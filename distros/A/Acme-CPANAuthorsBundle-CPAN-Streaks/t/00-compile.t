@@ -6,18 +6,27 @@ use warnings;
 
 use Test::More;
 
-plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 19 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Acme/CPANAuthors/CPAN/Streaks/DailyDistributions.pm',
-    'Acme/CPANAuthors/CPAN/Streaks/DailyNewDistributions.pm',
-    'Acme/CPANAuthors/CPAN/Streaks/DailyReleases.pm',
-    'Acme/CPANAuthors/CPAN/Streaks/MonthlyDistributions.pm',
-    'Acme/CPANAuthors/CPAN/Streaks/MonthlyNewDistributions.pm',
-    'Acme/CPANAuthors/CPAN/Streaks/MonthlyReleases.pm',
-    'Acme/CPANAuthors/CPAN/Streaks/WeeklyDistributions.pm',
-    'Acme/CPANAuthors/CPAN/Streaks/WeeklyNewDistributions.pm',
-    'Acme/CPANAuthors/CPAN/Streaks/WeeklyReleases.pm',
+    'Acme/CPANAuthors/CPAN/Streaks/DailyDistributions/AllTime.pm',
+    'Acme/CPANAuthors/CPAN/Streaks/DailyDistributions/Current.pm',
+    'Acme/CPANAuthors/CPAN/Streaks/DailyNewDistributions/AllTime.pm',
+    'Acme/CPANAuthors/CPAN/Streaks/DailyNewDistributions/Current.pm',
+    'Acme/CPANAuthors/CPAN/Streaks/DailyReleases/AllTime.pm',
+    'Acme/CPANAuthors/CPAN/Streaks/DailyReleases/Current.pm',
+    'Acme/CPANAuthors/CPAN/Streaks/MonthlyDistributions/AllTime.pm',
+    'Acme/CPANAuthors/CPAN/Streaks/MonthlyDistributions/Current.pm',
+    'Acme/CPANAuthors/CPAN/Streaks/MonthlyNewDistributions/AllTime.pm',
+    'Acme/CPANAuthors/CPAN/Streaks/MonthlyNewDistributions/Current.pm',
+    'Acme/CPANAuthors/CPAN/Streaks/MonthlyReleases/AllTime.pm',
+    'Acme/CPANAuthors/CPAN/Streaks/MonthlyReleases/Current.pm',
+    'Acme/CPANAuthors/CPAN/Streaks/WeeklyDistributions/AllTime.pm',
+    'Acme/CPANAuthors/CPAN/Streaks/WeeklyDistributions/Current.pm',
+    'Acme/CPANAuthors/CPAN/Streaks/WeeklyNewDistributions/AllTime.pm',
+    'Acme/CPANAuthors/CPAN/Streaks/WeeklyNewDistributions/Current.pm',
+    'Acme/CPANAuthors/CPAN/Streaks/WeeklyReleases/AllTime.pm',
+    'Acme/CPANAuthors/CPAN/Streaks/WeeklyReleases/Current.pm',
     'Acme/CPANAuthorsBundle/CPAN/Streaks.pm'
 );
 

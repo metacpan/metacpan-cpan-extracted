@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 # import params is just one 'no-unicode-escape-permanently'
 # if set, then unicode escaping will not happen at
@@ -24,11 +24,12 @@ use YAML::PP qw/Load Dump/;
 # this also works with tricky cases but needs compilation
 # on M$ systems and that can be tricky :(
 #use YAML::XS;
+
 use Data::Dumper qw/Dumper/;
 use Data::Dump qw/pp/;
 use Data::Dump::Filtered;
 
-use Exporter; # we have our own import() don't import it
+use Exporter;
 # the EXPORT_OK and EXPORT_TAGS is code by [kcott] @ Perlmongs.org, thanks!
 # see https://perlmonks.org/?node_id=11115288
 our (@EXPORT_OK, %EXPORT_TAGS);
@@ -641,7 +642,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =head1 SYNOPSIS
 
@@ -1183,6 +1184,7 @@ then be fed back to L</dump2perl>.
 =back
 
 =head2 C<dump2perl>
+
     # CAVEAT: it will eval($dumpstring) internally, so
     #         check $dumpstring for malicious code beforehand
     #         it is a security risk if you don't.
@@ -1455,7 +1457,14 @@ C<json2perl.pl>, C<perl2json.pl>, C<yaml2perl.pl>
 
 =head1 CAVEATS
 
-A valid Perl variable may kill L<YAML::PP::Load> because
+I have to apologise here to the authors of L<YAML::PP>
+for defaming them because I clumsily wrote L<YAML::PP>
+when I wanted to write L<YAML>.
+
+So, the reality is that L<YAML::PP> does not have any
+problem in handling the edge-case below.
+
+A valid Perl variable may kill L<YAML>'s C<Load()> because
 of escapes and quotes. For example this:
 
     my $yamlstr = <<'EOS';
@@ -1463,7 +1472,7 @@ of escapes and quotes. For example this:
     - 682224
     - "\"w": 1
     EOS
-    my $pv = eval { YAML::PP::Load($yamlstr) };
+    my $pv = eval { YAML::Load($yamlstr) };
     if( $@ ){ die "failed(1): ". $@ }
     # it's dead
 
@@ -1476,9 +1485,21 @@ Strangely, there is no problem for this:
     EOS
     # this is OK also:
     # - \"w: 1
-    my $pv = eval { YAML::PP::Load($yamlstr) };
+    my $pv = eval { YAML::Load($yamlstr) };
     if( $@ ){ die "failed(1): ". $@ }
     # it's OK! still alive.
+
+I have provided an author-only test (C<make deficiencies>) which
+tests all three of them on the edge cases. Both L<YAML::PP>
+and L<YAML::XS> pass the tests.
+
+This L<YAML issue|https://github.com/ingydotnet/yaml-pm/issues/224> is
+relevant. Many thanks to CPAN authors L<TINITA|https://metacpan.org/author/TINITA>
+and L<INGY|https://metacpan.org/author/INGY> for their work on this, and
+on C<YAML*> too.
+
+For now, the plan is to still use L<YAML::PP> and avoid explicitly requiring
+L<YAML::XS> until L<YAML::Any> is ready.
 
 =head1 AUTHOR
 
@@ -1554,8 +1575,13 @@ L<Data::Dumper>'s incessant unicode escaping)
 
 =item and an anonymous monk
 
-=item CPAN member Slaven ReziE<263> (SREZIC) for testing
+=item CPAN author Slaven ReziE<263>
+(L<SREZIC|https://metacpan.org/author/SREZIC>) for testing
 the code and reporting numerous problems.
+
+=item CPAN authors L<TINITA|https://metacpan.org/author/TINITA>
+and L<INGY|https://metacpan.org/author/INGY>
+for working on an issue related to L<YAML>.
 
 =back
 

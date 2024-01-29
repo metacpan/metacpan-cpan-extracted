@@ -10,8 +10,8 @@ lib/Term/Completion/Multi.pm
 lib/Term/Completion/Path.pm
 Makefile.PL
 MANIFEST
-META.yml
-README
+META.json
+README.md
 t/00_load.t
 t/01_basic.t
 t/02_features.t
@@ -22,3 +22,4 @@ t/06_readkey.t
 t/07_multi.t
 t/08_path.t
 t/09_scroll.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)

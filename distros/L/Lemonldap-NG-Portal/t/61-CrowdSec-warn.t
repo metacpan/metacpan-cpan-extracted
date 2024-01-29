@@ -1,7 +1,6 @@
 use warnings;
 use Test::More;
 use strict;
-use lib 'inc';
 use IO::String;
 use Data::Dumper;
 use LWP::UserAgent;

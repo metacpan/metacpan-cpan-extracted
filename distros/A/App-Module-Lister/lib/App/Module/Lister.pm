@@ -2,7 +2,7 @@
 package App::Module::Lister;
 use strict;
 
-our $VERSION = '0.155';
+our $VERSION = '1.001';
 
 =encoding utf8
 
@@ -268,7 +268,7 @@ This source is in GitHub:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 The idea and some of the testing came from Adam Wohld.
 
@@ -276,7 +276,7 @@ Some bits stolen from C<mldistwatch> in the PAUSE code, by Andreas König.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic 2 license.
 

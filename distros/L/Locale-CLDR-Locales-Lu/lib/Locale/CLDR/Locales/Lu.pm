@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Lu - Package for language Luba-Katanga
 
 package Locale::CLDR::Locales::Lu;
 # This file auto generated from Data\common\main\lu.xml
-#	on Tue  5 Dec  1:20:30 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'Liakan',
@@ -88,7 +88,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Andore',
  			'AE' => 'Lemila alabu',
@@ -215,7 +215,6 @@ has 'display_name_region' => (
  			'MD' => 'Molidavi',
  			'MG' => 'Madagasikari',
  			'MH' => 'Lutanda lua Marishale',
- 			'MK' => 'Masedwane',
  			'ML' => 'Mali',
  			'MM' => 'Myamare',
  			'MN' => 'Mongoli',
@@ -331,7 +330,7 @@ has 'characters' => (
 			auxiliary => qr{[g r x]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
 			main => qr{[a á à b c d e é è ɛ {ɛ́} {ɛ̀} f h i í ì j k l m n {ng} {ny} o ó ò ɔ {ɔ́} {ɔ̀} p {ph} q s {shi} t u ú ù v w y z]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT

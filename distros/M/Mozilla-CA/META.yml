@@ -22,5 +22,5 @@ resources:
   bugtracker: https://github.com/libwww-perl/Mozilla-CA/issues
   license: https://www.mozilla.org/media/MPL/2.0/index.txt
   repository: https://github.com/libwww-perl/Mozilla-CA.git
-version: '20230821'
+version: '20231213'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

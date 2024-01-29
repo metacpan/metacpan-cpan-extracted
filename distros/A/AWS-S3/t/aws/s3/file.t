@@ -98,7 +98,7 @@ is(
     'signed_url'
 );
 
-no warnings 'once';
+no warnings qw/ once redefine /;
 my $mocked_response = Mocked::HTTP::Response->new( 200,'bar' );
 *LWP::UserAgent::Determined::request = sub { $mocked_response };
 $mocked_response->{_msg} = '';

@@ -107,5 +107,10 @@ Test::DBIx::OpenTracing::test_database(
             ],
         ],
     },
+    error_detection => {
+        sqlstate    => '42000',
+        err         => '1064',
+    },
 );
+
 done_testing();

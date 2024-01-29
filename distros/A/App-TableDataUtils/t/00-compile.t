@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/TableDataUtils.pm'
@@ -14,7 +14,8 @@ my @module_files = (
 
 my @scripts = (
     'script/gen-rand-table',
-    'script/td2csv'
+    'script/td2csv',
+    'script/this-tabledata-mod'
 );
 
 # no fake home requested

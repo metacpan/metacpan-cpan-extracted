@@ -9,33 +9,45 @@ Platforms of Peril is a terminal-based game. Assuming App::cpanminus
 terminal (possibly one with a square font such as White Rabbit and a
 black background) install and run the game via:
 
-    cpanm Game::PlatformsOfPeril
-    pperil
+  cpanm Game::PlatformsOfPeril
+  pperil
 
 
 There is some documentation about the game:
 
-    perldoc Game::PlatformsOfPeril
+  perldoc Game::PlatformsOfPeril
 
 
 For the source code, see:
 
-https://github.com/thrig/Game-PlatformsOfPeril
+https://thrig.me/src/Game-PlatformsOfPeril.git
 
 This can be built and installed (with dependencies) by running:
 
-    git clone https://github.com/thrig/Game-PlatformsOfPeril
-    cd Game-PlatformsOfPeril
-    cpanm File::ShareDir::Install
-    cpanm .
+  git clone https://thrig.me/src/Game-PlatformsOfPeril.git
+  cd Game-PlatformsOfPeril
+  cpanm File::ShareDir::Install
+  cpanm .
 
 or without dependencies the manual old fashioned way:
 
-    perl Makefile.PL && make && make test && make install
+  perl Makefile.PL && make && make test && make install
 
 Level maps are ASCII files; these are installed to
 
-    perl -MFile::ShareDir=:ALL \
-      -E 'say dist_dir q(Game-PlatformsOfPeril)'
+  perl -MFile::ShareDir=:ALL -E 'say dist_dir q(Game-PlatformsOfPeril)'
 
 or can be found in the git repository.
+
+Run "perl pop" to test the game in this directory, or "perl pop 7" to
+try out level 7, etc.
+
+To author a new version:
+
+  perl Makefile.PL && make && make test && make dist
+  cpanm Game-PlatformsOfPeril...
+  pperil					# does it run once installed?
+  git tag v...
+  cpan-upload ...
+  git push ...
+  make realclean

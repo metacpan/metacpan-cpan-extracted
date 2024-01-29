@@ -1,5 +1,10 @@
 Revision history for Device-Chip-AnalogConverters
 
+0.16    2023-12-21
+        [CHANGES]
+         * Updated for Teest::ExpectAndCheck::Future v0.04
+         * Use Object::Pad::MOP rather than `no strict 'refs'` hackery
+
 0.15    2023-08-13
         [CHANGES]
          * General module style updates:

@@ -6,7 +6,7 @@ use warnings;
 use English;
 use Syntax::Keyword::Try;
 
-use Test::More tests => 23;
+use Test::More tests => 24;
 
 use Log::Log4perl;
 Log::Log4perl->easy_init( { level   => 'ERROR' } );
@@ -27,7 +27,7 @@ BEGIN {
 #diag "Connector::Proxy::Proc::SafeExec\n";
 ###########################################################################
 SKIP: {
-    skip "Proc::SafeExec not installed", 22 if $req_err;
+    skip "Proc::SafeExec not installed", 23 if $req_err;
 
     require_ok('Connector::Proxy::Proc::SafeExec');
     my $conn = Connector::Proxy::Proc::SafeExec->new(
@@ -132,8 +132,9 @@ SKIP: {
     $conn->stdin();
     $conn->args(['--echo','[% FILE %]']);
 
-    SKIP_CF: {
-        skip "Not supported on MacOS", 1 if $^O eq 'darwin';
+    if ( $^O eq 'darwin' ) {
+        like( $conn->set('foo', { payload => "Hello World" } ), qr@/var/folders/.+@ , 'Creating file');
+    } else {
         like( $conn->set('foo', { payload => "Hello World" } ), qr@/tmp/\w+/\w+@ , 'Creating file');
     }
 

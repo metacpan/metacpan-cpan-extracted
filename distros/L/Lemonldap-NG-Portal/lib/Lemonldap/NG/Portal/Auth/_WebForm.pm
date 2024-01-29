@@ -19,7 +19,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PASSWORDFORMEMPTY
 );
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.18.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -155,8 +155,12 @@ sub setAuthSessionInfo {
     # Store submitted password if set in configuration
     # WARNING: it can be a security hole
     if ( $self->conf->{storePassword} ) {
-        $req->{sessionInfo}->{'_password'} = $req->data->{'newpassword'}
-          || $req->data->{'password'};
+        my $passwordToStore =
+          $req->data->{'newpassword'} || $req->data->{'password'};
+        $req->{sessionInfo}->{'_password'} =
+            $self->conf->{storePasswordEncrypted}
+          ? $self->p->HANDLER->tsv->{cipher}->encrypt($passwordToStore)
+          : $passwordToStore;
     }
 
     # Store user timezone
@@ -185,6 +189,7 @@ sub setSecurity {
     }
 }
 
+# DEPRECATED, use get2fTplParams
 sub getFormParams {
     my ( $self, $req ) = @_;
     my $checkLogins = $req->param('checkLogins');

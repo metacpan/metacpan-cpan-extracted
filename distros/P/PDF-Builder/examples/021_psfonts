@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
 # wants one or more font names on the command line. They must have a file
-# extension of .pfa or .pfb, and have an associated metrics file of the same
-# path and name, except with extension .afm or .pfm respectively.
+# extension of .pfa, .pfb, or .t1 and have an associated metrics file of the 
+# same path and name, except with extension .afm or .pfm respectively.
 
 # CAUTION: the displayed Unicode value (U+xxxx) appears to be correct in most
 # cases, except that the MS Smart Quotes (32 characters) are given as U+0080
@@ -102,6 +102,7 @@ for ($i=0; $i<scalar @gns; $i++) {
     $base =~ m#([^/\\]+)$#;
     $base = $1;
     $base =~ s#\.pf[ab]$##i;
+    $base =~ s#\.t1$##i;
 
     # at least one page for each encoding 
     foreach my $ec (split / /, $ecs[$i]) {
@@ -228,7 +229,7 @@ for ($i=0; $i<scalar @gns; $i++) {
         $txt->transform(-translate => [50, 800]);
         $txt->fillcolor('black');
         $txt->font($fnt, 18);
-        $txt->lead(18*1.25);
+        $txt->leading(18*1.25);
         my $toprint;
         while ($textL ne '') {
         	($toprint, $textL) = $txt->_text_fill_line($textL, 500, 0);
@@ -268,7 +269,7 @@ flags_1 --
      following glyph file names until a new -e.
 
 glyph_file --
-  a .pfa or .pfb extension T1 (PS) glyph file (with path)
+  a .pfa or .pfb or .t1 extension Type 1 (PS) glyph file (with path)
 
 flags_2 --
   -m  metrics files paths
@@ -300,7 +301,7 @@ Going through glyph file names, the complete path, name, and extension
   will search for the metrics file (.afm or .pfm) using each metrics
   file path entry appended to the glyph file path, the base name of
   the glyph file, and each extension .afm and .pfm are tried (in that
-  order for a .pfa glyph file, and in the reverse order for a .pfb
+  order for a .pfa or .t1 glyph file, and in the reverse order for a .pfb
   glyph file). Matching of extensions is case-insensitive, even on
   Linux systems (e.g., times-roman.AFM is considered a match for
   times-roman.pfb).
@@ -408,10 +409,10 @@ sub processCMD {
           
         # split into path, basename, extension
         ($path, $basename, $extension) = splitPath($token);
-        if ($extension =~ m/^pf[ab]$/i) {
+        if ($extension =~ m/^pf[ab]$/i || $extension =~ m/^t1$/i) {
 	    # acceptable extension name
         } else {
-	    print "expected glyph file extension .pfa or .pfb not found in glyph file '$token' (arg $tokenNumber)\n";
+	    print "expected glyph file extension .pfa, .pfb, or .t1 not found in glyph file '$token' (arg $tokenNumber)\n";
 	    return 1;
         }
 
@@ -559,7 +560,7 @@ sub makeMPath {
 
     # try each gPath + gName + afm or pfm
     # .pfa tries .afm before .pfm, .pfb tries .pfm before .afm
-    my @extList = qw/ .afm .pfm /;
+    my @extList = qw/ .afm .pfm /; # also use for .t1
     if ($gExt =~ m#^pfb$#i) {
         @extList = qw/ .pfm .afm /; # or reverse @extList
     }

@@ -4,9 +4,9 @@ use 5.010001;
 use strict 'subs', 'vars';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-30'; # DATE
+our $DATE = '2024-01-17'; # DATE
 our $DIST = 'Data-Sah-DefaultValue'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our %common_args = (
     default_value_rules => {
@@ -55,6 +55,18 @@ _
             schema => 'str*',
             req => 1,
         },
+        extra_args => {
+            summary => 'Extra arguments to pass to value() subroutine',
+            schema => 'hash*',
+            description => <<'MARKDOWN',
+
+This is used, for example, by <pm:Data::Sah> when generating validation code
+from Sah schema. Sometimes the default value rule needs to know additional
+information like what a date type should be coerced to (DateTime object, or
+epoch) so it can generate the appropriate default value.
+
+MARKDOWN
+        },
     },
 };
 sub get_default_value_rules {
@@ -77,8 +89,20 @@ sub get_default_value_rules {
 
     my @rules;
     for my $item (@rules0) {
-        my $rule_name = ref $item eq 'ARRAY' ? $item->[0] : $item;
-        my $rule_gen_args = ref $item eq 'ARRAY' ? $item->[1] : undef;
+        my ($rule_name, $rule_gen_args);
+        if (ref $item eq 'ARRAY') {
+            $rule_name = $item->[0];
+            $rule_gen_args = $item->[1];
+        } else {
+            if ($item =~ /(.*?)=(.*)/) {
+                $rule_name = $1;
+                $rule_gen_args = {split /,/, $2};
+            } else {
+                $rule_name = $item;
+                $rule_gen_args = undef;
+            }
+        }
+
         my $mod = $prefix . $rule_name;
         (my $mod_pm = "$mod.pm") =~ s!::!/!g;
         require $mod_pm;
@@ -92,6 +116,7 @@ sub get_default_value_rules {
         }
         my $rule = &{"$mod\::value"}(
             (args => $rule_gen_args) x !!$rule_gen_args,
+            %{ $args{extra_args} // {} },
         );
         $rule->{name} = $rule_name;
         $rule->{meta} = $rule_meta;
@@ -116,7 +141,7 @@ Data::Sah::DefaultValueCommon - Common stuffs for Data::Sah::DefaultValue and Da
 
 =head1 VERSION
 
-This document describes version 0.003 of Data::Sah::DefaultValueCommon (from Perl distribution Data-Sah-DefaultValue), released on 2023-03-30.
+This document describes version 0.005 of Data::Sah::DefaultValueCommon (from Perl distribution Data-Sah-DefaultValue), released on 2024-01-17.
 
 =head1 FUNCTIONS
 
@@ -157,6 +182,15 @@ specifically include a rule, or C<!NAME> to exclude a rule.
 To use the default-value rules R1 and R2:
 
  ['R1', 'R2']
+
+=item * B<extra_args> => I<hash>
+
+Extra arguments to pass to value() subroutine.
+
+This is used, for example, by L<Data::Sah> when generating validation code
+from Sah schema. Sometimes the default value rule needs to know additional
+information like what a date type should be coerced to (DateTime object, or
+epoch) so it can generate the appropriate default value.
 
 
 =back
@@ -204,7 +238,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

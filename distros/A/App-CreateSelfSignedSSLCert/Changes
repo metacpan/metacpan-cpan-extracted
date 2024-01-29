@@ -1,31 +1,36 @@
-0.151   2019-04-18 (PERLANCAR)
+0.152   2023-10-05  Released-By: PERLANCAR; Urgency: medium
+
+        - [doc] Mention App::sslmaker.
+
+
+0.151   2019-04-18  Released-By: PERLANCAR
 
 	- No changes.
 
         - [build] Rebuild to update generated CLI's.
 
 
-0.150   2017-10-11 (PERLANCAR)
+0.150   2017-10-11  Released-By: PERLANCAR
 
 	- Split app backend to its own dist AppLib-CreateSelfSignedSSLCert so it
           can be used without having to depend on Perinci::CmdLine et al.
 
 
-0.14    2017-07-08 (PERLANCAR)
+0.14    2017-07-08  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.13    2016-06-09 (PERLANCAR)
+0.13    2016-06-09  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [dist] Replace Log::Any::For::Builtins with IPC::System::Options.
 
 
-0.12    2016-01-18 (PERLANCAR)
+0.12    2016-01-18  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -34,7 +39,7 @@
         - Bump prereq version Log::Any::IfLOG to 0.07.
 
 
-0.11    2015-08-18 (PERLANCAR)
+0.11    2015-08-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -43,27 +48,27 @@
 	  requirement.
 
 
-0.10    2015-08-17 (PERLANCAR)
+0.10    2015-08-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
 
-0.09    2015-04-02 (PERLANCAR)
+0.09    2015-04-02  Released-By: PERLANCAR
 
 	- [ux] Tweak Rinci metadata: add completion for ca (*.crt + *.pem
 	  files) & ca_key (*.key + *.pem files).
 
 
-0.08     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.08     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          - [build] CLI scripts are now generated automatically using
            Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
            generated script is not as polished as it should be. Stay tuned.
 
 
-0.07     2014-07-22 (SHARYANTO)
+0.07     2014-07-22  Released-By: SHARYANTO
 
          - No functional changes.
 
@@ -71,7 +76,7 @@
            Perinci::CmdLine::Any to reduce size of dependencies.
 
 
-0.06    2014-07-02 (SHARYANTO)
+0.06    2014-07-02  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -80,7 +85,7 @@
           installing [RT#96884]
 
 
-0.05    2014-06-19 (SHARYANTO)
+0.05    2014-06-19  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -91,7 +96,7 @@
           case App::FooBarBaz and dist App-FooBarBaz.
 
 
-0.04    2014-06-19 (SHARYANTO)
+0.04    2014-06-19  Released-By: SHARYANTO
 
         - No functinal changes.
 
@@ -99,7 +104,7 @@
           App-create-self-signed-ssl-cert, to reflect the name of the binary.
 
 
-0.03    2014-05-22 (SHARYANTO)
+0.03    2014-05-22  Released-By: SHARYANTO
 
         - Add utility: create-ssl-csr.
 
@@ -108,7 +113,7 @@
         - [Bugfix] --wildcard option didn't create CN=*.host.com.
 
 
-0.02    2014-03-26 (SHARYANTO)
+0.02    2014-03-26  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -116,6 +121,7 @@
           context.
 
 
-0.01    2014-03-26 (SHARYANTO)
+0.01    2014-03-26  Released-By: SHARYANTO
 
         - First release.
+

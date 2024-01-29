@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-use POSIX 'SIGUSR1';
+use POSIX qw/SIGUSR1 WEXITSTATUS/;
 use IO::Select;
 use Linux::FD::Pid;
 
@@ -39,7 +39,7 @@ if ($pid) {
 	is($buffer, 'USR1');
 	my $out_clone = $pidfd->get_handle($outfd);
 	alarm 2;
-	is($pidfd->wait, 42, 'Pid returns 42');
+	is(WEXITSTATUS($pidfd->wait), 42, 'Pid returns 42');
 	syswrite $out_clone, 'Bar' or die;
 	read $in, $buffer, 3 or die;
 	is($buffer, "Bar");

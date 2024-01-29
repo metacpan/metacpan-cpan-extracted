@@ -39,7 +39,7 @@ if ($read) {
         my @e = split /\s+/;
 
         die "integer numbers separated by whitespace expected\n"
-            if !@ || grep { !/^(?:0|[1-9][0-9]*)\z/ } @e;
+            if !@e || grep { !/^(?:0|[1-9][0-9]*)\z/ } @e;
 
         my $s0 = Math::DifferenceSet::Planar->from_elements(@e);
         process($s0);

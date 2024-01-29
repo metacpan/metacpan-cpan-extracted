@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -71,7 +71,6 @@
             "Dist::Zilla::Plugin::Test::PodSpelling" : "0",
             "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
             "Dist::Zilla::Plugin::Test::TrailingSpace" : "0",
-            "Dist::Zilla::Plugin::Test::UnusedVars" : "0",
             "Dist::Zilla::Plugin::Test::Version" : "0",
             "Dist::Zilla::PluginBundle::Basic" : "0",
             "Dist::Zilla::PluginBundle::Filter" : "0",
@@ -95,7 +94,6 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Spelling" : "0.12",
             "Test::TrailingSpace" : "0.0203",
-            "Test::Vars" : "0",
             "Test::Version" : "1"
          }
       },
@@ -110,6 +108,7 @@
             "Getopt::Long" : "0",
             "IPC::System::Simple" : "0",
             "JSON::PP" : "0",
+            "List::Util" : "1.33",
             "Module::Find" : "0",
             "Params::Validate" : "0",
             "Pod::Usage" : "0",
@@ -141,22 +140,23 @@
             "Test2::API" : "0",
             "Test2::V0" : "0",
             "Test::Lib" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::Script" : "0"
          }
       }
    },
    "provides" : {
       "App::Env" : {
          "file" : "lib/App/Env.pm",
-         "version" : "1.02"
+         "version" : "1.04"
       },
       "App::Env::Example" : {
          "file" : "lib/App/Env/Example.pm",
-         "version" : "1.02"
+         "version" : "1.04"
       },
       "App::Env::Null" : {
          "file" : "lib/App/Env/Null.pm",
-         "version" : "1.02"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
@@ -166,13 +166,14 @@
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env"
       },
       "repository" : {
-         "url" : "https://gitlab.com/djerius/App-Env.git",
-         "web" : "https://gitlab.com/djerius/App-Env"
+         "type" : "git",
+         "url" : "https://gitlab.com/djerius/app-env.git",
+         "web" : "https://gitlab.com/djerius/app-env"
       }
    },
-   "version" : "1.02",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
+   "version" : "1.04",
+   "x_generated_by_perl" : "v5.36.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

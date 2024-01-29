@@ -3,27 +3,37 @@ package Ixchel::Actions::perl;
 use 5.006;
 use strict;
 use warnings;
-use File::Slurp;
 use Ixchel::functions::perl_module_via_pkg;
 use Ixchel::functions::install_cpanm;
+use base 'Ixchel::Actions::base';
 
 =head1 NAME
 
-Ixchel::Actions::perl :: Handles making sure desired Perl modules are installed as specified by the config.
+Ixchel::Actions::perl - Handles making sure desired Perl modules are installed as specified by the config.
 
 =head1 VERSION
 
-Version 0.0.2
+Version 0.3.0
 
 =cut
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.3.0';
 
-=head1 SYNOPSIS
+=head1 CLI SYNOPSIS
 
-    use Data::Dumper;
+ixchel -a perl [B<--notest>] [B<--reinstall>] [B<--force>]
+
+=head1 CODE SYNOPSIS
 
     my $results=$ixchel->action(action=>'perl', opts=>{}'});
+
+    if ($results->{ok}) {
+        print $results->{status_text};
+    }else{
+        die('Action errored... '.joined("\n", @{$results->{errors}}));
+    }
+
+=head1 DESCRIPTION
 
 The modules to be installed are determined by the config.
 
@@ -49,15 +59,15 @@ The modules to be installed are determined by the config.
 
 =head1 FLAGS
 
-==head2 --notest
+=head2 --notest
 
 When calling cpanm, add --notest to it.
 
-==head2 --reinstall
+=head2 --reinstall
 
 When calling cpanm, add --reinstall to it.
 
-==head2 --force
+=head2 --force
 
 When calling cpanm, add --force to it.
 
@@ -69,64 +79,10 @@ When calling cpanm, add --force to it.
 
 =cut
 
-sub new {
-	my ( $empty, %opts ) = @_;
+sub new_extra { }
 
-	my $self = {
-		config => {},
-		vars   => {},
-		arggv  => [],
-		opts   => {},
-	};
-	bless $self;
-
-	if ( defined( $opts{config} ) ) {
-		$self->{config} = $opts{config};
-	}
-
-	if ( defined( $opts{t} ) ) {
-		$self->{t} = $opts{t};
-	} else {
-		die('$opts{t} is undef');
-	}
-
-	if ( defined( $opts{share_dir} ) ) {
-		$self->{share_dir} = $opts{share_dir};
-	}
-
-	if ( defined( $opts{opts} ) ) {
-		$self->{opts} = \%{ $opts{opts} };
-	}
-
-	if ( defined( $opts{argv} ) ) {
-		$self->{argv} = $opts{argv};
-	}
-
-	if ( defined( $opts{vars} ) ) {
-		$self->{vars} = $opts{vars};
-	}
-
-	if ( defined( $opts{ixchel} ) ) {
-		$self->{ixchel} = $opts{ixchel};
-	}
-
-	$self->{results} = {
-		errors      => [],
-		status_text => '',
-		ok          => 0,
-	};
-
-	return $self;
-} ## end sub new
-
-sub action {
+sub action_extra {
 	my $self = $_[0];
-
-	$self->{results} = {
-		errors      => [],
-		status_text => '',
-		ok          => 0,
-	};
 
 	# if we've already installed cpanm or not
 	my $installed_cpanm = 0;
@@ -149,6 +105,8 @@ sub action {
 	$self->status_add( status => 'pkgs_require: ' . join( ',', @{ $self->{config}{perl}{pkgs_require} } ), );
 
 	# handle ones that must be installed via pkgs
+	my @failed_pkg_required;
+	my @pkgs_installed;
 	if ( ref( $self->{config}{perl}{pkgs_require} ) eq 'ARRAY' ) {
 		$self->status_add( status => 'pkgs_require: ' . join( ',', @{ $self->{config}{perl}{pkgs_require} } ), );
 		foreach my $module ( @{ $self->{config}{perl}{pkgs_require} } ) {
@@ -160,10 +118,12 @@ sub action {
 					error  => 1
 				);
 				$tried_via_packages{$module} = 1;
+				push( @failed_pkg_required, $module );
 			} else {
 				$self->{results}{status_text} = $self->{results}{status_text} . $status;
 				$self->status_add( status => $module . ' installed' );
 				$installed{$module} = 1;
+				push( @pkgs_installed, $module );
 			}
 		} ## end foreach my $module ( @{ $self->{config}{perl}{pkgs_require...}})
 	} ## end if ( ref( $self->{config}{perl}{pkgs_require...}))
@@ -180,15 +140,13 @@ sub action {
 			if ($@) {
 				# not an error here as it using packages is optional and will be used later.
 				push( @modules, $module );
-				$self->status_add(
-					status => 'Failed to install ' . $module . ' via packages',
-					error  => 0
-				);
+				$self->status_add( status => 'Failed to install ' . $module . ' via packages', );
 				$tried_via_packages{$module} = 1;
 			} else {
 				$self->{results}{status_text} = $self->{results}{status_text} . $status;
 				$self->status_add( status => $module . ' installed' );
 				$installed{$module} = 1;
+				push( @pkgs_installed, $module );
 			}
 		} ## end foreach my $module ( @{ $self->{config}{perl}{pkgs_optional...}})
 	} ## end if ( ref( $self->{config}{perl}{pkgs_optional...}))
@@ -199,6 +157,8 @@ sub action {
 
 	$self->status_add( status => 'modules: ' . join( ',', @modules ) );
 
+	my @installed_via_cpanm;
+	my @cpanm_failed;
 	foreach my $module (@modules) {
 		if (   $self->{config}{perl}{pkgs_always_try}
 			&& !defined( $installed{$module} )
@@ -209,10 +169,7 @@ sub action {
 			if ($@) {
 				# not an error here as it using packages is optional and will be used later.
 				push( @modules, $module );
-				$self->status_add(
-					status => 'Failed to install ' . $module . ' via packages',
-					error  => 0
-				);
+				$self->status_add( status => 'Failed to install ' . $module . ' via packages', );
 			} else {
 				$self->{results}{status_text} = $self->{results}{status_text} . $status;
 				$self->status_add( status => $module . ' installed' );
@@ -230,7 +187,7 @@ sub action {
 				if ($@) {
 					$self->status_add( status => 'Failed to install cpanm via packages ... ' . $@, error => 1 );
 					# can't proceced beyond here as cpanm is required
-					return $self->{results};
+					return undef;
 				} else {
 					$self->status_add( status => 'cpanm installed' );
 				}
@@ -255,27 +212,30 @@ sub action {
 					status => 'cpanm failed: ' . join( ' ', @cpanm_args ),
 					error  => 1,
 				);
+				push( @cpanm_failed, $module );
 			} else {
 				$installed{$module} = 1;
+				push( @installed_via_cpanm, $module );
 			}
 
 		} ## end if ( !defined( $installed{$module} ) )
 	} ## end foreach my $module (@modules)
+	$self->status_add( status => 'Installed: ' . join( ',', keys( %{installed} ) ) );
+	if ( defined( $installed_via_cpanm[0] ) ) {
+		$self->status_add( status => 'Installed Via CPANM: ' . join( ',', @installed_via_cpanm ) );
+	}
+	if ( defined( $pkgs_installed[0] ) ) {
+		$self->status_add( status => 'Installed Via CPANM: ' . join( ',', @pkgs_installed ) );
+	}
+	if ( defined( $cpanm_failed[0] ) ) {
+		$self->status_add( status => 'CPANM Failed: ' . join( ',', @cpanm_failed ) );
+	}
+	if ( defined( $failed_pkg_required[0] ) ) {
+		$self->status_add( status => 'Failed Required By Pkg: ' . join( ',', @failed_pkg_required ) );
+	}
 
-	return $self->{results};
-} ## end sub action
-
-sub help {
-	return 'Install Perl modules specified by the config.
-
-
---notest      When calling cpanm, add --notest to it.
-
---reinstall   When calling cpanm, add --reinstall to it.
-
---force       When calling cpanm, add --force to it.
-';
-} ## end sub help
+	return undef;
+} ## end sub action_extra
 
 sub short {
 	return 'Install Perl modules specified by the config.';
@@ -288,34 +248,5 @@ force
 reinstall
 ';
 }
-
-sub status_add {
-	my ( $self, %opts ) = @_;
-
-	if ( !defined( $opts{status} ) ) {
-		return;
-	}
-
-	if ( !defined( $opts{error} ) ) {
-		$opts{error} = 0;
-	}
-
-	if ( !defined( $opts{type} ) ) {
-		$opts{type} = 'perl';
-	}
-
-	my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) = localtime(time);
-	my $timestamp = sprintf( "%04d-%02d-%02dT%02d:%02d:%02d", $year + 1900, $mon + 1, $mday, $hour, $min, $sec );
-
-	my $status = '[' . $timestamp . '] [' . $opts{type} . ', ' . $opts{error} . '] ' . $opts{status};
-
-	print $status. "\n";
-
-	$self->{results}{status_text} = $self->{results}{status_text} . $status;
-
-	if ( $opts{error} ) {
-		push( @{ $self->{results}{errors} }, $opts{status} );
-	}
-} ## end sub status_add
 
 1;

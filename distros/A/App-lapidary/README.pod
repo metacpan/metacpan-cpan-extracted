@@ -1,0 +1,39 @@
+=head1 NAME
+
+lapidary - Determine the read coverage and identity to a protein database using diamond
+
+=head1 DESCRIPTION
+
+Determine the read coverage and identity of reads from fastq files to a protein database using diamond and reports the output to a file
+
+=head1 SYNOPSIS
+
+  $ lapidary -read_1 Examples/Reads/Paired_reads_1.fq.gz -read_2 Examples/Reads/Paired_reads_2.fq.gz -read_type paired -db Examples/Amino_acid_database.fasta
+...  
+Total time = 5.668s
+Reported 613 pairwise alignments, 613 HSPs.
+613 queries aligned.
+
+=head1 AUTHOR
+
+Samuel Bloomfield
+
+=head1 LICENSE
+
+GPL_3
+
+=head1 INSTALLATION
+
+Using C<cpan>:
+
+    $ cpan App::lapidary
+
+Manual install:
+
+    $ perl Makefile.PL
+    $ make
+    $ make install
+
+
+=cut
+

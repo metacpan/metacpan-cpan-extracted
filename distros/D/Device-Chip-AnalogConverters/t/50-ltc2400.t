@@ -19,7 +19,7 @@ await $chip->mount(
 # ->read_adc
 {
    $adapter->expect_readwrite( "\x00\x00\x00\x00" )
-      ->returns( "\x20\x12\x34\x50" );
+      ->will_done( "\x20\x12\x34\x50" );
 
    is( await $chip->read_adc,
       {

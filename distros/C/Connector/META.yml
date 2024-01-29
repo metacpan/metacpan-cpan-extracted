@@ -39,7 +39,7 @@ no_index:
 provides:
   Connector:
     file: lib/Connector.pm
-    version: '1.53'
+    version: '1.54'
   Connector::Builtin:
     file: lib/Connector/Builtin.pm
   Connector::Builtin::Authentication::LDAP:
@@ -134,7 +134,7 @@ resources:
   bugtracker: https://github.com/whiterabbitsecurity/connector/issues
   homepage: https://github.com/whiterabbitsecurity/connector
   repository: git://github.com/whiterabbitsecurity/connector.git
-version: '1.53'
+version: '1.54'
 x_contributors:
   - 'Martin Bartosch <m.bartosch@cynops.de>'
   - 'Martin Bartosch <mbartosch@whiterabbitsecurity.com>'

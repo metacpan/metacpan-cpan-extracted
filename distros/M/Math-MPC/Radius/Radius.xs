@@ -488,50 +488,23 @@ Rmpcr_set_str_2str (rop, mantissa, exponent)
 	mpcr_ptr	rop
 	char *	mantissa
 	char *	exponent
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_set_str_2str(rop, mantissa, exponent);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_clear (op)
 	mpcr_ptr	op
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_clear(op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 DESTROY (op)
 	mpcr_ptr	op
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         DESTROY(op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 int
 Rmpcr_inf_p (op)
@@ -553,103 +526,49 @@ Rmpcr_cmp (op1, op2)
 void
 Rmpcr_set_inf (op)
 	mpcr_ptr	op
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_set_inf(op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_set_zero (op)
 	mpcr_ptr	op
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_set_zero(op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_set_one (op)
 	mpcr_ptr	op
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_set_one(op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_set (rop, op)
 	mpcr_ptr	rop
 	mpcr_ptr	op
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_set(rop, op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_set_ui64_2si64 (rop, mantissa, exponent)
 	mpcr_ptr	rop
 	UV	mantissa
 	IV	exponent
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_set_ui64_2si64(aTHX_ rop, mantissa, exponent);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_max (rop, op1, op2)
 	mpcr_ptr	rop
 	mpcr_ptr	op1
 	mpcr_ptr	op2
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_max(rop, op1, op2);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 IV
 Rmpcr_get_exp (op)
@@ -666,241 +585,115 @@ void
 Rmpcr_out_str (stream, op)
 	FILE *	stream
 	mpcr_ptr	op
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_out_str(aTHX_ stream, op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_out_str_win (stream, op)
 	FILE *	stream
 	mpcr_ptr	op
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_out_str_win(aTHX_ stream, op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_print (op)
 	mpcr_ptr	op
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_print(aTHX_ op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_print_win (op)
 	mpcr_ptr	op
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_print_win(aTHX_ op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_say (op)
 	mpcr_ptr	op
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_say(aTHX_ op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_say_win (op)
 	mpcr_ptr	op
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_say_win(aTHX_ op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_add (rop, op1, op2)
 	mpcr_ptr	rop
 	mpcr_ptr	op1
 	mpcr_ptr	op2
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_add(rop, op1, op2);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_sub (rop, op1, op2)
 	mpcr_ptr	rop
 	mpcr_ptr	op1
 	mpcr_ptr	op2
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_sub(rop, op1, op2);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_mul (rop, op1, op2)
 	mpcr_ptr	rop
 	mpcr_ptr	op1
 	mpcr_ptr	op2
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_mul(rop, op1, op2);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_div (rop, op1, op2)
 	mpcr_ptr	rop
 	mpcr_ptr	op1
 	mpcr_ptr	op2
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_div(rop, op1, op2);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_mul_2ui (rop, op, ui)
 	mpcr_ptr	rop
 	mpcr_ptr	op
 	unsigned long	ui
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_mul_2ui(rop, op, ui);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_div_2ui (rop, op, ui)
 	mpcr_ptr	rop
 	mpcr_ptr	op
 	unsigned long	ui
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_div_2ui(rop, op, ui);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_sqr (rop, op)
 	mpcr_ptr	rop
 	mpcr_ptr	op
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_sqr(rop, op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_sqrt (rop, op)
 	mpcr_ptr	rop
 	mpcr_ptr	op
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_sqrt(rop, op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_sub_rnd (rop, op1, op2, round)
@@ -908,69 +701,34 @@ Rmpcr_sub_rnd (rop, op1, op2, round)
 	mpcr_ptr	op1
 	mpcr_ptr	op2
 	SV *	round
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_sub_rnd(aTHX_ rop, op1, op2, round);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_c_abs_rnd (rop, mpc_op, round)
 	mpcr_ptr	rop
 	mpc_ptr	mpc_op
 	SV *	round
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_c_abs_rnd(aTHX_ rop, mpc_op, round);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_add_rounding_error (rop, op, round)
 	mpcr_ptr	rop
 	SV *	op
 	SV *	round
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpcr_add_rounding_error(aTHX_ rop, op, round);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpcr_split (op)
 	mpcr_ptr	op
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
+        PL_markstack_ptr++;
         Rmpcr_split(aTHX_ op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
         return; /* assume stack size is correct */
 
 SV *

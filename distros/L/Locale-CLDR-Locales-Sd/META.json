@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "DateTime" : "0.72",
-            "Locale::CLDR" : "v0.34.4",
+            "Locale::CLDR" : "v0.40.1",
             "Moo" : "2",
             "MooX::ClassAttribute" : "0.011",
             "Type::Tiny" : "0",
@@ -46,15 +46,23 @@
    "provides" : {
       "Locale::CLDR::Locales::Sd" : {
          "file" : "lib/Locale/CLDR/Locales/Sd.pm",
-         "version" : "v0.34.4"
+         "version" : "v0.40.1"
       },
-      "Locale::CLDR::Locales::Sd::Any" : {
-         "file" : "lib/Locale/CLDR/Locales/Sd/Any.pm",
-         "version" : "v0.34.4"
+      "Locale::CLDR::Locales::Sd::Arab" : {
+         "file" : "lib/Locale/CLDR/Locales/Sd/Arab.pm",
+         "version" : "v0.40.1"
       },
-      "Locale::CLDR::Locales::Sd::Any::Pk" : {
-         "file" : "lib/Locale/CLDR/Locales/Sd/Any/Pk.pm",
-         "version" : "v0.34.4"
+      "Locale::CLDR::Locales::Sd::Arab::Pk" : {
+         "file" : "lib/Locale/CLDR/Locales/Sd/Arab/Pk.pm",
+         "version" : "v0.40.1"
+      },
+      "Locale::CLDR::Locales::Sd::Deva" : {
+         "file" : "lib/Locale/CLDR/Locales/Sd/Deva.pm",
+         "version" : "v0.40.1"
+      },
+      "Locale::CLDR::Locales::Sd::Deva::In" : {
+         "file" : "lib/Locale/CLDR/Locales/Sd/Deva/In.pm",
+         "version" : "v0.40.1"
       }
    },
    "release_status" : "stable",
@@ -67,6 +75,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.34.4",
+   "version" : "v0.40.1",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

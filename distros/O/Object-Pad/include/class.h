@@ -8,6 +8,7 @@ struct ClassMeta {
   enum MetaType type : 8;
   enum ReprType repr : 8;
 
+  unsigned int begun : 1;
   unsigned int sealed : 1;
   unsigned int role_is_invokable : 1;
   unsigned int strict_params : 1;
@@ -28,7 +29,7 @@ struct ClassMeta {
   HV *stash;
   AV *pending_submeta; /* NULL, or AV containing raw ClassMeta pointers to subclasses pending seal */
   AV *hooks;           /* NULL, or AV of raw pointers directly to ClassHook structs */
-  AV *direct_fields;   /* each elem is a raw pointer directly to a FieldMeta */
+  AV *fields;          /* each elem is a raw pointer directly to a FieldMeta */
   AV *direct_methods;  /* each elem is a raw pointer directly to a MethodMeta */
   HV *parammap;        /* NULL, or each elem is a raw pointer directly at a ParamMeta (MERGED) */
   AV *requiremethods;  /* each elem is an SVt_PV giving a name */
@@ -44,13 +45,13 @@ struct ClassMeta {
 
   SuspendedCompCVBuffer initfields_compcv; /* temporary PL_compcv + associated state during initfields */
   OP *initfields_lines;                    /* temporary OP_LINESEQ to contain the initfield ops */
-  FIELDOFFSET next_fieldix_for_initfields; /* how many fields have we seen so far? */
+  U32 next_field_for_initfields;           /* how many fields have we seen so far? (offset into direct_fields, !NOT! fieldix) */
 
   SuspendedCompCVBuffer adjust_compcv; /* temporary PL_compcv + associated state during true-block ADJUSTs */
   CV *adjust_methodscope;              /* temporary CV used during compilation of ADJUST blocks */
   AV *adjust_params;                   /* temporary AV of the params used by true-block ADJUST :params */
   OP *adjust_lines;                    /* temporary OP_LINESEQ to contain true-block ADJUSTs */
-  FIELDOFFSET next_fieldix_for_adjust; /* how many fields have we seen so far? */
+  U32 next_field_for_adjust;           /* how many fields have we seen so far? (offset into direct_fields; !NOT! fieldix) */
 
   union {
     /* Things that only true classes have */
@@ -137,8 +138,8 @@ RoleEmbedding **ObjectPad_mop_class_get_all_roles(pTHX_ const ClassMeta *meta, U
 #define prepare_method_parse(meta)  ObjectPad__prepare_method_parse(aTHX_ meta)
 void ObjectPad__prepare_method_parse(pTHX_ ClassMeta *meta);
 
-#define add_fields_to_pad(meta, since_fieldix)  ObjectPad__add_fields_to_pad(aTHX_ meta, since_fieldix)
-void ObjectPad__add_fields_to_pad(pTHX_ ClassMeta *meta, FIELDOFFSET since_fieldix);
+#define add_fields_to_pad(meta, since_field)  ObjectPad__add_fields_to_pad(aTHX_ meta, since_field)
+void ObjectPad__add_fields_to_pad(pTHX_ ClassMeta *meta, U32 since_field);
 
 #define start_method_parse(meta, is_common)  ObjectPad__start_method_parse(aTHX_ meta, is_common)
 void ObjectPad__start_method_parse(pTHX_ ClassMeta *meta, bool is_common);

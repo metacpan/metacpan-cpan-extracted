@@ -6,7 +6,7 @@ use Test::More;
 BEGIN { require "./t/utils.pl" }
 our (@AvailableDrivers);
 
-use constant TESTS_PER_DRIVER => 18;
+use constant TESTS_PER_DRIVER => 19;
 
 my $total = scalar(@AvailableDrivers) * TESTS_PER_DRIVER;
 plan tests => $total;
@@ -125,6 +125,19 @@ diag "FUNCTION w/0 ? and () in Column" if $ENV{'TEST_VERBOSE'};
     );
 }
 
+diag "CAST FUNCTION in Column" if $ENV{'TEST_VERBOSE'};
+{
+    my $users_obj = $clean_obj->Clone;
+    $users_obj->UnLimit;
+    $users_obj->OrderByCols( { FIELD => $handle->CastAsDecimal('DeptNumber') } );
+    $users_obj->Column(FIELD => 'DeptNumber');
+    is_deeply(
+        [ map $_->DeptNumber, @{ $users_obj->ItemsArrayRef } ],
+        [ 2, 5, 30, 100 ],
+        'correct values',
+    );
+}
+
     cleanup_schema( 'TestApp', $handle );
 
 }} # SKIP, foreach blocks
@@ -138,7 +151,8 @@ sub schema_sqlite {
 q{
 CREATE TABLE Users (
     id integer primary key,
-    Login varchar(36)
+    Login varchar(36),
+    DeptNumber varchar(36)
 ) },
 q{
 CREATE TABLE UsersToGroups (
@@ -159,7 +173,30 @@ sub schema_mysql {
 q{
 CREATE TEMPORARY TABLE Users (
     id integer primary key AUTO_INCREMENT,
-    Login varchar(36)
+    Login varchar(36),
+    DeptNumber varchar(36)
+) },
+q{
+CREATE TEMPORARY TABLE UsersToGroups (
+    id integer primary key AUTO_INCREMENT,
+    UserId  integer,
+    GroupId integer
+) },
+q{
+CREATE TEMPORARY TABLE `Groups` (
+    id integer primary key AUTO_INCREMENT,
+    Name varchar(36)
+) },
+]
+}
+
+sub schema_mariadb {
+[
+q{
+CREATE TEMPORARY TABLE Users (
+    id integer primary key AUTO_INCREMENT,
+    Login varchar(36),
+    DeptNumber varchar(36)
 ) },
 q{
 CREATE TEMPORARY TABLE UsersToGroups (
@@ -180,7 +217,8 @@ sub schema_pg {
 q{
 CREATE TEMPORARY TABLE Users (
     id serial primary key,
-    Login varchar(36)
+    Login varchar(36),
+    DeptNumber varchar(36)
 ) },
 q{
 CREATE TEMPORARY TABLE UsersToGroups (
@@ -200,7 +238,8 @@ sub schema_oracle { [
     "CREATE SEQUENCE Users_seq",
     "CREATE TABLE Users (
         id integer CONSTRAINT Users_Key PRIMARY KEY,
-        Login varchar(36)
+        Login varchar(36),
+        DeptNumber varchar(36)
     )",
     "CREATE SEQUENCE UsersToGroups_seq",
     "CREATE TABLE UsersToGroups (
@@ -244,18 +283,20 @@ sub _ClassAccessible {
         {read => 1, type => 'int(11)'}, 
         Login => 
         {read => 1, write => 1, type => 'varchar(36)'},
+        DeptNumber =>
+        {read => 1, write => 1, type => 'varchar(36)'},
 
     }
 }
 
 sub init_data {
     return (
-    [ 'Login' ],
+    [ 'Login', 'DeptNumber' ],
 
-    [ 'Ivan' ],
-    [ 'john' ],
-    [ 'Bob' ],
-    [ 'aurelia' ],
+    [ 'Ivan', '30' ],
+    [ 'john', '100' ],
+    [ 'Bob', '5' ],
+    [ 'aurelia', '2' ],
     );
 }
 

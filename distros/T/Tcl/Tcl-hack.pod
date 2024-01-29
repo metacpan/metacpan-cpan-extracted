@@ -1,0 +1,122 @@
+=head1 some internal details/discussions; ordinary user should not bother about this
+
+=head2 Command table cleanup
+
+In V1.03 command table cleanup was introduced.
+This tries to keep the internal structure and command table clean.
+In V1.02 and prior heavy use of sub { .. } in Tcl commands could pollute these tables
+as they were never cleared. Command table cleanup tries to alleviate this.
+
+if you call create_tcl_sub the internal reference exists until
+you delete_ref or _code_dispose it, or you call create_tcl_sub with the same DESCRNAME.
+
+if the internal reference was created internally by call(...) there are two rules
+
+=over
+
+=item 1)
+
+If the command is an "after" the internal references are kept at least until 1 second after the delay.
+If there are still other "users" of the TCLNAME then it is not deleted until the last one goes away.
+If another call with the same CODEREF happens before this,
+then it will get registered as a "user" without any need to delete/recreate the tcl command first.
+
+=item 2)
+
+otherwise a DESCRNAME is created with the text sections of the command, prefaced by "=".
+Like
+"=after 1000"
+or "=:.m.m add command -command -label Exit"
+or "=::button .f3.b8 -text conn -command"
+or "=gets sock9ac2b50"
+or "=fileevent sock9827430 writable"
+
+
+the TCLCODES created for that command will be kept at least until a command with
+the same DESCRNAME and containing a subroutine reference is run again.
+Since many DESCRNAMES can reference the same TCLNAME only when
+the last DESCRNAME referencing a TCLNAME is released is the TCLNAME purged.
+
+NOTE:
+Since
+  $interp->call('fileevent','sock9827430','writable');
+does not contain a subroutine reference, it will not release/free the TCLNAME/DESCRNAME created by
+  $interp->call('fileevent','sock9827430','writable',sub{...});
+even though that is the way you deactivate a writable/readable callback in Tcl.
+
+=back
+
+Prior to V1.06 there was also a problem with the coderef never getting cleared from sas,
+a refcount was kept at the PVCV that prevented it from getting garbage collected,
+but that SV itself got "lost" and could never be garbage collected,
+thereby also keeping anything in that codes PAD.
+
+To assist in tracking changes to the internal table and the commands table 3 trace subs were added,
+set them to non-blank or non-zero to add the tracking output to SYSOUT, like this in your code:
+
+    sub Tcl::TRACE_SHOWCODE(){1}
+
+=over
+
+=item Tcl::TRACE_SHOWCODE
+
+Display all generated Tcl code by call().
+Be aware: Tkx::MainLoop runs by issuing a lot of "winfo exists ." calls, a LOT.
+But this is a nice way to tell what your programs are doing to Tcl.
+
+
+=item Tcl::TRACE_CREATECOMMAND
+
+Display Tcl subroutine creation by call/create_tcl_sub
+
+=item Tcl::TRACE_DELETECOMMAND
+
+Display Tcl subroutine deletion by cleanup/delete_ref/_code_dispose
+
+=back
+
+=head2 Moving Tcl/Tk around with Tcl.pm
+
+NOTE: explanations below is for developers managing Tcl/Tk installations
+itself, users should skip this section.
+
+In order to create Tcl/Tk application with this module, you need to make
+sure that Tcl/Tk is available within visibility of this module. There are
+many ways to achieve this, varying on ease of starting things up and
+providing flexible movable archived files.
+
+Following list enumerates them, in order of increased possibility to change
+location.
+
+=over
+
+=item *
+
+First method
+
+Install Tcl/Tk first, then install Perl module Tcl, so installed Tcl/Tk will
+be used. This is most normal approach, and no care of Tcl/Tk distribution is
+taken on Perl side (this is done on Tcl/Tk side)
+
+=item *
+
+Second method
+
+Copy installed Tcl/Tk binaries to some location, then install Perl module Tcl
+with a special action to make Tcl.pm know of this location. This approach
+makes sure that only chosen Tcl installation is used.
+
+=item *
+
+Third method
+
+During compiling Tcl Perl module, Tcl/Tk could be statically linked into
+module's shared library and all other files zipped into a single archive, so
+each file extracted when needed.
+
+To link Tcl/Tk binaries, prepare their libraries and then instruct Makefile.PL
+to use these libraries in a link stage.
+(TODO provide better detailed description)
+
+=back
+

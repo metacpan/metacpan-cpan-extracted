@@ -63,6 +63,7 @@ lib/oEdtk/libC7.pm
 lib/oEdtk/libDev.pm
 lib/oEdtk/libXls.pm
 lib/oEdtk/logger.pm
+lib/oEdtk/logger2.pm
 lib/oEdtk/Main.pm
 lib/oEdtk/Messenger.pm
 lib/oEdtk/OmgrIdxDoc.pm
@@ -83,7 +84,7 @@ lib/oEdtk/XPath.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-README
+README.md
 CHANGES
 t/cp_fr_fixe.dat
 t/test.t

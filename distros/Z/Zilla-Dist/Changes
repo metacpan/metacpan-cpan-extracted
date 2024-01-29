@@ -1,3 +1,18 @@
+0.1.23 Mon Dec 25 06:29:32 AM PST 2023
+ - Change skip-tag-check to no-git-update
+
+0.1.22 Sat Dec 23 07:28:59 AM PST 2023
+ - Don't do any git stuff when skip_tag_check
+
+0.1.21 Sat Dec 23 07:09:37 AM PST 2023
+ - Don't tag commit when skip_tag_check set
+
+0.1.20 Sat Dec 23 06:49:18 AM PST 2023
+ - Add skip_tag_check
+
+0.1.19 Sat Dec 23 06:11:24 AM PST 2023
+ - Fix Makefile bug with NAMEPATH
+
 0.1.18 Sat Jul 22 07:39:03 PM PDT 2023
  - Add Dist::Zilla::Plugin::MakeMaker::Awesome to requires
 

@@ -3,7 +3,7 @@ requires 'parent', 0;
 requires 'curry', '>= 1.001';
 requires 'indirect', 0;
 requires 'Future', '>= 0.42';
-requires 'Future::Queue', 0;
+requires 'Future::Queue', '>= 0.52';
 requires 'JSON::MaybeXS';
 requires 'MIME::Base64';
 requires 'Text::CSV';

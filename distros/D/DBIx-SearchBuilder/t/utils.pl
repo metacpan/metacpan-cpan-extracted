@@ -12,14 +12,15 @@ Array of all supported DBD drivers.
 =cut
 
 our @SupportedDrivers = qw(
-	Informix
-	mysql
-	mysqlPP
-	ODBC
-	Oracle
-	Pg
-	SQLite
-	Sybase
+    Informix
+    MariaDB
+    mysql
+    mysqlPP
+    ODBC
+    Oracle
+    Pg
+    SQLite
+    Sybase
 );
 
 =head2 @AvailableDrivers
@@ -115,6 +116,19 @@ sub connect_mysql
 		User => $ENV{'SB_TEST_MYSQL_USER'} || 'root',
 		Password => $ENV{'SB_TEST_MYSQL_PASS'} || '',
 	);
+}
+
+sub connect_mariadb
+{
+    my $handle = shift;
+    return $handle->Connect(
+        Driver => 'MariaDB',
+        Database => $ENV{'SB_TEST_MARIADB'},
+        Host => $ENV{'SB_TEST_MARIADB_HOST'},
+        Port => $ENV{'SB_TEST_MARIADB_PORT'},
+        User => $ENV{'SB_TEST_MARIADB_USER'} || 'root',
+        Password => $ENV{'SB_TEST_MARIADB_PASS'} || '',
+    );
 }
 
 sub connect_pg

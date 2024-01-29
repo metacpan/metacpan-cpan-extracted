@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::ColorSpace::Indexed';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -17,6 +17,20 @@ PDF::Builder::Resource::ColorSpace::Indexed::WebColor - colorspace support for "
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Util;
 use Scalar::Util qw(weaken);
+
+=head1 METHODS
+
+=head2 new
+
+     PDF::Builder::Resource::ColorSpace::Indexed::WebColor->new()
+
+=over
+
+Create a new "web-safe" indexed colorspace object.
+
+=back
+
+=cut
 
 sub new {
     my ($class, $pdf) = @_;

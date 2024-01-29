@@ -2,7 +2,6 @@ use warnings;
 use strict;
 use IO::String;
 use Test::More;
-use lib 'inc';
 use LWP::UserAgent;
 use LWP::Protocol::PSGI;
 use JSON qw(to_json from_json);

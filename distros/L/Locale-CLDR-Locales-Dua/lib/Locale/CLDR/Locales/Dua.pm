@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Dua - Package for language Duala
 
 package Locale::CLDR::Locales::Dua;
 # This file auto generated from Data\common\main\dua.xml
-#	on Tue  5 Dec  1:06:45 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'dua' => 'duálá',
@@ -46,7 +46,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'CM' => 'Cameroun',
 
@@ -66,7 +66,7 @@ has 'characters' => (
 			auxiliary => qr{[h q v x z]},
 			index => ['A', 'B', 'Ɓ', 'C', 'D', 'Ɗ', 'E', 'Ɛ', 'F', 'G', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'S', 'T', 'U', 'W', 'Y'],
 			main => qr{[a á b ɓ c d ɗ e é ɛ {ɛ́} f g i í j k l m n {ny} ŋ o ó ɔ {ɔ́} p r s t u ú ū w y]},
-			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT

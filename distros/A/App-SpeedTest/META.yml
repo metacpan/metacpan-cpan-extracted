@@ -1,7 +1,7 @@
 --- 
 abstract: Command line interface to speedtest.net
 author: 
-  - H.Merijn Brand <h.m.brand@xs4all.nl>
+  - H.Merijn Brand <hmbrand@cpan.org>
 configure_requires: 
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
@@ -14,16 +14,17 @@ name: App-SpeedTest
 provides: 
   App::SpeedTest: 
     file: speedtest
-    version: '0.28'
+    version: '0.29'
 recommends: 
-  Data::Peek: '0.50'
-  Getopt::Long: '2.52'
+  Data::Dumper: '2.154'
+  Data::Peek: '0.52'
+  Getopt::Long: '2.57'
   HTML::TreeBuilder: '5.07'
-  LWP::UserAgent: '6.60'
-  Socket: '2.032'
-  Test::More: '1.302188'
-  Text::CSV_XS: '1.47'
-  Time::HiRes: '1.9767'
+  LWP::UserAgent: '6.72'
+  Socket: '2.037'
+  Test::More: '1.302198'
+  Text::CSV_XS: '1.53'
+  Time::HiRes: '1.9775'
   XML::Simple: '2.25'
 requires: 
   Data::Dumper: 0
@@ -44,4 +45,4 @@ resources:
   homepage: https://metacpan.org/pod/App::SpeedTest
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/speedtest
-version: '0.28'
+version: '0.29'

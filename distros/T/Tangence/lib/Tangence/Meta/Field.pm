@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.66;
+use warnings;
+use Object::Pad 0.800;
 
-package Tangence::Meta::Field 0.30;
+package Tangence::Meta::Field 0.32;
 class Tangence::Meta::Field :strict(params);
 
 =head1 NAME

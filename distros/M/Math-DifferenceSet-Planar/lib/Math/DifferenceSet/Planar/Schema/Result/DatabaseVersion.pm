@@ -14,12 +14,12 @@ use base 'DBIx::Class::Core';
 
 =head1 VERSION
 
-This documentation refers to version 1.000 of
+This documentation refers to version 1.001 of
 Math::DifferenceSet::Planar::Schema::Result::DatabaseVersion.
 
 =cut
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 =head1 TABLE: C<database_version>
 

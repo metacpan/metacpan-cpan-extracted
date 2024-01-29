@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetChartsRequest.name : The workbook name.  ,
+# GetWorksheetChartsRequest.name : The file name.  ,
 # GetWorksheetChartsRequest.sheetName : The worksheet name.  ,
-# GetWorksheetChartsRequest.folder : Original workbook folder.  ,
-# GetWorksheetChartsRequest.storageName : Storage name.   
+# GetWorksheetChartsRequest.folder : The folder where the file is situated.  ,
+# GetWorksheetChartsRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_charts' } = { 
-    	summary => 'Get worksheet charts description.',
+    	summary => 'Retrieve descriptions of charts in the worksheet.',
         params => $params,
         returns => 'ChartsResponse',
     };
@@ -130,7 +130,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -144,14 +144,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

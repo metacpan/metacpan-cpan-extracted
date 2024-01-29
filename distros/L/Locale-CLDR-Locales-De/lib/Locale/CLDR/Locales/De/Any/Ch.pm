@@ -8,13 +8,13 @@ Locale::CLDR::Locales::De::Any::Ch - Package for language German
 
 package Locale::CLDR::Locales::De::Any::Ch;
 # This file auto generated from Data\common\main\de_CH.xml
-#	on Tue  5 Dec  1:06:34 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -25,19 +25,19 @@ use Moo;
 
 extends('Locale::CLDR::Locales::De::Any');
 has 'valid_algorithmic_formats' => (
-	is => 'ro',
-	isa => ArrayRef,
-	init_arg => undef,
-	default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal-neuter','spellout-cardinal-masculine','spellout-cardinal-feminine','spellout-cardinal-n','spellout-cardinal-r','spellout-cardinal-s','spellout-ordinal','spellout-ordinal-n','spellout-ordinal-r','spellout-ordinal-s' ]},
+    is => 'ro',
+    isa => ArrayRef,
+    init_arg => undef,
+    default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal-neuter','spellout-cardinal-masculine','spellout-cardinal-feminine','spellout-cardinal-n','spellout-cardinal-r','spellout-cardinal-s','spellout-cardinal-m','spellout-ordinal','spellout-ordinal-n','spellout-ordinal-r','spellout-ordinal-s','spellout-ordinal-m' ]},
 );
 
 has 'algorithmic_number_format_data' => (
-	is => 'ro',
-	isa => HashRef,
-	init_arg => undef,
-	default => sub { 
-		use bigfloat;
-		return {
+    is => 'ro',
+    isa => HashRef,
+    init_arg => undef,
+    default => sub {
+        use bigfloat;
+        return {
 		'spellout-cardinal-feminine' => {
 			'public' => {
 				'-x' => {
@@ -57,6 +57,93 @@ has 'algorithmic_number_format_data' => (
 					base_value => q(1),
 					divisor => q(1),
 					rule => q(eine),
+				},
+				'2' => {
+					base_value => q(2),
+					divisor => q(1),
+					rule => q(=%spellout-numbering=),
+				},
+				'100' => {
+					base_value => q(100),
+					divisor => q(100),
+					rule => q(←%spellout-cardinal-masculine←­hundert[­→→]),
+				},
+				'1000' => {
+					base_value => q(1000),
+					divisor => q(1000),
+					rule => q(←%spellout-cardinal-masculine←­tausend[­→→]),
+				},
+				'1000000' => {
+					base_value => q(1000000),
+					divisor => q(1000000),
+					rule => q(eine Million[ →→]),
+				},
+				'2000000' => {
+					base_value => q(2000000),
+					divisor => q(1000000),
+					rule => q(←%spellout-cardinal-feminine← Millionen[ →→]),
+				},
+				'1000000000' => {
+					base_value => q(1000000000),
+					divisor => q(1000000000),
+					rule => q(eine Milliarde[ →→]),
+				},
+				'2000000000' => {
+					base_value => q(2000000000),
+					divisor => q(1000000000),
+					rule => q(←%spellout-cardinal-feminine← Milliarden[ →→]),
+				},
+				'1000000000000' => {
+					base_value => q(1000000000000),
+					divisor => q(1000000000000),
+					rule => q(eine Billion[ →→]),
+				},
+				'2000000000000' => {
+					base_value => q(2000000000000),
+					divisor => q(1000000000000),
+					rule => q(←%spellout-cardinal-feminine← Billionen[ →→]),
+				},
+				'1000000000000000' => {
+					base_value => q(1000000000000000),
+					divisor => q(1000000000000000),
+					rule => q(eine Billiarde[ →→]),
+				},
+				'2000000000000000' => {
+					base_value => q(2000000000000000),
+					divisor => q(1000000000000000),
+					rule => q(←%spellout-cardinal-feminine← Billiarden[ →→]),
+				},
+				'1000000000000000000' => {
+					base_value => q(1000000000000000000),
+					divisor => q(1000000000000000000),
+					rule => q(=#,##0=),
+				},
+				'max' => {
+					base_value => q(1000000000000000000),
+					divisor => q(1000000000000000000),
+					rule => q(=#,##0=),
+				},
+			},
+		},
+		'spellout-cardinal-m' => {
+			'public' => {
+				'-x' => {
+					divisor => q(1),
+					rule => q(minus →→),
+				},
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(null),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(←← Komma →→),
+				},
+				'1' => {
+					base_value => q(1),
+					divisor => q(1),
+					rule => q(einem),
 				},
 				'2' => {
 					base_value => q(2),
@@ -702,16 +789,16 @@ has 'algorithmic_number_format_data' => (
 				'1100' => {
 					base_value => q(1100),
 					divisor => q(100),
-					rule => q(←%spellout-cardinal-masculine←­hundert[­→→]),
+					rule => q(←←­hundert[­→→]),
 				},
-				'10000' => {
-					base_value => q(10000),
-					divisor => q(10000),
+				'2000' => {
+					base_value => q(2000),
+					divisor => q(1000),
 					rule => q(=%spellout-numbering=),
 				},
 				'max' => {
-					base_value => q(10000),
-					divisor => q(10000),
+					base_value => q(2000),
+					divisor => q(1000),
 					rule => q(=%spellout-numbering=),
 				},
 			},
@@ -843,6 +930,27 @@ has 'algorithmic_number_format_data' => (
 				},
 			},
 		},
+		'spellout-ordinal-m' => {
+			'public' => {
+				'-x' => {
+					divisor => q(1),
+					rule => q(minus →→),
+				},
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(=%spellout-ordinal=m),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=#,##0.#=),
+				},
+				'max' => {
+					divisor => q(1),
+					rule => q(=#,##0.#=),
+				},
+			},
+		},
 		'spellout-ordinal-n' => {
 			'public' => {
 				'-x' => {
@@ -935,39 +1043,46 @@ has 'algorithmic_number_format_data' => (
 				'1' => {
 					base_value => q(1),
 					divisor => q(1),
-					rule => q(' =%spellout-ordinal=),
+					rule => q(‘ =%spellout-ordinal=),
 				},
 				'max' => {
 					base_value => q(1),
 					divisor => q(1),
-					rule => q(' =%spellout-ordinal=),
+					rule => q(‘ =%spellout-ordinal=),
 				},
 			},
 		},
-	} },
+    } },
 );
 
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ace' => 'Aceh-Sprache',
  				'ach' => 'Acholi-Sprache',
+ 				'ar_001' => 'Modernes Hocharabisch',
  				'ars' => 'Nadschd-Arabisch',
  				'bas' => 'Basaa-Sprache',
- 				'be' => 'Weissrussisch',
  				'bik' => 'Bikol-Sprache',
  				'bin' => 'Bini-Sprache',
  				'chb' => 'Chibcha-Sprache',
+ 				'de_CH' => 'Schweizer Hochdeutsch',
  				'din' => 'Dinka-Sprache',
  				'fan' => 'Pangwe-Sprache',
  				'gba' => 'Gbaya-Sprache',
  				'kmb' => 'Kimbundu-Sprache',
  				'mus' => 'Muskogee-Sprache',
+ 				'nl_BE' => 'Flämisch',
  				'prg' => 'Altpreussisch',
+ 				'rhg' => 'Rohingya',
+ 				'zh_Hans' => 'Chinesisch (vereinfacht)',
+ 				'zh_Hans@alt=long' => 'Hochchinesisch (vereinfacht)',
+ 				'zh_Hant' => 'Chinesisch (traditionell)',
+ 				'zh_Hant@alt=long' => 'Hochchinesisch (traditionell)',
 
 			);
 			if (@_) {
@@ -982,11 +1097,10 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'BN' => 'Brunei',
  			'BW' => 'Botswana',
- 			'BY' => 'Weissrussland',
  			'CV' => 'Kapverden',
  			'GB' => 'Grossbritannien',
  			'QO' => 'Äusseres Ozeanien',
@@ -1002,7 +1116,7 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'colcasefirst' => 'Sortierung nach Gross- bzw. Kleinbuchstaben',
  			'colcaselevel' => 'Sortierung nach Gross- oder Kleinschreibung',
@@ -1044,7 +1158,7 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			main => qr{[a ä b c d e f g h i j k l m n o ö p q r s t u ü v w x y z]},
-			numbers => qr{[\- . ’ % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ . ’ % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -1060,39 +1174,107 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
-					'cubic-foot' => {
-						'name' => q(Kubikfuss),
-						'one' => q({0} Kubikfuss),
-						'other' => q({0} Kubikfuss),
+					# Long Unit Identifier
+					'area-square-foot' => {
+						'name' => q(Quadratfuss),
+						'one' => q({0} Quadratfuss),
+						'other' => q({0} Quadratfuss),
 					},
+					# Core Unit Identifier
+					'square-foot' => {
+						'name' => q(Quadratfuss),
+						'one' => q({0} Quadratfuss),
+						'other' => q({0} Quadratfuss),
+					},
+					# Long Unit Identifier
+					'length-foot' => {
+						'name' => q(Fuss),
+						'one' => q({0} Fuss),
+						'other' => q({0} Fuss),
+						'per' => q({0} pro Fuss),
+					},
+					# Core Unit Identifier
 					'foot' => {
 						'name' => q(Fuss),
 						'one' => q({0} Fuss),
 						'other' => q({0} Fuss),
 						'per' => q({0} pro Fuss),
 					},
-					'gallon-imperial' => {
+					# Long Unit Identifier
+					'volume-cubic-foot' => {
+						'name' => q(Kubikfuss),
+						'one' => q({0} Kubikfuss),
+						'other' => q({0} Kubikfuss),
+					},
+					# Core Unit Identifier
+					'cubic-foot' => {
+						'name' => q(Kubikfuss),
+						'one' => q({0} Kubikfuss),
+						'other' => q({0} Kubikfuss),
+					},
+					# Long Unit Identifier
+					'volume-gallon-imperial' => {
 						'one' => q({0} gal Imp.),
 						'other' => q({0} gal Imp.),
 						'per' => q({0}/gal Imp.),
 					},
-					'milligram-per-deciliter' => {
-						'name' => q(mg/dL),
-					},
-					'square-foot' => {
-						'name' => q(Quadratfuss),
-						'one' => q({0} Quadratfuss),
-						'other' => q({0} Quadratfuss),
+					# Core Unit Identifier
+					'gallon-imperial' => {
+						'one' => q({0} gal Imp.),
+						'other' => q({0} gal Imp.),
+						'per' => q({0}/gal Imp.),
 					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'length-foot' => {
+						'name' => q(Fuss),
+					},
+					# Core Unit Identifier
 					'foot' => {
 						'name' => q(Fuss),
 					},
-					'gallon-imperial' => {
-						'one' => q({0} gal Imp.),
-						'other' => q({0} gal Imp.),
+					# Long Unit Identifier
+					'volume-dram' => {
+						'name' => q(Dram),
+						'one' => q({0} dr.),
+						'other' => q({0} dr.),
+					},
+					# Core Unit Identifier
+					'dram' => {
+						'name' => q(Dram),
+						'one' => q({0} dr.),
+						'other' => q({0} dr.),
+					},
+					# Long Unit Identifier
+					'volume-gallon-imperial' => {
 						'per' => q({0}/gal Imp.),
+					},
+					# Core Unit Identifier
+					'gallon-imperial' => {
+						'per' => q({0}/gal Imp.),
+					},
+					# Long Unit Identifier
+					'volume-jigger' => {
+						'name' => q(Schuss),
+						'one' => q(Schuss),
+						'other' => q({0} Schuss),
+					},
+					# Core Unit Identifier
+					'jigger' => {
+						'name' => q(Schuss),
+						'one' => q(Schuss),
+						'other' => q({0} Schuss),
+					},
+					# Long Unit Identifier
+					'volume-pinch' => {
+						'one' => q({0} Prise),
+						'other' => q({0} Prise),
+					},
+					# Core Unit Identifier
+					'pinch' => {
+						'one' => q({0} Prise),
+						'other' => q({0} Prise),
 					},
 				},
 			} }
@@ -1172,20 +1354,6 @@ has 'currencies' => (
 				'other' => q(São-toméischer Dobra \(2018\)),
 			},
 		},
-		'VEF' => {
-			display_name => {
-				'currency' => q(Venezolanischer Bolívar),
-				'one' => q(Venezolanischer Bolívar),
-				'other' => q(Venezolanische Bolívares),
-			},
-		},
-		'VES' => {
-			display_name => {
-				'currency' => q(VES),
-				'one' => q(VES),
-				'other' => q(VES),
-			},
-		},
 	} },
 );
 
@@ -1258,8 +1426,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'eras' => (

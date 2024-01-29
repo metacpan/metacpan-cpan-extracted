@@ -6,7 +6,7 @@ class Net::Async::Redis::Cluster::XS :isa(Net::Async::Redis::Cluster);
 use strict;
 use warnings;
 
-our $VERSION = '1.000'; # VERSION
+our $VERSION = '1.001'; # VERSION
 
 =head1 NAME
 

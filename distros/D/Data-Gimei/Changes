@@ -1,5 +1,11 @@
 Revision history for Perl extension Data-Gimei
 
+v0.4.2 2024-01-04T06:43:57Z
+    - update pod
+
+v0.4.1 2023-12-27T08:18:40Z
+    - support old version of perl
+
 v0.4.0 2022-09-30T12:19:39Z
 
     - clean up old random number generator

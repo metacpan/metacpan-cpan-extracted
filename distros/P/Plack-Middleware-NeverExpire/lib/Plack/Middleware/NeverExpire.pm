@@ -2,23 +2,36 @@ use 5.008001; use strict; use warnings;
 
 package Plack::Middleware::NeverExpire;
 
-our $VERSION = '1.007';
+our $VERSION = '1.101';
 
 BEGIN { require Plack::Middleware; our @ISA = 'Plack::Middleware' }
 
 use Plack::Util ();
-use Time::Piece ();
-use Time::Seconds ();
+
+sub ONE_YEAR () { 31_556_930 } # 365.24225 days
+
+# RFC 7231 Section 7.1.1.1
+my @DAY = qw( ??? Mon Tue Wed Thu Fri Sat Sun ); # 1-based
+my @MON = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
+sub FMT () { '%s, %02d %s %04d %02d:%02d:%02d GMT' }
+sub imf_fixdate {
+	my @f = gmtime $_[0];
+	sprintf FMT, $DAY[$f[6]], $f[3], $MON[$f[4]], 1900+$f[5], @f[2,1,0];
+}
+
+sub prepare_app { shift->{'_cached_time'} = 'NaN' }
 
 sub call {
 	my $self = shift;
-	Plack::Util::response_cb( $self->app->( shift ), sub {
-		my $res = shift;
-		return if $res->[0] != 200;
-		my $date = Time::Piece->gmtime( time + Time::Seconds::ONE_YEAR );
-		Plack::Util::header_set( $res->[1], 'Expires', $date->strftime );
-		push @{ $res->[1] }, 'Cache-Control', 'max-age=' . Time::Seconds::ONE_YEAR . ', public';
-		return;
+	my $now = time;
+	Plack::Util::response_cb( &{ $self->app }, sub {
+		$_[0][0] == 200 or return;
+		my $h = $_[0][1];
+		push @$h, 'Cache-Control', 'max-age=' . ONE_YEAR . ', public';
+		Plack::Util::header_set( $h, 'Expires' => $self->{'_cached_time'} == $now
+			?   $self->{'_cached_stamp'}
+			: ( $self->{'_cached_stamp'} = imf_fixdate ONE_YEAR + ( $self->{'_cached_time'} = $now ) )
+		);
 	} );
 }
 

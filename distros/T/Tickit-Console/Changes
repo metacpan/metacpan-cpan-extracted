@@ -1,5 +1,14 @@
 Revision history for Tickit-Console
 
+0.12    2023-12-23
+        [CHANGES]
+         * Updated for Teest::ExpectAndCheck::Future v0.04
+         * Updates for Object::Pad v0.800:
+            + add explicit `use warnings`
+         * Use Object::Pad::MOP rather than `no strict 'refs'` hackery
+         * Fixes to Pod style
+         * Ensure every Perl file contains a `use VERSION` declaration
+
 0.11    2023-03-04
         [CHANGES]
          * Updates for Object::Pad 0.74:

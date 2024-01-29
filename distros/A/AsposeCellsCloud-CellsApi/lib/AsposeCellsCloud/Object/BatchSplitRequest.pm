@@ -182,6 +182,13 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
+     'region' => {
+     	datatype => 'string',
+     	base_name => 'Region',
+     	description => 'The regional settings for workbook.',
+     	format => '',
+     	read_only => '',
+     		},
      'save_options' => {
      	datatype => 'SaveOptions',
      	base_name => 'SaveOptions',
@@ -200,6 +207,7 @@ __PACKAGE__->swagger_types( {
     'to_index' => 'int',
     'out_folder' => 'string',
     'out_storage' => 'string',
+    'region' => 'string',
     'save_options' => 'SaveOptions' 
 } );
 
@@ -212,6 +220,7 @@ __PACKAGE__->attribute_map( {
     'to_index' => 'ToIndex',
     'out_folder' => 'OutFolder',
     'out_storage' => 'OutStorage',
+    'region' => 'Region',
     'save_options' => 'SaveOptions' 
 } );
 

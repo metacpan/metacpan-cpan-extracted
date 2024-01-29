@@ -1,0 +1,150 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Time::Seconds {
+  allow Time::Piece;
+  
+  use StringBuffer;
+  
+  # Interfaces
+  interface Cloneable;
+  
+  # Fields
+  has seconds : ro long;
+  
+  # Class Methods
+  static method new : Time::Seconds ($second : long = 0) {
+    
+    my $self = new Time::Seconds;
+    
+    $self->{seconds} = $second;
+    
+    return $self;
+  }
+  
+  static method ONE_MINUTE : Time::Seconds() { return &new(60); }
+  
+  static method ONE_HOUR : Time::Seconds () { return &new(3_600); }
+  
+  static method ONE_DAY : Time::Seconds () { return &new(86_400); }
+  
+  static method ONE_WEEK : Time::Seconds () { return &new(604_800); }
+  
+  static method ONE_MONTH : Time::Seconds () { return &new(2_629_744); } # ONE_YEAR / 12
+  
+  static method ONE_YEAR : Time::Seconds () { return &new(31_556_930); } # 365.24225 days
+  
+  static method ONE_FINANCIAL_MONTH : Time::Seconds () { return &new(2_592_000); } # 30 days
+  
+  static method LEAP_YEAR : Time::Seconds () { return &new(31_622_400); } # 366 * ONE_DAY
+  
+  static method NON_LEAP_YEAR : Time::Seconds () { return &new(31_536_000); } # 365 * ONE_DAY
+  
+  # Instance Methods
+  method add : Time::Seconds ($seconds : long) {
+    
+    my $new_seconds = $self->{seconds} + $seconds;
+    
+    return Time::Seconds->new($new_seconds);
+  }
+  
+  method subtract : Time::Seconds ($seconds : long) {
+    
+    my $new_seconds = $self->{seconds} - $seconds;
+    
+    return Time::Seconds->new($new_seconds);
+  }
+  
+  method minutes : double () {
+    return $self->{seconds} / 60.0;
+  }
+  
+  method hours : double () {
+    return $self->minutes / 60.0;
+  }
+   
+  method days : double () {
+    return $self->hours / 24.0;
+  }
+   
+  method weeks : double () {
+    return $self->days / 7.0;
+  }
+   
+  method months : double () {
+    return $self->days / 30.4368541;
+  }
+   
+  method financial_months : double () {
+    return $self->days / 30.0;
+  }
+  
+  method years : double () {
+    return $self->days / 365.24225;
+  }
+  
+  method clone : Time::Seconds () {
+    return Time::Seconds->new($self->{seconds});
+  }
+  
+  method pretty : string () {
+    my $tsec_clone = $self->clone;
+    
+    my $buffer = StringBuffer->new;
+    
+    if ($tsec_clone->{seconds} < 0) {
+      $tsec_clone->{seconds} = -$tsec_clone->{seconds};
+      $buffer->push("minus ");
+    }
+    if ($tsec_clone->{seconds} >= &ONE_MINUTE->{seconds}) {
+      if ($tsec_clone->{seconds} >= &ONE_HOUR->{seconds}) {
+        if ($tsec_clone->{seconds} >= &ONE_DAY->{seconds}) {
+          my $days_floor = (int)$tsec_clone->days;
+          $buffer->push($days_floor);
+          
+          $buffer->push(" day");
+          
+          unless ($days_floor == 1) {
+            $buffer->push("s");
+          }
+          $buffer->push(", ");
+          
+          $tsec_clone->{seconds} -= ($days_floor * &ONE_DAY->{seconds});
+        }
+        my $hours_floor = (int)$tsec_clone->hours;
+        $buffer->push($hours_floor);
+        
+        $buffer->push(" hour");
+        
+        unless ($hours_floor == 1) {
+          $buffer->push("s");
+        }
+        $buffer->push(", ");
+        $tsec_clone->{seconds} -= ($hours_floor * &ONE_HOUR->{seconds});
+      }
+      my $mins_floor = (int)$tsec_clone->minutes;
+      $buffer->push($mins_floor);
+      
+      $buffer->push(" minute");
+      
+      unless ($mins_floor == 1) {
+        $buffer->push("s");
+      }
+      $buffer->push(", ");
+      $tsec_clone->{seconds} -= ($mins_floor * &ONE_MINUTE->{seconds});
+    }
+    
+    $buffer->push($tsec_clone->{seconds});
+    
+    $buffer->push(" second");
+    
+    unless ($tsec_clone->{seconds} == 1) {
+      $buffer->push("s");
+    }
+    
+    my $string = $buffer->to_string;
+    
+    return $string;
+  }
+  
+}

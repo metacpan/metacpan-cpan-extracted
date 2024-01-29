@@ -1,5 +1,11 @@
 Revision history for Perl module Math::MPFR
 
+4.28
+ - Correct the testing for the presence of the Windows subnormal bug in t/nvtoa2.t.
+ - Small tweaks to Rmpfr_cmp_IV and Rmpfr_set_IV.
+ - Avoid monitoring PL_markstack_ptr in MPFR.xs.
+ - In Rmpfr_deref2, replace 1st arg of '0' in mpfr_get_str() call with 'NULL'.
+
 4.27
  - Remove stray '}' from Rmpfr_add_z
  - Simplify overloading of '++' and '--'
@@ -396,7 +402,7 @@ Revision history for Perl module Math::MPFR
  - Add _Decimal64-mpfr_t conversion
 
 3.14
- - Fix pod. (The '±' symbol was causing pod.t failures.) Also took care of
+ - Fix pod. (The ' ' symbol was causing pod.t failures.) Also took care of
    some other typos/oversights in the documentation.
 
 3.13

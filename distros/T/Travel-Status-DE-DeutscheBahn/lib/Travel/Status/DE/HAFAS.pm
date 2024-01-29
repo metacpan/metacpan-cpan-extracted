@@ -20,7 +20,7 @@ use Travel::Status::DE::HAFAS::Message;
 use Travel::Status::DE::HAFAS::Polyline qw(decode_polyline);
 use Travel::Status::DE::HAFAS::StopFinder;
 
-our $VERSION = '5.01';
+our $VERSION = '5.04';
 
 # {{{ Endpoint Definition
 
@@ -515,13 +515,17 @@ sub mot_mask {
 	if ( my @mots = @{ $self->{exclusive_mots} // [] } ) {
 		$mot_mask = 0;
 		for my $mot (@mots) {
-			$mot_mask |= 1 << $mot_pos{$mot};
+			if ( exists $mot_pos{$mot} ) {
+				$mot_mask |= 1 << $mot_pos{$mot};
+			}
 		}
 	}
 
 	if ( my @mots = @{ $self->{excluded_mots} // [] } ) {
 		for my $mot (@mots) {
-			$mot_mask &= ~( 1 << $mot_pos{$mot} );
+			if ( exists $mot_pos{$mot} ) {
+				$mot_mask &= ~( 1 << $mot_pos{$mot} );
+			}
 		}
 	}
 
@@ -964,7 +968,7 @@ monitors
 
 =head1 VERSION
 
-version 5.01
+version 5.04
 
 =head1 DESCRIPTION
 

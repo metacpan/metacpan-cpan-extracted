@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Timer;
 
 use POE;
@@ -25,7 +25,7 @@ sub time_about
 
    time_about( sub { $future->await }, 1, '->new_delay future is ready' );
 
-   is_deeply( [ $future->get ], [], '$future->get returns empty list on new_delay' );
+   is( [ $future->get ], [], '$future->get returns empty list on new_delay' );
 }
 
 # delay cancellation
@@ -48,7 +48,7 @@ sub time_about
    # POE timing is a bit unreliable here :/
    #time_about( sub { $future->await }, 1, '->new_alarm future is ready' );
 
-   is_deeply( [ $future->get ], [], '$future->get returns empty list on new_alarm' );
+   is( [ $future->get ], [], '$future->get returns empty list on new_alarm' );
 }
 
 done_testing;

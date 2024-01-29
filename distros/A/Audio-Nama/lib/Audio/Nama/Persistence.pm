@@ -3,13 +3,12 @@
 
 package Audio::Nama;
 use File::Copy;
-use Modern::Perl; no warnings 'uninitialized';
+use Modern::Perl '2020'; no warnings 'uninitialized';
 
 sub save_state {
-	logsub("&save_state");
+	logsub((caller(0))[3]);
 	my $filename = shift;
-	if ($filename)
-	{
+	my $path = $filename || $file->state_store();
 
 		# remove extension if present
 		
@@ -20,9 +19,7 @@ sub save_state {
 		$filename = 
 				$filename =~ m{/} 	
 									? $filename	# as-is if input contains slashes
-									: join_path(project_dir(),$filename) 
-	}
-	my $path = $filename || $file->state_store();
+									: join_path(project_dir(),$filename) ;
 	$project->{nama_version} = $VERSION;
 
 	# store playback position, if possible
@@ -33,10 +30,6 @@ sub save_state {
 	logpkg(__FILE__,__LINE__,'debug', "saving palette");
 	$ui->save_palette;
 
-	# do nothing more if only Main and Mixdown
-	
-	#user_tracks_present() or throw("No user tracks, skipping..."), return;
-	
 	logpkg(__FILE__,__LINE__,'debug',"Saving state as ", $path);
 	save_system_state($path);
 	save_global_effect_chains();
@@ -123,7 +116,7 @@ sub save_system_state {
 	# save history -- 50 entries, maximum
 
 	my @history;
-	@history = $text->{term}->GetHistory if $text->{term};
+	@history = $term->GetHistory if $term;
 	my %seen;
 	$text->{command_history} = [];
 	map { push @{$text->{command_history}}, $_ 
@@ -139,7 +132,7 @@ sub save_system_state {
 			serialize(
 				file => $path,
 				format => $format,
-				vars => \@tracked_vars,
+				vars => [ (grep {!  /save_file_version_number/ } @tracked_vars) ],
 				class => 'Audio::Nama',
 				);
 
@@ -148,50 +141,11 @@ sub save_system_state {
 	serialize(
 		file => $file->untracked_state_store,
 		format => 'json',
-		vars => \@persistent_vars,
+		vars => [ (grep {!  /save_file_version_number/ } @persistent_vars) ],
 		class => 'Audio::Nama',
 	);	
 
 	"$path.json";
-}
-{
-my %is_legal_suffix = ( 
-		json => 'json', 
-		yml => 'yaml', 
-		pl 	 => 'perl',
-		bin  => 'storable',
-		yaml => 'yaml', # we allow formats as well
-		perl => 'perl',
-		storable => 'storable',
-);
-sub get_newest {
-	
-	# choose the newest
-	#
-	my ($path, $format) = @_;
-	
-	# simply return the file
-	# if filename matches exactly, 
-	# and we know the format
-	
-	return($path, $format) if -f $path and $is_legal_suffix{$format};
-
-	my ($dir, $name) = $path =~ m!^(.*?)([^/]+)$!; 
-	
-	# otherwise we glob, sort and filter directory entries
-	
-	my @sorted = 
-		sort{ $a->[1] <=> $b->[1] } 
-		grep{ $is_legal_suffix{$_->[2]} }
-		map 
-		{ 
-			my ($suffix) = m/^$path(?:\.(\w+))?$/;
-			[$_, -M $_, $suffix] 
-		} 
-		glob("$path*");
-	logpkg(__FILE__,__LINE__,'debug', sub{json_out \@sorted});
-	($sorted[0]->[0], $sorted[0]->[2]);
-}
 }
 
 { my %decode = 
@@ -225,28 +179,19 @@ sub decode {
 }
 
 sub restore_state_from_file {
-	logsub("&restore_state_from_file");
+	logsub((caller(0))[3]);
 	my $filename = shift;
-	$filename =~ s/\.json$//;
-	$filename = join_path(project_dir(), $filename) 
-		if $filename and not $filename =~ m(/);
-	$filename ||= $file->state_store();
+	$filename //= $file->state_store();
 
-	my ($ref, $path, $source, $suffix); 
-
-	# get state file, newest if more than one
-	# with same name, differing extensions
-	# i.e. State.json and State.yml
 	initialize_marshalling_arrays();
 
-	# restore from default filenames	
-	
-	( $path, $suffix ) = get_newest($file->untracked_state_store);
-	if ($path)
+	my $suffix = 'json';	
+	my $path = $file->untracked_state_store;
+	if (-r $path)
 	{
-		$source = read_file($path);
+		my $source = read_file($path);
 
-		$ref = decode($source, $suffix);
+		my $ref = decode($source, $suffix);
 		assign(
 				data	=> $ref,	
 				vars   	=> \@persistent_vars,
@@ -254,11 +199,11 @@ sub restore_state_from_file {
 		assign_singletons( { data => $ref });
 	}
 	
-	( $path, $suffix ) = get_newest($filename);
-	if ($path)
+	$path = $filename;
+	if (-r $path)
 	{
-		$source = read_file($path);
-		$ref = decode($source, $suffix);
+		my $source = read_file($path);
+		my $ref = decode($source, $suffix);
 
 		assign(
 					data => $ref,
@@ -278,7 +223,135 @@ sub restore_state_from_file {
 
 	####### Backward Compatibility ########
 
-	if ( $project->{nama_version}  < 1.214 )  { }
+	$project->{nama_version} //= delete $project->{save_file_version_number};
+
+	if ( $project->{nama_version} < 1.100){ 
+		map{ Audio::Nama::EffectChain::move_attributes($_) } 
+			(@project_effect_chain_data, @global_effect_chain_data)
+	}
+	if ( $project->{nama_version} < 1.105){ 
+		map{ $_->{class} = 'Audio::Nama::BoostTrack' } 
+		grep{ $_->{name} eq 'Boost' } @tracks_data;
+	}
+	if ( $project->{nama_version} < 1.109){ 
+		map
+		{ 	if ($_->{class} eq 'Audio::Nama::MixTrack') { 
+				$_->{is_mix_track}++;
+				$_->{class} = $_->{was_class};
+				$_->{class} = 'Audio::Nama::Track';
+		  	}
+		  	delete $_->{was_class};
+		} @tracks_data;
+		map
+		{    if($_->{class} eq 'Audio::Nama::MasterBus') {
+				$_->{class} = 'Audio::Nama::SubBus';
+			 }
+		} @bus_data;
+
+	}
+	if ( $project->{nama_version} < 1.111){ 
+		map
+		{
+			convert_rw($_);
+			delete $_->{effect_chain_stack} ;
+            delete $_->{rec_defeat};
+            delete $_->{was_class};
+			delete $_->{is_mix_track};
+			$_->{rw} = MON if $_->{name} eq 'Master';
+		} @tracks_data;
+		map
+		{
+			$_->{rw} = MON if $_->{rw} eq 'REC'
+		} @bus_data;
+	}
+
+	# convert effect object format
+	
+	if ( $project->{nama_version} < 1.200 )
+	{
+		@effects_data = 
+			map{ my $hashref = $fx->{applied}->{$_}; 
+					$hashref->{params} = $fx->{params}->{$_}; 
+					$hashref->{class} = 'Audio::Nama::Effect';
+					$hashref->{owns} ||= [];
+					$hashref }
+			grep { defined $_ } 
+			keys %{$fx->{applied}};
+		#say "effects data: ", json_out \@effects_data;
+		delete $fx->{applied};
+		delete $fx->{params};
+	}
+	if ( $project->{nama_version} <= 1.201 )
+	{
+		map{ $_->{owns} ||= [] } @effects_data;
+	}
+	if ( $project->{nama_version} <= 1.208 )
+	{
+		map
+		{ 
+			$_->{midi_versions} ||= [];
+			$_->{name} =~ s/^Master$/Main/;
+			$_->{group} =~ s/^Master$/Null/;
+			$_->{group}	  =~ s/^Open$/Null/;
+		} 
+		@tracks_data;
+		map
+		{
+			$_->{send_id} =~ s/^Master$/Main/;
+			$_->{name}	  =~ s/^null$/Aux/;
+			$_->{name}	  =~ s/^Open$/Null/;
+
+		}
+		@bus_data;
+	}
+	if ( $project->{nama_version} <= 1.208 )
+	{
+		# older projects did not store this
+		$project->{sample_rate} //= $config->{sample_rate} 
+	}
+	if ( $project->{nama_version} <= 1.211){ 
+		map { $_->{source_id} = 'Main', $_->{source_type} = 'bus' }
+		grep { $_->{name} eq 'Main'	} @tracks_data;
+		map { $_->{source_id} = 'Main'; 
+			  $_->{source_type} = 'track';
+			  $_->{send_type} = 'soundcard';
+			  $_->{send_id} = 1;
+			}
+		grep { $_->{name} eq 'Mixdown'	} @tracks_data;
+	}
+	if ( $project->{nama_version} <= 1.212 )
+	{
+		my($boost) = grep{$_->{name} eq 'Boost'} @tracks_data; 
+		delete $boost->{target}
+	}
+	if ( $project->{nama_version} <= 1.213 )
+	{
+		map { 
+			$project->{track_comments}->{         $_->{name} } = delete $_->{comment}         if $_->{comment};
+			$project->{track_version_comments}->{ $_->{name} } = delete $_->{version_comment} if $_->{version_comment};
+
+		} @tracks_data; 
+	}
+	if ( $project->{nama_version} <= 1.214 )
+	{
+		map 
+		{
+			$_->{class} =~ s/^Nama::/Audio::Nama::/ if $_->{class} 
+		}	@tracks_data,
+			@bus_data,
+			@marks_data,
+			@fade_data,
+			@edit_data,
+			@inserts_data,
+			@effects_data,
+			@global_effect_chain_data,
+			@project_effect_chain_data;
+	}
+	if ( $project->{nama_version} <= 1.216)
+	{
+		map { delete $_->{active} } @marks_data
+	}
+
 
 	# restore effects, no change to track objects needed
 	
@@ -373,7 +446,7 @@ sub restore_state_from_file {
 
 	# restore command history
 	
-	$text->{term}->SetHistory(@{$text->{command_history}})
+	$term->SetHistory(@{$text->{command_history}})
 		if (ref $text->{command_history}) =~ /ARRAY/;
 
 ;
@@ -387,6 +460,8 @@ sub restore_state_from_file {
 	my $fname = $file->midi_store;
 	midish_cmd(qq<load "$fname">);
 	
+	# disable hotkeys
+	delete $text->{hotkey_mode};
 } 
 sub convert_rw {
 	my $h = shift;
@@ -419,14 +494,13 @@ sub save_global_effect_chains {
 }
 sub restore_global_effect_chains {
 
-	logsub("&restore_global_effect_chains");
+	logsub((caller(0))[3]);
 		my $path =  $file->global_effect_chains;
-		my ($resolved, $format) = get_newest($path);  
-		throw("$resolved: file not found"), return unless $resolved;
-		my $source = read_file($resolved);
-		throw("$resolved: empty file"), return unless $source;
-		logpkg(__FILE__,__LINE__,'debug', "format: $format, source: \n",$source);
-		my $ref = decode($source, $format);
+		-r $path or return;
+		my $source = read_file($path);
+		throw("$path: empty file"), return unless $source;
+		my $suffix = 'json';
+		my $ref = decode($source, $suffix);
 		assign(
 				data => $ref,
 				vars   => \@global_effect_chain_vars, 

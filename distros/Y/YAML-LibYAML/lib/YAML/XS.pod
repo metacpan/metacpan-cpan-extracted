@@ -78,7 +78,14 @@ This ensures leading that things like leading zeros and other formatting are pre
 
 =item * C<$YAML::XS::Boolean> (since v0.67)
 
-Default is undef.
+Default: undef
+
+When used with perl 5.36 or later, builtin booleans will work out of the box. They will be created by C<Load> and recognized by C<Dump> automatically (since YAML::XS 0.89).
+
+    say Dump({ truth => builtin::true });
+    # truth: true
+
+For older perl versions you can use the following configuration to serialize data as YAML booleans:
 
 When set to C<"JSON::PP"> or C<"boolean">, the plain (unquoted) strings C<true> and C<false> will be loaded as C<JSON::PP::Boolean> or C<boolean.pm> objects. Those objects will be dumped again as plain "true" or "false".
 
@@ -146,7 +153,7 @@ Ingy döt Net L<ingy@ingy.net|mailto:ingy@ingy.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2007-2023 - Ingy döt Net
+Copyright 2007-2024 - Ingy döt Net
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

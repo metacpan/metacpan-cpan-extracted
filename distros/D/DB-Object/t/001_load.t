@@ -25,8 +25,12 @@ BEGIN
 #         diag( "Checking module $_" );
 #         use_ok( $_ );
 #     }
-# for m in `find ./lib -type f -name "*.pm"`; do echo $m | perl -pe 's,./lib/,,' | perl -pe 's,\.pm$,,' | perl -pe 's/\//::/g' | perl -pe 's,^(.*?)$,use_ok\( ''$1'' \)\;,'; done
+# find ./lib -type f -name "*.pm" -print | xargs perl -lE 'my @f=sort(@ARGV); for(@f) { s,./lib/,,; s,\.pm$,,; s,/,::,g; substr( $_, 0, 0, q{use_ok( ''} ); $_ .= q{'' );}; say $_; }'
+
     use_ok( 'DB::Object' );
+    use_ok( 'DB::Object::Constraint::Check' );
+    use_ok( 'DB::Object::Constraint::Foreign' );
+    use_ok( 'DB::Object::Constraint::Index' );
     use_ok( 'DB::Object::Fields' );
     use_ok( 'DB::Object::Fields::Overloaded' );
     use_ok( 'DB::Object::Fields::Unknown' );
@@ -70,4 +74,6 @@ BEGIN
 };
 
 done_testing();
+
+__END__
 

@@ -1,6 +1,6 @@
 =for comment
   This file was automatically generated from src/xsh_grammar.xml
-  on Wed Apr 28 20:17:46 2021
+  on Fri Dec 22 15:22:05 2023
 
 =head1 NAME
 

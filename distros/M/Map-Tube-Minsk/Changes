@@ -1,3 +1,23 @@
+0.06 2023-12-19T12:39:56+01:00
+ - Add EXAMPLE5 section to doc.
+ - Add test for ok_map_functions().
+ - Add new line to map.
+ - Fix image in doc.
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Implement station order.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move bugtracker to github.
+ - Rename example files to better names.
+ - Rewrite XML map to new version with line IDs.
+ - Rewrite XML map to new version without junctions.
+ - Rewrite doc to use of =head2.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+ - Update to Map::Tube 3.62.
+
 0.05 2015-10-16T12:07:20+02:00
  - Improve description for get_lines() in doc.
  - Update to Map::Tube 3.06.

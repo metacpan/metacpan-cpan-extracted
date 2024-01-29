@@ -30,7 +30,7 @@ requires:
   Fcntl: '0'
   JSON: '4.10'
   JSON::XS: '4.03'
-  Module::Generic: v0.32.3
+  Module::Generic: v0.33.0
   Net::IP: '1.26'
   POSIX: 1.53_01
   Promise::Me: v0.4.7
@@ -46,5 +46,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/DB-Object/issues
   repository: https://gitlab.com/jackdeguest/DB-Object
-version: v0.11.9
+version: v1.1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

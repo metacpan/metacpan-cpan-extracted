@@ -1,6 +1,6 @@
 package Lemonldap::NG::Portal::Main::Process;
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.18.0';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -22,19 +22,33 @@ sub process {
 
     # Store ipAddr in env
     $req->env->{ipAddr} = $req->address;
-    my $err = PE_OK;
+    my $err    = PE_OK;
+    my $nofail = delete $args{nofail};
     while ( my $sub = shift @{ $req->steps } ) {
+        $nofail = 1 if $req->data->{nofail};
         if ( ref $sub ) {
             $self->logger->debug("Processing code ref");
-            last if ( $err = $sub->( $req, %args ) );
+            my $tmp = $sub->( $req, %args );
+            if ($tmp) {
+                $err = $tmp unless $err > 0;
+                last        unless $nofail and $err != PE_SENDRESPONSE;
+            }
         }
         else {
             $self->logger->debug("Processing $sub");
             if ( my $as = $self->aroundSub->{$sub} ) {
-                last if ( $err = $as->( $req, %args ) );
+                my $tmp = $as->( $req, %args );
+                if ($tmp) {
+                    $err = $tmp unless $err > 0;
+                    last        unless $nofail and $err != PE_SENDRESPONSE;
+                }
             }
             else {
-                last if ( $err = $self->$sub( $req, %args ) );
+                my $tmp = $self->$sub( $req, %args );
+                if ($tmp) {
+                    $err = $tmp unless $err > 0;
+                    last        unless $nofail and $err != PE_SENDRESPONSE;
+                }
             }
             if ( $self->afterSub->{$sub} ) {
                 unshift @{ $req->steps }, @{ $self->afterSub->{$sub} };
@@ -216,6 +230,7 @@ sub controlUrl {
 sub checkLogout {
     my ( $self, $req ) = @_;
     if ( defined $req->param('logout') ) {
+        $req->data->{nofail} = 1;
         $req->steps(
             [ @{ $self->beforeLogout }, 'authLogout', 'deleteSession' ] );
     }
@@ -225,20 +240,8 @@ sub checkLogout {
 sub checkUnauthLogout {
     my ( $self, $req ) = @_;
     if ( defined $req->param('logout') ) {
-        $self->userLogger->info('Unauthenticated logout request');
-        $self->logger->debug('Cleaning pdata');
-        $self->logger->debug("Removing $self->{conf}->{cookieName} cookie");
-        $req->pdata( {} );
-        $req->addCookie(
-            $self->cookie(
-                name    => $self->conf->{cookieName},
-                domain  => $self->conf->{domain},
-                secure  => $self->conf->{securedCookie},
-                expires => 'Wed, 21 Oct 2015 00:00:00 GMT',
-                value   => 0
-            )
-        );
-        $req->steps( [ sub { PE_LOGOUT_OK } ] );
+        $self->_unauthLogout($req);
+        $req->steps( [ 'controlUrl', sub { PE_LOGOUT_OK } ] );
     }
     return PE_OK;
 }

@@ -1,10 +1,10 @@
 {
    "abstract" : "Perl interface to libpng",
    "author" : [
-      "Ben Bullock <bkb@cpan.org>"
+      "Ben Bullock <benkasminbullock@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -51,12 +51,12 @@
          "url" : "https://github.com/benkasminbullock/image-png-libpng"
       }
    },
-   "version" : "0.57",
+   "version" : "0.58",
    "x_contributors" : [
       "Aaron Crane <arc@cpan.org>",
       "Greg Kennedy <gregk@cpan.org>",
       "Petr Pisar",
       "Phil Perry <pmperry@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

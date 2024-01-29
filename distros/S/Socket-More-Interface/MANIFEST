@@ -1,0 +1,21 @@
+Changes
+const-c.inc
+const-xs.inc
+fallback/const-c.inc
+fallback/const-xs.inc
+Interface.bs
+Interface.c
+Interface.o
+Interface.xs
+lib/Socket/More/Interface.pm
+lib/Socket/More/Interface.pod
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+ppport.h
+README
+README.md
+t/Socket-More-Interface.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

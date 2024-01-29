@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 3f2f03cf96bcec06823df5045f3c247007ac08dd27f7069701cbfffe4e224167 Changes
+SHA256 e18fd195c30c0110fffb5d7b479b447d016a6519d59e6c691ea2678958578f8d Email.pm
+SHA256 d53de1de5e97aadb5bffa1eb84038b24a8c916622c44a16e0239d4cdafbe2df2 LICENSE
+SHA256 2c75980888c56353a615e36a9d49911d493da53b553b7aec57f43864a25fff15 MANIFEST
+SHA256 eb111f9f543d3caeda5c9860dd47898ec84de70f8513429719149371fc759aa3 META.yml
+SHA256 b8019b9d15399ff8337243da4606166ebb926c974e0e12ba4b2775a301cfe17c Makefile.PL
+SHA256 8d247da16b785cbf89eeb0d9285d5f3c75d91d38f3ee85b47de3a20d293d30b8 README
+SHA256 ee6a7194a1f70ebfbb90cabcae4b04567f44b232098de0dde03fd993615b9956 examples/check_email_fail.pl
+SHA256 784534129c85205706b8630c6c8d8343cb8b861490c60b7ea65c30b2df5fd317 examples/check_email_ok.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 a8f6a80aaaae9a80c6d2f158b61304ac1b2208ad889aa21a6e410eb237d7b25f t/Mo-utils-Email/01-use.t
+SHA256 3c8a32ac277a9e71d0e0d5ea3177d1bbaedf6a03bfae6b1262a990b3d26ce0cd t/Mo-utils-Email/02-version.t
+SHA256 91abad2f313dd9e3824872f4d7e78941ec17178bf9aa2e16efedefdc775dddfd t/Mo-utils-Email/03-check_email.t
+SHA256 a5cc05da5052625f8c72e7a71ffadb4380e88e9f0ca39e4012503ed62be88a62 xt/Mo-utils-Email/01-pod_coverage.t
+SHA256 38d9e7e9263a513a60ea15292ed75ec2fc386de27e6e9f4bfaa85d777d554b8d xt/Mo-utils-Email/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmWbONkACgkQojV9Rpe/
+B8trLw/+PeNI/1zFRsa4Dtp6VAP+lijOy9g+irVlm4xaPfu0VBCLkcJn6N9AcAwv
+kApndPCGNXMk8GYuKZ3kzktC4niwxv+kwyeJz/chA2XA5N5t32/rBeV+LsZrsn+E
+MYkYIa7/omqrcwbeX/EGMJe9167Y2/LevggqeFr6GbKrm3GTua/Uu1acwqORVFGD
+hB6RfVfFkVtFmK+cZL4IA1pW7dvvfc7JQrjM3uVpHm1kfxiq/JtN7att44MjiPcJ
+uMONVyvppFGClZiOeXtX/s3M67mlVeDt5wFfCgADXrjVra7+PnVvqXzdqbXRu3HS
+qfwXioW/kc92g5K0d6jEler0nsvnXND6DIDiT1/yJtdfcUv96Pjfgyha1nWzLAD/
+z7EHiibcmeaB2B8EsodZV1alJY8xSLSce5URkKfYcOzIqVTigc1T+5ZKdsDazmdV
+htSPYpidhWS2014cbuqnnMhR2HHlXvS0M5knf8hsIFOuetlaUda0wBRn1DUOtgVv
+zHiZMYJZONe1j6GO6+tYYLR4qME/qri5w/k3UJ2SU8+rtJGcghso1q8FdaiFZ3xu
+4gXTVeu4dX/DNUa1gAF5NvonKdhRrzwTXwfZUbqaH6WAKvBDP7vVlWJHLfCL0usj
+jpPTfvxjol+RPqUpV7ezBQQEklq0yQTFfmVy0W2dNV5IlTWgxHM=
+=EaNW
+-----END PGP SIGNATURE-----

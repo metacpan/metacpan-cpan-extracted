@@ -52,7 +52,7 @@ EXCEPTION: {
 
     my $plugin = $class->new();
     dies_ok( sub { $plugin->_against() }, 'dies if stderr and exit' );
-    is( $@, 'git-lint: ' . $error, 'exception matches expected' );
+    is( $@, $error, 'exception matches expected' );
 }
 
 done_testing;

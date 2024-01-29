@@ -1,5 +1,5 @@
 This archive contains the distribution Cassandra-Client,
-version 0.20:
+version 0.21:
 
   Perl library for accessing Cassandra using its binary network protocol
 

@@ -33,6 +33,13 @@ DESCRIPTION
     chip-specific concepts or features, only the use of this module to
     access them.
 
+MOUNT PARAMETERS
+
+ addr
+
+    The I²C address of the device. Can be specified in decimal, octal or
+    hex with leading 0 or 0x prefixes.
+
 METHODS
 
     The following methods documented in an await expression return Future
@@ -40,13 +47,13 @@ METHODS
 
  read_id
 
-       $id = await $chip->read_id
+       $id = await $chip->read_id;
 
     Returns the chip ID.
 
  read_config
 
-       $config = await $chip->read_config
+       $config = await $chip->read_config;
 
     Returns a HASH reference containing the chip config, using fields named
     from the data sheet.
@@ -61,7 +68,7 @@ METHODS
 
  change_config
 
-       await $chip->change_config( %changes )
+       await $chip->change_config( %changes );
 
     Writes updates to the configuration registers.
 
@@ -74,7 +81,7 @@ METHODS
 
  read_raw
 
-       ( $adc_P, $adc_T, $adc_H ) = await $chip->read_raw
+       ( $adc_P, $adc_T, $adc_H ) = await $chip->read_raw;
 
     Returns three integers containing the raw ADC reading values from the
     sensor.
@@ -85,7 +92,7 @@ METHODS
 
  read_sensor
 
-       ( $pressure, $temperature, $humidity ) = await $chip->read_sensor
+       ( $pressure, $temperature, $humidity ) = await $chip->read_sensor;
 
     Returns the sensor readings appropriately converted into units of
     Pascals for pressure, degrees Celcius for temperature, and percentage

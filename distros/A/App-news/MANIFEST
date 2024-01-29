@@ -14,6 +14,7 @@ t/10-groups.t
 t/20-post.t
 t/30-replies.t
 t/40-tags.t
+t/50-latest.t
 t/test.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

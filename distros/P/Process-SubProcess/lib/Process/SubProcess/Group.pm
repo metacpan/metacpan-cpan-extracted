@@ -58,7 +58,9 @@ in an object oriented manner.
 #----------------------------------------------------------------------------
 #Constructors
 
-=head1 CONSTRUCTOR
+=head1 METHODS
+
+=head2 Constructor
 
 =over 4
 
@@ -151,7 +153,7 @@ sub DESTROY {
 #----------------------------------------------------------------------------
 #Administration Methods
 
-=head1 Administration Methods
+=head2 Administration Methods
 
 =over 4
 
@@ -289,10 +291,10 @@ after 6 seconds.
 
 B<Parameters:>
 
-C<INTERVAL> - is an integer that specifies the interval in which each process should
-be checked.
+C<INTERVAL> - is an integer that specifies the interval in which all processes should
+be checked once.
 
-See L<Method C<Process::SubProcess::setArrProcess()>|Process::SubProcess/"setReadTimeout ( TIMEOUT )">
+See L<Method C<Process::SubProcess::setReadTimeout()>|Process::SubProcess/"setReadTimeout ( TIMEOUT )">
 
 =back
 
@@ -340,9 +342,9 @@ This method set the C<READTIMEOUT> for each C<Process::SubProcess> object.
 B<Parameters:>
 
 C<TIMEOUT> - is an integer that specifies the time in seconds to wait for output
-from the command.
+from the command for each C<Process::SubProcess> object.
 
-See L<Method C<Process::SubProcess::setArrProcess()>|Process::SubProcess/"setReadTimeout ( TIMEOUT )">
+See L<Method C<Process::SubProcess::setReadTimeout()>|Process::SubProcess/"setReadTimeout ( TIMEOUT )">
 
 =back
 
@@ -383,6 +385,30 @@ sub setReadTimeout {
         }    #if(scalar(@{$self->{"_array_processes"}}) > 0)
     }    #if(defined $self->{"_array_processes"})
 }
+
+=pod
+
+=over 4
+
+=item setTimeout ( TIMEOUT )
+
+This method set the C<EXECUTIONTIMEOUT> for the C<Process::SubProcess::Group> object.
+
+This enables the B<EXECUTIONTIMEOUT> functionality in the C<Wait()> method which
+ensures that no process runs longer than required. The C<Wait()> method will call the
+C<Terminate()> method which will call the C<Terminate()> method on each C<Process::SubProcess>
+that is still running.
+
+B<Parameters:>
+
+C<TIMEOUT> - is an integer that specifies the maximal execution time in seconds
+of the whole B<Process Group> execution.
+
+See L<Method C<Wait()>|/"Wait ( [ CONFIGURATIONS ] )">
+
+=back
+
+=cut
 
 sub setTimeout {
     my $self = shift;
@@ -643,9 +669,9 @@ sub Check {
 }
 
 sub checkiProcess {
-    my $self  = shift;
+    my $self  = $_[0];
     my $sbprc = undef;
-    my $iidx  = shift;
+    my $iidx  = $_[1];
     my $irs   = 0;
 
     $sbprc = $self->getiProcess($iidx);
@@ -658,6 +684,46 @@ sub checkiProcess {
 
     return $irs;
 }
+
+=pod
+
+=over 4
+
+=item Wait ( [ CONFIGURATIONS ] )
+
+This method checks the C<Process::SubProcess> objects regularly and continues until
+all C<Process::SubProcess> objects report that they are not C<RUNNING> anymore.
+
+If the B<EXECUTIONTIMEOUT> functionality is enabled the method will call the
+C<Terminate()> method which then calls the C<Terminate()> method on each C<Process::SubProcess>
+that is still running.
+
+B<Parameters:>
+
+C<CONFIGURATIONS> - is a list are passed in a hash like fashion, using key and value pairs.
+
+B<Recognized Configurations:>
+
+C<check> - is an integer that specifies the interval in which all processes should
+be checked once.
+
+C<read | readtimeout> - is an integer that specifies the time in seconds to wait for output
+from the command for each C<Process::SubProcess> object.
+
+C<timeout> - is an integer that specifies the maximal execution time in seconds
+of the whole B<Process Group> execution.
+
+See L<Method C<Process::SubProcess::Terminate()>|Process::SubProcess/"Terminate ()">
+
+See L<Method C<setCheckInterval()>|/"setCheckInterval ( INTERVAL )">
+
+See L<Method C<setReadTimeout()>|/"setReadTimeout ( TIMEOUT )">
+
+See L<Method C<setTimeout()>|/"setTimeout ( TIMEOUT )">
+
+=back
+
+=cut
 
 sub Wait {
 

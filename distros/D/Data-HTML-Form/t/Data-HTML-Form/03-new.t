@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
+use Data::HTML::Form;
 use English;
 use Error::Pure::Utils qw(clean);
-use Data::HTML::Form;
 use Test::More 'tests' => 5;
 use Test::NoWarnings;
 

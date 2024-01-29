@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/TieHash.pm
-## Version v1.2.1
+## Version v1.2.2
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2023/09/19
+## Modified 2023/12/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,8 +16,27 @@ BEGIN
     use strict;
     use warnings::register;
     use warnings;
+    use vars qw( $VERSION $PAUSED $MOD_PERL );
     use Scalar::Util ();
-    our $VERSION = 'v1.2.1';
+    # When true _exclude returns always false.
+    # This is used by Module::Generic::_message, because Module::Generic is always part of
+    # the exclusion list
+    our $PAUSED = 0;
+    our $VERSION = 'v1.2.2';
+    if( exists( $ENV{MOD_PERL} )
+        &&
+        ( $MOD_PERL = $ENV{MOD_PERL} =~ /^mod_perl\/(\d+\.[\d\.]+)/ ) )
+    {
+        select( ( select( STDOUT ), $| = 1 )[ 0 ] );
+        require Apache2::Log;
+        require Apache2::Module;
+        require Apache2::ServerUtil;
+        require Apache2::RequestUtil;
+        require Apache2::ServerRec;
+        require ModPerl::Util;
+        require Apache2::Const;
+        Apache2::Const->import( compile => qw( :log OK ) );
+    }
 };
 
 use strict;
@@ -123,9 +142,11 @@ sub FETCH
     my $repo = $self->{object_repo};
     my $key  = shift( @_ );
     my $caller = caller;
+    # require Devel::StackTrace;
+    # my $trace = Devel::StackTrace->new;
     if( $self->_exclude( $caller ) || !$self->{enable} )
     {
-        #print( STDERR "FETCH($caller)[owner calling, enable=$self->{enable}] <- '$key' <- '$self->{$key}'\n" );
+        return( wantarray ? () : undef ) if( !CORE::exists( $self->{ $key } ) );
         return( $self->{ $key } )
     }
     else
@@ -136,7 +157,7 @@ sub FETCH
         }
         else
         {
-            #print( STDERR "FETCH($caller)[enable=$self->{enable}] <- '$key' <- '$data->{$key}'\n" );
+            return( wantarray ? () : undef ) if( !CORE::exists( $data->{ $key } ) );
             return( $data->{ $key } );
         }
     }
@@ -248,7 +269,7 @@ sub _exclude
 {
     my $self = shift( @_ );
     my $caller = shift( @_ );
-    return( CORE::exists( $self->{disable}->{ $caller } ) );
+    return( !$PAUSED && CORE::exists( $self->{disable}->{ $caller } ) );
 }
 
 sub _message
@@ -264,7 +285,16 @@ sub _message
     my $prefix = '#';
     $txt    =~ s/\n$//gs;
     my $mesg = "${prefix} " . join( "\n${prefix} ", split( /\n/, $txt ) );
-    print( STDERR $mesg, "\n" );
+    if( $MOD_PERL )
+    {
+        require Apache2::ServerUtil;
+        my $s = Apache2::ServerUtil->server;
+        $s->log->debug( $mesg );
+    }
+    else
+    {
+        print( STDERR $mesg, "\n" );
+    }
 }
 
 sub FREEZE
@@ -367,9 +397,33 @@ This module implements a tied hash mechanism that accepts as keys strings or ref
 
 It also supports callback hooks for L<Storable>
 
+The constructor C<TIEHASH> supports the following options provided as an hash reference:
+
+=over 4
+
+=item * C<debug>
+
+The debug value as an integer.
+
+=item * C<disable>
+
+An array reference of module classes for which this package will give direct access to the tie object rather to the data stored.
+
+To avoid conflict, the object properties and the tied hash properties are stored in different parts of the tied object.
+
+By default, L<Module::Generic> is part of the exclusion list for which this tied object is disabled.
+
+=item * C<key_object>
+
+Boolean. If true, this allows for the storing of objects as hash keys. Normally, perl would stringify an object to use it as an hash key.
+
+=back
+
+Also, if you set the global variable C<$PAUSED>, then, the exclusion mechanism will be disabled, and during that time, any access to the tied hash will return data stored in it, rather than the object properties.
+
 =head1 VERSION
 
-    v1.2.1
+    v1.2.2
 
 =for Pod::Coverage key_object
 

@@ -1,5 +1,10 @@
 Revision history for Perl module XML::RSS
 
+1.63    2023-12-26
+    - Add allow_empty .
+        - https://github.com/shlomif/perl-XML-RSS/issues/20
+        - Thanks to @johnhorner .
+
 1.62    2020-10-15
     - dist.ini / weaver.ini / .tidyallrc / etc. cleanup
         - Move to @SHLOMIF

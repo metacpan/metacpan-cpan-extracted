@@ -17,6 +17,7 @@ BEGIN
     use common::sense;
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
+    use Want;
     our $VERSION = 'v0.1.0';
 };
 
@@ -44,6 +45,30 @@ sub elements { return( shift->_set_get_object_without_init( 'elements', 'DB::Obj
 
 # The field name
 sub field { return( shift->_set_get_scalar_or_object( 'field', 'DB::Object::Fields::Field', @_ ) ); }
+
+sub fo
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        return( $self->error( "Value provided for method fo() in class ", ref( $self ), " is not a DB::Object::Fields::Field object." ) ) if( !$self->_is_a( $_[0] => 'DB::Object::Fields::Field' ) );
+        $self->{fo} = shift( @_ );
+    }
+    return( $self->{fo} ) if( $self->{fo} );
+    my $f = $self->field;
+    my $fo;
+    if( $self->_is_a( $f => 'DB::Object::Fields::Field' ) )
+    {
+        $fo = $f;
+    }
+    else
+    {
+        $fo = $self->query_object->table_object->fields( $f );
+    }
+    $self->{fo} = $fo if( defined( $fo ) );
+    return( $self->new_null ) if( !defined( $fo ) && Want::want( 'OBJECT' ) );
+    return( $fo );
+}
 
 # The formatting for insert, e.g.: field = value, or possibly field = ?, or even field = $1
 sub format { return( shift->_set_get_scalar_as_object( 'format', @_ ) ); }
@@ -100,7 +125,7 @@ sub type { return( shift->_set_get_scalar_as_object( { field => 'type', callback
         if( ( !defined( $val ) || !$val->defined || !CORE::length( $val // '' ) ) &&
             $self->_is_a( $field => 'DB::Object::Fields::Field' ) )
         {
-            $val = $field->constant->constant;
+            $val = $field->datatype->constant;
         }
         return( $val );
     }
@@ -166,6 +191,25 @@ Sets or gets an L<DB::Object::Query::Elements> object. By default this is C<unde
 =head2 field
 
 Sets or gets the element SQL field (or column) name. It can also be set to a L<DB::Object::Fields::Field> object.
+
+=head2 fo
+
+    my $field_object = $el->fo;
+    $el->fo( $field_object );
+
+Sets or gets a L<table field object|DB::Object::Fields::Field>.
+
+If no field is set, then in accessor mode, this will retrieve the L<table field object|DB::Object::Fields::Field> for the L<field|/field> value currently set by calling L<fields|DB::Object::Tables> and passing it the field name set in L</field>, if any.
+
+If the value set in L</field> is already a L<table field object|DB::Object::Fields::Field>, then this is used instead of course.
+
+If nothing was found, it returns C<undef>, but if this method is called in object context, such as chaining, then a L<null object|Module::Generic::Null> will be returned instead to prevent a hard perl error.
+
+For example, assuming no L<field object|DB::Object::Fields::Field> could be found, the call below would normally return an error that C<name> cannot be called on an undefined value, but here it detects the call is in an object context and returns L<null object|Module::Generic::Null> allowing a fake C<name> method to be called and that will return C<undef>
+
+    $el->fo->name;
+
+Once found the value is cached, so if called many times, there is no performance penalty.
 
 =head2 format
 

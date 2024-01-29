@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use Compress::Zlib;
 
@@ -23,9 +23,11 @@ PDF::Builder::Resource::XObject::Image::TIFF_GT - TIFF image support
 
 =head1 METHODS
 
-=over
+=head2 new
 
-=item  $res = PDF::Builder::Resource::XObject::Image::TIFF_GT->new($pdf, $file, %opts)
+    $res = PDF::Builder::Resource::XObject::Image::TIFF_GT->new($pdf, $file, %opts)
+
+=over
 
 Returns a TIFF-image object. C<$pdf> is the PDF object being added to, C<$file>
 is the input TIFF file, and the optional C<$name> of the new parent image object
@@ -68,6 +70,8 @@ invalid things. If we can find a switch to disable this behavior, we will
 look into adding it as an option. According to Graphic::TIFF's owner 
 (ticket RT 133955), this is coming directly from libtiff (as write to STDERR), 
 so he can't do anything about it!
+
+=back
 
 =cut
 
@@ -137,7 +141,11 @@ sub new {
     return $self;
 } # end of new()
 
-=item  $mode = $tif->usesLib()
+=head2 usesLib
+
+    $mode = $tif->usesLib()
+
+=over
 
 Returns 1 if Graphics::TIFF installed and used, 0 if not installed, or -1 if
 installed but not used (nouseGT option given to C<image_tiff>).

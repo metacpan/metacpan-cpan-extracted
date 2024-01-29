@@ -4,7 +4,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 # VERSION
 
-Version 1.49
+Version 1.51
 
 # SYNOPSIS
 
@@ -243,6 +243,24 @@ It returns the newly created [credential](https://metacpan.org/pod/Firefox::Mari
 ## addons
 
 returns if pre-existing addons (extensions/themes) are allowed to run.  This will be true for Firefox versions less than 55, as [-safe-mode](http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29) cannot be automated.
+
+## agent
+
+accepts an optional value for the [User-Agent](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent) header and sets this using the profile preferences.  This value will be used on the next page load.  It returns the current value, such as 'Mozilla/5.0 (&lt;system-information>) &lt;platform> (&lt;platform-details>) &lt;extensions>'.  This value is retrieved with [navigator.userAgent](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/userAgent).
+
+This method can be used to set a user agent string like so;
+
+    use Firefox::Marionette();
+    use strict;
+
+    # useragents.me should only be queried once a month or less.
+    # these UA strings should be cached locally.
+
+    my %user_agent_strings = map { $_->{ua} => $_->{pct} } @{$firefox->json("https://www.useragents.me/api")->{data}};
+    my ($user_agent) = reverse sort { $user_agent_strings{$a} <=> $user_agent_strings{$b} } keys %user_agent_strings;
+
+    my $firefox = Firefox::Marionette->new();
+    $firefox->agent($user_agent); # agent is now the most popular agent from useragents.me
 
 ## alert\_text
 
@@ -1019,6 +1037,34 @@ causes the browser to traverse one step forward in the joint history of the curr
 
 full screens the firefox window. This method returns [itself](https://metacpan.org/pod/Firefox::Marionette) to aid in chaining methods.
 
+## geo
+
+accepts an optional [geo location](https://metacpan.org/pod/Firefox::Marionette::GeoLocation) object or the parameters for a [geo location](https://metacpan.org/pod/Firefox::Marionette::GeoLocation) object, turns on the [Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API) and returns the current [value](https://metacpan.org/pod/Firefox::Marionette::GeoLocation) returned by calling the javascript [getCurrentPosition](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition) method.  This method is further discussed in the [GEO LOCATION](#geo-location) section.
+
+NOTE: firefox will only allow [Geolocation](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation) calls to be made from [secure contexts](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts) and bizarrely, this does not include about:blank or similar.  Therefore, you will need to load a page before calling the [geo](#geo) method.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new( proxy => 'https://this.is.another.location:3128', geo => 1 );
+
+    # Get geolocation for this.is.another.location (via proxy)
+
+    $firefox->geo($firefox->json('https://freeipapi.com/api/json/'));
+
+    # now google maps will show us in this.is.another.location
+
+    $firefox->go('https://maps.google.com/');
+
+    my $geo = $firefox->geo();
+
+    warn "Apparently, we're now at " . join q[, ], $geo->latitude(), $geo->longitude();
+
+    # OR the quicker setup (run this with perl -C)
+
+    warn "Apparently, we're now at " . Firefox::Marionette->new( proxy => 'https://this.is.another.location:3128', geo => 'https://freeipapi.com/api/json/' )->go('https://maps.google.com/')->geo();
+
+NOTE: currently this call sets the location to be exactly what is specified.  It doesn't change anything else relevant (yet, but it may in future), such as [languages](#languages) or the [timezone](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset).  This function should be considered experimental.  Feedback welcome.
+
 ## go
 
 Navigates the current browsing context to the given [URI](https://metacpan.org/pod/URI) and waits for the document to load or the session's [page\_load](https://metacpan.org/pod/Firefox::Marionette::Timeouts#page_load) duration to elapse before returning, which, by default is 5 minutes.
@@ -1310,6 +1356,13 @@ returns a [JSON](https://metacpan.org/pod/JSON) object that has been parsed from
 
     say Firefox::Marionette->new()->go('https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->json()->{version};
 
+In addition, this method can accept a [URI](https://metacpan.org/pod/URI) as a parameter and retrieve that URI via the firefox [fetch call](https://developer.mozilla.org/en-US/docs/Web/API/fetch) and transforming the body to [JSON via firefox](https://developer.mozilla.org/en-US/docs/Web/API/Response/json_static)
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    say Firefox::Marionette->new()->json('https://freeipapi.com/api/json/')->{ipAddress};
+
 ## key\_down
 
 accepts a parameter describing a key and returns an action for use in the [perform](#perform) method that corresponding with that key being depressed.
@@ -1340,6 +1393,10 @@ accepts a parameter describing a key and returns an action for use in the [perfo
                                  $firefox->key_up('l'),
                                  $firefox->key_up(CONTROL())
                                )->content();
+
+## languages
+
+accepts an optional list of values for the [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language) header and sets this using the profile preferences.  It returns the current values as a list, such as ('en-US', 'en').
 
 ## loaded
 
@@ -1502,6 +1559,7 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 - debug - should firefox's debug to be available via STDERR. This defaults to "0". Any ssh connections will also be printed to STDERR.  This defaults to "0" (off).  This setting may be updated by the [debug](#debug) method.  If this option is not a boolean (0|1), the value will be passed to the [MOZ\_LOG](https://firefox-source-docs.mozilla.org/networking/http/logging.html) option on the command line of the firefox binary to allow extra levels of debug.
 - developer - only allow a [developer edition](https://www.mozilla.org/en-US/firefox/developer/) to be launched. This defaults to "0" (off).
 - devtools - begin the session with the [devtools](https://developer.mozilla.org/en-US/docs/Tools) window opened in a separate window.
+- geo - setup the browser [preferences](http://kb.mozillazine.org/About:config) to allow the [Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API) to work.  If the value for this key is a [URI](https://metacpan.org/pod/URI) object or a string beginning with '^(?:data|http)', this object will be retrieved using the [json](#json) method and the response will used to build a [GeoLocation](https://metacpan.org/pod/Firefox::Mozilla::GeoLocation) object, which will be sent to the [geo](#geo) method.  If the value for this key is a hash, the hash will be used to build a [GeoLocation](https://metacpan.org/pod/Firefox::Mozilla::GeoLocation) object, which will be sent to the [geo](#geo) method.
 - height - set the [height](http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29) of the initial firefox window
 - har - begin the session with the [devtools](https://developer.mozilla.org/en-US/docs/Tools) window opened in a separate window.  The [HAR Export Trigger](https://addons.mozilla.org/en-US/firefox/addon/har-export-trigger/) addon will be loaded into the new session automatically, which means that [-safe-mode](http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29) will not be activated for this session AND this functionality will only be available for Firefox 61+.
 - host - use [ssh](https://man.openbsd.org/ssh.1) to create and automate firefox on the specified host.  See [REMOTE AUTOMATION OF FIREFOX VIA SSH](#remote-automation-of-firefox-via-ssh) and [NETWORK ARCHITECTURE](#network-architecture).  The user will default to the current user name (see the user parameter to change this).  Authentication should be via public keys loaded into the local [ssh-agent](https://man.openbsd.org/ssh-agent).
@@ -1591,7 +1649,7 @@ accepts a optional hash as the first parameter with the following allowed keys;
 - page\_ranges - A list of the pages to print. Available for [Firefox 96](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/96#webdriver_conformance_marionette) and after.
 - print\_background - Print background graphics.  Boolean value.  Defaults to false. 
 - raw - rather than a file handle containing the PDF, the binary PDF will be returned.
-- scale - Scale of the webpage rendering.  Defaults to 1.
+- scale - Scale of the webpage rendering.  Defaults to 1.  `shrink_to_fit` should be disabled to make `scale` work.
 - size - The desired size (width and height) of the pdf, specified by name.  See the page key for an alternative and the [paper\_sizes](#paper_sizes) method for a list of accepted page size names. 
 - shrink\_to\_fit - Whether or not to override page size as defined by CSS.  Boolean value.  Defaults to true. 
 
@@ -2096,13 +2154,12 @@ returns a hash of known Windows product names (such as 'Mozilla Firefox') with p
 returns the [current window's handle](https://metacpan.org/pod/Firefox::Marionette::WebWindow). On desktop this typically corresponds to the currently selected tab.  returns an opaque server-assigned identifier to this window that uniquely identifies it within this Marionette instance.  This can be used to switch to this window at a later point.  This is the same as the [window](https://developer.mozilla.org/en-US/docs/Web/API/Window) object in Javascript.
 
     use Firefox::Marionette();
-    use 5.010;
 
     my $firefox = Firefox::Marionette->new();
     my $original_window = $firefox->window_handle();
     my $javascript_window = $firefox->script('return window'); # only works for Firefox 121 and later
     if ($javascript_window ne $original_window) {
-      die "That was unexpected!!! What happened?";
+        die "That was unexpected!!! What happened?";
     }
 
 ## window\_handles
@@ -2193,6 +2250,8 @@ See the [REMOTE AUTOMATION OF FIREFOX VIA SSH](#remote-automation-of-firefox-via
 
 See [SETTING UP SOCKS SERVERS USING SSH](https://metacpan.org/pod/Firefox::Marionette::Proxy#SETTING-UP-SOCKS-SERVERS-USING-SSH) for easy proxying via [ssh](https://man.openbsd.org/ssh)
 
+See [GEO LOCATION](#geo-location) section for how to combine this with providing appropriate browser settings for the end point.
+
 # AUTOMATING THE FIREFOX PASSWORD MANAGER
 
 This module allows you to login to a website without ever directly handling usernames and password details.  The Password Manager may be preloaded with appropriate passwords and locked, like so;
@@ -2231,6 +2290,44 @@ And used to fill in login prompts without explicitly knowing the account details
     $firefox->go('https://pause.perl.org/pause/authenquery')->accept_alert(); # this goes to the page and submits the http auth popup
 
     $firefox->go('https://github.com/login')->fill_login(); # fill the login and password fields without needing to see them
+
+# GEO LOCATION
+
+The firefox [Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API) can be used by supplying the `geo` parameter to the [new](#new) method and then calling the [geo](#geo) method (from a [secure context](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts).
+
+The [geo](#geo) method can accept various specific latitude and longitude parameters as a list, such as;
+
+    $firefox->geo(latitude => -37.82896, longitude => 144.9811);
+
+    OR
+
+    $firefox->geo(lat => -37.82896, long => 144.9811);
+
+    OR
+
+    $firefox->geo(lat => -37.82896, lng => 144.9811);
+
+    OR
+
+    $firefox->geo(lat => -37.82896, lon => 144.9811);
+
+or it can be passed in as a reference, such as;
+
+    $firefox->geo({ latitude => -37.82896, longitude => 144.9811 });
+
+the combination of a variety of parameter names and the ability to pass parameters in as a reference means it can be deal with various geo location websites, such as;
+
+    $firefox->geo($firefox->json('https://freeipapi.com/api/json/')); # get geo location from IP address
+
+    $firefox->geo($firefox->json('https://geocode.maps.co/search?street=101+Collins+St&city=Melbourne&state=VIC&postalcode=3000&country=AU&format=json')->[0]); # get geo location of street address
+
+    $firefox->geo($firefox->json('http://api.positionstack.com/v1/forward?access_key=' . $access_key . '&query=101+Collins+St,Melbourne,VIC+3000')->{data}->[0]); # get geo location of street address using api key
+
+    $firefox->geo($firefox->json('https://api.ipgeolocation.io/ipgeo?apiKey=' . $api_key)); # get geo location from IP address
+
+These sites were active at the time this documentation was written, but mainly function as an illustration of the flexibility of [geo](#geo) and [json](#json) methods in providing the desired location to the [Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API).
+
+The [country\_code](https://metacpan.org/pod/Firefox::Marionette::GeoLocation#country_code) and [timezone\_offset](https://metacpan.org/pod/Firefox::Marionette::GeoLocation#timezone_offset) methods can be used to help set the [languages](#languages) method and possibly in the future change the timezone of the browser.
 
 # CONSOLE LOGGING
 

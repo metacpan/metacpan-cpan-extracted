@@ -4,7 +4,7 @@
  *	This file contains XS code for the Perl's Tcl bridge module.
  *
  * Copyright (c) 1994-1997, Malcolm Beattie
- * Copyright (c) 2003-2018, Vadim Konovalov
+ * Copyright (c) 2003-2024, Vadim Konovalov
  * Copyright (c) 2004 ActiveState Corp., a division of Sophos PLC
  *
  */
@@ -17,17 +17,6 @@
 #ifndef DEBUG_REFCOUNTS
 #define DEBUG_REFCOUNTS 0
 #endif
-
-/*
- * Until we update for 8.4 CONST-ness
- */
-#define USE_NON_CONST
-
-/*
- * Both Perl and Tcl use these macros
- */
-#undef STRINGIFY
-#undef JOIN
 
 #include <tcl.h>
 
@@ -80,13 +69,14 @@ static char defaultLibraryDir[sizeof(LIB_RUNTIME_DIR)+200] = LIB_RUNTIME_DIR;
 #include <windows.h>
 #undef WIN32_LEAN_AND_MEAN
 #define dlopen(libname, flags)	LoadLibrary(libname)
-#define dlclose(path)		((void *) FreeLibrary((HMODULE) path))
+#define dlclose(path)		FreeLibrary((HMODULE) path)
 #define DLSYM(handle, symbol, type, proc) \
 	(proc = (type) GetProcAddress((HINSTANCE) handle, symbol))
 #define snprintf _snprintf
 
 #elif defined(__APPLE__)
 
+#ifdef SEE_TICKET_125664 /*sorry, no replacement for deprecated function */
 #include <CoreServices/CoreServices.h>
 
 static short DOMAINS[] = {
@@ -96,6 +86,7 @@ static short DOMAINS[] = {
     kSystemDomain
 };
 static const int DOMAINS_LEN = sizeof(DOMAINS)/sizeof(DOMAINS[0]);
+#endif
 
 #elif defined(__hpux)
 /* HPUX requires shl_* routines */
@@ -165,13 +156,13 @@ extern Tcl_PackageInitProc Blt_Init, Blt_SafeInit;
  * These may not exist - guard against NULL result.
  */
 
-static Tcl_ObjType *tclBooleanTypePtr = NULL;
-static Tcl_ObjType *tclByteArrayTypePtr = NULL;
-static Tcl_ObjType *tclDoubleTypePtr = NULL;
-static Tcl_ObjType *tclIntTypePtr = NULL;
-static Tcl_ObjType *tclListTypePtr = NULL;
-static Tcl_ObjType *tclStringTypePtr = NULL;
-static Tcl_ObjType *tclWideIntTypePtr = NULL;
+static const Tcl_ObjType *tclBooleanTypePtr = NULL;
+static const Tcl_ObjType *tclByteArrayTypePtr = NULL;
+static const Tcl_ObjType *tclDoubleTypePtr = NULL;
+static const Tcl_ObjType *tclIntTypePtr = NULL;
+static const Tcl_ObjType *tclListTypePtr = NULL;
+static const Tcl_ObjType *tclStringTypePtr = NULL;
+static const Tcl_ObjType *tclWideIntTypePtr = NULL;
 
 /*
  * This tells us whether Tcl is in a "callable" state.  Set to 1 in BOOT
@@ -255,8 +246,8 @@ NpLoadLibrary(pTHX_ HMODULE *tclHandle, char *dllFilename, int dllFilenameSize)
 	 * fail if the user has requested an alternate TCL_LIB_FILE.
 	 */
         strcat(libname, "/Tcl.framework/" TCL_LIB_FILE);
-	/* printf("Try \"%s\"\n", libname); */
 	handle = dlopen(libname, RTLD_NOW | RTLD_GLOBAL);
+	sprintf(buffer,"%sfailed dlopen(%s,...);\n", buffer, libname);
         if (handle) {
             break;
 	}
@@ -271,22 +262,16 @@ NpLoadLibrary(pTHX_ HMODULE *tclHandle, char *dllFilename, int dllFilenameSize)
 	    return TCL_ERROR;
 	}
 
-#if defined(__WIN32__) && defined(TCLSH_PATH)
 	if (!handle) {
-	    snprintf(libname, MAX_PATH-1, "%s/%s", TCLSH_PATH, TCL_LIB_FILE);
-	    handle = dlopen(libname, RTLD_NOW | RTLD_GLOBAL);
-	}
-#endif
-	if (!handle) {
-	    sprintf(buffer,"%sfailed dlopen(%s,...);\n", buffer, libname);
 	    /* Try based on full path. */
 	    snprintf(libname, MAX_PATH-1, "%s/%s", defaultLibraryDir, TCL_LIB_FILE);
+	    sprintf(buffer,"%sfailed dlopen(%s,...);\n", buffer, libname);
 	    handle = dlopen(libname, RTLD_NOW | RTLD_GLOBAL);
 	}
 	if (!handle) {
-	    sprintf(buffer,"%sfailed dlopen(%s,...);\n", buffer, libname);
 	    /* Try based on anywhere in the path. */
 	    strcpy(libname, TCL_LIB_FILE);
+	    sprintf(buffer,"%sfailed dlopen(%s,...);\n", buffer, libname);
 	    handle = dlopen(libname, RTLD_NOW | RTLD_GLOBAL);
 	}
 	if (!handle) {
@@ -296,7 +281,7 @@ NpLoadLibrary(pTHX_ HMODULE *tclHandle, char *dllFilename, int dllFilenameSize)
 	    if (*pos == '.') {
 		pos++;
 	    }
-	    *pos = '9'; /* count down from '9' to '0': 8.9, 8.8, 8.7, 8.6, ... */
+	    *pos = '7'; /* count down from '7' to '0': 8.7, 8.6, 8.5, 8.4, ... */
 	    do {
 		sprintf(buffer,"%strying dlopen(%s,...)\n", buffer, libname);
 		handle = dlopen(libname, RTLD_NOW | RTLD_GLOBAL);
@@ -395,11 +380,11 @@ NpInitialize(pTHX_ SV *X)
     static void (* findExecutable)(char *) = NULL;
     /*
      * We want the Tcl_InitStubs func static to ourselves - before Tcl
-     * is loaded dyanmically and possibly changes it.
+     * is loaded dynamically and possibly changes it.
      * Variable initstubs have to be declared as volatile to prevent
      * compiler optimizing it out.
      */
-    static CONST char *(*volatile initstubs)(Tcl_Interp *, CONST char *, int)
+    static const char *(*volatile initstubs)(Tcl_Interp *, const char *, int)
 	= Tcl_InitStubs;
     char dllFilename[MAX_PATH];
     dllFilename[0] = '\0';
@@ -495,7 +480,7 @@ NpInitialize(pTHX_ SV *X)
 	}
     }
     if (tclKit_AppInit(g_Interp) != TCL_OK) {
-	CONST84 char *msg = Tcl_GetVar(g_Interp, "errorInfo", TCL_GLOBAL_ONLY);
+	const char *msg = Tcl_GetVar(g_Interp, "errorInfo", TCL_GLOBAL_ONLY);
 	warn("Failed to initialize Tcl with %s:\n%s",
 		(tclKit_AppInit == Tcl_Init) ? "Tcl_Init" : "TclKit_AppInit",
 		msg);
@@ -532,9 +517,9 @@ check_refcounts(Tcl_Obj *objPtr) {
 #endif
 
 static int
-has_highbit(CONST char *s, int len)
+has_highbit(const char *s, int len)
 {
-    CONST char *e = s + len;
+    const char *e = s + len;
     while (s < e) {
 	if (*s++ & 0x80)
 	    return 1;
@@ -547,7 +532,7 @@ SvFromTclObj(pTHX_ Tcl_Obj *objPtr)
 {
     SV *sv;
     int len;
-    char *str;
+    const char *str;
 
     if (objPtr == NULL) {
 	/*
@@ -557,28 +542,42 @@ SvFromTclObj(pTHX_ Tcl_Obj *objPtr)
 	 */
 	sv = newSV(0);
     }
-    else if (objPtr->typePtr == tclIntTypePtr) {
-	sv = newSViv(objPtr->internalRep.longValue);
+    /* Must check this now in case any tcl…TypePtr's are NULL */
+    else if (objPtr->typePtr == NULL) {
+	goto handle_as_string;
+    }
+    else if ((objPtr->typePtr == tclIntTypePtr) ||
+	     (objPtr->typePtr == tclWideIntTypePtr)) {
+	/*
+	 * Tcl TIP 484 means that value type "int" may be 64-bit
+	 * even on 32-bit systems.
+	 */
+	Tcl_WideInt w;
+	Tcl_GetWideIntFromObj(NULL, objPtr, &w); /* must return TCL_OK */
+	if (IVSIZE >= sizeof(Tcl_WideInt) ||
+	    (w >= (Tcl_WideInt)IV_MIN && w <= (Tcl_WideInt)IV_MAX)
+	   ) {
+	    sv = newSViv(w);
+	} else if (w >= (Tcl_WideInt)UV_MIN && w <= (Tcl_WideInt)UV_MAX) {
+	    sv = newSVuv(w);
+	} else {
+	    goto handle_as_string;
+	}
     }
     else if (objPtr->typePtr == tclDoubleTypePtr) {
 	sv = newSVnv(objPtr->internalRep.doubleValue);
     }
     else if (objPtr->typePtr == tclBooleanTypePtr) {
 	/*
-	 * Booleans can originate as words (yes/true/...), so if there is a
-	 * string rep, use it instead.  We could check if the first byte
-	 * isdigit().  No need to check utf-8 as the all valid boolean words
-	 * are ascii-7.
+	 * Returning 0 or 1 to Perl is more useful than returning string boolean
+	 * (i.e. "true"/"false"/"yes"/"no"/"on"/"off").
 	 */
-	if (objPtr->typePtr == NULL) {
-	    sv = newSVsv(boolSV(objPtr->internalRep.longValue != 0));
-	} else {
-	    str = Tcl_GetStringFromObj(objPtr, &len);
-	    sv = newSVpvn(str, len);
-	}
+	int boolValue;
+	Tcl_GetBooleanFromObj(NULL, objPtr, &boolValue); /* must return TCL_OK */
+	sv = newSVsv(boolSV(boolValue));
     }
     else if (objPtr->typePtr == tclByteArrayTypePtr) {
-	str = (char *) Tcl_GetByteArrayFromObj(objPtr, &len);
+	str = (const char *) Tcl_GetByteArrayFromObj(objPtr, &len);
 	sv = newSVpvn(str, len);
     }
     else if (objPtr->typePtr == tclListTypePtr) {
@@ -612,8 +611,9 @@ SvFromTclObj(pTHX_ Tcl_Obj *objPtr)
 	}
     }
     /* tclStringTypePtr is true unicode */
-    /* tclWideIntTypePtr is 64-bit int */
+    /* may also be handling int/wideInt outside of [IV_MIN,UV_MAX] */
     else {
+handle_as_string:
 	str = Tcl_GetStringFromObj(objPtr, &len);
 	sv = newSVpvn(str, len);
 	/* should turn on, but let's check this first for efficiency */
@@ -663,7 +663,10 @@ TclObjFromSv(pTHX_ SV *sv)
     if (SvGMAGICAL(sv))
 	mg_get(sv);
 
-    if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
+    if (!SvOK(sv)) {
+	objPtr = Tcl_NewObj();
+    }
+    else if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV &&
 	(!SvOBJECT(SvRV(sv)) || sv_isa(sv, "Tcl::List")))
     {
 	/*
@@ -780,7 +783,7 @@ TclObjFromSv(pTHX_ SV *sv)
 }
 
 int Tcl_EvalInPerl(ClientData clientData, Tcl_Interp *interp,
-	int objc, Tcl_Obj *CONST objv[])
+	int objc, Tcl_Obj *const objv[])
 {
     dTHX; /* fetch context */
     dSP;
@@ -837,7 +840,7 @@ int Tcl_EvalInPerl(ClientData clientData, Tcl_Interp *interp,
 }
 
 int Tcl_PerlCallWrapper(ClientData clientData, Tcl_Interp *interp,
-	int objc, Tcl_Obj *CONST objv[])
+	int objc, Tcl_Obj *const objv[])
 {
     dTHX; /* fetch context */
     dSP;
@@ -1011,6 +1014,8 @@ var_trace(ClientData clientData, Tcl_Interp *interp,
 }
 
 MODULE = Tcl	PACKAGE = Tcl	PREFIX = Tcl_
+
+PROTOTYPES: DISABLE
 
 SV *
 Tcl__new(class = "Tcl")
@@ -1203,7 +1208,7 @@ Tcl_invoke(interp, sv, ...)
 #define NUM_OBJS 16
 	    Tcl_Obj     *baseobjv[NUM_OBJS];
 	    Tcl_Obj    **objv = baseobjv;
-	    char        *cmdName;
+	    const char  *cmdName;
 	    int          objc, i, result;
 	    STRLEN       length;
 	    Tcl_CmdInfo	 cmdinfo;
@@ -1270,11 +1275,11 @@ Tcl_invoke(interp, sv, ...)
 		 * prepare string arguments into argv (1st is already done)
 		 * and call found procedure
 		 */
-		char  *baseargv[NUM_OBJS];
-		char **argv = baseargv;
+		const char  *baseargv[NUM_OBJS];
+		const char **argv = baseargv;
 
 		if (objc > NUM_OBJS) {
-		    New(666, argv, objc, char *);
+		    New(666, argv, objc, const char *);
 		}
 
 		argv[0] = cmdName;
@@ -1404,7 +1409,7 @@ Tcl_DESTROY(interp)
 	     * Remove from the global hash of live interps.
 	     */
 	    if (hvInterps) {
-		(void) hv_delete(hvInterps, (const char *) interp,
+		(void) hv_delete(hvInterps, (const char *) &interp,
 			sizeof(Tcl), G_DISCARD);
 	    }
 	}
@@ -1556,7 +1561,7 @@ Tcl_CreateCommand(interp,cmdName,cmdProc,clientData=&PL_sv_undef,deleteProc=&PL_
     CODE:
 	if (!initialized) { return; }
 	if (SvIOK(cmdProc))
-	    Tcl_CreateCommand(interp, cmdName, (Tcl_CmdProc *) SvIV(cmdProc),
+	    Tcl_CreateCommand(interp, cmdName, INT2PTR(Tcl_CmdProc *, SvIV(cmdProc)),
 			      INT2PTR(ClientData, SvIV(clientData)), NULL);
 	else {
 	    AV *av = (AV *) SvREFCNT_inc((SV *) newAV());
@@ -1627,8 +1632,8 @@ Tcl_SplitList(interp, str)
 	Tcl		interp
 	char *		str
 	int		argc = NO_INIT
-	char **		argv = NO_INIT
-	char **		tofree = NO_INIT
+	const char **	argv = NO_INIT
+	const char **	tofree = NO_INIT
     PPCODE:
 	if (Tcl_SplitList(interp, str, &argc, &argv) == TCL_OK)
 	{
@@ -1706,15 +1711,21 @@ Tcl_UnsetVar2(interp, varname1, varname2, flags = 0)
     OUTPUT:
 	RETVAL
 
+int
+Tcl_InterpDeleted(interp)
+	Tcl interp
+
 
 MODULE = Tcl		PACKAGE = Tcl::List
+
+PROTOTYPES: DISABLE
 
 SV*
 as_string(SV* sv,...)
     PREINIT:
 	Tcl_Obj* objPtr;
 	int len;
-	char *str;
+	const char *str;
     CODE:
 	objPtr = TclObjFromSv(aTHX_ sv);
 	Tcl_IncrRefCount(objPtr);
@@ -1730,6 +1741,8 @@ as_string(SV* sv,...)
 
 
 MODULE = Tcl		PACKAGE = Tcl::Var
+
+PROTOTYPES: DISABLE
 
 SV *
 FETCH(av, key = NULL)
@@ -1809,6 +1822,8 @@ STORE(av, sv1, sv2 = NULL)
 
 MODULE = Tcl	PACKAGE = Tcl
 
+PROTOTYPES: DISABLE
+
 BOOT:
     {
 	SV *x = GvSV(gv_fetchpv("\030", TRUE, SVt_PV)); /* $^X */
@@ -1834,13 +1849,44 @@ BOOT:
 	hvInterps = newHV();
     }
 
-    tclBooleanTypePtr   = Tcl_GetObjType("boolean");
-    tclByteArrayTypePtr = Tcl_GetObjType("bytearray");
     tclDoubleTypePtr    = Tcl_GetObjType("double");
-    tclIntTypePtr       = Tcl_GetObjType("int");
     tclListTypePtr      = Tcl_GetObjType("list");
     tclStringTypePtr    = Tcl_GetObjType("string");
-    tclWideIntTypePtr   = Tcl_GetObjType("wideInt");
+    {
+	/* As of Tcl 9.0, Tcl_GetObjType() returns NULL for these types */
+
+	Tcl_Obj *objPtr;
+	int boolValue;
+
+	/* As suggested at https://core.tcl-lang.org/tcl/info/3bb3bcf2da5b */
+	objPtr = Tcl_NewStringObj("true", -1);
+	Tcl_GetBooleanFromObj(NULL, objPtr, &boolValue); /* must return TCL_OK */
+	tclBooleanTypePtr = objPtr->typePtr;
+	Tcl_DecrRefCount(objPtr);
+
+	/* As suggested by TIP 484 */
+	objPtr = Tcl_NewIntObj(0);
+	tclIntTypePtr = objPtr->typePtr;
+	Tcl_DecrRefCount(objPtr);
+
+	/*
+	 * Retrieve the 64-bit type, which is either "wideInt" or "int";
+	 * the "wideInt" type is only available when the "int" type is 32-bit.
+	 */
+	objPtr = Tcl_NewWideIntObj(
+		/*
+		 * Must use a value wider than 32-bit here, otherwise
+		 * Tcl_NewWideIntObj() could return a 32-bit "int".
+		 */
+		(Tcl_WideInt)(1) << 32
+	);
+	tclWideIntTypePtr = objPtr->typePtr;
+	Tcl_DecrRefCount(objPtr);
+
+	objPtr = Tcl_NewByteArrayObj(NULL, 0);
+	tclByteArrayTypePtr = objPtr->typePtr;
+	Tcl_DecrRefCount(objPtr);
+    }
 
     /* set up constant subs */
     {
@@ -1859,7 +1905,6 @@ BOOT:
 	newCONSTSUB(stash, "TRACE_WRITES",     newSViv(TCL_TRACE_WRITES));
 	newCONSTSUB(stash, "TRACE_UNSETS",     newSViv(TCL_TRACE_UNSETS));
 	newCONSTSUB(stash, "TRACE_DESTROYED",  newSViv(TCL_TRACE_DESTROYED));
-	newCONSTSUB(stash, "INTERP_DESTROYED", newSViv(TCL_INTERP_DESTROYED));
 	newCONSTSUB(stash, "LEAVE_ERR_MSG",    newSViv(TCL_LEAVE_ERR_MSG));
 	newCONSTSUB(stash, "TRACE_ARRAY",      newSViv(TCL_TRACE_ARRAY));
 

@@ -1,10 +1,10 @@
 =head1 NAME
 
-StreamFinder::IHeartRadio - Fetch actual raw streamable URLs from radio-station websites on IHeartRadio.com
+StreamFinder::IHeartRadio - Fetch actual raw streamable URLs from radio-station websites on IHeart.com
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2022 by
+This module is Copyright (C) 2017-2023 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -92,15 +92,15 @@ file.
 =head1 DESCRIPTION
 
 StreamFinder::IHeartRadio accepts a valid radio station or podcast ID or URL on 
-IHeartRadio.com and returns the actual stream URL(s), title, and cover art icon.  
-The purpose is that one needs one of these URLs in order to have the option to 
-stream the station in one's own choice of media player software rather than 
-using their web browser and accepting any / all flash, ads, javascript, 
-cookies, trackers, web-bugs, and other crapware that can come with that method 
-of play.  The author uses his own custom all-purpose media player called 
-"fauxdacious" (his custom hacked version of the open-source "audacious" 
-audio player).  "fauxdacious" can incorporate this module to decode and play 
-IHeartRadio.com streams.
+IHeart.com (formerly known as IHeartRadio.com) and returns the actual stream 
+URL(s), title, and cover art icon.  The purpose is that one needs one of these 
+URLs in order to have the option to stream the station in one's own choice of 
+media player software rather than using their web browser and accepting 
+any / all flash, ads, javascript, cookies, trackers, web-bugs, and other 
+crapware that can come with that method of play.  The author uses his own 
+custom all-purpose media player called "fauxdacious" (his custom hacked version 
+of the open-source "audacious" audio player).  "fauxdacious" can incorporate 
+this module to decode and play IHeart.com streams.
 
 One or more stream URLs can be returned for each station or podcast.  
 
@@ -111,7 +111,7 @@ One or more stream URLs can be returned for each station or podcast.
 =item B<new>(I<ID>|I<url> [, I<-keep|-skip> => I<streamtypes>] 
 [, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ] ... ])
 
-Accepts an iheartradio.com station / podcast ID or URL and creates and returns 
+Accepts an iheart.com station / podcast ID or URL and creates and returns 
 a new station (or podcast) object, or I<undef> if the URL is not a valid IHeart 
 station or podcast, or no streams are found.  The URL can be the full URL, 
 ie. https://www.iheart.com/live/B<station-id>, 
@@ -337,7 +337,7 @@ L<http://search.cpan.org/dist/StreamFinder-IHeartRadio/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2022 Jim Turner.
+Copyright 2017-2023 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

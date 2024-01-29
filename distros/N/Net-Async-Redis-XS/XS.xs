@@ -41,7 +41,7 @@ struct pending_stack {
 };
 
 void
-add_value(struct pending_stack *target, SV *v)
+add_value(pTHX_ struct pending_stack *target, SV *v)
 {
     if(!target)
         return;
@@ -204,7 +204,7 @@ PPCODE:
                     ptr += 2;
                     SV *v = newSViv(n);
                     if(ps) {
-                        add_value(ps, v);
+                        add_value(aTHX_ ps, v);
                     } else {
                         av_push(results, v);
                         extracted_item = true;
@@ -249,7 +249,7 @@ PPCODE:
                     }
                     ptr += 2;
                     if(ps) {
-                        add_value(ps, v);
+                        add_value(aTHX_ ps, v);
                     } else {
                         av_push(results, v);
                         extracted_item = true;
@@ -287,7 +287,7 @@ PPCODE:
                     }
                     ptr += 2;
                     if(ps) {
-                        add_value(ps, v);
+                        add_value(aTHX_ ps, v);
                     } else {
                         av_push(results, v);
                         extracted_item = true;
@@ -310,7 +310,7 @@ PPCODE:
                     SV *v = newSVpvn(start, n);
                     ptr += 2;
                     if(ps) {
-                        add_value(ps, v);
+                        add_value(aTHX_ ps, v);
                     } else {
                         av_push(results, v);
                         extracted_item = true;
@@ -374,7 +374,7 @@ PPCODE:
                     }
                     ptr += 2;
                     if(ps) {
-                        add_value(ps, v);
+                        add_value(aTHX_ ps, v);
                     } else {
                         av_push(results, v);
                         extracted_item = true;

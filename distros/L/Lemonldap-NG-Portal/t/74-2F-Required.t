@@ -4,7 +4,7 @@ use strict;
 use IO::String;
 
 require 't/test-lib.pm';
-my $maintests = 17;
+my $maintests = 18;
 
 SKIP: {
     eval { require Convert::Base32 };
@@ -13,12 +13,12 @@ SKIP: {
     }
     require Lemonldap::NG::Common::TOTP;
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel               => 'error',
                 totp2fSelfRegistration => 1,
                 totp2fActivation       => 1,
+                totp2fAuthnLevel       => 5,
                 sfRequired             => 1,
                 tokenUseGlobalStorage  => 1,
             }
@@ -85,12 +85,32 @@ SKIP: {
         ),
         'Post code'
     );
+    $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
     eval { $res = JSON::from_json( $res->[2]->[0] ) };
     ok( not($@), 'Content is JSON' )
       or explain( $res->[2]->[0], 'JSON content' );
     ok( $res->{result} == 1, 'Key is registered' );
 
-    # Try to sign-in
+    ok(
+        $res = $client->_get(
+            '/2fregisters',
+            accept => "text/html",
+            query  => "continue=1",
+            cookie => $pdata,
+        ),
+        "Continue login"
+    );
+
+    # Make sure we are redirected to the portal with a correctly updated session
+    expectRedirection( $res, qr'^http://auth.example.com/$' );
+    my $id      = expectCookie($res);
+    my $session = getSession($id);
+    is( $session->{data}->{_2f},                 "totp" );
+    is( $session->{data}->{authenticationLevel}, "5" );
+    like( $session->{data}->{_2fDevices}, qr/TOTP/ );
+    count(3);
+
+    # Try to sign in normally
     ok(
         $res = $client->_post(
             '/',
@@ -112,7 +132,7 @@ SKIP: {
         ),
         'Post code'
     );
-    my $id = expectCookie($res);
+    $id = expectCookie($res);
     $client->logout($id);
 }
 count($maintests);

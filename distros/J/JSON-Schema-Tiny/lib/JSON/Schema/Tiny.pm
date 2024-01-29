@@ -1,13 +1,16 @@
+# vim: set ft=perl ts=8 sts=2 sw=2 tw=100 et :
 use strictures 2;
-package JSON::Schema::Tiny; # git description: v0.020-6-g695f073
+package JSON::Schema::Tiny; # git description: v0.021-10-g2f94223
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 use 5.020;  # for unicode_strings, signatures, postderef features
-use experimental 0.026 qw(signatures postderef args_array_with_signatures);
+use stable 0.031 'postderef';
+use experimental 0.026 qw(signatures args_array_with_signatures);
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
@@ -21,7 +24,7 @@ use JSON::MaybeXS 1.004001 'is_bool';
 use Feature::Compat::Try;
 use JSON::PP ();
 use List::Util 1.33 qw(any none);
-use Scalar::Util 'blessed';
+use Scalar::Util qw(blessed looks_like_number);
 use if "$]" >= 5.022, POSIX => 'isinf';
 use Math::BigFloat;
 use namespace::clean;
@@ -34,6 +37,7 @@ our $SHORT_CIRCUIT = 0;
 our $MAX_TRAVERSAL_DEPTH = 50;
 our $MOJO_BOOLEANS; # deprecated; renamed to $SCALARREF_BOOLEANS
 our $SCALARREF_BOOLEANS;
+our $STRINGY_NUMBERS;
 our $SPECIFICATION_VERSION;
 
 my %version_uris = (
@@ -54,6 +58,7 @@ sub evaluate {
   local $SHORT_CIRCUIT = $_[0]->{short_circuit} // $SHORT_CIRCUIT,
   local $MAX_TRAVERSAL_DEPTH = $_[0]->{max_traversal_depth} // $MAX_TRAVERSAL_DEPTH,
   local $SCALARREF_BOOLEANS = $_[0]->{scalarref_booleans} // $SCALARREF_BOOLEANS // $_[0]->{mojo_booleans},
+  local $STRINGY_NUMBERS = $_[0]->{stringy_numbers} // $STRINGY_NUMBERS,
   local $SPECIFICATION_VERSION = $_[0]->{specification_version} // $SPECIFICATION_VERSION,
   shift
     if blessed($_[0]) and blessed($_[0])->isa(__PACKAGE__);
@@ -414,6 +419,8 @@ sub _eval_keyword_type ($data, $schema, $state) {
     my $type = get_type($data);
     return 1 if any {
       $type eq $_ or ($_ eq 'number' and $type eq 'integer')
+        or ($type eq 'string' and $STRINGY_NUMBERS and looks_like_number($data)
+            and ($_ eq 'number' or ($_ eq 'integer' and $data == int($data))))
         or ($_ eq 'boolean' and $SCALARREF_BOOLEANS and $type eq 'reference to SCALAR')
     } $schema->{type}->@*;
     return E($state, 'got %s, not one of %s', $type, join(', ', $schema->{type}->@*));
@@ -425,6 +432,8 @@ sub _eval_keyword_type ($data, $schema, $state) {
 
     my $type = get_type($data);
     return 1 if $type eq $schema->{type} or ($schema->{type} eq 'number' and $type eq 'integer')
+      or ($type eq 'string' and $STRINGY_NUMBERS and looks_like_number($data)
+          and ($schema->{type} eq 'number' or ($schema->{type} eq 'integer' and $data == int($data))))
       or ($schema->{type} eq 'boolean' and $SCALARREF_BOOLEANS and $type eq 'reference to SCALAR');
     return E($state, 'got %s, not %s', $type, $schema->{type});
   }
@@ -451,7 +460,9 @@ sub _eval_keyword_multipleOf ($data, $schema, $state) {
   assert_keyword_type($state, $schema, 'number');
   abort($state, 'multipleOf value is not a positive number') if $schema->{multipleOf} <= 0;
 
-  return 1 if not is_type('number', $data);
+  return 1 if not is_type('number', $data)
+    and not ($STRINGY_NUMBERS and is_type('string', $data) and looks_like_number($data)
+      and do { $data = 0+$data; 1 });
 
   # if either value is a float, use the bignum library for the calculation
   if (ref($data) =~ /^Math::Big(?:Int|Float)$/
@@ -475,29 +486,33 @@ sub _eval_keyword_multipleOf ($data, $schema, $state) {
 
 sub _eval_keyword_maximum ($data, $schema, $state) {
   assert_keyword_type($state, $schema, 'number');
-  return 1 if not is_type('number', $data);
-  return 1 if $data <= $schema->{maximum};
+  return 1 if not is_type('number', $data)
+    and not ($STRINGY_NUMBERS and is_type('string', $data) and looks_like_number($data));
+  return 1 if 0+$data <= $schema->{maximum};
   return E($state, 'value is larger than %s', sprintf_num($schema->{maximum}));
 }
 
 sub _eval_keyword_exclusiveMaximum ($data, $schema, $state) {
   assert_keyword_type($state, $schema, 'number');
-  return 1 if not is_type('number', $data);
-  return 1 if $data < $schema->{exclusiveMaximum};
+  return 1 if not is_type('number', $data)
+    and not ($STRINGY_NUMBERS and is_type('string', $data) and looks_like_number($data));
+  return 1 if 0+$data < $schema->{exclusiveMaximum};
   return E($state, 'value is equal to or larger than %s', sprintf_num($schema->{exclusiveMaximum}));
 }
 
 sub _eval_keyword_minimum ($data, $schema, $state) {
   assert_keyword_type($state, $schema, 'number');
-  return 1 if not is_type('number', $data);
-  return 1 if $data >= $schema->{minimum};
+  return 1 if not is_type('number', $data)
+    and not ($STRINGY_NUMBERS and is_type('string', $data) and looks_like_number($data));
+  return 1 if 0+$data >= $schema->{minimum};
   return E($state, 'value is smaller than %s', sprintf_num($schema->{minimum}));
 }
 
 sub _eval_keyword_exclusiveMinimum ($data, $schema, $state) {
   assert_keyword_type($state, $schema, 'number');
-  return 1 if not is_type('number', $data);
-  return 1 if $data > $schema->{exclusiveMinimum};
+  return 1 if not is_type('number', $data)
+    and not ($STRINGY_NUMBERS and is_type('string', $data) and looks_like_number($data));
+  return 1 if 0+$data > $schema->{exclusiveMinimum};
   return E($state, 'value is equal to or smaller than %s', sprintf_num($schema->{exclusiveMinimum}));
 }
 
@@ -1104,6 +1119,13 @@ sub is_equal ($x, $y, $state = {}) {
     ($y, $types[1]) = (0+!!$$y, 'boolean') if $types[1] eq 'reference to SCALAR';
   }
 
+  if ($STRINGY_NUMBERS) {
+    ($x, $types[0]) = (0+$x, int(0+$x) == $x ? 'integer' : 'number')
+      if $types[0] eq 'string' and looks_like_number($x);
+    ($y, $types[1]) = (0+$y, int(0+$y) == $y ? 'integer' : 'number')
+      if $types[1] eq 'string' and looks_like_number($y);
+  }
+
   return 0 if $types[0] ne $types[1];
   return 1 if $types[0] eq 'null';
   return $x eq $y if $types[0] eq 'string';
@@ -1275,7 +1297,7 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -1375,8 +1397,61 @@ other, or badly-written schemas that could be optimized. Defaults to 50.
 
 =head2 C<$SCALARREF_BOOLEANS>
 
-When true, any type that is expected to be a boolean B<in the instance data> may also be expressed as
+When true, any value that is expected to be a boolean B<in the instance data> may also be expressed as
 the scalar references C<\0> or C<\1> (which are serialized as booleans by JSON backends).
+Defaults to false.
+
+=head2 C<$STRINGY_NUMBERS>
+
+When true, any value that is expected to be a number or integer B<in the instance data> may also be
+expressed as a string. This applies only to the following keywords:
+
+=over 4
+
+=item *
+
+C<type> (where both C<string> and C<number> (and possibly C<integer>) are considered types
+
+=item *
+
+C<const> and C<enum> (where the string C<"1"> will match with C<"const": 1>)
+
+=item *
+
+C<uniqueItems> (where strings and numbers are compared numerically to each other, if either or both are numeric)
+
+=item *
+
+C<multipleOf>
+
+=item *
+
+C<maximum>
+
+=item *
+
+C<exclusiveMaximum>
+
+=item *
+
+C<minimum>
+
+=item *
+
+C<exclusiveMinimum>
+
+=back
+
+This allows you to write a schema like this (which validates a string representing an integer):
+
+  type: string
+  pattern: ^[0-9]$
+  multipleOf: 4
+  minimum: 16
+  maximum: 256
+
+Such keywords are only applied if the value looks like a number, and do not generate a failure
+otherwise. Values are determined to be numbers via L<perlapi/looks_like_number>.
 Defaults to false.
 
 =head2 C<$SPECIFICATION_VERSION>

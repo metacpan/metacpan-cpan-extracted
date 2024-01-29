@@ -1,17 +1,33 @@
 # Revision history for Perl extension Qmail::Deliverable.
 # The format for this changelog is described at http://use.perl.org/~hex/journal/34882
 
+VERSION:      1.09
+new:          detect ezmlm lists, reject null senders to lists
+new:          correctly ignore comments in qmail/users/assign #3
+new:          add module syntax tests #3
+new:          add regression test that exercises bug reported in #2
+fix:          fix interpretation of wildcard assignments #2
+info:         This version provided by Martin Sluka & Matt Simerson
+
+
+VERSION:      1.08
+change:       License change only.
+
+
 VERSION:      1.07
 fix:          default@example.org in vpopmail/valias now works as intended.
 new:          Support for vpopmail user-ext (disabled by default).
 change:       The plugin check_qmail_deliverable lost its "check_" prefix.
 info:         This version was provided by Matt Simerson.
 
+
 VERSION:      1.06
 new:          Support for vpopmail vaddaliasdomain.
 
+
 VERSION:      1.05
 new:          Support for vpopmail valias address extensions (foo-default).
+
 
 VERSION:      1.04
 new:          Support for vpopmail valias addresses.
@@ -23,6 +39,7 @@ new:          qmail-deliverabled can now stay in the foreground for use with
 security:     Made qmail-deliverabled safer and taint mode compliant for
               Perl 5.10.
 
+
 VERSION:      1.03
 new:          qmail-deliverabled now takes a pidfile on the command line, and can
               stop itself using that.
@@ -31,9 +48,11 @@ docs:         Qmail::Deliverable::Comparison, a document to compare with other
 fix:          Now correctly loads "me" if "locals" does not exist.
 new:          An example init.d script.
 
+
 VERSION:      1.02
 new:          Support for bouncesaying, although without using the configured
               error message. Plesk puts |bouncesaying in .qmail-default.
+
 
 VERSION:      1.01
 change:       qpsmtpd plugin check_qmail_deliverable installs as a binary, so
@@ -47,6 +66,7 @@ incompatible: ::Client::qmail_local no longer returns undef on connection error,
               because undef already meant something else.
 new:          qmail-deliverabled has basic statistics in $0.
 docs:         Minor documentation updates.
+
 
 VERSION:      1.00
 new:          First CPAN release.

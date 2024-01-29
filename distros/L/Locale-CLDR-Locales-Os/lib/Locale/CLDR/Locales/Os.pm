@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Os - Package for language Ossetic
 
 package Locale::CLDR::Locales::Os;
 # This file auto generated from Data\common\main\os.xml
-#	on Tue  5 Dec  1:27:02 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -44,7 +44,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ab' => 'абхазаг',
@@ -156,7 +156,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'Дуне',
  			'002' => 'Африкӕ',
@@ -185,7 +185,7 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'calendar' => 'Къӕлиндар',
  			'numbers' => 'Нымӕцтӕ',
@@ -217,7 +217,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{Метрикон},
  			'UK' => q{СБ},
@@ -231,7 +231,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'Ӕвзаг: {0}',
  			'script' => 'Скрипт: {0}',
@@ -252,8 +252,8 @@ has 'characters' => (
 		return {
 			index => ['А', 'Ӕ', 'Б', 'В', 'Г', '{Гъ}', 'Д', '{Дж}', '{Дз}', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', '{Къ}', 'Л', 'М', 'Н', 'О', 'П', '{Пъ}', 'Р', 'С', 'Т', '{Тъ}', 'У', 'Ф', 'Х', '{Хъ}', 'Ц', '{Цъ}', 'Ч', '{Чъ}', 'Ш', 'Щ', 'Ы', 'Э', 'Ю', 'Я'],
 			main => qr{[а ӕ б в г {гъ} д {дж} {дз} е ё ж з и й к {къ} л м н о п {пъ} р с т {тъ} у ф х {хъ} ц {цъ} ч {чъ} ш щ ъ ы ь э ю я]},
-			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ‚ " “ „ « » ( ) \[ \] \{ \} § @ * / \& #]},
+			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ‚ " “ „ « » ( ) \[ \] \{ \} § @ * / \& #]},
 		};
 	},
 EOT
@@ -317,36 +317,85 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(боны),
+						'one' => q({0} бон),
+						'other' => q({0} боны),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(боны),
 						'one' => q({0} бон),
 						'other' => q({0} боны),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(сахаты),
+						'one' => q({0} сахат),
+						'other' => q({0} сахаты),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(сахаты),
 						'one' => q({0} сахат),
 						'other' => q({0} сахаты),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(минуты),
+						'one' => q({0} минут),
+						'other' => q({0} минуты),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(минуты),
 						'one' => q({0} минут),
 						'other' => q({0} минуты),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(мӕйы),
+						'one' => q({0} мӕй),
+						'other' => q({0} мӕйы),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(мӕйы),
 						'one' => q({0} мӕй),
 						'other' => q({0} мӕйы),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(секунды),
+						'one' => q({0} секунд),
+						'other' => q({0} секунды),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(секунды),
 						'one' => q({0} секунд),
 						'other' => q({0} секунды),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(къуырийы),
+						'one' => q({0} къуыри),
+						'other' => q({0} къуырийы),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(къуырийы),
 						'one' => q({0} къуыри),
 						'other' => q({0} къуырийы),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(азы),
+						'one' => q({0} аз),
+						'other' => q({0} азы),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(азы),
 						'one' => q({0} аз),
@@ -354,30 +403,71 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(боны),
+						'one' => q({0} бон),
+						'other' => q({0} боны),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(боны),
 						'one' => q({0} бон),
 						'other' => q({0} боны),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(сахаты),
+						'one' => q({0} с.),
+						'other' => q({0} с.),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(сахаты),
 						'one' => q({0} с.),
 						'other' => q({0} с.),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(минуты),
+						'one' => q({0} мин.),
+						'other' => q({0} мин.),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(минуты),
 						'one' => q({0} мин.),
 						'other' => q({0} мин.),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(мӕйы),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(мӕйы),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(секунды),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(секунды),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(къуырийы),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(къуырийы),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(азы),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(азы),
 					},

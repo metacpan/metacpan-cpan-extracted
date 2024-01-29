@@ -1,3 +1,8 @@
+0.607   2023-12-12  Released-By: PERLANCAR; Urgency: medium
+
+        - Add function: rgb_closest_to().
+
+
 0.606   2021-08-06  Released-By: PERLANCAR; Urgency: medium
 
 	- [function rgb2grayscale] Add 'algo' argument, offer

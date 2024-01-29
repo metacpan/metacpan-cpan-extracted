@@ -1,6 +1,6 @@
 package File::Rename::Unicode;
 
-use 5.012;
+use 5.032;  # use 5.012;
 
 use strict;
 use warnings;

@@ -2,7 +2,7 @@ package Net::DNS::RR::SIG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SIG.pm 1908 2023-03-15 07:28:50Z willem $)[2];
+our $VERSION = (qw$Id: SIG.pm 1957 2024-01-10 14:54:10Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -32,7 +32,7 @@ use constant DNSSEC => USESEC && defined eval join '', qw(r e q u i r e), ' Net:
 
 my @index;
 if (DNSSEC) {
-	foreach my $class ( map {"Net::DNS::SEC::$_"} qw(RSA DSA ECCGOST ECDSA EdDSA) ) {
+	foreach my $class ( map {"Net::DNS::SEC::$_"} qw(RSA DSA ECDSA EdDSA) ) {
 		my @algorithms = eval join '', qw(r e q u i r e), " $class; $class->_index";	## no critic
 		push @index, map { ( $_ => $class ) } @algorithms;
 	}
@@ -46,11 +46,11 @@ my @field = qw(typecovered algorithm labels orgttl sigexpiration siginception ke
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my ( $self, $data, $offset ) = @_;
+	my ( $self, $data, $offset, @opaque ) = @_;
 
 	my $limit = $offset + $self->{rdlength};
 	@{$self}{@field} = unpack "\@$offset n C2 N3 n", $$data;
-	( $self->{signame}, $offset ) = Net::DNS::DomainName->decode( $data, $offset + 18 );
+	( $self->{signame}, $offset ) = Net::DNS::DomainName->decode( $data, $offset + 18, @opaque );
 	$self->{sigbin} = substr $$data, $offset, $limit - $offset;
 
 	croak('misplaced or corrupt SIG') unless $limit == length $$data;
@@ -477,11 +477,9 @@ sub _ordered() {			## irreflexive 32-bit partial ordering
 	return 1 unless defined $n1;				# ( undef, any )
 
 	# unwise to assume 64-bit arithmetic, or that 32-bit integer overflow goes unpunished
-	use integer;
-	if ( $n2 < 0 ) {					# fold, leaving $n2 non-negative
-		$n1 = ( $n1 & 0xFFFFFFFF ) ^ 0x80000000;	# -2**31 <= $n1 < 2**32
-		$n2 = ( $n2 & 0x7FFFFFFF );			#  0	 <= $n2 < 2**31
-	}
+	use integer;						# fold, leaving $n2 non-negative
+	$n1 = ( $n1 & 0xFFFFFFFF ) ^ ( $n2 & 0x80000000 );	# -2**31 <= $n1 < 2**32
+	$n2 = ( $n2 & 0x7FFFFFFF );				#  0	 <= $n2 < 2**31
 
 	return $n1 < $n2 ? ( $n1 > ( $n2 - 0x80000000 ) ) : ( $n2 < ( $n1 - 0x80000000 ) );
 }

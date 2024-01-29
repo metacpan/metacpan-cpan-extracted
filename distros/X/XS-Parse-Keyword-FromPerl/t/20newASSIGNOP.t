@@ -10,17 +10,10 @@ use XS::Parse::Keyword::FromPerl qw(
    register_xs_parse_keyword
 );
 use Optree::Generate qw(
-   opcode
    newASSIGNOP newGVOP newSVOP newUNOP
-);
 
-use constant {
-   # Pull out some OP_* constants
-   OP_CONST => opcode("const"),
-   OP_ADD   => opcode("add"),
-   OP_GV    => opcode("gv"),
-   OP_RV2SV => opcode("rv2sv"),
-};
+   OP_CONST OP_ADD OP_GV OP_RV2SV
+);
 
 # addten
 BEGIN {

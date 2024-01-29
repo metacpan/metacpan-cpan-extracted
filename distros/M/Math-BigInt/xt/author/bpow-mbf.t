@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 255;
+use Test::More tests => 259;
 
 use Math::BigFloat;
 
@@ -88,6 +88,24 @@ EOF
             is($z, $want, "\$z has the right value");
         }
     };
+}
+
+# Verify that accuracy and precision is restored (CPAN RT #150523).
+
+{
+    $class -> accuracy(10);
+    is($class -> accuracy(), 10, "class accuracy is 10 before bpow()");
+    my $x = $class -> new(12345);
+    $x -> bpow(2);
+    is($class -> accuracy(), 10, "class accuracy is 10 after bpow()");
+}
+
+{
+    $class -> precision(-10);
+    is($class -> precision(), -10, "class precision is -10 before bpow()");
+    my $x = $class -> new(12345);
+    $x -> bpow(2);
+    is($class -> precision(), -10, "class precision is -10 after bpow()");
 }
 
 __END__

@@ -5,7 +5,7 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 class Point {
    field $x :param;
@@ -26,7 +26,9 @@ class Point {
       'Point fully specified' );
 }
 
-class Point3D :isa(Point) {
+class Point3D {
+   inherit Point;
+
    field $z :param = 0;
 
    method pos { return ( $self->next::method, $z ) }

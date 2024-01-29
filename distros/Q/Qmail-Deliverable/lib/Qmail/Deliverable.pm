@@ -5,10 +5,11 @@ use 5.006;
 use Carp qw(carp);
 use base 'Exporter';
 
-our $VERSION = '1.07';
+our $VERSION = '1.09';
 our @EXPORT_OK = qw/reread_config qmail_local dot_qmail deliverable qmail_user/;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 our $VPOPMAIL_EXT = 0;
+our $qmail_dir = '/var/qmail';
 
 # rfc2822's "atext"
 my $atext = "[A-Za-z0-9!#\$%&\'*+\/=?^_\`{|}~-]";
@@ -66,24 +67,26 @@ sub reread_config {
     %virtualdomains = ();
     %users_exact    = ();
     %users_wild     = ();
-    my $locals_fn = -e "/var/qmail/control/locals"
-        ? "/var/qmail/control/locals"
-        : "/var/qmail/control/me";
+    my $locals_fn = -e "$qmail_dir/control/locals"
+        ? "$qmail_dir/control/locals"
+        : "$qmail_dir/control/me";
     for (_slurp $locals_fn) {
         chomp;
         ($_) = lc =~ /$ascii/ or do { warn "Invalid character"; next; };
         $locals{$_} = 1;
     }
-    for (_slurp "/var/qmail/control/virtualdomains") {
+    for (_slurp "$qmail_dir/control/virtualdomains") {
         chomp;
         ($_) = lc =~ /$ascii/ or do { warn "Invalid character"; next; };
         my ($domain, $prepend) = split /:/, $_, 2;
         $virtualdomains{$domain} = $prepend;
     }
-    for (_slurp "/var/qmail/users/assign") {
+    for (_slurp "$qmail_dir/users/assign") {
         chomp;
         ($_) = /$ascii/ or do { warn "Invalid character"; next; };
-        if (s/^=([^:]+)://) {
+        if (/^#/) {  # comment
+            next;
+        } elsif (s/^=([^:]+)://) {
             $users_exact{lc $1} = $_;
         } elsif (s/^\+([^:]+)://) {
             $users_wild{lc $1} = $_;
@@ -151,12 +154,15 @@ sub qmail_user {
             my $try = substr $local, 0, $_;
             if (exists $users_wild{$try}) {
                 my @assign = split /:/, $users_wild{$try}, 7;
-                $assign[5] = substr($local, $_) . $assign[5];
+                $assign[5] .= substr($local, $_);
                 return @assign;
             }
         }
     }
 
+    if ($qmail_dir eq "t/fixtures") {
+        return $local;
+    }
     return _qmail_getpw $local;
 }
 
@@ -289,6 +295,7 @@ sub deliverable {
         return 0x00;
     }
 
+    return 0x14 if grep /ezmlm/, @dot_qmail;
     return 0x12 if grep /^\|/, @dot_qmail;
 
     return 0xf1;
@@ -329,8 +336,8 @@ qmail-smtpd does not know if a user exists. Lots of resources are wasted by
 scanning mail for spam and viruses for addresses that do not exist anyway,
 including the annoying I<backscatter> or I<outscatter> phenomenon.
 
-A replacement smtpd written in Perl could use this module to quickly verify
-that a local email address is (probably) actually in use. Qmail::Delivery uses
+Smtp daemons can use this module to quickly verify that a local email address
+is (probably) actually in use. Qmail::Deliverable uses
 the same logic that qmail itself (in qmail-send/lspawn/local) uses.
 
 =head2 Bundled software
@@ -401,6 +408,7 @@ Possible return values are:
     0x11   Deliverability unknown: permission denied for any file
     0x12   Deliverability unknown: qmail-command called in dot-qmail file
     0x13   Deliverability unknown: bouncesaying with program
+    0x14   Deliverable, probable:  ezmlm mailing list
 
     0x21   Temporarily undeliverable: group/world writable
     0x22   Temporarily undeliverable: homedir is sticky
@@ -510,15 +518,25 @@ source code.
 
 =head1 UNICODE SUPPORT
 
-This module refuses non-ASCII data. If anyone out there actually uses non-ASCII
-data or control characters in their mail configuration, I'd like to learn about
-the circumstances. Please email me.
+This module refuses non-ASCII data.
 
-=head1 LEGAL
+=head1 LICENSE
 
-This software is released into the public domain, and does not come with
-warranty or guarantee of any kind. Use it at your own risk.
+This software does not come with warranty or guarantee of any kind. Use it at
+your own risk.
 
-=head1 AUTHOR
+This software may be redistributed under the terms of the GPL, LGPL, modified
+BSD, or Artistic license, or any of the other OSI approved licenses listed at
+http://www.opensource.org/licenses/alphabetical. Distribution is allowed under
+all of these these licenses, or any smaller subset of multiple or just one of
+these licenses.
 
+When using a packaged version, please refer to the package metadata to see
+under which license terms it was distributed. Alternatively, a distributor may
+choose to replace the LICENSE section of the documentation and/or include a
+LICENSE file to reflect the license(s) they chose to redistribute under.
+
+=head1 AUTHORS
+
+Matt Simerson <msimerson@cpan.org>
 Juerd Waalboer <#####@juerd.nl>

@@ -57,7 +57,7 @@
          "web" : "https://github.com/Corion/Text-CleanFragment"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

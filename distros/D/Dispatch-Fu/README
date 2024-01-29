@@ -1,5 +1,5 @@
 This archive contains the distribution Dispatch-Fu,
-version 0.99:
+version 1.05:
 
   Converts any complicated conditional dispatch situation into familiar static hash-key based dispatch
 

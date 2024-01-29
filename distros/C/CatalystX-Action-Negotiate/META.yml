@@ -1,5 +1,5 @@
 ---
-abstract: 'ActionRole for content negotiation'
+abstract: ~
 author:
   - 'Dorian Taylor, C<< <dorian at cpan.org> >>'
   - 'Dorian Taylor <dorian@cpan.org>'
@@ -11,7 +11,7 @@ configure_requires:
   Module::Install: 0
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,4 +32,4 @@ resources:
   bugtracker: https://github.com/doriantaylor/p5-catalystx-action-negotiate/issues
   license: http://www.apache.org/licenses/LICENSE-2.0
   repository: git://github.com/doriantaylor/p5-catalystx-action-negotiate.git
-version: '0.04'
+version: '0.05'

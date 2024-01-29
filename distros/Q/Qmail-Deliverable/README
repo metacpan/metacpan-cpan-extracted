@@ -26,11 +26,8 @@ DEPENDENCIES
 This module requires a functional qmail installation in its standard location,
 /var/qmail.
 
-COPYRIGHT AND LICENCE
+COPYRIGHT
 
-Put the correct copyright and licence information here.
-
+Copyright (C) 2024 by Matt Simerson
 Copyright (C) 2007 by Juerd Waalboer
 
-Released into the public domain, without warranty or guarantee of any kind.
-Use at your own risk.

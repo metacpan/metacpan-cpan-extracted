@@ -1,7 +1,7 @@
 ---
 abstract: 'test functions for particular variable types'
 author:
-  - 'brian d foy <bdfoy@cpan.org>'
+  - 'brian d foy <briandfoy@pobox.com>'
 build_requires:
   Test::Builder: '0'
   Test::Builder::Tester: '0'
@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,6 +29,6 @@ requires:
 resources:
   bugtracker: https://github.com/briandfoy/test-data/issues
   homepage: https://github.com/briandfoy/test-data
-  repository: https://github.com/briandfoy/test-data.git
-version: '1.244'
+  repository: https://github.com/briandfoy/test-data
+version: '1.245'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

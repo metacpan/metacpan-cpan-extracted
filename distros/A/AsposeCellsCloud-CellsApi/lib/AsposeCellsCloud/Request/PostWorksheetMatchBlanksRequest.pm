@@ -62,8 +62,8 @@ sub new {
 # PostWorksheetMatchBlanksRequest.name : The workbook name.  ,
 # PostWorksheetMatchBlanksRequest.sheetName : The worksheet name.  ,
 # PostWorksheetMatchBlanksRequest.fieldIndex : The integer offset of the field on which you want to base the filter (from the left of the list; the leftmost field is field 0).  ,
-# PostWorksheetMatchBlanksRequest.folder : Original workbook folder.  ,
-# PostWorksheetMatchBlanksRequest.storageName : Storage name.   
+# PostWorksheetMatchBlanksRequest.folder : The folder where the file is situated.  ,
+# PostWorksheetMatchBlanksRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_match_blanks' } = { 
-    	summary => 'Match all blank cell in the list.',
+    	summary => 'Match all blank cells in the list.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -156,14 +156,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

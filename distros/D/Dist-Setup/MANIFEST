@@ -1,0 +1,25 @@
+cpanfile
+data/cpanfile
+data/dist_setup.conf
+data/dot_devcontainer/.cond
+data/dot_devcontainer/devcontainer.json.raw
+data/dot_devcontainer/Dockerfile
+data/dot_devcontainer/update_content.sh
+data/dot_github/.cond
+data/dot_github/ci.yml
+data/dot_gitignore
+data/LICENSE.raw
+data/Makefile.PL
+data/MANIFEST.SKIP
+data/MANIFEST.skip
+data/tt_footer
+data/tt_header
+Dist-Setup-0.01.tar.gz
+lib/Dist/Setup.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+script/perl_dist_setup
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

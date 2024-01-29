@@ -3,12 +3,12 @@ abstract: "compare several perls's performance"
 author:
   - unknown
 build_requires:
-  Test::More: '0.94'
+  Test::More: '1'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,6 +16,8 @@ meta-spec:
 name: PerlBench
 no_index:
   directory:
+    - t
+    - inc
     - benchmarks
     - perlbench-results
     - t
@@ -32,6 +34,6 @@ requires:
 resources:
   bugtracker: https://github.com/briandfoy/perlbench/issues
   homepage: https://github.com/briandfoy/perlbench
-  repository: https://github.com/briandfoy/perlbench.git
-version: '1.001'
+  repository: https://github.com/briandfoy/perlbench
+version: '1.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

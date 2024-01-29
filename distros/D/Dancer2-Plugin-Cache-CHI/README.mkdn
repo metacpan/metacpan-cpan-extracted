@@ -4,55 +4,59 @@ Dancer2::Plugin::Cache::CHI - Dancer plugin to cache response content (and anyth
 
 # VERSION
 
-version 2.0.0
+version 2.0.1
 
 # SYNOPSIS
 
 In your configuration:
 
-    plugins:
-        'Cache::CHI':
-            driver: Memory
-            global: 1
+```
+plugins:
+    'Cache::CHI':
+        driver: Memory
+        global: 1
+```
 
 In your application:
 
-    use Dancer2;
-    use Dancer2::Plugin::Cache::CHI;
+```perl
+use Dancer2;
+use Dancer2::Plugin::Cache::CHI;
 
-    # caching pages' response
+# caching pages' response
 
-    check_page_cache;
+check_page_cache;
 
-    get '/cache_me' => sub {
-        cache_page template 'foo';
-    };
+get '/cache_me' => sub {
+    cache_page template 'foo';
+};
 
-    # using the helper functions
+# using the helper functions
 
-    get '/clear' => sub {
-        cache_clear;
-    };
+get '/clear' => sub {
+    cache_clear;
+};
 
-    put '/stash' => sub {
-        cache_set secret_stash => request->body;
-    };
+put '/stash' => sub {
+    cache_set secret_stash => request->body;
+};
 
-    get '/stash' => sub {
-        return cache_get 'secret_stash';
-    };
+get '/stash' => sub {
+    return cache_get 'secret_stash';
+};
 
-    del '/stash' => {
-        return cache_remove 'secret_stash';
-    };
+del '/stash' => {
+    return cache_remove 'secret_stash';
+};
 
-    # using the cache directly
+# using the cache directly
 
-    get '/something' => sub {
-        my $thingy = cache->compute( 'thingy', sub { compute_thingy() } );
+get '/something' => sub {
+    my $thingy = cache->compute( 'thingy', sub { compute_thingy() } );
 
-        return template 'foo' => { thingy => $thingy };
-    };
+    return template 'foo' => { thingy => $thingy };
+};
+```
 
 # DESCRIPTION
 
@@ -65,7 +69,9 @@ Unrecognized configuration elements are passed directly to the [CHI](https://met
 constructor. For example, the configuration given in the ["SYNOPSIS"](#synopsis)
 will create a cache object equivalent to
 
-    $cache = CHI->new( driver => 'Memory', global => 1, );
+```perl
+$cache = CHI->new( driver => 'Memory', global => 1, );
+```
 
 ## honor\_no\_cache
 
@@ -86,13 +92,15 @@ using _cache $namespace, \\%args_. The new cache uses the arguments as defined i
 the configuration, which values can be overriden by the optional arguments
 (which are only used on the first invocation of the namespace).
 
-    get '/memory' => sub {
-        cache('elephant')->get( 'stuff' );
-    };
+```perl
+get '/memory' => sub {
+    cache('elephant')->get( 'stuff' );
+};
 
-    get '/goldfish' => sub {
-        cache( 'goldfish' => { expires_in => 300 } )->get( 'stuff' );
-    };
+get '/goldfish' => sub {
+    cache( 'goldfish' => { expires_in => 300 } )->get( 'stuff' );
+};
+```
 
 Note that all the other keywords (`cache_page`, `cache_set`, etc) will still
 use the main cache object.
@@ -125,18 +133,22 @@ Sets the function that generates the cache key for _cache\_page_.
 For example, to have the key contains both information about the request's
 hostname and path\_info (useful to deal with multi-machine applications):
 
-    cache_page_key_generator sub {
-        return join ':', request()->host, request()->path_info;
-    };
+```perl
+cache_page_key_generator sub {
+    return join ':', request()->host, request()->path_info;
+};
+```
 
 ## cache\_set, cache\_get, cache\_remove, cache\_clear, cache\_compute
 
 Shortcut to the cache's object methods.
 
-    get '/cache/:attr/:value' => sub {
-        # equivalent to cache->set( ... );
-        cache_set $params->{attr} => $params->{value};
-    };
+```perl
+get '/cache/:attr/:value' => sub {
+    # equivalent to cache->set( ... );
+    cache_set $params->{attr} => $params->{value};
+};
+```
 
 See the [CHI](https://metacpan.org/pod/CHI) documentation for further info on these methods.
 
@@ -149,12 +161,14 @@ its first use.
 
 Useful, for example, to change the cache's configuration at run time:
 
-    use Sys::Hostname;
+```perl
+use Sys::Hostname;
 
-    # set the namespace to the current hostname
-    hook before_create_cache => sub {
-        config->{plugins}{'Cache::CHI'}{namespace} = hostname;
-    };
+# set the namespace to the current hostname
+hook before_create_cache => sub {
+    config->{plugins}{'Cache::CHI'}{namespace} = hostname;
+};
+```
 
 # SEE ALSO
 
@@ -162,7 +176,7 @@ Dancer2 Web Framework - [Dancer2](https://metacpan.org/pod/Dancer2)
 
 [CHI](https://metacpan.org/pod/CHI)
 
-[Dancer::Plugin::Memcached](https://metacpan.org/pod/Dancer::Plugin::Memcached) - plugin that heavily inspired this one.
+[Dancer::Plugin::Memcached](https://metacpan.org/pod/Dancer%3A%3APlugin%3A%3AMemcached) - plugin that heavily inspired this one.
 
 # AUTHOR
 
@@ -170,7 +184,7 @@ Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/en
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Yanick Champoux.
+This software is copyright (c) 2023 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

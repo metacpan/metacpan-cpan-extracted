@@ -19,7 +19,7 @@ no multidimensional;
 
 use Cwd 'abs_path';
 
-use Test::More tests => 97;
+use Test::More tests => 103;
 use Test::Output;
 use Test::Warn;
 
@@ -509,3 +509,21 @@ is($_->attr(), 42, 'changed SCALAR reference has correct value');
 
 $_ = UI::Various::PoorTerm::Class6->new({ attr => \$var });
 is($_->attr(), 42, 'constructor creates SCALAR correct reference');
+
+#####################################
+# checks of colour translation function:
+my $re_in_tc = ' in call to UI::Various::core::_tui_color' . $re_msg_tail;
+warning_like
+{   $_ = UI::Various::core::_tui_color(7);   }
+{   carped => qr/^invalid value 7 for parameter 'hex'$re_in_tc/   },
+    "bad 'hex' parameter value causes error";
+is($_, 0, "bad 'hex' parameter value returned correct dummy result");
+
+$_ = UI::Various::core::_tui_color('ffFFff');
+is($_, 215, "internal colour of 'ffffff' is correct");
+$_ = UI::Various::core::_tui_color('000000');
+is($_, 0, "internal colour of '000000' is correct");
+$_ = UI::Various::core::_tui_color('1f204f');
+is($_, 0 + 6 + 1, "internal colour of '1f204f' is correct");
+$_ = UI::Various::core::_tui_color('50b0df');
+is($_, 72 + 24 + 4, "internal colour of '50b0df' is correct");

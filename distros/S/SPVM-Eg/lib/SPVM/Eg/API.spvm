@@ -1,0 +1,19 @@
+class Eg::API {
+  
+  use Eg::API::App;
+  use Eg::API::Window;
+  
+  # Fields
+  has app : rw Eg::API::App;
+  
+  has window : rw Eg::API::Window;
+  
+  # Class Methods
+  static method new : Eg::API () {
+    
+    my $self = new Eg::API;
+    
+    return $self;
+  }
+  
+}

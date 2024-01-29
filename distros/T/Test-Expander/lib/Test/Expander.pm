@@ -2,7 +2,7 @@
 package Test::Expander;
 
 # The versioning is conform with https://semver.org
-our $VERSION = '2.2.0';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '2.3.2';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use strict;
 use warnings
@@ -11,12 +11,14 @@ use warnings
 
 use Const::Fast;
 use File::chdir;
-use File::Temp       qw( tempdir tempfile );
-use Getopt::Long     qw( GetOptions :config posix_default );
+use File::Temp          qw( tempdir tempfile );
+use Getopt::Long        qw( GetOptions :config posix_default );
 use Importer;
-use Path::Tiny       qw( cwd path );
-use Scalar::Readonly qw( readonly_on );
-use Test2::API       qw( context );
+use Path::Tiny          qw( cwd path );
+use Scalar::Readonly    qw( readonly_on );
+use Test::Builder;
+use Test2::API          qw( context );
+use Test2::API::Context qw();
 use Test2::Tools::Basic;
 use Test2::Tools::Explain;
 use Test2::Tools::Subtest;
@@ -26,13 +28,14 @@ use Test::Expander::Constants qw(
   $FMT_INVALID_DIRECTORY $FMT_INVALID_ENV_ENTRY $FMT_INVALID_VALUE $FMT_INVALID_SUBTEST_NUMBER $FMT_KEEP_ENV_VAR
   $FMT_NEW_FAILED $FMT_NEW_SUCCEEDED $FMT_REPLACEMENT $FMT_REQUIRE_DESCRIPTION $FMT_REQUIRE_IMPLEMENTATION
   $FMT_SEARCH_PATTERN $FMT_SET_ENV_VAR $FMT_SET_TO $FMT_SKIP_ENV_VAR $FMT_UNKNOWN_OPTION $FMT_USE_DESCRIPTION
-  $FMT_USE_IMPLEMENTATION $MSG_ERROR_WAS $MSG_UNEXPECTED_EXCEPTION
+  $FMT_USE_IMPLEMENTATION $MSG_BAIL_OUT $MSG_ERROR_WAS $MSG_UNEXPECTED_EXCEPTION
   $NOTE
   $REGEX_ANY_EXTENSION $REGEX_CLASS_HIERARCHY_LEVEL $REGEX_TOP_DIR_IN_PATH $REGEX_VERSION_NUMBER
   $TRUE
   %MOST_CONSTANTS_TO_EXPORT %REST_CONSTANTS_TO_EXPORT
 );
 
+my $ok_orig = \&Test2::API::Context::ok;
 my ( @subtest_names, @subtest_numbers );
 
 sub _subtest_selection {
@@ -72,10 +75,21 @@ our @EXPORT = (
   @{ Test2::V0::EXPORT },
   qw( tempdir tempfile ),
   qw( cwd path ),
-  qw( BAIL_OUT dies_ok is_deeply lives_ok new_ok require_ok throws_ok use_ok ),
+  qw( BAIL_OUT bail_on_failure dies_ok is_deeply lives_ok new_ok require_ok restore_failure_handler throws_ok use_ok ),
 );
 
 *BAIL_OUT = \&bail_out;                                     # Explicit "sub BAIL_OUT" would be untestable
+
+sub bail_on_failure {
+  _set_failure_handler(
+    sub {
+      # uncoverable subroutine
+      bail_out( $MSG_BAIL_OUT )                             # uncoverable statement
+    }
+  );
+
+  return;
+}
 
 sub dies_ok ( &;$ ) {
   my ( $coderef, $description ) = @_;
@@ -140,6 +154,13 @@ sub require_ok {
   ok( $require_result, sprintf( $FMT_REQUIRE_DESCRIPTION, $module, _error() ) );
 
   return $require_result;
+}
+
+sub restore_failure_handler {
+  no warnings qw( redefine );
+  *Test2::API::Context::ok = $ok_orig;
+
+  return;
 }
 
 sub throws_ok ( &$;$ ) {
@@ -212,6 +233,7 @@ sub _error {
 
   my $error = $MSG_ERROR_WAS . $@ =~ s/\n$//mr;
   $error =~ s/$search_string/$replacement_string/m if defined( $search_string );
+
   return $error;
 }
 
@@ -228,6 +250,7 @@ sub _export_rest_symbols {
   return _export_symbols( %REST_CONSTANTS_TO_EXPORT ) if $CLASS && $METHOD && ( $METHOD_REF = $CLASS->can( $METHOD ) );
 
   $METHOD = undef;
+
   return;
 }
 
@@ -272,7 +295,15 @@ sub _parse_options {
     $DIE->( $FMT_UNKNOWN_OPTION, $option_name, shift( @$exports ) // '' ) if $option_name !~ /^-\w/;
 
     my $option_value = shift( @$exports );
-    if ( $option_name eq '-builtins' ) {                    ## no critic (ProhibitCascadingIfElse)
+    if ( $option_name eq '-bail' ) {                        ## no critic (ProhibitCascadingIfElse)
+      _set_failure_handler(
+        sub {
+          # uncoverable subroutine
+          bail_out( $MSG_BAIL_OUT )                         # uncoverable statement
+        }
+      );
+    }
+    elsif ( $option_name eq '-builtins' ) {
       $DIE->( $FMT_INVALID_VALUE, $option_name, $option_value ) if ref( $option_value ) ne 'HASH';
       while ( my ( $sub_name, $sub_ref ) = each( %$option_value ) ) {
         $DIE->( $FMT_INVALID_VALUE, $option_name . "->{ $sub_name }", $sub_ref ) if ref( $sub_ref ) ne 'CODE';
@@ -390,7 +421,22 @@ sub _set_env_hierarchically {
   }
 
   local $CWD = $class_top_level;                            ## no critic (ProhibitLocalVars)
+
   return _set_env_hierarchically( $class, $env_found, $new_env );
+}
+
+sub _set_failure_handler {
+  my $action = shift;
+  no warnings qw( redefine );
+  *Test2::API::Context::ok = sub {
+    my ( undef, $pass ) = @_;
+    my $result = $ok_orig->( @_ );
+    $action->() unless $pass;                               # uncoverable branch true
+
+    return $result;
+  };
+
+  return;
 }
 
 sub _subtest_conditional {

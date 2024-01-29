@@ -1,6 +1,6 @@
 # NAME
 
-bff-pxf-simulator: A script that creates a JSON array of random BFF/PXF
+bff-pxf-simulator: A script that creates a JSON array of simulated BFF/PXF
 
 # SYNOPSIS
 
@@ -9,15 +9,17 @@ bff-pxf-simulator \[-options\]
      Options:
        -f|format                      Format [>bff|pxf]
        -n|number                      Number of individuals
-       -diseases                      Number of [1]
-       -phenotypicFeatures            IDEM
-       -treatments                    IDEM
-       -max-diseases-pool             To narrow the selection to N first array elements
-       -max-phenotypicFeatures-pool   IDEM
-       -max-treatments-pool           IDEM
        -o|output                      Output file [individuals.json]
        -external-ontologies           YAML file with ontologies for diseases, phenotypicFeatures and treatments
        -random-seed                   Initializes pseudorandom number sequences for reproducible results (int)
+
+       -diseases                      Number of [1]
+       -exposures                     IDEM
+       -phenotypicFeatures            IDEM
+       -procedures                    IDEM
+       -treatments                    IDEM
+       -max-[term]-pool               To narrow the selection to N first array elements.
+       -max-ethnicity-pool            Each individual can have only 1 ethnicity. However, you can also set a fixed sample size for the pool
 
      Generic Options;
        -debug                         Print debugging (from 1 to 5, being 5 max)
@@ -28,13 +30,23 @@ bff-pxf-simulator \[-options\]
 
 # DESCRIPTION
 
-A script that creates a JSON array of random BFF/PXF
+This script generates a JSON array of simulated BFF/PXF data. The files can be created based on pre-loaded ontologies or by utilizing an external YAML file.
 
 # SUMMARY
 
-A script that creates a JSON array of random BFF/PXF. 
+A script that creates a JSON array of simulated BFF/PXF. 
 
-For complex properties we only implemented `diseases,phenotypicFeatures` and `treatments`. Depending on the user's adoption we might implement more.
+Implemented array terms:
+
+**BFF:** `diseases, exposures, interventionsOrProcedures, phenotypicFeatures, treatments`. 
+
+procedures = interventionsOrProcedures
+
+**PXF:** `interventionsOrProcedures, medicalActions.procedure, medicalActions.treatment, phenotypicFeatures`.
+
+procedures = medicalActions.procedure
+
+treatments = medicalActions.treatment
 
 # INSTALLATION
 
@@ -52,7 +64,11 @@ For complex properties we only implemented `diseases,phenotypicFeatures` and `tr
 
 # HOW TO RUN BFF-PXF-SIMULATOR
 
-The software runs without any argument and assumes defaults. If you want to change some parameters please take a look to the synopsis.
+When run without any arguments, the software will use default settings. To modify any parameters, please refer to the synopsis for guidance.
+
+If you prefer not to include a specific term in the analysis, set its value to zero. For example:
+
+`--treatments 0`
 
 **Examples:**
 
@@ -61,6 +77,8 @@ The software runs without any argument and assumes defaults. If you want to chan
     $ ./bff-pxf-simulator -f pxf -n 1000 -o pxf.json # PXF with 1K samples and saved to pxf.json
 
     $ ./bff-pxf-simulator -phenotypicFeatures 10 # BFF with 100 samples and 10 pF each
+
+    $ ./bff-pxf-simulator -diseases 0 -exposures 0 -procedures 0 -phenotypicFeatures 0 -treatments 0 # Only sex and ethnicity
 
 ## COMMON ERRORS AND SOLUTIONS
 
@@ -72,7 +90,7 @@ The software runs without any argument and assumes defaults. If you want to chan
 
 # AUTHOR 
 
-Written by Manuel Rueda, PhD. Info about CNAG can be found at [https://www.cnag.crg.eu](https://www.cnag.crg.eu).
+Written by Manuel Rueda, PhD. Info about CNAG can be found at [https://www.cnag.eu](https://www.cnag.eu).
 
 # COPYRIGHT AND LICENSE
 

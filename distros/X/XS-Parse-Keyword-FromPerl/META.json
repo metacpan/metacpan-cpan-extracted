@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -30,6 +30,7 @@
          "requires" : {
             "XS::Parse::Infix" : "0.35",
             "XS::Parse::Keyword" : "0.35",
+            "meta" : "0.003_002",
             "perl" : "5.026"
          }
       },
@@ -42,15 +43,15 @@
    "provides" : {
       "Optree::Generate" : {
          "file" : "lib/Optree/Generate.pm",
-         "version" : "0.07"
+         "version" : "0.09"
       },
       "XS::Parse::Infix::FromPerl" : {
          "file" : "lib/XS/Parse/Infix/FromPerl.pm",
-         "version" : "0.07"
+         "version" : "0.09"
       },
       "XS::Parse::Keyword::FromPerl" : {
          "file" : "lib/XS/Parse/Keyword/FromPerl.pm",
-         "version" : "0.07"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -60,6 +61,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.07",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

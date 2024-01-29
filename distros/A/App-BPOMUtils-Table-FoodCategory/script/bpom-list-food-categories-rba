@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2023-09-23'; # DATE
 our $DIST = 'App-BPOMUtils-Table-FoodCategory'; # DIST
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/Table/FoodCategoryRBA/bpom_list_food_categories_rba",
@@ -21,6 +21,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
     log => 1,
     read_config => 0,
     read_env => 0,
+    use_utf8 => 1,
 );
 
 $cmdline->run;
@@ -40,7 +41,7 @@ bpom-list-food-categories-rba - List food categories in BPOM processed food divi
 
 =head1 VERSION
 
-This document describes version 0.018 of bpom-list-food-categories-rba (from Perl distribution App-BPOMUtils-Table-FoodCategory), released on 2023-09-03.
+This document describes version 0.020 of bpom-list-food-categories-rba (from Perl distribution App-BPOMUtils-Table-FoodCategory), released on 2023-09-23.
 
 =head1 SYNOPSIS
 
@@ -661,35 +662,91 @@ For fish and zsh, install L<shcompgen> as described above.
 =head2 Print active records matching "cokelat hitam" in a formatted text table
 
  % bpom-list-food-categories-rba --status-is Aktif 'cokelat hitam' -l --format text-pretty
- +--------+--------------+----------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
- | status | code         | name                                                                       | summary                                                                                                                                                                                                                                                                                  |
- +--------+--------------+----------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
- | Aktif  | 050104000001 | Cokelat Hitam (Dark Chocolate, Semisweet Chocolate, Bittersweet Chocolate) | Cokelat hitam (dark chocolate, semisweet chocolate, bittersweet chocolate) adalah produk yang diperhitungkan dalam kondisi tanpa kandungan air, mengandung tidak kurang dari 35% padatan kakao, tidak kurang dari 18% lemak kakao, dan tidak kurang dari 14% padatan kakao tanpa lemak.  |
- | Aktif  | 050104000002 | Cokelat Hitam Manis (Sweet Chocolate)                                      | Cokelat hitam manis (sweet chocolate) adalah produk yang diperhitungkan dalam kondisi tanpa kandungan air, mengandung tidak kurang dari 30% padatan kakao, tidak kurang dari 18% lemak kakao, dan tidak kurang dari 12% padatan kakao tanpa lemak.                                       |
- | Aktif  | 050104000003 | Cokelat Hitam Kovertur (Dark Chocolate Couverture)                         | Cokelat hitam kovertur (dark chocolate couverture) adalah produk yang diperhitungkan dalam kondisi tanpa kandungan air, mengandung tidak kurang dari 35% padatan kakao, tidak kurang dari 31% lemak kakao, dan tidak kurang dari 2,5% padatan kakao tanpa lemak.                         |
- | Aktif  | 050104000012 | Truffles                                                                   | Truffles adalah produk cokelat yang dibuat dari campuran cokelat hitam atau cokelat susu dengan lemak kakao, minyak nabati dan bahan pangan lain, umumnya berbentuk bulat, kerucut, atau lengkungan, dimana dapat berupa cokelat isi (filled chocolate).                                 |
- +--------+--------------+----------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+ .--------+--------------+--------------------------------+------------------------------------------------------------------------------------.
+ | status |         code | name                           | summary                                                                            |
+ +--------+--------------+--------------------------------+------------------------------------------------------------------------------------+
+ | Aktif  | 050104000001 | Cokelat Hitam (Dark Chocolate, | Cokelat hitam (dark chocolate, semisweet chocolate, bittersweet chocolate) adalah  |
+ |        |              | Semisweet Chocolate,           | produk yang diperhitungkan dalam kondisi tanpa kandungan air, mengandung tidak     |
+ |        |              | Bittersweet Chocolate)         | kurang dari 35% padatan kakao, tidak kurang dari 18% lemak kakao, dan tidak kurang |
+ |        |              |                                | dari 14% padatan kakao tanpa lemak.                                                |
+ | Aktif  | 050104000002 | Cokelat Hitam Manis (Sweet     | Cokelat hitam manis (sweet chocolate) adalah produk yang diperhitungkan dalam      |
+ |        |              | Chocolate)                     | kondisi tanpa kandungan air, mengandung tidak kurang dari 30% padatan kakao, tidak |
+ |        |              |                                | kurang dari 18% lemak kakao, dan tidak kurang dari 12% padatan kakao tanpa lemak.  |
+ | Aktif  | 050104000003 | Cokelat Hitam Kovertur (Dark   | Cokelat hitam kovertur (dark chocolate couverture) adalah produk yang              |
+ |        |              | Chocolate Couverture)          | diperhitungkan dalam kondisi tanpa kandungan air, mengandung tidak kurang dari 35% |
+ |        |              |                                | padatan kakao, tidak kurang dari 31% lemak kakao, dan tidak kurang dari 2,5%       |
+ |        |              |                                | padatan kakao tanpa lemak.                                                         |
+ | Aktif  | 050104000012 | Truffles                       | Truffles adalah produk cokelat yang dibuat dari campuran cokelat hitam atau        |
+ |        |              |                                | cokelat susu dengan lemak kakao, minyak nabati dan bahan pangan lain, umumnya      |
+ |        |              |                                | berbentuk bulat, kerucut, atau lengkungan, dimana dapat berupa cokelat isi (filled |
+ |        |              |                                | chocolate).                                                                        |
+ `--------+--------------+--------------------------------+------------------------------------------------------------------------------------'
 
 =head2 Print all category records with code 14.1.4.2
 
  % bpom-list-food-categories-rba --code-matches '^14010402' -l --format text-pretty
- +--------+--------------+---------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
- | status | code         | name                      | summary                                                                                                                                                                                                                                                                                                                                                                                  |
- +--------+--------------+---------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
- | Aktif  | 140104020001 | Punches/Ades              | Definisi :  Punches/ades adalah produk minuman yang diperoleh dari campuran sari buah dengan atau tanpa penambahan perisa.                                                                                                                                                                                                                                                               |
- | Aktif  | 140104020002 | Crush                     | Definisi :  Crush adalah minuman ringan yang mengandung sari buah, bukan untuk minuman citrus comminutes, ditujukan untuk dikonsumsi tanpa diencerkan, termasuk cordial yang dikonsumsi tanpa pengenceran.  Karakteristik dasar :  Kandungan buah tidak kurang dari 3% dan tidak lebih dari 5% tergantung jenisnya.                                                                      |
- | Aktif  | 140104020003 | Minuman Sari Buah         | Definisi :  Minuman sari buah adalah minuman yang diperoleh dengan mencampur air minum; sari buah atau campuran sari buah yang tidak difermentasi, dengan bagian lain dari satu jenis buah atau lebih, dengan atau tanpa penambahan gula. Total sari buah tidak kurang dari 35% (b/v).                                                                                                   |
- | Aktif  | 140104020004 | Minuman Buah              | Definisi :  Minuman buah adalah minuman yang terdiri dari satu atau lebih jenis buah, dengan total sari buah 10% sampai 35% (b/v).                                                                                                                                                                                                                                                       |
- | Aktif  | 140104020005 | Minuman Rasa Buah         | Definisi :  Minuman berperisa/rasa buah adalah minuman yang terdiri dari satu atau lebih jenis buah, dengan total sari buah kurang dari 10% (b/v).                                                                                                                                                                                                                                       |
- | Aktif  | 140104020006 | Minuman Berperisa         | Definisi :  Minuman berperisa adalah produk minuman yang diperoleh dari pencampuran air minum dengan bahan perisa dan gula dengan atau tanpa penambahan bahan pangan lain melalui proses pemanasan.                                                                                                                                                                                      |
- | Aktif  | 140104020007 | Minuman Jeli              | Definisi :  Minuman jeli adalah minuman yang menggunakan bahan baku berupa hidrokoloid sebagai komponen utama. Produk akhir berupa cairan semi liquid (gel) diperoleh dari proses pencampuran air, hidrokoloid dengan atau tanpa penambahan bahan pangan lain.  Karakteristik dasar :  \xE2\x80\xA2 Memiliki tekstur/konsistensi gel semi liquid ;  \xE2\x80\xA2 Kandungan hidrokoloid tidak kurang dari 0,1%. |
- | Aktif  | 140104020008 | Minuman Teh               | Definisi :  Minuman teh adalah minuman hasil seduhan daun teh dan/atau ekstrak teh dalam air dengan atau tanpa penambahan gula dan/atau bahan pangan lain, dan dikemas secara kedap (hermetis).                                                                                                                                                                                          |
- | Aktif  | 140104020009 | Minuman Kopi              | Definisi :  Minuman kopi adalah minuman yang dibuat dari kopi bubuk, kopi instan, dan/atau ekstrak kopi, air minum, dengan atau tanpa penambahan gula dan bahan pangan lain.  Karakteristik dasar :  Kadar kopi tidak kurang dari 4% (dihitung dari basis berat kering).                                                                                                                 |
- | Aktif  | 140104020010 | Kapucino                  | Definisi :  Kapucino adalah minuman yang dibuat dari espresso dan susu, yang merupakan minuman khas Italia.                                                                                                                                                                                                                                                                              |
- | Aktif  | 140104020011 | Minuman Rasa Susu         | Definisi : Minuman rasa susu adalah produk minuman yang diperoleh dari pencampuran air minum dengan susu untuk memberikan rasa, dengan atau tanpa penambahan bahan pangan lain.  Karakteristik dasar: \xE2\x80\xA2 Kadar lemak susu kurang dari 0.3%; \xE2\x80\xA2 Kadar CO2 tidak lebih dari 5.890 mg/L.                                                                                                      |
- | Aktif  | 140104020012 | Minuman Citrus Comminutes | Definisi : Minuman citrus comminutes adalah minuman ringan yang diperoleh dari proses yang melibatkan kelompok buah citrus utuh.  Karakteristik dasar : \xE2\x80\xA2 Kandungan buah dalam minuman 7% hingga 10% tergantung jenisnya sebelum diencerkan, dan 1,5% hingga 2% untuk minuman yang dikonsumsi tanpa pengenceran; \xE2\x80\xA2 Dapat ditambahkan gula tidak lebih dari 100 g/kg.                     |
- | Aktif  | 140104020013 | Minuman Teh Fermentasi    |                                                                                                                                                                                                                                                                                                                                                                                          |
- +--------+--------------+---------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+ .--------+--------------+---------------------------+-----------------------------------------------------------------------------------------.
+ | status |         code | name                      | summary                                                                                 |
+ +--------+--------------+---------------------------+-----------------------------------------------------------------------------------------+
+ | Aktif  | 140104020001 | Punches/Ades              | Definisi : Punches/ades adalah produk minuman yang diperoleh dari campuran sari buah    |
+ |        |              |                           | dengan atau tanpa penambahan perisa.                                                    |
+ | Aktif  | 140104020002 | Crush                     | Definisi : Crush adalah minuman ringan yang mengandung sari buah, bukan untuk minuman   |
+ |        |              |                           | citrus comminutes, ditujukan untuk dikonsumsi tanpa diencerkan, termasuk cordial yang   |
+ |        |              |                           | dikonsumsi tanpa pengenceran.                                                           |
+ |        |              |                           |                                                                                         |
+ |        |              |                           | Karakteristik dasar : Kandungan buah tidak kurang dari 3% dan tidak lebih dari 5%       |
+ |        |              |                           | tergantung jenisnya.                                                                    |
+ | Aktif  | 140104020003 | Minuman Sari Buah         | Definisi : Minuman sari buah adalah minuman yang diperoleh dengan mencampur air minum;  |
+ |        |              |                           | sari buah atau campuran sari buah yang tidak difermentasi, dengan bagian lain dari satu |
+ |        |              |                           | jenis buah atau lebih, dengan atau tanpa penambahan gula. Total sari buah tidak kurang  |
+ |        |              |                           | dari 35% (b/v).                                                                         |
+ | Aktif  | 140104020004 | Minuman Buah              | Definisi : Minuman buah adalah minuman yang terdiri dari satu atau lebih jenis buah,    |
+ |        |              |                           | dengan total sari buah 10% sampai 35% (b/v).                                            |
+ | Aktif  | 140104020005 | Minuman Rasa Buah         | Definisi : Minuman berperisa/rasa buah adalah minuman yang terdiri dari satu atau lebih |
+ |        |              |                           | jenis buah, dengan total sari buah kurang dari 10% (b/v).                               |
+ | Aktif  | 140104020006 | Minuman Berperisa         | Definisi : Minuman berperisa adalah produk minuman yang diperoleh dari pencampuran air  |
+ |        |              |                           | minum dengan bahan perisa dan gula dengan atau tanpa penambahan bahan pangan lain       |
+ |        |              |                           | melalui proses pemanasan.                                                               |
+ | Aktif  | 140104020007 | Minuman Jeli              | Definisi : Minuman jeli adalah minuman yang menggunakan bahan baku berupa hidrokoloid   |
+ |        |              |                           | sebagai komponen utama. Produk akhir berupa cairan semi liquid (gel) diperoleh dari     |
+ |        |              |                           | proses pencampuran air, hidrokoloid dengan atau tanpa penambahan bahan pangan lain.     |
+ |        |              |                           |                                                                                         |
+ |        |              |                           | Karakteristik dasar :                                                                   |
+ |        |              |                           |                                                                                         |
+ |        |              |                           | \xE2\x80\xA2 Memiliki tekstur/konsistensi gel semi liquid ;                                        |
+ |        |              |                           |                                                                                         |
+ |        |              |                           | \xE2\x80\xA2 Kandungan hidrokoloid tidak kurang dari 0,1%.                                         |
+ | Aktif  | 140104020008 | Minuman Teh               | Definisi : Minuman teh adalah minuman hasil seduhan daun teh dan/atau ekstrak teh dalam |
+ |        |              |                           | air dengan atau tanpa penambahan gula dan/atau bahan pangan lain, dan dikemas secara    |
+ |        |              |                           | kedap (hermetis).                                                                       |
+ | Aktif  | 140104020009 | Minuman Kopi              | Definisi : Minuman kopi adalah minuman yang dibuat dari kopi bubuk, kopi instan,        |
+ |        |              |                           | dan/atau ekstrak kopi, air minum, dengan atau tanpa penambahan gula dan bahan pangan    |
+ |        |              |                           | lain.                                                                                   |
+ |        |              |                           |                                                                                         |
+ |        |              |                           | Karakteristik dasar : Kadar kopi tidak kurang dari 4% (dihitung dari basis berat        |
+ |        |              |                           | kering).                                                                                |
+ | Aktif  | 140104020010 | Kapucino                  | Definisi : Kapucino adalah minuman yang dibuat dari espresso dan susu, yang merupakan   |
+ |        |              |                           | minuman khas Italia.                                                                    |
+ | Aktif  | 140104020011 | Minuman Rasa Susu         | Definisi : Minuman rasa susu adalah produk minuman yang diperoleh dari pencampuran air  |
+ |        |              |                           | minum dengan susu untuk memberikan rasa, dengan atau tanpa penambahan bahan pangan      |
+ |        |              |                           | lain.                                                                                   |
+ |        |              |                           |                                                                                         |
+ |        |              |                           | Karakteristik dasar:                                                                    |
+ |        |              |                           |                                                                                         |
+ |        |              |                           | \xE2\x80\xA2 Kadar lemak susu kurang dari 0.3%;                                                    |
+ |        |              |                           |                                                                                         |
+ |        |              |                           | \xE2\x80\xA2 Kadar CO2 tidak lebih dari 5.890 mg/L.                                                |
+ | Aktif  | 140104020012 | Minuman Citrus Comminutes | Definisi : Minuman citrus comminutes adalah minuman ringan yang diperoleh dari proses   |
+ |        |              |                           | yang melibatkan kelompok buah citrus utuh.                                              |
+ |        |              |                           |                                                                                         |
+ |        |              |                           | Karakteristik dasar :                                                                   |
+ |        |              |                           |                                                                                         |
+ |        |              |                           | \xE2\x80\xA2 Kandungan buah dalam minuman 7% hingga 10% tergantung jenisnya sebelum diencerkan,    |
+ |        |              |                           | dan 1,5% hingga 2% untuk minuman yang dikonsumsi tanpa pengenceran;                     |
+ |        |              |                           |                                                                                         |
+ |        |              |                           | \xE2\x80\xA2 Dapat ditambahkan gula tidak lebih dari 100 g/kg.                                     |
+ | Aktif  | 140104020013 | Minuman Teh Fermentasi    |                                                                                         |
+ `--------+--------------+---------------------------+-----------------------------------------------------------------------------------------'
 
 =head2 How many categories are active vs inactive?
 

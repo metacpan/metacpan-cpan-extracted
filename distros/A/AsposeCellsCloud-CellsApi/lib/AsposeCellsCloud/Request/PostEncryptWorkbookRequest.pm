@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# PostEncryptWorkbookRequest.name : The workbook name.  ,
-# PostEncryptWorkbookRequest.encryption : Encryption parameters.  ,
-# PostEncryptWorkbookRequest.folder : Original workbook folder.  ,
-# PostEncryptWorkbookRequest.storageName : Storage name.   
+# PostEncryptWorkbookRequest.name : The file name.  ,
+# PostEncryptWorkbookRequest.encryption : WorkbookEncryptionRequestEncryption parameters.  ,
+# PostEncryptWorkbookRequest.folder : The folder where the file is situated.  ,
+# PostEncryptWorkbookRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_encrypt_workbook' } = { 
-    	summary => 'Encripts workbook.',
+    	summary => 'Excel Encryption.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
      'encryption' => {
      	datatype => 'WorkbookEncryptionRequest',
      	base_name => 'encryption',
-     	description => 'Encryption parameters.',
+     	description => 'WorkbookEncryptionRequestEncryption parameters.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

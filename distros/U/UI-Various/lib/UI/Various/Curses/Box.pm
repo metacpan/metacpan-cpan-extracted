@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 use UI::Various::core;
 use UI::Various::Box;
@@ -98,6 +98,9 @@ sub _prepare($$$)
     my ($explicit_width, $explicit_height) = ($self->{width}, $self->{height});
     my $width = $self->width - $columns + 1;
     my $height = $self->height - $rows + 1;
+    # We only separate elements when other UIs have a border, otherwise it's
+    # tightly packed:
+    my $border = $self->border ? 1 : 0;
 
     # place children:
     my ($errors, $row_off) = (0, 0);
@@ -116,9 +119,9 @@ sub _prepare($$$)
 		my $h = $_->_cui->height;
 		$max_height < $h  and  $max_height = $h;
 	    }
-	    $col_off += $self->{width} + 1;
+	    $col_off += $self->{width} + $border;
 	}
-	$row_off += $max_height + 1;
+	$row_off += $max_height + $border;
 	$height -= $max_height;
     }
 

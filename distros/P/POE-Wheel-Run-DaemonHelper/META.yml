@@ -1,0 +1,29 @@
+---
+abstract: 'Helper for the POE::Wheel::Run for easy controlling logging of stdout/err as well as restarting with backoff.'
+author:
+  - 'Zane C. Bowers-Hadley <vvelox@vvelox.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Wheel-Run-DaemonHelper
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Algorithm::Backoff: '0'
+  Error::Helper: '0'
+  File::Slurp: '0'
+  POE: '0'
+  Sys::Syslog: '0'
+  perl: '5.006'
+version: v0.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

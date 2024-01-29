@@ -83,7 +83,7 @@
    "provides" : {
       "App::ListNewCPANDists" : {
          "file" : "lib/App/ListNewCPANDists.pm",
-         "version" : "0.021"
+         "version" : "0.023"
       }
    },
    "release_status" : "stable",
@@ -98,7 +98,7 @@
          "web" : "https://github.com/perlancar/perl-App-ListNewCPANDists"
       }
    },
-   "version" : "0.021",
+   "version" : "0.023",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -336,7 +336,7 @@
          {
             "class" : "Dist::Zilla::Plugin::OurDate",
             "name" : "@Author::PERLANCAR/OurDate",
-            "version" : "0.03"
+            "version" : "0.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDist",
@@ -475,7 +475,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.784"
+                        "version" : "0.785"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",

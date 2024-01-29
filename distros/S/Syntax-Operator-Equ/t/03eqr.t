@@ -39,6 +39,15 @@ ok(  "ghi" eqr $pat, 'string pattern match from variable');
    ok(!($greedy eqr "abc"), 'Greedy is not abc when unset' );
 }
 
+# unimport
+{
+   no Syntax::Operator::Eqr;
+
+   sub eqr { return "normal function" }
+
+   is( eqr, "normal function", 'eqr() parses as a normal function call' );
+}
+
 ok(!$warnings, 'no warnings');
 
 done_testing;

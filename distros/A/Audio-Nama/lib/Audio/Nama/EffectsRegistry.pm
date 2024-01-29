@@ -1,7 +1,7 @@
 ## -------------- Effects registry ---------------
 
 package Audio::Nama;
-use Modern::Perl;
+use Modern::Perl '2020';
 use Audio::Nama::Util qw(round);
 no warnings 'uninitialized';
 
@@ -11,7 +11,7 @@ no warnings 'uninitialized';
 sub prepare_static_effects_data{
 	my $source = shift; 
 	
-	logsub("&prepare_static_effects_data");
+	logsub((caller(0))[3]);
 
 	if (not is_test_script() ){
 		logpkg(__FILE__,__LINE__,'debug', join "\n", "newplugins:", new_plugins());
@@ -120,7 +120,7 @@ sub initialize_effect_index {
 	$fx_cache->{partial_label_to_full} = {};
 }
 sub generate_mappings_for_shortcuts {
-	logsub("&generate_mappings_for_shortcuts");
+	logsub((caller(0))[3]);
 	map{ 
 		my $code = $_;
  		
@@ -150,7 +150,7 @@ sub generate_mappings_for_shortcuts {
 		);
 		
 sub extract_effects_data {
-	logsub("&extract_effects_data");
+	logsub((caller(0))[3]);
 	my ($plugin_type, $lower, $upper, $regex, $separator, @lines) = @_;
 	carp ("incorrect number of lines ", join ' ',$upper-$lower,scalar @lines)
 		if $lower + @lines - 1 != $upper;
@@ -185,7 +185,7 @@ sub extract_effects_data {
 }
 }
 sub sort_ladspa_effects {
-	logsub("&sort_ladspa_effects");
+	logsub((caller(0))[3]);
 #	print json_out($fx_cache->{split}); 
 	my $aa = $fx_cache->{split}->{ladspa}{a};
 	my $zz = $fx_cache->{split}->{ladspa}{z};
@@ -213,14 +213,12 @@ sub trim_output {
 }
 sub read_in_effects_data {
 	
-	logsub("&read_in_effects_data");
+	logsub((caller(0))[3]);
 
 
 	#### LADSPA
 
-	my $lr = $config->{use_effects_bugfix} 
-					?  run_external_ecasound_cmd('ladspa-register') 
-					:  ecasound_iam('ladspa-register');
+	my $lr = run_external_ecasound_cmd('ladspa-register') ;
 
 	logpkg(__FILE__,__LINE__,'debug',"ladpsa-register output:\n",$lr);
 
@@ -233,9 +231,7 @@ sub read_in_effects_data {
 
 	#### LV2
 
-	my $lv2 = $config->{use_effects_bugfix} 
-					?  run_external_ecasound_cmd('lv2-register') 
-					:  ecasound_iam('lv2-register');
+	my $lv2 = run_external_ecasound_cmd('lv2-register') ;
 										# TODO test fake lv2-register
 										# get_data_section('fake_lv2_register');
 	logpkg(__FILE__,__LINE__,'debug',"lv2-register output:\n",$lv2);
@@ -415,7 +411,7 @@ sub lv2_path {
 	$ENV{LV2_PATH} || q(/usr/lib/lv2);
 }
 sub get_ladspa_hints{
-	logsub("&get_ladspa_hints");
+	logsub((caller(0))[3]);
 	my @dirs =  split ':', ladspa_path();
 	my $data = '';
 	my %seen = ();
@@ -556,7 +552,7 @@ sub range {
 
 }
 sub integrate_ladspa_hints {
-	logsub("&integrate_ladspa_hints");
+	logsub((caller(0))[3]);
 	map{ 
 		my $i = $fx_cache->{full_label_to_index}->{$_};
 		# print("$_ not found\n"), 

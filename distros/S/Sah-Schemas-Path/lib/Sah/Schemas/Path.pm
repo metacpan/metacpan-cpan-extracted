@@ -3,9 +3,9 @@ package Sah::Schemas::Path;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-23'; # DATE
+our $DATE = '2024-01-08'; # DATE
 our $DIST = 'Sah-Schemas-Path'; # DIST
-our $VERSION = '0.025'; # VERSION
+our $VERSION = '0.030'; # VERSION
 
 1;
 # ABSTRACT: Schemas related to filesystem path
@@ -22,32 +22,7 @@ Sah::Schemas::Path - Schemas related to filesystem path
 
 =head1 VERSION
 
-This document describes version 0.025 of Sah::Schemas::Path (from Perl distribution Sah-Schemas-Path), released on 2023-11-23.
-
-=head1 DESCRIPTION
-
-This distribution includes several schemas you can use if you want to accept
-filename/dirname/pathname.
-
-Some general guidelines:
-
-C<pathname> should be your first choice. But if you only want to accept
-directory name, you can use C<dirname> instead. And if you only want to accept
-file name and not directory, you can use C<filename>.
-
-C<filename>, C<dirname>, C<pathname> are basically the same; they differ in the
-completion they provide, i.e. C<dirname> offers completion of only directory
-names.
-
-Use C<filename::unix>, C<dirname::unix>, C<pathname::unix> only if you want to
-accept Unix-style path. These schemas contain additional checks that are
-specific to Unix filesystem.
-
-Use C<filename::exists>, C<dirname::exists>, C<pathname::exists> if you want to
-accept an existing path. For example in a utility/routine to rename or process
-files. On the contrary, there are C<filename::not_exists>,
-C<dirhname::not_exists>, and C<pathname::not_exists> if you want to accept
-non-existing path, e.g. in a utility/routine to create a new file.
+This document describes version 0.030 of Sah::Schemas::Path (from Perl distribution Sah-Schemas-Path), released on 2024-01-08.
 
 =head1 SAH SCHEMAS
 
@@ -81,7 +56,7 @@ Directory name, default to current directory.
 Note: be careful when using this schema for actions that are destructive,
 because a user can perform those actions without giving an argument (e.g. in a
 C<delete-files-in> script). It is safer to use this schema when performing a
-non=destructive action (e.g. C<ls>) and/or operate in dry-run mode by default.
+non-destructive action (e.g. C<ls>) and/or operate in dry-run mode by default.
 
 
 =item * L<dirname::default_curdir_abs|Sah::Schema::dirname::default_curdir_abs>
@@ -91,7 +66,7 @@ Directory name, default to current directory (absolutified).
 Note: be careful when using this schema for actions that are destructive,
 because a user can perform those actions without giving an argument (e.g. in a
 C<delete-files-in> script). It is safer to use this schema when performing a
-non=destructive action (e.g. C<ls>) and/or operate in dry-run mode by default.
+non-destructive action (e.g. C<ls>) and/or operate in dry-run mode by default.
 
 
 =item * L<dirname::default_only_subdir_in_curdir|Sah::Schema::dirname::default_only_subdir_in_curdir>
@@ -102,10 +77,34 @@ This is like the C<dirname> schema but with a default value of "only subdirector
 in the current directory". That is, if the current directory has a single
 subdirectory and nothing else.
 
+Difference with C<dirname::default_only_subdir_not_file_in_subdir> schema: the
+other schema ignores plain files. Thus, if a directory only contains C<file1> and
+C<subdir1>, then that other schema will return C<subdir1> but this schema will not
+return a default value.
+
 Note: be careful when using this schema for actions that are destructive,
 because a user can perform those actions without giving an argument (e.g. in a
 C<delete-files-in> script). It is safer to use this schema when performing a
-non=destructive action (e.g. C<ls>) and/or operate in dry-run mode by default.
+non-destructive action (e.g. C<ls>) and/or operate in dry-run mode by default.
+
+
+=item * L<dirname::default_only_subdir_not_file_in_curdir|Sah::Schema::dirname::default_only_subdir_not_file_in_curdir>
+
+Directory name, defaults to only subdirectory in current directory (if there is one) (files ignored).
+
+This is like the C<dirname> schema but with a default value of "only subdirectory
+in the current directory". That is, if the current directory has a single
+subdirectory and nothing else (plain files are ignored).
+
+Difference with C<dirname::default_only_subdir_in_subdir> schema: the other
+schema does not ignore plain files. Thus, if a directory only contains C<file1>
+and C<subdir1>, then that other schema will not return C<subdir1> but this schema
+will.
+
+Note: be careful when using this schema for actions that are destructive,
+because a user can perform those actions without giving an argument (e.g. in a
+C<delete-files-in> script). It is safer to use this schema when performing a
+non-destructive action (e.g. C<ls>) and/or operate in dry-run mode by default.
 
 
 =item * L<dirname::exists|Sah::Schema::dirname::exists>
@@ -127,7 +126,7 @@ single subdirectory and nothing else.
 Note: be careful when using this schema for actions that are destructive,
 because a user can perform those actions without giving an argument (e.g. in a
 C<delete-files-in> script). It is safer to use this schema when performing a
-non=destructive action (e.g. C<ls>) and/or operate in dry-run mode by default.
+non-destructive action (e.g. C<ls>) and/or operate in dry-run mode by default.
 
 
 =item * L<dirname::not_exists|Sah::Schema::dirname::not_exists>
@@ -195,6 +194,21 @@ What's the difference between this schema and C<dirname>? The default completion
 rule. C<dirname>'s completion only includes directories and not files.
 
 
+=item * L<filename::default_newest_file_in_curdir|Sah::Schema::filename::default_newest_file_in_curdir>
+
+File name, defaults to newest file in current directory (if there is one).
+
+This is like the C<filename> schema but with a default value of newest plain file
+in the current directory. If current directory does not contain any file, no
+default will be given.
+
+Note: be careful when using this schema for actions that are destructive,
+because a user can perform those actions without giving an argument (e.g. in a
+C<delete-file> script). It is safer to use this schema when performing a
+non-destructive action (e.g. C<checksum>) and/or operate in dry-run mode by
+default.
+
+
 =item * L<filename::default_only_file_in_curdir|Sah::Schema::filename::default_only_file_in_curdir>
 
 File name, defaults to only file in current directory (if there is one).
@@ -211,7 +225,7 @@ not return a default value.
 Note: be careful when using this schema for actions that are destructive,
 because a user can perform those actions without giving an argument (e.g. in a
 C<delete-file> script). It is safer to use this schema when performing a
-non=destructive action (e.g. C<checksum>) and/or operate in dry-run mode by
+non-destructive action (e.g. C<checksum>) and/or operate in dry-run mode by
 default.
 
 
@@ -230,7 +244,7 @@ C<subdir1>, then that other schema will not return C<file1> but this schema will
 Note: be careful when using this schema for actions that are destructive,
 because a user can perform those actions without giving an argument (e.g. in a
 C<delete-file> script). It is safer to use this schema when performing a
-non=destructive action (e.g. C<checksum>) and/or operate in dry-run mode by
+non-destructive action (e.g. C<checksum>) and/or operate in dry-run mode by
 default.
 
 
@@ -253,7 +267,7 @@ plain file and nothing else.
 Note: be careful when using this schema for actions that are destructive,
 because a user can perform those actions without giving an argument (e.g. in a
 C<delete-file> script). It is safer to use this schema when performing a
-non=destructive action (e.g. C<checksum>) and/or operate in dry-run mode by
+non-destructive action (e.g. C<checksum>) and/or operate in dry-run mode by
 default.
 
 
@@ -393,6 +407,31 @@ List of path names, all must exist on filesystem.
 
 =back
 
+=head1 DESCRIPTION
+
+This distribution includes several schemas you can use if you want to accept
+filename/dirname/pathname.
+
+Some general guidelines:
+
+C<pathname> should be your first choice. But if you only want to accept
+directory name, you can use C<dirname> instead. And if you only want to accept
+file name and not directory, you can use C<filename>.
+
+C<filename>, C<dirname>, C<pathname> are basically the same; they differ in the
+completion they provide, i.e. C<dirname> offers completion of only directory
+names.
+
+Use C<filename::unix>, C<dirname::unix>, C<pathname::unix> only if you want to
+accept Unix-style path. These schemas contain additional checks that are
+specific to Unix filesystem.
+
+Use C<filename::exists>, C<dirname::exists>, C<pathname::exists> if you want to
+accept an existing path. For example in a utility/routine to rename or process
+files. On the contrary, there are C<filename::not_exists>,
+C<dirhname::not_exists>, and C<pathname::not_exists> if you want to accept
+non-existing path, e.g. in a utility/routine to create a new file.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schemas-Path>.
@@ -437,7 +476,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2020, 2019, 2018, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2020, 2019, 2018, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

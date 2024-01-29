@@ -27,13 +27,11 @@ use Config::IniFiles;
 #inherits Lemonldap::NG::Common::Conf::Backends::SOAP
 #inherits Lemonldap::NG::Common::Conf::Backends::LDAP
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.17.2';
 our $msg     = '';
 our $iniObj;
 
 our $PlaceHolderRe = '%SERVERENV:(.*?)%';
-
-our $localconf;
 
 BEGIN {
     eval {
@@ -74,10 +72,10 @@ sub new {
         unless ( $self->{type} ) {
 
             # Use local conf to get configStorage and localStorage
-            $localconf =
+            my $localConfAccessPrms =
               $self->getLocalConf( CONFSECTION, $self->{confFile}, 0 );
-            if ( defined $localconf ) {
-                %$self = ( %$self, %$localconf );
+            if ( defined $localConfAccessPrms ) {
+                %$self = ( %$self, %$localConfAccessPrms );
             }
         }
         unless ( $self->{type} ) {
@@ -235,8 +233,6 @@ sub getConf {
 
     # Create cipher object and replace variable placeholder
     unless ( $args->{raw} ) {
-
-        $res = { %$res, %$localconf };
 
         $self->replacePlaceholders($res) if $self->{useServerEnv};
         eval {

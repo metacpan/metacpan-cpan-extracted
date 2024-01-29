@@ -8,13 +8,13 @@ Locale::CLDR::Locales::De::Any::At - Package for language German
 
 package Locale::CLDR::Locales::De::Any::At;
 # This file auto generated from Data\common\main\de_AT.xml
-#	on Tue  5 Dec  1:06:33 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ar_001' => 'modernes Hocharabisch',
@@ -58,7 +58,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'SJ' => 'Svalbard und Jan Mayen',
 
@@ -70,7 +70,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{Internationales Maßsystem (SI)},
  			'UK' => q{Englisches Maßsystem},
@@ -90,7 +90,7 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			index => ['A', 'Ä', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'Ö', 'P', 'Q', 'R', 'S', 'T', 'U', 'Ü', 'V', 'W', 'X', 'Y', 'Z'],
-			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -266,8 +266,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'day_periods' => (

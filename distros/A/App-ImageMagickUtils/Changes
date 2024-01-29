@@ -1,3 +1,9 @@
+0.022   2024-01-15  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli downsize-image] [ux] Add -S as shortcut for --downsize-to ''
+          (--no-downsize).
+
+
 0.021   2023-06-26  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

@@ -59,9 +59,4 @@ SKIP: {
     $domain->inspect({ bollocks => 1, foo => 1, bar => 1 }),
     'exclusively() fails when excess baggage is present using DDD'
   );
-is(
-  $domain->generate_documentation(),
-  "exclusively (any of ('alpha', 'beta', 'key with spaces', 'single\\'quote', all of ('foo', 'bar' and none of ('barf')) or one of ('quux' or 'garbleflux')))",
-  "doco for exclusively() works in DDD"
-);
 }

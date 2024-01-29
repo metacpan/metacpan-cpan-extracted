@@ -91,6 +91,7 @@ my %WriteMakefileArgs = (
     "Perinci::Object" => "0.311",
     "Perinci::Result::Format::Lite" => "0.286",
     "Perinci::Sub::DepChecker" => 0,
+    "Perinci::Sub::Util" => "0.471",
     "PerlIO::gzip" => 0,
     "Pod::Simple::Methody" => 0,
     "Proc::ChildError" => 0,
@@ -122,7 +123,7 @@ my %WriteMakefileArgs = (
     "Test::SQL::Schema::Versioned" => "0.15",
     "Test::WithDB::SQLite" => "0.08"
   },
-  "VERSION" => "1.073",
+  "VERSION" => "1.074",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -204,6 +205,7 @@ my %FallbackPrereqs = (
   "Perinci::Object" => "0.311",
   "Perinci::Result::Format::Lite" => "0.286",
   "Perinci::Sub::DepChecker" => 0,
+  "Perinci::Sub::Util" => "0.471",
   "PerlIO::gzip" => 0,
   "Pod::Simple::Methody" => 0,
   "Proc::ChildError" => 0,

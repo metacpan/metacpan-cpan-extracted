@@ -1,17 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
 
-use Object::Pad 0.800;
+use Object::Pad 0.807;
 
-package App::sdview::Output::Man 0.13;
-class App::sdview::Output::Man
-   :does(App::sdview::Output)
-   :strict(params);
+package App::sdview::Output::Man 0.14;
+class App::sdview::Output::Man :strict(params);
+
+apply App::sdview::Output;
 
 use constant format => "Man";
 

@@ -1,0 +1,78 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Eg::API::App : interface_t {
+  
+  use Eg::Node::Text;
+  use Eg::Runtime;
+  use Eg::CSS::BoxBuilder;
+  
+  method runtime : Eg::Runtime ();
+  
+  method open_main_window : void ($options : object[] = undef);
+  
+  method start_event_loop : void ();
+  
+  method text_metrics_height : int ($text_node : Eg::Node::Text);
+  
+  method reflow : void () {
+    
+    my $runtime = $self->runtime;
+    
+    my $box_builder = Eg::CSS::BoxBuilder->new($runtime);
+    
+    $box_builder->build;
+  }
+  
+  precompile method repaint : void () {
+    
+    my $runtime = $self->runtime;
+    
+    my $window = $runtime->window;
+    
+    my $document = $window->document;
+    
+    my $node_root = (Eg::Node)$document;
+    my $node_cur = $node_root;
+    my $finish = 0;
+    while ($node_cur) {
+      # [START]Preorder traversal position
+      
+      if ($node_cur->node_type == Eg::Node->TYPE_ELEMENT_NODE || $node_cur->node_type == Eg::Node->TYPE_TEXT_NODE) {
+        $self->paint_node($node_cur);
+      }
+      
+      if ($node_cur->first_child) {
+        $node_cur = (Eg::Node)$node_cur->first_child;
+      }
+      else {
+        while (1) {
+          # [START]Postorder traversal position
+          
+          if ($node_cur == $node_root) {
+            
+            $finish = 1;
+            
+            last;
+          }
+          
+          # Next sibling
+          if ($node_cur->next_sibling) {
+            $node_cur = $node_cur->next_sibling;
+            last;
+          }
+          # Next is parent
+          else {
+            $node_cur = $node_cur->parent_node;
+          }
+        }
+        if ($finish) {
+          last;
+        }
+      }
+    }
+    
+  }
+  
+  method paint_node : void ($node : Eg::Node);
+}

@@ -1,4 +1,4 @@
-use 5.008004;
+use 5.018;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
@@ -7,7 +7,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/Text/ASCII/Convert.pm',
     AUTHOR           => 'Kent Oyer <kent@mxguardian.net>',
     LICENSE          => 'GPL_3',
-    MIN_PERL_VERSION => '5.008004',
+    MIN_PERL_VERSION => '5.018',
     PREREQ_PM        => {
         'strict'   => 0,
         'warnings' => 0,

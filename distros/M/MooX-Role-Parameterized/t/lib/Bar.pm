@@ -4,11 +4,11 @@ use Moo::Role;
 use MooX::Role::Parameterized;
 
 role {
-    my ( $params, $p ) = @_;
+    my ( $params, $mop ) = @_;
 
-    $p->has( $params->{attr} => ( is => 'rw' ) );
+    $mop->has( $params->{attr} => ( is => 'rw' ) );
 
-    $p->method(
+    $mop->method(
         $params->{method} => sub {
             1024;
         }

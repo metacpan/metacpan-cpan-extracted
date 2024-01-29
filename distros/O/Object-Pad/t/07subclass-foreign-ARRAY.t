@@ -5,7 +5,7 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 package Base::Class {
    sub new {
@@ -23,7 +23,9 @@ package Base::Class {
    }
 }
 
-class Derived::Class :isa(Base::Class) {
+class Derived::Class {
+   inherit Base::Class;
+
    field $derived_field = 456;
 
    BUILD {

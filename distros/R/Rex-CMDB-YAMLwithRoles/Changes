@@ -1,0 +1,4 @@
+Revision history for Rex-CMDB-YAMLwithRoles
+
+0.0.1	2023-12-24/01:30
+		 - Initial fork from Rex::CMDB::TOML

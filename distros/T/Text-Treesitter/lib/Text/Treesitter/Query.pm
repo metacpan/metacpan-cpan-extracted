@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Text::Treesitter::Query 0.11;
+package Text::Treesitter::Query 0.12;
 
 use v5.14;
 use warnings;
@@ -137,7 +137,7 @@ C<Text::Treesitter::Tree> instance.
 
 Returns true if all the predicate tests in the given query match instance are
 successful (or if there are no predicates). Returns false if any predicate
-rejected it.
+rejected it. Directives in the query are also processed at the same time.
 
 This method needs the list of captures from the match instance. As it is
 likely that the caller will need this too, an optional additional arrayref
@@ -147,8 +147,14 @@ creating a second copy of the list.
    my @captures = $match->captures;
    my $ok = $query->test_predicates_for_match( $match, \@captures );
 
-The following predicate functions are recognised. Each also has an inverted
-variant whose name is preceeded by C<not-> to invert the logic.
+I<Since version 0.11>, in order to implement the C<#set!> directive, a hashref
+can be passed as the third argument, into which metadata will be placed.
+
+   my $ok = $query->test_predicates_for_match( $match, \@captures, \%metadata );
+
+The following predicate and directive functions are recognised. Each predicate
+also has an inverted variant whose name is preceeded by C<not-> to invert the
+logic.
 
 =head3 eq? / not-eq?
 
@@ -209,6 +215,14 @@ has a type that is any of the subsequent type names.
 
 (This predicate is inspired by F<nvim>.)
 
+=head3 set!
+
+   (#set! meta-key "value")
+
+Sets a metadata key in the metadata hash to the given value.
+
+(This directive is inspired by F<nvim>.)
+
 =cut
 
 # Not documented as a method but handy for unit testing
@@ -263,7 +277,7 @@ sub test_predicates_for_match
 {
    my $self = shift;
    shift if !defined $_[0] or $_[0]->isa( "Text::Treesitter::Tree" );
-   my ( $match, $_captures ) = @_;
+   my ( $match, $_captures, $metadata ) = @_;
 
    my @predicates = $self->predicates_for_pattern( $match->pattern_index ) 
       or return 1;
@@ -282,11 +296,16 @@ sub test_predicates_for_match
       my ( $func, @args ) = @$predicate;
       ref $_ and $_ = $captures_by_id{ $$_ } for @args;
 
-      # nvim extended the format to put directives as well as assertions; those
-      # have names ending in ! rather than ?
-      next unless $func =~ m/\?$/;
-
-      $self->test_predicate( $func, @args ) or return 0;
+      if( $func =~ m/\?$/ ) {
+         $self->test_predicate( $func, @args ) or return 0;
+      }
+      elsif( $func eq "set!" ) {
+         my ( $name, $value ) = @args;
+         $metadata->{$name} = $value;
+      }
+      else {
+         warn "Unrecognised query directive '#$func'";
+      }
    }
 
    return 1;

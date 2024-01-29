@@ -31,7 +31,6 @@ subtest "Register session, use it, then logout" => sub {
         ),
         'Auth query'
     );
-    my $id = expectCookie($res);
     my ( $host, $url, $query ) =
       expectForm( $res, undef, '/registerbrowser', 'fg', 'token' );
 
@@ -42,11 +41,11 @@ subtest "Register session, use it, then logout" => sub {
             '/registerbrowser',
             IO::String->new($query),
             length => length($query),
-            cookie => "lemonldap=$id",
             accept => 'text/html',
         ),
         'Post fingerprint'
     );
+    my $id = expectCookie($res);
     expectRedirection( $res, 'http://auth.example.com/' );
     my $cid = expectCookie( $res, 'llngpersistent' );
     ok( $res->[1]->[5] =~ /\bsecure\b/, ' Secure cookie found' )
@@ -99,7 +98,6 @@ subtest "Make sure connection ID is saved on first login too" => sub {
         ),
         'Auth query'
     );
-    my $id = expectCookie($res);
     my ( $host, $url, $query ) =
       expectForm( $res, undef, '/registerbrowser', 'fg', 'token' );
 
@@ -110,11 +108,11 @@ subtest "Make sure connection ID is saved on first login too" => sub {
             '/registerbrowser',
             IO::String->new($query),
             length => length($query),
-            cookie => "lemonldap=$id",
             accept => 'text/html',
         ),
         'Post fingerprint'
     );
+    my $id = expectCookie($res);
     expectRedirection( $res, 'http://auth.example.com/' );
     my $cid = expectCookie( $res, 'llngpersistent' );
     ok( $res->[1]->[5] =~ /\bsecure\b/, ' Secure cookie found' )

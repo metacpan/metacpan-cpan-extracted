@@ -1,0 +1,21 @@
+Revision history for Mojo::Util::Collection
+
+0.0.6   2023-12-20
+        Initial version
+
+0.0.7   2023-12-21
+        Add test suite
+
+0.0.8   2023-12-22
+        Rename new_object to newObject and serialize to toArray
+        Change toArray and toJson to accept a list of fields to be included
+        Add avg, max, min, splice
+
+0.0.9   2024-01-12
+        Add the "collect" method and allow the "model" to be specified via "as" method
+
+0.0.10   2024-01-19
+        Fix pod for the Mojo::Util::Model
+
+0.0.11   2024-01-22
+        Fix pod for the Mojo::Util::Model::User

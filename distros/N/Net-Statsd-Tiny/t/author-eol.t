@@ -36,7 +36,7 @@ my @files = (
     't/data/timing.dat',
     't/etc/perlcritic.rc',
     't/lib/Net/Statsd/Tiny/Test.pm',
-    't/release-check-manifest.t',
+    't/release-dist-manifest.t',
     't/release-fixme.t',
     't/release-kwalitee.t',
     't/release-trailing-space.t'

@@ -1,12 +1,12 @@
 package Locale::CLDR::NumberingSystems;
 # This file auto generated from Data\common\supplemental\numberingSystems.xml
-#	on Tue  5 Dec 12:58:55 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -76,6 +76,10 @@ has 'numbering_system' => (
 			type	=> 'numeric',
 			data	=> [qw(० १ २ ३ ४ ५ ६ ७ ८ ९)],
 		},
+		'diak'	=> {
+			type	=> 'numeric',
+			data	=> [qw(𑥐 𑥑 𑥒 𑥓 𑥔 𑥕 𑥖 𑥗 𑥘 𑥙)],
+		},
 		'ethi'	=> {
 			type	=> 'algorithmic',
 			data	=> 'ethiopic',
@@ -144,6 +148,10 @@ has 'numbering_system' => (
 			type	=> 'numeric',
 			data	=> [qw(𖭐 𖭑 𖭒 𖭓 𖭔 𖭕 𖭖 𖭗 𖭘 𖭙)],
 		},
+		'hmnp'	=> {
+			type	=> 'numeric',
+			data	=> [qw(𞅀 𞅁 𞅂 𞅃 𞅄 𞅅 𞅆 𞅇 𞅈 𞅉)],
+		},
 		'java'	=> {
 			type	=> 'numeric',
 			data	=> [qw(꧐ ꧑ ꧒ ꧓ ꧔ ꧕ ꧖ ꧗ ꧘ ꧙)],
@@ -155,6 +163,10 @@ has 'numbering_system' => (
 		'jpanfin'	=> {
 			type	=> 'algorithmic',
 			data	=> 'ja/SpelloutRules/spellout-cardinal-financial',
+		},
+		'jpanyear'	=> {
+			type	=> 'algorithmic',
+			data	=> 'ja/SpelloutRules/spellout-numbering-year-latn',
 		},
 		'kali'	=> {
 			type	=> 'numeric',
@@ -280,6 +292,10 @@ has 'numbering_system' => (
 			type	=> 'numeric',
 			data	=> [qw(꣐ ꣑ ꣒ ꣓ ꣔ ꣕ ꣖ ꣗ ꣘ ꣙)],
 		},
+		'segment'	=> {
+			type	=> 'numeric',
+			data	=> [qw(🯰 🯱 🯲 🯳 🯴 🯵 🯶 🯷 🯸 🯹)],
+		},
 		'shrd'	=> {
 			type	=> 'numeric',
 			data	=> [qw(𑇐 𑇑 𑇒 𑇓 𑇔 𑇕 𑇖 𑇗 𑇘 𑇙)],
@@ -316,6 +332,10 @@ has 'numbering_system' => (
 			type	=> 'numeric',
 			data	=> [qw(௦ ௧ ௨ ௩ ௪ ௫ ௬ ௭ ௮ ௯)],
 		},
+		'tnsa'	=> {
+			type	=> 'numeric',
+			data	=> [qw(𖫀 𖫁 𖫂 𖫃 𖫄 𖫅 𖫆 𖫇 𖫈 𖫉)],
+		},
 		'telu'	=> {
 			type	=> 'numeric',
 			data	=> [qw(౦ ౧ ౨ ౩ ౪ ౫ ౬ ౭ ౮ ౯)],
@@ -340,10 +360,14 @@ has 'numbering_system' => (
 			type	=> 'numeric',
 			data	=> [qw(𑣠 𑣡 𑣢 𑣣 𑣤 𑣥 𑣦 𑣧 𑣨 𑣩)],
 		},
+		'wcho'	=> {
+			type	=> 'numeric',
+			data	=> [qw(𞋰 𞋱 𞋲 𞋳 𞋴 𞋵 𞋶 𞋷 𞋸 𞋹)],
+		},
 	}},
 );
 
-has '_default_numbering_system' => ( 
+has '_default_numbering_system' => (
 	is			=> 'ro',
 	isa			=> Str,
 	init_arg	=> undef,
@@ -353,27 +377,27 @@ has '_default_numbering_system' => (
 );
 
 sub _set_default_nu {
-	my ($self, $system) = @_;
-	my $default = $self->_default_numbering_system // '';
-	$self->_set_default_numbering_system("$default$system");
+    my ($self, $system) = @_;
+    my $default = $self->_default_numbering_system // '';
+    $self->_set_default_numbering_system("$default$system");
 }
 
 sub _test_default_nu {
-	my $self = shift;
-	return length $self->_default_numbering_system ? 1 : 0;
+    my $self = shift;
+    return length $self->_default_numbering_system ? 1 : 0;
 }
 
 sub default_numbering_system {
-	my $self = shift;
-	
-	if($self->_test_default_nu) {
-		return $self->_default_numbering_system;
-	}
-	else {
-		my $numbering_system = $self->_find_bundle('default_numbering_system')->default_numbering_system;
-		$self->_set_default_nu($numbering_system);
-		return $numbering_system
-	}
+    my $self = shift;
+
+    if($self->_test_default_nu) {
+        return $self->_default_numbering_system;
+    }
+    else {
+        my $numbering_system = $self->_find_bundle('default_numbering_system')->default_numbering_system;
+        $self->_set_default_nu($numbering_system);
+        return $numbering_system
+    }
 }
 
 no Moo::Role;

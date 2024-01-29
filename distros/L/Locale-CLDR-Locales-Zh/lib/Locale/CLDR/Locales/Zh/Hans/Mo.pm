@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Zh::Hans::Mo - Package for language Chinese
 
 package Locale::CLDR::Locales::Zh::Hans::Mo;
 # This file auto generated from Data\common\main\zh_Hans_MO.xml
-#	on Tue  5 Dec  1:40:23 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -30,49 +30,118 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'concentr-karat' => {
+						'name' => q(开),
+						'other' => q({0}开),
+					},
+					# Core Unit Identifier
 					'karat' => {
 						'name' => q(开),
 						'other' => q({0}开),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'other' => q({0}秒),
+					},
+					# Core Unit Identifier
+					'second' => {
+						'other' => q({0}秒),
+					},
+					# Long Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Core Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Long Unit Identifier
+					'temperature-kelvin' => {
+						'name' => q(开氏度),
+						'other' => q({0}开氏度),
+					},
+					# Core Unit Identifier
 					'kelvin' => {
 						'name' => q(开氏度),
 						'other' => q({0}开氏度),
 					},
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					'second' => {
-						'other' => q({0}秒),
-					},
 				},
 				'narrow' => {
+					# Long Unit Identifier
+					'length-foot' => {
+						'other' => q({0}英尺),
+					},
+					# Core Unit Identifier
 					'foot' => {
 						'other' => q({0}英尺),
 					},
+					# Long Unit Identifier
+					'length-inch' => {
+						'other' => q({0}英寸),
+					},
+					# Core Unit Identifier
 					'inch' => {
 						'other' => q({0}英寸),
 					},
+					# Long Unit Identifier
+					'length-light-year' => {
+						'other' => q({0}光年),
+					},
+					# Core Unit Identifier
 					'light-year' => {
 						'other' => q({0}光年),
 					},
+					# Long Unit Identifier
+					'length-mile' => {
+						'other' => q({0}英里),
+					},
+					# Core Unit Identifier
 					'mile' => {
 						'other' => q({0}英里),
 					},
+					# Long Unit Identifier
+					'length-picometer' => {
+						'other' => q({0}皮米),
+					},
+					# Core Unit Identifier
 					'picometer' => {
 						'other' => q({0}皮米),
 					},
+					# Long Unit Identifier
+					'length-yard' => {
+						'other' => q({0}码),
+					},
+					# Core Unit Identifier
 					'yard' => {
 						'other' => q({0}码),
 					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'acceleration-g-force' => {
+						'other' => q({0}G力),
+					},
+					# Core Unit Identifier
 					'g-force' => {
 						'other' => q({0}G力),
 					},
+					# Long Unit Identifier
+					'concentr-karat' => {
+						'name' => q(开),
+						'other' => q({0}开),
+					},
+					# Core Unit Identifier
 					'karat' => {
 						'name' => q(开),
 						'other' => q({0}开),
 					},
+					# Long Unit Identifier
+					'temperature-kelvin' => {
+						'name' => q(开氏度),
+						'other' => q({0}°K),
+					},
+					# Core Unit Identifier
 					'kelvin' => {
 						'name' => q(开氏度),
 						'other' => q({0}°K),
@@ -286,8 +355,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'eras' => (
@@ -343,6 +412,10 @@ has 'time_formats' => (
 		'generic' => {
 		},
 		'gregorian' => {
+			'full' => q{zzzz ah:mm:ss},
+			'long' => q{z ah:mm:ss},
+			'medium' => q{ah:mm:ss},
+			'short' => q{ah:mm},
 		},
 		'islamic' => {
 		},

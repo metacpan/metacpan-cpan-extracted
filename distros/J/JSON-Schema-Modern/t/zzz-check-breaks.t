@@ -11,7 +11,7 @@ SKIP: {
 
 # this data duplicates x_breaks in META.json
 my $breaks = {
-  "JSON::Schema::Modern::Document::OpenAPI" => "< 0.051",
+  "JSON::Schema::Modern::Document::OpenAPI" => "< 0.055",
   "JSON::Schema::Modern::Vocabulary::OpenAPI" => "< 0.017"
 };
 

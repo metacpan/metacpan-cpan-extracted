@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
@@ -10,7 +10,7 @@ use utf8;
 use Object::Pad 0.800;
 use Object::Pad ':experimental(adjust_params)';
 
-package App::sdview::Output::Tickit 0.04;
+package App::sdview::Output::Tickit 0.05;
 class App::sdview::Output::Tickit
    :strict(params);
 
@@ -364,19 +364,6 @@ method _output_para ( $para, %opts )
       my %leaderstyle = App::sdview::Style->para_style( "leader" )->%*;
       $leaderstyle{$_} and $leader->apply_tag( 0, $leaderlen, $_ => $leaderstyle{$_} )
          for qw( fg bg bold under italic monospace );
-
-      if( $leaderlen + 1 <= $indent ) {
-         # Leader will fit on the same line
-         $lines[0] = $leader . " "x($indent - $leaderlen) . $lines[0];
-      }
-      else {
-         # spill the leader onto its own line
-         unshift @lines, $leader;
-      }
-
-   }
-   elsif( $para->type ne "verbatim" ) {
-      $lines[0] = " "x$indent . $lines[0] if @lines;
    }
 
    @lines or @lines = ( String::Tagged->new( "" ) ); # placate String::Tagged->join bug
@@ -396,6 +383,7 @@ method _output_para ( $para, %opts )
    else {
       $item = App::sdview::Output::Tickit::_ParagraphItem->new(
          text         => $text,
+         leader       => $leader,
          indent       => $indent,
          margin_left  => $margin,
          margin_right => 1,
@@ -470,6 +458,13 @@ class App::sdview::Output::Tickit::_ParagraphItem
    field $_margin_left  :param = 0;
    field $_margin_right :param = 0;
    field $_indent       :param = 0;
+   field $_leader       :param = undef;
+   field $_leaderlen;
+   field $_has_leaderline      = 0;
+   ADJUST {
+      $_leaderlen = Tickit::Utils::textwidth( $_leader ) if defined $_leader;
+      $_has_leaderline = 1 if $_leaderlen and $_leaderlen + 1 > $_indent;
+   }
 
    # Logic kindof stolen from T:W:Scroller::Item::(Rich)Text but modified
 
@@ -548,6 +543,7 @@ class App::sdview::Output::Tickit::_ParagraphItem
       $width -= $_margin_left + $_margin_right;
 
       @_lineruns = ();
+      push @_lineruns, undef if $_has_leaderline;
 
       # Operate on pos() within textplain as a proxy for the position within
       # the String::Tagged instance
@@ -570,12 +566,15 @@ class App::sdview::Output::Tickit::_ParagraphItem
             $linewidth = 0;
          }
 
+         $linewidth += $_indent if !$linewidth;
+
          $linewidth += $chunkwidth;
          $lineend = $endpos;
          $was_softhyphen = $is_softhyphen;
       }
 
       $self->_pushline( $linestart, $lineend, 0 ) if $linewidth;
+      return scalar @_lineruns;
    }
 
    method render ( $rb, %args )
@@ -585,8 +584,6 @@ class App::sdview::Output::Tickit::_ParagraphItem
       $self->height_for_width( $width ) if $width != $_cached_width;
 
       foreach my $line ( $args{firstline} .. $args{lastline} ) {
-         my $indent = ( $line && $_indent ) ? $_indent : 0;
-
          $rb->goto( $line, 0 );
          $rb->erase( $_margin_left ) if $_margin_left;
 
@@ -595,7 +592,19 @@ class App::sdview::Output::Tickit::_ParagraphItem
             $rb->setpen( $_pen );
          }
 
-         $rb->erase( $indent ) if $indent;
+         if( $line == 0 and $_leaderlen ) {
+            $_leader->iter_substr_nooverlap(
+               sub ( $substr, %tags )
+               {
+                  my $pen = Tickit::Pen::Immutable->new_from_attrs( \%tags );
+                  $rb->text( $substr, $pen );
+               },
+            );
+
+            next if $_has_leaderline;
+         }
+
+         $rb->erase_to( $_margin_left + $_indent ) if $_indent;
 
          my ( $start, $end, $is_softhyphen ) = $_lineruns[$line]->@*;
          $_text->iter_substr_nooverlap(

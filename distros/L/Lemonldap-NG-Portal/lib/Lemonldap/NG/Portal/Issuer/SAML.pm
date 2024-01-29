@@ -14,7 +14,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SAML_DESTINATION_ERROR
   PE_SAML_SESSION_ERROR
   PE_SAML_SIGNATURE_ERROR
-  PE_SAML_SLO_ERROR
+  PE_SLO_ERROR
   PE_SAML_SSO_ERROR
   PE_ISSUERMISSINGREQATTR
   PE_UNKNOWNPARTNER
@@ -22,7 +22,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_UNAUTHORIZEDPARTNER
 );
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.18.0';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::SAML';
@@ -404,6 +404,21 @@ sub run {
                           . " in registered Service Providers metadata." );
 
                     return PE_UNKNOWNPARTNER;
+                }
+                elsif ( $lasso_error ==
+                    Lasso::Constants::PROFILE_ERROR_INVALID_PROTOCOLPROFILE )
+                {
+                    $self->logger->error(
+                        "SSO: Fail to process authentication request");
+                    if ( my $ACS =
+                        eval { $login->request->AssertionConsumerServiceURL } )
+                    {
+                        $self->logger->error(
+                                "Requested AssertionConsumerServiceURL $ACS"
+                              . " might be missing from registered metadata" );
+                    }
+
+                    return PE_SAML_SSO_ERROR;
                 }
                 else {
                     $self->logger->error(
@@ -1401,7 +1416,7 @@ sub logout {
     if ($session) {
         unless ( $self->setSessionFromDump( $logout, $session ) ) {
             $self->logger->error("Unable to load Lasso Session");
-            return PE_SAML_SLO_ERROR;
+            return PE_SLO_ERROR;
         }
         $self->logger->debug("Lasso Session loaded");
     }
@@ -1416,7 +1431,7 @@ sub logout {
     if ($identity) {
         unless ( $self->setIdentityFromDump( $logout, $identity ) ) {
             $self->logger->error("Unable to load Lasso Identity");
-            return PE_SAML_SLO_ERROR;
+            return PE_SLO_ERROR;
         }
         $self->logger->debug("Lasso Identity loaded");
     }
@@ -1584,7 +1599,7 @@ sub sloRelayTerm {
 
     unless ($logout_dump) {
         $self->logger->error("Could not get logout dump");
-        return PE_SAML_SLO_ERROR;
+        return PE_SLO_ERROR;
     }
 
     # Rebuild Lasso::Logout object
@@ -1592,18 +1607,18 @@ sub sloRelayTerm {
 
     unless ($logout) {
         $self->logger->error("Could not build Lasso::Logout");
-        return PE_SAML_SLO_ERROR;
+        return PE_SLO_ERROR;
     }
 
     # Inject session
     unless ($session_dump) {
         $self->logger->error("Could not get session dump");
-        return PE_SAML_SLO_ERROR;
+        return PE_SLO_ERROR;
     }
 
     unless ( $self->setSessionFromDump( $logout, $session_dump ) ) {
         $self->logger->error("Could not set session from dump");
-        return PE_SAML_SLO_ERROR;
+        return PE_SLO_ERROR;
     }
 
     # Get Lasso::Session
@@ -1611,7 +1626,7 @@ sub sloRelayTerm {
 
     unless ($session) {
         $self->logger->error("Could not get session from logout");
-        return PE_SAML_SLO_ERROR;
+        return PE_SLO_ERROR;
     }
 
     # Loop on assertions and remove them if SLO status is OK
@@ -1656,7 +1671,7 @@ sub sloRelayTerm {
     }
     else {
         $self->logger->error("Fail to send SLO response");
-        return PE_SAML_SLO_ERROR;
+        return PE_SLO_ERROR;
     }
 
 }
@@ -1674,14 +1689,14 @@ sub sloResume {
 
     unless ($ResumeParams) {
         $self->logger->error("Could not find resumption info");
-        return PE_SAML_SLO_ERROR;
+        return PE_SLO_ERROR;
     }
 
     my $logoutContextSession = $self->getSamlSession($ResumeParams);
 
     unless ($logoutContextSession) {
         $self->logger->error("Could not find logout context session");
-        return PE_SAML_SLO_ERROR;
+        return PE_SLO_ERROR;
     }
 
     my $spConfKey   = $logoutContextSession->data->{spConfKey};

@@ -17,13 +17,13 @@ probe sub {
   my ($java_version_out) = capture_merged {
     system( qw(java -version) );
   };
-  my ($version_via_java) = $java_version_out =~ /^openjdk version "([0-9\._]+)"/m or return 'share';
+  my ($version_via_java) = $java_version_out =~ /^openjdk version "([0-9\._]+(?:-\w+)?)"/m or return 'share';
   $build->log("java has OpenJDK version: $version_via_java");
 
   my ($javac_version_out) = capture_merged {
     system( qw(javac -version) );
   };
-  my ($version_via_javac) = $javac_version_out =~ /^javac ([0-9\._]+)/m or return 'share';
+  my ($version_via_javac) = $javac_version_out =~ /^javac ([0-9\._]+(?:-\w+)?)/m or return 'share';
   $build->log("javac has version: $version_via_javac");
 
   return 'share' unless $version_via_java eq $version_via_javac;

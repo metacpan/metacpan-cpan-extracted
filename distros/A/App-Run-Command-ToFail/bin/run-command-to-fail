@@ -5,7 +5,7 @@ use warnings;
 
 use App::Run::Command::ToFail;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Run.
 exit App::Run::Command::ToFail->new->run;
@@ -104,6 +104,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

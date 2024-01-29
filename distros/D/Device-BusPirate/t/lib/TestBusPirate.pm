@@ -1,6 +1,6 @@
 package TestBusPirate;
 
-use strict;
+use v5.26;
 use warnings;
 
 use Carp;
@@ -14,6 +14,7 @@ our @EXPORT = qw(
    check_and_clear
 );
 
+require Test::Builder;
 my $builder = Test::Builder->new;
 
 my @expectations;

@@ -7,7 +7,7 @@ use lib 'blib/lib';
 
 #use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 use Test::More;
 use Test2::Plugin::UTF8; # rids of the Wide Character in TAP message!

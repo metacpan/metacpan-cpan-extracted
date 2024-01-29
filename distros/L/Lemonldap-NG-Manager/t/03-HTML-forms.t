@@ -40,7 +40,7 @@ foreach (qw(home homeViewer menuCat menuApp authParamsTextContainer)) {
 foreach my $type ( keys %types ) {
     delete $types{$type};
     if ( $type =~
-/^(?:array|authParamsText|url|PerlModule|hostname|pcre|lmAttrOrMacro|subContainer|RSAP(?:ublic|rivate)Key(?:OrCertificate)?)$/
+/^(?:array|authParamsText|url|PerlModule|hostname|pcre|lmAttrOrMacro|subContainer|(?:EcOr)?RSAP(?:ublic|rivate)Key(?:OrCertificate)?)$/
       )
     {
         delete $forms{$type};
@@ -56,7 +56,7 @@ foreach my $type ( keys %types ) {
         $count++;
     }
 }
-ok( !%forms, "No unused forms" ) or print "Found:\n" . Dumper( \%forms );
+ok( !%forms, "No unused forms" ) or print STDERR "Found:\n" . Dumper( \%forms );
 $count++;
 
 done_testing($count);

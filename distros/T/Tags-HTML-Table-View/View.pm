@@ -8,8 +8,9 @@ use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use List::MoreUtils qw(none);
 use Scalar::Util qw(blessed);
+use Tags::HTML::Element::A;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -38,6 +39,7 @@ sub _cleanup {
 
 	delete $self->{'_data'};
 	delete $self->{'_no_data'};
+	delete $self->{'_tags_html_a'};
 
 	return;
 }
@@ -47,6 +49,10 @@ sub _init {
 
 	$self->{'_data'} = $data_ar;
 	$self->{'_no_data'} = $no_data_value;
+	$self->{'_tags_html_a'} = Tags::HTML::Element::A->new(
+		'css' => $self->{'css'},
+		'tags' => $self->{'tags'},
+	);
 
 	return;
 }
@@ -184,8 +190,9 @@ sub _value {
 		);
 	} elsif (ref $value eq 'ARRAY') {
 		$self->{'tags'}->put(@{$value});
-	} elsif (blessed($value) && $value->isa('Data::HTML::A')) {
-		$self->_tags_a($value);
+	} elsif (blessed($value) && $value->isa('Data::HTML::Element::A')) {
+		$self->{'_tags_html_a'}->init($value);
+		$self->{'_tags_html_a'}->process;
 	} else {
 		err 'Bad value object.';
 	}
@@ -268,7 +275,7 @@ Returns undef.
 Process initialization before page run.
 
 Variable C<$data_ar> are data for table. Each item in array could be scalar,
-array with scalars or L<Data::HTML::A> instance.
+array with scalars or L<Data::HTML::Element::A> instance.
 
 Variable C<$no_data_value> contain information for situation when data in table not
 exists.
@@ -472,7 +479,7 @@ Returns undef.
  use warnings;
 
  use CSS::Struct::Output::Indent;
- use Data::HTML::A;
+ use Data::HTML::Element::A;
  use Tags::HTML::Table::View;
  use Tags::Output::Indent;
 
@@ -485,7 +492,7 @@ Returns undef.
  );
 
  # Table data.
- my $prague = Data::HTML::A->new(
+ my $prague = Data::HTML::Element::A->new(
          'data' => ['Prague'],
          'url' => 'https://prague.cz',
  );
@@ -575,12 +582,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2023 Michal Josef Špaček
+© 2021-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

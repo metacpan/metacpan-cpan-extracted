@@ -1,5 +1,11 @@
 Revision history for Perl extension Net::Waiter
 
+1.11  2023.12.08
+
+    1. fixed shared mem, semaphores, signalling issues
+    2. sig child pid cleanup moved to central loop
+    3. main stats for processes is moved to main loop also
+
 1.10  2023.11.25
 
     1. added get_kids_pids()

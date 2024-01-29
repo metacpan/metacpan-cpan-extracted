@@ -1,0 +1,13 @@
+Revision history for Perl extension App-bsky
+
+0.03 2024-01-27T23:46:20Z
+
+    - Commands for app passwords, likes, reposts, invite codes, threads, etc.
+
+0.02 2024-01-26T19:00:52Z
+
+    - Less broken session management
+
+0.01 2024-01-26T03:45:10Z
+
+    - original version

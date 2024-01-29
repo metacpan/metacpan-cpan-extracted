@@ -1,3 +1,16 @@
+0.018   2024-01-12  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        [Documentation]
+
+        - Mention Log::ger::App.
+
+        - Update outdated example (GH#1).
+
+        - Some wording tweaks.
+
+
 0.017   2020-11-17  Released-By: PERLANCAR; Urgency: medium
 
 	- Observe LOG_GER_OUTPUT_COMPOSITE_DEBUG.

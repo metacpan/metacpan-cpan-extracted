@@ -15,7 +15,7 @@ sub dotest ( $name, $in_pod )
    my $output = App::sdview::Output::Pod->new;
    my $out_pod = $output->generate( @p );
 
-   is( $out_pod, $in_pod, "Generated POD for $name" );
+   is( $out_pod, $in_pod, "Generated Pod for $name" );
 }
 
 dotest "Headings", <<"EOPOD";
@@ -42,12 +42,22 @@ L<link|target://> L<Module::Here>
 U<underline>
 EOPOD
 
+dotest "Formatted headings", <<"EOPOD";
+=head1 A B<Bold> Beginning
+EOPOD
+
 dotest "Verbatim", <<"EOPOD";
 =head1 EXAMPLE
 
     use v5.14;
     use warnings;
     say "Hello, world";
+EOPOD
+
+dotest "Non-breaking spaces", <<"EOPOD";
+=pod
+
+Some content with S<non-breaking spaces> in it.
 EOPOD
 
 dotest "Bullet lists", <<"EOPOD";

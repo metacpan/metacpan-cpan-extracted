@@ -176,9 +176,10 @@ my @n_widgets = map { TestWidget->new } 0 .. 3;
 
 done_testing;
 
-use Object::Pad 0.75 ':experimental(init_expr)';
+use Object::Pad 0.807;
 
-class TestWidget :isa(Tickit::Widget) {
+class TestWidget {
+   inherit Tickit::Widget;
    use constant WIDGET_PEN_FROM_STYLE => 1;
 
    use constant KEYPRESSES_FROM_STYLE => 1;
@@ -191,7 +192,8 @@ class TestWidget :isa(Tickit::Widget) {
    field $_CAN_FOCUS :reader :param //= 0;
 }
 
-class TestContainer :isa(Tickit::Widget::HBox) {
+class TestContainer {
+   inherit Tickit::Widget::HBox;
    use constant WIDGET_PEN_FROM_STYLE => 1;
 
    use Tickit::Style -copy;

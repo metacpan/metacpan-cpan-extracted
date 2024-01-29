@@ -21,8 +21,8 @@ requires:
   SPVM: '0.986'
   SPVM::File::Basename: '0.02'
   SPVM::File::Spec: '0.03'
-  SPVM::Sys: '0.39'
+  SPVM::Sys: '0.508'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-File-Path.git
-version: '0.011'
+version: '0.011001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

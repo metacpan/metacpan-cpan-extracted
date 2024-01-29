@@ -1,0 +1,31 @@
+Revision history for Automate-Animate
+
+0.01    23-12-2023 22:00
+        First version, released on an unsuspecting world.
+
+0.02    23-12-2023 23:00
+        input_patterns() is now accepting regex+modifiers.
+        Added clear_input_images().
+        Enhanced documentation.
+
+0.03    23-12-2023 23:30
+        Duh in packing.
+
+0.04    27-12-2023 20:00
+        Enhanced documentation especially regarding installation
+        and that ffmpeg is a prerequisite.
+
+0.05    27-12-2023 22:00
+        Enhanced documentation for the provided script.
+        Added more test logic in t/900-scripts.t
+        A first attempt is made to add support for unicode pathnames.
+
+0.06    28-12-2023 13:00
+        Enhanced documentation.
+
+0.07    03-01-2023 13:00
+        Added omitted Test2::Plugin::UTF8 and Encode as a dependency in Makefile.PL
+	Unicode normalisation is now done prior to comparing unicode'd filenames, see e.g. t/100-input-patterns.t
+
+0.08    04-01-2023 02:00
+        Fixed a pod error.

@@ -5,7 +5,7 @@
 
 package Lemonldap::NG::Manager::Build::PortalConstants;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.18.0';
 
 sub portalConstants {
     return {
@@ -64,7 +64,7 @@ sub portalConstants {
         PE_SAML_DESTINATION_ERROR            => 53,
         PE_SAML_CONDITIONS_ERROR             => 54,
         PE_SAML_IDPSSOINITIATED_NOTALLOWED   => 55,
-        PE_SAML_SLO_ERROR                    => 56,
+        PE_SLO_ERROR                         => 56,
         PE_SAML_SIGNATURE_ERROR              => 57,
         PE_SAML_ART_ERROR                    => 58,
         PE_SAML_SESSION_ERROR                => 59,

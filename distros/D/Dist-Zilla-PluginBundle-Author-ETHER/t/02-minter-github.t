@@ -43,7 +43,6 @@ my @expected_files = qw(
     .gitattributes
     .gitignore
     .mailmap
-    .travis.yml
     Changes
     dist.ini
     CONTRIBUTING
@@ -185,14 +184,16 @@ README
 );
 
 # deliberately calculating this differently from the template -- comes out to 5.26, 5.24, ..., 5.8
-(my $current_ver = $]) =~ s/^5\.0+/5\./;
-my @versions = grep $current_ver ge $_, map '5.'.2*$_, reverse(4..13);
-my $version_matrix = join("\n", map '  - "'.$_.'"', @versions);
-like(
-    path($mint_dir, '.travis.yml')->slurp_utf8,
-    qr/$version_matrix/,
-    'included all stable perl versions into travis test matrix',
-);
+if (0) { # RIP Travis CI
+  (my $current_ver = $]) =~ s/^5\.0+/5\./;
+  my @versions = grep $current_ver ge $_, map '5.'.2*$_, reverse(4..13);
+  my $version_matrix = join("\n", map '  - "'.$_.'"', @versions);
+  like(
+      path($mint_dir, '.travis.yml')->slurp_utf8,
+      qr/$version_matrix/,
+      'included all stable perl versions into travis test matrix',
+  );
+}
 
 diag 'got log messages: ', explain $tzil->log_messages
     if not Test::Builder->new->is_passing;

@@ -7,6 +7,9 @@ examples/hooks/pre-commit
 lib/Git/Lint.pm
 lib/Git/Lint/Check.pm
 lib/Git/Lint/Check/Commit.pm
+lib/Git/Lint/Check/Commit/IndentSpaces.pm
+lib/Git/Lint/Check/Commit/IndentTabs.pm
+lib/Git/Lint/Check/Commit/MixedIndentTabsSpaces.pm
 lib/Git/Lint/Check/Commit/UnresolvedConflict.pm
 lib/Git/Lint/Check/Commit/Whitespace.pm
 lib/Git/Lint/Check/Message.pm

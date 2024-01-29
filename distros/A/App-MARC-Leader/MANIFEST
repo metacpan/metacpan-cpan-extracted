@@ -26,5 +26,6 @@ t/App-MARC-Leader/01-use.t
 t/App-MARC-Leader/02-version.t
 t/App-MARC-Leader/03-new.t
 t/App-MARC-Leader/04-run.t
+t/data/ex1.xml
 xt/App-MARC-Leader/01-pod_coverage.t
 xt/App-MARC-Leader/02-pod.t

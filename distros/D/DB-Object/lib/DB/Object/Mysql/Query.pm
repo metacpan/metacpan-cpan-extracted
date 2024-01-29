@@ -1,12 +1,13 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql/Query.pm
-## Version v0.3.7
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Version v0.3.8
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/02/24
+## Modified 2023/10/20
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -21,7 +22,7 @@ BEGIN
     use Devel::Confess;
     use Want;
     our $DEBUG = 0;
-    our $VERSION = 'v0.3.7';
+    our $VERSION = 'v0.3.8';
 };
 
 use strict;
@@ -44,7 +45,7 @@ sub format_from_epoch
 {
     my $self = shift( @_ );
     my $opts = {};
-    $opts = shift( @_ ) if( scalar( @_ ) == 1 && $self->_is_hash( $_[0] ) );
+    $opts = shift( @_ ) if( scalar( @_ ) == 1 && $self->_is_hash( $_[0] => 'strict' ) );
     if( $opts->{bind} )
     {
         return( "FROM_UNIXTIME(?)" );
@@ -59,7 +60,7 @@ sub format_to_epoch
 {
     my $self = shift( @_ );
     my $opts = {};
-    $opts = shift( @_ ) if( scalar( @_ ) == 1 && $self->_is_hash( $_[0] ) );
+    $opts = shift( @_ ) if( scalar( @_ ) == 1 && $self->_is_hash( $_[0] => 'strict' ) );
     if( $opts->{bind} )
     {
         return( 'UNIX_TIMESTAMP(?)' );
@@ -110,7 +111,7 @@ sub replace
     my @arg  = @_;
     my %arg  = ();
     my $select = '';
-    if( !%arg && $data && $self->_is_hash( $data ) )
+    if( !%arg && $data && $self->_is_hash( $data => 'strict' ) )
     {
         %arg = %$data;
     }
@@ -136,7 +137,7 @@ sub replace
         arg => \@arg, 
         avoid => \@avoid
     });
-    my( $fields, $values ) = $self->format_statement();
+    my( $fields, $values ) = $self->format_statement;
     ## $self->{ 'binded_values' } = $db_data->{ 'binded_values' };
     my $query = $self->{query} = $select ? "REPLACE INTO $table $select" : "REPLACE INTO $table ($fields) VALUES($values)";
     ## Everything meaningfull lies within the object
@@ -182,11 +183,11 @@ sub reset_bind
     return( $self );
 }
 
-## Not supported in MySQL
-## sub returning
+# Not supported in MySQL
+# sub returning
 
-## Inherited from DB::Object::Query
-## sub update
+# Inherited from DB::Object::Query
+# sub update
 
 sub _query_components
 {
@@ -217,9 +218,6 @@ sub _query_components
     push( @query, "ORDER BY $order" ) if( $order && $type eq 'select'  );
     push( @query, $sort ) if( $sort && $order && $type eq 'select'  );
     push( @query, "$limit" ) if( $limit && $type eq 'select' );
-#     foreach my $this ( @query )
-#     {
-#     }
     return( \@query );
 }
 
@@ -240,7 +238,7 @@ DB::Object::Mysql::Query - Query Object for MySQL
 
 =head1 VERSION
 
-    v0.3.7
+    v0.3.8
 
 =head1 DESCRIPTION
 

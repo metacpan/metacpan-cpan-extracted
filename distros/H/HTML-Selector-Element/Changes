@@ -1,0 +1,10 @@
+2023-12-25
+    * fixed a small oopsie that reared its ugly head when using a rule with alternatives
+    * optimized handling of a fewcommon special cases
+    * released as version 0.96
+
+2020-05-01
+    * initial public release as version 0.95
+
+2018-08-30
+    * start of development

@@ -69,12 +69,13 @@ if ($] < 5.005) {
 WriteMakefile(
     NAME         => $DISTMOD,
     DISTNAME     => $DISTNAME,
-    VERSION      => '1.66',
+    VERSION      => '1.67',
     INSTALLDIRS  => ($] >= 5.006 ? 'perl' : 'site'),
     PL_FILES     => { map { (script("$_.PL") => script($_)) } @SCRIPTS },
     EXE_FILES    => [ @EXE_FILES ],
     dist         => { COMPRESS => 'gzip', SUFFIX => 'gz' },
     clean        => { FILES => "@EXE_FILES" },
+    macro        => { TARFLAGS => "--format=ustar -c -v -f" },
     test         => { TESTS => "@TESTPODS" },
     PREREQ_PM    => \%prereq,
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005

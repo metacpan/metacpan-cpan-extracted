@@ -1,4 +1,4 @@
-# File-LoadLines
+# File::LoadLines
 
 *This is the only module you'll ever need to read data*
 

@@ -9,9 +9,9 @@ use parent 'TableData::Munge::GroupRows';
 use DateTime;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-25'; # DATE
+our $DATE = '2023-11-26'; # DATE
 our $DIST = 'TableDataBundle-Perl-CPAN-Release'; # DIST
-our $VERSION = '20231120.3'; # VERSION
+our $VERSION = '20231126.0'; # VERSION
 
 my $re_period = qr/\A(\d\d\d\d)-(\d\d)/;
 
@@ -43,7 +43,7 @@ sub new {
     );
 }
 
-our %STATS = ("num_columns",2,"num_rows",340); # STATS
+# STATS
 
 1;
 # ABSTRACT: CPAN releases (grouped monthly)
@@ -60,7 +60,7 @@ TableData::Perl::CPAN::Release::Static::GroupedMonthly - CPAN releases (grouped 
 
 =head1 VERSION
 
-This document describes version 20231120.3 of TableData::Perl::CPAN::Release::Static::GroupedMonthly (from Perl distribution TableDataBundle-Perl-CPAN-Release), released on 2023-11-25.
+This document describes version 20231126.0 of TableData::Perl::CPAN::Release::Static::GroupedMonthly (from Perl distribution TableDataBundle-Perl-CPAN-Release), released on 2023-11-26.
 
 =head1 SYNOPSIS
 

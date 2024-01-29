@@ -1,5 +1,9 @@
 Revision history for Perl module Module::Release
 
+2.135 2024-01-08T14:56:34Z
+	* refresh distro, update email address
+	* minor doc fixes for typos, etc.
+
 2.133 2023-08-03T19:22:04Z
 	* Add GitHub to the bugtracker meta data so MetaCPAN doesn't point
 	to rt.cpan.org (Tux, #48)

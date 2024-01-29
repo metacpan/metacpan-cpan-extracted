@@ -18,12 +18,12 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_REDIRECT
   PE_LOGOUT_OK
-  PE_SAML_SLO_ERROR
+  PE_SLO_ERROR
 );
 
 with 'Lemonldap::NG::Portal::Lib::LazyLoadedConfiguration';
 
-our $VERSION = '2.16.3';
+our $VERSION = '2.18.0';
 
 # PROPERTIES
 
@@ -1544,11 +1544,16 @@ sub getAttributeValue {
         my @attr_values = $_->AttributeValue();
 
         foreach (@attr_values) {
-            my $xs      = XML::Simple->new();
-            my $data    = $xs->XMLin( $_->dump() );
-            my $content = $data->{content};
-            $value .= $content . $self->conf->{multiValuesSeparator}
-              if $content;
+            my $xs   = XML::Simple->new();
+            my $data = eval { $xs->XMLin( $_->dump() ) };
+            if ($@) {
+                $self->logger->error("Unable to decode a SAML attribute: $@");
+            }
+            else {
+                my $content = $data->{content};
+                $value .= $content . $self->conf->{multiValuesSeparator}
+                  if $content;
+            }
         }
         $value =~ s/$self->{conf}->{multiValuesSeparator}$// if $value;
 
@@ -2761,7 +2766,7 @@ sub sendLogoutRequestToProvider {
     # Signature
     my $signSLOMessage =
       $self->{ lc($type) . 'Options' }->{$providerID}
-      ->{ 'saml' . $type . 'MetaDataOptionsSignSLOMessage' };
+      ->{ 'saml' . $type . 'MetaDataOptionsSignSLOMessage' } // -1;
 
     if ( $signSLOMessage == 0 ) {
         $self->logger->debug("SLO request will not be signed");

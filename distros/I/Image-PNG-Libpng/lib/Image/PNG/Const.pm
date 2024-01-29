@@ -1,5 +1,5 @@
 package Image::PNG::Const;
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -1273,7 +1273,7 @@ all the symbols in this module:
 =head1 ABOUT THIS MODULE
 
 This Perl module was generated from the file F<png.h> supplied with
-version 1.6.37 of libpng.
+version 1.6.40 of libpng.
 
 
 
@@ -1284,7 +1284,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2011-2021
+2011-2024
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

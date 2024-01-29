@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 use UI::Various::core;
 use UI::Various::Listbox;
@@ -91,6 +91,7 @@ sub _prepare($$$)
 	error('_1_element_must_be_accompanied_by_parent', __PACKAGE__);
 	return 1;
     }
+    my @attributes = $self->_common_attributes();
     $self->_cui($_->_cui
 		->add($self->_cid,
 		      'Listbox', -x => $column, -y => $row,
@@ -98,6 +99,7 @@ sub _prepare($$$)
 		      -height => $self->height + 2,
 		      -width => $self->width + 2,
 		      -multi => $self->selection == 2,
+		      @attributes,
 		      -onchange => sub {
 			  defined $self->{on_select}  and
 			      # onchange is also called via _remove!

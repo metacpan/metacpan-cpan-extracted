@@ -1,0 +1,60 @@
+{
+   "abstract" : "a SDL game where cards are used to move around a board",
+   "author" : [
+      "Jeremy Mates <jmates@thrig.me>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Game-Kezboard",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::QuadTree" : "0",
+            "File::ShareDir" : "0",
+            "File::Spec" : "0",
+            "Game::Deckar" : "0.02",
+            "SDL" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "5.036000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000060",
+            "perl" : "v5.36.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://thrig.me/src/Game-Kezboard.git"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

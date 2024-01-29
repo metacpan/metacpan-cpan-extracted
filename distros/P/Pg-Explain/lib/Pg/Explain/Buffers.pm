@@ -32,11 +32,11 @@ Pg::Explain::Buffers - Object to store buffers information about node in Postgre
 
 =head1 VERSION
 
-Version 2.6
+Version 2.7
 
 =cut
 
-our $VERSION = '2.6';
+our $VERSION = '2.7';
 
 =head1 SYNOPSIS
 
@@ -113,31 +113,54 @@ sub add_timing {
     croak( 'Too many arguments to Pg::Explain::Buffers->new().' ) if 1 < scalar @_;
     my $arg = shift;
     croak( "Don't know how to add timing info in Pg::Explain::Buffers using " . ref( $arg ) ) unless '' eq ref( $arg );
+
     croak( "Invalid format of I/O Timing info: $arg" ) unless $arg =~ m{
         \A
         \s*
         I/O \s Timings:
-        (?:
-            \s+
-            shared/local
-        )?
         (
+            (
+                \s+
+                (?: read | write )
+                =
+                \d+(\.\d+)?
+            )+
+            |
             \s+
-            (?: read | write )
-            =
-            \d+\.\d+
-        )+
+            ( local | shared/local | shared | temp )
+            (
+                \s+
+                (?: read | write )
+                =
+                \d+(\.\d+)?
+            )+
+            (
+                , \s+
+                ( local | shared/local | shared | temp )
+                (
+                    \s+
+                    (?: read | write )
+                    =
+                    \d+(\.\d+)?
+                )+
+            )*
+        )
         \s*
         \z
     }xms;
 
-    my @matching = $arg =~ m{ (read|write) = (\d+\.\d+) }xg;
+    my @matching = $arg =~ m{ (read|write) = (\d+(?:\.\d+)?) }xg;
     return if 0 == scalar @matching;
-    my %matching = @matching;
-    for my $key ( qw( read write ) ) {
-        next unless my $val = $matching{ $key };
-        $self->{ 'data' }->{ 'timings' }->{ $key } = $val;
+
+    $arg =~ s/\A\s*//;
+    my $T = {
+        'info' => $arg,
+    };
+
+    for ( my $i = 0 ; $i < scalar @matching ; $i += 2 ) {
+        $T->{ $matching[ $i ] } += $matching[ $i + 1 ];
     }
+    $self->{ 'data' }->{ 'timings' } = $T;
     return;
 }
 
@@ -161,9 +184,7 @@ sub as_text {
     return if 0 == scalar @parts;
     my $ret = sprintf 'Buffers: %s', join( ', ', @parts );
     return $ret unless my $T = $self->{ 'data' }->{ 'timings' };
-    my $timing = join ' ', map { $_ . '=' . $T->{ $_ } } grep { $T->{ $_ } } qw{ read write };
-    return $ret unless $timing;
-    return $ret . "\nI/O Timings: " . $timing;
+    return $ret . "\n" . $T->{ 'info' };
 }
 
 =head2 get_struct
@@ -178,7 +199,7 @@ Returns hash(ref) with all data about buffers from this object. Keys in this has
 
 =item * temp (with subkeys: read, written)
 
-=item * timings (with subkeys: read, write
+=item * timings (with subkeys: read, write, info)
 
 =back
 
@@ -193,7 +214,7 @@ sub get_struct {
         'shared'  => [ qw{ hit read dirtied written } ],
         'local'   => [ qw{ hit read dirtied written } ],
         'temp'    => [ qw{ read written } ],
-        'timings' => [ qw{ read write } ],
+        'timings' => [ qw{ read write info } ],
     };
     my $ret = {};
     while ( my ( $type, $subtypes ) = each %{ $map } ) {
@@ -243,10 +264,9 @@ sub _build_from_struct {
     my $in   = shift;
 
     my $map = {
-        'shared'  => [ qw{ hit read dirtied written } ],
-        'local'   => [ qw{ hit read dirtied written } ],
-        'temp'    => [ qw{ read written } ],
-        'timings' => [ qw{ read write } ],
+        'shared' => [ qw{ hit read dirtied written } ],
+        'local'  => [ qw{ hit read dirtied written } ],
+        'temp'   => [ qw{ read written } ],
     };
 
     while ( my ( $type, $subtypes ) = each %{ $map } ) {
@@ -261,7 +281,80 @@ sub _build_from_struct {
         }
     }
 
+    # Timing information changes depending on version, so let's build it appropriately
+    my $T = {};
+    for my $key ( sort grep { m{I/O (?:Read|Write) Time$} } keys %{ $in } ) {
+        next if $in->{ $key } == 0;
+        if ( $key =~ /Read/ ) {
+            $T->{ 'read' } += $in->{ $key };
+        }
+        else {
+            $T->{ 'write' } += $in->{ $key };
+        }
+    }
+    if ( 0 < scalar keys %{ $T } ) {
+        $T->{ 'info' } = $self->_build_timing_info( $in );
+        $self->{ 'data' }->{ 'timings' } = $T;
+    }
+
     return;
+}
+
+=head2 _build_timing_info
+
+Based on data from structure from json/yaml/xml, build I/O Timings: info line for textual representation of explain.
+
+=cut
+
+sub _build_timing_info {
+    my $self = shift;
+    my $in   = shift;
+
+    my %parts = ();
+    for my $type ( qw( old shared local temp ) ) {
+        my @for_type    = ();
+        my $type_prefix = $type eq 'old' ? '' : ( ucfirst( $type ) . ' ' );
+        my $read_key    = $type_prefix . 'I/O Read Time';
+        my $write_key   = $type_prefix . 'I/O Write Time';
+
+        # +0 to make sure we're treating the thing as number, and not string
+        # The key can be absent from input, or it can be there, but be as number, or as string.
+        # The problem is that string '0.000' - as provided by YAML parsing, is causing issues, as it passes "if $val"
+        push @for_type, sprintf( 'read=%.3f',  $in->{ $read_key } )  if ( ( $in->{ $read_key }  // 0 ) + 0 ) > 0;
+        push @for_type, sprintf( 'write=%.3f', $in->{ $write_key } ) if ( ( $in->{ $write_key } // 0 ) + 0 ) > 0;
+        next if 0 == scalar @for_type;
+        $parts{ $type } = join( ' ', @for_type );
+    }
+    return if 0 == scalar keys %parts;
+
+    if ( exists $in->{ 'Local I/O Read Time' } ) {
+
+        # This is the newest format (pg17+)
+        # Timings: shared read=? write=?, local read=? write=?, temp read=? write=?
+        my @parts = ();
+        for my $type ( qw( shared local temp ) ) {
+            next unless $parts{ $type };
+            push @parts, $type . ' ' . $parts{ $type };
+        }
+        return sprintf( 'I/O Timings: %s', join( ', ', @parts ) );
+    }
+    elsif ( exists $in->{ 'Temp I/O Read Time' } ) {
+
+        # This is format from pg15 to pg16
+        # I/O Timings: shared/local read=? write=?, temp read=? write=?
+        my @parts = ();
+        for my $type ( qw( old temp ) ) {
+            next unless $parts{ $type };
+            my $label = $type eq 'old' ? 'shared/local' : $type;
+            push @parts, $label . ' ' . $parts{ $type };
+        }
+        return sprintf( 'I/O Timings: %s', join( ', ', @parts ) );
+    }
+    else {
+        # This is the oldest format (pg14 and older)
+        # I/O Timings: read=? write=?
+        return sprintf( 'I/O Timings: %s', $parts{ 'old' } );
+    }
 }
 
 =head2 _build_from_string

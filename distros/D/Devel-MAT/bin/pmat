@@ -4,7 +4,6 @@ use v5.14;
 use warnings;
 use Feature::Compat::Try;
 
-use Devel::MAT;
 use Devel::MAT::Cmd::Terminal;
 use Getopt::Long qw( :config no_permute );
 use Commandable::Invocation 0.03; # ->new_from_tokens
@@ -19,6 +18,8 @@ GetOptions(
 # Some tools might want to draw pretty graphs with line drawing / similar
 STDOUT->binmode( ":encoding(UTF-8)" );
 STDOUT->autoflush(1);
+
+require Devel::MAT;
 
 my $file = shift @ARGV or die "Need dumpfile\n";
 

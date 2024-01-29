@@ -58,6 +58,12 @@ SKIP: {
    ok(is_not_identical($true, 1), 'true isnot one');
 }
 
+no Syntax::Operator::Identical qw( is_identical );
+
+like( dies { is_identical("x", "x") },
+   qr/^Undefined subroutine &main::is_identical called at /,
+   'unimport' );
+
 ok(!$warnings, 'no warnings');
 
 done_testing;

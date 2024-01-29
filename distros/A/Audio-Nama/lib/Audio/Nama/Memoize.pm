@@ -1,6 +1,6 @@
 # ------ Memoize subroutines ------
 package Audio::Nama;
-use Modern::Perl;
+use Modern::Perl '2020';
 use Memoize qw(memoize unmemoize);
 
 BEGIN { # OPTMIZATION
@@ -36,7 +36,7 @@ sub track_unmemoize { # after generate_setup
 	return unless $config->{memoize};
 	map{package Audio::Nama::Track; unmemoize ($_)} @track_methods;
 }
-sub restart_wav_memoize {
+sub refresh_wav_cache {
 	return unless $config->{memoize};
 	map{package Audio::Nama::Wav; unmemoize ($_); memoize($_) } 
 		@wav_functions;

@@ -1,0 +1,18 @@
+Changes
+lib/Parse/SNI.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01_parse_sni.t
+t/bad_sni/1.sni
+t/bad_sni/2.sni
+t/bad_sni/3.sni
+t/bad_sni/4.sni
+t/bad_sni/5.sni
+t/bad_sni/6.sni
+t/good_sni/medium.com.sni
+t/good_sni/www.facebook.com.sni
+t/good_sni/www.xn--j1ay.xn--p1ai.sni
+t/good_sni/yt3.ggpht.com.sni
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

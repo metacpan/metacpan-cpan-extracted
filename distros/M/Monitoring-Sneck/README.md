@@ -12,28 +12,43 @@ sneck [-f <config file>] [-p] [-i]
 
 ## FLAGS
 
-```
--f <config>              Config file to use.
-                         Default: /usr/local/etc/sneck.conf
+### -f config_file
 
--c                       Print the cache and exit. Requires -u being used previously.
+The config file to use.
 
--C                       Cache file.
-                         Default: /var/cache/sneck.cache
+Default :: /usr/local/etc/sneck.conf
 
--b                       base64+gzip the printing of the cache.
+### -p
 
--u                       Run and write to cache.
+Pretty it in a nicely formatted format.
 
--p                       Pretty print. Does not affect -c.
+### -C cache_file
 
--i                       Include the raw config in the JSON.
+The cache file to use.
 
--h                       Print help info.
---help                   Print help info.
--v                       Print version info.
---version                Print version info.
-```
+Default :: /var/cache/sneck.cache
+
+A secondary cache file based on this name is also created. By default
+it is /var/cache/sneck.cache.snmp and is used for storing the
+compressed version.
+
+### -u
+
+Update the cache file. Will also print the was written to it.
+
+### -c
+
+Print the cache file. Please note that -p or -i won't affect
+this as this flag only reads/prints the cache file.
+
+### -b
+
+When used with -c, it does optional LibreNMS style GZip+BASE64
+style compression.
+
+### -i
+
+Includes the config file used.
 
 ## CONFIG FORMAT
 
@@ -44,46 +59,56 @@ Blank lines are ignored.
 
 Lines starting with /\#/ are comments lines.
 
-Lines matching /^[A-Za-z0-9\_]+\=/ are variables. Anything before the the
-/\=/ is used as the name with everything after being the value.
+Lines matching /^[Ee][Nn][Vv]\ [A-Za-z0-9\_]+\=/ are
+variables. Anything before the the /\=/ is used as the name with
+everything after being the value.
 
-Lines matching /^[A-Za-z0-9\_]+\|/ are checks to run. Anything before the
-/\|/ is the name with everything after command to run.
+Lines matching /^[A-Za-z0-9\_]+\=/ are variables. Anything before the
+the /\=/ is used as the name with everything after being the value.
+
+Lines matching /^[A-Za-z0-9\_]+\|/ are checks to run. Anything before
+the /\|/ is the name with everything after command to run.
 
 Any other sort of lines are considered an error.
 
-Variables in the checks are in the form of %%%varaible_name%%%.
+Variables in the checks are in the form of /%+varaible_name%+/.
 
-Variable names and check names may not be redefined once defined in the config.
+Variable names and check names may not be redefined once defined in
+the config.
 
-### EXAMPLE CONFIG
+## EXAMPLE CONFIG
 
 ```
-PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
-# this is a comment
-geom_foo|/usr/bin/env PATH=%%%PATH%%% /usr/local/libexec/nagios/check_geom mirror foo
-does_not_exist|/bin/this_will_error yup... that it will
- 
-does_not_exist_2|/usr/bin/env /bin/this_will_also_error
+    env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
+    # this is a comment
+    GEOM_DEV=foo
+    geom_foo|/usr/local/libexec/nagios/check_geom mirror %GEOM_DEV%
+    does_not_exist|/bin/this_will_error yup... that it will
+    
+    does_not_exist_2|/usr/bin/env /bin/this_will_also_error
 ```
 
-The first line creates a variable named path.
+The first line sets the %ENV variable PATH.
 
 The second is ignored as it is a comment.
 
-The third creates a check named geom_foo that calls env with and sets the PATH to the
-the variable defined on line 1 and then calls check_geom_mirror.
+The third sets the variable GEOM_DEV to 'foo'
 
-The fourth is a example of an error that will show what will happen when you call to a
-file that does not exist.
+The fourth creates a check named geom_foo that calls check_geom_mirror
+with the variable supplied to it being the value specified by the
+variable GEOM_DEV.
 
-The fifth line will be ignored as it is blank.
+The fith is a example of an error that will show what will happen when
+you call to a file that does not exit.
 
-The sixth is a example of another command erroring.
+The sixth line will be ignored as it is blank.
 
-When you run it, you will notice that errors for lines 4 and 5 are printed to STDERR.
-For this reason you should use '2> /dev/null' when calling it from snmpd or
-'2> /dev/null > /dev/null' when calling from cron.
+The seventh is a example of another command erroring.
+
+When you run it, you will notice that errors for lines 4 and 5 are
+printed to STDERR. For this reason you should use '2> /dev/null' when
+calling it from snmpd or '2> /dev/null > /dev/null' when calling from
+cron. 
 
 ## USAGE
 

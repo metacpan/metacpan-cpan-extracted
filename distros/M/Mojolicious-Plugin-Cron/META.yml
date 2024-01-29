@@ -3,12 +3,12 @@ abstract: 'a Cron-like helper for Mojolicious and Mojolicious::Lite projects'
 author:
   - 'Daniel Mantovani, C<dmanto@cpan.org>'
 build_requires:
-  Test2::V0: '0.000114'
-  Test::Mock::Time: v0.1.7
+  Test2::V0: '0.000159'
+  Test::Mock::Time: v0.2.1
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,16 +27,16 @@ no_index:
 provides:
   Mojolicious::Plugin::Cron:
     file: lib/Mojolicious/Plugin/Cron.pm
-    version: '0.033'
+    version: '0.034'
 requires:
   Algorithm::Cron: '0.10'
-  Mojolicious: '7.82'
+  Mojolicious: '9.35'
   perl: '5.020001'
 resources:
   bugtracker: https://github.com/dmanto/Mojolicious-Plugin-Cron/issues
   homepage: https://github.com/dmanto/Mojolicious-Plugin-Cron
-  repository: git://github.com/dmanto/Mojolicious-Plugin-Cron.git
-version: '0.033'
+  repository: https://github.com/dmanto/Mojolicious-Plugin-Cron.git
+version: '0.034'
 x_contributors:
   - 'Daniel Mantovani <daniel@MBP-daniel.local>'
   - 'Daniel Mantovani <daniel@gmail.com>'

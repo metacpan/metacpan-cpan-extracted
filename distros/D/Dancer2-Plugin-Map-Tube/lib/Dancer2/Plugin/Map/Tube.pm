@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Map::Tube;
 
-$Dancer2::Plugin::Map::Tube::VERSION   = '0.02';
+$Dancer2::Plugin::Map::Tube::VERSION   = '0.03';
 $Dancer2::Plugin::Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Dancer2::Plugin::Map::Tube - Dancer2 add-on for Map::Tube.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -97,6 +97,8 @@ be one of the following supported maps. Please make sure map is installed first.
 
 =item Berlin
 
+=item Bielefeld
+
 =item Bucharest
 
 =item Budapest
@@ -106,6 +108,8 @@ be one of the following supported maps. Please make sure map is installed first.
 =item Dnipropetrovsk
 
 =item Glasgow
+
+=item Hongkong
 
 =item Kazan
 
@@ -159,13 +163,13 @@ be one of the following supported maps. Please make sure map is installed first.
 
 our $INSTALLED_MAPS;
 our $SUPPORTED_MAPS = [qw/
-    Barcelona      Beijing         Berlin   Bucharest       Budapest
-    Delhi          Dnipropetrovsk  Glasgow  Kazan           Kharkiv
-    Kiev           KoelnBonn       Kolkatta KualaLumpur     London
-    Lyon           Malaga          Minsk    Moscow          Nanjing
-    NizhnyNovgorod Novosibirsk     Prague   SaintPetersburg Samara
-    Singapore      Sofia           Tbilisi  Vienna          Warsaw
-    Yekaterinburg/];
+    Barcelona       Beijing   Berlin          Bielefeld    Bucharest
+    Budapest        Delhi     Dnipropetrovsk  Glasgow      Hongkong
+    Kazan           Kharkiv   Kiev            KoelnBonn    Kolkatta
+    KualaLumpur     London    Lyon            Malaga       Minsk
+    Moscow          Nanjing   NizhnyNovgorod  Novosibirsk  Prague
+    SaintPetersburg Samara    Singapore       Sofia        Tbilisi
+    Vienna          Warsaw    Yekaterinburg/];
 
 register api => sub {
     my ($dsl, $map_name) = @_;
@@ -207,7 +211,7 @@ register_plugin;
 
 =head1 AUTHOR
 
-Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
+Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
@@ -215,8 +219,7 @@ L<https://github.com/manwar/Dancer2-Plugin-Map-Tube>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-dancer2-plugin-map-tube at rt.cpan.org>,
-or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dancer2-Plugin-Map-Tube>.
+Please report any bugs or feature requests through the web interface at L<https://github.com/manwar/Dancer2-Plugin-Map-Tube/issues>.
 I will  be notified and then you'll automatically be notified of progress on your
 bug as I make changes.
 
@@ -230,9 +233,9 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * BUGS / ISSUES
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer2-Plugin-Map-Tube>
+L<https://github.com/manwar/Dancer2-Plugin-Map-Tube/issues>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -242,15 +245,15 @@ L<http://annocpan.org/dist/Dancer2-Plugin-Map-Tube>
 
 L<http://cpanratings.perl.org/d/Dancer2-Plugin-Map-Tube>
 
-=item * Search CPAN
+=item * Search MetaCPAN
 
-L<http://search.cpan.org/dist/Dancer2-Plugin-Map-Tube/>
+L<https://metacpan.org/pod/Dancer2::Plugin::Map::Tube>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 Mohammad S Anwar.
+Copyright (C) 2024 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain  a copy of the full

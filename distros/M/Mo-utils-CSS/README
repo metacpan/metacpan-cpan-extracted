@@ -1,0 +1,272 @@
+NAME
+    Mo::utils::CSS - Mo CSS utilities.
+
+SYNOPSIS
+     use Mo::utils::CSS qw(check_array_css_color check_css_class check_css_color check_css_unit);
+
+     check_array_css_color($self, $key);
+     check_css_class($self, $key);
+     check_css_color($self, $key);
+     check_css_unit($self, $key);
+
+DESCRIPTION
+    Mo utilities for checking of CSS style things.
+
+SUBROUTINES
+  "check_array_css_color"
+     check_array_css_color($self, $key);
+
+    Check parameter defined by $key which is reference to array. Check if
+    all values are CSS colors.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+  "check_css_class"
+     check_css_class($self, $key);
+
+    Check parameter defined by $key if it's CSS class name. Value could be
+    undefined.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+  "check_css_color"
+     check_css_color($self, $key);
+
+    Check parameter defined by $key if it's CSS color. Value could be
+    undefined.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+  "check_css_unit"
+     check_css_unit($self, $key);
+
+    Check parameter defined by $key if it's CSS unit. Value could be
+    undefined.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+ERRORS
+     check_array_css_color():
+             Parameter '%s' has bad color name.
+                     Value: %s
+             Parameter '%s' has bad rgb color (bad hex number).
+                     Value: %s
+             Parameter '%s' has bad rgb color (bad length).
+                     Value: %s
+             Parameter '%s' must be a array.
+                     Value: %s
+                     Reference: %s
+
+     check_css_class():
+             Parameter '%s' has bad CSS class name.
+                     Value: %s
+             Parameter '%s' has bad CSS class name (number on begin).
+                     Value: %s
+
+     check_css_color():
+             Parameter '%s' has bad color name.
+                     Value: %s
+             Parameter '%s' has bad rgb color (bad hex number).
+                     Value: %s
+             Parameter '%s' has bad rgb color (bad length).
+                     Value: %s
+
+     check_css_unit():
+             Parameter '%s' doesn't contain number.
+             Parameter '%s' doesn't contain unit.
+             Parameter '%s' contain bad unit.
+                     Value: %s
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Mo::utils::CSS qw(check_array_css_color);
+
+     my $self = {
+             'key' => [
+                     'red',
+                     '#F00', '#FF0000', '#FF000000',
+                     'rgb(255,0,0)', 'rgba(255,0,0,0.3)',
+                     'hsl(120, 100%, 50%)', 'hsla(120, 100%, 50%, 0.3)',
+             ],
+     };
+     check_array_css_color($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::CSS qw(check_array_css_color);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => ['xxx'],
+     };
+     check_array_css_color($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Parameter 'key' has bad color name.
+
+EXAMPLE3
+     use strict;
+     use warnings;
+
+     use Mo::utils::CSS qw(check_css_class);
+
+     my $self = {
+             'key' => 'foo-bar',
+     };
+     check_css_class($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE4
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::CSS qw(check_css_class);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => '1xxx',
+     };
+     check_css_class($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Parameter 'key' has bad CSS class name (number of begin).
+
+EXAMPLE5
+     use strict;
+     use warnings;
+
+     use Mo::utils::CSS qw(check_css_color);
+
+     my $self = {
+             'key' => '#F00',
+     };
+     check_css_color($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE6
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::CSS qw(check_css_color);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'xxx',
+     };
+     check_css_color($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Parameter 'key' has bad color name.
+
+EXAMPLE7
+     use strict;
+     use warnings;
+
+     use Mo::utils::CSS qw(check_css_unit);
+
+     my $self = {
+             'key' => '123px',
+     };
+     check_css_unit($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE8
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::CSS qw(check_css_unit);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => '12',
+     };
+     check_css_unit($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Parameter 'key' doesn't contain unit.
+
+DEPENDENCIES
+    Error::Pure, Exporter, Graphics::ColorNames::CSS, List::Util, Mo::utils,
+    Readonly.
+
+SEE ALSO
+    Mo  Micro Objects. Mo is less.
+
+    Mo::utils
+        Mo utilities.
+
+    Mo::utils::Language
+        Mo language utilities.
+
+    Wikibase::Datatype::Utils
+        Wikibase datatype utilities.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Mo-utils-CSS>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023-2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.03
+

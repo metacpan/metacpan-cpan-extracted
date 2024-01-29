@@ -7,6 +7,8 @@ use open ':std', ':encoding(utf8)';
 use Test::More;
 use Test::Synopsis::Expectation;
 use Unicode::Normalize;
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 require_ok('Software::Copyright::Owner');
 

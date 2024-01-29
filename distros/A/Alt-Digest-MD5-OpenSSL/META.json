@@ -1,0 +1,47 @@
+{
+   "abstract" : "Alternative Digest::MD5 based on OpenSSL.",
+   "author" : [
+      "Michal Josef Spacek <michal.josef.spacek@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alt-Digest-MD5-OpenSSL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "lib/Digest"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Base::Wrapper" : "0.32",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Base::Wrapper" : "1.97",
+            "Alien::OpenSSL" : "0",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::base" : "1.00",
+            "XSLoader" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : 0.02,
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

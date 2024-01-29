@@ -2,87 +2,94 @@
 $Date => undef
 $Object => undef
 $DateTypes => undef
+$DayOfWeek => undef
+$TicketsSpanningDays => undef
+$WeekTicketPosition => undef
+$CurrentPostion => undef
 </%args>
-<div class="day">
-<small>
 
-% if ($IsReminder and RTx::Calendar::LocalDate($Object->DueObj->Unix) eq $today) {
-     <img src="<%$RT::WebImagesURL%>/reminder.png" />
+<%perl>
+my $spanning_tickets_for_today    = $TicketsSpanningDays->{$today}    || [];
+my $spanning_tickets_for_tomorrow = $TicketsSpanningDays->{$tomorrow} || [];
+my $first_day_of_the_event = 0;
+my $last_day_of_the_event = 0;
+# If the ticket is not in the spanning tickets for today array, it means
+# it's the first day of the event
+if ( ( ! grep { $_ eq $TicketId } @$spanning_tickets_for_today ) ) {
+    $first_day_of_the_event = 1;
+}
+if ( ( !grep { $_ eq $TicketId } @$spanning_tickets_for_tomorrow ) ) {
+    $last_day_of_the_event = 1;
+    # This frees up the position for the next ticket
+    $WeekTicketPosition->{$CurrentPostion}->{id} = "";
+}
+</%perl>
 
-% } elsif ($DateTypes->{Resolved}
-%           and RTx::Calendar::LocalDate($Object->ResolvedObj->Unix) eq $today) {
-         <img src="<%$RT::WebImagesURL%>/resolved.png" />
-
-% } elsif ($DateTypes->{Starts} and $DateTypes->{Due}
-%           and RTx::Calendar::LocalDate($Object->StartsObj->Unix) eq $today and RTx::Calendar::LocalDate($Object->DueObj->Unix) eq $today ) {
-    <img src="<%$RT::WebImagesURL%>/starts_due.png" />
-
-% } elsif ($DateTypes->{Due} and $DateTypes->{Created}
-%           and RTx::Calendar::LocalDate($Object->DueObj->Unix) eq $today and RTx::Calendar::LocalDate($Object->CreatedObj->Unix) eq $today ) {
-    <img src="<%$RT::WebImagesURL%>/created_due.png" />
-
-% } elsif ($DateTypes->{Starts}
-%           and RTx::Calendar::LocalDate($Object->StartsObj->Unix) eq $today) {
-    <img src="<%$RT::WebImagesURL%>/starts.png" />
-
-% } elsif ($DateTypes->{Due}
-%           and RTx::Calendar::LocalDate($Object->DueObj->Unix) eq $today) {
-    <img src="<%$RT::WebImagesURL%>/due.png" />
-
-% } elsif ($DateTypes->{Created}
-%           and RTx::Calendar::LocalDate($Object->CreatedObj->Unix) eq $today) {
-    <img src="<%$RT::WebImagesURL%>/created.png" />
-
-% } elsif ($DateTypes->{Started}
-%           and RTx::Calendar::LocalDate($Object->StartedObj->Unix) eq $today) {
-    <img src="<%$RT::WebImagesURL%>/started.png" />
-
-% } elsif ($DateTypes->{LastUpdated}
-%           and RTx::Calendar::LocalDate($Object->LastUpdatedObj->Unix) eq $today) {
-    <img src="<%$RT::WebImagesURL%>/updated.png" />
-
+<div class="day
+% if ( $last_day_of_the_event || $DayOfWeek eq 7 ) {
+    last-day
 % }
+% if ( $first_day_of_the_event || $DayOfWeek eq 1 ) {
+    first-day
+% }
+% my $status_class = 'event-status-'.$status;
+% $status_class =~ s/\s+/-/g;
+<% $status_class %>
+" style="
+% if ( $CalendarStatusColorMap{$status} ) {
+    background-color: <%$CalendarStatusColorMap{$status}%> !important;
+% } else {
+    background-color: <%$CalendarStatusColorMap{'_default_'}%> !important;
+% }
+% # We need to decrease the z-index of the spanning days of an event
+% # so the event title (which is placed on the div of the first day of the
+% # event and has a z-index of 4) is visible, since it cross multiple days.
+% if ( (grep { $_ eq $TicketId } @$spanning_tickets_for_today)
+%        && $DayOfWeek ne 1 ) {
+    z-index: 3;
+% }
+" data-object="<% $Object->Type %>-<% $Object->id %>">
 
-	<a href="<%$RT::WebPath%>/Ticket/Display.html?id=<%$TicketId%>">
+    <small>
+        <div class="event-icon" style="
+% if ($last_day_of_the_event
+% && !$first_day_of_the_event) {
+            float: right;
+% }
+        ">
+% if ( $first_day_of_the_event || $last_day_of_the_event ) {
+% my $icon = RTx::Calendar::GetEventImg( $Object, $today, $DateTypes, $IsReminder, $session{'CurrentUser'} );
+            <% $icon|n %>
+% }
+        </div>
+        <div class="event-info">
+% if ( $first_day_of_the_event || $DayOfWeek eq 1 ) {
+        <a class="event-title" href="<%$RT::WebPath%>/Ticket/Display.html?id=<%$TicketId%>">
            <% $Object->QueueObj->Name %> #<% $TicketId %>
            <% $display_owner ? 'by ' . $Object->OwnerObj->Name : '' %>
-           <% length($Object->Subject) > 80 ? substr($Object->Subject, 0, 77) . "..." : $Object->Subject %></a></small><br />
-	<span class="tip">
-	<a href="<%$RT::WebPath%>/Ticket/Display.html?id=<%$TicketId%>">
-           <% $Object->QueueObj->Name %> #<% $TicketId %>
+           <% length($Object->Subject) > 80 ? substr($Object->Subject, 0, 77) . "..." : $Object->Subject %>
         </a>
-	:</strong> <% $subject%><br />
-	<br />
-
-%# logic taken from Ticket/Search/Results.tsv
-% foreach my $attr (@display_fields) {
-%    my $value;
-%
-%    if ($attr =~ /(.*)->ISO$/ and $Object->$1->Unix <= 0) {
-%        $value = '-';
-%    } else {
-%        my $method = '$Object->'.$attr.'()';
-%        $method =~ s/->ISO\(\)$/->ISO( Timezone => 'user' )/;
-%        $value = eval $method;
-%        if ($@) {die "<b>Check your CalendarPopupFields config in etc/RT_SiteConfig.pm</b>.<br /><br />Failed to find \"$attr\" - ". $@};
-%    }
-	<strong><&|/l&><% $label_of{$attr} %></&>:</strong> <% $value %><br />
+% # Placeholder for the event details that will be loaded via AJAX on hover
+        <span class="tip">
+        </span>
 % }
+    </div>
+</small>
 
-<br />
-	</span>
 </div>
 
 <%init>
 use RTx::Calendar;
 
 my $today = $Date->strftime("%F");
+my $tomorrow = $Date->clone()->add(days => 1)->strftime("%F");
 
 my $TicketId;
 
 my $ticket;
 my $subject;
 my $IsReminder;
+my $status;
 
 if ($Object->Type eq 'reminder') {
     $IsReminder = 1;
@@ -90,40 +97,18 @@ if ($Object->Type eq 'reminder') {
 	$ticket   = $Object->RefersTo->First->TargetObj;
 	$TicketId = $ticket->Id;
 	$subject = $Object->Subject . " (" . $ticket->Subject . ")";
+        $status = $Object->Status;
     }
 } else {
     $TicketId = $Object->Id;
     $subject = $Object->Subject;
+    $status = $Object->Status;
 }
+
+my %CalendarStatusColorMap = RT->Config->Get('CalendarStatusColorMap');
 
 my $display_owner = $RT::CalendarDisplayOwner;
 $display_owner ||= RT->Config->Get('CalendarDisplayOwner')
     if RT->can('Config');
-
-
-# 3.6 config
-my @display_fields = @RT::CalendarPopupFields;
-
-# 3.8 config
-# the if condition is weird but it doesn't work with 3.8.0 without the last part
-@display_fields = RT->Config->Get('CalendarPopupFields')
-    if 0 == @display_fields and RT->can('Config') and RT->Config->Get('CalendarPopupFields');
-
-# default
-if (0 == @display_fields) {
-    @display_fields = qw(OwnerObj->Name CreatedObj->ISO StartsObj->ISO
-			 StartedObj->ISO LastUpdatedObj->ISO DueObj->ISO
-			 ResolvedObj->ISO Status Priority
-			 Requestors->MemberEmailAddressesAsString);
-}
-
-
-my %label_of;
-for my $field (@display_fields) {
-    my $label = $field;
-    $label =~ s'Obj-.(?:AsString|Name|ISO)''g;
-    $label =~ s'-\>MemberEmailAddressesAsString''g;
-    $label_of{$field} = $label;
-}
 
 </%init>

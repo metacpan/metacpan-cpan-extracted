@@ -2,8 +2,8 @@ NAME
     String::Util::Match - String utilities related to matching
 
 VERSION
-    This document describes version 0.003 of String::Util::Match (from Perl
-    distribution String-Util-Match), released on 2023-06-19.
+    This document describes version 0.004 of String::Util::Match (from Perl
+    distribution String-Util-Match), released on 2024-01-10.
 
 SYNOPSIS
      use String::Util::Match qw(match_array_or_regex num_occurs);
@@ -70,6 +70,31 @@ FUNCTIONS
 
     Return value: (any)
 
+  match_string
+    Usage:
+
+     match_string(%args) -> any
+
+    Match a string (with one of several choices).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   ignore_case => *bool*
+
+        Only relevant for string vs string matching.
+
+    *   matcher => *str|aos|obj::re|code*
+
+        Matcher.
+
+    *   str* => *str*
+
+        String to match against.
+
+    Return value: (any)
+
   num_occurs
     Usage:
 
@@ -120,7 +145,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2017 by perlancar
+    This software is copyright (c) 2024, 2023, 2017 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

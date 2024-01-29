@@ -2,7 +2,7 @@ NAME
     App::sort_by_spec - Sort lines of text by spec
 
 VERSION
-    This document describes version 0.002 of App::sort_by_spec (from Perl
+    This document describes version 0.003 of App::sort_by_spec (from Perl
     distribution App-sort_by_spec), released on 2023-09-06.
 
 FUNCTIONS
@@ -15,10 +15,10 @@ FUNCTIONS
 
     This utility lets you sort lines of text "by spec". Sorting by spec in
     an advanced form of sorting by example. In addition to specifying
-    example strings, you can also specify regexes or codes. For more
-    details, see Sort::BySpec.
+    example strings, you can also specify regexes or Perl sorter codes. For
+    more details, see the sorting backend module Sort::BySpec.
 
-    To specify a regex on the command-line, use one of this form:
+    To specify a regex on the command-line, use one of these forms:
 
      /.../
      qr(...)

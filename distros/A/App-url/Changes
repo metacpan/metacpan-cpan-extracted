@@ -1,5 +1,11 @@
 # Changes for App::url
 
+1.009 2024-01-17T18:56:52Z
+	* Try again for a botched release
+
+1.008 2024-01-17T18:23:53Z
+	* Refresh distro, update email address
+
 1.007 2021-02-13T12:56:04Z
 	* Skip some punycode tests if the locale is not UTF-8
 

@@ -20,8 +20,8 @@ use base 'PDF::Builder::Basic::PDF::String';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -30,13 +30,17 @@ and stores PDF names (things beginning with /)
 
 =head1 METHODS
 
+=head2 from_pdf
+
+    $n = PDF::Builder::Basic::PDF::Name->from_pdf($string)
+
 =over
 
-=item $n = PDF::Builder::Basic::PDF::Name->from_pdf($string)
-
 Creates a new string object (not a full object yet) from a given
-string.  The string is parsed according to input criteria with
+string. The string is parsed according to input criteria with
 escaping working, particular to Names.
+
+=back
 
 =cut
 
@@ -49,10 +53,16 @@ sub from_pdf {
     return $self;
 }
 
-=item $n->convert($string, $pdf)
+=head2 convert
+
+    $n->convert($string, $pdf)
+
+=over
 
 Converts a name into a string by removing the / and converting any hex
 munging.
+
+=back
 
 =cut
 
@@ -63,10 +73,16 @@ sub convert {
     return $string;
 }
 
-=item $s->as_pdf($pdf)
+=head2 as_pdf
+
+    $s->as_pdf($pdf)
+
+=over
 
 Returns a name formatted as PDF. C<$pdf> is optional but should be the
 PDF File object for which the name is intended if supplied.
+
+=back
 
 =cut
 
@@ -84,10 +100,16 @@ sub as_pdf {
 # spaces were implicitly allowed in names as well but it would be best
 # to ignore that (PDF 1.3, section H.3.2.4.3).
 
-=item PDF::Builder::Basic::PDF::Name->string_to_name($string, $pdf)
+=head2 string_to_name
+
+    PDF::Builder::Basic::PDF::Name->string_to_name($string, $pdf)
+
+=over
 
 Suitably encode the string C<$string> for output in the File object C<$pdf>
 (the exact format may depend on the version of $pdf).
+
+=back
 
 =cut
 
@@ -102,11 +124,17 @@ sub string_to_name {
     return $string;
 }
 
-=item PDF::Builder::Basic::PDF::Name->name_to_string($string, $pdf)
+=head2 name_to_string
+
+    PDF::Builder::Basic::PDF::Name->name_to_string($string, $pdf)
+
+=over
 
 Suitably decode the string C<$string> as read from the File object C<$pdf>
 (the exact decoding may depend on the version of $pdf).  Principally,
 undo the hex encoding for PDF versions > 1.1.
+
+=back
 
 =cut
 
@@ -122,9 +150,5 @@ sub name_to_string {
 
     return $string;
 }
-
-=back
-
-=cut
 
 1;

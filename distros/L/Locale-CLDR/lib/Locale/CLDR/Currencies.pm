@@ -1,12 +1,12 @@
 package Locale::CLDR::Currencies;
 # This file auto generated from Data.xml
-#	on Tue  5 Dec 12:58:57 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -453,29 +453,29 @@ has '_currency_fractions' => (
 			'cashdigits' => '0',
 			'cashrounding' => '0',
 		},
-	} },
+    } },
 );
 
 sub currency_fractions {
-	my ($self, $currency) = @_;
-	
-	my $currency_data = $self->_currency_fractions()->{$currency};
-	
-	$currency_data = {
-		digits 			=> 2,
-		cashdigits 		=> 2,
-		rounding 		=> 0,
-		cashrounding	=> 0,
-	} unless $currency_data;
-	
-	return $currency_data;
+    my ($self, $currency) = @_;
+
+    my $currency_data = $self->_currency_fractions()->{$currency};
+
+    $currency_data = {
+        digits          => 2,
+        cashdigits      => 2,
+        rounding        => 0,
+        cashrounding    => 0,
+    } unless $currency_data;
+
+    return $currency_data;
 }
 
 has '_default_currency' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
+    is          => 'ro',
+    isa         => HashRef,
+    init_arg    => undef,
+    default     => sub { {
 
 				'AC' => 'SHP',
 				'AD' => 'EUR',

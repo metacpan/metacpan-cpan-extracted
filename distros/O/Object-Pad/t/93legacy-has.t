@@ -5,7 +5,7 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 my @warnings;
 BEGIN { $SIG{__WARN__} = sub { push @warnings, $_[0] }; }

@@ -31,6 +31,16 @@ my $make_accessor = sub {
    };
 };
 
+my $make_field_accessor = sub {
+   my ( $name ) = @_;
+
+   return sub {
+      my $self = shift;
+      state $idx = $self->$field_index_for( $name );
+      return $self->field( $idx );
+   };
+};
+
 my $make_sv_accessor = sub {
    my ( $name ) = @_;
 
@@ -61,9 +71,40 @@ my $make_sv_elems_accessor = sub {
    };
 };
 
+sub around
+{
+   my ( $fqname, $code ) = @_;
+
+   my ( $package, $basename ) = $fqname =~ m/^(.*)::(.*?)$/;
+   my $orig = $package->can( $basename ) or
+      die "$package cannot ->$basename";
+
+   no strict 'refs';
+   no warnings 'redefine';
+   *{"${package}::${basename}"} = sub {
+      my $self = shift;
+      $self->$code( $orig, @_ );
+   };
+}
+
+around "Devel::MAT::SV::_outrefs_matching" => sub {
+   my $self = shift; my $orig = shift;
+   my ( $match, $no_desc ) = @_;
+
+   my @outrefs = $self->$orig( @_ );
+
+   my $fields_at = $self->{objectpad_fields_at};
+   if( $fields_at and $fields_at != $self->addr ) {
+      my $fieldsav = $self->df->sv_at( $fields_at );
+      push @outrefs, $no_desc ? ( inferred => $fieldsav ) :
+         Devel::MAT::SV::Reference( "the Object::Pad fields AV", inferred => $fieldsav );
+   }
+
+   return @outrefs;
+};
+
 package # hide
-   Devel::MAT::Tool::Object::Pad::_ClassSV;
-use base qw( Devel::MAT::SV::C_STRUCT );
+   Devel::MAT::Tool::Object::Pad::_RoleOrClassSV;
 
 *objectpad_name = $make_sv_pv_accessor->( "the name SV" );
 
@@ -71,9 +112,30 @@ use base qw( Devel::MAT::SV::C_STRUCT );
 
 *objectpad_repr = $make_accessor->( "repr" );
 
-*objectpad_superclass = $make_sv_accessor->( "the supermeta" );
+*_objectpad_direct_fields = $make_sv_elems_accessor->( "the direct fields AV" );
+*_objectpad_fields = $make_sv_elems_accessor->( "the fields AV" );
 
-*objectpad_direct_fields = $make_sv_elems_accessor->( "the direct fields AV" );
+sub objectpad_direct_fields
+{
+   my $self = shift;
+
+   if( defined $self->$field_index_for( "the fields AV" ) ) {
+      # Object::Pad version 0.807 or later
+      my @fields = $self->_objectpad_fields;
+      return grep { $_->objectpad_is_direct } @fields;
+      die "TODO: Filter for just direct fields";
+   }
+   else {
+      # Object::Pad version before 0.807
+      return $self->_objectpad_direct_fields;
+   }
+}
+
+package # hide
+   Devel::MAT::Tool::Object::Pad::_ClassSV;
+use base qw( Devel::MAT::SV::C_STRUCT Devel::MAT::Tool::Object::Pad::_RoleOrClassSV );
+
+*objectpad_superclass = $make_sv_accessor->( "the supermeta" );
 
 *objectpad_direct_roles = $make_sv_elems_accessor->( "the direct roles AV" );
 
@@ -121,21 +183,15 @@ sub _objectpad_fieldnames_for_class
 
 package # hide
    Devel::MAT::Tool::Object::Pad::_RoleSV;
-use base qw( Devel::MAT::SV::C_STRUCT );
-
-*objectpad_name = $make_sv_pv_accessor->( "the name SV" );
-
-*objectpad_type = $make_accessor->( "type" );
-
-*objectpad_repr = $make_accessor->( "repr" );
-
-*objectpad_direct_fields = $make_sv_elems_accessor->( "the direct fields AV" );
+use base qw( Devel::MAT::SV::C_STRUCT Devel::MAT::Tool::Object::Pad::_RoleOrClassSV );
 
 package # hide
    Devel::MAT::Tool::Object::Pad::_FieldSV;
 use base qw( Devel::MAT::SV::C_STRUCT );
 
 *objectpad_name = $make_sv_pv_accessor->( "the name SV" );
+
+*objectpad_is_direct = $make_field_accessor->( "is direct" );
 
 *objectpad_class = $make_sv_accessor->( "the class" );
 

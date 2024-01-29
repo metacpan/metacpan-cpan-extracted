@@ -1,4 +1,4 @@
-use Test::More tests => 12;
+use Test::More tests => 13;
 
 BEGIN { use_ok("DBIx::SearchBuilder"); }
 BEGIN { use_ok("DBIx::SearchBuilder::Handle"); }
@@ -19,4 +19,4 @@ BEGIN { use_ok("DBIx::SearchBuilder::Handle::Sybase"); }
 BEGIN { use_ok("DBIx::SearchBuilder::Handle::SQLite"); }
 BEGIN { use_ok("DBIx::SearchBuilder::Record"); }
 BEGIN { use_ok("DBIx::SearchBuilder::Record::Cachable"); }
-
+BEGIN { use_ok("DBIx::SearchBuilder::Handle::MariaDB"); }

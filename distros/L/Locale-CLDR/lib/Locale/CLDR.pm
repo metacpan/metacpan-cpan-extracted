@@ -8,7 +8,7 @@ Locale::CLDR - A Module to create locale objects with localisation data from the
 
 =head1 VERSION
 
-Version 0.34.4
+Version 0.40.1
 
 =head1 SYNOPSIS
 
@@ -39,7 +39,7 @@ or
 
 use v5.10.1;
 use version;
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use open ':encoding(utf8)';
 use utf8;
@@ -50,14 +50,15 @@ use Moo;
 use MooX::ClassAttribute;
 use Types::Standard qw( Str Int Maybe ArrayRef HashRef Object Bool InstanceOf );
 
-with 'Locale::CLDR::ValidCodes', 'Locale::CLDR::EraBoundries', 'Locale::CLDR::WeekData', 
-	'Locale::CLDR::MeasurementSystem', 'Locale::CLDR::LikelySubtags', 'Locale::CLDR::NumberingSystems',
-	'Locale::CLDR::NumberFormatter', 'Locale::CLDR::RegionContainment', 'Locale::CLDR::CalendarPreferences',
-	'Locale::CLDR::Currencies', 'Locale::CLDR::Plurals';
-	
+with 'Locale::CLDR::CalendarPreferences',   'Locale::CLDR::Currencies',         'Locale::CLDR::EraBoundries',
+#     'Locale::CLDR::LanguageMatching',
+                                            'Locale::CLDR::LikelySubtags',      'Locale::CLDR::MeasurementSystem',
+     'Locale::CLDR::NumberFormatter',       'Locale::CLDR::NumberingSystems',   'Locale::CLDR::Plurals',
+     'Locale::CLDR::RegionContainment',     'Locale::CLDR::ValidCodes',         'Locale::CLDR::WeekData';
+
 use Class::Load;
 use namespace::autoclean;
-use List::Util qw(first);
+use List::Util qw(first uniq);
 use DateTime::Locale;
 use Unicode::Normalize();
 use Locale::CLDR::Collator();
@@ -244,6 +245,174 @@ Persian Calendar
 =item roc
 
 Minguo Calendar
+
+=back
+
+=item cf
+
+This overrides the default currency format. It can be set to one of
+C<standard> or C<account>
+
+=item co
+
+=item collation
+
+The default collation order. Two collation orders are universal
+
+=over 12
+
+=item standard
+
+The standard collation order for the local
+
+=item search
+
+A collation type just used for comparing two strings to see if they match 
+
+=back
+
+There are other collation keywords but they are dependant on the local being used
+see L<Unicode Collation Identifier|https://www.unicode.org/reports/tr35/tr35-66/tr35.html#UnicodeCollationIdentifier>
+
+=item cu
+
+=item currency
+
+This extention overrides the default currency symbol for the locale.
+It's value is any valid currency identifyer.
+
+=item dx
+
+Dictionary break script exclusions: specifies scripts to be excluded from dictionary-based text break (for words and lines).
+
+=item em
+
+Emoji presentation style, can be one of
+
+=over 12
+
+=item emoji
+
+Use an emoji presentation for emoji characters if possible.
+
+=item text
+
+Use a text presentation for emoji characters if possible.
+
+=item default
+
+Use the default presentation for emoji characters as specified in UTR #51 Section 4, Presentation Style.
+
+=back
+
+=item fw
+
+This extention overrides the first day of the week. It can be set to 
+one of
+
+=over 12
+
+=item mon
+
+=item tue
+
+=item wed
+
+=item thu
+
+=item fri
+
+=item sat
+
+=item sun
+
+=back
+
+=item hc
+
+A Unicode Hour Cycle Identifier defines the preferred time cycle. Can be one of
+
+=over 12
+
+=item h12
+
+Hour system using 1–12; corresponds to 'h' in patterns
+
+=item h23
+
+Hour system using 0–23; corresponds to 'H' in patterns
+
+=item h11
+
+Hour system using 0–11; corresponds to 'K' in patterns
+
+=item h24
+
+Hour system using 1–24; corresponds to 'k' in patterns
+
+=back
+
+=item lb
+
+A Unicode Line Break Style Identifier defines a preferred line break style corresponding to the CSS level 3 line-break option. Can be one of
+
+=over 12
+
+=item strict
+
+CSS level 3 line-break=strict, e.g. treat CJ as NS
+
+=item normal
+
+CSS level 3 line-break=normal, e.g. treat CJ as ID, break before hyphens for ja,zh
+
+=item loose
+
+CSS level 3 line-break=loose
+
+=back
+
+=item lw
+
+A Unicode Line Break Word Identifier defines preferred line break word handling behavior corresponding to the CSS level 3 word-break option. Can be one of
+
+=over 12
+
+=item normal
+
+CSS level 3 word-break=normal, normal script/language behavior for midword breaks
+
+=item breakall
+
+CSS level 3 word-break=break-all, allow midword breaks unless forbidden by lb setting
+
+=item keepall
+
+CSS level 3 word-break=keep-all, prohibit midword breaks except for dictionary breaks
+
+=item phrase
+
+Prioritize keeping natural phrases (of multiple words) together when breaking, used in short text like title and headline
+
+=back
+
+=item ms
+
+Measurement system. Can be one of
+
+=over 12
+
+=item metric
+
+Metric System
+
+=item ussystem
+
+US System of measurement: feet, pints, etc.; pints are 16oz
+
+=item uksystem
+
+UK System of measurement: feet, pints, etc.; pints are 20oz
 
 =back
 
@@ -505,40 +674,37 @@ Vai Digits
 
 =back
 
-=item cu
+=item rg
 
-=item currency
+Region Override
 
-This extention overrides the default currency symbol for the locale.
-It's value is any valid currency identifyer.
+=item sd
 
-=item cf
+Regional Subdivision
 
-This overrides the default currency format. It can be set to one of
-C<standard> or C<account>
+=item ss
 
-=item fw
-
-This extention overrides the first day of the week. It can be set to 
-one of
+Sentence break suppressions. Can be one of
 
 =over 12
 
-=item mon
+=item none
 
-=item tue
+Don’t use sentence break suppressions data (the default).
 
-=item wed
+=item standard
 
-=item thu
-
-=item fri
-
-=item sat
-
-=item sun
+Use sentence break suppressions data of type "standard"
 
 =back
+
+=item tz
+
+Time zone
+
+=item va
+
+Common variant type
 
 =back
 
@@ -558,6 +724,93 @@ has 'extensions' => (
 The following methods can be called on the locale object
 
 =over 4
+
+=item installed_locales()
+
+Returns an array ref containing the sorted list of installed locale identfiers
+
+=cut
+
+# Method to return all installed locales
+sub installed_locales {
+	my $self = shift;
+	use feature qw(state);
+	state $locales //= [];
+	
+	return $locales if @$locales;
+	
+	my $path = $INC{'Locale/CLDR.pm'};
+    # Check if we are running a test script because the base distribution is in a different directory
+    # hirarichy than the language distributions
+    my $t_path = '';
+    if ($INC{'Test/More.pm'}) {
+        my $key = quotemeta('Locale/CLDR/Locales/'
+            . join('/', 
+                map { ucfirst lc } 
+                ( 
+                    $self->language_id, 
+                    $self->region_id 
+                        ? $self->script_id || 'Any'
+                        : $self->script_id || (),
+                    $self->region_id || ()
+                )
+            )
+            . '.pm'
+        );
+        ($key) = grep /${key}\z/, keys %INC;
+        $t_path = $INC{$key} if $key;
+    }
+	my (undef,$directories) = File::Spec->splitpath($path);
+    my (undef,$t_directories) = File::Spec->splitpath($t_path) if $t_path;
+	$path = File::Spec->catdir($directories, 'CLDR', 'Locales');
+    $t_path = File::Spec->catdir($t_directories);
+    $locales = _get_installed_locals($path);
+    push @$locales, @{_get_installed_locals($t_path)} if $t_path;
+	
+	$locales = [ 
+        map {$_->[0]} 
+        sort { $a->[1][0] cmp $b->[1][0] || ($a->[1][1] // '') cmp ($b->[1][1] // '') || ($a->[1][2] // '') cmp ($b->[1][2] // '') }
+        map { [$_, [ split (/_/, $_) ]] }
+        @$locales ];
+        
+    return [ uniq @$locales ];
+}
+
+sub _get_installed_locals {
+    my $path = shift;
+    my $locales = [];
+    
+    # Windows does some wierd stuff with the recycle bin
+    # make sure we don't enter that directory.
+    my @path = File::Spec->splitdir($path);
+    return $locales if join ('/', @path) !~ m#/lib/Locale/CLDR/Locales#;
+
+    opendir(my $dir, $path);
+	foreach my $file (readdir $dir) {
+        next if $file =~ /^\./;
+        next if $file eq 'Root.pm';
+        if (-d File::Spec->catdir($path, $file)) {
+            push @$locales, @{_get_installed_locals(File::Spec->catdir($path, $file))};
+        }
+        else {
+            open( my $package, '<', File::Spec->catfile($path, $file));
+            foreach my $line (<$package>) {
+                next unless $line =~ /^package/;
+                ($line) = $line =~ /^package Locale::CLDR::Locales::(.*);/;
+                my ($language, $script, $region, $variant) = map { defined && $_ eq 'Any' ? 'und' : $_ } split( /::/, $line);
+                if ( $script && $script eq 'und' && ! $region) {
+                    $script = undef;
+                }
+                push @$locales, join '_', grep {defined()} ($language, $script, $region, $variant);
+                last;
+            }
+            close $package;
+        }
+    }
+	closedir $dir;
+	
+    return [ uniq @$locales ];
+}
 
 =item id()
 
@@ -1199,6 +1452,7 @@ my $has_Line_Break_E_Base_GAZ = eval '1 !~ /\p{Line_Break=E_Base_GAZ}/';
 my $has_Line_Break_E_Modifier = eval '1 !~ /\p{Line_Break=E_Modifier}/';
 my $has_Extended_Pictographic = eval '1 !~ /\p{Extended_Pictographic}/';
 my $has_Word_Break_WSegSpace = eval '1 !~ /\p{Word_Break=WSegSpace}/';
+my $has_Indic_Syllabic_Category_Consonant = eval '1 !~ /\p{Indic_Syllabic_Category=Consonant}/';
 
 sub _fix_missing_unicode_properties {
 	my $regex = shift;
@@ -1255,6 +1509,9 @@ sub _fix_missing_unicode_properties {
 	
 	$regex =~ s/\\(p)\{Word_Break=WSegSpace\}/\\${1}{IsCLDREmpty}/ig
 		unless $has_Word_Break_WSegSpace;
+
+    $regex =~ s/\\(p)\{Indic_Syllabic_Category=Consonant\}/\\${1}{IsCLDREmpty}/ig
+		unless $has_Indic_Syllabic_Category_Consonant;
 	
 	return $regex;
 }
@@ -1313,10 +1570,10 @@ sub BUILDARGS {
 				(?:[-_]([a-zA-Z]{4}))?
 				(?:[-_]([a-zA-Z]{2,3}))?
 				(?:[-_]([a-zA-Z0-9]+))?
-				(?:[-_]u[_-](.+))?
+				(?:[-_][uU][_-](.+))?
 			$/x;
 
-		if (! defined $script && length $language == 4) {
+		if (! defined $script && length $language == 4 && lc $language ne 'root') { # root is a special case and is the only 4 letter language ID
 			$script = $language;
 			$language = undef;
 		}
@@ -1418,8 +1675,8 @@ sub BUILD {
 }
 
 after 'BUILD' => sub {
-	my $self = shift;
-	
+    my $self = shift;
+    
 	# Fix up likely sub tags
 	
 	my $likely_subtags = $self->likely_subtags;
@@ -1449,8 +1706,8 @@ after 'BUILD' => sub {
 	my ($likely_language_id, $likely_script_id, $likely_region_id);
 	if ($likely_subtag) {
 		($likely_language_id, $likely_script_id, $likely_region_id) = split /_/, $likely_subtag;
-		$likely_language_id		= $language_id 	unless $language_id eq 'und';
-		$likely_script_id		= $script_id	if length $script_id;
+		$likely_language_id	= $language_id 	unless $language_id eq 'und';
+		$likely_script_id	= $script_id	if length $script_id;
 		$likely_region_id	= $region_id	if length $region_id;
 		$self->_set_likely_subtag(__PACKAGE__->new(join '_',$likely_language_id, $likely_script_id, $likely_region_id));
 	}
@@ -1458,7 +1715,7 @@ after 'BUILD' => sub {
 	# Fix up extension overrides
 	my $extensions = $self->extensions;
 	
-	foreach my $extention ( qw( ca cf co cu em fw hc lb lw ms nu rg sd ss tz va ) ) {
+	foreach my $extention ( qw( ca cf co cu dx em fw hc lb lw ms nu rg sd ss tz va ) ) {
 		if (exists $extensions->{$extention}) {
 			my $default = "_set_default_$extention";
 			$self->$default($extensions->{$extention});
@@ -1469,7 +1726,7 @@ after 'BUILD' => sub {
 # Defaults get set by the -u- extension
 # Calendar, currency format, collation order, etc.
 # but not nu as that is done in the Numbering systems role
-foreach my $default (qw( ca cf co cu em fw hc lb lw ms rg sd ss tz va)) {
+foreach my $default (qw( ca cf co cu dx em fw hc lb lw ms rg sd ss tz va)) {
 	has "_default_$default" => (
 		is			=> 'ro',
 		isa			=> Str,
@@ -1560,14 +1817,11 @@ sub _build_id {
 
 sub _get_english {
 	my $self = shift;
-	my $english;
-	if ($self->language_id eq 'en') {
-		$english = $self;
-	}
-	else {
-		$english = Locale::CLDR->new('en_Latn_US');
-	}
+	use feature 'state';
+	state $english;
 
+	$english //= Locale::CLDR->new('en_Latn_US');
+	
 	return $english;
 }
 
@@ -1924,7 +2178,7 @@ sub variant_name {
 	$name //= $self;
 
 	if (! ref $name ) {
-		$name = __PACKAGE__->new(language_id=> 'und', variant_id => $name);
+		$name = __PACKAGE__->new(language_id=> $self->language_id, script_id => $self->script_id, variant_id => $name);
 	}
 
 	return '' unless $name->variant_id;
@@ -2282,10 +2536,10 @@ sub _split {
 =item is_exemplar_character($character)
 
 Tests if the given character is used in the locale. There are 
-three possible types; C<main>, C<auxiliary> and C<punctuation>.
-If no type is given C<main> is assumed. Unless the C<index> type
-is given you will have to have a Perl version of 5.18 or above
-to use this method
+four possible types; C<main>, C<auxiliary>, C<punctuation> and
+C<index>. If no type is given C<main> is assumed. Unless the
+C<index> type is given you will have to have a Perl version of
+5.18 or above to use this method
 
 =cut
 
@@ -2589,6 +2843,16 @@ sub all_units {
 	return keys %units;
 }
 
+# maps the unit name after `per` to the full unit name
+sub _per_unit_map {
+	my $self = shift;
+	my @units = $self->all_units;
+	
+	my %map = map { my $res = $_; $res =~ s/^.*?-(.*)$/$1/; ($res, $_) } @units;
+	
+	return %map;
+}
+
 =item unit($number, $unit, $width)
 
 Returns the localised string for the given number and unit formatted for the 
@@ -2640,7 +2904,7 @@ sub unit {
 	}
 	
 	# Check for a compound unit that we don't specifically have
-	if (! $format && (my ($dividend, $divisor) = $what =~ /^(.+)-per-(.+)$/)) {
+	if (! $format && (my ($dividend, $divisor) = $what =~ /^(?:[^\-]+-)?(.+)-per-(.+)$/)) {
 		return $self->_unit_compound($number, $dividend, $divisor, $type);
 	}
 	
@@ -3107,6 +3371,7 @@ sub _build_any_month {
 	my ($self, $type, $width) = @_;
 	my $default_calendar = $self->default_calendar();
 	my @bundles = $self->_find_bundle('calendar_months');
+	my $result = [];
 	BUNDLES: {
 		foreach my $bundle (@bundles) {
 			my $months = $bundle->calendar_months;
@@ -3120,9 +3385,16 @@ sub _build_any_month {
 				redo BUNDLES;
 			}
 			
-			my $result = $months->{$default_calendar}{$type}{$width}{nonleap};
-			return $result if defined $result;
+			my $results = $months->{$default_calendar}{$type}{$width}{nonleap};
+			if ($results) {
+				for(my $count = 0; $count < @$results; $count++) {
+					$result->[$count] //= $results->[$count];
+				}
+			}
 		}
+		
+		return $result if @$result;
+		
 		if ($default_calendar ne 'gregorian') {
 			$default_calendar = 'gregorian';
 			redo BUNDLES;
@@ -3908,7 +4180,11 @@ sub {
 	if ($normal) {
 		return "$set";
 	}
-	
+
+	# Unicode::Regex::Set needs spacs around opperaters
+	$set=~s/&/ & /g;
+	$set=~s/([\}\]])-(\[|\\[pP])/$1 - $2/g;
+
 	return Unicode::Regex::Set::parse($set);
 }
 
@@ -4646,6 +4922,7 @@ sub _parse_localetext_text {
 	# loop over text to find the first bracket group
 	while (length $text) {
 		my ($raw) = $text =~ /^ ( (?: (?: ~~ )*+ ~ \[ | [^\[] )++ ) /x;
+        $raw //= '';
 		if (length $raw) {
 			$text =~ s/^ ( (?: (?: ~~ )*+ ~ \[ | [^\[] )++ ) //gx;
 			# Fix up escapes
@@ -4721,15 +4998,14 @@ sub _parse_localetext_text {
 
 sub _make_text_gnum {
 	my ($self, $number, $type, $gender, $declention) = @_;
-	no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 	$type //= 'ordinal';
 	$gender //= 'neuter';
 	
 	die "Invalid number type ($type) in makelocale\n"
-		unless $type ~~ [qw(ordinal cardinal)];
+		unless grep { $type eq $_ } (qw(ordinal cardinal));
 	
 	die "Invalid gender ($gender) in makelocale\n"
-		unless $gender ~~ [qw(masculine feminine nuter)];
+        unless grep { $gender eq $_ } (qw(masculine feminine nuter));
 
 	my @names = (
 		( defined $declention ? "spellout-$type-$gender-$declention" : ()),

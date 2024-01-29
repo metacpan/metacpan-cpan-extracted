@@ -1,6 +1,13 @@
 Revision history for perl module Net::RDAP
 
-0.18 - added extra metadata to Makefile.PL
+0.20 - 2023-12-31
+  - use Storable::dclone instead of Clone::clone
+
+0.19 - 2023-05-23
+  - accept strings as arguments to domain() etc
+
+0.18 - 2023-05-11
+  - added extra metadata to Makefile.PL
 
 0.17 - (skipped)
 

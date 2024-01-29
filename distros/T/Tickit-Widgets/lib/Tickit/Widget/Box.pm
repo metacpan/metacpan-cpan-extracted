@@ -1,15 +1,18 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.70 ':experimental(adjust_params)';
+use warnings;
+use Object::Pad 0.807;
 
-package Tickit::Widget::Box 0.58;
-class Tickit::Widget::Box
-   :strict(params)
-   :isa(Tickit::SingleChildWidget);
+package Tickit::Widget::Box 0.60;
+class Tickit::Widget::Box :strict(params);
+
+inherit Tickit::ContainerWidget;
+
+apply Tickit::WidgetRole::SingleChildContainer;
 
 use Carp;
 
@@ -79,7 +82,7 @@ changed.
 
 =head2 new
 
-   $box = Tickit::Widget::Box->new( %args )
+   $box = Tickit::Widget::Box->new( %args );
 
 In addition to the constructor arguments allowed by C<Tickit::Widget> and
 C<Tickit::SingleChildWidget>, this constructor also recognises the following
@@ -154,13 +157,13 @@ available to the Box.
 
 =head2 set_child_cols_min
 
-   $min = $box->child_lines_min
+   $min = $box->child_lines_min;
 
-   $box->set_child_lines_min( $min )
+   $box->set_child_lines_min( $min );
 
-   $min = $box->child_cols_min
+   $min = $box->child_cols_min;
 
-   $box->set_child_cols_min( $min )
+   $box->set_child_cols_min( $min );
 
 Accessors for the child size minimum limits. If the child widget requests a
 size smaller than these limits, the allocated Window will be resized up to at
@@ -174,13 +177,13 @@ least these sizes.
 
 =head2 set_child_cols_max
 
-   $max = $box->child_lines_max
+   $max = $box->child_lines_max;
 
-   $box->set_child_lines_max( $max )
+   $box->set_child_lines_max( $max );
 
-   $max = $box->child_cols_max
+   $max = $box->child_cols_max;
 
-   $box->set_child_cols_max( $max )
+   $box->set_child_cols_max( $max );
 
 Accessors for the child size maximum limits. If the child widget requests a
 size larger than these limits, the allocated Window will be resized down to at
@@ -190,9 +193,9 @@ most these sizes.
 
 =head2 set_child_cols
 
-   $box->set_child_lines( $size )
+   $box->set_child_lines( $size );
 
-   $box->set_child_cols( $size )
+   $box->set_child_cols( $size );
 
 Convenient shortcut mutators that set both the minimum and maximum limit to
 the same value. This has the effect of forcing the size of the child widget.
@@ -205,46 +208,45 @@ field $_child_cols_max;  method _child_cols_max  :lvalue { $_child_cols_max  }
 field $_child_cols_min;  method _child_cols_min  :lvalue { $_child_cols_min  }
 
 # Because I hate copying code 4 times
-foreach my $dir (qw( lines cols )) {
-   my %subs;
+BEGIN {
+   use Object::Pad 0.800 ':experimental(mop)';
 
-   foreach my $lim (qw( max min )) {
-      my $fieldmeth = "_child_${dir}_${lim}";
-      my $name = "child_${dir}_${lim}";
+   my $meta = Object::Pad::MOP::Class->for_caller;
 
-      $subs{$name} = sub {
-         my $self = shift;
-         my $value = $self->$fieldmeth;
-         if( !defined $value ) {
-            return undef;
-         }
-         elsif( $value =~ m/^(.+)%$/ ) {
-            my $win = $self->window;
-            return $win ? int( $1 * $win->$dir / 100 ) : undef;
-         }
-         else {
-            return $value;
-         }
-      };
+   foreach my $dir (qw( lines cols )) {
+      foreach my $lim (qw( max min )) {
+         my $fieldmeth = "_child_${dir}_${lim}";
+         my $name = "child_${dir}_${lim}";
 
-      $subs{"set_$name"} = sub {
-         my $self = shift;
-         ( $self->$fieldmeth ) = @_;
-         $self->resized;
-      };
+         $meta->add_method( $name => method {
+            my $value = $self->$fieldmeth;
+            if( !defined $value ) {
+               return undef;
+            }
+            elsif( $value =~ m/^(.+)%$/ ) {
+               my $win = $self->window;
+               return $win ? int( $1 * $win->$dir / 100 ) : undef;
+            }
+            else {
+               return $value;
+            }
+         } );
+
+         $meta->add_method( "set_$name" => method {
+            ( $self->$fieldmeth ) = @_;
+            $self->resized;
+         } );
+      }
+
+      my $set_min = "set_child_${dir}_min";
+      my $set_max = "set_child_${dir}_max";
+
+      $meta->add_method( "set_child_$dir" => method {
+         my ( $value ) = @_;
+         $self->$set_min( $value );
+         $self->$set_max( $value );
+      } );
    }
-
-   my $set_min = "set_child_${dir}_min";
-   my $set_max = "set_child_${dir}_max";
-   $subs{"set_child_$dir"} = sub {
-      my $self = shift;
-      my ( $value ) = @_;
-      $self->$set_min( $value );
-      $self->$set_max( $value );
-   };
-
-   no strict 'refs';
-   *{$_} = $subs{$_} for keys %subs;
 }
 
 use Tickit::WidgetRole::Alignable name =>  "align", dir => "h", reshape => 1;

@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.66;
+use warnings;
+use Object::Pad 0.800;
 
-package Tangence::Property 0.30;
+package Tangence::Property 0.32;
 
 use warnings;
 use base qw( Tangence::Meta::Property );
@@ -19,6 +20,17 @@ require Tangence::Type;
 
 use Struct::Dumb;
 struct Instance => [qw( value callbacks cursors )];
+
+=head1 NAME
+
+C<Tangence::Property> - server implementation of a C<Tangence> property
+
+=head1 DESCRIPTION
+
+This module is a component of L<Tangence::Server>. It is not intended for
+end-user use directly.
+
+=cut
 
 sub build_accessor
 {
@@ -299,5 +311,11 @@ class # hide from CPAN
       );
    }
 }
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
 
 0x55AA;

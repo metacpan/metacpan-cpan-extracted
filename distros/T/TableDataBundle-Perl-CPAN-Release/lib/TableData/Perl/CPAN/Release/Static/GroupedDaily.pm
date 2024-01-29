@@ -9,9 +9,9 @@ use parent 'TableData::Munge::GroupRows';
 use DateTime;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-25'; # DATE
+our $DATE = '2023-11-26'; # DATE
 our $DIST = 'TableDataBundle-Perl-CPAN-Release'; # DIST
-our $VERSION = '20231120.3'; # VERSION
+our $VERSION = '20231126.0'; # VERSION
 
 my $re_date = qr/\A(\d\d\d\d)-(\d\d)-(\d\d)/;
 
@@ -43,7 +43,7 @@ sub new {
     );
 }
 
-# STATS
+our %STATS = ("num_rows",10330,"num_columns",2); # STATS
 
 1;
 # ABSTRACT: CPAN releases (grouped daily)
@@ -60,7 +60,7 @@ TableData::Perl::CPAN::Release::Static::GroupedDaily - CPAN releases (grouped da
 
 =head1 VERSION
 
-This document describes version 20231120.3 of TableData::Perl::CPAN::Release::Static::GroupedDaily (from Perl distribution TableDataBundle-Perl-CPAN-Release), released on 2023-11-25.
+This document describes version 20231126.0 of TableData::Perl::CPAN::Release::Static::GroupedDaily (from Perl distribution TableDataBundle-Perl-CPAN-Release), released on 2023-11-26.
 
 =head1 SYNOPSIS
 
@@ -98,7 +98,7 @@ See the L<tabledata> CLI's documentation for other available actions and options
  | key         | value |
  +-------------+-------+
  | num_columns | 2     |
- | num_rows    | 10324 |
+ | num_rows    | 10330 |
  +-------------+-------+
 
 The statistics is available in the C<%STATS> package variable.

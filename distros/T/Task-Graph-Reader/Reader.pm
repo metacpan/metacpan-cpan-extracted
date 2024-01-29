@@ -1,11 +1,9 @@
 package Task::Graph::Reader;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 1;
 
@@ -71,22 +69,24 @@ class for reading a Graph instance from XML
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Task-Graph-Reader>
+L<https://github.com/michal-josef-spacek/Task-Graph-Reader>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2015 Michal Špaček
- Artistic License
- BSD 2-Clause License
+© 2015-2024 Michal Josef Špaček
+
+Artistic License
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

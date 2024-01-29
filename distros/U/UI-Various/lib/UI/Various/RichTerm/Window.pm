@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 use UI::Various::core;
 use UI::Various::Window;
@@ -94,6 +94,7 @@ sub _show($)
     my $own_active = 0;
     while ($_ = $self->child)
     {   $own_active++ if $_->can('_process');   }
+    my ($col_on, $col_off) = $self->_color_on_off;
 
     # 3. determine space requirements of children:
     my $my_width = $self->{width};		# Don't use inheritance here!
@@ -129,13 +130,20 @@ sub _show($)
 	push @output, split(m/\n/, $_->_show($prefix, $w, $h, $pre_active));
     }
 
-    # 5. print full window (text box plus frame):
+    # 5. fix colour at end of line, if applicable:
+    if (defined $self->{bg})
+    {
+	my ($col_on, $col_off) = $self->_color_on_off;
+	s{( +)$}{$col_on$1$col_off} foreach @output;
+    }
+
+    # 6. print full window (text box plus frame):
     $my_width += $pre_len if $own_active;
     my $title = $self->title ? ' ' . $self->title . ' ' : $D{W8} x 2;
-    print $D{W7}, $D{W8}, $title;
+    print $col_on, $D{W7}, $D{W8}, $title;
     $_ = $my_width - $title_len;
     print $D{W8} x ($_ > 3 ? $_ - 3 : $_), ($_ > 3 ? '<0>' : '');
-    print $D{W9}, "\n";
+    print $D{W9}, $col_off, "\n";
     print($self->_format('', $D{W4}, '', \@output, '', $D{W6}, $my_width, 0),
 	  "\n");
     my $h = $self->height;
@@ -143,7 +151,7 @@ sub _show($)
     $h < $self->max_height  or  $h = $self->max_height;
     while ($h-- > $self->{_total_height})
     {   print $D{W4}, ' ' x $my_width, $D{W6}, "\n";   }
-    print $D{W1}, $D{W2} x $my_width, $D{W3}, "\n";
+    print $col_on, $D{W1}, $D{W2} x $my_width, $D{W3}, $col_off, "\n";
 }
 
 #########################################################################

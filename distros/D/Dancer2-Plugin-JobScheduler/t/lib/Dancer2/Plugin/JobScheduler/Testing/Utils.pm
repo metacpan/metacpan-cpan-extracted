@@ -13,6 +13,7 @@ our @EXPORT_OK = qw(
   build_test_dbs
   build_managed_handle_config
   db_2_managed_handle_config
+  db_2_dancer2_plugin_database_config
 );
 our %EXPORT_TAGS = (
     'all' => [
@@ -21,12 +22,15 @@ our %EXPORT_TAGS = (
           build_test_dbs
           build_managed_handle_config
           db_2_managed_handle_config
+          db_2_dancer2_plugin_database_config
         )
     ],
 );
 
-use Test2::V0;
+use Carp;
 use Module::Load qw( load );
+
+use Test2::V0;
 
 use Test::Database::Temp;
 
@@ -96,6 +100,19 @@ sub db_2_managed_handle_config {
     my @info = $db->connection_info();
     my %c;
     @c{ 'dsn', 'username', 'password', 'attr' } = @info;
+    return %c;
+}
+
+sub db_2_dancer2_plugin_database_config {
+    my ($db) = @_;
+    my %c;
+    if ( $db->driver eq 'SQLite' ) {
+        @c{'driver'}   = 'SQLite';
+        @c{'database'} = $db->info->{'filepath'};
+    }
+    else {
+        croak 'Unknown driver';
+    }
     return %c;
 }
 

@@ -60,7 +60,7 @@ register = ->
 								e = jQuery.Event( "mfaAdded" )
 								$(document).trigger e, [ { "type": "u" } ]
 								if !e.isDefaultPrevented()
-									setMsg 'yourKeyIsRegistered', 'positive'
+									window.location.href = window.portal + "2fregisters?continue=1"
 						error: displayError
 
 # Verification function (launched by "verify" button)

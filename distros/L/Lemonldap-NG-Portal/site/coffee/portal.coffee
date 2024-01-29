@@ -14,18 +14,33 @@ translationFields = {}
 #  - trplaceholder: set result in "placeholder" attribute
 #  - localtime    : transform time (in ms)ing translate()
 
-setDanger = (cond, field) ->
-	result = false
-	if cond
-		$("##{field}").addClass 'fa-check text-success'
-		$("##{field}").removeClass 'fa-times text-danger'
-		$("##{field}").attr 'role', 'status'
-	else
-		$("##{field}").addClass 'fa-times text-danger'
-		$("##{field}").removeClass 'fa-check text-success'
-		$("##{field}").attr 'role', 'alert'
-		result = true
-	result
+ppolicyResults = {}
+setResult = (field, result) ->
+	  ppolicyResults[field] = result
+
+	  # Clear icon
+	  $("#" + field).removeClass('fa-times fa-check fa-spinner fa-pulse fa-info-circle fa-question-circle text-danger text-success text-info text-secondary')
+	  $("#" + field).attr('role', 'status')
+
+	  # Display correct icon
+	  switch result
+		  when "good" then $("#" + field).addClass('fa-check text-success')
+		  when "bad"
+			  $("#" + field).addClass('fa-times text-danger')
+			  $("#" + field).attr('role', 'alert')
+		  when "unknown" then $("#" + field).addClass('fa-question-circle text-secondary')
+		  when "waiting" then $("#" + field).addClass('fa-spinner fa-pulse text-secondary')
+		  when "info" then $("#" + field).addClass('fa-info-circle text-info')
+
+	  # Compute form validity from all previous results
+	  if Object.values(ppolicyResults).every( (value) => ( value == "good" || value == "info" ) )
+
+			  $('.ppolicy').removeClass('border-danger').addClass('border-success')
+			  $('#newpassword').get(0)?.setCustomValidity('')
+	  else
+			  $('.ppolicy').removeClass('border-success').addClass('border-danger');
+			  $('#newpassword').get(0)?.setCustomValidity(translate('PE28'))
+
 
 translatePage = (lang) ->
 	$.getJSON "#{window.staticPrefix}languages/#{lang}.json", (data) ->
@@ -99,15 +114,6 @@ setOrder = ->
 
 # Function used to remove an OIDC consent
 removeOidcConsent = (partner) ->
-	#r = new RegExp "\b#{partner}\b,?", 'g'
-	#datas['oidcConsents'] = datas['oidcConsents'].replace(r,'').replace(/,$/,'')
-	#setKey '_oidcConnectedRP', datas['oidcConsents']
-	#	# Success
-	#	, () ->
-	#		$("[partner='#{partner}']").hide()
-	#	# Error
-	#	, (j,s,e) ->
-	#		alert "#{s} #{e}"
 	e = (j,s,e) ->
 		alert "#{s} #{e}"
 	delKey "_oidcConsents",partner
@@ -397,99 +403,13 @@ $(window).on 'load', () ->
 		setCookie 'llnglanguage', lang, 3650
 		translatePage lang
 
-	isAlphaNumeric = (chr) ->
-		code = chr.charCodeAt(0)
-		if code > 47 and code < 58 or code > 64 and code < 91 or code > 96 and code < 123
-			return true
-		false
-
 	# Password policy
-	checkpassword = (password,e) ->
-		result = true
-		if window.datas.ppolicy.minsize > 0
-			result = false if setDanger( password.length >= window.datas.ppolicy.minsize, 'ppolicy-minsize-feedback' )
-		if window.datas.ppolicy.minupper > 0
-			upper = password.match(/[A-Z]/g)
-			result = false if setDanger( upper and upper.length >= window.datas.ppolicy.minupper, 'ppolicy-minupper-feedback' )
-		if window.datas.ppolicy.minlower > 0
-			lower = password.match(/[a-z]/g)
-			result = false if setDanger( lower and lower.length >= window.datas.ppolicy.minlower, 'ppolicy-minlower-feedback')
-		if window.datas.ppolicy.mindigit > 0
-			digit = password.match(/[0-9]/g)
-			result = false if setDanger( digit and digit.length >= window.datas.ppolicy.mindigit, 'ppolicy-mindigit-feedback')
+	checkpassword = (password,evType) ->
 
-		# if checkHIBP is enabled
-		if $('#ppolicy-checkhibp-feedback').length > 0
-			# don't check HIBP at each keyup, but only when input focuses out
-			if e == "focusout"
-				newpasswordVal = $( "#newpassword" ).val()
-				if( newpasswordVal.length >= 5 )
-					$.ajax
-						dataType: "json"
-						url: "/checkhibp?password=" + btoa(newpasswordVal)
-						context: document.body
-						success: (data) ->
-							code = data.code
-							msg = data.message
-							if code != undefined
-								if parseInt(code) == 0
-									# password ok
-									result = false if setDanger( true, 'ppolicy-checkhibp-feedback' )
-								else if parseInt(code) == 2
-									# password compromised
-									result = false if setDanger( false, 'ppolicy-checkhibp-feedback' )
-								else
-									# unexpected error
-									console.log 'checkhibp: backend error: ', msg
-									result = false if setDanger( false, 'ppolicy-checkhibp-feedback' )
-						error: (j, status, err) ->
-							console.log 'checkhibp: frontend error: ', err  if err
-							res = JSON.parse j.responseText if j
-							if res and res.error
-								console.log 'checkhibp: returned error: ', res
-			# password compromised by default
-			else
-				result = false if setDanger( false, 'ppolicy-checkhibp-feedback' )
+		e = jQuery.Event( "checkpassword" )
+		info = { password: password, evType: evType, setResult: setResult };
 
-		if window.datas.ppolicy.allowedspechar
-			nonwhitespechar = window.datas.ppolicy.allowedspechar.replace(/\s/g, '')
-			nonwhitespechar = nonwhitespechar.replace(/<space>/g, ' ')
-			hasforbidden = false
-			i = 0
-			len = password.length
-			while i < len
-				if !isAlphaNumeric(password.charAt(i))
-					if nonwhitespechar.indexOf(password.charAt(i)) < 0
-						hasforbidden = true
-				i++
-			result = false if setDanger( hasforbidden == false, 'ppolicy-allowedspechar-feedback' )
-
-		if window.datas.ppolicy.minspechar > 0 and window.datas.ppolicy.allowedspechar
-			numspechar = 0
-			nonwhitespechar = window.datas.ppolicy.allowedspechar.replace(/\s/g, '')
-			nonwhitespechar = nonwhitespechar.replace(/<space>/g, ' ')
-			i = 0
-			while i < password.length
-				if nonwhitespechar.indexOf(password.charAt(i)) >= 0
-					numspechar++
-				i++
-			result = false if setDanger( numspechar >= window.datas.ppolicy.minspechar, 'ppolicy-minspechar-feedback')
-
-		if window.datas.ppolicy.minspechar > 0 and !window.datas.ppolicy.allowedspechar
-			numspechar = 0
-			i = 0
-			while i < password.length
-				numspechar++ if !isAlphaNumeric(password.charAt(i))
-				i++
-			result = false if setDanger( numspechar >= window.datas.ppolicy.minspechar, 'ppolicy-minspechar-feedback')
-
-		if result
-			$('.ppolicy').removeClass('border-danger').addClass 'border-success'
-			$('#newpassword').get(0)?.setCustomValidity('')
-		else
-			$('.ppolicy').removeClass('border-success').addClass 'border-danger'
-			$('#newpassword').get(0)?.setCustomValidity(translate('PE28'))
-		return
+		$(document).trigger(e, info)
 
 	if window.datas.ppolicy? and $('#newpassword').length
 		# Initialize display

@@ -3,8 +3,8 @@ package PDF::Builder::Resource::UniFont;
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use Carp;
 use Encode qw(:all);
@@ -15,15 +15,13 @@ PDF::Builder::Resource::UniFont - Unicode Font Support
 
 =head1 METHODS
 
+=head2 new
+
+    $font = PDF::Builder::Resource::UniFont->new($pdf, @fontspecs, %options)
+
 =over
 
-=item $font = PDF::Builder::Resource::UniFont->new($pdf, @fontspecs, %options)
-
 Returns a uni-font object.
-
-=cut
-
-=pod
 
 B<FONTSPECS:> fonts can be registered using the following hash-ref:
 
@@ -54,6 +52,8 @@ Valid %options are:
 
   'encode' ... changes the encoding of the font from its default.
     (see "perldoc Encode" for a list of valid tags)
+
+=back
 
 =cut
 
@@ -134,15 +134,51 @@ sub new {
     return $self;
 }
 
+=head2 isvirtual
+
+    $flag = $font->isvirtual()
+
+=over
+
+(No Information)
+
+=back
+
+=cut
+
 sub isvirtual { 
     return 1; 
 }
+
+=head2 fontlist
+
+    $font->fontlist()
+
+=over
+
+(No Information)
+
+=back
+
+=cut
 
 sub fontlist {
     my $self = shift;
 
     return [@{ $self->{'fonts'} }];
 }
+
+=head2 width
+
+    $w = $font->width($string)
+
+=over
+
+(No Information)
+
+=back
+
+=cut
 
 sub width {
     my ($self, $text) = @_;
@@ -175,6 +211,18 @@ sub width {
 
     return $width;
 }
+
+=head2 text
+
+    $font->text($string, $size, $indent)
+
+=over
+
+(No Information)
+
+=back
+
+=cut
 
 sub text {
     my ($self, $text, $size, $indent) = @_;
@@ -217,9 +265,5 @@ sub text {
 
     return $newtext;
 }
-
-=back
-
-=cut
 
 1;

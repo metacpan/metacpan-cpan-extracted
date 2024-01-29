@@ -68,10 +68,10 @@ sub new {
 # PutWorksheetCustomFilterRequest.isAnd : true/false  ,
 # PutWorksheetCustomFilterRequest.operatorType2 :   ,
 # PutWorksheetCustomFilterRequest.criteria2 : The custom criteria.  ,
-# PutWorksheetCustomFilterRequest.matchBlanks : Match all blank or  not blank cell in the list.(true/false)  ,
-# PutWorksheetCustomFilterRequest.refresh : If true, hide the filtered rows.  ,
-# PutWorksheetCustomFilterRequest.folder : Original workbook folder.  ,
-# PutWorksheetCustomFilterRequest.storageName : Storage name.   
+# PutWorksheetCustomFilterRequest.matchBlanks : Match all blank cell in the list.  ,
+# PutWorksheetCustomFilterRequest.refresh : Refresh auto filters to hide or unhide the rows.  ,
+# PutWorksheetCustomFilterRequest.folder : The folder where the file is situated.  ,
+# PutWorksheetCustomFilterRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -82,7 +82,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_custom_filter' } = { 
-    	summary => 'Filters a list with a custom criteria in worksheet.            ',
+    	summary => 'Filter a list with custom criteria in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -238,28 +238,28 @@ __PACKAGE__->method_documentation({
      'match_blanks' => {
      	datatype => 'string',
      	base_name => 'matchBlanks',
-     	description => 'Match all blank or  not blank cell in the list.(true/false)',
+     	description => 'Match all blank cell in the list.',
      	format => '',
      	read_only => '',
      		},
      'refresh' => {
      	datatype => 'string',
      	base_name => 'refresh',
-     	description => 'If true, hide the filtered rows.',
+     	description => 'Refresh auto filters to hide or unhide the rows.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

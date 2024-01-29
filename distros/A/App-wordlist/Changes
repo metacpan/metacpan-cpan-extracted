@@ -1,3 +1,8 @@
+0.292   2024-01-05  Released-By: PERLANCAR; Urgency: medium
+
+        - [dist] Update dependencies: remove WordListMod::RandomSeekPick.
+
+
 0.291   2022-08-28  Released-By: PERLANCAR; Urgency: medium
 
         - [doc] Reword description for the 'or' argument.

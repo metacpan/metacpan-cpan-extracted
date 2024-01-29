@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::Builder::Tester;
-use Test::More;
+use Test2::V0;
 
 use Test::Future::IO;
 

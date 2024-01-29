@@ -1,3 +1,7 @@
+0.04 2024-01-06T19:41:58+01:00
+ - Rewrite from Data::HTML::A to Data::HTML::Element::A.
+ - Update copyright years.
+
 0.03 2023-07-09T02:08:36+02:00
  - Add example with usage of Data::HTML::A to doc.
  - Add tests.

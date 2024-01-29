@@ -10,7 +10,7 @@ BEGIN {
     eval { use Time::HiRes qw(time) };
     eval { use Scalar::Util };
 }
-our $VERSION = '2.54'; # VERSION
+our $VERSION = '2.55'; # VERSION
 
 sub croak { die sprintf "%s at %3\$s line %4\$s\n", $_[0], caller 1 }
 

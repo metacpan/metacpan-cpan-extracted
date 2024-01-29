@@ -1,0 +1,26 @@
+slug=[% config.suricata_extract.slug %]
+
+env_proxy=[% config.suricata_extract.env_proxy %]
+
+url=[% config.suricata_extract.url %]
+
+[% IF config.suricata_extract.apikey %]
+apikey=[% config.suricata_extract.apikey %]
+[% END %]
+
+[% IF config.suricata_extract.ignore %]
+ignore=[% config.suricata_extract.ignore %]
+[% END %]
+
+[% IF config.suricata_extract.ignoreHosts %]
+ignoreHosts=[% config.suricata_extract.ignoreHosts %]
+[% END %]
+
+[% IF config.suricata_extract.stats_dir %]
+stats_dir=[% config.suricata_extract.stats_dir %]
+[% END %]
+
+[% IF config.suricata_extract.stats_file %]
+stats_file=[% config.suricata_extract.stats_file %]
+[% END %]
+

@@ -1,4 +1,6 @@
 {
     'read' => '0.059',
-    'write' => '0.366'
+    'write' => '0.366',
+    'info' => 'I/O Timings: read=0.059 write=0.366'
+
 }

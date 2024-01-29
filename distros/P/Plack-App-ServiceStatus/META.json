@@ -63,31 +63,31 @@
    "provides" : {
       "Plack::App::ServiceStatus" : {
          "file" : "lib/Plack/App/ServiceStatus.pm",
-         "version" : "0.912"
+         "version" : "0.913"
       },
       "Plack::App::ServiceStatus::DBI" : {
          "file" : "lib/Plack/App/ServiceStatus/DBI.pm",
-         "version" : "0.912"
+         "version" : "0.913"
       },
       "Plack::App::ServiceStatus::DBIC" : {
          "file" : "lib/Plack/App/ServiceStatus/DBIC.pm",
-         "version" : "0.912"
+         "version" : "0.913"
       },
       "Plack::App::ServiceStatus::DBIxConnector" : {
          "file" : "lib/Plack/App/ServiceStatus/DBIxConnector.pm",
-         "version" : "0.912"
+         "version" : "0.913"
       },
       "Plack::App::ServiceStatus::Elasticsearch" : {
          "file" : "lib/Plack/App/ServiceStatus/Elasticsearch.pm",
-         "version" : "0.912"
+         "version" : "0.913"
       },
       "Plack::App::ServiceStatus::NetStomp" : {
          "file" : "lib/Plack/App/ServiceStatus/NetStomp.pm",
-         "version" : "0.912"
+         "version" : "0.913"
       },
       "Plack::App::ServiceStatus::Redis" : {
          "file" : "lib/Plack/App/ServiceStatus/Redis.pm",
-         "version" : "0.912"
+         "version" : "0.913"
       }
    },
    "release_status" : "stable",
@@ -102,7 +102,7 @@
          "web" : "https://github.com/domm/Plack-App-ServiceStatus"
       }
    },
-   "version" : "0.912",
+   "version" : "0.913",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

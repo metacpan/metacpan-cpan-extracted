@@ -1,9 +1,11 @@
+.perlcriticrc
 Build.PL
 Changes
-examples/fatpack.sh
-examples/install.sh
-examples/pp.sh
-examples/pureproxy
+cpanfile
+fatpack/.pertidyrc
+fatpack/fatpack.sh
+fatpack/install.sh
+fatpack/pp.sh
 inc/Module/Build/My.pm
 lib/App/PureProxy.pm
 MANIFEST			This list of files
@@ -15,6 +17,7 @@ t/010_version.t
 xt/check_changes.t
 xt/consistent_version_numbers.t
 xt/copyright.t
+xt/cover.pl
 xt/cpan_changes.t
 xt/cpan_meta.t
 xt/dist_manifest.t
@@ -24,8 +27,6 @@ xt/kwalitee.t
 xt/minimumversion.t
 xt/no_tabs.t
 xt/perlcritic.t
-xt/perlcriticrc
-xt/pod_coverage.t
 xt/pod_spell.t
 xt/pod_spellrc
 xt/pod_syntax.t
@@ -35,4 +36,3 @@ Makefile.PL
 LICENSE
 META.yml
 META.json
-SIGNATURE    Added here by Module::Build

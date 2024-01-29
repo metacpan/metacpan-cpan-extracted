@@ -1,5 +1,12 @@
 #!/usr/bin/env perl
 
+###################################################################
+##### to DEBUG JS, set verbosity to 2
+##### each test's params can contain a 'js-outfile' to save
+##### the js-to-execute to a fail
+##### both find() and zap() understand the above option
+###################################################################
+
 use strict;
 use warnings;
 
@@ -7,7 +14,7 @@ use lib 'blib/lib';
 
 #use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 use Test::More;
 use Test2::Plugin::UTF8; # rids of the Wide Character in TAP message!
@@ -42,8 +49,8 @@ diag "found google-chrome executable, version:\n$cv";
 
 my $curdir = $FindBin::Bin;
 
-# verbosity can be 0, 1, 2, 3
-my $VERBOSITY = 0;
+# verbosity can be 0 (none), 1 (basic), 2 (JS), 3 (stupid)
+my $VERBOSITY = 2;
 
 $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops = $VERBOSITY;
 
@@ -220,6 +227,17 @@ EOJ
 		'must-not-be-returned' => ['header-id-1', 'nav-id-1', 'li-id-1', 'span-id-1', 'li-id-2', 'span-id-2', '_domops_created_id_0'],
 		'must-have-duplicates' => 0,
 	},
+
+	# multiple classes
+	'test12' => {
+		'params' => {
+			'element-class' => ['nav-class-1', 'extra-class1', 'extra-class2'],
+			'insert-id-if-none' => '_domops_created_id',
+		},
+		'must-be-returned' => ['nav-id-1', 'li-id-1', 'span-id-1', 'li-id-2', 'span-id-2', '_domops_created_id_0'],
+		'must-not-be-returned' => ['header-id-1', 'div-id-1', 'div-id-2', 'div-id-2-1'],
+	},
+
 	# execute a callback
 	'test20' => {
 		'params' => {
@@ -281,7 +299,7 @@ EOJ
 );
 
 for my $tk (sort keys %tests){
-	#next unless $tk eq 'test21';
+	#next unless $tk eq 'test12';
 	diag "doing test '${tk}' ...";
 	my $retmech = $mech_obj->get($URL);
 	ok(defined($retmech), "mech_obj->get() : called.") or BAIL_OUT("test '${tk}' : failed to get() url '$URL'");
@@ -327,20 +345,20 @@ for my $tk (sort keys %tests){
 
 	my %returnedids = map { $_ => 1 } grep { not /^\s*$/ } map { $_->{'id'} } @{ $found->{'all-levels'} };
 	# check that those which were supposed to be removed are in the returned results and vice versa
-	my %theids = map { $_ => 1 } @{ $tv->{'must-be-returned'} };
-	for my $anid (sort keys %theids){
-		ok(exists($returnedids{$anid}), "test '${tk}' : element with id '$anid' was found in the returned results.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
+	my %expected_returnedids = map { $_ => 1 } @{ $tv->{'must-be-returned'} };
+	for my $anid (sort keys %expected_returnedids){
+		ok(exists($returnedids{$anid}), "test '${tk}' : element with id '$anid' was found in the returned results as expected.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
 	}
 	for my $anid (sort keys %returnedids){
-		ok(exists($theids{$anid}), "test '${tk}' : element with id '$anid' of the returned results is in the list of expected ids.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
+		ok(exists($expected_returnedids{$anid}), "test '${tk}' : element with id '$anid' of the returned results is in the list of expected ids.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
 	}
 	# now check that those which were supposed not to be removed are not in the returned results and vice versa
-	%theids = map { $_ => 1 } @{ $tv->{'must-not-be-returned'} };
-	for my $anid (sort keys %theids){
-		ok(! exists($returnedids{$anid}), "test '${tk}' : element with id '$anid' was not found in the returned results.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
+	my %expected_not_returnedids = map { $_ => 1 } @{ $tv->{'must-not-be-returned'} };
+	for my $anid (sort keys %expected_not_returnedids){
+		ok(! exists($returnedids{$anid}), "test '${tk}' : element with id '$anid' was not found in the returned results as it shouldn't.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
 	}
 	for my $anid (sort keys %returnedids){
-		ok(! exists($theids{$anid}), "test '${tk}' : element with id '$anid' of the returned results is not in the list of expected ids.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
+		ok(! exists($expected_not_returnedids{$anid}), "test '${tk}' : element with id '$anid' of the returned results is not in the list of expected ids as it shouldn't.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
 	}
 
 	# check if there are duplicates if not supposed to be

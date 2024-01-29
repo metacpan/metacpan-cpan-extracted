@@ -1,5 +1,15 @@
 Revision history for SQL-Abstract-More
 
+
+1.42 22.01.2024
+  - backcompat : accept select(-from => $arrayref) and select(-from => $scalarref)
+
+1.41 21.01.2024
+  - support for subqueries as columns in a select list or as a source in -from clause
+  - new parameter ->select(... -as => $alias)
+  - support table aliases on simple tables
+  - internal refactorings for better clarity of the select() method
+
 1.40 19.11.2023
   - new dialect "Oracle12c" for using query_limiting clauses in Oracle version 12c or greater
   - internals : replaced Module::Install by Module::Build

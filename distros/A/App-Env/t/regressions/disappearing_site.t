@@ -3,7 +3,7 @@
 use Test2::V0;
 use Test::Lib;
 
-is( $ENV{APP_ENV_SITE}, U(), "No APP_ENV_SITE" );
+is( $ENV{APP_ENV_SITE}, U(), 'No APP_ENV_SITE' );
 
 {
     local %ENV = %ENV;
@@ -12,7 +12,7 @@ is( $ENV{APP_ENV_SITE}, U(), "No APP_ENV_SITE" );
     is( $env->{Site1_App1}, 1 );
 }
 
-is( $ENV{APP_ENV_SITE}, U(), "No APP_ENV_SITE" );
+is( $ENV{APP_ENV_SITE}, U(), 'No APP_ENV_SITE' );
 
 {
     local %ENV = %ENV;
@@ -21,6 +21,6 @@ is( $ENV{APP_ENV_SITE}, U(), "No APP_ENV_SITE" );
     is( $env->{Site1_App1}, 1 );
 }
 
-is( $ENV{APP_ENV_SITE}, U(), "No APP_ENV_SITE" );
+is( $ENV{APP_ENV_SITE}, U(), 'No APP_ENV_SITE' );
 
 done_testing;

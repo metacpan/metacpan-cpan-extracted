@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230903131448;
+our $VERSION = 1.20231210185946;
 
 my $formatters = [
                 {
@@ -48,7 +48,7 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[237-9]',
+                  'leading_digits' => '[236-9]',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 }
@@ -77,12 +77,18 @@ my $validators = {
         ',
                 'mobile' => '
           7020\\d{5}|
-          7(?:
-            0[013-9]|
-            1[0-3]|
-            [2-7]\\d|
-            8[03-8]|
-            9[0-29]
+          (?:
+            6(?:
+              2\\d|
+              40
+            )|
+            7(?:
+              0[013-9]|
+              1[0-3]|
+              [2-7]\\d|
+              8[03-8]|
+              9[0-39]
+            )
           )\\d{6}
         ',
                 'pager' => '',
@@ -97,90 +103,90 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{ro} = {"4021", "București\ și\ județul\ Ilfov",
-"4031", "București\ și\ județul\ Ilfov",};
-$areanames{en} = {"40343", "Ialomița",
-"40260", "Sălaj",
-"40356", "Timiș",
-"40269", "Sibiu",
-"40254", "Hunedoara",
-"40351", "Dolj",
-"40348", "Argeș",
-"40247", "Teleorman",
-"40365", "Mureș",
-"40352", "Mehedinți",
-"40239", "Brăila",
-"40357", "Arad",
-"40258", "Alba",
-"40241", "Constanța",
-"40344", "Prahova",
-"40230", "Suceava",
-"40242", "Călărași",
-"40335", "Vaslui",
-"40253", "Gorj",
-"40246", "Giurgiu",
-"4031", "Bucharest\ and\ Ilfov\ County",
-"40340", "Tulcea",
-"40332", "Iași",
-"40263", "Bistrița\-Năsăud",
-"40349", "Olt",
-"40331", "Botoșani",
-"40234", "Bacău",
-"40268", "Brașov",
-"40367", "Covasna",
-"40336", "Galați",
-"40245", "Dâmbovița",
-"40361", "Satu\ Mare",
-"40264", "Cluj",
-"40233", "Neamț",
-"40362", "Maramureș",
-"40355", "Caraș\-Severin",
-"40250", "Vâlcea",
-"40366", "Harghita",
-"40238", "Buzău",
-"40337", "Vrancea",
-"40259", "Bihor",
-"40342", "Călărași",
-"40330", "Suceava",
-"40244", "Prahova",
-"40341", "Constanța",
-"40358", "Alba",
-"40339", "Brăila",
-"40257", "Arad",
-"4021", "Bucharest\ and\ Ilfov\ County",
-"40346", "Giurgiu",
-"40353", "Gorj",
-"40235", "Vaslui",
+$areanames{ro} = {"4031", "București\ și\ județul\ Ilfov",
+"4021", "București\ și\ județul\ Ilfov",};
+$areanames{en} = {"40261", "Satu\ Mare",
 "40369", "Sibiu",
-"40256", "Timiș",
-"40360", "Sălaj",
-"40243", "Ialomița",
-"40252", "Mehedinți",
-"40265", "Mureș",
-"40347", "Teleorman",
-"40248", "Argeș",
-"40251", "Dolj",
-"40354", "Hunedoara",
-"40255", "Caraș\-Severin",
-"40333", "Neamț",
-"40262", "Maramureș",
-"40364", "Cluj",
-"40261", "Satu\ Mare",
-"40237", "Vrancea",
-"40359", "Bihor",
-"40338", "Buzău",
+"40335", "Vaslui",
+"40238", "Buzău",
+"40254", "Hunedoara",
+"40346", "Giurgiu",
+"40356", "Timiș",
+"40244", "Prahova",
+"40330", "Suceava",
 "40266", "Harghita",
-"40350", "Vâlcea",
-"40334", "Bacău",
-"40231", "Botoșani",
-"40249", "Olt",
-"40363", "Bistrița\-Năsăud",
+"40337", "Vrancea",
 "40232", "Iași",
+"40364", "Cluj",
+"40341", "Constanța",
+"40259", "Bihor",
+"40233", "Neamț",
+"40249", "Olt",
+"4021", "Bucharest\ and\ Ilfov\ County",
+"40351", "Dolj",
+"40352", "Mehedinți",
 "40240", "Tulcea",
-"40345", "Dâmbovița",
+"40247", "Teleorman",
+"40257", "Arad",
+"40250", "Vâlcea",
+"40342", "Călărași",
+"40231", "Botoșani",
+"40353", "Gorj",
+"40343", "Ialomița",
+"40339", "Brăila",
+"40268", "Brașov",
+"40365", "Mureș",
+"40255", "Caraș\-Severin",
+"40358", "Alba",
+"40263", "Bistrița\-Năsăud",
+"40348", "Argeș",
+"40245", "Dâmbovița",
 "40236", "Galați",
+"40360", "Sălaj",
+"40367", "Covasna",
+"40334", "Bacău",
+"40262", "Maramureș",
+"40361", "Satu\ Mare",
+"40269", "Sibiu",
+"40338", "Buzău",
+"40235", "Vaslui",
+"40246", "Giurgiu",
+"40354", "Hunedoara",
+"40344", "Prahova",
+"40256", "Timiș",
+"40366", "Harghita",
+"40230", "Suceava",
+"40237", "Vrancea",
+"40264", "Cluj",
+"40332", "Iași",
+"40241", "Constanța",
+"40359", "Bihor",
+"40349", "Olt",
+"4031", "Bucharest\ and\ Ilfov\ County",
+"40333", "Neamț",
+"40251", "Dolj",
+"40340", "Tulcea",
+"40252", "Mehedinți",
+"40347", "Teleorman",
+"40357", "Arad",
+"40242", "Călărași",
+"40350", "Vâlcea",
+"40331", "Botoșani",
+"40253", "Gorj",
+"40243", "Ialomița",
+"40239", "Brăila",
+"40265", "Mureș",
+"40368", "Brașov",
+"40258", "Alba",
+"40355", "Caraș\-Severin",
+"40363", "Bistrița\-Năsăud",
+"40345", "Dâmbovița",
+"40248", "Argeș",
+"40260", "Sălaj",
+"40336", "Galați",
 "40267", "Covasna",
-"40368", "Brașov",};
+"40362", "Maramureș",
+"40234", "Bacău",};
 
     sub new {
       my $class = shift;

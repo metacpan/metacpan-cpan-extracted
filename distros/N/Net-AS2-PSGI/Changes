@@ -1,5 +1,10 @@
 Revision history for perl module Net::AS2::PSGI
 
+1.0001 2024-01-08
+
+ [Create dynamic test certificate]
+ - tests failed due to expired hard-coded certs in t directory
+
 1.0 2019-03-04
 
  - Make Content-Disposition filename available for send and receive

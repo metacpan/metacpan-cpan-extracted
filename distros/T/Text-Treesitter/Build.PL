@@ -4,6 +4,8 @@ use warnings;
 
 use Module::Build::Using::PkgConfig;
 
+my @extra_compiler_flags = qw( -Ihax );
+
 my $build = Module::Build::Using::PkgConfig->new(
    module_name => 'Text::Treesitter',
    requires => {
@@ -26,6 +28,7 @@ my $build = Module::Build::Using::PkgConfig->new(
    license => 'perl',
    create_license => 1,
    create_readme  => 1,
+   extra_compiler_flags => \@extra_compiler_flags,
 );
 
 $build->use_pkgconfig( "tree-sitter",

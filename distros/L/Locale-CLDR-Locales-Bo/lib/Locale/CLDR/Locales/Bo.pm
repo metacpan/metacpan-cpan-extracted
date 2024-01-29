@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Bo - Package for language Tibetan
 
 package Locale::CLDR::Locales::Bo;
 # This file auto generated from Data\common\main\bo.xml
-#	on Tue  5 Dec  1:02:39 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'bn' => 'བྷང་ག་ལའི་སྐད།',
@@ -124,7 +124,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'འཛམ་གླིང་།',
  			'002' => 'ཨཕྲི་ཀ།',
@@ -324,7 +324,7 @@ has 'display_name_variant' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'PINYIN' => 'པིན་ཡིན།',
 
@@ -336,7 +336,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'US' => q{ཨ་མེ་རི་ཀའི།},
 
@@ -355,9 +355,9 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[ༀ]},
 			index => ['ཀ', 'ཁ', 'ག', 'ང', 'ཅ', 'ཆ', 'ཇ', 'ཉ', 'ཏ', 'ཐ', 'ད', 'ན', 'པ', 'ཕ', 'བ', 'མ', 'ཙ', 'ཚ', 'ཛ', 'ཝ', 'ཞ', 'ཟ', 'འ', 'ཡ', 'ར', 'ལ', 'ཤ', 'ས', 'ཧ', 'ཨ'],
-			main => qr{[ཾ ཿ ཀ {ཀྵ} ྐ {ྐྵ} ཁ ྑ ག {གྷ} ྒ {ྒྷ} ང ྔ ཅ ྕ ཆ ྖ ཇ ྗ ཉ ྙ ཊ ྚ ཋ ྛ ཌ {ཌྷ} ྜ {ྜྷ} ཎ ྞ ཏ ྟ ཐ ྠ ད {དྷ} ྡ {ྡྷ} ན ྣ པ ྤ ཕ ྥ བ {བྷ} ྦ {ྦྷ} མ ྨ ཙ ྩ ཚ ྪ ཛ {ཛྷ} ྫ {ྫྷ} ཝ ྭ ྺ ཞ ྮ ཟ ྯ འ ྰ ཡ ྱ ྻ ར ཪ ྲ ྼ ལ ླ ཤ ྴ ཥ ྵ ས ྶ ཧ ྷ ཨ ྸ ི {ཱི} ྀ {ཱྀ} ུ {ཱུ} {ྲྀ} ཷ {ླྀ} ཹ ེ ཻ ོ ཽ ྄]},
-			numbers => qr{[\- , . % ‰ + 0༠ 1༡ 2༢ 3༣ 4༤ 5༥ 6༦ 7༧ 8༨ 9༩]},
-			punctuation => qr{[\: ་ །]},
+			main => qr{[྄ ཿ ཀ {ཀྵ} ཁ ག {གྷ} ང ཅ ཆ ཇ ཉ ཏ ཊ ཐ ཋ ད {དྷ} ཌ {ཌྷ} ན ཎ པ ཕ བ {བྷ} མ ཾ ཙ ཚ ཛ {ཛྷ} ཝ ཞ ཟ འ ཡ ར ཪ ལ ཤ ཥ ས ཧ ཨ ི {ཱི} ྀ {ཱྀ} ུ {ཱུ} ེ ཻ ོ ཽ ྐ {ྐྵ} ྑ ྒ {ྒྷ} ྔ ྕ ྖ ྗ ྙ ྟ ྚ ྠ ྛ ྡ {ྡྷ} ྜ {ྜྷ} ྣ ྞ ྤ ྥ ྦ {ྦྷ} ྨ ྩ ྪ ྫ {ྫྷ} ྭ ྺ ྮ ྯ ྰ ྱ ྻ ྲ ྼ ླ ྴ ྵ ྶ ྷ ྸ {ྲྀ} ཷ {ླྀ} ཹ]},
+			numbers => qr{[\- ‑ , . % ‰ + 0༠ 1༡ 2༢ 3༣ 4༤ 5༥ 6༦ 7༧ 8༨ 9༩]},
+			punctuation => qr{[\: ། ་]},
 		};
 	},
 EOT
@@ -715,10 +715,10 @@ has 'time_formats' => (
 		'generic' => {
 		},
 		'gregorian' => {
-			'full' => q{h:mm:ss a zzzz},
-			'long' => q{h:mm:ss a z},
-			'medium' => q{h:mm:ss a},
-			'short' => q{h:mm a},
+			'full' => q{HH:mm:ss zzzz},
+			'long' => q{HH:mm:ss z},
+			'medium' => q{HH:mm:ss},
+			'short' => q{HH:mm},
 		},
 	} },
 );

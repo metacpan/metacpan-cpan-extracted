@@ -7,8 +7,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use IO::File;
 use PDF::Builder::Util;
@@ -24,9 +24,11 @@ PDF::Builder::Resource::XObject::Image::PNM - support routines for PNM (Portable
 
 =head2 METHODS
 
-=over
+=head2 new
 
-=item $res = PDF::Builder::Resource::XObject::Image::PNM->new($pdf, $file, %opts)
+    $res = PDF::Builder::Resource::XObject::Image::PNM->new($pdf, $file, %opts)
+
+=over
 
 Options:
 
@@ -58,6 +60,9 @@ data per pixel, otherwise two bytes. For RGB, each sample (full-on of that
 color) may be anything from 1 to 65535 (the same maximum for all three colors),
 with 0 being full black. If the maximum sample value is 255 or smaller, three
 bytes of raw binary data per pixel, otherwise six bytes.
+
+Remember that you need to use Builder.pm's image_pnm method to use this
+functionality.
 
 =cut
 

@@ -76,6 +76,15 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                 case 'print':
                     this._print(data.content);
                     break;
+                case 'openLink':
+                    const link = document.createElement('a');
+                    link.href = data.url;
+                    link.target = data.target || '_blank';
+                    link.rel = data.rel || 'noopener noreferrer';
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    break;
                 case 'reloadStatus':
                 case 'reload':
                     break;

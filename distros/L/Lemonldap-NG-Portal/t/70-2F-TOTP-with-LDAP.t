@@ -13,10 +13,6 @@ SKIP: {
     if ($@) {
         skip 'Convert::Base32 is missing', $maintests;
     }
-    eval { require Authen::OATH };
-    if ($@) {
-        skip 'Authen::OATH is missing', $maintests;
-    }
     skip 'LLNGTESTLDAP is not set', $maintests unless ( $ENV{LLNGTESTLDAP} );
     require 't/test-ldap.pm';
 

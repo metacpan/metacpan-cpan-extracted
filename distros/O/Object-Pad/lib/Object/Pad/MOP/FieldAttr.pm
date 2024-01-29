@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::FieldAttr 0.806;
+package Object::Pad::MOP::FieldAttr 0.808;
 
 use v5.14;
 use warnings;
@@ -61,6 +61,19 @@ Takes the following additional named arguments:
 
 Required. A string giving a key that must be found in the hints hash (C<%^H>)
 for this attribute name to be visible.
+
+=item no_value => BOOL
+
+An optional flag; if set to true then no value is permitted on the attribute's
+declaration. A compiletime error will be generated if a value is provided
+
+=item must_value => BOOL
+
+An optional flag; if set to true then a value is required on the attribute's
+declaration. A compiletime error will be generated if a value is not provided.
+
+If neither of these flags are provided, then a value is optional. It is not
+permitted to set both flags at once.
 
 =item apply => CODE
 

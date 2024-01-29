@@ -7,9 +7,9 @@ use warnings;
 use Number::Format::Metric;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-09'; # DATE
+our $DATE = '2023-09-26'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.073'; # VERSION
+our $VERSION = '1.074'; # VERSION
 
 END {
     printf "Total downloaded data: %sb\n",
@@ -31,7 +31,7 @@ End::PrintBytesIn - Show LWP::Protocol::Patch::CountBytesIn::bytes_in
 
 =head1 VERSION
 
-This document describes version 1.073 of End::PrintBytesIn (from Perl distribution App-lcpan), released on 2023-07-09.
+This document describes version 1.074 of End::PrintBytesIn (from Perl distribution App-lcpan), released on 2023-09-26.
 
 =head1 SYNOPSIS
 

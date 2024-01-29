@@ -13,16 +13,10 @@ use XS::Parse::Keyword::FromPerl qw(
    register_xs_parse_keyword
 );
 use Optree::Generate qw(
-   opcode
    newBINOP newSVOP newPADxVOP
-);
 
-use constant {
-   # Pull out some OP_* constants
-   OP_PADSV   => opcode("padsv"),
-   OP_CONST   => opcode("const"),
-   OP_SASSIGN => opcode("sassign"),
-};
+   OP_PADSV OP_CONST OP_SASSIGN
+);
 
 # zero
 BEGIN {

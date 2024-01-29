@@ -1,0 +1,26 @@
+Changes
+lib/Automate/Animate/FFmpeg.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+script/automate-animate-ffmpeg.pl
+t/000-load.t
+t/050-build-ffmpeg-cmdline.t
+t/100-input-patterns.t
+t/400-basic-animation.t
+t/500-animation-from-files.t
+t/900-scripts.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/t-data/images/blue.png
+t/t-data/images/green.jpg
+t/t-data/images/green.png
+t/t-data/images/red.png
+t/t-data/images/Περισσότερα/Κόκκινο.png
+t/t-data/images/Περισσότερα/πράσινο.jpg
+t/t-data/images/Περισσότερα/πράσινο.png
+t/t-data/images/κίτρινο.png
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

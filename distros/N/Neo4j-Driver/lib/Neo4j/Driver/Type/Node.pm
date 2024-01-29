@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Node;
 # ABSTRACT: Describes a node from a Neo4j graph
-$Neo4j::Driver::Type::Node::VERSION = '0.41';
+$Neo4j::Driver::Type::Node::VERSION = '0.42';
 
 use parent 'Neo4j::Types::Node';
 use overload '%{}' => \&_hash, fallback => 1;
@@ -112,7 +112,7 @@ Neo4j::Driver::Type::Node - Describes a node from a Neo4j graph
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 SYNOPSIS
 
@@ -249,10 +249,7 @@ L<Node (Python)|https://neo4j.com/docs/api/python-driver/5.2/api.html#node>
 
 =head1 AUTHOR
 
-Arne Johannessen <ajnn@cpan.org>
-
-If you contact me by email, please make sure you include the word
-"Perl" in your subject header to help beat the spam filters.
+Arne Johannessen (L<AJNN|https://arne.johannessen.de/>)
 
 =head1 COPYRIGHT AND LICENSE
 

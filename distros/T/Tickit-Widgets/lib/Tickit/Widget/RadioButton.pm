@@ -1,17 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.73 ':experimental(init_expr)';
+use warnings;
+use Object::Pad 0.807;
 
-package Tickit::Widget::RadioButton 0.37;
-class Tickit::Widget::RadioButton
-   :strict(params)
-   :isa(Tickit::Widget);
+package Tickit::Widget::RadioButton 0.41;
+class Tickit::Widget::RadioButton :strict(params);
 
-use Object::Pad qw( :experimental(init_expr) );
+inherit Tickit::Widget;
 
 use Tickit::Style;
 
@@ -127,7 +126,7 @@ use constant KEYPRESSES_FROM_STYLE => 1;
 
 =head2 new
 
-   $radiobutton = Tickit::Widget::RadioButton->new( %args )
+   $radiobutton = Tickit::Widget::RadioButton->new( %args );
 
 Constructs a new C<Tickit::Widget::RadioButton> object.
 
@@ -177,7 +176,7 @@ method cols
 
 =head2 group
 
-   $group = $radiobutton->group
+   $group = $radiobutton->group;
 
 Returns the C<Tickit::Widget::RadioButton::Group> this button belongs to.
 
@@ -189,9 +188,9 @@ Returns the C<Tickit::Widget::RadioButton::Group> this button belongs to.
 
 =head2 set_label
 
-   $label = $radiobutton->label
+   $label = $radiobutton->label;
 
-   $radiobutton->set_label( $label )
+   $radiobutton->set_label( $label );
 
 Returns or sets the label text of the button.
 
@@ -208,7 +207,7 @@ method set_label
 
 =head2 on_toggle
 
-   $on_toggle = $radiobutton->on_toggle
+   $on_toggle = $radiobutton->on_toggle;
 
 =cut
 
@@ -216,12 +215,12 @@ method set_label
 
 =head2 set_on_toggle
 
-   $radiobutton->set_on_toggle( $on_toggle )
+   $radiobutton->set_on_toggle( $on_toggle );
 
 Return or set the CODE reference to be called when the button state is
 changed.
 
- $on_toggle->( $radiobutton, $active )
+   $on_toggle->( $radiobutton, $active );
 
 When the radio tick mark moves from one button to another, the old button is
 marked unactive before the new one is marked active.
@@ -232,7 +231,7 @@ marked unactive before the new one is marked active.
 
 =head2 value
 
-   $value = $radiobutton->value
+   $value = $radiobutton->value;
 
 =cut
 
@@ -240,7 +239,7 @@ marked unactive before the new one is marked active.
 
 =head2 set_value
 
-   $radiobutton->set_value( $value )
+   $radiobutton->set_value( $value );
 
 Return or set the scalar value used to identify the radio button to the
 group's C<on_changed> callback. This can be any scalar value; it is simply
@@ -256,7 +255,7 @@ stored by the button and not otherwise used.
 
 =head2 activate
 
-   $radiobutton->activate
+   $radiobutton->activate;
 
 Sets this button as the active member of the group, deactivating the previous
 one.
@@ -281,7 +280,7 @@ method activate
 
 =head2 is_active
 
-   $active = $radiobutton->is_active
+   $active = $radiobutton->is_active;
 
 Returns true if this button is the active button of the group.
 
@@ -343,7 +342,7 @@ will be implicitly created for a button if none is passed.
 
 =head2 new
 
-   $group = Tickit::Widget::RadioButton::Group->new
+   $group = Tickit::Widget::RadioButton::Group->new;
 
 Returns a new group.
 
@@ -354,7 +353,7 @@ Returns a new group.
 
 =head2 active
 
-   $radiobutton = $group->active
+   $radiobutton = $group->active;
 
 Returns the button which is currently active in the group
 
@@ -368,13 +367,13 @@ Returns the button which is currently active in the group
 
 =head2 on_changed
 
-   $on_changed = $group->on_changed
+   $on_changed = $group->on_changed;
 
 =cut
 
 =head2 set_on_changed
 
-   $group->set_on_changed( $on_changed )
+   $group->set_on_changed( $on_changed );
 
 Return or set the CODE reference to be called when the active member of the
 group changes. This may be more convenient than setting the C<on_toggle>
@@ -382,7 +381,7 @@ callback of each button in the group.
 
 The callback is passed the currently-active button, and its C<value>.
 
-   $on_changed->( $active, $value )
+   $on_changed->( $active, $value );
 
 =cut
 

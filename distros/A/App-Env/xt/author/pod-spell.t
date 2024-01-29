@@ -24,6 +24,8 @@ Null
 Observatory
 Smithsonian
 SysFatal
+_Util
+_app
 appexec
 cacheid
 djerius

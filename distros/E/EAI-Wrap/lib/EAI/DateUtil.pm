@@ -1,4 +1,4 @@
-package EAI::DateUtil 1.904;
+package EAI::DateUtil 1.908;
 
 use strict; use warnings; use feature 'unicode_strings'; use utf8;
 use Exporter qw(import); use Time::Local qw( timelocal_modern timegm_modern ); use Time::localtime; use POSIX qw(mktime);
@@ -954,7 +954,7 @@ returns datestring (yyyymmdd) from epoch/Time::piece
 
 =head1 COPYRIGHT
 
-Copyright (c) 2023 Roland Kapl
+Copyright (c) 2024 Roland Kapl
 
 All rights reserved.  This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.

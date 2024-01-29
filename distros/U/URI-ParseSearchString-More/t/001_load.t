@@ -5,9 +5,10 @@ use warnings;
 
 # t/001_load.t - check module loading and create testing directory
 
-use Test::Most;
+use Test::Most import =>
+    [qw( can_ok cmp_ok diag done_testing isa_ok ok skip )];
 use Test::RequiresInternet ( 'search.aol.com' => 443 );
-use Test::WWW::Mechanize ();
+use Test::WWW::Mechanize         ();
 use URI::ParseSearchString::More ();
 
 my $more = URI::ParseSearchString::More->new();

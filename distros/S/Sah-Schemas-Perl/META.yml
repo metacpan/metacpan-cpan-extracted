@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.028, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,268 +22,268 @@ name: Sah-Schemas-Perl
 provides:
   Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modname_wildcard:
     file: lib/Data/Sah/Coerce/perl/To_array/From_str_or_array/expand_perl_modname_wildcard.pm
-    version: '0.048'
+    version: '0.049'
   Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modprefix_wildcard:
     file: lib/Data/Sah/Coerce/perl/To_array/From_str_or_array/expand_perl_modprefix_wildcard.pm
-    version: '0.048'
+    version: '0.049'
   Data::Sah::Coerce::perl::To_obj::From_str::perl_version:
     file: lib/Data/Sah/Coerce/perl/To_obj/From_str/perl_version.pm
-    version: '0.048'
+    version: '0.049'
   Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pm_or_pod_to_path:
     file: lib/Data/Sah/Coerce/perl/To_str/From_str/convert_perl_pm_or_pod_to_path.pm
-    version: '0.048'
+    version: '0.049'
   Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pm_to_path:
     file: lib/Data/Sah/Coerce/perl/To_str/From_str/convert_perl_pm_to_path.pm
-    version: '0.048'
+    version: '0.049'
   Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pod_or_pm_to_path:
     file: lib/Data/Sah/Coerce/perl/To_str/From_str/convert_perl_pod_or_pm_to_path.pm
-    version: '0.048'
+    version: '0.049'
   Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pod_to_path:
     file: lib/Data/Sah/Coerce/perl/To_str/From_str/convert_perl_pod_to_path.pm
-    version: '0.048'
+    version: '0.049'
   Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_distname:
     file: lib/Data/Sah/Coerce/perl/To_str/From_str/normalize_perl_distname.pm
-    version: '0.048'
+    version: '0.049'
   Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname:
     file: lib/Data/Sah/Coerce/perl/To_str/From_str/normalize_perl_modname.pm
-    version: '0.048'
+    version: '0.049'
   Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname_or_prefix:
     file: lib/Data/Sah/Coerce/perl/To_str/From_str/normalize_perl_modname_or_prefix.pm
-    version: '0.048'
+    version: '0.049'
   Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modprefix:
     file: lib/Data/Sah/Coerce/perl/To_str/From_str/normalize_perl_modprefix.pm
-    version: '0.048'
+    version: '0.049'
   Data::Sah::Filter::perl::Perl::check_module_installed:
     file: lib/Data/Sah/Filter/perl/Perl/check_module_installed.pm
-    version: '0.048'
+    version: '0.049'
   Data::Sah::Filter::perl::Perl::check_module_not_installed:
     file: lib/Data/Sah/Filter/perl/Perl/check_module_not_installed.pm
-    version: '0.048'
+    version: '0.049'
   Data::Sah::Filter::perl::Perl::check_module_release_expr:
     file: lib/Data/Sah/Filter/perl/Perl/check_module_release_expr.pm
-    version: '0.048'
+    version: '0.049'
   Data::Sah::Filter::perl::Perl::normalize_perl_modname:
     file: lib/Data/Sah/Filter/perl/Perl/normalize_perl_modname.pm
-    version: '0.048'
+    version: '0.049'
   Data::Sah::Filter::perl::Perl::normalize_perl_modname_pm:
     file: lib/Data/Sah/Filter/perl/Perl/normalize_perl_modname_pm.pm
-    version: '0.048'
+    version: '0.049'
   Data::Sah::Value::perl::Perl::these_dists:
     file: lib/Data/Sah/Value/perl/Perl/these_dists.pm
-    version: '0.048'
+    version: '0.049'
   Data::Sah::Value::perl::Perl::these_mods:
     file: lib/Data/Sah/Value/perl/Perl/these_mods.pm
-    version: '0.048'
+    version: '0.049'
   Data::Sah::Value::perl::Perl::this_dist:
     file: lib/Data/Sah/Value/perl/Perl/this_dist.pm
-    version: '0.048'
+    version: '0.049'
   Data::Sah::Value::perl::Perl::this_mod:
     file: lib/Data/Sah/Value/perl/Perl/this_mod.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::distname:
     file: lib/Sah/Schema/perl/distname.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::distname::default_this_dist:
     file: lib/Sah/Schema/perl/distname/default_this_dist.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::distname_with_optional_ver:
     file: lib/Sah/Schema/perl/distname_with_optional_ver.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::distname_with_ver:
     file: lib/Sah/Schema/perl/distname_with_ver.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::filename:
     file: lib/Sah/Schema/perl/filename.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::funcname:
     file: lib/Sah/Schema/perl/funcname.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::identifier::qualified_ascii:
     file: lib/Sah/Schema/perl/identifier/qualified_ascii.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::identifier::qualified_unicode:
     file: lib/Sah/Schema/perl/identifier/qualified_unicode.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::identifier::unqualified_ascii:
     file: lib/Sah/Schema/perl/identifier/unqualified_ascii.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::identifier::unqualified_unicode:
     file: lib/Sah/Schema/perl/identifier/unqualified_unicode.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::modargs:
     file: lib/Sah/Schema/perl/modargs.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::modname:
     file: lib/Sah/Schema/perl/modname.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::modname::default_this_mod:
     file: lib/Sah/Schema/perl/modname/default_this_mod.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::modname::installed:
     file: lib/Sah/Schema/perl/modname/installed.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::modname::not_installed:
     file: lib/Sah/Schema/perl/modname/not_installed.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::modname_or_prefix:
     file: lib/Sah/Schema/perl/modname_or_prefix.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::modname_pm:
     file: lib/Sah/Schema/perl/modname_pm.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::modname_with_optional_args:
     file: lib/Sah/Schema/perl/modname_with_optional_args.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::modname_with_optional_ver:
     file: lib/Sah/Schema/perl/modname_with_optional_ver.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::modname_with_ver:
     file: lib/Sah/Schema/perl/modname_with_ver.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::modnames:
     file: lib/Sah/Schema/perl/modnames.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::modprefix:
     file: lib/Sah/Schema/perl/modprefix.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::modprefixes:
     file: lib/Sah/Schema/perl/modprefixes.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::module::release::version:
     file: lib/Sah/Schema/perl/module/release/version.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::module::release::versions:
     file: lib/Sah/Schema/perl/module/release/versions.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::pm_filename:
     file: lib/Sah/Schema/perl/pm_filename.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::pod_filename:
     file: lib/Sah/Schema/perl/pod_filename.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::pod_or_pm_filename:
     file: lib/Sah/Schema/perl/pod_or_pm_filename.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::podname:
     file: lib/Sah/Schema/perl/podname.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::qualified_funcname:
     file: lib/Sah/Schema/perl/qualified_funcname.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::release::version:
     file: lib/Sah/Schema/perl/release/version.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::unqualified_funcname:
     file: lib/Sah/Schema/perl/unqualified_funcname.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schema::perl::version:
     file: lib/Sah/Schema/perl/version.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::distname:
     file: lib/Sah/SchemaR/perl/distname.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::distname::default_this_dist:
     file: lib/Sah/SchemaR/perl/distname/default_this_dist.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::distname_with_optional_ver:
     file: lib/Sah/SchemaR/perl/distname_with_optional_ver.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::distname_with_ver:
     file: lib/Sah/SchemaR/perl/distname_with_ver.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::filename:
     file: lib/Sah/SchemaR/perl/filename.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::funcname:
     file: lib/Sah/SchemaR/perl/funcname.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::identifier::qualified_ascii:
     file: lib/Sah/SchemaR/perl/identifier/qualified_ascii.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::identifier::qualified_unicode:
     file: lib/Sah/SchemaR/perl/identifier/qualified_unicode.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::identifier::unqualified_ascii:
     file: lib/Sah/SchemaR/perl/identifier/unqualified_ascii.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::identifier::unqualified_unicode:
     file: lib/Sah/SchemaR/perl/identifier/unqualified_unicode.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::modargs:
     file: lib/Sah/SchemaR/perl/modargs.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::modname:
     file: lib/Sah/SchemaR/perl/modname.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::modname::default_this_mod:
     file: lib/Sah/SchemaR/perl/modname/default_this_mod.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::modname::installed:
     file: lib/Sah/SchemaR/perl/modname/installed.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::modname::not_installed:
     file: lib/Sah/SchemaR/perl/modname/not_installed.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::modname_or_prefix:
     file: lib/Sah/SchemaR/perl/modname_or_prefix.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::modname_pm:
     file: lib/Sah/SchemaR/perl/modname_pm.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::modname_with_optional_args:
     file: lib/Sah/SchemaR/perl/modname_with_optional_args.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::modname_with_optional_ver:
     file: lib/Sah/SchemaR/perl/modname_with_optional_ver.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::modname_with_ver:
     file: lib/Sah/SchemaR/perl/modname_with_ver.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::modnames:
     file: lib/Sah/SchemaR/perl/modnames.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::modprefix:
     file: lib/Sah/SchemaR/perl/modprefix.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::modprefixes:
     file: lib/Sah/SchemaR/perl/modprefixes.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::module::release::version:
     file: lib/Sah/SchemaR/perl/module/release/version.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::module::release::versions:
     file: lib/Sah/SchemaR/perl/module/release/versions.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::pm_filename:
     file: lib/Sah/SchemaR/perl/pm_filename.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::pod_filename:
     file: lib/Sah/SchemaR/perl/pod_filename.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::pod_or_pm_filename:
     file: lib/Sah/SchemaR/perl/pod_or_pm_filename.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::podname:
     file: lib/Sah/SchemaR/perl/podname.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::qualified_funcname:
     file: lib/Sah/SchemaR/perl/qualified_funcname.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::release::version:
     file: lib/Sah/SchemaR/perl/release/version.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::unqualified_funcname:
     file: lib/Sah/SchemaR/perl/unqualified_funcname.pm
-    version: '0.048'
+    version: '0.049'
   Sah::SchemaR::perl::version:
     file: lib/Sah/SchemaR/perl/version.pm
-    version: '0.048'
+    version: '0.049'
   Sah::Schemas::Perl:
     file: lib/Sah/Schemas/Perl.pm
-    version: '0.048'
+    version: '0.049'
 requires:
   Complete::File: '0.440'
-  Complete::Module: '0.262'
+  Complete::Module: '0.263'
   Complete::Util: '0.616'
   Data::Dmp: '0.242'
   Module::CoreList: '0'
@@ -300,10 +300,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Perl
   homepage: https://metacpan.org/release/Sah-Schemas-Perl
   repository: git://github.com/perlancar/perl-Sah-Schemas-Perl.git
-version: '0.048'
+version: '0.049'
 x_Dist_Zilla:
   perl:
-    version: '5.034000'
+    version: '5.038000'
   plugins:
     -
       class: Dist::Zilla::Plugin::InsertCodeResult
@@ -316,7 +316,7 @@ x_Dist_Zilla:
           Module::Metadata: '1.000037'
           version: '0.006'
       name: Sah::Schemas
-      version: '0.030'
+      version: '0.031'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
@@ -333,66 +333,66 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Author::PERLANCAR/@Filter/GatherDir'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::PERLANCAR/@Filter/PruneCruft'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::PERLANCAR/@Filter/ManifestSkip'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::PERLANCAR/@Filter/MetaYAML'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::PERLANCAR/@Filter/License'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::PERLANCAR/@Filter/PodCoverageTests'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::PERLANCAR/@Filter/PodSyntaxTests'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::PERLANCAR/@Filter/ExtraTests'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/@Filter/ExecDir'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::PERLANCAR/@Filter/ShareDir'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::PERLANCAR/@Filter/MakeMaker'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::PERLANCAR/@Filter/Manifest'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/ExecDir script'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.606'
+      version: '0.608'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -450,15 +450,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::PERLANCAR/MetaConfig'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -467,13 +467,13 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.028'
+              version: '6.030'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
-          inherit_missing: '1'
-          inherit_version: '1'
-          meta_noindex: '1'
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000037'
           version: '0.006'
@@ -486,7 +486,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::OurDist
       name: '@Author::PERLANCAR/OurDist'
@@ -501,60 +501,60 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::PodWeaver:
           finder:
             - ':InstallModules'
-            - ':ExecFiles'
+            - ':PerlExecFiles'
           plugins:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Name
               name: '@Author::PERLANCAR/Name'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Version
               name: '@Author::PERLANCAR/Version'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::PERLANCAR/prelude'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Author::PERLANCAR/Leftovers'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::PERLANCAR/postlude'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Completion::GetoptLongComplete
               name: '@Author::PERLANCAR/Completion::GetoptLongComplete'
@@ -582,7 +582,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Authors
               name: '@Author::PERLANCAR/Authors'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Contributors
               name: '@Author::PERLANCAR/Contributors'
@@ -594,11 +594,11 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.784'
+              version: '0.786'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
@@ -610,7 +610,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Author::PERLANCAR/SingleEncoding'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
@@ -618,13 +618,13 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Sah::Schemas
               name: -Sah::Schemas
-              version: '0.072'
+              version: '0.074'
       name: '@Author::PERLANCAR/PodWeaver'
-      version: '4.008'
+      version: '4.010'
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: '@Author::PERLANCAR/PruneFiles'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Pod2Readme
       name: '@Author::PERLANCAR/Pod2Readme'
@@ -649,7 +649,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
-          bail_out_on_fail: '0'
+          bail_out_on_fail: 0
           fail_on_warning: author
           fake_home: 0
           filename: t/00-compile.t
@@ -692,7 +692,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Acme::CPANModules::Blacklist
       name: '@Author::PERLANCAR/Acme::CPANModules::Blacklist'
-      version: '0.001'
+      version: '0.002'
     -
       class: Dist::Zilla::Plugin::Prereqs::EnsureVersion
       name: '@Author::PERLANCAR/Prereqs::EnsureVersion'
@@ -700,7 +700,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'
@@ -712,7 +712,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -720,7 +720,7 @@ x_Dist_Zilla:
           phase: develop
           type: x_spec
       name: DevelopX_spec
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -728,58 +728,58 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.028'
+      version: '6.030'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: '0'
-    version: '6.028'
+      is_trial: 0
+    version: '6.030'
 x_authority: cpan:PERLANCAR
-x_generated_by_perl: v5.34.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

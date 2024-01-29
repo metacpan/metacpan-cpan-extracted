@@ -1,14 +1,14 @@
 package Spreadsheet::HTML;
 use strict;
 use warnings FATAL => 'all';
-our $VERSION = '1.20';
+our $VERSION = '1.22';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
     generate portrait landscape
     north east south west handson
     layout checkerboard scroll
-    chess checkers conway sudoku
+    chess checkers draughts conway sudoku
     calculator calendar banner maze
     beadwork list
 );
@@ -32,8 +32,9 @@ sub select          { Spreadsheet::HTML::Presets::List::select(     @_ ) }
 sub handson         { Spreadsheet::HTML::Presets::Handson::handson( @_ ) }
 sub conway          { Spreadsheet::HTML::Presets::Conway::conway(   @_ ) }
 sub calculator      { Spreadsheet::HTML::Presets::Calculator::calculator( @_ ) }
-sub chess           { Spreadsheet::HTML::Presets::Chess::chess(     @_ ) }
-sub checkers        { Spreadsheet::HTML::Presets::checkers(         @_ ) }
+sub chess           { Spreadsheet::HTML::Presets::Chess::chess(         @_ ) }
+sub checkers        { Spreadsheet::HTML::Presets::Draughts::draughts(   @_ ) }
+sub draughts        { Spreadsheet::HTML::Presets::Draughts::draughts(   @_ ) }
 sub tictactoe       { Spreadsheet::HTML::Presets::TicTacToe::tictactoe( @_ ) }
 sub sudoku          { Spreadsheet::HTML::Presets::Sudoku::sudoku(   @_ ) }
 sub checkerboard    { Spreadsheet::HTML::Presets::checkerboard(     @_ ) }
@@ -952,9 +953,10 @@ Generate <select> form elements.
 
 Generate Handsontable tables. (Excel like interface for browsers.)
 
-=item * C<checkerboard( colors, %params )>
+=item * C<checkerboard( colors || class, %params )>
 
-Generate checkerboard patterns in cell backgrounds.
+Generate checkerboard patterns in cell backgrounds. Specify an array of colors to be
+arranged in checkerboard pattern or array of class names (for external CSS).
 
 =item * C<banner( on, off, text, font, dir, emboss, %params )>
 
@@ -992,9 +994,11 @@ Generates a static maze.
 
 Creates a playable Tic-Tac-Toe game board.
 
+=item * C<draughts( on, off, jquery, %params )>
+
 =item * C<checkers( on, off, jquery, %params )>
 
-Creates a NON playable Checkers game board.
+Creates a NON playable Draughts/Checkers game board.
 
 =item * C<chess( on, off, jquery, jqueryui, %params )>
 
@@ -1140,7 +1144,7 @@ Jeff Anderson, C<< <jeffa at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Jeff Anderson.
+Copyright 2024 Jeff Anderson.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

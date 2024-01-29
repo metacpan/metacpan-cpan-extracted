@@ -8,9 +8,9 @@ require App::lcpan;
 require App::lcpan::Cmd::contents;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-09'; # DATE
+our $DATE = '2023-09-26'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.073'; # VERSION
+our $VERSION = '1.074'; # VERSION
 
 our %SPEC;
 
@@ -70,7 +70,7 @@ App::lcpan::Cmd::mod_contents - List contents inside a module's distribution
 
 =head1 VERSION
 
-This document describes version 1.073 of App::lcpan::Cmd::mod_contents (from Perl distribution App-lcpan), released on 2023-07-09.
+This document describes version 1.074 of App::lcpan::Cmd::mod_contents (from Perl distribution App-lcpan), released on 2023-09-26.
 
 =head1 FUNCTIONS
 

@@ -1,3 +1,34 @@
+0.013   2024-01-16  Released-By: PERLANCAR; Urgency: medium
+
+        [Enhancements]
+
+        - Allow filters after argument in conversion.
+
+
+0.012   2024-01-16  Released-By: PERLANCAR; Urgency: medium
+
+        [Enhancements]
+
+        - Allow argument in conversion using %(...)x syntax, e.g.
+          %(wordlist:Foo)w.
+
+        - Introduce argument 'u' in %h conversion to return uppercase hexdigits.
+          (Uppercasing is already possible using the -U command-line option).
+
+        - Introduce argument 'wordlist:' in %w conversion to allow selecting
+          word from a WordList module.
+
+        - Introduce argument 'arraydata:' in %w conversion to allow selecting
+          word from an ArrayData module.
+
+        - Introduce argument 'stdin:' in %w conversion to explicitly select word
+          from stdin.
+
+        [Documentation]
+
+        - Update link to related program: genpw-id -> genpw-ind.
+
+
 0.011   2020-05-22  Released-By: PERLANCAR; Urgency: medium
 
 	- Accept WordList::* object in _wl as an alternative to accepting words

@@ -324,7 +324,7 @@ perl_to_libyaml_event(yaml_emitter_t *emitter, HV *perl_event)
         }
 
         if (strEQ(type, "stream_start_event")) {
-            ok = yaml_stream_start_event_initialize(&event, 0);
+            ok = yaml_stream_start_event_initialize(&event, YAML_UTF8_ENCODING);
         }
         else if (strEQ(type, "stream_end_event")) {
             ok = yaml_stream_end_event_initialize(&event);

@@ -197,7 +197,7 @@ my @exp_file_events = (
         start => { line => 1, column => 0 },
         end   => { line => 1, column => 0 },
     },
-    { name => 'scalar_event', value => 'a', style => YAML_PLAIN_SCALAR_STYLE,
+    { name => 'scalar_event', value => decode_utf8('ä'), style => YAML_PLAIN_SCALAR_STYLE,
         start => { line => 1, column => 0 },
         end   => { line => 1, column => 1 },
     },
@@ -256,7 +256,7 @@ subtest emit_file_events => sub {
 
 
     open $fh, ">", "$Bin/data/simple.yaml.out" or die $!;
-    YAML::LibYAML::API::emit_filehandle_events($fh, $ev);
+    YAML::LibYAML::API::emit_filehandle_events($fh, $ev, { unicode => 0 });
     close $fh;
 
     open $fh, "<", "$Bin/data/simple.yaml.out" or die $!;
@@ -267,18 +267,17 @@ subtest emit_file_events => sub {
 
 subtest unicode => sub {
     my $ev = [];
-    $yaml = "- ö";
+    $yaml = "- ä";
+    my $dec = decode_utf8 "ä";
     YAML::LibYAML::API::parse_string_events($yaml, $ev);
     my $value = encode_utf8 $ev->[3]->{value};
-    cmp_ok($value, 'eq', "ö", "utf8 parse");
+    cmp_ok($value, 'eq', "ä", "utf8 parse");
 
-    $ev->[3]->{value} = decode_utf8 "ä";
-    my $dump = YAML::LibYAML::API::emit_string_events($ev);
-    cmp_ok($dump, '=~', qr{- "\\xE4"}i, "utf8 emit");
+    my $dump = YAML::LibYAML::API::emit_string_events($ev, { unicode => 0 });
+    cmp_ok($dump, '=~', qr{- $dec}i, "utf8 decoded emit");
 
-    $ev->[3]->{value} = "\303\274 \303\300";
-    $dump = YAML::LibYAML::API::emit_string_events($ev);
-    cmp_ok($dump, '=~', qr{- "\\xC3\\xBC \\xC3\\xC0"}i, "binary emit");
+    $dump = YAML::LibYAML::API::emit_string_events($ev, { unicode => 1 });
+    cmp_ok($dump, '=~', qr{- ä}i, "utf8 emit");
 };
 
 subtest indent => sub {

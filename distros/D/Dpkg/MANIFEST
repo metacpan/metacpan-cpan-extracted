@@ -17,6 +17,7 @@ lib/Dpkg/BuildFlags.pm
 lib/Dpkg/BuildInfo.pm
 lib/Dpkg/BuildOptions.pm
 lib/Dpkg/BuildProfiles.pm
+lib/Dpkg/BuildTree.pm
 lib/Dpkg/BuildTypes.pm
 lib/Dpkg/Changelog.pm
 lib/Dpkg/Changelog/Debian.pm
@@ -117,6 +118,7 @@ t/Dpkg_BuildFlags_Ubuntu.t
 t/Dpkg_BuildInfo.t
 t/Dpkg_BuildOptions.t
 t/Dpkg_BuildProfiles.t
+t/Dpkg_BuildTree.t
 t/Dpkg_BuildTypes.t
 t/Dpkg_Changelog.t
 t/Dpkg_Changelog/countme

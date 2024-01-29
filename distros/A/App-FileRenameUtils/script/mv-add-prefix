@@ -30,7 +30,7 @@ mv-add-prefix - Add prefix to filenames
 
 =head1 VERSION
 
-This document describes version 0.012 of mv-add-prefix (from Perl distribution App-FileRenameUtils), released on 2023-11-15.
+This document describes version 0.014 of mv-add-prefix (from Perl distribution App-FileRenameUtils), released on 2023-11-20.
 
 =head1 SYNOPSIS
 

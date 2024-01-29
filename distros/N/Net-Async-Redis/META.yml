@@ -18,7 +18,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,40 +34,43 @@ no_index:
 provides:
   Net::Async::Redis:
     file: lib/Net/Async/Redis.pm
-    version: '5.001'
+    version: '6.000'
   Net::Async::Redis::Cluster:
     file: lib/Net/Async/Redis/Cluster.pm
-    version: '5.001'
+    version: '6.000'
   Net::Async::Redis::Cluster::Multi:
     file: lib/Net/Async/Redis/Cluster/Multi.pm
-    version: '5.001'
+    version: '6.000'
   Net::Async::Redis::Cluster::Node:
     file: lib/Net/Async/Redis/Cluster/Node.pm
-    version: '5.001'
+    version: '6.000'
   Net::Async::Redis::Commands:
     file: lib/Net/Async/Redis/Commands.pm
-    version: '5.001'
+    version: '6.000'
   Net::Async::Redis::Multi:
     file: lib/Net/Async/Redis/Multi.pm
-    version: '5.001'
+    version: '6.000'
   Net::Async::Redis::Protocol:
     file: lib/Net/Async/Redis/Protocol.pm
-    version: '5.001'
+    version: '6.000'
   Net::Async::Redis::Server:
     file: lib/Net/Async/Redis/Server.pm
-    version: '5.001'
+    version: '6.000'
   Net::Async::Redis::Server::Connection:
     file: lib/Net/Async/Redis/Server/Connection.pm
-    version: '5.001'
+    version: '6.000'
   Net::Async::Redis::Server::Database:
     file: lib/Net/Async/Redis/Server/Database.pm
-    version: '5.001'
+    version: '6.000'
   Net::Async::Redis::Subscription:
     file: lib/Net/Async/Redis/Subscription.pm
-    version: '5.001'
+    version: '6.000'
   Net::Async::Redis::Subscription::Message:
     file: lib/Net/Async/Redis/Subscription/Message.pm
-    version: '5.001'
+    version: '6.000'
+recommends:
+  OpenTelemetry: '0.018'
+  OpenTelemetry::SDK: '0.020'
 requires:
   Cache::LRU: '0.04'
   Class::Method::Modifiers: '0'
@@ -85,7 +88,6 @@ requires:
   Math::Random::Secure: '0'
   Metrics::Any: '0'
   Object::Pad: '0.800'
-  OpenTracing::Any: '1.003'
   Path::Tiny: '0'
   Ryu: '2.009'
   Ryu::Async: '0.019'
@@ -101,7 +103,7 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Redis/issues
   homepage: https://github.com/team-at-cpan/Net-Async-Redis
   repository: https://github.com/team-at-cpan/Net-Async-Redis.git
-version: '5.001'
+version: '6.000'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Eyad Arnabeh <eyadof@gmail.com>'

@@ -6,7 +6,7 @@ CGI::Ex::Die - A CGI::Carp::FatalsToBrowser type utility.
 
 =head1 VERSION
 
-version 2.54
+version 2.55
 
 =cut
 
@@ -20,7 +20,7 @@ use vars qw($EXTENDED_ERRORS $SHOW_TRACE $IGNORE_EVAL);
 use CGI::Ex;
 use CGI::Ex::Dump qw(debug ctrace dex_html);
 
-our $VERSION = '2.54'; # VERSION
+our $VERSION = '2.55'; # VERSION
 our $no_recurse;
 our $ERROR_TEMPLATE;
 our $LOG_HANDLER;

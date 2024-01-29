@@ -1,5 +1,24 @@
 Revision history for App-Env
 
+1.04      2024-01-19 12:56:35-05:00 America/New_York
+
+  [BUG FIX]
+
+    * correct handling of case where environment module was not
+      found. a return of undef was expected, but instead a boolean was
+      returned.
+
+1.03      2024-01-18 12:22:09-05:00 America/New_York
+
+  [BUG FIX]
+
+    * By default the str() method and string overloading no longer
+      include environment variables with illegal names.  Use the new
+      AllowIllegalVariableNames option to true.
+
+
+  [ENHANCEMNT]
+
 1.02      2022-10-15 12:44:10-04:00 America/New_York
 
   [BUGFIX]
@@ -140,7 +159,7 @@ Revision history for App-Env
     * appexec
 
         * new --clear option to clear the current environment prior to
-	  loading a new environment
+          loading a new environment
 
         * multiple environments may be loaded
 
@@ -324,5 +343,4 @@ Revision history for App-Env
 0.01  2007-07-26T17:39:40-0400
 
     * original version; created by h2xs 1.23 2015-05-20T16:52:10-0400
-	    -A -X -n App::Env
-
+            -A -X -n App::Env

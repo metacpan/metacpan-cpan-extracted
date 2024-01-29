@@ -28,7 +28,6 @@ ok(
     'Auth query'
 );
 count(1);
-my $id = expectCookie($res);
 my ( $host, $url, $query ) =
   expectForm( $res, undef, '/registerbrowser', 'fg', 'token' );
 
@@ -43,7 +42,6 @@ ok(
     'Auth query'
 );
 count(1);
-$id = expectCookie($res);
 ( $host, $url, $query ) =
   expectForm( $res, undef, '/registerbrowser', 'fg', 'token' );
 
@@ -54,12 +52,12 @@ ok(
         '/registerbrowser',
         IO::String->new($query),
         length => length($query),
-        cookie => "lemonldap=$id",
         accept => 'text/html',
     ),
     'Post fingerprint'
 );
 expectRedirection( $res, 'http://auth.example.com/' );
+my $id  = expectCookie($res);
 my $cid = expectCookie( $res, 'llngconnection' );
 ok( $res->[1]->[5] =~ /\bHttpOnly=1\b/, ' HTTP cookie found' )
   or explain( $res->[1]->[5], 'HTTP cookie found' );

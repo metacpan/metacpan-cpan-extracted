@@ -1,2 +1,19 @@
+0.02 2023-12-12T14:03:43+01:00
+ - Add constructor test.
+ - Add support for testing from saved file.
+ - Fix doc METHODS.
+ - Fix use lib '.' in Makefile.PL.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Move bugtracker to github.
+ - Remove diacritics from author name in Makefile.PL.
+ - Rename example file to better name.
+ - Rename to new version of WWW::Search internal methods.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.01 2014-09-02T23:38:42+02:00
  - First version.

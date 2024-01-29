@@ -14,13 +14,14 @@ minil.toml
 script/gimei
 t/00_compile.t
 t/CLI.pm
+t/Util.pm
 t/generator.t
-t/help.t
+t/option_h.t
 t/option_n.t
 t/option_sep.t
+t/option_v.t
 t/render.t
 t/subtype.t
-t/version.t
 t/word_type.t
 META.yml
 MANIFEST

@@ -2,6 +2,230 @@ See also INFO/Changes-ver_2 for changes released for PDF::API2, and
 incorporated into PDF::Builder.
 See also INFO/Changes_2021 for earlier version 3 release logs.
 
+3.026     2023-12-07
+
+    lib/PDF/Builder/Content/Text.pm, examples/Column.pl
+     Add HTML "reversed" (boolean) to <ol> tag to count down instead of up 
+      (needs "start" value to make any sense). 
+
+      I wanted to fix a few more minor problems with column(), including the
+      color of the first text in a <li> overriding the marker color, a bunch
+      of redundant font and color change commands and some other 
+      inefficiencies, and some other stuff. Unfortunately, that looks like a 
+      considerable rewrite of column(), and I ran out of runway, so I'll have 
+      to put it off to the next release.
+
+    lib/PDF/Builder/Content.pm
+     Add some POD notes about the use of charspace for tracking adjustments,
+      and the interaction with wordspace adjustments for a more balanced
+      appearance of justified text.
+
+    devtools/
+     A collection of various utilities I use to build PDF::Builder (the CPAN
+      package), as well as do the PHP conversion of HTML code for the web page
+      display of documentation (see catskilltech.com). Note that buildDoc.pl
+      (to build all the HTML files from POD) is already shipped with the
+      package. Further note that tools/1_pc.pl (Perl Critic) will complain
+      a LOT about the code in devtools/ ... maybe some day I'll get around to
+      cleaning it up.
+
+    (many .pm files), META.yml, Makefile.PL, README.md, docs/buildDoc.pl,
+      t/00-all-usable.t, tools/optional_update.pl, version
+     Cleanup of POD so that unordered/bulleted lists, ordered/numbered lists,
+      definition/description lists, and indented paragraphs are properly
+      handled upon conversion to HTML. Change optional POD-to-HTML generation 
+      from the old pod2html to Pod::Simple::XHTML.
+
+    lib/PDF/Builder/Content.pm
+     The linedash() method was not properly handling a restore of a saved
+      dash pattern, resulting in PDF "dash pattern" values that could be
+      unusable by a Reader.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/FontManager.pm, 
+      lib/PDF/Builder/Content/Text.pm, t/03-xrefstm-index.t
+     Continuing Issue #197, clean up handling of newly-created PDF object
+      in from_string() method (used by open() method). Also knock-on effects
+      on some t-tests.
+
+    lib/PDF/Basic/PDF/Pages.pm
+     Issue #203 a new page was being inserted in the wrong place. Thanks to
+      Vadim Repin for finding a "one off" index error that's apparently been 
+      there for at least a decade, and the fix.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Basic/PDF/File.pm
+     Improve upon the Integrity Check, acknowledging that missing objects
+      might be hidden in an object stream. The open() function was also 
+      sometimes seeing a class reference rather than a pure class, which has
+      been fixed. See issue #196 and especially #197.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Content.pm, examples/060_transparency,
+      INFO/KNOWN_INCOMP, tools/1_pc.pl
+     Remove ability to generate save() ("q") and restore() ("Q") while in a
+      text object. If attempted in text, it is now a no-op with a one-time
+      (per run) warning message reminding users to update their code NOT to
+      attempt save and restore in text mode. This was prompted by PDF::TableX 
+      t-tests using text save and restore, which isn't permitted by the PDF
+      definition. Updated one PDF::Builder example that (unnecessarily) did a
+      save/restore in text mode. Thanks to Vadim Repin for troubleshooting this
+      and determining the problem and fix. While in here, make the warning 
+      message that a request for 'Times' core font is changed to 'Times-Roman'
+      a one-time (per run) output, rather than every time.
+
+    lib/PDF/Builder/Page.pm, INFO/DEPRECATED, t/deprecations-page.t 
+     Obsolete and deprecated methods get_mediabox(), get_cropbox(), 
+      get_bleedbox(), get_trimbox(), and get_artbox() have been removed. Please
+      use the regular methods (in $pdf or $page) with no arguments, to retrieve
+      the current box values.
+
+    lib/PDF/Builder/Resource/XObject/Image.pm, INFO/DEPRECATED
+     Deprecate Image object methods width() and height() ability to SET the 
+      width and height of an image. This setting apparently has never worked 
+      properly, but in case someone is actually using it for some purpose, it 
+      has not been immediately removed. It is planned to be removed after
+      October, 2025, unless someone shows that they are using it.
+
+    (most .pm files)
+     Reformat POD to make navigation easier, including the listing of all user-
+      accessible methods in a POD's Table of Contents at the top.
+
+    lib/PDF/Builder/Content.pm, lib/PDF/Resource/XObject/Form/Hybrid.pm,
+      lib/PDF/Builder/Lite.pm, INFO/DEPRECATED, examples/021_psfonts,
+      t/content-deprecated.t, t/deprecations.t
+     Remove long-deprecated method and global variable "lead". Use "leading" 
+      instead, which is the correct typographical term. Although the "Lite" 
+      subpackage isn't really maintained, "textlead()" has been replaced by 
+      "textleading()".
+    
+    lib/PDF/Builder/Basic/PDF/Array.pm, /lib/PDF/Builder/Basic/PDF/Objind.pm, 
+      INFO/DEPRECATED, t/deprecations.t
+     Remove long-deprecated method "elementsof()" in favor of "elements()".
+     Remove long-deprecated method "removeobj()" in favor of "remove_element()".
+
+    README.md, Makefile.PL, META.yml, META.json, lib/PDF/Builder.pm, 
+      examples/Column.pl
+     Minimum Perl version changed from 5.24 to 5.26. Update list of expected
+      end-of-service against various Perl versions.
+
+    lib/PDF/Builder/Content.pm
+     Clarify description of "bogen()" method's "larger" and "reverse" options.
+
+    lib/PDF/Builder/Content.pm, lib/PDF/Builder/Content/Text.pm
+     Implement 'align' option for text() left/center/right, l/c/r.
+
+    README.md, examples/020_textunderline
+     Add pointer to README to online documentation, and clarify underline 
+      example (that first text is NOT underlined).
+
+    lib/PDF/Builder.pm
+     Clarify documentation on page_labels() versus pageLabel(), add code to
+      check differences in starting page index and form of options, in response
+      to PDF::API2 Issue #61.
+
+    lib/PDF/Builder/Content/Text.pm
+     A number of minor fixes: explicitly make paragraph <p> a block level, 
+       any pending margin-bottom at the end of a column (if ran out of input) 
+       should be accounted for in the returned $start_y.
+
+    INFO/ACKNOWLEDGE.md (new), README.md, MANIFEST 
+     Add acknowledgements and thanks.
+
+    lib/PDF/Builder/Basic/PDF/Filter/LZWDecode.pm
+     Revert an earlier change that broke some filtering.
+
+    README.md  Update to point to new PDF::Builder Home Page structure (on 
+      catskilltech.com).
+
+    t/info.t
+     Add test of modified() method.
+
+    lib/PDF/Builder.pm
+     Incorrect check on date format (missing last '). Reported by Johan Vromans
+      against PDF::API2 #62. The _is_date() method has been updated to reflect
+      a number of date/time formats found "in the wild", although the PDF
+      documentation is a bit inconsistent over time, as well as ambiguous, so
+      this may allow through some invalid formats.
+
+    lib/PDF/Builder.pm, examples/050_pagelabels
+     Fix an incompatibility with PDF::API2 recent changes (page_labels method).
+      Now starts page index (for page_labels) at 1 instead of 0, and warns
+      if 0 page index (page number) is given for page_labels (per API2 ticket
+      #61). The old pageLabel method, kept for compatibility, is unaffected. 
+      The example script has been updated to show both styles.
+
+    lib/PDF/Builder/Content/Text.pm
+     Make paragraph() method compatible with PDF::API2's, i.e., $continue
+      parameter is optional. It should make no difference in calls to paragraph
+      whether there is a fourth parameter (continue) before the options. This
+      incompatibility showed up in PDF::TableX t-tests.
+
+    lib/PDF/Builder/Docs.pm
+     Full writeup of what's supported for markup input (Markdown, HTML).
+
+    tools/3_examples.pl, examples/020_corefonts, examples/021_synfonts,
+      examples/023_cjkfonts
+     Add -s flag to run a small subset of the lengthy test list for three of
+      the examples, plus overall when running all examples.
+
+    lib/PDF/Builder/Page.pm, lib/PDF/Builder/Resource/CIDFont.pm
+     Clean up some typos preventing synfont t-test from running.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Resource/CIDFont.pm
+     It has come to our attention (#193) that PDF Readers (Adobe Reader and a 
+      number of Third Party readers) do not properly handle the "Tw" operator 
+      with TrueType fonts. Other font types work as expected. This operator, 
+      set by the $text->wordspace(n) method, is ignored for TTF and OTF fonts
+      ($pdf->ttfont()) because Tw works only for inputs in the stream where 
+      words are separated by ASCII spaces (x20). TrueType fonts, on the other 
+      hand, uses an input list of glyph IDs (4 digit hex numbers). Thus, there 
+      are never any ASCII spaces to detect and adjust their widths. 
+
+      We have updated the TTF/OTF handling code to honor the Tw operator value
+      and emulate its actions, even though a native PDF Reader does not. In
+      order to match the effects of the Tw operator on other font types, only
+      ASCII spaces (x20) in the original text strings are affected, and not 
+      other flavors of spaces. Finally, TextHS() and advancewidthHS() still do
+      not handle charspace or wordspace settings (perhaps in the future).
+
+    lib/PDF/Builder/Content/Text.pm
+     When linking to a page via Markdown or HTML (URL #p-x-y), the default
+      zoom was 1 (100%) when given just the x and y coordinates on a page. This
+      has been changed to leave the zoom factor unchanged by default (unless,
+      of course, you choose to specify a zoom amount). Also, the thickness
+      (height) of the horizontal rule defaulted to 1pt, which was a bit heavy
+      in appearance. It has been changed to default to 0.5pt.
+
+    lib/PDF/Builder.pm
+     GD image call was not working in some circumstances, due to image_gd()
+      being called incorrectly. Reported and fixed by Hakon Hagland against
+      PDF::API2 (#60).
+
+    lib/PDF/Builder/Resource/Font/Postscript.pm, lib/PDF/Builder/Docs.pm,
+      examples/021_psfonts, t/font-type1.t
+     Update Type 1 font (PS font) handling to allow T1 fonts (.t1 filetype,
+      variant of .afm/.pfm). Also some new font paths to search on. Per request 
+      #194 from Red Hat packager (@ppisar).
+
+    ===== IMPORTANT NOTICE =====
+    lib/PDF/Builder.pm, lib/PDF/Builder/Docs.pm, 
+      lib/PDF/Builder/Resource/Font/Postscript.pm
+     Adobe has announced an end to support for Type 1 (Postscript/T1) fonts in 
+      its products. The announcement wordings are a bit vague, sometimes 
+      referring to "all products" and other times just to "authoring software".
+      Presumably, Adobe PDF Readers (as well as Readers supplied by other 
+      parties) will continue to display PDFs with Type 1 fonts for quite some 
+      time, although this is by no means absolutely certain. Note that this 
+      does NOT mean that PDF::Builder or other Third Party authoring tools may 
+      not continue to support Type 1 fonts. This termination by Adobe of
+      support of a now old and obsolete font format does not affect the use of 
+      PDF::Builder for authoring PDFs, nor is it binding on other non-Adobe 
+      readers and authoring tools. However, using Adobe products for editing of 
+      PDFs with Type 1 fonts, and possibly of displaying them, may soon no 
+      longer be possible. At any rate, users may want to consider starting to 
+      move away from Type 1 font usage (psfont), and switch to TTF/OTF (ttfont)
+      or even core fonts (corefont), as it is unknown how long Type 1 Reader 
+      support will continue.
+    ============================
+
 3.025     2023-01-19
 
     ===== many thanks to Amtivo Group for sponsoring this work!

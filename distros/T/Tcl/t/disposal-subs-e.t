@@ -40,7 +40,7 @@ $| = 1;
   exit;
 
 sub runcmd{
-  my $precmd=insure_ptrarray($inter,'info', 'commands', '::perl::*');
+  my $precmd=[$inter->icall('info', 'commands', '::perl::*')];
   $ct=0;
   for my $ii (0..9) {
     my $rand=&$sub1();
@@ -57,7 +57,7 @@ sub runcmd{
 sub newcmds {
  my $precmd=shift;
  my $print=shift;
-my $postcmd =insure_ptrarray($inter,'info', 'commands', '::perl::*');
+my $postcmd =[$inter->icall('info', 'commands', '::perl::*')];
 my %start;
 my $newct=0;
 my @newcmds;
@@ -70,19 +70,10 @@ return $newct,\@newcmds;
 sub flush_afters{
   my $inter=shift;
   while(1) {  # wait for afters to finish
-    my $info0=insure_ptrarray($inter,'after', 'info');
-    last unless (scalar(@$info0));
+    my @info0=$inter->icall('after', 'info');
+    last unless (scalar(@info0));
     $inter->icall('after', 300, 'set var fafafa');
     $inter->icall('vwait', 'var'); # will wait for .3 seconds
   }
 } # flush afters
 
-
-sub insure_ptrarray{
-  my $inter=shift;
-  my $list = $inter->icall(@_);
-  if (ref($list) ne 'Tcl::List') {  # v1.02
-      $list=[split(' ',$list)];
-      }
-return $list;
-}

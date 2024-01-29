@@ -8,7 +8,7 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '1.3012';
+our $VERSION = '1.3014';
 
 use Math::Pari qw(PARI pari2pv gdivent bittest
                   gcmp gcmp0 gcmp1 gcd ifact gpui gmul
@@ -176,11 +176,15 @@ sub _nok {
 
     # If k > n/2, or, equivalently, 2*k > n, compute nok(n, k) as nok(n, n-k).
 
-    {
-        my $twok = $class -> _mul($class -> _two(), $class -> _copy($k));
-        if ($class -> _acmp($twok, $n) > 0) {
-            $k = $class -> _sub($class -> _copy($n), $k);
-        }
+    my $umax = $class -> _new(~0);
+
+    if ($class -> _acmp($n, $umax) >= 0) {
+        return $class -> SUPER::_nok($n, $k);
+    }
+
+    my $twok = $class -> _mul($class -> _two(), $class -> _copy($k));
+    if ($class -> _acmp($twok, $n) > 0) {
+        $k = $class -> _sub($class -> _copy($n), $k);
     }
 
     binomial($n, $k);

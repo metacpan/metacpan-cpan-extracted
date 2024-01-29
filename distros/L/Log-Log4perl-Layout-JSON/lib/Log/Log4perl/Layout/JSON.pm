@@ -1,5 +1,5 @@
 package Log::Log4perl::Layout::JSON;
-$Log::Log4perl::Layout::JSON::VERSION = '0.60';
+$Log::Log4perl::Layout::JSON::VERSION = '0.61';
 # ABSTRACT: Layout a log message as a JSON hash, including MDC data
 
 use 5.010;
@@ -386,7 +386,7 @@ Log::Log4perl::Layout::JSON - Layout a log message as a JSON hash, including MDC
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -591,8 +591,8 @@ Originally created and maintained through v0.002003 by Tim Bunce.  Versions
 
 =head1 SOURCE
 
-The development version is on github at L<https://https://github.com/mschout/Log-Log4perl-Layout-JSON>
-and may be cloned from L<git://https://github.com/mschout/Log-Log4perl-Layout-JSON.git>
+The development version is on github at L<https://github.com/mschout/Log-Log4perl-Layout-JSON>
+and may be cloned from L<https://github.com/mschout/Log-Log4perl-Layout-JSON.git>
 
 =head1 BUGS
 

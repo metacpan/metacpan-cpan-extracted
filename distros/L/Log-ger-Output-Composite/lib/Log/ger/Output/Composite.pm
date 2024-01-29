@@ -1,13 +1,13 @@
 package Log::ger::Output::Composite;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-11-17'; # DATE
-our $DIST = 'Log-ger-Output-Composite'; # DIST
-our $VERSION = '0.017'; # VERSION
-
 use strict;
 use warnings;
 use Log::ger::Util;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-01-12'; # DATE
+our $DIST = 'Log-ger-Output-Composite'; # DIST
+our $VERSION = '0.018'; # VERSION
 
 # this can be used to override all level settings as it has the highest
 # precedence.
@@ -104,7 +104,7 @@ sub get_hooks {
             # priority 10) which create null outputter for levels lower than the
             # general level, since we want to do our own custom level checking.
             sub {        # hook
-                no strict 'refs';
+                no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
                 require Data::Dmp;
 
                 my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
@@ -201,7 +201,7 @@ sub get_hooks {
                     "Log::ger::Stash::OComposite_$suffix";
                 };
                 {
-                    no strict 'refs';
+                    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
                     ${$varname} = [];
                     ${$varname}->[0] = $outputters;
                     ${$varname}->[1] = $layouters;
@@ -283,7 +283,7 @@ sub get_hooks {
                         warn "Log::ger::Output::Composite logger source code (target type=$hook_args{target_type} target name=$hook_args{target_name}, routine name=$hook_args{routine_name}): <<$src>>\n";
                     }
 
-                    $composite_outputter = eval $src;
+                    $composite_outputter = eval $src; ## no critic: BuiltinFunctions::ProhibitStringyEval
                 }
                 [$composite_outputter];
             }] # hook record
@@ -310,7 +310,7 @@ Log::ger::Output::Composite - Composite output
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -366,8 +366,8 @@ per-category level. It can also apply per-output layout.
 
 =head2 outputs => hash
 
-Specify outputs. It's a hash with output name as keys and output specification
-as values.
+Hash. Specify outputs. Hash key is output name and and hash value is output
+specification.
 
 Output name is the name of output module without the C<Log::ger::Output::>
 prefix, e.g. L<Screen|Log::ger::Output::Screen> or
@@ -375,7 +375,7 @@ L<File|Log::ger::Output::File>.
 
 Output specification is either a hashref or arrayref of hashrefs to specify
 multiple outputs per type (e.g. if you want to output to two File's). Known
-hashref keys:
+hashref keys for output specification:
 
 =over
 
@@ -424,9 +424,9 @@ per-output layout.
 
 =head2 category_level => hash
 
-Specify per-category level. Optional. Hash key is category name, value is level
-(which can be a string/numeric level or a two-element array containing minimum
-and maximum level).
+Hash, optional. Specify per-category level. Hash key is category name, value is
+level (which can be a string/numeric level or a two-element array containing
+minimum and maximum level).
 
 =head1 FAQS
 
@@ -446,16 +446,15 @@ C<Log::ger::Output::Composite::set_level>, for example:
 This sets an internal level setting which is respected and has the highest
 precedence so all levels settings will use this instead. If previously you have:
 
- Log::ger::Output->set(Composite => {
-     default_level => 'error',
+ Log::ger::Output->set(Composite => (
      outputs => {
-         File => {path=>'/foo', level=>'debug'},
+         File   => {conf=>{path=>'/foo'}, level=>'debug'},
          Screen => {level=>'info', category_level=>{MyApp=>'warn'}},
      },
      category_level => {
          'MyApp::SubModule1' => 'debug',
      },
- });
+ ));
 
 then after the C<Log::ger::Output::Composite::set_level('trace')>, all the above
 per-category and per-output levels will be set to C<trace>.
@@ -472,13 +471,15 @@ Bool. If set to true, will print some debugging messages to stderr.
 
 =head1 SEE ALSO
 
+L<Log::ger::App> as an example on module that uses Log::ger::Output::Composite.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2024, 2020, 2019, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

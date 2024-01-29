@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::ColorSpace::Indexed';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Util;
@@ -18,9 +18,11 @@ PDF::Builder::Resource::ColorSpace::Indexed::ACTFile - Adobe Color Table support
 
 =head1 METHODS
 
-=over
+=head2 new
 
-=item $cs = PDF::Builder::Resource::ColorSpace::Indexed::ACTFile->new($pdf, $actfile)
+    $cs = PDF::Builder::Resource::ColorSpace::Indexed::ACTFile->new($pdf, $actfile)
+
+=over
 
 Returns a new colorspace object created from an adobe color table file (ACT/8BCT).
 See
@@ -28,6 +30,8 @@ Adobe Photoshop(R) 6.0 --
 File Formats Specification Version 6.0 Release 2,
 November 2000
 for details.
+
+=back
 
 =cut
 
@@ -62,9 +66,5 @@ sub new {
 
     return $self;
 }
-
-=back
-
-=cut
 
 1;

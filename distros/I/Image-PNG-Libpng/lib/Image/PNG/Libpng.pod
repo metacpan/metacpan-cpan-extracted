@@ -38,7 +38,7 @@ Libpng-like interface:
         print "$k: $header->{$k}\n";
     }
 
-(This example is included as L<F<examples/synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/synopsis.pl>
+(This example is included as L<F<examples/synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/synopsis.pl>
 in the distribution.)
 
 
@@ -65,16 +65,16 @@ Simple interface:
     $wpng->write_png_file ('new.png');
     
 
-(This example is included as L<F<examples/synopsis-easy.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/synopsis-easy.pl>
+(This example is included as L<F<examples/synopsis-easy.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/synopsis-easy.pl>
 in the distribution.)
 
 
 =head1 VERSION
 
-This document describes Image::PNG::Libpng version 0.57, corresponding to git commit L<unknown|https://github.com/benkasminbullock/image-png-libpng/commit/unknown> at unknown.
+This document describes Image::PNG::Libpng version 0.58, corresponding to git commit L<01ac5d8d71aaed8c93dd27542274703c084ed54e|https://github.com/benkasminbullock/image-png-libpng/commit/01ac5d8d71aaed8c93dd27542274703c084ed54e> at Mon Jan 29 09:05:33 2024 +0900.
 
 Unless otherwise qualified, comments in this document on the libpng
-source code and documentation refer to libpng version 1.6.37. Libpng is not bundled with this distribution, so
+source code and documentation refer to libpng version 1.6.40. Libpng is not bundled with this distribution, so
 your installed version may vary.
 
 =head1 DESCRIPTION
@@ -133,7 +133,7 @@ The following example demonstrates copying a PNG.
     $pngout->set_text ([{key => 'Name', text => 'Shunsaku Kudo'}]); 
     # $pngout->write_png_file ('copy.png');
 
-(This example is included as L<F<examples/copy-png.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/copy-png.pl>
+(This example is included as L<F<examples/copy-png.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/copy-png.pl>
 in the distribution.)
 
 
@@ -164,13 +164,13 @@ L</set_background> to replace the alpha channel.
     my $wpng = copy_png ($png);
     $wpng->write_png_file ("$Bin/set-background.png");
 
-(This example is included as L<F<examples/set-background.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/set-background.pl>
+(This example is included as L<F<examples/set-background.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/set-background.pl>
 in the distribution.)
 
 
 
 
-L<examples/luv.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/luv.png> is included in the distribution.
+L<examples/luv.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/luv.png> is included in the distribution.
 
 =begin html
 
@@ -180,12 +180,12 @@ L<examples/luv.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57
 <table>
 <tr>
 <td>
-<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/luv.png">
+<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/luv.png">
 </td>
 </tr>
 <tr>
 <th>
-<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/luv.png'>examples/luv.png</a>
+<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/luv.png'>examples/luv.png</a>
 </th>
 </tr>
 </table>
@@ -195,7 +195,7 @@ L<examples/luv.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57
 
 
 
-L<examples/set-background.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/set-background.png> is included in the distribution.
+L<examples/set-background.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/set-background.png> is included in the distribution.
 
 =begin html
 
@@ -205,12 +205,12 @@ L<examples/set-background.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-
 <table>
 <tr>
 <td>
-<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/set-background.png">
+<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/set-background.png">
 </td>
 </tr>
 <tr>
 <th>
-<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/set-background.png'>examples/set-background.png</a>
+<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/set-background.png'>examples/set-background.png</a>
 </th>
 </tr>
 </table>
@@ -259,7 +259,7 @@ This is useful when image data is stored in a Perl scalar. For example
     my $jc = JSON::Create->new (indent => 1, sort => 1);
     print $jc->run ($header);
 
-(This example is included as L<F<examples/get-www-png.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/get-www-png.pl>
+(This example is included as L<F<examples/get-www-png.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/get-www-png.pl>
 in the distribution.)
 
 
@@ -274,7 +274,7 @@ The output looks like this:
     }
 
 
-See also L</Input/output manipulation functions>.
+See also L</Input and output manipulation functions>.
 
 =head2 read_png_file
 
@@ -349,11 +349,11 @@ So, for example,
         return int (rand () * 0x100);
     }
 
-(This example is included as L<F<examples/png-cgi.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/png-cgi.pl>
+(This example is included as L<F<examples/png-cgi.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/png-cgi.pl>
 in the distribution.)
 
 
-See also L</Input/output manipulation functions>.
+See also L</Input and output manipulation functions>.
 
 The optional argument to L</write_png> can be specified using
 L</set_transforms>.
@@ -436,13 +436,13 @@ and then L</write_end> to actually write the PNG data to the file.
         return ($height, $width, \@rows);
     }
 
-(This example is included as L<F<examples/libpng-write.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/libpng-write.pl>
+(This example is included as L<F<examples/libpng-write.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/libpng-write.pl>
 in the distribution.)
 
 
 
 
-L<examples/mono.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/mono.png> is included in the distribution.
+L<examples/mono.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/mono.png> is included in the distribution.
 
 =begin html
 
@@ -452,12 +452,12 @@ L<examples/mono.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.5
 <table>
 <tr>
 <td>
-<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/mono.png">
+<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/mono.png">
 </td>
 </tr>
 <tr>
 <th>
-<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/mono.png'>examples/mono.png</a>
+<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/mono.png'>examples/mono.png</a>
 </th>
 </tr>
 </table>
@@ -511,6 +511,10 @@ or
 This function corresponds to C<png_init_io> in libpng, with a Perl
 file handle substituting for the C C<FILE *>.
 
+=head3 Caveats when using init_io
+
+=head4 Check the return value of open
+
 On some versions of Perl, L</init_io> may crash in some circumstances
 with an error like "segmentation fault", if you use code like
 
@@ -523,6 +527,20 @@ F<some.png> does not exist. The crash occurs within Perl's conversion
 of C<$file> into a C C<FILE *> pointer, before this module's code
 runs. This bug was fixed in Perls after version 5.24.1. To avoid
 trouble, please check the return value of C<open>.
+
+=head4 Cannot deal with non-file filehandles
+
+Since C<init_io> is a Perl access to an underlying C function
+C<png_init_io>, it requires something which can be passed to the
+underlying C as a C<FILE *>, C's file structure. If, for example you
+use L<IO::String> or open a scalar reference as a file handle, since
+these actions do not create a C file structure, an error of the form
+C<scalar's file handle is NULL> will occur. 
+
+If you have a PNG in the form of a Perl scalar, use
+L</read_from_scalar> instead of C<init_io>, which uses a C function
+called C<png_set_read_fn> so that the C library can access the data in
+the Perl scalar. See also L</Input and output manipulation functions>.
 
 =head2 read_end
 
@@ -827,7 +845,7 @@ case, with words separated by underscores, as in C<RGB_ALPHA>.
     my $name = color_type_name ($png->get_IHDR->{color_type});
     print "Your PNG has colour type $name.\n";
 
-(This example is included as L<F<examples/color-type-name.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/color-type-name.pl>
+(This example is included as L<F<examples/color-type-name.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/color-type-name.pl>
 in the distribution.)
 
 
@@ -1266,7 +1284,7 @@ This function corresponds to C<png_set_text> in libpng.
     }]);
     $png->write_png_file ('copyright.png');
 
-(This example is included as L<F<examples/set-text.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/set-text.pl>
+(This example is included as L<F<examples/set-text.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/set-text.pl>
 in the distribution.)
 
 
@@ -1335,7 +1353,7 @@ This function corresponds to C<png_get_chunk_malloc_max> in libpng
     $png->set_chunk_malloc_max ($max);
 
 This sets the maximum amount of memory that a chunk can use. The
-default value of libpng 1.6.37 is 8 megabytes.
+default value of libpng 1.6.40 is 8 megabytes.
 
 To test whether your version of libpng supports C<get_chunk_malloc_max>, use
 L</libpng_supports> with argument 'L</CHUNK_MALLOC_MAX>':
@@ -2574,7 +2592,7 @@ whether an image marked as RGB is really monochrome or not.
         print "The two files contain different image data.\n";
     }
 
-(This example is included as L<F<examples/xkcd.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/xkcd.pl>
+(This example is included as L<F<examples/xkcd.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/xkcd.pl>
 in the distribution.)
 
 
@@ -2588,7 +2606,7 @@ The output looks like this:
 
 
 
-L<examples/life-gray.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/life-gray.png> is included in the distribution.
+L<examples/life-gray.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/life-gray.png> is included in the distribution.
 
 =begin html
 
@@ -2598,12 +2616,12 @@ L<examples/life-gray.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpn
 <table>
 <tr>
 <td>
-<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/life-gray.png">
+<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/life-gray.png">
 </td>
 </tr>
 <tr>
 <th>
-<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/life-gray.png'>examples/life-gray.png</a>
+<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/life-gray.png'>examples/life-gray.png</a>
 </th>
 </tr>
 </table>
@@ -2869,13 +2887,13 @@ using colors picked from the image at random:
         return \@p;
     }
 
-(This example is included as L<F<examples/q.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/q.pl>
+(This example is included as L<F<examples/q.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/q.pl>
 in the distribution.)
 
 
 
 
-L<examples/wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/wave.png> is included in the distribution.
+L<examples/wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/wave.png> is included in the distribution.
 
 =begin html
 
@@ -2885,12 +2903,12 @@ L<examples/wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.5
 <table>
 <tr>
 <td>
-<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/wave.png">
+<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/wave.png">
 </td>
 </tr>
 <tr>
 <th>
-<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/wave.png'>examples/wave.png</a>
+<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/wave.png'>examples/wave.png</a>
 </th>
 </tr>
 </table>
@@ -2900,7 +2918,7 @@ L<examples/wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.5
 
 
 
-L<examples/random-wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/random-wave.png> is included in the distribution.
+L<examples/random-wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/random-wave.png> is included in the distribution.
 
 =begin html
 
@@ -2910,12 +2928,12 @@ L<examples/random-wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Lib
 <table>
 <tr>
 <td>
-<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/random-wave.png">
+<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/random-wave.png">
 </td>
 </tr>
 <tr>
 <th>
-<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/random-wave.png'>examples/random-wave.png</a>
+<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/random-wave.png'>examples/random-wave.png</a>
 </th>
 </tr>
 </table>
@@ -2925,7 +2943,7 @@ L<examples/random-wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Lib
 
 
 
-L<examples/picked-wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/picked-wave.png> is included in the distribution.
+L<examples/picked-wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/picked-wave.png> is included in the distribution.
 
 =begin html
 
@@ -2935,12 +2953,12 @@ L<examples/picked-wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Lib
 <table>
 <tr>
 <td>
-<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/picked-wave.png">
+<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/picked-wave.png">
 </td>
 </tr>
 <tr>
 <th>
-<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/picked-wave.png'>examples/picked-wave.png</a>
+<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/picked-wave.png'>examples/picked-wave.png</a>
 </th>
 </tr>
 </table>
@@ -2990,13 +3008,13 @@ C<$green_weight> both set to negative values.
     $wpng->set_IHDR ($ihdr);
     $wpng->write_png_file ("$Bin/grayface.png");
 
-(This example is included as L<F<examples/rgb-to-gray.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/rgb-to-gray.pl>
+(This example is included as L<F<examples/rgb-to-gray.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/rgb-to-gray.pl>
 in the distribution.)
 
 
 
 
-L<examples/grayface.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/grayface.png> is included in the distribution.
+L<examples/grayface.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/grayface.png> is included in the distribution.
 
 =begin html
 
@@ -3006,12 +3024,12 @@ L<examples/grayface.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng
 <table>
 <tr>
 <td>
-<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/grayface.png">
+<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/grayface.png">
 </td>
 </tr>
 <tr>
 <th>
-<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/examples/grayface.png'>examples/grayface.png</a>
+<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/examples/grayface.png'>examples/grayface.png</a>
 </th>
 </tr>
 </table>
@@ -3033,29 +3051,6 @@ This function corresponds to C<png_set_user_limits> in libpng
 This section contains other functions which don't correspond to
 anything in libpng itself, but which have been added to the module for
 utility.
-
-=head2 any2gray8
-
-    my $wpng = any2gray8 ("any.png");
-
-Convert any type of PNG file whatsoever into a bit-depth 8 grayscale
-image without an alpha channel (PNG_COLOR_TYPE_GRAY). The return value
-is a writing structure as made by L</create_write_struct>.
-
-Currently the L</tRNS> chunk is ignored by this.
-
-By default the alpha channel is set to either the value of the
-L</bKGD> chunk if there is one, or white if not. You can set another
-background using the option C<bkgd>:
-
-    my $wpng = any2gray8 ('any.png', bkgd => {red => 255, green => 0, blue => 99});
-
-This will of course be ignored if F<any.png> does not contain an alpha
-channel. RGB to gray conversion is done using L</set_rgb_to_gray> with
-the default values.
-
-This function is not supported for versions of libpng earlier than
-1.6.14.
 
 =head2 color_type_channels
 
@@ -4110,7 +4105,7 @@ unevaluated arguments, which have all been eliminated from this
 module.
 
 If you are interested in exactly which libpng arguments are omitted,
-you can find each instance L<in the file C<perl-libpng.c> in the top directory of the distribution|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.57/perl-libpng.c> in the macro
+you can find each instance L<in the file C<perl-libpng.c> in the top directory of the distribution|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.58/perl-libpng.c> in the macro
 C<UNUSED_ZERO_ARG>.
 
 =head2 Useless functions omitted
@@ -4152,34 +4147,30 @@ freeing is now handled by Perl automatically.
 
 =head2 Other unimplemented parts of libpng
 
-=over
-
-=item Memory management functions
+=head3 Memory management functions
 
 The management of memory for libpng objects is handled automatically
 by this module, and so it does not offer an interface to C<png_malloc>
 and C<png_free> or other libpng memory handling functions.
 
-=item Error handling functions
+=head3 Error handling functions
 
 This module does not offer an interface to C<png_error> and
 C<png_get_error_ptr> or any of the other error handling functions of
 libpng. It redirects the error and warning handlers to Perl's error
 stream.
 
-=item Input/output manipulation functions
+=head3 Input and output manipulation functions
 
 This module does not offer a direct interface to C<png_set_write_fn>
 and C<png_set_read_fn>. However, it is possible to use their
 functionality to access Perl data via L</read_from_scalar> and
 L</write_to_scalar>.
 
-=item Fixed point functions
+=head3 Fixed point functions
 
 There is currently no support for the PNG fixed point functions in
 this Perl module, the functions with suffix C<_fixed>.
-
-=back
 
 =head2 List of unsupported functions
 
@@ -4866,7 +4857,7 @@ problems using this module because of a conditionally-compiled libpng,
 then let us know and we'll add the necessary facility.
 
 Currently we test this module against vanilla libpng versions
-C<1.2.59>, C<1.4.22>, C<1.5.30>, and C<1.6.37> before
+C<1.2.59>, C<1.4.22>, C<1.5.30>, and C<1.6.40> before
 releases. There doesn't seem to have been a 1.3 or a 1.1 version of
 libpng. See
 L<http://www.libpng.org/pub/png/pngnews.html|http://www.libpng.org/pub/png/pngnews.html>. Versions
@@ -4900,7 +4891,23 @@ Versions of libpng up to 1.5 behave erratically when
 L</set_compression_level> or other C<set_compression_*> functions are
 used to alter the compression of the image data. Testing of
 compression-related functions is disabled by this Perl module for
-pre-1.6.13 versions of libpng.
+pre-1.6.13 versions of libpng. 
+
+=head3 Compression level and zlib-ng
+
+Some people have compiled libpng with a new version of zlib known as
+zlib-ng. This gives different values for compression than the original
+zlib. On versions of this module earlier than 0.58, this caused some
+unimportant but annoying test failures where this module was making
+exact size comparisons. See
+L<https://github.com/benkasminbullock/image-png-libpng/issues/40>. As
+far as we know, there is no way to detect whether zlib-ng is being
+used from Perl, so to support the use of zlib-ng, these tests have
+been switched off. The disabled tests can be restored by setting the
+environment variable C<ORIGINAL_ZLIB> to a true value, if you want
+them.
+
+    ORIGINAL_ZLIB=1 prove t/*.t
 
 =head3 sCAL chunk
 
@@ -5049,7 +5056,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2011-2021
+2011-2024
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

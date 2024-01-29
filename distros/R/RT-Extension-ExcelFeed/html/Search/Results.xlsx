@@ -51,22 +51,49 @@ $Query => ''
 $OrderBy => 'id'
 $Order => 'ASC'
 $PreserveNewLines => 0
+$Class => 'RT::Tickets'
+$ObjectType => $Class eq 'RT::Transactions' ? 'RT::Ticket' : ''
 </%ARGS>
 <%INIT>
-my $Tickets = RT::Tickets->new( $session{'CurrentUser'} );
-$Tickets->FromSQL( $Query );
+my $collection = $Class->new( $session{'CurrentUser'} );
+
+if ( $Class eq 'RT::Transactions' ) {
+    $Query = PreprocessTransactionSearchQuery( Query => $Query, ObjectType => $ObjectType );
+}
+
+if ( $Query ) {
+    $collection->FromSQL( $Query );
+}
+elsif ( $Class eq 'RT::Assets' ) {
+    my $catalog_obj = LoadDefaultCatalog($ARGS{'Catalog'} || '');
+    $ARGS{'Catalog'} = $catalog_obj->Id;
+    ProcessAssetsSearchArguments(
+        Assets => $collection, Catalog => $catalog_obj, ARGSRef => \%ARGS,
+    );
+}
+
 if ( $OrderBy =~ /\|/ ) {
     # Multiple Sorts
     my @OrderBy = split /\|/, $OrderBy;
     my @Order   = split /\|/, $Order;
-    $Tickets->OrderByCols(
+    $collection->OrderByCols(
         map { { FIELD => $OrderBy[$_], ORDER => $Order[$_] } }
         ( 0 .. $#OrderBy )
     );
 }
 else {
-    $Tickets->OrderBy( FIELD => $OrderBy, ORDER => $Order );
+    $collection->OrderBy( FIELD => $OrderBy, ORDER => $Order );
 }
 
-$m->comp( "/Elements/XLSXExport", Collection => $Tickets, Format => $Format, PreserveNewLines => $PreserveNewLines );
+if ( $Class eq 'RT::Assets' && !$Format ) {
+    $Format = q|id, Name, Description, Status, Catalog, |;
+    $Format .= "$_, " for RT::Asset->Roles;
+    my $catalog_obj = LoadDefaultCatalog($ARGS{'Catalog'} || '');
+    my $CFs = RT::CustomFields->new( $session{CurrentUser} );
+    $CFs->LimitToCatalog( $catalog_obj->Id );
+    $CFs->LimitToObjectId( 0 ); # LimitToGlobal but no LookupType restriction
+    $Format .= "'__CF.{$_}__/TITLE:$_', " for map {$_ = $_->Name; s/['\\]/\\$1/g; $_} @{$CFs->ItemsArrayRef};
+}
+
+$m->comp( "/Elements/XLSXExport", Collection => $collection, Format => $Format, PreserveNewLines => $PreserveNewLines );
 </%INIT>

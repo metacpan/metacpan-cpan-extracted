@@ -137,6 +137,7 @@ site/htdocs/static/forms/menuCat.html
 site/htdocs/static/forms/mini.html
 site/htdocs/static/forms/oidcAttribute.html
 site/htdocs/static/forms/oidcAttributeContainer.html
+site/htdocs/static/forms/OidcKey.html
 site/htdocs/static/forms/oidcOPMetaDataNode.html
 site/htdocs/static/forms/oidcOPMetaDataNodeContainer.html
 site/htdocs/static/forms/oidcRPMetaDataNode.html
@@ -149,7 +150,6 @@ site/htdocs/static/forms/postContainer.html
 site/htdocs/static/forms/README.md
 site/htdocs/static/forms/restore.html
 site/htdocs/static/forms/RSACertKey.html
-site/htdocs/static/forms/RSACertKeyNoPassword.html
 site/htdocs/static/forms/rule.html
 site/htdocs/static/forms/ruleContainer.html
 site/htdocs/static/forms/samlAssertion.html

@@ -1,5 +1,87 @@
 Revision history for Ixchel
 
+0.7.0  2024-01-26/15:15
+		 - action suricata_base, .netmap and .nflog added to items to remove by default
+		 - action lilith_config, add new action for configuring lilith
+
+0.6.3  2024-01-22/23:45
+		 - minor fixes for snmp_services
+
+0.6.2  2024-01-22/12:15
+		 - fix typo for pkgs
+
+0.6.1  2024-01-22/10:15
+		 -  add missing lib/Ixchel/Actions/base.pm to the MANIFEST
+
+0.6.0  2024-01-22/09:45
+		 - pkgs action, don't mark end report as errors
+		 - snmp_service, add new action
+		 - rework the synopsis section for all the actions
+		 - add base action for better code reuse
+
+0.5.1   2024-01-19/09:45
+		 - Fix typo in MANIFEST sneck_installs -> sneck_install
+
+0.5.0   2024-01-19/09:15
+		 - add snmp_install action
+		 - add sneck_install install
+		 - action pkgs, add in results reporting at the end of the action
+		 - now set both lower and upper case proxy values
+		 - LWP::Simple replaced with LWP::UserAgent everywhere
+		 - action xeno_build, fetch is a bit more verbose as to the results
+
+0.4.0   2024-01-16/17:00
+		 - ENV handling for proxy stuff and and cpanm home has moved to Ixchel->action to make handling easier
+		 - variables defined under .env are now transfered to %ENV by Ixchel->action
+		 - perl action, print results at the end
+		 - misc POD fixes
+		 - add sneck_config action and sneck template
+		 - add some missing tests
+		 - fix suricata_diff
+		 - suricata include/outputs file name update
+		 - fix missing items in the manifest
+		 - suricata_extract extend now depends on suricata for snmp_v2 template
+		 - perl action, don't treat failure on optional packages as a error if they can later be installed via cpanm
+		 - perl_module_via_pkg function, add handling for LWP/libwww given the nonstandard naming
+
+0.3.0   2024-01-09/23:00
+		 - add suricata-update support to auto_cron
+		 - the template action will now die when template errors instead of returning blank
+		 - add action snmp_v2
+		 - more minor POD stuff
+
+0.2.2   2024-01-08/23:45
+		 - POD fix for actions
+
+0.2.1   2024-01-08/23:30
+		 - auto_cron, fix writing file out
+		 - auto_cron template, compress the results for smart
+		 - snmp_v2 template, compress the zfs return
+		 - auto_cron template, fix mdadm
+		 - default config, add distro snmp extend with default enabled
+		 - snmp_v2 template, fix sneck extend
+
+0.2.0   2024-01-08/14:00
+		 - Fix the Ixchel config not being available as config for xeno_build.
+		 - add -r for the xeno action
+		 - convert to Pod::Usage and no longer use the method help
+		 - sagan_rules massive re-work... now updates the file from a specified base file
+		 - Various cleanup to make exec status lines for xeno_build more readable.
+		 - Lots of changes/fixes for Suricata.
+		 - Now uses TOML::Tiny.
+		 - Add suricata_diff for displaying differences between the Ixchel config and current suricata config.
+		 - dump_config now uses yaml by default
+		 - add sagan_merged action for generating sagan configs that have the base and include merged
+		 - add auto_cron action for calling the auto_cron template and optionally writing it out
+		 - add snmp_extends action for automatically installing the snmp extends via xeno remote
+		 - sagan_conf_update now uses .sagan.merged_base_include for if sagan_merged v. sagan_base and sagan_include should be used
+		 - add extend_logsize_config
+		 - apt_proxy write_file fix
+		 - .config.snmp.extends.logsize.remote is now 0 by default
+		 - add suricata_extract_submit_config action for generating the suricata_extract_submit config
+		 - add extend_smart_config for generating the config file for the smart extend
+		 - add extend support for borgbackup, bind, mojo_cape_submit, mdadm
+
 0.1.1   2023-11-17/12:00
         - Makefile.PL update
 
@@ -8,4 +90,3 @@ Revision history for Ixchel
 
 0.0.1   2023-11-16/11:00
         - Initial release.
-

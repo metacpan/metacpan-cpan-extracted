@@ -1,5 +1,5 @@
 package Pod::Weaver::Section::SourceGitHub;
-$Pod::Weaver::Section::SourceGitHub::VERSION = '0.56';
+$Pod::Weaver::Section::SourceGitHub::VERSION = '0.57';
 # ABSTRACT: Add SOURCE pod section for a github repository
 
 use Moose;
@@ -71,10 +71,7 @@ sub _build_repo_data {
         $url =~ s{^git\@github.com:/*}{github.com/}i;
         $url =~ s/\.git$//i;
 
-        my $repo_web = "https://$url";
-        my $repo_git = "git://$url.git";
-
-        return [ $repo_git, $repo_web ];
+        return [ "$url.git", $url ];
     }
 
     return [];
@@ -95,13 +92,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Pod::Weaver::Section::SourceGitHub - Add SOURCE pod section for a github repository
 
 =head1 VERSION
 
-version 0.56
+version 0.57
 
 =head1 SYNOPSIS
 
@@ -123,12 +122,16 @@ adds the C<SOURCE> section.
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/mschout/pod-weaver-section-sourcegithub>
-and may be cloned from L<git://github.com/mschout/pod-weaver-section-sourcegithub.git>
+and may be cloned from L<https://github.com/mschout/pod-weaver-section-sourcegithub.git>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to bug-pod-weaver-section-sourcegithub@rt.cpan.org or through the web interface at:
- http://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Section-SourceGitHub
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/mschout/pod-weaver-section-sourcegithub/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 
@@ -136,7 +139,7 @@ Michael Schout <mschout@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Michael Schout.
+This software is copyright (c) 2024 by Michael Schout.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

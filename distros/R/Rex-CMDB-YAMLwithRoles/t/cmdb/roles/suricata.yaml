@@ -1,0 +1,17 @@
+%YAML 1.1
+---
+
+suricata:
+  enable: 1
+  config:
+    rule-files:
+      - suricata.rules
+      - files.rules
+suricata_extract:
+  enable: 1
+snmp:
+  extends:
+    suricata:
+      enable: 1
+    suricata_extract:
+      enable: 1

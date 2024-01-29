@@ -7,7 +7,13 @@ BEGIN { use_ok('RPM::Query') };
 my $rq   = RPM::Query->new;
 isa_ok($rq, 'RPM::Query');
 
-my $skip = $^O eq 'linux' ? do {qx{rpm --version}; $?} : 1;
+my $skip = 1;
+foreach (1) {
+  last unless $^O eq 'linux';
+  last unless qx{rpm -q perl};
+  last if $?;
+  $skip = 0;
+}
 
 sub rpm {
   my $cmd    = join ' ', rpm => map {"'$_'"} @_;
@@ -17,7 +23,7 @@ sub rpm {
 }
 
 SKIP: {
-  skip 'rpm command not found', 17 if $skip;
+  skip 'rpm command not found or perl not installed by rpm', 17 if $skip;
   {
     my $package = $rq->query('perl');
     isa_ok($package, 'RPM::Query::Package');

@@ -708,6 +708,53 @@ OUTPUT:
     RETVAL
 
 SV *
+miu64_le_to_int64(net)
+    SV *net;
+PREINIT:
+    STRLEN len;
+    unsigned char *pv = (unsigned char *)SvPVbyte(net, len);
+    int64_t i64;
+CODE:
+    if (len != 8) croak_string(aTHX_ invalid_length_error_s);
+    i64 = (((((((((((((((int64_t)pv[7]) << 8)
+                      + (int64_t)pv[6]) << 8)
+                    + (int64_t)pv[5]) << 8)
+                  + (int64_t)pv[4]) << 8)
+                + (int64_t)pv[3]) << 8)
+              + (int64_t)pv[2]) << 8)
+            + (int64_t)pv[1]) <<8)
+        + (int64_t)pv[0];
+    RETVAL = ( use_native
+              ? newSViv(i64)
+              : newSVi64(aTHX_ i64) );
+OUTPUT:
+    RETVAL
+
+SV *
+miu64_le_to_uint64(net)
+    SV *net;
+PREINIT:
+    STRLEN len;
+    unsigned char *pv = (unsigned char *)SvPVbyte(net, len);
+    uint64_t u64;
+CODE:
+    if (len != 8)
+        croak_string(aTHX_ invalid_length_error_u);
+    u64 = (((((((((((((((uint64_t)pv[7]) << 8)
+                      + (uint64_t)pv[6]) << 8)
+                    + (uint64_t)pv[5]) << 8)
+                  + (uint64_t)pv[4]) << 8)
+                + (uint64_t)pv[3]) << 8)
+              + (uint64_t)pv[2]) << 8)
+            + (uint64_t)pv[1]) <<8)
+        + (uint64_t)pv[0];
+    RETVAL = ( use_native
+              ? newSVuv(u64)
+              : newSVu64(aTHX_ u64) );
+OUTPUT:
+    RETVAL
+
+SV *
 miu64_int64_to_net(self)
     SV *self
 PREINIT:
@@ -739,6 +786,42 @@ CODE:
     pv = SvPVX(RETVAL);
     pv[8] = '\0';
     for (i = 7; i >= 0; i--, u64 >>= 8)
+        pv[i] = u64;
+OUTPUT:
+    RETVAL
+
+SV *
+miu64_int64_to_le(self)
+    SV *self
+PREINIT:
+    char *pv;
+    int64_t i64 = SvI64(aTHX_ self);
+    int i;
+CODE:
+    RETVAL = newSV(8);
+    SvPOK_on(RETVAL);
+    SvCUR_set(RETVAL, 8);
+    pv = SvPVX(RETVAL);
+    pv[8] = '\0';
+    for (i = 0; i <= 7; i++, i64 >>= 8)
+        pv[i] = i64;
+OUTPUT:
+    RETVAL
+
+SV *
+miu64_uint64_to_le(self)
+    SV *self
+PREINIT:
+    char *pv;
+    uint64_t u64 = SvU64(aTHX_ self);
+    int i;
+CODE:
+    RETVAL = newSV(8);
+    SvPOK_on(RETVAL);
+    SvCUR_set(RETVAL, 8);
+    pv = SvPVX(RETVAL);
+    pv[8] = '\0';
+    for (i = 0; i <= 7; i++, u64 >>= 8)
         pv[i] = u64;
 OUTPUT:
     RETVAL

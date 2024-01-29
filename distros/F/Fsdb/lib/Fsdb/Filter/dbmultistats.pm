@@ -2,7 +2,7 @@
 
 #
 # dbmultistats.pm
-# Copyright (C) 1991-2019 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2024 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -248,6 +248,7 @@ sub set_defaults ($) {
     $self->{_median} = undef;   # special case: renames the output field
     $self->{_max_parallelism} = undef;
     $self->{_include_non_numeric} = undef;
+    $self->set_default_tmpdir;
     $self->{_header} = undef;
     $self->{_output_on_no_input} = undef;
     $self->{_fscode} = undef;
@@ -425,7 +426,7 @@ sub finish ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2024 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

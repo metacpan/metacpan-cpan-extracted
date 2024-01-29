@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 49 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 52 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Filter.pm',
@@ -45,6 +45,7 @@ my @module_files = (
     'Data/Sah/Filter/perl/Str/ltrim.pm',
     'Data/Sah/Filter/perl/Str/oneline.pm',
     'Data/Sah/Filter/perl/Str/remove_comment.pm',
+    'Data/Sah/Filter/perl/Str/remove_non_latin_alphanum.pm',
     'Data/Sah/Filter/perl/Str/remove_nondigit.pm',
     'Data/Sah/Filter/perl/Str/remove_whitespace.pm',
     'Data/Sah/Filter/perl/Str/replace_map.pm',
@@ -53,6 +54,8 @@ my @module_files = (
     'Data/Sah/Filter/perl/Str/try_center.pm',
     'Data/Sah/Filter/perl/Str/uc.pm',
     'Data/Sah/Filter/perl/Str/ucfirst.pm',
+    'Data/Sah/Filter/perl/Str/underscore_non_latin_alphanum.pm',
+    'Data/Sah/Filter/perl/Str/underscore_non_latin_alphanums.pm',
     'Data/Sah/Filter/perl/Str/upcase.pm',
     'Data/Sah/Filter/perl/Str/uppercase.pm',
     'Data/Sah/Filter/perl/Str/wrap.pm',

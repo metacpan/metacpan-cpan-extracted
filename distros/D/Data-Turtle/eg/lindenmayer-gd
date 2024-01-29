@@ -131,7 +131,7 @@ print $img->png;
 
 sub forward {
     my @line = $turtle->forward( $opts{distance} );
-    if ( @line ) {
+    if ( $turtle->pen_down ) {
         $img->setThickness( $line[5] );
         $img->line( @line[ 0 .. 3 ], $color{ $line[4] } );
     }

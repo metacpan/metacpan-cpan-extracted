@@ -80,7 +80,7 @@
             "Plack::Middleware::ReverseProxy" : "0",
             "Plack::Response" : "0",
             "Plack::Test" : "0",
-            "TAP::Formatter::GitHubActions" : "0",
+            "Test2::Tools::Compare" : "0",
             "Test2::V0" : "0",
             "Test::More" : "0",
             "strict" : "0"
@@ -90,7 +90,7 @@
    "provides" : {
       "Plack::Middleware::Greylist" : {
          "file" : "lib/Plack/Middleware/Greylist.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.7.2"
       }
    },
    "release_status" : "stable",
@@ -104,7 +104,7 @@
          "web" : "https://github.com/robrwo/Plack-Middleware-Greylist"
       }
    },
-   "version" : "v0.6.0",
+   "version" : "v0.7.2",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Gabor Szabo <gabor@szabgab.com>"

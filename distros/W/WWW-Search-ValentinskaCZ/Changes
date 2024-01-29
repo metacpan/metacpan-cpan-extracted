@@ -1,3 +1,25 @@
+0.06 2023-12-12T14:32:54+01:00
+ - Fix dependencies.
+ - Fix test dependencies.
+
+0.05 2023-12-12T14:02:45+01:00
+ - Add support for testing from saved file.
+ - Regen test.
+
+0.04 2023-12-11T11:45:16+01:00
+ - Add EXAMPLE2 to doc.
+ - Fix doc METHODS.
+ - Fix use lib '.' in Makefile.PL.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move bugtracker to github.
+ - Rename example file to better name.
+ - Simplify EXAMPLE1 in doc.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.03 2015-10-30T15:36:28+01:00
  - Add t/data example page.
  - Fix example in doc to situation after 0.02 version.

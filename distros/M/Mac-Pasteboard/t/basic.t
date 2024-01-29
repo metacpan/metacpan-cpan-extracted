@@ -50,8 +50,8 @@ is( Mac::Pasteboard->flavor_flag_names( 512 ), 'kPasteboardFlavorPromised',
 
 is( Mac::Pasteboard->flavor_tags(
 	'com.apple.traditional-mac-plain-text' )->{os},
-    'TEXT',
-    'OS flavor tag for com.apple.traditional-mac-plain-text is TEXT' );
+    ( Mac::Pasteboard::xs_pbl_is_at_least_monterey() ? undef : 'TEXT' ),
+    'OS flavor tag for com.apple.traditional-mac-plain-text' );
 
 done_testing;
 

@@ -1,5 +1,61 @@
-@  changeset:   192:4c83cf8fbaa6
+@  changeset:   199:bfad51286b33
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Thu Dec 14 13:40:52 2023 +0100
+|  files:       MANIFEST
+|  description:
+|  Update MANIFEST
+|
+|
+o  changeset:   198:e3800dd48389
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Thu Dec 14 13:40:11 2023 +0100
+|  files:       example/permissiontestclient.pl lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
+|  description:
+|  Add runOnce() so allow using external event loops. Add example client to show how to handle the "permission_denied" error message available in Net::Clacks::Server 28.
+|
+|
+o  changeset:   197:a5baf425ba60
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Thu Dec 14 11:59:50 2023 +0100
+|  files:       example/clacks_master.xml example/clacks_master_unixdomainsocket.xml example/clacks_slaveserver1.xml example/clacks_slaveserver2.xml
+|  description:
+|  Slightly adapt example configs
+|
+|
+o  changeset:   196:0f4a0863a419
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Thu Dec 14 11:54:15 2023 +0100
+|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/Server.pm
+|  description:
+|  Bump version number to 28
+|
+|
+o  changeset:   195:b5a71b9425a2
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Thu Dec 14 11:53:25 2023 +0100
+|  files:       example/clacks_master.xml example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
+|  description:
+|  Add multi-user support with different permissions
+|
+|
+o  changeset:   194:afc2926d9319
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Wed Dec 13 11:04:35 2023 +0100
+|  files:       Makefile.PL
+|  description:
+|  STart on Version 28: Declare MIN_PERL_VERSION in Makefile.PL (thanks, kcott from PerlMonks!)
+|
+|
+o  changeset:   193:0d97835b7252
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Tue Mar 21 11:17:24 2023 +0100
+|  files:       Changes
+|  description:
+|  Update Changes file
+|
+|
+o  changeset:   192:4c83cf8fbaa6
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Tue Mar 21 10:53:57 2023 +0100
 |  files:       lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/UpgradeGuide.pod

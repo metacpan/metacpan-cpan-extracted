@@ -13,27 +13,25 @@ name: circle-fe-term
 provides:
   Circle::FE::Term:
     file: lib/Circle/FE/Term.pm
-    version: '0.232470'
+    version: '0.240250'
   Circle::FE::Term::Ribbon:
     file: lib/Circle/FE/Term/Ribbon.pm
-    version: '0.232470'
+    version: '0.240250'
   Circle::FE::Term::Tab:
     file: lib/Circle/FE/Term/Tab.pm
-    version: '0.232470'
+    version: '0.240250'
   Circle::FE::Term::Widget::Box:
     file: lib/Circle/FE/Term/Widget/Box.pm
-    version: '0.232470'
+    version: '0.240250'
   Circle::FE::Term::Widget::Entry:
     file: lib/Circle/FE/Term/Widget/Entry.pm
-    version: '0.232470'
-  Circle::FE::Term::Widget::Entry::Widget:
-    file: lib/Circle/FE/Term/Widget/Entry.pm
+    version: '0.240250'
   Circle::FE::Term::Widget::Label:
     file: lib/Circle/FE/Term/Widget/Label.pm
-    version: '0.232470'
+    version: '0.240250'
   Circle::FE::Term::Widget::Scroller:
     file: lib/Circle/FE/Term/Widget/Scroller.pm
-    version: '0.232470'
+    version: '0.240250'
   Circle::FE::Term::Widget::Scroller::Widget:
     file: lib/Circle/FE/Term/Widget/Scroller.pm
 requires:
@@ -42,7 +40,7 @@ requires:
   File::ShareDir: '1.00'
   IO::Async: '0.14'
   Net::Async::Tangence::Client: '0.15'
-  Object::Pad: '0'
+  Object::Pad: '0.800'
   String::Tagged: '0'
   Syntax::Keyword::Match: '0'
   Tangence::ObjectProxy: 0.20_001
@@ -63,5 +61,5 @@ requires:
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.232470'
+version: '0.240250'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

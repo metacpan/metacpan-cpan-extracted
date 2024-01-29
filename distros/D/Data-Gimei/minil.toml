@@ -1,5 +1,5 @@
 name = "Data-Gimei"
-badges = ['github-actions/test']
+badges = ['github-actions/test', 'metacpan']
 authority="cpan:YOUPONG"
 
 module_maker="ModuleBuildTiny"

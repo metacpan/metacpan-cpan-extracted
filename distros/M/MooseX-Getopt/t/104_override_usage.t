@@ -19,8 +19,8 @@ with newline and some 123456789 123456789 123456789 characters' );
 }
 
 my $usage = qr/^\Qusage: 104_override_usage.t [-?h] [long options...]\E
-.*\t.*--help.+Prints this usage information\.
-.*\t--foo (INT)?\s+A foo.+characters/ms;
+\s+.*--help.+Prints this usage information\..*
+\s+--foo (INT)?\s+A foo.+characters/ms;
 
 {
     local @ARGV = ('--foo', '1');

@@ -6,26 +6,25 @@ BEGIN {
 		use strict;
 
 		# a.ammr a.a année d'existence, mm mois, r release
-		$VERSION	= 1.5093; 
-		$YEAR	= '2020';
+		$VERSION	= 1.8122; 
+		$YEAR	= '2024';
 		@ISA		= qw(Exporter);
 		@EXPORT	= qw(oEdtk_release);
+
+		print "(c) 2005-$YEAR oedtk\@free.fr - oEdtk v$VERSION\n";
 }
 
 #
 # CODE - DOC AT THE END
 #
-use strict;
-use warnings;
 
 sub oEdtk_release {
 	# warn "DEBUG: >$?< \nDEBUG: >$@<\n";
-	return "(c) 2005-$YEAR grechary\@cpan.org - edtk\@free.fr - oEdtk v$VERSION\n";
+	return "(c) 2005-$YEAR oedtk\@free.fr - oEdtk v$VERSION\n";
 }
 
 
 END {
-	warn oEdtk_release();
 }
 
 1;
@@ -45,6 +44,24 @@ This is the main module of the oEdtk toolkit. It's intended for documentation
 purposes only.  You will find general information about the diferents tools
 here.
 
+=head1 LICENCE
+
+    oEdtk Copyright (C) 2005-2024 G Chaillou Domingo, D Aunay, M Henrion, G Ballin
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
 =head1 SYNOPSIS
 
 =head2 SIMPLE USE (fixed records)
@@ -62,7 +79,7 @@ here.
         # Reading the input line by line
         while (my $ligne=<IN>) {
             chomp ($ligne);
-            # testing if $line match pre declared records
+            # testing if $line maok, pas de soucitch pre declared records
             if (oe_process_ref_rec(0, 3, $ligne)) {
             } else {
                 # If not, record is ignored
@@ -355,14 +372,14 @@ Example :
 
 =head1 AUTHORS
 
-oEdtk by D Aunay, GJ Chaillou Domingo, M Henrion, G Ballin 2005-2013.
+oEdtk by D Aunay, GJ Chaillou Domingo, M Henrion, G Ballin.
 
 This pod text by GJ Chaillou Domingo, M Henrion and others.
 Perl by Larry Wall and the C<perl5-porters>.
 
 =head1 COPYRIGHT
 
-The oEdtk module is Copyright (c) 2005-2013 D Aunay, GJ Chaillou Domingo, M Henrion, G Ballin.
+The oEdtk module is Copyright (c) .
 All rights reserved.
 
 You may distribute under the terms of either the GNU General Public

@@ -479,6 +479,21 @@ sub cleanup_schema_mysql { [
     "DROP TABLE Users", 
 ] }
 
+sub schema_mariadb {[
+	"DROP TABLE IF EXISTS Users",
+<<EOF
+CREATE TABLE Users (
+    id integer AUTO_INCREMENT,
+    Login varchar(18) NOT NULL,
+    Name varchar(36),
+    Phone varchar(18),
+    PRIMARY KEY (id))
+EOF
+]}
+sub cleanup_schema_mariadb { [
+    "DROP TABLE Users",
+] }
+
 sub schema_pg {
 <<EOF;
 CREATE TEMPORARY TABLE Users (

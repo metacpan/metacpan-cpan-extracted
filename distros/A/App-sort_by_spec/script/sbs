@@ -13,7 +13,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-09-06'; # DATE
 our $DIST = 'App-sort_by_spec'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/sort_by_spec/sort_by_spec",
@@ -40,7 +40,7 @@ sbs - Sort lines of text by spec (shorter alias for 'sort-by-spec')
 
 =head1 VERSION
 
-This document describes version 0.002 of sbs (from Perl distribution App-sort_by_spec), released on 2023-09-06.
+This document describes version 0.003 of sbs (from Perl distribution App-sort_by_spec), released on 2023-09-06.
 
 =head1 SYNOPSIS
 
@@ -58,9 +58,10 @@ See examples in the L</EXAMPLES> section.
 
 This utility lets you sort lines of text "by spec". Sorting by spec in an
 advanced form of sorting by example. In addition to specifying example strings,
-you can also specify regexes or codes. For more details, see L<Sort::BySpec>.
+you can also specify regexes or Perl sorter codes. For more details, see the
+sorting backend module L<Sort::BySpec>.
 
-To specify a regex on the command-line, use one of this form:
+To specify a regex on the command-line, use one of these forms:
 
  /.../
  qr(...)

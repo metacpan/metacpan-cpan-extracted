@@ -3,22 +3,37 @@ package Ixchel::Actions::systemd_auto_list;
 use 5.006;
 use strict;
 use warnings;
+use base 'Ixchel::Actions::base';
 
 =head1 NAME
 
-Ixchel::Actions::systemd_auto_list :: List systemd auto generated services.
+Ixchel::Actions::systemd_auto_list - List systemd auto generated services.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.2.0';
 
-=head1 SYNOPSIS
+=head1 CLI SYNOPSIS
 
-    my @systemd_auto_units=$ixchel->action(action=>'systemd_auto_list', opts=>{np=>1}, );
+ixchel -a <systemd_auto_list>
+
+=head1 CODE SYNOPSIS
+
+    use Data::Dumper;
+
+    my $results=$ixchel->action(action=>'systemd_auto_list', opts=>{np=>1}, );
+
+    if ($results->{ok}) {
+        print 'Service: '.joined(', ', @{ $results->{services} })."\n";
+    }else{
+        die('Action errored... '.joined("\n", @{$results->{errors}}));
+    }
+
+=head1 DESCRIPTION
 
 Returns configured automatically generated systemd units.
 
@@ -28,50 +43,18 @@ Returns configured automatically generated systemd units.
 
 Do not print anything. For use if calling this directly instead of via the cli tool.
 
+=head1 RESULT HASH REF
+
+    .errors :: A array of errors encountered.
+    .status_text :: A string description of what was done and the results.
+    .ok :: Set to zero if any of the above errored.
+    .services :: A array of services.
+
 =cut
 
-sub new {
-	my ( $empty, %opts ) = @_;
+sub new_extra { }
 
-	my $self = {
-		config => {},
-		vars   => {},
-		arggv  => [],
-		opts   => {},
-		ixchel => $opts{ixchel},
-	};
-	bless $self;
-
-	if ( defined( $opts{config} ) ) {
-		$self->{config} = $opts{config};
-	}
-
-	if ( defined( $opts{t} ) ) {
-		$self->{t} = $opts{t};
-	} else {
-		die('$opts{t} is undef');
-	}
-
-	if ( defined( $opts{share_dir} ) ) {
-		$self->{share_dir} = $opts{share_dir};
-	}
-
-	if ( defined( $opts{opts} ) ) {
-		$self->{opts} = \%{ $opts{opts} };
-	}
-
-	if ( defined( $opts{argv} ) ) {
-		$self->{argv} = $opts{argv};
-	}
-
-	if ( defined( $opts{vars} ) ) {
-		$self->{vars} = $opts{vars};
-	}
-
-	return $self;
-} ## end sub new
-
-sub action {
+sub action_extra {
 	my $self = $_[0];
 
 	my @services = keys( %{ $self->{config}{systemd}{auto} } );
@@ -83,15 +66,10 @@ sub action {
 		}
 	}
 
-	return @services;
-} ## end sub action
+	$self->{results}{services} = \@services;
 
-sub help {
-	return 'List systemd auto generated services.
-
---np    Do not print anything.
-';
-}
+	return undef;
+} ## end sub action_extra
 
 sub short {
 	return 'List systemd auto generated services.';

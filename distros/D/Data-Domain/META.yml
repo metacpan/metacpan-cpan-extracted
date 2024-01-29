@@ -5,7 +5,7 @@ author:
 build_requires:
   Clone: '0'
   Test::More: '1.30219'
-  Test::NoWarnings: '0'
+  Test::Warnings: '0'
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
@@ -18,7 +18,7 @@ name: Data-Domain
 provides:
   Data::Domain:
     file: lib/Data/Domain.pm
-    version: '1.12'
+    version: '1.15'
   Data::Domain::All_of:
     file: lib/Data/Domain.pm
   Data::Domain::Date:
@@ -52,6 +52,7 @@ recommends:
 requires:
   Date::Calc: '0'
   List::MoreUtils: '0'
+  List::Util: '1.45'
   Scalar::Does: '0.007'
   Scalar::Util: '0'
   Sub::Exporter: '0'
@@ -63,5 +64,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/Data-Domain
-version: '1.12'
+version: '1.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

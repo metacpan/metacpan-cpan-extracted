@@ -25,7 +25,7 @@ use strict;
 use warnings;
 no warnings;
 
-our $VERSION = '2.133';
+our $VERSION = '2.135';
 
 use Carp qw(carp croak);
 use File::Basename qw(dirname);
@@ -50,6 +50,9 @@ to the right places.
 
 The included C<release> script is a good starting place. Don't be afraid to
 edit it for your own purposes.
+
+The included C<release-test> script is a variation on C<release> aimed at
+pre-release testing against multiple perl versions.
 
 =head2 Configuration
 
@@ -1450,11 +1453,11 @@ This source is in GitHub
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2023, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
+Copyright © 2007-2024, brian d foy C<< <briandfoy@pobox.com> >>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the Artistic License 2.0.

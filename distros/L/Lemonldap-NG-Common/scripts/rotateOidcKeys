@@ -11,6 +11,7 @@ use strict;
 
 use Convert::PEM;
 use Crypt::OpenSSL::RSA;
+use Crypt::PK::ECC;
 use Lemonldap::NG::Common::Conf;
 use Lemonldap::NG::Common::Crypto;
 
@@ -25,17 +26,41 @@ my $conf = $lmconf->getConf();
 
 print "Configuration loaded\n" if $debug;
 
+# Verify type
+my $type = (
+      $conf->{oidcServiceNewPrivateKeySig}
+    ? $conf->{oidcServiceNewKeyTypeSig}
+    : $conf->{oidcServiceKeyTypeSig}
+  )
+  || 'RSA';
+
+die "Unknown key type $type" unless $type =~ /^(?:RSA|EC)$/;
+print "Type is $type\n" if $debug;
+
 #=============================================================================
 # Generate new key
 #=============================================================================
-my $rsa = Crypt::OpenSSL::RSA->generate_key(2048);
+my $keys;
+
 my $key_id =
   Lemonldap::NG::Common::Crypto::srandom()->randpattern("ssssssssss");
-my $keys = {
-    'private' => $rsa->get_private_key_string(),
-    'public'  => $rsa->get_public_key_x509_string(),
-    'id'      => $key_id,
-};
+if ( $type eq 'EC' ) {
+    my $ec_key = Crypt::PK::ECC->new();
+    $ec_key->generate_key('secp256r1');
+    $keys = {
+        private => $ec_key->export_key_pem('private'),
+        public  => $ec_key->export_key_pem('public'),
+        id      => $key_id,
+    };
+}
+else {
+    my $rsa = Crypt::OpenSSL::RSA->generate_key(2048);
+    $keys = {
+        private => $rsa->get_private_key_string(),
+        public  => $rsa->get_public_key_x509_string(),
+        id      => $key_id,
+    };
+}
 
 print "Private key generated:\n" . $keys->{private} . "\n" if $debug;
 print "Public key generated:\n" . $keys->{public} . "\n"   if $debug;
@@ -52,11 +77,13 @@ if ( $conf->{oidcServiceNewKeyIdSig} and $conf->{oidcServiceNewPublicKeySig} ) {
     $conf->{oidcServiceOldPrivateKeySig} = $conf->{oidcServicePrivateKeySig};
     $conf->{oidcServiceOldPublicKeySig}  = $conf->{oidcServicePublicKeySig};
     $conf->{oidcServiceOldKeyIdSig}      = $conf->{oidcServiceKeyIdSig};
+    $conf->{oidcServiceOldKeyTypeSig}    = $conf->{oidcServiceKeyTypeSig};
 
     # Move next key into current one
     $conf->{oidcServicePrivateKeySig} = $conf->{oidcServiceNewPrivateKeySig};
     $conf->{oidcServicePublicKeySig}  = $conf->{oidcServiceNewPublicKeySig};
     $conf->{oidcServiceKeyIdSig}      = $conf->{oidcServiceNewKeyIdSig};
+    $conf->{oidcServiceKeyTypeSig}    = $conf->{oidcServiceNewKeyTypeSig};
 }
 else {
     print STDERR
@@ -67,6 +94,42 @@ else {
 $conf->{oidcServiceNewPrivateKeySig} = $keys->{private};
 $conf->{oidcServiceNewPublicKeySig}  = $keys->{public};
 $conf->{oidcServiceNewKeyIdSig}      = $keys->{id};
+$conf->{oidcServiceNewKeyTypeSig}    = $type;
+
+if ( $conf->{oidcServicePrivateKeyEnc} ) {
+    $type = $conf->{oidcServiceKeyTypeEnc} || 'RSA';
+    $key_id =
+      Lemonldap::NG::Common::Crypto::srandom()->randpattern("ssssssssss");
+    if ( $type eq 'EC' ) {
+        my $ec_key = Crypt::PK::ECC->new();
+        $ec_key->generate_key('secp256r1');
+        $keys = {
+            private => $ec_key->export_key_pem('private'),
+            public  => $ec_key->export_key_pem('public'),
+            id      => $key_id,
+        };
+    }
+    else {
+        my $rsa  = Crypt::OpenSSL::RSA->generate_key(2048);
+        $keys = {
+            'private' => $rsa->get_private_key_string(),
+            'public'  => $rsa->get_public_key_x509_string(),
+            'id'      => $key_id,
+        };
+    }
+
+    # Move current key into previous one
+    $conf->{oidcServiceOldPrivateKeyEnc} = $conf->{oidcServicePrivateKeyEnc};
+    $conf->{oidcServiceOldPublicKeyEnc}  = $conf->{oidcServicePublicKeyEnc};
+    $conf->{oidcServiceOldKeyIdEnc}      = $conf->{oidcServiceKeyIdEnc};
+    $conf->{oidcServiceOldKeyTypeEnc}    = $conf->{oidcServiceKeyTypeEnc};
+
+    # Store new key
+    $conf->{oidcServicePrivateKeyEnc} = $keys->{private};
+    $conf->{oidcServicePublicKeyEnc}  = $keys->{public};
+    $conf->{oidcServiceKeyIdEnc}      = $keys->{id};
+    $conf->{oidcServiceKeyTypeEnc}    = $type;
+}
 
 ( $lmconf->saveConf($conf) > 0 ) or die $Lemonldap::NG::Common::Conf::msg;
 

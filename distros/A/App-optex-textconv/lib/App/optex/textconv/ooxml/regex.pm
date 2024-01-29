@@ -1,6 +1,6 @@
 package App::optex::textconv::ooxml::regex;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use v5.14;
 use warnings;
@@ -57,7 +57,8 @@ sub _xml2text {
     while (m{
 	     (?<footnote> <w:footnote \s+ w:id="(?<fn_id>\d+)" )
 	   | <(?<tag>[apw]:p|si)\b[^>]*>(?<para>.*?)</\g{tag}>
-	   }xsg) {
+	   }xsg)
+    {
 	if ($+{footnote}) {
 	    $fn_id = $+{fn_id};
 	    next;
@@ -71,20 +72,14 @@ sub _xml2text {
 	       | (?<br> <[aw]:br/> )
 	       | (?<tab> <w:tab/> | <w:tabs> )
 	       | <(?<tag>(?:[apw]:)?t)\b[^>]*> (?<text>[^<]*?) </\g{tag}>
-	       }xsg) {
-	    if ($+{fn_ref}) {
-		push @s, "[^$+{fn_id}]";
-	    } elsif ($+{footnote}) {
-		$fn_id = $+{fn_id};
-	    } elsif ($+{footnoteRef}) {
-		push @s, "[^$fn_id]:";
-	    } elsif ($+{br}) {
-		push @s, "\n";
-	    } elsif ($+{tab}) {
-		push @s, "  ";
-	    } else {
-		push @s, $+{text} if $+{text} ne '';
-	    }
+	       }xsg)
+	{
+	    if    ($+{fn_ref})      { push @s, "[^$+{fn_id}]" }
+	    elsif ($+{footnote})    { $fn_id = $+{fn_id} }
+	    elsif ($+{footnoteRef}) { push @s, "[^$fn_id]:" }
+	    elsif ($+{br})          { push @s, "\n" }
+	    elsif ($+{tab})         { push @s, "  " }
+	    elsif ($+{text} ne '')  { push @s, $+{text} }
 	}
 	@s or next;
 	push @p, join($param->{separator}, @s) . ("\n" x $param->{space});
@@ -99,6 +94,7 @@ use Archive::Zip 1.37 qw( :ERROR_CODES :CONSTANTS );
 sub to_text {
     my $file = shift;
     my $type = ($file =~ /\.((?:doc|xls|ppt)[xm])$/)[0] or return;
+    return '' if -z $file;
     my $zip = Archive::Zip->new($file) or die;
     my @contents;
     for my $entry (get_list($zip, $type)) {

@@ -59,7 +59,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 use UI::Various::core;
 
@@ -71,9 +71,9 @@ our @EXPORT_OK = qw();
 
 =item align [rw, optional]
 
-the alignment of a UI element is a digit between 1 and 9, 1 being the upper
-left corner, 2 the upper center, 3 the upper right and so on until the 9 in
-the lower right
+the alignment of a UI element is a digit between 1 and 9, 1 being the lower
+left corner, 2 the lower centre, 3 the lower right and so on until the 9 in
+the upper right
 
 Note: Simply look at the keypad of your keyboard as mnemonic.
 
@@ -84,6 +84,86 @@ Also note that the alignment is ignored by the PoorTerm interface.
 sub align($;$)
 {
     return access('align', undef, @_);
+}
+
+#########################################################################
+
+=item bg [rw, optional]
+
+the background colour of a UI element can either be the name of the basic 8
+colours (black, blue, cyan, green, magenta, red, white, yellow) or a numeric
+code of 6 hexadecimal digits for the RRGGBB value.
+
+Note that colours in the C<Curses> and C<RichTerm> terminal UIs are
+restricted to 6 different values of red, green and blue each (rounded to the
+nearest valid value), and they are completely ignored by the C<PoorTerm>
+interface.
+
+Also note this TUI restriction is independent of possible actual (maybe
+additional) restrictions of the colour-set of a terminal.  I've not yet
+found a reliable way to get this information as even the terminfo entries
+may be wrong (e.g. C<xterm> has an entry of only 8 colours while test with a
+simple shell script show it apparently can display true colour).  The 6^3 ==
+216 colours is just what most terminal emulations should support (using ANSI
+escape codes 38 and 48).
+
+Finally note that C<Curses> will probably mess up the standard terminal
+colours (at least those not being the 8 basic colours) when it exits.  I've
+not yet found a way to reset this.  Restricting an application to the 8
+basic colours (C<black>, C<blue>, C<cyan>, C<green>, C<magenta>, C<red>,
+C<white> and C<yellow>) should be always safe.
+
+=cut
+
+use constant COLOUR => ({black	=> '000000',
+			 blue	=> '0000ff',
+			 cyan	=> '00ffff',
+			 green	=> '00ff00',
+			 magenta=> 'ff00ff',
+			 red	=> 'ff0000',
+			 white	=> 'ffffff',
+			 yellow	=> 'ffff00'});
+
+sub bg($;$)
+{
+    return access('bg',
+		  sub{
+		      $_ = lc($_);
+		      defined ${\COLOUR}->{$_}  and  $_ = ${\COLOUR}->{$_};
+		      unless (m/^[0-9a-f]{6}$/)
+		      {
+			  error('parameter__1_must_be_a_valid_colour', 'bg');
+			  $_ = '000000';
+		      }
+		  },
+		  @_);
+}
+
+#########################################################################
+
+=item fg [rw, optional]
+
+the background colour of a UI element can either be the name of the basic 8
+colours (black, blue, cyan, green, magenta, red, white, yellow) or a numeric
+code of 6 hexadecimal digits for the RRGGBB value.
+
+See C<bg> above for the colour restrictions of the terminal UIs.
+
+=cut
+
+sub fg($;$)
+{
+    return access('fg',
+		  sub{
+		      $_ = lc($_);
+		      defined ${\COLOUR}->{$_}  and  $_ = ${\COLOUR}->{$_};
+		      unless (m/^[0-9a-f]{6}$/)
+		      {
+			  error('parameter__1_must_be_a_valid_colour', 'fg');
+			  $_ = '000000';
+		      }
+		  },
+		  @_);
 }
 
 #########################################################################
@@ -147,13 +227,13 @@ sub width($;$)
     return _inherited_access('width', undef, @_);
 }
 
-# TODO: fg, bg, x, y
+# TODO: x, y
 
 #########################################################################
 #
 # internal constants and data:
 
-use constant COMMON_PARAMETERS  => qw(align height width);
+use constant COMMON_PARAMETERS  => qw(align bg fg height width);
 use constant ALLOWED_PARAMETERS => qw(parent);
 use constant DEFAULT_ATTRIBUTES => (parent => undef);
 
@@ -399,8 +479,6 @@ sub _toplevel($)
     }
     return $_;
 }
-
-# TODO: terminal_color
 
 1;
 

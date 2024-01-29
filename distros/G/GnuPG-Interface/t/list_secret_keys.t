@@ -45,17 +45,20 @@ TEST
 TEST
 {
     my $keylist;
-    if ($gnupg->cmp_version($gnupg->version, '2.1') < 0) {
-	$keylist = '0';
+    if ( $gnupg->cmp_version( $gnupg->version, '2.1' ) < 0 ) {
+        $keylist = '0';
+    }
+    elsif ( $gnupg->cmp_version( $gnupg->version, '2.1.11' ) <= 0 ) {
+        $keylist = '1';
+    }
+    elsif ( $gnupg->cmp_version( $gnupg->version, '2.3.8' ) < 0 ) {
+        $keylist = '2.2';
     }
     else {
-	if ($gnupg->cmp_version($gnupg->version, '2.1.11') <= 0) {
-	    $keylist = '1';
-	}
-	else {
-	    $keylist = '2';
-	}
+        $keylist = '2';
     }
+
+
     my @files_to_test = ( 'test/secret-keys/1.'.$keylist.'.test' );
 
     return file_match( $outfile, @files_to_test );

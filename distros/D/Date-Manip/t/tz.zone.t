@@ -111,10 +111,10 @@ stdonly
    =>
    Atlantic/South_Georgia
    America/Noronha
+   America/Scoresbysund
    America/Nuuk
    Etc/GMT-2
    B
-   America/Scoresbysund
    Atlantic/Cape_Verde
    Atlantic/Azores
 
@@ -123,10 +123,10 @@ stdonly
    =>
    Atlantic/South_Georgia
    America/Noronha
+   America/Scoresbysund
    America/Nuuk
    Etc/GMT-2
    B
-   America/Scoresbysund
    Atlantic/Cape_Verde
    Atlantic/Azores
 

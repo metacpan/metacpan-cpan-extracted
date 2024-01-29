@@ -18,49 +18,48 @@ use Params::Validate               qw/validate_with SCALAR ARRAYREF CODEREF UNDE
 
 use Carp::Clan                     qw[^(DBIx::DataModel::|SQL::Abstract)];
 
-use SQL::Abstract::More 1.40;
+use SQL::Abstract::More 1.41;
 use Try::Tiny;
 use mro                            qw/c3/;
 
 use namespace::clean;
 
 
-my $spec = {
-  dbh                   => {type => OBJECT|ARRAYREF, optional => 1},
-  debug                 => {type => OBJECT|SCALAR,   optional => 1},
-  sql_abstract          => {type => OBJECT,
-                            isa  => 'SQL::Abstract::More',
-                            optional => 1},
-  dbi_prepare_method    => {type => SCALAR,   default  => 'prepare'},
-  placeholder_prefix    => {type => SCALAR,   default  => '?:'},
-  select_implicitly_for => {type => SCALAR,   default  => ''},
-  autolimit_firstrow    => {type => BOOLEAN,  optional => 1},
-  db_schema             => {type => SCALAR,   optional => 1},
-  resultAs_classes      => {type => ARRAYREF, optional => 1},
+my $schema_attributes_spec = {
+  dbh                   => {type => OBJECT|ARRAYREF, optional => 1                                        },
+  debug                 => {type => OBJECT|SCALAR,   optional => 1                                        },
+  sql_abstract          => {type => OBJECT,          optional => 1,         isa   => 'SQL::Abstract::More'},
+  dbi_prepare_method    => {type => SCALAR,          default  => 'prepare'                                },
+  placeholder_prefix    => {type => SCALAR,          default  => '?:'                                     },
+  select_implicitly_for => {type => SCALAR,          default  => ''                                       },
+  autolimit_firstrow    => {type => BOOLEAN,         optional => 1                                        },
+  db_schema             => {type => SCALAR,          optional => 1                                        },
+  resultAs_classes      => {type => ARRAYREF,        optional => 1                                        },
+  handleError_policy    => {type => SCALAR,          default  => 'combine', regex => qr(^(if_absent
+                                                                                         |combine
+                                                                                         |override
+                                                                                         |none)$)x        },
 };
-
 
 
 sub new {
   my $class = shift;
 
-  my $metadm = $class->metadm;
+  my %args = @_;
+  my $dbh = delete $args{dbh}; # this arg needs special treatment
 
+  # setup metaclass
+  my $metadm = $class->metadm;
   not $metadm->{singleton}
     or croak "$class is already used in single-schema mode, can't call new()";
 
-  # validate params
-  my %params = validate_with(
-    params      => \@_,
-    spec        => $spec,
+  # validate params and create $self
+  my $self = validate_with(
+    params      => [%args],
+    spec        => $schema_attributes_spec,
     allow_extra => 0,
    );
-
-  # instantiate and call 'setter' methods for %params
-  my $self = bless {}, $class;
-  while (my ($method, $arg) = each %params) {
-    $self->$method($arg);
-  }
+  bless $self, $class;
 
   # default SQLA
   $self->{sql_abstract} ||= $metadm->sql_abstract_class->new($metadm->sql_abstract_args);
@@ -71,8 +70,33 @@ sub new {
   # from now on, singleton mode will be forbidden
   $metadm->{singleton} = undef;
 
+  # initial dbh if it was passed within %args;
+  $self->dbh($dbh) if $dbh;
+
   return $self;
 }
+
+
+# install simple-minded rw accessors for schema attributes
+foreach my $accessor (grep {$_ ne 'dbh'} keys %$schema_attributes_spec) {
+  no strict 'refs';
+  *$accessor = sub {
+    my $self = shift;
+    ref $self or $self = $self->singleton;
+
+    if (@_) {
+      my ($new_val) = validate_with(params      => \@_,
+                                    spec        => [ $schema_attributes_spec->{$accessor} ],
+                                    allow_extra => 0);
+      $self->{$accessor} = $new_val;
+    }
+    return $self->{$accessor};
+  };
+}
+
+
+
+
 
 
 # proxy methods, forwarded to the meta-schema
@@ -135,6 +159,22 @@ sub dbh {
       $dbh->{RaiseError} 
         or croak "arg to dbh(..) must have RaiseError=1";
 
+      # install a HandleError attribute so that error reporting goes through Carp::Clan
+      my $HE_policy = $self->handleError_policy;
+      if ($HE_policy ne 'none') {
+        my $prev_handler   = $dbh->{HandleError}; # see L<DBI/HandleError>
+
+        my $should_install = !$prev_handler || ($HE_policy eq 'combine' || $HE_policy eq 'override');
+        $should_install  &&= 0 if ($prev_handler || -1) == ($dbh->{private_dbix_datamodel_handle_error} || -2);
+        if ($should_install) {
+          my $new_handler = $prev_handler && $HE_policy eq 'combine'   ? sub {my $was_handled = $prev_handler->(@_);
+                                                                              croak shift unless $was_handled}
+                                                                       : sub {croak shift};
+          $dbh->{HandleError} = $new_handler;
+          $dbh->{private_dbix_datamodel_handle_error} = $new_handler;
+        }
+      }
+
       # default values for $dbh_options{returning_through}
       if (not exists $dbh_options{returning_through}) {
         for ($dbh->{Driver}{Name}) {
@@ -156,24 +196,6 @@ sub dbh {
   return wantarray ? @$return_dbh : $return_dbh->[0];
 }
 
-
-
-# some rw setters/getters
-my @accessors = qw/debug select_implicitly_for dbi_prepare_method 
-                   sql_abstract placeholder_prefix autolimit_firstrow
-                   db_schema resultAs_classes/;
-foreach my $accessor (@accessors) {
-  no strict 'refs';
-  *$accessor = sub {
-    my $self = shift;
-    ref $self or $self = $self->singleton;
-
-    if (@_) {
-      $self->{$accessor} = shift;
-    }
-    return $self->{$accessor};
-  };
-}
 
 
 sub with_db_schema {
@@ -386,12 +408,12 @@ sub DESTROY { # called when the guard goes out of scope
   my ($schema, $previous_state) = @$self;
 
   # must cleanup dbh so that ->dbh(..) does not complain if in a transaction
-  if (exists $previous_state->{dbh}) {
-    delete $schema->{dbh};
-  }
-
+  delete $schema->{dbh} if exists $previous_state->{dbh};
+    
   # invoke "setter" method on each state component
-  $schema->$_($previous_state->{$_}) foreach keys %$previous_state;
+  while (my ($k, $v) = each %$previous_state) {
+    $schema->$k($v) if $v;
+  }
 }
 
 

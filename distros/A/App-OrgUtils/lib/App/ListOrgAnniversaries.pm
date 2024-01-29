@@ -13,9 +13,9 @@ use Exporter 'import';
 use Lingua::EN::Numbers::Ordinate;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-12'; # DATE
+our $DATE = '2024-01-09'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.486'; # VERSION
+our $VERSION = '0.487'; # VERSION
 
 our @EXPORT_OK = qw(list_org_anniversaries);
 
@@ -207,7 +207,7 @@ _
         field_pattern => {
             summary => 'Regex for fields that specify anniversaries',
             schema  => 're*',
-            default => qr/(?:birthday|anniversary)/i,
+            default => qr/(?:birthday|dob|date of birth|anniversary)/i,
         },
         reminded_field_pattern => {
             schema => 're*',
@@ -330,7 +330,7 @@ App::ListOrgAnniversaries - List all anniversaries in Org files
 
 =head1 VERSION
 
-This document describes version 0.486 of App::ListOrgAnniversaries (from Perl distribution App-OrgUtils), released on 2023-07-12.
+This document describes version 0.487 of App::ListOrgAnniversaries (from Perl distribution App-OrgUtils), released on 2024-01-09.
 
 =head1 SYNOPSIS
 
@@ -407,7 +407,7 @@ Arguments ('*' denotes required arguments):
 
 Only show anniversaries that are due in this number of days.
 
-=item * B<field_pattern> => I<re> (default: qr((?:birthday|anniversary))i)
+=item * B<field_pattern> => I<re> (default: qr((?:birthday|dob|date of birth|anniversary))i)
 
 Regex for fields that specify anniversaries.
 
@@ -504,7 +504,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

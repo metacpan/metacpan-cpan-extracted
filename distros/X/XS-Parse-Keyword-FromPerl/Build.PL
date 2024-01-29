@@ -15,8 +15,10 @@ my $build = Module::Build->new(
    },
    requires => {
       'perl' => '5.026',
+      'meta' => '0.003_002',
       'XS::Parse::Keyword' => '0.35',
       'XS::Parse::Infix' => '0.35',
+      ( $^V lt v5.36.0 ? ( 'builtin::Backport' => 0 ) : () ),
    },
    test_requires => {
       'Test2::V0' => 0,

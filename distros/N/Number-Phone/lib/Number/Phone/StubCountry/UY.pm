@@ -22,15 +22,18 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230903131448;
+our $VERSION = 1.20231210185946;
 
 my $formatters = [
                 {
                   'format' => '$1 $2',
+                  'pattern' => '(\\d{3})(\\d{3,4})'
+                },
+                {
+                  'format' => '$1 $2',
                   'leading_digits' => '
-            405|
-            8|
-            90
+            [49]0|
+            8
           ',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{3})(\\d{4})'
@@ -48,13 +51,11 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '4',
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{2,4})'
                 },
                 {
                   'format' => '$1 $2 $3 $4',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})(\\d{4})'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})(\\d{2,4})'
                 }
               ];
 
@@ -63,7 +64,10 @@ my $validators = {
           (?:
             1(?:
               770|
-              987
+              9(?:
+                20|
+                87
+              )
             )|
             (?:
               2\\d|
@@ -75,7 +79,10 @@ my $validators = {
           (?:
             1(?:
               770|
-              987
+              9(?:
+                20|
+                87
+              )
             )|
             (?:
               2\\d|
@@ -88,45 +95,34 @@ my $validators = {
                 'personal_number' => '',
                 'specialrate' => '(90[0-8]\\d{4})',
                 'toll_free' => '
+          0004\\d{2,9}|
           (?:
-            (?:
-              0004|
-              4
-            )\\d{5}|
+            405|
             80[05]
-          )\\d{4}|
-          405\\d{4}
+          )\\d{4}
         ',
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"598447", "Rocha",
-"5984365", "Durazno",
-"5984366", "Durazno",
-"598453", "Mercedes\/Soriano",
-"598456", "Fray\ Bentos\/Rio\ Negro",
-"598462", "Rivera",
-"5984364", "Trinidad\/Flores",
-"5984367", "Durazno",
-"598477", "Artigas",
-"5984360", "Durazno",
-"5984363", "Durazno",
-"598472", "Paysandu",
-"5984368", "Durazno",
-"598434", "San\ Jose\ de\ Mayo",
-"598464", "Melo\/Cerro\ Largo",
-"5984362", "Durazno",
+$areanames{en} = {"5982", "Montevideo",
 "598435", "Florida",
 "598473", "Salto",
-"598444", "Minas\/Lavalleja",
+"598462", "Rivera",
+"598445", "Treinta\ y\ Tres",
 "598433", "Canelones",
 "59842", "San\ Carlos",
-"5984361", "Durazno",
 "598463", "Tacuarembo",
+"598472", "Paysandu",
+"598436", "Durazno",
+"598434", "San\ Jose\ de\ Mayo",
+"598453", "Mercedes\/Soriano",
+"598444", "Minas\/Lavalleja",
+"598456", "Fray\ Bentos\/Rio\ Negro",
+"598464", "Melo\/Cerro\ Largo",
+"598477", "Artigas",
 "598452", "Colonia\ del\ Scaramento",
-"5984369", "Durazno",
-"5982", "Montevideo",
-"598445", "Treinta\ y\ Tres",};
+"598447", "Rocha",
+"5984364", "Trinidad\/Flores",};
 
     sub new {
       my $class = shift;

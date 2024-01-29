@@ -70,6 +70,7 @@ lib/SQL/Translator/Schema/Constants.pm
 lib/SQL/Translator/Schema/Constraint.pm
 lib/SQL/Translator/Schema/Field.pm
 lib/SQL/Translator/Schema/Index.pm
+lib/SQL/Translator/Schema/IndexField.pm
 lib/SQL/Translator/Schema/Object.pm
 lib/SQL/Translator/Schema/Procedure.pm
 lib/SQL/Translator/Schema/Role/Compare.pm
@@ -170,6 +171,7 @@ t/71-generator-sql_server.t
 t/72-sqlite-add-drop-fields.t
 t/73-sqlite-respects-quote.t
 t/74-filename-arrayref.t
+t/75-sqlserver-producer.t
 t/data/access/gdpdm.ddl
 t/data/diff/create1.yml
 t/data/diff/create2.yml

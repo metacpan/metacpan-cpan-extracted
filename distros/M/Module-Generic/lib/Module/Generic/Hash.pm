@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Hash.pm
-## Version v1.3.1
+## Version v1.4.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2023/09/19
+## Modified 2023/12/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,7 +17,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
-    use vars qw( $KEY_OBJECT );
+    use vars qw( $VERSION $DEBUG $KEY_OBJECT );
     use Clone ();
     use Data::Dumper;
     use JSON;
@@ -43,7 +43,7 @@ BEGIN
     );
     # Do we allow the use of object as hash keys?
     our $KEY_OBJECT = 0;
-    our( $VERSION ) = 'v1.3.1';
+    our( $VERSION ) = 'v1.4.0';
 };
 
 use strict;
@@ -60,8 +60,8 @@ sub new
     my %hash = ();
     # This enables access to the hash just like a real hash while still the user an call our object methods
     my $obj = tie( %hash, 'Module::Generic::TieHash', {
-        disable => ['Module::Generic'],
-        debug => 0,
+        # disable => ['Module::Generic'],
+        debug => $DEBUG,
         enable => 0,
         # Should we allow objects to be used as key? Default to false
         key_object => $KEY_OBJECT,
@@ -109,7 +109,20 @@ sub new
 
 # We are already an hash, so no need to do anything.
 # To convert to a regular hash as needed by JSON, the method TO_JSON can be used.
-sub as_hash { return( $_[0] ); }
+sub as_hash
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $opts = $self->_get_args_as_hash( @_ );
+        if( $opts->{strict} )
+        {
+            my $ref = { %$self };
+            return( $ref );
+        }
+    }
+    return( $self );
+}
 
 sub as_json { return( shift->json(@_)->scalar ); }
 

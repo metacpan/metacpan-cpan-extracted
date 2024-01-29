@@ -1,0 +1,19 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+# CharacterData in JavaScript
+class Eg::Node::Comment extends Eg::Node::CharacterData {
+  
+  allow Eg::Node::Document;
+  
+  # Class Methods
+  private static method new : Eg::Node::Comment ($node_value : string) {
+    
+    my $self = new Eg::Node::Comment;
+    
+    $self->SUPER::init({node_type => Eg::Node->TYPE_COMMENT_NODE, node_value => $node_value});
+    
+    return $self;
+  }
+  
+}

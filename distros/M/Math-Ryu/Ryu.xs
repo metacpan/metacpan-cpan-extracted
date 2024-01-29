@@ -30,6 +30,7 @@ NV M_RYU_s2d(char * buffer) {
 void M_RYU_d2s_buffered_n(pTHX_ SV * nv) {
   dXSARGS;
   int n;
+  PERL_UNUSED_ARG(items);
   char * result;
 
   Newxz(result, D_BUF, char);
@@ -66,6 +67,7 @@ void M_RYU_d2fixed_buffered_n(pTHX_ SV * nv, SV * prec) {
   dXSARGS;
   int n;
   char * result;
+  PERL_UNUSED_ARG(items);
 
   Newxz(result, D_BUF + SvUV(prec), char);
 
@@ -101,6 +103,7 @@ void M_RYU_d2exp_buffered_n(pTHX_ SV * nv, SV * exponent) {
   dXSARGS;
   int n;
   char * result;
+  PERL_UNUSED_ARG(items);
 
   Newxz(result, D_BUF + SvUV(exponent), char);
 

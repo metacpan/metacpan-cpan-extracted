@@ -110,6 +110,30 @@ sub process {
     $stream->write("3\t[hello] What's up?\tPoet <poet\@example.com>\t3 Oct 1998 04:38:40 -0500\t<1\@example.com>\t\t73\t3\r\n");
     $stream->write("4\t[hello] I don't know what I'm doing\tBard <bard\@example.com>\t4 Oct 1998 05:38:40 -0500\t<2\@example.com>\t<1\@example.net>\t1234\t17\r\n");
     $stream->write(".\r\n");
+  } elsif ($line =~ /^NEWNEWS \* \d\d\d\d\d\d \d\d\d\d\d\d/i) {
+    $stream->write("230 list of new articles by message-id follows\r\n");
+    $stream->write("<2\@example.com>\r\n");
+    $stream->write("<1\@example.com>\r\n");
+    $stream->write(".\r\n");
+  } elsif ($line =~ /^HEAD <1\@example.com>$/i) {
+    $stream->write("220 1 <1\@example.com>\r\n");
+    $stream->write("Path: pathost!demo!whitehouse!not-for-mail\r\n");
+    $stream->write("From: Poet <poet\@example.net>\r\n");
+    $stream->write("Newsgroups: local.test\r\n");
+    $stream->write("Subject: Haiku\r\n");
+    $stream->write("Date: 6 Oct 1998 04:38:40 -0500\r\n");
+    $stream->write("Message-ID: <1\@example.com>\r\n");
+    $stream->write(".\r\n");
+  } elsif ($line =~ /^HEAD <2\@example.com>$/i) {
+    $stream->write("220 2 <2\@example.com>\r\n");
+    $stream->write("Path: pathost!demo!whitehouse!not-for-mail\r\n");
+    $stream->write("From: Bard <bard\@example.com>\r\n");
+    $stream->write("Newsgroups: local.test\r\n");
+    $stream->write("Subject: Re: Haiku\r\n");
+    $stream->write("Date: 6 Oct 1998 05:38:40 -0500\r\n");
+    $stream->write("Message-ID: <2\@example.com>\r\n");
+    $stream->write("References: <1\@example.com>\r\n");
+    $stream->write(".\r\n");
   } else {
     diag("Unhandled: $line");
   }

@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 27;
+our $VERSION = 28;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -30,6 +30,8 @@ if(!defined($peer) || $peer !~ /\:/) {
 my ($host, $port) = split/\:/, $peer;
 my $username = 'exampleuser';
 my $password = 'unsafepassword';
+#my $username = 'rouser';
+#my $password = 'bar';
 my $authtoken = encode_base64($username, '') . ':' . encode_base64($password, '');
 my @initcommands = (
     "CLACKS devclient",

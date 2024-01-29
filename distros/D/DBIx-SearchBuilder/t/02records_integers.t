@@ -148,6 +148,17 @@ EOF
 
 }
 
+sub schema_mariadb {
+<<EOF;
+CREATE TEMPORARY TABLE MyTable (
+    id integer PRIMARY KEY AUTO_INCREMENT,
+    Optional integer NULL,
+    Mandatory integer NOT NULL DEFAULT 1
+)
+EOF
+
+}
+
 sub schema_pg {
 <<EOF;
 CREATE TEMPORARY TABLE MyTable (

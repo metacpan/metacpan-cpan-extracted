@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.014;
 
-our $VERSION = '5.01';
+our $VERSION = '5.04';
 
 use utf8;
 use DateTime;
@@ -15,9 +15,10 @@ use List::Util      qw(first max);
 use Travel::Status::DE::HAFAS;
 
 my ( $date, $time, $language );
-my $arrivals = 0;
-my $types    = q{};
+my $arrivals;
+my $types = q{};
 my $developer_mode;
+my $via;
 my ( $json_output,   $raw_json_output );
 my ( $list_services, $service );
 my ( @excluded_mots, @exclusive_mots );
@@ -29,6 +30,9 @@ for my $arg (@ARGV) {
 	$arg = decode( 'UTF-8', $arg );
 }
 
+my $output_bold  = -t STDOUT ? "\033[1m" : q{};
+my $output_reset = -t STDOUT ? "\033[0m" : q{};
+
 GetOptions(
 	'a|arrivals'   => \$arrivals,
 	'd|date=s'     => \$date,
@@ -37,6 +41,7 @@ GetOptions(
 	'm|mot=s'      => \$types,
 	's|service=s'  => \$service,
 	't|time=s'     => \$time,
+	'v|via=s'      => \$via,
 	'V|version'    => \&show_version,
 	'devmode'      => \$developer_mode,
 	'json'         => \$json_output,
@@ -198,6 +203,24 @@ sub show_similar_stops {
 	return;
 }
 
+sub journey_has_via {
+	my ( $journey, $via ) = @_;
+
+	if ( $via =~ m{ ^ [0-9,]+ $ }x ) {
+		for my $eva ( split( qr{,}, $via ) ) {
+			if ( my $stop = first { $_->loc->eva == $eva } $journey->route ) {
+				return $stop;
+			}
+		}
+		return;
+	}
+
+	if ( my $stop = first { $_->loc->name =~ m{$via}io } $journey->route ) {
+		return $stop;
+	}
+	return;
+}
+
 sub display_result {
 	my (@lines) = @_;
 
@@ -302,6 +325,19 @@ if ( $opt{journeyMatch} ) {
 		$opt{journey} = { id => $journey->id };
 		delete $opt{journeyMatch};
 		$status = Travel::Status::DE::HAFAS->new(%opt);
+		if ( my $err = $status->errstr ) {
+			say STDERR "Request error: ${err}";
+			if (
+				$status->errcode
+				and
+				( $status->errcode eq 'H730' or $status->errcode eq 'LOCATION' )
+				and not $raw_json_output
+			  )
+			{
+				show_similar_stops();
+			}
+			exit 2;
+		}
 	}
 	else {
 		for my $result ( $status->results ) {
@@ -348,12 +384,13 @@ elsif ( $opt{journey} ) {
 
 	printf( "%s → %s", $result->name, $result->route_end );
 	if ( $result->number ) {
-		printf( "  |  Zug  %s", $result->number );
+		printf( " / Zug %s", $result->number );
 	}
-	if ( $result->line ) {
-		printf( "  |  Linie %s", $result->line );
+	if ( $result->line_no ) {
+		printf( " / Linie %s", $result->line_no );
 	}
-	say q{};
+	printf( "\nFahrt %s am %s\n\n",
+		$result->id, ( $result->route )[0]->sched_dep->strftime('%d.%m.%Y') );
 
 	my $delay_len     = 0;
 	my $delay_fmt     = 0;
@@ -369,6 +406,19 @@ elsif ( $opt{journey} ) {
 	}
 	if ($delay_len) {
 		$delay_fmt = $delay_len + 3;
+	}
+
+	my $now       = DateTime->now( time_zone => 'Europe/Berlin' );
+	my $mark_stop = 0;
+	for my $i ( reverse 1 .. scalar $result->route ) {
+		my $stop = ( $result->route )[ $i - 1 ];
+		if ( not $stop->dep_cancelled and $stop->dep and $now <= $stop->dep ) {
+			$mark_stop = $stop;
+		}
+		elsif ( not $stop->arr_cancelled and $stop->arr and $now <= $stop->arr )
+		{
+			$mark_stop = $stop;
+		}
 	}
 
 	my $message_id = 1;
@@ -388,7 +438,8 @@ elsif ( $opt{journey} ) {
 			}
 		}
 		printf(
-"%5s %s %5s %-${delay_fmt}s%${occupancy_len}s%-${occupancy_len}s %s%s%s\n",
+"%s%5s %s %5s %-${delay_fmt}s%${occupancy_len}s%-${occupancy_len}s %s%s%s%s\n",
+			$stop == $mark_stop  ? $output_bold : q{},
 			$stop->arr_cancelled ? '--:--'
 			: ( $stop->arr ? $stop->arr->strftime('%H:%M') : q{} ),
 			( $stop->arr and $stop->dep ) ? '→' : q{ },
@@ -400,7 +451,8 @@ elsif ( $opt{journey} ) {
 			$stop->load->{SECOND} ? display_occupancy( $stop->load->{SECOND} )
 			: q{},
 			$stop->loc->name,
-			$stop->direction ? sprintf( ' → %s', $stop->direction ) : q{},
+			$stop == $mark_stop ? $output_reset                        : q{},
+			$stop->direction    ? sprintf( ' → %s', $stop->direction ) : q{},
 			$msg_line,
 		);
 	}
@@ -434,6 +486,10 @@ my @results = map { $_->[1] }
   sort { $a->[0] <=> $b->[0] }
   map { [ $_->datetime->epoch, $_ ] } $status->results;
 
+if ($via) {
+	@results = grep { journey_has_via( $_, $via ) } @results;
+}
+
 my $delay_len     = 0;
 my $occupancy_len = 0;
 for my $d (@results) {
@@ -458,6 +514,7 @@ for my $d (@results) {
 
 	for my $message ( $d->messages ) {
 		if ( $message->ref_count > 0 ) {
+			$message->{show} = 1;
 			$info_line = sprintf( '(%d) %s', $message->{id}, $info_line );
 		}
 	}
@@ -469,26 +526,38 @@ for my $d (@results) {
 		  . $info_line;
 	}
 
-	push(
-		@output,
-		[
-			$d->is_cancelled ? '--:--' : $d->datetime->strftime('%H:%M'),
-			$d->is_cancelled
-			? q{}
-			: format_delay( $d->delay, $delay_len ),
-			$d->name,
-			$d->route_end,
-			( $d->platform // q{} ) . ( $d->is_changed_platform ? ' !' : q{} ),
-			$info_line,
-			$d
-		]
-	);
+	my $entry = [
+		$d->is_cancelled ? '--:--' : $d->datetime->strftime('%H:%M'),
+		$d->is_cancelled
+		? q{}
+		: format_delay( $d->delay, $delay_len ),
+		$d->name,
+		$d->route_end,
+		( $d->platform // q{} ) . ( $d->is_changed_platform ? ' !' : q{} ),
+		$info_line,
+		$d
+	];
+
+	if ($via) {
+		my $stop = journey_has_via( $d, $via );
+
+		# HAFAS does not provide real-time data for route entries, so we have to guesstimate the arrival time
+		$entry->[0] .= ' → '
+		  . (
+			$stop->arr_cancelled
+			? '--:--'
+			: $stop->arr->clone->add( minutes => $d->delay // 0 )
+			  ->strftime('%H:%M')
+		  );
+	}
+
+	push( @output, $entry, );
 }
 
 display_result(@output);
 
 for my $m ( $status->messages ) {
-	if ( $m->ref_count > 0 ) {
+	if ( $m->ref_count > 0 and $m->{show} ) {
 		if ( $m->short ) {
 			printf( "\n# (%d) %s\n# %s\n", $m->{id}, $m->short, $m->text );
 		}
@@ -515,7 +584,7 @@ B<hafas-m> [B<-s> I<service>] [B<-l> I<language>] B<!>I<query>|I<journeyID>
 
 =head1 VERSION
 
-version 5.01
+version 5.04
 
 =head1 DESCRIPTION
 
@@ -623,6 +692,13 @@ to DB (Deutsche Bahn). See B<--list> for a list of known services.
 
 Time to list departures for.  Default: now.
 
+=item B<-v>, B<--via> I<stopname>|I<eva1>,I<eva2>,...
+
+Only show departures that pass by I<stopname> (or arivals that have passed by
+I<stopname>). If I<stopname> is given as a list of numeric EVA IDs, only
+arrivals/departures with an exact EVA ID match are shown. Otherwise I<stopname>
+is treated as a regular expression and matched against stop names.
+
 =item B<-V>, B<--version>
 
 Show version information and exit.
@@ -649,7 +725,15 @@ None.
 
 =head1 BUGS AND LIMITATIONS
 
-The non-default services (anything other than DB) are not well-tested.
+=over
+
+=item * The non-default services (anything other than DB) are not well-tested.
+
+=item * HAFAS does not provide real-time data for routes of stationboard
+entries.  Hence, B<--via> estimates the arrival time from scheduled
+departure and departure delay
+
+=back
 
 =head1 AUTHOR
 

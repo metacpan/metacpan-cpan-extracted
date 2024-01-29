@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::Font';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use PDF::Builder::Util;
 use PDF::Builder::Basic::PDF::Utils;
@@ -40,13 +40,15 @@ for body text!
 
 =head1 METHODS
 
-=over 4
+=head2 new
 
-=cut
+    $font = PDF::Builder::Resource::Font::BdFont->new($pdf, $font, %options)
 
-=item $font = PDF::Builder::Resource::Font::BdFont->new($pdf, $font, %options)
+=over
 
 Returns a BmpFont object.
+
+=back
 
 =cut
 
@@ -437,8 +439,6 @@ sub filled_circle {
 1;
 
 __END__
-
-=back
 
 =head1 AUTHOR
 

@@ -106,4 +106,4 @@ perltidy\.(LOG|ERR)
 fatlib/
 ^\.mite$
 cpanfile\.snapshot$
-local/
+^local/

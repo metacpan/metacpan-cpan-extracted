@@ -1,3 +1,18 @@
+0.024   2024-01-17  Released-By: PERLANCAR; Urgency: medium
+
+        - Support specifying gen arguments as string using the Foo=arg1,val1,...
+          syntax.
+
+
+0.023   2024-01-16  Released-By: PERLANCAR; Urgency: medium
+
+        - Add filters:
+          Str::{remove_non_latin_alphanum,underscore_non_latin_alphanum,und
+          erscore_non_latin_alphanums}.
+
+        - [doc] Clarify that generated filtering code is not only Perl.
+
+
 0.022   2023-08-16  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

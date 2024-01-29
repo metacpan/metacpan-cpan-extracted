@@ -3,6 +3,7 @@ Build.PL
 Changes
 examples/highlight.pl
 examples/viewtree.pl
+hax/croak_from_caller.c.inc
 languages/tree-sitter-fourfunc/grammar.js
 languages/tree-sitter-fourfunc/queries/highlights.scm
 languages/tree-sitter-fourfunc/queries/zero.scm

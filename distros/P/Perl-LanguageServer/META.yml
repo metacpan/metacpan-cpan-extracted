@@ -35,5 +35,5 @@ requires:
 resources:
   bugtracker: https://github.com/richterger/Perl-LanguageServer/issues
   repository: https://github.com/richterger/Perl-LanguageServer.git
-version: v2.6.1
+version: v2.6.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

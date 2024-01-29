@@ -4,7 +4,7 @@
       "Craig Manley"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -39,7 +39,7 @@
             "Crypt::OpenSSL::Random" : "0",
             "MIME::Base64" : "0",
             "Readonly" : "2",
-            "perl" : "5.01"
+            "perl" : "5.010"
          }
       }
    },
@@ -54,6 +54,6 @@
          "web" : "https://github.com/cmanley/p5-PHP-Functions-Password/"
       }
    },
-   "version" : "1.13",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "2.01",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

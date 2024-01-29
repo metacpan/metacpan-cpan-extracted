@@ -1,0 +1,37 @@
+# MANIFEST Sun 03 Dec 2023 13:50:32 MSK
+
+# General
+Changes                                  Changes list
+INSTALL.md                               Installation instructions
+LICENSE                                  License file
+Makefile.PL                              Makefile builder
+MANIFEST                                 This file
+README.md                                !!! README FIRST !!!
+TODO                                     TO DO
+
+# Libs
+lib/Acme/Ghost.pm                        Main library
+lib/Acme/Ghost/FilePid.pm                FilePid interface
+lib/Acme/Ghost/Log.pm                    Daemon logger
+lib/Acme/Ghost/Prefork.pm                Preforked daemon
+
+# Tests
+t/00-fixme.t                             FIXME/TODO/BUG warnings
+t/00-pod-coverage.t                      POD::Coverage testing
+t/00-pod.t                               Checking all POD documents
+t/00-trailingspace.t                     Style test: TrailingSpace
+t/01-use.t                               Test script
+t/02-daemon.t                            Daemon
+t/03-filepid.t                           FilePid interface
+t/04-log.t                               Daemon logger
+
+# Examples
+eg/ghost_acme.pl
+eg/ghost_ae.pl
+eg/ghost_ioloop.pl
+eg/ghost_nobody.pl
+eg/ghost_simple.pl
+eg/prefork_acme.pl
+eg/prefork_ioloop.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.7.0
+## Version v0.8.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2023/09/05
+## Modified 2024/01/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -127,7 +127,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.7.0';
+    our $VERSION = 'v0.8.0';
 };
 
 use strict;
@@ -1481,7 +1481,7 @@ sub glob
     my $pattern;
     if( scalar( @_ ) )
     {
-        # patter provided, if any, must be a regular string
+        # pattern provided, if any, must be a regular string
         return( $self->error( "Unsupported pattern provided ($_[0]). It must be a regular scalar, but instead is '", overload::StrVal( $_[0] ), "'" ) ) if( ref( $_[0] ) );
         $pattern = shift( @_ );
     }
@@ -2734,6 +2734,21 @@ sub readlink
     return( $self->new( $rv, { base_dir => $self->parent, os => $self->{os} } ) );
 }
 
+sub realpath
+{
+    my $self = shift( @_ );
+    my $path = shift( @_ ) || $self->filename;
+    # try-catch
+    local $@;
+    my $real = eval
+    {
+        require Cwd;
+        return( Cwd::realpath( $path ) );
+    };
+    return( $self->error( "Error getting the real path for $path: $@" ) ) if( $@ );
+    return( $self->new( $real, { base_dir => $self->parent, os => $self->{os} } ) );
+}
+
 sub relative
 {
     my $self = shift( @_ );
@@ -3399,6 +3414,7 @@ sub unload_json
     my $self = shift( @_ );
     my $data = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
+    # my $j = JSON->new->allow_nonref->allow_blessed->convert_blessed->allow_tags->relaxed;
     my $j = $self->new_json || return( $self->pass_error );
     my $equi =
     {
@@ -4511,10 +4527,12 @@ Module::Generic::File - File Object Abstraction Class
         die( $file->error );
 
     $file->flock(1) || die( $file->error );
+    my $new_object = $file->realpath;
+    my $new_object = Module::Generic::File->realpath( "/some/where/file.txt" );
 
 =head1 VERSION
 
-    v0.7.0
+    v0.8.0
 
 =head1 DESCRIPTION
 
@@ -5770,6 +5788,12 @@ This is an alias to L</read>, but can only be called on a directory, or it will 
 This calls L<perlfunc/readlink> and returns a new L<Module::Generic::File> object, but this does nothing and merely return the current object if the current operating system is one of Win32, VMS, RISC OS, or if the underlying file does not actually exist or of course if the element is actually not a symbolic link.
 
 If an error occurred, this returns undef and set an exception object.
+
+=head2 realpath
+
+Provided with a path, or using by default the value returned by L</filename> and this will attempt to load L<Cwd> and use C<Cwd::realpath>
+
+Upon success, it returns a new L<Module::Generic::File> object based on the value returned by C<Cwd::realpath>, and upon error, it sets an error object, and returns C<undef> in scalar context or an empty list in list context.
 
 =head2 relative
 

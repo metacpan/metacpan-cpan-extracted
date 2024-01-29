@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '2.031'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 
@@ -16,11 +16,15 @@ PDF::Builder::Resource::XObject - Base class for external objects
 
 =head1 METHODS
 
+=head2 new
+
+    $xobject = PDF::Builder::Resource::XObject->new($pdf, $name)
+
 =over
 
-=item $xobject = PDF::Builder::Resource::XObject->new($pdf, $name)
-
 Creates an XObject resource.
+
+=back
 
 =cut
 
@@ -34,9 +38,15 @@ sub new {
     return $self;
 }
 
-=item $type = $xobject->subtype($type)
+=head2 subtype
+
+    $type = $xobject->subtype($type)
+
+=over
 
 Get or set the Subtype of the XObject resource.
+
+=back
 
 =cut
 
@@ -48,9 +58,5 @@ sub subtype {
     }
     return $self->{'Subtype'}->val();
 }
-
-=back
-
-=cut
 
 1;

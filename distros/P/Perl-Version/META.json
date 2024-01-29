@@ -4,13 +4,13 @@
       "Andy Armstrong <andy@hexten.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Perl-Version",
    "no_index" : {
@@ -21,27 +21,42 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
             "Data::Dumper" : "0",
-            "File::Slurp::Tiny" : "0",
             "Getopt::Long" : "2.34",
             "Pod::Usage" : "1.3",
             "Scalar::Util" : "0",
-            "Test::More" : "0"
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.013"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/perl-version/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/perl-version",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/perl-version",
+         "web" : "https://github.com/briandfoy/perl-version"
+      }
+   },
+   "version" : "1.016",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

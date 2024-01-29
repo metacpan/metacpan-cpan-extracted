@@ -1,0 +1,65 @@
+{
+   "abstract" : "A peppered AES-encrypted Bcrypt encoder for Crypt::Passphrase",
+   "author" : [
+      "Leon Timmermans <fawaka@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.041",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Crypt-Passphrase-Bcrypt-AES",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.041"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Crypt::Passphrase" : "0.019",
+            "Crypt::Passphrase::Bcrypt::Encrypted" : "0",
+            "Crypt::Rijndael" : "1.16",
+            "parent" : "0",
+            "perl" : "5.014",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "strict" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Crypt::Passphrase::Bcrypt::AES" : {
+         "file" : "lib/Crypt/Passphrase/Bcrypt/AES.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Leont/crypt-passphrase-bcrypt-aes/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Leont/crypt-passphrase-bcrypt-aes.git",
+         "web" : "https://github.com/Leont/crypt-passphrase-bcrypt-aes"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}

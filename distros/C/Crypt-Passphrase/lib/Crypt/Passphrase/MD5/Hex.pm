@@ -1,5 +1,5 @@
 package Crypt::Passphrase::MD5::Hex;
-$Crypt::Passphrase::MD5::Hex::VERSION = '0.016';
+$Crypt::Passphrase::MD5::Hex::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ sub accepts_hash {
 
 sub verify_password {
 	my ($self, $password, $hash) = @_;
-	return md5($password) eq pack('H32', $hash);
+	return md5($password) eq pack 'H32', $hash;
 }
 
 1;
@@ -38,29 +38,24 @@ Crypt::Passphrase::MD5::Hex - Validate against hexed MD5 hashes with Crypt::Pass
 
 =head1 VERSION
 
-version 0.016
+version 0.019
+
+=head1 SYNOPSIS
+
+ my $passphrase = Crypt::Passphrase->new(
+     encoder    => 'Bcrypt',
+     validators => [ 'MD5::Hex' ],
+ );
 
 =head1 DESCRIPTION
 
-This module implements a validator for hex-encoded MD5 hashes.
+This module implements a validator for base64-encoded MD5 hashes.
 
-=head1 METHODS
-
-=head2 new()
-
-This creates a new MD5 validator. It takes no arguments.
-
-=head2 accepts_hash($hash)
-
-This (heuristically) determines if we may be dealing with a hex encoded md5 sum.
-
-=head2 verify_hash($password, $hash)
-
-This determines if the password matches the hash when MD5'ed.
+This has no configuration and will try to match any value that looks like 16 bytes encoded in hex.
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

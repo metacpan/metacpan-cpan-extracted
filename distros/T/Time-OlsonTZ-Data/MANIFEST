@@ -154,6 +154,7 @@ lib/Time/OlsonTZ/Data/Antarctica/Mawson.tz
 lib/Time/OlsonTZ/Data/Antarctica/Palmer.tz
 lib/Time/OlsonTZ/Data/Antarctica/Rothera.tz
 lib/Time/OlsonTZ/Data/Antarctica/Troll.tz
+lib/Time/OlsonTZ/Data/Antarctica/Vostok.tz
 lib/Time/OlsonTZ/Data/Asia/Almaty.tz
 lib/Time/OlsonTZ/Data/Asia/Amman.tz
 lib/Time/OlsonTZ/Data/Asia/Anadyr.tz
@@ -388,6 +389,7 @@ tzsrc/backward
 tzsrc/backzone
 tzsrc/calendars
 tzsrc/checklinks.awk
+tzsrc/checknow.awk
 tzsrc/checktab.awk
 tzsrc/date.1
 tzsrc/difftime.c
@@ -421,3 +423,4 @@ tzsrc/ziguard.awk
 tzsrc/zishrink.awk
 tzsrc/zone.tab
 tzsrc/zone1970.tab
+tzsrc/zonenow.tab

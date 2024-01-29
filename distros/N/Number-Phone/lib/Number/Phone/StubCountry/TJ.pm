@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230903131448;
+our $VERSION = 1.20231210185946;
 
 my $formatters = [
                 {
@@ -33,7 +33,7 @@ my $formatters = [
                 {
                   'format' => '$1 $2 $3',
                   'leading_digits' => '
-            44[04]|
+            44[02-479]|
             [34]7
           ',
                   'pattern' => '(\\d{3})(\\d{2})(\\d{4})'
@@ -62,7 +62,7 @@ my $validators = {
               72
             )|
             4(?:
-              4[046]|
+              46|
               74|
               87
             )
@@ -79,7 +79,7 @@ my $validators = {
               72
             )|
             4(?:
-              4[046]|
+              46|
               74|
               87
             )
@@ -87,7 +87,10 @@ my $validators = {
         ',
                 'mobile' => '
           (?:
-            41[18]|
+            4(?:
+              1[18]|
+              4[02-479]
+            )|
             81[1-9]
           )\\d{6}|
           (?:
@@ -108,66 +111,66 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"9923454", "Istravshan",
-"9923445", "Matchinskiy",
-"9923240", "Shaartuz",
-"9923137", "Rudaki",
-"9923455", "Jabarrasulov",
-"9923250", "Sarband",
-"9923456", "Shakhristan",
-"9923552", "Darvaz",
-"9923443", "Kayrakum",
-"9923315", "M\.\ Khamadoni",
-"9923130", "Tursun\-Zade",
-"9923316", "Parkhar",
-"9923465", "Taboshar",
-"9923222", "Kurgan\-Tube",
-"9923314", "Temurmalik",
+$areanames{en} = {"9923134", "Rogun",
+"9923248", "Djilikul",
+"9923442", "Gafurov",
+"9923467", "Kanibadam",
+"9923556", "Rushan",
+"9923154", "Tadjikabad",
 "992331700", "Khovaling",
-"9923247", "Kolkhozabad",
-"9923453", "Asht",
-"9923464", "Ganchi",
-"9923522", "Khorog",
-"9923311", "Vose",
-"99237", "Dushanbe",
-"9923249", "Kumsangir",
-"9923132", "Jirgital",
-"9923318", "Muminobod",
-"9923441", "Spitamen",
-"9923252", "Panj",
-"9923475", "Pendjikent",
-"9923139", "Hissar",
-"9923242", "Khuroson",
-"9923451", "Chkalovsk",
-"9923243", "Abdurakhmana\ Jami",
-"9923135", "Fayzabad",
-"9923136", "Vakhdat",
-"9923134", "Rogun",
-"9923153", "Varzob",
-"9923422", "Khujand",
+"9923465", "Taboshar",
+"9923312", "Dangara",
+"9923452", "Zafarabad",
 "9923479", "Ayni",
-"9923246", "Vakhsh",
-"9923245", "Bokhtar",
+"9923249", "Kumsangir",
 "9923133", "Nurobod",
 "9923551", "Vanj",
-"9923154", "Tadjikabad",
-"9923156", "Tavildara",
-"9923322", "Kulyab",
-"9923155", "Shakhrinav",
-"9923467", "Kanibadam",
+"9923153", "Varzob",
 "9923555", "Roshtkala",
+"9923451", "Chkalovsk",
+"9923311", "Vose",
+"9923455", "Jabarrasulov",
 "9923138", "Nurek",
-"9923452", "Zafarabad",
-"9923141", "Yavan",
-"9923556", "Rushan",
-"9923442", "Gafurov",
-"9923554", "Murgab",
-"9923251", "Kabodion",
-"9923248", "Djilikul",
-"9923553", "Ishkashim",
-"9923131", "Rasht",
+"9923315", "M\.\ Khamadoni",
+"9923552", "Darvaz",
+"9923445", "Matchinskiy",
+"9923243", "Abdurakhmana\ Jami",
+"9923139", "Hissar",
+"9923441", "Spitamen",
+"9923316", "Parkhar",
+"9923456", "Shakhristan",
+"9923322", "Kulyab",
 "9923462", "Isfara",
-"9923312", "Dangara",};
+"9923222", "Kurgan\-Tube",
+"9923130", "Tursun\-Zade",
+"9923132", "Jirgital",
+"9923251", "Kabodion",
+"9923246", "Vakhsh",
+"9923453", "Asht",
+"9923247", "Kolkhozabad",
+"9923422", "Khujand",
+"9923454", "Istravshan",
+"9923245", "Bokhtar",
+"9923475", "Pendjikent",
+"9923314", "Temurmalik",
+"9923443", "Kayrakum",
+"9923156", "Tavildara",
+"9923554", "Murgab",
+"9923141", "Yavan",
+"99237", "Dushanbe",
+"9923240", "Shaartuz",
+"9923136", "Vakhdat",
+"9923522", "Khorog",
+"9923242", "Khuroson",
+"9923250", "Sarband",
+"9923155", "Shakhrinav",
+"9923464", "Ganchi",
+"9923553", "Ishkashim",
+"9923137", "Rudaki",
+"9923131", "Rasht",
+"9923252", "Panj",
+"9923318", "Muminobod",
+"9923135", "Fayzabad",};
 
     sub new {
       my $class = shift;

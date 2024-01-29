@@ -182,7 +182,11 @@ All dates are in ISO 8601 Format
     Swapped bignum to bigfloat as bignum was causing problems with other modules
     
 0.34.3 2023-11-05
-    Fixes to Bundles to allow languages ane regions to co-exist
-    
+    Fixes to Bundles to allow languages and regions to co-exist
+
 0.34.4 2023-12-02
     Fixed recursion with likely_subtags
+
+0.40.0
+    Updated to use version 40 of CLDR
+    Added method to return all the installed locales as a prerequisite of locating the best match between installed locales and a requested locale 

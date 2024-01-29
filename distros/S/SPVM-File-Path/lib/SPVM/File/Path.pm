@@ -1,6 +1,6 @@
 package SPVM::File::Path;
 
-our $VERSION = "0.011";
+our $VERSION = "0.011001";
 
 1;
 

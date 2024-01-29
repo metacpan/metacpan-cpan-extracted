@@ -10,9 +10,9 @@ use Exporter 'import';
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2023-09-23'; # DATE
 our $DIST = 'App-BPOMUtils-Table-FoodCategory'; # DIST
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 our @EXPORT_OK = qw(
                        bpom_list_food_categories_rba
@@ -8140,8 +8140,27 @@ _
     hooks => {
         before_return => sub {
             my %args = @_;
-            # XXX adjust other properties e.g. table.field_formats etc
-            $args{_func_res}[3]{'table.fields'} = ['status'];
+
+            if ($args{_func_args}{detail}) {
+                # format text in summary
+                for my $row (@{ $args{_func_res}[2] }) {
+                    next unless $row->{summary};
+                    for ($row->{summary}) {
+                        s/\.  /.\n\n/g;
+                        s/ \x{2022}/\n\n\x{2022}/g;
+                    }
+                }
+
+                # XXX adjust other properties e.g. table.field_formats etc
+                $args{_func_res}[3]{'table.fields'} = ['status'];
+
+                # since 'summary' field is usually long text, we prefer to show it using Text::ANSITable
+                require Module::Installed::Tiny;
+                if (Module::Installed::Tiny::module_installed('Text::ANSITable')) {
+                    $ENV{FORMAT_PRETTY_TABLE_BACKEND} //= 'Text::ANSITable';
+                }
+            }
+
             1;
         },
     },
@@ -8162,7 +8181,7 @@ App::BPOMUtils::Table::FoodCategoryRBA - List food categories in BPOM processed 
 
 =head1 VERSION
 
-This document describes version 0.018 of App::BPOMUtils::Table::FoodCategoryRBA (from Perl distribution App-BPOMUtils-Table-FoodCategory), released on 2023-09-03.
+This document describes version 0.020 of App::BPOMUtils::Table::FoodCategoryRBA (from Perl distribution App-BPOMUtils-Table-FoodCategory), released on 2023-09-23.
 
 =head1 FUNCTIONS
 

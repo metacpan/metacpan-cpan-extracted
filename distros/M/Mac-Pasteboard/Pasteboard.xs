@@ -150,6 +150,17 @@ xs_pbl_variant()
     OUTPUT:
 	RETVAL
 
+int
+xs_pbl_is_at_least_monterey()
+    CODE:
+#ifdef MACOS_MONTEREY
+	RETVAL = 1;
+#else
+	RETVAL = 0;
+#endif
+    OUTPUT:
+	RETVAL
+
 void
 xs_pbl_create (SV * input_name)
     PPCODE:
@@ -297,7 +308,6 @@ xs_pbl_paste( void *pbref, SV *id, SV *sv_flavor )
 #else	/* def USE_PBL_BACKEND */
 	int any;
 	unsigned long cid;
-	unsigned char *data;
 	SV *sv_data = NULL;
 	PB_FLAVOR_FLAGS flags;
 	CFDataRef flavor_data = NULL;
@@ -327,7 +337,7 @@ xs_pbl_paste( void *pbref, SV *id, SV *sv_flavor )
 	    status = PasteboardGetItemIdentifier( pbref, item_inx, &item_id );
 	    if ( status ) goto cleanup;
 
-	    if ( ! any && item_id != ( PasteboardItemID ) id )
+	    if ( ! any && item_id != ( PasteboardItemID ) cid )
 		continue;
 
 	    status = PasteboardCopyItemFlavorData(
@@ -360,12 +370,11 @@ xs_pbl_paste( void *pbref, SV *id, SV *sv_flavor )
 	} else {
 	    EXTEND( SP, 3 );
 	    PUSHs( sv_2mortal( newSViv( status ) ) );
-	    if ( data == NULL ) {
+	    if ( sv_data == NULL ) {
 		PUSHs( sv_2mortal( newSV(0) ) );
 	    } else {
 	        PUSHs( sv_2mortal( sv_data ) );
 		SvTAINTED_on( ST( 1 ) );
-		free( data );
 	    }
 	    PUSHs( sv_2mortal( newSVuv( flags ) ) );
 	}
@@ -385,13 +394,13 @@ xs_pbl_synch (void * pbref)
 HV *
 xs_pbl_uti_tags( SV *sv_uti )
     CODE:
-#ifdef USE_PBL_BACKEND
+	HV *tags_h;
+	tags_h = (HV *) sv_2mortal ((SV *)newHV());
+#if defined(USE_PBL_BACKEND)
 	char *c_uti;
 	pbl_uti_tags_t tags_s;
-	HV *tags_h;
 	SV_TO_C( c_uti, sv_uti, NULL );
 	pbl_uti_tags (c_uti, &tags_s);
-	tags_h = (HV *) sv_2mortal ((SV *)newHV());
 	/* cast to void to avoid 'expression result unsed' warning */
 	if (tags_s.extension != NULL) {
 	    (void)(hv_store (tags_h, "extension", 9, newSVpv
@@ -404,24 +413,24 @@ xs_pbl_uti_tags( SV *sv_uti )
 		0));
 	    FREE ("xs_pbl_uti_tags tags_s.mime", tags_s.mime);
 	}
+#if ! defined(MACOS_MONTEREY)
 	if (tags_s.pboard != NULL) {
 	    (void)(hv_store (tags_h, "pboard", 6, newSVpv (tags_s.pboard,
 		0), 0));
 	    FREE ("xs_pbl_uti_tags tags_s.pboard", tags_s.pboard);
 	}
+
 	if (tags_s.os != NULL) {
 	    (void)(hv_store (tags_h, "os", 2, newSVpv (tags_s.os, 0), 0));
 	    FREE ("xs_pbl_uti_tags tags_s.os", tags_s.os);
 	}
-	RETVAL = tags_h;
+#endif
 #else	/* def USE_PBL_BACKEND */
-	HV *tags_h;
-	CFStringRef cf_tag = NULL;
 	CFStringRef cf_uti;
+	CFStringRef cf_tag = NULL;
 	OSStatus status;	/* Unused, but referred to by CF_TO_SV_CHECKED() */
 	SV *sv_tag;
 	SV_TO_CF( cf_uti, sv_uti, NULL );
-	tags_h = ( HV * ) sv_2mortal( ( SV * ) newHV() );
 
 	cf_tag = UTTypeCopyPreferredTagWithClass( cf_uti,
 		kUTTagClassFilenameExtension );
@@ -440,7 +449,7 @@ xs_pbl_uti_tags( SV *sv_uti )
 	    CFRelease( cf_tag );
 	    cf_tag = NULL;
 	}
-
+#if ! defined(MACOS_MONTEREY)
 	cf_tag = UTTypeCopyPreferredTagWithClass( cf_uti,
 		kUTTagClassNSPboardType );
 	if (cf_tag != NULL) {
@@ -458,14 +467,12 @@ xs_pbl_uti_tags( SV *sv_uti )
 	    CFRelease( cf_tag );
 	    cf_tag = NULL;
 	}
-
+#endif
 	cleanup:
-
 	if ( cf_tag != NULL )
 	    CFRelease( cf_tag );
-
-	RETVAL = tags_h;
 #endif	/* def USE_PBL_BACKEND */
+	RETVAL = tags_h;
     OUTPUT:
 	RETVAL
 
@@ -579,7 +586,7 @@ xs_pbl_all( void *pbref, SV *sv_id, int want_data, SV *sv_conforms_to )
 
 		( void ) hv_stores( flvr, "flags", newSVuv( flags ) );
 
-		( void ) hv_stores( flvr, "id", newSVuv( id ) );
+		( void ) hv_stores( flvr, "id", newSVuv( item_id ) );
 
 		CF_TO_SV_CHECKED( sv_data, flavor_type );
 		( void ) hv_stores( flvr, "flavor", sv_data );

@@ -57,6 +57,7 @@
          "requires" : {
             "Data::Fake" : "0.006",
             "JSON::XS" : "4.03",
+            "List::MoreUtils" : "0.430",
             "Path::Tiny" : "0.144",
             "Test::Exception" : "0.43",
             "Test::More" : "1.30",
@@ -80,7 +81,7 @@
          "web" : "https://github.com/CNAG-Biomedical-Informatics/pheno-ranker"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

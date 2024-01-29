@@ -20,7 +20,7 @@ my $DIAG_verbose = 0;
 use Data::Dump qw/pp/;
 use utf8;
 
-our $VERSION='0.25';
+our $VERSION='0.26';
 
 use File::Temp;
 use File::Spec;
@@ -47,14 +47,19 @@ ok(defined $randomiser, 'Data::Random::Structure->new()'." called.") or BAIL_OUT
 
 if( $DIAG_verbose > 0 ){ diag "called randomiser ... OK"; }
 
-# first test the sub fix_recursively()
-my $td = fix_scalar('abc:xyz"\\aa"\'');
-if( $DIAG_verbose > 0 ){ diag "fixed the scalar 1 ... OK"; }
-ok($td !~ /[:"'\\]/, 'fix_scalar()'." : called and it works for bad characters.") or BAIL_OUT("no it did not:\n$td\n");
-# with utf8
-$td = fix_scalar('αβγ:χψζ"\\αα"\'');
-if( $DIAG_verbose > 0 ){ diag "fixed the scalar 2 ... OK"; }
-ok($td !~ /[:"'\\]/, 'fix_scalar()'." : called and it works for bad characters.") or BAIL_OUT("no it did not:\n$td\n");
+if( 0 ){
+	# this is only needed before v0.22 when YAML::PP was not used
+	# now this is not needed
+
+	# first test the sub fix_recursively()
+	my $td = fix_scalar('abc:xyz"\\aa"\'');
+	if( $DIAG_verbose > 0 ){ diag "fixed the scalar 1 ... OK"; }
+	ok($td !~ /[:"'\\]/, 'fix_scalar()'." : called and it works for bad characters.") or BAIL_OUT("no it did not:\n$td\n");
+	# with utf8
+	$td = fix_scalar('αβγ:χψζ"\\αα"\'');
+	if( $DIAG_verbose > 0 ){ diag "fixed the scalar 2 ... OK"; }
+	ok($td !~ /[:"'\\]/, 'fix_scalar()'." : called and it works for bad characters.") or BAIL_OUT("no it did not:\n$td\n");
+} 
 
 if( $DIAG_verbose > 0 ){ diag "calling utf8 randomiser"; }
 my $randomiser_utf8 = Data::Random::Structure::UTF8->new(
@@ -84,6 +89,7 @@ for my $trial (1..2){
 	if( $DIAG_verbose > 0 ){ diag "called fix_recursively OK depth was $recursion_depth"; }
 
 	# YAML does not like quoted strings to contain escaped quotes
+	# But YAML::PP copes just fine, and it is YAML::PP being used now
 
 	if( $DIAG_verbose > 0 ){ diag "calling Data::Roundtrip::perl2json ..."; }
 	$json_string = Data::Roundtrip::perl2json($perl_data_structure);
@@ -114,7 +120,7 @@ for my $trial (1..2){
 	is_deeply($perl_data_structure, $perl_data_structure_from_file, "jsonfile2perl() : result agrees with what we saved before.");
 	if( $DIAG_verbose > 0 ){ diag "calling is_deeply OK"; }
 
-	# write YAML to file
+	# write YAML data to file
 	$outfile = File::Spec->catdir($tmpdir, 'out.yaml');
 	if( $DIAG_verbose > 0 ){ diag "opening2 out to file $outfile ..."; }
 	ok(open($FH, '>:utf8', $outfile), "open tmp file '${outfile}' for writing yaml string.") or BAIL_OUT;
@@ -173,7 +179,10 @@ if( $DIAG_verbose > 0 ){ diag "done testing called."; }
 # so we are traversing the data structure and changing all
 # scalars: array items, keys, values
 # to remove these characters
+# BUT since v0.22 we are using YAML::PP internally
+# so this is no longer needed
 sub fix_scalar {
+	return $_[0]; # short-circuit it, no need to fix anything
 	my $instr = $_[0];
 	$instr =~ s/[:'"\\]+//g;
 	return $instr;

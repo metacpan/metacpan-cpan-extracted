@@ -4,13 +4,14 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.5';
 our $Debug   = 0;
 
 use LWP::UserAgent ();
 use URI::Escape qw(uri_escape uri_escape_utf8);
 use Carp 'croak';
 use List::Util '1.29', 'pairs';
+use JSON;
 
 ## NOTE: This is an inside-out object; remove members in
 ## NOTE: the DESTROY() sub if you add additional members.
@@ -29,17 +30,17 @@ sub new {
 
     my $self = bless \(my $ref), $class;
 
-$account_sid  {$self} = $args{AccountSid}   || '';
-$auth_token   {$self} = $args{AuthToken}    || '';
-$api_version  {$self} = $args{API_VERSION}  || 'api/laml/2010-04-01';
-$lwp_callback {$self} = $args{LWP_Callback} || undef;
-$utf8         {$self} = $args{utf8}         || undef;
-$space        {$self} = $args{Space}        || undef;
-$domain       {$self} = $args{Domain}       || '.signalwire.com';
+    $account_sid  {$self} = $args{AccountSid}   || $ENV{PROJECT_ID};
+    $auth_token   {$self} = $args{AuthToken}    || $ENV{REST_API_TOKEN};
+    $api_version  {$self} = $args{API_VERSION}  || 'api/laml/2010-04-01';
+    $lwp_callback {$self} = $args{LWP_Callback} || undef;
+    $utf8         {$self} = $args{utf8}         || undef;
+    $space        {$self} = $args{Space}        || $ENV{SIGNALWIRE_SPACE};
+    $domain       {$self} = $args{Domain}       || '.signalwire.com';
 
-	croak 'AccountSid and AuthToken are required'
-		unless $account_sid{$self} and $auth_token{$self};
-return $self;
+    croak 'AccountSid and AuthToken are required'
+	unless $account_sid{$self} and $auth_token{$self};
+    return $self;
 }
 
 sub GET {
@@ -87,8 +88,13 @@ sub _do_request {
     }
 
     my $content = '';
+    
     if( keys %args ) {
-        $content = $self->_build_content( %args );
+	if ($content_type eq 'application/json' && $method eq 'POST') {
+	    $content = $self->_build_json_content( %args );
+	} else {
+	    $content = $self->_build_content( %args );
+	}
 
         if( $method eq 'GET' ) {
             $url .= '?' . $content;
@@ -104,7 +110,6 @@ sub _do_request {
 
     local $ENV{HTTPS_DEBUG} = $Debug;
     my $res = $lwp->request($req);
-    print STDERR "Request sent: " . $req->as_string . "\n" if $Debug;
 
     return { code    => $res->code,
              message => $res->message,
@@ -125,6 +130,20 @@ sub _build_content {
     }
 
     return join('&', @args) || '';
+}
+
+sub _build_json_content {
+    my $self = shift;
+
+    my $json = JSON->new->allow_nonref;
+
+    my $args = ();
+    for my $pair (pairs @_) {
+        my ($key, $val) = @$pair;
+        $args->{$key} = $val;
+    }
+
+    return $json->encode( $args );;
 }
 
 sub DESTROY {
@@ -154,11 +173,11 @@ SignalWire::RestAPI - Accessing SignalWire's REST API with Perl
 
   use SignalWire::RestAPI;
 
-  my $twilio = SignalWire::RestAPI->new(AccountSid => 'AC12345...',
+  my $signalwire = SignalWire::RestAPI->new(AccountSid => 'AC12345...',
                                      AuthToken  => '1234567...');
 
   ## make a phone call
-  $response = $twilio->POST( 'Calls',
+  $response = $signalwire->POST( 'Calls',
                              From => '1234567890',
                              To   => '8905671234',
                              Url  => 'http://domain.tld/send_twiml' );
@@ -184,7 +203,7 @@ latest version of everything, you have two options:
 Before you upgrade to 0.15, change all of your B<new()> method calls
 to explicitly use I<API_VERSION> as '2008-08-01', like this:
 
-  my $twilio = SignalWire::RestAPI->new
+  my $signalwire = SignalWire::RestAPI->new
     ( AccountSid  => 'AC12345...',
       AuthToken   => '1234567...',
       API_VERSION => '2008-08-01' );  ## <-- add this line here
@@ -217,17 +236,17 @@ B<SignalWire::RestAPI> knows almost nothing about the SignalWire API itself
 other than the authentication and basic format of the REST URIs.
 
 Users already familiar with the API may skip the following section
-labeled L</"TWILIO API"> and move to the L</"METHODS">
+labeled L</"SIGNAWIRE API"> and move to the L</"METHODS">
 section. Beginners should definitely continue here.
 
-=head1 TWILIO API
+=head1 SIGNALWIRE API
 
 This section is meant to help you understand how to read the SignalWire
 API documentation and translate it into B<SignalWire::RestAPI> calls.
 
 The SignalWire API documentation is found here:
 
-  http://www.twilio.com/docs/api/rest/
+  https://developer.signalwire.com/
 
 The SignalWire REST API consists of I<requests> and I<responses>. Requests
 consist of I<Resources> and I<Properties>. Responses consist of I<HTTP
@@ -238,10 +257,10 @@ documentation covers.
 =head2 Getting started
 
 While what comes next is covered in the SignalWire documentation, this may
-help some people who want a quicker start. Head over to twilio.com and
+help some people who want a quicker start. Head over to signalwire.com and
 signup for a free demo account. Once you've signed up, visit
 
-  https://www.twilio.com/user/account/
+  https://www.signalwire.com
 
 where you'll find your I<Account Sid> and I<AuthToken>. Your I<Account
 Sid> and I<AuthToken> are essentially your username and password for
@@ -249,7 +268,7 @@ the SignalWire API. Note that these are B<not> the same credentials as
 your SignalWire account login username and password, which is an email
 address and a password you've selected. You'll never use your email
 address and password in the API--those are only for logging into your
-SignalWire web account at twilio.com.
+SignalWire web account at signalwire.com.
 
 Once you've signed up, be sure to add at least one phone number to
 your account by clicking "Numbers" and then "Verify a number". Be sure
@@ -263,7 +282,7 @@ of our examples below.
 SignalWire request I<resources> look just like a URL you might enter into
 your browser to visit a secure web page:
 
-  https://api.twilio.com/2010-04-01/Accounts/{YourAccountSid}/Calls
+  https://SPACE.signalwire.com/laml/2010-04-01/Accounts/{YourAccountSid}/Calls
 
 In addition to the URI above, if the request is a B<POST> (as opposed
 to a B<GET>), you would also pass along certain key/value pairs that
@@ -271,7 +290,7 @@ represent the resources's I<properties>.
 
 So, to place a call using SignalWire, your resource is:
 
-  https://api.twilio.com/2010-04-01/Accounts/{YourAccountSid}/Calls
+  https://SPACE.signalwire.com/laml/2010-04-01/Accounts/{YourAccountSid}/Calls
 
 and the set of properties for this resource might be:
 
@@ -281,14 +300,14 @@ and the set of properties for this resource might be:
 
 You can see the list of properties for the I<Calls> resource here:
 
-  http://www.twilio.com/docs/api/rest/making_calls
+  https://developer.signalwire.com/compatibility-api/rest/create-a-call
 
 Further down in L</"METHODS"> we'll cover how this works using
 B<SignalWire::RestAPI>, but here's a teaser to help you see how easy your
 job as a budding SignalWire developer will be:
 
   ## call Jenny
-  $twilio->POST('Calls',
+  $signalwire->POST('Calls',
                 To => '5558675309',
                 From => '4158675309',
                 Url => 'http://www.myapp.com/myhandler');
@@ -387,22 +406,18 @@ documentation for making calls and you should see a table under I<POST
 Parameters> describing the required and optional parameters you may
 send in your API call.
 
-These are your I<resource parameters> for the I<Calls> API: From =
-'1234567890', To = '5558675309', Url =
-'http://perlcode.org/cgi-bin/twilio'.
-
 Also, if you want your response in something other than XML, you may
 add any of 'csv', 'json', or 'html' (any representation found at
-http://www.twilio.com/docs/api/rest/tips) to the SignalWire API call:
+https://developer.signalwire.com/compatibility-api) to the SignalWire API call:
 
   ## return JSON in $response->{content}
-  $response = $twilio->POST('Calls.json',
+  $response = $signalwire->POST('Calls.json',
                             To   => '5558675309',
                             From => '1234567890',
                             Url  => 'http://twimlets.com/callme');
 
   ## CSV list of recordings
-  $response = $twilio->POST('Recordings.csv');
+  $response = $signalwire->POST('Recordings.csv');
 
 See L</"Alternative resource representations"> below.
 
@@ -412,33 +427,33 @@ Create a B<SignalWire::RestAPI> object and make the call using the I<API
 method>, I<API resource>, and I<resource parameters>. The pattern
 you'll follow looks like this:
 
-  $response = $twilio_object->METHOD(Resource, %parameters);
+  $response = $signalwire_object->METHOD(Resource, %parameters);
 
 For these examples, see the following pages in SignalWire's API
 documentation:
 
-  http://www.twilio.com/docs/api/rest/call
-  http://www.twilio.com/docs/api/rest/making_calls
+  https://developer.signalwire.com/compatibility-api/rest/list-all-calls
+  https://developer.signalwire.com/compatibility-api/rest/create-a-call
 
 Here are the examples:
 
   ## create an object
-  my $twilio = new SignalWire::RestAPI( AccountSid => '{your account sid}',
+  my $signalwire = new SignalWire::RestAPI( AccountSid => '{your account sid}',
                                      AuthToken  => '{your auth token}' );
 
   ## view a list of calls we've made
-  $response = $twilio->GET('Calls.json');
+  $response = $signalwire->GET('Calls.json');
   print $response->{content};  ## this is a JSON document
 
   ## view one particular call we've made
-  $response = $twilio->GET('Calls/CA42ed11f93dc08b952027ffbc406d0868.csv');
+  $response = $signalwire->GET('Calls/CA42ed11f93dc08b952027ffbc406d0868.csv');
   print $response->{content};  ## this is a CSV document
 
   ## make a new call
-  $response = $twilio->POST('Calls',
+  $response = $signalwire->POST('Calls',
                             From => '1234567890',
                             To   => '3126540987',
-                            Url  => 'http://perlcode.org/cgi-bin/twilio');
+                            Url  => 'http://perlcode.org/cgi-bin/xml');
   print $response->{content};  ## this is an XML document
 
 =item 5.
@@ -448,7 +463,7 @@ code> isn't 200 (or whatever the normal code for the resource and
 method you're using is), something went wrong and you should check for
 any error codes:
 
-  $response = $twilio->POST('Calls');  ## I forgot my parameters!
+  $response = $signalwire->POST('Calls');  ## I forgot my parameters!
 
   unless( $response->{code} == 200 ) {
     die <<_UNTIMELY_;
@@ -466,7 +481,7 @@ which would print:
       <Status>400</Status>
       <Message>No called number is specified</Message>
       <Code>21201</Code>
-      <MoreInfo>http://www.twilio.com/docs/errors/21201</MoreInfo>
+      <MoreInfo>http://www.signalwire.com</MoreInfo>
     </RestException>
   </SignalWireResponse>
 
@@ -477,10 +492,10 @@ specify anything else either.
 Once we've fixed everything up, we can try again:
 
   ## call Jenny
-  $response = $twilio->POST('Calls',
+  $response = $signalwire->POST('Calls',
                             To   => '5558675309',
                             From => '3126540987',
-                            Url  => 'http://perlcode.org/cgi-bin/twilio');
+                            Url  => 'http://perlcode.org/cgi-bin/xml');
 
   print $response->{content};
 
@@ -525,7 +540,7 @@ B<GET> method).
 
 =back
 
-=head2 What's Missing? TwiML
+=head2 What's Missing? CompatAPI 
 
 The missing magical piece is the TwiML, which is supplied by the
 I<Url> resource parameter you may have noticed above in the I<Calls>
@@ -537,7 +552,7 @@ phrases to the person on the other end of the line.
 
 To continue the I<Calls> example, you will need to give the I<Calls>
 resource a URL that returns TwiML (see
-http://www.twilio.com/docs/api/twiml/). This is not hard, but it does
+https://developer.signalwire.com/compatibility-api/). This is not hard, but it does
 require you to have a web server somewhere on the Internet that can
 reply to GET or POST requests.
 
@@ -545,14 +560,14 @@ SignalWire provides a set of canned TwiML applications for you to use for
 free on their server, or you may download them and modify them as you
 wish. SignalWire's "Twimlets" may be found here:
 
-  http://labs.twilio.com/twimlets/
+  https://developer.signalwire.com/
 
 A TwiML document looks like this:
 
   <?xml version="1.0" encoding="UTF-8" ?>
   <Response>
     <Say>Hello World</Say>
-    <Play>http://api.twilio.com/Cowbell.mp3</Play>
+    <Play>http://example.com/Cowbell.mp3</Play>
   </Response>
 
 When the SignalWire API's I<Calls> resource is invoked with a URL that
@@ -580,7 +595,7 @@ For example, you could say:
 
 and when you did this:
 
-  $twilio->POST('Calls',
+  $signalwire->POST('Calls',
                 From => '1112223333',
                 To   => '1231231234',
                 Url  => 'http://twimlets.com/message?Message=Nice+to+meet+you');
@@ -591,8 +606,7 @@ will hear "Nice to meet you" in a somewhat computerized voice.
 Go ahead and follow the twimlets.com link above and view the source in
 your browser window. It's just a plain XML document.
 
-See http://www.twilio.com/docs/api_reference/TwiML/ for full TwiML
-documentation.
+See https://developer.signalwire.com/compatibility-api/xml documentation.
 
 =head1 METHODS
 
@@ -640,7 +654,7 @@ instead of C<uri_escape>.
 
 Example:
 
-  my $twilio = new SignalWire::RestAPI
+  my $signalwire = new SignalWire::RestAPI
     ( AccountSid => 'AC...',
       AuthToken  => '...',
       API_VERSION => '2008-08-01',
@@ -650,7 +664,7 @@ Example:
 
 All API calls are of the form:
 
-  $twilio_object->METHOD('Resource', %parameters)
+  $signalwire_object->METHOD('Resource', %parameters)
 
 where METHOD is one of B<GET>, B<POST>, B<PUT>, or B<DELETE>, and
 'Resource' is the resource URI I<after> removing the leading
@@ -673,7 +687,7 @@ element. This is the untouched, raw response of the SignalWire API server,
 suitable for you to do whatever you want with it. For example, you
 might want to hand it off to an XML parser:
 
-  $resp = $twilio->GET('Calls');
+  $resp = $signalwire->GET('Calls');
 
   use XML::LibXML;
   my $parser = new XML::LibXML;
@@ -712,7 +726,7 @@ explanations may be found here:
 
 Example:
 
-  $response = $twilio->GET('Calls/CA42ed11f93dc08b952027ffbc406d0868');
+  $response = $signalwire->GET('Calls/CA42ed11f93dc08b952027ffbc406d0868');
 
 B<$response> is a hashref that looks like this:
 
@@ -729,12 +743,7 @@ I<content> element. You may wish to have results returned in
 comma-separated value format. To do this, simply append '.csv' to the
 end of your I<API resource>:
 
-  $resp = $twilio->GET('Calls.csv');
-
-The same thing works for JSON and HTML: simply append '.json' or
-'.html' respectively to the end of your I<API resource>. See
-http://www.twilio.com/docs/api/rest/tips for other possible
-representations.
+  $resp = $signalwire->GET('Calls.csv');
 
 =head2 GET
 
@@ -779,16 +788,16 @@ parameters>.
 B<GET> examples:
 
   ## get a list of all calls
-  $response = $twilio->GET('Calls');
+  $response = $signalwire->GET('Calls');
 
   ## get a single call instance in CSV format
-  $response = $twilio->GET('Calls/CA42ed11f93dc08b952027ffbc406d0868.csv');
+  $response = $signalwire->GET('Calls/CA42ed11f93dc08b952027ffbc406d0868.csv');
 
   ## get a recording list in XML
-  $response = $twilio->GET('Recordings');
+  $response = $signalwire->GET('Recordings');
 
   ## get a recording list in HTML
-  $response = $twilio->GET('Recordings.html');
+  $response = $signalwire->GET('Recordings.html');
 
 =head2 POST
 
@@ -804,18 +813,18 @@ arguments for the current SignalWire API version.
 
   ## validate a CallerId: 'OutgoingCallerIds' is the API resource and
   ## everything else are resource parameters
-  $response = $twilio->POST('OutgoingCallerIds',
+  $response = $signalwire->POST('OutgoingCallerIds',
                             FriendlyName => "Some Caller Id",
                             PhoneNumber  => '1234567890');
 
   ## make a phone call (note: this is for SignalWire's 2008-08-01 API)
-  $response = $twilio->POST('Calls',
+  $response = $signalwire->POST('Calls',
                             Caller => '1231231234',
                             Called => '9081231234',
                             Url    => 'http://some.where/handler');
 
   ## send an SMS message
-  $response = $twilio->POST('SMS/Messages',
+  $response = $signalwire->POST('SMS/Messages',
                             From => '1231231234',
                             To   => '9081231234',
                             Body => "Hey, let's have lunch" );
@@ -838,7 +847,7 @@ Same as B<GET>.
 
 Example:
 
-  $response = $twilio->DELETE('Recordings/RE41331862605f3d662488fdafda2e175f');
+  $response = $signalwire->DELETE('Recordings/RE41331862605f3d662488fdafda2e175f');
 
 =head1 API CHANGES
 
@@ -861,7 +870,7 @@ please see SignalWire's own REST API documentation and TwiML documentation.
 
 =head1 SEE ALSO
 
-LWP(1), L<http://www.twilio.com/>
+LWP(1), L<http://www.signalwire.com/>
 
 =head1 AUTHOR
 

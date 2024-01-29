@@ -1,5 +1,10 @@
 Revision history for BioX-Seq
 
+0.008009 2024-01-08
+         Allow '*' and '.' characters in BioX::Seq::Fetch validation (often
+             used to denote stop codons)
+         Fix POD mistake ('with_description' vs 'with_descriptions')
+
 0.008008 2023-08-01
          Fix bug where input format is not passed through to objects created
          by range() and rev_com()

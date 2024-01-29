@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ku - Package for language Kurdish
 
 package Locale::CLDR::Locales::Ku;
 # This file auto generated from Data\common\main\ku.xml
-#	on Tue  5 Dec  1:19:10 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -44,7 +44,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'aa' => 'afarî',
@@ -63,7 +63,6 @@ has 'display_name_language' => (
  				'av' => 'avarî',
  				'ay' => 'aymarayî',
  				'az' => 'azerî',
- 				'az@alt=short' => 'azerî',
  				'ba' => 'başkîrî',
  				'ban' => 'balînî',
  				'be' => 'belarusî',
@@ -78,7 +77,6 @@ has 'display_name_language' => (
  				'br' => 'bretonî',
  				'bs' => 'bosnî',
  				'bug' => 'bugî',
- 				'byn' => 'byn',
  				'ca' => 'katalanî',
  				'ce' => 'çeçenî',
  				'ceb' => 'sebwanoyî',
@@ -116,7 +114,6 @@ has 'display_name_language' => (
  				'fy' => 'frîsî',
  				'ga' => 'îrî',
  				'gd' => 'gaelîka skotî',
- 				'gez' => 'gez',
  				'gil' => 'kîrîbatî',
  				'gl' => 'galîsî',
  				'gn' => 'guwaranî',
@@ -266,6 +263,7 @@ has 'display_name_language' => (
  				'udm' => 'udmurtî',
  				'ug' => 'oygurî',
  				'uk' => 'ukraynî',
+ 				'und' => 'zimanê nenas',
  				'ur' => 'urdûyî',
  				'uz' => 'ozbekî',
  				'vi' => 'viyetnamî',
@@ -277,6 +275,12 @@ has 'display_name_language' => (
  				'yi' => 'yidîşî',
  				'yo' => 'yorubayî',
  				'yue' => 'kantonî',
+ 				'zh' => 'çînî',
+ 				'zh@alt=menu' => 'çînî, mandarînî',
+ 				'zh_Hans' => 'çîniya sadekirî',
+ 				'zh_Hans@alt=long' => 'çîniya mandarînî ya sadekirî',
+ 				'zh_Hant' => 'çîniya kevneşopî',
+ 				'zh_Hant@alt=long' => 'çîniya mandarînî ya kevneşopî',
  				'zu' => 'zuluyî',
  				'zza' => 'zazakî',
 
@@ -303,7 +307,13 @@ has 'display_name_script' => (
  			'Deva' => 'devanagarî',
  			'Geor' => 'gurcî',
  			'Grek' => 'yewnanî',
+ 			'Hans' => 'sadekirî',
+ 			'Hans@alt=stand-alone' => 'haniya sadekirî',
+ 			'Hant' => 'kevneşopî',
+ 			'Hant@alt=stand-alone' => 'haniya kevneşopî',
+ 			'Jpan' => 'japonî',
  			'Khmr' => 'ximêrî',
+ 			'Kore' => 'koreyî',
  			'Latn' => 'latînî',
  			'Mong' => 'mongolî',
  			'Tibt' => 'tîbetî',
@@ -325,15 +335,18 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'Cîhan',
  			'002' => 'Afrîka',
  			'003' => 'Amerîkaya Bakur',
  			'005' => 'Amerîkaya Başûr',
  			'009' => 'Okyanûsya',
+ 			'011' => 'Afrîkaya Rojava',
  			'013' => 'Amerîkaya Navîn',
+ 			'014' => 'Afrîkaya Rojhilat',
  			'015' => 'Afrîkaya Bakur',
+ 			'017' => 'Afrîkaya Navîn',
  			'019' => 'Amerîka',
  			'029' => 'Karîb',
  			'053' => 'Awistralasya',
@@ -480,11 +493,9 @@ has 'display_name_region' => (
  			'MC' => 'Monako',
  			'MD' => 'Moldova',
  			'ME' => 'Montenegro',
- 			'MF' => 'MF',
  			'MG' => 'Madagaskar',
  			'MH' => 'Giravên Marşal',
  			'MK' => 'Makedonya',
- 			'MK@alt=variant' => 'MK',
  			'ML' => 'Malî',
  			'MM' => 'Myanmar (Birmanya)',
  			'MN' => 'Mongolya',
@@ -595,7 +606,7 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'calendar' => 'salname',
  			'collation' => 'rêzkirin',
@@ -633,7 +644,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'ziman: {0}',
  			'script' => 'nivîs: {0}',
@@ -652,10 +663,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{[á à ă â å ä ã ā æ é è ĕ ë ē í ì ĭ ï ī ñ ó ò ŏ ô ø ō œ ß ú ù ŭ ū ÿ]},
+			auxiliary => qr{[á à ă â å ä ã ā æ è ĕ ë ē é ì ĭ ï ī í ñ ó ò ŏ ô ø ō œ ß ŭ ū ú ù ÿ]},
 			index => ['A', 'B', 'C', 'Ç', 'D', 'E', 'Ê', 'F', 'G', 'H', 'I', 'Î', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'Ş', 'T', 'U', 'Û', 'V', 'W', 'X', 'Y', 'Z'],
 			main => qr{[a b c ç d e ê f g h i î j k l m n o p q r s ş t u û v w x y z]},
-			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
+			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -722,48 +733,195 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'angle-arc-minute' => {
+						'name' => q(xuleka kevanî),
+						'one' => q({0} xuleka kevanî),
+						'other' => q({0} xulekên kevanî),
+					},
+					# Core Unit Identifier
+					'arc-minute' => {
+						'name' => q(xuleka kevanî),
+						'one' => q({0} xuleka kevanî),
+						'other' => q({0} xulekên kevanî),
+					},
+					# Long Unit Identifier
+					'angle-arc-second' => {
+						'name' => q(çirkeya kevanî),
+						'one' => q({0} çirkeya kevanî),
+						'other' => q({0} çirkeyên kevanî),
+					},
+					# Core Unit Identifier
+					'arc-second' => {
+						'name' => q(çirkeya kevanî),
+						'one' => q({0} çirkeya kevanî),
+						'other' => q({0} çirkeyên kevanî),
+					},
+					# Long Unit Identifier
+					'angle-degree' => {
+						'name' => q(derece),
+						'one' => q({0} derece),
+						'other' => q({0} derece),
+					},
+					# Core Unit Identifier
+					'degree' => {
+						'name' => q(derece),
+						'one' => q({0} derece),
+						'other' => q({0} derece),
+					},
+					# Long Unit Identifier
+					'angle-radian' => {
+						'name' => q(radyan),
+						'one' => q({0} radyan),
+						'other' => q({0} radyan),
+					},
+					# Core Unit Identifier
+					'radian' => {
+						'name' => q(radyan),
+						'one' => q({0} radyan),
+						'other' => q({0} radyan),
+					},
+					# Long Unit Identifier
+					'angle-revolution' => {
+						'name' => q(dewr),
+						'one' => q({0} dewr),
+						'other' => q({0} dewr),
+					},
+					# Core Unit Identifier
+					'revolution' => {
+						'name' => q(dewr),
+						'one' => q({0} dewr),
+						'other' => q({0} dewr),
+					},
+					# Long Unit Identifier
+					'concentr-karat' => {
+						'name' => q(qerat),
+						'one' => q({0} qerat),
+						'other' => q({0} qerat),
+					},
+					# Core Unit Identifier
+					'karat' => {
+						'name' => q(qerat),
+						'one' => q({0} qerat),
+						'other' => q({0} qerat),
+					},
+					# Long Unit Identifier
+					'concentr-percent' => {
+						'name' => q(ji sedî),
+						'one' => q(ji sedî {0}),
+						'other' => q(ji sedî {0}),
+					},
+					# Core Unit Identifier
+					'percent' => {
+						'name' => q(ji sedî),
+						'one' => q(ji sedî {0}),
+						'other' => q(ji sedî {0}),
+					},
+					# Long Unit Identifier
 					'coordinate' => {
 						'east' => q({0} rojhilat),
 						'north' => q({0} bakur),
 						'south' => q({0} başûr),
 						'west' => q({0} rojava),
 					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0} rojhilat),
+						'north' => q({0} bakur),
+						'south' => q({0} başûr),
+						'west' => q({0} rojava),
+					},
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(roj),
+						'one' => q({0} roj),
+						'other' => q({0} roj),
+						'per' => q({0}/roj),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(roj),
 						'one' => q({0} roj),
 						'other' => q({0} roj),
 						'per' => q({0}/roj),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(saet),
+						'one' => q({0} saet),
+						'other' => q({0} saet),
+						'per' => q({0}/st),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(saet),
 						'one' => q({0} saet),
 						'other' => q({0} saet),
 						'per' => q({0}/st),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(deqîqe),
+						'one' => q({0} deqîqe),
+						'other' => q({0} deqîqe),
+						'per' => q({0}/d),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(deqîqe),
 						'one' => q({0} deqîqe),
 						'other' => q({0} deqîqe),
 						'per' => q({0}/d),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(meh),
+						'one' => q({0} meh),
+						'other' => q({0} meh),
+						'per' => q({0}/meh),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(meh),
 						'one' => q({0} meh),
 						'other' => q({0} meh),
 						'per' => q({0}/meh),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(sanî),
+						'one' => q({0} saniye),
+						'other' => q({0} saniye),
+						'per' => q({0}/s),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(sanî),
 						'one' => q({0} saniye),
 						'other' => q({0} saniye),
 						'per' => q({0}/s),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(hefte),
+						'one' => q({0} hefte),
+						'other' => q({0} hefte),
+						'per' => q({0}/hefte),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(hefte),
 						'one' => q({0} hefte),
 						'other' => q({0} hefte),
 						'per' => q({0}/hefte),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(sal),
+						'one' => q({0} sal),
+						'other' => q({0} sal),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(sal),
 						'one' => q({0} sal),
@@ -771,41 +929,119 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					# Long Unit Identifier
+					'concentr-percent' => {
+						'one' => q(%{0}),
+						'other' => q(%{0}),
+					},
+					# Core Unit Identifier
+					'percent' => {
+						'one' => q(%{0}),
+						'other' => q(%{0}),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-100-kilometer' => {
+						'name' => q(l/100km),
+						'one' => q({0}l/100km),
+						'other' => q({0}l/100km),
+					},
+					# Core Unit Identifier
+					'liter-per-100-kilometer' => {
+						'name' => q(l/100km),
+						'one' => q({0}l/100km),
+						'other' => q({0}l/100km),
+					},
+					# Long Unit Identifier
 					'coordinate' => {
 						'east' => q({0}Rh),
 						'north' => q({0}Bk),
 						'south' => q({0}Bş),
 						'west' => q({0}Ra),
 					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0}Rh),
+						'north' => q({0}Bk),
+						'south' => q({0}Bş),
+						'west' => q({0}Ra),
+					},
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(roj),
+						'one' => q({0}r),
+						'other' => q({0}r),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(roj),
 						'one' => q({0}r),
 						'other' => q({0}r),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(saet),
+						'one' => q({0}st),
+						'other' => q({0}st),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(saet),
 						'one' => q({0}st),
 						'other' => q({0}st),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(d),
+						'one' => q({0}d),
+						'other' => q({0}d),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(d),
 						'one' => q({0}d),
 						'other' => q({0}d),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(meh),
+						'one' => q({0}m),
+						'other' => q({0}m),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(meh),
 						'one' => q({0}m),
 						'other' => q({0}m),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(s),
+						'one' => q({0}s),
+						'other' => q({0}s),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(s),
 						'one' => q({0}s),
 						'other' => q({0}s),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'one' => q({0}hf),
+						'other' => q({0}hf),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'one' => q({0}hf),
 						'other' => q({0}hf),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(sl),
+						'one' => q({0}sl),
+						'other' => q({0}sl),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(sl),
 						'one' => q({0}sl),
@@ -813,48 +1049,202 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'angle-arc-minute' => {
+						'name' => q(xlk. kevanî),
+					},
+					# Core Unit Identifier
+					'arc-minute' => {
+						'name' => q(xlk. kevanî),
+					},
+					# Long Unit Identifier
+					'angle-arc-second' => {
+						'name' => q(çrk. kevanî),
+					},
+					# Core Unit Identifier
+					'arc-second' => {
+						'name' => q(çrk. kevanî),
+					},
+					# Long Unit Identifier
+					'angle-degree' => {
+						'name' => q(derece),
+					},
+					# Core Unit Identifier
+					'degree' => {
+						'name' => q(derece),
+					},
+					# Long Unit Identifier
+					'angle-radian' => {
+						'name' => q(radyan),
+						'one' => q({0} rad),
+						'other' => q({0} rad),
+					},
+					# Core Unit Identifier
+					'radian' => {
+						'name' => q(radyan),
+						'one' => q({0} rad),
+						'other' => q({0} rad),
+					},
+					# Long Unit Identifier
+					'angle-revolution' => {
+						'name' => q(dwr),
+						'one' => q({0} dwr),
+						'other' => q({0} dwr),
+					},
+					# Core Unit Identifier
+					'revolution' => {
+						'name' => q(dwr),
+						'one' => q({0} dwr),
+						'other' => q({0} dwr),
+					},
+					# Long Unit Identifier
+					'concentr-karat' => {
+						'name' => q(qerat),
+					},
+					# Core Unit Identifier
+					'karat' => {
+						'name' => q(qerat),
+					},
+					# Long Unit Identifier
+					'concentr-percent' => {
+						'one' => q(%{0}),
+						'other' => q(%{0}),
+					},
+					# Core Unit Identifier
+					'percent' => {
+						'one' => q(%{0}),
+						'other' => q(%{0}),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-100-kilometer' => {
+						'name' => q(l/100 km),
+						'one' => q({0} l/100 km),
+						'other' => q({0} l/100 km),
+					},
+					# Core Unit Identifier
+					'liter-per-100-kilometer' => {
+						'name' => q(l/100 km),
+						'one' => q({0} l/100 km),
+						'other' => q({0} l/100 km),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-kilometer' => {
+						'name' => q(l/km),
+						'one' => q({0} l/km),
+						'other' => q({0} l/km),
+					},
+					# Core Unit Identifier
+					'liter-per-kilometer' => {
+						'name' => q(l/km),
+						'one' => q({0} l/km),
+						'other' => q({0} l/km),
+					},
+					# Long Unit Identifier
 					'coordinate' => {
 						'east' => q({0} Rh),
 						'north' => q({0} Bk),
 						'south' => q({0} Bş),
 						'west' => q({0} Ra),
 					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0} Rh),
+						'north' => q({0} Bk),
+						'south' => q({0} Bş),
+						'west' => q({0} Ra),
+					},
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(roj),
+						'one' => q({0} roj),
+						'other' => q({0} roj),
+						'per' => q({0}/r),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(roj),
 						'one' => q({0} roj),
 						'other' => q({0} roj),
 						'per' => q({0}/r),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(saet),
+						'one' => q({0} st),
+						'other' => q({0} st),
+						'per' => q({0}/st),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(saet),
 						'one' => q({0} st),
 						'other' => q({0} st),
 						'per' => q({0}/st),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(d),
+						'one' => q({0} d),
+						'other' => q({0} d),
+						'per' => q({0}/d),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(d),
 						'one' => q({0} d),
 						'other' => q({0} d),
 						'per' => q({0}/d),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(meh),
+						'one' => q({0} m),
+						'other' => q({0} m),
+						'per' => q({0}/m),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(meh),
 						'one' => q({0} m),
 						'other' => q({0} m),
 						'per' => q({0}/m),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(s),
+						'one' => q({0} s),
+						'other' => q({0} s),
+						'per' => q({0}/s),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(s),
 						'one' => q({0} s),
 						'other' => q({0} s),
 						'per' => q({0}/s),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(hf),
+						'one' => q({0} hf),
+						'other' => q({0} hf),
+						'per' => q({0}/hf),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(hf),
 						'one' => q({0} hf),
 						'other' => q({0} hf),
 						'per' => q({0}/hf),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(sal),
+						'one' => q({0} sal),
+						'other' => q({0} sal),
+						'per' => q({0}/sal),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(sal),
 						'one' => q({0} sal),
@@ -889,27 +1279,6 @@ has 'listPatterns' => (
 				end => q({0} û {1}),
 				2 => q({0} û {1}),
 		} }
-);
-
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has native_numbering_system => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has 'minimum_grouping_digits' => (
-	is			=>'ro',
-	isa			=> Int,
-	init_arg	=> undef,
-	default		=> 1,
 );
 
 has 'number_symbols' => (
@@ -988,7 +1357,6 @@ has 'currencies' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'EUR' => {
-			symbol => '€',
 			display_name => {
 				'currency' => q(ewro),
 				'one' => q(ewro),
@@ -1256,10 +1624,10 @@ has 'calendar_quarters' => (
 						2 => '3',
 						3 => '4'
 					},
-					wide => {0 => 'Ç1',
-						1 => 'Ç2',
-						2 => 'Ç3',
-						3 => 'Ç4'
+					wide => {0 => 'Çarêka 1em',
+						1 => 'Çarêka 2em',
+						2 => 'Çarêka 3em',
+						3 => 'Çarêka 4em'
 					},
 				},
 				'stand-alone' => {
@@ -1272,6 +1640,11 @@ has 'calendar_quarters' => (
 						1 => '2',
 						2 => '3',
 						3 => '4'
+					},
+					wide => {0 => 'Çarêka 1em',
+						1 => 'Çarêka 2em',
+						2 => 'Çarêka 3em',
+						3 => 'Çarêka 4em'
 					},
 				},
 			},

@@ -28,6 +28,8 @@ The input is parsed as YAML,
 assuming the file is an array of dictionary entries.
 We extract the dictionary names and output this as an fsdb table.
 
+We also flatten one level of lists into comma-separated values.
+
 The output is tab-separated fsdb.
 (Someday more general field separators should be supported.)
 
@@ -266,7 +268,12 @@ sub run($) {
 	    if (!defined($i)) {
 		warn $self->{_prog} . ": unknown field $_ in record $record_no.\n";
 	    } else {
-		$row[$i] = $href->{$_}; 
+                my $n = $href->{$_};
+                if (ref $n eq 'ARRAY') {
+                    # one level of flattening
+                    $n = "[" . join(',', @$n) . "]";
+                };
+		$row[$i] = $n;
 	    };
 	};
 	grep { s/\t/ /g; } @row;   # clean up for fsdb double-space separator

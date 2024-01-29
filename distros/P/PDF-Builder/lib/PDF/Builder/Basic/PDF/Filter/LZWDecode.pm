@@ -6,8 +6,8 @@ use Carp;
 use POSIX;
 use base 'PDF::Builder::Basic::PDF::Filter::FlateDecode';
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -15,10 +15,12 @@ PDF::Builder::Basic::PDF::Filter::LZWDecode - compress and uncompress stream fil
 
 =cut
 
+# extensively extended from PDF::API2 version, for TIFF support
+
 sub new {
     my ($class, $decode_parms) = @_;
 
-    my $self = { DecodeParms => $decode_parms, };
+    my $self = { 'DecodeParms' => $decode_parms };
 
     bless $self, $class;
     $self->_reset_code();
@@ -38,15 +40,15 @@ sub infilt {
     }
     $self->{'table'} = [ map { chr } 0 .. $self->{'clear_table'} - 1 ];
 
-    while ( $data ne q{} ) {
+    while ($data ne q{}) {
         ($code, $partial_code, $partial_bits) =
           $self->read_dat(\$data, $partial_code, $partial_bits,
             $self->{'code_length'});
         last unless defined $code;
 
         unless ($early_change) {
-            if ($self->{next_code} == (1 << $self->{code_length})
-                and $self->{code_length} < 12) {
+            if ($self->{'next_code'} == (1 << $self->{'code_length'})
+                and $self->{'code_length'} < 12) {
                 $self->{'code_length'}++;
             }
         }
@@ -71,7 +73,7 @@ sub infilt {
 
         if ($early_change) {
             if ($self->{'next_code'} == (1 << $self->{'code_length'})
-                and $self->{code_length} < 12) {
+                and $self->{'code_length'} < 12) {
                 $self->{'code_length'}++;
             }
         }
@@ -80,8 +82,9 @@ sub infilt {
     $self->{'partial_bits'} = $partial_bits;
 
     if ($self->_predictor_type() == 2) {
-        return $self->_depredict($result);
+	return $self->_depredict($result);
     }
+
     return $result;
 }
 
@@ -95,30 +98,30 @@ sub outfilt {
     $self->{'buf'}     = q{};
     $self->{'buf_pos'} = 0;
     $self->_write_code($self->{'clear_table'});
-
+ 
     if ($self->_predictor_type() == 2) {
         $str = $self->_predict($str);
     }
-
+ 
     for my $i (0 .. length($str)) {
         my $char = substr($str, $i, 1);
         $bytes_in += 1;
-
+ 
         if (exists $self->{'table'}{ $seen . $char }) {
             $seen .= $char;
             next;
         }
-
+ 
         $self->_write_code($self->{'table'}{$seen});
-
+ 
         $self->_new_code($seen . $char);
-
+ 
         $seen = $char;
-
+ 
         if ($self->{'at_max_code'}) {
             $self->_write_code($self->{'clear_table'});
             $self->_reset_code();
-
+ 
             undef $checkpoint;
             undef $last_ratio;
         }
@@ -132,10 +135,10 @@ sub outfilt {
     }
     return pack 'B*', $self->{'buf'};
 }
-
+ 
 sub _reset_code {
     my $self = shift;
-
+ 
     $self->{'initial_code_length'} = 9;
     $self->{'max_code_length'}     = 12;
     $self->{'code_length'}         = $self->{'initial_code_length'};
@@ -147,15 +150,15 @@ sub _reset_code {
     $self->{'table'} = { map { chr $_ => $_ } 0 .. $self->{'clear_table'} - 1 };
     return;
 }
-
+ 
 sub _new_code {
     my ($self, $word) = @_;
-
+ 
     if ($self->{'at_max_code'} == 0) {
         $self->{'table'}{$word} = $self->{'next_code'};
         $self->{'next_code'} += 1;
     }
-
+ 
     if ($self->{'next_code'} >= $self->{'next_increase'}) {
         if ($self->{'code_length'} < $self->{'max_code_length'}) {
             $self->{'code_length'}   += 1;
@@ -166,17 +169,17 @@ sub _new_code {
     }
     return;
 }
-
+ 
 sub _write_code {
     my ($self, $code) = @_;
-
+ 
     if (not defined $code) { return; }
-
+ 
     if ($code > (2**$self->{'code_length'})) {
         croak
           "Code $code too large for current code length $self->{'code_length'}";
     }
-
+ 
     for my $bit (reverse 0 .. ($self->{'code_length'} - 1)) {
         if (($code >> $bit) & 1) {
             $self->{'buf'} .= '1';
@@ -184,20 +187,20 @@ sub _write_code {
             $self->{'buf'} .= '0';
         }
     }
-
+ 
     $self->{'buf_pos'} += $self->{'code_length'};
     return;
 }
-
+ 
 sub read_dat {
     my ($self, $data_ref, $partial_code, $partial_bits, $code_length) = @_;
 
     if (not defined $partial_bits) { $partial_bits = 0; }
     if (not defined $partial_code) { $partial_code = 0; }
 
-    while ($partial_bits < $code_length ) {
+    while ($partial_bits < $code_length) {
         return (undef, $partial_code, $partial_bits) unless length($$data_ref);
-        $partial_code = ($partial_code << 8 ) + unpack('C', $$data_ref);
+        $partial_code = ($partial_code << 8) + unpack('C', $$data_ref);
         substr($$data_ref, 0, 1, q{});
         $partial_bits += 8;
     }
@@ -223,7 +226,7 @@ sub _predictor_type {
     }
     return 1;
 }
-
+ 
 sub _depredict {
     my ($self, $data) = @_;
     my $param = $self->{'DecodeParms'};
@@ -233,7 +236,7 @@ sub _depredict {
     my $colors  = $param->{'Colors'}  ? $param->{'Colors'}->val()  : 1;
     my $columns = $param->{'Columns'} ? $param->{'Columns'}->val() : 1;
     my $rows    = $param->{'Rows'}    ? $param->{'Rows'}->val()    : 0;
-
+ 
     my $comp = $colors + $alpha;
     my $bpp  = ceil($bpc * $comp / 8);
     my $max  = 256;
@@ -252,7 +255,7 @@ sub _depredict {
     }
     return $data;
 }
-
+ 
 sub _predict {
     my ($self, $data) = @_;
     my $param = $self->{'DecodeParms'};
@@ -262,7 +265,7 @@ sub _predict {
     my $colors  = $param->{'Colors'}  ? $param->{'Colors'}->val()  : 1;
     my $columns = $param->{'Columns'} ? $param->{'Columns'}->val() : 1;
     my $rows    = $param->{'Rows'}    ? $param->{'Rows'}->val()    : 0;
-
+ 
     my $comp = $colors + $alpha;
     my $bpp  = ceil($bpc * $comp / 8);
     my $max  = 256;
@@ -281,5 +284,5 @@ sub _predict {
     }
     return $data;
 }
-
+ 
 1;

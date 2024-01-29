@@ -1,10 +1,10 @@
 {
    "abstract" : "Perl extension for no-carry arithmetic",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -48,10 +48,10 @@
       "homepage" : "https://github.com/briandfoy/math-nocarry",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/math-nocarry.git",
+         "url" : "https://github.com/briandfoy/math-nocarry",
          "web" : "https://github.com/briandfoy/math-nocarry"
       }
    },
-   "version" : "1.114",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "1.115",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,29 @@
 Revision history for Perl extension Net::SAML2.
 
+0.76 -- Mon Jan 08 18:31:06 AST 2024
+
+    - 688dc32 Forgot to increment the version for last release
+    - 65ba171 v0.75
+
+0.75 -- Mon Jan 01 22:54:10 AST 2024
+
+    [ Significant Changes since 0.74 ]
+    - A future release WILL make sha256 the default.  If that is a problem for you please check which year it is.
+    - waterkip has added the ability to expose the AttributeConsumingService in metadata generation
+    - See the documentation for AttributeConsumingService and RequestedAttribute
+
+    [Detailed Change Log]
+    - 18e4cdb Update Copyright year
+    - beb32f7 Updates for Release
+    - 75f86fe Add attribute_consuming_service to SP for metadata creation
+    - 0cc1a28 Add AttributeConsumingService object to Net::SAML2
+    - c77250d Add RequestedAttribute object to Net::SAML2
+    - 42ef7c0 Fix author tests for Net::SAML2::XML::Sig
+    - 80d0b6d Reflect that the default will be sha256
+    - 43d1d5c exclusive was an option for XML::CanonicalizeXML
+    - f3e8e5f Fixes #123 Useless cert_text
+    - 40da745 v0.74
+
 0.74 -- Sun Aug 27 22:04:34 ADT 2023
 
     [ Significant Changes since 0.73 ]

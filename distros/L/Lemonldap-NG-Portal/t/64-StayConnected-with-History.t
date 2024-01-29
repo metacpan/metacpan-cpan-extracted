@@ -34,7 +34,6 @@ ok(
     'Auth query'
 );
 count(1);
-my $id = expectCookie($res);
 my ( $host, $url, $query ) =
   expectForm( $res, undef, '/registerbrowser', 'fg', 'token' );
 
@@ -46,12 +45,11 @@ ok(
         '/registerbrowser',
         IO::String->new($query),
         length => length($query),
-        cookie => "lemonldap=$id",
         accept => 'text/html',
     ),
     'Post fingerprint'
 );
-expectRedirection( $res, 'http://auth.example.com/' );
+expectPortalError( $res, 24 );
 count(1);
 
 # Try to authenticate
@@ -65,7 +63,6 @@ ok(
     'Auth query'
 );
 count(1);
-$id = expectCookie($res);
 ( $host, $url, $query ) =
   expectForm( $res, undef, '/registerbrowser', 'fg', 'token' );
 
@@ -76,11 +73,11 @@ ok(
         '/registerbrowser',
         IO::String->new($query),
         length => length($query),
-        cookie => "lemonldap=$id",
         accept => 'text/html',
     ),
     'Post fingerprint'
 );
+my $id = expectCookie($res);
 expectRedirection( $res, 'http://auth.example.com/' );
 my $cid = expectCookie( $res, 'llngpersistent' );
 ok( $res->[1]->[5] =~ /\bsecure\b/, ' Secure cookie found' )
@@ -192,7 +189,6 @@ ok(
     'Auth query'
 );
 count(1);
-$id = expectCookie($res);
 ( $host, $url, $query ) =
   expectForm( $res, undef, '/registerbrowser', 'fg', 'token' );
 
@@ -203,12 +199,12 @@ ok(
         '/registerbrowser',
         IO::String->new($query),
         length => length($query),
-        cookie => "lemonldap=$id",
         accept => 'text/html',
     ),
     'Post fingerprint'
 );
 count(1);
+$id  = expectCookie($res);
 $cid = expectCookie( $res, 'llngpersistent' );
 
 ok( $res->[2]->[0] =~ qr%<img src="/static/common/logos/logo_llng_old.png"%,

@@ -60,7 +60,7 @@ typedef FILE * InOutStream;
 #ifdef HAVE_UTIL_H
 # ifdef UTIL_H_ABS_PATH
 #  include UTIL_H_ABS_PATH
-# elif ((PATCHLEVEL < 19) && (SUBVERSION < 4))
+# elif ((PATCHLEVEL < 19) || ((PATCHLEVEL == 19) && (SUBVERSION < 4)))
 #  include <util.h>
 # endif
 #endif /* HAVE_UTIL_H */

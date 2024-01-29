@@ -2,7 +2,7 @@
 #
 #  (C) Paul Evans, 2010-2023 -- leonerd@leonerd.org.uk
 
-package Circle::FE::Term::Widget::Entry 0.232470;
+package Circle::FE::Term::Widget::Entry 0.240250;
 
 use v5.26;
 use warnings;
@@ -164,22 +164,22 @@ Circle::FE::Term::Widget::Entry::Widget.topic {
 
 EOF
 
-package Circle::FE::Term::Widget::Entry::Widget;
+use Object::Pad v0.800;
+class Circle::FE::Term::Widget::Entry::Widget
+   :isa(Tickit::Widget::Entry);
 
-use base qw( Tickit::Widget::Entry );
 Tickit::Window->VERSION( '0.42' );
 
 use Tickit::Async 0.21;  # ->cancel_timer
 
 use Tickit::Style -copy;
 
-sub new
+sub BUILDARGS
 {
    my $class = shift;
    my %args = @_;
 
-   my $tab = delete $args{tab};
-   my $on_typing = delete $args{on_typing};
+   my $on_typing = $args{on_typing};
 
    if( $on_typing ) {
       my $on_enter = $args{on_enter};
@@ -190,64 +190,63 @@ sub new
       };
    }
 
-   my $self = $class->SUPER::new( %args );
-
-   $self->{tab} = $tab;
-   $self->{on_typing} = $on_typing;
-
-   return $self;
+   return %args;
 }
 
-sub on_key
+field $tab       :param;
+field $on_typing :param = undef;
+
+field $typing_timer_id;
+
+method on_key
 {
-   my $self = shift;
    my ( $ev ) = @_;
 
-   $self->{tab}->activated;
+   $tab->activated;
 
    my $ret = $self->SUPER::on_key( @_ );
 
-   if( $ret && $self->{on_typing} and length $self->text ) {
+   if( $ret && $on_typing and length $self->text ) {
       my $tickit = $self->window->tickit;
 
-      if( $self->{typing_timer_id} ) {
-         $tickit->cancel_timer( $self->{typing_timer_id} );
+      if( $typing_timer_id ) {
+         $tickit->cancel_timer( $typing_timer_id );
       }
       else {
          $self->started_typing;
       }
 
-      $self->{typing_timer_id} = $tickit->timer( after => 5, sub { $self->stopped_typing });
+      $typing_timer_id = $tickit->timer( after => 5, sub { $self->stopped_typing });
    }
 
    return $ret;
 }
 
-sub started_typing
+method started_typing
 {
-   my $self = shift;
-   $self->{on_typing}->( 1 );
+   $on_typing->( 1 );
 }
 
-sub stopped_typing
+method stopped_typing
 {
-   my $self = shift;
-   $self->window->tickit->cancel_timer( $self->{typing_timer_id} ) if defined $self->{typing_timer_id};
-   undef $self->{typing_timer_id};
-   $self->{on_typing}->( 0 );
+   $self->window->tickit->cancel_timer( $typing_timer_id ) if defined $typing_timer_id;
+   undef $typing_timer_id;
+   $on_typing->( 0 );
 }
 
-sub send_pending
+field $pending_count;
+field $pending_window;
+
+method send_pending
 {
-   my $self = shift;
    my ( $count ) = @_;
 
-   $self->{pending_count} = $count;
+   $pending_count = $count;
 
    if( $count ) {
-      my $win = $self->{pending_window} ||= do {
+      my $win = $pending_window ||= do {
          my $win = $self->window->make_hidden_sub( 0, $self->window->cols - 12, 1, 12 );
-         my $countr = \$self->{pending_count};
+         my $countr = \$pending_count;
          $win->bind_event( expose => sub {
             my ( $win, undef, $info ) = @_;
             my $rb = $info->rb;
@@ -263,13 +262,13 @@ sub send_pending
       if( !$win->is_visible ) {
          # TODO: Use Tickit->timer when it comes out
          $win->tickit->loop->watch_time( after => 0.5, code => sub {
-            $win->show if $self->{pending_count} and !$win->is_visible;
+            $win->show if $pending_count and !$win->is_visible;
          });
       }
 
       $win->expose if $win->is_visible;
    }
-   elsif( my $win = $self->{pending_window} ) {
+   elsif( my $win = $pending_window ) {
       $win->hide;
    }
 }

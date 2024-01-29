@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Device::BusPirate;
 use lib "t/lib";
@@ -30,7 +30,7 @@ my $bbio;
    expect_write "\x80"; # bitbang
    expect_read "\x00";
 
-   is_deeply( $bbio->read->get,
+   is( $bbio->read->get,
       { miso => '', cs => '', mosi => '', clk => '', aux => '' },
       '->read yields pins' );
 
@@ -52,7 +52,7 @@ my $bbio;
    expect_write "\x91"; # bitbang CS,AUX again
    expect_read "\x11";
 
-   is_deeply( $bbio->read->get,
+   is( $bbio->read->get,
       { miso => '', mosi => '', clk => '' },
       '->read yields fewer pins after write' );
 

@@ -1,13 +1,12 @@
 package File::Rename;
 
-use strict;
-use warnings;
+use 5.032;  # use strict; use warnings;
 
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( rename );
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 sub import {
     my $pack = shift;

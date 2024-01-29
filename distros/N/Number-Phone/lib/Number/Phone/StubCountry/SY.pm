@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230903131448;
+our $VERSION = 1.20231210185946;
 
 my $formatters = [
                 {
@@ -80,25 +80,25 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"96316", "Al\-Swedaa",
-"96325", "Menbej",
-"96313", "Al\-Zabadani",
-"96312", "Al\-Nebek",
-"96344", "Hamah",
-"96311", "Damascus\ and\ rural\ areas",
+$areanames{en} = {"96311", "Damascus\ and\ rural\ areas",
+"96323", "Edleb",
+"96333", "Hamah",
+"96351", "Deir\ Ezzour",
 "96334", "Palmyra",
 "96315", "Dara",
-"96352", "Alhasakah",
-"96353", "Al\-Kameshli",
-"96351", "Deir\ Ezzour",
-"96331", "Homs",
-"96321", "Aleppo",
-"96341", "Lattakia",
-"96314", "Al\-Quneitra",
-"96333", "Hamah",
-"96323", "Edleb",
 "96322", "Al\-Rakkah",
-"96343", "Tartous",};
+"96341", "Lattakia",
+"96321", "Aleppo",
+"96316", "Al\-Swedaa",
+"96314", "Al\-Quneitra",
+"96352", "Alhasakah",
+"96313", "Al\-Zabadani",
+"96343", "Tartous",
+"96344", "Hamah",
+"96331", "Homs",
+"96325", "Menbej",
+"96312", "Al\-Nebek",
+"96353", "Al\-Kameshli",};
 
     sub new {
       my $class = shift;

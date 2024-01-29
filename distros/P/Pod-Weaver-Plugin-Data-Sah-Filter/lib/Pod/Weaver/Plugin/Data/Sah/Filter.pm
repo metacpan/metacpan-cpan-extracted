@@ -9,9 +9,9 @@ use Data::Dmp;
 use File::Temp;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-15'; # DATE
+our $DATE = '2024-01-22'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Data-Sah-Filter'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 sub _process_filter_module {
     no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
@@ -41,7 +41,7 @@ sub _process_filter_module {
             $meta = $package->meta;
             #use DD; print "VERSION: "; dd ${"$package\::VERSION"}; print "meta: "; dd $meta;
         }
-        $package =~ /\AData::Sah::Filter::\w+::(\w+)::(\w+)\z/
+        $package =~ /\AData::Sah::Filter::\w+::((?:\w+)(?:::\w+)*)+::(\w+)\z/
             or $self->log_fatal("Invalid module name $package, please use Data::Sah::Filter::<LANG>::<CATEGORY>::<DESCRIPTION>");
         $rule_cat  = $1;
         $rule_desc = $2;
@@ -221,7 +221,7 @@ Pod::Weaver::Plugin::Data::Sah::Filter - Plugin to use when building Data::Sah::
 
 =head1 VERSION
 
-This document describes version 0.008 of Pod::Weaver::Plugin::Data::Sah::Filter (from Perl distribution Pod-Weaver-Plugin-Data-Sah-Filter), released on 2022-11-15.
+This document describes version 0.009 of Pod::Weaver::Plugin::Data::Sah::Filter (from Perl distribution Pod-Weaver-Plugin-Data-Sah-Filter), released on 2024-01-22.
 
 =head1 SYNOPSIS
 
@@ -294,7 +294,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

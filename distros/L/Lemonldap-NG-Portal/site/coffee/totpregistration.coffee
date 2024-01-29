@@ -84,7 +84,7 @@ verify = ->
 					e = jQuery.Event( "mfaAdded" )
 					$(document).trigger e, [ { "type": "totp" } ]
 					if !e.isDefaultPrevented()
-						setMsg 'yourKeyIsRegistered', 'success'
+						window.location.href = window.portal + "2fregisters?continue=1"
 					
 $(document).ready ->
 	getKey()

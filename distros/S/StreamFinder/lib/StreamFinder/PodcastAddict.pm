@@ -94,14 +94,20 @@ file.
 
 =head1 DESCRIPTION
 
+NOTE:  StreamFinder::Podcastaddict is now considered depreciated and may be 
+removed in a later StreamFinder release as it now requires a specific valid 
+episode page to fetch streams from, as Podcastaddict.com has javascripted up 
+their podcast pages now to the point that it is no longer possible to obtain 
+a playlist or first episode from them via our scripts.  
+
 StreamFinder::PodcastAddict accepts a valid podcast ID or URL on 
-PodcastAddict.com and returns the actual stream URL(s), title, and cover art icon.  
-The purpose is that one needs one of these URLs in order to have the option to 
-stream the podcast in one's own choice of media player software rather than 
-using their web browser and accepting any / all flash, ads, javascript, 
-cookies, trackers, web-bugs, and other crapware that can come with that method 
-of play.  The author uses his own custom all-purpose media player called 
-"fauxdacious" (his custom hacked version of the open-source "audacious" 
+PodcastAddict.com and returns the actual stream URL(s), title, and cover art 
+icon.  The purpose is that one needs one of these URLs in order to have the 
+option to stream the podcast in one's own choice of media player software 
+rather than using their web browser and accepting any / all flash, ads, 
+javascript, cookies, trackers, web-bugs, and other crapware that can come with 
+that method of play.  The author uses his own custom all-purpose media player 
+called "fauxdacious" (his custom hacked version of the open-source "audacious" 
 audio player).  "fauxdacious" can incorporate this module to decode and play 
 PodcastAddict.com streams.
 

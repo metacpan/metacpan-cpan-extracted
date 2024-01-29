@@ -1,0 +1,21 @@
+#fsdb x y
+# column x has absolute precision 10
+# column y has absolute precision 20
+0	0
+1	50
+11	50
+12	50
+22	50
+23	50
+33	50
+34	50
+44	50
+45	50
+50	70
+50	71
+50	91
+50	92
+50	99
+100	100
+# output 16 of 101 (0.1584)
+#   | dbcolsdecimate -v -P 10 x -P 20 y

@@ -1,8 +1,9 @@
-#!perl -w
+#!perl
+use strict;
+use warnings;
 
 use Test qw( plan );
 use IPC::Run3;
-use strict;
 
 my ( $in, $out, $err ) = @_;
 
@@ -214,20 +215,46 @@ sub {
 
       my $system_child_error = eval
       {
-	      local $SIG{CHLD} = "IGNORE";
-	      system $^X, '-e', 0;
-	      $?;
+        local $SIG{CHLD} = "IGNORE";
+        system $^X, '-e', 0;
+        $?;
       };
       my $run3_child_error = eval
       {
-	      local $SIG{CHLD} = "IGNORE";
-	      run3 [ $^X, '-e', 0 ], \undef, \undef, \undef, { return_if_system_error => 1 };
-	      $?;
+        local $SIG{CHLD} = "IGNORE";
+        run3 [ $^X, '-e', 0 ], \undef, \undef, \undef, { return_if_system_error => 1 };
+        $?;
       };
       ok $run3_child_error, $system_child_error;
 
   }
 },
+
+
+sub {
+  ($in, $out, $err) = ();
+  eval { run3 [ $^X, '-e', 'BEGIN { die }' ], \$in, \$out, \$err };
+  ok $@, '';
+},
+
+sub {
+  ($in, $out, $err) = ();
+  eval { run3 [ $^X, '-e', 'print STDOUT "stdout"; print STDERR "stderr"; exit 255;' ], \$in, \$out, \$err };
+  ok $@, '';
+},
+
+sub {
+  ok $out, "stdout";
+},
+
+sub {
+  ok $err, "stderr";
+},
+
+sub {
+  ok $? >> 8, 255;
+},
+
 );
 
 plan tests => 0+@tests;

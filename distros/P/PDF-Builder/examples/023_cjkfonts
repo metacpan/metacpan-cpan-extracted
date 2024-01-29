@@ -1,5 +1,8 @@
 #!/usr/bin/perl -w
 
+# wants one or more font names on the command line. If none given, use full
+# list of CJK fonts. If -s given as first arg, use the short list.
+
 use strict;
 use warnings;
 
@@ -30,6 +33,18 @@ my @fontnames = qw[
   KozMin KozMin-Bold KozMin-Italic KozMin-BoldItalic
   KozGo KozGo-Bold KozGo-Italic KozGo-BoldItalic 
 ];
+
+# 'short' (-s flag)?
+if (@ARGV > 0 && $ARGV[0] eq '-s') {
+    @fontnames = qw[
+      KozGo  Ming-Bold
+    ];
+}
+
+# override default list with command line entries
+if (scalar @ARGV && $ARGV[0] ne '-s') {
+    @fontnames = @ARGV;
+}
 
 foreach my $fn (@fontnames) {
    #if ($fn eq 'Ming-Bold') { last; } # for testing

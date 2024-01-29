@@ -37,4 +37,3 @@ ok(
     ),
     "Read $inifile"
 );
-

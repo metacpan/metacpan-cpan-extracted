@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_move_to' } = { 
-    	summary => 'Moves the current range to the dest range.            ',
+    	summary => 'Moves the current range to the dest range.',
         params => $params,
         returns => 'CellsCloudResponse',
     };

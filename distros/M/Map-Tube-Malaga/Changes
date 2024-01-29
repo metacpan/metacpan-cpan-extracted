@@ -1,3 +1,21 @@
+0.16 2023-12-09T10:57:12+01:00
+ - Add EXAMPLE5 section to doc.
+ - Add link to Wikipedia page to XML file.
+ - Add test for ok_map_functions().
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Fix image name in doc.
+ - Implement station order.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section.
+ - Move bugtracker to github.
+ - Rename example files to better names.
+ - Rewrite XML map to new version with line IDs.
+ - Rewrite doc to use of =head2.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.15 2015-10-16T12:05:58+02:00
  - Add EXAMPLE4 to doc.
  - Add tests for get_node_by_id() and get_node_by_name() methods.

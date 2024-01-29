@@ -16,6 +16,7 @@ WriteMakefile(
 	keywords => [qw(Tk Tcl/Tk GUI Debuger)],
     },
     PREREQ_PM => {
-	'Tcl::Tk' => 1.03
+	'Tcl::Tk' => 1.03,
+        'Tcl::Tk::Tkwidget::treectrl' => 1,
     }
 );

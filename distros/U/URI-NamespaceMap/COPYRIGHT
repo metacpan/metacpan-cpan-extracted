@@ -3,12 +3,7 @@ Upstream-Name: URI-NamespaceMap
 Upstream-Contact: Chris Prather (PERIGRIN) <chris@prather.org>, Gregory Todd Williams <gwilliams@cpan.org>, and Kjetil Kjernsmo <kjetilk@cpan.org>
 Source: https://metacpan.org/module/URI::NamespaceMap
 
-Files: Changes
- META.json
- META.yml
- doap.ttl
- lib/Types/Namespace.pm
- lib/URI/Namespace.pm
+Files: lib/Types/Namespace.pm
  lib/URI/NamespaceMap/ReservedLocalParts.pm
  t/justuri.t
  t/lib/CommonTest.pm
@@ -18,11 +13,13 @@ Files: Changes
 Copyright: Copyright 2019 Chris Prather, Gregory Todd Williams, and Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: COPYRIGHT
- CREDITS
- SIGNATURE
-Copyright: None
-License: public-domain
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+ lib/URI/Namespace.pm
+Copyright: Copyright 2024 Chris Prather, Gregory Todd Williams, and Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
 
 Files: t/namespacemap.t
  t/prefixguess-none.t
@@ -36,6 +33,12 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
 Files: README
  lib/URI/NamespaceMap.pm
 Copyright: Copyright 2012,2013,2014,2015,2016,2017,2018,2019 Gregory Todd Williams, Chris Prather and Kjetil Kjernsmo.
@@ -46,23 +49,23 @@ Files: dist.ini
 Copyright: Copyright 2018 Chris Prather, Gregory Todd Williams, and Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: t/iri.t
 Copyright: Copyright 2014 Chris Prather, Gregory Todd Williams, and Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: Makefile.PL
+Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2019 by the copyright holder(s).
+ This software is Copyright (c) 2024 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2019 by the copyright holder(s).
+ This software is Copyright (c) 2024 by the copyright holder(s).
  
  This is free software, licensed under:
  

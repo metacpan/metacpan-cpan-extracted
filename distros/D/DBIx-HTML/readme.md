@@ -1,6 +1,6 @@
 DBIx::HTML
 ==========
-Just another HTML table generating DBI extension. [![CPAN Version](https://badge.fury.io/pl/DBIx-HTML.svg)](https://metacpan.org/pod/DBIx::HTML) [![Build Status](https://api.travis-ci.org/jeffa/DBIx-HTML.svg?branch=master)](https://travis-ci.org/jeffa/DBIx-HTML)
+Just another HTML table generating DBI extension. [![CPAN Version](https://badge.fury.io/pl/DBIx-HTML.svg)](https://metacpan.org/pod/DBIx::HTML)
 
 See [DBIx::HTML](http://search.cpan.org/dist/DBIx-HTML/)
 and [Spreadsheet::HTML](http://search.cpan.org/dist/Spreadsheet-HTML/)

@@ -44,6 +44,7 @@ lib/Fsdb/Filter/dbcolneaten.pm
 lib/Fsdb/Filter/dbcolpercentile.pm
 lib/Fsdb/Filter/dbcolrename.pm
 lib/Fsdb/Filter/dbcolscorrelate.pm
+lib/Fsdb/Filter/dbcolsdecimate.pm
 lib/Fsdb/Filter/dbcolsplittocols.pm
 lib/Fsdb/Filter/dbcolsplittorows.pm
 lib/Fsdb/Filter/dbcolsregression.pm
@@ -322,6 +323,17 @@ TEST/dbcolscorrelate_multi.out
 TEST/dbcolscorrelate_uncentered.cmd
 TEST/dbcolscorrelate_uncentered.in
 TEST/dbcolscorrelate_uncentered.out
+TEST/dbcolsdecimate_linear.cmd
+TEST/dbcolsdecimate_linear.in
+TEST/dbcolsdecimate_linear.out
+TEST/dbcolsdecimate_linear_absolute.cmd
+TEST/dbcolsdecimate_linear_absolute.out
+TEST/dbcolsdecimate_linear_different.cmd
+TEST/dbcolsdecimate_linear_different.in
+TEST/dbcolsdecimate_linear_different.out
+TEST/dbcolsdecimate_stairstep.cmd
+TEST/dbcolsdecimate_stairstep.in
+TEST/dbcolsdecimate_stairstep.out
 TEST/dbcolsplittocols_C.cmd
 TEST/dbcolsplittocols_C.in
 TEST/dbcolsplittocols_C.out
@@ -818,7 +830,6 @@ TEST/dbrecolize_ex_S.in
 TEST/dbrecolize_ex_S.out
 TEST/dbrow_ex.cmd
 TEST/dbrow_ex.in
-TEST/dbrow_ex.in.gz
 TEST/dbrow_ex.out
 TEST/dbrow_ex_autodecompress.cmd
 TEST/dbrow_ex_autodecompress.out
@@ -1034,4 +1045,5 @@ TEST/yaml_to_db_ex.cmd
 TEST/yaml_to_db_ex.in
 TEST/yaml_to_db_ex.out
 update_modules
+TEST/dbrow_ex.in.gz
 META.json                                Module JSON meta-data (added by MakeMaker)

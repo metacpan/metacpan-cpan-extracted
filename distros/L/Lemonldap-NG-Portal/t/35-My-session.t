@@ -83,7 +83,7 @@ ok(
 );
 ok(
     $res->{myapplications}->[0]->{Applications}->[0]->{'Application Test 1'}
-      ->{AppLogo} eq 'http:/auth.example.com//static/common/apps/demo.png',
+      ->{AppLogo} eq 'http://auth.example.com/static/common/apps/demo.png',
     ' Logo app1 found'
 );
 ok(

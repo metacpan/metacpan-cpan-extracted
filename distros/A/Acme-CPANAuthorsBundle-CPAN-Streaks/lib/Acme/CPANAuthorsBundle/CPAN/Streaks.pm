@@ -3,9 +3,9 @@ package Acme::CPANAuthorsBundle::CPAN::Streaks;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-25'; # DATE
+our $DATE = '2024-01-01'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20231120.0'; # VERSION
+our $VERSION = '20240101.0'; # VERSION
 
 1;
 # ABSTRACT: A collection of Acme::CPANAuthors::CPAN::Streaks::* modules
@@ -22,7 +22,7 @@ Acme::CPANAuthorsBundle::CPAN::Streaks - A collection of Acme::CPANAuthors::CPAN
 
 =head1 VERSION
 
-This document describes version 20231120.0 of Acme::CPANAuthorsBundle::CPAN::Streaks (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2023-11-25.
+This document describes version 20240101.0 of Acme::CPANAuthorsBundle::CPAN::Streaks (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-01-01.
 
 =head1 HOMEPAGE
 
@@ -60,7 +60,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

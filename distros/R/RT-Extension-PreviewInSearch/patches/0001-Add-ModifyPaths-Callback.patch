@@ -1,0 +1,16 @@
+diff --git a/share/html/Elements/ShowHistoryPage b/share/html/Elements/ShowHistoryPage
+index f6aa296e8..7486a0276 100644
+--- a/share/html/Elements/ShowHistoryPage
++++ b/share/html/Elements/ShowHistoryPage
+@@ -136,6 +136,11 @@ while ( my $Transaction = $Transactions->Next ) {
+     );
+     next if $skip;
+
++    $m->callback(
++        ARGSRef      => \%ARGS,
++        CallbackName => 'ModifyPaths',
++    );
++
+     # ARGS is first because we're clobbering the "Attachments" parameter
+     $m->comp( 'ShowTransaction',
+         %ARGS,

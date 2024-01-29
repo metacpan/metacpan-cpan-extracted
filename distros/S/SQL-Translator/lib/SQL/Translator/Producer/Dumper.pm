@@ -41,73 +41,71 @@ use Template;
 
 use Data::Dumper;
 
-our $VERSION = '1.63';
+our $VERSION = '1.65';
 
 sub produce {
-    my $t              = shift;
-    my $args           = $t->producer_args;
-    my $schema         = $t->schema;
-    my $add_truncate   = $args->{'add_truncate'}   || 0;
-    my $skip           = $args->{'skip'}           || '';
-    my $skiplike       = $args->{'skiplike'}       || '';
-    my $db_user        = $args->{'db_user'}        || 'db_user';
-    my $db_pass        = $args->{'db_password'}    || 'db_pass';
-    my $parser_name    = $t->parser_type;
-    my %skip           = map { $_, 1 } map { s/^\s+|\s+$//; $_ }
-                         split (/,/, $skip);
-    my $sqlt_version   = $t->version;
+  my $t            = shift;
+  my $args         = $t->producer_args;
+  my $schema       = $t->schema;
+  my $add_truncate = $args->{'add_truncate'} || 0;
+  my $skip         = $args->{'skip'}         || '';
+  my $skiplike     = $args->{'skiplike'}     || '';
+  my $db_user      = $args->{'db_user'}      || 'db_user';
+  my $db_pass      = $args->{'db_password'}  || 'db_pass';
+  my $parser_name  = $t->parser_type;
+  my %skip         = map { $_, 1 } map { s/^\s+|\s+$//; $_ }
+      split(/,/, $skip);
+  my $sqlt_version = $t->version;
 
-    if ( $parser_name  =~ /Parser::(\w+)$/ ) {
-        $parser_name = $1
-    }
+  if ($parser_name =~ /Parser::(\w+)$/) {
+    $parser_name = $1;
+  }
 
-    my %type_to_dbd    = (
-        MySQL          => 'mysql',
-        Oracle         => 'Oracle',
-        PostgreSQL     => 'Pg',
-        SQLite         => 'SQLite',
-        Sybase         => 'Sybase',
-    );
-    my $dbd            = $type_to_dbd{ $parser_name } || 'DBD';
-    my $dsn            = $args->{'dsn'} || "dbi:$dbd:";
-    if ( $dbd eq 'Pg' && ! $args->{'dsn'} ) {
-        $dsn .= 'dbname=dbname;host=hostname';
-    }
-    elsif ( $dbd eq 'Oracle' && ! $args->{'dsn'} ) {
-        $db_user = "$db_user/$db_pass@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)" .
-            "(HOST=hostname)(PORT=1521))(CONNECT_DATA=(SID=sid)))";
-        $db_pass = '';
-    }
-    elsif ( $dbd eq 'mysql' && ! $args->{'dsn'} ) {
-        $dsn .= 'dbname';
-    }
+  my %type_to_dbd = (
+    MySQL      => 'mysql',
+    Oracle     => 'Oracle',
+    PostgreSQL => 'Pg',
+    SQLite     => 'SQLite',
+    Sybase     => 'Sybase',
+  );
+  my $dbd = $type_to_dbd{$parser_name} || 'DBD';
+  my $dsn = $args->{'dsn'}             || "dbi:$dbd:";
+  if ($dbd eq 'Pg' && !$args->{'dsn'}) {
+    $dsn .= 'dbname=dbname;host=hostname';
+  } elsif ($dbd eq 'Oracle' && !$args->{'dsn'}) {
+    $db_user = "$db_user/$db_pass@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)"
+        . "(HOST=hostname)(PORT=1521))(CONNECT_DATA=(SID=sid)))";
+    $db_pass = '';
+  } elsif ($dbd eq 'mysql' && !$args->{'dsn'}) {
+    $dsn .= 'dbname';
+  }
 
-    my $template      = Template->new;
-    my $template_text = template();
-    my $out;
-    $template->process(
-        \$template_text,
-        {
-            translator     => $t,
-            schema         => $schema,
-            db_user        => $db_user,
-            db_pass        => $db_pass,
-            dsn            => $dsn,
-            perl           => $Config{'startperl'},
-            skip           => \%skip,
-            skiplike       => $skiplike,
-        },
-        \$out
-    ) or die $template->error;
+  my $template      = Template->new;
+  my $template_text = template();
+  my $out;
+  $template->process(
+    \$template_text,
+    {
+      translator => $t,
+      schema     => $schema,
+      db_user    => $db_user,
+      db_pass    => $db_pass,
+      dsn        => $dsn,
+      perl       => $Config{'startperl'},
+      skip       => \%skip,
+      skiplike   => $skiplike,
+    },
+    \$out
+  ) or die $template->error;
 
-    return $out;
+  return $out;
 }
 
 sub template {
-#
-# Returns the template to be processed by Template Toolkit
-#
-    return <<'EOF';
+  #
+  # Returns the template to be processed by Template Toolkit
+  #
+  return <<'EOF';
 [% perl || '#!/usr/bin/perl' %]
 [% USE date %]
 #
@@ -232,17 +230,13 @@ for my $table ( @tables ) {
         my @vals;
         for my $fld ( @{ $table->{'fields'} } ) {
             my $val = $rec->{ $fld };
-            if ( $table->{'types'}{ $fld } eq 'string' ) {
-                if ( defined $val ) {
+            if ( defined $val ) {
+                if ( $table->{'types'}{ $fld } eq 'string' ) {
                     $val =~ s/'/\\'/g;
                     $val = qq['$val']
                 }
-                else {
-                    $val = qq[''];
-                }
-            }
-            else {
-                $val = defined $val ? $val : $mysql_loadfile ? '\N' : 'NULL';
+            } else {
+                $val = $mysql_loadfile ? '\N' : 'NULL';
             }
             push @vals, $val;
         }

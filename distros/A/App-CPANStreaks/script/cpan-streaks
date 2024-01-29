@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-25'; # DATE
+our $DATE = '2023-12-11'; # DATE
 our $DIST = 'App-CPANStreaks'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CPANStreaks/cpan_streaks",
@@ -40,7 +40,7 @@ cpan-streaks - Calculate and display CPAN streaks
 
 =head1 VERSION
 
-This document describes version 0.002 of cpan-streaks (from Perl distribution App-CPANStreaks), released on 2023-11-25.
+This document describes version 0.004 of cpan-streaks (from Perl distribution App-CPANStreaks), released on 2023-12-11.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,24 @@ B<cpan-streaks> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B
 
 B<cpan-streaks> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<cpan-streaks> [B<L<--author|/"--author=s">>=I<L<cpan::pause_id|Sah::Schema::cpan::pause_id>>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--exclude-broken|/"--include-broken">>|B<L<--include-broken|/"--include-broken">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<action|/"--list-tables*">>E<gt> [I<L<table|/"--table=s">>]
+B<cpan-streaks> [B<L<--author|/"--author=s">>=I<L<cpan::pause_id|Sah::Schema::cpan::pause_id>>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--exclude-broken|/"--include-broken">>|B<L<--include-broken|/"--include-broken">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--min-len|/"--min-len=s">>=I<L<posint|Sah::Schema::posint>>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<action|/"--list-tables*">>E<gt> [I<L<table|/"--table=s">>]
+
+=head1 DESCRIPTION
+
+This utility calculates one of various CPAN streaks, e.g. C<daily-releases> to
+see which authors have the longest streaks of releasing at least one CPAN
+distribution daily.
+
+The data used to calculate the streaks are CPAN module releases packaged in
+L<TableData::Perl::CPAN::Release::Static::GroupedDaily>,
+L<TableData::Perl::CPAN::Release::Static::GroupedWeekly>, and
+L<TableData::Perl::CPAN::Release::Static::GroupedMonthly>, so make you update
+those modules first from CPAN. These modules in turn get the data from MetaCPAN
+API from L<https://metacpan.org>.
+
+I<See also>
+- L<http://onceaweek.cjmweb.net> (defunct) by CJM.
+- L<http://cpan.io/board/once-a/> boards by NEILB.
 
 =head1 OPTIONS
 
@@ -86,6 +103,11 @@ Shortcut for --action=list-tables.
 See C<--action>.
 
 Can also be specified as the 1st command-line argument.
+
+=item B<--min-len>=I<s>
+
+(No description)
+
 
 =item B<--table>=I<s>
 

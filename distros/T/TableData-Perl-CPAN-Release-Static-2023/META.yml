@@ -20,7 +20,7 @@ name: TableData-Perl-CPAN-Release-Static-2023
 provides:
   TableData::Perl::CPAN::Release::Static::2023:
     file: lib/TableData/Perl/CPAN/Release/Static/2023.pm
-    version: '20231208.0'
+    version: '20240101.0'
 requires:
   File::Basename: '0'
   File::ShareDir: '0'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=TableData-Perl-CPAN-Release-Static-2023
   homepage: https://metacpan.org/release/TableData-Perl-CPAN-Release-Static-2023
   repository: git://github.com/perlancar/perl-TableData-Perl-CPAN-Release-Static-2023.git
-version: '20231208.0'
+version: '20240101.0'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

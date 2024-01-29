@@ -8,9 +8,9 @@ use Log::ger;
 use App::BrowserUtils ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-07'; # DATE
+our $DATE = '2023-10-28'; # DATE
 our $DIST = 'App-VivaldiUtils'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 our %SPEC;
 
@@ -159,7 +159,7 @@ App::VivaldiUtils - Utilities related to the Vivaldi browser
 
 =head1 VERSION
 
-This document describes version 0.010 of App::VivaldiUtils (from Perl distribution App-VivaldiUtils), released on 2022-10-07.
+This document describes version 0.011 of App::VivaldiUtils (from Perl distribution App-VivaldiUtils), released on 2023-10-28.
 
 =head1 SYNOPSIS
 
@@ -169,27 +169,27 @@ This distribution includes several utilities related to the Vivaldi browser:
 
 =over
 
-=item * L<kill-vivaldi>
+=item 1. L<kill-vivaldi>
 
-=item * L<list-vivaldi-profiles>
+=item 2. L<list-vivaldi-profiles>
 
-=item * L<pause-vivaldi>
+=item 3. L<pause-vivaldi>
 
-=item * L<ps-vivaldi>
+=item 4. L<ps-vivaldi>
 
-=item * L<restart-vivaldi>
+=item 5. L<restart-vivaldi>
 
-=item * L<start-vivaldi>
+=item 6. L<start-vivaldi>
 
-=item * L<terminate-vivaldi>
+=item 7. L<terminate-vivaldi>
 
-=item * L<unpause-vivaldi>
+=item 8. L<unpause-vivaldi>
 
-=item * L<vivaldi-has-processes>
+=item 9. L<vivaldi-has-processes>
 
-=item * L<vivaldi-is-paused>
+=item 10. L<vivaldi-is-paused>
 
-=item * L<vivaldi-is-running>
+=item 11. L<vivaldi-is-running>
 
 =back
 
@@ -218,6 +218,38 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<cmndline_pat> => I<re_from_str>
+
+Filter processes using regex against their cmndline.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<exec_pat> => I<re_from_str>
+
+Filter processes using regex against their exec.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<fname_pat> => I<re_from_str>
+
+Filter processes using regex against their fname.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<pid_pat> => I<re_from_str>
+
+Filter processes using regex against their pid.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
 
 =item * B<users> => I<array[unix::uid::exists]>
 
@@ -252,6 +284,38 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<cmndline_pat> => I<re_from_str>
+
+Filter processes using regex against their cmndline.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<exec_pat> => I<re_from_str>
+
+Filter processes using regex against their exec.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<fname_pat> => I<re_from_str>
+
+Filter processes using regex against their fname.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<pid_pat> => I<re_from_str>
+
+Filter processes using regex against their pid.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
 
 =item * B<users> => I<array[unix::uid::exists]>
 
@@ -292,7 +356,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<quiet> => I<true>
 
+(No description)
+
 =item * B<vivaldi_cmd> => I<array[str]|str> (default: "vivaldi")
+
+(No description)
 
 
 =back
@@ -339,7 +407,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<quiet> => I<true>
 
+(No description)
+
 =item * B<vivaldi_cmd> => I<array[str]|str> (default: "vivaldi")
+
+(No description)
 
 
 =back
@@ -381,7 +453,41 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<cmndline_pat> => I<re_from_str>
+
+Filter processes using regex against their cmndline.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<exec_pat> => I<re_from_str>
+
+Filter processes using regex against their exec.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<fname_pat> => I<re_from_str>
+
+Filter processes using regex against their fname.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<pid_pat> => I<re_from_str>
+
+Filter processes using regex against their pid.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
 =item * B<signal> => I<unix::signal>
+
+(No description)
 
 =item * B<users> => I<array[unix::uid::exists]>
 
@@ -417,6 +523,38 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<cmndline_pat> => I<re_from_str>
+
+Filter processes using regex against their cmndline.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<exec_pat> => I<re_from_str>
+
+Filter processes using regex against their exec.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<fname_pat> => I<re_from_str>
+
+Filter processes using regex against their fname.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<pid_pat> => I<re_from_str>
+
+Filter processes using regex against their pid.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
 =item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
@@ -451,7 +589,41 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<cmndline_pat> => I<re_from_str>
+
+Filter processes using regex against their cmndline.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<exec_pat> => I<re_from_str>
+
+Filter processes using regex against their exec.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<fname_pat> => I<re_from_str>
+
+Filter processes using regex against their fname.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<pid_pat> => I<re_from_str>
+
+Filter processes using regex against their pid.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
 =item * B<quiet> => I<true>
+
+(No description)
 
 =item * B<users> => I<array[unix::uid::exists]>
 
@@ -489,7 +661,41 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<cmndline_pat> => I<re_from_str>
+
+Filter processes using regex against their cmndline.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<exec_pat> => I<re_from_str>
+
+Filter processes using regex against their exec.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<fname_pat> => I<re_from_str>
+
+Filter processes using regex against their fname.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<pid_pat> => I<re_from_str>
+
+Filter processes using regex against their pid.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
 =item * B<quiet> => I<true>
+
+(No description)
 
 =item * B<users> => I<array[unix::uid::exists]>
 
@@ -530,7 +736,41 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<cmndline_pat> => I<re_from_str>
+
+Filter processes using regex against their cmndline.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<exec_pat> => I<re_from_str>
+
+Filter processes using regex against their exec.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<fname_pat> => I<re_from_str>
+
+Filter processes using regex against their fname.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+=item * B<pid_pat> => I<re_from_str>
+
+Filter processes using regex against their pid.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
 =item * B<quiet> => I<true>
+
+(No description)
 
 =item * B<users> => I<array[unix::uid::exists]>
 
@@ -597,7 +837,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

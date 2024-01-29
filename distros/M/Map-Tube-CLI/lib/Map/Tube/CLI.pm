@@ -1,6 +1,6 @@
 package Map::Tube::CLI;
 
-$Map::Tube::CLI::VERSION   = '0.67';
+$Map::Tube::CLI::VERSION   = '0.68';
 $Map::Tube::CLI::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version 0.67
+Version 0.68
 
 =cut
 
@@ -138,6 +138,8 @@ sure you have the latest maps when you install.
 =item * L<Beijing|Map::Tube::Beijing>
 
 =item * L<Berlin|Map::Tube::Berlin>
+
+=item * L<Bielefeld|Map::Tube::Bielefeld>
 
 =item * L<Bucharest|Map::Tube::Bucharest>
 
@@ -514,6 +516,7 @@ sub _supported_maps {
         'BARCELONA'       => 'Map::Tube::Barcelona',
         'BEIJING'         => 'Map::Tube::Beijing',
         'BERLIN'          => 'Map::Tube::Berlin',
+        'BIELEFELD'       => 'Map::Tube::Bielefeld',
         'BUCHAREST'       => 'Map::Tube::Bucharest',
         'BUDAPEST'        => 'Map::Tube::Budapest',
         'COPENHAGEN'      => 'Map::Tube::Copenhagen',
@@ -555,7 +558,7 @@ sub _supported_maps {
 
 =head1 AUTHOR
 
-Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
+Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
@@ -563,8 +566,7 @@ L<https://github.com/manwar/Map-Tube-CLI>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-map-tube-cli at rt.cpan.org>,
-or through the web interface at L<https://github.com/manwar/Map-Tube-CLI/issues>.
+Please report any bugs or feature requests through the web interface at L<https://github.com/manwar/Map-Tube-CLI/issues>.
 I will  be notified and then you'll automatically be notified of progress on your
 bug as I make changes.
 
@@ -578,7 +580,7 @@ You can also look for information at:
 
 =over 4
 
-=item * BUG report
+=item * BUGS / ISSUES
 
 L<https://github.com/manwar/Map-Tube-CLI/issues>
 
@@ -598,7 +600,7 @@ L<http://metacpan.org/dist/Map-Tube-CLI/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 - 2022 Mohammad S Anwar.
+Copyright (C) 2015 - 2024 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain  a copy of the full

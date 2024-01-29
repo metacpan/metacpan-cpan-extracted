@@ -1,6 +1,6 @@
 package Cassandra::Client::TLSHandling;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::TLSHandling::VERSION = '0.20';
+$Cassandra::Client::TLSHandling::VERSION = '0.21';
 use 5.010;
 use strict;
 use warnings;
@@ -45,7 +45,7 @@ sub DESTROY {
 
 package Cassandra::Client::TLSHandling::conn;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::TLSHandling::conn::VERSION = '0.20';
+$Cassandra::Client::TLSHandling::conn::VERSION = '0.21';
 use 5.010;
 use strict;
 use warnings;
@@ -72,7 +72,7 @@ Cassandra::Client::TLSHandling
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 AUTHOR
 

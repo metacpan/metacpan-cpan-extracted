@@ -1,0 +1,29 @@
+==== start svg ====
+XObject #1
+vb 0 0 300 200 (inferred) => bb 0.00 -200.00 300.00 0.00
+matrix( 1 0 0 -1 0 0)
+vb rect( 0.00 0.00 300.00 200.00)
+xo fill_color black (initial)
+  start handling rect (SVGPDF::Rect)
+  rect x=0 y=0 w=300 h=200
+    xo save
+    rect stroke=none fill=red
+    xo fill (none)
+    xo restore
+  end handling rect
+  start handling circle (SVGPDF::Circle)
+  circle cx=150 cy=100 r=80
+    xo save
+    circle stroke=none fill=green
+    xo fill (none)
+    xo restore
+  end handling circle
+  start handling text (SVGPDF::Text)
+  text  x=150 y=125 anchor="middle"
+    xo save
+    txt translate( 150.00, 125.00 ) scale( 1.00 -1.00 )
+      xo save
+      xo restore
+    xo restore
+  end handling text
+==== end svg ====

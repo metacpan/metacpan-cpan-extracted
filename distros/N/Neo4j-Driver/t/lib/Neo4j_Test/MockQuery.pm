@@ -103,7 +103,7 @@ sub _result_for_query {
 		]);
 	}
 	
-	if (ref $result eq '') {
+	if ($self->_looks_like_jolt_value($result)) {
 		return ( jolt => [
 			{ header  => { fields => [0] } },
 			{ data    => [$result] },
@@ -112,21 +112,26 @@ sub _result_for_query {
 		]);
 	}
 	
-	# At present, only a single scalar value is accepted as result.
+	# At present, only a single sparse or strict Jolt value is accepted as result.
 	
 	# YAGNI?
 	if (ref $result eq 'HASH') {
-		# TODO: assemble single data row
-	}
-	if (ref $result eq 'ARRAY' && ref $result->[0] eq '') {
-		# TODO: assemble single data column
-	}
-	if (ref $result eq 'ARRAY' && ref $result->[0] eq 'ARRAY') {
-		# TODO: assemble full data table; first row has column names
+		# TODO: assemble single data row from $result->{row}
+		# TODO: assemble single data column from $result->{column}
+		# TODO: assemble full data table from $result->{table}
 	}
 	
 	warn "No result for query '$query'";
 	return;
+}
+
+sub _looks_like_jolt_value {
+	my ($self, $result) = @_;
+	return 1 if ref $result eq '' || ref $result eq 'ARRAY';  # sparse
+	return 0 if ref $result ne 'HASH' || keys %$result != 1;
+	no warnings 'qw';
+	my $sigil = (keys %$result)[0];
+	return !! first { $_ eq $sigil } qw| ? Z R U [] {} () -> <- .. @ T # |;
 }
 
 sub request {

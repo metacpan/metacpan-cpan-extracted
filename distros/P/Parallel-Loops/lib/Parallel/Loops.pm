@@ -1,6 +1,6 @@
 package Parallel::Loops;
 
-our $VERSION='0.10';
+our $VERSION='0.12';
 
 # For Tie::ExtraHash - This was the earliest perl version in which I found this
 # class
@@ -200,6 +200,33 @@ array can be useful and fine.
 If you need to be able to determine which iteration generated what output, use
 a hash instead.
 
+=head2 set_waitpid_blocking_sleep
+
+This is about blocking calls.  When it comes to waiting for child processes to
+terminate, Parallel::ForkManager (and hence Parallel::Loops) is between a rock
+and a hard place. The underlying Perl waitpid function that the module relies
+on can block until either one specific or any child process terminate, but not
+for a process part of a given group.
+
+This means that the module can do one of two things when it waits for one of
+its child processes to terminate:
+
+B<Only wait for its own child processes> This is the default and involves
+sleeping between checking whether a process has exited. This is the reason why
+the above simple examples needlessly all take at least one second. But it is
+safe, in that other processes can exit safely.
+
+B<Block until any process terminate> This is faster, but not the default as it
+is potentialy unsafe.
+
+To get the unsafe behavior:
+
+    $pl->set_waitpid_blocking_sleep(0);
+
+All C<set_waitpid_blocking_sleep> does is setup I<exactly> the same behavior in
+C<Parallel::ForkManager>. See L<Parallel::ForkManager#BLOCKING-CALLS> for a
+much more thorough description.
+
 =head2 Recursive forking is possible
 
 Note that no check is performed for recursive forking: If the main
@@ -296,12 +323,12 @@ I believe this is the only dependency that isn't part of core perl:
 
     use Parallel::ForkManager;
 
-These should all be in perl's core:
+These are in perl's core:
 
-    use Storable;
-    use IO::Handle;
-    use Tie::Array;
-    use Tie::Hash;
+    use Storable;     # Since perl v5.7.3
+    use IO::Handle;   # Since perl 5.00307
+    use Tie::Array;   # Since perl 5.005
+    use Tie::Hash;    # Since perl 5.002
 
 =head1 BUGS / ENHANCEMENTS
 
@@ -513,6 +540,11 @@ sub printChangesToParent {
     }
 }
 
+sub set_waitpid_blocking_sleep {
+    my ($self, $sleep) = @_;
+    $self->{waitpid_blocking_sleep} = $sleep;
+}
+
 sub while {
     my ($self, $continueSub, $bodySub, $finishSub) = @_;
     my @retvals;
@@ -526,6 +558,9 @@ sub while {
     my %childHandles;
 
     my $fm = Parallel::ForkManager->new($$self{maxProcs});
+    if (exists $self->{waitpid_blocking_sleep}) {
+        $fm->set_waitpid_blocking_sleep($self->{waitpid_blocking_sleep});
+    }
     $$self{forkManager} = $fm;
     my %childFinishSubs;
     $fm->run_on_finish( sub {

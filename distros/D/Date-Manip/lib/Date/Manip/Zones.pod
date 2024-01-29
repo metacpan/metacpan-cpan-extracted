@@ -1,13 +1,13 @@
 
-# Copyright (c) 2008-2023 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2024 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Jun  7 12:25:41 EDT 2023
-#    Data version: tzdata2023c
-#    Code version: tzcode2023c
+#    Generated on: Tue Jan  9 14:21:49 EST 2024
+#    Data version: tzdata2023d
+#    Code version: tzcode2023d
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -195,6 +195,7 @@ database:
      Antarctica/Palmer                    anpalm00
      Antarctica/Rothera                   anroth00
      Antarctica/Troll                     antrol00
+     Antarctica/Vostok                    anvost00
      Asia/Almaty                          asalma00
      Asia/Amman                           asamma00
      Asia/Anadyr                          asanad00
@@ -527,7 +528,6 @@ The zoneinfo database provides several standard aliases, including:
      Antarctica/McMurdo                   Pacific/Auckland
      Antarctica/South_Pole                Pacific/Auckland
      Antarctica/Syowa                     Asia/Riyadh
-     Antarctica/Vostok                    Asia/Urumqi
      Arctic/Longyearbyen                  Europe/Berlin
      Asia/Aden                            Asia/Riyadh
      Asia/Ashkhabad                       Asia/Ashgabat
@@ -996,6 +996,8 @@ Aliases include:
      Africa/Porto-Novo                    Africa/Lagos
      Africa/Timbuktu                      Africa/Abidjan
      Alaskan Standard Time                America/Anchorage
+     Aleutian Standard Time               America/Adak
+     Altai Standard Time                  Asia/Barnaul
      America/Anguilla                     America/Puerto_Rico
      America/Antigua                      America/Puerto_Rico
      America/Argentina/ComodRivadavia     America/Argentina/Catamarca
@@ -1048,7 +1050,6 @@ Aliases include:
      Antarctica/McMurdo                   Pacific/Auckland
      Antarctica/South_Pole                Pacific/Auckland
      Antarctica/Syowa                     Asia/Riyadh
-     Antarctica/Vostok                    Asia/Urumqi
      Arab Standard Time                   Asia/Riyadh
      Arabian Standard Time                Asia/Dubai
      Arabic Standard Time                 Asia/Baghdad
@@ -1078,11 +1079,13 @@ Aliases include:
      Asia/Ujung_Pandang                   Asia/Makassar
      Asia/Ulan_Bator                      Asia/Ulaanbaatar
      Asia/Vientiane                       Asia/Bangkok
+     Astrakhan Standard Time              Europe/Astrakhan
      Atlantic Standard Time               America/Halifax
      Atlantic/Faeroe                      Atlantic/Faroe
      Atlantic/Jan_Mayen                   Europe/Berlin
      Atlantic/Reykjavik                   Africa/Abidjan
      Atlantic/St_Helena                   Africa/Abidjan
+     Aus Central W. Standard Time         Australia/Eucla
      Australia/ACT                        Australia/Sydney
      Australia/Canberra                   Australia/Sydney
      Australia/Currie                     Australia/Hobart
@@ -1101,6 +1104,8 @@ Aliases include:
      BRWST4BRWDT                          America/Campo_Grande
      Bahia Standard Time                  America/Bahia
      Bangladesh Standard Time             Asia/Dhaka
+     Belarus Standard Time                Europe/Minsk
+     Bougainville Standard Time           Pacific/Bougainville
      Brazil/Acre                          America/Rio_Branco
      Brazil/DeNoronha                     America/Noronha
      Brazil/East                          America/Sao_Paulo
@@ -1130,14 +1135,16 @@ Aliases include:
      Central Pacific Standard Time        Pacific/Guadalcanal
      Central Standard Time                America/Chicago
      Central Standard Time (Mexico)       America/Mexico_City
+     Chatham Islands Standard Time        Pacific/Chatham
      Chile/Continental                    America/Santiago
      Chile/EasterIsland                   Pacific/Easter
      China Standard Time                  Asia/Shanghai
      Cuba                                 America/Havana
+     Cuba Standard Time                   America/Havana
      Dateline Standard Time               Etc/GMT+12
      E. Africa Standard Time              Africa/Nairobi
      E. Australia Standard Time           Australia/Brisbane
-     E. Europe Standard Time              Asia/Nicosia
+     E. Europe Standard Time              Europe/Chisinau
      E. South America Standard Time       America/Sao_Paulo
      EET-2EETDST                          Europe/Helsinki
      EST-10EDT                            Australia/Melbourne
@@ -1149,7 +1156,9 @@ Aliases include:
      EST5EDT#Indiana                      America/Indiana/Indianapolis
      EST5EST                              America/Indiana/Indianapolis
      EST6CDT                              America/Indiana/Indianapolis
+     Easter Island Standard Time          Pacific/Easter
      Eastern Standard Time                America/New_York
+     Eastern Standard Time (Mexico)       America/Cancun
      Egypt                                Africa/Cairo
      Egypt Standard Time                  Africa/Cairo
      Eire                                 Europe/Dublin
@@ -1187,6 +1196,7 @@ Aliases include:
      Europe/Vatican                       Europe/Rome
      Europe/Zagreb                        Europe/Belgrade
      Europe/Zaporozhye                    Europe/Kyiv
+     FLE Standard Time                    Europe/Kyiv
      Fiji Standard Time                   Pacific/Fiji
      GB                                   Europe/London
      GB-Eire                              Europe/London
@@ -1195,10 +1205,12 @@ Aliases include:
      GMT+0                                Etc/GMT
      GMT-0                                Etc/GMT
      GMT0                                 Etc/GMT
-     GTB Standard Time                    Europe/Istanbul
+     GTB Standard Time                    Europe/Bucharest
      Georgian Standard Time               Asia/Tbilisi
      Greenland Standard Time              America/Nuuk
      Greenwich                            Etc/GMT
+     Greenwich Standard Time              Africa/Abidjan
+     Haiti Standard Time                  America/Port-au-Prince
      Hawaiian Standard Time               Pacific/Honolulu
      Hongkong                             Asia/Hong_Kong
      Iceland                              Africa/Abidjan
@@ -1222,6 +1234,9 @@ Aliases include:
      Korea Standard Time                  Asia/Seoul
      Kwajalein                            Pacific/Kwajalein
      Libya                                Africa/Tripoli
+     Libya Standard Time                  Africa/Tripoli
+     Line Islands Standard Time           Pacific/Kiritimati
+     Lord Howe Standard Time              Australia/Lord_Howe
      MET-1METDST                          MET
      MEZ-1MESZ                            CET
      MSM7MDM                              America/Chihuahua
@@ -1230,6 +1245,8 @@ Aliases include:
      MXST6MXDT                            America/Mexico_City
      MXST6MXDT#Mexico                     America/Mexico_City
      Magadan Standard Time                Asia/Magadan
+     Magallanes Standard Time             America/Punta_Arenas
+     Marquesas Standard Time              Pacific/Marquesas
      Mauritius Standard Time              Indian/Mauritius
      Mexico/BajaNorte                     America/Tijuana
      Mexico/BajaSur                       America/Mazatlan
@@ -1238,7 +1255,7 @@ Aliases include:
      Montevideo Standard Time             America/Montevideo
      Morocco Standard Time                Africa/Casablanca
      Mountain Standard Time               America/Denver
-     Mountain Standard Time (Mexico)      America/Chihuahua
+     Mountain Standard Time (Mexico)      America/Mazatlan
      Myanmar Standard Time                Asia/Yangon
      N. Central Asia Standard Time        Asia/Novosibirsk
      NST3:30NDT                           America/St_Johns
@@ -1250,13 +1267,17 @@ Aliases include:
      Nepal Standard Time                  Asia/Kathmandu
      New Zealand Standard Time            Pacific/Auckland
      Newfoundland Standard Time           America/St_Johns
+     Norfolk Standard Time                Pacific/Norfolk
      North Asia East Standard Time        Asia/Irkutsk
      North Asia Standard Time             Asia/Krasnoyarsk
+     North Korea Standard Time            Asia/Pyongyang
+     Omsk Standard Time                   Asia/Omsk
      PRC                                  Asia/Shanghai
      PST8PDT#Canada                       America/Vancouver
      PWT0PST                              Europe/Lisbon
      Pacific SA Standard Time             America/Santiago
      Pacific Standard Time                America/Los_Angeles
+     Pacific Standard Time (Mexico)       America/Tijuana
      Pacific/Chuuk                        Pacific/Port_Moresby
      Pacific/Enderbury                    Pacific/Kanton
      Pacific/Funafuti                     Pacific/Tarawa
@@ -1275,27 +1296,41 @@ Aliases include:
      Paraguay Standard Time               America/Asuncion
      Poland                               Europe/Warsaw
      Portugal                             Europe/Lisbon
+     Qyzylorda Standard Time              Asia/Qyzylorda
      ROC                                  Asia/Taipei
      ROK                                  Asia/Seoul
      Romance Standard Time                Europe/Paris
+     Russia Time Zone 10                  Asia/Srednekolymsk
+     Russia Time Zone 11                  Asia/Kamchatka
+     Russia Time Zone 3                   Europe/Samara
      Russian Standard Time                Europe/Moscow
      SA Eastern Standard Time             America/Cayenne
      SA Pacific Standard Time             America/Bogota
      SA Western Standard Time             America/La_Paz
      SAST-2                               Africa/Johannesburg
      SE Asia Standard Time                Asia/Bangkok
+     Saint Pierre Standard Time           America/Miquelon
+     Sakhalin Standard Time               Asia/Sakhalin
      Samoa Standard Time                  Pacific/Apia
+     Sao Tome Standard Time               Africa/Sao_Tome
+     Saratov Standard Time                Europe/Saratov
      Singapore                            Asia/Singapore
      Singapore Standard Time              Asia/Singapore
      South Africa Standard Time           Africa/Johannesburg
+     South Sudan Standard Time            Africa/Juba
      Sri Lanka Standard Time              Asia/Colombo
+     Sudan Standard Time                  Africa/Khartoum
      Syria Standard Time                  Asia/Damascus
      Taipei Standard Time                 Asia/Taipei
      Tasmania Standard Time               Australia/Hobart
+     Tocantins Standard Time              America/Araguaina
      Tokyo Standard Time                  Asia/Tokyo
+     Tomsk Standard Time                  Asia/Tomsk
      Tonga Standard Time                  Pacific/Tongatapu
+     Transbaikal Standard Time            Asia/Chita
      Turkey                               Europe/Istanbul
      Turkey Standard Time                 Europe/Istanbul
+     Turks And Caicos Standard Time       America/Grand_Turk
      UCT                                  Etc/UTC
      US Eastern Standard Time             America/Indiana/Indianapolis
      US Mountain Standard Time            America/Phoenix
@@ -1313,16 +1348,21 @@ Aliases include:
      US/Samoa                             Pacific/Pago_Pago
      UTC                                  Etc/UTC
      UTC+12                               Etc/GMT-12
+     UTC+13                               Etc/GMT-13
      UTC-02                               Etc/GMT+2
+     UTC-08                               Etc/GMT+8
+     UTC-09                               Etc/GMT+9
      UTC-11                               Etc/GMT+11
      Ulaanbaatar Standard Time            Asia/Ulaanbaatar
      Universal                            Etc/UTC
      Venezuela Standard Time              America/Caracas
      Vladivostok Standard Time            Asia/Vladivostok
+     Volgograd Standard Time              Europe/Volgograd
      W-SU                                 Europe/Moscow
      W. Australia Standard Time           Australia/Perth
      W. Central Africa Standard Time      Africa/Lagos
      W. Europe Standard Time              Europe/Berlin
+     W. Mongolia Standard Time            Asia/Hovd
      WET0WETDST                           WET
      WST-10WSTDST                         Asia/Vladivostok
      WST-11WSTDST                         Asia/Srednekolymsk
@@ -1337,8 +1377,10 @@ Aliases include:
      WST-8WSTDST                          Asia/Irkutsk
      WST-9WSTDST                          Asia/Yakutsk
      West Asia Standard Time              Asia/Tashkent
+     West Bank Standard Time              Asia/Hebron
      West Pacific Standard Time           Pacific/Port_Moresby
      Yakutsk Standard Time                Asia/Yakutsk
+     Yukon Standard Time                  America/Whitehorse
      Zulu                                 Etc/UTC
 
 Periodically, we need to be able to determine a time zone based on an
@@ -1748,11 +1790,11 @@ L<Date::Manip::TZ> module.
                         America/Paramaribo
                         America/Santarem
                         America/Punta_Arenas
-                        America/Nuuk
                         Etc/GMT-3
                         C
                         Antarctica/Palmer
                         Antarctica/Rothera
+                        America/Nuuk
                         America/Danmarkshavn
                         America/Guyana
                         America/Asuncion
@@ -1764,10 +1806,10 @@ L<Date::Manip::TZ> module.
      0      -02:09:40   America/Noronha
      0      -02:00:00   Atlantic/South_Georgia
                         America/Noronha
+                        America/Scoresbysund
                         America/Nuuk
                         Etc/GMT-2
                         B
-                        America/Scoresbysund
                         Atlantic/Cape_Verde
                         Atlantic/Azores
      0      -01:54:32   Atlantic/Azores
@@ -1840,6 +1882,7 @@ L<Date::Manip::TZ> module.
                         Antarctica/Mawson
                         Antarctica/Palmer
                         Antarctica/Rothera
+                        Antarctica/Vostok
      0      +00:06:04   Europe/Andorra
      0      +00:09:21   Europe/Paris
                         Africa/Tunis
@@ -2091,6 +2134,7 @@ L<Date::Manip::TZ> module.
                         Etc/GMT+5
                         R
                         Antarctica/Mawson
+                        Antarctica/Vostok
                         Asia/Bishkek
                         Asia/Qostanay
                         Indian/Chagos
@@ -2173,6 +2217,7 @@ L<Date::Manip::TZ> module.
                         Asia/Choibalsan
                         Asia/Ulaanbaatar
                         Asia/Singapore
+                        Antarctica/Vostok
      0      +07:06:30   Asia/Ho_Chi_Minh
      0      +07:07:12   Asia/Jakarta
      0      +07:07:32   Asia/Ulaanbaatar
@@ -2204,6 +2249,7 @@ L<Date::Manip::TZ> module.
                         Asia/Singapore
                         Etc/GMT+8
                         U
+                        Antarctica/Casey
                         Asia/Chita
                         Asia/Krasnoyarsk
                         Asia/Dili
@@ -2213,7 +2259,6 @@ L<Date::Manip::TZ> module.
                         Asia/Ho_Chi_Minh
                         Asia/Jakarta
                         Asia/Ust-Nera
-                        Antarctica/Casey
      0      +08:04:00   Asia/Manila
      0      +08:05:43   Asia/Shanghai
      0      +08:06:00   Asia/Taipei
@@ -2325,13 +2370,13 @@ L<Date::Manip::TZ> module.
                         Pacific/Norfolk
                         Etc/GMT+11
                         X
-                        Antarctica/Casey
                         Asia/Ust-Nera
                         Asia/Vladivostok
                         Asia/Kamchatka
                         Asia/Anadyr
                         Asia/Khandyga
                         Pacific/Kwajalein
+                        Antarctica/Casey
      0      +11:05:48   Pacific/Noumea
      0      +11:07:40   Pacific/Nauru
      0      +11:09:20   Pacific/Kwajalein
@@ -2560,16 +2605,16 @@ L<Date::Manip::TZ> module.
                         Antarctica/Palmer
      1      -01:30:00   America/St_Johns
                         America/Montevideo
-     1      -01:00:00   America/Nuuk
+     1      -01:00:00   America/Scoresbysund
+                        America/Nuuk
                         America/Noronha
-                        America/Scoresbysund
                         Atlantic/Azores
                         Atlantic/Cape_Verde
      1      +00:00:00   Atlantic/Azores
                         Europe/Dublin
-                        America/Scoresbysund
                         Africa/Casablanca
                         Africa/El_Aaiun
+                        America/Scoresbysund
                         Atlantic/Madeira
                         Europe/Prague
      1      +00:34:39   Europe/Dublin

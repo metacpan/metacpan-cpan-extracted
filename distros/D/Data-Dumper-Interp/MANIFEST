@@ -12,6 +12,7 @@ lib/Data/Dumper/Interp.pm
 t/20_globalstuff.t
 t/30_prelim.t
 t/35_pad.t
+t/40_Underscores.t
 t/50_shebang.t
 t/55_tied.t
 t/56_objects.t

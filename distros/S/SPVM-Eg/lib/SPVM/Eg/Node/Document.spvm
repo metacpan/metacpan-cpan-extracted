@@ -1,0 +1,136 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+# None in JavaScript
+class Eg::Node::Document extends Eg::Node {
+  
+  use Eg::Node::Element;
+  use Eg::Node::Text;
+  use Eg::Node::Comment;
+  use Eg::Node::DocumentFragment;
+  use Eg::Node::Attr;
+  use Eg::Node::CDATASection;
+  use Eg::Node::ProcessingInstruction;
+  use Eg::Node::DocumentType;
+  use Eg::Node::ShadowRoot;
+  use Regex;
+  
+  use Fn;
+  
+  # Fields
+  has namespace_uri : protected string;
+  
+  method parent_node : Eg::Node () {
+    return undef;
+  }
+  
+  method document_element : Eg::Node::Element () {
+    my $root_node = (Eg::Node::Element)$self->first_child;
+    
+    return $root_node;
+  }
+  
+  method create_text_node : Eg::Node::Text ($node_value : string) {
+    
+    unless ($node_value) {
+      die "\$node_value must be defined.";
+    }
+    
+    my $text_node = Eg::Node::Text->new($node_value);
+    
+    return $text_node;
+  }
+  
+  method create_comment : Eg::Node::Comment ($node_value : string) {
+    
+    unless ($node_value) {
+      die "\$node_value must be defined.";
+    }
+    
+    my $comment_node = Eg::Node::Comment->new($node_value);
+    
+    return $comment_node;
+  }
+  
+  method create_cdata_section : Eg::Node::CDATASection ($node_value : string) {
+    
+    unless ($node_value) {
+      die "\$node_value must be defined.";
+    }
+    
+    my $cdata_section_node = Eg::Node::CDATASection->new($node_value);
+    
+    return $cdata_section_node;
+  }
+  
+  method create_processing_instruction : Eg::Node::ProcessingInstruction ($target : string, $data : string) {
+    
+    unless ($target) {
+      die "\$target must be defined.";
+    }
+    
+    unless (Regex->new("^[a-zA-Z_][\w+\-\.]*$")->match($target)) {
+      die "\$target must be a valid XML name.";
+    }
+    
+    if ($data) {
+      if (Fn->contains($data, "?>")) {
+        die "\$data cannot contain  \"?>\".";
+      }
+    }
+    
+    my $processing_instruction_node = Eg::Node::ProcessingInstruction->new($data);
+    
+    $processing_instruction_node->{target} = $target;
+    
+    return $processing_instruction_node;
+  }
+  
+  method create_element : Eg::Node::Element ($tag_name : string) {
+    
+    unless ($tag_name) {
+      die "\$tag_name must be defined.";
+    }
+    
+    unless (length $tag_name) {
+      die "\$tag_name must have its length.";
+    }
+    
+    if (Fn->contains($tag_name, ":")) {
+      die "\$tag_name cannot contains \":\"";
+    }
+    
+    my $element = Eg::Node::Element->new;
+    
+    $element->{tag_name} = $tag_name;
+    
+    return $element;
+  }
+  
+  method create_document_fragment : Eg::Node::DocumentFragment () {
+    
+    my $document_fragment_node = Eg::Node::DocumentFragment->new;
+    
+    return $document_fragment_node;
+  }
+  
+  method create_attribute : Eg::Node::Attr ($name : string) {
+    
+    unless ($name) {
+      die "\$name must be defined.";
+    }
+    
+    unless (Regex->new("^[a-zA-Z_][\w+\-\.]*$")->match($name)) {
+      die "\$name must be a valid XML name.";
+    }
+    
+    $name = Fn->lc($name);
+    
+    my $attribute_node = Eg::Node::Attr->new;
+    
+    $attribute_node->{name} = $name;
+    
+    return $attribute_node;
+  }
+  
+}

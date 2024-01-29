@@ -7,7 +7,7 @@ use Test::More tests => 3;        # Indicate the number of tests you want to run
 use File::Compare;
 
 # Seed for srand
-my $seed = 12345;
+my $seed = 123456789;
 
 # The command line script to be tested
 my $script = catfile( 'utils', 'bff_pxf_simulator', 'bff-pxf-simulator' );
@@ -27,7 +27,7 @@ my $inc    = join ' -I', '', @INC;    # prepend -I to each path in @INC
 
     # Run the command line script with the input file, and redirect the output to the output_file
     system(
-"$^X $inc $script -n 100 -f bff -diseases 10 -max-diseases-pool 10 -phenotypicFeatures 10 -max-phenotypicFeatures-pool 10 -treatments 10 --max-treatments-pool 10 --random-seed $seed -o $tmp_file"
+"$^X $inc $script -n 100 -f bff -diseases 10 -max-diseases-pool 10 -phenotypicFeatures 10 -max-phenotypicFeatures-pool 10 -treatments 10 --max-treatments-pool 10 -procedures 10 -max-procedures-pool 10 -exposures 10 -max-exposures-pool 10 --random-seed $seed -o $tmp_file"
     );
 
     # Compare the output_file and the reference_file
@@ -43,7 +43,7 @@ my $inc    = join ' -I', '', @INC;    # prepend -I to each path in @INC
 
 {
     # The reference file to compare the output with
-    my $reference_file = catfile( 't', 'individuals_random_1000.json' );
+    my $reference_file = catfile( 't', 'pxf_random_100.json' );
 
     # The generated output file
     my ( undef, $tmp_file ) =
@@ -51,7 +51,7 @@ my $inc    = join ' -I', '', @INC;    # prepend -I to each path in @INC
 
     # Run the command line script with the input file, and redirect the output to the output_file
     system(
-"$^X $script -n 1000 -f bff -diseases 10 -max-diseases-pool 10 -phenotypicFeatures 10 -max-phenotypicFeatures-pool 10 -treatments 10 --max-treatments-pool 10 --random-seed $seed -o $tmp_file"
+"$^X $inc $script -n 100 -f pxf -diseases 10 -max-diseases-pool 10 -phenotypicFeatures 10 -max-phenotypicFeatures-pool 10 -treatments 10 --max-treatments-pool 10 -procedures 10 -max-procedures-pool 10 --random-seed $seed -o $tmp_file"
     );
 
     # Compare the output_file and the reference_file
@@ -60,6 +60,7 @@ my $inc    = join ' -I', '', @INC;    # prepend -I to each path in @INC
         qq/Output matches the <$reference_file> file/
     );
 }
+
 
 ##########
 # TEST 3 #
@@ -77,7 +78,7 @@ my $inc    = join ' -I', '', @INC;    # prepend -I to each path in @INC
 
     # Run the command line script with the input file, and redirect the output to the output_file
     system(
-"$^X $script -n 100 -f bff --external-ontologies $ont_file -diseases 1 -max-diseases-pool 1 -phenotypicFeatures 1 -max-phenotypicFeatures-pool 1 -treatments 1 -max-treatments-pool 1 --random-seed $seed -o $tmp_file"
+"$^X $script -n 100 -f bff --external-ontologies $ont_file -diseases 1 -max-diseases-pool 1 -phenotypicFeatures 1 -max-phenotypicFeatures-pool 1 -treatments 1 -max-treatments-pool 1 --exposures 0 -procedures 0 --random-seed $seed -o $tmp_file"
     );
 
     ########

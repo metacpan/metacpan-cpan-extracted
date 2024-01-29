@@ -4,7 +4,7 @@ Net::Statsd::Tiny - A tiny StatsD client that supports multimetric packets
 
 # VERSION
 
-version v0.3.6
+version v0.3.7
 
 # SYNOPSIS
 
@@ -21,7 +21,7 @@ my $stats = Net::Statsd::Tiny->new(
 
 $stats->increment('this.counter');
 
-$stats->set_add( $username ) if $username;
+$stats->set_add( 'this.users', $username ) if $username;
 
 $stats->timing( $run_time * 1000 );
 
@@ -105,7 +105,7 @@ be added. `$rate` must be between 0 and 1.
 ## `update`
 
 This is an alias for ["counter"](#counter), for compatability with
-[Etsy::StatsD](https://metacpan.org/pod/Etsy::StatsD) or [Net::Statsd::Client](https://metacpan.org/pod/Net::Statsd::Client).
+[Etsy::StatsD](https://metacpan.org/pod/Etsy%3A%3AStatsD) or [Net::Statsd::Client](https://metacpan.org/pod/Net%3A%3AStatsd%3A%3AClient).
 
 ## `increment`
 
@@ -177,7 +177,7 @@ rates for timings may not be supported by all statsd servers.
 ## `timing_ms`
 
 This is an alias for ["timing"](#timing), for compatability with
-[Net::Statsd::Client](https://metacpan.org/pod/Net::Statsd::Client).
+[Net::Statsd::Client](https://metacpan.org/pod/Net%3A%3AStatsd%3A%3AClient).
 
 ## `histogram`
 
@@ -205,8 +205,8 @@ is any data in the buffer.
 
 # SEE ALSO
 
-[Net::Statsd::Lite](https://metacpan.org/pod/Net::Statsd::Lite) which has a similar API but uses [Moo](https://metacpan.org/pod/Moo) and
-[Type::Tiny](https://metacpan.org/pod/Type::Tiny) for data validation. It's also faster.
+[Net::Statsd::Lite](https://metacpan.org/pod/Net%3A%3AStatsd%3A%3ALite) which has a similar API but uses [Moo](https://metacpan.org/pod/Moo) and
+[Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny) for data validation. It's also faster.
 
 [https://github.com/b/statsd\_spec](https://github.com/b/statsd_spec)
 
@@ -237,7 +237,7 @@ Michael R. Davis <mrdvt@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2020 by Robert Rothenberg.
+This software is Copyright (c) 2018-2023 by Robert Rothenberg.
 
 This is free software, licensed under:
 

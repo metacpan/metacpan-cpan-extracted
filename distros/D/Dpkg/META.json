@@ -94,6 +94,10 @@
          "file" : "lib/Dpkg/BuildProfiles.pm",
          "version" : "1.00"
       },
+      "Dpkg::BuildTree" : {
+         "file" : "lib/Dpkg/BuildTree.pm",
+         "version" : "0.01"
+      },
       "Dpkg::BuildTypes" : {
          "file" : "lib/Dpkg/BuildTypes.pm",
          "version" : "0.02"
@@ -140,7 +144,7 @@
       },
       "Dpkg::Control" : {
          "file" : "lib/Dpkg/Control.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Dpkg::Control::Changelog" : {
          "file" : "lib/Dpkg/Control/Changelog.pm",
@@ -413,6 +417,6 @@
          "web" : "https://git.dpkg.org/cgit/dpkg/dpkg.git"
       }
    },
-   "version" : "v1.22.1",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "v1.22.4",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

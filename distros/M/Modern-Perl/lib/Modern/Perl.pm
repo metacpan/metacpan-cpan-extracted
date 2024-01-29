@@ -1,6 +1,6 @@
 package Modern::Perl;
 # ABSTRACT: enable all of the features of Modern Perl with one import
-$Modern::Perl::VERSION = '1.20230106';
+$Modern::Perl::VERSION = '1.20240115';
 use 5.010_000;
 
 use strict;
@@ -18,7 +18,7 @@ my $wanted_date;
 sub VERSION {
     my ($self, $version) = @_;
 
-    my $default = 2023;
+    my $default = 2024;
 
     return $Modern::Perl::VERSION || $default unless defined $version;
     return $Modern::Perl::VERSION || $default if             $version < 2009;
@@ -42,6 +42,10 @@ sub import {
     if ($feature_tag ge ':5.34') {
         feature->import( 'signatures' );
         warnings->unimport( 'experimental::signatures' );
+    }
+
+    if ($feature_tag ge ':5.38') {
+        feature->import( 'module_true' );
     }
 
     mro::set_mro( scalar caller(), 'c3' );
@@ -70,6 +74,7 @@ sub validate_date {
         2021 => ':5.32',
         2022 => ':5.34',
         2023 => ':5.36',
+        2024 => ':5.38',
     );
 
     my $date = shift;
@@ -101,7 +106,7 @@ Modern::Perl - enable all of the features of Modern Perl with one import
 
 =head1 VERSION
 
-version 1.20230106
+version 1.20240115
 
 =head1 SYNOPSIS
 
@@ -210,8 +215,17 @@ I<year> value as the single optional import tag. For example:
 
 ... enables 5.36 features.
 
-Obviously you cannot use newer features on earlier
-versions. Perl will throw the appropriate exception if you try.
+    use Modern::Perl '2024';
+
+... enables 5.38 features.
+
+Obviously you cannot use newer features on earlier versions. Perl will throw
+the appropriate exception if you try.
+
+As of Perl 5.38, you may prefer to write C<use v5.38>, which is almost entirely
+equivalent to the use of this module. For the purpose of forward compatibility,
+this module will continue to work as expected--and will continue regular
+maintenance.
 
 =head1 AUTHOR
 
@@ -270,7 +284,7 @@ chromatic
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by chromatic@wgz.org.
+This software is copyright (c) 20242424242424242424 by chromatic@wgz.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

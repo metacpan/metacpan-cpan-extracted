@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ckb - Package for language Central Kurdish
 
 package Locale::CLDR::Locales::Ckb;
 # This file auto generated from Data\common\main\ckb.xml
-#	on Tue  5 Dec  1:05:00 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'aa' => 'ئەفار',
@@ -56,7 +56,6 @@ has 'display_name_language' => (
  				'awa' => 'ئاوادهی',
  				'ay' => 'ئایمارا',
  				'az' => 'ئازەربایجانی',
- 				'az@alt=short' => 'ئازەربایجانی',
  				'az_Arab' => 'ئازەربایجانی باشووری',
  				'ba' => 'باشکیەر',
  				'ban' => 'بالی',
@@ -156,7 +155,7 @@ has 'display_name_language' => (
  				'hr' => 'كرواتی',
  				'hsb' => 'سربیی سەروو',
  				'ht' => 'کریولی هائیتی',
- 				'hu' => 'هەنگاری (مەجاری)',
+ 				'hu' => 'هەنگاری',
  				'hup' => 'هووپا',
  				'hy' => 'ئەرمەنی',
  				'hz' => 'هێرێرۆ',
@@ -314,7 +313,6 @@ has 'display_name_language' => (
  				'ro' => 'ڕۆمانی',
  				'ro_MD' => 'مۆڵداڤی',
  				'rof' => 'ڕۆمبۆ',
- 				'root' => 'ڕووت',
  				'ru' => 'ڕووسی',
  				'rup' => 'ئارمۆمانی',
  				'rw' => 'کینیارواندا',
@@ -497,7 +495,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'جیهان',
  			'002' => 'ئەفریقا',
@@ -571,7 +569,7 @@ has 'display_name_region' => (
  			'CA' => 'کەنەدا',
  			'CC' => 'دوورگەکانی کیلینگ',
  			'CD' => 'کۆنگۆ کینشاسا',
- 			'CD@alt=variant' => 'کۆماری دیموکراتیکی کۆنگۆ',
+ 			'CD@alt=variant' => 'کۆماری دیموکراتیی کۆنگۆ',
  			'CF' => 'کۆماری ئەفریقای ناوەڕاست',
  			'CG' => 'کۆنگۆ برازاڤیل',
  			'CG@alt=variant' => 'کۆماری کۆنگۆ',
@@ -609,13 +607,12 @@ has 'display_name_region' => (
  			'EZ' => 'ناوچەی یۆرۆ',
  			'FI' => 'فینلاند',
  			'FJ' => 'فیجی',
- 			'FK' => 'دوورگەکانی مالڤیناس',
+ 			'FK' => 'دوورگەکانی مالڤیناس (دوورگەکانی فاڵکلاند)',
  			'FM' => 'مایکرۆنیزیا',
  			'FO' => 'دوورگەکانی فارەو',
  			'FR' => 'فەڕەنسا',
  			'GA' => 'گابۆن',
  			'GB' => 'شانشینی یەکگرتوو',
- 			'GB@alt=short' => 'شانشینی یەکگرتوو',
  			'GD' => 'گرینادا',
  			'GE' => 'گورجستان',
  			'GF' => 'گیانای فەرەنسا',
@@ -634,7 +631,6 @@ has 'display_name_region' => (
  			'GW' => 'گینێ بیساو',
  			'GY' => 'گویانا',
  			'HK' => 'هۆنگ کۆنگ',
- 			'HK@alt=short' => 'هۆنگ کۆنگ',
  			'HM' => 'دوورگەکانی هێرد و مەکدانڵد',
  			'HN' => 'ھۆندووراس',
  			'HR' => 'کرۆواتیا',
@@ -656,7 +652,7 @@ has 'display_name_region' => (
  			'JO' => 'ئوردن',
  			'JP' => 'ژاپۆن',
  			'KE' => 'کینیا',
- 			'KG' => 'قرغیزستان',
+ 			'KG' => 'کرگیزستان',
  			'KH' => 'کەمبۆدیا',
  			'KI' => 'کیریباس',
  			'KM' => 'دوورگەکانی کۆمۆر',
@@ -684,12 +680,11 @@ has 'display_name_region' => (
  			'MF' => 'سەن مارتین',
  			'MG' => 'ماداگاسکار',
  			'MH' => 'دوورگەکانی مارشاڵ',
- 			'MK' => 'ماکەدۆنیا',
+ 			'MK' => 'مەکدۆنیای باکوور',
  			'ML' => 'مالی',
  			'MM' => 'میانمار',
  			'MN' => 'مەنگۆلیا',
  			'MO' => 'ماکائۆ',
- 			'MO@alt=short' => 'ماکائۆ',
  			'MP' => 'دوورگەکانی ماریانای باکوور',
  			'MQ' => 'مارتینیک',
  			'MR' => 'مۆریتانیا',
@@ -779,7 +774,6 @@ has 'display_name_region' => (
  			'UM' => 'دوورگەکانی دەرەوەی ئەمریکا',
  			'UN' => 'نەتەوە یەکگرتووەکان',
  			'US' => 'ویلایەتە یەکگرتووەکان',
- 			'US@alt=short' => 'ویلایەتە یەکگرتووەکان',
  			'UY' => 'ئوروگوای',
  			'UZ' => 'ئوزبەکستان',
  			'VA' => 'ڤاتیکان',
@@ -807,7 +801,7 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'calendar' => 'ڕۆژژمێر',
  			'collation' => 'ڕیزبەندی',
@@ -826,11 +820,15 @@ has 'display_name_type' => (
 		{
 			'calendar' => {
  				'chinese' => q{ڕۆژژمێری چینی},
- 				'gregorian' => q{ڕۆژژمێری گورجی},
+ 				'gregorian' => q{ڕۆژژمێری زاینیی},
  				'hebrew' => q{ڕۆژژمێری عیبری},
  				'indian' => q{ڕۆژژمێری نەتەوەیی ھیندی},
  				'islamic' => q{ڕۆژژمێری کۆچیی مانگی},
+ 				'iso8601' => q{ISO-8601 ڕۆژژمێری},
  				'persian' => q{ڕۆژژمێری کۆچیی ھەتاوی},
+ 			},
+ 			'collation' => {
+ 				'standard' => q{ڕیزکردنی داواکری ستاندارد},
  			},
  			'numbers' => {
  				'arab' => q{ژمارە عەربی-ھیندییەکان},
@@ -848,10 +846,10 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{مەتریک},
- 			'UK' => q{بریتانی},
+ 			'UK' => q{بەڕیتانی},
  			'US' => q{ئەمەریکی},
 
 		}
@@ -862,10 +860,10 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'زمان: {0}',
- 			'script' => 'خەت: {0}',
+ 			'script' => 'نووسە:{0}',
  			'region' => 'ناوچە: {0}',
 
 		}
@@ -894,7 +892,7 @@ has 'characters' => (
 			auxiliary => qr{[‎‏ ً ٌ ٍ َ ُ ِ ّ ْ ء آ أ ؤ إ ة ث ذ ص ض ط ظ ك ه ى ي]},
 			index => ['ئ', 'ا', 'ب', 'پ', 'ت', 'ج', 'چ', 'ح', 'خ', 'د', 'ر', 'ز', 'ڕ', 'ژ', 'س', 'ش', 'ع', 'غ', 'ف', 'ڤ', 'ق', 'ک', 'گ', 'ل', 'ڵ', 'م', 'ن', 'ھ', 'ە', 'و', 'ۆ', 'ی', 'ێ'],
 			main => qr{[ئ ا ب پ ت ج چ ح خ د ر ز ڕ ژ س ش ع غ ف ڤ ق ک گ ل ڵ م ن ھ ە و ۆ ی ێ]},
-			numbers => qr{[‎‏ \- , ٫ ٬ . % ٪ ‰ ؉ + 0٠ 1١ 2٢ 3٣ 4٤ 5٥ 6٦ 7٧ 8٨ 9٩]},
+			numbers => qr{[‎‏ \- ‑ , ٫ ٬ . % ٪ ‰ ؉ + 0٠ 1١ 2٢ 3٣ 4٤ 5٥ 6٦ 7٧ 8٨ 9٩]},
 		};
 	},
 EOT
@@ -903,6 +901,27 @@ EOT
 },
 );
 
+
+has 'more_information' => (
+	is			=> 'ro',
+	isa			=> Str,
+	init_arg	=> undef,
+	default		=> qq{؟},
+);
+
+has 'yesstr' => (
+	is			=> 'ro',
+	isa			=> RegexpRef,
+	init_arg	=> undef,
+	default		=> sub { qr'^(?i:بەڵێ|ب|yes|y)$' }
+);
+
+has 'nostr' => (
+	is			=> 'ro',
+	isa			=> RegexpRef,
+	init_arg	=> undef,
+	default		=> sub { qr'^(?i:نەخێر|ن|no|n)$' }
+);
 
 has 'default_numbering_system' => (
 	is			=> 'ro',
@@ -1033,6 +1052,13 @@ has 'currencies' => (
 		'BZD' => {
 			display_name => {
 				'currency' => q(دۆلاری بەلیزی),
+			},
+		},
+		'CAD' => {
+			display_name => {
+				'currency' => q(دۆلاری کەنەدی),
+				'one' => q(دۆلاری کەنەدی),
+				'other' => q(دۆلاری کەنەدی),
 			},
 		},
 		'DZD' => {
@@ -1320,66 +1346,6 @@ has 'calendar_days' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-			'generic' => {
-				'format' => {
-					abbreviated => {
-						mon => 'دووشەممە',
-						tue => 'سێشەممە',
-						wed => 'چوارشەممە',
-						thu => 'پێنجشەممە',
-						fri => 'ھەینی',
-						sat => 'شەممە',
-						sun => 'یەکشەممە'
-					},
-					narrow => {
-						mon => 'د',
-						tue => 'س',
-						wed => 'چ',
-						thu => 'پ',
-						fri => 'ھ',
-						sat => 'ش',
-						sun => 'ی'
-					},
-					wide => {
-						mon => 'دووشەممە',
-						tue => 'سێشەممە',
-						wed => 'چوارشەممە',
-						thu => 'پێنجشەممە',
-						fri => 'ھەینی',
-						sat => 'شەممە',
-						sun => 'یەکشەممە'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						mon => 'دووشەممە',
-						tue => 'سێشەممە',
-						wed => 'چوارشەممە',
-						thu => 'پێنجشەممە',
-						fri => 'ھەینی',
-						sat => 'شەممە',
-						sun => 'یەکشەممە'
-					},
-					narrow => {
-						mon => 'د',
-						tue => 'س',
-						wed => 'چ',
-						thu => 'پ',
-						fri => 'ھ',
-						sat => 'ش',
-						sun => 'ی'
-					},
-					wide => {
-						mon => 'دووشەممە',
-						tue => 'سێشەممە',
-						wed => 'چوارشەممە',
-						thu => 'پێنجشەممە',
-						fri => 'ھەینی',
-						sat => 'شەممە',
-						sun => 'یەکشەممە'
-					},
-				},
-			},
 			'gregorian' => {
 				'format' => {
 					abbreviated => {
@@ -1466,22 +1432,6 @@ has 'calendar_quarters' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-			'generic' => {
-				'format' => {
-					wide => {0 => 'چارەکی یەکەم',
-						1 => 'چارەکی دووەم',
-						2 => 'چارەکی سێەم',
-						3 => 'چارەکی چوارەم'
-					},
-				},
-				'stand-alone' => {
-					wide => {0 => 'چارەکی یەکەم',
-						1 => 'چارەکی دووەم',
-						2 => 'چارەکی سێەم',
-						3 => 'چارەکی چوارەم'
-					},
-				},
-			},
 			'gregorian' => {
 				'format' => {
 					abbreviated => {0 => 'چ١',
@@ -1526,18 +1476,6 @@ has 'day_periods' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			'format' => {
-				'abbreviated' => {
-					'am' => q{ب.ن},
-					'pm' => q{د.ن},
-				},
-				'wide' => {
-					'am' => q{ب.ن},
-					'pm' => q{د.ن},
-				},
-			},
-		},
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
@@ -1718,7 +1656,7 @@ has 'datetime_formats_available_formats' => (
 			MEd => q{E، M/d},
 			MMM => q{LLL},
 			MMMEd => q{E، dی MMM},
-			MMMMW => q{هەفتەی W ی MMM},
+			MMMMW => q{هەفتەی W ی MMMM},
 			MMMMd => q{MMMM d},
 			MMMd => q{dی MMM},
 			Md => q{MM-dd},

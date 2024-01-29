@@ -10,17 +10,17 @@ App::Greple::xlate - Greple tõlkimise tugimoodul
 
 # VERSION
 
-Version 0.28
+Version 0.29
 
 # DESCRIPTION
 
-**Greple** **xlate** moodul leiab tekstiplokid ja asendab need tõlgitud tekstiga. Praegu on tagasiside mootorina rakendatud DeepL (`deepl.pm`) ja ChatGPT (`gpt3.pm`) moodul.
+**Greple** **xlate** moodul leiab soovitud tekstiplokid ja asendab need tõlgitud tekstiga. Praegu on tagasiside mootorina rakendatud DeepL (`deepl.pm`) ja ChatGPT (`gpt3.pm`) moodul.
 
-Kui soovite tõlkida tavalisi tekstiplokke, mis on kirjutatud [pod](https://metacpan.org/pod/pod) stiilis, kasutage **greple** käsku koos `xlate::deepl` ja `perl` mooduliga niimoodi:
+Kui soovite tõlkida tavalisi tekstiplokke Perli pod-stiilis kirjutatud dokumendis, kasutage käsku **greple** koos `xlate::deepl` ja `perl` mooduliga niimoodi:
 
     greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
 
-Muster `^(\w.*\n)+` tähendab järjestikuseid ridu, mis algavad tähtnumbrilise tähega. See käsk näitab tõlgitavat ala. Valikut **--all** kasutatakse kogu teksti koostamiseks.
+Selles käsus tähendab musterjada `^(\w.*\n)+` järjestikuseid ridu, mis algavad tähtnumbrilise tähega. See käsk näitab tõlgitavat ala esile tõstetud kujul. Valikut **--all** kasutatakse kogu teksti koostamiseks.
 
 <div>
     <p>
@@ -28,7 +28,7 @@ Muster `^(\w.*\n)+` tähendab järjestikuseid ridu, mis algavad tähtnumbrilise 
     </p>
 </div>
 
-Seejärel lisage valik `--xlate`, et tõlkida valitud ala. See leiab ja asendab need käsu **deepl** väljundiga.
+Seejärel lisatakse valik `--xlate`, et tõlkida valitud ala. Seejärel leitakse soovitud lõigud ja asendatakse need käsu **deepl** väljundiga.
 
 Vaikimisi trükitakse algne ja tõlgitud tekst [git(1)](http://man.he.net/man1/git)-ga ühilduvas "konfliktimärkide" formaadis. Kasutades `ifdef` formaati, saab soovitud osa hõlpsasti kätte käsuga [unifdef(1)](http://man.he.net/man1/unifdef). Väljundi formaati saab määrata valikuga **--xlate-format**.
 
@@ -76,7 +76,7 @@ Kui soovite tõlkida kogu teksti, kasutage valikut **--match-all**. See on otset
 
     - **conflict**, **cm**
 
-        Trükib originaal- ja tõlgitud teksti [git(1)](http://man.he.net/man1/git) konfliktimärgistuse formaadis.
+        Algne ja teisendatud tekst trükitakse [git(1)](http://man.he.net/man1/git) konfliktimärgistuse formaadis.
 
             <<<<<<< ORIGINAL
             original text
@@ -90,7 +90,7 @@ Kui soovite tõlkida kogu teksti, kasutage valikut **--match-all**. See on otset
 
     - **ifdef**
 
-        Prindi originaal- ja tõlgitud tekst [cpp(1)](http://man.he.net/man1/cpp) `#ifdef`-vormingus.
+        Algne ja teisendatud tekst trükitakse [cpp(1)](http://man.he.net/man1/cpp) `#ifdef` formaadis.
 
             #ifdef ORIGINAL
             original text
@@ -105,7 +105,7 @@ Kui soovite tõlkida kogu teksti, kasutage valikut **--match-all**. See on otset
 
     - **space**
 
-        Prindi originaal- ja tõlgitud tekst ühe tühja reaga eraldatud.
+        Algne ja teisendatud tekst trükitakse ühe tühja reaga eraldatuna.
 
     - **xtxt**
 
@@ -196,6 +196,8 @@ Peate installima käsurea tööriistad DeepL ja ChatGPT.
 
 [App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
 
+[https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
     DeepL Pythoni raamatukogu ja CLI käsk.
@@ -220,13 +222,27 @@ Peate installima käsurea tööriistad DeepL ja ChatGPT.
 
     Kasutage **sdif**, et näidata konfliktimärkide formaati kõrvuti valikuga **-V**.
 
+## ARTICLES
+
+- [https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250](https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250)
+
+    Greple moodul tõlkida ja asendada ainult vajalikud osad DeepL API (jaapani keeles)
+
+- [https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6](https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6)
+
+    Dokumentide genereerimine 15 keeles DeepL API mooduliga (jaapani keeles).
+
+- [https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd](https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd)
+
+    Automaatne tõlkekeskkond Docker koos DeepL API-ga (jaapani keeles)
+
 # AUTHOR
 
 Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023 Kazumasa Utashiro.
+Copyright © 2023-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

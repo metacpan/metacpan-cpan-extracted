@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::re_from_str;
 
-our $DATE = '2022-08-20'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2023-09-09'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 our $rschema = do{my$var={base=>"re",clsets_after_base=>[{description=>"\nThis schema accepts Regexp object or string which will be coerced to Regexp object\nusing <pm:Regexp::From::String>'s `str_to_re()` function.\n\nBasically, if string is of the form of `/.../` or `qr(...)`, then you could\nspecify metacharacters as if you are writing a literal regexp pattern in Perl.\nOtherwise, your string will be `quotemeta()`-ed first then compiled to Regexp\nobject. This means in the second case you cannot specify metacharacters.\n\n",examples=>[],prefilters=>[["Re::re_from_str",{}]],summary=>"Regexp object from string using Regexp::From::String's str_to_re()"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["re"],type=>"re",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::re_from_str - Regexp object from string using Regexp::From::String
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaR::re_from_str (from Perl distribution Sah-Schemas-Re), released on 2022-08-20.
+This document describes version 0.005 of Sah::SchemaR::re_from_str (from Perl distribution Sah-Schemas-Re), released on 2023-09-09.
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

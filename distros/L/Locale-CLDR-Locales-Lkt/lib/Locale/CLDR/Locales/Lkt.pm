@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Lkt - Package for language Lakota
 
 package Locale::CLDR::Locales::Lkt;
 # This file auto generated from Data\common\main\lkt.xml
-#	on Tue  5 Dec  1:19:42 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ab' => 'Abkhaz Iyápi',
@@ -194,7 +194,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'Makȟásitomni',
  			'002' => 'Hásapa Makȟáwita',
@@ -217,7 +217,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'US' => q{US},
 
@@ -237,8 +237,8 @@ has 'characters' => (
 			auxiliary => qr{[c d f {ȟʼ} j q r {sʼ} {šʼ} v x]},
 			index => ['A', 'B', 'Č', 'E', 'G', 'Ǧ', 'H', 'Ȟ', 'I', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'P', 'S', 'Š', 'T', 'U', 'W', 'Y', 'Z', 'Ž'],
 			main => qr{[a á {aŋ} b č {čh} {čʼ} e é g ǧ h ȟ i í {iŋ} k {kh} {kȟ} {kʼ} l m n ŋ o ó p {ph} {pȟ} {pʼ} s š t {th} {tȟ} {tʼ} u ú {uŋ} w y z ž ʼ]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- ‐ – — , ; \: ! ? . " “ ” ( ) \[ \] @ * / \& #]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . " “ ” ( ) \[ \] @ * / \& #]},
 		};
 	},
 EOT
@@ -254,136 +254,333 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(-čháŋ),
+						'other' => q({0}-čháŋ),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(-čháŋ),
 						'other' => q({0}-čháŋ),
 					},
-					'foot' => {
-						'name' => q(siíyutȟapi),
-						'other' => q(siíyutȟapi {0}),
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(Owápȟe),
+						'other' => q(Owápȟe {0}),
 					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(Owápȟe),
 						'other' => q(Owápȟe {0}),
 					},
-					'inch' => {
-						'name' => q(oíyutȟe čísčila),
-						'other' => q(oíyutȟe čísčila {0}),
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(Wíyawapi),
+						'other' => q(Wíyawapi {0}),
 					},
-					'mile' => {
-						'name' => q(makhíyutȟapi),
-						'other' => q(makhíyutȟapi {0}),
-					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(Wíyawapi),
 						'other' => q(Wíyawapi {0}),
 					},
-					'pound' => {
-						'name' => q(tkeíyutȟapi),
-						'other' => q(tkeíyutȟapi {0}),
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(Okpí),
+						'other' => q(Okpí {0}),
 					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(Okpí),
 						'other' => q(Okpí {0}),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(okó),
+						'other' => q(okó {0}),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(okó),
 						'other' => q(okó {0}),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(ómakȟa),
+						'other' => q(ómakȟa {0}),
+					},
+					# Core Unit Identifier
+					'year' => {
+						'name' => q(ómakȟa),
+						'other' => q(ómakȟa {0}),
+					},
+					# Long Unit Identifier
+					'length-foot' => {
+						'name' => q(siíyutȟapi),
+						'other' => q(siíyutȟapi {0}),
+					},
+					# Core Unit Identifier
+					'foot' => {
+						'name' => q(siíyutȟapi),
+						'other' => q(siíyutȟapi {0}),
+					},
+					# Long Unit Identifier
+					'length-inch' => {
+						'name' => q(oíyutȟe čísčila),
+						'other' => q(oíyutȟe čísčila {0}),
+					},
+					# Core Unit Identifier
+					'inch' => {
+						'name' => q(oíyutȟe čísčila),
+						'other' => q(oíyutȟe čísčila {0}),
+					},
+					# Long Unit Identifier
+					'length-mile' => {
+						'name' => q(makhíyutȟapi),
+						'other' => q(makhíyutȟapi {0}),
+					},
+					# Core Unit Identifier
+					'mile' => {
+						'name' => q(makhíyutȟapi),
+						'other' => q(makhíyutȟapi {0}),
+					},
+					# Long Unit Identifier
+					'length-yard' => {
+						'name' => q(čhaéglepi),
+						'other' => q(čhaéglepi {0}),
+					},
+					# Core Unit Identifier
 					'yard' => {
 						'name' => q(čhaéglepi),
 						'other' => q(čhaéglepi {0}),
 					},
-					'year' => {
-						'name' => q(ómakȟa),
-						'other' => q(ómakȟa {0}),
+					# Long Unit Identifier
+					'mass-pound' => {
+						'name' => q(tkeíyutȟapi),
+						'other' => q(tkeíyutȟapi {0}),
+					},
+					# Core Unit Identifier
+					'pound' => {
+						'name' => q(tkeíyutȟapi),
+						'other' => q(tkeíyutȟapi {0}),
 					},
 				},
 				'narrow' => {
-					'celsius' => {
-						'other' => q({0}°C),
+					# Long Unit Identifier
+					'duration-day' => {
+						'other' => q({0}-čháŋ),
 					},
+					# Core Unit Identifier
 					'day' => {
 						'other' => q({0}-čháŋ),
 					},
-					'fahrenheit' => {
-						'other' => q({0}°),
+					# Long Unit Identifier
+					'duration-hour' => {
+						'other' => q(Owápȟe {0}),
 					},
-					'foot' => {
-						'other' => q(siíyutȟapi {0}),
-					},
+					# Core Unit Identifier
 					'hour' => {
 						'other' => q(Owápȟe {0}),
 					},
-					'inch' => {
-						'other' => q({0}″),
+					# Long Unit Identifier
+					'duration-month' => {
+						'other' => q(Wí {0}),
 					},
-					'mile' => {
-						'other' => q({0} makh),
-					},
+					# Core Unit Identifier
 					'month' => {
 						'other' => q(Wí {0}),
 					},
-					'pound' => {
-						'other' => q({0}#),
+					# Long Unit Identifier
+					'duration-second' => {
+						'other' => q(Okpí {0}),
 					},
+					# Core Unit Identifier
 					'second' => {
 						'other' => q(Okpí {0}),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'other' => q(okó {0}),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'other' => q(okó {0}),
 					},
-					'yard' => {
-						'other' => q(čhaéglepi {0}),
+					# Long Unit Identifier
+					'duration-year' => {
+						'other' => q(ómakȟa {0}),
 					},
+					# Core Unit Identifier
 					'year' => {
 						'other' => q(ómakȟa {0}),
 					},
+					# Long Unit Identifier
+					'length-foot' => {
+						'other' => q(siíyutȟapi {0}),
+					},
+					# Core Unit Identifier
+					'foot' => {
+						'other' => q(siíyutȟapi {0}),
+					},
+					# Long Unit Identifier
+					'length-inch' => {
+						'other' => q({0}″),
+					},
+					# Core Unit Identifier
+					'inch' => {
+						'other' => q({0}″),
+					},
+					# Long Unit Identifier
+					'length-mile' => {
+						'other' => q({0} makh),
+					},
+					# Core Unit Identifier
+					'mile' => {
+						'other' => q({0} makh),
+					},
+					# Long Unit Identifier
+					'length-yard' => {
+						'other' => q(čhaéglepi {0}),
+					},
+					# Core Unit Identifier
+					'yard' => {
+						'other' => q(čhaéglepi {0}),
+					},
+					# Long Unit Identifier
+					'mass-pound' => {
+						'other' => q({0}#),
+					},
+					# Core Unit Identifier
+					'pound' => {
+						'other' => q({0}#),
+					},
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'other' => q({0}°C),
+					},
+					# Core Unit Identifier
+					'celsius' => {
+						'other' => q({0}°C),
+					},
+					# Long Unit Identifier
+					'temperature-fahrenheit' => {
+						'other' => q({0}°),
+					},
+					# Core Unit Identifier
+					'fahrenheit' => {
+						'other' => q({0}°),
+					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(-čháŋ),
+						'other' => q({0}-čháŋ),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(-čháŋ),
 						'other' => q({0}-čháŋ),
 					},
-					'foot' => {
-						'name' => q(siíyutȟapi),
-						'other' => q(siíyutȟapi {0}),
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(Owápȟe),
+						'other' => q(Owápȟe {0}),
 					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(Owápȟe),
 						'other' => q(Owápȟe {0}),
 					},
-					'inch' => {
-						'name' => q(oíyutȟe čísčila),
-						'other' => q(oíyutȟe čísčila {0}),
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(Wíyawapi),
+						'other' => q(Wíyawapi {0}),
 					},
-					'mile' => {
-						'name' => q(makhíyutȟapi),
-						'other' => q(makhíyutȟapi {0}),
-					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(Wíyawapi),
 						'other' => q(Wíyawapi {0}),
 					},
-					'pound' => {
-						'name' => q(tkeíyutȟapi),
-						'other' => q(tkeíyutȟapi {0}),
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(Okpí),
+						'other' => q(Okpí {0}),
 					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(Okpí),
 						'other' => q(Okpí {0}),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(okó),
+						'other' => q(okó {0}),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(okó),
 						'other' => q(okó {0}),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(ómakȟa),
+						'other' => q(ómakȟa {0}),
+					},
+					# Core Unit Identifier
+					'year' => {
+						'name' => q(ómakȟa),
+						'other' => q(ómakȟa {0}),
+					},
+					# Long Unit Identifier
+					'length-foot' => {
+						'name' => q(siíyutȟapi),
+						'other' => q(siíyutȟapi {0}),
+					},
+					# Core Unit Identifier
+					'foot' => {
+						'name' => q(siíyutȟapi),
+						'other' => q(siíyutȟapi {0}),
+					},
+					# Long Unit Identifier
+					'length-inch' => {
+						'name' => q(oíyutȟe čísčila),
+						'other' => q(oíyutȟe čísčila {0}),
+					},
+					# Core Unit Identifier
+					'inch' => {
+						'name' => q(oíyutȟe čísčila),
+						'other' => q(oíyutȟe čísčila {0}),
+					},
+					# Long Unit Identifier
+					'length-mile' => {
+						'name' => q(makhíyutȟapi),
+						'other' => q(makhíyutȟapi {0}),
+					},
+					# Core Unit Identifier
+					'mile' => {
+						'name' => q(makhíyutȟapi),
+						'other' => q(makhíyutȟapi {0}),
+					},
+					# Long Unit Identifier
+					'length-yard' => {
+						'name' => q(čhaéglepi),
+						'other' => q(čhaéglepi {0}),
+					},
+					# Core Unit Identifier
 					'yard' => {
 						'name' => q(čhaéglepi),
 						'other' => q(čhaéglepi {0}),
 					},
-					'year' => {
-						'name' => q(ómakȟa),
-						'other' => q(ómakȟa {0}),
+					# Long Unit Identifier
+					'mass-pound' => {
+						'name' => q(tkeíyutȟapi),
+						'other' => q(tkeíyutȟapi {0}),
+					},
+					# Core Unit Identifier
+					'pound' => {
+						'name' => q(tkeíyutȟapi),
+						'other' => q(tkeíyutȟapi {0}),
 					},
 				},
 			} }

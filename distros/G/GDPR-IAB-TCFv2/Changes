@@ -1,3 +1,41 @@
+0.201
+  - change subroutine redefinition from INIT to BEGIN to avoid warnings (Tiago)
+
+0.200
+  - refactor constants, stop use dualvars
+  - validate parameters on method check_publisher_restriction
+  - add method publisher_restrictions by vendor id
+  - add prefetch option to cache vendor ids when the consent string is range based. 
+It is 2x faster check consent on a prefetched vendor than a regular one if the consent is range based.
+Without increase the Parsing time.
+
+0.100
+  - parse publisher tc section if available
+  - add strict mode (disabled by default) to validate the consent string version
+
+0.084
+  - fix a bug while parsing valid consent strings range-based, see https://github.com/peczenyj/GDPR-IAB-TCFv2/issues/20
+
+0.083
+  - refactor on Publisher Restriction parsing.
+  - small fixes about data and offset.
+  - performance improvement: when we parse a range-based consent string now the Parse method is 23% faster, TO_JSON is 9% faster and check vendor consent or legitimate interest is between 122% and 137% faster than the previous version
+  - remove GDPR::IAB::TCFv2::RangeConsent package
+
+0.082
+  - increase TO_JSON performance by 76% on bitfields and 3116% on range based vendor section
+  - add json section 'publisher' and include all publisher restriction, if any, per purpose id, vendor id and restriction type
+
+0.081
+  - reorganize JSON output
+  - small fixes in pod
+
+0.08
+  - add TO_JSON method
+  - substitute offset numbers by constants
+  - fix typos in pod documentation
+  - test tests for pod
+
 0.07
   - add check for publisher restrictions
   - validate if string is a valid base64 url encoded string

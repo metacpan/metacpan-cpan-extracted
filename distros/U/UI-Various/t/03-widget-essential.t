@@ -18,7 +18,7 @@ use strictures;
 no indirect 'fatal';
 no multidimensional;
 
-use Test::More tests => 28;
+use Test::More tests => 37;
 use Test::Warn;
 
 # define fixed environment for unit tests:
@@ -115,6 +115,29 @@ else
 is($b1->parent(), undef, 'Box 1 again has no parent');
 $_ = $l2->top();
 is($_, $b1, 'test Leaf 2 again has correct top Box 1');
+
+#####################################
+# basic checks of colours:
+warning_like
+{   $_ = $l2->bg('bad');   }
+{   carped => qr/^parameter 'bg' must be a valid colour \(.*$re_msg_tail/   },
+    'bad background colour carps error';
+is($_, '000000', 'bad colour in bg return default value (black)');
+warning_like
+{   $_ = $l2->fg('bad');   }
+{   carped => qr/^parameter 'fg' must be a valid colour \(.*$re_msg_tail/   },
+    'bad foreground colour carps error';
+is($_, '000000', 'bad colour in fg return default value (black)');
+$_ = $l2->bg('red');
+is($_, 'ff0000', 'red background in bg is handled correctly');
+$_ = $l2->fg('blue');
+is($_, '0000ff', 'blue foreground in fg is handled correctly');
+$_ = $l2->fg('404040');
+is($_, '404040', 'dark grey foreground in fg is handled correctly');
+$_ = $l2->bg;
+is($_, 'ff0000', 'red background in bg has been set correctly');
+$_ = $l2->fg;
+is($_, '404040', 'dark grey foreground in fg has been set correctly');
 
 #####################################
 # checks of other attributes unless already checked by proper widgets):

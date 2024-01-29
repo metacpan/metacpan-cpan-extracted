@@ -28,7 +28,6 @@ use JSON       qw( to_json );
 
 use Dancer2::Plugin::JobScheduler::Testing::Utils qw( :all );
 use Database::Temp;
-use Data::Dumper;
 
 my $test_db;
 
@@ -77,13 +76,9 @@ my %plugin_config = (
         theschwartz => {
             client     => 'TheSchwartz',
             parameters => {
-                databases => {
-                    theschwartz_db1 => {
-
-                        # id => 'theschwartz_db1',
-                        prefix       => q{},
-                        dbh_callback => 'Database::ManagedHandle->instance',
-                    },
+                dbh_callback => 'Database::ManagedHandle->instance',
+                databases    => {
+                    theschwartz_db1 => {},
                 }
             }
         }
@@ -92,7 +87,7 @@ my %plugin_config = (
 
 {
 
-    package TestProgram;
+    package Dancer2::Plugin::JobScheduler::Testing::TheSchwartz::WebApp::Submit;
     use Dancer2;
     use HTTP::Status qw( :constants status_message );
 
@@ -101,7 +96,6 @@ my %plugin_config = (
         set plugins => { JobScheduler => \%plugin_config, };
     }
     use Dancer2::Plugin::JobScheduler;
-    use Data::Dumper;
 
     get q{/} => sub {
         status HTTP_OK;
@@ -139,7 +133,7 @@ my %plugin_config = (
 
 }
 
-my $app = TestProgram->to_app;
+my $app = Dancer2::Plugin::JobScheduler::Testing::TheSchwartz::WebApp::Submit->to_app;
 is( ref $app, 'CODE', 'Initialized the test app' );
 
 # Activate web app

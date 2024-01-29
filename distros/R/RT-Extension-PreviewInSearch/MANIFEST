@@ -22,5 +22,6 @@ lib/RT/Extension/PreviewInSearch.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
+patches/0001-Add-ModifyPaths-Callback.patch
 README
 SIGNATURE                                Public-key signature (added by MakeMaker)

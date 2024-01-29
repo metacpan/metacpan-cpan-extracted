@@ -740,6 +740,18 @@ static SV *S_CvNAME_FILE_LINE(pTHX_ CV *cv)
   return newSVpvf("__ANON__(%s line %d)", CopFILE((COP *)cop), CopLINE((COP *)cop));
 }
 
+static const char *statestr(struct FutureXS *self)
+{
+  if(!self->ready)
+    return "pending";
+  if(self->cancelled)
+    return "cancelled";
+  if(self->failure)
+    return "failed";
+
+  return "done";
+}
+
 void Future_donev(pTHX_ SV *f, SV **svp, size_t n)
 {
   struct FutureXS *self = get_future(f);
@@ -748,8 +760,8 @@ void Future_donev(pTHX_ SV *f, SV **svp, size_t n)
     return;
 
   if(self->ready)
-    croak("%" SVf " is already (STATE) and cannot be ->done",
-        SVfARG(f));
+    croak("%" SVf " is already %s and cannot be ->done",
+        SVfARG(f), statestr(self));
   // TODO: test subs
 
   self->result = newAV_svn_dup(svp, n);
@@ -764,8 +776,8 @@ void Future_failv(pTHX_ SV *f, SV **svp, size_t n)
     return;
 
   if(self->ready)
-    croak("%" SVf " is already (STATE) and cannot be ->fail'ed",
-        SVfARG(f));
+    croak("%" SVf " is already %s and cannot be ->fail'ed",
+        SVfARG(f), statestr(self));
 
   if(n == 1 &&
       SvROK(svp[0]) && SvOBJECT(SvRV(svp[0])) &&
@@ -855,8 +867,8 @@ void Future_failp(pTHX_ SV *f, const char *s)
     return;
 
   if(self->ready)
-    croak("%" SVf " is already (STATE) and cannot be ->fail'ed",
-        SVfARG(f));
+    croak("%" SVf " is already %s and cannot be ->fail'ed",
+        SVfARG(f), statestr(self));
 
   self->failure = newAV();
   av_push(self->failure, newSVpv(s, strlen(s)));

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ff - Package for language Fulah
 
 package Locale::CLDR::Locales::Ff;
 # This file auto generated from Data\common\main\ff.xml
-#	on Tue  5 Dec  1:09:42 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -25,19 +25,19 @@ use Moo;
 
 extends('Locale::CLDR::Locales::Root');
 has 'valid_algorithmic_formats' => (
-	is => 'ro',
-	isa => ArrayRef,
-	init_arg => undef,
-	default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal','spellout-cardinal-class-o','spellout-ordinal' ]},
+    is => 'ro',
+    isa => ArrayRef,
+    init_arg => undef,
+    default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal','spellout-cardinal-class-o','spellout-ordinal' ]},
 );
 
 has 'algorithmic_number_format_data' => (
-	is => 'ro',
-	isa => HashRef,
-	init_arg => undef,
-	default => sub { 
-		use bigfloat;
-		return {
+    is => 'ro',
+    isa => HashRef,
+    init_arg => undef,
+    default => sub {
+        use bigfloat;
+        return {
 		'spellout-cardinal' => {
 			'public' => {
 				'-x' => {
@@ -441,14 +441,14 @@ has 'algorithmic_number_format_data' => (
 				},
 			},
 		},
-	} },
+    } },
 );
 
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'Akaan',
@@ -510,7 +510,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Anndoora',
  			'AE' => 'Emiraat Araab Denntuɗe',
@@ -637,7 +637,6 @@ has 'display_name_region' => (
  			'MD' => 'Moldawii',
  			'MG' => 'Madagaskaar',
  			'MH' => 'Duuɗe Marsaal',
- 			'MK' => 'Meceduwaan',
  			'ML' => 'Maali',
  			'MM' => 'Miyamaar',
  			'MN' => 'Monngolii',
@@ -753,7 +752,7 @@ has 'characters' => (
 			auxiliary => qr{[q v x z]},
 			index => ['A', 'B', 'Ɓ', 'C', 'D', 'Ɗ', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'Ŋ', 'O', 'P', 'R', 'S', 'T', 'U', 'W', 'Y', 'Ƴ'],
 			main => qr{[a b ɓ c d ɗ e f g h i j k l m n ñ ŋ o p r s t u w y ƴ]},
-			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT

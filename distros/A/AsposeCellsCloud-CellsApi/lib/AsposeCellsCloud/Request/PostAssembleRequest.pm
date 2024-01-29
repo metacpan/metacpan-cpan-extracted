@@ -62,8 +62,9 @@ sub new {
 # PostAssembleRequest.File : The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
 # PostAssembleRequest.datasource :   ,
 # PostAssembleRequest.format : The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
-# PostAssembleRequest.password :   ,
-# PostAssembleRequest.checkExcelRestriction :    
+# PostAssembleRequest.password : The password needed to open an Excel file.  ,
+# PostAssembleRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.  ,
+# PostAssembleRequest.region : The regional settings for workbook.   
 
 {
     my $params = {
@@ -74,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_assemble' } = { 
-    	summary => 'Combine data files and template files to kinds of format files. ',
+    	summary => 'Assemble data files with template files to generate files in various formats.',
         params => $params,
         returns => 'FilesResult',
     };
@@ -114,6 +115,10 @@ sub run_http_request {
 
     if(defined $self->check_excel_restriction){
         $query_params->{'checkExcelRestriction'} = $client->to_query_value($self->check_excel_restriction);      
+    }
+
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
     } 
     my $_body_data;
  
@@ -159,14 +164,21 @@ __PACKAGE__->method_documentation({
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
-     	description => '',
+     	description => 'Whether check restriction of excel file when user modify cells related objects.',
+     	format => '',
+     	read_only => '',
+     		},
+     'region' => {
+     	datatype => 'string',
+     	base_name => 'region',
+     	description => 'The regional settings for workbook.',
      	format => '',
      	read_only => '',
      		},    
@@ -178,7 +190,8 @@ __PACKAGE__->attribute_map( {
     'datasource' => 'datasource',
     'format' => 'format',
     'password' => 'password',
-    'check_excel_restriction' => 'checkExcelRestriction' 
+    'check_excel_restriction' => 'checkExcelRestriction',
+    'region' => 'region' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

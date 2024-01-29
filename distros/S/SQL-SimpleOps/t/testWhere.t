@@ -27,7 +27,7 @@
 	$Data::Dumper::Terse = 1;
 	$Data::Dumper::Pad = "";
 
-	our $VERSION = "2023.106.1";
+	our $VERSION = "2023.362.1";
 
 	BEGIN{ use_ok('SQL::SimpleOps'); }
 
@@ -287,6 +287,48 @@
 		t=> "t1",
 		w=> [ a => [ "!", "\\concat(a,'abc')" ] ],
 		r=> "a != concat(a,'abc')"
+	);
+	&my_where
+	(
+		f=> "0232",
+		t=> "t1",
+		w=> [ a => "xx'xx" ],
+		r=> "a = 'xx\\'xx'",
+	);
+	&my_where
+	(
+		f=> "0233",
+		t=> "t1",
+		w=> [ a => [ "!", "xx'xx" ] ],
+		r=> "a != 'xx\\'xx'",
+	);
+	&my_where
+	(
+		f=> "0234",
+		t=> "t1",
+		w=> [ a => [ "xx'xx", "yy'yy" ] ],
+		r=> "a IN ('xx\\'xx','yy\\'yy')",
+	);
+	&my_where
+	(
+		f=> "0235",
+		t=> "t1",
+		w=> [ a => [ "xx'xx", "..", "yy'yy" ] ],
+		r=> "a BETWEEN ('xx\\'xx','yy\\'yy')",
+	);
+	&my_where
+	(
+		f=> "0240",
+		t=> "t1",
+		w=> [ a => 1, [ [ b => [], "or", c => 2 ] ] ],
+		r=> "a = '1' AND c = '2'",
+	);
+	&my_where
+	(
+		f=> "0241",
+		t=> "t1",
+		w=> [ a => 1, [ [ b => [] ], "or", [ c => 2 ] ] ],
+		r=> "a = '1' AND c = '2'",
 	);
 
 	diag("################################################################");

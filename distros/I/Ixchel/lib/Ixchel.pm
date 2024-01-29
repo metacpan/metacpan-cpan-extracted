@@ -15,11 +15,11 @@ Ixchel - Automate various sys admin stuff.
 
 =head1 VERSION
 
-Version 0.1.1
+Version 0.7.0
 
 =cut
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.7.0';
 
 =head1 METHODS
 
@@ -141,6 +141,16 @@ Now if we want to pass '--np' to not print it, we would do it like below.
 
     my $rendered_template=$ixchel->action( action=>'template', opts=>{ t=>'extend_logsize', np=>1 });
 
+If the following values are defined, the matching ENVs are set.
+
+    .proxy.ftp       ->  FTP_PROXY, ftp_proxy
+    .proxy.http      ->  HTTP_PROXY, http_proxy
+    .proxy.https     ->  HTTPS_PROXY, https_proxy
+    .perl.cpanm_home ->  PERL_CPANM_HOME
+
+Additionally any of the variables defined under .env will also be
+set. So .env.TMPDIR will set $ENV{TMPDIR}.
+
 =cut
 
 sub action {
@@ -188,6 +198,29 @@ sub action {
 		$vars = $opts{vars};
 	}
 
+	# set the enviromental variables if needed
+	if ( defined( $self->{config}{proxy}{ftp} ) && $self->{config}{proxy}{ftp} ne '' ) {
+		$ENV{FTP_PROXY} = $self->{config}{proxy}{ftp};
+		$ENV{ftp_proxy} = $self->{config}{proxy}{ftp};
+	}
+	if ( defined( $self->{config}{proxy}{http} ) && $self->{config}{proxy}{http} ne '' ) {
+		$ENV{HTTP_PROXY} = $self->{config}{proxy}{http};
+		$ENV{http_proxy} = $self->{config}{proxy}{http};
+	}
+	if ( defined( $self->{config}{proxy}{https} ) && $self->{config}{proxy}{https} ne '' ) {
+		$ENV{HTTPS_PROXY} = $self->{config}{proxy}{https};
+		$ENV{https_proxy} = $self->{config}{proxy}{https};
+	}
+	if ( defined( $self->{config}{perl}{cpanm_home} ) && $self->{config}{perl}{cpanm_home} ne '' ) {
+		$ENV{PERL_CPANM_HOME} = $self->{config}{perl}{cpanm_home};
+	}
+	my @env_keys = keys( %{ $self->{config}{env} } );
+	foreach my $env_key (@env_keys) {
+		if ( defined( $self->{config}{env}{$env_key} ) && ref( $self->{config}{env}{$env_key} ) eq '' ) {
+			$ENV{$env_key} = $self->{config}{env}{$env_key};
+		}
+	}
+
 	my $action_return;
 	my $action_obj;
 	my $to_eval
@@ -214,39 +247,6 @@ sub action {
 
 	return $action_return;
 } ## end sub action
-
-=head2 help
-
-Fetches help.
-
-One argument is required and that is the action to fetch info on.
-
-    my $help=Ixchel->help($action);
-
-=cut
-
-sub help {
-	my $self   = $_[0];
-	my $action = $_[1];
-
-	if ( !defined($action) ) {
-		die('No action to run defined');
-	}
-
-	# make sure the action only contains sane characters for when we eval
-	if ( $action =~ /[^a-zA-Z0-9\_]/ ) {
-		die( '"' . $action . '" matched /[^a-zA-Z0-9\_]/, which is not a valid action name' );
-	}
-
-	my $help;
-	my $to_eval = 'use Ixchel::Actions::' . $action . '; $help=Ixchel::Actions::' . $action . '->help;';
-	eval($to_eval);
-	if ($@) {
-		die( 'Help eval failed... ' . $@ );
-	}
-
-	return $help;
-} ## end sub help
 
 =head1 AUTHOR
 

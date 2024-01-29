@@ -1,11 +1,12 @@
 package Linux::FD;
-$Linux::FD::VERSION = '0.014';
+$Linux::FD::VERSION = '0.015';
 use 5.006;
 
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
-use Sub::Exporter -setup => { exports => [qw/eventfd signalfd timerfd/] };
+use Exporter 5.57 'import';
+our @EXPORT_OK = qw/eventfd signalfd timerfd/;
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, __PACKAGE__->VERSION);
@@ -26,7 +27,7 @@ Linux::FD - Linux specific special filehandles
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 DESCRIPTION
 

@@ -1,11 +1,11 @@
 NAME
-    Acme::CPANModules::PortedFrom::Ruby - Modules/applications that are
-    ported from (or inspired by) Ruby libraries
+    Acme::CPANModules::PortedFrom::Ruby - List of modules/applications that
+    are ported from (or inspired by) Ruby libraries
 
 VERSION
-    This document describes version 0.009 of
+    This document describes version 0.011 of
     Acme::CPANModules::PortedFrom::Ruby (from Perl distribution
-    Acme-CPANModules-PortedFrom-Ruby), released on 2022-10-17.
+    Acme-CPANModules-PortedFrom-Ruby), released on 2024-01-15.
 
 DESCRIPTION
     If you know of others, please drop me a message.
@@ -55,6 +55,16 @@ ACME::CPANMODULES ENTRIES
         Ruby project's gem: <https://rubygems.org/gems/rails>
 
         Ruby project's website: <https://rubyonrails.org/>
+
+    Dotenv
+        Although the 12-factor methodology is not tied to a single language,
+        the original implementation is in Ruby.
+
+        Author: BOOK <https://metacpan.org/author/BOOK>
+
+        Ruby project's gem: <https://rubygems.org/gems/dotenv>
+
+        Ruby project's website: <https://github.com/heroku/12factor>
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -127,8 +137,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2020, 2018 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2018 by
+    perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

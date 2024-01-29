@@ -1,0 +1,192 @@
+#!/pro/bin/perl
+
+# A modified version of Module::Release's "release", aimed at testing the
+# current distribution against all available perls (given .releaserc)
+
+use 5.014002;
+use warnings;
+
+our $VERSION = "0.031";
+our $CMD = $0 =~ s{.*/}{}r;
+
+sub usage {
+    my $err = shift and select STDERR;
+    say "usage: $CMD [-r] [-d] [-jN] [local [remote]]";
+    say "       -r  --skip-repo   Skip repository check";
+    say "       -d  --skip-debug  Print extra debugging information";
+    say "       -jN --jobs=N      Enable parallel tests";
+    exit $err;
+    } # usage
+
+my %opts = map { $_ => 1 } qw( t  a k m p C D );
+use Getopt::Long qw(:config bundling);
+GetOptions (
+    "help|?"		=> sub { usage (0); },
+    "V|version"		=> sub { say "$CMD [$VERSION]"; exit 0; },
+
+    "r|skip-repo!"	=> \my $opt_r,
+    "d|skip-debug!"	=> \$opts{d},
+    "j|jobs:0"		=> \$opts{j},
+
+    "v|verbose:1"	=> \(my $opt_v = 0),
+    ) or usage (1);
+
+use Module::Release 2.131;
+
+my $class = "Module::Release";
+
+# ALL CODE BELOW IS DIRECTLY COPIED FROM release
+# WHERE IRRELAVANT CODE FOR THIS SCRIPTS PURPOSE
+# HAS BEEN REMOVED. Style/layout changed though.
+
+# get the release object
+my %params;
+@ARGV and $params{local} = shift;
+
+if (@ARGV) {
+    $params{remote} = shift;
+    }
+elsif ($params{local}) {
+    $params{remote} = $params{local};
+    }
+$opts{d} and $params{debug} = 1;
+
+my $release = $class->new (%params);
+$release->_debug ("$CMD $VERSION, using $class " . $class->VERSION . "\n");
+
+# load whatever will handle source control
+unless ($opt_r) {
+    my @vcs = (
+	[ ".git"       => "Module::Release::Git" ],
+	[ ".gitignore" => "Module::Release::Git" ],
+	[ ".svn"       => "Module::Release::SVN" ],
+	[ "CVS"        => "Module::Release::CVS" ],
+	);
+    foreach my $vcs ( @vcs ) {
+	-e $vcs->[0] or next;
+	my $module = $vcs->[1];
+	$release->_debug ("I see an $vcs->[0] directory, so I'm loading $module\n");
+	$release->load_mixin ($module);
+	$@ and $release->_die ("Could not load $module: $@\n");
+	last;
+	}
+
+    if ($release->can ("is_allowed_branch")) {
+	$release->_print ("============ Checking for allowed branch\n");
+	my $branch = $release->vcs_branch;
+	$release->is_allowed_branch or
+	    $release->_die ("Configuration blocks release from branch <$branch>\n");
+	$release->_print ("Branch <$branch> is allowed to release\n");
+	}
+    }
+
+my $required = $release->config->required // "";
+
+$ENV{AUTOMATED_TESTING} = 1;
+
+my $test_jobs = $opts{j} // $release->config->test_jobs;
+if (defined $test_jobs) {
+    $test_jobs ||= eval {
+	require System::Info;
+	System::Info->new->get_core_count;
+	} || 9;
+    $ENV{HARNESS_OPTIONS} = join ":" => grep { length }
+	(split m/:/ => ($ENV{HARNESS_OPTIONS} // "")),
+	"j$test_jobs";
+    $release->_debug ("Will use HARNESS_OPTIONS '$ENV{HARNESS_OPTIONS}' during tests\n");
+    }
+
+unless ($opt_r) {
+    $release->_print ("============ Checking source repository\n");
+    $release->check_vcs;
+    }
+
+# Test with a bunch of perls
+my $old_perl = $release->get_perl;
+my @perls    = $release->perls;
+my ($n, $N)  = (1, scalar @perls);
+PERL: foreach my $perl (@perls) {
+    $release->_print ("============ Testing with $perl (", $n++, "/$N)\n");
+    $release->set_perl ($perl) or next;
+
+    $release->clean;
+
+    foreach my $mod (grep m/\S/ => split m/\s*,\s*/ => $required) {
+	$mod =~ m/^\w+(::\w+)*$/ or next;
+	system "$perl -M$mod -e1 >/dev/null 2>&1";
+	if ($?) {
+	    warn "Prereq $mod not available\n";
+	    next PERL;
+	    }
+	}
+
+    $release->build_makefile;
+    $release->make;
+    $release->test;
+    }
+$release->set_perl ($old_perl);
+
+$release->_print ("============ Cleaning up\n");
+$release->distclean;
+unlink glob "*.tar *.tgz *.tar.gz *.tar.bz *.tar.bz2 *.tbz *.zip";
+
+$release->_print ("============ DONE!\n");
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+release-test - test your dist against all available perl versions
+
+=head1 SYNOPSIS
+
+  release-test
+
+=head1 DESCRIPTION
+
+This is a stripped-down version of Module::Release's C<release> tool with default
+options aimed at testing the current distribution against all perl versions as
+givern in F<.releaserc>. It should be somewhat equivalent to:
+
+ $ release -t -a -k -D -m -p -C
+
+or with these options in C<.releaserc>:
+
+ automated_testing 1
+ skip_kwalitee 1
+ skip_manifest 1
+ skip_prereqs 1
+ skip_changes 1
+ skip_dist 1
+ ignore_untracked 1
+ allow_glob_in_perls 1
+
+All other options in F<.releaserc> are allowed too.
+
+=head1 REFERENCE
+
+Read the documentation for L<release>
+
+=head1 SOURCE AVAILABILITY
+
+This source is in GitHub as part of the Module::Release project:
+
+	https://github.com/briandfoy/module-release
+
+=head1 SEE ALSO
+
+L<Module::Release>
+
+=head1 AUTHOR
+
+H.Merijn Brand C<< <hmbrand@cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2024, H.Merijn Brand & brian d foy. All rights reserved.
+
+You may use this software under the same terms as Perl itself.
+
+=cut

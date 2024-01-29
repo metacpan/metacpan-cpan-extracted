@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.30
+    Version 0.32
 
 SYNOPSIS
 
@@ -29,15 +29,17 @@ SUBROUTINES/METHODS
       question is a holiday according to the state and the additional
       parameters.
 
-    holidays($year, $state, %params)
+    holidays(year => $year, state => $state, %params)
 
       Returns a hashref of all defined holidays in the year according to
       the state and the additional parameters. Keys in the hashref are in
       'mmdd' format, the values are the names of the holidays.
 
-      The states may be 'VIC','WA','NT','QLD','TAS','NSW','SA' or 'ACT'.
-      The default state is 'VIC'. The following tables lists the allowable
-      parameters for each state;
+      The states must be one of the allowed ISO 3166-2:AU
+      <https://en.wikipedia.org/wiki/ISO_3166-2:AU> codes;
+      'VIC','WA','NT','QLD','TAS','NSW','SA' or 'ACT'. The default state is
+      'VIC'. The following tables lists the allowable parameters for each
+      state;
 
          State  Parameter             Default   Values
          VIC    no_melbourne_cup      0         1 | 0

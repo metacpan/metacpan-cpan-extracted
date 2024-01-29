@@ -108,9 +108,10 @@ my @names = (
 
 
 my $code=
-'use v5.36;
+'use strict;
+use warnings;
 package Socket::More::Constants;
-our $VERSION=\'v0.1.0\';
+our $VERSION=\'v0.1.1\';
 my %table;
 BEGIN {%table=(
 ';
@@ -138,7 +139,7 @@ for(sort @names){
 
 $code.=');}
 use constant::more %table;
-use Export::These keys %table;
+use Export::These export_pass=>[], keys %table;
 1;';
 
 
@@ -158,11 +159,11 @@ WriteMakefile(
 	NAME              => 'Socket::More::Constants',
 	VERSION_FROM      => 'lib/Socket/More/Constants.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
 	PREREQ_PM         => {
-    "Export::These"=>0,
+    "Export::These"=>"v0.2.1",
     "constant::more"=>"v0.3.0"
 
 	}, # e.g., Module::Name => 1.1
-	MIN_PERL_VERSION=>"v5.36.0",
+	MIN_PERL_VERSION=>"v5.24.0",
 	TEST_REQUIRES	=>{
 		'Data::Cmp'=>0
 	},
@@ -180,7 +181,7 @@ WriteMakefile(
 			repository =>{
 				type => "git",
 				url => "git://github.com/drclaw1394/perl-socket-more-constants.git",
-				web => "http://github.com/drclaw1394/perl-socket-more-constants",
+				web => "https://github.com/drclaw1394/perl-socket-more-constants",
 			}
 		}
 	}

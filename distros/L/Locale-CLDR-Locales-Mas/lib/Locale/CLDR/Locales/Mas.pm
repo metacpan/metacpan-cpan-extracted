@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mas - Package for language Masai
 
 package Locale::CLDR::Locales::Mas;
 # This file auto generated from Data\common\main\mas.xml
-#	on Tue  5 Dec  1:20:51 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'nkʉtʉ́k ɔ́ɔ̄ lAkan',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Andora',
  			'AE' => 'Falme za Kiarabu',
@@ -217,7 +217,6 @@ has 'display_name_region' => (
  			'MD' => 'Moldova',
  			'MG' => 'Bukini',
  			'MH' => 'Visiwa vya Marshal',
- 			'MK' => 'Masedonia',
  			'ML' => 'Mali',
  			'MM' => 'Myama',
  			'MN' => 'Mongolia',
@@ -325,7 +324,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{Metric},
 

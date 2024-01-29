@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sn - Package for language Shona
 
 package Locale::CLDR::Locales::Sn;
 # This file auto generated from Data\common\main\sn.xml
-#	on Tue  5 Dec  1:31:28 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'chiAkani',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Andora',
  			'AE' => 'United Arab Emirates',
@@ -217,7 +217,6 @@ has 'display_name_region' => (
  			'MD' => 'Moldova',
  			'MG' => 'Madagascar',
  			'MH' => 'Zvitsuwa zveMarshall',
- 			'MK' => 'Macedonia',
  			'ML' => 'Mali',
  			'MM' => 'Myanmar',
  			'MN' => 'Mongolia',
@@ -332,7 +331,7 @@ has 'characters' => (
 			auxiliary => qr{[q x]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
 			main => qr{[a b c d e f g h i j k l m n o p r s t u v w y z]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -1184,7 +1183,6 @@ has 'datetime_formats_available_formats' => (
 			MMM => q{LLL},
 			MMMEd => q{MMM d, E},
 			MMMMEd => q{E, MMMM d},
-			MMMMW => q{'week' W 'of' MMM},
 			MMMMd => q{MMMM d},
 			MMMd => q{MMM d},
 			Md => q{MM-dd},
@@ -1205,7 +1203,6 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{y-MM-dd},
 			yQQQ => q{y QQQ},
 			yQQQQ => q{y QQQQ},
-			yw => q{'week' w 'of' Y},
 		},
 	} },
 );

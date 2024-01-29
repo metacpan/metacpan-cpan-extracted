@@ -1,7 +1,7 @@
 # Main running methods file
 package Lemonldap::NG::Handler::Main::Run;
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.18.0';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -271,7 +271,7 @@ sub unlog {
 sub updateStatus {
     my ( $class, $req, $action, $user, $url ) = @_;
     my $statusPipe = $class->tsv->{statusPipe} or return;
-    $user ||= $req->{env}->{REMOTE_ADDR};
+    $user ||= $req->address;
     $url  ||= $req->{env}->{REQUEST_URI};
     eval {
         $statusPipe->print(
@@ -474,7 +474,7 @@ sub goToPortal {
     my ( $ret, $msg );
     my $urlc_init = $class->encodeUrl( $req, $url );
     $class->logger->debug(
-        "Redirect $req->{env}->{REMOTE_ADDR} to portal (url was $url)");
+        'Redirect ' . $req->address . " to portal (url was $url)" );
     $class->set_header_out( $req,
             'Location' => $class->tsv->{portal}->()
           . "$path?url=$urlc_init"

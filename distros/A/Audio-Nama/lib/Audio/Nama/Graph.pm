@@ -1,11 +1,12 @@
 package Audio::Nama::Graph;
-use Modern::Perl;
+use Modern::Perl '2020';
+our $VERSION = 1.0;
 use Carp;
 use Graph;
 use Audio::Nama::Util qw(input_node output_node);
 use Audio::Nama::Log qw(logsub logpkg);
 use Audio::Nama::Globals qw(:trackrw);
-use vars qw(%reserved);
+our(%reserved);
 # this dispatch table also identifies labels reserved
 # for signal sources and sinks.
 *reserved = \%Audio::Nama::IO::io_class;
@@ -325,8 +326,6 @@ sub remove_tracks {
 				$g->delete_vertex($_);
 		} @names;
 }
-
-# for latency-related graph transformations
 
 sub remove_branch {
 	my ($g, $v) = @_;

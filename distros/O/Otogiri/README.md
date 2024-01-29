@@ -6,6 +6,9 @@ Otogiri - A lightweight medicine for using database
 
     use Otogiri;
     my $db = Otogiri->new(connect_info => ['dbi:SQLite:...', '', '']);
+
+    # or use with DBURL
+    my $db = Otogiri->new(dburl => 'sqlite://...');
     
     $db->insert(book => {title => 'mybook1', author => 'me', ...});
 

@@ -1,9 +1,20 @@
+# -*- cperl; cperl-indent-level: 4 -*-
+## no critic (RequireExplicitPackage RequireEndWithOne)
+use 5.014;
 use strict;
 use warnings;
 use utf8;
+use Readonly;
 
 use Test::More;
-BEGIN { plan tests => 12 }
+our $VERSION = v1.1.7;
+
+BEGIN {
+## no critic (ProhibitCallsToUnexportedSubs)
+    Readonly::Scalar my $BASE_TESTS => 12;
+## use critic
+    Test::More::plan 'tests' => $BASE_TESTS;
+}
 
 my %months = (
     '00000001.JPG' => [ '2000-01-01T00:00:00', 'januari' ],
@@ -23,5 +34,10 @@ my %months = (
 use Date::Extract::P800Picture;
 my $parser = Date::Extract::P800Picture->new();
 while ( my ( $filename, $expect ) = each %months ) {
-    is( "@{[$parser->extract($filename)]}", $expect->[0], $expect->[1] );
+    Test::More::is(
+        "@{[$parser->extract($filename)]}",
+## no critic (ProhibitAccessOfPrivateData)
+        $expect->[0], $expect->[1],
+## use critic
+    );
 }

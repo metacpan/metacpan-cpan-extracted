@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use Compress::Zlib;
 use POSIX qw(ceil floor);
@@ -24,9 +24,11 @@ Inherits from L<PDF::Builder::Resource::XObject::Image>
 
 =head1 METHODS
 
-=over
+=head2 new
 
-=item $res = PDF::Builder::Resource::XObject::Image::PNG->new($pdf, $file, %opts)
+    $res = PDF::Builder::Resource::XObject::Image::PNG->new($pdf, $file, %opts)
+
+=over
 
 Returns a PNG-image object. C<$pdf> is the PDF object being added to, C<$file>
 is the input PNG file, and the optional C<$name> of the new parent image object
@@ -50,6 +52,9 @@ if provided.
 This is the name you can give for the PNG image object. The default is Pxnnnn.
 
 =back
+
+Remember that you need to invoke the image_png method from Builder.pm in
+order to use this functionality.
 
 =back 
 
@@ -385,9 +390,11 @@ sub new {
     return($self);
 }
 
-=over 
+=head2 usesLib
 
-=item  $mode = $png->usesLib()
+    $mode = $png->usesLib()
+
+=over
 
 Returns 1 if Image::PNG::Libpng installed and used, 0 if not installed, or -1 
 if installed but not used (nouseIPL option given to C<image_png>).

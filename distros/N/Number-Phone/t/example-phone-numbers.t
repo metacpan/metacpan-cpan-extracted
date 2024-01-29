@@ -8518,6 +8518,24 @@
     },
 {
         class   => 'Number::Phone::Lib',
+        args    => ['GY','+5925151234'],
+        methods => ['is_ipphone'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['GY','5151234'],
+        methods => ['is_ipphone'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['+5925151234'],
+        methods => ['is_ipphone'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
         args    => ['HK','+85221234567'],
         methods => ['is_fixed_line'],
         test_country => 1,

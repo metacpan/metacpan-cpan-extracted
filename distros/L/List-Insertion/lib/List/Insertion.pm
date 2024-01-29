@@ -6,10 +6,9 @@ use warnings;
 
 use Template::Plex;
 use Data::Combination;
-use Exporter;# qw<import>;
 
 
-our $VERSION = 'v0.1.2';
+our $VERSION = 'v0.1.4';
 
 sub make_search;
 
@@ -136,7 +135,7 @@ sub make_search {
   die  "Unsupported value for type field: $options->{accessor}. Must be post dereference/method call ->..."
     unless $options->{accessor} eq "" or $options->{accessor}=~/^->/;
 
-  my $template=Template::Plex->load( \$template_base, {condition=>\%condition, update=>\%update, accessor=>$options->{accessor}}, inject=>['use feature "signatures";']);
+  my $template=Template::Plex->load( [$template_base], {condition=>\%condition, update=>\%update, accessor=>$options->{accessor}}, inject=>['use feature "signatures";']);
   my $code_str=$template->render({duplicate =>$options->{duplicate}, type=>$options->{type}});
 
   #use feature "say";

@@ -19,16 +19,16 @@ name: Sah-Schemas-Code
 provides:
   Data::Sah::Filter::perl::Code::eval:
     file: lib/Data/Sah/Filter/perl/Code/eval.pm
-    version: '0.001'
+    version: '0.002'
   Sah::Schema::code_from_str:
     file: lib/Sah/Schema/code_from_str.pm
-    version: '0.001'
+    version: '0.002'
   Sah::SchemaR::code_from_str:
     file: lib/Sah/SchemaR/code_from_str.pm
-    version: '0.001'
+    version: '0.002'
   Sah::Schemas::Code:
     file: lib/Sah/Schemas/Code.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   strict: '0'
   warnings: '0'
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Code
   homepage: https://metacpan.org/release/Sah-Schemas-Code
   repository: git://github.com/perlancar/perl-Sah-Schemas-Code.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -48,7 +48,7 @@ x_Dist_Zilla:
           Module::Metadata: '1.000037'
           version: '0.006'
       name: Sah::Schemas
-      version: '0.030'
+      version: '0.031'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'

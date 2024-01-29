@@ -11,8 +11,8 @@ use Pod::Usage;
 # use Data::Dumper::Simple;$Data::Dumper::Sortkeys = 1;$Data::Dumper::Purity = 1;
 
 BEGIN {
-	our $VERSION = '2.02';
-};
+    our $VERSION = '2.02';
+}
 
 my $default_dir = '.';
 my $errors      = FALSE;
@@ -31,7 +31,7 @@ my $dummy       = FALSE;
 GetOptions(
     'auto'             => \$auto,
     'errors'           => \$errors,
-	'full'             => \$dummy, # The default is fullscreen, but this retains compatibility to avoid errors
+    'full'             => \$dummy,         # The default is fullscreen, but this retains compatibility to avoid errors
     'nofull'           => \$fullscreen,
     'showall|all'      => \$showall,
     'help'             => \$help,
@@ -40,7 +40,7 @@ GetOptions(
     'noaccel'          => \$noaccel,
     'diagnostics'      => \$diagnostics,
     'showname'         => \$showname,
-	'ignore-x-windows' => \$ignore_x,
+    'ignore-x-windows' => \$ignore_x,
 );
 my @paths = (scalar(@ARGV)) ? @ARGV : ($default_dir);
 
@@ -59,7 +59,7 @@ our $FB = Graphics::Framebuffer->new(
     'ACCELERATED'      => !$noaccel,
     'FB_DEVICE'        => "/dev/fb$dev",
     'DIAGNOSTICS'      => $diagnostics,
-	'IGNORE_X_WINDOWS' => $ignore_x,
+    'IGNORE_X_WINDOWS' => $ignore_x,
 );
 
 $SIG{'QUIT'} = $SIG{'HUP'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'TERM'} = sub { $FB->text_mode(); exec('reset'); };
@@ -99,7 +99,7 @@ sub gather {
     foreach my $path (@paths) {
         chop($path) if ($path =~ /\/$/);
         $FB->rbox({ 'x' => 0, 'y' => 0, 'width' => $FB->{'XRES'}, 'height' => 32, 'filled' => 1, 'gradient' => { 'direction' => 'vertical', 'colors' => { 'red' => [0, 0], 'green' => [0, 0], 'blue' => [64, 128] } } });
-        print_it("Scanning - $path",TRUE);
+        print_it("Scanning - $path", TRUE);
         opendir(my $DIR, "$path") || die "Problem reading $path directory";
         chomp(my @dir = readdir($DIR));
         closedir($DIR);
@@ -132,7 +132,7 @@ sub show {
     $FB->wait_for_console(1);
     while ($idx < $p) {
         my $name = $pics[$idx];
-        print_it("Loading image $name",$showname);
+        print_it("Loading image $name", $showname);
         my $image;
         unless ($fullscreen) {
             $image = $FB->load_image(
@@ -157,13 +157,13 @@ sub show {
         if (ref($image) ne 'ARRAY') {
             $tdelay = $delay - $image->{'benchmark'}->{'total'};
         }
-        $tdelay = 0 if ($tdelay < 0);
+        $tdelay = 0   if ($tdelay < 0);
         sleep $tdelay if ($tdelay && $display);
 
         #        warn Dumper($image);exit;
         if (defined($image)) {
             $FB->cls();
-            $FB->wait_for_console(); # Results will vary (I don't know why)
+            $FB->wait_for_console();    # Results will vary (I don't know why)
             if (ref($image) eq 'ARRAY') {
                 my $s = time + ($delay * 2);
                 while (time <= $s) {
@@ -191,6 +191,7 @@ sub show {
             $display = TRUE;
         } ## end if (defined($image))
         $idx++;
+
         #        $idx = 0 if ($idx >= $p);
     } ## end while ($idx < $p)
 } ## end sub show
@@ -198,7 +199,7 @@ sub show {
 sub print_it {
     my $message = shift;
     my $showit  = shift;
-    return() unless ($showit);
+    return () unless ($showit);
 
     if ($FB->{'XRES'} >= 256) {
         $FB->xor_mode();

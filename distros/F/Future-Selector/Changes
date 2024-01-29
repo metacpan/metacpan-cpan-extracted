@@ -1,5 +1,10 @@
 Revision history for Future-Selector
 
+0.03    2024-01-22
+        [BUGFIXES]
+         * Ensure that `gen`-based items regenerate properly even after
+           deferred completion
+
 0.02    2023-10-31
         [CHANGES]
          * Added `->run` and `->run_until_ready` methods

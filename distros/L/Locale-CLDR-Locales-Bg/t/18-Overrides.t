@@ -29,13 +29,13 @@ $date_format = $locale->date_format_short;
 is($date_format, q(d.MM.yy 'г'.), 'Islamic Date Format Short');
 
 my $time_format = $locale->time_format_full;
-is($time_format, 'H:mm:ss \'ч\'. zzzz', 'Islamic Time Format Full');
+is($time_format, q(H:mm:ss 'ч'. zzzz), 'Islamic Time Format Full');
 $time_format = $locale->time_format_long;
-is($time_format, 'H:mm:ss \'ч\'. z', 'Islamic Time Format Long');
+is($time_format, q(H:mm:ss 'ч'. z), 'Islamic Time Format Long');
 $time_format = $locale->time_format_medium;
-is($time_format, 'H:mm:ss \'ч\'.', 'Islamic Time Format Medium');
+is($time_format, q(H:mm:ss 'ч'.), 'Islamic Time Format Medium');
 $time_format = $locale->time_format_short;
-is($time_format, 'H:mm \'ч\'.', 'Islamic Time Format Short');
+is($time_format, q(H:mm 'ч'.), 'Islamic Time Format Short');
 
 my $date_time_format = $locale->datetime_format_full;
 is($date_time_format, q(EEEE, d MMMM y 'г'., H:mm:ss 'ч'. zzzz), 'Islamic Date Time Format Full');

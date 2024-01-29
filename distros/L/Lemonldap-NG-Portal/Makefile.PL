@@ -12,6 +12,7 @@ WriteMakefile(
             'Authen::Radius'        => 0,
             'Authen::WebAuthn'      => 0,
             'Convert::Base32'       => 0,
+            'Crypt::JWT'            => 0,
             'DBI'                   => 0,
             'Email::Sender'         => 1.300027,
             'GD::SecurityImage'     => 0,
@@ -51,6 +52,7 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'Convert::Base32'     => 0,
+        'Crypt::JWT'          => 0,
         'Email::Sender'       => 0,
         'GD::SecurityImage'   => 0,
         'Hash::Merge::Simple' => 0,
@@ -67,7 +69,7 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Clone'                  => 0,
-        'Lemonldap::NG::Handler' => '2.17.0',
+        'Lemonldap::NG::Handler' => '2.18.1',
         'Regexp::Assemble'       => 0,
     },
     (

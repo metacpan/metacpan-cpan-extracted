@@ -12,6 +12,7 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/ansi_parser.t',
+    't/attr_to_class.t',
     't/class_prefix.t',
     't/css.t',
     't/encoding.t',

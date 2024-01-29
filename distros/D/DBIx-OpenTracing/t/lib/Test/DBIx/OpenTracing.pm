@@ -20,17 +20,25 @@ sub test_database {
     my $sql_invalid = $statements->{invalid};
     my $sql_simple  = $statements->{simple};
     my $sql_clear   = $statements->{clear};
+    my $sql_state   = $args{error_detection}->{sqlstate};
+    my $sql_errcode = $args{error_detection}->{err};
 
     my %tag_base = (
-              'caller.file'    => __FILE__,
-              'caller.line'    => re(qr/\A\d+\z/),
-              'caller.package' => __PACKAGE__,
-              'db.type'        => 'sql',
-        maybe 'db.instance'    => $db_name,
-        maybe 'db.user'        => $user,
+              'caller.file'     => __FILE__,
+              'caller.line'     => re(qr/\A\d+\z/),
+              'caller.package'  => __PACKAGE__,
+              'db.type'         => 'sql',
+        maybe 'db.instance'     => $db_name,
+        maybe 'db.user'         => $user,
     );
+    my %tag_errs = (
+              'error'           => 1,
+              'message'         => re(qr/${sql_state}/),
+              'error.kind'      => "SQLSTATE_${sql_state}",
+    );
+    
     span_generation_ok($dbh, $statements, {%tag_base});
-    error_detection_ok($dbh, $sql_invalid, {%tag_base});
+    error_detection_ok($dbh, $sql_invalid, {%tag_base}, {%tag_errs});
     enable_disable_ok($dbh, $sql_simple);
     compatibility_ok($dbh, $statements);
     tag_control_ok($dbh, $statements->{bind}, {%tag_base});
@@ -269,7 +277,7 @@ sub selectcol_ok {
 }
 
 sub error_detection_ok {
-    my ($dbh, $sql_invalid, $tag_base) = @_;
+    my ($dbh, $sql_invalid, $tag_base, $tag_errs) = @_;
 
     my @methods = qw(
         do
@@ -293,7 +301,7 @@ sub error_detection_ok {
                         %$tag_base,
                         'caller.subname' => _sub_here('__ANON__'),
                         'db.statement'   => $sql_invalid,
-                        error            => 1,
+                        %$tag_errs,
                     },
                 }], "$method produces a span with correct tags");
             }

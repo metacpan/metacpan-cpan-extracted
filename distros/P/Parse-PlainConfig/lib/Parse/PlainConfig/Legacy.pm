@@ -2,7 +2,7 @@
 #
 # (c) 2002 - 2023, Arthur Corliss <corliss@digitalmages.com>,
 #
-# $Id: lib/Parse/PlainConfig/Legacy.pm, 3.06 2023/09/23 19:24:20 acorliss Exp $
+# $Id: lib/Parse/PlainConfig/Legacy.pm, 3.07 2024/01/10 13:32:06 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -23,7 +23,7 @@ use strict;
 use warnings;
 use vars qw($VERSION);
 
-($VERSION) = ( q$Revision: 3.06 $ =~ /(\d+(?:\.(\d+))+)/sm );
+($VERSION) = ( q$Revision: 3.07 $ =~ /(\d+(?:\.(\d+))+)/sm );
 
 use Parse::PlainConfig::Constants qw(:all);
 use Text::ParseWords;
@@ -1093,7 +1093,7 @@ Parse::PlainConfig::Legacy - Parsing engine Legacy for Parse::PlainConfig
 
 =head1 VERSION
 
-$Id: lib/Parse/PlainConfig/Legacy.pm, 3.06 2023/09/23 19:24:20 acorliss Exp $
+$Id: lib/Parse/PlainConfig/Legacy.pm, 3.07 2024/01/10 13:32:06 acorliss Exp $
 
 =head1 SYNOPSIS
 

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Pa::Arab - Package for language Punjabi
 
 package Locale::CLDR::Locales::Pa::Arab;
 # This file auto generated from Data\common\main\pa_Arab.xml
-#	on Tue  5 Dec  1:27:21 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'pa' => 'پنجابی',
@@ -50,6 +50,7 @@ has 'display_name_script' => (
 		sub {
 			my %scripts = (
 			'Arab' => 'عربی',
+ 			'Aran' => 'نستعلیق',
  			'Guru' => 'گُرمُکھی',
 
 			);
@@ -65,7 +66,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'PK' => 'پاکستان',
 
@@ -95,7 +96,7 @@ has 'characters' => (
 			auxiliary => qr{[‎‏ أ ٻ ة ٺ ټ ٽ]},
 			index => ['ء', 'آ', 'ؤ', 'ئ', 'ا', 'ب', 'پ', 'ت', 'ث', 'ٹ', 'ج', 'چ', 'ح', 'خ', 'د', 'ذ', 'ڈ', 'ر', 'ز', 'ڑ', 'ژ', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ک', 'گ', 'ل', 'م', 'ن', 'ں', 'ه', 'ھ', 'ہ', 'و', 'ی', 'ے'],
 			main => qr{[ُ ء آ ؤ ئ ا ب پ ت ث ٹ ج چ ح خ د ذ ڈ ر ز ڑ ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن ں ه ھ ہ و ی ے]},
-			numbers => qr{[‎ \- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[‎ \- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -138,6 +139,9 @@ has 'number_symbols' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'arabext' => {
+			'timeSeparator' => q(:),
+		},
 		'latn' => {
 			'minusSign' => q(‎-),
 			'plusSign' => q(‎+),
@@ -302,8 +306,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'eras' => (

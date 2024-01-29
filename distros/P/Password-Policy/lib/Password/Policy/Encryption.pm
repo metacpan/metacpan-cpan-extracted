@@ -1,5 +1,5 @@
 package Password::Policy::Encryption;
-$Password::Policy::Encryption::VERSION = '0.04';
+$Password::Policy::Encryption::VERSION = '0.06';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Password::Policy::Encryption
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 AUTHOR
 

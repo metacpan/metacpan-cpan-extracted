@@ -1,3 +1,24 @@
+2.09 2023-12-11T09:50:11+01:00
+ [CODE]
+ - Add possibility of getting user/password from ENV variables.
+ - Add possibility of usage of e.g. »|inputloookup __table__« Splunk query
+   by adding backward compatible 'search' constructor variable which is
+   adding 'search' keyword to each Splunk query.
+ - Move hardcoded prefix=/services variable to 'service_prefix' constructor
+   variable.
+ - Remove spaces before subroutine/method call in bin/sc.
+ - Retab in bin/sc.
+
+ [DOC]
+ - Add constructor default values to WWW::Splunk::API.
+ - Add donation.
+
+ [OTHER]
+ - Add bugtracker.
+ - Fix dependencies.
+ - Fix test dependencies. We don't need dependencies for author tests.
+ - Update author github username.
+
 2.08 2017-11-07T10:07:05+01:00
  [FIXES]
  - Fix dependencies.

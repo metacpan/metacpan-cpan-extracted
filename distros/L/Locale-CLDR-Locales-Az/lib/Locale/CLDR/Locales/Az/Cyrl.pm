@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Az::Cyrl - Package for language Azerbaijani
 
 package Locale::CLDR::Locales::Az::Cyrl;
 # This file auto generated from Data\common\main\az_Cyrl.xml
-#	on Tue  5 Dec  1:01:37 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'aa' => 'афар',
@@ -118,7 +118,6 @@ has 'display_name_language' => (
  				'en_GB' => 'Британија инҝилисҹәси',
  				'en_GB@alt=short' => 'инҝилис (Б.К.)',
  				'en_US' => 'Америка инҝилисҹәси',
- 				'en_US@alt=short' => 'инҝилис (АБШ)',
  				'eo' => 'есперанто',
  				'es' => 'испан',
  				'es_419' => 'Латын Америкасы испанҹасы',
@@ -318,7 +317,6 @@ has 'display_name_language' => (
  				'rn' => 'рунди',
  				'ro' => 'румын',
  				'rof' => 'ромбо',
- 				'root' => 'рут',
  				'ru' => 'рус',
  				'rup' => 'ароман',
  				'rw' => 'кинјарванда',
@@ -453,7 +451,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'Дүнја',
  			'002' => 'Африка',
@@ -530,7 +528,7 @@ has 'display_name_region' => (
  			'CG' => 'Конго-Браззавил',
  			'CG@alt=variant' => 'Конго (Республика)',
  			'CH' => 'Исвечрә',
- 			'CI' => 'Kотд’ивуар',
+ 			'CI' => 'Котд’ивуар',
  			'CK' => 'Кук адалары',
  			'CL' => 'Чили',
  			'CM' => 'Камерун',
@@ -638,7 +636,6 @@ has 'display_name_region' => (
  			'MF' => 'Сент Мартин',
  			'MG' => 'Мадагаскар',
  			'MH' => 'Маршал адалары',
- 			'MK@alt=variant' => 'Македонија (КЈРМ)',
  			'ML' => 'Мали',
  			'MM' => 'Мјанма',
  			'MN' => 'Монголустан',
@@ -758,7 +755,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'Дил: {0}',
  			'script' => 'Скрипт: {0}',
@@ -780,7 +777,7 @@ has 'characters' => (
 			auxiliary => qr{[ц щ ъ ь э ю я]},
 			index => ['А', 'Ә', 'Б', 'В', 'Г', 'Ғ', 'Д', 'Е', 'Ж', 'З', 'И', 'Й', 'Ј', 'К', 'Ҝ', 'Л', 'М', 'Н', 'О', 'Ө', 'П', 'Р', 'С', 'Т', 'У', 'Ү', 'Ф', 'Х', 'Һ', 'Ч', 'Ҹ', 'Ш', 'Ы'],
 			main => qr{[а ә б в г ғ д е ж з и й ј к ҝ л м н о ө п р с т у ү ф х һ ч ҹ ш ы]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -1174,8 +1171,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'day_periods' => (
@@ -1357,7 +1354,7 @@ has 'datetime_formats_available_formats' => (
 			MEd => q{dd.MM, E},
 			MMM => q{LLL},
 			MMMEd => q{d MMM, E},
-			MMMMW => q{MMM, W 'һәфтә'},
+			MMMMW => q{MMMM, W 'һәфтә'},
 			MMMd => q{d MMM},
 			Md => q{dd.MM},
 			yM => q{MM.y},

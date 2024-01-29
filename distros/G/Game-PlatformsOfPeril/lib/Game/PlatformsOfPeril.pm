@@ -1,5 +1,3 @@
-# -*- Perl -*-
-#
 # Game::PlatformsOfPeril - this is a terminal-based game, run the
 # `pperil` command that should be installed with this module to begin
 #
@@ -28,17 +26,17 @@
 
 package Game::PlatformsOfPeril;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use 5.24.0;
 use warnings;
 use File::Spec::Functions qw(catfile);
-use List::PriorityQueue ();
-use List::Util qw(first);
-use List::UtilsBy 0.06 qw(nsort_by rev_nsort_by);
-use Term::ReadKey qw(GetTerminalSize ReadKey ReadMode);
-use Time::HiRes qw(sleep);
-use POSIX qw(STDIN_FILENO TCIFLUSH tcflush);
+use List::PriorityQueue   ();
+use List::Util            qw(first);
+use List::UtilsBy 0.06    qw(nsort_by rev_nsort_by);
+use Term::ReadKey         qw(GetTerminalSize ReadKey ReadMode);
+use Time::HiRes           qw(sleep);
+use POSIX                 qw(STDIN_FILENO TCIFLUSH tcflush);
 
 # ANSI or XTerm control sequences
 sub at              { "\e[" . $_[1] . ';' . $_[0] . 'H' }
@@ -131,8 +129,8 @@ our %CharMap = (
 );
 
 our (
-    @Animates, @Graphs, $LMap,  $Monst_Name, @RedrawA,
-    @RedrawB,  $Hero,   $TCols, $TRows
+    @Animates, %Explosions, @Graphs, $LMap,  $Monst_Name,
+    @RedrawA,  @RedrawB,    $Hero,   $TCols, $TRows
 );
 
 our %Examine_Offsets = (
@@ -202,67 +200,72 @@ our %Descriptions = (
     WALL,   'A wall.',
 );
 
-$Animates[HERO]->@[ WHAT, DISP, TYPE, STASH, UPDATE ] =
-  (HERO, "\e[1;33m\@\e[0m", ANI, [ START_GEMS, START_BOMBS ], \&update_hero);
+$Animates[HERO]->@[ WHAT, DISP, TYPE, STASH, UPDATE ] = (
+    HERO, "\e[1;33m\@\e[0m", ANI, [ START_GEMS, START_BOMBS ],
+    \&update_hero
+);
 
 our %Interact_With = (
     HERO,    # the target of the mover
     sub {
-        my ($mover, $target) = @_;
+        my ( $mover, $target ) = @_;
         game_over_monster() if $mover->[WHAT] == MONST;
         game_over_bomb()    if $mover->[WHAT] == BOMB;
-        grab_gem($target, $mover);
+        grab_gem( $target, $mover );
     },
     MONST,
     sub {
-        my ($mover, $target) = @_;
+        my ( $mover, $target ) = @_;
         game_over_monster() if $mover->[WHAT] == HERO;
-        if ($mover->[WHAT] == BOMB) {
-            my @cells = map { kill_animate($_, 1); $_->[LMC][WHERE] } $mover, $target;
-            redraw_ref(\@cells);
-            explode($target);
-        } elsif ($mover->[WHAT] == GEM) {
-            grab_gem($target, $mover);
+        if ( $mover->[WHAT] == BOMB ) {
+            my @cells = map { kill_animate( $_, 1 ); $_->[LMC][WHERE] } $mover,
+              $target;
+            redraw_ref( \@cells );
+            $Explosions{ join ',', $target->[LMC][WHERE]->@* } = $target;
+        } elsif ( $mover->[WHAT] == GEM ) {
+            grab_gem( $target, $mover );
         }
     },
     BOMB,
     sub {
-        my ($mover, $target) = @_;
+        my ( $mover, $target ) = @_;
         game_over_bomb() if $mover->[WHAT] == HERO;
-        if ($mover->[WHAT] == MONST) {
-            my @cells = map { kill_animate($_, 1); $_->[LMC][WHERE] } $mover, $target;
-            redraw_ref(\@cells);
-            explode($target);
+        if ( $mover->[WHAT] == MONST ) {
+            my @cells = map { kill_animate( $_, 1 ); $_->[LMC][WHERE] } $mover,
+              $target;
+            redraw_ref( \@cells );
+            $Explosions{ join ',', $target->[LMC][WHERE]->@* } = $target;
         }
     },
     GEM,
     sub {
-        my ($mover, $target) = @_;
-        if ($mover->[TYPE] == ANI) {
-            relocate($mover, $target->[LMC][WHERE]);
-            grab_gem($mover, $target);
+        my ( $mover, $target ) = @_;
+        if ( $mover->[TYPE] == ANI ) {
+            relocate( $mover, $target->[LMC][WHERE] );
+            grab_gem( $mover, $target );
         }
     },
 );
 
 our %Key_Commands = (
-    'h' => move_player(-1, +0),    # left
-    'j' => move_player(+0, +1),    # down
-    'k' => move_player(+0, -1),    # up
-    'l' => move_player(+1, +0),    # right
-    '.' => \&move_nop,             # rest
-    ' ' => \&move_nop,             # also rest
-    'v' => sub { post_message('Version ' . $VERSION); return MOVE_FAILED },
+    'h' => move_player( -1, +0 ),    # left
+    'j' => move_player( +0, +1 ),    # down
+    'k' => move_player( +0, -1 ),    # up
+    'l' => move_player( +1, +0 ),    # right
+    '.' => \&move_nop,               # rest
+    ' ' => \&move_nop,               # also rest
+    'v' =>
+      sub { post_message( 'Version ' . $VERSION ); return MOVE_FAILED },
     'x' => \&move_examine,
     '<' => sub {
-        post_message($Scientist . q{'s magic wonder left boot, activate!});
+        post_message( $Scientist . q{'s magic wonder left boot, activate!} );
         rotate_left();
         print draw_level();
         sleep($Rotate_Delay);
         return MOVE_OK;
     },
     '>' => sub {
-        post_message($Scientist . q{'s magic wonder right boot, activate!});
+        post_message( $Scientist . q{'s magic wonder right boot, activate!} );
         rotate_right();
         print draw_level();
         sleep($Rotate_Delay);
@@ -286,27 +289,27 @@ our %Key_Commands = (
         return MOVE_FAILED;
     },
     '$' => sub {
-        post_message('You have '
+        post_message( 'You have '
               . $Animates[HERO][STASH][BOMB_STASH]
               . ' bombs and '
               . $Animates[HERO][STASH][GEM_STASH]
-              . ' gems.');
+              . ' gems.' );
         return MOVE_FAILED;
     },
     # by way of history '%' is what rogue (version 3.6) uses for stairs,
     # except the '>' (or very rarely '<') keys are used to interact with
     # that symbol
     '%' => sub {
-        if ($Animates[HERO][LMC][GROUND][TYPE] == STAIR) {
+        if ( $Animates[HERO][LMC][GROUND][TYPE] == STAIR ) {
             load_level();
             print clear_screen(), draw_level();
-            post_message('Level '
+            post_message( 'Level '
                   . $Level
                   . ' (You have '
                   . $Animates[HERO][STASH][BOMB_STASH]
                   . ' bombs and '
                   . $Animates[HERO][STASH][GEM_STASH]
-                  . ' gems.)');
+                  . ' gems.)' );
             return MOVE_NEWLVL;
         } else {
             post_message('There are no stairs here?');
@@ -320,16 +323,18 @@ our %Key_Commands = (
         return MOVE_FAILED, 'There is already an item in this cell.'
           if defined $lmc->[ITEM];
         $Animates[HERO][STASH][BOMB_STASH]--;
-        make_item($lmc->[WHERE], BOMB, 0);
+        make_item( $lmc->[WHERE], BOMB, 0 );
         return MOVE_OK;
     },
     'M' => sub {
         return MOVE_FAILED, 'You need more gems.'
           if $Animates[HERO][STASH][GEM_STASH] < BOMB_COST;
         $Animates[HERO][STASH][GEM_STASH] -= BOMB_COST;
-        post_message('You now have ' . ++$Animates[HERO][STASH][BOMB_STASH] . ' bombs');
+        post_message(
+            'You now have ' . ++$Animates[HERO][STASH][BOMB_STASH] . ' bombs' );
         return MOVE_OK;
     },
+    'Q'    => sub { game_over('Be seeing you...') },
     'q'    => sub { game_over('Be seeing you...') },
     "\003" => sub {                                    # <C-c>
         post_message('Enough with these silly interruptions!');
@@ -350,29 +355,36 @@ our %Key_Commands = (
 );
 
 sub apply_gravity {
-    for my $ent (rev_nsort_by { $_->[LMC][WHERE][PROW] } @Animates) {
+    for my $ent ( rev_nsort_by { $_->[LMC][WHERE][PROW] } @Animates ) {
         next if $ent->[BLACK_SPOT];
         my $here = $ent->[LMC][WHERE];
         next
           if $here->[PROW] == ROWS - 1
           or (  $ent->[TYPE] == ANI
-            and $LMap->[ $here->[PROW] ][ $here->[PCOL] ][GROUND][WHAT] == LADDER)
-          or $LMap->[ $here->[PROW] + 1 ][ $here->[PCOL] ][GROUND][WHAT] == WALL;
+            and $LMap->[ $here->[PROW] ][ $here->[PCOL] ][GROUND][WHAT] ==
+            LADDER )
+          or $LMap->[ $here->[PROW] + 1 ][ $here->[PCOL] ][GROUND][WHAT] ==
+          WALL;
         my $dest = [ $here->[PCOL], $here->[PROW] + 1 ];
-        relocate($ent, $dest) unless interact($ent, $dest);
-        if ($ent->[WHAT] == HERO) {
-            if ($ent->[LMC][GROUND][WHAT] == LADDER) {
+        relocate( $ent, $dest ) unless interact( $ent, $dest );
+        if ( $ent->[WHAT] == HERO ) {
+            if ( $ent->[LMC][GROUND][WHAT] == LADDER ) {
                 post_message('You fall, but grab onto a ladder.');
             } else {
                 post_message('You fall!');
             }
         }
     }
+    maybe_boom_today();
 }
 
 sub bad_terminal {
-    ($TCols, $TRows) = (GetTerminalSize(*STDOUT))[ 0, 1 ];
-    return (not defined $TCols or $TCols < MSG_COLS_MAX or $TRows < MSG_MAX);
+    ( $TCols, $TRows ) = ( GetTerminalSize(*STDOUT) )[ 0, 1 ];
+    return (
+             not defined $TCols
+          or $TCols < MSG_COLS_MAX
+          or $TRows < MSG_MAX
+    );
 }
 
 sub bail_out {
@@ -383,10 +395,10 @@ sub bail_out {
 }
 
 sub between {
-    my ($min, $max, $value) = @_;
-    if ($value < $min) {
+    my ( $min, $max, $value ) = @_;
+    if ( $value < $min ) {
         $value = $min;
-    } elsif ($value > $max) {
+    } elsif ( $value > $max ) {
         $value = $max;
     }
     return $value;
@@ -394,19 +406,19 @@ sub between {
 
 sub draw_level {
     my $s = '';
-    for my $rownum (0 .. ROWS - 1) {
-        $s .= at(MAP_DISP_OFF, MAP_DISP_OFF + $rownum);
-        for my $lmc ($LMap->[$rownum]->@*) {
-            if (defined $lmc->[ANI]) {
+    for my $rownum ( 0 .. ROWS - 1 ) {
+        $s .= at( MAP_DISP_OFF, MAP_DISP_OFF + $rownum );
+        for my $lmc ( $LMap->[$rownum]->@* ) {
+            if ( defined $lmc->[ANI] ) {
                 $s .= $lmc->[ANI][DISP];
-            } elsif (defined $lmc->[ITEM]) {
+            } elsif ( defined $lmc->[ITEM] ) {
                 $s .= $lmc->[ITEM][DISP];
             } else {
                 $s .= $lmc->[GROUND][DISP];
             }
         }
     }
-    $s .= at(1, ROWS + 1) . $Things{ WALL, }[DISP] x COLS;
+    $s .= at( 1, ROWS + 1 ) . $Things{ WALL, }[DISP] x COLS;
     return $s;
 }
 
@@ -414,21 +426,22 @@ sub explode {
     my ($something) = @_;
     my $lmc         = $something->[LMC];
     my $pos         = $lmc->[WHERE];
-    my @colors      = ("\e[31m", "\e[33m");
-    for (1 .. 7) {
-        print at(map { MAP_DISP_OFF + $_ } $pos->@*), $colors[ rand @colors ], '*',
+    my @colors      = ( "\e[31m", "\e[33m" );
+    for ( 1 .. 7 ) {
+        print at( map { MAP_DISP_OFF + $_ } $pos->@* ),
+          $colors[ rand @colors ], '*',
           term_norm;
-        sleep($Redraw_Delay);
+        sleep( $Redraw_Delay / 4 );
     }
     post_message('ka-boom!');
     # HEROIC DESTRUCTION
     $lmc->[GROUND] = $Things{ FLOOR, } if $lmc->[GROUND][TYPE] == STATUE;
-    push @RedrawA, $pos;
+    redraw_ref( [$pos] );
 }
 
 # cribbed from some A* article on https://www.redblobgames.com/
 sub find_hero {
-    my ($ent, $mcol, $mrow) = @_;
+    my ( $ent, $mcol, $mrow ) = @_;
 
     my $start = $mcol . ',' . $mrow;
     my $pcol  = $Hero->[PCOL];
@@ -438,28 +451,28 @@ sub find_hero {
     # already waiting where the player is going to fall to
     return if $start eq $end;
 
-    my %costs = ($start => 0);
-    my %seen  = ($start => undef);
+    my %costs = ( $start => 0 );
+    my %seen  = ( $start => undef );
     my $q     = List::PriorityQueue->new;
-    $q->insert($start, 0);
+    $q->insert( $start, 0 );
 
     my $linked = 0;
-    while (my $node = $q->pop) {
-        if ($node eq $end) {
+    while ( my $node = $q->pop ) {
+        if ( $node eq $end ) {
             $linked = 1;
             last;
         }
-        for my $peer ($Graphs[$Rotation]{$node}->@*) {
+        for my $peer ( $Graphs[$Rotation]{$node}->@* ) {
             my $new  = $peer->[GRAPH_NODE];
             my $cost = $costs{$node} + $peer->[GRAPH_WEIGHT];
-            if (not exists $seen{$new} or $cost < $costs{$new}) {
+            if ( not exists $seen{$new} or $cost < $costs{$new} ) {
                 $costs{$new} = $cost;
                 # perhaps they drove taxicabs in Manhattan in a former life?
                 my $priority =
                   $cost +
-                  abs($pcol - $peer->[GRAPH_POINT][PCOL]) +
-                  abs($prow - $peer->[GRAPH_POINT][PROW]);
-                $q->insert($new, $priority);
+                  abs( $pcol - $peer->[GRAPH_POINT][PCOL] ) +
+                  abs( $prow - $peer->[GRAPH_POINT][PROW] );
+                $q->insert( $new, $priority );
                 $seen{$new} = $node;
             }
         }
@@ -468,7 +481,7 @@ sub find_hero {
 
     my @path;
     my $node = $end;
-    while ($node ne $start) {
+    while ( $node ne $start ) {
         unshift @path, $node;
         $node = $seen{$node};
     }
@@ -476,10 +489,12 @@ sub find_hero {
 }
 
 sub game_loop {
-    game_over('Terminal must be at least ' . MSG_COLS_MAX . 'x' . MSG_MAX)
+    game_over(
+        'Terminal must be at least ' . MSG_COLS_MAX . 'x' . MSG_MAX )
       if bad_terminal();
-    ($Level_Path, $Level, $Seed) = @_;
-    $SIG{$_} = \&bail_out for qw(INT HUP TERM PIPE QUIT USR1 USR2 __DIE__);
+    ( $Level_Path, $Level, $Seed ) = @_;
+    $SIG{$_} = \&bail_out
+      for qw(INT HUP TERM PIPE QUIT USR1 USR2 __DIE__);
     STDOUT->autoflush(1);
     load_level();
     ReadMode 'raw';
@@ -487,11 +502,12 @@ sub game_loop {
       draw_level;
     post_message('The Platforms of Peril');
     post_message('');
-    post_message('Your constant foes, the ' . properly_plural($Monst_Name));
+    post_message(
+        'Your constant foes, the ' . properly_plural($Monst_Name) );
     post_message('seek to destroy your way of life!');
     post_help();
     post_message('');
-    post_message('Seed ' . $Seed . ' of version ' . $VERSION);
+    post_message( 'Seed ' . $Seed . ' of version ' . $VERSION );
     $SIG{CONT}  = \&redraw_level;
     $SIG{WINCH} = sub {
         post_message('The terminal is too small!') if bad_terminal();
@@ -504,8 +520,9 @@ sub game_loop {
         redraw_movers() if @RedrawA;
         next            if $Animates[HERO][UPDATE]->() == MOVE_NEWLVL;
         track_hero();
-        for my $ent (@Animates[ 1 .. $#Animates ]) {
-            $ent->[UPDATE]->($ent) if !$ent->[BLACK_SPOT] and defined $ent->[UPDATE];
+        for my $ent ( @Animates[ 1 .. $#Animates ] ) {
+            $ent->[UPDATE]->($ent)
+              if !$ent->[BLACK_SPOT] and defined $ent->[UPDATE];
         }
         @Animates = grep { !$_->[BLACK_SPOT] } @Animates;
         redraw_movers();
@@ -513,7 +530,7 @@ sub game_loop {
 }
 
 sub game_over {
-    my ($msg, $code) = @_;
+    my ( $msg, $code ) = @_;
     $code //= 1;
     restore_term();
     print clear_right, $msg, ' (', $Animates[HERO][STASH][GEM_STASH],
@@ -524,22 +541,22 @@ sub game_over {
 sub game_over_bomb { game_over('You gone done blowed yourself up.') }
 
 sub game_over_monster {
-    game_over('The ' . $Monst_Name . ' polished you off.');
+    game_over( 'The ' . $Monst_Name . ' polished you off.' );
 }
 
 sub grab_gem {
-    my ($ent, $gem) = @_;
+    my ( $ent, $gem ) = @_;
     $ent->[STASH][GEM_STASH] += $gem->[STASH];
     kill_animate($gem);
-    if ($ent->[WHAT] == MONST) {
-        post_message('The ' . $Monst_Name . ' grabs a gem.');
+    if ( $ent->[WHAT] == MONST ) {
+        post_message( 'The ' . $Monst_Name . ' grabs a gem.' );
     } else {
-        post_message('You now have ' . $ent->[STASH][GEM_STASH] . ' gems.');
+        post_message( 'You now have ' . $ent->[STASH][GEM_STASH] . ' gems.' );
     }
 }
 
 sub graph_bilink {
-    my ($g, $c1, $r1, $c2, $r2) = @_;
+    my ( $g, $c1, $r1, $c2, $r2 ) = @_;
     my $from = $c1 . ',' . $r1;
     my $to   = $c2 . ',' . $r2;
     push $g->{$from}->@*, [ $to,   1, [ $c2, $r2 ] ];
@@ -548,63 +565,63 @@ sub graph_bilink {
 
 sub graph_setup {
     my $g = {};
-    for my $r (0 .. ROWS - 2) {
-        for my $c (0 .. COLS - 1) {
+    for my $r ( 0 .. ROWS - 2 ) {
+        for my $c ( 0 .. COLS - 1 ) {
             next if $LMap->[$r][$c][GROUND][WHAT] == WALL;
             # allow left/right, if ladder or wall below permits it
             if ($c != COLS - 1
                 and (  $LMap->[$r][$c][GROUND][WHAT] == LADDER
-                    or $LMap->[ $r + 1 ][$c][GROUND][WHAT] == WALL)
+                    or $LMap->[ $r + 1 ][$c][GROUND][WHAT] == WALL )
                 and (
                     $LMap->[$r][ $c + 1 ][GROUND][WHAT] == LADDER
                     or (    $LMap->[$r][ $c + 1 ][GROUND][WHAT] != WALL
-                        and $LMap->[ $r + 1 ][ $c + 1 ][GROUND][WHAT] == WALL)
+                        and $LMap->[ $r + 1 ][ $c + 1 ][GROUND][WHAT] == WALL )
                 )
             ) {
-                graph_bilink($g, $c, $r, $c + 1, $r);
+                graph_bilink( $g, $c, $r, $c + 1, $r );
             }
-            if ($r > 0) {
+            if ( $r > 0 ) {
                 # allow motion up/down ladders
                 if (    $LMap->[$r][$c][GROUND][WHAT] == LADDER
-                    and $LMap->[ $r - 1 ][$c][GROUND][WHAT] == LADDER) {
-                    graph_bilink($g, $c, $r, $c, $r - 1);
+                    and $LMap->[ $r - 1 ][$c][GROUND][WHAT] == LADDER ) {
+                    graph_bilink( $g, $c, $r, $c, $r - 1 );
                 } elsif (
                     $LMap->[$r][$c][GROUND][WHAT] == LADDER
                     or (    $LMap->[$r][$c][GROUND][WHAT] == FLOOR
-                        and $LMap->[ $r + 1 ][$c][GROUND][WHAT] == WALL)
+                        and $LMap->[ $r + 1 ][$c][GROUND][WHAT] == WALL )
                 ) {
                     # can we fall into this cell from above?
-                    graph_shaft($g, $c, $r);
+                    graph_shaft( $g, $c, $r );
                 }
             }
         }
     }
-    for my $c (0 .. COLS - 1) {
+    for my $c ( 0 .. COLS - 1 ) {
         next if $LMap->[ ROWS - 1 ][$c][GROUND][WHAT] == WALL;
         if (    $LMap->[ ROWS - 1 ][$c][GROUND][WHAT] == LADDER
-            and $LMap->[ ROWS - 2 ][$c][GROUND][WHAT] == LADDER) {
-            graph_bilink($g, $c, ROWS - 1, $c, ROWS - 2);
+            and $LMap->[ ROWS - 2 ][$c][GROUND][WHAT] == LADDER ) {
+            graph_bilink( $g, $c, ROWS - 1, $c, ROWS - 2 );
         } else {
-            graph_shaft($g, $c, ROWS - 1);
+            graph_shaft( $g, $c, ROWS - 1 );
         }
-        if ($c != COLS - 1) {
-            graph_bilink($g, $c, ROWS - 1, $c + 1, ROWS - 1);
+        if ( $c != COLS - 1 ) {
+            graph_bilink( $g, $c, ROWS - 1, $c + 1, ROWS - 1 );
         }
     }
     return $g;
 }
 
 sub graph_shaft {
-    my ($g, $c, $r) = @_;
-    for my $x (reverse 0 .. $r - 1) {
+    my ( $g, $c, $r ) = @_;
+    for my $x ( reverse 0 .. $r - 1 ) {
         last if $LMap->[$x][$c][GROUND][WHAT] == WALL;
         my $weight = $r - $x;
-        if ($LMap->[$x][$c][GROUND][WHAT] == LADDER) {
-            if ($weight == 1) {
-                graph_udlink($g, $c, $x, $c, $r, 1, [ $c, $x ]);
+        if ( $LMap->[$x][$c][GROUND][WHAT] == LADDER ) {
+            if ( $weight == 1 ) {
+                graph_udlink( $g, $c, $x, $c, $r, 1, [ $c, $x ] );
             } else {
-                graph_udlink($g, $c, $x, $c, $x + 1, 1, [ $c, $x ]);
-                graph_udlink($g, $c, $x + 1, $c, $r, $weight - 2, [ $c, $r ]);
+                graph_udlink( $g, $c, $x,     $c, $x + 1, 1,           [ $c, $x ] );
+                graph_udlink( $g, $c, $x + 1, $c, $r,     $weight - 2, [ $c, $r ] );
             }
             last;
         }
@@ -613,40 +630,40 @@ sub graph_shaft {
             and (
                 $LMap->[$x][ $c - 1 ][GROUND][WHAT] == LADDER
                 or (    $LMap->[$x][ $c - 1 ][GROUND][WHAT] == FLOOR
-                    and $LMap->[ $x + 1 ][ $c - 1 ][GROUND][WHAT] == WALL)
+                    and $LMap->[ $x + 1 ][ $c - 1 ][GROUND][WHAT] == WALL )
             )
         ) {
-            graph_udlink($g, $c - 1, $x, $c, $x, 1, [ $c, $x ]);
-            graph_udlink($g, $c, $x, $c, $r, $weight - 1, [ $c, $r ]);
+            graph_udlink( $g, $c - 1, $x, $c, $x, 1,           [ $c, $x ] );
+            graph_udlink( $g, $c,     $x, $c, $r, $weight - 1, [ $c, $r ] );
         }
         if ($c != COLS - 1
             and (
                 $LMap->[$x][ $c + 1 ][GROUND][WHAT] == LADDER
                 or (    $LMap->[$x][ $c + 1 ][GROUND][WHAT] == FLOOR
-                    and $LMap->[ $x + 1 ][ $c + 1 ][GROUND][WHAT] == WALL)
+                    and $LMap->[ $x + 1 ][ $c + 1 ][GROUND][WHAT] == WALL )
             )
         ) {
-            graph_udlink($g, $c + 1, $x, $c, $x, $weight, [ $c, $x ]);
-            graph_udlink($g, $c, $x, $c, $r, $weight - 1, [ $c, $r ]);
+            graph_udlink( $g, $c + 1, $x, $c, $x, $weight,     [ $c, $x ] );
+            graph_udlink( $g, $c,     $x, $c, $r, $weight - 1, [ $c, $r ] );
         }
     }
 }
 
 sub graph_udlink {
-    my ($g, $c1, $r1, $c2, $r2, $weight, $point) = @_;
+    my ( $g, $c1, $r1, $c2, $r2, $weight, $point ) = @_;
     my $from = $c1 . ',' . $r1;
     my $to   = $c2 . ',' . $r2;
     push $g->{$from}->@*, [ $to, $weight, $point ];
 }
 
 sub interact {
-    my ($mover, $dest) = @_;
-    for my $i (ANI, ITEM) {
+    my ( $mover, $dest ) = @_;
+    for my $i ( ANI, ITEM ) {
         my $target = $LMap->[ $dest->[PROW] ][ $dest->[PCOL] ][$i];
-        if (defined $target) {
+        if ( defined $target ) {
             # this code is assumed to take care of everything and be the
             # final say on the interaction
-            $Interact_With{ $target->[WHAT] }->($mover, $target);
+            $Interact_With{ $target->[WHAT] }->( $mover, $target );
             return 1;
         }
     }
@@ -654,7 +671,7 @@ sub interact {
 }
 
 sub kill_animate {
-    my ($ent, $no_draw) = @_;
+    my ( $ent, $no_draw ) = @_;
     push @RedrawA, $ent->[LMC][WHERE] unless defined $no_draw;
     $ent->[BLACK_SPOT] = 1;
     # NOTE this only works for TYPE of ANI or ITEM, may need to rethink
@@ -664,42 +681,43 @@ sub kill_animate {
 }
 
 sub load_level {
-    my $file = catfile($Level_Path, 'level' . $Level++);
-    game_over('You have completed all the levels.', 0) unless -e $file;
+    my $file = catfile( $Level_Path, 'level' . $Level++ );
+    game_over( 'You have completed all the levels.', 0 ) unless -e $file;
 
-    open(my $fh, '<', $file) or game_over("Failed to open '$file': $!");
+    open( my $fh, '<', $file ) or game_over("Failed to open '$file': $!");
 
     splice @Animates, 1;
     undef $Animates[HERO][LMC];
     $LMap = [];
 
     my $rownum = 0;
-    while (my $line = readline $fh) {
+    while ( my $line = readline $fh ) {
         chomp $line;
-        game_over("Wrong number of columns at $file:$.") if length $line != COLS;
+        game_over("Wrong number of columns at $file:$.")
+          if length $line != COLS;
         my $colnum = 0;
-        for my $v (split //, $line) {
+        for my $v ( split //, $line ) {
             my $c = $CharMap{$v} // game_over("Unknown character $v at $file:$.");
             my $point = [ $colnum++, $rownum ];    # PCOL, PROW (x, y)
-            if (exists $Things{$c}) {
-                if ($c eq BOMB) {
+            if ( exists $Things{$c} ) {
+                if ( $c eq BOMB ) {
                     push $LMap->[$rownum]->@*, [ $point, $Things{ FLOOR, } ];
-                    make_item($point, BOMB, 0);
-                } elsif ($c eq GEM) {
+                    make_item( $point, BOMB, 0 );
+                } elsif ( $c eq GEM ) {
                     push $LMap->[$rownum]->@*, [ $point, $Things{ FLOOR, } ];
-                    make_item($point, GEM, GEM_VALUE);
+                    make_item( $point, GEM, GEM_VALUE );
                 } else {
                     push $LMap->[$rownum]->@*, [ $point, $Things{$c} ];
                 }
             } else {
-                if ($c eq HERO) {
+                if ( $c eq HERO ) {
                     game_over("Player placed twice in $file")
                       if defined $Animates[HERO][LMC];
                     push $LMap->[$rownum]->@*,
                       [ $point, $Things{ FLOOR, }, undef, $Animates[HERO] ];
                     $Animates[HERO][LMC] = $LMap->[$rownum][-1];
                     $Hero = $point;
-                } elsif ($c eq MONST) {
+                } elsif ( $c eq MONST ) {
                     push $LMap->[$rownum]->@*, [ $point, $Things{ FLOOR, } ];
                     make_monster($point);
                 } else {
@@ -713,14 +731,14 @@ sub load_level {
     game_over("No player in $file") unless defined $Animates[HERO][LMC];
 
     $Rotation = 0;
-    for my $rot (1 .. 4) {
+    for my $rot ( 1 .. 4 ) {
         $Graphs[$Rotation] = graph_setup();
         rotate_left();
     }
 }
 
 sub make_item {
-    my ($point, $thingy, $stash, $update) = @_;
+    my ( $point, $thingy, $stash, $update ) = @_;
     my $item;
     $item->@[ WHAT, DISP, TYPE, STASH, UPDATE, LMC ] = (
         $Things{$thingy}->@*,
@@ -744,20 +762,30 @@ sub make_monster {
     $LMap->[ $point->[PROW] ][ $point->[PCOL] ][ANI] = $monst;
 }
 
+sub maybe_boom_today {
+    if ( keys %Explosions ) {
+        explode($_) for values %Explosions;
+        %Explosions = ();
+    }
+}
+
 sub move_animate {
-    my ($ent, $cols, $rows) = @_;
+    my ( $ent, $cols, $rows ) = @_;
     my $lmc = $ent->[LMC];
 
     my $from = $lmc->[WHERE][PCOL] . ',' . $lmc->[WHERE][PROW];
     my $to =
-      ($lmc->[WHERE][PCOL] + $cols) . ',' . ($lmc->[WHERE][PROW] + $rows);
+        ( $lmc->[WHERE][PCOL] + $cols ) . ','
+      . ( $lmc->[WHERE][PROW] + $rows );
 
     return MOVE_FAILED
-      unless first { $_->[GRAPH_NODE] eq $to } $Graphs[$Rotation]{$from}->@*;
+      unless first { $_->[GRAPH_NODE] eq $to }
+      $Graphs[$Rotation]{$from}->@*;
 
-    my $dest = [ $lmc->[WHERE][PCOL] + $cols, $lmc->[WHERE][PROW] + $rows ];
+    my $dest =
+      [ $lmc->[WHERE][PCOL] + $cols, $lmc->[WHERE][PROW] + $rows ];
 
-    relocate($ent, $dest) unless interact($ent, $dest);
+    relocate( $ent, $dest ) unless interact( $ent, $dest );
     return MOVE_OK;
 }
 
@@ -767,33 +795,33 @@ sub move_examine {
     my $key;
     my $row = $Animates[HERO][LMC][WHERE][PROW];
     my $col = $Animates[HERO][LMC][WHERE][PCOL];
-    print at(MSG_COL, MSG_ROW + $_), clear_right for 1 .. MSG_MAX;
-    print at(MSG_COL, MSG_ROW), clear_right,
+    print at( MSG_COL, MSG_ROW + $_ ), clear_right for 1 .. MSG_MAX;
+    print at( MSG_COL, MSG_ROW ), clear_right,
       'Move cursor to view a cell. Esc exits', show_cursor;
     while (1) {
-        print at(MSG_COL, MSG_ROW + $_), clear_right for 3 .. 5;
+        print at( MSG_COL, MSG_ROW + $_ ), clear_right for 3 .. 5;
         my $disp_row = 2;
-        for my $i (ANI, ITEM) {
+        for my $i ( ANI, ITEM ) {
             my $x = $LMap->[$row][$col][$i];
-            if (defined $x) {
-                print at(MSG_COL, MSG_ROW + $disp_row++), clear_right, $x->[DISP],
+            if ( defined $x ) {
+                print at( MSG_COL, MSG_ROW + $disp_row++ ), clear_right, $x->[DISP],
                   ' - ', $Descriptions{ $x->[WHAT] };
             }
         }
         my $g = $LMap->[$row][$col][GROUND];
-        print at(MSG_COL, MSG_ROW + $disp_row), clear_right, $g->[DISP],
+        print at( MSG_COL, MSG_ROW + $disp_row ), clear_right, $g->[DISP],
           ' - ', $Descriptions{ $g->[TYPE] },
-          at(MAP_DISP_OFF + $col, MAP_DISP_OFF + $row);
+          at( MAP_DISP_OFF + $col, MAP_DISP_OFF + $row );
         $key = ReadKey(0);
         last if $key eq "\033";
         my $distance = 1;
-        if (ord $key < 97) {    # SHIFT moves faster
+        if ( ord $key < 97 ) {    # SHIFT moves faster
             $key      = lc $key;
             $distance = 5;
         }
         my $dir = $Examine_Offsets{$key} // next;
-        $row = between(0, ROWS - 1, $row + $dir->[PROW] * $distance);
-        $col = between(0, COLS - 1, $col + $dir->[PCOL] * $distance);
+        $row = between( 0, ROWS - 1, $row + $dir->[PROW] * $distance );
+        $col = between( 0, COLS - 1, $col + $dir->[PCOL] * $distance );
     }
     print hide_cursor;
     show_messages();
@@ -803,41 +831,47 @@ sub move_examine {
 sub move_nop { return MOVE_OK }
 
 sub move_player {
-    my ($cols, $rows) = @_;
-    sub { move_animate($Animates[HERO], $cols, $rows) }
+    my ( $cols, $rows ) = @_;
+    sub { move_animate( $Animates[HERO], $cols, $rows ) }
 }
 
 sub post_help {
     my $ch = substr $Monst_Name, 0, 1;
     post_message('');
-    post_message(
-        ' ' . $Animates[HERO][DISP] . ' - You   ' . $ch . ' - a ' . $Monst_Name);
-    post_message(
-        ' ' . $Things{ STATUE, }[DISP] . ' - a large granite statue done in the');
-    post_message('     ' . $Style . ' style');
-    post_message(' '
+    post_message( ' '
+          . $Animates[HERO][DISP]
+          . ' - You   '
+          . $ch . ' - a '
+          . $Monst_Name );
+    post_message( ' '
+          . $Things{ STATUE, }[DISP]
+          . ' - a large granite statue done in the' );
+    post_message( '     ' . $Style . ' style' );
+    post_message( ' '
           . $Things{ BOMB, }[DISP]
           . ' - Bomb  '
           . $Things{ GEM, }[DISP]
-          . ' - Gem (get these)');
+          . ' - Gem (get these)' );
     post_message('');
     post_message(' h j k l - move');
     post_message(' < >     - activate left or right boot');
     post_message(' B       - drop a Bomb');
-    post_message(' M       - make a Bomb (consumes ' . BOMB_COST . ' Gems)');
     post_message(
-        ' %       - when on ' . $Things{ STAIR, }[DISP] . ' goes to the next level');
+        ' M       - make a Bomb (consumes ' . BOMB_COST . ' Gems)' );
+    post_message( ' %       - when on '
+          . $Things{ STAIR, }[DISP]
+          . ' goes to the next level' );
     post_message(' . space - pass a turn (handy when falling)');
     post_message('');
-    post_message(' q       - quit the game (no save)');
+    post_message(' Q q     - quit the game (no save)');
     post_message(' $       - display Bomb and Gem counts');
     post_message(' ?       - post these help messages');
     post_message('');
-    post_message('You have '
+    post_message( 'You have '
           . $Animates[HERO][STASH][BOMB_STASH]
           . ' bombs and '
           . $Animates[HERO][STASH][GEM_STASH]
-          . ' gems.');
+          . ' gems.' );
 }
 
 {
@@ -845,15 +879,15 @@ sub post_help {
 
     sub post_message {
         my ($msg) = @_;
-        while (@log >= MSG_MAX) { shift @log }
+        while ( @log >= MSG_MAX ) { shift @log }
         push @log, $msg;
         show_messages();
     }
     sub clear_messages { @log = () }
 
     sub show_messages {
-        for my $i (0 .. $#log) {
-            print at(MSG_COL, MSG_ROW + $i), clear_right, $log[$i];
+        for my $i ( 0 .. $#log ) {
+            print at( MSG_COL, MSG_ROW + $i ), clear_right, $log[$i];
         }
     }
 }
@@ -867,29 +901,30 @@ sub properly_plural {
 sub redraw_level { print clear_screen, draw_level; show_messages() }
 
 sub redraw_movers {
-    redraw_ref(\@RedrawA);
+    redraw_ref( \@RedrawA );
     sleep($Redraw_Delay);
-    redraw_ref(\@RedrawB);
+    redraw_ref( \@RedrawB );
+    maybe_boom_today();
     @RedrawA = ();
     @RedrawB = ();
 }
 
 sub redraw_ref {
-  CELL: for my $point ($_[0]->@*) {
-        for my $i (ANI, ITEM) {
+  CELL: for my $point ( $_[0]->@* ) {
+        for my $i ( ANI, ITEM ) {
             my $ent = $LMap->[ $point->[PROW] ][ $point->[PCOL] ][$i];
-            if (defined $ent and !$ent->[BLACK_SPOT]) {
-                print at(map { MAP_DISP_OFF + $_ } $point->@*), $ent->[DISP];
+            if ( defined $ent and !$ent->[BLACK_SPOT] ) {
+                print at( map { MAP_DISP_OFF + $_ } $point->@* ), $ent->[DISP];
                 next CELL;
             }
         }
-        print at(map { MAP_DISP_OFF + $_ } $point->@*),
+        print at( map { MAP_DISP_OFF + $_ } $point->@* ),
           $LMap->[ $point->[PROW] ][ $point->[PCOL] ][GROUND][DISP];
     }
 }
 
 sub relocate {
-    my ($ent, $dest) = @_;
+    my ( $ent, $dest ) = @_;
     my $src = $ent->[LMC][WHERE];
     push @RedrawA, $src;
     push @RedrawB, $dest;
@@ -906,28 +941,28 @@ sub restore_term {
 
 sub rotate_left {
     my $lm;
-    for my $r (0 .. ROWS - 1) {
-        for my $c (0 .. COLS - 1) {
+    for my $r ( 0 .. ROWS - 1 ) {
+        for my $c ( 0 .. COLS - 1 ) {
             my $newr = COLS - 1 - $c;
             $lm->[$newr][$r] = $LMap->[$r][$c];
             $lm->[$newr][$r][WHERE] = [ $r, $newr ];
         }
     }
     $LMap     = $lm;
-    $Rotation = ($Rotation + 1) % 4;
+    $Rotation = ( $Rotation + 1 ) % 4;
 }
 
 sub rotate_right {
     my $lm;
-    for my $r (0 .. ROWS - 1) {
-        for my $c (0 .. COLS - 1) {
+    for my $r ( 0 .. ROWS - 1 ) {
+        for my $c ( 0 .. COLS - 1 ) {
             my $newc = ROWS - 1 - $r;
             $lm->[$c][$newc] = $LMap->[$r][$c];
             $lm->[$c][$newc][WHERE] = [ $newc, $c ];
         }
     }
     $LMap     = $lm;
-    $Rotation = ($Rotation - 1) % 4;
+    $Rotation = ( $Rotation - 1 ) % 4;
 }
 
 sub track_hero {
@@ -937,17 +972,19 @@ sub track_hero {
     # tend to freeze or head in the wrong direction
     my $row = $Hero->[PROW];
     my $col = $Hero->[PCOL];
-    return if $row == ROWS - 1 or $LMap->[$row][$col][GROUND][WHAT] == LADDER;
+    return
+      if $row == ROWS - 1
+      or $LMap->[$row][$col][GROUND][WHAT] == LADDER;
 
     my $goal = $row;
-    for my $r ($row + 1 .. ROWS - 1) {
+    for my $r ( $row + 1 .. ROWS - 1 ) {
         last if $LMap->[$r][$col][GROUND][WHAT] == WALL;
         if ($LMap->[$r][$col][GROUND][WHAT] == LADDER
             or (    $r < ROWS - 2
                 and $LMap->[$r][$col][GROUND][WHAT] == FLOOR
-                and $LMap->[ $r + 1 ][$col][GROUND][WHAT] == WALL)
+                and $LMap->[ $r + 1 ][$col][GROUND][WHAT] == WALL )
             or (    $r == ROWS - 1
-                and $LMap->[$r][$col][GROUND][WHAT] == FLOOR)
+                and $LMap->[$r][$col][GROUND][WHAT] == FLOOR )
         ) {
             $goal = $r;
             last;
@@ -957,8 +994,8 @@ sub track_hero {
 }
 
 sub update_hero {
-    my ($key, $ret);
-    tcflush(STDIN_FILENO, TCIFLUSH);
+    my ( $key, $ret );
+    tcflush( STDIN_FILENO, TCIFLUSH );
     while (1) {
         while (1) {
             $key = ReadKey(0);
@@ -985,21 +1022,21 @@ sub update_monst {
     # head-running...)
     if (    $mrow != ROWS - 1
         and $ent->[LMC][GROUND][WHAT] == FLOOR
-        and $LMap->[ $mrow + 1 ][$mcol][GROUND][WHAT] != WALL) {
+        and $LMap->[ $mrow + 1 ][$mcol][GROUND][WHAT] != WALL ) {
         return;
     }
 
-    my $dest = find_hero($ent, $mcol, $mrow);
+    my $dest = find_hero( $ent, $mcol, $mrow );
     return unless defined $dest;
 
-    relocate($ent, $dest) unless interact($ent, $dest);
+    relocate( $ent, $dest ) unless interact( $ent, $dest );
 
-    if ($ent->[STASH][GEM_STASH] > 0
-        and !defined $ent->[LMC][ITEM]) {
-        if (rand() < $ent->[STASH][GEM_ODDS]) {
-            post_message('The ' . $Monst_Name . ' drops a gem!');
+    if ( $ent->[STASH][GEM_STASH] > 0
+        and !defined $ent->[LMC][ITEM] ) {
+        if ( rand() < $ent->[STASH][GEM_ODDS] ) {
+            post_message( 'The ' . $Monst_Name . ' drops a gem!' );
             $ent->[STASH][GEM_STASH]--;
-            make_item($ent->[LMC][WHERE], GEM, GEM_VALUE);
+            make_item( $ent->[LMC][WHERE], GEM, GEM_VALUE );
             $ent->[STASH][GEM_ODDS] = 0.0 - GEM_ODDS_ADJUST;
         }
         $ent->[STASH][GEM_ODDS] += GEM_ODDS_ADJUST;
@@ -1094,10 +1131,6 @@ L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Game-PlatformsOfPeril>.
 I will be notified, and then you'll automatically be notified of
 progress on your bug as I make changes.
 
-Patches might best be applied towards:
-
-L<https://github.com/thrig/Game-PlatformsOfPeril>
-
 =head2 Known Issues
 
 The most glorious lack of tests, the unconvincing and ham-fisted attempt
@@ -1142,7 +1175,7 @@ L<Game::TextPatterns> may help draw candidate level maps:
 
 =head1 AUTHOR
 
-thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
+thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at thrig.me> >>
 
 =head1 COPYRIGHT AND LICENSE
 

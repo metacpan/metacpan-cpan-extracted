@@ -3,9 +3,9 @@ NAME
     Data::Sah::Filter::* or Data::Sah::FilterBundle::* distribution
 
 VERSION
-    This document describes version 0.008 of
+    This document describes version 0.009 of
     Pod::Weaver::Plugin::Data::Sah::Filter (from Perl distribution
-    Pod-Weaver-Plugin-Data-Sah-Filter), released on 2022-11-15.
+    Pod-Weaver-Plugin-Data-Sah-Filter), released on 2024-01-22.
 
 SYNOPSIS
     In your weaver.ini:
@@ -63,7 +63,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2020 by perlancar
+    This software is copyright (c) 2024, 2022, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

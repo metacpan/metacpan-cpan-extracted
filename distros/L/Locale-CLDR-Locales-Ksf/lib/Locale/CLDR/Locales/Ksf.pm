@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ksf - Package for language Bafia
 
 package Locale::CLDR::Locales::Ksf;
 # This file auto generated from Data\common\main\ksf.xml
-#	on Tue  5 Dec  1:19:03 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'riakan',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'andɔrǝ',
  			'AE' => 'bǝlɔŋ bǝ kaksa bɛ táatáaŋzǝn',
@@ -217,7 +217,6 @@ has 'display_name_region' => (
  			'MD' => 'mɔldaví',
  			'MG' => 'madagaska',
  			'MH' => 'zǝ i marcál',
- 			'MK' => 'másǝdwán',
  			'ML' => 'mali',
  			'MM' => 'myanmár',
  			'MN' => 'mɔŋolí',
@@ -333,7 +332,7 @@ has 'characters' => (
 			auxiliary => qr{[q x]},
 			index => ['A', 'B', 'C', 'D', 'E', 'Ǝ', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
 			main => qr{[a á b c d e é ǝ {ǝ́} ɛ {ɛ́} f g h i í j k l m n ŋ o ó ɔ {ɔ́} p r s t u ú v w y z]},
-			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT

@@ -7,7 +7,7 @@ use Kephra::Config;
 
 package Kephra;
 
-our $VERSION = '0.405';
+our $VERSION = '0.406';
 our $NAME = 'Kephra';
 our $STAGE = 'less';
 
@@ -27,7 +27,7 @@ sub close  { $_[0]->{'window'}->Close() }
 
 sub OnExit {
     my $app = shift;
-   	Wx::wxTheClipboard->Flush;
+    Wx::wxTheClipboard->Flush;
     $app->{'config'}->write;
     # $app->{'window'}->Destroy;
     1;
@@ -41,7 +41,7 @@ __END__
 
 =head1 NAME
 
-Kephra - compact, effective and beautiful coding editor
+Kephra - compact, effective and inventive coding editor
 
 =head1 SYNOPSIS
 

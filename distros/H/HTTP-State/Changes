@@ -1,5 +1,9 @@
 Revision history for Perl extension HTTP::State.
 
+v0.1.2 2024-01-10
+  [maintenance]
+    - Update work with latest List::Insertion (v0.1.4) and Template::Plex (v0.7.0)
+ 
 v0.1.1
   [improvements]
   - Removed need for Time::Piece. Saves some RAM

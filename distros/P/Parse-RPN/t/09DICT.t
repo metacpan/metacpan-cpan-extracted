@@ -15,7 +15,7 @@ my $WIDTH = 35;
 $| = 1;
 my @tests;
 
-push @tests, [ 'WORDS,LEN',                     '1584',               'WORDS' ];
+push @tests, [ 'WORDS,LEN',                     '1598',               'WORDS' ];
 push @tests, [ 'test,C,!,C,@',                  'test',               '! (set variable)' ];
 push @tests, [ 'a,b,c,d,4,B,!!,B,@',            'a b c d',            '!!' ];
 push @tests, [ '1,A,!,VARS',                    'A | B | C',          'VARS' ];

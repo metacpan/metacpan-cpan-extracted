@@ -1,5 +1,36 @@
 Revision history for Tickit-Widgets
 
+0.41    2024-01-06
+        [CHANGES]
+         * Quiet the meta::experimental warnings of meta 0.003_002
+
+0.40    2024-01-03
+        [CHANGES]
+         * Use `meta` instead of `no strict refs' hackery to obtain caller's
+           \*DATA glob in Tickit::Style
+
+0.39    2023-12-29
+        [CHANGES]
+         * Use Object::Pad::MOP rather than no strict 'refs' hackery where
+           possible, issue a warning when not
+
+0.38    2023-12-13
+        [CHANGES]
+         * Updated for Object::Pad v0.807
+            + Explicit `use warnings` to account for removal of implied pragma
+            + `ADJUST :params` is now stable, no need for experimental
+            + Use new `apply` and `inherit` keywords
+            + Use experimental inheritable fields to avoid internal methods
+              between LinearSplit and HSplit/VSplit
+         * Various small Pod style updates
+
+0.37    2023-06-12
+        [CHANGES]
+         * Added Tickit::Widget::HLine / Tickit::Widget::VLine
+         * Support optionally drawing dividing lines between child widgets in
+           HBox/VBox
+         * Swap all unit tests from `Test::More` to `Test2::V0`
+
 0.36    2022-12-14
         [CHANGES]
          * Updated for Object::Pad v0.75

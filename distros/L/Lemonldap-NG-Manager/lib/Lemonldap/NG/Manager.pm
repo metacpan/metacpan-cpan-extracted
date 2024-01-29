@@ -17,7 +17,7 @@ use JSON;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::PSGI::Constants;
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.18.1';
 
 extends qw(
   Lemonldap::NG::Handler::PSGI::Router
@@ -119,16 +119,6 @@ sub init {
     $self->logger->debug("Default index -> $index");
     $self->defaultRoute( $self->loadedPlugins->[$index]->defaultRoute );
 
-# Find out more glyphicones at https://www.w3schools.com/icons/bootstrap_icons_glyphicons.asp
-    my $linksIcons = {
-        'conf'          => 'cog',
-        'sessions'      => 'duplicate',
-        'notifications' => 'bell',
-        '2ndFA'         => 'wrench',
-        'viewer'        => 'eye-open',
-        'api'           => 'flash'
-    };
-
     $self->links( [] );
     for ( my $i = 0 ; $i < @links ; $i++ ) {
         next unless ( defined $links[$i] );
@@ -136,7 +126,7 @@ sub init {
           {
             target => $self->loadedPlugins->[$i]->defaultRoute,
             title  => $links[$i],
-            icon   => $linksIcons->{ $links[$i] }
+            icon   => $self->loadedPlugins->[$i]->icon,
           };
     }
 

@@ -3,10 +3,25 @@ diseases:
     label: Foo
   - id: OMIM:22
     label: Bar
+ethnicity:
+  - id: NCIT:ET1
+    label: Foo
+  - id: NCIT:ET2
+    label: Bar
+exposures:
+  - id: NCIT:EX1
+    label: Foo
+  - id: NCIT:EX2
+    label: Bar
 phenotypicFeatures:
   - id: HP:11
     label: Foo
   - id: HP:22
+    label: Bar
+procedures:
+  - id: NCIT:PR1
+    label: Foo
+  - id: NCIT:PR2
     label: Bar
 treatments:
   - id: RxNorm:11

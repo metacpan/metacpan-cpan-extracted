@@ -13,6 +13,7 @@ example/clacks_slaveserver2.xml
 example/clock.pl
 example/exampleserver.crt
 example/exampleserver.key
+example/permissiontestclient.pl
 example/rawclient.pl
 example/README.txt
 example/server.pl

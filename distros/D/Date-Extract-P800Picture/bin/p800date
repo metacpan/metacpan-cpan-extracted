@@ -7,7 +7,7 @@ use warnings;
 use utf8;
 use 5.014000;
 
-BEGIN { our $VERSION = v1.1.6; }
+BEGIN { our $VERSION = v1.1.7; }
 
 use Date::Extract::P800Picture;
 
@@ -21,15 +21,15 @@ use Pod::Usage::CommandLine;
 
 use Readonly;
 ## no critic (ProhibitCallsToUnexportedSubs)
-Readonly::Scalar my $LOG_CONF    => q{p800date_log.conf};
+Readonly::Scalar my $LOG_CONF => q{p800date_log.conf};
 Readonly::Array my @DEBUG_LEVELS => ( $FATAL, $INFO, $WARN, $DEBUG );
-Readonly::Hash my %LOG           => (
+Readonly::Hash my %LOG => (
     'FILENAME' => q{Processing filename '%s'},
     'NO_PRINT' => q{Could not print},
 );
 Readonly::Array my @GETOPT_CONFIG =>
   qw(no_ignore_case bundling auto_version auto_help);
-Readonly::Array my @GETOPTIONS  => (q{verbose|v+});
+Readonly::Array my @GETOPTIONS => (q{verbose|v+});
 Readonly::Hash my %OPTS_DEFAULT => ();
 ## use critic
 
@@ -65,7 +65,7 @@ while ( my $filename = shift @ARGV ) {
     $log->debug( sprintf $LOG{'FILENAME'}, $filename );
 
     my $dt;
-    my $ret = eval { $dt = $p->extract( File::Basename::basename $filename); };
+    my $ret = eval { $dt = $p->extract( File::Basename::basename $filename ); };
     if ( my $e = Exception::Class->caught('DateExtractP800PictureException') ) {
         $log->logdie($e);
     }

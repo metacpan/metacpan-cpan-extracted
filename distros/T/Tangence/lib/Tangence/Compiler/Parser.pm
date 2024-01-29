@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use warnings;
+use Object::Pad 0.800;
 
-package Tangence::Compiler::Parser 0.30;
+package Tangence::Compiler::Parser 0.32;
 class Tangence::Compiler::Parser :isa(Parser::MGC);
 
 use Syntax::Keyword::Dynamically;

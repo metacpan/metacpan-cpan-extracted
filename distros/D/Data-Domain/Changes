@@ -1,5 +1,20 @@
 Revision history for Data-Domain
 
+1.15 13.01.2024
+  - add missing dependency on List::Util v1.45  
+
+1.14 07.01.2024
+  - new methods: validate(), func_signature(), meth_signature()
+  - new domain option: -default
+  - new domain shortcut : Coderef
+  - fix old bug on checks for tainted data
+
+1.13 02.12.2023
+  - new option Struct(-may_ignore => ...)
+  - NOT BACKWARD COMPATIBLE : the API for coderefs also passes the domain name
+    (but the old API can be restored through a global flag)
+  - global messages can contain coderefs
+  - $global_msgs can be localized
 
 1.12 16.05.2023
   - Struct(..., -exclude => ..) returns richer error messages

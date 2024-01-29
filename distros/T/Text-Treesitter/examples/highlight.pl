@@ -23,6 +23,7 @@ GetOptions(
    'use-theme|U'    => \( my $USE_THEME ),
    'folding|F'      => \( my $FOLDING ),
    'injections|J'   => \( my $INJECTIONS ),
+   'captures|C'     => \( my $CAPTURES ),
 ) or exit 1;
 
 STDOUT->binmode( ':encoding(UTF-8)' );
@@ -30,6 +31,7 @@ STDOUT->binmode( ':encoding(UTF-8)' );
 my %FORMATS = (
    # Names stolen from tree-sitter's highlight theme
    attribute  => { fg => "vga:cyan", italic => 1 },
+   character  => { fg => "vga:magenta" },
    comment    => { fg => "xterm:15", bg => "xterm:54", italic => 1 },
    decorator  => { fg => "xterm:140", italic => 1 },
    function   => { fg => "xterm:147", },
@@ -50,12 +52,13 @@ my %FORMATS = (
    'variable.hash'   => { fg => "xterm:81" },
 
    # For markup languages; e.g. used by tree-sitter-pod
-   'text.emphasis' => { italic => 1 },
-   'text.literal'  => { monospace => 1 },
-   'text.quote'    => { italic => 1, bg => "xterm:236", },
-   'text.strong'   => { bold => 1 },
-   'text.title'    => { fg => "vga:yellow", bold => 1, under => 1 },
-   'text.uri'      => { fg => "vga:blue", under => 1 },
+   'text.emphasis'  => { italic => 1 },
+   'text.literal'   => { monospace => 1 },
+   'text.quote'     => { italic => 1, bg => "xterm:236", },
+   'text.strong'    => { bold => 1 },
+   'text.title'     => { fg => "vga:yellow", bold => 1, under => 1 },
+   'text.uri'       => { fg => "vga:blue", under => 1 },
+   'text.underline' => { under => 1 },
 
    # Extra names
    label      => { fg => "xterm:140", under => 1 },
@@ -81,6 +84,13 @@ foreach ( values %FORMATS ) {
       $_->{bg} = Convert::Color->new( $_->{bg} )->as_xterm;
 }
 
+$FORMATS{include}       //= $FORMATS{keyword};
+$FORMATS{repeat}        //= $FORMATS{keyword};
+$FORMATS{conditional}   //= $FORMATS{keyword};
+$FORMATS{exception}     //= $FORMATS{keyword};
+$FORMATS{method}        //= $FORMATS{function};
+$FORMATS{"method.call"} //= $FORMATS{function};
+
 my $str = String::Tagged->new( read_text $ARGV[0] // "/dev/stdin" );
 
 my @fold_regions;
@@ -101,7 +111,7 @@ sub apply_language_highlights( $language, %opts )
    my $query_highlight = $ts->load_query_file( "highlights.scm" );
 
    my $query_folding;
-   if( $FOLDING and -f ( my $folding_path = $ts->query_file_path( "fold.scm" ) ) ) {
+   if( $FOLDING and -f ( my $folding_path = $ts->query_file_path( "folds.scm" ) ) ) {
       $query_folding = $ts->load_query_file( $folding_path );
    }
 
@@ -154,18 +164,24 @@ sub apply_language_highlights( $language, %opts )
       while( my $captures = $qc->next_match_captures ) {
          my $sublanguage;
          my $content;
-         if( defined $captures->{language} ) {
-            $sublanguage = $captures->{language}->text;
+         if( defined $captures->{'injection.language'} ) {
+            $sublanguage = $captures->{'injection.language'};
+            $content     = $captures->{'injection.content'};
+         }
+         elsif( defined $captures->{language} ) {
+            $sublanguage = $captures->{language};
             $content     = $captures->{content};
          }
          elsif( keys $captures->%* > 1 ) {
-            warn "This injection capture yielded more than one name key\n";
+            warn "This injection capture yielded more than one name key - ", join( ", ", sort keys $captures->%* ), "\n";
             next;
          }
          else {
             $sublanguage = ( keys $captures->%* )[0];
             $content     = $captures->{$sublanguage};
          }
+
+         $sublanguage = $sublanguage->text if $sublanguage isa Text::Treesitter::Node;
 
          apply_language_highlights( $sublanguage,
             start_byte => $content->start_byte,
@@ -178,10 +194,15 @@ sub apply_language_highlights( $language, %opts )
 
    while( my $captures = $qc->next_match_captures ) {
       CAPTURE: foreach my $capturename ( sort keys $captures->%* ) {
+         # TODO: actually implement the priority logic
+         next if $capturename eq "priority";
+
          my $node = $captures->{$capturename};
 
          my $start = $tree->byte_to_char( $node->start_byte );
          my $len   = $tree->byte_to_char( $node->end_byte ) - $start;
+
+         $str->apply_tag( $start, $len, captures => $capturename ) if $CAPTURES;
 
          my @nameparts = split m/\./, $capturename;
          while( @nameparts ) {
@@ -216,6 +237,14 @@ foreach my ( $lnum, $line ) ( indexed $str->split( qr/\n/ ) ) {
    }
    String::Tagged::Terminal->new_from_formatting( $line )
       ->say_to_terminal;
+   if( $CAPTURES ) {
+      my @captures;
+      $line->iter_extents_nooverlap( sub ( $e, %tags ) {
+         my $captures = $tags{captures};
+         push @captures, $captures // "*" if $e->substr =~ m/\S/;
+      }, only => [qw( captures )]);
+      print "# ", join( "|", @captures ), "\n" if @captures;
+   }
 }
 
 if( $PRINT_UNRECOGNISED and keys %UNRECOGNISED_CAPTURES ) {

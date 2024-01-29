@@ -4,6 +4,7 @@ use strict;
 
 use Graphics::Framebuffer;
 use Getopt::Long;
+
 # use Data::Dumper;
 
 our $RUNNING = TRUE;
@@ -19,21 +20,22 @@ GetOptions(
     'y=i'              => \$new_y,
     'color=s'          => \$color,
     'ampm'             => \$ampm,
-	'ignore-x-windows' => \$ignore_x,
+    'ignore-x-windows' => \$ignore_x,
 );
 
-my $FB = (defined($new_x) || defined($new_y)) ?
-  Graphics::Framebuffer->new('SPLASH' => 0, 'SIMULATED_X' => $new_x, 'SIMULATED_Y' => $new_y, 'IGNORE_X_WINDOWS' => $ignore_x) :
-  Graphics::Framebuffer->new('SPLASH' => 0, 'IGNORE_X_WINDOWS' => $ignore_x);
+my $FB =
+  (defined($new_x) || defined($new_y))
+  ? Graphics::Framebuffer->new('SPLASH' => 0, 'SIMULATED_X' => $new_x, 'SIMULATED_Y' => $new_y, 'IGNORE_X_WINDOWS' => $ignore_x)
+  : Graphics::Framebuffer->new('SPLASH' => 0, 'IGNORE_X_WINDOWS' => $ignore_x);
 
 $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'HUP'} = $SIG{'TERM'} = sub { $RUNNING = 0; $FB->text_mode(); exec('reset'); };
 
-$FB->cls('OFF'); # Turn off the console cursor
+$FB->cls('OFF');    # Turn off the console cursor
 
 # You can optionally set graphics mode here, but remember to turn on text mode
 # before exiting.
 
-$FB->graphics_mode(); # Shuts off all text and cursors.
+$FB->graphics_mode();    # Shuts off all text and cursors.
 
 # Gathers information on the screen for you to use as global information
 # {
@@ -51,37 +53,37 @@ $FB->graphics_mode(); # Shuts off all text and cursors.
 # }
 my $screen_info = $FB->screen_dimensions();
 
-my $x_adj = $screen_info->{'width'}  / 1920;
+my $x_adj = $screen_info->{'width'} / 1920;
 my $y_adj = $screen_info->{'height'} / 1080;
 
 my $font = $FB->get_font_list('^DejaVuSansMono$');
 
-while($RUNNING) {
-    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+while ($RUNNING) {
+    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime(time);
     my $t;
     if ($ampm) {
         if ($hour > 12) {
-            $t = sprintf('%02d:%02d:%02d pm',$hour-12,$min,$sec);
+            $t = sprintf('%02d:%02d:%02d pm', $hour - 12, $min, $sec);
         } else {
-            $t = sprintf('%02d:%02d:%02d am',$hour,$min,$sec);
+            $t = sprintf('%02d:%02d:%02d am', $hour, $min, $sec);
         }
     } else {
-        $t = sprintf('%02d:%02d:%02d',$hour,$min,$sec);
+        $t = sprintf('%02d:%02d:%02d', $hour, $min, $sec);
     }
     my $tp = {
         'bounding_box' => 1,
         'face'         => $font->{'face'},
         'font_path'    => $font->{'font_path'},
         'text'         => $t,
-        'color'        => ($color =~ /random/i) ? sprintf('%02X%02X%02XFF',int(128 + rand(128)), int(128 + rand(128)), int(128 + rand(128))) : $color,
+        'color'        => ($color =~ /random/i) ? sprintf('%02X%02X%02XFF', int(128 + rand(128)), int(128 + rand(128)), int(128 + rand(128))) : $color,
         'height'       => 200 * $y_adj,
         'x'            => 10,
         'y'            => 200,
         'antialias'    => 1,
     };
     $FB->normal_mode();
-    my $bbox = $FB->ttf_print($tp);
-    my $width = $screen_info->{'width'} - $bbox->{'pwidth'};
+    my $bbox   = $FB->ttf_print($tp);
+    my $width  = $screen_info->{'width'} - $bbox->{'pwidth'};
     my $height = ($screen_info->{'height'} - $bbox->{'pheight'}) - (210 * $y_adj);
     $bbox->{'x'} = int(rand($width));
     $bbox->{'y'} = int(rand($height)) + (210 * $y_adj);
@@ -89,11 +91,11 @@ while($RUNNING) {
     sleep 1;
     $FB->xor_mode();
     $FB->ttf_print($bbox);
-}
+} ## end while ($RUNNING)
 
-$FB->text_mode();  # Turn text and cursor back on.  You MUST do this if
-                   # graphics mode was set.
-$FB->cls('ON');    # Turn the console cursor back on
+$FB->text_mode();    # Turn text and cursor back on.  You MUST do this if
+                     # graphics mode was set.
+$FB->cls('ON');      # Turn the console cursor back on
 exit(0);
 
 __END__

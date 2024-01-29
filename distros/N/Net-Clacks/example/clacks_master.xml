@@ -10,8 +10,29 @@
         <cert>exampleserver.crt</cert>
         <key>exampleserver.key</key>
     </ssl>
+
+    <!-- This is the main user that has all permissions and also Interclacks -->
     <username>exampleuser</username>
     <password>unsafepassword</password>
+
+    <!-- additional user account with read and write, but no "manage" permissions -->
+    <user>
+        <username>rwuser</username>
+        <password>foo</password>
+        <read>1</read>
+        <write>1</write>
+        <manage>0</manage>
+    </user>
+
+    <!-- read-only user. Can see everything, but can't change it -->
+    <user>
+        <username>rouser</username>
+        <password>bar</password>
+        <read>1</read>
+        <write>0</write>
+        <manage>0</manage>
+    </user>
+
     <throttle>
         <maxsleep>5000</maxsleep>
         <step>1</step>

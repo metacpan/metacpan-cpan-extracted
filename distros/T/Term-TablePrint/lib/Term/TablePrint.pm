@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.161';
+our $VERSION = '0.162';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -161,6 +161,8 @@ sub print_table {
     }
     if ( $self->{hide_cursor} ) {
         print hide_cursor();
+        # 'choose' functions: Deactivate 'hide_cursor', because if 'hide_cursor' is
+        # activated (default), 'choose' activates the cursor before returning.
     }
     if ( ! @$tbl_orig ) {
         # Choose
@@ -821,7 +823,7 @@ sub __search {
         }
         print "\r${prompt}${string}";
         if ( ! eval {
-            $search->{filter} = $self->{search} == 1 ? qr/$string/i : qr/$string/;
+            $search->{filter} = $self->{search} == 1 ? "(?i:$string)" : $string;
             'Teststring' =~ $search->{filter};
             1
         } ) {
@@ -848,7 +850,7 @@ sub __search {
         # Choose
         choose(
             [ 'Continue with ENTER' ],
-            { prompt => $message, layout => 0, clear_screen => 1 }
+            { prompt => $message, layout => 0, clear_screen => 1, hide_cursor => 0 }
         );
         $search->{filter} = '';
         return;
@@ -884,7 +886,7 @@ sub _handle_reference {
     local $Data::Dumper::Indent = 0;
     local $Data::Dumper::Terse = 1;
     local $Data::Dumper::Maxdepth = 2;
-    return 'ref: ' . Data::Dumper::Dumper( $_[0] );
+    return Data::Dumper::Dumper( $_[0] );
 }
 
 
@@ -931,7 +933,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.161
+Version 0.162
 
 =cut
 
@@ -1326,7 +1328,7 @@ Matthäus Kiem <cuer2s@gmail.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2023 Matthäus Kiem.
+Copyright 2013-2024 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

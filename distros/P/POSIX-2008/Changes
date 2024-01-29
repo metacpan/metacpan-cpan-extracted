@@ -1,5 +1,31 @@
 Revision history for POSIX::2008.
 
+0.23  2024-01-27
+  - t/06_exec.t: Skip fexecve test if we can't sysopen() the Perl executable.
+  - Removed silly fileno int range check added in 0.22 because AT_FDCWD is
+    0xffd19553 on Solaris.
+
+0.22  2024-01-26
+  - Fixed confstr() error handling.
+  - Fixed getutx*() out-of-bounds read from utmpx string buffers.
+  - Fixed ptsname() and ttyname() to also accept file handles.
+  - Fixed read*() and pread*() to not overwrite read-only buffers.
+  - Fixed catclose(), dlclose(), killpg(), set*gid(), set*uid(), sig*()
+    to return "0 but true" on success and undef on error as documented.
+  - Forbid negative byte counts in read*(), pread*(), write(), pwrite().
+  - Added home-grown non-standard removeat().
+  - Added creat(), execveat(), fexecve(), raise().
+  - Added pathconf(), sysconf() and tons of _CS_, _PC_, _SC_ constants.
+  - Added :confstr, :pathconf, :sysconf export tags.
+  - Added some non-standard constants.
+  - Added t/06_exec.t.
+  - Made timer_create()'s "signal" argument optional.
+  - Made lchown(), log10(), nexttoward(), posix_f*() exportable.
+  - Bless returned file handles into IO::Dir/File to make handle methods work.
+  - t/02_fs.t: Skip dev/ino/rdev stat() checks on Windows w/ Perl 5.34+ to
+    fake cpantesters green lights (see perl5340delta).
+  - POD updates.
+
 0.21  2023-11-16
   - Replaced FMT_UINT macro by function.
   - Replaced safesysfree() by free() in realpath() (closes RT#149058).

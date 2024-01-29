@@ -1,7 +1,9 @@
 package Data::Gimei::Address;
 
+use 5.010;
+use strict;
 use warnings;
-use v5.22;
+
 use Carp;
 use File::Share qw( dist_file );
 use YAML::XS;

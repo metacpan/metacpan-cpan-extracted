@@ -8,9 +8,9 @@ use Log::ger;
 use Perinci::Exporter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-26'; # DATE
+our $DATE = '2024-01-15'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 our %SPEC;
 
@@ -154,6 +154,7 @@ _
             cmdline_aliases => {
                 dont_downsize => {summary=>"Alias for --downsize-to ''", is_flag=>1, code=>sub {$_[0]{downsize_to} = ''}},
                 no_downsize   => {summary=>"Alias for --downsize-to ''", is_flag=>1, code=>sub {$_[0]{downsize_to} = ''}},
+                S             => {summary=>"Alias for --downsize-to ''", is_flag=>1, code=>sub {$_[0]{downsize_to} = ''}},
                 1536          => {summary=>"Shortcut for --downsize-to=1536", is_flag=>1, code=>sub {$_[0]{downsize_to} = '1536'}},
                 2048          => {summary=>"Shortcut for --downsize-to=2048", is_flag=>1, code=>sub {$_[0]{downsize_to} = '2048'}},
             },
@@ -517,7 +518,7 @@ App::ImageMagickUtils - Utilities related to ImageMagick
 
 =head1 VERSION
 
-This document describes version 0.021 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2023-06-26.
+This document describes version 0.022 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2024-01-15.
 
 =head1 DESCRIPTION
 
@@ -949,7 +950,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 package Net::SAML2::Binding::Redirect;
 use Moose;
 
-our $VERSION = '0.74'; # VERSION
+our $VERSION = '0.76'; # VERSION
 
 use Carp qw(croak);
 use Crypt::OpenSSL::RSA;
@@ -38,7 +38,7 @@ has 'sig_hash' => (
     isa      => signingAlgorithm,
     is       => 'ro',
     required => 0,
-    default  => 'sha1'
+    default  => 'sha1' #FIXME: Change default to sha256
 );
 
 has debug => (
@@ -212,7 +212,7 @@ Net::SAML2::Binding::Redirect - HTTP Redirect binding for SAML
 
 =head1 VERSION
 
-version 0.74
+version 0.76
 
 =head1 SYNOPSIS
 
@@ -221,7 +221,7 @@ version 0.74
     url     => $sso_url,							# Service Provider Single Sign Out URL
     param   => 'SAMLRequest' OR 'SAMLResponse',		# Type of request
     cert    => $idp->cert('signing')				# Identity Provider (IdP) certificate
-    sig_hash => 'sha1', 'sha224', 'sha256', 'sha384', 'sha512'  # Signature to sign request
+    sig_hash => 'sha256', 'sha224', 'sha384', 'sha512' or 'sha1'  # Signature to sign request
   );
 
   my $url = $redirect->sign($authnreq);
@@ -269,13 +269,13 @@ Defaults to C<SAMLRequest>.
 
 =item B<sig_hash>
 
-RSA hash to use to sign request
+RSA signature hash used to sign request
 
 Supported:
 
-sha1, sha224, sha256, sha384, sha512
+sha256, sha224, sha384, sha512 and sha1
 
-Defaults to C<sha1>.
+Defaults to C<sha1>.  This will change to C<sha256> in a future release.
 
 =item B<debug>
 
@@ -340,7 +340,7 @@ Timothy Legge <timlegge@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Venda Ltd, see the CONTRIBUTORS file for others.
+This software is copyright (c) 2024 by Venda Ltd, see the CONTRIBUTORS file for others.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

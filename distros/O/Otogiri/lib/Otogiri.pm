@@ -3,7 +3,7 @@ use 5.008005;
 use strict;
 use warnings;
 
-our $VERSION = "0.21";
+our $VERSION = "0.22";
 
 use parent 'Exporter';
 use SQL::QueryMaker;
@@ -36,6 +36,9 @@ Otogiri - A lightweight medicine for using database
 
     use Otogiri;
     my $db = Otogiri->new(connect_info => ['dbi:SQLite:...', '', '']);
+
+    # or use with DBURL
+    my $db = Otogiri->new(dburl => 'sqlite://...');
     
     $db->insert(book => {title => 'mybook1', author => 'me', ...});
 

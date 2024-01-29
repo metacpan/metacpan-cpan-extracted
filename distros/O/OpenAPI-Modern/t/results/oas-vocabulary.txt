@@ -6,6 +6,6 @@ optional tests included: no
 filename                                  pass  todo-fail  fail
 ---------------------------------------------------------------
 discriminator.json                          11          1     0
-formats.json                                37          0     0
+formats.json                                39          0     0
 ---------------------------------------------------------------
-TOTAL                                       48          1     0
+TOTAL                                       50          1     0

@@ -1,6 +1,5 @@
 package File::Rename::Options;
-use strict;
-use warnings;
+use 5.032;  # use strict; use warnings;
 
 use Getopt::Long 2.24 ();
 

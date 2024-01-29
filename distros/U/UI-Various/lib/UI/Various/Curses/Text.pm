@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 use UI::Various::core;
 use UI::Various::Text;
@@ -91,7 +91,8 @@ sub _prepare($$$)
 	error('_1_element_must_be_accompanied_by_parent', __PACKAGE__);
 	return 1;
     }
-    my @attributes = (-width => $self->width);
+    my @attributes = $self->_common_attributes();
+    push @attributes, -width => $self->width;
     if (defined $self->{align})
     {
 	push(@attributes, '-textalignment',

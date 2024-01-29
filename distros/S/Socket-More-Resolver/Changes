@@ -1,0 +1,6 @@
+Revision history for Perl extension Socket::More::Resolver.
+
+0.01  Sat Dec 16 04:48:00 2023
+	- original version; created by h2xs 1.23 with options
+		--name Socket::More::Resolver -X -P -b 5.24.0
+

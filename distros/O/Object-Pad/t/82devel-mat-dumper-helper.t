@@ -11,7 +11,7 @@ BEGIN {
    require Devel::MAT::Dumper;
 }
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 class AClass
 {
@@ -41,7 +41,7 @@ my $df = $pmat->dumpfile;
    is( $classmeta->field_named( "the name SV" )->pv, 'AClass', '$classmeta name SV' );
 
    # Field
-   my @fieldmetas = $classmeta->field_named( "the direct fields AV" )->elems;
+   my @fieldmetas = $classmeta->field_named( "the fields AV" )->elems;
    is( scalar @fieldmetas, 1, '$classmeta has 1 fieldmeta' );
 
    my $fieldmeta = $fieldmetas[0];

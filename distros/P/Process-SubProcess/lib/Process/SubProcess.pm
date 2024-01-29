@@ -1,6 +1,6 @@
 #---------------------------------
 # @author Bodo (Hugo) Barwich
-# @version 2023-10-07
+# @version 2023-12-30
 # @package SubProcess Management
 # @subpackage Process/SubProcess.pm
 
@@ -44,7 +44,7 @@ use IO::Select;
 use IPC::Open3;
 use Symbol qw(gensym);
 
-our $VERSION = '2.1.9';
+our $VERSION = '2.1.12';
 
 =head1 DESCRIPTION
 
@@ -69,7 +69,9 @@ use constant FLAG_STDOUT => 1;
 use constant FLAG_STDERR => 2;
 use constant FLAG_ANYOUT => 3;
 
-=head1 STATIC METHODS
+=head1 METHODS
+
+=head2 Static Methods
 
 =over 4
 
@@ -133,7 +135,7 @@ sub runSubProcess {
 #----------------------------------------------------------------------------
 #Constructors
 
-=head1 CONSTRUCTOR
+=head2 Constructor
 
 =over 4
 
@@ -214,7 +216,7 @@ sub DESTROY {
 #----------------------------------------------------------------------------
 #Administration Methods
 
-=head1 Administration Methods
+=head2 Administration Methods
 
 =over 4
 
@@ -505,6 +507,27 @@ sub setProfiling {
         $self->{'_profiling'} = 0;
     }
 }
+
+=pod
+
+=over 4
+
+=item setDebug ( DEBUG )
+
+This method enables the B<Debug> mode.
+
+B<Parameters:>
+
+C<DEBUG> - whole number to enable or disable the B<Debug> mode. Negative numbers or C< 0 >
+will disable it. Positive numbers or C< 1 > will enable it.
+
+See L<Method C<Kill()>|/"Kill ()">
+
+See L<Method C<freeResources()>|/"freeResources ()">
+
+=back
+
+=cut
 
 sub setDebug {
     my $self = shift;
@@ -1068,15 +1091,26 @@ sub Read {
 
 =over 4
 
-=item Wait ()
+=item Wait ( [ CONFIGURATIONS ] )
 
 This method calls the C<Check()> method continuously for a started process
 which was started with the C<Launch()> method until the C<Check()> method tells that
 the process is finished.
 
-If a C<TIMEOUT> is set through the C<setTimeout()> method the B<Manager Process> will
-terminate the process after the C<TIMEOUT> is fulfilled.
+If a C<TIMEOUT> is set the B<Manager Process> will terminate the process with
+the C<Terminate()> method after the C<TIMEOUT> is fulfilled.
 When a process times out an B<Error Code> of C< 4 > will be set.
+
+B<Parameters:>
+
+C<CONFIGURATIONS> - is a list are passed in a hash like fashion, using key and value pairs.
+
+B<Recognized Configurations:>
+
+C<check> - is an integer that specifies the interval in which all processes should
+be checked once.
+
+C<timeout> - is an integer that specifies the maximal execution time in seconds.
 
 B<Returns:> It returns C< 1 > when the process has finished correctly.
 It returns C< 0 > when the process had to be terminated.
@@ -1174,17 +1208,28 @@ sub Wait {
 
 =over 4
 
-=item Run ()
+=item Run ( [ CONFIGURATIONS ] )
 
 This method starts the process calling the C<Launch()> method and then calls
 the C<Wait()> method to wait until the process is finished.
+
+B<Parameters:>
+
+C<CONFIGURATIONS> - is a list are passed in a hash like fashion, using key and value pairs.
+
+B<Recognized Configurations:>
+
+C<check> - is an integer that specifies the interval in which all processes should
+be checked once.
+
+C<timeout> - is an integer that specifies the maximal execution time in seconds.
 
 B<Returns:> It returns C< 1 > when the process was started and finished correctly.
 It returns C< 0 > when the process could not be started or had to be terminated.
 
 See L<Method C<Launch()>|/"Launch ()">
 
-See L<Method C<Wait()>|/"Wait ()">
+See L<Method C<Wait()>|/"Wait ( [ CONFIGURATIONS ] )">
 
 =back
 
@@ -1289,7 +1334,7 @@ Any not yet read output will get lost.
 This will include an Error Message "I<Process killing ...>"
 and set the Process C<ERROR CODE> to C< 4 > and the C<EXIT CODE> to C< 9 >.
 
-Enabling the C<DEBUG> option will additionally include an B<Error Message> from
+Enabling the B<Debug> mode will additionally include an B<Error Message> from
 which method C<Kill()> was called.
 
 See L<Method C<Check()>|/"Check ()">
@@ -1325,6 +1370,25 @@ sub Kill {
     }       #if($self->isRunning)
 }
 
+=pod
+
+=over 4
+
+=item freeResources ()
+
+This method removes all file handles to used pipes if it is not running anymore.
+
+If the process is still running it will be killed with the C<Kill> method.
+
+Enabling the B<Debug> mode will additionally include an B<Error Message> from
+which method C<freeResources()> was called.
+
+See L<Method C<Kill()>|/"Kill ()">
+
+=back
+
+=cut
+
 sub freeResources {
     my $self = shift;
 
@@ -1346,6 +1410,21 @@ sub freeResources {
     }    #if($self->isRunning < 1)
 }
 
+=pod
+
+=over 4
+
+=item clearErrors ()
+
+This method resets all data collected during the process execution.
+
+This prepares the object for the re-use with a new command or re-launch
+the same command with the same configuration.
+
+=back
+
+=cut
+
 sub clearErrors() {
     my $self = shift;
 
@@ -1360,11 +1439,11 @@ sub clearErrors() {
 #----------------------------------------------------------------------------
 #Consultation Methods
 
-=pod
+=head2 Consultation Methods
 
 =over 4
 
-=item getProcessID
+=item getProcessID ()
 
 This Method will return the B<ProcessID> of the process which was assigned by the system
 at launch time.
@@ -1387,7 +1466,7 @@ sub getProcessID {
 
 =over 4
 
-=item getName
+=item getName ()
 
 This Method will return the Name to the C<Process::SubProcess> object if any was assigned
 with the C<setName()> method.
@@ -1403,6 +1482,27 @@ See L<Method C<setName()>|/"setName ( NAME )">
 sub getName {
     return $_[0]->{"_name"};
 }
+
+=pod
+
+=over 4
+
+=item getNameComplete ()
+
+This Method will return the Name to the C<Process::SubProcess> object if any was assigned
+with the C<setName()> method. Additionally it adds the Process ID of the process.
+
+If the C<NAME> is not set the C<COMMAND> will be used as name.
+
+B<Returns:> The C<NAME> with C<PID> of the C<Process::SubProcess> object as string.
+
+See L<Method C<setName()>|/"setName ( NAME )">
+
+See L<Method C<getName()>|/"getName ()">
+
+=back
+
+=cut
 
 sub getNameComplete {
     my $self = $_[0];
@@ -1545,6 +1645,22 @@ sub getExecutionTime {
 sub isProfiling {
     return $_[0]->{'_profiling'};
 }
+
+=pod
+
+=over 4
+
+=item isDebug ()
+
+This Method indicates whether the B<Debug> mode is enabled.
+
+B<Returns:> It returns whole number representing the B<Debug> mode.
+
+See L<Method C<setDebug()>|/"setDebug ( DEBUG )">
+
+=back
+
+=cut
 
 sub isDebug {
     return $_[0]->{'_debug'};

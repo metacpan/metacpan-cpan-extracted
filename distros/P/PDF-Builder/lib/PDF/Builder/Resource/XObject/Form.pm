@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '2.031'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 
@@ -16,11 +16,15 @@ PDF::Builder::Resource::XObject::Form - Base class for external form objects
 
 =head1 METHODS
 
+=head2 new
+
+    $form = PDF::Builder::Resource::XObject::Form->new($pdf)
+
 =over
 
-=item $form = PDF::Builder::Resource::XObject::Form->new($pdf)
-
 Creates a form resource.
+
+=back
 
 =cut
 
@@ -35,9 +39,15 @@ sub new {
     return $self;
 }
 
-=item ($llx, $lly, $urx, $ury) = $form->bbox($llx, $lly, $urx, $ury)
+=head2 bbox
 
-Get or set the coordinates of the form object's bounding box
+    ($llx, $lly, $urx, $ury) = $form->bbox($llx, $lly, $urx, $ury)
+
+=over
+
+Get or set the coordinates of the form object's bounding box.
+
+=back
 
 =cut
 
@@ -51,13 +61,19 @@ sub bbox {
     return map { $_->val() } $self->{'BBox'}->elements();
 }
 
-=item $resource = $form->resource($type, $key)
+=head2 resource
 
-=item $form->resource($type, $key, $object, $force)
+    $resource = $form->resource($type, $key)
+
+    $form->resource($type, $key, $object, $force)
+
+=over
 
 Get or add a resource required by the form's contents, such as a Font, XObject, ColorSpace, etc.
 
 By default, an existing C<$key> will not be overwritten. Set C<$force> to override this behavior.
+
+=back
 
 =cut
 
@@ -86,9 +102,5 @@ sub resource {
 
     return $dict;
 }
-
-=back
-
-=cut
 
 1;

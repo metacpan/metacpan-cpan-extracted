@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Util;
@@ -17,11 +17,15 @@ PDF::Builder::Resource::ExtGState - Graphics state dictionary support
 
 =head1 METHODS
 
+=head2 new
+
+    $egs = PDF::Builder::Resource::ExtGState->new(@parameters)
+
 =over
 
-=item $egs = PDF::Builder::Resource::ExtGState->new(@parameters)
-
 Returns a new extgstate object (called from $pdf->egstate()).
+
+=back
 
 =cut
 
@@ -34,7 +38,15 @@ sub new {
     return $self;
 }
 
-=item $egs->strokeadjust($boolean)
+=head2 strokeadjust
+
+    $egs->strokeadjust($boolean)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -45,7 +57,15 @@ sub strokeadjust {
     return $self;
 }
 
-=item $egs->strokeoverprint($boolean)
+=head2 strokeoverprint
+
+    $egs->strokeoverprint($boolean)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -56,7 +76,15 @@ sub strokeoverprint {
     return $self;
 }
 
-=item $egs->filloverprint($boolean)
+=head2 filloverprint
+
+    $egs->filloverprint($boolean)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -67,7 +95,15 @@ sub filloverprint {
     return $self;
 }
 
-=item $egs->overprintmode($num)
+=head2 overprintmode
+
+    $egs->overprintmode($num)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -78,7 +114,15 @@ sub overprintmode {
     return $self;
 }
 
-=item $egs->blackgeneration($obj)
+=head2 blackgeneration
+
+    $egs->blackgeneration($obj)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -89,7 +133,15 @@ sub blackgeneration {
     return $self;
 }
 
-=item $egs->blackgeneration2($obj)
+=head2 blackgeneration2
+
+    $egs->blackgeneration2($obj)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -100,7 +152,15 @@ sub blackgeneration2 {
     return $self;
 }
 
-=item $egs->undercolorremoval($obj)
+=head2 undercolorremoval
+
+    $egs->undercolorremoval($obj)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -111,7 +171,15 @@ sub undercolorremoval {
     return $self;
 }
 
-=item $egs->undercolorremoval2($obj)
+=head2 undercolorremoval2
+
+    $egs->undercolorremoval2($obj)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -122,7 +190,15 @@ sub undercolorremoval2 {
     return $self;
 }
 
-=item $egs->transfer($obj)
+=head2 transfer
+
+    $egs->transfer($obj)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -133,7 +209,15 @@ sub transfer {
     return $self;
 }
 
-=item $egs->transfer2($obj)
+=head2 transfer2
+
+    $egs->transfer2($obj)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -144,7 +228,15 @@ sub transfer2 {
     return $self;
 }
 
-=item $egs->halftone($obj)
+=head2 halftone
+
+    $egs->halftone($obj)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -155,7 +247,15 @@ sub halftone {
     return $self;
 }
 
-=item $egs->halftonephase($obj)
+=head2 halftonephase
+
+    $egs->halftonephase($obj)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -168,7 +268,15 @@ sub halftonephase {
     return $self;
 }
 
-=item $egs->smoothness($num)
+=head2 smoothness
+
+    $egs->smoothness($num)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -179,7 +287,15 @@ sub smoothness {
     return $self;
 }
 
-=item $egs->font($font, $size)
+=head2 font
+
+    $egs->font($font, $size)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -190,7 +306,15 @@ sub font {
     return $self;
 }
 
-=item $egs->linewidth($size)
+=head2 linewidth
+
+    $egs->linewidth($size)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -201,7 +325,15 @@ sub linewidth {
     return $self;
 }
 
-=item $egs->linecap($cap)
+=head2 linecap
+
+    $egs->linecap($cap)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -212,7 +344,15 @@ sub linecap {
     return $self;
 }
 
-=item $egs->linejoin($join)
+=head2 linejoin
+
+    $egs->linejoin($join)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -223,7 +363,15 @@ sub linejoin {
     return $self;
 }
 
-=item $egs->miterlimit($limit)
+=head2 miterlimit
+
+    $egs->miterlimit($limit)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -236,7 +384,15 @@ sub miterlimit {
 
 # Note: miterlimit was originally named incorrectly as meterlimit, renamed
 
-=item $egs->dash(@dash)
+=head2 dash
+
+    $egs->dash(@dash)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -247,7 +403,15 @@ sub dash {
     return $self;
 }
 
-=item $egs->flatness($flat)
+=head2 flatness
+
+    $egs->flatness($flat)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -258,7 +422,15 @@ sub flatness {
     return $self;
 }
 
-=item $egs->renderingintent($intentName)
+=head2 renderingintent
+
+    $egs->renderingintent($intentName)
+
+=over
+
+(No information)
+
+=back
 
 =cut
 
@@ -269,11 +441,17 @@ sub renderingintent {
     return $self;
 }
 
-=item $egs->strokealpha($alpha)
+=head2 strokealpha
+
+    $egs->strokealpha($alpha)
+
+=over
 
 The current stroking alpha constant, specifying the
 constant shape or constant opacity value to be used
 for stroking operations in the transparent imaging model.
+
+=back
 
 =cut
 
@@ -284,9 +462,15 @@ sub strokealpha {
     return $self;
 }
 
-=item $egs->fillalpha($alpha)
+=head2 fillalpha
+
+    $egs->fillalpha($alpha)
+
+=over
 
 Same as strokealpha, but for nonstroking (fill) operations.
+
+=back
 
 =cut
 
@@ -297,11 +481,17 @@ sub fillalpha {
     return $self;
 }
 
-=item $egs->blendmode($blendname)
+=head2 blendmode
 
-=item $egs->blendmode($blendfunctionobj)
+    $egs->blendmode($blendname)
+
+    $egs->blendmode($blendfunctionobj)
+
+=over
 
 The current blend mode to be used in the transparent imaging model.
+
+=back
 
 =cut
 
@@ -316,12 +506,18 @@ sub blendmode {
     return $self;
 }
 
-=item $egs->alphaisshape($boolean)
+=head2 alphaisshape
+
+    $egs->alphaisshape($boolean)
+
+=over
 
 The alpha source flag (alpha is shape), specifying
 whether the current soft mask and alpha constant
 are to be interpreted as shape values (I<true>) or
 opacity values (I<false>).
+
+=back
 
 =cut
 
@@ -332,11 +528,17 @@ sub alphaisshape {
     return $self;
 }
 
-=item $egs->textknockout($boolean)
+=head2 textknockout
+
+    $egs->textknockout($boolean)
+
+=over
 
 The text knockout flag, which determines the behavior
 of overlapping glyphs within a text object in the
 transparent imaging model.
+
+=back
 
 =cut
 
@@ -347,11 +549,17 @@ sub textknockout {
     return $self;
 }
 
-=item $egs->transparency($t)
+=head2 transparency
+
+    $egs->transparency($t)
+
+=over
 
 The graphics transparency, with 0 being fully opaque and 1 being fully 
 transparent. This is a convenience method, setting proper values for 
 C<strokealpha> and C<fillalpha>.
+
+=back
 
 =cut
 
@@ -363,11 +571,17 @@ sub transparency {
     return $self;
 }
 
-=item $egs->opacity($op)
+=head2 opacity
+
+    $egs->opacity($op)
+
+=over
 
 The graphics opacity, with 1 being fully opaque and 0 being fully transparent.
 This is a convenience method, setting proper values for C<strokealpha> and 
 C<fillalpha>.
+
+=back
 
 =cut
 
@@ -388,9 +602,5 @@ sub opacity {
 #    }
 #    return $self->SUPER::outobjdeep(@opts);
 #}
-
-=back
-
-=cut
 
 1;

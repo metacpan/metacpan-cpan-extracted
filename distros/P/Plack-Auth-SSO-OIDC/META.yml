@@ -2,25 +2,30 @@
 abstract: 'implementation of OpenID Connect for Plack::Auth::SSO'
 author:
   - 'Nicolas Franck, C<< <nicolas.franck at ugent.be> >>'
-build_requires:
-  Module::Build: '0.28'
+build_requires: {}
 configure_requires:
-  Module::Build: '0.28'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150001'
-license: perl
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150001'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Plack-Auth-SSO-OIDC
 no_index:
   directory:
-    - eg
-    - examples
-    - inc
-    - share
     - t
     - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Auth::SSO::OIDC:
+    file: lib/Plack/Auth/SSO/OIDC.pm
+    version: '0.014'
 requires:
   Crypt::JWT: '0'
   Data::UUID: '0'
@@ -39,7 +44,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Plack-Auth-SSO-OIDC/issues
   homepage: https://github.com/LibreCat/Plack-Auth-SSO-OIDC
   repository: https://github.com/LibreCat/Plack-Auth-SSO-OIDC.git
-version: '0.013'
+version: '0.014'
 x_contributors:
   - 'Nicolas Franck <nicolas.franck@ugent.be>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_static_install: 1

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Bg::Any::Bg - Package for language Bulgarian
 
 package Locale::CLDR::Locales::Bg::Any::Bg;
 # This file auto generated from Data\common\main\bg_BG.xml
-#	on Tue  5 Dec  1:02:17 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';

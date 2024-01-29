@@ -1,5 +1,4 @@
 use warnings;
-use lib 'inc';
 use Test::More;
 use strict;
 use IO::String;
@@ -254,6 +253,8 @@ sub op {
                         oidcRPMetaDataOptionsLogoutBypassConfirm    => 1,
                         oidcRPMetaDataOptionsPostLogoutRedirectUris =>
                           "http://auth.rp.com?logout=1",
+                        oidcRPMetaDataOptionsRedirectUris =>
+                          'http://auth.rp.com?openidconnectcallback=1',
                     }
                 },
                 oidcOPMetaDataOptions           => {},

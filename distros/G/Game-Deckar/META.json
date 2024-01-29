@@ -1,0 +1,56 @@
+{
+   "abstract" : "a module for wrangling decks of cards",
+   "author" : [
+      "Jeremy Mates <jmates@thrig.me>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Game-Deckar",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Object::Pad" : "0.66",
+            "perl" : "v5.26.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Test2::V0" : "0.000060",
+            "perl" : "v5.26.0"
+         }
+      }
+   },
+   "provides" : {
+      "Game::Deckar" : {
+         "file" : "lib/Game/Deckar.pm",
+         "version" : "0.02"
+      },
+      "Game::Deckar::Card" : {
+         "file" : "lib/Game/Deckar.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/BSD-3-Clause"
+      ],
+      "repository" : {
+         "url" : "https://thrig.me/src/Game-Deckar.git"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

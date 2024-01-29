@@ -58,3 +58,31 @@ Revision history for Dispatch::Fu.
 0.99 Sat Sep 30 20:05:09 2023
      - fixed xdefault to allow for the first parameter to
        to be C<undef>
+
+1.00 Tues Dec 12 20:00:00 2023
+     - changes reverted but published
+     - replaced with 1.1
+
+1.01 Tues Dec 12 20:00:01 2023
+     - adding a C<warn> when C<on> is used in the void context,
+       which could become a more common error (thanks to tonycoz)
+
+1.02 Tues Dec 12 00:10:02 2023
+     - added proper warnings using "Carp" module; updated POD
+     - added "croak" if no cases are defined or unhandles cases are called
+     - public thank you to tonycoz for the suggestion to add
+       a warn when "on" is used in void or scalar context
+
+1.03 Wed Dec 13 01:01:01 2023
+     - fixed POD warnings
+
+1.04 Wed Dec 13 01:02:01 2023
+     - found and fixed an issue with the dispatched subroutine
+       not being able to return whatever it wants (e.g., fixed);
+       it now works as expected it - no restrictions on what it
+       can return. See C<t/04-return-values.t> for an example
+     - added test, updated POD to clarify this point
+
+1.05 Thu Dec 14 01:02:01 2023
+     - no functional changes
+     - POD updates only

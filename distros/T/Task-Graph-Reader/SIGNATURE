@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,38 +12,43 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 5e6b8a402f5d0b4019198c2919bca657b433572c Changes
-SHA1 fda23a0b314432c4a81e8d7beb5290e9f0219c73 LICENSE
-SHA1 d338ff57b6197d2af4cb1a2f97a5d621bcfc948a MANIFEST
-SHA1 979884f9d337ee9b9b8f146226626d2bb8ce54bd META.yml
-SHA1 a5612edce6fe2764fbdd4767b697fbc163f11016 Makefile.PL
-SHA1 941e11acfb1efacb52d45102d1dd8a29d8b4895a README
-SHA1 292a059a69758c7a3c6a331259725e48b6bcc4f0 Reader.pm
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 17f02c6fbaee2383172b0e1768535c707e3ebf58 t/Task-Graph-Reader/01-use.t
-SHA1 9679d4a83786091e4ce1af2f2012c47b3fa32720 t/Task-Graph-Reader/02-version.t
-SHA1 47834f1eb134f6cb0ef986147b52dcf96a4744ea xt/Task-Graph-Reader/01-pod_coverage.t
-SHA1 a0bf84cf927365b3cf3a1b15d8f5209dc2be1224 xt/Task-Graph-Reader/02-pod.t
+SHA256 bf1190b868da08600225ef9870ae858ef8970bc5725ad43df491884ac0001bed Changes
+SHA256 dc2f254fe0d068b697f028848325ab60e7608aa63c419eb9276b683f1754efbc LICENSE
+SHA256 d12c4fddb7417597238319a51ef61df9aa065fd9f4c4e72c4f3353b1d1e61140 MANIFEST
+SHA256 e4afecfce13810cfb3a13d96747e1dc1309e4990843f98a744167981d7a82606 META.yml
+SHA256 22e893c0817ad4e18fd7c208aa066efc0258e6c91c1a66762ae2bead448a4f5e Makefile.PL
+SHA256 51d3ffd9478458f4fead0b709a2d83c87ecfbfa57363abb5291c7ba0f3e6d6d5 README
+SHA256 4063a75de7c9bc44e546423de29e3a5ba109298fba24320c49e80693ac58b869 Reader.pm
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 c43e4201beafb324764286d0b087bda470e4d2fb8dccfdbc165cbc2bbf5c8f33 t/Task-Graph-Reader/01-use.t
+SHA256 2ffa31e0cd025e61d7c59da2a220087f39dc885d6636baba508c7935e8fe0536 t/Task-Graph-Reader/02-version.t
+SHA256 317b14a913df4c874e8b8bc4ee19bcfd0693c72fc36ecf7fc3d6240517883db1 xt/Task-Graph-Reader/01-pod_coverage.t
+SHA256 d0e959feae7bb2800ae51ea78cb9e6a109d93d10b21249eb64bb209e08ef0364 xt/Task-Graph-Reader/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWOTA1AAoJEJe+XXKaIuTlHLEH/2A1G5LlkCr1RCAgJTXutOLK
-SrZDALiz/JdArSNMYRPMkAA/O9gqkUXibG+iqFcmWpfpouQMPvHF3BbScBdEQWBq
-HTgtDSG7k9HVWm0uKlqm0woLZSHZCdefoyuSDgapSsccgFBN6qLcwMXlB0Plla5o
-Yg8Sa71Alxc1CpXsYJVFo7aYPuRTm9FFHPCvnFYYS4HZJrzwiOeV3JSvMawaEvoS
-LCvKtmDjzpbvbidY0o2T676KqvrSnMvhNx32ThpsJR2FAFeGfBY2uugvM26DiEKn
-/MMDOEA7IpvN4/LH4qYTeICv+/3n/meQ/syjiH1U/hFBcsJI366695L+c1aXu7o=
-=sxRS
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmWVUaoACgkQojV9Rpe/
+B8s62w//Um22iDEQNoLDteuo9B0vLRJa6OYU/chVpZcQlhBqFFwGKbYMboJVuCJZ
+bShIoAdH7qDQnA4b/Q7CbwI/j4V9OTGtIPrvamfAyLhhqbp5Xq9MLw5altbcsq8g
+zj3Jci0qLRizH6Keo90adS7rej8+zto/1Jy75QUBbM28nTdwSCJreW19Sb/knKq+
+I6Y4TN3zAXFTudehLJbV8kz7ASChEfQXNlbfR+PrRSbHZkwN6ZRaedmzmOMvgmDV
+erRHzbLT9I+z7ADRAGscVNqgj16kJbjk4wbsOAXdGtduY0cFX0dA5o+87wtYZX6A
+snV3aQYc6cWGX1YjeeWx38tY0drWzXSYpq4KYgQH1cDnUKAiYgnDaGP6mv0qwr1C
+vF7q/HeAuv2SNNoLflebapKnxLtL1wjbFDYlyEeQQ/Z4zD0nqG1+EY5HPhA5Uffs
+OemKYZ3fUaE/guX9QjPWCwR5chdjY+zSkTHG6Oclup9He6A113VAKiFM/CWZZqFY
+Es0gark7eM3c5gkp+WNN/Xrgyv1CrjWDWNDiQ/QmmR4/wBKsOVH0oCfpYVVQcokT
+cS/WeLemkwzcFBl/wmnLf91bHoFvQgA4bm+BxddwUaeowCzW0OcWOEhQLfXbGd9j
+DCqK+O5EGKRn/kWdnE0GNV+Oa3rgiz6SfsS85M7QWxl30BnW/fA=
+=lKJR
 -----END PGP SIGNATURE-----

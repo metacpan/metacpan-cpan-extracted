@@ -7,7 +7,7 @@ use Module::Loader;
 use List::MoreUtils ();
 use Git::Lint::Command;
 
-our $VERSION = '0.016';
+our $VERSION = '1.000';
 
 sub load {
     my $class = shift;
@@ -15,6 +15,25 @@ sub load {
 
     $self->{profiles}{commit}{default}  = [];
     $self->{profiles}{message}{default} = [];
+
+    bless $self, $class;
+
+    my $user_config = $self->user_config();
+
+    # add user defined config settings
+    if ( exists $user_config->{config} ) {
+        $self->{config} = $user_config->{config};
+    }
+
+    # if localdir is defined, add it into INC to load modules from
+    if ( exists $self->{config} && defined $self->{config}{localdir} ) {
+        if ( -d $self->{config}{localdir} ) {
+            push @INC, $self->{config}{localdir};
+        }
+        else {
+            warn "git-lint: [warn] configured localdir $self->{config}{localdir} isn't a readable directory\n";
+        }
+    }
 
     # all check modules are added to the default profile
     my $loader        = Module::Loader->new;
@@ -32,16 +51,10 @@ sub load {
         $self->{profiles}{message}{default} = \@message_checks;
     }
 
-    bless $self, $class;
-
-    my $user_config = $self->user_config();
-
     # user defined profiles override internally defined profiles
-    foreach my $cat ( keys %{$user_config} ) {
-        foreach my $check ( keys %{ $user_config->{$cat} } ) {
-            foreach my $profile ( keys %{ $user_config->{$cat}{$check} } ) {
-                $self->{$cat}{$check}{$profile} = $user_config->{$cat}{$check}{$profile};
-            }
+    foreach my $check ( keys %{ $user_config->{profiles} } ) {
+        foreach my $profile ( keys %{ $user_config->{profiles}{$check} } ) {
+            $self->{profiles}{$check}{$profile} = $user_config->{profiles}{$check}{$profile};
         }
     }
 
@@ -57,15 +70,32 @@ sub user_config {
 
     # if there is no user config, the git config command above will return 1
     # but without stderr.
-    die "git-lint: $stderr\n" if $exit && $stderr;
+    if ( $exit && !$stderr ) {
+        die "configuration setup is required. see the documentation for instructions.\n";
+    }
+
+    # if there was an error, propagate that up.
+    if ( $exit && $stderr ) {
+        die "$stderr\n";
+    }
 
     my %parsed_config = ();
+
+    # load check profiles
     foreach my $line ( split( /\n/, $stdout ) ) {
-        next unless $line =~ /^lint\.(\w+).(\w+).(\w+)\s+(.+)$/;
-        my ( $cat, $check, $profile, $value ) = ( $1, $2, $3, $4 );
+        next unless $line =~ /^lint\.profiles\.(\w+)\.(\w+)\s+(.+)$/;
+        my ( $check, $profile, $value ) = ( $1, $2, $3 );
 
         my @values = List::MoreUtils::apply {s/^\s+|\s+$//g} split( /,/, $value );
-        push @{ $parsed_config{$cat}{$check}{$profile} }, @values;
+        push @{ $parsed_config{profiles}{$check}{$profile} }, @values;
+    }
+
+    # load other config settings
+    foreach my $line ( split( /\n/, $stdout ) ) {
+        if ( $line =~ /^lint\.config\.localdir\s+(.+)$/ ) {
+            my ($value) = ($1);
+            $parsed_config{config}{localdir} = $value;
+        }
     }
 
     return \%parsed_config;

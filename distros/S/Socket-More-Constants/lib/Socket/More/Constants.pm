@@ -1,6 +1,7 @@
-use v5.36;
+use strict;
+use warnings;
 package Socket::More::Constants;
-our $VERSION='v0.1.0';
+our $VERSION='v0.1.1';
 my %table;
 BEGIN {%table=(
  AF_APPLETALK => 16,
@@ -167,5 +168,5 @@ BEGIN {%table=(
  TCP_NOPUSH => 4,
 );}
 use constant::more %table;
-use Export::These keys %table;
+use Export::These export_pass=>[], keys %table;
 1;

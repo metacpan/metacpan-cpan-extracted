@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Kkj - Package for language Kako
 
 package Locale::CLDR::Locales::Kkj;
 # This file auto generated from Data\common\main\kkj.xml
-#	on Tue  5 Dec  1:17:47 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'en' => 'yaman',
@@ -48,7 +48,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'CM' => 'Kamɛrun',
 
@@ -68,7 +68,7 @@ has 'characters' => (
 			auxiliary => qr{[q x z]},
 			index => ['A', 'B', 'Ɓ', 'C', 'D', 'Ɗ', '{Ɗy}', 'E', 'Ɛ', 'F', 'G', '{Gb}', '{Gw}', 'H', 'I', '{I\u0327}', 'J', 'K', '{Kp}', '{Kw}', 'L', 'M', '{Mb}', 'N', '{Nd}', 'ǋ', '{Ny}', 'Ŋ', '{Ŋg}', '{Ŋgb}', '{Ŋgw}', 'O', 'Ɔ', '{Ɔ\u0327}', 'P', 'R', 'S', 'T', 'U', '{U\u0327}', 'V', 'W', 'Y'],
 			main => qr{[a á à â {a̧} b ɓ c d ɗ {ɗy} e é è ê ɛ {ɛ́} {ɛ̀} {ɛ̂} {ɛ̧} f g {gb} {gw} h i í ì î {i̧} j k {kp} {kw} l m {mb} n {nd} ǌ {ny} ŋ {ŋg} {ŋgb} {ŋgw} o ó ò ô ɔ {ɔ́} {ɔ̀} {ɔ̂} {ɔ̧} p r s t u ú ù û {u̧} v w y]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 			punctuation => qr{[, \: ! ? . … ‘ ‹ › “ ” « » ( ) *]},
 		};
 	},
@@ -178,7 +178,7 @@ has 'calendar_months' => (
 							'fɛ',
 							'njapi',
 							'nyukul',
-							'11',
+							'M11',
 							'ɓulɓusɛ'
 						],
 						leap => [
@@ -199,7 +199,7 @@ has 'calendar_months' => (
 							'fɛ',
 							'njapi',
 							'nyukul',
-							'11',
+							'M11',
 							'ɓulɓusɛ'
 						],
 						leap => [

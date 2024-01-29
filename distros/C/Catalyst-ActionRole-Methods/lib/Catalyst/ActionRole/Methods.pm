@@ -2,7 +2,7 @@ package Catalyst::ActionRole::Methods;
 
 use Moose::Role;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 around 'dispatch', sub {
     my $orig = shift;
@@ -114,6 +114,12 @@ sub _return_not_implemented {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 

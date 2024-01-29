@@ -1,7 +1,8 @@
-.gitignore
 Changes
 LICENSE
 MANIFEST
+META.json
+META.yml
 Makefile.PL
 README
 levels/level0
@@ -11,10 +12,10 @@ levels/level3
 levels/level4
 levels/level5
 levels/level6
+levels/level7
+levels/level8
 lib/Game/PlatformsOfPeril.pm
 pperil
 t/00-load.t
 t/pod.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
 SIGNATURE                                Public-key signature (added by MakeMaker)

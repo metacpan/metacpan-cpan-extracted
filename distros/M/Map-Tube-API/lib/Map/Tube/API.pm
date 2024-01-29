@@ -1,6 +1,6 @@
 package Map::Tube::API;
 
-$Map::Tube::API::VERSION   = '0.05';
+$Map::Tube::API::VERSION   = '0.07';
 $Map::Tube::API::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::API - Interface to Map::Tube REST API.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =cut
 
@@ -23,11 +23,8 @@ use Moo;
 use namespace::autoclean;
 extends 'Map::Tube::API::UserAgent';
 
-our $DEFAULT_HOST    = 'manwar.mooo.info';
-our $DEFAULT_VERSION = 'v1';
-
-has 'host'    => (is => 'rw', default => sub { $DEFAULT_HOST    });
-has 'version' => (is => 'rw', default => sub { $DEFAULT_VERSION });
+has 'base_url' => (is => 'ro', default => sub { $ENV{'MAP_BASE_URL'} });
+has 'version'  => (is => 'ro', default => sub { $ENV{'MAP_VERSION'} || 'v1' });
 
 =head1 DESCRIPTION
 
@@ -42,6 +39,8 @@ Map::Tube REST API is still in beta. No API key is required at the moment.
 =item Beijing
 
 =item Berlin
+
+=item Bielefeld
 
 =item Bucharest
 
@@ -103,8 +102,10 @@ Map::Tube REST API is still in beta. No API key is required at the moment.
 
 =head1 CONSTRUCTOR
 
-Optionally you can provide C<host> of REST API and also  the C<version>. Default
+Optionally you can provide C<base_url> of REST API and also  the C<version>. Default
 version is C<v1>.
+
+You can even set the environment variable C<MAP_BASE_URL> and C<MAP_VERSION>.
 
     use strict; use warnings;
     use Map::Tube::API;
@@ -249,12 +250,15 @@ sub available_maps {
 sub _base_url {
     my ($self) = @_;
 
-    return sprintf("http://%s/map-tube/%s", $self->host, $self->version);
+    die "ERROR: Missing map base url, please set env MAP_BASE_URL."
+        unless defined $self->base_url;
+
+    return sprintf("%s/map-tube/%s", $self->base_url, $self->version);
 }
 
 =head1 AUTHOR
 
-Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
+Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
@@ -277,9 +281,9 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * BUGS / ISSUES
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Map-Tube-API>
+L<https://github.com/manwar/Map-Tube-API/issues>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -289,15 +293,15 @@ L<http://annocpan.org/dist/Map-Tube-API>
 
 L<http://cpanratings.perl.org/d/Map-Tube-API>
 
-=item * Search CPAN
+=item * Search MetaCPAN
 
-L<http://search.cpan.org/dist/Map-Tube-API/>
+L<https://metacpan.org/pod/Map::Tube::API>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 Mohammad S Anwar.
+Copyright (C) 2024 Mohammad Sajid Anwar.
 
 This  program  is  free software; you can redistribute it and/or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a copy of the full

@@ -238,7 +238,7 @@ sub join_all() {
 
 =head2 END
 
-Detect any non-repeaed processes.
+Detect any non-reaped processes.
 
 =cut
 

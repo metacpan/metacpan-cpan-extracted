@@ -1,0 +1,26 @@
+.github/workflows/linux-ubuntu-latest-32bit.yml
+.github/workflows/linux-ubuntu-latest-perl-5.8.9.yml
+.github/workflows/linux-ubuntu-latest.yml
+.github/workflows/macos-latest.yml
+.github/workflows/windows-2019.yml
+.github/workflows/windows-latest.yml
+.gitignore
+Changes
+lib/SPVM/Unicode/Normalize.c
+lib/SPVM/Unicode/Normalize.config
+lib/SPVM/Unicode/Normalize.native/include/.gitkeep
+lib/SPVM/Unicode/Normalize.native/include/spvm_utf8proc.h
+lib/SPVM/Unicode/Normalize.native/include/spvm_utf8proc_data.c
+lib/SPVM/Unicode/Normalize.native/src/.gitkeep
+lib/SPVM/Unicode/Normalize.native/src/spvm_utf8proc.c
+lib/SPVM/Unicode/Normalize.pm
+lib/SPVM/Unicode/Normalize.spvm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/basic.t
+t/lib/SPVM/TestCase/Unicode/Normalize.spvm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

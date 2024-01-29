@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230903131448;
+our $VERSION = 1.20231210185946;
 
 my $formatters = [];
 
@@ -47,26 +47,26 @@ my $validators = {
                 'voip' => '262\\d\\d'
               };
 my %areanames = ();
-$areanames{fr} = {"290267", "Sainte\-Hélène",
-"290266", "Sainte\-Hélène",
-"290264", "Sainte\-Hélène",
-"29027", "Sainte\-Hélène",
+$areanames{fr} = {"290268", "Sainte\-Hélène",
 "290269", "Sainte\-Hélène",
+"290266", "Sainte\-Hélène",
+"29027", "Sainte\-Hélène",
+"290267", "Sainte\-Hélène",
+"29024", "Sainte\-Hélène",
 "290265", "Sainte\-Hélène",
 "29023", "Sainte\-Hélène",
-"29024", "Sainte\-Hélène",
-"290268", "Sainte\-Hélène",};
-$areanames{en} = {"290268", "St\.\ Helena",
-"29024", "St\.\ Helena",
-"290265", "St\.\ Helena",
+"290264", "Sainte\-Hélène",};
+$areanames{en} = {"290264", "St\.\ Helena",
 "29023", "St\.\ Helena",
-"29022", "Jamestown",
-"290269", "St\.\ Helena",
-"2908", "Tristan\ da\ Cunha",
-"290264", "St\.\ Helena",
+"290265", "St\.\ Helena",
+"29024", "St\.\ Helena",
+"290267", "St\.\ Helena",
 "29027", "St\.\ Helena",
-"290266", "St\.\ Helena",
-"290267", "St\.\ Helena",};
+"2908", "Tristan\ da\ Cunha",
+"290269", "St\.\ Helena",
+"29022", "Jamestown",
+"290268", "St\.\ Helena",
+"290266", "St\.\ Helena",};
 
     sub new {
       my $class = shift;

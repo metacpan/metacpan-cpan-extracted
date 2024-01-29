@@ -4,7 +4,7 @@ StreamFinder::Bitchute - Fetch actual raw streamable URLs from Bitchute.com.
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2023 by
+This module is Copyright (C) 2017-2024 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -337,7 +337,7 @@ L<http://search.cpan.org/dist/StreamFinder-Bitchute/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2023 Jim Turner.
+Copyright 2017-2024 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -482,10 +482,10 @@ sub new
 		if ($html =~ m#\<link\s+rel\=\"canonical\"\s+href\=\"([^\"]+)#) {
 			$url2fetch = $1;
 			$url2fetch = 'https://' . $url2fetch  unless ($url2fetch =~ /^https?\:/);
-			print STDERR "i:We got the canonical URL from it!\n";
+			print STDERR "i:We got the canonical URL from it!\n"  if ($DEBUG);
 		} else {
 			$url2fetch =~ s#\/embed\/#\/video\/#;
-			print STDERR "w:No canonical URL found, try converting embed url to fallback video url.\n";
+			print STDERR "w:No canonical URL found, try converting embed url to fallback video url.\n"  if ($DEBUG);
 		}
 		#WE CAN STILL GO AHEAD AND GRAB THE TITLE & COVER-ART ICON HERE:
 		$self->{'title'} = $1  if ($html =~ m#\<title\>([^\<]+)\<#s);

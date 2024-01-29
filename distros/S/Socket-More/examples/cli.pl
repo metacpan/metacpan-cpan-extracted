@@ -1,6 +1,6 @@
 #Example for processing command line arguments
 use v5.36;
-use Socket::More ":all";
+use Socket::More;
 use Getopt::Long;
 
 use Data::Dumper;

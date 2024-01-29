@@ -1,7 +1,3 @@
-#
-# $Id$
-#
-
 =head1 NAME
 
 AudioFile::Info::MP3::Tag - Perl extension to get info from MP3 files.
@@ -24,7 +20,7 @@ use Carp;
 
 use MP3::Tag;
 
-our $VERSION = '1.6.3';
+our $VERSION = '1.6.4';
 
 my %data = (artist => ['artist', 'TPE1'],
             title  => ['song', 'TIT2'],
@@ -51,7 +47,7 @@ sub DESTROY {
 sub AUTOLOAD {
   our $AUTOLOAD;
 
-  my ($pkg, $sub) = $AUTOLOAD =~ /(.+)::(\w+)/;
+  my ($sub) = $AUTOLOAD =~ /::(\w+)$/;
 
   die "Invalid attribute $sub" unless exists $data{$sub};
 

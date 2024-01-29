@@ -6,12 +6,10 @@
 package Lemonldap::NG::Portal::Lib::OpenIDConnect;
 
 use strict;
-use Crypt::OpenSSL::Bignum;
 use Crypt::OpenSSL::RSA;
 use Crypt::OpenSSL::X509;
-use Digest::SHA
-  qw/sha1 hmac_sha256_base64 hmac_sha384_base64 hmac_sha512_base64 sha256 sha384
-  sha512 sha256_base64 sha384_base64 sha512_base64/;
+use Crypt::JWT  qw(encode_jwt decode_jwt);
+use Digest::SHA qw/sha1 hmac_sha256_base64 sha256 sha384 sha512 sha256_base64/;
 use JSON;
 use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Common::UserAgent;
@@ -28,7 +26,7 @@ use URI;
 
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_REDIRECT PE_ERROR);
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.18.1';
 
 use constant BACKCHANNEL_EVENTSKEY =>
   'http://schemas.openid.net/event/backchannel-logout';
@@ -59,6 +57,22 @@ use constant COMPLEX_CLAIM => {
     country        => "address",
 };
 
+use constant ENC_ALG_SUPPORTED => [ qw(
+      RSA-OAEP ECDH-ES RSA-OAEP-256
+      ECDH-ES+A256KW
+      ECDH-ES+A192KW
+      ECDH-ES+A128KW
+      RSA1_5
+    )
+];
+
+# Unsupported: A128KW A192KW A256KW A128GCMKW A192GCMKW A256GCMKW PBES2-HS256+A128KW PBES2-HS384+A192KW PBES2-HS512+A256KW
+
+use constant ENC_SUPPORTED => [ qw(
+      A256CBC-HS512 A256GCM A192CBC-HS384 A192GCM A128CBC-HS256 A128GCM
+    )
+];
+
 # PROPERTIES
 
 has opAttributes => ( is => 'rw', default => sub { {} } );
@@ -71,6 +85,8 @@ has rpOptions    => ( is => 'rw', default => sub { {} }, );
 has rpRules      => ( is => 'rw', default => sub { {} } );
 has rpScopes     => ( is => 'rw', default => sub { {} } );
 has rpScopeRules => ( is => 'rw', default => sub { {} } );
+has rpEncKey     => ( is => 'rw', default => sub { {} } );
+has rpSigKey     => ( is => 'rw', default => sub { {} } );
 
 # Deprecated names, remove in 3.0
 *oidcOPList   = *opMetadata;
@@ -150,29 +166,6 @@ sub loadOPs {
     }
 
     return 1;
-}
-
-# Load OpenID Connect Relying Parties
-# DEPRECATED, remove in 3.0, use sendOidcResponse instead
-# @param no_cache Disable cache use
-# @return boolean result
-sub loadRPs {
-    my ($self) = @_;
-
-    $self->warning->info("Using loadRPs is deprecated, use getRP instead");
-
-    # Check presence of at least one relying party in configuration
-    unless ( $self->conf->{oidcRPMetaDataOptions}
-        and keys %{ $self->conf->{oidcRPMetaDataOptions} } )
-    {
-        $self->logger->warn(
-            "No OpenID Connect Relying Party found in configuration");
-        return 1;
-    }
-
-    foreach my $rp ( keys %{ $self->conf->{oidcRPMetaDataOptions} || {} } ) {
-        $self->load_rp_from_llng_conf($rp);
-    }
 }
 
 # Load a single RP from LLNG configuration
@@ -256,6 +249,78 @@ sub load_rp {
                       . $self->p->HANDLER->tsv->{jail}->error );
                 $valid = 0;
             }
+        }
+    }
+    if (
+        $valid
+        and (  $config{options}->{oidcRPMetaDataOptionsJwksUri}
+            or $config{options}->{oidcRPMetaDataOptionsJwks} )
+      )
+    {
+        my $jwks = $config{options}->{oidcRPMetaDataOptionsJwks};
+        if ( !$jwks
+            and my $url = $config{options}->{oidcRPMetaDataOptionsJwksUri} )
+        {
+            my $resp = $self->ua->get($url);
+            if ( $resp->is_success ) {
+                my $content = $self->decodeJSON( $resp->decoded_content );
+                if ( $content and ref($content) eq 'HASH' and $content->{keys} )
+                {
+                    $jwks = $content;
+                }
+                else {
+                    $self->logger->error("Invalid response from $url");
+                    $valid = 0;
+                }
+            }
+            else {
+                $self->logger->error( "Unable to fetch RP keys from $url: "
+                      . $resp->status_line );
+                $valid = 0;
+            }
+        }
+        if ( $jwks and ref($jwks) eq 'HASH' and $jwks->{keys} ) {
+            my %keys;
+            my %validKeys;
+            foreach my $key ( sort @{ $jwks->{keys} } ) {
+                my $type = lc( $key->{use} );
+                next unless $type =~ /^(?:enc|sig)$/;
+                $key->{alg} = 'RSA-OAEP'
+                  if !$key->{alg} and $key->{kty} eq 'RSA';
+                $key->{alg} = 'ES256'
+                  if !$key->{alg} and $key->{kty} eq 'EC';
+                if ( $type eq 'sig' ) {
+                    push @{ $validKeys{sig} }, $key;
+                }
+                if ( $key->{alg} ) {
+                    $keys{ $key->{alg} } ||= $key;
+                }
+                else {
+                    $self->logger->warn('Unable to find "alg" field in RP key');
+                }
+            }
+            foreach my $alg ( @{&ENC_ALG_SUPPORTED} ) {
+                if ( $keys{$alg} and $keys{$alg}->{use} eq 'enc' ) {
+                    $self->logger->debug(
+                        "Found encryption key with algorith $alg");
+                    $validKeys{enc}{$alg} = $keys{$alg};
+                    last;
+                }
+            }
+            unless (%validKeys) {
+                $self->logger->error("Unable to find a supported key for $rp");
+                $valid = 0;
+            }
+            else {
+                $self->rpEncKey->{$rp} = { keys => $validKeys{enc} }
+                  if $validKeys{enc};
+                $self->rpSigKey->{$rp} = { keys => $validKeys{sig} }
+                  if $validKeys{sig};
+            }
+        }
+        else {
+            $self->logger->error('Malformed JWKS document');
+            $valid = 0;
         }
     }
     if ($valid) {
@@ -634,7 +699,9 @@ sub getAccessTokenFromTokenEndpoint {
       $self->opOptions->{$op}->{oidcOPMetaDataOptionsTokenEndpointAuthMethod}
       || 'client_secret_post';
 
-    unless ( $auth_method =~ /^client_secret_(basic|post)$/o ) {
+    unless ( $auth_method =~
+        /^(?:client_secret_(?:(?:pos|jw)t|basic)|private_key_jwt)$/o )
+    {
         $self->logger->error(
             "Bad authentication method on token endpoint for OP $op");
         return 0;
@@ -662,15 +729,39 @@ sub getAccessTokenFromTokenEndpoint {
             "Content-Type" => 'application/x-www-form-urlencoded',
         );
     }
-    elsif ( $auth_method eq "client_secret_post" ) {
-        $token_request_params->{client_id}     = $client_id;
-        $token_request_params->{client_secret} = $client_secret;
+    else {
+        if ( $auth_method eq "client_secret_post" ) {
+            $token_request_params->{client_id}     = $client_id;
+            $token_request_params->{client_secret} = $client_secret;
+        }
+        elsif ( $auth_method =~ /^(?:client_secret|private_key)_jwt$/ ) {
 
+            # TODO: add parameter to choose alg
+            my $alg =
+                $auth_method eq 'client_secret_jwt'          ? 'HS256'
+              : $self->conf->{oidcServiceKeyTypeSig} eq 'EC' ? 'ES256'
+              :                                                'RS256';
+            my $time = time;
+            my $jws  = $self->createJWTForOP( {
+                    iss => $client_id,
+                    sub => $client_id,
+                    aud => $access_token_uri,
+                    jti => $self->generateNonce,
+                    exp => $time + 30,
+                    iat => $time,
+                },
+                $alg, $op
+            );
+            $token_request_params->{client_id} = $client_id;
+            $token_request_params->{client_assertion_type} =
+              'urn:ietf:params:oauth:client-assertion-type:jwt-bearer';
+            $token_request_params->{client_assertion} = $jws;
+        }
+        else {
+            $self->logger->error("Unknown auth method $auth_method");
+        }
         $response = $self->ua->post( $access_token_uri, $token_request_params,
             "Content-Type" => 'application/x-www-form-urlencoded' );
-    }
-    else {
-        $self->logger->error("Unknown auth method $auth_method");
     }
 
     if ( $response->is_error ) {
@@ -986,8 +1077,8 @@ sub getUserInfo {
         return $self->decodeUserInfo($userinfo_content);
     }
     elsif ( $content_type =~ /jwt/ ) {
-        return unless $self->verifyJWTSignature( $userinfo_content, $op );
-        return getJWTPayload($userinfo_content);
+        my $jwt = $self->decryptJwt($userinfo_content);
+        return $self->decodeJWT( $jwt, $op );
     }
 }
 
@@ -1058,10 +1149,13 @@ sub getAuthorizationCode {
 sub newAccessToken {
     my ( $self, $req, $rp, $scope, $sessionInfo, $info ) = @_;
 
+    my $client_id = $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsClientID};
+
     my $at_info = {
 
-        scope => $scope,
-        rp    => $rp,
+        scope     => $scope,
+        rp        => $rp,
+        client_id => $client_id,
         %{$info},
     };
 
@@ -1077,6 +1171,14 @@ sub newAccessToken {
         if ( $self->_wantJWT($rp) ) {
             my $at_jwt =
               $self->makeJWT( $req, $rp, $scope, $session->id, $sessionInfo );
+            $at_jwt = $self->encryptToken(
+                $rp,
+                $at_jwt,
+                $self->rpOptions->{$rp}
+                  ->{oidcRPMetaDataOptionsIdTokenEncKeyMgtAlg},
+                $self->rpOptions->{$rp}
+                  ->{oidcRPMetaDataOptionsIdTokenEncContentEncAlg},
+            );
             $at_info->{sha256_hash} = $self->createHash( $at_jwt, 256 );
             $self->updateToken( $session->id, $at_info );
             return $at_jwt;
@@ -1136,7 +1238,7 @@ sub makeJWT {
 
     # Get signature algorithm
     my $alg = $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAccessTokenSignAlg}
-      || "RS256";
+      || ( $self->conf->{oidcServiceKeyTypeSig} eq 'EC' ? 'ES256' : 'RS256' );
     $self->logger->debug("Access Token signature algorithm: $alg");
 
     my $jwt = $self->createJWT( $access_token_payload, $alg, $rp, "at+JWT" );
@@ -1353,7 +1455,7 @@ sub extractState {
 
 # Check signature of a JWT
 # @return boolean 1 if signature is verified, 0 else
-sub verifyJWTSignature {
+sub decodeJWT {
     my ( $self, $jwt, $op, $rp ) = @_;
 
     $self->logger->debug("Verification of JWT signature: $jwt");
@@ -1375,123 +1477,84 @@ sub verifyJWTSignature {
             $self->logger->debug( "Signature "
                   . $signature
                   . " is present but algorithm is 'none'" );
-            return 0;
+            return;
         }
         $self->logger->debug(
             "JWT algorithm is 'none', signature cannot be verified");
-        return 0;
+        return;
     }
 
-    if ( $alg eq "HS256" or $alg eq "HS384" or $alg eq "HS512" ) {
+   # For now, only OP has JWKS
+   #my $jwks =
+   #  $op ? $self->opMetadata->{$op}->{jwks} : $self->rpMetadata->{$rp}->{jwks};
+    my $jwks = $op ? $self->opMetadata->{$op}->{jwks} : $self->rpSigKey->{$rp};
 
-        # Check signature with client secret
-        my $client_secret;
-        $client_secret =
-          $self->opOptions->{$op}->{oidcOPMetaDataOptionsClientSecret}
-          if ($op);
-        $client_secret =
-          $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsClientSecret}
-          if ($rp);
-
-        my $digest;
-
-        if ( $alg eq "HS256" ) {
-            $digest = hmac_sha256_base64( $signed_data, $client_secret );
-        }
-
-        if ( $alg eq "HS384" ) {
-            $digest = hmac_sha384_base64( $signed_data, $client_secret );
-        }
-
-        if ( $alg eq "HS512" ) {
-            $digest = hmac_sha512_base64( $signed_data, $client_secret );
-        }
-
-        # Convert + and / to get Base64 URL valid (RFC 4648)
-        $digest =~ s/\+/-/g;
-        $digest =~ s/\//_/g;
-
-        unless ( $digest eq $signature ) {
-            $self->logger->debug(
-                "Digest $digest not equal to signature " . $signature );
-            return 0;
-        }
-        return 1;
-    }
-
-    if ( $alg eq "RS256" or $alg eq "RS384" or $alg eq "RS512" ) {
-
-        if ($rp) {
-            $self->logger->debug("Algorithm $alg not supported");
-            return 0;
-        }
-
-        # The public key is needed
-        unless ( $self->opMetadata->{$op}->{jwks} ) {
+    unless ( $alg =~ /^HS/ ) {
+        unless ($jwks) {
             $self->logger->error(
                 "Cannot verify $alg signature: no JWKS data found");
-            return 0;
+            return;
         }
-
-        my $keys = $self->opMetadata->{$op}->{jwks}->{keys};
-        my $key_hash;
-
-        # Find Key ID associated with signature
-        my $kid = $jwt_header->{kid};
-
-        if ($kid) {
-            $self->logger->debug("Search key with id $kid");
-            foreach (@$keys) {
-                if ( $_->{kid} eq $kid ) {
-                    $key_hash = $_;
-                    last;
-                }
-            }
+        unless ($jwks->{keys}
+            and ref( $jwks->{keys} ) eq 'ARRAY'
+            and @{ $jwks->{keys} } )
+        {
+            $self->logger->error('Malformed JWKS, I need {"keys":[..keys..]}');
+            return;
         }
-        else {
-            $key_hash = shift @$keys;
-        }
-
-        unless ($key_hash) {
-            $self->logger->error("No key found in JWKS data");
-            return 0;
-        }
-
-        $self->logger->debug(
-            "Found public key parameter n: " . $key_hash->{n} );
-        $self->logger->debug(
-            "Found public key parameter e: " . $key_hash->{e} );
-
-        # Create public key
-        my $n =
-          Crypt::OpenSSL::Bignum->new_from_bin(
-            decode_base64url( $key_hash->{n} ) );
-        my $e =
-          Crypt::OpenSSL::Bignum->new_from_bin(
-            decode_base64url( $key_hash->{e} ) );
-
-        my $public_key = Crypt::OpenSSL::RSA->new_key_from_parameters( $n, $e );
-
-        if ( $alg eq "RS256" ) {
-            $public_key->use_sha256_hash;
-        }
-
-        if ( $alg eq "RS384" ) {
-            $public_key->use_sha384_hash;
-        }
-
-        if ( $alg eq "RS512" ) {
-            $public_key->use_sha512_hash;
-        }
-
-        return $public_key->verify( $signed_data,
-            decode_base64url($signature) );
     }
 
-    # Other algorithms not managed
-    $self->logger->debug("Algorithm $alg not known");
+    # Choosing keys
+    #  - if algorithm is HS{digits}, the key is the ClientSecret
+    #  - if JWS has a "kid" field in its header, use it (then replace the
+    #    "key" arg of Crypt::JWT by "kid_keys" and give the whole JWKS)
+    #  - else we try the first available key of jwks document
+    my @keyArgs;
+    if ( $alg =~ /^HS/ ) {
+        $self->logger->debug("Alg is $alg, using secret as key");
+        @keyArgs = ( [
+                key => $op
+                ? $self->opOptions->{$op}->{oidcOPMetaDataOptionsClientSecret}
+                : $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsClientSecret}
+            ]
+        );
+    }
+    elsif ( $jwt_header->{kid} ) {
+        $self->logger->debug(
+            "'kid' found in JWT header, using the whole JWKS doc as 'kid_keys'"
+        );
+        @keyArgs = ( [ kid_keys => $jwks ] );
+    }
+    else {
+        $self->logger->debug(
+"No 'kid' found in JWT header, will try all keys found in JWKS doc ("
+              . @{ $jwks->{keys} }
+              . ' key(s))' );
+        @keyArgs = map { [ key => $_ ] } @{ $jwks->{keys} };
+    }
 
-    return 0;
+    my $error = [];
+    my $content;
+    foreach my $keyArg (@keyArgs) {
+
+        # JSON decoding is done here because #2748
+        $content = eval {
+            JSON::from_json(
+                decode_jwt( token => $jwt, @$keyArg, decode_payload => 0 ) );
+        };
+        if ($@) {
+            $error = [ "Unable to verify JWT: $@", "Jwt was: $jwt" ];
+        }
+        else {
+            $error = [];
+            last;
+        }
+    }
+    if (@$error) {
+        $self->logger->error($_) foreach @$error;
+        return;
+    }
+    return wantarray ? ( $content, $alg ) : $content;
 }
 
 ### HERE
@@ -1659,8 +1722,10 @@ sub checkEndPointAuthenticationCredentials {
     my ( $self, $req ) = @_;
 
     # Check authentication
-    my ( $client_id, $client_secret ) =
+    my ( $client_id, $client_secret, $method ) =
       $self->getEndPointAuthenticationCredentials($req);
+
+    $self->logger->debug("Authentication method: $method");
 
     unless ($client_id) {
         $self->logger->error(
@@ -1687,17 +1752,28 @@ sub checkEndPointAuthenticationCredentials {
             "Relying Party $rp is public, do not check client secret");
     }
     else {
-        unless ($client_secret) {
-            $self->logger->error(
+        if ( $method =~ /^client_secret_(?:basic|post)$/ ) {
+            unless ($client_secret) {
+                $self->logger->error(
 "Relying Party $rp is confidential but no client secret was provided to authenticate on token endpoint"
-            );
-            return undef;
+                );
+                return undef;
+            }
+            unless ( $client_secret eq
+                $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsClientSecret} )
+            {
+                $self->logger->error("Wrong credentials for $rp");
+                return undef;
+            }
         }
-        unless ( $client_secret eq
-            $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsClientSecret} )
-        {
-            $self->logger->error("Wrong credentials for $rp");
-            return undef;
+
+        if ( $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAuthMethod} ) {
+            unless ( $method eq
+                $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAuthMethod} )
+            {
+                $self->logger->error("Wrong authetication method for $rp");
+                return undef;
+            }
         }
     }
     return $rp;
@@ -1707,10 +1783,11 @@ sub checkEndPointAuthenticationCredentials {
 # @return array (client_id, client_secret)
 sub getEndPointAuthenticationCredentials {
     my ( $self, $req ) = @_;
-    my ( $client_id, $client_secret );
+    my ( $client_id, $client_secret, $scheme );
 
     my $authorization = $req->authorization;
     if ( $authorization and $authorization =~ /^Basic (\w+)/i ) {
+        $scheme = 'client_secret_basic';
         $self->logger->debug("Method client_secret_basic used");
         eval {
             ( $client_id, $client_secret ) =
@@ -1719,22 +1796,110 @@ sub getEndPointAuthenticationCredentials {
         $self->logger->error("Bad authentication header: $@") if ($@);
 
         # Using multiple methods is an error
-        if ( $req->param('client_id') and $req->param('client_secret') ) {
+        if (
+            ( $req->param('client_id') and $req->param('client_secret') )
+            or (    $req->param('client_assertion')
+                and $req->param('client_assertion_type') )
+          )
+        {
             $self->logger->error("Multiple client authentication methods used");
             ( $client_id, $client_secret ) = ( undef, undef );
         }
     }
+
+    # JWS authentication
+    elsif ( my $atype = $req->param('client_assertion_type')
+        and my $jws = $req->param('client_assertion')
+        and my $_clientId = $req->param('client_id') )
+    {
+        # Type must be 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
+        if (
+            $atype eq 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer' )
+        {
+            # JWS token must contain iss, sub and iss must be equal to usb
+            my $payload = getJWTPayload($jws);
+            if (    $payload
+                and ( ref($payload) eq 'HASH' )
+                and $payload->{iss}
+                and $payload->{sub}
+                and $payload->{iss} eq $payload->{sub}
+                and $payload->{iss} eq $_clientId )
+            {
+                # client_id must match to a known relying party
+                my ($rp) = grep {
+                    $self->rpOptions->{$_}->{oidcRPMetaDataOptionsClientID} eq
+                      $_clientId
+                } keys %{ $self->rpOptions || {} };
+                if ($rp) {
+
+                    # RP must have a signature key registered
+                    # (key may be the secret for HS* alg)
+                    if (   $self->rpSigKey->{$rp}
+                        or $self->rpOptions->{$rp}
+                        ->{oidcRPMetaDataOptionsClientSecret} )
+                    {
+
+                        # Signature must be valid
+                        my ( $jwt, $alg ) =
+                          $self->decodeJWT( $jws, undef, $rp );
+                        if ($jwt) {
+
+                            $scheme =
+                              $alg =~ /^HS/i
+                              ? 'client_secret_jwt'
+                              : 'private_key_jwt';
+
+                            # Token must be time-valid
+                            if ( $jwt->{aud} and $jwt->{exp} ) {
+                                if ( time < $jwt->{exp} ) {
+                                    $self->logger->debug("JWS is valid");
+
+                                    # Then export the client_id !
+                                    $client_id = $_clientId;
+                                }
+                                else {
+                                    $self->logger->error('JWS expired');
+                                }
+                            }
+                            else {
+                                $self->logger->error(
+                                    'Bad JWS content (missing aud or exp)');
+                            }
+                        }
+                        else {
+                            $self->logger->error('Bad JWS signature');
+                        }
+                    }
+                    else {
+                        $self->logger->error("No signature key found for $rp");
+                    }
+                }
+                else {
+                    $self->logger->error(
+                        "Unable to find any RP with client_id=$_clientId");
+                }
+            }
+            else {
+                $self->logger->error("Bad JWS payload: $jws");
+            }
+        }
+        else {
+            $self->logger->error("Unsuported client_assertion_type $atype");
+        }
+    }
     elsif ( $req->param('client_id') and $req->param('client_secret') ) {
+        $scheme = 'client_secret_post';
         $self->logger->debug("Method client_secret_post used");
         $client_id     = $req->param('client_id');
         $client_secret = $req->param('client_secret');
     }
     elsif ( $req->param('client_id') and !$req->param('client_secret') ) {
+        $scheme = 'none';
         $self->logger->debug("Method none used");
         $client_id = $req->param('client_id');
     }
 
-    return ( $client_id, $client_secret );
+    return ( $client_id, $client_secret, $scheme );
 }
 
 # Get Access Token
@@ -1783,7 +1948,8 @@ sub getScope {
     if ( $self->conf->{oidcServiceAllowOnlyDeclaredScopes} ) {
         my @known_scopes = (
             keys( %{ $self->rpScopeRules->{$rp} || {} } ),
-            "openid", keys( %{ $self->rpScopes->{$rp} || {} } )
+            keys( %{ $self->rpScopes->{$rp}     || {} } ),
+            'openid', 'offline_access',
         );
         my @scope_values_tmp;
         for my $scope_value (@scope_values) {
@@ -2042,95 +2208,76 @@ sub _forceType {
 # @param alg Signature algorithm
 # @param rp Internal Relying Party identifier
 # @return String jwt JWT
+
 sub createJWT {
     my ( $self, $payload, $alg, $rp, $type ) = @_;
+    return $self->_createJWT( $payload, $alg, $rp, $type );
+}
 
-    # Payload encoding
-    my $jwt_payload = encode_base64url( to_json($payload), "" );
+sub createJWTForOP {
+    my ( $self, $payload, $alg, $rp, $type ) = @_;
+    return $self->_createJWT( $payload, $alg, $rp, $type, 1 );
+}
 
-    # JWT header
-    my $typ             = $type || "JWT";
-    my $jwt_header_hash = { typ => $typ, alg => $alg };
-    if ( $alg eq "RS256" or $alg eq "RS384" or $alg eq "RS512" ) {
-        $jwt_header_hash->{kid} = $self->conf->{oidcServiceKeyIdSig}
-          if $self->conf->{oidcServiceKeyIdSig};
+sub _createJWT {
+    my ( $self, $payload, $alg, $partner, $type, $isRp ) = @_;
+
+    my @keyArg;
+
+    # Set Cript::JWT arguments depending on "alg"
+    #  a) "none"
+    if ( $alg eq 'none' ) {
+        @keyArg = ( allow_none => 1 );
     }
-    my $jwt_header = encode_base64url( to_json($jwt_header_hash), "" );
 
-    if ( $alg eq "none" ) {
-
-        return $jwt_header . "." . $jwt_payload;
-    }
-
-    if ( $alg eq "HS256" or $alg eq "HS384" or $alg eq "HS512" ) {
+    #  b) HMAC algorithms, key is the client secret
+    elsif ( $alg =~ /^HS/ ) {
 
         # Sign with client secret
         my $client_secret =
-          $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsClientSecret};
+            $isRp
+          ? $self->opOptions->{$partner}->{oidcOPMetaDataOptionsClientSecret}
+          : $self->rpOptions->{$partner}->{oidcRPMetaDataOptionsClientSecret};
         unless ($client_secret) {
             $self->logger->error(
                 "Algorithm $alg needs a Client Secret to sign JWT");
             return;
         }
-
-        my $digest;
-
-        if ( $alg eq "HS256" ) {
-            $digest = hmac_sha256_base64( $jwt_header . "." . $jwt_payload,
-                $client_secret );
-        }
-
-        if ( $alg eq "HS384" ) {
-            $digest = hmac_sha384_base64( $jwt_header . "." . $jwt_payload,
-                $client_secret );
-        }
-
-        if ( $alg eq "HS512" ) {
-            $digest = hmac_sha512_base64( $jwt_header . "." . $jwt_payload,
-                $client_secret );
-        }
-
-        # Convert + and / to get Base64 URL valid (RFC 4648)
-        $digest =~ s/\+/-/g;
-        $digest =~ s/\//_/g;
-        $digest =~ s/=+$//g;
-
-        return $jwt_header . "." . $jwt_payload . "." . $digest;
+        @keyArg = ( key => $client_secret );
     }
 
-    elsif ( $alg eq "RS256" or $alg eq "RS384" or $alg eq "RS512" ) {
-
-        # Get signing private key
+    #  c) asymetric algorithms
+    else {
         my $priv_key = $self->conf->{oidcServicePrivateKeySig};
         unless ($priv_key) {
             $self->logger->error(
                 "Algorithm $alg needs a Private Key to sign JWT");
             return;
         }
+        @keyArg = ( key => \$priv_key, );
 
-        my $rsa_priv = Crypt::OpenSSL::RSA->new_private_key($priv_key);
-
-        if ( $alg eq "RS256" ) {
-            $rsa_priv->use_sha256_hash;
+        if ( $self->conf->{oidcServiceKeyIdSig} ) {
+            push @keyArg,
+              extra_headers => { kid => $self->conf->{oidcServiceKeyIdSig} };
         }
-
-        if ( $alg eq "RS384" ) {
-            $rsa_priv->use_sha384_hash;
-        }
-
-        if ( $alg eq "RS512" ) {
-            $rsa_priv->use_sha512_hash;
-        }
-
-        my $digest = encode_base64url(
-            $rsa_priv->sign( $jwt_header . "." . $jwt_payload ) );
-
-        return $jwt_header . "." . $jwt_payload . "." . $digest;
     }
 
-    $self->logger->debug("Algorithm $alg not supported to sign JWT");
-
-    return;
+    # Encode payload here due to #2748
+    my $jwt = eval {
+        encode_jwt(
+            payload       => to_json($payload),
+            alg           => $alg,
+            extra_headers => {
+                kid => $self->conf->{oidcServiceKeyIdSig},
+            },
+            @keyArg,
+        );
+    };
+    if ($@) {
+        $self->logger->error("Unable to build JWT: $@");
+        return;
+    }
+    return $jwt;
 }
 
 # Return ID Token
@@ -2147,7 +2294,14 @@ sub createIDToken {
     my $h = $self->p->processHook( $req, 'oidcGenerateIDToken', $payload, $rp );
     return undef if ( $h != PE_OK );
 
-    return $self->createJWT( $payload, $alg, $rp );
+    my $id_token = $self->createJWT( $payload, $alg, $rp );
+    return $self->encryptToken(
+        $rp,
+        $id_token,
+        $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAccessTokenEncKeyMgtAlg},
+        $self->rpOptions->{$rp}
+          ->{oidcRPMetaDataOptionsAccessTokenEncContentEncAlg},
+    );
 }
 
 # Return flow type
@@ -2179,15 +2333,24 @@ sub getIDTokenSub {
 # @param key Raw key
 # @return HashRef JWKS key
 sub key2jwks {
-    my ( $self, $key ) = @_;
+    my ( $self, $key, $type ) = @_;
 
-    my $rsa_pub = Crypt::OpenSSL::RSA->new_private_key($key);
-    my @params  = $rsa_pub->get_key_parameters();
+    if ( $type and $type eq 'EC' ) {
+        require Crypt::PK::ECC;
+        my $eck = Crypt::PK::ECC->new();
+        $eck->import_key( \$key );
+        return $eck->export_key_jwk( 'public', 1 );
+    }
+    else {
+        my $rsa_pub = Crypt::OpenSSL::RSA->new_private_key($key);
+        my @params  = $rsa_pub->get_key_parameters();
 
-    return {
-        n => encode_base64url( $params[0]->to_bin(), "" ),
-        e => encode_base64url( $params[1]->to_bin(), "" ),
-    };
+        return {
+            n   => encode_base64url( $params[0]->to_bin(), "" ),
+            e   => encode_base64url( $params[1]->to_bin(), "" ),
+            kty => 'RSA',
+        };
+    }
 }
 
 # Return X.509 data if public key is a certificate
@@ -2211,6 +2374,60 @@ sub getCertInfo {
     else {
         return {};
     }
+}
+
+### JWKS ENDPOINT
+
+# Keys to display in jwks endpoint:
+#  Signature:
+#   - current, new and old key to permit to clients to verify all JWT emitted
+#     during 3 weeks
+#  Encryption:
+#   - only the current key. Old encryption key is kept to permit to
+#     Auth::OPenIDCOnnect to decrypt all JWE emitted by Issuer but no
+#     need to display any other key
+use constant KEYS_TO_DISPLAY => (
+    [ ''    => 'Sig' ],
+    [ 'Old' => 'Sig' ],
+    [ 'New' => 'Sig' ],
+    [ ''    => 'Enc' ],
+);
+
+sub _buildJwk {
+    my ( $self, $prefix, $type ) = @_;
+    my $publicKeyOrCert = $self->conf->{"oidcService${prefix}PublicKey$type"};
+    my $privateKey      = $self->conf->{"oidcService${prefix}PrivateKey$type"};
+    my $keyId           = $self->conf->{"oidcService${prefix}KeyId$type"};
+    my $keytype         = $self->conf->{"oidcService${prefix}KeyType$type"};
+    return $privateKey
+      ? {
+        kty => $keytype,
+        use => lc($type),
+        (
+            $type eq 'Enc'
+            ? ( alg => $self->conf->{oidcServiceEncAlgorithmAlg} )
+            : ()
+        ),
+        ( $keyId ? ( kid => $keyId ) : () ),
+        %{ $self->key2jwks( $privateKey, $keytype ) },
+        %{ $self->getCertInfo($publicKeyOrCert) },
+      }
+      : ();
+}
+
+# Handle jwks endpoint
+sub jwks {
+    my ( $self, $req ) = @_;
+    $req->data->{dropCsp} = 1 if $self->conf->{oidcDropCspHeaders};
+    $self->logger->debug("URL detected as an OpenID Connect JWKS URL");
+
+    my $jwks = { keys => [] };
+
+    push @{ $jwks->{keys} }, $self->_buildJwk( $_->[0], $_->[1] )
+      foreach (KEYS_TO_DISPLAY);
+
+    $self->logger->debug("Send JWKS response sent");
+    return $self->p->sendJSONresponse( $req, $jwks );
 }
 
 # Build Logout Request URI
@@ -2282,7 +2499,9 @@ sub getRequestJWT {
     my $response = $self->ua->get($request_uri);
 
     if ( $response->is_error ) {
-        $self->logger->error("Unable to get request JWT on $request_uri");
+        $self->logger->error( "Unable to get request JWT on $request_uri: "
+              . $response->message );
+        $self->logger->debug( $response->content );
         return;
     }
 
@@ -2427,6 +2646,34 @@ sub getSidFromSession {
     my ( $self, $rp, $sessionInfo ) = @_;
     return Digest::SHA::hmac_sha256_base64(
         $sessionInfo->{_session_id} . ':' . $rp );
+}
+
+sub decryptJwt {
+    my ( $self, $jwt ) = @_;
+    my @count = split /\./, $jwt;
+    if ( $#count == 4 ) {
+        my $key = $self->conf->{oidcServicePrivateKeyEnc};
+        $self->logger->debug("Receive an encrypted JWT: $jwt");
+        unless ($key) {
+            $self->logger->error('Receive an encrypted JWT but no key defined');
+            return $jwt;
+        }
+
+        my $tmp;
+        eval { $tmp = decode_jwt( token => $jwt, key => \$key, ); };
+        if ($@) {
+            if ( $key = $self->conf->{oidcServiceOldPrivateKeyEnc} ) {
+                eval { $tmp = decode_jwt( token => $jwt, key => \$key, ); };
+            }
+            if ($@) {
+                $self->logger->error( 'Unable to decrypt JWE: ' . $@ );
+                return undef;
+            }
+        }
+        $jwt = $tmp;
+        $self->logger->debug("Decrypted JWT: $jwt");
+    }
+    return $jwt;
 }
 
 1;

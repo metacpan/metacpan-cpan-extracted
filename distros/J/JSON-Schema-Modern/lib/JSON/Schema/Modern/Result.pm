@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.575';
+our $VERSION = '0.582';
 
 use 5.020;
 use Moo;
@@ -16,7 +16,8 @@ no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use MooX::TypeTiny;
-use Types::Standard qw(ArrayRef InstanceOf Enum Bool);
+use Types::Standard qw(ArrayRef InstanceOf Enum Bool Str Maybe Tuple);
+use Types::Common::Numeric 'PositiveInt';
 use JSON::Schema::Modern::Annotation;
 use JSON::Schema::Modern::Error;
 use JSON::PP ();
@@ -32,19 +33,21 @@ use overload
   '""' => sub { $_[0]->stringify },
   fallback => 1;
 
+use constant { true => JSON::PP::true, false => JSON::PP::false };
+
 has valid => (
   is => 'ro',
-  isa => InstanceOf['JSON::PP::Boolean'],
-  coerce => sub { $_[0] ? JSON::PP::true : JSON::PP::false },
+  isa => Bool,
+  coerce => 1,
+  required => 1,
 );
 sub result { goto \&valid } # backcompat only
 
 has exception => (
   is => 'ro',
-  isa => InstanceOf['JSON::PP::Boolean'],
-  coerce => sub { $_[0] ? JSON::PP::true : JSON::PP::false },
+  isa => Bool,
   lazy => 1,
-  default => sub { any { $_->exception } $_[0]->errors },
+  default => sub ($self) { any { $_->exception or $_->error =~ /^EXCEPTION: / } $self->errors },
 );
 
 has $_.'s' => (
@@ -65,6 +68,23 @@ sub errors { ($_[0]->{errors}//[])->@* }
 sub error_count { scalar(($_[0]->{errors}//[])->@*) }
 sub annotations { ($_[0]->{annotations}//[])->@* }
 sub annotation_count { scalar(($_[0]->{annotations}//[])->@*) }
+
+has recommended_response => (
+  is => 'rw',
+  isa => Maybe[Tuple[PositiveInt, Str]],
+  lazy => 1,
+  default => sub ($self) {
+    return if not $self->errors;
+
+    for my $error ($self->errors) {
+      my $pe = $error->recommended_response;
+      return $pe if $pe;
+    }
+
+    return [ 500, 'Internal Server Error' ] if $self->exception;
+    return [ 400, ($self->errors)[0]->stringify ];
+  },
+);
 
 # strict_basic can only be used with draft2019-09.
 use constant OUTPUT_FORMATS => [qw(flag basic strict_basic detailed verbose terse data_only)];
@@ -89,11 +109,11 @@ sub format ($self, $style, $formatted_annotations = undef) {
   $formatted_annotations //= $self->formatted_annotations;
 
   if ($style eq 'flag') {
-    return +{ valid => $self->valid };
+    return +{ valid => $self->valid ? true : false };
   }
   elsif ($style eq 'basic') {
     return +{
-      valid => $self->valid,
+      valid => $self->valid ? true : false,
       $self->valid
         ? ($formatted_annotations && $self->annotation_count ? (annotations => [ map $_->TO_JSON, $self->annotations ]) : ())
         : (errors => [ map $_->TO_JSON, $self->errors ]),
@@ -102,7 +122,7 @@ sub format ($self, $style, $formatted_annotations = undef) {
   # note: strict_basic will NOT be supported after draft 2019-09!
   elsif ($style eq 'strict_basic') {
     return +{
-      valid => $self->valid,
+      valid => ($self->valid ? true : false),
       $self->valid
         ? ($formatted_annotations && $self->annotation_count ? (annotations => [ map _map_uris($_->TO_JSON), $self->annotations ]) : ())
         : (errors => [ map _map_uris($_->TO_JSON), $self->errors ]),
@@ -138,7 +158,7 @@ sub format ($self, $style, $formatted_annotations = undef) {
     die 'uh oh, have no errors left to report' if not $self->valid and not @errors;
 
     return +{
-      valid => $self->valid,
+      valid => $self->valid ? true : false,
       $self->valid
         ? ($formatted_annotations && $self->annotation_count ? (annotations => [ map $_->TO_JSON, $self->annotations ]) : ())
         : (errors => [ map $_->TO_JSON, @errors ]),
@@ -188,7 +208,12 @@ sub TO_JSON ($self) {
 }
 
 sub dump ($self) {
-  my $encoder = JSON::MaybeXS->new(utf8 => 0, convert_blessed => 1, canonical => 1, indent => 1, space_after => 1);
+  my $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new
+    ->utf8(0)
+    ->convert_blessed(1)
+    ->canonical(1)
+    ->indent(1)
+    ->space_after(1);
   $encoder->indent_length(2) if $encoder->can('indent_length');
   $encoder->encode($self);
 }
@@ -217,7 +242,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.575
+version 0.582
 
 =head1 SYNOPSIS
 
@@ -316,6 +341,26 @@ specification format and may change slightly over time, as it is tested in produ
 
 A boolean flag indicating whether L</format> should include annotations in the output. Defaults to true.
 
+=head2 exception
+
+Indicates that evaluation stopped due to a severe error.
+
+=head2 recommended_response
+
+=for stopwords OpenAPI
+
+A tuple, consisting of C<[ integer, string ]>, indicating the recommended HTTP response code and
+string to use for this result (if validating an HTTP request). This could exist for things like a
+failed authentication check in OpenAPI validation, in which case it would contain
+C<[ 401, 'Unauthorized' ]>.
+
+Only populated when there are errors; when not explicitly set by an evaluator, defaults to
+C<< [ 500, 'Internal Server Error' ] >> if any errors indicate an exception, and
+C<< [ 400, <first error string> ] >> otherwise. The exact error string is hidden in the case of 500
+errors because you should not leak internal issues with your application, but you may also wish to
+obfuscate normal validation errors, in which case you should check for C<400> and change the string
+to C<'Bad Request'>.
+
 =head1 METHODS
 
 =for Pod::Coverage BUILD OUTPUT_FORMATS result stringify annotation_count error_count
@@ -361,8 +406,6 @@ embedded in error messages.
 
 If you are embedding the full result inside another data structure, perhaps to be serialized to JSON
 (or another format) later on, use L</TO_JSON> or L</format>.
-
-=for stopwords OpenAPI
 
 =head1 SUPPORT
 

@@ -52,7 +52,7 @@
    "provides" : {
       "TableData::Perl::CPAN::Release::Static::2023" : {
          "file" : "lib/TableData/Perl/CPAN/Release/Static/2023.pm",
-         "version" : "20231208.0"
+         "version" : "20240101.0"
       }
    },
    "release_status" : "stable",
@@ -67,7 +67,7 @@
          "web" : "https://github.com/perlancar/perl-TableData-Perl-CPAN-Release-Static-2023"
       }
    },
-   "version" : "20231208.0",
+   "version" : "20240101.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

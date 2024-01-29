@@ -10,17 +10,17 @@ App::Greple::xlate - greple的翻译支持模块
 
 # VERSION
 
-Version 0.28
+Version 0.29
 
 # DESCRIPTION
 
-**Greple** **xlate**模块可以找到文本块并用翻译后的文本替换它们。目前实现了DeepL（`deepl.pm`）和ChatGPT（`gpt3.pm`）模块作为后端引擎。
+**Greple** **xlate**模块可以找到所需的文本块，并用翻译后的文本替换它们。目前已实现了DeepL（`deepl.pm`）和ChatGPT（`gpt3.pm`）模块作为后端引擎。
 
-如果您想要翻译以[pod](https://metacpan.org/pod/pod)风格编写的普通文本块，请使用以下命令：**greple**命令与`xlate::deepl`和`perl`模块一起使用，如下所示：
+如果您想要将Perl的pod样式文档中的普通文本块翻译成中文，请使用以下命令：**greple**，并结合`xlate::deepl`和`perl`模块，如下所示：
 
     greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
 
-模式`^(\w.*\n)+`表示以字母数字字符开头的连续行。此命令显示要翻译的区域。选项**--all**用于生成整个文本。
+在这个命令中，模式字符串`^(\w.*\n)+`表示以字母数字字符开头的连续行。这个命令会突出显示要翻译的区域。选项**--all**用于生成整个文本。
 
 <div>
     <p>
@@ -28,7 +28,7 @@ Version 0.28
     </p>
 </div>
 
-然后添加`--xlate`选项来翻译所选区域。它将找到并用**deepl**命令的输出替换它们。
+然后添加`--xlate`选项来翻译所选区域。然后，它会找到所需的部分，并用**deepl**命令的输出替换它们。
 
 默认情况下，原始文本和翻译后的文本以与[git(1)](http://man.he.net/man1/git)兼容的"冲突标记"格式打印。使用`ifdef`格式，您可以通过[unifdef(1)](http://man.he.net/man1/unifdef)命令轻松获取所需部分。输出格式可以通过**--xlate-format**选项指定。
 
@@ -76,7 +76,7 @@ Version 0.28
 
     - **conflict**, **cm**
 
-        以[git(1)](http://man.he.net/man1/git)冲突标记格式打印原始和翻译文本。
+        原始文本和转换后的文本以[git(1)](http://man.he.net/man1/git)冲突标记格式打印。
 
             <<<<<<< ORIGINAL
             original text
@@ -90,7 +90,7 @@ Version 0.28
 
     - **ifdef**
 
-        以[cpp(1)](http://man.he.net/man1/cpp) `#ifdef`格式打印原始和翻译文本。
+        原始文本和转换后的文本以[cpp(1)](http://man.he.net/man1/cpp) `#ifdef`格式打印。
 
             #ifdef ORIGINAL
             original text
@@ -105,7 +105,7 @@ Version 0.28
 
     - **space**
 
-        以单个空行分隔打印原始和翻译文本。
+        原始文本和转换后的文本之间以单个空行分隔。
 
     - **xtxt**
 
@@ -196,6 +196,8 @@ Version 0.28
 
 [App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
 
+[https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
     [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
@@ -220,13 +222,27 @@ Version 0.28
 
     您可以使用 `-Mupdate` 模块根据 **greple** 命令的结果修改文件。
 
+## ARTICLES
+
+- [https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250](https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250)
+
+    使用DeepL API进行翻译和替换仅必要的部分的Greple模块（日语）
+
+- [https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6](https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6)
+
+    使用DeepL API模块在15种语言中生成文档（日语）
+
+- [https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd](https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd)
+
+    带有DeepL API的自动翻译Docker环境（日语）
+
 # AUTHOR
 
 Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023 Kazumasa Utashiro.
+Copyright © 2023-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

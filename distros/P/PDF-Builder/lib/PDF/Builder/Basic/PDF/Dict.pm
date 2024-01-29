@@ -20,8 +20,8 @@ use base 'PDF::Builder::Basic::PDF::Objind';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 our $mincache = 16 * 1024 * 1024;
 
@@ -60,7 +60,16 @@ source PDF the stream starts.
 
 =head1 METHODS
 
+=head2 new
+
+    $d = PDF::Builder::Basic::PDF->new()
+
 =over
+
+Creates a new instance of a dictionary. The usual practice is to call 
+C<PDFDict()> instead.
+
+=back
 
 =cut
 
@@ -74,9 +83,15 @@ sub new {
     return $self;
 }
 
-=item $type = $d->type($type)
+=head2 type
+
+    $type = $d->type($type)
+
+=over
 
 Get/Set the standard Type key. It can be passed, and will return, a text value rather than a Name object.
+
+=back
 
 =cut
 
@@ -90,9 +105,15 @@ sub type {
     return $self->{'Type'}->val();
 }
 
-=item @filters = $d->filter(@filters)
+=head2 filter
+
+    @filters = $d->filter(@filters)
+
+=over
 
 Get/Set one or more filters being used by the optional stream attached to the dictionary.
+
+=back
 
 =cut
 
@@ -113,16 +134,22 @@ sub filter {
     return $self->{'Filter'};
 }
 
-# Undocumented alias, which may be removed in a future release
+# Undocumented alias, which may be removed in a future release TBD
 sub filters { return filter(@_); }
 
-=item $d->outobjdeep($fh, $pdf)
+=head2 outobjdeep
+
+    $d->outobjdeep($fh, $pdf)
+
+=over
 
 Outputs the contents of the dictionary to a PDF file. This is a recursive call.
 
 It also outputs a stream if the dictionary has a stream element. If this occurs
 then this method will calculate the length of the stream and insert it into the
 stream's dictionary.
+
+=back
 
 =cut
 
@@ -234,7 +261,11 @@ sub outobjdeep {
     return;
 }
 
-=item $d->read_stream($force_memory)
+=head2 read_stream
+
+    $d->read_stream($force_memory)
+
+=over
 
 Reads in a stream from a PDF file. If the stream is greater than
 C<PDF::Dict::mincache> (defaults to 32768) bytes to be stored, then
@@ -242,6 +273,8 @@ the default action is to create a file for it somewhere and to use that
 file as a data cache. If $force_memory is set, this caching will not
 occur and the data will all be stored in the $self->{' stream'}
 variable.
+
+=back
 
 =cut
 
@@ -316,18 +349,20 @@ sub read_stream {
     return $self;
 }
 
-=item $d->val()
+=head2 val
+
+    $d->val()
+
+=over
 
 Returns the dictionary, which is itself.
+
+=back
 
 =cut
 
 sub val {
     return $_[0];
 }
-
-=back
-
-=cut
 
 1;

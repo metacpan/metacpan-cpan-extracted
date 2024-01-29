@@ -13,6 +13,7 @@ BEGIN { use_ok( 'Parallel::Loops' ); }
 
 my $maxProcs = 2;
 my $pl = new_ok( 'Parallel::Loops', [$maxProcs] );
+$pl->set_waitpid_blocking_sleep(0);
 
 # unit tests
 {

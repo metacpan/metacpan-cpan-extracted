@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   IPC::System::Simple: '0'
+  JSON::PP: '4.02'
   LWP::UserAgent: '0'
   Test::Carp: '0'
   Test::CleanNamespaces: '0'
@@ -51,5 +52,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/CGI-Info/issues
   repository: git://github.com/nigelhorne/CGI-Info.git
-version: '0.78'
+version: '0.80'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

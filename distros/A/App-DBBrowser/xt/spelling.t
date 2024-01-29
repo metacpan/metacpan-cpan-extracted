@@ -54,6 +54,7 @@ de
 dir
 eol
 fract
+isn't
 mappable
 preselected
 preselection
@@ -61,6 +62,8 @@ repexp
 schemas
 sql
 stackoverflow
+submenu
+submenus
 subqueries
 subquery
 substatement

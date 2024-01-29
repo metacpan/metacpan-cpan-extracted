@@ -13,7 +13,7 @@ Neo4j::Driver::Types - Type mapping from Neo4j to Perl and vice versa
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 MAPPING
 
@@ -224,7 +224,7 @@ Byte arrays are not supported as query parameters.
 Byte arrays are coded as unblessed strings in Jolt results.
 
 =item *
-Temporal and spatial values are not yet supported.
+Temporal and spatial values are not supported as query parameters.
 
 =back
 
@@ -248,14 +248,15 @@ Byte arrays are not supported as query parameters.
 Byte arrays are coded as lists of integers in JSON results.
 
 =item *
-Temporal and spatial values are not supported.
+Temporal and spatial values are not supported as query parameters.
 
 =item *
 The value of node or relationship properties named C<_meta>
 may not be returned correctly.
 
 =item *
-Fields in records containing maps or lists may be returned with
+Fields in records containing maps, lists, or temporal values
+may be returned with
 incorrect type or meta data due to a bug in the Neo4j server
 (L<neo4j#12306|https://github.com/neo4j/neo4j/issues/12306>).
 
@@ -281,10 +282,7 @@ L<Neo4j::Types>
 
 =head1 AUTHOR
 
-Arne Johannessen <ajnn@cpan.org>
-
-If you contact me by email, please make sure you include the word
-"Perl" in your subject header to help beat the spam filters.
+Arne Johannessen (L<AJNN|https://arne.johannessen.de/>)
 
 =head1 COPYRIGHT AND LICENSE
 

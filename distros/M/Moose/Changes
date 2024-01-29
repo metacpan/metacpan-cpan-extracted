@@ -1,6 +1,12 @@
 Also see Moose::Manual::Delta for more details of, and workarounds
 for, noteworthy changes.
 
+2.2207   2024-01-21
+
+  [TESTS]
+
+  - remove test dependency on Test::CleanNamespaces (#184, Graham Knop)
+
 2.2206   2023-07-23
 
   [TESTS]

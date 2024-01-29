@@ -1,34 +1,65 @@
-0.01	Sun Jul 26 15:07:39 CEST 2015
-	- Initial version
+0.501   Wed Jan 03 2024 18:12:22 CET
+  - must support arrayref while set parameterized roles, instead repeat the same role name twice
+  - fix bug creating a parameterized role with parameter but no role block throw exception
+  - fix bug unexpected error while set a parameter in another role
+  - make sure we can load a parameterized with no arguments no with keyword (like using default parameters)
 
-0.02	Sun Jul 26 15:38:58 CEST 2015
-	- fix pod
+0.500   Tue Jan 02 2024 14:12:22 CET
+  - add experimental feature; parameter keyword
+  - small fixed in pod and documentation
 
-0.03	Sun Jul 26 19:04:23 CEST 2015
-	- apply role does not need 'with'
+0.300   Mon Jan 01 2024 13:12:22 CET
+  - small changes in POD
+  - add meta method in mop
+  - add is_role static method in MooX::Role::Parameterized
+  - fix bug in requires mop method
+  - use existing with subroutine if available on target and use as fallback on MooX::Role::Parameterized::With
+  - update examples
+  
+0.200   Sat Dec 30 2023 13:12:22 CET
+  - remove deprecated functions hasp and method
 
-0.04	Sun Jul 26 22:51:48 CEST 2015
-	- add ::With package
+0.101   Fri Dec 29 2023 16:55:22 CET
+  - fix versioning
 
-0.041	Mon Jul 27 10:42:03 CEST 2015
-	- force minperl to 5.10.0
-	- maybe 'requires' does not work inside role... should check :/
+0.100   Fri Dec 29 2023 16:45:22 CET
+  - add support to perl 5.8 (thanks @mohawk2)
+  - add a with keyword (thanks @perlancar)
+  - quote bareword role name (thanks @choroba)
+  - fallback to Role::Tiny when applying (thanks @perlancar)
+  - fix missing prereqs
 
-0.05	Mon Jul 27 22:50:50 CEST 2015
-	- add tests for 'requires'. yes it works.
+0.082	Tue 22 Dez 2015 16:49:22 CET
+  - fix meta ( bugtracker, issue tracker)
 
-0.06	Wed Nov 25 17:17:08 CET 2015
-  - allowed apply role multiple times with arrayref ( see issue #1 )
+0.081	Mon 21 Dez 2015 16:49:22 CET
+  - update dependencies
+
+0.08	Sun 20 Dez 2015 16:49:22 CET
+  - update documentation, promote using of mop object
 
 0.07	Fri Dec 18 16:16:15 CET 2015
   - fix issue with has ( introduct hasp ) see issue #2
   - add mop object to avoid problems with has/around/requires/with/ etc
 
-0.08	Sun 20 Dez 2015 16:49:22 CET
-  - update documentation, promote using of mop object.
+0.06	Wed Nov 25 17:17:08 CET 2015
+  - allowed apply role multiple times with arrayref ( see issue #1 )
 
-0.081	Mon 21 Dez 2015 16:49:22 CET
-  - update dependencies
+0.05	Mon Jul 27 22:50:50 CEST 2015
+  - add tests for 'requires'. yes it works.
 
-0.082	Ter 22 Dez 2015 16:49:22 CET
-  - fix meta ( bugtracker, issue tracker)
+0.041	Mon Jul 27 10:42:03 CEST 2015
+  - force minperl to 5.10.0
+  - maybe 'requires' does not work inside role... should check :/
+
+0.04	Sun Jul 26 22:51:48 CEST 2015
+  - add ::With package
+
+0.03	Sun Jul 26 19:04:23 CEST 2015
+  - apply role does not need 'with'
+
+0.02	Sun Jul 26 15:38:58 CEST 2015
+  - fix pod
+
+0.01	Sun Jul 26 15:07:39 CEST 2015
+  - Initial version

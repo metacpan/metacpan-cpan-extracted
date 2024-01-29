@@ -1,29 +1,14 @@
 # NAME
 
-Socket::More - Interface scoped passive/listener addressing
+Socket::More - Scoped listening/passive addresses and network utility routines
 
 # SYNOPSIS
 
-Bring into your namespace. This overrides `socket` also:
+Bring into your namespace. 
 
 ```perl
     use v5.36;
-    use Socket::More ":all";
-```
-
-Or import any of the functions by name:
-
-```perl
-    use v5.36;
-    use Socket::More qw<getifaddrs sockaddr_passive ...>;
-```
-
-Simple list of all network interfaces:
-
-```perl
-    #List basic interface information on all available interfaces
-    my @ifs=getifaddrs;
-    say $_->{name} for @ifs;
+    use Socket::More;
 ```
 
 Flexible way to create interface scoped passive (listen) address across
@@ -31,30 +16,31 @@ families. Special 'unix' interface for ease of use. All invalid combinations of
 family, port  and paths are discarded:
 
 ```perl
-    #Create passive (listening) sockets for selected interfaces
-    my @passive=sockaddr_passive {
-            interface=>     ["eth0", "unix"],
-            port=>          [5566, 7788],
-            path=> "path_to_sock"
-    };
-            
-    #All invalid family/interface/port/path  combinations are filtered out
-    #leaving only valid info for socket creation and binding:
-    for(@passive){
-            say $_->{address};
-            socket my $socket, $_->{family}, $_->{type}, 0;
-            bind $socket $_->{addr};
-    }
+      # Create passive (listening) sockets for selected interfaces
+#
+      my @passive=sockaddr_passive {
+              interface=>     ["eth0", "unix"],
+              port=>          [5566, 7788],
+              path=> "path_to_sock"
+      };
+              
+      #All invalid family/interface/port/path  combinations are filtered out
+      #leaving only valid info for socket creation and binding:
+#
+      for(@passive){
+              say $_->{address};
+              socket my $socket, $_->{family}, $_->{socktype}, 0;
+              bind $socket $_->{addr};
+      }
 ```
+
+Please see EXAMPLES section for more.
 
 # DESCRIPTION
 
-This module makes it easier to generate the data structures to bind multiple
-sockets of multiple addresses, types, and families (including unix) on a
-particular set of interfaces by name. 
-
-It implements `sockaddr_passive`, which facilitates solutions to requirements
-like these:
+Intended as an alternative for [Socket](https://metacpan.org/pod/Socket), implementing only 'modern subset' of
+routines. It providing extra routines to make listening addresses easy, to
+solve problems like this:
 
 ```
     'listen on interfaces eth0 and eth1, using IPv6 and port numbers 9090
@@ -67,19 +53,51 @@ like these:
     ipv6 address'
 ```
 
-In addition it also makes it easy to specify multiple listen/passive addresses
-from the command line, using concise key/value notation and string to socket
-family/type conversions.
+It also is a umbrella package, which reexports  [Socket::More::Constants](https://metacpan.org/pod/Socket%3A%3AMore%3A%3AConstants),
+[Socket::More::Lookup](https://metacpan.org/pod/Socket%3A%3AMore%3A%3ALookup) and [Socket::More::Interface](https://metacpan.org/pod/Socket%3A%3AMore%3A%3AInterface) for you.
 
 It also makes it easy to generate 'random' ports to bind to, **before** your
-program binds, to aid in testing scenarios.
+program binds, to aid in testing server scenarios.
 
-Several 'inet.h' and similar routines are also implemented (eg `getifaddrs`,
-`if_nametoindex`, `if_indextoname`, `if_nameindex`).
+Note this is a subset of [Socket](https://metacpan.org/pod/Socket) functionality.  The 'old school' inet\_\* functions are
+deliberately not included, to encourage the usage of getnameinfo/getaddrinfo.
 
-No symbols are exported by default. All symbols can be exported with the ":all"
-tag or individually by name.  Please see the [API](https://metacpan.org/pod/API) section for a complete
-listing.
+From version v0.5.0, the module has been decomposed to to separate modules on
+CPAN for targeted usage:
+
+- [Socket::More](https://metacpan.org/pod/Socket%3A%3AMore) (This Module)
+    - wrapper over `socket` to make it more flexible
+    - Methods for creating address structure for listening (passive)
+    sockets using a query and consise command line syntax 
+    - String/constant mapping
+    - General pack/unpack of address structures
+    - Address family and socket types as string names 
+    - Imports and rexports the modules listed below. 
+- [Socket::More::Constants](https://metacpan.org/pod/Socket%3A%3AMore%3A%3AConstants)
+
+    Contains all the networking constants (ie `AF_INET`, `NI_NUMERICHOST`, etc)
+    for your platform.
+
+- [Socket::More::Lookup](https://metacpan.org/pod/Socket%3A%3AMore%3A%3ALookup)
+
+    Implements and exports `getaddrinfo`, `getnameinfo` and `gai_strerror`, with
+    a different calling convention then Perl core Socket implementation.  More like
+    `sysread` convention
+
+- [Socket::More::Interface](https://metacpan.org/pod/Socket%3A%3AMore%3A%3AInterface)
+
+    Implements and exports `getifaddrs`, `if_nametoindex`, `if_indextoname` and
+    `if_nameindex` to query the interfaces of your system
+
+Other packages/distributions not reexported but part of the family:
+
+- [Socket::More::Resolver](https://metacpan.org/pod/Socket%3A%3AMore%3A%3AResolver)
+
+    Non blocking and event loop integration of system resolver functions.
+
+- [Socket::More::IPRanges](https://metacpan.org/pod/Socket%3A%3AMore%3A%3AIPRanges)
+
+    Grouping information on IP addresses
 
 # MOTIVATION
 
@@ -92,68 +110,29 @@ is a waste of resources and a potential security problem.
 Manually creating the multitude of potential addresses on the same interface
 (especially for IPv6) is a pain to maintain. This module reduces the effort by
 generating all combinations of parameters and then filters out what doesn't
-make sense and what you don't want
+make sense and what you don't want. See `sockaddr_passive` below for more
+information.
 
 # API
 
-## getifaddrs
+From version v0.5.0 the structure of the module has been refactored into other
+modules. The same API is accessible from this module, as it imports them and
+reexports their subroutines/constants. If you don't need the easy listening
+features of this module, then you can use these modules independently.
 
-```perl
-    my @interfaces=getifaddrs;
-```
+## getifaddrs ([Socket::More::Interface](https://metacpan.org/pod/Socket%3A%3AMore%3A%3AInterface))
 
-Queries the OS via  `getifaddr` for the list of interfaces currently active.
-Returns a list of hash references representing the network interfaces. The keys
-of these hashes include:
+## if\_nametoindex ([Socket::More::Interface](https://metacpan.org/pod/Socket%3A%3AMore%3A%3AInterface))
 
-- name
+## if\_indextoname ([Socket::More::Interface](https://metacpan.org/pod/Socket%3A%3AMore%3A%3AInterface))
 
-    The text name of the interface
+## if\_nameindex ([Socket::More::Interface](https://metacpan.org/pod/Socket%3A%3AMore%3A%3AInterface))
 
-- flags
+## getaddrinfo ([Socket::More::Lookup](https://metacpan.org/pod/Socket%3A%3AMore%3A%3ALookup))
 
-    Flags set on the interface
+## getnameinfo ([Socket::More::Lookup](https://metacpan.org/pod/Socket%3A%3AMore%3A%3ALookup))
 
-- addr
-
-    Packed sockaddr structure suitable for use with `bind`
-
-- netmask
-
-    Packed sockaddr structure of the netmask
-
-- dstmask
-
-    Packed sockaddr structure of the dstmask
-
-## if\_nametoindex
-
-```perl
-    my $index=if_nametoindex($name);
-```
-
-Returns the index of an interface by name. If the interface is not found,
-returns 0 and sets `$!` with error code.
-
-## if\_indextoname
-
-```perl
-    my $name=if_indextoname($index);
-```
-
-Returns the name of an interface by index. If the index does not represent an
-interface, `undef` is returned and sets `$!` with error code
-
-## if\_nameindex
-
-```perl
-    my @pairs=if_nameindex;
-```
-
-Returns a list of key value pairs. The key is the interface index, and the
-value is the name of the interface.
-
-Return `undef` on error and sets `$!` with error code.
+## gai\_strerror ([Socket::More::Lookup](https://metacpan.org/pod/Socket%3A%3AMore%3A%3ALookup))
 
 ## family\_to\_string
 
@@ -181,27 +160,29 @@ For example calling with `"INET"` will return a list of two elements,
 This is useful for handling address families supplied from the command line, as
 abbreviated names can be matched.
 
-## sock\_to\_string
+## socktype\_to\_string or sock\_to\_string
 
 ```perl
-    my $string=sock_to_string($type);
+    my $string=socktype_to_string($type);
 ```
 
 Returns a string label representing a socket type `$type`. For example,
 calling with the integer constant `SOCK_STREAM`, will return a string
 `"SOCK_STREAM"`
 
-## string\_to\_sock
+## string\_to\_socktype  or string\_to\_type
 
 ```perl
-    my @type=string_to_family($string);
+    my @type=string_to_socktype($string);
 ```
 
 Performs a match of all SOCK\_.\* names against `$pattern`. Returns a list of
 integers for the corresponding socket types that matched. Returns an empty list
-if the patten/string does not match. The match is performed insensitive to case.
+if the patten/string does not match. The match is performed insensitive to
+case.
 
-For example calling with `"STREAM"` will return a list of one element, `SOCK_STREAM`.
+For example calling with `"STREAM"` will return a list of one element,
+`SOCK_STREAM`.
 
 This is useful for handling address families supplied from the command line, as
 abbreviated names can be matched.
@@ -215,11 +196,14 @@ abbreviated names can be matched.
 Returns a list of 'interface' structures (similar to getifaddr above) which
 provide meta data and packed address structures suitable for passive use (i.e
 bind) and matching the `$specification`. The resulting data is sorted by
-interface name, then but family and finally by type.
+interface name, then by family and finally by type.
 
 It has some overlapping function of `getaddrinfo`, however it is specifically
 for creating addresses for binding, allows the use of interface names and
 operates with UNIX domain configurations through a synthetic  'unix' interface.
+
+From **v0.5.0** the results will return interface information in an addition
+field.
 
 A specification hash has optional keys which dictate what addresses are
 generated and filtered:
@@ -237,8 +221,8 @@ The only required keys are `port` and/or `path`. These are used in the
 address generation and not as a filter. Without at least one of these keys, no
 results will be generated. 
 
-Other keys like `interface`, `family`  and `type` for example are used to
-restrict addresses created to the match 
+Other keys like `interface`, `family`  and `socktype` for example are used
+to restrict addresses created to the match 
 
 Keys like `address` and `group` are a filter which are directly matched
 against the address and group.
@@ -255,7 +239,7 @@ are:
             po=>...         #port
             pa=>...         #path
             a=>...          #address
-            t=>...          #type
+            s=>...          #socktype
             g=>...          #group
     }
 ```
@@ -276,7 +260,7 @@ It can include the following keys:
     A string or array ref of strings which are used as regex to match interface
     names currently available.
 
-- familiy
+- family
 
     ```perl
         examples: family=>AF_INET family=>[AF_INET, AF_INET6, AF_UNIX]
@@ -288,10 +272,10 @@ It can include the following keys:
     **From v0.4.0:** Also can be a string or array ref of strings, which are matched
     against supported families. See `parse_passive_spec` for matching details
 
-- type
+- socktype (was type)
 
     ```perl
-        examples: type=>SOCK_STREAM type=>[SOCK_STREAM, SOCK_DGRAM]
+        examples: socktype=>SOCK_STREAM socktype=>[SOCK_STREAM, SOCK_DGRAM]
     ```
 
     A integer or array ref of integers representing the socket type an interface
@@ -383,8 +367,8 @@ key.
 
 `port` and `path` keys take literal values.
 
-`family` and `type` keys take regex values, which match against the
-family/type names (using `string_to_sock` and `string_to_family`) and are
+`family` and `socktype` keys take regex values, which match against the
+family/socktype names (using `string_to_sock` and `string_to_family`) and are
 replaced with the integer values internally.
 
 Other keys treat the value as a string/regex to match against.
@@ -413,7 +397,7 @@ match SOCK\_STREAM sockets, for both AF\_INET and AF\_INET6 families, on all
 available interfaces.
 
 ```
-    family=INET,type=STREAM #Full key name
+    family=INET,socktype=STREAM #Full key name
     f=INET,t=STREAM         #Shortest unique string for keys
 ```
 
@@ -441,14 +425,14 @@ of \[\] and will need to be escaped or quoted in the shell
 ## socket
 
 ```perl
-    socket $socket, $domain_or_addr, $type, $proto
+      socket $socket, $domain, $socktype, $proto
+socket $socket, $hash
 
 
-    example:
-            die "$!" unless socket my $socket, AF_INET, SOCK_STREAM,0;
+      example:
+              die "$!" unless socket my $socket, AF_INET, SOCK_STREAM,0;
 
-            
-            die "$!" unless socket my $socket, $sockaddr, SOCK_STREAM,0;
+              die "$!" unless socket my $socket, {family=>AF_INET, protocol=>0, socktype=>SOCK_STREAM};
 ```
 
 A wrapper around `CORE::socket`.  It checks if the `DOMAIN` is a number.  If
@@ -592,7 +576,7 @@ local addresses:
 On interface en0,lo and unix, port 1000, path mypath.sock, and stream type only
 
 ```perl
-    perl examples/cli.pl -l interface='en0|lo|unix',port=1000,path=mypath.sock,type=stream
+    perl examples/cli.pl -l interface='en0|lo|unix',port=1000,path=mypath.sock,socktype=stream
 
     Interface Address                   Family   Group              Port Path          Type        Data
     en0       192.168.1.103             AF_INET  PRIVATE            1000               SOCK_STREAM
@@ -635,12 +619,6 @@ Interface en0 and lo, port 1010, private or link local group, multiple data keys
     lo0       fe80::1                   AF_INET6 LINK-LOCAL-UNICAST 1010      SOCK_DGRAM  ca=test,key=path
 ```
 
-# TODO
-
-- Network interface queries for byte counts, rates.. etc
-- Expand address family types support(i.e link)
-- Network change events/notifications
-
 # SEE ALSO
 
 Other modules provide network interface queries:
@@ -657,7 +635,7 @@ Please report any bugs via git hub: [http://github.com/drclaw1394/perl-socket-mo
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2022 by Ruben Westerberg
+Copyright (C) 2023 by Ruben Westerberg
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl or the MIT license.

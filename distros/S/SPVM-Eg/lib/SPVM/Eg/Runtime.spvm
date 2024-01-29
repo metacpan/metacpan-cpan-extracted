@@ -1,0 +1,35 @@
+class Eg::Runtime {
+  allow Eg::OS::API;
+  
+  use Eg::API;
+  use Eg::Window;
+  
+  # Fields
+  has api : ro Eg::API;
+  
+  has window : ro Eg::Window;
+  
+  has data_h : Hash;
+  
+  # Class Methods
+  static method new : Eg::Runtime ($options : object[] = undef) {
+    my $options_h = Hash->new($options);
+    
+    my $self = new Eg::Runtime;
+    
+    $self->{api} = Eg::API->new;
+    
+    my $window = Eg::Window->new;
+    
+    $self->{window} = $window;
+    
+    $window->{runtime} = $self;
+    
+    $self->{data_h} = Hash->new;
+    
+    warn dump $self;
+    
+    return $self;
+  }
+  
+}

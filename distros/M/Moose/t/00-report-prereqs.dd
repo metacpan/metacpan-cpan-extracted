@@ -200,7 +200,6 @@ do { my $x = {
                                    'CPAN::Meta::Requirements' => '0',
                                    'File::Spec' => '0',
                                    'Module::Metadata' => '0',
-                                   'Test::CleanNamespaces' => '0.13',
                                    'Test::Fatal' => '0.001',
                                    'Test::More' => '0.96',
                                    'Test::Needs' => '0.002010'

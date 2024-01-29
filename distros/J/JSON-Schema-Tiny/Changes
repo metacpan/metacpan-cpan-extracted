@@ -1,5 +1,8 @@
 Revision history for JSON-Schema-Tiny
 
+0.022     2023-12-17 00:42:56Z
+          - new $STRINGY_NUMBERS option, for validating numbers more loosely
+
 0.021     2023-04-22 17:25:12Z
           - fix bad handling of empty patterns in "pattern",
             "patternProperties" keywords

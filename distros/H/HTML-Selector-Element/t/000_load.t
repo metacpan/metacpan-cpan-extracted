@@ -14,12 +14,15 @@ is_deeply($s->{parsed},
                 static => [ '_tag' => 'div', 'class' => qr/(?<!\S)head(?!\S)/ ],
                 # extra
                 tag => 'div',
+                selector => 'div.head'
             },
             # extra
             tag => 'div',
+            selector => 'div.head + div.sub_content'
         },
         # extra
         tag => 'label',
+        selector => 'div.head + div.sub_content label'
     }],
     'parsed');
 done_testing();

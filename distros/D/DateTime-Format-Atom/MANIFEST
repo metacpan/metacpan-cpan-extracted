@@ -1,5 +1,4 @@
 .gitignore
-Makefile.PL
 Changes
 lib/DateTime/Format/Atom.pm
 LICENSE.txt

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO.pm
-## Version v0.6.4
+## Version v0.7.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/06/21
-## Modified 2023/10/31
+## Modified 2023/12/10
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -25,11 +25,10 @@ BEGIN
     use Encode ();
     use Fcntl qw( :DEFAULT );
     use JSON ();
-    use Nice::Try;
     use Scalar::Util;
     use Text::PO::Element;
     use constant HAS_LOCAL_TZ => ( eval( qq{DateTime::TimeZone->new( name => 'local' );} ) ? 1 : 0 );
-    our $VERSION = 'v0.6.4';
+    our $VERSION = 'v0.7.0';
 };
 
 use strict;
@@ -211,15 +210,17 @@ sub as_json
         $j->$t( $opts->{ $t } ) if( exists( $opts->{ $t } ) );
     }
     $j->canonical( $opts->{sort} ) if( exists( $opts->{sort} ) );
-    try
+    # try-catch
+    local $@;
+    my $json = eval
     {
-        my $json = $j->encode( $hash );
-        return( $json );
-    }
-    catch( $e )
+        $j->encode( $hash );
+    };
+    if( $@ )
     {
-        return( $self->error( "Unable to json encode the hash data created: $e" ) );
+        return( $self->error( "Unable to json encode the hash data created: $@" ) );
     }
+    return( $json );
 }
 
 sub charset
@@ -255,15 +256,18 @@ sub decode
     return( '' ) if( !length( $str ) );
     my $enc = $self->encoding;
     return( $str ) if( !$enc );
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         return( Encode::decode_utf8( $str, Encode::FB_CROAK ) ) if( $enc eq 'utf8' );
         return( Encode::decode( $enc, $str, Encode::FB_CROAK ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to decode a string using encoding '$enc': $e" ) );
+        return( $self->error( "An error occurred while trying to decode a string using encoding '$enc': $@" ) );
     }
+    return( $rv );
 }
 
 sub domain { return( shift->_set_get_scalar( 'domain', @_ ) ); }
@@ -321,7 +325,7 @@ sub dump
         next if( $e->is_meta || !CORE::length( $e->msgid ) );
         if( $e->po ne $self )
         {
-            warnings::warn( "This element '", $e->msgid, "' does not belong to us. Its po object is different than our current object.\n" ) if( warnings::enabled() );
+            warn( "This element '", $e->msgid, "' does not belong to us. Its po object is different than our current object.\n" ) if( $self->_is_warnings_enabled );
         }
         $fh->print( $e->dump, "\n" ) || return( $self->error( "Unable to print po data to file handle: $!" ) );
         $fh->print( "\n" ) || return( $self->error( "Unable to print po data to file handle: $!" ) );
@@ -612,13 +616,15 @@ sub parse
                                 ## See PerlIO::encoding man page
                                 $enc = 'utf8' if( lc( $enc ) eq 'utf-8' );
                                 $self->encoding( $enc );
-                                try
+                                # try-catch
+                                local $@;
+                                eval
                                 {
                                     $io->binmode( $enc eq 'utf8' ? ":$enc" : ":encoding($enc)" );
-                                }
-                                catch( $e )
+                                };
+                                if( $@ )
                                 {
-                                    return( $self->error( "Unable to set binmode to charset \"$enc\": $e" ) );
+                                    return( $self->error( "Unable to set binmode to charset \"$enc\": $@" ) );
                                 }
                             }
                         }
@@ -652,7 +658,7 @@ sub parse
             my $c = $1;
             $e->flags( [ split( /[[:blank:]]*,[[:blank:]]*/, $c ) ] ) if( $c );
         }
-        elsif( /^\#+[[:blank:]]+(.*?)$/ )
+        elsif( /^\#+[[:blank:]]*(.*?)$/ )
         {
             my $c = $1;
             if( !$self->meta->length && $c =~ /^domain[[:blank:]\h]+\"(.*?)\"/ )
@@ -722,9 +728,13 @@ sub parse
                 warn( "Unable to find method \"${sub}\" in class \"", ref( $e ), "\" for line parsed \"$_\"\n" );
             }
         }
+        elsif( /^\#[[:blank:]\h]*$/ )
+        {
+            # Found some standalone comments; we just ignore
+        }
         else
         {
-            warnings::warn( "I do not understand the line \"$_\" at line $n\n" ) if( warnings::enabled() );
+            warn( "I do not understand the line \"$_\" at line $n\n" ) if( $self->_is_warnings_enabled );
         }
     }
     $io->close unless( $fh_was_open );
@@ -805,13 +815,15 @@ sub parse2hash
         $io->close;
         my $j = JSON->new->relaxed;
         my $ref = {};
-        try
+        # try-catch
+        local $@;
+        eval
         {
             $ref = $j->decode( $buff );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "An error occurred while json decoding data from \"${file}\": $e" ) );
+            return( $self->error( "An error occurred while json decoding data from \"${file}\": $@" ) );
         }
         my $hash = {};
         foreach my $elem ( @{$ref->{elements}} )
@@ -841,13 +853,15 @@ sub parse2object
         $io->close;
         my $j = JSON->new->relaxed;
         my $ref = {};
-        try
+        # try-catch
+        local $@;
+        eval
         {
             $ref = $j->decode( $buff );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "An error occurred while json decoding data from \"${file}\": $e" ) );
+            return( $self->error( "An error occurred while json decoding data from \"${file}\": $@" ) );
         }
         
         $self->domain( $ref->{domain} ) if( length( $ref->{domain} ) && !length( $self->domain ) );
@@ -1340,7 +1354,7 @@ Text::PO - Read and write PO files
 
 =head1 VERSION
 
-    v0.6.4
+    v0.7.0
 
 =head1 DESCRIPTION
 

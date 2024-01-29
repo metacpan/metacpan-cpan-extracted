@@ -7,7 +7,7 @@ use Test2::V0;
 
 use Scalar::Util qw( reftype );
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 class Point {
    field $x = 0;
@@ -157,7 +157,9 @@ class WithBuildargs {
    class One {
       BUILD { $BUILD_invoked++ }
    }
-   class Two :isa(One) {}
+   class Two {
+      inherit One;
+   }
 
    Two->new;
    is( $BUILD_invoked, 1, 'One::BUILD invoked only once for Two->new' );

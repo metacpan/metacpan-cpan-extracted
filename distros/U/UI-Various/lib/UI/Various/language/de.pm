@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 #########################################################################
 
@@ -70,7 +70,7 @@ our %T =
      bad_usage_of__1_pkg_is__2
      => "fehlerhafte Nutzung von %s, \$pkg ist '%s'",
      can_t_open__1__2
-     => "",	# TODO: "can't open '%s': %s"
+     => "kann '%s' nicht öffnen: %s",
      can_t_remove__1_from_old_parent__2
      => "kann '%s' nicht von altem Elternelement trennen",
      can_t_remove__1_no_such_node_in__2
@@ -92,7 +92,7 @@ our %T =
      invalid_object__1_in_call_to__2__3
      => 'ungültiges Objekt (%s) in Aufruf von %s::%s',
      invalid_pair_in__1_attribute
-     => "",	# TODO: "invalid pair in '%s' attribute"
+     => "ungültiges Pärchen in Attribut '%s'",
      invalid_parameter__1_in_call_to__2
      => "ungültiger Parameter '%s'in Aufruf von %s",
      invalid_parameter__1_in_call_to__2__3
@@ -110,7 +110,7 @@ our %T =
      leave_box
      => 'Box verlassen',
      leave_dialog
-     => '',	# TODO: 'leave dialogue'
+     => 'Dialog verlassen',
      leave_listbox
      => 'Listbox verlassen',
      leave_window
@@ -137,6 +137,8 @@ our %T =
      => "parameter '%s' muß positive ganze Zahl sein",
      parameter__1_must_be_a_positive_integer_in_call_to__2__3
      => "parameter '%s' in Aufruf von %s::%s muß positive ganze Zahl sein",
+     parameter__1_must_be_a_valid_colour
+     => "parameter '%s' muß eine Farbe sein (Basisfarbe oder Hex-Code)",
      parameter__1_must_be_in__2__3
      => "parameter '%s' muß im Bereich [%s..%s] liegen",
      reset_directory_invalid_symbolic_link

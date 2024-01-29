@@ -1,5 +1,5 @@
 {
-   "abstract" : "compact, effective and beautiful coding editor",
+   "abstract" : "compact, effective and inventive coding editor",
    "author" : [
       "Herbert Breunung <lichtkind@cpan.org>"
    ],
@@ -50,7 +50,7 @@
    "provides" : {
       "Kephra" : {
          "file" : "lib/Kephra.pm",
-         "version" : "0.405"
+         "version" : "0.406"
       }
    },
    "release_status" : "stable",
@@ -61,7 +61,7 @@
          "web" : "https://github.com/lichtkind/Kephra"
       }
    },
-   "version" : "0.405",
+   "version" : "0.406",
    "x_generated_by_perl" : "v5.34.0",
    "x_maintainers" : [
       "Herbert Breunung <lichtkind@cpan.org>"

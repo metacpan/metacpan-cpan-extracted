@@ -22,16 +22,16 @@ name: Locale-CLDR-Locales-Gd
 provides:
   Locale::CLDR::Locales::Gd:
     file: lib/Locale/CLDR/Locales/Gd.pm
-    version: v0.34.4
+    version: v0.40.1
   Locale::CLDR::Locales::Gd::Any:
     file: lib/Locale/CLDR/Locales/Gd/Any.pm
-    version: v0.34.4
+    version: v0.40.1
   Locale::CLDR::Locales::Gd::Any::Gb:
     file: lib/Locale/CLDR/Locales/Gd/Any/Gb.pm
-    version: v0.34.4
+    version: v0.40.1
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.34.4
+  Locale::CLDR: v0.40.1
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -41,5 +41,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.34.4
+version: v0.40.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -198,6 +198,24 @@ while (<DATA>) {
     is($x, $wanted, $test);
 }
 
+# Verify that accuracy and precision is restored (CPAN RT #150523).
+
+{
+    $class -> accuracy(10);
+    is($class -> accuracy(), 10, "class accuracy is 10 before bexp()");
+    my $x = $class -> new(2);
+    $x -> bexp();
+    is($class -> accuracy(), 10, "class accuracy is 10 after bexp()");
+}
+
+{
+    $class -> precision(-10);
+    is($class -> precision(), -10, "class precision is -10 before bexp()");
+    my $x = $class -> new(2);
+    $x -> bexp();
+    is($class -> precision(), -10, "class precision is -10 after bexp()");
+}
+
 done_testing();
 
 __DATA__

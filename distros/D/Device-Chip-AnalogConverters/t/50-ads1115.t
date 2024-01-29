@@ -19,7 +19,7 @@ await $chip->mount(
 # ->read_config
 {
    $adapter->expect_write_then_read( "\x01", 2 )
-      ->returns( "\x85\x83" );
+      ->will_done( "\x85\x83" );
 
    is( await $chip->read_config,
       {
@@ -54,7 +54,7 @@ await $chip->mount(
 {
    $adapter->expect_write( "\x01\x87\x83" ); # trigger
    $adapter->expect_write_then_read( "\x00", 2 )
-      ->returns( "\x12\x34" );
+      ->will_done( "\x12\x34" );
 
    await $chip->trigger;
    is( scalar await $chip->read_adc, 0x1234,
@@ -66,7 +66,7 @@ await $chip->mount(
 # ->read_adc_voltage
 {
    $adapter->expect_write_then_read( "\x00", 2 )
-      ->returns( "\x7d\x00" );
+      ->will_done( "\x7d\x00" );
 
    is( scalar await $chip->read_adc_voltage, 1.000,
       '$chip->read_adc_voltage returns result' );

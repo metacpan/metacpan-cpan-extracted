@@ -50,9 +50,9 @@ my %WriteMakefile = (
 	'ABSTRACT_FROM' => $main_file,
 	'VERSION_FROM'  => $main_file,
 	'LICENSE'       => 'artistic_2',
-	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
+	'AUTHOR'        => 'brian d foy <briandfoy@pobox.com>',
 
-	'EXE_FILES'    =>  [ 'script/release' ],
+	'EXE_FILES'    =>  [ 'script/release', 'script/release-test' ],
 
 	'CONFIGURE_REQUIRES' => {
 		'ExtUtils::MakeMaker'   => '6.64',
@@ -73,7 +73,7 @@ my %WriteMakefile = (
 		},
 
 	'TEST_REQUIRES' => {
- 		'Capture::Tiny'         => '0',
+		'Capture::Tiny'         => '0',
 		'File::Temp'            => '0',
 		'Test::More'            => '1',
 		'Test::Output'          => '0',
@@ -90,7 +90,6 @@ my %WriteMakefile = (
 				},
 			bugtracker => {
 				web  => "$github/issues",
-				url  => "$github/issues",
 				},
 			},
 		keywords => ['workflow', 'module', 'distribution',
@@ -98,7 +97,8 @@ my %WriteMakefile = (
 		},
 
 	'MAN1PODS'     => {
-		'script/release' => '$(INST_MAN1DIR)/release.$(MAN1EXT)',
+		'script/release'      => '$(INST_MAN1DIR)/release.$(MAN1EXT)',
+		'script/release-test' => '$(INST_MAN1DIR)/release-test.$(MAN1EXT)',
 		},
 
 	'clean' => { FILES => "$dist-*" },

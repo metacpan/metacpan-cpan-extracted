@@ -1,6 +1,6 @@
 # ---------- Git Support ----------
 package Audio::Nama;
-use Modern::Perl;
+use Modern::Perl '2020';
 sub git { 
 	return if is_test_script();
 	$config->{use_git} or warn("@_: git command, but git is not enabled.
@@ -8,22 +8,33 @@ You may want to set use_git: 1 in .namarc"), return;
 	logpkg(__FILE__,__LINE__,'debug',"VCS command: git @_"); 
 	$project->{repo}->run(@_) 
 }
-sub initialize_project_git_repository {
-	logsub('&initialize_project_git_repository');
-	confess("no project dir") if ! project_dir();
-	return unless $config->{use_git} and not is_test_script();
-	pager("Creating git repository in ", join_path( project_dir(),  '.git' ))
-		if ! -d join_path( project_dir(),  '.git' );
-	Git::Repository->run( init => project_dir());
-	$project->{repo} = Git::Repository->new( work_tree => project_dir() );
-	write_file($file->git_state_store, "{}\n") if ! -e $file->git_state_store;
-	git( add => $file->git_state_store );
-	write_file($file->midi_store, ""), git( add => $file->midi_store )
-			if ! -e $file->midi_store;
-	git( commit => '--quiet', '--message', "initialize project");
+sub repo_git_dir { join_path(project_dir(),'.git') }
+sub init_repo_obj { $project->{repo} = Git::Repository->new( work_tree => project_dir() ) }
+sub create_repo { Git::Repository->run( init => project_dir() )}
+
+sub initialize_project_repository {
+	logsub((caller(0))[3]);
+	Audio::Nama::throw("either a test script running or use_git: 0 is configured in .namarc. ",
+		"No repo created for project ", project_dir()), 
+		return if not $config->{use_git} or is_test_script();
+	if (not -d repo_git_dir()){
+		pager("Creating git repository in ". repo_git_dir()); 
+		create_repo;
+		init_repo_obj();
+		create_file_stubs();
+		git_commit('initialize_repository');
+	} else {
+		init_repo_obj();
+		#git_commit('committing prior changes') if git_diff();
+	}
+}
+sub git_diff { 
+	my @files = @_; 
+	my $diff = git('diff', @files); 
+	$diff =~ /\S/ ? $diff : undef 
 }
 sub git_tag_exists {
-	logsub('&git_tag_exists');
+	logsub((caller(0))[3]);
 	my $tag = shift;
 	grep { $tag eq $_ } git( 'tag','--list');
 }
@@ -34,7 +45,7 @@ sub git_tag_exists {
 sub tag_branch { "$_[0]-branch" }
 
 sub restore_state_from_vcs {
-	logsub("&restore_state_from_vcs");
+	logsub((caller(0))[3]);
 	my $name = shift; # tag or branch
 	
 	# checkout branch if matching branch exists
@@ -68,35 +79,52 @@ sub restore_state_from_vcs {
 	restore_state_from_file();
 }
  
-sub git_snapshot {
-	logsub("&git_snapshot");
-	my $commit_message = shift() || "";
-	return unless $config->{use_git} and ! $config->{opts}->{R};
+sub project_snapshot {
+	logsub((caller(0))[3]);
+	return if $config->{opts}->{R}
+		   or $this_engine->running and Audio::Nama::ChainSetup::really_recording();
+	# we skip storing commands that do not affect project state
+
 	save_state();
-	reset_command_buffer(), return unless state_changed();
+	reset_command_buffer(), return if not state_changed();
+
+	return if not $config->{use_git} 
+	  	   or not $project->{name} 
+		   or not $project->{repo};
+
+	my $commit_message = shift() || "";
 	git_commit($commit_message);
 }
+
 sub reset_command_buffer { $project->{command_buffer} = [] } 
 
-sub git_commit {
-	logsub("&git_commit");
-	my $commit_message = shift;
-	no warnings 'uninitialized';
-	use utf8;
-	scalar @{$project->{command_buffer}} and $commit_message .= join "\n", 
+sub command_buffer_contents {
+	no warnings 'uninitialized'; 
+	scalar @{$project->{command_buffer}} and join("\n", 
 		undef,
 		(map{ $_->{command} } @{$project->{command_buffer}}),
-		# context for first command
+		# context for first command of group
 		"* track: $project->{command_buffer}->[0]->{context}->{track}",
 		"* bus:   $project->{command_buffer}->[0]->{context}->{bus}",
-		"* op:    $project->{command_buffer}->[0]->{context}->{op}",
-	git( add => $file->git_state_store );
+		"* op: $project->{command_buffer}->[0]->{context}->{op}"
+		) or undef
+}
+sub git_commit {
+	logsub((caller(0))[3]);
+	my $commit_message = shift;
+	my @defaults = ($file->state_store, $file->midi_store, $file->tempo_map);
+	my @files = scalar @_ ? @_ : @defaults;
+	no warnings 'uninitialized';
+	@files = @defaults if not @files;
+	$commit_message .= command_buffer_contents();
+	use utf8;
+	git( add => @files);
 	git( commit => '--quiet', '--message', $commit_message);
 	reset_command_buffer();
 }
 
 sub git_checkout {
-	logsub("&git_checkout");
+	logsub((caller(0))[3]);
 	my ($branchname, @args) = @_;
 	return unless $config->{use_git};
 
@@ -122,8 +150,9 @@ these changes, or throw them away."
 	git(checkout => $branchname, @args);
 
 }
+
 sub git_create_branch {
-	logsub("&git_create_branch");
+	logsub((caller(0))[3]);
 	my ($branchname, $branchfrom) = @_;
 	return unless $config->{use_git};
 	# create new branch
@@ -137,13 +166,13 @@ sub git_create_branch {
 }
 
 sub state_changed {  
-	logsub("&state_changed");
+	logsub((caller(0))[3]);
 	return unless $config->{use_git};
-	git("diff");
+	git_diff();
 }
 
 sub git_branch_exists { 
-	logsub("&git_branch_exists");
+	logsub((caller(0))[3]);
 	return unless $config->{use_git};
 	my $branchname = shift;
 	grep{ $_ eq $branchname } 
@@ -152,7 +181,7 @@ sub git_branch_exists {
 }
 
 sub current_branch {
-	logsub("&current_branch");
+	logsub((caller(0))[3]);
 	return unless $project->{repo};
 	my ($b) = map{ /\* (\S+)/ } grep{ /\*/ } split "\n", git('branch');
 	$b
@@ -164,7 +193,7 @@ sub git_sha {
 		$sha
 }
 sub git_branch_display {
-	logsub("&git_branch_display");
+	logsub((caller(0))[3]);
 	my $display = $Audio::Nama::project->{name};
 	return $display unless $config->{use_git};
 	my $cb = current_branch();
@@ -181,10 +210,6 @@ sub list_branches {
 	);
 }
 
-sub autosave {
-		logsub("&autosave");
-		$this_engine->started() ? return : git_snapshot();
-}
 sub redo {
 	if ($project->{redo}){
 		git('cherry-pick',$project->{redo});

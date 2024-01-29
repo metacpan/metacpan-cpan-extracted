@@ -4,8 +4,8 @@ package Sah::SchemaR::perl::modname;
 # preamble code
 no warnings 'experimental::regex_sets';
 
-our $DATE = '2023-01-19'; # DATE
-our $VERSION = '0.048'; # VERSION
+our $DATE = '2023-10-26'; # DATE
+our $VERSION = '0.049'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nThis is a schema you can use when you want to accept a Perl module name. It\noffers basic checking of syntax as well as a couple of conveniences. First, it\noffers completion from list of locally installed Perl modules. Second, it\ncontains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`\nor even 'Foo.Bar' and it will be normalized into `Foo::Bar`.\n\nTo see this schema in action on the CLI, you can try e.g. the `pmless` script\nfrom <pm:App::PMUtils> and activate its tab completion (see its manpage for more\ndetails). Then on the CLI try typing:\n\n    % pmless M/<tab>\n    % pmless dzp/<tab>\n    % pmless Module/List/Wildcard\n    % pmless Module::List::Wildcard\n\nNote that this schema does not check that the Perl module exists or is installed\nlocally. To check that, use the `perl::modname::installed` schema. And there's\nalso a `perl::modname::not_installed` schema.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo::Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo-Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar.pm"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo.Bar"},{valid=>0,value=>"Foo|Bar"}],match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*)\\z",prefilters=>["Perl::normalize_perl_modname"],summary=>"Perl module name, e.g. Foo::Bar","x.completion"=>"perl_modname"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -24,7 +24,7 @@ Sah::SchemaR::perl::modname - Perl module name, e.g. Foo::Bar
 
 =head1 VERSION
 
-This document describes version 0.048 of Sah::SchemaR::perl::modname (from Perl distribution Sah-Schemas-Perl), released on 2023-01-19.
+This document describes version 0.049 of Sah::SchemaR::perl::modname (from Perl distribution Sah-Schemas-Perl), released on 2023-10-26.
 
 =head1 DESCRIPTION
 

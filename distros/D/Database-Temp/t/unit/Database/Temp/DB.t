@@ -1,5 +1,6 @@
 #!perl
 ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
+## no critic (ControlStructures::ProhibitPostfixControls)
 
 use strict;
 use warnings;
@@ -12,6 +13,11 @@ use utf8;
 use Test2::V0 -target => 'Database::Temp::DB';
 use Test2::Tools::Spec;
 set_encoding('utf8');
+
+use Database::Temp;
+
+skip_all('Skip testing with SQLite; Not available')
+  if ( !Database::Temp->is_available( driver => 'SQLite' ) );
 
 describe 'method `connection_info`' => sub {
     my ( $driver, $name, $dsn, $username, $password, $attr, @expected_connection_info );

@@ -14,8 +14,9 @@
 
 use 5.14.0;
 use warnings;
+use Capture::Tiny 'capture';
 use File::Spec::Functions 'tmpdir';
-use File::Temp ();
+use File::Temp   ();
 use Getopt::Long qw(GetOptions :config no_ignore_case);
 use POSIX 'setsid';
 use Text::ParseWords 'shellwords';
@@ -177,7 +178,15 @@ close $tmp_ly;
 
 say $ly_filename if $Flag_Generate_Score;
 
-system @Lilypond_Cmd == 0 or die "lilypond failed: $?\n";
+# lilypond is noisy by default
+my ( $stdout, $stderr, $status ) = capture {
+    system @Lilypond_Cmd, $ly_filename;
+};
+if ( $status != 0 ) {
+    print STDERR $stderr;
+    exit 1;
+}
+print STDERR $stderr if $Flag_Verbose;
 
 if ($Flag_Show_Score) {
     local $SIG{CHLD} = 'IGNORE';

@@ -1,3 +1,3 @@
 package Test::More::YAMLScript;
 use base 'Lingy::Namespace';
-our $VERSION = '0.1.6';
+our $VERSION = '0.1.7';

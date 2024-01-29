@@ -1,0 +1,13 @@
+Revision history for POE-Wheel-Run-DaemonHelper
+
+0.1.0   2024-01-27/15:30
+		 - add support for PID files created by child procs for their child proc
+		 - + add new option pid_file
+		 - + add pids method for returning child pid and the pid from the PID file
+		 - + add pid_from_pid_file for returning the PID from the PID file
+		 - + reads PID file via File::Slurp, so new depend
+		 - add kill method for killing the procs
+
+0.0.1   2024-01-14/18:00
+		 - Initial release.
+

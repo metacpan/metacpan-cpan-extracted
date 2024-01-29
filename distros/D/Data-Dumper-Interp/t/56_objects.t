@@ -87,7 +87,7 @@ foreach (0,1) {
   my ($desc, $HVcn, $Hcn, $Ccn, $Scn, $Gcn);
   if ($_) {
     $Data::Dumper::Interp::Objects
-      = {show_overloaded_classname => 0, objects => 1};
+      = {show_classname => 0, objects => 1};
     $HVcn = $Hcn = $Ccn = $Scn = $Gcn = "";
     $desc = "Objects enabled but not showing overloaded classnames";
   } else {

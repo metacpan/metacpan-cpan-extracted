@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.2.1';
 
 use Export::Attrs;
 use List::Util qw( any );
@@ -410,7 +410,7 @@ sub _mock_ev { ## no critic (ProhibitExcessComplexity)
         $repeat = sprintf '%.6f', $repeat < 0 ? 0 : $repeat;
         my $now = sprintf '%.6f', $Absolute + $Relative;
         if ($repeat > 0 && $at < $now) {
-            use bigint;
+            use bignum;
             $at += $repeat * int(($now - $at) / $repeat + 1);
             $at = sprintf '%.6f', $at;
         }
@@ -509,7 +509,7 @@ Test::Mock::Time - Deterministic time & timers for event loop tests
 
 =head1 VERSION
 
-This document describes Test::Mock::Time version v0.2.0
+This document describes Test::Mock::Time version v0.2.1
 
 
 =head1 SYNOPSIS

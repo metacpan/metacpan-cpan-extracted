@@ -5,7 +5,7 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 use attributes ();
 
@@ -33,7 +33,9 @@ class Counter {
    is( $counter->count, 5, 'count is 5' );
 }
 
-class TwiceCounter :isa(Counter) {
+class TwiceCounter {
+   inherit Counter;
+
    method inc :override { $self->SUPER::inc; $self->SUPER::inc; }
 }
 
@@ -46,7 +48,9 @@ class TwiceCounter :isa(Counter) {
    is( $counter2->count, 2, 'count is 2 after double-inc' );
 }
 
-class CountFromTen :isa(Counter) {
+class CountFromTen {
+   inherit Counter;
+
    method from_ten :common {
       my $self = $class->new;
       $self->count = 10;

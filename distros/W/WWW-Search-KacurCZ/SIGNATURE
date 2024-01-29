@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.70.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,37 +12,47 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 44bf729857913c1c1b2754ae2f35570a2df4ec7e Changes
-SHA1 e2d2020b237cfe6049a9c051334de4c77502a01b KacurCZ.pm
-SHA1 62ea8161d1cc7e68c6aa5a240b42a571037b8c51 LICENSE
-SHA1 b59cc26cb0ff5ff5cec75200a878075253452a9f MANIFEST
-SHA1 25d8c47ce382fd98a4b23108f80db7d7a542d4da META.yml
-SHA1 6e292a44a9904c462188d7532e07992cc2b8b8f4 Makefile.PL
-SHA1 877a45e15319fd2b3e8453d930a88869583b8c4a README
-SHA1 8cde9be7339fc18b8e6e218d35ecf555c628f89d examples/ex1.pl
-SHA1 9b5001bfa9cf8607b3b3935284d9253e0391c9f1 inc/Module/Install.pm
-SHA1 cab0e564f9bdf658535f683aa197157e06d0dcea inc/Module/Install/Base.pm
-SHA1 a1559b5b3b40f68efbbd256f4fef85970891b3ae inc/Module/Install/Can.pm
-SHA1 f15c1ba85f6d52e70c48c64bf0752c90a4ad66f9 inc/Module/Install/Fetch.pm
-SHA1 eb48df8bafd07c6a862126d9b274df42b4395742 inc/Module/Install/Makefile.pm
-SHA1 95c73873c6c3cb7024614c225c53863e1e90c134 inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 f8b2ae3386f6ba26c33408968a953d450842eade inc/Module/Install/Win32.pm
-SHA1 f302bc703d76299cff243e5b44cecd61aac27b76 inc/Module/Install/WriteAll.pm
-SHA1 fe385be779abd6384c83c5379a3ab01a9276a8a3 t/WWW-Search-KacurCZ/00-use.t
-SHA1 df0bc8720bda7cf8fb679c3ecfa1ff967b2d6ad7 t/WWW-Search-KacurCZ/01-version.t
-SHA1 39fd7c1164d423c679955d8c9b50cf6da89db494 t/WWW-Search-KacurCZ/02-pod_coverage.t
-SHA1 e00f4d3edd76402cd6c95ccc1df9c009002bd938 t/WWW-Search-KacurCZ/03-pod.t
+SHA256 c882b3ae2bb2264cf4559c587bd552685f2b3dc30ad79fb91107bb8f7d72f6d1 Changes
+SHA256 15dbb4e30be9460b3ac0d4b57c2d6982c46d93fb96bba25f86ffdec9fc498323 KacurCZ.pm
+SHA256 bb21e21e0f3e33f0870057aa51c2073bf720004b7848a58e997bbbef4ae5d653 LICENSE
+SHA256 746cea9850d849399a0864b0c31e5cda8fc6107dd80aa8a3daded41fc82e9fd0 MANIFEST
+SHA256 0ac3c045b163ba7e526468fd35e1b8ebf78da1c9974216dcf009c90917be43ab META.yml
+SHA256 47fe86ea98268322283874bdc22fe6019ce7c4f19e8d24c2ab57d3da8df5947f Makefile.PL
+SHA256 e3a2ae9aaaf64aa6d2b33bd943c58cfb4e84db6b17997397b028c086f4b04726 README
+SHA256 c1eb1d5e7b76aaf4941dd83ac3fc4e7ec3941698e33689c0594e15b4ac9cd74d examples/fetch_kacur_capek.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 b78d78ffd9e8e30cad1b3c9821765d66602cd970e00deab27047753b7ac15871 t/WWW-Search-KacurCZ/01-use.t
+SHA256 10d898c4247a292b42448750da19e89d11943d8ac0f96ac43902493122379fc9 t/WWW-Search-KacurCZ/02-version.t
+SHA256 64d347fb043b9e638e8d2f722ba93611518e81d057600d6a2ce49e60b135beef t/WWW-Search-KacurCZ/03-new.t
+SHA256 e56e815b106bdf2a4c9b1fe56b605439930c47b351db2f861e0b3170de2a43eb t/WWW-Search-KacurCZ/04-search_from_file.t
+SHA256 c3016c7f0de5dcf5939207284e7e9ba385fcc5b386dca55554afa734115a7e17 t/data/kacur_cz-20231212-Capek.html
+SHA256 579c95e2b394b0367732d0382bfcfde116b49521c21179cc555ceb12bfc83c4f xt/WWW-Search-KacurCZ/01-pod_coverage.t
+SHA256 069e25f4ca870929fad08f9af10b8dfbb1c6e04586c0fefb333305fd24ec76cc xt/WWW-Search-KacurCZ/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQEcBAEBAgAGBQJUBjjsAAoJEAwa+cf4dLBamyYH/16axGWTo8qBNHzo70xnEhQp
-wxFadvB+iILlPlAlG/V0ptuVXF40HxLkqFHp38+Ju3rOzxR7+aco5gQB5KBhK4ub
-HQxRAWvK0lnQ6wJToAwnUHMVrVWn4DAyioA56Vwy62K7O2IfUAvdrZlA1YdjJwaE
-f4eK/gmtMt8zKf0o1M/kgXP0F1Qy9GZXSeWaZOXwCswPEBCes1GavK1I4knCB/Gf
-PUduBJH8+WXfKx9tGBCKmw820vzwF7RbRkW/pWGlTRf6dUOXF6UMSJRRdydXqQxd
-HxNt22ztYNeHtGfPoFYEePnSZU/fuQZJX9VPjdLwwhjaYr7xcVBStdSjFg6+hvI=
-=5kTO
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmV4WjEACgkQojV9Rpe/
+B8uUzw/+K4CeKBkmTOUJQAsUh8jT4ZoZKeLi1pncU2jCEvkkLzFmAs1sLeEIijVk
+cBryOyBG6UREJYX3E/O39jcvK0dCMRudb320nx17UoBa7mIiwiLG48JGNXdindSS
+ZSTLyFAb760sWsVkq2ZpDVLuj9WlRGqdsHI8ZSO15dn8eGd2bWkveQ9xLPPOSmek
+SHHSkyFDru2yw7xSPAaM4XK8Z+TJH32ZZIY9iQVXjkx26Qp9jzL6KVv2mGLPoM+H
+Pen0HVpObrOFs3BQYlvVjFdSMXP8+P5AzXcCL32RO5/0ZN7/xUL31GKhMFcKlJ4H
+RZw+/jF2wkMVWlCyN00q36AEOWbhjHtuJtsT2CSnP209l71RFXisv77mOX1SNF71
+67Nk8RcU9uDFL2LrgCECZ1VU64g5aXEhAcDLhuGXZejGR9EC6EI473/QYnGlyUM4
+cHT1BsMwn7jX6s1NoMoDsWOhwC1zmR7tYA8GRnSL+V4gIw7aa+nBWHRfVvV79LEG
+GaamsDj4selYtsNkcaBCO3EJaunrfzLaBBW5vZv/BReLg1kAd/eHF6kcoOYKOV8o
+L+zZvEdBKD5SwxYk9e/eArVRVmYi76EMAXVwwrFwKQJB85Dqgi+giMDfxGAs4n/2
+AURBY7DD6U0CGQ1XD1Q8jiW5GF1ce564hJeiWNvlZILPmP1X43Y=
+=5+QB
 -----END PGP SIGNATURE-----

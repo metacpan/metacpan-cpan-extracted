@@ -3,47 +3,65 @@
     <h3 class="panel-title">{{currentNode.title}}</h3>
   </div>
   <table class="table table-striped">
-    <thead>
-      <tr>
-        <th trspan="name"></th>
-        <th trspan="type"></th>
-        <th trspan="registerextra"></th>
-        <th trspan="label"></th>
-        <th trspan="logo"></th>
-        <th trspan="level"></th>
-        <th trspan="rule"></th>
-        <th></th>
-      </tr>
-    </thead>
     <tbody>
       <tr>
+        <th trspan="name"></th>
         <td>
           <input class="form-control" ng-model="currentNode.title" />
         </td>
+      </tr>
+      <tr>
+        <th trspan="type"></th>
         <td>
           <select class="form-control" ng-model="currentNode.data.type">
             <option ng-repeat="item in _findContainer().select" ng-selected="item.k===currentNode.data.type" value="{{item.k}}">{{item.v}}</option>
           </select>
         </td>
-        <td class="form-horizontal">
-          <input type="checkbox" class="form-control checkbox-inline" ng-model="currentNode.data.register" />
-        </td>
+      </tr>
+      <tr>
+        <th trspan="label"></th>
         <td>
           <input class="form-control" ng-model="currentNode.data.label" />
         </td>
+      </tr>
+      <tr>
+        <th trspan="logo"></th>
         <td>
           <input class="form-control" ng-model="currentNode.data.logo" />
         </td>
+      </tr>
+      <tr>
+        <th trspan="level"></th>
         <td>
           <input class="form-control" ng-model="currentNode.data.level" />
         </td>
+      </tr>
+      <tr>
+        <th trspan="activationrule"></th>
         <td>
             <input class="form-control" ng-model="currentNode.data.rule" />
         </td>
       </tr>
+      <tr>
+        <th trspan="registerextra"></th>
+        <td class="form-horizontal">
+          <input type="checkbox" class="form-control checkbox-inline" ng-model="currentNode.data.register" />
+        </td>
+      </tr>
+      <tr>
+        <th trspan="registerrule"></th>
+        <td>
+            <input class="form-control" ng-model="currentNode.data.regrule" />
+        </td>
+      </tr>
     </tbody>
   </table>
-  <h4 trspan="overPrm"></h4>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h4 class="panel-title" trspan="overPrm"></h4>
+  </div>
   <table class="table">
     <tr ng-repeat="t in currentNode.data.over">
       <td>

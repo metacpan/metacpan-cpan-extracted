@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Util;
-$Search::Elasticsearch::Util::VERSION = '8.00';
+$Search::Elasticsearch::Util::VERSION = '8.12';
 use Moo;
 use Search::Elasticsearch::Error();
 use Scalar::Util qw(blessed);
@@ -136,7 +136,7 @@ Search::Elasticsearch::Util - A utility class for internal use by Search::Elasti
 
 =head1 VERSION
 
-version 8.00
+version 8.12
 
 =head1 AUTHOR
 
@@ -144,7 +144,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Elasticsearch BV.
+This software is Copyright (c) 2024 by Elasticsearch BV.
 
 This is free software, licensed under:
 

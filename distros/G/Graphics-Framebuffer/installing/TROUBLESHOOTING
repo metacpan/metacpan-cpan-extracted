@@ -66,6 +66,13 @@ TROUBLESHOOTING
     This should force a full screen flush, but only use this if you really
     need it.
 
+  Where are the fonts?
+  
+    The default chosen font is "FreeSans" and this is included in the
+	"fonts-freetype-ttf" package.  If this package is not installed, then
+	either install it (recommended) or pick a different font.  The "fonts.pl"
+	example script uses FreeSans.
+
   It Just Plain Isn't Working
 
     Well, either your system doesn't have a framebuffer driver, or perhaps the

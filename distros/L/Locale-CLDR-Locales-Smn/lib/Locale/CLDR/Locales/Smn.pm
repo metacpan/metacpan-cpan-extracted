@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Smn - Package for language Inari Sami
 
 package Locale::CLDR::Locales::Smn;
 # This file auto generated from Data\common\main\smn.xml
-#	on Tue  5 Dec  1:31:27 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -44,7 +44,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'aa' => 'afar',
@@ -132,9 +132,7 @@ has 'display_name_language' => (
  				'en_AU' => 'Australia eŋgâlâskielâ',
  				'en_CA' => 'Kanada eŋgâlâskielâ',
  				'en_GB' => 'Britannia eŋgâlâskielâ',
- 				'en_GB@alt=short' => 'eŋgâlâskielâ (OK)',
  				'en_US' => 'Amerika eŋgâlâskielâ',
- 				'en_US@alt=short' => 'eŋgâlâskielâ (USA)',
  				'eo' => 'esperantokielâ',
  				'es' => 'espanjakielâ',
  				'es_419' => 'Läättin-Amerika espanjakielâ',
@@ -339,7 +337,6 @@ has 'display_name_language' => (
  				'ro' => 'romaniakielâ',
  				'rof' => 'rombo',
  				'rom' => 'roomaankielâ',
- 				'root' => 'ruotâs',
  				'ru' => 'ruošâkielâ',
  				'rup' => 'aromaniakielâ',
  				'rw' => 'ruandakielâ',
@@ -457,7 +454,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AC' => 'Ascension-suálui',
  			'AD' => 'Andorra',
@@ -608,7 +605,6 @@ has 'display_name_region' => (
  			'MF' => 'St. Martin',
  			'MG' => 'Madagaskar',
  			'MH' => 'Marshallsuolluuh',
- 			'MK@alt=variant' => 'OJT Makedonia',
  			'ML' => 'Mali',
  			'MM' => 'Myanmar (Burma)',
  			'MN' => 'Mongolia',
@@ -726,7 +722,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{metrisâš},
  			'UK' => q{brittilâš},
@@ -740,7 +736,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'kielâ: {0}',
  			'script' => 'čäällimvuáhádâh: {0}',
@@ -772,7 +768,7 @@ has 'characters' => (
 			auxiliary => qr{[à ç é è í ñ ń ó ò q ú ü w x æ ø å ã ö]},
 			index => ['A', 'Â', 'B', 'C', 'Č', 'D', 'Đ', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'P', 'R', 'S', 'Š', 'T', 'U', 'V', 'Y', 'Z', 'Ž', 'Ä', 'Á'],
 			main => qr{[a â b c č d đ e f g h i j k l m n ŋ o p r s š t u v y z ž ä á]},
-			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -788,36 +784,89 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(peeivih),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(peeivih),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(tiijmeh),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(tiijmeh),
 					},
+					# Long Unit Identifier
+					'duration-microsecond' => {
+						'name' => q(mikrosekunteh),
+						'one' => q({0} μs),
+						'other' => q({0} μs),
+						'two' => q({0} μs),
+					},
+					# Core Unit Identifier
 					'microsecond' => {
 						'name' => q(mikrosekunteh),
 						'one' => q({0} μs),
 						'other' => q({0} μs),
 						'two' => q({0} μs),
 					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(millisekunteh),
+					},
+					# Core Unit Identifier
 					'millisecond' => {
 						'name' => q(millisekunteh),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(minutteh),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(minutteh),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(mánuppajeh),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(mánuppajeh),
 					},
+					# Long Unit Identifier
+					'duration-nanosecond' => {
+						'name' => q(nanosekunteh),
+					},
+					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(nanosekunteh),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(sekunteh),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(sekunteh),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(ohoh),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(ohoh),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(iveh),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(iveh),
 					},
@@ -1497,7 +1546,7 @@ has 'datetime_formats_available_formats' => (
 			MEd => q{E d.M.},
 			MMM => q{LLL},
 			MMMEd => q{E, MMM d.},
-			MMMMW => q{'okko' W, MMM},
+			MMMMW => q{'okko' W, MMMM},
 			MMMMd => q{MMMM d.},
 			MMMd => q{MMM d.},
 			Md => q{d.M.},

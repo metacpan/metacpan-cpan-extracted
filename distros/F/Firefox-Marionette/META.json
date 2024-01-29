@@ -92,6 +92,6 @@
          "web" : "https://github.com/david-dick/firefox-marionette"
       }
    },
-   "version" : "1.49",
+   "version" : "1.51",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

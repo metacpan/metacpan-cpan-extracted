@@ -1,21 +1,21 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
 
-use Object::Pad 0.800;
+use Object::Pad 0.807;
 
-package App::sdview::Parser::Markdown 0.13;
-class App::sdview::Parser::Markdown
-   :does(App::sdview::Parser)
-   :strict(params);
+package App::sdview::Parser::Markdown 0.14;
+class App::sdview::Parser::Markdown :strict(params);
+
+apply App::sdview::Parser;
 
 use File::Slurper 'read_text';
 
-use String::Tagged::Markdown;
+use String::Tagged::Markdown 0.05;
 
 use constant format => "Markdown";
 use constant sort_order => 20;

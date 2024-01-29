@@ -66,10 +66,10 @@ sub new {
 # PutWorksheetFilterTop10Request.isTop : Indicates whether filter from top or bottom  ,
 # PutWorksheetFilterTop10Request.isPercent : Indicates whether the items is percent or count  ,
 # PutWorksheetFilterTop10Request.itemCount : The item count  ,
-# PutWorksheetFilterTop10Request.matchBlanks : Match all blank or  not blank cell in the list.(true/false)  ,
-# PutWorksheetFilterTop10Request.refresh : If true, hide the filtered rows.  ,
-# PutWorksheetFilterTop10Request.folder : Original workbook folder.  ,
-# PutWorksheetFilterTop10Request.storageName : Storage name.   
+# PutWorksheetFilterTop10Request.matchBlanks : Match all blank cell in the list.  ,
+# PutWorksheetFilterTop10Request.refresh : Refresh auto filters to hide or unhide the rows.  ,
+# PutWorksheetFilterTop10Request.folder : The folder where the file is situated.  ,
+# PutWorksheetFilterTop10Request.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -80,7 +80,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_filter_top10' } = { 
-    	summary => 'Filters the top 10 item in the list in worksheet',
+    	summary => 'Filter the top 10 items in the list in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -214,28 +214,28 @@ __PACKAGE__->method_documentation({
      'match_blanks' => {
      	datatype => 'string',
      	base_name => 'matchBlanks',
-     	description => 'Match all blank or  not blank cell in the list.(true/false)',
+     	description => 'Match all blank cell in the list.',
      	format => '',
      	read_only => '',
      		},
      'refresh' => {
      	datatype => 'string',
      	base_name => 'refresh',
-     	description => 'If true, hide the filtered rows.',
+     	description => 'Refresh auto filters to hide or unhide the rows.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

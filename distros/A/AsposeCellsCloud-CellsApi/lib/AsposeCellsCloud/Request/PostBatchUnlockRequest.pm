@@ -59,7 +59,7 @@ sub new {
 
 
 # Run Operation Request
-# PostBatchUnlockRequest.batchLockRequest :    
+# PostBatchUnlockRequest.batchLockRequest : BatchLockRequest Batch locking file request.     
 
 {
     my $params = {
@@ -70,7 +70,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_batch_unlock' } = { 
-    	summary => '',
+    	summary => 'Batch unlocking files that meet specific matching conditions.',
         params => $params,
         returns => 'string',
     };
@@ -117,7 +117,7 @@ __PACKAGE__->method_documentation({
      'batch_lock_request' => {
      	datatype => 'BatchLockRequest',
      	base_name => 'batchLockRequest',
-     	description => '',
+     	description => 'BatchLockRequest Batch locking file request.  ',
      	format => '',
      	read_only => '',
      		},    

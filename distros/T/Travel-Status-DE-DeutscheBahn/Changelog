@@ -1,3 +1,21 @@
+Travel::Status::DE::DeutscheBahn 5.04 - Sat Dec 30 2023
+
+    * Journey: Add is_additional accessor
+    * Stop: Add is_additional accessor
+
+Travel::Status::DE::DeutscheBahn 5.03 - Wed Dec 19 2023
+
+    * Journey: Fix route_interesting accessor (broken by 5.00)
+
+Travel::Status::DE::DeutscheBahn 5.02 - Wed Dec 14 2023
+
+    * Fix calls to $journey->route crashing in handle_day_change or add_message
+      in some circumstances if the $hafas object that created $journey has
+      gone out of scope (and become eligible for garbage collection) in the
+      meantime. The culprit was a mis-application of weaken() introduced in
+      v5.01.
+    * hafas-m: Add -v/--via option
+
 Travel::Status::DE::DeutscheBahn 5.01 - Sat Nov 25 2023
 
     * Fix incorrect handling of HIM messages (introduced in 4.19)

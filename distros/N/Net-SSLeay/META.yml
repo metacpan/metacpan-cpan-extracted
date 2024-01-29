@@ -1,11 +1,11 @@
 ---
 abstract: 'Perl bindings for OpenSSL and LibreSSL'
 author:
-  - 'Sampo Kellomäki <sampo@iki.fi>'
+  - 'Sampo Kellomaki <sampo@iki.fi>'
   - 'Florian Ragwitz <rafl@debian.org>'
   - 'Mike McCauley <mikem@airspayce.com>'
-  - 'Chris Novakovic <chris@chrisn.me.uk>'
   - 'Tuure Vartiainen <vartiait@radiatorsoftware.com>'
+  - 'Chris Novakovic <chris@chrisn.me.uk>'
   - 'Heikki Vatiainen <hvn@radiatorsoftware.com>'
 build_requires:
   Carp: '0'
@@ -47,5 +47,5 @@ requires:
 resources:
   bugtracker: https://github.com/radiator-software/p5-net-ssleay/issues
   repository: git://github.com/radiator-software/p5-net-ssleay.git
-version: '1.92'
+version: '1.94'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

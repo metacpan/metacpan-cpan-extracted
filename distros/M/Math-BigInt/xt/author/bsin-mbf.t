@@ -185,4 +185,22 @@ for my $entry (@$entries) {
     is($x, $want, 'value of $x');
 }
 
+# Verify that accuracy and precision is restored (CPAN RT #150523).
+
+{
+    $class -> accuracy(10);
+    is($class -> accuracy(), 10, "class accuracy is 10 before bsin()");
+    my $x = $class -> new("1.2345");
+    $x -> bsin();
+    is($class -> accuracy(), 10, "class accuracy is 10 after bsin()");
+}
+
+{
+    $class -> precision(-10);
+    is($class -> precision(), -10, "class precision is -10 before bsin()");
+    my $x = $class -> new("1.2345");
+    $x -> bsin();
+    is($class -> precision(), -10, "class precision is -10 after bsin()");
+}
+
 done_testing();

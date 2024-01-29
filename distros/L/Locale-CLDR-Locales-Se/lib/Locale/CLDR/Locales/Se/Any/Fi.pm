@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Se::Any::Fi - Package for language Northern Sami
 
 package Locale::CLDR::Locales::Se::Any::Fi;
 # This file auto generated from Data\common\main\se_FI.xml
-#	on Tue  5 Dec  1:30:21 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ace' => 'ačehgiella',
@@ -62,6 +62,7 @@ has 'display_name_language' => (
  				'th' => 'thaigiella',
  				'vi' => 'vietnamagiella',
  				'zh_Hans' => 'álkes kiinnágiella',
+ 				'zh_Hant' => 'árbevirolaš kiinnágiella',
 
 			);
 			if (@_) {
@@ -82,9 +83,7 @@ has 'display_name_script' => (
 			'Arab' => 'arábalaš',
  			'Hani' => 'kiinnálaš',
  			'Hans' => 'álkes kiinnálaš',
- 			'Hans@alt=stand-alone' => 'álkes kiinnálaš',
  			'Hant' => 'árbevirolaš kiinnálaš',
- 			'Hant@alt=stand-alone' => 'árbevirolaš kiinnálaš',
  			'Zxxx' => 'orrut čállojuvvot',
  			'Zzzz' => 'dovdameahttun čállin',
 
@@ -101,7 +100,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'Máilbmi',
  			'002' => 'Afrihka',
@@ -144,9 +143,6 @@ has 'display_name_type' => (
  				'ethiopic-amete-alem' => q{etiohpalaš-amete-alem kaleandar},
  				'gregorian' => q{gregorialaš kalendar},
  			},
- 			'numbers' => {
- 				'fullwide' => q{fullwide},
- 			},
 
 		}
 	},
@@ -156,7 +152,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'script' => 'čállin: {0}',
 
@@ -238,9 +234,9 @@ has 'calendar_months' => (
 				'format' => {
 					abbreviated => {
 						nonleap => [
-							'',
-							'',
-							'',
+							undef(),
+							undef(),
+							undef(),
 							'cuoŋ'
 						],
 						leap => [
@@ -251,9 +247,9 @@ has 'calendar_months' => (
 				'stand-alone' => {
 					abbreviated => {
 						nonleap => [
-							'',
-							'',
-							'',
+							undef(),
+							undef(),
+							undef(),
 							'cuoŋ'
 						],
 						leap => [
@@ -514,7 +510,7 @@ has 'datetime_formats_available_formats' => (
 			GyMMMd => q{d MMM y G},
 			MEd => q{E d.M},
 			MMMEd => q{E d MMM},
-			MMMMW => q{MMMM':a vahkku' W},
+			MMMMW => q{MMMM:'a' 'vahkku' W},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},

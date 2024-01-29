@@ -1,5 +1,5 @@
 package Password::Policy::Rule::Length;
-$Password::Policy::Rule::Length::VERSION = '0.04';
+$Password::Policy::Rule::Length::VERSION = '0.06';
 use strict;
 use warnings;
 
@@ -15,9 +15,16 @@ sub check {
     my $self = shift;
     my $password = $self->prepare(shift);
     my $strmb = String::Multibyte->new('UTF8');
-    my $len = $strmb->length($password);
-    if($len < $self->arg) {
-        Password::Policy::Exception::InsufficientLength->throw;
+    if($strmb->islegal($password)) {
+        my $len = $strmb->length($password);
+        if($len < $self->arg) {
+            Password::Policy::Exception::InsufficientLength->throw;
+        }
+    } else {
+        my $len = length $password;
+        if($len < $self->arg) {
+            Password::Policy::Exception::InsufficientLength->throw;
+        }
     }
     return 1;
 }
@@ -36,7 +43,7 @@ Password::Policy::Rule::Length
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 AUTHOR
 

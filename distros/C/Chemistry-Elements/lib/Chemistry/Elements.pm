@@ -10,8 +10,8 @@ no warnings;
 use Carp qw(croak carp);
 use Scalar::Util qw(blessed);
 
-use vars qw( @ISA $AUTOLOAD
-             $debug %names %elements $maximum_Z
+use vars qw( $AUTOLOAD
+             $debug %names $maximum_Z
              %names_to_Z $Default_language %Languages
             );
 
@@ -19,7 +19,7 @@ use Exporter qw(import);
 
 our @EXPORT_OK = qw(get_Z get_symbol get_name);
 our @EXPORT    = qw();
-our $VERSION   = '1.075';
+our $VERSION   = '1.077';
 
 use subs qw(
 	_get_name_by_Z
@@ -709,11 +709,11 @@ The source for this module is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2000-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2000-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

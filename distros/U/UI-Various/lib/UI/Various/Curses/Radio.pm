@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 use UI::Various::core;
 use UI::Various::Radio;
@@ -99,6 +99,7 @@ sub _prepare($$$)
     {
 	$var eq $self->{_button_keys}[$i]  and  $selected = $i;
     }
+    my @attributes = $self->_common_attributes();
     $self->_cui($_->_cui
 		->add($self->_cid,
 		      'Radiobuttonbox', -x => $column, -y => $row,
@@ -106,6 +107,7 @@ sub _prepare($$$)
 		      -labels => $self->{_button_hash},
 		      -values => $self->{_button_values},
 		      -selected => $selected,
+		      @attributes,
 		      -onblur => sub {
 			  # no automatic dereference:
 			  my $var = $self->{var};

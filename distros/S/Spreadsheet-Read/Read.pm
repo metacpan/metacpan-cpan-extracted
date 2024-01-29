@@ -38,7 +38,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.88";
+our $VERSION = "0.89";
 sub  Version { $VERSION }
 
 use Carp;
@@ -2700,6 +2700,8 @@ L<Text::CSV_PP|https://metacpan.org/release/Text-CSV> (the pure perl version).
 
 L<Spreadsheet::ParseExcel|https://metacpan.org/release/Spreadsheet-ParseExcel> is
 the best parser for old-style Microsoft Excel (.xls) files.
+Most recent commit was Dec 2023. Please use version 0.66 or higher to prevent
+possible memory bombs.
 
 =item Spreadsheet::ParseXLSX
 
@@ -2708,15 +2710,17 @@ like L<Spreadsheet::ParseExcel|https://metacpan.org/release/Spreadsheet-ParseExc
 but for new Microsoft Excel 2007+ files (.xlsx). They have the same API.
 
 This module uses L<XML::Twig|https://metacpan.org/release/XML-Twig> to parse the
-internal XML.
+internal XML. Most recent commit was in Dec 2023. Please use version 0.29 or
+higher to prevent possible memory bombs.
 
 =item Spreadsheet::XLSX
 
 See L<Spreadsheet::XLSX|https://metacpan.org/release/Spreadsheet-XLSX>
 documentation.
 
-This module is dead and deprecated. It is B<buggy and unmaintained>.  I<Please>
-use L<Spreadsheet::ParseXLSX|https://metacpan.org/release/Spreadsheet-ParseXLSX>
+This module is dead and deprecated. It is B<buggy and unmaintained> (Most recent
+commit was Oct 2014).  I<Please> use
+L<Spreadsheet::ParseXLSX|https://metacpan.org/release/Spreadsheet-ParseXLSX>
 instead.
 
 =item Excel::ValueReader::XLSX
@@ -2784,7 +2788,7 @@ H.Merijn Brand <perl5@tux.freedom.nl>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2023 H.Merijn Brand
+Copyright (C) 2005-2024 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

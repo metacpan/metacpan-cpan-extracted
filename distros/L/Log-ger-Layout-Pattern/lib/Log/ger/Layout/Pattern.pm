@@ -9,9 +9,9 @@ use Log::ger ();
 use Time::HiRes qw(time);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-24'; # DATE
+our $DATE = '2024-01-22'; # DATE
 our $DIST = 'Log-ger-Layout-Pattern'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $time_start = time();
 our $time_now   = $time_start;
@@ -46,8 +46,9 @@ our %format_for = (
     },
     'l' => sub {
         sprintf(
-            "%s (%s:%d)",
-            $per_message_data{caller1}[3] // '',
+            "%s%s(%s:%d)",
+            $per_message_data{caller1}[3],
+            $per_message_data{caller1}[3] ? ' ' : '',
             $per_message_data{caller0}[1],
             $per_message_data{caller0}[2],
         );
@@ -162,7 +163,7 @@ Log::ger::Layout::Pattern - Pattern layout
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -230,7 +231,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2017 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2021, 2020, 2019, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

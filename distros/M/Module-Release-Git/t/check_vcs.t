@@ -11,12 +11,46 @@ use Test::More 'no_plan';
 my $class  = 'Module::Release::Git';
 my $method = 'check_vcs';
 
+use lib qw(t/lib);
+
+use_ok( 'Local::Config' );
+use_ok( 'Module::Release' );
 use_ok( $class );
 can_ok( $class, $method );
 
 # are we where we think we're starting?
 can_ok( $class, 'run' );
 is( $class->run, $output );
+
+subtest dummy_releaserc => sub {
+	if( -e 'releaserc' ) { return pass( "releaserc exists" ) }
+	my $fh;
+	unless( open $fh, '>', 'releaserc' ) {
+		return fail( "Could not create releaserc: $!" );
+		}
+	print { $fh } "cpan_user ADOPTME\n";
+	pass( "Created releaserc" );
+	};
+
+my $release = Module::Release->new;
+$release->load_mixin( $class );
+can_ok( $release, $method );
+
+our $config_hash = {
+	commit_message_format => 'nonsense foo bar %s'
+	};
+
+{
+package Module::Release;
+no warnings qw(redefine once);
+*run          = sub { $Module::Release::Git::run_output };
+*remote_file  = sub { $_[0]->{remote_file} };
+*dist_version = sub { $_[0]->{dist_version} };
+*_warn        = sub { 1 };
+*_print       = sub { 1 };
+*_get_time    = sub { '137' };
+*config       = sub { Local::Config->new( $config_hash ) };
+}
 
 # we're testing, so turn off output (kludge)
 {
@@ -27,38 +61,46 @@ no warnings 'redefine';
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Test when there is nothing left to commit (using the starting $output)
-foreach my $try (qw(fine_output clean_output_git_2x)) {
-	no strict 'refs';
-	local $Module::Release::Git::run_output = ${ "Module::Release::Git::$try" };
+subtest nothing_left_to_commit => sub {
+	foreach my $try (qw(fine_output clean_output_git_2x)) {
+		subtest $try => sub {
+			no strict 'refs';
+			local $Module::Release::Git::run_output = ${ "Module::Release::Git::$try" };
 
-	my $rc = eval { $class->$method() };
-	my $at = $@;
-	diag( "EVAL error: $at" ) if $at;
+			my $rc = eval { $release->$method() };
+			my $at = $@;
+			diag( "EVAL error: $at" ) if $at;
 
-	ok( ! $at, "(Nothing left to commit) \$@ undef (good)" );
-	ok( $rc, "(Nothing left to commit) returns true (good)" );
-	}
+			ok( ! $at, "(Nothing left to commit) \$@ undef (good)" );
+			is( $rc, 1, "(Nothing left to commit) returns true (good)" );
+			};
+		}
+	};
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Test when there is a new file
-foreach my $try (qw(newfile_output changedfile_output
-	untrackedfile_output combined_output ) )
-	{
-	no strict 'refs';
-	local $Module::Release::Git::run_output =
-		${ "Module::Release::Git::$try" };
+subtest working_tree_dirty => sub {
+	foreach my $try (qw(newfile_output changedfile_output
+		untrackedfile_output combined_output ) )
+		{
+		subtest $try => sub {
+			no strict 'refs';
+			local $Module::Release::Git::run_output =
+				${ "Module::Release::Git::$try" };
 
-	#print STDERR "try is $Module::Release::Git::run_output\n";
+			#print STDERR "try is $Module::Release::Git::run_output\n";
 
-	my $rc = eval { $class->$method() };
-	my $at = $@;
+			my $rc = eval { $release->$method() };
+			my $at = $@;
 
-	#print STDERR "At is $@\n";
+			#print STDERR "At is $@\n";
 
-	ok( defined $at, "(Dirty working dir) \$@ defined (good)" );
-	ok( ! $rc, "(Dirty working dir) returns true (good)" );
-	like( $at, qr/not up-to-date/, "Reports that Git is not up-to-date" );
-	}
+			ok( defined $at, "(Dirty working dir) \$@ defined (good)" );
+			ok( ! $rc, "(Dirty working dir) returns true (good)" );
+			like( $at, qr/not up-to-date/, "Reports that Git is not up-to-date" );
+			};
+		}
+	};
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 =pod

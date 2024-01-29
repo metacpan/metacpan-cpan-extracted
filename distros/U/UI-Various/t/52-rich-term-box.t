@@ -3,10 +3,11 @@
 #
 # After "./Build install" it should work as "perl 52-rich-term-box.t".
 #
-# Without "Build" file it could be called with "perl -I../lib 52-rich-term-box.t"
-# or "perl -Ilib t/52-rich-term-box.t".  This is also the command needed to find
-# out what specific tests failed in a "./Build test" as the later only gives
-# you a number and not the description of the test.
+# Without "Build" file it could be called with "perl -I../lib
+# 52-rich-term-box.t" or "perl -Ilib t/52-rich-term-box.t".  This is also
+# the command needed to find out what specific tests failed in a "./Build
+# test" as the later only gives you a number and not the description of the
+# test.
 #
 # For successful run with test coverage use "./Build testcover".
 
@@ -45,6 +46,7 @@ BEGIN {
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
     delete $ENV{UI};
+    delete $ENV{LANG};
 }
 
 use UI::Various({use => ['RichTerm']});
@@ -54,11 +56,6 @@ do(T_PATH . '/functions/call_with_stdin.pl');
 
 #########################################################################
 # prepare some building blocks for the tests:
-
-# TODO: currently for testing purposes only, later switch in base.pm when utf8
-#use utf8::all
-#%UI::Various::RichTerm::base::D = UI::Various::RichTerm::base::DECO_UTF8;
-my %D = %UI::Various::RichTerm::base::D; # simple short-cut
 
 # 10-16 of each (short / long / multi-line texts, buttons):
 my $text1_10 = '';

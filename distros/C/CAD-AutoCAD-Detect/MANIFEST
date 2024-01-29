@@ -26,5 +26,6 @@ t/data/ex1.dwg
 t/data/ex2.dwg
 t/data/ex3.dwg
 t/data/fake.dwg
+t/data/fake2.dwg
 xt/CAD-AutoCAD-Detect/01-pod_coverage.t
 xt/CAD-AutoCAD-Detect/02-pod.t

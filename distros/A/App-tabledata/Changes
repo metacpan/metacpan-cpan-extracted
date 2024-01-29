@@ -1,3 +1,9 @@
+0.008   2023-09-23  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Use Text::ANSITable by default for showing table data
+          (dump_as_aoaos) to show long fields more comfortably.
+
+
 0.007   2023-04-19  Released-By: PERLANCAR; Urgency: medium
 
         - Add actions: list_cpan (-C) & list_lcpan (-c).

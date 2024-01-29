@@ -1,0 +1,17 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Eg::Node::Element::HTML::Unknown extends Eg::Node::Element::HTML {
+  
+  allow Eg::Node::Document::HTML;
+  
+  # Class Methods
+  private static method new : Eg::Node::Element::HTML::Unknown () {
+    
+    my $self = new Eg::Node::Element::HTML::Unknown;
+    
+    $self->SUPER::init;
+    
+    return $self;
+  }
+}

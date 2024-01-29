@@ -19,7 +19,7 @@ use Term::ANSIColor;
 use Time::HiRes qw(time);
 use File::Basename;
 
-use Data::Dumper;
+use Data::Dumper; # Included in Perl
 eval {    # Data::Dumper::Simple is preferred.  Try to load it without dying.
     require Data::Dumper::Simple;
     Data::Dumper::Simple->import();
@@ -31,13 +31,13 @@ $Data::Dumper::Purity   = TRUE;
 $Data::Dumper::Deparse  = TRUE;
 
 use Config;
-eval { use threads; };
+use threads;
 
 BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION = '2.11';
+    our $VERSION = '2.13';
 
     # Inherit from Exporter to export functions and variables
     our @ISA = qw(Exporter);
@@ -196,7 +196,7 @@ B<0>, B<Off>, or B<False> (Off)
 
 B<1>, B<On>, or B<True> (On - Default)
 
-  This turns on colored output.  This makes it easier to spot all of the different types of messages throughout a sea of debug output.  You can read the output with Less, and see color, by using it's switch "-r".
+  This turns on colored output.  This makes it easier to spot all of the different types of messages throughout a sea of debug output.  You can read the output with "less", and see color, by using it's switch "-r".
 
 =back
 
@@ -761,7 +761,7 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 B<VERSION>
 
-Version 2.08    (June 24, 2021)
+Version 2.13    (Dec 15, 2023)
 
 =head1 B<SUPPORT>
 
@@ -773,7 +773,7 @@ or if you have "man" installed, then
 
 C<man Debug::Easy>
 
-You can also look for information at:
+You can also look for information at:  L<https://github.com/richcsst/Debug-Easy>
 
 =head1 B<AUTHOR COMMENTS>
 

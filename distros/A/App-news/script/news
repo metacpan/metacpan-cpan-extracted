@@ -177,6 +177,12 @@ The Tildeverse also runs news. L<https://news.tildeverse.org/>
 L<RFC 3977|https://www.rfc-editor.org/rfc/rfc3977>: Network News Transfer
 Protocol (NNTP).
 
+L<RFC 3987|https://www.rfc-editor.org/rfc/rfc3987>: Internationalized Resource
+Identifiers (IRIs)
+
+L<RFC 4643|https://www.rfc-editor.org/rfc/rfc4643>: Network News Transfer
+Protocol (NNTP) Extension for Authentication.
+
 L<RFC 5536|https://www.rfc-editor.org/rfc/rfc5536>: Netnews Article Format.
 
 L<RFC 5537|https://www.rfc-editor.org/rfc/rfc5537>: Netnews Architecture and
@@ -269,13 +275,13 @@ get '/group/#group' => sub {
     app->log->debug("Getting $group $from-$to");
     my $messages = $nntp->xover("$from-$to");
     my $articles = [];
+    my $parser = DateTime::Format::Mail->new->loose;
     for my $num (sort { $b <=> $a } keys %$messages) {
       my ($subject, $from, $date, $id, $references) = @{$messages->{$num}};
       $subject = decode("MIME-Header", $subject) || "?";
       my ($tag) = $subject =~ /\[(.*?)\]/;
       $from = no_email(decode("MIME-Header", $from));
-      $date =~ s/\s*\(.*\)//; # remove extra timezone info like "(UTC)"
-      my $dt = DateTime::Format::Mail->parse_datetime($date);
+      my $dt = $parser->parse_datetime($date);
       my $url = $c->url_for('article', group => $group, id => $num);
       $url = $url->query(edit => $edit) if $edit;
       push(@$articles, {
@@ -370,6 +376,7 @@ get '/tag/#group/#tag' => sub {
     my $fmt = $nntp->overview_fmt;
     my $re = quotemeta($tag);
     my $articles = [];
+    my $parser = DateTime::Format::Mail->new->loose;
     for my $range (@$ranges) {
       app->log->debug("Getting $group " . (ref $range ? join("-", @$range) : $range));
       my $messages = $nntp->xover($range);
@@ -379,8 +386,7 @@ get '/tag/#group/#tag' => sub {
         $subject = decode("MIME-Header", $subject) || "?";
         $subject =~ s/\[$re\]\s*//;
         $from = no_email(decode("MIME-Header", $from));
-        $date =~ s/\s*\(.*\)//; # remove extra timezone info like "(UTC)"
-        my $dt = DateTime::Format::Mail->parse_datetime($date);
+        my $dt = $parser->parse_datetime($date);
         my $url = $c->url_for('article', group => $group, id => $num);
         $url = $url->query(edit => $edit) if $edit;
         push(@$articles, {
@@ -445,15 +451,15 @@ sub show_article {
     # app->log->trace(join("", @$article));
     # $article is header lines, an empty line, and body lines
     my $headers = Mojo::Headers->new;
-    while ($_ = shift(@$article) and /\S/) {
+    while ($_ = shift(@$article)) {
       $headers->parse("$_\r\n");
+      last unless /\S/;
     }
     my $id = $headers->header("message-id");
     my $subject = decode("MIME-Header", $headers->header("subject")) || "?";
     my $from = no_email(decode("MIME-Header", $headers->header("from")));
     my $date = $headers->header("date");
-    $date =~ s/\s*\(.*\)//; # remove extra timezone info like "(UTC)"
-    my $dt = DateTime::Format::Mail->parse_datetime($date);
+    my $dt = DateTime::Format::Mail->new->loose->parse_datetime($date);
     $date = [$dt->ymd, sprintf("%02d:%02d", $dt->hour, $dt->minute)];
     my $newsgroups = [split(/\s*,\s*/, decode("MIME-Header", $headers->header("newsgroups")) || "")];
     $group ||= "@$newsgroups";
@@ -580,6 +586,49 @@ post '/post' => sub {
   $c->render('posted', group => $group, ok => $ok);
 } => 'post';
 
+get '/latest' => sub {
+  my $c = shift;
+  my $list = cached("news " . ($ENV{NEWS_GROUPS} || "*"), sub {
+    my $nntp = Net::NNTP->new() or return 'error';
+    my $since = time() - 7 * 24 * 60 * 60; # one week
+    my $ids = $nntp->newnews($since, $ENV{NEWS_GROUPS} || "*");
+    $ids = [@$ids[$#$ids - $per_page .. $#$ids]] if @$ids > $per_page;
+    my $articles = [];
+    my $parser = DateTime::Format::Mail->new->loose;
+    for my $id (@$ids) {
+      my $head = $nntp->head($id);
+      next unless $head;
+      my $headers = Mojo::Headers->new;
+      for my $line (@$head) {
+        $headers->parse("$line\r\n");
+      }
+      $headers->parse("\r\n"); # make sure it finishes correctly
+      my $subject = decode("MIME-Header", $headers->header("subject")) || "?";
+      my ($tag) = $subject =~ /\[(.*?)\]/;
+      my $from = no_email(decode("MIME-Header", $headers->header("from")));
+      my $date = $headers->header("date");
+      app->log->debug("$from/$subject/$date") unless $date;
+      my $dt = $parser->parse_datetime($date);
+      $date = [$dt->ymd, sprintf("%02d:%02d", $dt->hour, $dt->minute)];
+      my $newsgroups = [split(/\s*,\s*/, decode("MIME-Header", $headers->header("newsgroups")) || "")];
+      my $group = "@$newsgroups";
+      my $url = $c->url_for('article', group => $group, id => $id); # $num is not available
+      push(@$articles, {
+        id => $id,
+        tag => $tag,
+        url => $url,
+        group => $group,
+        from => $from,
+        subject => $subject,
+        date => $date,
+        newsgroups => $newsgroups, });
+    };
+    $nntp->quit;
+    return $articles });
+  return $c->render(template => 'noserver') if $list eq 'error';
+  $c->render(template => 'latest', list => $list);
+} => 'latest';
+
 app->start;
 
 __DATA__
@@ -594,10 +643,11 @@ href="https://en.wikipedia.org/wiki/News_server">news server</a>. If you have a
 web browser that knows how to handle news URLs, like <tt>lynx</tt>, you can
 visit the news server <a href="news://<%= $address %>/">directly</a>.
 
-% if ($id) {
 <p>
+% if ($id) {
 <%= link_to url_for('article_id', id => $id) => begin %>Start here<% end %>.
 % }
+<%= link_to url_for('latest') => begin %>Latest posts<% end %>.
 
 <table>
 <tr><th class="status">Post</th><th>Group</th></tr>
@@ -820,6 +870,34 @@ server.
 % } else {
 <h1>Error</h1>
 <p>Oops. Looks like posting to <%= link_to url_for('group', group => $group) => begin %><%= $group %><% end %> failed!
+% }
+
+@@ latest.html.ep
+% layout "default";
+% title "New news";
+<h1>New news</h1>
+<p><%= link_to url_for('index') => begin %>List all groups<% end %>
+% if (@$list) {
+<table>
+<tr><th class="date">Date</th><th class="from">From</th><th class="subject">Subject</th></tr>
+%   my $date = "";
+%   for my $article (@$list) {
+%     if ($article->{date}->[0] ne $date) {
+%       $date = $article->{date}->[0];
+<tr><td class="day"><%= $date %></td><td></td><td></td></tr>
+%     }
+%     if ($article->{tag}) {
+%       my $re = quotemeta($article->{tag});
+%       my @part = split(/$re/, $article->{subject}, 2);
+<tr><td class="time"><a href="<%= $article->{url} %>"><%= $article->{date}->[1] %></a></td><td class="from"><%= $article->{from} %></td><td class="subject"><%= $part[0] %><%= link_to url_for('tag', group => $article->{group}, tag => $article->{tag}) =>begin %><%= $article->{tag} %><% end %><%= $part[1] %></td></tr>
+%     } else {
+<tr><td class="time"><a href="<%= $article->{url} %>"><%= $article->{date}->[1] %></a></td><td class="from"><%= $article->{from} %></td><td class="subject"><%= $article->{subject} %></td></tr>
+%     }
+%   }
+</table>
+% } else {
+<p>No news is good news.
+<p>Uhh… 🤔
 % }
 
 @@ layouts/default.html.ep

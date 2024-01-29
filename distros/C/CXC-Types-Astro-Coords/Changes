@@ -1,0 +1,7 @@
+Revision history for CXC-Types-Astro-Coords
+
+0.11      2023-12-18 15:36:24-05:00 America/New_York
+
+  [SPLIT]
+
+    * Split out of darkpan CXC::Types::Coords module

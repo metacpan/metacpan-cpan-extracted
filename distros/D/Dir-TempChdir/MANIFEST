@@ -1,0 +1,13 @@
+Changes
+COPYING
+Makefile.PL
+MANIFEST
+META.json
+META.yml
+README
+ppport.h
+TempChdir.xs
+lib/Dir/TempChdir.pm
+lib/Dir/TempChdir.pod
+t/01_use.t
+t/02_cd.t

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2018-2023 -- leonerd@leonerd.org.uk
 
-package Device::Chip::AnalogConverters 0.15;
+package Device::Chip::AnalogConverters 0.16;
 
 use v5.26;
 use warnings;

@@ -8,10 +8,10 @@ use AsposeCellsCloud::Request::PostEncryptWorkbook;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | The workbook name. |
-**encryption** | **WorkbookEncryptionRequest** | Encryption parameters. |
-**folder** | **string** | Original workbook folder. |
-**storage_name** | **string** | Storage name. |  
+**name** | **string** | The file name. |
+**encryption** | **WorkbookEncryptionRequest** | WorkbookEncryptionRequestEncryption parameters. |
+**folder** | **string** | The folder where the file is situated. |
+**storage_name** | **string** | The storage name where the file is situated. |  
 
 [[Back to Model list]](../README.md#documentation-for-requests) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

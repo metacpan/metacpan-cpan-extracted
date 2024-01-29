@@ -1,5 +1,8 @@
 Revision history for Perl module Pod::Perldoc::ToToc
 
+1.123 2024-01-22T17:39:29Z
+	* refresh distro, update email address
+
 1.122 2021-09-02T16:10:36Z
 	* Pod::TOC is now distributed with this module, so fix the Makefile.PL
 	for that. (GitHub #1)

@@ -40,12 +40,12 @@ my %WriteMakefileArgs = (
     "Plack::Middleware::ReverseProxy" => 0,
     "Plack::Response" => 0,
     "Plack::Test" => 0,
-    "TAP::Formatter::GitHubActions" => 0,
+    "Test2::Tools::Compare" => 0,
     "Test2::V0" => 0,
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "v0.6.0",
+  "VERSION" => "v0.7.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -71,7 +71,7 @@ my %FallbackPrereqs = (
   "Plack::Response" => 0,
   "Plack::Test" => 0,
   "Ref::Util" => 0,
-  "TAP::Formatter::GitHubActions" => 0,
+  "Test2::Tools::Compare" => 0,
   "Test2::V0" => 0,
   "Test::More" => 0,
   "Time::Seconds" => 0,

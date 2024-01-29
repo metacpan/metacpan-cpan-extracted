@@ -163,8 +163,14 @@ ClassMeta *ObjectPad_mop_get_class_for_stash(pTHX_ HV *stash);
 #define mop_class_get_name(class)  ObjectPad_mop_class_get_name(aTHX_ class)
 SV *ObjectPad_mop_class_get_name(pTHX_ ClassMeta *class);
 
+#define mop_class_load_and_set_superclass(class, supername, superver)  ObjectPad_mop_class_load_and_set_superclass(aTHX_ class, supername, superver)
+void ObjectPad_mop_class_load_and_set_superclass(pTHX_ ClassMeta *class, SV *supername, SV *superver);
+
 #define mop_class_set_superclass(class, super)  ObjectPad_mop_class_set_superclass(aTHX_ class, super)
 void ObjectPad_mop_class_set_superclass(pTHX_ ClassMeta *class, SV *superclassname);
+
+#define mop_class_inherit_from_superclass(class, args, nargs)  ObjectPad_mop_class_inherit_from_superclass(aTHX_ class, args, nargs)
+void ObjectPad_mop_class_inherit_from_superclass(pTHX_ ClassMeta *class, SV **args, size_t nargs);
 
 #define mop_class_begin(meta)  ObjectPad_mop_class_begin(aTHX_ meta)
 void ObjectPad_mop_class_begin(pTHX_ ClassMeta *meta);
@@ -186,6 +192,14 @@ MethodMeta *ObjectPad_mop_class_add_method_cv(pTHX_ ClassMeta *meta, SV *methodn
 
 #define mop_class_add_field(class, fieldname)  ObjectPad_mop_class_add_field(aTHX_ class, fieldname)
 FieldMeta *ObjectPad_mop_class_add_field(pTHX_ ClassMeta *meta, SV *fieldname);
+
+enum {
+  FIND_FIELD_ONLY_DIRECT      = (1<<0),
+  FIND_FIELD_ONLY_INHERITABLE = (1<<1),
+};
+
+#define mop_class_find_field(class, fieldname, flags)  ObjectPad_mop_class_find_field(aTHX_ class, fieldname, flags)
+FieldMeta *ObjectPad_mop_class_find_field(pTHX_ ClassMeta *meta, SV *fieldname, U32 flags);
 
 #define mop_class_add_BUILD(class, cv)  ObjectPad_mop_class_add_BUILD(aTHX_ class, cv)
 void ObjectPad_mop_class_add_BUILD(pTHX_ ClassMeta *meta, CV *cv);
@@ -209,8 +223,8 @@ AV *ObjectPad_mop_class_get_attribute_values(pTHX_ ClassMeta *classmeta, const c
 void ObjectPad_register_class_attribute(pTHX_ const char *name, const struct ClassHookFuncs *funcs, void *funcdata);
 
 /* Field API */
-#define mop_create_field(fieldname, classmeta)  ObjectPad_mop_create_field(aTHX_ fieldname, classmeta)
-FieldMeta *ObjectPad_mop_create_field(pTHX_ SV *fieldname, ClassMeta *classmeta);
+#define mop_create_field(fieldname, fieldix, classmeta)  ObjectPad_mop_create_field(aTHX_ fieldname, fieldix, classmeta)
+FieldMeta *ObjectPad_mop_create_field(pTHX_ SV *fieldname, FIELDOFFSET fieldix, ClassMeta *classmeta);
 
 #define mop_field_seal(fieldmeta)  ObjectPad_mop_field_seal(aTHX_ fieldmeta)
 void ObjectPad_mop_field_seal(pTHX_ FieldMeta *fieldmeta);

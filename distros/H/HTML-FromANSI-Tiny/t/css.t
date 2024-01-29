@@ -125,6 +125,30 @@ $h = new_ok($mod, [
 ok find_style(qr/^#console \.term-red \{ color: crimson; \}/ ), 'replace color';
 ok!find_style(qr/^#console \.term-red \{ color: #($color); \}/   ), 'default color overwritten';
 
+{
+  package CustomClassNames;
+  our @ISA = qw(HTML::FromANSI::Tiny);
+
+  our %ATTR_TO_CLASS = (
+    red => 'text-danger',
+    bold => 'brave',
+  );
+
+  sub attr_to_class {
+    $ATTR_TO_CLASS{$_[1]} || $_[1];
+  }
+}
+
+$h = new_ok('CustomClassNames', [
+  selector_prefix => '#console ',
+]);
+@css = $h->css;
+
+ok find_style(qr/^#console \.brave \{ font-weight: bold; \}/), 'custom class name bold';
+ok find_style(qr/^#console \.text-danger \{ color: #$color; \}/ ), 'custom class name red';
+ok!find_style(qr/^#console \.red/   ), 'default class name overwritten';
+
+
 done_testing;
 
 sub find_style {

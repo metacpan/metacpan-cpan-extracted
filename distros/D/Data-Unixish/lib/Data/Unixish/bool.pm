@@ -9,21 +9,34 @@ use warnings;
 
 use Data::Unixish::Util qw(%common_args);
 
-our $VERSION = '1.572'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-09-23'; # DATE
+our $DIST = 'Data-Unixish'; # DIST
+our $VERSION = '1.573'; # VERSION
 
 our %SPEC;
 
 sub _is_true {
     my ($val, $notion) = @_;
 
-    if ($notion eq 'n1') {
-        return undef unless defined($val);
+    if ($notion =~ /^n1/) {
+        return undef unless defined($val); ## no critic: Subroutines::ProhibitExplicitReturnUndef
         return 0 if ref($val) eq 'ARRAY' && !@$val;
         return 0 if ref($val) eq 'HASH'  && !keys(%$val);
-        return $val ? 1:0;
+        if ($notion =~ /\+.*en(\z|_)/) {
+            return undef if $val =~ /^(undef|undefined|null|)$/i; ## no critic: Subroutines::ProhibitExplicitReturnUndef
+            return 0 if $val =~ /^(no|n|false|f)$/i;
+            return 1;
+        } elsif ($notion =~ /\+.*id(\z|_)/) {
+            return undef if $val =~ /^(null|kosong|)$/i; ## no critic: Subroutines::ProhibitExplicitReturnUndef
+            return 0 if $val =~ /^(tidak|tdk|t|salah|s|bukan)$/i;
+            return 1;
+        } else {
+            return $val ? 1:0;
+        }
     } else {
         # perl
-        return undef unless defined($val);
+        return undef unless defined($val); ## no critic: Subroutines::ProhibitExplicitReturnUndef
         return $val ? 1:0;
     }
 }
@@ -70,13 +83,16 @@ _
         },
         notion => {
             summary => 'What notion to use to determine true/false',
-            schema => [str => in=>[qw/perl n1/], default => 'perl'],
+            schema => [str => in=>[qw/perl n1 n1+en n1+id n1+en_id/], default => 'n1+en_id'],
             description => <<'_',
 
 `perl` uses Perl notion.
 
 `n1` (for lack of better name) is just like Perl notion, but empty array and
 empty hash is considered false.
+
+`n1+en_id` is like `n1` but also handle 'Yes', 'No', 'true', 'false', etc
+(English) and 'ya', 'tidak', etc (Indonesian).
 
 TODO: add Ruby, Python, PHP, JavaScript, etc notion.
 
@@ -101,7 +117,7 @@ sub bool {
 sub _bool_begin {
     my $args = shift;
 
-    $args->{notion} //= 'perl';
+    $args->{notion} //= 'n1+en_id';
     $args->{style}  //= 'one_zero';
     $args->{style} = 'one_zero' if !$styles{$args->{style}};
 
@@ -131,7 +147,7 @@ Data::Unixish::bool - Format boolean
 
 =head1 VERSION
 
-This document describes version 1.572 of Data::Unixish::bool (from Perl distribution Data-Unixish), released on 2019-10-26.
+This document describes version 1.573 of Data::Unixish::bool (from Perl distribution Data-Unixish), released on 2023-09-23.
 
 =head1 SYNOPSIS
 
@@ -156,7 +172,7 @@ In command line:
 
 Usage:
 
- bool(%args) -> [status, msg, payload, meta]
+ bool(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Format boolean.
 
@@ -174,14 +190,17 @@ Instead of style, you can also specify character for true value.
 
 Input stream (e.g. array or filehandle).
 
-=item * B<notion> => I<str> (default: "perl")
+=item * B<notion> => I<str> (default: "n1+en_id")
 
-What notion to use to determine true/false.
+What notion to use to determine trueE<sol>false.
 
 C<perl> uses Perl notion.
 
 C<n1> (for lack of better name) is just like Perl notion, but empty array and
 empty hash is considered false.
+
+C<n1+en_id> is like C<n1> but also handle 'Yes', 'No', 'true', 'false', etc
+(English) and 'ya', 'tidak', etc (Indonesian).
 
 TODO: add Ruby, Python, PHP, JavaScript, etc notion.
 
@@ -225,16 +244,17 @@ Available styles:
 
 Instead of style, you can also specify character for true value.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -246,6 +266,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Unixi
 
 Source repository is at L<https://github.com/perlancar/perl-Data-Unixish>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Unixish>
@@ -253,16 +302,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

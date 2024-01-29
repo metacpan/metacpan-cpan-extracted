@@ -2,25 +2,26 @@ NAME
     App::FileRenameUtils - Utilities related to renaming/moving files
 
 VERSION
-    This document describes version 0.012 of App::FileRenameUtils (from Perl
-    distribution App-FileRenameUtils), released on 2023-11-15.
+    This document describes version 0.014 of App::FileRenameUtils (from Perl
+    distribution App-FileRenameUtils), released on 2023-11-20.
 
 DESCRIPTION
     This distribution provides the following command-line utilities:
 
-    1. move-files-here
-    2. mv-add-prefix
-    3. mv-add-prefix-datestamp
-    4. mv-add-prefix-number
-    5. mv-files-to-dirs
-    6. mv-reverse
-    7. mv-swap
-    8. mv-to-from
-    9. rename-add-prefix
-    10. rename-add-prefix-datestamp
-    11. rename-add-prefix-number
-    12. rename-swap
-    13. rename-to-from
+    1. datestamp
+    2. move-files-here
+    3. mv-add-prefix
+    4. mv-add-prefix-datestamp
+    5. mv-add-prefix-number
+    6. mv-files-to-dirs
+    7. mv-reverse
+    8. mv-swap
+    9. mv-to-from
+    10. rename-add-prefix
+    11. rename-add-prefix-datestamp
+    12. rename-add-prefix-number
+    13. rename-swap
+    14. rename-to-from
 
 FUNCTIONS
   add_filename_suffix

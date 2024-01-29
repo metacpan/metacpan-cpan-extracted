@@ -24,6 +24,9 @@ subtest 'basic assignments' => sub {
     foreach my $file (test_data_file('basic.ini'), test_data_file('basic_spaces.ini')) {
       subtest $file => sub {
         $obj->parse_ini(src => $file);
+        is($obj->tocopy_section, DFLT_TOCOPY_SECTION, 'tocopy_section()');
+        is($obj->current_tocopy_section, DFLT_TOCOPY_SECTION, 'current_tocopy_section()');
+        is($obj->src_name, $file, 'src_name()');
         is_deeply($obj->sections,
                   [+DFLT_TOCOPY_SECTION, "this section"],
                   "sections()");
@@ -201,6 +204,40 @@ EOT
                          xyz  => "This is variable 'xyz' in section Sec-3."
                         }
 
+            },
+            'variables()');
+};
+
+subtest "??= and ?=" => sub {
+  local $ENV{NO_SUCH_VAR};
+
+  my $src = <<'EOT';
+    [sec]
+    a1?=A1
+    a2??=A2
+
+    b1=
+    b2=
+
+    b1 ?= B1
+    b2 ??= B2
+
+    c1:=$(=ENV:NO_SUCH_VAR)
+    c2:=$(=ENV:NO_SUCH_VAR)
+    c1?=C1
+    c2??=C2
+EOT
+  my $obj = Config::INI::RefVars->new->parse_ini(src => $src);
+  is_deeply($obj->variables,
+            {
+             'sec' => {
+                       'a1' => 'A1',
+                       'a2' => 'A2',
+                       'b1' => '',
+                       'b2' => 'B2',
+                       'c1' => '',
+                       'c2' => 'C2'
+                      }
             },
             'variables()');
 };

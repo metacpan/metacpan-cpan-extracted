@@ -7,7 +7,7 @@ use 5.012000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "compact, effective and beautiful coding editor",
+  "ABSTRACT" => "compact, effective and inventive coding editor",
   "AUTHOR" => "Herbert Breunung <lichtkind\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "1.3"
   },
-  "VERSION" => "0.405",
+  "VERSION" => "0.406",
   "test" => {
     "TESTS" => "t/*.t"
   }

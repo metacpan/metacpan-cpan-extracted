@@ -3,22 +3,23 @@ use strict;
 use warnings;
 use 5.014;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use utf8;
 use DateTime;
 use Encode qw(decode);
 use JSON;
-use Getopt::Long    qw(:config no_ignore_case);
+use Getopt::Long    qw(:config no_ignore_case bundling);
 use List::MoreUtils qw(uniq);
 use List::Util      qw(first max);
 use Travel::Routing::DE::HAFAS;
 use Travel::Status::DE::HAFAS;
 
-my ( $date, $time, $language );
+my ( $date, $time, $arrival, $language );
 my $types = q{};
 my $developer_mode;
 my $json_output;
+my $show_full_route;
 my ( $list_services, $service );
 my ( @excluded_mots, @exclusive_mots );
 my $verbosity = 0;
@@ -43,17 +44,19 @@ my $output_bold  = -t STDOUT ? "\033[1m" : q{};
 my $output_reset = -t STDOUT ? "\033[0m" : q{};
 
 GetOptions(
-	'd|date=s'     => \$date,
-	'h|help'       => sub { show_help(0) },
-	'l|language=s' => \$language,
-	'm|mot=s'      => \$types,
-	's|service=s'  => \$service,
-	't|time=s'     => \$time,
-	'v|verbose+'   => \$verbosity,
-	'V|version'    => \&show_version,
-	'devmode'      => \$developer_mode,
-	'json'         => \$json_output,
-	'list'         => \$list_services,
+	'a|arrive=s'      => sub { $arrival = 1; $time = $_[1] },
+	'd|date=s'        => \$date,
+	'h|help'          => sub { show_help(0) },
+	'f|full-route'    => \$show_full_route,
+	'l|language=s'    => \$language,
+	'm|mot=s'         => \$types,
+	's|service=s'     => \$service,
+	't|time|depart=s' => \$time,
+	'v|verbose+'      => \$verbosity,
+	'V|version'       => \&show_version,
+	'devmode'         => \$developer_mode,
+	'json'            => \$json_output,
+	'list'            => \$list_services,
 
 ) or show_help(1);
 
@@ -84,6 +87,7 @@ my %opt = (
 	to_stop        => $to_stop,
 	developer_mode => $developer_mode,
 	service        => $service,
+	arrival        => $arrival,
 	language       => $language,
 );
 
@@ -231,18 +235,18 @@ sub display_occupancies {
 	my ($load) = @_;
 
 	if ( $load and ( $load->{FIRST} or $load->{SECOND} ) ) {
-		return sprintf( "[%1s%1s]",
+		return sprintf( "%1s%1s",
 			display_occupancy( $load->{FIRST} ),
 			display_occupancy( $load->{SECOND} ) );
 	}
 
-	return q{    };
+	return q{  };
 }
 
 sub format_delay {
-	my ($delay) = @_;
-	if ($delay) {
-		return sprintf( '(%+4d)', $delay );
+	my ( $delay, $len ) = @_;
+	if ( $delay and $len ) {
+		return sprintf( "(%+${len}d)", $delay );
 	}
 	return q{};
 }
@@ -283,31 +287,47 @@ for my $res ( $hafas->connections ) {
 		}
 	}
 
+	my $negative_transfer;
+
 	my $glance = q{};
 	for my $sec ( $res->sections ) {
 		if ( $sec->type ne 'JNY' ) {
 			next;
 		}
 		if ( defined $sec->transfer_duration ) {
-			$glance .= sprintf(
-				'  (%01d:%02d)  %s',
-				$sec->transfer_duration->in_units( 'hours', 'minutes' ),
-				$sec->name
-			);
+			if ( $sec->transfer_duration->in_units('minutes') >= 0 ) {
+				$glance .= sprintf(
+					'  (%01d:%02d)  %s',
+					$sec->transfer_duration->in_units( 'hours', 'minutes' ),
+					$sec->journey->name
+				);
+			}
+			else {
+				$negative_transfer = 1;
+				$glance .= sprintf( '  (--:--)  %s', $sec->journey->name );
+			}
 		}
 		else {
-			$glance .= $sec->name;
+			$glance .= $sec->journey->name;
 		}
 	}
 
-	if ($cancelled) {
-		printf( "--:--  %s  %s\n", display_occupancies( $res->load ), $glance );
+	if ( $cancelled or $negative_transfer ) {
+		printf(
+			"--:--  (%02d:%02d)  %s  %s  %s\n",
+			$res->duration->in_units( 'hours', 'minutes' ),
+			$res->arr->strftime('%H:%M'),
+			display_occupancies( $res->load ), $glance
+		);
 	}
 	else {
 		printf(
-			"%02d:%02d  %s  %s\n",
+			"%s  (%02d:%02d)  %s  %s  %s\n",
+			$res->dep->strftime('%H:%M'),
 			$res->duration->in_units( 'hours', 'minutes' ),
-			display_occupancies( $res->load ), $glance
+			$res->arr->strftime('%H:%M'),
+			display_occupancies( $res->load ),
+			$glance
 		);
 	}
 
@@ -316,43 +336,71 @@ for my $res ( $hafas->connections ) {
 	}
 	say q{};
 
-	my $have_delay = 0;
-
+	my $delay_len = 0;
+	my $delay_fmt = 0;
 	for my $sec ( $res->sections ) {
-		if ( $sec->dep_delay or $sec->arr_delay ) {
-			$have_delay = 7;
+		if ( $sec->dep_delay ) {
+			$delay_len = max( $delay_len, length( $sec->dep_delay ) + 1 );
 		}
+		if ( $sec->arr_delay ) {
+			$delay_len = max( $delay_len, length( $sec->arr_delay ) + 1 );
+		}
+	}
+	if ($delay_len) {
+		$delay_fmt = $delay_len + 2;
 	}
 
 	for my $sec ( $res->sections ) {
 		if ( $sec->type eq 'JNY' ) {
-			printf( "${output_bold}%s${output_reset} → %s\n",
-				$sec->name, $sec->direction );
 			printf(
-				"%-5s %-${have_delay}s ab  %s%s%s\n",
-				$sec->dep_cancelled
-				? '--:--'
-				: $sec->dep->strftime('%H:%M'),
-				format_delay( $sec->dep_delay ),
-				$sec->dep_loc->name,
-				$sec->dep_platform ? q{: } : q{},
-				$sec->dep_platform // q{},
+				"${output_bold}%s${output_reset} → %s  %s\n",
+				$sec->journey->name,
+				$sec->journey->direction,
+				$show_full_route ? q{} : display_occupancies( $sec->load ),
 			);
-			printf(
-				"%-5s %-${have_delay}s an  %s%s%s\n",
-				$sec->arr_cancelled
-				? '--:--'
-				: $sec->arr->strftime('%H:%M'),
-				format_delay( $sec->arr_delay ),
-				$sec->arr_loc->name,
-				$sec->arr_platform ? q{: } : q{},
-				$sec->arr_platform // q{},
-			);
+			if ($show_full_route) {
+				for my $stop ( $sec->journey->route ) {
+					printf(
+						"%-5s %-${delay_fmt}s %s  %s%s%s\n",
+						$stop->arr ? $stop->arr->strftime('%H:%M') : q{},
+						format_delay( $stop->arr_delay, $delay_len ),
+						display_occupancies( $stop->load ),
+						$stop->loc->name,
+						$stop->platform ? q{: } : q{},
+						$stop->platform // q{},
+					);
+				}
+			}
+			else {
+				printf(
+					"%-5s %-${delay_fmt}s ab  %s%s%s\n",
+					$sec->dep_cancelled
+					? '--:--'
+					: $sec->dep->strftime('%H:%M'),
+					format_delay( $sec->dep_delay, $delay_len ),
+					$sec->dep_loc->name,
+					$sec->dep_platform ? q{: } : q{},
+					$sec->dep_platform // q{},
+				);
+				printf(
+					"%-5s %-${delay_fmt}s an  %s%s%s\n",
+					$sec->arr_cancelled
+					? '--:--'
+					: $sec->arr->strftime('%H:%M'),
+					format_delay( $sec->arr_delay, $delay_len ),
+					$sec->arr_loc->name,
+					$sec->arr_platform ? q{: } : q{},
+					$sec->arr_platform // q{},
+				);
+			}
 		}
 		elsif ( $sec->type eq 'WALK' ) {
 			printf(
-				"${output_bold}Walk %dm${output_reset}  (approx. %d minutes)\n",
-				$sec->distance, $sec->duration->in_units('minutes') );
+				"${output_bold}Walk %dm${output_reset}  (approx. %d minute%s)",
+				$sec->distance,
+				$sec->duration->in_units('minutes'),
+				$sec->duration->in_units('minutes') == 1 ? q{} : 's'
+			);
 		}
 		else {
 			printf("\n???\n");
@@ -384,7 +432,7 @@ B<hafas> [B<-d> I<date>] [B<-t> I<time>] [B<-m> I<motlist>]
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 DESCRIPTION
 
@@ -396,9 +444,18 @@ between two stops and prints the results.
 
 =over
 
+=item B<-a>, B<--arriva> I<hh>:I<mm>
+
+Request connections that arrive at the destination before I<hh>:I<mm>.
+Overrides B<--time> / B<--depart>.
+
 =item B<-d>, B<--date> I<dd>.I<mm>.[I<yyyy>]
 
 Planned departure (or arrival) date.  Default: today.
+
+=item B<-f>, B<--full-route>
+
+Show intermediate stops of each connection.
 
 =item B<-l>, B<--language> I<language>
 
@@ -428,9 +485,10 @@ The I<mot> types depend on the used service. Use C<< -m help >> to list them.
 Use the API provided by I<service> for routing; defaults to DB (Deutsche Bahn).
 See B<--list> for a list of known services.
 
-=item B<-t>, B<--time> I<hh>:I<mm>
+=item B<-t>, B<--time>, B<--depart> I<hh>:I<mm>
 
-Planned departure (or arrival) time.  Default: now.
+Request connections that depart from the origin after I<hh>:I<mm>.
+Default: now.
 
 =item B<-v>, B<--verbose>
 

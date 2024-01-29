@@ -4,7 +4,11 @@ package SPVM::StringBuffer;
 
 =head1 Name
 
-SPVM::StringBuffer - String Buffer
+SPVM::StringBuffer - String Buffers
+
+=head1 Description
+
+The StringBuffer class in L<SPVM> has methods to manipulate string buffers.
 
 =head1 Usage
   
@@ -13,40 +17,41 @@ SPVM::StringBuffer - String Buffer
   # new
   my $buffer = StringBuffer->new;
   
+  my $buffer = StringBuffer->new("abc");
+  
   # push string
-  $buffer->push("abc");
   $buffer->push("def");
   
-  # Convert to string - abcdef
+  # Convert to the string
   my $string = $buffer->to_string;
-  
-=head1 Description
 
-String buffer.
+=head1 Details
 
-=head1 Enumerations
+=head2 Internal Data Structure
 
-  enum {
-    DEFAULT_CAPACITY = 4,
-  }
+The L</"string"> stored in a StringBuffer object always starts at index 0.
 
-=head2 DEFAULT_CAPACITY
-
-The default capacity. The value is 4.
+The charactors in the range that is greater than or equal to the L</"length"> field and less than the L</"capacity"> field are filled with "\0".
 
 =head1 Fields
 
 =head2 capacity
 
-  has capacity : ro int;
+C<has capacity : ro int;>
 
 The capacity. This is the length of the internally reserved characters to extend the length of the string buffer.
 
 =head2 length
 
-  has length : ro int;
+C<has length : ro int;>
 
 The length of the string buffer.
+
+=head2 string
+
+C<has string : mutable string;>
+
+The internal string stored in the StringBuffer object.
 
 =head1 Class Methods
 
@@ -66,7 +71,7 @@ C<static method new_len : L<StringBuffer|SPVM::StringBuffer> ($length : int, $ca
 
 Creates a new C<StringBuffer> object with $length and $capacity.
 
-If $capacity is less than 0, $capacity is set to the value of L</"DEFAULT_CAPACITY">.
+If $capacity is less than 0, $capacity is set to an appropriate value.
 
 If $length is greater than $capacity, $capacity is set to $length.
 
@@ -133,6 +138,20 @@ C<method get_string_unsafe : string ();>
 Gets the internally string. 
 
 This buffer is unsafe because it continues to point to the old string if the internal string is extended.
+
+=head2 set_length
+
+C<method set_length : void ($length : int);>
+
+Sets the L</"length"> fields.
+
+If the length $length is greater than the L</"length"> field, the characters of the exceeding part are filled with "\0".
+
+=head2 set
+
+C<method set : void ($string : string);>
+
+Sets the string $string.
 
 =head1 Copyright & License
 

@@ -50,8 +50,10 @@
             "Mojo::Redis2" : "0",
             "MojoX::JSON::RPC" : "0",
             "Mojolicious" : "7.29",
+            "Object::Pad" : "0",
             "Scalar::Util" : "0",
             "Syntax::Keyword::Try" : "0.04",
+            "UUID::Tiny" : "0",
             "Unicode::Normalize" : "1.25",
             "curry" : "1.001",
             "indirect" : "0",
@@ -91,7 +93,7 @@
          "web" : "https://github.com/binary-com/perl-Mojo-WebSocketProxy"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_generated_by_perl" : "v5.26.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

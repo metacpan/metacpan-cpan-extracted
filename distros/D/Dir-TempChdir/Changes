@@ -1,0 +1,23 @@
+Revision history for Dir::TempChdir.
+
+0.05  2024-01-27
+  - Added #define NEED_caller_cx to XS to silence some cpantesters.
+
+0.04  2024-01-26
+  - Added XS code to import O_PATH or O_SEARCH if available.
+  - pushd(): Open "." with O_PATH or O_SEARCH if available.
+  - Switched from Module::Build to ExtUtils::MakeMaker.
+  - POD improvements.
+
+0.03  2023-12-15
+  - Overload 'bool' to avoid comparison with possibly undef getcwd() from '""'.
+  - POD improvements.
+
+0.02  2023-12-14
+  - pushd(): Skip opendir() if fchdir() is absent as we can't use the handle.
+  - pushd(): Use File::Spec->curdir() instead of "." for opendir().
+  - Minor optimizations.
+  - POD improvements.
+
+0.01  2023-12-09
+  - Initial version.

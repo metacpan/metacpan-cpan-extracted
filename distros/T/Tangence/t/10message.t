@@ -3,8 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 use Test::HexString;
 
 use Tangence::Message;
@@ -56,7 +55,7 @@ sub test_specific
    is_hexstr( $m->payload, $args{stream}, "$pack_method $name" );
 
    my $unpack_method = "unpack_$args{type}";
-   is_deeply( $m->$unpack_method(), exists $args{retdata} ? $args{retdata} : $args{data}, "$unpack_method $name" );
+   is( $m->$unpack_method(), exists $args{retdata} ? $args{retdata} : $args{data}, "$unpack_method $name" );
    is( length $m->payload, 0, "eats all stream for $name" );
 }
 
@@ -65,14 +64,14 @@ sub test_specific_dies
    my $name = shift;
    my %args = @_;
 
-   ok( exception {
+   ok( dies {
       my $m = Tangence::Message->new( TestStream->new, undef );
       my $pack_method = "pack_$args{type}";
 
       $m->$pack_method( $args{data} );
    }, "pack $name dies" ) if exists $args{data};
 
-   ok( exception {
+   ok( dies {
       my $m = Tangence::Message->new( TestStream->new, undef, $args{stream} );
       my $unpack_method = "unpack_$args{type}";
 
@@ -220,7 +219,7 @@ sub test_typed
       $expect = 0+$expect;
    }
 
-   is_deeply( $value, $expect, "\$type->unpack_value $name" );
+   is( $value, $expect, "\$type->unpack_value $name" );
    is( length $m->payload, 0, "eats all stream for $name" );
 }
 
@@ -232,13 +231,13 @@ sub test_typed_dies
    my $sig = $args{sig};
    my $type = _make_type $sig;
 
-   ok( exception {
+   ok( dies {
       my $m = Tangence::Message->new( TestStream->new, undef );
 
       $type->pack_value( $m, $args{data} );
    }, "\$type->pack_value for ($sig) $name dies" ) if exists $args{data};
 
-   ok( exception {
+   ok( dies {
       my $m = Tangence::Message->new( TestStream->new, undef, $args{stream} );
 
       $type->unpack_value( $m )
@@ -586,7 +585,7 @@ $m->pack_all_sametype( _make_type('int'), 10, 20, 30 );
 
 is_hexstr( $m->payload, "\x02\x0a\x02\x14\x02\x1e", 'pack_all_sametype' );
 
-is_deeply( [ $m->unpack_all_sametype( _make_type('int') ) ], [ 10, 20, 30 ], 'unpack_all_sametype' );
+is( [ $m->unpack_all_sametype( _make_type('int') ) ], [ 10, 20, 30 ], 'unpack_all_sametype' );
 is( length $m->payload, 0, "eats all stream for all_sametype" );
 
 done_testing;

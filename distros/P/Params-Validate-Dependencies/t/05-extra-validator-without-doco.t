@@ -36,14 +36,6 @@ SKIP: {
     my $domain = Dependencies(@pvd);
     ok(!$domain->inspect({alpha => 1, gamma => 1}), "DDD: correct params");
     ok($domain->inspect({alpha => 1, beta => 1, gamma => 1}), "DDD: incorrect params");
-    
-    dies_ok(sub { $domain->generate_documentation() },
-      "DDD: can't document the undoccable");
-    is(
-      Dependencies(one_of('foo', two_of('bar')))->generate_documentation(),
-      "one of ('foo' or [coderef does not support autodoc])",
-      'DDD auto-doc also detects un-doccable stuff deep down in the tree'
-    );
 }
 
 sub two_of {

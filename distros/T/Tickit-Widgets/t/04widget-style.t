@@ -9,51 +9,56 @@ use Tickit::Test;
 
 use Tickit::Widget;
 
-use Object::Pad;
+use Object::Pad 0.807;
 
 my $win = mk_window;
 
-class StyledWidget :isa(Tickit::Widget);
-use Tickit::Style;
-
-# Needs declarative code
-BEGIN {
-   style_definition base =>
-      fg => 2,
-      text => "Hello, world!",
-      spacing => 1,
-      marker => "[]",
-      '<Enter>' => "activate";
-
-   style_definition ':active' =>
-      u => 1;
-
-   style_reshape_keys qw( spacing );
-   style_reshape_textwidth_keys qw( text );
-   style_redraw_keys qw( marker );
-}
-
-use constant WIDGET_PEN_FROM_STYLE => 1;
-
-method cols  { 1 }
-method lines { 1 }
-
 my $RENDERED;
-method render_to_rb { $RENDERED++ }
-
 my $RESHAPED;
-method reshape { $RESHAPED++ }
-
 my %style_changed_values;
-method on_style_changed_values
-{
-   %style_changed_values = @_;
+
+class StyledWidget {
+   inherit Tickit::Widget;
+   use Tickit::Style;
+
+   # Needs declarative code
+   BEGIN {
+      style_definition base =>
+         fg => 2,
+         text => "Hello, world!",
+         spacing => 1,
+         marker => "[]",
+         '<Enter>' => "activate";
+
+      style_definition ':active' =>
+         u => 1;
+
+      style_reshape_keys qw( spacing );
+      style_reshape_textwidth_keys qw( text );
+      style_redraw_keys qw( marker );
+   }
+
+   use constant WIDGET_PEN_FROM_STYLE => 1;
+
+   method cols  { 1 }
+   method lines { 1 }
+
+   method render_to_rb { $RENDERED++ }
+
+   method reshape { $RESHAPED++ }
+
+   method on_style_changed_values
+   {
+      %style_changed_values = @_;
+   }
 }
 
-class StyledWidget::Subclass :isa(StyledWidget) {
+class StyledWidget::Subclass {
+   inherit StyledWidget;
 }
 
-class StyledWidget::StyledSubclass :isa(StyledWidget) {
+class StyledWidget::StyledSubclass {
+   inherit StyledWidget;
    use Tickit::Style -blank;
 
    BEGIN {
@@ -62,7 +67,8 @@ class StyledWidget::StyledSubclass :isa(StyledWidget) {
    }
 }
 
-class StyledWidget::CopiedSubclass :isa(StyledWidget) {
+class StyledWidget::CopiedSubclass {
+   inherit StyledWidget;
    use Tickit::Style -copy;
 
    BEGIN {
@@ -71,8 +77,6 @@ class StyledWidget::CopiedSubclass :isa(StyledWidget) {
          text => "Altered world";
    }
 }
-
-package main;
 
 # Code-declared default style
 {
@@ -96,15 +100,9 @@ StyledWidget {
 StyledWidget.BOLD {
    b: true;
 }
-
-StyledWidget.PLAIN {
-   !fg;
-}
-
-StyledWidget:active {
-   bg: 2;
-}
 EOF
+
+Tickit::Style->load_style_from_DATA;
 
 # Stylesheet-applied default style
 {
@@ -323,3 +321,12 @@ EOF
 }
 
 done_testing;
+
+__DATA__
+StyledWidget.PLAIN {
+   !fg;
+}
+
+StyledWidget:active {
+   bg: 2;
+}

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,40 +12,48 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 e10a85fce7da1fd3ddc277362a358735977c60af Changes
-SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE
-SHA1 8b0bab7159c21e4cac50b373ccccc05d14cb6c72 MANIFEST
-SHA1 36e358dc019d98570b804915aba630de82ba3e58 META.yml
-SHA1 6795e4ef1751a6e9b112dd6d14518683d756ce32 Makefile.PL
-SHA1 e2d42494319f91815c5a25d9ba7db502a4f3cace README
-SHA1 c156359b45cf778ed2a3148e5b7f4e69792fe3ba ValentinskaCZ.pm
-SHA1 ede66a27a12a0dcaf106bfe692e0547156d241e4 examples/ex1.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 877aaa85e8ed964add7b2414e17a6e02476a32f5 t/WWW-Search-ValentinskaCZ/01-use.t
-SHA1 a5a2a59592b743b1efcd0cfe91b10e2bb116167b t/WWW-Search-ValentinskaCZ/02-version.t
-SHA1 bee669c60a478784c3983d899897c0bab828cf75 t/data/valentinska_cz-20151030-Capek.html
-SHA1 b871d38ef4defe503c72423f45ea5a815cd1a642 xt/WWW-Search-ValentinskaCZ/01-pod_coverage.t
-SHA1 e43f1077040f04eabb2ed9ff382de681bc32ab1e xt/WWW-Search-ValentinskaCZ/02-pod.t
+SHA256 b6e528b4e4035962d4b22cbedcb1812d3681749d39adacd185b00f5e7176c76b Changes
+SHA256 bb21e21e0f3e33f0870057aa51c2073bf720004b7848a58e997bbbef4ae5d653 LICENSE
+SHA256 2ec61789dea312a4712b1c28abcd04ca2f31979108d2ce6cab0d3a5a3373a081 MANIFEST
+SHA256 5a64c9116231b6885696f07ce65eb4194364313138da145703fe6a81dcf548f1 META.yml
+SHA256 ed4e2733d339b28acd1ea270f41aa85a3eddfbc93fe7363f13abc5877faa3606 Makefile.PL
+SHA256 4cc5f77d620822464e1177b572e85bd0abacc5a62622713b56c6df87d81fb7b7 README
+SHA256 d742d804b29809e5982cbfb68e1b28743384641380e92929c72d5eea998a8ea7 ValentinskaCZ.pm
+SHA256 1d8e66405f2c27fca0f1d91d4f71e942a2accba83e5b289aeaddaa7d8ea1d504 examples/fetch_valentinska_capek.pl
+SHA256 d2c7b5d5a21048599207a93b7f5915ce327491fa0b2c99b7c7c12c22d6ccd320 examples/print_valentinska_maintainer.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 5a56994d73df3656464e95a67a24caf5c251c9b4f719402e760c342348765fef t/WWW-Search-ValentinskaCZ/01-use.t
+SHA256 d2010c00800f1c381f36c47aafbebfe65cadc80ee16e6e07157cfedd4eda6f13 t/WWW-Search-ValentinskaCZ/02-version.t
+SHA256 9554e6b0dc21c840fec5c35b8d006e33b0cd6f65d9f611a9753069010bba6da1 t/WWW-Search-ValentinskaCZ/03-new.t
+SHA256 84d17d42268e66df0e9a50f215a6db04641fba14bce36650b63e73f39d1a31ed t/WWW-Search-ValentinskaCZ/04-search_from_file.t
+SHA256 7a935c36a893083283d2b696ce68ce94fb47acfcbe2c11bd180a2f71f6775eaa t/data/valentinska_cz-20151030-Capek.html
+SHA256 b38750f557786ef8b7fcfe4808d76889aa404b07665469c7765c4eef3329b4c0 xt/WWW-Search-ValentinskaCZ/01-pod_coverage.t
+SHA256 546f06300c39b97b6bfde5392ccdb27194ad1d306dbfeb650559971ae32c7875 xt/WWW-Search-ValentinskaCZ/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWM4BvAAoJEJe+XXKaIuTlqbwIAJ3QIYDRfIdTMCnzK/pWz543
-83mPIBkXmKLIy+V6ONrooxZhDmFcZ0pO3G6Bk1woqTz4FjIAiqTcyAF1SNkNSQfC
-0iAaEWg0MCcRScCfXiPBLiWUinQtiNMcURjpLQcAF/JUZtH+pkmrqBq1C+dMl6X2
-2nN8u2p5NLMb3tBEzMEuZO7yuTm8nqfa0pbZmfkG0Jzu0W+d2wUhFnkSCORueQgT
-LzALTjWU3i+B7mbYd1da0uA8wSOHfcV5Mn6GKURKLsgSQkd/CGV09qbDB5lOMqs5
-hLUzdxkswjW3JH4m3X6YpXl5fDCu3mip2nk5oXe+mVrgmNg03X7pRfIXzzSWg/o=
-=RFfr
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmV4YQgACgkQojV9Rpe/
+B8vICg//VVOMYKHShwdvAKGTDB78+cOFLlIzGJqzmN/sbKaZFhSBoPiSolMQ+F7u
++M6bl+nyCC5AFb/wK6GAh9+YlQklNDBT35i3/RmYDBXReoV9baU+4sALx2dZllb4
+/QmVdYhkPEktQMLIVs2UzUhFjG7/DdP2uH9CUIySx+atpHW7MAGiDjZZ6V38K5Eo
+LD6VhTeEFzVsgBitMaNKAyns3qmSbjIlI46V7wOpXPXQs5b81itbAH21KLqRmt1y
+GEe7lcZdkQoFTUP7HvhmadkxQR5scUvRBc0LuHPCmK763bD2u+WtA7UF+Se2SePF
+U4/ZOZhiXjnBqZhorExwyidykBpXh40/8jbwarPb1B8v6Kge0gTSo2pDRkWjr9+5
+z9DTgu5T6hjs+4oukIfw8uUQUXZlzuTK/cSXIH4i3bToq96wMI+w1UJgM0zk/2Ul
+XsxkJ/8DeE9LAKv+Xf+40zl9jfR5JHaVFPnux2LHWOIaLXgN6aZgaO3TrprMQzS3
+sn7XUN/nDcgtGFUpsRm2zwGS1UBrB1XFv8mopFz8CbKCRoHmfsxZYCtg9J7Fj/NZ
+SbXB1BwAYLxSRnQcfDkEzsXgcWJuV8de5k8rJqJxQED5PXR4w/FW2+ObFDEdSG/w
+0LbrwSk1/UxAUfQtsZlLRmbiqCKORip/lD8qVK0jaRG/nos4zWs=
+=eh5h
 -----END PGP SIGNATURE-----

@@ -1,3 +1,14 @@
+0.021   2024-01-15  Released-By: PERLANCAR; Urgency: medium
+
+        - Add role: TableDataRole::Util::GetRowByPos.
+
+
+0.020   2023-12-28  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] [role Source::AOH] Fix getting arrayref rows before any
+          call to get_column_names().
+
+
 0.019   2023-11-25  Released-By: PERLANCAR; Urgency: high
 
         - [role Munge::GroupRows][bugfix] Add tests, fix rows being

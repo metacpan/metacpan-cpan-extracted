@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "Tk",
       "Tcl/Tk",
@@ -38,7 +38,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Tcl::Tk" : "1.03"
+            "Tcl::Tk" : "1.03",
+            "Tcl::Tk::Tkwidget::treectrl" : "1"
          }
       }
    },
@@ -51,6 +52,6 @@
       },
       "x_MailingList" : "mailto:tcltk@perl.org"
    },
-   "version" : "2.3",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "2.4",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

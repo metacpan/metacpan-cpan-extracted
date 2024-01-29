@@ -106,6 +106,7 @@ my $text1 = UI::Various::Text->new(text => 'Hello World!');
 is(ref($text1), 'UI::Various::Tk::Text',
    'type UI::Various::Tk::Text is correct');
 my $button1 = UI::Various::Button->new(text => 'OK',
+				       fg => 'black', bg => 'white',
 				       code => sub { print "OK!\n"; });
 is(ref($button1), 'UI::Various::Tk::Button',
    'type UI::Various::Tk::Button is correct');
@@ -190,7 +191,7 @@ is_deeply($listbox->{texts}, \@text8, 'listbox replaces correctly before usage')
 $box1->add(0, 1, $input, $check, $text2, $radio);
 
 my $button2 = UI::Various::Button->new(text => 'Quit');
-my $box2 = UI::Various::Box->new(columns => 2);
+my $box2 = UI::Various::Box->new(columns => 2, fg => 'black', bg => 'white');
 $box2->add($button1, $button2);
 my $w = $main->window({title => 'Hello', height => 16, width => 42},
 		      $text1, $box1, $listbox, $optionmenu, $optionmenu2, $box2);

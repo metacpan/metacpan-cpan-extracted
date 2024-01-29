@@ -1,5 +1,8 @@
 #!/usr/bin/perl
 
+# command line defaults to 0 (full list of core fonts). 1 or -s is for a
+# short list, 2 is a single TTF, and 3 is a single Type 1
+
 use strict;
 use warnings;
 
@@ -8,7 +11,7 @@ use PDF::Builder;
 use PDF::Builder::Util;
 
 my $type = 0;  # 0 = full list of core fonts 
-               # 1 = single core font (for testing)
+               # 1 or -s = single core font (for testing)
 	       # 2 = TTF font(s)
 	       # 3 = Type1 (PS) font(s)
 my $encoding = 'latin1';  # normally latin1
@@ -16,7 +19,9 @@ my $encoding = 'latin1';  # normally latin1
 
 # for testing, command line number is type
 if (scalar @ARGV > 0) {
-    if ($ARGV[0] > -1 && $ARGV[0] < 4) {
+    if      ($ARGV[0] eq '-s') {
+	$type = 1;  # -s is alias for 1
+    } elsif ($ARGV[0] > -1 && $ARGV[0] < 4) {
 	# command line type 0 1 2 or 3
 	$type = $ARGV[0];
     }
@@ -37,8 +42,8 @@ push @varLabels, 'bold 4';
 push @variants, {-caps=>1};
 push @varLabels, 'caps 1';
 
-my $compress = 'none'; # no stream compression
-#my $compress = 'flate'; # compress streams
+#my $compress = 'none'; # no stream compression
+my $compress = 'flate'; # compress streams
 
 my $sx = 33;
 my $sy = 45;
@@ -47,6 +52,7 @@ my $fx = 20;
 my ($ci, $y, $k);
 
 my (@font_list, @short_name, @T1_metrics);
+
 # core
 if ($type == 0) {
   @font_list = qw(
@@ -82,7 +88,7 @@ if ($type == 0) {
   );
 }
 if ($type == 1) {
-  @font_list = qw( Times-Roman ); 
+  @font_list = qw( Courier-Oblique ); 
 }
   
 # note that for TTF and Type1, spaces in names (Windows) replaced by ~

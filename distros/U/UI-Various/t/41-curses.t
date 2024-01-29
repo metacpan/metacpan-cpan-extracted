@@ -17,6 +17,7 @@ use strictures;
 no indirect 'fatal';
 no multidimensional;
 
+use Carp;
 use Cwd 'abs_path';
 
 use Test::More;
@@ -76,7 +77,7 @@ package Curses::UI::Common {
     no warnings 'redefine';
     sub char_read(;$)
     {
-	0 < @chars_to_read  or  die 'run out of input';
+	0 < @chars_to_read  or  Carp::confess 'run out of input';
 	local $_ = shift @chars_to_read;
 	return $_;
     };
@@ -279,7 +280,7 @@ $box2->add($t[4], 1, $t[6], $t[7]);
 my $box3 = UI::Various::Box->new(rows => 2, columns => 2,
 				 width => 3, height => 4);
 $box3->add(0, 1, $t[9], $t[10]);
-my $box = UI::Various::Box->new(rows => 2, columns => 2);
+my $box = UI::Various::Box->new(rows => 2, columns => 2, border => 1);
 $box->add($box1, $box2, $box3, $button1);
 is(ref($box), 'UI::Various::Curses::Box',
    'type UI::Various::Curses::Box is correct');
@@ -575,7 +576,8 @@ like($_, $re_too_small_error, 'error-output for small dialog looks correct');
 $w1 = UI::Various::Window->new(title => 'hello');
 $w2 = UI::Various::Window->new(title => 'dummy 1');
 my $d1 = UI::Various::Dialog->new(title => 'dummy 2', height => 2);
-my $d2 = $main->dialog({title => 'dummy 3', height => 3},
+my $d2 = $main->dialog({title => 'dummy 3', height => 3,
+			fg => 'black', bg => 'white'},
 		       UI::Various::Button->new(text => "multi\n line"));
 is(@{$main->{children}}, 4, 'main has new children');
 $d2->_prepare;

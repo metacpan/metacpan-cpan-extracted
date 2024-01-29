@@ -1,3 +1,8 @@
+0.487   2024-01-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Recognize 'dob' and 'date of birth' as anniversary field.
+
+
 0.486   2023-07-11  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.

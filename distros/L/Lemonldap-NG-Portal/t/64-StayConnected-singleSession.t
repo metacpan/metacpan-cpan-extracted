@@ -5,25 +5,22 @@ use IO::String;
 
 require 't/test-lib.pm';
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel                   => 'error',
-            useSafeJail                => 1,
-            stayConnected              => '$env->{REMOTE_ADDR} eq "127.0.0.1"',
+            stayConnected              => 1,
+            singleSession              => 1,
+            notifyDeleted              => 1,
             loginHistoryEnabled        => 1,
             securedCookie              => 1,
             stayConnectedTimeout       => 1000,
-            stayConnectedCookieName    => 'llngpersistent',
             stayConnectedSingleSession => 1,
-            portalMainLogo             => 'common/logos/logo_llng_old.png',
-            accept                     => 'text/html',
         }
     }
 );
 
 sub login_create_persistent_cookie_from_scratch {
-    my ($client) = @_;
+    my ( $client, $notifydeleted ) = @_;
     my $res;
 
     ok(
@@ -34,8 +31,6 @@ sub login_create_persistent_cookie_from_scratch {
         ),
         'Auth query'
     );
-    count(1);
-    my $id = expectCookie($res);
     my ( $host, $url, $query ) =
       expectForm( $res, undef, '/registerbrowser', 'fg', 'token' );
 
@@ -46,29 +41,63 @@ sub login_create_persistent_cookie_from_scratch {
             '/registerbrowser',
             IO::String->new($query),
             length => length($query),
-            cookie => "lemonldap=$id",
             accept => 'text/html',
         ),
         'Post fingerprint'
     );
-    count(1);
-    expectRedirection( $res, 'http://auth.example.com/' );
-    my $cid = expectCookie( $res, 'llngpersistent' );
+
+    my $id = expectCookie($res);
+    if ($notifydeleted) {
+        like( $res->[2]->[0], qr/sessionsDeleted/, "Show deleted sessions" );
+        expectForm( $res, "auth.example.com", "/" );
+    }
+    else {
+        expectRedirection( $res, 'http://auth.example.com/' );
+    }
+    my $cid = expectCookie( $res, 'llngconnection' );
     return ( $id, $cid );
 }
 
-sub try_connect_with_persistent_cookie {
-    my ( $client, $cid ) = @_;
+sub sessionid_not_valid {
+    my ( $client, $id ) = @_;
     my $res;
     ok(
         $res = $client->_get(
             '/',
-            cookie => "llngpersistent=$cid",
+            cookie => "lemonldap=$id",
+            accept => 'text/html',
+        ),
+        'Check session validity'
+    );
+    is( getHeader( $res, 'Lm-Remote-User' ),
+        undef, "Session ID no longer valid" );
+}
+
+sub sessionid_still_valid {
+    my ( $client, $id ) = @_;
+    my $res;
+    ok(
+        $res = $client->_get(
+            '/',
+            cookie => "lemonldap=$id",
+            accept => 'text/html',
+        ),
+        'Check session validity'
+    );
+    expectAuthenticatedAs( $res, "dwho" );
+}
+
+sub try_connect_with_persistent_cookie {
+    my ( $client, $cid, $notifydeleted ) = @_;
+    my $res;
+    ok(
+        $res = $client->_get(
+            '/',
+            cookie => "llngconnection=$cid",
             accept => 'text/html',
         ),
         'Try to auth with persistent cookie'
     );
-    count(1);
     expectOK($res);
     if ( $res->[2]->[0] =~ qr/Register browser/ ) {
         my ( $host, $url, $query ) =
@@ -80,14 +109,20 @@ sub try_connect_with_persistent_cookie {
             $res = $client->_post(
                 '/',
                 IO::String->new($query),
-                cookie => "llngpersistent=$cid",
+                cookie => "llngconnection=$cid",
                 length => length($query),
                 accept => 'text/html',
             ),
             'Post fingerprint'
         );
-        count(1);
-        expectRedirection( $res, 'http://auth.example.com/' );
+        if ($notifydeleted) {
+            like( $res->[2]->[0], qr/sessionsDeleted/,
+                "Show deleted sessions" );
+            expectForm( $res, "auth.example.com", "/" );
+        }
+        else {
+            expectRedirection( $res, 'http://auth.example.com/' );
+        }
         return expectCookie($res);
     }
     else {
@@ -95,25 +130,36 @@ sub try_connect_with_persistent_cookie {
     }
 }
 
-# Create a persistent connection
-my ( $id, $cid ) = login_create_persistent_cookie_from_scratch($client);
-$id = try_connect_with_persistent_cookie( $client, $cid );
-ok( $id, "Got cookie" );
-$id = try_connect_with_persistent_cookie( $client, $cid );
-ok( $id, "Got cookie" );
-count(2);
+subtest "Login with stay connected, then with persistent cookie"
+  . ", user sees notification" => sub {
 
-# Create a second persistent connection
-my ( $id2, $cid2 ) = login_create_persistent_cookie_from_scratch($client);
-$id2 = try_connect_with_persistent_cookie( $client, $cid2 );
-ok( $id2, "Got cookie" );
-count(1);
+    clean_sessions();
 
-# First persistent cookie should not be valid anymore
-$id = try_connect_with_persistent_cookie( $client, $cid );
-ok( !$id, "First persistent ID is no longer valid" );
-count(1);
+    # Create a persistent connection
+    my ( $id, $cid ) = login_create_persistent_cookie_from_scratch($client);
+    sessionid_still_valid( $client, $id );
+
+    # NotifyDeleted must be shown
+    my $id2 = try_connect_with_persistent_cookie( $client, $cid, 1 );
+    sessionid_still_valid( $client, $id2 );
+    sessionid_not_valid( $client, $id );
+  };
+
+subtest "Login with stay connected, then without persistent cookie"
+  . ", user sees notification" => sub {
+
+    clean_sessions();
+
+    # Create a persistent connection
+    my ( $id, $cid ) = login_create_persistent_cookie_from_scratch($client);
+    sessionid_still_valid( $client, $id );
+
+    # NotifyDeleted must be shown
+    my ( $id2, $cid2 ) =
+      login_create_persistent_cookie_from_scratch( $client, 1 );
+    sessionid_not_valid( $client, $id );
+  };
 
 clean_sessions();
-done_testing( count() );
+done_testing();
 

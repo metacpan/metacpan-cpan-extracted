@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl -w
 
-$VERSION = 0.048;
+$VERSION = 0.049;
 
 =head1 NAME
 
@@ -34,7 +34,7 @@ sub _usage {
     ## At least, we hope it's rarely needed.
     require Pod::Usage;
 
-    $message = "Unkown error (message not provided)"
+    $message = "Unknown error (message not provided)"
         if defined $message && ! length $message;
 
     my $help_mode = ! defined $message;
@@ -70,8 +70,8 @@ GetOptions(
     "help|h|?" => sub { _usage },
 ) or _usage 1;
 
-# _usage "Too few paramaters"  unless @ARGV > 0;
-# _usage "Too many paramaters" if     @ARGV > 0;
+# _usage "Too few parameters"  unless @ARGV > 0;
+# _usage "Too many parameters" if     @ARGV > 0;
 
 ###############################################################################
 #

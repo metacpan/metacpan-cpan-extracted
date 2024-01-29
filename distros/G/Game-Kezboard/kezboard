@@ -1,0 +1,862 @@
+#!perl
+# kezboard - a SDL game where cards are used to move around a board.
+# This is the launcher script for said game. Probably a lot of this code
+# should be shuffled off to *.pm files, but this form lets the prototype
+# script get published easily enough.
+
+use 5.36.0;
+use Algorithm::QuadTree;
+use File::ShareDir 'dist_dir';
+use File::Spec::Functions 'catfile';
+use Game::Deckar 0.02;
+use Getopt::Long 'GetOptions';
+use SDL;
+use SDL::App;
+use SDL::Event;
+use SDL::Rect;
+use SDL::Surface;
+use SDL::Tool::Font;
+use Time::HiRes 'sleep';
+
+sub MAX_LEVEL () { 5 }
+
+my $mulligan;
+
+GetOptions(
+    'delay=f'  => \my $delay,
+    'help|h|?' => sub {
+        print STDERR <<'EOH';
+Usage: kezboard [--delay=f] [--level=i] [--no-mulligan] [--seed=i]
+                [--prefix=dir]
+EOH
+        exit(64);
+    },
+    'level=i'   => \my $level,
+    'mulligan!' => sub { $mulligan = $_[1] ? 0 : 1 },
+    'prefix=s'  => \my $prefix,
+    'seed=i'    => sub { srand $_[1] },
+) or exit 1;
+
+if ( !defined $level ) {
+    $level = 1;
+} else {
+    die "kezboard: invalid starting level '$level'\n"
+      if $level < 1
+      or $level > 1 + MAX_LEVEL;
+}
+# seconds to delay when "animating" moves
+$delay = 0.5 if !defined $delay or $delay <= 0.0;
+# directory that contains the font/... and image/... files
+$prefix //= dist_dir('Game-Kezboard');
+
+sub CARD_NAME ()   { 0 }
+sub CARD_FUNC ()   { 1 }
+sub CARD_SPRITE () { 2 }
+
+# larger values may require rejiggering the display and clicks
+# handling code
+sub HANDSIZE () { 5 }
+sub TOPLAY ()   { 3 }
+
+sub MOVE_OK ()  { 0 }
+sub MOVE_EOL () { 1 }    # end of level (player got to goal, etc)
+sub MOVE_NOP () { 2 }    # a move that should not cause delays
+
+# game state - picking cards, or are the cards being run?
+sub STATE_PICK () { 0 }
+sub STATE_BRUN () { 1 }
+
+sub HERO () { 0 }    # where in @animates the player lives (also ID)
+sub GOAL () { 1 }
+
+sub SCRAM () { 2 }    # animate IDs
+sub BOMB ()  { 3 }
+
+sub XX ()     { 0 }    # points, and @animates index slots
+sub YY ()     { 1 }
+sub IX ()     { 2 }    # animate inertia
+sub IY ()     { 3 }
+sub ORIENT () { 4 }    # animate orientation (if any)
+sub SPRITE () { 5 }    # array for sprite based on orientation
+sub ID ()     { 6 }
+sub NAME ()   { 7 }
+sub DEAD ()   { 8 }
+
+my $cards_played = ~0;    # score (lower is better)
+
+my @collisions;
+$collisions[HERO][GOAL]  = \&collide_hero_goal;
+$collisions[HERO][SCRAM] = \&collide_hero_scram;
+$collisions[HERO][BOMB]  = \&collide_hero_bomb;
+$collisions[GOAL][HERO]  = \&collide_hero_goal;
+$collisions[GOAL][SCRAM] = \&collide_gate_scram;
+
+my $clicks;               # quadtree foo
+
+my @headings = (
+    [ 1,  0 ],            # x,y vector
+    [ 0,  -1 ],
+    [ -1, 0 ],
+    [ 0,  1 ],
+);
+
+my @boardsz = ( 20, 20 );
+my @occupy;    # where animates are (collision detection)
+
+my $swidth  = 1024;           # SDL window dimensions
+my $sheight = 768;
+my $cellsz  = 32;             # how big a grid cell is
+my $cardsz  = 64;             # how big a card is (roughly)
+my $cpad    = 32;             # padding around the cards for clicks
+my @cardxy  = ( 64,  96 );    # cards to put into play
+my @gridxy  = ( 192, 64 );    # where the grid starts
+my @playxy  = ( 896, 96 );    # played cards (and some buttons)
+
+my $state;
+
+my $app = SDL::App->new(
+    -w          => $swidth,
+    -h          => $sheight,
+    -resizeable => 0,
+    -title      => 'Kezboard Alpha',
+);
+
+# there are better fonts, but this one won on disk space
+my $fontsz = 32;
+my $font   = SDL::Tool::Font->new(
+    -ttfont => catfile( $prefix, qw[font Ac437_EverexME_5x8.ttf] ),
+    -size   => $fontsz,
+    -fg     => $SDL::Color::white,
+    -bg     => $SDL::Color::black,
+);
+my $description;    # shows details for something, usually the player
+my $max_desc_len = 21;
+
+my $bgi = SDL::Surface->new(
+    -name => catfile( $prefix, qw[image starfield.png] ) );
+my $dbi = SDL::Surface->new(
+    -name => catfile( $prefix, qw[image descbg.png] ) );
+my $blanki = SDL::Surface->new(
+    -name => catfile( $prefix, qw[image blank.png] ) );
+my $bombi = SDL::Surface->new(
+    -name => catfile( $prefix, qw[image bomba.png] ) );
+my $casti = SDL::Surface->new(
+    -name => catfile( $prefix, qw[image castle.png] ) );
+my $gridi =
+  SDL::Surface->new(
+    -name => catfile( $prefix, qw[image grid.png] ) );
+my $mulgi =
+  SDL::Surface->new(
+    -name => catfile( $prefix, qw[image mulligan.png] ) );
+my $nopei =
+  SDL::Surface->new(
+    -name => catfile( $prefix, qw[image nope.png] ) );
+my $okayi =
+  SDL::Surface->new(
+    -name => catfile( $prefix, qw[image okay.png] ) );
+my $scrami = SDL::Surface->new(
+    -name => catfile( $prefix, qw[image scrambler.png] ) );
+my $score = SDL::Surface->new(
+    -name => catfile( $prefix, qw[image score.png] ) );
+my $pretitle = SDL::Surface->new(
+    -name => catfile( $prefix, qw[image pretitle.png] ) );
+my $title = SDL::Surface->new(
+    -name => catfile( $prefix, qw[image title.png] ) );
+my $victor = SDL::Surface->new(
+    -name => catfile( $prefix, qw[image victory.png] ) );
+
+my @cards = (
+    [   "Left",
+        \&turn_left,
+        SDL::Surface->new(
+            -name => catfile( $prefix, qw[image card-left.png] )
+        )
+    ],
+    [   "Right",
+        \&turn_right,
+        SDL::Surface->new(
+            -name => catfile( $prefix, qw[image card-right.png] )
+        )
+    ],
+    [   "Reverse",
+        \&turn_around,
+        SDL::Surface->new(
+            -name => catfile( $prefix, qw[image card-reverse.png] )
+        )
+    ],
+    [   "NOP",
+        \&move_nop,
+        SDL::Surface->new(
+            -name => catfile( $prefix, qw[image card-nop.png] )
+        )
+    ],
+    [   "Forward",
+        \&move_forward,
+        SDL::Surface->new(
+            -name => catfile( $prefix, qw[image card-forward.png] )
+        )
+    ],
+    [   "Back",
+        \&move_backwards,
+        SDL::Surface->new(
+            -name => catfile( $prefix, qw[image card-backwards.png] )
+        )
+    ],
+);
+
+# cards start in the discard pile so that "draw" is empty which triggers
+# a card collection and shuffle
+my $deck = Game::Deckar->new(
+    decks   => [qw(draw player board discard)],
+    initial => {
+        discard => [
+            ( $cards[0] ) x 5,
+            ( $cards[1] ) x 5,
+            ( $cards[2] ) x 2,
+            ( $cards[3] ) x 2,
+            ( $cards[4] ) x 9,
+            ( $cards[5] ) x 4,
+        ]
+    }
+);
+
+# some go for a 1000 faces on the hero, but here we only have four
+my @faces = (
+    SDL::Surface->new(
+        -name => catfile( $prefix, qw[image hero-e.png] )
+    ),
+    SDL::Surface->new(
+        -name => catfile( $prefix, qw[image hero-n.png] )
+    ),
+    SDL::Surface->new(
+        -name => catfile( $prefix, qw[image hero-w.png] )
+    ),
+    SDL::Surface->new(
+        -name => catfile( $prefix, qw[image hero-s.png] )
+    ),
+);
+
+for my $s ( $blanki, $bombi, $casti, @faces, $scrami,
+    map { $_->[CARD_SPRITE] } @cards ) {
+    $s->display_format;
+    $s->set_color_key( SDL_SRCCOLORKEY, $s->pixel( 0, 0 ) );
+}
+
+my @animates;
+
+my %events = (
+    SDL_KEYUP() => sub ($e) {
+        my $s = $e->key_sym;
+        if ( $s == SDLK_q ) {
+            game_over() if SDL::GetModState() & KMOD_SHIFT;
+        }
+        return unless $state == STATE_PICK;
+        if ( $s == SDLK_ESCAPE or $s == SDLK_c or $s == SDLK_u ) {
+            clear_played() and update();
+        } elsif ( SDLK_1() <= $s <= SDLK_9() ) {
+            # PORTABILITY this assumes ASCII, or something compatible
+            play_card( $s - SDLK_1 ) and update();
+        } elsif ( $s == SDLK_m and SDL::GetModState() & KMOD_SHIFT ) {
+            take_mulligan() and update();
+        } elsif ( $s == SDLK_RETURN ) {
+            end_turn() and update();
+        }
+    },
+    SDL_MOUSEBUTTONDOWN() => sub ($e) {
+        return unless $state == STATE_PICK;
+        my @mousexy = ( $e->motion_x, $e->motion_y );
+        my $fn      = $clicks->getEnclosedObjects( @mousexy, @mousexy )->[0];
+        defined $fn and $fn->(@mousexy) and update();
+    },
+    SDL_QUIT() => sub { game_over() },
+);
+
+a_random_screen($pretitle);
+a_random_screen($title);
+
+setup_clicks();
+$cards_played = ( $level - 1 ) * 10000;
+next_level();
+update();
+$app->loop( \%events );
+game_over();
+
+########################################################################
+#
+# SUBROUTINES
+
+sub a_random_screen ( $sprite, $fn = undef ) {
+    my ( $done, $halfdone, $atmost, $event ) =
+      ( 0, 0, 4, SDL::Event->new );
+
+    my %events = (
+        SDL_KEYUP() => sub ($e) {
+            my $s = $e->key_sym;
+            $done = 1
+              if $s == SDLK_RETURN
+              or $s == SDLK_ESCAPE
+              or $s == SDLK_SPACE
+              or $atmost-- <= 0;
+        },
+        # check for a full mouse cycle due to a stray "button up" event
+        # when the app is started on OpenBSD 7.4
+        SDL_MOUSEBUTTONDOWN() => sub { $halfdone           = 1 },
+        SDL_MOUSEBUTTONUP()   => sub { $halfdone and $done = 1 },
+    );
+
+    put_sprite( 0, 0, $sprite );
+    $fn->() if defined $fn;
+    $app->sync;
+    sleep $delay;
+
+    while ( !$done and $event->wait ) {
+        my $fn = $events{ $event->type };
+        defined $fn and $fn->($event);
+    }
+}
+
+# put any played cards back into the player's hand
+sub clear_played () {
+    if ( $deck->get('board')->@* ) {
+        $deck->collect(qw(player board));
+        return 1;
+    }
+}
+
+sub collide_hero_bomb ( $ani, $obj ) {
+    if ( $ani->[ID] == HERO ) {
+        relocate( $ani, $obj->@[ XX, YY ] );
+    } else {
+        draw_cell( $ani->@[ XX, YY ], $blanki );
+    }
+    return MOVE_EOL;
+}
+
+sub collide_hero_goal ( $ani, $obj ) {
+    if ( $ani->[ID] == HERO ) {
+        # NOTE this messes up the occupy map; hopefully the EOL
+        # resets things
+        relocate( $ani, $obj->@[ XX, YY ] );
+    } else {
+        # goal moves onto hero: undraw where the goal is
+        draw_cell( $ani->@[ XX, YY ], $blanki );
+    }
+    $level++;
+    return MOVE_EOL;
+}
+
+sub collide_hero_scram ( $ani, $obj ) {
+    if ( $ani->[ID] == HERO ) {
+        $ani->@[ IX, IY ] = random_inertia(3);
+        relocate( $ani, $obj->@[ XX, YY ] );
+        $obj->[DEAD] = 1;
+        return MOVE_OK;
+    } else {
+        $obj->@[ IX, IY ] = random_inertia(3);
+        draw_cell( $ani->@[ XX, YY ], $blanki );
+        unoccupy( $ani->@[ XX, YY ] );
+        $ani->[DEAD] = 1;
+        return MOVE_NOP;
+    }
+}
+
+sub collide_gate_scram ( $ani, $obj ) {
+    if ( $ani->[ID] == GOAL ) {
+        $ani->@[ IX, IY ] = random_inertia(3);
+        relocate( $ani, $obj->@[ XX, YY ] );
+        $obj->[DEAD] = 1;
+        return MOVE_OK;
+    } else {
+        $obj->@[ IX, IY ] = random_inertia(3);
+        draw_cell( $ani->@[ XX, YY ], $blanki );
+        unoccupy( $ani->@[ XX, YY ] );
+        $ani->[DEAD] = 1;
+        return MOVE_NOP;
+    }
+}
+
+sub collide_scram ( $ani, $obj ) {
+    for my $scram ( $ani, $obj ) {
+        $scram->@[ IX, IY ] = random_inertia(3);
+    }
+    return MOVE_NOP;
+}
+
+# fill up the player's hand, with various complications
+sub deal_cards () {
+    my $avail = $deck->get('draw')->@*;
+    if ( $avail < HANDSIZE ) {
+        $deck->collect(qw{draw discard});
+        $deck->shuffle('draw');
+    }
+    my $inhand = $deck->get('player')->@*;
+    $deck->deal( draw => 'player', 0 ) while $inhand++ < HANDSIZE;
+}
+
+# taxicab distance, but accounts for the wrap-around quirk
+sub distance ( $x1, $y1, $x2, $y2 ) {
+    my $dx = abs( $x1 - $x2 );
+    $dx = $boardsz[XX] - $dx if $dx > $boardsz[XX] / 2;
+    my $dy = abs( $y1 - $y2 );
+    $dy = $boardsz[YY] - $dy if $dy > $boardsz[YY] / 2;
+    return $dx + $dy;
+}
+
+sub draw_animate ( $ani, $inplace = 0 ) {
+    my $n       = $ani->[ORIENT];
+    my $sprites = $ani->[SPRITE];
+    $n = 0 if $n >= $sprites->@*;
+    draw_cell( $ani->@[ XX, YY ], $blanki ) if $inplace;
+    put_sprite(
+        $gridxy[XX] + $ani->[XX] * $cellsz,
+        $gridxy[YY] + $ani->[YY] * $cellsz,
+        $sprites->[$n]
+    );
+}
+
+sub end_turn () {
+    return unless $deck->get('board')->@* == TOPLAY;
+    $state = STATE_BRUN;
+    return 1;
+}
+
+# only status 0 if they "win"
+sub game_over ( $status = 1, $message = '' ) {
+    say $message if length $message;
+    exit $status;
+}
+
+sub describe_animate ($ani) {
+    my $s = sprintf "%s %d,%d %+d,%+d", $ani->[NAME],
+      $ani->@[ XX, YY, IX ], -$ani->[IY];
+    $description = substr $s, 0, $max_desc_len;
+    return 1;
+}
+
+sub describe_cell (@mousexy) {
+    $mousexy[XX] -= $gridxy[XX];
+    $mousexy[YY] -= $gridxy[YY];
+    for my $n (@mousexy) { $n = int( $n / $cellsz ) }
+    my $ani = occupied(@mousexy);
+    describe_animate($ani) if defined $ani;
+}
+
+# for the general level map with the grid and cards to play and whatnot
+sub setup_clicks {
+    $clicks = Algorithm::QuadTree->new(
+        -xmin  => 0,
+        -ymin  => 0,
+        -xmax  => $swidth,
+        -ymax  => $sheight,
+        -depth => 6
+    );
+    # somewhere in the game board... hmm need to pass args to this one
+    $clicks->add(
+        sub { describe_cell(@_) and update() },
+        @gridxy,
+        $gridxy[XX] + $boardsz[XX] * $cellsz,
+        $gridxy[YY] + $boardsz[YY] * $cellsz
+    );
+    # player's hand and played card columns, with some padding
+    my @xy = @cardxy;
+    for my $index ( 0 .. 4 ) {
+        $clicks->add(
+            sub { play_card($index) and update() },
+            $xy[XX] - $cpad,
+            $xy[YY] - $cpad,
+            $xy[XX] + $cardsz + $cpad,
+            $xy[YY] + $cardsz + $cpad
+        );
+        $clicks->add(
+            sub { unplay_card($index) and update() },
+            $playxy[XX] - $cpad,
+            $xy[YY] - $cpad,
+            $playxy[XX] + $cardsz + $cpad,
+            $xy[YY] + $cardsz + $cpad
+        );
+        $xy[YY] += 4 * $cellsz;
+    }
+    # nope and okay buttons (may not be visible nor active, depending)
+    $clicks->add(
+        sub { clear_played() and update() },
+        $swidth - 288,
+        $sheight - 48,
+        $swidth - 143, $sheight
+    );
+    $clicks->add(
+        sub { end_turn() and update() },
+        $swidth - 144,
+        $sheight - 48,
+        $swidth, $sheight
+    );
+
+    $clicks->add(
+        sub { take_mulligan() and update() },
+        $swidth - 144,
+        0, $swidth, 48
+    );
+}
+
+# a complication mostly so that the array slots can be fiddled with
+sub make_animate ( $id, $name, $xx, $yy, $or, $sp, $ix = 0, $iy = 0 )
+{
+    my $obj = [];
+    $obj->@[ XX, YY, IX, IY, ORIENT, SPRITE, ID, NAME ] =
+      ( $xx, $yy, $ix, $iy, $or, $sp, $id, $name );
+    return $obj;
+}
+
+# actually it's "change interia"; moves happen elsewhere
+sub move_forward ($ani) {
+    my $head = $headings[ $ani->[ORIENT] % @headings ];
+    $ani->[IX] += $head->[XX];
+    $ani->[IY] += $head->[YY];
+}
+
+sub move_backwards ($ani) {
+    my $head = $headings[ $ani->[ORIENT] % @headings ];
+    $ani->[IX] -= $head->[XX];
+    $ani->[IY] -= $head->[YY];
+}
+
+# it was easy to implement, so why not?
+sub move_nop ($ani) { }
+
+# generate the next game level (or not)
+sub next_level () {
+    if ( $level > MAX_LEVEL ) {
+        a_random_screen($victor);
+        a_random_screen(
+            $score,
+            sub {
+                $font->print( $app, 256, $sheight / 2, $cards_played );
+            }
+        );
+        game_over( 0, $cards_played );
+    }
+
+    @animates = @occupy = ();
+
+    # this could be made more difficult by ensuring the inertia of the
+    # goal (if any) is directed away from the player, but that's harder
+    # to calculate
+    my @start = random_point();
+    my @goal;
+    do {
+        @goal = random_point();
+    } while ( distance( @start, @goal ) < 11 );
+
+    $animates[HERO] =
+      make_animate( HERO, 'You', @start, random_orient(), \@faces );
+    $animates[GOAL] = make_animate( GOAL, 'Goal', @goal, 0, [$casti] );
+
+    place_animate($_) for @animates;
+
+    if ( 2 <= $level <= 3 ) {
+        $animates[GOAL]->@[ IX, IY ] = random_inertia(3);
+    }
+    if ( $level == 3 or $level == 5 ) {
+        my $n = 37;
+        $n = 29 if $level == 5;
+        for ( 1 .. $n ) {
+            push @animates,
+              make_animate( SCRAM, '??', random_point_unique(), 0, [$scrami] );
+            place_animate( $animates[-1] );
+        }
+    }
+    if ( $level >= 4 ) {
+        my $n = 29;
+        $n = 17 if $level == 5;
+        for ( 1 .. $n ) {
+            push @animates,
+              make_animate( BOMB, 'Bomb', random_point_unique(), 0, [$bombi] );
+            place_animate( $animates[-1] );
+        }
+    }
+
+    # NOTE you could instead first collect everything and shuffle here
+    # so that a new level (or a restart) starts from a clean deck
+    $deck->collect( 'discard', qw(board player) );
+    deal_cards();
+    describe_animate( $animates[HERO] );
+    $state = STATE_PICK;
+}
+
+sub occupied ( $x, $y ) { $occupy[$y][$x] }
+sub unoccupy ( $x, $y ) { undef $occupy[$y][$x] }
+
+sub place_animate ($ani) {
+    $occupy[ $ani->[YY] ][ $ani->[XX] ] = $ani;
+}
+
+sub draw_cell ( $i, $j, $sprite ) {
+    my @xy = @gridxy;
+    put_sprite( $xy[XX] + $i * $cellsz, $xy[YY] + $j * $cellsz, $sprite );
+}
+
+sub relocate ( $ani, $x, $y ) {
+    undef $occupy[ $ani->[YY] ][ $ani->[XX] ];
+    draw_cell( $ani->@[ XX, YY ], $blanki );
+    ( $ani->[XX], $ani->[YY] ) = ( $x, $y );
+    draw_animate($ani);
+    $occupy[$y][$x] = $ani;
+}
+
+# try to put a card from the player's hand to the bottom of the board
+# (cards are applied from top to bottom)
+sub play_card ($index) {
+    return if $deck->get('board')->@* == TOPLAY;
+    eval { $deck->deal( player => board => $index, 0 ); 1 }
+}
+
+sub unplay_card ($index) {
+    return if $deck->get('board')->@* == 0;
+    eval { $deck->deal( board => player => $index, 0 ); 1 }
+}
+
+# this may need a stack trace (confess) if ->width on undef is attempted
+sub put_sprite ( $x, $y, $sprite ) {
+    my $dest = SDL::Rect->new(
+        -x      => $x,
+        -y      => $y,
+        -width  => $sprite->width,
+        -height => $sprite->height,
+    );
+    $sprite->blit( NULL, $app, $dest );
+}
+
+sub random_inertia ($max) {
+    my @inertia = ( 0, 0 );
+    my $half    = int( $max / 2 );
+    while ( $inertia[XX] == 0 and $inertia[YY] == 0 ) {
+        @inertia = map { $_ = int( rand $max ) - $half } 1 .. 2;
+    }
+    return @inertia;
+}
+
+sub random_orient () { int rand @headings }
+
+sub random_point () {
+    int rand( $boardsz[XX] ), int rand( $boardsz[YY] );
+}
+
+sub random_point_unique () {
+    my @point;
+    do {
+        @point = ( int rand( $boardsz[XX] ), int rand( $boardsz[YY] ) );
+    } while ( defined occupied(@point) );
+    return @point;
+}
+
+sub take_mulligan () {
+    unless ($mulligan) {
+        $cards_played += 1;    # TODO this penalty might be higher?
+        $deck->collect(qw{draw player board discard});
+        $deck->shuffle('draw');
+        deal_cards();
+        $mulligan = 1;
+        return 1;
+    }
+}
+
+sub try_move ( $ani, $nx, $ny ) {
+    my $other = occupied( $nx, $ny );
+    if ( !defined $other ) {
+        relocate( $ani, $nx, $ny );
+        return MOVE_OK;
+    }
+    my $fn = $collisions[ $ani->[ID] ][ $other->[ID] ];
+    die "no mapping ", $ani->[ID], " ", $other->[ID] unless defined $fn;
+    return $fn->( $ani, $other );
+}
+
+sub turn_left ($ani) {
+    $ani->[ORIENT] = ( $ani->[ORIENT] + 1 ) % @headings;
+}
+
+sub turn_right ($ani) {
+    $ani->[ORIENT] = ( $ani->[ORIENT] - 1 ) % @headings;
+}
+
+sub turn_around ($ani) {
+    $ani->[ORIENT] = ( $ani->[ORIENT] + 2 ) % @headings;
+}
+
+sub update {
+    put_sprite( 0, 0, $bgi );
+    put_sprite( @gridxy, $gridi );
+
+    my $title = q{K E Z B O A R D  A L P H A  -  L} . $level;
+    $font->print( $app, 16, 15, $title );
+
+    $font->print( $app, 16, $sheight - 47, $description );
+
+    my ( $pcard, $bcard ) = map $deck->get($_), qw(player board);
+    my @xy = @cardxy;
+    for my $i ( 0 .. 4 ) {
+        if ( $state == STATE_PICK and defined $pcard->[$i] ) {
+            put_sprite( @xy, $pcard->[$i][CARD_SPRITE] );
+        }
+        if ( $i < TOPLAY and defined $bcard->[$i] ) {
+            put_sprite( $playxy[XX], $xy[YY], $bcard->[$i][CARD_SPRITE] );
+        }
+        $xy[YY] += 4 * $cellsz;
+    }
+
+    if ( $state == STATE_PICK ) {
+        put_sprite( $swidth - 144, 12,            $mulgi ) unless $mulligan;
+        put_sprite( $swidth - 288, $sheight - 48, $nopei ) if $bcard->@*;
+        put_sprite( $swidth - 144, $sheight - 48, $okayi )
+          if $bcard->@* == TOPLAY;
+    }
+
+    draw_animate($_) for @animates;
+    $app->sync;
+
+    # KLUGE the "physics engine" (such as it is) probably shouldn't be
+    # wrapped up with the GUI updates like it is here, but I want to
+    # ship a prototype sometime this year
+    goto &world_update if $state == STATE_BRUN;
+}
+
+# handle applying cards and moving stuff around, interleaved with calls
+# to the update function, KLUGE
+sub world_update {
+    if ( $deck->get('board')->@* <= 0 ) {
+        $state = STATE_PICK;
+        deal_cards();
+        describe_animate( $animates[HERO] );
+        goto &update;
+    }
+
+    $cards_played++;
+    my ( $card, undef ) = $deck->deal( board => 'discard' );
+    $card->[CARD_FUNC]->( $animates[HERO] );
+
+    # redraw player and update their description
+    describe_animate( $animates[HERO] );
+    put_sprite( 0, $sheight - 64, $dbi );
+    $font->print( $app, 16, $sheight - 48, $description );
+    draw_animate( $animates[HERO], 1 );
+    $app->sync;
+    sleep $delay;
+
+    for my $ani (@animates) {
+        next if $ani->[IX] == 0 and $ani->[IY] == 0;
+        my ( $ix, $iy ) = $ani->@[ IX, IY ];
+        while ( $ix != 0 or $iy != 0 ) {
+            if ( $ix != 0 ) {
+                my $dx = $ix < 0 ? 1 : -1;
+                my $ret =
+                  try_move( $ani, ( $ani->[XX] - $dx ) % $boardsz[XX], $ani->[YY] );
+                goto NEXT_LEVEL if $ret == MOVE_EOL;
+                $ix += $dx;
+                if ( $ret == MOVE_OK ) {
+                    $app->sync;
+                    sleep $delay;
+                }
+            }
+            if ( $iy != 0 ) {
+                my $dy = $iy < 0 ? 1 : -1;
+                my $ret =
+                  try_move( $ani, $ani->[XX], ( $ani->[YY] - $dy ) % $boardsz[YY] );
+                goto NEXT_LEVEL if $ret == MOVE_EOL;
+                $iy += $dy;
+                if ( $ret == MOVE_OK ) {
+                    $app->sync;
+                    sleep $delay;
+                }
+            }
+        }
+    }
+    # NOTE goal and hero if killed should cause a failure (game over or
+    # level restart)
+    @animates = grep { !$_->[DEAD] } @animates;
+
+    # TODO could skip this if we here redraw the board card list
+    goto &update;
+
+  NEXT_LEVEL:
+    next_level();
+    goto &update;
+}
+
+1;
+__END__
+
+=head1 NAME
+
+kezboard - a SDL game where cards are used to move around a board
+
+=head1 SYNOPSIS
+
+  kezboard [--delay=0.5] [--level=1] [--no-mulligan] [--seed=20240112]
+
+=head1 DESCRIPTION
+
+B<kezboard> is a SDL game. The player's icon can be moved by playing
+cards such as "turn left" or "move forward" from the left column. Use
+the mouse or number keys to select cards to play in a particular order.
+"Escape" or C<c> or C<u> will remove any played cards if you change your
+mind. Click the "okay" button or hit the "return" key to submit the
+cards (once three cards have been played), and then see how your ship
+moves. The goal is to move to the goal cell, which hopefully should be
+obvious. Subsequent levels add obstacles of various sorts that probably
+should be avoided.
+
+C<M> or the mulligan button will take a mulligan, in the event you get a
+bad hand and want a new one. Only one of these may be taken per game,
+and it adds one to your score.
+
+C<Q> will quit the game from the level map, if your window manager omits
+drawing any sort of close button on a window.
+
+"Move forward" actually adds C<+1> to the inertia counter in the
+direction your ship is currently heading; inertia is retained unless
+removed by moving in the opposite direction, or by running into a bomb
+or something like that.
+
+Motion is done X inertia first, then Y, repeating until all the inertia
+counters reach C<0>.
+
+You can also click on object in the grid to see details on them such as
+their position and more importantly inertia. C<+X> is to the right, and
+C<+Y> is towards the top of the window. The mental practice of
+visualizing moves was a large motivation for this game.
+
+Options include:
+
+=over 4
+
+=item B<--delay>
+
+Delay in seconds for the "animations", C<0.5> by default.
+
+=item B<--level>
+
+Starting game level, default C<1>.
+
+=item B<--no-mulligan>
+
+Disable the ability to take a mulligan.
+
+=item B<--seed>
+
+Custom seed for Perl's C<rand()> RNG. The actual numbers generated may
+depend on the operating system or specific version of Perl.
+
+=back
+
+=head1 EXIT STATUS
+
+B<kezboard> exits 0 on game victory, and >0 if an error occurs.
+
+=head1 SEE ALSO
+
+RoboRally
+
+=head1 AUTHORS
+
+Jeremy Mates
+
+=cut

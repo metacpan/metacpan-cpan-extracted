@@ -5,7 +5,7 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 class Animal 1.23 {
    field $legs;
@@ -18,7 +18,9 @@ class Animal 1.23 {
 
 is( $Animal::VERSION, 1.23, 'Versioned class has $VERSION' );
 
-class Spider 4.56 :isa(Animal) {
+class Spider 4.56 {
+   inherit Animal;
+
    sub BUILDARGS {
       my $self = shift;
       return $self->SUPER::BUILDARGS( 8 );
@@ -39,7 +41,7 @@ is( $Spider::VERSION, 4.56, 'Versioned subclass has $VERSION' );
 
 {
    ok( !eval <<'EOPERL',
-      class Antelope :isa(Animal 2.34);
+      class Antelope { inherit Animal 2.34; }
 EOPERL
       ':isa insufficient version fails' );
    like( $@, qr/^Animal version 2.34 required--this is only version 1.23 /,
@@ -51,7 +53,8 @@ EOPERL
    class BaseClass {
       field $_afield;
 
-      class SubClass :isa(BaseClass) {
+      class SubClass {
+         inherit BaseClass;
          method one { 1 }
       }
    }
@@ -70,7 +73,7 @@ EOPERL
       }
    }
 
-   # Test whitespace trimming
+   # Test whitespace trimming on attribute
    class TrivialSubclass :isa( WithAdjustParams ) {}
 
    TrivialSubclass->new( param => "value" );

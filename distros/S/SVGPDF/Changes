@@ -1,0 +1,116 @@
+Revision history for SVGPDF
+
+0.084
+	- Change license info.
+	- Add gif, tif(f) and p[bgnp]m to recognized image extensions.
+	- Support CSS for element#id.
+	- Support CSS for element.class.
+	- Remove xt tests from MANIFEST.
+
+0.083	2023-12-25
+
+	- Satisfy CPAN indexer.
+
+0.082	2023-12-25
+
+	- Satisfy CPAN upload.
+
+0.081	2023-12-22
+
+	- Add --notest for svpdg script to suppress page marks.
+	- Explicitly end paths that are not stroked/filled (Issue #2.2).
+
+0.080	2023-11-07
+
+	- Add --ppi option for svgpdf script.
+	- Add matrix multiply method (unused).
+
+0.070	2023-09-08
+
+	- Add callback for text handling.
+
+0.062	2023-09-07
+
+	- Internal: Flipped coordinates.
+	- Internal: Rework Path.
+	- Leave vwidth/vheight as is so caller can scale to font size.
+	- Add rounded rectangles.
+	- Auto def for <g> with id.
+	- Add warning when viewBox and width/height are disproportional.
+	- Relax warning when viewBox and width/height are disproportional.
+	- Add sample programs, update documentation.
+	- Fix some pixels versus points confusion.
+	- Simplify font handler callback.
+
+0.060	2023-08-18
+
+	- Change package name to SVGPDF.
+	- Rename PDF::* and SVG::* to SVGPDF.
+	- Adjust all modules and tests.
+	- Move contrib bogen code to SVGPDF::Contrib::Bogen.
+	- Add regression test for PDF::API2 and PDF::Builder.
+	- Add warning that rounded rectangles are not yet supported.
+	- Add warning in unhandled subelements in <text>
+	- (Parser) Enable whitespace tokes for abc2svg.
+	- (Text/TSpan) Fix fill/color use.
+	- (TextElement) Reduce whitespace.
+	- Add samples from https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Introduction to regtests.
+	- Support % units for h, height, w, and width.
+	- Support stroke-dasharray none.
+
+0.050	2023-08-14
+
+	- (Partial) support for @font-face.
+	- Support font-family alternatives.
+	- Add tweak for MathJax.
+	- Move font managing to separate module.
+	- Suppress stroke if stroke width = 0.
+	- Allow colors as rgb percentages.
+	- Docs!
+	- Warn when element is not implemented.
+	- Add example program.
+	- Rename script to svgpdf.
+	- Add support for <style>.
+	- Move routines for circular and elliptic arcs to module
+	  PDF::Builder::Bogen and sync with upstream. Thanks, Phil!
+	- Fix state initializer for 5.26.
+
+0.040	2023-07-19
+
+	- Reworked to COR using Object::Pad (WIP).
+	- Steal and enhance parser from XML::Tiny.
+	- Improve fill/stroke (handle transparency).
+	- Add grid for debugging.
+	- Add ellipse.
+	- Improve scaling.
+	- Handle argument and units.
+	- Fix fontsize bug in makefont.
+	- Handle stroke-linejoin and stroke-linecap.
+	- Add routines for circular and elliptic arcs.
+
+0.030	2023-07-12
+
+	- Add single-style outline for simple <text>.
+	- Add circle.
+	- Add polyline.
+	- Add image (inline, base64).
+	- Add path S, Q (qubic bezier) and T.
+	- Add sample program.
+	- Neatify PAST to generate perl program.
+	- (CSS) Handle outline shorthand.
+	- (CSS) Fix priorities.
+	- Elegantly skip unimplemented arcs.
+	- Fix rectangle bug.
+
+0.020	2023-07-07
+
+	- Moved repo to Github.
+	- Added subroutine signatures.
+	- Almost everything is working again.
+	- (CSS) Handle selector el.class.
+	- Fixed css mixups and whitespace elements.
+
+0.010   2022-04-03
+
+	- First version, released on an unsuspecting world.
+

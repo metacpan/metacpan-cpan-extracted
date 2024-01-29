@@ -50,6 +50,6 @@
          "url" : "https://github.com/abeltje/V.git"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

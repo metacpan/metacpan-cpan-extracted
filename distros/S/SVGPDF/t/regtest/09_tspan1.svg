@@ -1,0 +1,4 @@
+<svg width="500" height="600" viewBox="0 0 500 600">
+  <text x="100" y="100">Hello <tspan style="font:20px
+  text,sans-serif">nice<tspan dx="5" dy="15">!</tspan></tspan> day</text>
+</svg>  

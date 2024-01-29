@@ -22,7 +22,7 @@ use Moo 2.001000 ();
 use Search::Elasticsearch::Util qw(parse_params load_plugin);
 use namespace::clean;
 
-our $VERSION = '8.00';
+our $VERSION = '8.12';
 
 my %Default_Plugins = (
     client      => [ 'Search::Elasticsearch::Client',       '8_0::Direct' ],
@@ -79,7 +79,7 @@ Search::Elasticsearch - The official client for Elasticsearch
 
 =head1 VERSION
 
-version 8.00
+version 8.12
 
 =head1 SYNOPSIS
 
@@ -165,6 +165,14 @@ If you need to talk to a version of Elasticsearch before 7.0.0, please
 install one of the following packages:
 
 =over
+
+=item *
+
+L<Search::Elasticsearch::Client::6_0>
+
+=item *
+
+L<Search::Elasticsearch::Client::5_0>
 
 =item *
 
@@ -582,7 +590,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Elasticsearch BV.
+This software is Copyright (c) 2024 by Elasticsearch BV.
 
 This is free software, licensed under:
 

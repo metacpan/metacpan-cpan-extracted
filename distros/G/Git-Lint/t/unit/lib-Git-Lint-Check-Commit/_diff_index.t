@@ -38,7 +38,7 @@ EXCEPTION: {
 
     my $plugin = $class->new();
     dies_ok( sub { $plugin->_diff_index() }, 'dies if exit' );
-    is( $@, 'git-lint: ' . $error, 'exception matches expected' );
+    is( $@, $error, 'exception matches expected' );
 }
 
 done_testing;

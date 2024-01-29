@@ -8,7 +8,7 @@ use Test2::V0;
 use Future;
 use Future::Selector;
 
-# ->run
+# ->run on immediate
 {
    my $selector = Future::Selector->new;
 
@@ -23,6 +23,32 @@ use Future::Selector;
    );
 
    my $run_f = $selector->run;
+
+   ok( $run_f->is_ready, '->run completed after failure' );
+   is( scalar $run_f->failure, "Stop now\n",
+      'failure from ->run future' );
+}
+
+# ->run on deferred
+{
+   my $selector = Future::Selector->new;
+
+   my @f;
+
+   my $count = 0;
+   $selector->add(
+      data => "loop",
+      gen  => sub {
+         return Future->fail( "Stop now\n" ) if $count > 3;
+         $count++;
+         push @f, my $f = Future->new;
+         return $f;
+      },
+   );
+
+   my $run_f = $selector->run;
+
+   ( shift @f )->done while @f;
 
    ok( $run_f->is_ready, '->run completed after failure' );
    is( scalar $run_f->failure, "Stop now\n",

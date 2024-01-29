@@ -5,7 +5,7 @@ package Data::Record::Serialize::Role::Default;
 use v5.12;
 use Moo::Role;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use Hash::Util qw[ hv_store ];
 use Ref::Util  qw[ is_coderef ];
@@ -13,6 +13,7 @@ use Ref::Util  qw[ is_coderef ];
 use Data::Record::Serialize::Error { errors => ['fields'] }, -all;
 
 use namespace::clean;
+
 
 
 
@@ -44,6 +45,7 @@ sub send {
 
 # just in case they're not defined in preceding roles
 sub setup      { }
+sub finalize   { }
 sub _map_types { }
 sub _needs_eol { 1 }
 
@@ -73,6 +75,10 @@ around 'setup' => sub {
     $self->_set__run_setup( 0 );
 };
 
+before 'close' => sub {
+    my ( $self, @args ) = @_;
+    $self->finalize( @args );
+};
 
 before 'send' => sub {
     my ( $self, $data ) = @_;
@@ -169,7 +175,7 @@ Data::Record::Serialize::Role::Default - Default methods for Data::Record::Seria
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 DESCRIPTION
 
@@ -193,6 +199,7 @@ contents, pass in a copy.
 =for Pod::Coverage cleanup
  send
  setup
+ finalize
  DEMOLISH
 
 =head1 SUPPORT

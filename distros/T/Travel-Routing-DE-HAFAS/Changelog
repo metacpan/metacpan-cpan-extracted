@@ -1,3 +1,21 @@
+Travel::Routing::DE::HAFAS 0.03 - Sun Dec 10 2023
+
+    * hafas: Add --depart and -a / --arrive options
+    * HAFAS->new: Add arrival option
+
+Travel::Routing::DE::HAFAS 0.02 - Sat Nov 25 2023
+
+    * hafas: Add -f / --full-route option
+    * hafas: Fix -vv / -vvv support
+    * Use Travel::Status::DE::HAFAS::Location for location data
+    * Remove Travel::Routing::DE::HAFAS::Location
+    * Use Travel::Status::DE::HAFAS::Journey for journey data
+    * Section: add load accessor
+    * Section: add journey accessor
+    * Section: remove operator, id, name ,category ,category_long, class,
+      number ,line ,line_no, delay, direction accessors. Use journey->operator,
+      journey->id, etc. instead.
+
 Travel::Routing::DE::HAFAS 0.01 - Thu Nov 16 2023
 
     * Initial release

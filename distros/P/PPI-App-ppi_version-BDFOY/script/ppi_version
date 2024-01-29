@@ -17,3 +17,52 @@ print "brian d foy's ppi_version $VERSION\n";
 exit(
         PPI::App::ppi_version::BDFOY->main(@ARGV)
 );
+
+=encoding utf8
+
+=head1 NAME
+
+ppi_version - brian d foy's version of a Perl Parsing Interface version updater
+
+=head1 SYNOPSIS
+
+	# call it like PPI::App::ppi_version
+	% ppi_version show
+
+	% ppi_version change 1.23 1.24
+
+	# call it with less typing. With no arguments, it assumes 'show'.
+	% ppi_version
+
+	# with arguments that are not 'show' or 'change', assume 'change'
+	% ppi_version 1.23 1.24
+
+=head1 DESCRIPTION
+
+B<ppi_version> looks for Perl files in the current directory and
+subdirectories and extracts Perl versions.
+
+To change versions, give the existing version that you want to target
+and the version you want to change that too. B<ppi_version> does not
+try to be smart about this like B<perlreversion> from L<Perl::VERSION>.
+
+=head1 SOURCE AVAILABILITY
+
+This source is part of a Github project:
+
+	https://github.com/briandfoy/ppi-app-ppi_version-bdfoy
+
+=head1 AUTHOR
+
+Adam Kennedy wrote the original, and I stole some of the code. I even
+inherit from the original.
+
+brian d foy, C<< <briandfoy@pobox.com> >>
+
+=head1 COPYRIGHT
+
+Copyright © 2008-2024, brian d foy briandfoy@pobox.com>. All rights reserved.
+
+You may redistribute this under the same terms as the Artistic License 2.0.
+
+=cut

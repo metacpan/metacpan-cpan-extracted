@@ -79,7 +79,7 @@ sub cc
 
 @EXPORT = qw(rpn rpn_error rpn_separator_out  rpn_separator_in);
 
-$VERSION = '2.86';
+$VERSION = '2.87';
 
 my %dict;
 my %pub_dict;
@@ -2037,9 +2037,6 @@ $dict{GE} = sub {
 };
 
 =head2 a b CMP
-        WORDS,LEN                                                              = 1584'
-#   at t/09DICT.t line 58.
-# Looks like you failed 1 test of 31.
 
       return the result of 'a' CMP 'b'  ( BOOLEAN value )
         

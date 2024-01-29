@@ -8,24 +8,25 @@ use String::ShellQuote;
 use Rex::Commands::Gather;
 use File::Temp qw/ tempdir /;
 use Rex::Commands::Pkg;
-use LWP::Simple;
+use LWP::UserAgent ();
 use Ixchel::functions::perl_module_via_pkg;
 use Ixchel::functions::install_cpanm;
 use Ixchel::functions::python_module_via_pkg;
 use Ixchel::functions::install_pip;
 use Cwd;
+use base 'Ixchel::Actions::base';
 
 =head1 NAME
 
-Ixchel::Actions::xeno_build :: Builds and installs stuff based on the supplied hash.
+Ixchel::Actions::xeno_build - Builds and installs stuff based on the supplied hash.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.1.0';
 
 =head1 SYNOPSIS
 
@@ -248,12 +249,6 @@ The following functions are available.
 
     - shell_quote :: shell_quote from String::ShellQuote
 
-=head1 RESULT HASH REF
-
-    .errors :: A array of errors encountered.
-    .status :: A string description of what was done and the results.
-    .ok :: True if everyting okay.
-
 =head1 Determining OS
 
 L<Rex::Commands::Gather> is used for this.
@@ -331,28 +326,24 @@ Below is a example for installing Sagan on Debian and FreeBSD.
           - libjson-c-dev
           - libmaxminddb-dev
 
+=head1 RESULT HASH REF
+
+    .errors :: A array of errors encountered.
+    .status :: A string description of what was done and the results.
+    .ok :: True if everyting okay.
+
 =cut
 
-sub new {
-	my ( $empty, %opts ) = @_;
-
-	my $self = {
-		config        => {},
-		vars          => {},
-		arggv         => [],
-		opts          => {},
-		os            => $^O,
-		template_vars => {
+sub new_extra{
+	my ( $self ) = @_;
+	$self->{template_vars}={
 			shell_quote    => \&shell_quote,
 			env            => \%ENV,
 			vars           => {},
-			templated_vars => {},
-		},
-	};
-	bless $self;
-	# in two places as .template_vars will get passed to TT
-	$self->{template_vars}{config} = $self->{config};
-	# having it in two places for the purposes of simplicity
+							templated_vars => {},
+							};
+
+		# having it in two places for the purposes of simplicity
 	$self->{template_vars}{os} = $self->{os};
 
 	if (is_freebsd) {
@@ -388,47 +379,16 @@ sub new {
 		$self->{template_vars}{is_systemd} = 0;
 	}
 
-	if ( defined( $opts{config} ) ) {
-		$self->{config} = $opts{config};
-	}
-	$self->{template_vars} = $self->{config};
-
-	if ( defined( $opts{t} ) ) {
-		$self->{t} = $opts{t};
-	} else {
-		die('$opts{t} is undef');
-	}
-
-	if ( defined( $opts{share_dir} ) ) {
-		$self->{share_dir} = $opts{share_dir};
-	}
-
-	if ( defined( $opts{opts} ) ) {
-		$self->{opts} = \%{ $opts{opts} };
-	}
-
-	if ( defined( $opts{argv} ) ) {
-		$self->{argv} = $opts{argv};
-	}
-
-	if ( defined( $opts{vars} ) ) {
-		$self->{vars} = $opts{vars};
-	}
-
-	if ( defined( $opts{ixchel} ) ) {
-		$self->{ixchel} = $opts{ixchel};
-	}
-
-	return $self;
-} ## end sub new
+	$self->{template_vars}{config} = $self->{config};
+}
 
 sub action {
 	my $self = $_[0];
 
 	$self->{results} = {
-		errors => [],
-		status => '',
-		ok     => 0,
+		errors      => [],
+		status_text => '',
+		ok          => 0,
 	};
 
 	# if this is not set, no reason to continue
@@ -631,10 +591,43 @@ sub action {
 						status => 'Fetch "' . $fetch_name . '" DST Template Results: ' . $dst
 					);
 				} ## end if ($template_it)
-				my $return_code = getstore( $url, $dst );
+
+				my $return_code  = 'undef';
+				my $return_extra = '';
+				eval {
+					my $ua = LWP::UserAgent->new( timeout => 10 );
+					if ( defined( $ENV{HTTP_PROXY} ) ) {
+						$ua->proxy( ['http'], $ENV{HTTP_PROXY} );
+					}
+					if ( defined( $ENV{HTTPS_PROXY} ) ) {
+						$ua->proxy( ['https'], $ENV{HTTPS_PROXY} );
+					}
+					if ( defined( $ENV{FTP_PROXY} ) ) {
+						$ua->proxy( ['ftp'], $ENV{FTP_PROXY} );
+					}
+
+					my $response = $ua->get($url);
+
+					$return_code = $response->status_line;
+
+					my $content;
+					if ( $response->is_success ) {
+						$content = $response->decoded_content;
+					} else {
+						die( $response->status_line );
+					}
+
+					write_file( $dst, $content );
+				};
+				my $fetch_errored = 0;
+				if ($@) {
+					$return_extra  = '   ...   ' . $@;
+					$fetch_errored = 1;
+				}
 				$self->status_add(
 					type   => $type,
-					status => 'Fetch "' . $fetch_name . '" Return Code: ' . $return_code
+					error  => $fetch_errored,
+					status => 'Fetch "' . $fetch_name . '" Return Code: ' . $return_code . $return_extra
 				);
 			} ## end foreach my $fetch_name (@fetch_names)
 
@@ -773,7 +766,8 @@ sub action {
 					type   => $type,
 					status => 'Trying to install Perl ' . $module . ' via pkg',
 				);
-				my $returned = perl_module_via_pkg( module => $module );
+				my $returned;
+				eval { perl_module_via_pkg( module => $module ); };
 				# if this fails, set error and return as the module is required to be installed via pkg and we can't
 				if ($returned) {
 					$self->status_add(
@@ -797,7 +791,8 @@ sub action {
 					type   => $type,
 					status => 'Trying to install Perl ' . $module . ' via pkg',
 				);
-				my $returned = perl_module_via_pkg( module => $module );
+				my $returned;
+				eval { $returned = perl_module_via_pkg( module => $module ); };
 				if ($returned) {
 					$self->status_add(
 						type   => $type,
@@ -1025,14 +1020,6 @@ sub action {
 						status => 'exec[' . $command_int . '] command: ' . $command_hash->{command},
 					);
 
-					$self->status_add(
-						type   => $type,
-						status => 'exec['
-							. $command_int
-							. '] ok exits: '
-							. join( ',', @{ $command_hash->{exits} } ),
-					);
-
 					# if requested to template it, process the command and dir
 					if ( $command_hash->{template} ) {
 						eval {
@@ -1047,20 +1034,29 @@ sub action {
 							$self->{t}->process( \$dir, $self->{template_vars}, \$output )
 								|| die $self->{t}->error;
 							$command_hash->{dir} = $output;
+
+							$self->status_add(
+								type   => $type,
+								status => 'exec[' . $command_int . '] Templated: ' . $command_hash->{command},
+							);
 						};
 						if ($@) {
 							$self->status_add(
 								type   => $type,
-								status => 'Templating failed... ' . $@,
+								status => 'exec[' . $command_int . '] Templating failed... ' . $@,
 								error  => 1,
 							);
 							return $self->{results};
 						}
-						$self->status_add(
-							type   => $type,
-							status => 'Templated: ' . $command_hash->{command},
-						);
 					} ## end if ( $command_hash->{template} )
+
+					$self->status_add(
+						type   => $type,
+						status => 'exec['
+							. $command_int
+							. '] ok exits: '
+							. join( ',', @{ $command_hash->{exits} } ),
+					);
 
 					# chdir to the dir specified if needed
 					if ( $command_hash->{dir} ) {
@@ -1105,7 +1101,12 @@ sub action {
 							error => 1,
 						);
 						return $self->{results};
-					} ## end if ( !$exit_code_matched )
+					} else {
+						$self->status_add(
+							type   => $type,
+							status => 'exec[' . $command_int . ']  Exit Code: ' . $exit_code,
+						);
+					}
 
 				} ## end if ( defined( $self->{opts}{xeno_build}{$type...}))
 
@@ -1122,15 +1123,6 @@ sub action {
 	return $self->{results};
 } ## end sub action
 
-sub help {
-	return 'Builds/installs stuff based on a passed hash ref.
-
-Not usable directly. Use xeno action.
-
-See perldoc Ixchel::Actions::xeno_build for more details.
-';
-}
-
 sub short {
 	return 'Builds/installs stuff based on a passed hash ref. Not usable directly. Use xeno action.';
 }
@@ -1140,34 +1132,11 @@ sub opts_data {
 ';
 }
 
-sub status_add {
-	my ( $self, %opts ) = @_;
+sub status_add_error_extra {
+	my ( $self ) = @_;
 
-	if ( !defined( $opts{status} ) ) {
-		return;
-	}
+	chdir( $self->{opts}{xeno_build}{options}{tmpdir} . '/..' );
 
-	if ( !defined( $opts{error} ) ) {
-		$opts{error} = 0;
-	}
-
-	if ( !defined( $opts{type} ) ) {
-		$opts{type} = 'xeno_build';
-	}
-
-	my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) = localtime(time);
-	my $timestamp = sprintf( "%04d-%02d-%02dT%02d:%02d:%02d", $year + 1900, $mon + 1, $mday, $hour, $min, $sec );
-
-	my $status = '[' . $timestamp . '] [' . $opts{type} . ', ' . $opts{error} . '] ' . $opts{status};
-
-	print $status. "\n";
-
-	$self->{results}{status} = $self->{results}{status} . $status;
-
-	if ( $opts{error} ) {
-		push( @{ $self->{results}{errors} }, $opts{status} );
-		chdir( $self->{opts}{xeno_build}{options}{tmpdir} . '/..' );
-	}
 } ## end sub status_add
 
 1;

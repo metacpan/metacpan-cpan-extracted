@@ -4,7 +4,7 @@
       "Tom Molesworth <TEAM@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -76,19 +76,19 @@
    "provides" : {
       "Net::Async::Redis::Cluster::Node::XS" : {
          "file" : "lib/Net/Async/Redis/Cluster/Node/XS.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       },
       "Net::Async::Redis::Cluster::XS" : {
          "file" : "lib/Net/Async/Redis/Cluster/XS.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       },
       "Net::Async::Redis::Protocol::XS" : {
          "file" : "lib/Net/Async/Redis/XS.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       },
       "Net::Async::Redis::XS" : {
          "file" : "lib/Net/Async/Redis/XS.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       }
    },
    "release_status" : "stable",
@@ -103,7 +103,7 @@
          "web" : "https://github.com/team-at-cpan/Net-Async-Redis-XS"
       }
    },
-   "version" : "1.000",
+   "version" : "1.001",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Tom Molesworth <tom@deriv.com>",

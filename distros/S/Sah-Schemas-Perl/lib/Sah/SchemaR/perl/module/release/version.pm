@@ -4,8 +4,8 @@ package Sah::SchemaR::perl::module::release::version;
 # preamble code
 no warnings 'experimental::regex_sets';
 
-our $DATE = '2023-01-19'; # DATE
-our $VERSION = '0.048'; # VERSION
+our $DATE = '2023-10-26'; # DATE
+our $VERSION = '0.049'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{examples=>[{valid=>0,value=>""},{valid=>1,value=>0.001},{valid=>1,value=>"< latest"},{valid=>0,value=>"< foo"}],prefilters=>["Perl::check_module_release_expr"],summary=>"Expression to select module release"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -24,7 +24,7 @@ Sah::SchemaR::perl::module::release::version - Expression to select module relea
 
 =head1 VERSION
 
-This document describes version 0.048 of Sah::SchemaR::perl::module::release::version (from Perl distribution Sah-Schemas-Perl), released on 2023-01-19.
+This document describes version 0.049 of Sah::SchemaR::perl::module::release::version (from Perl distribution Sah-Schemas-Perl), released on 2023-10-26.
 
 =head1 DESCRIPTION
 

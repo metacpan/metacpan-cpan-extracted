@@ -10,7 +10,7 @@ use Carp();
 
 use base qw(Exporter);
 our @EXPORT_OK = qw(is_holiday holidays);
-our $VERSION   = '0.30';
+our $VERSION   = '0.32';
 
 sub _DEFAULT_STATE { return 'VIC' }
 
@@ -907,6 +907,7 @@ sub _compute_vic_grand_final_eve_day {    # i have no words ...
         2021 => { day => 24, month => 8 },
         2022 => { day => 23, month => 8 },
         2023 => { day => 29, month => 8 },
+        2024 => { day => 27, month => 8 },
     );
     if ( $year < 2015 ) {
         return ();
@@ -1164,6 +1165,7 @@ sub _compute_wa_royal_bday
         2022 => { day => 26, month => 8 },
         2023 => { day => 25, month => 8 },
         2024 => { day => 23, month => 8 },
+        2025 => { day => 29, month => 8 },
     );
     if ( $wa_royal_bday{$year} ) {
         $day   = $wa_royal_bday{$year}{day};
@@ -1279,7 +1281,7 @@ Date::Holidays::AU - Determine Australian Public Holidays
 
 =head1 VERSION
  
-Version 0.30
+Version 0.32
 
 =head1 SYNOPSIS
 
@@ -1305,14 +1307,14 @@ is_holiday and holidays.
 returns true or false depending to whether or not the date in question
 is a holiday according to the state and the additional parameters.
 
-=item holidays($year, $state, %params)
+=item holidays(year => $year, state => $state, %params)
 
 Returns a hashref of all defined holidays in the year according
 to the state and the additional parameters. Keys in the hashref
 are in 'mmdd' format, the values are the names of the
 holidays.
 
-The states may be 'VIC','WA','NT','QLD','TAS','NSW','SA' or 'ACT'.  The
+The states must be one of the allowed L<ISO 3166-2:AU|https://en.wikipedia.org/wiki/ISO_3166-2:AU> codes; 'VIC','WA','NT','QLD','TAS','NSW','SA' or 'ACT'.  The
 default state is 'VIC'.  The following tables lists the allowable parameters
 for each state;
 

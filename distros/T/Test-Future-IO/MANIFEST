@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 lib/Test/Future/IO.pm
@@ -10,4 +11,6 @@ t/00use.t
 t/01sleep.t
 t/02sysread.t
 t/03syswrite.t
+t/04connect.t
+t/05accept.t
 t/99pod.t

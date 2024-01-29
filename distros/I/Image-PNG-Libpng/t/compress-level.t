@@ -23,6 +23,8 @@ skip_old ();
 
 use Image::PNG::Libpng ':all';
 
+my $original_zlib = $ENV{ORIGINAL_ZLIB};
+
 # These are the compression levels used in the PngSuite 
 
 my @levels = (0, 3, 6, 9);
@@ -43,8 +45,10 @@ foreach my $src_level (@levels) {
 	my $output = $dest_png->write_to_scalar ();
 	my $dest_size = length $output;
 	if ($src_level == $target_level) {
-	    cmp_ok ($src_size, '==', $dest_size,
-		"source $ffile (level: $src_level, $src_size bytes) equal to target (level: $target_level, $dest_size bytes)" );
+	    if ($original_zlib) {
+		cmp_ok ($src_size, '==', $dest_size,
+			"source $ffile (level: $src_level, $src_size bytes) equal to target (level: $target_level, $dest_size bytes)" );
+	    }
 	}
 	elsif ($src_level < $target_level) {
 	    cmp_ok ($src_size, '>=', $dest_size,

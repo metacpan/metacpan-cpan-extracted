@@ -70,7 +70,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_cells_cloud_services_health_check' } = { 
-    	summary => 'Gets cells description in some format.',
+    	summary => 'Retrieve cell descriptions in a specified format.',
         params => $params,
         returns => 'string',
     };

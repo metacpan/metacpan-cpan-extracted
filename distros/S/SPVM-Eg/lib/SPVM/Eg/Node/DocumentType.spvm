@@ -1,0 +1,25 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+# DocumentType in JavaScript
+class Eg::Node::DocumentType extends Eg::Node {
+  
+  allow Eg::DOM::Implementation;
+  
+  # Fields
+  has name : ro string;
+  
+  has public_id : ro string;
+  
+  has system_id : ro string;
+  
+  # Class Methods
+  private static method new : Eg::Node::DocumentType () {
+    
+    my $self = new Eg::Node::DocumentType;
+    
+    $self->SUPER::init({node_type => Eg::Node->TYPE_DOCUMENT_TYPE_NODE});
+    
+    return $self;
+  }
+}

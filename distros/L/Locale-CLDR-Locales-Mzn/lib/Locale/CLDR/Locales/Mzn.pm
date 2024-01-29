@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mzn - Package for language Mazanderani
 
 package Locale::CLDR::Locales::Mzn;
 # This file auto generated from Data\common\main\mzn.xml
-#	on Tue  5 Dec  1:22:54 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -44,7 +44,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ab' => 'آبخازی',
@@ -313,7 +313,6 @@ has 'display_name_script' => (
  			'Hang' => 'هانگول',
  			'Hani' => 'هان',
  			'Hans' => 'ساده‌بَیی هان',
- 			'Hans@alt=stand-alone' => 'ساده‌بَیی هان',
  			'Hant' => 'سنتی هانت',
  			'Hant@alt=stand-alone' => 'استاندارد ِسنتی هانت',
  			'Hebr' => 'عبری',
@@ -334,7 +333,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'جهون',
  			'002' => 'آفریقا',
@@ -452,7 +451,6 @@ has 'display_name_region' => (
  			'FR' => 'فرانسه',
  			'GA' => 'گابون',
  			'GB' => 'بریتانیا',
- 			'GB@alt=short' => 'بریتانیا',
  			'GD' => 'گرانادا',
  			'GE' => 'گرجستون',
  			'GF' => 'فرانسه‌ی ِگویان',
@@ -521,8 +519,6 @@ has 'display_name_region' => (
  			'MF' => 'سنت مارتین',
  			'MG' => 'ماداگاسکار',
  			'MH' => 'مارشال جزایر',
- 			'MK' => 'مقدونیه',
- 			'MK@alt=variant' => 'مقدونیه جمهوری',
  			'ML' => 'مالی',
  			'MM' => 'میانمار',
  			'MN' => 'مغولستون',
@@ -645,7 +641,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{متریک},
  			'UK' => q{بریتانیایی},
@@ -659,7 +655,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'زوون: {0}',
  			'script' => 'اسکریپت: {0}',
@@ -691,7 +687,7 @@ has 'characters' => (
 			auxiliary => qr{[‌‍‎‏ َ ُ ِ ْ ٖ ٰ إ ك ى ي]},
 			index => ['آ', 'ا', 'ب', 'پ', 'ت', 'ث', 'ج', 'چ', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'ژ', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ک', 'گ', 'ل', 'م', 'ن', 'ه', 'و', 'ی'],
 			main => qr{[ً ٌ ٍ ّ ٔ ء آ أ ؤ ئ ا ب پ ة ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن ه و ی]},
-			punctuation => qr{[\- ‐ ، ٫ ٬ ؛ \: ! ؟ . … ‹ › « » ( ) \[ \] * / \\]},
+			punctuation => qr{[\- ‐ ‑ ، ٫ ٬ ؛ \: ! ؟ . … ‹ › « » ( ) \[ \] * / \\]},
 		};
 	},
 EOT
@@ -769,872 +765,2151 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
-					'acre-foot' => {
-						'name' => q(آکر-فوت),
-						'other' => q({0} آکر-فوت),
+					# Long Unit Identifier
+					'acceleration-g-force' => {
+						'name' => q(g-force),
+						'other' => q({0} G),
 					},
-					'ampere' => {
-						'name' => q(آمپر),
-						'other' => q({0} آمپر),
+					# Core Unit Identifier
+					'g-force' => {
+						'name' => q(g-force),
+						'other' => q({0} G),
 					},
+					# Long Unit Identifier
+					'acceleration-meter-per-square-second' => {
+						'name' => q(m/s²),
+						'other' => q({0} m/s²),
+					},
+					# Core Unit Identifier
+					'meter-per-square-second' => {
+						'name' => q(m/s²),
+						'other' => q({0} m/s²),
+					},
+					# Long Unit Identifier
+					'angle-arc-minute' => {
+						'name' => q(arcmin),
+						'other' => q({0}′),
+					},
+					# Core Unit Identifier
 					'arc-minute' => {
 						'name' => q(arcmin),
 						'other' => q({0}′),
 					},
+					# Long Unit Identifier
+					'angle-arc-second' => {
+						'name' => q(arcsec),
+						'other' => q({0}″),
+					},
+					# Core Unit Identifier
 					'arc-second' => {
 						'name' => q(arcsec),
 						'other' => q({0}″),
 					},
-					'bit' => {
-						'name' => q(بیت),
-						'other' => q({0} بیت),
+					# Long Unit Identifier
+					'angle-degree' => {
+						'name' => q(deg),
+						'other' => q({0}°),
 					},
-					'byte' => {
-						'name' => q(بایت),
-						'other' => q({0} بایت),
+					# Core Unit Identifier
+					'degree' => {
+						'name' => q(deg),
+						'other' => q({0}°),
 					},
-					'calorie' => {
-						'name' => q(کالری),
-						'other' => q({0} کالری),
+					# Long Unit Identifier
+					'angle-radian' => {
+						'name' => q(rad),
+						'other' => q({0} rad),
 					},
-					'carat' => {
-						'name' => q(قیراط),
-						'other' => q({0} قیراط),
+					# Core Unit Identifier
+					'radian' => {
+						'name' => q(rad),
+						'other' => q({0} rad),
 					},
-					'celsius' => {
-						'name' => q(درجه سلسیوس),
-						'other' => q({0} درجه سلسیوس),
+					# Long Unit Identifier
+					'angle-revolution' => {
+						'name' => q(rev),
+						'other' => q({0} rev),
 					},
-					'centiliter' => {
-						'name' => q(سانتی‌لیتر),
-						'other' => q({0} سانتی‌لیتر),
+					# Core Unit Identifier
+					'revolution' => {
+						'name' => q(rev),
+						'other' => q({0} rev),
 					},
-					'century' => {
-						'name' => q(قرن),
-						'other' => q({0} قرن),
+					# Long Unit Identifier
+					'concentr-karat' => {
+						'name' => q(kt),
+						'other' => q({0} kt),
 					},
+					# Core Unit Identifier
+					'karat' => {
+						'name' => q(kt),
+						'other' => q({0} kt),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-100-kilometer' => {
+						'name' => q(L/100km),
+						'other' => q({0} L/100km),
+					},
+					# Core Unit Identifier
+					'liter-per-100-kilometer' => {
+						'name' => q(L/100km),
+						'other' => q({0} L/100km),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-kilometer' => {
+						'name' => q(L/km),
+						'other' => q({0} L/km),
+					},
+					# Core Unit Identifier
+					'liter-per-kilometer' => {
+						'name' => q(L/km),
+						'other' => q({0} L/km),
+					},
+					# Long Unit Identifier
+					'consumption-mile-per-gallon' => {
+						'name' => q(mpg),
+						'other' => q({0} mpg),
+					},
+					# Core Unit Identifier
+					'mile-per-gallon' => {
+						'name' => q(mpg),
+						'other' => q({0} mpg),
+					},
+					# Long Unit Identifier
 					'coordinate' => {
 						'east' => q({0}E),
 						'north' => q({0}N),
 						'south' => q({0}S),
 						'west' => q({0}W),
 					},
-					'cubic-centimeter' => {
-						'name' => q(سانتی‌متر مکعب),
-						'other' => q({0} سانتی‌متر مکعب),
-						'per' => q({0} هر سانتی‌متر مکعب دله),
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0}E),
+						'north' => q({0}N),
+						'south' => q({0}S),
+						'west' => q({0}W),
 					},
-					'cubic-foot' => {
-						'name' => q(فوت مکعب),
-						'other' => q({0} فوت مکعب),
+					# Long Unit Identifier
+					'digital-bit' => {
+						'name' => q(بیت),
+						'other' => q({0} بیت),
 					},
-					'cubic-inch' => {
-						'name' => q(اینچ مکعب),
-						'other' => q({0} اینچ مکعب),
+					# Core Unit Identifier
+					'bit' => {
+						'name' => q(بیت),
+						'other' => q({0} بیت),
 					},
-					'cubic-kilometer' => {
-						'name' => q(کیلومتر مکعب),
-						'other' => q({0} کیلومتر مکعب),
+					# Long Unit Identifier
+					'digital-byte' => {
+						'name' => q(بایت),
+						'other' => q({0} بایت),
 					},
-					'cubic-meter' => {
-						'name' => q(متر مکعب),
-						'other' => q({0} متر مکعب),
-						'per' => q({0} هر متر مکعب دله),
+					# Core Unit Identifier
+					'byte' => {
+						'name' => q(بایت),
+						'other' => q({0} بایت),
 					},
-					'cubic-mile' => {
-						'name' => q(مایل مکعب),
-						'other' => q({0} مایل مکعب),
+					# Long Unit Identifier
+					'digital-gigabit' => {
+						'name' => q(گیگابیت),
+						'other' => q({0} گیگابیت),
 					},
-					'cubic-yard' => {
-						'name' => q(یارد مکعب),
-						'other' => q({0} یارد مکعب),
+					# Core Unit Identifier
+					'gigabit' => {
+						'name' => q(گیگابیت),
+						'other' => q({0} گیگابیت),
 					},
-					'cup' => {
-						'name' => q(دَییل),
-						'other' => q({0} دَییل),
+					# Long Unit Identifier
+					'digital-gigabyte' => {
+						'name' => q(گیگابایت),
+						'other' => q({0} گیگابایت),
 					},
-					'cup-metric' => {
-						'name' => q(متریک دَییل),
-						'other' => q({0} متریک دَییل),
+					# Core Unit Identifier
+					'gigabyte' => {
+						'name' => q(گیگابایت),
+						'other' => q({0} گیگابایت),
 					},
+					# Long Unit Identifier
+					'digital-kilobit' => {
+						'name' => q(کیلوبیت),
+						'other' => q({0} کیلوبیت),
+					},
+					# Core Unit Identifier
+					'kilobit' => {
+						'name' => q(کیلوبیت),
+						'other' => q({0} کیلوبیت),
+					},
+					# Long Unit Identifier
+					'digital-kilobyte' => {
+						'name' => q(کیلوبایت),
+						'other' => q({0} کیلوبایت),
+					},
+					# Core Unit Identifier
+					'kilobyte' => {
+						'name' => q(کیلوبایت),
+						'other' => q({0} کیلوبایت),
+					},
+					# Long Unit Identifier
+					'digital-megabit' => {
+						'name' => q(مگابیت),
+						'other' => q({0} مگابیت),
+					},
+					# Core Unit Identifier
+					'megabit' => {
+						'name' => q(مگابیت),
+						'other' => q({0} مگابیت),
+					},
+					# Long Unit Identifier
+					'digital-megabyte' => {
+						'name' => q(مگابایت),
+						'other' => q({0} مگابایت),
+					},
+					# Core Unit Identifier
+					'megabyte' => {
+						'name' => q(مگابایت),
+						'other' => q({0} مگابایت),
+					},
+					# Long Unit Identifier
+					'digital-terabit' => {
+						'name' => q(ترابیت),
+						'other' => q({0} ترابیت),
+					},
+					# Core Unit Identifier
+					'terabit' => {
+						'name' => q(ترابیت),
+						'other' => q({0} ترابیت),
+					},
+					# Long Unit Identifier
+					'digital-terabyte' => {
+						'name' => q(ترابایت),
+						'other' => q({0} ترابایت),
+					},
+					# Core Unit Identifier
+					'terabyte' => {
+						'name' => q(ترابایت),
+						'other' => q({0} ترابایت),
+					},
+					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(قرن),
+						'other' => q({0} قرن),
+					},
+					# Core Unit Identifier
+					'century' => {
+						'name' => q(قرن),
+						'other' => q({0} قرن),
+					},
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(روز),
+						'other' => q({0} روز),
+						'per' => q({0} روز),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(روز),
 						'other' => q({0} روز),
 						'per' => q({0} روز),
 					},
-					'deciliter' => {
-						'name' => q(دسی‌لیتر),
-						'other' => q({0} دسی‌لیتر),
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(ساعت),
+						'other' => q({0} ساعِت),
+						'per' => q({0} ساعِت),
 					},
-					'degree' => {
-						'name' => q(deg),
-						'other' => q({0}°),
-					},
-					'fahrenheit' => {
-						'name' => q(فارنهایت),
-						'other' => q({0} فارنهایت),
-					},
-					'fluid-ounce' => {
-						'name' => q(فلوید اونس),
-						'other' => q({0} فلوید اونس),
-					},
-					'foodcalorie' => {
-						'name' => q(کالری),
-						'other' => q({0} کالری),
-					},
-					'g-force' => {
-						'name' => q(g-force),
-						'other' => q({0} G),
-					},
-					'gallon' => {
-						'name' => q(گالون),
-						'other' => q({0} گالون),
-						'per' => q({0} هر گالون دله),
-					},
-					'generic' => {
-						'name' => q(°),
-						'other' => q({0}°),
-					},
-					'gigabit' => {
-						'name' => q(گیگابیت),
-						'other' => q({0} گیگابیت),
-					},
-					'gigabyte' => {
-						'name' => q(گیگابایت),
-						'other' => q({0} گیگابایت),
-					},
-					'gigahertz' => {
-						'name' => q(گیگاهرتز),
-						'other' => q({0} گیگاهرتز),
-					},
-					'gigawatt' => {
-						'name' => q(گیگاوات),
-						'other' => q({0} گیگاوات),
-					},
-					'gram' => {
-						'name' => q(گرم),
-						'other' => q({0} گرم),
-						'per' => q({0} هر گرم دله),
-					},
-					'hectoliter' => {
-						'name' => q(هکتولیتر),
-						'other' => q({0} هکتولیتر),
-					},
-					'hertz' => {
-						'name' => q(هرتز),
-						'other' => q({0} هرتز),
-					},
-					'horsepower' => {
-						'name' => q(اسب‌بخار),
-						'other' => q({0} اسب بخار),
-					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(ساعت),
 						'other' => q({0} ساعِت),
 						'per' => q({0} ساعِت),
 					},
-					'joule' => {
-						'name' => q(ژول),
-						'other' => q({0} ژول),
+					# Long Unit Identifier
+					'duration-microsecond' => {
+						'name' => q(میکروثانیه),
+						'other' => q({0} میکروثانیه),
 					},
-					'karat' => {
-						'name' => q(kt),
-						'other' => q({0} kt),
-					},
-					'kelvin' => {
-						'name' => q(کلوین),
-						'other' => q({0} کلوین),
-					},
-					'kilobit' => {
-						'name' => q(کیلوبیت),
-						'other' => q({0} کیلوبیت),
-					},
-					'kilobyte' => {
-						'name' => q(کیلوبایت),
-						'other' => q({0} کیلوبایت),
-					},
-					'kilocalorie' => {
-						'name' => q(کیلوکالری),
-						'other' => q({0} کیلوکالری),
-					},
-					'kilogram' => {
-						'name' => q(کیلوگرم),
-						'other' => q({0} کیلوگرم),
-						'per' => q({0} هر کیلوگرم دله),
-					},
-					'kilohertz' => {
-						'name' => q(کیلوهرتز),
-						'other' => q({0} کیلوهرتز),
-					},
-					'kilojoule' => {
-						'name' => q(کیلوژول),
-						'other' => q({0} کیلوژول),
-					},
-					'kilometer-per-hour' => {
-						'name' => q(کیلومتر بر ساعت),
-						'other' => q({0} کیلومتر بر ساعت),
-					},
-					'kilowatt' => {
-						'name' => q(کیلووات),
-						'other' => q({0} کیلووات),
-					},
-					'kilowatt-hour' => {
-						'name' => q(کیلووات بر ساعت),
-						'other' => q({0} کیلووات-ساعت),
-					},
-					'knot' => {
-						'name' => q(گره),
-						'other' => q({0} گره),
-					},
-					'liter' => {
-						'name' => q(لیتر),
-						'other' => q({0} لیتر),
-						'per' => q({0} هر لیتر دله),
-					},
-					'liter-per-100kilometers' => {
-						'name' => q(L/100km),
-						'other' => q({0} L/100km),
-					},
-					'liter-per-kilometer' => {
-						'name' => q(L/km),
-						'other' => q({0} L/km),
-					},
-					'lux' => {
-						'name' => q(lx),
-						'other' => q({0} lx),
-					},
-					'megabit' => {
-						'name' => q(مگابیت),
-						'other' => q({0} مگابیت),
-					},
-					'megabyte' => {
-						'name' => q(مگابایت),
-						'other' => q({0} مگابایت),
-					},
-					'megahertz' => {
-						'name' => q(مگاهرتز),
-						'other' => q({0} مگاهرتز),
-					},
-					'megaliter' => {
-						'name' => q(مگالیتر),
-						'other' => q({0} مگالیتر),
-					},
-					'megawatt' => {
-						'name' => q(مگاوات),
-						'other' => q({0} مگاوات),
-					},
-					'meter-per-second' => {
-						'name' => q(متر بر ثانیه),
-						'other' => q({0} متر بر ثانیه),
-					},
-					'meter-per-second-squared' => {
-						'name' => q(m/s²),
-						'other' => q({0} m/s²),
-					},
-					'metric-ton' => {
-						'name' => q(متریک تُن),
-						'other' => q({0} متریک تُن),
-					},
-					'microgram' => {
-						'name' => q(میکروگرم),
-						'other' => q({0} میکروگرم),
-					},
+					# Core Unit Identifier
 					'microsecond' => {
 						'name' => q(میکروثانیه),
 						'other' => q({0} میکروثانیه),
 					},
-					'mile-per-gallon' => {
-						'name' => q(mpg),
-						'other' => q({0} mpg),
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(میلی‌ثانیه),
+						'other' => q({0} میلی‌ثانیه),
 					},
-					'mile-per-hour' => {
-						'name' => q(مایل بر ساعت),
-						'other' => q({0} مایل بر ساعت),
-					},
-					'milliampere' => {
-						'name' => q(میلی‌آمپر),
-						'other' => q({0} میلی‌آمپر),
-					},
-					'milligram' => {
-						'name' => q(میلی‌گرم),
-						'other' => q({0} میلی‌گرم),
-					},
-					'milliliter' => {
-						'name' => q(میلی‌لیتر),
-						'other' => q({0} میلی‌لیتر),
-					},
+					# Core Unit Identifier
 					'millisecond' => {
 						'name' => q(میلی‌ثانیه),
 						'other' => q({0} میلی‌ثانیه),
 					},
-					'milliwatt' => {
-						'name' => q(میلی‌وات),
-						'other' => q({0} میلی‌وات),
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(دقیقه),
+						'other' => q({0} دقیقه),
 					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(دقیقه),
 						'other' => q({0} دقیقه),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(ماه),
+						'other' => q({0} ماه),
+						'per' => q({0} ماه پیش),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(ماه),
 						'other' => q({0} ماه),
 						'per' => q({0} ماه پیش),
 					},
+					# Long Unit Identifier
+					'duration-nanosecond' => {
+						'name' => q(نانوثانیه),
+						'other' => q({0} نانوثانیه),
+					},
+					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(نانوثانیه),
 						'other' => q({0} نانوثانیه),
 					},
-					'ohm' => {
-						'name' => q(اُهم),
-						'other' => q({0} Ω),
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(ثانیه),
+						'other' => q({0} ثانیه),
+						'per' => q({0} ثانیه),
 					},
-					'ounce' => {
-						'name' => q(اونس),
-						'other' => q({0} اونس),
-						'per' => q({0} هر اونس دله),
-					},
-					'ounce-troy' => {
-						'name' => q(تروی اونس),
-						'other' => q({0} تروی اونس),
-					},
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					'pint' => {
-						'name' => q(پاینت),
-						'other' => q({0} پاینت),
-					},
-					'pint-metric' => {
-						'name' => q(متریک پاینت),
-						'other' => q({0} متریک پاینت),
-					},
-					'pound' => {
-						'name' => q(پوند),
-						'other' => q({0} پوند),
-						'per' => q({0} هر پوند دله),
-					},
-					'quart' => {
-						'name' => q(ربع),
-						'other' => q({0} ربع),
-					},
-					'radian' => {
-						'name' => q(rad),
-						'other' => q({0} rad),
-					},
-					'revolution' => {
-						'name' => q(rev),
-						'other' => q({0} rev),
-					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(ثانیه),
 						'other' => q({0} ثانیه),
 						'per' => q({0} ثانیه),
 					},
-					'tablespoon' => {
-						'name' => q(کال),
-						'other' => q({0}تا کال),
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(هفته),
+						'other' => q({0} هفته),
+						'per' => q({0} هفته پیش),
 					},
-					'teaspoon' => {
-						'name' => q(چایی‌خاری کچه),
-						'other' => q({0} چایی‌خاری کچه),
-					},
-					'terabit' => {
-						'name' => q(ترابیت),
-						'other' => q({0} ترابیت),
-					},
-					'terabyte' => {
-						'name' => q(ترابایت),
-						'other' => q({0} ترابایت),
-					},
-					'ton' => {
-						'name' => q(تُن),
-						'other' => q({0} تُن),
-					},
-					'volt' => {
-						'name' => q(وُلت),
-						'other' => q({0} ولت),
-					},
-					'watt' => {
-						'name' => q(وات),
-						'other' => q({0} وات),
-					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(هفته),
 						'other' => q({0} هفته),
 						'per' => q({0} هفته پیش),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(سال),
+						'other' => q({0} سال),
+						'per' => q({0} سال پیش),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(سال),
 						'other' => q({0} سال),
 						'per' => q({0} سال پیش),
 					},
-				},
-				'narrow' => {
-					'celsius' => {
-						'name' => q(°C),
-						'other' => q({0}°C),
+					# Long Unit Identifier
+					'electric-ampere' => {
+						'name' => q(آمپر),
+						'other' => q({0} آمپر),
 					},
-					'coordinate' => {
-						'east' => q({0}E),
-						'north' => q({0}N),
-						'south' => q({0}S),
-						'west' => q({0}W),
-					},
-					'day' => {
-						'name' => q(روز),
-						'other' => q({0} روز),
-					},
-					'gram' => {
-						'name' => q(گرم),
-						'other' => q({0} g),
-					},
-					'hour' => {
-						'name' => q(ساعت),
-						'other' => q({0} ساعِت),
-					},
-					'kilogram' => {
-						'name' => q(کیلوگرم),
-						'other' => q({0} kg),
-					},
-					'kilometer-per-hour' => {
-						'name' => q(کیلومتر بر ساعت),
-						'other' => q({0} km/h),
-					},
-					'liter' => {
-						'name' => q(لیتر),
-						'other' => q({0} l),
-					},
-					'liter-per-100kilometers' => {
-						'name' => q(L/100km),
-						'other' => q({0} L/100km),
-					},
-					'millisecond' => {
-						'name' => q(میلی‌ثانیه),
-						'other' => q({0} میلی‌ثانیه),
-					},
-					'minute' => {
-						'name' => q(دَقه),
-						'other' => q({0} دَقه),
-					},
-					'month' => {
-						'name' => q(ماه),
-						'other' => q({0} ماه),
-					},
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					'second' => {
-						'name' => q(ثانیه),
-						'other' => q({0} ثانیه),
-					},
-					'week' => {
-						'name' => q(هفته),
-						'other' => q({0} هفته),
-					},
-					'year' => {
-						'name' => q(سال),
-						'other' => q({0} سال),
-					},
-				},
-				'short' => {
-					'acre-foot' => {
-						'name' => q(آکرفوت),
-						'other' => q({0} ac ft),
-					},
+					# Core Unit Identifier
 					'ampere' => {
 						'name' => q(آمپر),
-						'other' => q({0} A),
+						'other' => q({0} آمپر),
 					},
-					'arc-minute' => {
-						'name' => q(arcmin),
-						'other' => q({0}′),
+					# Long Unit Identifier
+					'electric-milliampere' => {
+						'name' => q(میلی‌آمپر),
+						'other' => q({0} میلی‌آمپر),
 					},
-					'arc-second' => {
-						'name' => q(arcsec),
-						'other' => q({0}″),
+					# Core Unit Identifier
+					'milliampere' => {
+						'name' => q(میلی‌آمپر),
+						'other' => q({0} میلی‌آمپر),
 					},
-					'bit' => {
-						'name' => q(بیت),
-						'other' => q({0} بیت),
+					# Long Unit Identifier
+					'electric-ohm' => {
+						'name' => q(اُهم),
+						'other' => q({0} Ω),
 					},
-					'byte' => {
-						'name' => q(بایت),
-						'other' => q({0} بایت),
+					# Core Unit Identifier
+					'ohm' => {
+						'name' => q(اُهم),
+						'other' => q({0} Ω),
 					},
+					# Long Unit Identifier
+					'electric-volt' => {
+						'name' => q(وُلت),
+						'other' => q({0} ولت),
+					},
+					# Core Unit Identifier
+					'volt' => {
+						'name' => q(وُلت),
+						'other' => q({0} ولت),
+					},
+					# Long Unit Identifier
+					'energy-calorie' => {
+						'name' => q(کالری),
+						'other' => q({0} کالری),
+					},
+					# Core Unit Identifier
 					'calorie' => {
 						'name' => q(کالری),
-						'other' => q({0} cal),
+						'other' => q({0} کالری),
 					},
+					# Long Unit Identifier
+					'energy-foodcalorie' => {
+						'name' => q(کالری),
+						'other' => q({0} کالری),
+					},
+					# Core Unit Identifier
+					'foodcalorie' => {
+						'name' => q(کالری),
+						'other' => q({0} کالری),
+					},
+					# Long Unit Identifier
+					'energy-joule' => {
+						'name' => q(ژول),
+						'other' => q({0} ژول),
+					},
+					# Core Unit Identifier
+					'joule' => {
+						'name' => q(ژول),
+						'other' => q({0} ژول),
+					},
+					# Long Unit Identifier
+					'energy-kilocalorie' => {
+						'name' => q(کیلوکالری),
+						'other' => q({0} کیلوکالری),
+					},
+					# Core Unit Identifier
+					'kilocalorie' => {
+						'name' => q(کیلوکالری),
+						'other' => q({0} کیلوکالری),
+					},
+					# Long Unit Identifier
+					'energy-kilojoule' => {
+						'name' => q(کیلوژول),
+						'other' => q({0} کیلوژول),
+					},
+					# Core Unit Identifier
+					'kilojoule' => {
+						'name' => q(کیلوژول),
+						'other' => q({0} کیلوژول),
+					},
+					# Long Unit Identifier
+					'energy-kilowatt-hour' => {
+						'name' => q(کیلووات بر ساعت),
+						'other' => q({0} کیلووات-ساعت),
+					},
+					# Core Unit Identifier
+					'kilowatt-hour' => {
+						'name' => q(کیلووات بر ساعت),
+						'other' => q({0} کیلووات-ساعت),
+					},
+					# Long Unit Identifier
+					'frequency-gigahertz' => {
+						'name' => q(گیگاهرتز),
+						'other' => q({0} گیگاهرتز),
+					},
+					# Core Unit Identifier
+					'gigahertz' => {
+						'name' => q(گیگاهرتز),
+						'other' => q({0} گیگاهرتز),
+					},
+					# Long Unit Identifier
+					'frequency-hertz' => {
+						'name' => q(هرتز),
+						'other' => q({0} هرتز),
+					},
+					# Core Unit Identifier
+					'hertz' => {
+						'name' => q(هرتز),
+						'other' => q({0} هرتز),
+					},
+					# Long Unit Identifier
+					'frequency-kilohertz' => {
+						'name' => q(کیلوهرتز),
+						'other' => q({0} کیلوهرتز),
+					},
+					# Core Unit Identifier
+					'kilohertz' => {
+						'name' => q(کیلوهرتز),
+						'other' => q({0} کیلوهرتز),
+					},
+					# Long Unit Identifier
+					'frequency-megahertz' => {
+						'name' => q(مگاهرتز),
+						'other' => q({0} مگاهرتز),
+					},
+					# Core Unit Identifier
+					'megahertz' => {
+						'name' => q(مگاهرتز),
+						'other' => q({0} مگاهرتز),
+					},
+					# Long Unit Identifier
+					'light-lux' => {
+						'name' => q(lx),
+						'other' => q({0} lx),
+					},
+					# Core Unit Identifier
+					'lux' => {
+						'name' => q(lx),
+						'other' => q({0} lx),
+					},
+					# Long Unit Identifier
+					'mass-carat' => {
+						'name' => q(قیراط),
+						'other' => q({0} قیراط),
+					},
+					# Core Unit Identifier
 					'carat' => {
 						'name' => q(قیراط),
 						'other' => q({0} قیراط),
 					},
-					'celsius' => {
-						'name' => q(°C),
-						'other' => q({0}°C),
+					# Long Unit Identifier
+					'mass-gram' => {
+						'name' => q(گرم),
+						'other' => q({0} گرم),
+						'per' => q({0} هر گرم دله),
 					},
+					# Core Unit Identifier
+					'gram' => {
+						'name' => q(گرم),
+						'other' => q({0} گرم),
+						'per' => q({0} هر گرم دله),
+					},
+					# Long Unit Identifier
+					'mass-kilogram' => {
+						'name' => q(کیلوگرم),
+						'other' => q({0} کیلوگرم),
+						'per' => q({0} هر کیلوگرم دله),
+					},
+					# Core Unit Identifier
+					'kilogram' => {
+						'name' => q(کیلوگرم),
+						'other' => q({0} کیلوگرم),
+						'per' => q({0} هر کیلوگرم دله),
+					},
+					# Long Unit Identifier
+					'mass-metric-ton' => {
+						'name' => q(متریک تُن),
+						'other' => q({0} متریک تُن),
+					},
+					# Core Unit Identifier
+					'metric-ton' => {
+						'name' => q(متریک تُن),
+						'other' => q({0} متریک تُن),
+					},
+					# Long Unit Identifier
+					'mass-microgram' => {
+						'name' => q(میکروگرم),
+						'other' => q({0} میکروگرم),
+					},
+					# Core Unit Identifier
+					'microgram' => {
+						'name' => q(میکروگرم),
+						'other' => q({0} میکروگرم),
+					},
+					# Long Unit Identifier
+					'mass-milligram' => {
+						'name' => q(میلی‌گرم),
+						'other' => q({0} میلی‌گرم),
+					},
+					# Core Unit Identifier
+					'milligram' => {
+						'name' => q(میلی‌گرم),
+						'other' => q({0} میلی‌گرم),
+					},
+					# Long Unit Identifier
+					'mass-ounce' => {
+						'name' => q(اونس),
+						'other' => q({0} اونس),
+						'per' => q({0} هر اونس دله),
+					},
+					# Core Unit Identifier
+					'ounce' => {
+						'name' => q(اونس),
+						'other' => q({0} اونس),
+						'per' => q({0} هر اونس دله),
+					},
+					# Long Unit Identifier
+					'mass-ounce-troy' => {
+						'name' => q(تروی اونس),
+						'other' => q({0} تروی اونس),
+					},
+					# Core Unit Identifier
+					'ounce-troy' => {
+						'name' => q(تروی اونس),
+						'other' => q({0} تروی اونس),
+					},
+					# Long Unit Identifier
+					'mass-pound' => {
+						'name' => q(پوند),
+						'other' => q({0} پوند),
+						'per' => q({0} هر پوند دله),
+					},
+					# Core Unit Identifier
+					'pound' => {
+						'name' => q(پوند),
+						'other' => q({0} پوند),
+						'per' => q({0} هر پوند دله),
+					},
+					# Long Unit Identifier
+					'mass-ton' => {
+						'name' => q(تُن),
+						'other' => q({0} تُن),
+					},
+					# Core Unit Identifier
+					'ton' => {
+						'name' => q(تُن),
+						'other' => q({0} تُن),
+					},
+					# Long Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Core Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Long Unit Identifier
+					'power-gigawatt' => {
+						'name' => q(گیگاوات),
+						'other' => q({0} گیگاوات),
+					},
+					# Core Unit Identifier
+					'gigawatt' => {
+						'name' => q(گیگاوات),
+						'other' => q({0} گیگاوات),
+					},
+					# Long Unit Identifier
+					'power-horsepower' => {
+						'name' => q(اسب‌بخار),
+						'other' => q({0} اسب بخار),
+					},
+					# Core Unit Identifier
+					'horsepower' => {
+						'name' => q(اسب‌بخار),
+						'other' => q({0} اسب بخار),
+					},
+					# Long Unit Identifier
+					'power-kilowatt' => {
+						'name' => q(کیلووات),
+						'other' => q({0} کیلووات),
+					},
+					# Core Unit Identifier
+					'kilowatt' => {
+						'name' => q(کیلووات),
+						'other' => q({0} کیلووات),
+					},
+					# Long Unit Identifier
+					'power-megawatt' => {
+						'name' => q(مگاوات),
+						'other' => q({0} مگاوات),
+					},
+					# Core Unit Identifier
+					'megawatt' => {
+						'name' => q(مگاوات),
+						'other' => q({0} مگاوات),
+					},
+					# Long Unit Identifier
+					'power-milliwatt' => {
+						'name' => q(میلی‌وات),
+						'other' => q({0} میلی‌وات),
+					},
+					# Core Unit Identifier
+					'milliwatt' => {
+						'name' => q(میلی‌وات),
+						'other' => q({0} میلی‌وات),
+					},
+					# Long Unit Identifier
+					'power-watt' => {
+						'name' => q(وات),
+						'other' => q({0} وات),
+					},
+					# Core Unit Identifier
+					'watt' => {
+						'name' => q(وات),
+						'other' => q({0} وات),
+					},
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'name' => q(کیلومتر بر ساعت),
+						'other' => q({0} کیلومتر بر ساعت),
+					},
+					# Core Unit Identifier
+					'kilometer-per-hour' => {
+						'name' => q(کیلومتر بر ساعت),
+						'other' => q({0} کیلومتر بر ساعت),
+					},
+					# Long Unit Identifier
+					'speed-knot' => {
+						'name' => q(گره),
+						'other' => q({0} گره),
+					},
+					# Core Unit Identifier
+					'knot' => {
+						'name' => q(گره),
+						'other' => q({0} گره),
+					},
+					# Long Unit Identifier
+					'speed-meter-per-second' => {
+						'name' => q(متر بر ثانیه),
+						'other' => q({0} متر بر ثانیه),
+					},
+					# Core Unit Identifier
+					'meter-per-second' => {
+						'name' => q(متر بر ثانیه),
+						'other' => q({0} متر بر ثانیه),
+					},
+					# Long Unit Identifier
+					'speed-mile-per-hour' => {
+						'name' => q(مایل بر ساعت),
+						'other' => q({0} مایل بر ساعت),
+					},
+					# Core Unit Identifier
+					'mile-per-hour' => {
+						'name' => q(مایل بر ساعت),
+						'other' => q({0} مایل بر ساعت),
+					},
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'name' => q(درجه سلسیوس),
+						'other' => q({0} درجه سلسیوس),
+					},
+					# Core Unit Identifier
+					'celsius' => {
+						'name' => q(درجه سلسیوس),
+						'other' => q({0} درجه سلسیوس),
+					},
+					# Long Unit Identifier
+					'temperature-fahrenheit' => {
+						'name' => q(فارنهایت),
+						'other' => q({0} فارنهایت),
+					},
+					# Core Unit Identifier
+					'fahrenheit' => {
+						'name' => q(فارنهایت),
+						'other' => q({0} فارنهایت),
+					},
+					# Long Unit Identifier
+					'temperature-generic' => {
+						'name' => q(°),
+						'other' => q({0}°),
+					},
+					# Core Unit Identifier
+					'generic' => {
+						'name' => q(°),
+						'other' => q({0}°),
+					},
+					# Long Unit Identifier
+					'temperature-kelvin' => {
+						'name' => q(کلوین),
+						'other' => q({0} کلوین),
+					},
+					# Core Unit Identifier
+					'kelvin' => {
+						'name' => q(کلوین),
+						'other' => q({0} کلوین),
+					},
+					# Long Unit Identifier
+					'volume-acre-foot' => {
+						'name' => q(آکر-فوت),
+						'other' => q({0} آکر-فوت),
+					},
+					# Core Unit Identifier
+					'acre-foot' => {
+						'name' => q(آکر-فوت),
+						'other' => q({0} آکر-فوت),
+					},
+					# Long Unit Identifier
+					'volume-centiliter' => {
+						'name' => q(سانتی‌لیتر),
+						'other' => q({0} سانتی‌لیتر),
+					},
+					# Core Unit Identifier
 					'centiliter' => {
 						'name' => q(سانتی‌لیتر),
-						'other' => q({0} cL),
+						'other' => q({0} سانتی‌لیتر),
 					},
-					'century' => {
-						'name' => q(قرن),
-						'other' => q({0} قرن),
+					# Long Unit Identifier
+					'volume-cubic-centimeter' => {
+						'name' => q(سانتی‌متر مکعب),
+						'other' => q({0} سانتی‌متر مکعب),
+						'per' => q({0} هر سانتی‌متر مکعب دله),
 					},
+					# Core Unit Identifier
+					'cubic-centimeter' => {
+						'name' => q(سانتی‌متر مکعب),
+						'other' => q({0} سانتی‌متر مکعب),
+						'per' => q({0} هر سانتی‌متر مکعب دله),
+					},
+					# Long Unit Identifier
+					'volume-cubic-foot' => {
+						'name' => q(فوت مکعب),
+						'other' => q({0} فوت مکعب),
+					},
+					# Core Unit Identifier
+					'cubic-foot' => {
+						'name' => q(فوت مکعب),
+						'other' => q({0} فوت مکعب),
+					},
+					# Long Unit Identifier
+					'volume-cubic-inch' => {
+						'name' => q(اینچ مکعب),
+						'other' => q({0} اینچ مکعب),
+					},
+					# Core Unit Identifier
+					'cubic-inch' => {
+						'name' => q(اینچ مکعب),
+						'other' => q({0} اینچ مکعب),
+					},
+					# Long Unit Identifier
+					'volume-cubic-kilometer' => {
+						'name' => q(کیلومتر مکعب),
+						'other' => q({0} کیلومتر مکعب),
+					},
+					# Core Unit Identifier
+					'cubic-kilometer' => {
+						'name' => q(کیلومتر مکعب),
+						'other' => q({0} کیلومتر مکعب),
+					},
+					# Long Unit Identifier
+					'volume-cubic-meter' => {
+						'name' => q(متر مکعب),
+						'other' => q({0} متر مکعب),
+						'per' => q({0} هر متر مکعب دله),
+					},
+					# Core Unit Identifier
+					'cubic-meter' => {
+						'name' => q(متر مکعب),
+						'other' => q({0} متر مکعب),
+						'per' => q({0} هر متر مکعب دله),
+					},
+					# Long Unit Identifier
+					'volume-cubic-mile' => {
+						'name' => q(مایل مکعب),
+						'other' => q({0} مایل مکعب),
+					},
+					# Core Unit Identifier
+					'cubic-mile' => {
+						'name' => q(مایل مکعب),
+						'other' => q({0} مایل مکعب),
+					},
+					# Long Unit Identifier
+					'volume-cubic-yard' => {
+						'name' => q(یارد مکعب),
+						'other' => q({0} یارد مکعب),
+					},
+					# Core Unit Identifier
+					'cubic-yard' => {
+						'name' => q(یارد مکعب),
+						'other' => q({0} یارد مکعب),
+					},
+					# Long Unit Identifier
+					'volume-cup' => {
+						'name' => q(دَییل),
+						'other' => q({0} دَییل),
+					},
+					# Core Unit Identifier
+					'cup' => {
+						'name' => q(دَییل),
+						'other' => q({0} دَییل),
+					},
+					# Long Unit Identifier
+					'volume-cup-metric' => {
+						'name' => q(متریک دَییل),
+						'other' => q({0} متریک دَییل),
+					},
+					# Core Unit Identifier
+					'cup-metric' => {
+						'name' => q(متریک دَییل),
+						'other' => q({0} متریک دَییل),
+					},
+					# Long Unit Identifier
+					'volume-deciliter' => {
+						'name' => q(دسی‌لیتر),
+						'other' => q({0} دسی‌لیتر),
+					},
+					# Core Unit Identifier
+					'deciliter' => {
+						'name' => q(دسی‌لیتر),
+						'other' => q({0} دسی‌لیتر),
+					},
+					# Long Unit Identifier
+					'volume-fluid-ounce' => {
+						'name' => q(فلوید اونس),
+						'other' => q({0} فلوید اونس),
+					},
+					# Core Unit Identifier
+					'fluid-ounce' => {
+						'name' => q(فلوید اونس),
+						'other' => q({0} فلوید اونس),
+					},
+					# Long Unit Identifier
+					'volume-gallon' => {
+						'name' => q(گالون),
+						'other' => q({0} گالون),
+						'per' => q({0} هر گالون دله),
+					},
+					# Core Unit Identifier
+					'gallon' => {
+						'name' => q(گالون),
+						'other' => q({0} گالون),
+						'per' => q({0} هر گالون دله),
+					},
+					# Long Unit Identifier
+					'volume-hectoliter' => {
+						'name' => q(هکتولیتر),
+						'other' => q({0} هکتولیتر),
+					},
+					# Core Unit Identifier
+					'hectoliter' => {
+						'name' => q(هکتولیتر),
+						'other' => q({0} هکتولیتر),
+					},
+					# Long Unit Identifier
+					'volume-liter' => {
+						'name' => q(لیتر),
+						'other' => q({0} لیتر),
+						'per' => q({0} هر لیتر دله),
+					},
+					# Core Unit Identifier
+					'liter' => {
+						'name' => q(لیتر),
+						'other' => q({0} لیتر),
+						'per' => q({0} هر لیتر دله),
+					},
+					# Long Unit Identifier
+					'volume-megaliter' => {
+						'name' => q(مگالیتر),
+						'other' => q({0} مگالیتر),
+					},
+					# Core Unit Identifier
+					'megaliter' => {
+						'name' => q(مگالیتر),
+						'other' => q({0} مگالیتر),
+					},
+					# Long Unit Identifier
+					'volume-milliliter' => {
+						'name' => q(میلی‌لیتر),
+						'other' => q({0} میلی‌لیتر),
+					},
+					# Core Unit Identifier
+					'milliliter' => {
+						'name' => q(میلی‌لیتر),
+						'other' => q({0} میلی‌لیتر),
+					},
+					# Long Unit Identifier
+					'volume-pint' => {
+						'name' => q(پاینت),
+						'other' => q({0} پاینت),
+					},
+					# Core Unit Identifier
+					'pint' => {
+						'name' => q(پاینت),
+						'other' => q({0} پاینت),
+					},
+					# Long Unit Identifier
+					'volume-pint-metric' => {
+						'name' => q(متریک پاینت),
+						'other' => q({0} متریک پاینت),
+					},
+					# Core Unit Identifier
+					'pint-metric' => {
+						'name' => q(متریک پاینت),
+						'other' => q({0} متریک پاینت),
+					},
+					# Long Unit Identifier
+					'volume-quart' => {
+						'name' => q(ربع),
+						'other' => q({0} ربع),
+					},
+					# Core Unit Identifier
+					'quart' => {
+						'name' => q(ربع),
+						'other' => q({0} ربع),
+					},
+					# Long Unit Identifier
+					'volume-tablespoon' => {
+						'name' => q(کال),
+						'other' => q({0}تا کال),
+					},
+					# Core Unit Identifier
+					'tablespoon' => {
+						'name' => q(کال),
+						'other' => q({0}تا کال),
+					},
+					# Long Unit Identifier
+					'volume-teaspoon' => {
+						'name' => q(چایی‌خاری کچه),
+						'other' => q({0} چایی‌خاری کچه),
+					},
+					# Core Unit Identifier
+					'teaspoon' => {
+						'name' => q(چایی‌خاری کچه),
+						'other' => q({0} چایی‌خاری کچه),
+					},
+				},
+				'narrow' => {
+					# Long Unit Identifier
+					'consumption-liter-per-100-kilometer' => {
+						'name' => q(L/100km),
+						'other' => q({0} L/100km),
+					},
+					# Core Unit Identifier
+					'liter-per-100-kilometer' => {
+						'name' => q(L/100km),
+						'other' => q({0} L/100km),
+					},
+					# Long Unit Identifier
 					'coordinate' => {
 						'east' => q({0}E),
 						'north' => q({0}N),
 						'south' => q({0}S),
 						'west' => q({0}W),
 					},
-					'cubic-centimeter' => {
-						'name' => q(cm³),
-						'other' => q({0} cm³),
-						'per' => q({0}/cm³),
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0}E),
+						'north' => q({0}N),
+						'south' => q({0}S),
+						'west' => q({0}W),
 					},
-					'cubic-foot' => {
-						'name' => q(ft³),
-						'other' => q({0} ft³),
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(روز),
+						'other' => q({0} روز),
 					},
-					'cubic-inch' => {
-						'name' => q(in³),
-						'other' => q({0} in³),
+					# Core Unit Identifier
+					'day' => {
+						'name' => q(روز),
+						'other' => q({0} روز),
 					},
-					'cubic-kilometer' => {
-						'name' => q(km³),
-						'other' => q({0} km³),
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(ساعت),
+						'other' => q({0} ساعِت),
 					},
-					'cubic-meter' => {
-						'name' => q(m³),
-						'other' => q({0} m³),
-						'per' => q({0}/m³),
+					# Core Unit Identifier
+					'hour' => {
+						'name' => q(ساعت),
+						'other' => q({0} ساعِت),
 					},
-					'cubic-mile' => {
-						'name' => q(mi³),
-						'other' => q({0} mi³),
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(میلی‌ثانیه),
+						'other' => q({0} میلی‌ثانیه),
 					},
-					'cubic-yard' => {
-						'name' => q(yd³),
-						'other' => q({0} yd³),
+					# Core Unit Identifier
+					'millisecond' => {
+						'name' => q(میلی‌ثانیه),
+						'other' => q({0} میلی‌ثانیه),
 					},
-					'cup' => {
-						'name' => q(دَییل),
-						'other' => q({0} c),
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(دَقه),
+						'other' => q({0} دَقه),
 					},
-					'cup-metric' => {
-						'name' => q(mcup),
-						'other' => q({0} mc),
+					# Core Unit Identifier
+					'minute' => {
+						'name' => q(دَقه),
+						'other' => q({0} دَقه),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(ماه),
+						'other' => q({0} ماه),
+					},
+					# Core Unit Identifier
+					'month' => {
+						'name' => q(ماه),
+						'other' => q({0} ماه),
+					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(ثانیه),
+						'other' => q({0} ثانیه),
+					},
+					# Core Unit Identifier
+					'second' => {
+						'name' => q(ثانیه),
+						'other' => q({0} ثانیه),
+					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(هفته),
+						'other' => q({0} هفته),
+					},
+					# Core Unit Identifier
+					'week' => {
+						'name' => q(هفته),
+						'other' => q({0} هفته),
+					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(سال),
+						'other' => q({0} سال),
+					},
+					# Core Unit Identifier
+					'year' => {
+						'name' => q(سال),
+						'other' => q({0} سال),
+					},
+					# Long Unit Identifier
+					'mass-gram' => {
+						'name' => q(گرم),
+						'other' => q({0} g),
+					},
+					# Core Unit Identifier
+					'gram' => {
+						'name' => q(گرم),
+						'other' => q({0} g),
+					},
+					# Long Unit Identifier
+					'mass-kilogram' => {
+						'name' => q(کیلوگرم),
+						'other' => q({0} kg),
+					},
+					# Core Unit Identifier
+					'kilogram' => {
+						'name' => q(کیلوگرم),
+						'other' => q({0} kg),
+					},
+					# Long Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Core Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'name' => q(کیلومتر بر ساعت),
+						'other' => q({0} km/h),
+					},
+					# Core Unit Identifier
+					'kilometer-per-hour' => {
+						'name' => q(کیلومتر بر ساعت),
+						'other' => q({0} km/h),
+					},
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'name' => q(°C),
+						'other' => q({0}°C),
+					},
+					# Core Unit Identifier
+					'celsius' => {
+						'name' => q(°C),
+						'other' => q({0}°C),
+					},
+					# Long Unit Identifier
+					'volume-liter' => {
+						'name' => q(لیتر),
+						'other' => q({0} l),
+					},
+					# Core Unit Identifier
+					'liter' => {
+						'name' => q(لیتر),
+						'other' => q({0} l),
+					},
+				},
+				'short' => {
+					# Long Unit Identifier
+					'acceleration-g-force' => {
+						'name' => q(g-force),
+						'other' => q({0} G),
+					},
+					# Core Unit Identifier
+					'g-force' => {
+						'name' => q(g-force),
+						'other' => q({0} G),
+					},
+					# Long Unit Identifier
+					'acceleration-meter-per-square-second' => {
+						'name' => q(m/s²),
+						'other' => q({0} m/s²),
+					},
+					# Core Unit Identifier
+					'meter-per-square-second' => {
+						'name' => q(m/s²),
+						'other' => q({0} m/s²),
+					},
+					# Long Unit Identifier
+					'angle-arc-minute' => {
+						'name' => q(arcmin),
+						'other' => q({0}′),
+					},
+					# Core Unit Identifier
+					'arc-minute' => {
+						'name' => q(arcmin),
+						'other' => q({0}′),
+					},
+					# Long Unit Identifier
+					'angle-arc-second' => {
+						'name' => q(arcsec),
+						'other' => q({0}″),
+					},
+					# Core Unit Identifier
+					'arc-second' => {
+						'name' => q(arcsec),
+						'other' => q({0}″),
+					},
+					# Long Unit Identifier
+					'angle-degree' => {
+						'name' => q(deg),
+						'other' => q({0}°),
+					},
+					# Core Unit Identifier
+					'degree' => {
+						'name' => q(deg),
+						'other' => q({0}°),
+					},
+					# Long Unit Identifier
+					'angle-radian' => {
+						'name' => q(rad),
+						'other' => q({0} rad),
+					},
+					# Core Unit Identifier
+					'radian' => {
+						'name' => q(rad),
+						'other' => q({0} rad),
+					},
+					# Long Unit Identifier
+					'angle-revolution' => {
+						'name' => q(rev),
+						'other' => q({0} rev),
+					},
+					# Core Unit Identifier
+					'revolution' => {
+						'name' => q(rev),
+						'other' => q({0} rev),
+					},
+					# Long Unit Identifier
+					'concentr-karat' => {
+						'name' => q(kt),
+						'other' => q({0} kt),
+					},
+					# Core Unit Identifier
+					'karat' => {
+						'name' => q(kt),
+						'other' => q({0} kt),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-100-kilometer' => {
+						'name' => q(L/100km),
+						'other' => q({0} L/100km),
+					},
+					# Core Unit Identifier
+					'liter-per-100-kilometer' => {
+						'name' => q(L/100km),
+						'other' => q({0} L/100km),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-kilometer' => {
+						'name' => q(L/km),
+						'other' => q({0} L/km),
+					},
+					# Core Unit Identifier
+					'liter-per-kilometer' => {
+						'name' => q(L/km),
+						'other' => q({0} L/km),
+					},
+					# Long Unit Identifier
+					'consumption-mile-per-gallon' => {
+						'name' => q(mpg),
+						'other' => q({0} mpg),
+					},
+					# Core Unit Identifier
+					'mile-per-gallon' => {
+						'name' => q(mpg),
+						'other' => q({0} mpg),
+					},
+					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0}E),
+						'north' => q({0}N),
+						'south' => q({0}S),
+						'west' => q({0}W),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0}E),
+						'north' => q({0}N),
+						'south' => q({0}S),
+						'west' => q({0}W),
+					},
+					# Long Unit Identifier
+					'digital-bit' => {
+						'name' => q(بیت),
+						'other' => q({0} بیت),
+					},
+					# Core Unit Identifier
+					'bit' => {
+						'name' => q(بیت),
+						'other' => q({0} بیت),
+					},
+					# Long Unit Identifier
+					'digital-byte' => {
+						'name' => q(بایت),
+						'other' => q({0} بایت),
+					},
+					# Core Unit Identifier
+					'byte' => {
+						'name' => q(بایت),
+						'other' => q({0} بایت),
+					},
+					# Long Unit Identifier
+					'digital-gigabit' => {
+						'name' => q(گیگابیت),
+						'other' => q({0} گیگابیت),
+					},
+					# Core Unit Identifier
+					'gigabit' => {
+						'name' => q(گیگابیت),
+						'other' => q({0} گیگابیت),
+					},
+					# Long Unit Identifier
+					'digital-gigabyte' => {
+						'name' => q(گیگابایت),
+						'other' => q({0} گیگابایت),
+					},
+					# Core Unit Identifier
+					'gigabyte' => {
+						'name' => q(گیگابایت),
+						'other' => q({0} گیگابایت),
+					},
+					# Long Unit Identifier
+					'digital-kilobit' => {
+						'name' => q(کیلوبیت),
+						'other' => q({0} کیلوبیت),
+					},
+					# Core Unit Identifier
+					'kilobit' => {
+						'name' => q(کیلوبیت),
+						'other' => q({0} کیلوبیت),
+					},
+					# Long Unit Identifier
+					'digital-kilobyte' => {
+						'name' => q(کیلوبایت),
+						'other' => q({0} کیلوبایت),
+					},
+					# Core Unit Identifier
+					'kilobyte' => {
+						'name' => q(کیلوبایت),
+						'other' => q({0} کیلوبایت),
+					},
+					# Long Unit Identifier
+					'digital-megabit' => {
+						'name' => q(مگابیت),
+						'other' => q({0} مگابیت),
+					},
+					# Core Unit Identifier
+					'megabit' => {
+						'name' => q(مگابیت),
+						'other' => q({0} مگابیت),
+					},
+					# Long Unit Identifier
+					'digital-megabyte' => {
+						'name' => q(مگابایت),
+						'other' => q({0} مگابایت),
+					},
+					# Core Unit Identifier
+					'megabyte' => {
+						'name' => q(مگابایت),
+						'other' => q({0} مگابایت),
+					},
+					# Long Unit Identifier
+					'digital-terabit' => {
+						'name' => q(ترابیت),
+						'other' => q({0} ترابیت),
+					},
+					# Core Unit Identifier
+					'terabit' => {
+						'name' => q(ترابیت),
+						'other' => q({0} ترابیت),
+					},
+					# Long Unit Identifier
+					'digital-terabyte' => {
+						'name' => q(ترابایت),
+						'other' => q({0} ترابایت),
+					},
+					# Core Unit Identifier
+					'terabyte' => {
+						'name' => q(ترابایت),
+						'other' => q({0} ترابایت),
+					},
+					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(قرن),
+						'other' => q({0} قرن),
+					},
+					# Core Unit Identifier
+					'century' => {
+						'name' => q(قرن),
+						'other' => q({0} قرن),
+					},
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(روز),
+						'other' => q({0} روز),
+						'per' => q({0} روز),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(روز),
 						'other' => q({0} روز),
 						'per' => q({0} روز),
 					},
-					'deciliter' => {
-						'name' => q(دسی‌لیتر),
-						'other' => q({0} dL),
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(ساعت),
+						'per' => q({0} ساعِت),
 					},
-					'degree' => {
-						'name' => q(deg),
-						'other' => q({0}°),
-					},
-					'fahrenheit' => {
-						'name' => q(°F),
-						'other' => q({0}°F),
-					},
-					'fluid-ounce' => {
-						'name' => q(فلوید اونس),
-						'other' => q({0} fl oz),
-					},
-					'foodcalorie' => {
-						'name' => q(کالری),
-						'other' => q({0} Cal),
-					},
-					'g-force' => {
-						'name' => q(g-force),
-						'other' => q({0} G),
-					},
-					'gallon' => {
-						'name' => q(گالون),
-						'other' => q({0} gal),
-						'per' => q({0}/gal),
-					},
-					'generic' => {
-						'name' => q(°),
-						'other' => q({0}°),
-					},
-					'gigabit' => {
-						'name' => q(گیگابیت),
-						'other' => q({0} گیگابیت),
-					},
-					'gigabyte' => {
-						'name' => q(گیگابایت),
-						'other' => q({0} گیگابایت),
-					},
-					'gigahertz' => {
-						'name' => q(گیگاهرتز),
-						'other' => q({0} GHz),
-					},
-					'gigawatt' => {
-						'name' => q(گیگاوات),
-						'other' => q({0} GW),
-					},
-					'gram' => {
-						'name' => q(گرم),
-						'other' => q({0} g),
-						'per' => q({0}/g),
-					},
-					'hectoliter' => {
-						'name' => q(هکتولیتر),
-						'other' => q({0} hL),
-					},
-					'hertz' => {
-						'name' => q(هرتز),
-						'other' => q({0} Hz),
-					},
-					'horsepower' => {
-						'name' => q(اسب‌بخار),
-						'other' => q({0} hp),
-					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(ساعت),
 						'per' => q({0} ساعِت),
 					},
-					'joule' => {
-						'name' => q(ژول),
-						'other' => q({0} J),
+					# Long Unit Identifier
+					'duration-microsecond' => {
+						'name' => q(میکروثانیه),
+						'other' => q({0} میکروثانیه),
 					},
-					'karat' => {
-						'name' => q(kt),
-						'other' => q({0} kt),
-					},
-					'kelvin' => {
-						'name' => q(K),
-						'other' => q({0} K),
-					},
-					'kilobit' => {
-						'name' => q(کیلوبیت),
-						'other' => q({0} کیلوبیت),
-					},
-					'kilobyte' => {
-						'name' => q(کیلوبایت),
-						'other' => q({0} کیلوبایت),
-					},
-					'kilocalorie' => {
-						'name' => q(کیلوکالری),
-						'other' => q({0} kcal),
-					},
-					'kilogram' => {
-						'name' => q(کیلوگرم),
-						'other' => q({0} kg),
-						'per' => q({0}/kg),
-					},
-					'kilohertz' => {
-						'name' => q(کیلوهرتز),
-						'other' => q({0} kHz),
-					},
-					'kilojoule' => {
-						'name' => q(کیلوژول),
-						'other' => q({0} kJ),
-					},
-					'kilometer-per-hour' => {
-						'name' => q(کیلومتر بر ساعت),
-						'other' => q({0} km/h),
-					},
-					'kilowatt' => {
-						'name' => q(کیلووات),
-						'other' => q({0} kW),
-					},
-					'kilowatt-hour' => {
-						'name' => q(کیلووات-ساعت),
-						'other' => q({0} kWh),
-					},
-					'knot' => {
-						'name' => q(گره),
-						'other' => q({0} kn),
-					},
-					'liter' => {
-						'name' => q(لیتر),
-						'other' => q({0} لیتر),
-						'per' => q({0}/l),
-					},
-					'liter-per-100kilometers' => {
-						'name' => q(L/100km),
-						'other' => q({0} L/100km),
-					},
-					'liter-per-kilometer' => {
-						'name' => q(L/km),
-						'other' => q({0} L/km),
-					},
-					'lux' => {
-						'name' => q(lx),
-						'other' => q({0} lx),
-					},
-					'megabit' => {
-						'name' => q(مگابیت),
-						'other' => q({0} مگابیت),
-					},
-					'megabyte' => {
-						'name' => q(مگابایت),
-						'other' => q({0} مگابایت),
-					},
-					'megahertz' => {
-						'name' => q(مگاهرتز),
-						'other' => q({0} MHz),
-					},
-					'megaliter' => {
-						'name' => q(مگالیتر),
-						'other' => q({0} ML),
-					},
-					'megawatt' => {
-						'name' => q(مگاوات),
-						'other' => q({0} MW),
-					},
-					'meter-per-second' => {
-						'name' => q(متر بر ثانیه),
-						'other' => q({0} m/s),
-					},
-					'meter-per-second-squared' => {
-						'name' => q(m/s²),
-						'other' => q({0} m/s²),
-					},
-					'metric-ton' => {
-						'name' => q(t),
-						'other' => q({0} t),
-					},
-					'microgram' => {
-						'name' => q(میکروگرم),
-						'other' => q({0} µg),
-					},
+					# Core Unit Identifier
 					'microsecond' => {
 						'name' => q(میکروثانیه),
 						'other' => q({0} میکروثانیه),
 					},
-					'mile-per-gallon' => {
-						'name' => q(mpg),
-						'other' => q({0} mpg),
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(میلی‌ثانیه),
+						'other' => q({0} میلی‌ثانیه),
 					},
-					'mile-per-hour' => {
-						'name' => q(مایل بر ساعت),
-						'other' => q({0} mi/h),
-					},
-					'milliampere' => {
-						'name' => q(میلی‌آمپر),
-						'other' => q({0} mA),
-					},
-					'milligram' => {
-						'name' => q(میلی‌گرم),
-						'other' => q({0} mg),
-					},
-					'milliliter' => {
-						'name' => q(میلی‌لیتر),
-						'other' => q({0} mL),
-					},
+					# Core Unit Identifier
 					'millisecond' => {
 						'name' => q(میلی‌ثانیه),
 						'other' => q({0} میلی‌ثانیه),
 					},
-					'milliwatt' => {
-						'name' => q(میلی‌وات),
-						'other' => q({0} mW),
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(دَقه),
+						'other' => q({0} دَقه),
+						'per' => q({0} دَقه),
 					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(دَقه),
 						'other' => q({0} دَقه),
 						'per' => q({0} دَقه),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(ماه),
+						'other' => q({0} ماه),
+						'per' => q({0} ماه),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(ماه),
 						'other' => q({0} ماه),
 						'per' => q({0} ماه),
 					},
+					# Long Unit Identifier
+					'duration-nanosecond' => {
+						'name' => q(نانوثانیه),
+						'other' => q({0} نانوثانیه),
+					},
+					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(نانوثانیه),
 						'other' => q({0} نانوثانیه),
 					},
-					'ohm' => {
-						'name' => q(اهم),
-						'other' => q({0} Ω),
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(ثانیه),
+						'other' => q({0} ثانیه),
+						'per' => q({0} ثانیه),
 					},
-					'ounce' => {
-						'name' => q(اونس),
-						'other' => q({0} oz),
-						'per' => q({0}/oz),
-					},
-					'ounce-troy' => {
-						'name' => q(تروی اونس),
-						'other' => q({0} oz t),
-					},
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					'pint' => {
-						'name' => q(پاینت),
-						'other' => q({0} pt),
-					},
-					'pint-metric' => {
-						'name' => q(متریک پاینت),
-						'other' => q({0} mpt),
-					},
-					'pound' => {
-						'name' => q(پوند),
-						'other' => q({0} lb),
-						'per' => q({0}/lb),
-					},
-					'quart' => {
-						'name' => q(ربع),
-						'other' => q({0} qt),
-					},
-					'radian' => {
-						'name' => q(rad),
-						'other' => q({0} rad),
-					},
-					'revolution' => {
-						'name' => q(rev),
-						'other' => q({0} rev),
-					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(ثانیه),
 						'other' => q({0} ثانیه),
 						'per' => q({0} ثانیه),
 					},
-					'tablespoon' => {
-						'name' => q(کال),
-						'other' => q({0} tbsp),
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(هفته),
+						'other' => q({0} هفته),
+						'per' => q({0} هفته),
 					},
-					'teaspoon' => {
-						'name' => q(چایی‌خاری کچه),
-						'other' => q({0} tsp),
-					},
-					'terabit' => {
-						'name' => q(ترابیت),
-						'other' => q({0} ترابیت),
-					},
-					'terabyte' => {
-						'name' => q(ترابایت),
-						'other' => q({0} ترابایت),
-					},
-					'ton' => {
-						'name' => q(تُن),
-						'other' => q({0} tn),
-					},
-					'volt' => {
-						'name' => q(ولت),
-						'other' => q({0} V),
-					},
-					'watt' => {
-						'name' => q(وات),
-						'other' => q({0} W),
-					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(هفته),
 						'other' => q({0} هفته),
 						'per' => q({0} هفته),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(سال),
+						'other' => q({0} سال),
+						'per' => q({0} سال),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(سال),
 						'other' => q({0} سال),
 						'per' => q({0} سال),
+					},
+					# Long Unit Identifier
+					'electric-ampere' => {
+						'name' => q(آمپر),
+						'other' => q({0} A),
+					},
+					# Core Unit Identifier
+					'ampere' => {
+						'name' => q(آمپر),
+						'other' => q({0} A),
+					},
+					# Long Unit Identifier
+					'electric-milliampere' => {
+						'name' => q(میلی‌آمپر),
+						'other' => q({0} mA),
+					},
+					# Core Unit Identifier
+					'milliampere' => {
+						'name' => q(میلی‌آمپر),
+						'other' => q({0} mA),
+					},
+					# Long Unit Identifier
+					'electric-ohm' => {
+						'name' => q(اهم),
+						'other' => q({0} Ω),
+					},
+					# Core Unit Identifier
+					'ohm' => {
+						'name' => q(اهم),
+						'other' => q({0} Ω),
+					},
+					# Long Unit Identifier
+					'electric-volt' => {
+						'name' => q(ولت),
+						'other' => q({0} V),
+					},
+					# Core Unit Identifier
+					'volt' => {
+						'name' => q(ولت),
+						'other' => q({0} V),
+					},
+					# Long Unit Identifier
+					'energy-calorie' => {
+						'name' => q(کالری),
+						'other' => q({0} cal),
+					},
+					# Core Unit Identifier
+					'calorie' => {
+						'name' => q(کالری),
+						'other' => q({0} cal),
+					},
+					# Long Unit Identifier
+					'energy-foodcalorie' => {
+						'name' => q(کالری),
+						'other' => q({0} Cal),
+					},
+					# Core Unit Identifier
+					'foodcalorie' => {
+						'name' => q(کالری),
+						'other' => q({0} Cal),
+					},
+					# Long Unit Identifier
+					'energy-joule' => {
+						'name' => q(ژول),
+						'other' => q({0} J),
+					},
+					# Core Unit Identifier
+					'joule' => {
+						'name' => q(ژول),
+						'other' => q({0} J),
+					},
+					# Long Unit Identifier
+					'energy-kilocalorie' => {
+						'name' => q(کیلوکالری),
+						'other' => q({0} kcal),
+					},
+					# Core Unit Identifier
+					'kilocalorie' => {
+						'name' => q(کیلوکالری),
+						'other' => q({0} kcal),
+					},
+					# Long Unit Identifier
+					'energy-kilojoule' => {
+						'name' => q(کیلوژول),
+						'other' => q({0} kJ),
+					},
+					# Core Unit Identifier
+					'kilojoule' => {
+						'name' => q(کیلوژول),
+						'other' => q({0} kJ),
+					},
+					# Long Unit Identifier
+					'energy-kilowatt-hour' => {
+						'name' => q(کیلووات-ساعت),
+						'other' => q({0} kWh),
+					},
+					# Core Unit Identifier
+					'kilowatt-hour' => {
+						'name' => q(کیلووات-ساعت),
+						'other' => q({0} kWh),
+					},
+					# Long Unit Identifier
+					'frequency-gigahertz' => {
+						'name' => q(گیگاهرتز),
+						'other' => q({0} GHz),
+					},
+					# Core Unit Identifier
+					'gigahertz' => {
+						'name' => q(گیگاهرتز),
+						'other' => q({0} GHz),
+					},
+					# Long Unit Identifier
+					'frequency-hertz' => {
+						'name' => q(هرتز),
+						'other' => q({0} Hz),
+					},
+					# Core Unit Identifier
+					'hertz' => {
+						'name' => q(هرتز),
+						'other' => q({0} Hz),
+					},
+					# Long Unit Identifier
+					'frequency-kilohertz' => {
+						'name' => q(کیلوهرتز),
+						'other' => q({0} kHz),
+					},
+					# Core Unit Identifier
+					'kilohertz' => {
+						'name' => q(کیلوهرتز),
+						'other' => q({0} kHz),
+					},
+					# Long Unit Identifier
+					'frequency-megahertz' => {
+						'name' => q(مگاهرتز),
+						'other' => q({0} MHz),
+					},
+					# Core Unit Identifier
+					'megahertz' => {
+						'name' => q(مگاهرتز),
+						'other' => q({0} MHz),
+					},
+					# Long Unit Identifier
+					'light-lux' => {
+						'name' => q(lx),
+						'other' => q({0} lx),
+					},
+					# Core Unit Identifier
+					'lux' => {
+						'name' => q(lx),
+						'other' => q({0} lx),
+					},
+					# Long Unit Identifier
+					'mass-carat' => {
+						'name' => q(قیراط),
+						'other' => q({0} قیراط),
+					},
+					# Core Unit Identifier
+					'carat' => {
+						'name' => q(قیراط),
+						'other' => q({0} قیراط),
+					},
+					# Long Unit Identifier
+					'mass-gram' => {
+						'name' => q(گرم),
+						'other' => q({0} g),
+						'per' => q({0}/g),
+					},
+					# Core Unit Identifier
+					'gram' => {
+						'name' => q(گرم),
+						'other' => q({0} g),
+						'per' => q({0}/g),
+					},
+					# Long Unit Identifier
+					'mass-kilogram' => {
+						'name' => q(کیلوگرم),
+						'other' => q({0} kg),
+						'per' => q({0}/kg),
+					},
+					# Core Unit Identifier
+					'kilogram' => {
+						'name' => q(کیلوگرم),
+						'other' => q({0} kg),
+						'per' => q({0}/kg),
+					},
+					# Long Unit Identifier
+					'mass-metric-ton' => {
+						'name' => q(t),
+						'other' => q({0} t),
+					},
+					# Core Unit Identifier
+					'metric-ton' => {
+						'name' => q(t),
+						'other' => q({0} t),
+					},
+					# Long Unit Identifier
+					'mass-microgram' => {
+						'name' => q(میکروگرم),
+						'other' => q({0} μg),
+					},
+					# Core Unit Identifier
+					'microgram' => {
+						'name' => q(میکروگرم),
+						'other' => q({0} μg),
+					},
+					# Long Unit Identifier
+					'mass-milligram' => {
+						'name' => q(میلی‌گرم),
+						'other' => q({0} mg),
+					},
+					# Core Unit Identifier
+					'milligram' => {
+						'name' => q(میلی‌گرم),
+						'other' => q({0} mg),
+					},
+					# Long Unit Identifier
+					'mass-ounce' => {
+						'name' => q(اونس),
+						'other' => q({0} oz),
+						'per' => q({0}/oz),
+					},
+					# Core Unit Identifier
+					'ounce' => {
+						'name' => q(اونس),
+						'other' => q({0} oz),
+						'per' => q({0}/oz),
+					},
+					# Long Unit Identifier
+					'mass-ounce-troy' => {
+						'name' => q(تروی اونس),
+						'other' => q({0} oz t),
+					},
+					# Core Unit Identifier
+					'ounce-troy' => {
+						'name' => q(تروی اونس),
+						'other' => q({0} oz t),
+					},
+					# Long Unit Identifier
+					'mass-pound' => {
+						'name' => q(پوند),
+						'other' => q({0} lb),
+						'per' => q({0}/lb),
+					},
+					# Core Unit Identifier
+					'pound' => {
+						'name' => q(پوند),
+						'other' => q({0} lb),
+						'per' => q({0}/lb),
+					},
+					# Long Unit Identifier
+					'mass-ton' => {
+						'name' => q(تُن),
+						'other' => q({0} tn),
+					},
+					# Core Unit Identifier
+					'ton' => {
+						'name' => q(تُن),
+						'other' => q({0} tn),
+					},
+					# Long Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Core Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Long Unit Identifier
+					'power-gigawatt' => {
+						'name' => q(گیگاوات),
+						'other' => q({0} GW),
+					},
+					# Core Unit Identifier
+					'gigawatt' => {
+						'name' => q(گیگاوات),
+						'other' => q({0} GW),
+					},
+					# Long Unit Identifier
+					'power-horsepower' => {
+						'name' => q(اسب‌بخار),
+						'other' => q({0} hp),
+					},
+					# Core Unit Identifier
+					'horsepower' => {
+						'name' => q(اسب‌بخار),
+						'other' => q({0} hp),
+					},
+					# Long Unit Identifier
+					'power-kilowatt' => {
+						'name' => q(کیلووات),
+						'other' => q({0} kW),
+					},
+					# Core Unit Identifier
+					'kilowatt' => {
+						'name' => q(کیلووات),
+						'other' => q({0} kW),
+					},
+					# Long Unit Identifier
+					'power-megawatt' => {
+						'name' => q(مگاوات),
+						'other' => q({0} MW),
+					},
+					# Core Unit Identifier
+					'megawatt' => {
+						'name' => q(مگاوات),
+						'other' => q({0} MW),
+					},
+					# Long Unit Identifier
+					'power-milliwatt' => {
+						'name' => q(میلی‌وات),
+						'other' => q({0} mW),
+					},
+					# Core Unit Identifier
+					'milliwatt' => {
+						'name' => q(میلی‌وات),
+						'other' => q({0} mW),
+					},
+					# Long Unit Identifier
+					'power-watt' => {
+						'name' => q(وات),
+						'other' => q({0} W),
+					},
+					# Core Unit Identifier
+					'watt' => {
+						'name' => q(وات),
+						'other' => q({0} W),
+					},
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'name' => q(کیلومتر بر ساعت),
+						'other' => q({0} km/h),
+					},
+					# Core Unit Identifier
+					'kilometer-per-hour' => {
+						'name' => q(کیلومتر بر ساعت),
+						'other' => q({0} km/h),
+					},
+					# Long Unit Identifier
+					'speed-knot' => {
+						'name' => q(گره),
+						'other' => q({0} kn),
+					},
+					# Core Unit Identifier
+					'knot' => {
+						'name' => q(گره),
+						'other' => q({0} kn),
+					},
+					# Long Unit Identifier
+					'speed-meter-per-second' => {
+						'name' => q(متر بر ثانیه),
+						'other' => q({0} m/s),
+					},
+					# Core Unit Identifier
+					'meter-per-second' => {
+						'name' => q(متر بر ثانیه),
+						'other' => q({0} m/s),
+					},
+					# Long Unit Identifier
+					'speed-mile-per-hour' => {
+						'name' => q(مایل بر ساعت),
+						'other' => q({0} mi/h),
+					},
+					# Core Unit Identifier
+					'mile-per-hour' => {
+						'name' => q(مایل بر ساعت),
+						'other' => q({0} mi/h),
+					},
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'name' => q(°C),
+						'other' => q({0}°C),
+					},
+					# Core Unit Identifier
+					'celsius' => {
+						'name' => q(°C),
+						'other' => q({0}°C),
+					},
+					# Long Unit Identifier
+					'temperature-fahrenheit' => {
+						'name' => q(°F),
+						'other' => q({0}°F),
+					},
+					# Core Unit Identifier
+					'fahrenheit' => {
+						'name' => q(°F),
+						'other' => q({0}°F),
+					},
+					# Long Unit Identifier
+					'temperature-generic' => {
+						'name' => q(°),
+						'other' => q({0}°),
+					},
+					# Core Unit Identifier
+					'generic' => {
+						'name' => q(°),
+						'other' => q({0}°),
+					},
+					# Long Unit Identifier
+					'temperature-kelvin' => {
+						'name' => q(K),
+						'other' => q({0} K),
+					},
+					# Core Unit Identifier
+					'kelvin' => {
+						'name' => q(K),
+						'other' => q({0} K),
+					},
+					# Long Unit Identifier
+					'volume-acre-foot' => {
+						'name' => q(آکرفوت),
+						'other' => q({0} ac ft),
+					},
+					# Core Unit Identifier
+					'acre-foot' => {
+						'name' => q(آکرفوت),
+						'other' => q({0} ac ft),
+					},
+					# Long Unit Identifier
+					'volume-centiliter' => {
+						'name' => q(سانتی‌لیتر),
+						'other' => q({0} cL),
+					},
+					# Core Unit Identifier
+					'centiliter' => {
+						'name' => q(سانتی‌لیتر),
+						'other' => q({0} cL),
+					},
+					# Long Unit Identifier
+					'volume-cubic-centimeter' => {
+						'name' => q(cm³),
+						'other' => q({0} cm³),
+						'per' => q({0}/cm³),
+					},
+					# Core Unit Identifier
+					'cubic-centimeter' => {
+						'name' => q(cm³),
+						'other' => q({0} cm³),
+						'per' => q({0}/cm³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-foot' => {
+						'name' => q(ft³),
+						'other' => q({0} ft³),
+					},
+					# Core Unit Identifier
+					'cubic-foot' => {
+						'name' => q(ft³),
+						'other' => q({0} ft³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-inch' => {
+						'name' => q(in³),
+						'other' => q({0} in³),
+					},
+					# Core Unit Identifier
+					'cubic-inch' => {
+						'name' => q(in³),
+						'other' => q({0} in³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-kilometer' => {
+						'name' => q(km³),
+						'other' => q({0} km³),
+					},
+					# Core Unit Identifier
+					'cubic-kilometer' => {
+						'name' => q(km³),
+						'other' => q({0} km³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-meter' => {
+						'name' => q(m³),
+						'other' => q({0} m³),
+						'per' => q({0}/m³),
+					},
+					# Core Unit Identifier
+					'cubic-meter' => {
+						'name' => q(m³),
+						'other' => q({0} m³),
+						'per' => q({0}/m³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-mile' => {
+						'name' => q(mi³),
+						'other' => q({0} mi³),
+					},
+					# Core Unit Identifier
+					'cubic-mile' => {
+						'name' => q(mi³),
+						'other' => q({0} mi³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-yard' => {
+						'name' => q(yd³),
+						'other' => q({0} yd³),
+					},
+					# Core Unit Identifier
+					'cubic-yard' => {
+						'name' => q(yd³),
+						'other' => q({0} yd³),
+					},
+					# Long Unit Identifier
+					'volume-cup' => {
+						'name' => q(دَییل),
+						'other' => q({0} c),
+					},
+					# Core Unit Identifier
+					'cup' => {
+						'name' => q(دَییل),
+						'other' => q({0} c),
+					},
+					# Long Unit Identifier
+					'volume-cup-metric' => {
+						'name' => q(mcup),
+						'other' => q({0} mc),
+					},
+					# Core Unit Identifier
+					'cup-metric' => {
+						'name' => q(mcup),
+						'other' => q({0} mc),
+					},
+					# Long Unit Identifier
+					'volume-deciliter' => {
+						'name' => q(دسی‌لیتر),
+						'other' => q({0} dL),
+					},
+					# Core Unit Identifier
+					'deciliter' => {
+						'name' => q(دسی‌لیتر),
+						'other' => q({0} dL),
+					},
+					# Long Unit Identifier
+					'volume-fluid-ounce' => {
+						'name' => q(فلوید اونس),
+						'other' => q({0} fl oz),
+					},
+					# Core Unit Identifier
+					'fluid-ounce' => {
+						'name' => q(فلوید اونس),
+						'other' => q({0} fl oz),
+					},
+					# Long Unit Identifier
+					'volume-gallon' => {
+						'name' => q(گالون),
+						'other' => q({0} gal),
+						'per' => q({0}/gal),
+					},
+					# Core Unit Identifier
+					'gallon' => {
+						'name' => q(گالون),
+						'other' => q({0} gal),
+						'per' => q({0}/gal),
+					},
+					# Long Unit Identifier
+					'volume-hectoliter' => {
+						'name' => q(هکتولیتر),
+						'other' => q({0} hL),
+					},
+					# Core Unit Identifier
+					'hectoliter' => {
+						'name' => q(هکتولیتر),
+						'other' => q({0} hL),
+					},
+					# Long Unit Identifier
+					'volume-liter' => {
+						'name' => q(لیتر),
+						'other' => q({0} لیتر),
+						'per' => q({0}/l),
+					},
+					# Core Unit Identifier
+					'liter' => {
+						'name' => q(لیتر),
+						'other' => q({0} لیتر),
+						'per' => q({0}/l),
+					},
+					# Long Unit Identifier
+					'volume-megaliter' => {
+						'name' => q(مگالیتر),
+						'other' => q({0} ML),
+					},
+					# Core Unit Identifier
+					'megaliter' => {
+						'name' => q(مگالیتر),
+						'other' => q({0} ML),
+					},
+					# Long Unit Identifier
+					'volume-milliliter' => {
+						'name' => q(میلی‌لیتر),
+						'other' => q({0} mL),
+					},
+					# Core Unit Identifier
+					'milliliter' => {
+						'name' => q(میلی‌لیتر),
+						'other' => q({0} mL),
+					},
+					# Long Unit Identifier
+					'volume-pint' => {
+						'name' => q(پاینت),
+						'other' => q({0} pt),
+					},
+					# Core Unit Identifier
+					'pint' => {
+						'name' => q(پاینت),
+						'other' => q({0} pt),
+					},
+					# Long Unit Identifier
+					'volume-pint-metric' => {
+						'name' => q(متریک پاینت),
+						'other' => q({0} mpt),
+					},
+					# Core Unit Identifier
+					'pint-metric' => {
+						'name' => q(متریک پاینت),
+						'other' => q({0} mpt),
+					},
+					# Long Unit Identifier
+					'volume-quart' => {
+						'name' => q(ربع),
+						'other' => q({0} qt),
+					},
+					# Core Unit Identifier
+					'quart' => {
+						'name' => q(ربع),
+						'other' => q({0} qt),
+					},
+					# Long Unit Identifier
+					'volume-tablespoon' => {
+						'name' => q(کال),
+						'other' => q({0} tbsp),
+					},
+					# Core Unit Identifier
+					'tablespoon' => {
+						'name' => q(کال),
+						'other' => q({0} tbsp),
+					},
+					# Long Unit Identifier
+					'volume-teaspoon' => {
+						'name' => q(چایی‌خاری کچه),
+						'other' => q({0} tsp),
+					},
+					# Core Unit Identifier
+					'teaspoon' => {
+						'name' => q(چایی‌خاری کچه),
+						'other' => q({0} tsp),
 					},
 				},
 			} }
@@ -1678,6 +2953,17 @@ has native_numbering_system => (
 	isa			=> Str,
 	init_arg	=> undef,
 	default		=> 'arabext',
+);
+
+has 'number_symbols' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'arabext' => {
+			'timeSeparator' => q(:),
+		},
+	} }
 );
 
 has 'currencies' => (
@@ -2699,7 +3985,7 @@ has 'currencies' => (
 			},
 		},
 		'XOF' => {
-			symbol => 'CFA',
+			symbol => 'F CFA',
 			display_name => {
 				'currency' => q(غربی آفریقای ِسی‌اف‌ای فرانک),
 				'other' => q(غربی آفریقای ِسی‌اف‌ای فرانک),

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.575';
+our $VERSION = '0.582';
 
 use 5.020;
 use Moo;
@@ -18,11 +18,14 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use Safe::Isa;
 use JSON::PP ();
 use MooX::TypeTiny;
-use Types::Standard qw(Str Undef InstanceOf Enum);
+use Types::Standard qw(Str Bool Undef InstanceOf Enum Tuple);
+use Types::Common::Numeric qw(PositiveInt PositiveOrZeroInt);
 use namespace::clean;
 
 use overload
-  '""' => sub { $_[0]->stringify };
+  '0+' => sub { Scalar::Util::refaddr($_[0]) },
+  '""' => sub { $_[0]->stringify },
+  fallback => 1;
 
 has [qw(
   instance_location
@@ -48,13 +51,23 @@ has keyword => (
 
 has exception => (
   is => 'ro',
-  isa => InstanceOf['JSON::PP::Boolean'],
-  coerce => sub { $_[0] ? JSON::PP::true : JSON::PP::false },
+  isa => Bool,
 );
 
 has mode => (
   is => 'rw',
   isa => Enum[qw(traverse evaluate)],
+);
+
+has recommended_response => (
+  is => 'ro',
+  isa => Tuple[PositiveInt, Str],
+);
+
+has depth => (
+  is => 'ro',
+  isa => PositiveOrZeroInt,
+  required => 1,
 );
 
 sub TO_JSON ($self) {
@@ -75,7 +88,12 @@ sub stringify ($self) {
 }
 
 sub dump ($self) {
-  my $encoder = JSON::MaybeXS->new(utf8 => 0, convert_blessed => 1, canonical => 1, indent => 1, space_after => 1);
+  my $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new
+    ->utf8(0)
+    ->convert_blessed(1)
+    ->canonical(1)
+    ->indent(1)
+    ->space_after(1);
   $encoder->indent_length(2) if $encoder->can('indent_length');
   $encoder->encode($self);
 }
@@ -88,7 +106,7 @@ __END__
 
 =encoding UTF-8
 
-=for stopwords schema fragmentless
+=for stopwords schema fragmentless subschemas
 
 =head1 NAME
 
@@ -96,7 +114,7 @@ JSON::Schema::Modern::Error - Contains a single error from a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.575
+version 0.582
 
 =head1 SYNOPSIS
 
@@ -147,6 +165,20 @@ The actual error string.
 
 Indicates the error's severity is sufficient to stop evaluation.
 
+=head2 recommended_response
+
+=for stopwords OpenAPI
+
+A tuple, consisting of C<[ integer, string ]>, indicating the recommended HTTP response code and
+string to use for this error (if validating an HTTP request). This could exist for things like a
+failed authentication check in OpenAPI validation, in which case it would contain
+C<[ 401, 'Unauthorized' ]>.
+
+=head2 depth
+
+An integer which indicates how many subschemas deep this error was generated from. Can be used to
+construct a tree-like structure of errors.
+
 =head1 METHODS
 
 =for Pod::Coverage stringify mode
@@ -164,8 +196,6 @@ if the distinction is important to you.)
 
 Returns a JSON string representing the error object, according to
 the L<specification|https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.10>.
-
-=for stopwords OpenAPI
 
 =head1 SUPPORT
 

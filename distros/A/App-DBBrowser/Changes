@@ -1,6 +1,61 @@
 Revision history for App-DBBrowser
 
 
+2.403  2024-01-25
+        - Update documentation.
+        - Term::Choose minimum version '1.763'.
+
+2.402  2024-01-03
+        - Updated input filter 'search & replace'.
+        - Update documentation.
+        - Term::TablePrint minimum version '0.162'.
+
+2.401  2023-12-24
+        - Reset HAVING substatement when leaving the aggregate mode.
+        - Use String::Substitution in the 'search & replace' input filter.
+        - Now it is possible to use captured groups in the replacement part of a 'search & replace'.
+
+2.400  2023-12-18
+        - Changed SQL submenu behavior.
+        - New scalar functions.
+        - New extension to set aliases for all selected columns.
+        - Fixes for submenus HAVING and ORDER_BY when in aggregate mode.
+        - Updates for option alias.
+        - Update aggregate mode.
+        - Catch table-print execute errors earlier.
+        - Removed backwards compatibility for old f_attached_db and f_subqueries format.
+        - Use Clone to backup data.
+        - Term::Choose::Util minimum version '0.140'.
+        - Update documentation.
+
+2.345_05  2023-12-09
+        - Fixes for submenus HAVING and ORDER when in aggregate mode.
+        - Update aggregate mode.
+        - Update CTEs.
+        - Update option alias for derived tables and non-unique columns in join.
+        - Bugfix backup data in join.
+        - Update documentation.
+
+2.345_04  2023-11-16
+        - Bugfixes in the HAVING submenu.
+        - Removed option 'fast_reset'.
+        - Catch table-print execute errors earlier.
+
+2.345_03  2023-10-28
+        - Use Clone to backup data.
+        - New option 'fast_reset'.
+
+2.345_02  2023-10-23
+        - Bugfixes, updates and cleanups.
+
+2.345_01  2023-10-21
+        - Changed SQL submenu behavior.
+        - Removed backwards compatibility for old f_attached_db and f_subqueries format.
+        - Added scalar new functions.
+        - Added extension to set aliases for all selected columns.
+        - Update option alias.
+        - Term::Choose::Util minimum version '0.140'.
+
 2.344  2023-10-15
         - Bugfix: no table alias in update/insert/delete.
 

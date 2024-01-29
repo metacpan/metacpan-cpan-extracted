@@ -4,7 +4,7 @@
       "Clark Cooper (coopercc@netheaven.com)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "LWP::UserAgent" : "0",
-            "perl" : "5.00405"
+            "perl" : "5.004050"
          }
       },
       "test" : {
@@ -52,6 +52,6 @@
          "url" : "http://github.com/toddr/XML-Parser"
       }
    },
-   "version" : "2.46",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "2.47",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

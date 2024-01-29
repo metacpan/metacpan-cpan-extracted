@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Class::Simple;
-use Test::Most tests => 73;
+use Test::Most tests => 89;
 use Test::Deep;
 use Test::NoWarnings;
 
@@ -71,6 +71,8 @@ TEXT: {
 		# 'March-1st-2015',
 		'1 March 2015',
 	) {
+		cmp_deeply(DateTime::Format::Text::parse($test), methods('day' => num(1), 'month' => num(3), 'year' => num(2015)), $test);
+		cmp_deeply(DateTime::Format::Text::parse_datetime($test), methods('day' => num(1), 'month' => num(3), 'year' => num(2015)), $test);
 		cmp_deeply($dft->parse($test), methods('day' => num(1), 'month' => num(3), 'year' => num(2015)), $test);
 		my $s = "foo $test bar";
 		cmp_deeply($dft->parse_datetime($s), methods('day' => num(1), 'month' => num(3), 'year' => num(2015)), $s);

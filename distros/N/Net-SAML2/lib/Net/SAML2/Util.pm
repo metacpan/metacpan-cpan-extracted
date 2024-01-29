@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Util;
-our $VERSION = '0.74'; # VERSION
+our $VERSION = '0.76'; # VERSION
 
 use Crypt::OpenSSL::Random qw(random_pseudo_bytes);
 
@@ -32,7 +32,7 @@ Net::SAML2::Util - Utility functions for Net::SAML2
 
 =head1 VERSION
 
-version 0.74
+version 0.76
 
 =head1 SYNOPSIS
 
@@ -62,7 +62,7 @@ Timothy Legge <timlegge@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Venda Ltd, see the CONTRIBUTORS file for others.
+This software is copyright (c) 2024 by Venda Ltd, see the CONTRIBUTORS file for others.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -16,6 +16,7 @@ lib/Kephra/App/Dialog/About.pm
 lib/Kephra/App/Editor.pm
 lib/Kephra/App/Editor/Document.pm
 lib/Kephra/App/Editor/Edit.pm
+lib/Kephra/App/Editor/Events.pm
 lib/Kephra/App/Editor/Goto.pm
 lib/Kephra/App/Editor/Move.pm
 lib/Kephra/App/Editor/Position.pm

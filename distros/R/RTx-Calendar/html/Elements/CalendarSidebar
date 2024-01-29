@@ -1,0 +1,97 @@
+<%args>
+@FilterOnStatus => undef
+@Dates => undef
+</%args>
+<div class="calendar-sidebar-toggle-content">
+  <a title="Toggle Filter" href="javascript:;" class="calendar-toggle-sidebar"></a>
+  <div class="calendar-sidebar">
+    <&| /Widgets/TitleBox,
+      title => loc('Filter on Status'),
+      class => 'calendar-filter-status-box',
+      &>
+
+    <form id="FilterOnStatusForm"
+     method="post">
+      <select name="NewFilterOnStatus" id="NewFilterOnStatus"
+        class="selectpicker form-control filteronstatus mt-3 mb-3" multiple="multiple" size="6">
+% for my $Status (sort {lc(loc($a)) cmp lc(loc($b))} @{RT->Config->Get('CalendarFilterStatuses')}) {
+        <option value="<% $Status %>"
+% if (@FilterOnStatus && $FilterOnStatus[0]) {
+      <% (grep { $Status eq $_ } @FilterOnStatus) ? 'selected="selected"':''%>
+% }
+        ><% loc($Status) %></option>
+% }
+      </select>
+      <div class="text-center">
+        <input type="submit" value="<% loc('Filter') %>" class="mr-2 button btn btn-primary form-control" />
+        <button type="submit" id="FilterOnStatusClear" name="FilterOnStatusClear"
+          value="1" class="button btn btn-primary form-control"><% loc('Clear Filter') %></button>
+      </div>
+    </form>
+    </&>
+
+    <&| /Widgets/TitleBox,
+      title => loc('Event Types'),
+      &>
+% foreach my $TranslatedLegend (sort keys %CalendarIconsTranslated) {
+      <span class="tip">
+        <span class="tipimg">
+          <img
+            src="<% $RT::WebImagesURL %>/<%
+            $CalendarIcons{$CalendarIconsTranslated{$TranslatedLegend}}|n %>" />
+        </span>
+        <span class="tiplegend">
+          <% $TranslatedLegend %>
+        </span>
+      </span>
+% }
+    </&>
+
+<&| /Widgets/TitleBox,
+     title => loc('Status Colors'),
+     &>
+% my %ColorStatusMap = RT->Config->Get('CalendarStatusColorMap');
+% foreach my $Status (sort { lc($a) cmp lc($b) } keys %ColorStatusMap) {
+%   next if $Status eq '_default_';
+    <span style="color: <% $ColorStatusMap{$Status} %> !important;"><% $Status %></span><br />
+% }
+</&>
+
+  </div>
+</div>
+
+<script type="text/javascript">
+  jQuery(document).ready(function() {
+    jQuery('.calendar-toggle-sidebar').click(function() {
+      jQuery('.calendar-sidebar').toggle();
+      jQuery('.calendar-sidebar-toggle-content,.calendar-toggle-sidebar').toggleClass('sidebar-off');
+      jQuery('.calendar-content').toggleClass('sidebar-off');
+    });
+  });
+</script>
+
+<%init>
+my %CalendarIcons = RT->Config->Get('CalendarIcons');
+# Sort the legend after translation
+my %CalendarIconsTranslated;
+
+my %date = map { $_ => 1 } @Dates;
+
+foreach my $legend (sort { lc($a) cmp lc($b) } keys %CalendarIcons) {
+  # We might have multiple labels for the same icon
+  # such as "LastUpdated, CF.{Maintenance Date}"
+  # so we need to split them and translate them individually
+  my @LegendLabels = split '\s*,\s*', $legend;
+  next if grep { !$date{$_} } @LegendLabels;
+
+  my $LegendLabel = join ', ',
+    map {
+      my $label = $_;
+      $_ =~ s/^\s+|\s+$//g;
+      $_ =~ s/^CF\.\{(.*)\}/$1/;
+      $_ = 'Last Updated' if $_ eq 'LastUpdated';
+      loc($_)
+    } @LegendLabels;
+  $CalendarIconsTranslated{$LegendLabel} = $legend;
+}
+</%init>

@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+README
+dist.json
+lib/Crypt/Passphrase/Bcrypt/AES.pm
+metamerge.yml
+t/basic.t

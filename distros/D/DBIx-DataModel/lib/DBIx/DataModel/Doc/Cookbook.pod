@@ -437,11 +437,11 @@ that :
 
 =over
 
-=item a.
+=item *
 
 they are blessed into a source class
 
-=item b.
+=item *
 
 they may contain an additional key C<< $row->{__schema}  >>
 if C<DBIx::DataModel> is used in
@@ -458,6 +458,112 @@ recursively applied to nested datastructures :
   $schema->unbless($rows);
   my $json = JSON->new->encode($rows);
 
+
+=head2 Common table expressions (WITH RECURSIVE)
+
+The SQL syntax for I<common table expressions> (CTEs),
+introduced in L<SQL 1999|https://en.wikipedia.org/wiki/SQL:1999>,
+defines a temporary name corresponding to a simple query,
+so that this name can be used in a more general SQL statement :
+
+  WITH [RECURSIVE] <tmp_table_name> (<col1>, ...) AS (<simple_query>)
+  SELECT <main_query>
+
+This is useful in two situations :
+
+=over
+
+=item *
+
+when the I<tmp_table_name> is needed at several places within the main query
+
+=item *
+
+for expressing queries that willl I<recursively> traverse a graph of related nodes.
+See SQLite examples at L<https://sqlite.org/lang_with.html>; but many other database
+management systems also support CTEs. possibly with some slight variations.
+
+=back
+
+For using CTEs within C<DBIx::DataModel>, the first step is encapsulate the WITH query
+as a new instance of L<SQL::Abstract::More>, through the 
+L<SQL::Abstract::More/with_recursive> method.
+Then that instance can be passed to C<DBIx::DataModel> statements through the 
+C<-with> argument. Here is an example borrowed from L<https://sqlite.org/lang_with.html> : 
+
+=over
+
+=item *
+
+suppose an initial table like this :
+
+  CREATE TABLE family(name, mom, dad, bord, died)
+
+The declaration within C<DBIx::DataModel> looks like this :
+
+  my $schema = DBIx::DataModel->Schema('CTE_example');
+  $schema->Table(qw/Family family name/); 
+
+=item *
+
+Encapsulate a C<descendant_of> common table expression as a new instance of L<SQL::Abstract::More> :
+
+  sub sqla_with_CTE_descendant_of {
+    my ($schema, $ancestor) = @_;
+
+    return $schema->sql_abstract->with_recursive(
+      [ -table     => 'parent_of',
+        -columns   => [qw/name parent/],
+        -as_select => {-columns => [qw/name mom/],
+                       -from    => 'family',
+                       -union   => [-columns => [qw/name dad/]]},
+       ],
+      [ -table     => 'descendant_of',
+        -columns   => [qw/name/],
+        -as_select => {-columns   => [qw/name/],
+                       -from      => 'parent_of',
+                       -where     => {parent => $ancestor},
+                       -union_all => [-columns => [qw/parent_of.name/],
+                                      -from    => [qw/-join parent_of {parent=name} descendant_of/]],
+                   },
+       ],
+      );
+  }
+
+Note: this is defined at the level of C<SQL::Abstract::More>, not C<DBIx::DataModel>,
+so the syntax for the join is C<<-from => [qw/-join parent_of {parent=name} descendant_of/]>>,
+following the specification in L<SQL::Abstract::More/join>.
+
+
+=item *
+
+The CTE table C<descendant_of> will recursively find all descendants of any given ancestor.
+This can be used as a subquery for selecting family members who are descendants :
+
+  my $subquery    = \ ["SELECT name FROM descendant_of"];
+  my $descendants = $schema->table('Family')->select(
+    -with     => sqla_with_CTE_descendant_of($schema, $ancestor),
+    -columns  => [qw/name born died/],
+    -where    => {name => {-in => $subquery }},
+    -order_by => 'born',
+  );
+  
+=back
+
+Another approach would be to declare C<ancestor_of> as a new table, and add a new association
+with the C<family> table. This approach is displayed below; but it is not
+recommanded because it creates I<permanent> metada within the schema, while CTEs are meant to be
+used as I<temporary> constructs for building complex queries. Here is the example :
+
+  $schema->Table(qw/Descendant_of descendant_of name/)
+         ->Association([qw/Descendant_of descendants *  name/],
+                       [qw/Family        family      1  name/]);
+  
+  my $descendants = $schema->join(qw/Descendant_of family/)->select(
+    -with     => sqla_with_CTE_descendant_of($schema, $ancestor),
+    -columns  => [qw/family.name born died/],
+    -order_by => 'born',
+  );
 
 
 =head1 DATA UPDATE

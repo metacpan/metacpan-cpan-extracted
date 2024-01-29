@@ -20,6 +20,15 @@ my $alnum = "${alpha}${digit}";
 my $graph = "${alnum}${punct}";
 my $print = " ${graph}";
 
+my $inf_ok = do {
+  use bigrat;
+  sprintf('%f', inf()) =~ /^inf$/i;
+};
+my $nan_ok = do {
+  use bigrat;
+  sprintf('%f', NaN()) =~ /^nan$/i;
+};
+
 SKIP: {
   if (!defined &POSIX::2008::isatty) {
     skip 'isatty() UNAVAILABLE', 1;
@@ -32,11 +41,16 @@ SKIP: {
     skip 'isfinite() UNAVAILABLE', 4;
   }
   else {
-    use bigrat;
-    ok(!POSIX::2008::isfinite(NaN()), '!isfinite(NaN)');
-    ok(!POSIX::2008::isfinite(inf()), '!isfinite(inf)');
-    ok(!POSIX::2008::isfinite(-inf()), '!isfinite(-inf)');
     ok(POSIX::2008::isfinite(0), 'isfinite(0)');
+    if (!$inf_ok || !$nan_ok) {
+      skip 'inf() or NaN() broken', 3;
+    }
+    else {
+      use bigrat;
+      ok(!$nan_ok || !POSIX::2008::isfinite(NaN()), '!isfinite(NaN)');
+      ok(!$inf_ok || !POSIX::2008::isfinite(inf()), '!isfinite(inf)');
+      ok(!$inf_ok || !POSIX::2008::isfinite(-inf()), '!isfinite(-inf)');
+    }
   }
 }
 
@@ -45,11 +59,16 @@ SKIP: {
     skip 'isinf() UNAVAILABLE', 4;
   }
   else {
-    use bigrat;
-    ok(!POSIX::2008::isinf(NaN()), '!isinf(NaN)');
-    ok(POSIX::2008::isinf(inf()), 'isinf(inf)');
-    ok(POSIX::2008::isinf(-inf()), 'isinf(-inf)');
     ok(!POSIX::2008::isinf(0), '!isinf(0)');
+    if (!$inf_ok || !$nan_ok) {
+      skip 'inf() or NaN() broken', 3;
+    }
+    else {
+      use bigrat;
+      ok(!$nan_ok || !POSIX::2008::isinf(NaN()), '!isinf(NaN)');
+      ok(!$inf_ok || POSIX::2008::isinf(inf()), 'isinf(inf)');
+      ok(!$inf_ok || POSIX::2008::isinf(-inf()), 'isinf(-inf)');
+    }
   }
 }
 
@@ -58,11 +77,16 @@ SKIP: {
     skip 'isnan() UNAVAILABLE', 4;
   }
   else {
-    use bigrat;
-    ok(POSIX::2008::isnan(NaN()), 'isnan(NaN)');
-    ok(!POSIX::2008::isnan(inf()), '!isnan(inf)');
-    ok(!POSIX::2008::isnan(-inf()), '!isnan(-inf)');
     ok(!POSIX::2008::isnan(0), '!isnan(0)');
+    if (!$inf_ok || !$nan_ok) {
+      skip 'inf() or NaN() broken', 3;
+    }
+    else {
+      use bigrat;
+      ok(!$nan_ok || POSIX::2008::isnan(NaN()), 'isnan(NaN)');
+      ok(!$inf_ok || !POSIX::2008::isnan(inf()), '!isnan(inf)');
+      ok(!$inf_ok || !POSIX::2008::isnan(-inf()), '!isnan(-inf)');
+    }
   }
 }
 
@@ -71,12 +95,17 @@ SKIP: {
     skip 'isnormal() UNAVAILABLE', 5;
   }
   else {
-    use bigrat;
-    ok(!POSIX::2008::isnormal(NaN()), '!isnormal(NaN)');
-    ok(!POSIX::2008::isnormal(inf()), '!isnormal(inf)');
-    ok(!POSIX::2008::isnormal(-inf()), '!isnormal(-inf)');
-    ok(!POSIX::2008::isnormal(0), '!isnormal(0)');
     ok(POSIX::2008::isnormal(1), 'isnormal(1)');
+    ok(!POSIX::2008::isnormal(0), '!isnormal(0)');
+    if (!$inf_ok || !$nan_ok) {
+      skip 'inf() or NaN() broken', 3;
+    }
+    else {
+      use bigrat;
+      ok(!$nan_ok || !POSIX::2008::isnormal(NaN()), '!isnormal(NaN)');
+      ok(!$inf_ok || !POSIX::2008::isnormal(inf()), '!isnormal(inf)');
+      ok(!$inf_ok || !POSIX::2008::isnormal(-inf()), '!isnormal(-inf)');
+    }
   }
 }
 

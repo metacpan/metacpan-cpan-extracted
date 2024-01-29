@@ -91,9 +91,9 @@ AWS::S3 attempts to provide an alternate interface to the Amazon S3 Simple Stora
 
 **NOTE:** Until AWS::S3 gets to version 1.000 it will not implement the full S3 interface.
 
-**Disclaimer:** Several portions of AWS::S3 have been adopted from [Net::Amazon::S3](https://metacpan.org/pod/Net::Amazon::S3).
+**Disclaimer:** Several portions of AWS::S3 have been adopted from [Net::Amazon::S3](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3).
 
-**NOTE:** AWS::S3 is NOT a drop-in replacement for [Net::Amazon::S3](https://metacpan.org/pod/Net::Amazon::S3).
+**NOTE:** AWS::S3 is NOT a drop-in replacement for [Net::Amazon::S3](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3).
 
 **TODO:** CloudFront integration.
 
@@ -127,9 +127,9 @@ Default is `s3.amazonaws.com`
 
 ## ua
 
-Optional.  Should be an instance of [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) or a subclass of it.
+Optional.  Should be an instance of [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) or a subclass of it.
 
-Defaults to creating a new instance of [LWP::UserAgent::Determined](https://metacpan.org/pod/LWP::UserAgent::Determined)
+Defaults to creating a new instance of [LWP::UserAgent::Determined](https://metacpan.org/pod/LWP%3A%3AUserAgent%3A%3ADetermined)
 
 ## honor\_leading\_slashes
 
@@ -156,21 +156,21 @@ String.  Read-only.
 
 ## ua
 
-[LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) object.  Read-only.
+[LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) object.  Read-only.
 
 ## owner
 
-[AWS::S3::Owner](https://metacpan.org/pod/AWS::S3::Owner) object.  Read-only.
+[AWS::S3::Owner](https://metacpan.org/pod/AWS%3A%3AS3%3A%3AOwner) object.  Read-only.
 
 # PUBLIC METHODS
 
 ## buckets
 
-Returns an array of [AWS::S3::Bucket](https://metacpan.org/pod/AWS::S3::Bucket) objects.
+Returns an array of [AWS::S3::Bucket](https://metacpan.org/pod/AWS%3A%3AS3%3A%3ABucket) objects.
 
 ## bucket( $name )
 
-Returns the [AWS::S3::Bucket](https://metacpan.org/pod/AWS::S3::Bucket) object matching `$name` if found.
+Returns the [AWS::S3::Bucket](https://metacpan.org/pod/AWS%3A%3AS3%3A%3ABucket) object matching `$name` if found.
 
 Returns nothing otherwise.
 
@@ -179,23 +179,23 @@ Returns nothing otherwise.
 Attempts to create a new bucket with the name provided. The location parameter is optional
 and, as per the AWS docs, will default to "us-east-1".
 
-On success, returns the new [AWS::S3::Bucket](https://metacpan.org/pod/AWS::S3::Bucket)
+On success, returns the new [AWS::S3::Bucket](https://metacpan.org/pod/AWS%3A%3AS3%3A%3ABucket)
 
 On failure, dies with the error message.
 
-See [AWS::S3::Bucket](https://metacpan.org/pod/AWS::S3::Bucket) for details on how to use buckets (and access their files).
+See [AWS::S3::Bucket](https://metacpan.org/pod/AWS%3A%3AS3%3A%3ABucket) for details on how to use buckets (and access their files).
 
 # SEE ALSO
 
 [The Amazon S3 API Documentation](http://docs.amazonwebservices.com/AmazonS3/latest/API/)
 
-[AWS::S3::Bucket](https://metacpan.org/pod/AWS::S3::Bucket)
+[AWS::S3::Bucket](https://metacpan.org/pod/AWS%3A%3AS3%3A%3ABucket)
 
-[AWS::S3::File](https://metacpan.org/pod/AWS::S3::File)
+[AWS::S3::File](https://metacpan.org/pod/AWS%3A%3AS3%3A%3AFile)
 
-[AWS::S3::FileIterator](https://metacpan.org/pod/AWS::S3::FileIterator)
+[AWS::S3::FileIterator](https://metacpan.org/pod/AWS%3A%3AS3%3A%3AFileIterator)
 
-[AWS::S3::Owner](https://metacpan.org/pod/AWS::S3::Owner)
+[AWS::S3::Owner](https://metacpan.org/pod/AWS%3A%3AS3%3A%3AOwner)
 
 # AUTHOR
 

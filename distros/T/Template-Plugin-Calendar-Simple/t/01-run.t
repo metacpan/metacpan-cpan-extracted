@@ -35,7 +35,7 @@ is $out, '
 ', "correct output for Jan 1970";
 
 __DATA__
-[% USE cal = Calendar.Simple( month, year ) %]
+[% USE cal = Calendar.Simple( month, year, 0 ) %]
 <table border="1">
   <caption>[% month %] [% year %]</caption>
   <tr>

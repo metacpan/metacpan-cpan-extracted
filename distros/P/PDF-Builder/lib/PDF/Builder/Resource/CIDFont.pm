@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::BaseFont';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use Encode qw(:all);
 
@@ -19,11 +19,15 @@ PDF::Builder::Resource::CIDFont - Base class for CID fonts
 
 =head1 METHODS
 
+=head2 new
+
+    $font = PDF::Builder::Resource::CIDFont->new($pdf, $name)
+
 =over
 
-=item $font = PDF::Builder::Resource::CIDFont->new($pdf, $name)
-
 Returns a cid-font object, base class for all CID-based fonts.
+
+=back
 
 =cut
 
@@ -129,9 +133,15 @@ sub width_cid {
     return $width;
 }
 
-=item $cidstring = $font->cidsByStr($string)
+=head2 cidsByStr
+
+    $cidstring = $font->cidsByStr($string)
+
+=over
 
 Returns the cid-string from string based on the font's encoding map.
+
+=back
 
 =cut
 
@@ -171,9 +181,15 @@ sub cidsByStr {
     return $text;
 }
 
-=item $cidstring = $font->cidsByUtf($utf8string)
+=head2 cidsByUtf
+
+    $cidstring = $font->cidsByUtf($utf8string)
+
+=over
 
 Returns the CID-encoded string from utf8-string.
+
+=back
 
 =cut
 
@@ -204,19 +220,50 @@ sub textByStrKern {
 sub text {
     my ($self, $text, $size, $indent) = @_;
 
-    my $newtext = $self->textByStr($text);
-    if      (defined $size && $self->{'-dokern'}) {
-        $newtext = $self->textByStrKern($text, $size, $indent);
-        return $newtext;
-    } elsif (defined $size) {
-        if (defined($indent) && $indent!=0) {
-	    return("[ $indent $newtext ] TJ");
-        } else {
-	    return "$newtext Tj";
-        }
-    } else {
-        return $newtext;
+    # need to break up $text into fragments ending with x20
+    # TBD: handle other spaces (espec. xA0) "appropriately" (control by flag)
+    #      0 = x20 space only
+    #      1 (default) = x20 and same/longer spaces
+    #      2 = all spaces
+    #      the problem is, other font types handle only x20 in Reader
+    my $latest_page = $self->{' apipdf'}->{' outlist'}[0]->{'Pages'}->{'Kids'}->{' val'}[-1];
+    my $wordspace = $latest_page->{'Contents'}->{' val'}[0]->{' wordspace'};
+    my $fontsize = $latest_page->{'Contents'}->{' val'}[0]->{' fontsize'};
+    my @fragments = ( $text ); # default for wordspace = 0
+    # TBD: get list of different lengths of spaces found, split on all of them
+    #      could have null fragments where two or more spaces in a row, or
+    #        text ended with a space
+    if ($wordspace) {
+	# split appears to drop trailing blanks, so need a guard
+        @fragments = split / /, $text."|";
+	chop($fragments[-1]);
     }
+
+    my $out_str = '';
+    for (my $i = 0; $i <= $#fragments; $i++) {
+	if ($fragments[$i] ne '') {
+            my $newtext = $self->textByStr($fragments[$i]);  # '<glyphIDsList>'
+            if      (defined $size && $self->{'-dokern'}) {
+                $newtext = $self->textByStrKern($fragments[$i], $size, $indent);
+                $out_str .= $newtext;
+            } elsif (defined $size) {
+                if (defined($indent) && $indent!=0) {
+	            $out_str .= "[ $indent $newtext ] TJ";
+                } else {
+	            $out_str .= "$newtext Tj";
+                }
+            } else {
+                $out_str .= $newtext;
+            }
+	}
+	# unless this is the last fragment (no space follows), add a "kerned"
+	# space to out_str (reduce its effective width by moving left).
+	# TBD: different spaces of different lengths with different "kerns"
+	if ($i < $#fragments) {
+	    $out_str .= "[ ".$self->textByStrKern(' ')." ".(-$wordspace/$fontsize*1000)." ] TJ";
+	}
+    }
+    return $out_str;
 }
 
 sub text_cid {
@@ -336,9 +383,5 @@ sub glyphNum {
 #
 #    return $self->SUPER::outobjdeep($fh, $pdf, %opts);
 #}
-
-=back
-
-=cut
 
 1;

@@ -216,7 +216,7 @@ sub compile_source_file {
 
   # Execute compile command
   my $cbuilder = ExtUtils::CBuilder->new(quiet => 1);
-  my $cc_cmd = $compile_info->create_compile_command;
+  my $cc_cmd = $compile_info->create_command;
   
   unless ($quiet) {
     warn "@$cc_cmd\n";
@@ -423,7 +423,7 @@ sub create_link_info {
     }
     else {
       $lib_name = $lib;
-      $lib_info = SPVM::Builder::LibInfo->new;
+      $lib_info = SPVM::Builder::LibInfo->new(config => $config);
       $lib_info->name($lib_name);
     }
     
@@ -636,7 +636,7 @@ sub link {
     my $link_info_output_file = $link_info->output_file;
     my $link_info_object_files = $link_info->object_files;
     
-    my $link_command_args = $link_info->create_link_command_args;
+    my $link_command_args = $link_info->create_ldflags;
     
     my $link_info_object_file_names = [map { $_->to_string; } @$link_info_object_files];
 
@@ -654,7 +654,7 @@ sub link {
         dl_func_list => $dl_func_list,
       );
       unless ($quiet) {
-        my $link_command = $link_info->to_cmd;
+        my $link_command = $link_info->to_command;
         warn "$link_command\n";
       }
     }
@@ -677,7 +677,7 @@ sub link {
         extra_linker_flags => "@$link_command_args",
       );
       unless ($quiet) {
-        my $link_command = $link_info->to_cmd;
+        my $link_command = $link_info->to_command;
         warn "$link_command\n";
       }
     }

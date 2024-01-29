@@ -1,21 +1,19 @@
 # Authen::WebAuthn
 
-A library to add [Web Authentication](https://www.w3.org/TR/webauthn-2/) support to server applications
-
-![](image.png){width=100%}
+A library to add [Web Authentication](https://www.w3.org/TR/webauthn/) support to server applications
 
 # Status
 
 * Authentication works
 * ECC/RSA keys supported
-* Registration works with "none" attestation type
+* Supported attestation types: none, packed, fido-u2f
+* Mandatory attestation trust chain validation
 
 # TODO
 
 * Support more attestation types
 * Support more public key types (EdDSA...)
-* Support attestation authority certificates
-    * Support FIDO Metadata Service
+* Support FIDO Metadata Service
 * Handle request creation too
 
 # Documentation

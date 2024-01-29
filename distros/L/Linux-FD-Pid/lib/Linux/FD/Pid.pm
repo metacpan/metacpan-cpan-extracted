@@ -1,5 +1,5 @@
 package Linux::FD::Pid;
-$Linux::FD::Pid::VERSION = '0.006';
+$Linux::FD::Pid::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ Linux::FD::Pid - PID file descriptors
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -47,7 +47,7 @@ This sends a signal to the process. The signal may be given as either a signal n
 
 =head2 wait($flags = WEXITED)
 
-This waits for the process to end and returns its return value. It's only allowed to be child of the current process. It takes a flags argument like `waitpid`, the constants for this from the L<POSIX|POSIX> module can be used for this. If either the pidfd is non-blocking or C<WNOHANG> is part of C<$flag> and the process isn't then ready C<undef> is returned instead.
+This waits for the process to end and returns its return status. It's only allowed to be child of the current process. It takes a flags argument like `waitpid`, the constants for this from the L<POSIX|POSIX> module can be used for this. If either the pidfd is non-blocking or C<WNOHANG> is part of C<$flag> and the process isn't then ready C<undef> is returned instead.
 
 =head2 get_handle($fd)
 

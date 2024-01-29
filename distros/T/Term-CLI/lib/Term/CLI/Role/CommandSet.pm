@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Role::CommandSet 0.058002;
+package Term::CLI::Role::CommandSet 0.059000;
 
 use 5.014;
 use warnings;
@@ -379,7 +379,7 @@ Term::CLI::Role::CommandSet - Role for (sub-)commands in Term::CLI
 
 =head1 VERSION
 
-version 0.058002
+version 0.059000
 
 =head1 SYNOPSIS
 

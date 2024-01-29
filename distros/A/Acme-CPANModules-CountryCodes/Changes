@@ -1,3 +1,15 @@
+0.006   2023-10-20  Released-By: PERLANCAR; Urgency: low
+
+        - Grammar.
+
+
+0.005   2023-10-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Fix formatting typo.
+
+        - Fix Changes file.
+
+
 0.004   2023-08-06  Released-By: PERLANCAR; Urgency: medium
 
         - Replace entry Locale::Util::Country with App::ListCountries &
@@ -15,7 +27,7 @@
 
         - No functional changes.
 
-        - [doc] Mention related list: Acme::CPANModules::CountryCodes.
+        - [doc] Mention related list: Acme::CPANModules::LanguageCodes.
 
 
 0.001   2023-08-06  Released-By: PERLANCAR

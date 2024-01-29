@@ -44,7 +44,7 @@ register = ->
 					e = jQuery.Event( "mfaAdded" )
 					$(document).trigger e, [ { "type": "password" } ]
 					if !e.isDefaultPrevented()
-						setMsg 'yourPasswordIsRegistered', 'success'
+						window.location.href = window.portal + "2fregisters?continue=1"
 
 # Register "click" events
 $(document).ready ->

@@ -14,7 +14,7 @@ use Lemonldap::NG::Common::Conf::Serializer;
 our $VERSION = '2.0.0';
 
 BEGIN {
-    *Lemonldap::NG::Common::Conf::ldap = \&ldap;
+    *Lemonldap::NG::Common::Conf::getLdapConnection = \&getLdapConnection;
 }
 
 sub prereq {
@@ -35,16 +35,18 @@ sub prereq {
 sub available {
     my $self = shift;
 
-    unless ( $self->ldap ) {
+    my $ldap = $self->getLdapConnection;
+    unless ($ldap) {
         return 0;
     }
 
-    my $search = $self->ldap->search(
+    my $search = $ldap->search(
         base   => $self->{ldapConfBase},
         filter => '(objectClass=' . $self->{ldapObjectClass} . ')',
         scope  => 'one',
         attrs  => [ $self->{ldapAttributeId} ],
     );
+    $ldap->unbind;
 
     if ( $search->code ) {
         $self->logError($search);
@@ -58,7 +60,6 @@ sub available {
         my ($cfgNum) = ( $cn =~ /lmConf-(\d*)/ );
         push @conf, $cfgNum;
     }
-    $self->ldap->unbind() && delete $self->{ldap};
     return sort { $a <=> $b } @conf;
 }
 
@@ -68,9 +69,8 @@ sub lastCfg {
     return $avail[$#avail];
 }
 
-sub ldap {
+sub getLdapConnection {
     my $self = shift;
-    return $self->{ldap} if ( $self->{ldap} );
 
     # Parse servers configuration
     my $useTls = 0;
@@ -140,7 +140,6 @@ sub ldap {
         return;
     }
 
-    $self->{ldap} = $ldap;
     return $ldap;
 }
 
@@ -165,7 +164,8 @@ sub unlock {
 sub store {
     my ( $self, $fields ) = @_;
 
-    unless ( $self->ldap ) {
+    my $ldap = $self->getLdapConnection;
+    unless ($ldap) {
         return 0;
     }
 
@@ -187,11 +187,11 @@ sub store {
 
     if ( $lastCfg == $fields->{cfgNum} ) {
         $operation =
-          $self->ldap->modify( $confDN,
+          $ldap->modify( $confDN,
             replace => { $self->{ldapAttributeContent} => \@confValues } );
     }
     else {
-        $operation = $self->ldap->add(
+        $operation = $ldap->add(
             $confDN,
             attrs => [
                 objectClass              => [ 'top', $self->{ldapObjectClass} ],
@@ -200,20 +200,21 @@ sub store {
             ]
         );
     }
+    $ldap->unbind;
 
     if ( $operation->code ) {
         $self->logError($operation);
         return 0;
     }
 
-    $self->ldap->unbind() && delete $self->{ldap};
     return $fields->{cfgNum};
 }
 
 sub load {
     my ( $self, $cfgNum, $fields ) = @_;
 
-    unless ( $self->ldap ) {
+    my $ldap = $self->getLdapConnection;
+    unless ($ldap) {
         return;
     }
 
@@ -222,12 +223,13 @@ sub load {
     my $confDN =
       $self->{ldapAttributeId} . "=$confName," . $self->{ldapConfBase};
 
-    my $search = $self->ldap->search(
+    my $search = $ldap->search(
         base   => $confDN,
         filter => '(objectClass=' . $self->{ldapObjectClass} . ')',
         scope  => 'base',
         attrs  => [ $self->{ldapAttributeContent} ],
     );
+    $ldap->unbind;
 
     if ( $search->code ) {
         $self->logError($search);
@@ -245,14 +247,14 @@ sub load {
             $f->{$k} = $v;
         }
     }
-    $self->ldap->unbind() && delete $self->{ldap};
     return $self->unserialize($f);
 }
 
 sub delete {
     my ( $self, $cfgNum ) = @_;
 
-    unless ( $self->ldap ) {
+    my $ldap = $self->getLdapConnection;
+    unless ($ldap) {
         return 0;
     }
 
@@ -261,8 +263,8 @@ sub delete {
       . "=lmConf-"
       . $cfgNum . ","
       . $self->{ldapConfBase};
-    my $delete = $self->ldap->delete($confDN);
-    $self->ldap->unbind() && delete $self->{ldap};
+    my $delete = $ldap->delete($confDN);
+    $ldap->unbind;
     $self->logError($delete) if ( $delete->code );
 }
 

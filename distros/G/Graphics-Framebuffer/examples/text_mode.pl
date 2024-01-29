@@ -8,8 +8,8 @@ use strict;
 
 chomp(my $tty = `tty`);
 
-open(my $ftty,'>',$tty);
-ioctl($ftty,0x4B3A,0);
+open(my $ftty, '>', $tty);
+ioctl($ftty, 0x4B3A, 0);
 close($ftty);
 
 exec('reset');

@@ -1,0 +1,124 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+$| = 1;
+
+my $USAGE = "usage: numlist_deltas [-i|-m modulus] [file]...\n";
+
+my $inv = 0;
+my $mod = 0;
+while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
+    my $opt = $1;
+    shift @ARGV;
+    last            if '-' eq $opt;
+    $inv =  1, next if 'i' eq $opt;
+    $mod = $1, next if $opt =~ /^m([1-9][0-9]*)\z/;
+    $mod = $1, next
+        if 'm' eq $opt && @ARGV && shift(@ARGV) =~ /^([1-9][0-9]*)\z/;
+    die $USAGE;
+}
+die $USAGE if $inv && $mod;
+
+while (<<>>) {
+    s/^\s+//;
+    my @e = split /\s+/;
+    next if !@e;
+    my $sm = 0;
+
+    if (!$inv && 2 < @e && "@e" =~ / \(mod ([1-9][0-9]*)\)\z/) {
+        $sm = $1;
+        splice @e, -2;
+    }
+
+    # 0 1 3 9 <--> 1 2 6 4
+    my @e2;
+    if ($inv) {
+        die "non-negative integer numbers separated by whitespace expected\n"
+            if $sm || grep { !/^(?:0|[1-9][0-9]*)\z/ } @e;
+
+        my $sum = 0;
+        @e2 = (0, map { $sum += $_ } @e);
+        pop @e2;
+        if (@e * $#e + 1 != $sum) {
+            push @e2, "(mod $sum)";
+        }
+    }
+    else {
+        die "integer numbers separated by whitespace ",
+            "and optional (mod n) spec expected\n"
+            if grep { !/^(?:0|-?[1-9][0-9]*)\z/ } @e;
+
+        my $m = $sm || $mod || @e * $#e + 1;
+        @e = sort { $a <=> $b } map { $_ % $m } @e;
+        my $p = shift @e;
+        push @e, $m + $p;
+        @e2 = map { ($p, my $q) = ($_, $p); $p - $q } @e;
+    }
+
+    print "@e2\n";
+}
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+numlist_deltas - convert numbers to differences and vice versa
+
+=head1 SYNOPSIS
+
+  numlist_deltas [-i|-m modulus] [file]...
+
+=head1 DESCRIPTION
+
+This example program reads lines with lists of integer numbers,
+separated by whitespace, optionally followed by a modulus specification
+" (mod number)", and converts them to lists of differences of consecutive
+items, when taken as modular integers and ordered by residue values,
+including a wrap-around from the item with the largest residue to the
+the one with the smallest.
+
+An optional parameter B<-m> I<modulus> specifies a default modulus
+for lines lacking the modulus specification.  Without the parameter,
+the default modulus is taken as I<kE<178>-k+1> if I<k> is the number
+of items of the line currently processed.  This is useful for lines
+representing cyclic planar difference sets.
+
+The program also provides the reverse operation, selected by option B<-i>.
+In this case, input lines may only have non-negative numbers and a
+modulus must not be specified.  Sets in the output will start with
+zero and take numbers of the input as consecutive differences to the
+following elements starting from there.  If the sum of the differences
+is not equal to I<kE<178>-k+1> with I<k> being the number of items of
+the line currently processed, a modulus specification " (mod I<sum>)"
+with the actual sum is appended to the output.
+
+=head1 EXAMPLES
+
+  echo 0 1 3 9 |numlist_deltas
+  # prints 1 2 6 4
+
+  echo 1 2 6 4 |numlist_deltas -i
+  # prints 0 1 3 9
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2023 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

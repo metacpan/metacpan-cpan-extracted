@@ -19,7 +19,6 @@ requires 'URI', 0;
 requires 'URI::redis', 0;
 requires 'Class::Method::Modifiers', 0;
 requires 'Math::Random::Secure', 0;
-requires 'OpenTracing::Any', '>= 1.003';
 requires 'Metrics::Any', 0;
 
 # Client-side caching
@@ -32,6 +31,10 @@ requires 'YAML::XS', '>= 0.88';
 
 requires 'File::ShareDir';
 requires 'File::ShareDir::Install';
+
+suggests 'OpenTracing::Any', '>= 1.003';
+recommends 'OpenTelemetry', '>= 0.018';
+recommends 'OpenTelemetry::SDK', '>= 0.020';
 
 on 'test' => sub {
     requires 'Test::More', '>= 0.98';

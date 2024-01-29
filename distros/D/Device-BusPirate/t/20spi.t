@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Device::BusPirate;
 use lib "t/lib";
@@ -95,7 +95,7 @@ my $spi;
    expect_write "\x11BB";
    expect_read "\x01DD";
 
-   is_deeply( [ Future->needs_all(
+   is( [ Future->needs_all(
       $spi->writeread( "AA" ),
       $spi->writeread( "BB" ),
    )->get ], [qw( CC DD )], 'concurrent ->writeread yields results' );
@@ -119,7 +119,7 @@ my $spi;
    expect_write "\x03";
    expect_read "\x01";
 
-   is_deeply( [ Future->needs_all(
+   is( [ Future->needs_all(
       $spi->writeread_cs( "EE" ),
       $spi->writeread_cs( "FF" ),
    )->get ], [qw( GG HH )], 'concurrent ->writeread_cs yields results' );

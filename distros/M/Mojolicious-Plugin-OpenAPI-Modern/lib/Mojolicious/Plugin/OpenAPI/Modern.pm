@@ -1,10 +1,10 @@
 use strictures 2;
-package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.005-7-ge8a94ef
+package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.007-3-g7653d5e
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Mojolicious plugin providing access to an OpenAPI document and parser
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.006';
+our $VERSION = '0.008';
 
 use 5.020;
 use if "$]" >= 5.022, experimental => 're_strict';
@@ -29,29 +29,7 @@ sub register ($self, $app, $config) {
   my $stash = Mojo::Util::_stash(openapi => $app);
 
   try {
-    my $schema;
-    if (exists $config->{schema}) {
-      $schema = $config->{schema};
-    }
-    elsif (exists $config->{document_filename}) {
-      if ($config->{document_filename} =~ /\.ya?ml$/) {
-        $schema = YAML::PP->new(boolean => 'JSON::PP')->load_file($config->{document_filename}),
-      }
-      elsif ($config->{document_filename} =~ /\.json$/) {
-        $schema = decode_json(path($config->{document_filename})->slurp_raw);
-      }
-      else {
-        die 'Unsupported file format in filename: ', $config->{document_filename};
-      }
-    }
-    else {
-      die 'missing config: one of schema, filename';
-    }
-
-    my $openapi = OpenAPI::Modern->new(
-      openapi_uri    => $config->{document_filename} // '',
-      openapi_schema => $schema,
-    );
+    my $openapi = $config->{openapi_obj} // OpenAPI::Modern->new(_process_configs($config));
 
     # leave room for other keys in our localized stash
     $stash->{openapi} = $openapi;
@@ -60,7 +38,7 @@ sub register ($self, $app, $config) {
     die 'Cannot load OpenAPI document: ', $e;
   }
 
-  $app->helper(openapi => sub ($c) { $stash->{openapi} });
+  $app->helper(openapi => sub ($) { $stash->{openapi} });
 
   $app->helper(validate_request => \&_validate_request);
   $app->helper(validate_response => \&_validate_response);
@@ -68,6 +46,33 @@ sub register ($self, $app, $config) {
   $app->hook(after_dispatch => sub ($c) {
     $c->res->on(finish => sub ($res) { $config->{after_response}->($c) });
   }) if $config->{after_response};
+}
+
+# converts a config hash into values suitable for constructing an OpenAPI::Modern object
+sub _process_configs ($config) {
+  my $schema;
+  if (exists $config->{schema}) {
+    $schema = $config->{schema};
+  }
+  elsif (exists $config->{document_filename}) {
+    if ($config->{document_filename} =~ /\.ya?ml$/) {
+      $schema = YAML::PP->new(boolean => 'JSON::PP')->load_file($config->{document_filename}),
+    }
+    elsif ($config->{document_filename} =~ /\.json$/) {
+      $schema = decode_json(path($config->{document_filename})->slurp_raw);
+    }
+    else {
+      die 'Unsupported file format in filename: ', $config->{document_filename};
+    }
+  }
+  else {
+    die 'missing config: one of schema, filename';
+  }
+
+  return {
+    openapi_uri    => $config->{document_filename} // '',
+    openapi_schema => $schema,
+  };
 }
 
 sub _validate_request ($c) {
@@ -95,7 +100,7 @@ Mojolicious::Plugin::OpenAPI::Modern - Mojolicious plugin providing access to an
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -125,12 +130,18 @@ There are many features to come.
 =head2 schema
 
 The literal, unblessed Perl data structure containing the OpenAPI document. See
-L<OpenAPI::Modern/openapi_schema>.
+L<OpenAPI::Modern/openapi_schema>; passed to the L<OpenAPI::Modern> constructor.
+Only used if L</openapi_obj> is not provided.
 
 =head2 document_filename
 
 A filename indicating from where to load the OpenAPI document. Supports YAML and json file formats.
-Only used if L</schema> is not provided.
+Only used if L</schema> is not provided; also passed to the L<OpenAPI::Modern> constructor as
+C<openapi_uri>. Only used if L</openapi_obj> is not provided.
+
+=head2 openapi_obj
+
+An L<OpenAPI::Modern> object to use
 
 =head2 after_response
 
@@ -237,6 +248,10 @@ L<OpenAPI::Modern>
 
 =item *
 
+L<Test::Mojo::Role::OpenAPI::Modern>
+
+=item *
+
 L<JSON::Schema::Modern::Document::OpenAPI>
 
 =item *
@@ -253,7 +268,7 @@ L<https://www.openapis.org/>
 
 =item *
 
-L<https://oai.github.io/Documentation/>
+L<https://learn.openapis.org/>
 
 =item *
 

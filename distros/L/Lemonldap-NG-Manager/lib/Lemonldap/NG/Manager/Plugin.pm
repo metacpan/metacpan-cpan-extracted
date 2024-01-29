@@ -6,7 +6,7 @@ use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Common::Conf::Constants;
 use URI::URL;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.18.0';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -23,6 +23,9 @@ has ua => (
         Lemonldap::NG::Common::UserAgent->new( $_[0]->{conf} );
     }
 );
+
+# Icon from https://www.w3schools.com/icons/bootstrap_icons_glyphicons.asp
+use constant icon => 'wrench';
 
 sub sendError {
     my $self = shift;

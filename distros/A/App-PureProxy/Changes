@@ -1,3 +1,14 @@
+0.0200  2024-01-23      Piotr Roszatycki <dexter@cpan.org>
+
+* Thrall server is preferred when threads are enabled.
+* Default number of workers is 50.
+* Requires IO::Socket::IP.
+* Requires Thrall 0.0402 and Starlight 0.0501.
+* Provides cpanfile.
+* Removed fatpack from the manifest.
+* git.io is not used as it is obsoleted.
+* Help shows options.
+
 0.0100  2015-03-28      Piotr Roszatycki <dexter@cpan.org>
 
 * First CPAN release.

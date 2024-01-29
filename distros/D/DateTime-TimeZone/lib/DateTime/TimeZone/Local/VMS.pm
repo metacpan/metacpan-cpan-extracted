@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.60';
+our $VERSION = '2.61';
 
 use parent 'DateTime::TimeZone::Local';
 
@@ -30,7 +30,7 @@ DateTime::TimeZone::Local::VMS - Determine the local system's time zone on VMS
 
 =head1 VERSION
 
-version 2.60
+version 2.61
 
 =head1 SYNOPSIS
 

@@ -124,7 +124,7 @@ DBIx::DataModel::Schema::ResultAs::Xlsx - writes into an Excel file
 
 =head1 SYNOPSIS
 
-  $source->select(..., $result_as => [xlsx => ($file,
+  $source->select(..., -result_as => [xlsx => ($file,
                                                -worksheet    => $wksh_name,
                                                -tech_details => 0)]);
 

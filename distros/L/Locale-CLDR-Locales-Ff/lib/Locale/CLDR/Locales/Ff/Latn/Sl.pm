@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ff::Latn::Sl - Package for language Fulah
 
 package Locale::CLDR::Locales::Ff::Latn::Sl;
 # This file auto generated from Data\common\main\ff_Latn_SL.xml
-#	on Tue  5 Dec  1:09:45 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -35,6 +35,74 @@ has 'currencies' => (
 	} },
 );
 
+
+has 'eras' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'gregorian' => {
+		},
+	} },
+);
+
+has 'date_formats' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'gregorian' => {
+		},
+	} },
+);
+
+has 'time_formats' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'gregorian' => {
+			'full' => q{h:mm:ss a zzzz},
+			'long' => q{h:mm:ss a z},
+			'medium' => q{h:mm:ss a},
+			'short' => q{h:mm a},
+		},
+	} },
+);
+
+has 'datetime_formats' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'gregorian' => {
+		},
+	} },
+);
+
+has 'datetime_formats_available_formats' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+	} },
+);
+
+has 'datetime_formats_append_item' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+	} },
+);
+
+has 'datetime_formats_interval' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+	} },
+);
 
 no Moo;
 

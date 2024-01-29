@@ -10,11 +10,11 @@ sub mount {
     my ($win) = @_;
     my $ed = $win->{'editor'};
 
-    my $file_menu = Wx::Menu->new();
+    $win->{'file_menu'} = my $file_menu = Wx::Menu->new();
     $file_menu->Append( 11100, "&New\tCtrl+N", "create new empty document" );
     $file_menu->AppendSeparator();
     $file_menu->Append( 11200, "&Open\tCtrl+O", "create document by loading a given (dialog) file" );
-    $file_menu->Append( 11300, "&Reload\tCtrl+Shift+O", "disregard current state of document and laod associated file" );
+    $file_menu->Append( 11210, "&Reload\tCtrl+Shift+O", "disregard current state of document and laod associated file" );
     $file_menu->AppendSeparator();
     $file_menu->Append( 11400, "&Save\tCtrl+S", "save current sate of document into associated file" );
     $file_menu->Append( 11500, "Save &As\tCtrl+Shift+S", "save document into different file, which will be the new associated file" );
@@ -148,10 +148,11 @@ sub mount {
     $menu_bar->Append( $view_menu,   '&View' );
     $menu_bar->Append( $help_menu,   '&Help' );
     $win->SetMenuBar($menu_bar);
+    update_recent_files_menu( $win );
 
     Wx::Event::EVT_MENU( $win, 11100, sub { $win->new_file                         });
     Wx::Event::EVT_MENU( $win, 11200, sub { $win->open_file                        });
-    Wx::Event::EVT_MENU( $win, 11300, sub { $win->reopen_file                      });
+    Wx::Event::EVT_MENU( $win, 11210, sub { $win->reopen_file                      });
     Wx::Event::EVT_MENU( $win, 11400, sub { $win->save_file                        });
     Wx::Event::EVT_MENU( $win, 11500, sub { $win->save_as_file                     });
     Wx::Event::EVT_MENU( $win, 11600, sub { $win->save_under_file                  });
@@ -217,7 +218,26 @@ sub mount {
     Wx::Event::EVT_MENU( $win, 17500, sub { Kephra::App::Dialog::about( $win)  });
 }
 
-
+sub update_recent_files_menu {
+    my ($win, $closed_file) = @_;
+    my $recent_files = $win->config->get_value('file', 'closed');
+    return unless ref $recent_files eq 'ARRAY';
+    if (defined $closed_file and $closed_file){
+        unshift @$recent_files, $closed_file;
+        for my $i (reverse 1 .. $#$recent_files){
+            splice( @$recent_files, $i, 1) if $recent_files->[$i] eq $closed_file;
+        }
+    }
+    my $start_menu_ID = 11300;
+    $win->{'file_menu'}->Destroy( $start_menu_ID );
+    my $Recent_ID = $start_menu_ID + 1;
+    $win->{'recent_menu'} = Wx::Menu->new();
+    for my $path (@$recent_files){
+        $win->{'recent_menu'}->Append($Recent_ID, $path);
+        Wx::Event::EVT_MENU( $win, $Recent_ID++, sub { $win->read_file( $path ) });
+    }
+    $win->{'file_menu'}->Insert( 4, $start_menu_ID, '&Closed', $win->{'recent_menu'}, 'reopen recently closed files' );
+}
 
 
 sub edit_context { $edit }

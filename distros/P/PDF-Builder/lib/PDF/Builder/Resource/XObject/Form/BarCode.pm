@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Form::Hybrid';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use PDF::Builder::Util;
 use PDF::Builder::Basic::PDF::Utils;
@@ -17,11 +17,15 @@ PDF::Builder::Resource::XObject::Form::BarCode - Base class for one-dimensional 
 
 =head1 METHODS
 
+=head2 new
+
+    $barcode = PDF::Builder::Resource::XObject::Form::BarCode->new($pdf, %options)
+
 =over
 
-=item $barcode = PDF::Builder::Resource::XObject::Form::BarCode->new($pdf, %options)
-
 Creates a barcode form resource.
+
+=back
 
 =cut
 
@@ -179,7 +183,15 @@ sub drawbar {
     return;
 }
 
-=item $width = $barcode->width()
+=head2 width
+
+    $width = $barcode->width()
+
+=over
+
+Returns the width of the bar code.
+
+=back
 
 =cut
 
@@ -189,18 +201,23 @@ sub width {
     return $self->{' w'};
 }
 
-=item $height = $barcode->height()
+=head2 height
+
+    $height = $barcode->height()
+
+=over
+
+Returns the height of the bar code.
+
+=back
 
 =cut
+
 
 sub height {
     my $self = shift;
 
     return $self->{' h'};
 }
-
-=back
-
-=cut
 
 1;

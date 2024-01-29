@@ -12,6 +12,13 @@ is $db->maker->strict, 1;
 is $db->row_class_schema, undef;
 is $db->row_class, $db;
 
+$db = Otogiri->new( dburl => "sqlite://$dbfile" );
+isa_ok $db, 'DBIx::Otogiri';
+can_ok $db, qw/insert fast_insert select single search_by_sql delete update txn_scope dbh maker do/;
+is $db->maker->strict, 1;
+is $db->row_class_schema, undef;
+is $db->row_class, $db;
+
 my $sql = <<'EOF';
 CREATE TABLE member (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,

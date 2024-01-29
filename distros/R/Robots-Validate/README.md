@@ -4,7 +4,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 # VERSION
 
-version v0.2.7
+version v0.2.9
 
 # SYNOPSIS
 
@@ -70,7 +70,7 @@ You can specify the following `%opts`:
 
 - `agent`
 
-    This is the user-agent string. If it does not match, then the DNS lookkups
+    This is the user-agent string. If it does not match, then the DNS lookups
     will not be performed.
 
     It is optional.
@@ -95,6 +95,12 @@ support reverse DNS lookups. This means that it cannot be used to
 validate some robots from
 [Facebook](https://developers.facebook.com/docs/sharing/webmasters/crawler)
 or Twitter.
+
+# SUPPORT FOR OLDER PERL VERSIONS
+
+This module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
 
 # SEE ALSO
 
@@ -122,7 +128,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2022 by Robert Rothenberg.
+This software is Copyright (c) 2018-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

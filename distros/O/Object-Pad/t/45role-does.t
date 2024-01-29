@@ -5,12 +5,13 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 role ARole {
 }
 
-class AClass :does(ARole) {
+class AClass {
+   apply ARole;
 }
 
 {
@@ -23,7 +24,9 @@ class AClass :does(ARole) {
 role BRole {
 }
 
-class BClass :does(ARole) :does(BRole) {
+class BClass {
+   apply ARole;
+   apply BRole;
 }
 
 {
@@ -35,7 +38,8 @@ class BClass :does(ARole) :does(BRole) {
 role CRole {
 }
 
-class CClass :does(CRole) {
+class CClass {
+   apply CRole;
 }
 
 {
@@ -45,10 +49,12 @@ class CClass :does(CRole) {
   ok( !$obj->DOES( "BRole" ), 'CClass::DOES NOT BRole' );
 }
 
-class ABase :does(ARole) {
+class ABase {
+   apply ARole;
 }
 
-class ADerived :isa(ABase) {
+class ADerived {
+   inherit ABase;
 }
 
 {
@@ -62,7 +68,9 @@ package FBaseOne {
    sub new { return bless {}, shift; }
 }
 
-class FClassOne :isa(FBaseOne) :does(CRole) {
+class FClassOne {
+   inherit FBaseOne;
+   apply CRole;
 }
 
 {
@@ -80,7 +88,9 @@ package FBaseTwo {
    }
 }
 
-class FClassTwo :isa(FBaseTwo) :does(ARole) {
+class FClassTwo {
+   inherit FBaseTwo;
+   apply ARole;
 }
 
 {
@@ -88,10 +98,12 @@ class FClassTwo :isa(FBaseTwo) :does(ARole) {
    ok( FClassTwo->DOES( "FakeRole42" ), 'Foreign base class DOES method' );
 }
 
-role DRole :does(ARole) {
+role DRole {
+   apply ARole;
 }
 
-class DClass :does(DRole) {
+class DClass {
+   apply DRole;
 }
 
 {

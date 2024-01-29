@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Text::Treesitter::QueryCursor 0.11;
+package Text::Treesitter::QueryCursor 0.12;
 class Text::Treesitter::QueryCursor
    :strict(params);
 
@@ -128,6 +128,9 @@ array reference containing every node that was captured at that name. If the
 option is false then it will contain just the final capture (which is normally
 fine because most patterns do not capture multiple nodes).
 
+I<Since version 0.12> the returned captures hash may also contain plain-text
+strings that are the result of C<#set!> directives found in the query.
+
 =cut
 
 method next_match_captures ( %options )
@@ -141,9 +144,12 @@ method next_match_captures ( %options )
 
       my @captures = $match->captures;
 
-      redo unless $_current_query->test_predicates_for_match( $match, \@captures );
+      redo unless $_current_query->test_predicates_for_match( $match, \@captures, \my %metadata );
 
       my %captures_by_name;
+
+      # TODO: What happens on collisions?
+      %captures_by_name = %metadata;
 
       foreach my $capture ( @captures ) {
          my $node = $capture->node;

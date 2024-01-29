@@ -1,15 +1,19 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.70 ':experimental(adjust_params)';
+use warnings;
+use Object::Pad 0.805;
 
-package Tickit::Style 0.55;
+package Tickit::Style 0.59;
 
 use warnings;
 use experimental 'postderef';
+
+use meta 0.003_002;
+no warnings 'meta::experimental';
 
 use Carp;
 
@@ -124,18 +128,18 @@ behavioural actions with keypresses. These are given by a keypress key name in
 angle brackets (C<< <NAME> >>) and an action name, which is a bareword
 identifier.
 
- WidgetClass {
-   <Enter>: activate;
- }
+   WidgetClass {
+     <Enter>: activate;
+   }
 
 A special widget type name of C<*> can also be used to provide style blocks
 that will apply (at lower priority) to any type of widget. Typically these
 would be used along with classes or tags, to set application-wide styles.
 
- *:error {
-   bg: "red";
-   fg: "hi-white";
- }
+   *:error {
+     bg: "red";
+     fg: "hi-white";
+   }
 
 =head2 How Style is Determined
 
@@ -240,7 +244,14 @@ sub import
    }
 
    # Import the symbols
-   {
+   use Object::Pad 0.808 ':experimental(mop)';
+   if( my $meta = Object::Pad::MOP::Class->try_for_class( $pkg ) ) {
+      $meta->add_method( $_ => \&{"Tickit::Style::$_"} ) for @EXPORTS;
+      $meta->add_method( _widget_style_type => sub () { $type } );
+   }
+   else {
+      carp "Using legacy Tickit::Style exporter using no strict 'refs'";
+
       no strict 'refs';
       *{"${pkg}::$_"} = \&{"Tickit::Style::$_"} for @EXPORTS;
       *{"${pkg}::_widget_style_type"} = sub () { $type };
@@ -266,7 +277,7 @@ sub _ref_tagset
 
 =head2 style_definition
 
-   style_definition( $tags, %definition )
+   style_definition( $tags, %definition );
 
 In addition to any loaded stylesheets, the widget class itself can provide
 style information, via the C<style_definition> function. It provides a definition
@@ -300,7 +311,7 @@ sub style_definition
 
 =head2 style_reshape_keys
 
-   style_reshape_keys( @keys )
+   style_reshape_keys( @keys );
 
 Declares that the given list of keys are somehow responsible for determining
 the shape of the widget. If their values are changed, the C<reshape> method is
@@ -324,7 +335,7 @@ sub _reshape_keys
 
 =head2 style_reshape_textwidth_keys
 
-   style_reshape_textwidth_keys( @keys )
+   style_reshape_textwidth_keys( @keys );
 
 Declares that the given list of keys contain text, the C<textwidth()> of which
 is used to determine the shape of the widget. If their values are changed such
@@ -348,7 +359,7 @@ sub _reshape_textwidth_keys
 
 =head2 style_redraw_keys
 
-   style_redraw_keys( @keys )
+   style_redraw_keys( @keys );
 
 Declares that the given list of keys are somehow responsible for determining
 the look of the widget, but in a way that does not determine the size. If
@@ -400,7 +411,7 @@ These functions are not exported, but may be called directly.
 
 =head2 load_style
 
-   Tickit::Style->load_style( $string )
+   Tickit::Style->load_style( $string );
 
 Loads definitions from a stylesheet given in a string.
 
@@ -418,7 +429,7 @@ sub load_style
 
 =head2 load_style_file
 
-   Tickit::Style->load_style_file( $path )
+   Tickit::Style->load_style_file( $path );
 
 Loads definitions from a stylesheet file given by the path.
 
@@ -441,7 +452,7 @@ sub load_style_file
 
 =head2 load_style_from_DATA
 
-   Tickit::Style->load_style_from_DATA
+   Tickit::Style->load_style_from_DATA;
 
 A convenient shortcut for loading style definitions from the caller's C<DATA>
 filehandle.
@@ -452,14 +463,14 @@ sub load_style_from_DATA
 {
    shift;
    my $pkg = caller;
-   my $fh = do { no strict 'refs'; \*{"${pkg}::DATA"} };
+   my $fh = meta::package->get( $pkg )->get_glob( "DATA" )->reference;
    my $str = do { local $/; <$fh> };
    _load_style( Tickit::Style::Parser->new->from_string( $str ) );
 }
 
 =head2 on_style_load
 
-   Tickit::Style::on_style_load( \&code )
+   Tickit::Style::on_style_load( \&code );
 
 Adds a CODE reference to be invoked after either C<load_style> or
 C<load_style_file> are called. This may be useful to flush any caches or
@@ -549,5 +560,11 @@ method keysets
 {
    return @_keysets;
 }
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
 
 0x55AA;

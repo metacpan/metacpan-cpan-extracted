@@ -37,8 +37,11 @@ stderr_is(
 
 # Test.
 @ARGV = (
-	'-n 10',
-	File::Object->new->up->dir('data')->file('test_ok.pl')->s,
+	'-n',
+	10,
+	'-p',
+	'blank',
+	$EXECUTABLE_NAME.' '.File::Object->new->up->dir('data')->file('test_ok.pl')->s.' 10',
 	10,
 );
 $right_ret = <<'END';
@@ -55,10 +58,11 @@ stdout_is(
 
 # Test.
 @ARGV = (
-	'-n 10',
-	File::Object->new->up->dir('data')->file('test_fail.pl')->s,
+	'-n',
 	10,
-	5,
+	'-p',
+	'blank',
+	$EXECUTABLE_NAME.' '.File::Object->new->up->dir('data')->file('test_fail.pl')->s.' 10 5',
 );
 $right_ret = <<'END';
 Error.

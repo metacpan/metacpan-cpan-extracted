@@ -15,8 +15,9 @@ my @files = (
     't/lib/Dancer2/Plugin/JobScheduler/Testing/TheSchwartz/Database/Schemas/SQLite.pm',
     't/lib/Dancer2/Plugin/JobScheduler/Testing/Utils.pm',
     't/theschwartz-webapp-all.t',
-    't/theschwartz-webapp-submit.t',
-    't/theschwartz-webapp.t'
+    't/theschwartz-webapp-config.t',
+    't/theschwartz-webapp-database-plugin.t',
+    't/theschwartz-webapp-submit.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

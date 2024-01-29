@@ -1,12 +1,13 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Statement.pm
-## Version v0.4.3
+## Version v0.5.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/07/04
+## Modified 2023/11/22
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -25,7 +26,7 @@ BEGIN
     use Class::Struct qw( struct );
     use Want;
     our $DEBUG = 0;
-    our $VERSION = 'v0.4.3';
+    our $VERSION = 'v0.5.0';
     use Devel::Confess;
 };
 
@@ -195,6 +196,7 @@ sub execute
 {
     my $self = shift( @_ );
     my @args = @_;
+    $self->messagec( 5, "{green}", scalar( @args ), "{/} arguments provided." );
     my( $pack, $file, $line ) = caller();
     my $sub = ( caller(1) )[3];
     # What we want is to get the point from where we were originatly called
@@ -214,16 +216,29 @@ sub execute
     $self->{sub}  = $sub;
     $self->{executed}++;
     my $q = $self->query_object;
+    $self->messagec( 5, "Query object for this statement is {green}", overload::StrVal( $q // 'undef' ), "{/}" );
     $q->final(1) if( $q );
     my @binded = ();
     my @binded_types = ();
+    # Boolean used so we do not automatically change a string litteral into an array
+    # if the number of types and values are not the same, as it would lead to undesirable results.
+    my $bind_mismatch = 0;
+    my $el;
     # As a rule, if the first placeholder is a numbered one, then all are, because we cannot mix numbered placeholder and non-numbered ones.
     my $use_numbered_placeholders = ( ( $q && $q->elements->first->is_numbered ) ? 1 : 0 );
-    # if( $q && $q->binded_types->length )
-    if( $q && $q->elements->types->length )
+    if( $q && 
+        ( $el = $q->elements ) &&
+        $el->types->length )
     {
+        $self->messagec( 5, "There are {green}", $el->length, "{/} elements for this query." );
         my $types = $q->binded_types_as_param;
+        $self->messagec( 5, "Using {green}", $el->types->length, "{/} binded types from the query object ($q) -> ", sub{ $self->Module::Generic::dump( $types ) } );
         @binded_types = @$types;
+    }
+    
+    if( defined( $el ) )
+    {
+        $self->messagec( 5, "{green}", $el->elements->length, "{/} elements set." );
     }
     
     # Get the values to bind
@@ -232,14 +247,14 @@ sub execute
         if( @_ && 
             (
                 # hash reference
-                ( @_ == 1 && $self->_is_hash( $_[0] ) ) ||
+                ( @_ == 1 && $self->_is_hash( $_[0] => 'strict' ) ) ||
                 # key => value pairs
                 ( !( @_ % 2 ) && ref( $_[0] ) ne 'HASH' )
             )
           )
         {
             my $vals = {};
-            if( $self->_is_hash( $_[0] ) )
+            if( $self->_is_hash( $_[0] => 'strict' ) )
             {
                 $vals = shift( @_ );
             }
@@ -275,7 +290,6 @@ sub execute
         }
     }
     
-#    @binded = @_ if( ( !@binded && @_ ) || @_ );
     @binded = @_ if( !@binded && @_ );
     @binded = () if( !@binded );
     if( $q && $q->is_upsert )
@@ -290,6 +304,9 @@ sub execute
     if( scalar( @_ ) )
     {
         my $temp = {};
+        my $el;
+        $el = $q->elements->elements if( $q && $q->elements );
+        local $" = ', ';
         for( my $i = 0; $i < scalar( @args ); $i++ )
         {
             # { $some_value => 'varchar' }
@@ -327,6 +344,8 @@ sub execute
     
     if( $q && scalar( @binded ) != scalar( @binded_types ) )
     {
+        # Flag we use a bit below
+        $bind_mismatch++;
         warn( sprintf( "Warning: total %d bound values does not match the total %d bound types ('%s')! Check the code for query $self->{sth}->{Statement}...\n", scalar( @binded ), scalar( @binded_types ), CORE::join( "','", @binded_types ) ) );
         # Cancel it, because it will create problems
         @binded_types = ();
@@ -336,6 +355,54 @@ sub execute
     for( my $i = 0; $i < scalar( @binded ); $i++ )
     {
         next if( !defined( $binded[$i] ) );
+        my $elem;
+        if( defined( $el ) && 
+            !$bind_mismatch &&
+            ( $elem = $el->elements->[$i] ) &&
+            defined( $elem ) &&
+            $self->_is_a( $elem->fo => 'DB::Object::Fields::Field' ) )
+        {
+        }
+        
+        if( defined( $el ) && 
+            !$bind_mismatch &&
+            ( $elem = $el->elements->[$i] ) &&
+            defined( $elem ) &&
+            $self->_is_a( $elem->fo => 'DB::Object::Fields::Field' ) &&
+            $elem->fo->is_array &&
+            !$self->_is_array( $binded[$i] ) &&
+            defined( $binded[$i] ) )
+        {
+            $self->messagec( 5, "Transforming value {green}", $binded[$i], "{/} into an array." );
+            $binded[$i] = $self->_is_number( $binded[$i] ) ? [$binded[$i]] : [$self->database_object->quote( $binded[$i] )];
+        }
+        elsif( defined( $el ) && 
+            !$bind_mismatch &&
+            ( $elem = $el->elements->[$i] ) &&
+            defined( $elem ) &&
+            $self->_is_a( $elem->fo => 'DB::Object::Fields::Field' ) &&
+            ( $elem->fo->type eq 'jsonb' || $elem->fo->type eq 'json' ) &&
+            $self->_is_hash( $binded[$i] => 'strict' ) )
+        {
+            $self->messagec( 5, "Transforming hash value {green}", $binded[$i], "{/} into a JSON string." );
+            # try-catch
+            local $@;
+            my $json = eval
+            {
+                $self->new_json->encode( $binded[$i] );
+            };
+            if( $@ )
+            {
+                warn( "Error trying to encode hash value ", $binded[$i], ": $@" ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
+            }
+            else
+            {
+                $binded[$i] = $json;
+            }
+        }
+        
+        # The value is an array object, but not a simple array, so we need to convert it
+        # or else the driver will not understand nor accept it.
         if( $self->_is_array( $binded[$i] ) && 
             ref( $binded[$i] ) ne 'ARRAY' )
         {
@@ -912,8 +979,7 @@ sub join
             $left_join = "LEFT JOIN ${new_table}${as} ON $ret->{clause}";
         }
         # There is a second parameter - if so this is the condition of the 'LEFT JOIN'
-        # elsif( $self->_is_hash( $on ) )
-        elsif( ref( $on ) eq 'HASH' )
+        elsif( $self->_is_hash( $on => 'strict' ) )
         {
             # Previous join
             my $join_ref = $q_source->left_join;
@@ -1133,8 +1199,8 @@ DB::Object::Statement - Statement Object
     # Here in this mixed example, $val1 and $val3 have known types
     $tbl->where( $dbh->AND(
         $tbl->fo->name == '?',
-        $tbl->fo>city == '?',
-        '?' == ANY( $tbl->fo->alias )
+        $tbl->fo->city == '?',
+        '?' == $dbh->ANY( $tbl->fo->alias )
     ) );
     my $sth = $tbl->select || die( $tbl->error );
     $sth->execute( $val1, $val2, { $val3 => 'varchar' } ) || die( $sth->error );
@@ -1155,7 +1221,7 @@ DB::Object::Statement - Statement Object
 
 =head1 VERSION
 
-v0.4.3
+v0.5.0
 
 =head1 DESCRIPTION
 
@@ -1209,8 +1275,8 @@ This is an alias for L</execute>
     # Here in this mixed example, $val1 and $val3 have known types
     $tbl->where( $dbh->AND(
         $tbl->fo->name == '?',
-        $tbl->fo>city == '?',
-        '?' == ANY( $tbl->fo->alias )
+        $tbl->fo->city == '?',
+        '?' == $dbh->ANY( $tbl->fo->alias )
     ) );
     my $sth = $tbl->select || die( $tbl->error );
     $sth->execute( $val1, $val2, { $val3 => 'varchar' } ) || die( $sth->error );
@@ -1228,7 +1294,7 @@ Thus, if you do:
 L<DB::Object::Query> knows the datatype, because you are using a field object (C<fo>), but if you were doing:
 
     $tbl->where(
-        '?' == ANY( $tbl->fo->alias )
+        '?' == $dbh->ANY( $tbl->fo->alias )
     );
 
 In this scenario, L<DB::Object::Query> does not know what the bind value would be, although we could venture a guess by looking at the right-hand side, but this is a bit hazardous. So you are left with a placeholder, but no datatype. So you would execute like:
@@ -1238,6 +1304,12 @@ In this scenario, L<DB::Object::Query> does not know what the bind value would b
 If the total number of binded values does not match the total number of binded type, this will trigger a warning.
 
 L<DBI/execute> will be called with the binded values and if this method was called in an object context, the current object is returned, otherwise the returned value from L<DBI/execute> is returned.
+
+With the version C<0.5.0> of this module, this method is more able to find out the data type of the table field. To achieve this, it uses the L<field object|DB::Object::Fields::Field> set in each L<element object|DB::Object::Query::Element>. Those element objects are instantiated upon C<insert> or C<update> query.
+
+Also, if you provide a value during an C<insert> or C<update> for a field that the database expects an array, this method will automatically convert it into an array.
+
+Likewise, if the table field is of type C<json> or C<jsonb> and an hash reference value is provided, this method will encode the hash reference into a C<JSON> string.
 
 =head2 executed
 

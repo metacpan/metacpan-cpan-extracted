@@ -7,14 +7,14 @@ use feature qw(say);
 use Path::Tiny;
 use File::Basename;
 use File::Spec::Functions qw(catdir catfile);
-use List::Util            qw(any);
-use YAML::XS              qw(LoadFile DumpFile);
+use List::Util qw(any);
+use YAML::XS qw(LoadFile DumpFile);
 use JSON::XS;
 
 #use Sort::Naturally qw(nsort);
 use Exporter 'import';
 our @EXPORT =
-  qw(serialize_hashes write_alignment io_yaml_or_json read_json read_yaml write_json write_array2txt array2object validate_json write_poi coverage_stats append_and_rename_primary_key);
+  qw(serialize_hashes write_alignment io_yaml_or_json read_json read_yaml write_json write_array2txt array2object validate_json write_poi coverage_stats check_existence_of_include_terms append_and_rename_primary_key);
 use constant DEVEL_MODE => 0;
 
 #########################
@@ -220,7 +220,7 @@ sub say_errors {
 
 sub coverage_stats {
 
-    use Data::Dumper;
+    #use Data::Dumper;
     my $data     = shift;
     my $coverage = {};
     for my $item (@$data) {
@@ -229,6 +229,18 @@ sub coverage_stats {
         }
     }
     return { cohort_size => scalar @$data, coverage_terms => $coverage };
+}
+
+sub check_existence_of_include_terms {
+
+    my ( $coverage, $include_terms ) = @_;
+
+    # Return true if include_terms is empty
+    return 1 unless @$include_terms;
+
+    # Check for the existence of any term in include_terms within coverage
+    # Returns true if any term exists, false otherwise
+    return any { exists $coverage->{coverage_terms}{$_} } @$include_terms;
 }
 
 sub append_and_rename_primary_key {

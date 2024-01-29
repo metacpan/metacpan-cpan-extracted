@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Shi::Latn - Package for language Tachelhit
 
 package Locale::CLDR::Locales::Shi::Latn;
 # This file auto generated from Data\common\main\shi_Latn.xml
-#	on Tue  5 Dec  1:30:28 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'Takant',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'andura',
  			'AE' => 'limarat',
@@ -217,7 +217,6 @@ has 'display_name_region' => (
  			'MD' => 'muldufya',
  			'MG' => 'madaɣacqar',
  			'MH' => 'tigzirin n marcal',
- 			'MK' => 'masidunya',
  			'ML' => 'mali',
  			'MM' => 'myanmar',
  			'MN' => 'mnɣulya',
@@ -333,7 +332,7 @@ has 'characters' => (
 			auxiliary => qr{[o p v]},
 			index => ['A', 'B', 'C', 'D', 'Ḍ', 'E', 'Ɛ', 'F', 'G', '{Gʷ}', 'Ɣ', 'H', 'Ḥ', 'I', 'J', 'K', '{Kʷ}', 'L', 'M', 'N', 'Q', 'R', 'Ṛ', 'S', 'Ṣ', 'T', 'Ṭ', 'U', 'W', 'X', 'Y', 'Z'],
 			main => qr{[a b c d ḍ e ɛ f g {gʷ} ɣ h ḥ i j k {kʷ} l m n q r ṛ s ṣ t ṭ u w x y z]},
-			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT

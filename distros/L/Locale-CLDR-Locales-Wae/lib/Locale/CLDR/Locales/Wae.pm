@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Wae - Package for language Walser
 
 package Locale::CLDR::Locales::Wae;
 # This file auto generated from Data\common\main\wae.xml
-#	on Tue  5 Dec  1:38:01 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ab' => 'Abčasiš',
@@ -238,7 +238,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'Wäld',
  			'002' => 'Afrika',
@@ -422,8 +422,6 @@ has 'display_name_region' => (
  			'MF' => 'St. Martin',
  			'MG' => 'Madagaskar',
  			'MH' => 'Maršalinslä',
- 			'MK' => 'Mazedonie',
- 			'MK@alt=variant' => 'Mazedonie (EJR)',
  			'ML' => 'Mali',
  			'MM' => 'Burma',
  			'MN' => 'Mongolei',
@@ -562,7 +560,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{Metriš},
  			'UK' => q{Angelsä},
@@ -576,7 +574,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'Sprač: {0}',
  			'script' => 'Alfabét: {0}',
@@ -598,7 +596,7 @@ has 'characters' => (
 			auxiliary => qr{[à ă â å ā æ ç è ĕ ê ë ē ì ĭ î ï ī ñ ò ŏ ô ø ō œ ß ù ŭ û ū ÿ]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
 			main => qr{[a á ä ã b c č d e é f g h i í j k l m n o ó ö õ p q r s š t u ú ü ũ v w x y z]},
-			numbers => qr{[\- , ’ % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , ’ % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -642,36 +640,85 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(täg),
+						'one' => q({0} täg),
+						'other' => q({0} täg),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(täg),
 						'one' => q({0} täg),
 						'other' => q({0} täg),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(stunde),
+						'one' => q({0} stund),
+						'other' => q({0} stunde),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(stunde),
 						'one' => q({0} stund),
 						'other' => q({0} stunde),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(minüte),
+						'one' => q({0} minüta),
+						'other' => q({0} minüte),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(minüte),
 						'one' => q({0} minüta),
 						'other' => q({0} minüte),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(mánet),
+						'one' => q({0} mánet),
+						'other' => q({0} mánet),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(mánet),
 						'one' => q({0} mánet),
 						'other' => q({0} mánet),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(sekunde),
+						'one' => q({0} sekund),
+						'other' => q({0} sekunde),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(sekunde),
 						'one' => q({0} sekund),
 						'other' => q({0} sekunde),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(wučä),
+						'one' => q({0} wuča),
+						'other' => q({0} wučä),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(wučä),
 						'one' => q({0} wuča),
 						'other' => q({0} wučä),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(jár),
+						'one' => q({0} jár),
+						'other' => q({0} jár),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(jár),
 						'one' => q({0} jár),
@@ -679,24 +726,59 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(täg),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(täg),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(stunde),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(stunde),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(minüte),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(minüte),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(mánet),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(mánet),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(sekunde),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(sekunde),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(wučä),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(wučä),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(jár),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(jár),
 					},

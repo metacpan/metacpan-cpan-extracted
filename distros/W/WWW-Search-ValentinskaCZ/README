@@ -2,7 +2,8 @@ NAME
     WWW::Search::ValentinskaCZ - Class for searching http://valentinska.cz .
 
 SYNOPSIS
-     use WWW::Search::ValentinskaCZ;
+     use WWW::Search;
+
      my $obj = WWW::Search->new('ValentinskaCZ');
      $obj->native_query($query);
      my $maintainer = $obj->maintainer; 
@@ -10,20 +11,14 @@ SYNOPSIS
      my $version = $obj->version;
 
 METHODS
-    "native_setup_search($query)"
-             Setup.
+    For methods look to WWW::Search.
 
-    "native_retrieve_some()"
-             Get data.
-
-EXAMPLE
-     # Pragmas.
+EXAMPLE1
      use strict;
      use warnings;
 
-     # Modules.
      use Data::Printer;
-     use WWW::Search::ValentinskaCZ;
+     use WWW::Search;
 
      # Arguments.
      if (@ARGV < 1) {
@@ -54,8 +49,23 @@ EXAMPLE
      #     url      "http://www.valentinska.cz/144061-a-o-barnbooth-jeho-duverny-denik"
      # }
 
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use WWW::Search;
+
+     # Object.
+     my $obj = WWW::Search->new('ValentinskaCZ');
+
+     print $obj->maintainer."\n";
+
+     # Output:
+     # Michal Josef Spacek <skim@cpan.org>
+
 DEPENDENCIES
-    Encode, LWP::UserAgent, Readonly, URI, Web::Scraper, WWW::Search.
+    Encode, LWP::UserAgent, Perl6::Slurp, Readonly, URI, Web::Scraper,
+    WWW::Search.
 
 SEE ALSO
     WWW::Search
@@ -65,17 +75,18 @@ SEE ALSO
         Install the WWW::Search modules for Czech antiquarian bookstores.
 
 REPOSITORY
-    <https://github.com/tupinek/WWW-Search-ValentinskaCZ>
+    <https://github.com/michal-josef-spacek/WWW-Search-ValentinskaCZ>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Špaček 2014-2015
-     BSD 2-Clause License
+    © Michal Josef Špaček 2014-2023
+
+    BSD 2-Clause License
 
 VERSION
-    0.03
+    0.06
 

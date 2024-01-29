@@ -2,33 +2,8 @@ NAME
     Sah::Schemas::Path - Schemas related to filesystem path
 
 VERSION
-    This document describes version 0.025 of Sah::Schemas::Path (from Perl
-    distribution Sah-Schemas-Path), released on 2023-11-23.
-
-DESCRIPTION
-    This distribution includes several schemas you can use if you want to
-    accept filename/dirname/pathname.
-
-    Some general guidelines:
-
-    "pathname" should be your first choice. But if you only want to accept
-    directory name, you can use "dirname" instead. And if you only want to
-    accept file name and not directory, you can use "filename".
-
-    "filename", "dirname", "pathname" are basically the same; they differ in
-    the completion they provide, i.e. "dirname" offers completion of only
-    directory names.
-
-    Use "filename::unix", "dirname::unix", "pathname::unix" only if you want
-    to accept Unix-style path. These schemas contain additional checks that
-    are specific to Unix filesystem.
-
-    Use "filename::exists", "dirname::exists", "pathname::exists" if you
-    want to accept an existing path. For example in a utility/routine to
-    rename or process files. On the contrary, there are
-    "filename::not_exists", "dirhname::not_exists", and
-    "pathname::not_exists" if you want to accept non-existing path, e.g. in
-    a utility/routine to create a new file.
+    This document describes version 0.030 of Sah::Schemas::Path (from Perl
+    distribution Sah-Schemas-Path), released on 2024-01-08.
 
 SAH SCHEMAS
     The following schemas are included in this distribution:
@@ -61,7 +36,7 @@ SAH SCHEMAS
         Note: be careful when using this schema for actions that are
         destructive, because a user can perform those actions without giving
         an argument (e.g. in a "delete-files-in" script). It is safer to use
-        this schema when performing a non=destructive action (e.g. "ls")
+        this schema when performing a non-destructive action (e.g. "ls")
         and/or operate in dry-run mode by default.
 
     *   dirname::default_curdir_abs
@@ -71,7 +46,7 @@ SAH SCHEMAS
         Note: be careful when using this schema for actions that are
         destructive, because a user can perform those actions without giving
         an argument (e.g. in a "delete-files-in" script). It is safer to use
-        this schema when performing a non=destructive action (e.g. "ls")
+        this schema when performing a non-destructive action (e.g. "ls")
         and/or operate in dry-run mode by default.
 
     *   dirname::default_only_subdir_in_curdir
@@ -83,10 +58,36 @@ SAH SCHEMAS
         subdirectory in the current directory". That is, if the current
         directory has a single subdirectory and nothing else.
 
+        Difference with "dirname::default_only_subdir_not_file_in_subdir"
+        schema: the other schema ignores plain files. Thus, if a directory
+        only contains "file1" and "subdir1", then that other schema will
+        return "subdir1" but this schema will not return a default value.
+
         Note: be careful when using this schema for actions that are
         destructive, because a user can perform those actions without giving
         an argument (e.g. in a "delete-files-in" script). It is safer to use
-        this schema when performing a non=destructive action (e.g. "ls")
+        this schema when performing a non-destructive action (e.g. "ls")
+        and/or operate in dry-run mode by default.
+
+    *   dirname::default_only_subdir_not_file_in_curdir
+
+        Directory name, defaults to only subdirectory in current directory
+        (if there is one) (files ignored).
+
+        This is like the "dirname" schema but with a default value of "only
+        subdirectory in the current directory". That is, if the current
+        directory has a single subdirectory and nothing else (plain files
+        are ignored).
+
+        Difference with "dirname::default_only_subdir_in_subdir" schema: the
+        other schema does not ignore plain files. Thus, if a directory only
+        contains "file1" and "subdir1", then that other schema will not
+        return "subdir1" but this schema will.
+
+        Note: be careful when using this schema for actions that are
+        destructive, because a user can perform those actions without giving
+        an argument (e.g. in a "delete-files-in" script). It is safer to use
+        this schema when performing a non-destructive action (e.g. "ls")
         and/or operate in dry-run mode by default.
 
     *   dirname::exists
@@ -108,7 +109,7 @@ SAH SCHEMAS
         Note: be careful when using this schema for actions that are
         destructive, because a user can perform those actions without giving
         an argument (e.g. in a "delete-files-in" script). It is safer to use
-        this schema when performing a non=destructive action (e.g. "ls")
+        this schema when performing a non-destructive action (e.g. "ls")
         and/or operate in dry-run mode by default.
 
     *   dirname::not_exists
@@ -174,6 +175,21 @@ SAH SCHEMAS
         completion rule. "dirname"'s completion only includes directories
         and not files.
 
+    *   filename::default_newest_file_in_curdir
+
+        File name, defaults to newest file in current directory (if there is
+        one).
+
+        This is like the "filename" schema but with a default value of
+        newest plain file in the current directory. If current directory
+        does not contain any file, no default will be given.
+
+        Note: be careful when using this schema for actions that are
+        destructive, because a user can perform those actions without giving
+        an argument (e.g. in a "delete-file" script). It is safer to use
+        this schema when performing a non-destructive action (e.g.
+        "checksum") and/or operate in dry-run mode by default.
+
     *   filename::default_only_file_in_curdir
 
         File name, defaults to only file in current directory (if there is
@@ -192,7 +208,7 @@ SAH SCHEMAS
         Note: be careful when using this schema for actions that are
         destructive, because a user can perform those actions without giving
         an argument (e.g. in a "delete-file" script). It is safer to use
-        this schema when performing a non=destructive action (e.g.
+        this schema when performing a non-destructive action (e.g.
         "checksum") and/or operate in dry-run mode by default.
 
     *   filename::default_only_file_not_dir_in_curdir
@@ -213,7 +229,7 @@ SAH SCHEMAS
         Note: be careful when using this schema for actions that are
         destructive, because a user can perform those actions without giving
         an argument (e.g. in a "delete-file" script). It is safer to use
-        this schema when performing a non=destructive action (e.g.
+        this schema when performing a non-destructive action (e.g.
         "checksum") and/or operate in dry-run mode by default.
 
     *   filename::exists
@@ -235,7 +251,7 @@ SAH SCHEMAS
         Note: be careful when using this schema for actions that are
         destructive, because a user can perform those actions without giving
         an argument (e.g. in a "delete-file" script). It is safer to use
-        this schema when performing a non=destructive action (e.g.
+        this schema when performing a non-destructive action (e.g.
         "checksum") and/or operate in dry-run mode by default.
 
     *   filename::not_exists
@@ -363,6 +379,31 @@ SAH SCHEMAS
 
         List of path names, all must exist on filesystem.
 
+DESCRIPTION
+    This distribution includes several schemas you can use if you want to
+    accept filename/dirname/pathname.
+
+    Some general guidelines:
+
+    "pathname" should be your first choice. But if you only want to accept
+    directory name, you can use "dirname" instead. And if you only want to
+    accept file name and not directory, you can use "filename".
+
+    "filename", "dirname", "pathname" are basically the same; they differ in
+    the completion they provide, i.e. "dirname" offers completion of only
+    directory names.
+
+    Use "filename::unix", "dirname::unix", "pathname::unix" only if you want
+    to accept Unix-style path. These schemas contain additional checks that
+    are specific to Unix filesystem.
+
+    Use "filename::exists", "dirname::exists", "pathname::exists" if you
+    want to accept an existing path. For example in a utility/routine to
+    rename or process files. On the contrary, there are
+    "filename::not_exists", "dirhname::not_exists", and
+    "pathname::not_exists" if you want to accept non-existing path, e.g. in
+    a utility/routine to create a new file.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Sah-Schemas-Path>.
@@ -399,8 +440,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2020, 2019, 2018, 2016 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2024, 2023, 2020, 2019, 2018, 2016 by
+    perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,11 @@
 Revision history for AI-Embedding
 
+1.11     20th December 2023
+          Corrected minimum Perl version
+
+1.10     18th December 2023
+          Die if an incorrect API is provided instead os a random error
+
 1.01	 10th June 2023
 	  Corrected minor errors in POD including version number
 

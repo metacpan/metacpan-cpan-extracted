@@ -1,0 +1,7 @@
+# Version/Revision history
+
+1.01 Sat 16 Dec 2023 21:00:36 MSK
+    * Added `POST /authorize` method
+
+1.00 Thu 27 Jul 2023 17:48:02 MSK
+    * Initial release

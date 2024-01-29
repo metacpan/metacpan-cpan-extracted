@@ -1,0 +1,53 @@
+{
+   "abstract" : "Date::Holidays Adapter for New York Stock Exchange (NYSE) holidays",
+   "author" : [
+      "Michael R. Davis"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Date-Holidays-NYSE",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Calc" : "5",
+            "Exporter" : "0",
+            "POSIX" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mrdvt92/perl-Date-Holidays-NYSE/issues"
+      },
+      "homepage" : "https://github.com/mrdvt92/perl-Date-Holidays-NYSE",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mrdvt92/perl-Date-Holidays-NYSE.git"
+      }
+   },
+   "version" : "0.02"
+}

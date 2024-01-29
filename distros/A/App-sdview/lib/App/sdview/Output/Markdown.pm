@@ -6,14 +6,14 @@
 use v5.26;
 use warnings;
 
-use Object::Pad 0.800;
+use Object::Pad 0.807;
 
-package App::sdview::Output::Markdown 0.13;
-class App::sdview::Output::Markdown
-   :does(App::sdview::Output)
-   :strict(params);
+package App::sdview::Output::Markdown 0.14;
+class App::sdview::Output::Markdown :strict(params);
 
-use String::Tagged::Markdown 0.02;
+apply App::sdview::Output;
+
+use String::Tagged::Markdown 0.05;
 
 use constant format => "Markdown";
 

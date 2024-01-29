@@ -2,21 +2,50 @@ use v5.12;
 use warnings;
 
 package Kephra::App::Editor::Position;
-
 package Kephra::App::Editor;
 
 
 sub line_start {
     my ($self, $pos) = @_;
     my $line = $self->LineFromPosition( $pos );
-    return $line if $line == -1;
+    return -1 if $line == -1;
     $self->GetLineIndentPosition( $line );
 }
 
-sub word_edges {
+sub word_edges_expand {
     my ($self, $pos) = @_;
     $pos = $self->GetCurrentPos unless defined $pos;
     ($self->WordStartPosition( $pos, 1 ), $self->WordEndPosition( $pos, 1 ) );
+}
+
+sub word_edges_shrink {
+    my ($self, $pos, $anchor) = @_;
+    $pos = $self->GetCurrentPos unless defined $pos;
+    $anchor = $self->GetAnchor unless defined $anchor;
+    my $char = $self->GetCharAt( $pos );
+    if ($pos > $anchor) {
+        my $npos = $pos;
+        unless ($self->WordEndPosition( $pos-1, 1 ) == $pos){
+            $npos = $self->WordStartPosition( $pos, 1 ) unless $char == 32;
+            $self->GotoPos( $npos );
+            $self->SearchAnchor;
+            $npos = $self->SearchPrev( &Wx::wxSTC_FIND_REGEXP, '\S');
+            $npos++;
+        }
+        my $nstart = $self->WordStartPosition( $npos-1, 1 );
+        return ($nstart >= $anchor) ? ( $nstart, $npos ) : ($pos, $pos);
+    } else {
+        my $npos = $pos;
+        unless ($self->WordStartPosition( $pos, 1 ) == $pos){
+            $npos = $self->WordEndPosition( $pos, 1 ) unless $char == 32;
+            $self->GotoPos( $npos );
+            $self->SearchAnchor;
+            $npos = $self->SearchNext( &Wx::wxSTC_FIND_REGEXP, '\S');
+        }
+        my $nend = $self->WordEndPosition( $npos+1, 1 );
+        return ($nend <= $anchor) ? ( $npos, $nend ) : ($pos, $pos);
+    }
+
 }
 
 sub block_edges_expand {
@@ -37,6 +66,28 @@ sub block_edges_expand {
     return if $block_end < $sel_end;
     return if $sel_start == $block_start and $sel_end == $block_end;
     ($block_start, $block_end);
+}
+
+sub block_edges_shrink {
+    my ($self, $pos, $anchor) = @_;
+    $pos = $self->GetCurrentPos unless defined $pos;
+    $anchor = $self->GetAnchor unless defined $anchor;
+
+    #~ $sel_end //= $sel_start;
+    #~ ($sel_start, $sel_end) = ($sel_end, $sel_start) if $sel_start > $sel_end;
+    #~ my $line_nr = $self->LineFromPosition( $sel_start );
+    #~ return unless $self->GetLine( $line_nr ) =~ /\S/;
+    #~ $line_nr-- while $line_nr > 0 and $self->GetLine( $line_nr ) =~ /\S/;
+    #~ $line_nr++ unless $self->GetLine( $line_nr ) =~ /\S/;
+    #~ my $block_start = $self->PositionFromLine( $line_nr );
+    #~ my $last_line_nr = $self->GetLineCount - 1;
+    #~ $line_nr = $self->LineFromPosition( $sel_start );
+    #~ $line_nr++ while $line_nr < $last_line_nr and $self->GetLine( $line_nr ) =~ /\S/;
+    #~ $line_nr-- unless $self->GetLine( $line_nr ) =~ /\S/;
+    #~ my $block_end = $self->GetLineEndPosition( $line_nr );
+    #~ return if $block_end < $sel_end;
+    #~ return if $sel_start == $block_start and $sel_end == $block_end;
+    #~ ($block_start, $block_end);
 }
 
 sub style_edges {
@@ -96,6 +147,8 @@ sub loop_edges_expand {
     $self->SearchAnchor;
     $npos = $self->SearchPrev( 0, 'for');
     $loop_start = $npos if $npos > $loop_start and $self->GetStyleAt( $npos ) == 5;
+    $npos = $self->SearchPrev( 0, 'foreach');
+    $loop_start = $npos if $npos > $loop_start and $self->GetStyleAt( $npos ) == 5;
     $npos = $self->SearchPrev( 0, 'until');
     $loop_start = $npos if $npos > $loop_start and $self->GetStyleAt( $npos ) == 5;
     $npos = $self->SearchPrev( 0, 'while');
@@ -108,6 +161,8 @@ sub loop_edges_expand {
     $self->SearchAnchor;
     $loop_start = -1;
     $npos = $self->SearchPrev( 0, 'for');
+    $loop_start = $npos if $npos > $loop_start and $self->GetStyleAt( $npos ) == 5;
+    $npos = $self->SearchPrev( 0, 'foreach');
     $loop_start = $npos if $npos > $loop_start and $self->GetStyleAt( $npos ) == 5;
     $npos = $self->SearchPrev( 0, 'until');
     $loop_start = $npos if $npos > $loop_start and $self->GetStyleAt( $npos ) == 5;
@@ -326,5 +381,38 @@ sub next_brace_pos {
     $pos;
 }
 
+sub same_column_in_other_line {
+    my ($self, $pos, $lines) = @_;
+    $lines //= 0;
+}
+
+sub column_in_prev_lines { # get position at same column as $pos, but $lines up
+    my ($self, $pos, $lines) = @_;
+    $lines //= 1;
+    my $line_nr = $self->LineFromPosition( $pos ) - $lines;
+    return $pos if $line_nr < 0;
+    my ($col) = ($self->get_caret_pos_cache('caret_col'));
+    unless (defined $col){
+        $col = $self->GetColumn( $pos );
+        $self->set_caret_pos_cache('caret_col', $col);
+    }
+    my $next_pos = $self->PositionFromLine( $line_nr ) + $col;
+    my $line_end = $self->GetLineEndPosition( $line_nr );
+    return $line_end < $next_pos ? $line_end : $next_pos;
+}
+sub column_in_next_lines {
+    my ($self, $pos, $lines) = @_;
+    $lines //= 1;
+    my $line_nr = $self->LineFromPosition( $pos ) + $lines;
+    return $self->GetLastPosition if $self->GetLineCount <= $line_nr;
+    my ($col) = ($self->get_caret_pos_cache('caret_col'));
+    unless (defined $col){
+        $col = $self->GetColumn( $pos );
+        $self->set_caret_pos_cache('caret_col', $col);
+    }
+    my $next_pos = $self->PositionFromLine( $line_nr) + $col;
+    my $line_end = $self->GetLineEndPosition( $line_nr);
+    return $line_end < $next_pos ? $line_end : $next_pos;
+}
 
 1;

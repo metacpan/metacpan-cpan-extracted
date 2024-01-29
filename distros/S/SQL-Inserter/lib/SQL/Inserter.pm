@@ -13,11 +13,11 @@ SQL::Inserter - Efficient buffered DBI inserter and fast INSERT SQL builder
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @EXPORT_OK = qw(simple_insert multi_insert_sql);
 
@@ -32,20 +32,21 @@ our @EXPORT_OK = qw(simple_insert multi_insert_sql);
     buffer => 100?   # Default buffer is 100 rows
   );
 
-  # Fastest method: pass single or multiple rows of data as an array
+  # Pass single or multiple rows of data as an array (fastest method):
   $sql->insert($col1_row1, $col2_row1, $col1_row2...);
 
-  # You can manually flush the buffer at any time with no argument on insert
-  # (otherwise there is auto-flush on the object's destruction)
-  $sql->insert();
-
-  # Alternative, pass a single row as a hash, allows SQL code passed as
-  # references instead of values (no need to define cols in constructor)
+  # Alternatively, pass a single row as a hash, allows SQL code passed as
+  # references instead of values (no need to define cols in constructor):
   $sql->insert({
     column1 => $data1,
     column2 => \'NOW()',
     ...
   });
+
+  # Since the inserts are buffered, they might not have been executed yet.
+  # You can manually flush the buffer at any time with no argument on insert
+  # (otherwise there is auto-flush on the object's destruction):
+  $sql->insert();
 
   # There are also functions to just get the SQL statement and its bind vars
   # similar to SQL::Abstract or SQL::Maker insert, but with much less overhead:
@@ -261,6 +262,29 @@ sub insert {
     }
 
     return $ret;
+}
+
+=head2 last_insert_id
+
+  # MySQL
+  my $id = $sql->last_insert_id;
+
+  # Depending on the driver you might need parameters
+  my $id = $sql->last_insert_id($catalog, $schema, $table, $field, \%attr);
+
+Returns the id of the last insert row, if available, after emptying the buffer.
+
+Convenience wrapper around L<DBI>'s database handle method of the same name. See
+that method's documentation for details and caveats depending on your DB driver.
+
+=cut
+
+sub last_insert_id {
+    my $self = shift;
+
+    $self->_empty_buffer() if $self->{buffer_counter};
+
+    return $self->{dbh}->last_insert_id(@_);
 }
 
 =head1 ATTRIBUTES

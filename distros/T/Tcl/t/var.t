@@ -40,7 +40,7 @@ print "$ok $five\n";
 print defined($i->GetVar("nonesuch")) ? "not ok 6\n" : "ok 6\n";
 
 # some Unicode tests
-if ($]>=5.006 && $i->GetVar("tcl_version")>=8.1) {
+if ($]>=5.006) {
     $i->SetVar("univar","\x{abcd}\x{1234}");
     if ($i->GetVar("univar") ne "\x{abcd}\x{1234}") {
 	print "not ";
@@ -57,6 +57,6 @@ if ($]>=5.006 && $i->GetVar("tcl_version")>=8.1) {
     print "# $r\n";
 }
 else {
-    for (7..8) {print "ok $_  # skipped: not Unicode-aware Perl or Tcl\n";}
+    for (7..8) {print "ok $_  # skipped: not Unicode-aware Perl\n";}
 }
 

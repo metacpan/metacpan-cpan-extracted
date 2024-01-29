@@ -29,11 +29,11 @@ Pg::Explain::FromJSON - Parser for explains in JSON format
 
 =head1 VERSION
 
-Version 2.6
+Version 2.7
 
 =cut
 
-our $VERSION = '2.6';
+our $VERSION = '2.7';
 
 =head1 SYNOPSIS
 

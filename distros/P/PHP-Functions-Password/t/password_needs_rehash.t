@@ -60,7 +60,7 @@ my @tests = (
 		'crypted'	=> 'yabadabadoo',	# completely invalid crypt string
 		'algo'		=> 0,
 		'options'	=> {},
-		'expect'	=> 0,
+		'expect'	=> 1,
 		'reason'	=> 'unknown algorithm given',
 	},
 	{

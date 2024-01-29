@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.161-6-g8e9216b
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.162-4-gf26f164
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.162';
+our $VERSION = '0.163';
 
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -417,7 +417,7 @@ sub configure {
             : ()
         } ],
         [ 'Authority'           => { ':version' => '1.009', authority => $self->authority, do_munging => 0 } ],
-        [ 'MetaNoIndex'         => { directory => [ qw(t xt), grep -d, qw(inc local perl5 fatlib examples share corpus demo) ] } ],
+        [ 'MetaNoIndex'         => { directory => [ qw(t xt), grep -d, qw(inc local perl5 fatlib eg examples share corpus demo ) ] } ],
         [ 'MetaProvides::Package' => { ':version' => '1.15000002', finder => ':InstallModules', meta_noindex => 1, inherit_version => 0, inherit_missing => 0 } ],
         'MetaConfig',
         [ 'Keywords'            => { ':version' => '0.004' } ],
@@ -665,7 +665,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.162
+version 0.163
 
 =head1 SYNOPSIS
 

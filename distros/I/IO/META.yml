@@ -25,5 +25,5 @@ resources:
   bugtracker: https://github.com/perl/perl5/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Perl/perl5/tree/blead/dist/IO
-version: '1.51'
+version: '1.55'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

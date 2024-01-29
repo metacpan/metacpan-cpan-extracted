@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.554';
+our $VERSION = '0.555';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form );
 
@@ -57,8 +57,8 @@ sub _valid_options {
         codepage_mapping   => '[ 0 1 ]',
         auto_up            => '[ 0 1 2 ]',
         clear_screen       => '[ 0 1 2 ]',
-        color              => '[ 0 1 2 ]',         # hide_cursor == 2 # documentation
-        hide_cursor        => '[ 0 1 2 ]',
+        color              => '[ 0 1 2 ]',
+        hide_cursor        => '[ 0 1 2 ]',         # hide_cursor == 2 # documentation
         page               => '[ 0 1 2 ]',         # undocumented
         keep               => '[ 1-9 ][ 0-9 ]*',   # undocumented
         read_only          => 'Array_Int',
@@ -533,7 +533,7 @@ sub __print_readline {
 sub __unicode_trim {
     my ( $self, $str, $len ) = @_;
     return $str if print_columns( $str ) <= $len;
-    return cut_to_printwidth( $str, $len - 3, 0 ) . '...';
+    return cut_to_printwidth( $str, $len - $self->{i}{char_trimmed_w}, 0 ) . $self->{i}{char_trimmed};
 }
 
 
@@ -649,7 +649,10 @@ sub __get_row {
     }
     if ( ! defined $self->{i}{keys}[$idx] ) {
         my $key = $list->[$idx][0];
-        $self->{i}{keys}[$idx] = unicode_sprintf( $key, $self->{i}{max_key_w} );
+        $self->{i}{keys}[$idx] = unicode_sprintf(
+            $key, $self->{i}{max_key_w},
+            { mark_if_truncated => [ $self->{i}{char_trimmed}, $self->{i}{char_trimmed_w} ] }
+        );
     }
     if ( ! defined $self->{i}{seps}[$idx] ) {
         if ( any { $_ == $idx } @{$self->{i}{read_only}} ) {
@@ -821,6 +824,8 @@ sub fill_form {
     $self->{i}{sep}    = ': ';
     $self->{i}{sep_ro} = '| ';
     die if length $self->{i}{sep} != length $self->{i}{sep_ro};
+    $self->{i}{char_trimmed} = '~';
+    $self->{i}{char_trimmed_w} = length $self->{i}{char_trimmed};
     $self->{i}{arrow_left}  = '<';
     $self->{i}{arrow_right} = '>';
     $self->{i}{arrow_w} = 1;
@@ -1156,7 +1161,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.554
+Version 0.555
 
 =cut
 
@@ -1181,7 +1186,7 @@ Version 0.554
 
     use Term::Form qw( fill_form );
 
-    my $modified_list = fill_form( $aoa );
+    $modified_list = fill_form( $aoa );
 
 =head1 DESCRIPTION
 
@@ -1238,6 +1243,9 @@ C<fill_form> reads a list of lines from STDIN.
 The first argument is a reference to an array of arrays. The arrays have 1 or 2 elements: the first element is the key
 and the optional second element is the value. The key is used as the prompt string for the "readline", the value is used
 as the default value for the "readline" (initial value of input).
+
+Strings that have been shortened to fit into the terminal width are marked with a trailing C<~>. This does not affect
+the returned data.
 
 When C<$aoa> is return values of rows where nothing has been entered are set to the empty string.
 
@@ -1372,7 +1380,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2023 Matthäus Kiem.
+Copyright 2014-2024 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

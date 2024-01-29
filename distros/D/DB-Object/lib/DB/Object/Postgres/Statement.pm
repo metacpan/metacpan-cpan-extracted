@@ -1,12 +1,13 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres/Statement.pm
-## Version v0.301.2
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.302.0
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2022/11/04
+## Modified 2023/11/07
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -23,7 +24,7 @@ BEGIN
     use parent qw( DB::Object::Statement DB::Object::Postgres );
     use vars qw( $VERSION $DEBUG );
     our $DEBUG = 0;
-    our $VERSION = 'v0.301.2';
+    our $VERSION = 'v0.302.0';
 };
 
 use strict;
@@ -80,7 +81,7 @@ sub disable_trigger
 sub distinct
 {
     my $self = shift( @_ );
-    my $what = shift( @_ );
+    my $what = @_ > 1 ? join( ', ', @_ ) : shift( @_ );
     my $query = $self->{query} ||
         return( $self->error( "No query to set as to be ignored." ) );
     
@@ -328,7 +329,7 @@ DB::Object::Postgres::Statement - PostgreSQL Statement Object
 
 =head1 VERSION
 
-    v0.301.2
+    v0.302.0
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,6 @@
+Revision history for Perl extension Socket::More::Lookup.
+
+0.01  Fri Oct  6 08:10:58 2023
+	- original version; created by h2xs 1.23 with options
+    -- Split out from Socket::More
+

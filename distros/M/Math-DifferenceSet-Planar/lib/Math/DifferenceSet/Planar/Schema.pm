@@ -5,7 +5,7 @@ use warnings;
 
 use base 'DBIx::Class::Schema';
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 __PACKAGE__->load_namespaces;
 
@@ -18,7 +18,7 @@ Math::DifferenceSet::Planar::Schema - data schema for planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 1.000 of
+This documentation refers to version 1.001 of
 Math::DifferenceSet::Planar::Schema.
 
 =head1 SYNOPSIS

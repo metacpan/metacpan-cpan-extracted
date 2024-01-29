@@ -1,14 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2024 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::Elem 0.06;
+package Syntax::Operator::Elem 0.09;
 
 use v5.14;
 use warnings;
 
 use Carp;
+
+use meta 0.003_002;
+no warnings 'meta::experimental';
 
 =encoding UTF-8
 
@@ -92,12 +95,15 @@ sub apply
           : delete $^H{"Syntax::Operator::Elem/elem"};
    }
 
+   my $callerpkg;
+
    foreach (qw( elem_str elem_num )) {
       next unless delete $syms{$_};
 
-      no strict 'refs';
-      $on ? *{"${caller}::$_"} = \&{$_}
-          : warn "TODO: implement unimport of package symbol";
+      $callerpkg //= meta::package->get( $caller );
+
+      $on ? $callerpkg->add_symbol( '&'.$_ => \&{$_} )
+          : $callerpkg->remove_symbol( '&'.$_ );
    }
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;

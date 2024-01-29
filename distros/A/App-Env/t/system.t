@@ -37,7 +37,7 @@ my $badscript = catfile( qw [ t bin script_no_exist ] );
             ( $stdout, $exit )
               = capture_stdout { $app1->system( $^X, $script, 'Site1_App1' ) };
         },
-        'successful system call: SysFatal'
+        'successful system call: SysFatal',
     ) or bail_out( $@ );
 
     chomp $stdout;
@@ -78,7 +78,7 @@ my $badscript = catfile( qw [ t bin script_no_exist ] );
     my $app1   = App::Env->new( 'App1', { Cache => 0 } );
     my $output = $app1->qexec( $badscript );
 
-    is( $output, undef, 'qexec: bad script' );
+    is( $output, U(), 'qexec: bad script' );
     App::Env::Site1::App1::reset();
 }
 
@@ -86,7 +86,7 @@ my $badscript = catfile( qw [ t bin script_no_exist ] );
     my $app1 = App::Env->new( 'App1', { Cache => 0, SysFatal => 1 } );
 
     my $output = eval { $app1->qexec( $^X, '-e', 'print $ENV{Site1_App1}' ) };
-    is( $@, '', 'qexec: good script call: SysFatal' );
+    is( $@, q{}, 'qexec: good script call: SysFatal' );
 
     chomp( $output );
 
@@ -98,9 +98,9 @@ my $badscript = catfile( qw [ t bin script_no_exist ] );
     my $app1 = App::Env->new( 'App1', { Cache => 0, SysFatal => 1 } );
 
     my $output = eval { $app1->qexec( $badscript ) };
-    isnt( $@, '', 'qexec: bad script call: SysFatal' );
+    isnt( $@, q{}, 'qexec: bad script call: SysFatal' );
 
-    is( $output, undef, 'qexec: bad script' );
+    is( $output, U(), 'qexec: bad script' );
     App::Env::Site1::App1::reset();
 }
 

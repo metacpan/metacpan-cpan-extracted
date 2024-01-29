@@ -4,7 +4,7 @@ use warnings;
 
 package RT::Extension::PreviewInSearch;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -21,11 +21,17 @@ for a ticket. This extension allows you to view the history of tickets at the
 bottom of the search results page without clicking over to the full display
 ticket page.
 
+=for html <p><img src="https://raw.github.com/bestpractical/rt-extension-previewinsearch/master/doc/images/preview-screenshot.png" alt="History Preview in Search Results" /></p>
+
 With the extension installed, perform your search, then click anywhere in the
 ticket row in the search results. The history for that ticket will be displayed
-at the bottom of the page.
+at the bottom of the page. With RT 5, if you have inline edit enabled for
+some search fields, click anywhere outside the inline edit fields. You'll
+see the pencil icon appear if you are in an inline edit area.
 
-=for html <p><img src="https://raw.github.com/bestpractical/rt-extension-previewinsearch/master/doc/images/preview-screenshot.png" alt="History Preview in Search Results" /></p>
+To make it easier to see the ticket history with less scrolling, you can set
+the Rows per page setting on the search to a smaller number. A L</$SideBySidePreview>
+mode is also available.
 
 =head1 RT VERSIONS
 
@@ -43,20 +49,21 @@ Works with RT 4.2, 4.4, 5.0
 
 May need root permissions
 
+=item Patch RT
+
+For RT 5 prior to 5.0.6, apply the patches:
+
+    patch -d /opt/rt5 -p1 < 0001-Add-ModifyPaths-Callback.patch
+
 =item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
 
 Add this line:
-
-    Set(@Plugins, qw(RT::Extension::PreviewInSearch));
-
-or add C<RT::Extension::PreviewInSearch> to your existing C<@Plugins> line.
-Starting with RT 4.2 you can also use:
 
     Plugin( "RT::Extension::PreviewInSearch" );
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt5/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -68,23 +75,24 @@ Starting with RT 4.2 you can also use:
 
 =head2 C<$SideBySidePreview>
 
-This allow the preview box to be displayed aside of search results box.
+Set this option to divide the search results page in half and
+display the selected ticket history on the right of search results.
 
     Set($SideBySidePreview, 1);
 
 =head1 AUTHOR
 
-Best Practical Solutions, LLC E<lt>modules@bestpractical.comE<gt>
+Best Practical Solutions, LLC
 
 =head1 BUGS
 
 All bugs should be reported via email to
 
-    L<bug-RT-Extension-PreviewInSearch@rt.cpan.org|mailto:bug-RT-Extension-PreviewInSearch@rt.cpan.org>
+L<bug-RT-Extension-PreviewInSearch@rt.cpan.org|mailto:bug-RT-Extension-PreviewInSearch@rt.cpan.org>
 
 or via the web at
 
-    L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-PreviewInSearch>.
+L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-PreviewInSearch>.
 
 =head1 LICENSE AND COPYRIGHT
 

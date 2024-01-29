@@ -1,5 +1,26 @@
 Revision history for Shell-Var-Reader
 
+0.8.2   2024-01-26/09:30
+		 - \- in the found keys are replaced with \_\_
+
+0.8.1   2024-01-14/18:00
+		 - Remove a requirement for a no longer used requirement.
+
+0.8.0   2024-01-09/22:45
+		 - sort system groups and systems for cmdb_shell_var_reader
+
+0.7.2   2024-01-09/14:00
+		 - fix TOML capitalization for toml to TOML for default CMDB type so it will actually invoke it
+
+0.7.1	 2023-12-27/11:30
+		 - Fix cmdb_shell_var_reader POD.
+
+0.7.0	 2023-12-26/13:00
+		 - Now use TOML::Tiny.
+		 - Remove the init stuff.
+		 - Add support for other CMDB types besides TOML.
+		 - cmdb_shell_var_reader will not tryt o autofind the dir based off of the .shell_var_reader file.
+
 0.6.0	 2023-11-15/15:45
 		 - Add multiout to shell_var_reader.
 

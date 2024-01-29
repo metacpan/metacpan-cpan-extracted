@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use Config;
 use Math::MPFR qw(:mpfr);
 use Math::BigInt; # for some error tests
 
@@ -8,6 +9,10 @@ print "1..72\n";
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
 print  "# Using gmp library version ", Math::MPFR::gmp_v(), "\n";
+
+my $expected_refcnt = 1;
+$expected_refcnt++
+  if $Config{ccflags} =~ /\-DPERL_RC_STACK/;
 
 Rmpfr_set_default_prec(200);
 
@@ -70,9 +75,9 @@ $z = $p * $posi;
 if($z == 1527692) {$ok .= 'g'}
 
 if($ok eq 'abcdefg'
-   && Math::MPFR::get_refcnt($z) == 1
-   && Math::MPFR::get_refcnt($p) == 1
-   && Math::MPFR::get_refcnt($q) == 1) {print "ok 1\n"}
+   && Math::MPFR::get_refcnt($z) == $expected_refcnt
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt
+   && Math::MPFR::get_refcnt($q) == $expected_refcnt) {print "ok 1\n"}
 else {print "not ok 1 $ok\n"}
 
 $ok = '';
@@ -116,7 +121,7 @@ if($p == 1527692) {$ok .= 'g'}
 Rmpfr_set_ui($p, 1234, GMP_RNDN);
 
 if($ok eq 'abcdefg'
-   && Math::MPFR::get_refcnt($p) == 1) {print "ok 2\n"}
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt) {print "ok 2\n"}
 else {print "not ok 2 $ok\n"}
 
 $ok = '';
@@ -153,8 +158,8 @@ $z = $p + $posi;
 if($z == 2472) {$ok .= 'g'}
 
 if($ok eq 'abcdefg'
-   && Math::MPFR::get_refcnt($p) == 1
-   && Math::MPFR::get_refcnt($z) == 1) {print "ok 3\n"}
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt
+   && Math::MPFR::get_refcnt($z) == $expected_refcnt) {print "ok 3\n"}
 else {print "not ok 3 $ok\n"}
 
 $ok = '';
@@ -198,7 +203,7 @@ if($p == 2472) {$ok .= 'g'}
 Rmpfr_set_ui($p, 1234, GMP_RNDN);
 
 if($ok eq 'abcdefg'
-   && Math::MPFR::get_refcnt($p) == 1) {print "ok 4\n"}
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt) {print "ok 4\n"}
 else {print "not ok 4 $ok\n"}
 
 $ok = '';
@@ -246,8 +251,8 @@ $z *= $posi / $p;
 if($z > 0.999 && $z < 1.001) {$ok .= '7'}
 
 if($ok eq 'a1b2c3d4e5f6g7'
-   && Math::MPFR::get_refcnt($p) == 1
-   && Math::MPFR::get_refcnt($z) == 1) {print "ok 5\n"}
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt
+   && Math::MPFR::get_refcnt($z) == $expected_refcnt) {print "ok 5\n"}
 else {print "not ok 5 $ok\n"}
 
 $ok = '';
@@ -281,7 +286,7 @@ $p /= $posi;
 if($p < 1234.0001 && $p > 1233.9999) {$ok .= 'g'}
 
 if($ok eq 'abcdefg'
-   && Math::MPFR::get_refcnt($p) == 1) {print "ok 6\n"}
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt) {print "ok 6\n"}
 else {print "not ok 6 $ok\n"}
 
 my $c = $p;
@@ -289,14 +294,14 @@ if("$c" eq '1.234e3'
    && "$c" eq "$p"
    && $c == $p
    && $c != $q
-   && Math::MPFR::get_refcnt($p) == 1
-   && Math::MPFR::get_refcnt($c) == 1
-   && Math::MPFR::get_refcnt($q) == 1) {print "ok 7\n"}
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt
+   && Math::MPFR::get_refcnt($c) == $expected_refcnt
+   && Math::MPFR::get_refcnt($q) == $expected_refcnt) {print "ok 7\n"}
 else {print "not ok 7\n"}
 
 $c *= -1;
 if(Rmpfr_get_str(abs($c), 10, 0, GMP_RNDN) eq '1.234e3'
-   && Math::MPFR::get_refcnt($c) == 1) {print "ok 8\n"}
+   && Math::MPFR::get_refcnt($c) == $expected_refcnt) {print "ok 8\n"}
 else {print "not ok 8\n"}
 
 $ok = adjust($p!=$ui).adjust($p==$ui).adjust($p>$ui).adjust($p>=$ui).adjust($p<$ui)
@@ -350,28 +355,28 @@ else {print "not ok 17\n"}
 $ok = adjust($frac!=$p).adjust($frac==$p).adjust($frac>$p).adjust($frac>=$p)
 .adjust($frac<$p).adjust($frac<=$p).adjust($frac<=>$p);
 if($ok eq '100011-1'
-   && Math::MPFR::get_refcnt($p) == 1) {print "ok 18\n"}
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt) {print "ok 18\n"}
 else {print "not ok 18\n"}
 
 Rmpfr_set_ui($q, 0, GMP_RNDN);
 
-if($p && Math::MPFR::get_refcnt($p) == 1) {print "ok 19\n"}
+if($p && Math::MPFR::get_refcnt($p) == $expected_refcnt) {print "ok 19\n"}
 else {print "not ok 19 $p\n"}
 
-if(!$q && Math::MPFR::get_refcnt($q) == 1) {print "ok 20\n"}
+if(!$q && Math::MPFR::get_refcnt($q) == $expected_refcnt) {print "ok 20\n"}
 else {print "not ok 20\n"}
 
-if(not($q) && Math::MPFR::get_refcnt($q) == 1) {print "ok 21\n"}
+if(not($q) && Math::MPFR::get_refcnt($q) == $expected_refcnt) {print "ok 21\n"}
 else {print "not ok 21\n"}
 
-unless($q || Math::MPFR::get_refcnt($q) != 1) {print "ok 22\n"}
+unless($q || Math::MPFR::get_refcnt($q) != $expected_refcnt) {print "ok 22\n"}
 else {print "not ok 22\n"}
 
 $z = $c;
 $z *= -1;
 if($z == -$c
-  && Math::MPFR::get_refcnt($z) == 1
-  && Math::MPFR::get_refcnt($c) == 1) {print "ok 23\n"}
+  && Math::MPFR::get_refcnt($z) == $expected_refcnt
+  && Math::MPFR::get_refcnt($c) == $expected_refcnt) {print "ok 23\n"}
 else {
   warn "\$z: $z -\$c: ", -$c, "\n";
   warn "refcounts are ", Math::MPFR::get_refcnt($z), " and ", Math::MPFR::get_refcnt($c), "\n";
@@ -409,8 +414,8 @@ $z += $posi;
 if($z == $p) {$ok .= 'g'}
 
 if($ok eq 'abcdefg'
-   && Math::MPFR::get_refcnt($z) == 1
-   && Math::MPFR::get_refcnt($p) == 1) {print "ok 24\n"}
+   && Math::MPFR::get_refcnt($z) == $expected_refcnt
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt) {print "ok 24\n"}
 else {print "not ok 24 $ok\n"}
 
 $ok = '';
@@ -444,8 +449,8 @@ $z -= $posi;
 if($z == $p) {$ok .= 'g'}
 
 if($ok eq 'abcdefg'
-   && Math::MPFR::get_refcnt($z) == 1
-   && Math::MPFR::get_refcnt($p) == 1) {print "ok 25\n"}
+   && Math::MPFR::get_refcnt($z) == $expected_refcnt
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt) {print "ok 25\n"}
 else {print "not ok 25 $ok\n"}
 
 $ok = '';
@@ -479,8 +484,8 @@ $z -= $posi;
 if($z == -$p) {$ok .= 'g'}
 
 if($ok eq 'abcdefg'
-   && Math::MPFR::get_refcnt($z) == 1
-   && Math::MPFR::get_refcnt($p) == 1) {print "ok 26\n"}
+   && Math::MPFR::get_refcnt($z) == $expected_refcnt
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt) {print "ok 26\n"}
 else {print "not ok 26 $ok\n"}
 
 $ok = '';
@@ -514,13 +519,13 @@ $z -= $posi;
 if($z == $p) {$ok .= 'g'}
 
 if($ok eq 'abcdefg'
-   && Math::MPFR::get_refcnt($z) == 1
-   && Math::MPFR::get_refcnt($p) == 1) {print "ok 27\n"}
+   && Math::MPFR::get_refcnt($z) == $expected_refcnt
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt) {print "ok 27\n"}
 else {print "not ok 27 $ok\n"}
 
 $ok = ($posi!=$p).($posi==$p).($posi>$p).($posi>=$p).($posi<$p).($posi<=$p).($posi<=>$p);
 if($ok eq '1011001'
-   && Math::MPFR::get_refcnt($p) == 1) {print "ok 28\n"}
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt) {print "ok 28\n"}
 else {print "not ok 28\n"}
 
 $ok = ($p!=$posi).($p==$posi).($p>$posi).($p>=$posi).($p<$posi).($p<=$posi).($p<=>$posi);
@@ -531,8 +536,8 @@ Rmpfr_set_ui($z, 2, GMP_RNDN);
 
 my $root = sqrt($z);
 if($root > 1.414 && $root < 1.415
-   && Math::MPFR::get_refcnt($z) == 1
-   && Math::MPFR::get_refcnt($root) == 1) {print "ok 30\n"}
+   && Math::MPFR::get_refcnt($z) == $expected_refcnt
+   && Math::MPFR::get_refcnt($root) == $expected_refcnt) {print "ok 30\n"}
 else {print "not ok 30\n"}
 
 my $root_copy = $root;
@@ -542,22 +547,22 @@ $root_copy **= 2;
 
 if($root_copy > 1.99999 && $root_copy < 2.00000001
    && $root > 1.99999 && $root < 2.00000001
-   && Math::MPFR::get_refcnt($root) == 1
-   && Math::MPFR::get_refcnt($root_copy) == 1) {print "ok 31\n"}
+   && Math::MPFR::get_refcnt($root) == $expected_refcnt
+   && Math::MPFR::get_refcnt($root_copy) == $expected_refcnt) {print "ok 31\n"}
 else {print "not ok 31\n"}
 
 $z = $root ** -2;
 
 if($z > 0.24999 && $z < 0.25001
-   && Math::MPFR::get_refcnt($z) == 1
-   && Math::MPFR::get_refcnt($root) == 1) {print "ok 32\n"}
+   && Math::MPFR::get_refcnt($z) == $expected_refcnt
+   && Math::MPFR::get_refcnt($root) == $expected_refcnt) {print "ok 32\n"}
 else {print "not ok 32\n"}
 
 $root_copy **= -2;
 
 if($root_copy > 0.24999 && $root_copy < 0.25001
-   && Math::MPFR::get_refcnt($root) == 1
-   && Math::MPFR::get_refcnt($root_copy)  == 1) {print "ok 33\n"}
+   && Math::MPFR::get_refcnt($root) == $expected_refcnt
+   && Math::MPFR::get_refcnt($root_copy)  == $expected_refcnt) {print "ok 33\n"}
 else {print "not ok 33\n"}
 
 Rmpfr_set_ui($z, 2, GMP_RNDN);
@@ -566,16 +571,16 @@ Rmpfr_set_ui($root, 3, GMP_RNDN);
 $p = $z ** $root;
 
 if($p == 8
-   && Math::MPFR::get_refcnt($z) == 1
-   && Math::MPFR::get_refcnt($p) == 1
-   && Math::MPFR::get_refcnt($root) == 1) {print "ok 34\n"}
+   && Math::MPFR::get_refcnt($z) == $expected_refcnt
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt
+   && Math::MPFR::get_refcnt($root) == $expected_refcnt) {print "ok 34\n"}
 else {print "not ok 34\n"}
 
 $z **= $root;
 
 if($z == 8
-   && Math::MPFR::get_refcnt($root) == 1
-   && Math::MPFR::get_refcnt($z)  == 1) {print "ok 35\n"}
+   && Math::MPFR::get_refcnt($root) == $expected_refcnt
+   && Math::MPFR::get_refcnt($z)  == $expected_refcnt) {print "ok 35\n"}
 else {print "not ok 35\n"}
 
 Rmpfr_set_ui($z, 2, GMP_RNDN);
@@ -584,16 +589,16 @@ Rmpfr_set_si($root, -3, GMP_RNDN);
 $p = $z ** $root;
 
 if($p == 0.125
-   && Math::MPFR::get_refcnt($z) == 1
-   && Math::MPFR::get_refcnt($p) == 1
-   && Math::MPFR::get_refcnt($root) == 1) {print "ok 36\n"}
+   && Math::MPFR::get_refcnt($z) == $expected_refcnt
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt
+   && Math::MPFR::get_refcnt($root) == $expected_refcnt) {print "ok 36\n"}
 else {print "not ok 36\n"}
 
 $z **= $root;
 
 if($z == 0.125
-   && Math::MPFR::get_refcnt($root) == 1
-   && Math::MPFR::get_refcnt($z)  == 1) {print "ok 37\n"}
+   && Math::MPFR::get_refcnt($root) == $expected_refcnt
+   && Math::MPFR::get_refcnt($z)  == $expected_refcnt) {print "ok 37\n"}
 else {print "not ok 37\n"}
 
 my $s = sin($p);
@@ -603,8 +608,8 @@ $s **= 2;
 $c **= 2;
 
 if($s + $c < 1.0001 && $s + $c > 0.9999
-   && Math::MPFR::get_refcnt($s) == 1
-   && Math::MPFR::get_refcnt($c) == 1) {print "ok 38\n"}
+   && Math::MPFR::get_refcnt($s) == $expected_refcnt
+   && Math::MPFR::get_refcnt($c) == $expected_refcnt) {print "ok 38\n"}
 else {print "not ok 38\n"}
 
 Rmpfr_set_ui($c, 10, GMP_RNDN);
@@ -614,8 +619,8 @@ $s = log($c);
 if($] >= 5.008) {
   my $int = int($s);
   if(int($s) == 2 && $int == 2
-    && Math::MPFR::get_refcnt($s) == 1
-    && Math::MPFR::get_refcnt($int) == 1) {print "ok 39\n"}
+    && Math::MPFR::get_refcnt($s) == $expected_refcnt
+    && Math::MPFR::get_refcnt($int) == $expected_refcnt) {print "ok 39\n"}
   else {print "not ok 39\n"}
   }
 else {
@@ -626,8 +631,8 @@ else {
 $s = exp($s);
 
 if($s < 10.0001 && $s > 0.9999
-   && Math::MPFR::get_refcnt($s) == 1
-   && Math::MPFR::get_refcnt($c) == 1) {print "ok 40\n"}
+   && Math::MPFR::get_refcnt($s) == $expected_refcnt
+   && Math::MPFR::get_refcnt($c) == $expected_refcnt) {print "ok 40\n"}
 else {print "not ok 40\n"}
 
 Rmpfr_set_ui($s, 3, GMP_RNDN);
@@ -719,8 +724,8 @@ if($atan2 - atan2($x_atan2, 2.07) < 0.0000001 &&
    $atan2 - atan2($x_atan2, 2.07) > -0.0000001) {$ok .= 'o'}
 
 if($ok eq 'zabcdefghijklmno'
-  && Math::MPFR::get_refcnt($atan2) == 1
-  && Math::MPFR::get_refcnt($y_atan2) == 1) {print "ok 41\n"}
+  && Math::MPFR::get_refcnt($atan2) == $expected_refcnt
+  && Math::MPFR::get_refcnt($y_atan2) == $expected_refcnt) {print "ok 41\n"}
 else {print "not ok 41 $ok\n"}
 
 Rmpfr_set_d($p, 81, GMP_RNDN);
@@ -739,8 +744,8 @@ Rmpfr_set_d($p, 36, GMP_RNDN);
 
 $p **= 0.5;
 if($p == 6
-   && Math::MPFR::get_refcnt($p) == 1
-   && Math::MPFR::get_refcnt($q) == 1) {print "ok 44\n"}
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt
+   && Math::MPFR::get_refcnt($q) == $expected_refcnt) {print "ok 44\n"}
 else {print "not ok 44\n"}
 
 my $mbi = Math::BigInt->new(112345);
@@ -834,8 +839,8 @@ $q = $p * $mbi;
 $p = $q / $mbi;
 
 if($p == 1234
-   && Math::MPFR::get_refcnt($p) == 1
-   && Math::MPFR::get_refcnt($q) == 1) {print "ok 47\n"}
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt
+   && Math::MPFR::get_refcnt($q) == $expected_refcnt) {print "ok 47\n"}
 else {print "not ok 47\n"}
 
 $p *= $mbi;
@@ -844,24 +849,24 @@ $p += $mbi;
 $p -= $mbi;
 
 if($p == 1234
-   && Math::MPFR::get_refcnt($p) == 1
-   && Math::MPFR::get_refcnt($q) == 1) {print "ok 48\n"}
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt
+   && Math::MPFR::get_refcnt($q) == $expected_refcnt) {print "ok 48\n"}
 else {print "not ok 48\n"}
 
 $q = $mbi + $p;
 $p = $mbi - $q;
 
 if($p == -1234
-   && Math::MPFR::get_refcnt($p) == 1
-   && Math::MPFR::get_refcnt($q) == 1) {print "ok 49\n"}
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt
+   && Math::MPFR::get_refcnt($q) == $expected_refcnt) {print "ok 49\n"}
 else {print "not ok 49\n"}
 
 $q = $mbi * $p;
 $p = $mbi / $q;
 
 if($p < -0.00081 && $p > -0.000811
-   && Math::MPFR::get_refcnt($p) == 1
-   && Math::MPFR::get_refcnt($q) == 1) {print "ok 50\n"}
+   && Math::MPFR::get_refcnt($p) == $expected_refcnt
+   && Math::MPFR::get_refcnt($q) == $expected_refcnt) {print "ok 50\n"}
 else {print "not ok 50\n"}
 
 Rmpfr_set_str($p, "1234567.123", 10, GMP_RNDN);
@@ -874,7 +879,7 @@ if($p > $mbi &&
    ($mbi <=> $p) < 0 &&
    $p != $mbi &&
    !($p == $mbi) &&
-   Math::MPFR::get_refcnt($p) == 1) {print "ok 51\n"}
+   Math::MPFR::get_refcnt($p) == $expected_refcnt) {print "ok 51\n"}
 else {print "not ok 51\n"}
 
 $mbi = \$p;

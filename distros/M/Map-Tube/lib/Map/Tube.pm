@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.68';
+$Map::Tube::VERSION   = '3.69';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.68
+Version 3.69
 
 =cut
 
@@ -65,13 +65,13 @@ documented in L<Map::Tube::Cookbook>.
     +---------------------+----------+------------------------------------------+
     | Author              | PAUSE ID | Map Count (City)                         |
     +---------------------+----------+------------------------------------------+
-    | Michal Josef Spacek | SKIM     | 22 (Bucharest, Budapest, Dnipropetrovsk, |
-    |                     |          | Kazan, Kharkiv, Kiev, KualaLumpur,       |
-    |                     |          | Malaga, Minsk, Moscow, Nanjing,          |
-    |                     |          | NizhnyNovgorod, Novosibirsk, Prague,     |
-    |                     |          | SaintPetersburg, Samara, Singapore,      |
-    |                     |          | Sofia, Tbilisi, Vienna, Warsaw,          |
-    |                     |          | Yekaterinburg)                           |
+    | Michal Josef Spacek | SKIM     | 23 (Bielefeld, Bucharest, Budapest,      |
+    |                     |          | Dnipropetrovsk, Kazan, Kharkiv, Kiev,    |
+    |                     |          | KualaLumpur, Malaga, Minsk, Moscow,      |
+    |                     |          | Nanjing, NizhnyNovgorod, Novosibirsk,    |
+    |                     |          | Prague, SaintPetersburg, Samara,         |
+    |                     |          | Singapore, Sofia, Tbilisi, Vienna,       |
+    |                     |          | Warsaw, Yekaterinburg)                   |
     |                     |          |                                          |
     | Mohammad S Anwar    | MANWAR   | 7 (Barcelona, Delhi, Kolkatta, London,   |
     |                     |          | Madrid, NYC, Tokyo)                      |
@@ -90,7 +90,7 @@ documented in L<Map::Tube::Cookbook>.
     |                     |          |                                          |
     | Soren Lund          | SLU      | 1 (Copenhagen)                           |
     |                     |          |                                          |
-    | FUNG Cheok Yin      | CYFUNG   | 1 (Hongkong)                             |
+    | FUNG Cheok Yin      | CYFUNG   | 1 (Hong Kong)                            |
     +---------------------+----------+------------------------------------------+
 
 =cut
@@ -1369,7 +1369,7 @@ sub _is_visited {
 
 =head1 AUTHOR
 
-Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
+Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
@@ -1437,7 +1437,7 @@ L<https://metacpan.org/dist/Map-Tube/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 - 2022 Mohammad S Anwar.
+Copyright (C) 2010 - 2024 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a  copy of the full

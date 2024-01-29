@@ -6,27 +6,31 @@ use Dispatch::Fu;
 sub _runner {
     my $INPUT = shift;
 
-    my $ouput = dispatch {
+    my ($ouput, $canary) = dispatch {
         my $input_ref = shift;
 
         # checking internal inspection routine, cases
         my @cases = cases;
-        is 6, @cases, q{found expected number of cases};
+        is 7, @cases, q{found expected number of cases};
 
         return ( scalar @$input_ref > 5 )
           ? q{case5}
           : sprintf qq{case%d}, scalar @$input_ref;
     }
     $INPUT,
-      on case0 => sub { return qq{0} },
-      on case1 => sub { return qq{1} },
-      on case2 => sub { return qq{2} },
-      on case3 => sub { return qq{3} },
-      on case4 => sub { return qq{4} },
-      on case5 => sub { return qq{5} };
+      on case0 => sub { return qw/0 +/ },
+      on case1 => sub { return qw/1 +/ },
+      on case2 => sub { return qw/2 +/ },
+      on case3 => sub { return qw/3 +/ },
+      on case4 => sub { return qw/4 +/ },
+      on case5 => sub { return qw/5 +/ };
 
-      my @cases = cases;
-      is 0, @cases, q{found expected number of cases};
+    my @cases = cases;
+    is 1, @cases, q{found expected number of cases};
+
+    # quick test to make sure files get returned as expected when run in
+    # a loop, necessarily involves clearing $DISPATCH_TABLE and rebuilding it
+    is $canary, q{+}, q{return LIST working fine.};
 
     return $ouput;
 }

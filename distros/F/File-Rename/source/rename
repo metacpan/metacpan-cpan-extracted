@@ -1,6 +1,5 @@
 #!perl
-use strict;
-use warnings;
+use 5.032;  # use strict; use warnings;
 
 use File::Rename;   # REQUIRE_ORDER
 use Pod::Usage;
@@ -99,6 +98,11 @@ the same time as making other changes (but see B<--filename>)
 You can also write the statements separately (see B<-e>/B<-E>)
 
 	rename -E 'y/A-Z/a-z/' -E 's/^/my_new_dir\//' -- *.*
+
+You can use the predefined variables C<$a, $b> in the code; 
+for instance to create sequences of numbers
+
+    rename -e '$a++;s/\w+/file_$a/' -- *.*
 
 =head1 OPTIONS
 

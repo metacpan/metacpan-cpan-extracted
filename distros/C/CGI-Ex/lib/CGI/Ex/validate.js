@@ -1,4 +1,4 @@
-// Copyright - Paul Seamons - ver 2.47
+// Copyright - Paul Seamons - ver 3.00
 // Distributed under the Perl Artistic License without warranty
 // See perldoc CGI::Ex::Validate for usage
 
@@ -313,6 +313,7 @@ function v_validate_buddy (form, field, field_val, val_hash, ifs_match) {
 
  var _value   = v_get_form_value(form[field]);
  var modified = 0;
+ var type_ne_required = val_hash['group type_ne_required'];
 
  if (typeof(field_val['default']) != 'undefined'
      && (typeof(_value) == 'undefined'
@@ -374,7 +375,7 @@ function v_validate_buddy (form, field, field_val, val_hash, ifs_match) {
  }
  if (field_val.vif_disable) v_set_disable(form[field], false);
 
- var is_required = field_val['required'] ? 'required' : '';
+ var is_required = field_val['required'] ? 'required' : field_val['req'] ? 'required' : '';
  if (! is_required) {
   var tests = v_filter_types('required_if', types);
   for (var i = 0; i < tests.length; i++) {
@@ -428,6 +429,11 @@ function v_validate_buddy (form, field, field_val, val_hash, ifs_match) {
 
  for (var n = 0; n < values.length; n++) {
   var value = values[n];
+
+  if (type_ne_required) {
+   if (typeof value == 'undefined') continue;
+   if (value.length == 0) continue; // values coming from form will always have value, just possibly empty
+  }
 
   if (typeof field_val['enum'] != 'undefined') {
    var is_found = 0;
@@ -484,33 +490,40 @@ function v_validate_buddy (form, field, field_val, val_hash, ifs_match) {
     for (var j = 0; j < _fv.length; j++) {
      var comp = _fv[j];
      if (! comp) continue;
-     var hold = false;
      var copy = value;
-     if (m = comp.match(/^\s*(>|<|[><!=]=)\s*([\d\.\-]+)\s*$/)) {
-      if (! copy) copy = 0;
-      copy *= 1;
-      if      (m[1] == '>' ) hold = (copy >  m[2])
-      else if (m[1] == '<' ) hold = (copy <  m[2])
-      else if (m[1] == '>=') hold = (copy >= m[2])
-      else if (m[1] == '<=') hold = (copy <= m[2])
-      else if (m[1] == '!=') hold = (copy != m[2])
-      else if (m[1] == '==') hold = (copy == m[2])
-     } else if (m = comp.match(/^\s*(eq|ne|gt|ge|lt|le)\s+(.+?)\s*$/)) {
-      if (     m[2].match(/^\"/)) m[2] = m[2].replace(/^"(.*)"$/,'$1');
-      else if (m[2].match(/^\'/)) m[2] = m[2].replace(/^'(.*)'$/,'$1');
-      if      (m[1] == 'gt') hold = (copy >  m[2])
-      else if (m[1] == 'lt') hold = (copy <  m[2])
-      else if (m[1] == 'ge') hold = (copy >= m[2])
-      else if (m[1] == 'le') hold = (copy <= m[2])
-      else if (m[1] == 'ne') hold = (copy != m[2])
-      else if (m[1] == 'eq') hold = (copy == m[2])
-     } else {
-      v_error("Not sure how to compare \""+comp+"\"");
-      return errors;
+     m = comp.match(/^\s*(>|<|[><!=]=)\s*([\d\.\-]+|field:(.+))\s*$/);
+     if (!m) {
+      m = comp.match(/^\s*(eq|ne|gt|ge|lt|le)\s+(field:(.+)|.+?)\s*$/);
+      if (!m) { v_error("Not sure how to compare \""+comp+"\""); return errors }
+      m._str_ = 1;
      }
-     if (! hold) v_add_error(errors, field, type, field_val, ifs_match, form);
+     var val2 = m[2];
+     if (m[3]) {
+      var field2 = m[3].replace(/\$(\d+)/g, function (all, N) {
+       return (typeof(ifs_match) != 'object' || typeof(ifs_match[N]) == 'undefined') ? '' : ifs_match[N];
+      });
+      val2 = v_get_form_value(form[field2]);
+     }
+     if (!m._str_) {
+      copy = copy ? copy*1 : 0;
+      val2 = val2 ? val2*1 : 0;
+     } else {
+      if (typeof(val2) == 'undefined') val2 = '';
+      else if (!m[3]) {
+        if (     val2.match(/^\"/)) val2 = val2.replace(/^"(.*)"$/,'$1');
+        else if (val2.match(/^\'/)) val2 = val2.replace(/^'(.*)'$/,'$1');
+      }
+     }
+     var h = (m[1] == '>' ) ? (copy >  val2)   : (m[1] == '<' ) ? (copy <  val2)
+           : (m[1] == '>=') ? (copy >= val2)   : (m[1] == '<=') ? (copy <= val2)
+           : (m[1] == '!=') ? (copy != val2)   : (m[1] == '==') ? (copy == val2)
+           : (m[1] == 'gt') ? (copy >  val2)   : (m[1] == 'lt') ? (copy <  val2)
+           : (m[1] == 'ge') ? (copy >= val2)   : (m[1] == 'le') ? (copy <= val2)
+           : (m[1] == 'ne') ? (copy != val2)   : (m[1] == 'eq') ? (copy == val2)  : false;
+     if (! h) v_add_error(errors, field, type, field_val, ifs_match, form);
     }
    }
+
   }
  }
 
@@ -523,7 +536,8 @@ function v_validate_buddy (form, field, field_val, val_hash, ifs_match) {
    var value = values.length == 1 ? values[0] : values;
    var err;
    var ok;
-   try { ok = (typeof _fv == 'function') ? _fv({'value':value, 'field_val':field_val, 'form':form, 'key':field_val.field, 'errors':errors, 'event':v_event}) : eval(_fv) } catch (e) { err = e }
+   try { ok = (typeof _fv == 'function') ? _fv({'value':value, 'field_val':field_val, 'form':form, 'key':field_val.field, 'errors':errors, 'event':v_event,
+      set_value: function (k,v) { return v_set_form_value(form[k],v) }, get_value: function (k) { return v_get_form_value(form[k]) } }) : eval(_fv) } catch (e) { err = e }
    if (!ok) v_add_error(errors, field, type, field_val, ifs_match, form, err);
   }
  }
@@ -558,6 +572,7 @@ function v_check_type (value, type, field, form) {
 
  } else if (type == 'DOMAIN') {
   if (! value) return 0;
+  value = value.toLowerCase();
   if (! value.match(/^[a-z0-9.-]{4,255}$/)) return 0;
   if (value.match(/^[.\-]/))             return 0;
   if (value.match(/(\.-|-\.|\.\.)/))  return 0;
@@ -575,7 +590,9 @@ function v_check_type (value, type, field, form) {
  } else if (type == 'URI') {
   if (! value) return 0;
   if (value.match(/\s/)) return 0;
-
+ } else if (type == 'STR') {
+  if (typeof(value) == 'undefined') return 0;
+  if (typeof(value) != 'string' && typeof(vlaue) != 'number') return 0;
  } else if (type == 'INT') {
   if (!value.match(/^-?(?:0|[1-9]\d*)$/)) return 0;
   if ((value < 0) ? value < -Math.pow(2,31) : value > Math.pow(2,31)-1) return 0;
@@ -584,7 +601,10 @@ function v_check_type (value, type, field, form) {
   if (value > Math.pow(2,32)-1) return 0;
  } else if (type == 'NUM') {
   if (!value.match(/^-?(?:0|[1-9]\d*(?:\.\d+)?|0?\.\d+)$/)) return 0;
-
+ } else if (type == 'UNUM') {
+  if (!value.match(/^(?:0|[1-9]\d*(?:\.\d+)?|0?\.\d+)$/)) return 0;
+ } else if (type == 'CODE') {
+  if (typeof(value) == 'function') return 0;
  } else if (type == 'CC') {
   if (! value) return 0;
   if (value.match(/[^\d\- ]/)) return 0;
@@ -647,6 +667,8 @@ function v_get_form_value (el, form) {
   for (var j=0;j<el.length;j++) {
    if (type.indexOf('multiple') != -1) {
     if (el[j].selected) a.push(el[j].value);
+   } else if (el[j].type == 'text') {
+    a.push(el[j].value);
    } else {
     if (el[j].checked)  a.push(v_get_form_value(el[j]));
    }
@@ -863,6 +885,7 @@ document.validate = function (form, val_hash) {
  }
 
  var err_obj = v_validate(form, val_hash);
+ document.validation_errors = err_obj ? true : false;
  if (! err_obj) {
    var f = val_hash['group clear_all_hook'] || document.validate_clear_all_hook;
    if (f) f();
@@ -976,6 +999,20 @@ document.check_form = function (form, val_hash) {
  if (types.change || types.blur) {
   var clean = v_get_ordered_fields(val_hash);
   if (clean.error) return clean.error;
+  var keys = ['blur','change'];
+  for (var i=0; i < keys.length; i++ ) {
+    var k = keys[i];
+    if (typeof(types[k]) === 'object') {
+      for (var j in types[k]) {
+        var names = v_field_names(form, j);
+        if (names) {
+          for (var ii = 0; ii < names.length; ii++) {
+          types[k][names[ii][0]] = types[k][j];
+          }
+        }
+      }
+    }
+  }
   var h = {};
   _add = function (k, v) { if (! h[k]) h[k] = []; h[k].push(v) };
   for (var i = 0; i < clean.fields.length; i++) {

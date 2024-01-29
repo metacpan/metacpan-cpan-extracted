@@ -1,0 +1,89 @@
+NAME
+
+    App::csvtool - implements the csvtool core commands
+
+DESCRIPTION
+
+    This module provides the main commands for the csvtool wrapper script.
+
+COMMANDS
+
+ cut
+
+       $ csvtool cut -fFIELDS INPUT...
+
+    Extracts the given field column(s).
+
+  --fields, -f
+
+    A comma-separated list of field indexes (defaults to 1).
+
+ grep
+
+       $ csvtool grep PATTERN INPUT...
+
+    Filter rows by the given pattern. The pattern is always interpreted as
+    a Perl regular expression.
+
+  --ignore-case, -i
+
+    Ignore case when matching.
+
+  --invert-match, -v
+
+    Output only the lines that do not match the filter pattern.
+
+ head
+
+       $ csvtool head -nLINES INPUT...
+
+    Output only the first few rows.
+
+  --lines, -n
+
+    Number of lines to output. If negative, will output all but the final
+    few rows of the given number.
+
+ sort
+
+       $ csvtool sort INPUT...
+
+    Sorts the rows according to the given field.
+
+  --field, -f
+
+    The field index to sort by (defaults to 1).
+
+  --numerical, -n
+
+    Sorts numerically. If absent, sorting happens alphabetically.
+
+  --reverse, -r
+
+    Reverses the order of sorting.
+
+ tail
+
+       $ csvtool tail -nLINES INPUT...
+
+    Output only the final few rows.
+
+  --lines, -n
+
+    Number of lines to output. If negative, will output all but the first
+    few rows of the given number.
+
+ uniq
+
+       $ csvtool uniq -fFIELD INPUT...
+
+    Filters rows for unique values of the given field.
+
+  --field, -f
+
+    The field index to select rows on (defaults to 1).
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

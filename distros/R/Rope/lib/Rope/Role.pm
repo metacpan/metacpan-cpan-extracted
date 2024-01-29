@@ -6,18 +6,18 @@ use Rope no_import => 1;
 
 sub import {
 	my ($pkg, $caller) = (shift, scalar(caller));
-	Rope->import(caller => $caller, import => [qw/function property prototyped requires/]);
+	Rope->import(caller => $caller, import => [qw/function property properties prototyped requires/]);
 }
 
 1;
 
 =head1 NAME
 
-Rope::Autoload - Rope Autoload!
+Rope::Autoload - Rope Roles!
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =cut
 

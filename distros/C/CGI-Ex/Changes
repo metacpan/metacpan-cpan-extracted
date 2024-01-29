@@ -1,5 +1,11 @@
 Revision history for CGI-Ex.
 
+2.55      2024-01-09 09:19:32-07:00 America/Denver
+  * Add support for type_ne_required in both Validate.pm and validate.js
+  * Add support for various types including unum, str, array, hash, {}, []
+  * Add support for nested types in Validate.pm (not part of validate.js)
+  * Add support for coerce in Validate.pm (not part of validate.js)
+
 2.54      2022-03-11 15:00:51-07:00 America/Denver
   * Fix sending cookies on location_bounce, if mod_perl 2 (thank you csjewell and oaxlin)
 

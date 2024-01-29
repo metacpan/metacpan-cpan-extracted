@@ -9,11 +9,14 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '2.54'; # VERSION
+our $VERSION = '2.55'; # VERSION
 our $QR_EXTRA = qr/^(\w+_error|as_(array|string|hash)_\w+|no_\w+)/;
 our @UNSUPPORTED_BROWSERS = (qr/MSIE\s+5.0\d/i);
 our $JS_URI_PATH;
 our $JS_URI_PATH_VALIDATE;
+
+our $type_ne_required;
+$type_ne_required //= 0;
 
 sub new {
     my $class = shift;
@@ -34,6 +37,7 @@ sub validate {
     my ($fields, $ARGS) = $self->get_ordered_fields($val_hash);
     return if ! @$fields;
 
+    local $type_ne_required = 1 if $ARGS->{'type_ne_required'};
     return if $ARGS->{'validate_if'} && ! $self->check_conditional($form, $ARGS->{'validate_if'});
 
     # Finally we have our arrayref of hashrefs that each have their 'field' key
@@ -102,13 +106,8 @@ sub validate {
     push(@errors, @$hold_error) if $hold_error; # allow for final OR to work
 
     # optionally check for unused keys in the form
-    if ($ARGS->{no_extra_fields} || $self->{no_extra_fields}) {
-        my %keys = map { ($_->{'field'} => 1) } @$fields;
-        foreach my $key (sort keys %$form) {
-            next if $keys{$key};
-            push @errors, [$key, 'no_extra_fields', {}, undef];
-        }
-    }
+    $self->no_extra_fields($form,$fields,$val_hash,\@errors) if ($ARGS->{'no_extra_fields'} || $self->{'no_extra_fields'});
+    delete @$form{grep {!$self->{'was_valid'}->{$_}} keys %$form} if $ARGS->{'delete_unvalidated'} || $self->{'delete_unvalidated'};
 
     if (@errors) {
         my @copy = grep {/$QR_EXTRA/o} keys %$self;
@@ -120,6 +119,42 @@ sub validate {
     }
 
     return; # success
+}
+
+sub no_extra_fields {
+    my ($self,$form,$fields,$fv,$errors,$field_prefix) = @_;
+    $field_prefix ||= '';
+    local $self->{'_recurse'} = ($self->{'_recurse'} || 0) + 1;
+    die "Max dependency level reached 10\n" if $self->{'_recurse'} > 10;
+
+    my %keys = map { ($_->{'field'} => 1) } @$fields;
+    foreach my $key (sort keys %$form) {
+        if (ref $form->{$key} eq 'HASH') {
+            my $field_type = $fv->{$key}->{'type'};
+            if(!defined $field_type) {
+                # Do nothing
+            }
+            elsif (ref $field_type ne 'HASH') {
+                push @$errors, [$field_prefix.$key, 'no_extra_fields', {}, undef];
+                next;
+            } else {
+                my $f = [map { {field=>$_} } keys %$field_type];
+                $self->no_extra_fields($form->{$key},$f,$field_type,$errors,$field_prefix.$key.'.');
+            }
+        } elsif (ref $form->{$key} eq 'ARRAY') {
+            my $field_type = $fv->{$key}->{'type'};
+            if (!defined $field_type) {
+                # Do nothing
+            } elsif (ref $field_type eq 'HASH') {
+                my $f = [map { {field=>$_} } keys %$field_type];
+                foreach (my $i = 0; $i <= $#{$form->{$key}}; $i ++) {
+                    $self->no_extra_fields($form->{$key}->[$i],$f,$field_type,$errors,$field_prefix.$key.':'.$i.'.') if ref $form->{$key}->[$i];
+                }
+            }
+        }
+        next if $keys{$key};
+        push @$errors, [$field_prefix.$key, 'no_extra_fields', {}, undef];
+    }
 }
 
 sub get_ordered_fields {
@@ -218,6 +253,9 @@ sub check_conditional {
         my $field = $ref->{'field'} || die "Missing field key during validate_if (possibly used a reference to a main hash *foo -> &foo)";
         $field =~ s/\$(\d+)/defined($ifs_match->[$1]) ? $ifs_match->[$1] : ''/eg if $ifs_match;
 
+        # max_values is properly checked elsewhere, however we need to stub in a value so defaults are properly set
+        $ref->{'max_values'} ||= scalar @{$form->{$field}} if ref $form->{$field} eq 'ARRAY';
+
         my $errs = $self->validate_buddy($form, $field, $ref);
 
         $found = 0 if $errs;
@@ -228,7 +266,8 @@ sub check_conditional {
 
 ### this is where the main checking goes on
 sub validate_buddy {
-    my ($self, $form, $field, $field_val, $ifs_match) = @_;
+    my ($self, $form, $field, $field_val, $ifs_match, $field_prefix) = @_;
+    $field_prefix ||= '';
     local $self->{'_recurse'} = ($self->{'_recurse'} || 0) + 1;
     die "Max dependency level reached 10" if $self->{'_recurse'} > 10;
     my @errors;
@@ -251,10 +290,27 @@ sub validate_buddy {
         return @errors ? \@errors : 0;
     }
 
-    if ($field_val->{'was_valid'}   && ! $self->{'was_valid'}->{$field})   { return [[$field, 'was_valid',   $field_val, $ifs_match]]; }
-    if ($field_val->{'had_error'}   && ! $self->{'had_error'}->{$field})   { return [[$field, 'had_error',   $field_val, $ifs_match]]; }
-    if ($field_val->{'was_checked'} && ! $self->{'was_checked'}->{$field}) { return [[$field, 'was_checked', $field_val, $ifs_match]]; }
+    # allow for canonical field name (allows api to present one field name but return a different one)
+    # need to do this relatively early since we are changing the value of $field
+    if ($field_val->{'canonical'}) {
+        my $orig = $field_val->{'orig_field'} = $field;
+        $field = $field_val->{'canonical'};
+        $form->{$field} = delete $form->{$orig};
+    }
 
+    if ($field_val->{'was_valid'}   && ! $self->{'was_valid'}->{$field})   { return [[$field_prefix.$field, 'was_valid',   $field_val, $ifs_match]]; }
+    if ($field_val->{'had_error'}   && ! $self->{'had_error'}->{$field})   { return [[$field_prefix.$field, 'had_error',   $field_val, $ifs_match]]; }
+    if ($field_val->{'was_checked'} && ! $self->{'was_checked'}->{$field}) { return [[$field_prefix.$field, 'was_checked', $field_val, $ifs_match]]; }
+
+    my $is_A = $field_val->{'type'} && ((ref($field_val->{'type'}) eq 'ARRAY' && '[]') || ($field_val->{'type'} eq 'array' && 'array'));
+
+    if (!exists($form->{$field}) && $field_val->{'alias'}) {
+        foreach my $alias (ref($field_val->{'alias'}) ? @{$field_val->{'alias'}} : $field_val->{'alias'}) {
+            next if ! exists $form->{$alias};
+            $form->{$field} = delete $form->{$alias};
+            last;
+        }
+    }
 
     # allow for default value
     if (defined($field_val->{'default'})
@@ -263,7 +319,14 @@ sub validate_buddy {
         $form->{$field} = $field_val->{'default'};
     }
 
-    my $values   = UNIVERSAL::isa($form->{$field},'ARRAY') ? $form->{$field} : [$form->{$field}];
+    my $values;
+    if (ref $form->{$field} eq 'ARRAY') {
+        $values = $form->{$field};
+    } elsif ($is_A && $field_val->{'coerce'}) {
+        $values = exists($form->{$field}) ? ($form->{$field} = [$form->{$field}]) : [];
+    } else {
+        $values = [$form->{$field}];
+    }
     my $n_values = @$values;
 
     # allow for a few form modifiers
@@ -321,6 +384,15 @@ sub validate_buddy {
             }
         }
     } }
+
+    if ($field_val->{'truncate'} and my $n = $field_val->{'max_len'}) {
+        foreach my $value (@$values) {
+            next if !defined($value) || length($value) <= $n;
+            $value = substr $value, 0, $n;
+            $modified = 1;
+        }
+    }
+
     $form->{$field} = $values->[0] if $modified && $n_values == 1; # put them back into the form if we have modified it
 
     # only continue if a validate_if is not present or passes test
@@ -339,7 +411,7 @@ sub validate_buddy {
 
     # check for simple existence
     # optionally check only if another condition is met
-    my $is_required = $field_val->{'required'} ? 'required' : '';
+    my $is_required = ($field_val->{'required'} || $field_val->{'req'}) ? 'required' : '';
     if (! $is_required) {
         if ($types{'required_if'}) { foreach my $type (@{ $types{'required_if'} }) {
             my $ifs = $field_val->{$type};
@@ -349,22 +421,24 @@ sub validate_buddy {
         } }
     }
     if ($is_required
-        && ($n_values == 0 || ($n_values == 1 && (! defined($values->[0]) || ! length $values->[0])))) {
+        && (!@$values
+            || grep {! defined || (! length && (!defined($field_val->{'min_len'}) || $field_val->{'min_len'}))} @$values)
+        ) {
         return [] if $self->{'_check_conditional'};
-        return [[$field, $is_required, $field_val, $ifs_match]];
+        return [[$field_prefix.$field, $is_required, $field_val, $ifs_match]];
     }
 
     my $n = exists($field_val->{'min_values'}) ? $field_val->{'min_values'} || 0 : 0;
     if ($n_values < $n) {
         return [] if $self->{'_check_conditional'};
-        return [[$field, 'min_values', $field_val, $ifs_match]];
+        return [[$field_prefix.$field, 'min_values', $field_val, $ifs_match]];
     }
 
-    $field_val->{'max_values'} = 1 if ! exists $field_val->{'max_values'};
+    $field_val->{'max_values'} = ($is_A ? 1e6 : $field_val->{'min_values'} || 1) if ! exists $field_val->{'max_values'};
     $n = $field_val->{'max_values'} || 0;
     if ($n_values > $n) {
         return [] if $self->{'_check_conditional'};
-        return [[$field, 'max_values', $field_val, $ifs_match]];
+        return [[$field_prefix.$field, 'max_values', $field_val, $ifs_match]];
     }
 
     foreach ([min => $types{'min_in_set'}],
@@ -384,7 +458,7 @@ sub validate_buddy {
             if (   ($minmax eq 'min' && $n > 0)
                    || ($minmax eq 'max' && $n < 0)) {
                 return [] if $self->{'_check_conditional'};
-                return [[$field, $type, $field_val, $ifs_match]];
+                return [[$field_prefix.$field, $type, $field_val, $ifs_match]];
             }
         }
     }
@@ -392,7 +466,14 @@ sub validate_buddy {
     # at this point @errors should still be empty
     my $content_checked; # allow later for possible untainting (only happens if content was checked)
 
+    my $nT = $field_val->{'type'};
+    push @errors, [$field_prefix.$field, 'type', $field_val, $ifs_match] if $is_A && defined($form->{$field}) && ref $form->{$field} ne 'ARRAY';
+    push @errors, [$field_prefix.$field, 'type', $field_val, $ifs_match] if $nT && $nT eq 'str' && ref $form->{$field} eq 'ARRAY';
+    $nT = (ref $nT && $nT->[0]) || undef if $is_A;
+
     OUTER: foreach my $value (@$values) {
+
+        next if ! defined($value) && $type_ne_required;
 
         if (exists $field_val->{'enum'}) {
             my $ref = ref($field_val->{'enum'}) ? $field_val->{'enum'} : [split(/\s*\|\|\s*/,$field_val->{'enum'})];
@@ -402,18 +483,29 @@ sub validate_buddy {
             }
             if (! $found) {
                 return [] if $self->{'_check_conditional'};
-                push @errors, [$field, 'enum', $field_val, $ifs_match];
+                push @errors, [$field_prefix.$field, 'enum', $field_val, $ifs_match];
                 next OUTER;
             }
             $content_checked = 1;
         }
 
         # do specific type checks
-        if (exists $field_val->{'type'}) {
-            if (! $self->check_type($value, $field_val->{'type'}, $field, $form)){
+        if ($nT) {
+            if (! $self->check_type($value, $nT, $field, $form)){
                 return [] if $self->{'_check_conditional'};
-                push @errors, [$field, 'type', $field_val, $ifs_match];
+                my $_fv = ($nT eq $field_val->{'type'}) ? $field_val : {%$field_val, type => $nT};
+                push @errors, [$field_prefix.$field, 'type', $_fv, $ifs_match];
                 next OUTER;
+            }
+            if (ref($nT) eq 'HASH' && $form->{$field}) {
+                # recursively check these
+                foreach my $key (keys %$nT) {
+                    foreach my $subform (@{ref($form->{$field}) eq 'ARRAY' ? $form->{$field} : [$form->{$field}]}) {
+                        my $errs = $self->validate_buddy($subform, $key, $nT->{$key},[],$field_prefix.$field.'.');
+                        push @errors, @$errs if $errs;
+                    }
+                }
+                return @errors ? \@errors : 0;
             }
             $content_checked = 1;
         }
@@ -436,7 +528,7 @@ sub validate_buddy {
             }
             if ($not ? $success : ! $success) {
                 return [] if $self->{'_check_conditional'};
-                push @errors, [$field, $type, $field_val, $ifs_match];
+                push @errors, [$field_prefix.$field, $type, $field_val, $ifs_match];
                 next OUTER;
             }
             $content_checked = 1;
@@ -446,7 +538,7 @@ sub validate_buddy {
             my $n = $field_val->{'min_len'};
             if (! defined($value) || length($value) < $n) {
                 return [] if $self->{'_check_conditional'};
-                push @errors, [$field, 'min_len', $field_val, $ifs_match];
+                push @errors, [$field_prefix.$field, 'min_len', $field_val, $ifs_match];
             }
         }
 
@@ -454,7 +546,7 @@ sub validate_buddy {
             my $n = $field_val->{'max_len'};
             if (defined($value) && length($value) > $n) {
                 return [] if $self->{'_check_conditional'};
-                push @errors, [$field, 'max_len', $field_val, $ifs_match];
+                push @errors, [$field_prefix.$field, 'max_len', $field_val, $ifs_match];
             }
         }
 
@@ -466,7 +558,7 @@ sub validate_buddy {
             foreach my $rx (@$ref) {
                 if (UNIVERSAL::isa($rx,'Regexp')) {
                     if (! defined($value) || $value !~ $rx) {
-                        push @errors, [$field, $type, $field_val, $ifs_match];
+                        push @errors, [$field_prefix.$field, $type, $field_val, $ifs_match];
                     }
                 } else {
                     if ($rx !~ m/^(!\s*|)m([^\s\w])(.*)\2([eigsmx]*)$/s) {
@@ -478,7 +570,7 @@ sub validate_buddy {
                     if ( (     $not && (  defined($value) && $value =~ m/(?$opt:$pat)/))
                          || (! $not && (! defined($value) || $value !~ m/(?$opt:$pat)/)) ) {
                         return [] if $self->{'_check_conditional'};
-                        push @errors, [$field, $type, $field_val, $ifs_match];
+                        push @errors, [$field_prefix.$field, $type, $field_val, $ifs_match];
                     }
                 }
             }
@@ -518,7 +610,7 @@ sub validate_buddy {
                 }
                 if (! $test) {
                     return [] if $self->{'_check_conditional'};
-                    push @errors, [$field, $type, $field_val, $ifs_match];
+                    push @errors, [$field_prefix.$field, $type, $field_val, $ifs_match];
                 }
             }
             $content_checked = 1;
@@ -540,7 +632,7 @@ sub validate_buddy {
             if ( (! $return && $field_val->{"${type}_error_if"})
                  || ($return && ! $field_val->{"${type}_error_if"}) ) {
                 return [] if $self->{'_check_conditional'};
-                push @errors, [$field, $type, $field_val, $ifs_match];
+                push @errors, [$field_prefix.$field, $type, $field_val, $ifs_match];
             }
             $content_checked = 1;
         } }
@@ -558,17 +650,16 @@ sub validate_buddy {
                 next if $check;
             }
             return [] if $self->{'_check_conditional'};
-            push @errors, [$field, $type, $field_val, $ifs_match, (defined($err) ? $err : ())];
+            push @errors, [$field_prefix.$field, $type, $field_val, $ifs_match, (defined($err) ? $err : ())];
             $content_checked = 1;
         } }
-
     }
 
     # allow for the data to be "untainted"
     # this is only allowable if the user ran some other check for the datatype
     if ($field_val->{'untaint'} && $#errors == -1) {
         if (! $content_checked) {
-            push @errors, [$field, 'untaint', $field_val, $ifs_match];
+            push @errors, [$field_prefix.$field, 'untaint', $field_val, $ifs_match];
         } else {
             # generic untainter - assuming the other required content_checks did good validation
             $_ = /(.*)/ ? $1 : die "Couldn't match?" foreach @$values;
@@ -587,7 +678,10 @@ sub validate_buddy {
 ### used to validate specific types
 sub check_type {
     my ($self, $value, $type) = @_;
+    $type = ref($type) eq 'Type::Tiny' ? $type :
+            ref($type) eq 'HASH' ? 'hash' : lc $type;
     $type = lc $type;
+    return 0 if ! defined($value) && $type ne 'code';
     if ($type eq 'email') {
         return 0 if ! $value;
         my ($local_p,$dom) = ($value =~ /^(.+)\@(.+?)$/) ? ($1,$2) : return 0;
@@ -595,7 +689,8 @@ sub check_type {
         return 0 if length($dom) > 100;
         return 0 if ! $self->check_type($dom,'domain') && ! $self->check_type($dom,'ip');
         return 0 if ! $self->check_type($local_p,'local_part');
-
+    } elsif ($type eq 'hash') {
+        return 0 if ref $value ne 'HASH';
     # the "username" portion of an email address - sort of arbitrary
     } elsif ($type eq 'local_part') {
         return 0 if ! defined($value) || ! length($value);
@@ -626,6 +721,10 @@ sub check_type {
         return 0 if ! $value;
         return 0 if $value =~ m/\s+/;
 
+    } elsif ($type eq 'code') {
+        return 0 if defined($value) && ref($value) ne 'CODE';
+    } elsif ($type eq 'str') {
+        return 0 if ref($value) || ! defined($value);
     } elsif ($type eq 'int') {
         return 0 if $value !~ /^-? (?: 0 | [1-9]\d*) $/x;
         return 0 if ($value < 0) ? $value < -2**31 : $value > 2**31-1;
@@ -634,6 +733,8 @@ sub check_type {
         return 0 if $value > 2**32-1;
     } elsif ($type eq 'num') {
         return 0 if $value !~ /^-? (?: 0 | [1-9]\d* (?:\.\d+)? | 0?\.\d+) $/x;
+    } elsif ($type eq 'unum') {
+        return 0 if $value !~ /^   (?: 0 | [1-9]\d* (?:\.\d+)? | 0?\.\d+) $/x;
 
     } elsif ($type eq 'cc') {
         return 0 if ! $value;
@@ -1037,6 +1138,8 @@ sub get_error_text {
 
         } elsif ($type eq 'type') {
             my $_type = $field_val->{"type${dig}"};
+            $_type = 'hash' if ref($_type) eq 'HASH';
+            $_type = '[]' if ref($_type) eq 'ARRAY';
             $return = "$name did not match type $_type.";
 
         } elsif ($type eq 'untaint') {

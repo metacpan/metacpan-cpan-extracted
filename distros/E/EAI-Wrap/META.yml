@@ -8,6 +8,7 @@ build_requires:
   Test::File: '0'
   Test::More: '0'
   Test::Timer: '0'
+  Time::Piece: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -21,6 +22,25 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  EAI::Common:
+    file: lib/EAI/Common.pm
+    version: '1.908'
+  EAI::DB:
+    file: lib/EAI/DB.pm
+    version: '1.908'
+  EAI::DateUtil:
+    file: lib/EAI/DateUtil.pm
+    version: '1.908'
+  EAI::FTP:
+    file: lib/EAI/FTP.pm
+    version: '1.908'
+  EAI::File:
+    file: lib/EAI/File.pm
+    version: '1.908'
+  EAI::Wrap:
+    file: lib/EAI/Wrap.pm
+    version: '1.908'
 recommends:
   Text::CSV_XS: '0'
   Win32::Console::ANSI: '0'
@@ -43,8 +63,9 @@ requires:
   Time::Local: '1.27'
   XML::LibXML: '0'
   XML::LibXML::Debugging: '0'
+  perl: '5.006'
 resources:
   bugtracker: https://github.com/rkapl123/EAI-Wrap/issues
   repository: https://github.com/rkapl123/EAI-Wrap.git
-version: '1.904'
+version: '1.908'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

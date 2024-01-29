@@ -1,0 +1,30 @@
+Revision history for meta
+
+0.004   2024-01-06
+        [CHANGES]
+         * Emit warnings in the `meta::experimental` category from all
+           entrypoint functions.
+         * Added `meta::package->get` and `meta::glob->get` constructors
+         * Added `->try_get_...` name variant of all the `can` methods
+         * Added `meta::glob->try_get`
+         * Added `meta::glob->get_or_add` and `$metapkg->get_or_add_symbol`
+
+        [BUGFIXES]
+         * Avoid C99-style variable declaration in for loop
+         * Make sure to define _MUST_SVTYPE_FROM_REFSV also for compilers that
+           lack PERL_USE_GCC_BRACE_GROUPS
+
+0.003   2023-12-31
+        [CHANGES]
+         * Add documentation pointing out it's experimental
+         * Add a SEE ALSO link to the PPC 0022 document
+        (no actual code change)
+
+0.002   2023-12-29
+        [CHANGES]
+         * Provide a real non-placeholder implementation
+
+0.001   2023-09-20
+        First version, released on an unsuspecting world.
+        Purely placeholder for the name while developing in devel versions
+

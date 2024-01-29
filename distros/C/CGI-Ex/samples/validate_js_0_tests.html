@@ -76,6 +76,13 @@ function run_tests () {
   e = validate({text1:1}, {text1:{required:1}});
   ok(! e, "Got no required error");
 
+  e = validate({}, {text1:{req:1}});
+  ok(e, "Got required error");
+  ok(e.text1_error == "The field text1 is required.", "Got the right required error (using req)");
+
+  e = validate({text1:1}, {text1:{req:1}});
+  ok(! e, "Got no required error (using req)");
+
   // validate_if
 
   e = validate({}, {text1:{required:1, validate_if:'text2'}});
@@ -135,6 +142,11 @@ function run_tests () {
   e = validate({text1:1}, v);
   ok(! e, "No enum error");
 
+  v['group type_ne_required'] = 1;
+  e = validate({}, v);
+  ok(!e, "type_ne_required - ok if no val");
+  ok(1, JSON.stringify(e));
+
   v = {text1:{'enum':[1, 2, 3],match:'m/3/'}};
   e = validate({text1:1}, v);
   ok(e, 'enum');
@@ -144,7 +156,7 @@ function run_tests () {
   ok(e, 'enum');
   ok(e.text1_error == "The field text1 is not in the given list.", 'enum shortcircuit2');
 
-  v = {text2:{'enum':"1 || 2||3"}};
+  v = {'group type_ne_required': 1, text2:{'enum':"1 || 2||3"}};
   e = validate({text2:1}, v);
   ok(! e, "No enum error");
   e = validate({text2:4}, v);
@@ -395,18 +407,34 @@ function run_tests () {
   ok(e, "Got cc error");
   e = validate({text1:'4241-4242-4242'}, {text1:{type:'cc'}});
   ok(e, "Got cc error");
-  for (var $_ in {"0":1, "2":1, "23":1, "-0":1, "-2":1, "-23":1, "0.0":1, ".1":1, "0.1":1, "0.10":1, "1.0":1, "1.01":1})
+  ["0", 2, "23", "-0", "-2", "-23", "0.0", .1, "0.1", "0.10", "1.0", "1.01"].forEach(function ($_) {
     ok(!validate({text1: $_}, {text1: {type: 'num'}}),  "Type num "+$_)
-  for (var $_ in {"0":1, "2":1, "23":1, "-0":1, "-2":1, "-23":1, "2147483647":1, "-2147483648":1})
+  });
+  ["0", 2, "23", "0.0", .1, "0.1", "0.10", "1.0", "1.01"].forEach(function ($_) {
+    ok(!validate({text1: $_}, {text1: {type: 'unum'}}),  "Type unum "+$_)
+  });
+  ["0", "2", "23", "-0", "-2", "-23", "2147483647", "-2147483648"].forEach(function ($_) {
     ok(!validate({text1: $_}, {text1: {type: 'int'}}),  "Type int "+$_);
-  for (var $_ in {"0":1, "2":1, "23":1, "4294967295":1})
+  });
+  ["0", "2", "23", "4294967295"].forEach(function ($_) {
     ok(!validate({text1: $_}, {text1: {type: 'uint'}}), "Type uint "+$_);
-  for (var $_ in {"0a":1, "a2":1, "-0a":1, "0..0":1, "00":1, "001":1, "1.":1})
+  });
+  ['', 12, '0', '2', 'a'].forEach(function ($_) {
+    ok(!validate({text1: $_}, {text1: {type: 'str'}}), "Type str "+$_);
+  });
+
+  ["0a", "a2", "-0a", "0..0", "00", "001", "1."].forEach(function ($_) {
     ok(validate({text1: $_},  {text1: {type: 'num'}}),  "Type num invalid "+$_);
-  for (var $_ in {"1.1":1, "0.1":1, "0.0":1, "-1.1":1, "0a":1, "a2":1, "a":1, "00":1, "001":1, "2147483648":1, "-2147483649":1})
+  });
+  ["-0", -2, "-23"].forEach(function ($_) {
+    ok(validate({text1: $_}, {text1: {type: 'unum'}}),  "Type unum invalid "+$_)
+  });
+  ["1.1", "0.1", "0.0", "-1.1", "0a", "a2", "a", "00", "001", "2147483648", "-2147483649"].forEach(function ($_) {
     ok(validate({text1: $_},  {text1: {type: 'int'}}),  "Type int invalid "+$_);
-  for (var $_ in {"-1":1, "-0":1, "1.1":1, "0.1":1, "0.0":1, "-1.1":1, "0a":1, "a2":1, "a":1, "00":1, "001":1, "4294967296":1})
+  });
+  ["-1", "-0", "1.1", "0.1", "0.0", "-1.1", "0a", "a2", "a", "00", "001", "4294967296"].forEach(function ($_) {
     ok(validate({text1: $_},  {text1: {type: 'uint'}}), "Type uint invalid "+$_);
+  });
 
   // min_in_set checks
   v = {text1:{min_in_set:'2 of text1 text2 password1', max_values:5}};

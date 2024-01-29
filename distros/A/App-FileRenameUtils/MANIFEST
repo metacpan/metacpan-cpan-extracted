@@ -9,6 +9,7 @@ README
 dist.ini
 lib/App/FileMoveUtils.pm
 lib/App/FileRenameUtils.pm
+script/datestamp
 script/move-files-here
 script/mv-add-prefix
 script/mv-add-prefix-datestamp

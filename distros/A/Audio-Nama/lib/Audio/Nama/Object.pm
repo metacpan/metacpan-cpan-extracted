@@ -1,13 +1,14 @@
 package Audio::Nama::Object;
-use Modern::Perl;
+use Modern::Perl '2020';
+our $VERSION = 1.05;
 use Carp;
 use Audio::Nama::Assign qw(json_out); 
 use Storable qw(dclone);
 use Data::Dumper::Concise;
+no strict 'refs';
+no strict 'subs';
 
-no strict; # Enable during dev and testing
 BEGIN {
-	require 5.004;
 	$Audio::Nama::Object::VERSION = '1.04';
 }
 

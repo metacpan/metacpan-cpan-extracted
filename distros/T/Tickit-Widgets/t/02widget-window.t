@@ -43,8 +43,9 @@ is_oneref( $widget, '$widget has refcount 1 at EOF' );
 
 done_testing;
 
-use Object::Pad;
-class TestWidget :isa(Tickit::Widget) {
+use Object::Pad 0.807;
+class TestWidget {
+   inherit Tickit::Widget;
    use constant WIDGET_PEN_FROM_STYLE => 1;
 
    method render_to_rb

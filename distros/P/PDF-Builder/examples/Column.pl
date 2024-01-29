@@ -6,8 +6,8 @@ use PDF::Builder;
 #use Data::Dumper; # for debugging
 # $Data::Dumper::Sortkeys = 1; # hash keys in sorted order
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.025'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 my $use_Table = 1; # if 1, use PDF::Table for table example
 # TBD automatically check if PDF::Table available, and if so, use it
@@ -288,41 +288,41 @@ if ($use_Table) {
     my $table = PDF::Table->new();
     my $table_data = [
         # row 1, solid color lines
-    	[   
- 	    [ 'html', '<font color="red">This is some red text</font>',
-	      { 'font_size' => 12, 'para' => [ 0, 0 ] } ], 
+	[
+	    [ 'html', '<font color="red">This is some red text</font>',
+	      { 'font_size' => 12, 'para' => [ 0, 0 ] } ],
             [ 'html', "<span style=\"color:green\">This is some green text</span>",
-	      { 'font_size' => 12, 'para' => [ 0, 0 ] } ], 
-	], 
+	      { 'font_size' => 12, 'para' => [ 0, 0 ] } ],
+	],
 
         # row 2, special symbols, colored
 	[
-    	    [ 'html', 'This is a red cross: <font face="ZapfDingbats" color="red">8</font>.', 
-	      { 'font_size' => 12, 'para' => [ 0, 0 ] } ], 
-    	    [ 'html', "This is a green tick: <span style=\"font-family:ZapfDingbats; color:green\">4</span>.", 
+	    [ 'html', 'This is a red cross: <font face="ZapfDingbats" color="red">8</font>.',
+	      { 'font_size' => 12, 'para' => [ 0, 0 ] } ],
+	    [ 'html', "This is a green tick: <span style=\"font-family:ZapfDingbats; color:green\">4</span>.",
 	      { 'font_size' => 12, 'para' => [ 0, 0 ] } ], 
         ],
 
         # row 3, like row 2, but using macro substitutions
 	[
-    	    [ 'html', "This is a red cross substitute: %cross%.", 
-	      { 'font_size'=>12, 'para'=>[ 0, 0 ], 
-    		'substitute'=>[
-    		    ['%cross%','<font face="ZapfDingbats" color="red">', '8', '</font>'],
-    		    ['%tick%','<span style="font-family: ZapfDingbats; color: green;">', '4', '</span>'] ]
-	      } 
-            ],
-    	    [ 'html', "This is a green tick substitute: %tick%.", 
-    	      { 'font_size'=>12, 'para'=>[ 0, 0 ], 
-    		'substitute'=>[
-    		    ['%cross%','<font face="ZapfDingbats" color="red">', '8', '</font>'],
-    		    ['%tick%','<span style="font-family: ZapfDingbats; color: green;">', '4', '</span>'] ]
+	    [ 'html', "This is a red cross substitute: %cross%.",
+	      { 'font_size'=>12, 'para'=>[ 0, 0 ],
+		'substitute'=>[
+		    ['%cross%','<font face="ZapfDingbats" color="red">', '8', '</font>'],
+		    ['%tick%','<span style="font-family: ZapfDingbats; color: green;">', '4', '</span>'] ]
 	      }
             ],
-	],
+	    [ 'html', "This is a green tick substitute: %tick%.",
+	      { 'font_size'=>12, 'para'=>[ 0, 0 ],
+		'substitute'=>[
+		    ['%cross%','<font face="ZapfDingbats" color="red">', '8', '</font>'],
+		    ['%tick%','<span style="font-family: ZapfDingbats; color: green;">', '4', '</span>'] ]
+	      }
+            ],
+  	],
 
         # row 4, non-markup text
-	[ 'Plain old text', 
+	[ 'Plain old text',
 	  'More plain text'
         ],
 	             ];
@@ -447,6 +447,23 @@ $content = <<"END_OF_CONTENT";
 
 A Perl library to facilitate the creation and modification of PDF files
 
+## What is it?
+
+PDF::Builder is a **fork** of the popular PDF::API2 Perl library. It provides a 
+library of modules and functions so that a PDF file (document) may be built and 
+maintained from Perl programs. It is not a WYSIWYG editor; nor is it a canned 
+utility or converter. It does _not_ have a GUI -- it is driven by your Perl 
+program. It is a set of **building blocks** with which you can perform a wide 
+variety of operations, ranging from basic operations such as selecting a font 
+face, to defining an entire page at a time in the document, using a large 
+subset of either Markdown or HTML markup languages. You can call it from 
+arbitrary Perl programs, which may even create content on-the-fly (or read it 
+in from other sources). Quite a few code examples are provided, to help you to 
+get started with the process of creating a PDF document. Many enhancements are 
+in the pipeline to make PDF::Builder even more powerful and versatile.
+
+[Home Page](https://www.catskilltech.com/FreeSW/product/PDF%2DBuilder/title/PDF%3A%3ABuilder/freeSW_full), including Documentation and Examples.
+
 [![Open Issues](https://img.shields.io/github/issues/PhilterPaper/Perl-PDF-Builder)](https://github.com/PhilterPaper/Perl-PDF-Builder/issues)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://makeapullrequest.com)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/PhilterPaper/Perl-PDF-Builder/graphs/commit-activity)
@@ -478,7 +495,7 @@ By default, none are installed.
 
 ### Perl
 
-**Perl 5.24** or higher. It will likely run on somewhat earlier versions, but
+**Perl 5.26** or higher. It will likely run on somewhat earlier versions, but
 the CPAN installer may refuse to install it. The reason this version was
 chosen was so that LTS (Long Term Support) versions of Perl going back about
 6 years are officially supported (by PDF::Builder), and older versions are not
@@ -487,14 +504,14 @@ are an artifact of old Perl releases.
 
 #### Older Perls
 
-If you MUST install on an older (pre 5.24) Perl, you can try the following for
+If you MUST install on an older (pre 5.26) Perl, you can try the following for
 Strawberry Perl (Windows). NO PROMISES! Something similar MAY work for other
 OS's and Perl installations:
 
 1. Unpack installation file (`.tar.gz`, via a utility such as 7-Zip) into a directory, and cd to that directory
-1. Edit META.json and change 5.024000 to 5.016000 or whatever level desired
-1. Edit META.yml and change 5.024000 to 5.016000 or whatever level desired
-1. Edit Makefile.PL and change `use 5.024000;` to `use 5.016000;`, change `\$PERL_version` from `5.024000` to `5.016000`
+1. Edit META.json and change 5.026000 to 5.016000 or whatever level desired
+1. Edit META.yml and change 5.026000 to 5.016000 or whatever level desired
+1. Edit Makefile.PL and change `use 5.026000;` to `use 5.016000;`, change `\$PERL_version` from `5.026000` to `5.016000`
 1. `cpan .`
 
 Note that some Perl installers MAY have a means to override or suppress the
@@ -529,11 +546,13 @@ matters, especially if an optional package fails to install. You can always
 manually install them later, if you desire to make use of their added 
 functionality.
 
+* Perl::Critic (1.150 or higher, need if running tools/1\_pc.pl)
 * Graphics::TIFF (19 or higher, recommended if using TIFF image functions)
 * Image::PNG::Libpng (0.57 or higher, recommended for enhanced PNG image function processing)
 * HarfBuzz::Shaper (0.024 or higher, needed for Latin script ligatures and kerning, as well as for any complex script such as Arabic, Indic scripts, or Khmer)
 * Text::Markdown (1.000031 or higher, needed if using 'md1' markup)
 * HTML::TreeBuilder (5.07 or higher, needed if using 'html' or 'md1' markup)
+* Pod::Simple::XHTML (3.45 or higher, needed if using buildDoc utility to create HTML documentation)
 
 If an optional package is needed, but not installed, sometimes PDF::Builder
 will be able to fall back to built-in partial functionality (TIFF and PNG 
@@ -564,7 +583,8 @@ have it under a different name, such as dmake (Strawberry Perl on Windows),
 gmake, or nmake.
 
 PDF::Builder does not currently compile and link anything, so gcc, g++, etc.
-will not be used. The build process merely copies .pm files around.
+will not be used. The build process merely copies .pm files around, and
+runs the "t" tests to confirm the proper installation.
 
 ## Copyright
 
@@ -590,11 +610,24 @@ redistribute and/or modify this software (those portions under LGPL) at an
 LGPL version greater than 2.1. See INFO/LICENSE for more information on the
 licenses and warranty statement.
 
+### Carrying On...
+
+PDF::Builder is Open Source software, built upon the efforts not only of the
+current maintainer, but also of many people before me. Therefore, it's perfectly
+fair to make use of the algorithms and even code (within the terms of the
+LICENSE). That's exactly how the State of the
+Art progresses! Just please be considerate and acknowledge the work of others
+that you are building on, as well as pointing back to this package. Drop us a
+note with news of your project (if based on the code and algorithms in
+PDF::Builder, or even just heavily inspired by it) and we'll be happy to make
+a pointer to your work. The more cross-pollination, the better!
+
 ## See Also
 
-* INFO/RoadMap file for the PDF::Builder road map
 * CONTRIBUTING file for how to contribute to the project
 * LICENSE file for more on the license term
+* INFO/RoadMap file for the PDF::Builder road map
+* INFO/ACKNOWLEDGE.md for "thank yous" to those who contributed to this product
 * INFO/SUPPORT file for information on reporting bugs, etc. via GitHub Issues 
 * INFO/DEPRECATED file for information on deprecated features
 * INFO/KNOWN\_INCOMP file for known incompatibilities with PDF::API2
@@ -610,6 +643,10 @@ To build the full HTML documentation (all the POD), get the full installation
 and go to the `docs/` directory. Run `buildDoc.pl --all` to generate the full
 tree of documentation. There's a lot of additional information in the
 PDF::Builder::Docs module (it's all documentation).
+
+You may find it more convenient to point your browser to our 
+[Home Page](https://www.catskilltech.com/FreeSW/product/PDF-Builder/title/PDF%3A%3ABuilder/freeSW_full)
+to see the full documentation build (as well as most of the example outputs).
 
 We admit that the documentation is a bit light on "how to" task orientation.
 We hope to more fully address this in the future, but for now, get the full
@@ -774,8 +811,53 @@ if ($rc) {
     print STDERR "list example overflowed column!\n";
 }
 
-# block quotes and font extent changes
+# Counting down (reversed) ordered lists
 print "======================================================= pg 11\n";
+print "---- Count down list examples\n";
+$page = $pdf->page();
+$text = $page->text();
+$grfx = $page->gfx();
+
+$content = <<"END_OF_CONTENT";
+<h2>Test reversed ordered lists</h2>
+<ol reversed="1" start="10">
+  <li>ten</li>
+  <li>nine</li>
+  <li>eight</li>
+  <li>seven</li>
+  <li>six</li>
+  <li>five
+  <ol>
+    <li>holding</li>
+    <li>resume countdown</li>
+  </ol></li>
+  <li>four</li>
+  <li>three</li>
+  <li>two</li>
+  <li>one</li>
+</ol>
+<h2>Reversed ordered list run past 1</h2>
+<ol reversed="1" start="3">
+  <li>three</li>
+  <li>two</li>
+  <li>one</li>
+  <li>zero... blast off!</li>
+  <li>minus one... the clock is running</li>
+</ol>
+END_OF_CONTENT
+
+restore_props($text, $grfx);
+($rc, $next_y, $unused) =
+    $text->column($page, $text, $grfx, 'html', $content, 
+	          'rect'=>[50,750, 500,450], 'outline'=>$magenta, 
+		  'para'=>[ 0, 0 ] );
+if ($rc) {
+    print STDERR "list example overflowed column!\n";
+}
+
+
+# block quotes and font extent changes
+print "======================================================= pg 12\n";
 print "---- Block quotes\n";
 $page = $pdf->page();
 $text = $page->text();
@@ -841,7 +923,7 @@ if ($rc) {
 }
 
 # setting your own CSS for Markdown or none
-print "======================================================= pg 12\n";
+print "======================================================= pg 13\n";
 $page = $pdf->page();
 $text = $page->text();
 $grfx = $page->gfx();
@@ -965,11 +1047,18 @@ if ($rc) {
 
 # might have to go to a column2.pl!
 # demonstrate balanced columns two long columns and one short, first pass
-#   fill blindly, then by trial-and-error shorten long columns until short
-#   one just fills (show initial and final runs)
+#   fill blindly, overflowing to column 2 then 3, then by trial-and-error
+#   shorten long two columns until short one just fills (show initial and
+#   final runs). graphic X-out block for ad.
+#   headline in English Towne Medium (.otf) "New Yawk Times" ("All the news
+#   that fits, we print!"). Headline under it (across 3 columns): "Congress
+#   Does Something Stoopid". Lorem Ipsum for body text.
+#   continuation to page __ method? text to output for very last line in col.
 # demonstrate column shapes that split line in two (only first part used)
 # demonstrate irregularly shaped columns, including a bowtie scaled 3 times
-# demonstrate two column layout with insets and marginpar
+# demonstrate two column layout with insets and marginpar (inset routine to
+#   place text w/ hr's, return cutout outline for columns outline creation,
+#   intersect with rectangles for columns)
 # demonstrate a circular column, etc.
 # demonstrate a spline column cutout, with image in background with edges
 #   that fade away so text can overlap outer fringes of image

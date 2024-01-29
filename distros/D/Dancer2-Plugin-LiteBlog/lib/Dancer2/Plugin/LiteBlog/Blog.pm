@@ -77,7 +77,11 @@ sub has_rss { 1 }
 =head2 elements
 
 Read-only attribute that contains a list of featured posts to show on the home
-page widget section.  If a C<featured_post> entry is found in the C<blog-meta>
+page widget section.  
+
+If C<no_widget> is set, return nothing (no widget will be rendered on the home page).
+
+If a C<featured_post> entry is found in the C<blog-meta>
 file of the widget, use this. If not, returns the last 3 posts published.  Each
 post is represented as an instance of the L<Dancer2::Plugin::LiteBlog::Article>
 class.
@@ -92,6 +96,9 @@ has elements => (
     default => sub {
         my ($self) = @_;
         
+        my $disabled = $self->meta->{'no_widget'};
+        return [] if $disabled;
+
         # A featured_posts entry is defined in the blog config...
         my $featured_posts = $self->meta->{'featured_posts'};
         return $self->featured_posts() if defined $featured_posts;
@@ -548,7 +555,7 @@ Examples:
             $self->info("In $prefix/$category");
 
             if (! -d File::Spec->catdir($self->root, $category)) {
-                return $plugin->render_client_error("Invalid category requested: '$category'");
+                $plugin->dsl->pass();
             }
             my $articles = $self->select_articles(category => $category, limit => 6);
             $self->info("retrieved ".scalar(@$articles)." articles");

@@ -20,8 +20,18 @@ sub wav_format{
 	my $track = shift;
 	Audio::Nama::wav_format($track->full_path)
 }
-
-	
+sub wav_width {
+	my $track = shift;
+	no warnings 'uninitialized';
+ 	my ($depth,$width,$freq) = split ',', $track->wav_format;
+	$width
+}
+sub wav_frequency {
+	my $track = shift;
+	no warnings 'uninitialized';
+ 	my ($depth,$width,$freq) = split ',', $track->wav_format;
+	$freq
+}
 sub dir {
 	my $self = shift;
 	 $self->project  
@@ -48,7 +58,7 @@ sub current_wav {
 	my $last = $track->current_version;
 	if 	($track->rec){ 
 		$track->name . '_' . $last . '.wav'
-	} elsif ( $track->rw eq PLAY){ 
+	} elsif ( $track->rw ne MON){ 
 		my $filename = $track->targets->{ $track->playback_version } ;
 		$filename
 	} else {
@@ -62,14 +72,14 @@ sub current_version {
 
 	# two possible version numbers, depending on REC/PLAY status
 	
-	if 	($track->rec)
+	if 	($track->{rw} eq REC)
 	{ 
 		my $last = $config->{use_group_numbering} 
 					? Audio::Nama::Bus::overall_last()
 					: $track->last;
 		return ++$last
 	}
-	elsif ($track->play){ return $track->playback_version } 
+	elsif ($track->{rw} ne MON){ return $track->playback_version } 
 	else { return 0 }
 }
 

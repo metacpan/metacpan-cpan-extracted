@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 use UI::Various::core;
 use UI::Various::Button;
@@ -92,9 +92,11 @@ sub _prepare($$$)
 	return 1;
     }
     my $width = $self->_needed_width;
+    my @attributes = $self->_common_attributes();
     $self->_cui($_->_cui
 		->add($self->_cid,
 		      'Buttonbox', -x => $column, -y => $row, -width => $width,
+		      @attributes,
 		      -buttons =>
 		      [{-label => $self->text,
 			(defined $self->{align}

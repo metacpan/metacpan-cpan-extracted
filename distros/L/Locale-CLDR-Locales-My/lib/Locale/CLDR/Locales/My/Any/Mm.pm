@@ -8,13 +8,13 @@ Locale::CLDR::Locales::My::Any::Mm - Package for language Burmese
 
 package Locale::CLDR::Locales::My::Any::Mm;
 # This file auto generated from Data\common\main\my_MM.xml
-#	on Tue  5 Dec  1:22:54 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';

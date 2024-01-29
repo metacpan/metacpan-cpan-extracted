@@ -62,7 +62,7 @@ sub validate_registration {
     );
 
     my $registration_params = merge {
-        challenge_b64 => $challenge,
+        challenge_b64        => $challenge,
         client_data_json_b64 =>
           encode_base64url( $credential->{response}->{clientDataJSON} ),
         attestation_object_b64 =>
@@ -93,7 +93,7 @@ sub validate_authentication {
     );
 
     my $assertion_params = merge {
-        challenge_b64 => $challenge,
+        challenge_b64         => $challenge,
         credential_pubkey_b64 =>
           encode_base64url( $authenticator->encode_cosekey ),
         client_data_json_b64 =>
@@ -119,6 +119,10 @@ sub test_registration {
     if ($exception_message) {
         like( $exception, $exception_message,
             "$test_name fails with expected message" );
+    }
+    elsif ($exception) {
+        fail($test_name);
+        diag("Exception: $exception");
     }
     else {
         is( $res->{attestation_result}->{success}, 1, "$test_name succeeds" );
@@ -184,6 +188,13 @@ test_registration(
     { response => { clientDataJSON => { challenge => "xxx" } } },
     "Fails with wrong challenge",
     qr,Challenge received from client data.*does not match server challenge,
+);
+
+test_registration(
+    { allowed_attestation_types => ["Basic"] },
+    {},
+    "Fails with disallowed attestation type",
+    qr,Attestation type None is not allowed,
 );
 
 # Authentication tests

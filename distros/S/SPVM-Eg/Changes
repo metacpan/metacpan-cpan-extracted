@@ -1,0 +1,119 @@
+0.014 2024-01-25
+  [New Features]
+    * Add many Node child classes.
+  [Incompatible Changes]
+    * Rename the Eg::Node::Document class to Eg::Node::Document::HTML, and add Eg::Node::Document.
+0.013 2024-01-24
+  [New Features]
+    * Add the create_element method to the Eg::Document class.
+    * Add the create_text_node method to the Eg::Document class.
+    * Add the create_comment method to the Eg::Document class.
+    * Add the document method to the Eg class.
+    * Add many Eg::HTMLElement classes.
+    * Add the Eg::DOMImplementation class.
+    * Add the empty Eg::URL class.
+  [Incompatible Changes]
+    * Many things are changed.
+    * All tag methods are removed from the Eg class.
+    * Many classes are renamed.
+0.012 2024-01-13
+  [New Features]
+    * Add the append method to the Eg::Node class.
+    * Add the prepend method to the Eg::Node class.
+    * Add the after method to the Eg::Node class.
+    * Add the before method to the Eg::Node class.
+    
+  [Incompatible Changes]
+    * The Eg::Document class extends Eg::Node.
+    
+0.011 2024-01-12
+  [Incompatible Changes]
+    * Rename the document method in the Eg class to the new_document method.
+    * Many things are drastically changed.
+0.010 2024-01-11
+  [New Features]
+    * Add the Eg::EventTarget class.
+    * Add the Eg::Window class.
+    * Add the Eg::Document class.
+    * The Eg::Node class extends The Eg::EventTarget class.
+    * Add the Eg::API class.
+    * Add the Eg::API::Window class.
+    * Add the Eg::Location class.
+    * Add the Eg::URLSearchParams class.
+    * Add the Eg::History class.
+0.009 2024-01-10
+  [Incompatible Changes]
+    * Rename the attribute method in the Eg::Node class to the attribute_pairs method.
+    * Rename the styles method in the Eg::Node class to the styles_pairs method.
+0.008 2024-01-10
+  [New Features]
+    * Add the attributes method to the Eg::Node class.
+    * Add the exists_attr method to the Eg::Node class.
+    * Add the remove_attr method to the Eg::Node class.
+    * Add the styles method to the Eg::Node class.
+    * Add the exists_css method to the Eg::Node class.
+    * Add the remove_css method to the Eg::Node class.
+    * Add the children method to the Eg::Node class.
+    
+  [Incompatible Changes]
+    * Remove the Eg::Attributes class.
+    * Remove the attributes field from the Eg::Node.
+    * Attributes in the Eg::Node is created on demand.
+    * Rename the text_buffer field in the Eg::Node class to the value_buffer field.
+    * Rename the nodes field in the Eg::Node class to the child_nodes_list field.
+    * Rename the new_document method in the Eg::Node class to the new_document_node field.
+    * Rename the new_element method in the Eg::Node class to the new_element_node field.
+    * Rename the new_text method in the Eg::Node class to the new_text_node field.
+0.007 2024-01-09
+  [New Features]
+    * Add the new_document method to the Eg::Node class.
+    * Add the document method to the Eg class.
+  [Incompatible Changes]
+    * The html and html_ methods in the Eg checks nodes.
+    * Remove the style field from the Eg::Attributes class and add the style field to the Eg::Node class.
+    
+0.006 2024-01-06
+  [Incompatible Changes]
+    * Rename the text field in the Eg::Node class to the text_buffer method.
+    * Allow tag methods the string type argument.
+  [New Features]
+    * Add the text method to the Eg::Node class.
+    * Add the set_text method to the Eg::Node class.
+    
+0.005 2024-01-05
+  [Incompatible Changes]
+    * All are drastically changed.
+  [Requirement Changes]
+    * Require SPVM::Regex 0.244.
+0.004 2023-12-26
+  [New Features]
+    * Add the new_text method to the Eg::Node class.
+    * Add the new_element method to the Eg::Node class.
+    * Add the parent field to the Eg::Node class.
+0.003 2023-12-26
+  [New Features]
+    * Add the style field to the Eg::Node.
+  [Incompatible Changes]
+    * The style attribute is removed from the key of the attribute field, and the style field is set to the value.
+0.002 2023-12-26
+  [Incompatible Changes]
+    * Rename Eg::Element to Eg::Node.
+    * Rename the elements field in the Eg::Node to nodes.
+    * Change enumeration for the type field in the Eg::Node.
+    
+      enum {
+        TYPE_ELEMENT_NODE = 1,
+        TYPE_ATTRIBUTE_NODE = 2,
+        TYPE_TEXT_NODE = 3,
+        TYPE_CDATA_SECTION_NODE = 4,
+        TYPE_PROCESSING_INSTRUCTION_NODE = 7,
+        TYPE_COMMENT_NODE = 8,
+        TYPE_DOCUMENT_NODE = 9,
+        TYPE_DOCUMENT_TYPE_NODE = 10,
+        TYPE_DOCUMENT_FRAGMENT_NODE = 11,
+      }
+
+0.001 2023-12-25
+  [Changes]
+    * First release.
+  

@@ -1,3 +1,12 @@
+1.09
+
+- No user visible changes. Increased minimum Mojolicious version to
+  9.00.
+
+1.08
+
+- Add list of latest posts.
+
 1.07
 
 - Add line-wrapping before posting.

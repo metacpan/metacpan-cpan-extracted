@@ -1,7 +1,7 @@
 package Math::Window2Viewport;
 use strict;
 use warnings FATAL => 'all';
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 sub new {
     my $class = shift;
@@ -169,6 +169,8 @@ directory for more.
 
 =item * L<https://www.cs.mtsu.edu/~jhankins/files/4250/notes/WinToView/WinToViewMap.html>
 
+=item * L<https://web.archive.org/web/20090525013259/https://www.cs.mtsu.edu/~jhankins/files/4250/notes/WinToView/WinToViewMap.html>
+
 =back
 
 =head1 AUTHOR
@@ -177,7 +179,7 @@ Jeff Anderson, C<< <jeffa at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Jeff Anderson.
+Copyright 2024 Jeff Anderson.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

@@ -28,6 +28,11 @@ sub function_with_no_col {
         return "CURRENT_TIMESTAMP"; # ansi 2003
         # "CURRENT_TIMESTAMP(9)"
     }
+    elsif ( $func =~ /^RAND\z/i ) {
+        return "RANDOM()"          if $driver =~ /^(?:SQLite|Pg)\z/;
+        return "DBMS_RANDOM.VALUE" if $driver eq 'Oracle';
+        return "RAND()";
+    }
     else {
         return "$func()"; # none
     }
@@ -54,6 +59,9 @@ sub function_with_col {
         return "LENGTH($col)"             if $driver =~ /^(?:SQLite|Oracle)\z/;
         return "CHAR_LENGTH($col)"; # ansi 2003
     }
+    elsif ( $func =~ /^(?:YEAR|QUARTER|MONTH|WEEK|DAY|HOUR|MINUTE|SECOND|DAYOFWEEK|DAYOFYEAR)\z/ ) {
+        return $sf->function_with_col_and_arg( 'EXTRACT', $col, $func );
+    }
     else {
         return "$func($col)";
     }
@@ -71,56 +79,43 @@ sub function_with_col_and_arg {
         if ( $driver eq 'SQLite' ) {
             return "CEILING(strftime('%m',$col)/3.00)" if $arg eq 'QUARTER';
             my %map = ( YEAR => '%Y', MONTH => '%m', WEEK => '%W', DAY => '%d', HOUR => '%H', MINUTE => '%M', SECOND => '%S',
-                        DAY_OF_YEAR => '%j', DAY_OF_WEEK => '%w',
+                        DAYOFYEAR => '%j', DAYOFWEEK => '%w',
             );
             if ( $map{ uc( $arg ) } ) {
                 $arg = "'" . $map{ uc( $arg ) } . "'";
             }
             return "strftime($arg,$col)";
         }
-        elsif ( $arg eq 'QUARTER' ) {
-            return "QUARTER($col)"              if $driver =~ /^(?:mysql|MariaDB|DB2|Informix)\z/;
-            return "EXTRACT(QUARTER FROM $col)" if $driver eq 'Pg';
-            return "to_char($col,'Q')"          if $driver eq 'Oracle';
-            return "CEILING(EXTRACT(MONTH FROM $col)/3.00)"
-        }
-        elsif ( $arg eq 'WEEK' ) {
-            return "to_char($col,'WI')" if $driver eq 'Oracle'; # WW
-            return "EXTRACT($arg FROM $col)";
-        }
-        elsif ( $arg eq 'DAY_OF_WEEK' ) {
-            # SQLite: '%w': 0 = Sunday
-
+        elsif ( $driver =~ /^(?:mysql|MariaDB|DB2|Informix)\z/ ) {
+            return "EXTEND($col,$arg to $arg)" if $driver eq 'Informix' && $arg =~ /^(?:HOUR|MINUTE|SECOND)\z/;
+            return "$arg($col)";
             # mysql: WEEKDAY:   0 = Monday
             # mysql: DAYOFWEEK: 1 = Sunday
-
-            # Firebird: EXTRACT(WEEKDAY ...): 0 = Sunday
-
-            # Pg: ISODOW: 1 = Monday
-            # Pg: DOW:    0 = Sunday
-
             # DB2: DAYOFWEEK_ISO: 1 = Monday
             # DB2: DAYOFWEEK:     1 = Sunday
-
-            # Informix: WEEKDAY:  0 = Sunday
-
-            # Oracle: to_char($col,'D'): 1 = Sunday
-
-            return "DAYOFWEEK($col)"            if $driver =~ /^(?:mysql|MariaDB)\z/;
-            return "EXTRACT(DOW FROM $col)"     if $driver eq 'Pg';
-            return "EXTRACT(WEEKDAY FROM $col)" if $driver eq 'Firebird';
-            return "DAYOFWEEK($col)"            if $driver eq 'DB2';
-            return "WEEKDAY($col)"              if $driver eq 'Informix';
-            return "to_char($col,'D')"          if $driver eq 'Oracle';
         }
-        elsif ( $arg eq 'DAY_OF_YEAR' ) {
-            return "DAYOFYEAR($col)"            if $driver =~ /^(?:mysql|MariaDB)\z/;
-            return "EXTRACT(DOY FROM $col)"     if $driver eq 'Pg';
-            return "EXTRACT(YEARDAY FROM $col)" if $driver eq 'Firebird';
-            return "DAYOFYEAR($col)"            if $driver eq 'DB2';
-            return "to_char($col,'DDD')"        if $driver eq 'Oracle';
+        elsif ( $driver eq 'Pg' ) {
+            return "EXTRACT(DOW FROM $col)" if $arg eq 'DAYOFWEEK';
+            return "EXTRACT(DOY FROM $col)" if $arg eq 'DAYOFYEAR';
+            return "EXTRACT($arg FROM $col)";
+            # Pg: ISODOW: 1 = Monday
+            # Pg: DOW:    0 = Sunday
+        }
+        elsif ( $driver eq 'Firebird' ) {
+            return "CEILING(EXTRACT(MONTH FROM $col)/3.00)" if $arg eq 'QUARTER';
+            return "EXTRACT(WEEKDAY FROM $col)"             if $arg eq 'DAYOFWEEK';
+            return "EXTRACT(YEARDAY FROM $col)"             if $arg eq 'DAYOFYEAR';
+            return "EXTRACT($arg FROM $col)";
+        }
+        elsif ( $driver eq 'Oracle' ) {
+            return "to_char($col,'Q')"   if $arg eq 'QUARTER';
+            return "to_char($col,'WI')"  if $arg eq 'WEEK'; # WW
+            return "to_char($col,'D')"   if $arg eq 'DAYOFWEEK';
+            return "to_char($col,'DDD')" if $arg eq 'DAYOFYEAR';
+            return "EXTRACT($arg FROM $col)";
         }
         else {
+            return "CEILING(EXTRACT(MONTH FROM $col)/3.00)" if $arg eq 'QUARTER';
             return "EXTRACT($arg FROM $col)"; # ansi 2003
         }
     }
@@ -149,14 +144,14 @@ sub function_with_col_and_arg {
         # DB2, Informix, Oracle: INSTR(string, substring, start, count)
         # Firebird: position(substring, string, start)
     }
-    #elsif ( $func =~ /^LEFT\z/i ) {
-    #    return "SUBSTR($col,1,$arg)" if $driver eq 'SQLite';
-    #    return "LEFT($col,$arg)";
-    #}
-    #elsif ( $func =~ /^RIGHT\z/i ) {
-    #    return "SUBSTR($col,-$arg)" if $driver eq 'SQLite';
-    #    return "RIGHT($col,$arg)";
-    #}
+    elsif ( $func =~ /^LEFT\z/i ) {
+        return "SUBSTR($col,1,$arg)" if $driver eq 'SQLite';
+        return "LEFT($col,$arg)";
+    }
+    elsif ( $func =~ /^RIGHT\z/i ) {
+        return "SUBSTR($col,-$arg)" if $driver eq 'SQLite';
+        return "RIGHT($col,$arg)";
+    }
     else {
         return "$func($col,$arg)";
     }
@@ -186,7 +181,7 @@ sub function_with_col_and_2args {
     elsif ( $func =~ /^LPAD\z/i ) {
         my $length = $arg1;
         my $fill = $arg2;
-        if ( $sf->{i}{driver} eq 'SQLite' ) {
+        if ( $driver eq 'SQLite' ) {
             $fill = ' ' if ! length $fill;
             $fill = $sf->{d}{dbh}->quote( $fill x $length );
             return "SUBSTR($fill||$col,-$length,$length)";
@@ -200,7 +195,7 @@ sub function_with_col_and_2args {
     elsif ( $func =~ /^RPAD\z/i ) {
         my $length = $arg1;
         my $fill = $arg2;
-        if ( $sf->{i}{driver} eq 'SQLite' ) {
+        if ( $driver eq 'SQLite' ) {
             $fill = ' ' if ! length $fill;
             $fill = $sf->{d}{dbh}->quote( $fill x $length );
             return "SUBSTR($col||$fill,1,$length)";
@@ -210,6 +205,16 @@ sub function_with_col_and_2args {
             $fill = $sf->{d}{dbh}->quote( $fill );
             return "RPAD($col,$length,$fill)";
         }
+    }
+    elsif ( $func =~ /^DATEADD\z/i ) {
+        my $amount = $arg1;
+        my $unit = $arg2;
+        return "DATETIME($col,'$amount $unit')"        if $driver eq 'SQLite';
+        return "DATE_ADD($col,INTERVAL $amount $unit)" if $driver =~ /^(?:mysql|MariaDB)\z/;
+        return "$col + INTERVAL '$amount $unit'"       if $driver eq 'Pg';
+        return "ADD_${unit}S($col,$amount)"            if $driver eq 'DB2';
+        return "$col + $amount UNITS $unit"            if $driver eq 'Informix';
+        return "DATEADD($unit,$amount,$col)";
     }
     else {
         return "$func($col,$arg1,$arg2)"; # none

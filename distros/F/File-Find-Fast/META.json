@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -22,10 +22,13 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Benchmark" : "0",
-            "File::Find" : "0",
-            "Path::Iterator::Rule" : "1.015",
-            "Test::More" : "0.47"
+            "Carp" : "0.1",
+            "Data::Dumper" : "0.1",
+            "Exporter" : "0.1",
+            "File::Basename" : "0.1",
+            "File::Spec" : "0.1",
+            "File::Temp" : "0.1",
+            "Getopt::Long" : "0.1"
          }
       },
       "configure" : {
@@ -37,6 +40,14 @@
          "requires" : {
             "perl" : "5.012000"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Benchmark" : "0.1",
+            "File::Find" : "0.1",
+            "Path::Iterator::Rule" : "1.015",
+            "Test::More" : "0.47"
+         }
       }
    },
    "release_status" : "stable",
@@ -47,6 +58,6 @@
          "web" : "https://github.com/lskatz/file-find-fast"
       }
    },
-   "version" : "v0.2.1",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "v0.4.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

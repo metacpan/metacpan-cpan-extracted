@@ -166,16 +166,16 @@ if(MPC_HEADER_V >= 66304) {
           );
 
 @ball = qw (
-Rmpcb_init Rmpcb_init_nobless Rmpcb_clear
-Rmpcb_get_prec Rmpcb_set Rmpcb_set_c Rmpcb_set_ui_ui Rmpcb_neg
-Rmpcb_add Rmpcb_mul Rmpcb_sqr Rmpcb_pow_ui Rmpcb_sqrt
-Rmpcb_div Rmpcb_div_2ui Rmpcb_set_inf
-Rmpcb_can_round Rmpcb_round Rmpcb_retrieve
+  Rmpcb_init Rmpcb_init_nobless Rmpcb_clear
+  Rmpcb_get_prec Rmpcb_set Rmpcb_set_c Rmpcb_set_ui_ui Rmpcb_neg
+  Rmpcb_add Rmpcb_mul Rmpcb_sqr Rmpcb_pow_ui Rmpcb_sqrt
+  Rmpcb_div Rmpcb_div_2ui Rmpcb_set_inf
+  Rmpcb_can_round Rmpcb_round Rmpcb_retrieve Rmpcb_out_str
          );
 }
 
     @Math::MPC::EXPORT_OK = (@tagged, @radius, @ball);
-    our $VERSION = '1.31';
+    our $VERSION = '1.32';
     #$VERSION = eval $VERSION;
 
     Math::MPC->DynaLoader::bootstrap($VERSION);
@@ -272,6 +272,7 @@ if(MPC_HEADER_V >= 66304) { # mpc library is at least version 1.3.0
   *Rmpcb_can_round = \&Math::MPC::Ball::Rmpcb_can_round;
   *Rmpcb_round = \&Math::MPC::Ball::Rmpcb_round;
   *Rmpcb_retrieve = \&Math::MPC::Ball::Rmpcb_retrieve;
+  *Rmpcb_out_str = \&Math::MPC::Ball::Rmpcb_out_str;
 }
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking

@@ -8,7 +8,7 @@ my $build = Module::Build->new(
    module_name => 'App::sdview',
    requires => {
       perl => '5.026',
-      'Object::Pad' => '0.800',
+      'Object::Pad' => '0.807',
       'Object::Pad::FieldAttr::Checked' => '0.04',
       'Types::Standard' => 0,
 
@@ -22,7 +22,7 @@ my $build = Module::Build->new(
       'Parse::Man::DOM' => '0.03',
       'Pod::Simple' => 0,
       'String::Tagged' => '0.15',
-      'String::Tagged::Markdown' => '0.02',
+      'String::Tagged::Markdown' => '0.05',
       'String::Tagged::Terminal' => 0,
       'Term::Size' => 0,
    },

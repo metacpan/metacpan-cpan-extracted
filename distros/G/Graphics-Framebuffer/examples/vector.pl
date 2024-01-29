@@ -8,16 +8,17 @@
 use strict;
 
 use Graphics::Framebuffer;
+
 # use Data::Dumper::Simple;
 
 BEGIN {
-	our $VERSION = '0.02';
-};
+    our $VERSION = '0.02';
+}
 
 my $F = Graphics::Framebuffer->new('SPLASH' => 0);
 
-my ($width,$height,$bpp) = $F->screen_dimensions();
-my ($xf,$yf) = ($width / 3840, $height / 2160);
+my ($width, $height, $bpp) = $F->screen_dimensions();
+my ($xf, $yf) = ($width / 3840, $height / 2160);
 
 open(my $FILE, '<', shift(@ARGV));
 chomp(my @text = <$FILE>);
@@ -101,7 +102,7 @@ my $cmd = {
             {
                 'x'          => shift(@_) * $xf,
                 'y'          => shift(@_) * $yf,
-                'radius'     => shift(@_) * (($xf + $yf)/2),
+                'radius'     => shift(@_) * (($xf + $yf) / 2),
                 'angle'      => shift(@_),
                 'pixel_size' => (scalar(@_)) ? shift(@_) : 1,
             }
@@ -206,9 +207,9 @@ my $cmd = {
                 'y'          => shift(@_) * $yf,
                 'xx'         => shift(@_) * $xf,
                 'yy'         => shift(@_) * $yf,
-                'filled'     => (scalar(@_)) ? shift(@_) : 0,
+                'filled'     => (scalar(@_)) ? shift(@_)       : 0,
                 'radius'     => (scalar(@_)) ? shift(@_) * $yf : 0,
-                'pixel_size' => (scalar(@_)) ? shift(@_) : 1,
+                'pixel_size' => (scalar(@_)) ? shift(@_)       : 1,
             }
         );
     },
@@ -219,9 +220,9 @@ my $cmd = {
                 'y'          => shift(@_) * $yf,
                 'width'      => shift(@_) * $xf,
                 'height'     => shift(@_) * $yf,
-                'filled'     => (scalar(@_)) ? shift(@_) : 0,
+                'filled'     => (scalar(@_)) ? shift(@_)       : 0,
                 'radius'     => (scalar(@_)) ? shift(@_) * $yf : 0,
-                'pixel_size' => (scalar(@_)) ? shift(@_) : 1,
+                'pixel_size' => (scalar(@_)) ? shift(@_)       : 1,
             }
         );
     },
@@ -335,25 +336,25 @@ sub parse {
     foreach my $line (@cmds) {
         $line =~ s/\#.*//;
         next if ($line eq '');
-        my ($c,$t,@p);
+        my ($c, $t, @p);
         unless ($line =~ /\s+/) {
             $c = $line;
             $cmd->{$line}->();
         } else {
-            ($c,$t) = ($line =~ /^(.*?)\s+(.*)/);
+            ($c, $t) = ($line =~ /^(.*?)\s+(.*)/);
             if ($t =~ /,/) {
-                @p = split(/,\s*/,$t);
+                @p = split(/,\s*/, $t);
             } else {
-                push(@p,$t);
+                push(@p, $t);
             }
-        }
-        if (exists($cmd->{uc($c)})) {
-            $cmd->{uc($c)}->(@p);
+        } ## end else
+        if (exists($cmd->{ uc($c) })) {
+            $cmd->{ uc($c) }->(@p);
         } else {
             warn "$c not found!";
         }
-    }
-}
+    } ## end foreach my $line (@cmds)
+} ## end sub parse
 
 __END__
 

@@ -1,5 +1,12 @@
 Revision history for Games-Solitaire-BlackHole-Solver
 
+0.8.0   2024-01-18
+        - Add the --display-boards flag.
+        - Add the --num-foundations flag.
+            - we need support for 2 foundations for Binary Star
+            - https://github.com/shlomif/black-hole-solitaire/issues/8
+        - Add the --max-iters flag.
+
 0.6.0   2020-10-27
         - Add get_max_num_played_cards()
         - Add the --show-max-num-played-cards command line flag.

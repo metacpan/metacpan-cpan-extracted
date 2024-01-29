@@ -3,10 +3,16 @@ abstract: 'File utilities involving a list of directories'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
+  File::Find::Wanted: '0'
+  File::Path: '0'
+  File::Slurper: '0'
   File::Spec: '0'
+  File::Temp: '0.2307'
+  File::chdir: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::More: '0'
+  Test::Exception: '0'
+  Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -19,7 +25,7 @@ name: File-Util-DirList
 provides:
   File::Util::DirList:
     file: lib/File/Util/DirList.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Exporter: '5.57'
   File::Copy::Recursive: '0'
@@ -31,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Util-DirList
   homepage: https://metacpan.org/release/File-Util-DirList
   repository: git://github.com/perlancar/perl-File-Util-DirList.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -111,7 +117,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.609'
+      version: '0.610'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'

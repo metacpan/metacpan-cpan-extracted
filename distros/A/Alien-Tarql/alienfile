@@ -1,0 +1,20 @@
+use alienfile;
+
+plugin 'Probe::CommandLine' => (
+  command => 'tarql',
+  args    => [ '--version' ],
+  match   => qr/tarql/,
+  version => qr/tarql:\s+VERSION:\s+([0-9\.]+)/,
+);
+
+share {
+  plugin 'Download::GitHub' => (
+    github_user => 'tarql',
+    github_repo => 'tarql',
+    asset        =>  1,
+    asset_name   => qr/^tarql-.*\.tar\.gz$/,
+    asset_format => 'tar.gz',
+  );
+  plugin Extract => 'tar.gz';
+  plugin 'Build::Copy';
+}

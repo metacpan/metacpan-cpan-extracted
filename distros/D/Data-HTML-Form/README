@@ -18,8 +18,6 @@ METHODS
 
     Constructor.
 
-    Returns instance of object.
-
     *       "action"
 
             Form action.
@@ -69,6 +67,8 @@ METHODS
 
             Possible methods are: get and post
 
+    Returns instance of object.
+
   "action"
      my $action = $obj->action;
 
@@ -92,16 +92,22 @@ METHODS
     Returns string.
 
   "id"
+     my $id = $obj->id;
+
     Get form identifier.
 
     Returns string.
 
   "label"
+     my $label = $obj->label;
+
     Get form label.
 
     Returns string.
 
   "method"
+     my $method = $obj->method;
+
     Get form method.
 
     Returns string.
@@ -170,10 +176,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2022 Michal Josef Špaček
+    © 2022-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

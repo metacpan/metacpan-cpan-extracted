@@ -26,17 +26,18 @@
 #define need_PLparser()  ObjectPad__need_PLparser(aTHX)
 void ObjectPad__need_PLparser(pTHX); /* in Object/Pad.xs */
 
-FieldMeta *ObjectPad_mop_create_field(pTHX_ SV *fieldname, ClassMeta *classmeta)
+FieldMeta *ObjectPad_mop_create_field(pTHX_ SV *fieldname, FIELDOFFSET fieldix, ClassMeta *classmeta)
 {
   FieldMeta *fieldmeta;
   Newx(fieldmeta, 1, FieldMeta);
 
-  assert(classmeta->next_fieldix > -1);
+  assert(fieldix > -1);
 
   *fieldmeta = (FieldMeta){
-    .name    = SvREFCNT_inc(fieldname),
-    .class   = classmeta,
-    .fieldix = classmeta->next_fieldix,
+    .name      = SvREFCNT_inc(fieldname),
+    .is_direct = true,
+    .class     = classmeta,
+    .fieldix   = fieldix,
   };
 
   return fieldmeta;
@@ -826,6 +827,25 @@ static struct FieldHookFuncs fieldhooks_accessor = {
   .seal  = &fieldhook_accessor_seal,
 };
 
+/* :inheritable */
+
+static bool fieldhook_inheritble_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_ptr, void *_funcdata)
+{
+  HV *hints = GvHV(PL_hintgv);
+  if(!hv_fetchs(hints, "Object::Pad/experimental(inherit_field)", 0))
+    Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
+      "inheriting fields is experimental and may be changed or removed without notice");
+
+  fieldmeta->is_inheritable = true;
+
+  return false;
+}
+
+static struct FieldHookFuncs fieldhooks_inheritable = {
+  .ver   = OBJECTPAD_ABIVERSION,
+  .apply = &fieldhook_inheritble_apply,
+};
+
 void ObjectPad_register_field_attribute(pTHX_ const char *name, const struct FieldHookFuncs *funcs, void *funcdata)
 {
   if(funcs->ver < 57)
@@ -859,4 +879,7 @@ void ObjectPad__boot_fields(pTHX)
   register_field_attribute("writer",   &fieldhooks_writer,   NULL);
   register_field_attribute("mutator",  &fieldhooks_mutator,  NULL);
   register_field_attribute("accessor", &fieldhooks_accessor, NULL);
+
+  // TODO: temporary name
+  register_field_attribute("inheritable", &fieldhooks_inheritable, NULL);
 }

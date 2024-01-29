@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Zgh - Package for language Standard Moroccan Tamazight
 
 package Locale::CLDR::Locales::Zgh;
 # This file auto generated from Data\common\main\zgh.xml
-#	on Tue  5 Dec  1:38:58 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'ⵜⴰⴽⴰⵏⵜ',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'ⴰⵏⴷⵓⵔⴰ',
  			'AE' => 'ⵍⵉⵎⴰⵔⴰⵜ',
@@ -218,7 +218,6 @@ has 'display_name_region' => (
  			'ME' => 'ⵎⵓⵏⵜⵉⵏⵉⴳⵔⵓ',
  			'MG' => 'ⵎⴰⴷⴰⵖⴰⵛⵇⴰⵔ',
  			'MH' => 'ⵜⵉⴳⵣⵉⵔⵉⵏ ⵏ ⵎⴰⵔⵛⴰⵍ',
- 			'MK' => 'ⵎⴰⵙⵉⴷⵓⵏⵢⴰ',
  			'ML' => 'ⵎⴰⵍⵉ',
  			'MM' => 'ⵎⵢⴰⵏⵎⴰⵔ',
  			'MN' => 'ⵎⵏⵖⵓⵍⵢⴰ',
@@ -328,7 +327,7 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'calendar' => 'ⴰⵙⵎⵍⵓⵙⵙⴰⵏ',
  			'collation' => 'ⴰⵏⵎⴰⵍⴰ ⵏ ⵓⵙⵜⴰⵢ',
@@ -366,7 +365,7 @@ has 'characters' => (
 		return {
 			index => ['ⴰ', 'ⴱ', 'ⴳ', 'ⴷ', 'ⴹ', 'ⴻ', 'ⴼ', 'ⴽ', 'ⵀ', 'ⵃ', 'ⵄ', 'ⵅ', 'ⵇ', 'ⵉ', 'ⵊ', 'ⵍ', 'ⵎ', 'ⵏ', 'ⵓ', 'ⵔ', 'ⵕ', 'ⵖ', 'ⵙ', 'ⵚ', 'ⵛ', 'ⵜ', 'ⵟ', 'ⵡ', 'ⵢ', 'ⵣ', 'ⵥ'],
 			main => qr{[ⴰ ⴱ ⴳ {ⴳⵯ} ⴷ ⴹ ⴻ ⴼ ⴽ {ⴽⵯ} ⵀ ⵃ ⵄ ⵅ ⵇ ⵉ ⵊ ⵍ ⵎ ⵏ ⵓ ⵔ ⵕ ⵖ ⵙ ⵚ ⵛ ⵜ ⵟ ⵡ ⵢ ⵣ ⵥ]},
-			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -1199,7 +1198,6 @@ has 'datetime_formats_available_formats' => (
 			MEd => q{MM-dd, E},
 			MMM => q{MMM},
 			MMMEd => q{E d MMM},
-			MMMMW => q{'week' W 'of' MMM},
 			MMMMd => q{MMMM d},
 			MMMd => q{d MMM},
 			Md => q{d/M},
@@ -1220,7 +1218,6 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{y-MM-dd},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
-			yw => q{'week' w 'of' Y},
 		},
 	} },
 );

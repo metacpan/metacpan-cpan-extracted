@@ -1,4 +1,5 @@
-# Created by create_map_tube_xml.pl 0.04 (part of BBBike)
+# Created by create_map_tube_xml.pl 0.05 (part of BBBike)
+# DO NOT EDIT, please follow instructions in Makefile.PL and re-run 'make build-map'
 
 --stations
 
@@ -139,9 +140,9 @@ Johannisthal
 Adlershof
 Altglienicke
 Grünbergallee
-Flughafen BER - Terminal 5
+Schönefeld
 Waßmannsdorf
-Flughafen BER - Terminal 1-2
+Flughafen BER
 
 # S46
 Grünau
@@ -191,7 +192,7 @@ Gehrenseestr.
 
 # S8
 Plänterwald
-Mühlenbeck-Mönchsmühle
+Mühlenbeck-Mönchmühle
 Schönfließ
 Bergfelde b. Berlin
 
@@ -414,7 +415,7 @@ Schloßstr.
 1045|Altglienicke|Grünbergallee
 7|Altstadt Spandau|Rathaus Spandau
 9|Amrumer Str.|Westhafen
-1001,1025,1026,1002|Anhalter Bhf.|Potsdamer Platz
+1001,1025,1002,1026|Anhalter Bhf.|Potsdamer Platz
 1002|Attilastr.|Priesterweg
 3|Augsburger Str.|Spichernstr.
 1007|Babelsberg|Potsdam Hauptbahnhof
@@ -440,17 +441,17 @@ Schloßstr.
 7|Bismarckstr.|Richard-Wagner-Platz
 2|Bismarckstr.|Sophie-Charlotte-Platz
 1002|Blankenburg|Karow
-1008|Blankenburg|Mühlenbeck-Mönchsmühle
+1008|Blankenburg|Mühlenbeck-Mönchmühle
 1002|Blankenfelde|Mahlow
 7|Blaschkoallee|Grenzallee
 7|Blissestr.|Fehrbelliner Platz
 8|Boddinstr.|Hermannplatz
 1001|Borgsdorf|Lehnitz
-1008,1002,1085|Bornholmer Str.|Pankow
-1001,1025,1026|Bornholmer Str.|Wollankstr.
+1008,1002,1026|Bornholmer Str.|Pankow
+1001,1025,1085|Bornholmer Str.|Wollankstr.
 6|Borsigwerke|Alt-Tegel
 1001|Botanischer Garten|Rathaus Steglitz
-1001,1025,1026,1002|Brandenburger Tor|Friedrichstr.
+1001,1025,1002,1026|Brandenburger Tor|Friedrichstr.
 5|Brandenburger Tor|Unter den Linden
 3|Breitenbachplatz|Podbielskiallee
 7|Britz-Süd|Parchimer Allee
@@ -477,9 +478,7 @@ Schloßstr.
 3|Fehrbelliner Platz|Heidelberger Platz
 7|Fehrbelliner Platz|Konstanzer Str.
 1001|Feuerbachstr.|Friedenau
-1009|Flughafen BER - Terminal 1-2|Waßmannsdorf
-1009|Flughafen BER - Terminal 5|Grünbergallee
-1045|Flughafen BER - Terminal 5|Waßmannsdorf
+1009|Flughafen BER|Waßmannsdorf
 5|Frankfurter Allee|Magdalenenstr.
 1041|Frankfurter Allee|Ostkreuz
 1008,1085|Frankfurter Allee|Storkower Str.
@@ -494,11 +493,11 @@ Schloßstr.
 1003|Friedrichshagen|Hirschgarten
 1003|Friedrichstr.|Hackescher Markt
 1003,1005,1007,1009|Friedrichstr.|Hauptbahnhof
-1001,1025,1026,1002|Friedrichstr.|Oranienburger Str.
+1001,1025,1002,1026|Friedrichstr.|Oranienburger Str.
 6|Friedrichstr.|Oranienburger Tor
 1001|Frohnau|Hohen Neuendorf
 1075|Gehrenseestr.|Springpfuhl
-1001,1025,1026,1002|Gesundbrunnen|Bornholmer Str.
+1001,1025,1002,1026|Gesundbrunnen|Bornholmer Str.
 8|Gesundbrunnen|Pankstr.
 2|Gleisdreieck|Bülowstr.
 1,3|Gleisdreieck|Kurfürstenstr.
@@ -511,7 +510,7 @@ Schloßstr.
 1008,1085|Grünau|Adlershof
 1046|Grünau|Eichwalde
 1009|Grünbergallee|Altglienicke
-1045|Grünbergallee|Flughafen BER - Terminal 5
+1045|Grünbergallee|Schönefeld
 1,3|Görlitzer Bhf.|Kottbusser Tor
 9|Güntzelstr.|Berliner Str.
 1003|Hackescher Markt|Alexanderplatz
@@ -549,7 +548,7 @@ Schloßstr.
 3|Hohenzollernplatz|Fehrbelliner Platz
 6|Holzhauser Str.|Borsigwerke
 1005|Hoppegarten|Birkenstein
-1001,1025,1026,1002|Humboldthain|Gesundbrunnen
+1001,1025,1002,1026|Humboldthain|Gesundbrunnen
 1041|Innsbrucker Platz|Bundesplatz
 1046|Innsbrucker Platz|Schöneberg
 7|Jakob-Kaiser-Platz|Halemweg
@@ -620,7 +619,7 @@ Schloßstr.
 2|Märkisches Museum|Spittelmarkt
 1,3|Möckernbrücke|Gleisdreieck
 7|Möckernbrücke|Yorckstr.
-1008|Mühlenbeck-Mönchsmühle|Schönfließ
+1008|Mühlenbeck-Mönchmühle|Schönfließ
 6|Naturkundemuseum|Schwartzkopffstr.
 9|Nauener Platz|Leopoldplatz
 2|Neu-Westend|Olympia-Stadion
@@ -632,13 +631,13 @@ Schloßstr.
 1007|Nikolassee|Wannsee
 4|Nollendorfplatz|Viktoria-Luise-Platz
 1,3,2|Nollendorfplatz|Wittenbergplatz
-1001,1025,1026,1002|Nordbahnhof|Humboldthain
+1001,1025,1002,1026|Nordbahnhof|Humboldthain
 1005,1007,1075|Nöldnerplatz|Ostkreuz
 1047|Oberspree|Schöneweide
 2|Olympia-Stadion|Ruhleben
 1009,1003|Olympiastadion|Pichelsberg
 3|Onkel Toms Hütte|Krumme Lanke
-1001,1025,1026,1002|Oranienburger Str.|Nordbahnhof
+1001,1025,1002,1026|Oranienburger Str.|Nordbahnhof
 6|Oranienburger Tor|Naturkundemuseum
 1025,1026|Osdorfer Str.|Lichterfelde Ost
 3|Oskar-Helene-Heim|Onkel Toms Hütte
@@ -649,9 +648,9 @@ Schloßstr.
 1041|Ostkreuz|Treptower Park
 1003,1005,1007,1075|Ostkreuz|Warschauer Str.
 6|Otisstr.|Holzhauser Str.
-1008,1002|Pankow|Pankow-Heinersdorf
+1008,1002,1026|Pankow|Pankow-Heinersdorf
 2|Pankow|Vinetastr.
-1008,1002|Pankow-Heinersdorf|Blankenburg
+1008,1002,1026|Pankow-Heinersdorf|Blankenburg
 8|Pankstr.|Osloer Str.
 8|Paracelsus-Bad|Lindauer Allee
 6|Paradestr.|Platz der Luftbrücke
@@ -663,11 +662,11 @@ Schloßstr.
 1008,1009,1085|Plänterwald|Treptower Park
 3|Podbielskiallee|Dahlem-Dorf
 1007|Poelchaustr.|Springpfuhl
-1001,1025,1026,1002|Potsdamer Platz|Brandenburger Tor
+1001,1025,1002,1026|Potsdamer Platz|Brandenburger Tor
 2|Potsdamer Platz|Mendelssohn-Bartholdy-Park
 1041|Prenzlauer Allee|Greifswalder Str.
 1008,1085|Prenzlauer Allee|Schönhauser Allee
-1025,1026,1002|Priesterweg|Südkreuz
+1025,1002,1026|Priesterweg|Südkreuz
 1,3|Prinzenstr.|Hallesches Tor
 1003|Rahnsdorf|Friedrichshagen
 1007|Raoul-Wallenberg-Str.|Marzahn
@@ -701,6 +700,8 @@ Schloßstr.
 1041|Schöneberg|Innsbrucker Platz
 1001|Schöneberg|Julius-Leber-Brücke
 1046|Schöneberg|Südkreuz
+1009|Schönefeld|Grünbergallee
+1045|Schönefeld|Waßmannsdorf
 1008,1009,1085,1047|Schöneweide|Baumschulenweg
 1046,1045|Schöneweide|Johannisthal
 1008|Schönfließ|Bergfelde b. Berlin
@@ -708,7 +709,7 @@ Schloßstr.
 2|Schönhauser Allee|Eberswalder Str.
 1041|Schönhauser Allee|Prenzlauer Allee
 1025|Schönholz|Alt-Reinickendorf
-1001,1026|Schönholz|Wilhelmsruh
+1001,1085|Schönholz|Wilhelmsruh
 8|Schönleinstr.|Kottbusser Tor
 6|Seestr.|Rehberge
 2|Senefelderplatz|Rosa-Luxemburg-Platz
@@ -733,7 +734,7 @@ Schloßstr.
 1025,1026|Südende|Priesterweg
 1041|Südkreuz|Schöneberg
 1046,1045|Südkreuz|Tempelhof
-1025,1026,1002|Südkreuz|Yorckstr.
+1025,1002,1026|Südkreuz|Yorckstr.
 7|Südstern|Gneisenaustr.
 1025|Tegel|Schulzendorf
 1025,1026|Teltow Stadt|Lichterfelde Süd
@@ -761,8 +762,8 @@ Schloßstr.
 1003,1005,1007,1009|Warschauer Str.|Ostbahnhof
 1,3|Warschauer Str.|Schlesisches Tor
 1075|Wartenberg|Hohenschönhausen
-1045|Waßmannsdorf|Flughafen BER - Terminal 1-2
-1009|Waßmannsdorf|Flughafen BER - Terminal 5
+1045|Waßmannsdorf|Flughafen BER
+1009|Waßmannsdorf|Schönefeld
 5|Weberwiese|Frankfurter Tor
 1041|Wedding|Gesundbrunnen
 6|Wedding|Leopoldplatz
@@ -778,19 +779,20 @@ Schloßstr.
 1009,1003|Westkreuz|Messe Süd
 6|Westphalweg|Ullsteinstr.
 1046|Wildau|Königs Wusterhausen
+1008|Wildau|Zeuthen
 1003|Wilhelmshagen|Rahnsdorf
-1001,1026|Wilhelmsruh|Wittenau
+1001,1085|Wilhelmsruh|Wittenau
 7|Wilmersdorfer Str.|Bismarckstr.
-1001,1026|Wittenau|Waidmannslust
+1001,1085|Wittenau|Waidmannslust
 3|Wittenbergplatz|Augsburger Str.
 1|Wittenbergplatz|Kurfürstendamm
 2|Wittenbergplatz|Zoologischer Garten
-1001,1025,1026|Wollankstr.|Schönholz
+1001,1025,1085|Wollankstr.|Schönholz
 1005|Wuhletal|Biesdorf
 5|Wuhletal|Kaulsdorf-Nord
 1003|Wuhlheide|Karlshorst
 7|Wutzkyallee|Lipschitzallee
-1001,1025,1026,1002|Yorckstr.|Anhalter Bhf.
+1001,1025,1002,1026|Yorckstr.|Anhalter Bhf.
 7|Yorckstr.|Kleistpark
 1001|Zehlendorf|Sundgauer Str.
 1002|Zepernick|Bernau-Friedenstal

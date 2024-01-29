@@ -9,7 +9,7 @@ use Text::CSV;
 use Date::Calc		qw(Today Gmtime Week_of_Year Add_Delta_Days);
 use List::Util		qw(max sum);
 use oEdtk::Config	qw(config_read);
-use oEdtk::DBAdmin	qw(db_connect db_backup_agent create_table_INDEX @INDEX_COLS);
+use oEdtk::DBAdmin	qw(db_connect db_backup_agent create_table_OUTMNGR @INDEX_COLS);
 use POSIX			qw(strftime);
 use DBI;
 # use Sys::Hostname;
@@ -86,7 +86,7 @@ sub omgr_import($$$) {
 
 	# Create the $cfg->{'EDTK_DBI_OUTMNGR'} table if we're using SQLite.
 	if ($dbh->{'Driver'}->{'Name'} eq 'SQLite') {
-		create_table_INDEX($dbh, $cfg->{'EDTK_DBI_OUTMNGR'});
+		create_table_OUTMNGR($dbh, $cfg->{'EDTK_DBI_OUTMNGR'});
 	}
 
 	eval {

@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-12-08'; # DATE
+our $DATE = '2023-12-12'; # DATE
 our $DIST = 'App-DownloadsDirUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/DownloadsDirUtils/oldest_download",
@@ -39,7 +39,7 @@ oldest-download - Return the oldest file(s) in the downloads directories
 
 =head1 VERSION
 
-This document describes version 0.006 of oldest-download (from Perl distribution App-DownloadsDirUtils), released on 2023-12-08.
+This document describes version 0.007 of oldest-download (from Perl distribution App-DownloadsDirUtils), released on 2023-12-12.
 
 =head1 SYNOPSIS
 

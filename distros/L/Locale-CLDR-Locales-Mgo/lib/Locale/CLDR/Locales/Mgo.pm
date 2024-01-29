@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mgo - Package for language Metaʼ
 
 package Locale::CLDR::Locales::Mgo;
 # This file auto generated from Data\common\main\mgo.xml
-#	on Tue  5 Dec  1:20:56 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'mgo' => 'metaʼ',
@@ -67,7 +67,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'CM' => 'Kamalun',
  			'ZZ' => 'aba aben tisɔ̀',
@@ -97,7 +97,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => '{0}',
  			'script' => '{0}',
@@ -119,7 +119,7 @@ has 'characters' => (
 			auxiliary => qr{[c h l q v x]},
 			index => ['A', 'B', '{CH}', 'D', 'E', 'Ə', 'F', 'G', '{GH}', 'I', 'J', 'K', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'R', 'S', 'T', 'U', 'W', 'Y', 'Z', 'ʼ'],
 			main => qr{[a à b {ch} d e è ə {ə̀} f g {gh} i ì j k m n ŋ o ò ɔ {ɔ̀} p r s t u ù w y z ʼ]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 			punctuation => qr{[, ; \: ! ? . ' ‘ ’ " “ ”]},
 		};
 	},
@@ -184,26 +184,61 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(d),
+						'one' => q({0} d),
+						'other' => q({0} d),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(d),
 						'one' => q({0} d),
 						'other' => q({0} d),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(h),
+						'one' => q({0} h),
+						'other' => q({0} h),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(h),
 						'one' => q({0} h),
 						'other' => q({0} h),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(min),
+						'one' => q({0} min),
+						'other' => q({0} min),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(min),
 						'one' => q({0} min),
 						'other' => q({0} min),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(m),
+						'one' => q({0} m),
+						'other' => q({0} m),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(m),
 						'one' => q({0} m),
 						'other' => q({0} m),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(s),
+						'one' => q({0} s),
+						'other' => q({0} s),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(s),
 						'one' => q({0} s),
@@ -211,18 +246,43 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(d),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(d),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(h),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(h),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(min),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(min),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(m),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(m),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(s),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(s),
 					},

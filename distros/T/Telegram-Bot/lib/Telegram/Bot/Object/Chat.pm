@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Chat;
-$Telegram::Bot::Object::Chat::VERSION = '0.024';
+$Telegram::Bot::Object::Chat::VERSION = '0.025';
 # ABSTRACT: The base class for Telegram 'Chat' type objects
 
 
@@ -56,7 +56,7 @@ Telegram::Bot::Object::Chat - The base class for Telegram 'Chat' type objects
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 DESCRIPTION
 
@@ -84,6 +84,10 @@ Justin Hawkins <justin@eatmorecode.com>
 =item *
 
 James Green <jkg@earth.li>
+
+=item *
+
+Julien Fiegehenn <simbabque@cpan.org>
 
 =back
 

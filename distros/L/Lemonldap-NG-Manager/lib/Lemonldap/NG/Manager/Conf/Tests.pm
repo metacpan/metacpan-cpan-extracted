@@ -8,7 +8,7 @@ use Lemonldap::NG::Handler::Main;
 use Lemonldap::NG::Common::Util qw(getSameSite);
 use URI;
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.18.0';
 
 ## @method hashref tests(hashref conf)
 # Return a hash ref where keys are the names of the tests and values
@@ -1143,7 +1143,50 @@ sub tests {
                 }
             }
             return 1;
-        }
+        },
+
+        # OIDC Signature and Encryption tests
+        oidcSigAlgShouldMatchKeyType => sub {
+            for my $key (
+                qw(oidcRPMetaDataOptionsIDTokenSignAlg oidcRPMetaDataOptionsAccessTokenSignAlg oidcRPMetaDataOptionsUserInfoSignAlg)
+              )
+            {
+                foreach my $rp ( keys %{ $conf->{oidcRPMetaDataOptions} } ) {
+                    return ( 0,
+"Signature algorithm shouldn't be ES* if key type is RSA ($rp/$key)"
+                      )
+                      if $conf->{oidcRPMetaDataOptions}->{$rp}->{$key}
+                      and $conf->{oidcRPMetaDataOptions}->{$rp}->{$key} =~ /^E/
+                      and $conf->{oidcServiceKeyTypeSig} ne 'EC';
+                    return ( 0,
+"Signature algorithm shouldn't be RS* or PS* if key type is EC ($rp/$key)"
+                      )
+                      if $conf->{oidcRPMetaDataOptions}->{$rp}->{$key}
+                      and $conf->{oidcRPMetaDataOptions}->{$rp}->{$key} !~ /^E/
+                      and $conf->{oidcServiceKeyTypeSig} eq 'EC';
+                }
+            }
+            return 1;
+        },
+
+# Warn if both oidcRPMetaDataOptionsJwks and oidcRPMetaDataOptionsJwksUri is set
+        noJwksDuplication => sub {
+            return 1
+              unless $conf->{oidcRPMetaDataOptions}
+              and ref $conf->{oidcRPMetaDataOptions};
+            my @pb;
+            for my $rp ( keys %{ $conf->{oidcRPMetaDataOptions} } ) {
+                push @pb, $rp
+                  if $conf->{oidcRPMetaDataOptions}->{$rp}
+                  ->{oidcRPMetaDataOptionsJwks}
+                  and $conf->{oidcRPMetaDataOptions}->{$rp}
+                  ->{oidcRPMetaDataOptionsJwksUri};
+            }
+            return 1 unless @pb;
+            return ( 1,
+                "JWKS URI defined while JWKS document is fixed: "
+                  . join( ', ', @pb ) );
+        },
     };
 }
 

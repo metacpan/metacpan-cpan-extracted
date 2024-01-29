@@ -26,10 +26,10 @@ export PATH := $(BASE)/bin:$(PATH)
 
 # XXX Change to `metaspec =zild libname`
 NAMEPATH := $(shell $(ZILD) meta =zild/libname)
-NAMEPATH := $(subst ::,/,$(NAMEPATH))
 ifeq (,$(NAMEPATH))
 NAMEPATH := $(shell $(ZILD) meta name)
 endif
+NAMEPATH := $(subst ::,/,$(NAMEPATH))
 NAME := $(shell $(ZILD) meta name)
 VERSION := $(shell $(ZILD) meta version)
 RELEASE_BRANCH ?= $(shell $(ZILD) meta branch)
@@ -156,6 +156,7 @@ endif
 ifneq ($(LOG),)
 	@echo "$$(date) - Release $(DIST) UPLOADED" >> $(LOG)
 endif
+ifeq (1,$(shell grep -q no-git-update: Meta || echo 1))
 	$(MAKE) clean
 	[ -z "$$(git status -s)" ] || zild-git-commit
 	git push
@@ -165,6 +166,7 @@ endif
 ifneq ($(PERL_ZILLA_DIST_AUTO_INSTALL),)
 	@echo "***** Installing after release"
 	$(MAKE) install
+endif
 endif
 	@echo
 	git status

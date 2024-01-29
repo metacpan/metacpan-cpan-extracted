@@ -19,7 +19,9 @@ ok(-d $dir, "Created test dir $dir");
 my $large1 = '0123456789' x 100_000;
 my $val;
 {
-    my $env = LMDB::Env->new($dir);
+    my $env = LMDB::Env->new($dir, {
+        mapsize => 100 * 1024 * 1024
+    });
     ok(my $DB = $env->BeginTxn->OpenDB, 'Open unamed');
     is($DB->dbi, 1, 'Opened');
     is($DB->put('A' => $large1), $large1, 'Put large value');

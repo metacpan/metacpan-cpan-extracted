@@ -1,18 +1,14 @@
 #!perl
-#
-# This file is part of Method-Extension
-#
-# This software is Copyright (c) 2015 by Tiago Peczenyj.
-#
-# This is free software, licensed under:
-#
-#   The MIT (X11) License
-#
 use Test::More;
-use t::lib::Foo;
-use t::lib::Bar;
+
+use lib 't/lib';
+
+use Foo;
+use Bar;
 
 my $foo = Foo->new;
+
+isa_ok $foo, 'Foo';
 
 can_ok $foo, 'baz';
 

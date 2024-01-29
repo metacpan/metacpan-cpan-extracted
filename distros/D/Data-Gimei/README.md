@@ -1,12 +1,14 @@
-[![Actions Status](https://github.com/youpong/pl-gimei/workflows/test/badge.svg)](https://github.com/youpong/pl-gimei/actions)
+[![Actions Status](https://github.com/youpong/Data-Gimei/workflows/test/badge.svg)](https://github.com/youpong/Data-Gimei/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Data-Gimei.svg)](https://metacpan.org/release/Data-Gimei)
 # NAME
 
 Data::Gimei - a Perl port of Ruby's gimei generates fake data in Japanese.
 
 # SYNOPSIS
 
+    use 5.010;
+    use strict;
     use warnings;
-    use v5.22;
+
     binmode STDOUT, ":utf8";
 
     use Data::Gimei;
@@ -95,7 +97,7 @@ You can also look for information at:
 
 # LICENSE
 
-MIT
+MIT License
 
 Dictionary YAML file is generated from naist-jdic.
 

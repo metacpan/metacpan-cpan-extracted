@@ -19,7 +19,7 @@ await $chip->mount(
 # ->read_config
 {
    $adapter->expect_read( 5 )
-      ->returns( "\xC0\x80\x00\x08\x00" );
+      ->will_done( "\xC0\x80\x00\x08\x00" );
 
    is( await $chip->read_config,
       {

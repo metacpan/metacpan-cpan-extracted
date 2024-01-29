@@ -46,6 +46,9 @@ provides:
   Dpkg::BuildProfiles:
     file: lib/Dpkg/BuildProfiles.pm
     version: '1.00'
+  Dpkg::BuildTree:
+    file: lib/Dpkg/BuildTree.pm
+    version: '0.01'
   Dpkg::BuildTypes:
     file: lib/Dpkg/BuildTypes.pm
     version: '0.02'
@@ -81,7 +84,7 @@ provides:
     version: '1.04'
   Dpkg::Control:
     file: lib/Dpkg/Control.pm
-    version: '1.03'
+    version: '1.04'
   Dpkg::Control::Changelog:
     file: lib/Dpkg/Control/Changelog.pm
     version: '1.00'
@@ -284,5 +287,5 @@ resources:
   homepage: https://wiki.debian.org/Teams/Dpkg
   license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
   repository: https://git.dpkg.org/git/dpkg/dpkg.git
-version: v1.22.1
+version: v1.22.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

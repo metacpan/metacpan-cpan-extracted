@@ -4,6 +4,82 @@ require 5.002;
 use strict;
 $| = 1;
 
+=encoding utf8
+
+=head1 NAME
+
+perlbench - compare the relative speed of different versions of Perl
+
+=head1 SYNOPSIS
+
+	% perlbench-run [-s] [-t filter] [-c cpu-factor] [-d results_dir]
+
+=head1 DESCRIPTION
+
+This is a Perl benchmark suite.  It can be used to compare the
+relative speed of different versions of Perl.  You run the benchmark
+by starting the 'perlbench-run' script giving the path-name of various
+Perls you want to test as argument.  The perlbench-run program takes
+the following optional parameters:
+
+  -s               don't scale numbers (so that first perl is always 100)
+  -t <filter>      only tests that match <filter> regex are timed
+  -c <cpu-factor>  use this factor to scale tests instead of running the
+                   'cpu_factor' program to determine it.
+  -d <dirname>     what directory to save results in
+
+=head2 Creating new tests
+
+The individual tests are found in a directory called "benchmarks".
+They expect to be started with at least a single number as argument.
+This number is the CPU speed factor as calculated by the 'cpu_factor'
+program.  This factor is used to scale the number of iterations that
+the test must run to give measurable timing.
+
+A new test is created by making a new file under the "benchmarks"
+directory.  The filename should end with the F<*.t> suffix.  A test
+should look like this:
+
+  # Name: Regexp matching
+  # Require: 4
+
+  require 'benchlib.pl';
+
+  # YOUR SETUP CODE HERE
+  $a = 0;
+
+  &runtest(100, <<'ENDTEST');
+     # YOUR TESTING CODE HERE
+     $a++;  # for instance
+  ENDTEST
+
+The first part of the test declares some properties of the test.  The
+'require' property means that you need a perl with version number
+greater or equal to this to run the test (same as the 'require NUM'
+does for perl5).  You are advised to write the tests so that they can
+run under perl4 as well as perl5.
+
+You should then load the F<benchlib.pl> library.  This will take care
+of the command line arguments and also provide the function
+C<&main::runtest()> which will perform the testing.  The first argument
+to C<runtest()> is the test scale factor.  It should be set to some
+number that makes the test run for about about 10 seconds when given a
+proper CPU factor command line argument.  The second argument to
+C<runtest()> is the code you want to test.  The code should be suitable
+as the body inside a loop.
+
+If you want to contribute some additional tests, please make a pull
+request at L<https://github.com/briandfoy/perlbench>.
+
+=head1 AUTHOR
+
+Gisle Aas originally wrote the code, and it's still pretty much what
+he created.
+
+Maintained by brian d foy, C<< <bdfoy@cpan.org> >>.
+
+=cut
+
 use Getopt::Std;
 use vars qw($opt_c $opt_t $opt_d $opt_s $opt_v);
 getopts("c:t:d:sv") or usage();

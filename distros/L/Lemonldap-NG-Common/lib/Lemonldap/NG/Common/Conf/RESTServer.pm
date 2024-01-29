@@ -6,7 +6,7 @@ use Mouse;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.18.0';
 
 extends 'Lemonldap::NG::Common::Conf::AccessLib';
 
@@ -758,7 +758,7 @@ sub sfExtra {
         $tmp->{id}         = "sfExtra/$mod";
         $tmp->{type}       = 'sfExtra';
         $tmp->{data}->{$_} = $val->{$mod}->{$_}
-          foreach (qw(type rule logo level label));
+          foreach (qw(type rule regrule logo level label));
         $tmp->{data}->{register} = $val->{$mod}->{register} ? \1 : \0;
         my $over = $val->{$mod}->{over} // {};
         $tmp->{data}->{over} = [ map { [ $_, $over->{$_} ] } keys %$over ];

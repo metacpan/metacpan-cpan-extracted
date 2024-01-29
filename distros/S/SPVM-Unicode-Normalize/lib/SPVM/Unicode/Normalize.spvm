@@ -1,0 +1,15 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Unicode::Normalize : precompile {
+  version "0.003";
+  
+  native static method NFC : string ($string : string);
+  
+  native static method NFD : string ($string : string);
+  
+  native static method NFKD : string ($string : string);
+  
+  native static method NFKC : string ($string : string);
+  
+}

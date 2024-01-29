@@ -1,0 +1,62 @@
+NAME
+    RT-Extension-SwitchUsers - Switch current logged in user to others
+
+DESCRIPTION
+    This extension provides a way to switch current logged in user to others
+    defined in user custom field "Switch Users Accounts".
+
+RT VERSION
+    Works with RT 5
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    make initdb
+        Only run this the first time you install this module.
+
+        If you run this twice, you may end up with duplicate data in your
+        database.
+
+        If you are upgrading this module, check for upgrading instructions
+        in case changes need to be made to your database.
+
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Plugin('RT::Extension::SwitchUsers');
+
+        Set the group which users belong to can switch users.
+
+            Set($SwitchUsersGroup, 'Core Team');
+
+        Set fields all the switched users can share:
+
+            Set(@SwitchUsersSharedFields, qw/EmailAddress SMIMECertificate/);
+
+        CAVEAT: please don't share Name field as it's been used to
+        distinguish switched users.
+
+    Clear your mason cache
+            rm -rf /opt/rt5/var/mason_data/obj
+
+    Restart your webserver
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+        bug-RT-Extension-SwitchUsers@rt.cpan.org
+    or via the web at
+        http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-SwitchUsers
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2018-2023 by Best Practical Solutions,
+    LLC
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

@@ -1,7 +1,7 @@
 This archive contains the distribution TheSchwartz-JobScheduler,
-version 0.001:
+version 0.002:
 
-  Lightweight TheSchwartz job dispatcher
+  Lightweight TheSchwartz job dispatcher with maintained database connections
 
 This software is copyright (c) 2023 by Mikko Koivunalho.
 

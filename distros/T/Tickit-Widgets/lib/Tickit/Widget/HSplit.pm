@@ -1,15 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.57;
+use warnings;
+use Object::Pad 0.807 ':experimental(inherit_field)';
 
-package Tickit::Widget::HSplit 0.37;
-class Tickit::Widget::HSplit
-   :strict(params)
-   :isa(Tickit::Widget::LinearSplit);
+package Tickit::Widget::HSplit 0.41;
+class Tickit::Widget::HSplit :strict(params);
+
+inherit Tickit::Widget::LinearSplit qw( $_split_at $_split_len );
 
 use Tickit::Style;
 use Tickit::RenderBuffer qw( LINE_SINGLE CAP_BOTH );
@@ -95,7 +96,7 @@ use constant VALUE_METHOD => "lines";
 
 =head2 new
 
-   $hsplit = Tickit::Widget::HSplit->new( %args )
+   $hsplit = Tickit::Widget::HSplit->new( %args );
 
 Constructs a new C<Tickit::Widget::HSplit> object.
 
@@ -127,9 +128,9 @@ method cols
 
 =head2 set_top_child
 
-   $child = $hsplit->top_child
+   $child = $hsplit->top_child;
 
-   $hsplit->set_top_child( $child )
+   $hsplit->set_top_child( $child );
 
 Accessor for the child widget used in the top half of the display.
 
@@ -142,9 +143,9 @@ Accessor for the child widget used in the top half of the display.
 
 =head2 set_bottom_child
 
-   $child = $hsplit->bottom_child
+   $child = $hsplit->bottom_child;
 
-   $hsplit->set_bottom_child( $child )
+   $hsplit->set_bottom_child( $child );
 
 Accessor for the child widget used in the bottom half of the display.
 
@@ -170,21 +171,18 @@ method render_to_rb
 {
    my ( $rb, $rect ) = @_;
 
-   my $split_len = $self->_split_len;
-   my $split_at  = $self->_split_at;
-
    my $cols = $self->window->cols;
 
    $rb->setpen( $self->get_style_pen( "split" ) );
 
-   $rb->hline_at( $split_at, 0, $cols-1, LINE_SINGLE, undef, CAP_BOTH );
+   $rb->hline_at( $_split_at, 0, $cols-1, LINE_SINGLE, undef, CAP_BOTH );
 
-   foreach my $line ( $rect->linerange( 1, $split_len-2 ) ) {
-      $rb->erase_at( $split_at + $line, 0, $cols );
+   foreach my $line ( $rect->linerange( 1, $_split_len-2 ) ) {
+      $rb->erase_at( $_split_at + $line, 0, $cols );
    }
 
-   if( $split_len > 1 ) {
-      $rb->hline_at( $split_at + $split_len - 1, 0, $cols-1, LINE_SINGLE, undef, CAP_BOTH );
+   if( $_split_len > 1 ) {
+      $rb->hline_at( $_split_at + $_split_len - 1, 0, $cols-1, LINE_SINGLE, undef, CAP_BOTH );
    }
 }
 

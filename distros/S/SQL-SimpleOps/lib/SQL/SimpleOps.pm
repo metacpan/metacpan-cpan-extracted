@@ -94,7 +94,7 @@
 		$err
 	);
 
-	our $VERSION = "2023.302.1";
+	our $VERSION = "2023.362.1";
 
 	our @EXPORT_OK = @EXPORT;
 
@@ -1350,6 +1350,7 @@ sub _Insert()
 	my @fields;
 	my @values;
 
+	## format: fields => { ... }
 	if (ref($argv->{fields}) eq "HASH")
 	{
 		## mapping field and value
@@ -1357,10 +1358,11 @@ sub _Insert()
 		foreach my $field(sort(keys(%{$argv->{fields}})))
 		{
 			push(@fields,$self->_getAliasCols(8,$field,SQL_SIMPLE_ALIAS_INSERT));
-			push(@value_,(!defined($argv->{fields}{$field})) ? "NULL" : $self->{argv}{quote}.$argv->{fields}{$field}.$self->{argv}{quote});
+			push(@value_,(!defined($argv->{fields}{$field})) ? "NULL" : $self->{argv}{quote}.$self->_escapeQuote($argv->{fields}{$field}).$self->{argv}{quote});
 		}
 		@values = ("(".join(",",@value_).")");
 	}
+	## format: fields => [ ... ]
 	else
 	{
 		## mapping field
@@ -1371,16 +1373,18 @@ sub _Insert()
 		my @value_;
 		foreach my $value(@{$argv->{values}})
 		{
+			## format: fields => [ col => val ]
 			if (ref($value) ne "ARRAY")
 			{
-				push(@value_,(!defined($value)) ? "NULL" : $self->{argv}{quote}.$value.$self->{argv}{quote});
+				push(@value_,(!defined($value)) ? "NULL" : $self->{argv}{quote}.$self->_escapeQuote($value).$self->{argv}{quote});
 			}
+			## format: fields => [ col => [ val1, ... ] ], field must be 1
 			else
 			{
 				my @value2;
 				foreach my $value2(@{$value})
 				{
-					push(@value2,(!defined($value2)) ? "NULL" : $value.$self->{argv}{quote},$value2.$self->{argv}{quote});
+					push(@value2,(!defined($value2)) ? "NULL" : $self->{argv}{quote}.$self->_escapeQuote($value2).$self->{argv}{quote});
 				}
 				push(@values,"(".join(",",@value2).")");
 			}
@@ -1397,7 +1401,7 @@ sub _Insert()
 		{
 			($argv->{conflict}{$field} =~ /^\\(.*)/) ?
 				push(@conflict,$self->_getAliasCols(10,$field,SQL_SIMPLE_ALIAS_INSERT)." = ".$1): 
-				push(@conflict,$self->_getAliasCols(11,$field,SQL_SIMPLE_ALIAS_INSERT)." = ".$self->{argv}{quote}.$argv->{conflict}{$field}.$self->{argv}{quote});
+				push(@conflict,$self->_getAliasCols(11,$field,SQL_SIMPLE_ALIAS_INSERT)." = ".$self->{argv}{quote}.$self->_escapeQuote($argv->{conflict}{$field}).$self->{argv}{quote});
 		}
 		$sql .= ($self->{init}{plugin_id} =~ /^mysql/i || $self->{init}{plugin_id} =~ /^mariadb/i) ?
 			" ON DUPLICATE KEY UPDATE ".join(", ",@conflict) :
@@ -1500,7 +1504,7 @@ sub _Update()
 		{
 			## validate functions as arguments
 			$self->_checkFunctions(\$argv->{fields}{$field},SQL_SIMPLE_ALIAS_UPDATE);
-			push(@fields,$realn." = ".$self->{argv}{quote}.$argv->{fields}{$field}.$self->{argv}{quote});
+			push(@fields,$realn." = ".$self->{argv}{quote}.$self->_escapeQuote($argv->{fields}{$field}).$self->{argv}{quote});
 		}
 	}
 
@@ -2020,6 +2024,8 @@ sub _getWhereRecursive()
 	my $oper_pend = 0;
 	for (my $ix=0; $ix < @{$where};)
 	{
+		undef(@where_tmp) if (@where_tmp && join('',@where_tmp) eq '');
+
 		###############################################################
 		## value1
 
@@ -2041,7 +2047,7 @@ sub _getWhereRecursive()
 		## check and/or logical connector
 		if ($value1 =~ /^(and|\&\&|or|\|\|)$/i)
 		{
-			push(@where_tmp,uc($value1));
+			push(@where_tmp,uc($value1)) if ($oper_pend && @where_tmp);
 			$oper_pend = 0;
 			next;
 		}
@@ -2163,11 +2169,13 @@ sub _getWhereRecursive()
 						}
 						else
 						{
-							$_value2[$i] = $quote.$_value2[$i].$quote;
+							$_value2[$i] = $quote.$self->_escapeQuote($_value2[$i]).$quote;
 						}
 					}
 					$quote = "";
 					my $not = ($operator eq "!=") ? " NOT" : "";
+					
+					## no _escapeQuote required, already done in value2 build
 					(@_value2 == 3 && $_value2[1] eq "'..'") ?
 						push(@where_tmp,$value1.$not." BETWEEN (".$quote.$_value2[0].$quote.",".$quote.$_value2[2].$quote.")"):
 						push(@where_tmp,$value1.$not." IN (".$quote.join("$quote,$quote",@_value2).$quote.")");
@@ -2179,8 +2187,7 @@ sub _getWhereRecursive()
 			my @where_aux;
 			foreach my $value(@_value2)
 			{
-##				if	(defined($value) && $value ne "")
-				if	(defined($value)) ## && $value ne "")
+				if	(defined($value))
 				{
 					if ($value =~ /^\\(.*)/)
 					{
@@ -2204,13 +2211,9 @@ sub _getWhereRecursive()
 							push(@where_aux,$value1." ".$operator." ".$v);
 						}
 					}
-##					elsif (@{$self->{work}{tables_inuse}} == 1)
-##					{
-##						push(@where_aux,$value1." ".$operator." ".$quote.$value2_a.$value.$value2_b.$quote);
-##					}
 					else
 					{
-						push(@where_aux,$value1." ".$operator." ".$quote.$value2_a.$value.$value2_b.$quote);
+						push(@where_aux,$value1." ".$operator." ".$quote.$self->_escapeQuote($value2_a.$value.$value2_b).$quote);
 					}
 				}
 				elsif	($operator eq "=")
@@ -2239,41 +2242,30 @@ sub _getWhereRecursive()
 		}
 		if (ref($value2) eq "")
 		{
-##			if ($value2 ne "")
-##			{
-				if ($value2 =~ /^\\(.*)/)
+			if ($value2 =~ /^\\(.*)/)
+			{
+				my $v = $1;
+				if ($v =~ /^(\(SELECT\s+(.*)\))$/)
 				{
-					my $v = $1;
-					if ($v =~ /^(\(SELECT\s+(.*)\))$/)
-					{
-						push(@where_tmp,$value1." IN ".$1);
-					}
-					elsif ($v =~ /^(.*?)\..*?$/ && grep(/^$1$/,@{$self->{work}{tables_valids}}))
-					{
-						push(@where_tmp,$value1." = ".$self->_getAliasCols(24,$v,SQL_SIMPLE_ALIAS_WHERE+SQL_SIMPLE_ALIAS_FQDN));
-					}
-					elsif (defined($self->{work}{field_alias}{$v}))
-					{
-						push(@where_tmp,$value1." = ".$self->_getAliasCols(25,$self->{work}{field_alias}{$v},SQL_SIMPLE_ALIAS_WHERE+SQL_SIMPLE_ALIAS_FQDN));
-					}
-					else
-					{
-						push(@where_tmp,$value1." = ".$v);
-					}
+					push(@where_tmp,$value1." IN ".$1);
 				}
-##				elsif (@{$self->{work}{tables_inuse}} == 1)
-##				{
-##					push(@where_tmp,$value1." = ".$quote.$value2.$quote);
-##				}
+				elsif ($v =~ /^(.*?)\..*?$/ && grep(/^$1$/,@{$self->{work}{tables_valids}}))
+				{
+					push(@where_tmp,$value1." = ".$self->_getAliasCols(24,$v,SQL_SIMPLE_ALIAS_WHERE+SQL_SIMPLE_ALIAS_FQDN));
+				}
+				elsif (defined($self->{work}{field_alias}{$v}))
+				{
+					push(@where_tmp,$value1." = ".$self->_getAliasCols(25,$self->{work}{field_alias}{$v},SQL_SIMPLE_ALIAS_WHERE+SQL_SIMPLE_ALIAS_FQDN));
+				}
 				else
 				{
-					push(@where_tmp,$value1." = ".$quote.$value2.$quote);
+					push(@where_tmp,$value1." = ".$v);
 				}
-##			}
-##			else
-##			{
-##				push(@where_tmp,$value1." IS NULL");
-##			}
+			}
+			else
+			{
+				push(@where_tmp,$value1." = ".$quote.$self->_escapeQuote($value2).$quote);
+			}
 			next;
 		}
 
@@ -2284,9 +2276,11 @@ sub _getWhereRecursive()
 	if (@where_tmp)
 	{
 		push(@{$buffer},join(" ",@where_tmp));
-		$buffer->[0] = "(".$buffer->[0] if ($level);
-		my $n = @{$buffer};
-		$buffer->[$n-1] .= ")" if ($level);
+		if ($level && @where_tmp > 1)
+		{
+			$buffer->[0] = "(".$buffer->[0];
+			$buffer->[@{$buffer}-1] .= ")";
+		}
 	}
 	return 0;
 }
@@ -2668,6 +2662,23 @@ sub _setQuote()
 	my $save = $self->{argv}{quote};
 	$self->{argv}{quote} = $quote || "'" if ($quote eq "" || $quote eq '"' || $quote eq "'");
 	return $save;
+}
+
+################################################################################
+## action: escape quote in string
+## return: string with escape (if exists)
+
+sub _escapeQuote()
+{
+	my $self = shift;
+	my $value = shift;
+	
+	## return if not quote
+	return $value if ($self->{argv}{quote} eq "");
+	
+	## escape and return
+	$value =~ s/$self->{argv}{quote}/\\$self->{argv}{quote}/g;
+	return $value;
 }
 
 ################################################################################

@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-04'; # DATE
+our $DATE = '2024-01-22'; # DATE
 our $DIST = 'Log-ger-App'; # DIST
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 our $DEBUG = defined($ENV{LOG_GER_APP_DEBUG}) ? $ENV{LOG_GER_APP_DEBUG} : 0;
 
@@ -243,7 +243,7 @@ Log::ger::App - An easy way to use Log::ger in applications
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -595,16 +595,15 @@ C<Log::ger::Output::Composite::set_level>, for example:
 This sets an internal level setting which is respected and has the highest
 precedence so all levels settings will use this instead. If previously you have:
 
- Log::ger::Output->set(Composite => {
-     default_level => 'error',
+ Log::ger::Output->set(Composite => (
      outputs => {
-         File => {path=>'/foo', level=>'debug'},
+         File   => {conf=>{path=>'/foo'}, level=>'debug'},
          Screen => {level=>'info', category_level=>{MyApp=>'warn'}},
      },
      category_level => {
          'MyApp::SubModule1' => 'debug',
      },
- });
+ ));
 
 then after the C<Log::ger::Output::Composite::set_level('trace')>, all the above
 per-category and per-output levels will be set to C<trace>.
@@ -619,7 +618,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2022, 2021, 2020, 2019, 2018, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

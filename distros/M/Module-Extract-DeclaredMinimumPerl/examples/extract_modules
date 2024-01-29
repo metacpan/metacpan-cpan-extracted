@@ -21,7 +21,7 @@ our $VERSION = '1.10';
 
 Use: extract_modules filename [...]
 
-Given Perl files, extract and report the Perl modules included 
+Given Perl files, extract and report the Perl modules included
 with C<use> or C<require>.
 
 =head1 DESCRIPTION
@@ -46,12 +46,12 @@ my %methods = qw(
 	Module::Extract::Use get_modules
 	Module::ExtractUse   extract_use
 	);
-	
+
 foreach my $module ( @classes ) {
 	eval "require $module";
 	next if $@;
 	( $object, $method ) = ( $module->new, $methods{$module} );
-	}	
+	}
 
 die "No usable file scanner module found; exiting...\n" unless defined $object;
 
@@ -64,7 +64,7 @@ foreach my $file ( @ARGV ) {
 
 	dump_list( $file, sort $object->$method( $file ) );
 	}
-	
+
 
 BEGIN {
 my $corelist = eval { require Module::CoreList };
@@ -91,18 +91,18 @@ sub dump_list {
 
 	printf "%d module(s) in core, %d external module(s)\n\n", $core, $extern;
 	}
-	
+
 }
 
 =head1 AUTHORS
 
 Jonathan Yu C<< <frequency@cpan.org> >>
 
-brian d foy C<< <bdfoy@cpan.org> >>
+brian d foy C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright © 2009-2015, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2009-2015, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You can use this script under the same terms as Perl itself.
 

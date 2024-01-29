@@ -1,0 +1,8 @@
+NAME
+
+Parse::SNI - parse Server Name Indication from TLS handshake
+
+INSTALLATION
+
+perl Makefile.PL
+make && make test && make install

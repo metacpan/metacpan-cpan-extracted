@@ -1,5 +1,10 @@
 Revision history for Future-Queue
 
+0.52    2024-01-03
+        [BUGFIXES]
+         * Avoid an infinite deep recursion on `_manage_push_waiters`
+           (RT151010)
+
 0.51    2023-02-08
         [CHANGES]
          * Allow specifying a different class, prototype instance, or

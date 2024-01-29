@@ -61,8 +61,8 @@ sub new {
 # Run Operation Request
 # PostWorksheetAutoFilterRefreshRequest.name : The workbook name.  ,
 # PostWorksheetAutoFilterRefreshRequest.sheetName : The worksheet name.  ,
-# PostWorksheetAutoFilterRefreshRequest.folder : Original workbook folder.  ,
-# PostWorksheetAutoFilterRefreshRequest.storageName : Storage name.   
+# PostWorksheetAutoFilterRefreshRequest.folder : The folder where the file is situated.  ,
+# PostWorksheetAutoFilterRefreshRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_auto_filter_refresh' } = { 
-    	summary => 'Refresh auto filters in worksheet.',
+    	summary => 'Refresh auto filters in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -144,14 +144,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

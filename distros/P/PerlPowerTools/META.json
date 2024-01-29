@@ -1,7 +1,7 @@
 {
    "abstract" : "BSD utilities written in pure Perl",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
@@ -58,6 +58,6 @@
          "web" : "https://github.com/briandfoy/PerlPowerTools"
       }
    },
-   "version" : "1.041",
+   "version" : "1.043",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

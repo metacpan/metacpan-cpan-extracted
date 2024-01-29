@@ -1,5 +1,14 @@
 Revision history for Perl extension Poppler.
 
+1.0103  Sun Apr 10 13:21:00 2016
+	- Pushed a new version with long-standing documentation bug fixes
+
+1.0102  Sun Apr 10 13:21:00 2016
+	- Fixed new_from_data() constructor
+
+1.0101  Sun Jan 10 23:03:01 2016
+	- Fixed minimum URI version and repository URL in Build.PL
+
 1.01  Sun Jan 03 14:13:00 2016
 	- major re-write to utilize GObject introspection 
 

@@ -74,6 +74,10 @@ MODULE = Linux::FD::Pid				PACKAGE = Linux::FD::Pid
 
 PROTOTYPES: DISABLED
 
+BOOT:
+    load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("IO::Handle"), NULL);
+    av_push(get_av("Linux::FD::Pid::ISA" , GV_ADD), newSVpvs("IO::Handle"));
+
 SV*
 new(classname, pid, ...)
 	const char* classname;
@@ -122,7 +126,10 @@ wait(file_handle, flags = WEXITED)
 		}
 		if (info.si_signo == 0)
 			XSRETURN_UNDEF;
-		RETVAL = info.si_status;
+		if (info.si_code == CLD_EXITED)
+			RETVAL = info.si_status << 8;
+		else
+			RETVAL = info.si_status;
 	OUTPUT:
 		RETVAL
 

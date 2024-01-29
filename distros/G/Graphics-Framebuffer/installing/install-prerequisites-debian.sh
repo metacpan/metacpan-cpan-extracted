@@ -7,13 +7,13 @@ sudo apt update # Bring the Debian module database up to date
 # Absolutely needed
 
 sudo apt install -y build-essential \
-                    libfreetype6-dev \
+                    libfreetype-dev \
                     libgif-dev \
                     libjpeg-dev \
                     libpng-dev \
                     libtiff-dev \
-                    libfreetype6-dev \
 					ffmpeg \
+					fonts-freefonts-ttf \
                     fonts-wine
 
 # Only needed if you are using the OS installed (packaged) Perl

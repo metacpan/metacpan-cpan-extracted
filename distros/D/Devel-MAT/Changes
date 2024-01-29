@@ -1,5 +1,16 @@
 Revision history for Devel-MAT
 
+0.52    2024-01-13
+        [CHANGES]
+         * Ensure that `packages -V` can cope with version objects as well as
+           plain numerical SVs
+         * Make sure to load `Devel::MAT` only after processing the `--blib`
+           commandline option
+
+        [BUGFIXES]
+         * Print a warning and skip attempts to apply SVx annotations to
+           unrecognised SV addresses (alleviates but does not fix RT134117)
+
 0.51    2023-03-23
         [BUGFIXES]
          * Don't crash when loading files that claim non-existent SVs are

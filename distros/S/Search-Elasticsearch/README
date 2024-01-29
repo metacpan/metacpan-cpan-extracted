@@ -2,7 +2,7 @@ NAME
     Search::Elasticsearch - The official client for Elasticsearch
 
 VERSION
-    version 8.00
+    version 8.12
 
 SYNOPSIS
         use Search::Elasticsearch;
@@ -83,6 +83,10 @@ PREVIOUS VERSIONS OF ELASTICSEARCH
 
     If you need to talk to a version of Elasticsearch before 7.0.0, please
     install one of the following packages:
+
+    *   Search::Elasticsearch::Client::6_0
+
+    *   Search::Elasticsearch::Client::5_0
 
     *   Search::Elasticsearch::Client::2_0
 
@@ -414,7 +418,7 @@ AUTHOR
     Enrico Zimuel <enrico.zimuel@elastic.co>
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2022 by Elasticsearch BV.
+    This software is Copyright (c) 2024 by Elasticsearch BV.
 
     This is free software, licensed under:
 

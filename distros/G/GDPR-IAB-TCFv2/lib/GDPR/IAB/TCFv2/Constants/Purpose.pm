@@ -1,30 +1,38 @@
 package GDPR::IAB::TCFv2::Constants::Purpose;
 use strict;
 use warnings;
-use Scalar::Util qw<dualvar>;
 
 require Exporter;
 use base qw<Exporter>;
 
 use constant {
-    InfoStorageAccess =>
-      dualvar( 1, "Store and/or access information on a device" ),
-    BasicAdserving => dualvar( 2, "Use limited data to select advertising" ),
-    PersonalizationProfile =>
-      dualvar( 3, "Create profiles for personalised advertising" ),
+    InfoStorageAccess        => 1,
+    BasicAdserving           => 2,
+    PersonalizationProfile   => 3,
+    PersonalizationSelection => 4,
+    ContentProfile           => 5,
+    ContentSelection         => 6,
+    AdPerformance            => 7,
+    ContentPerformance       => 8,
+    MarketResearch           => 9,
+    DevelopImprove           => 10,
+    SelectContent            => 11,
+};
+
+use constant PurposeDescription => {
+    InfoStorageAccess        => "Store and/or access information on a device",
+    BasicAdserving           => "Use limited data to select advertising",
+    PersonalizationProfile   => "Create profiles for personalised advertising",
     PersonalizationSelection =>
-      dualvar( 4, "Use profiles to select personalised advertising" ),
-    ContentProfile   => dualvar( 5, "Create profiles to personalise content" ),
-    ContentSelection =>
-      dualvar( 6, "Use profiles to select personalised content" ),
-    AdPerformance      => dualvar( 7, "Measure advertising performance" ),
-    ContentPerformance => dualvar( 8, "Measure content performance" ),
-    MarketResearch     => dualvar(
-        9,
-        "Understand audiences through statistics or combinations of data from different sources"
-    ),
-    DevelopImprove => dualvar( 10, "Develop and improve services" ),
-    SelectContent  => dualvar( 11, "Use limited data to select content" ),
+      "Use profiles to select personalised advertising",
+    ContentProfile     => "Create profiles to personalise content",
+    ContentSelection   => "Use profiles to select personalised content",
+    AdPerformance      => "Measure advertising performance",
+    ContentPerformance => "Measure content performance",
+    MarketResearch     =>
+      "Understand audiences through statistics or combinations of data from different sources",
+    DevelopImprove => "Develop and improve services",
+    SelectContent  => "Use limited data to select content",
 };
 
 our @EXPORT_OK = qw<
@@ -39,6 +47,7 @@ our @EXPORT_OK = qw<
   MarketResearch
   DevelopImprove
   SelectContent
+  PurposeDescription
 >;
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
@@ -58,15 +67,15 @@ GDPR::IAB::TCFv2::Constants::Purpose - TCF v2.2 purposes
 
     use feature 'say';
     
-    say "Purpose id is ". (0+InfoStorageAccess), ", and it means " . InfoStorageAccess;
+    say "Purpose id is ", InfoStorageAccess , ", and it means " . PurposeDescription->{InfoStorageAccess};
     # Output:
     # Purpose id is 1, and it means Store and/or access information on a device
 
 =head1 CONSTANTS
 
-All constants are C<dualvar> (see L<Scalar::Util>).
+All constants are integers.
 
-Returns a scalar that has the C<id> in a numeric context and the C<description> in a string context.
+To find the description of a given id you can use the hashref L</PurposeDescription>
 
 =head2  InfoStorageAccess
 
@@ -289,3 +298,7 @@ A travel magazine has published an article on its website about the new online c
 A sports news mobile app has started a new section of articles covering the most recent football games. Each article includes videos hosted by a separate streaming platform showcasing the highlights of each match. If you fast-forward a video, this information may be used to select a shorter video to play next.
 
 =back
+
+=head2 PurposeDescription
+
+Returns a hashref with a mapping between all purpose ids and their description.

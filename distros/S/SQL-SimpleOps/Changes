@@ -1,8 +1,13 @@
 Revision history for Perl extension SQL::SimpleOps.
 
+2023.362.1 Thu Dec 28 20:00:42 2023
+	- NOTICE: For end users of previous version 2023.284.1 only
+	- NOTICE: This version provide enchanced changes (you must see the version notes)
+	- news: escape quote character in values if exists: by CCELSO
+
 2023.302.1 Sun Oct 29 03:14:35 2023
 	- NOTICE: For end users of previous version 2023.284.1 only
-	- NOTICE: The version provide enchanced changes (you must see the version notes)
+	- NOTICE: This version provide enchanced changes (you must see the version notes)
 	- news: Option 'cursor_order' added; by CCELSO
 	- news: Info 'previouscmd' added in cursor_info; by CCELSO
 

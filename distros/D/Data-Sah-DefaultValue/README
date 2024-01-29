@@ -2,8 +2,8 @@ NAME
     Data::Sah::DefaultValue - Default-value rules for Data::Sah
 
 VERSION
-    This document describes version 0.003 of Data::Sah::DefaultValue (from
-    Perl distribution Data-Sah-DefaultValue), released on 2023-03-30.
+    This document describes version 0.005 of Data::Sah::DefaultValue (from
+    Perl distribution Data-Sah-DefaultValue), released on 2024-01-17.
 
 SYNOPSIS
      use Data::Sah::DefaultValue  qw(gen_default_value_code);
@@ -38,9 +38,9 @@ DESCRIPTION
 
         From DefHash.
 
-    The module must also contain "default_value" subroutine which must
-    generate the code for default value. The subroutine must accept a hash
-    of arguments ("*" indicates required arguments):
+    The module must also contain "value" subroutine which must generate the
+    code for default value. The subroutine must accept a hash of arguments
+    ("*" indicates required arguments):
 
     The "value" subroutine must return a hashref with the following keys
     ("*" indicates required keys):
@@ -145,7 +145,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2021 by perlancar
+    This software is copyright (c) 2024, 2023, 2021 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

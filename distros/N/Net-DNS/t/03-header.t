@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 03-header.t 1910 2023-03-30 19:16:30Z willem $
+# $Id: 03-header.t 1953 2023-12-24 09:03:14Z willem $
 #
 
 use strict;
@@ -27,7 +27,7 @@ sub toggle {
 }
 
 
-my $newid = Net::DNS::Packet->new()->header->id(0);
+my $newid = Net::DNS::Packet->new()->header->id(undef);
 ok( $newid, 'expected non-zero packet ID' );
 
 toggle( $header, 'opcode', qw(QUERY UPDATE DSO) );

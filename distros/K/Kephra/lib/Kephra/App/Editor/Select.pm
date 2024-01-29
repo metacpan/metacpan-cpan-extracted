@@ -8,13 +8,15 @@ sub expand_selecton {
     my ($self, $pos) = @_;
     my ($sel_start, $sel_end) = $self->GetSelection;
     return 0 if defined $pos and ($pos < $sel_start or $pos > $sel_start);
+    return 0 if $sel_start == 0 and $sel_end == $self->GetLastPosition;
     my $start_line = $self->LineFromPosition( $sel_start );
     my $end_line = $self->LineFromPosition( $sel_end );
     my $line_start = $self->PositionFromLine( $start_line );
     my $line_end = $self->GetLineEndPosition( $start_line );
     my @selection;
+
     if ($start_line == $end_line and not ($sel_start == $line_start and $sel_end == $line_end)) {
-        my @word_edge = $self->word_edges( $sel_start );
+        my @word_edge = $self->word_edges_expand( $sel_start );
         if    ( $sel_start == $word_edge[0] and $sel_end == $word_edge[1] ) {                         }
         elsif ( $sel_start >= $word_edge[0] and $sel_end <= $word_edge[1] ) { @selection = @word_edge } # select word if got less
 
@@ -35,29 +37,54 @@ sub expand_selecton {
             @selection = ($line_start, $line_end) unless @selection;
         }
     }
-    unless (@selection) { # select construct: sub for if
-        @selection = (0, $self->GetTextLength - 1 ); #  select all
+    unless (@selection) { #  get smallest selection lasrger than current
+        @selection = (0, $self->GetLastPosition ); #  select all
         my @block_edges = $self->block_edges_expand( $sel_start, $sel_end );
         @selection = @block_edges if @block_edges and ($block_edges[0] >= $selection[0] or $block_edges[1] <= $selection[1]);
         my @sub_edges = $self->sub_edges_expand( $sel_start, $sel_end );
         @selection = @sub_edges   if @sub_edges   and ($sub_edges[0]   >= $selection[0] or $sub_edges[1]  <= $selection[1]);
         my @loop_edges = $self->loop_edges_expand( $sel_start, $sel_end );
         @selection = @loop_edges  if @loop_edges  and ($loop_edges[0]  >= $selection[0] or $loop_edges[1] <= $selection[1]);
-        # my @branch_edges = $self->branch_edges_expand( $sel_start, $sel_end );  select if () {}     # select unless () {}
+        # my @branch_edges = $self->branch_edges_expand( $sel_start, $sel_end );  select if () {}     # select unless () {} # for if and unless
     }
     $self->SetSelection( @selection );
+
+    # remember from where selection was expanded to be able go back
+    my ($selection_history) = ($self->get_caret_pos_cache('expand_selecton'));
+    $selection_history = [[$sel_start, $sel_end]] unless ref $selection_history eq 'ARRAY';
+    push @$selection_history, [@selection];
+    $self->set_caret_pos_cache('expand_selecton', $selection_history);
+
     1;
 }
 
 sub shrink_selecton {
     my ($self) = @_;
     my ($start_pos, $end_pos) = $self->GetSelection;
+    return 0 if $start_pos == $end_pos;
+
+    my ($selection_history) = ($self->get_caret_pos_cache('expand_selecton'));
+    if (ref $selection_history and @$selection_history){
+        my $selection = pop @$selection_history;
+        $selection = pop @$selection_history if @$selection_history
+                                            and $selection->[0] == $start_pos and $selection->[1] == $end_pos;
+        return $self->SetSelection( @$selection );
+    }
+
+    my $pos = $self->GetCurrentPos;
+    my $pos_anchor = $self->GetAnchor;
+ say "$pos $pos_anchor ";
     my $center = $self->{'set_pos'};
     my $start_line = $self->LineFromPosition( $start_pos );
     my $end_line = $self->LineFromPosition( $end_pos );
     my $line_start = $self->PositionFromLine( $start_line );
     my $line_end = $self->GetLineEndPosition( $start_line );
     my @selection;
+    # @selection = $self->word_edges_shrink($pos, $pos_anchor);
+    @selection = $self->block_edges_shrink($pos, $pos_anchor);
+    say "@selection";
+
+# shrink toward the caret
     #~ return if $start_pos == $end_pos;
 
     #~ if ($start_line == $end_line) {
@@ -83,7 +110,7 @@ sub shrink_selecton {
         #~ @selection = $start_pos, $end_pos;
     #~ }
 #~ # say "shrink $start_pos, $end_pos ", $self->{'select_stack'};
-    #~ $self->SetSelection( @selection );
+    $self->SetSelection( @selection );
     1;
 }
 
@@ -154,6 +181,11 @@ sub select_next_block {
     $self->SetAnchor($anchor);
     $self->EnsureCaretVisible;
 }
+
+sub select_all {
+    my ($self) = @_;
+    $self->SetSelection( 0, $self->GetTextLength - 1 );
+}
 #say $self->GetRect;
 # ->SelectionIsRectangle
 # ->HomeRectExtend ()
@@ -166,34 +198,39 @@ sub select_next_block {
 
 sub select_rect_up {
     my ($self) = @_;
-    $self->LineUpRectExtend;
-#say "$_ : ", $self->GetSelectionNCaret($_) for 1..6;
-#say '      '.$self->GetSelections();
+    $self->LineUpRectExtend; #say "$_ : ", $self->GetSelectionNCaret($_) for 1..6; #->GetSelections();
 }
-
-
 sub select_rect_down {
     my ($self) = @_;
     $self->LineDownRectExtend;
 }
 
-
 sub select_rect_left {
     my ($self) = @_;
     $self->CharLeftRectExtend;
 }
-
-
 sub select_rect_right {
     my ($self) = @_;
-    $self->CharRightRectExtend;
-# $self->SetSelectionNCaret
+    $self->CharRightRectExtend; # $self->SetSelectionNCaret # &Wx::wxSTC_MULTIPASTE_EACH
 }
-# &Wx::wxSTC_MULTIPASTE_EACH
 
-sub select_all {
+sub select_home {
     my ($self) = @_;
-    $self->SetSelection( 0, $self->GetTextLength - 1 );
+    my ($sel_start, $sel_end) = $self->GetSelection;
+    my $pos = $self->GetCurrentPos;
+    $self->del_caret_pos_cache();
+    $self->GotoPos( $self->PositionFromLine( $self->GetCurrentLine ) );
+    if ($sel_start == $pos){ $self->SetAnchor($sel_end) }
+    else                   { $self->SetAnchor($sel_start) }
+}
+sub select_end {
+    my ($self) = @_;
+    my ($sel_start, $sel_end) = $self->GetSelection;
+    my $pos = $self->GetCurrentPos;
+    $self->del_caret_pos_cache();
+    $self->GotoPos( $self->GetLineEndPosition( $self->GetCurrentLine  ) );
+    if ($sel_start == $pos){ $self->SetAnchor($sel_end) }
+    else                   { $self->SetAnchor($sel_start) }
 }
 
 

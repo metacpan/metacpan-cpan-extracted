@@ -27,21 +27,22 @@ Primary and unique keys are table constraints, not indices.
 
 use Moo;
 use SQL::Translator::Schema::Constants;
-use SQL::Translator::Utils qw(ex2err throw);
+use SQL::Translator::Schema::IndexField;
+use SQL::Translator::Utils qw(ex2err throw parse_list_arg);
 use SQL::Translator::Role::ListAttr;
 use SQL::Translator::Types qw(schema_obj enum);
-use Sub::Quote qw(quote_sub);
+use Sub::Quote             qw(quote_sub);
 
 extends 'SQL::Translator::Schema::Object';
 
-our $VERSION = '1.63';
+our $VERSION = '1.65';
 
 my %VALID_INDEX_TYPE = (
-  UNIQUE         => 1,
-  NORMAL         => 1,
-  FULLTEXT       => 1, # MySQL only (?)
-  FULL_TEXT      => 1, # MySQL only (?)
-  SPATIAL        => 1, # MySQL only (?)
+  UNIQUE    => 1,
+  NORMAL    => 1,
+  FULLTEXT  => 1,    # MySQL only (?)
+  FULL_TEXT => 1,    # MySQL only (?)
+  SPATIAL   => 1,    # MySQL only (?)
 );
 
 =head2 new
@@ -61,12 +62,22 @@ names and keep them in order by the first occurrence of a field name.
   $index->fields( 'id, name' );
   $index->fields( [ 'id', 'name' ] );
   $index->fields( qw[ id name ] );
+  $index->fields(id => { name => 'name', order_by => 'ASC NULLS LAST' });
 
   my @fields = $index->fields;
 
 =cut
 
-with ListAttr fields => ( uniq => 1 );
+with ListAttr fields => (
+  coerce => sub {
+    my %seen;
+    return [
+      grep !$seen{ $_->name }++,
+      map SQL::Translator::Schema::IndexField->new($_),
+      @{ parse_list_arg($_[0]) }
+    ];
+  }
+);
 
 sub is_valid {
 
@@ -80,17 +91,16 @@ Determine whether the index is valid or not.
 
 =cut
 
-    my $self   = shift;
-    my $table  = $self->table  or return $self->error('No table');
-    my @fields = $self->fields or return $self->error('No fields');
+  my $self   = shift;
+  my $table  = $self->table  or return $self->error('No table');
+  my @fields = $self->fields or return $self->error('No fields');
 
-    for my $field ( @fields ) {
-        return $self->error(
-            "Field '$field' does not exist in table '", $table->name, "'"
-        ) unless $table->get_field( $field );
-    }
+  for my $field (@fields) {
+    return $self->error("Field '$field' does not exist in table '", $table->name, "'")
+        unless $table->get_field($field);
+  }
 
-    return 1;
+  return 1;
 }
 
 =head2 name
@@ -102,9 +112,9 @@ Get or set the index's name.
 =cut
 
 has name => (
-    is => 'rw',
-    coerce => quote_sub(q{ defined $_[0] ? $_[0] : '' }),
-    default => quote_sub(q{ '' }),
+  is      => 'rw',
+  coerce  => quote_sub(q{ defined $_[0] ? $_[0] : '' }),
+  default => quote_sub(q{ '' }),
 );
 
 =head2 options
@@ -126,7 +136,7 @@ Get or set the index's table object.
 
 =cut
 
-has table => ( is => 'rw', isa => schema_obj('Table'), weak_ref => 1 );
+has table => (is => 'rw', isa => schema_obj('Table'), weak_ref => 1);
 
 around table => \&ex2err;
 
@@ -146,12 +156,16 @@ uppercase.
 =cut
 
 has type => (
-    is => 'rw',
-    coerce => quote_sub(q{ uc $_[0] }),
-    default => quote_sub(q{ 'NORMAL' }),
-    isa => enum([keys %VALID_INDEX_TYPE], {
-        msg => "Invalid index type: %s", allow_false => 1,
-    }),
+  is      => 'rw',
+  coerce  => quote_sub(q{ uc $_[0] }),
+  default => quote_sub(q{ 'NORMAL' }),
+  isa     => enum(
+    [ keys %VALID_INDEX_TYPE ],
+    {
+      msg         => "Invalid index type: %s",
+      allow_false => 1,
+    }
+  ),
 );
 
 around type => \&ex2err;
@@ -165,40 +179,45 @@ Determines if this index is the same as another
 =cut
 
 around equals => sub {
-    my $orig = shift;
-    my $self = shift;
-    my $other = shift;
-    my $case_insensitive = shift;
-    my $ignore_index_names = shift;
+  my $orig               = shift;
+  my $self               = shift;
+  my $other              = shift;
+  my $case_insensitive   = shift;
+  my $ignore_index_names = shift;
 
-    return 0 unless $self->$orig($other);
+  return 0 unless $self->$orig($other);
 
-    unless ($ignore_index_names) {
-      unless ((!$self->name && ($other->name eq $other->fields->[0])) ||
-        (!$other->name && ($self->name eq $self->fields->[0]))) {
-        return 0 unless $case_insensitive ? uc($self->name) eq uc($other->name) : $self->name eq $other->name;
-      }
+  unless ($ignore_index_names) {
+    unless ((!$self->name && ($other->name eq $other->fields->[0]->name))
+      || (!$other->name && ($self->name eq $self->fields->[0]->name))) {
+      return 0
+          unless $case_insensitive
+          ? uc($self->name) eq uc($other->name)
+          : $self->name eq $other->name;
     }
-    #return 0 unless $self->is_valid eq $other->is_valid;
-    return 0 unless $self->type eq $other->type;
+  }
 
-    # Check fields, regardless of order
-    my %otherFields = ();  # create a hash of the other fields
-    foreach my $otherField ($other->fields) {
-      $otherField = uc($otherField) if $case_insensitive;
-      $otherFields{$otherField} = 1;
-    }
-    foreach my $selfField ($self->fields) { # check for self fields in hash
-      $selfField = uc($selfField) if $case_insensitive;
-      return 0 unless $otherFields{$selfField};
-      delete $otherFields{$selfField};
-    }
-    # Check all other fields were accounted for
-    return 0 unless keys %otherFields == 0;
+  #return 0 unless $self->is_valid eq $other->is_valid;
+  return 0 unless $self->type eq $other->type;
 
-    return 0 unless $self->_compare_objects(scalar $self->options, scalar $other->options);
-    return 0 unless $self->_compare_objects(scalar $self->extra, scalar $other->extra);
-    return 1;
+  # Check fields, regardless of order
+  my $get_name    = sub { return $case_insensitive ? uc(shift->name) : shift->name; };
+  my @otherFields = sort { $a->{key} cmp $b->{key} }
+      map +{ item => $_, key => $get_name->($_) }, $other->fields;
+  my @selfFields = sort { $a->{key} cmp $b->{key} }
+      map +{ item => $_, key => $get_name->($_) }, $self->fields;
+  return 0 unless @otherFields == @selfFields;
+  for my $idx (0 .. $#selfFields) {
+    return 0 unless $selfFields[$idx]{key} eq $otherFields[$idx]{key};
+    return 0
+        unless $self->_compare_objects(scalar $selfFields[$idx]{item}->extra, scalar $otherFields[$idx]{item}->extra);
+  }
+
+  return 0
+      unless $self->_compare_objects(scalar $self->options, scalar $other->options);
+  return 0
+      unless $self->_compare_objects(scalar $self->extra, scalar $other->extra);
+  return 1;
 };
 
 # Must come after all 'has' declarations

@@ -4,11 +4,12 @@
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
 use v5.36;
-use Object::Pad 0.800;
+use Object::Pad 0.807;
 
-class App::perl::distrolint::Check::VersionVar 0.03
-   :does(App::perl::distrolint::CheckRole::EachFile)
-   :does(App::perl::distrolint::CheckRole::TreeSitterPerl);
+class App::perl::distrolint::Check::VersionVar 0.06;
+
+apply App::perl::distrolint::CheckRole::EachFile;
+apply App::perl::distrolint::CheckRole::TreeSitterPerl;
 
 use Text::Treesitter 0.07; # child_by_field_name
 
@@ -29,17 +30,17 @@ syntax of Perl v5.14.
 
 method run ( $app )
 {
-   return $self->run_for_each_perl_file( check_file => $app );
+   return $self->run_for_each_perl_file( check_file => );
 }
 
-method check_file ( $file, $app )
+method check_file ( $file )
 {
    my $tree = $self->parse_perl_file( $file );
 
-   return $self->walk_each_statement( $tree->root_node, check_statement => $file, $app );
+   return $self->walk_each_statement( $tree->root_node, check_statement => $file );
 }
 
-method check_statement ( $node, $file, $app )
+method check_statement ( $node, $file )
 {
    my ( $expr ) = $node->child_nodes;
    return 1 unless $expr->type eq "assignment_expression";
@@ -71,8 +72,7 @@ method check_statement ( $node, $file, $app )
    foreach my $var ( @vars ) {
       next unless $var->text eq '$VERSION';
 
-      my $line = ( $node->start_point )[0] + 1;
-      $app->diag( "%s line %d has an assignment to \$VERSION", $file, $line );
+      App->diag( App->format_file( $file, $node->start_row + 1 ), " has an assignment to ", App->format_literal( '$VERSION' ) );
       return 0;
    }
 

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Brx - Package for language Bodo
 
 package Locale::CLDR::Locales::Brx;
 # This file auto generated from Data\common\main\brx.xml
-#	on Tue  5 Dec  1:02:59 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -44,7 +44,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ab' => 'अब्खाज़ियन्',
@@ -368,7 +368,6 @@ has 'display_name_language' => (
  				'ro' => 'रूमानीयन्',
  				'ro_MD' => 'मोल्डेवियन्',
  				'rom' => 'रुमानी',
- 				'root' => 'रुट',
  				'ru' => 'रुसी',
  				'rup' => 'आरोमानी',
  				'rw' => 'किन्यारुआण्डा',
@@ -631,7 +630,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'दुनिया',
  			'002' => 'अफ्रीका',
@@ -805,7 +804,6 @@ has 'display_name_region' => (
  			'MF' => 'सेँ मार्टेँ',
  			'MG' => 'मदागास्कर',
  			'MH' => 'मार्शल द्वीप',
- 			'MK' => 'मैसेडोनिया',
  			'ML' => 'माली',
  			'MM' => 'म्यानमार',
  			'MN' => 'मंगोलिया',
@@ -920,7 +918,7 @@ has 'display_name_variant' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'1901' => 'पारम्पारिक जर्मन वर्तनी 1901',
  			'1994' => 'पारम्पारिक रेसीयन वर्तनी 1994',
@@ -955,7 +953,7 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'calendar' => 'पंचाग',
  			'collation' => 'वर्गीकरण',
@@ -998,7 +996,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{मिथार खिलमिथार},
  			'US' => q{यु.एस},
@@ -1011,7 +1009,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'script' => 'देवनागरी: {0}',
  			'region' => 'क्षेत्र:भारत {0}',
@@ -1032,7 +1030,7 @@ has 'characters' => (
 			auxiliary => qr{[‌‍]},
 			index => ['अ', 'आ', 'इ', 'ई', 'उ', 'ऊ', 'ऍ', 'ए', 'ऐ', 'ऑ', 'ओ', 'औ', 'क', 'ख', 'ग', 'घ', 'च', 'छ', 'ज', 'झ', 'ञ', 'ट', 'ठ', 'ड', '{ड\u093C}', 'ढ', 'ण', 'त', 'थ', 'द', 'ध', 'न', 'प', 'फ', 'ब', 'भ', 'म', 'य', 'र', 'ल', 'ळ', 'व', 'श', 'ष', 'स', 'ह'],
 			main => qr{[़ ँ ं अ आ इ ई उ ऊ ऍ ए ऐ ऑ ओ औ क ख ग घ च छ ज झ ञ ट ठ ड {ड़} ढ ण त थ द ध न प फ ब भ म य र ल ळ व श ष स ह ा ि ी ु ू ृ ॅ े ै ॉ ो ौ ्]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -1076,36 +1074,85 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(सान),
+						'one' => q({0} सान),
+						'other' => q({0} सान),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(सान),
 						'one' => q({0} सान),
 						'other' => q({0} सान),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(घंटे),
+						'one' => q({0} रिंगा),
+						'other' => q({0} घंटे),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(घंटे),
 						'one' => q({0} रिंगा),
 						'other' => q({0} घंटे),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(मिन.),
+						'one' => q({0} मिन.),
+						'other' => q({0} मिन.),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(मिन.),
 						'one' => q({0} मिन.),
 						'other' => q({0} मिन.),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(महीने),
+						'one' => q({0} महीना),
+						'other' => q({0} महीने),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(महीने),
 						'one' => q({0} महीना),
 						'other' => q({0} महीने),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(सेकं.),
+						'one' => q({0} सेकं.),
+						'other' => q({0} सेकं.),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(सेकं.),
 						'one' => q({0} सेकं.),
 						'other' => q({0} सेकं.),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(सप्ताह),
+						'one' => q({0} सप्ताह),
+						'other' => q({0} सप्ताह),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(सप्ताह),
 						'one' => q({0} सप्ताह),
 						'other' => q({0} सप्ताह),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(साल),
+						'one' => q({0} साल),
+						'other' => q({0} साल),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(साल),
 						'one' => q({0} साल),
@@ -1113,24 +1160,59 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(सान),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(सान),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(घंटे),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(घंटे),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(मिन.),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(मिन.),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(महीने),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(महीने),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(सेकं.),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(सेकं.),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(सप्ताह),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(सप्ताह),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(साल),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(साल),
 					},
@@ -4570,6 +4652,8 @@ has 'time_zone_names' => (
 		},
 		'Norfolk' => {
 			long => {
+				'daylight' => q#नॉरफोक डेलाईट टाईम#,
+				'generic' => q#नॉरफोक टाईम#,
 				'standard' => q#नॉरफोक स्टैंडर्ड टाईम#,
 			},
 		},

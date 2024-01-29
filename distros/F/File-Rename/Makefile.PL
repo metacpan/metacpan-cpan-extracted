@@ -20,9 +20,23 @@ my $unsafe = File::Spec->catfile( 'script',
                                     'unsafe-rename');
 my $source = File::Spec->catfile( 'source', 'rename');
                                
+my @pms = map File::Spec->catfile( 'File', $_), 
+            (q(Rename.pm), 
+            (map File::Spec->catfile( 'Rename', $_), 
+                qw(Options.pm Unicode.pm)));
+
+my @libs = map File::Spec->catfile('lib', $_), @pms;
+my %pm;
+@pm{@pms} = map "\$(INST_LIB)/$_", @pms;
+
+my $baselib = $libs[0];
+
+my %rename = ( $script => $source );
+@rename{@pms} = @libs;
+
 WriteMakefile(
           NAME          => 'File::Rename',
-          VERSION_FROM  => 'lib/File/Rename.pm',
+          VERSION_FROM  => $baselib,
           INSTALLDIRS   => 'site',
           PREREQ_PM     => {
             'Getopt::Long'  => 2.24,    # for posix_default
@@ -33,11 +47,13 @@ WriteMakefile(
             'File::Temp'    => 0,   # for testing
             'Test::More'    => 0,   # for testing(!)
           },
+          PM    => \%pm,
+          clean => { FILES => join ' ', @pms },
           EXE_FILES     => [ $script, $unsafe ],
-          PL_FILES      => { 'rename.PL' => {$script => $source},
-                             'unsafe.PL' => {$unsafe => $source},
+          PL_FILES      => { 'rename.PL' => \%rename, 
+                             'unsafe.PL' => {$unsafe => $script},
                         },
-          ABSTRACT_FROM => 'lib/File/Rename.pm',
+          ABSTRACT_FROM => $baselib,
                             # retrieve abstract from module
           AUTHOR        => 'Robin Barker <RMBarker@cpan.org>',
           LICENSE       => 'perl',

@@ -1,3 +1,4 @@
+.editorconfig
 bin/tangence-dumptan
 Build.PL
 Changes

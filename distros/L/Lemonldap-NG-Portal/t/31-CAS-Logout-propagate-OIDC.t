@@ -1,5 +1,4 @@
 use warnings;
-use lib 'inc';
 use Test::More;
 use strict;
 use IO::String;
@@ -101,6 +100,7 @@ sub issuer {
                         oidcRPMetaDataOptionsLogoutType            => "front",
                         oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
                         oidcRPMetaDataOptionsBypassConsent         => 1,
+                        oidcRPMetaDataOptionsRedirectUris => 'http://rp.com/',
                     },
                 },
                 oidcOPMetaDataOptions           => {},

@@ -12,20 +12,21 @@ sub db_from {
   # list of join components from the Meta::Join
   my $db_from   = $self->metadm->db_from;
 
-  # if there is no db_schema, just return that list
-  my $db_schema = $self->schema->db_schema
-    or return $db_from;
+  # if there is a db_schema, we must prefix each table in list with $db_schema.
+  my $db_schema = $self->schema->db_schema;
+  if ($db_schema) {
+    # The list is of shape: [-join => $table1, $join_spec1, $table2, $join_spec2 .... $table_n];
+    # therefore tables are at odd positions in the list. Tables already containing
+    # a '.' are left untouched.
+    my @copy = @$db_from;
+    for (my $i=1; $i < @copy && $copy[$i] !~ /\./; $i += 2) {
+      $copy[$i] =~ s/^/$db_schema./;
+    }
 
-  # otherwise, prefix each table in list with $db_schema. The list is of
-  # shape: [-join => $table1, $join_spec1, $table2, $join_spec2 .... $table_n];
-  # therefore tables are at odd positions in the list. Tables already containing
-  # a '.' are left untouched.
-  my @copy = @$db_from;
-  for (my $i=1; $i < @copy; $i += 2) {
-    /\./ or $_ = "$db_schema.$_" for $copy[$i];
+    $db_from = \@copy;
   }
 
-  return \@copy;
+  return $db_from;
 }
 
 

@@ -10,6 +10,7 @@ use Firefox::Marionette::Cookie();
 use Firefox::Marionette::Display();
 use Firefox::Marionette::Window::Rect();
 use Firefox::Marionette::Element::Rect();
+use Firefox::Marionette::GeoLocation();
 use Firefox::Marionette::Timeouts();
 use Firefox::Marionette::Image();
 use Firefox::Marionette::Link();
@@ -71,7 +72,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.49';
+our $VERSION = '1.51';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -197,6 +198,107 @@ sub BY_PARTIAL {
 '**** DEPRECATED METHOD - using find(..., BY_PARTIAL()) HAS BEEN REPLACED BY find_partial ****'
     );
     return 'partial link text';
+}
+
+sub languages {
+    my ( $self, @new_languages ) = @_;
+    my $pref_name = 'intl.accept_languages';
+    my $script =
+      'return navigator.languages'
+      ; # branch.getComplexValue(arguments[0], Components.interfaces.nsIPrefLocalizedString).data';
+    my $old           = $self->_context('chrome');
+    my @old_languages = @{
+        $self->script(
+            $self->_compress_script(
+                $self->_prefs_interface_preamble() . $script
+            ),
+            args => [$pref_name]
+        )
+    };
+    $self->_context($old);
+    if ( scalar @new_languages ) {
+        $self->set_pref( $pref_name, join q[, ], @new_languages );
+    }
+    return @old_languages;
+}
+
+sub _setup_geo {
+    my ( $self, $geo ) = @_;
+    $self->set_pref( 'geo.enabled',                   1 );
+    $self->set_pref( 'geo.provider.use_geoclue',      0 );
+    $self->set_pref( 'geo.provider.use_corelocation', 0 );
+    $self->set_pref( 'geo.provider.testing',          1 );
+    $self->set_pref( 'geo.prompt.testing',            1 );
+    $self->set_pref( 'geo.prompt.testing.allow',      1 );
+    $self->set_pref( 'geo.security.allowinsecure',    1 );
+    $self->set_pref( 'geo.wifi.scan',                 1 );
+    $self->set_pref( 'permissions.default.geo',       1 );
+
+    if ( ref $geo ) {
+        if ( ( Scalar::Util::blessed($geo) ) && ( $geo->isa('URI') ) ) {
+            $self->geo( $self->json($geo) );
+        }
+        else {
+            $self->geo($geo);
+        }
+    }
+    elsif ( $geo =~ /^(?:data|http)/smx ) {
+        $self->geo( $self->json($geo) );
+    }
+    return $self;
+}
+
+sub geo {
+    my ( $self, @parameters ) = @_;
+
+    my $location;
+    if ( scalar @parameters ) {
+        $location = Firefox::Marionette::GeoLocation->new(@parameters);
+    }
+    if ( defined $location ) {
+        $self->set_pref( 'geo.provider.network.url',
+            q[data:application/json,]
+              . JSON->new()->convert_blessed()->encode($location) );
+        $self->set_pref( 'geo.wifi.uri',
+            q[data:application/json,]
+              . JSON->new()->convert_blessed()->encode($location) );
+        return $self;
+    }
+    my $new_location =
+      Firefox::Marionette::GeoLocation->new( $self->_get_geolocation() );
+    return $new_location;
+}
+
+sub _get_geolocation {
+    my ($self) = @_;
+
+    my $result = $self->script( $self->_compress_script( <<'_JS_') );
+return (async function() {
+  function getGeo() {
+    return new Promise((resolve, reject) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(resolve, reject, { maximumAge: 0, enableHighAccuracy: true });
+      } else {
+        reject("navigator.geolocation is unavailable");
+      }
+    })
+  };
+  return await getGeo().then((response) => { let d = new Date(); return {
+									"timezone_offset": d.getTimezoneOffset(),
+									"latitude": response["coords"]["latitude"],
+									"longitude": response["coords"]["longitude"],
+									"altitude": response["coords"]["altitude"],
+									"accuracy": response["coords"]["accuracy"],
+									"altitudeAccuracy": response["coords"]["altitudeAccuracy"],
+									"heading": response["coords"]["heading"],
+									"speed": response["coords"]["speed"],
+									}; }).catch((err) => { throw err.message });
+})();
+_JS_
+    if ( ( defined $result ) && ( !ref $result ) ) {
+        Firefox::Marionette::Exception->throw("javascript error: $result");
+    }
+    return $result;
 }
 
 sub _prefs_interface_preamble {
@@ -354,6 +456,22 @@ _JS_
     );
     $self->_context($old);
     return $self;
+}
+
+sub agent {
+    my ( $self, @new ) = @_;
+    my $pref_name = 'general.useragent.override';
+    my $old_agent =
+      $self->script( $self->_compress_script('return navigator.userAgent') );
+    if ( ( scalar @new ) > 0 ) {
+        if ( defined $new[0] ) {
+            $self->set_pref( $pref_name, $new[0] );
+        }
+        else {
+            $self->clear_pref($pref_name);
+        }
+    }
+    return $old_agent;
 }
 
 sub _download_directory {
@@ -809,6 +927,7 @@ sub _store_restart_parameters {
         next if ( $key eq 'profile' );
         next if ( $key eq 'capabilities' );
         next if ( $key eq 'timeout' );
+        next if ( $key eq 'geo' );
         $self->{_restart_parameters}->{$key} = $parameters{$key};
     }
     return;
@@ -824,6 +943,7 @@ sub _init {
     $self->{force_scp_protocol} = $parameters{scp};
     $self->{visible}            = $parameters{visible};
     $self->{force_webauthn}     = $parameters{webauthn};
+    $self->{geo}                = $parameters{geo};
 
     foreach my $type (qw(nightly developer waterfox)) {
         if ( defined $parameters{$type} ) {
@@ -3644,6 +3764,13 @@ sub _setup_shortcut_proxy {
             $firefox_proxy =
               Firefox::Marionette::Proxy->new( tls => $proxy_uri->host_port() );
         }
+        elsif ( $proxy_uri =~ /^socks([45])?:\/\/([^\/]+)/smx ) {
+            my ( $protocol_version, $host_port ) = ( $1, $2 );
+            $firefox_proxy = Firefox::Marionette::Proxy->new(
+                socks_protocol => $protocol_version,
+                socks          => $host_port
+            );
+        }
         else {
             $firefox_proxy =
               Firefox::Marionette::Proxy->new(
@@ -3753,6 +3880,9 @@ sub _post_launch_checks_and_setup {
         $self->{$webauthn_default_authenticator_key_name} =
           $self->add_webauthn_authenticator();
     }
+    if ( my $geo = delete $self->{geo} ) {
+        $self->_setup_geo($geo);
+    }
     return;
 }
 
@@ -3807,39 +3937,20 @@ sub _build_local_extension_directory {
     return;
 }
 
-sub _clean_local_extension_directory {
+sub har {
     my ($self) = @_;
-    if ( $self->{_local_extension_directory} ) {
-
-        # manual clearing of the directory to aid with win32 idiocy
-        my $handle = DirHandle->new( $self->{_local_extension_directory} )
-          or Firefox::Marionette::Exception->throw(
-"Failed to open directory '$self->{_local_extension_directory}':$EXTENDED_OS_ERROR"
-          );
-        my $cleaned = 1;
-        while ( my $entry = $handle->read() ) {
-            next if ( $entry eq File::Spec->updir() );
-            next if ( $entry eq File::Spec->curdir() );
-            my $path = File::Spec->catfile( $self->{_local_extension_directory},
-                $entry );
-            unlink $path or $cleaned = 0;
-        }
-        closedir $handle
-          or Firefox::Marionette::Exception->throw(
-"Failed to close directory '$self->{_local_extension_directory}':$EXTENDED_OS_ERROR"
-          );
-        if ($cleaned) {
-            delete $self->{_local_extension_directory};
+    my $context = $self->_context('content');
+    if ( $self->{_har} ) {
+        while (
+            !$self->script(
+                'if (window.HAR && window.HAR.triggerExport) { return 1 }')
+          )
+        {
+            sleep 1;
         }
     }
-    return;
-}
-
-sub har {
-    my ($self)  = @_;
-    my $context = $self->_context('content');
-    my $log     = $self->script(<<'_JS_');
-return (async function() { return await HAR.triggerExport() })();
+    my $log = $self->script(<<'_JS_');
+return (async function() { return await window.HAR.triggerExport() })();
 _JS_
     $self->_context($context);
     return { log => $log };
@@ -4387,16 +4498,22 @@ sub _is_auto_listen_okay {
     }
 }
 
+sub _setup_parameters_for_execute_via_ssh {
+    my ( $self, $ssh ) = @_;
+    my $parameters = {};
+    if ( !defined $ssh->{ssh_connections_to_host} ) {
+        $parameters->{accept_new} = 1;
+    }
+    if ( !$ssh->{control_established} ) {
+        $parameters->{master} = 1;
+    }
+    return $parameters;
+}
+
 sub execute {
     my ( $self, $binary, @arguments ) = @_;
     if ( my $ssh = $self->_ssh() ) {
-        my $parameters = {};
-        if ( !defined $ssh->{ssh_connections_to_host} ) {
-            $parameters->{accept_new} = 1;
-        }
-        if ( !$ssh->{control_established} ) {
-            $parameters->{master} = 1;
-        }
+        my $parameters = $self->_setup_parameters_for_execute_via_ssh($ssh);
         if ( !defined $ssh->{first_ssh_connection_to_host} ) {
             $ssh->{ssh_connections_to_host} = 1;
         }
@@ -4435,6 +4552,11 @@ sub execute {
         {
             $output .= $buffer;
         }
+        defined $result
+          or
+          Firefox::Marionette::Exception->throw( q[Failed to read STDOUT from ']
+              . ( join q[ ], $binary, @arguments )
+              . "':$EXTENDED_OS_ERROR" );
         while ( $result = sysread $error,
             my $buffer, _READ_LENGTH_OF_OPEN3_OUTPUT() )
         {
@@ -7979,15 +8101,10 @@ sub browser_version {
     }
 }
 
-sub _create_capabilities {
-    my ( $self, $parameters ) = @_;
-    my $pid = $parameters->{'moz:processID'} || $parameters->{processId};
-    if ( ($pid) && ( $OSNAME eq 'cygwin' ) ) {
-        $pid = $self->_firefox_pid();
-    }
-    my $headless = $self->_visible() ? 0 : 1;
+sub _get_moz_headless {
+    my ( $self, $headless, $parameters ) = @_;
     if ( defined $parameters->{'moz:headless'} ) {
-        my $firefox_headless = $parameters->{'moz:headless'} ? 1 : 0;
+        my $firefox_headless = ${ $parameters->{'moz:headless'} } ? 1 : 0;
         if ( $firefox_headless != $headless ) {
             Firefox::Marionette::Exception->throw(
                 'moz:headless has not been determined correctly');
@@ -7996,6 +8113,18 @@ sub _create_capabilities {
     else {
         $parameters->{'moz:headless'} = $headless;
     }
+    return $headless;
+}
+
+sub _create_capabilities {
+    my ( $self, $parameters ) = @_;
+    my $pid = $parameters->{'moz:processID'} || $parameters->{processId};
+    if ( ($pid) && ( $OSNAME eq 'cygwin' ) ) {
+        $pid = $self->_firefox_pid();
+    }
+    my $headless = $self->_visible() ? 0 : 1;
+    $parameters->{'moz:headless'} =
+      $self->_get_moz_headless( $headless, $parameters );
     if ( !defined $self->{_cached_per_instance}->{_page_load_timeouts_key} ) {
         if ( $parameters->{timeouts} ) {
             if ( defined $parameters->{timeouts}->{'page load'} ) {
@@ -8043,7 +8172,9 @@ sub _create_capabilities {
         platform_name => defined $parameters->{platformName}
         ? $parameters->{platformName}
         : $parameters->{platform},
-        rotatable        => $parameters->{rotatable} ? 1 : 0,
+        rotatable => (
+            defined $parameters->{rotatable} and ${ $parameters->{rotatable} }
+        ) ? 1 : 0,
         platform_version =>
           $self->_platform_version_from_capabilities($parameters),
         moz_profile => $parameters->{'moz:profile'}
@@ -8077,11 +8208,11 @@ sub _get_optional_capabilities {
     }
     if ( defined $parameters->{'moz:accessibilityChecks'} ) {
         $optional{moz_accessibility_checks} =
-          $parameters->{'moz:accessibilityChecks'} ? 1 : 0;
+          ${ $parameters->{'moz:accessibilityChecks'} } ? 1 : 0;
     }
     if ( defined $parameters->{strictFileInteractability} ) {
         $optional{strict_file_interactability} =
-          $parameters->{strictFileInteractability} ? 1 : 0;
+          ${ $parameters->{strictFileInteractability} } ? 1 : 0;
     }
     if ( defined $parameters->{'moz:shutdownTimeout'} ) {
         $optional{moz_shutdown_timeout} = $parameters->{'moz:shutdownTimeout'};
@@ -8091,22 +8222,22 @@ sub _get_optional_capabilities {
           $parameters->{unhandledPromptBehavior};
     }
     if ( defined $parameters->{setWindowRect} ) {
-        $optional{set_window_rect} = $parameters->{setWindowRect} ? 1 : 0;
+        $optional{set_window_rect} = ${ $parameters->{setWindowRect} } ? 1 : 0;
     }
     if ( defined $parameters->{'moz:webdriverClick'} ) {
         $optional{moz_webdriver_click} =
-          $parameters->{'moz:webdriverClick'} ? 1 : 0;
+          ${ $parameters->{'moz:webdriverClick'} } ? 1 : 0;
     }
     if ( defined $parameters->{acceptInsecureCerts} ) {
         $optional{accept_insecure_certs} =
-          $parameters->{acceptInsecureCerts} ? 1 : 0;
+          ${ $parameters->{acceptInsecureCerts} } ? 1 : 0;
     }
     if ( defined $parameters->{pageLoadStrategy} ) {
         $optional{page_load_strategy} = $parameters->{pageLoadStrategy};
     }
     if ( defined $parameters->{'moz:useNonSpecCompliantPointerOrigin'} ) {
         $optional{moz_use_non_spec_compliant_pointer_origin} =
-          $parameters->{'moz:useNonSpecCompliantPointerOrigin'} ? 1 : 0;
+          ${ $parameters->{'moz:useNonSpecCompliantPointerOrigin'} } ? 1 : 0;
     }
     return %optional;
 }
@@ -9290,6 +9421,7 @@ sub _map_deprecated_pdf_parameters {
         next if ( $key eq 'pageRanges' );
         next if ( $key eq 'size' );
         next if ( $key eq 'raw' );
+        next if ( $key eq 'scale' );
         Firefox::Marionette::Exception->throw(
             "Unknown key $key for the pdf method");
     }
@@ -10872,10 +11004,29 @@ sub _check_for_and_translate_into_objects {
 }
 
 sub json {
-    my ($self)  = @_;
-    my $content = $self->strip();
-    my $json    = JSON->new()->decode($content);
-    return $json;
+    my ( $self, $uri ) = @_;
+    if ( defined $uri ) {
+        my $old  = $self->_context('chrome');
+        my $json = $self->script(
+            $self->_compress_script( <<'_SCRIPT_'), args => [$uri] );
+return (async function(url) {
+  let response = await fetch(url, { method: "GET", mode: "cors", headers: { "Content-Type": "application/json" }, redirect: "follow", referrerPolicy: "no-referrer"});
+  if (response.ok) {
+	  return await response.json();
+  } else {
+	  throw new Error(url + " returned a " + response.status);
+  }
+})(arguments[0]);
+_SCRIPT_
+        $self->_context($old);
+        return $json;
+    }
+    else {
+
+        my $content = $self->strip();
+        my $json    = JSON->new()->decode($content);
+        return $json;
+    }
 }
 
 sub strip {
@@ -11303,7 +11454,6 @@ sub install {
         ]
     );
     my $response = $self->_get_response($message_id);
-    $self->_clean_local_extension_directory();
     return $self->_response_result_value($response);
 }
 
@@ -11576,7 +11726,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.49
+Version 1.51
 
 =head1 SYNOPSIS
 
@@ -11858,6 +12008,24 @@ It returns the newly created L<credential|Firefox::Marionette::WebAuthn::Credent
 =head2 addons
 
 returns if pre-existing addons (extensions/themes) are allowed to run.  This will be true for Firefox versions less than 55, as L<-safe-mode|http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29> cannot be automated.
+
+=head2 agent
+
+accepts an optional value for the L<User-Agent|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent> header and sets this using the profile preferences.  This value will be used on the next page load.  It returns the current value, such as 'Mozilla/5.0 (<system-information>) <platform> (<platform-details>) <extensions>'.  This value is retrieved with L<navigator.userAgent|https://developer.mozilla.org/en-US/docs/Web/API/Navigator/userAgent>.
+
+This method can be used to set a user agent string like so;
+
+    use Firefox::Marionette();
+    use strict;
+
+    # useragents.me should only be queried once a month or less.
+    # these UA strings should be cached locally.
+
+    my %user_agent_strings = map { $_->{ua} => $_->{pct} } @{$firefox->json("https://www.useragents.me/api")->{data}};
+    my ($user_agent) = reverse sort { $user_agent_strings{$a} <=> $user_agent_strings{$b} } keys %user_agent_strings;
+
+    my $firefox = Firefox::Marionette->new();
+    $firefox->agent($user_agent); # agent is now the most popular agent from useragents.me
 
 =head2 alert_text
 
@@ -12639,6 +12807,34 @@ causes the browser to traverse one step forward in the joint history of the curr
 
 full screens the firefox window. This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
+=head2 geo
+
+accepts an optional L<geo location|Firefox::Marionette::GeoLocation> object or the parameters for a L<geo location|Firefox::Marionette::GeoLocation> object, turns on the L<Geolocation API|https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API> and returns the current L<value|Firefox::Marionette::GeoLocation> returned by calling the javascript L<getCurrentPosition|https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition> method.  This method is further discussed in the L<GEO LOCATION|/GEO-LOCATION> section.
+
+NOTE: firefox will only allow L<Geolocation|https://developer.mozilla.org/en-US/docs/Web/API/Geolocation> calls to be made from L<secure contexts|https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts> and bizarrely, this does not include about:blank or similar.  Therefore, you will need to load a page before calling the L<geo|/geo> method.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new( proxy => 'https://this.is.another.location:3128', geo => 1 );
+
+    # Get geolocation for this.is.another.location (via proxy)
+
+    $firefox->geo($firefox->json('https://freeipapi.com/api/json/'));
+
+    # now google maps will show us in this.is.another.location
+
+    $firefox->go('https://maps.google.com/');
+
+    my $geo = $firefox->geo();
+
+    warn "Apparently, we're now at " . join q[, ], $geo->latitude(), $geo->longitude();
+
+    # OR the quicker setup (run this with perl -C)
+
+    warn "Apparently, we're now at " . Firefox::Marionette->new( proxy => 'https://this.is.another.location:3128', geo => 'https://freeipapi.com/api/json/' )->go('https://maps.google.com/')->geo();
+
+NOTE: currently this call sets the location to be exactly what is specified.  It doesn't change anything else relevant (yet, but it may in future), such as L<languages|/languages> or the L<timezone|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset>.  This function should be considered experimental.  Feedback welcome.
+
 =head2 go
 
 Navigates the current browsing context to the given L<URI|URI> and waits for the document to load or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.
@@ -12941,6 +13137,13 @@ returns a L<JSON|JSON> object that has been parsed from the page source of the c
 
     say Firefox::Marionette->new()->go('https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->json()->{version};
 
+In addition, this method can accept a L<URI|URI> as a parameter and retrieve that URI via the firefox L<fetch call|https://developer.mozilla.org/en-US/docs/Web/API/fetch> and transforming the body to L<JSON via firefox|https://developer.mozilla.org/en-US/docs/Web/API/Response/json_static>
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    say Firefox::Marionette->new()->json('https://freeipapi.com/api/json/')->{ipAddress};
+
 =head2 key_down
 
 accepts a parameter describing a key and returns an action for use in the L<perform|/perform> method that corresponding with that key being depressed.
@@ -12971,6 +13174,10 @@ accepts a parameter describing a key and returns an action for use in the L<perf
                                  $firefox->key_up('l'),
                                  $firefox->key_up(CONTROL())
                                )->content();
+
+=head2 languages
+
+accepts an optional list of values for the L<Accept-Language|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language> header and sets this using the profile preferences.  It returns the current values as a list, such as ('en-US', 'en').
 
 =head2 loaded
 
@@ -13170,6 +13377,8 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * devtools - begin the session with the L<devtools|https://developer.mozilla.org/en-US/docs/Tools> window opened in a separate window.
 
+=item * geo - setup the browser L<preferences|http://kb.mozillazine.org/About:config> to allow the L<Geolocation API|https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API> to work.  If the value for this key is a L<URI|URI> object or a string beginning with '^(?:data|http)', this object will be retrieved using the L<json|/json> method and the response will used to build a L<GeoLocation|Firefox::Mozilla::GeoLocation> object, which will be sent to the L<geo|/geo> method.  If the value for this key is a hash, the hash will be used to build a L<GeoLocation|Firefox::Mozilla::GeoLocation> object, which will be sent to the L<geo|/geo> method.
+
 =item * height - set the L<height|http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29> of the initial firefox window
 
 =item * har - begin the session with the L<devtools|https://developer.mozilla.org/en-US/docs/Tools> window opened in a separate window.  The L<HAR Export Trigger|https://addons.mozilla.org/en-US/firefox/addon/har-export-trigger/> addon will be loaded into the new session automatically, which means that L<-safe-mode|http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29> will not be activated for this session AND this functionality will only be available for Firefox 61+.
@@ -13301,7 +13510,7 @@ accepts a optional hash as the first parameter with the following allowed keys;
 
 =item * raw - rather than a file handle containing the PDF, the binary PDF will be returned.
 
-=item * scale - Scale of the webpage rendering.  Defaults to 1.
+=item * scale - Scale of the webpage rendering.  Defaults to 1.  C<shrink_to_fit> should be disabled to make C<scale> work.
 
 =item * size - The desired size (width and height) of the pdf, specified by name.  See the page key for an alternative and the L<paper_sizes|/paper_sizes> method for a list of accepted page size names. 
 
@@ -13942,6 +14151,8 @@ See the L<REMOTE AUTOMATION OF FIREFOX VIA SSH|/REMOTE-AUTOMATION-OF-FIREFOX-VIA
 
 See L<SETTING UP SOCKS SERVERS USING SSH|Firefox::Marionette::Proxy#SETTING-UP-SOCKS-SERVERS-USING-SSH> for easy proxying via L<ssh|https://man.openbsd.org/ssh>
 
+See L<GEO LOCATION|/GEO-LOCATION> section for how to combine this with providing appropriate browser settings for the end point.
+
 =head1 AUTOMATING THE FIREFOX PASSWORD MANAGER
 
 This module allows you to login to a website without ever directly handling usernames and password details.  The Password Manager may be preloaded with appropriate passwords and locked, like so;
@@ -13980,6 +14191,44 @@ And used to fill in login prompts without explicitly knowing the account details
     $firefox->go('https://pause.perl.org/pause/authenquery')->accept_alert(); # this goes to the page and submits the http auth popup
 
     $firefox->go('https://github.com/login')->fill_login(); # fill the login and password fields without needing to see them
+
+=head1 GEO LOCATION
+
+The firefox L<Geolocation API|https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API> can be used by supplying the C<geo> parameter to the L<new|/new> method and then calling the L<geo|/geo> method (from a L<secure context|https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts>.
+
+The L<geo|/geo> method can accept various specific latitude and longitude parameters as a list, such as;
+
+    $firefox->geo(latitude => -37.82896, longitude => 144.9811);
+
+    OR
+
+    $firefox->geo(lat => -37.82896, long => 144.9811);
+
+    OR
+
+    $firefox->geo(lat => -37.82896, lng => 144.9811);
+
+    OR
+
+    $firefox->geo(lat => -37.82896, lon => 144.9811);
+
+or it can be passed in as a reference, such as;
+
+    $firefox->geo({ latitude => -37.82896, longitude => 144.9811 });
+
+the combination of a variety of parameter names and the ability to pass parameters in as a reference means it can be deal with various geo location websites, such as;
+
+    $firefox->geo($firefox->json('https://freeipapi.com/api/json/')); # get geo location from IP address
+
+    $firefox->geo($firefox->json('https://geocode.maps.co/search?street=101+Collins+St&city=Melbourne&state=VIC&postalcode=3000&country=AU&format=json')->[0]); # get geo location of street address
+
+    $firefox->geo($firefox->json('http://api.positionstack.com/v1/forward?access_key=' . $access_key . '&query=101+Collins+St,Melbourne,VIC+3000')->{data}->[0]); # get geo location of street address using api key
+
+    $firefox->geo($firefox->json('https://api.ipgeolocation.io/ipgeo?apiKey=' . $api_key)); # get geo location from IP address
+
+These sites were active at the time this documentation was written, but mainly function as an illustration of the flexibility of L<geo|/geo> and L<json|/json> methods in providing the desired location to the L<Geolocation API|https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API>.
+
+The L<country_code|Firefox::Marionette::GeoLocation#country_code> and L<timezone_offset|Firefox::Marionette::GeoLocation#timezone_offset> methods can be used to help set the L<languages|/languages> method and possibly in the future change the timezone of the browser.
 
 =head1 CONSOLE LOGGING
 

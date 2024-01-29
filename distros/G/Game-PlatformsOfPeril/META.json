@@ -1,10 +1,10 @@
 {
    "abstract" : "the platforms of peril",
    "author" : [
-      "Jeremy Mates <jmates@cpan.org>"
+      "Jeremy Mates <jmates@thrig.me>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -47,7 +47,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0",
+            "Test2::V0" : "0.000060",
             "lib" : "0"
          }
       }
@@ -55,9 +55,9 @@
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "https://github.com/thrig/Game-PlatformsOfPeril"
+         "url" : "https://thrig.me/src/Game-PlatformsOfPeril.git"
       }
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

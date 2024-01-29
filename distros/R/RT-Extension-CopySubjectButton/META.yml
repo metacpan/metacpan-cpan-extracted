@@ -1,7 +1,7 @@
 ---
 abstract: 'RT-Extension-CopySubjectButton Extension'
 author:
-  - 'Averkios Averkiadis <aaverkios at outlook dot com>'
+  - 'Averkios'
 build_requires:
   ExtUtils::MakeMaker: 6.59
 configure_requires:
@@ -23,7 +23,7 @@ requires:
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/averkios/RT-Extension-CopySubjectButton
-version: '0.03'
+version: '0.06'
 x_module_install_rtx_version: '0.42'
 x_requires_rt: 5.0.1
 x_rt_too_new: 5.2.0

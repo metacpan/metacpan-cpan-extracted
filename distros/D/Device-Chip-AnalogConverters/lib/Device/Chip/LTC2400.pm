@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Device::Chip::LTC2400 0.15;
+package Device::Chip::LTC2400 0.16;
 class Device::Chip::LTC2400
    :isa(Device::Chip);
 

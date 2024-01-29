@@ -1,7 +1,11 @@
 Revision history for Perl extension Util::H2O.
 
-0.22	Sat, Jan 28 2023
-	- fix a bug where -arrays was not passed into to hashes of hashes
+0.24	Wed, Dec 13 2023
+	- fix a bug where o2h would die on scalars that looked like options
+	  (Thanks @oodler577!)
+
+0.22	Sat, Jan 28 2023	commit d8d5d8b2acc0f6518c7e09b26df0ea486d118006
+	- fix a bug where -arrays was not passed into hashes of hashes
 
 0.20	Sat, Jan 14 2023	commit 9d67f1da9c63f5d5d7de34ceebf0a4d5f8fc68c1
 	- added "-arrays" option to h2o and o2h

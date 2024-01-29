@@ -1,5 +1,9 @@
 Revision history for Dancer2::Plugin::Map::Tube
 
+0.03  2024-01-28
+      - Added Map::Tube::Bielefeld, thanks Michal Josef Špaček.
+      - Added Map::Tube::Hongkong, thanks FUNG Cheok Yin.
+
 0.02  2018-04-22
       - Added key 'provides' to the Makefile.PL script.
 

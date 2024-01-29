@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Role::CxnPool::Static;
-$Search::Elasticsearch::Role::CxnPool::Static::VERSION = '8.00';
+$Search::Elasticsearch::Role::CxnPool::Static::VERSION = '8.12';
 use Moo::Role;
 with 'Search::Elasticsearch::Role::CxnPool';
 requires 'next_cxn';
@@ -56,7 +56,7 @@ Search::Elasticsearch::Role::CxnPool::Static - A CxnPool role for connecting to 
 
 =head1 VERSION
 
-version 8.00
+version 8.12
 
 =head1 METHODS
 
@@ -73,7 +73,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Elasticsearch BV.
+This software is Copyright (c) 2024 by Elasticsearch BV.
 
 This is free software, licensed under:
 

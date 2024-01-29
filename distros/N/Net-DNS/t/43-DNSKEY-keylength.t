@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 43-DNSKEY-keylength.t 1856 2021-12-02 14:36:25Z willem $	-*-perl-*-
+# $Id: 43-DNSKEY-keylength.t 1957 2024-01-10 14:54:10Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -18,7 +18,7 @@ foreach my $package (@prerequisite) {
 	exit;
 }
 
-plan tests => 9;
+plan tests => 7;
 
 
 my $rsa = Net::DNS::RR->new( <<'END' );
@@ -52,17 +52,6 @@ END
 ok( $dsa, 'set up DSA public key' );
 
 is( $dsa->keylength, 1024, 'DSA keylength has expected value' );
-
-
-my $eccgost = Net::DNS::RR->new( <<'END' );
-ECC-GOST.example.	IN	DNSKEY	256 3 12 (
-	6VwgNT1BXxXNVpTQXcJQ82PcsCYmI60oN88Plbl028ruvl6DqJby/uBGULHT5FXmZiXBJozE6kP0
-	+BirN9YPBQ== ) ; Key ID = 46387
-END
-
-ok( $eccgost, 'set up ECC-GOST public key' );
-
-is( $eccgost->keylength, 256, 'ECC-GOST keylength has expected value' );
 
 
 my $ecdsa = Net::DNS::RR->new( <<'END' );

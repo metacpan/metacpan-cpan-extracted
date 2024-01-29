@@ -1,15 +1,23 @@
 Revision history for DateTime-Format-Atom
 
-1.2.0   2015/10/09
-        No functional changes.
-	Updated to adopt the conventions used by my other modules.
-	A few tests were added, and a repository information was added.
+1.6.0   2024-01-21
+        - Added missing Perl v5.10 requirement.
+        - Updated the version of ExtUtils::MakeMaker that's required.
 
-1.0.2   2011/03/28
+1.4.0   2024-01-01
+        - Fixed bug tracker information.
+        - Misc internal improvements.
+
+1.2.0   2015-10-09
+        No functional changes.
+        Updated to adopt the conventions used by my other modules.
+        A few tests were added, and a repository information was added.
+
+1.0.2   2011-03-28
         Specified license more explicitly.
 
-1.0.1   2009/01/07
+1.0.1   2009-01-07
         Documentation formatting fixes.
 
-1.0.0   2009/01/05
+1.0.0   2009-01-05
         Initial version

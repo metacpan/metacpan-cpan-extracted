@@ -124,7 +124,7 @@ int32_t SPVM_VM_call_method(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTIME_METHO
     // Total area byte size
     int32_t total_vars_size = numeric_vars_size + address_vars_size;
     
-    call_stack = SPVM_API_new_memory_stack(env, stack, total_vars_size + 1);
+    call_stack = SPVM_API_new_memory_block(env, stack, total_vars_size + 1);
     if (call_stack == NULL) {
       void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_CALL_STACK_ALLOCATION_FAILED]);
       env->set_exception(env, stack, exception);
@@ -484,20 +484,20 @@ int32_t SPVM_VM_call_method(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTIME_METHO
         SPVM_IMPLEMENT_DIVIDE_UNSIGNED_LONG(env, stack, &long_vars[opcode->operand0], long_vars[opcode->operand1], long_vars[opcode->operand2], &error_id);
         break;
       }
-      case SPVM_OPCODE_C_ID_REMAINDER_INT: {
-        SPVM_IMPLEMENT_REMAINDER_INT(env, stack, &int_vars[opcode->operand0], int_vars[opcode->operand1], int_vars[opcode->operand2], &error_id);
+      case SPVM_OPCODE_C_ID_MODULO_INT: {
+        SPVM_IMPLEMENT_MODULO_INT(env, stack, &int_vars[opcode->operand0], int_vars[opcode->operand1], int_vars[opcode->operand2], &error_id);
         break;
       }
-      case SPVM_OPCODE_C_ID_REMAINDER_LONG: {
-        SPVM_IMPLEMENT_REMAINDER_LONG(env, stack, &long_vars[opcode->operand0], long_vars[opcode->operand1], long_vars[opcode->operand2], &error_id);
+      case SPVM_OPCODE_C_ID_MODULO_LONG: {
+        SPVM_IMPLEMENT_MODULO_LONG(env, stack, &long_vars[opcode->operand0], long_vars[opcode->operand1], long_vars[opcode->operand2], &error_id);
         break;
       }
-      case SPVM_OPCODE_C_ID_REMAINDER_UNSIGNED_INT: {
-        SPVM_IMPLEMENT_REMAINDER_UNSIGNED_INT(env, stack, &int_vars[opcode->operand0], int_vars[opcode->operand1], int_vars[opcode->operand2], &error_id);
+      case SPVM_OPCODE_C_ID_MODULO_UNSIGNED_INT: {
+        SPVM_IMPLEMENT_MODULO_UNSIGNED_INT(env, stack, &int_vars[opcode->operand0], int_vars[opcode->operand1], int_vars[opcode->operand2], &error_id);
         break;
       }
-      case SPVM_OPCODE_C_ID_REMAINDER_UNSIGNED_LONG: {
-        SPVM_IMPLEMENT_REMAINDER_UNSIGNED_LONG(env, stack, &long_vars[opcode->operand0], long_vars[opcode->operand1], long_vars[opcode->operand2], &error_id);
+      case SPVM_OPCODE_C_ID_MODULO_UNSIGNED_LONG: {
+        SPVM_IMPLEMENT_MODULO_UNSIGNED_LONG(env, stack, &long_vars[opcode->operand0], long_vars[opcode->operand1], long_vars[opcode->operand2], &error_id);
         break;
       }
       case SPVM_OPCODE_C_ID_LEFT_SHIFT_INT: {
@@ -2411,7 +2411,7 @@ int32_t SPVM_VM_call_method(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTIME_METHO
       }
     }
     
-    SPVM_API_free_memory_stack(env, stack, call_stack);
+    SPVM_API_free_memory_block(env, stack, call_stack);
     call_stack = NULL;
     
     return error_id;

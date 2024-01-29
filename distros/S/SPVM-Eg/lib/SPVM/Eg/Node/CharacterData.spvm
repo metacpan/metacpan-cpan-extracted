@@ -1,0 +1,39 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+# Node in JavaScript
+class Eg::Node::CharacterData extends Eg::Node {
+  allow Eg;
+  
+  use Hash;
+  
+  # Instance Methods
+  protected method init : void ($options : object[] = undef) {
+    
+    my $options_h = Hash->new($options);
+    
+    my $node_value = $options_h->get_or_default_string("node_value", undef);
+    
+    unless ($node_value) {
+      die "The \node_value option must be defined.";
+    }
+    
+    $self->SUPER::init($options);
+  }
+  
+  method data : string () {
+    my $node_value_buffer = $self->{node_value_buffer};
+    
+    my $node_value = $node_value_buffer->to_string;
+    
+    return $node_value;
+  }
+  
+  method length : int () {
+    my $node_value_buffer = $self->{node_value_buffer};
+    
+    my $node_value_length = $node_value_buffer->length;
+    
+    return $node_value_length;
+  }
+}

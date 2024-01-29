@@ -161,8 +161,6 @@ docs/AutoFilterResponse.md
 docs/AutoShapeResponse.md
 docs/AutoShapesResponse.md
 docs/AxisResponse.md
-docs/BarcodeResponse.md
-docs/BarcodeResponseList.md
 docs/BorderResponse.md
 docs/ButtonResponse.md
 docs/CalculateFormulaResponse.md
@@ -874,8 +872,6 @@ lib/AsposeCellsCloud/Object/AutoFilterResponse.pm
 lib/AsposeCellsCloud/Object/AutoShapeResponse.pm
 lib/AsposeCellsCloud/Object/AutoShapesResponse.pm
 lib/AsposeCellsCloud/Object/AxisResponse.pm
-lib/AsposeCellsCloud/Object/BarcodeResponse.pm
-lib/AsposeCellsCloud/Object/BarcodeResponseList.pm
 lib/AsposeCellsCloud/Object/BorderResponse.pm
 lib/AsposeCellsCloud/Object/ButtonResponse.pm
 lib/AsposeCellsCloud/Object/CalculateFormulaResponse.pm

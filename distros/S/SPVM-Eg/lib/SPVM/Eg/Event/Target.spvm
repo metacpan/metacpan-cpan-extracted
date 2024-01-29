@@ -1,0 +1,14 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+# EventTarget in JavaScript
+class Eg::Event::Target {
+  
+  # Class Methods
+  static method new : Eg::Event::Target () {
+    
+    my $self = new Eg::Event::Target;
+    
+    return $self;
+  }
+}

@@ -4,24 +4,29 @@ use 5.006;
 use strict;
 use warnings;
 use Ixchel::functions::sys_info;
-use TOML qw(to_toml);
-use JSON qw(to_json);
-use YAML::XS qw(Dump);
+use TOML::Tiny qw(to_toml);
+use JSON       qw(to_json);
+use YAML::XS   qw(Dump);
 use Data::Dumper;
+use base 'Ixchel::Actions::base';
 
 =head1 NAME
 
-Ixchel::Actions::sys_info :: Fetches system info via Rex::Hardware and prints it in various formats.
+Ixchel::Actions::sys_info - Fetches system info via Rex::Hardware and prints it in various formats.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.2.0';
 
-=head1 SYNOPSIS
+=head1 CLI SYNOPSIS
+
+ixchel -a sys_info [B<-o> <format>]
+
+=head1 CODE SYNOPSIS
 
 Fetches system info via Rex::Hardware and prints it in various formats.
 
@@ -31,26 +36,15 @@ Fetches system info via Rex::Hardware and prints it in various formats.
 
 Format to print it in.
 
-Available: json, yaml, toml
+Available: json, yaml, toml, dumper
 
 Default: toml
 
 =cut
 
-sub new {
-	my ( $empty, %opts ) = @_;
+sub new_extra { }
 
-	my $self = { config => undef, opts => {}, ixchel=>$opts{ixchel} };
-	bless $self;
-
-	if ( defined( $opts{opts} ) ) {
-		$self->{opts} = \%{ $opts{opts} };
-	}
-
-	return $self;
-} ## end sub new
-
-sub action {
+sub action_extra {
 	my $self = $_[0];
 
 	if ( !defined( $self->{opts}->{o} ) ) {
@@ -62,9 +56,12 @@ sub action {
 		&& $self->{opts}->{o} ne 'dumper'
 		&& $self->{opts}->{o} ne 'yaml' )
 	{
-		$self->{ixchel}{errors_count}++;
-		die( '-o is set to "' . $self->{opts}->{o} . '" which is not a understood setting' );
-	}
+		$self->status_add(
+			status => '-o is set to "' . $self->{opts}->{o} . '" which is not a understood setting',
+			error  => 1,
+		);
+		return undef;
+	} ## end if ( $self->{opts}->{o} ne 'toml' && $self...)
 
 	my $sys_info = sys_info;
 
@@ -79,31 +76,32 @@ sub action {
 	}
 
 	my $string;
-	if ( $self->{opts}->{o} eq 'toml' ) {
-		$string = to_toml($sys_info) . "\n";
-		print $string;
-	} elsif ( $self->{opts}->{o} eq 'json' ) {
-		my $json = JSON->new;
-		$json->canonical(1);
-		$json->pretty(1);
-		$string = $json->encode($sys_info);
-		print $string;
-	} elsif ( $self->{opts}->{o} eq 'yaml' ) {
-		$string = Dump($sys_info);
-		print $string;
+	eval {
+		if ( $self->{opts}->{o} eq 'toml' ) {
+			$string = to_toml($sys_info) . "\n";
+			print $string;
+		} elsif ( $self->{opts}->{o} eq 'json' ) {
+			my $json = JSON->new;
+			$json->canonical(1);
+			$json->pretty(1);
+			$string = $json->encode($sys_info);
+			print $string;
+		} elsif ( $self->{opts}->{o} eq 'yaml' ) {
+			$string = Dump($sys_info);
+			print $string;
+		}
+	};
+	if ($@) {
+		$self->status_add(
+			error  => 1,
+			status => $@,
+		);
+	} else {
+		$self->{results}{status_text} = $string;
 	}
 
-	return $string;
-} ## end sub action
-
-sub help {
-	return 'Prints data from the sys_info function.
-
--o <format>     Format to print it in.
-                Available: json, yaml, toml
-                Default: toml
-';
-}
+	return undef;
+} ## end sub action_extra
 
 sub short {
 	return 'Prints data from the sys_info function.';

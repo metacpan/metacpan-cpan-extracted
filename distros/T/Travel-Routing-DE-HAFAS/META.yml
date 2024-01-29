@@ -19,16 +19,13 @@ name: Travel-Routing-DE-HAFAS
 provides:
   Travel::Routing::DE::HAFAS:
     file: lib/Travel/Routing/DE/HAFAS.pm
-    version: '0.01'
+    version: '0.03'
   Travel::Routing::DE::HAFAS::Connection:
     file: lib/Travel/Routing/DE/HAFAS/Connection.pm
-    version: '0.01'
+    version: '0.03'
   Travel::Routing::DE::HAFAS::Connection::Section:
     file: lib/Travel/Routing/DE/HAFAS/Connection/Section.pm
-    version: '0.01'
-  Travel::Routing::DE::HAFAS::Location:
-    file: lib/Travel/Routing/DE/HAFAS/Location.pm
-    version: '0.01'
+    version: '0.03'
   Travel::Routing::DE::HAFAS::Utils:
     file: lib/Travel/Routing/DE/HAFAS/Utils.pm
 requires:
@@ -45,10 +42,12 @@ requires:
   List::MoreUtils: '0'
   List::Util: '0'
   Travel::Status::DE::HAFAS: '0'
+  Travel::Status::DE::HAFAS::Journey: '5.01'
+  Travel::Status::DE::HAFAS::Location: '5.00'
   Travel::Status::DE::HAFAS::Message: '4.19'
   perl: v5.14.0
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/derf/Travel-Routing-DE-HAFAS
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

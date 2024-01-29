@@ -8,7 +8,7 @@
 #                  of lemonldap-ng.ini) and underlying handler configuration
 package Lemonldap::NG::Portal::Main::Init;
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.18.0';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -31,6 +31,8 @@ has _userDB         => ( is => 'rw' );
 has _passwordDB     => ( is => 'rw' );
 has _sfEngine       => ( is => 'rw' );
 has _captcha        => ( is => 'rw' );
+has _trustedBrowser => ( is => 'rw' );
+has _ppRules        => ( is => 'rw', default => sub { {} } );
 
 has loadedModules => ( is => 'rw' );
 
@@ -120,7 +122,7 @@ sub init {
             my $lang = $1 || 'all';
             $self->trOver->{$lang}->{"PE$2"} = $self->localConfig->{$k};
         }
-        elsif ( $k =~ /msg_(?:(\w+?)_)?(\w+)$/ ) {
+        elsif ( $k =~ /msg_(?:([a-z][a-z](?:_[A-Z][A-Z])?)_)?(\w+)$/ ) {
             my $lang = $1 || 'all';
             $self->trOver->{$lang}->{$2} = $self->localConfig->{$k};
         }
@@ -271,17 +273,6 @@ sub reloadConf {
     $self->cors($cors);
     $self->logger->debug( "Initialized CORS headers : " . $self->cors );
 
-    # Initialize templateDir
-    $self->{templateDir} =
-      $self->conf->{templateDir} . '/' . $self->conf->{portalSkin}
-      if ( $self->conf->{templateDir} and $self->conf->{portalSkin} );
-    unless ( -d $self->{templateDir} ) {
-        $self->error("Template dir $self->{templateDir} doesn't exist");
-        return $self->fail;
-    }
-    $self->templateDir(
-        [ $self->{templateDir}, $self->conf->{templateDir} . '/bootstrap' ] );
-
     $self->{staticPrefix} = $self->conf->{staticPrefix} || '/static';
     $self->{languages}    = $self->conf->{languages}    || 'en';
 
@@ -339,6 +330,15 @@ sub reloadConf {
     return $self->fail
       unless $self->{_sfEngine} =
       $self->loadPlugin( $self->conf->{'sfEngine'} );
+
+    # Load trusted browser engine
+    return $self->fail
+      unless $self->_trustedBrowser(
+        $self->loadPlugin(
+            $self->conf->{'trustedBrowserEngine'}
+              || "::Plugins::TrustedBrowser"
+        )
+      );
 
     # Load Captcha module
     return $self->fail
@@ -567,11 +567,11 @@ sub findEP {
 
     # Rules for menu
     if ( $obj->can('spRules') ) {
-        foreach my $k ( keys %{ $obj->{spRules} } ) {
+        foreach my $k ( keys %{ $obj->spRules } ) {
             $self->logger->info(
 "$k is defined more than one time, it can have some bad effects on Menu display"
             ) if ( $self->spRules->{$k} );
-            $self->spRules->{$k} = $obj->{spRules}->{$k};
+            $self->spRules->{$k} = $obj->spRules->{$k};
         }
     }
     return $obj;
@@ -642,6 +642,11 @@ sub buildRule {
         $self->logger->error( "Bad" . $ruleDesc . "rule: " . $error );
     }
     return $compiledRule,;
+}
+
+sub addPasswordPolicyDisplay {
+    my ( $self, $id, $options ) = @_;
+    $self->_ppRules->{$id} = {%$options};
 }
 
 1;

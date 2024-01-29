@@ -1,16 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2023 -- leonerd@leonerd.org.uk
 #  Original render code by Tom Molesworth
 
 use v5.20;
-use Object::Pad 0.73 ':experimental(init_expr)';
+use warnings;
+use Object::Pad 0.807;
 
-package Tickit::Widget::Placegrid 0.37;
-class Tickit::Widget::Placegrid
-   :strict(params)
-   :isa(Tickit::Widget);
+package Tickit::Widget::Placegrid 0.41;
+class Tickit::Widget::Placegrid :strict(params);
+
+inherit Tickit::Widget;
 
 use Tickit::Style;
 use Tickit::RenderBuffer qw( LINE_SINGLE LINE_THICK );

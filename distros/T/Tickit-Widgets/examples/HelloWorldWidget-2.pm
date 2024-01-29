@@ -1,8 +1,10 @@
 use v5.20;
-use Object::Pad 0.57;
+use warnings;
+use Object::Pad 0.807;
 
-class HelloWorldWidget
-   :isa(Tickit::Widget);
+class HelloWorldWidget;
+
+inherit Tickit::Widget;
 
 method lines {  1 }
 method cols  { 12 }

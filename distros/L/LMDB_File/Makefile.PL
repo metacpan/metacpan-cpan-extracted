@@ -25,7 +25,7 @@ my $myextlib = '';
     my($Head) = grep -f "$_/lmdb.h", @stdinc;
     if(!$NOSYS && ($INC || $Head) && $libdata[0]) {
 	$INC ||= "-I$Head" if -f "$libdata[3]/lmdb.h";
-	warn "Will use SYSTEM lmdb in $libdata[3]\n";
+	warn "Will use SYSTEM lmdb in @{[$libdata[3] || $Head]}\n";
 	$LIBS ||= '-llmdb';
 	warn "If that path isn't a standard one, you may need to set LD_LIBRARY_PATH!\n"
 	    if($libdata[4][0] =~ /.so/);

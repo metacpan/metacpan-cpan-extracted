@@ -1,6 +1,6 @@
 package Test::Expander::Constants;
 
-our $VERSION = '2.2.0';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '2.3.1';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use strict;
 use warnings
@@ -40,6 +40,7 @@ const our $FMT_UNKNOWN_OPTION          => "Unknown option '%s' => '%s' supplied.
 const our $FMT_USE_DESCRIPTION         => 'use %s;%s';
 const our $FMT_USE_IMPLEMENTATION      => 'package %s; use %s%s; 1';
 
+const our $MSG_BAIL_OUT                => 'Test failed.';
 const our $MSG_ERROR_WAS               => ' Error was: ';
 const our $MSG_UNEXPECTED_EXCEPTION    => 'Unexpectedly caught exception: ';
 

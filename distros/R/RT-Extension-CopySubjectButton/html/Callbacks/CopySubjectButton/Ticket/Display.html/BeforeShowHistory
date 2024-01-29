@@ -1,0 +1,36 @@
+<%PERL>
+    # Output the subject to a hidden element. This allows the js in the callback to grab it when you click the copy button.
+    if (defined $Ticket->id)
+        {
+            $TicketSubject = "<div id=\"24t45g45ygh5k8rgh\" style=\"display: none;\">" . $Ticket->SubjectTag . " " . $Ticket->Subject . "</div>";
+            print $TicketSubject;
+        }
+</%PERL>
+
+<!-- Add the necessary JS to copy the subject to the clipboard -->
+<script type="text/javascript">
+    if (window.location.href.includes("Ticket/Display.html")){
+        document.getElementById('header').getElementsByTagName("h1")[0].innerHTML+='&nbsp;<button class="button form-control btn btn-primary float-right" onclick="copyContent()">Copy</button>';
+    }
+    
+const copyContent = async () => {
+      let subjectwithtag = document.getElementById("24t45g45ygh5k8rgh").innerHTML;
+      try {
+      await navigator.clipboard.writeText(subjectwithtag);
+        console.log('Content copied to clipboard');
+      } catch (err) {
+        console.error('Failed to copy: ', err);
+      }
+    }
+</script>
+
+<%ARGS>
+    $Ticket => undef
+    $ARGS => undef
+    $Transactions => undef
+    $Attachments => undef
+</%ARGS>
+
+<%INIT>
+    my $TicketSubject = undef;
+</%INIT>

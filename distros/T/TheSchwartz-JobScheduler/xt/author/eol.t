@@ -17,6 +17,7 @@ my @files = (
     't/lib/TheSchwartz/JobScheduler/Test/Database/Schemas/Pg.pm',
     't/lib/TheSchwartz/JobScheduler/Test/Database/Schemas/SQLite.pm',
     't/private-_get_dbh.t',
+    't/use_adhoc_dbhandle.t',
     't/use_database_managedhandle.t'
 );
 

@@ -37,6 +37,12 @@ $SIG{__WARN__} = sub { $warnings++ };
    ok(!is_eqr( "ghi", qr/H/ ), 'string pattern non-match');
 }
 
+no Syntax::Operator::Equ qw( is_strequ );
+
+like( dies { is_strequ( "x", "x" ) },
+   qr/^Undefined subroutine &main::is_strequ called at /,
+   'unimport' );
+
 ok(!$warnings, 'no warnings');
 
 done_testing;

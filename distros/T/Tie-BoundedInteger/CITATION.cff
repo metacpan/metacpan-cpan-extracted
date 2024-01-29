@@ -1,0 +1,21 @@
+# This CITATION.cff file was generated with /Users/brian/bin/bmt
+# Thu Feb 17 21:33:15 2022
+
+abstract: Tie::BoundedInteger - Limit the magnitude of a number in a scalar
+authors:
+- alias: briandfoy
+  email: briandfoy@pobox.com
+  family-names: foy
+  given-names: brian d
+  orcid: 0000-0002-0283-8283
+cff-version: 1.2.0
+date-released: 2014-08-16
+doi: 10.5281/zenodo.6131569
+license: artistic_2
+license-url: https://github.com/briandfoy/tie-boundedinteger/LICENSE
+message: The GitHub page for this module provides formatted citations
+repository-code: https://github.com/briandfoy/tie-boundedinteger
+title: The Tie::BoundedInteger Perl module
+type: software
+version: '1.073'
+

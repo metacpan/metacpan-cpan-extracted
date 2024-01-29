@@ -5,26 +5,34 @@ use strict;
 use warnings;
 use File::Slurp;
 use YAML::XS qw(Dump);
+use File::Spec;
+use base 'Ixchel::Actions::base';
 
 =head1 NAME
 
-Ixchel::Actions::sagan_include :: Generates the instance specific include for a sagan instance.
+Ixchel::Actions::sagan_include - Generates the instance specific include for a sagan instance.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.2.0';
 
-=head1 SYNOPSIS
+=head1 CLI SYNOPSIS
+
+ixchel -a sagan_include [B<--np>] [B<-w>] [B<-i> <instance>]
+
+=head1 CODE SYNOPSIS
 
     use Data::Dumper;
 
-    my $results=$ixchel->action(action=>'sagan_include', opts=>{np=>1, w=>1, });
+    my $results=$ixchel->action(action=>'sagan_include', opts=>{ w=>1, });
 
     print Dumper($results);
+
+=head1 DESCRIPTION
 
 Generates the Sagan include config.
 
@@ -62,13 +70,9 @@ instance setups if .sagan.multi_instance is set to 1 then
 
 =head1 FLAGS
 
-=head2 --np
-
-Do not print the status of it.
-
 =head2 -w
 
-Write the generated services to service files.
+Write out the configs.
 
 =head2 -i instance
 
@@ -82,58 +86,10 @@ A instance to operate on.
 
 =cut
 
-sub new {
-	my ( $empty, %opts ) = @_;
+sub new_extra { }
 
-	my $self = {
-		config => {},
-		vars   => {},
-		arggv  => [],
-		opts   => {},
-	};
-	bless $self;
-
-	if ( defined( $opts{config} ) ) {
-		$self->{config} = $opts{config};
-	}
-
-	if ( defined( $opts{t} ) ) {
-		$self->{t} = $opts{t};
-	} else {
-		die('$opts{t} is undef');
-	}
-
-	if ( defined( $opts{share_dir} ) ) {
-		$self->{share_dir} = $opts{share_dir};
-	}
-
-	if ( defined( $opts{opts} ) ) {
-		$self->{opts} = \%{ $opts{opts} };
-	}
-
-	if ( defined( $opts{argv} ) ) {
-		$self->{argv} = $opts{argv};
-	}
-
-	if ( defined( $opts{vars} ) ) {
-		$self->{vars} = $opts{vars};
-	}
-
-	if ( defined( $opts{ixchel} ) ) {
-		$self->{ixchel} = $opts{ixchel};
-	}
-
-	return $self;
-} ## end sub new
-
-sub action {
+sub action_extra {
 	my $self = $_[0];
-
-	my $results = {
-		errors      => [],
-		status_text => '',
-		ok          => 0,
-	};
 
 	my $config_base = $self->{config}{sagan}{config_base};
 
@@ -182,7 +138,7 @@ sub action {
 				my %tmp_base_config = %{$base_config};
 				my $merged          = $merger->merge( \%tmp_base_config, \%tmp_config );
 
-				$merged->{include} = $config_base . '/sagan-rules-' . $instance . '.yaml';
+				$merged->{include} = File::Spec->canonpath( $config_base . '/sagan-rules-' . $instance . '.yaml' );
 
 				$filled_in = '%YAML 1.1' . "\n" . Dump($merged);
 
@@ -191,34 +147,36 @@ sub action {
 				}
 			};
 			if ($@) {
-				push( @{ $results->{errors} }, $@ );
-				$results->{status_text}
-					= $results->{status_text}
-					. '-----[ Errored: '
-					. $instance
-					. ' ]-------------------------------------' . "\n" . '# '
-					. $@ . "\n";
-				$self->{ixchel}{errors_count}++;
+				$self->status_add(
+					error  => 1,
+					status => '-----[ Errored: '
+						. $instance
+						. ' ]-------------------------------------' . "\n" . '# '
+						. $@ . "\n"
+				);
 			} else {
-				$results->{status_text}
-					= $results->{status_text}
-					. '-----[ '
-					. $instance
-					. ' ]-------------------------------------' . "\n"
-					. $filled_in . "\n";
+				$self->status_add( status => '-----[ '
+						. $instance
+						. ' ]-------------------------------------' . "\n"
+						. $filled_in
+						. "\n" );
 			}
 
 		} ## end foreach my $instance (@instances)
 	} else {
 		if ( defined( $self->{opts}{i} ) ) {
-			die('-i may not be used in single instance mode, .sagan.multi_instance=1, ,');
+			$self->status_add(
+				error  => 1,
+				status => '-i may not be used in single instance mode, .sagan.multi_instance=0'
+			);
+			return undef;
 		}
 
 		my $filled_in;
 		eval {
 			my $config = $self->{config}{sagan}{config};
 
-			$config->{include} = $config_base . '/sagan-rules.yaml';
+			$config->{include} = File::Spec->canonpath( $config_base . '/sagan-rules.yaml' );
 
 			$filled_in = '%YAML 1.1' . "\n" . Dump($config);
 
@@ -227,36 +185,17 @@ sub action {
 			}
 		};
 		if ($@) {
-			push( @{ $results->{errors} }, $@ );
-			$results->{status_text} = '# ' . $@;
-			$self->{ixchel}{errors_count}++;
+			$self->status_add(
+				error  => 1,
+				status => 'Errored ... ' . $@
+			);
 		} else {
-			$results->{status_text} = $filled_in;
+			$self->status_add( status => "Filled in ... \n" . $filled_in );
 		}
 	} ## end else [ if ( $self->{config}{sagan}{multi_instance...})]
 
-	if ( !$self->{opts}{np} ) {
-		print $results->{status_text};
-	}
-
-	if ( !defined( $results->{errors}[0] ) ) {
-		$results->{ok} = 1;
-	}
-
-	return $results;
-} ## end sub action
-
-sub help {
-	return 'Generates the instance specific include for a sagan instance.
-
---np          Do not print the status of it.
-
--w            Write the generated includes out.
-
--i <instance> A instance to operate on.
-
-';
-} ## end sub help
+	return undef;
+} ## end sub action_extra
 
 sub short {
 	return 'Generates the instance specific include for a sagan instance.';
@@ -264,7 +203,6 @@ sub short {
 
 sub opts_data {
 	return 'i=s
-np
 w
 ';
 }

@@ -14,6 +14,7 @@
 #include "perl-backcompat.c.inc"
 
 #include "av-utils.c.inc"
+#include "croak_from_caller.c.inc"
 
 #define warn_void_context(func)  S_warn_void_context(aTHX_ func)
 static void S_warn_void_context(pTHX_ const char *func)
@@ -162,7 +163,7 @@ await(SV *self)
       RETVAL = newSVsv(ST(0));
       XSRETURN(1);
     }
-    croak("%" SVf " is not yet complete and does not provide an ->await method",
+    croak_from_caller("%" SVf " is not yet complete and does not provide an ->await method",
       SVfARG(self));
   OUTPUT:
     RETVAL

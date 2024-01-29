@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.344';
+our $VERSION = '2.403';
 
 #use bytes; # required
 use Scalar::Util qw( looks_like_number );
@@ -254,7 +254,7 @@ sub tables_info { # not documented
     my ( @user_table_keys, @sys_table_keys );
     my $tables_info = {};
     for my $info_table ( @$info_tables ) {
-        if ( $driver =~ /^(?:Informix|Sybase)\z/ && $schema ne $info_table->{$table_schem} ) {
+        if ( $driver =~ /^(?:Informix|Sybase)\z/ && defined $schema && $schema ne $info_table->{$table_schem} ) {
             # Informix: `table_info` returns everything.
             next;
         }
@@ -324,7 +324,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.344
+Version 2.403
 
 =head1 DESCRIPTION
 
@@ -574,7 +574,7 @@ Matthäus Kiem <cuer2s@gmail.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2023 Matthäus Kiem.
+Copyright 2012-2024 Matthäus Kiem.
 
 THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
 IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

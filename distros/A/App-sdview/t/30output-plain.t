@@ -7,7 +7,7 @@ use experimental 'signatures';
 
 use Test2::V0;
 
-# We don't have a "plain" input, but we can input from POD or Markdown and test
+# We don't have a "plain" input, but we can input from Pod or Markdown and test
 # that we get some expected output
 use App::sdview::Parser::Pod;
 use App::sdview::Parser::Markdown;

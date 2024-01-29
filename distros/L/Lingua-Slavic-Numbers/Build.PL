@@ -9,5 +9,10 @@ my $build = Module::Build->new
 	       'List::Util'  => 0,
 	       'Regexp::Common'  => 0,
 	      },
+  meta_merge => {
+		 resources => {
+			       repository => 'https://github.com/eserte/Lingua-Slavic-Numbers',
+			      },
+		},
  );
 $build->create_build_script;

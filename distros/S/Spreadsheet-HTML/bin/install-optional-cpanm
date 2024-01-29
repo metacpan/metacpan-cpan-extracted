@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+cpanm -n JavaScript::Minifier JSON YAML Spreadsheet::Engine \
+	Spreadsheet::Read Text::CSV_XS Text::CSV Text::CSV_PP \
+	Spreadsheet::ParseExcel HTML::TableExtract Imager Color::Spectrum

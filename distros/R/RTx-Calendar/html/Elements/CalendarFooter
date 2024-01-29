@@ -1,0 +1,38 @@
+<&| /Widgets/TitleBox, title => loc('Help') &>
+
+<h4 class="mt-2"><&|/l&>Displaying reminders</&>:</h4>
+<p>
+<&|/l_unsafe, qq{<a href="$RT::WebPath/Search/Edit.html">} . loc("Advanced") . '</a>' &>
+If you want to see reminders on the calendar, you need to go to the [_1] tab
+of your query and explicitly add the following clause to it:
+</&>
+ <pre>
+   AND ( Type = 'ticket' OR Type = 'reminder' )
+</pre>
+</p>
+
+<h4><&|/l&>Displaying other kind of dates</&>:</h4>
+<p>
+<&|/l_unsafe, qq{<a href="$RT::WebPath/Search/Build.html">} . loc("Query Builder") . '</a>'&>
+By default, RTx::Calendar displays Due and Starts dates. You can select other
+date fields with the Display Columns section in the [_1].
+The following format will display the two additional date fields, LastUpdated and a
+custom field called Maintenance Date:
+</&>
+<pre>
+  '&lt;small&gt;__Due__&lt;/small&gt;',
+  '&lt;small&gt;__Starts__&lt;/small&gt;',
+  '&lt;small&gt;__LastUpdated__&lt;/small&gt;',
+  '&lt;small&gt;__CustomField.{Maintenance Date}__&lt;/small&gt;'
+</pre>
+</p>
+
+<h4><&|/l&>Changing the default query</&>:</h4>
+<p>
+<&|/l_unsafe, qq{<a href="$RT::WebPath/Search/Build.html">} . loc("Query Builder") . '</a>'&>
+You can change the default query used by Calendar.html and the MyCalendar
+portlet by saving a query with the name <code>calendar</code> in the [_1].
+</&>
+</p>
+
+</&>

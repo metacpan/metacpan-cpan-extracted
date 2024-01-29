@@ -2,9 +2,9 @@ package Lemonldap::NG::Portal::Auth::OpenIDConnect;
 
 use strict;
 use Mouse;
-use MIME::Base64 qw/encode_base64 decode_base64/;
-use Scalar::Util qw/looks_like_number/;
-use Lemonldap::NG::Common::JWT qw(getJWTPayload);
+use MIME::Base64                           qw/encode_base64 decode_base64/;
+use Scalar::Util                           qw/looks_like_number/;
+use Lemonldap::NG::Common::JWT             qw(getJWTPayload);
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_IDPCHOICE
@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.18.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -90,7 +90,9 @@ sub init {
         'Auth',
         oidcServiceMetaDataFrontChannelURI => 'frontLogout',
         oidcServiceMetaDataBackChannelURI  => 'backLogout',
+        oidcServiceMetaDataJWKSURI         => 'jwks',
     );
+    $self->addRouteFromConf( 'Unauth', oidcServiceMetaDataJWKSURI => 'jwks', );
 
     @list =
       sort {
@@ -188,9 +190,9 @@ sub extractFormInfo {
             $self->logger->debug("Token response is valid");
         }
 
-        my $access_token  = $token_response->{access_token};
-        my $expires_in    = $token_response->{expires_in};
-        my $id_token      = $token_response->{id_token};
+        my $access_token = $token_response->{access_token};
+        my $expires_in   = $token_response->{expires_in};
+        my $id_token     = $self->decryptJwt( $token_response->{id_token} );
         my $refresh_token = $token_response->{refresh_token};
 
         undef $expires_in unless looks_like_number($expires_in);
@@ -203,9 +205,12 @@ sub extractFormInfo {
             "Refresh token: " . ( $refresh_token || "<none>" ) );
 
         # Verify JWT signature
+        my $id_token_payload_hash;
         if ( $self->opOptions->{$op}->{oidcOPMetaDataOptionsCheckJWTSignature} )
         {
-            unless ( $self->verifyJWTSignature( $id_token, $op ) ) {
+            unless ( $id_token_payload_hash =
+                $self->decodeJWT( $id_token, $op ) )
+            {
                 $self->logger->error("JWT signature verification failed");
                 return PE_OIDC_AUTH_ERROR;
             }
@@ -213,9 +218,9 @@ sub extractFormInfo {
         }
         else {
             $self->logger->debug("JWT signature check disabled");
+            $id_token_payload_hash = getJWTPayload($id_token);
         }
 
-        my $id_token_payload_hash = getJWTPayload($id_token);
         unless ( defined $id_token_payload_hash ) {
             $self->logger->error(
                 "Could not decode incoming ID token: $id_token");
@@ -559,7 +564,7 @@ sub backLogout {
       unless $content and $content->{logout_token};
 
     # Decode token
-    my $logoutToken = $content->{logout_token};
+    my $logoutToken = $self->decryptJwt( $content->{logout_token} );
     my $payload     = getJWTPayload($logoutToken)
       or
       return $self->p->sendError( $req, 'Could not decode logout token', 400 );
@@ -586,7 +591,7 @@ sub backLogout {
 
     # Verify signature
     return $self->p->sendError( $req, 'Bad signature', 400 )
-      unless $self->verifyJWTSignature( $logoutToken, $op );
+      unless $self->decodeJWT( $logoutToken, $op );
 
     # Verify audience
     return $self->p->error( $req, 'Bad aud', 400 )

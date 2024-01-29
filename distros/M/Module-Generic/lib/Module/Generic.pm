@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.32.8
+## Version v0.34.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2023/11/17
+## Modified 2024/01/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.32.8';
+    our $VERSION     = 'v0.34.0';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -138,7 +138,7 @@ $stderr_raw->autoflush( 1 );
     $false = $Module::Generic::Boolean::false;
 }
 
-# for sub in `egrep -E '^sub ' ./lib/Module/Generic.pm| awk '{print $2 }' | perl -pe 's/\;$//' | LC_COLLATE=C sort -uV`; do echo "sub $sub;"; done
+# for sub in `perl -ln -E 'say "$1" if( /^sub (\w+)[[:blank:]\v]*(?:\{|\Z|[[:blank:]\v]*:[[:blank:]\v]*lvalue)/ )' ./lib/Module/Generic.pm | LC_COLLATE=C sort -uV`; do echo "sub $sub;"; done
 sub AUTOLOAD;
 sub DEBUG;
 sub FREEZE;
@@ -174,14 +174,8 @@ sub get;
 sub import;
 sub init;
 sub log_handler;
-sub message;
-sub messagef;
 sub messagef_colour;
-sub message_check;
 sub message_colour;
-sub message_frame;
-sub message_log;
-sub message_log_io;
 sub new;
 sub new_array;
 sub new_datetime;
@@ -284,6 +278,7 @@ sub _set_get_scalar_or_object;
 sub _set_get_uri;
 sub _set_get_uuid;
 sub _set_get_version;
+sub _set_symbol;
 sub _to_array_object;
 sub _warnings_is_enabled;
 sub _warnings_is_registered;
@@ -1838,6 +1833,7 @@ sub pass_error
             $err = $_[0];
         }
     }
+    $err = $opts->{error} if( !defined( $err ) && CORE::exists( $opts->{error} ) && defined( $opts->{error} ) && CORE::length( $opts->{error} ) );
     # We set $class only if the hash provided is a one-element hash and not an error-defining hash
     # $class = CORE::delete( $opts->{class} ) if( scalar( keys( %$opts ) ) == 1 && [keys( %$opts )]->[0] eq 'class' );
     $class = $opts->{class} if( CORE::exists( $opts->{class} ) && defined( $opts->{class} ) && CORE::length( $opts->{class} ) );
@@ -2787,7 +2783,7 @@ sub _message
         $this->{debug} || 
         ${ $class . '::DEBUG' } || 
         # Last parameter is an hash and there is a debug property
-        ( scalar( @_ ) && ref( $_[-1] ) eq 'HASH' && exists( $_[-1]->{debug} ) && $_[-1]->{debug} ) )
+        ( scalar( @_ ) && ref( $_[-1] ) eq 'HASH' && CORE::exists( $_[-1]->{debug} ) && $_[-1]->{debug} ) )
     {
         my $r;
         if( $MOD_PERL )
@@ -2803,13 +2799,19 @@ sub _message
                 print( STDERR "Error trying to get the global Apache2::ApacheRec: $@\n" );
             }
         }
-    
+
+        local $Module::Generic::TieHash::PAUSED = 1;
         my $ref;
         $ref = $self->_message_check( @_ );
         return(1) if( !$ref );
         
         my $opts = {};
-        $opts = pop( @$ref ) if( ref( $ref->[-1] ) eq 'HASH' );
+        # NOTE: make sure to update this if there is use of additional parameters
+        if( ref( $ref->[-1] ) eq 'HASH' &&
+            scalar( grep( /^(caller_info|colour|color|level|message|no_encoding|no_exec|prefix|skip_frames|type)$/, keys( %{$ref->[-1]} ) ) ) )
+        {
+            $opts = pop( @$ref );
+        }
 
         my $stackFrame = $self->_message_frame( (caller(1))[3] ) || 0;
         $stackFrame = 0 unless( $stackFrame =~ /^\d+$/ );
@@ -2824,7 +2826,7 @@ sub _message
         my $sub2 = substr( $sub, rindex( $sub, '::' ) + 2 );
         if( ref( $this->{_message_frame} ) eq 'HASH' )
         {
-            if( exists( $this->{_message_frame}->{ $sub2 } ) )
+            if( CORE::exists( $this->{_message_frame}->{ $sub2 } ) )
             {
                 my $frameNo = int( $this->{_message_frame}->{ $sub2 } );
                 if( $frameNo > 0 )
@@ -2949,6 +2951,7 @@ sub _message_check
     no strict 'refs';
     if( @_ )
     {
+        local $Module::Generic::TieHash::PAUSED = 1;
         if( $_[0] !~ /^\d/ )
         {
             # The last parameter is an options parameter which has the level property set
@@ -2956,10 +2959,10 @@ sub _message_check
             {
                 # Then let's use this
             }
-            elsif( $this->{ '_message_default_level' } =~ /^\d+$/ &&
-                $this->{ '_message_default_level' } > 0 )
+            elsif( $this->{_message_default_level} =~ /^\d+$/ &&
+                $this->{_message_default_level} > 0 )
             {
-                unshift( @_, $this->{ '_message_default_level' } );
+                unshift( @_, $this->{_message_default_level} );
             }
             else
             {
@@ -3977,6 +3980,7 @@ sub _set_get_hash_as_mix_object : lvalue
                 if( $ctx->{object} || $ctx->{hash} )
                 {
                     require Module::Generic::Hash;
+                    local $Module::Generic::Hash::DEBUG = $self->debug;
                     my $o = Module::Generic::Hash->new( $data->{ $field } );
                     return( $o );
                 }
@@ -3985,6 +3989,7 @@ sub _set_get_hash_as_mix_object : lvalue
             elsif( $data->{ $field } && !$self->_is_object( $data->{ $field } ) )
             {
                 require Module::Generic::Hash;
+                local $Module::Generic::Hash::DEBUG = $self->debug;
                 my $o = Module::Generic::Hash->new( $data->{ $field } );
                 $data->{ $field } = $o;
             }
@@ -4033,6 +4038,7 @@ sub _set_get_hash_as_mix_object : lvalue
             else
             {
                 require Module::Generic::Hash;
+                local $Module::Generic::Hash::DEBUG = $self->debug;
                 $data->{ $field } = Module::Generic::Hash->new( $val );
             }
             
@@ -4043,6 +4049,7 @@ sub _set_get_hash_as_mix_object : lvalue
                 if( $ctx->{object} || $ctx->{hash} )
                 {
                     require Module::Generic::Hash;
+                    local $Module::Generic::Hash::DEBUG = $self->debug;
                     my $o = Module::Generic::Hash->new( $data->{ $field } );
                     return( $o );
                 }
@@ -4051,6 +4058,7 @@ sub _set_get_hash_as_mix_object : lvalue
             elsif( $data->{ $field } && !$self->_is_object( $data->{ $field } ) )
             {
                 require Module::Generic::Hash;
+                local $Module::Generic::Hash::DEBUG = $self->debug;
                 my $o = Module::Generic::Hash->new( $data->{ $field } );
                 $data->{ $field } = $o;
             }
@@ -6840,18 +6848,34 @@ sub _get_datetime_regexp
     use utf8;
     unless( defined( $PARSE_DATE_FRACTIONAL1_RE ) )
     {
+        my $aliases = [qw( JST )];
+        if( $self->_load_class( 'DateTime::TimeZone::Catalog::Extend', { version => 'v0.2.0' } ) )
+        {
+            $aliases = DateTime::TimeZone::Catalog::Extend->aliases;
+        }
+        my $tz_aliases = join( '|', @$aliases );
         $PARSE_DATE_FRACTIONAL1_RE = qr/
             (?<year>\d{4})
-            (?<d_sep>\D)
+            (?<d_sep>[^\d\+])
             (?<month>\d{1,2})
-            \D
+            [^\d\+]
             (?<day>\d{1,2})
             (?<sep>[\s\t]+)
             (?<hour>\d{1,2})
-            (?<t_sep>\D)
+            (?<t_sep>[^\d\+])
             (?<minute>\d{1,2})
-            (?:\D(?<second>\d{1,2}))?
-            (?<tz>([+-])(\d{2})(\d{2}))
+            (?:[^\d\+](?<second>\d{1,2}))?
+            (?<tz>
+                (?:
+                    (?<blank2>[[:blank:]]*)
+                    (?<tz1>[-+]?\d{2,4})
+                )
+                |
+                (?:
+                    (?<blank2>(?:[[:blank:]]+|[-+]))
+                    (?<tz2>$tz_aliases)
+                )
+            )?
         /x;
     }
     
@@ -7591,8 +7615,6 @@ PERL
     _parse_timestamp => <<'PERL',
 # Ref:
 # <https://en.wikipedia.org/wiki/Date_format_by_country>
-# Ref:
-# <https://en.wikipedia.org/wiki/Date_format_by_country>
 sub _parse_timestamp
 {
     my $self = shift( @_ );
@@ -7725,19 +7747,68 @@ sub _parse_timestamp
     # GNU PO file
     # 2019-10-03 19-44+0000
     # 2019-10-03 19:44:01+0000
+    # 2001-03-12 17:07+JST
     # if( $str =~ /^(?<year>\d{4})(?<d_sep>\D)(?<month>\d{1,2})\D(?<day>\d{1,2})(?<sep>[\s\t]+)(?<hour>\d{1,2})(?<t_sep>\D)(?<minute>\d{1,2})(?:\D(?<second>\d{1,2}))?(?<tz>([+-])(\d{2})(\d{2}))$/ )
     if( $str =~ /^$PARSE_DATE_FRACTIONAL1_RE$/x )
     {
         my $re = { %+ };
-        $fmt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) ) . $re->{sep} . join( $re->{t_sep}, qw( %H %M ) );
+        my @buff = ();
+        my @buff_fmt = ();
+        push( @buff, '%F %T' );
+        # $fmt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) ) . $re->{sep} . join( $re->{t_sep}, qw( %H %M ) );
+        push( @buff_fmt, join( $re->{d_sep}, qw( %Y %m %d ) ) . $re->{sep} . join( $re->{t_sep}, qw( %H %M ) ) );
         if( length( $re->{second} ) )
         {
-            $fmt->{pattern} .= $re->{t_sep} . '%S';
+            # $fmt->{pattern} .= $re->{t_sep} . '%S';
+            push( @buff_fmt, $re->{t_sep} . '%S' );
         }
-        $fmt->{pattern} .= '%z';
+        # $fmt->{pattern} .= '%z';
+        # push( @buff_fmt, '%z' );
         $str = join( '-', @$re{qw( year month day )} ) . ' ' . join( ':', @$re{qw( hour minute )}, ( length( $re->{second} ) ? $re->{second} : '00' ) ) . $re->{tz};
-        $opt->{pattern} = '%F %T%z';
-        $fmt->{time_zone} = $opt->{time_zone} = $re->{tz};
+        
+        if( CORE::defined( $re->{tz1} ) || CORE::defined( $re->{tz2} ) )
+        {
+            if( CORE::defined( $re->{tz1} ) && length( $re->{tz1} ) )
+            {
+                $fmt->{time_zone} = $opt->{time_zone} = $re->{tz};
+                my $tz_sign = substr( $re->{tz1}, 0, 1 );
+                if( $tz_sign eq '+' || $tz_sign eq '-' )
+                {
+                    push( @buff, ( $re->{blank2} // '' ) . '%z' );
+                    push( @buff_fmt, ( $re->{blank2} // '' ) . '%z' );
+                    CORE::delete( $fmt->{time_zone} );
+                    CORE::delete( $opt->{time_zone} );
+                }
+                else
+                {
+                    push( @buff_fmt, $re->{blank2} . $re->{tz1} );
+                }
+            }
+            elsif( CORE::defined( $re->{tz2} ) && length( $re->{tz2} ) )
+            {
+                $self->_load_class( 'DateTime::TimeZone::Catalog::Extend' ) ||
+                    warn( "Warning only: could not load module DateTime::TimeZone::Catalog::Extend: ", $self->error, "\n" ) if( $self->_warnings_is_enabled );
+                my $map = DateTime::TimeZone::Catalog::Extend->zone_map;
+                $opt->{zone_map} = $map;
+
+                # try-catch
+                local $@;
+                eval
+                {
+                    $tz = DateTime::TimeZone->new( name => $re->{tz2} );
+                };
+                if( $@ )
+                {
+                    warn( "Warning only: error trying to set the time zone object using '$re->{tz2}': $@\n" ) if( $self->_warnings_is_enabled );
+                }
+                push( @buff, ( $re->{blank2} // '' ) . '%O' );
+                push( @buff_fmt, ( $re->{blank2} // '' ) . $re->{tz2} );
+                $opt->{time_zone} = $fmt->{time_zone} = $tz->name;
+            }
+        }
+        # $opt->{pattern} = '%F %T%z';
+        $opt->{pattern} = join( '', @buff );
+        $fmt->{pattern} = join( '', @buff_fmt );
     }
     # 2019-06-19 23:23:57.000000000+0900
     # From PostgreSQL: 2019-06-20 11:02:36.306917+09
@@ -7841,8 +7912,6 @@ sub _parse_timestamp
                 my $tz_sign = substr( $re->{tz1}, 0, 1 );
                 if( $tz_sign eq '+' || $tz_sign eq '-' )
                 {
-#                     my( $blank, $tzval ) = @$re{qw( blank2 tz1 )};
-#                     $str =~ s/\Q$re->{blank2}$re->{tz1}\E$/$re->{blank2}\+$re->{tz1}/;
                     push( @buff, ( $re->{blank2} // '' ) . '%z' );
                     push( @buff_fmt, ( $re->{blank2} // '' ) . '%z' );
                     CORE::delete( $fmt->{time_zone} );
@@ -7874,13 +7943,6 @@ sub _parse_timestamp
                 push( @buff_fmt, ( $re->{blank2} // '' ) . $re->{tz2} );
                 $opt->{time_zone} = $fmt->{time_zone} = $tz->name;
             }
-#             push( @buff, (
-#                 ( CORE::defined( $re->{tz1} ) && length( $re->{tz1} ) )
-#                     ? ( ( $re->{blank2} // '' ) . '%z' )
-#                     : ( CORE::defined( $re->{tz2} ) && length( $re->{tz2} ) )
-#                         ? ( $re->{blank2} . '%Z' )
-#                         : ()
-#             ) );
         }
         $opt->{pattern} = join( '', @buff );
         $fmt->{pattern} = join( '', @buff_fmt );
@@ -8150,7 +8212,6 @@ sub _parse_timestamp
     }
     # <https://en.wikipedia.org/wiki/Date_format_by_country>
     # Possibly followed by a dot and some integer for milliseconds as provided by Time::HiRes
-    # elsif( $str =~ /^\d{1,10}(?:\.\d+)?$/ )
     elsif( $str =~ /^$PARSE_DATE_TIMESTAMP_RE$/x )
     {
         my $re = { %+ };
@@ -8170,7 +8231,6 @@ sub _parse_timestamp
         }
         return( $dt );
     }
-    # elsif( $str =~ /^([\+\-]?\d+)([YyMDdhms])?$/ )
     elsif( $str =~ /^$PARSE_DATETIME_RELATIVE_RE$/x )
     {
         my( $num, $unit ) = ( $1, $2 );
@@ -8446,6 +8506,151 @@ sub _set_get_datetime : lvalue
             return( $data->{ $field } );
         }
     }, @_ ) );
+}
+PERL
+    # NOTE: _set_symbol
+    _set_symbol => <<'PERL',
+# $o->_set_symbol(
+# class => 'Foo::Bar',
+# variable => '$some_var',
+# value => 'some value',
+# filename => '/some/where/file.pl',
+# start_line => 10,
+# end_line => 15,
+# );
+sub _set_symbol
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    if( !CORE::exists( $opts->{class} ) )
+    {
+        $opts->{class} = ( ref( $self ) || $self );
+    }
+    
+    if( !defined( $opts->{class} ) ||
+        !CORE::length( $opts->{class} // '' ) )
+    {
+        return( $self->error( "No class name was provided to add symbol." ) );
+    }
+    elsif( $opts->{class} !~ /^[a-zA-Z_][a-zA-Z0-9_]+(?:\:{2}[a-zA-Z0-9_]+)*$/ )
+    {
+        return( $self->error( "Invalid class name '$opts->{class}'" ) );
+    }
+    elsif( !CORE::exists( $opts->{variable} ) ||
+        !defined( $opts->{variable} ) ||
+        !CORE::length( $opts->{variable} // '' ) )
+    {
+        return( $self->error( "No variable was aprovided." ) );
+    }
+    my $class = $opts->{class};
+    my $var = $opts->{variable};
+    no strict 'refs';
+    my $ns = \%{$class . '::'};
+    require Symbol;
+    my $map = 
+    {
+    '$' => 'SCALAR',
+    '@' => 'ARRAY',
+    '%' => 'HASH',
+    '&' => 'CODE',
+    '*' => 'GLOB',
+    };
+    my $defaults = 
+    {
+        ARRAY => [],
+        CODE => sub{},
+        HASH => {},
+        GLOB => Symbol::geniosym,
+        SCALAR => \undef,
+    };
+    my( $name, $sigil, $type );
+    if( CORE::exists( $opts->{type} ) &&
+        defined( $opts->{type} ) &&
+        CORE::exists( $defaults->{uc( $opts->{type} )} ) )
+    {
+        $sigil = substr( $name = $var, 0, 1, '' );
+        $type = $opts->{type};
+    }
+    elsif( exists( $map->{ substr( $var, 0, 1 ) } ) )
+    {
+        $sigil = substr( $name = $var, 0, 1, '' );
+        $type = $map->{ $sigil };
+    }
+    else
+    {
+        # $type = $map->{ '' };
+        return( $self->error( "Unsupported variable ${var}. You can only set array, hash, scalar, code or glob" ) );
+    }
+    
+    my $value;
+    if( CORE::exists( $opts->{value} ) &&
+        defined( $opts->{value} ) )
+    {
+        my $refval = Scalar::Util::reftype( $opts->{value} );
+        if( $type eq 'SCALAR' &&
+            ( $refval eq 'HASH' || $refval eq 'ARRAY' || $refval eq 'CODE' ) )
+        {
+            $type = $refval;
+            $value = \$opts->{value};
+        }
+        else
+        {
+            $value = $opts->{value};
+        }
+        
+        if( $type eq 'ARRAY' ||
+              $type eq 'CODE' ||
+              $type eq 'HASH' ||
+              $type eq 'GLOB' )
+        {
+            return( $self->error( "Value of type ${refval} provided for ${var} is incompatible." ) ) if( $refval ne $type );
+        }
+        elsif( $refval ne 'SCALAR' &&
+            $refval ne 'REF' &&
+            $refval ne 'LVALUE' &&
+            $refval ne 'REGEXP' &&
+            $refval ne 'VSTRING' )
+        {
+            return( $self->error( "Value of type ${refval} provided for ${var} cannot be used." ) );
+        }
+        
+        # cheap fail-fast check for PERLDBf_SUBLINE and '&'
+        if( $^P && 
+            ( $^P & 0x10 ) && 
+            $sigil eq '&' )
+        {
+            no warnings 'once';
+            my $filename = $opts->{filename};
+            my $start_line = $opts->{start_line};
+            ( $filename, $start_line ) = (caller)[1,2] if( !defined( $filename ) );
+            my $end_line = $opts->{end_line} || ( $start_line ||= 0 );
+            # <http://perldoc.perl.org/perldebguts.html#Debugger-Internals>
+            $DB::sub{ $class . '::' . $name } = "${filename}:${start_line}-${end_line}";
+        }
+    }
+    
+    if( defined( $value ) )
+    {
+        no strict 'refs';
+        no warnings 'redefine';
+        *{ $class . '::' . $name } = ref( $value )
+            ? $value
+            : \$value;
+    }
+    else
+    {
+        no strict 'refs';
+        # Broken ISA assignment
+        if( $] < 5.012 && 
+            $name eq 'ISA' )
+        {
+            *{ $class . '::' . $name };
+        }
+        else
+        {
+            *{ $class . '::' . $name } = $defaults->{ $type };
+        }
+    }
 }
 PERL
     };
@@ -8889,12 +9094,12 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.32.8
+    v0.34.0
 
 =head1 DESCRIPTION
 
 L<Module::Generic> as its name says it all, is a generic module to inherit from.
-It is designed to provide a useful framework and speed up coding and debugging.
+It is designed to be fast and provide a useful framework and speed up coding and debugging.
 It contains standard and support methods that may be superseded by your module.
 
 It also contains an AUTOLOAD transforming any hash object key into dynamic methods and also recognize the dynamic routine a la AutoLoader. The reason is that while C<AutoLoader> provides the user with a convenient AUTOLOAD, I wanted a way to also keep the functionnality of L<Module::Generic> AUTOLOAD that were not included in C<AutoLoader>. So the only solution was a merger.
@@ -8980,15 +9185,15 @@ Parameters are:
 
 =over 4
 
-=item I<text> or I<message>
+=item * C<text> or I<message>
 
 This is the text to be formatted in colour.
 
-=item I<bgcolour> or I<bgcolor> or I<bg_colour> or I<bg_color>
+=item * C<bgcolour> or I<bgcolor> or I<bg_colour> or I<bg_color>
 
 The value for the background colour.
 
-=item I<colour> or I<color> or I<fg_colour> or I<fg_color> or I<fgcolour> or I<fgcolor>
+=item * C<colour> or I<color> or I<fg_colour> or I<fg_color> or I<fgcolour> or I<fgcolor>
 
 The value for the foreground colour.
 
@@ -9000,7 +9205,7 @@ Similarly, if an rgba value is provided, and the opacity is less than 1, this is
 
 It returns the text properly formatted to be outputted in a terminal.
 
-=item I<style>
+=item * C<style>
 
 The possible values are: I<bold>, I<italic>, I<underline>, I<blink>, I<reverse>, I<conceal>, I<strike>
 
@@ -9178,6 +9383,30 @@ Sets or gets an error number.
 
 =head2 error
 
+    my $o = Foo::Bar->new;
+    $o->do_something || return( $self->error( "Some error", "message." ) );
+    # or
+    $o->do_something || return( $self->error({
+        message => "Some error message.",
+        # will be loaded if necessary
+        class => 'My::Exception::Class',
+        # by default 'object' only
+        # it could also be simply 'all' to imply all the ones below
+        want => [qw( array code glob hash object scalar )],
+        debug => 4,
+        # code to execute upon error
+        callback => sub
+        {
+            # do some cleanup
+            $dbh->rollback if( $dbh->transaction );
+        },
+        # make it fatal
+        fatal => 1,
+        # When used inside an lvalue method
+        # lvalue => 1,
+        # assign => 1,
+    }) );
+
 Provided with a list of strings or an hash reference of parameters and this will set the current error issuing a L<Module::Generic::Exception> object, call L<perlfunc/warn>, or C<$r->warn> under Apache2 modperl, and returns undef() or an empty list in list context:
 
     if( $some_condition )
@@ -9200,7 +9429,15 @@ If you want to use an hash reference instead, you can pass the following paramet
 
 =over 4
 
-=item I<class>
+=item * C<assign>
+
+Boolean. Set this to a true value if this is called within an assign method, such as one using lvalue.
+
+=item * C<callback>
+
+Specify a code reference such as a reference to a subroutine. This is designed to be called upon error to do some cleanup for example.
+
+=item * C<class>
 
 The package name or class to use to instantiate the error object. By default, it will use L<Module::Generic::Exception> class or the one specified with the object property C<_exception_class>
 
@@ -9214,11 +9451,25 @@ The package name or class to use to instantiate the error object. By default, it
 
 Note, however, that if the class specified cannot be loaded for some reason, L<Module::Generic/error> will die since this would be an error within another error.
 
-=item I<message>
+=item * C<debug>
+
+Integer. Specify a value to set the debugging value for this exception.
+
+=item * C<fatal>
+
+Boolean. Specify a true value to make this error fatal. This means that instead of issuing a C<warn>, it will die.
+
+=item * C<lvalue>
+
+Boolean. Set this to a true value if this is called within an assign method, such as one using lvalue.
+
+=item * C<message>
+
+Specify a string for the error message.
 
 The error message.
 
-=item I<want>
+=item * C<want>
 
 An array reference of data types that you allow this method to return when such data type is expected by the original caller.
 
@@ -9332,8 +9583,8 @@ Uset to get an object data key value:
 This is no more needed, as it has been more conveniently bypassed by the AUTOLOAD
 generic routine with which you may say:
 
-    $obj->verbose( 1 );
-    $obj->debug( 0 );
+    $obj->verbose(1);
+    $obj->debug(0);
     ## ...
     my $verbose = $obj->verbose();
 
@@ -9472,17 +9723,17 @@ L</message> also takes an optional hash reference as the last parameter with the
 
 =over 4
 
-=item I<caller_info>
+=item * C<caller_info>
 
 This is a boolean value, which is true by default.
 
 When true, this will prepend the debug message with information about the caller of L</message>
 
-=item I<level>
+=item * C<level>
 
 An integer. Debugging level.
 
-=item I<message>
+=item * C<message>
 
 The text of the debugging message. This is optional since this can be provided as first or consecutive arguments like in a list as demonstrated in the example above. This allows you to do something like this:
 
@@ -9492,15 +9743,15 @@ or
 
     $self->message( { message => "Some debug message here", prefix => ">>", level => 2 });
 
-=item I<no_encoding>
+=item * C<no_encoding>
 
 Boolean value. If true and when the debugging is set to be printed to a file, this will not set the binmode to C<utf-8>
 
-=item I<prefix>
+=item * C<prefix>
 
 By default this is set to C<E<35>E<35>>. This value is used as the prefix used in debugging output.
 
-=item I<type>
+=item * C<type>
 
 Type of debugging
 
@@ -9815,17 +10066,35 @@ You can optionally provide an hash of parameters as the last argument, such as:
 
     return( $self->pass_error( $obj->error, { class => 'My::Exception', code => 400 } ) );
 
+Or, you could also pass all parameters as an hash reference, such as:
+
+    return( $self->pass_error({
+        error => $obj->error,
+        class => 'My::Exception',
+        code => 400,
+    }) );
+
 Supported options are:
 
 =over 4
 
-=item C<class>
+=item * C<callback>
+
+A code reference, such as a subroutine reference or an anonymous code that will be executed. This is designed to be used to do some cleanup.
+
+=item * C<class>
 
 The name of a class name to re-bless the error object provided.
 
-=item C<code>
+=item * C<code>
 
 The error code to set in the error object being passed.
+
+=item * C<error>
+
+The error object to be passed on.
+
+If this is not provided, it will get it with the object C<error> method, or the class global variable C<$ERROR>
 
 =back
 
@@ -10401,11 +10670,11 @@ Possible options are:
 
 =over 4
 
-=item I<caller>
+=item * C<caller>
 
 The package name of the caller. If this is not provided, it will default to the value provided with L<perlfunc/caller>
 
-=item I<no_import>
+=item * C<no_import>
 
 Set to a true value and this will prevent the loaded module from importing anything into your namespace.
 
@@ -10413,7 +10682,7 @@ This is the equivalent of doing:
 
     use My::Module ();
 
-=item I<version>
+=item * C<version>
 
 The minimum version for this class to load. This value is passed directly to L<perlfunc/use>
 
@@ -11380,11 +11649,11 @@ Alternatively, the property name can be an hash with the following properties:
 
 =over 4
 
-=item I<field>
+=item * C<field>
 
 The object property name
 
-=item I<class>
+=item * C<class>
 
 The URI class to use. By default, L<URI>, but you could also use L<URI::Fast>, or other class of your choice. That class will be loaded, if it is not loaded already.
 
@@ -11416,11 +11685,11 @@ Alternatively, the property name can be an hash with the following properties:
 
 =over 4
 
-=item I<field>
+=item * C<field>
 
 The object property name
 
-=item I<class>
+=item * C<class>
 
 The version class to use. By default, L<version>, but you could also use L<Perl::Version>, or other class of your choice. That class will be loaded, if it is not loaded already.
 
@@ -11437,6 +11706,154 @@ would work, but of course also:
 The value can be a legitimate version string, or a version object matching the C<class> to be used, which is by default L<version>. If it is a string, it will be made an object of the class specified using C<parse> if that class supports it, or by simply calling C<new>.
 
 When called in get mode, it will convert any value pre-set, if any, into a version object of the specified class if the value is not an object of that class already, and return it, or else it will return an empty string or undef whatever you will have set in your object for this property.
+
+=head2 _set_symbol
+
+    $o->_set_symbol(
+        # class defaults to the current object class
+        variable => '$some_scalar_ref',
+        # variable value defaults to scalar reference to undef
+        # or [], {}, sub{} depending on the variable type
+    );
+    # or
+    $o->_set_symbol(
+        class => 'Foo::Bar',
+        variable => '$some_scalar_name',
+        value => \"some string reference",
+    );
+    # or
+    $o->_set_symbol(
+        class => 'Foo::Bar',
+        variable => '@some_array_name',
+        value => $an_array_reference,
+    );
+    # or
+    $o->_set_symbol(
+        class => 'Foo::Bar',
+        variable => '%some_array_name',
+        value => $an_hash_reference,
+    );
+    # or
+    $o->_set_symbol(
+        class => 'Foo::Bar',
+        variable => '&some_sub_name',
+        value => $an_hash_reference,
+    );
+    # or
+    $o->_set_symbol(
+        class => 'Foo::Bar',
+        # explicitly specify the variable type
+        type => 'hash',
+        variable => '$some_hash_name',
+        value => $an_hash_reference,
+    );
+    # or
+    $o->_set_symbol(
+        class => 'Foo::Bar',
+        type => 'array',
+        variable => '$some_array_name',
+        value => $an_array_reference,
+    );
+    # or
+    $o->_set_symbol(
+        class => 'Foo::Bar',
+        type => 'scalar',
+        variable => '$some_array_name',
+        value => $a_scalar_reference,
+    );
+    # or
+    $o->_set_symbol(
+        class => 'Foo::Bar',
+        type => 'code',
+        variable => '$some_sub_name',
+        # Like \&some_thing, or maybe sub{ # do something here }
+        value => $a_code_reference,
+    );
+
+This method is used to add a new symbol to a given class, a.k.a. package. A proper symbol type can only be an array reference, an hash reference, a scalar, a code reference, or a glob.
+
+This takes the following options:
+
+=over 4
+
+=item * C<class>
+
+The class, or package name to add the new symbol to.
+
+=item * C<end_line>
+
+An integer to specify the end line of the the code reference, represented by the variable, in the class provided. If none is provided, the value for C<start_line> will be used.
+
+=item * C<filename>
+
+An optional filename to associate the new symbol with. For example C</some/where/file.pl>
+
+This is only used when perl debugging is enabled and for variables that are code reference.
+
+If no filename is provided, it will default to the value returned by L<perlfunc/caller>
+
+=item * C<start_line>
+
+An integer to specify the start line of the code reference, represented by the variable, in the class provided.
+
+If no start line is provided, it will default to 0.
+
+=item * C<type>
+
+The optional variable type. This can be either C<array>, C<code>, C<glob>, C<hash>, or C<scalar>
+
+If this is not explicitly specified, the type will be derived from the sigil, i.e. the first character of the variable name.
+
+The sigil will determine how the variable will be accessed from the package name. Fer example:
+
+    $o->_set_symbol(
+        class => 'Foo::Bar',
+        variable => '@some_array',
+        value => [qw( John Peter Paul )],
+    );
+
+The C<@Foo::Bar::some_array> is accessible, but not C<$Foo::Bar::some_array>, but if you do:
+
+    $o->_set_symbol(
+        class => 'Foo::Bar',
+        variable => '$some_array',
+        value => [qw( John Peter Paul )],
+    );
+
+then, C<$Foo::Bar::some_array> is accessible, but not C<@Foo::Bar::some_array>
+
+If you prefer providing a variable with a dollar for the name, because you use a reference, it is ok too. The type will be derived from the value you provide if the value is an array, a code reference or an hash.
+
+There will be a slight difference in the symbol table. Variable starting with C<%>, or C<@> can only then be retrieved with the same sigil. If an array, hash or code reference variable is stored with C<$>, it will be stored as C<REF>, and must be dereferenced when the symbol is later retrieved. For example:
+
+    $o->_set_symbol(
+        variable => '$some_array_name',
+        value => [qw( John Peter Paul )],
+    );
+    my $sym = $o->_get_symbol( '$some_array_name' );
+    my $ref = $$sym;
+    say "@$ref"; # John Peter Paul
+
+Whereas:
+
+    $o->_set_symbol(
+        variable => '@some_array_name',
+        value => [qw( John Peter Paul )],
+    );
+    my $sym = $o->_get_symbol( '@some_array_name' );
+    say "@$sym"; # John Peter Paul
+
+Acceptable value types are: C<array>, C<code>, C<glob>, C<hash>, or C<scalar>, but also C<lvalue>, C<regexp>, and C<vstring>
+
+=item * C<value>
+
+Specifies an appropriate value for this new symbol. If the value is not suitable for the new symbol, an error is returned.
+
+=item * C<variable>
+
+A variable including its C<sigil>, i.e. the first character of a variable name, such as C<$>, C<%>, C<@>, or C<&>
+
+=back
 
 =head2 _to_array_object
 

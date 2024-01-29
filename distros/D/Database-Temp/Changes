@@ -1,5 +1,10 @@
 Revision history for Database-Temp
 
+0.003     2023-12-19 22:27:37+01:00 Europe/Berlin
+            * Remove SQLite from test because in some test environments SQLite is not installed.
+            * Add SQLite available test bailout
+            * Add DummyForTesting driver and use in is_available test
+
 0.002     2023-12-01 22:17:54+01:00 Europe/Berlin
           * Fix literal octal string
           * Fix here doc in tests to work with earlier Perls

@@ -29,10 +29,6 @@ foreach my $dir(@dirs) {
 	}
 }
 
-my %urls = (
-	"https://$site/export/dump/alternatenames/GB.zip" => 'lib/Locale/Places/databases/GB.zip',
-);
-
 # unlink('lib/Geo/Coder/Free/MaxMind/databases/cities.sql');
 if(eval { require HTTP::Cache::Transparent; }) {
 	HTTP::Cache::Transparent->import();
@@ -49,7 +45,7 @@ if(eval { require HTTP::Cache::Transparent; }) {
 
 	if(!-d $cachedir) {
 		print "Creating the cache directory $cachedir\n";
-		mkdir $cachedir || die "$cachedir: $@";
+		mkdir $cachedir, 02755 || die "$cachedir: $@";
 	}
 	HTTP::Cache::Transparent::init({
 		BasePath => $cachedir,
@@ -75,8 +71,10 @@ if(eval { require LWP::Simple::WithCache; }) {
 	}
 }
 
-foreach my $url(keys %urls) {
-	my $file = $urls{$url};
+foreach my $country('GB', 'US') {
+	my $url = "https://$site/export/dump/alternatenames/$country.zip";
+	my $file = "lib/Locale/Places/databases/$country.zip";
+
 	my $use_mirror = 0;
 
 	if(-r $file) {
@@ -109,39 +107,41 @@ foreach my $url(keys %urls) {
 		}
 	}
 	die $file if(!-r $file);
-}
 
-if(!(-r 'lib/Locale/Places/databases/GB.csv')) {
-	my $zip = 'lib/Locale/Places/databases/GB.zip';
+	if(!(-r "lib/Locale/Places/databases/$country.csv")) {
+		my $zip = "lib/Locale/Places/databases/$country.zip";
 
-	# Try inline as the external program fails on Windows
-	# http://www.cpantesters.org/cpan/report/a03259ca-6c02-1014-bd5e-9b11492b42cd
-	eval 'require IO::Uncompress::Unzip';
-	if($@) {
-		system("unzip $zip") or die "unzip $zip failed";
+		print "Exploding $zip\n";
 
-		rename 'GB.txt', 'lib/Locale/Places/databases/GB.csv' or die "rename: $!";
-		unlink 'readme.txt';
-	} elsif(open(my $fout, '>', 'lib/Locale/Places/databases/GB.csv')) {
-		IO::Uncompress::Unzip->import();
-		my $fin = IO::Uncompress::Unzip->new($zip);
-		do {
-			if($fin->getHeaderInfo->{'Name'} eq 'GB.txt') {
-				while(my $line = $fin->getline()) {
-					print $fout $line;
+		# Try inline as the external program fails on Windows
+		# http://www.cpantesters.org/cpan/report/a03259ca-6c02-1014-bd5e-9b11492b42cd
+		eval 'require IO::Uncompress::Unzip';
+		if($@) {
+			system("unzip $zip") or die "unzip $zip failed";
+
+			rename "$country.txt", "lib/Locale/Places/databases/$country.csv" or die "rename: $!";
+			unlink 'readme.txt';
+		} elsif(open(my $fout, '>', "lib/Locale/Places/databases/$country.csv")) {
+			IO::Uncompress::Unzip->import();
+			my $fin = IO::Uncompress::Unzip->new($zip);
+			do {
+				if($fin->getHeaderInfo->{'Name'} eq "$country.txt") {
+					while(my $line = $fin->getline()) {
+						print $fout $line;
+					}
+					# last; # Gives syntax error that it's not in a loop :-(
 				}
-				# last; # Gives syntax error that it's not in a loop :-(
-			}
-		} while($fin->nextStream());
+			} while($fin->nextStream());
+		}
+		# Save disc space, but prevent more than one download
+		# if(open(my $fout, '>', $zip)) {
+			# close($fout);
+		# }
+		truncate $zip, 0;
 	}
-	# Save disc space, but prevent more than one download
-	# if(open(my $fout, '>', $zip)) {
-		# close($fout);
-	# }
-	truncate $zip, 0;
-}
 
-die if(!(-r 'lib/Locale/Places/databases/GB.csv'));
+	die if(!(-r "lib/Locale/Places/databases/$country.csv"));
+}
 
 # my $pm = {
 	# 'lib/Locale/Places.pm' => 'blib/lib/Locale/Places.pm',

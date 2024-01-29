@@ -59,9 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# PostConvertWorkbookToMarkdownRequest.File : File to upload  ,
-# PostConvertWorkbookToMarkdownRequest.password :   ,
-# PostConvertWorkbookToMarkdownRequest.checkExcelRestriction :    
+# PostConvertWorkbookToMarkdownRequest.File : The password needed to open an Excel file.  ,
+# PostConvertWorkbookToMarkdownRequest.password : The password needed to open an Excel file.  ,
+# PostConvertWorkbookToMarkdownRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.  ,
+# PostConvertWorkbookToMarkdownRequest.region : The regional settings for workbook.   
 
 {
     my $params = {
@@ -72,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_convert_workbook_to_markdown' } = { 
-    	summary => '',
+    	summary => 'Convert Excel file to Markdown files.',
         params => $params,
         returns => 'FileInfo',
     };
@@ -104,6 +105,10 @@ sub run_http_request {
 
     if(defined $self->check_excel_restriction){
         $query_params->{'checkExcelRestriction'} = $client->to_query_value($self->check_excel_restriction);      
+    }
+
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
     } 
     my $_body_data;
  
@@ -128,21 +133,28 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'File to upload',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
-     	description => '',
+     	description => 'Whether check restriction of excel file when user modify cells related objects.',
+     	format => '',
+     	read_only => '',
+     		},
+     'region' => {
+     	datatype => 'string',
+     	base_name => 'region',
+     	description => 'The regional settings for workbook.',
      	format => '',
      	read_only => '',
      		},    
@@ -152,7 +164,8 @@ __PACKAGE__->method_documentation({
 __PACKAGE__->attribute_map( {
     'file' => 'File',
     'password' => 'password',
-    'check_excel_restriction' => 'checkExcelRestriction' 
+    'check_excel_restriction' => 'checkExcelRestriction',
+    'region' => 'region' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -11,7 +11,7 @@ use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Common::Session;
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.18.0';
 our @ISA     = ('Exporter');
 our @EXPORT  = qw(fetchId retrieveSession createSession hideCookie goToPortal);
 our @EXPORT_OK = @EXPORT;
@@ -80,7 +80,7 @@ sub createSession {
     # Add client IP as X-Forwarded-For IP in request
     my $xheader = $req->env->{'HTTP_X_FORWARDED_FOR'};
     $xheader .= ", " if ($xheader);
-    $xheader .= $req->{env}->{REMOTE_ADDR};
+    $xheader .= $req->address;
 
     #my $soapHeaders = HTTP::Headers->new( "X-Forwarded-For" => $xheader );
     ## TODO: use adminSession or sessions

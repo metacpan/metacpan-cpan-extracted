@@ -1,6 +1,7 @@
 { 
 package Audio::Nama::Effect;
-use Modern::Perl;
+use Modern::Perl '2020';
+our $VERSION = 1.0;
 use List::MoreUtils qw(first_index insert_after_string);
 use Carp qw(carp cluck croak confess);
 use Data::Dumper::Concise;
@@ -37,9 +38,6 @@ use Audio::Nama::Object qw(
 				predecessor
 
 );
-*this_op			= \&Audio::Nama::this_op;
-*this_param			= \&Audio::Nama::this_param;
-*this_stepsize		= \&Audio::Nama::this_stepsize;
 our %by_id;
 our $AUTOLOAD;
 import_engine_subs();
@@ -57,7 +55,7 @@ sub initialize {
 sub AUTOLOAD {
 	my $self = shift;
 	#say "got self: $self", Audio::Nama::Dumper $self;
-	die 'not object' unless ref $self;
+	confess 'not object' unless ref $self;
 	# get tail of method call
 	my ($call) = $AUTOLOAD =~ /([^:]+)$/;
 	# see if this can be satisfied by a field from
@@ -176,7 +174,7 @@ sub remove_name { my $self = shift; delete $self->{name} }
 sub set_name    { my $self = shift; $self->{name} = shift }
 sub set_surname { my $self = shift; $self->{surname} = shift}
 sub is_controller { my $self = shift; $self->parent } 
-sub is_channel_op { my $self = shift; $Audio::Nama::config->{ecasound_channel_ops}->{$self->type} }
+sub is_channel_op { my $self = shift; $config->{ecasound_channel_ops}->{$self->type} }
 
 
 sub has_read_only_param {
@@ -194,7 +192,7 @@ sub registry_index {
 	$fx_cache->{full_label_to_index}->{ $self->type };
 }
 sub ecasound_controller_index { 
-	logsub("&ecasound_controller_index");
+	logsub((caller(0))[3]);
 	my $self = shift;
 	my $n = $self->chain;
 	my $id = $self->id;
@@ -209,7 +207,7 @@ sub ecasound_controller_index {
 	$opcount;
 }
 sub ecasound_effect_index { 
-	logsub("&ecasound_effect_index");
+	logsub((caller(0))[3]);
 	my $self = shift;
 	my $n = $self->chain;
 	my $id = $self->id;
@@ -274,7 +272,7 @@ sub trackname { $_[0]->track->name }
 
 sub ladspa_id {
 	my $self = shift;
-	$Audio::Nama::fx_cache->{ladspa_label_to_unique_id}->{$self->type} 
+	$fx_cache->{ladspa_label_to_unique_id}->{$self->type} 
 }
 sub nameline {
 	my $self = shift;
@@ -324,7 +322,7 @@ sub _modify_effect {
 	1
 }
 sub _remove_effect { 
-	logsub("&_remove_effect");
+	logsub((caller(0))[3]);
 	my $self = shift;
 	my $id = $self->id;
 	my $n 		= $self->chain;
@@ -374,7 +372,7 @@ sub _remove_effect {
 	return(); 
 }
 sub position_effect {
-	#logsub('&position_effect');
+	#logsub((caller(0))[3]);
 	my($self, $pos) = @_;
 
 	my $op = $self->id;
@@ -418,7 +416,7 @@ sub position_effect {
 }
 
 sub apply_op {
-	logsub("&apply_op");
+	logsub((caller(0))[3]);
 	my $self = shift;
 	local $config->{category} = 'ECI_FX';
 	my $id = $self->id;
@@ -469,9 +467,6 @@ sub import_engine_subs {
 	*sleeper			= \&Audio::Nama::sleeper;
 	*nama_cmd    = \&Audio::Nama::nama_cmd;
 	*pager				= \&Audio::Nama::pager;
-	*this_op			= \&Audio::Nama::this_op;
-	*this_param			= \&Audio::Nama::this_param;
-	*this_stepsize		= \&Audio::Nama::this_stepsize;
 }
 
 use Exporter qw(import);
@@ -507,10 +502,17 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 
 					set_current_op
 					set_current_param
-					set_current_stepsize
+					this_param
+					this_op
+					this_op_o
+					param_stepsize
+					set_param_value
+
 					increment_param
-					decrement_param
-					set_parameter_value
+					increment_param_1
+					increment_param_10
+					decrement_param_1
+					decrement_param_10
 
 ) ] );
 
@@ -568,14 +570,24 @@ sub set_chain_value {
 #				* restores the operators
 		 
 sub add_effect {
-	#logsub('&add_effect');
+	#logsub((caller(0))[3]);
 	my $args = shift;
 	my $added = _add_effect($args);
+	initialize_current_param_and_stepsize(@$added);
 	$added->[0]->id
+}
+sub initialize_current_param_and_stepsize {
+	for my $FX (@_){
+		my $param_count = $FX->about->{count};
+		$project->{current_param}->{$FX->id} //=  $param_count ? 1 : 0;
+		for (1..$param_count){
+			$project->{param_stepsize}->{$FX->id}->{$_} //= 1;
+		}
+	}
 }
 sub _add_effect {
 	my $p = shift;
-	logsub("&_add_effect");
+	logsub((caller(0))[3]);
 	#logpkg(__FILE__,__LINE__,'debug',sub{ "add effect arguments - 0:\n".json_out($p)});
 	
 	set_chain_value($p);
@@ -634,6 +646,7 @@ sub append_effect {
 			}  
 		}
 		my $FX = Audio::Nama::Effect->new(%args);
+		$args{self} = $FX;
 		push @added, $FX;
 		if( ! $FX->name )
 		{
@@ -730,7 +743,7 @@ sub insert_effect {
 	$added;
 }
 sub modify_effect {
-	logsub("&modify_effect");
+	logsub((caller(0))[3]);
 	my ($op_id, $parameter, $sign, $value) = @_;
 		# $parameter: one-based
 	
@@ -741,19 +754,19 @@ sub modify_effect {
 
 
 sub modify_multiple_effects {
-	logsub("&modify_multiple_effects");
+	logsub((caller(0))[3]);
 	my ($op_ids, $parameters, $sign, $value) = @_;
 	map{ my $op_id = $_;
 		map{ 	my $parameter = $_;
 				modify_effect($op_id, $parameter, $sign, $value);
 				set_current_op($op_id);
-				set_current_param($parameter);	
+				set_current_param($parameter);
 		} @$parameters;
 	} @$op_ids;
 }
 
 sub remove_effect { 
-	logsub("&remove_effect");
+	logsub((caller(0))[3]);
 	my $id = shift;
 	my $FX = fxn($id)
 		or logpkg(__FILE__,__LINE__,'logcarp',"$id: does not exist, skipping...\n"), return;
@@ -817,7 +830,7 @@ sub fx_defaults {
 ## Ecasound engine -- apply/remove chain operators
 
 sub apply_ops {  # in addition to operators in .ecs file
-	logsub("&apply_ops");
+	logsub((caller(0))[3]);
 	for my $track ( Audio::Nama::audio_tracks() ) {
 		my $n = $track->n;
  		next unless Audio::Nama::ChainSetup::is_ecasound_chain($n);
@@ -831,7 +844,7 @@ sub apply_ops {  # in addition to operators in .ecs file
 sub remove_op {
 	# remove chain operator from Ecasound engine
 
-	logsub("&remove_op");
+	logsub((caller(0))[3]);
 	local $config->{category} = 'ECI_FX';
 
 	# only if engine is configured
@@ -927,7 +940,7 @@ sub update_ecasound_effect {
 	# update the parameters of the Ecasound chain operator
 	# referred to by a Nama operator_id
 	
-	#logsub("&update_effect");
+	#logsub((caller(0))[3]);
 
 	return unless $this_engine->valid_setup;
 	#my $es = ecasound_iam("engine-status");
@@ -976,7 +989,7 @@ sub update_effect {
 }
 
 sub sync_effect_parameters {
-	logsub('&sync_effect_parameters');
+	logsub((caller(0))[3]);
 	local $config->{category} = 'ECI_FX';
 
 	# when a controller changes an effect parameter, the
@@ -1024,7 +1037,7 @@ sub ops_with_read_only_params {
 sub find_op_offsets {
 
 	local $config->{category} = 'ECI_FX';
-	logsub("&find_op_offsets");
+	logsub((caller(0))[3]);
 	my @op_offsets = grep{ /"\d+"/} split "\n",ecasound_iam("cs");
 	logpkg(__FILE__,__LINE__,'debug', join "\n\n",@op_offsets);
 	for my $output (@op_offsets){
@@ -1088,7 +1101,7 @@ sub set_bypass_state {
 	
 	local $config->{category} = 'ECI_FX';
 	my($track, $bypass_state, @ops) = @_;
-	logsub('&set_bypass_state');
+	logsub((caller(0))[3]);
 
 	# only process ops that belong to this track
 	@ops = intersect_with_track_ops_list($track,@ops);
@@ -1124,21 +1137,27 @@ sub set_current_op {
 	return unless $FX;
 	$project->{current_op}->{$FX->trackname} = $op_id;
 }
-sub set_current_param {
-	my $parameter = shift;
-	$project->{current_param}->{Audio::Nama::this_op()} = $parameter;
-}
-sub set_current_stepsize {
-	my $stepsize = shift;
-	$project->{current_stepsize}->{Audio::Nama::this_op()}->[this_param()] = $stepsize;
-}
-sub increment_param { modify_effect(Audio::Nama::this_op(), this_param(),'+',this_stepsize())}
-sub decrement_param { modify_effect(Audio::Nama::this_op(), this_param(),'-',this_stepsize())}
-sub set_parameter_value {
-	my $value = shift;
-	modify_effect(Audio::Nama::this_op(), this_param(), undef, $value)
-}
+sub set_current_param { $project->{current_param}->{this_op()} = $_[0] }
 
+sub this_op    	   { $this_track and $this_track->op }
+sub this_op_o 	   { $this_track and $this_track->op and fxn($this_track->op) }
+sub this_param     { $project->{current_param}->{ this_op() } }
+sub param_stepsize { $project->{param_stepsize}->{this_op() }->[ this_param() ] } 
+
+sub set_param_value {
+	#return if cannot_modify_parameter();
+	my $value = shift;
+	modify_effect(this_op(), this_param(), undef, $value)
+}
+sub increment_param {
+	return if cannot_modify_parameter();
+	my $multiplier = shift;
+	modify_effect(this_op(), this_param(), '+', $multiplier * param_stepsize())
+}
+sub increment_param_1    { increment_param(  1) }
+sub increment_param_10   { increment_param( 10) }
+sub decrement_param_1    { increment_param( -1) }
+sub decrement_param_10   { increment_param(-10) }
 
 sub check_fx_consistency {
 
@@ -1301,6 +1320,14 @@ sub ecasound_format {
 	$cmd .= ':'.join ',' ,@{$self->{params}} if $self->{params} and @{$self->{params}} > 0;
 	$cmd
 }
+# sub no_params {
+# 	my $self = shift;
+# 	$self->about->{count} == 0
+# }
+# sub cannot_modify_parameter {
+# 	$self->no_params or $self->is_read_only(current_param())
+# }
+
 
 } # end package Effect
 

@@ -19,7 +19,7 @@ name: Number-Util-Range
 provides:
   Number::Util::Range:
     file: lib/Number/Util/Range.pm
-    version: '0.006'
+    version: '0.008'
 requires:
   Exporter: '5.57'
   perl: '5.010001'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Number-Util-Range
   homepage: https://metacpan.org/release/Number-Util-Range
   repository: git://github.com/perlancar/perl-Number-Util-Range.git
-version: '0.006'
+version: '0.008'
 x_Dist_Zilla:
   perl:
     version: '5.038000'

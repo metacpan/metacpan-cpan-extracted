@@ -1,6 +1,6 @@
 NAME
 
-    App::sdview - a terminal document viewer for POD and other syntaxes
+    App::sdview - a terminal document viewer for Pod and other syntaxes
 
 SYNOPSIS
 
@@ -11,7 +11,7 @@ SYNOPSIS
 DESCRIPTION
 
     This module implements a terminal-based program for viewing structured
-    documents. It currently understands POD, some simple Markdown
+    documents. It currently understands Pod, some simple Markdown
     formatting, and a basic understanding of nroff (for manpages). Future
     versions may expand on these abilities, extending them or adding new
     formats.
@@ -29,7 +29,7 @@ DESCRIPTION
 
     Various output plugins exist. By default it will output a
     terminal-formatted rendering of the document via the less pager, but it
-    can also output plaintext, POD, Markdown.
+    can also output plaintext, Pod, Markdown.
 
        $ sdview Some::Module -o plain > module.txt
     

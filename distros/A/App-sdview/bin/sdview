@@ -20,13 +20,13 @@ exit App::sdview->new->run(
 
 =head1 NAME
 
-F<sdview> - a terminal-based structured document viewer for POD and other formats
+F<sdview> - a terminal-based structured document viewer for Pod and other formats
 
 =head1 SYNOPSIS
 
    $ sdview my-document.pod
 
-   # Understands POD in .pm files
+   # Understands Pod in .pm files
    $ sdview lib/App/sdview.pm
 
    # Search perldoc for page documentation
@@ -47,7 +47,7 @@ document to a terminal output, via the F<less> pager.
 =head2 FILE
 
 If a file path is given, the filename is used to determine if it should be
-parsed as POD (F<*.pm>, F<*.pl> or F<*.pod>), or Markdown (F<*.md>). (But see
+parsed as Pod (F<*.pm>, F<*.pl> or F<*.pod>), or Markdown (F<*.md>). (But see
 also the C<-f> option).
 
 If the name is not a file, C<perldoc -l> will be used to convert the name of
@@ -58,10 +58,10 @@ a Perl module into a location for its documentation.
 =head2 -f, --format FORMAT
 
 Overrides detection of the file's format by inspecting the filename. Useful
-for viewing POD out of toplevel scripts whose filename does not indicate a
+for viewing Pod out of toplevel scripts whose filename does not indicate a
 language:
 
-   $ sdview -f POD bin/sdview
+   $ sdview -f Pod bin/sdview
 
 =head2 -t, --output FORMAT
 

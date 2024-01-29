@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1925 2023-05-31 11:58:59Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1957 2024-01-10 14:54:10Z willem $	-*-perl-*-
 #
 
 use 5.008009;
@@ -24,6 +24,7 @@ my %metadata = (
 	LICENSE		   => 'mit',
 	MIN_PERL_VERSION   => 5.008009,
 	CONFIGURE_REQUIRES => {
+		'Config'	      => 0,
 		'ExtUtils::MakeMaker' => 6.48,
 		'Getopt::Long'	      => 2.43,
 		'IO::File'	      => 1.14,
@@ -52,7 +53,7 @@ my $platform = $platform{$^O} || {};
 my %prerequisite = (
 	'Carp'		 => 1.10,
 	'Digest::HMAC'	 => 1.03,
-	'Digest::MD5'	 => 2.13,
+	'Digest::MD5'	 => 2.37,
 	'Digest::SHA'	 => 5.23,
 	'Encode'	 => 2.26,
 	'Exporter'	 => 5.63,
@@ -61,10 +62,17 @@ my %prerequisite = (
 	'IO::Select'	 => 1.17,
 	'IO::Socket'	 => 1.30,
 	'IO::Socket::IP' => 0.38,
-	'MIME::Base64'	 => 2.13,
+	'MIME::Base64'	 => 3.07,
 	'PerlIO'	 => 1.05,
 	'Scalar::Util'	 => 1.19,
+	'Socket'	 => 1.81,
 	'Time::Local'	 => 1.19,
+	'base'		 => 2.13,
+	'constant'	 => 1.17,
+	'integer'	 => 1.00,
+	'overload'	 => 1.06,
+	'strict'	 => 1.03,
+	'warnings'	 => 1.0501,
 	%$platform
 	);
 

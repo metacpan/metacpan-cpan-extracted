@@ -7,7 +7,7 @@ use Git::Lint::Config;
 use Try::Tiny;
 use Module::Loader;
 
-our $VERSION = '0.016';
+our $VERSION = '1.000';
 
 my $config;
 
@@ -32,20 +32,20 @@ sub run {
     my $opt  = shift;
 
     foreach my $required (qw{profile check}) {
-        die "git-lint: $required is required\n"
+        die "$required is required\n"
             unless defined $opt->{$required};
     }
 
     if ( $opt->{check} ne 'message' && $opt->{check} ne 'commit' ) {
-        die "git-lint: check must be either message or commit\n";
+        die "check must be either message or commit\n";
     }
 
     if ( $opt->{check} eq 'message' ) {
-        die "git-lint: file is required if check is message\n"
+        die "file is required if check is message\n"
             unless defined $opt->{file};
     }
 
-    die 'git-lint: profile ' . $opt->{profile} . ' was not found' . "\n"
+    die 'profile ' . $opt->{profile} . ' was not found' . "\n"
         unless exists $self->config->{profiles}{ $opt->{check} }{ $opt->{profile} };
 
     my $check = lc $opt->{check};
@@ -61,7 +61,7 @@ sub run {
         }
         catch {
             my $exception = $_;
-            die "git-lint: $exception\n";
+            die "$exception\n";
         };
         my $plugin = $class->new();
 
@@ -211,6 +211,45 @@ Message check profiles can also be defined.
      summary = SummaryEndingPeriod, SummaryLength
 
 An example configuration is provided in the C<examples> directory of this project.
+
+Configuration is required.  If no configuration exists, an error will be printed to STDERR, but the action allowed to complete.
+
+ blaine@base ~/git/test (master *) $ git add test
+ blaine@base ~/git/test (master +) $ git commit
+ git-lint: [error] configuration setup is required. see the documentation for instructions.
+ [master 894b6d0] test
+  1 file changed, 1 insertion(+), 1 deletion(-)
+ blaine@base ~/git/test (master) $
+
+=head1 ADDING NEW CHECK MODULES
+
+C<git-lint> can be configured to load check modules from a local directory using the C<localdir> configuration setting.
+
+To load modules from a local directory, add the lint C<config> setting, with C<localdir> key and directory location to the git config file.
+
+ [lint "config"]
+     localdir = /home/blaine/tmp/git-lint/lib
+
+In this example, we're adding a new commit check, C<Flipdoozler>.  Create the local directory and path for the new module.
+
+ $ mkdir -p /home/blaine/tmp/git-lint/lib/Git/Lint/Check/Commit
+
+Then add the new check module.
+
+ $ vi /home/blaine/tmp/git-lint/lib/Git/Lint/Check/Commit/Flipdoozler.pm
+ package Git::Lint::Check::Commit::Flipdoozler;
+ ...
+
+Update the commit check profile to use the new module.
+
+ [lint "profiles.commit"]
+     default = Whitespace, IndentTabs, MixedIndentTabsSpaces, Flipdoozler
+
+C<git-lint> will now warn for the check contained in Flipdoozler.
+
+ blaine@base ~/git/test (master +) $ git commit
+ git-lint: [commit] test - Flipdoozler (line 18)
+ blaine@base ~/git/test (master +) $
 
 =head1 ENABLING CHECKS FOR REPOS
 

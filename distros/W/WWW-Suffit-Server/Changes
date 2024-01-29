@@ -1,5 +1,24 @@
 # Version/Revision history
 
+1.07 Tue 19 Dec 2023 14:58:27 MSK
+    * Bug fixed: added additional condition to check file size while uploading file
+    * Bug fixed: added WWW::Suffit::Server routes namespace by initialize
+
+1.06 Sat 16 Dec 2023 22:43:58 MSK
+    * Added the `authorize` method to WWW::Suffit::Server::Auth
+
+1.05 Thu 14 Dec 2023 10:10:08 MSK
+    * Added options to the startup call
+    * Added server_addr, server_port and max_history_size attributes
+
+1.04 Wed 13 Dec 2023 11:26:08 MSK
+    * Added Mojolicious::Plugin::ConfigGeneral to requirements
+    * Added options-set to base startup method
+    * Removed WWW::Suffit::AuthDB from requirements
+
+1.03 Tue 12 Dec 2023 11:43:31 MSK
+    * Added new server files from real working project
+
 1.02 Thu 07 Dec 2023 16:26:19 MSK
     * All plugins has been relocated to the WWW::Suffit::Plugin namespace
 

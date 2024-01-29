@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Perl - Sah schemas related to Perl
 
 VERSION
-    This document describes version 0.048 of Sah::Schemas::Perl (from Perl
-    distribution Sah-Schemas-Perl), released on 2023-01-19.
+    This document describes version 0.049 of Sah::Schemas::Perl (from Perl
+    distribution Sah-Schemas-Perl), released on 2023-10-26.
 
 SAH SCHEMAS
     The following schemas are included in this distribution:
@@ -37,9 +37,16 @@ SAH SCHEMAS
 
         Perl distribution name, defaults to "this distribution".
 
-        See App::ThisDist's "this_dist()" for more details on how "this
+        See App::ThisDist's this_dist() for more details on how "this
         distribution" is determined. Note that "App::ThisDist" is not added
         as dependency automatically; you will have to add it manually.
+
+        Note: be careful when using this schema for actions that are
+        destructive to a Perl dist or that change some things, because a
+        user can perform those actions without giving an argument (e.g. a
+        "delete-dist" script). It is safer to use this schema to perform a
+        non=destructive action (e.g. "ls-dist") and/or operate in dry-run
+        mode by default.
 
     *   perl::distname_with_optional_ver
 
@@ -168,9 +175,16 @@ SAH SCHEMAS
 
         Perl module, defaults to "this module".
 
-        See App::ThisDist's "this_mod()" for more details on how "this
-        module" is determined. Note that "App::ThisDist" is not added as
-        dependency automatically; you will have to add it manually.
+        See App::ThisDist's this_mod() for more details on how "this module"
+        is determined. Note that "App::ThisDist" is not added as dependency
+        automatically; you will have to add it manually.
+
+        Note: be careful when using this schema for actions that are
+        destructive to a Perl module or that change some things, because a
+        user can perform those actions without giving an argument (e.g. a
+        "delete-module" script). It is safer to use this schema to perform a
+        non=destructive action (e.g. "man-module") and/or operate in dry-run
+        mode by default.
 
     *   perl::modname::installed
 

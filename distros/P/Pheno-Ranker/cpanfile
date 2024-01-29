@@ -15,6 +15,7 @@ requires 'File::ShareDir::ProjectDistDir';
 
 # t
 requires 'Test::Exception';
+requires 'List::MoreUtils';
 
 # utils
 requires 'Data::Fake';

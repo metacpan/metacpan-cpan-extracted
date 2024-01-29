@@ -1,5 +1,8 @@
 Revision history for Perl extension Otogiri
 
+0.22 2023-12-10T00:22:10Z
+    - Support DBURL
+
 0.21 2023-10-15T02:01:51Z
 
     - Bump up

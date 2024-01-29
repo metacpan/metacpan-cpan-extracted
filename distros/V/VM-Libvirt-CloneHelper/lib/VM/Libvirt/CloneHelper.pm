@@ -12,11 +12,11 @@ VM::Libvirt::CloneHelper - Create a bunch of cloned VMs in via libvirt.
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.1.1
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 
 =head1 SYNOPSIS
 
@@ -145,22 +145,19 @@ sub new {
 			{
 				die( '"' . $args{mac_base} . '" does not appear to be a valid base for a MAC address' );
 			}
-		}
-		elsif ( $key eq 'ipv4_base' ) {
+		} elsif ( $key eq 'ipv4_base' ) {
 
 			# make sure we have a likely sane base for the IPv4 address
 			if ( $args{ipv4_base} !~ /^[0-9]+\.[0-9]+\.[0-9]+\.$/ ) {
 				die( '"' . $args{ipv4_base} . '" does not appear to be a valid base for a IPv4 address' );
 			}
-		}
-		elsif ( $key eq 'to_clone' ) {
+		} elsif ( $key eq 'to_clone' ) {
 
 			# make sure we have a likely sane base VM name
 			if ( $args{to_clone} !~ /^[A-Za-z0-9\-\.]+$/ ) {
 				die( '"' . $args{to_clone} . '" does not appear to be a valid VM name' );
 			}
-		}
-		elsif ( $key eq 'clone_name_base' ) {
+		} elsif ( $key eq 'clone_name_base' ) {
 
 			# make sure we have a likely sane base name to use for creating clones
 			if ( $args{clone_name_base} !~ /^[A-Za-z0-9\-\.]+$/ ) {
@@ -170,14 +167,14 @@ sub new {
 
 		# likely good, adding
 		$self->{$key} = $args{$key};
-	}
+	} ## end foreach my $key (@keys)
 
 	$self->{end} = $self->{start} + $self->{count} - 1;
 
 	$self->{VMs} = $self->vm_list;
 
 	return $self;
-}
+} ## end sub new
 
 =head2 clone
 
@@ -202,8 +199,7 @@ sub clone {
 			die( '"' . $VMs . '" is not a known VM' );
 		}
 		push( @VM_names, $name );
-	}
-	else {
+	} else {
 		@VM_names = sort( keys( %{$VMs} ) );
 	}
 	foreach my $name (@VM_names) {
@@ -217,8 +213,8 @@ sub clone {
 
 		my @args = ( 'virt-clone', '-m', $VMs->{$name}{mac}, '-o', $self->{to_clone}, '--auto-clone', '-n', $name );
 		system(@args) == 0 or die("system '@args' failed... $?");
-	}
-}
+	} ## end foreach my $name (@VM_names)
+} ## end sub clone
 
 =head2 delete_clones
 
@@ -251,8 +247,7 @@ sub delete_clones {
 			die( '"' . $VMs . '" is not a known VM' );
 		}
 		push( @VM_names, $name );
-	}
-	else {
+	} else {
 		@VM_names = sort( keys( %{$VMs} ) );
 	}
 	foreach my $name (@VM_names) {
@@ -266,8 +261,8 @@ sub delete_clones {
 			print "Unlinking " . $image . "\n";
 			unlink($image) or die( 'unlinking "' . $image . '" failed... ' . $! );
 		}
-	}
-}
+	} ## end foreach my $name (@VM_names)
+} ## end sub delete_clones
 
 =head2 net_xml
 
@@ -314,7 +309,7 @@ sub net_xml {
     <dnsmasq:option value=\'address=/skype.com/\'/>
     <dnsmasq:option value=\'address=/trafficmanager.net/\'/>
 ';
-	}
+	} ## end if ( $self->{windows_blank} )
 
 	if ( -f $self->{blank_domains} ) {
 		my $blank_raw = read_file( $self->{blank_domains} ) or die( 'Failed to read "' . $self->{blank_domains} . '"' );
@@ -329,7 +324,7 @@ sub net_xml {
 				$xml = $xml . "    <dnsmasq:option value='address=/" . $domain . "/'/>\n";
 			}
 		}
-	}
+	} ## end if ( -f $self->{blank_domains} )
 
 	my @VM_names = sort( keys( %{$VMs} ) );
 	foreach my $name (@VM_names) {
@@ -341,7 +336,7 @@ sub net_xml {
 	}
 
 	return $xml . $xml_tail;
-}
+} ## end sub net_xml
 
 =head2 net_redefine
 
@@ -370,7 +365,7 @@ sub net_redefine {
 	unlink($tmp_file) or die( 'Failed to unlink net config "' . $tmp_file . '"... ' . $@ );
 
 	return;
-}
+} ## end sub net_redefine
 
 =head2 recreate
 
@@ -403,12 +398,12 @@ sub recreate {
 	$self->delete_clones($name);
 	$self->clone($name);
 	$self->start_clones($name);
-	sleep($self->{wait});
+	sleep( $self->{wait} );
 	$self->snapshot_clones($name);
 	$self->stop_clones($name);
 
 	return;
-}
+} ## end sub recreate
 
 =head2 recreate_all
 
@@ -430,13 +425,13 @@ sub recreate_all {
 		$self->delete_clones($name);
 		$self->clone($name);
 		$self->start_clones($name);
-		sleep($self->{wait});
+		sleep( $self->{wait} );
 		$self->snapshot_clones($name);
 		$self->stop_clones($name);
 	}
 
 	return;
-}
+} ## end sub recreate_all
 
 =head2 snapshot_clones
 
@@ -461,8 +456,7 @@ sub snapshot_clones {
 			die( '"' . $VMs . '" is not a known VM' );
 		}
 		push( @VM_names, $name );
-	}
-	else {
+	} else {
 		@VM_names = sort( keys( %{$VMs} ) );
 	}
 	foreach my $name (@VM_names) {
@@ -470,7 +464,7 @@ sub snapshot_clones {
 		my @args = ( 'virsh', 'snapshot-create-as', '--name', $self->{snapshot_name}, $name );
 		system(@args) == 0 or die("system '@args' failed... $?");
 	}
-}
+} ## end sub snapshot_clones
 
 =head2 start_clones
 
@@ -495,8 +489,7 @@ sub start_clones {
 			die( '"' . $VMs . '" is not a known VM' );
 		}
 		push( @VM_names, $name );
-	}
-	else {
+	} else {
 		@VM_names = sort( keys( %{$VMs} ) );
 	}
 	foreach my $name (@VM_names) {
@@ -504,7 +497,7 @@ sub start_clones {
 		my @args = ( 'virsh', 'start', $name );
 		system(@args) == 0 or die("system '@args' failed... $?");
 	}
-}
+} ## end sub start_clones
 
 =head2 stop_clones
 
@@ -530,8 +523,7 @@ sub stop_clones {
 			die( '"' . $VMs . '" is not a known VM' );
 		}
 		push( @VM_names, $name );
-	}
-	else {
+	} else {
 		@VM_names = sort( keys( %{$VMs} ) );
 	}
 	foreach my $name (@VM_names) {
@@ -539,7 +531,7 @@ sub stop_clones {
 		my @args = ( 'virsh', 'destroy', $name );
 		system(@args) == 0 or warn("system '@args' failed... $?");
 	}
-}
+} ## end sub stop_clones
 
 =head2 vm_list
 
@@ -570,10 +562,10 @@ sub vm_list {
 		};
 
 		$current++;
-	}
+	} ## end while ( $current <= $till )
 
 	return $VMs;
-}
+} ## end sub vm_list
 
 =head1 BLANKED MS DOMAINS
 
@@ -630,10 +622,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=VM-Libvirt-CloneHelper>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/VM-Libvirt-CloneHelper>
 
 =item * Search CPAN
 

@@ -1,4 +1,4 @@
-$tkdb::VERSION = '2.3';
+$tkdb::VERSION = '2.4';
 
 use strict;
 use Data::Dumper;

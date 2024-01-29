@@ -3,7 +3,7 @@
 # See the LICENSE file in the project root for more information
 
 package Search::Elasticsearch::Transport;
-$Search::Elasticsearch::Transport::VERSION = '8.00';
+$Search::Elasticsearch::Transport::VERSION = '8.12';
 use Moo;
 
 use URI();
@@ -76,7 +76,7 @@ Search::Elasticsearch::Transport - Provides interface between the client class a
 
 =head1 VERSION
 
-version 8.00
+version 8.12
 
 =head1 DESCRIPTION
 
@@ -168,7 +168,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Elasticsearch BV.
+This software is Copyright (c) 2024 by Elasticsearch BV.
 
 This is free software, licensed under:
 

@@ -3,7 +3,7 @@ package Protocol::Database::PostgreSQL::Backend::ParseComplete;
 use strict;
 use warnings;
 
-our $VERSION = '2.000'; # VERSION
+our $VERSION = '2.001'; # VERSION
 
 use parent qw(Protocol::Database::PostgreSQL::Backend);
 

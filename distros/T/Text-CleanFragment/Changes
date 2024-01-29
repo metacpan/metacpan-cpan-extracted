@@ -1,3 +1,8 @@
+0.08 2024-01-14
+  * Guard clean_fragment_filename test against non-breaking whitespace difference
+    between Perl 5.32 and earlier versions. Before 5.32 , \x{a0} is matched by \s ?
+  * No code changes, no need to upgrade
+
 0.07 2023-07-07
   * Don't remove [] from filenames anymore qr// takes a character list, not a
     character class

@@ -14,10 +14,20 @@ use Test2::V0 -target => 'Database::Temp';
 use Test2::Tools::Spec;
 set_encoding('utf8');
 
+# Add t/lib to @INC
+use FindBin 1.51 qw( $RealBin );
+use File::Spec;
+my $lib_path;
+
+BEGIN {
+    $lib_path = File::Spec->catdir( ( $RealBin =~ /(.+)/msx )[0], q{.}, q{../..}, 'lib' );
+}
+use lib "$lib_path";
+
 describe 'method `is_available`' => sub {
     my ( $driver, $expected_availability );
-    case 'SQLite driver' => sub {
-        $driver                = 'SQLite';
+    case 'DummyForTesting driver' => sub {
+        $driver                = 'DummyForTesting';
         $expected_availability = 1;
     };
     case 'Missing driver' => sub {

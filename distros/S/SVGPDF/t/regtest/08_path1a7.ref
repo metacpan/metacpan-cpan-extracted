@@ -1,0 +1,98 @@
+==== start svg ====
+XObject #1
+vb 0 0 450 400 (inferred) => bb 0.00 -400.00 450.00 0.00
+matrix( 1 0 0 -1 0 0)
+vb rect( 0.00 0.00 450.00 400.00)
+xo fill_color black (initial)
+  start handling path (SVGPDF::Path)
+  path d="M 100 350 l 150 -300"
+    xo save
+    path stroke-width=3 stroke=red fill=none
+    xo move(100.00,350.00)
+    xo line(250.00,50.00)
+    xo stroke (red)
+    xo restore
+  end handling path
+  start handling path (SVGPDF::Path)
+  path d="M 250 50 l 150 300"
+    xo save
+    path stroke-width=3 stroke=red fill=none
+    xo move(250.00,50.00)
+    xo line(400.00,350.00)
+    xo stroke (red)
+    xo restore
+  end handling path
+  start handling path (SVGPDF::Path)
+  path d="M 175 200 l 150 0"
+    xo save
+    path stroke-width=3 stroke=green fill=none
+    xo move(175.00,200.00)
+    xo line(325.00,200.00)
+    xo stroke (green)
+    xo restore
+  end handling path
+  start handling path (SVGPDF::Path)
+  path d="M 100 350 q 150 -300..."
+    xo save
+    path stroke-width=5 stroke=blue fill=none
+    xo move(100.00,350.00)
+    xo spline(250.00,50.00 400.00,350.00)
+    xo stroke (blue)
+    xo restore
+  end handling path
+  start handling g (SVGPDF::G)
+  g ====
+    xo save
+      start handling circle (SVGPDF::Circle)
+      circle cx=100 cy=350 r=3
+        xo save
+        circle stroke-width=3 stroke=black fill=black
+        xo paint (black black)
+        xo restore
+      end handling circle
+      start handling circle (SVGPDF::Circle)
+      circle cx=250 cy=50 r=3
+        xo save
+        circle stroke-width=3 stroke=black fill=black
+        xo paint (black black)
+        xo restore
+      end handling circle
+      start handling circle (SVGPDF::Circle)
+      circle cx=400 cy=350 r=3
+        xo save
+        circle stroke-width=3 stroke=black fill=black
+        xo paint (black black)
+        xo restore
+      end handling circle
+    xo restore
+  end handling g
+  start handling g (SVGPDF::G)
+  g ====
+    xo save
+      start handling text (SVGPDF::Text)
+      text  x=100 y=350 dx=-30 anchor="middle"
+        xo save
+        txt translate( 70.00, 350.00 ) scale( 1.00 -1.00 )
+          xo save
+          xo restore
+        xo restore
+      end handling text
+      start handling text (SVGPDF::Text)
+      text  x=250 y=50 dy=-10 anchor="middle"
+        xo save
+        txt translate( 250.00, 40.00 ) scale( 1.00 -1.00 )
+          xo save
+          xo restore
+        xo restore
+      end handling text
+      start handling text (SVGPDF::Text)
+      text  x=400 y=350 dx=30 anchor="middle"
+        xo save
+        txt translate( 430.00, 350.00 ) scale( 1.00 -1.00 )
+          xo save
+          xo restore
+        xo restore
+      end handling text
+    xo restore
+  end handling g
+==== end svg ====

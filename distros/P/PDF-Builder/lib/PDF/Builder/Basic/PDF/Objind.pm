@@ -19,8 +19,8 @@ use strict;
 use warnings;
 use Scalar::Util 'isweak';
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -63,8 +63,6 @@ Holds a direct reference to the next free object in the free list.
 
 =head1 METHODS
 
-=over
-
 =cut
 
 use Scalar::Util qw(blessed reftype weaken);
@@ -76,9 +74,15 @@ $uidc = "pdfuid000";
 @inst = qw(parent objnum objgen isfree nextfree uid realised);
 $inst{" $_"} = 1 for @inst;
 
-=item PDF::Builder::Basic::PDF::Objind->new()
+=head2 new
+
+    PDF::Builder::Basic::PDF::Objind->new()
+
+=over
 
 Creates a new indirect object
+
+=back
 
 =cut
 
@@ -88,9 +92,15 @@ sub new {
     return bless {}, ref $class || $class;
 }
 
-=item $UID = $r->uid()
+=head2 uid
+
+    $UID = $r->uid()
+
+=over
 
 Returns a Unique id for this object, creating one if it didn't have one before
+
+=back
 
 =cut
 
@@ -99,7 +109,11 @@ sub uid {
     return $_[0]->{' uid'};
 }
 
-=item $r->release()
+=head2 release
+
+    $r->release()
+
+=over
 
 Releases ALL of the memory used by this indirect object, and all of
 its component/child objects.  This method is called automatically by
@@ -112,6 +126,8 @@ have an enormous amount of cross-references and this causes circular
 references within our own internal data structures.  Calling
 'C<release()>' forces these circular references to be cleaned up and
 the entire internal data structure purged.
+
+=back
 
 =cut
 
@@ -143,13 +159,19 @@ sub release {
     return;
 }
 
-=item $value = $r->val()
+=head2 val
+
+    $value = $r->val()
+
+=over
 
 Returns the value of this object or reads the object and then returns
 its value.
 
 Note that all direct subclasses *must* make their own versions of this
 subroutine otherwise we could be in for a very deep loop!
+
+=back
 
 =cut
 
@@ -170,9 +192,15 @@ sub val {
     }
 }
 
-=item $r->realise()
+=head2 realise
+
+    $r->realise()
+
+=over
 
 Makes sure that the object is fully read in, etc.
+
+=back
 
 =cut
 
@@ -184,11 +212,17 @@ sub realise {
     return $self;
 }
 
-=item $v = $r->outobjdeep($fh, $pdf)
+=head2 outobjdeep
+
+    $v = $r->outobjdeep($fh, $pdf)
+
+=over
 
 If you really want to output this object, then you need to read it first.
 This also means that all direct subclasses must subclass this method, or they 
 will loop forever!
+
+=back
 
 =cut
 
@@ -209,10 +243,16 @@ sub outobjdeep {
     }
 }
 
-=item $r->outobj($fh, $pdf)
+=head2 outobj
+
+    $r->outobj($fh, $pdf)
+
+=over
 
 If this is a full object then outputs a reference to the object, otherwise calls
 outobjdeep to output the contents of the object at this point.
+
+=back
 
 =cut
 
@@ -227,17 +267,18 @@ sub outobj {
     return;
 }
 
-=item $s = $r->elements()
+=head2 elements
+
+    $s = $r->elements()
+
+=over
 
 Abstract superclass function filler. Returns self here but should return
 something more useful if an array.
 
-The old name of this method, C<elementsof>, has been B<deprecated> and will
-be removed in the future.
+=back
 
 =cut
-
-sub elementsof { return elements(@_); }
 
 sub elements {
     my ($self) = @_;
@@ -249,11 +290,17 @@ sub elements {
     }
 }
 
-=item $s = $r->empty()
+=head2 empty
+
+    $s = $r->empty()
+
+=over
 
 Empties all content from this object to free up memory or to be read to pass
 the object into the free list. Simplistically undefs all instance variables
 other than object number and generation.
+
+=back
 
 =cut
 
@@ -267,12 +314,18 @@ sub empty {
     return $self;
 }
 
-=item $o = $r->merge($objind)
+=head2 merge
+
+    $o = $r->merge($objind)
+
+=over
 
 This merges content information into an object reference placeholder.
 This occurs when an object reference is read before the object definition
 and the information in the read data needs to be merged into the object
 placeholder.
+
+=back
 
 =cut
 
@@ -291,11 +344,17 @@ sub merge {
     return bless $self, ref($other);
 }
 
-=item $r->is_obj($pdf)
+=head2 is_obj
+
+    $r->is_obj($pdf)
+
+=over
 
 Returns whether this object is a full object with its own object number or
 whether it is purely a sub-object. C<$pdf> indicates which output file we are
 concerned that the object is an object in.
+
+=back
 
 =cut
 
@@ -303,7 +362,11 @@ sub is_obj {
     return defined $_[1]->{' objects'}{$_[0]->uid()};
 }
 
-=item $r->copy($pdf, $res)
+=head2 copy
+
+    $r->copy($pdf, $res)
+
+=over
 
 Returns a new copy of this object. The object is assumed to be some kind
 of associative array and the copy is a deep copy for elements which are
@@ -316,6 +379,8 @@ If C<$res> is defined then the copy goes into that object rather than creating a
 new one. It is up to the caller to bless C<$res>, etc. Notice that elements from
 C<$self> are not copied into C<$res> if there is already an entry for them 
 existing in C<$res>.
+
+=back
 
 =cut
 
@@ -337,9 +402,5 @@ sub copy {
     }
     return $res;
 }
-
-=back
-
-=cut
 
 1;

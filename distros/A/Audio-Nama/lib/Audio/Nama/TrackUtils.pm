@@ -1,9 +1,9 @@
 package Audio::Nama;
-use Modern::Perl;
+use Modern::Perl '2020';
 
 sub add_track {
 
-	logsub("&add_track");
+	logsub((caller(0))[3]);
 	my ($name, @params) = @_;
 	my %vals = (name => $name, @params);
 	my $class = $vals{class} // 'Audio::Nama::Track';
@@ -73,7 +73,6 @@ sub add_track_alias_project {
 }
 # vol/pan requirements of mastering and mixdown tracks
 
-# called from Track_subs, Graphical_subs
 { my %volpan = (
 	Eq => {},
 	Low => {},
@@ -85,11 +84,6 @@ sub add_track_alias_project {
 
 sub need_vol_pan {
 
-	# this routine used by 
-	#
-	# + add_track() to determine whether a new track _will_ need vol/pan controls
-	# + add_track_gui() to determine whether an existing track needs vol/pan  
-	
 	my ($track_name, $type) = @_;
 
 	# $type: vol | pan
@@ -147,7 +141,7 @@ sub rename_track {
 	use Cwd;
 	use File::Slurp;
 	my ($oldname, $newname, $statefile, $dir) = @_;
-	save_state();
+	project_snapshot();
 	my $old_dir = cwd();
 	chdir $dir;
 
@@ -171,7 +165,7 @@ sub rename_track {
 		send_id| 
 		target| 
 		current_edit| 
-		send_id| 
+		source_id| 
 		return_id| 
 		wet_track| 
 		dry_track| 
@@ -185,7 +179,7 @@ sub rename_track {
 
 	write_file($statefile, $state);
 	my $msg = "Rename track $oldname -> $newname";
-	git_commit($msg);
+	project_snapshot($msg);
 	Audio::Nama::pager($msg);
 	load_project(name => $Audio::Nama::project->{name});
 }
@@ -201,8 +195,4 @@ sub rec_hookable_tracks {
 }
 sub user_tracks { grep { ! $_->is_system_track } all_tracks() }
 sub system_tracks { grep { $_->is_system_track } all_tracks() }
-sub this_op { $this_track and $this_track->op }
-sub this_op_o { $this_track and $this_track->op and fxn($this_track->op) }
-sub this_param { $this_track ? $this_track->param : ""}
-sub this_stepsize { $this_track ? $this_track->stepsize : ""}
 sub this_track_name { $this_track ? $this_track->name : "" }

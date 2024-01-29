@@ -10,6 +10,7 @@ use Mojo::WebSocketProxy::Config;
 use Class::Method::Modifiers;
 
 use JSON::MaybeUTF8    qw(:v1);
+use Log::Any           qw($log);
 use Unicode::Normalize ();
 use Future::Mojo 0.004;    # ->new_timeout
 use Future::Utils qw(fmap);
@@ -20,7 +21,7 @@ use DataDog::DogStatsd::Helper qw(stats_inc);
 use constant TIMEOUT => $ENV{MOJO_WEBSOCKETPROXY_TIMEOUT} || 15;
 use Mojo::WebSocketProxy::RequestLogger;
 
-our $VERSION = '0.15';     ## VERSION
+our $VERSION = '0.16';     ## VERSION
 around 'send' => sub {
     my ($orig, $c, $api_response, $req_storage) = @_;
 
@@ -50,8 +51,8 @@ sub ok {
 sub open_connection {
     my ($c) = @_;
 
-    my $log = $c->app->log;
-    $log->debug("accepting a websocket connection from " . $c->tx->remote_address);
+    my $remote_address = $c->tx->remote_address // 'undef';
+    $log->debugf('accepting a websocket connection from %s', $remote_address);
     # Enable permessage-deflate
     $c->tx->with_compression;
 

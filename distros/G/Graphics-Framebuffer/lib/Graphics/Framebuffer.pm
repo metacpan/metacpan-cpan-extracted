@@ -2,6 +2,8 @@ package Graphics::Framebuffer;
 
 
 
+=encoding utf8
+
 =head1 NAME
 
 Graphics::Framebuffer - A Simple Framebuffer Graphics Library
@@ -352,16 +354,16 @@ use Imager::Font::Wrap;
 use Graphics::Framebuffer::Mouse;                                # The mouse handler
 use Graphics::Framebuffer::Splash;                               # The splash code is here
 
-Imager->preload; # The Imager documentation says to do this, but doesn't give much of an explanation why.  However, I assume it is to initialize global variables ahead of time.
+Imager->preload; # The Imager documentation says to do this, but doesn't give much of an explanation why.  However, I assume it is to initialize global variables ahead of time so threads behave.
 
 ## This is for debugging, and should normally be commented out.
-# use Data::Dumper::Simple;$Data::Dumper::Sortkeys=1;$Data::Dumper::Purity=1;
+# use Data::Dumper::Simple;$Data::Dumper::Sortkeys=TRUE;$Data::Dumper::Purity=TRUE;
 
 BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.56';
+    our $VERSION   = '6.59';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -434,22 +436,26 @@ sub DESTROY { # Always clean up after yourself before exiting
     my $self = shift;
     $self->text_mode();
     $self->_screen_close();
-	unlink('/tmp/output.gif') if (-e '/tmp/output.gif');
+    unlink('/tmp/output.gif') if (-e '/tmp/output.gif');
     _reset() if ($self->{'RESET'});    # Exit by calling 'reset' first
 }
 
 # use Inline 'info', 'noclean', 'noisy'; # Only needed for debugging
 
+use Inline Config => warnings => 0;
 use Inline C => <<'C_CODE','name' => 'Graphics::Framebuffer', 'VERSION' => $VERSION;
-/* Copyright 2018-2023 Richard Kelsch, All Rights Reserved
+/* Copyright 2018-2024 Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  6.56
+   Version:  6.59
 
    You may wonder why the stack is so heavily used when the global structures
    have the needed values.  Well, the module can emulate another graphics mode
    that may not be the one being displayed.  This means using the two structures
    would break functionality.  Therefore, the data from Perl is passed along.
+
+   8 bit and 1 bit modes are not yet supported and their case values are just
+   placeholders.
 */
 
 #include <stdlib.h>
@@ -615,9 +621,9 @@ void c_plot(
                         {
                             *((unsigned short*)(framebuffer + index)) = (short) color; // 16 bit can send a word at a time, the second most efficient method.
                         }
-				        break;
-				    case 8 :
-				        break;
+                        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -641,8 +647,8 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) ^= (short) color;
                         }
                         break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -666,8 +672,8 @@ void c_plot(
                            *((unsigned short*)(framebuffer + index)) |= (short) color;
                         }
                         break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -691,8 +697,8 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) &= (short) color;
                         }
                         break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -722,8 +728,8 @@ void c_plot(
                             }
                         }
                         break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -753,8 +759,8 @@ void c_plot(
                              }
                          }
                          break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -816,8 +822,8 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) = rgb565;
                         }
                         break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -841,8 +847,8 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) += (short) color;
                         }
                         break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -866,8 +872,8 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) -= (short) color;
                         }
                         break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -891,8 +897,8 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) *= (short) color;
                         }
                         break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -916,8 +922,8 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) /= (short) color;
                         }
                         break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -2089,9 +2095,9 @@ void c_convert_24_32(char* buf24, unsigned int size24, char* buf32, unsigned cha
         *((unsigned int*)(buf32 + loc32++)) = r | (g << 8) | (b << 16);
         loc32 += 3;
         if (r == 0 && g == 0 && b == 0) {
-            *(buf32 + loc32++) = 0;
+            *(buf32 + loc32++) = 0; // The background is transparent
         } else {
-            *(buf32 + loc32++) = 255;
+            *(buf32 + loc32++) = 255; // The foreground is opague
         }
     }
 }
@@ -2417,19 +2423,19 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
     # code that directly uses values.
     my $this;
     $ENV{'PATH'} = '/usr/bin:/bin:/usr/local/bin'; # Testing doesn't work in taint mode unless this is here.
-	my $FFMPEG;
-	if (-e '/usr/bin/ffmpeg') {
-		$FFMPEG = '/usr/bin/ffmpeg';
-	} elsif (-e '/usr/local/bin/ffmpeg') {
-		$FFMPEG = '/usr/local/bin/ffmpeg';
-	}
+    my $FFMPEG;
+    if (-e '/usr/bin/ffmpeg') {
+        $FFMPEG = '/usr/bin/ffmpeg';
+    } elsif (-e '/usr/local/bin/ffmpeg') {
+        $FFMPEG = '/usr/local/bin/ffmpeg';
+    }
     my $self = {
         'SCREEN'        => '',            # The all mighty framebuffer that is mapped to the real framebuffer later
 
         'RESET'         => TRUE,          # Default to use 'reset' on destroy
         'VERSION'       => $VERSION,      # Helps with debugging for people sending me dumps
         'HATCHES'       => [@HATCHES],    # Pull in hatches from Imager
-		'FFMPEG'        => $FFMPEG,
+        'FFMPEG'        => $FFMPEG,
 
         # Set up the user defined graphics primitives and attributes default values
         'Imager-Has-TrueType'  => $Imager::formats{'tt'}  || 0,
@@ -7417,7 +7423,8 @@ Failures of this method are usually due to it not being able to find the font.  
     my $font = Imager::Font->new(
         'file'  => $pfont,
         'color' => $P_color,
-        'size'  => $TTF_h
+        'size'  => $TTF_h,
+		'aa'    => $aa,
     );
     unless (defined($font)) {
         warn __LINE__ . " Can't initialize Imager::Font!\n", Imager->errstr() if ($self->{'SHOW_ERRORS'});
@@ -7865,12 +7872,12 @@ If the image has multiple frames, then a reference to an array of hashes is retu
     my $bench_subtotal = $bench_start;
     my $bench_load     = $bench_start;
     my $color_order    = $self->{'COLOR_ORDER'};
-	my $hold;
-	if (defined($self->{'FFMPEG'}) && $params->{'file'} =~ /\.(mkv|mp4|avi|mpeg4|webp)$/i) {
-		system($self->{'FFMPEG'},'-i',$params->{'file'},'-vf', 'fps=10,scale=-1:-1:flags=bicubic', '-loop','0','-loglevel','quiet','/tmp/output.gif');
-		$hold = $params->{'file'};
-		$params->{'file'} = '/tmp/output.gif';
-	}
+    my $hold;
+    if (defined($self->{'FFMPEG'}) && $params->{'file'} =~ /\.(mkv|mp4|avi|mpeg4|webp)$/i) {
+        system($self->{'FFMPEG'},'-i',$params->{'file'},'-vf', 'fps=10,scale=-1:-1:flags=bicubic', '-loop','0','-loglevel','quiet','/tmp/output.gif');
+        $hold = $params->{'file'};
+        $params->{'file'} = '/tmp/output.gif';
+    }
     if ($params->{'file'} =~ /\.(gif|png|apng)$/i) {
         eval {
             @Img = Imager->read_multi(
@@ -8008,6 +8015,7 @@ If the image has multiple frames, then a reference to an array of hashes is retu
             } else {    # 16 bit
                 $channels = $img->getchannels();
                 $img      = $img->convert('preset' => 'noalpha') if ($channels == 4);
+                # $img = $img->to_rgb16(); # Maybe use this for speed?
                 $img->write(
                     'type'              => 'raw',
                     'interleave'        => FALSE,
@@ -8072,10 +8080,10 @@ If the image has multiple frames, then a reference to an array of hashes is retu
                 $self->{'DRAW_MODE'} = $saved;
             }
         }
-		if (-e '/tmp/output.gif') {
-			unlink('/tmp/output.gif');
-			$params->{'file'} = $hold;
-		}
+        if (-e '/tmp/output.gif') {
+            unlink('/tmp/output.gif');
+            $params->{'file'} = $hold;
+        }
 
         if (scalar(@odata) > 1) { # Animation
             return (    # return it in a form the blit routines can dig
@@ -8127,16 +8135,16 @@ The Tagged Image File Format.  Sort of an older version of PNG (but not the same
 
  $fb->screen_dump(
      {
-     	 'file'   => '/path/filename', # name of file to be written
- 	 	 'format' => 'jpeg',           # jpeg, gif, png, pnm, tga, or tiff
+         'file'   => '/path/filename', # name of file to be written
+         'format' => 'jpeg',           # jpeg, gif, png, pnm, tga, or tiff
 
- 	 	 # for JPEG formats only
- 	 	 'quality' => 75,              # quality of the JPEG file 1-100% (the
- 	 	                               # higher the number, the better the
- 	 	                               # quality, but the larger the file)
+         # for JPEG formats only
+         'quality' => 75,              # quality of the JPEG file 1-100% (the
+                                       # higher the number, the better the
+                                       # quality, but the larger the file)
 
- 	 	 # for GIF formats only
- 	 	 'dither'  => 'floyd',         # Can be "floyd", "jarvis" or "stucki"
+         # for GIF formats only
+         'dither'  => 'floyd',         # Can be "floyd", "jarvis" or "stucki"
      }
  );
 
@@ -9157,7 +9165,7 @@ Richard Kelsch <rich@rk-internet.com>
 
 =head1 COPYRIGHT
 
-Copyright © 2003-2023 Richard Kelsch, All Rights Reserved.
+Copyright © 2003-2024 Richard Kelsch, All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under the GNU software license.
 
@@ -9169,7 +9177,7 @@ A copy of this license is included in the 'LICENSE' file in this distribution.
 
 =head1 VERSION
 
-Version 6.56 (Oct 08, 2023)
+Version 6.59 (Jan 18, 2024)
 
 =head1 THANKS
 

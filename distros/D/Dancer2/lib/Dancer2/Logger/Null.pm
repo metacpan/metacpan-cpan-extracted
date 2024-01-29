@@ -1,6 +1,6 @@
 package Dancer2::Logger::Null;
 # ABSTRACT: Blackhole-like silent logging engine for Dancer2
-$Dancer2::Logger::Null::VERSION = '1.0.0';
+$Dancer2::Logger::Null::VERSION = '1.1.0';
 use Moo;
 with 'Dancer2::Core::Role::Logger';
 
@@ -20,7 +20,7 @@ Dancer2::Logger::Null - Blackhole-like silent logging engine for Dancer2
 
 =head1 VERSION
 
-version 1.0.0
+version 1.1.0
 
 =head1 DESCRIPTION
 

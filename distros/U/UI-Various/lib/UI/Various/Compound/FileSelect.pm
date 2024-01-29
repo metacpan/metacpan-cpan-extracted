@@ -57,7 +57,7 @@ use warnings 'once';
 
 use Cwd 'abs_path';
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 use UI::Various::core;
 use UI::Various::Box;

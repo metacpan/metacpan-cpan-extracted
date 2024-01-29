@@ -7,7 +7,7 @@ use Moo;
 use Math::Trig qw(:pi);
 use POSIX qw(ceil);
 
-our $VERSION = '0.0202';
+our $VERSION = '0.0207';
 
 use constant K => pi / 180;
 
@@ -150,9 +150,9 @@ sub forward {
     $self->x($x + $xo);
     $self->y($y + $yo);
 
-    return $self->pen_status == 1
-        ? ( ceil($xo), ceil($yo), ceil($self->x), ceil($self->y), $self->pen_color, $self->pen_size )
-        : undef;
+    return ceil($xo), ceil($yo),
+        ceil($self->x), ceil($self->y),
+        $self->pen_color, $self->pen_size;
 }
 
 
@@ -179,9 +179,9 @@ sub goto {
     $self->x($x);
     $self->y($y);
 
-    return $self->pen_status == 1
-        ? ( ceil($xo), ceil($yo), ceil($self->x), ceil($self->y), $self->pen_color, $self->pen_size )
-        : undef;
+    return ceil($xo), ceil($yo),
+        ceil($self->x), ceil($self->y),
+        $self->pen_color, $self->pen_size;
 }
 
 1;
@@ -198,12 +198,14 @@ Data::Turtle - Turtle Movement and State Operations
 
 =head1 VERSION
 
-version 0.0202
+version 0.0207
 
 =head1 SYNOPSIS
 
   use Data::Turtle;
+
   my $turtle = Data::Turtle->new;
+
   $turtle->pen_up;
   $turtle->right(45);
   $turtle->forward(10);
@@ -211,24 +213,28 @@ version 0.0202
   $turtle->mirror;
   $turtle->backward(10);
   $turtle->pen_down;
+
   my ($x, $y, $heading, $status, $color, $size) = $turtle->get_state;
   $turtle->set_state($x, $y, $heading, $status, $color, $size);
+
   for my $i (1 .. 4) {
       my @line = $turtle->forward(50);
-      # if (@line) { ... # Draw it!
+      if ($turtle->pen_down) { # Draw it!
+          # ...insert your favorite graphics method...
+      }
       $turtle->right(90);
   }
 
 =head1 DESCRIPTION
 
-This module enables basic turtle movement and state operations without requiring
-any particular graphics package.
+This module enables basic turtle movement and state operations without
+requiring any particular graphics package.
 
-The methods don't draw anything.  They just set or output coordinates and
-values for drawing by your favorite graphics package.
+The methods don't draw anything. They just set or output coordinates
+and values for drawing by your favorite graphics package.
 
-For examples with L<GD> and L<Imager>, please see the files in the F<eg/>
-distribution directory.
+For examples with L<GD> and L<Imager>, please see the files in the
+F<eg/> distribution directory.
 
 =head1 METHODS
 
@@ -254,7 +260,7 @@ Attributes:
 
 =item * width, height
 
-Drawing surface dimensions.  Defaults:
+Drawing surface dimensions. Defaults:
 
   width  = 500
   height = 500
@@ -265,7 +271,7 @@ Drawing surface dimensions.  Defaults:
 
 =item * x, y, heading
 
-Coordinate parameters.  Defaults:
+Coordinate parameters. Defaults:
 
   x       = width / 2
   y       = height / 2
@@ -277,9 +283,12 @@ Coordinate parameters.  Defaults:
 
 =item * pen_status, pen_color, pen_size
 
-Is the pen is up or down?  Default: 1 (down position)
+Is the pen is up or down? Default: C<1> (down position)
 
-Pen properties.  Defaults: pen_color = the string 'black', pen_size = 1
+Pen properties. Defaults:
+
+  pen_color = black
+  pen_size  = 1
 
 =back
 
@@ -337,17 +346,24 @@ Set the turtle state with the given parameters.
 
   @line = $turtle->forward($steps);
 
-Move forward the given number of steps.  If the pen is down, a list defining a
-line is returned with these values:
+Move forward the given number of steps, and return a list defining a
+line with these values:
 
   x0, y0, x, y, pen_color, pen_size
+
+Where a step is given by
+
+    x = step * cos(heading * K)
+    y = step * sin(heading * K)
+
+and C<K> is C<pi / 180>.
 
 =head2 backward
 
   @line = $turtle->backward($steps);
 
-Move backward the given number of steps.  If the pen is down, a list defining a
-line is returned with these values:
+Move backward the given number of steps, and return a list defining a
+line with these values:
 
   x0, y0, x, y, pen_color, pen_size
 
@@ -361,8 +377,8 @@ Reflect the heading (by multiplying by -1).
 
   @line = $turtle->goto($x, $y);
 
-Move the pen to the given coordinate.  If the pen is down, a list defining a
-line is returned with these values:
+Move the pen to the given coordinate, and return a list defining a
+line with these values:
 
   x0, y0, x, y, pen_color, pen_size
 

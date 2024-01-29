@@ -40,6 +40,10 @@ sub jaccard_similarity {
 
 sub estimate_hamming_stats {
 
+    # Estimate Hamming stats using a binomial distribution model. Assumes each bit position
+    # in the binary strings has an independent 50% chance of mismatch, to calculate
+    # the mean and standard deviation of the Hamming distance.
+
     my $length               = shift;
     my $probability_mismatch = 0.5;
     my $estimated_average    = $length * $probability_mismatch;

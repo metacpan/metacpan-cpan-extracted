@@ -45,7 +45,6 @@ if (defined $ENV{BIOPERLEMAIL}) {
     my %common_names = map { $_ => 1 } $n->common_names;
     cmp_ok keys %common_names, '>=', 3, ref($db).": common names";
     ok exists $common_names{human};
-    ok exists $common_names{man};
 
     is $n->division, 'Primates';
     is $n->genetic_code, 1;
@@ -99,7 +98,7 @@ if (defined $ENV{BIOPERLEMAIL}) {
     sleep(3);
 
     ok $n = $db->get_Taxonomy_Node('1760');
-    is $n->scientific_name, 'Actinomycetia';
+    is $n->scientific_name, 'Actinomycetes';
 
     sleep(3);
 
@@ -165,8 +164,8 @@ if (defined $ENV{BIOPERLEMAIL}) {
     # 'Chlorella vulgaris'   | 3077          | 3077
     # 'Phygadeuon solidus'   | 1763951       | 1763951
     # 'Ovatus'               | 666060        | 666060
-    # 'Phygadeuon ovatus'    | "No hit"      | 666060
-    # 'Trimorus ovatus'      | "No hit"      | 666060
+    # 'Phygadeuon ovatus'    | 2890685       | 2890685
+    # 'Zaphod Beeblebrox'    | "No hit"      | "No hit"
 
     my @ids;
     @ids = $db->get_taxonids('Lissotriton vulgaris');
@@ -178,8 +177,8 @@ if (defined $ENV{BIOPERLEMAIL}) {
     @ids = $db->get_taxonids('Ovatus');
     is $ids[0], 666060, 'Correct: Ovatus';
     @ids = $db->get_taxonids('Phygadeuon ovatus');
-    is $ids[0], 'No hit', 'Correct: No hit';
-    @ids = $db->get_taxonids('Trimorus ovatus');
+    is $ids[0], '2890685', 'Correct: 2890685';
+    @ids = $db->get_taxonids('Zaphod Beeblebrox');
     is $ids[0], 'No hit', 'Correct: No hit';
 }
 

@@ -17,7 +17,7 @@ use constant _F_VERSION  => 2;  # PDS space result set object or undef
 use constant _F_PATH     => 3;  # database path name
 use constant _NFIELDS    => 4;
 
-our $VERSION  = '1.000';
+our $VERSION  = '1.001';
 our @CARP_NOT = qw(Math::DifferenceSet::Planar);
 
 our $DATABASE_DIR = dist_dir('Math-DifferenceSet-Planar');
@@ -205,7 +205,7 @@ Math::DifferenceSet::Planar::Data - storage of sample planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 1.000 of
+This documentation refers to version 1.001 of
 Math::DifferenceSet::Planar::Data.
 
 =head1 SYNOPSIS

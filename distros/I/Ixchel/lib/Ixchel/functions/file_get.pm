@@ -6,7 +6,7 @@ use warnings;
 use File::Slurp;
 use Exporter 'import';
 our @EXPORT = qw(file_get);
-use LWP::Simple;
+use LWP::UserAgent ();
 
 =head1 NAME
 
@@ -32,18 +32,7 @@ our $VERSION = '0.0.1';
 
 Any protocol understood via L<LWP> may be used.
 
-If it failes to fetch it, it will die.
-
-    - url :: The URL to fetch. Required.
-
-    - ftp :: FTP proxy to use. Optional.
-
-    - http :: HTTP proxy to use. Optional.
-
-    - https :: HTTPS proxy to use. Optional.
-
-If the $ENV variables below are set, they will be used for proxy info,
-but the ones above will take president over that and set the env vars.
+If the $ENV variables below are set, they will be used for proxy info.
 
     $ENV{FTP_PROXY}
     $ENV{HTTP_PROXY}
@@ -52,25 +41,35 @@ but the ones above will take president over that and set the env vars.
 =cut
 
 sub file_get {
-	my ( %opts ) = @_;
+	my (%opts) = @_;
 
 	if ( !defined( $opts{url} ) ) {
 		die('url not specified');
 	}
 
-	if ( defined( $opts{ftp} ) ) {
-		$ENV{FTP_PROXY} = $opts{ftp};
-	}
-	if ( defined( $opts{http} ) ) {
-		$ENV{HTTP_PROXY} = $opts{http};
-	}
-	if ( defined( $opts{https} ) ) {
-		$ENV{HTTPS_PROXY} = $opts{https};
-	}
+	my $content;
+	eval {
+		my $ua = LWP::UserAgent->new( timeout => 10 );
+		if ( defined( $ENV{HTTP_PROXY} ) ) {
+			$ua->proxy( ['http'], $ENV{HTTP_PROXY} );
+		}
+		if ( defined( $ENV{HTTPS_PROXY} ) ) {
+			$ua->proxy( ['https'], $ENV{HTTPS_PROXY} );
+		}
+		if ( defined( $ENV{FTP_PROXY} ) ) {
+			$ua->proxy( ['ftp'], $ENV{FTP_PROXY} );
+		}
 
-	my $content = get( $opts{url} );
-	if ( !defined($content) ) {
-		die( 'Fetching "' . $opts{url} . '" failed' );
+		my $response = $ua->get( $opts{url} );
+
+		if ( $response->is_success ) {
+			$content = $response->decoded_content;
+		} else {
+			die( $response->status_line );
+		}
+	};
+	if ($@) {
+		die( 'Fetching "' . $opts{url} . '" failed' ... $@ );
 	}
 
 	return $content;

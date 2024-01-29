@@ -184,6 +184,33 @@ sub cleanup_schema_mysql { [
     "DROP TABLE UsersToGroups", 
 ] }
 
+# TEMPORARY tables can not be referenced more than once
+# in the same query, use real table for UsersToGroups
+sub schema_mariadb {
+[
+q{
+CREATE TEMPORARY TABLE Users (
+    id integer primary key AUTO_INCREMENT,
+    Login varchar(36)
+) },
+q{
+CREATE TABLE UsersToGroups (
+    id integer primary key AUTO_INCREMENT,
+    UserId  integer,
+    GroupId integer
+) },
+q{
+CREATE TEMPORARY TABLE `Groups` (
+    id integer primary key AUTO_INCREMENT,
+    Name varchar(36)
+) },
+]
+}
+
+sub cleanup_schema_mariadb { [
+    "DROP TABLE UsersToGroups",
+] }
+
 sub schema_pg {
 [
 q{

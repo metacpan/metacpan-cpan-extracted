@@ -1,7 +1,7 @@
 # ------------- MIDI routines -----------
 
 package Audio::Nama;
-use Modern::Perl;
+use Modern::Perl '2020';
 #use Audio::Nama::Log qw(logpkg);
 use Carp;
 
@@ -11,7 +11,7 @@ my @handles = my ($fh_midi_write, $fh_midi_read, $fh_midi_error) = map{ IO::Hand
 map{ $_->autoflush(1) } @handles;
 
 sub start_midish_process {
-	logsub('&start_midish_process');
+	logsub((caller(0))[3]);
 	my $executable = qx(which midish);
 	chomp $executable;
 	$executable or say("Midish not found!"), return;
@@ -28,7 +28,7 @@ sub start_midish_process {
 }
 sub midish_cmd {
 	my $command = shift;
-	logsub('&midish');
+	logsub((caller(0))[3]);
 	return unless $config->{use_midi};
 	
 	print $fh_midi_write "$command\n";

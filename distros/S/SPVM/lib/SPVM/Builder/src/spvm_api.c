@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <errno.h>
+#include <ctype.h>
 
 #include "spvm_native.h"
 #include "spvm_api.h"
@@ -291,8 +292,8 @@ SPVM_ENV* SPVM_API_new_env(void) {
     SPVM_API_strerror_string_nolen,
     SPVM_API_strerror,
     SPVM_API_strerror_nolen,
-    SPVM_API_new_memory_stack,
-    SPVM_API_free_memory_stack,
+    NULL, // reserved194,
+    NULL, // reserved195,
     SPVM_API_new_stack,
     SPVM_API_free_stack,
     SPVM_API_get_field_object_defined_and_has_pointer_by_name,
@@ -377,7 +378,7 @@ int32_t SPVM_API_set_command_info_program_name(SPVM_ENV* env, SPVM_VALUE* stack,
     return SPVM_API_die(env, stack, "The obj_program_name must be a string.", __func__, FILE_NAME, __LINE__);
   }
   
-  SPVM_API_set_class_var_object_by_name(env, stack, "CommandInfo", "$PROGRAM_NAME", obj_program_name, &error_id, __func__, __FILE__, __LINE__);
+  SPVM_API_set_class_var_object_by_name(env, stack, "CommandInfo", "$PROGRAM_NAME", obj_program_name, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   return 0;
@@ -396,7 +397,7 @@ int32_t SPVM_API_set_command_info_argv(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OB
     return SPVM_API_die(env, stack, "The obj_argv must be a string array.", __func__, FILE_NAME, __LINE__);
   }
   
-  SPVM_API_set_class_var_object_by_name(env, stack, "CommandInfo", "$ARGV", obj_argv, &error_id, __func__, __FILE__, __LINE__);
+  SPVM_API_set_class_var_object_by_name(env, stack, "CommandInfo", "$ARGV", obj_argv, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   return 0;
@@ -406,7 +407,7 @@ int32_t SPVM_API_set_command_info_base_time(SPVM_ENV* env, SPVM_VALUE* stack, in
   
   int32_t error_id = 0;
   
-  SPVM_API_set_class_var_long_by_name(env, stack, "CommandInfo", "$BASE_TIME", base_time, &error_id, __func__, __FILE__, __LINE__);
+  SPVM_API_set_class_var_long_by_name(env, stack, "CommandInfo", "$BASE_TIME", base_time, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   return 0;
@@ -2287,6 +2288,54 @@ const char* SPVM_API_dumpc(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object
   return dump_chars;
 }
 
+#define utf_cont(ch)  (((ch) & 0xc0) == 0x80)
+#define SPVM_UTF8PROC_ERROR_INVALIDUTF8 -3
+static ptrdiff_t spvm_utf8proc_iterate(const uint8_t *str, ptrdiff_t strlen, int32_t *dst) {
+  uint32_t uc;
+  const uint8_t *end;
+  
+  *dst = -1;
+  if (!strlen) return 0;
+  end = str + ((strlen < 0) ? 4 : strlen);
+  uc = *str++;
+  if (uc < 0x80) {
+    *dst = uc;
+    return 1;
+  }
+  // Must be between 0xc2 and 0xf4 inclusive to be valid
+  if ((uc - 0xc2) > (0xf4-0xc2)) return SPVM_UTF8PROC_ERROR_INVALIDUTF8;
+  if (uc < 0xe0) {         // 2-byte sequence
+     // Must have valid continuation character
+     if (str >= end || !utf_cont(*str)) return SPVM_UTF8PROC_ERROR_INVALIDUTF8;
+     *dst = ((uc & 0x1f)<<6) | (*str & 0x3f);
+     return 2;
+  }
+  if (uc < 0xf0) {        // 3-byte sequence
+     if ((str + 1 >= end) || !utf_cont(*str) || !utf_cont(str[1]))
+        return SPVM_UTF8PROC_ERROR_INVALIDUTF8;
+     // Check for surrogate chars
+     if (uc == 0xed && *str > 0x9f)
+         return SPVM_UTF8PROC_ERROR_INVALIDUTF8;
+     uc = ((uc & 0xf)<<12) | ((*str & 0x3f)<<6) | (str[1] & 0x3f);
+     if (uc < 0x800)
+         return SPVM_UTF8PROC_ERROR_INVALIDUTF8;
+     *dst = uc;
+     return 3;
+  }
+  // 4-byte sequence
+  // Must have 3 valid continuation characters
+  if ((str + 2 >= end) || !utf_cont(*str) || !utf_cont(str[1]) || !utf_cont(str[2]))
+     return SPVM_UTF8PROC_ERROR_INVALIDUTF8;
+  // Make sure in correct range (0x10000 - 0x10ffff)
+  if (uc == 0xf0) {
+    if (*str < 0x90) return SPVM_UTF8PROC_ERROR_INVALIDUTF8;
+  } else if (uc == 0xf4) {
+    if (*str > 0x8f) return SPVM_UTF8PROC_ERROR_INVALIDUTF8;
+  }
+  *dst = ((uc & 7)<<18) | ((*str & 0x3f)<<12) | ((str[1] & 0x3f)<<6) | (str[2] & 0x3f);
+  return 4;
+}
+
 void SPVM_API_dump_recursive(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t* depth, SPVM_STRING_BUFFER* string_buffer, SPVM_HASH* address_symtable) {
   
   SPVM_RUNTIME* runtime = env->runtime;
@@ -2303,8 +2352,43 @@ void SPVM_API_dump_recursive(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* obje
     if (SPVM_API_is_string(env, stack, object)) {
       const char* chars = SPVM_API_get_chars(env, stack, object);
       int32_t chars_length  = SPVM_API_length(env, stack, object);
+      
       SPVM_STRING_BUFFER_add(string_buffer, "\"");
-      SPVM_STRING_BUFFER_add_len(string_buffer, (char*)chars, chars_length);
+      
+      int32_t offset = 0;
+      while (1) {
+        
+        if (offset >= chars_length) {
+          break;
+        }
+        
+        int32_t dst;
+        int32_t utf8_char_len = (int32_t)spvm_utf8proc_iterate((const uint8_t*)(chars + offset), chars_length, &dst);
+        
+        int32_t uchar;
+        if (utf8_char_len > 0) {
+            
+          if (utf8_char_len == 1 && !isprint(*(chars + offset))) {
+            sprintf(tmp_buffer, "\\0x{%02X}", *(chars + offset));
+            
+            SPVM_STRING_BUFFER_add_len(string_buffer, tmp_buffer, 7);
+          }
+          else {
+            SPVM_STRING_BUFFER_add_len(string_buffer, (char*)(chars + offset), utf8_char_len);
+          }
+          
+          offset += utf8_char_len;
+        }
+        else {
+          
+          sprintf(tmp_buffer, "\\0x{%02X}", *(chars + offset));
+          
+          SPVM_STRING_BUFFER_add_len(string_buffer, tmp_buffer, 7);
+          
+          offset += 1;
+        }
+      }
+      
       SPVM_STRING_BUFFER_add(string_buffer, "\"");
     }
     else if (type_dimension > 0) {
@@ -3241,12 +3325,6 @@ SPVM_RUNTIME_METHOD* SPVM_API_get_instance_method(SPVM_ENV* env, SPVM_VALUE* sta
   return method;
 }
 
-// Deprecated
-void* SPVM_API_new_memory_stack(SPVM_ENV* env, SPVM_VALUE* stack, size_t size) {
-  
-  return SPVM_API_new_memory_block(env, stack, size);
-}
-
 void* SPVM_API_new_memory_block(SPVM_ENV* env, SPVM_VALUE* stack, size_t size) {
   
   SPVM_RUNTIME* runtime = env->runtime;
@@ -3304,12 +3382,6 @@ void SPVM_API_free_memory_block(SPVM_ENV* env, SPVM_VALUE* stack, void* block) {
     }
 #endif
   }
-}
-
-void SPVM_API_free_memory_stack(SPVM_ENV* env, SPVM_VALUE* stack, void* block) {
-  
-  SPVM_API_free_memory_block(env, stack, block);
-  
 }
 
 int32_t SPVM_API_get_memory_blocks_count(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -3505,12 +3577,12 @@ SPVM_RUNTIME_BASIC_TYPE* SPVM_API_get_basic_type_by_id(SPVM_ENV* env, SPVM_VALUE
 
 void* SPVM_API_strerror_string(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value, int32_t length) {
   
-  if (length < 0) {
-    return NULL;
-  }
+  assert(length >= 0);
   
   if (length == 0) {
-    length = 64;
+    // Linux maybe needs at least 49.
+    // Windows needs at least 94.
+    length = 128;
   }
   
   void* obj_strerror_value = SPVM_API_new_string(env, stack, NULL, length);
@@ -3518,13 +3590,14 @@ void* SPVM_API_strerror_string(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_v
   
   int32_t status = SPVM_STRERROR_strerror(errno_value, strerror_value, length);
   
-  if (status == 0) {
-    SPVM_API_shorten(env, stack, obj_strerror_value, strlen(strerror_value));
-    return obj_strerror_value;
+  if (!(status == 0)) {
+    errno = status;
+    sprintf(strerror_value, "strerror failed. errno is %d.", errno);
   }
-  else {
-    return NULL;
-  }
+  
+  SPVM_API_shorten(env, stack, obj_strerror_value, strlen(strerror_value));
+  
+  return obj_strerror_value;
 }
 
 const char* SPVM_API_strerror(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value, int32_t length) {
@@ -3645,9 +3718,10 @@ int32_t SPVM_API_call_method_common(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTI
   stack[SPVM_API_C_STACK_INDEX_ARGS_WIDTH].ival = args_width;
   stack[SPVM_API_C_STACK_INDEX_CALL_DEPTH].ival++;
   
-  int32_t max_call_depth = 10000;
+  int32_t max_call_depth = 1000;
   if (stack[SPVM_API_C_STACK_INDEX_CALL_DEPTH].ival > max_call_depth) {
-    error_id = SPVM_API_die(env, stack, "Deep recursion occurs. The depth of a method call must be less than %d", max_call_depth, FILE_NAME, __LINE__);
+    
+    error_id = SPVM_API_die(env, stack, "Deep recursion occurs. The depth of a method call must be less than %d.", max_call_depth, __func__, FILE_NAME, __LINE__);
   }
   else {
     void* method_return_basic_type = method->return_basic_type;
@@ -3984,21 +4058,21 @@ void SPVM_API_unweaken_thread_unsafe(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJE
     SPVM_API_inc_ref_count(env, stack, object);
     
     // Remove a weaken back reference
-    assert(object->weaken_backref_head);
-    SPVM_WEAKEN_BACKREF** weaken_backref_next_ptr = &object->weaken_backref_head;
-    while (*weaken_backref_next_ptr != NULL){
-      if ((*weaken_backref_next_ptr)->ref == ref) {
-        SPVM_WEAKEN_BACKREF* tmp = (*weaken_backref_next_ptr)->next;
+    SPVM_WEAKEN_BACKREF** weaken_backref_cur_ptr = &object->weaken_backref_head;
+    
+    while (*weaken_backref_cur_ptr != NULL){
+      if ((*weaken_backref_cur_ptr)->ref == ref) {
+        SPVM_WEAKEN_BACKREF* weaken_backref_next = (*weaken_backref_cur_ptr)->next;
         
-        SPVM_WEAKEN_BACKREF* weaken_backref_next =  *weaken_backref_next_ptr;
+        SPVM_WEAKEN_BACKREF* weaken_backref_cur = *weaken_backref_cur_ptr;
         
-        SPVM_API_free_memory_block(env, stack, weaken_backref_next);
-        weaken_backref_next = NULL;
+        SPVM_API_free_memory_block(env, stack, weaken_backref_cur);
+        weaken_backref_cur = NULL;
         
-        *weaken_backref_next_ptr = tmp;
+        *weaken_backref_cur_ptr = weaken_backref_next;
         break;
       }
-      *weaken_backref_next_ptr = (*weaken_backref_next_ptr)->next;
+      weaken_backref_cur_ptr = &((*weaken_backref_cur_ptr)->next);
     }
   }
   
@@ -4028,15 +4102,20 @@ void SPVM_API_unweaken(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT** ref) {
 
 void SPVM_API_free_weaken_backrefs(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_WEAKEN_BACKREF* weaken_backref_head) {
   
-  SPVM_WEAKEN_BACKREF* weaken_backref_head_cur = weaken_backref_head;
-  SPVM_WEAKEN_BACKREF* weaken_backref_head_next = NULL;
-  while (weaken_backref_head_cur != NULL){
-    *(weaken_backref_head_cur->ref) = NULL;
-    weaken_backref_head_next = weaken_backref_head_cur->next;
+  SPVM_WEAKEN_BACKREF* weaken_backref_cur = weaken_backref_head;
+  while (weaken_backref_cur != NULL){
+    int32_t isweak = SPVM_API_isweak_only_check_flag(env, stack, weaken_backref_cur->ref);
     
-    SPVM_API_free_memory_block(env, stack, weaken_backref_head_cur);
-    weaken_backref_head_cur = NULL;
-    weaken_backref_head_cur = weaken_backref_head_next;
+    assert(isweak);
+    
+    *(weaken_backref_cur->ref) = NULL;
+    
+    SPVM_WEAKEN_BACKREF* weaken_backref_head_next = weaken_backref_cur->next;
+    
+    SPVM_API_free_memory_block(env, stack, weaken_backref_cur);
+    weaken_backref_cur = NULL;
+    
+    weaken_backref_cur = weaken_backref_head_next;
   }
 }
 

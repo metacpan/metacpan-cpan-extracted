@@ -119,7 +119,7 @@ is($date_time_format, "EEEE d MMMM y 'à' HH:mm:ss zzzz", 'Date Time Format Full
 $date_time_format = $locale->datetime_format_long;
 is($date_time_format, "d MMMM y 'à' HH:mm:ss z", 'Date Time Format Long');
 $date_time_format = $locale->datetime_format_medium;
-is($date_time_format, "d MMM y 'à' HH:mm:ss", 'Date Time Format Medium');
+is($date_time_format, "d MMM y, HH:mm:ss", 'Date Time Format Medium');
 $date_time_format = $locale->datetime_format_short;
 is($date_time_format, 'dd/MM/y HH:mm', 'Date Time Format Short');
 

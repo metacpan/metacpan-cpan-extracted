@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# DeleteWorksheetChartLegendRequest.name : The workbook name.  ,
+# DeleteWorksheetChartLegendRequest.name : The file name.  ,
 # DeleteWorksheetChartLegendRequest.sheetName : The worksheet name.  ,
 # DeleteWorksheetChartLegendRequest.chartIndex : The chart index.  ,
-# DeleteWorksheetChartLegendRequest.folder : Original workbook folder.  ,
-# DeleteWorksheetChartLegendRequest.storageName : Storage name.   
+# DeleteWorksheetChartLegendRequest.folder : The folder where the file is situated.  ,
+# DeleteWorksheetChartLegendRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -137,7 +137,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -158,14 +158,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

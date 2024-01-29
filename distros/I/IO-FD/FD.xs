@@ -54,17 +54,6 @@ SV * slurp(pTHX_ int fd, int read_size){
 
   SV *max_file_desc;
 
-#if defined(IO_FD_OS_DARWIN)|| defined(IO_FD_OS_BSD)
-#define IO_FD_ATIME atime=buf.st_atimespec.tv_sec+buf.st_atimespec.tv_nsec*1e-9;
-#define IO_FD_MTIME mtime=buf.st_mtimespec.tv_sec+buf.st_mtimespec.tv_nsec*1e-9;
-#define IO_FD_CTIME ctime=buf.st_ctimespec.tv_sec+buf.st_ctimespec.tv_nsec*1e-9;
-#endif
-
-#if defined(IO_FD_OS_LINUX)
-#define IO_FD_ATIME atime=buf.st_atim.tv_sec+buf.st_atim.tv_nsec*1e-9;
-#define IO_FD_MTIME mtime=buf.st_mtim.tv_sec+buf.st_mtim.tv_nsec*1e-9;
-#define IO_FD_CTIME ctime=buf.st_ctim.tv_sec+buf.st_ctim.tv_nsec*1e-9;
-#endif
 
 #if defined(IO_FD_OS_DARWIN)
 #define KEVENT kevent64

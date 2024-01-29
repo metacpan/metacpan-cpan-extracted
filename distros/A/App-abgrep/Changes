@@ -1,3 +1,11 @@
+0.010   2024-01-25  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with AppBase::Grep to update documentation (new
+          grep options -l & -L).
+
+
 0.009   2022-11-04  Released-By: PERLANCAR; Urgency: medium
 
         - [refactor] Extract file-related code to AppBase::Grep::File. Add

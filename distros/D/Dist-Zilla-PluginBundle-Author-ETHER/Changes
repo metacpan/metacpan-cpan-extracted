@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.163     2023-12-09 22:56:32Z
+          - .travis.yml file removed from minting profile
+
 0.162     2021-11-28 20:10:01Z
           - now using 're_strict' feature in boilerplate
           - removed podweaver override for "SUPPORT" section, giving

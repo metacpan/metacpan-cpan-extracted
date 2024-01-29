@@ -51,9 +51,9 @@
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/drclaw1394/perl-template-plex.git",
-         "web" : "http://github.com/drclaw1394/perl-template-plex"
+         "web" : "https://github.com/drclaw1394/perl-template-plex"
       }
    },
-   "version" : "v0.6.2",
+   "version" : "v0.7.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

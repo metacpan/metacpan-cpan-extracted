@@ -26,32 +26,6 @@ YAML
 my $doc_uri = Mojo::URL->new('https://example.com/api');
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 
-subtest 'bad conversion to Mojo::Message::Request' => sub {
-  my $req = HTTP::Request->new(GET => 'http://example.com/', [ Host => 'example.com' ]);
-  my $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
-paths: {}
-YAML
-
-  cmp_deeply(
-    (my $result = $openapi->validate_request($req))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => '',
-          absoluteKeywordLocation => $doc_uri->clone->to_string,
-          error => 'Bad request start-line',
-        },
-      ],
-    },
-    'invalid request object is detected early',
-  );
-};
-
 my $type_index = 0;
 
 START:
@@ -634,13 +608,13 @@ YAML
           instanceLocation => '/request/uri/query/query1',
           keywordLocation => jsonp(qw(/paths /foo get parameters 0 content application/json)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 0 content application/json)))->to_string,
-          error => re(qr/^could not decode content as application\/json: \'"\' expected, at character offset 1/),
+          error => re(qr/^could not decode content as application\/json: /),
         },
         {
           instanceLocation => '/request/header/Header1',
           keywordLocation => jsonp(qw(/paths /foo get parameters 1 content application/json)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 1 content application/json)))->to_string,
-          error => re(qr/^could not decode content as application\/json: \'"\' expected, at character offset 1/),
+          error => re(qr/^could not decode content as application\/json: /),
         },
       ],
     },
@@ -1042,7 +1016,7 @@ YAML
           instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json)))->to_string,
-          error => re(qr/^could not decode content as application\/json: \'"\' expected, at character offset 1/),
+          error => re(qr/^could not decode content as application\/json: /),
         },
       ],
     },
@@ -1748,29 +1722,6 @@ YAML
       ],
     },
     'unevaluatedProperties can be used in schemas',
-  );
-
-  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json' ], '{"bar":1}');
-  cmp_deeply(
-    ($result = $openapi->validate_request($request))->format('basic', 1),
-    {
-      valid => true,
-      annotations => [
-        {
-          instanceLocation => '/request/body',
-          keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema properties)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema properties)))->to_string,
-          annotation => ['bar'],
-        },
-        {
-          instanceLocation => '/request/body',
-          keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema unevaluatedProperties)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema unevaluatedProperties)))->to_string,
-          annotation => [],
-        },
-      ],
-    },
-    'annotations are collected when evaluating valid requests',
   );
 };
 

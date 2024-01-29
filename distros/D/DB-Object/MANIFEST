@@ -5,6 +5,9 @@ lib/DB/Object/ALL.pod
 lib/DB/Object/AND.pod
 lib/DB/Object/ANY.pod
 lib/DB/Object/Cache/Tables.pm
+lib/DB/Object/Constraint/Check.pm
+lib/DB/Object/Constraint/Foreign.pm
+lib/DB/Object/Constraint/Index.pm
 lib/DB/Object/Expression.pod
 lib/DB/Object/Fields.pm
 lib/DB/Object/Fields/Field.pm
@@ -45,6 +48,7 @@ t/003_sqlite.t
 t/004_mysql.t
 t/005.field.t
 t/006_placeholder.t
+t/007_element.t
 t/900_pod.t
 t/910.coverage.t
 t/999.kwalitee.t

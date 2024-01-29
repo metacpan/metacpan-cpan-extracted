@@ -22,23 +22,32 @@ lines into a single block.  If you don't like this, override it by
 
 - **--frame**
 
+    <div>
+            <p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-frame/main/images/terminal-3.png">
+    </div>
+
     Set frame and fold long lines with frame-friendly prefix string.
     Folding width is taken from the terminal.  Or you can specify the
     width by calling **set** function with module option.
+
+- **--frame-cols**
+
+    Output results in multi-column format to fit the width of the
+    terminal.  The number of columns is automatically calculated from the
+    terminal width.
+
+- **--frame-pages**
+
+    Output results in multi-column and paginated format.
+
+    <div>
+            <p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-frame/main/images/terminal-frame-pages.png">
+    </div>
 
 - **--set-frame-width**=_#_
 
     Set frame width.  You have to put this option before **--frame**
     option.  See **set** function in ["FUNCTION"](#function) section.
-
-- **--frame-pages**
-
-    Output results in multi-column, paginated format to fit the width of the 
-    terminal.
-
-<div>
-    <p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-frame/main/images/terminal-3.png">
-</div>
 
 # FUNCTION
 
@@ -65,6 +74,8 @@ lines into a single block.  If you don't like this, override it by
 # SEE ALSO
 
 [App::ansifold](https://metacpan.org/pod/App%3A%3Aansifold)
+
+[App::ansicolumn](https://metacpan.org/pod/App%3A%3Aansicolumn)
 
 [Math::RPN](https://metacpan.org/pod/Math%3A%3ARPN)
 

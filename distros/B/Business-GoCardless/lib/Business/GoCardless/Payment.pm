@@ -98,6 +98,26 @@ sub refunded    { return shift->status eq 'refunded' }
 sub submitted   { return shift->status eq 'submitted' }
 sub confirmed   { return shift->status eq 'confirmed' }
 
+=head1 payout_id
+
+=head1 mandate_id
+
+=head1 creditor_id
+
+Accessors for details found in the C<links> section
+
+=cut
+
+sub payout_id   { return shift->_link_content( 'payout' ) }
+sub mandate_id  { return shift->_link_content( 'mandate' ) }
+sub creditor_id { return shift->_link_content( 'creditor' ) }
+
+sub _link_content {
+    my ( $self,$attr ) = @_;
+    my $links = $self->links || {};
+    return $links->{$attr};
+}
+
 =head1 AUTHOR
 
 Lee Johnson - C<leejo@cpan.org>

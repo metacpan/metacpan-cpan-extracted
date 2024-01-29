@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::7_0::Async::Bulk;
-$Search::Elasticsearch::Client::7_0::Async::Bulk::VERSION = '8.00';
+$Search::Elasticsearch::Client::7_0::Async::Bulk::VERSION = '8.12';
 use Moo;
 with 'Search::Elasticsearch::Client::7_0::Role::Bulk',
     'Search::Elasticsearch::Role::Is_Async';
@@ -144,7 +144,7 @@ Search::Elasticsearch::Client::7_0::Async::Bulk - A helper module for the Bulk A
 
 =head1 VERSION
 
-version 8.00
+version 8.12
 
 =head1 SYNOPSIS
 
@@ -515,7 +515,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Elasticsearch BV.
+This software is Copyright (c) 2024 by Elasticsearch BV.
 
 This is free software, licensed under:
 

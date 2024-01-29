@@ -59,10 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# DeleteMetadataRequest.File : File to upload  ,
-# DeleteMetadataRequest.type :   ,
-# DeleteMetadataRequest.password :   ,
-# DeleteMetadataRequest.checkExcelRestriction :    
+# DeleteMetadataRequest.File : Cells document property name.  ,
+# DeleteMetadataRequest.type : Cells document property name.  ,
+# DeleteMetadataRequest.outFormat : The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
+# DeleteMetadataRequest.password : The password needed to open an Excel file.  ,
+# DeleteMetadataRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.   
 
 {
     my $params = {
@@ -73,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_metadata' } = { 
-    	summary => '',
+    	summary => 'Delete cells document properties in Excel file, and save them is various formats.',
         params => $params,
         returns => 'FilesResult',
     };
@@ -101,6 +102,10 @@ sub run_http_request {
  
     if(defined $self->type){
         $query_params->{'type'} = $client->to_query_value($self->type);      
+    }
+
+    if(defined $self->out_format){
+        $query_params->{'outFormat'} = $client->to_query_value($self->out_format);      
     }
 
     if(defined $self->password){
@@ -133,28 +138,35 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'File to upload',
+     	description => 'Cells document property name.',
      	format => '',
      	read_only => '',
      		},
      'type' => {
      	datatype => 'string',
      	base_name => 'type',
-     	description => '',
+     	description => 'Cells document property name.',
+     	format => '',
+     	read_only => '',
+     		},
+     'out_format' => {
+     	datatype => 'string',
+     	base_name => 'outFormat',
+     	description => 'The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
-     	description => '',
+     	description => 'Whether check restriction of excel file when user modify cells related objects.',
      	format => '',
      	read_only => '',
      		},    
@@ -164,6 +176,7 @@ __PACKAGE__->method_documentation({
 __PACKAGE__->attribute_map( {
     'file' => 'File',
     'type' => 'type',
+    'out_format' => 'outFormat',
     'password' => 'password',
     'check_excel_restriction' => 'checkExcelRestriction' 
 } );

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ha::Any::Ne - Package for language Hausa
 
 package Locale::CLDR::Locales::Ha::Any::Ne;
 # This file auto generated from Data\common\main\ha_NE.xml
-#	on Tue  5 Dec  1:13:11 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,14 +28,28 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
-				'eo' => 'Dʼan/Ƴar Kabilar Andalus',
- 				'eu' => 'Dan/Ƴar Kabilar Bas',
- 				'kn' => 'Dan/Ƴar Kabilar Kannada',
- 				'sq' => 'Dʼan/Ƴar Kabilar Albaniya',
- 				'te' => 'Dʼan/Ƴar Kabilar Telug',
+				'ar_001' => 'Larabci Asali Na Zamani',
+ 				'de_AT' => 'Jamusanci Ostiriya',
+ 				'de_CH' => 'Jamusanci Suwizalan',
+ 				'en_AU' => 'Turanci Ostareliya',
+ 				'en_CA' => 'Turanci Kanada',
+ 				'en_GB' => 'Turanci Biritaniya',
+ 				'en_GB@alt=short' => 'Turancin Ingila',
+ 				'en_US' => 'Turanci Amirka',
+ 				'en_US@alt=short' => 'Turancin Amurka',
+ 				'es_419' => 'Sifaniyancin Latin Amirka',
+ 				'es_ES' => 'Sifaniyanci Turai',
+ 				'es_MX' => 'Sifaniyanci Mesiko',
+ 				'fa_AF' => 'Vote Farisanci na Afaganistan',
+ 				'fr_CA' => 'Farasanci Kanada',
+ 				'fr_CH' => 'Farasanci Suwizalan',
+ 				'pt_BR' => 'Harshen Potugis na Birazil',
+ 				'pt_PT' => 'Potugis Ƙasashen Turai',
+ 				'zh_Hans' => 'Sauƙaƙaƙƙen Sinanci',
+ 				'zh_Hant' => 'Sinanci na gargajiya',
 
 			);
 			if (@_) {
@@ -57,7 +71,6 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[á à â é è ê í ì î ó ò ô p q {r̃} ú ù û v x {ʼy}]},
 			index => ['A', 'B', 'Ɓ', 'C', 'D', 'Ɗ', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'Ƙ', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Ƴ', 'Z'],
-			main => qr{[a b ɓ c d ɗ e f g h i j k ƙ l m n o r s {sh} t {ts} u w y ƴ z ʼ]},
 		};
 	},
 EOT

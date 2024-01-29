@@ -1,15 +1,22 @@
-0.03    2017-05-24 (PERLANCAR)
+0.040   2023-03-30  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+        - [build] Rebuild with Business::Tax::ID::PPH21 0.066.
+
+
+0.03    2017-05-24  Released-By: PERLANCAR
 
 	- Add utility: calc-net-income-from-pph21-op.
 
 
-0.02    2016-01-18 (PERLANCAR)
+0.02    2016-01-18  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix POD section ordering.
 
 
-0.01    2015-12-22 (PERLANCAR)
+0.01    2015-12-22  Released-By: PERLANCAR
 
         - First release.

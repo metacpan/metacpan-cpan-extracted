@@ -3,10 +3,13 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword::FromPerl 0.07;
+package XS::Parse::Keyword::FromPerl 0.09;
 
 use v5.26; # XS code needs op_class() and the OPclass_* constants
 use warnings;
+
+use meta 0.003_002;
+no warnings 'meta::experimental';
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, our $VERSION );
@@ -365,6 +368,8 @@ pieces.
 
 =cut
 
+my $thispkg = meta::get_this_package();
+
 # Simple pieces
 foreach (qw(
       BLOCK ANONSUB ARITHEXPR TERMEXPR LISTEXPR IDENT IDENT_OPT
@@ -372,9 +377,9 @@ foreach (qw(
    )) {
    my $name = "XPK_$_";
    push @EXPORT_OK, $name;
-
-   no strict 'refs';
-   *$name = sub { bless [$name], "XS::Parse::Keyword::FromPerl::_Piece" };
+   $thispkg->add_symbol( "\&$name" => sub {
+      bless [$name], "XS::Parse::Keyword::FromPerl::_Piece";
+   } );
 }
 # Single-SV parametric pieces
 foreach (qw(
@@ -382,9 +387,9 @@ foreach (qw(
    )) {
    my $name = "XPK_$_";
    push @EXPORT_OK, $name;
-
-   no strict 'refs';
-   *$name = sub { bless [$name, $_[0]], "XS::Parse::Keyword::FromPerl::_Piece" };
+   $thispkg->add_symbol( "\&$name" => sub {
+      bless [$name, $_[0]], "XS::Parse::Keyword::FromPerl::_Piece";
+   } );
 }
 # Structural multiple-value pieces
 foreach (qw(
@@ -393,9 +398,9 @@ foreach (qw(
    )) {
    my $name = "XPK_$_";
    push @EXPORT_OK, $name;
-
-   no strict 'refs';
-   *$name = sub { bless [$name, [@_]], "XS::Parse::Keyword::FromPerl::_Piece" };
+   $thispkg->add_symbol( "\&$name" => sub {
+      bless [$name, [@_]], "XS::Parse::Keyword::FromPerl::_Piece";
+   } );
 }
 
 # Back-compat wrappers for the old names
@@ -403,12 +408,10 @@ foreach (qw( PAREN ARG BRACKET BRACE CHEVRON )) {
    my $macroname = "XPK_${_}S";
    my $funcname  = "XPK_${_}SCOPE";
    push @EXPORT_OK, $funcname;
-
-   no strict 'refs';
-   *$funcname = sub {
+   $thispkg->add_symbol( "\&$funcname" => sub {
       warnings::warnif deprecated => "$funcname is now deprecated; use $macroname instead";
       bless [$macroname, [@_]], "XS::Parse::Keyword::FromPerl::_Piece";
-   };
+   } );
 }
 
 =head2 Parser Arguments

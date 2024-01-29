@@ -1,5 +1,5 @@
 package Password::Policy::Exception::InvalidProfile;
-$Password::Policy::Exception::InvalidProfile::VERSION = '0.04';
+$Password::Policy::Exception::InvalidProfile::VERSION = '0.06';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Password::Policy::Exception::InvalidProfile
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 AUTHOR
 

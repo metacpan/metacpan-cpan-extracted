@@ -1,5 +1,12 @@
 Revision history for YAML-yq-Helper
 
+0.2.0	2023-12-28/15:00
+		 - Doc fixes.
+		 - Add merge_yaml.
+		 - Convert to Pod::Usage.
+		 - Add yaml_diff.
+		 - Add ensure action.
+
 0.1.2	 2023-10-19/13:30
 		 -Fix ensure so it checks for %YAML instead of %YANL
 

@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostSetCellRangeValueRequest.name : The workbook name.  ,
+# PostSetCellRangeValueRequest.name : The file name.  ,
 # PostSetCellRangeValueRequest.sheetName : The worksheet name.  ,
 # PostSetCellRangeValueRequest.cellarea : Cell area (like "A1:C2")  ,
 # PostSetCellRangeValueRequest.value : Range value  ,
 # PostSetCellRangeValueRequest.type : Value data type (like "int")  ,
-# PostSetCellRangeValueRequest.folder : Original workbook folder.  ,
-# PostSetCellRangeValueRequest.storageName : Storage name.   
+# PostSetCellRangeValueRequest.folder : The folder where the file is situated.  ,
+# PostSetCellRangeValueRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_set_cell_range_value' } = { 
-    	summary => 'Sets the value of the range in worksheet.',
+    	summary => 'Set the value of the range in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -145,7 +145,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -180,14 +180,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

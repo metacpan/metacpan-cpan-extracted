@@ -7,30 +7,55 @@ use Math::DifferenceSet::Planar 1.000;
 
 $| = 1;
 
-my $USAGE = "usage: pds_info [-D database] [-h] [--key]... [file]...\n";
+my $USAGE =
+    "usage: pds_info [-D database] [-l limit] [-h] [-a] [--key]... [file]...\n";
+$USAGE   .= "       pds_info -k\n";
 my @KEYS = qw(
     order order_base order_exponent modulus n_planes n_sets
     start_element peak_elements min_element max_element
-    largest_gap eta zeta theta lambda n_mult
-    n_elems n_princ n_suppl n_deriv n_fill
+    largest_gap eta zeta theta lambda n_mult phi_modulus
+    n_elems n_princ n_suppl n_deriv n_princ_deriv n_suppl_deriv n_fill
+    elems
 );
-my %keys = map {($_ => 1)} @KEYS;
-@keys{qw(peak_elements largest_gap)} = (2, 3);
+my @SUBKEYS = qw(
+    largest_gap_elements largest_gap_difference
+);
+my %keys = map {($_ => 1)} @KEYS, @SUBKEYS;
+@keys{qw(peak_elements largest_gap largest_gap_elements)} = (2, 3, 2);
+my @SUPER = ();
+foreach my $key (@SUBKEYS) {
+    if ($key =~ /^(.*)_/) {
+        my $sk = $1;
+        if (@SUPER && $SUPER[-1]->[0] eq $sk) {
+            push @{$SUPER[-1]->[1]}, $key;
+        }
+        else {
+            push @SUPER, [$sk, [$key]];
+        }
+    }
+}
 
-my @cols = ();
-my $head = 0;
-my $db   = undef;
+my @cols  = ();
+my $head  = 0;
+my $all   = 0;
+my $db    = undef;
+my $limit = 5;
 while (@ARGV && $ARGV[0] =~ /^-(.+)/) {
     my $opt = $1;
     shift @ARGV;
-    last                       if '-' eq $opt;
-    $head = 1,            next if 'h' eq $opt;
-    push(@cols, $1   ),   next if $opt =~ /^-(\w+)\z/ && exists $keys{$1};
-    push(@cols, @KEYS),   next if '-all' eq $opt;
-    $db   = shift(@ARGV), next if 'D' eq $opt && @ARGV;
-    $db   = $1,           next if $opt =~ /^D(.+)s/;
+    last                        if '-' eq $opt;
+    $head  = 1,            next if 'h' eq $opt;
+    $all   = 1,            next if 'a' eq $opt;
+    display_keys()              if 'k' eq $opt;
+    push(@cols, $1),       next if $opt =~ /^-(\w+)\z/ && exists $keys{$1};
+    $db    = shift(@ARGV), next if 'D' eq $opt && @ARGV;
+    $db    = $1,           next if $opt =~ /^D(.+)/s;
+    $limit = shift(@ARGV), next
+        if 'l' eq $opt && @ARGV && $ARGV[0] =~ /^0|[1-9][0-9]*\z/;
+    $limit = $1,           next if $opt =~ /^l(0|[1-9][0-9]*)\z/;
     die $USAGE;
 }
+push @cols, missing_keys(@cols)                if $all;
 @cols = @KEYS[0..4]                            if !@cols;
 Math::DifferenceSet::Planar->set_database($db) if defined $db;
 
@@ -52,6 +77,26 @@ while (<<>>) {
     print "@res\n";
 }
 
+sub missing_keys {
+    my %have = ();
+    @have{@_} = ();
+    foreach my $r (@SUPER) {
+        my ($sk, $ks) =@{$r};
+        if (exists $have{$sk}) {
+            @have{@{$ks}} = ();
+        }
+        elsif (grep {exists $have{$_}} @{$ks}) {
+            $have{$sk} = undef;
+        }
+    }
+    return grep { !exists $have{$_} } @KEYS, @SUBKEYS;
+}
+
+sub display_keys {
+    print map {; "--$_\n" } @KEYS, @SUBKEYS;
+    exit 0;
+}
+
 package Math::DifferenceSet::Planar;
 
 use Math::BigInt try => 'GMP';
@@ -68,6 +113,34 @@ sub n_deriv {
     return 1 + $this->order - $this->n_princ - $this->n_suppl - $this->n_fill;
 }
 
+sub n_princ_deriv {
+    my ($this) = @_;
+    return $this->plane_principal_elements * ($this->multipliers - 1);
+}
+
+sub n_suppl_deriv {
+    my ($this) = @_;
+    return $this->n_deriv - $this->n_princ_deriv;
+}
+
+sub phi_modulus {
+    my ($this) = @_;
+    return $this->n_planes * $this->multipliers;
+}
+
+sub elems {
+    my ($this) = @_;
+    if (!$limit || $this->order < $limit) {
+        return join q[,], $this->elements_sorted;
+    }
+    my @elems = map { $this->element_sorted($_) } 0 .. $limit-1;
+    push @elems, q[...];
+    return join q[,], @elems;
+}
+
+sub largest_gap_elements   { ($_[0]->largest_gap)[0, 1] }
+sub largest_gap_difference { ($_[0]->largest_gap)[2]    }
+
 __END__
 
 =encoding utf8
@@ -78,7 +151,8 @@ pds_info - display information about planar difference sets
 
 =head1 SYNOPSIS
 
-  pds_info [-D database] [-h] [--key]... [file]...
+  pds_info [-D database] [-l limit] [-h] [-a] [--key]... [file]...
+  pds_info -k
 
 =head1 DESCRIPTION
 
@@ -98,11 +172,18 @@ attribute names preceded by two dashes.  In addition to the default
 attributes, these are: n_sets, start_element, peak_elements (yielding
 two output columns), min_element, max_element, largest_gap (yielding
 three output colums of two elements and their difference), eta, zeta,
-theta, lambda, n_mult, n_elems, n_princ, n_suppl, n_deriv, n_fill, all
-(yielding all 24 items).  An unkown value of lambda is replaced by zero
-(which is not an otherwise possible value).
+theta, lambda, n_mult, phi_modulus, n_elems, n_princ, n_suppl, n_deriv,
+n_princ_deriv, n_suppl_deriv n_fill, elems.  An unkown value of lambda
+is replaced by zero (which is not an otherwise possible value).
+
+The first two values of largest_gap can be obtained with the
+largest_gap_elements attribute and the third value with the
+largest_gap_difference attribute.
 
 With option B<-h>, the data is preceded by a header line.
+
+With option B<-a>, all columns mentioned above and not specified
+individually are added.
 
 Parameter C<-D> specifies an alternate sample database.
 
@@ -168,6 +249,12 @@ and the increment amount.
 Example: I<{3, 4, 6} (mod 7)> has largest-gap elements I<6> and I<3>
 and the increment I<4>, as I<6 + 4 (mod 7)> is congruent to I<3 (mod 7)>.
 
+=item largest_gap_elements
+=item largest_gap_difference
+
+The elements (first two columns) of largest_gap can also be accessed as
+largest_gap_elements and the increment amount as largest_gap_difference.
+
 =item eta
 
 The translation amount equivalent to multiplying the set by I<order_base>.
@@ -215,8 +302,18 @@ For the definition, cf. L<Math::DifferenceSet::Planar>.
 
 =item n_deriv
 
-The number of derived elements of a set's plane.
-For the definition, cf. L<Math::DifferenceSet::Planar>.
+The number of elements derived from principal and supplemental elements
+of a set's plane.  For the definition, cf. L<Math::DifferenceSet::Planar>.
+
+=item n_princ_deriv
+
+The number of elements derived from the principal elements of a set's
+plane.  For the definition, cf. L<Math::DifferenceSet::Planar>.
+
+=item n_suppl_deriv
+
+The number of elements derived from the supplemental elements of a
+set's plane.  For the definition, cf. L<Math::DifferenceSet::Planar>.
 
 =item n_fill
 
@@ -224,6 +321,18 @@ The number of fill elements of a set's plane.
 For the definition, cf. L<Math::DifferenceSet::Planar>.
 
 Note that I<n_princ + n_suppl + n_deriv + n_fill> is equal to I<n_elems>.
+
+=item phi_modulus
+
+The cardinality of the unit space of the modular integer ring.
+Equal to Euler phi(modulus), equal to n_planes * n_mult.
+
+=item elems
+
+The comma-separated list of elements of the set in numerically ascending
+order, if the set is small, otherwise the first few elements followed
+by three dots.  By default, few means five elements.  The limit can be
+changed with the B<-l> parameter.  A limit of 0 means no cut-off.
 
 =back
 

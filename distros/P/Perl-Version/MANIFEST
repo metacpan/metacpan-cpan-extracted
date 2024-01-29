@@ -1,18 +1,23 @@
 Changes
 examples/perl-reversion
+INSTALL.SKIP
 lib/Perl/Version.pm
+LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 Notes.txt
-README
+README.pod
 t/00.load.t
 t/05.misc.t
 t/10.regression.t
 t/20.compare.t
 t/30.vstring.t
 t/40.perl-reversion.t
+t/99.rt-110074.t
+t/99.rt-119447.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+xt/changes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

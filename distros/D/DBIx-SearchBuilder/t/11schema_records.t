@@ -235,6 +235,26 @@ q{CREATE TEMPORARY TABLE `Groups` (
 ]
 }
 
+sub schema_mariadb {
+[ q{
+CREATE TEMPORARY TABLE Employees (
+	id integer AUTO_INCREMENT primary key,
+	Name varchar(36)
+)
+}, q{
+CREATE TEMPORARY TABLE Phones (
+	id integer AUTO_INCREMENT primary key,
+	Employee integer NOT NULL,
+	Phone varchar(18)
+)
+},
+q{CREATE TEMPORARY TABLE `Groups` (
+	id integer AUTO_INCREMENT primary key,
+	Name varchar(36)
+) }
+]
+}
+
 sub schema_pg {
 [ q{
 CREATE TEMPORARY TABLE Employees (

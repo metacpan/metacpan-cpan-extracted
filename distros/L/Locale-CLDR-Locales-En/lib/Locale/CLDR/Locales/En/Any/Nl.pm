@@ -8,13 +8,13 @@ Locale::CLDR::Locales::En::Any::Nl - Package for language English
 
 package Locale::CLDR::Locales::En::Any::Nl;
 # This file auto generated from Data\common\main\en_NL.xml
-#	on Tue  5 Dec  1:08:04 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,6 +24,18 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::En::Any::150');
+has 'number_symbols' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'latn' => {
+			'decimal' => q(,),
+			'group' => q(.),
+		},
+	} }
+);
+
 has 'number_currency_formats' => (
 	is			=> 'ro',
 	isa			=> HashRef,

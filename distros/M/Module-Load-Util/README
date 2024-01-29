@@ -2,13 +2,15 @@ NAME
     Module::Load::Util - Some utility routines related to module loading
 
 VERSION
-    This document describes version 0.009 of Module::Load::Util (from Perl
-    distribution Module-Load-Util), released on 2023-06-13.
+    This document describes version 0.010 of Module::Load::Util (from Perl
+    distribution Module-Load-Util), released on 2024-01-24.
 
 SYNOPSIS
      use Module::Load::Util qw(
          load_module_with_optional_args
          instantiate_class_with_optional_args
+         call_module_function_with_optional_args
+         call_module_method_with_optional_args
      );
 
      load_module_with_optional_args("Foo::Bar=import-arg1,import-arg2");
@@ -54,12 +56,12 @@ FUNCTIONS
      load_module_with_optional_args({ns_prefix=>"Color"}, "RGB::Util=rgb2hsv");        # equivalent to runtime version of 'use Color::RGB::Util qw(rgb2hsv)'
      load_module_with_optional_args({ns_prefix=>"Color"}, ["RGB::Util", ["rgb2hsv"]]); # ditto
 
-    Load a module with "require()" followed by calling the module's
-    "import()" (unless instructed to skip importing). Main feature of this
-    function is the flexibility in the $module_with_optional_args argument,
-    as well as some options like namespace prefix. Suitable to be used to
-    load plugins for your application, for example, where you can specify
-    the plugin to load as simply a string or a 2-element array.
+    Load a module with require() followed by calling the module's import()
+    (unless instructed to skip importing). Main feature of this function is
+    the flexibility in the $module_with_optional_args argument, as well as
+    some options like namespace prefix. Suitable to be used to load plugins
+    for your application, for example, where you can specify the plugin to
+    load as simply a string or a 2-element array.
 
     $module_with_optional_args can be a string containing module name (e.g.
     "Foo::Bar"), or a string containing module name string followed by "=",
@@ -68,7 +70,7 @@ FUNCTIONS
     the module name and the second element is an arrayref or hashref
     containing import arguments (e.g. "["Foo::Bar", ["arg1","arg2"]]" or
     "["Foo::Bar", {arg1=>"val",arg2=>"val"]]"). Hashref list of arguments
-    will still be passed as a list to "import()".
+    will still be passed as a list to import().
 
     Will die on require() or import() failure.
 
@@ -145,8 +147,37 @@ FUNCTIONS
     *   load
 
         Boolean. Default true. Whether to "require" the class module.
-        Sometimes you do not want to "require()", e.g. when the class is
+        Sometimes you do not want to require(), e.g. when the class is
         already defined somewhere else.
+
+  call_module_function_with_optional_args
+    Usage:
+
+     call_module_function_with_optional_args( [ \%opts , ] $function_with_optional_args );
+
+    Examples:
+
+     call_module_function_with_optional_args("App::ChromeUtils::chrome_is_running");
+     call_module_function_with_optional_args("App::ChromeUtils::start_chrome=quiet,1");
+     call_module_function_with_optional_args("Color::RGB::Util::int2rgb=100500");
+     call_module_function_with_optional_args(["App::ChromeUtils::start_chrome" => {quiet=>1}]);
+     call_module_function_with_optional_args(["Color::RGB::Util::int2rgb" => [100500]]);
+
+     call_module_function_with_optional_args({load=>0}, ["Color::RGB::Util::int2rgb" => [100500]]);
+
+    Load module then call module's function with optional arguments.
+
+    Known options:
+
+    *   load
+
+    *   ns_prefix
+
+    *   ns_prefixes
+
+  call_module_method_with_optional_args
+    Just like "call_module_function_with_optional_args" except the
+    subroutine call is replaced with a method call instead.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -183,7 +214,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022, 2021, 2020 by perlancar
+    This software is copyright (c) 2024, 2023, 2022, 2021, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

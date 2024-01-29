@@ -21,6 +21,9 @@ my $builder = Module::Build->new(
         # 'Moose'  => '2.2203',
         # 'Term::ANSIColor' => '5.01',
         # 'Carp'  => '1.52'
+         'Getopt::Long' => '2.52',
+         'Progress::Awesome' => '0.01'
+        # perl => '5.14'
    },
     add_to_cleanup     => [ 'App-FileComposer-*' ],
 );

@@ -1,0 +1,13 @@
+Changes
+JS.pm
+JS.pod
+JS.xs
+Makefile.PL
+MANIFEST
+t/arith.t
+t/basic.t
+t/inc_dec.t
+t/stringify.t
+t/switch_args.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

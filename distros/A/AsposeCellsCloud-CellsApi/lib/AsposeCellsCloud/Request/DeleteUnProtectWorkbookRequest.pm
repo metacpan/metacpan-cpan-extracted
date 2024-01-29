@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# DeleteUnProtectWorkbookRequest.name : The workbook name.  ,
+# DeleteUnProtectWorkbookRequest.name : The file name.  ,
 # DeleteUnProtectWorkbookRequest.password : Protection settings, only password can be specified.  ,
-# DeleteUnProtectWorkbookRequest.folder : Original workbook folder.  ,
-# DeleteUnProtectWorkbookRequest.storageName : Storage name.   
+# DeleteUnProtectWorkbookRequest.folder : The folder where the file is situated.  ,
+# DeleteUnProtectWorkbookRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_un_protect_workbook' } = { 
-    	summary => 'Unprotects workbook.',
+    	summary => 'Excel unprotection.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -142,14 +142,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

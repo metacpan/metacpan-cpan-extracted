@@ -12,8 +12,10 @@ my @tests = (
     [ 'foo', { value => 'foo bar baz' }, 'foo=foo%20bar%20baz'],
     [ 'foo', { value => 'val',expires => undef }, 'foo=val'],
     [ 'foo', { value => 'val',path => '/' }, 'foo=val; path=/'],
-    [ 'foo', { value => 'val',path => '/', secure => 1, httponly => 0 }, 'foo=val; path=/; secure'],
-    [ 'foo', { value => 'val',path => '/', secure => 0, httponly => 1 }, 'foo=val; path=/; HttpOnly'],
+    [ 'foo', { value => 'val',path => '/', secure => 0, httponly => 0, partitioned => 0 }, 'foo=val; path=/'],
+    [ 'foo', { value => 'val',path => '/', secure => 1, httponly => 0, partitioned => 0 }, 'foo=val; path=/; secure'],
+    [ 'foo', { value => 'val',path => '/', secure => 0, httponly => 1, partitioned => 0 }, 'foo=val; path=/; HttpOnly'],
+    [ 'foo', { value => 'val',path => '/', secure => 0, httponly => 0, partitioned => 1 }, 'foo=val; path=/; SameSite=None; secure; Partitioned'],
     [ 'foo', { value => 'val',expires => 'now' }, 'foo=val; expires=Mon, 07-Oct-2013 13:56:57 GMT'],
     [ 'foo', { value => 'val',expires => $now + 24*60*60 }, 'foo=val; expires=Tue, 08-Oct-2013 13:56:57 GMT'],
     [ 'foo', { value => 'val',expires => '1s' }, 'foo=val; expires=Mon, 07-Oct-2013 13:56:58 GMT'],
@@ -31,8 +33,10 @@ my @tests = (
     [ 'foo', { value => 'val','max-age' => '0' }, 'foo=val; max-age=0'],
     [ 'foo', { value => 'val', samesite => 'lax' }, 'foo=val; SameSite=Lax'],
     [ 'foo', { value => 'val', samesite => 'strict' }, 'foo=val; SameSite=Strict'],
-    [ 'foo', { value => 'val', samesite => 'none' }, 'foo=val; SameSite=None'],
+    [ 'foo', { value => 'val', samesite => 'none' }, 'foo=val; SameSite=None; secure'],
+    [ 'foo', { value => 'val', samesite => 'none', secure => 0 }, 'foo=val; SameSite=None; secure'],
     [ 'foo', { value => 'val', samesite => 'invalid value' }, 'foo=val'],
+    [ 'foo', { value => 'val', samesite => 'strict', partitioned => 1 }, 'foo=val; SameSite=None; secure; Partitioned'],
 );
 
 for my $test (@tests) {

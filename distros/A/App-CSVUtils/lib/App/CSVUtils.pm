@@ -9,9 +9,9 @@ use Cwd;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-06'; # DATE
+our $DATE = '2023-09-06'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.031'; # VERSION
+our $VERSION = '1.033'; # VERSION
 
 our @EXPORT_OK = qw(
                        gen_csv_util
@@ -1985,7 +1985,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 1.031 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2023-08-06.
+This document describes version 1.033 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2023-09-06.
 
 =head1 DESCRIPTION
 
@@ -2079,41 +2079,45 @@ This distribution contains the following CLI utilities:
 
 =item 43. L<csv-sort-fields>
 
-=item 44. L<csv-sort-rows>
+=item 44. L<csv-sort-fields-by-example>
 
-=item 45. L<csv-sorted>
+=item 45. L<csv-sort-fields-by-spec>
 
-=item 46. L<csv-sorted-fields>
+=item 46. L<csv-sort-rows>
 
-=item 47. L<csv-sorted-rows>
+=item 47. L<csv-sorted>
 
-=item 48. L<csv-split>
+=item 48. L<csv-sorted-fields>
 
-=item 49. L<csv-sum>
+=item 49. L<csv-sorted-rows>
 
-=item 50. L<csv-transpose>
+=item 50. L<csv-split>
 
-=item 51. L<csv-trim>
+=item 51. L<csv-sum>
 
-=item 52. L<csv-uniq>
+=item 52. L<csv-transpose>
 
-=item 53. L<csv-unquote>
+=item 53. L<csv-trim>
 
-=item 54. L<csv2ltsv>
+=item 54. L<csv-uniq>
 
-=item 55. L<csv2paras>
+=item 55. L<csv-unquote>
 
-=item 56. L<csv2td>
+=item 56. L<csv2ltsv>
 
-=item 57. L<csv2tsv>
+=item 57. L<csv2paras>
 
-=item 58. L<csv2vcf>
+=item 58. L<csv2td>
 
-=item 59. L<list-csvutils>
+=item 59. L<csv2tsv>
 
-=item 60. L<paras2csv>
+=item 60. L<csv2vcf>
 
-=item 61. L<tsv2csv>
+=item 61. L<list-csvutils>
+
+=item 62. L<paras2csv>
+
+=item 63. L<tsv2csv>
 
 =back
 

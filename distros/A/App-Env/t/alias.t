@@ -12,7 +12,7 @@ use App::Env;
 
     # import alias.  Site1 App3 is an alias for Site1 App1
     App::Env::import( 'App3' );
-    is( $ENV{Site1_App1}, 1, "import alias" );
+    is( $ENV{Site1_App1}, 1, 'import alias' );
 }
 
 {
@@ -22,7 +22,7 @@ use App::Env;
     # the internal counter or it'll be impossible to distinguish
     # between a first time import or a cache
     App::Env::import( 'App1', { Force => 1 } );
-    is( $ENV{Site1_App1}, 2, "import original" );
+    is( $ENV{Site1_App1}, 2, 'import original' );
 }
 
 {
@@ -30,8 +30,8 @@ use App::Env;
 
     # import nested alias, which also sets AppOpts
     App::Env::import( 'App4', { Force => 1 } );
-    is( $ENV{Site1_App1}, 3,      "import nested alias" );
-    is( $ENV{Alias},      'App4', "alias w/ AppOpts" );
+    is( $ENV{Site1_App1}, 3,      'import nested alias' );
+    is( $ENV{Alias},      'App4', 'alias w/ AppOpts' );
 }
 
 {
@@ -40,8 +40,8 @@ use App::Env;
     # import nested alias, which also sets AppOpts,
     # but override AppOpts
     App::Env::import( 'App4', { Force => 1, AppOpts => { Alias => 'None' } } );
-    is( $ENV{Site1_App1}, 4,      "import nested alias" );
-    is( $ENV{Alias},      'None', "alias w/ overridden AppOpts" );
+    is( $ENV{Site1_App1}, 4,      'import nested alias' );
+    is( $ENV{Alias},      'None', 'alias w/ overridden AppOpts' );
 }
 
 
@@ -50,10 +50,10 @@ use App::Env;
 
     # import lowercased alias
     App::Env::import( 'app3', { Force => 1 } );
-    is( $ENV{Site1_App1}, 5, "import lower case alias" );
+    is( $ENV{Site1_App1}, 5, 'import lower case alias' );
 }
 
-is( App::Env->new( 'app1', { Force => 1, Site => '' } )->env( 'App1' ),
+is( App::Env->new( 'app1', { Force => 1, Site => q{} } )->env( 'App1' ),
     1, 'lower case alias, no Site' );
 
 done_testing;

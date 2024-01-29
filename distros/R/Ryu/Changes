@@ -1,5 +1,14 @@
 Revision history for Ryu
 
+3.005     2024-01-04 04:21:40+08:00 Asia/Singapore
+    [Bugs fixed]
+
+    - handle the `max_items` parameter to `->as_queue`
+
+    [Dependencies]
+
+    - update to latest Future::Queue to avoid deep-recursion scenario
+
 3.004     2023-03-05 14:36:17+08:00 Asia/Singapore
     [New features]
     - Ryu::Source->as_queue allows `max_items` and will pause the stream while waiting for the queue to drain

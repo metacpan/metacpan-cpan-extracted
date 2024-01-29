@@ -8,6 +8,7 @@ do { my $x = {
                       'requires' => {
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Test::CleanNamespaces' => '0.15',
+                                      'Test::DistManifest' => '0',
                                       'Test::EOF' => '0',
                                       'Test::EOL' => '0',
                                       'Test::Kwalitee' => '1.21',

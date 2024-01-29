@@ -46,6 +46,7 @@ my @files = (
     't/data/freshmeat.rdf',
     't/data/merlyn1.rss',
     't/data/rss-permalink.xml',
+    't/empty-elements.t',
     't/enclosures-multi.t',
     't/enclosures.t',
     't/enclosures2.t',

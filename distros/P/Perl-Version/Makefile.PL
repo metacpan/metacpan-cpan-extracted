@@ -1,36 +1,119 @@
+package Perl::Version;
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
 
-eval 'use ExtUtils::MakeMaker::Coverage';
+=encoding utf8
 
-my %ARGS = (
-  license( 'perl' ),
-  NAME          => 'Perl::Version',
-  AUTHOR        => 'Andy Armstrong <andy@hexten.net>',
-  VERSION_FROM  => 'lib/Perl/Version.pm',
-  ABSTRACT_FROM => 'lib/Perl/Version.pm',
-  PL_FILES      => {},
-  PREREQ_PM     => {
-  	'Carp'               => 0,
-    'Test::More'         => 0,
-    'Scalar::Util'       => 0,
-    'Getopt::Long'       => '2.34',
-    'Pod::Usage'         => '1.3',
-    'File::Slurp::Tiny'  => 0,
-    'Data::Dumper'       => 0,
-  },
-  EXE_FILES => ['examples/perl-reversion'],
-  dist      => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-  clean => { FILES => 'Perl-Version-*' },
-);
+=head1 The build file for Perl::Version
 
-WriteMakefile( %ARGS );
+This build file is a modulino; it works as both a build script and
+a module.
 
-sub license {
-  my $lic = shift;
-  local $^W = 0;    # Silence warning about non-numeric version
-  return
-   unless $ExtUtils::MakeMaker::VERSION >= '6.31';
-  return ( LICENSE => $lic );
-}
+To build the distribution, run this file normally:
+
+	% perl Makefile.PL
+
+But, it's more interesting than that. You can load it with C<require>
+and call C<arguments> to get the data structure it passes to
+C<WriteMakefile>:
+
+	my $package = require '/path/to/Makefile.PL';
+	my $arguments = $package->arguments;
+
+Note that C<require>-ing a file makes an entry in C<%INC> for exactly
+that name. If you try to C<require> another file with the same name,
+even from a different path, C<require> thinks it has already loaded
+the file. As such, I recommend you always require the full path to the
+file.
+
+The return value of the C<require> is a package name (in this case,
+the name of the main module. Use that to call the C<arguments> method.
+
+Even if this distribution needs a higher version of Perl, this bit
+only needs v5.8. You can play with the data structure with a primitive
+Perl.
+
+=cut
+
+use File::Spec::Functions qw(catfile);
+
+my $module    = __PACKAGE__;
+( my $dist = $module ) =~ s/::/-/g;
+
+my $github    = 'https://github.com/briandfoy/perl-version';
+my $main_file = catfile( 'lib', split /::/, "$module.pm" );
+
+my %WriteMakefile = (
+	'MIN_PERL_VERSION' => '5.010',
+
+	'NAME'          => $module,
+	'VERSION_FROM'  => $main_file,
+	'ABSTRACT_FROM' => $main_file,
+	'AUTHOR'        => 'Andy Armstrong <andy@hexten.net>',
+	'LICENSE'       => 'artistic_2',
+
+	'EXE_FILES' => ['examples/perl-reversion'],
+
+	'CONFIGURE_REQUIRES' => {
+		'ExtUtils::MakeMaker'   => '6.64',
+		'File::Spec::Functions' => '0',
+		},
+
+	'BUILD_REQUIRES' => {
+		},
+
+	'TEST_REQUIRES' => {
+		'Test::More' => '1',
+		},
+
+	'PREREQ_PM'     => {
+		'Carp'               => 0,
+		'Scalar::Util'       => 0,
+		'Getopt::Long'       => '2.34',
+		'Pod::Usage'         => '1.3',
+		'Data::Dumper'       => 0,
+		},
+
+	'META_MERGE' => {
+		'meta-spec' => { version => 2 },
+		resources => {
+			repository => {
+				type => 'git',
+				url  => $github,
+				web  => $github,
+				},
+			bugtracker => {
+				web  => "$github/issues",
+				},
+			homepage => $github,
+			},
+		},
+
+	clean => { FILES => "$dist-*" },
+	);
+
+sub arguments { \%WriteMakefile }
+
+do_it() unless caller;
+sub do_it {
+	require File::Spec;
+	my $MM ='ExtUtils::MakeMaker';
+	my $MM_version =
+		eval{ "$MM " . $WriteMakefile{'CONFIGURE_REQUIRES'}{'ExtUtils::MakeMaker'} }
+			||
+		"$MM 6.64";
+	eval "use $MM_version; 1" or die "Could not load $MM_version: $@";
+	eval 'use ExtUtils::MakeMaker::Coverage';
+	eval "use Test::Manifest 1.21"
+		if -e File::Spec->catfile( qw(t test_manifest) );
+
+	my $arguments = arguments();
+	my $minimum_perl = $arguments->{MIN_PERL_VERSION} || '5.008';
+	eval "require $minimum_perl;" or die $@;
+
+	WriteMakefile( %$arguments );
+	}
+
+
+no warnings;
+__PACKAGE__;

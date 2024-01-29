@@ -1,5 +1,8 @@
 Revision history for Perl module ConfigReader::Simple
 
+1.296 2024-01-23T14:28:43Z
+	* refresh distro, update email address, update repo URL
+
 1.295 2022-01-09T00:15:28Z
 	* No code changes. Fix a link in the README.pod.
 
@@ -83,7 +86,7 @@ Revision history for Perl module ConfigReader::Simple
 	* you don't need to call parse() since new() does it for you
 	* you can use the NAME=VALUE format in config files thanks to
 		Alan W. Jurgensen <jurgensen@berbee.com>
-	* the module is now maintained by brian d foy <bdfoy@cpan.org>
+	* the module is now maintained by brian d foy, briandfoy@pobox.com
 
 0.9 - 2000-08-11
    * Bumped up the version number because it's nearly mature
@@ -93,7 +96,7 @@ Revision history for Perl module ConfigReader::Simple
 
 0.5 - 1999-02-10
    * Changed module name to ConfigReader::Simple to match up with
-     other modules in CPAN better. 
+     other modules in CPAN better.
    * Quote delimiters now have to be matched, ie not 'foo" etc.
    * Doesn't get confused by trailing whitespace
    * Copes with quote-delimited strings as long as they're all on the

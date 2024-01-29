@@ -24,12 +24,18 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "File::Find::Wanted" => 0,
+    "File::Path" => 0,
+    "File::Slurper" => 0,
     "File::Spec" => 0,
+    "File::Temp" => "0.2307",
+    "File::chdir" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => 0
+    "Test::Exception" => 0,
+    "Test::More" => "0.98"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,12 +45,18 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Exporter" => "5.57",
   "File::Copy::Recursive" => 0,
+  "File::Find::Wanted" => 0,
+  "File::Path" => 0,
+  "File::Slurper" => 0,
   "File::Spec" => 0,
+  "File::Temp" => "0.2307",
+  "File::chdir" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::ger" => "0.038",
   "Perinci::Object" => "0.311",
-  "Test::More" => 0,
+  "Test::Exception" => 0,
+  "Test::More" => "0.98",
   "strict" => 0,
   "warnings" => 0
 );

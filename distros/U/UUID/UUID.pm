@@ -9,16 +9,13 @@ require DynaLoader;
 use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK $VERSION);
 @ISA = qw(Exporter DynaLoader);
 
-$VERSION = '0.31';
-
-# This allows declaration       use UUID ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
+$VERSION = '0.32';
 
 %EXPORT_TAGS = (
     'all' => [qw(
         &clear &compare &copy &generate &generate_random &generate_time
-        &is_null &parse &unparse &unparse_lower &unparse_upper &uuid
+        &is_null &parse &time &type &unparse &unparse_lower
+        &unparse_upper &uuid &variant
     )],
 );
 
@@ -33,7 +30,7 @@ __END__
 
 =head1 NAME
 
-UUID - DCE compatible Universally Unique Identifier library for Perl
+UUID - Universally Unique Identifier library for Perl
 
 =head1 SYNOPSIS
 
@@ -56,7 +53,12 @@ UUID - DCE compatible Universally Unique Identifier library for Perl
 
     UUID::clear( $uuid );                # set binary UUID to NULL
     UUID::is_null( $uuid );              # compare binary UUID to NULL
-    
+
+    UUID::type( $uuid );                 # return UUID type
+    UUID::variant( $uuid );              # return UUID variant
+
+    UUID::time( $uuid );                 # return internal UUID time
+
 
 =head1 DESCRIPTION
 
@@ -70,6 +72,10 @@ system, and unique across all systems, and are compatible with those
 created by the Open Software Foundation (OSF) Distributed Computing
 Environment (DCE) utility uuidgen.
 
+All generated UUIDs are either type 1 from B<UUID::generate_time()>, or
+type 4 from B<UUID::generate_random()>. And all are variant 1, meaning
+compliant with the OSF DCE standard as described in RFC4122.
+
 =head1 FUNCTIONS
 
 Most of the UUID functions expose the underlying I<libuuid> C interface
@@ -82,13 +88,33 @@ not very likely to change any time soon.
 All take or return UUIDs in either binary or string format. The string
 format resembles the following:
 
-    1b4e28ba-2fa1-11d2-883f-0016d3cca427
+    21b081a3-de83-4480-a14f-e89a1dcf8f0f
 
 Or, in terms of printf(3) format:
 
     "%08x-%04x-%04x-%04x-%012x"
 
-The binary format is simply a packed 16 byte binary value.
+The binary form is simply a packed 16 byte binary value.
+
+=head2 B<clear(> I<$uuid> B<)>
+
+Sets I<$uuid> equal to the value of the NULL UUID.
+
+=head2 B<copy(> I<$dst>B<,> I<$src> B<)>
+
+Copies the binary I<$src> UUID to I<$dst>.
+
+If I<$src> isn't a UUID, I<$dst> is set to the NULL UUID.
+
+=head2 B<compare(> I<$uuid1>B<,> I<$uuid2> B<)>
+
+Compares two binary UUIDs.
+
+Returns an integer less than, equal to, or greater than zero if
+I<$uuid1> is less than, equal to, or greater than I<$uuid2>.
+
+However, if either operand is not a UUID, falls back to a simple string
+comparison returning similar values.
 
 =head2 B<generate(> I<$uuid> B<)>
 
@@ -125,13 +151,49 @@ This can cause privacy problems in some applications, so the B<generate()>
 function only uses this algorithm if a high-quality source of randomness
 is not available.
 
+=head2 B<is_null(> I<$uuid> B<)>
+
+Compares the value of I<$uuid> to the NULL UUID.
+
+Returns 1 if NULL, and 0 otherwise.
+
+=head2 B<parse(> I<$string>B<,> I<$uuid> B<)>
+
+Converts the string format UUID in I<$string> to binary and returns in
+I<$uuid>. The previous content of I<$uuid>, if any, is lost.
+
+Returns 0 on success and -1 on failure. Additionally on failure, the
+content of I<$uuid> is unchanged.
+
+=head2 B<time(> I<$uuid> B<)>
+
+Returns the time element of a binary UUID in seconds since the epoch,
+the same as I<Perl>'s B<time> function.
+
+Keep in mind this only works for type 1 UUIDs. Values returned from
+other types range from non-standardized to totally random.
+
+=head2 B<type(> I<$uuid> B<)>
+
+Returns the type of binary I<$uuid>.
+
+This module only generates type 1 (time) and type 4 (random) UUIDs, but
+others may be found in the wild.
+
+Known types:
+    1  a.k.a. Version 1 - date/time and MAC address
+    2  a.k.a. Version 2 - date/time and MAC address, security version
+    3  a.k.a. Version 3 - namespace based, MD5 hash
+    4  a.k.a. Version 4 - random
+    5  a.k.a. Version 5 - namespace based, SHA-1 hash
+
 =head2 B<unparse(> I<$uuid>B<,> I<$string> B<)>
 
 Converts the binary UUID in I<$uuid> to string format and returns in
 I<$string>. The previous content of I<$string>, if any, is lost.
 
 The case of the hex digits returned may be upper or lower case, and is
-dependent on the system-dependent local default.
+dependent on the local system default.
 
 =head2 B<unparse_lower(> I<$uuid>B<,> I<$string> B<)>
 
@@ -141,56 +203,32 @@ Same as B<unparse()> but I<$string> is forced to lower case.
 
 Same as B<unparse()> but I<$string> is forced to upper case.
 
-=head2 B<$rc = parse(> I<$string>B<,> I<$uuid> B<)>
-
-Converts the string format UUID in I<$string> to binary and returns in
-I<$uuid>. The previous content of I<$uuid>, if any, is lost.
-
-Returns 0 on success and -1 on failure. Additionally on failure, the
-content of I<$uuid> is unchanged.
-
-=head2 B<clear(> I<$uuid> B<)>
-
-Sets I<$uuid> equal to the value of the NULL UUID.
-
-=head2 B<is_null(> I<$uuid> B<)>
-
-Compares the value of I<$uuid> to the NULL UUID.
-
-Returns 1 if NULL, and 0 otherwise.
-
-=head2 B<copy(> I<$dst>B<,> I<$src> B<)>
-
-Copies the binary I<$src> UUID to I<$dst>.
-
-If I<$src> isn't a UUID, I<$dst> is set to the NULL UUID.
-
-=head2 B<compare(> I<$uuid1>B<,> I<$uuid2> B<)>
-
-Compares two binary UUIDs.
-
-Returns an integer less than, equal to, or greater than zero if
-I<$uuid1> is less than, equal to, or greater than I<$uuid2>.
-
-However, if either operand is not a UUID, falls back to a simple string
-comparison returning similar values.
-
-=head2 B<>I<$string> B<= uuid()>
+=head2 B<uuid()>
 
 Creates a new string format UUID and returns it in a more Perlish way.
 
 Functionally the equivalent of calling B<generate()> and then B<unparse()>, but
 throwing away the intermediate binary UUID.
 
+=head2 B<variant(> I<$uuid> B<)>
+
+Returns the variant of binary I<$uuid>.
+
+This module only generates variant 1 UUIDs, but others may be found in
+the wild.
+
+Known variants:
+
+    0  NCS
+    1  DCE
+    2  Microsoft
+    3  Other
+
 =head1 UUID LIBRARY
 
-On some systems external packages will need to be installed first.
-Notably, uuid-dev, libuuid-devel, or uuid-devel, depending on your
-platform.
-
-Some may also have more than one package available. It should be safe to
-install all variations. The UUID installer will then opt towards the
-older, faster library.
+Prior to version 0.32, UUID required libuuid or similar be installed
+first. This is no longer the case. UUID now builds against a private
+copy of the e2fsprogs UUID code.
 
 =head1 EXPORTS
 
@@ -246,4 +284,3 @@ B<uuid_generate(3)>, B<uuid_is_null(3)>, B<uuid_parse(3)>,
 B<uuid_unparse(3)>, B<perl(1)>.
 
 =cut
-

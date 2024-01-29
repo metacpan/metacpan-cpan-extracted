@@ -299,34 +299,24 @@ ok(
       $client->_get( '/', cookie => "lemonldap=$id", accept => 'text/html' ),
     'Get Menu'
 );
+ok( $res->[2]->[0] =~ m%<span trspan="passwordPolicyMinSize"></span> 6%,
+    ' passwordPolicyMinSize' )
+  or print STDERR Dumper( $res->[2]->[0], 'passwordPolicyMinSize' );
+ok( $res->[2]->[0] =~ m%<span trspan="passwordPolicyMinLower"></span> 3%,
+    ' passwordPolicyMinLower' )
+  or print STDERR Dumper( $res->[2]->[0], 'passwordPolicyMinLower' );
+ok( $res->[2]->[0] =~ m%<span trspan="passwordPolicyMinUpper"></span> 3%,
+    ' passwordPolicyMinUpper' )
+  or print STDERR Dumper( $res->[2]->[0], 'passwordPolicyMinUpper' );
+ok( $res->[2]->[0] =~ m%<span trspan="passwordPolicyMinDigit"></span> 1%,
+    ' passwordPolicyMinDigit' )
+  or print STDERR Dumper( $res->[2]->[0], 'passwordPolicyMinDigit' );
+ok( $res->[2]->[0] =~ m%<span trspan="passwordPolicyMinSpeChar"></span> 2%,
+    ' passwordPolicyMinSpeChar' )
+  or print STDERR Dumper( $res->[2]->[0], 'passwordPolicyMinSpeChar' );
 ok(
     $res->[2]->[0] =~
-      m%<span trspan="passwordPolicyMinSize">Minimal size:</span> 6%,
-    ' passwordPolicyMinSize'
-) or print STDERR Dumper( $res->[2]->[0], 'passwordPolicyMinSize' );
-ok(
-    $res->[2]->[0] =~
-m%<span trspan="passwordPolicyMinLower">Minimal lower characters:</span> 3%,
-    ' passwordPolicyMinLower'
-) or print STDERR Dumper( $res->[2]->[0], 'passwordPolicyMinLower' );
-ok(
-    $res->[2]->[0] =~
-m%<span trspan="passwordPolicyMinUpper">Minimal upper characters:</span> 3%,
-    ' passwordPolicyMinUpper'
-) or print STDERR Dumper( $res->[2]->[0], 'passwordPolicyMinUpper' );
-ok(
-    $res->[2]->[0] =~
-m%<span trspan="passwordPolicyMinDigit">Minimal digit characters:</span> 1%,
-    ' passwordPolicyMinDigit'
-) or print STDERR Dumper( $res->[2]->[0], 'passwordPolicyMinDigit' );
-ok(
-    $res->[2]->[0] =~
-m%<span trspan="passwordPolicyMinSpeChar">Minimal special characters:</span> 2%,
-    ' passwordPolicyMinSpeChar'
-) or print STDERR Dumper( $res->[2]->[0], 'passwordPolicyMinSpeChar' );
-ok(
-    $res->[2]->[0] =~
-m%\Q<span trspan="passwordPolicySpecialChar">Allowed special characters:</span> &lt;space&gt; [ \ }%,
+      m%\Q<span trspan="passwordPolicySpecialChar"></span> &lt;space&gt; [ \ }%,
     ' passwordPolicySpecialChar'
 ) or print STDERR Dumper( $res->[2]->[0], 'passwordPolicySpecialChar' );
 ok( $res->[2]->[0] !~ m%class="fa fa-eye-slash toggle-password">%,

@@ -9,7 +9,6 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More;
 use Safe::Isa;
 use Feature::Compat::Try;
 use Path::Tiny;
@@ -74,6 +73,8 @@ sub acceptance_tests (%options) {
         if not $ENV{NO_SHORT_CIRCUIT}
           and ($result xor $result_short);
 
+      my $in_todo;
+
       # if any errors contain an exception, generate a warning so we can be sure
       # to count that as a failure (an exception would be caught and perhaps TODO'd).
       # (This might change if tests are added that are expected to produce exceptions.)
@@ -81,7 +82,8 @@ sub acceptance_tests (%options) {
         print STDERR 'evaluation generated an exception: '.$_->dump
           foreach
             grep +($_->{error} =~ /^EXCEPTION/
-                && $_->{error} !~ /(max|min)imum value is not a number$/),  # optional/bignum.json
+                && $_->{error} !~ /(max|min)imum value is not a number$/)   # optional/bignum.json
+                && !($in_todo //= grep $_->{todo}, Test2::API::test2_stack->top->{_pre_filters}->@*),
               $r->errors;
       }
 

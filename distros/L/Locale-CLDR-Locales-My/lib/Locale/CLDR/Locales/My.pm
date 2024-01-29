@@ -8,13 +8,13 @@ Locale::CLDR::Locales::My - Package for language Burmese
 
 package Locale::CLDR::Locales::My;
 # This file auto generated from Data\common\main\my.xml
-#	on Tue  5 Dec  1:22:39 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -25,19 +25,19 @@ use Moo;
 
 extends('Locale::CLDR::Locales::Root');
 has 'valid_algorithmic_formats' => (
-	is => 'ro',
-	isa => ArrayRef,
-	init_arg => undef,
-	default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal','spellout-ordinal' ]},
+    is => 'ro',
+    isa => ArrayRef,
+    init_arg => undef,
+    default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal','spellout-ordinal' ]},
 );
 
 has 'algorithmic_number_format_data' => (
-	is => 'ro',
-	isa => HashRef,
-	init_arg => undef,
-	default => sub { 
-		use bigfloat;
-		return {
+    is => 'ro',
+    isa => HashRef,
+    init_arg => undef,
+    default => sub {
+        use bigfloat;
+        return {
 		'spellout-cardinal' => {
 			'public' => {
 				'-x' => {
@@ -278,7 +278,7 @@ has 'algorithmic_number_format_data' => (
 				},
 			},
 		},
-	} },
+    } },
 );
 
 # Need to add code for Key type pattern
@@ -287,7 +287,7 @@ sub display_name_pattern {
 
 	my $display_pattern = '{0} ({1})';
 	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}၊ {1}', grep {$_} (
+	my $subtags = join '{0}// {1}', grep {$_} (
 		$region,
 		$script,
 		$variant,
@@ -301,7 +301,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'aa' => 'အာဖာ',
@@ -320,11 +320,12 @@ has 'display_name_language' => (
  				'ang' => 'အင်ဂလို ဆက္ကစွန်',
  				'anp' => 'အန်ဂီကာ',
  				'ar' => 'အာရဗီ',
+ 				'ar_001' => 'ခေတ်သစ် ရှေ့ဆောင် အာရဗီ',
  				'arn' => 'မာပုချီ',
  				'arp' => 'အာရာပါဟို',
  				'as' => 'အာသံ',
  				'asa' => 'အာစု',
- 				'ast' => 'အက်စတူရီယန်း',
+ 				'ast' => 'အက်စ်တိုးရီးယား',
  				'av' => 'အာဗာရစ်ခ်',
  				'awa' => 'အာဝါဒီ',
  				'ay' => 'အိုင်မာရ',
@@ -351,6 +352,7 @@ has 'display_name_language' => (
  				'bug' => 'ဘူဂစ်စ်',
  				'byn' => 'ဘလင်',
  				'ca' => 'ကတ်တလန်',
+ 				'ccp' => 'ချတ်ခ်မာ',
  				'ce' => 'ချက်ချန်း',
  				'ceb' => 'စီဗူအာနို',
  				'cgg' => 'ချီဂါ',
@@ -360,7 +362,9 @@ has 'display_name_language' => (
  				'cho' => 'ချော့တို',
  				'chr' => 'ချာရိုကီ',
  				'chy' => 'ချေယန်း',
- 				'ckb' => 'ဆိုရာနီ',
+ 				'ckb' => 'ဗဟိုဒေသသုံး ကဒ်ဘာသာ',
+ 				'ckb@alt=menu' => 'ကဒ် ဗဟို',
+ 				'ckb@alt=variant' => 'ကဒ် ဆိုရာနီ',
  				'co' => 'ခိုစီကန်',
  				'cr' => 'ခရီး',
  				'crs' => 'ခရီအိုလီ',
@@ -378,6 +382,7 @@ has 'display_name_language' => (
  				'del' => 'ဒယ်လာဝဲလ်',
  				'dgr' => 'ဒေါ့ဂ်ရစ်ဘ်',
  				'dje' => 'ဇာမာ',
+ 				'doi' => 'ဒိုဂရီ',
  				'dsb' => 'အနိမ့် ဆိုဘီယန်း',
  				'dua' => 'ဒူအလာ',
  				'dum' => 'အလယ်ပိုင်း ဒတ်ချ်',
@@ -392,7 +397,7 @@ has 'display_name_language' => (
  				'eka' => 'အီကာဂျုခ်',
  				'el' => 'ဂရိ',
  				'en' => 'အင်္ဂလိပ်',
- 				'en_AU' => 'ဩစတြေးလျှ အင်္ဂလိပ်',
+ 				'en_AU' => 'ဩစတြေးလျ အင်္ဂလိပ်',
  				'en_CA' => 'ကနေဒါ အင်္ဂလိပ်',
  				'en_GB' => 'ဗြိတိသျှ အင်္ဂလိပ်',
  				'en_GB@alt=short' => 'ယူကေ အင်္ဂလိပ်',
@@ -402,10 +407,12 @@ has 'display_name_language' => (
  				'eo' => 'အက်စ်ပရန်တို',
  				'es' => 'စပိန်',
  				'es_ES' => 'စပိန် (ဥရောပ)',
+ 				'es_MX' => 'စပိန် (မက္ကဆီကို)',
  				'et' => 'အက်စ်တိုးနီးယား',
  				'eu' => 'ဘာစ်ခ်',
  				'ewo' => 'အီဝန်ဒို',
  				'fa' => 'ပါရှန်',
+ 				'fa_AF' => 'ဒါရီ',
  				'ff' => 'ဖူလာ',
  				'fi' => 'ဖင်လန်',
  				'fil' => 'ဖိလစ်ပိုင်',
@@ -610,12 +617,12 @@ has 'display_name_language' => (
  				'quc' => 'ကီခ်အီချီ',
  				'rap' => 'ရပန်နူအီ',
  				'rar' => 'ရရိုတွန်ဂန်',
+ 				'rhg' => 'ရိုဟင်ဂျာ',
  				'rm' => 'ရောမ',
  				'rn' => 'ရွန်ဒီ',
  				'ro' => 'ရိုမေနီယား',
  				'ro_MD' => 'မော်လဒိုဗာ',
  				'rof' => 'ရွမ်ဘို',
- 				'root' => 'မူလရင်းမြစ်',
  				'ru' => 'ရုရှ',
  				'rup' => 'အာရိုမန်းနီးယန်း',
  				'rw' => 'ကင်ရာဝန်ဒါ',
@@ -711,9 +718,13 @@ has 'display_name_language' => (
  				'ybb' => 'ရမ်ဘာ',
  				'yi' => 'ဂျူး',
  				'yo' => 'ယိုရူဘာ',
- 				'yue' => 'ကွမ်တုံ',
+ 				'yue' => 'ကွမ်းတုံ',
+ 				'yue@alt=menu' => 'တရုတ်/ ကွမ်းတုံ',
  				'zgh' => 'မိုရိုကို တမဇိုက်',
  				'zh' => 'တရုတ်',
+ 				'zh@alt=menu' => 'ပြည်ကြီးတရုတ်',
+ 				'zh_Hans@alt=long' => 'ပြည်ကြီးတရုတ် (ရိုးရှင်း)',
+ 				'zh_Hant@alt=long' => 'ပြည်ကြီးတရုတ် (ရိုးရာ)',
  				'zu' => 'ဇူးလူး',
  				'zun' => 'ဇူနီ',
  				'zxx' => 'ဘာသာစကားနှင့် ပတ်သက်သောအရာ မရှိပါ',
@@ -803,7 +814,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'ကမ္ဘာ',
  			'002' => 'အာဖရိက',
@@ -982,7 +993,7 @@ has 'display_name_region' => (
  			'LK' => 'သီရိလင်္ကာ',
  			'LR' => 'လိုက်ဘေးရီးယား',
  			'LS' => 'လီဆိုသို',
- 			'LT' => 'လစ်သူယေးနီးယား',
+ 			'LT' => 'လစ်သူဝေးနီးယား',
  			'LU' => 'လူဇင်ဘတ်',
  			'LV' => 'လတ်ဗီးယား',
  			'LY' => 'လစ်ဗျား',
@@ -993,8 +1004,7 @@ has 'display_name_region' => (
  			'MF' => 'စိန့်မာတင်',
  			'MG' => 'မဒါဂတ်စကား',
  			'MH' => 'မာရှယ် ကျွန်းစု',
- 			'MK' => 'မက်ဆီဒိုးနီးယား',
- 			'MK@alt=variant' => 'မက်ဆီဒိုးနီးယား (ယခင် ယူဂိုစလားဗီးယား မက်ဆီဒိုးနီးယားပြည်ထောင်စု)',
+ 			'MK' => 'မြောက် မက်ဆီဒိုးနီးယား',
  			'ML' => 'မာလီ',
  			'MM' => 'မြန်မာ',
  			'MN' => 'မွန်ဂိုးလီးယား',
@@ -1088,7 +1098,6 @@ has 'display_name_region' => (
  			'UG' => 'ယူဂန်းဒါး',
  			'UM' => 'ယူနိုက်တက်စတိတ် ကျွန်းနိုင်ငံများ',
  			'UN' => 'ကုလသမဂ္ဂ',
- 			'UN@alt=short' => 'ကုလသမဂ္ဂ',
  			'US' => 'အမေရိကန် ပြည်ထောင်စု',
  			'US@alt=short' => 'ယူအက်စ်',
  			'UY' => 'ဥရုဂွေး',
@@ -1102,6 +1111,8 @@ has 'display_name_region' => (
  			'VU' => 'ဗနွားတူ',
  			'WF' => 'ဝေါလစ်နှင့် ဖူကျူးနား',
  			'WS' => 'ဆမိုးအား',
+ 			'XA' => 'နိုင်ငံခြားသံ',
+ 			'XB' => 'စာပြောင်းပြန်',
  			'XK' => 'ကိုဆိုဗို',
  			'YE' => 'ယီမင်',
  			'YT' => 'မေယော့',
@@ -1118,7 +1129,7 @@ has 'display_name_variant' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'1901' => 'ရှေးရိုးစဉ်လာ ဂျာမန် ရေးထုံး',
  			'1996' => '၁၉၉၆ ဂျာမန် ရေးထုံး',
@@ -1140,7 +1151,7 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'calendar' => 'ပြက္ခဒိန်',
  			'cf' => 'ငွေရေတွက်ပုံစနစ်',
@@ -1248,7 +1259,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{မက်ထရစ်စနစ်},
  			'UK' => q{ဗြိတိန်စနစ်},
@@ -1262,7 +1273,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'ဘာသာစကား - {0}',
  			'script' => 'စာ - {0}',
@@ -1281,10 +1292,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{[၀႐ ၁႑ ၂႒ ၃႓ ၄႔ ၅႕ ၆႖ ၇႗ ၈႘ ၉႙ ၵ ၚ ၽ ၾ ၐ ၑ ၥ ဨ ဢ ၒ ၓ ၔ ၕ ဳ ၖ ၗ ၘ ၙ ဴ ၢ ႆ ၤ ႈ ႊ ႏ]},
+			auxiliary => qr{[၀႐ ၁႑ ၂႒ ၃႓ ၄႔ ၅႕ ၆႖ ၇႗ ၈႘ ၉႙ ၵ ၚ ၽ ၾ ၐ ၑ ၥ ဨ ဢ ၒ ၓ ၔ ၕ ဳ ၖ ၗ ၘ ၙ ႆ ဴ ၢ ၤ ႈ ႊ ႏ]},
 			index => ['က', 'ခ', 'ဂ', 'ဃ', 'င', 'စ', 'ဆ', 'ဇ', 'ဈ', 'ဉ', 'ည', 'ဋ', 'ဌ', 'ဍ', 'ဎ', 'ဏ', 'တ', 'ထ', 'ဒ', 'ဓ', 'န', 'ပ', 'ဖ', 'ဗ', 'ဘ', 'မ', 'ယ', 'ရ', 'လ', 'ဝ', 'သ', 'ဟ', 'ဠ', 'အ'],
 			main => qr{[က ခ ဂ ဃ င စ ဆ ဇ ဈ ဉ ည ဋ ဌ ဍ ဎ ဏ တ ထ ဒ ဓ န ပ ဖ ဗ ဘ မ ယ ရ လ ဝ သ ဟ ဠ အ ဣ ၏ ဤ ဥ ဦ ဧ ဩ ဪ ာ ါ ိ ီ ု ူ ေ ဲ ံ ဿ ျ ြ ွ ှ ္ ် ့ း]},
-			numbers => qr{[\- , . % ‰ + 0၀ 1၁ 2၂ 3၃ 4၄ 5၅ 6၆ 7၇ 8၈ 9၉]},
+			numbers => qr{[\- ‑ , . % ‰ + 0၀ 1၁ 2၂ 3၃ 4၄ 5၅ 6၆ 7၇ 8၈ 9၉]},
 			punctuation => qr{[၊ ။ ‘ ’ “ ”]},
 		};
 	},
@@ -1363,1340 +1374,4503 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
 					'' => {
 						'name' => q(အရပ် လေးမျက်နှာ),
 					},
-					'acre' => {
-						'name' => q(ဧက),
-						'other' => q({0} ဧက),
+					# Core Unit Identifier
+					'' => {
+						'name' => q(အရပ် လေးမျက်နှာ),
 					},
-					'acre-foot' => {
-						'name' => q(ဧက-ပေ),
-						'other' => q({0} ဧက-ပေ),
+					# Long Unit Identifier
+					'1024p1' => {
+						'1' => q(ကီဘီ{0}),
 					},
-					'ampere' => {
-						'name' => q(အမ်ပီယာ),
-						'other' => q({0} အမ်ပီယာ),
+					# Core Unit Identifier
+					'1024p1' => {
+						'1' => q(ကီဘီ{0}),
 					},
+					# Long Unit Identifier
+					'1024p2' => {
+						'1' => q(မက်ဘီ{0}),
+					},
+					# Core Unit Identifier
+					'1024p2' => {
+						'1' => q(မက်ဘီ{0}),
+					},
+					# Long Unit Identifier
+					'1024p3' => {
+						'1' => q(ဂီဘီ{0}),
+					},
+					# Core Unit Identifier
+					'1024p3' => {
+						'1' => q(ဂီဘီ{0}),
+					},
+					# Long Unit Identifier
+					'1024p4' => {
+						'1' => q(တယ်ဘီ{0}),
+					},
+					# Core Unit Identifier
+					'1024p4' => {
+						'1' => q(တယ်ဘီ{0}),
+					},
+					# Long Unit Identifier
+					'1024p5' => {
+						'1' => q(ပယ်ဘီ{0}),
+					},
+					# Core Unit Identifier
+					'1024p5' => {
+						'1' => q(ပယ်ဘီ{0}),
+					},
+					# Long Unit Identifier
+					'1024p6' => {
+						'1' => q(အိတ်ဇ်ဘီ{0}),
+					},
+					# Core Unit Identifier
+					'1024p6' => {
+						'1' => q(အိတ်ဇ်ဘီ{0}),
+					},
+					# Long Unit Identifier
+					'1024p7' => {
+						'1' => q(ဇက်ဘီ{0}),
+					},
+					# Core Unit Identifier
+					'1024p7' => {
+						'1' => q(ဇက်ဘီ{0}),
+					},
+					# Long Unit Identifier
+					'1024p8' => {
+						'1' => q(ယိုဘီ{0}),
+					},
+					# Core Unit Identifier
+					'1024p8' => {
+						'1' => q(ယိုဘီ{0}),
+					},
+					# Long Unit Identifier
+					'10p-1' => {
+						'1' => q(ဒက်စီ{0}),
+					},
+					# Core Unit Identifier
+					'1' => {
+						'1' => q(ဒက်စီ{0}),
+					},
+					# Long Unit Identifier
+					'10p-12' => {
+						'1' => q(ပီကို{0}),
+					},
+					# Core Unit Identifier
+					'12' => {
+						'1' => q(ပီကို{0}),
+					},
+					# Long Unit Identifier
+					'10p-15' => {
+						'1' => q(ဖမ်တို{0}),
+					},
+					# Core Unit Identifier
+					'15' => {
+						'1' => q(ဖမ်တို{0}),
+					},
+					# Long Unit Identifier
+					'10p-18' => {
+						'1' => q(အက်တို{0}),
+					},
+					# Core Unit Identifier
+					'18' => {
+						'1' => q(အက်တို{0}),
+					},
+					# Long Unit Identifier
+					'10p-2' => {
+						'1' => q(စင်တီ{0}),
+					},
+					# Core Unit Identifier
+					'2' => {
+						'1' => q(စင်တီ{0}),
+					},
+					# Long Unit Identifier
+					'10p-21' => {
+						'1' => q(ဇက်ပ်တို{0}),
+					},
+					# Core Unit Identifier
+					'21' => {
+						'1' => q(ဇက်ပ်တို{0}),
+					},
+					# Long Unit Identifier
+					'10p-24' => {
+						'1' => q(ယောက်တို{0}),
+					},
+					# Core Unit Identifier
+					'24' => {
+						'1' => q(ယောက်တို{0}),
+					},
+					# Long Unit Identifier
+					'10p-3' => {
+						'1' => q(မီလီ{0}),
+					},
+					# Core Unit Identifier
+					'3' => {
+						'1' => q(မီလီ{0}),
+					},
+					# Long Unit Identifier
+					'10p-6' => {
+						'1' => q(မိုက်ခရို{0}),
+					},
+					# Core Unit Identifier
+					'6' => {
+						'1' => q(မိုက်ခရို{0}),
+					},
+					# Long Unit Identifier
+					'10p-9' => {
+						'1' => q(နာနို{0}),
+					},
+					# Core Unit Identifier
+					'9' => {
+						'1' => q(နာနို{0}),
+					},
+					# Long Unit Identifier
+					'10p1' => {
+						'1' => q(ဒက်ကာ{0}),
+					},
+					# Core Unit Identifier
+					'10p1' => {
+						'1' => q(ဒက်ကာ{0}),
+					},
+					# Long Unit Identifier
+					'10p12' => {
+						'1' => q(တယ်ရာ{0}),
+					},
+					# Core Unit Identifier
+					'10p12' => {
+						'1' => q(တယ်ရာ{0}),
+					},
+					# Long Unit Identifier
+					'10p15' => {
+						'1' => q(ပက်တာ{0}),
+					},
+					# Core Unit Identifier
+					'10p15' => {
+						'1' => q(ပက်တာ{0}),
+					},
+					# Long Unit Identifier
+					'10p18' => {
+						'1' => q(အိတ်စ်ဆာ{0}),
+					},
+					# Core Unit Identifier
+					'10p18' => {
+						'1' => q(အိတ်စ်ဆာ{0}),
+					},
+					# Long Unit Identifier
+					'10p2' => {
+						'1' => q(ဟက်တို{0}),
+					},
+					# Core Unit Identifier
+					'10p2' => {
+						'1' => q(ဟက်တို{0}),
+					},
+					# Long Unit Identifier
+					'10p21' => {
+						'1' => q(ဇက်တာ{0}),
+					},
+					# Core Unit Identifier
+					'10p21' => {
+						'1' => q(ဇက်တာ{0}),
+					},
+					# Long Unit Identifier
+					'10p24' => {
+						'1' => q(ယိုဒါ{0}),
+					},
+					# Core Unit Identifier
+					'10p24' => {
+						'1' => q(ယိုဒါ{0}),
+					},
+					# Long Unit Identifier
+					'10p3' => {
+						'1' => q(ကီလို{0}),
+					},
+					# Core Unit Identifier
+					'10p3' => {
+						'1' => q(ကီလို{0}),
+					},
+					# Long Unit Identifier
+					'10p6' => {
+						'1' => q(မီဂါ{0}),
+					},
+					# Core Unit Identifier
+					'10p6' => {
+						'1' => q(မီဂါ{0}),
+					},
+					# Long Unit Identifier
+					'10p9' => {
+						'1' => q(ဂီဂါ{0}),
+					},
+					# Core Unit Identifier
+					'10p9' => {
+						'1' => q(ဂီဂါ{0}),
+					},
+					# Long Unit Identifier
+					'acceleration-g-force' => {
+						'name' => q(ဆွဲငင်အား),
+						'other' => q({0} ဆွဲငင်အား),
+					},
+					# Core Unit Identifier
+					'g-force' => {
+						'name' => q(ဆွဲငင်အား),
+						'other' => q({0} ဆွဲငင်အား),
+					},
+					# Long Unit Identifier
+					'acceleration-meter-per-square-second' => {
+						'name' => q(မီတာ/စက္ကန့်နှစ်ထပ်ကိန်း),
+						'other' => q({0} မီတာ/စက္ကန့်နှစ်ထပ်ကိန်း),
+					},
+					# Core Unit Identifier
+					'meter-per-square-second' => {
+						'name' => q(မီတာ/စက္ကန့်နှစ်ထပ်ကိန်း),
+						'other' => q({0} မီတာ/စက္ကန့်နှစ်ထပ်ကိန်း),
+					},
+					# Long Unit Identifier
+					'angle-arc-minute' => {
+						'name' => q(မိနစ်),
+						'other' => q({0} မိနစ်),
+					},
+					# Core Unit Identifier
 					'arc-minute' => {
 						'name' => q(မိနစ်),
 						'other' => q({0} မိနစ်),
 					},
+					# Long Unit Identifier
+					'angle-arc-second' => {
+						'name' => q(စက္ကန့်),
+						'other' => q({0} စက္ကန့်),
+					},
+					# Core Unit Identifier
 					'arc-second' => {
 						'name' => q(စက္ကန့်),
 						'other' => q({0} စက္ကန့်),
 					},
-					'astronomical-unit' => {
-						'name' => q(နက်ခတ်တဗဒေယူနဈ),
-						'other' => q({0} နက်ခတ်တဗဒေယူနဈ),
+					# Long Unit Identifier
+					'angle-degree' => {
+						'name' => q(ဒီဂရီ),
+						'other' => q({0} ဒီဂရီ),
 					},
-					'atmosphere' => {
-						'name' => q(ကမ္ဘာ့လေထု),
-						'other' => q({0} ကမ္ဘာ့လေထု),
+					# Core Unit Identifier
+					'degree' => {
+						'name' => q(ဒီဂရီ),
+						'other' => q({0} ဒီဂရီ),
 					},
-					'bit' => {
-						'name' => q(ဘစ်),
-						'other' => q({0} ဘစ်),
+					# Long Unit Identifier
+					'angle-radian' => {
+						'name' => q(ရေဒီယဲန်း),
+						'other' => q({0} ရေဒီယဲန်း),
 					},
-					'byte' => {
-						'name' => q(ဘိုက်),
-						'other' => q({0} ဘိုက်),
+					# Core Unit Identifier
+					'radian' => {
+						'name' => q(ရေဒီယဲန်း),
+						'other' => q({0} ရေဒီယဲန်း),
 					},
-					'calorie' => {
-						'name' => q(ကယ်လိုရီ),
-						'other' => q({0} ကယ်လိုရီ),
+					# Long Unit Identifier
+					'angle-revolution' => {
+						'name' => q(လည်ပတ်ခြင်း),
+						'other' => q({0} လည်ပတ်ခြင်း),
 					},
-					'carat' => {
+					# Core Unit Identifier
+					'revolution' => {
+						'name' => q(လည်ပတ်ခြင်း),
+						'other' => q({0} လည်ပတ်ခြင်း),
+					},
+					# Long Unit Identifier
+					'area-acre' => {
+						'name' => q(ဧက),
+						'other' => q({0} ဧက),
+					},
+					# Core Unit Identifier
+					'acre' => {
+						'name' => q(ဧက),
+						'other' => q({0} ဧက),
+					},
+					# Long Unit Identifier
+					'area-dunam' => {
+						'name' => q(dunams),
+						'other' => q({0} dunam),
+					},
+					# Core Unit Identifier
+					'dunam' => {
+						'name' => q(dunams),
+						'other' => q({0} dunam),
+					},
+					# Long Unit Identifier
+					'area-hectare' => {
+						'name' => q(ဟက်တာ),
+						'other' => q({0} ဟက်တာ),
+					},
+					# Core Unit Identifier
+					'hectare' => {
+						'name' => q(ဟက်တာ),
+						'other' => q({0} ဟက်တာ),
+					},
+					# Long Unit Identifier
+					'area-square-centimeter' => {
+						'name' => q(စတုရန်းစင်တီမီတာ),
+						'other' => q({0} စတုရန်းစင်တီမီတာ),
+						'per' => q(တစ်စတုရန်းစင်တီမီတာလျှင် {0}),
+					},
+					# Core Unit Identifier
+					'square-centimeter' => {
+						'name' => q(စတုရန်းစင်တီမီတာ),
+						'other' => q({0} စတုရန်းစင်တီမီတာ),
+						'per' => q(တစ်စတုရန်းစင်တီမီတာလျှင် {0}),
+					},
+					# Long Unit Identifier
+					'area-square-foot' => {
+						'name' => q(စတုရန်းပေ),
+						'other' => q({0} စတုရန်းပေ),
+					},
+					# Core Unit Identifier
+					'square-foot' => {
+						'name' => q(စတုရန်းပေ),
+						'other' => q({0} စတုရန်းပေ),
+					},
+					# Long Unit Identifier
+					'area-square-inch' => {
+						'name' => q(စတုရန်းလက်မ),
+						'other' => q({0} စတုရန်းလက်မ),
+						'per' => q(တစ်စတုရန်းလက်မလျှင် {0}),
+					},
+					# Core Unit Identifier
+					'square-inch' => {
+						'name' => q(စတုရန်းလက်မ),
+						'other' => q({0} စတုရန်းလက်မ),
+						'per' => q(တစ်စတုရန်းလက်မလျှင် {0}),
+					},
+					# Long Unit Identifier
+					'area-square-kilometer' => {
+						'name' => q(စတုရန်းကီလိုမီတာ),
+						'other' => q({0} စတုရန်းကီလိုမီတာ),
+						'per' => q(တစ်စတုရန်းကီလိုမီတာလျှင် {0}),
+					},
+					# Core Unit Identifier
+					'square-kilometer' => {
+						'name' => q(စတုရန်းကီလိုမီတာ),
+						'other' => q({0} စတုရန်းကီလိုမီတာ),
+						'per' => q(တစ်စတုရန်းကီလိုမီတာလျှင် {0}),
+					},
+					# Long Unit Identifier
+					'area-square-meter' => {
+						'name' => q(စတုရန်းမီတာ),
+						'other' => q({0} စတုရန်းမီတာ),
+						'per' => q(တစ်စတုရန်းမီတာလျှင် {0}),
+					},
+					# Core Unit Identifier
+					'square-meter' => {
+						'name' => q(စတုရန်းမီတာ),
+						'other' => q({0} စတုရန်းမီတာ),
+						'per' => q(တစ်စတုရန်းမီတာလျှင် {0}),
+					},
+					# Long Unit Identifier
+					'area-square-mile' => {
+						'name' => q(စတုရန်းမိုင်),
+						'other' => q({0} စတုရန်းမိုင်),
+						'per' => q(တစ်စတုရန်းမိုင်လျှင် {0}),
+					},
+					# Core Unit Identifier
+					'square-mile' => {
+						'name' => q(စတုရန်းမိုင်),
+						'other' => q({0} စတုရန်းမိုင်),
+						'per' => q(တစ်စတုရန်းမိုင်လျှင် {0}),
+					},
+					# Long Unit Identifier
+					'area-square-yard' => {
+						'name' => q(စတုရန်းကိုက်),
+						'other' => q({0} စတုရန်းကိုက်),
+					},
+					# Core Unit Identifier
+					'square-yard' => {
+						'name' => q(စတုရန်းကိုက်),
+						'other' => q({0} စတုရန်းကိုက်),
+					},
+					# Long Unit Identifier
+					'concentr-karat' => {
 						'name' => q(ကာရက်),
 						'other' => q({0} ကာရက်),
 					},
-					'celsius' => {
-						'name' => q(ဒီဂရီ စင်တီဂရိတ်),
-						'other' => q({0} ဒီဂရီ စင်တီဂရိတ်),
+					# Core Unit Identifier
+					'karat' => {
+						'name' => q(ကာရက်),
+						'other' => q({0} ကာရက်),
 					},
-					'centiliter' => {
-						'name' => q(စင်တီလီတာ),
-						'other' => q({0} စင်တီလီတာ),
+					# Long Unit Identifier
+					'concentr-milligram-ofglucose-per-deciliter' => {
+						'name' => q(တစ်ဒက်စီလီတာရှိ မီလီဂရမ်),
+						'other' => q(တစ်ဒက်စီလီတာရှိ {0} မီလီဂရမ်),
 					},
-					'centimeter' => {
-						'name' => q(စင်တီမီတာ),
-						'other' => q({0} စင်တီမီတာ),
-						'per' => q(တစ်စင်တီမီလာလျှင် {0}),
+					# Core Unit Identifier
+					'milligram-ofglucose-per-deciliter' => {
+						'name' => q(တစ်ဒက်စီလီတာရှိ မီလီဂရမ်),
+						'other' => q(တစ်ဒက်စီလီတာရှိ {0} မီလီဂရမ်),
 					},
-					'century' => {
-						'name' => q(ရာစုနှစ်),
-						'other' => q({0} ရာစုနှစ်),
+					# Long Unit Identifier
+					'concentr-millimole-per-liter' => {
+						'name' => q(တစ်လီတာရှိ မီလီမိုးလ်),
+						'other' => q(တစ်လီတာရှိ {0} မီလီမိုးလ်),
 					},
+					# Core Unit Identifier
+					'millimole-per-liter' => {
+						'name' => q(တစ်လီတာရှိ မီလီမိုးလ်),
+						'other' => q(တစ်လီတာရှိ {0} မီလီမိုးလ်),
+					},
+					# Long Unit Identifier
+					'concentr-mole' => {
+						'name' => q(mol),
+						'other' => q({0} mol),
+					},
+					# Core Unit Identifier
+					'mole' => {
+						'name' => q(mol),
+						'other' => q({0} mol),
+					},
+					# Long Unit Identifier
+					'concentr-percent' => {
+						'name' => q(ရာခိုင်နှုန်း),
+						'other' => q({0} ရာခိုင်နှုန်း),
+					},
+					# Core Unit Identifier
+					'percent' => {
+						'name' => q(ရာခိုင်နှုန်း),
+						'other' => q({0} ရာခိုင်နှုန်း),
+					},
+					# Long Unit Identifier
+					'concentr-permille' => {
+						'name' => q(ထောင်လီစိတ်),
+						'other' => q({0} ထောင်လီစိတ်),
+					},
+					# Core Unit Identifier
+					'permille' => {
+						'name' => q(ထောင်လီစိတ်),
+						'other' => q({0} ထောင်လီစိတ်),
+					},
+					# Long Unit Identifier
+					'concentr-permillion' => {
+						'name' => q(တစ်သန်းပုံ တစ်ပုံ),
+						'other' => q(တစ်သန်းပုံ {0} ပုံ),
+					},
+					# Core Unit Identifier
+					'permillion' => {
+						'name' => q(တစ်သန်းပုံ တစ်ပုံ),
+						'other' => q(တစ်သန်းပုံ {0} ပုံ),
+					},
+					# Long Unit Identifier
+					'concentr-permyriad' => {
+						'name' => q(ပါမီရိတ်),
+						'other' => q({0} ပါမီရိတ်),
+					},
+					# Core Unit Identifier
+					'permyriad' => {
+						'name' => q(ပါမီရိတ်),
+						'other' => q({0} ပါမီရိတ်),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-100-kilometer' => {
+						'name' => q(တစ်ရာကီလိုမီတာရှိ လီတာ),
+						'other' => q(တစ်ရာကီလိုမီတာရှိ {0} လီတာ),
+					},
+					# Core Unit Identifier
+					'liter-per-100-kilometer' => {
+						'name' => q(တစ်ရာကီလိုမီတာရှိ လီတာ),
+						'other' => q(တစ်ရာကီလိုမီတာရှိ {0} လီတာ),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-kilometer' => {
+						'name' => q(တစ်ကီလိုမီတာရှိ လီတာ),
+						'other' => q(တစ်ကီလိုမီတာရှိ {0} လီတာ),
+					},
+					# Core Unit Identifier
+					'liter-per-kilometer' => {
+						'name' => q(တစ်ကီလိုမီတာရှိ လီတာ),
+						'other' => q(တစ်ကီလိုမီတာရှိ {0} လီတာ),
+					},
+					# Long Unit Identifier
+					'consumption-mile-per-gallon' => {
+						'name' => q(တစ်ဂါလံ မိုင်နှုန်း),
+						'other' => q(တစ်ဂါလံလျှင် {0} မိုင်),
+					},
+					# Core Unit Identifier
+					'mile-per-gallon' => {
+						'name' => q(တစ်ဂါလံ မိုင်နှုန်း),
+						'other' => q(တစ်ဂါလံလျှင် {0} မိုင်),
+					},
+					# Long Unit Identifier
+					'consumption-mile-per-gallon-imperial' => {
+						'name' => q(ယူကေတစ်ဂါလံ မိုင်နှုန်း),
+						'other' => q(ယူကေတစ်ဂါလံလျှင် {0} မိုင်),
+					},
+					# Core Unit Identifier
+					'mile-per-gallon-imperial' => {
+						'name' => q(ယူကေတစ်ဂါလံ မိုင်နှုန်း),
+						'other' => q(ယူကေတစ်ဂါလံလျှင် {0} မိုင်),
+					},
+					# Long Unit Identifier
 					'coordinate' => {
 						'east' => q({0} အရှေ့),
 						'north' => q({0} မြောက်),
 						'south' => q({0} တောင်),
 						'west' => q({0} အနောက်),
 					},
-					'cubic-centimeter' => {
-						'name' => q(ကုဗစင်တီမီတာ),
-						'other' => q({0} ကုဗစင်တီမီတာ),
-						'per' => q(တစ်ကုဗစင်တီမီတာလျှင် {0}),
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0} အရှေ့),
+						'north' => q({0} မြောက်),
+						'south' => q({0} တောင်),
+						'west' => q({0} အနောက်),
 					},
-					'cubic-foot' => {
-						'name' => q(ကုဗပေ),
-						'other' => q({0} ကုဗပေ),
+					# Long Unit Identifier
+					'digital-bit' => {
+						'name' => q(ဘစ်),
+						'other' => q({0} ဘစ်),
 					},
-					'cubic-inch' => {
-						'name' => q(ကုဗလက်မ),
-						'other' => q({0} ကုဗလက်မ),
+					# Core Unit Identifier
+					'bit' => {
+						'name' => q(ဘစ်),
+						'other' => q({0} ဘစ်),
 					},
-					'cubic-kilometer' => {
-						'name' => q(ကုဗကီလိုမီတာ),
-						'other' => q({0} ကုဗကီလိုမီတာ),
+					# Long Unit Identifier
+					'digital-byte' => {
+						'name' => q(ဘိုက်),
+						'other' => q({0} ဘိုက်),
 					},
-					'cubic-meter' => {
-						'name' => q(ကုဗမီတာ),
-						'other' => q({0} ကုဗမီတာ),
-						'per' => q(တစ်ကုဗမီတာလျှင် {0}),
+					# Core Unit Identifier
+					'byte' => {
+						'name' => q(ဘိုက်),
+						'other' => q({0} ဘိုက်),
 					},
-					'cubic-mile' => {
-						'name' => q(ကုဗမိုင်),
-						'other' => q({0} ကုဗမိုင်),
+					# Long Unit Identifier
+					'digital-gigabit' => {
+						'name' => q(ဂစ်ဂါဘစ်),
+						'other' => q({0} ဂစ်ဂါဘစ်),
 					},
-					'cubic-yard' => {
-						'name' => q(ကုဗကိုက်),
-						'other' => q({0} ကုဗကိုက်),
+					# Core Unit Identifier
+					'gigabit' => {
+						'name' => q(ဂစ်ဂါဘစ်),
+						'other' => q({0} ဂစ်ဂါဘစ်),
 					},
-					'cup' => {
-						'name' => q(ခွက်),
-						'other' => q({0} ခွက်),
+					# Long Unit Identifier
+					'digital-gigabyte' => {
+						'name' => q(ဂစ်ဂါဘိုက်),
+						'other' => q({0} ဂစ်ဂါဘိုက်),
 					},
-					'cup-metric' => {
-						'name' => q(မထ္ထရစ် ခွက်),
-						'other' => q({0} မထ္ထရစ် ခွက်),
+					# Core Unit Identifier
+					'gigabyte' => {
+						'name' => q(ဂစ်ဂါဘိုက်),
+						'other' => q({0} ဂစ်ဂါဘိုက်),
 					},
+					# Long Unit Identifier
+					'digital-kilobit' => {
+						'name' => q(ကီလိုဘစ်),
+						'other' => q({0} ကီလိုဘစ်),
+					},
+					# Core Unit Identifier
+					'kilobit' => {
+						'name' => q(ကီလိုဘစ်),
+						'other' => q({0} ကီလိုဘစ်),
+					},
+					# Long Unit Identifier
+					'digital-kilobyte' => {
+						'name' => q(ကီလိုဘိုက်),
+						'other' => q({0} ကီလိုဘိုက်),
+					},
+					# Core Unit Identifier
+					'kilobyte' => {
+						'name' => q(ကီလိုဘိုက်),
+						'other' => q({0} ကီလိုဘိုက်),
+					},
+					# Long Unit Identifier
+					'digital-megabit' => {
+						'name' => q(မီဂါဘစ်),
+						'other' => q({0} မီဂါဘစ်),
+					},
+					# Core Unit Identifier
+					'megabit' => {
+						'name' => q(မီဂါဘစ်),
+						'other' => q({0} မီဂါဘစ်),
+					},
+					# Long Unit Identifier
+					'digital-megabyte' => {
+						'name' => q(မီဂါဘိုက်),
+						'other' => q({0} မီဂါဘိုက်),
+					},
+					# Core Unit Identifier
+					'megabyte' => {
+						'name' => q(မီဂါဘိုက်),
+						'other' => q({0} မီဂါဘိုက်),
+					},
+					# Long Unit Identifier
+					'digital-petabyte' => {
+						'name' => q(ပက်တာဘိုက်),
+						'other' => q({0} ပက်တာဘိုက်),
+					},
+					# Core Unit Identifier
+					'petabyte' => {
+						'name' => q(ပက်တာဘိုက်),
+						'other' => q({0} ပက်တာဘိုက်),
+					},
+					# Long Unit Identifier
+					'digital-terabit' => {
+						'name' => q(တယ်ရာဘစ်),
+						'other' => q({0} တယ်ရာဘစ်),
+					},
+					# Core Unit Identifier
+					'terabit' => {
+						'name' => q(တယ်ရာဘစ်),
+						'other' => q({0} တယ်ရာဘစ်),
+					},
+					# Long Unit Identifier
+					'digital-terabyte' => {
+						'name' => q(တယ်ရာဘိုက်),
+						'other' => q({0} တယ်ရာဘိုက်),
+					},
+					# Core Unit Identifier
+					'terabyte' => {
+						'name' => q(တယ်ရာဘိုက်),
+						'other' => q({0} တယ်ရာဘိုက်),
+					},
+					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(ရာစုနှစ်),
+						'other' => q({0} ရာစုနှစ်),
+					},
+					# Core Unit Identifier
+					'century' => {
+						'name' => q(ရာစုနှစ်),
+						'other' => q({0} ရာစုနှစ်),
+					},
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(ရက်),
+						'other' => q({0} ရက်),
+						'per' => q(တစ်ရက်လျှင် {0}),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(ရက်),
 						'other' => q({0} ရက်),
 						'per' => q(တစ်ရက်လျှင် {0}),
 					},
-					'deciliter' => {
-						'name' => q(ဒက်စီလီတာ),
-						'other' => q({0} ဒက်စီလီတာ),
+					# Long Unit Identifier
+					'duration-decade' => {
+						'name' => q(ဆယ်စုနှစ်),
+						'other' => q({0} ဆယ်စုနှစ်),
 					},
-					'decimeter' => {
-						'name' => q(ဒက်စီမီတာ),
-						'other' => q({0} ဒက်စီမီတာ),
+					# Core Unit Identifier
+					'decade' => {
+						'name' => q(ဆယ်စုနှစ်),
+						'other' => q({0} ဆယ်စုနှစ်),
 					},
-					'degree' => {
-						'name' => q(ဒီဂရီ),
-						'other' => q({0} ဒီဂရီ),
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(နာရီ),
+						'other' => q({0} နာရီ),
+						'per' => q(တစ်နာရီလျှင် {0}),
 					},
-					'fahrenheit' => {
-						'name' => q(ဒီဂရီ ဖာရင်ဟိုက်),
-						'other' => q({0} ဒီဂရီ ဖာရင်ဟိုက်),
-					},
-					'fluid-ounce' => {
-						'name' => q(အရည်အောင်စ),
-						'other' => q({0} အရည်အောင်စ),
-					},
-					'foodcalorie' => {
-						'name' => q(ကယ်လိုရီ),
-						'other' => q({0} ကယ်လိုရီ),
-					},
-					'foot' => {
-						'name' => q(ပေ),
-						'other' => q({0} ပေ),
-						'per' => q(တစ်ပေလျှင် {0}),
-					},
-					'g-force' => {
-						'name' => q(ဆွဲငင်အား),
-						'other' => q({0} ဆွဲငင်အား),
-					},
-					'gallon' => {
-						'name' => q(ဂါလံ),
-						'other' => q({0} ဂါလံ),
-						'per' => q(တစ်ဂါလံလျှင် {0}),
-					},
-					'gallon-imperial' => {
-						'name' => q(ယူကေ ဂါလံ),
-						'other' => q({0} ယူကေ ဂါလံ),
-						'per' => q(တစ် ယူကေ ဂါလံလျှင် {0}),
-					},
-					'generic' => {
-						'name' => q(°),
-						'other' => q({0}°),
-					},
-					'gigabit' => {
-						'name' => q(ဂစ်ဂါဘစ်),
-						'other' => q({0} ဂစ်ဂါဘစ်),
-					},
-					'gigabyte' => {
-						'name' => q(ဂစ်ဂါဘိုက်),
-						'other' => q({0} ဂစ်ဂါဘိုက်),
-					},
-					'gigahertz' => {
-						'name' => q(ဂီဂါဟတ်ဇ်),
-						'other' => q({0} ဂီဂါဟတ်ဇ်),
-					},
-					'gigawatt' => {
-						'name' => q(ဂစ်ဂါဝပ်),
-						'other' => q({0} ဂစ်ဂါဝပ်),
-					},
-					'gram' => {
-						'name' => q(ဂရမ်),
-						'other' => q({0} ဂရမ်),
-						'per' => q(တစ်ဂရမ်လျှင် {0}),
-					},
-					'hectare' => {
-						'name' => q(ဟက်တာ),
-						'other' => q({0} ဟက်တာ),
-					},
-					'hectoliter' => {
-						'name' => q(ဟက်တိုလီတာ),
-						'other' => q({0} ဟက်တိုမီတာ),
-					},
-					'hectopascal' => {
-						'name' => q(ဟက်တိုပါစကယ်),
-						'other' => q({0} ဟက်တိုပါစကယ်),
-					},
-					'hertz' => {
-						'name' => q(ဟတ်ဇ်),
-						'other' => q({0} ဟတ်ဇ်),
-					},
-					'horsepower' => {
-						'name' => q(မြင်းကောင်ရေအား),
-						'other' => q({0} မြင်းကောင်ရေအား),
-					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(နာရီ),
 						'other' => q({0} နာရီ),
 						'per' => q(တစ်နာရီလျှင် {0}),
 					},
-					'inch' => {
-						'name' => q(လက်မ),
-						'other' => q({0} လက်မ),
-						'per' => q(တစ်လက်မလျှင် {0}),
+					# Long Unit Identifier
+					'duration-microsecond' => {
+						'name' => q(မိုက်ခရိုစက္ကန့်),
+						'other' => q({0} မိုက်ခရိုစက္ကန့်),
 					},
-					'inch-hg' => {
-						'name' => q(ပြဒါးလက်မ),
-						'other' => q({0} ပြဒါးလက်မ),
-					},
-					'joule' => {
-						'name' => q(ဂျူးလ်),
-						'other' => q({0} ဂျူးလ်),
-					},
-					'karat' => {
-						'name' => q(ကာရက်),
-						'other' => q({0} ကာရက်),
-					},
-					'kelvin' => {
-						'name' => q(ကယ်လ်ဗင်),
-						'other' => q({0} ကယ်လ်ဗင်),
-					},
-					'kilobit' => {
-						'name' => q(ကီလိုဘစ်),
-						'other' => q({0} ကီလိုဘစ်),
-					},
-					'kilobyte' => {
-						'name' => q(ကီလိုဘိုက်),
-						'other' => q({0} ကီလိုဘိုက်),
-					},
-					'kilocalorie' => {
-						'name' => q(ကီလိုကယ်လိုရီ),
-						'other' => q({0} ကီလိုကယ်လိုရီ),
-					},
-					'kilogram' => {
-						'name' => q(ကီလိုဂရမ်),
-						'other' => q({0} ကီလိုဂရမ်),
-						'per' => q(တစ်ကီလိုဂရမ်လျှင် {0}),
-					},
-					'kilohertz' => {
-						'name' => q(ကီလိုဟတ်ဇ်),
-						'other' => q({0} ကီလိုဟတ်ဇ်),
-					},
-					'kilojoule' => {
-						'name' => q(ကီလိုဂျူးလ်),
-						'other' => q({0} ကီလိုဂျူးလ်),
-					},
-					'kilometer' => {
-						'name' => q(ကီလိုမီတာ),
-						'other' => q({0} ကီလိုမီတာ),
-						'per' => q(တစ်ကီလိုမီတာလျှင် {0}),
-					},
-					'kilometer-per-hour' => {
-						'name' => q(ကီလိုမီတာ/နာရီ),
-						'other' => q(တစ်နာရီလျှင် {0} ကီလိုမီတာ),
-					},
-					'kilowatt' => {
-						'name' => q(ကီလိုဝပ်),
-						'other' => q({0} ကီလိုဝပ်),
-					},
-					'kilowatt-hour' => {
-						'name' => q(ကီလိုဝပ်-နာရီ),
-						'other' => q({0} ကီလိုဝပ်-နာရီ),
-					},
-					'knot' => {
-						'name' => q(နော့တီကယ်မိုင်),
-						'other' => q({0} နော့တီကယ်မိုင်),
-					},
-					'light-year' => {
-						'name' => q(အလင်းနှစ်),
-						'other' => q({0} အလင်းနှစ်),
-					},
-					'liter' => {
-						'name' => q(လီတာ),
-						'other' => q({0} လီတာ),
-						'per' => q(တစ်လီတာလျှင် {0}),
-					},
-					'liter-per-100kilometers' => {
-						'name' => q(တစ်ရာကီလိုမီတာရှိ လီတာ),
-						'other' => q(တစ်ရာကီလိုမီတာရှိ {0} လီတာ),
-					},
-					'liter-per-kilometer' => {
-						'name' => q(တစ်ကီလိုမီတာရှိ လီတာ),
-						'other' => q(တစ်ကီလိုမီတာရှိ {0} လီတာ),
-					},
-					'lux' => {
-						'name' => q(လတ်ခ်),
-						'other' => q({0} လတ်ခ်),
-					},
-					'megabit' => {
-						'name' => q(မီဂါဘစ်),
-						'other' => q({0} မီဂါဘစ်),
-					},
-					'megabyte' => {
-						'name' => q(မီဂါဘိုက်),
-						'other' => q({0} မီဂါဘိုက်),
-					},
-					'megahertz' => {
-						'name' => q(မီဂါဟတ်ဇ်),
-						'other' => q({0} မီဂါဟတ်ဇ်),
-					},
-					'megaliter' => {
-						'name' => q(မီဂါလီတာ),
-						'other' => q({0} မီဂါလီတာ),
-					},
-					'megawatt' => {
-						'name' => q(မီဂါဝပ်),
-						'other' => q({0} မီဂါဝပ်),
-					},
-					'meter' => {
-						'name' => q(မီတာ),
-						'other' => q({0} မီတာ),
-						'per' => q(တစ်မီတာလျှင် {0}),
-					},
-					'meter-per-second' => {
-						'name' => q(မီတာ/စက္ကန့်),
-						'other' => q(တစ်စက္ကန့်လျှင် {0} မီတာ),
-					},
-					'meter-per-second-squared' => {
-						'name' => q(မီတာ/စက္ကန့်နှစ်ထပ်ကိန်း),
-						'other' => q({0} မီတာ/စက္ကန့်နှစ်ထပ်ကိန်း),
-					},
-					'metric-ton' => {
-						'name' => q(မက်ထရစ်တန်),
-						'other' => q({0} မက်ထရစ်တန်),
-					},
-					'microgram' => {
-						'name' => q(မိုက်ခရို ဂရမ်),
-						'other' => q({0} မိုက်ခရို ဂရမ်),
-					},
-					'micrometer' => {
-						'name' => q(မိုက်ခရိုမီတာ),
-						'other' => q({0} မိုက်ခရိုမီတာ),
-					},
+					# Core Unit Identifier
 					'microsecond' => {
 						'name' => q(မိုက်ခရိုစက္ကန့်),
 						'other' => q({0} မိုက်ခရိုစက္ကန့်),
 					},
-					'mile' => {
-						'name' => q(မိုင်),
-						'other' => q({0} မိုင်),
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(မီလီစက္ကန့်),
+						'other' => q({0} မီလီစက္ကန့်),
 					},
-					'mile-per-gallon' => {
-						'name' => q(တစ်ဂါလံ မိုင်နှုန်း),
-						'other' => q(တစ်ဂါလံလျှင် {0} မိုင်),
-					},
-					'mile-per-gallon-imperial' => {
-						'name' => q(ယူကေတစ်ဂါလံ မိုင်နှုန်း),
-						'other' => q(ယူကေတစ်ဂါလံလျှင် {0} မိုင်),
-					},
-					'mile-per-hour' => {
-						'name' => q(မိုင်/နာရီ),
-						'other' => q(တစ်နာရီလျှင် {0} မိုင်),
-					},
-					'mile-scandinavian' => {
-						'name' => q(စကင်ဒီနေဗီးယန်း မိုင်),
-						'other' => q({0} စကင်ဒီနေဗီးယန်း မိုင်),
-					},
-					'milliampere' => {
-						'name' => q(မီလီအမ်ပီယာ),
-						'other' => q({0} မီလီအမ်ပီယာ),
-					},
-					'millibar' => {
-						'name' => q(မီလီဘား),
-						'other' => q({0} မီလီဘား),
-					},
-					'milligram' => {
-						'name' => q(မီလီဂရမ်),
-						'other' => q({0} မီလီဂရမ်),
-					},
-					'milligram-per-deciliter' => {
-						'name' => q(တစ်ဒက်စီလီတာရှိ မီလီဂရမ်),
-						'other' => q(တစ်ဒက်စီလီတာရှိ {0} မီလီဂရမ်),
-					},
-					'milliliter' => {
-						'name' => q(မီလီလီတာ),
-						'other' => q({0} မီလီလီတာ),
-					},
-					'millimeter' => {
-						'name' => q(မီလီမီတာ),
-						'other' => q({0} မီလီမီတာ),
-					},
-					'millimeter-of-mercury' => {
-						'name' => q(ပြဒါးမီလီမီတာ),
-						'other' => q({0} ပြဒါးမီလီမီတာ),
-					},
-					'millimole-per-liter' => {
-						'name' => q(တစ်လီတာရှိ မီလီမိုးလ်),
-						'other' => q(တစ်လီတာရှိ {0} မီလီမိုးလ်),
-					},
+					# Core Unit Identifier
 					'millisecond' => {
 						'name' => q(မီလီစက္ကန့်),
 						'other' => q({0} မီလီစက္ကန့်),
 					},
-					'milliwatt' => {
-						'name' => q(မီလီဝပ်),
-						'other' => q({0} မီလီဝပ်),
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(မိနစ်),
+						'other' => q({0} မိနစ်),
+						'per' => q(တစ်မိနစ်လျှင် {0}),
 					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(မိနစ်),
 						'other' => q({0} မိနစ်),
 						'per' => q(တစ်မိနစ်လျှင် {0}),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(လ),
+						'other' => q({0} လ),
+						'per' => q(တစ်လလျှင် {0}),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(လ),
 						'other' => q({0} လ),
 						'per' => q(တစ်လလျှင် {0}),
 					},
-					'nanometer' => {
-						'name' => q(နာနိုမီတာ),
-						'other' => q({0} နာနိုမီတာ),
+					# Long Unit Identifier
+					'duration-nanosecond' => {
+						'name' => q(နာနိုစက္ကန့်),
+						'other' => q({0} နာနိုစက္ကန့်),
 					},
+					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(နာနိုစက္ကန့်),
 						'other' => q({0} နာနိုစက္ကန့်),
 					},
-					'nautical-mile' => {
-						'name' => q(ရေမိုင်),
-						'other' => q({0} ရေမိုင်),
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(စက္ကန့်),
+						'other' => q({0} စက္ကန့်),
+						'per' => q(တစ်စက္ကန့်လျှင် {0}),
 					},
-					'ohm' => {
-						'name' => q(အုမ်း),
-						'other' => q({0} အုမ်း),
-					},
-					'ounce' => {
-						'name' => q(အောင်စ),
-						'other' => q({0} အောင်စ),
-						'per' => q(တစ်အောင်စလျှင် {0}),
-					},
-					'ounce-troy' => {
-						'name' => q(ထရိုအောင်စ),
-						'other' => q({0} ထရိုအောင်စ),
-					},
-					'parsec' => {
-						'name' => q(ပါစက်ခ်),
-						'other' => q({0} ပါစက်ခ်),
-					},
-					'part-per-million' => {
-						'name' => q(တစ်သန်းပုံ တစ်ပုံ),
-						'other' => q(တစ်သန်းပုံ {0} ပုံ),
-					},
-					'per' => {
-						'1' => q(တစ်{1} လျှင် {0}),
-					},
-					'percent' => {
-						'name' => q(ရာခိုင်နှုန်း),
-						'other' => q({0} ရာခိုင်နှုန်း),
-					},
-					'permille' => {
-						'name' => q(ထောင်လီစိတ်),
-						'other' => q({0} ထောင်လီစိတ်),
-					},
-					'petabyte' => {
-						'name' => q(ပက်တာဘိုက်),
-						'other' => q({0} ပက်တာဘိုက်),
-					},
-					'picometer' => {
-						'name' => q(ပီကိုမီတာ),
-						'other' => q({0} ပီကိုမီတာ),
-					},
-					'pint' => {
-						'name' => q(ပိုင့်),
-						'other' => q({0} ပိုင့်),
-					},
-					'pint-metric' => {
-						'name' => q(မထ္ထရစ် ပိုင့်),
-						'other' => q({0} မထ္ထရစ် ပိုင့်),
-					},
-					'point' => {
-						'name' => q(ပွိုင့်),
-						'other' => q({0} ပွိုင့်),
-					},
-					'pound' => {
-						'name' => q(ပေါင်),
-						'other' => q({0} ပေါင်),
-						'per' => q(တစ်ပေါင်လျှင် {0}),
-					},
-					'pound-per-square-inch' => {
-						'name' => q(ပေါင်/စတုရန်းလက်မ),
-						'other' => q(တစ်စတုရန်းလက်မလျှင် {0} ပေါင်),
-					},
-					'quart' => {
-						'name' => q(ကွတ်),
-						'other' => q({0} ကွတ်),
-					},
-					'radian' => {
-						'name' => q(ရေဒီယဲန်း),
-						'other' => q({0} ရေဒီယဲန်း),
-					},
-					'revolution' => {
-						'name' => q(လည်ပတ်ခြင်း),
-						'other' => q({0} လည်ပတ်ခြင်း),
-					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(စက္ကန့်),
 						'other' => q({0} စက္ကန့်),
 						'per' => q(တစ်စက္ကန့်လျှင် {0}),
 					},
-					'square-centimeter' => {
-						'name' => q(စတုရန်းစင်တီမီတာ),
-						'other' => q({0} စတုရန်းစင်တီမီတာ),
-						'per' => q(တစ်စတုရန်းစင်တီမီတာလျှင် {0}),
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(ပတ်),
+						'other' => q({0} ပတ်),
+						'per' => q(တစ်ပတ်လျှင် {0}),
 					},
-					'square-foot' => {
-						'name' => q(စတုရန်းပေ),
-						'other' => q({0} စတုရန်းပေ),
-					},
-					'square-inch' => {
-						'name' => q(စတုရန်းလက်မ),
-						'other' => q({0} စတုရန်းလက်မ),
-						'per' => q(တစ်စတုရန်းလက်မလျှင် {0}),
-					},
-					'square-kilometer' => {
-						'name' => q(စတုရန်းကီလိုမီတာ),
-						'other' => q({0} စတုရန်းကီလိုမီတာ),
-						'per' => q(တစ်စတုရန်းကီလိုမီတာလျှင် {0}),
-					},
-					'square-meter' => {
-						'name' => q(စတုရန်းမီတာ),
-						'other' => q({0} စတုရန်းမီတာ),
-						'per' => q(တစ်စတုရန်းမီတာလျှင် {0}),
-					},
-					'square-mile' => {
-						'name' => q(စတုရန်းမိုင်),
-						'other' => q({0} စတုရန်းမိုင်),
-						'per' => q(တစ်စတုရန်းမိုင်လျှင် {0}),
-					},
-					'square-yard' => {
-						'name' => q(စတုရန်းကိုက်),
-						'other' => q({0} စတုရန်းကိုက်),
-					},
-					'tablespoon' => {
-						'name' => q(စားပွဲဇွန်း),
-						'other' => q(စားပွဲဇွန်း {0} ဇွန်း),
-					},
-					'teaspoon' => {
-						'name' => q(လက်ဖက်ရည်ဇွန်း),
-						'other' => q(လက်ဖက်ရည်ဇွန်း {0} ဇွန်း),
-					},
-					'terabit' => {
-						'name' => q(တယ်ရာဘစ်),
-						'other' => q({0} တယ်ရာဘစ်),
-					},
-					'terabyte' => {
-						'name' => q(တယ်ရာဘိုက်),
-						'other' => q({0} တယ်ရာဘိုက်),
-					},
-					'ton' => {
-						'name' => q(တန်),
-						'other' => q({0} တန်),
-					},
-					'volt' => {
-						'name' => q(ဗို့),
-						'other' => q({0} ဗို့),
-					},
-					'watt' => {
-						'name' => q(ဝပ်),
-						'other' => q({0} ဝပ်),
-					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(ပတ်),
 						'other' => q({0} ပတ်),
 						'per' => q(တစ်ပတ်လျှင် {0}),
 					},
-					'yard' => {
-						'name' => q(ကိုက်),
-						'other' => q({0} ကိုက်),
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(နှစ်),
+						'other' => q({0} နှစ်),
+						'per' => q(တစ်နှစ်လျှင် {0}),
 					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(နှစ်),
 						'other' => q({0} နှစ်),
 						'per' => q(တစ်နှစ်လျှင် {0}),
 					},
+					# Long Unit Identifier
+					'electric-ampere' => {
+						'name' => q(အမ်ပီယာ),
+						'other' => q({0} အမ်ပီယာ),
+					},
+					# Core Unit Identifier
+					'ampere' => {
+						'name' => q(အမ်ပီယာ),
+						'other' => q({0} အမ်ပီယာ),
+					},
+					# Long Unit Identifier
+					'electric-milliampere' => {
+						'name' => q(မီလီအမ်ပီယာ),
+						'other' => q({0} မီလီအမ်ပီယာ),
+					},
+					# Core Unit Identifier
+					'milliampere' => {
+						'name' => q(မီလီအမ်ပီယာ),
+						'other' => q({0} မီလီအမ်ပီယာ),
+					},
+					# Long Unit Identifier
+					'electric-ohm' => {
+						'name' => q(အုမ်း),
+						'other' => q({0} အုမ်း),
+					},
+					# Core Unit Identifier
+					'ohm' => {
+						'name' => q(အုမ်း),
+						'other' => q({0} အုမ်း),
+					},
+					# Long Unit Identifier
+					'electric-volt' => {
+						'name' => q(ဗို့),
+						'other' => q({0} ဗို့),
+					},
+					# Core Unit Identifier
+					'volt' => {
+						'name' => q(ဗို့),
+						'other' => q({0} ဗို့),
+					},
+					# Long Unit Identifier
+					'energy-british-thermal-unit' => {
+						'name' => q(ဗြိတိသျှ သာမယ်လ်ယူနစ်),
+						'other' => q({0} ဗြိတိသျှ သာမယ်လ်ယူနစ်),
+					},
+					# Core Unit Identifier
+					'british-thermal-unit' => {
+						'name' => q(ဗြိတိသျှ သာမယ်လ်ယူနစ်),
+						'other' => q({0} ဗြိတိသျှ သာမယ်လ်ယူနစ်),
+					},
+					# Long Unit Identifier
+					'energy-calorie' => {
+						'name' => q(ကယ်လိုရီ),
+						'other' => q({0} ကယ်လိုရီ),
+					},
+					# Core Unit Identifier
+					'calorie' => {
+						'name' => q(ကယ်လိုရီ),
+						'other' => q({0} ကယ်လိုရီ),
+					},
+					# Long Unit Identifier
+					'energy-electronvolt' => {
+						'name' => q(အီလက်ထရွန်ဗို့),
+						'other' => q({0} အီလက်ထရွန်ဗို့),
+					},
+					# Core Unit Identifier
+					'electronvolt' => {
+						'name' => q(အီလက်ထရွန်ဗို့),
+						'other' => q({0} အီလက်ထရွန်ဗို့),
+					},
+					# Long Unit Identifier
+					'energy-foodcalorie' => {
+						'name' => q(ကယ်လိုရီ),
+						'other' => q({0} ကယ်လိုရီ),
+					},
+					# Core Unit Identifier
+					'foodcalorie' => {
+						'name' => q(ကယ်လိုရီ),
+						'other' => q({0} ကယ်လိုရီ),
+					},
+					# Long Unit Identifier
+					'energy-joule' => {
+						'name' => q(ဂျူးလ်),
+						'other' => q({0} ဂျူးလ်),
+					},
+					# Core Unit Identifier
+					'joule' => {
+						'name' => q(ဂျူးလ်),
+						'other' => q({0} ဂျူးလ်),
+					},
+					# Long Unit Identifier
+					'energy-kilocalorie' => {
+						'name' => q(ကီလိုကယ်လိုရီ),
+						'other' => q({0} ကီလိုကယ်လိုရီ),
+					},
+					# Core Unit Identifier
+					'kilocalorie' => {
+						'name' => q(ကီလိုကယ်လိုရီ),
+						'other' => q({0} ကီလိုကယ်လိုရီ),
+					},
+					# Long Unit Identifier
+					'energy-kilojoule' => {
+						'name' => q(ကီလိုဂျူးလ်),
+						'other' => q({0} ကီလိုဂျူးလ်),
+					},
+					# Core Unit Identifier
+					'kilojoule' => {
+						'name' => q(ကီလိုဂျူးလ်),
+						'other' => q({0} ကီလိုဂျူးလ်),
+					},
+					# Long Unit Identifier
+					'energy-kilowatt-hour' => {
+						'name' => q(ကီလိုဝပ်-နာရီ),
+						'other' => q({0} ကီလိုဝပ်-နာရီ),
+					},
+					# Core Unit Identifier
+					'kilowatt-hour' => {
+						'name' => q(ကီလိုဝပ်-နာရီ),
+						'other' => q({0} ကီလိုဝပ်-နာရီ),
+					},
+					# Long Unit Identifier
+					'energy-therm-us' => {
+						'name' => q(ယူအက်စ် သာမယ်လ်),
+						'other' => q({0} ယူအက်စ် သာမယ်လ်),
+					},
+					# Core Unit Identifier
+					'therm-us' => {
+						'name' => q(ယူအက်စ် သာမယ်လ်),
+						'other' => q({0} ယူအက်စ် သာမယ်လ်),
+					},
+					# Long Unit Identifier
+					'force-newton' => {
+						'name' => q(နယူတန်),
+						'other' => q({0} နယူတန်),
+					},
+					# Core Unit Identifier
+					'newton' => {
+						'name' => q(နယူတန်),
+						'other' => q({0} နယူတန်),
+					},
+					# Long Unit Identifier
+					'force-pound-force' => {
+						'name' => q(lbf),
+						'other' => q({0} lbf),
+					},
+					# Core Unit Identifier
+					'pound-force' => {
+						'name' => q(lbf),
+						'other' => q({0} lbf),
+					},
+					# Long Unit Identifier
+					'frequency-gigahertz' => {
+						'name' => q(ဂီဂါဟတ်ဇ်),
+						'other' => q({0} ဂီဂါဟတ်ဇ်),
+					},
+					# Core Unit Identifier
+					'gigahertz' => {
+						'name' => q(ဂီဂါဟတ်ဇ်),
+						'other' => q({0} ဂီဂါဟတ်ဇ်),
+					},
+					# Long Unit Identifier
+					'frequency-hertz' => {
+						'name' => q(ဟတ်ဇ်),
+						'other' => q({0} ဟတ်ဇ်),
+					},
+					# Core Unit Identifier
+					'hertz' => {
+						'name' => q(ဟတ်ဇ်),
+						'other' => q({0} ဟတ်ဇ်),
+					},
+					# Long Unit Identifier
+					'frequency-kilohertz' => {
+						'name' => q(ကီလိုဟတ်ဇ်),
+						'other' => q({0} ကီလိုဟတ်ဇ်),
+					},
+					# Core Unit Identifier
+					'kilohertz' => {
+						'name' => q(ကီလိုဟတ်ဇ်),
+						'other' => q({0} ကီလိုဟတ်ဇ်),
+					},
+					# Long Unit Identifier
+					'frequency-megahertz' => {
+						'name' => q(မီဂါဟတ်ဇ်),
+						'other' => q({0} မီဂါဟတ်ဇ်),
+					},
+					# Core Unit Identifier
+					'megahertz' => {
+						'name' => q(မီဂါဟတ်ဇ်),
+						'other' => q({0} မီဂါဟတ်ဇ်),
+					},
+					# Long Unit Identifier
+					'graphics-dot' => {
+						'name' => q(အစက်),
+						'other' => q({0} အစက်),
+					},
+					# Core Unit Identifier
+					'dot' => {
+						'name' => q(အစက်),
+						'other' => q({0} အစက်),
+					},
+					# Long Unit Identifier
+					'length-astronomical-unit' => {
+						'name' => q(နက်ခတ်တဗဒေယူနဈ),
+						'other' => q({0} နက်ခတ်တဗဒေယူနဈ),
+					},
+					# Core Unit Identifier
+					'astronomical-unit' => {
+						'name' => q(နက်ခတ်တဗဒေယူနဈ),
+						'other' => q({0} နက်ခတ်တဗဒေယူနဈ),
+					},
+					# Long Unit Identifier
+					'length-centimeter' => {
+						'name' => q(စင်တီမီတာ),
+						'other' => q({0} စင်တီမီတာ),
+						'per' => q(တစ်စင်တီမီလာလျှင် {0}),
+					},
+					# Core Unit Identifier
+					'centimeter' => {
+						'name' => q(စင်တီမီတာ),
+						'other' => q({0} စင်တီမီတာ),
+						'per' => q(တစ်စင်တီမီလာလျှင် {0}),
+					},
+					# Long Unit Identifier
+					'length-decimeter' => {
+						'name' => q(ဒက်စီမီတာ),
+						'other' => q({0} ဒက်စီမီတာ),
+					},
+					# Core Unit Identifier
+					'decimeter' => {
+						'name' => q(ဒက်စီမီတာ),
+						'other' => q({0} ဒက်စီမီတာ),
+					},
+					# Long Unit Identifier
+					'length-earth-radius' => {
+						'name' => q(ကမ္ဘာ့ အချင်းဝက်),
+						'other' => q({0} ကမ္ဘာ့အချင်းဝက်),
+					},
+					# Core Unit Identifier
+					'earth-radius' => {
+						'name' => q(ကမ္ဘာ့ အချင်းဝက်),
+						'other' => q({0} ကမ္ဘာ့အချင်းဝက်),
+					},
+					# Long Unit Identifier
+					'length-fathom' => {
+						'name' => q(ဖန်တမ်),
+						'other' => q({0} ဖန်တမ်),
+					},
+					# Core Unit Identifier
+					'fathom' => {
+						'name' => q(ဖန်တမ်),
+						'other' => q({0} ဖန်တမ်),
+					},
+					# Long Unit Identifier
+					'length-foot' => {
+						'name' => q(ပေ),
+						'other' => q({0} ပေ),
+						'per' => q(တစ်ပေလျှင် {0}),
+					},
+					# Core Unit Identifier
+					'foot' => {
+						'name' => q(ပေ),
+						'other' => q({0} ပေ),
+						'per' => q(တစ်ပေလျှင် {0}),
+					},
+					# Long Unit Identifier
+					'length-furlong' => {
+						'name' => q(ဖာလုံ),
+						'other' => q({0} ဖာလုံ),
+					},
+					# Core Unit Identifier
+					'furlong' => {
+						'name' => q(ဖာလုံ),
+						'other' => q({0} ဖာလုံ),
+					},
+					# Long Unit Identifier
+					'length-inch' => {
+						'name' => q(လက်မ),
+						'other' => q({0} လက်မ),
+						'per' => q(တစ်လက်မလျှင် {0}),
+					},
+					# Core Unit Identifier
+					'inch' => {
+						'name' => q(လက်မ),
+						'other' => q({0} လက်မ),
+						'per' => q(တစ်လက်မလျှင် {0}),
+					},
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'name' => q(ကီလိုမီတာ),
+						'other' => q({0} ကီလိုမီတာ),
+						'per' => q(တစ်ကီလိုမီတာလျှင် {0}),
+					},
+					# Core Unit Identifier
+					'kilometer' => {
+						'name' => q(ကီလိုမီတာ),
+						'other' => q({0} ကီလိုမီတာ),
+						'per' => q(တစ်ကီလိုမီတာလျှင် {0}),
+					},
+					# Long Unit Identifier
+					'length-light-year' => {
+						'name' => q(အလင်းနှစ်),
+						'other' => q({0} အလင်းနှစ်),
+					},
+					# Core Unit Identifier
+					'light-year' => {
+						'name' => q(အလင်းနှစ်),
+						'other' => q({0} အလင်းနှစ်),
+					},
+					# Long Unit Identifier
+					'length-meter' => {
+						'name' => q(မီတာ),
+						'other' => q({0} မီတာ),
+						'per' => q(တစ်မီတာလျှင် {0}),
+					},
+					# Core Unit Identifier
+					'meter' => {
+						'name' => q(မီတာ),
+						'other' => q({0} မီတာ),
+						'per' => q(တစ်မီတာလျှင် {0}),
+					},
+					# Long Unit Identifier
+					'length-micrometer' => {
+						'name' => q(မိုက်ခရိုမီတာ),
+						'other' => q({0} မိုက်ခရိုမီတာ),
+					},
+					# Core Unit Identifier
+					'micrometer' => {
+						'name' => q(မိုက်ခရိုမီတာ),
+						'other' => q({0} မိုက်ခရိုမီတာ),
+					},
+					# Long Unit Identifier
+					'length-mile' => {
+						'name' => q(မိုင်),
+						'other' => q({0} မိုင်),
+					},
+					# Core Unit Identifier
+					'mile' => {
+						'name' => q(မိုင်),
+						'other' => q({0} မိုင်),
+					},
+					# Long Unit Identifier
+					'length-mile-scandinavian' => {
+						'name' => q(စကင်ဒီနေဗီးယန်း မိုင်),
+						'other' => q({0} စကင်ဒီနေဗီးယန်း မိုင်),
+					},
+					# Core Unit Identifier
+					'mile-scandinavian' => {
+						'name' => q(စကင်ဒီနေဗီးယန်း မိုင်),
+						'other' => q({0} စကင်ဒီနေဗီးယန်း မိုင်),
+					},
+					# Long Unit Identifier
+					'length-millimeter' => {
+						'name' => q(မီလီမီတာ),
+						'other' => q({0} မီလီမီတာ),
+					},
+					# Core Unit Identifier
+					'millimeter' => {
+						'name' => q(မီလီမီတာ),
+						'other' => q({0} မီလီမီတာ),
+					},
+					# Long Unit Identifier
+					'length-nanometer' => {
+						'name' => q(နာနိုမီတာ),
+						'other' => q({0} နာနိုမီတာ),
+					},
+					# Core Unit Identifier
+					'nanometer' => {
+						'name' => q(နာနိုမီတာ),
+						'other' => q({0} နာနိုမီတာ),
+					},
+					# Long Unit Identifier
+					'length-nautical-mile' => {
+						'name' => q(ရေမိုင်),
+						'other' => q({0} ရေမိုင်),
+					},
+					# Core Unit Identifier
+					'nautical-mile' => {
+						'name' => q(ရေမိုင်),
+						'other' => q({0} ရေမိုင်),
+					},
+					# Long Unit Identifier
+					'length-parsec' => {
+						'name' => q(ပါစက်ခ်),
+						'other' => q({0} ပါစက်ခ်),
+					},
+					# Core Unit Identifier
+					'parsec' => {
+						'name' => q(ပါစက်ခ်),
+						'other' => q({0} ပါစက်ခ်),
+					},
+					# Long Unit Identifier
+					'length-picometer' => {
+						'name' => q(ပီကိုမီတာ),
+						'other' => q({0} ပီကိုမီတာ),
+					},
+					# Core Unit Identifier
+					'picometer' => {
+						'name' => q(ပီကိုမီတာ),
+						'other' => q({0} ပီကိုမီတာ),
+					},
+					# Long Unit Identifier
+					'length-point' => {
+						'name' => q(ပွိုင့်),
+						'other' => q({0} ပွိုင့်),
+					},
+					# Core Unit Identifier
+					'point' => {
+						'name' => q(ပွိုင့်),
+						'other' => q({0} ပွိုင့်),
+					},
+					# Long Unit Identifier
+					'length-solar-radius' => {
+						'name' => q(ဆိုလာ ရာဒီ),
+						'other' => q({0} ဆိုလာ ရာဒီ),
+					},
+					# Core Unit Identifier
+					'solar-radius' => {
+						'name' => q(ဆိုလာ ရာဒီ),
+						'other' => q({0} ဆိုလာ ရာဒီ),
+					},
+					# Long Unit Identifier
+					'length-yard' => {
+						'name' => q(ကိုက်),
+						'other' => q({0} ကိုက်),
+					},
+					# Core Unit Identifier
+					'yard' => {
+						'name' => q(ကိုက်),
+						'other' => q({0} ကိုက်),
+					},
+					# Long Unit Identifier
+					'light-candela' => {
+						'name' => q(ကန်ဒဲလာ),
+						'other' => q({0} ကန်ဒဲလာ),
+					},
+					# Core Unit Identifier
+					'candela' => {
+						'name' => q(ကန်ဒဲလာ),
+						'other' => q({0} ကန်ဒဲလာ),
+					},
+					# Long Unit Identifier
+					'light-lumen' => {
+						'name' => q(လူမန်),
+						'other' => q({0} လူမန်),
+					},
+					# Core Unit Identifier
+					'lumen' => {
+						'name' => q(လူမန်),
+						'other' => q({0} လူမန်),
+					},
+					# Long Unit Identifier
+					'light-lux' => {
+						'name' => q(လတ်ခ်),
+						'other' => q({0} လတ်ခ်),
+					},
+					# Core Unit Identifier
+					'lux' => {
+						'name' => q(လတ်ခ်),
+						'other' => q({0} လတ်ခ်),
+					},
+					# Long Unit Identifier
+					'light-solar-luminosity' => {
+						'name' => q(ဆိုလာ လူမီနိုစီတီးစ်),
+						'other' => q({0} ဆိုလာ လူမီနိုစီးတီးစ်),
+					},
+					# Core Unit Identifier
+					'solar-luminosity' => {
+						'name' => q(ဆိုလာ လူမီနိုစီတီးစ်),
+						'other' => q({0} ဆိုလာ လူမီနိုစီးတီးစ်),
+					},
+					# Long Unit Identifier
+					'mass-carat' => {
+						'name' => q(ကာရက်),
+						'other' => q({0} ကာရက်),
+					},
+					# Core Unit Identifier
+					'carat' => {
+						'name' => q(ကာရက်),
+						'other' => q({0} ကာရက်),
+					},
+					# Long Unit Identifier
+					'mass-dalton' => {
+						'name' => q(ဒဲလ်တန်စ်),
+						'other' => q({0} ဒဲလ်တန်စ်),
+					},
+					# Core Unit Identifier
+					'dalton' => {
+						'name' => q(ဒဲလ်တန်စ်),
+						'other' => q({0} ဒဲလ်တန်စ်),
+					},
+					# Long Unit Identifier
+					'mass-earth-mass' => {
+						'name' => q(ကမ္ဘာ့ဒြပ်ထု),
+						'other' => q({0} ကမ္ဘာ့ဒြပ်ထု),
+					},
+					# Core Unit Identifier
+					'earth-mass' => {
+						'name' => q(ကမ္ဘာ့ဒြပ်ထု),
+						'other' => q({0} ကမ္ဘာ့ဒြပ်ထု),
+					},
+					# Long Unit Identifier
+					'mass-grain' => {
+						'name' => q(ဂရိန်),
+						'other' => q({0} ဂရိန်),
+					},
+					# Core Unit Identifier
+					'grain' => {
+						'name' => q(ဂရိန်),
+						'other' => q({0} ဂရိန်),
+					},
+					# Long Unit Identifier
+					'mass-gram' => {
+						'name' => q(ဂရမ်),
+						'other' => q({0} ဂရမ်),
+						'per' => q(တစ်ဂရမ်လျှင် {0}),
+					},
+					# Core Unit Identifier
+					'gram' => {
+						'name' => q(ဂရမ်),
+						'other' => q({0} ဂရမ်),
+						'per' => q(တစ်ဂရမ်လျှင် {0}),
+					},
+					# Long Unit Identifier
+					'mass-kilogram' => {
+						'name' => q(ကီလိုဂရမ်),
+						'other' => q({0} ကီလိုဂရမ်),
+						'per' => q(တစ်ကီလိုဂရမ်လျှင် {0}),
+					},
+					# Core Unit Identifier
+					'kilogram' => {
+						'name' => q(ကီလိုဂရမ်),
+						'other' => q({0} ကီလိုဂရမ်),
+						'per' => q(တစ်ကီလိုဂရမ်လျှင် {0}),
+					},
+					# Long Unit Identifier
+					'mass-metric-ton' => {
+						'name' => q(မက်ထရစ်တန်),
+						'other' => q({0} မက်ထရစ်တန်),
+					},
+					# Core Unit Identifier
+					'metric-ton' => {
+						'name' => q(မက်ထရစ်တန်),
+						'other' => q({0} မက်ထရစ်တန်),
+					},
+					# Long Unit Identifier
+					'mass-microgram' => {
+						'name' => q(မိုက်ခရို ဂရမ်),
+						'other' => q({0} မိုက်ခရို ဂရမ်),
+					},
+					# Core Unit Identifier
+					'microgram' => {
+						'name' => q(မိုက်ခရို ဂရမ်),
+						'other' => q({0} မိုက်ခရို ဂရမ်),
+					},
+					# Long Unit Identifier
+					'mass-milligram' => {
+						'name' => q(မီလီဂရမ်),
+						'other' => q({0} မီလီဂရမ်),
+					},
+					# Core Unit Identifier
+					'milligram' => {
+						'name' => q(မီလီဂရမ်),
+						'other' => q({0} မီလီဂရမ်),
+					},
+					# Long Unit Identifier
+					'mass-ounce' => {
+						'name' => q(အောင်စ),
+						'other' => q({0} အောင်စ),
+						'per' => q(တစ်အောင်စလျှင် {0}),
+					},
+					# Core Unit Identifier
+					'ounce' => {
+						'name' => q(အောင်စ),
+						'other' => q({0} အောင်စ),
+						'per' => q(တစ်အောင်စလျှင် {0}),
+					},
+					# Long Unit Identifier
+					'mass-ounce-troy' => {
+						'name' => q(ထရိုအောင်စ),
+						'other' => q({0} ထရိုအောင်စ),
+					},
+					# Core Unit Identifier
+					'ounce-troy' => {
+						'name' => q(ထရိုအောင်စ),
+						'other' => q({0} ထရိုအောင်စ),
+					},
+					# Long Unit Identifier
+					'mass-pound' => {
+						'name' => q(ပေါင်),
+						'other' => q({0} ပေါင်),
+						'per' => q(တစ်ပေါင်လျှင် {0}),
+					},
+					# Core Unit Identifier
+					'pound' => {
+						'name' => q(ပေါင်),
+						'other' => q({0} ပေါင်),
+						'per' => q(တစ်ပေါင်လျှင် {0}),
+					},
+					# Long Unit Identifier
+					'mass-solar-mass' => {
+						'name' => q(နေရောင်ခြည် ဒြပ်ထု),
+						'other' => q({0} နေရောင်ခြည် ဒြပ်ထု),
+					},
+					# Core Unit Identifier
+					'solar-mass' => {
+						'name' => q(နေရောင်ခြည် ဒြပ်ထု),
+						'other' => q({0} နေရောင်ခြည် ဒြပ်ထု),
+					},
+					# Long Unit Identifier
+					'mass-stone' => {
+						'name' => q(စတုန်),
+						'other' => q({0} စတုန်),
+					},
+					# Core Unit Identifier
+					'stone' => {
+						'name' => q(စတုန်),
+						'other' => q({0} စတုန်),
+					},
+					# Long Unit Identifier
+					'mass-ton' => {
+						'name' => q(တန်),
+						'other' => q({0} တန်),
+					},
+					# Core Unit Identifier
+					'ton' => {
+						'name' => q(တန်),
+						'other' => q({0} တန်),
+					},
+					# Long Unit Identifier
+					'per' => {
+						'1' => q(တစ်{1} လျှင် {0}),
+					},
+					# Core Unit Identifier
+					'per' => {
+						'1' => q(တစ်{1} လျှင် {0}),
+					},
+					# Long Unit Identifier
+					'power-gigawatt' => {
+						'name' => q(ဂစ်ဂါဝပ်),
+						'other' => q({0} ဂစ်ဂါဝပ်),
+					},
+					# Core Unit Identifier
+					'gigawatt' => {
+						'name' => q(ဂစ်ဂါဝပ်),
+						'other' => q({0} ဂစ်ဂါဝပ်),
+					},
+					# Long Unit Identifier
+					'power-horsepower' => {
+						'name' => q(မြင်းကောင်ရေအား),
+						'other' => q({0} မြင်းကောင်ရေအား),
+					},
+					# Core Unit Identifier
+					'horsepower' => {
+						'name' => q(မြင်းကောင်ရေအား),
+						'other' => q({0} မြင်းကောင်ရေအား),
+					},
+					# Long Unit Identifier
+					'power-kilowatt' => {
+						'name' => q(ကီလိုဝပ်),
+						'other' => q({0} ကီလိုဝပ်),
+					},
+					# Core Unit Identifier
+					'kilowatt' => {
+						'name' => q(ကီလိုဝပ်),
+						'other' => q({0} ကီလိုဝပ်),
+					},
+					# Long Unit Identifier
+					'power-megawatt' => {
+						'name' => q(မီဂါဝပ်),
+						'other' => q({0} မီဂါဝပ်),
+					},
+					# Core Unit Identifier
+					'megawatt' => {
+						'name' => q(မီဂါဝပ်),
+						'other' => q({0} မီဂါဝပ်),
+					},
+					# Long Unit Identifier
+					'power-milliwatt' => {
+						'name' => q(မီလီဝပ်),
+						'other' => q({0} မီလီဝပ်),
+					},
+					# Core Unit Identifier
+					'milliwatt' => {
+						'name' => q(မီလီဝပ်),
+						'other' => q({0} မီလီဝပ်),
+					},
+					# Long Unit Identifier
+					'power-watt' => {
+						'name' => q(ဝပ်),
+						'other' => q({0} ဝပ်),
+					},
+					# Core Unit Identifier
+					'watt' => {
+						'name' => q(ဝပ်),
+						'other' => q({0} ဝပ်),
+					},
+					# Long Unit Identifier
+					'power2' => {
+						'1' => q(နှစ်ထပ်ကိန်း {0}),
+						'other' => q(စတုရန်း{0}),
+					},
+					# Core Unit Identifier
+					'power2' => {
+						'1' => q(နှစ်ထပ်ကိန်း {0}),
+						'other' => q(စတုရန်း{0}),
+					},
+					# Long Unit Identifier
+					'power3' => {
+						'1' => q(ကုဗ {0}),
+						'other' => q(ကုဗ{0}),
+					},
+					# Core Unit Identifier
+					'power3' => {
+						'1' => q(ကုဗ {0}),
+						'other' => q(ကုဗ{0}),
+					},
+					# Long Unit Identifier
+					'pressure-atmosphere' => {
+						'name' => q(ကမ္ဘာ့လေထု),
+						'other' => q({0} ကမ္ဘာ့လေထု),
+					},
+					# Core Unit Identifier
+					'atmosphere' => {
+						'name' => q(ကမ္ဘာ့လေထု),
+						'other' => q({0} ကမ္ဘာ့လေထု),
+					},
+					# Long Unit Identifier
+					'pressure-bar' => {
+						'name' => q(ဘား),
+						'other' => q({0} ဘား),
+					},
+					# Core Unit Identifier
+					'bar' => {
+						'name' => q(ဘား),
+						'other' => q({0} ဘား),
+					},
+					# Long Unit Identifier
+					'pressure-hectopascal' => {
+						'name' => q(ဟက်တိုပါစကယ်),
+						'other' => q({0} ဟက်တိုပါစကယ်),
+					},
+					# Core Unit Identifier
+					'hectopascal' => {
+						'name' => q(ဟက်တိုပါစကယ်),
+						'other' => q({0} ဟက်တိုပါစကယ်),
+					},
+					# Long Unit Identifier
+					'pressure-inch-ofhg' => {
+						'name' => q(ပြဒါးလက်မ),
+						'other' => q({0} ပြဒါးလက်မ),
+					},
+					# Core Unit Identifier
+					'inch-ofhg' => {
+						'name' => q(ပြဒါးလက်မ),
+						'other' => q({0} ပြဒါးလက်မ),
+					},
+					# Long Unit Identifier
+					'pressure-kilopascal' => {
+						'name' => q(ကီလိုပါစကယ်),
+						'other' => q({0} ကီလိုပါစကယ်),
+					},
+					# Core Unit Identifier
+					'kilopascal' => {
+						'name' => q(ကီလိုပါစကယ်),
+						'other' => q({0} ကီလိုပါစကယ်),
+					},
+					# Long Unit Identifier
+					'pressure-megapascal' => {
+						'name' => q(မီဂါပါစကယ်),
+						'other' => q({0} မီဂါပါစကယ်),
+					},
+					# Core Unit Identifier
+					'megapascal' => {
+						'name' => q(မီဂါပါစကယ်),
+						'other' => q({0} မီဂါပါစကယ်),
+					},
+					# Long Unit Identifier
+					'pressure-millibar' => {
+						'name' => q(မီလီဘား),
+						'other' => q({0} မီလီဘား),
+					},
+					# Core Unit Identifier
+					'millibar' => {
+						'name' => q(မီလီဘား),
+						'other' => q({0} မီလီဘား),
+					},
+					# Long Unit Identifier
+					'pressure-millimeter-ofhg' => {
+						'name' => q(ပြဒါးမီလီမီတာ),
+						'other' => q({0} ပြဒါးမီလီမီတာ),
+					},
+					# Core Unit Identifier
+					'millimeter-ofhg' => {
+						'name' => q(ပြဒါးမီလီမီတာ),
+						'other' => q({0} ပြဒါးမီလီမီတာ),
+					},
+					# Long Unit Identifier
+					'pressure-pound-force-per-square-inch' => {
+						'name' => q(ပေါင်/စတုရန်းလက်မ),
+						'other' => q(တစ်စတုရန်းလက်မလျှင် {0} ပေါင်),
+					},
+					# Core Unit Identifier
+					'pound-force-per-square-inch' => {
+						'name' => q(ပေါင်/စတုရန်းလက်မ),
+						'other' => q(တစ်စတုရန်းလက်မလျှင် {0} ပေါင်),
+					},
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'name' => q(ကီလိုမီတာ/နာရီ),
+						'other' => q(တစ်နာရီလျှင် {0} ကီလိုမီတာ),
+					},
+					# Core Unit Identifier
+					'kilometer-per-hour' => {
+						'name' => q(ကီလိုမီတာ/နာရီ),
+						'other' => q(တစ်နာရီလျှင် {0} ကီလိုမီတာ),
+					},
+					# Long Unit Identifier
+					'speed-knot' => {
+						'name' => q(နော့တီကယ်မိုင်),
+						'other' => q({0} နော့တီကယ်မိုင်),
+					},
+					# Core Unit Identifier
+					'knot' => {
+						'name' => q(နော့တီကယ်မိုင်),
+						'other' => q({0} နော့တီကယ်မိုင်),
+					},
+					# Long Unit Identifier
+					'speed-meter-per-second' => {
+						'name' => q(မီတာ/စက္ကန့်),
+						'other' => q(တစ်စက္ကန့်လျှင် {0} မီတာ),
+					},
+					# Core Unit Identifier
+					'meter-per-second' => {
+						'name' => q(မီတာ/စက္ကန့်),
+						'other' => q(တစ်စက္ကန့်လျှင် {0} မီတာ),
+					},
+					# Long Unit Identifier
+					'speed-mile-per-hour' => {
+						'name' => q(မိုင်/နာရီ),
+						'other' => q(တစ်နာရီလျှင် {0} မိုင်),
+					},
+					# Core Unit Identifier
+					'mile-per-hour' => {
+						'name' => q(မိုင်/နာရီ),
+						'other' => q(တစ်နာရီလျှင် {0} မိုင်),
+					},
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'name' => q(ဒီဂရီ စင်တီဂရိတ်),
+						'other' => q({0} ဒီဂရီ စင်တီဂရိတ်),
+					},
+					# Core Unit Identifier
+					'celsius' => {
+						'name' => q(ဒီဂရီ စင်တီဂရိတ်),
+						'other' => q({0} ဒီဂရီ စင်တီဂရိတ်),
+					},
+					# Long Unit Identifier
+					'temperature-fahrenheit' => {
+						'name' => q(ဒီဂရီ ဖာရင်ဟိုက်),
+						'other' => q({0} ဒီဂရီ ဖာရင်ဟိုက်),
+					},
+					# Core Unit Identifier
+					'fahrenheit' => {
+						'name' => q(ဒီဂရီ ဖာရင်ဟိုက်),
+						'other' => q({0} ဒီဂရီ ဖာရင်ဟိုက်),
+					},
+					# Long Unit Identifier
+					'temperature-generic' => {
+						'name' => q(°),
+						'other' => q({0}°),
+					},
+					# Core Unit Identifier
+					'generic' => {
+						'name' => q(°),
+						'other' => q({0}°),
+					},
+					# Long Unit Identifier
+					'temperature-kelvin' => {
+						'name' => q(ကယ်လ်ဗင်),
+						'other' => q({0} ကယ်လ်ဗင်),
+					},
+					# Core Unit Identifier
+					'kelvin' => {
+						'name' => q(ကယ်လ်ဗင်),
+						'other' => q({0} ကယ်လ်ဗင်),
+					},
+					# Long Unit Identifier
+					'torque-newton-meter' => {
+						'name' => q(နယူတန်−မီတာ),
+						'other' => q({0} နယူတန်−မီတာ),
+					},
+					# Core Unit Identifier
+					'newton-meter' => {
+						'name' => q(နယူတန်−မီတာ),
+						'other' => q({0} နယူတန်−မီတာ),
+					},
+					# Long Unit Identifier
+					'torque-pound-force-foot' => {
+						'name' => q(lbf.ft),
+						'other' => q({0} lbf.ft),
+					},
+					# Core Unit Identifier
+					'pound-force-foot' => {
+						'name' => q(lbf.ft),
+						'other' => q({0} lbf.ft),
+					},
+					# Long Unit Identifier
+					'volume-acre-foot' => {
+						'name' => q(ဧက-ပေ),
+						'other' => q({0} ဧက-ပေ),
+					},
+					# Core Unit Identifier
+					'acre-foot' => {
+						'name' => q(ဧက-ပေ),
+						'other' => q({0} ဧက-ပေ),
+					},
+					# Long Unit Identifier
+					'volume-barrel' => {
+						'name' => q(ဘယ်ရလ်စ်),
+						'other' => q({0} ဘယ်ရလ်စ်),
+					},
+					# Core Unit Identifier
+					'barrel' => {
+						'name' => q(ဘယ်ရလ်စ်),
+						'other' => q({0} ဘယ်ရလ်စ်),
+					},
+					# Long Unit Identifier
+					'volume-bushel' => {
+						'name' => q(၈ ဂါလံဝင်ပုံး),
+						'other' => q(၈ ဂါလံဝင်ပုံး {0} ပုံး),
+					},
+					# Core Unit Identifier
+					'bushel' => {
+						'name' => q(၈ ဂါလံဝင်ပုံး),
+						'other' => q(၈ ဂါလံဝင်ပုံး {0} ပုံး),
+					},
+					# Long Unit Identifier
+					'volume-centiliter' => {
+						'name' => q(စင်တီလီတာ),
+						'other' => q({0} စင်တီလီတာ),
+					},
+					# Core Unit Identifier
+					'centiliter' => {
+						'name' => q(စင်တီလီတာ),
+						'other' => q({0} စင်တီလီတာ),
+					},
+					# Long Unit Identifier
+					'volume-cubic-centimeter' => {
+						'name' => q(ကုဗစင်တီမီတာ),
+						'other' => q({0} ကုဗစင်တီမီတာ),
+						'per' => q(တစ်ကုဗစင်တီမီတာလျှင် {0}),
+					},
+					# Core Unit Identifier
+					'cubic-centimeter' => {
+						'name' => q(ကုဗစင်တီမီတာ),
+						'other' => q({0} ကုဗစင်တီမီတာ),
+						'per' => q(တစ်ကုဗစင်တီမီတာလျှင် {0}),
+					},
+					# Long Unit Identifier
+					'volume-cubic-foot' => {
+						'name' => q(ကုဗပေ),
+						'other' => q({0} ကုဗပေ),
+					},
+					# Core Unit Identifier
+					'cubic-foot' => {
+						'name' => q(ကုဗပေ),
+						'other' => q({0} ကုဗပေ),
+					},
+					# Long Unit Identifier
+					'volume-cubic-inch' => {
+						'name' => q(ကုဗလက်မ),
+						'other' => q({0} ကုဗလက်မ),
+					},
+					# Core Unit Identifier
+					'cubic-inch' => {
+						'name' => q(ကုဗလက်မ),
+						'other' => q({0} ကုဗလက်မ),
+					},
+					# Long Unit Identifier
+					'volume-cubic-kilometer' => {
+						'name' => q(ကုဗကီလိုမီတာ),
+						'other' => q({0} ကုဗကီလိုမီတာ),
+					},
+					# Core Unit Identifier
+					'cubic-kilometer' => {
+						'name' => q(ကုဗကီလိုမီတာ),
+						'other' => q({0} ကုဗကီလိုမီတာ),
+					},
+					# Long Unit Identifier
+					'volume-cubic-meter' => {
+						'name' => q(ကုဗမီတာ),
+						'other' => q({0} ကုဗမီတာ),
+						'per' => q(တစ်ကုဗမီတာလျှင် {0}),
+					},
+					# Core Unit Identifier
+					'cubic-meter' => {
+						'name' => q(ကုဗမီတာ),
+						'other' => q({0} ကုဗမီတာ),
+						'per' => q(တစ်ကုဗမီတာလျှင် {0}),
+					},
+					# Long Unit Identifier
+					'volume-cubic-mile' => {
+						'name' => q(ကုဗမိုင်),
+						'other' => q({0} ကုဗမိုင်),
+					},
+					# Core Unit Identifier
+					'cubic-mile' => {
+						'name' => q(ကုဗမိုင်),
+						'other' => q({0} ကုဗမိုင်),
+					},
+					# Long Unit Identifier
+					'volume-cubic-yard' => {
+						'name' => q(ကုဗကိုက်),
+						'other' => q({0} ကုဗကိုက်),
+					},
+					# Core Unit Identifier
+					'cubic-yard' => {
+						'name' => q(ကုဗကိုက်),
+						'other' => q({0} ကုဗကိုက်),
+					},
+					# Long Unit Identifier
+					'volume-cup' => {
+						'name' => q(ခွက်),
+						'other' => q({0} ခွက်),
+					},
+					# Core Unit Identifier
+					'cup' => {
+						'name' => q(ခွက်),
+						'other' => q({0} ခွက်),
+					},
+					# Long Unit Identifier
+					'volume-cup-metric' => {
+						'name' => q(မထ္ထရစ် ခွက်),
+						'other' => q({0} မထ္ထရစ် ခွက်),
+					},
+					# Core Unit Identifier
+					'cup-metric' => {
+						'name' => q(မထ္ထရစ် ခွက်),
+						'other' => q({0} မထ္ထရစ် ခွက်),
+					},
+					# Long Unit Identifier
+					'volume-deciliter' => {
+						'name' => q(ဒက်စီလီတာ),
+						'other' => q({0} ဒက်စီလီတာ),
+					},
+					# Core Unit Identifier
+					'deciliter' => {
+						'name' => q(ဒက်စီလီတာ),
+						'other' => q({0} ဒက်စီလီတာ),
+					},
+					# Long Unit Identifier
+					'volume-dessert-spoon' => {
+						'name' => q(အချိုပွဲဇွန်း),
+						'other' => q(အချိုပွဲဇွန်း {0} ဇွန်း),
+					},
+					# Core Unit Identifier
+					'dessert-spoon' => {
+						'name' => q(အချိုပွဲဇွန်း),
+						'other' => q(အချိုပွဲဇွန်း {0} ဇွန်း),
+					},
+					# Long Unit Identifier
+					'volume-dessert-spoon-imperial' => {
+						'name' => q(ဗြိတိသျှသုံး အချိုပွဲဇွန်း),
+						'other' => q(ဗြိတိသျှသုံး အချိုပွဲဇွန်း {0} ဇွန်း),
+					},
+					# Core Unit Identifier
+					'dessert-spoon-imperial' => {
+						'name' => q(ဗြိတိသျှသုံး အချိုပွဲဇွန်း),
+						'other' => q(ဗြိတိသျှသုံး အချိုပွဲဇွန်း {0} ဇွန်း),
+					},
+					# Long Unit Identifier
+					'volume-dram' => {
+						'name' => q(ဒရမ်),
+						'other' => q({0} ဒရမ်),
+					},
+					# Core Unit Identifier
+					'dram' => {
+						'name' => q(ဒရမ်),
+						'other' => q({0} ဒရမ်),
+					},
+					# Long Unit Identifier
+					'volume-drop' => {
+						'name' => q(တစ်စက်),
+						'other' => q({0} စက်),
+					},
+					# Core Unit Identifier
+					'drop' => {
+						'name' => q(တစ်စက်),
+						'other' => q({0} စက်),
+					},
+					# Long Unit Identifier
+					'volume-fluid-ounce' => {
+						'name' => q(အရည်အောင်စ),
+						'other' => q({0} အရည်အောင်စ),
+					},
+					# Core Unit Identifier
+					'fluid-ounce' => {
+						'name' => q(အရည်အောင်စ),
+						'other' => q({0} အရည်အောင်စ),
+					},
+					# Long Unit Identifier
+					'volume-fluid-ounce-imperial' => {
+						'name' => q(Imp. fl oz),
+						'other' => q({0} Imp. fl oz),
+					},
+					# Core Unit Identifier
+					'fluid-ounce-imperial' => {
+						'name' => q(Imp. fl oz),
+						'other' => q({0} Imp. fl oz),
+					},
+					# Long Unit Identifier
+					'volume-gallon' => {
+						'name' => q(ဂါလံ),
+						'other' => q({0} ဂါလံ),
+						'per' => q(တစ်ဂါလံလျှင် {0}),
+					},
+					# Core Unit Identifier
+					'gallon' => {
+						'name' => q(ဂါလံ),
+						'other' => q({0} ဂါလံ),
+						'per' => q(တစ်ဂါလံလျှင် {0}),
+					},
+					# Long Unit Identifier
+					'volume-gallon-imperial' => {
+						'name' => q(ယူကေ ဂါလံ),
+						'other' => q({0} ယူကေ ဂါလံ),
+						'per' => q(တစ် ယူကေ ဂါလံလျှင် {0}),
+					},
+					# Core Unit Identifier
+					'gallon-imperial' => {
+						'name' => q(ယူကေ ဂါလံ),
+						'other' => q({0} ယူကေ ဂါလံ),
+						'per' => q(တစ် ယူကေ ဂါလံလျှင် {0}),
+					},
+					# Long Unit Identifier
+					'volume-hectoliter' => {
+						'name' => q(ဟက်တိုလီတာ),
+						'other' => q({0} ဟက်တိုမီတာ),
+					},
+					# Core Unit Identifier
+					'hectoliter' => {
+						'name' => q(ဟက်တိုလီတာ),
+						'other' => q({0} ဟက်တိုမီတာ),
+					},
+					# Long Unit Identifier
+					'volume-jigger' => {
+						'name' => q(ပက်),
+						'other' => q({0} ပက်),
+					},
+					# Core Unit Identifier
+					'jigger' => {
+						'name' => q(ပက်),
+						'other' => q({0} ပက်),
+					},
+					# Long Unit Identifier
+					'volume-liter' => {
+						'name' => q(လီတာ),
+						'other' => q({0} လီတာ),
+						'per' => q(တစ်လီတာလျှင် {0}),
+					},
+					# Core Unit Identifier
+					'liter' => {
+						'name' => q(လီတာ),
+						'other' => q({0} လီတာ),
+						'per' => q(တစ်လီတာလျှင် {0}),
+					},
+					# Long Unit Identifier
+					'volume-megaliter' => {
+						'name' => q(မီဂါလီတာ),
+						'other' => q({0} မီဂါလီတာ),
+					},
+					# Core Unit Identifier
+					'megaliter' => {
+						'name' => q(မီဂါလီတာ),
+						'other' => q({0} မီဂါလီတာ),
+					},
+					# Long Unit Identifier
+					'volume-milliliter' => {
+						'name' => q(မီလီလီတာ),
+						'other' => q({0} မီလီလီတာ),
+					},
+					# Core Unit Identifier
+					'milliliter' => {
+						'name' => q(မီလီလီတာ),
+						'other' => q({0} မီလီလီတာ),
+					},
+					# Long Unit Identifier
+					'volume-pinch' => {
+						'name' => q(တစ်ဆိတ်),
+						'other' => q({0} ဆိတ်),
+					},
+					# Core Unit Identifier
+					'pinch' => {
+						'name' => q(တစ်ဆိတ်),
+						'other' => q({0} ဆိတ်),
+					},
+					# Long Unit Identifier
+					'volume-pint' => {
+						'name' => q(ပိုင့်),
+						'other' => q({0} ပိုင့်),
+					},
+					# Core Unit Identifier
+					'pint' => {
+						'name' => q(ပိုင့်),
+						'other' => q({0} ပိုင့်),
+					},
+					# Long Unit Identifier
+					'volume-pint-metric' => {
+						'name' => q(မထ္ထရစ် ပိုင့်),
+						'other' => q({0} မထ္ထရစ် ပိုင့်),
+					},
+					# Core Unit Identifier
+					'pint-metric' => {
+						'name' => q(မထ္ထရစ် ပိုင့်),
+						'other' => q({0} မထ္ထရစ် ပိုင့်),
+					},
+					# Long Unit Identifier
+					'volume-quart' => {
+						'name' => q(ကွတ်),
+						'other' => q({0} ကွတ်),
+					},
+					# Core Unit Identifier
+					'quart' => {
+						'name' => q(ကွတ်),
+						'other' => q({0} ကွတ်),
+					},
+					# Long Unit Identifier
+					'volume-quart-imperial' => {
+						'name' => q(ဗြိတိသျှသုံး ကွတ်),
+						'other' => q(ဗြိတိသျှသုံး {0} ကွတ်),
+					},
+					# Core Unit Identifier
+					'quart-imperial' => {
+						'name' => q(ဗြိတိသျှသုံး ကွတ်),
+						'other' => q(ဗြိတိသျှသုံး {0} ကွတ်),
+					},
+					# Long Unit Identifier
+					'volume-tablespoon' => {
+						'name' => q(စားပွဲဇွန်း),
+						'other' => q(စားပွဲဇွန်း {0} ဇွန်း),
+					},
+					# Core Unit Identifier
+					'tablespoon' => {
+						'name' => q(စားပွဲဇွန်း),
+						'other' => q(စားပွဲဇွန်း {0} ဇွန်း),
+					},
+					# Long Unit Identifier
+					'volume-teaspoon' => {
+						'name' => q(လက်ဖက်ရည်ဇွန်း),
+						'other' => q(လက်ဖက်ရည်ဇွန်း {0} ဇွန်း),
+					},
+					# Core Unit Identifier
+					'teaspoon' => {
+						'name' => q(လက်ဖက်ရည်ဇွန်း),
+						'other' => q(လက်ဖက်ရည်ဇွန်း {0} ဇွန်း),
+					},
 				},
 				'narrow' => {
+					# Long Unit Identifier
 					'' => {
 						'name' => q(လမ်းကြောင်း),
 					},
-					'acre' => {
-						'other' => q({0} ac),
+					# Core Unit Identifier
+					'' => {
+						'name' => q(လမ်းကြောင်း),
 					},
+					# Long Unit Identifier
+					'1024p1' => {
+						'1' => q(Ki{0}),
+					},
+					# Core Unit Identifier
+					'1024p1' => {
+						'1' => q(Ki{0}),
+					},
+					# Long Unit Identifier
+					'1024p2' => {
+						'1' => q(Mi{0}),
+					},
+					# Core Unit Identifier
+					'1024p2' => {
+						'1' => q(Mi{0}),
+					},
+					# Long Unit Identifier
+					'1024p3' => {
+						'1' => q(Gi{0}),
+					},
+					# Core Unit Identifier
+					'1024p3' => {
+						'1' => q(Gi{0}),
+					},
+					# Long Unit Identifier
+					'1024p4' => {
+						'1' => q(Ti{0}),
+					},
+					# Core Unit Identifier
+					'1024p4' => {
+						'1' => q(Ti{0}),
+					},
+					# Long Unit Identifier
+					'1024p5' => {
+						'1' => q(Pi{0}),
+					},
+					# Core Unit Identifier
+					'1024p5' => {
+						'1' => q(Pi{0}),
+					},
+					# Long Unit Identifier
+					'1024p6' => {
+						'1' => q(Ei{0}),
+					},
+					# Core Unit Identifier
+					'1024p6' => {
+						'1' => q(Ei{0}),
+					},
+					# Long Unit Identifier
+					'1024p7' => {
+						'1' => q(Zi{0}),
+					},
+					# Core Unit Identifier
+					'1024p7' => {
+						'1' => q(Zi{0}),
+					},
+					# Long Unit Identifier
+					'1024p8' => {
+						'1' => q(Yi{0}),
+					},
+					# Core Unit Identifier
+					'1024p8' => {
+						'1' => q(Yi{0}),
+					},
+					# Long Unit Identifier
+					'10p-1' => {
+						'1' => q(d{0}),
+					},
+					# Core Unit Identifier
+					'1' => {
+						'1' => q(d{0}),
+					},
+					# Long Unit Identifier
+					'10p21' => {
+						'1' => q(Z{0}),
+					},
+					# Core Unit Identifier
+					'10p21' => {
+						'1' => q(Z{0}),
+					},
+					# Long Unit Identifier
+					'10p24' => {
+						'1' => q(Y{0}),
+					},
+					# Core Unit Identifier
+					'10p24' => {
+						'1' => q(Y{0}),
+					},
+					# Long Unit Identifier
+					'acceleration-g-force' => {
+						'other' => q({0} G),
+					},
+					# Core Unit Identifier
+					'g-force' => {
+						'other' => q({0} G),
+					},
+					# Long Unit Identifier
+					'angle-arc-minute' => {
+						'other' => q({0}′),
+					},
+					# Core Unit Identifier
 					'arc-minute' => {
 						'other' => q({0}′),
 					},
+					# Long Unit Identifier
+					'angle-arc-second' => {
+						'other' => q({0}″),
+					},
+					# Core Unit Identifier
 					'arc-second' => {
 						'other' => q({0}″),
 					},
-					'celsius' => {
-						'name' => q(°C),
-						'other' => q({0}°C),
+					# Long Unit Identifier
+					'angle-degree' => {
+						'other' => q({0}°),
 					},
-					'centimeter' => {
-						'name' => q(cm),
-						'other' => q({0} cm),
+					# Core Unit Identifier
+					'degree' => {
+						'other' => q({0}°),
 					},
+					# Long Unit Identifier
+					'area-acre' => {
+						'other' => q({0} ac),
+					},
+					# Core Unit Identifier
+					'acre' => {
+						'other' => q({0} ac),
+					},
+					# Long Unit Identifier
+					'area-hectare' => {
+						'other' => q({0} ha),
+					},
+					# Core Unit Identifier
+					'hectare' => {
+						'other' => q({0} ha),
+					},
+					# Long Unit Identifier
+					'area-square-foot' => {
+						'other' => q({0} ft²),
+					},
+					# Core Unit Identifier
+					'square-foot' => {
+						'other' => q({0} ft²),
+					},
+					# Long Unit Identifier
+					'area-square-kilometer' => {
+						'other' => q({0} km²),
+					},
+					# Core Unit Identifier
+					'square-kilometer' => {
+						'other' => q({0} km²),
+					},
+					# Long Unit Identifier
+					'area-square-meter' => {
+						'other' => q({0} m²),
+					},
+					# Core Unit Identifier
+					'square-meter' => {
+						'other' => q({0} m²),
+					},
+					# Long Unit Identifier
+					'area-square-mile' => {
+						'other' => q({0} mi²),
+					},
+					# Core Unit Identifier
+					'square-mile' => {
+						'other' => q({0} mi²),
+					},
+					# Long Unit Identifier
+					'concentr-percent' => {
+						'name' => q(%),
+						'other' => q({0}%),
+					},
+					# Core Unit Identifier
+					'percent' => {
+						'name' => q(%),
+						'other' => q({0}%),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-100-kilometer' => {
+						'name' => q(L/100km),
+						'other' => q({0} L/100km),
+					},
+					# Core Unit Identifier
+					'liter-per-100-kilometer' => {
+						'name' => q(L/100km),
+						'other' => q({0} L/100km),
+					},
+					# Long Unit Identifier
+					'consumption-mile-per-gallon-imperial' => {
+						'other' => q({0}m/gUK),
+					},
+					# Core Unit Identifier
+					'mile-per-gallon-imperial' => {
+						'other' => q({0}m/gUK),
+					},
+					# Long Unit Identifier
 					'coordinate' => {
 						'east' => q({0}E),
 						'north' => q({0}N),
 						'south' => q({0}S),
 						'west' => q({0}W),
 					},
-					'cubic-kilometer' => {
-						'other' => q({0} km³),
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0}E),
+						'north' => q({0}N),
+						'south' => q({0}S),
+						'west' => q({0}W),
 					},
-					'cubic-mile' => {
-						'other' => q({0} mi³),
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(ရက်),
+						'other' => q({0} ရက်),
 					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(ရက်),
 						'other' => q({0} ရက်),
 					},
-					'degree' => {
-						'other' => q({0}°),
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(နာရီ),
+						'other' => q({0} နာရီ),
 					},
-					'fahrenheit' => {
-						'other' => q({0}°F),
-					},
-					'foot' => {
-						'other' => q({0} '),
-					},
-					'g-force' => {
-						'other' => q({0} G),
-					},
-					'gram' => {
-						'name' => q(ဂရမ်),
-						'other' => q({0} g),
-					},
-					'hectare' => {
-						'other' => q({0} ha),
-					},
-					'hectopascal' => {
-						'other' => q({0} hPa),
-					},
-					'horsepower' => {
-						'other' => q({0} hp),
-					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(နာရီ),
 						'other' => q({0} နာရီ),
 					},
-					'inch' => {
-						'other' => q({0} ″),
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(မီလီစက္ကန့်),
+						'other' => q({0} ms),
 					},
-					'inch-hg' => {
-						'other' => q({0} inHg),
-					},
-					'kilogram' => {
-						'name' => q(ကီလိုဂရမ်),
-						'other' => q({0} kg),
-					},
-					'kilometer' => {
-						'name' => q(km),
-						'other' => q({0}km),
-					},
-					'kilometer-per-hour' => {
-						'name' => q(ကီလိုမီတာ/နာရီ),
-						'other' => q({0} km/h),
-					},
-					'kilowatt' => {
-						'other' => q({0} kW),
-					},
-					'light-year' => {
-						'other' => q({0} အလင်းနှစ်),
-					},
-					'liter' => {
-						'name' => q(လီတာ),
-						'other' => q({0}L),
-					},
-					'liter-per-100kilometers' => {
-						'name' => q(L/100km),
-						'other' => q({0} L/100km),
-					},
-					'meter' => {
-						'name' => q(m),
-						'other' => q({0} m),
-					},
-					'meter-per-second' => {
-						'other' => q({0} m/s),
-					},
-					'mile' => {
-						'other' => q({0}မိုင်),
-					},
-					'mile-per-hour' => {
-						'other' => q({0} mi/h),
-					},
-					'millibar' => {
-						'other' => q({0} mbar),
-					},
-					'millimeter' => {
-						'name' => q(mm),
-						'other' => q({0} mm),
-					},
+					# Core Unit Identifier
 					'millisecond' => {
 						'name' => q(မီလီစက္ကန့်),
 						'other' => q({0} ms),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(မိနစ်),
+						'other' => q({0} မိနစ်),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(မိနစ်),
 						'other' => q({0} မိနစ်),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(လ),
+						'other' => q({0} လ),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(လ),
 						'other' => q({0} လ),
 					},
-					'ounce' => {
-						'other' => q({0} oz),
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(စက္ကန့်),
+						'other' => q({0} s),
 					},
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					'percent' => {
-						'name' => q(%),
-						'other' => q({0}%),
-					},
-					'picometer' => {
-						'other' => q({0} pm),
-					},
-					'pound' => {
-						'other' => q({0} lb),
-					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(စက္ကန့်),
 						'other' => q({0} s),
 					},
-					'square-foot' => {
-						'other' => q({0} ft²),
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(ပတ်),
+						'other' => q({0} ပတ်),
 					},
-					'square-kilometer' => {
-						'other' => q({0} km²),
-					},
-					'square-meter' => {
-						'other' => q({0} m²),
-					},
-					'square-mile' => {
-						'other' => q({0} mi²),
-					},
-					'watt' => {
-						'other' => q({0} W),
-					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(ပတ်),
 						'other' => q({0} ပတ်),
 					},
-					'yard' => {
-						'other' => q({0} ကိုက်),
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(နှစ်),
+						'other' => q({0} နှစ်),
 					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(နှစ်),
 						'other' => q({0} နှစ်),
 					},
-				},
-				'short' => {
-					'' => {
-						'name' => q(လမ်းကြောင်း),
+					# Long Unit Identifier
+					'energy-therm-us' => {
+						'other' => q({0}US therms),
 					},
-					'acre' => {
-						'name' => q(ဧက),
-						'other' => q({0} ac),
+					# Core Unit Identifier
+					'therm-us' => {
+						'other' => q({0}US therms),
 					},
-					'acre-foot' => {
-						'name' => q(ဧက-ပေ),
-						'other' => q({0} ac ft),
+					# Long Unit Identifier
+					'force-kilowatt-hour-per-100-kilometer' => {
+						'other' => q({0}kWh/100km),
 					},
-					'ampere' => {
-						'name' => q(အမ်ပီယာ),
-						'other' => q({0} A),
+					# Core Unit Identifier
+					'kilowatt-hour-per-100-kilometer' => {
+						'other' => q({0}kWh/100km),
 					},
-					'arc-minute' => {
-						'name' => q(မိနစ်),
-						'other' => q({0}′),
+					# Long Unit Identifier
+					'length-centimeter' => {
+						'name' => q(cm),
+						'other' => q({0} cm),
 					},
-					'arc-second' => {
-						'name' => q(စက္ကန့်),
-						'other' => q({0}″),
+					# Core Unit Identifier
+					'centimeter' => {
+						'name' => q(cm),
+						'other' => q({0} cm),
 					},
-					'astronomical-unit' => {
-						'name' => q(နက်ခတ်တဗဒေယူနဈ),
-						'other' => q({0} au),
+					# Long Unit Identifier
+					'length-earth-radius' => {
+						'name' => q(R⊕),
+						'other' => q({0}R⊕),
 					},
-					'atmosphere' => {
-						'name' => q(atm),
-						'other' => q({0} atm),
+					# Core Unit Identifier
+					'earth-radius' => {
+						'name' => q(R⊕),
+						'other' => q({0}R⊕),
 					},
-					'bit' => {
-						'name' => q(ဘစ်),
-						'other' => q({0} bit),
+					# Long Unit Identifier
+					'length-inch' => {
+						'other' => q({0} ″),
 					},
-					'byte' => {
-						'name' => q(ဘိုက်),
-						'other' => q({0} byte),
+					# Core Unit Identifier
+					'inch' => {
+						'other' => q({0} ″),
 					},
-					'calorie' => {
-						'name' => q(ကယ်လိုရီ),
-						'other' => q({0} cal),
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'name' => q(km),
+						'other' => q({0}km),
 					},
-					'carat' => {
-						'name' => q(ကာရက်),
-						'other' => q({0} CD),
+					# Core Unit Identifier
+					'kilometer' => {
+						'name' => q(km),
+						'other' => q({0}km),
 					},
+					# Long Unit Identifier
+					'length-light-year' => {
+						'other' => q({0} အလင်းနှစ်),
+					},
+					# Core Unit Identifier
+					'light-year' => {
+						'other' => q({0} အလင်းနှစ်),
+					},
+					# Long Unit Identifier
+					'length-meter' => {
+						'name' => q(m),
+						'other' => q({0} m),
+					},
+					# Core Unit Identifier
+					'meter' => {
+						'name' => q(m),
+						'other' => q({0} m),
+					},
+					# Long Unit Identifier
+					'length-mile' => {
+						'other' => q({0}မိုင်),
+					},
+					# Core Unit Identifier
+					'mile' => {
+						'other' => q({0}မိုင်),
+					},
+					# Long Unit Identifier
+					'length-millimeter' => {
+						'name' => q(mm),
+						'other' => q({0} mm),
+					},
+					# Core Unit Identifier
+					'millimeter' => {
+						'name' => q(mm),
+						'other' => q({0} mm),
+					},
+					# Long Unit Identifier
+					'length-picometer' => {
+						'other' => q({0} pm),
+					},
+					# Core Unit Identifier
+					'picometer' => {
+						'other' => q({0} pm),
+					},
+					# Long Unit Identifier
+					'length-yard' => {
+						'other' => q({0} ကိုက်),
+					},
+					# Core Unit Identifier
+					'yard' => {
+						'other' => q({0} ကိုက်),
+					},
+					# Long Unit Identifier
+					'mass-gram' => {
+						'name' => q(ဂရမ်),
+						'other' => q({0} g),
+					},
+					# Core Unit Identifier
+					'gram' => {
+						'name' => q(ဂရမ်),
+						'other' => q({0} g),
+					},
+					# Long Unit Identifier
+					'mass-kilogram' => {
+						'name' => q(ကီလိုဂရမ်),
+						'other' => q({0} kg),
+					},
+					# Core Unit Identifier
+					'kilogram' => {
+						'name' => q(ကီလိုဂရမ်),
+						'other' => q({0} kg),
+					},
+					# Long Unit Identifier
+					'mass-ounce' => {
+						'other' => q({0} oz),
+					},
+					# Core Unit Identifier
+					'ounce' => {
+						'other' => q({0} oz),
+					},
+					# Long Unit Identifier
+					'mass-pound' => {
+						'other' => q({0} lb),
+					},
+					# Core Unit Identifier
+					'pound' => {
+						'other' => q({0} lb),
+					},
+					# Long Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Core Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Long Unit Identifier
+					'power-horsepower' => {
+						'other' => q({0} hp),
+					},
+					# Core Unit Identifier
+					'horsepower' => {
+						'other' => q({0} hp),
+					},
+					# Long Unit Identifier
+					'power-kilowatt' => {
+						'other' => q({0} kW),
+					},
+					# Core Unit Identifier
+					'kilowatt' => {
+						'other' => q({0} kW),
+					},
+					# Long Unit Identifier
+					'power-watt' => {
+						'other' => q({0} W),
+					},
+					# Core Unit Identifier
+					'watt' => {
+						'other' => q({0} W),
+					},
+					# Long Unit Identifier
+					'pressure-hectopascal' => {
+						'other' => q({0} hPa),
+					},
+					# Core Unit Identifier
+					'hectopascal' => {
+						'other' => q({0} hPa),
+					},
+					# Long Unit Identifier
+					'pressure-inch-ofhg' => {
+						'other' => q({0} inHg),
+					},
+					# Core Unit Identifier
+					'inch-ofhg' => {
+						'other' => q({0} inHg),
+					},
+					# Long Unit Identifier
+					'pressure-millibar' => {
+						'other' => q({0} mbar),
+					},
+					# Core Unit Identifier
+					'millibar' => {
+						'other' => q({0} mbar),
+					},
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'name' => q(ကီလိုမီတာ/နာရီ),
+						'other' => q({0} km/h),
+					},
+					# Core Unit Identifier
+					'kilometer-per-hour' => {
+						'name' => q(ကီလိုမီတာ/နာရီ),
+						'other' => q({0} km/h),
+					},
+					# Long Unit Identifier
+					'speed-meter-per-second' => {
+						'other' => q({0} m/s),
+					},
+					# Core Unit Identifier
+					'meter-per-second' => {
+						'other' => q({0} m/s),
+					},
+					# Long Unit Identifier
+					'speed-mile-per-hour' => {
+						'other' => q({0} mi/h),
+					},
+					# Core Unit Identifier
+					'mile-per-hour' => {
+						'other' => q({0} mi/h),
+					},
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'name' => q(°C),
+						'other' => q({0}°C),
+					},
+					# Core Unit Identifier
 					'celsius' => {
 						'name' => q(°C),
 						'other' => q({0}°C),
 					},
-					'centiliter' => {
-						'name' => q(စင်တီလီတာ),
-						'other' => q({0} cL),
+					# Long Unit Identifier
+					'temperature-fahrenheit' => {
+						'other' => q({0}°F),
 					},
-					'centimeter' => {
-						'name' => q(cm),
-						'other' => q({0} cm),
-						'per' => q({0}/cm),
+					# Core Unit Identifier
+					'fahrenheit' => {
+						'other' => q({0}°F),
 					},
-					'century' => {
-						'name' => q(ရာစု),
-						'other' => q({0} ရာစု),
+					# Long Unit Identifier
+					'volume-cubic-kilometer' => {
+						'other' => q({0} km³),
 					},
+					# Core Unit Identifier
+					'cubic-kilometer' => {
+						'other' => q({0} km³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-mile' => {
+						'other' => q({0} mi³),
+					},
+					# Core Unit Identifier
+					'cubic-mile' => {
+						'other' => q({0} mi³),
+					},
+					# Long Unit Identifier
+					'volume-fluid-ounce-imperial' => {
+						'other' => q({0}fl oz Im),
+					},
+					# Core Unit Identifier
+					'fluid-ounce-imperial' => {
+						'other' => q({0}fl oz Im),
+					},
+					# Long Unit Identifier
+					'volume-liter' => {
+						'name' => q(လီတာ),
+						'other' => q({0}L),
+					},
+					# Core Unit Identifier
+					'liter' => {
+						'name' => q(လီတာ),
+						'other' => q({0}L),
+					},
+				},
+				'short' => {
+					# Long Unit Identifier
+					'' => {
+						'name' => q(လမ်းကြောင်း),
+					},
+					# Core Unit Identifier
+					'' => {
+						'name' => q(လမ်းကြောင်း),
+					},
+					# Long Unit Identifier
+					'1024p1' => {
+						'1' => q(Ki{0}),
+					},
+					# Core Unit Identifier
+					'1024p1' => {
+						'1' => q(Ki{0}),
+					},
+					# Long Unit Identifier
+					'1024p2' => {
+						'1' => q(Mi{0}),
+					},
+					# Core Unit Identifier
+					'1024p2' => {
+						'1' => q(Mi{0}),
+					},
+					# Long Unit Identifier
+					'1024p3' => {
+						'1' => q(Gi{0}),
+					},
+					# Core Unit Identifier
+					'1024p3' => {
+						'1' => q(Gi{0}),
+					},
+					# Long Unit Identifier
+					'1024p4' => {
+						'1' => q(Ti{0}),
+					},
+					# Core Unit Identifier
+					'1024p4' => {
+						'1' => q(Ti{0}),
+					},
+					# Long Unit Identifier
+					'1024p5' => {
+						'1' => q(Pi{0}),
+					},
+					# Core Unit Identifier
+					'1024p5' => {
+						'1' => q(Pi{0}),
+					},
+					# Long Unit Identifier
+					'1024p6' => {
+						'1' => q(Ei{0}),
+					},
+					# Core Unit Identifier
+					'1024p6' => {
+						'1' => q(Ei{0}),
+					},
+					# Long Unit Identifier
+					'1024p7' => {
+						'1' => q(Zi{0}),
+					},
+					# Core Unit Identifier
+					'1024p7' => {
+						'1' => q(Zi{0}),
+					},
+					# Long Unit Identifier
+					'1024p8' => {
+						'1' => q(Yi{0}),
+					},
+					# Core Unit Identifier
+					'1024p8' => {
+						'1' => q(Yi{0}),
+					},
+					# Long Unit Identifier
+					'10p-1' => {
+						'1' => q(d{0}),
+					},
+					# Core Unit Identifier
+					'1' => {
+						'1' => q(d{0}),
+					},
+					# Long Unit Identifier
+					'10p21' => {
+						'1' => q(Z{0}),
+					},
+					# Core Unit Identifier
+					'10p21' => {
+						'1' => q(Z{0}),
+					},
+					# Long Unit Identifier
+					'10p24' => {
+						'1' => q(Y{0}),
+					},
+					# Core Unit Identifier
+					'10p24' => {
+						'1' => q(Y{0}),
+					},
+					# Long Unit Identifier
+					'acceleration-g-force' => {
+						'name' => q(ဆွဲငင်အား),
+						'other' => q({0} G),
+					},
+					# Core Unit Identifier
+					'g-force' => {
+						'name' => q(ဆွဲငင်အား),
+						'other' => q({0} G),
+					},
+					# Long Unit Identifier
+					'acceleration-meter-per-square-second' => {
+						'name' => q(မီတာ/စက္ကန့်နှစ်ထပ်ကိန်း),
+						'other' => q({0} m/s²),
+					},
+					# Core Unit Identifier
+					'meter-per-square-second' => {
+						'name' => q(မီတာ/စက္ကန့်နှစ်ထပ်ကိန်း),
+						'other' => q({0} m/s²),
+					},
+					# Long Unit Identifier
+					'angle-arc-minute' => {
+						'name' => q(မိနစ်),
+						'other' => q({0}′),
+					},
+					# Core Unit Identifier
+					'arc-minute' => {
+						'name' => q(မိနစ်),
+						'other' => q({0}′),
+					},
+					# Long Unit Identifier
+					'angle-arc-second' => {
+						'name' => q(စက္ကန့်),
+						'other' => q({0}″),
+					},
+					# Core Unit Identifier
+					'arc-second' => {
+						'name' => q(စက္ကန့်),
+						'other' => q({0}″),
+					},
+					# Long Unit Identifier
+					'angle-degree' => {
+						'name' => q(ဒီဂရီ),
+						'other' => q({0} deg),
+					},
+					# Core Unit Identifier
+					'degree' => {
+						'name' => q(ဒီဂရီ),
+						'other' => q({0} deg),
+					},
+					# Long Unit Identifier
+					'angle-radian' => {
+						'name' => q(ရေဒီယဲန်း),
+						'other' => q({0} rad),
+					},
+					# Core Unit Identifier
+					'radian' => {
+						'name' => q(ရေဒီယဲန်း),
+						'other' => q({0} rad),
+					},
+					# Long Unit Identifier
+					'angle-revolution' => {
+						'name' => q(rev),
+						'other' => q({0} rev),
+					},
+					# Core Unit Identifier
+					'revolution' => {
+						'name' => q(rev),
+						'other' => q({0} rev),
+					},
+					# Long Unit Identifier
+					'area-acre' => {
+						'name' => q(ဧက),
+						'other' => q({0} ac),
+					},
+					# Core Unit Identifier
+					'acre' => {
+						'name' => q(ဧက),
+						'other' => q({0} ac),
+					},
+					# Long Unit Identifier
+					'area-dunam' => {
+						'name' => q(dunams),
+						'other' => q({0} dunam),
+					},
+					# Core Unit Identifier
+					'dunam' => {
+						'name' => q(dunams),
+						'other' => q({0} dunam),
+					},
+					# Long Unit Identifier
+					'area-hectare' => {
+						'name' => q(ဟက်တာ),
+						'other' => q({0} ha),
+					},
+					# Core Unit Identifier
+					'hectare' => {
+						'name' => q(ဟက်တာ),
+						'other' => q({0} ha),
+					},
+					# Long Unit Identifier
+					'area-square-centimeter' => {
+						'name' => q(စတုရန်းစင်တီမီတာ),
+						'other' => q({0} cm²),
+						'per' => q({0}/cm²),
+					},
+					# Core Unit Identifier
+					'square-centimeter' => {
+						'name' => q(စတုရန်းစင်တီမီတာ),
+						'other' => q({0} cm²),
+						'per' => q({0}/cm²),
+					},
+					# Long Unit Identifier
+					'area-square-foot' => {
+						'name' => q(စတုရန်းပေ),
+						'other' => q({0} ft²),
+					},
+					# Core Unit Identifier
+					'square-foot' => {
+						'name' => q(စတုရန်းပေ),
+						'other' => q({0} ft²),
+					},
+					# Long Unit Identifier
+					'area-square-inch' => {
+						'name' => q(စတုရန်းလက်မ),
+						'other' => q({0} in²),
+						'per' => q({0}/in²),
+					},
+					# Core Unit Identifier
+					'square-inch' => {
+						'name' => q(စတုရန်းလက်မ),
+						'other' => q({0} in²),
+						'per' => q({0}/in²),
+					},
+					# Long Unit Identifier
+					'area-square-kilometer' => {
+						'name' => q(စတုရန်းကီလိုမီတာ),
+						'other' => q({0} km²),
+						'per' => q({0}/km²),
+					},
+					# Core Unit Identifier
+					'square-kilometer' => {
+						'name' => q(စတုရန်းကီလိုမီတာ),
+						'other' => q({0} km²),
+						'per' => q({0}/km²),
+					},
+					# Long Unit Identifier
+					'area-square-meter' => {
+						'name' => q(စတုရန်းမီတာ),
+						'other' => q({0} m²),
+						'per' => q({0}/m²),
+					},
+					# Core Unit Identifier
+					'square-meter' => {
+						'name' => q(စတုရန်းမီတာ),
+						'other' => q({0} m²),
+						'per' => q({0}/m²),
+					},
+					# Long Unit Identifier
+					'area-square-mile' => {
+						'name' => q(စတုရန်းမိုင်),
+						'other' => q({0} mi²),
+						'per' => q({0}/mi²),
+					},
+					# Core Unit Identifier
+					'square-mile' => {
+						'name' => q(စတုရန်းမိုင်),
+						'other' => q({0} mi²),
+						'per' => q({0}/mi²),
+					},
+					# Long Unit Identifier
+					'area-square-yard' => {
+						'name' => q(စတုရန်းကိုက်),
+						'other' => q({0} yd²),
+					},
+					# Core Unit Identifier
+					'square-yard' => {
+						'name' => q(စတုရန်းကိုက်),
+						'other' => q({0} yd²),
+					},
+					# Long Unit Identifier
+					'concentr-karat' => {
+						'name' => q(ကာရက်),
+						'other' => q({0} kt),
+					},
+					# Core Unit Identifier
+					'karat' => {
+						'name' => q(ကာရက်),
+						'other' => q({0} kt),
+					},
+					# Long Unit Identifier
+					'concentr-milligram-ofglucose-per-deciliter' => {
+						'name' => q(mg/dL),
+						'other' => q({0} mg/dL),
+					},
+					# Core Unit Identifier
+					'milligram-ofglucose-per-deciliter' => {
+						'name' => q(mg/dL),
+						'other' => q({0} mg/dL),
+					},
+					# Long Unit Identifier
+					'concentr-millimole-per-liter' => {
+						'name' => q(mmol/L),
+						'other' => q({0} mmol/L),
+					},
+					# Core Unit Identifier
+					'millimole-per-liter' => {
+						'name' => q(mmol/L),
+						'other' => q({0} mmol/L),
+					},
+					# Long Unit Identifier
+					'concentr-mole' => {
+						'name' => q(mol),
+						'other' => q({0} mol),
+					},
+					# Core Unit Identifier
+					'mole' => {
+						'name' => q(mol),
+						'other' => q({0} mol),
+					},
+					# Long Unit Identifier
+					'concentr-percent' => {
+						'name' => q(%),
+						'other' => q({0}%),
+					},
+					# Core Unit Identifier
+					'percent' => {
+						'name' => q(%),
+						'other' => q({0}%),
+					},
+					# Long Unit Identifier
+					'concentr-permille' => {
+						'name' => q(‰),
+						'other' => q({0}‰),
+					},
+					# Core Unit Identifier
+					'permille' => {
+						'name' => q(‰),
+						'other' => q({0}‰),
+					},
+					# Long Unit Identifier
+					'concentr-permillion' => {
+						'name' => q(တစ်သန်းပုံ တစ်ပုံ),
+						'other' => q({0} ppm),
+					},
+					# Core Unit Identifier
+					'permillion' => {
+						'name' => q(တစ်သန်းပုံ တစ်ပုံ),
+						'other' => q({0} ppm),
+					},
+					# Long Unit Identifier
+					'concentr-permyriad' => {
+						'name' => q(ပါမီရိတ်),
+						'other' => q({0}‱),
+					},
+					# Core Unit Identifier
+					'permyriad' => {
+						'name' => q(ပါမီရိတ်),
+						'other' => q({0}‱),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-100-kilometer' => {
+						'name' => q(တစ်ရာကီလိုမီတာရှိ လီတာ),
+						'other' => q({0} L/100 km),
+					},
+					# Core Unit Identifier
+					'liter-per-100-kilometer' => {
+						'name' => q(တစ်ရာကီလိုမီတာရှိ လီတာ),
+						'other' => q({0} L/100 km),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-kilometer' => {
+						'name' => q(လီတာ/ကီလိုမီတာ),
+						'other' => q({0} L/km),
+					},
+					# Core Unit Identifier
+					'liter-per-kilometer' => {
+						'name' => q(လီတာ/ကီလိုမီတာ),
+						'other' => q({0} L/km),
+					},
+					# Long Unit Identifier
+					'consumption-mile-per-gallon' => {
+						'name' => q(မိုင်/ဂါလန်),
+						'other' => q({0} mpg),
+					},
+					# Core Unit Identifier
+					'mile-per-gallon' => {
+						'name' => q(မိုင်/ဂါလန်),
+						'other' => q({0} mpg),
+					},
+					# Long Unit Identifier
+					'consumption-mile-per-gallon-imperial' => {
+						'name' => q(mpg Imp.),
+						'other' => q({0} mpg Imp.),
+					},
+					# Core Unit Identifier
+					'mile-per-gallon-imperial' => {
+						'name' => q(mpg Imp.),
+						'other' => q({0} mpg Imp.),
+					},
+					# Long Unit Identifier
 					'coordinate' => {
 						'east' => q({0} E),
 						'north' => q({0} N),
 						'south' => q({0} S),
 						'west' => q({0} W),
 					},
-					'cubic-centimeter' => {
-						'name' => q(ကုဗစင်တီမီတာ),
-						'other' => q({0} cm³),
-						'per' => q({0}/cm³),
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0} E),
+						'north' => q({0} N),
+						'south' => q({0} S),
+						'west' => q({0} W),
 					},
-					'cubic-foot' => {
-						'name' => q(ကုဗပေ),
-						'other' => q({0} ft³),
+					# Long Unit Identifier
+					'digital-bit' => {
+						'name' => q(ဘစ်),
+						'other' => q({0} bit),
 					},
-					'cubic-inch' => {
-						'name' => q(ကုဗလက်မ),
-						'other' => q({0} in³),
+					# Core Unit Identifier
+					'bit' => {
+						'name' => q(ဘစ်),
+						'other' => q({0} bit),
 					},
-					'cubic-kilometer' => {
-						'name' => q(ကုဗကီလိုမီတာ),
-						'other' => q({0} km³),
+					# Long Unit Identifier
+					'digital-byte' => {
+						'name' => q(ဘိုက်),
+						'other' => q({0} byte),
 					},
-					'cubic-meter' => {
-						'name' => q(ကုဗမီတာ),
-						'other' => q({0} m³),
-						'per' => q({0}/m³),
+					# Core Unit Identifier
+					'byte' => {
+						'name' => q(ဘိုက်),
+						'other' => q({0} byte),
 					},
-					'cubic-mile' => {
-						'name' => q(ကုဗမိုင်),
-						'other' => q({0} mi³),
+					# Long Unit Identifier
+					'digital-gigabit' => {
+						'name' => q(ဂစ်ဂါဘစ်),
+						'other' => q({0} Gb),
 					},
-					'cubic-yard' => {
-						'name' => q(ကုဗကိုက်),
-						'other' => q({0} yd³),
+					# Core Unit Identifier
+					'gigabit' => {
+						'name' => q(ဂစ်ဂါဘစ်),
+						'other' => q({0} Gb),
 					},
-					'cup' => {
-						'name' => q(ခွက်),
-						'other' => q({0} c),
+					# Long Unit Identifier
+					'digital-gigabyte' => {
+						'name' => q(ဂစ်ဂါဘိုက်),
+						'other' => q({0} GB),
 					},
-					'cup-metric' => {
-						'name' => q(မထ္ထရစ်ခွက်),
-						'other' => q({0} mc),
+					# Core Unit Identifier
+					'gigabyte' => {
+						'name' => q(ဂစ်ဂါဘိုက်),
+						'other' => q({0} GB),
 					},
+					# Long Unit Identifier
+					'digital-kilobit' => {
+						'name' => q(ကီလိုဘစ်),
+						'other' => q({0} kb),
+					},
+					# Core Unit Identifier
+					'kilobit' => {
+						'name' => q(ကီလိုဘစ်),
+						'other' => q({0} kb),
+					},
+					# Long Unit Identifier
+					'digital-kilobyte' => {
+						'name' => q(ကီလိုဘိုက်),
+						'other' => q({0} kB),
+					},
+					# Core Unit Identifier
+					'kilobyte' => {
+						'name' => q(ကီလိုဘိုက်),
+						'other' => q({0} kB),
+					},
+					# Long Unit Identifier
+					'digital-megabit' => {
+						'name' => q(မီဂါဘစ်),
+						'other' => q({0} Mb),
+					},
+					# Core Unit Identifier
+					'megabit' => {
+						'name' => q(မီဂါဘစ်),
+						'other' => q({0} Mb),
+					},
+					# Long Unit Identifier
+					'digital-megabyte' => {
+						'name' => q(မီဂါဘိုက်),
+						'other' => q({0} MB),
+					},
+					# Core Unit Identifier
+					'megabyte' => {
+						'name' => q(မီဂါဘိုက်),
+						'other' => q({0} MB),
+					},
+					# Long Unit Identifier
+					'digital-petabyte' => {
+						'name' => q(ပက်တာဘိုက်),
+						'other' => q({0} PB),
+					},
+					# Core Unit Identifier
+					'petabyte' => {
+						'name' => q(ပက်တာဘိုက်),
+						'other' => q({0} PB),
+					},
+					# Long Unit Identifier
+					'digital-terabit' => {
+						'name' => q(တယ်ရာဘစ်),
+						'other' => q({0} Tb),
+					},
+					# Core Unit Identifier
+					'terabit' => {
+						'name' => q(တယ်ရာဘစ်),
+						'other' => q({0} Tb),
+					},
+					# Long Unit Identifier
+					'digital-terabyte' => {
+						'name' => q(တယ်ရာဘိုက်),
+						'other' => q({0} TB),
+					},
+					# Core Unit Identifier
+					'terabyte' => {
+						'name' => q(တယ်ရာဘိုက်),
+						'other' => q({0} TB),
+					},
+					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(ရာစု),
+						'other' => q({0} ရာစု),
+					},
+					# Core Unit Identifier
+					'century' => {
+						'name' => q(ရာစု),
+						'other' => q({0} ရာစု),
+					},
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(ရက်),
+						'other' => q({0} ရက်),
+						'per' => q({0}/ ရက်),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(ရက်),
 						'other' => q({0} ရက်),
 						'per' => q({0}/ ရက်),
 					},
-					'deciliter' => {
-						'name' => q(ဒက်စီလီတာ),
-						'other' => q({0} dL),
+					# Long Unit Identifier
+					'duration-decade' => {
+						'name' => q(ဆယ်စု),
+						'other' => q({0} ဆယ်စု),
 					},
-					'decimeter' => {
-						'name' => q(dm),
-						'other' => q({0} dm),
+					# Core Unit Identifier
+					'decade' => {
+						'name' => q(ဆယ်စု),
+						'other' => q({0} ဆယ်စု),
 					},
-					'degree' => {
-						'name' => q(ဒီဂရီ),
-						'other' => q({0} deg),
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(နာရီ),
+						'other' => q({0} နာရီ),
+						'per' => q({0}/ နာရီ),
 					},
-					'fahrenheit' => {
-						'name' => q(°F),
-						'other' => q({0}°F),
-					},
-					'fluid-ounce' => {
-						'name' => q(အရည်အောင်စ),
-						'other' => q({0} fl oz),
-					},
-					'foodcalorie' => {
-						'name' => q(ကယ်လိုရီ),
-						'other' => q({0} Cal),
-					},
-					'foot' => {
-						'name' => q(ပေ),
-						'other' => q({0} ပေ),
-						'per' => q({0}/ပေ),
-					},
-					'g-force' => {
-						'name' => q(ဆွဲငင်အား),
-						'other' => q({0} G),
-					},
-					'gallon' => {
-						'name' => q(ဂါလံ),
-						'other' => q({0} ဂါလံ),
-						'per' => q({0}/gal US),
-					},
-					'gallon-imperial' => {
-						'name' => q(ယူကဂေါလံ),
-						'other' => q({0} ယူကဂေါလံ),
-						'per' => q({0}/gal Imp.),
-					},
-					'generic' => {
-						'name' => q(°),
-						'other' => q({0}°),
-					},
-					'gigabit' => {
-						'name' => q(ဂစ်ဂါဘစ်),
-						'other' => q({0} Gb),
-					},
-					'gigabyte' => {
-						'name' => q(ဂစ်ဂါဘိုက်),
-						'other' => q({0} GB),
-					},
-					'gigahertz' => {
-						'name' => q(ဂီဂါဟတ်ဇ်),
-						'other' => q({0} GHz),
-					},
-					'gigawatt' => {
-						'name' => q(ဂစ်ဂါဝပ်),
-						'other' => q({0} GW),
-					},
-					'gram' => {
-						'name' => q(ဂရမ်),
-						'other' => q({0} g),
-						'per' => q({0}/g),
-					},
-					'hectare' => {
-						'name' => q(ဟက်တာ),
-						'other' => q({0} ha),
-					},
-					'hectoliter' => {
-						'name' => q(ဟက်တိုလီတာ),
-						'other' => q({0} hL),
-					},
-					'hectopascal' => {
-						'name' => q(hPa),
-						'other' => q({0} hPa),
-					},
-					'hertz' => {
-						'name' => q(Hz),
-						'other' => q({0} Hz),
-					},
-					'horsepower' => {
-						'name' => q(hp),
-						'other' => q({0} hp),
-					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(နာရီ),
 						'other' => q({0} နာရီ),
 						'per' => q({0}/ နာရီ),
 					},
-					'inch' => {
-						'name' => q(လက်မ),
-						'other' => q({0} လက်မ),
-						'per' => q({0}/လက်မ),
+					# Long Unit Identifier
+					'duration-microsecond' => {
+						'name' => q(မိုက်ခရိုစက္ကန့်),
+						'other' => q({0} μs),
 					},
-					'inch-hg' => {
-						'name' => q(inHg),
-						'other' => q({0} inHg),
-					},
-					'joule' => {
-						'name' => q(ဂျူးလ်),
-						'other' => q({0} J),
-					},
-					'karat' => {
-						'name' => q(ကာရက်),
-						'other' => q({0} kt),
-					},
-					'kelvin' => {
-						'name' => q(K),
-						'other' => q({0} K),
-					},
-					'kilobit' => {
-						'name' => q(ကီလိုဘစ်),
-						'other' => q({0} kb),
-					},
-					'kilobyte' => {
-						'name' => q(ကီလိုဘိုက်),
-						'other' => q({0} kB),
-					},
-					'kilocalorie' => {
-						'name' => q(ကီလိုကယ်လိုရီ),
-						'other' => q({0} kcal),
-					},
-					'kilogram' => {
-						'name' => q(ကီလိုဂရမ်),
-						'other' => q({0} kg),
-						'per' => q({0}/kg),
-					},
-					'kilohertz' => {
-						'name' => q(kHz),
-						'other' => q({0} kHz),
-					},
-					'kilojoule' => {
-						'name' => q(ကီလိုဂျူးလ်),
-						'other' => q({0} kJ),
-					},
-					'kilometer' => {
-						'name' => q(km),
-						'other' => q({0} km),
-						'per' => q({0}/km),
-					},
-					'kilometer-per-hour' => {
-						'name' => q(ကီလိုမီတာ/နာရီ),
-						'other' => q({0} km/h),
-					},
-					'kilowatt' => {
-						'name' => q(ကီလိုဝပ်),
-						'other' => q({0} kW),
-					},
-					'kilowatt-hour' => {
-						'name' => q(ကီလိုဝပ်-နာရီ),
-						'other' => q({0} kWh),
-					},
-					'knot' => {
-						'name' => q(kn),
-						'other' => q({0} kn),
-					},
-					'light-year' => {
-						'name' => q(အလင်းနှစ်),
-						'other' => q({0} အလင်းနှစ်),
-					},
-					'liter' => {
-						'name' => q(လီတာ),
-						'other' => q({0} လီတာ),
-						'per' => q({0}/l),
-					},
-					'liter-per-100kilometers' => {
-						'name' => q(တစ်ရာကီလိုမီတာရှိ လီတာ),
-						'other' => q({0} L/100 km),
-					},
-					'liter-per-kilometer' => {
-						'name' => q(လီတာ/ကီလိုမီတာ),
-						'other' => q({0} L/km),
-					},
-					'lux' => {
-						'name' => q(လတ်ခ်),
-						'other' => q({0} lx),
-					},
-					'megabit' => {
-						'name' => q(မီဂါဘစ်),
-						'other' => q({0} Mb),
-					},
-					'megabyte' => {
-						'name' => q(မီဂါဘိုက်),
-						'other' => q({0} MB),
-					},
-					'megahertz' => {
-						'name' => q(မီဂါဟတ်ဇ်),
-						'other' => q({0} MHz),
-					},
-					'megaliter' => {
-						'name' => q(မီဂါလီတာ),
-						'other' => q({0} ML),
-					},
-					'megawatt' => {
-						'name' => q(မီဂါဝပ်),
-						'other' => q({0} MW),
-					},
-					'meter' => {
-						'name' => q(m),
-						'other' => q({0} m),
-						'per' => q({0}/m),
-					},
-					'meter-per-second' => {
-						'name' => q(မီတာ/စက္ကန့်),
-						'other' => q({0} m/s),
-					},
-					'meter-per-second-squared' => {
-						'name' => q(မီတာ/စက္ကန့်နှစ်ထပ်ကိန်း),
-						'other' => q({0} m/s²),
-					},
-					'metric-ton' => {
-						'name' => q(မက်ထရစ်တန်),
-						'other' => q({0} t),
-					},
-					'microgram' => {
-						'name' => q(µg),
-						'other' => q({0} µg),
-					},
-					'micrometer' => {
-						'name' => q(မိုက်ခရိုမီတာ),
-						'other' => q({0} µm),
-					},
+					# Core Unit Identifier
 					'microsecond' => {
 						'name' => q(မိုက်ခရိုစက္ကန့်),
 						'other' => q({0} μs),
 					},
-					'mile' => {
-						'name' => q(မိုင်),
-						'other' => q({0} မိုင်),
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(မီလီစက္ကန့်),
+						'other' => q({0} မီလီစက္ကန့်),
 					},
-					'mile-per-gallon' => {
-						'name' => q(မိုင်/ဂါလန်),
-						'other' => q({0} mpg),
-					},
-					'mile-per-gallon-imperial' => {
-						'name' => q(mpg Imp.),
-						'other' => q({0} mpg Imp.),
-					},
-					'mile-per-hour' => {
-						'name' => q(မိုင်/နာရီ),
-						'other' => q({0} mi/h),
-					},
-					'mile-scandinavian' => {
-						'name' => q(smi),
-						'other' => q({0} smi),
-					},
-					'milliampere' => {
-						'name' => q(mA),
-						'other' => q({0} mA),
-					},
-					'millibar' => {
-						'name' => q(မီလီဘား),
-						'other' => q({0} mbar),
-					},
-					'milligram' => {
-						'name' => q(မီလီဂရမ်),
-						'other' => q({0} mg),
-					},
-					'milligram-per-deciliter' => {
-						'name' => q(mg/dL),
-						'other' => q({0} mg/dL),
-					},
-					'milliliter' => {
-						'name' => q(မီလီလီတာ),
-						'other' => q({0} mL),
-					},
-					'millimeter' => {
-						'name' => q(mm),
-						'other' => q({0} mm),
-					},
-					'millimeter-of-mercury' => {
-						'name' => q(mm Hg),
-						'other' => q({0} mm Hg),
-					},
-					'millimole-per-liter' => {
-						'name' => q(mmol/L),
-						'other' => q({0} mmol/L),
-					},
+					# Core Unit Identifier
 					'millisecond' => {
 						'name' => q(မီလီစက္ကန့်),
 						'other' => q({0} မီလီစက္ကန့်),
 					},
-					'milliwatt' => {
-						'name' => q(မီလီဝပ်),
-						'other' => q({0} mW),
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(မိနစ်),
+						'other' => q({0} မိနစ်),
+						'per' => q({0}/ မိနစ်),
 					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(မိနစ်),
 						'other' => q({0} မိနစ်),
 						'per' => q({0}/ မိနစ်),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(လ),
+						'other' => q({0} လ),
+						'per' => q({0}/ လ),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(လ),
 						'other' => q({0} လ),
 						'per' => q({0}/ လ),
 					},
-					'nanometer' => {
-						'name' => q(nm),
-						'other' => q({0} nm),
+					# Long Unit Identifier
+					'duration-nanosecond' => {
+						'name' => q(နာနိုစက္ကန့်),
+						'other' => q({0} ns),
 					},
+					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(နာနိုစက္ကန့်),
 						'other' => q({0} ns),
 					},
-					'nautical-mile' => {
-						'name' => q(ရေမိုင်),
-						'other' => q({0} nmi),
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(စက္ကန့်),
+						'other' => q({0} sec),
 					},
-					'ohm' => {
-						'name' => q(အုမ်း),
-						'other' => q({0} Ω),
-					},
-					'ounce' => {
-						'name' => q(အောင်စ),
-						'other' => q({0} oz),
-						'per' => q({0}/oz),
-					},
-					'ounce-troy' => {
-						'name' => q(ထရိုအောင်စ),
-						'other' => q({0} oz t),
-					},
-					'parsec' => {
-						'name' => q(ပါစက်ခ်),
-						'other' => q({0} pc),
-					},
-					'part-per-million' => {
-						'name' => q(တစ်သန်းပုံ တစ်ပုံ),
-						'other' => q({0} ppm),
-					},
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					'percent' => {
-						'name' => q(%),
-						'other' => q({0}%),
-					},
-					'permille' => {
-						'name' => q(‰),
-						'other' => q({0}‰),
-					},
-					'petabyte' => {
-						'name' => q(PB),
-						'other' => q({0} PB),
-					},
-					'picometer' => {
-						'name' => q(pm),
-						'other' => q({0} pm),
-					},
-					'pint' => {
-						'name' => q(ပိုင့်),
-						'other' => q({0} pt),
-					},
-					'pint-metric' => {
-						'name' => q(မထ္ထရစ်ပိုင့်),
-						'other' => q({0} mpt),
-					},
-					'point' => {
-						'name' => q(ပွိုင့်),
-						'other' => q({0} ပွိုင့်),
-					},
-					'pound' => {
-						'name' => q(ပေါင်),
-						'other' => q({0} lb),
-						'per' => q({0}/lb),
-					},
-					'pound-per-square-inch' => {
-						'name' => q(ပေါင်/စတုရန်းလက်မ),
-						'other' => q({0} psi),
-					},
-					'quart' => {
-						'name' => q(ကွတ်),
-						'other' => q({0} qt),
-					},
-					'radian' => {
-						'name' => q(ရေဒီယဲန်း),
-						'other' => q({0} rad),
-					},
-					'revolution' => {
-						'name' => q(rev),
-						'other' => q({0} rev),
-					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(စက္ကန့်),
-						'other' => q({0} စက္ကန့်),
-						'per' => q({0}/ စက္ကန့်),
+						'other' => q({0} sec),
 					},
-					'square-centimeter' => {
-						'name' => q(စတုရန်းစင်တီမီတာ),
-						'other' => q({0} cm²),
-						'per' => q({0}/cm²),
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(ပတ်),
+						'other' => q({0} ပတ်),
+						'per' => q({0}/ ပတ်),
 					},
-					'square-foot' => {
-						'name' => q(စတုရန်းပေ),
-						'other' => q({0} ft²),
-					},
-					'square-inch' => {
-						'name' => q(စတုရန်းလက်မ),
-						'other' => q({0} in²),
-						'per' => q({0}/in²),
-					},
-					'square-kilometer' => {
-						'name' => q(စတုရန်းကီလိုမီတာ),
-						'other' => q({0} km²),
-						'per' => q({0}/km²),
-					},
-					'square-meter' => {
-						'name' => q(စတုရန်းမီတာ),
-						'other' => q({0} m²),
-						'per' => q({0}/m²),
-					},
-					'square-mile' => {
-						'name' => q(စတုရန်းမိုင်),
-						'other' => q({0} mi²),
-						'per' => q({0}/mi²),
-					},
-					'square-yard' => {
-						'name' => q(စတုရန်းကိုက်),
-						'other' => q({0} yd²),
-					},
-					'tablespoon' => {
-						'name' => q(စားပွဲဇွန်း),
-						'other' => q({0} tbsp),
-					},
-					'teaspoon' => {
-						'name' => q(လက်ဖက်ရည်ဇွန်း),
-						'other' => q({0} tsp),
-					},
-					'terabit' => {
-						'name' => q(တယ်ရာဘစ်),
-						'other' => q({0} Tb),
-					},
-					'terabyte' => {
-						'name' => q(တယ်ရာဘိုက်),
-						'other' => q({0} TB),
-					},
-					'ton' => {
-						'name' => q(တန်),
-						'other' => q({0} tn),
-					},
-					'volt' => {
-						'name' => q(ဗို့),
-						'other' => q({0} V),
-					},
-					'watt' => {
-						'name' => q(ဝပ်),
-						'other' => q({0} W),
-					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(ပတ်),
 						'other' => q({0} ပတ်),
 						'per' => q({0}/ ပတ်),
 					},
-					'yard' => {
-						'name' => q(ကိုက်),
-						'other' => q({0} ကိုက်),
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(နှစ်),
+						'other' => q({0} နှစ်),
+						'per' => q({0}/ နှစ်),
 					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(နှစ်),
 						'other' => q({0} နှစ်),
 						'per' => q({0}/ နှစ်),
+					},
+					# Long Unit Identifier
+					'electric-ampere' => {
+						'name' => q(အမ်ပီယာ),
+						'other' => q({0} A),
+					},
+					# Core Unit Identifier
+					'ampere' => {
+						'name' => q(အမ်ပီယာ),
+						'other' => q({0} A),
+					},
+					# Long Unit Identifier
+					'electric-milliampere' => {
+						'name' => q(mA),
+						'other' => q({0} mA),
+					},
+					# Core Unit Identifier
+					'milliampere' => {
+						'name' => q(mA),
+						'other' => q({0} mA),
+					},
+					# Long Unit Identifier
+					'electric-ohm' => {
+						'name' => q(အုမ်း),
+						'other' => q({0} Ω),
+					},
+					# Core Unit Identifier
+					'ohm' => {
+						'name' => q(အုမ်း),
+						'other' => q({0} Ω),
+					},
+					# Long Unit Identifier
+					'electric-volt' => {
+						'name' => q(ဗို့),
+						'other' => q({0} V),
+					},
+					# Core Unit Identifier
+					'volt' => {
+						'name' => q(ဗို့),
+						'other' => q({0} V),
+					},
+					# Long Unit Identifier
+					'energy-british-thermal-unit' => {
+						'name' => q(BTU),
+						'other' => q({0} Btu),
+					},
+					# Core Unit Identifier
+					'british-thermal-unit' => {
+						'name' => q(BTU),
+						'other' => q({0} Btu),
+					},
+					# Long Unit Identifier
+					'energy-calorie' => {
+						'name' => q(ကယ်လိုရီ),
+						'other' => q({0} cal),
+					},
+					# Core Unit Identifier
+					'calorie' => {
+						'name' => q(ကယ်လိုရီ),
+						'other' => q({0} cal),
+					},
+					# Long Unit Identifier
+					'energy-electronvolt' => {
+						'name' => q(အီလက်ထရွန်ဗို့),
+						'other' => q({0} eV),
+					},
+					# Core Unit Identifier
+					'electronvolt' => {
+						'name' => q(အီလက်ထရွန်ဗို့),
+						'other' => q({0} eV),
+					},
+					# Long Unit Identifier
+					'energy-foodcalorie' => {
+						'name' => q(ကယ်လိုရီ),
+						'other' => q({0} Cal),
+					},
+					# Core Unit Identifier
+					'foodcalorie' => {
+						'name' => q(ကယ်လိုရီ),
+						'other' => q({0} Cal),
+					},
+					# Long Unit Identifier
+					'energy-joule' => {
+						'name' => q(ဂျူးလ်),
+						'other' => q({0} J),
+					},
+					# Core Unit Identifier
+					'joule' => {
+						'name' => q(ဂျူးလ်),
+						'other' => q({0} J),
+					},
+					# Long Unit Identifier
+					'energy-kilocalorie' => {
+						'name' => q(ကီလိုကယ်လိုရီ),
+						'other' => q({0} kcal),
+					},
+					# Core Unit Identifier
+					'kilocalorie' => {
+						'name' => q(ကီလိုကယ်လိုရီ),
+						'other' => q({0} kcal),
+					},
+					# Long Unit Identifier
+					'energy-kilojoule' => {
+						'name' => q(ကီလိုဂျူးလ်),
+						'other' => q({0} kJ),
+					},
+					# Core Unit Identifier
+					'kilojoule' => {
+						'name' => q(ကီလိုဂျူးလ်),
+						'other' => q({0} kJ),
+					},
+					# Long Unit Identifier
+					'energy-kilowatt-hour' => {
+						'name' => q(ကီလိုဝပ်-နာရီ),
+						'other' => q({0} kWh),
+					},
+					# Core Unit Identifier
+					'kilowatt-hour' => {
+						'name' => q(ကီလိုဝပ်-နာရီ),
+						'other' => q({0} kWh),
+					},
+					# Long Unit Identifier
+					'energy-therm-us' => {
+						'name' => q(ယူအက်စ် သာမယ်လ်),
+						'other' => q({0} ယူအက်စ်သာမယ်လ်),
+					},
+					# Core Unit Identifier
+					'therm-us' => {
+						'name' => q(ယူအက်စ် သာမယ်လ်),
+						'other' => q({0} ယူအက်စ်သာမယ်လ်),
+					},
+					# Long Unit Identifier
+					'force-newton' => {
+						'name' => q(နယူတန်),
+					},
+					# Core Unit Identifier
+					'newton' => {
+						'name' => q(နယူတန်),
+					},
+					# Long Unit Identifier
+					'force-pound-force' => {
+						'name' => q(lbf),
+						'other' => q({0} lbf),
+					},
+					# Core Unit Identifier
+					'pound-force' => {
+						'name' => q(lbf),
+						'other' => q({0} lbf),
+					},
+					# Long Unit Identifier
+					'frequency-gigahertz' => {
+						'name' => q(ဂီဂါဟတ်ဇ်),
+						'other' => q({0} GHz),
+					},
+					# Core Unit Identifier
+					'gigahertz' => {
+						'name' => q(ဂီဂါဟတ်ဇ်),
+						'other' => q({0} GHz),
+					},
+					# Long Unit Identifier
+					'frequency-hertz' => {
+						'name' => q(Hz),
+						'other' => q({0} Hz),
+					},
+					# Core Unit Identifier
+					'hertz' => {
+						'name' => q(Hz),
+						'other' => q({0} Hz),
+					},
+					# Long Unit Identifier
+					'frequency-kilohertz' => {
+						'name' => q(kHz),
+						'other' => q({0} kHz),
+					},
+					# Core Unit Identifier
+					'kilohertz' => {
+						'name' => q(kHz),
+						'other' => q({0} kHz),
+					},
+					# Long Unit Identifier
+					'frequency-megahertz' => {
+						'name' => q(မီဂါဟတ်ဇ်),
+						'other' => q({0} MHz),
+					},
+					# Core Unit Identifier
+					'megahertz' => {
+						'name' => q(မီဂါဟတ်ဇ်),
+						'other' => q({0} MHz),
+					},
+					# Long Unit Identifier
+					'graphics-dot' => {
+						'name' => q(အစက်),
+						'other' => q({0} အစက်),
+					},
+					# Core Unit Identifier
+					'dot' => {
+						'name' => q(အစက်),
+						'other' => q({0} အစက်),
+					},
+					# Long Unit Identifier
+					'length-astronomical-unit' => {
+						'name' => q(နက်ခတ်တဗဒေယူနဈ),
+						'other' => q({0} au),
+					},
+					# Core Unit Identifier
+					'astronomical-unit' => {
+						'name' => q(နက်ခတ်တဗဒေယူနဈ),
+						'other' => q({0} au),
+					},
+					# Long Unit Identifier
+					'length-centimeter' => {
+						'name' => q(cm),
+						'other' => q({0} cm),
+						'per' => q({0}/cm),
+					},
+					# Core Unit Identifier
+					'centimeter' => {
+						'name' => q(cm),
+						'other' => q({0} cm),
+						'per' => q({0}/cm),
+					},
+					# Long Unit Identifier
+					'length-decimeter' => {
+						'name' => q(dm),
+						'other' => q({0} dm),
+					},
+					# Core Unit Identifier
+					'decimeter' => {
+						'name' => q(dm),
+						'other' => q({0} dm),
+					},
+					# Long Unit Identifier
+					'length-earth-radius' => {
+						'name' => q(ကမ္ဘာ့အချင်းဝက်),
+						'other' => q({0} ကမ္ဘာ့အချင်းဝက်),
+					},
+					# Core Unit Identifier
+					'earth-radius' => {
+						'name' => q(ကမ္ဘာ့အချင်းဝက်),
+						'other' => q({0} ကမ္ဘာ့အချင်းဝက်),
+					},
+					# Long Unit Identifier
+					'length-fathom' => {
+						'name' => q(ဖန်တမ်),
+						'other' => q({0} ဖန်တမ်),
+					},
+					# Core Unit Identifier
+					'fathom' => {
+						'name' => q(ဖန်တမ်),
+						'other' => q({0} ဖန်တမ်),
+					},
+					# Long Unit Identifier
+					'length-foot' => {
+						'name' => q(ပေ),
+						'other' => q({0} ပေ),
+						'per' => q({0}/ပေ),
+					},
+					# Core Unit Identifier
+					'foot' => {
+						'name' => q(ပေ),
+						'other' => q({0} ပေ),
+						'per' => q({0}/ပေ),
+					},
+					# Long Unit Identifier
+					'length-furlong' => {
+						'name' => q(ဖာလုံ),
+						'other' => q({0} ဖာလုံ),
+					},
+					# Core Unit Identifier
+					'furlong' => {
+						'name' => q(ဖာလုံ),
+						'other' => q({0} ဖာလုံ),
+					},
+					# Long Unit Identifier
+					'length-inch' => {
+						'name' => q(လက်မ),
+						'other' => q({0} လက်မ),
+						'per' => q({0}/လက်မ),
+					},
+					# Core Unit Identifier
+					'inch' => {
+						'name' => q(လက်မ),
+						'other' => q({0} လက်မ),
+						'per' => q({0}/လက်မ),
+					},
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'name' => q(km),
+						'other' => q({0} km),
+						'per' => q({0}/km),
+					},
+					# Core Unit Identifier
+					'kilometer' => {
+						'name' => q(km),
+						'other' => q({0} km),
+						'per' => q({0}/km),
+					},
+					# Long Unit Identifier
+					'length-light-year' => {
+						'name' => q(အလင်းနှစ်),
+						'other' => q({0} အလင်းနှစ်),
+					},
+					# Core Unit Identifier
+					'light-year' => {
+						'name' => q(အလင်းနှစ်),
+						'other' => q({0} အလင်းနှစ်),
+					},
+					# Long Unit Identifier
+					'length-meter' => {
+						'name' => q(m),
+						'other' => q({0} m),
+						'per' => q({0}/m),
+					},
+					# Core Unit Identifier
+					'meter' => {
+						'name' => q(m),
+						'other' => q({0} m),
+						'per' => q({0}/m),
+					},
+					# Long Unit Identifier
+					'length-micrometer' => {
+						'name' => q(မိုက်ခရိုမီတာ),
+						'other' => q({0} μm),
+					},
+					# Core Unit Identifier
+					'micrometer' => {
+						'name' => q(မိုက်ခရိုမီတာ),
+						'other' => q({0} μm),
+					},
+					# Long Unit Identifier
+					'length-mile' => {
+						'name' => q(မိုင်),
+						'other' => q({0} မိုင်),
+					},
+					# Core Unit Identifier
+					'mile' => {
+						'name' => q(မိုင်),
+						'other' => q({0} မိုင်),
+					},
+					# Long Unit Identifier
+					'length-mile-scandinavian' => {
+						'name' => q(smi),
+						'other' => q({0} smi),
+					},
+					# Core Unit Identifier
+					'mile-scandinavian' => {
+						'name' => q(smi),
+						'other' => q({0} smi),
+					},
+					# Long Unit Identifier
+					'length-millimeter' => {
+						'name' => q(mm),
+						'other' => q({0} mm),
+					},
+					# Core Unit Identifier
+					'millimeter' => {
+						'name' => q(mm),
+						'other' => q({0} mm),
+					},
+					# Long Unit Identifier
+					'length-nanometer' => {
+						'name' => q(nm),
+						'other' => q({0} nm),
+					},
+					# Core Unit Identifier
+					'nanometer' => {
+						'name' => q(nm),
+						'other' => q({0} nm),
+					},
+					# Long Unit Identifier
+					'length-nautical-mile' => {
+						'name' => q(ရေမိုင်),
+						'other' => q({0} nmi),
+					},
+					# Core Unit Identifier
+					'nautical-mile' => {
+						'name' => q(ရေမိုင်),
+						'other' => q({0} nmi),
+					},
+					# Long Unit Identifier
+					'length-parsec' => {
+						'name' => q(ပါစက်ခ်),
+						'other' => q({0} pc),
+					},
+					# Core Unit Identifier
+					'parsec' => {
+						'name' => q(ပါစက်ခ်),
+						'other' => q({0} pc),
+					},
+					# Long Unit Identifier
+					'length-picometer' => {
+						'name' => q(pm),
+						'other' => q({0} pm),
+					},
+					# Core Unit Identifier
+					'picometer' => {
+						'name' => q(pm),
+						'other' => q({0} pm),
+					},
+					# Long Unit Identifier
+					'length-point' => {
+						'name' => q(ပွိုင့်),
+						'other' => q({0} ပွိုင့်),
+					},
+					# Core Unit Identifier
+					'point' => {
+						'name' => q(ပွိုင့်),
+						'other' => q({0} ပွိုင့်),
+					},
+					# Long Unit Identifier
+					'length-solar-radius' => {
+						'name' => q(ဆိုလာ ရာဒီ),
+						'other' => q({0} R☉),
+					},
+					# Core Unit Identifier
+					'solar-radius' => {
+						'name' => q(ဆိုလာ ရာဒီ),
+						'other' => q({0} R☉),
+					},
+					# Long Unit Identifier
+					'length-yard' => {
+						'name' => q(ကိုက်),
+						'other' => q({0} ကိုက်),
+					},
+					# Core Unit Identifier
+					'yard' => {
+						'name' => q(ကိုက်),
+						'other' => q({0} ကိုက်),
+					},
+					# Long Unit Identifier
+					'light-lumen' => {
+						'name' => q(လူမန်),
+						'other' => q({0} လူမန်),
+					},
+					# Core Unit Identifier
+					'lumen' => {
+						'name' => q(လူမန်),
+						'other' => q({0} လူမန်),
+					},
+					# Long Unit Identifier
+					'light-lux' => {
+						'name' => q(လတ်ခ်),
+						'other' => q({0} lx),
+					},
+					# Core Unit Identifier
+					'lux' => {
+						'name' => q(လတ်ခ်),
+						'other' => q({0} lx),
+					},
+					# Long Unit Identifier
+					'light-solar-luminosity' => {
+						'name' => q(ဆိုလာ လူမီနိုစီးတီးစ်),
+					},
+					# Core Unit Identifier
+					'solar-luminosity' => {
+						'name' => q(ဆိုလာ လူမီနိုစီးတီးစ်),
+					},
+					# Long Unit Identifier
+					'mass-carat' => {
+						'name' => q(ကာရက်),
+						'other' => q({0} CD),
+					},
+					# Core Unit Identifier
+					'carat' => {
+						'name' => q(ကာရက်),
+						'other' => q({0} CD),
+					},
+					# Long Unit Identifier
+					'mass-dalton' => {
+						'name' => q(ဒဲလ်တန်စ်),
+						'other' => q({0} Da),
+					},
+					# Core Unit Identifier
+					'dalton' => {
+						'name' => q(ဒဲလ်တန်စ်),
+						'other' => q({0} Da),
+					},
+					# Long Unit Identifier
+					'mass-earth-mass' => {
+						'name' => q(ကမ္ဘာ့ဒြပ်ထု),
+						'other' => q({0} M⊕),
+					},
+					# Core Unit Identifier
+					'earth-mass' => {
+						'name' => q(ကမ္ဘာ့ဒြပ်ထု),
+						'other' => q({0} M⊕),
+					},
+					# Long Unit Identifier
+					'mass-grain' => {
+						'name' => q(ဂရိန်),
+						'other' => q({0} ဂရိန်),
+					},
+					# Core Unit Identifier
+					'grain' => {
+						'name' => q(ဂရိန်),
+						'other' => q({0} ဂရိန်),
+					},
+					# Long Unit Identifier
+					'mass-gram' => {
+						'name' => q(ဂရမ်),
+						'other' => q({0} g),
+						'per' => q({0}/g),
+					},
+					# Core Unit Identifier
+					'gram' => {
+						'name' => q(ဂရမ်),
+						'other' => q({0} g),
+						'per' => q({0}/g),
+					},
+					# Long Unit Identifier
+					'mass-kilogram' => {
+						'name' => q(ကီလိုဂရမ်),
+						'other' => q({0} kg),
+						'per' => q({0}/kg),
+					},
+					# Core Unit Identifier
+					'kilogram' => {
+						'name' => q(ကီလိုဂရမ်),
+						'other' => q({0} kg),
+						'per' => q({0}/kg),
+					},
+					# Long Unit Identifier
+					'mass-metric-ton' => {
+						'name' => q(မက်ထရစ်တန်),
+						'other' => q({0} t),
+					},
+					# Core Unit Identifier
+					'metric-ton' => {
+						'name' => q(မက်ထရစ်တန်),
+						'other' => q({0} t),
+					},
+					# Long Unit Identifier
+					'mass-microgram' => {
+						'name' => q(μg),
+						'other' => q({0} μg),
+					},
+					# Core Unit Identifier
+					'microgram' => {
+						'name' => q(μg),
+						'other' => q({0} μg),
+					},
+					# Long Unit Identifier
+					'mass-milligram' => {
+						'name' => q(မီလီဂရမ်),
+						'other' => q({0} mg),
+					},
+					# Core Unit Identifier
+					'milligram' => {
+						'name' => q(မီလီဂရမ်),
+						'other' => q({0} mg),
+					},
+					# Long Unit Identifier
+					'mass-ounce' => {
+						'name' => q(အောင်စ),
+						'other' => q({0} oz),
+						'per' => q({0}/oz),
+					},
+					# Core Unit Identifier
+					'ounce' => {
+						'name' => q(အောင်စ),
+						'other' => q({0} oz),
+						'per' => q({0}/oz),
+					},
+					# Long Unit Identifier
+					'mass-ounce-troy' => {
+						'name' => q(ထရိုအောင်စ),
+						'other' => q({0} oz t),
+					},
+					# Core Unit Identifier
+					'ounce-troy' => {
+						'name' => q(ထရိုအောင်စ),
+						'other' => q({0} oz t),
+					},
+					# Long Unit Identifier
+					'mass-pound' => {
+						'name' => q(ပေါင်),
+						'other' => q({0} lb),
+						'per' => q({0}/lb),
+					},
+					# Core Unit Identifier
+					'pound' => {
+						'name' => q(ပေါင်),
+						'other' => q({0} lb),
+						'per' => q({0}/lb),
+					},
+					# Long Unit Identifier
+					'mass-solar-mass' => {
+						'name' => q(နေရောင်ခြည် ဒြပ်ထု),
+						'other' => q({0} M☉),
+					},
+					# Core Unit Identifier
+					'solar-mass' => {
+						'name' => q(နေရောင်ခြည် ဒြပ်ထု),
+						'other' => q({0} M☉),
+					},
+					# Long Unit Identifier
+					'mass-stone' => {
+						'name' => q(စတုန်),
+						'other' => q({0} စတုန်),
+					},
+					# Core Unit Identifier
+					'stone' => {
+						'name' => q(စတုန်),
+						'other' => q({0} စတုန်),
+					},
+					# Long Unit Identifier
+					'mass-ton' => {
+						'name' => q(တန်),
+						'other' => q({0} tn),
+					},
+					# Core Unit Identifier
+					'ton' => {
+						'name' => q(တန်),
+						'other' => q({0} tn),
+					},
+					# Long Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Core Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Long Unit Identifier
+					'power-gigawatt' => {
+						'name' => q(ဂစ်ဂါဝပ်),
+						'other' => q({0} GW),
+					},
+					# Core Unit Identifier
+					'gigawatt' => {
+						'name' => q(ဂစ်ဂါဝပ်),
+						'other' => q({0} GW),
+					},
+					# Long Unit Identifier
+					'power-horsepower' => {
+						'name' => q(hp),
+						'other' => q({0} hp),
+					},
+					# Core Unit Identifier
+					'horsepower' => {
+						'name' => q(hp),
+						'other' => q({0} hp),
+					},
+					# Long Unit Identifier
+					'power-kilowatt' => {
+						'name' => q(ကီလိုဝပ်),
+						'other' => q({0} kW),
+					},
+					# Core Unit Identifier
+					'kilowatt' => {
+						'name' => q(ကီလိုဝပ်),
+						'other' => q({0} kW),
+					},
+					# Long Unit Identifier
+					'power-megawatt' => {
+						'name' => q(မီဂါဝပ်),
+						'other' => q({0} MW),
+					},
+					# Core Unit Identifier
+					'megawatt' => {
+						'name' => q(မီဂါဝပ်),
+						'other' => q({0} MW),
+					},
+					# Long Unit Identifier
+					'power-milliwatt' => {
+						'name' => q(မီလီဝပ်),
+						'other' => q({0} mW),
+					},
+					# Core Unit Identifier
+					'milliwatt' => {
+						'name' => q(မီလီဝပ်),
+						'other' => q({0} mW),
+					},
+					# Long Unit Identifier
+					'power-watt' => {
+						'name' => q(ဝပ်),
+						'other' => q({0} W),
+					},
+					# Core Unit Identifier
+					'watt' => {
+						'name' => q(ဝပ်),
+						'other' => q({0} W),
+					},
+					# Long Unit Identifier
+					'pressure-atmosphere' => {
+						'name' => q(atm),
+						'other' => q({0} atm),
+					},
+					# Core Unit Identifier
+					'atmosphere' => {
+						'name' => q(atm),
+						'other' => q({0} atm),
+					},
+					# Long Unit Identifier
+					'pressure-bar' => {
+						'name' => q(ဘား),
+						'other' => q({0} ဘား),
+					},
+					# Core Unit Identifier
+					'bar' => {
+						'name' => q(ဘား),
+						'other' => q({0} ဘား),
+					},
+					# Long Unit Identifier
+					'pressure-hectopascal' => {
+						'name' => q(hPa),
+						'other' => q({0} hPa),
+					},
+					# Core Unit Identifier
+					'hectopascal' => {
+						'name' => q(hPa),
+						'other' => q({0} hPa),
+					},
+					# Long Unit Identifier
+					'pressure-inch-ofhg' => {
+						'name' => q(inHg),
+						'other' => q({0} inHg),
+					},
+					# Core Unit Identifier
+					'inch-ofhg' => {
+						'name' => q(inHg),
+						'other' => q({0} inHg),
+					},
+					# Long Unit Identifier
+					'pressure-kilopascal' => {
+						'name' => q(kPa),
+						'other' => q({0} kPa),
+					},
+					# Core Unit Identifier
+					'kilopascal' => {
+						'name' => q(kPa),
+						'other' => q({0} kPa),
+					},
+					# Long Unit Identifier
+					'pressure-megapascal' => {
+						'name' => q(MPa),
+						'other' => q({0} MPa),
+					},
+					# Core Unit Identifier
+					'megapascal' => {
+						'name' => q(MPa),
+						'other' => q({0} MPa),
+					},
+					# Long Unit Identifier
+					'pressure-millibar' => {
+						'name' => q(မီလီဘား),
+						'other' => q({0} mbar),
+					},
+					# Core Unit Identifier
+					'millibar' => {
+						'name' => q(မီလီဘား),
+						'other' => q({0} mbar),
+					},
+					# Long Unit Identifier
+					'pressure-millimeter-ofhg' => {
+						'name' => q(mm Hg),
+						'other' => q({0} mm Hg),
+					},
+					# Core Unit Identifier
+					'millimeter-ofhg' => {
+						'name' => q(mm Hg),
+						'other' => q({0} mm Hg),
+					},
+					# Long Unit Identifier
+					'pressure-pound-force-per-square-inch' => {
+						'name' => q(ပေါင်/စတုရန်းလက်မ),
+						'other' => q({0} psi),
+					},
+					# Core Unit Identifier
+					'pound-force-per-square-inch' => {
+						'name' => q(ပေါင်/စတုရန်းလက်မ),
+						'other' => q({0} psi),
+					},
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'name' => q(ကီလိုမီတာ/နာရီ),
+						'other' => q({0} km/h),
+					},
+					# Core Unit Identifier
+					'kilometer-per-hour' => {
+						'name' => q(ကီလိုမီတာ/နာရီ),
+						'other' => q({0} km/h),
+					},
+					# Long Unit Identifier
+					'speed-knot' => {
+						'name' => q(kn),
+						'other' => q({0} kn),
+					},
+					# Core Unit Identifier
+					'knot' => {
+						'name' => q(kn),
+						'other' => q({0} kn),
+					},
+					# Long Unit Identifier
+					'speed-meter-per-second' => {
+						'name' => q(မီတာ/စက္ကန့်),
+						'other' => q({0} m/s),
+					},
+					# Core Unit Identifier
+					'meter-per-second' => {
+						'name' => q(မီတာ/စက္ကန့်),
+						'other' => q({0} m/s),
+					},
+					# Long Unit Identifier
+					'speed-mile-per-hour' => {
+						'name' => q(မိုင်/နာရီ),
+						'other' => q({0} mi/h),
+					},
+					# Core Unit Identifier
+					'mile-per-hour' => {
+						'name' => q(မိုင်/နာရီ),
+						'other' => q({0} mi/h),
+					},
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'name' => q(°C),
+						'other' => q({0}°C),
+					},
+					# Core Unit Identifier
+					'celsius' => {
+						'name' => q(°C),
+						'other' => q({0}°C),
+					},
+					# Long Unit Identifier
+					'temperature-fahrenheit' => {
+						'name' => q(°F),
+						'other' => q({0}°F),
+					},
+					# Core Unit Identifier
+					'fahrenheit' => {
+						'name' => q(°F),
+						'other' => q({0}°F),
+					},
+					# Long Unit Identifier
+					'temperature-generic' => {
+						'name' => q(°),
+						'other' => q({0}°),
+					},
+					# Core Unit Identifier
+					'generic' => {
+						'name' => q(°),
+						'other' => q({0}°),
+					},
+					# Long Unit Identifier
+					'temperature-kelvin' => {
+						'name' => q(K),
+						'other' => q({0} K),
+					},
+					# Core Unit Identifier
+					'kelvin' => {
+						'name' => q(K),
+						'other' => q({0} K),
+					},
+					# Long Unit Identifier
+					'torque-newton-meter' => {
+						'name' => q(N.m),
+						'other' => q({0} N.m),
+					},
+					# Core Unit Identifier
+					'newton-meter' => {
+						'name' => q(N.m),
+						'other' => q({0} N.m),
+					},
+					# Long Unit Identifier
+					'torque-pound-force-foot' => {
+						'name' => q(lbf.ft),
+						'other' => q({0} lbf.ft),
+					},
+					# Core Unit Identifier
+					'pound-force-foot' => {
+						'name' => q(lbf.ft),
+						'other' => q({0} lbf.ft),
+					},
+					# Long Unit Identifier
+					'volume-acre-foot' => {
+						'name' => q(ဧက-ပေ),
+						'other' => q({0} ac ft),
+					},
+					# Core Unit Identifier
+					'acre-foot' => {
+						'name' => q(ဧက-ပေ),
+						'other' => q({0} ac ft),
+					},
+					# Long Unit Identifier
+					'volume-barrel' => {
+						'name' => q(ဘယ်ရလ်),
+						'other' => q({0} bbl),
+					},
+					# Core Unit Identifier
+					'barrel' => {
+						'name' => q(ဘယ်ရလ်),
+						'other' => q({0} bbl),
+					},
+					# Long Unit Identifier
+					'volume-bushel' => {
+						'name' => q(၈ ဂါလံဝင်ပုံး),
+						'other' => q(၈ ဂါလံဝင်ပုံး {0} ပုံး),
+					},
+					# Core Unit Identifier
+					'bushel' => {
+						'name' => q(၈ ဂါလံဝင်ပုံး),
+						'other' => q(၈ ဂါလံဝင်ပုံး {0} ပုံး),
+					},
+					# Long Unit Identifier
+					'volume-centiliter' => {
+						'name' => q(စင်တီလီတာ),
+						'other' => q({0} cL),
+					},
+					# Core Unit Identifier
+					'centiliter' => {
+						'name' => q(စင်တီလီတာ),
+						'other' => q({0} cL),
+					},
+					# Long Unit Identifier
+					'volume-cubic-centimeter' => {
+						'name' => q(ကုဗစင်တီမီတာ),
+						'other' => q({0} cm³),
+						'per' => q({0}/cm³),
+					},
+					# Core Unit Identifier
+					'cubic-centimeter' => {
+						'name' => q(ကုဗစင်တီမီတာ),
+						'other' => q({0} cm³),
+						'per' => q({0}/cm³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-foot' => {
+						'name' => q(ကုဗပေ),
+						'other' => q({0} ft³),
+					},
+					# Core Unit Identifier
+					'cubic-foot' => {
+						'name' => q(ကုဗပေ),
+						'other' => q({0} ft³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-inch' => {
+						'name' => q(ကုဗလက်မ),
+						'other' => q({0} in³),
+					},
+					# Core Unit Identifier
+					'cubic-inch' => {
+						'name' => q(ကုဗလက်မ),
+						'other' => q({0} in³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-kilometer' => {
+						'name' => q(ကုဗကီလိုမီတာ),
+						'other' => q({0} km³),
+					},
+					# Core Unit Identifier
+					'cubic-kilometer' => {
+						'name' => q(ကုဗကီလိုမီတာ),
+						'other' => q({0} km³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-meter' => {
+						'name' => q(ကုဗမီတာ),
+						'other' => q({0} m³),
+						'per' => q({0}/m³),
+					},
+					# Core Unit Identifier
+					'cubic-meter' => {
+						'name' => q(ကုဗမီတာ),
+						'other' => q({0} m³),
+						'per' => q({0}/m³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-mile' => {
+						'name' => q(ကုဗမိုင်),
+						'other' => q({0} mi³),
+					},
+					# Core Unit Identifier
+					'cubic-mile' => {
+						'name' => q(ကုဗမိုင်),
+						'other' => q({0} mi³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-yard' => {
+						'name' => q(ကုဗကိုက်),
+						'other' => q({0} yd³),
+					},
+					# Core Unit Identifier
+					'cubic-yard' => {
+						'name' => q(ကုဗကိုက်),
+						'other' => q({0} yd³),
+					},
+					# Long Unit Identifier
+					'volume-cup' => {
+						'name' => q(ခွက်),
+						'other' => q({0} c),
+					},
+					# Core Unit Identifier
+					'cup' => {
+						'name' => q(ခွက်),
+						'other' => q({0} c),
+					},
+					# Long Unit Identifier
+					'volume-cup-metric' => {
+						'name' => q(မထ္ထရစ်ခွက်),
+						'other' => q({0} mc),
+					},
+					# Core Unit Identifier
+					'cup-metric' => {
+						'name' => q(မထ္ထရစ်ခွက်),
+						'other' => q({0} mc),
+					},
+					# Long Unit Identifier
+					'volume-deciliter' => {
+						'name' => q(ဒက်စီလီတာ),
+						'other' => q({0} dL),
+					},
+					# Core Unit Identifier
+					'deciliter' => {
+						'name' => q(ဒက်စီလီတာ),
+						'other' => q({0} dL),
+					},
+					# Long Unit Identifier
+					'volume-dessert-spoon' => {
+						'name' => q(အချိုပွဲဇွန်း),
+						'other' => q(အချိုပွဲဇွန်း {0} ဇွန်း),
+					},
+					# Core Unit Identifier
+					'dessert-spoon' => {
+						'name' => q(အချိုပွဲဇွန်း),
+						'other' => q(အချိုပွဲဇွန်း {0} ဇွန်း),
+					},
+					# Long Unit Identifier
+					'volume-dessert-spoon-imperial' => {
+						'name' => q(ဗြိတိသျှသုံး အချိုပွဲဇွန်း),
+						'other' => q(ဗြိတိသျှသုံးအချိုပွဲဇွန်း {0} ဇွန်း),
+					},
+					# Core Unit Identifier
+					'dessert-spoon-imperial' => {
+						'name' => q(ဗြိတိသျှသုံး အချိုပွဲဇွန်း),
+						'other' => q(ဗြိတိသျှသုံးအချိုပွဲဇွန်း {0} ဇွန်း),
+					},
+					# Long Unit Identifier
+					'volume-dram' => {
+						'name' => q(ဒရမ်),
+						'other' => q({0} ဒရမ်),
+					},
+					# Core Unit Identifier
+					'dram' => {
+						'name' => q(ဒရမ်),
+						'other' => q({0} ဒရမ်),
+					},
+					# Long Unit Identifier
+					'volume-drop' => {
+						'name' => q(တစ်စက်),
+						'other' => q({0} စက်),
+					},
+					# Core Unit Identifier
+					'drop' => {
+						'name' => q(တစ်စက်),
+						'other' => q({0} စက်),
+					},
+					# Long Unit Identifier
+					'volume-fluid-ounce' => {
+						'name' => q(အရည်အောင်စ),
+						'other' => q({0} fl oz),
+					},
+					# Core Unit Identifier
+					'fluid-ounce' => {
+						'name' => q(အရည်အောင်စ),
+						'other' => q({0} fl oz),
+					},
+					# Long Unit Identifier
+					'volume-fluid-ounce-imperial' => {
+						'name' => q(Imp. fl oz),
+						'other' => q({0} fl oz Imp.),
+					},
+					# Core Unit Identifier
+					'fluid-ounce-imperial' => {
+						'name' => q(Imp. fl oz),
+						'other' => q({0} fl oz Imp.),
+					},
+					# Long Unit Identifier
+					'volume-gallon' => {
+						'name' => q(ဂါလံ),
+						'other' => q({0} ဂါလံ),
+						'per' => q({0}/gal US),
+					},
+					# Core Unit Identifier
+					'gallon' => {
+						'name' => q(ဂါလံ),
+						'other' => q({0} ဂါလံ),
+						'per' => q({0}/gal US),
+					},
+					# Long Unit Identifier
+					'volume-gallon-imperial' => {
+						'name' => q(ယူကေ ဂါလံ),
+						'other' => q({0} ယူကေ ဂါလံ),
+						'per' => q({0}/gal Imp.),
+					},
+					# Core Unit Identifier
+					'gallon-imperial' => {
+						'name' => q(ယူကေ ဂါလံ),
+						'other' => q({0} ယူကေ ဂါလံ),
+						'per' => q({0}/gal Imp.),
+					},
+					# Long Unit Identifier
+					'volume-hectoliter' => {
+						'name' => q(ဟက်တိုလီတာ),
+						'other' => q({0} hL),
+					},
+					# Core Unit Identifier
+					'hectoliter' => {
+						'name' => q(ဟက်တိုလီတာ),
+						'other' => q({0} hL),
+					},
+					# Long Unit Identifier
+					'volume-jigger' => {
+						'name' => q(ပက်),
+						'other' => q({0} ပက်),
+					},
+					# Core Unit Identifier
+					'jigger' => {
+						'name' => q(ပက်),
+						'other' => q({0} ပက်),
+					},
+					# Long Unit Identifier
+					'volume-liter' => {
+						'name' => q(လီတာ),
+						'other' => q({0} လီတာ),
+						'per' => q({0}/l),
+					},
+					# Core Unit Identifier
+					'liter' => {
+						'name' => q(လီတာ),
+						'other' => q({0} လီတာ),
+						'per' => q({0}/l),
+					},
+					# Long Unit Identifier
+					'volume-megaliter' => {
+						'name' => q(မီဂါလီတာ),
+						'other' => q({0} ML),
+					},
+					# Core Unit Identifier
+					'megaliter' => {
+						'name' => q(မီဂါလီတာ),
+						'other' => q({0} ML),
+					},
+					# Long Unit Identifier
+					'volume-milliliter' => {
+						'name' => q(မီလီလီတာ),
+						'other' => q({0} mL),
+					},
+					# Core Unit Identifier
+					'milliliter' => {
+						'name' => q(မီလီလီတာ),
+						'other' => q({0} mL),
+					},
+					# Long Unit Identifier
+					'volume-pinch' => {
+						'name' => q(တစ်ဆိတ်),
+						'other' => q({0} ဆိတ်),
+					},
+					# Core Unit Identifier
+					'pinch' => {
+						'name' => q(တစ်ဆိတ်),
+						'other' => q({0} ဆိတ်),
+					},
+					# Long Unit Identifier
+					'volume-pint' => {
+						'name' => q(ပိုင့်),
+						'other' => q({0} pt),
+					},
+					# Core Unit Identifier
+					'pint' => {
+						'name' => q(ပိုင့်),
+						'other' => q({0} pt),
+					},
+					# Long Unit Identifier
+					'volume-pint-metric' => {
+						'name' => q(မထ္ထရစ်ပိုင့်),
+						'other' => q({0} mpt),
+					},
+					# Core Unit Identifier
+					'pint-metric' => {
+						'name' => q(မထ္ထရစ်ပိုင့်),
+						'other' => q({0} mpt),
+					},
+					# Long Unit Identifier
+					'volume-quart' => {
+						'name' => q(ကွတ်),
+						'other' => q({0} qt),
+					},
+					# Core Unit Identifier
+					'quart' => {
+						'name' => q(ကွတ်),
+						'other' => q({0} qt),
+					},
+					# Long Unit Identifier
+					'volume-quart-imperial' => {
+						'name' => q(ဗြိတိသျှသုံး ကွတ်),
+						'other' => q(ဗြိတိသျှသုံး {0} ကွတ်),
+					},
+					# Core Unit Identifier
+					'quart-imperial' => {
+						'name' => q(ဗြိတိသျှသုံး ကွတ်),
+						'other' => q(ဗြိတိသျှသုံး {0} ကွတ်),
+					},
+					# Long Unit Identifier
+					'volume-tablespoon' => {
+						'name' => q(စားပွဲဇွန်း),
+						'other' => q({0} tbsp),
+					},
+					# Core Unit Identifier
+					'tablespoon' => {
+						'name' => q(စားပွဲဇွန်း),
+						'other' => q({0} tbsp),
+					},
+					# Long Unit Identifier
+					'volume-teaspoon' => {
+						'name' => q(လက်ဖက်ရည်ဇွန်း),
+						'other' => q({0} tsp),
+					},
+					# Core Unit Identifier
+					'teaspoon' => {
+						'name' => q(လက်ဖက်ရည်ဇွန်း),
+						'other' => q({0} tsp),
 					},
 				},
 			} }
@@ -2721,8 +5895,8 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				start => q({0} {1}),
-				middle => q({0} {1}),
+				start => q({0}- {1}),
+				middle => q({0}- {1}),
 				end => q({0}နှင့် {1}),
 				2 => q({0}နှင့် {1}),
 		} }
@@ -3044,8 +6218,8 @@ has 'currencies' => (
 		'BBD' => {
 			symbol => 'BBD',
 			display_name => {
-				'currency' => q(ဘာဘေးဒီယန်း ဒေါ်လာ),
-				'other' => q(ဘာဘေးဒီယန်း ဒေါ်လာ),
+				'currency' => q(ဘာဘေးဒိုးစ် ဒေါ်လာ),
+				'other' => q(ဘာဘေးဒိုးစ် ဒေါ်လာ),
 			},
 		},
 		'BDT' => {
@@ -3590,6 +6764,12 @@ has 'currencies' => (
 				'other' => q(လိုက်ဘေးရီးယား ဒေါ်လာ),
 			},
 		},
+		'LSL' => {
+			display_name => {
+				'currency' => q(လီဆိုသို လိုတီ),
+				'other' => q(လီဆိုသို လိုတီစ်),
+			},
+		},
 		'LTL' => {
 			display_name => {
 				'currency' => q(လစ်သူယေးနီးယားလီတားစ်),
@@ -3941,7 +7121,7 @@ has 'currencies' => (
 			},
 		},
 		'STN' => {
-			symbol => 'Db',
+			symbol => 'STN',
 			display_name => {
 				'currency' => q(ဆောင်တူမေးနှင့် ပရင်စီပီ ဒိုဘရာ \(၂၀၁၈\)),
 				'other' => q(ဆောင်တူမေးနှင့် ပရင်စီပီ ဒိုဘရာစ် \(၂၀၁၈\)),
@@ -4148,17 +7328,17 @@ has 'currencies' => (
 			},
 		},
 		'XOF' => {
-			symbol => 'CFA',
+			symbol => 'F CFA',
 			display_name => {
-				'currency' => q(အနောက် အာဖရိက CFA ဖရန့်),
-				'other' => q(အနောက် အာဖရိက CFA ဖရန့်),
+				'currency' => q(အနောက် အာဖရိက [CFA ]ဖရန့်),
+				'other' => q(အနောက် အာဖရိက [CFA] ဖရန့်),
 			},
 		},
 		'XPF' => {
 			symbol => 'CFPF',
 			display_name => {
-				'currency' => q(CFP ဖရန့်),
-				'other' => q(CFP ဖရန့်),
+				'currency' => q([CFP] ဖရန့်),
+				'other' => q([CFP] ဖရန့်),
 			},
 		},
 		'XPT' => {
@@ -4530,8 +7710,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'day_periods' => (
@@ -4640,9 +7820,9 @@ has 'date_formats' => (
 			'short' => q{GGGGG dd-MM-yy},
 		},
 		'gregorian' => {
-			'full' => q{y၊ MMMM d၊ EEEE},
-			'long' => q{y၊ d MMMM},
-			'medium' => q{y၊ MMM d},
+			'full' => q{y- MMMM d- EEEE},
+			'long' => q{y- MMMM d},
+			'medium' => q{y- MMM d},
 			'short' => q{dd-MM-yy},
 		},
 	} },
@@ -4658,8 +7838,8 @@ has 'time_formats' => (
 		'gregorian' => {
 			'full' => q{zzzz HH:mm:ss},
 			'long' => q{z HH:mm:ss},
-			'medium' => q{B HH:mm:ss},
-			'short' => q{B H:mm},
+			'medium' => q{H:mm:ss},
+			'short' => q{H:mm},
 		},
 	} },
 );
@@ -4711,7 +7891,7 @@ has 'datetime_formats_available_formats' => (
 			M => q{L},
 			MEd => q{d/M Eနေ့},
 			MMM => q{LLL},
-			MMMEd => q{MMM d၊ E},
+			MMMEd => q{MMM d- E},
 			MMMMEd => q{MMMM d Eနေ့},
 			MMMMd => q{MMMM d},
 			MMMd => q{MMM d},
@@ -4747,19 +7927,19 @@ has 'datetime_formats_available_formats' => (
 			Ehms => q{E B h:mm:ss},
 			Gy => q{G y},
 			GyMMM => q{G y MMM},
-			GyMMMEd => q{G y၊ MMM d၊ E},
-			GyMMMd => q{G y၊ MMM d},
+			GyMMMEd => q{G y- MMM d- E},
+			GyMMMd => q{G y- MMM d},
 			H => q{HH},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			Hmsv => q{v HH:mm:ss},
 			Hmv => q{v HH:mm},
 			M => q{L},
-			MEd => q{d/M၊ E},
+			MEd => q{d-M- E},
 			MMM => q{LLL},
-			MMMEd => q{MMM d၊ E},
+			MMMEd => q{MMM d- E},
 			MMMMEd => q{MMMM d ရက် Eနေ့},
-			MMMMW => q{MMM လ W ပတ်မြောက်},
+			MMMMW => q{MMMM လ W ပတ်မြောက်},
 			MMMMd => q{MMMM d},
 			MMMd => q{d MMM},
 			Md => q{d/M},
@@ -4772,11 +7952,11 @@ has 'datetime_formats_available_formats' => (
 			ms => q{mm:ss},
 			y => q{y},
 			yM => q{M/y},
-			yMEd => q{d/M/y၊ E},
+			yMEd => q{d/M/y- E},
 			yMMM => q{MMM y},
-			yMMMEd => q{y၊ MMM d၊ E},
+			yMMMEd => q{y- MMM d- E},
 			yMMMM => q{y MMMM},
-			yMMMd => q{y၊ MMM d},
+			yMMMd => q{y- MMM d},
 			yMd => q{dd-MM-y},
 			yQQQ => q{y QQQ},
 			yQQQQ => q{y QQQQ},
@@ -4802,6 +7982,15 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
+			Bh => {
+				B => q{h B – h B},
+				h => q{h – h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+				h => q{h:mm – h:mm B},
+				m => q{h:mm – h:mm B},
+			},
 			H => {
 				H => q{HH–HH},
 			},
@@ -4897,6 +8086,53 @@ has 'datetime_formats_interval' => (
 			},
 		},
 		'gregorian' => {
+			Bh => {
+				B => q{h B – h B},
+				h => q{h – h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+				h => q{h:mm – h:mm B},
+				m => q{h:mm – h:mm B},
+			},
+			Gy => {
+				G => q{G y – G y},
+				y => q{G y – y},
+			},
+			GyM => {
+				G => q{GGGGG y-MM – GGGGG y-MM},
+				M => q{GGGGG y-MM – y-MM},
+				y => q{GGGGG y-MM – y-MM},
+			},
+			GyMEd => {
+				G => q{GGGGG y-MM-dd, E – GGGGG y-MM-dd, E},
+				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+			},
+			GyMMM => {
+				G => q{G y MMM – G y MMM},
+				M => q{G y MMM–MMM},
+				y => q{G y MMM – y MMM},
+			},
+			GyMMMEd => {
+				G => q{G y MMM d, E – G y MMM d, E},
+				M => q{G y MMM d, E – MMM d, E},
+				d => q{G y MMM d, E – MMM d, E},
+				y => q{G y MMM d, E – y MMM d, E},
+			},
+			GyMMMd => {
+				G => q{G y MMM d – G y MMM d},
+				M => q{G y MMM d – MMM d},
+				d => q{G y MMM d – d},
+				y => q{G y MMM d – y MMM d},
+			},
+			GyMd => {
+				G => q{GGGGG y-MM-dd – GGGGG y-MM-dd},
+				M => q{GGGGG y-MM-dd – y-MM-dd},
+				d => q{GGGGG y-MM-dd – y-MM-dd},
+				y => q{GGGGG y-MM-dd – y-MM-dd},
+			},
 			H => {
 				H => q{HH – HH},
 			},
@@ -4915,15 +8151,15 @@ has 'datetime_formats_interval' => (
 				M => q{M – M},
 			},
 			MEd => {
-				M => q{d/M၊ EEEE – d/M၊ EEEE},
-				d => q{d/M၊ EEEE – d/M၊ EEEE},
+				M => q{d/M- EEEE – d/M- EEEE},
+				d => q{d/M- EEEE – d/M- EEEE},
 			},
 			MMM => {
 				M => q{MMM – MMM},
 			},
 			MMMEd => {
-				M => q{MMM d၊ E – MMM d၊ E},
-				d => q{MMM d၊ E – MMM d၊ E},
+				M => q{MMM d- E – MMM d- E},
+				d => q{MMM d- E – MMM d- E},
 			},
 			MMMd => {
 				M => q{MMM d – MMM d},
@@ -4963,27 +8199,27 @@ has 'datetime_formats_interval' => (
 				y => q{M/y – M/y},
 			},
 			yMEd => {
-				M => q{d/M/y၊ EEEE – d/M/y၊ EEEE},
-				d => q{d/M/y၊ EEEE – d/M/y၊ EEEE},
-				y => q{d/M/y၊ EEEE – d/M/y၊ EEEE},
+				M => q{d/M/y- EEEE – d/M/y- EEEE},
+				d => q{d/M/y- EEEE – d/M/y- EEEE},
+				y => q{d/M/y- EEEE – d/M/y- EEEE},
 			},
 			yMMM => {
 				M => q{y MMM – MMM},
 				y => q{y MMM – y MMM},
 			},
 			yMMMEd => {
-				M => q{y၊ MMM d၊ EEEE – MMM d၊ EEEE},
-				d => q{y၊ MMM d၊ EEEE – MMM d၊ EEEE},
-				y => q{y၊ MMM d၊ EEEE – y၊ MMM d၊ EEEE},
+				M => q{y- MMM d- EEEE – MMM d- EEEE},
+				d => q{y- MMM d- EEEE – MMM d- EEEE},
+				y => q{y- MMM d- EEEE – y- MMM d- EEEE},
 			},
 			yMMMM => {
 				M => q{y MMMM – MMMM},
 				y => q{y MMMM – y MMMM},
 			},
 			yMMMd => {
-				M => q{y၊ MMM d – MMM d},
-				d => q{y၊ MMM d – d},
-				y => q{y၊ MMM d – y၊ MMM d},
+				M => q{y- MMM d – MMM d},
+				d => q{y- MMM d – d},
+				y => q{y- MMM d – y- MMM d},
 			},
 			yMd => {
 				M => q{d/M/y – d/M/y},
@@ -5060,7 +8296,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ကိုနာကရီး#,
 		},
 		'Africa/Dakar' => {
-			exemplarCity => q#ဒက်ကား#,
+			exemplarCity => q#ဒကျကား#,
 		},
 		'Africa/Dar_es_Salaam' => {
 			exemplarCity => q#ဒါရက်စ်ဆာလမ်#,
@@ -5288,7 +8524,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#ကာရာကာစ်#,
 		},
 		'America/Catamarca' => {
-			exemplarCity => q#ကာတာမာရျကာ#,
+			exemplarCity => q#ကာတာမာရကာ#,
 		},
 		'America/Cayenne' => {
 			exemplarCity => q#ကေညင်န်#,
@@ -5917,6 +9153,9 @@ has 'time_zone_names' => (
 		'Asia/Qatar' => {
 			exemplarCity => q#ကာတာ#,
 		},
+		'Asia/Qostanay' => {
+			exemplarCity => q#ကော့စ်တနေ#,
+		},
 		'Asia/Qyzylorda' => {
 			exemplarCity => q#ကီဇလော်ဒါ#,
 		},
@@ -6224,9 +9463,9 @@ has 'time_zone_names' => (
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q#အီစတာကျွန်းနွေရာသီအချိန်#,
-				'generic' => q#အီစတာကျွန်းအချိန်#,
-				'standard' => q#အီစတာကျွန်းစံတော်ချိန်#,
+				'daylight' => q#အီစတာကျွန်း နွေရာသီ အချိန်#,
+				'generic' => q#အီစတာကျွန်း အချိန်#,
+				'standard' => q#အီစတာကျွန်း စံတော်ချိန်#,
 			},
 		},
 		'Ecuador' => {
@@ -6485,7 +9724,7 @@ has 'time_zone_names' => (
 		},
 		'Galapagos' => {
 			long => {
-				'standard' => q#ဂါလားပါဂိုးစ်အချိန်#,
+				'standard' => q#ဂါလားပါဂိုးစ် အချိန်#,
 			},
 		},
 		'Gambier' => {
@@ -6814,12 +10053,14 @@ has 'time_zone_names' => (
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q#နောဖော့ခ်ကျွန်းအချိန်#,
+				'daylight' => q#နောဖော့ခ်ကျွန်း နွေရာသီ စံတော်ချိန်#,
+				'generic' => q#နောဖော့ခ်ကျွန်း အချိန်#,
+				'standard' => q#နောဖော့ခ်ကျွန်း စံတော်ချိန်#,
 			},
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q#ဖာနန်ဒိုးဒီနိုးရိုးညာ နွေရာသီအချိန်#,
+				'daylight' => q#ဖာနန်ဒိုးဒီနိုးရိုးညာ နွေရာသီ အချိန်#,
 				'generic' => q#ဖာနန်ဒိုးဒီနိုးရိုးညာ အချိန်#,
 				'standard' => q#ဖာနန်ဒိုးဒီနိုးရိုးညာ စံတော်ချိန်#,
 			},
@@ -7187,6 +10428,11 @@ has 'time_zone_names' => (
 				'daylight' => q#ရယ်ခါးတီရင်ဘာခ် နွေရာသီ အချိန်#,
 				'generic' => q#ရယ်ခါးတီရင်ဘားခ် အချိန်#,
 				'standard' => q#ရယ်ခါးတီရင်ဘားခ် စံတော်ချိန်#,
+			},
+		},
+		'Yukon' => {
+			long => {
+				'standard' => q#ယူကွန်း အချိန်#,
 			},
 		},
 	 } }

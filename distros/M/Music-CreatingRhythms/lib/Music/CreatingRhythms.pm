@@ -3,9 +3,8 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Combinatorial algorithms to generate rhythms
 
-our $VERSION = '0.0802';
+our $VERSION = '0.0806';
 
-use Moo;
 use strictures 2;
 use Algorithm::Combinatorics qw(permutations);
 use Data::Munge qw(list2re);
@@ -13,11 +12,13 @@ use Integer::Partition ();
 use List::Util qw(all any);
 use Math::Sequence::DeBruijn qw(debruijn);
 use Module::Load::Conditional qw(check_install);
+use Moo;
 use Music::AtonalUtil ();
-use namespace::clean;
 
 use if defined check_install(module => 'Math::NumSeq::SqrtContinued'),
     'Math::NumSeq::SqrtContinued';
+
+use namespace::clean;
 
 
 has verbose => (
@@ -265,33 +266,39 @@ sub comprnd {
 }
 
 
-sub count_ones {
-    my ($self, $n) = @_;
+sub count_digits {
+    my ($self, $digit, $n) = @_;
     my $x = 0;
     if (ref $n) {
         for my $i (@$n) {
-            $x++ if $i == 1;
+            $x++ if $i == $digit;
         }
     }
     else {
-        $x = $n =~ tr/1//;
+           if ($digit == 0) { $x = $n =~ tr/0// }
+        elsif ($digit == 1) { $x = $n =~ tr/1// }
+        elsif ($digit == 2) { $x = $n =~ tr/2// }
+        elsif ($digit == 3) { $x = $n =~ tr/3// }
+        elsif ($digit == 4) { $x = $n =~ tr/4// }
+        elsif ($digit == 5) { $x = $n =~ tr/5// }
+        elsif ($digit == 6) { $x = $n =~ tr/6// }
+        elsif ($digit == 7) { $x = $n =~ tr/7// }
+        elsif ($digit == 8) { $x = $n =~ tr/8// }
+        elsif ($digit == 9) { $x = $n =~ tr/9// }
     }
     return $x;
 }
 
 
+sub count_ones {
+    my ($self, $n) = @_;
+    return $self->count_digits(1, $n);
+}
+
+
 sub count_zeros {
     my ($self, $n) = @_;
-    my $x = 0;
-    if (ref $n) {
-        for my $i (@$n) {
-            $x++ if $i == 0;
-        }
-    }
-    else {
-        $x = $n =~ tr/0//;
-    }
-    return $x;
+    return $self->count_digits(0, $n);
 }
 
 
@@ -602,7 +609,7 @@ Music::CreatingRhythms - Combinatorial algorithms to generate rhythms
 
 =head1 VERSION
 
-version 0.0802
+version 0.0806
 
 =head1 SYNOPSIS
 
@@ -612,15 +619,15 @@ version 0.0802
 
 =head1 DESCRIPTION
 
-C<Music::CreatingRhythms> provides the combinatorial algorithms
-described in the book, "Creating Rhythms", by Hollos. Many of these
-algorithms are ported directly from the C, and are pretty fast. Please
-see the links below for more information.
+C<Music::CreatingRhythms> provides most of the the combinatorial
+algorithms described in the book, "Creating Rhythms", by Hollos. Many
+of these algorithms are ported directly from the C, and are pretty
+fast. Please see the links below for more information.
 
 NB: Arguments are sometimes switched between book and software.
 
 Additionally, this module provides utilities that are not part of the
-book, but are nonetheless handy.
+book but are handy nonetheless.
 
 =head1 ATTRIBUTES
 
@@ -642,8 +649,14 @@ Create a new C<Music::CreatingRhythms> object.
 
   $intervals = $mcr->b2int($sequences);
 
-Convert binary B<sequences> of the form C<[[1,0],[1,0,0]]> into a set
-of intervals of the form C<[[2],[3]]>.
+This method takes a set of binary sequences and converts them into
+intervals.
+
+That is, it converts binary B<sequences> of the form
+C<[[1],[1,0],[1,0,0]]> into a set of intervals of the form
+C<[[1],[2],[3]]>.
+
+This basically is the number of zeros following a one.
 
 Examples:
 
@@ -654,7 +667,9 @@ Examples:
 
   $convergent = $mcr->cfcv(@terms);
 
-Calculate a continued fraction convergent given the B<terms>.
+This method calculates the continued fraction convergent given a set
+of B<terms>. It is used to find the best rational approximations to
+real numbers by using their continued fraction expansions.
 
 Examples:
 
@@ -669,6 +684,9 @@ Examples:
 
 Calculate the continued fraction for C<sqrt(n)> to B<m> digits, where
 B<n> and B<m> are integers.
+
+* This method needs L<Math::NumSeq::SqrtContinued> to be installed.
+YMMV
 
 Examples:
 
@@ -700,6 +718,11 @@ Examples:
   $got = $mcr->chsequl('u', 11, 5, 4); # [1,1,1,0];
 
 =head2 comp
+
+The C<comp*> methods are used to generate compositions of numbers,
+which are ways to partition an integer into smaller parts. The
+arguments passed to these functions determine the specific composition
+that is generated.
 
   $compositions = $mcr->comp($n);
 
@@ -772,6 +795,19 @@ Example:
 
   $got = $mcr->comprnd(16); # [1,3,2,1,1,2,1,3,2], etc.
 
+=head2 count_digits
+
+  $count = $mcr->count_digits($digit, $n);
+
+Count the number of a given B<digit> in a string or vector (B<n>).
+
+Examples:
+
+  $got = $mcr->count_digits(0, '100110100');         # 5
+  $got = $mcr->count_digits(0, [1,0,0,1,1,0,1,0,0]); # 5
+  $got = $mcr->count_digits(1, '100110100');         # 4
+  $got = $mcr->count_digits(1, [1,0,0,1,1,0,1,0,0]); # 4
+
 =head2 count_ones
 
   $count = $mcr->count_ones($n);
@@ -798,7 +834,9 @@ Examples:
 
   $sequence = $mcr->de_bruijn($n);
 
-Generate the largest de Bruijn sequence of order B<n>.
+This method generates the largest de Bruijn sequence of order B<n>,
+which is a cyclic sequence containing all possible combinations of
+length C<n> with no repeating subsequences.
 
 Example:
 
@@ -845,6 +883,9 @@ Examples:
 
 =head2 neck
 
+The C<neck*> methods generate binary necklaces of a certain length
+with or without specific constraints on their intervals.
+
   $necklaces = $mcr->neck($n);
 
 Generate all binary necklaces of length B<n>.
@@ -858,7 +899,7 @@ Example:
   $necklaces = $mcr->necka($n, @intervals);
 
 Generate binary necklaces of length B<n> with allowed intervals
-B<p1, p2, ... pn>. For these "necklace" class of functions, the word
+B<p1, p2, ... pn>. For these "necklace" class of methods, the word
 "intervals" refers to the size of a number given trailing zeros. So
 intervals C<1>, C<2>, and C<3> are represented as C<1>, C<1,0>, and
 C<1,0,0> respectively.
@@ -889,6 +930,10 @@ Example:
   $got = $mcr->neckm(4, 2); # [[1,1,0,0],[1,0,1,0]]
 
 =head2 part
+
+The C<part*> methods are used to generate all possible partitions of
+an integer into smaller parts, either with or without specific
+constraints on the lengths of those parts.
 
   $partitions = $mcr->part($n);
 
@@ -954,6 +999,12 @@ Generate "paper folding" sequences, where B<n> is the number of terms
 to calculate, B<m> is the size of the binary representation of the
 folding function, and B<f> is the folding function number, which can
 range from C<0> to C<2^m - 1>.
+
+This method generates "paper folding" sequences, which are binary
+sequences that represent the creases on a piece of paper after it has
+been folded multiple times in different directions. The arguments
+passed to this function determine the specific sequence that is
+generated.
 
 To quote the book, "Put a rectangular strip of paper on a flat surface
 in front of you, with the long dimension going left to right. Now pick
@@ -1026,8 +1077,6 @@ L<Math::Sequence::DeBruijn>
 L<Moo>
 
 L<Music::AtonalUtil>
-
-L<Music::CreatingRhythms::SqrtContinued>
 
 =head1 AUTHOR
 

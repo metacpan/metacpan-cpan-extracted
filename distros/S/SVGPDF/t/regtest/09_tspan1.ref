@@ -1,0 +1,30 @@
+==== start svg ====
+XObject #1
+vb 0 0 500 600 => bb 0.00 -600.00 500.00 0.00
+matrix( 1 0 0 -1 0 0)
+vb rect( 0.00 0.00 500.00 600.00)
+xo fill_color black (initial)
+  start handling text (SVGPDF::Text)
+  text  x=100 y=100
+    xo save
+    txt translate( 100.00, 100.00 ) scale( 1.00 -1.00 )
+      xo save
+      xo restore
+      xo save
+      tspan 
+        xo save
+        xo restore
+        xo save
+        tspan  dx=5 dy=15
+        txt translate( 5.00, 15.00 )
+          xo save
+          xo restore
+        tspan moved to 44.98, 15
+        xo restore
+      tspan moved to 169.7, 115
+      xo restore
+      xo save
+      xo restore
+    xo restore
+  end handling text
+==== end svg ====

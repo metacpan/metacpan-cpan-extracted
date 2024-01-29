@@ -3,7 +3,7 @@ NAME
     (e.g. 100,2,3,4,5,101 -> 100,"2..5",101)
 
 VERSION
-    This document describes version 0.006 of Number::Util::Range (from Perl
+    This document describes version 0.008 of Number::Util::Range (from Perl
     distribution Number-Util-Range), released on 2023-09-08.
 
 FUNCTIONS

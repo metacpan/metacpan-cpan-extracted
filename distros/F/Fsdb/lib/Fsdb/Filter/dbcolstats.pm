@@ -2,7 +2,7 @@
 
 #
 # dbcolstats.pm
-# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2024 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -105,7 +105,7 @@ Defaults on.
 Specify the field (column) separator as C<S>.
 See L<dbfilealter> for valid field separators.
 
-=item B<-T TmpDir>
+=item B<-T TmpDir> or <B--tmpdir TmpDir>
 
 where to put temporary data.
 Only used if median or quantiles are requested.
@@ -393,6 +393,8 @@ sub setup($) {
 	    my(@dbsort_args) = qw(-n data);
 	    push (@dbsort_args, '--parallelism', $self->{_max_parallelism})
 		if (defined($self->{_max_parallelism}));
+	    push (@dbsort_args, '--tmpdir', $self->{_tmpdir})
+		if (defined($self->{_tmpdir}));
 	    print STDERR "dbcolstats: doing sorter thread\n" if ($self->{_debug} > 2);
 	    ($save_out, $sorter_fred) = dbpipeline_sink(\@writer_args,
 			'--output' => $self->{_save_out_filename},
@@ -704,7 +706,7 @@ sub run($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2024 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

@@ -12,7 +12,7 @@ use File::Spec::Functions qw(catfile);
 our @EXPORT    = qw(run_t_manifest);
 our @EXPORT_OK = qw(get_t_files make_test_manifest manifest_name);
 
-our $VERSION = '2.023';
+our $VERSION = '2.024';
 
 my %SeenInclude = ();
 my %SeenTest = ();
@@ -90,7 +90,7 @@ before you call C<WriteMakefile>. To make it optional, load it in an eval:
 
 =head2 Module::Build
 
-Overiding parts of C<Module::Build> is tricker if you want to use the
+Overriding parts of C<Module::Build> is tricker if you want to use the
 subclassing mechanism and still make C<Test::Manifest> optional. If you
 can load C<Test::Manifest> (version 2.00 or later), C<Test::Manifest> can
 create the subclass for you.
@@ -441,11 +441,11 @@ Olivier Mengué supplied a documentation patch.
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

@@ -4,17 +4,19 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PerlBench",
    "no_index" : {
       "directory" : [
+         "t",
+         "inc",
          "benchmarks",
          "perlbench-results",
          "t"
@@ -46,7 +48,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.94"
+            "Test::More" : "1"
          }
       }
    },
@@ -58,10 +60,10 @@
       "homepage" : "https://github.com/briandfoy/perlbench",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/perlbench.git",
+         "url" : "https://github.com/briandfoy/perlbench",
          "web" : "https://github.com/briandfoy/perlbench"
       }
    },
-   "version" : "1.001",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.003",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

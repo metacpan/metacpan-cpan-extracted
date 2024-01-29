@@ -4,7 +4,7 @@ WriteMakefile(
   NAME              => 'List::Insertion',
   VERSION_FROM      => 'lib/List/Insertion.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
   PREREQ_PM         => {
-    "Template::Plex"=>"v0.5.0",
+    "Template::Plex"=>"v0.7.0",
     "Data::Combination"=>0,
     #"Error::Show"   => 0
   }, 
@@ -21,7 +21,7 @@ WriteMakefile(
       repository =>{
         type => "git",
         url => "git://github.com/drclaw1394/perl-list-insertion.git",
-        web => "http://github.com/drclaw1394/perl-list-insertion",
+        web => "https://github.com/drclaw1394/perl-list-insertion",
       }
     }
   }

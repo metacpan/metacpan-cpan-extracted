@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 
 use strict;
+
 # use warnings; # Use just for development, otherwise leave warnings off
 use constants {
     TRUE  => 1,
@@ -9,13 +10,13 @@ use constants {
 
 use threads;
 use threads::shared;
-use Sys::CPU;              # Finds the number of cores your CPU has
-use Graphics::Framebuffer; # There are things to import, if you want, but they
-                           # are usually not needed.
+use Sys::CPU;                 # Finds the number of cores your CPU has
+use Graphics::Framebuffer;    # There are things to import, if you want, but they
+                              # are usually not needed.
 
 BEGIN {
-	our $VERSION = '0.01';
-};
+    our $VERSION = '0.01';
+}
 
 ##############################################################################
 ## Initialize any global variables here ######################################
@@ -32,8 +33,8 @@ our $OK_START : shared = FALSE;
 # Initialize your threads here, to prevent copying any unneeded large
 # variables.
 our @THREADS;
-for (my $count=0;$count < $threads;$count++) {
-    push(@THREADS,threads->create(\&thread_runner,[$parameter]));
+for (my $count = 0; $count < $threads; $count++) {
+    push(@THREADS, threads->create(\&thread_runner, [$parameter]));
 }
 
 ##############################################################################
@@ -44,18 +45,18 @@ for (my $count=0;$count < $threads;$count++) {
 # just fine to get started.
 my $FB = Graphics::Framebuffer->new('SPLASH' => 0);
 
-$FB->cls('OFF'); # Turn off the console cursor
+$FB->cls('OFF');    # Turn off the console cursor
 
 # You can optionally set graphics mode here, but remember to turn on text mode
 # before exiting.
 
-$FB->graphics_mode(); # Shuts off all text and cursors.
+$FB->graphics_mode();    # Shuts off all text and cursors.
 
 # Gathers information on the screen for you to use as global information
 our $screen_info = $FB->screen_dimensions();
 
 alarm 0;
-$SIG{'ALRM'} = sub { # Hard exit if a thread is hung and won't play nice
+$SIG{'ALRM'} = sub {    # Hard exit if a thread is hung and won't play nice
     $FB->text_mode();
     foreach my $t (@THREADS) {
         $t->kill('KILL')->detach();
@@ -67,14 +68,12 @@ foreach my $sig (qw(INT HUP TERM QUIT KILL)) {
 }
 ## Do your stuff in here #####################################################
 
-
-
 ##############################################################################
 
-$RUNNING = FALSE;  # Tell threads to exit
-$FB->text_mode();  # Turn text and cursor back on.  You MUST do this if
-                   # graphics mode was set.
-$FB->cls('ON');    # Turn the console cursor back on
+$RUNNING = FALSE;    # Tell threads to exit
+$FB->text_mode();    # Turn text and cursor back on.  You MUST do this if
+                     # graphics mode was set.
+$FB->cls('ON');      # Turn the console cursor back on
 exit(0);
 
 sub finish {
@@ -84,7 +83,7 @@ sub finish {
         $t->join();
     }
     exec('reset');
-}
+} ## end sub finish
 
 # You want your thread to remain running and act as a job processor.  It is
 # not good to call and exit threads a lot.  So set up shared variables to
@@ -101,21 +100,22 @@ sub finish {
 sub thread_runner {
     my $parameters = shift;
 
-    while($RUNNING && ! $OK_START) {
-        threads->yield(); # wait until the main process says it's ok to proceed.
+    while ($RUNNING && !$OK_START) {
+        threads->yield();    # wait until the main process says it's ok to proceed.
     }
 
-    if ($RUNNING) { # Always make sure the thread has permission to do more
+    if ($RUNNING) {          # Always make sure the thread has permission to do more
         my $fb = Graphics::Framebuffer->new('SPLASH' => FALSE);
         foreach my $sig (qw(INT HUP TERM QUIT KILL)) {
-            local $SIG{$sig} = sub {$fb->text_mode(); threads->exit; };
+            local $SIG{$sig} = sub { $fb->text_mode(); threads->exit; };
         }
 
-        while($RUNNING) {
+        while ($RUNNING) {
+
             # do your stuff in here
         }
-    }
-}
+    } ## end if ($RUNNING)
+} ## end sub thread_runner
 
 __END__
 

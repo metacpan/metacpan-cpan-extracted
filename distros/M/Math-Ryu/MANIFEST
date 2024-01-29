@@ -16,7 +16,7 @@ t/_1basic.t
 t/mpfr_checks.t
 t/n2s.t
 t/round_trip.t
-Debug/t/_1basic.t
+Debug/t/debug_basic.t
 
 # The following are all ryu source files
 # from https://github.com/ulfjack/ryu/tree/master/ryu.

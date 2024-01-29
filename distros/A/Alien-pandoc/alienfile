@@ -1,0 +1,56 @@
+use alienfile;
+
+use Config;
+use Path::Tiny;
+
+plugin 'Probe::CommandLine' => (
+  command => 'pandoc',
+  args    => [ '--version' ],
+  match   => qr/^pandoc(?:\.exe)? ([0-9\.]+)/i,
+  version => qr/^pandoc(?:\.exe)? ([0-9\.]+)/i,
+);
+
+
+share {
+  my %os_arch_mapping = (
+    'darwin-aarch64'  => { tag => 'arm64-macOS'   , format => 'zip'    },
+    'darwin-x86_64'   => { tag => 'x86_64-macOS'  , format => 'zip'    },
+    'linux-x86_64'    => { tag => 'linux-amd64'   , format => 'tar.gz' },
+    'linux-aarch64'   => { tag => 'linux-arm64'   , format => 'tar.gz' },
+    'MSWin32-x86_64'  => { tag => 'windows-x86_64', format => 'zip'    },
+  );
+
+  my $os = $^O;
+  my $meta_arch = meta->prop->{platform}{cpu}{arch}{name};
+  my $os_arch = "$os-$meta_arch";
+
+  my $match = qr{
+    ^
+    pandoc-([0-9\.]+)
+    -
+    @{[ $os_arch_mapping{$os_arch}{tag} ]}
+    \.
+    \Q@{[ $os_arch_mapping{$os_arch}{format} ]}\E
+    $
+  }x;
+
+  plugin 'Download::GitHub' => (
+    github_user => 'jgm',
+    github_repo => 'pandoc',
+    asset        =>  1,
+    asset_name   => $match,
+    asset_format => $os_arch_mapping{$os_arch}{format},
+  );
+  plugin Extract => $os_arch_mapping{$os_arch}{format};
+  patch sub {
+    if( $^O eq 'MSWin32' ) {
+      my $bin_dir = path('bin');
+      $bin_dir->mkdir;
+
+      my $pandoc_bin_name = "pandoc$Config{_exe}";
+      my $pandoc_bin = Path::Tiny->new($pandoc_bin_name);
+      $pandoc_bin->move( $bin_dir->child($pandoc_bin_name) );
+    }
+  };
+  plugin 'Build::Copy';
+}

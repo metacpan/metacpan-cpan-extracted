@@ -51,7 +51,7 @@
    "provides" : {
       "Number::Util::Range" : {
          "file" : "lib/Number/Util/Range.pm",
-         "version" : "0.006"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -66,7 +66,7 @@
          "web" : "https://github.com/perlancar/perl-Number-Util-Range"
       }
    },
-   "version" : "0.006",
+   "version" : "0.008",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"

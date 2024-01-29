@@ -7,7 +7,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME               => 'Map::Tube::CLI',
-    AUTHOR             => q{Mohammad S Anwar <mohammad.anwar@yahoo.com>},
+    AUTHOR             => q{Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>},
     VERSION_FROM       => 'lib/Map/Tube/CLI.pm',
     ABSTRACT_FROM      => 'lib/Map/Tube/CLI.pm',
     LICENSE            => 'artistic_2',
@@ -38,8 +38,8 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Map::Tube::CLI'         => { file => 'lib/Map/Tube/CLI.pm'       , version => '0.67' },
-            'Map::Tube::CLI::Option' => { file => 'lib/Map/Tube/CLI/Option.pm', version => '0.67' },
+            'Map::Tube::CLI'         => { file => 'lib/Map/Tube/CLI.pm'       , version => '0.68' },
+            'Map::Tube::CLI::Option' => { file => 'lib/Map/Tube/CLI/Option.pm', version => '0.68' },
         },
         resources => {
             repository => {

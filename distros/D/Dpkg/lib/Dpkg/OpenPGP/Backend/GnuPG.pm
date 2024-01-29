@@ -88,9 +88,18 @@ sub has_verify_cmd {
 sub get_trusted_keyrings {
     my $self = shift;
 
+    my $keystore;
+    if ($ENV{GNUPGHOME} && -e $ENV{GNUPGHOME}) {
+        $keystore = $ENV{GNUPGHOME};
+    } elsif ($ENV{HOME} && -e "$ENV{HOME}/.gnupg") {
+        $keystore = "$ENV{HOME}/.gnupg";
+    } else {
+        return;
+    }
+
     my @keyrings;
-    if (length $ENV{HOME} and -r "$ENV{HOME}/.gnupg/trustedkeys.gpg") {
-        push @keyrings, "$ENV{HOME}/.gnupg/trustedkeys.gpg";
+    foreach my $keyring (qw(trustedkeys.kbx trustedkeys.gpg)) {
+        push @keyrings, "$keystore/$keyring" if -r "$keystore/$keyring";
     }
     return @keyrings;
 }
@@ -245,7 +254,10 @@ sub _gpg_verify {
         # XXX: The internal dearmor() does not handle concatenated ASCII Armor,
         # but the old implementation handled such certificate keyrings, so to
         # avoid regressing for now, we fallback to use the GnuPG dearmor.
-        if (defined $self->{cmd}) {
+        if ($cert =~ m{\.kbx$}) {
+            # Accept GnuPG apparent keybox-format keyrings as-is.
+            $rc = 1;
+        } elsif (defined $self->{cmd}) {
             $rc = $self->_gpg_exec($self->{cmd}, @cmd_opts, '--yes',
                                           '--output', $certring,
                                           '--dearmor', $cert);

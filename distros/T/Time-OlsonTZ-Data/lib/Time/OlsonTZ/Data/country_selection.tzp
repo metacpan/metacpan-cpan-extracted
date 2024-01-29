@@ -161,9 +161,9 @@ use strict;
 				olson_description => "Buenos Aires (BA, CF)",
 				timezone_name => "America/Argentina/Buenos_Aires",
 			},
-			"Catamarca (CT); Chubut (CH)" => {
+			"Catamarca (CT), Chubut (CH)" => {
 				location_coords => "-2828-06547",
-				olson_description => "Catamarca (CT); Chubut (CH)",
+				olson_description => "Catamarca (CT), Chubut (CH)",
 				timezone_name => "America/Argentina/Catamarca",
 			},
 			"Jujuy (JY)" => {
@@ -542,9 +542,9 @@ use strict;
 				olson_description => "Mato Grosso do Sul",
 				timezone_name => "America/Campo_Grande",
 			},
-			"Para (east); Amapa" => {
+			"Para (east), Amapa" => {
 				location_coords => "-0127-04829",
-				olson_description => "Para (east); Amapa",
+				olson_description => "Para (east), Amapa",
 				timezone_name => "America/Belem",
 			},
 			"Para (west)" => {
@@ -648,9 +648,9 @@ use strict;
 				olson_description => "Atlantic - NS (Cape Breton)",
 				timezone_name => "America/Glace_Bay",
 			},
-			"Atlantic - NS (most areas); PE" => {
+			"Atlantic - NS (most areas), PE" => {
 				location_coords => "+4439-06336",
-				olson_description => "Atlantic - NS (most areas); PE",
+				olson_description => "Atlantic - NS (most areas), PE",
 				timezone_name => "America/Halifax",
 			},
 			"Atlantic - New Brunswick" => {
@@ -678,14 +678,14 @@ use strict;
 				olson_description => "Central - NU (central)",
 				timezone_name => "America/Rankin_Inlet",
 			},
-			"Central - ON (west); Manitoba" => {
+			"Central - ON (west), Manitoba" => {
 				location_coords => "+4953-09709",
-				olson_description => "Central - ON (west); Manitoba",
+				olson_description => "Central - ON (west), Manitoba",
 				timezone_name => "America/Winnipeg",
 			},
-			"EST - ON (Atikokan); NU (Coral H)" => {
+			"EST - ON (Atikokan), NU (Coral H)" => {
 				location_coords => "+484531-0913718",
-				olson_description => "EST - ON (Atikokan); NU (Coral H)",
+				olson_description => "EST - ON (Atikokan), NU (Coral H)",
 				timezone_name => "America/Atikokan",
 			},
 			"Eastern - NU (most areas)" => {
@@ -693,9 +693,9 @@ use strict;
 				olson_description => "Eastern - NU (most areas)",
 				timezone_name => "America/Iqaluit",
 			},
-			"Eastern - ON, QC (most areas)" => {
+			"Eastern - ON & QC (most areas)" => {
 				location_coords => "+4339-07923",
-				olson_description => "Eastern - ON, QC (most areas)",
+				olson_description => "Eastern - ON & QC (most areas)",
 				timezone_name => "America/Toronto",
 			},
 			"MST - BC (Creston)" => {
@@ -723,9 +723,9 @@ use strict;
 				olson_description => "MST - Yukon (west)",
 				timezone_name => "America/Dawson",
 			},
-			"Mountain - AB; BC (E); NT (E); SK (W)" => {
+			"Mountain - AB, BC(E), NT(E), SK(W)" => {
 				location_coords => "+5333-11328",
-				olson_description => "Mountain - AB; BC (E); NT (E); SK (W)",
+				olson_description => "Mountain - AB, BC(E), NT(E), SK(W)",
 				timezone_name => "America/Edmonton",
 			},
 			"Mountain - NT (west)" => {
@@ -738,9 +738,9 @@ use strict;
 				olson_description => "Mountain - NU (west)",
 				timezone_name => "America/Cambridge_Bay",
 			},
-			"Newfoundland; Labrador (southeast)" => {
+			"Newfoundland, Labrador (SE)" => {
 				location_coords => "+4734-05243",
-				olson_description => "Newfoundland; Labrador (southeast)",
+				olson_description => "Newfoundland, Labrador (SE)",
 				timezone_name => "America/St_Johns",
 			},
 			"Pacific - BC (most areas)" => {
@@ -1495,9 +1495,9 @@ use strict;
 		alpha2_code => "ID",
 		olson_name => "Indonesia",
 		regions => {
-			"Borneo (east, south); Sulawesi/Celebes, Bali, Nusa Tengarra; Timor (west)" => {
+			"Borneo (east, south), Sulawesi/Celebes, Bali, Nusa Tengarra, Timor (west)" => {
 				location_coords => "-0507+11924",
-				olson_description => "Borneo (east, south); Sulawesi/Celebes, Bali, Nusa Tengarra; Timor (west)",
+				olson_description => "Borneo (east, south), Sulawesi/Celebes, Bali, Nusa Tengarra, Timor (west)",
 				timezone_name => "Asia/Makassar",
 			},
 			"Borneo (west, central)" => {
@@ -1510,9 +1510,9 @@ use strict;
 				olson_description => "Java, Sumatra",
 				timezone_name => "Asia/Jakarta",
 			},
-			"New Guinea (West Papua / Irian Jaya); Malukus/Moluccas" => {
+			"New Guinea (West Papua / Irian Jaya), Malukus/Moluccas" => {
 				location_coords => "-0232+14042",
-				olson_description => "New Guinea (West Papua / Irian Jaya); Malukus/Moluccas",
+				olson_description => "New Guinea (West Papua / Irian Jaya), Malukus/Moluccas",
 				timezone_name => "Asia/Jayapura",
 			},
 		},
@@ -2755,9 +2755,9 @@ use strict;
 				olson_description => "MSK+08 - Magadan",
 				timezone_name => "Asia/Magadan",
 			},
-			"MSK+08 - Sakha (E); N Kuril Is" => {
+			"MSK+08 - Sakha (E), N Kuril Is" => {
 				location_coords => "+6728+15343",
-				olson_description => "MSK+08 - Sakha (E); N Kuril Is",
+				olson_description => "MSK+08 - Sakha (E), N Kuril Is",
 				timezone_name => "Asia/Srednekolymsk",
 			},
 			"MSK+08 - Sakhalin Island" => {
@@ -3382,9 +3382,9 @@ use strict;
 				olson_description => "Mountain (most areas)",
 				timezone_name => "America/Denver",
 			},
-			"Mountain - ID (south); OR (east)" => {
+			"Mountain - ID (south), OR (east)" => {
 				location_coords => "+433649-1161209",
-				olson_description => "Mountain - ID (south); OR (east)",
+				olson_description => "Mountain - ID (south), OR (east)",
 				timezone_name => "America/Boise",
 			},
 			Pacific => {

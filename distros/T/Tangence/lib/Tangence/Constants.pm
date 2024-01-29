@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2010-2016 -- leonerd@leonerd.org.uk
 
-package Tangence::Constants 0.30;
+package Tangence::Constants 0.32;
 
 use v5.26;
 use warnings;
@@ -190,6 +190,17 @@ use constant DATAMETA_STRUCT    => 3;
 
 use constant VERSION_MAJOR => 0;
 use constant VERSION_MINOR => 4;
+
+=head1 NAME
+
+C<Tangence::Constants> - protocol constants for C<Tangence>
+
+=head1 DESCRIPTION
+
+This module is a component of L<Tangence::Client> or L<Tangence::Server>. It
+is not intended for end-user use directly.
+
+=cut
 
 =head1 AUTHOR
 

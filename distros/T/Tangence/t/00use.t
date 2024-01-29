@@ -3,19 +3,20 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Tangence" );
-use_ok( "Tangence::Class" );
-use_ok( "Tangence::Client" );
-use_ok( "Tangence::Constants" );
-use_ok( "Tangence::Message" );
-use_ok( "Tangence::Object" );
-use_ok( "Tangence::ObjectProxy" );
-use_ok( "Tangence::Property" );
-use_ok( "Tangence::Registry" );
-use_ok( "Tangence::Server" );
-use_ok( "Tangence::Server::Context" );
-use_ok( "Tangence::Stream" );
+require Tangence;
+require Tangence::Class;
+require Tangence::Client;
+require Tangence::Constants;
+require Tangence::Message;
+require Tangence::Object;
+require Tangence::ObjectProxy;
+require Tangence::Property;
+require Tangence::Registry;
+require Tangence::Server;
+require Tangence::Server::Context;
+require Tangence::Stream;
 
+pass( 'Modules loaded' );
 done_testing;

@@ -59,16 +59,16 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetIconFilterRequest.name : The workbook name.  ,
+# PutWorksheetIconFilterRequest.name : The file name.  ,
 # PutWorksheetIconFilterRequest.sheetName : The worksheet name.  ,
 # PutWorksheetIconFilterRequest.range : Represents the range to which the specified AutoFilter applies.  ,
 # PutWorksheetIconFilterRequest.fieldIndex : The integer offset of the field on which you want to base the filter (from the left of the list; the leftmost field is field 0).  ,
 # PutWorksheetIconFilterRequest.iconSetType : The icon set type.  ,
 # PutWorksheetIconFilterRequest.iconId : The icon id.  ,
-# PutWorksheetIconFilterRequest.matchBlanks : Match all blank or  not blank cell in the list.(true/false)  ,
-# PutWorksheetIconFilterRequest.refresh : If true, hide the filtered rows.  ,
-# PutWorksheetIconFilterRequest.folder : Original workbook folder.  ,
-# PutWorksheetIconFilterRequest.storageName : Storage name.   
+# PutWorksheetIconFilterRequest.matchBlanks : Match all blank cell in the list.  ,
+# PutWorksheetIconFilterRequest.refresh : Refresh auto filters to hide or unhide the rows.  ,
+# PutWorksheetIconFilterRequest.folder : The folder where the file is situated.  ,
+# PutWorksheetIconFilterRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -79,7 +79,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_icon_filter' } = { 
-    	summary => 'Adds an icon filter in worksheet.',
+    	summary => 'Add an icon filter in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -160,7 +160,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -202,28 +202,28 @@ __PACKAGE__->method_documentation({
      'match_blanks' => {
      	datatype => 'string',
      	base_name => 'matchBlanks',
-     	description => 'Match all blank or  not blank cell in the list.(true/false)',
+     	description => 'Match all blank cell in the list.',
      	format => '',
      	read_only => '',
      		},
      'refresh' => {
      	datatype => 'string',
      	base_name => 'refresh',
-     	description => 'If true, hide the filtered rows.',
+     	description => 'Refresh auto filters to hide or unhide the rows.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

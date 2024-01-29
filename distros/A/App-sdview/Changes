@@ -1,5 +1,11 @@
 Revision history for App-sdview
 
+0.14    2023-12-13
+        [CHANGES]
+         * Handle non-breaking spaces in Markdown and Pod
+         * Updated for Object::Pad v0.807:
+            + Use new `inherit` and `apply` keywords
+
 0.13    2023-09-22
         [CHANGES]
          * Allow overriding of inline format styles in App::sdview::Style

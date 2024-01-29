@@ -22,14 +22,18 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
   accept4
 	listen
 	socket
+  sockatmark
 	bind
 	connect
 
 	sysopen
 	sysopen4
+  openat
+  open
 	close
 
 	sysread
+  sysread3
 	sysread4
 
 	syswrite
@@ -53,8 +57,14 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	fcntl
 	ioctl
 
+  stat
+  lstat
+
 	getsockopt
 	setsockopt
+  getpeername
+  getsockname
+  shutdown
 	select
 	poll
 
@@ -63,6 +73,15 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 
 	readline
 	fileno
+
+
+  pread
+  pwrite
+
+  recv
+  send
+  sendfile
+
 ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
@@ -71,7 +90,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = 'v0.3.5';
+our $VERSION = 'v0.3.7';
 
 use constant::more();
 #use constant();

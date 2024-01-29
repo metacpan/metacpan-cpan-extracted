@@ -2,19 +2,19 @@
 
 =encoding utf8
 
-=for HTML <a href="https://www.github.com/briandfoy/ConfigReader-Simple/actions?query=workflow%3Amacos"><img src="https://www.github.com/briandfoy/ConfigReader-Simple/workflows/macos/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/configreader-simple/actions?query=workflow%3Amacos"><img src="https://www.github.com/briandfoy/configreader-simple/workflows/macos/badge.svg"></a>
 
-=for HTML <a href="https://www.github.com/briandfoy/ConfigReader-Simple/actions?query=workflow%3Aubuntu"><img src="https://www.github.com/briandfoy/ConfigReader-Simple/workflows/ubuntu/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/configreader-simple/actions?query=workflow%3Aubuntu"><img src="https://www.github.com/briandfoy/configreader-simple/workflows/ubuntu/badge.svg"></a>
 
-=for HTML <a href="https://www.github.com/briandfoy/ConfigReader-Simple/actions?query=workflow%3Awindows"><img src="https://www.github.com/briandfoy/ConfigReader-Simple/workflows/windows/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/configreader-simple/actions?query=workflow%3Awindows"><img src="https://www.github.com/briandfoy/configreader-simple/workflows/windows/badge.svg"></a>
 
-=for HTML <a href='https://ci.appveyor.com/project/briandfoy/ConfigReader-Simple'><img src='https://ci.appveyor.com/api/projects/status/j1f3xhrl7jko6wti?svg=true' /></a>
+=for HTML <a href='https://ci.appveyor.com/project/briandfoy/configreader-simple'><img src='https://ci.appveyor.com/api/projects/status/j1f3xhrl7jko6wti?svg=true' /></a>
 
-=for HTML <a href='https://coveralls.io/github/briandfoy/ConfigReader-Simple?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/ConfigReader-Simple/badge.svg?branch=master' alt='Coverage Status' /></a>
+=for HTML <a href='https://coveralls.io/github/briandfoy/configreader-simple?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/configreader-simple/badge.svg?branch=master' alt='Coverage Status' /></a>
 
-=for HTML <a href="https://github.com/briandfoy/ConfigReader-Simple/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/ConfigReader-Simple.svg" /></a>
+=for HTML <a href="https://github.com/briandfoy/configreader-simple/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/configreader-simple.svg" /></a>
 
-=for HTML <a href="https://metacpan.org/pod/ConfigReader::Simple"><img src="https://img.shields.io/cpan/v/ConfigReader-Simple.svg" /></A>
+=for HTML <a href="https://metacpan.org/pod/ConfigReader::Simple"><img src="https://img.shields.io/cpan/v/configreader-simple.svg" /></A>
 
 =head1 The ConfigReader::Simple module
 
@@ -76,18 +76,12 @@ the source repository:
 
 =over 4
 
-=item *	L<https://github.com/briandfoy/ConfigReader-Simple>
+=item *	L<https://github.com/briandfoy/configreader-simple>
 
 =back
 
 If you find a problem, file a ticket in the L<issue
-tracker|https://github.com/briandfoy/ConfigReader-Simple/issues>:
-
-=over 4
-
-=item *	L<https://github.com/briandfoy/ConfigReader-Simple/issues>
-
-=back
+tracker|https://github.com/briandfoy/configreader-simple/issues>.
 
 =head2 Getting help
 
@@ -114,6 +108,6 @@ you wrote code that you didn't.
 
 Enjoy,
 
-brian d foy, bdfoy@cpan.org
+brian d foy, briandfoy@pobox.com
 
 =cut

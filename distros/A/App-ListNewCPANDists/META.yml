@@ -21,7 +21,7 @@ name: App-ListNewCPANDists
 provides:
   App::ListNewCPANDists:
     file: lib/App/ListNewCPANDists.pm
-    version: '0.021'
+    version: '0.023'
 requires:
   App::MetaCPANUtils: '0'
   DBI: '0'
@@ -61,7 +61,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListNewCPANDists
   homepage: https://metacpan.org/release/App-ListNewCPANDists
   repository: git://github.com/perlancar/perl-App-ListNewCPANDists.git
-version: '0.021'
+version: '0.023'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -247,7 +247,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::OurDist
       name: '@Author::PERLANCAR/OurDist'
@@ -359,7 +359,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.784'
+              version: '0.785'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

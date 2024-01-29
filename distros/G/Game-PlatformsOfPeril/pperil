@@ -1,7 +1,5 @@
 #!perl
-#
-# launcher script for Game::PlatformsOfPeril
-
+# pperil - launcher script for Game::PlatformsOfPeril
 use 5.24.0;
 use warnings;
 use File::ShareDir qw(dist_dir);
@@ -67,3 +65,87 @@ $Game::PlatformsOfPeril::Redraw_Delay = $ddelay if defined $ddelay;
 $Game::PlatformsOfPeril::Rotate_Delay = $rdelay if defined $rdelay;
 
 Game::PlatformsOfPeril::game_loop( $prefix, $level, $seed );
+
+__END__
+=head1 NAME
+
+pperil - the platforms of peril
+
+=head1 SYNOPSIS
+
+  Usage: pperil [--err=file] [--level=N] [--prefix=path] [--seed=N]
+  
+    --err    - send STDERR to this file if not already redirected
+    --ddelay - draw delay in seconds between moves
+    --level  - level integer to start on
+    --prefix - path to the levels directory (containing the files
+               level0, level1, ...)
+    --rdelay - delay (secs) following a rotation
+    --seed   - PRNG uses the given integer as the seed
+
+=head1 DESCRIPTION
+
+Platforms of Peril is a terminal-based game. Help text should be
+printed when the game starts. Use the C<?> key in game to show the help
+text again.
+
+You are the only spawn (son, daughter, etc.) of a Xorbian Ranger and as
+such are duty bound not to peruse pointless background material such as
+this. You have long hair, green eyes, and start the game with a bomb,
+and need to collect gems all the while avoiding the enemies. The enemies
+have been blessed with pretty much bog standard A* pathfinding yet do
+know a thing or two about gravity. Gems can be made into bombs (the
+details as to how are not entirely clear) and bombs in turn will explode
+on contact with things that move. You also have two magic boots, one on
+each foot. These do something when activated.
+
+P.S. Do not drop a bomb while falling, as it will fall with you and
+then explode.
+
+P.P.S. You can make bombs while falling. This is perhaps a more
+productive use of that time than mashing space or the C<.> key.
+
+=head2 Customizing the Game
+
+C<pperil> accepts a number of options that do not do very much:
+
+    Usage: pperil [--err=file] [--level=N] [--prefix=path] [--seed=N]
+
+      --err    - send STDERR to this file if not already redirected
+      --level  - level integer to start on
+      --prefix - path to the levels directory (containing the files
+                 level0, level1, ...)
+      --seed   - PRNG uses the given integer as the seed
+
+Otherwise customizing the game will involve hacking directly at the
+module code or level maps, see L</"Known Issues">.
+
+=head2 Terminal Setup
+
+This game may benefit from the use of a square font; C<~/.Xdefaults>
+might contain something like:
+
+    # "White Rabbit" square font (the name is "New" in the
+    # "whitrabt.ttf" file that I downloaded from who knows where)
+    wrterm*background:black
+    wrterm*colorMode:true
+    wrterm*cursorBlink:false
+    wrterm*cursorColor:white
+    wrterm*dynamicColors:true
+    wrterm*faceName:New
+    wrterm*faceSize:24
+    wrterm*foreground:gold
+    wrterm*geometry:70x24
+    wrterm*termName:xterm-256color
+
+And with that loaded by X11 an C<xterm> could be launched via:
+
+    xterm -class wrterm
+
+to play the game in.
+
+=head1 AUTHOR
+
+Jeremy Mates
+
+=cut

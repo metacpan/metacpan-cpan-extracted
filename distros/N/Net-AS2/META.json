@@ -4,13 +4,13 @@
       "Andrew Maguire <ajm@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-AS2",
    "prereqs" : {
@@ -44,6 +44,7 @@
       },
       "test" : {
          "requires" : {
+            "Net::SSLeay" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0"
          }
@@ -58,7 +59,9 @@
          "web" : "https://github.com/andrewjmaguire/Net-AS2"
       }
    },
-   "version" : "1.0110",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "version" : "1.0111",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

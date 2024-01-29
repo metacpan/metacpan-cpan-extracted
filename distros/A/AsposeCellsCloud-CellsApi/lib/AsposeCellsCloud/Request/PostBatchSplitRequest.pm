@@ -59,7 +59,7 @@ sub new {
 
 
 # Run Operation Request
-# PostBatchSplitRequest.batchSplitRequest :    
+# PostBatchSplitRequest.batchSplitRequest : BatchSplitRequest Batch splitting file request.     
 
 {
     my $params = {
@@ -70,7 +70,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_batch_split' } = { 
-    	summary => '',
+    	summary => 'Batch splitting files that meet specific matching conditions.',
         params => $params,
         returns => 'string',
     };
@@ -117,7 +117,7 @@ __PACKAGE__->method_documentation({
      'batch_split_request' => {
      	datatype => 'BatchSplitRequest',
      	base_name => 'batchSplitRequest',
-     	description => '',
+     	description => 'BatchSplitRequest Batch splitting file request.  ',
      	format => '',
      	read_only => '',
      		},    

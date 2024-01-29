@@ -11,23 +11,24 @@ App::Greple::xlate - translation support module for greple
 
 # VERSION
 
-Version 0.28
+Version 0.29
 
 # DESCRIPTION
 
-**Greple** **xlate** module find text blocks and replace them by the
-translated text.  Currently DeepL (`deepl.pm`) and ChatGPT
+**Greple** **xlate** module find desired text blocks and replace them by
+the translated text.  Currently DeepL (`deepl.pm`) and ChatGPT
 (`gpt3.pm`) module are implemeted as a back-end engine.
 
-If you want to translate normal text blocks written in the [pod](https://metacpan.org/pod/pod)
-style, use **greple** command with `xlate::deepl` and `perl` module
-like this:
+If you want to translate normal text blocks in a document written in
+the Perl's pod style, use **greple** command with `xlate::deepl` and
+`perl` module like this:
 
     greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
 
-Pattern `^(\w.*\n)+` means consecutive lines starting with
-alpha-numeric letter.  This command show the area to be translated.
-Option **--all** is used to produce entire text.
+In this command, pattern string `^(\w.*\n)+` means consecutive lines
+starting with alpha-numeric letter.  This command show the area to be
+translated highlighted.  Option **--all** is used to produce entire
+text.
 
 <div>
     <p>
@@ -35,8 +36,9 @@ Option **--all** is used to produce entire text.
     </p>
 </div>
 
-Then add `--xlate` option to translate the selected area.  It will
-find and replace them by the **deepl** command output.
+Then add `--xlate` option to translate the selected area.  Then, it
+will find the desired sections and replace them by the **deepl**
+command output.
 
 By default, original and translated text is printed in the "conflict
 marker" format compatible with [git(1)](http://man.he.net/man1/git).  Using `ifdef` format, you
@@ -102,7 +104,8 @@ text.
 
     - **conflict**, **cm**
 
-        Print original and translated text in [git(1)](http://man.he.net/man1/git) conflict marker format.
+        Original and converted text are printed in [git(1)](http://man.he.net/man1/git) conflict marker
+        format.
 
             <<<<<<< ORIGINAL
             original text
@@ -116,7 +119,8 @@ text.
 
     - **ifdef**
 
-        Print original and translated text in [cpp(1)](http://man.he.net/man1/cpp) `#ifdef` format.
+        Original and converted text are printed in [cpp(1)](http://man.he.net/man1/cpp) `#ifdef`
+        format.
 
             #ifdef ORIGINAL
             original text
@@ -131,7 +135,8 @@ text.
 
     - **space**
 
-        Print original and translated text separated by single blank line.
+        Original and converted text are printed separated by single blank
+        line.
 
     - **xtxt**
 
@@ -239,6 +244,8 @@ You have to install command line tools for DeepL and ChatGPT.
 
 [App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
 
+[https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
     DeepL Python library and CLI command.
@@ -267,13 +274,27 @@ You have to install command line tools for DeepL and ChatGPT.
     Use **sdif** to show conflict marker format side by side with **-V**
     option.
 
+## ARTICLES
+
+- [https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250](https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250)
+
+    Greple module to translate and replace only the necessary parts with DeepL API (in Japanese)
+
+- [https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6](https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6)
+
+    Generating documents in 15 languages with DeepL API module (in Japanese)
+
+- [https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd](https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd)
+
+    Automatic translation Docker environment with DeepL API (in Japanese)
+
 # AUTHOR
 
 Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023 Kazumasa Utashiro.
+Copyright © 2023-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,0 +1,142 @@
+=head1 NAME
+
+Socket::More::Lookup - System DNS Lookup Routines
+
+=head1 SYNOPSIS
+
+  use Socket::More::Lookup;
+  use Socket::More::Constants;
+
+  # Convert a host name to one or more address structures
+  my $res=getaddrinfo( "www.google.com", 80, {family=>AF_INET}, my @results);
+  die gai_strerror($!) unless $res;
+
+  # Convert an addres structure to a hostname and port
+  my $res=getnameinfo($addr, my $host="", my $port="", $flags);
+  die gai_strerror($!) unless $res;
+
+
+=head1 DESCRIPTION
+
+This is an alternative implementation to the Perl C<Socket> subroutines for
+address and name resolution.  It provides bindings to L<getaddrinfo>,
+L<getnameinfo>, L<gai_strerror>.
+
+Big differences between Core Perl Socket and this module:
+
+=over
+
+=item More like the C library and Perl's 'sys*' subroutines
+
+The return value is a indication of success, while the results are stored in an
+'in/out' array
+
+=item Error codes is stored in C<$!>
+
+The user must convert to a string error if they want it via C<gai_strerror>
+
+=item Results are either hash or arrays
+
+
+If the hints used is an array the returned results will be arrays. If the hints
+are a hash, the results are a hash
+
+
+=back
+
+
+This module is part of L<Socket::More> but exists as a standalone distribution
+for better reuse and smaller memory footprint 
+
+If you are after asynchronous resolving with event loop (or not) integration,
+please look at L<Socket::More::Resolver>.
+
+The resulting address information is super set of the Core Perl routines.
+
+=head1 API
+
+=head2 getaddrinfo
+
+  my $res=getaddrinfo($host, $port, \%hints, @results)
+
+  my $res=getaddrinfo($host, $port, \@hints, @results)
+
+Calls the C<getaddrinfo> library function to resolve the address information of
+C<$host>. The C<$port> variable is filled into the resulting address structure.
+
+The address structures returned are influenced by the hints provided by as
+either a hash reference C<\%hints> or  array reference C<\@hints>.  If it isn't
+a reference, the default hints are used. If the array is an empty array, the
+default hints are used.
+
+The hash keys accepted for hints are B<flags>, B<family>, B<socktype> and
+B<protocol>. The array version expects each element to be in this order.
+
+Please refer to the man page of getaddrinfo for details on what the hint values
+mean.
+
+Results, if any are are stored in C<@results>. If the hints argument was a hash
+reference, the results are represented as a hash references. If hints was an
+array reference, the results are represented as array references.  The hash
+case contains the keys B<flags>, B<family>, B<socktype>, B<protocol>, B<addr>
+and C<cannonname>. The array case contains the fields in the same order.
+
+Please refer to the main page of getaddrinfo for details.
+
+Returns true on success, on C<undef> on failure. In the later case C<$!> is set
+to the numeric error code, which can then be converted to a string via
+C<gai_strerror>.
+
+
+
+=head2 getnaminfo
+
+  my $res=getnameinfo($sock_addr, $host, $port);
+  my $res=getnameinfo($sock_addr, my $host="", my $port="",$flags);
+
+Calls the C<getnameinfo>library function to convert a known address structure
+to a host and port. The resulting hostname and port number are stored in the
+arguments C<$host> and C<$port>. This must be defined string and writable
+variables.
+
+The output is influenced by the C<$flags> argument. Please refer to the man
+page of getnameinfo for details.
+
+Returns true on success, on undef on failure. In the later case C<$!> is set to
+the numeric error code, which can then be converted to a string via
+C<gai_strerror>
+
+
+=head2 gai_strerror
+
+  my $string=gai_strerror($code)
+
+Converts a numerical error code returned from either getaddrinfo or getnameinfo
+into a human readable string. Please refer to man page of gai_strerror for more
+details
+
+=head1 AUTHOR
+
+Ruben Westerberg, E<lt>drclaw@mac.comE<gt>
+
+=head1 REPOSITORTY and BUGS
+
+Please report any bugs via git hub: L<https://github.com/drclaw1394/perl-socket-more-lookup>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Ruben Westerberg
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl or the MIT license.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
+
+

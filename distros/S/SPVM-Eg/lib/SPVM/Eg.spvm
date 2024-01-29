@@ -1,0 +1,28 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Eg {
+  version "0.014";
+  
+  use Eg::Node;
+  use Eg::Node::Document::HTML;
+  use Eg::Node::Element;
+  use Eg::Node::Text;
+  use Eg::Runtime;
+  
+  use Hash;
+  use List;
+  use StringBuffer;
+  
+  our $RUNTIME : rw Eg::Runtime;
+  
+  # Class Methods
+  static method window : Eg::Window () {
+    return $RUNTIME->window;
+  }
+  
+  static method document : Eg::Node::Document::HTML () {
+    return &window->document;
+  }
+  
+}

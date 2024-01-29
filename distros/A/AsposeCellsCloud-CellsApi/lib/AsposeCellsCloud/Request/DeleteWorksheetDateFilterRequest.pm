@@ -69,8 +69,8 @@ sub new {
 # DeleteWorksheetDateFilterRequest.hour : The hour.  ,
 # DeleteWorksheetDateFilterRequest.minute : The minute.  ,
 # DeleteWorksheetDateFilterRequest.second : The second.  ,
-# DeleteWorksheetDateFilterRequest.folder : Original workbook folder.  ,
-# DeleteWorksheetDateFilterRequest.storageName : Storage name.   
+# DeleteWorksheetDateFilterRequest.folder : The folder where the file is situated.  ,
+# DeleteWorksheetDateFilterRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -81,7 +81,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_worksheet_date_filter' } = { 
-    	summary => 'Removes a date filter in worksheet.            ',
+    	summary => 'Remove a date filter in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -240,14 +240,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

@@ -1,4 +1,6 @@
-#!perl -w
+#!perl
+use strict;
+use warnings;
 
 use Test::More;
 plan skip_all => "Test::More 0.31 required for no_ending()" if $Test::More::VERSION <= 0.31;
@@ -6,7 +8,6 @@ plan skip_all => "tests fail on Win32 and Cygwin" if $^O =~ /^(MSWin32|cygwin)$/
 plan tests => 5;
 
 use IPC::Run3;
-use strict;
 
 sub techo
 {
@@ -18,7 +19,7 @@ sub techo
 
 my ($got, $exp);
 
-# force IPC::Run3 into populating %fh_cache 
+# force IPC::Run3 into populating %fh_cache
 # by running techo once in the parent
 ($got, $exp) = techo("parent$$ before fork");
 is($got, $exp, "parent before fork");
@@ -39,12 +40,12 @@ else
     my ($got, $exp) = techo("child$$");
     if ($exp eq $got)
     {
-	exit(0);
+      exit(0);
     }
     else
     {
-	diag qq[child $$: expected "$exp", got "$got"\n];
-	exit(1);
+      diag qq[child $$: expected "$exp", got "$got"\n];
+      exit(1);
     }
 }
 
@@ -53,30 +54,30 @@ is($got, $exp, "parent after fork");
 
 # now run several child processes in parallel,
 # all calling run3 repeatedly
-my ($nkids, $nruns) = (5, 10);	# usually enough, even on uniprocessor systems
+my ($nkids, $nruns) = (5, 10); # usually enough, even on uniprocessor systems
 
 my @kids;
 for (1..$nkids)
 {
     if (my $kid = fork)
     {
-	push @kids, $kid;
+      push @kids, $kid;
     }
     else
     {
-        # child
-	Test::More->builder->no_ending(1);
+      # child
+      Test::More->builder->no_ending(1);
 
-	for (1..$nruns)
-	{
-	    my ($got, $exp) = techo("child$$:run$_");
-	    next if $exp eq $got;
+      for (1..$nruns)
+      {
+          my ($got, $exp) = techo("child$$:run$_");
+          next if $exp eq $got;
 
-	    diag qq[child $$: expected "$exp", got "$got"\n];
-	    exit(1);
-	}
+          diag qq[child $$: expected "$exp", got "$got"\n];
+          exit(1);
+      }
 
-	exit(0);
+      exit(0);
     }
 }
 

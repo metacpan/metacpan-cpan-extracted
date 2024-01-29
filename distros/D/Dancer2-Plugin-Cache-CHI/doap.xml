@@ -16,6 +16,12 @@
   </developer>
   <helper>
     <foaf:Person>
+      <foaf:name>Alexis Sukrieh</foaf:name>
+      <foaf:mbox rdf:resource="mailto:sukria@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>David Precious</foaf:name>
       <foaf:mbox rdf:resource="mailto:davidp@preshweb.co.uk" />
     </foaf:Person>
@@ -48,6 +54,12 @@
     <foaf:Person>
       <foaf:name>Peter Mottram</foaf:name>
       <foaf:mbox rdf:resource="mailto:peter@sysnix.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@babyl.ca" />
     </foaf:Person>
   </helper>
   <license rdf:resource="http://dev.perl.org/licenses/" />
@@ -165,6 +177,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.7.1</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2016-01-04</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2.0.0</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2016-08-03</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

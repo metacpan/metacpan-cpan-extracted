@@ -1,12 +1,13 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql.pm
-## Version v0.3.7
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v1.0.0
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/02/24
+## Modified 2023/11/17
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -19,14 +20,249 @@ BEGIN
     use warnings;
     use parent qw( DB::Object );
     use vars qw(
-        $VERSION $CACHE_QUERIES $CACHE_SIZE $CACHE_TABLE $CONNECT_VIA $DB_ERRSTR @DBH 
-        $DEBUG $ERROR $MOD_PERL $USE_BIND $USE_CACHE $PLACEHOLDER_REGEXP $DATATYPES
+        $VERSION $CACHE_QUERIES $CACHE_SIZE $CONNECT_VIA $DB_ERRSTR @DBH 
+        $DEBUG $ERROR $MOD_PERL $USE_BIND $USE_CACHE $PLACEHOLDER_REGEXP
+        $DATATYPES_DICT $TABLE_CACHE
     );
     eval{ require DBD::mysql; };
     die( $@ ) if( $@ );
+    our $TABLE_CACHE = {};
+    # <https://dev.mysql.com/doc/refman/8.0/en/data-types.html>
+    # the 'constant' property in the dictionary hash is added in structure()
+    # See also: SELECT DISTINCT(data_type) FROM information_schema.columns ORDER by data_type
+    # but this does not provide a complete list of datatype
+    our $DATATYPES_DICT =
+    {
+        bigint => {
+            constant => '',
+            name => 'SQL_BIGINT',
+            re => qr/^(bigint)/,
+            type => 'bigint',
+        },
+        binary => {
+            constant => '',
+            name => 'SQL_BINARY',
+            re => qr/^binary/,
+            type => 'binary',
+        },
+        bit => {
+            constant => '',
+            name => 'SQL_BIT',
+            re => qr/^(bit)/,
+            type => 'bit',
+        },
+        blob => {
+            constant => '',
+            name => 'SQL_BLOB',
+            re => qr/^blob/,
+            type => 'blob',
+        },
+        curve => {
+            constant => '',
+            name => 'SQL_UNKNOWN_TYPE',
+            re => qr/^(curve)\b/,
+            type => 'curve',
+        },
+        date => {
+            constant => '',
+            name => 'SQL_DATE',
+            re => qr/^(date)\b/,
+            type => 'date',
+        },
+        datetime => {
+            constant => '',
+            name => 'SQL_DATETIME',
+            re => qr/^(datetime)/,
+            type => 'datetime',
+        },
+        decimal => {
+            alias => [qw( dec )],
+            constant => '',
+            name => 'SQL_DECIMAL',
+            re => qr/^(dec|decimal)/,
+            type => 'decimal',
+        },
+        double => {
+            alias => [ 'double precision' ],
+            constant => '',
+            name => 'SQL_DOUBLE',
+            re => qr/^(double\s+precision|double)/,
+            type => 'double',
+        },
+        enum => {
+            constant => '',
+            name => 'SQL_UNKNOWN_TYPE',
+            re => qr/^(enum)\b/,
+            type => 'enum',
+        },
+        float => {
+            constant => '',
+            name => 'SQL_FLOAT',
+            re => qr/^(float)/,
+            type => 'float',
+        },
+        geometry => {
+            constant => '',
+            name => 'SQL_UNKNOWN_TYPE',
+            re => qr/^(geometry)\b/,
+            type => 'geometry',
+        },
+        geometrycollection => {
+            constant => '',
+            name => 'SQL_UNKNOWN_TYPE',
+            re => qr/^(geometrycollection)\b/,
+            type => 'geometrycollection',
+        },
+        int => {
+            alias => [qw( integer )],
+            constant => '',
+            name => 'SQL_INTEGER',
+            re => qr/^(integer|int)/,
+            type => 'int',
+        },
+        json => {
+            constant => '',
+            name => 'SQL_UNKNOWN_TYPE',
+            re => qr/^(json)\b/,
+            type => 'json',
+        },
+        linestring => {
+            constant => '',
+            name => 'SQL_UNKNOWN_TYPE',
+            re => qr/^(linestring)\b/,
+            type => 'linestring',
+        },
+        longlob => {
+            constant => '',
+            name => 'SQL_BLOB',
+            re => qr/^(longlob)\b/,
+            type => 'longlob',
+        },
+        longtext => {
+            constant => '',
+            name => 'SQL_LONGVARCHAR',
+            re => qr/^(longtext)\b/,
+            type => 'longtext',
+        },
+        mediumblob => {
+            constant => '',
+            name => 'SQL_BLOB',
+            re => qr/^(mediumblob)\b/,
+            type => 'mediumblob',
+        },
+        mediumint => {
+            constant => '',
+            name => 'SQL_BIT',
+            re => qr/^(mediumint)/,
+            type => 'mediumint',
+        },
+        mediumtext => {
+            constant => '',
+            name => 'SQL_LONGVARCHAR',
+            re => qr/^(mediumtext)\b/,
+            type => 'mediumtext',
+        },
+        multicurve => {
+            constant => '',
+            name => 'SQL_UNKNOWN_TYPE',
+            re => qr/^(multicurve)\b/,
+            type => 'multicurve',
+        },
+        multilinestring => {
+            constant => '',
+            name => 'SQL_UNKNOWN_TYPE',
+            re => qr/^(multilinestring)\b/ ,
+            type => 'multilinestring',
+        },
+        multipoint => {
+            constant => '',
+            name => 'SQL_UNKNOWN_TYPE',
+            re => qr/^(multipoint)\b/,
+            type => 'multipoint',
+        },
+        multipolygon => {
+            constant => '',
+            name => 'SQL_UNKNOWN_TYPE',
+            re => qr/^(multipolygon)\b/,
+            type => 'multipolygon',
+        },
+        point => {
+            constant => '',
+            name => 'SQL_UNKNOWN_TYPE',
+            re => qr/^(point)\b/,
+            type => 'point',
+        },
+        polygon => {
+            constant => '',
+            name => 'SQL_UNKNOWN_TYPE',
+            re => qr/^(polygon)\b/,
+            type => 'polygon',
+        },
+        set => {
+            constant => '',
+            name => 'SQL_UNKNOWN_TYPE',
+            re => qr/^(set)\b/,
+            type => 'set',
+        },
+        smallint => {
+            constant => '',
+            name => 'SQL_SMALLINT',
+            re => qr/^(smallint)/,
+            type => 'smallint',
+        },
+        text => {
+            constant => '',
+            name => 'SQL_LONGVARCHAR',
+            re => qr/^text/,
+            type => 'text',
+        },
+        timestamp => {
+            constant => '',
+            name => 'SQL_TIMESTAMP',
+            re => qr/^(timestamp)/,
+            type => 'timestamp',
+        },
+        tinyblob => {
+            constant => '',
+            name => 'SQL_BLOB',
+            re => qr/^(tinyblob)\b/,
+            type => 'tinyblob',
+        },
+        tinyint => {
+            constant => '',
+            name => 'SQL_TINYINT',
+            re => qr/^(tinyint)/,
+            type => 'tinyint',
+        },
+        tinytext => {
+            constant => '',
+            name => 'SQL_LONGVARCHAR',
+            re => qr/^(tinytext)\b/,
+            type => 'tinytext',
+        },
+        varbinary => {
+            constant => '',
+            name => 'SQL_VARBINARY',
+            re => qr/^varbinary/,
+            type => 'varbinary',
+        },
+        varchar => {
+            alias => [qw( char character ), 'character varying' ],
+            constant => '',
+            name => 'SQL_VARCHAR',
+            re => qr/^((?:character varying|varchar)|(?:(?:character|char)\b(?![[:blank:]]+varying)))/,
+            type => 'varchar',
+        },
+        year => {
+            constant => '',
+            name => 'SQL_INTERVAL_YEAR',
+            re => qr/^(year)/,
+            type => 'year',
+        },
+    };
     # DBI->trace(5);
     our $PLACEHOLDER_REGEXP = qr/\b\?\b/;
-    our $VERSION = 'v0.3.7';
+    our $VERSION = 'v1.0.0';
     use Devel::Confess;
 };
 
@@ -50,6 +286,48 @@ if( $INC{ 'Apache/DBI.pm' } &&
 }
 # Actually the one in DB::Object is used, because DBD::mysql has no datatype constants of its own
 # our $DATATYPES = {};
+foreach my $type ( keys( %$DATATYPES_DICT ) )
+{
+    if( CORE::exists( $DATATYPES_DICT->{ $type }->{alias} ) && 
+        ref( $DATATYPES_DICT->{ $type }->{alias} ) eq 'ARRAY' &&
+        scalar( @{$DATATYPES_DICT->{ $type }->{alias}} ) )
+    {
+        foreach my $alias ( @{$DATATYPES_DICT->{ $type }->{alias}} )
+        {
+            next if( CORE::exists( $DATATYPES_DICT->{ $alias } ) );
+            $DATATYPES_DICT->{ $alias } = $DATATYPES_DICT->{ $type };
+        }
+    }
+}
+
+my $keys = $DBI::EXPORT_TAGS{sql_types};
+my @constants_to_ignore = qw(
+    SQL_GUID SQL_WLONGVARCHAR SQL_WVARCHAR SQL_WCHAR SQL_LONGVARBINARY SQL_LONGVARCHAR
+    SQL_UNKNOWN_TYPE SQL_ALL_TYPES SQL_NUMERIC SQL_REAL SQL_INTERVAL SQL_TIME SQL_BOOLEAN
+    SQL_UDT SQL_UDT_LOCATOR SQL_ROW SQL_REF SQL_BLOB_LOCATOR SQL_CLOB SQL_CLOB_LOCATOR
+    SQL_ARRAY SQL_ARRAY_LOCATOR SQL_MULTISET SQL_MULTISET_LOCATOR SQL_TYPE_DATE 
+    SQL_TYPE_TIME SQL_TYPE_TIMESTAMP SQL_TYPE_TIME_WITH_TIMEZONE SQL_TYPE_TIMESTAMP_WITH_TIMEZONE
+    SQL_INTERVAL_YEAR SQL_INTERVAL_MONTH SQL_INTERVAL_DAY SQL_INTERVAL_HOUR SQL_INTERVAL_MINUTE
+    SQL_INTERVAL_SECOND SQL_INTERVAL_YEAR_TO_MONTH SQL_INTERVAL_DAY_TO_HOUR 
+    SQL_INTERVAL_DAY_TO_MINUTE SQL_INTERVAL_DAY_TO_SECOND SQL_INTERVAL_HOUR_TO_MINUTE
+    SQL_INTERVAL_HOUR_TO_SECOND SQL_INTERVAL_MINUTE_TO_SECOND
+);
+foreach my $c ( @$keys )
+{
+    next if( scalar( grep( /^$c$/, @constants_to_ignore ) ) );
+    if( $c =~ /^SQL_(\w+)$/ )
+    {
+        my $type = lc( $1 );
+        my $code = \&{"DBI::$c"};
+        my $val = $code->();
+        if( !CORE::exists( $DATATYPES_DICT->{ $type } ) )
+        {
+            warn( "Unknown MySQL constant DBI::${c}" ) if( DB::Object::Mysql->_is_warnings_enabled( 'DB::Object' ) );
+            next;
+        }
+        $DATATYPES_DICT->{ $type }->{constant} = $val;
+    }
+}
 
 sub init
 {
@@ -153,8 +431,7 @@ sub create_db
 {
     my $self = shift( @_ );
     my $name = shift( @_ ) || return( $self->error( "No database name to create was provided." ) );
-    my $opts = {};
-    $opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
+    my $opts = $self->_get_args_as_hash( @_ );
     my $params = [];
     # https://dev.mysql.com/doc/refman/5.6/en/create-database.html
     push( @$params, sprintf( 'CHARACTER SET = %s', $opts->{charset} ) ) if( $opts->{charset} );
@@ -250,7 +527,34 @@ sub databases
     return( @dbases );
 }
 
+# NOTE: sub datatype_dict is inherited
+
 # NOTE: sub datatype_to_constant is inherited
+
+# NOTE: sub datatypes is in inherited
+
+sub get_sql_type
+{
+    my $self = shift( @_ );
+    my $type = shift( @_ ) || return( $self->error( "No sql type was provided to get its constant." ) );
+    $type = lc( $type );
+    if( CORE::exists( $DATATYPES_DICT->{ $type } ) &&
+        $type ne $DATATYPES_DICT->{ $type }->{type} )
+    {
+        $type = $DATATYPES_DICT->{ $type }->{type};
+    }
+    my $const;
+    if( substr( $type, 0, 4 ) eq 'sql_' )
+    {
+        $const = $self->{dbh}->can( "DBI::\U${type}\E" );
+    }
+    else
+    {
+        $const = $self->{dbh}->can( "DBI::SQL_\U${type}\E" );
+    }
+    return( '' ) if( !defined( $const ) );
+    return( $const->() );
+}
 
 # Specific to Mysql (Postgres also uses it)
 sub having
@@ -328,8 +632,7 @@ sub table_info
     my $self = shift( @_ );
     my $table = shift( @_ ) || 
     return( $self->error( "You must provide a table name to access the table methods." ) );
-    my $opts = {};
-    $opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
+    my $opts = $self->_get_args_as_hash( @_ );
     my $db = $opts->{database} || $self->database;
     # my $sth = $self->{dbh}->table_info( undef(), undef(), $table );
     my $sql = "SELECT * FROM information_schema.tables WHERE table_name=?";
@@ -457,7 +760,7 @@ sub _connection_parameters
 {
     my $self  = shift( @_ );
     my $param = shift( @_ );
-    my $core = [qw( db login passwd host port driver database server opt uri debug cache_connections unknown_field )];
+    my $core = [qw( db login passwd host port driver database server opt uri debug cache_connections cache_table unknown_field )];
     my @mysql_params = grep( /^mysql_/, keys( %$param ) );
     # See DBD::mysql for the list of valid parameters
     # E.g.: mysql_client_found_rows, mysql_compression mysql_connect_timeout mysql_write_timeout mysql_read_timeout mysql_init_command mysql_skip_secure_auth mysql_read_default_file mysql_read_default_group mysql_socket mysql_ssl mysql_ssl_client_key mysql_ssl_client_cert mysql_ssl_ca_file mysql_ssl_ca_path mysql_ssl_cipher mysql_local_infile mysql_multi_statements mysql_server_prepare mysql_server_prepare_disable_fallback mysql_embedded_options mysql_embedded_groups mysql_conn_attrs 
@@ -628,7 +931,7 @@ DB::Object::Mysql - Mysql Database Object
     
 =head1 VERSION
 
-    v0.3.7
+    v1.0.0
 
 =head1 DESCRIPTION
 
@@ -656,23 +959,23 @@ You can specify the following arguments:
 
 =over 4
 
-=item I<database>
+=item * C<database>
 
 The database name you wish to connect to
 
-=item I<login>
+=item * C<login>
 
 The login used to access that database
 
-=item I<password>
+=item * C<password>
 
 The password that goes along
 
-=item I<server>
+=item * C<server>
 
 The server, that is hostname of the machine serving a SQL server.
 
-=item I<driver>
+=item * C<driver>
 
 The driver you want to use. It needs to be of the same type than the server you want to connect to. If you are connecting to a MySQL server, you would use C<mysql>, if you would connecto to an Oracle server, you would use C<oracle>.
 
@@ -712,99 +1015,99 @@ The authorised parameters are:
 
 =over 4
 
-=item I<Warn>
+=item * C<Warn>
 
 Can be overridden.
 
-=item I<Active>
+=item * C<Active>
 
 Read-only.
 
-=item I<Kids>
+=item * C<Kids>
 
 Read-only.
 
-=item I<ActiveKids>
+=item * C<ActiveKids>
 
 Read-only.
 
-=item I<CachedKids>
+=item * C<CachedKids>
 
 Read-only.
 
-=item I<InactiveDestroy>
+=item * C<InactiveDestroy>
 
 Can be overridden.
 
-=item I<PrintError>
+=item * C<PrintError>
 
 Can be overridden.
 
-=item I<RaiseError>
+=item * C<RaiseError>
 
 Can be overridden.
 
-=item I<ChopBlanks>
+=item * C<ChopBlanks>
 
 Can be overridden.
 
-=item I<LongReadLen>
+=item * C<LongReadLen>
 
 Can be overridden.
 
-=item I<LongTruncOk>
+=item * C<LongTruncOk>
 
 Can be overridden.
 
-=item I<AutoCommit>
+=item * C<AutoCommit>
 
 Can be overridden.
 
-=item I<Name>
+=item * C<Name>
 
 Read-only.
 
-=item I<RowCacheSize>
+=item * C<RowCacheSize>
 
 Read-only.
 
-=item I<NUM_OF_FIELDS>
+=item * C<NUM_OF_FIELDS>
 
 Read-only.
 
-=item I<NUM_OF_PARAMS>
+=item * C<NUM_OF_PARAMS>
 
 Read-only.
 
-=item I<NAME>
+=item * C<NAME>
 
 Read-only.
 
-=item I<TYPE>
+=item * C<TYPE>
 
 Read-only.
 
-=item I<PRECISION>
+=item * C<PRECISION>
 
 Read-only.
 
-=item I<SCALE>
+=item * C<SCALE>
 
 Read-only.
 
-=item I<NULLABLE>
+=item * C<NULLABLE>
 
 Read-only.
 
-=item I<CursorName>
+=item * C<CursorName>
 
 Read-only.
 
-=item I<Statement>
+=item * C<Statement>
 
 Read-only.
 
-=item I<RowsInCache>
+=item * C<RowsInCache>
 
 Read-only.
 
@@ -872,15 +1175,15 @@ Possible options are:
 
 =over 4
 
-=item I<charset>
+=item * C<charset>
 
 The character encoding.
 
-=item I<collate>
+=item * C<collate>
 
 Sets the C<COLLATE> attribute
 
-=item I<if_not_exists>
+=item * C<if_not_exists>
 
 Add the condition C<IF NOT EXISTS>
 
@@ -899,6 +1202,13 @@ Returns a list of all available databases.
 =head2 data_sources
 
 Given an optional list of options, this return the data source of the database handler.
+
+=head2 datatype_dict
+
+Returns an hash reference of each data type with their equivalent C<constant>, regular expression (C<re>), constant C<name> and C<type> name.
+
+Each data type is an hash with the following properties for each type: C<constant>, C<name>, C<re>, C<type>
+
 
 =head2 data_type
 
@@ -972,7 +1282,7 @@ Formats update query based on the following arguments provided:
 
 =over 4
 
-=item I<data>
+=item * C<data>
 
 An array of key-value pairs to be used in the update query. This array can be provided as the prime argument as a reference to an array, an array, or as the I<data> element of a hash or a reference to a hash provided.
 
@@ -999,6 +1309,12 @@ If L<DB::Object/bind> is enabled, a question mark will be used as the value and 
 Finally, otherwise the value is escaped and surrounded by single quotes.
 
 L<DB::Object/format_update> returns a string representing the comma-separated list of fields that will be used.
+
+=head2 get_sql_type
+
+Provided with a SQL type, irrespective of the character case, and this will return the equivalent constant value.
+
+Values are taken from C<DBI::SQL_*>
 
 =head2 getdefault
 
@@ -1228,11 +1544,11 @@ Optional parameters are:
 
 =over 4
 
-=item I<anywhere>
+=item * C<anywhere>
 
 If true, it will search anywhere.
 
-=item I<schema>
+=item * C<schema>
 
 A database schema.
 
@@ -1258,19 +1574,19 @@ Information retrieved from the PostgreSQL system tables for every table found in
 
 =over 4
 
-=item I<name>
+=item * C<name>
 
 The object name
 
-=item I<owner>
+=item * C<owner>
 
 The object owner (role)
 
-=item I<schema>
+=item * C<schema>
 
 Database schema, if any.
 
-=item I<type>
+=item * C<type>
 
 The object type, which may be one of: C<table>, C<view>, C<materialized view>, C<special>, C<foreign table>
 

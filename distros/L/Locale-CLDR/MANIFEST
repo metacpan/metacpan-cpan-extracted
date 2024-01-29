@@ -41,7 +41,7 @@ t/19-Currency.t
 t/20-Plurals.t
 t/21-Collation.t
 t/22-Maketext.t
-t/23-Likely-Subtags.t
+t/23-Deep-recursion.t
 t/pod-coverage.t
 t/pod.t
 META.yml

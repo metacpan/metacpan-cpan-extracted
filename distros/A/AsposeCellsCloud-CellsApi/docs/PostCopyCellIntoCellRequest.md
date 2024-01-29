@@ -8,15 +8,15 @@ use AsposeCellsCloud::Request::PostCopyCellIntoCell;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | The workbook name. |
-**dest_cell_name** | **string** | Destination cell name |
-**sheet_name** | **string** | Destination worksheet name. |
-**worksheet** | **string** | Source worksheet name. |
-**cellname** | **string** | Source cell name |
-**row** | **int** | Source row |
-**column** | **int** | Source column |
-**folder** | **string** | Original workbook folder. |
-**storage_name** | **string** | Storage name. |  
+**name** | **string** | The file name. |
+**dest_cell_name** | **string** | The destination cell name. |
+**sheet_name** | **string** | The destination worksheet name. |
+**worksheet** | **string** | The source worksheet name. |
+**cellname** | **string** | The source cell name. |
+**row** | **int** | The source row index. |
+**column** | **int** | The source column index. |
+**folder** | **string** | The folder where the file is situated. |
+**storage_name** | **string** | The storage name where the file is situated. |  
 
 [[Back to Model list]](../README.md#documentation-for-requests) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

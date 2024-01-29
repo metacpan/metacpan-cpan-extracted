@@ -1,5 +1,16 @@
 Revision history for Crypt-Passphrase
 
+0.019     2024-01-28 19:12:25+01:00 Europe/Brussels
+          - Add recode_hash method to Crypt::Passphrase
+          - Remove deprecated curry_with_password method
+
+0.018     2024-01-16 20:39:47+01:00 Europe/Berlin
+          - Depend on the correct Crypt::URandom version
+
+0.017     2024-01-15 02:19:46+01:00 Europe/Brussels
+          - Use unbuffered randomness
+          - Reorganize documentation
+
 0.016     2023-05-03 19:19:41+02:00 Europe/Amsterdam
           - Make pepper algorithm part of crypt identifiers
           - Better encode salts in System encoder

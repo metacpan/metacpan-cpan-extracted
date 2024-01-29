@@ -5,16 +5,16 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-22'; # DATE
+our $DATE = '2024-01-25'; # DATE
 our $DIST = 'AppBase-Grep'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our %SPEC;
 
 $SPEC{grep} = {
     v => 1.1,
     summary => 'A base for grep-like CLI utilities',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 This routine provides a base for grep-like CLI utilities. It accepts coderef as
 source of lines, which in the actual utilities can be from files or other
@@ -35,7 +35,7 @@ Compared to the standard grep, AppBase::Grep also has these unique features:
 * `--all` option to match all patterns instead of just one;
 * observe the `COLOR` environment variable to set `--color` default;
 
-_
+MARKDOWN
     args => {
         pattern => {
             summary => 'Specify *string* to search for',
@@ -65,14 +65,14 @@ _
         dash_prefix_inverts => { # not in grep
             summary => 'When given pattern that starts with dash "-FOO", make it to mean "^(?!.*FOO)"',
             schema => 'bool*',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 This is a convenient way to search for lines that do not match a pattern.
 Instead of using `-v` to invert the meaning of all patterns, this option allows
 you to invert individual pattern using the dash prefix, which is also used by
 Google search and a few other search engines.
 
-_
+MARKDOWN
             tags => ['category:matching-control'],
         },
         all => { # not in grep
@@ -81,9 +81,21 @@ _
             tags => ['category:matching-control'],
         },
         count => {
-            summary => 'Supress normal output, return a count of matching lines',
+            summary => 'Supress normal output; instead return a count of matching lines',
             schema => 'true*',
             cmdline_aliases => {c=>{}},
+            tags => ['category:general-output-control'],
+        },
+        files_with_matches => {
+            summary => 'Supress normal output; instead return filenames with matching lines; scanning for each file will stop on the first match',
+            schema => 'true*',
+            cmdline_aliases => {l=>{}},
+            tags => ['category:general-output-control'],
+        },
+        files_without_match => {
+            summary => 'Supress normal output; instead return filenames without matching lines',
+            schema => 'true*',
+            cmdline_aliases => {L=>{}},
             tags => ['category:general-output-control'],
         },
         color => {
@@ -115,13 +127,16 @@ _
         _source => {
             schema => 'code*',
             tags => ['hidden'],
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 Code to produce lines of text to grep form. Required.
 
 Will be called with these arguments:
 
-    ()
+    ($instruction*)
+
+where `$instruction` can be 1 to instruct the source to skip to the next "file"
+(or source) before retrieving the next line.
 
 Should return the following:
 
@@ -132,21 +147,21 @@ Where `$line` is the line (with newline ending, unless `$chomp` is true),
 from files), and `$chomp` is boolean that can be set to true to indicate that
 line is already chomped and should not be chomped again.
 
-_
+MARKDOWN
         },
         _highlight_regexp => {
             schema => 're*',
             tags => ['hidden'],
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 Regexp pattern to capture each pattern for highlighting. Optional.
 
-_
+MARKDOWN
         },
         _filter_code => {
             schema => 'code*',
             tags => ['hidden'],
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 Custom filtering. If set, then `pattern` and `regexps` arguments are not
 required and lines of text will be filtered by this code. Used e.g. for grepping
@@ -160,9 +175,16 @@ Will be called for each line of text with these arguments:
 where `$line` is the line of text and `%args` are the arguments given to the
 `grep()` function.
 
-_
+MARKDOWN
         },
 
+    },
+    args_rels => {
+        'choose_one&' => [
+            [qw/quiet count files_with_matches files_without_match/],
+            [qw/invert_match files_with_matches/],
+            [qw/invert_match files_without_match/],
+        ],
     },
 };
 sub grep {
@@ -174,6 +196,8 @@ sub grep {
     my $opt_ci     = $args{ignore_case};
     my $opt_invert = $args{invert_match};
     my $opt_count  = $args{count};
+    my $opt_files_with_matches  = $args{files_with_matches};
+    my $opt_files_without_match = $args{files_without_match};
     my $opt_quiet  = $args{quiet};
     my $opt_linum  = $args{line_number};
 
@@ -238,55 +262,66 @@ sub grep {
         print "\n" if $chomp;
     };
 
-    my $prevlabel;
+    my ($prevlabel, $is_file_match, $instruction, $has_print_files_without_match);
+  LINE:
     while (1) {
-        ($line, $label, $chomp) = $source->();
+        ($line, $label, $chomp) = $source->($instruction);
         last unless defined $line;
+        undef $instruction;
 
         chomp($line) if $chomp;
 
         $label //= '';
 
-        if ($opt_linum) {
-            if (!defined $prevlabel) {
+        if (!defined $prevlabel) {
+            $prevlabel = $label;
+            $linum = 1;
+        } else {
+            if ($label ne $prevlabel) {
+                if ($opt_files_without_match && !$is_file_match) {
+                    print $label, "\n";
+                }
+                undef $is_file_match;
                 $prevlabel = $label;
                 $linum = 1;
             } else {
-                if ($label ne $prevlabel) {
-                    $prevlabel = $label;
-                    $linum = 1;
-                } else {
-                    $linum++;
-                }
+                $linum++;
             }
         }
 
-        my $is_match;
+        my $is_line_match;
         if ($args{_filter_code}) {
-            $is_match = $args{_filter_code}->($line, \%args);
+            $is_line_match = $args{_filter_code}->($line, \%args);
         } elsif ($logic eq 'or') {
-            $is_match = 0;
+            $is_line_match = 0;
             for my $re (@re_patterns) {
                 if ($line =~ $re) {
-                    $is_match = 1;
+                    $is_line_match = 1;
                     last;
                 }
             }
         } else {
-            $is_match = 1;
+            $is_line_match = 1;
             for my $re (@re_patterns) {
                 unless ($line =~ $re) {
-                    $is_match = 0;
+                    $is_line_match = 0;
                     last;
                 }
             }
         }
 
-        if ($is_match) {
+        if ($is_line_match) {
+            $is_file_match = 1;
+            if ($opt_files_with_matches) {
+                print $label, "\n";
+                $instruction = 1;
+                next LINE;
+            }
+
             next if $opt_invert;
             if ($opt_quiet || $opt_count) {
                 $num_matches++;
-            } else {
+            } elsif (!$opt_files_without_match) {
                 $code_print->();
             }
         } else {
@@ -297,6 +332,10 @@ sub grep {
                 $code_print->();
             }
         }
+    }
+
+    if ($opt_files_without_match && !$is_file_match) {
+        print $prevlabel, "\n";
     }
 
     return [
@@ -322,7 +361,7 @@ AppBase::Grep - A base for grep-like CLI utilities
 
 =head1 VERSION
 
-This document describes version 0.011 of AppBase::Grep (from Perl distribution AppBase-Grep), released on 2023-07-22.
+This document describes version 0.013 of AppBase::Grep (from Perl distribution AppBase-Grep), released on 2024-01-25.
 
 =head1 FUNCTIONS
 
@@ -375,7 +414,7 @@ Specify when to show color (never, always, or autoE<sol>when interactive).
 
 =item * B<count> => I<true>
 
-Supress normal output, return a count of matching lines.
+Supress normal output; instead return a count of matching lines.
 
 =item * B<dash_prefix_inverts> => I<bool>
 
@@ -385,6 +424,14 @@ This is a convenient way to search for lines that do not match a pattern.
 Instead of using C<-v> to invert the meaning of all patterns, this option allows
 you to invert individual pattern using the dash prefix, which is also used by
 Google search and a few other search engines.
+
+=item * B<files_with_matches> => I<true>
+
+Supress normal output; instead return filenames with matching lines; scanning for each file will stop on the first match.
+
+=item * B<files_without_match> => I<true>
+
+Supress normal output; instead return filenames without matching lines.
 
 =item * B<ignore_case> => I<bool>
 
@@ -481,7 +528,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

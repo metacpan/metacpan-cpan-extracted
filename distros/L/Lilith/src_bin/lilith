@@ -33,7 +33,9 @@ lilith [B<-c> <config>] B<-a> search [B<--output> <return>] [B<-t> <table>]
 [B<--hostl>] [B<--hosN>] [B<--ih> <host>] [B<--ihl>] [B<--ihN>] [B<-i> <instance>]
 [B<-il>] [B<-iN>] [B<-c> <class>] [B<--cl>] [B<--cN>] [B<-s> <sig>] [B<--sl>]
 [B<--sN>] [B<--if> <if>] [B<--ifl>] [B<--ifN>] [B<--ap> <proto>] [B<--apl>] [B<--apN>]
-[B<--gid> <gid>] [B<--sid> <sid>] [B<--rev> <rev>]
+[B<--gid> <gid>] [B<--sid> <sid>] [B<--rev> <rev>] [B<--subip> <subip>]
+[B<--subhost> <subhost>] [B<--slug> <slug>] [B<--pkg> <pkg>] [B<--malscore> <malscore>]
+[B<--size> <size>] [B<--target> <target>] [B<--task> <task>]
 
 =head1 DESCRIPTION
 
@@ -135,7 +137,7 @@ The directory to write it out too.
 
 =head2 get_short_class_snmp_list
 
-Print a list of shorted class names for use wit SNMP.
+Print a list of shorted class names for use with SNMP.
 
 =head2 search
 
@@ -148,6 +150,7 @@ The common option types for search are as below.
     - String :: A string to check for. May be matched using like or negated via
                 the proper options.
     - Complex :: A item to match.
+    - IP :: An IP.
 
 =head3 General Search Options
 
@@ -172,6 +175,8 @@ Column to use for sorting by.
 
     - Default :: timestamp
 
+    - Cape Default :: stop
+
 =head4 --orderdir <direction>
 
 Direction to order in.
@@ -186,21 +191,21 @@ Direction to order in.
 Source IP.
 
     - Default :: undef
-    - Type :: string
+    - Type :: IP
 
 =head4  --di <dst IP>
 
 Destination IP.
 
     - Default :: undef
-    - Type :: string
+    - Type :: IP
 
 =head4  --ip <IP>
 
 IP, either dst or src.
 
     - Default :: undef
-    - Type :: complex
+    - Type :: complex IP
 
 =head3  Port Options
 
@@ -223,7 +228,7 @@ Destination port.
 Port, either dst or src.
 
     - Default :: undef
-    - Type :: complex
+    - Type :: complex integer
 
 =head3 Host Options
 
@@ -245,12 +250,14 @@ Host.
 Use like for matching host.
 
     - Default :: undef
+    - Type :: string
 
 =head4 --hostN
 
 Invert host matching.
 
     - Default :: undef
+    - Type :: string
 
 =head3 Instance Options
 
@@ -287,12 +294,14 @@ Instance.
 Use like for matching instance.
 
     - Default :: undef
+    - Type :: string
 
 =head4 --iN
 
 Invert instance matching.
 
     - Default :: undef
+    - Type :: string
 
 =head3 Class Options
 
@@ -308,12 +317,14 @@ Classification.
 Use like for matching classification.
 
     - Default :: undef
+    - Type :: string
 
 =head4 --cN
 
 Invert class matching.
 
     - Default :: undef
+    - Type :: string
 
 =head3 Signature Options
 
@@ -329,12 +340,14 @@ Signature.
 Use like for matching signature.
 
     - Default :: undef
+    - Type :: string
 
 =head4 --sN
 
 Invert signature matching.
 
     - Default :: undef
+    - Type :: string
 
 =head3 In Interface Options
 
@@ -400,6 +413,65 @@ Rev.
 
     - Default :: undef
     - Type :: integer
+
+=head3 CAPEv2 Options
+
+=head4 --slug <slug>
+
+The slug it was submitted with.
+
+    - Default :: undef
+    - Type :: string
+
+
+=head4 --pkg <pkg>
+
+The detopnation package used with CAPEv2.
+
+    - Default :: undef
+    - Type :: string
+
+=head4 --malscore <malscore>
+
+The malscore of the sample.
+
+    - Default :: undef
+    - Type :: integer
+
+=head4 --size <size>
+
+The size of the sample.
+
+    - Default :: undef
+    - Type :: integer
+
+=head4 --target <target>
+
+The the detonation target.
+
+    - Default :: undef
+    - Type :: string
+
+=head4 --task <task>
+
+The task ID of the run.
+
+    - Default :: undef
+    - Type :: integer
+
+=head4 --subip <subip>
+
+The IP the sample was submitted from.
+
+    - Default :: undef
+    - Type :: IP
+
+=head4 --subhost <subhost>
+
+The host the sample was submitted from.
+
+    - Default :: undef
+    - Type :: string
 
 =head1 ENVIROMENTAL VARIABLES
 
@@ -545,7 +617,7 @@ sub help {
 
 	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT );
 
-} ## end sub help
+}
 
 # get the commandline options
 my $help        = 0;
@@ -608,6 +680,14 @@ my $raw;
 my $virani;
 my $pcap;
 my $buffer = 60;
+my $subip;
+my $subhost;
+my $slug;
+my $pkg;
+my $malscore;
+my $size;
+my $target;
+my $task;
 Getopt::Long::Configure('no_ignore_case');
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -621,7 +701,7 @@ GetOptions(
 	'sp=s'        => \$src_port,
 	'di=s'        => \$dest_ip,
 	'dp=s'        => \$dest_port,
-	'id=s'        => \$alert_id,
+	'id=s'        => \$id,
 	't=s'         => \$table,
 	'host=s'      => \$host,
 	'hostN=s'     => \$host_not,
@@ -660,7 +740,6 @@ GetOptions(
 	'columns=s'   => \$columns,
 	'columnset=s' => \$column_set,
 	'debug'       => \$debug,
-	'id=s'        => \$id,
 	'event=s'     => \$event_id,
 	'raw'         => \$decode_raw,
 	'daemonize'   => \$daemonize,
@@ -671,6 +750,14 @@ GetOptions(
 	'pcap=s'      => \$pcap,
 	'virani=s'    => \$virani,
 	'buffer=s'    => \$buffer,
+	'subip=s',    => \$subip,
+	'subhost=s',  => \$subhost,
+	'slug=s'      => \$slug,
+	'pkg=s'       => \$pkg,
+	'malscore=s'  => \$malscore,
+	'size=s'      => \$size,
+	'target=s'    => \$target,
+	'task=s'      => \$task,
 );
 
 # print version or help if requested
@@ -940,6 +1027,14 @@ if ( $action eq 'search' ) {
 		limit              => $limit,
 		offset             => $offset,
 		go_back_minutes    => $go_back_minutes,
+		subbed_from_ip     => $subip,
+		subbed_from_host   => $subhost,
+		slug               => $slug,
+		pkg                => $pkg,
+		malscore           => $malscore,
+		size               => $size,
+		target             => $target,
+		task               => $task,
 	);
 
 	#
@@ -978,7 +1073,7 @@ if ( $action eq 'search' ) {
 				} else {
 					die( '"' . $column_set . '" is not a known column set' );
 				}
-			} else {
+			} elsif ( $table eq 'sagan' ) {
 				if ( $column_set eq 'default' ) {
 					$columns
 						= 'id,instance,src_ip,host,xff,facility,level,priority,program,signature,classification,rule_id';
@@ -994,7 +1089,11 @@ if ( $action eq 'search' ) {
 				} else {
 					die( '"' . $column_set . '" is not a known column set' );
 				}
-			} ## end else [ if ( $table eq 'suricata' ) ]
+			} elsif ( $table eq 'cape' ) {
+				if ( $column_set eq 'default' ) {
+					$columns = 'id,instance,slug,target,size,pkg,malscore,subbed_from_ip,subbed_from_host';
+				}
+			}
 		} ## end if ( !defined($columns) )
 
 		# friendly column names
@@ -1030,6 +1129,13 @@ if ( $action eq 'search' ) {
 			'xff'                 => 'xff',
 			'stream'              => 'stream',
 			'event_id'            => 'event',
+			'slug'                => 'slug',
+			'target'              => 'target',
+			'size'                => 'size',
+			'pkg'                 => 'pkg',
+			'malscore'            => 'malscore',
+			'subbed_from_ip'      => 'subbed_from_ip',
+			'subbed_from_host'    => 'subbed_from_host',
 		};
 
 		#

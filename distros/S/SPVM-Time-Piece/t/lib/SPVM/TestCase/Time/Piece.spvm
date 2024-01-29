@@ -1,0 +1,718 @@
+class TestCase::Time::Piece {
+  
+  use Sys;
+  use Time::Piece;
+  use Time::Seconds;
+  use Format;
+  use Array;
+  use Sys::OS;
+  
+  static method localtime : int () {
+    
+    {
+      my $tp = Time::Piece->localtime(0);
+      
+      warn "[Test Output]localtime::" . $tp->cdate;
+      
+      unless (Fn->contains($tp->cdate, "1970")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime;
+      
+      warn "[Test Output]localtime:no_args:" . $tp->cdate;
+      
+      unless ($tp->epoch > 0) {
+        return 0;
+      }
+    }
+    
+    unless (Sys::OS->is_windows) {
+      my $tp = Time::Piece->localtime(-(Time::Seconds->ONE_DAY->seconds * 2), 1);
+      
+      warn "[Test Output]localtime:allow_minus:" . $tp->cdate;
+      
+      unless (Fn->contains($tp->cdate, "1969")) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method gmtime : int () {
+    
+    {
+      my $tp = Time::Piece->gmtime(0);
+      
+      warn "[Test Output]gmtime::" . $tp->cdate;
+      
+      unless (Fn->contains($tp->cdate, "1970")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->gmtime;
+      
+      warn "[Test Output]gmtime:no_args:" . $tp->cdate;
+      
+      unless ($tp->epoch > 0) {
+        return 0;
+      }
+    }
+    
+    unless (Sys::OS->is_windows) {
+      my $tp = Time::Piece->gmtime(-(Time::Seconds->ONE_DAY->seconds * 2), 1);
+      
+      warn "[Test Output]gmtime:allow_minus:" . $tp->cdate;
+      
+      unless (Fn->contains($tp->cdate, "1969")) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method accessors : int () {
+    {
+      my $tp = Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S");
+      
+      unless ($tp->sec == 56) {
+        return 0;
+      }
+      
+      unless ($tp->min == 11) {
+        return 0;
+      }
+      
+      unless ($tp->hour == 10) {
+        return 0;
+      }
+      
+      unless ($tp->mday == 13) {
+        return 0;
+      }
+      
+      unless ($tp->mon == 12) {
+        return 0;
+      }
+      
+      unless ($tp->_mon == 11) {
+        return 0;
+      }
+      
+      unless ($tp->monname eq "Dec") {
+        return 0;
+      }
+      
+      unless ($tp->monname(["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]) eq "12") {
+        return 0;
+      }
+      
+      unless ($tp->month eq "Dec") {
+        return 0;
+      }
+      
+      unless ($tp->month(["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]) eq "12") {
+        return 0;
+      }
+      
+      unless ($tp->fullmonth eq "December") {
+        return 0;
+      }
+      
+      unless ($tp->year == 2022) {
+        return 0;
+      }
+      
+      unless ($tp->_year == 122) {
+        return 0;
+      }
+      
+      unless ($tp->yy == 22) {
+        return 0;
+      }
+      
+      unless ($tp->wday == 3) {
+        return 0;
+      }
+      
+      unless ($tp->_wday == 2) {
+        return 0;
+      }
+      
+      unless ($tp->day_of_week == 2) {
+        return 0;
+      }
+      
+      unless ($tp->wdayname eq "Tue") {
+        return 0;
+      }
+      
+      unless ($tp->wdayname(["0", "1", "2", "3", "4", "5", "6"])  eq "2") {
+        return 0;
+      }
+      
+      unless ($tp->day eq "Tue") {
+        return 0;
+      }
+      
+      unless ($tp->day(["0", "1", "2", "3", "4", "5", "6"])  eq "2") {
+        return 0;
+      }
+      
+      unless ($tp->fullday eq "Tuesday") {
+        return 0;
+      }
+      
+      unless ($tp->yday == 346) {
+        return 0;
+      }
+      
+      unless ($tp->day_of_year == 346) {
+        return 0;
+      }
+      
+      unless ($tp->isdst == 0) {
+        return 0;
+      }
+      
+      unless ($tp->daylight_savings == 0) {
+        return 0;
+      }
+      
+      unless ($tp->hms eq "10:11:56") {
+        return 0;
+      }
+      
+      unless ($tp->hms(".") eq "10.11.56") {
+        return 0;
+      }
+      
+      unless ($tp->time eq "10:11:56") {
+        return 0;
+      }
+      
+      unless ($tp->time(".") eq "10.11.56") {
+        return 0;
+      }
+      
+      unless ($tp->ymd eq "2022-12-13") {
+        return 0;
+      }
+      
+      unless ($tp->date eq "2022-12-13") {
+        return 0;
+      }
+      
+      unless ($tp->mdy eq "12-13-2022") {
+        return 0;
+      }
+      
+      unless ($tp->mdy("/") eq "12/13/2022") {
+        return 0;
+      }
+      
+      unless ($tp->dmy eq "13-12-2022") {
+        return 0;
+      }
+      
+      unless ($tp->dmy(".") eq "13.12.2022") {
+        return 0;
+      }
+      
+      unless ($tp->datetime eq "2022-12-13T10:11:56") {
+        return 0;
+      }
+      
+      unless ($tp->cdate eq "Tue Dec 13 10:11:56 2022") {
+        return 0;
+      }
+      
+      unless ($tp->epoch == 1670926316) {
+        return 0;
+      }
+      
+      unless ($tp->tzoffset->seconds == 0) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method tzoffset : int () {
+    
+    {
+      my $tp = Time::Piece->gmtime;
+      
+      unless ($tp->tzoffset->seconds == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime;
+      
+      my $tzoffset = $tp->tzoffset;
+      
+      warn "[Test Output]tzoffset:" . $tzoffset->hours;
+    }
+    
+    return 1;
+  }
+  
+  static method julian_day : int () {
+    
+    {
+      my $tp = Time::Piece->gmtime;
+      
+      my $julian_day = $tp->julian_day;
+      
+      warn "[Test Output]julian_day:" . Format->sprintf("%.10f", [(object)$julian_day]);
+    }
+    
+    return 1;
+  }
+  
+  static method mjd : int () {
+    
+    {
+      my $tp = Time::Piece->gmtime;
+      
+      my $mjd = $tp->mjd;
+      
+      warn "[Test Output]mjd:" . Format->sprintf("%.10f", [(object)$mjd]);
+    }
+    
+    return 1;
+  }
+  
+  static method week : int () {
+    
+    {
+      my $tp = Time::Piece->gmtime;
+      
+      my $week = $tp->week;
+      
+      warn "[Test Output]week:$week";
+    }
+    
+    return 1;
+  }
+  
+  static method is_leap_year : int () {
+    
+    {
+      my $tp = Time::Piece->gmtime;
+      
+      my $is_leap_year = $tp->is_leap_year;
+      
+      warn "[Test Output]week:$is_leap_year";
+    }
+    
+    return 1;
+  }
+  
+  static method month_last_day : int () {
+    
+    {
+      my $tp = Time::Piece->gmtime;
+      
+      my $month_last_day = $tp->month_last_day;
+      
+      warn "[Test Output]month_last_day:$month_last_day";
+    }
+    
+    return 1;
+  }
+  
+  static method strftime : int () {
+    {
+      my $tp = Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S");
+      
+      my $output = $tp->strftime("%Y-%m-%d %H:%M:%S");
+      
+      unless ($output eq "2022-12-13 10:11:56") {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $tp = Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S");
+      
+      my $format = Fn->join(" ", Array->repeat_string(["%Y"], 50));
+      
+      my $expected = Fn->join(" ", Array->repeat_string(["2022"], 50));
+      
+      my $output = $tp->strftime($format);
+      
+      unless ($output eq $expected) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->gmtime;
+      
+      my $descriptors = ["%a", "%A", "%b", "%B", "%c", "%d", "%H", "%I", "%j", "%m", "%M", "%p", "%S", "%U", "%w", "%W", "%x", "%X", "%y", "%Y", "%z", "%Z", "%%"];
+      
+      for my $descriptor (@$descriptors) {
+        my $output = $tp->strftime($descriptor);
+        warn "[Test Output]strftime:format:$descriptor:output:$output";
+      }
+      
+      # Invalid descriptors in Windows.
+      ["%C", "%D", "%e", "%F", "%G", "%g", "%h", "%k", "%l", "%n", "%P", "%r", "%R", "%s", "%t", "%T", "%u", "%V", "%+", "%Ec", "%EC", "%Ex", "%EX", "%Ey", "%EY", "%Od", "%Oe", "%OH", "%OI", "%Om", "%OM", "%OS", "%Ou", "%OU", "%OV", "%Ow", "%OW", "%Oy"];
+    }
+    
+    {
+      my $tp = Time::Piece->gmtime;
+      
+      my $strftime = $tp->strftime;
+      
+      warn "[Test Output]strftime:$strftime";
+    }
+    
+    {
+      my $tp = Time::Piece->localtime;
+      
+      my $strftime = $tp->strftime;
+      
+      warn "[Test Output]strftime:$strftime";
+    }
+    
+    return 1;
+  }
+  
+  static method strptime : int () {
+    {
+      my $tp = Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S");
+      
+      unless ($tp->year == 2022) {
+        return 0;
+      }
+      
+      unless ($tp->mon == 12) {
+        return 0;
+      }
+      
+      unless ($tp->mday == 13) {
+        return 0;
+      }
+      
+      unless ($tp->hour == 10) {
+        return 0;
+      }
+      
+      unless ($tp->min == 11) {
+        return 0;
+      }
+      
+      unless ($tp->sec == 56) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method localtime_tp : int () {
+    {
+      my $tp = Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S");
+      
+      my $tp_localtime = Time::Piece->localtime_tp($tp);
+      
+      warn $tp_localtime->strftime;
+      
+      unless ($tp->year == 2022) {
+        return 0;
+      }
+      
+      unless ($tp->mon == 12) {
+        return 0;
+      }
+      
+      unless ($tp->mday == 13) {
+        return 0;
+      }
+      
+      unless ($tp->hour == 10) {
+        return 0;
+      }
+      
+      unless ($tp->min == 11) {
+        return 0;
+      }
+      
+      unless ($tp->sec == 56) {
+        return 0;
+      }
+      
+      warn "[Test Output]localtime_tp:\$tp->epoch:" . $tp->epoch . ":\$tp_localtime->epoch:" . $tp_localtime->epoch;
+      
+      my $epoch_diff = $tp->epoch - $tp_localtime->epoch;
+      
+      my $epoch_diff_hour = $epoch_diff / 60 / 60;
+      
+      unless ($epoch_diff_hour == 9) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method clone : int () {
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_clone = $tp->clone;
+      
+      unless ($tp_clone->strftime("%Y-%m-%d %H:%M:%S") eq "2022-12-13 10:11:56") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method truncate : int () {
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_truncate = $tp->truncate({to => "second"});
+      
+      unless ($tp_truncate->strftime("%Y-%m-%d %H:%M:%S") eq "2022-12-13 10:11:00") {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_truncate = $tp->truncate({to => "minute"});
+      
+      unless ($tp_truncate->strftime("%Y-%m-%d %H:%M:%S") eq "2022-12-13 10:00:00") {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_truncate = $tp->truncate({to => "hour"});
+      
+      unless ($tp_truncate->strftime("%Y-%m-%d %H:%M:%S") eq "2022-12-13 00:00:00") {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_truncate = $tp->truncate({to => "day"});
+      
+      unless ($tp_truncate->strftime("%Y-%m-%d %H:%M:%S") eq "2022-12-01 00:00:00") {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_truncate = $tp->truncate({to => "day"});
+      
+      unless ($tp_truncate->strftime("%Y-%m-%d %H:%M:%S") eq "2022-12-01 00:00:00") {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_truncate = $tp->truncate({to => "month"});
+      
+      unless ($tp_truncate->strftime("%Y-%m-%d %H:%M:%S") eq "2022-01-01 00:00:00") {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_truncate = $tp->truncate({to => "quarter"});
+      
+      unless ($tp_truncate->strftime("%Y-%m-%d %H:%M:%S") eq "2022-10-01 00:00:00") {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_truncate = $tp->truncate({to => "year"});
+      
+      warn $tp_truncate->cdate;
+      
+      unless ($tp_truncate->strftime("%Y-%m-%d %H:%M:%S") eq "2022-01-01 00:00:00") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method add : int () {
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_add = $tp->add(Time::Seconds->new(1));
+      
+      unless ($tp_add->strftime("%Y-%m-%d %H:%M:%S") eq "2022-12-13 10:11:57") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method subtract : int () {
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_subtract = $tp->subtract(Time::Seconds->new(1));
+      
+      unless ($tp_subtract->strftime("%Y-%m-%d %H:%M:%S") eq "2022-12-13 10:11:55") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method subtract_tp : int () {
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp2 = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:55", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tsec = $tp->subtract_tp($tp2);
+      
+      unless ($tsec->seconds == 1) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method compare : int () {
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp2 = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:55", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp3 = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:57", "%Y-%m-%d %H:%M:%S"));
+      
+      unless ($tp->compare($tp) == 0) {
+        return 0;
+      }
+      
+      unless ($tp->compare($tp2) == 1) {
+        return 0;
+      }
+      
+      unless ($tp->compare($tp3) == -1) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method add_months : int () {
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_add_mongths = $tp->add_months(1);
+      
+      unless ($tp_add_mongths->strftime("%Y-%m-%d %H:%M:%S") eq "2023-01-13 10:11:56") {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2023-01-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_add_mongths = $tp->add_months(-1);
+      
+      warn $tp_add_mongths->strftime("%Y-%m-%d %H:%M:%S");
+      
+      unless ($tp_add_mongths->strftime("%Y-%m-%d %H:%M:%S") eq "2022-12-13 10:11:56") {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_add_mongths = $tp->add_months(12);
+      
+      unless ($tp_add_mongths->strftime("%Y-%m-%d %H:%M:%S") eq "2023-12-13 10:11:56") {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_add_mongths = $tp->add_months(-12);
+      
+      unless ($tp_add_mongths->strftime("%Y-%m-%d %H:%M:%S") eq "2021-12-13 10:11:56") {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2008-02-31 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_add_mongths = $tp->add_months(1);
+      
+      unless ($tp_add_mongths->strftime("%Y-%m-%d %H:%M:%S") eq "2008-04-02 10:11:56") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method add_years : int () {
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_add_mongths = $tp->add_years(1);
+      
+      unless ($tp_add_mongths->strftime("%Y-%m-%d %H:%M:%S") eq "2023-12-13 10:11:56") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+}

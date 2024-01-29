@@ -1,3 +1,11 @@
-0.001   2019-01-25 (PERLANCAR)
+0.002   2023-09-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with String::Util::Range 0.002 to update
+          documentation.
+
+
+0.001   2019-01-25  Released-By: PERLANCAR
 
         - First release.

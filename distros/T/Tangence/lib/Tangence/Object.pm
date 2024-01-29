@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Object 0.30;
+package Tangence::Object 0.32;
 
 use v5.26;
 use warnings;
@@ -75,7 +75,7 @@ sub new ( $class, %args )
 
 =head2 destroy
 
-   $obj->destroy
+   $obj->destroy;
 
 Requests that the object destroy itself, informing all clients that are aware
 of it. Once they all report that they have dropped the object, the object is
@@ -122,7 +122,7 @@ sub _destroy_really
 
 =head2 id
 
-   $id = $obj->id
+   $id = $obj->id;
 
 Returns the object's C<Tangence> ID number
 
@@ -136,7 +136,7 @@ sub id
 
 =head2 describe
 
-   $description = $obj->describe
+   $description = $obj->describe;
 
 Returns a textual description of the object, for internal debugging purposes.
 Subclasses are encouraged to override this method to return something more
@@ -152,7 +152,7 @@ sub describe
 
 =head2 registry
 
-   $registry = $obj->registry
+   $registry = $obj->registry;
 
 Returns the L<Tangence::Registry> that constructed this object.
 
@@ -184,7 +184,7 @@ sub smash ( $self, $smashkeys )
 
 =head2 class
 
-   $class = $obj->class
+   $class = $obj->class;
 
 Returns the L<Tangence::Meta::Class> object representing the class of this
 object.
@@ -199,7 +199,7 @@ sub class
 
 =head2 can_method
 
-   $method = $obj->can_method( $name )
+   $method = $obj->can_method( $name );
 
 Returns the L<Tangence::Meta::Method> object representing the named method, or
 C<undef> if no such method exists.
@@ -214,7 +214,7 @@ sub can_method
 
 =head2 can_event
 
-   $event = $obj->can_event( $name )
+   $event = $obj->can_event( $name );
 
 Returns the L<Tangence::Meta::Event> object representing the named event, or
 C<undef> if no such event exists.
@@ -229,7 +229,7 @@ sub can_event
 
 =head2 can_property
 
-   $property = $obj->can_property( $name )
+   $property = $obj->can_property( $name );
 
 Returns the L<Tangence::Meta::Property> object representing the named
 property, or C<undef> if no such property exists.
@@ -250,7 +250,7 @@ sub smashkeys
 
 =head2 fire_event
 
-   $obj->fire_event( $event, @args )
+   $obj->fire_event( $event, @args );
 
 Fires the named event on the object. Each event subscription function will be
 invoked with the given arguments.
@@ -272,13 +272,13 @@ sub fire_event ( $self, $event, @args )
 
 =head2 subscribe_event
 
-   $id = $obj->subscribe_event( $event, $callback )
+   $id = $obj->subscribe_event( $event, $callback );
 
 Subscribes an event-handling callback CODE ref to the named event. When the
 event is fired by C<fire_event> this callback will be invoked, being passed
 the object reference and the event's arguments.
 
-   $callback->( $obj, @args )
+   $callback->( $obj, @args );
 
 Returns an opaque ID value that can be used to remove this subscription by
 calling C<unsubscribe_event>.
@@ -299,7 +299,7 @@ sub subscribe_event ( $self, $event, $callback )
 
 =head2 unsubscribe_event
 
-   $obj->unsubscribe_event( $event, $id )
+   $obj->unsubscribe_event( $event, $id );
 
 Removes an event-handling callback previously registered with
 C<subscribe_event>.
@@ -320,7 +320,7 @@ sub unsubscribe_event ( $self, $event, $id )
 
 =head2 watch_property
 
-   $id = $obj->watch_property( $prop, %callbacks )
+   $id = $obj->watch_property( $prop, %callbacks );
 
 Watches a named property for changes, registering a set of callback functions
 to be invoked when the property changes in certain ways. The set of callbacks
@@ -328,34 +328,34 @@ required depends on the dimension of the property being watched.
 
 For all property types:
 
-   $on_set->( $obj, $value )
+   $on_set->( $obj, $value );
 
 For hash properties:
 
-   $on_add->( $obj, $key, $value )
-   $on_del->( $obj, $key )
+   $on_add->( $obj, $key, $value );
+   $on_del->( $obj, $key );
 
 For queue properties:
 
-   $on_push->( $obj, @values )
-   $on_shift->( $obj, $count )
+   $on_push->( $obj, @values );
+   $on_shift->( $obj, $count );
 
 For array properties:
 
-   $on_push->( $obj, @values )
-   $on_shift->( $obj, $count )
-   $on_splice->( $obj, $index, $count, @values )
-   $on_move->( $obj, $index, $delta )
+   $on_push->( $obj, @values );
+   $on_shift->( $obj, $count );
+   $on_splice->( $obj, $index, $count, @values );
+   $on_move->( $obj, $index, $delta );
 
 For objset properties:
 
-   $on_add->( $obj, $added_object )
-   $on_del->( $obj, $deleted_object_id )
+   $on_add->( $obj, $added_object );
+   $on_del->( $obj, $deleted_object_id );
 
 Alternatively, a single callback may be installed that is invoked after any
 change of the property, being passed the new value entirely:
 
-   $on_updated->( $obj, $value )
+   $on_updated->( $obj, $value );
 
 Returns an opaque ID value that can be used to remove this watch by calling
 C<unwatch_property>.
@@ -394,7 +394,7 @@ sub watch_property ( $self, $prop, %callbacks )
 
 =head2 unwatch_property
 
-   $obj->unwatch_property( $prop, $id )
+   $obj->unwatch_property( $prop, $id );
 
 Removes the set of callback functions previously registered with
 C<watch_property>.

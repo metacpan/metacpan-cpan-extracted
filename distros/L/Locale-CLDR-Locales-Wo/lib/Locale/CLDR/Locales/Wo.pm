@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Wo - Package for language Wolof
 
 package Locale::CLDR::Locales::Wo;
 # This file auto generated from Data\common\main\wo.xml
-#	on Tue  5 Dec  1:38:02 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -44,7 +44,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'af' => 'Afrikaans',
@@ -71,16 +71,24 @@ has 'display_name_language' => (
  				'cy' => 'Wels',
  				'da' => 'Danuwa',
  				'de' => 'Almaa',
+ 				'de_AT' => 'Almaa bu Ótiriis',
+ 				'de_CH' => 'Almaa bu Kawe bu Swis',
  				'dsb' => 'Sorab-Suuf',
  				'dv' => 'Diweyi',
  				'dz' => 'Dsongkaa',
  				'el' => 'Gereg',
  				'en' => 'Àngale',
+ 				'en_AU' => 'Àngale bu Óstraali',
+ 				'en_CA' => 'Àngale bu Kanadaa',
+ 				'en_GB' => 'Àngale bu Grànd Brëtaañ',
  				'en_GB@alt=short' => 'Àngale (RI)',
+ 				'en_US' => 'Àngale bu Amerik',
  				'en_US@alt=short' => 'Àngale (ES)',
  				'eo' => 'Esperantoo',
  				'es' => 'Español',
- 				'es_419' => 'Español (Amerik Latin)',
+ 				'es_419' => 'Español bu Amerik Latin',
+ 				'es_ES' => 'Español bu Tugël',
+ 				'es_MX' => 'Español bu Meksik',
  				'et' => 'Estoñiye',
  				'eu' => 'Bask',
  				'fa' => 'Pers',
@@ -89,6 +97,8 @@ has 'display_name_language' => (
  				'fil' => 'Filipiye',
  				'fo' => 'Feroos',
  				'fr' => 'Farañse',
+ 				'fr_CA' => 'Frañse bu Kanadaa',
+ 				'fr_CH' => 'Frañse bu Swis',
  				'ga' => 'Irlànde',
  				'gd' => 'Galuwaa bu Ekos',
  				'gl' => 'Galisiye',
@@ -153,6 +163,8 @@ has 'display_name_language' => (
  				'pl' => 'Polone',
  				'ps' => 'Pasto',
  				'pt' => 'Purtugees',
+ 				'pt_BR' => 'Purtugees bu Bresil',
+ 				'pt_PT' => 'Portugees bu Tugël',
  				'qu' => 'Kesuwa',
  				'quc' => 'Kishe',
  				'rm' => 'Romaas',
@@ -198,7 +210,9 @@ has 'display_name_language' => (
  				'yo' => 'Yoruba',
  				'zh' => 'Sinuwaa',
  				'zh_Hans' => 'Sinuwaa buñ woyofal',
+ 				'zh_Hans@alt=long' => 'Sinuwaa buñ woyofal',
  				'zh_Hant' => 'Sinuwaa bu cosaan',
+ 				'zh_Hant@alt=long' => 'Sinuwaa bu cosaan',
 
 			);
 			if (@_) {
@@ -239,7 +253,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Andoor',
  			'AE' => 'Emira Arab Ini',
@@ -283,7 +297,7 @@ has 'display_name_region' => (
  			'CF' => 'Repiblik Sàntar Afrik',
  			'CG@alt=variant' => 'Réewum Kongo',
  			'CH' => 'Siwis',
- 			'CI' => 'Kodiwaar (Côte d’Ivoire)',
+ 			'CI' => 'Kodiwaar',
  			'CK' => 'Duni Kuuk',
  			'CL' => 'Sili',
  			'CM' => 'Kamerun',
@@ -381,8 +395,7 @@ has 'display_name_region' => (
  			'MF' => 'Saŋ Marteŋ',
  			'MG' => 'Madagaskaar',
  			'MH' => 'Duni Marsaal',
- 			'MK' => 'Maseduwaan',
- 			'MK@alt=variant' => 'Maseduwaan (Réewum yugoslawi gu yàgg ga)',
+ 			'MK' => 'Maseduwaan bëj Gànnaar',
  			'ML' => 'Mali',
  			'MM' => 'Miyanmaar',
  			'MN' => 'Mongoli',
@@ -518,7 +531,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{Metrik},
  			'UK' => q{UK},
@@ -532,7 +545,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => '{0}',
  			'script' => '{0}',
@@ -554,7 +567,8 @@ has 'characters' => (
 			auxiliary => qr{[ã h v z]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
 			main => qr{[a à b c d e é ë f g i j k l m n ñ ŋ o ó p q r s t u w x y]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‑ , ; \: ! ? . ( ) \[ \] \{ \}]},
 		};
 	},
 EOT
@@ -789,7 +803,7 @@ has 'currencies' => (
 			},
 		},
 		'XOF' => {
-			symbol => 'CFA',
+			symbol => 'F CFA',
 			display_name => {
 				'currency' => q(Franc CFA bu Afrik Sowwu-jant),
 				'other' => q(Franc CFA yu Afrik Sowwu-jant),
@@ -1220,6 +1234,7 @@ has 'datetime_formats_available_formats' => (
 			GyMMM => q{MMM, y G},
 			GyMMMEd => q{E, d MMM, y G},
 			GyMMMd => q{d MMM, y G},
+			GyMd => q{dd-MM-y GGGGG},
 			H => q{HH},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},

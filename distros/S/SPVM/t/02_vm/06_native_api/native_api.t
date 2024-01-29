@@ -105,6 +105,21 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
   ok(SPVM::TestCase::NativeAPI->push_mortal_multi);
 }
 
+# get_class_var_byte
+{
+  ok(SPVM::TestCase::NativeAPI->get_class_var_byte);
+}
+
+# get_class_var_int
+{
+  ok(SPVM::TestCase::NativeAPI->get_class_var_int);
+}
+
+# get_class_var_short
+{
+  ok(SPVM::TestCase::NativeAPI->get_class_var_short);
+}
+
 # Field
 {
   ok(SPVM::TestCase::NativeAPI->get_field_byte_by_name);
@@ -253,6 +268,8 @@ ok(!-f "$build_dir/work/object/SPVM/CORE.o");
 
 # strerror_string
 {
+  ok(SPVM::TestCase::NativeAPI->strerror_string);
+  
   if (exists $!{EAGAIN}) {
     my $strerror_string = SPVM::TestCase::NativeAPI->strerror_string_value(Errno::EAGAIN);
     ok(ref $strerror_string);

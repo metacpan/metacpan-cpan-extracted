@@ -1,13 +1,13 @@
 # ----------- Fade ------------
 package Audio::Nama::Fade;
-use Modern::Perl;
+use Modern::Perl '2020';
 use List::Util qw(min);
 our $VERSION = 1.0;
 use Carp;
 use warnings;
 no warnings qw(uninitialized);
 our @ISA;
-use vars qw($n %by_index);
+our($n, %by_index);
 use Audio::Nama::Globals qw(:singletons %tn @fade_data); 
 use Audio::Nama::Log qw(logsub logpkg);
 use Audio::Nama::Effect  qw(remove_effect add_effect update_effect);

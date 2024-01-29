@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sr - Package for language Serbian
 
 package Locale::CLDR::Locales::Sr;
 # This file auto generated from Data\common\main\sr.xml
-#	on Tue  5 Dec  1:32:00 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -25,19 +25,19 @@ use Moo;
 
 extends('Locale::CLDR::Locales::Root');
 has 'valid_algorithmic_formats' => (
-	is => 'ro',
-	isa => ArrayRef,
-	init_arg => undef,
-	default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal-masculine','spellout-cardinal-neuter','spellout-cardinal-feminine','spellout-ordinal' ]},
+    is => 'ro',
+    isa => ArrayRef,
+    init_arg => undef,
+    default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal-masculine','spellout-cardinal-neuter','spellout-cardinal-feminine','spellout-ordinal' ]},
 );
 
 has 'algorithmic_number_format_data' => (
-	is => 'ro',
-	isa => HashRef,
-	init_arg => undef,
-	default => sub { 
-		use bigfloat;
-		return {
+    is => 'ro',
+    isa => HashRef,
+    init_arg => undef,
+    default => sub {
+        use bigfloat;
+        return {
 		'ordi' => {
 			'private' => {
 				'0' => {
@@ -760,7 +760,7 @@ has 'algorithmic_number_format_data' => (
 				},
 			},
 		},
-	} },
+    } },
 );
 
 # Need to add code for Key type pattern
@@ -783,7 +783,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'aa' => 'афарски',
@@ -848,6 +848,7 @@ has 'display_name_language' => (
  				'cad' => 'кадо',
  				'car' => 'карипски',
  				'cch' => 'атсам',
+ 				'ccp' => 'чакма',
  				'ce' => 'чеченски',
  				'ceb' => 'себуански',
  				'cgg' => 'чига',
@@ -877,6 +878,7 @@ has 'display_name_language' => (
  				'dar' => 'даргински',
  				'dav' => 'таита',
  				'de' => 'немачки',
+ 				'de_AT' => 'аустријски немачки',
  				'de_CH' => 'швајцарски високи немачки',
  				'del' => 'делаверски',
  				'den' => 'слејви',
@@ -884,7 +886,7 @@ has 'display_name_language' => (
  				'din' => 'динка',
  				'dje' => 'зарма',
  				'doi' => 'догри',
- 				'dsb' => 'доњи лужичкосрпски',
+ 				'dsb' => 'доњолужичкосрпски',
  				'dua' => 'дуала',
  				'dum' => 'средњехоландски',
  				'dv' => 'малдивски',
@@ -901,9 +903,7 @@ has 'display_name_language' => (
  				'elx' => 'еламитски',
  				'en' => 'енглески',
  				'en_GB' => 'енглески (Велика Британија)',
- 				'en_GB@alt=short' => 'енглески (УК)',
  				'en_US' => 'енглески (Сједињене Америчке Државе)',
- 				'en_US@alt=short' => 'енглески (САД)',
  				'enm' => 'средњеенглески',
  				'eo' => 'есперанто',
  				'es' => 'шпански',
@@ -912,6 +912,7 @@ has 'display_name_language' => (
  				'eu' => 'баскијски',
  				'ewo' => 'евондо',
  				'fa' => 'персијски',
+ 				'fa_AF' => 'дари',
  				'fan' => 'фанг',
  				'fat' => 'фанти',
  				'ff' => 'фула',
@@ -960,7 +961,7 @@ has 'display_name_language' => (
  				'hmn' => 'хмоншки',
  				'ho' => 'хири моту',
  				'hr' => 'хрватски',
- 				'hsb' => 'горњи лужичкосрпски',
+ 				'hsb' => 'горњолужичкосрпски',
  				'ht' => 'хаићански',
  				'hu' => 'мађарски',
  				'hup' => 'хупа',
@@ -1155,13 +1156,13 @@ has 'display_name_language' => (
  				'raj' => 'раџастански',
  				'rap' => 'рапануи',
  				'rar' => 'раротонгански',
+ 				'rhg' => 'рохингја',
  				'rm' => 'романш',
  				'rn' => 'кирунди',
  				'ro' => 'румунски',
  				'ro_MD' => 'молдавски',
  				'rof' => 'ромбо',
  				'rom' => 'ромски',
- 				'root' => 'рут',
  				'ru' => 'руски',
  				'rup' => 'цинцарски',
  				'rw' => 'кињаруанда',
@@ -1283,14 +1284,18 @@ has 'display_name_language' => (
  				'yi' => 'јидиш',
  				'yo' => 'јоруба',
  				'yue' => 'кантонски',
+ 				'yue@alt=menu' => 'кантонски кинески',
  				'za' => 'џуаншки',
  				'zap' => 'запотечки',
  				'zbl' => 'блисимболи',
  				'zen' => 'зенага',
  				'zgh' => 'стандардни марокански тамазигт',
  				'zh' => 'кинески',
+ 				'zh@alt=menu' => 'мандарински кинески',
  				'zh_Hans' => 'поједностављени кинески',
+ 				'zh_Hans@alt=long' => 'поједностављени мандарински кинески',
  				'zh_Hant' => 'традиционални кинески',
+ 				'zh_Hant@alt=long' => 'традиционални мандарински кинески',
  				'zu' => 'зулу',
  				'zun' => 'зуни',
  				'zxx' => 'без лингвистичког садржаја',
@@ -1462,7 +1467,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'свет',
  			'002' => 'Африка',
@@ -1493,7 +1498,7 @@ has 'display_name_region' => (
  			'151' => 'Источна Европа',
  			'154' => 'Северна Европа',
  			'155' => 'Западна Европа',
- 			'202' => 'Африка јужно од Сахаре',
+ 			'202' => 'Подсахарска Африка',
  			'419' => 'Латинска Америка',
  			'AC' => 'Острво Асенсион',
  			'AD' => 'Андора',
@@ -1572,7 +1577,7 @@ has 'display_name_region' => (
  			'ER' => 'Еритреја',
  			'ES' => 'Шпанија',
  			'ET' => 'Етиопија',
- 			'EU' => 'Европска Унија',
+ 			'EU' => 'Европска унија',
  			'EZ' => 'Еврозона',
  			'FI' => 'Финска',
  			'FJ' => 'Фиџи',
@@ -1652,8 +1657,7 @@ has 'display_name_region' => (
  			'MF' => 'Свети Мартин (Француска)',
  			'MG' => 'Мадагаскар',
  			'MH' => 'Маршалска Острва',
- 			'MK' => 'Македонија',
- 			'MK@alt=variant' => 'Македонија (БЈРМ)',
+ 			'MK' => 'Северна Македонија',
  			'ML' => 'Мали',
  			'MM' => 'Мијанмар (Бурма)',
  			'MN' => 'Монголија',
@@ -1762,6 +1766,8 @@ has 'display_name_region' => (
  			'VU' => 'Вануату',
  			'WF' => 'Валис и Футуна',
  			'WS' => 'Самоа',
+ 			'XA' => 'Псеудоакценти',
+ 			'XB' => 'Псеудобиди',
  			'XK' => 'Косово',
  			'YE' => 'Јемен',
  			'YT' => 'Мајот',
@@ -1778,7 +1784,7 @@ has 'display_name_variant' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'1901' => 'Традиционална немачка ортографија',
  			'1994' => 'Стандарднизована ресијанска ортографија',
@@ -1820,7 +1826,7 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'calendar' => 'календар',
  			'cf' => 'формат валуте',
@@ -1829,9 +1835,9 @@ has 'display_name_key' => (
  			'colcasefirst' => 'Ређање према малом/великом слову',
  			'colcaselevel' => 'Сортирање према малом/великом слову',
  			'collation' => 'редослед сортирања',
- 			'colnormalization' => 'Нормализовано сортирање',
- 			'colnumeric' => 'Нумеричко сортирање',
- 			'colstrength' => 'Сортирање према јачини',
+ 			'colnormalization' => 'нормализовано сортирање',
+ 			'colnumeric' => 'нумеричко сортирање',
+ 			'colstrength' => 'сортирање према јачини',
  			'currency' => 'валута',
  			'hc' => 'приказивање времена (12- или 24-часовно)',
  			'lb' => 'стил прелома реда',
@@ -1999,7 +2005,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{Метрички},
  			'UK' => q{УК},
@@ -2013,7 +2019,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'Језик: {0}',
  			'script' => 'Писмо: {0}',
@@ -2032,11 +2038,11 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{[ё й щ ъ ы ь э ю я]},
+			auxiliary => qr{[{а̂} {е̂} ё й {и̂} {о̂} {у̂} щ ъ ы ь э ю я]},
 			index => ['А', 'Б', 'В', 'Г', 'Д', 'Ђ', 'Е', 'Ж', 'З', 'И', 'Ј', 'К', 'Л', 'Љ', 'М', 'Н', 'Њ', 'О', 'П', 'Р', 'С', 'Т', 'Ћ', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Џ', 'Ш'],
 			main => qr{[а б в г д ђ е ж з и ј к л љ м н њ о п р с т ћ у ф х ц ч џ ш]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- ‐ – , ; \: ! ? . … ‘ ‚ “ „ ( ) \[ \] \{ \} * #]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ ‑ – , ; \: ! ? . … ‘ ‚ “ „ ( ) \[ \] \{ \} * #]},
 		};
 	},
 EOT
@@ -2102,9 +2108,9 @@ has 'duration_units' => (
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
 	default		=> sub { {
-				hm => 'h:mm',
-				hms => 'h:mm:ss',
-				ms => 'm:ss',
+				hm => 'h.mm',
+				hms => 'h.mm.ss',
+				ms => 'm.ss',
 			} }
 );
 
@@ -2114,745 +2120,401 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
 					'' => {
 						'name' => q(главни правац),
 					},
+					# Core Unit Identifier
+					'' => {
+						'name' => q(главни правац),
+					},
+					# Long Unit Identifier
+					'1024p1' => {
+						'1' => q(киби{0}),
+					},
+					# Core Unit Identifier
+					'1024p1' => {
+						'1' => q(киби{0}),
+					},
+					# Long Unit Identifier
+					'1024p2' => {
+						'1' => q(меби{0}),
+					},
+					# Core Unit Identifier
+					'1024p2' => {
+						'1' => q(меби{0}),
+					},
+					# Long Unit Identifier
+					'1024p3' => {
+						'1' => q(гиби{0}),
+					},
+					# Core Unit Identifier
+					'1024p3' => {
+						'1' => q(гиби{0}),
+					},
+					# Long Unit Identifier
+					'1024p4' => {
+						'1' => q(теби{0}),
+					},
+					# Core Unit Identifier
+					'1024p4' => {
+						'1' => q(теби{0}),
+					},
+					# Long Unit Identifier
+					'1024p5' => {
+						'1' => q(пеби{0}),
+					},
+					# Core Unit Identifier
+					'1024p5' => {
+						'1' => q(пеби{0}),
+					},
+					# Long Unit Identifier
+					'1024p6' => {
+						'1' => q(ексби{0}),
+					},
+					# Core Unit Identifier
+					'1024p6' => {
+						'1' => q(ексби{0}),
+					},
+					# Long Unit Identifier
+					'1024p7' => {
+						'1' => q(зеби{0}),
+					},
+					# Core Unit Identifier
+					'1024p7' => {
+						'1' => q(зеби{0}),
+					},
+					# Long Unit Identifier
+					'1024p8' => {
+						'1' => q(јобе{0}),
+					},
+					# Core Unit Identifier
+					'1024p8' => {
+						'1' => q(јобе{0}),
+					},
+					# Long Unit Identifier
+					'10p-1' => {
+						'1' => q(деци{0}),
+					},
+					# Core Unit Identifier
+					'1' => {
+						'1' => q(деци{0}),
+					},
+					# Long Unit Identifier
+					'10p-12' => {
+						'1' => q(пико{0}),
+					},
+					# Core Unit Identifier
+					'12' => {
+						'1' => q(пико{0}),
+					},
+					# Long Unit Identifier
+					'10p-15' => {
+						'1' => q(фемто{0}),
+					},
+					# Core Unit Identifier
+					'15' => {
+						'1' => q(фемто{0}),
+					},
+					# Long Unit Identifier
+					'10p-18' => {
+						'1' => q(ато{0}),
+					},
+					# Core Unit Identifier
+					'18' => {
+						'1' => q(ато{0}),
+					},
+					# Long Unit Identifier
+					'10p-2' => {
+						'1' => q(центи{0}),
+					},
+					# Core Unit Identifier
+					'2' => {
+						'1' => q(центи{0}),
+					},
+					# Long Unit Identifier
+					'10p-21' => {
+						'1' => q(зепто{0}),
+					},
+					# Core Unit Identifier
+					'21' => {
+						'1' => q(зепто{0}),
+					},
+					# Long Unit Identifier
+					'10p-24' => {
+						'1' => q(јокто{0}),
+					},
+					# Core Unit Identifier
+					'24' => {
+						'1' => q(јокто{0}),
+					},
+					# Long Unit Identifier
+					'10p-3' => {
+						'1' => q(мили{0}),
+					},
+					# Core Unit Identifier
+					'3' => {
+						'1' => q(мили{0}),
+					},
+					# Long Unit Identifier
+					'10p-6' => {
+						'1' => q(микро{0}),
+					},
+					# Core Unit Identifier
+					'6' => {
+						'1' => q(микро{0}),
+					},
+					# Long Unit Identifier
+					'10p-9' => {
+						'1' => q(нано{0}),
+					},
+					# Core Unit Identifier
+					'9' => {
+						'1' => q(нано{0}),
+					},
+					# Long Unit Identifier
+					'10p1' => {
+						'1' => q(дека{0}),
+					},
+					# Core Unit Identifier
+					'10p1' => {
+						'1' => q(дека{0}),
+					},
+					# Long Unit Identifier
+					'10p12' => {
+						'1' => q(тера{0}),
+					},
+					# Core Unit Identifier
+					'10p12' => {
+						'1' => q(тера{0}),
+					},
+					# Long Unit Identifier
+					'10p15' => {
+						'1' => q(пета{0}),
+					},
+					# Core Unit Identifier
+					'10p15' => {
+						'1' => q(пета{0}),
+					},
+					# Long Unit Identifier
+					'10p18' => {
+						'1' => q(екса{0}),
+					},
+					# Core Unit Identifier
+					'10p18' => {
+						'1' => q(екса{0}),
+					},
+					# Long Unit Identifier
+					'10p2' => {
+						'1' => q(хекто{0}),
+					},
+					# Core Unit Identifier
+					'10p2' => {
+						'1' => q(хекто{0}),
+					},
+					# Long Unit Identifier
+					'10p21' => {
+						'1' => q(зета{0}),
+					},
+					# Core Unit Identifier
+					'10p21' => {
+						'1' => q(зета{0}),
+					},
+					# Long Unit Identifier
+					'10p24' => {
+						'1' => q(јота{0}),
+					},
+					# Core Unit Identifier
+					'10p24' => {
+						'1' => q(јота{0}),
+					},
+					# Long Unit Identifier
+					'10p3' => {
+						'1' => q(кило{0}),
+					},
+					# Core Unit Identifier
+					'10p3' => {
+						'1' => q(кило{0}),
+					},
+					# Long Unit Identifier
+					'10p6' => {
+						'1' => q(мега{0}),
+					},
+					# Core Unit Identifier
+					'10p6' => {
+						'1' => q(мега{0}),
+					},
+					# Long Unit Identifier
+					'10p9' => {
+						'1' => q(гига{0}),
+					},
+					# Core Unit Identifier
+					'10p9' => {
+						'1' => q(гига{0}),
+					},
+					# Long Unit Identifier
+					'acceleration-g-force' => {
+						'1' => q(feminine),
+						'few' => q({0} ге сила),
+						'name' => q(ге сила),
+						'one' => q({0} ге сила),
+						'other' => q({0} ге сила),
+					},
+					# Core Unit Identifier
+					'g-force' => {
+						'1' => q(feminine),
+						'few' => q({0} ге сила),
+						'name' => q(ге сила),
+						'one' => q({0} ге сила),
+						'other' => q({0} ге сила),
+					},
+					# Long Unit Identifier
+					'acceleration-meter-per-square-second' => {
+						'few' => q({0} метра у секунди на квадрат),
+						'name' => q(метри у секунди на квадрат),
+						'one' => q({0} метар у секунди на квадрат),
+						'other' => q({0} метара у секунди на квадрат),
+					},
+					# Core Unit Identifier
+					'meter-per-square-second' => {
+						'few' => q({0} метра у секунди на квадрат),
+						'name' => q(метри у секунди на квадрат),
+						'one' => q({0} метар у секунди на квадрат),
+						'other' => q({0} метара у секунди на квадрат),
+					},
+					# Long Unit Identifier
+					'angle-arc-minute' => {
+						'1' => q(inanimate),
+						'few' => q({0} лучна минута),
+						'name' => q(лучни минути),
+						'one' => q({0} лучни минут),
+						'other' => q({0} лучних минута),
+					},
+					# Core Unit Identifier
+					'arc-minute' => {
+						'1' => q(inanimate),
+						'few' => q({0} лучна минута),
+						'name' => q(лучни минути),
+						'one' => q({0} лучни минут),
+						'other' => q({0} лучних минута),
+					},
+					# Long Unit Identifier
+					'angle-arc-second' => {
+						'1' => q(feminine),
+						'few' => q({0} лучне секунде),
+						'name' => q(лучне секунде),
+						'one' => q({0} лучна секунда),
+						'other' => q({0} лучних секунди),
+					},
+					# Core Unit Identifier
+					'arc-second' => {
+						'1' => q(feminine),
+						'few' => q({0} лучне секунде),
+						'name' => q(лучне секунде),
+						'one' => q({0} лучна секунда),
+						'other' => q({0} лучних секунди),
+					},
+					# Long Unit Identifier
+					'angle-degree' => {
+						'1' => q(inanimate),
+						'few' => q({0} степена),
+						'name' => q(степени),
+						'one' => q({0} степен),
+						'other' => q({0} степени),
+					},
+					# Core Unit Identifier
+					'degree' => {
+						'1' => q(inanimate),
+						'few' => q({0} степена),
+						'name' => q(степени),
+						'one' => q({0} степен),
+						'other' => q({0} степени),
+					},
+					# Long Unit Identifier
+					'angle-radian' => {
+						'1' => q(inanimate),
+						'few' => q({0} радијана),
+						'name' => q(радијани),
+						'one' => q({0} радијан),
+						'other' => q({0} радијана),
+					},
+					# Core Unit Identifier
+					'radian' => {
+						'1' => q(inanimate),
+						'few' => q({0} радијана),
+						'name' => q(радијани),
+						'one' => q({0} радијан),
+						'other' => q({0} радијана),
+					},
+					# Long Unit Identifier
+					'angle-revolution' => {
+						'1' => q(inanimate),
+						'few' => q({0} обртаја),
+						'name' => q(обртај),
+						'one' => q({0} обртај),
+						'other' => q({0} обртаја),
+					},
+					# Core Unit Identifier
+					'revolution' => {
+						'1' => q(inanimate),
+						'few' => q({0} обртаја),
+						'name' => q(обртај),
+						'one' => q({0} обртај),
+						'other' => q({0} обртаја),
+					},
+					# Long Unit Identifier
+					'area-acre' => {
+						'few' => q({0} акера),
+						'name' => q(акери),
+						'one' => q({0} акер),
+						'other' => q({0} акера),
+					},
+					# Core Unit Identifier
 					'acre' => {
 						'few' => q({0} акера),
 						'name' => q(акери),
 						'one' => q({0} акер),
 						'other' => q({0} акера),
 					},
-					'acre-foot' => {
-						'few' => q({0} акер стопе),
-						'name' => q(акер стопе),
-						'one' => q({0} акер стопа),
-						'other' => q({0} акер стопа),
+					# Long Unit Identifier
+					'area-dunam' => {
+						'few' => q({0} дунама),
+						'name' => q(дунами),
+						'one' => q({0} дунам),
+						'other' => q({0} дунама),
 					},
-					'ampere' => {
-						'few' => q({0} ампера),
-						'name' => q(ампери),
-						'one' => q({0} ампер),
-						'other' => q({0} ампера),
+					# Core Unit Identifier
+					'dunam' => {
+						'few' => q({0} дунама),
+						'name' => q(дунами),
+						'one' => q({0} дунам),
+						'other' => q({0} дунама),
 					},
-					'arc-minute' => {
-						'few' => q({0} лучна минута),
-						'name' => q(лучни минути),
-						'one' => q({0} лучни минут),
-						'other' => q({0} лучних минута),
-					},
-					'arc-second' => {
-						'few' => q({0} лучне секунде),
-						'name' => q(лучне секунде),
-						'one' => q({0} лучна секунда),
-						'other' => q({0} лучних секунди),
-					},
-					'astronomical-unit' => {
-						'few' => q({0} астрономске јединице),
-						'name' => q(астрономске јединице),
-						'one' => q({0} астрономска јединица),
-						'other' => q({0} астрономских јединица),
-					},
-					'atmosphere' => {
-						'few' => q({0} атмосфере),
-						'name' => q(атмосфере),
-						'one' => q({0} атмосфера),
-						'other' => q({0} атмосфера),
-					},
-					'bit' => {
-						'few' => q({0} бита),
-						'name' => q(битови),
-						'one' => q({0} бит),
-						'other' => q({0} битова),
-					},
-					'byte' => {
-						'few' => q({0} бајта),
-						'name' => q(бајтови),
-						'one' => q({0} бајт),
-						'other' => q({0} бајтова),
-					},
-					'calorie' => {
-						'few' => q({0} калорије),
-						'name' => q(калорије),
-						'one' => q({0} калорија),
-						'other' => q({0} калорија),
-					},
-					'carat' => {
-						'few' => q({0} карата),
-						'name' => q(карати),
-						'one' => q({0} карат),
-						'other' => q({0} карата),
-					},
-					'celsius' => {
-						'few' => q({0} степена Целзијуса),
-						'name' => q(степени Целзијуса),
-						'one' => q({0} степен Целзијуса),
-						'other' => q({0} степени Целзијуса),
-					},
-					'centiliter' => {
-						'few' => q({0} центилитра),
-						'name' => q(центилитри),
-						'one' => q({0} центилитар),
-						'other' => q({0} центилитара),
-					},
-					'centimeter' => {
-						'few' => q({0} центиментра),
-						'name' => q(центиметри),
-						'one' => q({0} центиметар),
-						'other' => q({0} центиметара),
-						'per' => q({0}/cm),
-					},
-					'century' => {
-						'few' => q({0} века),
-						'name' => q(векови),
-						'one' => q({0} век),
-						'other' => q({0} векова),
-					},
-					'coordinate' => {
-						'east' => q({0}И),
-						'north' => q({0}С),
-						'south' => q({0}Ј),
-						'west' => q({0}З),
-					},
-					'cubic-centimeter' => {
-						'few' => q({0} кубна центиметра),
-						'name' => q(кубни центиметри),
-						'one' => q({0} кубни центиметар),
-						'other' => q({0} кубних центиметара),
-						'per' => q({0}/cm³),
-					},
-					'cubic-foot' => {
-						'few' => q({0} кубне стопе),
-						'name' => q(кубне стопе),
-						'one' => q({0} кубна стопа),
-						'other' => q({0} кубних стопа),
-					},
-					'cubic-inch' => {
-						'few' => q({0} кубна инча),
-						'name' => q(кубни инчи),
-						'one' => q({0} кубни инч),
-						'other' => q({0} кубних инча),
-					},
-					'cubic-kilometer' => {
-						'few' => q({0} кубна километра),
-						'name' => q(кубни километри),
-						'one' => q({0} кубни километар),
-						'other' => q({0} кубних километара),
-					},
-					'cubic-meter' => {
-						'few' => q({0} кубна метра),
-						'name' => q(кубни метри),
-						'one' => q({0} кубни метар),
-						'other' => q({0} кубних метара),
-						'per' => q({0}/m³),
-					},
-					'cubic-mile' => {
-						'few' => q({0} кубне миље),
-						'name' => q(кубне миље),
-						'one' => q({0} кубна миља),
-						'other' => q({0} кубних миља),
-					},
-					'cubic-yard' => {
-						'few' => q({0} кубна јарда),
-						'name' => q(кубни јарди),
-						'one' => q({0} кубни јард),
-						'other' => q({0} кубних јарди),
-					},
-					'cup' => {
-						'few' => q({0} шоље),
-						'name' => q(шоље),
-						'one' => q({0} шоља),
-						'other' => q({0} шоља),
-					},
-					'cup-metric' => {
-						'few' => q({0} метричке шоље),
-						'name' => q(метричка шоља),
-						'one' => q({0} метричка шоља),
-						'other' => q({0} метричких шоља),
-					},
-					'day' => {
-						'few' => q({0} дана),
-						'name' => q(дани),
-						'one' => q({0} дан),
-						'other' => q({0} дана),
-						'per' => q({0}/дневно),
-					},
-					'deciliter' => {
-						'few' => q({0} децилитра),
-						'name' => q(децилитри),
-						'one' => q({0} децилитар),
-						'other' => q({0} децилитара),
-					},
-					'decimeter' => {
-						'few' => q({0} дециметра),
-						'name' => q(дециметри),
-						'one' => q({0} дециметар),
-						'other' => q({0} дециметара),
-					},
-					'degree' => {
-						'few' => q({0} степена),
-						'name' => q(степени),
-						'one' => q({0} степен),
-						'other' => q({0} степени),
-					},
-					'fahrenheit' => {
-						'few' => q({0} степена Фаренхајта),
-						'name' => q(степени Фаренхајта),
-						'one' => q({0} степен Фаренхајта),
-						'other' => q({0} степени Фаренхајта),
-					},
-					'fluid-ounce' => {
-						'few' => q({0} унце течности),
-						'name' => q(унце течности),
-						'one' => q({0} унца течности),
-						'other' => q({0} унци течности),
-					},
-					'foodcalorie' => {
-						'few' => q({0} калорије),
-						'name' => q(Калорије),
-						'one' => q({0} калорија),
-						'other' => q({0} калорија),
-					},
-					'foot' => {
-						'few' => q({0} стопе),
-						'name' => q(стопе),
-						'one' => q({0} стопа),
-						'other' => q({0} стопа),
-						'per' => q({0}/ft),
-					},
-					'g-force' => {
-						'few' => q({0} ге сила),
-						'name' => q(ге сила),
-						'one' => q({0} ге сила),
-						'other' => q({0} ге сила),
-					},
-					'gallon' => {
-						'few' => q({0} галона),
-						'name' => q(галони),
-						'one' => q({0} галон),
-						'other' => q({0} галона),
-						'per' => q({0} по галону),
-					},
-					'gallon-imperial' => {
-						'few' => q({0} имп. галона),
-						'name' => q(империјални галон),
-						'one' => q({0} имп. галон),
-						'other' => q({0} имп. галона),
-						'per' => q({0} по имп. галону),
-					},
-					'generic' => {
-						'few' => q({0}°),
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					'gigabit' => {
-						'few' => q({0} гигабита),
-						'name' => q(гигабитови),
-						'one' => q({0} гигабит),
-						'other' => q({0} гигабита),
-					},
-					'gigabyte' => {
-						'few' => q({0} гигабајта),
-						'name' => q(гигабајти),
-						'one' => q({0} гигабајт),
-						'other' => q({0} гигабајта),
-					},
-					'gigahertz' => {
-						'few' => q({0} гигахерца),
-						'name' => q(гигахерци),
-						'one' => q({0} гигахерц),
-						'other' => q({0} гигахерца),
-					},
-					'gigawatt' => {
-						'few' => q({0} гигавата),
-						'name' => q(гигавати),
-						'one' => q({0} гигават),
-						'other' => q({0} гигавати),
-					},
-					'gram' => {
-						'few' => q({0} грама),
-						'name' => q(грами),
-						'one' => q({0} грам),
-						'other' => q({0} грама),
-						'per' => q({0} по граму),
-					},
-					'hectare' => {
+					# Long Unit Identifier
+					'area-hectare' => {
+						'1' => q(inanimate),
 						'few' => q({0} хектара),
 						'name' => q(хектари),
 						'one' => q({0} хектар),
 						'other' => q({0} хектара),
 					},
-					'hectoliter' => {
-						'few' => q({0} хектолитра),
-						'name' => q(хектолитри),
-						'one' => q({0} хектолитар),
-						'other' => q({0} хектолитара),
-					},
-					'hectopascal' => {
-						'few' => q({0} хектопаскала),
-						'name' => q(хектопаскали),
-						'one' => q({0} хектопаскал),
-						'other' => q({0} хектопаскала),
-					},
-					'hertz' => {
-						'few' => q({0} херца),
-						'name' => q(херци),
-						'one' => q({0} херц),
-						'other' => q({0} херца),
-					},
-					'horsepower' => {
-						'few' => q({0} коњске снаге),
-						'name' => q(коњске снаге),
-						'one' => q({0} коњска снага),
-						'other' => q({0} коњских снага),
-					},
-					'hour' => {
-						'few' => q({0} сата),
-						'name' => q(сати),
-						'one' => q({0} сат),
-						'other' => q({0} сати),
-						'per' => q({0}/сат),
-					},
-					'inch' => {
-						'few' => q({0} инча),
-						'name' => q(инчи),
-						'one' => q({0} инч),
-						'other' => q({0} инча),
-						'per' => q({0}/in),
-					},
-					'inch-hg' => {
-						'few' => q({0} инча живиног стуба),
-						'name' => q(инчи живиног стуба),
-						'one' => q({0} инч живиног стуба),
-						'other' => q({0} инча живиног стуба),
-					},
-					'joule' => {
-						'few' => q({0} џула),
-						'name' => q(џули),
-						'one' => q({0} џул),
-						'other' => q({0} џула),
-					},
-					'karat' => {
-						'few' => q({0} карата),
-						'name' => q(карати),
-						'one' => q({0} карат),
-						'other' => q({0} карата),
-					},
-					'kelvin' => {
-						'few' => q({0} келвина),
-						'name' => q(келвин),
-						'one' => q({0} келвин),
-						'other' => q({0} келвина),
-					},
-					'kilobit' => {
-						'few' => q({0} килобита),
-						'name' => q(килобитови),
-						'one' => q({0} килобит),
-						'other' => q({0} килобита),
-					},
-					'kilobyte' => {
-						'few' => q({0} килобајта),
-						'name' => q(килобајти),
-						'one' => q({0} килобајт),
-						'other' => q({0} килобајта),
-					},
-					'kilocalorie' => {
-						'few' => q({0} килокалорије),
-						'name' => q(килокалорије),
-						'one' => q({0} килокалорија),
-						'other' => q({0} килокалорија),
-					},
-					'kilogram' => {
-						'few' => q({0} килограма),
-						'name' => q(килограми),
-						'one' => q({0} килограм),
-						'other' => q({0} килограма),
-						'per' => q({0} по килограму),
-					},
-					'kilohertz' => {
-						'few' => q({0} килохерца),
-						'name' => q(килохерци),
-						'one' => q({0} килохерц),
-						'other' => q({0} килохерца),
-					},
-					'kilojoule' => {
-						'few' => q({0} килоџула),
-						'name' => q(килоџули),
-						'one' => q({0} килоџул),
-						'other' => q({0} килоџула),
-					},
-					'kilometer' => {
-						'few' => q({0} километра),
-						'name' => q(километри),
-						'one' => q({0} километар),
-						'other' => q({0} километара),
-						'per' => q({0}/km),
-					},
-					'kilometer-per-hour' => {
-						'few' => q({0} километра на сат),
-						'name' => q(километри на сат),
-						'one' => q({0} километар на сат),
-						'other' => q({0} километара на сат),
-					},
-					'kilowatt' => {
-						'few' => q({0} киловата),
-						'name' => q(киловати),
-						'one' => q({0} киловат),
-						'other' => q({0} киловати),
-					},
-					'kilowatt-hour' => {
-						'few' => q({0} киловат-сата),
-						'name' => q(киловат-сати),
-						'one' => q({0} киловат-сат),
-						'other' => q({0} киловат-сати),
-					},
-					'knot' => {
-						'few' => q({0} чвора),
-						'name' => q(чвор),
-						'one' => q({0} чвор),
-						'other' => q({0} чворова),
-					},
-					'light-year' => {
-						'few' => q({0} светлосне године),
-						'name' => q(светлосне године),
-						'one' => q({0} светлосна година),
-						'other' => q({0} светлосних година),
-					},
-					'liter' => {
-						'few' => q({0} литра),
-						'name' => q(литри),
-						'one' => q({0} литар),
-						'other' => q({0} литара),
-						'per' => q({0} по литри),
-					},
-					'liter-per-100kilometers' => {
-						'few' => q({0} литра на 100 километара),
-						'name' => q(L/100km),
-						'one' => q({0} литар на 100 километара),
-						'other' => q({0} литара на 100 километара),
-					},
-					'liter-per-kilometer' => {
-						'few' => q({0} литра по километру),
-						'name' => q(литри по километру),
-						'one' => q({0} литар по километру),
-						'other' => q({0} литара по километру),
-					},
-					'lux' => {
-						'few' => q({0} лукса),
-						'name' => q(лукс),
-						'one' => q({0} лукс),
-						'other' => q({0} лукса),
-					},
-					'megabit' => {
-						'few' => q({0} мегабита),
-						'name' => q(мегабитови),
-						'one' => q({0} мегабит),
-						'other' => q({0} мегабита),
-					},
-					'megabyte' => {
-						'few' => q({0} мегабајта),
-						'name' => q(мегабајти),
-						'one' => q({0} мегабајт),
-						'other' => q({0} мегабајта),
-					},
-					'megahertz' => {
-						'few' => q({0} мегахерца),
-						'name' => q(мегахерци),
-						'one' => q({0} мегахерц),
-						'other' => q({0} мегахерца),
-					},
-					'megaliter' => {
-						'few' => q({0} мегалитра),
-						'name' => q(мегалитри),
-						'one' => q({0} мегалитар),
-						'other' => q({0} мегалитара),
-					},
-					'megawatt' => {
-						'few' => q({0} мегавата),
-						'name' => q(мегавати),
-						'one' => q({0} мегават),
-						'other' => q({0} мегавати),
-					},
-					'meter' => {
-						'few' => q({0} метра),
-						'name' => q(метри),
-						'one' => q({0} метар),
-						'other' => q({0} метара),
-						'per' => q({0}/m),
-					},
-					'meter-per-second' => {
-						'few' => q({0} метра у секунди),
-						'name' => q(метри у секунди),
-						'one' => q({0} метар у секунди),
-						'other' => q({0} метара у секунди),
-					},
-					'meter-per-second-squared' => {
-						'few' => q({0} метра у секунди на квадрат),
-						'name' => q(метри у секунди на квадрат),
-						'one' => q({0} метар у секунди на квадрат),
-						'other' => q({0} метара у секунди на квадрат),
-					},
-					'metric-ton' => {
-						'few' => q({0} метричке тоне),
-						'name' => q(метричке тоне),
-						'one' => q({0} метричка тона),
-						'other' => q({0} метричких тона),
-					},
-					'microgram' => {
-						'few' => q({0} микрограма),
-						'name' => q(микрограми),
-						'one' => q({0} микрограм),
-						'other' => q({0} микрограма),
-					},
-					'micrometer' => {
-						'few' => q({0} микрометра),
-						'name' => q(микрометри),
-						'one' => q({0} микрометар),
-						'other' => q({0} микрометара),
-					},
-					'microsecond' => {
-						'few' => q({0} микросекунде),
-						'name' => q(микросекунде),
-						'one' => q({0} микросекунда),
-						'other' => q({0} микросекунди),
-					},
-					'mile' => {
-						'few' => q({0} миље),
-						'name' => q(миље),
-						'one' => q({0} миља),
-						'other' => q({0} миља),
-					},
-					'mile-per-gallon' => {
-						'few' => q({0} миље по галону),
-						'name' => q(миља по галону),
-						'one' => q({0} миља по галону),
-						'other' => q({0} миља по галону),
-					},
-					'mile-per-gallon-imperial' => {
-						'few' => q({0} миље по империјалном галону),
-						'name' => q(миља по империјалном галону),
-						'one' => q({0} миља по империјалном галону),
-						'other' => q({0} миља по империјалном галону),
-					},
-					'mile-per-hour' => {
-						'few' => q({0} миље на сат),
-						'name' => q(миље на сат),
-						'one' => q({0} миља на сат),
-						'other' => q({0} миља на сат),
-					},
-					'mile-scandinavian' => {
-						'few' => q({0} скандинавске миље),
-						'name' => q(скандинавска миља),
-						'one' => q({0} скандинавска миља),
-						'other' => q({0} скандинавских миља),
-					},
-					'milliampere' => {
-						'few' => q({0} милиампера),
-						'name' => q(милиампери),
-						'one' => q({0} милиампер),
-						'other' => q({0} милиампера),
-					},
-					'millibar' => {
-						'few' => q({0} милибара),
-						'name' => q(милибари),
-						'one' => q({0} милибар),
-						'other' => q({0} милибара),
-					},
-					'milligram' => {
-						'few' => q({0} милиграма),
-						'name' => q(милиграми),
-						'one' => q({0} милиграм),
-						'other' => q({0} милиграма),
-					},
-					'milligram-per-deciliter' => {
-						'few' => q({0} милиграма по децилитру),
-						'name' => q(милиграми по децилитру),
-						'one' => q({0} милиграм по децилитру),
-						'other' => q({0} милиграма по децилитру),
-					},
-					'milliliter' => {
-						'few' => q({0} милилитра),
-						'name' => q(милилитри),
-						'one' => q({0} милилитар),
-						'other' => q({0} милилитара),
-					},
-					'millimeter' => {
-						'few' => q({0} милиметра),
-						'name' => q(милиметри),
-						'one' => q({0} милиметар),
-						'other' => q({0} милиметара),
-					},
-					'millimeter-of-mercury' => {
-						'few' => q({0} милиметра живиног стуба),
-						'name' => q(милиметри живиног стуба),
-						'one' => q({0} милиметар живиног стуба),
-						'other' => q({0} милиметара живиног стуба),
-					},
-					'millimole-per-liter' => {
-						'few' => q({0} милимола по литри),
-						'name' => q(милимол по литри),
-						'one' => q({0} милимол по литри),
-						'other' => q({0} милимола по литри),
-					},
-					'millisecond' => {
-						'few' => q({0} милисекунде),
-						'name' => q(милисекунде),
-						'one' => q({0} милисекунда),
-						'other' => q({0} милисекунди),
-					},
-					'milliwatt' => {
-						'few' => q({0} миливата),
-						'name' => q(миливати),
-						'one' => q({0} миливат),
-						'other' => q({0} миливати),
-					},
-					'minute' => {
-						'few' => q({0} минута),
-						'name' => q(минути),
-						'one' => q({0} минут),
-						'other' => q({0} минута),
-						'per' => q({0} у минуту),
-					},
-					'month' => {
-						'few' => q({0} месеца),
-						'name' => q(месеци),
-						'one' => q({0} месец),
-						'other' => q({0} месеци),
-						'per' => q({0} месечно),
-					},
-					'nanometer' => {
-						'few' => q({0} нанометра),
-						'name' => q(нанометри),
-						'one' => q({0} нанометар),
-						'other' => q({0} нанометара),
-					},
-					'nanosecond' => {
-						'few' => q({0} наносекунде),
-						'name' => q(наносекунде),
-						'one' => q({0} наносекунда),
-						'other' => q({0} наносекунди),
-					},
-					'nautical-mile' => {
-						'few' => q({0} наутичке миље),
-						'name' => q(наутичке миље),
-						'one' => q({0} наутичка миља),
-						'other' => q({0} наутичких миља),
-					},
-					'ohm' => {
-						'few' => q({0} ома),
-						'name' => q(оми),
-						'one' => q({0} ом),
-						'other' => q({0} ома),
-					},
-					'ounce' => {
-						'few' => q({0} унце),
-						'name' => q(унце),
-						'one' => q({0} унца),
-						'other' => q({0} унци),
-						'per' => q({0} по унци),
-					},
-					'ounce-troy' => {
-						'few' => q({0} фине унце),
-						'name' => q(фине унце),
-						'one' => q({0} фина унца),
-						'other' => q({0} финих унци),
-					},
-					'parsec' => {
-						'few' => q({0} парсека),
-						'name' => q(парсеци),
-						'one' => q({0} парсек),
-						'other' => q({0} парсека),
-					},
-					'part-per-million' => {
-						'few' => q({0} честице на милион),
-						'name' => q(честица на милион),
-						'one' => q({0} честица на милион),
-						'other' => q({0} честица на милион),
-					},
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					'percent' => {
-						'few' => q({0} процената),
-						'name' => q(проценат),
-						'one' => q({0} проценат),
-						'other' => q({0} процената),
-					},
-					'permille' => {
-						'few' => q({0} промила),
-						'name' => q(промил),
-						'one' => q({0} промил),
-						'other' => q({0} промила),
-					},
-					'petabyte' => {
-						'few' => q({0} петабајта),
-						'name' => q(петабајти),
-						'one' => q({0} петабајт),
-						'other' => q({0} петабајта),
-					},
-					'picometer' => {
-						'few' => q({0} пикометра),
-						'name' => q(пикометри),
-						'one' => q({0} пикометар),
-						'other' => q({0} пикометара),
-					},
-					'pint' => {
-						'few' => q({0} пинте),
-						'name' => q(пинте),
-						'one' => q({0} пинта),
-						'other' => q({0} пинти),
-					},
-					'pint-metric' => {
-						'few' => q({0} метричке пинте),
-						'name' => q(метричке пинте),
-						'one' => q({0} метричка пинта),
-						'other' => q({0} метричких пинти),
-					},
-					'point' => {
-						'few' => q({0} pt),
-						'name' => q(pt),
-						'one' => q({0} pt),
-						'other' => q({0} pt),
-					},
-					'pound' => {
-						'few' => q({0} фунте),
-						'name' => q(фунте),
-						'one' => q({0} фунта),
-						'other' => q({0} фунти),
-						'per' => q({0} по фунти),
-					},
-					'pound-per-square-inch' => {
-						'few' => q({0} фунте по квадратном инчу),
-						'name' => q(фунте по квадратном инчу),
-						'one' => q({0} фунта по квадратном инчу),
-						'other' => q({0} фунти по квадратном инчу),
-					},
-					'quart' => {
-						'few' => q({0} кварта),
-						'name' => q(кварти),
-						'one' => q({0} кварат),
-						'other' => q({0} кварата),
-					},
-					'radian' => {
-						'few' => q({0} радијана),
-						'name' => q(радијани),
-						'one' => q({0} радијан),
-						'other' => q({0} радијана),
-					},
-					'revolution' => {
-						'few' => q({0} обртаја),
-						'name' => q(обртај),
-						'one' => q({0} обртај),
-						'other' => q({0} обртаја),
-					},
-					'second' => {
-						'few' => q({0} секунде),
-						'name' => q(секунде),
-						'one' => q({0} секунда),
-						'other' => q({0} секунди),
-						'per' => q({0}/у секунди),
-					},
+					# Core Unit Identifier
+					'hectare' => {
+						'1' => q(inanimate),
+						'few' => q({0} хектара),
+						'name' => q(хектари),
+						'one' => q({0} хектар),
+						'other' => q({0} хектара),
+					},
+					# Long Unit Identifier
+					'area-square-centimeter' => {
+						'few' => q({0} квадратна центиметра),
+						'name' => q(квадратни центиметри),
+						'one' => q({0} квадратни центиметар),
+						'other' => q({0} квадратних центиметара),
+						'per' => q({0}/cm²),
+					},
+					# Core Unit Identifier
 					'square-centimeter' => {
 						'few' => q({0} квадратна центиметра),
 						'name' => q(квадратни центиметри),
@@ -2860,12 +2522,29 @@ has 'units' => (
 						'other' => q({0} квадратних центиметара),
 						'per' => q({0}/cm²),
 					},
+					# Long Unit Identifier
+					'area-square-foot' => {
+						'few' => q({0} квадратне стопе),
+						'name' => q(квадратне стопе),
+						'one' => q({0} квадратна стопа),
+						'other' => q({0} квадратних стопа),
+					},
+					# Core Unit Identifier
 					'square-foot' => {
 						'few' => q({0} квадратне стопе),
 						'name' => q(квадратне стопе),
 						'one' => q({0} квадратна стопа),
 						'other' => q({0} квадратних стопа),
 					},
+					# Long Unit Identifier
+					'area-square-inch' => {
+						'few' => q({0} квадратна инча),
+						'name' => q(квадратни инчи),
+						'one' => q({0} квадратни инч),
+						'other' => q({0} квадратних инча),
+						'per' => q({0}/in²),
+					},
+					# Core Unit Identifier
 					'square-inch' => {
 						'few' => q({0} квадратна инча),
 						'name' => q(квадратни инчи),
@@ -2873,6 +2552,15 @@ has 'units' => (
 						'other' => q({0} квадратних инча),
 						'per' => q({0}/in²),
 					},
+					# Long Unit Identifier
+					'area-square-kilometer' => {
+						'few' => q({0} квадратна километра),
+						'name' => q(квадратни километри),
+						'one' => q({0} квадратни километар),
+						'other' => q({0} квадратних километара),
+						'per' => q({0} по квадратном километру),
+					},
+					# Core Unit Identifier
 					'square-kilometer' => {
 						'few' => q({0} квадратна километра),
 						'name' => q(квадратни километри),
@@ -2880,6 +2568,15 @@ has 'units' => (
 						'other' => q({0} квадратних километара),
 						'per' => q({0} по квадратном километру),
 					},
+					# Long Unit Identifier
+					'area-square-meter' => {
+						'few' => q({0} квадратна метра),
+						'name' => q(квадратни метри),
+						'one' => q({0} квадратни метар),
+						'other' => q({0} квадратних метара),
+						'per' => q({0}/m²),
+					},
+					# Core Unit Identifier
 					'square-meter' => {
 						'few' => q({0} квадратна метра),
 						'name' => q(квадратни метри),
@@ -2887,6 +2584,15 @@ has 'units' => (
 						'other' => q({0} квадратних метара),
 						'per' => q({0}/m²),
 					},
+					# Long Unit Identifier
+					'area-square-mile' => {
+						'few' => q({0} квадратне миље),
+						'name' => q(квадратне миље),
+						'one' => q({0} квадратна миља),
+						'other' => q({0} квадратних миља),
+						'per' => q({0} по квадратној миљи),
+					},
+					# Core Unit Identifier
 					'square-mile' => {
 						'few' => q({0} квадратне миље),
 						'name' => q(квадратне миље),
@@ -2894,650 +2600,1011 @@ has 'units' => (
 						'other' => q({0} квадратних миља),
 						'per' => q({0} по квадратној миљи),
 					},
+					# Long Unit Identifier
+					'area-square-yard' => {
+						'few' => q({0} квадратна јарда),
+						'name' => q(квадратни јарди),
+						'one' => q({0} квадратни јард),
+						'other' => q({0} квадратних јарди),
+					},
+					# Core Unit Identifier
 					'square-yard' => {
 						'few' => q({0} квадратна јарда),
 						'name' => q(квадратни јарди),
 						'one' => q({0} квадратни јард),
 						'other' => q({0} квадратних јарди),
 					},
-					'tablespoon' => {
-						'few' => q({0} кашике),
-						'name' => q(кашике),
-						'one' => q({0} кашика),
-						'other' => q({0} кашика),
+					# Long Unit Identifier
+					'concentr-item' => {
+						'few' => q({0} ставке),
+						'name' => q(ставке),
+						'one' => q({0} ставка),
+						'other' => q({0} ставки),
 					},
-					'teaspoon' => {
-						'few' => q({0} кашичице),
-						'name' => q(кашичице),
-						'one' => q({0} кашичица),
-						'other' => q({0} кашичица),
+					# Core Unit Identifier
+					'item' => {
+						'few' => q({0} ставке),
+						'name' => q(ставке),
+						'one' => q({0} ставка),
+						'other' => q({0} ставки),
 					},
+					# Long Unit Identifier
+					'concentr-karat' => {
+						'1' => q(inanimate),
+						'few' => q({0} карата),
+						'name' => q(карати),
+						'one' => q({0} карат),
+						'other' => q({0} карата),
+					},
+					# Core Unit Identifier
+					'karat' => {
+						'1' => q(inanimate),
+						'few' => q({0} карата),
+						'name' => q(карати),
+						'one' => q({0} карат),
+						'other' => q({0} карата),
+					},
+					# Long Unit Identifier
+					'concentr-milligram-ofglucose-per-deciliter' => {
+						'few' => q({0} милиграма по децилитру),
+						'name' => q(милиграми по децилитру),
+						'one' => q({0} милиграм по децилитру),
+						'other' => q({0} милиграма по децилитру),
+					},
+					# Core Unit Identifier
+					'milligram-ofglucose-per-deciliter' => {
+						'few' => q({0} милиграма по децилитру),
+						'name' => q(милиграми по децилитру),
+						'one' => q({0} милиграм по децилитру),
+						'other' => q({0} милиграма по децилитру),
+					},
+					# Long Unit Identifier
+					'concentr-millimole-per-liter' => {
+						'few' => q({0} милимола по литри),
+						'name' => q(милимол по литри),
+						'one' => q({0} милимол по литри),
+						'other' => q({0} милимола по литри),
+					},
+					# Core Unit Identifier
+					'millimole-per-liter' => {
+						'few' => q({0} милимола по литри),
+						'name' => q(милимол по литри),
+						'one' => q({0} милимол по литри),
+						'other' => q({0} милимола по литри),
+					},
+					# Long Unit Identifier
+					'concentr-mole' => {
+						'1' => q(inanimate),
+						'few' => q({0} мола),
+						'name' => q(моли),
+						'one' => q({0} мол),
+						'other' => q({0} мола),
+					},
+					# Core Unit Identifier
+					'mole' => {
+						'1' => q(inanimate),
+						'few' => q({0} мола),
+						'name' => q(моли),
+						'one' => q({0} мол),
+						'other' => q({0} мола),
+					},
+					# Long Unit Identifier
+					'concentr-percent' => {
+						'1' => q(inanimate),
+						'few' => q({0} процената),
+						'name' => q(проценат),
+						'one' => q({0} проценат),
+						'other' => q({0} процената),
+					},
+					# Core Unit Identifier
+					'percent' => {
+						'1' => q(inanimate),
+						'few' => q({0} процената),
+						'name' => q(проценат),
+						'one' => q({0} проценат),
+						'other' => q({0} процената),
+					},
+					# Long Unit Identifier
+					'concentr-permille' => {
+						'1' => q(inanimate),
+						'few' => q({0} промила),
+						'name' => q(промил),
+						'one' => q({0} промил),
+						'other' => q({0} промила),
+					},
+					# Core Unit Identifier
+					'permille' => {
+						'1' => q(inanimate),
+						'few' => q({0} промила),
+						'name' => q(промил),
+						'one' => q({0} промил),
+						'other' => q({0} промила),
+					},
+					# Long Unit Identifier
+					'concentr-permillion' => {
+						'1' => q(feminine),
+						'few' => q({0} честице на милион),
+						'name' => q(честица на милион),
+						'one' => q({0} честица на милион),
+						'other' => q({0} честица на милион),
+					},
+					# Core Unit Identifier
+					'permillion' => {
+						'1' => q(feminine),
+						'few' => q({0} честице на милион),
+						'name' => q(честица на милион),
+						'one' => q({0} честица на милион),
+						'other' => q({0} честица на милион),
+					},
+					# Long Unit Identifier
+					'concentr-permyriad' => {
+						'1' => q(inanimate),
+						'few' => q({0}‱),
+						'one' => q({0}‱),
+						'other' => q({0}‱),
+					},
+					# Core Unit Identifier
+					'permyriad' => {
+						'1' => q(inanimate),
+						'few' => q({0}‱),
+						'one' => q({0}‱),
+						'other' => q({0}‱),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-100-kilometer' => {
+						'few' => q({0} литра на 100 километара),
+						'name' => q(литри на 100 километара),
+						'one' => q({0} литар на 100 километара),
+						'other' => q({0} литара на 100 километара),
+					},
+					# Core Unit Identifier
+					'liter-per-100-kilometer' => {
+						'few' => q({0} литра на 100 километара),
+						'name' => q(литри на 100 километара),
+						'one' => q({0} литар на 100 километара),
+						'other' => q({0} литара на 100 километара),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-kilometer' => {
+						'few' => q({0} литра по километру),
+						'name' => q(литри по километру),
+						'one' => q({0} литар по километру),
+						'other' => q({0} литара по километру),
+					},
+					# Core Unit Identifier
+					'liter-per-kilometer' => {
+						'few' => q({0} литра по километру),
+						'name' => q(литри по километру),
+						'one' => q({0} литар по километру),
+						'other' => q({0} литара по километру),
+					},
+					# Long Unit Identifier
+					'consumption-mile-per-gallon' => {
+						'few' => q({0} миље по галону),
+						'name' => q(миља по галону),
+						'one' => q({0} миља по галону),
+						'other' => q({0} миља по галону),
+					},
+					# Core Unit Identifier
+					'mile-per-gallon' => {
+						'few' => q({0} миље по галону),
+						'name' => q(миља по галону),
+						'one' => q({0} миља по галону),
+						'other' => q({0} миља по галону),
+					},
+					# Long Unit Identifier
+					'consumption-mile-per-gallon-imperial' => {
+						'few' => q({0} миље по империјалном галону),
+						'name' => q(миља по империјалном галону),
+						'one' => q({0} миља по империјалном галону),
+						'other' => q({0} миља по империјалном галону),
+					},
+					# Core Unit Identifier
+					'mile-per-gallon-imperial' => {
+						'few' => q({0} миље по империјалном галону),
+						'name' => q(миља по империјалном галону),
+						'one' => q({0} миља по империјалном галону),
+						'other' => q({0} миља по империјалном галону),
+					},
+					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0}И),
+						'north' => q({0}С),
+						'south' => q({0}Ј),
+						'west' => q({0}З),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0}И),
+						'north' => q({0}С),
+						'south' => q({0}Ј),
+						'west' => q({0}З),
+					},
+					# Long Unit Identifier
+					'digital-bit' => {
+						'1' => q(inanimate),
+						'few' => q({0} бита),
+						'name' => q(битови),
+						'one' => q({0} бит),
+						'other' => q({0} битова),
+					},
+					# Core Unit Identifier
+					'bit' => {
+						'1' => q(inanimate),
+						'few' => q({0} бита),
+						'name' => q(битови),
+						'one' => q({0} бит),
+						'other' => q({0} битова),
+					},
+					# Long Unit Identifier
+					'digital-byte' => {
+						'1' => q(inanimate),
+						'few' => q({0} бајта),
+						'name' => q(бајтови),
+						'one' => q({0} бајт),
+						'other' => q({0} бајтова),
+					},
+					# Core Unit Identifier
+					'byte' => {
+						'1' => q(inanimate),
+						'few' => q({0} бајта),
+						'name' => q(бајтови),
+						'one' => q({0} бајт),
+						'other' => q({0} бајтова),
+					},
+					# Long Unit Identifier
+					'digital-gigabit' => {
+						'few' => q({0} гигабита),
+						'name' => q(гигабитови),
+						'one' => q({0} гигабит),
+						'other' => q({0} гигабитова),
+					},
+					# Core Unit Identifier
+					'gigabit' => {
+						'few' => q({0} гигабита),
+						'name' => q(гигабитови),
+						'one' => q({0} гигабит),
+						'other' => q({0} гигабитова),
+					},
+					# Long Unit Identifier
+					'digital-gigabyte' => {
+						'few' => q({0} гигабајта),
+						'name' => q(гигабајти),
+						'one' => q({0} гигабајт),
+						'other' => q({0} гигабајтова),
+					},
+					# Core Unit Identifier
+					'gigabyte' => {
+						'few' => q({0} гигабајта),
+						'name' => q(гигабајти),
+						'one' => q({0} гигабајт),
+						'other' => q({0} гигабајтова),
+					},
+					# Long Unit Identifier
+					'digital-kilobit' => {
+						'few' => q({0} килобита),
+						'name' => q(килобитови),
+						'one' => q({0} килобит),
+						'other' => q({0} килобитова),
+					},
+					# Core Unit Identifier
+					'kilobit' => {
+						'few' => q({0} килобита),
+						'name' => q(килобитови),
+						'one' => q({0} килобит),
+						'other' => q({0} килобитова),
+					},
+					# Long Unit Identifier
+					'digital-kilobyte' => {
+						'few' => q({0} килобајта),
+						'name' => q(килобајти),
+						'one' => q({0} килобајт),
+						'other' => q({0} килобајтова),
+					},
+					# Core Unit Identifier
+					'kilobyte' => {
+						'few' => q({0} килобајта),
+						'name' => q(килобајти),
+						'one' => q({0} килобајт),
+						'other' => q({0} килобајтова),
+					},
+					# Long Unit Identifier
+					'digital-megabit' => {
+						'few' => q({0} мегабита),
+						'name' => q(мегабитови),
+						'one' => q({0} мегабит),
+						'other' => q({0} мегабитова),
+					},
+					# Core Unit Identifier
+					'megabit' => {
+						'few' => q({0} мегабита),
+						'name' => q(мегабитови),
+						'one' => q({0} мегабит),
+						'other' => q({0} мегабитова),
+					},
+					# Long Unit Identifier
+					'digital-megabyte' => {
+						'few' => q({0} мегабајта),
+						'name' => q(мегабајти),
+						'one' => q({0} мегабајт),
+						'other' => q({0} мегабајтова),
+					},
+					# Core Unit Identifier
+					'megabyte' => {
+						'few' => q({0} мегабајта),
+						'name' => q(мегабајти),
+						'one' => q({0} мегабајт),
+						'other' => q({0} мегабајтова),
+					},
+					# Long Unit Identifier
+					'digital-petabyte' => {
+						'few' => q({0} петабајта),
+						'name' => q(петабајти),
+						'one' => q({0} петабајт),
+						'other' => q({0} петабајтова),
+					},
+					# Core Unit Identifier
+					'petabyte' => {
+						'few' => q({0} петабајта),
+						'name' => q(петабајти),
+						'one' => q({0} петабајт),
+						'other' => q({0} петабајтова),
+					},
+					# Long Unit Identifier
+					'digital-terabit' => {
+						'few' => q({0} терабита),
+						'name' => q(терабитови),
+						'one' => q({0} терабит),
+						'other' => q({0} терабитова),
+					},
+					# Core Unit Identifier
 					'terabit' => {
 						'few' => q({0} терабита),
 						'name' => q(терабитови),
 						'one' => q({0} терабит),
-						'other' => q({0} терабита),
+						'other' => q({0} терабитова),
 					},
+					# Long Unit Identifier
+					'digital-terabyte' => {
+						'few' => q({0} терабајта),
+						'name' => q(терабајти),
+						'one' => q({0} терабајт),
+						'other' => q({0} терабајта),
+					},
+					# Core Unit Identifier
 					'terabyte' => {
 						'few' => q({0} терабајта),
 						'name' => q(терабајти),
 						'one' => q({0} терабајт),
 						'other' => q({0} терабајта),
 					},
-					'ton' => {
-						'few' => q({0} тоне),
-						'name' => q(тоне),
-						'one' => q({0} тона),
-						'other' => q({0} тона),
+					# Long Unit Identifier
+					'duration-century' => {
+						'1' => q(inanimate),
+						'few' => q({0} века),
+						'name' => q(векови),
+						'one' => q({0} век),
+						'other' => q({0} векова),
 					},
-					'volt' => {
-						'few' => q({0} волта),
-						'name' => q(волти),
-						'one' => q({0} волт),
-						'other' => q({0} волти),
+					# Core Unit Identifier
+					'century' => {
+						'1' => q(inanimate),
+						'few' => q({0} века),
+						'name' => q(векови),
+						'one' => q({0} век),
+						'other' => q({0} векова),
 					},
-					'watt' => {
-						'few' => q({0} вата),
-						'name' => q(вати),
-						'one' => q({0} ват),
-						'other' => q({0} вати),
+					# Long Unit Identifier
+					'duration-day' => {
+						'1' => q(inanimate),
+						'few' => q({0} дана),
+						'name' => q(дани),
+						'one' => q({0} дан),
+						'other' => q({0} дана),
+						'per' => q({0}/дневно),
 					},
-					'week' => {
+					# Core Unit Identifier
+					'day' => {
+						'1' => q(inanimate),
+						'few' => q({0} дана),
+						'name' => q(дани),
+						'one' => q({0} дан),
+						'other' => q({0} дана),
+						'per' => q({0}/дневно),
+					},
+					# Long Unit Identifier
+					'duration-decade' => {
+						'1' => q(feminine),
+						'few' => q({0} деценије),
+						'name' => q(деценије),
+						'one' => q({0} деценија),
+						'other' => q({0} деценија),
+					},
+					# Core Unit Identifier
+					'decade' => {
+						'1' => q(feminine),
+						'few' => q({0} деценије),
+						'name' => q(деценије),
+						'one' => q({0} деценија),
+						'other' => q({0} деценија),
+					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'1' => q(inanimate),
+						'few' => q({0} сата),
+						'name' => q(сати),
+						'one' => q({0} сат),
+						'other' => q({0} сати),
+						'per' => q({0}/сат),
+					},
+					# Core Unit Identifier
+					'hour' => {
+						'1' => q(inanimate),
+						'few' => q({0} сата),
+						'name' => q(сати),
+						'one' => q({0} сат),
+						'other' => q({0} сати),
+						'per' => q({0}/сат),
+					},
+					# Long Unit Identifier
+					'duration-microsecond' => {
+						'few' => q({0} микросекунде),
+						'name' => q(микросекунде),
+						'one' => q({0} микросекунда),
+						'other' => q({0} микросекунди),
+					},
+					# Core Unit Identifier
+					'microsecond' => {
+						'few' => q({0} микросекунде),
+						'name' => q(микросекунде),
+						'one' => q({0} микросекунда),
+						'other' => q({0} микросекунди),
+					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'few' => q({0} милисекунде),
+						'name' => q(милисекунде),
+						'one' => q({0} милисекунда),
+						'other' => q({0} милисекунди),
+					},
+					# Core Unit Identifier
+					'millisecond' => {
+						'few' => q({0} милисекунде),
+						'name' => q(милисекунде),
+						'one' => q({0} милисекунда),
+						'other' => q({0} милисекунди),
+					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'1' => q(inanimate),
+						'few' => q({0} минута),
+						'name' => q(минути),
+						'one' => q({0} минут),
+						'other' => q({0} минута),
+						'per' => q({0} у минуту),
+					},
+					# Core Unit Identifier
+					'minute' => {
+						'1' => q(inanimate),
+						'few' => q({0} минута),
+						'name' => q(минути),
+						'one' => q({0} минут),
+						'other' => q({0} минута),
+						'per' => q({0} у минуту),
+					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'1' => q(inanimate),
+						'few' => q({0} месеца),
+						'name' => q(месеци),
+						'one' => q({0} месец),
+						'other' => q({0} месеци),
+						'per' => q({0} месечно),
+					},
+					# Core Unit Identifier
+					'month' => {
+						'1' => q(inanimate),
+						'few' => q({0} месеца),
+						'name' => q(месеци),
+						'one' => q({0} месец),
+						'other' => q({0} месеци),
+						'per' => q({0} месечно),
+					},
+					# Long Unit Identifier
+					'duration-nanosecond' => {
+						'few' => q({0} наносекунде),
+						'name' => q(наносекунде),
+						'one' => q({0} наносекунда),
+						'other' => q({0} наносекунди),
+					},
+					# Core Unit Identifier
+					'nanosecond' => {
+						'few' => q({0} наносекунде),
+						'name' => q(наносекунде),
+						'one' => q({0} наносекунда),
+						'other' => q({0} наносекунди),
+					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'1' => q(feminine),
+						'few' => q({0} секунде),
+						'name' => q(секунде),
+						'one' => q({0} секунда),
+						'other' => q({0} секунди),
+						'per' => q({0}/у секунди),
+					},
+					# Core Unit Identifier
+					'second' => {
+						'1' => q(feminine),
+						'few' => q({0} секунде),
+						'name' => q(секунде),
+						'one' => q({0} секунда),
+						'other' => q({0} секунди),
+						'per' => q({0}/у секунди),
+					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'1' => q(feminine),
 						'few' => q({0} недеље),
 						'name' => q(недеље),
 						'one' => q({0} недеља),
 						'other' => q({0} недеља),
 						'per' => q({0} недељно),
 					},
-					'yard' => {
-						'few' => q({0} јарда),
-						'name' => q(јарди),
-						'one' => q({0} јард),
-						'other' => q({0} јарди),
+					# Core Unit Identifier
+					'week' => {
+						'1' => q(feminine),
+						'few' => q({0} недеље),
+						'name' => q(недеље),
+						'one' => q({0} недеља),
+						'other' => q({0} недеља),
+						'per' => q({0} недељно),
 					},
-					'year' => {
+					# Long Unit Identifier
+					'duration-year' => {
+						'1' => q(feminine),
 						'few' => q({0} године),
 						'name' => q(године),
 						'one' => q({0} година),
 						'other' => q({0} година),
 						'per' => q({0} годишње),
 					},
-				},
-				'narrow' => {
-					'' => {
-						'name' => q(правац),
-					},
-					'acre' => {
-						'few' => q({0} ac),
-						'one' => q({0} ac),
-						'other' => q({0} ac),
-					},
-					'arc-minute' => {
-						'few' => q({0}′),
-						'one' => q({0}′),
-						'other' => q({0}′),
-					},
-					'arc-second' => {
-						'few' => q({0}″),
-						'one' => q({0}″),
-						'other' => q({0}″),
-					},
-					'celsius' => {
-						'few' => q({0}°C),
-						'name' => q(°C),
-						'one' => q({0}°C),
-						'other' => q({0}°C),
-					},
-					'centimeter' => {
-						'few' => q({0} cm),
-						'name' => q(cm),
-						'one' => q({0} cm),
-						'other' => q({0} cm),
-					},
-					'coordinate' => {
-						'east' => q({0}И),
-						'north' => q({0}С),
-						'south' => q({0}Ј),
-						'west' => q({0}З),
-					},
-					'cubic-kilometer' => {
-						'few' => q({0} km³),
-						'one' => q({0} km³),
-						'other' => q({0} km³),
-					},
-					'cubic-mile' => {
-						'few' => q({0} mi³),
-						'one' => q({0} mi³),
-						'other' => q({0} mi³),
-					},
-					'day' => {
-						'few' => q({0} д),
-						'name' => q(д),
-						'one' => q({0} д),
-						'other' => q({0} д),
-					},
-					'degree' => {
-						'few' => q({0}°),
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					'fahrenheit' => {
-						'few' => q({0}°F),
-						'one' => q({0}°F),
-						'other' => q({0}°F),
-					},
-					'foot' => {
-						'few' => q({0} ft),
-						'name' => q(ft),
-						'one' => q({0} ft),
-						'other' => q({0} ft),
-					},
-					'g-force' => {
-						'few' => q({0} G),
-						'one' => q({0} G),
-						'other' => q({0} G),
-					},
-					'gram' => {
-						'few' => q({0} g),
-						'name' => q(g),
-						'one' => q({0} g),
-						'other' => q({0} g),
-					},
-					'hectare' => {
-						'few' => q({0} ha),
-						'one' => q({0} ha),
-						'other' => q({0} ha),
-					},
-					'hectopascal' => {
-						'few' => q({0} hPa),
-						'one' => q({0} hPa),
-						'other' => q({0} hPa),
-					},
-					'horsepower' => {
-						'few' => q({0} кс),
-						'one' => q({0} кс),
-						'other' => q({0} кс),
-					},
-					'hour' => {
-						'few' => q({0} ч),
-						'name' => q(ч),
-						'one' => q({0} ч),
-						'other' => q({0} ч),
-					},
-					'inch' => {
-						'few' => q({0} инча),
-						'one' => q({0} инч),
-						'other' => q({0} инча),
-					},
-					'inch-hg' => {
-						'few' => q({0} inHg),
-						'one' => q({0} inHg),
-						'other' => q({0} inHg),
-					},
-					'kilogram' => {
-						'few' => q({0} kg),
-						'name' => q(kg),
-						'one' => q({0} kg),
-						'other' => q({0} kg),
-					},
-					'kilometer' => {
-						'few' => q({0} km),
-						'name' => q(km),
-						'one' => q({0} km),
-						'other' => q({0} km),
-					},
-					'kilometer-per-hour' => {
-						'few' => q({0} km/h),
-						'name' => q(km/h),
-						'one' => q({0} km/h),
-						'other' => q({0} km/h),
-					},
-					'kilowatt' => {
-						'few' => q({0} kW),
-						'one' => q({0} kW),
-						'other' => q({0} kW),
-					},
-					'light-year' => {
-						'few' => q({0} сг),
-						'one' => q({0} сг),
-						'other' => q({0} сг),
-					},
-					'liter' => {
-						'few' => q({0} l),
-						'name' => q(l),
-						'one' => q({0} l),
-						'other' => q({0} l),
-					},
-					'liter-per-100kilometers' => {
-						'few' => q({0} L/100km),
-						'name' => q(L/100km),
-						'one' => q({0} L/100km),
-						'other' => q({0} L/100km),
-					},
-					'meter' => {
-						'few' => q({0} m),
-						'name' => q(m),
-						'one' => q({0} m),
-						'other' => q({0} m),
-					},
-					'meter-per-second' => {
-						'few' => q({0} m/s),
-						'one' => q({0} m/s),
-						'other' => q({0} m/s),
-					},
-					'mile' => {
-						'few' => q({0} миље),
-						'one' => q({0} миља),
-						'other' => q({0} миља),
-					},
-					'mile-per-hour' => {
-						'few' => q({0} mi/h),
-						'one' => q({0} mi/h),
-						'other' => q({0} mi/h),
-					},
-					'millibar' => {
-						'few' => q({0} mbar),
-						'one' => q({0} mbar),
-						'other' => q({0} mbar),
-					},
-					'millimeter' => {
-						'few' => q({0} mm),
-						'name' => q(mm),
-						'one' => q({0} mm),
-						'other' => q({0} mm),
-					},
-					'millisecond' => {
-						'few' => q({0} ms),
-						'name' => q(ms),
-						'one' => q({0} ms),
-						'other' => q({0} ms),
-					},
-					'minute' => {
-						'few' => q({0} м),
-						'name' => q(мин),
-						'one' => q({0} м),
-						'other' => q({0} м),
-					},
-					'month' => {
-						'few' => q({0} м),
-						'name' => q(м.),
-						'one' => q({0} м),
-						'other' => q({0} м),
-					},
-					'ounce' => {
-						'few' => q({0} унце),
-						'one' => q({0} унца),
-						'other' => q({0} унци),
-					},
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					'percent' => {
-						'few' => q({0}%),
-						'name' => q(%),
-						'one' => q({0}%),
-						'other' => q({0}%),
-					},
-					'picometer' => {
-						'few' => q({0} pm),
-						'one' => q({0} pm),
-						'other' => q({0} pm),
-					},
-					'pound' => {
-						'few' => q({0} lb),
-						'one' => q({0} lb),
-						'other' => q({0} lb),
-					},
-					'second' => {
-						'few' => q({0} с),
-						'name' => q(с),
-						'one' => q({0} с),
-						'other' => q({0} с),
-					},
-					'square-foot' => {
-						'few' => q({0} ft²),
-						'one' => q({0} ft²),
-						'other' => q({0} ft²),
-					},
-					'square-kilometer' => {
-						'few' => q({0} km²),
-						'one' => q({0} km²),
-						'other' => q({0} km²),
-					},
-					'square-meter' => {
-						'few' => q({0} m²),
-						'one' => q({0} m²),
-						'other' => q({0} m²),
-					},
-					'square-mile' => {
-						'few' => q({0} mi²),
-						'one' => q({0} mi²),
-						'other' => q({0} mi²),
-					},
-					'watt' => {
-						'few' => q({0} W),
-						'one' => q({0} W),
-						'other' => q({0} W),
-					},
-					'week' => {
-						'few' => q({0} н),
-						'name' => q(н.),
-						'one' => q({0} н),
-						'other' => q({0} н),
-					},
-					'yard' => {
-						'few' => q({0} јрд),
-						'one' => q({0} јрд),
-						'other' => q({0} јрд),
-					},
+					# Core Unit Identifier
 					'year' => {
-						'few' => q({0} г),
-						'name' => q(г.),
-						'one' => q({0} г),
-						'other' => q({0} г),
+						'1' => q(feminine),
+						'few' => q({0} године),
+						'name' => q(године),
+						'one' => q({0} година),
+						'other' => q({0} година),
+						'per' => q({0} годишње),
 					},
-				},
-				'short' => {
-					'' => {
-						'name' => q(правац),
+					# Long Unit Identifier
+					'electric-ampere' => {
+						'1' => q(inanimate),
+						'few' => q({0} ампера),
+						'name' => q(ампери),
+						'one' => q({0} ампер),
+						'other' => q({0} ампера),
 					},
-					'acre' => {
-						'few' => q({0} ac),
-						'name' => q(акери),
-						'one' => q({0} ac),
-						'other' => q({0} ac),
-					},
-					'acre-foot' => {
-						'few' => q({0} ac ft),
-						'name' => q(ac ft),
-						'one' => q({0} ac ft),
-						'other' => q({0} ac ft),
-					},
+					# Core Unit Identifier
 					'ampere' => {
-						'few' => q({0} A),
-						'name' => q(A),
-						'one' => q({0} A),
-						'other' => q({0} A),
+						'1' => q(inanimate),
+						'few' => q({0} ампера),
+						'name' => q(ампери),
+						'one' => q({0} ампер),
+						'other' => q({0} ампера),
 					},
-					'arc-minute' => {
-						'few' => q({0}′),
-						'name' => q(лучни мин),
-						'one' => q({0}′),
-						'other' => q({0}′),
+					# Long Unit Identifier
+					'electric-milliampere' => {
+						'few' => q({0} милиампера),
+						'name' => q(милиампери),
+						'one' => q({0} милиампер),
+						'other' => q({0} милиампера),
 					},
-					'arc-second' => {
-						'few' => q({0}″),
-						'name' => q(лучне сек),
-						'one' => q({0}″),
-						'other' => q({0}″),
+					# Core Unit Identifier
+					'milliampere' => {
+						'few' => q({0} милиампера),
+						'name' => q(милиампери),
+						'one' => q({0} милиампер),
+						'other' => q({0} милиампера),
 					},
-					'astronomical-unit' => {
-						'few' => q({0} ај),
-						'name' => q(ај),
-						'one' => q({0} ај),
-						'other' => q({0} ај),
+					# Long Unit Identifier
+					'electric-ohm' => {
+						'1' => q(inanimate),
+						'few' => q({0} ома),
+						'name' => q(оми),
+						'one' => q({0} ом),
+						'other' => q({0} ома),
 					},
-					'atmosphere' => {
-						'few' => q({0} atm),
-						'name' => q(atm),
-						'one' => q({0} atm),
-						'other' => q({0} atm),
+					# Core Unit Identifier
+					'ohm' => {
+						'1' => q(inanimate),
+						'few' => q({0} ома),
+						'name' => q(оми),
+						'one' => q({0} ом),
+						'other' => q({0} ома),
 					},
-					'bit' => {
-						'few' => q({0} b),
-						'name' => q(бит),
-						'one' => q({0} b),
-						'other' => q({0} b),
+					# Long Unit Identifier
+					'electric-volt' => {
+						'1' => q(inanimate),
+						'few' => q({0} волта),
+						'name' => q(волти),
+						'one' => q({0} волт),
+						'other' => q({0} волти),
 					},
-					'byte' => {
-						'few' => q({0} B),
-						'name' => q(бајт),
-						'one' => q({0} B),
-						'other' => q({0} B),
+					# Core Unit Identifier
+					'volt' => {
+						'1' => q(inanimate),
+						'few' => q({0} волта),
+						'name' => q(волти),
+						'one' => q({0} волт),
+						'other' => q({0} волти),
 					},
+					# Long Unit Identifier
+					'energy-british-thermal-unit' => {
+						'name' => q(Британска термална јединица),
+					},
+					# Core Unit Identifier
+					'british-thermal-unit' => {
+						'name' => q(Британска термална јединица),
+					},
+					# Long Unit Identifier
+					'energy-calorie' => {
+						'1' => q(feminine),
+						'few' => q({0} калорије),
+						'name' => q(калорије),
+						'one' => q({0} калорија),
+						'other' => q({0} калорија),
+					},
+					# Core Unit Identifier
 					'calorie' => {
-						'few' => q({0} cal),
-						'name' => q(cal),
-						'one' => q({0} cal),
-						'other' => q({0} cal),
+						'1' => q(feminine),
+						'few' => q({0} калорије),
+						'name' => q(калорије),
+						'one' => q({0} калорија),
+						'other' => q({0} калорија),
 					},
-					'carat' => {
-						'few' => q({0} CD),
-						'name' => q(карати),
-						'one' => q({0} CD),
-						'other' => q({0} CD),
+					# Long Unit Identifier
+					'energy-electronvolt' => {
+						'few' => q({0} електронволта),
+						'name' => q(електронволти),
+						'one' => q({0} електронволт),
+						'other' => q({0} електронволти),
 					},
-					'celsius' => {
-						'few' => q({0}°C),
-						'name' => q(°C),
-						'one' => q({0}°C),
-						'other' => q({0}°C),
+					# Core Unit Identifier
+					'electronvolt' => {
+						'few' => q({0} електронволта),
+						'name' => q(електронволти),
+						'one' => q({0} електронволт),
+						'other' => q({0} електронволти),
 					},
-					'centiliter' => {
-						'few' => q({0} cL),
-						'name' => q(cL),
-						'one' => q({0} cL),
-						'other' => q({0} cL),
+					# Long Unit Identifier
+					'energy-foodcalorie' => {
+						'few' => q({0} калорије),
+						'name' => q(Калорије),
+						'one' => q({0} калорија),
+						'other' => q({0} калорија),
 					},
-					'centimeter' => {
-						'few' => q({0} cm),
-						'name' => q(cm),
-						'one' => q({0} cm),
-						'other' => q({0} cm),
+					# Core Unit Identifier
+					'foodcalorie' => {
+						'few' => q({0} калорије),
+						'name' => q(Калорије),
+						'one' => q({0} калорија),
+						'other' => q({0} калорија),
+					},
+					# Long Unit Identifier
+					'energy-joule' => {
+						'1' => q(inanimate),
+						'few' => q({0} џула),
+						'name' => q(џули),
+						'one' => q({0} џул),
+						'other' => q({0} џула),
+					},
+					# Core Unit Identifier
+					'joule' => {
+						'1' => q(inanimate),
+						'few' => q({0} џула),
+						'name' => q(џули),
+						'one' => q({0} џул),
+						'other' => q({0} џула),
+					},
+					# Long Unit Identifier
+					'energy-kilocalorie' => {
+						'few' => q({0} килокалорије),
+						'name' => q(килокалорије),
+						'one' => q({0} килокалорија),
+						'other' => q({0} килокалорија),
+					},
+					# Core Unit Identifier
+					'kilocalorie' => {
+						'few' => q({0} килокалорије),
+						'name' => q(килокалорије),
+						'one' => q({0} килокалорија),
+						'other' => q({0} килокалорија),
+					},
+					# Long Unit Identifier
+					'energy-kilojoule' => {
+						'few' => q({0} килоџула),
+						'name' => q(килоџули),
+						'one' => q({0} килоџул),
+						'other' => q({0} килоџула),
+					},
+					# Core Unit Identifier
+					'kilojoule' => {
+						'few' => q({0} килоџула),
+						'name' => q(килоџули),
+						'one' => q({0} килоџул),
+						'other' => q({0} килоџула),
+					},
+					# Long Unit Identifier
+					'energy-kilowatt-hour' => {
+						'few' => q({0} киловат-сата),
+						'name' => q(киловат-сати),
+						'one' => q({0} киловат-сат),
+						'other' => q({0} киловат-сати),
+					},
+					# Core Unit Identifier
+					'kilowatt-hour' => {
+						'few' => q({0} киловат-сата),
+						'name' => q(киловат-сати),
+						'one' => q({0} киловат-сат),
+						'other' => q({0} киловат-сати),
+					},
+					# Long Unit Identifier
+					'energy-therm-us' => {
+						'few' => q({0} US therms),
+						'name' => q(US therms),
+						'one' => q({0} US therm),
+						'other' => q({0} US therms),
+					},
+					# Core Unit Identifier
+					'therm-us' => {
+						'few' => q({0} US therms),
+						'name' => q(US therms),
+						'one' => q({0} US therm),
+						'other' => q({0} US therms),
+					},
+					# Long Unit Identifier
+					'force-newton' => {
+						'1' => q(inanimate),
+						'few' => q({0} њутна),
+						'name' => q(њутни),
+						'one' => q({0} њутн),
+						'other' => q({0} њутна),
+					},
+					# Core Unit Identifier
+					'newton' => {
+						'1' => q(inanimate),
+						'few' => q({0} њутна),
+						'name' => q(њутни),
+						'one' => q({0} њутн),
+						'other' => q({0} њутна),
+					},
+					# Long Unit Identifier
+					'force-pound-force' => {
+						'few' => q({0} фунте силе),
+						'name' => q(фунти силе),
+						'one' => q({0} фунта силе),
+						'other' => q({0} фунти силе),
+					},
+					# Core Unit Identifier
+					'pound-force' => {
+						'few' => q({0} фунте силе),
+						'name' => q(фунти силе),
+						'one' => q({0} фунта силе),
+						'other' => q({0} фунти силе),
+					},
+					# Long Unit Identifier
+					'frequency-gigahertz' => {
+						'few' => q({0} гигахерца),
+						'name' => q(гигахерци),
+						'one' => q({0} гигахерц),
+						'other' => q({0} гигахерца),
+					},
+					# Core Unit Identifier
+					'gigahertz' => {
+						'few' => q({0} гигахерца),
+						'name' => q(гигахерци),
+						'one' => q({0} гигахерц),
+						'other' => q({0} гигахерца),
+					},
+					# Long Unit Identifier
+					'frequency-hertz' => {
+						'1' => q(inanimate),
+						'few' => q({0} херца),
+						'name' => q(херци),
+						'one' => q({0} херц),
+						'other' => q({0} херца),
+					},
+					# Core Unit Identifier
+					'hertz' => {
+						'1' => q(inanimate),
+						'few' => q({0} херца),
+						'name' => q(херци),
+						'one' => q({0} херц),
+						'other' => q({0} херца),
+					},
+					# Long Unit Identifier
+					'frequency-kilohertz' => {
+						'few' => q({0} килохерца),
+						'name' => q(килохерци),
+						'one' => q({0} килохерц),
+						'other' => q({0} килохерца),
+					},
+					# Core Unit Identifier
+					'kilohertz' => {
+						'few' => q({0} килохерца),
+						'name' => q(килохерци),
+						'one' => q({0} килохерц),
+						'other' => q({0} килохерца),
+					},
+					# Long Unit Identifier
+					'frequency-megahertz' => {
+						'few' => q({0} мегахерца),
+						'name' => q(мегахерци),
+						'one' => q({0} мегахерц),
+						'other' => q({0} мегахерца),
+					},
+					# Core Unit Identifier
+					'megahertz' => {
+						'few' => q({0} мегахерца),
+						'name' => q(мегахерци),
+						'one' => q({0} мегахерц),
+						'other' => q({0} мегахерца),
+					},
+					# Long Unit Identifier
+					'graphics-dot' => {
+						'few' => q({0} тачке),
+						'name' => q(тачка),
+						'one' => q({0} тачка),
+						'other' => q({0} тачака),
+					},
+					# Core Unit Identifier
+					'dot' => {
+						'few' => q({0} тачке),
+						'name' => q(тачка),
+						'one' => q({0} тачка),
+						'other' => q({0} тачака),
+					},
+					# Long Unit Identifier
+					'graphics-em' => {
+						'1' => q(inanimate),
+						'few' => q({0} em),
+						'one' => q({0} em),
+						'other' => q({0} em),
+					},
+					# Core Unit Identifier
+					'em' => {
+						'1' => q(inanimate),
+						'few' => q({0} em),
+						'one' => q({0} em),
+						'other' => q({0} em),
+					},
+					# Long Unit Identifier
+					'graphics-pixel' => {
+						'1' => q(inanimate),
+						'few' => q({0} px),
+						'one' => q({0} px),
+						'other' => q({0} px),
+					},
+					# Core Unit Identifier
+					'pixel' => {
+						'1' => q(inanimate),
+						'few' => q({0} px),
+						'one' => q({0} px),
+						'other' => q({0} px),
+					},
+					# Long Unit Identifier
+					'length-astronomical-unit' => {
+						'few' => q({0} астрономске јединице),
+						'name' => q(астрономске јединице),
+						'one' => q({0} астрономска јединица),
+						'other' => q({0} астрономских јединица),
+					},
+					# Core Unit Identifier
+					'astronomical-unit' => {
+						'few' => q({0} астрономске јединице),
+						'name' => q(астрономске јединице),
+						'one' => q({0} астрономска јединица),
+						'other' => q({0} астрономских јединица),
+					},
+					# Long Unit Identifier
+					'length-centimeter' => {
+						'few' => q({0} центиментра),
+						'name' => q(центиметри),
+						'one' => q({0} центиметар),
+						'other' => q({0} центиметара),
 						'per' => q({0}/cm),
 					},
-					'century' => {
-						'few' => q({0} в),
-						'name' => q(в.),
-						'one' => q({0} в),
-						'other' => q({0} в),
+					# Core Unit Identifier
+					'centimeter' => {
+						'few' => q({0} центиментра),
+						'name' => q(центиметри),
+						'one' => q({0} центиметар),
+						'other' => q({0} центиметара),
+						'per' => q({0}/cm),
 					},
-					'coordinate' => {
-						'east' => q({0}И),
-						'north' => q({0}С),
-						'south' => q({0}Ј),
-						'west' => q({0}З),
+					# Long Unit Identifier
+					'length-decimeter' => {
+						'few' => q({0} дециметра),
+						'name' => q(дециметри),
+						'one' => q({0} дециметар),
+						'other' => q({0} дециметара),
 					},
-					'cubic-centimeter' => {
-						'few' => q({0} cm³),
-						'name' => q(cm³),
-						'one' => q({0} cm³),
-						'other' => q({0} cm³),
-						'per' => q({0}/cm³),
-					},
-					'cubic-foot' => {
-						'few' => q({0} ft³),
-						'name' => q(ft³),
-						'one' => q({0} ft³),
-						'other' => q({0} ft³),
-					},
-					'cubic-inch' => {
-						'few' => q({0} in³),
-						'name' => q(in³),
-						'one' => q({0} in³),
-						'other' => q({0} in³),
-					},
-					'cubic-kilometer' => {
-						'few' => q({0} km³),
-						'name' => q(km³),
-						'one' => q({0} km³),
-						'other' => q({0} km³),
-					},
-					'cubic-meter' => {
-						'few' => q({0} m³),
-						'name' => q(m³),
-						'one' => q({0} m³),
-						'other' => q({0} m³),
-						'per' => q({0}/m³),
-					},
-					'cubic-mile' => {
-						'few' => q({0} mi³),
-						'name' => q(mi³),
-						'one' => q({0} mi³),
-						'other' => q({0} mi³),
-					},
-					'cubic-yard' => {
-						'few' => q({0} yd³),
-						'name' => q(yd³),
-						'one' => q({0} yd³),
-						'other' => q({0} yd³),
-					},
-					'cup' => {
-						'few' => q({0} ш.),
-						'name' => q(шоље),
-						'one' => q({0} ш.),
-						'other' => q({0} ш.),
-					},
-					'cup-metric' => {
-						'few' => q({0} mc),
-						'name' => q(mcup),
-						'one' => q({0} mc),
-						'other' => q({0} mc),
-					},
-					'day' => {
-						'few' => q({0} дана),
-						'name' => q(д.),
-						'one' => q({0} дан),
-						'other' => q({0} дана),
-						'per' => q({0}/д),
-					},
-					'deciliter' => {
-						'few' => q({0} dL),
-						'name' => q(dL),
-						'one' => q({0} dL),
-						'other' => q({0} dL),
-					},
+					# Core Unit Identifier
 					'decimeter' => {
-						'few' => q({0} dm),
-						'name' => q(dm),
-						'one' => q({0} dm),
-						'other' => q({0} dm),
+						'few' => q({0} дециметра),
+						'name' => q(дециметри),
+						'one' => q({0} дециметар),
+						'other' => q({0} дециметара),
 					},
-					'degree' => {
-						'few' => q({0}°),
-						'name' => q(степени),
-						'one' => q({0}°),
-						'other' => q({0}°),
+					# Long Unit Identifier
+					'length-earth-radius' => {
+						'few' => q({0} R⊕),
+						'name' => q(полупречник Земље),
+						'one' => q({0} полупречник Земље),
+						'other' => q({0} полупречника Земље),
 					},
-					'fahrenheit' => {
-						'few' => q({0}°F),
-						'name' => q(степени Фаренхајта),
-						'one' => q({0}°F),
-						'other' => q({0}°F),
+					# Core Unit Identifier
+					'earth-radius' => {
+						'few' => q({0} R⊕),
+						'name' => q(полупречник Земље),
+						'one' => q({0} полупречник Земље),
+						'other' => q({0} полупречника Земље),
 					},
-					'fluid-ounce' => {
-						'few' => q({0} fl oz),
-						'name' => q(fl oz),
-						'one' => q({0} fl oz),
-						'other' => q({0} fl oz),
+					# Long Unit Identifier
+					'length-fathom' => {
+						'few' => q({0} хвата),
+						'name' => q(хвати),
+						'one' => q({0} хват),
+						'other' => q({0} хвати),
 					},
-					'foodcalorie' => {
-						'few' => q({0} Cal),
-						'name' => q(Cal),
-						'one' => q({0} Cal),
-						'other' => q({0} Cal),
+					# Core Unit Identifier
+					'fathom' => {
+						'few' => q({0} хвата),
+						'name' => q(хвати),
+						'one' => q({0} хват),
+						'other' => q({0} хвати),
 					},
-					'foot' => {
-						'few' => q({0} ft),
-						'name' => q(ft),
-						'one' => q({0} ft),
-						'other' => q({0} ft),
+					# Long Unit Identifier
+					'length-foot' => {
+						'few' => q({0} стопе),
+						'name' => q(стопе),
+						'one' => q({0} стопа),
+						'other' => q({0} стопа),
 						'per' => q({0}/ft),
 					},
-					'g-force' => {
-						'few' => q({0} G),
-						'name' => q(ге сила),
-						'one' => q({0} G),
-						'other' => q({0} G),
+					# Core Unit Identifier
+					'foot' => {
+						'few' => q({0} стопе),
+						'name' => q(стопе),
+						'one' => q({0} стопа),
+						'other' => q({0} стопа),
+						'per' => q({0}/ft),
 					},
-					'gallon' => {
-						'few' => q({0} gal),
-						'name' => q(gal),
-						'one' => q({0} gal),
-						'other' => q({0} gal),
-						'per' => q({0}/gal),
+					# Long Unit Identifier
+					'length-furlong' => {
+						'few' => q({0} фурлонга),
+						'name' => q(фурлонзи),
+						'one' => q({0} фурлонг),
+						'other' => q({0} фурлонга),
 					},
-					'gallon-imperial' => {
-						'few' => q({0} gal Imp.),
-						'name' => q(Imp. gal),
-						'one' => q({0} gal Imp.),
-						'other' => q({0} gal Imp.),
-						'per' => q({0}/gal Imp.),
+					# Core Unit Identifier
+					'furlong' => {
+						'few' => q({0} фурлонга),
+						'name' => q(фурлонзи),
+						'one' => q({0} фурлонг),
+						'other' => q({0} фурлонга),
 					},
-					'generic' => {
-						'few' => q({0}°),
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
+					# Long Unit Identifier
+					'length-inch' => {
+						'few' => q({0} инча),
+						'name' => q(инчи),
+						'one' => q({0} инч),
+						'other' => q({0} инча),
+						'per' => q({0}/in),
 					},
-					'gigabit' => {
-						'few' => q({0} Gb),
-						'name' => q(Gb),
-						'one' => q({0} Gb),
-						'other' => q({0} Gb),
-					},
-					'gigabyte' => {
-						'few' => q({0} GB),
-						'name' => q(GB),
-						'one' => q({0} GB),
-						'other' => q({0} GB),
-					},
-					'gigahertz' => {
-						'few' => q({0} GHz),
-						'name' => q(GHz),
-						'one' => q({0} GHz),
-						'other' => q({0} GHz),
-					},
-					'gigawatt' => {
-						'few' => q({0} GW),
-						'name' => q(GW),
-						'one' => q({0} GW),
-						'other' => q({0} GW),
-					},
-					'gram' => {
-						'few' => q({0} g),
-						'name' => q(грами),
-						'one' => q({0} g),
-						'other' => q({0} g),
-						'per' => q({0}/g),
-					},
-					'hectare' => {
-						'few' => q({0} ha),
-						'name' => q(хектари),
-						'one' => q({0} ha),
-						'other' => q({0} ha),
-					},
-					'hectoliter' => {
-						'few' => q({0} hL),
-						'name' => q(hL),
-						'one' => q({0} hL),
-						'other' => q({0} hL),
-					},
-					'hectopascal' => {
-						'few' => q({0} hPa),
-						'name' => q(hPa),
-						'one' => q({0} hPa),
-						'other' => q({0} hPa),
-					},
-					'hertz' => {
-						'few' => q({0} Hz),
-						'name' => q(Hz),
-						'one' => q({0} Hz),
-						'other' => q({0} Hz),
-					},
-					'horsepower' => {
-						'few' => q({0} hp),
-						'name' => q(hp),
-						'one' => q({0} hp),
-						'other' => q({0} hp),
-					},
-					'hour' => {
-						'few' => q({0} сата),
-						'name' => q(сати),
-						'one' => q({0} сат),
-						'other' => q({0} сати),
-						'per' => q({0}/ч),
-					},
+					# Core Unit Identifier
 					'inch' => {
 						'few' => q({0} инча),
 						'name' => q(инчи),
@@ -3545,438 +3612,2323 @@ has 'units' => (
 						'other' => q({0} инча),
 						'per' => q({0}/in),
 					},
-					'inch-hg' => {
-						'few' => q({0} inHg),
-						'name' => q(inHg),
-						'one' => q({0} inHg),
-						'other' => q({0} inHg),
-					},
-					'joule' => {
-						'few' => q({0} J),
-						'name' => q(J),
-						'one' => q({0} J),
-						'other' => q({0} J),
-					},
-					'karat' => {
-						'few' => q({0} kt),
-						'name' => q(kt),
-						'one' => q({0} kt),
-						'other' => q({0} kt),
-					},
-					'kelvin' => {
-						'few' => q({0} K),
-						'name' => q(K),
-						'one' => q({0} K),
-						'other' => q({0} K),
-					},
-					'kilobit' => {
-						'few' => q({0} kb),
-						'name' => q(kb),
-						'one' => q({0} kb),
-						'other' => q({0} kb),
-					},
-					'kilobyte' => {
-						'few' => q({0} kB),
-						'name' => q(kB),
-						'one' => q({0} kB),
-						'other' => q({0} kB),
-					},
-					'kilocalorie' => {
-						'few' => q({0} kcal),
-						'name' => q(kcal),
-						'one' => q({0} kcal),
-						'other' => q({0} kcal),
-					},
-					'kilogram' => {
-						'few' => q({0} kg),
-						'name' => q(kg),
-						'one' => q({0} kg),
-						'other' => q({0} kg),
-						'per' => q({0}/kg),
-					},
-					'kilohertz' => {
-						'few' => q({0} kHz),
-						'name' => q(kHz),
-						'one' => q({0} kHz),
-						'other' => q({0} kHz),
-					},
-					'kilojoule' => {
-						'few' => q({0} kJ),
-						'name' => q(kJ),
-						'one' => q({0} kJ),
-						'other' => q({0} kJ),
-					},
-					'kilometer' => {
-						'few' => q({0} km),
-						'name' => q(km),
-						'one' => q({0} km),
-						'other' => q({0} km),
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'few' => q({0} километра),
+						'name' => q(километри),
+						'one' => q({0} километар),
+						'other' => q({0} километара),
 						'per' => q({0}/km),
 					},
-					'kilometer-per-hour' => {
-						'few' => q({0} km/h),
-						'name' => q(km/h),
-						'one' => q({0} km/h),
-						'other' => q({0} km/h),
+					# Core Unit Identifier
+					'kilometer' => {
+						'few' => q({0} километра),
+						'name' => q(километри),
+						'one' => q({0} километар),
+						'other' => q({0} километара),
+						'per' => q({0}/km),
 					},
-					'kilowatt' => {
-						'few' => q({0} kW),
-						'name' => q(kW),
-						'one' => q({0} kW),
-						'other' => q({0} kW),
+					# Long Unit Identifier
+					'length-light-year' => {
+						'few' => q({0} светлосне године),
+						'name' => q(светлосне године),
+						'one' => q({0} светлосна година),
+						'other' => q({0} светлосних година),
 					},
-					'kilowatt-hour' => {
-						'few' => q({0} kWh),
-						'name' => q(kWh),
-						'one' => q({0} kWh),
-						'other' => q({0} kWh),
-					},
-					'knot' => {
-						'few' => q({0} kn),
-						'name' => q(kn),
-						'one' => q({0} kn),
-						'other' => q({0} kn),
-					},
+					# Core Unit Identifier
 					'light-year' => {
-						'few' => q({0} сг),
-						'name' => q(светлосне год.),
-						'one' => q({0} сг),
-						'other' => q({0} сг),
+						'few' => q({0} светлосне године),
+						'name' => q(светлосне године),
+						'one' => q({0} светлосна година),
+						'other' => q({0} светлосних година),
 					},
-					'liter' => {
-						'few' => q({0} l),
-						'name' => q(литри),
-						'one' => q({0} l),
-						'other' => q({0} l),
-						'per' => q({0}/l),
-					},
-					'liter-per-100kilometers' => {
-						'few' => q({0} L/100 km),
-						'name' => q(L/100 km),
-						'one' => q({0} L/100 km),
-						'other' => q({0} L/100 km),
-					},
-					'liter-per-kilometer' => {
-						'few' => q({0} L/km),
-						'name' => q(L/km),
-						'one' => q({0} L/km),
-						'other' => q({0} L/km),
-					},
-					'lux' => {
-						'few' => q({0} lx),
-						'name' => q(lx),
-						'one' => q({0} lx),
-						'other' => q({0} lx),
-					},
-					'megabit' => {
-						'few' => q({0} Mb),
-						'name' => q(Mb),
-						'one' => q({0} Mb),
-						'other' => q({0} Mb),
-					},
-					'megabyte' => {
-						'few' => q({0} MB),
-						'name' => q(MB),
-						'one' => q({0} MB),
-						'other' => q({0} MB),
-					},
-					'megahertz' => {
-						'few' => q({0} MHz),
-						'name' => q(MHz),
-						'one' => q({0} MHz),
-						'other' => q({0} MHz),
-					},
-					'megaliter' => {
-						'few' => q({0} ML),
-						'name' => q(ML),
-						'one' => q({0} ML),
-						'other' => q({0} ML),
-					},
-					'megawatt' => {
-						'few' => q({0} MW),
-						'name' => q(MW),
-						'one' => q({0} MW),
-						'other' => q({0} MW),
-					},
-					'meter' => {
-						'few' => q({0} m),
-						'name' => q(m),
-						'one' => q({0} m),
-						'other' => q({0} m),
+					# Long Unit Identifier
+					'length-meter' => {
+						'1' => q(inanimate),
+						'few' => q({0} метра),
+						'name' => q(метри),
+						'one' => q({0} метар),
+						'other' => q({0} метара),
 						'per' => q({0}/m),
 					},
-					'meter-per-second' => {
-						'few' => q({0} m/s),
-						'name' => q(метри у секунди),
-						'one' => q({0} m/s),
-						'other' => q({0} m/s),
+					# Core Unit Identifier
+					'meter' => {
+						'1' => q(inanimate),
+						'few' => q({0} метра),
+						'name' => q(метри),
+						'one' => q({0} метар),
+						'other' => q({0} метара),
+						'per' => q({0}/m),
 					},
-					'meter-per-second-squared' => {
-						'few' => q({0} m/s²),
-						'name' => q(m/s²),
-						'one' => q({0} m/s²),
-						'other' => q({0} m/s²),
+					# Long Unit Identifier
+					'length-micrometer' => {
+						'few' => q({0} микрометра),
+						'name' => q(микрометри),
+						'one' => q({0} микрометар),
+						'other' => q({0} микрометара),
 					},
-					'metric-ton' => {
-						'few' => q({0} t),
-						'name' => q(t),
-						'one' => q({0} t),
-						'other' => q({0} t),
-					},
-					'microgram' => {
-						'few' => q({0} µg),
-						'name' => q(µg),
-						'one' => q({0} µg),
-						'other' => q({0} µg),
-					},
+					# Core Unit Identifier
 					'micrometer' => {
-						'few' => q({0} µm),
-						'name' => q(µm),
-						'one' => q({0} µm),
-						'other' => q({0} µm),
+						'few' => q({0} микрометра),
+						'name' => q(микрометри),
+						'one' => q({0} микрометар),
+						'other' => q({0} микрометара),
 					},
-					'microsecond' => {
-						'few' => q({0} μs),
-						'name' => q(μs),
-						'one' => q({0} μs),
-						'other' => q({0} μs),
-					},
-					'mile' => {
-						'few' => q({0} mi),
+					# Long Unit Identifier
+					'length-mile' => {
+						'few' => q({0} миље),
 						'name' => q(миље),
-						'one' => q({0} mi),
-						'other' => q({0} mi),
+						'one' => q({0} миља),
+						'other' => q({0} миља),
 					},
-					'mile-per-gallon' => {
-						'few' => q({0} mpg),
-						'name' => q(mpg),
-						'one' => q({0} mpg),
-						'other' => q({0} mpg),
+					# Core Unit Identifier
+					'mile' => {
+						'few' => q({0} миље),
+						'name' => q(миље),
+						'one' => q({0} миља),
+						'other' => q({0} миља),
 					},
-					'mile-per-gallon-imperial' => {
-						'few' => q({0} mpg Imp.),
-						'name' => q(mpg Imp.),
-						'one' => q({0} mpg Imp.),
-						'other' => q({0} mpg Imp.),
+					# Long Unit Identifier
+					'length-mile-scandinavian' => {
+						'1' => q(feminine),
+						'few' => q({0} скандинавске миље),
+						'name' => q(скандинавска миља),
+						'one' => q({0} скандинавска миља),
+						'other' => q({0} скандинавских миља),
 					},
-					'mile-per-hour' => {
-						'few' => q({0} mi/h),
-						'name' => q(миље на сат),
-						'one' => q({0} mi/h),
-						'other' => q({0} mi/h),
-					},
+					# Core Unit Identifier
 					'mile-scandinavian' => {
-						'few' => q({0} smi),
-						'name' => q(smi),
-						'one' => q({0} smi),
-						'other' => q({0} smi),
+						'1' => q(feminine),
+						'few' => q({0} скандинавске миље),
+						'name' => q(скандинавска миља),
+						'one' => q({0} скандинавска миља),
+						'other' => q({0} скандинавских миља),
 					},
-					'milliampere' => {
-						'few' => q({0} mA),
-						'name' => q(mA),
-						'one' => q({0} mA),
-						'other' => q({0} mA),
+					# Long Unit Identifier
+					'length-millimeter' => {
+						'few' => q({0} милиметра),
+						'name' => q(милиметри),
+						'one' => q({0} милиметар),
+						'other' => q({0} милиметара),
 					},
-					'millibar' => {
-						'few' => q({0} mbar),
-						'name' => q(mbar),
-						'one' => q({0} mbar),
-						'other' => q({0} mbar),
-					},
-					'milligram' => {
-						'few' => q({0} mg),
-						'name' => q(mg),
-						'one' => q({0} mg),
-						'other' => q({0} mg),
-					},
-					'milligram-per-deciliter' => {
-						'few' => q({0} mg/dL),
-						'name' => q(mg/dL),
-						'one' => q({0} mg/dL),
-						'other' => q({0} mg/dL),
-					},
-					'milliliter' => {
-						'few' => q({0} mL),
-						'name' => q(mL),
-						'one' => q({0} mL),
-						'other' => q({0} mL),
-					},
+					# Core Unit Identifier
 					'millimeter' => {
-						'few' => q({0} mm),
-						'name' => q(mm),
-						'one' => q({0} mm),
-						'other' => q({0} mm),
+						'few' => q({0} милиметра),
+						'name' => q(милиметри),
+						'one' => q({0} милиметар),
+						'other' => q({0} милиметара),
 					},
-					'millimeter-of-mercury' => {
-						'few' => q({0} mm Hg),
-						'name' => q(mm Hg),
-						'one' => q({0} mm Hg),
-						'other' => q({0} mm Hg),
+					# Long Unit Identifier
+					'length-nanometer' => {
+						'few' => q({0} нанометра),
+						'name' => q(нанометри),
+						'one' => q({0} нанометар),
+						'other' => q({0} нанометара),
 					},
-					'millimole-per-liter' => {
-						'few' => q({0} mmol/L),
-						'name' => q(mmol/L),
-						'one' => q({0} mmol/L),
-						'other' => q({0} mmol/L),
-					},
-					'millisecond' => {
-						'few' => q({0} ms),
-						'name' => q(ms),
-						'one' => q({0} ms),
-						'other' => q({0} ms),
-					},
-					'milliwatt' => {
-						'few' => q({0} mW),
-						'name' => q(mW),
-						'one' => q({0} mW),
-						'other' => q({0} mW),
-					},
-					'minute' => {
-						'few' => q({0} мин),
-						'name' => q(мин),
-						'one' => q({0} мин),
-						'other' => q({0} мин),
-						'per' => q({0}/мин),
-					},
-					'month' => {
-						'few' => q({0} мес.),
-						'name' => q(месеци),
-						'one' => q({0} мес.),
-						'other' => q({0} мес.),
-						'per' => q({0}/м),
-					},
+					# Core Unit Identifier
 					'nanometer' => {
-						'few' => q({0} nm),
-						'name' => q(nm),
-						'one' => q({0} nm),
-						'other' => q({0} nm),
+						'few' => q({0} нанометра),
+						'name' => q(нанометри),
+						'one' => q({0} нанометар),
+						'other' => q({0} нанометара),
 					},
-					'nanosecond' => {
-						'few' => q({0} ns),
-						'name' => q(ns),
-						'one' => q({0} ns),
-						'other' => q({0} ns),
+					# Long Unit Identifier
+					'length-nautical-mile' => {
+						'few' => q({0} наутичке миље),
+						'name' => q(наутичке миље),
+						'one' => q({0} наутичка миља),
+						'other' => q({0} наутичких миља),
 					},
+					# Core Unit Identifier
 					'nautical-mile' => {
-						'few' => q({0} nmi),
-						'name' => q(nmi),
-						'one' => q({0} nmi),
-						'other' => q({0} nmi),
+						'few' => q({0} наутичке миље),
+						'name' => q(наутичке миље),
+						'one' => q({0} наутичка миља),
+						'other' => q({0} наутичких миља),
 					},
-					'ohm' => {
-						'few' => q({0} Ω),
-						'name' => q(Ω),
-						'one' => q({0} Ω),
-						'other' => q({0} Ω),
-					},
-					'ounce' => {
-						'few' => q({0} oz),
-						'name' => q(oz),
-						'one' => q({0} oz),
-						'other' => q({0} oz),
-						'per' => q({0}/oz),
-					},
-					'ounce-troy' => {
-						'few' => q({0} oz t),
-						'name' => q(oz t),
-						'one' => q({0} oz t),
-						'other' => q({0} oz t),
-					},
-					'parsec' => {
-						'few' => q({0} pc),
+					# Long Unit Identifier
+					'length-parsec' => {
+						'few' => q({0} парсека),
 						'name' => q(парсеци),
-						'one' => q({0} pc),
-						'other' => q({0} pc),
+						'one' => q({0} парсек),
+						'other' => q({0} парсека),
 					},
-					'part-per-million' => {
-						'few' => q({0} ppm),
-						'name' => q(ppm),
-						'one' => q({0} ppm),
-						'other' => q({0} ppm),
+					# Core Unit Identifier
+					'parsec' => {
+						'few' => q({0} парсека),
+						'name' => q(парсеци),
+						'one' => q({0} парсек),
+						'other' => q({0} парсека),
 					},
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					'percent' => {
-						'few' => q({0}%),
-						'name' => q(проценат),
-						'one' => q({0}%),
-						'other' => q({0}%),
-					},
-					'permille' => {
-						'few' => q({0}‰),
-						'name' => q(промил),
-						'one' => q({0}‰),
-						'other' => q({0}‰),
-					},
-					'petabyte' => {
-						'few' => q({0} PB),
-						'name' => q(PB),
-						'one' => q({0} PB),
-						'other' => q({0} PB),
-					},
-					'picometer' => {
-						'few' => q({0} pm),
+					# Long Unit Identifier
+					'length-picometer' => {
+						'few' => q({0} пикометра),
 						'name' => q(пикометри),
-						'one' => q({0} pm),
-						'other' => q({0} pm),
+						'one' => q({0} пикометар),
+						'other' => q({0} пикометара),
 					},
-					'pint' => {
+					# Core Unit Identifier
+					'picometer' => {
+						'few' => q({0} пикометра),
+						'name' => q(пикометри),
+						'one' => q({0} пикометар),
+						'other' => q({0} пикометара),
+					},
+					# Long Unit Identifier
+					'length-point' => {
 						'few' => q({0} pt),
 						'name' => q(pt),
 						'one' => q({0} pt),
 						'other' => q({0} pt),
 					},
-					'pint-metric' => {
-						'few' => q({0} mpt),
-						'name' => q(mpt),
-						'one' => q({0} mpt),
-						'other' => q({0} mpt),
-					},
+					# Core Unit Identifier
 					'point' => {
 						'few' => q({0} pt),
 						'name' => q(pt),
 						'one' => q({0} pt),
 						'other' => q({0} pt),
 					},
+					# Long Unit Identifier
+					'length-solar-radius' => {
+						'few' => q({0} сунчева полупречника),
+						'name' => q(сунчеви полупречници),
+						'one' => q({0} сунчев полупречник),
+						'other' => q({0} сунчевих полупречника),
+					},
+					# Core Unit Identifier
+					'solar-radius' => {
+						'few' => q({0} сунчева полупречника),
+						'name' => q(сунчеви полупречници),
+						'one' => q({0} сунчев полупречник),
+						'other' => q({0} сунчевих полупречника),
+					},
+					# Long Unit Identifier
+					'length-yard' => {
+						'few' => q({0} јарда),
+						'name' => q(јарди),
+						'one' => q({0} јард),
+						'other' => q({0} јарди),
+					},
+					# Core Unit Identifier
+					'yard' => {
+						'few' => q({0} јарда),
+						'name' => q(јарди),
+						'one' => q({0} јард),
+						'other' => q({0} јарди),
+					},
+					# Long Unit Identifier
+					'light-candela' => {
+						'1' => q(feminine),
+						'few' => q({0} канделе),
+						'name' => q(кандела),
+						'one' => q({0} кандела),
+						'other' => q({0} кандела),
+					},
+					# Core Unit Identifier
+					'candela' => {
+						'1' => q(feminine),
+						'few' => q({0} канделе),
+						'name' => q(кандела),
+						'one' => q({0} кандела),
+						'other' => q({0} кандела),
+					},
+					# Long Unit Identifier
+					'light-lumen' => {
+						'1' => q(inanimate),
+						'few' => q({0} лумена),
+						'name' => q(лумен),
+						'one' => q({0} лумен),
+						'other' => q({0} лумена),
+					},
+					# Core Unit Identifier
+					'lumen' => {
+						'1' => q(inanimate),
+						'few' => q({0} лумена),
+						'name' => q(лумен),
+						'one' => q({0} лумен),
+						'other' => q({0} лумена),
+					},
+					# Long Unit Identifier
+					'light-lux' => {
+						'1' => q(inanimate),
+						'few' => q({0} лукса),
+						'name' => q(лукс),
+						'one' => q({0} лукс),
+						'other' => q({0} лукса),
+					},
+					# Core Unit Identifier
+					'lux' => {
+						'1' => q(inanimate),
+						'few' => q({0} лукса),
+						'name' => q(лукс),
+						'one' => q({0} лукс),
+						'other' => q({0} лукса),
+					},
+					# Long Unit Identifier
+					'mass-carat' => {
+						'1' => q(inanimate),
+						'few' => q({0} карата),
+						'name' => q(карати),
+						'one' => q({0} карат),
+						'other' => q({0} карата),
+					},
+					# Core Unit Identifier
+					'carat' => {
+						'1' => q(inanimate),
+						'few' => q({0} карата),
+						'name' => q(карати),
+						'one' => q({0} карат),
+						'other' => q({0} карата),
+					},
+					# Long Unit Identifier
+					'mass-dalton' => {
+						'few' => q({0} далтона),
+						'name' => q(далтони),
+						'one' => q({0} далтон),
+						'other' => q({0} далтона),
+					},
+					# Core Unit Identifier
+					'dalton' => {
+						'few' => q({0} далтона),
+						'name' => q(далтони),
+						'one' => q({0} далтон),
+						'other' => q({0} далтона),
+					},
+					# Long Unit Identifier
+					'mass-earth-mass' => {
+						'few' => q({0} масе земље),
+						'name' => q(масе земље),
+						'one' => q({0} маса земље),
+						'other' => q({0} маса земље),
+					},
+					# Core Unit Identifier
+					'earth-mass' => {
+						'few' => q({0} масе земље),
+						'name' => q(масе земље),
+						'one' => q({0} маса земље),
+						'other' => q({0} маса земље),
+					},
+					# Long Unit Identifier
+					'mass-grain' => {
+						'few' => q({0} грејна),
+						'name' => q(грејн),
+						'one' => q({0} грејн),
+						'other' => q({0} грејна),
+					},
+					# Core Unit Identifier
+					'grain' => {
+						'few' => q({0} грејна),
+						'name' => q(грејн),
+						'one' => q({0} грејн),
+						'other' => q({0} грејна),
+					},
+					# Long Unit Identifier
+					'mass-gram' => {
+						'1' => q(inanimate),
+						'few' => q({0} грама),
+						'name' => q(грами),
+						'one' => q({0} грам),
+						'other' => q({0} грама),
+						'per' => q({0} по граму),
+					},
+					# Core Unit Identifier
+					'gram' => {
+						'1' => q(inanimate),
+						'few' => q({0} грама),
+						'name' => q(грами),
+						'one' => q({0} грам),
+						'other' => q({0} грама),
+						'per' => q({0} по граму),
+					},
+					# Long Unit Identifier
+					'mass-kilogram' => {
+						'1' => q(inanimate),
+						'few' => q({0} килограма),
+						'name' => q(килограми),
+						'one' => q({0} килограм),
+						'other' => q({0} килограма),
+						'per' => q({0} по килограму),
+					},
+					# Core Unit Identifier
+					'kilogram' => {
+						'1' => q(inanimate),
+						'few' => q({0} килограма),
+						'name' => q(килограми),
+						'one' => q({0} килограм),
+						'other' => q({0} килограма),
+						'per' => q({0} по килограму),
+					},
+					# Long Unit Identifier
+					'mass-metric-ton' => {
+						'1' => q(feminine),
+						'few' => q({0} метричке тоне),
+						'name' => q(метричке тоне),
+						'one' => q({0} метричка тона),
+						'other' => q({0} метричких тона),
+					},
+					# Core Unit Identifier
+					'metric-ton' => {
+						'1' => q(feminine),
+						'few' => q({0} метричке тоне),
+						'name' => q(метричке тоне),
+						'one' => q({0} метричка тона),
+						'other' => q({0} метричких тона),
+					},
+					# Long Unit Identifier
+					'mass-microgram' => {
+						'few' => q({0} микрограма),
+						'name' => q(микрограми),
+						'one' => q({0} микрограм),
+						'other' => q({0} микрограма),
+					},
+					# Core Unit Identifier
+					'microgram' => {
+						'few' => q({0} микрограма),
+						'name' => q(микрограми),
+						'one' => q({0} микрограм),
+						'other' => q({0} микрограма),
+					},
+					# Long Unit Identifier
+					'mass-milligram' => {
+						'few' => q({0} милиграма),
+						'name' => q(милиграми),
+						'one' => q({0} милиграм),
+						'other' => q({0} милиграма),
+					},
+					# Core Unit Identifier
+					'milligram' => {
+						'few' => q({0} милиграма),
+						'name' => q(милиграми),
+						'one' => q({0} милиграм),
+						'other' => q({0} милиграма),
+					},
+					# Long Unit Identifier
+					'mass-ounce' => {
+						'few' => q({0} унце),
+						'name' => q(унце),
+						'one' => q({0} унца),
+						'other' => q({0} унци),
+						'per' => q({0} по унци),
+					},
+					# Core Unit Identifier
+					'ounce' => {
+						'few' => q({0} унце),
+						'name' => q(унце),
+						'one' => q({0} унца),
+						'other' => q({0} унци),
+						'per' => q({0} по унци),
+					},
+					# Long Unit Identifier
+					'mass-ounce-troy' => {
+						'few' => q({0} фине унце),
+						'name' => q(фине унце),
+						'one' => q({0} фина унца),
+						'other' => q({0} финих унци),
+					},
+					# Core Unit Identifier
+					'ounce-troy' => {
+						'few' => q({0} фине унце),
+						'name' => q(фине унце),
+						'one' => q({0} фина унца),
+						'other' => q({0} финих унци),
+					},
+					# Long Unit Identifier
+					'mass-pound' => {
+						'few' => q({0} фунте),
+						'name' => q(фунте),
+						'one' => q({0} фунта),
+						'other' => q({0} фунти),
+						'per' => q({0} по фунти),
+					},
+					# Core Unit Identifier
 					'pound' => {
+						'few' => q({0} фунте),
+						'name' => q(фунте),
+						'one' => q({0} фунта),
+						'other' => q({0} фунти),
+						'per' => q({0} по фунти),
+					},
+					# Long Unit Identifier
+					'mass-solar-mass' => {
+						'few' => q({0} масе сунца),
+						'name' => q(масе сунца),
+						'one' => q({0} маса сунца),
+						'other' => q({0} маса сунца),
+					},
+					# Core Unit Identifier
+					'solar-mass' => {
+						'few' => q({0} масе сунца),
+						'name' => q(масе сунца),
+						'one' => q({0} маса сунца),
+						'other' => q({0} маса сунца),
+					},
+					# Long Unit Identifier
+					'mass-stone' => {
+						'few' => q({0} америчке тоне),
+						'name' => q(америчке тоне),
+						'one' => q({0} америчка тона),
+						'other' => q({0} америчких тона),
+					},
+					# Core Unit Identifier
+					'stone' => {
+						'few' => q({0} америчке тоне),
+						'name' => q(америчке тоне),
+						'one' => q({0} америчка тона),
+						'other' => q({0} америчких тона),
+					},
+					# Long Unit Identifier
+					'mass-ton' => {
+						'few' => q({0} тоне),
+						'name' => q(тоне),
+						'one' => q({0} тона),
+						'other' => q({0} тона),
+					},
+					# Core Unit Identifier
+					'ton' => {
+						'few' => q({0} тоне),
+						'name' => q(тоне),
+						'one' => q({0} тона),
+						'other' => q({0} тона),
+					},
+					# Long Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Core Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Long Unit Identifier
+					'power-gigawatt' => {
+						'few' => q({0} гигавата),
+						'name' => q(гигавати),
+						'one' => q({0} гигават),
+						'other' => q({0} гигавати),
+					},
+					# Core Unit Identifier
+					'gigawatt' => {
+						'few' => q({0} гигавата),
+						'name' => q(гигавати),
+						'one' => q({0} гигават),
+						'other' => q({0} гигавати),
+					},
+					# Long Unit Identifier
+					'power-horsepower' => {
+						'few' => q({0} коњске снаге),
+						'name' => q(коњске снаге),
+						'one' => q({0} коњска снага),
+						'other' => q({0} коњских снага),
+					},
+					# Core Unit Identifier
+					'horsepower' => {
+						'few' => q({0} коњске снаге),
+						'name' => q(коњске снаге),
+						'one' => q({0} коњска снага),
+						'other' => q({0} коњских снага),
+					},
+					# Long Unit Identifier
+					'power-kilowatt' => {
+						'few' => q({0} киловата),
+						'name' => q(киловати),
+						'one' => q({0} киловат),
+						'other' => q({0} киловати),
+					},
+					# Core Unit Identifier
+					'kilowatt' => {
+						'few' => q({0} киловата),
+						'name' => q(киловати),
+						'one' => q({0} киловат),
+						'other' => q({0} киловати),
+					},
+					# Long Unit Identifier
+					'power-megawatt' => {
+						'few' => q({0} мегавата),
+						'name' => q(мегавати),
+						'one' => q({0} мегават),
+						'other' => q({0} мегавати),
+					},
+					# Core Unit Identifier
+					'megawatt' => {
+						'few' => q({0} мегавата),
+						'name' => q(мегавати),
+						'one' => q({0} мегават),
+						'other' => q({0} мегавати),
+					},
+					# Long Unit Identifier
+					'power-milliwatt' => {
+						'few' => q({0} миливата),
+						'name' => q(миливати),
+						'one' => q({0} миливат),
+						'other' => q({0} миливати),
+					},
+					# Core Unit Identifier
+					'milliwatt' => {
+						'few' => q({0} миливата),
+						'name' => q(миливати),
+						'one' => q({0} миливат),
+						'other' => q({0} миливати),
+					},
+					# Long Unit Identifier
+					'power-watt' => {
+						'1' => q(inanimate),
+						'few' => q({0} вата),
+						'name' => q(вати),
+						'one' => q({0} ват),
+						'other' => q({0} вати),
+					},
+					# Core Unit Identifier
+					'watt' => {
+						'1' => q(inanimate),
+						'few' => q({0} вата),
+						'name' => q(вати),
+						'one' => q({0} ват),
+						'other' => q({0} вати),
+					},
+					# Long Unit Identifier
+					'power2' => {
+						'1' => q(квадратни {0}),
+						'few' => q(квадратна {0}),
+						'one' => q(квадратни {0}),
+						'other' => q(квадратних {0}),
+					},
+					# Core Unit Identifier
+					'power2' => {
+						'1' => q(квадратни {0}),
+						'few' => q(квадратна {0}),
+						'one' => q(квадратни {0}),
+						'other' => q(квадратних {0}),
+					},
+					# Long Unit Identifier
+					'power3' => {
+						'1' => q(кубни {0}),
+						'few' => q(кубна {0}),
+						'one' => q(кубни {0}),
+						'other' => q(кубних {0}),
+					},
+					# Core Unit Identifier
+					'power3' => {
+						'1' => q(кубни {0}),
+						'few' => q(кубна {0}),
+						'one' => q(кубни {0}),
+						'other' => q(кубних {0}),
+					},
+					# Long Unit Identifier
+					'pressure-atmosphere' => {
+						'1' => q(feminine),
+						'few' => q({0} атмосфере),
+						'name' => q(атмосфере),
+						'one' => q({0} атмосфера),
+						'other' => q({0} атмосфера),
+					},
+					# Core Unit Identifier
+					'atmosphere' => {
+						'1' => q(feminine),
+						'few' => q({0} атмосфере),
+						'name' => q(атмосфере),
+						'one' => q({0} атмосфера),
+						'other' => q({0} атмосфера),
+					},
+					# Long Unit Identifier
+					'pressure-bar' => {
+						'1' => q(inanimate),
+						'few' => q({0} бара),
+						'name' => q(бари),
+						'one' => q({0} бар),
+						'other' => q({0} бара),
+					},
+					# Core Unit Identifier
+					'bar' => {
+						'1' => q(inanimate),
+						'few' => q({0} бара),
+						'name' => q(бари),
+						'one' => q({0} бар),
+						'other' => q({0} бара),
+					},
+					# Long Unit Identifier
+					'pressure-hectopascal' => {
+						'few' => q({0} хектопаскала),
+						'name' => q(хектопаскали),
+						'one' => q({0} хектопаскал),
+						'other' => q({0} хектопаскала),
+					},
+					# Core Unit Identifier
+					'hectopascal' => {
+						'few' => q({0} хектопаскала),
+						'name' => q(хектопаскали),
+						'one' => q({0} хектопаскал),
+						'other' => q({0} хектопаскала),
+					},
+					# Long Unit Identifier
+					'pressure-inch-ofhg' => {
+						'few' => q({0} инча живиног стуба),
+						'name' => q(инчи живиног стуба),
+						'one' => q({0} инч живиног стуба),
+						'other' => q({0} инча живиног стуба),
+					},
+					# Core Unit Identifier
+					'inch-ofhg' => {
+						'few' => q({0} инча живиног стуба),
+						'name' => q(инчи живиног стуба),
+						'one' => q({0} инч живиног стуба),
+						'other' => q({0} инча живиног стуба),
+					},
+					# Long Unit Identifier
+					'pressure-kilopascal' => {
+						'few' => q({0} килопаскала),
+						'name' => q(килопаскали),
+						'one' => q({0} килопаскал),
+						'other' => q({0} килопаскала),
+					},
+					# Core Unit Identifier
+					'kilopascal' => {
+						'few' => q({0} килопаскала),
+						'name' => q(килопаскали),
+						'one' => q({0} килопаскал),
+						'other' => q({0} килопаскала),
+					},
+					# Long Unit Identifier
+					'pressure-megapascal' => {
+						'few' => q({0} мегапаскала),
+						'name' => q(мегапаскали),
+						'one' => q({0} мегапаскал),
+						'other' => q({0} мегапаскала),
+					},
+					# Core Unit Identifier
+					'megapascal' => {
+						'few' => q({0} мегапаскала),
+						'name' => q(мегапаскали),
+						'one' => q({0} мегапаскал),
+						'other' => q({0} мегапаскала),
+					},
+					# Long Unit Identifier
+					'pressure-millibar' => {
+						'few' => q({0} милибара),
+						'name' => q(милибари),
+						'one' => q({0} милибар),
+						'other' => q({0} милибара),
+					},
+					# Core Unit Identifier
+					'millibar' => {
+						'few' => q({0} милибара),
+						'name' => q(милибари),
+						'one' => q({0} милибар),
+						'other' => q({0} милибара),
+					},
+					# Long Unit Identifier
+					'pressure-millimeter-ofhg' => {
+						'few' => q({0} милиметра живиног стуба),
+						'name' => q(милиметри живиног стуба),
+						'one' => q({0} милиметар живиног стуба),
+						'other' => q({0} милиметара живиног стуба),
+					},
+					# Core Unit Identifier
+					'millimeter-ofhg' => {
+						'few' => q({0} милиметра живиног стуба),
+						'name' => q(милиметри живиног стуба),
+						'one' => q({0} милиметар живиног стуба),
+						'other' => q({0} милиметара живиног стуба),
+					},
+					# Long Unit Identifier
+					'pressure-pascal' => {
+						'1' => q(inanimate),
+						'few' => q({0} паскала),
+						'name' => q(паскали),
+						'one' => q({0} паскал),
+						'other' => q({0} паскала),
+					},
+					# Core Unit Identifier
+					'pascal' => {
+						'1' => q(inanimate),
+						'few' => q({0} паскала),
+						'name' => q(паскали),
+						'one' => q({0} паскал),
+						'other' => q({0} паскала),
+					},
+					# Long Unit Identifier
+					'pressure-pound-force-per-square-inch' => {
+						'few' => q({0} фунте по квадратном инчу),
+						'name' => q(фунте по квадратном инчу),
+						'one' => q({0} фунта по квадратном инчу),
+						'other' => q({0} фунти по квадратном инчу),
+					},
+					# Core Unit Identifier
+					'pound-force-per-square-inch' => {
+						'few' => q({0} фунте по квадратном инчу),
+						'name' => q(фунте по квадратном инчу),
+						'one' => q({0} фунта по квадратном инчу),
+						'other' => q({0} фунти по квадратном инчу),
+					},
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'few' => q({0} километра на сат),
+						'name' => q(километри на сат),
+						'one' => q({0} километар на сат),
+						'other' => q({0} километара на сат),
+					},
+					# Core Unit Identifier
+					'kilometer-per-hour' => {
+						'few' => q({0} километра на сат),
+						'name' => q(километри на сат),
+						'one' => q({0} километар на сат),
+						'other' => q({0} километара на сат),
+					},
+					# Long Unit Identifier
+					'speed-knot' => {
+						'few' => q({0} чвора),
+						'name' => q(чвор),
+						'one' => q({0} чвор),
+						'other' => q({0} чворова),
+					},
+					# Core Unit Identifier
+					'knot' => {
+						'few' => q({0} чвора),
+						'name' => q(чвор),
+						'one' => q({0} чвор),
+						'other' => q({0} чворова),
+					},
+					# Long Unit Identifier
+					'speed-meter-per-second' => {
+						'few' => q({0} метра у секунди),
+						'name' => q(метри у секунди),
+						'one' => q({0} метар у секунди),
+						'other' => q({0} метара у секунди),
+					},
+					# Core Unit Identifier
+					'meter-per-second' => {
+						'few' => q({0} метра у секунди),
+						'name' => q(метри у секунди),
+						'one' => q({0} метар у секунди),
+						'other' => q({0} метара у секунди),
+					},
+					# Long Unit Identifier
+					'speed-mile-per-hour' => {
+						'few' => q({0} миље на сат),
+						'name' => q(миље на сат),
+						'one' => q({0} миља на сат),
+						'other' => q({0} миља на сат),
+					},
+					# Core Unit Identifier
+					'mile-per-hour' => {
+						'few' => q({0} миље на сат),
+						'name' => q(миље на сат),
+						'one' => q({0} миља на сат),
+						'other' => q({0} миља на сат),
+					},
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'1' => q(inanimate),
+						'few' => q({0} степена Целзијуса),
+						'name' => q(степени Целзијуса),
+						'one' => q({0} степен Целзијуса),
+						'other' => q({0} степени Целзијуса),
+					},
+					# Core Unit Identifier
+					'celsius' => {
+						'1' => q(inanimate),
+						'few' => q({0} степена Целзијуса),
+						'name' => q(степени Целзијуса),
+						'one' => q({0} степен Целзијуса),
+						'other' => q({0} степени Целзијуса),
+					},
+					# Long Unit Identifier
+					'temperature-fahrenheit' => {
+						'few' => q({0} степена Фаренхајта),
+						'name' => q(степени Фаренхајта),
+						'one' => q({0} степен Фаренхајта),
+						'other' => q({0} степени Фаренхајта),
+					},
+					# Core Unit Identifier
+					'fahrenheit' => {
+						'few' => q({0} степена Фаренхајта),
+						'name' => q(степени Фаренхајта),
+						'one' => q({0} степен Фаренхајта),
+						'other' => q({0} степени Фаренхајта),
+					},
+					# Long Unit Identifier
+					'temperature-generic' => {
+						'1' => q(inanimate),
+						'few' => q({0}°),
+						'name' => q(°),
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Core Unit Identifier
+					'generic' => {
+						'1' => q(inanimate),
+						'few' => q({0}°),
+						'name' => q(°),
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Long Unit Identifier
+					'temperature-kelvin' => {
+						'1' => q(inanimate),
+						'few' => q({0} келвина),
+						'name' => q(келвин),
+						'one' => q({0} келвин),
+						'other' => q({0} келвина),
+					},
+					# Core Unit Identifier
+					'kelvin' => {
+						'1' => q(inanimate),
+						'few' => q({0} келвина),
+						'name' => q(келвин),
+						'one' => q({0} келвин),
+						'other' => q({0} келвина),
+					},
+					# Long Unit Identifier
+					'times' => {
+						'1' => q({0}-{1}),
+					},
+					# Core Unit Identifier
+					'times' => {
+						'1' => q({0}-{1}),
+					},
+					# Long Unit Identifier
+					'torque-newton-meter' => {
+						'few' => q({0} њутн-метра),
+						'name' => q(њутн-метри),
+						'one' => q({0} њутн-метар),
+						'other' => q({0} њутн-метара),
+					},
+					# Core Unit Identifier
+					'newton-meter' => {
+						'few' => q({0} њутн-метра),
+						'name' => q(њутн-метри),
+						'one' => q({0} њутн-метар),
+						'other' => q({0} њутн-метара),
+					},
+					# Long Unit Identifier
+					'torque-pound-force-foot' => {
+						'few' => q({0} фунте силе стопе),
+						'name' => q(фунта-стопе),
+						'one' => q({0} фунта силе стопе),
+						'other' => q({0} фунти силе стопе),
+					},
+					# Core Unit Identifier
+					'pound-force-foot' => {
+						'few' => q({0} фунте силе стопе),
+						'name' => q(фунта-стопе),
+						'one' => q({0} фунта силе стопе),
+						'other' => q({0} фунти силе стопе),
+					},
+					# Long Unit Identifier
+					'volume-acre-foot' => {
+						'few' => q({0} акер стопе),
+						'name' => q(акер стопе),
+						'one' => q({0} акер стопа),
+						'other' => q({0} акер стопа),
+					},
+					# Core Unit Identifier
+					'acre-foot' => {
+						'few' => q({0} акер стопе),
+						'name' => q(акер стопе),
+						'one' => q({0} акер стопа),
+						'other' => q({0} акер стопа),
+					},
+					# Long Unit Identifier
+					'volume-barrel' => {
+						'few' => q({0} барела),
+						'name' => q(барели),
+						'one' => q({0} барел),
+						'other' => q({0} барела),
+					},
+					# Core Unit Identifier
+					'barrel' => {
+						'few' => q({0} барела),
+						'name' => q(барели),
+						'one' => q({0} барел),
+						'other' => q({0} барела),
+					},
+					# Long Unit Identifier
+					'volume-bushel' => {
+						'few' => q({0} бушела),
+						'name' => q(бушели),
+						'one' => q({0} бушел),
+						'other' => q({0} бушела),
+					},
+					# Core Unit Identifier
+					'bushel' => {
+						'few' => q({0} бушела),
+						'name' => q(бушели),
+						'one' => q({0} бушел),
+						'other' => q({0} бушела),
+					},
+					# Long Unit Identifier
+					'volume-centiliter' => {
+						'few' => q({0} центилитра),
+						'name' => q(центилитри),
+						'one' => q({0} центилитар),
+						'other' => q({0} центилитара),
+					},
+					# Core Unit Identifier
+					'centiliter' => {
+						'few' => q({0} центилитра),
+						'name' => q(центилитри),
+						'one' => q({0} центилитар),
+						'other' => q({0} центилитара),
+					},
+					# Long Unit Identifier
+					'volume-cubic-centimeter' => {
+						'few' => q({0} кубна центиметра),
+						'name' => q(кубни центиметри),
+						'one' => q({0} кубни центиметар),
+						'other' => q({0} кубних центиметара),
+						'per' => q({0}/cm³),
+					},
+					# Core Unit Identifier
+					'cubic-centimeter' => {
+						'few' => q({0} кубна центиметра),
+						'name' => q(кубни центиметри),
+						'one' => q({0} кубни центиметар),
+						'other' => q({0} кубних центиметара),
+						'per' => q({0}/cm³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-foot' => {
+						'few' => q({0} кубне стопе),
+						'name' => q(кубне стопе),
+						'one' => q({0} кубна стопа),
+						'other' => q({0} кубних стопа),
+					},
+					# Core Unit Identifier
+					'cubic-foot' => {
+						'few' => q({0} кубне стопе),
+						'name' => q(кубне стопе),
+						'one' => q({0} кубна стопа),
+						'other' => q({0} кубних стопа),
+					},
+					# Long Unit Identifier
+					'volume-cubic-inch' => {
+						'few' => q({0} кубна инча),
+						'name' => q(кубни инчи),
+						'one' => q({0} кубни инч),
+						'other' => q({0} кубних инча),
+					},
+					# Core Unit Identifier
+					'cubic-inch' => {
+						'few' => q({0} кубна инча),
+						'name' => q(кубни инчи),
+						'one' => q({0} кубни инч),
+						'other' => q({0} кубних инча),
+					},
+					# Long Unit Identifier
+					'volume-cubic-kilometer' => {
+						'few' => q({0} кубна километра),
+						'name' => q(кубни километри),
+						'one' => q({0} кубни километар),
+						'other' => q({0} кубних километара),
+					},
+					# Core Unit Identifier
+					'cubic-kilometer' => {
+						'few' => q({0} кубна километра),
+						'name' => q(кубни километри),
+						'one' => q({0} кубни километар),
+						'other' => q({0} кубних километара),
+					},
+					# Long Unit Identifier
+					'volume-cubic-meter' => {
+						'few' => q({0} кубна метра),
+						'name' => q(кубни метри),
+						'one' => q({0} кубни метар),
+						'other' => q({0} кубних метара),
+						'per' => q({0}/m³),
+					},
+					# Core Unit Identifier
+					'cubic-meter' => {
+						'few' => q({0} кубна метра),
+						'name' => q(кубни метри),
+						'one' => q({0} кубни метар),
+						'other' => q({0} кубних метара),
+						'per' => q({0}/m³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-mile' => {
+						'few' => q({0} кубне миље),
+						'name' => q(кубне миље),
+						'one' => q({0} кубна миља),
+						'other' => q({0} кубних миља),
+					},
+					# Core Unit Identifier
+					'cubic-mile' => {
+						'few' => q({0} кубне миље),
+						'name' => q(кубне миље),
+						'one' => q({0} кубна миља),
+						'other' => q({0} кубних миља),
+					},
+					# Long Unit Identifier
+					'volume-cubic-yard' => {
+						'few' => q({0} кубна јарда),
+						'name' => q(кубни јарди),
+						'one' => q({0} кубни јард),
+						'other' => q({0} кубних јарди),
+					},
+					# Core Unit Identifier
+					'cubic-yard' => {
+						'few' => q({0} кубна јарда),
+						'name' => q(кубни јарди),
+						'one' => q({0} кубни јард),
+						'other' => q({0} кубних јарди),
+					},
+					# Long Unit Identifier
+					'volume-cup' => {
+						'few' => q({0} шоље),
+						'name' => q(шоље),
+						'one' => q({0} шоља),
+						'other' => q({0} шоља),
+					},
+					# Core Unit Identifier
+					'cup' => {
+						'few' => q({0} шоље),
+						'name' => q(шоље),
+						'one' => q({0} шоља),
+						'other' => q({0} шоља),
+					},
+					# Long Unit Identifier
+					'volume-cup-metric' => {
+						'1' => q(feminine),
+						'few' => q({0} метричке шоље),
+						'name' => q(метричка шоља),
+						'one' => q({0} метричка шоља),
+						'other' => q({0} метричких шоља),
+					},
+					# Core Unit Identifier
+					'cup-metric' => {
+						'1' => q(feminine),
+						'few' => q({0} метричке шоље),
+						'name' => q(метричка шоља),
+						'one' => q({0} метричка шоља),
+						'other' => q({0} метричких шоља),
+					},
+					# Long Unit Identifier
+					'volume-deciliter' => {
+						'few' => q({0} децилитра),
+						'name' => q(децилитри),
+						'one' => q({0} децилитар),
+						'other' => q({0} децилитара),
+					},
+					# Core Unit Identifier
+					'deciliter' => {
+						'few' => q({0} децилитра),
+						'name' => q(децилитри),
+						'one' => q({0} децилитар),
+						'other' => q({0} децилитара),
+					},
+					# Long Unit Identifier
+					'volume-dessert-spoon' => {
+						'few' => q({0} десертне кашичице),
+						'name' => q(десертна кашичица),
+						'one' => q({0} десертна кашичица),
+						'other' => q({0} десертних кашичица),
+					},
+					# Core Unit Identifier
+					'dessert-spoon' => {
+						'few' => q({0} десертне кашичице),
+						'name' => q(десертна кашичица),
+						'one' => q({0} десертна кашичица),
+						'other' => q({0} десертних кашичица),
+					},
+					# Long Unit Identifier
+					'volume-dessert-spoon-imperial' => {
+						'few' => q({0} империјске десертне кашичице),
+						'name' => q(империјска десертна кашичица),
+						'one' => q({0} империјска десертна кашичица),
+						'other' => q({0} империјских десертних кашичица),
+					},
+					# Core Unit Identifier
+					'dessert-spoon-imperial' => {
+						'few' => q({0} империјске десертне кашичице),
+						'name' => q(империјска десертна кашичица),
+						'one' => q({0} империјска десертна кашичица),
+						'other' => q({0} империјских десертних кашичица),
+					},
+					# Long Unit Identifier
+					'volume-dram' => {
+						'few' => q({0} драма течности),
+						'name' => q(драм течности),
+						'one' => q({0} драм течности),
+						'other' => q({0} драма течности),
+					},
+					# Core Unit Identifier
+					'dram' => {
+						'few' => q({0} драма течности),
+						'name' => q(драм течности),
+						'one' => q({0} драм течности),
+						'other' => q({0} драма течности),
+					},
+					# Long Unit Identifier
+					'volume-drop' => {
+						'few' => q({0} капи),
+						'name' => q(кап),
+						'one' => q({0} кап),
+						'other' => q({0} капи),
+					},
+					# Core Unit Identifier
+					'drop' => {
+						'few' => q({0} капи),
+						'name' => q(кап),
+						'one' => q({0} кап),
+						'other' => q({0} капи),
+					},
+					# Long Unit Identifier
+					'volume-fluid-ounce' => {
+						'few' => q({0} унце течности),
+						'name' => q(унце течности),
+						'one' => q({0} унца течности),
+						'other' => q({0} унци течности),
+					},
+					# Core Unit Identifier
+					'fluid-ounce' => {
+						'few' => q({0} унце течности),
+						'name' => q(унце течности),
+						'one' => q({0} унца течности),
+						'other' => q({0} унци течности),
+					},
+					# Long Unit Identifier
+					'volume-fluid-ounce-imperial' => {
+						'few' => q({0} империјске унце течности),
+						'name' => q(империјске унце течности),
+						'one' => q({0} империјска унца течности),
+						'other' => q({0} империјских унци течности),
+					},
+					# Core Unit Identifier
+					'fluid-ounce-imperial' => {
+						'few' => q({0} империјске унце течности),
+						'name' => q(империјске унце течности),
+						'one' => q({0} империјска унца течности),
+						'other' => q({0} империјских унци течности),
+					},
+					# Long Unit Identifier
+					'volume-gallon' => {
+						'few' => q({0} галона),
+						'name' => q(галони),
+						'one' => q({0} галон),
+						'other' => q({0} галона),
+						'per' => q({0} по галону),
+					},
+					# Core Unit Identifier
+					'gallon' => {
+						'few' => q({0} галона),
+						'name' => q(галони),
+						'one' => q({0} галон),
+						'other' => q({0} галона),
+						'per' => q({0} по галону),
+					},
+					# Long Unit Identifier
+					'volume-gallon-imperial' => {
+						'few' => q({0} имп. галона),
+						'name' => q(империјални галон),
+						'one' => q({0} имп. галон),
+						'other' => q({0} имп. галона),
+						'per' => q({0} по имп. галону),
+					},
+					# Core Unit Identifier
+					'gallon-imperial' => {
+						'few' => q({0} имп. галона),
+						'name' => q(империјални галон),
+						'one' => q({0} имп. галон),
+						'other' => q({0} имп. галона),
+						'per' => q({0} по имп. галону),
+					},
+					# Long Unit Identifier
+					'volume-hectoliter' => {
+						'few' => q({0} хектолитра),
+						'name' => q(хектолитри),
+						'one' => q({0} хектолитар),
+						'other' => q({0} хектолитара),
+					},
+					# Core Unit Identifier
+					'hectoliter' => {
+						'few' => q({0} хектолитра),
+						'name' => q(хектолитри),
+						'one' => q({0} хектолитар),
+						'other' => q({0} хектолитара),
+					},
+					# Long Unit Identifier
+					'volume-jigger' => {
+						'few' => q({0} џигера),
+						'name' => q(џигер),
+						'one' => q({0} џигер),
+						'other' => q({0} џигера),
+					},
+					# Core Unit Identifier
+					'jigger' => {
+						'few' => q({0} џигера),
+						'name' => q(џигер),
+						'one' => q({0} џигер),
+						'other' => q({0} џигера),
+					},
+					# Long Unit Identifier
+					'volume-liter' => {
+						'1' => q(inanimate),
+						'few' => q({0} литра),
+						'name' => q(литри),
+						'one' => q({0} литар),
+						'other' => q({0} литара),
+						'per' => q({0} по литри),
+					},
+					# Core Unit Identifier
+					'liter' => {
+						'1' => q(inanimate),
+						'few' => q({0} литра),
+						'name' => q(литри),
+						'one' => q({0} литар),
+						'other' => q({0} литара),
+						'per' => q({0} по литри),
+					},
+					# Long Unit Identifier
+					'volume-megaliter' => {
+						'few' => q({0} мегалитра),
+						'name' => q(мегалитри),
+						'one' => q({0} мегалитар),
+						'other' => q({0} мегалитара),
+					},
+					# Core Unit Identifier
+					'megaliter' => {
+						'few' => q({0} мегалитра),
+						'name' => q(мегалитри),
+						'one' => q({0} мегалитар),
+						'other' => q({0} мегалитара),
+					},
+					# Long Unit Identifier
+					'volume-milliliter' => {
+						'few' => q({0} милилитра),
+						'name' => q(милилитри),
+						'one' => q({0} милилитар),
+						'other' => q({0} милилитара),
+					},
+					# Core Unit Identifier
+					'milliliter' => {
+						'few' => q({0} милилитра),
+						'name' => q(милилитри),
+						'one' => q({0} милилитар),
+						'other' => q({0} милилитара),
+					},
+					# Long Unit Identifier
+					'volume-pinch' => {
+						'few' => q({0} прстохвата),
+						'name' => q(прстохват),
+						'one' => q({0} прстохват),
+						'other' => q({0} прстохвата),
+					},
+					# Core Unit Identifier
+					'pinch' => {
+						'few' => q({0} прстохвата),
+						'name' => q(прстохват),
+						'one' => q({0} прстохват),
+						'other' => q({0} прстохвата),
+					},
+					# Long Unit Identifier
+					'volume-pint' => {
+						'few' => q({0} пинте),
+						'name' => q(пинте),
+						'one' => q({0} пинта),
+						'other' => q({0} пинти),
+					},
+					# Core Unit Identifier
+					'pint' => {
+						'few' => q({0} пинте),
+						'name' => q(пинте),
+						'one' => q({0} пинта),
+						'other' => q({0} пинти),
+					},
+					# Long Unit Identifier
+					'volume-pint-metric' => {
+						'1' => q(feminine),
+						'few' => q({0} метричке пинте),
+						'name' => q(метричке пинте),
+						'one' => q({0} метричка пинта),
+						'other' => q({0} метричких пинти),
+					},
+					# Core Unit Identifier
+					'pint-metric' => {
+						'1' => q(feminine),
+						'few' => q({0} метричке пинте),
+						'name' => q(метричке пинте),
+						'one' => q({0} метричка пинта),
+						'other' => q({0} метричких пинти),
+					},
+					# Long Unit Identifier
+					'volume-quart' => {
+						'few' => q({0} кварта),
+						'name' => q(кварти),
+						'one' => q({0} кварат),
+						'other' => q({0} кварата),
+					},
+					# Core Unit Identifier
+					'quart' => {
+						'few' => q({0} кварта),
+						'name' => q(кварти),
+						'one' => q({0} кварат),
+						'other' => q({0} кварата),
+					},
+					# Long Unit Identifier
+					'volume-quart-imperial' => {
+						'few' => q({0} империјске четвртине),
+						'name' => q(империјска четвртина),
+						'one' => q({0} империјска четвртина),
+						'other' => q({0} империјских четвртина),
+					},
+					# Core Unit Identifier
+					'quart-imperial' => {
+						'few' => q({0} империјске четвртине),
+						'name' => q(империјска четвртина),
+						'one' => q({0} империјска четвртина),
+						'other' => q({0} империјских четвртина),
+					},
+					# Long Unit Identifier
+					'volume-tablespoon' => {
+						'few' => q({0} кашике),
+						'name' => q(кашике),
+						'one' => q({0} кашика),
+						'other' => q({0} кашика),
+					},
+					# Core Unit Identifier
+					'tablespoon' => {
+						'few' => q({0} кашике),
+						'name' => q(кашике),
+						'one' => q({0} кашика),
+						'other' => q({0} кашика),
+					},
+					# Long Unit Identifier
+					'volume-teaspoon' => {
+						'few' => q({0} кашичице),
+						'name' => q(кашичице),
+						'one' => q({0} кашичица),
+						'other' => q({0} кашичица),
+					},
+					# Core Unit Identifier
+					'teaspoon' => {
+						'few' => q({0} кашичице),
+						'name' => q(кашичице),
+						'one' => q({0} кашичица),
+						'other' => q({0} кашичица),
+					},
+				},
+				'narrow' => {
+					# Long Unit Identifier
+					'' => {
+						'name' => q(правац),
+					},
+					# Core Unit Identifier
+					'' => {
+						'name' => q(правац),
+					},
+					# Long Unit Identifier
+					'acceleration-g-force' => {
+						'few' => q({0} G),
+						'one' => q({0} G),
+						'other' => q({0} G),
+					},
+					# Core Unit Identifier
+					'g-force' => {
+						'few' => q({0} G),
+						'one' => q({0} G),
+						'other' => q({0} G),
+					},
+					# Long Unit Identifier
+					'angle-arc-minute' => {
+						'few' => q({0}′),
+						'one' => q({0}′),
+						'other' => q({0}′),
+					},
+					# Core Unit Identifier
+					'arc-minute' => {
+						'few' => q({0}′),
+						'one' => q({0}′),
+						'other' => q({0}′),
+					},
+					# Long Unit Identifier
+					'angle-arc-second' => {
+						'few' => q({0}″),
+						'one' => q({0}″),
+						'other' => q({0}″),
+					},
+					# Core Unit Identifier
+					'arc-second' => {
+						'few' => q({0}″),
+						'one' => q({0}″),
+						'other' => q({0}″),
+					},
+					# Long Unit Identifier
+					'angle-degree' => {
+						'few' => q({0}°),
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Core Unit Identifier
+					'degree' => {
+						'few' => q({0}°),
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Long Unit Identifier
+					'area-acre' => {
+						'few' => q({0} ac),
+						'one' => q({0} ac),
+						'other' => q({0} ac),
+					},
+					# Core Unit Identifier
+					'acre' => {
+						'few' => q({0} ac),
+						'one' => q({0} ac),
+						'other' => q({0} ac),
+					},
+					# Long Unit Identifier
+					'area-hectare' => {
+						'few' => q({0} ha),
+						'one' => q({0} ha),
+						'other' => q({0} ha),
+					},
+					# Core Unit Identifier
+					'hectare' => {
+						'few' => q({0} ha),
+						'one' => q({0} ha),
+						'other' => q({0} ha),
+					},
+					# Long Unit Identifier
+					'area-square-foot' => {
+						'few' => q({0} ft²),
+						'one' => q({0} ft²),
+						'other' => q({0} ft²),
+					},
+					# Core Unit Identifier
+					'square-foot' => {
+						'few' => q({0} ft²),
+						'one' => q({0} ft²),
+						'other' => q({0} ft²),
+					},
+					# Long Unit Identifier
+					'area-square-kilometer' => {
+						'few' => q({0} km²),
+						'one' => q({0} km²),
+						'other' => q({0} km²),
+					},
+					# Core Unit Identifier
+					'square-kilometer' => {
+						'few' => q({0} km²),
+						'one' => q({0} km²),
+						'other' => q({0} km²),
+					},
+					# Long Unit Identifier
+					'area-square-meter' => {
+						'few' => q({0} m²),
+						'one' => q({0} m²),
+						'other' => q({0} m²),
+					},
+					# Core Unit Identifier
+					'square-meter' => {
+						'few' => q({0} m²),
+						'one' => q({0} m²),
+						'other' => q({0} m²),
+					},
+					# Long Unit Identifier
+					'area-square-mile' => {
+						'few' => q({0} mi²),
+						'one' => q({0} mi²),
+						'other' => q({0} mi²),
+					},
+					# Core Unit Identifier
+					'square-mile' => {
+						'few' => q({0} mi²),
+						'one' => q({0} mi²),
+						'other' => q({0} mi²),
+					},
+					# Long Unit Identifier
+					'concentr-item' => {
+						'few' => q({0} ставке),
+						'name' => q(ставка),
+						'one' => q({0} ставка),
+						'other' => q({0} ставки),
+					},
+					# Core Unit Identifier
+					'item' => {
+						'few' => q({0} ставке),
+						'name' => q(ставка),
+						'one' => q({0} ставка),
+						'other' => q({0} ставки),
+					},
+					# Long Unit Identifier
+					'concentr-percent' => {
+						'few' => q({0}%),
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					# Core Unit Identifier
+					'percent' => {
+						'few' => q({0}%),
+						'name' => q(%),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-100-kilometer' => {
+						'few' => q({0} L/100km),
+						'name' => q(L/100km),
+						'one' => q({0} L/100km),
+						'other' => q({0} L/100km),
+					},
+					# Core Unit Identifier
+					'liter-per-100-kilometer' => {
+						'few' => q({0} L/100km),
+						'name' => q(L/100km),
+						'one' => q({0} L/100km),
+						'other' => q({0} L/100km),
+					},
+					# Long Unit Identifier
+					'consumption-mile-per-gallon-imperial' => {
+						'few' => q({0} mpg Imp),
+						'name' => q(mpg Imp),
+						'one' => q({0} mpg Imp),
+						'other' => q({0} mpg Imp),
+					},
+					# Core Unit Identifier
+					'mile-per-gallon-imperial' => {
+						'few' => q({0} mpg Imp),
+						'name' => q(mpg Imp),
+						'one' => q({0} mpg Imp),
+						'other' => q({0} mpg Imp),
+					},
+					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0}И),
+						'north' => q({0}С),
+						'south' => q({0}Ј),
+						'west' => q({0}З),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0}И),
+						'north' => q({0}С),
+						'south' => q({0}Ј),
+						'west' => q({0}З),
+					},
+					# Long Unit Identifier
+					'duration-day' => {
+						'few' => q({0} д),
+						'name' => q(д),
+						'one' => q({0} д),
+						'other' => q({0} д),
+					},
+					# Core Unit Identifier
+					'day' => {
+						'few' => q({0} д),
+						'name' => q(д),
+						'one' => q({0} д),
+						'other' => q({0} д),
+					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'few' => q({0} ч),
+						'name' => q(ч),
+						'one' => q({0} ч),
+						'other' => q({0} ч),
+					},
+					# Core Unit Identifier
+					'hour' => {
+						'few' => q({0} ч),
+						'name' => q(ч),
+						'one' => q({0} ч),
+						'other' => q({0} ч),
+					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'few' => q({0} ms),
+						'name' => q(ms),
+						'one' => q({0} ms),
+						'other' => q({0} ms),
+					},
+					# Core Unit Identifier
+					'millisecond' => {
+						'few' => q({0} ms),
+						'name' => q(ms),
+						'one' => q({0} ms),
+						'other' => q({0} ms),
+					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'few' => q({0} м),
+						'name' => q(мин),
+						'one' => q({0} м),
+						'other' => q({0} м),
+					},
+					# Core Unit Identifier
+					'minute' => {
+						'few' => q({0} м),
+						'name' => q(мин),
+						'one' => q({0} м),
+						'other' => q({0} м),
+					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'few' => q({0} м),
+						'name' => q(м.),
+						'one' => q({0} м),
+						'other' => q({0} м),
+					},
+					# Core Unit Identifier
+					'month' => {
+						'few' => q({0} м),
+						'name' => q(м.),
+						'one' => q({0} м),
+						'other' => q({0} м),
+					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'few' => q({0} с),
+						'name' => q(с),
+						'one' => q({0} с),
+						'other' => q({0} с),
+					},
+					# Core Unit Identifier
+					'second' => {
+						'few' => q({0} с),
+						'name' => q(с),
+						'one' => q({0} с),
+						'other' => q({0} с),
+					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'few' => q({0} н),
+						'name' => q(н.),
+						'one' => q({0} н),
+						'other' => q({0} н),
+					},
+					# Core Unit Identifier
+					'week' => {
+						'few' => q({0} н),
+						'name' => q(н.),
+						'one' => q({0} н),
+						'other' => q({0} н),
+					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'few' => q({0} г),
+						'name' => q(г.),
+						'one' => q({0} г),
+						'other' => q({0} г),
+					},
+					# Core Unit Identifier
+					'year' => {
+						'few' => q({0} г),
+						'name' => q(г.),
+						'one' => q({0} г),
+						'other' => q({0} г),
+					},
+					# Long Unit Identifier
+					'length-centimeter' => {
+						'few' => q({0} cm),
+						'name' => q(cm),
+						'one' => q({0} cm),
+						'other' => q({0} cm),
+					},
+					# Core Unit Identifier
+					'centimeter' => {
+						'few' => q({0} cm),
+						'name' => q(cm),
+						'one' => q({0} cm),
+						'other' => q({0} cm),
+					},
+					# Long Unit Identifier
+					'length-foot' => {
+						'few' => q({0} ft),
+						'name' => q(ft),
+						'one' => q({0} ft),
+						'other' => q({0} ft),
+					},
+					# Core Unit Identifier
+					'foot' => {
+						'few' => q({0} ft),
+						'name' => q(ft),
+						'one' => q({0} ft),
+						'other' => q({0} ft),
+					},
+					# Long Unit Identifier
+					'length-inch' => {
+						'few' => q({0} in),
+						'name' => q(in),
+						'one' => q({0} in),
+						'other' => q({0} in),
+					},
+					# Core Unit Identifier
+					'inch' => {
+						'few' => q({0} in),
+						'name' => q(in),
+						'one' => q({0} in),
+						'other' => q({0} in),
+					},
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'few' => q({0} km),
+						'name' => q(km),
+						'one' => q({0} km),
+						'other' => q({0} km),
+					},
+					# Core Unit Identifier
+					'kilometer' => {
+						'few' => q({0} km),
+						'name' => q(km),
+						'one' => q({0} km),
+						'other' => q({0} km),
+					},
+					# Long Unit Identifier
+					'length-light-year' => {
+						'few' => q({0} ly),
+						'one' => q({0} ly),
+						'other' => q({0} ly),
+					},
+					# Core Unit Identifier
+					'light-year' => {
+						'few' => q({0} ly),
+						'one' => q({0} ly),
+						'other' => q({0} ly),
+					},
+					# Long Unit Identifier
+					'length-meter' => {
+						'few' => q({0} m),
+						'name' => q(m),
+						'one' => q({0} m),
+						'other' => q({0} m),
+					},
+					# Core Unit Identifier
+					'meter' => {
+						'few' => q({0} m),
+						'name' => q(m),
+						'one' => q({0} m),
+						'other' => q({0} m),
+					},
+					# Long Unit Identifier
+					'length-mile' => {
+						'few' => q({0} миље),
+						'one' => q({0} миља),
+						'other' => q({0} миља),
+					},
+					# Core Unit Identifier
+					'mile' => {
+						'few' => q({0} миље),
+						'one' => q({0} миља),
+						'other' => q({0} миља),
+					},
+					# Long Unit Identifier
+					'length-millimeter' => {
+						'few' => q({0} mm),
+						'name' => q(mm),
+						'one' => q({0} mm),
+						'other' => q({0} mm),
+					},
+					# Core Unit Identifier
+					'millimeter' => {
+						'few' => q({0} mm),
+						'name' => q(mm),
+						'one' => q({0} mm),
+						'other' => q({0} mm),
+					},
+					# Long Unit Identifier
+					'length-picometer' => {
+						'few' => q({0} pm),
+						'one' => q({0} pm),
+						'other' => q({0} pm),
+					},
+					# Core Unit Identifier
+					'picometer' => {
+						'few' => q({0} pm),
+						'one' => q({0} pm),
+						'other' => q({0} pm),
+					},
+					# Long Unit Identifier
+					'length-yard' => {
+						'few' => q({0} yd),
+						'name' => q(yd),
+						'one' => q({0} yd),
+						'other' => q({0} yd),
+					},
+					# Core Unit Identifier
+					'yard' => {
+						'few' => q({0} yd),
+						'name' => q(yd),
+						'one' => q({0} yd),
+						'other' => q({0} yd),
+					},
+					# Long Unit Identifier
+					'mass-gram' => {
+						'few' => q({0} g),
+						'name' => q(g),
+						'one' => q({0} g),
+						'other' => q({0} g),
+					},
+					# Core Unit Identifier
+					'gram' => {
+						'few' => q({0} g),
+						'name' => q(g),
+						'one' => q({0} g),
+						'other' => q({0} g),
+					},
+					# Long Unit Identifier
+					'mass-kilogram' => {
+						'few' => q({0} kg),
+						'name' => q(kg),
+						'one' => q({0} kg),
+						'other' => q({0} kg),
+					},
+					# Core Unit Identifier
+					'kilogram' => {
+						'few' => q({0} kg),
+						'name' => q(kg),
+						'one' => q({0} kg),
+						'other' => q({0} kg),
+					},
+					# Long Unit Identifier
+					'mass-ounce' => {
+						'few' => q({0} унце),
+						'one' => q({0} унца),
+						'other' => q({0} унци),
+					},
+					# Core Unit Identifier
+					'ounce' => {
+						'few' => q({0} унце),
+						'one' => q({0} унца),
+						'other' => q({0} унци),
+					},
+					# Long Unit Identifier
+					'mass-pound' => {
 						'few' => q({0} lb),
-						'name' => q(lb),
 						'one' => q({0} lb),
 						'other' => q({0} lb),
-						'per' => q({0}/lb),
 					},
-					'pound-per-square-inch' => {
-						'few' => q({0} psi),
-						'name' => q(psi),
-						'one' => q({0} psi),
-						'other' => q({0} psi),
+					# Core Unit Identifier
+					'pound' => {
+						'few' => q({0} lb),
+						'one' => q({0} lb),
+						'other' => q({0} lb),
 					},
-					'quart' => {
-						'few' => q({0} qt),
-						'name' => q(qt),
-						'one' => q({0} qt),
-						'other' => q({0} qt),
+					# Long Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
 					},
+					# Core Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Long Unit Identifier
+					'power-horsepower' => {
+						'few' => q({0} кс),
+						'one' => q({0} кс),
+						'other' => q({0} кс),
+					},
+					# Core Unit Identifier
+					'horsepower' => {
+						'few' => q({0} кс),
+						'one' => q({0} кс),
+						'other' => q({0} кс),
+					},
+					# Long Unit Identifier
+					'power-kilowatt' => {
+						'few' => q({0} kW),
+						'one' => q({0} kW),
+						'other' => q({0} kW),
+					},
+					# Core Unit Identifier
+					'kilowatt' => {
+						'few' => q({0} kW),
+						'one' => q({0} kW),
+						'other' => q({0} kW),
+					},
+					# Long Unit Identifier
+					'power-watt' => {
+						'few' => q({0} W),
+						'one' => q({0} W),
+						'other' => q({0} W),
+					},
+					# Core Unit Identifier
+					'watt' => {
+						'few' => q({0} W),
+						'one' => q({0} W),
+						'other' => q({0} W),
+					},
+					# Long Unit Identifier
+					'power2' => {
+						'few' => q({0}²),
+						'one' => q({0}²),
+						'other' => q({0}²),
+					},
+					# Core Unit Identifier
+					'power2' => {
+						'few' => q({0}²),
+						'one' => q({0}²),
+						'other' => q({0}²),
+					},
+					# Long Unit Identifier
+					'pressure-hectopascal' => {
+						'few' => q({0} hPa),
+						'one' => q({0} hPa),
+						'other' => q({0} hPa),
+					},
+					# Core Unit Identifier
+					'hectopascal' => {
+						'few' => q({0} hPa),
+						'one' => q({0} hPa),
+						'other' => q({0} hPa),
+					},
+					# Long Unit Identifier
+					'pressure-inch-ofhg' => {
+						'few' => q({0} inHg),
+						'one' => q({0} inHg),
+						'other' => q({0} inHg),
+					},
+					# Core Unit Identifier
+					'inch-ofhg' => {
+						'few' => q({0} inHg),
+						'one' => q({0} inHg),
+						'other' => q({0} inHg),
+					},
+					# Long Unit Identifier
+					'pressure-millibar' => {
+						'few' => q({0} mbar),
+						'one' => q({0} mbar),
+						'other' => q({0} mbar),
+					},
+					# Core Unit Identifier
+					'millibar' => {
+						'few' => q({0} mbar),
+						'one' => q({0} mbar),
+						'other' => q({0} mbar),
+					},
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'few' => q({0} km/h),
+						'name' => q(km/h),
+						'one' => q({0} km/h),
+						'other' => q({0} km/h),
+					},
+					# Core Unit Identifier
+					'kilometer-per-hour' => {
+						'few' => q({0} km/h),
+						'name' => q(km/h),
+						'one' => q({0} km/h),
+						'other' => q({0} km/h),
+					},
+					# Long Unit Identifier
+					'speed-meter-per-second' => {
+						'few' => q({0} m/s),
+						'one' => q({0} m/s),
+						'other' => q({0} m/s),
+					},
+					# Core Unit Identifier
+					'meter-per-second' => {
+						'few' => q({0} m/s),
+						'one' => q({0} m/s),
+						'other' => q({0} m/s),
+					},
+					# Long Unit Identifier
+					'speed-mile-per-hour' => {
+						'few' => q({0} mi/h),
+						'one' => q({0} mi/h),
+						'other' => q({0} mi/h),
+					},
+					# Core Unit Identifier
+					'mile-per-hour' => {
+						'few' => q({0} mi/h),
+						'one' => q({0} mi/h),
+						'other' => q({0} mi/h),
+					},
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'few' => q({0}°C),
+						'name' => q(°C),
+						'one' => q({0}°C),
+						'other' => q({0}°C),
+					},
+					# Core Unit Identifier
+					'celsius' => {
+						'few' => q({0}°C),
+						'name' => q(°C),
+						'one' => q({0}°C),
+						'other' => q({0}°C),
+					},
+					# Long Unit Identifier
+					'temperature-fahrenheit' => {
+						'few' => q({0}°F),
+						'one' => q({0}°F),
+						'other' => q({0}°F),
+					},
+					# Core Unit Identifier
+					'fahrenheit' => {
+						'few' => q({0}°F),
+						'one' => q({0}°F),
+						'other' => q({0}°F),
+					},
+					# Long Unit Identifier
+					'times' => {
+						'1' => q({0}⋅{1}),
+					},
+					# Core Unit Identifier
+					'times' => {
+						'1' => q({0}⋅{1}),
+					},
+					# Long Unit Identifier
+					'volume-cubic-kilometer' => {
+						'few' => q({0} km³),
+						'one' => q({0} km³),
+						'other' => q({0} km³),
+					},
+					# Core Unit Identifier
+					'cubic-kilometer' => {
+						'few' => q({0} km³),
+						'one' => q({0} km³),
+						'other' => q({0} km³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-mile' => {
+						'few' => q({0} mi³),
+						'one' => q({0} mi³),
+						'other' => q({0} mi³),
+					},
+					# Core Unit Identifier
+					'cubic-mile' => {
+						'few' => q({0} mi³),
+						'one' => q({0} mi³),
+						'other' => q({0} mi³),
+					},
+					# Long Unit Identifier
+					'volume-dessert-spoon-imperial' => {
+						'few' => q({0} dstspn Imp),
+						'one' => q({0} dstspn Imp),
+						'other' => q({0}dsp-Imp),
+					},
+					# Core Unit Identifier
+					'dessert-spoon-imperial' => {
+						'few' => q({0} dstspn Imp),
+						'one' => q({0} dstspn Imp),
+						'other' => q({0}dsp-Imp),
+					},
+					# Long Unit Identifier
+					'volume-fluid-ounce-imperial' => {
+						'few' => q({0} fl oz Imp),
+						'name' => q(Imp fl oz),
+						'one' => q({0} fl oz Imp),
+						'other' => q({0} fl oz Imp),
+					},
+					# Core Unit Identifier
+					'fluid-ounce-imperial' => {
+						'few' => q({0} fl oz Imp),
+						'name' => q(Imp fl oz),
+						'one' => q({0} fl oz Imp),
+						'other' => q({0} fl oz Imp),
+					},
+					# Long Unit Identifier
+					'volume-gallon-imperial' => {
+						'few' => q({0}/gal Imp),
+						'name' => q(Imp gal),
+						'one' => q({0}/gal Imp),
+						'other' => q({0}/gal Imp),
+						'per' => q({0}/gal Imp),
+					},
+					# Core Unit Identifier
+					'gallon-imperial' => {
+						'few' => q({0}/gal Imp),
+						'name' => q(Imp gal),
+						'one' => q({0}/gal Imp),
+						'other' => q({0}/gal Imp),
+						'per' => q({0}/gal Imp),
+					},
+					# Long Unit Identifier
+					'volume-liter' => {
+						'few' => q({0} l),
+						'name' => q(l),
+						'one' => q({0} l),
+						'other' => q({0} l),
+					},
+					# Core Unit Identifier
+					'liter' => {
+						'few' => q({0} l),
+						'name' => q(l),
+						'one' => q({0} l),
+						'other' => q({0} l),
+					},
+					# Long Unit Identifier
+					'volume-pinch' => {
+						'few' => q({0} pn),
+						'one' => q({0} pn),
+						'other' => q({0} pn),
+					},
+					# Core Unit Identifier
+					'pinch' => {
+						'few' => q({0} pn),
+						'one' => q({0} pn),
+						'other' => q({0} pn),
+					},
+					# Long Unit Identifier
+					'volume-quart-imperial' => {
+						'few' => q({0} qt Imp),
+						'one' => q({0} qt Imp),
+						'other' => q({0} qt Imp),
+					},
+					# Core Unit Identifier
+					'quart-imperial' => {
+						'few' => q({0} qt Imp),
+						'one' => q({0} qt Imp),
+						'other' => q({0} qt Imp),
+					},
+				},
+				'short' => {
+					# Long Unit Identifier
+					'' => {
+						'name' => q(правац),
+					},
+					# Core Unit Identifier
+					'' => {
+						'name' => q(правац),
+					},
+					# Long Unit Identifier
+					'acceleration-g-force' => {
+						'few' => q({0} G),
+						'name' => q(ге сила),
+						'one' => q({0} G),
+						'other' => q({0} G),
+					},
+					# Core Unit Identifier
+					'g-force' => {
+						'few' => q({0} G),
+						'name' => q(ге сила),
+						'one' => q({0} G),
+						'other' => q({0} G),
+					},
+					# Long Unit Identifier
+					'acceleration-meter-per-square-second' => {
+						'few' => q({0} m/s²),
+						'name' => q(m/s²),
+						'one' => q({0} m/s²),
+						'other' => q({0} m/s²),
+					},
+					# Core Unit Identifier
+					'meter-per-square-second' => {
+						'few' => q({0} m/s²),
+						'name' => q(m/s²),
+						'one' => q({0} m/s²),
+						'other' => q({0} m/s²),
+					},
+					# Long Unit Identifier
+					'angle-arc-minute' => {
+						'few' => q({0}′),
+						'name' => q(лучни мин),
+						'one' => q({0}′),
+						'other' => q({0}′),
+					},
+					# Core Unit Identifier
+					'arc-minute' => {
+						'few' => q({0}′),
+						'name' => q(лучни мин),
+						'one' => q({0}′),
+						'other' => q({0}′),
+					},
+					# Long Unit Identifier
+					'angle-arc-second' => {
+						'few' => q({0}″),
+						'name' => q(лучне сек),
+						'one' => q({0}″),
+						'other' => q({0}″),
+					},
+					# Core Unit Identifier
+					'arc-second' => {
+						'few' => q({0}″),
+						'name' => q(лучне сек),
+						'one' => q({0}″),
+						'other' => q({0}″),
+					},
+					# Long Unit Identifier
+					'angle-degree' => {
+						'few' => q({0}°),
+						'name' => q(степени),
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Core Unit Identifier
+					'degree' => {
+						'few' => q({0}°),
+						'name' => q(степени),
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Long Unit Identifier
+					'angle-radian' => {
+						'few' => q({0} rad),
+						'name' => q(rad),
+						'one' => q({0} rad),
+						'other' => q({0} rad),
+					},
+					# Core Unit Identifier
 					'radian' => {
 						'few' => q({0} rad),
 						'name' => q(rad),
 						'one' => q({0} rad),
 						'other' => q({0} rad),
 					},
+					# Long Unit Identifier
+					'angle-revolution' => {
+						'few' => q({0} rev),
+						'name' => q(rev),
+						'one' => q({0} rev),
+						'other' => q({0} rev),
+					},
+					# Core Unit Identifier
 					'revolution' => {
 						'few' => q({0} rev),
 						'name' => q(rev),
 						'one' => q({0} rev),
 						'other' => q({0} rev),
 					},
-					'second' => {
-						'few' => q({0} сек),
-						'name' => q(сек),
-						'one' => q({0} сек),
-						'other' => q({0} сек),
-						'per' => q({0}/с),
+					# Long Unit Identifier
+					'area-acre' => {
+						'few' => q({0} ac),
+						'name' => q(акери),
+						'one' => q({0} ac),
+						'other' => q({0} ac),
 					},
+					# Core Unit Identifier
+					'acre' => {
+						'few' => q({0} ac),
+						'name' => q(акери),
+						'one' => q({0} ac),
+						'other' => q({0} ac),
+					},
+					# Long Unit Identifier
+					'area-dunam' => {
+						'few' => q({0} дунама),
+						'name' => q(дунами),
+						'one' => q({0} дунам),
+						'other' => q({0} дунама),
+					},
+					# Core Unit Identifier
+					'dunam' => {
+						'few' => q({0} дунама),
+						'name' => q(дунами),
+						'one' => q({0} дунам),
+						'other' => q({0} дунама),
+					},
+					# Long Unit Identifier
+					'area-hectare' => {
+						'few' => q({0} ha),
+						'name' => q(хектари),
+						'one' => q({0} ha),
+						'other' => q({0} ha),
+					},
+					# Core Unit Identifier
+					'hectare' => {
+						'few' => q({0} ha),
+						'name' => q(хектари),
+						'one' => q({0} ha),
+						'other' => q({0} ha),
+					},
+					# Long Unit Identifier
+					'area-square-centimeter' => {
+						'few' => q({0} cm²),
+						'name' => q(cm²),
+						'one' => q({0} cm²),
+						'other' => q({0} cm²),
+						'per' => q({0}/cm²),
+					},
+					# Core Unit Identifier
 					'square-centimeter' => {
 						'few' => q({0} cm²),
 						'name' => q(cm²),
@@ -3984,12 +5936,29 @@ has 'units' => (
 						'other' => q({0} cm²),
 						'per' => q({0}/cm²),
 					},
+					# Long Unit Identifier
+					'area-square-foot' => {
+						'few' => q({0} ft²),
+						'name' => q(квадратне стопе),
+						'one' => q({0} ft²),
+						'other' => q({0} ft²),
+					},
+					# Core Unit Identifier
 					'square-foot' => {
 						'few' => q({0} ft²),
 						'name' => q(квадратне стопе),
 						'one' => q({0} ft²),
 						'other' => q({0} ft²),
 					},
+					# Long Unit Identifier
+					'area-square-inch' => {
+						'few' => q({0} in²),
+						'name' => q(in²),
+						'one' => q({0} in²),
+						'other' => q({0} in²),
+						'per' => q({0}/in²),
+					},
+					# Core Unit Identifier
 					'square-inch' => {
 						'few' => q({0} in²),
 						'name' => q(in²),
@@ -3997,6 +5966,15 @@ has 'units' => (
 						'other' => q({0} in²),
 						'per' => q({0}/in²),
 					},
+					# Long Unit Identifier
+					'area-square-kilometer' => {
+						'few' => q({0} km²),
+						'name' => q(квадратни километри),
+						'one' => q({0} km²),
+						'other' => q({0} km²),
+						'per' => q({0}/km²),
+					},
+					# Core Unit Identifier
 					'square-kilometer' => {
 						'few' => q({0} km²),
 						'name' => q(квадратни километри),
@@ -4004,6 +5982,15 @@ has 'units' => (
 						'other' => q({0} km²),
 						'per' => q({0}/km²),
 					},
+					# Long Unit Identifier
+					'area-square-meter' => {
+						'few' => q({0} m²),
+						'name' => q(квадратни метри),
+						'one' => q({0} m²),
+						'other' => q({0} m²),
+						'per' => q({0}/m²),
+					},
+					# Core Unit Identifier
 					'square-meter' => {
 						'few' => q({0} m²),
 						'name' => q(квадратни метри),
@@ -4011,6 +5998,15 @@ has 'units' => (
 						'other' => q({0} m²),
 						'per' => q({0}/m²),
 					},
+					# Long Unit Identifier
+					'area-square-mile' => {
+						'few' => q({0} mi²),
+						'name' => q(mi²),
+						'one' => q({0} mi²),
+						'other' => q({0} mi²),
+						'per' => q({0}/mi²),
+					},
+					# Core Unit Identifier
 					'square-mile' => {
 						'few' => q({0} mi²),
 						'name' => q(mi²),
@@ -4018,54 +6014,501 @@ has 'units' => (
 						'other' => q({0} mi²),
 						'per' => q({0}/mi²),
 					},
+					# Long Unit Identifier
+					'area-square-yard' => {
+						'few' => q({0} yd²),
+						'name' => q(yd²),
+						'one' => q({0} yd²),
+						'other' => q({0} yd²),
+					},
+					# Core Unit Identifier
 					'square-yard' => {
 						'few' => q({0} yd²),
 						'name' => q(yd²),
 						'one' => q({0} yd²),
 						'other' => q({0} yd²),
 					},
-					'tablespoon' => {
-						'few' => q({0} каш.),
-						'name' => q(каш.),
-						'one' => q({0} каш.),
-						'other' => q({0} каш.),
+					# Long Unit Identifier
+					'concentr-item' => {
+						'few' => q({0} ставке),
+						'name' => q(ставка),
+						'one' => q({0} ставка),
+						'other' => q({0} ставки),
 					},
-					'teaspoon' => {
-						'few' => q({0} кашич.),
-						'name' => q(кашич.),
-						'one' => q({0} кашич.),
-						'other' => q({0} кашич.),
+					# Core Unit Identifier
+					'item' => {
+						'few' => q({0} ставке),
+						'name' => q(ставка),
+						'one' => q({0} ставка),
+						'other' => q({0} ставки),
 					},
+					# Long Unit Identifier
+					'concentr-karat' => {
+						'few' => q({0} kt),
+						'name' => q(kt),
+						'one' => q({0} kt),
+						'other' => q({0} kt),
+					},
+					# Core Unit Identifier
+					'karat' => {
+						'few' => q({0} kt),
+						'name' => q(kt),
+						'one' => q({0} kt),
+						'other' => q({0} kt),
+					},
+					# Long Unit Identifier
+					'concentr-milligram-ofglucose-per-deciliter' => {
+						'few' => q({0} mg/dL),
+						'name' => q(mg/dL),
+						'one' => q({0} mg/dL),
+						'other' => q({0} mg/dL),
+					},
+					# Core Unit Identifier
+					'milligram-ofglucose-per-deciliter' => {
+						'few' => q({0} mg/dL),
+						'name' => q(mg/dL),
+						'one' => q({0} mg/dL),
+						'other' => q({0} mg/dL),
+					},
+					# Long Unit Identifier
+					'concentr-millimole-per-liter' => {
+						'few' => q({0} mmol/L),
+						'name' => q(mmol/L),
+						'one' => q({0} mmol/L),
+						'other' => q({0} mmol/L),
+					},
+					# Core Unit Identifier
+					'millimole-per-liter' => {
+						'few' => q({0} mmol/L),
+						'name' => q(mmol/L),
+						'one' => q({0} mmol/L),
+						'other' => q({0} mmol/L),
+					},
+					# Long Unit Identifier
+					'concentr-percent' => {
+						'few' => q({0}%),
+						'name' => q(проценат),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					# Core Unit Identifier
+					'percent' => {
+						'few' => q({0}%),
+						'name' => q(проценат),
+						'one' => q({0}%),
+						'other' => q({0}%),
+					},
+					# Long Unit Identifier
+					'concentr-permille' => {
+						'few' => q({0}‰),
+						'name' => q(промил),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					# Core Unit Identifier
+					'permille' => {
+						'few' => q({0}‰),
+						'name' => q(промил),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					# Long Unit Identifier
+					'concentr-permillion' => {
+						'few' => q({0} ppm),
+						'name' => q(ppm),
+						'one' => q({0} ppm),
+						'other' => q({0} ppm),
+					},
+					# Core Unit Identifier
+					'permillion' => {
+						'few' => q({0} ppm),
+						'name' => q(ppm),
+						'one' => q({0} ppm),
+						'other' => q({0} ppm),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-100-kilometer' => {
+						'few' => q({0} L/100 km),
+						'name' => q(L/100 km),
+						'one' => q({0} L/100 km),
+						'other' => q({0} L/100 km),
+					},
+					# Core Unit Identifier
+					'liter-per-100-kilometer' => {
+						'few' => q({0} L/100 km),
+						'name' => q(L/100 km),
+						'one' => q({0} L/100 km),
+						'other' => q({0} L/100 km),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-kilometer' => {
+						'few' => q({0} L/km),
+						'name' => q(L/km),
+						'one' => q({0} L/km),
+						'other' => q({0} L/km),
+					},
+					# Core Unit Identifier
+					'liter-per-kilometer' => {
+						'few' => q({0} L/km),
+						'name' => q(L/km),
+						'one' => q({0} L/km),
+						'other' => q({0} L/km),
+					},
+					# Long Unit Identifier
+					'consumption-mile-per-gallon' => {
+						'few' => q({0} mpg),
+						'name' => q(mpg),
+						'one' => q({0} mpg),
+						'other' => q({0} mpg),
+					},
+					# Core Unit Identifier
+					'mile-per-gallon' => {
+						'few' => q({0} mpg),
+						'name' => q(mpg),
+						'one' => q({0} mpg),
+						'other' => q({0} mpg),
+					},
+					# Long Unit Identifier
+					'consumption-mile-per-gallon-imperial' => {
+						'few' => q({0} mpg Imp.),
+						'name' => q(mpg Imp.),
+						'one' => q({0} mpg Imp.),
+						'other' => q({0} mpg Imp.),
+					},
+					# Core Unit Identifier
+					'mile-per-gallon-imperial' => {
+						'few' => q({0} mpg Imp.),
+						'name' => q(mpg Imp.),
+						'one' => q({0} mpg Imp.),
+						'other' => q({0} mpg Imp.),
+					},
+					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0}И),
+						'north' => q({0}С),
+						'south' => q({0}Ј),
+						'west' => q({0}З),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0}И),
+						'north' => q({0}С),
+						'south' => q({0}Ј),
+						'west' => q({0}З),
+					},
+					# Long Unit Identifier
+					'digital-bit' => {
+						'few' => q({0} b),
+						'name' => q(бит),
+						'one' => q({0} b),
+						'other' => q({0} b),
+					},
+					# Core Unit Identifier
+					'bit' => {
+						'few' => q({0} b),
+						'name' => q(бит),
+						'one' => q({0} b),
+						'other' => q({0} b),
+					},
+					# Long Unit Identifier
+					'digital-byte' => {
+						'few' => q({0} B),
+						'name' => q(бајт),
+						'one' => q({0} B),
+						'other' => q({0} B),
+					},
+					# Core Unit Identifier
+					'byte' => {
+						'few' => q({0} B),
+						'name' => q(бајт),
+						'one' => q({0} B),
+						'other' => q({0} B),
+					},
+					# Long Unit Identifier
+					'digital-gigabit' => {
+						'few' => q({0} Gb),
+						'name' => q(Gb),
+						'one' => q({0} Gb),
+						'other' => q({0} Gb),
+					},
+					# Core Unit Identifier
+					'gigabit' => {
+						'few' => q({0} Gb),
+						'name' => q(Gb),
+						'one' => q({0} Gb),
+						'other' => q({0} Gb),
+					},
+					# Long Unit Identifier
+					'digital-gigabyte' => {
+						'few' => q({0} GB),
+						'name' => q(GB),
+						'one' => q({0} GB),
+						'other' => q({0} GB),
+					},
+					# Core Unit Identifier
+					'gigabyte' => {
+						'few' => q({0} GB),
+						'name' => q(GB),
+						'one' => q({0} GB),
+						'other' => q({0} GB),
+					},
+					# Long Unit Identifier
+					'digital-kilobit' => {
+						'few' => q({0} kb),
+						'name' => q(kb),
+						'one' => q({0} kb),
+						'other' => q({0} kb),
+					},
+					# Core Unit Identifier
+					'kilobit' => {
+						'few' => q({0} kb),
+						'name' => q(kb),
+						'one' => q({0} kb),
+						'other' => q({0} kb),
+					},
+					# Long Unit Identifier
+					'digital-kilobyte' => {
+						'few' => q({0} kB),
+						'name' => q(kB),
+						'one' => q({0} kB),
+						'other' => q({0} kB),
+					},
+					# Core Unit Identifier
+					'kilobyte' => {
+						'few' => q({0} kB),
+						'name' => q(kB),
+						'one' => q({0} kB),
+						'other' => q({0} kB),
+					},
+					# Long Unit Identifier
+					'digital-megabit' => {
+						'few' => q({0} Mb),
+						'name' => q(Mb),
+						'one' => q({0} Mb),
+						'other' => q({0} Mb),
+					},
+					# Core Unit Identifier
+					'megabit' => {
+						'few' => q({0} Mb),
+						'name' => q(Mb),
+						'one' => q({0} Mb),
+						'other' => q({0} Mb),
+					},
+					# Long Unit Identifier
+					'digital-megabyte' => {
+						'few' => q({0} MB),
+						'name' => q(MB),
+						'one' => q({0} MB),
+						'other' => q({0} MB),
+					},
+					# Core Unit Identifier
+					'megabyte' => {
+						'few' => q({0} MB),
+						'name' => q(MB),
+						'one' => q({0} MB),
+						'other' => q({0} MB),
+					},
+					# Long Unit Identifier
+					'digital-petabyte' => {
+						'few' => q({0} PB),
+						'name' => q(PB),
+						'one' => q({0} PB),
+						'other' => q({0} PB),
+					},
+					# Core Unit Identifier
+					'petabyte' => {
+						'few' => q({0} PB),
+						'name' => q(PB),
+						'one' => q({0} PB),
+						'other' => q({0} PB),
+					},
+					# Long Unit Identifier
+					'digital-terabit' => {
+						'few' => q({0} Tb),
+						'name' => q(Tb),
+						'one' => q({0} Tb),
+						'other' => q({0} Tb),
+					},
+					# Core Unit Identifier
 					'terabit' => {
 						'few' => q({0} Tb),
 						'name' => q(Tb),
 						'one' => q({0} Tb),
 						'other' => q({0} Tb),
 					},
+					# Long Unit Identifier
+					'digital-terabyte' => {
+						'few' => q({0} TB),
+						'name' => q(TB),
+						'one' => q({0} TB),
+						'other' => q({0} TB),
+					},
+					# Core Unit Identifier
 					'terabyte' => {
 						'few' => q({0} TB),
 						'name' => q(TB),
 						'one' => q({0} TB),
 						'other' => q({0} TB),
 					},
-					'ton' => {
-						'few' => q({0} tn),
-						'name' => q(tn),
-						'one' => q({0} tn),
-						'other' => q({0} tn),
+					# Long Unit Identifier
+					'duration-century' => {
+						'few' => q({0} в),
+						'name' => q(в.),
+						'one' => q({0} в),
+						'other' => q({0} в),
 					},
-					'volt' => {
-						'few' => q({0} V),
-						'name' => q(V),
-						'one' => q({0} V),
-						'other' => q({0} V),
+					# Core Unit Identifier
+					'century' => {
+						'few' => q({0} в),
+						'name' => q(в.),
+						'one' => q({0} в),
+						'other' => q({0} в),
 					},
-					'watt' => {
-						'few' => q({0} W),
-						'name' => q(W),
-						'one' => q({0} W),
-						'other' => q({0} W),
+					# Long Unit Identifier
+					'duration-day' => {
+						'few' => q({0} дана),
+						'name' => q(д.),
+						'one' => q({0} дан),
+						'other' => q({0} дана),
+						'per' => q({0}/д),
 					},
+					# Core Unit Identifier
+					'day' => {
+						'few' => q({0} дана),
+						'name' => q(д.),
+						'one' => q({0} дан),
+						'other' => q({0} дана),
+						'per' => q({0}/д),
+					},
+					# Long Unit Identifier
+					'duration-decade' => {
+						'few' => q({0} дец.),
+						'name' => q(дец.),
+						'one' => q({0} дец.),
+						'other' => q({0} дец.),
+					},
+					# Core Unit Identifier
+					'decade' => {
+						'few' => q({0} дец.),
+						'name' => q(дец.),
+						'one' => q({0} дец.),
+						'other' => q({0} дец.),
+					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'few' => q({0} сата),
+						'name' => q(сати),
+						'one' => q({0} сат),
+						'other' => q({0} сати),
+						'per' => q({0}/ч),
+					},
+					# Core Unit Identifier
+					'hour' => {
+						'few' => q({0} сата),
+						'name' => q(сати),
+						'one' => q({0} сат),
+						'other' => q({0} сати),
+						'per' => q({0}/ч),
+					},
+					# Long Unit Identifier
+					'duration-microsecond' => {
+						'few' => q({0} μs),
+						'name' => q(μs),
+						'one' => q({0} μs),
+						'other' => q({0} μs),
+					},
+					# Core Unit Identifier
+					'microsecond' => {
+						'few' => q({0} μs),
+						'name' => q(μs),
+						'one' => q({0} μs),
+						'other' => q({0} μs),
+					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'few' => q({0} ms),
+						'name' => q(ms),
+						'one' => q({0} ms),
+						'other' => q({0} ms),
+					},
+					# Core Unit Identifier
+					'millisecond' => {
+						'few' => q({0} ms),
+						'name' => q(ms),
+						'one' => q({0} ms),
+						'other' => q({0} ms),
+					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'few' => q({0} мин),
+						'name' => q(мин),
+						'one' => q({0} мин),
+						'other' => q({0} мин),
+						'per' => q({0}/мин),
+					},
+					# Core Unit Identifier
+					'minute' => {
+						'few' => q({0} мин),
+						'name' => q(мин),
+						'one' => q({0} мин),
+						'other' => q({0} мин),
+						'per' => q({0}/мин),
+					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'few' => q({0} мес.),
+						'name' => q(месеци),
+						'one' => q({0} мес.),
+						'other' => q({0} мес.),
+						'per' => q({0}/м),
+					},
+					# Core Unit Identifier
+					'month' => {
+						'few' => q({0} мес.),
+						'name' => q(месеци),
+						'one' => q({0} мес.),
+						'other' => q({0} мес.),
+						'per' => q({0}/м),
+					},
+					# Long Unit Identifier
+					'duration-nanosecond' => {
+						'few' => q({0} ns),
+						'name' => q(ns),
+						'one' => q({0} ns),
+						'other' => q({0} ns),
+					},
+					# Core Unit Identifier
+					'nanosecond' => {
+						'few' => q({0} ns),
+						'name' => q(ns),
+						'one' => q({0} ns),
+						'other' => q({0} ns),
+					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'few' => q({0} сек),
+						'name' => q(сек),
+						'one' => q({0} сек),
+						'other' => q({0} сек),
+						'per' => q({0}/с),
+					},
+					# Core Unit Identifier
+					'second' => {
+						'few' => q({0} сек),
+						'name' => q(сек),
+						'one' => q({0} сек),
+						'other' => q({0} сек),
+						'per' => q({0}/с),
+					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'few' => q({0} нед.),
+						'name' => q(нед.),
+						'one' => q({0} нед.),
+						'other' => q({0} нед.),
+						'per' => q({0}/н),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'few' => q({0} нед.),
 						'name' => q(нед.),
@@ -4073,18 +6516,1559 @@ has 'units' => (
 						'other' => q({0} нед.),
 						'per' => q({0}/н),
 					},
-					'yard' => {
-						'few' => q({0} јрд),
-						'name' => q(јарди),
-						'one' => q({0} јрд),
-						'other' => q({0} јрд),
+					# Long Unit Identifier
+					'duration-year' => {
+						'few' => q({0} год.),
+						'name' => q(год.),
+						'one' => q({0} год),
+						'other' => q({0} год.),
+						'per' => q({0}/год),
 					},
+					# Core Unit Identifier
 					'year' => {
 						'few' => q({0} год.),
 						'name' => q(год.),
 						'one' => q({0} год),
 						'other' => q({0} год.),
 						'per' => q({0}/год),
+					},
+					# Long Unit Identifier
+					'electric-ampere' => {
+						'few' => q({0} A),
+						'name' => q(A),
+						'one' => q({0} A),
+						'other' => q({0} A),
+					},
+					# Core Unit Identifier
+					'ampere' => {
+						'few' => q({0} A),
+						'name' => q(A),
+						'one' => q({0} A),
+						'other' => q({0} A),
+					},
+					# Long Unit Identifier
+					'electric-milliampere' => {
+						'few' => q({0} mA),
+						'name' => q(mA),
+						'one' => q({0} mA),
+						'other' => q({0} mA),
+					},
+					# Core Unit Identifier
+					'milliampere' => {
+						'few' => q({0} mA),
+						'name' => q(mA),
+						'one' => q({0} mA),
+						'other' => q({0} mA),
+					},
+					# Long Unit Identifier
+					'electric-ohm' => {
+						'few' => q({0} Ω),
+						'name' => q(Ω),
+						'one' => q({0} Ω),
+						'other' => q({0} Ω),
+					},
+					# Core Unit Identifier
+					'ohm' => {
+						'few' => q({0} Ω),
+						'name' => q(Ω),
+						'one' => q({0} Ω),
+						'other' => q({0} Ω),
+					},
+					# Long Unit Identifier
+					'electric-volt' => {
+						'few' => q({0} V),
+						'name' => q(V),
+						'one' => q({0} V),
+						'other' => q({0} V),
+					},
+					# Core Unit Identifier
+					'volt' => {
+						'few' => q({0} V),
+						'name' => q(V),
+						'one' => q({0} V),
+						'other' => q({0} V),
+					},
+					# Long Unit Identifier
+					'energy-calorie' => {
+						'few' => q({0} cal),
+						'name' => q(cal),
+						'one' => q({0} cal),
+						'other' => q({0} cal),
+					},
+					# Core Unit Identifier
+					'calorie' => {
+						'few' => q({0} cal),
+						'name' => q(cal),
+						'one' => q({0} cal),
+						'other' => q({0} cal),
+					},
+					# Long Unit Identifier
+					'energy-electronvolt' => {
+						'few' => q({0} eV),
+						'name' => q(електронволт),
+						'one' => q({0} eV),
+						'other' => q({0} eV),
+					},
+					# Core Unit Identifier
+					'electronvolt' => {
+						'few' => q({0} eV),
+						'name' => q(електронволт),
+						'one' => q({0} eV),
+						'other' => q({0} eV),
+					},
+					# Long Unit Identifier
+					'energy-foodcalorie' => {
+						'few' => q({0} Cal),
+						'name' => q(Cal),
+						'one' => q({0} Cal),
+						'other' => q({0} Cal),
+					},
+					# Core Unit Identifier
+					'foodcalorie' => {
+						'few' => q({0} Cal),
+						'name' => q(Cal),
+						'one' => q({0} Cal),
+						'other' => q({0} Cal),
+					},
+					# Long Unit Identifier
+					'energy-joule' => {
+						'few' => q({0} J),
+						'name' => q(J),
+						'one' => q({0} J),
+						'other' => q({0} J),
+					},
+					# Core Unit Identifier
+					'joule' => {
+						'few' => q({0} J),
+						'name' => q(J),
+						'one' => q({0} J),
+						'other' => q({0} J),
+					},
+					# Long Unit Identifier
+					'energy-kilocalorie' => {
+						'few' => q({0} kcal),
+						'name' => q(kcal),
+						'one' => q({0} kcal),
+						'other' => q({0} kcal),
+					},
+					# Core Unit Identifier
+					'kilocalorie' => {
+						'few' => q({0} kcal),
+						'name' => q(kcal),
+						'one' => q({0} kcal),
+						'other' => q({0} kcal),
+					},
+					# Long Unit Identifier
+					'energy-kilojoule' => {
+						'few' => q({0} kJ),
+						'name' => q(kJ),
+						'one' => q({0} kJ),
+						'other' => q({0} kJ),
+					},
+					# Core Unit Identifier
+					'kilojoule' => {
+						'few' => q({0} kJ),
+						'name' => q(kJ),
+						'one' => q({0} kJ),
+						'other' => q({0} kJ),
+					},
+					# Long Unit Identifier
+					'energy-kilowatt-hour' => {
+						'few' => q({0} kWh),
+						'name' => q(kWh),
+						'one' => q({0} kWh),
+						'other' => q({0} kWh),
+					},
+					# Core Unit Identifier
+					'kilowatt-hour' => {
+						'few' => q({0} kWh),
+						'name' => q(kWh),
+						'one' => q({0} kWh),
+						'other' => q({0} kWh),
+					},
+					# Long Unit Identifier
+					'energy-therm-us' => {
+						'few' => q({0} US therms),
+						'name' => q(US therm),
+						'one' => q({0} US therm),
+						'other' => q({0} US therms),
+					},
+					# Core Unit Identifier
+					'therm-us' => {
+						'few' => q({0} US therms),
+						'name' => q(US therm),
+						'one' => q({0} US therm),
+						'other' => q({0} US therms),
+					},
+					# Long Unit Identifier
+					'force-newton' => {
+						'name' => q(њутн),
+					},
+					# Core Unit Identifier
+					'newton' => {
+						'name' => q(њутн),
+					},
+					# Long Unit Identifier
+					'frequency-gigahertz' => {
+						'few' => q({0} GHz),
+						'name' => q(GHz),
+						'one' => q({0} GHz),
+						'other' => q({0} GHz),
+					},
+					# Core Unit Identifier
+					'gigahertz' => {
+						'few' => q({0} GHz),
+						'name' => q(GHz),
+						'one' => q({0} GHz),
+						'other' => q({0} GHz),
+					},
+					# Long Unit Identifier
+					'frequency-hertz' => {
+						'few' => q({0} Hz),
+						'name' => q(Hz),
+						'one' => q({0} Hz),
+						'other' => q({0} Hz),
+					},
+					# Core Unit Identifier
+					'hertz' => {
+						'few' => q({0} Hz),
+						'name' => q(Hz),
+						'one' => q({0} Hz),
+						'other' => q({0} Hz),
+					},
+					# Long Unit Identifier
+					'frequency-kilohertz' => {
+						'few' => q({0} kHz),
+						'name' => q(kHz),
+						'one' => q({0} kHz),
+						'other' => q({0} kHz),
+					},
+					# Core Unit Identifier
+					'kilohertz' => {
+						'few' => q({0} kHz),
+						'name' => q(kHz),
+						'one' => q({0} kHz),
+						'other' => q({0} kHz),
+					},
+					# Long Unit Identifier
+					'frequency-megahertz' => {
+						'few' => q({0} MHz),
+						'name' => q(MHz),
+						'one' => q({0} MHz),
+						'other' => q({0} MHz),
+					},
+					# Core Unit Identifier
+					'megahertz' => {
+						'few' => q({0} MHz),
+						'name' => q(MHz),
+						'one' => q({0} MHz),
+						'other' => q({0} MHz),
+					},
+					# Long Unit Identifier
+					'graphics-dot' => {
+						'few' => q({0} тачке),
+						'name' => q(тачка),
+						'one' => q({0} тачка),
+						'other' => q({0} тачака),
+					},
+					# Core Unit Identifier
+					'dot' => {
+						'few' => q({0} тачке),
+						'name' => q(тачка),
+						'one' => q({0} тачка),
+						'other' => q({0} тачака),
+					},
+					# Long Unit Identifier
+					'graphics-dot-per-centimeter' => {
+						'few' => q({0} ppcm),
+						'name' => q(dpcm),
+						'one' => q({0} ppcm),
+						'other' => q({0} dpcm),
+					},
+					# Core Unit Identifier
+					'dot-per-centimeter' => {
+						'few' => q({0} ppcm),
+						'name' => q(dpcm),
+						'one' => q({0} ppcm),
+						'other' => q({0} dpcm),
+					},
+					# Long Unit Identifier
+					'graphics-dot-per-inch' => {
+						'few' => q({0} ppi),
+						'name' => q(dpi),
+						'one' => q({0} ppi),
+						'other' => q({0} dpi),
+					},
+					# Core Unit Identifier
+					'dot-per-inch' => {
+						'few' => q({0} ppi),
+						'name' => q(dpi),
+						'one' => q({0} ppi),
+						'other' => q({0} dpi),
+					},
+					# Long Unit Identifier
+					'graphics-em' => {
+						'few' => q({0} em),
+						'name' => q(em),
+						'one' => q({0} em),
+						'other' => q({0} em),
+					},
+					# Core Unit Identifier
+					'em' => {
+						'few' => q({0} em),
+						'name' => q(em),
+						'one' => q({0} em),
+						'other' => q({0} em),
+					},
+					# Long Unit Identifier
+					'graphics-megapixel' => {
+						'few' => q({0} MP),
+						'name' => q(MP),
+						'one' => q({0} MP),
+						'other' => q({0} MP),
+					},
+					# Core Unit Identifier
+					'megapixel' => {
+						'few' => q({0} MP),
+						'name' => q(MP),
+						'one' => q({0} MP),
+						'other' => q({0} MP),
+					},
+					# Long Unit Identifier
+					'graphics-pixel' => {
+						'few' => q({0} px),
+						'name' => q(px),
+						'one' => q({0} px),
+						'other' => q({0} px),
+					},
+					# Core Unit Identifier
+					'pixel' => {
+						'few' => q({0} px),
+						'name' => q(px),
+						'one' => q({0} px),
+						'other' => q({0} px),
+					},
+					# Long Unit Identifier
+					'graphics-pixel-per-centimeter' => {
+						'few' => q({0} ppcm),
+						'name' => q(ppcm),
+						'one' => q({0} ppcm),
+						'other' => q({0} ppcm),
+					},
+					# Core Unit Identifier
+					'pixel-per-centimeter' => {
+						'few' => q({0} ppcm),
+						'name' => q(ppcm),
+						'one' => q({0} ppcm),
+						'other' => q({0} ppcm),
+					},
+					# Long Unit Identifier
+					'graphics-pixel-per-inch' => {
+						'few' => q({0} ppi),
+						'name' => q(ppi),
+						'one' => q({0} ppi),
+						'other' => q({0} ppi),
+					},
+					# Core Unit Identifier
+					'pixel-per-inch' => {
+						'few' => q({0} ppi),
+						'name' => q(ppi),
+						'one' => q({0} ppi),
+						'other' => q({0} ppi),
+					},
+					# Long Unit Identifier
+					'length-astronomical-unit' => {
+						'few' => q({0} ај),
+						'name' => q(ај),
+						'one' => q({0} ај),
+						'other' => q({0} ај),
+					},
+					# Core Unit Identifier
+					'astronomical-unit' => {
+						'few' => q({0} ај),
+						'name' => q(ај),
+						'one' => q({0} ај),
+						'other' => q({0} ај),
+					},
+					# Long Unit Identifier
+					'length-centimeter' => {
+						'few' => q({0} cm),
+						'name' => q(cm),
+						'one' => q({0} cm),
+						'other' => q({0} cm),
+						'per' => q({0}/cm),
+					},
+					# Core Unit Identifier
+					'centimeter' => {
+						'few' => q({0} cm),
+						'name' => q(cm),
+						'one' => q({0} cm),
+						'other' => q({0} cm),
+						'per' => q({0}/cm),
+					},
+					# Long Unit Identifier
+					'length-decimeter' => {
+						'few' => q({0} dm),
+						'name' => q(dm),
+						'one' => q({0} dm),
+						'other' => q({0} dm),
+					},
+					# Core Unit Identifier
+					'decimeter' => {
+						'few' => q({0} dm),
+						'name' => q(dm),
+						'one' => q({0} dm),
+						'other' => q({0} dm),
+					},
+					# Long Unit Identifier
+					'length-earth-radius' => {
+						'few' => q({0} R⊕),
+						'name' => q(R⊕),
+						'one' => q({0} R⊕),
+						'other' => q({0} R⊕),
+					},
+					# Core Unit Identifier
+					'earth-radius' => {
+						'few' => q({0} R⊕),
+						'name' => q(R⊕),
+						'one' => q({0} R⊕),
+						'other' => q({0} R⊕),
+					},
+					# Long Unit Identifier
+					'length-fathom' => {
+						'few' => q({0} fth),
+						'name' => q(хв),
+						'one' => q({0} fth),
+						'other' => q({0} fth),
+					},
+					# Core Unit Identifier
+					'fathom' => {
+						'few' => q({0} fth),
+						'name' => q(хв),
+						'one' => q({0} fth),
+						'other' => q({0} fth),
+					},
+					# Long Unit Identifier
+					'length-foot' => {
+						'few' => q({0} ft),
+						'name' => q(ft),
+						'one' => q({0} ft),
+						'other' => q({0} ft),
+						'per' => q({0}/ft),
+					},
+					# Core Unit Identifier
+					'foot' => {
+						'few' => q({0} ft),
+						'name' => q(ft),
+						'one' => q({0} ft),
+						'other' => q({0} ft),
+						'per' => q({0}/ft),
+					},
+					# Long Unit Identifier
+					'length-furlong' => {
+						'few' => q({0} fur),
+						'name' => q(фурлонзи),
+						'one' => q({0} fur),
+						'other' => q({0} fur),
+					},
+					# Core Unit Identifier
+					'furlong' => {
+						'few' => q({0} fur),
+						'name' => q(фурлонзи),
+						'one' => q({0} fur),
+						'other' => q({0} fur),
+					},
+					# Long Unit Identifier
+					'length-inch' => {
+						'few' => q({0} инча),
+						'name' => q(инчи),
+						'one' => q({0} инч),
+						'other' => q({0} инча),
+						'per' => q({0}/in),
+					},
+					# Core Unit Identifier
+					'inch' => {
+						'few' => q({0} инча),
+						'name' => q(инчи),
+						'one' => q({0} инч),
+						'other' => q({0} инча),
+						'per' => q({0}/in),
+					},
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'few' => q({0} km),
+						'name' => q(km),
+						'one' => q({0} km),
+						'other' => q({0} km),
+						'per' => q({0}/km),
+					},
+					# Core Unit Identifier
+					'kilometer' => {
+						'few' => q({0} km),
+						'name' => q(km),
+						'one' => q({0} km),
+						'other' => q({0} km),
+						'per' => q({0}/km),
+					},
+					# Long Unit Identifier
+					'length-light-year' => {
+						'few' => q({0} сг),
+						'name' => q(светлосне год.),
+						'one' => q({0} сг),
+						'other' => q({0} сг),
+					},
+					# Core Unit Identifier
+					'light-year' => {
+						'few' => q({0} сг),
+						'name' => q(светлосне год.),
+						'one' => q({0} сг),
+						'other' => q({0} сг),
+					},
+					# Long Unit Identifier
+					'length-meter' => {
+						'few' => q({0} m),
+						'name' => q(m),
+						'one' => q({0} m),
+						'other' => q({0} m),
+						'per' => q({0}/m),
+					},
+					# Core Unit Identifier
+					'meter' => {
+						'few' => q({0} m),
+						'name' => q(m),
+						'one' => q({0} m),
+						'other' => q({0} m),
+						'per' => q({0}/m),
+					},
+					# Long Unit Identifier
+					'length-micrometer' => {
+						'few' => q({0} μm),
+						'name' => q(μm),
+						'one' => q({0} μm),
+						'other' => q({0} μm),
+					},
+					# Core Unit Identifier
+					'micrometer' => {
+						'few' => q({0} μm),
+						'name' => q(μm),
+						'one' => q({0} μm),
+						'other' => q({0} μm),
+					},
+					# Long Unit Identifier
+					'length-mile' => {
+						'few' => q({0} mi),
+						'name' => q(миље),
+						'one' => q({0} mi),
+						'other' => q({0} mi),
+					},
+					# Core Unit Identifier
+					'mile' => {
+						'few' => q({0} mi),
+						'name' => q(миље),
+						'one' => q({0} mi),
+						'other' => q({0} mi),
+					},
+					# Long Unit Identifier
+					'length-mile-scandinavian' => {
+						'few' => q({0} smi),
+						'name' => q(smi),
+						'one' => q({0} smi),
+						'other' => q({0} smi),
+					},
+					# Core Unit Identifier
+					'mile-scandinavian' => {
+						'few' => q({0} smi),
+						'name' => q(smi),
+						'one' => q({0} smi),
+						'other' => q({0} smi),
+					},
+					# Long Unit Identifier
+					'length-millimeter' => {
+						'few' => q({0} mm),
+						'name' => q(mm),
+						'one' => q({0} mm),
+						'other' => q({0} mm),
+					},
+					# Core Unit Identifier
+					'millimeter' => {
+						'few' => q({0} mm),
+						'name' => q(mm),
+						'one' => q({0} mm),
+						'other' => q({0} mm),
+					},
+					# Long Unit Identifier
+					'length-nanometer' => {
+						'few' => q({0} nm),
+						'name' => q(nm),
+						'one' => q({0} nm),
+						'other' => q({0} nm),
+					},
+					# Core Unit Identifier
+					'nanometer' => {
+						'few' => q({0} nm),
+						'name' => q(nm),
+						'one' => q({0} nm),
+						'other' => q({0} nm),
+					},
+					# Long Unit Identifier
+					'length-nautical-mile' => {
+						'few' => q({0} nmi),
+						'name' => q(nmi),
+						'one' => q({0} nmi),
+						'other' => q({0} nmi),
+					},
+					# Core Unit Identifier
+					'nautical-mile' => {
+						'few' => q({0} nmi),
+						'name' => q(nmi),
+						'one' => q({0} nmi),
+						'other' => q({0} nmi),
+					},
+					# Long Unit Identifier
+					'length-parsec' => {
+						'few' => q({0} pc),
+						'name' => q(парсеци),
+						'one' => q({0} pc),
+						'other' => q({0} pc),
+					},
+					# Core Unit Identifier
+					'parsec' => {
+						'few' => q({0} pc),
+						'name' => q(парсеци),
+						'one' => q({0} pc),
+						'other' => q({0} pc),
+					},
+					# Long Unit Identifier
+					'length-picometer' => {
+						'few' => q({0} pm),
+						'name' => q(пикометри),
+						'one' => q({0} pm),
+						'other' => q({0} pm),
+					},
+					# Core Unit Identifier
+					'picometer' => {
+						'few' => q({0} pm),
+						'name' => q(пикометри),
+						'one' => q({0} pm),
+						'other' => q({0} pm),
+					},
+					# Long Unit Identifier
+					'length-point' => {
+						'few' => q({0} pt),
+						'name' => q(pt),
+						'one' => q({0} pt),
+						'other' => q({0} pt),
+					},
+					# Core Unit Identifier
+					'point' => {
+						'few' => q({0} pt),
+						'name' => q(pt),
+						'one' => q({0} pt),
+						'other' => q({0} pt),
+					},
+					# Long Unit Identifier
+					'length-yard' => {
+						'few' => q({0} јрд),
+						'name' => q(јарди),
+						'one' => q({0} јрд),
+						'other' => q({0} јрд),
+					},
+					# Core Unit Identifier
+					'yard' => {
+						'few' => q({0} јрд),
+						'name' => q(јарди),
+						'one' => q({0} јрд),
+						'other' => q({0} јрд),
+					},
+					# Long Unit Identifier
+					'light-lux' => {
+						'few' => q({0} lx),
+						'name' => q(lx),
+						'one' => q({0} lx),
+						'other' => q({0} lx),
+					},
+					# Core Unit Identifier
+					'lux' => {
+						'few' => q({0} lx),
+						'name' => q(lx),
+						'one' => q({0} lx),
+						'other' => q({0} lx),
+					},
+					# Long Unit Identifier
+					'mass-carat' => {
+						'few' => q({0} CD),
+						'name' => q(карати),
+						'one' => q({0} CD),
+						'other' => q({0} CD),
+					},
+					# Core Unit Identifier
+					'carat' => {
+						'few' => q({0} CD),
+						'name' => q(карати),
+						'one' => q({0} CD),
+						'other' => q({0} CD),
+					},
+					# Long Unit Identifier
+					'mass-grain' => {
+						'name' => q(грејн),
+					},
+					# Core Unit Identifier
+					'grain' => {
+						'name' => q(грејн),
+					},
+					# Long Unit Identifier
+					'mass-gram' => {
+						'few' => q({0} g),
+						'name' => q(грами),
+						'one' => q({0} g),
+						'other' => q({0} g),
+						'per' => q({0}/g),
+					},
+					# Core Unit Identifier
+					'gram' => {
+						'few' => q({0} g),
+						'name' => q(грами),
+						'one' => q({0} g),
+						'other' => q({0} g),
+						'per' => q({0}/g),
+					},
+					# Long Unit Identifier
+					'mass-kilogram' => {
+						'few' => q({0} kg),
+						'name' => q(kg),
+						'one' => q({0} kg),
+						'other' => q({0} kg),
+						'per' => q({0}/kg),
+					},
+					# Core Unit Identifier
+					'kilogram' => {
+						'few' => q({0} kg),
+						'name' => q(kg),
+						'one' => q({0} kg),
+						'other' => q({0} kg),
+						'per' => q({0}/kg),
+					},
+					# Long Unit Identifier
+					'mass-metric-ton' => {
+						'few' => q({0} t),
+						'name' => q(t),
+						'one' => q({0} t),
+						'other' => q({0} t),
+					},
+					# Core Unit Identifier
+					'metric-ton' => {
+						'few' => q({0} t),
+						'name' => q(t),
+						'one' => q({0} t),
+						'other' => q({0} t),
+					},
+					# Long Unit Identifier
+					'mass-microgram' => {
+						'few' => q({0} μg),
+						'name' => q(μg),
+						'one' => q({0} μg),
+						'other' => q({0} μg),
+					},
+					# Core Unit Identifier
+					'microgram' => {
+						'few' => q({0} μg),
+						'name' => q(μg),
+						'one' => q({0} μg),
+						'other' => q({0} μg),
+					},
+					# Long Unit Identifier
+					'mass-milligram' => {
+						'few' => q({0} mg),
+						'name' => q(mg),
+						'one' => q({0} mg),
+						'other' => q({0} mg),
+					},
+					# Core Unit Identifier
+					'milligram' => {
+						'few' => q({0} mg),
+						'name' => q(mg),
+						'one' => q({0} mg),
+						'other' => q({0} mg),
+					},
+					# Long Unit Identifier
+					'mass-ounce' => {
+						'few' => q({0} oz),
+						'name' => q(oz),
+						'one' => q({0} oz),
+						'other' => q({0} oz),
+						'per' => q({0}/oz),
+					},
+					# Core Unit Identifier
+					'ounce' => {
+						'few' => q({0} oz),
+						'name' => q(oz),
+						'one' => q({0} oz),
+						'other' => q({0} oz),
+						'per' => q({0}/oz),
+					},
+					# Long Unit Identifier
+					'mass-ounce-troy' => {
+						'few' => q({0} oz t),
+						'name' => q(oz t),
+						'one' => q({0} oz t),
+						'other' => q({0} oz t),
+					},
+					# Core Unit Identifier
+					'ounce-troy' => {
+						'few' => q({0} oz t),
+						'name' => q(oz t),
+						'one' => q({0} oz t),
+						'other' => q({0} oz t),
+					},
+					# Long Unit Identifier
+					'mass-pound' => {
+						'few' => q({0} lb),
+						'name' => q(lb),
+						'one' => q({0} lb),
+						'other' => q({0} lb),
+						'per' => q({0}/lb),
+					},
+					# Core Unit Identifier
+					'pound' => {
+						'few' => q({0} lb),
+						'name' => q(lb),
+						'one' => q({0} lb),
+						'other' => q({0} lb),
+						'per' => q({0}/lb),
+					},
+					# Long Unit Identifier
+					'mass-ton' => {
+						'few' => q({0} tn),
+						'name' => q(tn),
+						'one' => q({0} tn),
+						'other' => q({0} tn),
+					},
+					# Core Unit Identifier
+					'ton' => {
+						'few' => q({0} tn),
+						'name' => q(tn),
+						'one' => q({0} tn),
+						'other' => q({0} tn),
+					},
+					# Long Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Core Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Long Unit Identifier
+					'power-gigawatt' => {
+						'few' => q({0} GW),
+						'name' => q(GW),
+						'one' => q({0} GW),
+						'other' => q({0} GW),
+					},
+					# Core Unit Identifier
+					'gigawatt' => {
+						'few' => q({0} GW),
+						'name' => q(GW),
+						'one' => q({0} GW),
+						'other' => q({0} GW),
+					},
+					# Long Unit Identifier
+					'power-horsepower' => {
+						'few' => q({0} hp),
+						'name' => q(hp),
+						'one' => q({0} hp),
+						'other' => q({0} hp),
+					},
+					# Core Unit Identifier
+					'horsepower' => {
+						'few' => q({0} hp),
+						'name' => q(hp),
+						'one' => q({0} hp),
+						'other' => q({0} hp),
+					},
+					# Long Unit Identifier
+					'power-kilowatt' => {
+						'few' => q({0} kW),
+						'name' => q(kW),
+						'one' => q({0} kW),
+						'other' => q({0} kW),
+					},
+					# Core Unit Identifier
+					'kilowatt' => {
+						'few' => q({0} kW),
+						'name' => q(kW),
+						'one' => q({0} kW),
+						'other' => q({0} kW),
+					},
+					# Long Unit Identifier
+					'power-megawatt' => {
+						'few' => q({0} MW),
+						'name' => q(MW),
+						'one' => q({0} MW),
+						'other' => q({0} MW),
+					},
+					# Core Unit Identifier
+					'megawatt' => {
+						'few' => q({0} MW),
+						'name' => q(MW),
+						'one' => q({0} MW),
+						'other' => q({0} MW),
+					},
+					# Long Unit Identifier
+					'power-milliwatt' => {
+						'few' => q({0} mW),
+						'name' => q(mW),
+						'one' => q({0} mW),
+						'other' => q({0} mW),
+					},
+					# Core Unit Identifier
+					'milliwatt' => {
+						'few' => q({0} mW),
+						'name' => q(mW),
+						'one' => q({0} mW),
+						'other' => q({0} mW),
+					},
+					# Long Unit Identifier
+					'power-watt' => {
+						'few' => q({0} W),
+						'name' => q(W),
+						'one' => q({0} W),
+						'other' => q({0} W),
+					},
+					# Core Unit Identifier
+					'watt' => {
+						'few' => q({0} W),
+						'name' => q(W),
+						'one' => q({0} W),
+						'other' => q({0} W),
+					},
+					# Long Unit Identifier
+					'power2' => {
+						'few' => q({0}²),
+						'one' => q({0}²),
+						'other' => q({0}²),
+					},
+					# Core Unit Identifier
+					'power2' => {
+						'few' => q({0}²),
+						'one' => q({0}²),
+						'other' => q({0}²),
+					},
+					# Long Unit Identifier
+					'pressure-atmosphere' => {
+						'few' => q({0} atm),
+						'name' => q(atm),
+						'one' => q({0} atm),
+						'other' => q({0} atm),
+					},
+					# Core Unit Identifier
+					'atmosphere' => {
+						'few' => q({0} atm),
+						'name' => q(atm),
+						'one' => q({0} atm),
+						'other' => q({0} atm),
+					},
+					# Long Unit Identifier
+					'pressure-bar' => {
+						'few' => q({0} bar),
+						'name' => q(bar),
+						'one' => q({0} bar),
+						'other' => q({0} bar),
+					},
+					# Core Unit Identifier
+					'bar' => {
+						'few' => q({0} bar),
+						'name' => q(bar),
+						'one' => q({0} bar),
+						'other' => q({0} bar),
+					},
+					# Long Unit Identifier
+					'pressure-hectopascal' => {
+						'few' => q({0} hPa),
+						'name' => q(hPa),
+						'one' => q({0} hPa),
+						'other' => q({0} hPa),
+					},
+					# Core Unit Identifier
+					'hectopascal' => {
+						'few' => q({0} hPa),
+						'name' => q(hPa),
+						'one' => q({0} hPa),
+						'other' => q({0} hPa),
+					},
+					# Long Unit Identifier
+					'pressure-inch-ofhg' => {
+						'few' => q({0} inHg),
+						'name' => q(inHg),
+						'one' => q({0} inHg),
+						'other' => q({0} inHg),
+					},
+					# Core Unit Identifier
+					'inch-ofhg' => {
+						'few' => q({0} inHg),
+						'name' => q(inHg),
+						'one' => q({0} inHg),
+						'other' => q({0} inHg),
+					},
+					# Long Unit Identifier
+					'pressure-millibar' => {
+						'few' => q({0} mbar),
+						'name' => q(mbar),
+						'one' => q({0} mbar),
+						'other' => q({0} mbar),
+					},
+					# Core Unit Identifier
+					'millibar' => {
+						'few' => q({0} mbar),
+						'name' => q(mbar),
+						'one' => q({0} mbar),
+						'other' => q({0} mbar),
+					},
+					# Long Unit Identifier
+					'pressure-millimeter-ofhg' => {
+						'few' => q({0} mm Hg),
+						'name' => q(mm Hg),
+						'one' => q({0} mm Hg),
+						'other' => q({0} mm Hg),
+					},
+					# Core Unit Identifier
+					'millimeter-ofhg' => {
+						'few' => q({0} mm Hg),
+						'name' => q(mm Hg),
+						'one' => q({0} mm Hg),
+						'other' => q({0} mm Hg),
+					},
+					# Long Unit Identifier
+					'pressure-pascal' => {
+						'few' => q({0} Pa),
+						'name' => q(Pa),
+						'one' => q({0} Pa),
+						'other' => q({0} Pa),
+					},
+					# Core Unit Identifier
+					'pascal' => {
+						'few' => q({0} Pa),
+						'name' => q(Pa),
+						'one' => q({0} Pa),
+						'other' => q({0} Pa),
+					},
+					# Long Unit Identifier
+					'pressure-pound-force-per-square-inch' => {
+						'few' => q({0} psi),
+						'name' => q(psi),
+						'one' => q({0} psi),
+						'other' => q({0} psi),
+					},
+					# Core Unit Identifier
+					'pound-force-per-square-inch' => {
+						'few' => q({0} psi),
+						'name' => q(psi),
+						'one' => q({0} psi),
+						'other' => q({0} psi),
+					},
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'few' => q({0} km/h),
+						'name' => q(km/h),
+						'one' => q({0} km/h),
+						'other' => q({0} km/h),
+					},
+					# Core Unit Identifier
+					'kilometer-per-hour' => {
+						'few' => q({0} km/h),
+						'name' => q(km/h),
+						'one' => q({0} km/h),
+						'other' => q({0} km/h),
+					},
+					# Long Unit Identifier
+					'speed-knot' => {
+						'few' => q({0} kn),
+						'name' => q(kn),
+						'one' => q({0} kn),
+						'other' => q({0} kn),
+					},
+					# Core Unit Identifier
+					'knot' => {
+						'few' => q({0} kn),
+						'name' => q(kn),
+						'one' => q({0} kn),
+						'other' => q({0} kn),
+					},
+					# Long Unit Identifier
+					'speed-meter-per-second' => {
+						'few' => q({0} m/s),
+						'name' => q(метри у секунди),
+						'one' => q({0} m/s),
+						'other' => q({0} m/s),
+					},
+					# Core Unit Identifier
+					'meter-per-second' => {
+						'few' => q({0} m/s),
+						'name' => q(метри у секунди),
+						'one' => q({0} m/s),
+						'other' => q({0} m/s),
+					},
+					# Long Unit Identifier
+					'speed-mile-per-hour' => {
+						'few' => q({0} mi/h),
+						'name' => q(миље на сат),
+						'one' => q({0} mi/h),
+						'other' => q({0} mi/h),
+					},
+					# Core Unit Identifier
+					'mile-per-hour' => {
+						'few' => q({0} mi/h),
+						'name' => q(миље на сат),
+						'one' => q({0} mi/h),
+						'other' => q({0} mi/h),
+					},
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'few' => q({0}°C),
+						'name' => q(°C),
+						'one' => q({0}°C),
+						'other' => q({0}°C),
+					},
+					# Core Unit Identifier
+					'celsius' => {
+						'few' => q({0}°C),
+						'name' => q(°C),
+						'one' => q({0}°C),
+						'other' => q({0}°C),
+					},
+					# Long Unit Identifier
+					'temperature-fahrenheit' => {
+						'few' => q({0}°F),
+						'name' => q(степени Фаренхајта),
+						'one' => q({0}°F),
+						'other' => q({0}°F),
+					},
+					# Core Unit Identifier
+					'fahrenheit' => {
+						'few' => q({0}°F),
+						'name' => q(степени Фаренхајта),
+						'one' => q({0}°F),
+						'other' => q({0}°F),
+					},
+					# Long Unit Identifier
+					'temperature-generic' => {
+						'few' => q({0}°),
+						'name' => q(°),
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Core Unit Identifier
+					'generic' => {
+						'few' => q({0}°),
+						'name' => q(°),
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Long Unit Identifier
+					'temperature-kelvin' => {
+						'few' => q({0} K),
+						'name' => q(K),
+						'one' => q({0} K),
+						'other' => q({0} K),
+					},
+					# Core Unit Identifier
+					'kelvin' => {
+						'few' => q({0} K),
+						'name' => q(K),
+						'one' => q({0} K),
+						'other' => q({0} K),
+					},
+					# Long Unit Identifier
+					'times' => {
+						'1' => q({0}⋅{1}),
+					},
+					# Core Unit Identifier
+					'times' => {
+						'1' => q({0}⋅{1}),
+					},
+					# Long Unit Identifier
+					'volume-acre-foot' => {
+						'few' => q({0} ac ft),
+						'name' => q(ac ft),
+						'one' => q({0} ac ft),
+						'other' => q({0} ac ft),
+					},
+					# Core Unit Identifier
+					'acre-foot' => {
+						'few' => q({0} ac ft),
+						'name' => q(ac ft),
+						'one' => q({0} ac ft),
+						'other' => q({0} ac ft),
+					},
+					# Long Unit Identifier
+					'volume-centiliter' => {
+						'few' => q({0} cL),
+						'name' => q(cL),
+						'one' => q({0} cL),
+						'other' => q({0} cL),
+					},
+					# Core Unit Identifier
+					'centiliter' => {
+						'few' => q({0} cL),
+						'name' => q(cL),
+						'one' => q({0} cL),
+						'other' => q({0} cL),
+					},
+					# Long Unit Identifier
+					'volume-cubic-centimeter' => {
+						'few' => q({0} cm³),
+						'name' => q(cm³),
+						'one' => q({0} cm³),
+						'other' => q({0} cm³),
+						'per' => q({0}/cm³),
+					},
+					# Core Unit Identifier
+					'cubic-centimeter' => {
+						'few' => q({0} cm³),
+						'name' => q(cm³),
+						'one' => q({0} cm³),
+						'other' => q({0} cm³),
+						'per' => q({0}/cm³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-foot' => {
+						'few' => q({0} ft³),
+						'name' => q(ft³),
+						'one' => q({0} ft³),
+						'other' => q({0} ft³),
+					},
+					# Core Unit Identifier
+					'cubic-foot' => {
+						'few' => q({0} ft³),
+						'name' => q(ft³),
+						'one' => q({0} ft³),
+						'other' => q({0} ft³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-inch' => {
+						'few' => q({0} in³),
+						'name' => q(in³),
+						'one' => q({0} in³),
+						'other' => q({0} in³),
+					},
+					# Core Unit Identifier
+					'cubic-inch' => {
+						'few' => q({0} in³),
+						'name' => q(in³),
+						'one' => q({0} in³),
+						'other' => q({0} in³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-kilometer' => {
+						'few' => q({0} km³),
+						'name' => q(km³),
+						'one' => q({0} km³),
+						'other' => q({0} km³),
+					},
+					# Core Unit Identifier
+					'cubic-kilometer' => {
+						'few' => q({0} km³),
+						'name' => q(km³),
+						'one' => q({0} km³),
+						'other' => q({0} km³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-meter' => {
+						'few' => q({0} m³),
+						'name' => q(m³),
+						'one' => q({0} m³),
+						'other' => q({0} m³),
+						'per' => q({0}/m³),
+					},
+					# Core Unit Identifier
+					'cubic-meter' => {
+						'few' => q({0} m³),
+						'name' => q(m³),
+						'one' => q({0} m³),
+						'other' => q({0} m³),
+						'per' => q({0}/m³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-mile' => {
+						'few' => q({0} mi³),
+						'name' => q(mi³),
+						'one' => q({0} mi³),
+						'other' => q({0} mi³),
+					},
+					# Core Unit Identifier
+					'cubic-mile' => {
+						'few' => q({0} mi³),
+						'name' => q(mi³),
+						'one' => q({0} mi³),
+						'other' => q({0} mi³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-yard' => {
+						'few' => q({0} yd³),
+						'name' => q(yd³),
+						'one' => q({0} yd³),
+						'other' => q({0} yd³),
+					},
+					# Core Unit Identifier
+					'cubic-yard' => {
+						'few' => q({0} yd³),
+						'name' => q(yd³),
+						'one' => q({0} yd³),
+						'other' => q({0} yd³),
+					},
+					# Long Unit Identifier
+					'volume-cup' => {
+						'few' => q({0} ш.),
+						'name' => q(шоље),
+						'one' => q({0} ш.),
+						'other' => q({0} ш.),
+					},
+					# Core Unit Identifier
+					'cup' => {
+						'few' => q({0} ш.),
+						'name' => q(шоље),
+						'one' => q({0} ш.),
+						'other' => q({0} ш.),
+					},
+					# Long Unit Identifier
+					'volume-cup-metric' => {
+						'few' => q({0} mc),
+						'name' => q(mcup),
+						'one' => q({0} mc),
+						'other' => q({0} mc),
+					},
+					# Core Unit Identifier
+					'cup-metric' => {
+						'few' => q({0} mc),
+						'name' => q(mcup),
+						'one' => q({0} mc),
+						'other' => q({0} mc),
+					},
+					# Long Unit Identifier
+					'volume-deciliter' => {
+						'few' => q({0} dL),
+						'name' => q(dL),
+						'one' => q({0} dL),
+						'other' => q({0} dL),
+					},
+					# Core Unit Identifier
+					'deciliter' => {
+						'few' => q({0} dL),
+						'name' => q(dL),
+						'one' => q({0} dL),
+						'other' => q({0} dL),
+					},
+					# Long Unit Identifier
+					'volume-dram' => {
+						'name' => q(драм течности),
+					},
+					# Core Unit Identifier
+					'dram' => {
+						'name' => q(драм течности),
+					},
+					# Long Unit Identifier
+					'volume-drop' => {
+						'few' => q({0} капи),
+						'name' => q(кап),
+						'one' => q({0} кап),
+						'other' => q({0} капи),
+					},
+					# Core Unit Identifier
+					'drop' => {
+						'few' => q({0} капи),
+						'name' => q(кап),
+						'one' => q({0} кап),
+						'other' => q({0} капи),
+					},
+					# Long Unit Identifier
+					'volume-fluid-ounce' => {
+						'few' => q({0} fl oz),
+						'name' => q(fl oz),
+						'one' => q({0} fl oz),
+						'other' => q({0} fl oz),
+					},
+					# Core Unit Identifier
+					'fluid-ounce' => {
+						'few' => q({0} fl oz),
+						'name' => q(fl oz),
+						'one' => q({0} fl oz),
+						'other' => q({0} fl oz),
+					},
+					# Long Unit Identifier
+					'volume-gallon' => {
+						'few' => q({0} gal),
+						'name' => q(gal),
+						'one' => q({0} gal),
+						'other' => q({0} gal),
+						'per' => q({0}/gal),
+					},
+					# Core Unit Identifier
+					'gallon' => {
+						'few' => q({0} gal),
+						'name' => q(gal),
+						'one' => q({0} gal),
+						'other' => q({0} gal),
+						'per' => q({0}/gal),
+					},
+					# Long Unit Identifier
+					'volume-gallon-imperial' => {
+						'few' => q({0} gal Imp.),
+						'name' => q(Imp. gal),
+						'one' => q({0} gal Imp.),
+						'other' => q({0} gal Imp.),
+						'per' => q({0}/gal Imp.),
+					},
+					# Core Unit Identifier
+					'gallon-imperial' => {
+						'few' => q({0} gal Imp.),
+						'name' => q(Imp. gal),
+						'one' => q({0} gal Imp.),
+						'other' => q({0} gal Imp.),
+						'per' => q({0}/gal Imp.),
+					},
+					# Long Unit Identifier
+					'volume-hectoliter' => {
+						'few' => q({0} hL),
+						'name' => q(hL),
+						'one' => q({0} hL),
+						'other' => q({0} hL),
+					},
+					# Core Unit Identifier
+					'hectoliter' => {
+						'few' => q({0} hL),
+						'name' => q(hL),
+						'one' => q({0} hL),
+						'other' => q({0} hL),
+					},
+					# Long Unit Identifier
+					'volume-jigger' => {
+						'name' => q(џигер),
+					},
+					# Core Unit Identifier
+					'jigger' => {
+						'name' => q(џигер),
+					},
+					# Long Unit Identifier
+					'volume-liter' => {
+						'few' => q({0} l),
+						'name' => q(литри),
+						'one' => q({0} l),
+						'other' => q({0} l),
+						'per' => q({0}/l),
+					},
+					# Core Unit Identifier
+					'liter' => {
+						'few' => q({0} l),
+						'name' => q(литри),
+						'one' => q({0} l),
+						'other' => q({0} l),
+						'per' => q({0}/l),
+					},
+					# Long Unit Identifier
+					'volume-megaliter' => {
+						'few' => q({0} ML),
+						'name' => q(ML),
+						'one' => q({0} ML),
+						'other' => q({0} ML),
+					},
+					# Core Unit Identifier
+					'megaliter' => {
+						'few' => q({0} ML),
+						'name' => q(ML),
+						'one' => q({0} ML),
+						'other' => q({0} ML),
+					},
+					# Long Unit Identifier
+					'volume-milliliter' => {
+						'few' => q({0} mL),
+						'name' => q(mL),
+						'one' => q({0} mL),
+						'other' => q({0} mL),
+					},
+					# Core Unit Identifier
+					'milliliter' => {
+						'few' => q({0} mL),
+						'name' => q(mL),
+						'one' => q({0} mL),
+						'other' => q({0} mL),
+					},
+					# Long Unit Identifier
+					'volume-pinch' => {
+						'name' => q(прстохват),
+					},
+					# Core Unit Identifier
+					'pinch' => {
+						'name' => q(прстохват),
+					},
+					# Long Unit Identifier
+					'volume-pint' => {
+						'few' => q({0} pt),
+						'name' => q(pt),
+						'one' => q({0} pt),
+						'other' => q({0} pt),
+					},
+					# Core Unit Identifier
+					'pint' => {
+						'few' => q({0} pt),
+						'name' => q(pt),
+						'one' => q({0} pt),
+						'other' => q({0} pt),
+					},
+					# Long Unit Identifier
+					'volume-pint-metric' => {
+						'few' => q({0} mpt),
+						'name' => q(mpt),
+						'one' => q({0} mpt),
+						'other' => q({0} mpt),
+					},
+					# Core Unit Identifier
+					'pint-metric' => {
+						'few' => q({0} mpt),
+						'name' => q(mpt),
+						'one' => q({0} mpt),
+						'other' => q({0} mpt),
+					},
+					# Long Unit Identifier
+					'volume-quart' => {
+						'few' => q({0} qt),
+						'name' => q(qt),
+						'one' => q({0} qt),
+						'other' => q({0} qt),
+					},
+					# Core Unit Identifier
+					'quart' => {
+						'few' => q({0} qt),
+						'name' => q(qt),
+						'one' => q({0} qt),
+						'other' => q({0} qt),
+					},
+					# Long Unit Identifier
+					'volume-tablespoon' => {
+						'few' => q({0} каш.),
+						'name' => q(каш.),
+						'one' => q({0} каш.),
+						'other' => q({0} каш.),
+					},
+					# Core Unit Identifier
+					'tablespoon' => {
+						'few' => q({0} каш.),
+						'name' => q(каш.),
+						'one' => q({0} каш.),
+						'other' => q({0} каш.),
+					},
+					# Long Unit Identifier
+					'volume-teaspoon' => {
+						'few' => q({0} кашич.),
+						'name' => q(кашич.),
+						'one' => q({0} кашич.),
+						'other' => q({0} кашич.),
+					},
+					# Core Unit Identifier
+					'teaspoon' => {
+						'few' => q({0} кашич.),
+						'name' => q(кашич.),
+						'one' => q({0} кашич.),
+						'other' => q({0} кашич.),
 					},
 				},
 			} }
@@ -4409,10 +8393,10 @@ has 'currencies' => (
 		'AED' => {
 			symbol => 'AED',
 			display_name => {
-				'currency' => q(УАЕ дирхам),
-				'few' => q(УАЕ дирхама),
-				'one' => q(УАЕ дирхам),
-				'other' => q(УАЕ дирхама),
+				'currency' => q(дирхам УАЕ),
+				'few' => q(дирхама УАЕ),
+				'one' => q(дирхам УАЕ),
+				'other' => q(дирхама УАЕ),
 			},
 		},
 		'AFA' => {
@@ -4426,7 +8410,7 @@ has 'currencies' => (
 		'AFN' => {
 			symbol => 'AFN',
 			display_name => {
-				'currency' => q(Авганистански авгани),
+				'currency' => q(авганистански авгани),
 				'few' => q(авганистанска авгана),
 				'one' => q(aвганистански авгани),
 				'other' => q(авганистанских авгана),
@@ -4442,7 +8426,7 @@ has 'currencies' => (
 		'ALL' => {
 			symbol => 'ALL',
 			display_name => {
-				'currency' => q(Албански лек),
+				'currency' => q(албански лек),
 				'few' => q(албанска лека),
 				'one' => q(албански лек),
 				'other' => q(албанских лека),
@@ -4451,7 +8435,7 @@ has 'currencies' => (
 		'AMD' => {
 			symbol => 'AMD',
 			display_name => {
-				'currency' => q(Јерменски драм),
+				'currency' => q(јерменски драм),
 				'few' => q(јерменска драма),
 				'one' => q(јерменски драм),
 				'other' => q(јерменска драма),
@@ -4460,7 +8444,7 @@ has 'currencies' => (
 		'ANG' => {
 			symbol => 'ANG',
 			display_name => {
-				'currency' => q(Холандскоантилски гулден),
+				'currency' => q(холандскоантилски гулден),
 				'few' => q(холандскоантилска гулдена),
 				'one' => q(холандскоантилски гулден),
 				'other' => q(холандскоантилских гулдена),
@@ -4469,7 +8453,7 @@ has 'currencies' => (
 		'AOA' => {
 			symbol => 'AOA',
 			display_name => {
-				'currency' => q(Анголска кванза),
+				'currency' => q(анголска кванза),
 				'few' => q(анголске кванзе),
 				'one' => q(анголска кванза),
 				'other' => q(анголских кванзи),
@@ -4534,7 +8518,7 @@ has 'currencies' => (
 		'ARS' => {
 			symbol => 'ARS',
 			display_name => {
-				'currency' => q(Аргентински пезос),
+				'currency' => q(аргентински пезос),
 				'few' => q(аргентинска пезоса),
 				'one' => q(аргентински пезос),
 				'other' => q(аргентинских пезоса),
@@ -4551,7 +8535,7 @@ has 'currencies' => (
 		'AUD' => {
 			symbol => 'AUD',
 			display_name => {
-				'currency' => q(Аустралијски долар),
+				'currency' => q(аустралијски долар),
 				'few' => q(аустралијска долара),
 				'one' => q(аустралијски долар),
 				'other' => q(аустралијских долара),
@@ -4560,7 +8544,7 @@ has 'currencies' => (
 		'AWG' => {
 			symbol => 'AWG',
 			display_name => {
-				'currency' => q(Арубански флорин),
+				'currency' => q(арубански флорин),
 				'few' => q(арубанска флорина),
 				'one' => q(арубански флорин),
 				'other' => q(арубанских флорина),
@@ -4577,7 +8561,7 @@ has 'currencies' => (
 		'AZN' => {
 			symbol => 'AZN',
 			display_name => {
-				'currency' => q(Азербејџански манат),
+				'currency' => q(азербејџански манат),
 				'few' => q(азербејџанска маната),
 				'one' => q(азербејџански манат),
 				'other' => q(азербејџанских маната),
@@ -4594,7 +8578,7 @@ has 'currencies' => (
 		'BAM' => {
 			symbol => 'КМ',
 			display_name => {
-				'currency' => q(Босанско-херцеговачка конвертибилна марка),
+				'currency' => q(босанско-херцеговачка конвертибилна марка),
 				'few' => q(босанско-херцеговачке конвертибилне маркe),
 				'one' => q(босанско-херцеговачка конвертибилна марка),
 				'other' => q(босанско-херцеговачких конвертибилних марака),
@@ -4611,7 +8595,7 @@ has 'currencies' => (
 		'BBD' => {
 			symbol => 'BBD',
 			display_name => {
-				'currency' => q(Барбадошки долар),
+				'currency' => q(барбадошки долар),
 				'few' => q(барбадошка долара),
 				'one' => q(барбадошки долар),
 				'other' => q(барбадошких долара),
@@ -4620,7 +8604,7 @@ has 'currencies' => (
 		'BDT' => {
 			symbol => 'BDT',
 			display_name => {
-				'currency' => q(Бангладешка така),
+				'currency' => q(бангладешка така),
 				'few' => q(бангладешке таке),
 				'one' => q(бангладешка така),
 				'other' => q(бангладешких така),
@@ -4669,7 +8653,7 @@ has 'currencies' => (
 		'BGN' => {
 			symbol => 'BGN',
 			display_name => {
-				'currency' => q(Бугарски лев),
+				'currency' => q(бугарски лев),
 				'few' => q(бугарска лева),
 				'one' => q(бугарски лев),
 				'other' => q(бугарских лева),
@@ -4686,7 +8670,7 @@ has 'currencies' => (
 		'BHD' => {
 			symbol => 'BHD',
 			display_name => {
-				'currency' => q(Бахреински динар),
+				'currency' => q(бахреински динар),
 				'few' => q(бахреинскa динара),
 				'one' => q(бахреински динар),
 				'other' => q(бахреинских динара),
@@ -4695,7 +8679,7 @@ has 'currencies' => (
 		'BIF' => {
 			symbol => 'BIF',
 			display_name => {
-				'currency' => q(Бурундски франак),
+				'currency' => q(бурундски франак),
 				'few' => q(бурундска франка),
 				'one' => q(бурундски франак),
 				'other' => q(бурундских франакa),
@@ -4704,7 +8688,7 @@ has 'currencies' => (
 		'BMD' => {
 			symbol => 'BMD',
 			display_name => {
-				'currency' => q(Бермудски долар),
+				'currency' => q(бермудски долар),
 				'few' => q(бермудска долара),
 				'one' => q(бермудски долар),
 				'other' => q(бермудских долара),
@@ -4713,7 +8697,7 @@ has 'currencies' => (
 		'BND' => {
 			symbol => 'BND',
 			display_name => {
-				'currency' => q(Брунејски долар),
+				'currency' => q(брунејски долар),
 				'few' => q(брунејска долара),
 				'one' => q(брунејски долар),
 				'other' => q(брунејских долара),
@@ -4722,7 +8706,7 @@ has 'currencies' => (
 		'BOB' => {
 			symbol => 'BOB',
 			display_name => {
-				'currency' => q(Боливијски боливијано),
+				'currency' => q(боливијски боливијано),
 				'few' => q(боливијска боливијана),
 				'one' => q(боливијски боливијано),
 				'other' => q(боливијских боливијана),
@@ -4779,7 +8763,7 @@ has 'currencies' => (
 		'BRL' => {
 			symbol => 'R$',
 			display_name => {
-				'currency' => q(Бразилски реал),
+				'currency' => q(бразилски реал),
 				'few' => q(бразилска реала),
 				'one' => q(бразилски реал),
 				'other' => q(бразилских реала),
@@ -4812,7 +8796,7 @@ has 'currencies' => (
 		'BSD' => {
 			symbol => 'BSD',
 			display_name => {
-				'currency' => q(Бахамски долар),
+				'currency' => q(бахамски долар),
 				'few' => q(бахамска долара),
 				'one' => q(бахамски долар),
 				'other' => q(бахамских долара),
@@ -4821,7 +8805,7 @@ has 'currencies' => (
 		'BTN' => {
 			symbol => 'BTN',
 			display_name => {
-				'currency' => q(Бутански нгултрум),
+				'currency' => q(бутански нгултрум),
 				'few' => q(бутанска нгултрума),
 				'one' => q(бутански нгултрум),
 				'other' => q(бутанских нгултрума),
@@ -4838,7 +8822,7 @@ has 'currencies' => (
 		'BWP' => {
 			symbol => 'BWP',
 			display_name => {
-				'currency' => q(Боцванска пула),
+				'currency' => q(боцванска пула),
 				'few' => q(боцванске пуле),
 				'one' => q(боцванска пула),
 				'other' => q(боцванских пула),
@@ -4855,14 +8839,13 @@ has 'currencies' => (
 		'BYN' => {
 			symbol => 'BYN',
 			display_name => {
-				'currency' => q(Белоруска рубља),
+				'currency' => q(белоруска рубља),
 				'few' => q(белоруске рубље),
 				'one' => q(белоруска рубља),
 				'other' => q(белоруских рубљи),
 			},
 		},
 		'BYR' => {
-			symbol => 'BYR',
 			display_name => {
 				'currency' => q(Белоруска рубља \(2000–2016\)),
 				'few' => q(белоруске рубље \(2000–2016\)),
@@ -4873,7 +8856,7 @@ has 'currencies' => (
 		'BZD' => {
 			symbol => 'BZD',
 			display_name => {
-				'currency' => q(Белиски долар),
+				'currency' => q(белиски долар),
 				'few' => q(белиска долара),
 				'one' => q(белиски долар),
 				'other' => q(белиских долара),
@@ -4882,7 +8865,7 @@ has 'currencies' => (
 		'CAD' => {
 			symbol => 'CA$',
 			display_name => {
-				'currency' => q(Канадски долар),
+				'currency' => q(канадски долар),
 				'few' => q(канадска долара),
 				'one' => q(канадски долар),
 				'other' => q(канадских долара),
@@ -4891,7 +8874,7 @@ has 'currencies' => (
 		'CDF' => {
 			symbol => 'CDF',
 			display_name => {
-				'currency' => q(Конгоански франак),
+				'currency' => q(конгоански франак),
 				'few' => q(конгоанска франка),
 				'one' => q(конгоански франак),
 				'other' => q(конгоанских франака),
@@ -4908,7 +8891,7 @@ has 'currencies' => (
 		'CHF' => {
 			symbol => 'CHF',
 			display_name => {
-				'currency' => q(Швајцарски франак),
+				'currency' => q(швајцарски франак),
 				'few' => q(швајцарска франка),
 				'one' => q(швајцарски франак),
 				'other' => q(швајцарских франака),
@@ -4941,7 +8924,7 @@ has 'currencies' => (
 		'CLP' => {
 			symbol => 'CLP',
 			display_name => {
-				'currency' => q(Чилеански пезос),
+				'currency' => q(чилеански пезос),
 				'few' => q(чилеанска пезоса),
 				'one' => q(чилеански пезос),
 				'other' => q(чилеанских пезоса),
@@ -4950,7 +8933,7 @@ has 'currencies' => (
 		'CNH' => {
 			symbol => 'CNH',
 			display_name => {
-				'currency' => q(Кинески јуан \(острвски\)),
+				'currency' => q(кинески јуан \(острвски\)),
 				'few' => q(кинеска јуана \(острвска\)),
 				'one' => q(кинески јуан \(острвски\)),
 				'other' => q(кинеских јуана \(острвских\)),
@@ -4967,7 +8950,7 @@ has 'currencies' => (
 		'CNY' => {
 			symbol => 'CN¥',
 			display_name => {
-				'currency' => q(Кинески јуан),
+				'currency' => q(кинески јуан),
 				'few' => q(кинеска јуана),
 				'one' => q(кинески јуан),
 				'other' => q(кинеских јуана),
@@ -4976,7 +8959,7 @@ has 'currencies' => (
 		'COP' => {
 			symbol => 'COP',
 			display_name => {
-				'currency' => q(Колумбијски пезос),
+				'currency' => q(колумбијски пезос),
 				'few' => q(колумбијска пезоса),
 				'one' => q(колумбијски пезос),
 				'other' => q(колумбијских пезоса),
@@ -4993,10 +8976,10 @@ has 'currencies' => (
 		'CRC' => {
 			symbol => 'CRC',
 			display_name => {
-				'currency' => q(Костарикански колон),
+				'currency' => q(костарикански колон),
 				'few' => q(костариканска колона),
 				'one' => q(костарикански колон),
-				'other' => q(костарикански колони),
+				'other' => q(костариканских колона),
 			},
 		},
 		'CSD' => {
@@ -5018,7 +9001,7 @@ has 'currencies' => (
 		'CUC' => {
 			symbol => 'CUC',
 			display_name => {
-				'currency' => q(Кубански конвертибилни пезос),
+				'currency' => q(кубански конвертибилни пезос),
 				'few' => q(кубанска конвертибилна пезоса),
 				'one' => q(кубански конвертибилни пезос),
 				'other' => q(кубанских конвертибилних пезоса),
@@ -5027,7 +9010,7 @@ has 'currencies' => (
 		'CUP' => {
 			symbol => 'CUP',
 			display_name => {
-				'currency' => q(Кубански пезос),
+				'currency' => q(кубански пезос),
 				'few' => q(кубанска пезоса),
 				'one' => q(кубански пезос),
 				'other' => q(кубанских пезоса),
@@ -5036,7 +9019,7 @@ has 'currencies' => (
 		'CVE' => {
 			symbol => 'CVE',
 			display_name => {
-				'currency' => q(Зеленортски ескудо),
+				'currency' => q(зеленортски ескудо),
 				'few' => q(зеленортска ескуда),
 				'one' => q(зеленортски ескудо),
 				'other' => q(зеленортских ескуда),
@@ -5053,7 +9036,7 @@ has 'currencies' => (
 		'CZK' => {
 			symbol => 'CZK',
 			display_name => {
-				'currency' => q(Чешка круна),
+				'currency' => q(чешка круна),
 				'few' => q(чешке круне),
 				'one' => q(чешка круна),
 				'other' => q(чешких крунa),
@@ -5078,16 +9061,16 @@ has 'currencies' => (
 		'DJF' => {
 			symbol => 'DJF',
 			display_name => {
-				'currency' => q(Џибутански франак),
-				'few' => q(џибутанскa франкa),
-				'one' => q(џибутански франак),
-				'other' => q(џибутанских франакa),
+				'currency' => q(џибутски франак),
+				'few' => q(џибутска франка),
+				'one' => q(џибутски франак),
+				'other' => q(џибутских франака),
 			},
 		},
 		'DKK' => {
 			symbol => 'DKK',
 			display_name => {
-				'currency' => q(Данска круна),
+				'currency' => q(данска круна),
 				'few' => q(данске круне),
 				'one' => q(данска круна),
 				'other' => q(данских круна),
@@ -5096,7 +9079,7 @@ has 'currencies' => (
 		'DOP' => {
 			symbol => 'DOP',
 			display_name => {
-				'currency' => q(Доминикански пезос),
+				'currency' => q(доминикански пезос),
 				'few' => q(доминиканска пезоса),
 				'one' => q(доминикански пезос),
 				'other' => q(доминиканских пезоса),
@@ -5105,7 +9088,7 @@ has 'currencies' => (
 		'DZD' => {
 			symbol => 'DZD',
 			display_name => {
-				'currency' => q(Алжирски динар),
+				'currency' => q(алжирски динар),
 				'few' => q(алжирска динара),
 				'one' => q(алжирски динар),
 				'other' => q(алжирских динара),
@@ -5138,7 +9121,7 @@ has 'currencies' => (
 		'EGP' => {
 			symbol => 'EGP',
 			display_name => {
-				'currency' => q(Египатска фунта),
+				'currency' => q(египатска фунта),
 				'few' => q(египатске фунте),
 				'one' => q(египатска фунта),
 				'other' => q(египатских фунти),
@@ -5147,7 +9130,7 @@ has 'currencies' => (
 		'ERN' => {
 			symbol => 'ERN',
 			display_name => {
-				'currency' => q(Eритрејска накфa),
+				'currency' => q(еритрејска накфа),
 				'few' => q(еритрејске накфе),
 				'one' => q(еритрејска накфа),
 				'other' => q(еритрејских накфи),
@@ -5180,7 +9163,7 @@ has 'currencies' => (
 		'ETB' => {
 			symbol => 'ETB',
 			display_name => {
-				'currency' => q(Етиопски бир),
+				'currency' => q(етиопијски бир),
 				'few' => q(етиопска бира),
 				'one' => q(етиопски бир),
 				'other' => q(етиопских бира),
@@ -5206,7 +9189,7 @@ has 'currencies' => (
 		'FJD' => {
 			symbol => 'FJD',
 			display_name => {
-				'currency' => q(Фиџијски долар),
+				'currency' => q(фиџијски долар),
 				'few' => q(фиџијска долара),
 				'one' => q(фиџијски долар),
 				'other' => q(фиџијских долара),
@@ -5215,7 +9198,7 @@ has 'currencies' => (
 		'FKP' => {
 			symbol => 'FKP',
 			display_name => {
-				'currency' => q(Фокландска фунта),
+				'currency' => q(фолкландска фунта),
 				'few' => q(фокландске фунте),
 				'one' => q(фокландска фунта),
 				'other' => q(фокландских фунти),
@@ -5232,7 +9215,7 @@ has 'currencies' => (
 		'GBP' => {
 			symbol => '£',
 			display_name => {
-				'currency' => q(Британска фунта),
+				'currency' => q(британска фунта),
 				'few' => q(британске фунте),
 				'one' => q(британска фунта),
 				'other' => q(британских фунти),
@@ -5249,7 +9232,7 @@ has 'currencies' => (
 		'GEL' => {
 			symbol => 'GEL',
 			display_name => {
-				'currency' => q(Грузијски лари),
+				'currency' => q(грузијски лари),
 				'few' => q(грузијска ларија),
 				'one' => q(грузијски лари),
 				'other' => q(грузијских ларија),
@@ -5266,7 +9249,7 @@ has 'currencies' => (
 		'GHS' => {
 			symbol => 'GHS',
 			display_name => {
-				'currency' => q(Гански седи),
+				'currency' => q(гански седи),
 				'few' => q(ганска седија),
 				'one' => q(гански седи),
 				'other' => q(ганских седија),
@@ -5275,7 +9258,7 @@ has 'currencies' => (
 		'GIP' => {
 			symbol => 'GIP',
 			display_name => {
-				'currency' => q(Гибралтарска фунта),
+				'currency' => q(гибралтарска фунта),
 				'few' => q(гибралтарске фунте),
 				'one' => q(гибралтарска фунта),
 				'other' => q(гибралтарских фунти),
@@ -5284,7 +9267,7 @@ has 'currencies' => (
 		'GMD' => {
 			symbol => 'GMD',
 			display_name => {
-				'currency' => q(Гамбијски даласи),
+				'currency' => q(гамбијски даласи),
 				'few' => q(гамбијских даласија),
 				'one' => q(гамбијски даласи),
 				'other' => q(гамбијских даласија),
@@ -5293,7 +9276,7 @@ has 'currencies' => (
 		'GNF' => {
 			symbol => 'GNF',
 			display_name => {
-				'currency' => q(Гвинејски франак),
+				'currency' => q(гвинејски франак),
 				'few' => q(гвинејска франка),
 				'one' => q(гвинејски франак),
 				'other' => q(гвинејских франака),
@@ -5326,7 +9309,7 @@ has 'currencies' => (
 		'GTQ' => {
 			symbol => 'GTQ',
 			display_name => {
-				'currency' => q(Гватемалски кецал),
+				'currency' => q(гватемалски кецал),
 				'few' => q(гватемалска кецала),
 				'one' => q(гватемалски кецал),
 				'other' => q(гватемалских кецала),
@@ -5351,7 +9334,7 @@ has 'currencies' => (
 		'GYD' => {
 			symbol => 'GYD',
 			display_name => {
-				'currency' => q(Гвајански долар),
+				'currency' => q(гвајански долар),
 				'few' => q(гвајанска долара),
 				'one' => q(гвајански долар),
 				'other' => q(гвајанских долара),
@@ -5360,7 +9343,7 @@ has 'currencies' => (
 		'HKD' => {
 			symbol => 'HK$',
 			display_name => {
-				'currency' => q(Хонгконшки долар),
+				'currency' => q(хонгконшки долар),
 				'few' => q(хонгконшка долара),
 				'one' => q(хонгконшки долар),
 				'other' => q(хонгконшких долара),
@@ -5369,7 +9352,7 @@ has 'currencies' => (
 		'HNL' => {
 			symbol => 'HNL',
 			display_name => {
-				'currency' => q(Хондурашка лемпира),
+				'currency' => q(хондурашка лемпира),
 				'few' => q(хондурашке лемпире),
 				'one' => q(хондурашка лемпира),
 				'other' => q(хондурашких лемпира),
@@ -5386,7 +9369,7 @@ has 'currencies' => (
 		'HRK' => {
 			symbol => 'HRK',
 			display_name => {
-				'currency' => q(Хрватска куна),
+				'currency' => q(хрватска куна),
 				'few' => q(хрватске куне),
 				'one' => q(хрватска куна),
 				'other' => q(хрватских куна),
@@ -5395,7 +9378,7 @@ has 'currencies' => (
 		'HTG' => {
 			symbol => 'HTG',
 			display_name => {
-				'currency' => q(Хаићански гурд),
+				'currency' => q(хаићански гурд),
 				'few' => q(хаићанска гурда),
 				'one' => q(хаићански гурд),
 				'other' => q(хаићанских гурда),
@@ -5404,7 +9387,7 @@ has 'currencies' => (
 		'HUF' => {
 			symbol => 'HUF',
 			display_name => {
-				'currency' => q(Мађарска форинта),
+				'currency' => q(мађарска форинта),
 				'few' => q(мађарске форинте),
 				'one' => q(мађарска форинта),
 				'other' => q(мађарских форинти),
@@ -5413,7 +9396,7 @@ has 'currencies' => (
 		'IDR' => {
 			symbol => 'IDR',
 			display_name => {
-				'currency' => q(Индонежанска рупија),
+				'currency' => q(индонежанска рупија),
 				'few' => q(индонежанске рупије),
 				'one' => q(индонежанска рупија),
 				'other' => q(индонежанских рупијa),
@@ -5446,7 +9429,7 @@ has 'currencies' => (
 		'ILS' => {
 			symbol => '₪',
 			display_name => {
-				'currency' => q(Израелски нови шекел),
+				'currency' => q(израелски нови шекел),
 				'few' => q(израелска нова шекела),
 				'one' => q(израелски нови шекел),
 				'other' => q(израелских нових шекела),
@@ -5455,7 +9438,7 @@ has 'currencies' => (
 		'INR' => {
 			symbol => '₹',
 			display_name => {
-				'currency' => q(Индијска рупија),
+				'currency' => q(индијска рупија),
 				'few' => q(индијске рупије),
 				'one' => q(индијска рупија),
 				'other' => q(индијских рупија),
@@ -5464,7 +9447,7 @@ has 'currencies' => (
 		'IQD' => {
 			symbol => 'IQD',
 			display_name => {
-				'currency' => q(Ирачки динар),
+				'currency' => q(ирачки динар),
 				'few' => q(ирачка динара),
 				'one' => q(ирачки динар),
 				'other' => q(ирачких динара),
@@ -5473,7 +9456,7 @@ has 'currencies' => (
 		'IRR' => {
 			symbol => 'IRR',
 			display_name => {
-				'currency' => q(Ирански риjал),
+				'currency' => q(ирански ријал),
 				'few' => q(иранска ријала),
 				'one' => q(ирански ријал),
 				'other' => q(иранских ријала),
@@ -5490,7 +9473,7 @@ has 'currencies' => (
 		'ISK' => {
 			symbol => 'ISK',
 			display_name => {
-				'currency' => q(Исландска круна),
+				'currency' => q(исландска круна),
 				'few' => q(исландске круне),
 				'one' => q(исландска круна),
 				'other' => q(исландских круна),
@@ -5507,7 +9490,7 @@ has 'currencies' => (
 		'JMD' => {
 			symbol => 'JMD',
 			display_name => {
-				'currency' => q(Јамајчански долар),
+				'currency' => q(јамајчански долар),
 				'few' => q(jамајчанска долара),
 				'one' => q(jамајчански долар),
 				'other' => q(jамајчанскиx долара),
@@ -5516,7 +9499,7 @@ has 'currencies' => (
 		'JOD' => {
 			symbol => 'JOD',
 			display_name => {
-				'currency' => q(Јордански динар),
+				'currency' => q(јордански динар),
 				'few' => q(јорданскa динара),
 				'one' => q(јордански динар),
 				'other' => q(јорданских динара),
@@ -5525,7 +9508,7 @@ has 'currencies' => (
 		'JPY' => {
 			symbol => '¥',
 			display_name => {
-				'currency' => q(Јапански јен),
+				'currency' => q(јапански јен),
 				'few' => q(јапанска јена),
 				'one' => q(јапански јен),
 				'other' => q(јапанских јена),
@@ -5534,7 +9517,7 @@ has 'currencies' => (
 		'KES' => {
 			symbol => 'KES',
 			display_name => {
-				'currency' => q(Кенијски шилинг),
+				'currency' => q(кенијски шилинг),
 				'few' => q(кенијска шилинга),
 				'one' => q(кенијски шилинг),
 				'other' => q(кенијских шилинга),
@@ -5543,7 +9526,7 @@ has 'currencies' => (
 		'KGS' => {
 			symbol => 'KGS',
 			display_name => {
-				'currency' => q(Киргистански сом),
+				'currency' => q(киргистански сом),
 				'few' => q(киргистанска сома),
 				'one' => q(киргистански сом),
 				'other' => q(киргистанских сома),
@@ -5552,7 +9535,7 @@ has 'currencies' => (
 		'KHR' => {
 			symbol => 'KHR',
 			display_name => {
-				'currency' => q(Kамбоџански ријел),
+				'currency' => q(камбоџански ријел),
 				'few' => q(камбоџанска ријела),
 				'one' => q(камбоџански ријел),
 				'other' => q(камбоџанских ријела),
@@ -5561,7 +9544,7 @@ has 'currencies' => (
 		'KMF' => {
 			symbol => 'KMF',
 			display_name => {
-				'currency' => q(Коморски франак),
+				'currency' => q(коморски франак),
 				'few' => q(коморскa франкa),
 				'one' => q(коморски франак),
 				'other' => q(коморских франакa),
@@ -5570,7 +9553,7 @@ has 'currencies' => (
 		'KPW' => {
 			symbol => 'KPW',
 			display_name => {
-				'currency' => q(Севернокорејски вон),
+				'currency' => q(севернокорејски вон),
 				'few' => q(севернокорејска вона),
 				'one' => q(севернокорејски вон),
 				'other' => q(севернокорејских вона),
@@ -5595,7 +9578,7 @@ has 'currencies' => (
 		'KRW' => {
 			symbol => 'KRW',
 			display_name => {
-				'currency' => q(Јужнокорејски вон),
+				'currency' => q(јужнокорејски вон),
 				'few' => q(јужнокорејска вона),
 				'one' => q(јужнокорејски вон),
 				'other' => q(јужнокорејских вона),
@@ -5604,7 +9587,7 @@ has 'currencies' => (
 		'KWD' => {
 			symbol => 'KWD',
 			display_name => {
-				'currency' => q(Кувајтски динар),
+				'currency' => q(кувајтски динар),
 				'few' => q(кувајтскa динара),
 				'one' => q(кувајтски динар),
 				'other' => q(кувајтских динара),
@@ -5613,7 +9596,7 @@ has 'currencies' => (
 		'KYD' => {
 			symbol => 'KYD',
 			display_name => {
-				'currency' => q(Кајмански долар),
+				'currency' => q(кајмански долар),
 				'few' => q(кајманска долара),
 				'one' => q(кајмански долар),
 				'other' => q(кајманских долара),
@@ -5622,7 +9605,7 @@ has 'currencies' => (
 		'KZT' => {
 			symbol => 'KZT',
 			display_name => {
-				'currency' => q(Казахстански тенге),
+				'currency' => q(казахстански тенге),
 				'few' => q(казахстанска тенгеа),
 				'one' => q(казахстански тенге),
 				'other' => q(казахстанских тенгеа),
@@ -5631,16 +9614,16 @@ has 'currencies' => (
 		'LAK' => {
 			symbol => 'LAK',
 			display_name => {
-				'currency' => q(Лаошки кип),
-				'few' => q(лаошка кипа),
-				'one' => q(лаошки кип),
-				'other' => q(лаошких кипи),
+				'currency' => q(лаоски кип),
+				'few' => q(лаоска кипа),
+				'one' => q(лаоски кип),
+				'other' => q(лаоских кипа),
 			},
 		},
 		'LBP' => {
 			symbol => 'LBP',
 			display_name => {
-				'currency' => q(Либанска фунта),
+				'currency' => q(либанска фунта),
 				'few' => q(либанскe фунтe),
 				'one' => q(либанскa фунтa),
 				'other' => q(либанских фунти),
@@ -5649,16 +9632,16 @@ has 'currencies' => (
 		'LKR' => {
 			symbol => 'LKR',
 			display_name => {
-				'currency' => q(Шриланканскa рупиja),
-				'few' => q(шриланканскe рупијe),
-				'one' => q(шриланканска рупија),
-				'other' => q(шриланканских рупија),
+				'currency' => q(шриланчанска рупија),
+				'few' => q(шриланчанске рупије),
+				'one' => q(шриланчанска рупија),
+				'other' => q(шриланчанских рупија),
 			},
 		},
 		'LRD' => {
 			symbol => 'LRD',
 			display_name => {
-				'currency' => q(Либеријски долар),
+				'currency' => q(либеријски долар),
 				'few' => q(либеријска долара),
 				'one' => q(либеријски долар),
 				'other' => q(либеријских долара),
@@ -5666,10 +9649,10 @@ has 'currencies' => (
 		},
 		'LSL' => {
 			display_name => {
-				'currency' => q(Лесото лоти),
-				'few' => q(лесотска лотиса),
-				'one' => q(лесотски лотис),
-				'other' => q(лесотских лотиса),
+				'currency' => q(лесотски лоти),
+				'few' => q(лесотска лотија),
+				'one' => q(лесотски лоти),
+				'other' => q(лесотских лотија),
 			},
 		},
 		'LTL' => {
@@ -5733,7 +9716,7 @@ has 'currencies' => (
 		'LYD' => {
 			symbol => 'LYD',
 			display_name => {
-				'currency' => q(Либијски динар),
+				'currency' => q(либијски динар),
 				'few' => q(либијскa динарa),
 				'one' => q(либијски динар),
 				'other' => q(либијских динарa),
@@ -5742,7 +9725,7 @@ has 'currencies' => (
 		'MAD' => {
 			symbol => 'MAD',
 			display_name => {
-				'currency' => q(Марокански дирхам),
+				'currency' => q(марокански дирхам),
 				'few' => q(мароканска дирхама),
 				'one' => q(марокански дирхам),
 				'other' => q(мароканских дирхама),
@@ -5775,7 +9758,7 @@ has 'currencies' => (
 		'MDL' => {
 			symbol => 'MDL',
 			display_name => {
-				'currency' => q(Молдавски леј),
+				'currency' => q(молдавски леј),
 				'few' => q(молдaвскa леја),
 				'one' => q(молдaвски леј),
 				'other' => q(молдaвских леја),
@@ -5784,10 +9767,10 @@ has 'currencies' => (
 		'MGA' => {
 			symbol => 'MGA',
 			display_name => {
-				'currency' => q(Мадагаскарски ариари),
-				'few' => q(мадагаскарска ариарија),
-				'one' => q(мадагаскарски ариари),
-				'other' => q(мадагаскарских ариарија),
+				'currency' => q(малгашки аријари),
+				'few' => q(малгашка аријарија),
+				'one' => q(малгашки аријари),
+				'other' => q(малгашких аријарија),
 			},
 		},
 		'MGF' => {
@@ -5801,10 +9784,10 @@ has 'currencies' => (
 		'MKD' => {
 			symbol => 'MKD',
 			display_name => {
-				'currency' => q(Македонски денар),
+				'currency' => q(македонски денар),
 				'few' => q(македонска денара),
 				'one' => q(македонски денар),
-				'other' => q(македонских динара),
+				'other' => q(македонских денара),
 			},
 		},
 		'MKN' => {
@@ -5826,7 +9809,7 @@ has 'currencies' => (
 		'MMK' => {
 			symbol => 'MMK',
 			display_name => {
-				'currency' => q(Мјанмарски кјат),
+				'currency' => q(мјанмарски кјат),
 				'few' => q(мјанмарскa кјатa),
 				'one' => q(мјанмарски кјат),
 				'other' => q(мјанмарских кјатa),
@@ -5835,7 +9818,7 @@ has 'currencies' => (
 		'MNT' => {
 			symbol => 'MNT',
 			display_name => {
-				'currency' => q(Монголски тугрик),
+				'currency' => q(монголски тугрик),
 				'few' => q(монголскa тугрика),
 				'one' => q(монголски тугрик),
 				'other' => q(монголских тугрика),
@@ -5844,7 +9827,7 @@ has 'currencies' => (
 		'MOP' => {
 			symbol => 'MOP',
 			display_name => {
-				'currency' => q(Макаоска патака),
+				'currency' => q(макаоска патака),
 				'few' => q(макаоске патаке),
 				'one' => q(макаоска патака),
 				'other' => q(макаоских патака),
@@ -5862,10 +9845,10 @@ has 'currencies' => (
 		'MRU' => {
 			symbol => 'MRU',
 			display_name => {
-				'currency' => q(Мауританијска oгија),
-				'few' => q(мауританијскe oгијe),
-				'one' => q(мауританијска oгија),
-				'other' => q(мауританијских oгијa),
+				'currency' => q(мауританска огија),
+				'few' => q(мауританске огије),
+				'one' => q(мауританска огија),
+				'other' => q(мауританских огија),
 			},
 		},
 		'MTL' => {
@@ -5887,7 +9870,7 @@ has 'currencies' => (
 		'MUR' => {
 			symbol => 'MUR',
 			display_name => {
-				'currency' => q(Маурицијска рупија),
+				'currency' => q(маурицијска рупија),
 				'few' => q(маурицијскe рупијe),
 				'one' => q(маурицијска рупија),
 				'other' => q(маурицијских рупија),
@@ -5896,7 +9879,7 @@ has 'currencies' => (
 		'MVR' => {
 			symbol => 'MVR',
 			display_name => {
-				'currency' => q(Малдивска руфија),
+				'currency' => q(малдивска руфија),
 				'few' => q(малдивскe руфијe),
 				'one' => q(малдивскa руфија),
 				'other' => q(малдивских руфија),
@@ -5905,7 +9888,7 @@ has 'currencies' => (
 		'MWK' => {
 			symbol => 'MWK',
 			display_name => {
-				'currency' => q(Малавијска квача),
+				'currency' => q(малавијска квача),
 				'few' => q(малавијске кваче),
 				'one' => q(малавијска квача),
 				'other' => q(малавијских квача),
@@ -5914,7 +9897,7 @@ has 'currencies' => (
 		'MXN' => {
 			symbol => 'MX$',
 			display_name => {
-				'currency' => q(Мексички пезос),
+				'currency' => q(мексички пезос),
 				'few' => q(мексичка пезоса),
 				'one' => q(мексички пезос),
 				'other' => q(мексичких пезоса),
@@ -5939,7 +9922,7 @@ has 'currencies' => (
 		'MYR' => {
 			symbol => 'MYR',
 			display_name => {
-				'currency' => q(Малезијски рингит),
+				'currency' => q(малезијски рингит),
 				'few' => q(малезијска рингита),
 				'one' => q(малезијски рингит),
 				'other' => q(малезијских рингита),
@@ -5964,7 +9947,7 @@ has 'currencies' => (
 		'MZN' => {
 			symbol => 'MZN',
 			display_name => {
-				'currency' => q(Мозамбички метикал),
+				'currency' => q(мозамбички метикал),
 				'few' => q(мозамбичка метикала),
 				'one' => q(мозамбички метикал),
 				'other' => q(мозамбичких метикала),
@@ -5973,7 +9956,7 @@ has 'currencies' => (
 		'NAD' => {
 			symbol => 'NAD',
 			display_name => {
-				'currency' => q(Намибијски долар),
+				'currency' => q(намибијски долар),
 				'few' => q(намибијска долара),
 				'one' => q(намибијски долар),
 				'other' => q(намибијских долара),
@@ -5982,7 +9965,7 @@ has 'currencies' => (
 		'NGN' => {
 			symbol => 'NGN',
 			display_name => {
-				'currency' => q(Нигеријска наира),
+				'currency' => q(нигеријска наира),
 				'few' => q(нигеријске наире),
 				'one' => q(нигеријска наира),
 				'other' => q(нигеријских наира),
@@ -5990,19 +9973,19 @@ has 'currencies' => (
 		},
 		'NIC' => {
 			display_name => {
-				'currency' => q(Никарагванска кордоба),
-				'few' => q(никарагванске кордобе),
-				'one' => q(никарагванска кордоба),
-				'other' => q(никарагванских кордоба),
+				'currency' => q(никарагванска кордоба \(1988–1991\)),
+				'few' => q(никарагванске кордобе \(1988–1991\)),
+				'one' => q(никарагванска кордоба \(1988–1991\)),
+				'other' => q(никарагванских кордоба \(1988–1991\)),
 			},
 		},
 		'NIO' => {
 			symbol => 'NIO',
 			display_name => {
-				'currency' => q(Никарагванска златна кордоба),
-				'few' => q(никарагванске златне кордобе),
-				'one' => q(никарагванска златна кордоба),
-				'other' => q(никарагванских златних кордоба),
+				'currency' => q(никарагванска кордоба),
+				'few' => q(никарагванске кордобе),
+				'one' => q(никарагванска кордоба),
+				'other' => q(никарагванских кордоба),
 			},
 		},
 		'NLG' => {
@@ -6016,7 +9999,7 @@ has 'currencies' => (
 		'NOK' => {
 			symbol => 'NOK',
 			display_name => {
-				'currency' => q(Норвешка круна),
+				'currency' => q(норвешка круна),
 				'few' => q(норвешке круне),
 				'one' => q(норвешка круна),
 				'other' => q(норвешких круна),
@@ -6025,7 +10008,7 @@ has 'currencies' => (
 		'NPR' => {
 			symbol => 'NPR',
 			display_name => {
-				'currency' => q(Непалскa рупиja),
+				'currency' => q(непалска рупија),
 				'few' => q(непалске рупије),
 				'one' => q(непалска рупија),
 				'other' => q(непалских рупија),
@@ -6034,7 +10017,7 @@ has 'currencies' => (
 		'NZD' => {
 			symbol => 'NZD',
 			display_name => {
-				'currency' => q(Новозеландски долар),
+				'currency' => q(новозеландски долар),
 				'few' => q(новозеландска долара),
 				'one' => q(новозеландски долар),
 				'other' => q(новозеландских долара),
@@ -6043,7 +10026,7 @@ has 'currencies' => (
 		'OMR' => {
 			symbol => 'OMR',
 			display_name => {
-				'currency' => q(Омански ријал),
+				'currency' => q(омански ријал),
 				'few' => q(оманскa ријала),
 				'one' => q(омански ријал),
 				'other' => q(оманских ријала),
@@ -6052,7 +10035,7 @@ has 'currencies' => (
 		'PAB' => {
 			symbol => 'PAB',
 			display_name => {
-				'currency' => q(Панамска балбоа),
+				'currency' => q(панамска балбоа),
 				'few' => q(панамске балбое),
 				'one' => q(панамска балбоа),
 				'other' => q(панамских балбоа),
@@ -6069,7 +10052,7 @@ has 'currencies' => (
 		'PEN' => {
 			symbol => 'PEN',
 			display_name => {
-				'currency' => q(Перуански сол),
+				'currency' => q(перуански сол),
 				'few' => q(перуанска сола),
 				'one' => q(перуански сол),
 				'other' => q(перуанских сола),
@@ -6087,7 +10070,7 @@ has 'currencies' => (
 		'PGK' => {
 			symbol => 'PGK',
 			display_name => {
-				'currency' => q(Папуанска кина),
+				'currency' => q(папуанска кина),
 				'few' => q(папуанскe кинe),
 				'one' => q(папуанска кина),
 				'other' => q(папуанских кинa),
@@ -6096,7 +10079,7 @@ has 'currencies' => (
 		'PHP' => {
 			symbol => 'PHP',
 			display_name => {
-				'currency' => q(Филипински пезос),
+				'currency' => q(филипински пезос),
 				'few' => q(филипинска пезоса),
 				'one' => q(филипински пезос),
 				'other' => q(филипинских пезоса),
@@ -6105,7 +10088,7 @@ has 'currencies' => (
 		'PKR' => {
 			symbol => 'PKR',
 			display_name => {
-				'currency' => q(Пакистанскa рупиja),
+				'currency' => q(пакистанска рупија),
 				'few' => q(пакистанске рупије),
 				'one' => q(пакистанска рупија),
 				'other' => q(пакистанских рупија),
@@ -6114,7 +10097,7 @@ has 'currencies' => (
 		'PLN' => {
 			symbol => 'PLN',
 			display_name => {
-				'currency' => q(Пољски злот),
+				'currency' => q(пољски злот),
 				'few' => q(пољска злота),
 				'one' => q(пољски злот),
 				'other' => q(пољских злота),
@@ -6139,7 +10122,7 @@ has 'currencies' => (
 		'PYG' => {
 			symbol => 'PYG',
 			display_name => {
-				'currency' => q(Парагвајски гварани),
+				'currency' => q(парагвајски гварани),
 				'few' => q(парагвајска гваранија),
 				'one' => q(парагвајски гварани),
 				'other' => q(парагвајских гваранија),
@@ -6148,7 +10131,7 @@ has 'currencies' => (
 		'QAR' => {
 			symbol => 'QAR',
 			display_name => {
-				'currency' => q(Катарски ријал),
+				'currency' => q(катарски ријал),
 				'few' => q(катарска ријала),
 				'one' => q(катарски ријал),
 				'other' => q(катарских ријала),
@@ -6173,7 +10156,7 @@ has 'currencies' => (
 		'RON' => {
 			symbol => 'RON',
 			display_name => {
-				'currency' => q(Румунски леј),
+				'currency' => q(румунски леј),
 				'few' => q(румунскa леја),
 				'one' => q(румунски леј),
 				'other' => q(румунских леја),
@@ -6182,7 +10165,7 @@ has 'currencies' => (
 		'RSD' => {
 			symbol => 'RSD',
 			display_name => {
-				'currency' => q(Српски динар),
+				'currency' => q(српски динар),
 				'few' => q(српска динара),
 				'one' => q(српски динар),
 				'other' => q(српских динара),
@@ -6191,7 +10174,7 @@ has 'currencies' => (
 		'RUB' => {
 			symbol => 'RUB',
 			display_name => {
-				'currency' => q(Руска рубља),
+				'currency' => q(руска рубља),
 				'few' => q(руске рубље),
 				'one' => q(руска рубља),
 				'other' => q(руских рубљи),
@@ -6208,7 +10191,7 @@ has 'currencies' => (
 		'RWF' => {
 			symbol => 'RWF',
 			display_name => {
-				'currency' => q(Руандски франак),
+				'currency' => q(руандски франак),
 				'few' => q(руандскa франка),
 				'one' => q(руандски франак),
 				'other' => q(руандских франака),
@@ -6217,7 +10200,7 @@ has 'currencies' => (
 		'SAR' => {
 			symbol => 'SAR',
 			display_name => {
-				'currency' => q(Саудијски ријал),
+				'currency' => q(саудијски ријал),
 				'few' => q(саудијска ријала),
 				'one' => q(саудијски ријал),
 				'other' => q(саудијских ријала),
@@ -6226,7 +10209,7 @@ has 'currencies' => (
 		'SBD' => {
 			symbol => 'SBD',
 			display_name => {
-				'currency' => q(Соломонски долар),
+				'currency' => q(соломонски долар),
 				'few' => q(соломонска долара),
 				'one' => q(соломонски долар),
 				'other' => q(соломонских долара),
@@ -6235,7 +10218,7 @@ has 'currencies' => (
 		'SCR' => {
 			symbol => 'SCR',
 			display_name => {
-				'currency' => q(Сејшелска рупија),
+				'currency' => q(сејшелска рупија),
 				'few' => q(сејшелске рупије),
 				'one' => q(сејшелска рупија),
 				'other' => q(сејшелских рупија),
@@ -6252,7 +10235,7 @@ has 'currencies' => (
 		'SDG' => {
 			symbol => 'SDG',
 			display_name => {
-				'currency' => q(Суданска фунта),
+				'currency' => q(суданска фунта),
 				'few' => q(суданске фунте),
 				'one' => q(суданска фунта),
 				'other' => q(суданских фунти),
@@ -6269,7 +10252,7 @@ has 'currencies' => (
 		'SEK' => {
 			symbol => 'SEK',
 			display_name => {
-				'currency' => q(Шведска круна),
+				'currency' => q(шведска круна),
 				'few' => q(шведске круне),
 				'one' => q(шведска круна),
 				'other' => q(шведских круна),
@@ -6278,7 +10261,7 @@ has 'currencies' => (
 		'SGD' => {
 			symbol => 'SGD',
 			display_name => {
-				'currency' => q(Сингапурски долар),
+				'currency' => q(сингапурски долар),
 				'few' => q(сингапурска долара),
 				'one' => q(сингапурски долар),
 				'other' => q(сингапурских долара),
@@ -6287,10 +10270,10 @@ has 'currencies' => (
 		'SHP' => {
 			symbol => 'SHP',
 			display_name => {
-				'currency' => q(Св. јеленска фунта),
-				'few' => q(св. јеленске фунте),
-				'one' => q(св. јеленска фунта),
-				'other' => q(св. јеленских фунти),
+				'currency' => q(фунта Свете Јелене),
+				'few' => q(фунте Свете Јелене),
+				'one' => q(фунта Свете Јелене),
+				'other' => q(фунти Свете Јелене),
 			},
 		},
 		'SIT' => {
@@ -6312,7 +10295,7 @@ has 'currencies' => (
 		'SLL' => {
 			symbol => 'SLL',
 			display_name => {
-				'currency' => q(Сијералеонски леоне),
+				'currency' => q(сијералеонски леоне),
 				'few' => q(сијералеонска леона),
 				'one' => q(сијералеонски леоне),
 				'other' => q(сијералеонских леона),
@@ -6321,7 +10304,7 @@ has 'currencies' => (
 		'SOS' => {
 			symbol => 'SOS',
 			display_name => {
-				'currency' => q(Сомалијски шилинг),
+				'currency' => q(сомалијски шилинг),
 				'few' => q(сомалијска шилинга),
 				'one' => q(сомалијски шилинг),
 				'other' => q(сомалијских шилинга),
@@ -6330,7 +10313,7 @@ has 'currencies' => (
 		'SRD' => {
 			symbol => 'SRD',
 			display_name => {
-				'currency' => q(Суринамски долар),
+				'currency' => q(суринамски долар),
 				'few' => q(суринамска долара),
 				'one' => q(суринамски долар),
 				'other' => q(суринамских долара),
@@ -6347,7 +10330,7 @@ has 'currencies' => (
 		'SSP' => {
 			symbol => 'SSP',
 			display_name => {
-				'currency' => q(Јужносуданска фунта),
+				'currency' => q(јужносуданска фунта),
 				'few' => q(јужносуданскe фунтe),
 				'one' => q(јужносуданска фунта),
 				'other' => q(јужносуданских фунти),
@@ -6365,7 +10348,7 @@ has 'currencies' => (
 		'STN' => {
 			symbol => 'STN',
 			display_name => {
-				'currency' => q(Саотомска добра),
+				'currency' => q(саотомска добра),
 				'few' => q(саотомске добре),
 				'one' => q(саотомска добра),
 				'other' => q(саотомских добри),
@@ -6390,7 +10373,7 @@ has 'currencies' => (
 		'SYP' => {
 			symbol => 'SYP',
 			display_name => {
-				'currency' => q(Сиријска фунта),
+				'currency' => q(сиријска фунта),
 				'few' => q(сиријске фунте),
 				'one' => q(сиријска фунта),
 				'other' => q(сиријских фунти),
@@ -6399,7 +10382,7 @@ has 'currencies' => (
 		'SZL' => {
 			symbol => 'SZL',
 			display_name => {
-				'currency' => q(Свазилендски лилангени),
+				'currency' => q(свазилендски лилангени),
 				'few' => q(свазилендска лилангенија),
 				'one' => q(свазилендски лилангени),
 				'other' => q(свазилендских лилангенија),
@@ -6408,7 +10391,7 @@ has 'currencies' => (
 		'THB' => {
 			symbol => 'THB',
 			display_name => {
-				'currency' => q(Тајландски бат),
+				'currency' => q(тајландски бат),
 				'few' => q(тајландска бата),
 				'one' => q(тајландски бат),
 				'other' => q(тајландских бата),
@@ -6425,7 +10408,7 @@ has 'currencies' => (
 		'TJS' => {
 			symbol => 'TJS',
 			display_name => {
-				'currency' => q(Таџикистански сомон),
+				'currency' => q(таџикистански сомон),
 				'few' => q(таџикистанска сомона),
 				'one' => q(таџикистански сомон),
 				'other' => q(таџикистанских сомона),
@@ -6442,7 +10425,7 @@ has 'currencies' => (
 		'TMT' => {
 			symbol => 'TMT',
 			display_name => {
-				'currency' => q(Туркменистански манат),
+				'currency' => q(туркменистански манат),
 				'few' => q(туркменистанскa манатa),
 				'one' => q(туркменистански манат),
 				'other' => q(туркменистанских маната),
@@ -6451,7 +10434,7 @@ has 'currencies' => (
 		'TND' => {
 			symbol => 'TND',
 			display_name => {
-				'currency' => q(Туниски динар),
+				'currency' => q(туниски динар),
 				'few' => q(туниска динара),
 				'one' => q(туниски динар),
 				'other' => q(туниских динара),
@@ -6460,7 +10443,7 @@ has 'currencies' => (
 		'TOP' => {
 			symbol => 'TOP',
 			display_name => {
-				'currency' => q(Тонганска панга),
+				'currency' => q(тонганска панга),
 				'few' => q(тонганске панге),
 				'one' => q(тонганска панга),
 				'other' => q(тонганских панги),
@@ -6485,7 +10468,7 @@ has 'currencies' => (
 		'TRY' => {
 			symbol => 'TRY',
 			display_name => {
-				'currency' => q(Турска лира),
+				'currency' => q(турска лира),
 				'few' => q(турске лире),
 				'one' => q(турска лира),
 				'other' => q(турских лира),
@@ -6503,7 +10486,7 @@ has 'currencies' => (
 		'TWD' => {
 			symbol => 'NT$',
 			display_name => {
-				'currency' => q(Нови тајвански долар),
+				'currency' => q(нови тајвански долар),
 				'few' => q(нова тајванска долара),
 				'one' => q(нови тајвански долар),
 				'other' => q(нових тајванских долара),
@@ -6512,7 +10495,7 @@ has 'currencies' => (
 		'TZS' => {
 			symbol => 'TZS',
 			display_name => {
-				'currency' => q(Танзанијски шилинг),
+				'currency' => q(танзанијски шилинг),
 				'few' => q(танзанијска шилинга),
 				'one' => q(танзанијски шилинг),
 				'other' => q(танзанијских шилинга),
@@ -6521,9 +10504,9 @@ has 'currencies' => (
 		'UAH' => {
 			symbol => 'UAH',
 			display_name => {
-				'currency' => q(Украјинска хривња),
+				'currency' => q(украјинска гривна),
 				'few' => q(украјинскe гривнe),
-				'one' => q(украјинскa хривњa),
+				'one' => q(украјинска гривна),
 				'other' => q(украјинских хривњи),
 			},
 		},
@@ -6546,7 +10529,7 @@ has 'currencies' => (
 		'UGX' => {
 			symbol => 'UGX',
 			display_name => {
-				'currency' => q(Угандски шилинг),
+				'currency' => q(угандски шилинг),
 				'few' => q(угандскa шилинга),
 				'one' => q(угандски шилинг),
 				'other' => q(угандских шилинга),
@@ -6555,7 +10538,7 @@ has 'currencies' => (
 		'USD' => {
 			symbol => 'US$',
 			display_name => {
-				'currency' => q(Амерички долар),
+				'currency' => q(амерички долар),
 				'few' => q(америчка долара),
 				'one' => q(амерички долар),
 				'other' => q(америчких долара),
@@ -6596,7 +10579,7 @@ has 'currencies' => (
 		'UYU' => {
 			symbol => 'UYU',
 			display_name => {
-				'currency' => q(Уругвајски пезос),
+				'currency' => q(уругвајски пезос),
 				'few' => q(уругвајска пезоса),
 				'one' => q(уругвајски пезос),
 				'other' => q(уругвајских пезоса),
@@ -6605,7 +10588,7 @@ has 'currencies' => (
 		'UZS' => {
 			symbol => 'UZS',
 			display_name => {
-				'currency' => q(Узбекистански сом),
+				'currency' => q(узбекистански сом),
 				'few' => q(узбекистанска сома),
 				'one' => q(узбекистански сом),
 				'other' => q(узбекистанских сома),
@@ -6631,7 +10614,7 @@ has 'currencies' => (
 		'VES' => {
 			symbol => 'VES',
 			display_name => {
-				'currency' => q(Венецуелански боливар),
+				'currency' => q(венецуелански боливар),
 				'few' => q(венецуеланска боливара),
 				'one' => q(венецуелански боливар),
 				'other' => q(венецуеланских боливара),
@@ -6640,7 +10623,7 @@ has 'currencies' => (
 		'VND' => {
 			symbol => 'VND',
 			display_name => {
-				'currency' => q(Вијетнамски донг),
+				'currency' => q(вијетнамски донг),
 				'few' => q(вијетнамска донга),
 				'one' => q(вијетнамски донг),
 				'other' => q(вијетнамских донга),
@@ -6657,7 +10640,7 @@ has 'currencies' => (
 		'VUV' => {
 			symbol => 'VUV',
 			display_name => {
-				'currency' => q(Вануатски вату),
+				'currency' => q(вануатски вату),
 				'few' => q(вануатскa ватуa),
 				'one' => q(вануатски вату),
 				'other' => q(вануатских ватуa),
@@ -6666,7 +10649,7 @@ has 'currencies' => (
 		'WST' => {
 			symbol => 'WST',
 			display_name => {
-				'currency' => q(Самоанска тала),
+				'currency' => q(самоанска тала),
 				'few' => q(самоанске тале),
 				'one' => q(самоанска тала),
 				'other' => q(самоанских тала),
@@ -6675,10 +10658,10 @@ has 'currencies' => (
 		'XAF' => {
 			symbol => 'FCFA',
 			display_name => {
-				'currency' => q(CFA франак BEAC),
-				'few' => q(CFA франка BEAC),
-				'one' => q(CFA франак BEAC),
-				'other' => q(CFA франака BEAC),
+				'currency' => q(централноафрички франак),
+				'few' => q(централноафричка франка),
+				'one' => q(централноафрички франак),
+				'other' => q(централноафричких франака),
 			},
 		},
 		'XAG' => {
@@ -6732,7 +10715,7 @@ has 'currencies' => (
 		'XCD' => {
 			symbol => 'EC$',
 			display_name => {
-				'currency' => q(Источнокарипски долар),
+				'currency' => q(источнокарипски долар),
 				'few' => q(источнокарипскa доларa),
 				'one' => q(источнокарипски долар),
 				'other' => q(источнокарипскиx доларa),
@@ -6771,12 +10754,12 @@ has 'currencies' => (
 			},
 		},
 		'XOF' => {
-			symbol => 'CFA',
+			symbol => 'F CFA',
 			display_name => {
-				'currency' => q(ЦФА франак БЦЕАО),
-				'few' => q(ЦФА франка БЦЕАО),
-				'one' => q(ЦФА франак БЦЕАО),
-				'other' => q(ЦФА франака БЦЕАО),
+				'currency' => q(западноафрички франак),
+				'few' => q(западноафричка франка),
+				'one' => q(западноафрички франак),
+				'other' => q(западноафричких франака),
 			},
 		},
 		'XPD' => {
@@ -6839,7 +10822,7 @@ has 'currencies' => (
 		'YER' => {
 			symbol => 'YER',
 			display_name => {
-				'currency' => q(Јеменски риjал),
+				'currency' => q(јеменски ријал),
 				'few' => q(јеменска ријала),
 				'one' => q(јеменски ријал),
 				'other' => q(jеменских ријала),
@@ -6888,7 +10871,7 @@ has 'currencies' => (
 		'ZAR' => {
 			symbol => 'ZAR',
 			display_name => {
-				'currency' => q(Јужноафрички ранд),
+				'currency' => q(јужноафрички ранд),
 				'few' => q(јужноафричка ранда),
 				'one' => q(јужноафрички ранд),
 				'other' => q(јужноафричких ранда),
@@ -6905,7 +10888,7 @@ has 'currencies' => (
 		'ZMW' => {
 			symbol => 'ZMW',
 			display_name => {
-				'currency' => q(Замбијска квача),
+				'currency' => q(замбијска квача),
 				'few' => q(замбијске кваче),
 				'one' => q(замбијска квача),
 				'other' => q(замбијских квача),
@@ -7147,13 +11130,13 @@ has 'calendar_months' => (
 							'Елул'
 						],
 						leap => [
-							'',
-							'',
-							'',
-							'',
-							'',
-							'',
-							'Адар II'
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							
 						],
 					},
 				},
@@ -7363,10 +11346,10 @@ has 'calendar_quarters' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {0 => 'К1',
-						1 => 'К2',
-						2 => 'К3',
-						3 => 'К4'
+					abbreviated => {0 => '1. кв.',
+						1 => '2. кв.',
+						2 => '3. кв.',
+						3 => '4. кв.'
 					},
 					narrow => {0 => '1.',
 						1 => '2.',
@@ -7380,10 +11363,10 @@ has 'calendar_quarters' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {0 => 'К1',
-						1 => 'К2',
-						2 => 'К3',
-						3 => 'К4'
+					abbreviated => {0 => '1. кв.',
+						1 => '2. кв.',
+						2 => '3. кв.',
+						3 => '4. кв.'
 					},
 					narrow => {0 => '1.',
 						1 => '2.',
@@ -7690,8 +11673,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'day_periods' => (
@@ -7703,45 +11686,43 @@ has 'day_periods' => (
 			'format' => {
 				'abbreviated' => {
 					'afternoon1' => q{по подне},
-					'am' => q{пре подне},
 					'evening1' => q{увече},
 					'midnight' => q{поноћ},
 					'morning1' => q{ујутро},
 					'night1' => q{ноћу},
 					'noon' => q{подне},
-					'pm' => q{по подне},
 				},
 				'narrow' => {
 					'afternoon1' => q{по подне},
-					'am' => q{a},
+					'am' => q{AM},
 					'evening1' => q{увече},
 					'midnight' => q{поноћ},
 					'morning1' => q{ујутру},
 					'night1' => q{ноћу},
 					'noon' => q{подне},
-					'pm' => q{p},
+					'pm' => q{PM},
 				},
 				'wide' => {
 					'afternoon1' => q{по подне},
-					'am' => q{пре подне},
+					'am' => q{AM},
 					'evening1' => q{увече},
 					'midnight' => q{поноћ},
 					'morning1' => q{ујутро},
 					'night1' => q{ноћу},
 					'noon' => q{подне},
-					'pm' => q{по подне},
+					'pm' => q{PM},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
 					'afternoon1' => q{поподне},
-					'am' => q{пре подне},
+					'am' => q{AM},
 					'evening1' => q{вече},
 					'midnight' => q{поноћ},
 					'morning1' => q{јутро},
 					'night1' => q{ноћ},
 					'noon' => q{подне},
-					'pm' => q{по подне},
+					'pm' => q{PM},
 				},
 				'narrow' => {
 					'afternoon1' => q{поподне},
@@ -7755,13 +11736,13 @@ has 'day_periods' => (
 				},
 				'wide' => {
 					'afternoon1' => q{поподне},
-					'am' => q{пре подне},
+					'am' => q{AM},
 					'evening1' => q{вече},
 					'midnight' => q{поноћ},
 					'morning1' => q{јутро},
 					'night1' => q{ноћ},
 					'noon' => q{подне},
-					'pm' => q{по подне},
+					'pm' => q{PM},
 				},
 			},
 		},
@@ -8047,7 +12028,8 @@ has 'eras' => (
 				'232' => 'Меиђи',
 				'233' => 'Таишо',
 				'234' => 'Шова',
-				'235' => 'Хаисеи'
+				'235' => 'Хаисеи',
+				'236' => 'Реива'
 			},
 		},
 		'persian' => {
@@ -8082,9 +12064,9 @@ has 'date_formats' => (
 			'short' => q{d.M.y. GGGGG},
 		},
 		'gregorian' => {
-			'full' => q{EEEE, dd. MMMM y.},
-			'long' => q{dd. MMMM y.},
-			'medium' => q{dd.MM.y.},
+			'full' => q{EEEE, d. MMMM y.},
+			'long' => q{d. MMMM y.},
+			'medium' => q{d. M. y.},
 			'short' => q{d.M.yy.},
 		},
 		'hebrew' => {
@@ -8199,6 +12181,7 @@ has 'datetime_formats_available_formats' => (
 			GyMMM => q{MMM y. G},
 			GyMMMEd => q{E, d. MMM y. G},
 			GyMMMd => q{d. MMM y. G},
+			GyMd => q{d.M.y. GGGGG},
 			H => q{HH},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -8247,6 +12230,7 @@ has 'datetime_formats_available_formats' => (
 			GyMMM => q{MMM y. G},
 			GyMMMEd => q{E, d. MMM y. G},
 			GyMMMd => q{d. MMM y. G},
+			GyMd => q{d.MM.y. GGGGG},
 			H => q{HH},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -8257,7 +12241,7 @@ has 'datetime_formats_available_formats' => (
 			MMM => q{LLL},
 			MMMEd => q{E d. MMM},
 			MMMMEd => q{E, d. MMMM},
-			MMMMW => q{W. 'седмица' 'у' MMM.},
+			MMMMW => q{W. 'седмица' 'у' MMMM.},
 			MMMMd => q{d. MMMM},
 			MMMd => q{d. MMM},
 			MMMdd => q{dd.MMM},
@@ -8834,7 +12818,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Куиаба#,
 		},
 		'America/Curacao' => {
-			exemplarCity => q#Кирасо#,
+			exemplarCity => q#Курасао#,
 		},
 		'America/Danmarkshavn' => {
 			exemplarCity => q#Данмарксхаген#,
@@ -9454,6 +13438,9 @@ has 'time_zone_names' => (
 		'Asia/Qatar' => {
 			exemplarCity => q#Катар#,
 		},
+		'Asia/Qostanay' => {
+			exemplarCity => q#Костанај#,
+		},
 		'Asia/Qyzylorda' => {
 			exemplarCity => q#Кизилорда#,
 		},
@@ -9840,7 +13827,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Истанбул#,
 		},
 		'Europe/Jersey' => {
-			exemplarCity => q#Џерси#,
+			exemplarCity => q#Џерзи#,
 		},
 		'Europe/Kaliningrad' => {
 			exemplarCity => q#Калињинград#,
@@ -9991,7 +13978,7 @@ has 'time_zone_names' => (
 		},
 		'Europe_Further_Eastern' => {
 			long => {
-				'standard' => q#Даљи исток Европе#,
+				'standard' => q#Време даљег истока Европе#,
 			},
 		},
 		'Europe_Western' => {
@@ -10381,7 +14368,9 @@ has 'time_zone_names' => (
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q#Норфолк Острво време#,
+				'daylight' => q#Норфолк Острво, летње време#,
+				'generic' => q#Норфолк Острво време#,
+				'standard' => q#Норфолк Острво, стандардно време#,
 			},
 		},
 		'Noronha' => {
@@ -10773,6 +14762,11 @@ has 'time_zone_names' => (
 				'daylight' => q#Јекатеринбург, летње време#,
 				'generic' => q#Јекатеринбург време#,
 				'standard' => q#Јекатеринбург, стандардно време#,
+			},
+		},
+		'Yukon' => {
+			long => {
+				'standard' => q#Јукон#,
 			},
 		},
 	 } }

@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Fallback;
-$Crypt::Passphrase::Fallback::VERSION = '0.016';
+$Crypt::Passphrase::Fallback::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -39,29 +39,43 @@ Crypt::Passphrase::Fallback - a fallback validator for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.016
+version 0.019
 
-=head1 METHODS
+=head1 SYNOPSIS
 
-=head2 new(%args)
+ sub plaintext {
+	my ($password, $hash) = @_;
+	return $password eq $hash;
+ }
 
-This method takes two named arguments
+ my $passphrase = Crypt::Passphrase->new(
+     encoder    => 'Argon2',
+     validators => [ \&plaintext ],
+ );
+
+=head1 DESCRIPTION
+
+This is a helper class to write ad-hoc validators. If passing a subref as a validator C<Crypt::Passphrase> will automatically wrap it in a fallback object, but it can also passed explicitly.
+
+=head1 CONFIGURATION
+
+This takes two named arguments:
 
 =over 4
 
 =item * callback
 
-The C<verify_password> method will call this with the password and the hash, and return its return value.
+The C<verify_password> method will call this with the password and the hash, and return its return value. C<This is mandatory>.
 
 =item * acceptor
 
-This callback will decide if this object will take a hash. By default it accepts anything.
+This callback will decide if this object will try to match a hash. By default it always return true (so always accepts 
 
 =back
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

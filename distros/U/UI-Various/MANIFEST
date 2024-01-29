@@ -15,6 +15,7 @@ builder/update-language.pl
 cpanfile
 examples/README.md
 examples/_common.pl
+examples/all.sh
 examples/hello-sized.pl
 examples/hello-two-windows.pl
 examples/hello-variable-content.pl
@@ -23,6 +24,7 @@ examples/hello.pl
 examples/listbox-with-buttons.pl
 examples/listbox.pl
 examples/overview-alignments.pl
+examples/overview-colours.pl
 examples/select-file.pl
 lib/UI/Various.pm
 lib/UI/Various/Box.pm
@@ -124,6 +126,8 @@ t/52-rich-term-box.t
 t/53-rich-term-listbox.t
 t/54-rich-term-dialog.t
 t/55-rich-term-optionmenu.t
+t/56-rich-term-utf8.t
+t/57-rich-term-colour.t
 t/functions/call_with_stdin.pl
 t/functions/run_in_fork.pl
 t/functions/sub_perl.pl

@@ -1,5 +1,5 @@
 # ENV-Util
-Parse prefixed environment variables and dotnev (.env) files into Perl
+Parse prefixed environment variables and dotenv (.env) files into Perl
 
 ## Synopsis
 

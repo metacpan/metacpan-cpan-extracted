@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.806;
+package Object::Pad 0.808;
 
 use v5.14;
 use warnings;
@@ -113,6 +113,8 @@ module to only silence the module's warnings selectively:
 
    use Object::Pad ':experimental(composed_adjust)';
 
+   use Object::Pad ':experimental(inherit_field)';
+
    use Object::Pad ':experimental';  # all of the above
 
 I<Since version 0.64.>
@@ -196,36 +198,6 @@ sets the value of the package's C<$VERSION> variable.
 
    class Name VERSION;
 
-A single superclass is supported by the keyword C<isa>
-
-I<Since version 0.41.>
-
-   class Name isa BASECLASS {
-      ...
-   }
-
-   class Name isa BASECLASS BASEVER {
-      ...
-   }
-
-Prior to version 0.41 this was called C<extends>, but I<since version 0.73>
-this is no longer recognised. The C<isa> keyword is now deprecated, in favour
-of the L</:isa> attribute which is preferred because it follows a more
-standard grammar without this special-case.
-
-One or more roles can be composed into the class by the keyword C<does>
-
-I<Since version 0.41.>
-
-   class Name does ROLE, ROLE,... {
-      ...
-   }
-
-Prior to version 0.41 this was called C<implements>, but I<since version 0.73>
-this is no longer recognised. The C<does> keyword is now deprecated, in favour
-of the L</:does> attribute which is preferred because it follows a more
-standard grammar without this special-case.
-
 An optional list of attributes may be supplied in similar syntax as for subs
 or lexical variables. (These are annotations about the class itself; the
 concept should not be confused with per-object-instance data, which here is
@@ -276,8 +248,7 @@ An optional version check can also be supplied; it performs the equivalent of
 I<Since version 0.57.>
 
 Composes a role into the class; optionally requiring a version check on the
-role package. This is a newer form of the C<implements> and C<does>
-keywords and should be preferred for new code.
+role package.
 
 Multiple roles can be composed by using multiple C<:does> attributes, one per
 role.
@@ -457,6 +428,76 @@ upgrade of existing classical Perl code into using C<Object::Pad>. When all
 existing code is using C<Object::Pad> then this attribute can be removed from
 the role.
 
+=head2 inherit
+
+   inherit Classname;
+   inherit Classname VER;
+
+   inherit Classname LIST...;
+   inherit Classname VER LIST...;
+
+Declares a superclass that this class extends. At most one superclass is
+supported. If present, this declaration must come before any methods or fields
+are declared, or any roles applied. (Other compile-time declarations such as
+C<use> statements that import utility functions or other behaviours may be
+permitted before this, however, provided that they do not interact with the
+class structure in any way).
+
+This is a newer form of the C<:isa> attribute intended to be more flexible if
+import arguments or other features are added at a later time.
+
+If the package providing the superclass does not exist, an attempt is made to
+load it by code equivalent to
+
+   require Classname;
+
+and thus it must either already exist, or be locatable via the usual C<@INC>
+mechanisms.
+
+An optional version check can also be supplied; it performs the equivalent of
+
+   Classname->VERSION( $ver )
+
+Experimentally I<since version 0.807>, an optional list of arguments can also
+be provided, in similar syntax to those in a C<use> statement. Currently this
+list of arguments must be names of fields to be inherited. Only fields in the
+base class that are annotated with the C<:inheritable> attribute may be
+inherited. Once a field is inherited, methods and other expressions in the
+class body can use that field identically to any fields defined by that class
+itself.
+
+   class Class1 {
+      field $x :inheritable = 123;
+   }
+
+   class Class2 {
+      inherit Class1 '$x';
+      field $y = 456;
+      method describe { say "Class2(x=$x,y=$y)" }
+   }
+
+   Class2->new->describe;
+
+=head2 apply
+
+   apply Rolename;
+
+   apply Rolename VER;
+
+I<Since version 0.807.>
+
+Composes a role into the class; optionally requiring a version check on the
+role package. This is a newer form of the C<:does> attribute intended to be
+more flexible if import arguments or other features are added at a later time.
+
+Multiple roles can be composed by using multiple C<:does> attributes, one per
+role.
+
+C<apply> statements can be freely mixed with other statements inside the body
+of the class. In particular, an C<apply> statement that adds fields or methods
+may appear before or after the class has defined some of its own. It is not
+required that they appear first.
+
 =head2 field
 
    field $var;
@@ -618,6 +659,12 @@ executed.
 
 Values for fields are assigned by the constructor before any C<BUILD> blocks
 are invoked.
+
+=head3 :inheritable
+
+Experimentally I<since version 0.807> fields may be optionally inherited when
+deriving a subclass from another. Not every field is allowed to be inherited.
+This attribute marks a field as being available for subclasses to inherit.
 
 =head3 Field Initialiser Expressions
 
@@ -1337,7 +1384,7 @@ sub import_into
    my $class = shift;
    my $caller = shift;
 
-   $class->_import_experimental( \@_, qw( init_expr mop custom_field_attr adjust_params composed_adjust ) );
+   $class->_import_experimental( \@_, qw( init_expr mop custom_field_attr adjust_params composed_adjust inherit_field ) );
 
    $class->_import_configuration( \@_ );
 
@@ -1345,10 +1392,10 @@ sub import_into
 
    # Default imports
    unless( %syms ) {
-      $syms{$_}++ for qw( class role method field has requires BUILD ADJUST );
+      $syms{$_}++ for qw( class role inherit apply method field has requires BUILD ADJUST );
    }
 
-   delete $syms{$_} and $^H{"Object::Pad/$_"}++ for qw( class role method field has requires BUILD ADJUST );
+   delete $syms{$_} and $^H{"Object::Pad/$_"}++ for qw( class role inherit apply method field has requires BUILD ADJUST );
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }

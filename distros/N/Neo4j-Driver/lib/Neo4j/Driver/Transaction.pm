@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transaction;
 # ABSTRACT: Logical container for an atomic unit of work
-$Neo4j::Driver::Transaction::VERSION = '0.41';
+$Neo4j::Driver::Transaction::VERSION = '0.42';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(
@@ -296,7 +296,7 @@ Neo4j::Driver::Transaction - Logical container for an atomic unit of work
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 SYNOPSIS
 
@@ -520,10 +520,7 @@ L<Sessions & Transactions (Python)|https://neo4j.com/docs/api/python-driver/5.2/
 
 =head1 AUTHOR
 
-Arne Johannessen <ajnn@cpan.org>
-
-If you contact me by email, please make sure you include the word
-"Perl" in your subject header to help beat the spam filters.
+Arne Johannessen (L<AJNN|https://arne.johannessen.de/>)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,3 +1,17 @@
+0.014   2023-11-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Build against updated File::Util::DirList (0.002) which adds
+          two arguments to mv_files_to_dirs(): 'files_per_dir' and 'reverse'.
+
+
+0.013   2023-11-20  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add shorter alias for rename-add-prefix-datestamp:
+          datestamp.
+
+
 0.012   2023-11-15  Released-By: PERLANCAR; Urgency: medium
 
         - Add utility: mv-files-to-dirs.

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2;
-our $VERSION = "0.74";
+our $VERSION = "0.76";
 
 require 5.012;
 
@@ -10,6 +10,8 @@ require 5.012;
 # entities
 use Net::SAML2::IdP;
 use Net::SAML2::SP;
+use Net::SAML2::RequestedAttribute;
+use Net::SAML2::AttributeConsumingService;
 
 # bindings
 use Net::SAML2::Binding::Redirect;
@@ -38,7 +40,7 @@ Net::SAML2 - SAML2 bindings and protocol implementation
 
 =head1 VERSION
 
-version 0.74
+version 0.76
 
 =head1 SYNOPSIS
 
@@ -176,7 +178,7 @@ Timothy Legge <timlegge@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Venda Ltd, see the CONTRIBUTORS file for others.
+This software is copyright (c) 2024 by Venda Ltd, see the CONTRIBUTORS file for others.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

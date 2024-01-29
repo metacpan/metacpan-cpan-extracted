@@ -1,5 +1,5 @@
 This archive contains the distribution Env-Assert,
-version 0.009:
+version 0.010:
 
   Ensure that the environment variables match what you need, or abort.
 

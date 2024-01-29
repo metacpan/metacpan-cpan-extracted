@@ -1,5 +1,11 @@
 Revision history for Database-Async-Engine-PostgreSQL
 
+1.004     2024-01-08 14:22:35+08:00 Asia/Singapore
+    [Bugs fixed]
+
+    - for ->simple_query(), ensure we finish the row source, and pass through the Database::Async
+    instance (otherwise you'd get errors about not being able to call ->new_future)
+
 1.003     2023-12-04 23:22:18+08:00 Asia/Singapore
     [New features]
 

@@ -1,13 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2024 -- leonerd@leonerd.org.uk
 
-use v5.14;
-use Object::Pad 0.45;
+use v5.26;
+use warnings;
+use Object::Pad 0.800;
 
-package Device::BusPirate::Mode::I2C 0.23;
-class Device::BusPirate::Mode::I2C isa Device::BusPirate::Mode;
+package Device::BusPirate::Mode::I2C 0.24;
+class Device::BusPirate::Mode::I2C :isa(Device::BusPirate::Mode);
 
 use Carp;
 
@@ -49,12 +50,11 @@ with one or more I2C-attached chips.
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented with C<await> expressions L<Future> instances.
 
 =cut
 
-has $_version;
+field $_version;
 
 # Not to be confused with start_bit
 async method start
@@ -69,7 +69,7 @@ async method start
 
 =head2 configure
 
-   $i2c->configure( %args )->get
+   await $i2c->configure( %args );
 
 Change configuration options. The following options exist:
 
@@ -114,7 +114,7 @@ async method configure ( %args )
 
 =head2 start_bit
 
-   $i2c->start_bit->get
+   await $i2c->start_bit;
 
 Sends an I2C START bit transition
 
@@ -129,7 +129,7 @@ method start_bit
 
 =head2 stop_bit
 
-   $i2c->stop_bit->get
+   await $i2c->stop_bit;
 
 Sends an I2C STOP bit transition
 
@@ -144,7 +144,7 @@ method stop_bit
 
 =head2 write
 
-   $i2c->write( $bytes )->get
+   await $i2c->write( $bytes );
 
 Sends the given bytes over the I2C wire. This method does I<not> send a
 preceding start or a following stop; you must do that yourself, or see the
@@ -172,7 +172,7 @@ async method write ( $bytes )
 
 =head2 read
 
-   $bytes = $i2c->read( $length )->get
+   $bytes = await $i2c->read( $length );
 
 Receives the given number of bytes over the I2C wire, sending an ACK bit after
 each one but the final, to which is sent a NACK.
@@ -213,7 +213,7 @@ method _i2c_txn ( $code )
 
 =head2 send
 
-   $i2c->send( $address, $bytes )->get
+   await $i2c->send( $address, $bytes );
 
 A convenient wrapper around C<start_bit>, C<write> and C<stop_bit>. This
 method sends a START bit, then an initial byte to address the slave in WRITE
@@ -236,7 +236,7 @@ method send ( $address, $bytes )
 
 =head2 recv
 
-   $bytes = $i2c->recv( $address, $length )->get
+   $bytes = await $i2c->recv( $address, $length );
 
 A convenient wrapper around C<start_bit>, C<write>, C<read> and C<stop_bit>.
 This method sends a START bit, then an initial byte to address the slave in
@@ -260,7 +260,7 @@ method recv ( $address, $length )
 
 =head2 send_then_recv
 
-   $bytes_in = $ic->send_then_recv( $address, $bytes_out, $read_len )->get
+   $bytes_in = await $ic->send_then_recv( $address, $bytes_out, $read_len );
 
 A convenient wrapper around C<start_bit>, C<write>, C<read> and C<stop_bit>.
 This method combines a C<send> and C<recv> operation, with a repeated START

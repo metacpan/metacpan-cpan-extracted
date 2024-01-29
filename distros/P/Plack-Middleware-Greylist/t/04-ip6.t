@@ -14,7 +14,7 @@ use Plack::Middleware::ReverseProxy;
 my $file = Path::Tiny->tempfile;
 
 my %greylist = (
-    "2001:67c:1220::/32"   => [ 5,  "first" ],
+    "2001:67c:1220::/32"      => [ 5, "first" ],
     "2001:67c:1220:f565::/64" => [ 6, "second" ],
 );
 
@@ -94,7 +94,8 @@ subtest "rate limiting" => sub {
         my $res = $cb->($req);
         is $res->code, HTTP_TOO_MANY_REQUESTS, "too many requests";
 
-        is \@logs, [ { level => "warn", message => "Rate limiting 2001:67c:1220:f565::1 after 7/6 for 2001:67c:1220:f565::/64" } ], "logs";
+        is \@logs,
+          [ { level => "warn", message => "Rate limiting 2001:67c:1220:f565::1 after 7/6 for 2001:67c:1220:f565::/64" } ], "logs";
 
       };
 

@@ -233,8 +233,7 @@ sub sendCodeForm {
               . $self->prefix
               . '2fcheck?skin='
               . $self->p->getSkin($req),
-            CHECKLOGINS   => $checkLogins,
-            STAYCONNECTED => $stayconnected,
+            $self->get2fTplParams($req),
             %params,
         }
     );

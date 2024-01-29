@@ -44,7 +44,7 @@ CONSTRUCTOR
 
  new
 
-       $pirate = Device::BusPirate->new( %args )
+       $pirate = Device::BusPirate->new( %args );
 
     Returns a new Device::BusPirate instance to communicate with the given
     device. Takes the following named arguments:
@@ -62,19 +62,19 @@ CONSTRUCTOR
 
 METHODS
 
-    The following methods documented with a trailing call to ->get return
-    Future instances.
+    The following methods documented with await expressions Future
+    instances.
 
  sleep
 
-       $pirate->sleep( $timeout )->get
+       await $pirate->sleep( $timeout );
 
     Returns a Future that will become ready after the given timeout (in
     seconds), unless it is cancelled first.
 
  enter_mutex
 
-       @result = $pirate->enter_mutex( $code )->get
+       @result = await $pirate->enter_mutex( $code );
 
     Acts as a mutex lock, to ensure only one block of code runs at once.
     Calls to enter_mutex will be queued up; each $code block will only be
@@ -86,7 +86,7 @@ METHODS
 
  enter_mode
 
-       $mode = $pirate->enter_mode( $modename )->get
+       $mode = await $pirate->enter_mode( $modename );
 
     Switches the attached device into the given mode, and returns an object
     to represent that hardware mode to interact with. This will be an
@@ -116,7 +116,7 @@ METHODS
 
  start
 
-       $pirate->start->get
+       await $pirate->start;
 
     Starts binary IO mode on the Bus Pirate device, enabling the module to
     actually communicate with it. Normally it is not necessary to call this
@@ -125,7 +125,7 @@ METHODS
 
  stop
 
-       $pirate->stop
+       $pirate->stop;
 
     Stops binary IO mode on the Bus Pirate device and returns it to user
     terminal mode. It may be polite to perform this at the end of a program

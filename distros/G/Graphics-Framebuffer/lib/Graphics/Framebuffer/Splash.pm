@@ -14,7 +14,7 @@ use List::Util qw(min max);
 BEGIN {
     require Exporter;
     our @ISA = qw( Exporter );
-    our $VERSION = '1.23';
+    our $VERSION = '1.24';
     our @EXPORT = qw( _perl_logo splash );
     our @EXPORT_OK = qw();
 }
@@ -71,7 +71,7 @@ sub _perl_logo {
 
 sub splash {
     my $self    = shift;
-    my $version = shift;
+    my $version = shift || $self->{'VERSION'};
     return if ($self->{'SPLASH'} == 0);
 
     my $X = $self->{'X_CLIP'};
@@ -110,7 +110,7 @@ sub splash {
             'hatch'  => 'dots16'
         }
     );
-    $self->alpha_mode() if ($self->{'GPU'} !~ /nouveaufb/ && $self->{'ACCELERATED'});
+    $self->alpha_mode() if ($self->{'GPU'} !~ /nouveaufb/ && $self->{'ACCELERATED'}); # Nouveau SUCKS
     $self->set_color({ 'red' => 0, 'green' => 0, 'blue' => 128, 'alpha' => 255 });
     $self->polygon(
         {
@@ -376,7 +376,7 @@ sub splash {
         }
     );
 
-    # Accelerated green-yellow
+    # (Un)Accelerated green-yellow
     $self->rbox(
         {
             'x'        => (470 * $hf) + $X,
@@ -388,10 +388,10 @@ sub splash {
             'gradient' => {
                 'direction' => 'vertical',
                 'colors'    => {
-                    'red'   => [0,   255, 255, 255],
-                    'green' => [255, 255, 255, 0],
-                    'blue'  => [0,   0,   0,   255],
-                    'alpha' => [255, 255, 255, 255],
+                    'red'   => [0,0,   255, 255, 255,0],
+                    'green' => [0,255, 255, 255, 0,0],
+                    'blue'  => [0,0,   0,   0,   255,0],
+                    'alpha' => [0,255, 255, 255, 255,0],
                 },
             }
         }

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1005;
+use Test::More tests => 503;
 
 ###############################################################################
 # Read and load configuration file and backend library.
@@ -53,48 +53,6 @@ while (<DATAFILE>) {
     push @data, [ split /:/ ];
 }
 close DATAFILE or die "$datafile: can't close file after reading: $!";
-
-# List context.
-
-for (my $i = 0 ; $i <= $#data ; ++ $i) {
-    my $in0 = $i;
-    my $out = [ map { $data[$_][1] } 0 .. $i ];
-
-    my ($x, @got);
-
-    my $test = qq|\$x = $LIB->_new("$in0"); |
-             . qq|\@got = $LIB->_lucas(\$x);|;
-
-    diag("\n$test\n\n") if $ENV{AUTHOR_DEBUGGING};
-
-    eval $test;
-    is($@, "", "'$test' gives emtpy \$\@");
-
-    subtest "_lucas() in list context: $test", sub {
-        plan tests =>  3 * $i + 6,
-
-        cmp_ok(scalar @got, "==", scalar @$out,
-               "'$test' gives one output arg");
-
-        for (my $j = 0 ; $j <= $#$out ; ++ $j) {
-
-            is(ref($got[$j]), $REF,
-               "'$test' output arg is a $REF");
-
-            is($LIB->_check($got[$j]), 0,
-               "'$test' output is valid");
-
-            is($LIB->_str($got[$j]), $out->[$j],
-               "'$test' output arg has the right value");
-        }
-
-        is(ref($x), $REF,
-           "'$test' input arg is still a $REF");
-
-        ok($LIB->_str($x) eq $out->[-1] || $LIB->_str($x) eq $in0,
-           "'$test' input arg has the correct value");
-    };
-}
 
 # Scalar context.
 

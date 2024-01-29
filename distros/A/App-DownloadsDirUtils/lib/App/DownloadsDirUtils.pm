@@ -11,9 +11,9 @@ use Perinci::Object;
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-12-08'; # DATE
+our $DATE = '2023-12-12'; # DATE
 our $DIST = 'App-DownloadsDirUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our %SPEC;
 
@@ -112,6 +112,7 @@ MARKDOWN
         },
         output_code => sub {
             no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
+            require File::Basename;
             require File::Copy::Recursive;
 
             my %args = @_;
@@ -126,7 +127,7 @@ MARKDOWN
             my $i = 0;
             for my $file (@{ $res->[2] }) {
                 $i++;
-                my $targetpath = $to_dir . '/' . ($args{as} // $file);
+                my $targetpath = $to_dir . '/' . ($args{as} // File::Basename::basename($file));
                 if (-e $targetpath && !$args{overwrite}) {
                     $envres->add_result(409, "File already exist '$targetpath', please choose another name or specify -O to overwrite", {item_id=>$file});
                 } elsif ($args{-dry_run}) {
@@ -164,7 +165,7 @@ App::DownloadsDirUtils - Utilities related to downloads directories
 
 =head1 VERSION
 
-This document describes version 0.006 of App::DownloadsDirUtils (from Perl distribution App-DownloadsDirUtils), released on 2023-12-08.
+This document describes version 0.007 of App::DownloadsDirUtils (from Perl distribution App-DownloadsDirUtils), released on 2023-12-12.
 
 =head1 DESCRIPTION
 

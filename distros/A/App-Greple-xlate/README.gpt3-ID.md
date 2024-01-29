@@ -10,17 +10,17 @@ App::Greple::xlate - modul dukungan terjemahan untuk greple
 
 # VERSION
 
-Version 0.28
+Version 0.29
 
 # DESCRIPTION
 
-Modul **Greple** **xlate** mencari blok teks dan menggantinya dengan teks yang diterjemahkan. Saat ini, modul DeepL (`deepl.pm`) dan ChatGPT (`gpt3.pm`) diimplementasikan sebagai mesin backend.
+Modul **Greple** **xlate** mencari blok teks yang diinginkan dan menggantinya dengan teks terjemahan. Saat ini, modul DeepL (`deepl.pm`) dan ChatGPT (`gpt3.pm`) diimplementasikan sebagai mesin backend.
 
-Jika Anda ingin menerjemahkan blok teks normal yang ditulis dalam gaya [pod](https://metacpan.org/pod/pod), gunakan perintah **greple** dengan modul `xlate::deepl` dan `perl` seperti ini:
+Jika Anda ingin menerjemahkan blok teks normal dalam dokumen yang ditulis dalam gaya pod Perl, gunakan perintah **greple** dengan modul `xlate::deepl` dan `perl` seperti ini:
 
     greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
 
-Pola `^(\w.*\n)+` berarti baris-baris berurutan yang dimulai dengan huruf alfanumerik. Perintah ini menampilkan area yang akan diterjemahkan. Opsi **--all** digunakan untuk menghasilkan seluruh teks.
+Pada perintah ini, string pola `^(\w.*\n)+` berarti baris-baris berurutan yang dimulai dengan huruf alfanumerik. Perintah ini menampilkan area yang akan diterjemahkan yang di-highlight. Opsi **--all** digunakan untuk menghasilkan seluruh teks.
 
 <div>
     <p>
@@ -28,7 +28,7 @@ Pola `^(\w.*\n)+` berarti baris-baris berurutan yang dimulai dengan huruf alfanu
     </p>
 </div>
 
-Kemudian tambahkan opsi `--xlate` untuk menerjemahkan area yang dipilih. Ini akan mencari dan menggantinya dengan output perintah **deepl**.
+Kemudian tambahkan opsi `--xlate` untuk menerjemahkan area yang dipilih. Kemudian, akan mencari bagian yang diinginkan dan menggantinya dengan output perintah **deepl**.
 
 Secara default, teks asli dan diterjemahkan dicetak dalam format "conflict marker" yang kompatibel dengan [git(1)](http://man.he.net/man1/git). Dengan menggunakan format `ifdef`, Anda dapat mendapatkan bagian yang diinginkan dengan mudah menggunakan perintah [unifdef(1)](http://man.he.net/man1/unifdef). Format output dapat ditentukan dengan opsi **--xlate-format**.
 
@@ -76,7 +76,7 @@ Jika Anda ingin menerjemahkan seluruh teks, gunakan opsi **--match-all**. Ini ad
 
     - **conflict**, **cm**
 
-        Cetak teks asli dan terjemahan dalam format penanda konflik [git(1)](http://man.he.net/man1/git).
+        Teks asli dan terjemahan dicetak dalam format penanda konflik [git(1)](http://man.he.net/man1/git).
 
             <<<<<<< ORIGINAL
             original text
@@ -90,7 +90,7 @@ Jika Anda ingin menerjemahkan seluruh teks, gunakan opsi **--match-all**. Ini ad
 
     - **ifdef**
 
-        Cetak teks asli dan terjemahan dalam format [cpp(1)](http://man.he.net/man1/cpp) `#ifdef`.
+        Teks asli dan terjemahan dicetak dalam format [cpp(1)](http://man.he.net/man1/cpp) `#ifdef`.
 
             #ifdef ORIGINAL
             original text
@@ -105,7 +105,7 @@ Jika Anda ingin menerjemahkan seluruh teks, gunakan opsi **--match-all**. Ini ad
 
     - **space**
 
-        Cetak teks asli dan terjemahan yang dipisahkan oleh satu baris kosong.
+        Teks asli dan terjemahan dicetak terpisah oleh satu baris kosong.
 
     - **xtxt**
 
@@ -196,6 +196,8 @@ Anda harus menginstal alat baris perintah untuk DeepL dan ChatGPT.
 
 [App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
 
+[https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
     Pustaka DeepL Python dan perintah CLI.
@@ -220,13 +222,27 @@ Anda harus menginstal alat baris perintah untuk DeepL dan ChatGPT.
 
     Gunakan **sdif** untuk menampilkan format penanda konflik berdampingan dengan opsi **-V**.
 
+## ARTICLES
+
+- [https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250](https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250)
+
+    Modul Greple untuk menerjemahkan dan mengganti hanya bagian yang diperlukan dengan API DeepL (dalam bahasa Jepang)
+
+- [https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6](https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6)
+
+    Menghasilkan dokumen dalam 15 bahasa dengan modul API DeepL (dalam bahasa Jepang)
+
+- [https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd](https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd)
+
+    Lingkungan Docker terjemahan otomatis dengan API DeepL (dalam bahasa Jepang)
+
 # AUTHOR
 
 Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023 Kazumasa Utashiro.
+Copyright © 2023-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

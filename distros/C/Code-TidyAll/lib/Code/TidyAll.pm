@@ -29,7 +29,7 @@ use Try::Tiny;
 
 use Moo 2.000000;
 
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 
 sub default_conf_names { ( 'tidyall.ini', '.tidyallrc' ) }
 
@@ -275,8 +275,8 @@ sub _build_plugin_objects {
     # alphabetical
     # TODO: These should probably sort in a consistent way independent of locale
     return [
-        sort    { ( $a->weight <=> $b->weight ) || ( $a->name cmp $b->name ) }
-            map { $self->_load_plugin( $_, $self->_plugins_to_run->{$_} ) }
+        sort { ( $a->weight <=> $b->weight ) || ( $a->name cmp $b->name ) }
+        map  { $self->_load_plugin( $_, $self->_plugins_to_run->{$_} ) }
             keys %{ $self->_plugins_to_run }
     ];
 }
@@ -856,7 +856,7 @@ Code::TidyAll - Engine for tidyall, your all-in-one code tidier and validator
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 SYNOPSIS
 
@@ -1072,7 +1072,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Adam Herzog Andreas Vögele Andy Jack Bernhard Schmalhofer Finn Smith George Hartzell Graham Knop Gregory Oschwald Joe Crotty Kenneth Ölwing Mark Fowler Grimes Martin Gruner Mohammad S Anwar Nick Tonkin Olaf Alders Paulo Custodio Pavel Dostál Pedro Melo Ricardo Signes Sergey Romanov Shlomi Fish timgimyee
+=for stopwords Adam Herzog Andreas Vögele Andy Jack Bernhard Schmalhofer Finn Smith George Hartzell Graham Knop Gregory Oschwald Joe Crotty Kenneth Ölwing Mark Fowler Grimes Martin Gruner mauke Mohammad S Anwar Nick Tonkin Olaf Alders Paulo Custodio Pavel Dostál Pedro Melo Ricardo Signes Sergey Romanov Shlomi Fish timgimyee
 
 =over 4
 
@@ -1130,6 +1130,10 @@ Martin Gruner <martin.gruner@otrs.com>
 
 =item *
 
+mauke <lukasmai.403@gmail.com>
+
+=item *
+
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =item *
@@ -1172,7 +1176,7 @@ timgimyee <tim.gim.yee@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2022 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2023 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

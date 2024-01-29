@@ -4,7 +4,7 @@ package Lemonldap::NG::Portal::Main::Constants;
 use strict;
 use Exporter 'import';
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.18.0';
 
 use constant HANDLER => 'Lemonldap::NG::Handler::PSGI::Main';
 use constant URIRE =>
@@ -62,7 +62,7 @@ use constant {
     PE_SAML_DESTINATION_ERROR            => 53,
     PE_SAML_CONDITIONS_ERROR             => 54,
     PE_SAML_IDPSSOINITIATED_NOTALLOWED   => 55,
-    PE_SAML_SLO_ERROR                    => 56,
+    PE_SLO_ERROR                         => 56,
     PE_SAML_SIGNATURE_ERROR              => 57,
     PE_SAML_ART_ERROR                    => 58,
     PE_SAML_SESSION_ERROR                => 59,
@@ -178,7 +178,7 @@ sub portalConsts {
         '53'  => 'PE_SAML_DESTINATION_ERROR',
         '54'  => 'PE_SAML_CONDITIONS_ERROR',
         '55'  => 'PE_SAML_IDPSSOINITIATED_NOTALLOWED',
-        '56'  => 'PE_SAML_SLO_ERROR',
+        '56'  => 'PE_SLO_ERROR',
         '57'  => 'PE_SAML_SIGNATURE_ERROR',
         '58'  => 'PE_SAML_ART_ERROR',
         '59'  => 'PE_SAML_SESSION_ERROR',
@@ -287,7 +287,7 @@ our @EXPORT_OK = (
     'PE_SAML_DESTINATION_ERROR',
     'PE_SAML_CONDITIONS_ERROR',
     'PE_SAML_IDPSSOINITIATED_NOTALLOWED',
-    'PE_SAML_SLO_ERROR',
+    'PE_SLO_ERROR',
     'PE_SAML_SIGNATURE_ERROR',
     'PE_SAML_ART_ERROR',
     'PE_SAML_SESSION_ERROR',

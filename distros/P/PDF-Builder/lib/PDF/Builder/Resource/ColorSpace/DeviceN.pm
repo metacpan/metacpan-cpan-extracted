@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::ColorSpace';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Util;
@@ -16,6 +16,16 @@ use Scalar::Util qw(weaken);
 
 PDF::Builder::Resource::ColorSpace::DeviceN - colorspace handling for Device 
 CMYK. Inherits from L<PDF::Builder::Resource::ColorSpace>
+
+=head2 new
+
+    PDF::Builder::Resource::ColorSpace:DeviceN->new($pdf, $key, $clrs)
+
+=over
+
+Create a new DeviceN ColorSpace object.
+
+=back
 
 =cut
 

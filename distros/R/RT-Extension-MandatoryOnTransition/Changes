@@ -1,5 +1,10 @@
 Revision history for RT-Extension-MandatoryOnTransition
 
+0.23 2023-03-16
+
+ - Do not render cf inputs if RT::Extension::CustomFieldsOnUpdate is on
+ - Add support for CF type Binary/Image
+
 0.22 2022-07-13
  - Add RTIR support
 

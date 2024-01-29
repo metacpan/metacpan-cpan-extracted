@@ -1,5 +1,9 @@
 Changes for Plack::App::ServiceStatus
 
+0.913     2024-01-25 11:00:09+01:00
+    - read buildinfo during new() (Thomas Klausner)
+
+
 0.912     2023-11-27 14:24:46+01:00
     - added to_app to example in SYNOPIS (Thomas Klausner)
 

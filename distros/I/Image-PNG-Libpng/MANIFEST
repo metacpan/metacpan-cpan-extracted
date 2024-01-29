@@ -40,7 +40,6 @@ my-xs.h
 nicemake.pl
 perl-libpng.c
 ppport.h
-qrpng-small.png
 README
 script/pnginspect
 t/bKGD.t
@@ -54,10 +53,10 @@ t/compress-level.t
 t/Const.t
 t/copy-all-png.t
 t/daft.t
-t/emoticon.png
 t/exif.t
 t/functions.t
 t/gAMA.t
+t/gecko-1200-gray8.png
 t/get-internals.t
 t/get-palette-max.t
 t/get-text.t
@@ -249,6 +248,7 @@ t/oFFs.t
 t/pCAL.t
 t/pHYs.t
 t/PLTE.t
+t/qrpng.png
 t/read-from-scalar.t
 t/saru-fs8.png
 t/sBIT.t

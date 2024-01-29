@@ -6,7 +6,7 @@
 use v5.36;
 use Object::Pad 0.800;
 
-package App::perl::distrolint 0.03;
+package App::perl::distrolint 0.06;
 class App::perl::distrolint;
 
 use List::Util qw( max );
@@ -59,13 +59,16 @@ my %FORMAT = (
    pass   => { bold => 1, fgindex => $COL{green} },
    fail   => { bold => 1, fgindex => $COL{red} },
    note   => { fgindex => $COL{yellow} },
-   diag   => { italic => 1 },
+   diag   => {},
+
+   file    => { italic => 1 },
+   literal => { altfont => 1 },
 );
 
 my $PASS = String::Tagged::Terminal->new_tagged( "PASS", $FORMAT{pass}->%* );
 my $FAIL = String::Tagged::Terminal->new_tagged( "FAIL", $FORMAT{fail}->%* );
 
-field $notecount;
+my $notecount;
 
 method run ( @argv )
 {
@@ -123,21 +126,35 @@ method checks
    return sort { $a->{sort} <=> $b->{sort} } @checks;
 }
 
-method note ( $format, @args )
+# Formatted output support for checks
+# Yes we're just shoving this in the toplevel `App::` namespace.
+
+sub App::format_file ( $app, $path, $line = undef )
+{
+   my $str = String::Tagged::Terminal->new_tagged( $path, $FORMAT{file}->%* );
+   $str .= " line $line" if defined $line;
+   return $str;
+}
+
+sub App::format_literal ( $app, $str )
+{
+   $str =~ s/([\\`])/\\$1/g;
+   return "`" . String::Tagged::Terminal->new_tagged( $str, $FORMAT{literal}->%* ) . "`";
+}
+
+sub App::note ( $app, @args )
 {
    $notecount++;
-   $self->_print_formatted( note => $format, @args );
+   App->_print_formatted( note => String::Tagged::Terminal->join( "", @args ) );
 }
 
-method diag ( $format, @args )
+sub App::diag ( $app, @args )
 {
-   $self->_print_formatted( diag => $format, @args );
+   App->_print_formatted( diag => String::Tagged::Terminal->join( "", @args ) );
 }
 
-method _print_formatted ( $style, $format, @args )
+sub App::_print_formatted ( $app, $style, $str )
 {
-   my $str = String::Tagged::Terminal->from_sprintf( $format, @args );
-
    # TODO: wish for $st->apply_tags()
    $str->apply_tag( 0, -1, $_, $FORMAT{$style}{$_} ) for keys $FORMAT{$style}->%*;
 

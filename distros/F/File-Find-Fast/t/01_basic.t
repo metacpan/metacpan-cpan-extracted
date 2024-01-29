@@ -19,5 +19,12 @@ my $thisDir = dirname($0);
 subtest 'basic' => sub{
   my $files = File::Find::Fast::find("$thisDir/files");
   is(scalar(@$files), 8, "Found 8 files/folders");
+
+  my $it = File::Find::Fast::find_iterator("$thisDir/files");
+  my @iterFiles;
+  while(my $f = $it->()){
+    push(@iterFiles, $f);
+  }
+  is_deeply([sort @iterFiles], [sort @$files], "Iterator gives same files as regular function");
 };
 

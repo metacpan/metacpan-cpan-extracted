@@ -231,7 +231,7 @@ pass to www.musixmatch.com.  Some sites are pickey about receiving a user-agent
 string that corresponds to a valid / supported web-browser to prevent their 
 sites from being "scraped" by programs, such as this.  
 
-Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0">.
+Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:112.0) Gecko/20100101 Firefox/112.0">.
 
 NOTE:  This value will be overridden if $founder->agent("agent") is 
 called!
@@ -290,7 +290,7 @@ www.musixmatch.com.  Some sites are pickey about receiving a user-agent
 string that corresponds to a valid / supported web-browser to prevent their 
 sites from being "scraped" by programs, such as this.  
 
-Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0">
+Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:112.0) Gecko/20100101 Firefox/112.0">
 
 If no argument is passed, it returns the current GENERAL user-agent string in 
 effect (but a different agent option is specified for a specific module may 

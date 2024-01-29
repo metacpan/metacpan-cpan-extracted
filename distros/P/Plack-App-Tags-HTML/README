@@ -55,9 +55,9 @@ METHODS
     *       "data_prepare"
 
             Reference to array with structure for input argument of
-            Tags::HTML::init().
+            Tags::HTML::prepare().
 
-            This structure is used in init phase of preparation of web app.
+            This structure is used in prepare phase of web app run.
 
             Default value is undef.
 
@@ -174,10 +174,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2021-2023 Michal Josef Špaček
+    © 2021-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.14
+    0.15
 

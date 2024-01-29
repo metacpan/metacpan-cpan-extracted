@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_workbook_name' } = { 
-    	summary => 'Update workbook`s name. ',
+    	summary => 'Update workbook`s name.',
         params => $params,
         returns => 'CellsCloudResponse',
     };

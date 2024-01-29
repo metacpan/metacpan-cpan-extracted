@@ -2,7 +2,7 @@
 
 #
 # dbfilepivot.pm
-# Copyright (C) 2011-2022 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 2011-2024 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -128,7 +128,7 @@ Assume data is already grouped by key.
 Provided twice, it removes the validation of this assertion.
 By default, we sort by key.
 
-=item B<-T TmpDir>
+=item B<-T TmpDir> or B<--tmpdir TmpDir>
 
 where to put tmp files.
 Also uses environment variable TMPDIR, if -T is 
@@ -266,6 +266,7 @@ sub set_defaults ($) {
     $self->{_sort_order} = undef;
     $self->{_sort_method} = undef;
     $self->{_possible_pivots} = undef;
+    $self->set_default_tmpdir;
 }
 
 =head2 parse_options
@@ -406,6 +407,7 @@ sub setup ($) {
 	# not sorted, so sort it and read that
 	my @sort_args = ('--nolog', $self->{_key_column});
 	unshift(@sort_args, '--descending') if ($self->{_sort_order} == -1);
+	unshift(@sort_args, '--tmpdir', $self->{_tmpdir}) if (defined($self->{_tmpdir}));
 	unshift(@sort_args, $self->{_sort_method}) if (defined($self->{_sort_method}));
 	my($new_reader, $new_fred) = dbpipeline_filter($self->{_input}, [-comment_handler => $self->create_delay_comments_sub], dbsort(@sort_args));
 	$self->{_pre_sorted_input} = $self->{_input};
@@ -548,7 +550,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 2011-2022 by John Heidemann <johnh@isi.edu>
+Copyright (C) 2011-2024 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

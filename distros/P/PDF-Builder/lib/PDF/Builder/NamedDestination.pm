@@ -8,8 +8,8 @@ use warnings;
 use Carp;
 use Encode qw(:all);
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 # TBD: do rect and border apply to Named Destinations (link, url, file)? 
 #      There is nothing to implement these options. Perhaps the code was copied 
@@ -25,18 +25,16 @@ PDF::Builder::NamedDestination - Add named destinations (views) to a PDF
 
 =head1 METHODS
 
-=over
+=head2 new
 
-=item $dest = PDF::Builder::NamedDestination->new($pdf, ...)
+    $dest = PDF::Builder::NamedDestination->new($pdf, ...)
+
+=over
 
 Creates a new named destination object. Any optional additional arguments
 will be passed on to C<destination>.
 
 =back
-
-=head2 Destination types
-
-=over
 
 =cut
 
@@ -67,7 +65,13 @@ sub new_api {
     return $destination;
 }
 
-=item $dest->dest($page, %opts)
+=head2 Destination types
+
+=head3 dest
+
+    $dest->dest($page, %opts)
+
+=over
 
 A destination (dest) is a particular view of a PDF, consisting of a page 
 object, the
@@ -155,11 +159,17 @@ sub dest {
     return $self;
 }
 
+# These targets are similar to what is given in Annotations, and are used to
+# provide an Action when the externally visible name is given to the PDF Reader
+# (see Named Destination issue #202 for #nameddest= ).
+
 =head2 Target Destinations
 
-=over
+=head3 link, goto
 
-=item $dest->link($page, %opts)
+    $dest->link($page, %opts)
+
+=over
 
 A go-to (link) action changes the view to a specified destination (page, 
 location, and magnification factor).
@@ -170,6 +180,8 @@ B<Alternate name:> C<goto>
 
 Originally this method was C<link>, but recently PDF::API2 changed the name
 to C<goto>. "goto" is added for compatibility.
+
+=back
 
 =cut
 
@@ -185,7 +197,11 @@ sub goto {
     return $self->dest(@_);
 }
 
-=item $dest->uri($url)
+=head3 uri, url
+
+    $dest->uri($url)
+
+=over
 
 Defines the destination as launch-url with uri C<$url>.
 
@@ -193,6 +209,8 @@ B<Alternate name:> C<url>
 
 Originally this method was C<url>, but recently PDF::API2 changed the name
 to C<uri>. "url" is retained for compatibility.
+
+=back
 
 =cut
 
@@ -208,7 +226,11 @@ sub uri {
     return $self;
 }
 
-=item $dest->launch($file)
+=head3 launch, file
+
+    $dest->launch($file)
+
+=over
 
 Defines the destination as launch-file with filepath C<$file> and
 page-fit options %opts. The target application is run. Note that this is
@@ -218,6 +240,8 @@ B<Alternate name:> C<file>
 
 Originally this method was C<file>, but recently PDF::API2 changed the name
 to C<launch>. "file" is retained for compatibility.
+
+=back
 
 =cut
 
@@ -233,7 +257,11 @@ sub launch {
     return $self;
 }
 
-=item $dest->pdf($pdf_file, $pagenum, %opts)
+=head3 pdf, pdf_file, pdfile
+
+    $dest->pdf($pdf_file, $pagenum, %opts)
+
+=over
 
 Defines the destination as a PDF-file with filepath C<$pdf_file>, on page
 C<$pagenum>, and options %opts (same as dest()).
@@ -245,6 +273,8 @@ C<pdf_file>, but recently PDF::API2 changed the name to C<pdf>. "pdfile" and
 "pdf_file" are retained for compatibility. B<Note that> the position and zoom
 information is still given as a hash element in PDF::Builder, while PDF::API2
 has changed to a position string and an array of dimensions.
+
+=back
 
 =cut
 
@@ -262,9 +292,5 @@ sub pdf{
 
     return $self;
 }
-
-=back
-
-=cut
 
 1;

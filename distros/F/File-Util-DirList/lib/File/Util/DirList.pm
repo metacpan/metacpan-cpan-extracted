@@ -8,9 +8,9 @@ use Exporter qw(import);
 use Perinci::Object;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-15'; # DATE
+our $DATE = '2023-11-20'; # DATE
 our $DIST = 'File-Util-DirList'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our @EXPORT_OK = qw(
                        mv_files_to_dirs
@@ -30,20 +30,41 @@ our %argspecs_common = (
         pos => 0,
         slurpy => 1,
     },
+    files_per_dir => {
+        summary => 'Number of files to move to each diectory',
+        schema => 'posint*',
+        default => 1,
+    },
+    reverse => {
+        summary => 'Reverse processing (so first file will go to the last dir, second file to second-last dir, and so on)',
+        schema => 'true*',
+        cmdline_aliases => {r=>{}},
+        default => 1,
+    },
 );
 
 sub _cp_or_mv_or_ln_files_to_dirs {
     my $action = shift;
     my %args = @_;
 
-    my ($files_then_dirs, $half_size);
+    my ($files_then_dirs, $files_per_dir, $num_dirs, $dir_pos, @files, @dirs);
   CHECK_ARGUMENTS: {
         $files_then_dirs = $args{files_then_dirs} or return [400, "Please specify files_then_dirs"];
-        (ref $files_then_dirs eq 'ARRAY') && (@$files_then_dirs >= 2) && (@$files_then_dirs % 2 == 0)
-            or return [400, "files_then_dirs must be array of even number of elements, minimum 2"];
-        $half_size = @$files_then_dirs / 2;
-        for my $i ($half_size .. $#{$files_then_dirs}) {
-            -d $files_then_dirs->[$i] or return [400, "files_then_dirs[$i] not a directory"];
+        (ref $files_then_dirs eq 'ARRAY') && (@$files_then_dirs >= 2)
+            or return [400, "files_then_dirs must be array, minimum 2 elements"];
+        $files_per_dir = $args{files_per_dir} || 1;
+        (@$files_then_dirs % ($files_per_dir+1) == 0)
+            or return [400, "files_then_dirs' elements must be multiples of ".($files_per_dir+1)];
+
+        $num_dirs = @$files_then_dirs / ($files_per_dir + 1);
+        $dir_pos = $num_dirs * $files_per_dir;
+        log_trace "num_dirs=<$num_dirs>, files_per_dir=<$files_per_dir>";
+        for my $i (0.. $dir_pos -1 ) {
+            push @files, $files_then_dirs->[$i];
+        }
+        for my $i ($dir_pos .. $#{$files_then_dirs}) {
+            -d $files_then_dirs->[$i] or return [400, "files_then_dirs[$i] ($files_then_dirs->[$i]) not a directory"];
+            push @dirs, $files_then_dirs->[$i];
         }
     }
 
@@ -52,28 +73,31 @@ sub _cp_or_mv_or_ln_files_to_dirs {
     require File::Copy::Recursive;
 
   FILE:
-    for my $i (0 .. $half_size-1) {
-        my $file = $files_then_dirs->[$i];
-        my $dir  = $files_then_dirs->[$i+$half_size];
+    for my $i (0 .. $num_dirs-1) {
+        my $dir  = $dirs[$i];
+        for my $j (0 .. $files_per_dir-1) {
+            my $ifile = ($args{reverse} ? ($num_dirs-1-$i) : $i) * $files_per_dir + $j;
+            my $file = $files[$ifile];
 
-        if ($action eq 'mv') {
-            if ($args{-dry_run}) {
-                log_info "[DRY_RUN] [#%d/%d] Moving %s to dir %s ...", $i+1, scalar(@$files_then_dirs), $file, $dir;
-                $envres->add_result(200, "OK (dry-run)", {item_id=>$file});
-            } else {
-                log_info "[#%d/%d] Moving %s to dir %s ...", $i+1, scalar(@$files_then_dirs), $file, $dir;
-                my $ok = File::Copy::Recursive::rmove($file, $dir);
-                if ($ok) {
-                    $envres->add_result(200, "OK", {item_id=>$file});
+            if ($action eq 'mv') {
+                if ($args{-dry_run}) {
+                    log_info "DRY-RUN: [#%d/%d] Moving %s to dir %s ...", $ifile+1, scalar(@$files_then_dirs), $file, $dir;
+                    $envres->add_result(200, "OK (dry-run)", {item_id=>$file});
                 } else {
-                    log_error "Can't move %s to dir %s: %s", $file, $dir, $!;
-                    $envres->add_result(500, "Error: $!", {item_id=>$file});
+                    log_info "[#%d/%d] Moving %s to dir %s ...", $ifile+1, scalar(@$files_then_dirs), $file, $dir;
+                    my $ok = File::Copy::Recursive::rmove($file, $dir);
+                    if ($ok) {
+                        $envres->add_result(200, "OK", {item_id=>$file});
+                    } else {
+                        log_error "Can't move %s to dir %s: %s", $file, $dir, $!;
+                        $envres->add_result(500, "Error: $!", {item_id=>$file});
+                    }
                 }
+            } else {
+                return [501, "Action unknown or not yet implemented"];
             }
-        } else {
-            return [501, "Action unknown or not yet implemented"];
-        }
-    }
+        } # for j
+    } # for i
 
     $envres->as_struct;
 }
@@ -115,7 +139,7 @@ File::Util::DirList - File utilities involving a list of directories
 
 =head1 VERSION
 
-This document describes version 0.001 of File::Util::DirList (from Perl distribution File-Util-DirList), released on 2023-11-15.
+This document describes version 0.002 of File::Util::DirList (from Perl distribution File-Util-DirList), released on 2023-11-20.
 
 =head1 FUNCTIONS
 
@@ -147,9 +171,17 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<files_per_dir> => I<posint> (default: 1)
+
+Number of files to move to each diectory.
+
 =item * B<files_then_dirs>* => I<array[pathname::exists]>
 
 One or more existing file (or directory) names then the same number of existing directories.
+
+=item * B<reverse> => I<true> (default: 1)
+
+Reverse processing (so first file will go to the last dir, second file to second-last dir, and so on).
 
 
 =back

@@ -6,7 +6,8 @@
       'read' => '44'
     },
     'timings' => {
-      'read' => '0.888'
+      'read' => '0.888',
+      'info' => 'I/O Timings: read=0.888'
     }
   },
   'planning_time' => '2.765',
@@ -20,7 +21,8 @@
         'read' => '2087'
       },
       'timings' => {
-        'read' => '16.319'
+        'read' => '16.319',
+        'info' => 'I/O Timings: read=16.319'
       }
     },
     'estimated_row_width' => '8',
@@ -39,7 +41,8 @@
             'read' => '2087'
           },
           'timings' => {
-            'read' => '16.319'
+            'read' => '16.319',
+            'info' => 'I/O Timings: read=16.319'
           }
         },
         'estimated_row_width' => '0',

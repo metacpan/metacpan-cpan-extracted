@@ -57,5 +57,5 @@ resources:
   bugtracker: https://github.com/dbsrgits/dbix-class-schema-loader/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/dbsrgits/dbix-class-schema-loader
-version: '0.07051'
+version: '0.07052'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

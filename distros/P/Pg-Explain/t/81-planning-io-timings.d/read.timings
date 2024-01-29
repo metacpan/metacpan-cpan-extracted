@@ -1,3 +1,4 @@
 {
-  'read' => '0.049'
+  'read' => '0.049',
+  'info' => 'I/O Timings: read=0.049'
 }

@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 use UI::Various::core;
 use UI::Various::Window;
@@ -81,10 +81,11 @@ sub _prepare($@)
     my ($h, $w) = ($self->height, $self->width);
     defined $h  or  $h = $self->max_height;
     defined $w  or  $w = $self->max_width;
+    my @attributes = $self->_common_attributes();
     $self->_cui($_->_cui
 		->add($self->_cid,
 		      'Window', -border => 1, -title => $self->title,
-		      -height => $h, -width => $w));
+		      -height => $h, -width => $w, @attributes));
 
     my ($errors, $row) = (0, 0);
     while ($_ = $self->child)

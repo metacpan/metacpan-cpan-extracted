@@ -39,17 +39,18 @@ SEE ALSO
         Common rules for searching for DICOM things.
 
 REPOSITORY
-    <https://github.com/tupinek/Task-Dicom>
+    <https://github.com/michal-josef-spacek/Task-Dicom>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2015-2016 Michal Špaček
-     BSD 2-Clause License
+    © 2015-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.07
+    0.08
 

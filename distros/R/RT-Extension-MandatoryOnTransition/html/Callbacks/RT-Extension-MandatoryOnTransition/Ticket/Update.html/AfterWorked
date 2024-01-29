@@ -52,7 +52,7 @@ foreach my $role (@{$roles}) {
 }
 </%init>
 %# 'Named' is handled by this extension in the MassageCustomFields callback
-% if ( @$cfs ) {
+% if ( @$cfs && !grep { $_ eq 'RT::Extension::CustomFieldsOnUpdate' } RT->Config->Get('Plugins') ) {
     <& $comp,
         %ARGS,
         %obj_args,

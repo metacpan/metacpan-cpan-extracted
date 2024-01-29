@@ -12,7 +12,7 @@ use Perinci::Sub::Util qw(gen_modified_sub);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-09-06'; # DATE
 our $DIST = 'App-sort_by_spec'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our %SPEC;
 
@@ -24,9 +24,10 @@ gen_modified_sub(
 
 This utility lets you sort lines of text "by spec". Sorting by spec in an
 advanced form of sorting by example. In addition to specifying example strings,
-you can also specify regexes or codes. For more details, see <pm:Sort::BySpec>.
+you can also specify regexes or Perl sorter codes. For more details, see the
+sorting backend module <pm:Sort::BySpec>.
 
-To specify a regex on the command-line, use one of this form:
+To specify a regex on the command-line, use one of these forms:
 
     /.../
     qr(...)
@@ -113,7 +114,7 @@ App::sort_by_spec - Sort lines of text by spec
 
 =head1 VERSION
 
-This document describes version 0.002 of App::sort_by_spec (from Perl distribution App-sort_by_spec), released on 2023-09-06.
+This document describes version 0.003 of App::sort_by_spec (from Perl distribution App-sort_by_spec), released on 2023-09-06.
 
 =head1 FUNCTIONS
 
@@ -128,9 +129,10 @@ Sort lines of text by spec.
 
 This utility lets you sort lines of text "by spec". Sorting by spec in an
 advanced form of sorting by example. In addition to specifying example strings,
-you can also specify regexes or codes. For more details, see L<Sort::BySpec>.
+you can also specify regexes or Perl sorter codes. For more details, see the
+sorting backend module L<Sort::BySpec>.
 
-To specify a regex on the command-line, use one of this form:
+To specify a regex on the command-line, use one of these forms:
 
  /.../
  qr(...)

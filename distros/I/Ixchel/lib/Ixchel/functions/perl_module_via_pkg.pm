@@ -15,7 +15,7 @@ $::QUIET = 2;
 
 =head1 NAME
 
-Ixchel::functions::perl_module_via_pkg
+Ixchel::functions::perl_module_via_pkg - Tries to install a Perl module via the package manager.
 
 =head1 VERSION
 
@@ -66,6 +66,32 @@ sub perl_module_via_pkg {
 		die('Nothing specified for a module to install');
 	}
 
+	# LWP is a bit name unfriendly for this given it is on cpan as libwww
+	my $lwp_modules = {
+		'LWP'                     => 1,
+		'LWP::ConnCache'          => 1,
+		'LWP::Debug'              => 1,
+		'LWP::MemberMixin'        => 1,
+		'LWP::Protocol'           => 1,
+		'LWP::RobotUA'            => 1,
+		'LWP::Simple'             => 1,
+		'LWP::UserAgent'          => 1,
+		'LWP::Authen::Basic'      => 1,
+		'LWP::Authen::Digest'     => 1,
+		'LWP::Debug::TraceHTTP'   => 1,
+		'LWP::DebugFile'          => 1,
+		'LWP::Protocol::cpan'     => 1,
+		'LWP::Protocol::data'     => 1,
+		'LWP::Protocol::file'     => 1,
+		'LWP::Protocol::ftp'      => 1,
+		'LWP::Protocol::gopher'   => 1,
+		'LWP::Protocol::http'     => 1,
+		'LWP::Protocol::loopback' => 1,
+		'LWP::Protocol::mailto'   => 1,
+		'LWP::Protocol::nntp'     => 1,
+		'LWP::Protocol::nogo'     => 1,
+	};
+
 	my $pkg = $opts{module};
 	my @pkg_alts;
 
@@ -77,16 +103,26 @@ sub perl_module_via_pkg {
 		status => 'Trying to install Perl module ' . $opts{module}
 	);
 
-	if (is_freebsd || is_netbsd || is_freebsd) {
-		$status = $status . status( type => $type, error => 0, status => 'OS Family FreeBSD, NetBSD, or OpenBSD detectected' );
-		$pkg =~ s/^/p5\-/;
-		$pkg =~ s/\:\:/\-/g;
+	if ( is_freebsd || is_netbsd || is_freebsd ) {
+		$status = $status
+		. status( type => $type, error => 0, status => 'OS Family FreeBSD, NetBSD, or OpenBSD detectected' );
+		if ($lwp_modules->{$pkg}) {
+			$pkg='p5-libwww';
+		}else {
+			$pkg =~ s/^/p5\-/;
+			$pkg =~ s/\:\:/\-/g;
+		}
 	} elsif (is_debian) {
 		$status = $status . status( type => $type, error => 0, status => 'OS Family Debian detectected' );
-		$pkg =~ s/\:\:/\-/g;
-		$pkg = 'lib' . lc($pkg) . '-perl';
-	} elsif (is_redhat || is_arch || is_suse || is_alt || is_mageia) {
-		$status = $status . status( type => $type, error => 0, status => 'OS Family Redhat, Arch, Suse, Alt, or Mageia detectected' );
+		if ($lwp_modules->{$pkg}) {
+			$pkg='libwww-perl';
+		}else {
+			$pkg =~ s/\:\:/\-/g;
+			$pkg = 'lib' . lc($pkg) . '-perl';
+		}
+	} elsif ( is_redhat || is_arch || is_suse || is_alt || is_mageia ) {
+		$status = $status
+			. status( type => $type, error => 0, status => 'OS Family Redhat, Arch, Suse, Alt, or Mageia detectected' );
 		$pkg =~ s/\:\:/\-/g;
 		$pkg = 'perl-' . $pkg;
 	}

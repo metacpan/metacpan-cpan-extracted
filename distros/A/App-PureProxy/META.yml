@@ -1,11 +1,15 @@
 ---
-abstract: 'a Pure Perl HTTP proxy server'
+abstract: 'Pure Perl HTTP proxy server'
 author:
   - 'Piotr Roszatycki <dexter@cpan.org>'
 build_requires:
-  Test::More: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0'
+  Module::CPANfile: '0'
+  Software::License: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,17 +18,21 @@ name: App-PureProxy
 provides:
   App::PureProxy:
     file: lib/App/PureProxy.pm
-    version: '0.0100'
+    version: '0.0200'
 recommends:
   Plack::Middleware::TrafficLog: '0'
+  Thrall: '0.0402'
 requires:
+  IO::Socket::IP: '0'
+  Plack: '0.9920'
   Plack::App::Proxy::Backend::HTTP::Tiny: '0'
   Plack::Middleware::Proxy::Connect::IO: '0'
   Plack::Middleware::Proxy::Requests: '0'
-  Starlight: '0'
-  perl: '5.008'
+  Starlight: '0.0501'
+  perl: '5.008001'
 resources:
-  bugtracker: http://github.com/dex4er/PureProxy/issues
+  bugtracker: https://github.com/dex4er/PureProxy/issues
   license: http://dev.perl.org/licenses/
-  repository: http://github.com/dex4er/PureProxy
-version: '0.0100'
+  repository: https://github.com/dex4er/PureProxy.git
+version: '0.0200'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

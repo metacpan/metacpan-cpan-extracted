@@ -8,26 +8,33 @@ use Test::More;
 use DateTime               qw( );
 use DateTime::Format::Atom qw( );
 
-{
-   my @pos_tests = (
-      [ '2002-07-01T13:50:05Z', DateTime->new( year => 2002, month => 7, day => 1, hour => 13, minute => 50, second => 5, time_zone => 'UTC' ) ],
-   );
+my @tests;
 
-   my @neg_tests = (
-   );
+my $default_format = 'DateTime::Format::Atom';
 
-   plan tests => @pos_tests + @neg_tests;
+push @tests, (
+   [
+      undef,
+      $default_format,
+      '2002-07-01T13:50:05Z',
+      DateTime->new( year => 2002, month => 7, day => 1, hour => 13, minute => 50, second => 5, time_zone => 'UTC' ),
+   ],
+);
 
-   for (@pos_tests) {
-      my ($str, $expected_dt) = @$_;
-      my $actual_dt = eval { DateTime::Format::Atom->parse_datetime($str) };
-      ok( defined($actual_dt) && $actual_dt eq $expected_dt, $str );
-   }
+plan tests => 0+@tests;
 
-   for (@neg_tests) {
-      my ($str, $expected_e) = @$_;
-      eval { DateTime::Format::Atom->parse_datetime($str) };
-      my $actual_e = $@;
-      like( $actual_e, $expected_e, $str );
+for ( @tests ) {
+   my ( $name, $format, $str, $expected_dt ) = @$_;
+
+   $name //= $str;
+
+   my $actual_dt = eval { $format->parse_datetime( $str ) };
+   my $e = $@;
+
+   if ( ref( $expected_dt ) eq 'DateTime' ) {
+      is( $actual_dt, $expected_dt, $name );
+      diag( "Exception: $e" ) if $e;
+   } else {
+      like( $e, $expected_dt, $name )
    }
 }

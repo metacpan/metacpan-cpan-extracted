@@ -19,13 +19,30 @@ sub view {
   return $self->view_for($self->ctx->action, @args);
 }
 
+sub view_at {
+  my ($self, $view_name_proto, @args) = @_;
+  my ($view_name, $view_fragment) = split(/\./, $view_name_proto);
+
+  push @args, view_fragment => $view_fragment if $view_fragment;
+  $view_name = "@{[$self->path_prefix]}/$view_name" if $self->path_prefix;
+  my $namepart = String::CamelCase::camelize($view_name);
+  $namepart =~s/\//::/g;
+
+  my $view = $self->_build_view_name($namepart);
+  $self->ctx->log->debug("Initializing View: $view") if $self->ctx->debug;
+  return $self->ctx->view($view, @args);
+}
+
 sub view_for {
-  my ($self, $action_proto, @args) = @_;
+  my ($self, $proto, @args) = @_;
+  my ($action_proto, $view_fragment) = split(/\./, $proto);
+  
+  push @args, view_fragment => $view_fragment if $view_fragment;
   my $action = Scalar::Util::blessed($action_proto) ?
     $action_proto :
       $self->action_for($action_proto);
 
-  return die "No action for $action_proto" unless $action;
+  return $self->view_at($proto, @args) unless $action; # Not sure if this is right
 
   my $action_namepart = $self->_action_namepart_from_action($action);
   my $view = $self->_build_view_name($action_namepart);

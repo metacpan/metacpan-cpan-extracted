@@ -16,7 +16,7 @@ my $gnupg;
 # See that we instantiate an object in Taint mode
 TEST
 {
-    $gnupg = GnuPG::Interface->new( call => '/usr/bin/gpg' );
+    $gnupg = GnuPG::Interface->new( call => './test/fake-gpg-v2' );
 };
 
 # See that version is set

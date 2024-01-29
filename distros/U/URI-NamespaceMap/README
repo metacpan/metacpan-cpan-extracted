@@ -2,7 +2,7 @@ NAME
     URI::NamespaceMap - Class holding a collection of namespaces
 
 VERSION
-    Version 1.10
+    Version 1.12
 
 SYNOPSIS
       use URI::NamespaceMap;
@@ -103,7 +103,7 @@ AUTHORS
     `<tobyink@cpan.org>`
 
 CONTRIBUTORS
-    Dorian Taylor Paul Williams
+    Dorian Taylor Paul Williams Zakariyya Mughal Chris Prather
 
 BUGS
     Please report any bugs using github

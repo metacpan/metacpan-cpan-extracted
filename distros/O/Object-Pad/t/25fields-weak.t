@@ -5,7 +5,7 @@ use warnings;
 
 use Test2::V0 0.000148; # is_refcount
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 my $arr = [];
 
@@ -31,7 +31,9 @@ is_oneref( $arr, '$arr has one reference before we start' );
 
 # RT139665
 {
-   class subWithWeak :isa(WithWeak) {
+   class subWithWeak {
+      inherit WithWeak;
+
       field $three = 3;
    }
 
@@ -43,7 +45,7 @@ is_oneref( $arr, '$arr has one reference before we start' );
    class WithInnerHelper {
       field $field :writer :param :weak;
 
-      class InnerHelperClass :isa(WithInnerHelper) {}
+      class InnerHelperClass { inherit WithInnerHelper; }
    }
 
    my $obj = InnerHelperClass->new( field => $arr );

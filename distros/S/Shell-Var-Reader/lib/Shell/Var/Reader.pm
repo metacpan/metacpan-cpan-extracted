@@ -11,11 +11,11 @@ Shell::Var::Reader - Runs a sh or bash script and returns the variables that hav
 
 =head1 VERSION
 
-Version 0.6.0
+Version 0.8.2
 
 =cut
 
-our $VERSION = '0.6.0';
+our $VERSION = '0.8.2';
 
 =head1 SYNOPSIS
 
@@ -65,7 +65,7 @@ sub read_in {
 	#
 	my $cmd           = $shell . " -c 'if [ -z \"\$BASH_VERSION\" ]; then set; else set -o posix; set; fi'";
 	my $results       = `$cmd`;
-	my $base_vars     = {'ShellVarReaderFile'=>1};
+	my $base_vars     = { 'ShellVarReaderFile' => 1 };
 	my @results_split = split( /\n/, $results );
 	foreach my $line (@results_split) {
 		if ( $line =~ /^[\_a-zA-Z]+[\_a-zA-Z0-9]*\=/ ) {
@@ -79,7 +79,8 @@ sub read_in {
 	#
 	$ENV{ShellVarReaderFile} = $file;
 	$cmd
-		= $shell . " -c ' . \"\$ShellVarReaderFile\" > /dev/null 2> /dev/null ; if [ -z \"\$BASH_VERSION\" ]; then set; else set -o posix; set; fi'";
+		= $shell
+		. " -c ' . \"\$ShellVarReaderFile\" > /dev/null 2> /dev/null ; if [ -z \"\$BASH_VERSION\" ]; then set; else set -o posix; set; fi'";
 	$results = `$cmd`;
 	my $found_vars = {};
 	@results_split = split( /\n/, $results );
@@ -99,12 +100,11 @@ sub read_in {
 			{
 				$found_vars->{$var_key} =~ s/^\'//;
 				$multiline = 1;
-			}else {
+			} else {
 				$found_vars->{$var_key} =~ s/^\'//;
 				$found_vars->{$var_key} =~ s/\'$//;
 			}
-		}
-		else {
+		} else {
 			$found_vars->{$var_key} = $line;
 			# if it ends with ', then we have reached the end of the variable
 			if ( $found_vars->{$var_key} =~ /\'$/ ) {
@@ -112,20 +112,20 @@ sub read_in {
 				$multiline = 0;
 			}
 		}
-	}
+	} ## end foreach my $line (@results_split)
 
 	#
 	# remove base vars
 	#
-	my @found_keys=keys(%{ $found_vars });
+	my @found_keys = keys( %{$found_vars} );
 	foreach my $var_key (@found_keys) {
-		if (defined($base_vars->{$var_key})) {
+		if ( defined( $base_vars->{$var_key} ) ) {
 			delete $found_vars->{$var_key};
 		}
 	}
 
 	return $found_vars;
-}
+} ## end sub read_in
 
 =head1 AUTHOR
 

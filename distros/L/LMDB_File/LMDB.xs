@@ -110,12 +110,55 @@ S_mySvPVutf8(pTHX_ SV *sv, STRLEN *const len) {
 
 typedef IV MyInt;
 
+/* lifted from Perl core and simplified [rt.cpan.org #148421] */
+STATIC UV
+my_do_vecget(pTHX_ SV *sv, STRLEN offset, int size)
+{
+    STRLEN srclen;
+    const I32 svpv_flags = ((PL_op->op_flags & OPf_MOD || LVRET)
+                                          ? SV_UNDEF_RETURNS_NULL : 0);
+    unsigned char *s = (unsigned char *)
+                            SvPV_flags(sv, srclen, (svpv_flags|SV_GMAGIC));
+    UV retnum = 0;
+
+    if (!s) {
+      s = (unsigned char *)"";
+    }
+
+    /* aka. PERL_ARGS_ASSERT_DO_VECGET */
+    assert(sv);
+    /* sanity checks to make sure the premises for our simplifications still hold */
+    assert(LMDB_OFLAGN <= 8);
+    if (size != LMDB_OFLAGN)
+        Perl_croak(aTHX_ "This is a crippled version of vecget that supports size==%d (LMDB_OFLAGN)", LMDB_OFLAGN);
+
+    if (SvUTF8(sv)) {
+        if (Perl_sv_utf8_downgrade_flags(aTHX_ sv, TRUE, 0)) {
+            /* PVX may have changed */
+            s = (unsigned char *) SvPV_flags(sv, srclen, svpv_flags);
+        }
+        else {
+            Perl_croak(aTHX_ "Use of strings with code points over 0xFF"
+                             " as arguments to vec is forbidden");
+        }
+    }
+
+    STRLEN bitoffs = ((offset % 8) * size) % 8;
+    STRLEN uoffset = offset / (8 / size);
+
+    if (uoffset >= srclen)
+        return 0;
+
+    retnum = (s[uoffset] >> bitoffs) & nBIT_MASK(size);
+    return retnum;
+}
+
 static void
 populateStat(pTHX_ HV** hashptr, int res, MDB_stat *stat)
 {
     HV* RETVAL;
     if(res)
-	croak(mdb_strerror(res));
+	croak("%s", mdb_strerror(res));
     RETVAL = newHV();
     StoreUV("psize", stat->ms_psize);
     StoreUV("depth", stat->ms_depth);
@@ -152,7 +195,7 @@ typedef struct {
 
 START_MY_CXT
 
-#define LMDB_OFLAGS TOHIWORD(Perl_do_vecget(aTHX_ MY_CXT.OFlags, dbi, LMDB_OFLAGN))
+#define LMDB_OFLAGS TOHIWORD(my_do_vecget(aTHX_ MY_CXT.OFlags, dbi, LMDB_OFLAGN))
 #define MY_CMP   *av_fetch(MY_CXT.Cmps, MY_CXT.curdb, 1)
 #define MY_DCMP	 *av_fetch(MY_CXT.DCmps, MY_CXT.curdb, 1)
 
@@ -191,7 +234,7 @@ START_MY_CXT
 	data.mv_size = sizeof(MyInt);				\
     }								\
     else data.mv_data = LwUTF8 ? MySvPVutf8(sv, data.mv_size)	\
-		               : MySvPV(sv, data.mv_size)
+			       : MySvPV(sv, data.mv_size)
 
 /* ZeroCopy support
  *
@@ -913,17 +956,17 @@ mdb_cursor_put(cursor, key, data, flags = 0, ...)
 		? mdb_env_get_maxkeysize(envid)
 		: 0xffffffff;
 	    if(items != 5)
-		croak("%s: MDB_RESERVE needs a length argument (1 .. %d)",
+		croak("%s: MDB_RESERVE needs a length argument (1 .. %zu)",
 		      "LMDB_File::_put", max_size);
 	    res_size = SvUV(ST(5));
 	    if(res_size == 0)
 		croak("%s: MDB_RESERVE length must be > 0",
 		      "LMDB_File::_put");
 	    if(ISDBDINT && res_size != sizeof(MyInt))
-		croak("%s: MDB_RESERVE with MDB_INTEGERDUP length should be %d",
+		croak("%s: MDB_RESERVE with MDB_INTEGERDUP length should be %zu",
 		      "LMDB_File::_put", sizeof(MyInt));
 	    if(res_size > max_size)
-		croak("%s: MDB_RESERVE length should be <= %d", max_size);
+		croak("%s: MDB_RESERVE length should be <= %zu", "LMDB_File::_put", max_size);
 	    data.mv_size = res_size;
 	    data.mv_data = NULL;
 	} else {
@@ -1064,17 +1107,18 @@ mdb_put(txn, dbi, key, data, flags = 0, ...)
 		? mdb_env_get_maxkeysize(envid)
 		: 0xffffffff;
 	    if(items != 6)
-		croak("%s: MDB_RESERVE needs a length argument (1 .. %d)",
+		croak("%s: MDB_RESERVE needs a length argument (1 .. %zu)",
 		      "LMDB_File::_put", max_size);
 	    res_size = SvUV(ST(5));
 	    if(res_size == 0)
 		croak("%s: MDB_RESERVE length must be > 0",
 		      "LMDB_File::_put");
 	    if(ISDBDINT && res_size != sizeof(MyInt))
-		croak("%s: MDB_RESERVE with MDB_INTEGERDUP length should be %d",
+		croak("%s: MDB_RESERVE with MDB_INTEGERDUP length should be %zu",
 		      "LMDB_File::_put", sizeof(MyInt));
 	    if(res_size > max_size)
-		croak("%s: MDB_RESERVE length should be <= %d", max_size);
+		croak("%s: MDB_RESERVE length should be <= %zu",
+		      "LMDB_File::_put", max_size);
 	    data.mv_size = res_size;
 	    data.mv_data = NULL;
 	} else {

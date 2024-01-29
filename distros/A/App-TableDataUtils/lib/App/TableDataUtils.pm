@@ -1,13 +1,13 @@
 package App::TableDataUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-29'; # DATE
-our $DIST = 'App-TableDataUtils'; # DIST
-our $VERSION = '0.050'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-09-23'; # DATE
+our $DIST = 'App-TableDataUtils'; # DIST
+our $VERSION = '0.052'; # VERSION
 
 our %SPEC;
 
@@ -174,7 +174,7 @@ App::TableDataUtils - Routines related to table data
 
 =head1 VERSION
 
-This document describes version 0.050 of App::TableDataUtils (from Perl distribution App-TableDataUtils), released on 2020-05-29.
+This document describes version 0.052 of App::TableDataUtils (from Perl distribution App-TableDataUtils), released on 2023-09-23.
 
 =head1 DESCRIPTION
 
@@ -186,6 +186,8 @@ This distribution includes a few utility scripts related to table data.
 
 =item * L<td2csv>
 
+=item * L<this-tabledata-mod>
+
 =back
 
 =head1 FUNCTIONS
@@ -195,7 +197,7 @@ This distribution includes a few utility scripts related to table data.
 
 Usage:
 
- gen_rand_aoaos(%args) -> [status, msg, payload, meta]
+ gen_rand_aoaos(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Generate array of (array of scalars) with random values.
 
@@ -218,12 +220,12 @@ Number of rows.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -233,7 +235,7 @@ Return value:  (any)
 
 Usage:
 
- gen_rand_aohos(%args) -> [status, msg, payload, meta]
+ gen_rand_aohos(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Generate array of (hash of scalars) with random values.
 
@@ -256,12 +258,12 @@ Number of rows.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -271,7 +273,7 @@ Return value:  (any)
 
 Usage:
 
- gen_rand_aos(%args) -> [status, msg, payload, meta]
+ gen_rand_aos(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Generate array of scalars with random values.
 
@@ -290,12 +292,12 @@ Number of elements.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -305,7 +307,7 @@ Return value:  (any)
 
 Usage:
 
- gen_rand_hash(%args) -> [status, msg, payload, meta]
+ gen_rand_hash(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Generate hash with random keysE<sol>values.
 
@@ -324,12 +326,12 @@ Number of keys.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -339,7 +341,7 @@ Return value:  (any)
 
 Usage:
 
- td2csv() -> [status, msg, payload, meta]
+ td2csv() -> [$status_code, $reason, $payload, \%result_meta]
 
 Convert table data in STDIN to CSV.
 
@@ -351,12 +353,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -368,6 +370,43 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-TableD
 
 Source repository is at L<https://github.com/perlancar/perl-App-TableDataUtils>.
 
+=head1 SEE ALSO
+
+L<td> from L<App::td>
+
+L<TableDef>
+
+L<tabledata> from L<App::tabledata>, L<TableData>, C<TableData::*> modules.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2020, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-TableDataUtils>
@@ -375,22 +414,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-L<td> from L<App::td>
-
-L<TableDef>
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

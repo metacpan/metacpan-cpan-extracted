@@ -6,10 +6,6 @@ BEGIN
     use Test::More qw( no_plan );
     select(($|=1,select(STDERR),$|=1)[1]);
     use Module::Generic::File qw( file );
-# 	use File::Basename;
-# 	use File::Spec;
-# 	use IO::Dir;
-# 	use IO::File;
 	use JSON;
 	use version;
 	our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
@@ -152,6 +148,18 @@ SKIP:
 	my $str = $cust->delete->as_string;
 	is( $str, "DELETE FROM customers WHERE email='john\@example.org'", "Checking DELETE query" );
 
+    my $fields = $cust->fields;
+    is( scalar( keys( %$fields ) ) =>  7, '$cust->fields' );
+    isa_ok( $fields->{id} => 'DB::Object::Fields::Field', '$cust->fields->id is a DB::Object::Fields::Field object' );
+    my $fname = $cust->fields( 'first_name' );
+    isa_ok( $fname => 'DB::Object::Fields::Field', '$cust->fields( "first_name" ) is a DB::Object::Fields::Field object' );
+    if( $fname )
+    {
+        ok( $fname->is_nullable, '$cust->first_name can be null' );
+        is( $fname->size, 255, '$cust->first_name size is 255' );
+        is( $fname->type => 'varchar', '$cust->first_name type is varchar' );
+    }
+
 	{
 		local $SIG{__WARN__} = sub{};
 		my $fake_tbl = $dbh->table( 'plop' );
@@ -184,7 +192,7 @@ SKIP:
         diag( "Testing INSERT with ON CONFLICT clause since database version is higher or equal to 9.5" ) if( $DEBUG );
         # <https://www.postgresql.org/docs/9.5/sql-insert.html>
         $expected = <<SQL;
-INSERT INTO customers (first_name, last_name, email, active) VALUES('Paul', 'Goldman', 'paul\@example.org', '0') ON CONFLICT ON CONSTRAINT idx_customers DO UPDATE SET first_name='Paul', last_name='Goldman', email='paul\@example.org', active='0'
+INSERT INTO customers (first_name, last_name, email, active) VALUES('Paul', 'Goldman', 'paul\@example.org', '0') ON CONFLICT ON CONSTRAINT idx_customers DO UPDATE SET first_name='Paul', last_name='Goldman', email='paul\@example.org', active=FALSE
 SQL
     }
     else
@@ -226,7 +234,7 @@ SQL
 	$result = $cust_sth_upd->only->as_string;
 	diag( "Error getting the update only statement: ", $cust_sth_upd->error ) if( !$result );
 	$expected = <<SQL;
-UPDATE ONLY customers SET active='0' WHERE email='john\@example.org'
+UPDATE ONLY customers SET active=FALSE WHERE email='john\@example.org'
 SQL
 	chomp( $expected );
 	is( $result, $expected, "Checking UPDATE query on customers table using ONLY clause" );
@@ -342,7 +350,7 @@ SQL
 	    await( $p );
 	    is( "@results", 'B A', 'asynchronous query result' );
 	};
-
+	
 	# diag( "Removing test database $test_db" );
 	my $dbh2;
 	if( !( $dbh2 = $dbh->use( 'template1' ) ) )

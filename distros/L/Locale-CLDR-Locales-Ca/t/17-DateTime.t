@@ -26,4 +26,4 @@ my $dt_ca_fr = DateTime->new(
 	time_zone  => 'Europe/London',
 );
 
-is ($dt_ca_fr->format_cldr($locale->datetime_format_full), 'dimarts, 25 d’octubre de 1966 a les 7:15:47 Europe/London', 'Date Time Format Full US English ');
+is ($dt_ca_fr->format_cldr($locale->datetime_format_full), 'dimarts, 25 d’octubre de 1966, a les 7:15:47 (Europe/London)', 'Date Time Format Full Catalan');

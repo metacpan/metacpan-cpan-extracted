@@ -1,5 +1,10 @@
 Revision history for Future-Buffer
 
+0.06    2024-01-22
+        [BUGFIXES]
+         * Avoid an exception when destroying an instance if it goes out of
+           scope during its own fill future on_done callback
+
 0.05    2023-11-10
         [BUGFIXES]
          * Fix logic for fill futures that complete immediately

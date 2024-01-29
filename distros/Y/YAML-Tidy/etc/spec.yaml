@@ -1,0 +1,108 @@
+---
+name: yamltidy
+appspec: { version: 0.001 }
+title: Reformat YAML files
+format: pod
+description: |
+  This script checks YAML files according to a configuration and automatically
+  reformats them.
+  It will output the formatted code on standard output, or edit the file
+  directly.
+
+
+  =head1 EXAMPLES
+
+  =over
+
+  =item Tidy a file and print to stdout
+
+      % cat in.yaml
+      ---
+      a:
+          b:
+              c: d
+      % yamltidy in.yaml
+      ---
+      a:
+        b:
+          c: d
+
+  =item Tidy content from stdin
+
+      % echo '---
+      a:
+          b:
+              c: d' | yamltidy -
+      ---
+      a:
+        b:
+          c: d
+
+
+  =item Tidy a file and save the result back
+
+      % yamltidy --inplace in.yaml
+      % cat in.yaml
+      ---
+      a:
+        b:
+          c: d
+
+  =item Process a list of files from stdin
+
+      # Tidy all .yaml files that are in git
+      % git ls-files | grep '.yaml$' | yamltidy --inplace --batch -
+      # short options
+      % git ls-files | grep '.yaml$' | yamltidy -i -b -
+      # Only tidy modified files
+      % git ls-files --modified | grep '.yaml$' | yamltidy --inplace --batch -
+
+  In the future yamltidy can take a directory as an argument and process
+  file name patterns from configuration.
+
+  =item Use a certain configuration file
+
+      % yamltidy -c /path/to/yamltidy.yaml file.yaml
+
+  =item Partial formatting
+
+  From within an editor you can pass only a part of the file on stdin.
+  This is important for keeping the indentation of that part. Also
+  it won't add a C<---> header. Compare:
+
+      % echo '
+        a:
+            b: c' | yamltidy -
+      ---
+      a:
+        b: c
+      % echo '
+          a:
+              b: c' | yamltidy --partial -
+
+          a:
+            b: c
+
+  Vim example configuration:
+
+      # :noremap <leader>yt :%!yamltidy -<CR>
+      # :vnoremap <leader>yt :!yamltidy --partial -<CR>
+
+  =back
+
+options:
+- config-file|c=s --Config file
+- config-data|d=s --Configuration as a string
+- inplace|i --Edit file inplace
+- debug --Debugging output
+- partial --Input is only a part of a YAML file
+- indent=i --Override indentation spaces from config
+- batch|b --Tidy all files - currently requires parameter "-" for filenames passed via STDIN
+- verbose --Output information
+- help|h --print usage message and exit
+- version --Print version information
+
+parameters:
+- name: file
+  summary: File
+  type: file

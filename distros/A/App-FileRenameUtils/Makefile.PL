@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-FileRenameUtils",
   "EXE_FILES" => [
+    "script/datestamp",
     "script/move-files-here",
     "script/mv-add-prefix",
     "script/mv-add-prefix-datestamp",
@@ -37,6 +38,8 @@ my %WriteMakefileArgs = (
     "App::perlmv::scriptlet::add_prefix_datestamp" => 0,
     "Cwd" => 0,
     "Data::Sah::Compiler::perl::TH::array" => "0.914",
+    "Data::Sah::Compiler::perl::TH::bool" => "0.914",
+    "Data::Sah::Compiler::perl::TH::int" => "0.914",
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
     "Data::Sah::Filter::perl::Path::check_path_exists" => 0,
     "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
@@ -44,13 +47,15 @@ my %WriteMakefileArgs = (
     "Exporter" => "5.57",
     "File::Copy" => 0,
     "File::Find" => 0,
-    "File::Util::DirList" => 0,
+    "File::Util::DirList" => "0.002",
     "IPC::System::Options" => "0.339",
     "Log::ger" => "0.038",
     "Log::ger::Screen" => 0,
     "Perinci::CmdLine::Any" => "0.154",
     "Perinci::CmdLine::Lite" => "1.924",
     "Sah::Schema::pathname::exists" => 0,
+    "Sah::Schema::posint" => 0,
+    "Sah::Schema::true" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -62,7 +67,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -75,6 +80,8 @@ my %FallbackPrereqs = (
   "App::perlmv::scriptlet::add_prefix_datestamp" => 0,
   "Cwd" => 0,
   "Data::Sah::Compiler::perl::TH::array" => "0.914",
+  "Data::Sah::Compiler::perl::TH::bool" => "0.914",
+  "Data::Sah::Compiler::perl::TH::int" => "0.914",
   "Data::Sah::Compiler::perl::TH::str" => "0.914",
   "Data::Sah::Filter::perl::Path::check_path_exists" => 0,
   "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
@@ -85,7 +92,7 @@ my %FallbackPrereqs = (
   "File::Slurper" => 0,
   "File::Spec" => 0,
   "File::Temp" => "0.2307",
-  "File::Util::DirList" => 0,
+  "File::Util::DirList" => "0.002",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "IPC::System::Options" => "0.339",
@@ -94,6 +101,8 @@ my %FallbackPrereqs = (
   "Perinci::CmdLine::Any" => "0.154",
   "Perinci::CmdLine::Lite" => "1.924",
   "Sah::Schema::pathname::exists" => 0,
+  "Sah::Schema::posint" => 0,
+  "Sah::Schema::true" => 0,
   "Test::More" => "0.98",
   "strict" => 0,
   "warnings" => 0

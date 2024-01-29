@@ -1,0 +1,33 @@
+class Eg::OS::Windows {
+  
+  use Eg::Runtime;
+  use Eg::OS::Windows::API::App;
+  use Eg::OS::Windows::API::Window;
+  
+  static method new : Eg::OS::Windows () {
+    
+    my $self = new Eg::OS::Windows;
+    
+    return $self;
+  }
+  
+  method build_runtime : void ($runtime : Eg::Runtime) {
+    
+    $self->build_api($runtime);
+    
+  }
+  
+  method build_api : void ($runtime : Eg::Runtime) {
+    
+    my $api = $runtime->api;
+    
+    my $api_app = Eg::OS::Windows::API::App->new($runtime);
+    
+    $api->set_app($api_app);
+    
+    my $api_window = Eg::OS::Windows::API::Window->new($runtime);
+    
+    $api->set_window($api_window);
+  }
+  
+}

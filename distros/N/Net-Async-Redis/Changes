@@ -1,5 +1,18 @@
 Revision history for Net-Async-Redis
 
+6.000     2024-01-28 05:00:01+08:00 Asia/Singapore
+    [New features]
+
+    - Initial OpenTelemetry support, thanks to JJATRIA's work on implementing (see OpenTelemetry::SDK).
+    Note that this is expected to evolve in future as more async support is added to the OpenTelemetry
+    SDK.
+
+    [Bugs fixed]
+
+    - some configuration features, such as clientside caching, could end up triggering a rapid memory
+    leak due to interactions with Syntax::Keyword::Dynamically, the connection code has been refactored
+    to avoid this (partially related to https://rt.cpan.org/Public/Bug/Display.html?id=148742)
+
 5.001     2023-11-15 13:42:42+08:00 Asia/Singapore
     [New features]
 

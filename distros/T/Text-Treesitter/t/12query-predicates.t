@@ -92,6 +92,7 @@ isa_ok( $qc, [ "Text::Treesitter::QueryCursor" ], '$qc' );
       'QueryCursor yields captures from ->next_match_captures' );
 }
 
+# #has-parent? predicate
 {
    my $query = Text::Treesitter::Query->new( $lang, '((expr) @expr (#has-parent? @expr expr))' );
 
@@ -113,6 +114,7 @@ isa_ok( $qc, [ "Text::Treesitter::QueryCursor" ], '$qc' );
       'query with #has-parent? predicate' );
 }
 
+# #has-ancestor? predicate
 {
    my $query = Text::Treesitter::Query->new( $lang, '((expr) @expr (#has-ancestor? @expr expr))' );
 
@@ -132,6 +134,23 @@ isa_ok( $qc, [ "Text::Treesitter::QueryCursor" ], '$qc' );
    is( \@matches,
       [ { expr => q[(expr (number) operator: "*" (number))] } ],
       'query with #has-parent? predicate' );
+}
+
+# #set! directive
+{
+   my $query = Text::Treesitter::Query->new( $lang, '((expr) @expr (#set! meta "1234"))' );
+
+   $qc->exec( $query, $root );
+
+   my @captures;
+   while( my $captures = $qc->next_match_captures ) {
+      push @captures, $captures;
+   }
+
+   is( \@captures,
+      [ { expr => check_isa( "Text::Treesitter::Node" ), meta => "1234" },
+        { expr => check_isa( "Text::Treesitter::Node" ), meta => "1234" }, ],
+      'query with #set! directive' );
 }
 
 done_testing;

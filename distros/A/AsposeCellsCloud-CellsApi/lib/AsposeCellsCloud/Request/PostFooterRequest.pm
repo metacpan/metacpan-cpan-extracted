@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_footer' } = { 
-    	summary => 'Update  page footer description in worksheet. ',
+    	summary => 'Update  page footer description in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };

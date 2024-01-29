@@ -1,5 +1,5 @@
 package Net::RDAP::Service;
-use Clone qw(clone);
+use Storable qw(dclone);
 use Net::RDAP;
 use strict;
 
@@ -21,7 +21,7 @@ sub nameserver  { $_[0]->fetch('nameserver',    $_[1]->name         ) }
 sub fetch {
     my ($self, $type, $handle, %params) = @_;
 
-    my $uri = clone($self->base);
+    my $uri = dclone($self->base);
 
     $uri->path_segments(grep { defined } ($uri->path_segments, $type, $handle));
     $uri->query_form(%params);

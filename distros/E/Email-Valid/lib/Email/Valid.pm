@@ -1,7 +1,7 @@
 require 5.006;
 use strict;
 use warnings;
-package Email::Valid 1.203;
+package Email::Valid 1.204;
 
 # ABSTRACT: Check validity of Internet email addresses
 our (
@@ -150,7 +150,7 @@ sub _net_dns_query {
   if (@mx_entries) {
     # Check for RFC-7505 Null MX
     my $nmx = scalar @mx_entries;
-    if ($nmx == 1 && length($mx_entries[0]->exchange) == 0) {
+    if ($nmx == 1 && $mx_entries[0]->exchange eq '.') {
       return $self->details('mx');
     }
     foreach my $mx (@mx_entries) {
@@ -194,10 +194,10 @@ sub _nslookup_query {
   # Check for an MX record
   if ($^O eq 'MSWin32' or $^O eq 'Cygwin') {
     # Oh no, we're on Windows!
-    require IO::CaptureOutput;
-    my $response = IO::CaptureOutput::capture_exec(
+    require Capture::Tiny;
+    my $response = Capture::Tiny::capture_stdout {
      $Nslookup_Path, '-query=mx', $host
-    );
+    };
     croak "unable to execute nslookup '$Nslookup_Path': exit $?" if $?;
     print STDERR $response if $Debug;
     $response =~ /$NSLOOKUP_PAT/io or return $self->details('mx');
@@ -730,7 +730,7 @@ Email::Valid - Check validity of Internet email addresses
 
 =head1 VERSION
 
-version 1.203
+version 1.204
 
 =head1 SYNOPSIS
 
@@ -749,13 +749,13 @@ address is deliverable without attempting delivery
 
 =head1 PERL VERSION
 
-This library should run on perls released even a long time ago.  It should work
-on any version of perl released in the last five years.
+This library should run on perls released even a long time ago.  It should
+work on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 PREREQUISITES
 
@@ -957,7 +957,7 @@ Maurice Aubrey <maurice@hevanet.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexandr Ciornii Dan Book Gene Hightower Karel Miko McA Michael Schout Mohammad S Anwar Neil Bowers Ricardo Signes Steve Bertrand Svetlana Troy Morehouse Yanick Champoux
+=for stopwords Alexandr Ciornii Arne Johannessen Dan Book Gene Hightower James E Keenan Karel Miko McA Michael Schout Mohammad S Anwar Neil Bowers Ricardo Signes Steve Bertrand Svetlana Troy Morehouse Yanick Champoux
 
 =over 4
 
@@ -967,11 +967,19 @@ Alexandr Ciornii <alexchorny@gmail.com>
 
 =item *
 
+Arne Johannessen <ajnn@cpan.org>
+
+=item *
+
 Dan Book <grinnz@gmail.com>
 
 =item *
 
 Gene Hightower <gene@digilicious.com>
+
+=item *
+
+James E Keenan <jkeenan@cpan.org>
 
 =item *
 
@@ -992,10 +1000,6 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 =item *
 
 Neil Bowers <neil@bowers.com>
-
-=item *
-
-Ricardo Signes <rjbs@cpan.org>
 
 =item *
 

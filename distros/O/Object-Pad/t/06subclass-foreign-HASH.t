@@ -5,7 +5,7 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 package Base::Class {
    sub new {
@@ -25,7 +25,9 @@ package Base::Class {
 
 my @BUILDS_INVOKED;
 
-class Derived::Class :isa(Base::Class) {
+class Derived::Class {
+   inherit Base::Class;
+
    field $derived_field = 456;
 
    BUILD {
@@ -61,7 +63,9 @@ class Derived::Class :isa(Base::Class) {
 
 # Ensure that double-derived classes still chain down to foreign new
 {
-   class DoubleDerived :isa(Derived::Class) {
+   class DoubleDerived {
+      inherit Derived::Class;
+
       BUILD {
          push @BUILDS_INVOKED, __PACKAGE__;
       }
@@ -90,7 +94,9 @@ class Derived::Class :isa(Base::Class) {
 
 # Test case one - no field access in example_method
 {
-   class RT132263::Child1 :isa(RT132263::Parent) {
+   class RT132263::Child1 {
+      inherit RT132263::Parent;
+
       method example_method { 1 }
    }
 
@@ -102,7 +108,9 @@ class Derived::Class :isa(Base::Class) {
 
 # Test case two - read from an initialised field
 {
-   class RT132263::Child2 :isa(RT132263::Parent) {
+   class RT132263::Child2 {
+      inherit RT132263::Parent;
+
       field $value = 456;
       method example_method { $value }
    }
@@ -138,7 +146,9 @@ class Derived::Class :isa(Base::Class) {
    package RefcountTest::Base {
       sub new { bless {}, shift }
    }
-   class RefcountTest :isa(RefcountTest::Base) {
+   class RefcountTest {
+      inherit RefcountTest::Base;
+
       sub BUILDARGS {
          return DestroyWatch->new( \$buildargs_result_destroyed )
       }
@@ -148,6 +158,26 @@ class Derived::Class :isa(Base::Class) {
 
    is( $newarg_destroyed, 1, 'argument to ->new destroyed' );
    is( $buildargs_result_destroyed, 1, 'result of BUILDARGS destroyed' );
+}
+
+# Ensure next::method works with subclassing (RT#150794)
+{
+   package RT150794::Base {
+      sub new { return bless {}, shift }
+      sub configure {}
+   }
+
+   class RT150794::Derived {
+      inherit RT150794::Base;
+      method configure { $self->next::method }
+   }
+
+   is(
+      scalar( grep { $_ eq "Object::Pad::UNIVERSAL" } @RT150794::Derived::ISA ),
+      1,
+      'RT150794::Derived @ISA contains Object::Pad::UNIVERSAL only once' );
+
+   RT150794::Derived->new->configure;
 }
 
 done_testing;

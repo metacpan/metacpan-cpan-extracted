@@ -1,0 +1,52 @@
+{
+   "abstract" : "System DNS Lookup Routines",
+   "author" : [
+      "Ruben Westerberg <drclaw@mac.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Socket-More-Lookup",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Export::These" : "v0.2.1",
+            "Socket::More::Constants" : "v0.1.1",
+            "constant::more" : "v0.3.0",
+            "perl" : "5.036000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/drclaw1394/perl-socket-more-lookup.git",
+         "web" : "https://github.com/drclaw1394/perl-socket-more-lookup"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

@@ -22,7 +22,7 @@ is ($locale->script_name('Guru'), 'Gwrmwci', 'Script name');
 is ($locale->script_name('wibl'), 'Sgript anhysbys', 'Invalid Script name');
 is ($locale->region_name('GB'), 'Y Deyrnas Unedig', 'Region name');
 is ($locale->region_name('wibble'), 'Rhanbarth Anhysbys', 'Invalid Region name');
-is ($locale->variant_name('AREVMDA'), 'Armeneg Gorllewinol', 'Variant name');
+is ($locale->variant_name('SCOTLAND'), 'Saesneg Safonol yr Alban', 'Variant name');
 throws_ok { $locale->variant_name('WIBBLE') } qr{ \A Invalid \s variant }xms, 'Invalid Variant name';
 is ($locale->language_name('i_klingon'), 'Klingon', 'Language alias');
 is ($locale->region_name('BQ'), 'Antilles yr Iseldiroedd', 'Region alias');

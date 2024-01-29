@@ -4,7 +4,10 @@ use warnings;
 package Kephra::Config::Default;
 
 sub get {{
-    file => '',
+    file => {
+        open => '',
+        closed => [],
+    },
     session => {loaded => '', last => [] },
     document_default => {},
     editor => {
@@ -38,7 +41,7 @@ sub get {{
         whole_word => 0,
         word_start => 0,
         regular_expression => 0,
-        wrap_abound_document => 0,
+        wrap_abound_document => 1,
     },
 
 }}

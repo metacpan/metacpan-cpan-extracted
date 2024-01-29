@@ -17,6 +17,7 @@ The following class-variables can be changed during runtime:
     Num!ROUND           = 0          # rounding mode for floating-point numbers
     Num!VERBOSE         = false      # true to enable verbose/debug mode
     Num!USE_YAFU        = false      # true to use YAFU for factoring large integers
+    Num!USE_PFGW        = false      # true to use PFGW64 as a primality pretest for large enough n
     Num!USE_PARI_GP     = false      # true to use PARI/GP in several methods
     Num!USE_FACTORDB    = false      # true to use factordb.com for factoring large integers
     Num!USE_PRIMESUM    = false      # true to use Kim Walisch's primesum in prime_sum(n)
@@ -819,6 +820,40 @@ Returns the sum of k-almost primes <= C<n>, or in the range C<a..b>.
 
 =cut
 
+=head2 antidivisor_count
+
+    antidivisor_count(n)
+
+Returns the number of antidivisors of C<n>.
+
+    say antidivisor_count(13)   #=> 4
+    say antidivisor_count(27)   #=> 5
+
+=cut
+
+=head2 antidivisors
+
+    antidivisors(n)
+
+Returns an array with the antidivisors of C<n> sorted from C<1..n>.
+
+Antidivisors of C<n> are numbers that do not divide C<n> by the largest possible margin.
+
+    say antidivisors(24)    #=> [7, 16]
+    say antidivisors(128)   #=> [3, 5, 15, 17, 51, 85]
+
+=cut
+
+=head2 antidivisor_sum
+
+    antidivisor_sum(n)
+
+Returns the sum of anti-divisors of C<n>.
+
+Aliases: I<antidivisor_sigma>
+
+=cut
+
 =head2 approx_ge
 
     approx_ge(a, b)
@@ -1498,6 +1533,22 @@ Returns the centered k-gonal root of C<n>. Also defined for complex numbers.
 
     say centered_polygonal_root(n, 3)      # centered triangular root
     say centered_polygonal_root(n, 5)      # centered pentagonal root
+
+=cut
+
+=head2 centered_pyramidal
+
+    n.centered_pyramidal(k)
+
+Returns the n-th centered k-gonal pyramidal number.
+
+=cut
+
+=head2 centered_pyramidal_root
+
+    n.centered_pyramidal_root(k)
+
+Returns the centered k-gonal pyramidal root of C<n>. Also defined for complex numbers.
 
 =cut
 
@@ -3470,6 +3521,30 @@ Geometric sum: C<r^0 + r^1 + ... + r^n>, using the following formula:
 Example:
 
     say geometric_sum(5, 8)     # 8^0 + 8^1 + 8^2 + 8^3 + 8^4 + 8^5 = 37449
+
+=cut
+
+=head2 geometric_summod
+
+    geometric_summod(n, r, m)
+
+Geometric sum modulo C<m>: C<r^0 + r^1 + ... + r^n (mod m)>, using the following formula:
+
+    geometric_summod(n, r, m) = ((powmod(r, n+1, m)-1) * invmod(r-1, m)) % m
+
+=cut
+
+=head2 germain_factor
+
+    germain_factor(n)
+
+Tries to factorize C<n>, using the Sophie Germain identity:
+
+    x^4 + 4y^4 = (x^2 - 2xy + 2y^2) * (x^2 + 2xy + 2y^2)
+
+The product of the factors will give back C<n>. However, some factors may be composite.
+
+Aliases: I<sophie_germain_factor>
 
 =cut
 
@@ -6754,6 +6829,17 @@ Aliases: I<almost_primepi>, I<pi_k>
 
 =cut
 
+=head2 pisano_period
+
+    pisano_period(n)
+
+Returns the n-th Pisano number: period of Fibonacci numbers mod C<n>.
+
+    say pisano_period(10!)          #=> 86400
+    say pisano_period(2**128 + 1)   #=> 28356863910078205764000346543980814080
+
+=cut
+
 =head2 pm1_factor
 
     n.pm1_factor
@@ -8323,6 +8409,17 @@ Hyperbolic sine function.
 
 =cut
 
+=head2 smod
+
+    x.smod(m)
+
+Returns the residual mod C<m> such that it is within half of the modulus.
+
+    say smod(1, 6)      #=> 1
+    say smod(4, 6)      #=> -2
+
+=cut
+
 =head2 smooth_count
 
     k.smooth_count(n)
@@ -8403,6 +8500,23 @@ Find the smallest pair of integers C<(x,y)> that satisfy the Pell equation: C<x^
     say [solve_pell(953, -1)]   #=> [2746864744, 88979677]
 
 Return C<(nil,nil)> when a solution does not exist.
+
+=cut
+
+=head2 solve_quadratic_form
+
+    solve_quadratic_form(d, n)
+
+Given a positive integer C<n> and a positive integer C<d>, returns an array with C<[x,y]> solutions to the equation:
+
+    x^2 + d*y^2 = n
+
+Example:
+
+    say solve_quadratic_form(13, 97)      #=> []
+    say solve_quadratic_form(18, 43*97)   #=> [[61, 5], [11, 15]]
+
+Not all solutions may be returned. Returns an empty array if there are no solutions.
 
 =cut
 
@@ -9195,6 +9309,16 @@ Returns the number of times C<n> is divisible by C<k>.
     Num.zero
 
 Returns the number 0.
+
+=cut
+
+=head2 znlog
+
+    znlog(a, g, m)
+
+Returns the integer C<k> that solves the congruence: C<a = g^k (mod m)>.
+
+Returns C<NaN> if a solution is not found.
 
 =cut
 

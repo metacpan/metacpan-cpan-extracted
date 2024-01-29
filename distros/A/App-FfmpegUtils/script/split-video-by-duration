@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/FfmpegUtils/split_video_by_duration
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-22'; # DATE
+our $DATE = '2023-12-13'; # DATE
 our $DIST = 'App-FfmpegUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FfmpegUtils/split_video_by_duration",
@@ -41,11 +41,15 @@ split-video-by-duration - Split video by duration into parts
 
 =head1 VERSION
 
-This document describes version 0.012 of split-video-by-duration (from Perl distribution App-FfmpegUtils), released on 2022-09-22.
+This document describes version 0.013 of split-video-by-duration (from Perl distribution App-FfmpegUtils), released on 2023-12-13.
 
 =head1 SYNOPSIS
 
-B<split-video-by-duration> [B<--copy>|B<--no-copy>|B<--nocopy>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--dry-run>|B<-n>] [B<--every>=I<any>|B<--every-json>=I<json>] [(B<--file>=I<filename>)+|B<--files-json>=I<json>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--parts>=I<posint>] -- E<lt>I<file>E<gt> ...
+B<split-video-by-duration> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<split-video-by-duration> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<split-video-by-duration> [B<L<--copy|/"--copy">>|B<L<--no-copy|/"--copy">>|B<L<--nocopy|/"--copy">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--dry-run|/"--dry-run, -n">>|B<L<-n|/"--dry-run, -n">>] [B<L<--every|/"--every=s">>=I<any>|B<L<--every-json|/"--every=s">>=I<json>] [(B<L<--file|/"--files-json=s">>=I<L<filename|Sah::Schema::filename>>)+|B<L<--files-json|/"--files-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--parts|/"--parts=s">>=I<L<posint|Sah::Schema::posint>>] -- E<lt>I<L<file|/"--files-json=s">>E<gt> ...
 
 
 
@@ -82,7 +86,13 @@ See C<--every>.
 
 =item B<--every>=I<s>
 
+(No description)
+
+
 =item B<--file>=I<s@>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument and onwards.
 
@@ -95,6 +105,9 @@ See C<--file>.
 Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--parts>=I<s>
+
+(No description)
+
 
 =back
 
@@ -303,7 +316,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

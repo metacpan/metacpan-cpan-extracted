@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sr::Cyrl::Xk - Package for language Serbian
 
 package Locale::CLDR::Locales::Sr::Cyrl::Xk;
 # This file auto generated from Data\common\main\sr_Cyrl_XK.xml
-#	on Tue  5 Dec  1:32:22 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'bm' => 'бамананкан',
@@ -59,14 +59,13 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'CG' => 'Конго',
  			'CV' => 'Кабо Верде',
  			'CZ' => 'Чешка Република',
  			'HK' => 'САР Хонгконг',
  			'KN' => 'Свети Китс и Невис',
- 			'MK@alt=variant' => 'БЈР Македонија',
  			'MO' => 'САР Макао',
  			'PM' => 'Свети Пјер и Микелон',
  			'RE' => 'Реунион',
@@ -86,18 +85,18 @@ has 'calendar_months' => (
 				'format' => {
 					abbreviated => {
 						nonleap => [
-							'јан.',
-							'феб.',
+							'јан',
+							'феб',
 							'март',
-							'апр.',
+							'апр',
 							'мај',
 							'јун',
 							'јул',
-							'авг.',
-							'септ.',
-							'окт.',
-							'нов.',
-							'дец.'
+							'авг',
+							'септ',
+							'окт',
+							'нов',
+							'дец'
 						],
 						leap => [
 							
@@ -107,54 +106,22 @@ has 'calendar_months' => (
 				'stand-alone' => {
 					abbreviated => {
 						nonleap => [
-							'јан.',
-							'феб.',
+							'јан',
+							'феб',
 							'март',
-							'апр.',
+							'апр',
 							'мај',
 							'јун',
 							'јул',
-							'авг.',
-							'септ.',
-							'окт.',
-							'нов.',
-							'дец.'
+							'авг',
+							'септ',
+							'окт',
+							'нов',
+							'дец'
 						],
 						leap => [
 							
 						],
-					},
-				},
-			},
-	} },
-);
-
-has 'calendar_days' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-			'gregorian' => {
-				'format' => {
-					abbreviated => {
-						mon => 'пон.',
-						tue => 'ут.',
-						wed => 'ср.',
-						thu => 'чет.',
-						fri => 'пет.',
-						sat => 'суб.',
-						sun => 'нед.'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						mon => 'пон.',
-						tue => 'ут.',
-						wed => 'ср.',
-						thu => 'чет.',
-						fri => 'пет.',
-						sat => 'суб.',
-						sun => 'нед.'
 					},
 				},
 			},
@@ -226,8 +193,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'day_periods' => (

@@ -400,7 +400,7 @@ void encode_time(pTHX_ SV *dest, SV *src)
     sv_catpvn(dest, (char*)out, 12);
 }
 
-inline int div_properly(int a, int b)
+static inline int div_properly(int a, int b)
 {
     int n = a / b;
     if (a < 0 && a%b != 0)

@@ -5,16 +5,9 @@ use Test::Net::SSLeay qw( data_file_path initialise_libssl is_openssl );
 
 use utf8;
 
-plan tests => 139;
+plan tests => 141;
 
 initialise_libssl();
-
-if (defined &Net::SSLeay::OSSL_PROVIDER_load)
-{
-    my $provider = Net::SSLeay::OSSL_PROVIDER_load(undef, 'legacy');
-    diag('Failed to load legacy provider: PEM_get_string_PrivateKey may fail')
-	unless $provider;
-}
 
 my $ca_crt_pem = data_file_path('root-ca.cert.pem');
 my $ca_key_pem = data_file_path('root-ca.key.pem');
@@ -34,12 +27,24 @@ is(Net::SSLeay::X509_NAME_cmp($ca_issuer, $ca_subject), 0, "X509_NAME_cmp");
   ok(my $rsa = Net::SSLeay::RSA_generate_key(2048, &Net::SSLeay::RSA_F4), "RSA_generate_key");
   ok(Net::SSLeay::EVP_PKEY_assign_RSA($pk,$rsa), "EVP_PKEY_assign_RSA");
 
-  SKIP: 
-  {
-    skip 'openssl<1.1.0 required', 1 unless Net::SSLeay::SSLeay < 0x10100000
-       or Net::SSLeay::constant("LIBRESSL_VERSION_NUMBER");
-    my @params = Net::SSLeay::RSA_get_key_parameters($rsa);
-    ok(@params == 8, "RSA_get_key_parameters");
+  my @params = Net::SSLeay::RSA_get_key_parameters($rsa);
+  ok(@params == 8, "RSA_get_key_parameters");
+
+ SKIP: {
+     skip('No Crypt::OpenSSL::Bignum for additional tests', 2)
+	 unless eval {require Crypt::OpenSSL::Bignum; 1; };
+
+     # Check that the exponent is what we expect and that our calls
+     # don't clear and free the original value. See
+     # RSA_get_key_parameters in the manual for the details.
+     my $bn = Net::SSLeay::BN_dup($params[1]);
+     my $r = Crypt::OpenSSL::Bignum->bless_pointer($bn);
+     is($r->to_decimal(), Net::SSLeay::RSA_F4(), 'Crypt::OpenSSL::Bignum exponent once');
+     undef $r;
+
+     $bn = Net::SSLeay::BN_dup($params[1]);
+     $r = Crypt::OpenSSL::Bignum->bless_pointer($bn);
+     is($r->to_decimal(), Net::SSLeay::RSA_F4(), 'Crypt::OpenSSL::Bignum exponent twice');
   }
  
   ok(my $x509  = Net::SSLeay::X509_new(), "X509_new");
@@ -53,7 +58,8 @@ is(Net::SSLeay::X509_NAME_cmp($ca_issuer, $ca_subject), 0, "X509_NAME_cmp");
   #set organizationName via add_entry_by_txt
   ok(Net::SSLeay::X509_NAME_add_entry_by_txt($name, "organizationName", MBSTRING_UTF8, "Company Name"), "X509_NAME_add_entry_by_txt");
   
-  ok(Net::SSLeay::X509_set_version($x509, 3), "X509_set_version");
+  my $x509_version_3 = (defined &Net::SSLeay::X509_VERSION_3) ? Net::SSLeay::X509_VERSION_3() : 2; # Note: X509_VERSION_3 is 2
+  ok(Net::SSLeay::X509_set_version($x509, $x509_version_3), "X509_set_version");
   ok(my $sn = Net::SSLeay::X509_get_serialNumber($x509), "X509_get_serialNumber");
   
   my $pubkey = Net::SSLeay::X509_get_X509_PUBKEY($x509);
@@ -78,11 +84,8 @@ is(Net::SSLeay::X509_NAME_cmp($ca_issuer, $ca_subject), 0, "X509_NAME_cmp");
   is(Net::SSLeay::P_ASN1_INTEGER_get_hex(Net::SSLeay::X509_get_serialNumber($x509)), '01E240', "P_ASN1_INTEGER_get_hex");
   
   Net::SSLeay::X509_set_issuer_name($x509, Net::SSLeay::X509_get_subject_name($ca_cert));
-  SKIP: {
-    skip 'openssl-0.9.7e required', 2 unless Net::SSLeay::SSLeay >= 0x0090705f; 
-    ok(Net::SSLeay::P_ASN1_TIME_set_isotime(Net::SSLeay::X509_get_notBefore($x509), "2010-02-01T00:00:00Z"), "P_ASN1_TIME_set_isotime+X509_get_notBefore");
-    ok(Net::SSLeay::P_ASN1_TIME_set_isotime(Net::SSLeay::X509_get_notAfter($x509), "2099-02-01T00:00:00Z"), "P_ASN1_TIME_set_isotime+X509_get_notAfter");
-  }
+  ok(Net::SSLeay::P_ASN1_TIME_set_isotime(Net::SSLeay::X509_get_notBefore($x509), "2010-02-01T00:00:00Z"), "P_ASN1_TIME_set_isotime+X509_get_notBefore");
+  ok(Net::SSLeay::P_ASN1_TIME_set_isotime(Net::SSLeay::X509_get_notAfter($x509), "2099-02-01T00:00:00Z"), "P_ASN1_TIME_set_isotime+X509_get_notAfter");
   
   ok(Net::SSLeay::P_X509_add_extensions($x509,$ca_cert,
         &Net::SSLeay::NID_key_usage => 'digitalSignature,keyEncipherment',
@@ -93,16 +96,33 @@ is(Net::SSLeay::X509_NAME_cmp($ca_issuer, $ca_subject), 0, "X509_NAME_cmp");
         &Net::SSLeay::NID_crl_distribution_points => 'URI:http://pki.dom.com/crl1.pem,URI:http://pki.dom.com/crl2.pem',
     ), "P_X509_add_extensions");
 
-  ok(my $sha1_digest = Net::SSLeay::EVP_get_digestbyname("sha1"), "EVP_get_digestbyname");
-  ok(Net::SSLeay::X509_sign($x509, $ca_pk, $sha1_digest), "X509_sign");
+  ok(my $sha256_digest = Net::SSLeay::EVP_get_digestbyname("sha256"), "EVP_get_digestbyname");
+  ok(Net::SSLeay::X509_sign($x509, $ca_pk, $sha256_digest), "X509_sign");
   
-  is(Net::SSLeay::X509_get_version($x509), 3, "X509_get_version");  
+  is(Net::SSLeay::X509_get_version($x509), $x509_version_3, "X509_get_version");
   is(Net::SSLeay::X509_verify($x509, Net::SSLeay::X509_get_pubkey($ca_cert)), 1, "X509_verify");
   
   like(my $crt_pem = Net::SSLeay::PEM_get_string_X509($x509), qr/-----BEGIN CERTIFICATE-----/, "PEM_get_string_X509");
   
   like(my $key_pem1 = Net::SSLeay::PEM_get_string_PrivateKey($pk), qr/-----BEGIN (RSA )?PRIVATE KEY-----/, "PEM_get_string_PrivateKey+nopasswd");        
-  like(my $key_pem2 = Net::SSLeay::PEM_get_string_PrivateKey($pk,"password"), qr/-----BEGIN (ENCRYPTED|RSA) PRIVATE KEY-----/, "PEM_get_string_PrivateKey+passwd");
+  SKIP: {
+      # PEM_get_string_PrivateKey uses DES in CBC mode as the default
+      # key encryption algorithm. Upcoming Net::SSLeay version 2.00 is
+      # likely to remove obsolete functionality. This includes
+      # updating PEM_get_stringPrivateKey default algorithm from
+      # EVP_des_cbc() to, for example, EVP_aes_128_cbc(). When this is
+      # done, this SKIP block and everything in it, besides the test
+      # itself, can be removed.
+      fail("Legacy provider still used with Net::SSLeay version $Net::SSLeay::VERSION") if $Net::SSLeay::VERSION =~ m/^2/s;
+      if (defined &Net::SSLeay::OSSL_PROVIDER_load &&
+	  !Net::SSLeay::OSSL_PROVIDER_load(undef, 'legacy'))
+      {
+	  my $des_warning = 'No legacy provider for PEM_get_string_PrivateKey';
+	  diag($des_warning);
+	  skip($des_warning, 1);
+      }
+      like(my $key_pem2 = Net::SSLeay::PEM_get_string_PrivateKey($pk,"password"), qr/-----BEGIN (ENCRYPTED|RSA) PRIVATE KEY-----/, "PEM_get_string_PrivateKey+passwd");
+  }
   
   ok(my $alg1 = Net::SSLeay::EVP_get_cipherbyname("DES-EDE3-CBC"), "EVP_get_cipherbyname");
   like(my $key_pem3 = Net::SSLeay::PEM_get_string_PrivateKey($pk,"password",$alg1), qr/-----BEGIN (ENCRYPTED|RSA) PRIVATE KEY-----/, "PEM_get_string_PrivateKey+passwd+enc_alg");
@@ -183,28 +203,26 @@ is(Net::SSLeay::X509_NAME_cmp($ca_issuer, $ca_subject), 0, "X509_NAME_cmp");
   ok(Net::SSLeay::X509_REQ_add1_attr_by_NID($req, 54, MBSTRING_ASC, 'password xyz'), "X509_REQ_add1_attr_by_NID");
   #49 = NID_pkcs9_unstructuredName - XXX-TODO add new constant
   ok(Net::SSLeay::X509_REQ_add1_attr_by_NID($req, 49, MBSTRING_ASC, 'Any Uns.name'), "X509_REQ_add1_attr_by_NID");
-   
-  ok(Net::SSLeay::X509_REQ_set_version($req, 2), "X509_REQ_set_version");
 
-  ok(my $sha1_digest = Net::SSLeay::EVP_get_digestbyname("sha1"), "EVP_get_digestbyname");
-  ok(Net::SSLeay::X509_REQ_sign($req, $pk, $sha1_digest), "X509_REQ_sign");
+  my $x509_req_version_1 = (defined &Net::SSLeay::X509_REQ_VERSION_1) ? Net::SSLeay::X509_REQ_VERSION_1() : 0; # Note: X509_REQ_VERSION_1 is 0
+  ok(Net::SSLeay::X509_REQ_set_version($req, $x509_req_version_1), "X509_REQ_set_version");
+
+  ok(my $sha256_digest = Net::SSLeay::EVP_get_digestbyname("sha256"), "EVP_get_digestbyname");
+  ok(Net::SSLeay::X509_REQ_sign($req, $pk, $sha256_digest), "X509_REQ_sign");
   
   ok(my $req_pubkey = Net::SSLeay::X509_REQ_get_pubkey($req), "X509_REQ_get_pubkey");
   is(Net::SSLeay::X509_REQ_verify($req, $req_pubkey), 1, "X509_REQ_verify");
   
-  is(Net::SSLeay::X509_REQ_get_version($req), 2, "X509_REQ_get_version");
+  is(Net::SSLeay::X509_REQ_get_version($req), $x509_req_version_1, "X509_REQ_get_version");
   ok(my $obj_challengePassword = Net::SSLeay::OBJ_txt2obj('1.2.840.113549.1.9.7'), "OBJ_txt2obj");
   ok(my $nid_challengePassword = Net::SSLeay::OBJ_obj2nid($obj_challengePassword), "OBJ_obj2nid");  
   is(Net::SSLeay::X509_REQ_get_attr_count($req), 3, "X509_REQ_get_attr_count");
   is(my $n1 = Net::SSLeay::X509_REQ_get_attr_by_NID($req, $nid_challengePassword,-1), 1, "X509_REQ_get_attr_by_NID");
   is(my $n2 = Net::SSLeay::X509_REQ_get_attr_by_OBJ($req, $obj_challengePassword,-1), 1, "X509_REQ_get_attr_by_OBJ");
   
-  SKIP: {
-    skip('requires openssl-0.9.7', 3) unless Net::SSLeay::SSLeay >= 0x0090700f;
-    ok(my @attr_values = Net::SSLeay::P_X509_REQ_get_attr($req, $n1), "P_X509_REQ_get_attr");
-    is(scalar(@attr_values), 1, "attr_values size");
-    is(Net::SSLeay::P_ASN1_STRING_get($attr_values[0]), "password xyz", "attr_values[0]");
-  }
+  ok(my @attr_values = Net::SSLeay::P_X509_REQ_get_attr($req, $n1), "P_X509_REQ_get_attr");
+  is(scalar(@attr_values), 1, "attr_values size");
+  is(Net::SSLeay::P_ASN1_STRING_get($attr_values[0]), "password xyz", "attr_values[0]");
   
   like(my $req_pem = Net::SSLeay::PEM_get_string_X509_REQ($req), qr/-----BEGIN CERTIFICATE REQUEST-----/, "PEM_get_string_X509_REQ");
   like(my $key_pem = Net::SSLeay::PEM_get_string_PrivateKey($pk), qr/-----BEGIN (RSA )?PRIVATE KEY-----/, "PEM_get_string_PrivateKey");  
@@ -214,7 +232,8 @@ is(Net::SSLeay::X509_NAME_cmp($ca_issuer, $ca_subject), 0, "X509_NAME_cmp");
   
   ## PHASE2 - turn X509_REQ into X509 cert + sign with CA key
   ok(my $x509ss = Net::SSLeay::X509_new(), "X509_new");
-  ok(Net::SSLeay::X509_set_version($x509ss, 2), "X509_set_version");
+  my $x509_version_3 = (defined &Net::SSLeay::X509_VERSION_3) ? Net::SSLeay::X509_VERSION_3() : 2; # Note: X509_VERSION_3 is 2
+  ok(Net::SSLeay::X509_set_version($x509ss, $x509_version_3), "X509_set_version");
   ok(my $sn = Net::SSLeay::X509_get_serialNumber($x509ss), "X509_get_serialNumber");
   Net::SSLeay::P_ASN1_INTEGER_set_hex($sn, 'ABCDEF');
   Net::SSLeay::X509_set_issuer_name($x509ss, Net::SSLeay::X509_get_subject_name($ca_cert));
@@ -228,7 +247,7 @@ is(Net::SSLeay::X509_NAME_cmp($ca_issuer, $ca_subject), 0, "X509_NAME_cmp");
   ok(Net::SSLeay::X509_set_pubkey($x509ss,$tmppkey), "X509_set_pubkey");
   Net::SSLeay::EVP_PKEY_free($tmppkey);
   
-  ok(Net::SSLeay::X509_sign($x509ss, $ca_pk, $sha1_digest), "X509_sign");
+  ok(Net::SSLeay::X509_sign($x509ss, $ca_pk, $sha256_digest), "X509_sign");
   like(my $crt_pem = Net::SSLeay::PEM_get_string_X509($x509ss), qr/-----BEGIN CERTIFICATE-----/, "PEM_get_string_X509");
 
   #write_file("tmp_cert2.crt.pem", $crt_pem);
@@ -236,11 +255,8 @@ is(Net::SSLeay::X509_NAME_cmp($ca_issuer, $ca_subject), 0, "X509_NAME_cmp");
   ## PHASE3 - check some certificate parameters
   is(Net::SSLeay::X509_NAME_print_ex(Net::SSLeay::X509_get_subject_name($x509ss)), "O=Company Name,C=UK,CN=Common name text X509_REQ", "X509_NAME_print_ex 1");
   is(Net::SSLeay::X509_NAME_print_ex(Net::SSLeay::X509_get_issuer_name($x509ss)), 'CN=Root CA,OU=Test Suite,O=Net-SSLeay,C=PL', "X509_NAME_print_ex 2");
-  SKIP: {
-    skip 'openssl-0.9.7e required', 2 unless Net::SSLeay::SSLeay >= 0x0090705f; 
-    like(Net::SSLeay::P_ASN1_TIME_get_isotime(Net::SSLeay::X509_get_notBefore($x509ss)), qr/^\d\d\d\d-\d\d-\d\d/, "X509_get_notBefore");
-    like(Net::SSLeay::P_ASN1_TIME_get_isotime(Net::SSLeay::X509_get_notAfter($x509ss)), qr/^\d\d\d\d-\d\d-\d\d/, "X509_get_notAfter");
-  }
+  like(Net::SSLeay::P_ASN1_TIME_get_isotime(Net::SSLeay::X509_get_notBefore($x509ss)), qr/^\d\d\d\d-\d\d-\d\d/, "X509_get_notBefore");
+  like(Net::SSLeay::P_ASN1_TIME_get_isotime(Net::SSLeay::X509_get_notAfter($x509ss)), qr/^\d\d\d\d-\d\d-\d\d/, "X509_get_notAfter");
 
   # See that all subjectAltNames added to request were copied to the certificate
   my @altnames = Net::SSLeay::X509_get_subjectAltNames($x509ss);
@@ -290,14 +306,11 @@ is(Net::SSLeay::X509_NAME_cmp($ca_issuer, $ca_subject), 0, "X509_NAME_cmp");
   ok(Net::SSLeay::X509_set_serialNumber($x509, $sn), "X509_get_serialNumber");
 
   Net::SSLeay::X509_set_issuer_name($x509, Net::SSLeay::X509_get_subject_name($ca_cert));
-  SKIP: {
-    skip 'openssl-0.9.7e required', 2 unless Net::SSLeay::SSLeay >= 0x0090705f;
-    ok(Net::SSLeay::P_ASN1_TIME_set_isotime(Net::SSLeay::X509_get_notBefore($x509), "2010-02-01T00:00:00Z") , "P_ASN1_TIME_set_isotime+X509_get_notBefore");
-    ok(Net::SSLeay::P_ASN1_TIME_set_isotime(Net::SSLeay::X509_get_notAfter($x509), "2038-01-01T00:00:00Z"), "P_ASN1_TIME_set_isotime+X509_get_notAfter");
-  }
+  ok(Net::SSLeay::P_ASN1_TIME_set_isotime(Net::SSLeay::X509_get_notBefore($x509), "2010-02-01T00:00:00Z") , "P_ASN1_TIME_set_isotime+X509_get_notBefore");
+  ok(Net::SSLeay::P_ASN1_TIME_set_isotime(Net::SSLeay::X509_get_notAfter($x509), "2038-01-01T00:00:00Z"), "P_ASN1_TIME_set_isotime+X509_get_notAfter");
   
-  ok(my $sha1_digest = Net::SSLeay::EVP_get_digestbyname("sha1"), "EVP_get_digestbyname");
-  ok(Net::SSLeay::X509_sign($x509, $ca_pk, $sha1_digest), "X509_sign");
+  ok(my $sha256_digest = Net::SSLeay::EVP_get_digestbyname("sha256"), "EVP_get_digestbyname");
+  ok(Net::SSLeay::X509_sign($x509, $ca_pk, $sha256_digest), "X509_sign");
   
   like(my $crt_pem = Net::SSLeay::PEM_get_string_X509($x509), qr/-----BEGIN CERTIFICATE-----/, "PEM_get_string_X509");
   like(my $key_pem = Net::SSLeay::PEM_get_string_PrivateKey($pk), qr/-----BEGIN (RSA )?PRIVATE KEY-----/, "PEM_get_string_PrivateKey");  
@@ -311,8 +324,8 @@ is(Net::SSLeay::X509_NAME_cmp($ca_issuer, $ca_subject), 0, "X509_NAME_cmp");
   ok(my $bio = Net::SSLeay::BIO_new_file($req_pem, 'r'), "BIO_new_file");
   ok(my $req = Net::SSLeay::PEM_read_bio_X509_REQ($bio), "PEM_read_bio_X509");
   
-  ok(my $sha1_digest = Net::SSLeay::EVP_get_digestbyname("sha1"), "EVP_get_digestbyname");
-  is(unpack("H*", Net::SSLeay::X509_REQ_digest($req, $sha1_digest)), "372c21a20a6d4e15bf8ecefb487cc604d9a10960", "X509_REQ_digest");
+  ok(my $sha256_digest = Net::SSLeay::EVP_get_digestbyname("sha256"), "EVP_get_digestbyname");
+  is(unpack("H*", Net::SSLeay::X509_REQ_digest($req, $sha256_digest)), "420e99da1e23e192409ab2a5f1a9b09ac03c52fa4b8bd0d19e561358f9880e88", "X509_REQ_digest");
   
   ok(my $req2  = Net::SSLeay::X509_REQ_new(), "X509_REQ_new");  
   ok(my $name = Net::SSLeay::X509_REQ_get_subject_name($req), "X509_REQ_get_subject_name");

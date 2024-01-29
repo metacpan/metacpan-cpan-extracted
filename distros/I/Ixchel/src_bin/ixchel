@@ -39,21 +39,34 @@ Do not attempt to load the config even if it exists.
 
 This is automatic for the action 'list_actions' and 'sys_info'
 
-=cut
+=head1 ENVIROMENTAL VARIABLES
 
+If the following values are defined, the matching ENV is set.
+
+    .proxy.ftp       ->  FTP_PROXY
+    .proxy.http      ->  HTTP_PROXY
+    .proxy.https     ->  HTTPS_PROXY
+    .perl.cpanm_home ->  PERL_CPANM_HOME
+
+Additionally any of the variables defined under .env will also be
+set. So .env.TMPDIR will set $ENV{TMPDIR}.
+
+=cut
 
 use strict;
 use warnings;
 use Getopt::Long qw(:config pass_through);
 use File::Slurp;
-use TOML qw(from_toml);
-use JSON qw(decode_json);
-use YAML::XS qw(Load);
+use TOML::Tiny qw(from_toml);
+use JSON       qw(decode_json);
+use YAML::XS   qw(Load);
 use Ixchel;
 use utf8;
+use Pod::Usage;
+use Pod::Find qw(pod_where);
 
 sub version {
-	print "ixchel v. 0.0.1\n";
+	print 'ixchel v. '.$Ixchel::VERSION."\n";
 }
 
 # disable color if asked
@@ -68,7 +81,7 @@ my $version;
 my $noConfig;
 GetOptions(
 	'a=s'      => \$action,
-	'config=s'   => \$config_file,
+	'config=s' => \$config_file,
 	'noConfig' => \$noConfig,
 	'help'     => \$help,
 	'version'  => \$version,
@@ -76,6 +89,7 @@ GetOptions(
 
 if ($version) {
 	&version;
+	exit 0;
 }
 
 if ($help) {
@@ -103,8 +117,16 @@ For a list of actions use the action list_actions
 		exit 0;
 	}
 
-	my $i = Ixchel->new;
-	print "Action specific help... \n\n" . $i->help($action) . "\n";
+	print "Action specific help... \n\n";
+	pod2usage(
+		-input    => pod_where( { -inc => 1 }, 'Ixchel::Actions::' . $action, ),
+		-sections => [
+			'CLI SYNOPSIS', 'DESCRIPTION', 'DESCRIPTION/Introduction', 'FLAGS',
+			'VERSION',      'NAME',        'OPTIONS',                  'BUILD HASH'
+		],
+		-verbose => 99,
+		-output  => \*STDOUT
+	);
 
 	exit 0;
 } ## end if ($help)
@@ -121,8 +143,8 @@ if ( !defined($config_file) ) {
 }
 
 # set noConfig for items that won't need it
-if ($action eq 'list_actions' || $action eq 'sys_info' ) {
-	$noConfig=1;
+if ( $action eq 'list_actions' || $action eq 'sys_info' ) {
+	$noConfig = 1;
 }
 
 my $parsed_config;
@@ -157,8 +179,8 @@ if ( defined($config_file) && -e $config_file ) {
 	die( '"' . $config_file . '" does not exist and --noConfig is not specified' );
 }
 
-my $i = Ixchel->new(config=>$parsed_config);
+my $i = Ixchel->new( config => $parsed_config );
 
-$i->action(action=>$action);
+$i->action( action => $action );
 
 exit $i->{errors_count};

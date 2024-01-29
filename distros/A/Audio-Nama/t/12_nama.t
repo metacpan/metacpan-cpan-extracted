@@ -29,7 +29,7 @@ $ENV{NAMA_VERBOSE_TEST_OUTPUT} and diag( qx(find $test_dir) );
 apply_test_args();
 
 $ENV{NAMA_VERBOSE_TEST_OUTPUT} and diag "options: @ARGV";
-bootstrap_environment();
+startup();
 $config->{use_git} = 0;
 
 $ENV{NAMA_VERBOSE_TEST_OUTPUT} and diag "Check representative variable from default .namarc";
@@ -1083,6 +1083,16 @@ sub check_setup {
 	is( json_out(setup_content(Audio::Nama::ChainSetup::ecasound_chain_setup())), 
 		json_out(setup_content($expected_setup_lines)), 
 		$test_name);
+}
+sub check_tempo_conversions {
+	# make objects
+	# run tests
+
+
+
+
+
+
 }
 
 

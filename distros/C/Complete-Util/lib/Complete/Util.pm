@@ -9,9 +9,9 @@ use Complete::Common qw(:all);
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-12-01'; # DATE
+our $DATE = '2024-01-23'; # DATE
 our $DIST = 'Complete-Util'; # DIST
-our $VERSION = '0.618'; # VERSION
+our $VERSION = '0.620'; # VERSION
 
 our @EXPORT_OK = qw(
                        hashify_answer
@@ -26,6 +26,8 @@ our @EXPORT_OK = qw(
                        complete_hash_value
                        complete_comma_sep
                        complete_comma_sep_pair
+                       get_answer_words
+                       get_answer_summaries
                );
 
 our %SPEC;
@@ -48,7 +50,7 @@ $SPEC{':package'} = {
 
 This package provides some generic completion routines that follow the
 <pm:Complete> convention. (If you are looking for bash/shell tab completion
-routines, take a look at the See Also section.) The main routine is
+routines, take a look at L</"SEE ALSO">.) The main routine is
 `complete_array_elem` which tries to complete a word using choices from elements
 of supplied array. For example:
 
@@ -131,6 +133,70 @@ sub arrayify_answer {
         $ans = $ans->{words};
     }
     $ans;
+}
+
+$SPEC{get_answer_words} = {
+    v => 1.1,
+    summary => 'Extract just the words from answer structure',
+    description => <<'_',
+
+This routine accepts a hash or an array answer structure. It then returns an
+arrayref containing just the words from each answer entry. If the answer is
+undef, it returns an empty arrayref.
+
+See also: `get_answer_summaries()`.
+
+_
+    args => {
+        %arg0_answer,
+    },
+    args_as => 'array',
+    result_naked => 1,
+    result => {
+        schema => 'array*',
+    },
+};
+sub get_answer_words {
+    my $ans = shift;
+    return [] unless defined $ans;
+    if (ref($ans) eq 'HASH') {
+        $ans = $ans->{words};
+    }
+    my @words;
+    for (@$ans) { push @words, ref($_) eq 'HASH' ? $_->{word} : $_ }
+    \@words;
+}
+
+$SPEC{get_answer_summaries} = {
+    v => 1.1,
+    summary => 'Extract just the entry summaries from answer structure',
+    description => <<'_',
+
+This routine accepts a hash or an array answer structure. It then returns an
+arrayref containing just the summaries from each answer entry. If the answer is
+undef, it returns an empty arrayref.
+
+See also: `get_answer_words()`.
+
+_
+    args => {
+        %arg0_answer,
+    },
+    args_as => 'array',
+    result_naked => 1,
+    result => {
+        schema => 'array*',
+    },
+};
+sub get_answer_summaries {
+    my $ans = shift;
+    return [] unless defined $ans;
+    if (ref($ans) eq 'HASH') {
+        $ans = $ans->{words};
+    }
+    my @summaries;
+    for (@$ans) { push @summaries, ref($_) eq 'HASH' ? $_->{summary} : undef }
+    \@summaries;
 }
 
 $SPEC{answer_num_entries} = {
@@ -824,6 +890,7 @@ to return a completion answer.
 _
         },
         uniq => {
+            summary => 'If set to true, then do not offer key that has been mentioned before in the word',
             schema => 'bool*',
             default => 1,
         },
@@ -1123,7 +1190,6 @@ _
     result => {
         schema => 'undef',
     },
-    tags => ['hidden'],
 };
 sub ununiquify_answer {
     my %args = @_;
@@ -1154,14 +1220,14 @@ Complete::Util - General completion routine
 
 =head1 VERSION
 
-This document describes version 0.618 of Complete::Util (from Perl distribution Complete-Util), released on 2023-12-01.
+This document describes version 0.620 of Complete::Util (from Perl distribution Complete-Util), released on 2024-01-23.
 
 =head1 DESCRIPTION
 
 
 This package provides some generic completion routines that follow the
 L<Complete> convention. (If you are looking for bash/shell tab completion
-routines, take a look at the See Also section.) The main routine is
+routines, take a look at L</"SEE ALSO">.) The main routine is
 C<complete_array_elem> which tries to complete a word using choices from elements
 of supplied array. For example:
 
@@ -1551,7 +1617,7 @@ and is expected to return remaining elements to offer.
 
 =item * B<uniq> => I<bool> (default: 1)
 
-(No description)
+If set to true, then do not offer key that has been mentioned before in the word.
 
 =item * B<word>* => I<str> (default: "")
 
@@ -1638,6 +1704,68 @@ Return value:  (array)
 
 
 
+=head2 get_answer_summaries
+
+Usage:
+
+ get_answer_summaries($answer) -> array
+
+Extract just the entry summaries from answer structure.
+
+This routine accepts a hash or an array answer structure. It then returns an
+arrayref containing just the summaries from each answer entry. If the answer is
+undef, it returns an empty arrayref.
+
+See also: C<get_answer_words()>.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<$answer>* => I<array|hash>
+
+Completion answer structure.
+
+
+=back
+
+Return value:  (array)
+
+
+
+=head2 get_answer_words
+
+Usage:
+
+ get_answer_words($answer) -> array
+
+Extract just the words from answer structure.
+
+This routine accepts a hash or an array answer structure. It then returns an
+arrayref containing just the words from each answer entry. If the answer is
+undef, it returns an empty arrayref.
+
+See also: C<get_answer_summaries()>.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<$answer>* => I<array|hash>
+
+Completion answer structure.
+
+
+=back
+
+Return value:  (array)
+
+
+
 =head2 hashify_answer
 
 Usage:
@@ -1696,6 +1824,34 @@ Arguments ('*' denotes required arguments):
 (No description)
 
 =item * B<suffix> => I<str>
+
+(No description)
+
+
+=back
+
+Return value:  (undef)
+
+
+
+=head2 ununiquify_answer
+
+Usage:
+
+ ununiquify_answer(%args) -> undef
+
+If answer contains only one item, make it two.
+
+For example, if answer is C<["a"]>, then will make answer become C<["a","a "]>.
+This will prevent shell from automatically adding space.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<answer>* => I<hash|array>
 
 (No description)
 
@@ -1812,7 +1968,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2020, 2019, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2020, 2019, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

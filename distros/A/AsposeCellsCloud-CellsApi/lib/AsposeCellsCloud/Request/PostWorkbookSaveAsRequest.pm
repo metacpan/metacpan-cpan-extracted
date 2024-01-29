@@ -60,14 +60,15 @@ sub new {
 
 # Run Operation Request
 # PostWorkbookSaveAsRequest.name : The workbook name.  ,
-# PostWorkbookSaveAsRequest.newfilename : The new file name.  ,
+# PostWorkbookSaveAsRequest.newfilename : newfilename to save the result.The `newfilename` should encompass both the filename and extension.  ,
 # PostWorkbookSaveAsRequest.saveOptions :   ,
 # PostWorkbookSaveAsRequest.isAutoFitRows : Indicates if Autofit rows in workbook.  ,
 # PostWorkbookSaveAsRequest.isAutoFitColumns : Indicates if Autofit columns in workbook.  ,
-# PostWorkbookSaveAsRequest.folder : Original workbook folder.  ,
-# PostWorkbookSaveAsRequest.storageName : Storage name.  ,
-# PostWorkbookSaveAsRequest.outStorageName :   ,
-# PostWorkbookSaveAsRequest.checkExcelRestriction :    
+# PostWorkbookSaveAsRequest.folder : The folder where the file is situated.  ,
+# PostWorkbookSaveAsRequest.storageName : The storage name where the file is situated.  ,
+# PostWorkbookSaveAsRequest.outStorageName : The storage name where the output file is situated.  ,
+# PostWorkbookSaveAsRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.  ,
+# PostWorkbookSaveAsRequest.region : The regional settings for workbook.   
 
 {
     my $params = {
@@ -78,7 +79,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_workbook_save_as' } = { 
-    	summary => 'Converts document and saves result to storage.',
+    	summary => 'Save an Excel file in various formats.',
         params => $params,
         returns => 'SaveResponse',
     };
@@ -134,6 +135,10 @@ sub run_http_request {
 
     if(defined $self->check_excel_restriction){
         $query_params->{'checkExcelRestriction'} = $client->to_query_value($self->check_excel_restriction);      
+    }
+
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
     } 
     my $_body_data;
 
@@ -162,7 +167,7 @@ __PACKAGE__->method_documentation({
      'newfilename' => {
      	datatype => 'string',
      	base_name => 'newfilename',
-     	description => 'The new file name.',
+     	description => 'newfilename to save the result.The `newfilename` should encompass both the filename and extension.',
      	format => '',
      	read_only => '',
      		},
@@ -190,28 +195,35 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'out_storage_name' => {
      	datatype => 'string',
      	base_name => 'outStorageName',
-     	description => '',
+     	description => 'The storage name where the output file is situated.',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
-     	description => '',
+     	description => 'Whether check restriction of excel file when user modify cells related objects.',
+     	format => '',
+     	read_only => '',
+     		},
+     'region' => {
+     	datatype => 'string',
+     	base_name => 'region',
+     	description => 'The regional settings for workbook.',
      	format => '',
      	read_only => '',
      		},    
@@ -227,7 +239,8 @@ __PACKAGE__->attribute_map( {
     'folder' => 'folder',
     'storage_name' => 'storageName',
     'out_storage_name' => 'outStorageName',
-    'check_excel_restriction' => 'checkExcelRestriction' 
+    'check_excel_restriction' => 'checkExcelRestriction',
+    'region' => 'region' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

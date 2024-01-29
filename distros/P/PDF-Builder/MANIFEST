@@ -2,6 +2,7 @@
 # if add or delete a .pm file, also update META.yml and META.json files
 # if add or delete a .t file, also update tools/2_t-tests.pl
 # if add or delete an example file, also update tools/3_examples.pl
+#    as well as the list of examples and expected results
 # if add or delete a contribution, also update tools/4_contrib.pl
 .perlcriticrc
 Changes
@@ -18,6 +19,7 @@ tools/3_examples.pl
 tools/4_contrib.pl
 #tools/optional_update.pl
 tools/TTFdump.pl
+INFO/ACKNOWLEDGE.md
 INFO/Changes_2017
 INFO/Changes_2018
 INFO/Changes_2019

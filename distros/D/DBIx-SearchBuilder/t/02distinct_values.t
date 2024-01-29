@@ -88,6 +88,17 @@ EOF
 
 }
 
+sub schema_mariadb {
+<<EOF;
+CREATE TEMPORARY TABLE Users (
+    id integer AUTO_INCREMENT,
+    Login varchar(18) NOT NULL,
+    GroupName varchar(36),
+    PRIMARY KEY (id))
+EOF
+
+}
+
 sub schema_pg {
 <<EOF;
 CREATE TEMPORARY TABLE Users (

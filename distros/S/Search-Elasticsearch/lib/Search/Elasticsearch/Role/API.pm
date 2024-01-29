@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Role::API;
-$Search::Elasticsearch::Role::API::VERSION = '8.00';
+$Search::Elasticsearch::Role::API::VERSION = '8.12';
 use Moo::Role;
 requires 'api_version';
 requires 'api';
@@ -135,7 +135,7 @@ Search::Elasticsearch::Role::API - Provides common functionality for API impleme
 
 =head1 VERSION
 
-version 8.00
+version 8.12
 
 =head1 AUTHOR
 
@@ -143,7 +143,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Elasticsearch BV.
+This software is Copyright (c) 2024 by Elasticsearch BV.
 
 This is free software, licensed under:
 

@@ -1,25 +1,34 @@
 NAME
-    Acme::CPANModules::PortedFrom::NPM - Modules/applications that are
-    ported (or inspired from) NPM libraries
+    Acme::CPANModules::PortedFrom::NPM - List of modules/applications that
+    are ported (or inspired from) NPM libraries
 
 VERSION
-    This document describes version 0.004 of
+    This document describes version 0.005 of
     Acme::CPANModules::PortedFrom::NPM (from Perl distribution
-    Acme-CPANModules-PortedFrom-NPM), released on 2021-08-10.
+    Acme-CPANModules-PortedFrom-NPM), released on 2023-09-25.
 
 DESCRIPTION
     If you know of others, please drop me a message.
 
-ACME::MODULES ENTRIES
-    *   App::AsciiChart
+    Keywords: JavaScript, JS, npmjs
 
-    *   App::chalk
+ACME::CPANMODULES ENTRIES
+    App::AsciiChart
+        Author: VTI <https://metacpan.org/author/VTI>
 
-    *   App::envset
+    App::chalk
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Inky
+    App::envset
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Smart::Options
+    Inky
+        Author: MFONTANI <https://metacpan.org/author/MFONTANI>
+
+    Smart::Options
+        Author: MIKIHOSHI <https://metacpan.org/author/MIKIHOSHI>
+
+    Is::Bot
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -50,7 +59,9 @@ FAQ
 
     This Acme::CPANModules module also helps lcpan produce a more meaningful
     result for "lcpan related-mods" command when it comes to finding related
-    modules for the modules listed in this Acme::CPANModules module.
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -60,19 +71,13 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANModules-PortedFrom-NPM>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Port
-    edFrom-NPM>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     More on the same theme of modules ported from other languages:
     Acme::CPANModules::PortedFrom::Java, Acme::CPANModules::PortedFrom::PHP,
     Acme::CPANModules::PortedFrom::Python,
     Acme::CPANModules::PortedFrom::Ruby.
+
+    <https://www.npmjs.com>
 
     Acme::CPANModules - about the Acme::CPANModules namespace
 
@@ -92,15 +97,23 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2018 by perlancar
+    This software is copyright (c) 2023, 2021, 2018 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Port
+    edFrom-NPM>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

@@ -1,0 +1,42 @@
+==== start svg ====
+XObject #1
+vb 0 0 350 50 (inferred) => bb 0.00 -50.00 350.00 0.00
+matrix( 1 0 0 -1 0 0)
+vb rect( 0.00 0.00 350.00 50.00)
+xo fill_color black (initial)
+  start handling image (SVGPDF::Image)
+  image x=0 y=0 w=50 h=50
+  xo save
+  xo restore
+  end handling image
+  start handling image (SVGPDF::Image)
+  image x=0 y=0 w=50 h=50
+  xo save
+  xo restore
+  end handling image
+  start handling image (SVGPDF::Image)
+  image x=100 y=0 w=50 h=50
+  xo save
+  xo restore
+  end handling image
+  start handling image (SVGPDF::Image)
+  image x=150 y=0 w=50 h=50
+  xo save
+  xo restore
+  end handling image
+  start handling image (SVGPDF::Image)
+  image x=200 y=0 w=50 h=50
+  xo save
+  xo restore
+  end handling image
+  start handling image (SVGPDF::Image)
+  image x=250 y=0 w=50 h=50
+  xo save
+  xo restore
+  end handling image
+  start handling image (SVGPDF::Image)
+  image x=300 y=0 w=50 h=50
+  xo save
+  xo restore
+  end handling image
+==== end svg ====

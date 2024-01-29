@@ -1,6 +1,6 @@
 package Map::Tube::Server;
 
-$Map::Tube::Server::VERSION   = '0.01';
+$Map::Tube::Server::VERSION   = '0.05';
 $Map::Tube::Server::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Server - Dancer2 based server for Map::Tube.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.05
 
 =cut
 
@@ -23,9 +23,35 @@ use Dancer2::Plugin::Map::Tube;
 
 =head1 DESCRIPTION
 
-Dancer2 based framework to build the Map::Tube public facing  REST API. Currently
-it is being used by manwar.org to provide the service as REST API.It's still very
-much beta version v1.
+Dancer2 based framework to build the L<Map::Tube> public  facing  REST API.
+Currently it is being used by L<https://manwar.org> to provide the service
+as REST API. It's still very much a beta version C<v1>.
+
+=head1 SETUP
+
+You can install individual maps manually. For C<London Tube Map>, just install
+the CPAN module L<Map::Tube::London>.
+
+Now the server C<server.psgi> can be setup locally like below:
+
+    #!/usr/bin/env perl
+
+    use strict; use warnings;
+    use Map::Tube::Server;
+    use Plack::Builder;
+
+    builder { mount '/map-tube/v1' => Map::Tube::Server->to_app; };
+
+Time to start the server like below:
+
+    $ plackup server.psgi
+    HTTP::Server::PSGI: Accepting connections at http://0:5000/
+
+Open up another terminal and test the REST API call assuming you have
+just one map C<London> installed on the server.
+
+    $ curl http://127.0.0.1:5000/map-tube/v1/maps
+    [ "London" ]
 
 =head1 SUPPORTED MAPS
 
@@ -74,7 +100,7 @@ The following maps do not have complete map data yet.
 =cut
 
 hook before => sub {
-    header 'Content-Type' => 'application/json';
+    response_header 'Content-Type' => 'application/json';
 };
 
 =head1 ROUTES
@@ -87,7 +113,7 @@ Returns ref to an array of shortest route stations list in JSON format.
 
 For example:
 
-    curl http://manwar.mooo.info/map-tube/v1/shortest-route/london/baker%20street/wembley%20park
+    curl http://127.0.0.1:5000/map-tube/v1/shortest-route/london/baker%20street/wembley%20park
 
 =cut
 
@@ -111,7 +137,7 @@ C<line>. The C<map> can be any of the supported maps. And the  C<line> can be an
 of lines within the C<map>.For more details, please look into the relevant module
 for the map C<Map::Tube::*>.
 
-    curl http://manwar.mooo.info/map-tube/v1/stations/london/metropolitan
+    curl http://127.0.0.1:5000/map-tube/v1/stations/london/metropolitan
 
 =cut
 
@@ -132,7 +158,7 @@ get '/stations/:map/:line' => sub {
 
 Returns ref to an array of stations list in JSON format for the given C<map>.
 
-    curl http://manwar.mooo.info/map-tube/v1/stations/london
+    curl http://127.0.0.1:5000/map-tube/v1/stations/london
 
 =cut
 
@@ -151,7 +177,7 @@ get '/stations/:map' => sub {
 
 Returns ref to an array of supported maps.
 
-    curl http://manwar.mooo.info/map-tube/v1/maps
+    curl http://127.0.0.1:5000/map-tube/v1/maps
 
 =cut
 
@@ -167,7 +193,7 @@ get '/maps' => sub {
 
 =head1 AUTHOR
 
-Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
+Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
@@ -175,8 +201,7 @@ L<https://github.com/manwar/Map-Tube-Server>
 
 =head1 BUGS
 
-Please  report any bugs or feature requests to C<bug-map-tube-server at rt.cpan.org>,
-or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Map-Tube-Server>.
+Please  report any bugs or feature requests through the web interface at L<https://github.com/manwar/Map-Tube-Server/issues>.
 I will  be notified and then you'll automatically be notified of progress on your
 bug as I make changes.
 
@@ -190,9 +215,9 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * BUGS / ISSUES
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Map-Tube-Server>
+L<https://github.com/manwar/Map-Tube-Server/issues>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -202,15 +227,15 @@ L<http://annocpan.org/dist/Map-Tube-Server>
 
 L<http://cpanratings.perl.org/d/Map-Tube-Server>
 
-=item * Search CPAN
+=item * Search MetaCPAN
 
-L<http://search.cpan.org/dist/Map-Tube-Server/>
+L<https://metacpan.org/pod/Map::Tube::Server>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 Mohammad S Anwar.
+Copyright (C) 2024 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain  a copy of the full

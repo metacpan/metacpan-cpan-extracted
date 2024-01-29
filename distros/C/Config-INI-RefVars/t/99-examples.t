@@ -23,6 +23,23 @@ subtest "SYNOPSIS" => sub {
   while (my ($section, $section_vars) = each(%$variables)) {
     isa_ok($section_vars, 'HASH');
   }
+  is_deeply($variables,
+            {
+             '__TOCOPY__' => {
+                              'section' => '__TOCOPY__'
+                             },
+             'sec A' => {
+                         'bar' => 'Variable foo in section sec A',
+                         'foo' => 'Variable foo in section sec A!',
+                         'section' => 'sec A'
+                        },
+             'sec B' => {
+                         'baz' => 'from sec B: ref foo from sec A: Variable foo in section sec A!',
+                         'section' => 'sec B'
+                        }
+            },
+            'variables()'
+           );
 };
 
 subtest "COMMENTS" => sub {
@@ -56,6 +73,60 @@ subtest "HEADERS" => sub {
 
 
 subtest "VARIABLES AND ASSIGNMENT OPERATORS" => sub {
+  subtest "??=" => sub {
+    my $obj = Config::INI::RefVars->new();
+    my $src = <<'EOT';
+      [sec]
+      env_var:=$(=ENV:ENV_VAR)
+      env_var??=the default
+
+      wrong1=$(=ENV:ENV_VAR)
+      wrong1??=the default
+
+      wrong2:=$(=ENV:ENV_VAR)
+      wrong1?=the default
+EOT
+    subtest "ENV_VAR is undef" => sub {
+      local $ENV{ENV_VAR};
+      $obj->parse_ini(src => $src);
+      is_deeply($obj->variables,
+                {
+                 sec => {
+                         env_var => 'the default',
+                         wrong1  => '',
+                         wrong2  => ''
+                        }
+                },
+                'variables()');
+    };
+    subtest "ENV_VAR is empty" => sub {
+      local $ENV{ENV_VAR} = "";
+      $obj->parse_ini(src => $src);
+      is_deeply($obj->variables,
+                {
+                 sec => {
+                         env_var => 'the default',
+                         wrong1  => '',
+                         wrong2  => ''
+                        }
+                },
+                'variables()');
+    };
+    subtest "ENV_VAR is not empty" => sub {
+      local $ENV{ENV_VAR} = "blah";
+      $obj->parse_ini(src => $src);
+      is_deeply($obj->variables,
+                {
+                 sec => {
+                         env_var => 'blah',
+                         wrong1  => 'blah',
+                         wrong2  => 'blah'
+                        }
+                },
+                'variables()');
+    };
+
+  };
   subtest ".=" => sub {
     my $obj = Config::INI::RefVars->new();
     my $src = [
@@ -320,7 +391,7 @@ EOT
             'variables()');
 };
 
-subtest "THE TOCOPY SECTION" => sub {
+subtest "THE SECTION TOCOPY" => sub {
   my $obj = Config::INI::RefVars->new();
 
   subtest "tocopy and manual copying" => sub {
@@ -359,7 +430,7 @@ EOT
   };
   subtest "with and without explicite __TOCOPY__" => sub {
     my $obj = Config::INI::RefVars->new();
-    my $src = <<'EOT';
+    my $src1 = <<'EOT';
      [__TOCOPY__]
      a=this
      b=that
@@ -371,18 +442,61 @@ EOT
                     __TOCOPY__ => {a => 'this', b => 'that'},
                     sec        => {a => 'this', b => 'that', x => 'y'},
                    };
-    $obj->parse_ini(src => $src);
+    $obj->parse_ini(src => $src1);
     is_deeply($obj->variables, $expected, 'variables()');
 
-    $src = <<'EOT';
+    my $src2 = <<'EOT';
      a=this
      b=that
 
      [sec]
       x=y
 EOT
-    $obj->parse_ini(src => $src);
+    $obj->parse_ini(src => $src2);
     is_deeply($obj->variables, $expected, 'variables()');
+
+    my $obj_gm = Config::INI::RefVars->new(global_mode => 1);
+    $obj_gm->parse_ini(src => $src1);
+    is_deeply($obj_gm->variables,
+              {
+               __TOCOPY__ => {a => 'this', b => 'that'},
+               sec        => {x => 'y'},
+              },
+              'variables(), global mode');
+  };
+  subtest "global vs default" => sub {
+    my $src = <<'EOT';
+      section=$(=)
+
+      [sec A]
+      var 1 = $(section)
+      var 2 := $(section)
+EOT
+    my $obj_gm = Config::INI::RefVars->new(global_mode => 1)->parse_ini(src => $src);
+    my $obj_dflt = Config::INI::RefVars->new()->parse_ini(src => $src);
+    is_deeply($obj_gm->variables,
+              {
+               '__TOCOPY__' => {
+                                'section' => '__TOCOPY__'
+                               },
+               'sec A' => {
+                           'var 1' => '__TOCOPY__',
+                           'var 2' => 'sec A'
+                          }
+              },
+              'variables(), global mode');
+    is_deeply($obj_dflt->variables,
+              {
+               '__TOCOPY__' => {
+                                'section' => '__TOCOPY__'
+                               },
+               'sec A' => {
+                           'section' => 'sec A',
+                           'var 1' => 'sec A',
+                           'var 2' => 'sec A'
+                          }
+              },
+              'variables(), global mode');
   };
 };
 
@@ -414,6 +528,67 @@ EOT
             'variables()');
   is_deeply($obj->sections_h, { A => '0', B => '1' }, 'sections_h())');
   is_deeply($obj->sections,   [qw(A B)],            'sections())');
+};
+
+subtest "EXAMPLES" => sub {
+  my $obj = Config::INI::RefVars->new(separator      => "\\",
+                                      cmnt_vl        => 1,
+                                      tocopy_section => 'Settings',
+                                      global_mode    => 1);
+  # see https://www.dhcpserver.de/cms/ini_file_reference/special/sectionname-syntax-for-ini-file-variables/
+  my $src = <<'EOT';
+   [Settings]
+   BaseDir="d:\dhcpsrv" ; dhcpsrv.exe resides here
+   IPBIND_1=192.168.17.2
+   IPPOOL_1=$(Settings\IPBIND_1)-50
+   AssociateBindsToPools=1
+   Trace=1
+   TraceFile="$(BaseDir)\dhcptrc.txt" ; trace file
+
+   [DNS-Settings]
+   EnableDNS=1
+
+   [General]
+   SUBNETMASK=255.255.255.0
+   DNS_1=$(IPBIND_1)
+
+   [TFTP-Settings]
+   EnableTFTP=1
+   Root="$(BaseDir)\wwwroot" ; use wwwroot for http and tftp
+
+   [HTTP-Settings]
+   EnableHTTP=1
+   Root="$(BaseDir)\wwwroot" ; use wwwroot for http and tftp
+EOT
+  $obj->parse_ini(src => $src);
+  is_deeply($obj->variables,
+            {
+             'Settings' => {
+                            'AssociateBindsToPools' => '1',
+                            'BaseDir' => '"d:\\dhcpsrv"',
+                            'IPBIND_1' => '192.168.17.2',
+                            'IPPOOL_1' => '192.168.17.2-50',
+                            'Trace' => '1',
+                            'TraceFile' => '""d:\\dhcpsrv"\\dhcptrc.txt"'
+                           },
+             'DNS-Settings' => {
+                                'EnableDNS' => '1',
+                               },
+             'General' => {
+                           'DNS_1' => '192.168.17.2',
+                           'SUBNETMASK' => '255.255.255.0'
+                          },
+             'TFTP-Settings' => {
+                                 'EnableTFTP' => '1',
+                                 'Root' => '""d:\\dhcpsrv"\\wwwroot"'
+                                },
+             'HTTP-Settings' => {
+                                 'EnableHTTP' => '1',
+                                 'Root' => '""d:\\dhcpsrv"\\wwwroot"'
+                                },
+
+            }
+           );
 };
 
 #==================================================================================================

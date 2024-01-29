@@ -3,7 +3,7 @@ package Devel::StackTrace::Frame;
 use strict;
 use warnings;
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 # Create accessor routines
 BEGIN {
@@ -183,7 +183,7 @@ Devel::StackTrace::Frame - A single frame in a stack trace
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 DESCRIPTION
 
@@ -193,20 +193,33 @@ See L<Devel::StackTrace> for details.
 
 =head1 METHODS
 
-See Perl's C<caller> documentation for more information on what these
-methods return.
+See Perl's C<caller> documentation for more information on what these methods
+return.
 
 =head2 $frame->package
 
+The package which created this frame.
+
 =head2 $frame->filename
+
+The filename which created this frame.
 
 =head2 $frame->line
 
+The line where the frame was created.
+
 =head2 $frame->subroutine
+
+The subroutine which created this frame.
 
 =head2 $frame->hasargs
 
+This will be true if a new C<@_> was created for this this frame.
+
 =head2 $frame->wantarray
+
+This indicates the context for the call for this frame. This will be true if
+called in array context, false in scalar context, and C<undef> in void context.
 
 =head2 $frame->evaltext
 
@@ -223,7 +236,11 @@ references are returned as references, not copies.
 
 =head2 $frame->hints
 
+Returns the value of C<$^H> for this frame.
+
 =head2 $frame->bitmask
+
+Returns the value of C<$bitmask> for this frame.
 
 =head2 $frame->as_string
 
@@ -232,8 +249,6 @@ Returns a string containing a description of the frame.
 =head1 SUPPORT
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Devel-StackTrace/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 
@@ -245,7 +260,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2000 - 2019 by David Rolsky.
+This software is Copyright (c) 2000 - 2024 by David Rolsky.
 
 This is free software, licensed under:
 

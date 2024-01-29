@@ -26,10 +26,10 @@
             "File::Slurper" : "0",
             "List::Util" : "1.29",
             "Module::Pluggable::Object" : "0",
-            "Object::Pad" : "0.800",
+            "Object::Pad" : "0.807",
             "String::Tagged::Terminal" : "0",
-            "Syntax::Keyword::Match" : "0",
-            "Text::Treesitter" : "0.10",
+            "Syntax::Keyword::Match" : "0.13",
+            "Text::Treesitter" : "0.11",
             "perl" : "5.036"
          }
       },
@@ -42,7 +42,55 @@
    "provides" : {
       "App::perl::distrolint" : {
          "file" : "lib/App/perl/distrolint.pm",
-         "version" : "0.03"
+         "version" : "0.06"
+      },
+      "App::perl::distrolint::Check::DeprecatedFeatures" : {
+         "file" : "lib/App/perl/distrolint/Check/DeprecatedFeatures.pm",
+         "version" : "0.06"
+      },
+      "App::perl::distrolint::Check::Editorconfig" : {
+         "file" : "lib/App/perl/distrolint/Check/Editorconfig.pm",
+         "version" : "0.06"
+      },
+      "App::perl::distrolint::Check::FilePaths" : {
+         "file" : "lib/App/perl/distrolint/Check/FilePaths.pm",
+         "version" : "0.06"
+      },
+      "App::perl::distrolint::Check::HardTabs" : {
+         "file" : "lib/App/perl/distrolint/Check/HardTabs.pm",
+         "version" : "0.06"
+      },
+      "App::perl::distrolint::Check::NoStrictRefs" : {
+         "file" : "lib/App/perl/distrolint/Check/NoStrictRefs.pm",
+         "version" : "0.06"
+      },
+      "App::perl::distrolint::Check::Pod" : {
+         "file" : "lib/App/perl/distrolint/Check/Pod.pm",
+         "version" : "0.06"
+      },
+      "App::perl::distrolint::Check::StrictAndWarnings" : {
+         "file" : "lib/App/perl/distrolint/Check/StrictAndWarnings.pm",
+         "version" : "0.06"
+      },
+      "App::perl::distrolint::Check::Test2" : {
+         "file" : "lib/App/perl/distrolint/Check/Test2.pm",
+         "version" : "0.06"
+      },
+      "App::perl::distrolint::Check::Unimport" : {
+         "file" : "lib/App/perl/distrolint/Check/Unimport.pm",
+         "version" : "0.06"
+      },
+      "App::perl::distrolint::Check::UseUTF8" : {
+         "file" : "lib/App/perl/distrolint/Check/UseUTF8.pm",
+         "version" : "0.06"
+      },
+      "App::perl::distrolint::Check::UseVERSION" : {
+         "file" : "lib/App/perl/distrolint/Check/UseVERSION.pm",
+         "version" : "0.06"
+      },
+      "App::perl::distrolint::Check::VersionVar" : {
+         "file" : "lib/App/perl/distrolint/Check/VersionVar.pm",
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -51,6 +99,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.03",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

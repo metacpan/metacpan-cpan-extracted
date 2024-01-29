@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.213';
+our $VERSION = '1.214';
 
 use Quiq::Trash;
 use Quiq::Shell;
@@ -125,7 +125,7 @@ Zeige die Bilddateien des Quellverzeichnisses $srcDir mit C<eog>
 an. Bilder, die in C<eog> mit C<DEL> gelöscht werden, landen im
 Trash. Nach Verlassen von C<eog> werden die Bilddateien aus dem Trash
 ins Zielverzeichnis bewegt. Existiert das Zielverzeichnis nicht,
-wird es automatisch erzeugt.
+wird es erzeugt.
 
 Die Methode ist so konzipiert, dass auch Dateien mit dem gleichen
 Grundnamen wie die Bilddatei mitkopiert werden (z.B. .xfc-Dateien).
@@ -206,7 +206,7 @@ sub transferImages {
 
 =head1 VERSION
 
-1.213
+1.214
 
 =head1 AUTHOR
 
@@ -214,7 +214,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2023 Frank Seitz
+Copyright (C) 2024 Frank Seitz
 
 =head1 LICENSE
 

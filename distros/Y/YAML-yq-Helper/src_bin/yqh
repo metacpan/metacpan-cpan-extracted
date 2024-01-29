@@ -1,101 +1,237 @@
 #!perl
 
+=head1 NAME
+
+yqh - Helper wrapper around yq.
+
+=head1 SYNOPSIS
+
+yqh B<-f> <yaml> B<-a> clear_array B<--var> <var>
+
+yqh B<-f> <yaml> B<-a> clear_hash B<--var> <var>
+
+yqh B<-f> <yaml> B<-a> create_array B<--var> <var> [B<--vals> <vals>]
+
+yqh B<-f> <yaml> B<-a> create_hash B<--var> <var>
+
+yqh B<-f> <yaml> B<-a> dedup_array B<--var> <var>
+
+yqh B<-f> <yaml> B<-a> delete B<--var> <var>
+
+yqh B<-f> <yaml> B<-a> delete_array B<--var> <var>
+
+yqh B<-f> <yaml> B<-a> delete_hash B<--var> <var>
+
+yqh B<-f> <yaml> B<-a> ensure
+
+yqh B<-f> <yaml> B<-a> is_array B<--var> <var>
+
+yqh B<-f> <yaml> B<-a> is_hash B<--var> <var>
+
+yqh B<-f> <yaml> B<-a> is_defined B<--var> <var>
+
+yqh B<-f> <yaml> B<-a> merge_yaml B<--yaml> <yaml> [B<--mode> <mode>]
+
+yqh B<-f> <yaml> B<-a> push_array B<--var> <var> B<--vals> <vals>
+
+yqh B<-f> <yaml> B<-a> set_array B<--var> <var> B<--vals> <vals>
+
+yqh B<-f> <yaml> B<-a> set_hash B<--var> <var> B<--hash> <hash>
+
+yqh B<-f> <yaml> B<-a> set_in_array B<--var> <var> B<--vals> <vals> [B<--dedup>]
+
+yqh B<-f> <yaml> B<-a> yaml_diff B<--yaml> <yaml_file_2>
+
+=head1 FLAGS
+
+=head2 -f <file>
+
+YAML file to operate on.
+
+Default :: undef
+
+=head2 -a <action>
+
+Action to perform.
+
+Default :: undef
+
+=head2 --var <string>
+
+Variable to set.
+
+Default :: undef
+
+=head2 --vals <string>
+
+Comma seperate list of array values.
+
+Default :: undef
+
+=head2 --hash <string>
+
+Comma seperate list of hash values. Each
+value is a sub string with key/value seperate
+by a /=/.
+
+Default :: undef
+
+=head2 --dedup <bool>
+
+If it should dedup the data for the op.
+
+Default :: 1
+
+=head2 --yaml <file>
+
+Another YAML file to use with like the merge_yaml
+action or the like.
+
+Default :: undef
+
+=head2 --mode <mode>
+
+Merge mode to use.
+
+Default :: deeply
+
+=head1 ACTIONS
+
+=head2 clear_array
+
+Clears the specified array.
+
+Requires :: --var
+
+=head2 clear_hash
+
+Clears the specified hash.
+
+Requires :: --var
+
+=head2 create_array
+
+Creates the specified array if it does not exist.
+
+Requires :: --var
+
+Optional :: --vals
+
+=head2 create_hash
+
+Creates the specified hash if it does not exist.
+
+Requires :: --var
+
+=head2 dedup_array
+
+Deduplicates an array.
+
+Requires :: --var
+
+=head2 delete
+
+Deletes the var without checking the type.
+
+Requires :: --var
+
+=head2 delete_array
+
+Deletes the specified array.
+
+Requires :: --var
+
+=head2 delete_hash
+
+Deletes the specified hash.
+
+Requires :: --var
+
+=head2 ensure
+
+Ensures that the YAML starts with
+
+    %YAML $version
+    ---
+
+This is largely for use with stuff used by
+LibYAML as that sometimes does not play nice
+when that is missing.
+
+Version 1.1 is used if it is not set.
+
+=head2 is_array
+
+Returns 0 or 1 based on if it is a array.
+
+Requires :: --var
+
+=head2 is_hash
+
+Returns 0 or 1 based on if it is a hash.
+
+Requires :: --var
+
+=head2 is_defined
+
+Returns 0 or 1 based on if it is defined.
+
+Requires :: --var
+
+=head2 merge_yaml
+
+Merges the specified YAML into the YAML.
+
+Requires :: --yaml
+
+Optional :: --mode
+
+=head2 push_array
+
+Pushes a set of items onto an array.
+
+Requires :: --var, --vals
+
+=head2 set_array
+
+Clears the array and sets it to specified values.
+
+Requires :: --var, --vals
+
+=head2 set_hash
+
+Clears the hash and sets it to specified values.
+
+Requires :: --var, --hash
+
+=head2 set_in_array
+
+Make sure a set of values exist in a array and if not add them.
+
+Requires :: --var, --vals
+
+Optional :: --dedup
+
+=head2 yaml_diff
+
+Diffs the two YAMLs.
+
+Requires :: --yaml
+
+=cut
+
 use strict;
 use warnings;
 use Getopt::Long;
 use YAML::yq::Helper;
+use Pod::Usage;
 
 sub version {
-	print "yqh v. 0.1.1\n";
+	print "yqh v. " . $YAML::yq::Helper::VERSION . ".\n";
 }
 
 sub help {
-	&version;
-
-	print '
-
--f <file>         Config INI file.
-                  Default :: undef
-
--a <action>       Action to perform.
-                  Default :: undef
-
---var <string>    Variable to set.
-                  Default :: undef
-
---vals <string>   Comma seperate list of array values.
-                  Default :: undef
-
---hash <string>   Comma seperate list of hash values. Each
-                  value is a sub string with key/value seperate
-                  by a /=/.
-                  Default :: undef
-
---dedup <bool>    If it should dedup the data for the op.
-                  Default :: 1
-
-Action :: is_array
-Description :: Returns 0 or 1 based on if it is a array.
-Requires :: --var
-
-Action :: is_hash
-Description :: Returns 0 or 1 based on if it is a hash.
-Requires :: --var
-
-Action :: is_defined
-Description :: Returns 0 or 1 based on if it is defined.
-Requires :: --var
-
-Action :: clear_array
-Description :: Clears the specified array.
-Requires :: --var
-
-Action :: clear_hash
-Description :: Clears the specified hash.
-Requires :: --var
-
-Action :: create_array
-Description :: Creates the specified array if it does not exist.
-Requires :: --var
-Optional :: --vals
-
-Action :: create_hash
-Description :: Creates the specified hash if it does not exist.
-Requires :: --var
-
-Action :: dedup_array
-Description :: Deduplicates an array.
-Requires :: --var
-
-Action :: delete
-Description :: Deletes the var without checking the type.
-Requires :: --var
-
-Action :: delete_array
-Description :: Deletes the specified array.
-Requires :: --var
-
-Action :: delete_hash
-Description :: Deletes the specified hash.
-Requires :: --var
-
-Action :: push_array
-Description :: Pushes a set of items onto an array.
-Requires :: --var,--vals
-
-Action :: set_array
-Description :: Clears the array and sets it to specified values.
-Requires :: --var,--vals
-
-Action :: set_hash
-Description :: Clears the hash and sets it to specified values.
-Requires :: --var,--hash
-
-Action :: set_in_array
-Description :: Make sure a set of values exist in a array and if not add them.
-Requires :: --var,--vals
-Optional :: --dedup
-';
+	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT );
 }
 
 # get the commandline options
@@ -111,6 +247,8 @@ my $key;
 my $hash_string;
 my $val;
 my $dedup = 1;
+my $yaml2;
+my $mode = 'deeply';
 Getopt::Long::Configure('no_ignore_case');
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -127,6 +265,8 @@ GetOptions(
 	'val=s'   => \$val_string,
 	'k=s'     => \$key,
 	'dedup=s' => \$dedup,
+	'yaml=s'  => \$yaml2,
+	'mode=s'  => \$mode,
 );
 
 $vals_sep = quotemeta($vals_sep);
@@ -178,12 +318,11 @@ if ( defined($hash_string) ) {
 		my ( $item_key, $item_val ) = split( /\=/, $item );
 		if ( defined($item_key) and $item_key ne '' ) {
 			$hash->{$item_key} = $item_val;
-		}
-		elsif ( defined($item_key) and $item_key eq '' ) {
+		} elsif ( defined($item_key) and $item_key eq '' ) {
 			die('--hash contains a key that matches ""');
 		}
 	}
-}
+} ## end if ( defined($hash_string) )
 
 # print version or help if requested
 if ($help) {
@@ -281,6 +420,21 @@ if ( $action eq 'create_array' ) {
 
 if ( $action eq 'create_hash' ) {
 	$yq->create_hash( var => $var );
+	exit 0;
+}
+
+if ( $action eq 'merge_yaml' ) {
+	$yq->merge_yaml( yaml => $yaml2, merge_mode => $mode );
+	exit 0;
+}
+
+if ( $action eq 'yaml_diff' ) {
+	print $yq->yaml_diff( yaml => $yaml2 );
+	exit 0;
+}
+
+if ( $action eq 'ensure' ) {
+	$yq->ensure( force=>1 );
 	exit 0;
 }
 

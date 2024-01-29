@@ -10,17 +10,17 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 
 # VERSION
 
-Version 0.28
+Version 0.29
 
 # DESCRIPTION
 
-**Greple** **xlate**モジュールはテキストブロックを見つけ、翻訳されたテキストに置き換えます。現在、DeepL (`deepl.pm`) と ChatGPT (`gpt3.pm`) モジュールがバックエンドエンジンとして実装されています。
+**Greple** **xlate**モジュールは目的のテキストブロックを見つけ、翻訳されたテキストに置き換えます。現在、DeepL (`deepl.pm`) と ChatGPT (`gpt3.pm`) モジュールがバックエンドエンジンとして実装されています。
 
-[pod](https://metacpan.org/pod/pod)スタイルで書かれた通常のテキストブロックを翻訳したい場合は、このように`xlate::deepl`と`perl`モジュールで**greple**コマンドを使います：
+Perlのポッドスタイルで書かれた文書中の通常のテキストブロックを翻訳したい場合は、**greple**コマンドを`xlate::deepl`と`perl`モジュールと一緒に次のように使います：
 
     greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
 
-パターン `^(\w.*n)+` は、英数字で始まる連続した行を意味します。このコマンドは、翻訳される領域を表示します。オプション**--all**は、テキスト全体を翻訳するために使用します。
+このコマンドでは、パターン文字列`^( \w.*n)+` は英数字で始まる連続行を意味します。このコマンドでは、翻訳される領域が強調表示されます。オプション**--all**はテキスト全体を表示します。
 
 <div>
     <p>
@@ -28,7 +28,7 @@ Version 0.28
     </p>
 </div>
 
-次に、`--xlate`オプションを追加して、選択された領域を翻訳します。これは、**deepl**コマンドの出力でそれらを見つけて置き換えます。
+次に、`--xlate`オプションを追加して、選択した領域を翻訳します。そして、必要な部分を見つけ、**deepl**コマンドの出力で置き換えます。
 
 デフォルトでは、原文と翻訳文は [git(1)](http://man.he.net/man1/git) と互換性のある "conflict marker" フォーマットで出力されます。`ifdef`形式を使えば、[unifdef(1)](http://man.he.net/man1/unifdef)コマンドで簡単に目的の部分を取得できます。出力形式は**--xlate-format**オプションで指定できます。
 
@@ -76,7 +76,7 @@ Version 0.28
 
     - **conflict**, **cm**
 
-        原文と訳文を[git(1)](http://man.he.net/man1/git)コンフリクトマーカ形式で出力します。
+        オリジナルと変換後のテキストは、[git(1)](http://man.he.net/man1/git) conflict marker フォーマットで表示されます。
 
             <<<<<<< ORIGINAL
             original text
@@ -90,7 +90,7 @@ Version 0.28
 
     - **ifdef**
 
-        原文と訳文を[cpp(1)](http://man.he.net/man1/cpp) `#ifdef`形式で出力します。
+        オリジナルと変換後のテキストは、[cpp(1)](http://man.he.net/man1/cpp) `#ifdef` フォーマットで表示されます。
 
             #ifdef ORIGINAL
             original text
@@ -105,7 +105,7 @@ Version 0.28
 
     - **space**
 
-        原文と訳文を1行の空白で区切って表示します。
+        元のテキストと変換後のテキストは、1行の空白行で区切られて表示されます。
 
     - **xtxt**
 
@@ -196,6 +196,8 @@ DeepLおよびChatGPT用のコマンドラインツールをインストール�
 
 [App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3) をインストールしてください。
 
+[https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
     DeepL の Python ライブラリと CLI コマンド。
@@ -220,13 +222,27 @@ DeepLおよびChatGPT用のコマンドラインツールをインストール�
 
     **sdif**を使用すると、**-V**オプションでコンフリクトマーカー形式を並べて表示することができます。
 
+## ARTICLES
+
+- [https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250](https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250)
+
+    DeepL APIで必要な部分だけを翻訳して置き換えるGrepleモジュール
+
+- [https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6](https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6)
+
+    DeepL APIモジュールによる15言語のドキュメント生成
+
+- [https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd](https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd)
+
+    DeepL APIによる自動翻訳Docker環境
+
 # AUTHOR
 
 Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023 Kazumasa Utashiro.
+Copyright © 2023-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

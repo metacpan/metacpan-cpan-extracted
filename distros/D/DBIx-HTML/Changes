@@ -1,5 +1,9 @@
 Revision history for DBIx-HTML
 
+1.04
+    - update copyright date
+    - refactored attribute assignments
+
 1.03
     - update copyright date
     - require minimum Spreadsheet::HTML v1.20

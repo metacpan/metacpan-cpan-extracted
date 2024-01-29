@@ -1,15 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.73 ':experimental(init_expr)';
+use warnings;
+use Object::Pad 0.807;
 
-package Tickit::Widget::CheckButton 0.37;
-class Tickit::Widget::CheckButton
-   :strict(params)
-   :isa(Tickit::Widget);
+package Tickit::Widget::CheckButton 0.41;
+class Tickit::Widget::CheckButton :strict(params);
+
+inherit Tickit::Widget;
 
 use Tickit::Style;
 
@@ -120,7 +121,7 @@ use constant KEYPRESSES_FROM_STYLE => 1;
 
 =head2 new
 
-   $checkbutton = Tickit::Widget::CheckButton->new( %args )
+   $checkbutton = Tickit::Widget::CheckButton->new( %args );
 
 Constructs a new C<Tickit::Widget::CheckButton> object.
 
@@ -165,9 +166,9 @@ method cols
 
 =head2 set_label
 
-   $label = $checkbutton->label
+   $label = $checkbutton->label;
 
-   $checkbutton->set_label( $label )
+   $checkbutton->set_label( $label );
 
 Returns or sets the label text of the button.
 
@@ -184,7 +185,7 @@ method set_label
 
 =head2 on_toggle
 
-   $on_toggle = $checkbutton->on_toggle
+   $on_toggle = $checkbutton->on_toggle;
 
 =cut
 
@@ -192,12 +193,12 @@ method set_label
 
 =head2 set_on_toggle
 
-   $checkbutton->set_on_toggle( $on_toggle )
+   $checkbutton->set_on_toggle( $on_toggle );
 
 Return or set the CODE reference to be called when the button state is
 changed.
 
-   $on_toggle->( $checkbutton, $active )
+   $on_toggle->( $checkbutton, $active );
 
 =cut
 
@@ -209,7 +210,7 @@ changed.
 
 =head2 activate
 
-   $checkbutton->activate
+   $checkbutton->activate;
 
 Sets this button's active state to true.
 
@@ -224,7 +225,7 @@ method activate
 
 =head2 deactivate
 
-   $checkbutton->deactivate
+   $checkbutton->deactivate;
 
 Sets this button's active state to false.
 
@@ -246,7 +247,7 @@ method toggle
 
 =head2 is_active
 
-   $active = $checkbutton->is_active
+   $active = $checkbutton->is_active;
 
 Returns this button's active state.
 

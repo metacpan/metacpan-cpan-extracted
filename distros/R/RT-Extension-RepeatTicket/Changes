@@ -1,5 +1,8 @@
 Revision history for RT-Extension-RepeatTicket
 
+2.03 2023-12-11
+ - Allow RT::Ticket::Create to set the correct Status on create
+
 2.02 2023-09-26
  - Fix display issue with selectpicker controls
 

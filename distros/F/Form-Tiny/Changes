@@ -1,5 +1,8 @@
 Revision history for Perl extension Form::Tiny.
 
+2.23 Fri Dec 29 2023
+	- fix incorrect usage of a type library in tests
+
 2.22 Thu Nov 23 2023
 	- include subform errors in an exception if the default value is not a valid subform input
 

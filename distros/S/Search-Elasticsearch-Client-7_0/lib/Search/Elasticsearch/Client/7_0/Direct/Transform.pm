@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::7_0::Direct::Transform;
-$Search::Elasticsearch::Client::7_0::Direct::Transform::VERSION = '8.00';
+$Search::Elasticsearch::Client::7_0::Direct::Transform::VERSION = '8.12';
 use Moo;
 with 'Search::Elasticsearch::Client::7_0::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -36,7 +36,7 @@ Search::Elasticsearch::Client::7_0::Direct::Transform - Transform feature of Sea
 
 =head1 VERSION
 
-version 8.00
+version 8.12
 
 =head2 DESCRIPTION
 
@@ -57,7 +57,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Elasticsearch BV.
+This software is Copyright (c) 2024 by Elasticsearch BV.
 
 This is free software, licensed under:
 

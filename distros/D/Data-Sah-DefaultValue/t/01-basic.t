@@ -29,6 +29,11 @@ subtest "rule args" => sub {
         default_value_rules=>[["Str::repeat", {str=>"foo",n=>3}]]);
     is_deeply($c_pl->(undef), "foofoofoo");
 
+    # string-style
+    $c_pl = Data::Sah::DefaultValue::gen_default_value_code(
+        default_value_rules=>["Str::repeat=str,foo,n,4"]);
+    is_deeply($c_pl->(undef), "foofoofoofoo");
+
     subtest js => sub {
         plan skip_all => 'node.js is not available' unless get_nodejs_path();
         my $c_js = Data::Sah::DefaultValueJS::gen_default_value_code(

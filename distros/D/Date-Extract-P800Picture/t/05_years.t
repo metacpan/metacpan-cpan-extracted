@@ -1,9 +1,20 @@
+# -*- cperl; cperl-indent-level: 4 -*-
+## no critic (RequireExplicitPackage RequireEndWithOne)
+use 5.014;
 use strict;
 use warnings;
 use utf8;
+use Readonly;
 
 use Test::More;
-BEGIN { plan tests => 36 }
+our $VERSION = v1.1.7;
+
+BEGIN {
+## no critic (ProhibitCallsToUnexportedSubs)
+    Readonly::Scalar my $BASE_TESTS => 36;
+## use critic
+    Test::More::plan 'tests' => $BASE_TESTS;
+}
 
 my %years = (
     '00000001.JPG' => [ '2000-01-01T00:00:00', '2000' ],
@@ -47,6 +58,10 @@ my %years = (
 use Date::Extract::P800Picture;
 my $parser = Date::Extract::P800Picture->new();
 while ( my ( $filename, $expect ) = each %years ) {
-    is( "@{[$parser->extract($filename)]}",
-        $expect->[0], "year " . $expect->[1] );
+    Test::More::is(
+        "@{[$parser->extract($filename)]}",
+## no critic (ProhibitAccessOfPrivateData)
+        $expect->[0], q{year } . $expect->[1],
+## use critic
+    );
 }

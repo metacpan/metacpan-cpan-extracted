@@ -3,7 +3,7 @@
 # See the LICENSE file in the project root for more information
 
 package Search::Elasticsearch::Role::Client;
-$Search::Elasticsearch::Role::Client::VERSION = '8.00';
+$Search::Elasticsearch::Role::Client::VERSION = '8.12';
 use Moo::Role;
 use namespace::clean;
 
@@ -32,7 +32,7 @@ Search::Elasticsearch::Role::Client - Provides common functionality for Client i
 
 =head1 VERSION
 
-version 8.00
+version 8.12
 
 =head1 DESCRIPTION
 
@@ -54,7 +54,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Elasticsearch BV.
+This software is Copyright (c) 2024 by Elasticsearch BV.
 
 This is free software, licensed under:
 

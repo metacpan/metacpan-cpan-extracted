@@ -1,7 +1,11 @@
 Revision history for Game::PlatformsOfPeril
 
+0.11    2024-01-27
+        * Add some new levels.
+        * Yet again try to make the bomb explosions less bad.
+
 0.10    2021-04-27
-        fix where the bomb expolsion happens
+        "fix" where the bomb explosion[sic] happens
 
 0.09    2020-03-02
         tweaks related to code review due to development of Game::Xomb

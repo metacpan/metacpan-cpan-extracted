@@ -6,7 +6,7 @@ use utf8;
 
 use Test2::V0;
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 role ARole {
    method one { return 1 }
@@ -16,7 +16,8 @@ role ARole {
    }
 }
 
-class AClass :does(ARole) {
+class AClass {
+   apply ARole;
 }
 
 {
@@ -27,11 +28,25 @@ class AClass :does(ARole) {
    is( $obj->own_cvname, "AClass::own_cvname", '->own_cvname sees correct subname' );
 }
 
+# Older :does attribute notation
+class AClassAttr :does(ARole) {
+}
+
+{
+   my $obj = AClassAttr->new;
+   isa_ok( $obj, [ "AClassAttr" ], '$obj' );
+
+   is( $obj->one, 1, 'AClassAttr has a ->one method' );
+   is( $obj->own_cvname, "AClassAttr::own_cvname", '->own_cvname sees correct subname' );
+}
+
 role BRole {
    method two { return 2 }
 }
 
-class BClass :does(ARole) :does(BRole) {
+class BClass {
+   apply ARole;
+   apply BRole;
 }
 
 {
@@ -46,7 +61,9 @@ role CRole {
    method three;
 }
 
-class CClass :does(CRole) {
+class CClass {
+   apply CRole;
+
    method three { return 3 }
 }
 
@@ -62,16 +79,19 @@ pass( 'CClass compiled OK' );
       }
    }
 
-   class RecurseClass :does(RecurseRole) {}
+   class RecurseClass { apply RecurseRole }
 
    is( RecurseClass->new->recurse( 5 ), 5, 'role methods can be reëntrant' );
 }
 
-role DRole :does(BRole) {
+role DRole {
+   apply BRole;
+
    method four { return 4 }
 }
 
-class DClass :does(DRole) {
+class DClass {
+   apply DRole;
 }
 
 {
@@ -81,10 +101,13 @@ class DClass :does(DRole) {
    is( $obj->two,  2, 'DClass inherited BRole method' );
 }
 
-role ERole :does(ARole) :does(BRole) {
+role ERole {
+   apply ARole;
+   apply BRole;
 }
 
-class EClass :does(ERole) {
+class EClass {
+   apply ERole;
 }
 
 {
@@ -98,7 +121,8 @@ role FRole {
    method onetwothree :common { 123 }
 }
 
-class FClass :does(FRole) {
+class FClass {
+   apply FRole;
 }
 
 {
@@ -112,7 +136,9 @@ role GRole {
    method a { pack "C", 65 }
 }
 
-class GClass :does(GRole) {}
+class GClass {
+   apply GRole;
+}
 
 {
    is( GClass->new->a, "A", 'GClass ->a method has constant' );

@@ -1,3 +1,7 @@
+version 0.202304; 2023-12-22
+
+  * Olson database version 2023d: 352 canonical zones, 245 links
+
 version 0.202303; 2023-03-28
 
   * Olson database version 2023c: 351 canonical zones, 246 links

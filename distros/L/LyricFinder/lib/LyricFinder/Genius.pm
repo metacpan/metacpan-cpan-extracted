@@ -169,6 +169,13 @@ string.  It's designed to be called by LyricFinder, but can be used
 directly as well.  In LyricFinder, it is invoked by specifying 
 I<"Genius"> as the third argument of the B<fetch>() method.
 
+NOTE:  Genius.com has an annoying tendency to insert a small bit of "spam" 
+text into their returned lyrics, which we've attempted to strip out here, but 
+has become a "moving target" to the point that I've given up trying to find 
+and remove it all.  If this is a problem for you then I suggest adding Genius 
+to your "-omit" list when calling "new LyricFinder()".  This doesn't seem to 
+be a problem with the other supported lyrics sites.
+
 In case of problems with fetching lyrics, the error string will be returned by 
 $finder->message().  If all goes well, it will have 'Ok' in it.
 
@@ -200,7 +207,7 @@ pass to genius.com.  Some sites are pickey about receiving a user-agent
 string that corresponds to a valid / supported web-browser to prevent their 
 sites from being "scraped" by programs, such as this.  
 
-Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0">.
+Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:112.0) Gecko/20100101 Firefox/112.0">.
 
 NOTE:  This value will be overridden if $founder->agent("agent") is 
 called!
@@ -250,7 +257,7 @@ Some sites are pickey about receiving a user-agent
 string that corresponds to a valid / supported web-browser to prevent their 
 sites from being "scraped" by programs, such as this.  
 
-Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0">
+Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:112.0) Gecko/20100101 Firefox/112.0">
 
 If no argument is passed, it returns the current GENERAL user-agent string in 
 effect (but a different agent option is specified for a specific module may 

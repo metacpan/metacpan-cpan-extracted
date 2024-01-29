@@ -6,12 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/Env.pm',
     'App/Env/Example.pm',
-    'App/Env/Null.pm'
+    'App/Env/Null.pm',
+    'App/Env/_Util.pm',
+    'App/Env/_app.pm'
 );
 
 my @scripts = (

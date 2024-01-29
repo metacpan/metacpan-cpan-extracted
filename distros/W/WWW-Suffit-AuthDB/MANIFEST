@@ -1,0 +1,26 @@
+# MANIFEST Thu 27 Jul 2023 17:48:02 MSK
+
+# General
+Changes                                 Changes list
+INSTALL.md                              Installation instructions
+LICENSE                                 License file
+Makefile.PL                             Makefile builder
+MANIFEST                                This file
+README.md                               !!! README FIRST !!!
+TODO                                    TO DO
+
+# Libs
+lib/WWW/Suffit/AuthDB.pm                Main library
+lib/WWW/Suffit/AuthDB/Group.pm          Group class
+lib/WWW/Suffit/AuthDB/Model.pm          Model (store) class
+lib/WWW/Suffit/AuthDB/Realm.pm          Realm class
+lib/WWW/Suffit/AuthDB/User.pm           User class
+
+# Tests
+t/00-fixme.t                            FIXME/TODO/BUG warnings
+t/00-pod-coverage.t                     POD::Coverage testing
+t/00-pod.t                              Checking all POD documents
+t/00-trailingspace.t                    Style test: TrailingSpace
+t/01-use.t                              Test script
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,19 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+# DocumentFragment in JavaScript
+class Eg::Node::DocumentFragment extends Eg::Node {
+  
+  allow Eg::Node::Document;
+  
+  # Class Methods
+  private static method new : Eg::Node::DocumentFragment () {
+    
+    my $self = new Eg::Node::DocumentFragment;
+    
+    $self->SUPER::init({node_type => Eg::Node->TYPE_DOCUMENT_FRAGMENT_NODE});
+    
+    return $self;
+  }
+  
+}

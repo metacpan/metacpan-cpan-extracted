@@ -1,8 +1,9 @@
 ---
-abstract: 'meta-programming API (PLACEHOLDER)'
+abstract: 'meta-programming API'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
+  ExtUtils::CBuilder: '0'
   Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
@@ -16,10 +17,10 @@ name: meta
 provides:
   meta:
     file: lib/meta.pm
-    version: '0.001'
+    version: '0.004'
 requires:
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.001'
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,31 @@
+---
+abstract: 'implements the F<csvtool> core commands'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-csvtool
+provides:
+  App::csvtool:
+    file: lib/App/csvtool.pm
+    version: '0.01'
+requires:
+  Commandable::Finder::Packages: '0.11'
+  Commandable::Invocation: '0.03'
+  File::Basename: '0'
+  Getopt::Long: '0'
+  List::UtilsBy: '0'
+  Text::CSV: '0'
+  perl: '5.026'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -80,12 +80,12 @@ subtest "rate limiting" => sub {
         is $res->header('Retry-After'), 120, "Retry-After";
 
       SKIP: {
-          skip "RELEASE_TESTING" unless $ENV{RELEASE_TESTING};
+            skip "RELEASE_TESTING" unless $ENV{RELEASE_TESTING};
 
-          # Even though Retry-After is larger, it's not enforced.
-          sleep(61);
-          my $res = $cb->($req);
-          is $res->code, HTTP_OK, "request ok after delay";
+            # Even though Retry-After is larger, it's not enforced.
+            sleep(61);
+            my $res = $cb->($req);
+            is $res->code, HTTP_OK, "request ok after delay";
         }
 
       };
@@ -117,7 +117,6 @@ subtest "rate limiting (netblock)" => sub {
 
 };
 
-
 subtest "rate limiting (shared blocks)" => sub {
 
     @logs = ();
@@ -142,7 +141,6 @@ subtest "rate limiting (shared blocks)" => sub {
       };
 
 };
-
 
 subtest "whitelisted" => sub {
 

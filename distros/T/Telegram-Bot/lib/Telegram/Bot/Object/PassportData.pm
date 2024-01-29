@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::PassportData;
-$Telegram::Bot::Object::PassportData::VERSION = '0.024';
+$Telegram::Bot::Object::PassportData::VERSION = '0.025';
 # ABSTRACT: The base class for Telegram 'PassportData' type objects
 
 
@@ -33,7 +33,7 @@ Telegram::Bot::Object::PassportData - The base class for Telegram 'PassportData'
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 DESCRIPTION
 
@@ -51,6 +51,10 @@ Justin Hawkins <justin@eatmorecode.com>
 =item *
 
 James Green <jkg@earth.li>
+
+=item *
+
+Julien Fiegehenn <simbabque@cpan.org>
 
 =back
 

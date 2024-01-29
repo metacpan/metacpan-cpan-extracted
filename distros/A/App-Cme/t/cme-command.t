@@ -202,7 +202,7 @@ my @script_tests = (
     {
         label => "line ".__LINE__.": modification with a YAML script and a var that uses a default value",
         script => [
-            "# Format: YAML",
+            "# Format:  YAML",
             "---",
             "app: popcon",
             "default: ",
@@ -251,12 +251,14 @@ Changes applied to popcon configuration:
     {
         label =>"line ". __LINE__.": modification with a Perl script run by cme run with args",
         script => [
+            "#!/usr/bin/env perl",
             "use Config::Model qw(cme);",
             'my ($opt,$val,$name) = @ARGV;',
             'cme(application => "popcon", root_dir => $val)->modify("! MY_HOSTID=\$name$name");'
         ],
         args => ['foobar3'],
         test => qr/"\$namefoobar3"/,
+        exec_mode => 1,
         stderr => q(
 Changes applied to popcon configuration:
 - MY_HOSTID: 'aaaaaaaaaaaaaaaaaaaa' -> '$namefoobar3'
@@ -299,7 +301,7 @@ Changes applied to popcon configuration:
         label => "line ".__LINE__.": modification with a script with Perl format",
         script => [
             <<'EOS'
-# Format: perl
+# Format:perl
 {
    app => 'popcon',
    sub => sub ($root, $arg ) { $root->fetch_element('MY_HOSTID')->store($arg->{to_store});  },
@@ -323,6 +325,7 @@ foreach my $test ( @script_tests) {
         $conf_file->spew_utf8(@orig);
         my $script = $wr_dir->child('my-script'.$i++.'.cme');
         $script->spew_utf8( map { "$_\n"} @{$test->{script}});
+        $script->chmod("0755") if $test->{exec_mode};
 
         my $cmd = [
             run => $script->stringify,

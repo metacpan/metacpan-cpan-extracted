@@ -19,4 +19,6 @@ use Syntax::Operator::Elem qw( elem_str elem_num );
    ok(!elem_num(6, 1..5), '6 is not in 1..5');
 }
 
+# TODO unimport test makes the-above test fail
+
 done_testing;

@@ -671,6 +671,8 @@ sub check_uncoverable()
 	    {
 		if ($location =~ m/ uncoverable .* # TODO/)
 		{}
+		elsif ($location =~ m|/confess-uncoverable\.lst|)
+		{}
 		elsif (defined $uncoverable{$location})
 		{
 		    ok(1, "found expected location");

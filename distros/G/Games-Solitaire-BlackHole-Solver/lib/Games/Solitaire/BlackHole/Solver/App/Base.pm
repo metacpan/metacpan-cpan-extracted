@@ -1,36 +1,30 @@
 package Games::Solitaire::BlackHole::Solver::App::Base;
-$Games::Solitaire::BlackHole::Solver::App::Base::VERSION = '0.6.0';
+$Games::Solitaire::BlackHole::Solver::App::Base::VERSION = '0.8.0';
 use Moo;
-use Getopt::Long qw/ GetOptions /;
-use Pod::Usage qw/ pod2usage /;
+use utf8;
+use Getopt::Long     qw/ GetOptions /;
+use Pod::Usage       qw/ pod2usage /;
 use Math::Random::MT ();
-use List::Util 1.34 qw/ any max /;
+use List::Util 1.34  qw/ any first max /;
 
 extends('Exporter');
 
+has '_num_foundations' => ( default => 1, is => 'rw', );
+
 has [
-    '_active_record',
-    '_active_task',
-    '_board_cards',
-    '_board_lines',
-    '_board_values',
-    '_init_foundation',
-    '_init_queue',
-    '_init_tasks_configs',
-    '_is_good_diff',
-    '_maximal_num_played_cards__from_all_tasks',
-    '_prelude',
-    '_prelude_iter',
-    '_prelude_string',
-    '_talon_cards',
-    '_positions',
-    '_quiet',
-    '_output_handle',
-    '_output_fn',
-    '_should_show_maximal_num_played_cards',
-    '_tasks',
-    '_tasks_by_names',
-    '_task_idx',
+    '_active_record',                            '_active_task',
+    '_bits_offset',                              '_board_cards',
+    '_board_lines',                              '_board_values',
+    '_display_boards',                           '_init_foundation',
+    '_init_foundation_cards',                    '_init_queue',
+    '_init_tasks_configs',                       '_is_good_diff',
+    '_maximal_num_played_cards__from_all_tasks', '_max_iters_limit',
+    '_prelude',                                  '_prelude_iter',
+    '_prelude_string',                           '_talon_cards',
+    '_positions',                                '_quiet',
+    '_output_handle',                            '_output_fn',
+    '_should_show_maximal_num_played_cards',     '_tasks',
+    '_tasks_by_names',                           '_task_idx',
 ] => ( is => 'rw' );
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
@@ -90,6 +84,10 @@ sub _update_max_num_played_cards
 sub _trace_solution
 {
     my ( $self, $final_state ) = @_;
+
+    my $_num_foundations = $self->_num_foundations();
+    my $offset           = $self->_bits_offset();
+
     $self->_update_max_num_played_cards();
     my $output_handle = $self->_output_handle;
     $output_handle->print("Solved!\n");
@@ -103,20 +101,106 @@ sub _trace_solution
 LOOP:
     while ( ( $prev_state, $col_idx ) = @{ $self->_positions->{$state} } )
     {
+        my $foundation_str;
+        my $changed_foundation;
+        my $outboard = sub {
+            if ( not $self->_display_boards )
+            {
+                return;
+            }
+            my $ret = '';
+            my $foundation_val;
+            while ( my ( $i, $col ) = each( @{ $self->_board_cards } ) )
+            {
+                my $prevlen = vec( $prev_state, $offset + $i, 4 );
+                my $height  = $prevlen - 1;
+                my $iscurr  = ( $col_idx == $i );
+                my @c       = @$col[ 0 .. $height ];
+                if ($iscurr)
+                {
+                    $foundation_val = $self->_board_values->[$col_idx][$height];
+                    foreach my $x ( $c[-1] )
+                    {
+                        $foundation_str = $x;
+                        $x              = "[ $x → ]";
+                    }
+                }
+                $ret .= join( " ", ":", @c ) . "\n";
+            }
+            $changed_foundation =
+                first { vec( $state, $_, 8 ) ne vec( $prev_state, $_, 8 ) }
+                ( 0 .. $_num_foundations - 1 );
+            if ( not defined $changed_foundation )
+            {
+                die;
+            }
+
+            push @moves,
+                +{
+                type               => "board",
+                str                => $ret,
+                foundation_str     => $foundation_str,
+                foundation_val     => $foundation_val,
+                changed_foundation => $changed_foundation,
+                };
+            return;
+        };
         last LOOP if not defined $prev_state;
+        $outboard->();
         push @moves,
-            (
-            ( $col_idx == @{ $self->_board_cards } )
-            ? "Deal talon " . $self->_talon_cards->[ vec( $prev_state, 1, 8 ) ]
-            : $self->_board_cards->[$col_idx]
-                [ vec( $prev_state, 4 + $col_idx, 4 ) - 1 ]
-            );
+            +{
+            type => "card",
+            str  => scalar(
+                ( $col_idx == @{ $self->_board_cards } ) ? "Deal talon "
+                    . $self->_talon_cards->[ vec( $prev_state, 1, 8 ) ]
+                : $self->_display_boards
+                ? sprintf( "Move %s from stack %d to foundations %d",
+                    $foundation_str, $col_idx, $changed_foundation, )
+                : $self->_board_cards->[$col_idx]
+                    [ vec( $prev_state, $offset + $col_idx, 4 ) - 1 ]
+            ),
+            };
     }
     continue
     {
         $state = $prev_state;
     }
-    print {$output_handle} map { "$_\n" } reverse(@moves);
+
+    my @foundation_cards = @{ $self->_init_foundation_cards() };
+    foreach my $move_rec ( reverse(@moves) )
+    {
+        my $type = $move_rec->{"type"};
+        my $str;
+        if ( $type eq "card" )
+        {
+            $str = "";
+            $str .= $move_rec->{"str"};
+        }
+        elsif ( $type eq "board" )
+        {
+            if ( not $self->_display_boards )
+            {
+                die;
+            }
+            my $i     = $move_rec->{"changed_foundation"};
+            my $new   = $move_rec->{"foundation_str"};
+            my @shown = @foundation_cards;
+            foreach my $x ( $shown[$i] )
+            {
+                $x = "[ $x → $new ]";
+            }
+            $str = "";
+            $str .= "\n";
+            $str .= join( " ", "Foundations:", @shown ) . "\n";
+            $str .= $move_rec->{"str"};
+            $foundation_cards[$i] = $new;
+        }
+        else
+        {
+            die;
+        }
+        print {$output_handle} "$str\n";
+    }
 
     return;
 }
@@ -163,14 +247,21 @@ sub _parse_board
     my $found_line = shift(@$lines);
 
     my $init_foundation;
-    if ( my ($card) = $found_line =~ m{\AFoundations: ($card_re)\z} )
+    my @init_foundation_cards;
+    my $_num_foundations = $self->_num_foundations();
+    if ( my ($card) =
+        $found_line =~ m{\AFoundations:((?: $card_re){$_num_foundations})\z} )
     {
-        $init_foundation = $self->_get_rank($card);
+        $card =~ s#\A ## or die "no whitespace";
+        @init_foundation_cards = split /\s+/, $card;
+        $init_foundation =
+            [ map { $self->_get_rank($_) } @init_foundation_cards ];
     }
     else
     {
         die "Could not match first foundation line!";
     }
+    $self->_init_foundation_cards( \@init_foundation_cards );
     $self->_init_foundation($init_foundation);
 
     $self->_board_cards( [ map { [ split /\s+/, $_ ] } @$lines ] );
@@ -190,13 +281,18 @@ sub _set_up_initial_position
 
     my $init_state = "";
 
-    vec( $init_state, 0, 8 ) = $self->_init_foundation;
-    vec( $init_state, 1, 8 ) = $talon_ptr;
+    my $offset = $self->_bits_offset();
+    my $o      = 0;
+    foreach my $x ( @{ $self->_init_foundation } )
+    {
+        vec( $init_state, $o++, 8 ) = $x;
+    }
+    vec( $init_state, $o, 8 ) = $talon_ptr;
 
     my $board_values = $self->_board_values;
     foreach my $col_idx ( keys @$board_values )
     {
-        vec( $init_state, 4 + $col_idx, 4 ) =
+        vec( $init_state, $offset + $col_idx, 4 ) =
             scalar( @{ $board_values->[$col_idx] } );
     }
 
@@ -226,6 +322,17 @@ sub _shuffle
     return;
 }
 
+sub _set_bits_offset
+{
+    my $self = shift;
+
+    my $_num_foundations = $self->_num_foundations();
+    my $offset           = 2 + 2 * $_num_foundations;
+    $self->_bits_offset($offset);
+
+    return;
+}
+
 my $TASK_NAME_RE  = qr/[A-Za-z0-9_]+/;
 my $TASK_ALLOC_RE = qr/[0-9]+\@$TASK_NAME_RE/;
 
@@ -233,8 +340,11 @@ sub _process_cmd_line
 {
     my ( $self, $args ) = @_;
 
+    $self->_set_bits_offset();
+    $self->_max_iters_limit( ( 1 << 31 ) );
     $self->_should_show_maximal_num_played_cards(0);
-    my $quiet = '';
+    my $display_boards = '';
+    my $quiet          = '';
     my $output_fn;
     my ( $help, $man, $version );
     my @tasks;
@@ -249,10 +359,21 @@ sub _process_cmd_line
     };
     $push_task->();
     GetOptions(
-        "o|output=s" => \$output_fn,
-        "quiet!"     => \$quiet,
-        "next-task"  => sub {
+        "display-boards!" => \$display_boards,
+        "o|output=s"      => \$output_fn,
+        "quiet!"          => \$quiet,
+        "next-task"       => sub {
             $push_task->();
+            return;
+        },
+        "num-foundations=i" => sub {
+            my ( undef, $val ) = @_;
+            if ( not( ( $val eq "1" ) or ( $val eq "2" ) ) )
+            {
+                die;
+            }
+            $self->_num_foundations($val);
+            $self->_set_bits_offset();
             return;
         },
         "prelude=s" => sub {
@@ -283,6 +404,11 @@ sub _process_cmd_line
             $self->_should_show_maximal_num_played_cards($val);
             return;
         },
+        "max-iters=i" => sub {
+            my ( undef, $val ) = @_;
+            $self->_max_iters_limit($val);
+            return;
+        },
         'help|h|?' => \$help,
         'man'      => \$man,
         'version'  => \$version,
@@ -308,6 +434,7 @@ sub _process_cmd_line
         exit(0);
     }
 
+    $self->_display_boards($display_boards);
     $self->_quiet($quiet);
     my $output_handle;
 
@@ -318,8 +445,11 @@ sub _process_cmd_line
     }
     else
     {
+        ## no critic
         open( $output_handle, ">&STDOUT" );
+        ## use critic
     }
+    binmode( $output_handle, ":encoding(utf8)" );
     $self->_output_fn($output_fn);
     $self->_output_handle($output_handle);
     $self->_calc_lines( shift(@ARGV) );
@@ -370,7 +500,8 @@ sub _set_up_tasks
                 die "Unknown task name $name in prelude!";
             }
             my $task_obj = $self->_tasks_by_names->{$name};
-            return Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem
+            return
+                Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem
                 ->new(
                 {
                     _quota     => $quota,
@@ -515,38 +646,60 @@ sub _process_pending_items
 sub _find_moves
 {
     my ( $self, $_pending, $state, $no_cards ) = @_;
-    my $board_values  = $self->_board_values;
-    my $fnd           = vec( $state, 0, 8 );
-    my $positions     = $self->_positions;
-    my $_is_good_diff = $self->_is_good_diff;
+    my $board_values     = $self->_board_values;
+    my $_num_foundations = $self->_num_foundations();
+    my $offset           = $self->_bits_offset();
+    my $used             = '';
+    my @fnd;
+    foreach my $i ( 0 .. $_num_foundations - 1 )
+    {
+        my $v = vec( $state, $i, 8 );
+        if ( not vec( $used, $v, 1 ) )
+        {
+            vec( $used, $v, 1 ) = 1;
+            push @fnd, [ $i, $v ];
+        }
+    }
+    my $max_iters_limit = $self->_max_iters_limit;
+    my $positions       = $self->_positions;
+    my $_is_good_diff   = $self->_is_good_diff;
     foreach my $col_idx ( keys @$board_values )
     {
-        my $pos = vec( $state, 4 + $col_idx, 4 );
+        my $pos = vec( $state, $offset + $col_idx, 4 );
 
         if ($pos)
         {
             $$no_cards = 0;
 
             my $card = $board_values->[$col_idx][ $pos - 1 ];
-            if ( exists( $_is_good_diff->{ $card - $fnd } ) )
+            die if not defined $card;
+            foreach my $x (@fnd)
             {
-                my $next_s = $state;
-                vec( $next_s, 0, 8 ) = $card;
-                --vec( $next_s, 4 + $col_idx, 4 );
-                my $exists = exists( $positions->{$next_s} );
-                my $to_add = 0;
-                if ( !$exists )
+                my ( $i, $v ) = @$x;
+                if ( exists( $_is_good_diff->{ $card - $v } ) )
                 {
-                    $positions->{$next_s} = [ $state, $col_idx, 1, 0 ];
-                    $to_add = 1;
-                }
-                elsif ( $positions->{$next_s}->[2] )
-                {
-                    $to_add = 1;
-                }
-                if ($to_add)
-                {
-                    push( @$_pending, [ $next_s, $exists ] );
+                    my $next_s = $state;
+                    vec( $next_s, $i, 8 ) = $card;
+                    --vec( $next_s, $offset + $col_idx, 4 );
+                    my $exists = exists( $positions->{$next_s} );
+                    my $to_add = 0;
+                    if ( !$exists )
+                    {
+                        $positions->{$next_s} = [ $state, $col_idx, 1, 0 ];
+                        if ( keys(%$positions) > $max_iters_limit )
+                        {
+                            die "Exceeded max_iters_limit !";
+                        }
+                        $to_add = 1;
+                    }
+                    elsif ( $positions->{$next_s}->[2] )
+                    {
+                        $to_add = 1;
+                    }
+                    if ($to_add)
+                    {
+                        push( @$_pending, [ $next_s, $exists ] );
+                    }
                 }
             }
         }
@@ -568,7 +721,7 @@ sub _set_up_solver
 }
 
 package Games::Solitaire::BlackHole::Solver::App::Base::Task;
-$Games::Solitaire::BlackHole::Solver::App::Base::Task::VERSION = '0.6.0';
+$Games::Solitaire::BlackHole::Solver::App::Base::Task::VERSION = '0.8.0';
 use Moo;
 
 has '_queue'        => ( is => 'ro', default => sub { return []; }, );
@@ -593,7 +746,7 @@ sub _push_to_queue
 }
 
 package Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem;
-$Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem::VERSION = '0.6.0';
+$Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem::VERSION = '0.8.0';
 use Moo;
 
 has [ '_quota', '_task', '_task_idx', '_task_name', ] => ( is => 'rw' );
@@ -612,7 +765,7 @@ Games::Solitaire::BlackHole::Solver::App::Base - base class.
 
 =head1 VERSION
 
-version 0.6.0
+version 0.8.0
 
 =head1 METHODS
 

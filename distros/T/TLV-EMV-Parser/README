@@ -1,0 +1,38 @@
+NAME
+
+    TLV::EMV::Parser - A module for parsing EMV TLV strings
+
+SYNOPSIS
+
+    use TLV::EMV::Parser;
+
+    my $parser = TLV::EMV::Parser->new(); $parser->parse($emv_string);
+
+DESCRIPTION
+
+    The TLV::EMV::Parser module provides a simple interface for parsing EMV
+    strings. It uses TLV::Parser as its base module and pass all EMV Tags
+    to it so the users can use it directly to parse EMV strings.
+
+METHODS
+
+    new()
+
+      Creates a new TLV::EMV::Parser object.
+
+    parse($emv_string)
+
+      Parses the specified EMV TLV string.
+
+AUTHOR
+
+    Guangsheng He (何光胜) <heguangsheng@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2024 by Guangsheng He (何光胜)
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

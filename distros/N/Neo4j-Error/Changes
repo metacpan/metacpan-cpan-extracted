@@ -1,5 +1,13 @@
 Revision history for Neo4j::Error
 
+0.02  2024-01-13
+
+ - Fix decoding of Neo4j errors in strict Jolt format to work correctly,
+   irrespective of the order of method calls.
+ - Fix test failures on Win32.
+ - Tests no longer fail for unexpected warnings, except during author testing.
+ - Update and clarify documentation.
+
 0.01  2023-01-27
 
  - initial release

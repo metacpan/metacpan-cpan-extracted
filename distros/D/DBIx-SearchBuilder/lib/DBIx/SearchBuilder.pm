@@ -4,7 +4,7 @@ package DBIx::SearchBuilder;
 use strict;
 use warnings;
 
-our $VERSION = "1.79";
+our $VERSION = "1.81";
 
 use Clone qw();
 use Encode qw();
@@ -2115,7 +2115,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2001-2023, Best Practical Solutions LLC.
+Copyright (C) 2001-2024, Best Practical Solutions LLC.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

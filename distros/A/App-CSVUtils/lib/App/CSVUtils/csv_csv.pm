@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-06'; # DATE
+our $DATE = '2023-09-06'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.031'; # VERSION
+our $VERSION = '1.033'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -60,7 +60,7 @@ App::CSVUtils::csv_csv - Convert CSV to CSV
 
 =head1 VERSION
 
-This document describes version 1.031 of App::CSVUtils::csv_csv (from Perl distribution App-CSVUtils), released on 2023-08-06.
+This document describes version 1.033 of App::CSVUtils::csv_csv (from Perl distribution App-CSVUtils), released on 2023-09-06.
 
 =head1 FUNCTIONS
 

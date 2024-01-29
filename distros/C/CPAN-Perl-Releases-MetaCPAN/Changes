@@ -1,5 +1,11 @@
 Revision history for CPAN-Perl-Releases-MetaCPAN
 
+0.009  2024-01-01 01:05:04 JST
+    - Add a release sample to pod
+
+0.008  2024-01-01 00:52:55 JST
+    - Add checksum_sha256 (#2)
+
 0.007  2023-09-22 14:05:02 JST
     - No functional changes; update metadata
 

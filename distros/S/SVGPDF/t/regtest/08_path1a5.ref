@@ -1,0 +1,399 @@
+==== start svg ====
+XObject #1
+vb 0 0 1200 525 => bb 0.00 -525.00 1200.00 0.00
+matrix( 1 0 0 -1 0 0)
+vb rect( 0.00 0.00 1200.00 525.00)
+xo fill_color black (initial)
+  start handling title (SVGPDF::Element)
+  skipping title (not implemented)
+  end handling title
+  start handling desc (SVGPDF::Element)
+  skipping desc (not implemented)
+  end handling desc
+  start handling g (SVGPDF::G)
+  g ====
+    xo save
+      start handling defs (SVGPDF::Defs)
+        defs ====
+        defs: "baseEllipses" (g)
+      end handling defs
+      start handling rect (SVGPDF::Rect)
+      rect x=1 y=1 w=1198 h=523
+        xo save
+        rect stroke-width=1 stroke=blue fill=none
+        xo stroke (blue)
+        xo restore
+      end handling rect
+      start handling g (SVGPDF::G)
+      g ====
+        xo save
+          start handling g (SVGPDF::G)
+          g ====
+            xo save
+            transform translate(0.00,0.00)
+              start handling use (SVGPDF::Use)
+              use "#baseEllipses" (g), x=0, y=0
+                xo save
+                use stroke=none fill=(current) fill=black
+                g ====
+                  xo save
+                    start handling ellipse (SVGPDF::Ellipse)
+                    ellipse cx=125 cy=125 rx=100 ry=50
+                      xo save
+                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      xo stroke (#888888)
+                      xo restore
+                    end handling ellipse
+                    start handling ellipse (SVGPDF::Ellipse)
+                    ellipse cx=225 cy=75 rx=100 ry=50
+                      xo save
+                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      xo stroke (#888888)
+                      xo restore
+                    end handling ellipse
+                    start handling text (SVGPDF::Text)
+                    text  x=35 y=70
+                      xo save
+                      txt translate( 35.00, 70.00 ) scale( 1.00 -1.00 )
+                        xo save
+                        xo restore
+                      xo restore
+                    end handling text
+                    start handling text (SVGPDF::Text)
+                    text  x=225 y=145
+                      xo save
+                      txt translate( 225.00, 145.00 ) scale( 1.00 -1.00 )
+                        xo save
+                        xo restore
+                      xo restore
+                    end handling text
+                  xo restore
+                xo restore
+              end handling use
+            xo restore
+          end handling g
+          start handling g (SVGPDF::G)
+          g ====
+            xo save
+            transform translate(400.00,0.00)
+              start handling text (SVGPDF::Text)
+              text  x=50 y=210
+                xo save
+                txt translate( 50.00, 210.00 ) scale( 1.00 -1.00 )
+                  xo save
+                  xo restore
+                xo restore
+              end handling text
+              start handling text (SVGPDF::Text)
+              text  x=50 y=250
+                xo save
+                txt translate( 50.00, 250.00 ) scale( 1.00 -1.00 )
+                  xo save
+                  xo restore
+                xo restore
+              end handling text
+              start handling use (SVGPDF::Use)
+              use "#baseEllipses" (g), x=0, y=0
+                xo save
+                use stroke=none fill=(current) fill=black
+                g ====
+                  xo save
+                    start handling ellipse (SVGPDF::Ellipse)
+                    ellipse cx=125 cy=125 rx=100 ry=50
+                      xo save
+                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      xo stroke (#888888)
+                      xo restore
+                    end handling ellipse
+                    start handling ellipse (SVGPDF::Ellipse)
+                    ellipse cx=225 cy=75 rx=100 ry=50
+                      xo save
+                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      xo stroke (#888888)
+                      xo restore
+                    end handling ellipse
+                    start handling text (SVGPDF::Text)
+                    text  x=35 y=70
+                      xo save
+                      txt translate( 35.00, 70.00 ) scale( 1.00 -1.00 )
+                        xo save
+                        xo restore
+                      xo restore
+                    end handling text
+                    start handling text (SVGPDF::Text)
+                    text  x=225 y=145
+                      xo save
+                      txt translate( 225.00, 145.00 ) scale( 1.00 -1.00 )
+                        xo save
+                        xo restore
+                      xo restore
+                    end handling text
+                  xo restore
+                xo restore
+              end handling use
+              start handling path (SVGPDF::Path)
+              path d="M 125,75 a100,50 0 0..."
+                xo save
+                path stroke-width=6 stroke=red fill=none
+                xo move(125.00,75.00)
+                xo arc(100.00,50.00 0.00 0,0 225.00,125.00)
+                elliptic_arc(125.00,75.00 225.00,125.00 100.00,50.00 move=0 large=0 dir=0 rot=0.00)
+                  xo curve( 125.00,81.57 127.59,88.07 132.61,94.13 )
+                  xo curve( 137.64,100.20 145.00,105.71 154.29,110.36 )
+                  xo curve( 163.58,115.00 174.60,118.68 186.73,121.19 )
+                  xo curve( 198.86,123.71 211.87,125.00 225.00,125.00 )
+                xo stroke (red)
+                xo restore
+              end handling path
+            xo restore
+          end handling g
+          start handling g (SVGPDF::G)
+          g ====
+            xo save
+            transform translate(800.00,0.00)
+              start handling text (SVGPDF::Text)
+              text  x=50 y=210
+                xo save
+                txt translate( 50.00, 210.00 ) scale( 1.00 -1.00 )
+                  xo save
+                  xo restore
+                xo restore
+              end handling text
+              start handling text (SVGPDF::Text)
+              text  x=50 y=250
+                xo save
+                txt translate( 50.00, 250.00 ) scale( 1.00 -1.00 )
+                  xo save
+                  xo restore
+                xo restore
+              end handling text
+              start handling use (SVGPDF::Use)
+              use "#baseEllipses" (g), x=0, y=0
+                xo save
+                use stroke=none fill=(current) fill=black
+                g ====
+                  xo save
+                    start handling ellipse (SVGPDF::Ellipse)
+                    ellipse cx=125 cy=125 rx=100 ry=50
+                      xo save
+                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      xo stroke (#888888)
+                      xo restore
+                    end handling ellipse
+                    start handling ellipse (SVGPDF::Ellipse)
+                    ellipse cx=225 cy=75 rx=100 ry=50
+                      xo save
+                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      xo stroke (#888888)
+                      xo restore
+                    end handling ellipse
+                    start handling text (SVGPDF::Text)
+                    text  x=35 y=70
+                      xo save
+                      txt translate( 35.00, 70.00 ) scale( 1.00 -1.00 )
+                        xo save
+                        xo restore
+                      xo restore
+                    end handling text
+                    start handling text (SVGPDF::Text)
+                    text  x=225 y=145
+                      xo save
+                      txt translate( 225.00, 145.00 ) scale( 1.00 -1.00 )
+                        xo save
+                        xo restore
+                      xo restore
+                    end handling text
+                  xo restore
+                xo restore
+              end handling use
+              start handling path (SVGPDF::Path)
+              path d="M 125,75 a100,50 0 0..."
+                xo save
+                path stroke-width=6 stroke=red fill=none
+                xo move(125.00,75.00)
+                xo arc(100.00,50.00 0.00 0,1 225.00,125.00)
+                elliptic_arc(125.00,75.00 225.00,125.00 100.00,50.00 move=0 large=0 dir=1 rot=0.00)
+                  xo curve( 138.13,75.00 151.14,76.29 163.27,78.81 )
+                  xo curve( 175.40,81.32 186.42,85.00 195.71,89.64 )
+                  xo curve( 205.00,94.29 212.36,99.80 217.39,105.87 )
+                  xo curve( 222.41,111.93 225.00,118.43 225.00,125.00 )
+                xo stroke (red)
+                xo restore
+              end handling path
+            xo restore
+          end handling g
+          start handling g (SVGPDF::G)
+          g ====
+            xo save
+            transform translate(400.00,250.00)
+              start handling text (SVGPDF::Text)
+              text  x=50 y=210
+                xo save
+                txt translate( 50.00, 210.00 ) scale( 1.00 -1.00 )
+                  xo save
+                  xo restore
+                xo restore
+              end handling text
+              start handling text (SVGPDF::Text)
+              text  x=50 y=250
+                xo save
+                txt translate( 50.00, 250.00 ) scale( 1.00 -1.00 )
+                  xo save
+                  xo restore
+                xo restore
+              end handling text
+              start handling use (SVGPDF::Use)
+              use "#baseEllipses" (g), x=0, y=0
+                xo save
+                use stroke=none fill=(current) fill=black
+                g ====
+                  xo save
+                    start handling ellipse (SVGPDF::Ellipse)
+                    ellipse cx=125 cy=125 rx=100 ry=50
+                      xo save
+                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      xo stroke (#888888)
+                      xo restore
+                    end handling ellipse
+                    start handling ellipse (SVGPDF::Ellipse)
+                    ellipse cx=225 cy=75 rx=100 ry=50
+                      xo save
+                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      xo stroke (#888888)
+                      xo restore
+                    end handling ellipse
+                    start handling text (SVGPDF::Text)
+                    text  x=35 y=70
+                      xo save
+                      txt translate( 35.00, 70.00 ) scale( 1.00 -1.00 )
+                        xo save
+                        xo restore
+                      xo restore
+                    end handling text
+                    start handling text (SVGPDF::Text)
+                    text  x=225 y=145
+                      xo save
+                      txt translate( 225.00, 145.00 ) scale( 1.00 -1.00 )
+                        xo save
+                        xo restore
+                      xo restore
+                    end handling text
+                  xo restore
+                xo restore
+              end handling use
+              start handling path (SVGPDF::Path)
+              path d="M 125,75 a100,50 0 1..."
+                xo save
+                path stroke-width=6 stroke=red fill=none
+                xo move(125.00,75.00)
+                xo arc(100.00,50.00 0.00 1,0 225.00,125.00)
+                elliptic_arc(125.00,75.00 225.00,125.00 100.00,50.00 move=0 large=1 dir=0 rot=0.00)
+                  xo curve( 115.16,75.00 105.38,75.73 95.97,77.15 )
+                  xo curve( 86.56,78.58 77.62,80.69 69.44,83.43 )
+                  xo curve( 61.27,86.16 53.94,89.48 47.70,93.28 )
+                  xo curve( 41.46,97.08 36.38,101.32 32.61,105.87 )
+                  xo curve( 28.85,110.41 26.45,115.21 25.48,120.10 )
+                  xo curve( 24.52,124.99 25.00,129.93 26.92,134.75 )
+                  xo curve( 28.84,139.58 32.17,144.23 36.81,148.57 )
+                  xo curve( 41.44,152.91 47.33,156.88 54.29,160.36 )
+                  xo curve( 61.24,163.83 69.19,166.78 77.86,169.10 )
+                  xo curve( 86.53,171.41 95.84,173.08 105.49,174.04 )
+                  xo curve( 115.14,175.00 125.01,175.24 134.80,174.76 )
+                  xo curve( 144.59,174.28 154.18,173.08 163.27,171.19 )
+                  xo curve( 172.35,169.31 180.84,166.77 188.44,163.65 )
+                  xo curve( 196.04,160.53 202.68,156.87 208.15,152.78 )
+                  xo curve( 213.61,148.69 217.84,144.22 220.69,139.51 )
+                  xo curve( 223.55,134.81 225.00,129.92 225.00,125.00 )
+                xo stroke (red)
+                xo restore
+              end handling path
+            xo restore
+          end handling g
+          start handling g (SVGPDF::G)
+          g ====
+            xo save
+            transform translate(800.00,250.00)
+              start handling text (SVGPDF::Text)
+              text  x=50 y=210
+                xo save
+                txt translate( 50.00, 210.00 ) scale( 1.00 -1.00 )
+                  xo save
+                  xo restore
+                xo restore
+              end handling text
+              start handling text (SVGPDF::Text)
+              text  x=50 y=250
+                xo save
+                txt translate( 50.00, 250.00 ) scale( 1.00 -1.00 )
+                  xo save
+                  xo restore
+                xo restore
+              end handling text
+              start handling use (SVGPDF::Use)
+              use "#baseEllipses" (g), x=0, y=0
+                xo save
+                use stroke=none fill=(current) fill=black
+                g ====
+                  xo save
+                    start handling ellipse (SVGPDF::Ellipse)
+                    ellipse cx=125 cy=125 rx=100 ry=50
+                      xo save
+                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      xo stroke (#888888)
+                      xo restore
+                    end handling ellipse
+                    start handling ellipse (SVGPDF::Ellipse)
+                    ellipse cx=225 cy=75 rx=100 ry=50
+                      xo save
+                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      xo stroke (#888888)
+                      xo restore
+                    end handling ellipse
+                    start handling text (SVGPDF::Text)
+                    text  x=35 y=70
+                      xo save
+                      txt translate( 35.00, 70.00 ) scale( 1.00 -1.00 )
+                        xo save
+                        xo restore
+                      xo restore
+                    end handling text
+                    start handling text (SVGPDF::Text)
+                    text  x=225 y=145
+                      xo save
+                      txt translate( 225.00, 145.00 ) scale( 1.00 -1.00 )
+                        xo save
+                        xo restore
+                      xo restore
+                    end handling text
+                  xo restore
+                xo restore
+              end handling use
+              start handling path (SVGPDF::Path)
+              path d="M 125,75 a100,50 0 1..."
+                xo save
+                path stroke-width=6 stroke=red fill=none
+                xo move(125.00,75.00)
+                xo arc(100.00,50.00 0.00 1,1 225.00,125.00)
+                elliptic_arc(125.00,75.00 225.00,125.00 100.00,50.00 move=0 large=1 dir=1 rot=0.00)
+                  xo curve( 125.00,68.43 127.59,61.93 132.61,55.87 )
+                  xo curve( 137.64,49.80 145.00,44.29 154.29,39.64 )
+                  xo curve( 163.58,35.00 174.60,31.32 186.73,28.81 )
+                  xo curve( 198.86,26.29 211.87,25.00 225.00,25.00 )
+                  xo curve( 238.13,25.00 251.14,26.29 263.27,28.81 )
+                  xo curve( 275.40,31.32 286.42,35.00 295.71,39.64 )
+                  xo curve( 305.00,44.29 312.36,49.80 317.39,55.87 )
+                  xo curve( 322.41,61.93 325.00,68.43 325.00,75.00 )
+                  xo curve( 325.00,81.57 322.41,88.07 317.39,94.13 )
+                  xo curve( 312.36,100.20 305.00,105.71 295.71,110.36 )
+                  xo curve( 286.42,115.00 275.40,118.68 263.27,121.19 )
+                  xo curve( 251.14,123.71 238.13,125.00 225.00,125.00 )
+                xo stroke (red)
+                xo restore
+              end handling path
+            xo restore
+          end handling g
+        xo restore
+      end handling g
+    xo restore
+  end handling g
+==== end svg ====

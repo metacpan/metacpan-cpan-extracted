@@ -1,5 +1,4 @@
 use warnings;
-use lib 'inc';
 use Test::More;
 use strict;
 use IO::String;
@@ -249,7 +248,7 @@ SKIP: {
             'SAMLRequest' );
     };
 
-    subtest "SP-initiated flow, authorized user" => sub {
+    subtest "SP-initiated flow, authorized user, with redirection" => sub {
 
         my $res;
 

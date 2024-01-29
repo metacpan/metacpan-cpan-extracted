@@ -49,7 +49,7 @@ SKIP: {
         my ($got) = $handle->dbh->selectrow_array("SELECT datetime(?,'localtime')", undef, $check);
         $skip_tz_tests = 1 if $got eq $check;
     }
-    elsif ($d eq 'mysql') {
+    elsif ( $d eq 'mysql' || $d eq 'MariaDB' ) {
         my $check = '2013-04-01 16:00:00';
         my ($got) = $handle->dbh->selectrow_array(
             "SELECT CONVERT_TZ(?, ?, ?)", undef, $check, 'UTC', 'Europe/Moscow'
@@ -279,6 +279,17 @@ sub run_test {
 package TestApp;
 
 sub schema_mysql {
+<<EOF;
+CREATE TEMPORARY TABLE Users (
+    id integer AUTO_INCREMENT,
+    Expires DATETIME NULL,
+    PRIMARY KEY (id)
+)
+EOF
+
+}
+
+sub schema_mariadb {
 <<EOF;
 CREATE TEMPORARY TABLE Users (
     id integer AUTO_INCREMENT,

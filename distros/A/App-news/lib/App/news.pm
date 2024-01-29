@@ -21,7 +21,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(wrap html_unwrap ranges sranges);
 
-our $VERSION = 1.07;
+our $VERSION = 1.09;
 
 =head1 NAME
 
@@ -58,6 +58,13 @@ Alex Schroeder
 GNU Affero General Public License
 
 =cut
+
+# Some US-ASCII coded characters 00-1F and 7F hexadecimal are excluded; the
+# space character and all whitespace is excluded; angle-bracket "<" and ">" and
+# double-quote (") characters are excluded; and the "unwise" characters are
+# excluded. This regular expression is case-sensitive, so the scheme most be
+# lower-case!
+my $iri_re = qr((\b[a-z]+:[^\x00-\x1F\x7F[:space:]<>"{}|\\^\[\]`]+));
 
 sub wrap {
   my @lines = split(/\n/, shift);
@@ -109,8 +116,10 @@ sub html_unwrap {
   my @lines = split(/\n/, shift);
   my $result;
   my $depth = 0;
+  my @escapes;
   for (@lines) {
     chomp;
+    s!$iri_re!push(@escapes, qq(<a href="$1">$1</a>)); "\x1e$#escapes\x1e"!ge;
     my ($prefix) = /^([> ]*)/;
     my $new_depth = () = $prefix =~ />/g;
     s/^([> ]*)//;
@@ -133,6 +142,9 @@ sub html_unwrap {
   while ($depth > 0) {
     $result .= "</blockquote>";
     $depth--;
+  }
+  for my $i (0 .. $#escapes) {
+    $result =~ s/\x1e$i\x1e/$escapes[$i]/;
   }
   return $result;
 }

@@ -1,5 +1,12 @@
 Revision history for Mojolicious-Plugin-OpenAPI-Modern
 
+0.008     2024-01-15 03:21:04Z
+          - fix prerequisite declaration to allow tests to pass
+
+0.007     2023-12-10 06:12:33Z
+          - new config option "openapi_obj", for providing the OpenAPI::Modern
+            object to use instead of constructing a new one.
+
 0.006     2023-11-24 01:27:44Z
           - new config option "after_response", for providing a subref for
             validating the response when it is returned.

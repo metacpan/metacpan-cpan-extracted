@@ -30,6 +30,7 @@ t/Data-HTML-Form-Select-Option/01-use.t
 t/Data-HTML-Form-Select-Option/02-version.t
 t/Data-HTML-Form-Select/01-use.t
 t/Data-HTML-Form-Select/02-version.t
+t/Data-HTML-Form-Select/03-new.t
 t/Data-HTML-Form/01-use.t
 t/Data-HTML-Form/02-version.t
 t/Data-HTML-Form/03-new.t

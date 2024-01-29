@@ -13,8 +13,9 @@ my $build = Module::Build->new(
    requires => {
       'perl' => '5.020', # experimental.pm; postderef
 
+      'meta' => '0.003_002',
       'List::Util' => '1.33',
-      'Object::Pad' => '0.75',
+      'Object::Pad' => '0.808',
       'Parser::MGC' => 0,
       'Syntax::Keyword::Dynamically' => 0,
       'Tickit::Event' => '0.66', # $info->type newapi

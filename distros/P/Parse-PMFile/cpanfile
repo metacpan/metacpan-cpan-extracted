@@ -8,7 +8,7 @@ configure_requires 'ExtUtils::MakeMaker::CPANfile' => '0.07';
 
 on test => sub {
   requires 'File::Temp' => '0.19'; # newdir
-  requires 'Test::More' => '0.88';
+  requires 'Test::More' => '0.94';
 };
 
 on develop => sub {

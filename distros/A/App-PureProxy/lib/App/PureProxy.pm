@@ -4,23 +4,27 @@ package App::PureProxy;
 
 =head1 NAME
 
-App::PureProxy - a Pure Perl HTTP proxy server
+App::PureProxy - Pure Perl HTTP proxy server
 
 =head1 SYNOPSIS
 
-  $ pureproxy --host=0.0.0.0 --port=5000 --workers=10 --server Starlight
+=for markdown ```sh
 
-  $ pureproxy --traffic-log=traffic.log --traffic-log-body-eol='|'
+    pureproxy --host=0.0.0.0 --port=5000 --workers=10 --server Starlight
 
-  $ pureproxy --access-log=access.log
+    pureproxy --traffic-log=traffic.log --traffic-log-body-eol='|'
 
-  $ pureproxy --other-plackup-options
+    pureproxy --access-log=access.log
 
-  $ pureproxy -v
+    pureproxy --other-plackup-options
 
-  $ http_proxy=http://localhost:5000/ lwp-request http://www.perl.org/
+    pureproxy -v
 
-  $ https_proxy=http://localhost:5000/ lwp-request https://metacpan.org/
+    http_proxy=http://localhost:5000/ lwp-request http://www.perl.org/
+
+    https_proxy=http://localhost:5000/ lwp-request https://metacpan.org/
+
+=for markdown ```
 
 =head1 DESCRIPTION
 
@@ -32,35 +36,50 @@ command.
 
 =cut
 
-
-use 5.006;
+use 5.008_001;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.0100';
-
+our $VERSION = '0.0200';
 
 1;
 
+__END__
 
 =head1 INSTALLATION
 
 =head2 With cpanm(1)
 
-  $ cpanm App::PureProxy
+=for markdown ```sh
+
+    cpanm App::PureProxy
+
+=for markdown ```
 
 =head2 Directly
 
-  $ lwp-request http://git.io/jEE6 | sh
+=for markdown ```sh
+
+    lwp-request -m get https://raw.githubusercontent.com/dex4er/PureProxy/master/fatpack/install.sh | sh
+
+=for markdown ```
 
 or
 
-  $ curl -kL http://git.io/jEE6 | sh
+=for markdown ```sh
+
+    curl -qsSL https://raw.githubusercontent.com/dex4er/PureProxy/master/fatpack/install.sh | sh
+
+=for markdown ```
 
 or
 
-  $ wget --quiet -O- http://git.io/jEE6 | sh
+=for markdown ```sh
+
+    wget --quiet -O- https://raw.githubusercontent.com/dex4er/PureProxy/master/fatpack/install.sh | sh
+
+=for markdown ```
 
 =head1 SEE ALSO
 
@@ -72,7 +91,7 @@ Piotr Roszatycki <dexter@cpan.org>
 
 =head1 LICENSE
 
-Copyright (c) 2014-2015 Piotr Roszatycki <dexter@cpan.org>.
+Copyright (c) 2014-2015, 2023-2024 Piotr Roszatycki <dexter@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as perl itself.

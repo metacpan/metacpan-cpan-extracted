@@ -1,7 +1,7 @@
 #!perl
 use strict;
 use warnings;
-use Test::More tests => 175;
+use Test::More tests => 174;
 use Test::Exception;
 use Encode;
 
@@ -55,7 +55,8 @@ throws_ok {
     isa_ok(my $stat = $env->stat, 'HASH', 'Get Stat');
     ok(exists $stat->{$_}, "Stat has $_")
 	for qw(psize depth branch_pages leaf_pages overflow_pages entries);
-    is($stat->{psize}, 4096, 'Default psize');
+    # psize differs on various platforms
+    #is($stat->{psize}, 4096, 'Default psize');
     is($stat->{$_}, 0, "$_ = 0, empty")
 	for qw(depth branch_pages leaf_pages overflow_pages entries);
 

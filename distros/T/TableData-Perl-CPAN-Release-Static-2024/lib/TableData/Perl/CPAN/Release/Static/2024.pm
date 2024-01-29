@@ -30,13 +30,13 @@ use warnings;
 use Role::Tiny::With;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-20'; # DATE
+our $DATE = '2024-01-01'; # DATE
 our $DIST = 'TableData-Perl-CPAN-Release-Static-2024'; # DIST
-our $VERSION = '20231120.0'; # VERSION
+our $VERSION = '20240101.0'; # VERSION
 
 with 'TableDataRole::Perl::CPAN::Release::Static::2024';
 
-our %STATS = ("num_rows",0,"num_columns",9); # STATS
+our %STATS = ("num_columns",9,"num_rows",10); # STATS
 
 1;
 # ABSTRACT: CPAN releases for the year 2024
@@ -53,7 +53,7 @@ TableDataRole::Perl::CPAN::Release::Static::2024 - CPAN releases for the year 20
 
 =head1 VERSION
 
-This document describes version 20231120.0 of TableDataRole::Perl::CPAN::Release::Static::2024 (from Perl distribution TableData-Perl-CPAN-Release-Static-2024), released on 2023-11-20.
+This document describes version 20240101.0 of TableDataRole::Perl::CPAN::Release::Static::2024 (from Perl distribution TableData-Perl-CPAN-Release-Static-2024), released on 2024-01-01.
 
 =head1 SYNOPSIS
 
@@ -91,7 +91,7 @@ See the L<tabledata> CLI's documentation for other available actions and options
  | key         | value |
  +-------------+-------+
  | num_columns | 9     |
- | num_rows    | 0     |
+ | num_rows    | 10    |
  +-------------+-------+
 
 The statistics is available in the C<%STATS> package variable.
@@ -135,7 +135,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

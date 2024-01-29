@@ -26,16 +26,7 @@ use warnings;
 use 5.014;
 use utf8;
 
-EOF
-
-if ($ENV{DB_IRIS_DEB_BUILD}) {
-	$buf .= "use Geo::Distance;\n"
-}
-else {
-	$buf .= "use GIS::Distance;\n";
-}
-
-$buf .= <<'EOF';
+use GIS::Distance;
 use List::Util qw(min);
 use List::UtilsBy qw(uniq_by);
 use List::MoreUtils qw(firstval pairwise);
@@ -43,7 +34,7 @@ use Text::LevenshteinXS qw(distance);
 
 # TODO switch to Text::Levenshtein::XS once AUR/Debian packages become available
 
-our $VERSION = '1.90';
+our $VERSION = '1.94';
 
 # Automatically generated, see share/stations.json
 my @stations = (
@@ -71,11 +62,8 @@ $buf .= <<'EOF';
 my $meta = {
 EOF
 
-for my $eva (keys %{$meta}) {
-	$buf .= sprintf("%s => [%s],\n",
-		$eva,
-		join(q{,}, @{$meta->{$eva}})
-	);
+for my $eva ( keys %{$meta} ) {
+	$buf .= sprintf( "%s => [%s],\n", $eva, join( q{,}, @{ $meta->{$eva} } ) );
 }
 
 $buf .= <<'EOF';
@@ -130,16 +118,7 @@ sub get_station_by_location {
 
 	$num_matches //= 10;
 
-EOF
-
-if ($ENV{DB_IRIS_DEB_BUILD}) {
-	$buf .= "\tmy \$dist = Geo::Distance->new();\n";
-}
-else {
-	$buf .= "\tmy \$dist = GIS::Distance->new();\n";
-}
-
-$buf .= <<'EOF';
+	my $dist = GIS::Distance->new();
 
 	# we only use geolocations inside germany.
 	# For these, this fast preprocessing step will let through all
@@ -150,18 +129,8 @@ $buf .= <<'EOF';
 		  and abs( $_->[4] - $lat )
 		  < 1
 	} @stations;
-	my @distances
-EOF
-
-if ($ENV{DB_IRIS_DEB_BUILD}) {
-	$buf .= '= map { $dist->distance( \'kilometer\', $lon, $lat, $_->[3], $_->[4] ) }';
-}
-else {
-	$buf .= '= map { $dist->distance_metal( $lat, $lon, $_->[4], $_->[3] ) }';
-}
-
-$buf .= <<'EOF';
-	  @candidates;
+	my @distances = map
+		{ $dist->distance_metal( $lat, $lon, $_->[4], $_->[3] ) } @candidates;
 	my @station_map = pairwise { [ $a, $b ] } @candidates, @distances;
 
 	@station_map = sort { $a->[1] <=> $b->[1] } @station_map;
@@ -235,7 +204,7 @@ Travel::Status::DE::IRIS::Stations - Station name to station code mapping
 
 =head1 VERSION
 
-version 1.90
+version 1.94
 
 =head1 DESCRIPTION
 
@@ -342,7 +311,7 @@ Travel::Status::DE::IRIS(3pm).
 
 Station data: Copyright (C) 2016 by DB Station&Service AG, Europaplatz 1, 10557 Berlin, Germany
 
-Lookup code: Copyright (C) 2014-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Lookup code: Copyright (C) 2014-2024 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

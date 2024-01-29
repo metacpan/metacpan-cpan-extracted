@@ -1,12 +1,12 @@
 package Locale::CLDR::EraBoundries;
 # This file auto generated from Data.xml
-#	on Tue  5 Dec 12:58:57 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -17,9 +17,9 @@ use Moo::Role;
 
 
 sub era_boundry {
-	my ($self, $type, $date) = @_;
-	my $era = $self->_era_boundry;
-	return $era->($self, $type, $date);
+    my ($self, $type, $date) = @_;
+    my $era = $self->_era_boundry;
+    return $era->($self, $type, $date);
 }
 
 has '_era_boundry' => (

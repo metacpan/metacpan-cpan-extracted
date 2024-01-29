@@ -1,5 +1,8 @@
 Revision history for Perl module Modulino::Demo
 
+1.005 2024-01-29T01:35:38Z
+	* refresh distro, update email address
+
 1.004 2022-01-09T00:33:10Z
 	* No code changes. Fix link in README.pod.
 

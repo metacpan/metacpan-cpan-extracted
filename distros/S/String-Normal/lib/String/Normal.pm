@@ -1,7 +1,7 @@
 package String::Normal;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 use String::Normal::Type;
 
@@ -359,7 +359,7 @@ The following people contributed algorithms and strategies in addition to the au
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Jeff Anderson.
+Copyright 2024 Jeff Anderson.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

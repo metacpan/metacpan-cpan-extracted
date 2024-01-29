@@ -3,7 +3,7 @@ package App::perlimports::CLI;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000052';
+our $VERSION = '0.000053';
 
 use App::perlimports           ();
 use App::perlimports::Config   ();
@@ -482,10 +482,10 @@ FILENAME:
                     return $pi_doc->linter_success;
                 }
             );
-            if ($linter_success) {
+            if ( $linter_success && !$self->_json ) {
                 $logger->error( $filename . ' OK' );
             }
-            else {
+            elsif ( !$linter_success ) {
                 $exit_code = 1;
             }
             next FILENAME;
@@ -550,7 +550,7 @@ App::perlimports::CLI - CLI arg parsing for C<perlimports>
 
 =head1 VERSION
 
-version 0.000052
+version 0.000053
 
 =head1 DESCRIPTION
 

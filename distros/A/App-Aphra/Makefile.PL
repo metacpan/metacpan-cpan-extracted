@@ -28,11 +28,11 @@ WriteMakefile(
     resources => {
       repository => {
         type => 'git',
-        url  => 'https://github.com/davorg/app-aphra.git',
-        web  => 'https://github.com/davorg/app-aphra',
+        url  => 'https://github.com/davorg-cpan/app-aphra.git',
+        web  => 'https://github.com/davorg-cpan/app-aphra',
       },
       bugtracker => {
-        web  => 'https://github.com/davorg/app-aphra/issues',
+        web  => 'https://github.com/davorg-cpan/app-aphra/issues',
       },
     },
   },

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Es::Any::Cr - Package for language Spanish
 
 package Locale::CLDR::Locales::Es::Any::Cr;
 # This file auto generated from Data\common\main\es_CR.xml
-#	on Tue  5 Dec  1:08:39 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ace' => 'acehnés',
@@ -59,12 +59,11 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'BA' => 'Bosnia y Herzegovina',
  			'GB@alt=short' => 'RU',
  			'TA' => 'Tristán de Acuña',
- 			'TL' => 'Timor-Leste',
  			'UM' => 'Islas menores alejadas de EE. UU.',
 
 		}
@@ -80,7 +79,7 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -113,147 +112,6 @@ has 'currencies' => (
 	} },
 );
 
-
-has 'day_period_data' => (
-	is			=> 'ro',
-	isa			=> CodeRef,
-	init_arg	=> undef,
-	default		=> sub { sub {
-		# Time in hhmm format
-		my ($self, $type, $time, $day_period_type) = @_;
-		$day_period_type //= 'default';
-		SWITCH:
-		for ($type) {
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
-				}
-				last SWITCH;
-				}
-		}
-	} },
-);
-
-around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
-};
-
-has 'day_periods' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'gregorian' => {
-			'format' => {
-				'abbreviated' => {
-					'am' => q{a. m.},
-					'pm' => q{p. m.},
-				},
-				'wide' => {
-					'am' => q{a. m.},
-					'pm' => q{p. m.},
-				},
-			},
-			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{a. m.},
-					'pm' => q{p. m.},
-				},
-				'narrow' => {
-					'am' => q{a. m.},
-					'pm' => q{p. m.},
-				},
-				'wide' => {
-					'am' => q{a. m.},
-					'pm' => q{p. m.},
-				},
-			},
-		},
-	} },
-);
-
-has 'eras' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'gregorian' => {
-		},
-	} },
-);
-
-has 'date_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'gregorian' => {
-		},
-	} },
-);
-
-has 'time_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'gregorian' => {
-		},
-	} },
-);
-
-has 'datetime_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'gregorian' => {
-		},
-	} },
-);
-
-has 'datetime_formats_available_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-	} },
-);
-
-has 'datetime_formats_append_item' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-	} },
-);
-
-has 'datetime_formats_interval' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-	} },
-);
 
 no Moo;
 

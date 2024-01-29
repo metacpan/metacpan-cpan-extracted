@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use v5.26;
 
-use App::url 1.006;
+use App::url 1.009;
 
 =encoding utf8
 
@@ -64,7 +64,7 @@ Decompose the URL and reformat it according to a template.
 
 =head1 COPYRIGHT
 
-Copyright © 2020-2021, brian d foy, all rights reserved.
+Copyright © 2020-2024, brian d foy, all rights reserved.
 
 =head1 LICENSE
 

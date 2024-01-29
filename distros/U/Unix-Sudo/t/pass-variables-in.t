@@ -38,6 +38,10 @@ sudosanity::checks && do {
     };
 
     is(sudo { $code->() }, 11, "Can read variables from the parent context");
+
+    $Data::Dumper::Terse = 1;
+    is(sudo { $code->() }, 11, 'Works when $Data::Dumper::Terse is set');
+
 };
 
 done_testing();

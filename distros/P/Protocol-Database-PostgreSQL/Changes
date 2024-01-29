@@ -1,5 +1,10 @@
 Revision history for Protocol-Database-PostgreSQL
 
+2.001     2024-01-27 16:59:10+08:00 Asia/Singapore
+    [New features]
+
+    - latest error codes added from https://www.postgresql.org/docs/current/errcodes-appendix.html
+
 2.000     2022-09-07 04:59:16+08:00 Asia/Singapore
     New features:
 

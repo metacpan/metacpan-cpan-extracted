@@ -1,5 +1,5 @@
 {
-   "abstract" : "DCE compatible Universally Unique Identifier library for Perl",
+   "abstract" : "Universally Unique Identifier library for Perl",
    "author" : [
       "Rick Myers <jrm@cpan.org>"
    ],
@@ -22,20 +22,31 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.64"
+            "Config" : "0",
+            "Devel::CheckLib" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
+            "Text::Patch" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Devel::CheckLib" : "1.14",
-            "ExtUtils::MakeMaker" : "6.64"
+            "Config" : "0",
+            "Devel::CheckLib" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "DynaLoader" : "0",
             "Exporter" : "0",
-            "perl" : "5.005"
+            "perl" : "5.005",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -47,6 +58,7 @@
             "Test::More" : "0",
             "lib" : "0",
             "strict" : "0",
+            "vars" : "0",
             "warnings" : "0"
          }
       }
@@ -54,10 +66,10 @@
    "provides" : {
       "UUID" : {
          "file" : "UUID.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       }
    },
    "release_status" : "stable",
-   "version" : "0.31",
+   "version" : "0.32",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

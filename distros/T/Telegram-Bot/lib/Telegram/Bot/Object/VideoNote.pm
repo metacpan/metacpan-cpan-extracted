@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::VideoNote;
-$Telegram::Bot::Object::VideoNote::VERSION = '0.024';
+$Telegram::Bot::Object::VideoNote::VERSION = '0.025';
 # ABSTRACT: The base class for Telegram 'VideoNote' type objects
 
 
@@ -34,7 +34,7 @@ Telegram::Bot::Object::VideoNote - The base class for Telegram 'VideoNote' type 
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 DESCRIPTION
 
@@ -52,6 +52,10 @@ Justin Hawkins <justin@eatmorecode.com>
 =item *
 
 James Green <jkg@earth.li>
+
+=item *
+
+Julien Fiegehenn <simbabque@cpan.org>
 
 =back
 

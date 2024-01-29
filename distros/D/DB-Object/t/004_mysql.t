@@ -9,6 +9,7 @@ BEGIN
 	use File::Basename;
 	use File::Spec;
 	use JSON;
+	our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
 # BEGIN { use_ok( 'DB::Object::Mysql' ); };
@@ -32,7 +33,7 @@ SKIP:
 	'db'		=> 'mysql',
 	'host'		=> ( $ENV{DB_HOST} || 'localhost' ),
 	'driver'	=> 'mysql',
-	#'debug'		=> 3,
+	'debug'		=> $DEBUG,
 	};
 	if( $^O eq 'MSWin32' )
 	{

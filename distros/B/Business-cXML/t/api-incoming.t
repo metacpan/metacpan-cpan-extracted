@@ -17,7 +17,7 @@ use Business::cXML::Transmission;
 use lib 't/';
 use Test::cXML qw(comparable);
 
-plan tests => 19;
+plan tests => 20;
 
 my $cxml = Business::cXML->new(local => 'https://example.com/api/cxml');
 
@@ -174,6 +174,7 @@ $cxml->on(PunchOutSetup => { __handler => sub {
 		role      => undef,
 		urls      => [],
 	}]), 'Extrinsic UserFullName is recognized');
+	cmp_deeply($req->payload->{_ext_email}, '1234@remotehost', 'Extrinsics available');
 }});
 $s = read_file('t/xml-assets/punchoutsetup3-request.xml');
 $cxml->process($s);

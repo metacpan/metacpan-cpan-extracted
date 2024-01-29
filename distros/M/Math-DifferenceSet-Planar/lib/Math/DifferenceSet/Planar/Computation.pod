@@ -34,15 +34,21 @@ through powers of I<x> modulo this polynomial from exponent zero up to
 exponent I<kE<178>+k>.  The exponents yielding a remainder with degree
 less than two will be a planar difference set containing zero and one.
 
-The git repository of this library has a Pari/GP script
-F<prime_order_samples.gp> working like this, employing modular integers.
-It can only handle prime orders, though.
+The git repository of this library has two Pari/GP scripts
+F<prime_order_samples.gp> and F<extra_large_sample.gp> working like this,
+employing modular integers, and thus only handling prime orders.
 
-For orders that are prime powers with an exponent greater than one,
-the same algorithm is valid, but it needs Galois field arithmetic rather
-than simple modular integer arithmetic.  It can be found in the examples
-collection of the separate perl library Math-GaloisField (due to be
-published around the same time as this library).
+For orders that are prime powers with an exponent greater than one, the
+same algorithm is valid, but it needs Galois field arithmetic rather than
+simple modular integer arithmetic.  A generic implementation will be in
+the examples collection of the separate perl library Math-GaloisField
+(due to be published not too long after this library).
+
+Efficient implementation of field arithmetic becomes increasingly
+important as orders grow larger.  The C program F<even_order_sample.c> of
+the repository is a sample set generator for fields with characteristic
+two, or orders that are powers of two.  The remaining case of odd prime
+powers could be implemented in similar fashion.
 
 =head2 Obtaining space information
 

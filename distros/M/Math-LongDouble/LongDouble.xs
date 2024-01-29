@@ -725,6 +725,44 @@ SV * _overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
     croak("Invalid argument supplied to Math::LongDouble::_overload_add_eq function");
 }
 
+void broken_overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
+    long double ld;
+    if(third == &PL_sv_undef) printf("UNDEF in broken_overload_add\n");
+    if(SvUOK(b)) {
+       ld = (ldbl)SvUVX(b);
+       *(INT2PTR(ldbl *, SvIVX(SvRV(a)))) += ld;
+    }
+
+    else if(SvIOK(b)) {
+       ld = (ldbl)SvIVX(b);
+       printf("From SvIV: %Lf\n", ld);
+       *(INT2PTR(ldbl *, SvIVX(SvRV(a)))) += ld;
+    }
+
+    else if(SvNOK(b)) {
+       ld = (ldbl)SvNVX(b);
+       printf("From SvNV: %Lf\n", ld);
+       *(INT2PTR(ldbl *, SvIVX(SvRV(a)))) += ld;
+    }
+
+    else if(SvPOK(b)) {
+       char * p;
+       *(INT2PTR(ldbl *, SvIVX(SvRV(a)))) += strtold(SvPV_nolen(b), &p);
+       _nnum_inc(p);
+    }
+
+    else if(sv_isobject(b)) {
+       const char *h = HvNAME(SvSTASH(SvRV(b)));
+       if(strEQ(h, "Math::LongDouble")) {
+         ld = (ldbl)*(INT2PTR(long double *, SvIVX(SvRV(b))));
+         *(INT2PTR(long double *, SvIVX(SvRV(a)))) += ld;
+      }
+    }
+    else {
+      croak("Invalid argument supplied to Math::LongDouble::broken_overload_add_eq function");
+    }
+}
+
 SV * _overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
 
     SvREFCNT_inc(a);
@@ -1417,22 +1455,12 @@ SV * _overload_atan2(pTHX_ SV * a, SV * b, SV * third) {
      croak("Invalid argument supplied to Math::LongDouble::_overload_atan2 function");
 }
 
-SV * _overload_inc(pTHX_ SV * a, SV * b, SV * third) {
-
-     SvREFCNT_inc(a);
-
+void _overload_inc(pTHX_ SV * a, SV * b, SV * third) {
      *(INT2PTR(long double *, SvIVX(SvRV(a)))) += 1.0L;
-
-     return a;
 }
 
-SV * _overload_dec(pTHX_ SV * a, SV * b, SV * third) {
-
-     SvREFCNT_inc(a);
-
+void _overload_dec(pTHX_ SV * a, SV * b, SV * third) {
      *(INT2PTR(long double *, SvIVX(SvRV(a)))) -= 1.0L;
-
-     return a;
 }
 
 SV * _overload_pow(pTHX_ SV * a, SV * b, SV * third) {
@@ -1735,7 +1763,11 @@ void fdim_LD(ldbl * rop, ldbl * op1, ldbl * op2) {
 }
 
 int finite_LD(ldbl * op) {
+#ifdef WIN32
+  return _finite(*op);
+#else
   return finite(*op);
+#endif
 }
 
 void floor_LD(ldbl * rop, ldbl * op) {
@@ -2830,6 +2862,24 @@ CODE:
   RETVAL = _overload_add_eq (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
+void
+broken_overload_add_eq (a, b, third)
+	SV *	a
+	SV *	b
+	SV *	third
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        broken_overload_add_eq(aTHX_ a, b, third);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
+
 SV *
 _overload_mul_eq (a, b, third)
 	SV *	a
@@ -3029,23 +3079,41 @@ CODE:
   RETVAL = _overload_atan2 (aTHX_ a, b, third);
 OUTPUT:  RETVAL
 
-SV *
+void
 _overload_inc (a, b, third)
 	SV *	a
 	SV *	b
 	SV *	third
-CODE:
-  RETVAL = _overload_inc (aTHX_ a, b, third);
-OUTPUT:  RETVAL
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        _overload_inc(aTHX_ a, b, third);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
 
-SV *
+void
 _overload_dec (a, b, third)
 	SV *	a
 	SV *	b
 	SV *	third
-CODE:
-  RETVAL = _overload_dec (aTHX_ a, b, third);
-OUTPUT:  RETVAL
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        _overload_dec(aTHX_ a, b, third);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
 
 SV *
 _overload_pow (a, b, third)

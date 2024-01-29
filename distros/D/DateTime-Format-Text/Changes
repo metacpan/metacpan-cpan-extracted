@@ -1,10 +1,11 @@
 Revision history for DateTime-Format-Text
 
-0.06
+0.06	Mon Jan  1 19:41:35 EST 2024
 	Fix misparse of "Foo in November 2009 Bar. XYZZY 45th PLUGH 7th TULIP"
 		which parsed as 45/11/09
+	Increased test coverage
 
-0.05 Tue Jun 27 21:40:01 EDT 2023
+0.05	Tue Jun 27 21:40:01 EDT 2023
 	Croak if we can't work out the date
 	Fix misparsing of the string "6 February 1870-18/19 August 1914"
 

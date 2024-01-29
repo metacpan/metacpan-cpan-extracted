@@ -19,12 +19,12 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "XXX" => "0.38",
     "YAML::PP" => "0.036",
-    "YAMLScript" => "0.1.11"
+    "YAMLScript::Lingy" => "0.2.1"
   },
   "TEST_REQUIRES" => {
     "Capture::Tiny" => "0.48"
   },
-  "VERSION" => "0.0.1",
+  "VERSION" => "0.0.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,7 +35,7 @@ my %FallbackPrereqs = (
   "Capture::Tiny" => "0.48",
   "XXX" => "0.38",
   "YAML::PP" => "0.036",
-  "YAMLScript" => "0.1.11"
+  "YAMLScript::Lingy" => "0.2.1"
 );
 
 

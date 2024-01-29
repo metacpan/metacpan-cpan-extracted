@@ -23,6 +23,7 @@ my $builder = Module::Build->new(
         'perl'                  => '5.14.0',
     },
     requires => {
+        'Capture::Tiny'           => 0,
         'Carp'                    => 0,
         'File::Spec'              => 0,
         'File::Temp'              => 0,

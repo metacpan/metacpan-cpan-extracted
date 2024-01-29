@@ -7,7 +7,7 @@ use sigtrap qw(die normal-signals error-signals);
 use Fcntl qw(:DEFAULT :mode);
 use File::Path 'rmtree';
 use File::Temp 'mktemp';
-use Test::More tests => 28;
+use Test::More tests => 35;
 
 use POSIX::2008;
 
@@ -24,10 +24,12 @@ SKIP: {
   sysseek $fh, 0, 0;
   if (! defined &POSIX::2008::write) {
     cmp_ok(syswrite($fh, '111222'), '==', 6, '... syswrite(fh) bytes written (fallback)');
-    skip 'write() UNAVAILABLE', 1;
+    skip 'write() UNAVAILABLE', 2;
   }
+  my $rv = eval { POSIX::2008::write($fh, '', -3) };
+  ok(!$rv && $@ =~ /negative/, 'write fails due to negative size');
   cmp_ok(POSIX::2008::write($fh, '111'), '==', 3, 'write(fh) bytes written');
-  cmp_ok(POSIX::2008::write($fd, '222'), '==', 3, 'write(fd) bytes written');
+  cmp_ok(POSIX::2008::write($fd, '222', 10), '==', 3, 'write(fd) bytes written');
 }
 SKIP: {
   my $buf;
@@ -35,8 +37,10 @@ SKIP: {
   if (! defined &POSIX::2008::read) {
     cmp_ok(sysread($fh, $buf, 6), '==', 6, '... sysread(fh) bytes read (fallback)');
     cmp_ok($buf, 'eq', '111222', '  sysread(fh) string read (fallback)');
-    skip 'read() UNAVAILABLE', 2;
+    skip 'read() UNAVAILABLE', 3;
   }
+  my $rv = eval { POSIX::2008::read($fh, my $buf, -3) };
+  ok(!$rv && $@ =~ /negative/, 'read fails due to negative size');
   cmp_ok(POSIX::2008::read($fh, $buf, 3), '==', 3, 'read(fh) bytes read');
   cmp_ok($buf, 'eq', '111', 'read(fh) string read');
   cmp_ok(POSIX::2008::read($fd, $buf, 3), '==', 3, 'read(fd) bytes read');
@@ -50,8 +54,10 @@ SKIP: {
   if (! defined &POSIX::2008::pwrite) {
     sysseek $fh, 0, 0;
     cmp_ok(syswrite($fh, '333444'), '==', 6, '... syswrite(fh) bytes written (fallback)');
-    skip 'pwrite() UNAVAILABLE', 1;
+    skip 'pwrite() UNAVAILABLE', 2;
   }
+  my $rv = eval { POSIX::2008::pwrite($fh, '', -3, 0) };
+  ok(!$rv && $@ =~ /negative/, 'pwrite fails due to negative size');
   cmp_ok(POSIX::2008::pwrite($fh, '444', undef, 3), '==', 3, 'pwrite(fh) bytes written');
   cmp_ok(POSIX::2008::pwrite($fd, '333', undef, 0), '==', 3, 'pwrite(fd) bytes written');
 }
@@ -61,8 +67,10 @@ SKIP: {
     sysseek $fh, 0, 0;
     cmp_ok(sysread($fh, $buf, 6), '==', 6, '... sysread(fh) bytes read (fallback)');
     cmp_ok($buf, 'eq', '333444', '... sysread(fh) string read (fallback)');
-    skip 'pread() UNAVAILABLE', 2;
+    skip 'pread() UNAVAILABLE', 3;
   }
+  my $rv = eval { POSIX::2008::pread($fh, my $buf, -3, 0) };
+  ok(!$rv && $@ =~ /negative/, 'pread fails due to negative size');
   cmp_ok(POSIX::2008::pread($fh, $buf, 3, 3), '==', 3, 'pread(fh) bytes read');
   cmp_ok($buf, 'eq', '444', 'pread(fh) string read');
   cmp_ok(POSIX::2008::pread($fd, $buf, 3, 0), '==', 3, 'pread(fd) bytes read');
@@ -76,8 +84,11 @@ SKIP: {
   sysseek $fh, 0, 0;
   if (! defined &POSIX::2008::writev) {
     cmp_ok(syswrite($fh, '555666'), '==', 6, '... syswrite(fh) bytes written (fallback)');
-    skip 'writev() UNAVAILABLE', 1;
+    skip 'writev() UNAVAILABLE', 2;
   }
+  my $rv = eval { POSIX::2008::writev($fh, "foobar") };
+  # Note: The /i is needed because some Perls say "ARRAY", others say "array".
+  ok(!$rv && $@ =~ /not an ARRAY/i);
   cmp_ok(POSIX::2008::writev($fh, ['55', '', undef, '5']), '==', 3, 'writev(fh) bytes written');
   cmp_ok(POSIX::2008::writev($fd, ['6', undef, '', '66']), '==', 3, 'writev(fd) bytes written');
 }
@@ -87,14 +98,19 @@ SKIP: {
     my $buf;
     cmp_ok(sysread($fh, $buf, 6), '==', 6, '... sysread(fh) bytes read (fallback)');
     cmp_ok($buf, 'eq', '555666', '... sysread(fh) string read (fallback)');
-    skip 'readv() UNAVAILABLE', 4;
+    skip 'readv() UNAVAILABLE', 6;
   }
+  my $rv;
   my @buf1;
   my @buf2;
-  cmp_ok(POSIX::2008::readv($fh, @buf1, [1, 0, 0, 2]), '==', 3, 'readv(fh) bytes read');
+  $rv = eval { POSIX::2008::readv($fh, my $buf, 'foobar') };
+  ok(!$rv && $@ =~ /not an ARRAY/i, 'readv fails due to non-arrayref');
+  $rv = eval { POSIX::2008::readv($fh, my $buf, [0, -1, 0]) };
+  ok(!$rv && $@ =~ /negative/, 'readv fails due to negative size');
+  cmp_ok(POSIX::2008::readv($fh, @buf1, [0, 1, 0, 2]), '==', 3, 'readv(fh) bytes read');
   cmp_ok(scalar(@buf1), '==', 4, 'readv(fh) buffers read');
   cmp_ok(join('', @buf1), 'eq', '555', 'readv(fh) strings read');
-  cmp_ok(POSIX::2008::readv($fd, @buf2, [2, 0, 0, 1]), '==', 3, 'readv(fd) bytes read');
+  cmp_ok(POSIX::2008::readv($fd, @buf2, [2, 0, 1, 0]), '==', 3, 'readv(fd) bytes read');
   cmp_ok(scalar(@buf2), '==', 4, 'readv(fd) buffers read');
   cmp_ok(join('', @buf2), 'eq', '666', 'readv(fd) strings read');
 }

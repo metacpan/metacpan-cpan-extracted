@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Vun::Any::Tz - Package for language Vunjo
 
 package Locale::CLDR::Locales::Vun::Any::Tz;
 # This file auto generated from Data\common\main\vun_TZ.xml
-#	on Tue  5 Dec  1:38:01 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';

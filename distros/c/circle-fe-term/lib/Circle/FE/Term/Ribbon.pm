@@ -6,7 +6,7 @@ use v5.26;
 use warnings;
 use Object::Pad;
 
-package Circle::FE::Term::Ribbon 0.232470;
+package Circle::FE::Term::Ribbon 0.240250;
 
 use base qw( Tickit::Widget::Tabbed::Ribbon );
 
@@ -148,8 +148,9 @@ sub render_to_rb
       }
 
       if( $hiddencount ) {
+         my $hiddenlevel = $format >= 7 ? "level2" : "level1";
          $rb->savepen;
-         $rb->setpen( Circle::FE::Term->get_theme_pen( "level1" ) );
+         $rb->setpen( Circle::FE::Term->get_theme_pen( $hiddenlevel ) );
          $rb->text( " + $hiddencount more" );
          $rb->restore;
       }

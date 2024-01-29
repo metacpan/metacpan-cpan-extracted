@@ -8,9 +8,10 @@ my $build = Module::Build->new(
    module_name => 'Tangence',
    requires => {
       'perl' => '5.026',
+      'meta' => '0.003_002',
       'Feature::Compat::Try' => 0,
       'Future::AsyncAwait' => '0.47',
-      'Object::Pad' => '0.70',
+      'Object::Pad' => '0.800',
       'Syntax::Keyword::Dynamically' => 0,
       'Syntax::Keyword::Match' => '0.06',
 
@@ -25,12 +26,9 @@ my $build = Module::Build->new(
    },
    test_requires => {
       'Struct::Dumb' => '0.09',
-      'Test::Fatal' => '0.006',
       'Test::HexString' => 0,
-      'Test::Identity' => 0,
-      'Test::Memory::Cycle' => 0,
       'Test::More' => '0.88', # done_testing
-      'Test::Refcount' => 0,
+      'Test2::V0' => '0.000149',
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

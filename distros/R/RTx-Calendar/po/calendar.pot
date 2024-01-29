@@ -1,0 +1,95 @@
+#. (qq{<a href="$RT::WebPath/Search/Build.html">} . loc("Query Builder") . '</a>')
+#: html/Elements/CalendarFooter:21
+msgid ""
+"\n"
+"By default, RTx::Calendar displays Due and Starts dates. You can select other\n"
+"date fields with the Display Columns section in the %1.\n"
+"The following format will display the two additional date fields, LastUpdated and a\n"
+"custom field called Maintenance Date:\n"
+msgstr ""
+
+#. (qq{<a href="$RT::WebPath/Search/Edit.html">} . loc("Advanced") . '</a>')
+#: html/Elements/CalendarFooter:8
+msgid ""
+"\n"
+"If you want to see reminders on the calendar, you need to go to the %1 tab\n"
+"of your query and explicitly add the following clause to it:\n"
+msgstr ""
+
+#. (qq{<a href="$RT::WebPath/Search/Build.html">} . loc("Query Builder") . '</a>')
+#: html/Elements/CalendarFooter:35
+msgid ""
+"\n"
+"You can change the default query used by Calendar.html and the MyCalendar\n"
+"portlet by saving a query with the name <code>calendar</code> in the %1.\n"
+msgstr ""
+
+#: html/Helpers/CalendarEventInfo:81
+msgid "<% $label_of{$attr} %>"
+msgstr ""
+
+#: html/Elements/CalendarFooter:5
+msgid "Advanced"
+msgstr ""
+
+#: html/Callbacks/RTx-Calendar/Elements/Tabs/Privileged:52 html/Elements/Calendar:233 html/Elements/MyCalendar:2 html/Elements/MyCalendar:90 html/Search/Calendar.html:1
+msgid "Calendar"
+msgstr ""
+
+#. ($rtdate->GetMonth($Month), $Year)
+#: html/Elements/Calendar:23
+msgid "Calendar for %1 %2"
+msgstr ""
+
+#: html/Elements/CalendarFooter:30
+msgid "Changing the default query"
+msgstr ""
+
+#: html/Elements/CalendarSidebar:28
+msgid "Clear Filter"
+msgstr ""
+
+#: html/Elements/CalendarFooter:14
+msgid "Displaying other kind of dates"
+msgstr ""
+
+#: html/Elements/CalendarFooter:3
+msgid "Displaying reminders"
+msgstr ""
+
+#: html/Elements/Calendar:25
+msgid "Download Spreadsheet"
+msgstr ""
+
+#: etc/tabs_privileged_callback.patch:25
+msgid "Edit"
+msgstr ""
+
+#: html/Elements/CalendarSidebar:34
+msgid "Event Types"
+msgstr ""
+
+#: html/Elements/CalendarSidebar:26
+msgid "Filter"
+msgstr ""
+
+#: html/Elements/CalendarSidebar:9
+msgid "Filter on Status"
+msgstr ""
+
+#: html/Elements/CalendarFooter:1
+msgid "Help"
+msgstr ""
+
+#: html/Elements/CalendarFooter:16 html/Elements/CalendarFooter:32
+msgid "Query Builder"
+msgstr ""
+
+#: html/Elements/CalendarSidebar:51
+msgid "Status Colors"
+msgstr ""
+
+#: html/Elements/Calendar:177
+msgid "Submit"
+msgstr ""
+

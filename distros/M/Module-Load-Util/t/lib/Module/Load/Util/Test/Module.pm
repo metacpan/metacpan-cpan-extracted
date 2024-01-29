@@ -16,4 +16,7 @@ sub foo4 { "foo4" }
 sub foo5 { "foo5" }
 sub foo6 { "foo6" }
 
+sub qux { $_[0] + $_[1] }
+sub quux { my $class = shift; $_[0] + $_[1] }
+
 1;

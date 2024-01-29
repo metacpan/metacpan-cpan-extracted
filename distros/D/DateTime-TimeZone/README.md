@@ -4,7 +4,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 # VERSION
 
-version 2.60
+version 2.61
 
 # SYNOPSIS
 
@@ -298,6 +298,7 @@ Dave Rolsky <autarch@urth.org>
 - Alexey Molchanov <alexey.molchanov@gmail.com>
 - Alfie John <alfiej@fastmail.fm>
 - Andrew Paprocki <apaprocki@bloomberg.net>
+- Brian Fraser <brian.fraser@booking.com>
 - Bron Gondwana <brong@fastmail.fm>
 - Daisuke Maki <dmaki@cpan.org>
 - David Pinkowitz <dave@pinkowitz.com>

@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use Carp qw(croak);
 use PDF::Builder::Basic::PDF::Utils;
@@ -28,11 +28,15 @@ PDF::Builder::Outline - Manage PDF outlines (a.k.a. I<bookmarks>)
 
 =head1 METHODS
 
+=head2 new
+
+    $outline = PDF::Builder::Outline->new($api, $parent, $prev)
+
 =over
 
-=item $outline = PDF::Builder::Outline->new($api, $parent, $prev)
-
 Returns a new outline object (called from $outlines->outline()).
+
+=back
 
 =cut
 
@@ -50,15 +54,17 @@ sub new {
     return $self;
 }
 
-=back
-
 =head2 Examine the Outline Tree
+
+=head3 has_children
+
+    $boolean = $outline->has_children()
 
 =over
 
-=item $boolean = $outline->has_children()
-
 Return true if the current outline item has children (child items).
+
+=back
 
 =cut
 
@@ -74,10 +80,16 @@ sub has_children {
     return;
 }
 
-=item $integer = $outline->count()
+=head3 count
+
+    $integer = $outline->count()
+
+=over
 
 Return the number of descendants that are visible when the current outline item
 is open (expanded).
+
+=back
 
 =cut
 
@@ -129,9 +141,15 @@ sub _load_children {
     return $self;
 }
 
-=item $child = $outline->first()
+=head3 first
+
+    $child = $outline->first()
+
+=over
 
 Return the first child of the current outline level, if one exists.
+
+=back
 
 =cut
 
@@ -144,9 +162,15 @@ sub first {
     return $self->{'First'};
 }
 
-=item $child = $outline->last()
+=head3 last
+
+    $child = $outline->last()
+
+=over
 
 Return the last child of the current outline level, if one exists.
+
+=back
 
 =cut
 
@@ -159,10 +183,16 @@ sub last {
     return $self->{'Last'};
 }
 
-=item $parent = $outline->parent()
+=head3 parent
+
+    $parent = $outline->parent()
+
+=over
 
 Return the parent of the current item, if not at the top level of the outline
 tree.
+
+=back
 
 =cut
 
@@ -173,9 +203,15 @@ sub parent {
     return $self->{'Parent'};
 }
 
-=item $sibling = $outline->prev()
+=head3 prev
+
+    $sibling = $outline->prev()
+
+=over
 
 Return the previous item of the current level of the outline tree.
+
+=back
 
 =cut
 
@@ -186,9 +222,15 @@ sub prev {
     return $self->{'Prev'};
 }
 
-=item $sibling = $outline->next()
+=head3 next
+
+    $sibling = $outline->next()
+
+=over
 
 Return the next item of the current level of the outline tree.
+
+=back
 
 =cut
 
@@ -199,16 +241,18 @@ sub next {
     return $self->{'Next'};
 }
 
-=back
-
 =head2 Modify the Outline Tree
 
-=over 
+=head3 outline
 
-=item $child_outline = $parent_outline->outline()
+    $child_outline = $parent_outline->outline()
+
+=over
 
 Returns a new sub-outline (nested outline) added at the end of the
 current outline's children.
+
+=back
 
 =cut
 
@@ -228,9 +272,15 @@ sub outline {
     return $child;
 }
 
-=item $sibling = $outline->insert_after()
+=head3 insert_after
+
+    $sibling = $outline->insert_after()
+
+=over
 
 Add an outline item immediately following the current item.
+
+=back
 
 =cut
 
@@ -249,9 +299,15 @@ sub insert_after {
     return $sibling;
 }
 
-=item $sibling = $outline->insert_before()
+=head3 insert_before
+
+    $sibling = $outline->insert_before()
+
+=over
 
 Add an outline item immediately preceding the current item.
+
+=back
 
 =cut
 
@@ -284,11 +340,17 @@ sub _reset_children {
     return $self;
 }
 
-=item $outline->delete()
+=head3 delete
+
+    $outline->delete()
+
+=over
 
 Remove the current outline item from the outline tree. If the item has any
 children, they will effectively be deleted as well, since they will no longer 
 be linked.
+
+=back
 
 =cut
 
@@ -307,11 +369,17 @@ sub delete {
     return;
 }
 
-=item $boolean = $outline->is_open() # Get
+=head3 is_open
 
-=item $outline = $outline->is_open($boolean) # Set
+    $boolean = $outline->is_open() # Get
+
+    $outline = $outline->is_open($boolean) # Set
+
+=over
 
 Get/set whether the outline is expanded (open) or collapsed (closed).
+
+=back
 
 =cut
 
@@ -337,11 +405,17 @@ sub is_open {
     return $self;
 }
 
-=item $outline->open()
+=head3 open
+
+    $outline->open()
+
+=over
 
 Set the status of the outline to open (i.e., expanded).
 
 This is an B<alternate> method to using is_open(true).
+
+=back
 
 =cut
 
@@ -352,11 +426,17 @@ sub open {
     return $self;
 }
 
-=item $outline->closed()
+=head3 closed
+
+    $outline->closed()
+
+=over
 
 Set the status of the outline to closed (i.e., collapsed).
 
 This is an B<alternate> method to using is_open(false).
+
+=back
 
 =cut
 
@@ -367,17 +447,19 @@ sub closed {
     return $self;
 }
 
-=back
-
 =head2 Set Outline Attributes
+
+=head3 title
+
+    $title = $outline->title() # Get
+
+    $outline = $outline->title($text) # Set
 
 =over
 
-=item $title = $outline->title() # Get
-
-=item $outline = $outline->title($text) # Set
-
 Get/set the title of the outline item.
+
+=back
 
 =cut
 
@@ -396,9 +478,13 @@ sub title {
     return $self;
 }
 
-=item $outline->dest($page_object, %position)
+=head3 dest
 
-=item $outline->dest($page_object)
+    $outline->dest($page_object, %position)
+
+    $outline->dest($page_object)
+
+=over
 
 Sets the destination page and optional position of the outline.
 
@@ -407,12 +493,14 @@ Sets the destination page and optional position of the outline.
 "xyz" is the B<default> fit setting, with position (left and top) and zoom
 the same as the calling page's.
 
-=item $outline->dest($name, %position)
+    $outline->dest($name, %position)
 
-=item $outline->dest($name)
+    $outline->dest($name)
 
 Connect the Outline to a "Named Destination" defined elsewhere,
 and optional positioning as described above.
+
+=back
 
 =cut
 
@@ -470,19 +558,21 @@ sub _fit {
     return $self;
 }
 
-=back
-
 =head2 Destination targets
 
-=over
+=head3 uri, url
 
-=item $outline->uri($url)
+    $outline->uri($url)
+
+=over
 
 Defines the outline as launch-url with url C<$url>, typically a web page.
 
 B<Alternate name:> C<url>
 
 Either C<uri> or C<url> may be used; C<uri> is for compatibility with PDF::API2.
+
+=back
 
 =cut
 
@@ -500,7 +590,11 @@ sub uri {
     return $self;
 }
 
-=item $outline->launch($file)
+=head3 launch, file
+
+    $outline->launch($file)
+
+=over
 
 Defines the outline as launch-file with filepath C<$file>. This is typically
 a local application or file.
@@ -508,6 +602,8 @@ a local application or file.
 B<Alternate name:> C<file>
 
 Either C<launch> or C<file> may be used; C<launch> is for compatibility with PDF::API2.
+
+=back
 
 =cut
 
@@ -525,9 +621,13 @@ sub launch {
     return $self;
 }
 
-=item $outline->pdf($pdffile, $page_number, %position, %args)
+=head3 pdf, pdf_file, pdfile
 
-=item $outline->pdf($pdffile, $page_number)
+    $outline->pdf($pdffile, $page_number, %position, %args)
+
+    $outline->pdf($pdffile, $page_number)
+
+=over
 
 Defines the destination of the outline as a PDF-file with filepath 
 C<$pdffile>, on page C<$pagenum> (default 0), and position C<%position> 
@@ -537,6 +637,8 @@ B<Alternate names:> C<pdf_file> and C<pdfile>
 
 Either C<pdf> or C<pdf_file> (or the older C<pdfile>) may be used; C<pdf> is 
 for compatibility with PDF::API2. 
+
+=back
 
 =cut
 
@@ -590,9 +692,5 @@ sub outobjdeep {
     $self->fix_outline();
     return $self->SUPER::outobjdeep(@_);
 }
-
-=back
-
-=cut
 
 1;

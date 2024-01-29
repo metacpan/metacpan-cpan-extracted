@@ -10,7 +10,7 @@ install_share dist => 'share';
 
 WriteMakefile(
     NAME               => 'Map::Tube',
-    AUTHOR             => q{Mohammad S Anwar <mohammad.anwar@yahoo.com>},
+    AUTHOR             => q{Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>},
     VERSION_FROM       => 'lib/Map/Tube.pm',
     ABSTRACT_FROM      => 'lib/Map/Tube.pm',
     LICENSE            => 'artistic_2',
@@ -48,14 +48,14 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Map::Tube'            => { file => 'lib/Map/Tube.pm'          , version => '3.68' },
-            'Map::Tube::Node'      => { file => 'lib/Map/Tube/Node.pm'     , version => '3.68' },
-            'Map::Tube::Line'      => { file => 'lib/Map/Tube/Line.pm'     , version => '3.68' },
-            'Map::Tube::Table'     => { file => 'lib/Map/Tube/Table.pm'    , version => '3.68' },
-            'Map::Tube::Route'     => { file => 'lib/Map/Tube/Route.pm'    , version => '3.68' },
-            'Map::Tube::Utils'     => { file => 'lib/Map/Tube/Utils.pm'    , version => '3.68' },
-            'Map::Tube::Types'     => { file => 'lib/Map/Tube/Types.pm'    , version => '3.68' },
-            'Map::Tube::Pluggable' => { file => 'lib/Map/Tube/Pluggable.pm', version => '3.68' },
+            'Map::Tube'            => { file => 'lib/Map/Tube.pm'          , version => '3.69' },
+            'Map::Tube::Node'      => { file => 'lib/Map/Tube/Node.pm'     , version => '3.69' },
+            'Map::Tube::Line'      => { file => 'lib/Map/Tube/Line.pm'     , version => '3.69' },
+            'Map::Tube::Table'     => { file => 'lib/Map/Tube/Table.pm'    , version => '3.69' },
+            'Map::Tube::Route'     => { file => 'lib/Map/Tube/Route.pm'    , version => '3.69' },
+            'Map::Tube::Utils'     => { file => 'lib/Map/Tube/Utils.pm'    , version => '3.69' },
+            'Map::Tube::Types'     => { file => 'lib/Map/Tube/Types.pm'    , version => '3.69' },
+            'Map::Tube::Pluggable' => { file => 'lib/Map/Tube/Pluggable.pm', version => '3.69' },
         },
         resources => {
             repository => {

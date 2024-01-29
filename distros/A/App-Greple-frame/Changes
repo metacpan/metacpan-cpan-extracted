@@ -1,5 +1,17 @@
 Revision history for Perl extension App-Greple-frame
 
+1.03 2023-12-18T08:05:39Z
+
+    - introduce --frame-cols option
+
+1.02 2023-12-14T02:52:35Z
+
+    - add --frame-pages image in the document
+
+1.01 2023-12-13T06:11:21Z
+
+    - improve --frame-pages definition
+
 1.00 2023-10-08T01:44:27Z
 
     - document --frame-pages option

@@ -40,7 +40,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 use UI::Various::core;
 
@@ -213,6 +213,38 @@ sub _update_all_references($)
 	    $_->can('_update')  and  $_->_update();
 	}
     }
+}
+
+#########################################################################
+
+=head2 B<_common_attributes> - compute array of common C<Curses::UI> attributes
+
+    my @attributes = $ui_element->_common_attributes();
+
+=head3 description:
+
+This method returns an array of attributes of a UI element that are common
+to all C<Curses::UI> widgets.
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+sub _common_attributes($)
+{
+    my ($self) = @_;
+    local $_;
+    my @attributes = ();
+    if (defined $self->{bg})
+    {
+	$_ = 'C' . UI::Various::core::_tui_color($self->{bg});
+	push(@attributes, -bg => $_, -bbg => $_);
+    }
+    if (defined $self->{fg})
+    {
+	$_ = 'C' . UI::Various::core::_tui_color($self->{fg});
+	push(@attributes, -fg => $_, -bfg => $_);
+    }
+    return @attributes;
 }
 
 #########################################################################

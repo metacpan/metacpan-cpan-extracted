@@ -8,7 +8,7 @@ use Test::Net::SSLeay qw(
 if (not can_fork()) {
     plan skip_all => "fork() not supported on this system";
 } else {
-    plan tests => 46;
+    plan tests => 47;
 }
 
 initialise_libssl();
@@ -19,7 +19,7 @@ END { kill 9,$pid if $pid }
 
 # Values that were previously looked up for get_keyblock_size test
 # Revisit: currently the only known user for get_keyblock_size is
-# EAP-FAST. How it works with AEAD ciphers is for future study.
+# EAP-FAST.
 our %non_aead_cipher_to_keyblock_size =
     (
      'RC4-MD5' => 64,
@@ -31,23 +31,30 @@ our %non_aead_cipher_to_keyblock_size =
     );
 
 our %tls_1_2_aead_cipher_to_keyblock_size = (
-     'AES128-GCM-SHA256' => 56,
-     'AES256-GCM-SHA384' => 88,
+     'AES128-GCM-SHA256' => 40,
+     'AES256-GCM-SHA384' => 72,
     );
 
-# LibreSSL uses different names for the TLSv1.3 ciphersuites:
 our %tls_1_3_aead_cipher_to_keyblock_size =
-      is_libressl()
-    ? (
-          'AEAD-AES128-GCM-SHA256'        => 56,
-          'AEAD-AES256-GCM-SHA384'        => 88,
-          'AEAD-CHACHA20-POLY1305-SHA256' => 88,
-      )
-    : (
-         'TLS_AES_128_GCM_SHA256'       => 56,
-         'TLS_AES_256_GCM_SHA384'       => 88,
-         'TLS_CHACHA20_POLY1305_SHA256' => 88,
-      );
+    (
+     'TLS_AES_128_GCM_SHA256'       => 40,
+     'TLS_AES_256_GCM_SHA384'       => 72,
+     'TLS_CHACHA20_POLY1305_SHA256' => 88,
+
+     # These are not enabled by default in OpenSSL:
+     #'TLS_AES_128_CCM_SHA256'       => 40,
+     #'TLS_AES_128_CCM_8_SHA256'     => 40,
+    );
+
+# LibreSSL initially used different names for the TLSv1.3 ciphersuites
+# but switched to to TLS_ names with version 3.5.0.  Add names needed
+# with LibresSSL 3.4.3 and earlier.
+if (is_libressl())
+{
+      $tls_1_3_aead_cipher_to_keyblock_size{'AEAD-AES128-GCM-SHA256'} = $tls_1_3_aead_cipher_to_keyblock_size{'TLS_AES_128_GCM_SHA256'};
+      $tls_1_3_aead_cipher_to_keyblock_size{'AEAD-AES256-GCM-SHA384'} = $tls_1_3_aead_cipher_to_keyblock_size{'TLS_AES_256_GCM_SHA384'};
+      $tls_1_3_aead_cipher_to_keyblock_size{'AEAD-CHACHA20-POLY1305-SHA256'} = $tls_1_3_aead_cipher_to_keyblock_size{'TLS_CHACHA20_POLY1305_SHA256'};
+}
 
 # Combine the AEAD hashes
 our %aead_cipher_to_keyblock_size = (%tls_1_2_aead_cipher_to_keyblock_size, %tls_1_3_aead_cipher_to_keyblock_size);
@@ -82,9 +89,10 @@ my $server = tcp_socket();
 	my $cl = $server->accept();
 	my $ctx = new_ctx();
 	Net::SSLeay::set_cert_and_key($ctx, $cert_pem, $key_pem);
-#	my $get_keyblock_size_ciphers = join(':', keys(%cipher_to_keyblock_size));
-	my $get_keyblock_size_ciphers = join(':', keys(%non_aead_cipher_to_keyblock_size));
+	my $get_keyblock_size_ciphers = join(':', keys(%non_aead_cipher_to_keyblock_size), keys(%tls_1_2_aead_cipher_to_keyblock_size));
 	Net::SSLeay::CTX_set_cipher_list($ctx, $get_keyblock_size_ciphers);
+	# No need to set_ciphersuites because we know keyblock size for all TLSv1.3 ciphersuites
+	#Net::SSLeay::CTX_set_ciphersuites($ctx, join(':', keys(%tls_1_3_aead_cipher_to_keyblock_size)));
 	my $ssl = Net::SSLeay::new($ctx);
 
 	Net::SSLeay::set_fd($ssl, fileno($cl));
@@ -126,6 +134,7 @@ sub client {
     client_test_finished($ssl);
     client_test_keyblock_size($ssl);
     client_test_version_funcs($ssl);
+    client_test_post_handshake_funcs($ssl);
 
     # Tell the server to quit and see that our connection is still up
     my $end = "end";
@@ -236,13 +245,42 @@ sub client_test_version_funcs
 	} else {
 	    is(Net::SSLeay::client_version($ssl), $version, 'Net::SSLeay::client_version equals to Net::SSLeay::version');
 	}
-	is(Net::SSLeay::is_dtls($ssl), 0, 'Net::SSLeay::is_dtls returns 0');
     } else
     {
       SKIP: {
-	  skip('Do not have Net::SSLeay::client_version nor Net::SSLeay::is_dtls', 2);
+	  skip('Do not have Net::SSLeay::client_version', 1);
 	};
     }
+
+    if (defined &Net::SSLeay::is_dtls) {
+	is(Net::SSLeay::is_dtls($ssl), 0, 'Net::SSLeay::is_dtls returns 0');
+    } else {
+      SKIP: {
+	  skip('Do not have Net::SSLeay::is_dtls', 1);
+	};
+    }
+
+    return;
+}
+
+# Test a variety of functions that are valid after a handshake
+sub client_test_post_handshake_funcs
+{
+    my ($ssl) = @_;
+
+    unless (defined &Net::SSLeay::CIPHER_get_handshake_digest) {
+      SKIP: {
+	  skip('Do not have Net::SSLeay::CIPHER_get_handshake_digest', 1);
+	};
+	return;
+    }
+
+    # We could test this without an SSL, but now we don't need to
+    # worry about knowing which CIPHERs are available.
+    my $cipher = Net::SSLeay::get_current_cipher($ssl);
+    my $md = Net::SSLeay::CIPHER_get_handshake_digest($cipher);
+    my $nid = Net::SSLeay::EVP_MD_type($md);
+    isnt($nid, Net::SSLeay::NID_undef(), "Net::SSLeay::CIPHER_get_handshake_digest returns MD with a NID: $nid, " . Net::SSLeay::OBJ_nid2sn($nid));
 
     return;
 }

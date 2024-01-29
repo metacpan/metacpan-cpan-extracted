@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Dumpfile 0.51;
+package Devel::MAT::Dumpfile 0.52;
 
 use v5.14;
 use warnings;
@@ -471,15 +471,15 @@ sub _read_sv
          }
          else {
             my $sv_addr = $self->_read_ptr;
-            my $sv = $self->sv_at( $sv_addr );
+            my @args = $self->_read_bytesptrsstrs( @$sizes );
 
-            if( my $code = $self->can( sprintf "_read_svx_%02X", $type ) ) {
-               $self->$code( $sv, $self->_read_bytesptrsstrs( @$sizes ) );
-            }
-            else {
-               warn sprintf "Skipping unrecognised SVx 0x%02X\n", $type;
-               $self->_read_bytesptrsstrs( @$sizes ); # ignore
-            }
+            my $sv = $self->sv_at( $sv_addr ) or
+               warn( sprintf "Skipping SVx 0x%02X on missing SV at addr 0x%X\n", $type, $sv_addr ), next;
+
+            my $code = $self->can( sprintf "_read_svx_%02X", $type ) or
+               warn( sprintf "Skipping unrecognised SVx 0x%02X\n", $type ), next;
+
+            $self->$code( $sv, @args );
          }
 
          next;

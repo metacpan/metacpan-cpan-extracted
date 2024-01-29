@@ -139,8 +139,9 @@ kinds in the heap:
 
 We can inspect the callstack at the time the heap dump was made:
 
-  pmat> callstack
-  program.pl line 152: &main::func => void
+  pmat> callers
+  caller(0): CODE(PP) at 0x55555582a4e8=&main::__ANON__ => void
+    at t/test.pl line 49
     $_[0]: SCALAR(PV) at 0x55c2bdce2778 = "arguments"
     $_[1]: SCALAR(PV) at 0x55c2bdce2868 = "go"
     $_[2]: SCALAR(PV) at 0x55c2bdce26e8 = "here"
@@ -152,7 +153,7 @@ A list of the commands currently available in the shell can be found by the
 C<help> command:
 
   pmat> help
-  callstack - Display the call stack
+  callers   - Display the caller stack
   count     - Count the various kinds of SV
   elems     - List the elements of an ARRAY SV
   ...

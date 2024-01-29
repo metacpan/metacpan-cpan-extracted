@@ -32,12 +32,6 @@ pictures or icons (unless the later are part of the character set used) need
 alternative descriptions for the text based interfaces, which can make a big
 difference in the usability.
 
-Currently the module is still missing some of its planned frills like
-alignment, colour, exact positioning, graphics, pictures or icons.  At least
-the first two of this list will be added in later versions.  The essential
-functionality is ready to be used and will be tested / used by another
-project developed before further enhancements on this one.
-
 # DESCRIPTION
 
 UI::Various is a user interface (UI) choosing the best available UI from a
@@ -120,6 +114,14 @@ than 12 lines).  This seems to be especially for script #41 some FreeBSD
 systems, where `stty -a` reports 0 rows/columns.  (Outside of
 `[Curses::UI](https://metacpan.org/pod/Curses%3A%3AUI)` the module now uses a default size of 24 x 80 in those
 cases.)
+
+Colours in [Curses::UI](https://metacpan.org/pod/Curses%3A%3AUI) may behave strange and/or wrong and also leave the
+previously defined colours in a messed up state.
+
+There are probably other quirks in the display, even though the unit-tests
+have a coverage of almost 100% (see `builder/confess-uncoverable.lst` for
+the complete list of statements, branches and conditions that could not be
+covered).
 
 # METHODS
 

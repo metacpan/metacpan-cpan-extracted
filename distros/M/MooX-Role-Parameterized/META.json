@@ -1,0 +1,64 @@
+{
+   "abstract" : "roles with composition parameters",
+   "author" : [
+      "Tiago Peczenyj <tiago.peczenyj+cpan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MooX-Role-Parameterized",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "2",
+            "MooX::BuildClass" : "0.21336",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.43",
+            "Test::More" : "0.94",
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/peczenyj/MooX-Role-Parameterized/issues"
+      },
+      "homepage" : "https://github.com/peczenyj/MooX-Role-Parameterized",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/peczenyj/MooX-Role-Parameterized.git",
+         "web" : "https://github.com/peczenyj/MooX-Role-Parameterized"
+      }
+   },
+   "version" : "0.501",
+   "x_authority" : "cpan:PACMAN"
+}

@@ -1,0 +1,34 @@
+---
+abstract: 'SVG renderer for PDF::API2'
+author:
+  - 'Johan Vromans <jvromans@squirrel.nl>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.24'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SVGPDF
+no_index:
+  directory:
+    - t
+    - inc
+    - lib/SVGPDF
+provides:
+  SVGPDF:
+    file: lib/SVGPDF.pm
+    version: '0.084'
+requires:
+  File::LoadLines: '1.044'
+  Image::Info: '1.42'
+  Object::Pad: '0.78'
+  PDF::API2: '2.043'
+  perl: '5.026'
+resources:
+  license: https://dev.perl.org/licenses/
+version: '0.084'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

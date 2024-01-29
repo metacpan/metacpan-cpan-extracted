@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Path;
 # ABSTRACT: Directed sequence of relationships between two nodes
-$Neo4j::Driver::Type::Path::VERSION = '0.41';
+$Neo4j::Driver::Type::Path::VERSION = '0.42';
 
 use parent 'Neo4j::Types::Path';
 use overload '@{}' => \&_array, fallback => 1;
@@ -76,7 +76,7 @@ Neo4j::Driver::Type::Path - Directed sequence of relationships between two nodes
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 SYNOPSIS
 
@@ -162,10 +162,7 @@ L<Path (Java)|https://neo4j.com/docs/api/java-driver/5.2/org.neo4j.driver/org/ne
 
 =head1 AUTHOR
 
-Arne Johannessen <ajnn@cpan.org>
-
-If you contact me by email, please make sure you include the word
-"Perl" in your subject header to help beat the spam filters.
+Arne Johannessen (L<AJNN|https://arne.johannessen.de/>)
 
 =head1 COPYRIGHT AND LICENSE
 

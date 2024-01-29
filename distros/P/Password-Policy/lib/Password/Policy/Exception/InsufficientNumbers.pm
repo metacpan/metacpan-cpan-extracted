@@ -1,5 +1,5 @@
 package Password::Policy::Exception::InsufficientNumbers;
-$Password::Policy::Exception::InsufficientNumbers::VERSION = '0.04';
+$Password::Policy::Exception::InsufficientNumbers::VERSION = '0.06';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Password::Policy::Exception::InsufficientNumbers
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 AUTHOR
 

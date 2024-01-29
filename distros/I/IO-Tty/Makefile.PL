@@ -37,7 +37,7 @@ $^W=1;
 
 my %define;
 my @libs;
-my $Package_Version = '1.18';  # keep this consistent with Tty.pm
+my $Package_Version = '1.20';  # keep this consistent with Tty.pm
 my $Is_Beta = ($Package_Version =~ m/_/);
 
 open(SUB, ">xssubs.c") or die "open: $!";
@@ -174,7 +174,7 @@ ESQ
 
   close(TST);
   print "Looking for $f()" . "." x (13-length($f)) . " ";
-  if (system("$cfg{'cc'} $flags -Wl,--no-undefined $funcs{$f} functest_$f.c > functest_$f.log 2>&1")) {
+  if (system("$cfg{'cc'} $flags $funcs{$f} functest_$f.c > functest_$f.log 2>&1")) {
     print "not found.\n";
   } else {
     $define{"-DHAVE_\U$f"} = undef;

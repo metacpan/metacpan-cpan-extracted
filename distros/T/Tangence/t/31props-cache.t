@@ -5,8 +5,10 @@ use warnings;
 
 use Future::AsyncAwait 0.47;
 
-use Test::More;
-use Test::Memory::Cycle;
+use Test2::V0;
+use constant HAVE_TEST_MEMORY_CYCLE => defined eval {
+   require Test::Memory::Cycle; Test::Memory::Cycle->import;
+};
 
 use Tangence::Constants;
 use Tangence::Registry;
@@ -53,7 +55,7 @@ await $proxy->watch_property_with_initial( "hash",
    on_updated => sub { $hash_changed = 1 },
 );
 
-is_deeply( $proxy->prop( "hash" ),
+is( $proxy->prop( "hash" ),
            { one => 1, two => 2, three => 3 },
            'hash property cache' );
 
@@ -62,7 +64,7 @@ await $proxy->watch_property_with_initial( "array",
    on_updated => sub { $array_changed = 1 },
 );
 
-is_deeply( $proxy->prop( "array" ),
+is( $proxy->prop( "array" ),
            [ 1, 2, 3 ],
            'array property cache' );
 
@@ -73,10 +75,10 @@ $array_changed = 0;
 is( $proxy->prop( "scalar" ), 
     "1234",
     "scalar property cache after update" );
-is_deeply( $proxy->prop( "hash" ), 
+is( $proxy->prop( "hash" ), 
            { one => 1, two => 2, three => 3, four => 4 },
            'hash property cache after update' );
-is_deeply( $proxy->prop( "array" ),
+is( $proxy->prop( "array" ),
            [ 1, 2, 3, 4 ],
            'array property cache after update' );
 
@@ -86,7 +88,7 @@ $obj->add_number( five => 4 );
 
 ok( !$scalar_changed, 'scalar unchanged' );
 ok( !$array_changed,  'array unchanged' );
-is_deeply( $proxy->prop( "hash" ),
+is( $proxy->prop( "hash" ),
            { one => 1, two => 2, three => 3, four => 4, five => 4 },
            'hash property cache after wrong five' );
 
@@ -97,10 +99,10 @@ $obj->add_number( five => 5 );
 is( $proxy->prop( "scalar" ),
     "12345",
     "scalar property cache after five" );
-is_deeply( $proxy->prop( "hash" ),
+is( $proxy->prop( "hash" ),
            { one => 1, two => 2, three => 3, four => 4, five => 5 },
            'hash property cache after five' );
-is_deeply( $proxy->prop( "array" ),
+is( $proxy->prop( "array" ),
            [ 1, 2, 3, 4, 5 ],
            'array property cache after five' );
 
@@ -111,10 +113,10 @@ $obj->del_number( 3 );
 is( $proxy->prop( "scalar" ),
     "1245",
     "scalar property cache after delete three" );
-is_deeply( $proxy->prop( "hash" ),
+is( $proxy->prop( "hash" ),
            { one => 1, two => 2, four => 4, five => 5 },
            'hash property cache after delete three' );
-is_deeply( $proxy->prop( "array" ),
+is( $proxy->prop( "array" ),
            [ 1, 2, 4, 5 ],
            'array property cache after delete three' );
 
@@ -124,17 +126,17 @@ $obj->set_prop_array( [ 0 .. 9 ] );
 
 $obj->move_prop_array( 3, 2 );
 
-is_deeply( $proxy->prop( "array" ),
+is( $proxy->prop( "array" ),
            [ 0, 1, 2, 4, 5, 3, 6, 7, 8, 9 ],
            'array property cacahe after move(+2)' );
 
 $obj->move_prop_array( 5, -2 );
 
-is_deeply( $proxy->prop( "array" ),
+is( $proxy->prop( "array" ),
            [ 0 .. 9 ],
            'array property cacahe after move(-2)' );
 
-{
+if(HAVE_TEST_MEMORY_CYCLE) {
    no warnings 'redefine';
    local *Tangence::Property::Instance::_forbid_arrayification = sub {};
 

@@ -9,7 +9,7 @@
 #
 package Lemonldap::NG::Portal::Main::Run;
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.18.0';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -36,11 +36,11 @@ sub authProcess { qw(extractFormInfo getUser authenticate) }
 
 sub sessionData {
     return qw(setAuthSessionInfo setSessionInfo), $_[0]->groupsAndMacros,
-      qw(setPersistentSessionInfo setLocalGroups store secondFactor);
+      qw(setPersistentSessionInfo setLocalGroups rememberBrowserCheck store secondFactor);
 }
 
 sub validSession {
-    qw(storeHistory buildCookie);
+    qw(storeHistory rememberBrowser buildCookie);
 }
 
 # RESPONSE HANDLER
@@ -264,11 +264,18 @@ sub logout {
             'importHandlerData',      'controlUrl',
             @{ $self->beforeLogout }, 'authLogout',
             'deleteSession'
-        ]
+        ],
+        1,    # No fail: logout should continue even if errors
     );
 }
 
 sub unauthLogout {
+    my ( $self, $req ) = @_;
+    $self->_unauthLogout($req);
+    return $self->do( $req, [ 'controlUrl', sub { PE_LOGOUT_OK } ] );
+}
+
+sub _unauthLogout {
     my ( $self, $req ) = @_;
     $self->userLogger->info('Unauthenticated logout request');
     $self->logger->debug('Cleaning pdata');
@@ -283,17 +290,16 @@ sub unauthLogout {
             value   => 0
         )
     );
-    return $self->do( $req, [ sub { PE_LOGOUT_OK } ] );
 }
 
 # RUNNING METHODS
 # ---------------
 
 sub do {
-    my ( $self, $req, $steps ) = @_;
+    my ( $self, $req, $steps, $nofail ) = @_;
     $req->steps($steps);
     $req->data->{activeTimer} = $self->conf->{activeTimer};
-    my $err = $req->error( $self->process($req) );
+    my $err = $req->error( $self->process( $req, nofail => $nofail ) );
 
     # Update status
     if ( my $p = $self->HANDLER->tsv->{statusPipe} ) {
@@ -928,21 +934,14 @@ sub getTrOver {
 sub sendHtml {
     my ( $self, $req, $template, %args ) = @_;
 
-    my $templateDir = $self->conf->{templateDir} . '/' . $self->getSkin($req);
-    my $defaultTemplateDir = $self->conf->{templateDir} . '/bootstrap';
-    $self->templateDir( [ $templateDir, $defaultTemplateDir ] );
+    my $skin_template_dir =
+      $self->conf->{templateDir} . '/' . $self->getSkin($req);
 
-    # Check template
-    $args{templateDir} = $templateDir;
-    my $tmpl = $args{templateDir} . "/$template.tpl";
-    unless ( -f $tmpl ) {
-        $self->logger->debug("Template $tmpl not found");
-        $args{templateDir} = $self->conf->{templateDir} . '/bootstrap';
-        $tmpl = $args{templateDir} . "/$template.tpl";
-        $self->logger->debug("-> Trying to load $tmpl");
-    }
+    # Look for templates in skin subdirectories instead of templateDir
+    $args{templateDir} =
+      [ $skin_template_dir, $self->templateDir . "/bootstrap" ];
 
-    $args{params}->{TROVER} = $self->getTrOver( $req, $templateDir );
+    $args{params}->{TROVER} = $self->getTrOver( $req, $skin_template_dir );
 
     $self->processHook( $req, 'sendHtml', \$template, \%args );
 
@@ -1389,6 +1388,28 @@ sub buildUrl {
     }
     $uri->path_segments(@pathSg);
     return $uri->as_string;
+}
+
+sub rememberBrowser {
+    my ( $self, $req ) = @_;
+
+    if ( $self->_trustedBrowser and $self->_trustedBrowser->can("newDevice") ) {
+        return $self->_trustedBrowser->newDevice($req);
+    }
+    else {
+        return PE_OK;
+    }
+}
+
+sub rememberBrowserCheck {
+    my ( $self, $req ) = @_;
+
+    if ( $self->_trustedBrowser and $self->_trustedBrowser->can("check") ) {
+        return $self->_trustedBrowser->check($req);
+    }
+    else {
+        return PE_OK;
+    }
 }
 
 1;

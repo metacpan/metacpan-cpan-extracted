@@ -1,5 +1,8 @@
 Revision history for Business-GoCardless
 
+0.40     2024-01-26
+        - Add payout_id, mandate_id, and creditor_id accessor to Payment object
+
 0.39     2023-09-01
         - Add funds_settlement (and is managed/is_direct) to Mandate object
 

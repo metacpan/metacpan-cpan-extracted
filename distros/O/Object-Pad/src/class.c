@@ -283,7 +283,7 @@ static void S_make_instance_fields(pTHX_ const ClassMeta *classmeta, SV *fieldst
     make_instance_fields(classmeta->cls.supermeta, fieldstore, 0);
   }
 
-  AV *fields = classmeta->direct_fields;
+  AV *fields = classmeta->fields;
   I32 nfields = av_count(fields);
 
   if(SvTYPE(fieldstore) == SVt_PVAV)
@@ -292,6 +292,8 @@ static void S_make_instance_fields(pTHX_ const ClassMeta *classmeta, SV *fieldst
   I32 i;
   for(i = 0; i < nfields; i++) {
     FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+    if(!fieldmeta->is_direct)
+      continue;
     char sigil = SvPV_nolen(fieldmeta->name)[0];
 
     FIELDOFFSET fieldix = fieldmeta->fieldix + roleoffset;
@@ -351,12 +353,14 @@ static void S_alias_fieldkeys_into_av(pTHX_ ClassMeta *classmeta, HV *hv, AV *ba
   if(classmeta->cls.supermeta)
     alias_fieldkeys_into_av(classmeta->cls.supermeta, hv, backingav);
 
-  AV *fields = classmeta->direct_fields;
+  AV *fields = classmeta->fields;
   I32 nfields = av_count(fields);
 
   I32 i;
   for(i = 0; i < nfields; i++) {
     FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+    if(!fieldmeta->is_direct)
+      continue;
 
     SV *fieldkey = newSVpvf("%" SVf "/%" SVf, classmeta->name, fieldmeta->name);
     HE *he = hv_fetch_ent(hv, fieldkey, 1, 0);
@@ -575,20 +579,20 @@ void ObjectPad__start_method_parse(pTHX_ ClassMeta *meta, bool is_common)
   intro_my();
 }
 
-void ObjectPad__add_fields_to_pad(pTHX_ ClassMeta *meta, FIELDOFFSET since_fieldix)
+void ObjectPad__add_fields_to_pad(pTHX_ ClassMeta *meta, U32 since_field)
 {
-  AV *fields = meta->direct_fields;
+  AV *fields = meta->fields;
   U32 nfields = av_count(fields);
 
   U32 i;
-  for(i = 0; i < nfields; i++) {
+  for(i = since_field; i < nfields; i++) {
     FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
-    if(fieldmeta->fieldix < since_fieldix)
-      continue;
 
     /* Skip the anonymous ones */
     if(SvCUR(fieldmeta->name) < 2)
       continue;
+
+    /* includes the non-direct ones */
 
     /* Claim these are all STATE variables just to quiet the "will not stay
      * shared" warning */
@@ -643,7 +647,8 @@ static PADOFFSET S_find_padix_for_field(pTHX_ FieldMeta *fieldmeta)
 static OP *S_make_methstart_ops(pTHX_ ClassMeta *meta, CV *outerscope)
 {
   U8 opf_special_if_role = (meta->type == METATYPE_ROLE) ? OPf_SPECIAL : 0;
-  I32 nfields = av_count(meta->direct_fields);
+  AV *fields = meta->fields;
+  I32 nfields = av_count(fields);
 
   PADNAMELIST *fieldnames = outerscope ? PadlistNAMES(CvPADLIST(outerscope)) : NULL;
   PADNAME **snames = fieldnames ? PadnamelistARRAY(fieldnames) : NULL;
@@ -668,7 +673,7 @@ static OP *S_make_methstart_ops(pTHX_ ClassMeta *meta, CV *outerscope)
 
   int i;
   for(i = 0; i < nfields; i++) {
-    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(meta->direct_fields)[i];
+    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
 
     if(snames) {
       PADNAME *fieldname = snames[i + 1];
@@ -1029,6 +1034,8 @@ MethodMeta *ObjectPad_mop_class_add_method(pTHX_ ClassMeta *meta, SV *methodname
 {
   AV *methods = meta->direct_methods;
 
+  if(!meta->begun)
+    croak("Cannot add a new method to a class that is not yet begun");
   if(meta->sealed)
     croak("Cannot add a new method to an already-sealed class");
 
@@ -1079,9 +1086,9 @@ MethodMeta *ObjectPad_mop_class_add_method_cv(pTHX_ ClassMeta *meta, SV *methodn
 
 FieldMeta *ObjectPad_mop_class_add_field(pTHX_ ClassMeta *meta, SV *fieldname)
 {
-  AV *fields = meta->direct_fields;
+  AV *fields = meta->fields;
 
-  if(meta->next_fieldix == -1)
+  if(!meta->begun)
     croak("Cannot add a new field to a class that is not yet begun");
   if(meta->sealed)
     croak("Cannot add a new field to an already-sealed class");
@@ -1099,17 +1106,10 @@ FieldMeta *ObjectPad_mop_class_add_field(pTHX_ ClassMeta *meta, SV *fieldname)
       croak("fieldname must begin with a sigil");
   }
 
-  U32 i;
-  for(i = 0; i < av_count(fields); i++) {
-    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
-    if(SvCUR(fieldmeta->name) < 2)
-      continue;
+  if(mop_class_find_field(meta, fieldname, 0))
+    croak("Cannot add another field named %" SVf, fieldname);
 
-    if(sv_eq(fieldmeta->name, fieldname))
-      croak("Cannot add another field named %" SVf, fieldname);
-  }
-
-  FieldMeta *fieldmeta = mop_create_field(fieldname, meta);
+  FieldMeta *fieldmeta = mop_create_field(fieldname, meta->next_fieldix, meta);
 
   av_push(fields, (SV *)fieldmeta);
   meta->next_fieldix++;
@@ -1119,8 +1119,32 @@ FieldMeta *ObjectPad_mop_class_add_field(pTHX_ ClassMeta *meta, SV *fieldname)
   return fieldmeta;
 }
 
+FieldMeta *ObjectPad_mop_class_find_field(pTHX_ ClassMeta *meta, SV *fieldname, U32 flags)
+{
+  AV *fields = meta->fields;
+
+  U32 i, nfields = av_count(fields);
+  for(i = 0; i < nfields; i++) {
+    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+    if(SvCUR(fieldmeta->name) < 2)
+      continue;
+
+    if((flags & FIND_FIELD_ONLY_DIRECT) && !(fieldmeta->is_direct))
+      continue;
+    if((flags & FIND_FIELD_ONLY_INHERITABLE) && !(fieldmeta->is_inheritable))
+      continue;
+
+    if(sv_eq(fieldmeta->name, fieldname))
+      return fieldmeta;
+  }
+
+  return NULL;
+}
+
 void ObjectPad_mop_class_add_BUILD(pTHX_ ClassMeta *meta, CV *cv)
 {
+  if(!meta->begun)
+    croak("Cannot add a new BUILD block to a class that is not yet begun");
   if(meta->sealed)
     croak("Cannot add a BUILD block to an already-sealed class");
   if(meta->strict_params)
@@ -1134,6 +1158,8 @@ void ObjectPad_mop_class_add_BUILD(pTHX_ ClassMeta *meta, CV *cv)
 
 void ObjectPad_mop_class_add_ADJUST(pTHX_ ClassMeta *meta, CV *cv)
 {
+  if(!meta->begun)
+    croak("Cannot add a new ADJUST block to a class that is not yet begun");
   if(meta->sealed)
     croak("Cannot add an ADJUST(PARAMS) block to an already-sealed class");
 
@@ -1151,6 +1177,9 @@ void ObjectPad_mop_class_add_required_method(pTHX_ ClassMeta *meta, SV *methodna
 {
   if(meta->type != METATYPE_ROLE)
     croak("Can only add a required method to a role");
+
+  if(!meta->begun)
+    croak("Cannot add a new required method to a class that is not yet begun");
   if(meta->sealed)
     croak("Cannot add a new required method to an already-sealed class");
 
@@ -1277,6 +1306,8 @@ static RoleEmbedding *S_embed_role(pTHX_ ClassMeta *classmeta, ClassMeta *roleme
 
 void ObjectPad_mop_class_add_role(pTHX_ ClassMeta *dstmeta, ClassMeta *rolemeta)
 {
+  if(!dstmeta->begun)
+    croak("Cannot add a new role to a class that is not yet begun");
   if(dstmeta->sealed)
     croak("Cannot add a role to an already-sealed class");
   /* Can't currently do this as it breaks t/77mop-create-role.t
@@ -1435,7 +1466,7 @@ static void S_mop_class_apply_role(pTHX_ RoleEmbedding *embedding)
     }
   }
 
-  classmeta->next_fieldix += av_count(rolemeta->direct_fields);
+  classmeta->next_fieldix += rolemeta->next_fieldix;
 
   /* TODO: Run an APPLY block if the role has one */
 }
@@ -1605,6 +1636,8 @@ static void S_generate_initfields_method(pTHX_ ClassMeta *meta)
 
 void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
 {
+  if(!meta->begun)
+    mop_class_begin(meta);
   if(meta->sealed) /* idempotent */
     return;
 
@@ -1640,6 +1673,8 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
     }
 
     GV *gv = gv_fetchmeth_pvs(meta->stash, "BUILDARGS", -1, 0);
+    assert(gv); assert(SvTYPE(gv) == SVt_PVGV);
+
     if(GvSTASH(gv) != gv_stashpvs("Object::Pad::UNIVERSAL", 0))
       meta->has_buildargs = true;
   }
@@ -1649,9 +1684,12 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
       SVfARG(meta->name));
 
   {
+    AV *fields = meta->fields;
+    U32 nfields = av_count(fields);
+
     U32 i;
-    for(i = 0; i < av_count(meta->direct_fields); i++) {
-      FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(meta->direct_fields)[i];
+    for(i = 0; i < nfields; i++) {
+      FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
 
       U32 hooki;
       for(hooki = 0; fieldmeta->hooks && hooki < av_count(fieldmeta->hooks); hooki++) {
@@ -2236,7 +2274,7 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
 
     .next_fieldix = -1,
 
-    .direct_fields  = newAV(),
+    .fields         = newAV(),
     .direct_methods = newAV(),
     .requiremethods = newAV(),
   };
@@ -2304,7 +2342,7 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
     prepare_adjust_params(meta);
     meta->adjust_params = newAV();
 
-    meta->next_fieldix_for_adjust = meta->next_fieldix;
+    meta->next_field_for_adjust = 0;
 
     LEAVE_SCOPE(floor_ix);
   }
@@ -2457,27 +2495,89 @@ void ObjectPad_mop_class_set_superclass(pTHX_ ClassMeta *meta, SV *superclassnam
       croak("Unable to find SUPER::new for %" SVf, superclassname);
 
     meta->cls.foreign_does = fetch_superclass_method_pv(meta->stash, "DOES", 4, -1);
-
-    av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
   }
 
   meta->has_superclass = true;
   meta->cls.supermeta = supermeta;
 }
 
+void ObjectPad_mop_class_load_and_set_superclass(pTHX_ ClassMeta *class, SV *supername, SV *superver)
+{
+  if(class->type != METATYPE_CLASS)
+    croak("Only a class may extend another");
+
+  HV *superstash = gv_stashsv(supername, 0);
+  if(!superstash || !hv_fetchs(superstash, "new", 0)) {
+    /* Try to `require` the module then attempt a second time */
+    /* load_module() will modify the name argument and take ownership of it */
+    load_module(PERL_LOADMOD_NOIMPORT, newSVsv(supername), NULL, NULL);
+    superstash = gv_stashsv(supername, 0);
+  }
+
+  if(!superstash)
+    croak("Superclass %" SVf " does not exist", supername);
+
+  if(superver && SvOK(superver))
+    ensure_module_version(supername, superver);
+
+  mop_class_set_superclass(class, supername);
+}
+
+void ObjectPad_mop_class_inherit_from_superclass(pTHX_ ClassMeta *meta, SV **args, size_t nargs)
+{
+  if(!meta->begun)
+    croak("Cannot inherit into a class that is not yet begun");
+  if(meta->sealed)
+    croak("Cannot inherit into an already-sealed class");
+
+  ClassMeta *supermeta = meta->cls.supermeta;
+  if(meta->type != METATYPE_CLASS || !supermeta)
+    croak("Cannot inherit into a non-class or from a non-Object::Pad-based superclass");
+
+  for(int i = 0; i < nargs; i++) {
+    SV *arg = args[i];
+
+    if(SvPVX(arg)[0] == '$') {
+      /* A field name */
+      FieldMeta *superfield = mop_class_find_field(supermeta, arg, FIND_FIELD_ONLY_INHERITABLE);
+      if(!superfield)
+        croak("Superclass does not have a field named %" SVf " (or it is not :inheritable",
+          SVfARG(arg));
+      assert(superfield->fieldix < meta->next_fieldix);
+
+      if(mop_class_find_field(meta, arg, 0))
+        croak("Cannot add another field named %" SVf, arg);
+
+      FieldMeta *fieldmeta = mop_create_field(superfield->name, superfield->fieldix, meta);
+      fieldmeta->is_direct = false;
+
+      av_push(meta->fields, (SV *)fieldmeta);
+      /* TODO: Think about running some field hooks?? */
+    }
+    else
+      croak("Unrecognised inherit argument '%" SVf "'", SVfARG(arg));
+  }
+}
+
 void ObjectPad_mop_class_begin(pTHX_ ClassMeta *meta)
 {
+  if(meta->begun)
+    /* idempotent */
+    return;
+
   SV *isaname = newSVpvf("%" SVf "::ISA", meta->name);
   SAVEFREESV(isaname);
 
-  AV *isa = get_av(SvPV_nolen(isaname), GV_ADD | (SvFLAGS(isaname) & SVf_UTF8));
-  if(!av_count(isa))
+  if(meta->type == METATYPE_CLASS && !meta->cls.supermeta) {
+    AV *isa = get_av(SvPV_nolen(isaname), GV_ADD | (SvFLAGS(isaname) & SVf_UTF8));
     av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
+  }
 
   if(meta->type == METATYPE_CLASS &&
       meta->repr == REPR_AUTOSELECT && !meta->cls.foreign_new)
     meta->repr = REPR_NATIVE;
 
+  meta->begun = true;
   meta->next_fieldix = meta->start_fieldix;
 }
 
@@ -2539,24 +2639,7 @@ static bool classhook_isa_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **attr
   if(*end)
     croak("Unexpected characters while parsing :isa() attribute: %s", end);
 
-  if(classmeta->type != METATYPE_CLASS)
-    croak("Only a class may extend another");
-
-  HV *superstash = gv_stashsv(superclassname, 0);
-  if(!superstash || !hv_fetchs(superstash, "new", 0)) {
-    /* Try to `require` the module then attempt a second time */
-    /* load_module() will modify the name argument and take ownership of it */
-    load_module(PERL_LOADMOD_NOIMPORT, newSVsv(superclassname), NULL, NULL);
-    superstash = gv_stashsv(superclassname, 0);
-  }
-
-  if(!superstash)
-    croak("Superclass %" SVf " does not exist", superclassname);
-
-  if(superclassver && SvOK(superclassver))
-    ensure_module_version(superclassname, superclassver);
-
-  mop_class_set_superclass(classmeta, superclassname);
+  mop_class_load_and_set_superclass(classmeta, superclassname, superclassver);
 
   return FALSE;
 }
@@ -2579,6 +2662,8 @@ static bool classhook_does_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **att
 
   if(*end)
     croak("Unexpected characters while parsing :does() attribute: %s", end);
+
+  mop_class_begin(classmeta);
 
   mop_class_load_and_add_role(classmeta, rolename, rolever);
 

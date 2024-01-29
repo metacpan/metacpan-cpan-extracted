@@ -22,6 +22,6 @@ requires:
   Data::CosineSimilarity: '0.02'
   HTTP::Tiny: '0.014'
   JSON::PP: '2.00'
-  perl: '5.006'
-version: '1.01'
+  perl: '5.010'
+version: '1.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

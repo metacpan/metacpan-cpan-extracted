@@ -3,8 +3,8 @@ package PDF::Builder::FontManager;
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.025'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use Carp;
 use Scalar::Util qw(weaken);
@@ -95,9 +95,11 @@ created earlier, the saved C<$font> will be returned.
 
 =head1 METHODS
 
-=over
+=head2 new
 
-=item PDF::Builder::FontManager->new(%opts)
+    PDF::Builder::FontManager->new(%opts)
+
+=over
 
 This is called from Builder.pm's C<new()>. Currently there are no options
 selectable. It will set up the font manager system and preload it with the
@@ -106,6 +108,8 @@ serif face (core Times-Roman), sans-serif face (core Helvetica), constant
 width (fixed pitch) face (core Courier), and a symbol font (core Symbol).
 There is no default for a script (cursive) font unless you set one using
 the C<font_settings()> method.
+
+=back
 
 =cut
 
@@ -118,6 +122,7 @@ sub new {
    #$class = ref($class) if ref($class);
    #my $self = $class->SUPER::new($pdf);
     $self->{' pdf'} = $pdf;
+    weaken $self->{' pdf'};
 
     # current font is default font until face explicitly changed.
     # Times face should be element 0 of the font-list array.
@@ -148,9 +153,13 @@ sub new {
     return $self;
 } # end of new()
 
-=item @list = $pdf->font_settings()  # Get
+=head2 font_settings
 
-=item $pdf->font_settings(%info)  # Set
+    @list = $pdf->font_settings()  # Get
+
+    $pdf->font_settings(%info)  # Set
+
+=over
 
 Get or set some information about fonts, particularly the fonts to be used for
 "generic" purposes.
@@ -172,6 +181,8 @@ generic script face is C<undef>).
     'script' => face to use for the generic script face (uninitialized)
     'symbol' => face to use for the generic symbol face 
                 (initialized to Symbol)
+
+=back
 
 =cut
 
@@ -251,7 +262,11 @@ sub font_settings {
     return;
 }
 
-=item $rc = $pdf->add_font_path("a directory path", %opts)
+=head2 add_font_path
+
+    $rc = $pdf->add_font_path("a directory path", %opts)
+
+=over
 
 This method adds one search path to the list of paths to search. In the
 C<get_font()> method, each defined search path will be prepended to the C<file> 
@@ -300,6 +315,8 @@ was a problem encountered (and a message was issued).
 
 No options are currently defined.
 
+=back
+
 =cut
 
 sub add_font_path {
@@ -314,7 +331,11 @@ sub add_font_path {
     return $rc;
 } # end of add_font_path()
 
-=item $rc = add_font(%info)
+=head2 add_font
+
+    $rc = add_font(%info)
+
+=over
 
 Add a new font entry (by face and variants) to the Font Manager's list of
 known fonts.
@@ -484,6 +505,8 @@ You I<can> give the entire path of the font's source file, in an absolute
 path, if you wish. However, it's usually less typing to use C<add_font_path()>
 to specify a list of font directories to search, and only give the name (and
 perhaps a subdirectory) for the path here in C<add_font()>.
+
+=back
 
 =back
 
@@ -698,9 +721,11 @@ sub _initialize_core {
 
 ## for some reason, this is uncallable from Content::Text
 ## try to fix it... it belongs here and not in Text.pm
-#=over
+#=head2 get_fv_extents
 #
-#=item ($ascender, $descender, $d_leading) = $pdf->get_fv_extents($font_size, $leading)
+#    ($ascender, $descender, $d_leading) = $pdf->get_fv_extents($font_size, $leading)
+#
+#=over
 #
 #Get the I<current> font's vertical extents (points above and below the
 #baseline), scaled by font_size, and leading is added to the descender amount.
@@ -710,6 +735,8 @@ sub _initialize_core {
 #Note that the extents are the maximum values defined for this particular 
 #I<font>, and not what the particular text's ascenders and descenders are 
 #actually using.
+#
+#=back
 #
 #=cut
 #
@@ -729,9 +756,13 @@ sub _initialize_core {
 #    return ($ascender, $descender, $descender-($leading-1.0)*$font_size);
 #} # end of get_fv_extents()
 
-=item @current = $pdf->get_font()  # Get
+=head2 get_font
 
-=item $font = $pdf->get_font(%info)  # Set
+    @current = $pdf->get_font()  # Get
+
+    $font = $pdf->get_font(%info)  # Set
+
+=over
 
 If no parameters are given (C<@current = $pdf-E<gt>get_font()>), a list
 (array) is returned giving the I<current> font setting: I<face> name, I<italic> 
@@ -777,6 +808,8 @@ value is 0 or 1 for "off" (Roman/upright posture) and "on" (italic posture).
 This requests use of the bold (heavy weight) variant of the font, in
 either the current face (C<face> not given in this call) or the new face. The
 value is 0 or 1 for "off" (medium weight) and "on" (heavy weight).
+
+=back
 
 =back
 
@@ -1039,9 +1072,15 @@ sub _filepath {
     return @out_list;
 }
 
-=item $pdf->dump_font_tables()
+=head2 dump_font_tables
+
+    $pdf->dump_font_tables()
+
+=over
 
 Print (to STDOUT) all the Font Manager font information on hand.
+
+=back
 
 =cut
 
@@ -1120,9 +1159,5 @@ sub dump_font_tables {
 
     return;
 } # end of dump_font_tables()
-
-=back
-
-=cut
 
 1;

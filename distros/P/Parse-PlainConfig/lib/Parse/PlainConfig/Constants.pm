@@ -2,7 +2,7 @@
 #
 # (c) 2016 - 2013, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Parse/PlainConfig/Constants.pm, 3.06 2023/09/23 19:24:20 acorliss Exp $
+# $Id: lib/Parse/PlainConfig/Constants.pm, 3.07 2024/01/10 13:32:06 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -28,7 +28,7 @@ use Paranoid::Debug;
 
 use base qw(Exporter);
 
-($VERSION) = ( q$Revision: 3.06 $ =~ /(\d+(?:\.(\d+))+)/sm );
+($VERSION) = ( q$Revision: 3.07 $ =~ /(\d+(?:\.(\d+))+)/sm );
 
 use constant PPCDLEVEL1   => PDEBUG6;
 use constant PPCDLEVEL2   => PDEBUG7;
@@ -49,7 +49,7 @@ use constant DEFAULT_HDOC => 'EOF';
 use constant PPC_SCALAR => CEH_SCALAR;
 use constant PPC_ARRAY  => CEH_ARRAY;
 use constant PPC_HASH   => CEH_HASH;
-use constant PPC_HDOC   => 512;
+use constant PPC_HDOC   => 1024;
 
 @EXPORT    = qw(PPC_SCALAR PPC_ARRAY PPC_HASH PPC_HDOC);
 @EXPORT_OK = (
@@ -79,7 +79,7 @@ Parse::PlainConfig::Constants - PPC Constants
 
 =head1 VERSION
 
-$Id: lib/Parse/PlainConfig/Constants.pm, 3.06 2023/09/23 19:24:20 acorliss Exp $
+$Id: lib/Parse/PlainConfig/Constants.pm, 3.07 2024/01/10 13:32:06 acorliss Exp $
 
 =head1 SYNOPSIS
 

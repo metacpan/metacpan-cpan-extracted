@@ -1,5 +1,13 @@
 Revision history for Device-BusPirate
 
+0.24    2024-01-09
+        [CHANGES]
+         * Much update for modern Object::Pad and style suggestions
+            + Use `field` and `:isa` attribute of Object::Pad
+            + Pod style updates
+            + use VERSION in all files
+            + Swap unit tests from `Test::More` to `Test2::V0`
+
 0.23    2021-07-18
         [CHANGES]
          * Convert to Object::Pad

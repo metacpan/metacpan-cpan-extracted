@@ -106,3 +106,4 @@ perltidy\.(LOG|ERR)
 fatlib/
 cpanfile\.snapshot$
 local/
+TODO\.bak

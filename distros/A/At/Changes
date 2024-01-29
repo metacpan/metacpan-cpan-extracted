@@ -1,5 +1,70 @@
 Revision history for Perl extension At.pm
 
+0.15 2024-01-27T23:37:51Z
+
+    - Minor bug sweep as I work on a functioning client
+
+0.14 2024-01-27T21:45:25Z
+
+    - Minor bug sweep as I work on a functioning client
+
+0.13 2024-01-26T19:00:20Z
+
+    - Less broken session management
+
+0.12 2024-01-26T03:45:00Z
+
+    - Update according to lexicon changes in bluesky-social/atproto@4171c04
+       - add interest tags to preferences
+    - Update according to lexicon changes in bluesky-social/atproto@8994d36
+       - signup queueing
+
+0.11 2024-01-25T20:06:55Z
+
+    - Minor bug sweep as I work on a functioning client
+    - Early version of sugary API
+
+0.10 2024-01-25T05:01:45Z
+
+    - Minor bug sweep as I work on a functioning client
+
+0.09 2024-01-24T21:30:18Z
+
+    - Update according to lexicon changes in bluesky-social/atproto@dac5c9e
+       - tagged suggestions
+    - Update according to lexicon changes in bluesky-social/atproto@fb979b1
+       - social graph relationships endpoint
+
+0.08 2024-01-23T01:48:21Z
+
+    - Resume expired sessions with $at->server_refreshSession( ... )
+
+0.07 2024-01-20T22:54:55Z
+
+    - Login failures are fatal errors
+    - New system to resume an authenticated session
+    - Update according to lexicon changes in bluesky-social/atproto@15f3856
+       - communication templates for moderation
+
+0.06 2024-01-19T02:20:52Z
+
+    - Update according to lexicon changes in bluesky-social/atproto@e43396a
+       - phone verification support on account creation
+
+0.05 2024-01-09T04:01:09Z
+
+    - Update according to lexicon changes in bluesky-social/atproto#1970
+       - new method: admin_getAccountsInfo
+       - new field in class At::Lexicon::com::atproto::admin::accountView
+
+0.04 2024-01-06T21:14:08Z
+
+    - ...don't write tests that fail when an otherwise unimportant page on the internet changes
+
+0.03 2024-01-06T20:58:02Z
+
+    - Full support for core At protocol and Bluesky extensions
+
 0.02 2023-11-22T04:14:23Z
 
     - Fix synopsis

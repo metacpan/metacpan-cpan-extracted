@@ -1,9 +1,13 @@
+# -*- cperl; cperl-indent-level: 4 -*-
+## no critic (RequireExplicitPackage RequireEndWithOne)
+use 5.014;
 use strict;
 use warnings;
 use utf8;
 
 use Test::More;
 
+our $VERSION = v1.1.7;
 my %preserved_field_data = (
     '4BC90027.jpg' => '2004-12-13T09:00:00',
     '413A0048.jpg' => '2004-02-04T10:00:00',
@@ -2333,13 +2337,15 @@ my %shifted_field_data = (
     '36O60113.jpg' => '2003-07-25T07:00:00',
 );
 
-plan tests => ( keys %preserved_field_data ) + ( keys %shifted_field_data );
+Test::More::plan 'tests' => ( keys %preserved_field_data ) +
+  ( keys %shifted_field_data );
 
 use Date::Extract::P800Picture;
 my $parser = Date::Extract::P800Picture->new();
 while ( my ( $filename, $timestamp ) = each %preserved_field_data ) {
-    is( "@{[$parser->extract($filename)]}", $timestamp, $filename );
+    Test::More::is( "@{[$parser->extract($filename)]}", $timestamp, $filename );
 }
 while ( my ( $filename, $timestamp ) = each %shifted_field_data ) {
-    isnt( "@{[$parser->extract($filename)]}", $timestamp, $filename );
+    Test::More::isnt( "@{[$parser->extract($filename)]}",
+        $timestamp, $filename );
 }

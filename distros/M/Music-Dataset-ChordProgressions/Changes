@@ -1,0 +1,57 @@
+Revision history for Music-Dataset-ChordProgressions
+
+0.0400 2023-12-26 09:58:03
+    - Fresh name that is searchable!
+
+0.0303 2023-02-02 21:51:21
+    - Improve documentation again.
+
+0.0302 2023-02-02 21:36:21
+    - Improve documentation.
+
+0.0301 2023-02-02 21:21:41
+    - Fix the transpose() progression logic.
+
+0.0300 2023-02-02 21:00:12
+    - Ok ok. Use Exporter. Sheesh!
+
+0.0201 2023-02-02 20:42:44
+    - Improve the eg/* programs.
+
+0.0200 2023-02-02 20:30:08
+    - Add the transpose() function.
+
+0.0109 2022-10-21 20:49:28
+    - Avoid implicit imports.
+
+0.0108 2021-05-15 09:41:31
+    - Remove unused code from the eg/play-rock program.
+
+0.0107 2021-05-15 09:24:36
+    - Fix an error in eg/play-rock.
+
+0.0106 2021-05-13 07:41:53
+    - Improve eg/play-rock.
+    - Improve documentation.
+
+0.0105 2021-05-12 23:18:13
+    - Add the eg/play-rock MIDI program.
+
+0.0104 2021-05-11 13:24:47
+    - Fix typos in the shared CSV.
+    - Remove the two instances of the "5 chord".
+    - Add the eg/play-jazz MIDI program.
+
+0.0103 2021-05-11 06:05:39
+    - Replace "Aug" with "aug" (augmented) in the shared CSV.
+    - Improve the eg/jazz program.
+
+0.0102 2021-05-11 04:37:51
+    - Improve documentation.
+    - Add the WIP eg/jazz program.
+
+0.0101 2021-05-11 03:34:10
+    - Replace "Dom7" with "7" in the shared CSV.
+
+0.0100 2021-05-11 03:19:22
+    - Copy from the Data-Dataset-Classic-Titanic distribution.

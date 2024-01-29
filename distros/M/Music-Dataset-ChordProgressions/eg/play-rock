@@ -1,0 +1,55 @@
+#!/usr/bin/env perl
+
+# Play a random rock progression!
+
+# Unfortunately, certain chords are unknown (e.g. 6sus4) yet.
+
+use strict;
+use warnings;
+
+use Music::Dataset::ChordProgressions qw(as_hash transpose);
+use List::MoreUtils qw(first_index);
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
+use MIDI::Util qw(setup_score midi_format);
+use Music::Chord::Note;
+
+my $reps  = shift || 2;
+my $sects = shift || 'Amv-DMc-Emv-DMc'; # <note><major|minor><verse|chorus>
+
+my @sections = split /-/, $sects;
+
+my $octave = 4;
+
+my $score = setup_score();
+
+my $cn = Music::Chord::Note->new;
+
+my %data = as_hash();
+
+for my $sect (@sections) {
+    my ($note, $section, $scale, @pool);
+    if ($sect =~ /^([A-G][#b]?)(M|m)(v|c)$/) {
+        ($note, $scale, $section) = ($1, $2, $3);
+        $scale   = $scale   eq 'M' ? 'major' : 'minor';
+        $section = $section eq 'v' ? 'verse' : 'chorus';
+        @pool    = @{ $data{rock}{$scale}{$section} };
+    }
+
+    my $progression = $pool[int rand @pool];
+
+    my $named = transpose($note, $scale, $progression->[0]);
+
+    print "$note $scale: $named, $progression->[1]\n";
+
+    my @chords = split /-/, $named;
+
+    for my $j (1 .. $reps) {
+        for my $chord (@chords) {
+            my @notes = $cn->chord_with_octave($chord, $octave);
+            @notes = midi_format(@notes);
+            $score->n('wn', @notes);
+        }
+    }
+}
+
+$score->write_score("$0.mid");

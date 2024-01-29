@@ -3,8 +3,8 @@ NAME
     things)
 
 VERSION
-    This document describes version 0.007 of App::tabledata (from Perl
-    distribution App-tabledata), released on 2023-04-19.
+    This document describes version 0.008 of App::tabledata (from Perl
+    distribution App-tabledata), released on 2023-09-23.
 
 SYNOPSIS
     See the included script tabledata.

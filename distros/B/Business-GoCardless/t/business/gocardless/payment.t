@@ -19,6 +19,11 @@ isa_ok(
             merchant_id => 'boz',
 			api_version => 2,
         ),
+        links => {
+            mandate => 'MD123',
+            payout => 'PO456',
+            creditor => 'CR001',
+        },
     ),
     'Business::GoCardless::Payment'
 );
@@ -72,6 +77,10 @@ ok( ! $Payment->confirmed,'confirmed' );
 
 $Payment->id( 123 );
 is( $Payment->uri,'https://api.gocardless.com/payments/123','->uri' );
+
+is( $Payment->payout_id,'PO456','->payout_id' );
+is( $Payment->mandate_id,'MD123','->mandate_id' );
+is( $Payment->creditor_id,'CR001','->creditor_id' );
 
 done_testing();
 

@@ -1,7 +1,7 @@
 # ------------  Bus --------------------
 {
 package Audio::Nama::Bus;
-use Modern::Perl; use Carp; 
+use Modern::Perl '2020'; use Carp; 
 use Audio::Nama::Log qw(logsub logpkg);
 use Audio::Nama::Globals qw(:trackrw $setup); 
 our @ISA = qw( Audio::Nama::Object );
@@ -157,7 +157,8 @@ sub list {
 ### subclasses
 {
 package Audio::Nama::SubBus; # with magic for Main bus
-use Modern::Perl; use Carp; our @ISA = 'Audio::Nama::Bus';
+use Modern::Perl '2020'; use Carp; our @ISA = 'Audio::Nama::Bus';
+our $VERSION = 1.0;
 use Audio::Nama::Log qw(logsub logpkg);
 use Audio::Nama::Util qw(input_node);
 use Audio::Nama::Globals qw(:trackrw %tn);
@@ -221,7 +222,8 @@ sub wantme {
 }
 {
 package Audio::Nama::SendBusRaw;
-use Modern::Perl; use Carp; our @ISA = 'Audio::Nama::Bus';
+use Modern::Perl '2020'; use Carp; our @ISA = 'Audio::Nama::Bus';
+our $VERSION = 1.0;
 use Audio::Nama::Log qw(logsub logpkg);
 sub apply {
 	my $bus = shift;
@@ -250,7 +252,8 @@ sub remove {
 {
 package Audio::Nama::SendBusCooked;
 use Audio::Nama::Log qw(logsub logpkg);
-use Modern::Perl; use Carp; our @ISA = 'Audio::Nama::SendBusRaw';
+use Modern::Perl '2020'; use Carp; our @ISA = 'Audio::Nama::SendBusRaw';
+our $VERSION = 1.0;
 
 # graphic routing: target -> slave -> bus_send_type
 
@@ -269,7 +272,8 @@ sub apply {
 }
 {
 package Audio::Nama::MidiBus;
-use Modern::Perl; use Carp; our @ISA = 'Audio::Nama::Bus';
+use Modern::Perl '2020'; use Carp; our @ISA = 'Audio::Nama::Bus';
+our $VERSION = 1.0;
 use Audio::Nama::Log qw(logsub logpkg);
 use Audio::Nama::Util qw(input_node);
 use Audio::Nama::Globals qw(:trackrw);
@@ -285,7 +289,7 @@ sub remove { }  # We never remove the Midi bus
 # ---------- Bus routines --------
 {
 package Audio::Nama;
-use Modern::Perl; use Carp;
+use Modern::Perl '2020'; use Carp;
 use Audio::Nama::Util qw(dest_type);
 our (
 	$this_track,

@@ -48,13 +48,17 @@ pds_optable - print difference table for planar difference sets
 
 =head1 SYNOPSIS
 
-  pds_optable [file]...
+  pds_optable [-m modulus] [file]...
 
 =head1 DESCRIPTION
 
 This example program reads lists of non-negative integer numbers, one
 per line, separated by whitespace, converts them to ASCII-formatted
 difference tables, and writes the results to standard output.
+
+The modulus can be specified with an optional B<-m> parameter.
+If omitted, it is calculated from the number of elements of each line,
+assuming they are planar difference sets.
 
 =head1 AUTHOR
 

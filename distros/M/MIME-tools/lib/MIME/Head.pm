@@ -138,7 +138,7 @@ use MIME::Field::ContType;
 #------------------------------
 
 ### The package version, both in 1.23 style *and* usable by MakeMaker:
-$VERSION = "5.510";
+$VERSION = "5.513";
 
 ### Sanity (we put this test after our own version, for CPAN::):
 use Mail::Header 1.06 ();
@@ -659,6 +659,25 @@ or undefined if it isn't there:
     $name = $head->mime_attr("content-type.name"); ### homepage.html
 
 In all cases, the new/current value is returned.
+
+The special sub-field tag C<@duplicate_parameters> (which can never be
+a real tag) returns an arrayref of tags that were duplicated in the header,
+or C<undef> if no such tags were found.  For example, given the header:
+
+    Content-Type: multipart/mixed; boundary="foo"; boundary="bar"
+
+Then:
+
+    $head->mime_attr('content-type.@duplicate_parameters')
+
+would return:
+
+    [ 'boundary' ]
+
+A duplicate "boundary" tag should be treated as a security risk, as should
+duplicate Content-Type headers in a message.  Since such messages cannot
+be parsed unambiguously, we strongly recommend that they never be
+delivered to end-users.
 
 =cut
 

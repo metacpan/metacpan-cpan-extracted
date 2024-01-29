@@ -1,0 +1,25 @@
+class Eg::OS::API {
+  
+  has runtime : rw protected Eg::Runtime;
+  
+  method get_data : object ($name : string) {
+    
+    my $runtime = $self->{runtime};
+    
+    my $data_h = $runtime->{data_h};
+    
+    my $value = $data_h->get($name);
+    
+    return $value;
+  }
+  
+  method set_data : void ($name : string, $value : object) {
+    
+    my $runtime = $self->{runtime};
+    
+    my $data_h = $runtime->{data_h};
+    
+    $data_h->set($name, $value);
+  }
+  
+}

@@ -10,6 +10,7 @@ set_spell_cmd('aspell --master=en_US list');
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+49699333
 Aas
 Accomazzi
 Adam
@@ -25,6 +26,7 @@ Arne
 Asplund
 Atzberger
 Authen
+Axel
 BGMNT
 Basic
 Beijen
@@ -38,6 +40,7 @@ Bryan
 Buenzli
 Burak
 Burke
+Burri
 CGI
 CPAN
 Campbell
@@ -64,6 +67,7 @@ DebugFile
 Denaxas
 Desmond
 Digest
+Dmitriy
 Doug
 Dubois
 Dunkin
@@ -124,6 +128,7 @@ Jacob
 Jakub
 James
 Jason
+Javier
 Jeremy
 Joao
 Joe
@@ -225,6 +230,7 @@ Piotr
 Pon
 Poul
 Protocol
+Puche
 Quaranta
 Rabbitson
 Radoslaw
@@ -245,6 +251,7 @@ Schwern
 Sean
 Sebastian
 Sergey
+Shamatrin
 Shirazi
 Shoichi
 Simple
@@ -321,6 +328,7 @@ andrew
 anirvan
 asjo
 at
+axel
 bin
 brong
 bryan
@@ -335,10 +343,12 @@ david
 davidrw
 de
 denaxas
+dependabot
 dnstandish
 dot
 doug
 dpettit
+dshamatrin
 dsteinbrunner
 eric
 erik
@@ -365,6 +375,7 @@ hfroehlich
 http
 iank
 instantiation
+javier
 jefflee
 jfesler
 jmates

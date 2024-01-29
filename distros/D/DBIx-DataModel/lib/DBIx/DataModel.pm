@@ -3,7 +3,7 @@ package DBIx::DataModel;
 #----------------------------------------------------------------------
 # see POD doc at end of file
 
-use 5.008;
+use 5.010;
 use warnings;
 use strict;
 use version;
@@ -11,7 +11,7 @@ use MRO::Compat;
 use DBIx::DataModel::Meta::Utils qw/does/;
 use Carp::Clan qw[^(DBIx::DataModel::|SQL::Abstract)];
 
-our $VERSION = '3.06';
+our $VERSION = '3.09';
 
 # compatibility setting : see import()
 our $COMPATIBILITY = $VERSION; # from 2.20, no longer automatic compatibility

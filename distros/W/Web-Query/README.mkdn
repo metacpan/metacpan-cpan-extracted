@@ -4,7 +4,7 @@ Web::Query - Yet another scraping library like jQuery
 
 # VERSION
 
-version 1.00
+version 1.01
 
 # SYNOPSIS
 
@@ -23,7 +23,7 @@ wq('http://www.w3.org/TR/html401/')
 
 Web::Query is a yet another scraping framework, have a jQuery like interface.
 
-Yes, I know Ingy's [pQuery](https://metacpan.org/pod/pQuery). But it's just a alpha quality. It doesn't works.
+Yes, I know Ingy's [pQuery](https://metacpan.org/pod/pQuery). But it's just alpha quality. It doesn't work.
 Web::Query built at top of the CPAN modules, [HTML::TreeBuilder::XPath](https://metacpan.org/pod/HTML%3A%3ATreeBuilder%3A%3AXPath), [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent), and [HTML::Selector::XPath](https://metacpan.org/pod/HTML%3A%3ASelector%3A%3AXPath).
 
 So, this module uses [HTML::Selector::XPath](https://metacpan.org/pod/HTML%3A%3ASelector%3A%3AXPath) and only supports the CSS 3

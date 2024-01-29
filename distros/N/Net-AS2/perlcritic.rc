@@ -1,7 +1,5 @@
 severity = 3
 
-[Documentation::RequirePodLinksIncludeText]
-severity = 1
 [Documentation::RequirePodSections]
 severity = 1
 lib_sections    = NAME | SYNOPSIS | BUGS AND LIMITATIONS | AUTHOR

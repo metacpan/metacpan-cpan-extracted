@@ -1,3 +1,8 @@
+0.004   2024-01-10  Released-By: PERLANCAR; Urgency: medium
+
+        - Add function: match_string().
+
+
 0.003   2023-06-19  Released-By: PERLANCAR; Urgency: medium
 
         - Add function: num_occurs().

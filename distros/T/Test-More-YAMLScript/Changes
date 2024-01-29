@@ -1,3 +1,6 @@
+0.1.7 Fri Dec 29 10:16:08 AM PST 2023
+ - Depend on YAMLScript::Lingy not YAMLScript for now
+
 0.1.6 Fri Jul  7 11:42:50 AM EDT 2023
  - Updates for YAMLScript API changes
 

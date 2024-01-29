@@ -4,13 +4,13 @@
       "Jeremy Volkening <jdv@base2bio.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Poppler",
    "prereqs" : {
@@ -39,7 +39,7 @@
    "provides" : {
       "Poppler" : {
          "file" : "lib/Poppler.pm",
-         "version" : "1.0101"
+         "version" : "1.0103"
       },
       "Poppler::Page::Dimension" : {
          "file" : "lib/Poppler/Page/Dimension.pm"
@@ -54,5 +54,6 @@
          "url" : "https://github.com/c9s/perl-poppler"
       }
    },
-   "version" : "1.0101"
+   "version" : "1.0103",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

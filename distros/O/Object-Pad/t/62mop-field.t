@@ -5,7 +5,7 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad ':experimental(mop)';
+use Object::Pad 0.800 ':experimental(mop inherit_field)';
 
 class Example {
    field $field :mutator :param(initial_field) = undef;
@@ -57,7 +57,9 @@ is( [ $classmeta->fields ], [ $fieldmeta ],
    my $fieldmeta = Object::Pad::MOP::Class->for_class( 'ARole' )->get_field( '$data' );
    is( $fieldmeta->name, '$data', '$fieldmeta->name for field of role' );
 
-   class AClass :does(ARole) {
+   class AClass {
+      apply ARole;
+
       field $data = 21;
    }
 
@@ -65,7 +67,8 @@ is( [ $classmeta->fields ], [ $fieldmeta ],
    is( $fieldmeta->value( $obja ), 42,
       '$fieldmeta->value as accessor on role instance fetches correct field' );
 
-   class BClass :isa(AClass) {
+   class BClass {
+      inherit AClass;
       field $data = 63;
    }
 
@@ -74,17 +77,35 @@ is( [ $classmeta->fields ], [ $fieldmeta ],
       '$fieldmeta->value as accessor on role instance subclass fetches correct field' );
 }
 
+# Inherited fields aren't directly visible
+{
+   class CClass {
+      field $x :inheritable;
+   }
+   class DClass {
+      inherit CClass qw( $x );
+   }
+
+   my $classmeta = Object::Pad::MOP::Class->for_class( 'DClass' );
+   like( dies { $classmeta->get_field( '$x' ) },
+      qr/^Class DClass does not have a field called '\$x' at /,
+      'Attempt to get fieldmeta for inherited field fails' );
+
+   is( [ $classmeta->fields ], [],
+      '->fields returns an empty list' );
+}
+
 # RT136869
 {
    class A {
       field @arr;
-      BUILD { @arr = (1,2,3) }
+      ADJUST { @arr = (1,2,3) }
       method m { @arr }
    }
    role R {
       field $data :param;
    }
-   class B :isa(A) :does(R) {}
+   class B { inherit A; apply R; }
 
    is( [ B->new( data => 456 )->m ], [ 1, 2, 3 ],
       'Role params are embedded correctly' );

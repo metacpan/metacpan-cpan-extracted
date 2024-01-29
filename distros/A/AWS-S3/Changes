@@ -1,6 +1,9 @@
 
 Changelog for perl module AWS::S3
 
+0.19 2024-01-08
+  - Fix "bad hostname" test may fail in presence of wildcard DNS records (GH #19)
+
 0.18 2019-03-01
   - Fix leading slashes defaults to off, see honor_leading_slashes arg
 

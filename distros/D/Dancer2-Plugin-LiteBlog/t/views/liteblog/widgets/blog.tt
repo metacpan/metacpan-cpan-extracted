@@ -1,3 +1,4 @@
+[% IF widget.has_elements %]
 <!-- Blog Cards -->
 <section id="blog">
     <div class="blog-header">
@@ -5,3 +6,4 @@
     </div>
 [% INCLUDE 'liteblog/widgets/blog-cards.tt' %]
 </section>
+[% END %]

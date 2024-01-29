@@ -3,7 +3,7 @@ use strict;
 use Exporter qw'import';
 use Text::Unidecode;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 our @EXPORT = (qw(clean_fragment clean_fragment_filename));
 
 =head1 NAME
@@ -172,7 +172,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2012-2023 by Max Maischein C<corion@cpan.org>.
+Copyright 2012-2024 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

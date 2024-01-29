@@ -8,7 +8,7 @@
 
 package Mail::Message::Test;
 use vars '$VERSION';
-$VERSION = '3.014';
+$VERSION = '3.015';
 
 use base 'Exporter';
 

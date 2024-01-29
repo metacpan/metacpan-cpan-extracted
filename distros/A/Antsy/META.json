@@ -1,10 +1,10 @@
 {
    "abstract" : "Streaming ANSI escape sequences",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -32,7 +32,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "perl" : "5.032"
+            "perl" : "5.026"
          }
       },
       "test" : {
@@ -49,10 +49,10 @@
       "homepage" : "https://github.com/briandfoy/antsy",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/antsy.git",
+         "url" : "https://github.com/briandfoy/antsy",
          "web" : "https://github.com/briandfoy/antsy"
       }
    },
-   "version" : "0.903",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.905",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

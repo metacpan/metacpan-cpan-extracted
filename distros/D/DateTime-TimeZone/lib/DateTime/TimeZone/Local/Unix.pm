@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.60';
+our $VERSION = '2.61';
 
 use Cwd 3;
 use Try::Tiny;
@@ -283,7 +283,7 @@ DateTime::TimeZone::Local::Unix - Determine the local system's time zone on Unix
 
 =head1 VERSION
 
-version 2.60
+version 2.61
 
 =head1 SYNOPSIS
 

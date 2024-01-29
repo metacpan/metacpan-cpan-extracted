@@ -1,0 +1,215 @@
+class TestCase::Time::Seconds {
+  
+  use Sys;
+  use Time::Seconds;
+  
+  static method constant_values : int () {
+    
+    unless (Time::Seconds->ONE_MINUTE->seconds == 60) {
+      return 0;
+    }
+    
+    unless (Time::Seconds->ONE_HOUR->seconds == 3_600) {
+      return 0;
+    }
+    
+    unless (Time::Seconds->ONE_DAY->seconds == 86_400) {
+      return 0;
+    }
+    
+    unless (Time::Seconds->ONE_WEEK->seconds == 604_800) {
+      return 0;
+    }
+    
+    unless (Time::Seconds->ONE_MONTH->seconds == 2_629_744) {
+      return 0;
+    }
+    
+    unless (Time::Seconds->ONE_YEAR->seconds == 31_556_930) {
+      return 0;
+    }
+    
+    unless (Time::Seconds->ONE_FINANCIAL_MONTH->seconds == 2_592_000) {
+      return 0;
+    }
+    
+    unless (Time::Seconds->LEAP_YEAR->seconds == 31_622_400) {
+      return 0;
+    }
+    
+    unless (Time::Seconds->NON_LEAP_YEAR->seconds == 31_536_000) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method add : int () {
+    
+    {
+      my $tsec = Time::Seconds->new(1);
+      
+      my $tsec_add = $tsec->add(2);
+      
+      unless ($tsec_add->seconds == 3) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method subtract : int () {
+    
+    {
+      my $tsec = Time::Seconds->new(1);
+      
+      my $tsec_subtract = $tsec->subtract(2);
+      
+      unless ($tsec_subtract->seconds == -1) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method unit_methods : int () {
+    
+    {
+      my $tsec = Time::Seconds->new(60);
+      
+      my $unit = $tsec->minutes;
+      
+      unless ($unit isa double) {
+        return 0;
+      }
+      
+      unless ($unit == 1) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tsec = Time::Seconds->new(60 * 60);
+      
+      my $unit = $tsec->hours;
+      
+      unless ($unit isa double) {
+        return 0;
+      }
+      
+      unless ($unit == 1) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tsec = Time::Seconds->new(60 * 60 * 24);
+      
+      my $unit = $tsec->days;
+      
+      unless ($unit isa double) {
+        return 0;
+      }
+      
+      unless ($unit == 1) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tsec = Time::Seconds->new(60 * 60 * 24 * 7);
+      
+      my $unit = $tsec->weeks;
+      
+      unless ($unit isa double) {
+        return 0;
+      }
+      
+      unless ($unit == 1) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tsec = Time::Seconds->new(60 * 60 * 24 * 366);
+      
+      my $unit = $tsec->months;
+      
+      warn "[Test Output]months:$unit";
+      
+      unless ($unit isa double) {
+        return 0;
+      }
+      
+      unless ($unit > 12.0249 - 0.001 && $unit < 12.0249 + 0.001) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tsec = Time::Seconds->new(60 * 60 * 24 * 366);
+      
+      my $unit = $tsec->financial_months;
+      
+      warn "[Test Output]financial_months:$unit";
+      
+      unless ($unit isa double) {
+        return 0;
+      }
+      
+      unless ($unit > 12.2 - 0.001 && $unit < 12.2 + 0.001) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tsec = Time::Seconds->new(60 * 60 * 24 * 366);
+      
+      my $unit = $tsec->years;
+      
+      warn "[Test Output]years:$unit";
+      
+      unless ($unit isa double) {
+        return 0;
+      }
+      
+      unless ($unit > 1.00207 - 0.00001 && $unit < 1.00207 + 0.00001) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method clone : int () {
+    
+    {
+      my $tsec_clone = Time::Seconds->new(60)->clone;
+      
+      unless ($tsec_clone->seconds == 60) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method pretty : int () {
+    
+    {
+      my $tsec = Time::Seconds->new(60 * 60 * 24 * 366 * 3 + 13456);
+      
+      my $pretty = $tsec->pretty;
+      
+      unless ($pretty eq "1098 days, 3 hours, 44 minutes, 16 seconds") {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+}

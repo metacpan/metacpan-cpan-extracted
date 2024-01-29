@@ -1351,8 +1351,11 @@ SKIP: {
 	"Change to home directory succeeded. \$^O = '$^O'" );
 }
 
-chdir $dist_dir
-    or BAIL_OUT "Can not get back to directory '$dist_dir': $!";
+unless( chdir $dist_dir ) {
+    fail "Can not get back to directory '$dist_dir': $!";
+    done_testing;
+    exit;
+}
 
 call_m( clear => undef, 'Clear the observing list' );
 

@@ -28,8 +28,6 @@ response_for 'property' => { jolt => single_column(
 	{ 'Z' => '13' },
 	{ 'R' => '0.5' },
 	{ 'U' => 'hello' },
-	{ 'T' => '2002-04-16T12:34:56' },
-	{ '@' => 'POINT (30 10)' },
 	{ '#' => '466F6F' },  # hex, see neo4j#12660
 )};
 
@@ -112,6 +110,7 @@ response_for 'element id format version error' => {
 # converts Neo4j values to Perl values.
 
 use Neo4j::Driver;
+use Neo4j::Types;
 
 my ($s, $r, $v, $e);
 
@@ -139,7 +138,7 @@ sub id5 {
 
 
 subtest 'property types' => sub {
-	plan tests => 15;
+	plan tests => 13;
 	lives_and { ok $r = $s->run('property') } 'run';
 	lives_and { is $r->fetch->get(), undef } 'null';
 	lives_ok { $v = undef; $v = $r->fetch->get() } 'Boolean true';
@@ -151,8 +150,6 @@ subtest 'property types' => sub {
 	lives_and { is $r->fetch->get(), 13 } 'Integer';
 	lives_and { is $r->fetch->get(), 0.5 } 'Float';
 	lives_and { is $r->fetch->get(), 'hello' } 'String';
-	lives_and { is ref($r->fetch->get), 'Neo4j::Driver::Type::Temporal' } 'Date';
-	lives_and { is ref($r->fetch->get), 'Neo4j::Driver::Type::Point' } 'Point';
 	lives_and { is $r->fetch->get(), 'Foo' } 'Bytes';
 	lives_and { ok ! $r->has_next } 'no has_next';
 };

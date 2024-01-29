@@ -1,0 +1,17 @@
+0.003   2023-09-30  Released-By: PERLANCAR; Urgency: medium
+
+        - Add alias module: Acme::CPANModules::RemovingElementsFromList.
+
+        - mention Acme::CPANModules::GroupingElementsOfArray.
+
+
+0.002   2023-09-30  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Wording.
+
+
+0.001   2023-09-30  Released-By: PERLANCAR
+
+        - First release.

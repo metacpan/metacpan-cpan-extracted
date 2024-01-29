@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Session;
 # ABSTRACT: Context of work for database interactions
-$Neo4j::Driver::Session::VERSION = '0.41';
+$Neo4j::Driver::Session::VERSION = '0.42';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(
@@ -202,7 +202,7 @@ Neo4j::Driver::Session - Context of work for database interactions
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 SYNOPSIS
 
@@ -270,9 +270,8 @@ work with multiple concurrent transactions, simply use more than
 one session.
 On C<http:> and C<https:> connections, you can
 alternatively enable concurrent transactions within the same
-session through a config option (currently experimental);
-see L<Neo4j::Driver/"Concurrent transactions in HTTP sessions">
-for details.
+session through a config option; see
+L<Neo4j::Driver::Config/"concurrent_tx"> for details.
 
 To create a new session, call L<Neo4j::Driver/"session">.
 
@@ -406,10 +405,7 @@ L<ISession (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.2/html/6bcf5d8c-98e
 
 =head1 AUTHOR
 
-Arne Johannessen <ajnn@cpan.org>
-
-If you contact me by email, please make sure you include the word
-"Perl" in your subject header to help beat the spam filters.
+Arne Johannessen (L<AJNN|https://arne.johannessen.de/>)
 
 =head1 COPYRIGHT AND LICENSE
 

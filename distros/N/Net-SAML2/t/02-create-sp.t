@@ -441,4 +441,50 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
     );
 }
 
+{
+    my $consuming_index = Net::SAML2::AttributeConsumingService->new(
+        service_name => 'Net::SAML2 testsuite',
+        index        => 1,
+        attributes   => [
+            Net::SAML2::RequestedAttribute->new(
+                friendly_name => 'foo',
+                name          => 'urn:foo:bar',
+                name_format   => 'xx',
+                required      => 1,
+            ),
+        ],
+    );
+
+    my $sp = net_saml2_sp(attribute_consuming_service => $consuming_index,);
+
+    my $xpath = get_xpath(
+        $sp->metadata,
+        md => URN_METADATA,
+        ds => URN_SIGNATURE,
+    );
+
+    my $node = get_single_node_ok($xpath, '//md:SPSSODescriptor');
+    my $acs  = get_single_node_ok($node,  '//md:AttributeConsumingService');
+
+    is($acs->getAttribute('index'),     1, ".. index is 1");
+    is($acs->getAttribute('isDefault'), 0, "Not the default");
+
+
+    my @child = $acs->childNodes();
+    is(@child,              2,                "Have 2 children");
+    is($child[0]->nodeName, "md:ServiceName", "Service name node found");
+    is(
+        $child[0]->textContent,
+        'Net::SAML2 testsuite',
+        ".. with the correct value"
+    );
+
+    is($child[1]->nodeName, "md:RequestedAttribute",
+        "Requested attribute found");
+    is($child[1]->getAttribute('FriendlyName'),
+        'foo', ".. with the correct friendly name");
+    is($child[1]->getAttribute('Name'),       'urn:foo:bar', ".. and name");
+    is($child[1]->getAttribute('isRequired'), '1', ".. and requiredness");
+}
+
 done_testing;

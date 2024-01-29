@@ -1,2 +1,7 @@
+0.02 2023-12-10T12:07:23+01:00
+ - Add check for preset values.
+ - Fix @ARGV in test.
+ - Fix test run. We need to use perl, which we are testing.
+
 0.01 2023-12-07T21:19:44+01:00
  - First version.

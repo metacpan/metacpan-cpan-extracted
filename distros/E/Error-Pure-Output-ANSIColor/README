@@ -18,65 +18,111 @@ SYNOPSIS
      my @ret = err_print_var(@errors);
 
 SUBROUTINES
-    "err_bt_pretty(@errors)"
-             Returns string with full backtrace in scalar context.
-             Returns array of full backtrace lines in array context.
-             Both with ANSI sequences for terminals.
-             Format of error is:
-                     ERROR: %s
-                     %s: %s
-                     ...
-                     %s %s %s %s
-                     ...
-             Values of error are:
-                     message
-                     message as key, $message as value
-                     ...
-                     sub, caller, program, line
+  "err_bt_pretty"
+     my $ret = err_bt_pretty(@errors);
+     my @ret = err_bt_pretty(@errors);
 
-    "err_bt_pretty_rev(@errors)"
-             Reverse version of print for err_bt_pretty().
-             Returns string with full backtrace in scalar context.
-             Returns array of full backtrace lines in array context.
-             Both with ANSI sequences for terminals.
-             Format of error is:
-                     ERROR: %s
-                     %s: %s
-                     ...
-                     %s %s %s %s
-                     ...
-             Values of error are:
-                     message
-                     message as key, $message as value
-                     ...
-                     sub, caller, program, line
+    Returns string with full backtrace in scalar context.
 
-    "err_die(@errors)"
-             Returns string with error in classic die style with colors with ANSI sequences for terminals.
-             Format of error line is: "%s at %s line %s".
-             Values of error line are: $message(s), $program, $line
+    Returns array of full backtrace lines in array context.
 
-    "err_line(@errors)"
-             Returns string with error on one line with ANSI sequences for terminals.
-             Use last error in @errors structure..
-             Format of error is: "#Error [%s:%s] %s\n"
-             Values of error are: $program, $line, $message
+    Both with ANSI sequences for terminals.
 
-    "err_line_all(@errors)"
-             Returns string with errors each on one line with ANSI sequences for terminals.
-             Use all errors in @errors structure.
-             Format of error line is: "#Error [%s:%s] %s\n"
-             Values of error line are: $program, $line, $message
+    Format of error is:
 
-    "err_print(@errors)"
-             Print first error with ANSI sequences for terminals.
-             If error comes from class, print class name before error.
-             Returns string with error.
+     ERROR: %s
+     %s: %s
+     ...
+     %s %s %s %s
+     ...
 
-    "err_print_var(@errors)"
-             Print first error with all variables with ANSI sequences for terminals.
-             Returns error string in scalar mode.
-             Returns lines of error in array mode.
+    Values of error are:
+
+     message
+     message as key, $message as value
+     ...
+     sub, caller, program, line
+     ...
+
+  "err_bt_pretty_rev"
+     my $ret = err_bt_pretty_rev(@errors);
+     my @ret = err_bt_pretty_rev(@errors);
+
+    Reverse version of print for err_bt_pretty().
+
+    Returns string with full backtrace in scalar context.
+
+    Returns array of full backtrace lines in array context.
+
+    Both with ANSI sequences for terminals.
+
+    Format of error is:
+
+     ERROR: %s
+     %s: %s
+     ...
+     %s %s %s %s
+     ...
+
+    Values of error are:
+
+     message
+     message as key, $message as value
+     ...
+     sub, caller, program, line
+     ...
+
+  "err_die(@errors)"
+     my $ret = err_die(@errors);
+
+    Returns string with error in classic die style with colors with ANSI
+    sequences for terminals.
+
+    Format of error line is: "%s at %s line %s".
+
+    Values of error line are: $message(s), $program, $line
+
+  "err_line"
+     my $ret = err_line(@errors);
+
+    Returns string with error on one line with ANSI sequences for terminals.
+
+    Use last error in @errors structure.
+
+    Format of error is: "#Error [%s:%s] %s\n"
+
+    Values of error are: $program, $line, $message
+
+  "err_line_all"
+     my $ret = err_line_all(@errors);
+
+    Returns string with errors each on one line with ANSI sequences for
+    terminals.
+
+    Use all errors in @errors structure.
+
+    Format of error line is: "#Error [%s:%s] %s\n"
+
+    Values of error line are: $program, $line, $message
+
+  "err_print"
+     my $ret = err_print(@errors);
+
+    Print first error with ANSI sequences for terminals.
+
+    If error comes from class, print class name before error.
+
+    Returns string with error.
+
+  "err_print_var"
+     my $ret = err_print_var(@errors);
+     my @ret = err_print_var(@errors);
+
+    Print first error with all variables with ANSI sequences for terminals.
+
+    Returns error string in scalar mode.
+
+    Returns lines of error in array mode.
 
 EXAMPLE1
      use strict;
@@ -471,10 +517,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2013-2022 Michal Josef Špaček
+    © 2013-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

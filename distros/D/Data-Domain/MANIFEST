@@ -8,6 +8,7 @@ t/data-domain.t
 t/import-except.t
 t/invalid-lazy.t
 t/method-calls.t
+t/validate.t
 xt/pod-coverage.t
 xt/pod.t
 META.json

@@ -1,5 +1,5 @@
 package CGI::Application::Plugin::RunmodeParseKeyword;
-$CGI::Application::Plugin::RunmodeParseKeyword::VERSION = '0.14';
+$CGI::Application::Plugin::RunmodeParseKeyword::VERSION = '0.15';
 use warnings;
 use strict;
 
@@ -14,6 +14,8 @@ use Carp qw(croak);
 use Sub::Name 'subname';
 use Data::Dumper;
 use Parse::Keyword {};
+
+$Carp::Internal{ (__PACKAGE__) }++;
 
 sub import {
     my $caller = caller;
@@ -101,7 +103,7 @@ sub parse_mode {
     my $name = parse_name();
     my $sig  = parse_signature($invocant);
     my $attr = parse_attributes();
-    my $body = parse_body($sig);
+    my $body = parse_body($sig) or ($@ and die);
 
     if (defined $name) {
         my $full_name = join('::', compiling_package, $name);
@@ -169,7 +171,7 @@ sub parse_signature {
     my $seen_slurpy;
     while ((my $sigil = lex_peek) ne ')') {
         my $var = {};
-        die "syntax error"
+        die "syntax error: expected ')' but found '$sigil'"
             unless $sigil eq '$' || $sigil eq '@' || $sigil eq '%';
         die "Can't declare parameters after a slurpy parameter"
             if $seen_slurpy;
@@ -200,8 +202,9 @@ sub parse_signature {
 
         push @vars, $var;
 
-        die "syntax error"
-            unless lex_peek eq ')' || lex_peek eq ',';
+        my $c = lex_peek;
+        die "syntax error: expected ')' or ',' but found '$c'"
+            unless $c eq ')' || $c eq ',';
 
         if (lex_peek eq ',') {
             lex_read;
@@ -286,7 +289,9 @@ sub parse_body {
 
     lex_read_space;
 
-    if (lex_peek eq '{') {
+    my $c = lex_peek;
+    croak "syntax error: expected start of block '{' but found '$c'" unless $c eq '{';
+    {
         local $CAPRPK::{'DEFAULTS::'};
         if ($sigs) {
             lex_read;
@@ -302,16 +307,17 @@ sub parse_body {
             $preamble .= 'my (' . join(', ', @names) . ') = @_;';
 
             for my $name (@names) {
+                my $p;
                 my $s = substr($name,0,1);
                 my $n = substr($name,1);
                 if ($s eq '$') {
-                    my $p = $inv->{name} . '->param("' . $n . '")';
+                    $p = $inv->{name} . '->param("' . $n . '")';
                     $preamble .= $name . ' = ' . $p . ' unless ' . ( $s eq '$' ? 'defined ' : 'scalar ') . $name . ';';
                 }
-                my $p = $inv->{name} . '->query->' . ($s eq '@' ? 'multi_param' : 'param') . '("' . $n . '")';
+                $p = $inv->{name} . '->query->' . ($s eq '@' ? 'multi_param' : 'param') . '("' . $n . '")';
                 $preamble .= $name . ' = ' . $p . ' unless ' . ( $s eq '$' ? 'defined ' : 'scalar ') . $name . ';';
                 if ($s eq '@') {
-                    my $p = $inv->{name} . '->query->' . ($s eq '@' ? 'multi_param' : 'param') . '("' . $n . '[]")';
+                    $p = $inv->{name} . '->query->' . ($s eq '@' ? 'multi_param' : 'param') . '("' . $n . '[]")';
                     $preamble .= $name . ' = ' . $p . ' unless ' . ( $s eq '$' ? 'defined ' : 'scalar ') . $name . ';';
                 }
             }
@@ -333,9 +339,6 @@ sub parse_body {
             lex_stuff($preamble);
         }
         $body = parse_block;
-    }
-    else {
-        die "syntax error";
     }
     return $body;
 }

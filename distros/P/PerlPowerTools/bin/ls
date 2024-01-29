@@ -14,6 +14,8 @@ License: perl
 
 # Perl Power Tool - ls(1)
 
+use strict;
+
 use Config qw(%Config);
 use File::Basename qw(basename);
 use File::Spec::Functions;
@@ -73,7 +75,8 @@ sub unix {
 
 sub default { 80 }
 
-sub has ( $program ) {
+sub has {
+	my $program = shift;
 	foreach my $dir ( split /\Q$Config{path_sep}/, $ENV{PATH} ) {
 		next unless -x catfile( $dir, $program );
 		return 1;
@@ -138,14 +141,14 @@ if ($@) {
 # ------ get directory entries
 sub DirEntries {
 	my $Options = shift;	# option arguments hashref
-	local *DH;		# directory handle
+	my $dh;			# directory handle
 	my %Attributes = ();	# entry/attributes hash
 	my @Entries = ();	# entries in original order
 	my $Name = "";		# entry name
 
-	if (!opendir(DH, $_[0]) || exists($Options{'d'})) {
+	if (!opendir($dh, $_[0]) || exists($Options{'d'})) {
 		if (-e $_[0]) {
-			closedir(DH) if (defined(DH));
+			closedir($dh) if (defined($dh));
 			push(@Entries, $_[0]);
 			$Attributes{$_[0]} = stat($_[0]);
 			push(@Entries, \%Attributes);
@@ -154,13 +157,13 @@ sub DirEntries {
 		warn "$Program: can't access '$_[0]': $!\n";
 		return ();
 	}
-	while ($Name = readdir(DH)) {
+	while ($Name = readdir($dh)) {
 		next if (!exists($Options->{'a'}) &&
 		 $Name =~ m/^\./o);
 		push(@Entries, $Name);
 		$Attributes{$Name} = stat( File::Spec->catfile( $_[0], $Name ) );
 	}
-	closedir(DH);
+	closedir($dh);
 
 	# ------ return list with %Attributes ref at end
 	push(@Entries, \%Attributes);
@@ -308,6 +311,7 @@ UNDEFSTAT
 sub List {
 	my $Name = shift;	# directory name
 	my $Options = shift;	# options/flags hashref
+	my $is_dir = shift;
 	my $Expand = shift;	# do 1 level of dir expansion,
 				# for "ls DIRNAME"
 	my $Attributes = "";	# entry attributes hashref
@@ -344,12 +348,12 @@ sub List {
 
 	# ------ print directory name if -R
 	if (exists($Options->{'R'})) {
-		print "$Name:\n";
+		print "$Name:\n" if $is_dir;
 	}
 
 	# ----- print total in blocks if -s or -l
 	if (exists($Options->{'l'}) || exists($Options->{'s'})) {
-		print "total $TotalBlocks\n";
+		print "total $TotalBlocks\n" if $is_dir;
 	}
 
 	# ------ sort entry list
@@ -402,7 +406,7 @@ sub List {
 			 $Attributes->{$Entry}->mode & 0040000) {
 				$Path = File::Spec->canonpath(File::Spec->catdir($Name,$Entry));
 				@Dirs = DirEntries(\%Options, $Path);
-				List($Path, \%Options, 0, @Dirs);
+				List($Path, \%Options, 1, 0, @Dirs);
 			}
 		}
 	}
@@ -491,14 +495,14 @@ if ($Options{'f'}) {
 }
 
 $WinCols = get_columns();
-$Attributes = stat(STDOUT);
+$Attributes = stat(*STDOUT);
 if ($Attributes->mode & 0140000) {
 	$Options{'1'} = '1';
 }
 
 # ------ current directory if no arguments
 if ($#ARGV < 0) {
-	List('.', \%Options, 0, DirEntries(\%Options, "."));
+	List('.', \%Options, 1, 0, DirEntries(\%Options, "."));
 
 # ------ named files/directories if arguments
 } else {
@@ -517,7 +521,7 @@ if ($#ARGV < 0) {
 	}
 	for my $Arg (Order(\%Options, \%Attributes, @Files)) {
 		$First = 0;
-		List($Arg, \%Options, 0,
+		List($Arg, \%Options, 0, 0,
 		 DirEntries(\%Options, $Arg));
 	}
 	for my $Arg (@Dirs) {
@@ -529,7 +533,7 @@ if ($#ARGV < 0) {
 			$First = 0;
 			print "$Arg:\n" if ($ArgCount > 0);
 		}
-		List($Arg, \%Options, 0,
+		List($Arg, \%Options, 1, 0,
 		 DirEntries(\%Options, $Arg));
 	}
 }

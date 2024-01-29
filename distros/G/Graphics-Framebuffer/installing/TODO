@@ -8,16 +8,6 @@ Many features this module have were as a result of user requests.
 
 ==============================================================================
 
-* Use DRM Framebuffer Compatibility Mode
-
-DRM drivers (those without a "/dev/fb0" file) have a framebuffer compatibility
-capability I may exploit to allow all video cards to work with this module.
-
-However, this won't guarantee hardware acceleration, but it will be a step in
-that direction.
-
-==============================================================================
-
 * Completely C accelerate all primitive drawing
 
 Currently only some functions are C code accelerated.  More are added as work

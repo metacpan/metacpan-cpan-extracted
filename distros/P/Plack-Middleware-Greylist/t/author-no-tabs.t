@@ -22,6 +22,7 @@ my @files = (
     't/02-rate-codes.t',
     't/03-override.t',
     't/04-ip6.t',
+    't/05-callback.t',
     't/author-changes.t',
     't/author-critic.t',
     't/author-eof.t',

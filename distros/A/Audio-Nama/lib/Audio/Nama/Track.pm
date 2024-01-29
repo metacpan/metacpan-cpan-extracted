@@ -19,13 +19,13 @@ use Audio::Nama::Log qw(logpkg logsub);
 use Audio::Nama::Effect  qw(fxn);
 use List::MoreUtils qw(first_index);
 use Try::Tiny;
-use Modern::Perl;
+use Modern::Perl '2020';
+our $VERSION = 1.0;
 use Carp qw(carp cluck croak);
 use File::Copy qw(copy);
 use File::Slurp;
 use Memoize qw(memoize unmemoize);
 no warnings qw(uninitialized redefine);
-our $VERSION = 1.0;
 
 use Audio::Nama::Util qw(freq input_node dest_type dest_string join_path);
 use Audio::Nama::Assign qw(json_out);
@@ -126,6 +126,7 @@ sub new {
 					width => 1,
 					vol  	=> undef,
 					pan 	=> undef,
+					rw		=> 'MON',
 
 					modifiers 		=> q(), # start, reverse, audioloop, playat
 					looping 		=> undef, # do we repeat our sound sample
@@ -270,6 +271,11 @@ sub off  { $_[0]->rec_status eq OFF }
 sub current_midi {}
 sub fades { grep { $_->{track} eq $_[0]->name } values %Audio::Nama::Fade::by_index  }
 
+sub width { 
+	return $_[0]->{width} if $_[0]->{width} > 2 or not $_[0]->wav_width() or $_[0]->{rw} eq MON;
+	return $_[0]->wav_width // $_[0]->{width}
+}
+
 } # end package
 
 
@@ -279,7 +285,8 @@ sub fades { grep { $_->{track} eq $_[0]->name } values %Audio::Nama::Fade::by_in
 {
 package Audio::Nama::SimpleTrack; # used for Main track
 use Audio::Nama::Globals qw(:all);
-use Modern::Perl; use Carp; use Audio::Nama::Log qw(logpkg);
+use Modern::Perl '2020'; use Carp; use Audio::Nama::Log qw(logpkg);
+our $VERSION = 1.0;
 use SUPER;
 no warnings qw(uninitialized redefine);
 our @ISA = 'Audio::Nama::Track';
@@ -298,7 +305,8 @@ sub activate_bus {}
 {
 package Audio::Nama::MasteringTrack; # used for mastering chains 
 use Audio::Nama::Globals qw(:all);
-use Modern::Perl; use Audio::Nama::Log qw(logpkg);
+use Modern::Perl '2020'; use Audio::Nama::Log qw(logpkg);
+our $VERSION = 1.0;
 no warnings qw(uninitialized redefine);
 our @ISA = 'Audio::Nama::SimpleTrack';
 
@@ -315,7 +323,8 @@ sub version {0}
 package Audio::Nama::EarTrack; # for submix helper tracks
 use Audio::Nama::Globals qw(:all);
 use Audio::Nama::Util qw(dest_string);
-use Modern::Perl; use Audio::Nama::Log qw(logpkg);
+use Modern::Perl '2020'; use Audio::Nama::Log qw(logpkg);
+our $VERSION = 1.0;
 use SUPER;
 no warnings qw(uninitialized redefine);
 our @ISA = 'Audio::Nama::SlaveTrack';
@@ -331,7 +340,8 @@ sub width { $_[0]->{width} }
 {
 package Audio::Nama::SlaveTrack;
 use Audio::Nama::Globals qw(:all);
-use Modern::Perl; use Audio::Nama::Log qw(logpkg);
+use Modern::Perl '2020'; use Audio::Nama::Log qw(logpkg);
+our $VERSION = 1.0;
 no warnings qw(uninitialized redefine);
 our @ISA = 'Audio::Nama::Track';
 sub width { $tn{$_[0]->target}->width }
@@ -341,14 +351,16 @@ sub playback_version { $tn{$_[0]->target}->playback_version}
 sub source_type { $tn{$_[0]->target}->source_type}
 sub source_id { $tn{$_[0]->target}->source_id}
 sub source_status { $tn{$_[0]->target}->source_status }
-sub send_type { $tn{$_[0]->target}->send_type}
-sub send_id { $tn{$_[0]->target}->send_id}
+sub send_type { $tn{$_[0]->target}->send_type }
+sub send_id {   $tn{$_[0]->target}->send_id   }
+
 sub dir { $tn{$_[0]->target}->dir }
 }
 {
 package Audio::Nama::BoostTrack; 
 use Audio::Nama::Globals qw(:all);
-use Modern::Perl; use Audio::Nama::Log qw(logpkg);
+use Modern::Perl '2020'; use Audio::Nama::Log qw(logpkg);
+our $VERSION = 1.0;
 no warnings qw(uninitialized redefine);
 our @ISA = 'Audio::Nama::Track';
 sub rec_status{
@@ -360,6 +372,7 @@ sub send_id { $tn{Main}->send_id }
 }
 {
 package Audio::Nama::CacheRecTrack;
+our $VERSION = 1.0;
 use Audio::Nama::Globals qw(:all);
 use Audio::Nama::Log qw(logpkg);
 our @ISA = qw(Audio::Nama::SlaveTrack);
@@ -376,6 +389,7 @@ sub full_path { my $track = shift; Audio::Nama::join_path( $track->dir, $track->
 }
 {
 package Audio::Nama::MixDownTrack; 
+our $VERSION = 1.0;
 use Audio::Nama::Globals qw(:all);
 use Audio::Nama::Log qw(logpkg);
 use SUPER;
@@ -411,6 +425,7 @@ sub forbid_user_ops { 1 }
 package Audio::Nama::EditTrack; use Carp qw(carp cluck);
 use Audio::Nama::Globals qw(:all);
 use Audio::Nama::Log qw(logpkg);
+our $VERSION = 1.0;
 our @ISA = 'Audio::Nama::Track';
 our $AUTOLOAD;
 sub AUTOLOAD {
@@ -439,6 +454,7 @@ sub playat_time {
 package Audio::Nama::VersionTrack;
 use Audio::Nama::Globals qw(:all);
 use Audio::Nama::Log qw(logpkg);
+our $VERSION = 1.0;
 our @ISA ='Audio::Nama::Track';
 sub set_version {}
 sub versions { [$_[0]->version] }
@@ -460,6 +476,7 @@ package Audio::Nama::Clip;
 
 use Audio::Nama::Globals qw(:all);
 use Audio::Nama::Log qw(logpkg);
+our $VERSION = 1.0;
 our @ISA = qw( Audio::Nama::VersionTrack Audio::Nama::Track );
 
 sub sequence { my $self = shift; $Audio::Nama::bn{$self->group} };
@@ -500,6 +517,7 @@ sub rec_status { $_[0]->version ? PLAY : OFF }
 } # end package
 { 
 package Audio::Nama::Spacer;
+our $VERSION = 1.0;
 our @ISA = 'Audio::Nama::Clip';
 use SUPER;
 use Audio::Nama::Object qw(duration);
@@ -524,14 +542,16 @@ sub new {
 { 
 package Audio::Nama::WetTrack; # for inserts
 use Audio::Nama::Globals qw(:all);
-use Modern::Perl; use Audio::Nama::Log qw(logpkg);
+use Modern::Perl '2020'; use Audio::Nama::Log qw(logpkg);
+our $VERSION = 1.0;
 our @ISA = 'Audio::Nama::SlaveTrack';
 }
 
 {
 package Audio::Nama::MidiTrack; 
 use Audio::Nama::Globals qw(:all);
-use Modern::Perl;
+use Modern::Perl '2020';
+our $VERSION = 1.0;
 use SUPER;
 use Audio::Nama::Log qw(logpkg);
 our @ISA = qw(Audio::Nama::Track);

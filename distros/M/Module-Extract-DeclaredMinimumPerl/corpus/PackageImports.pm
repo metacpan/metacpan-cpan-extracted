@@ -12,4 +12,11 @@ use Mimi qq{string};
 
 my $cat = 'Buster';
 
+=pod
+
+use v5.22;
+
+=cut
+
+
 1;

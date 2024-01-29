@@ -26,7 +26,7 @@ use JSON 'to_json';
 use Lemonldap::NG::Common::Conf::ReConstants;
 use Lemonldap::NG::Manager::Attributes;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.18.0';
 
 extends 'Lemonldap::NG::Common::Conf::Compact';
 
@@ -894,7 +894,7 @@ sub _scanNodes {
                     foreach my $node ( @{ $leaf->{nodes} } ) {
                         my $tmp;
                         $tmp->{$_} = $node->{data}->{$_}
-                          foreach (qw(type rule logo level label));
+                          foreach (qw(type rule logo level label regrule));
                         $tmp->{register} = $node->{data}->{register} ? 1 : 0;
                         $tmp->{over}     = {};
                         foreach ( @{ $node->{data}->{over} } ) {

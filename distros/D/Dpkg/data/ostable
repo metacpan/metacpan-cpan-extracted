@@ -26,11 +26,9 @@ abin32-gnu-linux	linux-gnuabin32		linux[^-]*-gnuabin32
 abi64-gnu-linux		linux-gnuabi64		linux[^-]*-gnuabi64
 spe-gnu-linux		linux-gnuspe		linux[^-]*-gnuspe
 x32-gnu-linux		linux-gnux32		linux[^-]*-gnux32
-ilp32-gnu-linux		linux-gnu_ilp32		linux[^-]*-gnu_ilp32
 base-gnu-linux		linux-gnu		linux[^-]*(-gnu.*)?
 eabihf-gnu-kfreebsd	kfreebsd-gnueabihf	kfreebsd[^-]*-gnueabihf
 base-gnu-kfreebsd	kfreebsd-gnu		kfreebsd[^-]*(-gnu.*)?
-base-gnu-knetbsd	knetbsd-gnu		knetbsd[^-]*(-gnu.*)?
 base-gnu-kopensolaris	kopensolaris-gnu	kopensolaris[^-]*(-gnu.*)?
 base-gnu-hurd		gnu			gnu[^-]*
 base-bsd-darwin		darwin			darwin[^-]*
@@ -40,6 +38,4 @@ base-bsd-netbsd		netbsd			netbsd[^-]*
 base-bsd-openbsd	openbsd			openbsd[^-]*
 base-sysv-aix		aix			aix[^-]*
 base-sysv-solaris	solaris			solaris[^-]*
-eabi-uclibc-uclinux	uclinux-uclibceabi	uclinux[^-]*-uclibceabi
-base-uclibc-uclinux	uclinux-uclibc		uclinux[^-]*(-uclibc.*)?
 base-tos-mint		mint			mint[^-]*

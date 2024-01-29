@@ -3,9 +3,9 @@ package Sah::Schema::filename::unix::basename;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-23'; # DATE
+our $DATE = '2024-01-08'; # DATE
 our $DIST = 'Sah-Schemas-Path'; # DIST
-our $VERSION = '0.025'; # VERSION
+our $VERSION = '0.030'; # VERSION
 
 our $schema = ["str" => {
     summary => 'Filesystem base file name on a Unix system',
@@ -46,7 +46,23 @@ Sah::Schema::filename::unix::basename - Filesystem base file name on a Unix syst
 
 =head1 VERSION
 
-This document describes version 0.025 of Sah::Schema::filename::unix::basename (from Perl distribution Sah-Schemas-Path), released on 2023-11-23.
+This document describes version 0.030 of Sah::Schema::filename::unix::basename (from Perl distribution Sah-Schemas-Path), released on 2024-01-08.
+
+=head1 SAH SCHEMA DEFINITION
+
+ [
+   "str",
+   {
+     "match"        => "\\A(?:[^/\\0]{1,255})\\z",
+     "prefilters"   => [],
+     "summary"      => "Filesystem base file name on a Unix system",
+     "x.completion" => ["filename_curdir"],
+   },
+ ]
+
+Base type: L<str|Data::Sah::Type::str>
+
+Used completion: L<filename_curdir|Perinci::Sub::XCompletion::filename_curdir>
 
 =head1 SYNOPSIS
 
@@ -82,7 +98,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = "";
+ $data = "foo\0";
  my $errmsg = $validator->($data); # => "Must match regex pattern \\A(?:[^/\\0]{1,255})\\z"
 
 Often a schema has coercion rule or default value rules, so after validation the
@@ -97,8 +113,8 @@ validated value will be different from the original. To return the validated
  my $res = $validator->($data); # => ["","foo"]
  
  # a sample invalid data
- $data = "";
- my $res = $validator->($data); # => ["Must match regex pattern \\A(?:[^/\\0]{1,255})\\z",""]
+ $data = "foo\0";
+ my $res = $validator->($data); # => ["Must match regex pattern \\A(?:[^/\\0]{1,255})\\z","foo\0"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -229,7 +245,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2020, 2019, 2018, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2020, 2019, 2018, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

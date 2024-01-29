@@ -1,5 +1,8 @@
 Revision history for Perl module App::Module::Lister
 
+1.001 2024-01-13T00:18:26Z
+	* Refresh the distro, bump to 1.x release, update email address
+
 0.155 2022-01-08T03:37:58Z
 	* No code changes - fix link in README.pod
 

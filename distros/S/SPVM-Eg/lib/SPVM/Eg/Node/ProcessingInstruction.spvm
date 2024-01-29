@@ -1,0 +1,21 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+# ProcessingInstruction in JavaScript
+class Eg::Node::ProcessingInstruction extends Eg::Node::CharacterData {
+  
+  allow Eg::Node::Document;
+  
+  # Fields
+  has target : ro string;
+  
+  # Class Methods
+  private static method new : Eg::Node::ProcessingInstruction ($node_value : string) {
+    
+    my $self = new Eg::Node::ProcessingInstruction;
+    
+    $self->SUPER::init({node_type => Eg::Node->TYPE_PROCESSING_INSTRUCTION_NODE, node_value => $node_value});
+    
+    return $self;
+  }
+}

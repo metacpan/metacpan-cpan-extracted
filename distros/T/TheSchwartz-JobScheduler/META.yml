@@ -1,8 +1,9 @@
 ---
-abstract: 'Lightweight TheSchwartz job dispatcher'
+abstract: 'Lightweight TheSchwartz job dispatcher with maintained database connections'
 author:
   - 'Mikko Koivunalho <mikkoi@cpan.org>'
 build_requires:
+  DBD::SQLite: '0'
   DBI: '0'
   Data::Dumper: '0'
   Database::ManagedHandle: '0'
@@ -19,7 +20,7 @@ build_requires:
   utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.006'
+  perl: '5.010'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 keywords:
@@ -34,6 +35,8 @@ recommends:
   Database::ManagedHandle: '0'
 requires:
   Carp: '0'
+  Carp::Assert: '0'
+  Const::Fast: '0'
   English: '0'
   Log::Any: '0'
   Log::Any::Adapter::Util: '0'
@@ -48,7 +51,7 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=TheSchwartz-JobScheduler
   homepage: https://metacpan.org/release/TheSchwartz-JobScheduler
   repository: https://github.com/mikkoi/TheSchwartz-JobScheduler.git
-version: '0.001'
-x_generated_by_perl: v5.34.1
+version: '0.002'
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

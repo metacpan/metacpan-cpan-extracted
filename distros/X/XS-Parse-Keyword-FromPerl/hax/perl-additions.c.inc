@@ -173,12 +173,13 @@ static void S_ensure_module_version(pTHX_ SV *module, SV *version)
 }
 
 #if HAVE_PERL_VERSION(5, 16, 0)
+  /* TODO: perl 5.14 lacks HvNAMEUTF8, gv_fetchmeth_pvn() */
 #  define fetch_superclass_method_pv(stash, pv, len, level)  S_fetch_superclass_method_pv(aTHX_ stash, pv, len, level)
 static CV *S_fetch_superclass_method_pv(pTHX_ HV *stash, const char *pv, STRLEN len, U32 level)
 {
-#if HAVE_PERL_VERSION(5, 18, 0)
+#  if HAVE_PERL_VERSION(5, 18, 0)
   GV *gv = gv_fetchmeth_pvn(stash, pv, len, level, GV_SUPER);
-#else
+#  else
   SV *superclassname = newSVpvf("%*s::SUPER", HvNAMELEN_get(stash), HvNAME_get(stash));
   if(HvNAMEUTF8(stash))
     SvUTF8_on(superclassname);
@@ -186,13 +187,13 @@ static CV *S_fetch_superclass_method_pv(pTHX_ HV *stash, const char *pv, STRLEN 
 
   HV *superstash = gv_stashsv(superclassname, GV_ADD);
   GV *gv = gv_fetchmeth_pvn(superstash, pv, len, level, 0);
-#endif
+#  endif
 
   if(!gv)
     return NULL;
   return GvCV(gv);
 }
-#endif
+#endif /* HAVE_PERL_VERSION(5, 16, 0) */
 
 #define get_class_isa(stash)  S_get_class_isa(aTHX_ stash)
 static AV *S_get_class_isa(pTHX_ HV *stash)

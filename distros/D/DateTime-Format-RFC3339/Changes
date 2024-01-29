@@ -1,15 +1,30 @@
 Revision history for DateTime-Format-RFC3339
 
-1.2.0   2015/10/09
-        No functional changes.
-	Updated to adopt the conventions used by my other modules.
-	A few tests were added, and a repository information was added.
+1.8.0   2024-01-21
+        - Added missing Perl v5.10 requirement.
+        - Updated the version of ExtUtils::MakeMaker that's required.
 
-1.0.5   2011/03/28
+1.6.0   2024-01-01
+        - Fix bug in POD.
+
+1.4.0   2024-01-01
+        - Added `decimals` option.
+        - Added `sep` and `sep_re` options.
+        - Documented `uc_only` option.
+        - Fixed bug tracker information.
+        - Misc internal improvements.
+
+1.2.0   2015-10-09
+        No functional changes.
+        Updated to adopt the conventions used by my other modules.
+        A few tests were added, and a repository information was added.
+
+1.0.5   2011-03-28
         Specified license more explicitly.
 
 1.0.4   2010-10-10
-        Switch to UTC rather than rounding when dealing with timezone offsets of non-integral minutes.
+        Switch to UTC rather than rounding when dealing with timezone offsets
+        of non-integral minutes.
 
 1.0.3   2010-10-07
         Leave timezone unchanged when formatting.

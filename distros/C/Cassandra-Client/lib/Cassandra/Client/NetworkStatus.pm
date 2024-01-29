@@ -1,6 +1,6 @@
 package Cassandra::Client::NetworkStatus;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::NetworkStatus::VERSION = '0.20';
+$Cassandra::Client::NetworkStatus::VERSION = '0.21';
 use 5.010;
 use strict;
 use warnings;
@@ -168,7 +168,7 @@ Cassandra::Client::NetworkStatus
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 AUTHOR
 

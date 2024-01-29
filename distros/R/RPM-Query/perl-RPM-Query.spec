@@ -1,5 +1,5 @@
 Name:           perl-RPM-Query
-Version:        0.02
+Version:        0.03
 Release:        1%{?dist}
 Summary:        Perl object overlay of the RPM query command
 License:        MIT

@@ -1,5 +1,5 @@
 package XML::RSS::Private::Output::V0_9;
-$XML::RSS::Private::Output::V0_9::VERSION = '1.62';
+$XML::RSS::Private::Output::V0_9::VERSION = '1.63';
 use strict;
 use warnings;
 
@@ -45,7 +45,7 @@ __END__
 
 =head1 VERSION
 
-version 1.62
+version 1.63
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

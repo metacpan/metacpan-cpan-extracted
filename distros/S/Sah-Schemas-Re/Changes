@@ -1,3 +1,26 @@
+0.005   2023-09-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Base re_or_code_from_str on obj::re instead of the 're' type, to
+          be more strict.
+
+
+0.004   2023-09-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schema: obj::re.
+
+
+0.003   2023-09-05  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schema: re_or_code_from_str.
+
+
+0.002   2023-09-03  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention some related modules/schemas.
+
+
 0.001   2022-08-20  Released-By: PERLANCAR
 
         - First release.

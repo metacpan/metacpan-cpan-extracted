@@ -40,7 +40,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 use UI::Various::core;
 
@@ -113,6 +113,10 @@ sub _attributes($)
     my @attributes = ();
     if (defined $self->{align})
     {   push @attributes, @{$alignment[$self->{align}]};   }
+    if (defined $self->{bg})
+    {   push @attributes, '-background' => '#' . $self->{bg};   }
+    if (defined $self->{fg})
+    {   push @attributes, '-foreground' => '#' . $self->{fg};   }
     if (defined $self->{height})
     {   push @attributes, '-height', $self->{height};   }
     if (defined $self->{width})

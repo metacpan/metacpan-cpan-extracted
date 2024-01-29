@@ -2,13 +2,12 @@
 # MIT License
 
 class File::Temp::Dir {
-  use Sys::FileTest;
   use File::Path;
   
   allow File::Temp;
   
   has dirname : ro string;
-
+  
   # Class Methods
   private static method new : File::Temp::Dir () {
     my $self = new File::Temp::Dir;
@@ -18,149 +17,8 @@ class File::Temp::Dir {
   private method DESTROY : void () {
     my $dirname = $self->{dirname};
     
-    if ($dirname && Sys::FileTest->d($dirname)) {
+    if ($dirname && Sys->d($dirname)) {
       File::Path->rmtree($dirname);
     }
   }
 }
-
-=pod
-
-  private static method tempdir : string () {
-    # Default options
-    my %options = (
-                   "CLEANUP"    => 0, # Remove directory on exit
-                   "DIR"        => '', # Root directory
-                   "TMPDIR"     => 0,  # Use tempdir with template
-                  );
-
-    # Deal with the DIR and TMPDIR options
-    if (defined $template) {
-
-      # Need to strip directory path if using DIR or TMPDIR
-      if ($options{'TMPDIR'} || $options{'DIR'}) {
-
-        # Strip parent directory from the filename
-        #
-        # There is no filename at the end
-        my ($volume, $directories, undef) = File::Spec->splitpath( $template, 1);
-
-        # Last directory is then our template
-        $template = (File::Spec->splitdir($directories))[-1];
-
-        # Prepend the supplied directory or temp dir
-        if ($options{"DIR"}) {
-
-          $template = File::Spec->catdir($options{"DIR"}, $template);
-
-        } elsif ($options{TMPDIR}) {
-
-          # Prepend tmpdir
-          $template = File::Spec->catdir(_wrap_file_spec_tmpdir(), $template);
-
-        }
-      }
-
-    } else {
-
-      if ($options{"DIR"}) {
-
-        $template = File::Spec->catdir($options{"DIR"}, TEMPXXX);
-
-      } else {
-
-        $template = File::Spec->catdir(_wrap_file_spec_tmpdir(), TEMPXXX);
-
-      }
-
-    }
-
-    my $tempdir;
-    my $suffixlen = 0;
-
-    my $errstr;
-    croak "Error in tempdir() using $template: $errstr"
-      unless ((undef, $tempdir) = _gettemp($template,
-                                           "open" => 0,
-                                           "mkdir"=> 1 ,
-                                           "suffixlen" => $suffixlen,
-                                           "ErrStr" => \$errstr,
-                                          ) );
-
-    # Return the dir name
-    return $tempdir;
-  }
-  
-  method DESTROY : void () {
-    my $temp_dir = $self->{dirname};
-    if ($temp_dir && Sys::FileTest->d($temp_dir)) {
-      File::Path->rmtree($temp_dir);
-    }
-  }
-
-  sub _wrap_file_spec_tmpdir {
-    return File::Spec->tmpdir unless $^O eq "MSWin32" && ${^TAINT};
-
-    if ( $checked ) {
-      return $alt_tmpdir ? $alt_tmpdir : File::Spec->tmpdir;
-    }
-
-    # probe what File::Spec gives and find a fallback
-    my $xxpath = _replace_XX( "X" x 10, 0 );
-
-    # First, see if File::Spec->tmpdir is writable
-    my $tmpdir = File::Spec->tmpdir;
-    my $testpath = File::Spec->catdir( $tmpdir, $xxpath );
-    if (mkdir( $testpath, 0700) ) {
-      $checked = 1;
-      rmdir $testpath;
-      return $tmpdir;
-    }
-
-    # Next, see if CSIDL_LOCAL_APPDATA is writable
-    require Win32;
-    my $local_app = File::Spec->catdir(
-      Win32::GetFolderPath( Win32::CSIDL_LOCAL_APPDATA() ), 'Temp'
-    );
-    $testpath = File::Spec->catdir( $local_app, $xxpath );
-    if ( -e $local_app or mkdir( $local_app, 0700 ) ) {
-      if (mkdir( $testpath, 0700) ) {
-        $checked = 1;
-        rmdir $testpath;
-        return $alt_tmpdir = $local_app;
-      }
-    }
-
-    # Can't find something writable
-    croak << "HERE";
-Couldn't find a writable temp directory in taint mode. Tried:
-  $tmpdir
-  $local_app
-
-Try setting and untainting the TMPDIR environment variable.
-HERE
-
-  }
-
-  sub _replace_XX {
-
-    croak 'Usage: _replace_XX($template, $ignore)'
-      unless scalar(@_) == 2;
-
-    my ($path, $ignore) = @_;
-
-    # Do it as an if, since the suffix adjusts which section to replace
-    # and suffixlen=0 returns nothing if used in the substr directly
-    # Alternatively, could simply set $ignore to length($path)-1
-    # Don't want to always use substr when not required though.
-    my $end = ( $] >= 5.006 ? "\\z" : "\\Z" );
-
-    if ($ignore) {
-      substr($path, 0, - $ignore) =~ s/X(?=X*$end)/$CHARS[ int( rand( @CHARS ) ) ]/ge;
-    } else {
-      $path =~ s/X(?=X*$end)/$CHARS[ int( rand( @CHARS ) ) ]/ge;
-    }
-  }
-}
-
-=cut

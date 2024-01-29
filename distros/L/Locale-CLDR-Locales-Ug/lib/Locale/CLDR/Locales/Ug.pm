@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ug - Package for language Uyghur
 
 package Locale::CLDR::Locales::Ug;
 # This file auto generated from Data\common\main\ug.xml
-#	on Tue  5 Dec  1:36:28 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -44,7 +44,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'aa' => 'ئافارچە',
@@ -423,7 +423,6 @@ has 'display_name_language' => (
  				'ro' => 'رومىنچە',
  				'rof' => 'رومبوچە',
  				'rom' => 'سىگانچە',
- 				'root' => 'غول تىل',
  				'ru' => 'رۇسچە',
  				'rup' => 'ئارومانچە',
  				'rw' => 'كېنىيەرىۋانداچە',
@@ -618,9 +617,7 @@ has 'display_name_script' => (
  			'Hani' => 'خەنچە',
  			'Hano' => 'خانۇنۇچە',
  			'Hans' => 'ئاددىي خەنچە',
- 			'Hans@alt=stand-alone' => 'ئاددىي خەنچە',
  			'Hant' => 'مۇرەككەپ خەنچە',
- 			'Hant@alt=stand-alone' => 'مۇرەككەپ خەنچە',
  			'Hebr' => 'ئىبرانىچە',
  			'Hira' => 'خىراگانا',
  			'Hluw' => 'ئاناتولىيە تەسۋىرىي يېزىق',
@@ -747,7 +744,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'دۇنيا',
  			'002' => 'ئافرىقا',
@@ -934,8 +931,7 @@ has 'display_name_region' => (
  			'MF' => 'ساينت مارتىن',
  			'MG' => 'ماداغاسقار',
  			'MH' => 'مارشال ئاراللىرى',
- 			'MK' => 'ماكېدونىيە',
- 			'MK@alt=variant' => 'ماكېدونىيە (سابىق يۇگوسلاۋىيە ماكېدونىيە جۇمھۇرىيىتى)',
+ 			'MK' => 'شىمالىي ماكېدونىيە',
  			'ML' => 'مالى',
  			'MM' => 'بىرما',
  			'MN' => 'موڭغۇلىيە',
@@ -1057,7 +1053,7 @@ has 'display_name_variant' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'1901' => 'ئەنئەنىۋى گېرمانچە ئىملا قائىدىسى',
  			'1994' => 'ئۆلچەملەشتۈرۈلگەن رېسىيان ئىملا قائىدىسى',
@@ -1113,7 +1109,7 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'calendar' => 'يىلنامە',
  			'collation' => 'تەرتىپلەش تەرتىپى',
@@ -1236,7 +1232,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{مېتىر},
  			'UK' => q{ئەنگلىيە ئۆلچىمى},
@@ -1250,7 +1246,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'تىل: {0}',
  			'script' => 'يېزىق: {0}',
@@ -1279,14 +1275,15 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			index => ['ئ', 'ا', 'ە', 'ب', 'پ', 'ت', 'ج', 'چ', 'خ', 'د', 'ر', 'ز', 'ژ', 'س', 'ش', 'غ', 'ف', 'ق', 'ك', 'گ', 'ڭ', 'ل', 'م', 'ن', 'ھ', 'و', 'ۇ', 'ۆ', 'ۈ', 'ۋ', 'ې', 'ى', 'ي'],
-			main => qr{[ئ ا ە ب پ ت ج چ خ د ر ز ژ س ش غ ف ق ك گ ڭ ل م ن ھ و ۇ ۆ ۈ ۋ ې ى ي]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			auxiliary => qr{[‎‏ ئ]},
+			index => ['{ئا}', '{ئه}', '{ئو}', '{ئۇ}', '{ئۆ}', '{ئۈ}', '{ئې}', '{ئى}', 'ا', 'ە', 'ب', 'پ', 'ت', 'ج', 'چ', 'خ', 'د', 'ر', 'ز', 'ژ', 'س', 'ش', 'غ', 'ف', 'ق', 'ك', 'گ', 'ڭ', 'ل', 'م', 'ن', 'ھ', 'و', 'ۇ', 'ۆ', 'ۈ', 'ۋ', 'ې', 'ى', 'ي'],
+			main => qr{[{ئا} {ئه} {ئو} {ئۇ} {ئۆ} {ئۈ} {ئې} {ئى} ا ە ب پ ت ج چ خ د ر ز ژ س ش غ ف ق ك گ ڭ ل م ن ھ و ۇ ۆ ۈ ۋ ې ى ي]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['ئ', 'ا', 'ە', 'ب', 'پ', 'ت', 'ج', 'چ', 'خ', 'د', 'ر', 'ز', 'ژ', 'س', 'ش', 'غ', 'ف', 'ق', 'ك', 'گ', 'ڭ', 'ل', 'م', 'ن', 'ھ', 'و', 'ۇ', 'ۆ', 'ۈ', 'ۋ', 'ې', 'ى', 'ي'], };
+		return { index => ['{ئا}', '{ئه}', '{ئو}', '{ئۇ}', '{ئۆ}', '{ئۈ}', '{ئې}', '{ئى}', 'ا', 'ە', 'ب', 'پ', 'ت', 'ج', 'چ', 'خ', 'د', 'ر', 'ز', 'ژ', 'س', 'ش', 'غ', 'ف', 'ق', 'ك', 'گ', 'ڭ', 'ل', 'م', 'ن', 'ھ', 'و', 'ۇ', 'ۆ', 'ۈ', 'ۋ', 'ې', 'ى', 'ي'], };
 },
 );
 
@@ -1325,623 +1322,1501 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
-					'acre' => {
-						'name' => q(ئىنگلىز موسى),
-						'one' => q({0} ئىنگلىز موسى),
-						'other' => q({0} ئىنگلىز موسى),
+					# Long Unit Identifier
+					'acceleration-g-force' => {
+						'name' => q(ئېغىرلىق كۈچى),
+						'one' => q({0} ئېغىرلىق كۈچى),
+						'other' => q({0} ئېغىرلىق كۈچى),
 					},
-					'celsius' => {
-						'name' => q(سېلسىيە گرادۇس),
-						'one' => q({0} سېلسىيە گرادۇس),
-						'other' => q({0} سېلسىيە گرادۇس),
-					},
-					'centimeter' => {
-						'name' => q(سانتىمېتىر),
-						'one' => q({0} سانتىمېتىر),
-						'other' => q({0} سانتىمېتىر),
-					},
-					'cubic-kilometer' => {
-						'name' => q(كۇب كىلومېتىر),
-						'one' => q({0} كۇب كىلومېتىر),
-						'other' => q({0} كۇب كىلومېتىر),
-					},
-					'cubic-mile' => {
-						'name' => q(كۇب مىل),
-						'one' => q({0} كۇب مىل),
-						'other' => q({0} كۇب مىل),
-					},
-					'day' => {
-						'name' => q(كۈن),
-						'one' => q({0} كۈن),
-						'other' => q({0} كۈن),
-					},
-					'degree' => {
-						'name' => q(گىرادۇس),
-						'one' => q({0} گىرادۇس),
-						'other' => q({0} گىرادۇس),
-					},
-					'fahrenheit' => {
-						'name' => q(فارېنگېيت گرادۇس),
-						'one' => q({0} فارېنگېيت گرادۇس),
-						'other' => q({0} فارېنگېيت گرادۇس),
-					},
-					'foot' => {
-						'name' => q(فۇت),
-						'one' => q({0} فۇت),
-						'other' => q({0} فۇت),
-					},
+					# Core Unit Identifier
 					'g-force' => {
 						'name' => q(ئېغىرلىق كۈچى),
 						'one' => q({0} ئېغىرلىق كۈچى),
 						'other' => q({0} ئېغىرلىق كۈچى),
 					},
-					'gram' => {
-						'name' => q(گرام),
-						'one' => q({0} گرام),
-						'other' => q({0} گرام),
-					},
-					'hectare' => {
-						'name' => q(hectares),
-						'one' => q({0} گېكتار),
-						'other' => q({0} hectares),
-					},
-					'hectopascal' => {
-						'name' => q(يۈز پاسكال),
-						'one' => q({0} يۈز پاسكال),
-						'other' => q({0} يۈز پاسكال),
-					},
-					'horsepower' => {
-						'name' => q(ئات كۈچى),
-						'one' => q({0} ئات كۈچى),
-						'other' => q({0} ئات كۈچى),
-					},
-					'hour' => {
-						'name' => q(سائەت),
-						'one' => q({0} سائەت),
-						'other' => q({0} سائەت),
-					},
-					'inch' => {
-						'name' => q(ديۇيم),
-						'one' => q({0} ديۇيم),
-						'other' => q({0} ديۇيم),
-					},
-					'inch-hg' => {
-						'name' => q(ديۇيم سىماب تۈۋرۇكى),
-						'one' => q({0} ديۇيم سىماب تۈۋرۇكى),
-						'other' => q({0} ديۇيم سىماب تۈۋرۇكى),
-					},
-					'kilogram' => {
-						'name' => q(كىلوگرام),
-						'one' => q({0} كىلوگرام),
-						'other' => q({0} كىلوگرام),
-					},
-					'kilometer' => {
-						'name' => q(كىلومېتىر),
-						'one' => q({0} كىلومېتىر),
-						'other' => q({0} كىلومېتىر),
-					},
-					'kilometer-per-hour' => {
-						'name' => q(كىلومېتىر ھەر سائەت),
-						'one' => q({0} كىلومېتىر ھەر سائەت),
-						'other' => q({0} كىلومېتىر ھەر سائەت),
-					},
-					'kilowatt' => {
-						'name' => q(كىلوۋات),
-						'one' => q({0} كىلوۋات),
-						'other' => q({0} كىلوۋات),
-					},
-					'light-year' => {
-						'name' => q(يورۇقلۇق يىلى),
-						'one' => q({0} يورۇقلۇق يىلى),
-						'other' => q({0} يورۇقلۇق يىلى),
-					},
-					'liter' => {
-						'name' => q(لىتېر),
-						'one' => q({0} لىتېر),
-						'other' => q({0} لىتېر),
-					},
-					'meter' => {
-						'name' => q(مېتىر),
-						'one' => q({0} مېتىر),
-						'other' => q({0} مېتىر),
-					},
-					'meter-per-second' => {
-						'name' => q(مېتىر ھەر سېكۇنت),
-						'one' => q({0} مېتىر ھەر سېكۇنت),
-						'other' => q({0} مېتىر ھەر سېكۇنت),
-					},
-					'mile' => {
-						'name' => q(مىل),
-						'one' => q({0} مىل),
-						'other' => q({0} مىل),
-					},
-					'mile-per-hour' => {
-						'name' => q(مىل ھەر سائەت),
-						'one' => q({0} مىل ھەر سائەت),
-						'other' => q({0} مىل ھەر سائەت),
-					},
-					'millibar' => {
-						'name' => q(مىللىبار),
-						'one' => q({0} مىللىبار),
-						'other' => q({0} مىللىبار),
-					},
-					'millimeter' => {
-						'name' => q(مىللىمېتىر),
-						'one' => q({0} مىللىمېتىر),
-						'other' => q({0} مىللىمېتىر),
-					},
-					'millisecond' => {
-						'name' => q(مىللى سېكۇنت),
-						'one' => q({0} مىللى سېكۇنت),
-						'other' => q({0} مىللى سېكۇنت),
-					},
-					'minute' => {
-						'name' => q(مىنۇت),
-						'one' => q({0} مىنۇت),
-						'other' => q({0} مىنۇت),
-					},
-					'month' => {
-						'name' => q(ئاي),
-						'one' => q({0} ئاي),
-						'other' => q({0} ئاي),
-					},
-					'ounce' => {
-						'name' => q(ئۇنسىيە),
-						'one' => q({0} ئۇنسىيە),
-						'other' => q({0} ئۇنسىيە),
-					},
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					'picometer' => {
-						'name' => q(پىكومېتىر),
-						'one' => q({0} پىكومېتىر),
-						'other' => q({0} پىكومېتىر),
-					},
-					'pound' => {
-						'name' => q(قاداق),
-						'one' => q({0} قاداق),
-						'other' => q({0} قاداق),
-					},
-					'second' => {
-						'name' => q(سېكۇنت),
-						'one' => q({0} سېكۇنت),
-						'other' => q({0} سېكۇنت),
-					},
-					'square-foot' => {
-						'name' => q(كۋادرات فۇت),
-						'one' => q({0} كۋادرات فۇت),
-						'other' => q({0} كۋادرات فۇت),
-					},
-					'square-kilometer' => {
-						'name' => q(كۋادرات كىلومېتىر),
-						'one' => q({0} كۋادرات كىلومېتىر),
-						'other' => q({0} كۋادرات كىلومېتىر),
-					},
-					'square-meter' => {
-						'name' => q(كۋادرات مېتىر),
-						'one' => q({0} كۋادرات مېتىر),
-						'other' => q({0} كۋادرات مېتىر),
-					},
-					'square-mile' => {
-						'name' => q(كۋادرات مىل),
-						'one' => q({0} كۋادرات مىل),
-						'other' => q({0} كۋادرات مىل),
-					},
-					'watt' => {
-						'name' => q(ۋات),
-						'one' => q({0} ۋات),
-						'other' => q({0} ۋات),
-					},
-					'week' => {
-						'name' => q(ھەپتە),
-						'one' => q({0} ھەپتە),
-						'other' => q({0} ھەپتە),
-					},
-					'yard' => {
-						'name' => q(يارد),
-						'one' => q({0} يارد),
-						'other' => q({0} يارد),
-					},
-					'year' => {
-						'name' => q(يىل),
-						'one' => q({0} يىل),
-						'other' => q({0} يىل),
-					},
-				},
-				'narrow' => {
-					'acre' => {
-						'one' => q({0}ac),
-						'other' => q({0}ac),
-					},
-					'celsius' => {
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					'centimeter' => {
-						'one' => q({0}cm),
-						'other' => q({0}cm),
-					},
-					'cubic-kilometer' => {
-						'one' => q({0}km³),
-						'other' => q({0}km³),
-					},
-					'cubic-mile' => {
-						'one' => q({0}mi³),
-						'other' => q({0}mi³),
-					},
-					'day' => {
-						'one' => q({0} كۈن),
-						'other' => q({0} كۈن),
-					},
-					'degree' => {
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					'fahrenheit' => {
-						'one' => q({0}°F),
-						'other' => q({0}°F),
-					},
-					'foot' => {
-						'one' => q({0}′),
-						'other' => q({0}′),
-					},
-					'g-force' => {
-						'one' => q({0}G),
-						'other' => q({0}Gs),
-					},
-					'gram' => {
-						'one' => q({0}g),
-						'other' => q({0}g),
-					},
-					'hectare' => {
-						'one' => q({0}گېكتار),
-						'other' => q({0}گېكتار),
-					},
-					'hectopascal' => {
-						'one' => q({0}hPa),
-						'other' => q({0}hPa),
-					},
-					'horsepower' => {
-						'one' => q({0}hp),
-						'other' => q({0}hp),
-					},
-					'hour' => {
-						'one' => q({0}h),
-						'other' => q({0}h),
-					},
-					'inch' => {
-						'one' => q({0}″),
-						'other' => q({0}″),
-					},
-					'inch-hg' => {
-						'one' => q({0}" Hg),
-						'other' => q({0}" Hg),
-					},
-					'kilogram' => {
-						'one' => q({0}kg),
-						'other' => q({0}kg),
-					},
-					'kilometer' => {
-						'one' => q({0}km),
-						'other' => q({0}km),
-					},
-					'kilometer-per-hour' => {
-						'one' => q({0}kph),
-						'other' => q({0}kph),
-					},
-					'kilowatt' => {
-						'one' => q({0}kW),
-						'other' => q({0}kW),
-					},
-					'light-year' => {
-						'one' => q({0}ly),
-						'other' => q({0}ly),
-					},
-					'liter' => {
-						'one' => q({0}l),
-						'other' => q({0}l),
-					},
-					'meter' => {
-						'one' => q({0}m),
-						'other' => q({0}m),
-					},
-					'meter-per-second' => {
-						'one' => q({0}m/s),
-						'other' => q({0}m/s),
-					},
-					'mile' => {
-						'one' => q({0}mi),
-						'other' => q({0}mi),
-					},
-					'mile-per-hour' => {
-						'one' => q({0}mph),
-						'other' => q({0}mph),
-					},
-					'millibar' => {
-						'one' => q({0}mb),
-						'other' => q({0}mb),
-					},
-					'millimeter' => {
-						'one' => q({0}mm),
-						'other' => q({0}mm),
-					},
-					'millisecond' => {
-						'one' => q({0}ms),
-						'other' => q({0}ms),
-					},
-					'minute' => {
-						'one' => q({0}m),
-						'other' => q({0}m),
-					},
-					'month' => {
-						'one' => q({0} ئاي),
-						'other' => q({0} ئاي),
-					},
-					'ounce' => {
-						'one' => q({0}oz),
-						'other' => q({0}oz),
-					},
-					'picometer' => {
-						'one' => q({0}pm),
-						'other' => q({0}pm),
-					},
-					'pound' => {
-						'one' => q({0}#),
-						'other' => q({0}#),
-					},
-					'second' => {
-						'one' => q({0}s),
-						'other' => q({0}s),
-					},
-					'square-foot' => {
-						'one' => q({0}ft²),
-						'other' => q({0}ft²),
-					},
-					'square-mile' => {
-						'one' => q({0}mi²),
-						'other' => q({0}mi²),
-					},
-					'watt' => {
-						'one' => q({0}W),
-						'other' => q({0}W),
-					},
-					'week' => {
-						'one' => q({0} ھەپتە),
-						'other' => q({0} ھەپتە),
-					},
-					'yard' => {
-						'one' => q({0}yd),
-						'other' => q({0}yd),
-					},
-					'year' => {
-						'one' => q({0} يىل),
-						'other' => q({0} يىل),
-					},
-				},
-				'short' => {
-					'acre' => {
-						'name' => q(ئىنگلىز موسى),
-						'one' => q({0} ئىنگلىز موسى),
-						'other' => q({0} ئىنگلىز موسى),
-					},
-					'celsius' => {
-						'name' => q(سېلسىيە گرادۇس),
-						'one' => q({0}°C),
-						'other' => q({0}°C),
-					},
-					'centimeter' => {
-						'name' => q(سانتىمېتىر),
-						'one' => q({0} سانتىمېتىر),
-						'other' => q({0} سانتىمېتىر),
-					},
-					'cubic-kilometer' => {
-						'name' => q(كۇب كىلومېتىر),
-						'one' => q({0} km³),
-						'other' => q({0} km³),
-					},
-					'cubic-mile' => {
-						'name' => q(كۇب مىل),
-						'one' => q({0} mi³),
-						'other' => q({0} mi³),
-					},
-					'day' => {
-						'name' => q(كۈن),
-						'one' => q({0} كۈن),
-						'other' => q({0} كۈن),
-					},
+					# Long Unit Identifier
+					'angle-degree' => {
+						'name' => q(گىرادۇس),
+						'one' => q({0} گىرادۇس),
+						'other' => q({0} گىرادۇس),
+					},
+					# Core Unit Identifier
 					'degree' => {
 						'name' => q(گىرادۇس),
 						'one' => q({0} گىرادۇس),
 						'other' => q({0} گىرادۇس),
 					},
-					'fahrenheit' => {
-						'name' => q(فارېنگېيت گرادۇس),
-						'one' => q({0}°F),
-						'other' => q({0}°F),
+					# Long Unit Identifier
+					'area-acre' => {
+						'name' => q(ئىنگلىز موسى),
+						'one' => q({0} ئىنگلىز موسى),
+						'other' => q({0} ئىنگلىز موسى),
 					},
-					'foot' => {
-						'name' => q(فۇت),
-						'one' => q({0} پۇت),
-						'other' => q({0} پۇت),
+					# Core Unit Identifier
+					'acre' => {
+						'name' => q(ئىنگلىز موسى),
+						'one' => q({0} ئىنگلىز موسى),
+						'other' => q({0} ئىنگلىز موسى),
 					},
-					'g-force' => {
-						'name' => q(ئېغىرلىق كۈچى),
-						'one' => q({0} G),
-						'other' => q({0} G),
+					# Long Unit Identifier
+					'area-hectare' => {
+						'name' => q(hectares),
+						'one' => q({0} گېكتار),
+						'other' => q({0} hectares),
 					},
-					'gram' => {
-						'name' => q(گرام),
-						'one' => q({0} g),
-						'other' => q({0} g),
-					},
+					# Core Unit Identifier
 					'hectare' => {
 						'name' => q(hectares),
 						'one' => q({0} گېكتار),
-						'other' => q({0} گېكتار),
+						'other' => q({0} hectares),
 					},
-					'hectopascal' => {
-						'name' => q(يۈز پاسكال),
-						'one' => q({0} ھېكتوپاسكال),
-						'other' => q({0} ھېكتوپاسكال),
+					# Long Unit Identifier
+					'area-square-foot' => {
+						'name' => q(كۋادرات فۇت),
+						'one' => q({0} كۋادرات فۇت),
+						'other' => q({0} كۋادرات فۇت),
 					},
-					'horsepower' => {
-						'name' => q(ئات كۈچى),
-						'one' => q({0} ئات كۈچى),
-						'other' => q({0} ئات كۈچى),
-					},
-					'hour' => {
-						'name' => q(سائەت),
-						'one' => q({0} سائەت),
-						'other' => q({0} سائەت),
-					},
-					'inch' => {
-						'name' => q(ديۇيم),
-						'one' => q({0} ئىنگلىز چىسى),
-						'other' => q({0} ئىنگلىز چىسى),
-					},
-					'inch-hg' => {
-						'name' => q(ديۇيم سىماب تۈۋرۇكى),
-						'one' => q({0} inHg),
-						'other' => q({0} inHg),
-					},
-					'kilogram' => {
-						'name' => q(كىلوگرام),
-						'one' => q({0} kg),
-						'other' => q({0} kg),
-					},
-					'kilometer' => {
-						'name' => q(كىلومېتىر),
-						'one' => q({0} كىلومېتىر),
-						'other' => q({0} كىلومېتىر),
-					},
-					'kilometer-per-hour' => {
-						'name' => q(كىلومېتىر ھەر سائەت),
-						'one' => q({0} سائەت/كىلومېتىر),
-						'other' => q({0} سائەت/كىلومېتىر),
-					},
-					'kilowatt' => {
-						'name' => q(كىلوۋات),
-						'one' => q({0} kW),
-						'other' => q({0} kW),
-					},
-					'light-year' => {
-						'name' => q(يورۇقلۇق يىلى),
-						'one' => q({0} يورۇقلۇق يىلى),
-						'other' => q({0} يورۇقلۇق يىلى),
-					},
-					'liter' => {
-						'name' => q(لىتېر),
-						'one' => q({0} l),
-						'other' => q({0} l),
-					},
-					'meter' => {
-						'name' => q(مېتىر),
-						'one' => q({0} مېتىر),
-						'other' => q({0} مېتىر),
-					},
-					'meter-per-second' => {
-						'name' => q(مېتىر ھەر سېكۇنت),
-						'one' => q({0} سېكۇنت/مېتىر),
-						'other' => q({0} سېكۇنت/مېتىر),
-					},
-					'mile' => {
-						'name' => q(مىل),
-						'one' => q({0} مىل),
-						'other' => q({0} مىل),
-					},
-					'mile-per-hour' => {
-						'name' => q(مىل ھەر سائەت),
-						'one' => q({0} سائەت/مىل),
-						'other' => q({0} سائەت/مىل),
-					},
-					'millibar' => {
-						'name' => q(مىللىبار),
-						'one' => q({0} mbar),
-						'other' => q({0} mbar),
-					},
-					'millimeter' => {
-						'name' => q(مىللىمېتىر),
-						'one' => q({0} مىللىمېتىر),
-						'other' => q({0} مىللىمېتىر),
-					},
-					'millisecond' => {
-						'name' => q(مىللى سېكۇنت),
-						'one' => q({0} مىللىسېكۇنت),
-						'other' => q({0} مىللىسېكۇنت),
-					},
-					'minute' => {
-						'name' => q(مىنۇت),
-						'one' => q({0} مىنۇت),
-						'other' => q({0} مىنۇت),
-					},
-					'month' => {
-						'name' => q(ئاي),
-						'one' => q({0} ئاي),
-						'other' => q({0} ئاي),
-					},
-					'ounce' => {
-						'name' => q(ئۇنسىيە),
-						'one' => q({0} ئۇنسىيە),
-						'other' => q({0} ئۇنسىيە),
-					},
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					'picometer' => {
-						'name' => q(پىكومېتىر),
-						'one' => q({0} پىكومېتىر),
-						'other' => q({0} پىكومېتىر),
-					},
-					'pound' => {
-						'name' => q(قاداق),
-						'one' => q({0} قاداق),
-						'other' => q({0} قاداق),
-					},
-					'second' => {
-						'name' => q(سېكۇنت),
-						'one' => q({0} سېكۇنت),
-						'other' => q({0} سېكۇنت),
-					},
+					# Core Unit Identifier
 					'square-foot' => {
 						'name' => q(كۋادرات فۇت),
 						'one' => q({0} كۋادرات فۇت),
 						'other' => q({0} كۋادرات فۇت),
 					},
+					# Long Unit Identifier
+					'area-square-kilometer' => {
+						'name' => q(كۋادرات كىلومېتىر),
+						'one' => q({0} كۋادرات كىلومېتىر),
+						'other' => q({0} كۋادرات كىلومېتىر),
+					},
+					# Core Unit Identifier
 					'square-kilometer' => {
 						'name' => q(كۋادرات كىلومېتىر),
-						'one' => q({0} km²),
-						'other' => q({0} km²),
+						'one' => q({0} كۋادرات كىلومېتىر),
+						'other' => q({0} كۋادرات كىلومېتىر),
 					},
+					# Long Unit Identifier
+					'area-square-meter' => {
+						'name' => q(كۋادرات مېتىر),
+						'one' => q({0} كۋادرات مېتىر),
+						'other' => q({0} كۋادرات مېتىر),
+					},
+					# Core Unit Identifier
 					'square-meter' => {
 						'name' => q(كۋادرات مېتىر),
-						'one' => q({0} m²),
-						'other' => q({0} m²),
+						'one' => q({0} كۋادرات مېتىر),
+						'other' => q({0} كۋادرات مېتىر),
 					},
+					# Long Unit Identifier
+					'area-square-mile' => {
+						'name' => q(كۋادرات مىل),
+						'one' => q({0} كۋادرات مىل),
+						'other' => q({0} كۋادرات مىل),
+					},
+					# Core Unit Identifier
 					'square-mile' => {
 						'name' => q(كۋادرات مىل),
 						'one' => q({0} كۋادرات مىل),
 						'other' => q({0} كۋادرات مىل),
 					},
-					'watt' => {
-						'name' => q(ۋات),
-						'one' => q({0} W),
-						'other' => q({0} W),
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(كۈن),
+						'one' => q({0} كۈن),
+						'other' => q({0} كۈن),
 					},
+					# Core Unit Identifier
+					'day' => {
+						'name' => q(كۈن),
+						'one' => q({0} كۈن),
+						'other' => q({0} كۈن),
+					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(سائەت),
+						'one' => q({0} سائەت),
+						'other' => q({0} سائەت),
+					},
+					# Core Unit Identifier
+					'hour' => {
+						'name' => q(سائەت),
+						'one' => q({0} سائەت),
+						'other' => q({0} سائەت),
+					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(مىللى سېكۇنت),
+						'one' => q({0} مىللى سېكۇنت),
+						'other' => q({0} مىللى سېكۇنت),
+					},
+					# Core Unit Identifier
+					'millisecond' => {
+						'name' => q(مىللى سېكۇنت),
+						'one' => q({0} مىللى سېكۇنت),
+						'other' => q({0} مىللى سېكۇنت),
+					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(مىنۇت),
+						'one' => q({0} مىنۇت),
+						'other' => q({0} مىنۇت),
+					},
+					# Core Unit Identifier
+					'minute' => {
+						'name' => q(مىنۇت),
+						'one' => q({0} مىنۇت),
+						'other' => q({0} مىنۇت),
+					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(ئاي),
+						'one' => q({0} ئاي),
+						'other' => q({0} ئاي),
+					},
+					# Core Unit Identifier
+					'month' => {
+						'name' => q(ئاي),
+						'one' => q({0} ئاي),
+						'other' => q({0} ئاي),
+					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(سېكۇنت),
+						'one' => q({0} سېكۇنت),
+						'other' => q({0} سېكۇنت),
+					},
+					# Core Unit Identifier
+					'second' => {
+						'name' => q(سېكۇنت),
+						'one' => q({0} سېكۇنت),
+						'other' => q({0} سېكۇنت),
+					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(ھەپتە),
+						'one' => q({0} ھەپتە),
+						'other' => q({0} ھەپتە),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(ھەپتە),
 						'one' => q({0} ھەپتە),
 						'other' => q({0} ھەپتە),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(يىل),
+						'one' => q({0} يىل),
+						'other' => q({0} يىل),
+					},
+					# Core Unit Identifier
+					'year' => {
+						'name' => q(يىل),
+						'one' => q({0} يىل),
+						'other' => q({0} يىل),
+					},
+					# Long Unit Identifier
+					'length-centimeter' => {
+						'name' => q(سانتىمېتىر),
+						'one' => q({0} سانتىمېتىر),
+						'other' => q({0} سانتىمېتىر),
+					},
+					# Core Unit Identifier
+					'centimeter' => {
+						'name' => q(سانتىمېتىر),
+						'one' => q({0} سانتىمېتىر),
+						'other' => q({0} سانتىمېتىر),
+					},
+					# Long Unit Identifier
+					'length-foot' => {
+						'name' => q(فۇت),
+						'one' => q({0} فۇت),
+						'other' => q({0} فۇت),
+					},
+					# Core Unit Identifier
+					'foot' => {
+						'name' => q(فۇت),
+						'one' => q({0} فۇت),
+						'other' => q({0} فۇت),
+					},
+					# Long Unit Identifier
+					'length-inch' => {
+						'name' => q(ديۇيم),
+						'one' => q({0} ديۇيم),
+						'other' => q({0} ديۇيم),
+					},
+					# Core Unit Identifier
+					'inch' => {
+						'name' => q(ديۇيم),
+						'one' => q({0} ديۇيم),
+						'other' => q({0} ديۇيم),
+					},
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'name' => q(كىلومېتىر),
+						'one' => q({0} كىلومېتىر),
+						'other' => q({0} كىلومېتىر),
+					},
+					# Core Unit Identifier
+					'kilometer' => {
+						'name' => q(كىلومېتىر),
+						'one' => q({0} كىلومېتىر),
+						'other' => q({0} كىلومېتىر),
+					},
+					# Long Unit Identifier
+					'length-light-year' => {
+						'name' => q(يورۇقلۇق يىلى),
+						'one' => q({0} يورۇقلۇق يىلى),
+						'other' => q({0} يورۇقلۇق يىلى),
+					},
+					# Core Unit Identifier
+					'light-year' => {
+						'name' => q(يورۇقلۇق يىلى),
+						'one' => q({0} يورۇقلۇق يىلى),
+						'other' => q({0} يورۇقلۇق يىلى),
+					},
+					# Long Unit Identifier
+					'length-meter' => {
+						'name' => q(مېتىر),
+						'one' => q({0} مېتىر),
+						'other' => q({0} مېتىر),
+					},
+					# Core Unit Identifier
+					'meter' => {
+						'name' => q(مېتىر),
+						'one' => q({0} مېتىر),
+						'other' => q({0} مېتىر),
+					},
+					# Long Unit Identifier
+					'length-mile' => {
+						'name' => q(مىل),
+						'one' => q({0} مىل),
+						'other' => q({0} مىل),
+					},
+					# Core Unit Identifier
+					'mile' => {
+						'name' => q(مىل),
+						'one' => q({0} مىل),
+						'other' => q({0} مىل),
+					},
+					# Long Unit Identifier
+					'length-millimeter' => {
+						'name' => q(مىللىمېتىر),
+						'one' => q({0} مىللىمېتىر),
+						'other' => q({0} مىللىمېتىر),
+					},
+					# Core Unit Identifier
+					'millimeter' => {
+						'name' => q(مىللىمېتىر),
+						'one' => q({0} مىللىمېتىر),
+						'other' => q({0} مىللىمېتىر),
+					},
+					# Long Unit Identifier
+					'length-picometer' => {
+						'name' => q(پىكومېتىر),
+						'one' => q({0} پىكومېتىر),
+						'other' => q({0} پىكومېتىر),
+					},
+					# Core Unit Identifier
+					'picometer' => {
+						'name' => q(پىكومېتىر),
+						'one' => q({0} پىكومېتىر),
+						'other' => q({0} پىكومېتىر),
+					},
+					# Long Unit Identifier
+					'length-yard' => {
+						'name' => q(يارد),
+						'one' => q({0} يارد),
+						'other' => q({0} يارد),
+					},
+					# Core Unit Identifier
 					'yard' => {
 						'name' => q(يارد),
 						'one' => q({0} يارد),
 						'other' => q({0} يارد),
 					},
+					# Long Unit Identifier
+					'mass-gram' => {
+						'name' => q(گرام),
+						'one' => q({0} گرام),
+						'other' => q({0} گرام),
+					},
+					# Core Unit Identifier
+					'gram' => {
+						'name' => q(گرام),
+						'one' => q({0} گرام),
+						'other' => q({0} گرام),
+					},
+					# Long Unit Identifier
+					'mass-kilogram' => {
+						'name' => q(كىلوگرام),
+						'one' => q({0} كىلوگرام),
+						'other' => q({0} كىلوگرام),
+					},
+					# Core Unit Identifier
+					'kilogram' => {
+						'name' => q(كىلوگرام),
+						'one' => q({0} كىلوگرام),
+						'other' => q({0} كىلوگرام),
+					},
+					# Long Unit Identifier
+					'mass-ounce' => {
+						'name' => q(ئۇنسىيە),
+						'one' => q({0} ئۇنسىيە),
+						'other' => q({0} ئۇنسىيە),
+					},
+					# Core Unit Identifier
+					'ounce' => {
+						'name' => q(ئۇنسىيە),
+						'one' => q({0} ئۇنسىيە),
+						'other' => q({0} ئۇنسىيە),
+					},
+					# Long Unit Identifier
+					'mass-pound' => {
+						'name' => q(قاداق),
+						'one' => q({0} قاداق),
+						'other' => q({0} قاداق),
+					},
+					# Core Unit Identifier
+					'pound' => {
+						'name' => q(قاداق),
+						'one' => q({0} قاداق),
+						'other' => q({0} قاداق),
+					},
+					# Long Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Core Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Long Unit Identifier
+					'power-horsepower' => {
+						'name' => q(ئات كۈچى),
+						'one' => q({0} ئات كۈچى),
+						'other' => q({0} ئات كۈچى),
+					},
+					# Core Unit Identifier
+					'horsepower' => {
+						'name' => q(ئات كۈچى),
+						'one' => q({0} ئات كۈچى),
+						'other' => q({0} ئات كۈچى),
+					},
+					# Long Unit Identifier
+					'power-kilowatt' => {
+						'name' => q(كىلوۋات),
+						'one' => q({0} كىلوۋات),
+						'other' => q({0} كىلوۋات),
+					},
+					# Core Unit Identifier
+					'kilowatt' => {
+						'name' => q(كىلوۋات),
+						'one' => q({0} كىلوۋات),
+						'other' => q({0} كىلوۋات),
+					},
+					# Long Unit Identifier
+					'power-watt' => {
+						'name' => q(ۋات),
+						'one' => q({0} ۋات),
+						'other' => q({0} ۋات),
+					},
+					# Core Unit Identifier
+					'watt' => {
+						'name' => q(ۋات),
+						'one' => q({0} ۋات),
+						'other' => q({0} ۋات),
+					},
+					# Long Unit Identifier
+					'pressure-hectopascal' => {
+						'name' => q(يۈز پاسكال),
+						'one' => q({0} يۈز پاسكال),
+						'other' => q({0} يۈز پاسكال),
+					},
+					# Core Unit Identifier
+					'hectopascal' => {
+						'name' => q(يۈز پاسكال),
+						'one' => q({0} يۈز پاسكال),
+						'other' => q({0} يۈز پاسكال),
+					},
+					# Long Unit Identifier
+					'pressure-inch-ofhg' => {
+						'name' => q(ديۇيم سىماب تۈۋرۇكى),
+						'one' => q({0} ديۇيم سىماب تۈۋرۇكى),
+						'other' => q({0} ديۇيم سىماب تۈۋرۇكى),
+					},
+					# Core Unit Identifier
+					'inch-ofhg' => {
+						'name' => q(ديۇيم سىماب تۈۋرۇكى),
+						'one' => q({0} ديۇيم سىماب تۈۋرۇكى),
+						'other' => q({0} ديۇيم سىماب تۈۋرۇكى),
+					},
+					# Long Unit Identifier
+					'pressure-millibar' => {
+						'name' => q(مىللىبار),
+						'one' => q({0} مىللىبار),
+						'other' => q({0} مىللىبار),
+					},
+					# Core Unit Identifier
+					'millibar' => {
+						'name' => q(مىللىبار),
+						'one' => q({0} مىللىبار),
+						'other' => q({0} مىللىبار),
+					},
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'name' => q(كىلومېتىر ھەر سائەت),
+						'one' => q({0} كىلومېتىر ھەر سائەت),
+						'other' => q({0} كىلومېتىر ھەر سائەت),
+					},
+					# Core Unit Identifier
+					'kilometer-per-hour' => {
+						'name' => q(كىلومېتىر ھەر سائەت),
+						'one' => q({0} كىلومېتىر ھەر سائەت),
+						'other' => q({0} كىلومېتىر ھەر سائەت),
+					},
+					# Long Unit Identifier
+					'speed-meter-per-second' => {
+						'name' => q(مېتىر ھەر سېكۇنت),
+						'one' => q({0} مېتىر ھەر سېكۇنت),
+						'other' => q({0} مېتىر ھەر سېكۇنت),
+					},
+					# Core Unit Identifier
+					'meter-per-second' => {
+						'name' => q(مېتىر ھەر سېكۇنت),
+						'one' => q({0} مېتىر ھەر سېكۇنت),
+						'other' => q({0} مېتىر ھەر سېكۇنت),
+					},
+					# Long Unit Identifier
+					'speed-mile-per-hour' => {
+						'name' => q(مىل ھەر سائەت),
+						'one' => q({0} مىل ھەر سائەت),
+						'other' => q({0} مىل ھەر سائەت),
+					},
+					# Core Unit Identifier
+					'mile-per-hour' => {
+						'name' => q(مىل ھەر سائەت),
+						'one' => q({0} مىل ھەر سائەت),
+						'other' => q({0} مىل ھەر سائەت),
+					},
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'name' => q(سېلسىيە گرادۇس),
+						'one' => q({0} سېلسىيە گرادۇس),
+						'other' => q({0} سېلسىيە گرادۇس),
+					},
+					# Core Unit Identifier
+					'celsius' => {
+						'name' => q(سېلسىيە گرادۇس),
+						'one' => q({0} سېلسىيە گرادۇس),
+						'other' => q({0} سېلسىيە گرادۇس),
+					},
+					# Long Unit Identifier
+					'temperature-fahrenheit' => {
+						'name' => q(فارېنگېيت گرادۇس),
+						'one' => q({0} فارېنگېيت گرادۇس),
+						'other' => q({0} فارېنگېيت گرادۇس),
+					},
+					# Core Unit Identifier
+					'fahrenheit' => {
+						'name' => q(فارېنگېيت گرادۇس),
+						'one' => q({0} فارېنگېيت گرادۇس),
+						'other' => q({0} فارېنگېيت گرادۇس),
+					},
+					# Long Unit Identifier
+					'volume-cubic-kilometer' => {
+						'name' => q(كۇب كىلومېتىر),
+						'one' => q({0} كۇب كىلومېتىر),
+						'other' => q({0} كۇب كىلومېتىر),
+					},
+					# Core Unit Identifier
+					'cubic-kilometer' => {
+						'name' => q(كۇب كىلومېتىر),
+						'one' => q({0} كۇب كىلومېتىر),
+						'other' => q({0} كۇب كىلومېتىر),
+					},
+					# Long Unit Identifier
+					'volume-cubic-mile' => {
+						'name' => q(كۇب مىل),
+						'one' => q({0} كۇب مىل),
+						'other' => q({0} كۇب مىل),
+					},
+					# Core Unit Identifier
+					'cubic-mile' => {
+						'name' => q(كۇب مىل),
+						'one' => q({0} كۇب مىل),
+						'other' => q({0} كۇب مىل),
+					},
+					# Long Unit Identifier
+					'volume-liter' => {
+						'name' => q(لىتېر),
+						'one' => q({0} لىتېر),
+						'other' => q({0} لىتېر),
+					},
+					# Core Unit Identifier
+					'liter' => {
+						'name' => q(لىتېر),
+						'one' => q({0} لىتېر),
+						'other' => q({0} لىتېر),
+					},
+				},
+				'narrow' => {
+					# Long Unit Identifier
+					'acceleration-g-force' => {
+						'one' => q({0}G),
+						'other' => q({0}Gs),
+					},
+					# Core Unit Identifier
+					'g-force' => {
+						'one' => q({0}G),
+						'other' => q({0}Gs),
+					},
+					# Long Unit Identifier
+					'angle-degree' => {
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Core Unit Identifier
+					'degree' => {
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Long Unit Identifier
+					'area-acre' => {
+						'one' => q({0}ac),
+						'other' => q({0}ac),
+					},
+					# Core Unit Identifier
+					'acre' => {
+						'one' => q({0}ac),
+						'other' => q({0}ac),
+					},
+					# Long Unit Identifier
+					'area-hectare' => {
+						'one' => q({0}گېكتار),
+						'other' => q({0}گېكتار),
+					},
+					# Core Unit Identifier
+					'hectare' => {
+						'one' => q({0}گېكتار),
+						'other' => q({0}گېكتار),
+					},
+					# Long Unit Identifier
+					'area-square-foot' => {
+						'one' => q({0}ft²),
+						'other' => q({0}ft²),
+					},
+					# Core Unit Identifier
+					'square-foot' => {
+						'one' => q({0}ft²),
+						'other' => q({0}ft²),
+					},
+					# Long Unit Identifier
+					'area-square-mile' => {
+						'one' => q({0}mi²),
+						'other' => q({0}mi²),
+					},
+					# Core Unit Identifier
+					'square-mile' => {
+						'one' => q({0}mi²),
+						'other' => q({0}mi²),
+					},
+					# Long Unit Identifier
+					'duration-day' => {
+						'one' => q({0} كۈن),
+						'other' => q({0} كۈن),
+					},
+					# Core Unit Identifier
+					'day' => {
+						'one' => q({0} كۈن),
+						'other' => q({0} كۈن),
+					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'one' => q({0}h),
+						'other' => q({0}h),
+					},
+					# Core Unit Identifier
+					'hour' => {
+						'one' => q({0}h),
+						'other' => q({0}h),
+					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'one' => q({0}ms),
+						'other' => q({0}ms),
+					},
+					# Core Unit Identifier
+					'millisecond' => {
+						'one' => q({0}ms),
+						'other' => q({0}ms),
+					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'one' => q({0}m),
+						'other' => q({0}m),
+					},
+					# Core Unit Identifier
+					'minute' => {
+						'one' => q({0}m),
+						'other' => q({0}m),
+					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'one' => q({0} ئاي),
+						'other' => q({0} ئاي),
+					},
+					# Core Unit Identifier
+					'month' => {
+						'one' => q({0} ئاي),
+						'other' => q({0} ئاي),
+					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'one' => q({0}s),
+						'other' => q({0}s),
+					},
+					# Core Unit Identifier
+					'second' => {
+						'one' => q({0}s),
+						'other' => q({0}s),
+					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'one' => q({0} ھەپتە),
+						'other' => q({0} ھەپتە),
+					},
+					# Core Unit Identifier
+					'week' => {
+						'one' => q({0} ھەپتە),
+						'other' => q({0} ھەپتە),
+					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'one' => q({0} يىل),
+						'other' => q({0} يىل),
+					},
+					# Core Unit Identifier
+					'year' => {
+						'one' => q({0} يىل),
+						'other' => q({0} يىل),
+					},
+					# Long Unit Identifier
+					'length-centimeter' => {
+						'one' => q({0}cm),
+						'other' => q({0}cm),
+					},
+					# Core Unit Identifier
+					'centimeter' => {
+						'one' => q({0}cm),
+						'other' => q({0}cm),
+					},
+					# Long Unit Identifier
+					'length-foot' => {
+						'one' => q({0}′),
+						'other' => q({0}′),
+					},
+					# Core Unit Identifier
+					'foot' => {
+						'one' => q({0}′),
+						'other' => q({0}′),
+					},
+					# Long Unit Identifier
+					'length-inch' => {
+						'one' => q({0}″),
+						'other' => q({0}″),
+					},
+					# Core Unit Identifier
+					'inch' => {
+						'one' => q({0}″),
+						'other' => q({0}″),
+					},
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'one' => q({0}km),
+						'other' => q({0}km),
+					},
+					# Core Unit Identifier
+					'kilometer' => {
+						'one' => q({0}km),
+						'other' => q({0}km),
+					},
+					# Long Unit Identifier
+					'length-light-year' => {
+						'one' => q({0}ly),
+						'other' => q({0}ly),
+					},
+					# Core Unit Identifier
+					'light-year' => {
+						'one' => q({0}ly),
+						'other' => q({0}ly),
+					},
+					# Long Unit Identifier
+					'length-meter' => {
+						'one' => q({0}m),
+						'other' => q({0}m),
+					},
+					# Core Unit Identifier
+					'meter' => {
+						'one' => q({0}m),
+						'other' => q({0}m),
+					},
+					# Long Unit Identifier
+					'length-mile' => {
+						'one' => q({0}mi),
+						'other' => q({0}mi),
+					},
+					# Core Unit Identifier
+					'mile' => {
+						'one' => q({0}mi),
+						'other' => q({0}mi),
+					},
+					# Long Unit Identifier
+					'length-millimeter' => {
+						'one' => q({0}mm),
+						'other' => q({0}mm),
+					},
+					# Core Unit Identifier
+					'millimeter' => {
+						'one' => q({0}mm),
+						'other' => q({0}mm),
+					},
+					# Long Unit Identifier
+					'length-picometer' => {
+						'one' => q({0}pm),
+						'other' => q({0}pm),
+					},
+					# Core Unit Identifier
+					'picometer' => {
+						'one' => q({0}pm),
+						'other' => q({0}pm),
+					},
+					# Long Unit Identifier
+					'length-yard' => {
+						'one' => q({0}yd),
+						'other' => q({0}yd),
+					},
+					# Core Unit Identifier
+					'yard' => {
+						'one' => q({0}yd),
+						'other' => q({0}yd),
+					},
+					# Long Unit Identifier
+					'mass-gram' => {
+						'one' => q({0}g),
+						'other' => q({0}g),
+					},
+					# Core Unit Identifier
+					'gram' => {
+						'one' => q({0}g),
+						'other' => q({0}g),
+					},
+					# Long Unit Identifier
+					'mass-kilogram' => {
+						'one' => q({0}kg),
+						'other' => q({0}kg),
+					},
+					# Core Unit Identifier
+					'kilogram' => {
+						'one' => q({0}kg),
+						'other' => q({0}kg),
+					},
+					# Long Unit Identifier
+					'mass-ounce' => {
+						'one' => q({0}oz),
+						'other' => q({0}oz),
+					},
+					# Core Unit Identifier
+					'ounce' => {
+						'one' => q({0}oz),
+						'other' => q({0}oz),
+					},
+					# Long Unit Identifier
+					'mass-pound' => {
+						'one' => q({0}#),
+						'other' => q({0}#),
+					},
+					# Core Unit Identifier
+					'pound' => {
+						'one' => q({0}#),
+						'other' => q({0}#),
+					},
+					# Long Unit Identifier
+					'power-horsepower' => {
+						'one' => q({0}hp),
+						'other' => q({0}hp),
+					},
+					# Core Unit Identifier
+					'horsepower' => {
+						'one' => q({0}hp),
+						'other' => q({0}hp),
+					},
+					# Long Unit Identifier
+					'power-kilowatt' => {
+						'one' => q({0}kW),
+						'other' => q({0}kW),
+					},
+					# Core Unit Identifier
+					'kilowatt' => {
+						'one' => q({0}kW),
+						'other' => q({0}kW),
+					},
+					# Long Unit Identifier
+					'power-watt' => {
+						'one' => q({0}W),
+						'other' => q({0}W),
+					},
+					# Core Unit Identifier
+					'watt' => {
+						'one' => q({0}W),
+						'other' => q({0}W),
+					},
+					# Long Unit Identifier
+					'pressure-hectopascal' => {
+						'one' => q({0}hPa),
+						'other' => q({0}hPa),
+					},
+					# Core Unit Identifier
+					'hectopascal' => {
+						'one' => q({0}hPa),
+						'other' => q({0}hPa),
+					},
+					# Long Unit Identifier
+					'pressure-inch-ofhg' => {
+						'one' => q({0}" Hg),
+						'other' => q({0}" Hg),
+					},
+					# Core Unit Identifier
+					'inch-ofhg' => {
+						'one' => q({0}" Hg),
+						'other' => q({0}" Hg),
+					},
+					# Long Unit Identifier
+					'pressure-millibar' => {
+						'one' => q({0}mb),
+						'other' => q({0}mb),
+					},
+					# Core Unit Identifier
+					'millibar' => {
+						'one' => q({0}mb),
+						'other' => q({0}mb),
+					},
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'one' => q({0}kph),
+						'other' => q({0}kph),
+					},
+					# Core Unit Identifier
+					'kilometer-per-hour' => {
+						'one' => q({0}kph),
+						'other' => q({0}kph),
+					},
+					# Long Unit Identifier
+					'speed-meter-per-second' => {
+						'one' => q({0}m/s),
+						'other' => q({0}m/s),
+					},
+					# Core Unit Identifier
+					'meter-per-second' => {
+						'one' => q({0}m/s),
+						'other' => q({0}m/s),
+					},
+					# Long Unit Identifier
+					'speed-mile-per-hour' => {
+						'one' => q({0}mph),
+						'other' => q({0}mph),
+					},
+					# Core Unit Identifier
+					'mile-per-hour' => {
+						'one' => q({0}mph),
+						'other' => q({0}mph),
+					},
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Core Unit Identifier
+					'celsius' => {
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Long Unit Identifier
+					'temperature-fahrenheit' => {
+						'one' => q({0}°F),
+						'other' => q({0}°F),
+					},
+					# Core Unit Identifier
+					'fahrenheit' => {
+						'one' => q({0}°F),
+						'other' => q({0}°F),
+					},
+					# Long Unit Identifier
+					'volume-cubic-kilometer' => {
+						'one' => q({0}km³),
+						'other' => q({0}km³),
+					},
+					# Core Unit Identifier
+					'cubic-kilometer' => {
+						'one' => q({0}km³),
+						'other' => q({0}km³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-mile' => {
+						'one' => q({0}mi³),
+						'other' => q({0}mi³),
+					},
+					# Core Unit Identifier
+					'cubic-mile' => {
+						'one' => q({0}mi³),
+						'other' => q({0}mi³),
+					},
+					# Long Unit Identifier
+					'volume-liter' => {
+						'one' => q({0}l),
+						'other' => q({0}l),
+					},
+					# Core Unit Identifier
+					'liter' => {
+						'one' => q({0}l),
+						'other' => q({0}l),
+					},
+				},
+				'short' => {
+					# Long Unit Identifier
+					'acceleration-g-force' => {
+						'name' => q(ئېغىرلىق كۈچى),
+						'one' => q({0} G),
+						'other' => q({0} G),
+					},
+					# Core Unit Identifier
+					'g-force' => {
+						'name' => q(ئېغىرلىق كۈچى),
+						'one' => q({0} G),
+						'other' => q({0} G),
+					},
+					# Long Unit Identifier
+					'angle-degree' => {
+						'name' => q(گىرادۇس),
+						'one' => q({0} گىرادۇس),
+						'other' => q({0} گىرادۇس),
+					},
+					# Core Unit Identifier
+					'degree' => {
+						'name' => q(گىرادۇس),
+						'one' => q({0} گىرادۇس),
+						'other' => q({0} گىرادۇس),
+					},
+					# Long Unit Identifier
+					'area-acre' => {
+						'name' => q(ئىنگلىز موسى),
+						'one' => q({0} ئىنگلىز موسى),
+						'other' => q({0} ئىنگلىز موسى),
+					},
+					# Core Unit Identifier
+					'acre' => {
+						'name' => q(ئىنگلىز موسى),
+						'one' => q({0} ئىنگلىز موسى),
+						'other' => q({0} ئىنگلىز موسى),
+					},
+					# Long Unit Identifier
+					'area-hectare' => {
+						'name' => q(hectares),
+						'one' => q({0} گېكتار),
+						'other' => q({0} گېكتار),
+					},
+					# Core Unit Identifier
+					'hectare' => {
+						'name' => q(hectares),
+						'one' => q({0} گېكتار),
+						'other' => q({0} گېكتار),
+					},
+					# Long Unit Identifier
+					'area-square-foot' => {
+						'name' => q(كۋادرات فۇت),
+						'one' => q({0} كۋادرات فۇت),
+						'other' => q({0} كۋادرات فۇت),
+					},
+					# Core Unit Identifier
+					'square-foot' => {
+						'name' => q(كۋادرات فۇت),
+						'one' => q({0} كۋادرات فۇت),
+						'other' => q({0} كۋادرات فۇت),
+					},
+					# Long Unit Identifier
+					'area-square-kilometer' => {
+						'name' => q(كۋادرات كىلومېتىر),
+						'one' => q({0} km²),
+						'other' => q({0} km²),
+					},
+					# Core Unit Identifier
+					'square-kilometer' => {
+						'name' => q(كۋادرات كىلومېتىر),
+						'one' => q({0} km²),
+						'other' => q({0} km²),
+					},
+					# Long Unit Identifier
+					'area-square-meter' => {
+						'name' => q(كۋادرات مېتىر),
+						'one' => q({0} m²),
+						'other' => q({0} m²),
+					},
+					# Core Unit Identifier
+					'square-meter' => {
+						'name' => q(كۋادرات مېتىر),
+						'one' => q({0} m²),
+						'other' => q({0} m²),
+					},
+					# Long Unit Identifier
+					'area-square-mile' => {
+						'name' => q(كۋادرات مىل),
+						'one' => q({0} كۋادرات مىل),
+						'other' => q({0} كۋادرات مىل),
+					},
+					# Core Unit Identifier
+					'square-mile' => {
+						'name' => q(كۋادرات مىل),
+						'one' => q({0} كۋادرات مىل),
+						'other' => q({0} كۋادرات مىل),
+					},
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(كۈن),
+						'one' => q({0} كۈن),
+						'other' => q({0} كۈن),
+					},
+					# Core Unit Identifier
+					'day' => {
+						'name' => q(كۈن),
+						'one' => q({0} كۈن),
+						'other' => q({0} كۈن),
+					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(سائەت),
+						'one' => q({0} سائەت),
+						'other' => q({0} سائەت),
+					},
+					# Core Unit Identifier
+					'hour' => {
+						'name' => q(سائەت),
+						'one' => q({0} سائەت),
+						'other' => q({0} سائەت),
+					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(مىللى سېكۇنت),
+						'one' => q({0} مىللىسېكۇنت),
+						'other' => q({0} مىللىسېكۇنت),
+					},
+					# Core Unit Identifier
+					'millisecond' => {
+						'name' => q(مىللى سېكۇنت),
+						'one' => q({0} مىللىسېكۇنت),
+						'other' => q({0} مىللىسېكۇنت),
+					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(مىنۇت),
+						'one' => q({0} مىنۇت),
+						'other' => q({0} مىنۇت),
+					},
+					# Core Unit Identifier
+					'minute' => {
+						'name' => q(مىنۇت),
+						'one' => q({0} مىنۇت),
+						'other' => q({0} مىنۇت),
+					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(ئاي),
+						'one' => q({0} ئاي),
+						'other' => q({0} ئاي),
+					},
+					# Core Unit Identifier
+					'month' => {
+						'name' => q(ئاي),
+						'one' => q({0} ئاي),
+						'other' => q({0} ئاي),
+					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(سېكۇنت),
+						'one' => q({0} سېكۇنت),
+						'other' => q({0} سېكۇنت),
+					},
+					# Core Unit Identifier
+					'second' => {
+						'name' => q(سېكۇنت),
+						'one' => q({0} سېكۇنت),
+						'other' => q({0} سېكۇنت),
+					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(ھەپتە),
+						'one' => q({0} ھەپتە),
+						'other' => q({0} ھەپتە),
+					},
+					# Core Unit Identifier
+					'week' => {
+						'name' => q(ھەپتە),
+						'one' => q({0} ھەپتە),
+						'other' => q({0} ھەپتە),
+					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(يىل),
+						'one' => q({0} يىل),
+						'other' => q({0} يىل),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(يىل),
 						'one' => q({0} يىل),
 						'other' => q({0} يىل),
+					},
+					# Long Unit Identifier
+					'length-centimeter' => {
+						'name' => q(سانتىمېتىر),
+						'one' => q({0} سانتىمېتىر),
+						'other' => q({0} سانتىمېتىر),
+					},
+					# Core Unit Identifier
+					'centimeter' => {
+						'name' => q(سانتىمېتىر),
+						'one' => q({0} سانتىمېتىر),
+						'other' => q({0} سانتىمېتىر),
+					},
+					# Long Unit Identifier
+					'length-foot' => {
+						'name' => q(فۇت),
+						'one' => q({0} پۇت),
+						'other' => q({0} پۇت),
+					},
+					# Core Unit Identifier
+					'foot' => {
+						'name' => q(فۇت),
+						'one' => q({0} پۇت),
+						'other' => q({0} پۇت),
+					},
+					# Long Unit Identifier
+					'length-inch' => {
+						'name' => q(ديۇيم),
+						'one' => q({0} ئىنگلىز چىسى),
+						'other' => q({0} ئىنگلىز چىسى),
+					},
+					# Core Unit Identifier
+					'inch' => {
+						'name' => q(ديۇيم),
+						'one' => q({0} ئىنگلىز چىسى),
+						'other' => q({0} ئىنگلىز چىسى),
+					},
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'name' => q(كىلومېتىر),
+						'one' => q({0} كىلومېتىر),
+						'other' => q({0} كىلومېتىر),
+					},
+					# Core Unit Identifier
+					'kilometer' => {
+						'name' => q(كىلومېتىر),
+						'one' => q({0} كىلومېتىر),
+						'other' => q({0} كىلومېتىر),
+					},
+					# Long Unit Identifier
+					'length-light-year' => {
+						'name' => q(يورۇقلۇق يىلى),
+						'one' => q({0} يورۇقلۇق يىلى),
+						'other' => q({0} يورۇقلۇق يىلى),
+					},
+					# Core Unit Identifier
+					'light-year' => {
+						'name' => q(يورۇقلۇق يىلى),
+						'one' => q({0} يورۇقلۇق يىلى),
+						'other' => q({0} يورۇقلۇق يىلى),
+					},
+					# Long Unit Identifier
+					'length-meter' => {
+						'name' => q(مېتىر),
+						'one' => q({0} مېتىر),
+						'other' => q({0} مېتىر),
+					},
+					# Core Unit Identifier
+					'meter' => {
+						'name' => q(مېتىر),
+						'one' => q({0} مېتىر),
+						'other' => q({0} مېتىر),
+					},
+					# Long Unit Identifier
+					'length-mile' => {
+						'name' => q(مىل),
+						'one' => q({0} مىل),
+						'other' => q({0} مىل),
+					},
+					# Core Unit Identifier
+					'mile' => {
+						'name' => q(مىل),
+						'one' => q({0} مىل),
+						'other' => q({0} مىل),
+					},
+					# Long Unit Identifier
+					'length-millimeter' => {
+						'name' => q(مىللىمېتىر),
+						'one' => q({0} مىللىمېتىر),
+						'other' => q({0} مىللىمېتىر),
+					},
+					# Core Unit Identifier
+					'millimeter' => {
+						'name' => q(مىللىمېتىر),
+						'one' => q({0} مىللىمېتىر),
+						'other' => q({0} مىللىمېتىر),
+					},
+					# Long Unit Identifier
+					'length-picometer' => {
+						'name' => q(پىكومېتىر),
+						'one' => q({0} پىكومېتىر),
+						'other' => q({0} پىكومېتىر),
+					},
+					# Core Unit Identifier
+					'picometer' => {
+						'name' => q(پىكومېتىر),
+						'one' => q({0} پىكومېتىر),
+						'other' => q({0} پىكومېتىر),
+					},
+					# Long Unit Identifier
+					'length-yard' => {
+						'name' => q(يارد),
+						'one' => q({0} يارد),
+						'other' => q({0} يارد),
+					},
+					# Core Unit Identifier
+					'yard' => {
+						'name' => q(يارد),
+						'one' => q({0} يارد),
+						'other' => q({0} يارد),
+					},
+					# Long Unit Identifier
+					'mass-gram' => {
+						'name' => q(گرام),
+						'one' => q({0} g),
+						'other' => q({0} g),
+					},
+					# Core Unit Identifier
+					'gram' => {
+						'name' => q(گرام),
+						'one' => q({0} g),
+						'other' => q({0} g),
+					},
+					# Long Unit Identifier
+					'mass-kilogram' => {
+						'name' => q(كىلوگرام),
+						'one' => q({0} kg),
+						'other' => q({0} kg),
+					},
+					# Core Unit Identifier
+					'kilogram' => {
+						'name' => q(كىلوگرام),
+						'one' => q({0} kg),
+						'other' => q({0} kg),
+					},
+					# Long Unit Identifier
+					'mass-ounce' => {
+						'name' => q(ئۇنسىيە),
+						'one' => q({0} ئۇنسىيە),
+						'other' => q({0} ئۇنسىيە),
+					},
+					# Core Unit Identifier
+					'ounce' => {
+						'name' => q(ئۇنسىيە),
+						'one' => q({0} ئۇنسىيە),
+						'other' => q({0} ئۇنسىيە),
+					},
+					# Long Unit Identifier
+					'mass-pound' => {
+						'name' => q(قاداق),
+						'one' => q({0} قاداق),
+						'other' => q({0} قاداق),
+					},
+					# Core Unit Identifier
+					'pound' => {
+						'name' => q(قاداق),
+						'one' => q({0} قاداق),
+						'other' => q({0} قاداق),
+					},
+					# Long Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Core Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Long Unit Identifier
+					'power-horsepower' => {
+						'name' => q(ئات كۈچى),
+						'one' => q({0} ئات كۈچى),
+						'other' => q({0} ئات كۈچى),
+					},
+					# Core Unit Identifier
+					'horsepower' => {
+						'name' => q(ئات كۈچى),
+						'one' => q({0} ئات كۈچى),
+						'other' => q({0} ئات كۈچى),
+					},
+					# Long Unit Identifier
+					'power-kilowatt' => {
+						'name' => q(كىلوۋات),
+						'one' => q({0} kW),
+						'other' => q({0} kW),
+					},
+					# Core Unit Identifier
+					'kilowatt' => {
+						'name' => q(كىلوۋات),
+						'one' => q({0} kW),
+						'other' => q({0} kW),
+					},
+					# Long Unit Identifier
+					'power-watt' => {
+						'name' => q(ۋات),
+						'one' => q({0} W),
+						'other' => q({0} W),
+					},
+					# Core Unit Identifier
+					'watt' => {
+						'name' => q(ۋات),
+						'one' => q({0} W),
+						'other' => q({0} W),
+					},
+					# Long Unit Identifier
+					'pressure-hectopascal' => {
+						'name' => q(يۈز پاسكال),
+						'one' => q({0} ھېكتوپاسكال),
+						'other' => q({0} ھېكتوپاسكال),
+					},
+					# Core Unit Identifier
+					'hectopascal' => {
+						'name' => q(يۈز پاسكال),
+						'one' => q({0} ھېكتوپاسكال),
+						'other' => q({0} ھېكتوپاسكال),
+					},
+					# Long Unit Identifier
+					'pressure-inch-ofhg' => {
+						'name' => q(ديۇيم سىماب تۈۋرۇكى),
+						'one' => q({0} inHg),
+						'other' => q({0} inHg),
+					},
+					# Core Unit Identifier
+					'inch-ofhg' => {
+						'name' => q(ديۇيم سىماب تۈۋرۇكى),
+						'one' => q({0} inHg),
+						'other' => q({0} inHg),
+					},
+					# Long Unit Identifier
+					'pressure-millibar' => {
+						'name' => q(مىللىبار),
+						'one' => q({0} mbar),
+						'other' => q({0} mbar),
+					},
+					# Core Unit Identifier
+					'millibar' => {
+						'name' => q(مىللىبار),
+						'one' => q({0} mbar),
+						'other' => q({0} mbar),
+					},
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'name' => q(كىلومېتىر ھەر سائەت),
+						'one' => q({0} سائەت/كىلومېتىر),
+						'other' => q({0} سائەت/كىلومېتىر),
+					},
+					# Core Unit Identifier
+					'kilometer-per-hour' => {
+						'name' => q(كىلومېتىر ھەر سائەت),
+						'one' => q({0} سائەت/كىلومېتىر),
+						'other' => q({0} سائەت/كىلومېتىر),
+					},
+					# Long Unit Identifier
+					'speed-meter-per-second' => {
+						'name' => q(مېتىر ھەر سېكۇنت),
+						'one' => q({0} سېكۇنت/مېتىر),
+						'other' => q({0} سېكۇنت/مېتىر),
+					},
+					# Core Unit Identifier
+					'meter-per-second' => {
+						'name' => q(مېتىر ھەر سېكۇنت),
+						'one' => q({0} سېكۇنت/مېتىر),
+						'other' => q({0} سېكۇنت/مېتىر),
+					},
+					# Long Unit Identifier
+					'speed-mile-per-hour' => {
+						'name' => q(مىل ھەر سائەت),
+						'one' => q({0} سائەت/مىل),
+						'other' => q({0} سائەت/مىل),
+					},
+					# Core Unit Identifier
+					'mile-per-hour' => {
+						'name' => q(مىل ھەر سائەت),
+						'one' => q({0} سائەت/مىل),
+						'other' => q({0} سائەت/مىل),
+					},
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'name' => q(سېلسىيە گرادۇس),
+						'one' => q({0}°C),
+						'other' => q({0}°C),
+					},
+					# Core Unit Identifier
+					'celsius' => {
+						'name' => q(سېلسىيە گرادۇس),
+						'one' => q({0}°C),
+						'other' => q({0}°C),
+					},
+					# Long Unit Identifier
+					'temperature-fahrenheit' => {
+						'name' => q(فارېنگېيت گرادۇس),
+						'one' => q({0}°F),
+						'other' => q({0}°F),
+					},
+					# Core Unit Identifier
+					'fahrenheit' => {
+						'name' => q(فارېنگېيت گرادۇس),
+						'one' => q({0}°F),
+						'other' => q({0}°F),
+					},
+					# Long Unit Identifier
+					'volume-cubic-kilometer' => {
+						'name' => q(كۇب كىلومېتىر),
+						'one' => q({0} km³),
+						'other' => q({0} km³),
+					},
+					# Core Unit Identifier
+					'cubic-kilometer' => {
+						'name' => q(كۇب كىلومېتىر),
+						'one' => q({0} km³),
+						'other' => q({0} km³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-mile' => {
+						'name' => q(كۇب مىل),
+						'one' => q({0} mi³),
+						'other' => q({0} mi³),
+					},
+					# Core Unit Identifier
+					'cubic-mile' => {
+						'name' => q(كۇب مىل),
+						'one' => q({0} mi³),
+						'other' => q({0} mi³),
+					},
+					# Long Unit Identifier
+					'volume-liter' => {
+						'name' => q(لىتېر),
+						'one' => q({0} l),
+						'other' => q({0} l),
+					},
+					# Core Unit Identifier
+					'liter' => {
+						'name' => q(لىتېر),
+						'one' => q({0} l),
+						'other' => q({0} l),
 					},
 				},
 			} }
@@ -4792,10 +5667,10 @@ has 'time_formats' => (
 		'generic' => {
 		},
 		'gregorian' => {
-			'full' => q{h:mm:ss a zzzz},
-			'long' => q{h:mm:ss a z},
-			'medium' => q{h:mm:ss a},
-			'short' => q{h:mm a},
+			'full' => q{HH:mm:ss zzzz},
+			'long' => q{HH:mm:ss z},
+			'medium' => q{HH:mm:ss},
+			'short' => q{HH:mm},
 		},
 		'hebrew' => {
 		},
@@ -4889,7 +5764,7 @@ has 'datetime_formats_available_formats' => (
 			MEd => q{d-M، E},
 			MMM => q{LLL},
 			MMMEd => q{d-MMM، E},
-			MMMMW => q{MMM، W-ھەپتە},
+			MMMMW => q{MMMM، W-ھەپتە},
 			MMMMd => q{d-MMMM},
 			MMMd => q{d-MMM},
 			Md => q{d-M},
@@ -5847,7 +6722,9 @@ has 'time_zone_names' => (
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q#نورفولك ئاراللىرى ۋاقتى#,
+				'daylight' => q#نورفولك ئاراللىرى يازلىق ۋاقتى#,
+				'generic' => q#نورفولك ئاراللىرى ۋاقتى#,
+				'standard' => q#نورفولك ئاراللىرى ئۆلچەملىك ۋاقتى#,
 			},
 		},
 		'Noronha' => {

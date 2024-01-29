@@ -2,11 +2,16 @@ package Liveman;
 use 5.22.0;
 use common::sense;
 
-our $VERSION = "1.2";
+our $VERSION = "2.0";
 
-use Term::ANSIColor qw/colored/;
+use Cwd::utf8 qw/getcwd/;
+use File::Basename qw/dirname/;
+use File::Find::Wanted qw/find_wanted/;
+use File::Spec qw//;
 use File::Slurper qw/read_text write_text/;
+use File::Path qw/mkpath rmtree/;
 use Markdown::To::POD qw/markdown_to_pod/;
+use Term::ANSIColor qw/colored/;
 use Text::Trim qw/trim/;
 
 
@@ -18,21 +23,34 @@ sub new {
     $self
 }
 
+# Пакет из пути
+sub _pkg($) {
+    my ($pkg) = @_;
+    my @pkg = File::Spec->splitdir($pkg);
+    shift @pkg; # Удаляем lib/
+    $pkg[$#pkg] =~ s!\.\w+$!!; # Удаляем расширение
+    join "::", @pkg
+}
+
 # Получить путь к тестовому файлу из пути к md-файлу
 sub test_path {
     my ($self, $md) = @_;
-    $md =~ s!^lib/(.*)\.md$!
-        join "", "t/", join("/", map {
-            lcfirst($_) =~ s/[A-Z]/"-" . lc $&/gre
-        } split /\//, $1), ".t"
-    !e;
+
+    my ($volume, $chains) = File::Spec->splitpath($md, 1);
+    my @dirs = File::Spec->splitdir($chains);
+
+    shift @dirs; # Удаляем lib
+    $dirs[$#dirs] =~ s!\.md$!\.t!;
+
+    my $md = File::Spec->catfile("t", map { lcfirst($_) =~ s/[A-Z]/"-" . lc $&/gre } @dirs);
+
     $md
 }
 
 # Трансформирует md-файлы
 sub transforms {
     my ($self) = @_;
-    my $mds = $self->{files} // [split /\n/, `find lib -name '*.md'`];
+    my $mds = $self->{files} // [ find_wanted(sub { /\.md$/ }, "lib") ];
 
     $self->{count} = 0;
 
@@ -84,12 +102,6 @@ sub _qq_esc {
 # Эскейпинг для строки в одинарных кавычках
 sub _q_esc {
     $_[0] =~ s!'!\\'!gr
-}
-
-# Создаёт путь
-sub _mkpath {
-    my ($p) = @_;
-    mkdir $`, 0755 while $p =~ /\//g;
 }
 
 # Строка кода для тестирования
@@ -171,23 +183,73 @@ sub transform {
     push @test, "\n\tdone_testing;\n};\n" if $close_subtest;
     push @test, "\ndone_testing;\n";
 
-    _mkpath($test);
-    my $mkpath = q{sub _mkpath_ { my ($p) = @_; length($`) && !-e $`? mkdir($`, 0755) || die "mkdir $`: $!": () while $p =~ m!/!g; $p }};
-    my $write_files = q{open my $__f__, "<:utf8", $t or die "Read $t: $!"; read $__f__, $s, -s $__f__; close $__f__; while($s =~ /^#\\@> (.*)\n((#>> .*\n)*)#\\@< EOF\n/gm) { my ($file, $code) = ($1, $2); $code =~ s/^#>> //mg; open my $__f__, ">:utf8", _mkpath_($file) or die "Write $file: $!"; print $__f__ $code; close $__f__; }};
-    #my @symbol = ('a'..'z', 'A'..'Z', '0' .. '9', '-', '_');
-    # "-" . join("", map $symbol[rand(scalar @symbol)], 1..6)
-    my $test_path = join "", "/tmp/.liveman/",
-        `pwd` =~ s/^.*?([^\/]+)\n$/$1/rs,
-        $test =~ s!^t/(.*)\.t$!/$1!r =~ y/\//!/r, "/";
-    my $chdir = "my \$t = `pwd`; chop \$t; \$t .= '/' . __FILE__; my \$s = '${\ _q_esc($test_path)}'; `rm -fr '\$s'` if -e \$s; chdir _mkpath_(\$s) or die \"chdir \$s: \$!\";";
-    # use Carp::Always::Color ::Term;
-    my $die = 'use Scalar::Util qw//; use Carp qw//; $SIG{__DIE__} = sub { my ($s) = @_; if(ref $s) { $s->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $s; die $s } else {die Carp::longmess defined($s)? $s: "undef" }};';
-    write_text $test, join "", "use common::sense; use open qw/:std :utf8/; use Test::More 0.98; $mkpath BEGIN { $die $chdir $write_files } ", @test;
+    my @pwd_dirs = File::Spec->splitdir(getcwd());
+    my $project_name = $pwd_dirs[$#pwd_dirs];
+
+    my @test_dirs = File::Spec->splitdir($test);
+
+    my $test_dir = File::Spec->catfile(@test_dirs[0..$#test_dirs-1]);
+
+    mkpath($test_dir);
+    shift @test_dirs; # Удаляем t/
+    $test_dirs[$#test_dirs] =~ s!\.t$!!; # Удаляем .t
+
+    local $ENV{TMPDIR}; # yath устанавливает свою TMPDIR, нам этого не надо
+    my $test_path = File::Spec->catfile(File::Spec->tmpdir, ".liveman", $project_name, join("!", @test_dirs));
+
+    my $test_head1 = << 'END';
+use common::sense;
+use open qw/:std :utf8/;
+
+use Carp qw//;
+use File::Basename qw//;
+use File::Slurper qw//;
+use File::Spec qw//;
+use File::Path qw//;
+use Scalar::Util qw//;
+
+use Test::More 0.98;
+
+BEGIN {
+    $SIG{__DIE__} = sub {
+        my ($s) = @_;
+        if(ref $s) {
+            $s->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $s;
+            die $s;
+        } else {
+            die Carp::longmess defined($s)? $s: "undef"
+        }
+    };
+
+    my $t = File::Slurper::read_text(__FILE__);
+    my $s = 
+END
+
+my $test_head2 = << 'END2';
+    ;
+    File::Path::rmtree($s) if -e $s;
+    File::Path::mkpath($s);
+    chdir $s or die "chdir $s: $!";
+
+    while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) {
+        my ($file, $code) = ($1, $2);
+        $code =~ s/^#>> //mg;
+        File::Path::mkpath(File::Basename::dirname($file));
+        File::Slurper::write_text($file, $code);
+    }
+
+}
+END2
+
+    $test_head1 =~ y!\r\n!  !;
+    $test_head2 =~ y!\r\n!  !;
+
+    write_text $test, join "", $test_head1, "'", _q_esc($test_path), "'", $test_head2, @test;
 
     # Создаём модуль, если его нет
     my $pm = $md =~ s/\.md$/.pm/r;
     if(!-e $pm) {
-        my $pkg = ($pm =~ s!^lib/(.*)\.pm$!$1!r) =~ s!/!::!gr;
+        my $pkg = _pkg($pm);
         write_text $pm, "package $pkg;\n\n1;";
     }
 
@@ -235,7 +297,7 @@ sub tests {
     system "$cover -delete";
     if($self->{prove}) {
         local $ENV{PERL5OPT} = "$perl5opt -MDevel::Cover";
-        $self->{exit_code} = system "env | grep PERL5OPT; prove -Ilib -r t $options";
+        $self->{exit_code} = system "prove -Ilib -r t $options";
         #$self->{exit_code} = system "prove --exec 'echo `pwd`/lib && perl -MDevel::Cover -I`pwd`/lib' -r t";
     } else {
         $self->{exit_code} = system "$yath test -j4 --cover $options";
@@ -258,7 +320,7 @@ Liveman - markdown compiller to test and pod
 
 =head1 VERSION
 
-1.2
+2.0
 
 =head1 SYNOPSIS
 

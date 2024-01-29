@@ -130,6 +130,8 @@ for my $method (qw/ abs rel eq canonical /) {
 	eval qq[ sub $method { shift->uri->${method}(\@_) } ];
 }
 
+sub DESTROY { }
+
 our $AUTOLOAD;
 sub AUTOLOAD {
 	my $self = shift;

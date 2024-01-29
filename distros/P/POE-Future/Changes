@@ -1,5 +1,13 @@
 Revision history for POE-Future
 
+0.05    2024-01-02
+        [CHANGES]
+         * Swap unit tests from `Test::More` to `Test2::V0`
+
+        [BUGFIXES]
+         * Use `udata` interface of `Future` v0.49 in case of Future::XS
+           instances, which are not HASH references (RT150944)
+
 0.04    2019-06-26 18:19:45
         [CHANGES]
          * Provide Future::IO::Impl::POE

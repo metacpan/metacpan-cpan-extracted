@@ -943,6 +943,30 @@ Exceptions:
 
 $array must be defined. Otherwise an exception is thrown.
 
+=head2 repeat_string
+
+C<static method repeat_string : string[] ($strings : string[], $count : int);>
+
+Creates a new array that repeats the string $strings $count times, and returns it.
+
+Exceptions:
+
+$strings must be defined. Otherwise an exception is thrown.
+
+$count must be greater than or equal to 0. Otherwise an exception is thrown.
+
+=head2 copy_object_with_proto
+
+C<static method copy_object_with_proto : object[] ($array : object[], $proto : object[], $cloner : L<Cloner|SPVM::Cloner> = undef, $offset : int = 0, $length : int = -1);>
+
+The same as L</"copy_object">, but can give the prototype array $proto for the copied array.
+
+=head2 copy_object_address_with_proto
+
+C<static method copy_object_address_with_proto : object[] ($array : object[], $proto : object[], $offset : int = 0, $length : int = -1);>
+
+The same as L</"copy_object_address">, but can give the prototype array $proto for the copied array.
+
 =head1 Copyright & License
 
 Copyright (c) 2023 Yuki Kimoto

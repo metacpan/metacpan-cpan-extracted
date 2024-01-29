@@ -15,8 +15,7 @@ use Test::More;
 use XML::LibXML::XPathContext;
 use XML::LibXML;
 
-use Net::SAML2::Protocol::AuthnRequest;
-use Net::SAML2::SP;
+use Net::SAML2;
 use Net::SAML2::Util qw(generate_id);
 
 require Exporter;

@@ -8,7 +8,7 @@ use Carp;
 require Exporter;
 use AutoLoader;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 our $DEBUG = 0;
 
 our @ISA = qw(Exporter);
@@ -1594,8 +1594,8 @@ Salvador Ortiz Garcia, E<lt>sortiz@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
- Copyright (C) 2013-2014 by Salvador Ortiz García
- Copyright (C) 2013-2014 by Matías Software Group, S.A. de C.V.
+ Copyright (C) 2013-2021 by Salvador Ortiz García
+ Copyright (C) 2013-2021 by Matías Software Group, S.A. de C.V.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License version 2.0, see L<LICENSE>.

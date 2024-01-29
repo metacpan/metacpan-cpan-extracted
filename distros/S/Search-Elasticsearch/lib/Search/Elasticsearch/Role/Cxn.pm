@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Role::Cxn;
-$Search::Elasticsearch::Role::Cxn::VERSION = '8.00';
+$Search::Elasticsearch::Role::Cxn::VERSION = '8.12';
 our $PRODUCT_CHECK_HEADER = 'x-elastic-product';
 our $PRODUCT_CHECK_VALUE = 'Elasticsearch';
 
@@ -35,6 +35,7 @@ use Net::IP;
 
 requires qw(perform_request error_from_text handle);
 
+has 'client_version'        => ( is => 'ro', required => 1, default => $Search::Elasticsearch::VERSION );
 has 'host'                  => ( is => 'ro', required => 1 );
 has 'port'                  => ( is => 'ro', required => 1 );
 has 'uri'                   => ( is => 'ro', required => 1 );
@@ -183,6 +184,10 @@ sub BUILDARGS {
     $host = "[$host]" if Net::IP::ip_is_ipv6($host);
     $params->{uri}             = URI->new("$scheme://$host:$port$path");
     $params->{default_headers} = \%default_headers;
+    # Add the client version
+    if (defined $params->{client}) {
+        $params->{client_version} = substr($params->{client}, 0, index($params->{client}, '_'));
+    }
 
     return $params;
 }
@@ -360,8 +365,8 @@ sub process_response {
 #===================================
     my ( $self, $params, $code, $msg, $body, $headers ) = @_;
 
-    # Product check
-    if ( $code >= 200 and $code < 300 ) {
+    # Product check only for 8+ client API version
+    if ( $self->client_version >= 8 and $code >= 200 and $code < 300 ) {
         my $product = $headers->{$PRODUCT_CHECK_HEADER} // '';
         if ($product ne $PRODUCT_CHECK_VALUE) {
             throw( "ProductCheck", "The client noticed that the server is not Elasticsearch and we do not support this unknown product" );
@@ -490,7 +495,7 @@ Search::Elasticsearch::Role::Cxn - Provides common functionality to HTTP Cxn imp
 
 =head1 VERSION
 
-version 8.00
+version 8.12
 
 =head1 DESCRIPTION
 
@@ -858,7 +863,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Elasticsearch BV.
+This software is Copyright (c) 2024 by Elasticsearch BV.
 
 This is free software, licensed under:
 

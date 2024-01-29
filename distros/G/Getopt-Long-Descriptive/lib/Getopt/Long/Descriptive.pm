@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Getopt::Long::Descriptive 0.112;
+package Getopt::Long::Descriptive 0.114;
 # ABSTRACT: Getopt::Long, but simpler and more powerful
 
 use v5.12;
@@ -283,7 +283,6 @@ use Sub::Exporter 0.972 -setup => {
 
 my %CONSTRAINT = (
   implies  => \&_mk_implies,
-  required => { optional => 0 },
   only_one => \&_mk_only_one,
 );
 
@@ -544,7 +543,15 @@ sub _validate_with {
 
   my $spec = $arg{spec};
   my %pvspec;
-  for my $ct (keys %{$spec}) {
+  SPEC_ENTRY: for my $ct (keys %{$spec}) {
+    if ($ct eq 'required') {
+      # This used to be in %CONSTRAINT but this whole system is a bit
+      # overcomplex, I think, and moving this here makes life simpler.  Someday
+      # (ha ha) this can all be overhauled. -- rjbs, 2024-01-20
+      $pvspec{optional} = ! $spec->{$ct};
+      next SPEC_ENTRY;
+    }
+
     if ($CONSTRAINT{$ct} and ref $CONSTRAINT{$ct} eq 'CODE') {
       $pvspec{callbacks} ||= {};
       $pvspec{callbacks} = {
@@ -727,7 +734,7 @@ Getopt::Long::Descriptive - Getopt::Long, but simpler and more powerful
 
 =head1 VERSION
 
-version 0.112
+version 0.114
 
 =head1 SYNOPSIS
 

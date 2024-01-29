@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ha::Any::Ng - Package for language Hausa
 
 package Locale::CLDR::Locales::Ha::Any::Ng;
 # This file auto generated from Data\common\main\ha_NG.xml
-#	on Tue  5 Dec  1:13:11 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';

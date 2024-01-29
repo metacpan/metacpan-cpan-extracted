@@ -1,0 +1,5 @@
+requires 'Mojolicious';
+requires 'List::Util';
+requires 'Scalar::Util';
+
+test_requires 'Test::More';

@@ -50,7 +50,7 @@ my %WriteMakefile = (
 	'VERSION_FROM'	=> $main_file,
 	'ABSTRACT_FROM' => $main_file,
 	'LICENSE'		=> 'artistic_2',
-	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
+	'AUTHOR'        => 'brian d foy <briandfoy@pobox.com>',
 
 	'CONFIGURE_REQUIRES' => {
 		'ExtUtils::MakeMaker'   => '6.64',
@@ -72,7 +72,7 @@ my %WriteMakefile = (
 		resources => {
 			repository => {
 				type => 'git',
-				url  => "$github.git",
+				url  => $github,
 				web  => $github,
 				},
 			bugtracker => {

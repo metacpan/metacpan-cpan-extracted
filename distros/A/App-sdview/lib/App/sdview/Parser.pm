@@ -7,10 +7,10 @@ use v5.26;
 use warnings;
 use utf8;
 
-use Object::Pad 0.800 ':experimental(adjust_params)';
+use Object::Pad 0.807;
 use Object::Pad::FieldAttr::Checked;
 
-package App::sdview::Parser 0.13;
+package App::sdview::Parser 0.14;
 role App::sdview::Parser;
 
 use String::Tagged;
@@ -85,7 +85,9 @@ class App::sdview::Para::Table :strict(params) {
    }
 }
 
-class App::sdview::Para::TableCell :isa(App::sdview::Para::Plain) :strict(params) {
+class App::sdview::Para::TableCell :strict(params) {
+   inherit App::sdview::Para::Plain;
+
    use Types::Standard qw( Enum );
 
    field $align :param :reader :Checked(Enum[qw( left centre right )]);

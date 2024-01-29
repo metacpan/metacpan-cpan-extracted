@@ -8,7 +8,7 @@ use Algorithm::Cron;
 
 use Carp 'croak';
 
-our $VERSION = "0.033";
+our $VERSION = "0.034";
 use constant CRON_DIR => 'mojo_cron_';
 my $crondir;
 
@@ -76,7 +76,7 @@ sub _cron {
             if (-e $dat && $dat->slurp // '') =~ /(\d+)/;   # do some untainting
           $rtime //= '0';
           if ($rtime != $time) {
-            $dat->spurt($time);
+            $dat->spew($time);
             $fire = 1;
           }
           undef $dat;

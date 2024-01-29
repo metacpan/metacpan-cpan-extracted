@@ -1,0 +1,58 @@
+{
+   "abstract" : "SVG renderer for PDF::API2",
+   "author" : [
+      "Johan Vromans <jvromans@squirrel.nl>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SVGPDF",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "lib/SVGPDF"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.24"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::LoadLines" : "1.044",
+            "Image::Info" : "1.42",
+            "Object::Pad" : "0.78",
+            "PDF::API2" : "2.043",
+            "perl" : "5.026"
+         }
+      }
+   },
+   "provides" : {
+      "SVGPDF" : {
+         "file" : "lib/SVGPDF.pm",
+         "version" : "0.084"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.084",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

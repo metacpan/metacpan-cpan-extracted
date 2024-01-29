@@ -38,7 +38,7 @@ sub defaults {
             select_complex_col => 0,
             join_table         => 0,
             join_columns       => 0,
-            derived_table      => 0,
+            derived_table      => 1,
             table              => 0,
         },
         enable => {
@@ -63,7 +63,6 @@ sub defaults {
 
             j_derived  => 0,
             j_cte      => 0,
-
 
             u_derived     => 0,
             u_cte         => 0,

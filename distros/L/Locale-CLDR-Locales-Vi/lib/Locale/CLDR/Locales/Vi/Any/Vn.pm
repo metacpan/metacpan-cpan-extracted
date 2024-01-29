@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Vi::Any::Vn - Package for language Vietnamese
 
 package Locale::CLDR::Locales::Vi::Any::Vn;
 # This file auto generated from Data\common\main\vi_VN.xml
-#	on Tue  5 Dec  1:37:59 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';

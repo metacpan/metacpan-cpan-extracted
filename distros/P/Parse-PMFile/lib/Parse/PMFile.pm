@@ -10,7 +10,7 @@ use Dumpvalue;
 use version ();
 use File::Spec ();
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 our $VERBOSE = 0;
 our $ALLOW_DEV_VERSION = 0;
 our $FORK = 0;
@@ -462,6 +462,7 @@ sub _packages_per_pmfile {
                             length($ppp->{$pkg}{version});
             }
             $ppp->{$pkg}{filemtime} = $filemtime;
+            $ppp->{$pkg}{version} .= "";    # make sure to stringify version
         } else {
             # $self->_verbose(2,"no pkg found");
         }

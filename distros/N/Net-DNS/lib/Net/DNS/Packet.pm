@@ -3,7 +3,7 @@ package Net::DNS::Packet;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Packet.pm 1947 2023-11-23 09:40:45Z willem $)[2];
+our $VERSION = (qw$Id: Packet.pm 1959 2024-01-17 08:55:01Z willem $)[2];
 
 
 =head1 NAME
@@ -435,7 +435,7 @@ sub string {
 	my @additional = $self->additional;
 	my $arcount    = scalar @additional;
 	my $ars	       = $arcount != 1 ? 's' : '';
-	my $EDNSmarker = join ' ', qq[;; {\t"EDNS-VERSION":], $edns->version, qq[}\n];
+	my $EDNSmarker = join ' ', qq[;; {\t"EDNS-VERSION":], $edns->version, qq[}];
 	CORE::push( @record, "\n;; ADDITIONAL SECTION ($arcount record$ars)" );
 	CORE::push( @record, map { ( $_ eq $edns ) ? $EDNSmarker : $_->string } @additional );
 

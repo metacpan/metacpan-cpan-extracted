@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ii - Package for language Sichuan Yi
 
 package Locale::CLDR::Locales::Ii;
 # This file auto generated from Data\common\main\ii.xml
-#	on Tue  5 Dec  1:15:27 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'de' => 'ꄓꇩꉙ',
@@ -84,7 +84,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'BR' => 'ꀠꑭ',
  			'CN' => 'ꍏꇩ',
@@ -121,7 +121,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{ꂰꌬꌠ},
  			'US' => q{ꂰꇩ},
@@ -134,7 +134,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'ꅇꉙ: {0}',
  			'script' => 'ꇇꁱ: {0}',
@@ -155,7 +155,7 @@ has 'characters' => (
 		return {
 			index => ['ꀀ', 'ꀋ', 'ꀗ', 'ꀣ', 'ꀯ', 'ꀺ', 'ꁆ', 'ꁒ', 'ꁞ', 'ꁩ', 'ꁵ', 'ꂁ', 'ꂍ', 'ꂘ', 'ꂤ', 'ꂰ', 'ꂼ', 'ꃇ', 'ꃓ', 'ꃟ', 'ꃫ', 'ꃶ', 'ꄂ', 'ꄎ', 'ꄚ', 'ꄥ', 'ꄱ', 'ꄽ', 'ꅉ', 'ꅔ', 'ꅠ', 'ꅬ', 'ꅸ', 'ꆃ', 'ꆏ', 'ꆛ', 'ꆧ', 'ꆳ', 'ꆾ', 'ꇊ', 'ꇖ', 'ꇢ', 'ꇭ', 'ꇹ', 'ꈅ', 'ꈑ', 'ꈜ', 'ꈨ', 'ꈴ', 'ꉀ', 'ꉋ', 'ꉗ', 'ꉣ', 'ꉯ', 'ꉺ', 'ꊆ', 'ꊒ', 'ꊞ', 'ꊩ', 'ꊵ', 'ꋁ', 'ꋍ', 'ꋘ', 'ꋤ', 'ꋰ', 'ꋼ', 'ꌇ', 'ꌓ', 'ꌟ', 'ꌫ', 'ꌷ', 'ꍂ', 'ꍎ', 'ꍚ', 'ꍦ', 'ꍱ', 'ꍽ', 'ꎉ', 'ꎕ', 'ꎠ', 'ꎬ', 'ꎸ', 'ꏄ', 'ꏏ', 'ꏛ', 'ꏧ', 'ꏳ', 'ꏾ', 'ꐊ', 'ꐖ', 'ꐢ', 'ꐭ', 'ꐹ', 'ꑅ', 'ꑑ', 'ꑜ', 'ꑨ', 'ꑴ', 'ꒀ', 'ꒋ'],
 			main => qr{[ꀀ-ꒌ]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -551,10 +551,10 @@ has 'time_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
-			'full' => q{h:mm:ss a zzzz},
-			'long' => q{h:mm:ss a z},
-			'medium' => q{h:mm:ss a},
-			'short' => q{h:mm a},
+			'full' => q{HH:mm:ss zzzz},
+			'long' => q{HH:mm:ss z},
+			'medium' => q{HH:mm:ss},
+			'short' => q{HH:mm},
 		},
 	} },
 );

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Cs::Any::Cz - Package for language Czech
 
 package Locale::CLDR::Locales::Cs::Any::Cz;
 # This file auto generated from Data\common\main\cs_CZ.xml
-#	on Tue  5 Dec  1:05:28 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';

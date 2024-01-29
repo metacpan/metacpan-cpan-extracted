@@ -2,7 +2,7 @@ package CPAN::Perl::Releases::MetaCPAN;
 use strict;
 use warnings;
 
-our $VERSION = '0.007';
+our $VERSION = '0.009';
 use JSON::PP ();
 use HTTP::Tinyish;
 
@@ -42,7 +42,7 @@ sub get {
             size => 1000,
             from => $from,
             sort => [ { date => 'desc' } ],
-            fields => [qw( name date author version status maturity download_url )],
+            fields => [qw( name date author version status maturity download_url checksum_sha256 )],
         };
         my $res = $self->{http}->post($uri, {
             content => $self->{json}->encode($query),
@@ -125,9 +125,22 @@ CPAN::Perl::Releases::MetaCPAN - Mapping Perl releases on CPAN to the location o
 
   use CPAN::Perl::Releases::MetaCPAN;
 
-  # OO
+  # Object oriented interface
   my $cpan = CPAN::Perl::Releases::MetaCPAN->new;
   my $releases = $cpan->get;
+  # [
+  #   {
+  #     author => "BOOK",
+  #     checksum_sha256 => "cb8715636bc744cca6e8864b6daa16f388d16ca3a134df6e6f35bbbe39dd7f63",
+  #     date => "2023-12-30T21:59:20",
+  #     download_url => "https://cpan.metacpan.org/authors/id/B/BO/BOOK/perl-5.39.6.tar.gz",
+  #     maturity => "developer",
+  #     name => "perl-5.39.6",
+  #     status => "cpan",
+  #     version => "5.039006",
+  #   },
+  #   ...
+  # ]
 
   # Functions
   use CPAN::Perl::Releases::MetaCPAN qw/perl_tarballs/;

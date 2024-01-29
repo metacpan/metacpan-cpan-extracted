@@ -2,8 +2,8 @@ NAME
     TableDataRoles::Standard - Standard set of roles for TableData
 
 VERSION
-    This document describes version 0.019 of TableDataRoles::Standard (from
-    Perl distribution TableDataRoles-Standard), released on 2023-11-25.
+    This document describes version 0.021 of TableDataRoles::Standard (from
+    Perl distribution TableDataRoles-Standard), released on 2024-01-15.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -36,7 +36,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022, 2021 by perlancar
+    This software is copyright (c) 2024, 2023, 2022, 2021 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

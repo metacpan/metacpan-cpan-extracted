@@ -1,3 +1,8 @@
+0.04 2024-01-11T23:22:32+01:00
+ - Add EXAMPLE2 to doc.
+ - Fix raw output.
+ - Update copyright years.
+
 0.03 2023-11-20T16:13:04+01:00
  - Rewrite to new Data::MARC::Leader::Utils.
 

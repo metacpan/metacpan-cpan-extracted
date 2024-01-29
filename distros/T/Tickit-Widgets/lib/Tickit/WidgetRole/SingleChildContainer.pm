@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.66;
+use warnings;
+use Object::Pad 0.800;
 
-package Tickit::WidgetRole::SingleChildContainer 0.37;
+package Tickit::WidgetRole::SingleChildContainer 0.41;
 role Tickit::WidgetRole::SingleChildContainer;
 
 use Carp;
@@ -19,10 +20,15 @@ single other widget
 =head1 SYNOPSIS
 
    class Some::Widget::Class
-      extends Tickit::Widget
-      implements Tickit::WidgetRole::SingleChildContainer;
+      :isa(Tickit::Widget)
+      :does(Tickit::WidgetRole::SingleChildContainer);
 
    ...
+
+=head1 DESCRIPTION
+
+Applying this role to a L<Tickit::Widget> subclass adds behaviour for it to
+act as a container widget holding a single child widget.
 
 =cut
 
@@ -34,7 +40,7 @@ field $_child :reader;
 
 =head2 child
 
-   $child = $widget->child
+   $child = $widget->child;
 
 Returns the contained child widget.
 
@@ -50,7 +56,7 @@ method children
 
 =head2 set_child
 
-   $widget->set_child( $child )
+   $widget->set_child( $child );
 
 Sets the child widget, or C<undef> to remove.
 

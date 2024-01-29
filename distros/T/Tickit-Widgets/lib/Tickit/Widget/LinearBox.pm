@@ -1,15 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.66;
+use warnings;
+use Object::Pad 0.807;
 
-package Tickit::Widget::LinearBox 0.54;
-class Tickit::Widget::LinearBox
-   :strict(params)
-   :isa(Tickit::ContainerWidget);
+package Tickit::Widget::LinearBox 0.55;
+class Tickit::Widget::LinearBox :strict(params);
+
+inherit Tickit::ContainerWidget;
 
 use experimental 'postderef';
 
@@ -63,7 +64,7 @@ returned by C<get_child_base>.
 
 =head2 new
 
-   $widget = Tickit::Widget::LinearBox->new( %args )
+   $widget = Tickit::Widget::LinearBox->new( %args );
 
 Returns a new C<Tickit::Widget::LinearBox>.
 
@@ -89,7 +90,7 @@ sub BUILDARGS
 
 =head2 children
 
-   @children = $widget->children
+   @children = $widget->children;
 
 In scalar context, returns the number of contained children. In list context,
 returns a list of all the child widgets.
@@ -118,7 +119,7 @@ method _any2index
 
 =head2 child_opts
 
-   %opts = $widget->child_opts( $child_or_index )
+   %opts = $widget->child_opts( $child_or_index );
 
 Returns the options currently set for the given child, specified either by
 reference or by index.
@@ -137,7 +138,7 @@ method child_opts
 
 =head2 set_child
 
-   $widget->set_child( $index, $child )
+   $widget->set_child( $index, $child );
 
 Replaces the child widget at the given index with the given new one;
 preserving any options that are set on it.
@@ -165,7 +166,7 @@ method set_child
 
 =head2 set_child_opts
 
-   $widget->set_child_opts( $child_or_index, %newopts )
+   $widget->set_child_opts( $child_or_index, %newopts );
 
 Sets new options on the given child, specified either by reference or by
 index. Any options whose value is given as C<undef> are deleted.
@@ -207,7 +208,7 @@ method render_to_rb
 
 =head2 add
 
-   $widget->add( $child, %opts )
+   $widget->add( $child, %opts );
 
 Adds the widget as a new child of this one, with the given options.
 
@@ -236,7 +237,7 @@ method add
 
 =head2 add_children
 
-   $widget->add_children( @children )
+   $widget->add_children( @children );
 
 Adds each of the given widgets as a new child of this one. Each element of the
 list should either be a widget object reference directly, or an unblessed hash
@@ -261,7 +262,7 @@ sub add_children
 
 =head2 remove
 
-   $widget->remove( $child_or_index )
+   $widget->remove( $child_or_index );
 
 Removes the given child widget if present, by reference or index
 

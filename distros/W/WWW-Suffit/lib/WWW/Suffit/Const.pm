@@ -88,7 +88,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use base qw/Exporter/;
 
@@ -102,9 +102,11 @@ use constant {
     IS_TTY              => (-t STDOUT) ? 1 : 0,
     IS_ROOT             => ($> == 0) ? 1 : 0,
 
-    # Date and time formats
-    DATE_FORMAT         => '%Y-%m-%d', # See strftime(3)
-    DATETIME_FORMAT     => '%Y-%m-%dT%H:%M:%S', # See strftime(3)
+    # Date and time formats (see strftime(3))
+    DATE_FORMAT         => '%Y-%m-%d', # POSIX::strftime(DATE_FORMAT, localtime($t))
+    TIME_FORMAT         => '%H:%M:%S', # POSIX::strftime(TIME_FORMAT, localtime($t))
+    DATETIME_FORMAT     => '%Y-%m-%dT%H:%M:%S', # POSIX::strftime(DATETIME_FORMAT, localtime($t))
+    DATE_TIME_FORMAT    => '%Y-%m-%d %H:%M:%S', # POSIX::strftime(DATE_TIME_FORMAT, localtime($t))
 
     # Session
     SESSION_EXPIRATION  => 3600, # 1 hour
@@ -114,12 +116,19 @@ use constant {
     TOKEN_EXPIRE_MAX    => 86400 * 30, # 30 days (for session and access tokens only)
     TOKEN_FILE_FORMAT   => 'token-%s.tkn',
 
+    # Files
+    AUTHDBFILE          => 'suffit-auth.db',
+
     # Security and Cryptography
-    DEFAULT_SECRET      => 'The_Suffit_API_secret_string_673', # 32 chars
+    DEFAULT_SECRET      => 'Suffit!AP1$ecret%String_r.673-@w',
     PRIVATEKEYFILE      => 'rsa-private.key',
     PUBLICKEYFILE       => 'rsa-public.key',
     DIGEST_ALGORITHMS   => [qw/MD5 SHA1 SHA224 SHA256 SHA384 SHA512/],
     DEFAULT_ALGORITHM   => 'SHA256',
+
+    # JWT/JTI
+    JWT_REGEXP          => qr/^[A-Za-z0-9_-]{2,}(?:\.[A-Za-z0-9_-]{2,}){2}$/,
+    JTI_REGEXP          => qr/[a-zA-Z0-9\-_]{8,64}/,
 
     # Misc
     USERNAME_REGEXP     => qr/(?![_.\-])(?!.*[_.\-]{2,})[a-zA-Z0-9_.\-]+(?<![_.\-])/,
@@ -135,6 +144,7 @@ use constant {
     SERVER_TIMEOUT      => 60,
     SERVER_MAX_CLIENTS  => 1000, # See Mojo::Server::Prefork
     SERVER_MAX_REQUESTS => 100, # See Mojo::Server::Prefork
+    SERVER_MAX_MESSAGE_SIZE => 16*1024*1024, # '16MiB' See MOJO_MAX_MESSAGE_SIZE
     SERVER_ACCEPTS      => 0, # See Mojo::Server::Prefork
     SERVER_SPARE        => 2, # See Mojo::Server::Prefork
     SERVER_WORKERS      => 4, # See Mojo::Server::Prefork
@@ -146,6 +156,32 @@ use constant {
         TRACE
         ANY MULTI
     /],
+    AUTHZ_PROVIDERS => [qw[
+        Default
+        User/Group
+        Host
+        Env
+        Header
+    ]],
+    AUTHZ_ENTITIES => {
+      # Provider           Entities
+        'Default'       => [qw/Allow Deny/], # allowed granted denied
+        'User/Group'    => [qw/User Group Valid-User/],
+        'Host'          => [qw/Host IP/],
+        'Env'           => [qw/LANG LOGNAME MOJO_MODE USER USERNAME USR1 USR2 USR3/],
+        'Header'        => [qw/Accept Host User-Agent X-Token X-Auth X-OWL-Auth X-Usr1 X-Usr2 X-Usr3/],
+    },
+    AUTHZ_OPERATOTS => [
+        {name => 'eq', operator => '==', title => 'equal to'},
+        {name => 'ne', operator => '!=', title => 'not equal'},
+        {name => 'gt', operator => '>',  title => 'greater than'},
+        {name => 'lt', operator => '<',  title => 'less than'},
+        {name => 'ge', operator => '>=', title => 'greater than or equal to'},
+        {name => 'le', operator => '<=', title => 'less than or equal to'},
+        {name => 're', operator => '=~', title => 'regexp match'},
+        {name => 'rn', operator => '!~', title => 'regexp not match'},
+    ],
+
 };
 
 # Named groups of exports
@@ -153,7 +189,7 @@ our %EXPORT_TAGS = (
     'GENERAL' => [qw/
         IS_TTY IS_ROOT
         DEFAULT_URL
-        DATE_FORMAT DATETIME_FORMAT
+        DATE_FORMAT TIME_FORMAT DATETIME_FORMAT DATE_TIME_FORMAT
     /],
     'SESSION' => [qw/
         SESSION_EXPIRATION SESSION_EXPIRE_MAX
@@ -168,19 +204,25 @@ our %EXPORT_TAGS = (
     /],
     'MISC' => [qw/
         USERNAME_REGEXP EMAIL_REGEXP
+        JWT_REGEXP JTI_REGEXP
     /],
     'DICTS' => [qw/
         HTTP_METHODS
+        AUTHZ_PROVIDERS AUTHZ_ENTITIES AUTHZ_OPERATOTS
     /],
     'SERVER' => [qw/
         SERVER_TIMEOUT SERVER_UPGRADE_TIMEOUT
         SERVER_MAX_CLIENTS SERVER_MAX_REQUESTS
+        SERVER_MAX_MESSAGE_SIZE
         SERVER_ACCEPTS SERVER_SPARE SERVER_WORKERS
     /],
     'DIR' => [qw/
         PREFIX LOCALSTATEDIR SYSCONFDIR SRVDIR
         BINDIR SBINDIR DATADIR DOCDIR LOCALEDIR MANDIR LOCALBINDIR
         CACHEDIR LOGDIR SPOOLDIR RUNDIR LOCKDIR SHAREDSTATEDIR WEBDIR
+    /],
+    'FILE' => [qw/
+        AUTHDBFILE
     /],
 );
 
@@ -194,6 +236,12 @@ our @EXPORT = (
 our @EXPORT_OK = (
         map {@{$_}} values %EXPORT_TAGS
     );
+
+# Correct tags: makes lowercase tags as aliases of original uppercase tags
+foreach my $k (keys %EXPORT_TAGS) {
+    next if exists $EXPORT_TAGS{(lc($k))};
+    $EXPORT_TAGS{(lc($k))} = $EXPORT_TAGS{$k} if $k =~ /^[A-Z_]+$/;
+}
 
 #
 # Filesystem Hierarchy Standard

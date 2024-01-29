@@ -68,7 +68,7 @@ SV * _MPFR_VERSION_MAJOR(pTHX) {
 SV * _MPFR_VERSION_MINOR(pTHX) {
      return newSVuv(MPFR_VERSION_MINOR);
 }
-  
+
 SV * _MPFR_VERSION_PATCHLEVEL(pTHX) {
      return newSVuv(MPFR_VERSION_PATCHLEVEL);
 }
@@ -86,7 +86,7 @@ SV * Rmpfr_get_version(pTHX) {
 */
 
 
-MODULE = Math::MPFR::V  PACKAGE = Math::MPFR::V  
+MODULE = Math::MPFR::V  PACKAGE = Math::MPFR::V
 
 PROTOTYPES: DISABLE
 

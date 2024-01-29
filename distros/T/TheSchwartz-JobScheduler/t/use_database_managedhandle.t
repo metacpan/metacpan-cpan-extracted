@@ -100,48 +100,63 @@ use Database::ManagedHandle;
 subtest 'Testing' => sub {
     my %databases;
     foreach my $db (@test_dbs) {
-        $databases{ $db->name } = {
-            dbh_callback => 'Database::ManagedHandle->instance',
-            prefix       => q{}
-        };
+        $databases{ $db->name } = { prefix => q{} };
     }
-    my $scheduler = TheSchwartz::JobScheduler->new( databases => \%databases, );
+    my $scheduler = TheSchwartz::JobScheduler->new(
+        databases    => \%databases,
+        dbh_callback => 'Database::ManagedHandle->instance',
+    );
 
-    my $jobid_1 = $scheduler->insert( 'fetch', 'https://example.com/' );
+    my $job1 = TheSchwartz::JobScheduler::Job->new(
+        funcname => 'fetch',
+        arg      => { type => 'site', url => 'https://example.com/1' },
+    );
+    my $jobid_1 = $scheduler->insert( job => $job1 );
     is( $jobid_1, 1, 'Job id is 1' );
 
     my $jobid_2 = $scheduler->insert(
-        TheSchwartz::JobScheduler::Job->new(
+        job => TheSchwartz::JobScheduler::Job->new(
             funcname => 'fetch',
-            arg      => { type => 'site', url => 'https://example.com/' },
+            arg      => { type => 'site', url => 'https://example.com/2' },
             priority => 3,
-        )
+        ),
     );
     is( $jobid_2, 2, 'Job id is 2' );
 
-    my @jobs = $scheduler->list_jobs( { funcname => 'fetch' } );
+    my @jobs = $scheduler->list_jobs( search_params => { funcname => 'fetch' }, );
+
+    # use Data::Dumper;
+    # diag Dumper \@jobs;
     is( scalar @jobs, 2, 'two jobs with funcname fetch' );
     my $row = $jobs[0];
     ok( $row, 'Jobs[0] exists' );
-    is( $row->jobid,    1,                      'jobs[0]->jobid is 1' );
-    is( $row->arg,      'https://example.com/', 'arg(scalar) is correct' );
-    is( $row->priority, undef,                  'priority is correct' );
+    is( $row->jobid, 1,                                                  'jobs[0]->jobid is 1' );
+    is( $row->arg,   { type => 'site', url => 'https://example.com/1' }, 'arg(hash) is correct' );
+
+    # is($row->arg,      'https://example.com/1', 'arg(scalar) is correct');
+    is( $row->priority, undef, 'priority (default: undef) is correct' );
 
     $row = $jobs[1];
     ok( $row, 'Jobs[1] exists' );
-    is( $row->jobid,    2,                                                 'jobs[0]->jobid is 2' );
-    is( $row->arg,      { type => 'site', url => 'https://example.com/' }, 'arg(hash) is correct' );
-    is( $row->priority, 3,                                                 'priority is correct' );
+    is( $row->jobid,    2,                                                  'jobs[0]->jobid is 2' );
+    is( $row->arg,      { type => 'site', url => 'https://example.com/2' }, 'arg(hash) is correct' );
+    is( $row->priority, 3,                                                  'priority (defined) is correct' );
 
-    my $jobid_3 = $scheduler->insert( 'push', 'https://example.com/' );
+    my $jobid_3 = $scheduler->insert(
+        job => TheSchwartz::JobScheduler::Job->new(
+            funcname => 'push',
+            arg      => { type => 'site', url => 'https://example.com/3' },
+            priority => 2,
+        ),
+    );
 
-    my @push_jobs = $scheduler->list_jobs( { funcname => 'push' } );
+    my @push_jobs = $scheduler->list_jobs( search_params => { funcname => 'push' }, );
     is( scalar @push_jobs, 1, 'two jobs with funcname fetch' );
     $row = $push_jobs[0];
     is( $row->jobid, 3, 'jobs[0]->jobid is 3' );
 
-    is( $row->arg,      'https://example.com/', 'arg(scalar) is correct' );
-    is( $row->priority, undef,                  'priority is correct' );
+    is( $row->arg,      { type => 'site', url => 'https://example.com/3' }, 'arg(hash) is correct' );
+    is( $row->priority, 2,                                                  'priority is correct' );
 
     done_testing;
 };

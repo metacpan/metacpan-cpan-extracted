@@ -1,5 +1,5 @@
 package Plack::Middleware::OpenTelemetry;
-$Plack::Middleware::OpenTelemetry::VERSION = '0.233360';
+$Plack::Middleware::OpenTelemetry::VERSION = '0.240230';
 # ABSTRACT: Plack middleware to setup OpenTelemetry tracing
 
 use v5.36.0;
@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use feature 'signatures';
 use parent qw(Plack::Middleware);
-use Plack::Util::Accessor qw(resource_attributes);
+use Plack::Util::Accessor qw(resource_attributes include_client_errors);
 use OpenTelemetry -all;
 use OpenTelemetry::Constants qw( SPAN_KIND_SERVER SPAN_STATUS_ERROR SPAN_STATUS_OK );
 use OpenTelemetry::Common 'config';
@@ -53,16 +53,17 @@ sub call {
             "plack.version" => "$Plack::VERSION",
 
             # https://opentelemetry.io/docs/specs/semconv/http/http-spans/
+            # https://opentelemetry.io/blog/2023/http-conventions-declared-stable/
             "client.address"      => $env->{REMOTE_ADDR},
             "http.request.method" => $method,
-            "user_agent.original" => $env->{HTTP_USER_AGENT},
+            "user_agent.original" => ($env->{HTTP_USER_AGENT} || ''),
             "server.address"      => $env->{HTTP_HOST},
             "url.full"            => $url->as_string,
             "url.scheme"          => $scheme,
             "url.path"            => $url->path,
             ($url->query ? ("url.query" => $url->query) : ()),
 
-            # todo: "http.request_content_length"
+            # todo: "http.request.body.size"
 
         },
     );
@@ -79,9 +80,9 @@ sub call {
         }
 
         if (ref($res) && ref($res) eq 'ARRAY') {
-            set_status_code($span, $res);
+            $self->set_status_code($span, $res);
             my $content_length = Plack::Util::content_length($res->[2]);
-            $span->set_attribute("http.response_content_length", $content_length);
+            $span->set_attribute("http.response.body.size", $content_length);
             $span->end();
             return $res;
         }
@@ -90,30 +91,48 @@ sub call {
             $res,
             sub {
                 my $res = shift;
-                set_status_code($span, $res);
+                $self->set_status_code($span, $res);
+                $span->set_attribute("plack.callback", "true");
+
                 my $content_length = Plack::Util::content_length($res->[2]);
-                $span->set_attribute("http.response_content_length", $content_length);
-                $span->set_attribute("plack.callback",               "true");
-                $span->end();
+                if (defined $content_length) {
+                    $span->set_attribute("http.response.body.size", $content_length);
+                    $span->end();
+                    return;
+                }
+
+                $content_length = 0;
+
+                return sub {
+                    my $chunk = shift;
+                    unless (defined $chunk) {
+                        $span->set_attribute("http.response.body.size", $content_length);
+                        $span->end();
+                    }
+                    $content_length += length($chunk);
+                    return $chunk;
+                }
             }
         );
     }
     catch ($error) {
         warn "got request error: $error";
         my $message = $error;
-        $span->record_exception($error)->set_attribute('http.status_code' => 500)
+        $span->record_exception($error)->set_attribute('http.response.status_code' => 500)
           ->set_status(SPAN_STATUS_ERROR, $message)->end;
         die $error;
     }
 }
 
-sub set_status_code ($span, $res) {
+sub set_status_code ($self, $span, $res) {
     my $status_code = $res->[0] or return;
     $span->set_attribute("http.response.status_code", $status_code);
-    if ($status_code >= 400 and $status_code <= 599) {
+    if (   $status_code >= 400 and $self->include_client_errors
+        or $status_code >= 500)
+    {
         $span->set_status(SPAN_STATUS_ERROR);
     }
-    elsif ($status_code >= 200 and $status_code <= 399) {
+    elsif ($status_code >= 100) {
         $span->set_status(SPAN_STATUS_OK);
     }
 }
@@ -122,17 +141,17 @@ sub set_status_code ($span, $res) {
 
 =head1 NAME
 
-Plack::Middleware::OpenTelemetry - Plack middleware to handle X-Forwarded-For headers
+Plack::Middleware::OpenTelemetry - Plack middleware to setup OpenTelemetry spans
 
 =head1 VERSION
 
-version 0.233360
+version 0.240230
 
 =head1 SYNOPSIS
 
   builder {
     enable "Plack::Middleware::OpenTelemetry",
-      tracer => {name => "my-app", "version" => "1.2"};
+      include_client_errors => 0;
   };
 
 =head1 DESCRIPTION
@@ -144,9 +163,10 @@ span for the request.
 
 =over
 
-=item resource_attributes
+=item include_client_errors
 
-Optional attributes to be added to the resource in the created spans.
+By default client errors (HTTP status 400-499) don't set span status to
+"error". Enable this option to include them as errors.
 
 =back
 

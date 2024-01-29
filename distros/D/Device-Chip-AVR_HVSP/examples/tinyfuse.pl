@@ -5,21 +5,10 @@ use warnings;
 
 use Tickit;
 use Tickit::Widgets qw( VBox HBox Button Static GridBox CheckButton Choice );
+use Tickit::ContainerWidget 0.59; # ->add returns $self
 
 use Device::BusPirate;
 use Getopt::Long;
-
-# All the ->add code is nicer if you can chain calls
-{
-   # TODO: This should be in Tickit itself
-   my $old_add = Tickit::ContainerWidget->can( 'add' );
-   no strict 'refs'; no warnings 'redefine';
-   *Tickit::ContainerWidget::add = sub {
-      my $self = shift;
-      $self->$old_add( @_ );
-      return $self;
-   };
-}
 
 Tickit::Style->load_style( <<'EOF' );
 HBox { spacing: 1; }

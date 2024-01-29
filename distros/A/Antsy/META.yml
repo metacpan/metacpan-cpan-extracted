@@ -1,14 +1,14 @@
 ---
 abstract: 'Streaming ANSI escape sequences'
 author:
-  - 'brian d foy <bdfoy@cpan.org>'
+  - 'brian d foy <briandfoy@pobox.com>'
 build_requires:
   Test::More: '1'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,10 +20,10 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  perl: '5.032'
+  perl: '5.026'
 resources:
   bugtracker: https://github.com/briandfoy/antsy/issues
   homepage: https://github.com/briandfoy/antsy
-  repository: https://github.com/briandfoy/antsy.git
-version: '0.903'
+  repository: https://github.com/briandfoy/antsy
+version: '0.905'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

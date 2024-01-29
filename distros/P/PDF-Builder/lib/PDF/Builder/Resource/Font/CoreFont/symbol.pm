@@ -3,7 +3,7 @@ package PDF::Builder::Resource::Font::CoreFont::symbol;
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
+our $VERSION = '3.026'; # VERSION
 our $LAST_UPDATE = '3.019'; # manually update whenever code is changed
 
 =head1 NAME

@@ -1,5 +1,5 @@
 package Crypt::Passphrase::PassphraseHash;
-$Crypt::Passphrase::PassphraseHash::VERSION = '0.016';
+$Crypt::Passphrase::PassphraseHash::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -43,7 +43,7 @@ Crypt::Passphrase::PassphraseHash - An object representing a hash for password c
 
 =head1 VERSION
 
-version 0.016
+version 0.019
 
 =head1 DESCRIPTION
 
@@ -51,19 +51,27 @@ This class can be useful for plugging C<Crypt::Passphrase> into some frameworks 
 
 =head1 METHODS
 
-=head2 new($crypt_passphrase, $raw_hash)
+=head2 new
 
-This takes a C<Crypt::Passphrase> object, and a hash string. You probably want to use the C<curry_with_hash> or C<curry_with_password> methods on C<Crypt::Passphrase> instead of calling this directly.
+ Crypt::Passphrase::PassphraseHash->new($crypt_passphrase, $raw_hash)
 
-=head2 verify_password($password)
+This takes a C<Crypt::Passphrase> object, and a hash string. You probably want to use the C<curry_with_hash> or C<curry_with_password> methods on C<Crypt::Passphrase> instead of calling this directly. Typically called by C<< Crypt::Passphrase->curry_with_hash($hash) >> instead of directly.
+
+=head2 verify_password
+
+ $hash->verify_password($password)
 
 Verify that the password matches the hash in this object.
 
-=head2 needs_rehash()
+=head2 needs_rehash
+
+ $hash->needs_rehash
 
 Check if the hash needs to be rehashed.
 
-=head2 raw_hash()
+=head2 raw_hash
+
+ $hash->raw_hash
 
 This returns the hash contained in this object as a string.
 
@@ -77,7 +85,7 @@ This returns the hash contained in this object as a string.
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

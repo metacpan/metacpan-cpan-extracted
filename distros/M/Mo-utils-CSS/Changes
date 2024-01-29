@@ -1,0 +1,12 @@
+0.03 2024-01-07T23:09:07+01:00
+ - Add check_array_css_color().
+ - Fix SYNOPSIS section in doc.
+ - Improve subroutines doc.
+ - Regen example file.
+ - Rewrite check_css_color() to better helpers.
+
+0.02 2024-01-06T18:50:41+01:00
+ - Add check_css_class().
+
+0.01 2024-01-06T15:55:01+01:00
+ - First version.

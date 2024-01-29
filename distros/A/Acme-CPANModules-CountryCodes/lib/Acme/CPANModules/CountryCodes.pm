@@ -4,9 +4,9 @@ use strict;
 use Acme::CPANModulesUtil::Misc;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-06'; # DATE
+our $DATE = '2023-10-20'; # DATE
 our $DIST = 'Acme-CPANModules-CountryCodes'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our $LIST = {
     summary => 'List of modules related to country codes',
@@ -15,8 +15,8 @@ our $LIST = {
 ## Basics
 
 <pm:Locale::Country> and <pm:Locale::Codes::Country> (both part of
-<pm:Locale::Codes now) should be your first go-to module. It is a core module
-since perl 5.14 (Locale::Country from 5.8) and supports converting between
+<pm:Locale::Codes> now) should be your first go-to module. They are core modules
+since perl 5.14 (Locale::Country from 5.8) and they support converting between
 English country names and 2-letter- and 3-letter ISO country codes, and retired
 codes. If you need to squeeze some milliseconds of loading time, you can use
 <pm:Locale::Codes::Country_Codes> directly.
@@ -73,15 +73,15 @@ Acme::CPANModules::CountryCodes - List of modules related to country codes
 
 =head1 VERSION
 
-This document describes version 0.004 of Acme::CPANModules::CountryCodes (from Perl distribution Acme-CPANModules-CountryCodes), released on 2023-08-06.
+This document describes version 0.006 of Acme::CPANModules::CountryCodes (from Perl distribution Acme-CPANModules-CountryCodes), released on 2023-10-20.
 
 =head1 DESCRIPTION
 
 =head2 Basics
 
 L<Locale::Country> and L<Locale::Codes::Country> (both part of
-<pm:Locale::Codes now) should be your first go-to module. It is a core module
-since perl 5.14 (Locale::Country from 5.8) and supports converting between
+L<Locale::Codes> now) should be your first go-to module. They are core modules
+since perl 5.14 (Locale::Country from 5.8) and they support converting between
 English country names and 2-letter- and 3-letter ISO country codes, and retired
 codes. If you need to squeeze some milliseconds of loading time, you can use
 L<Locale::Codes::Country_Codes> directly.
@@ -121,6 +121,10 @@ L<App::LocaleCodesUtils>
 Author: L<SBECK|https://metacpan.org/author/SBECK>
 
 =item L<Locale::Codes::Country>
+
+Author: L<SBECK|https://metacpan.org/author/SBECK>
+
+=item L<Locale::Codes>
 
 Author: L<SBECK|https://metacpan.org/author/SBECK>
 

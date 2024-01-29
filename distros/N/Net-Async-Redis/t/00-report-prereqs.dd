@@ -26,6 +26,10 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
+                      'recommends' => {
+                                        'OpenTelemetry' => '0.018',
+                                        'OpenTelemetry::SDK' => '0.020'
+                                      },
                       'requires' => {
                                       'Cache::LRU' => '0.04',
                                       'Class::Method::Modifiers' => '0',
@@ -43,7 +47,6 @@ do { my $x = {
                                       'Math::Random::Secure' => '0',
                                       'Metrics::Any' => '0',
                                       'Object::Pad' => '0.800',
-                                      'OpenTracing::Any' => '1.003',
                                       'Path::Tiny' => '0',
                                       'Ryu' => '2.009',
                                       'Ryu::Async' => '0.019',
@@ -55,6 +58,9 @@ do { my $x = {
                                       'YAML::XS' => '0.88',
                                       'curry' => '0',
                                       'parent' => '0'
+                                    },
+                      'suggests' => {
+                                      'OpenTracing::Any' => '1.003'
                                     }
                     },
        'test' => {

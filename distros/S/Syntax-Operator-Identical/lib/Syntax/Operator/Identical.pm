@@ -3,12 +3,15 @@
 #
 #  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::Identical 0.01;
+package Syntax::Operator::Identical 0.04;
 
 use v5.14;
 use warnings;
 
 use Carp;
+
+use meta 0.003_002;
+no warnings 'meta::experimental';
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, our $VERSION );
@@ -169,12 +172,15 @@ sub apply
           : delete $^H{"Syntax::Operator::Identical/identical"};
    }
 
+   my $callerpkg;
+
    foreach (qw( is_identical is_not_identical )) {
       next unless delete $syms{$_};
 
-      no strict 'refs';
-      $on ? *{"${caller}::$_"} = \&{$_}
-          : warn "TODO: implement unimport of package symbol";
+      $callerpkg //= meta::package->get( $caller );
+
+      $on ? $callerpkg->add_symbol( '&'.$_ => \&{$_} )
+          : $callerpkg->remove_symbol( '&'.$_ );
    }
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;

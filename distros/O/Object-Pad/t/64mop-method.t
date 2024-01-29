@@ -5,7 +5,7 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad ':experimental(mop)';
+use Object::Pad 0.800 ':experimental(mop)';
 
 class Example {
    method m { }
@@ -27,14 +27,15 @@ is( [ $classmeta->direct_methods ], [ $methodmeta ],
 is( [ $classmeta->all_methods ], [ $methodmeta ],
    '$classmeta->all_methods' );
 
-class SubClass :isa(Example) {}
+class SubClass { inherit Example; }
 
 ok( defined Object::Pad::MOP::Class->for_class( "SubClass" )->get_method( 'm' ),
    'Subclass can ->get_method' );
 
 # subclass with overridden method
 {
-   class WithOverride :isa(Example) {
+   class WithOverride {
+      inherit Example;
       method m { "different" }
    }
 

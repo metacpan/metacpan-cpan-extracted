@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# PutDocumentProtectFromChangesRequest.name : The workbook name.  ,
-# PutDocumentProtectFromChangesRequest.password : Modification password.  ,
-# PutDocumentProtectFromChangesRequest.folder : Original workbook folder.  ,
-# PutDocumentProtectFromChangesRequest.storageName : Storage name.   
+# PutDocumentProtectFromChangesRequest.name : The file name.  ,
+# PutDocumentProtectFromChangesRequest.password : The password needed to open an Excel file.  ,
+# PutDocumentProtectFromChangesRequest.folder : The folder where the file is situated.  ,
+# PutDocumentProtectFromChangesRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_document_protect_from_changes' } = { 
-    	summary => 'Protects document from changes.',
+    	summary => 'Excel file write protection.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'PasswordRequest',
      	base_name => 'password',
-     	description => 'Modification password.',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

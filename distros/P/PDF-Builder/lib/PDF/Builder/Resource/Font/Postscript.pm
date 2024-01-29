@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::Font';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use Encode qw(:all);
 use IO::File qw();
@@ -17,6 +17,19 @@ use PDF::Builder::Basic::PDF::Utils;
 =head1 NAME
 
 PDF::Builder::Resource::Font::Postscript - support routines for using PostScript fonts. Inherits from L<PDF::Builder::Resource::Font>
+
+=head1 METHODS
+
+=head2 new
+
+    PDF::Builder::Resource::Font::Postscript->new($pdf, $psfile, %opts)
+
+=over
+
+Create an object for a PostScript font. Handles ASCII (.pfa), binary (.pfb), and
+T1 (.t1) font files, as well as ASCII (.afm) and binary (.pfm) metrics files.
+
+=back
 
 =cut
 
@@ -95,17 +108,29 @@ sub readPFAPFB {
     die "Cannot find PFA/PFB font file '$file' ..." unless -f $file;
 
     my $l = -s $file;
+    $l1 = $l2 = $l3 = 0;
+    $head = $body = $tail = '';
+
+    my $type = 'pfa';
+    if      ($file =~ m/\.pfb$/i) {
+	$type = 'pfb';
+    } elsif ($file =~ m/\.t1$/i) {
+	$type = 't1';
+    }
 
     open(my $inf, "<", $file) or die "$!: $file";
     binmode($inf,':raw');
-    read($inf, $line, 2);
+    read($inf, $line, 2); # read 2 bytes to check header
     @lines = unpack('C*', $line);
-    if      ($lines[0] == 0x80 && $lines[1] == 1) {
+
+    if      ($lines[0] == 0x80 && $lines[1] == 1) {  # .pfb
+	# first 6 bytes are 80 01, 4 byte LSB $l1 head length
         read($inf, $line, 4);
-        $l1 = unpack('V', $line);
+        $l1 = unpack('V', $line); # length of head
         seek($inf, $l1, 1);
         read($inf, $line, 2);
         @lines = unpack('C*', $line);
+	# at start of binary body, 6 bytes 80 01, 4 byte LSB $l2 body length
         if ($lines[0] == 0x80 && $lines[1] == 2) {
             read($inf, $line, 4);
             $l2 = unpack('V', $line);
@@ -115,6 +140,7 @@ sub readPFAPFB {
         seek($inf, $l2, 1);
         read($inf, $line, 2);
         @lines = unpack('C*', $line);
+	# after body, 6 bytes 80 01, 4 byte LSB $l3 tail length
         if ($lines[0] == 0x80 && $lines[1] == 1) {
             read($inf, $line, 4);
             $l3 = unpack('V', $line);
@@ -124,33 +150,84 @@ sub readPFAPFB {
         seek($inf, 0, 0);
         @lines = <$inf>;
         $stream = join('', @lines);
+	# each section, skip over 80 01, length; read in length of section
         $t1stream = substr($stream, 6, $l1);
         $t1stream .= substr($stream, 12+$l1, $l2);
         $t1stream .= substr($stream, 18+$l1+$l2, $l3);
-    } elsif ($line eq '%!') {
+
+    } elsif ($line eq '%!' && $type eq 'pfa') { 
         seek($inf, 0, 0);
         while ($line = <$inf>) {
-            if      (!$l1) {
-                $head .= $line;
+            if      (!$l1) {  # $head empty or not complete yet?
+                $head .= $line; # up through and including currentfile eexec
                 if ($line=~/eexec$/) {
                     chomp($head);
                     $head .= "\x0d";
                     $l1 = length($head);
                 }
-            } elsif (!$l2) {
-                if ($line =~ /^0+$/) {
+            } elsif (!$l2) {  # $body empty or not complete yet?
+                if ($line =~ /^0+$/) {  # at block of 0's, marking end of body
                     $l2 = length($body);
                     $tail = $line;
                 } else {
                     chomp($line);
-                    $body .= pack('H*', $line);
+                    $body .= pack('H*', $line); # binary form of hex codes
                 }
-            } else {
+            } else {  # rest goes into the $tail
                 $tail .= $line;
             }
         }
         $l3 = length($tail);
+	# head = individual lines (^M terminated) with settings list
+	# body = one long string of bytes (binary)
+	# tail = 8 lines x 64 0's ^M terminated, cleartomark (no ^M)
         $t1stream = "$head$body$tail";
+
+    } elsif ($line eq '%!' && $type eq 't1') { 
+	# .t1
+	my $pos;
+        seek($inf, 0, 0);
+        while (1) { # head
+            read($inf, $line, 200);
+	    $head .= $line;
+	    $pos = index($head, "currentfile eexec\x0D");
+	    if ($pos > 0) {
+		# found end of head, so split there
+		$body = substr($head, $pos+18);
+		$head = substr($head, 0, $pos+18);
+		$l1 = length($head);
+		last;
+	    }
+	}
+	while (1) { # body
+            read($inf, $line, 200);
+	    $body .= $line;
+	    #                             1111111111222222222233333333334444444444555555555566666
+	    #                    1234567890123456789012345678901234567890123456789012345678901234
+	    $pos = index($body, "0000000000000000000000000000000000000000000000000000000000000000");
+	    if ($pos > 0) {
+		# found end of body, so split there
+		$tail = substr($body, $pos);
+		$body = substr($body, 0, $pos);
+		$l2 = length($body);
+		last;
+	    }
+	}
+	while (1) { # remainder into tail
+            read($inf, $line, 200);
+	    $tail .= $line;
+	    if (length($line) == 0) {
+		# found end of tail
+		$l3 = length($tail);
+		last;
+	    }
+	}
+
+	# head = individual lines (^M terminated) with settings list
+	# body = one long string of bytes (binary)
+	# tail = 8 lines x 64 0's ^M terminated, cleartomark (no ^M)
+        $t1stream = "$head$body$tail";
+
     } else {
         die "Unsupported font-format in file '$file' at marker='1'.";
     }

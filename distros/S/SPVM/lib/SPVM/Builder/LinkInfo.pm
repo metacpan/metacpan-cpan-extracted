@@ -45,18 +45,24 @@ sub new {
   my $class = shift;
   
   my $self = {@_};
-
+  
   bless $self, $class;
+  
+  my $config = $self->config;
+  
+  unless ($config) {
+    confess "The \"config\" field must be defined.";
+  }
   
   unless (defined $self->object_files) {
     $self->object_files([]);
   }
-
+  
   return $self;
 }
 
 # Instance Methods
-sub create_link_command {
+sub create_command {
   my ($self) = @_;
   
   my $config = $self->config;
@@ -66,7 +72,7 @@ sub create_link_command {
   my $object_files = $self->object_files;
   my $object_file_names = [map { $_->to_string; } @$object_files];
   
-  my $link_command_args = $self->create_link_command_args;
+  my $link_command_args = $self->create_ldflags;
   
   # Note: Arguments of the link command(these contain -l flags) must be
   # after object file names for resolving symbol names properly
@@ -75,7 +81,7 @@ sub create_link_command {
   return \@link_command;
 }
 
-sub create_link_command_args {
+sub create_ldflags {
   my ($self) = @_;
   
   my $config = $self->config;
@@ -107,11 +113,11 @@ sub create_link_command_args {
     my $lib_ldflag;
     
     unless (ref $lib) {
-      $lib = SPVM::Builder::LibInfo->new(name => $lib);
+      $lib = SPVM::Builder::LibInfo->new(config => $config, name => $lib);
     }
     
-    $lib_ldflag = $lib->to_arg;
-    push @lib_ldflags, $lib_ldflag;
+    my $lib_ldflags = $lib->create_ldflags;
+    push @lib_ldflags, @$lib_ldflags;
   }
   
   push @merged_ldflags, @lib_ldflags;
@@ -119,10 +125,10 @@ sub create_link_command_args {
   return \@merged_ldflags;
 }
 
-sub to_cmd {
+sub to_command {
   my ($self) = @_;
-
-  my $link_command = $self->create_link_command;
+  
+  my $link_command = $self->create_command;
   my $link_command_string = "@$link_command";
   
   return $link_command_string;
@@ -132,16 +138,16 @@ sub to_cmd {
 
 =head1 Name
 
-SPVM::Builder::LinkInfo - Link Information
+SPVM::Builder::LinkInfo - Linker Information
 
 =head1 Description
 
-The SPVM::Builder::LinkInfo class has methods to manipulate link information.
+The SPVM::Builder::LinkInfo class has methods to manipulate linker information.
 
 =head1 Usage
 
   my $link_info = SPVM::Builder::LinkInfo->new(%fields);
-  my $link_command_string = $link_info->to_cmd;
+  my $link_command = $link_info->to_command;
 
 =head1 Fields
 
@@ -150,27 +156,21 @@ The SPVM::Builder::LinkInfo class has methods to manipulate link information.
   my $config = $link_info->config;
   $link_info->config($config);
 
-Gets and sets the C<config> field.
-
-This field is a L<SPVM::Builder::Config> object used to link the object files.
+Gets and sets the C<config> field, a L<SPVM::Builder::Config> object.
 
 =head2 output_file
 
   my $output_file = $link_info->output_file;
   $link_info->output_file($output_file);
 
-Gets and sets the C<output_file> field.
-
-This field is an output file.
+Gets and sets the C<output_file> field, an output file.
 
 =head2 object_files
 
   my $object_files = $link_info->object_files;
   $link_info->object_files($object_files);
 
-Gets and sets the C<object_files> field.
-
-This field is an array reference of L<SPVM::Builder::ObjectFileInfo> objects.
+Gets and sets the C<object_files> field, an array reference of L<SPVM::Builder::ObjectFileInfo> objects.
 
 =head1 Class Methods
 
@@ -178,17 +178,11 @@ This field is an array reference of L<SPVM::Builder::ObjectFileInfo> objects.
 
   my $link_info = SPVM::Builder::LinkInfo->new(%fields);
 
-Creates a new C<SPVM::Builder::LinkInfo> object with L</"Fields">.
-
-Default Field Values:
+Creates a new C<SPVM::Builder::LinkInfo> object given L</"Fields">.
 
 If a field is not defined, the field is set to the following default value.
 
 =over 2
-
-=item * L</"config">
-
-undef
 
 =item * L</"output_file">
 
@@ -200,37 +194,41 @@ undef
 
 =back
 
+Exceptions:
+
+The "config" field must be defined.
+
 =head1 Instance Methods
 
-=head2 create_link_command
+=head2 create_command
 
-  my $link_command = $link_info->create_link_command;
+  my $link_command = $link_info->create_command;
 
-Creates a link command, and returns it. The return value is an array reference.
+Creates an array reference of the link command, and returns it.
 
-The following one is an example of the return value.
+Return Value Examples:
 
   [qw(cc -o dylib.so foo.o bar.o -shared -O2 -Llibdir -lz)]
 
-=head2 create_link_command_args
+=head2 create_ldflags
 
-  my $link_command_args = $link_info->create_link_command_args;
+  my $link_command_args = $link_info->create_ldflags;
 
-Creates the parts of the arguments of the link command from the information of the L</"config"> field, and returns it. The return value is an array reference.
+Creates an array reference of the linker options, and returns it.
 
-The C<-o> option and the object file names are not contained.
+The output file L</"output_file"> and the object files L</"object_files"> are not contained.
 
-The following one is an example of the return value.
+Return Value Examples:
 
   [qw(-shared -O2 -Llibdir -lz)]
 
-=head2 to_cmd
+=head2 to_command
 
-  my $link_command_string = $link_info->to_cmd;
+  my $link_command_string = $link_info->to_command;
 
-Calls the L<create_link_command|/"create_link_command"> method and joins all elements of the returned array reference with a space, and returns it.
+Joins all elements of the return value of the L<create_command|/"create_command"> method with a space, and returns it.
 
-The following one is an example of the return value.
+Return Value Examples:
 
   "cc -o dylib.so foo.o bar.o -shared -O2 -Llibdir -lz"
 

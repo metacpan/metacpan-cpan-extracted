@@ -6,7 +6,7 @@ use experimental qw/ signatures /;
 
 package YAML::Tidy::Node;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = 'v0.9.0'; # VERSION
 use overload '""' => \&_stringify;
 
 sub new($class, %args) {
@@ -49,7 +49,9 @@ use constant DEBUG => $ENV{YAML_TIDY_DEBUG} ? 1 : 0;
 
 use base 'YAML::Tidy::Node';
 
-sub is_collection { 1 }
+sub is_collection($self) { 1 }
+
+sub is_alias($self) { 0 }
 
 sub indent($self) {
     my $firstevent = $self->open;
@@ -166,22 +168,11 @@ sub fix_lines($self, $startline, $diff) {
     }
 }
 
-package YAML::Tidy::Node::Scalar;
-use constant DEBUG => $ENV{YAML_TIDY_DEBUG} ? 1 : 0;
-use YAML::PP::Common qw/
-    YAML_PLAIN_SCALAR_STYLE YAML_SINGLE_QUOTED_SCALAR_STYLE
-    YAML_DOUBLE_QUOTED_SCALAR_STYLE YAML_LITERAL_SCALAR_STYLE
-    YAML_FOLDED_SCALAR_STYLE
-    YAML_FLOW_SEQUENCE_STYLE YAML_FLOW_MAPPING_STYLE
-/;
-
+package YAML::Tidy::Node::Leaf;
 use base 'YAML::Tidy::Node';
+use constant DEBUG => $ENV{YAML_TIDY_DEBUG} ? 1 : 0;
 
 sub is_collection { 0 }
-
-sub is_quoted($self) {
-    return $self->{style} ne YAML_PLAIN_SCALAR_STYLE
-}
 
 sub indent($self) {
     return $self->open->{column};
@@ -191,11 +182,82 @@ sub start($self) {
     return $self->open;
 }
 
+sub end($self) {
+    return $self->close;
+}
+
 sub open($self) { $self->{start} }
 sub close($self) { $self->{end} }
 
-sub end($self) {
-    return $self->close;
+sub fix_lines($self, $startline, $diff) {
+    DEBUG and warn __PACKAGE__.':'.__LINE__.": ======== fix_lines $startline $diff ($self)\n";
+    for my $pos ($self->open) {
+        if ($self->empty_leaf and $pos->{column} == 0 and $pos->{line} == $startline) {
+        }
+        elsif ($pos->{line} >= $startline) {
+            $pos->{line} += $diff;
+        }
+    }
+    for my $pos ($self->close) {
+        if ($pos->{column} == 0 and $pos->{line} == $startline) {
+        }
+        elsif ($pos->{line} >= $startline) {
+            $pos->{line} += $diff;
+        }
+    }
+}
+
+sub empty_leaf($self) {
+    my ($start, $end) = ($self->open, $self->close);
+    if ($start->{line} == $end->{line} and $start->{column} == $end->{column}) {
+        return 1;
+    }
+    return 0;
+}
+
+sub fix_node_indent($self, $fix) {
+    for my $pos ($self->open, $self->close) {
+        $pos->{column} += $fix;
+    }
+}
+
+sub _fix_flow_indent($self, %args) {
+    my $line = $args{line};
+    my $diff = $args{diff};
+#    warn __PACKAGE__.':'.__LINE__.": ========== _fix_flow_indent l=$line diff=$diff\n";
+    for my $pos ($self->open, $self->close) {
+        if ($pos->{line} == $line) {
+            $pos->{column} += $diff;
+        }
+    }
+}
+
+sub _move_columns($self, $line, $offset, $fix) {
+#    warn __PACKAGE__.':'.__LINE__.": _move_columns $self $line $offset $fix\n";
+    return if $self->end->{line} < $line;
+    return if $self->start->{line} > $line;
+    for my $pos ($self->open, $self->close) {
+        if ($pos->{line} == $line and $pos->{column} >= $offset) {
+            $pos->{column} += $fix;
+        }
+    }
+}
+
+
+package YAML::Tidy::Node::Scalar;
+use base 'YAML::Tidy::Node::Leaf';
+use constant DEBUG => $ENV{YAML_TIDY_DEBUG} ? 1 : 0;
+use YAML::PP::Common qw/
+    YAML_PLAIN_SCALAR_STYLE YAML_SINGLE_QUOTED_SCALAR_STYLE
+    YAML_DOUBLE_QUOTED_SCALAR_STYLE YAML_LITERAL_SCALAR_STYLE
+    YAML_FOLDED_SCALAR_STYLE
+    YAML_FLOW_SEQUENCE_STYLE YAML_FLOW_MAPPING_STYLE
+/;
+
+sub is_alias($self) { 0 }
+
+sub is_quoted($self) {
+    return $self->{style} ne YAML_PLAIN_SCALAR_STYLE
 }
 
 sub realendline($self) {
@@ -225,58 +287,15 @@ sub multiline($self) {
     return 0;
 }
 
-sub empty_scalar($self) {
-    my ($start, $end) = ($self->open, $self->close);
-    if ($start->{line} == $end->{line} and $start->{column} == $end->{column}) {
-        return 1;
-    }
-    return 0;
+package YAML::Tidy::Node::Alias;
+use constant DEBUG => $ENV{YAML_TIDY_DEBUG} ? 1 : 0;
+use base 'YAML::Tidy::Node::Leaf';
+
+sub line($self) {
+    return $self->open->{line};
 }
 
-sub fix_node_indent($self, $fix) {
-    for my $pos ($self->open, $self->close) {
-        $pos->{column} += $fix;
-    }
-}
-
-sub _move_columns($self, $line, $offset, $fix) {
-#    warn __PACKAGE__.':'.__LINE__.": _move_columns $self $line $offset $fix\n";
-    return if $self->end->{line} < $line;
-    return if $self->start->{line} > $line;
-    for my $pos ($self->open, $self->close) {
-        if ($pos->{line} == $line and $pos->{column} >= $offset) {
-            $pos->{column} += $fix;
-        }
-    }
-}
-
-sub _fix_flow_indent($self, %args) {
-    my $line = $args{line};
-    my $diff = $args{diff};
-#    warn __PACKAGE__.':'.__LINE__.": ========== _fix_flow_indent l=$line diff=$diff\n";
-    for my $pos ($self->open, $self->close) {
-        if ($pos->{line} == $line) {
-            $pos->{column} += $diff;
-        }
-    }
-}
-
-sub fix_lines($self, $startline, $diff) {
-    DEBUG and warn __PACKAGE__.':'.__LINE__.": ======== fix_lines $startline $diff ($self)\n";
-    for my $pos ($self->open) {
-        if ($self->empty_scalar and $pos->{column} == 0 and $pos->{line} == $startline) {
-        }
-        elsif ($pos->{line} >= $startline) {
-            $pos->{line} += $diff;
-        }
-    }
-    for my $pos ($self->close) {
-        if ($pos->{column} == 0 and $pos->{line} == $startline) {
-        }
-        elsif ($pos->{line} >= $startline) {
-            $pos->{line} += $diff;
-        }
-    }
-}
+sub multiline($self) { 0 }
+sub is_alias($self) { 1 }
 
 1;

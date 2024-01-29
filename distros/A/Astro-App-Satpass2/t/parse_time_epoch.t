@@ -5,12 +5,12 @@ use 5.008;
 use strict;
 use warnings;
 
+use Test::More 0.88;	# Because of done_testing();
+use Astro::App::Satpass2::ParseTime;
+
 use lib qw{ inc };
 
-use Test::More 0.88;	# Because of done_testing();
 use My::Module::Test::App;
-
-require_ok 'Astro::App::Satpass2::ParseTime';
 
 klass( 'Astro::App::Satpass2::ParseTime' );
 

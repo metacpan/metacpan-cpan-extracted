@@ -29,11 +29,11 @@ Pg::Explain::FromText - Parser for text based explains
 
 =head1 VERSION
 
-Version 2.6
+Version 2.7
 
 =cut
 
-our $VERSION = '2.6';
+our $VERSION = '2.7';
 
 =head1 SYNOPSIS
 
@@ -389,7 +389,10 @@ sub parse_source {
                         $node->buffers->add_timing( $info ) if $node->buffers;
                     }
                 };
-                $node->add_extra_info( $info ) if $EVAL_ERROR;
+                if ( $EVAL_ERROR ) {
+                    print "[[ $EVAL_ERROR ]]\n";
+                    $node->add_extra_info( $info ) if $EVAL_ERROR;
+                }
             }
             else {
                 $node->add_extra_info( $info );

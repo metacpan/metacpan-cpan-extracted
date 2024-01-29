@@ -28,14 +28,14 @@ WriteMakefile(
     META_MERGE        => {
         'meta-spec' => { version => 2 },
         resources => {
-                      repository => {
-                           type => 'git',
-                           url => 'git://github.com/davorg/app-cpanmodulesite.git',
-                           web => 'https://github.com/davorg/app-cpanmodulesite',
-                          },
-                      bugtracker => {
-                                     "web" => "https://github.com/davorg/app-cpanmodulesite/issues"
-                                    }
+            repository => {
+                type => 'git',
+                url => 'git://github.com/davorg-cpan/app-cpanmodulesite.git',
+                web => 'https://github.com/davorg-cpan/app-cpanmodulesite',
+            },
+            bugtracker => {
+                "web" => "https://github.com/davorg-cpan/app-cpanmodulesite/issues"
+            }
         },
     },
 );

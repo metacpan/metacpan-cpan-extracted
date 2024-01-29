@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230903131448;
+our $VERSION = 1.20231210185946;
 
 my $formatters = [
                 {
@@ -123,30 +123,30 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"5144", "La\ Libertad",
-"5142", "San\ Martín",
-"5151", "Puno",
-"5163", "Pasco",
-"5176", "Cajamarca",
-"5183", "Apurímac",
-"511", "Lima\/Callao",
-"5141", "Amazonas",
-"5173", "Piura",
-"5166", "Ayacucho",
-"5154", "Arequipa",
+$areanames{en} = {"5172", "Tumbes",
 "5152", "Tacna",
+"5162", "Huánuco",
+"5166", "Ayacucho",
+"5156", "Ica",
+"5141", "Amazonas",
+"5176", "Cajamarca",
+"5182", "Madre\ de\ Dios",
+"5183", "Apurímac",
+"5144", "La\ Libertad",
+"5173", "Piura",
+"5163", "Pasco",
+"5153", "Moquegua",
+"5161", "Ucayali",
+"5151", "Puno",
+"5142", "San\ Martín",
+"511", "Lima\/Callao",
+"5184", "Cusco",
 "5165", "Loreto",
 "5143", "Ancash",
-"5164", "Junín",
-"5156", "Ica",
-"5167", "Huancavelica",
-"5162", "Huánuco",
-"5182", "Madre\ de\ Dios",
-"5184", "Cusco",
-"5172", "Tumbes",
 "5174", "Lambayeque",
-"5153", "Moquegua",
-"5161", "Ucayali",};
+"5154", "Arequipa",
+"5164", "Junín",
+"5167", "Huancavelica",};
 
     sub new {
       my $class = shift;

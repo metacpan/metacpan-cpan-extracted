@@ -1,5 +1,13 @@
 Revision history for Text-Treesitter
 
+0.12    2023-12-28
+        [CHANGES]
+         * Implement the `#set!` directive in queries
+         * Improvements to examples/highlight.pl:
+            + Look for `queries/folds.scm`, not `fold.scm`
+            + Recognise more capture names
+            + Recognise `@injection.*` format of injections.scm
+
 0.11    2023-09-18
         [CHANGES]
          * Added `$node->start_row` and similar convenience accessors

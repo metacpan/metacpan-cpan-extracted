@@ -1,5 +1,4 @@
 use warnings;
-use lib 'inc';
 use Test::More;
 use strict;
 use IO::String;
@@ -167,10 +166,10 @@ ok(
         '/mysession',
         query  => 'whoami=1',
         accept => 'application/json',
-        host => 'auth.op.com',
+        host   => 'auth.op.com',
         custom => {
             HTTP_AUTHORIZATION => "Bearer $access_token",
-            VHOSTTYPE => 'OAuth2',
+            VHOSTTYPE          => 'OAuth2',
         }
     ),
     'Check session'
@@ -185,11 +184,11 @@ sub op {
     return LLNG::Manager::Test->new(
         {
             ini => {
-                logLevel                        => $debug,
+                logLevel      => $debug,
                 locationRules => {
                     'auth.op.com' => {
                         '^/mysession' => '$_scope =~ /(?<!\S)llngapi(?!\S)/',
-                        default => 'accept',
+                        default       => 'accept',
                     },
                 },
                 domain                          => 'idp.com',
@@ -222,7 +221,9 @@ sub op {
                         oidcRPMetaDataOptionsAccessTokenExpiration  => 3600,
                         oidcRPMetaDataOptionsPostLogoutRedirectUris =>
                           "http://auth.rp.com/?logout=1",
-                        oidcRPMetaDataOptionsRule => '$uid eq "french"',
+                        oidcRPMetaDataOptionsRule         => '$uid eq "french"',
+                        oidcRPMetaDataOptionsRedirectUris =>
+                          'http://auth.rp.com/?openidconnectcallback=1',
                     }
                 },
                 oidcOPMetaDataOptions           => {},
@@ -268,7 +269,8 @@ sub rp {
                         oidcOPMetaDataOptionsJWKSTimeout       => 0,
                         oidcOPMetaDataOptionsAcrValues => "loa-32 customacr-1",
                         oidcOPMetaDataOptionsClientSecret => "rpsecret",
-                        oidcOPMetaDataOptionsScope => "openid profile email llngapi",
+                        oidcOPMetaDataOptionsScope        =>
+                          "openid profile email llngapi",
                         oidcOPMetaDataOptionsStoreIDToken     => 0,
                         oidcOPMetaDataOptionsMaxAge           => 30,
                         oidcOPMetaDataOptionsDisplay          => "",

@@ -1,0 +1,15 @@
+Revision history for Game::Deckar
+
+0.02    2024-01-01
+        Add "move" method, like "deal" but in bulk.
+
+        Add "pick" method to pick cards in some order from a deck.
+
+        Pains are taken to preserve the array reference of the decks
+        across the various methods so that the caller can hold onto
+        them.
+
+        Throw errors on various edge cases previously not caught.
+
+0.01    2023-12-29
+        First version, released on an unsuspecting world.

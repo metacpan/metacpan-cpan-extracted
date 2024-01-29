@@ -11,6 +11,10 @@ print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
 print  "# Using gmp library version ", Math::MPFR::gmp_v(), "\n";
 
+my $expected_refcnt = 1;
+$expected_refcnt++
+  if $Config{ccflags} =~ /\-DPERL_RC_STACK/;
+
 my $arb = 2;
 
 my $double = 12345.5;
@@ -449,7 +453,6 @@ my ($t2, $s2) = Rmpfr_init_set_d($double, GMP_RNDN);
 
 if(Rmpfr_eq($t1, $t2, 50)) {print "ok 43\n"}
 else {print "not ok 43\n"}
-
 my ($t3, $s33) = Rmpfr_init_set_ui(int($double), GMP_RNDN);
 my ($t4, $s44) = Rmpfr_init_set_si(int($double) + 1, GMP_RNDN);
 
@@ -459,7 +462,7 @@ if(Rmpfr_cmp($t3, $t2) < 0
 else {print "not ok 44\n"}
 
 if($have_mpz) {
-   eval {my $t = Rmpfr_init_set_z($z, GMP_RNDN)};
+   eval {my ($t, $inex) = Rmpfr_init_set_z($z, GMP_RNDN)};
    if(!$@) {print "ok 45\n"}
    else {print "not ok 45\n"}
    }
@@ -469,7 +472,7 @@ else {
 }
 
 if($have_mpq) {
-   eval {my $t = Rmpfr_init_set_q($q, GMP_RNDN)};
+   eval {my ($t, $inex) = Rmpfr_init_set_q($q, GMP_RNDN)};
    if(!$@) {print "ok 46\n"}
    else {print "not ok 46\n"}
    }
@@ -479,7 +482,7 @@ else {
 }
 
 if($have_mpf) {
-   eval {my $t = Rmpfr_init_set_f($f, GMP_RNDN)};
+   eval {my ($t, $inex) = Rmpfr_init_set_f($f, GMP_RNDN)};
    if(!$@) {print "ok 47\n"}
    else {print "not ok 47\n"}
    }
@@ -513,8 +516,8 @@ if($have_mpz) {
    if(Rmpfr_inf_p($check)) {$ok .= 'd'}
 
    if($ok eq 'abcd' && !$flag
-     && Math::MPFR::get_refcnt($c) == 1
-     && Math::MPFR::get_refcnt($check) == 1){print "ok 48\n"}
+     && Math::MPFR::get_refcnt($c) == $expected_refcnt
+     && Math::MPFR::get_refcnt($check) == $expected_refcnt){print "ok 48\n"}
    else {print "not ok 48 \$ok: $ok   \$flag: $flag\n"}
    }
 else {
@@ -537,8 +540,8 @@ my $flag = Rmpfr_nanflag_p();
 
 $check = $check / $c;
 if(!$flag && Rmpfr_nanflag_p()
-   && Math::MPFR::get_refcnt($check) == 1
-   && Math::MPFR::get_refcnt($c) == 1
+   && Math::MPFR::get_refcnt($check) == $expected_refcnt
+   && Math::MPFR::get_refcnt($c) == $expected_refcnt
    && $ok eq 'ab') {print "ok 49\n"}
 else {print "not ok 49 (Got: $flag ", Rmpfr_nanflag_p(), " $ok)\n"}
 

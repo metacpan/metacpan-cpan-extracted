@@ -14,7 +14,7 @@ use File::Spec::Functions qw(catfile);
 use Getopt::Long qw(GetOptionsFromArray);
 use POSIX qw(ceil);
 
-our $VERSION = '1.92';
+our $VERSION = '1.94';
 
 local $SIG{__DIE__} = sub {
     my ($cause) = @_;
@@ -427,7 +427,7 @@ C<update-exported-constants> - Manage constants exported by Net::SSLeay
 
 =head1 VERSION
 
-This document describes version 1.92 of C<update-exported-constants>.
+This document describes version 1.94 of C<update-exported-constants>.
 
 =head1 USAGE
 
@@ -724,13 +724,11 @@ the version of Net-SSLeay you are using.
 
 Originally written by Chris Novakovic.
 
-Maintained by Chris Novakovic, Tuure Vartiainen and Heikki Vatiainen.
+Maintained by Chris Novakovic and Heikki Vatiainen.
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright 2021- Chris Novakovic <chris@chrisn.me.uk>.
-
-Copyright 2021- Tuure Vartiainen <vartiait@radiatorsoftware.com>.
 
 Copyright 2021- Heikki Vatiainen <hvn@radiatorsoftware.com>.
 

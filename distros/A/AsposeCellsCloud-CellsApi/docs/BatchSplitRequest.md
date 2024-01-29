@@ -16,6 +16,7 @@ Name | Type | Description | Notes
 **ToIndex** | **int** | To worksheet index of workbook. |
 **OutFolder** | **string** | The directory that stores files whose format conversion was successful. |
 **OutStorage** | **string** | Aspose Cloud storage name. |
+**Region** | **string** | The regional settings for workbook. |
 **SaveOptions** | **SaveOptions** | Indicates save options. |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

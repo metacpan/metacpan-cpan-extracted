@@ -1,0 +1,68 @@
+=pod
+
+=encoding utf8
+
+=head1 Overview
+
+L<Error::Pure> system is replacement for usage of Perl C<die> or L<Carp> C<croak>.
+
+Main features are:
+
+=over
+
+=item * Structured and defined output
+
+=item * Stack trace support inside
+
+=back
+
+=head1 Basic usage
+
+Simple Perl script, which have two subroutines and there is error inside.
+Error output via L<Error::Pure> is to console and with ANSI colors.
+Output formatter is placed in L<Error::Pure::Output::ANSIColor/err_bt_pretty>.
+
+Perl script
+
+ #!/usr/bin/env perl
+
+ use strict;
+ use warnings;
+
+ use Error::Pure qw(err);
+
+ sub first {
+         my $text = shift;
+
+         second($text);
+
+         return;
+ }
+
+ sub second {
+         my $text = shift;
+
+         err 'This is error',
+                 'Context', $text,
+         ;
+ }
+
+ first("Hellow world");
+
+Output to stderr
+
+ ERROR: This is error
+ Context: Hellow world
+ main  err     /home/skim/data/gitprac/lang/perl/perl/MODULES/Error-Pure/ex19.pl  19
+ main  second  /home/skim/data/gitprac/lang/perl/perl/MODULES/Error-Pure/ex19.pl  11
+ main  first   /home/skim/data/gitprac/lang/perl/perl/MODULES/Error-Pure/ex19.pl  24
+
+Output is in ANSI colors, you could look to image
+
+=begin html
+
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Error-Pure/master/images/basic_example.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Error-Pure/master/images/basic_example.png" alt="Basic example" width="300px" height="300px" />
+</a>
+
+=cut

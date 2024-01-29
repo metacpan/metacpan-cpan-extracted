@@ -1,5 +1,11 @@
 Revision history for Perl module File::Fingerprint
 
+0.104 2024-01-07T22:56:36Z
+	* release once again because of a minor sanfu in the process
+
+0.103 2024-01-07T22:52:42Z
+	* Freshen distro with new email address
+
 0.102 2018-05-14T13:30:34Z
 	* Mohammad S Anwar improved the test for roll()
 

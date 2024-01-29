@@ -6,6 +6,7 @@ my $query_string = '?' . $m->comp('/Elements/QueryString',
     Query            => $ARGSRef->{Query},
     GroupBy          => $ARGSRef->{GroupBy},
     ChartFunction    => $ARGSRef->{ChartFunction},
+    Class            => $ARGSRef->{Class},
 );
 my $href = RT->Config->Get('WebPath') . '/Search/Chart.xlsx' . $query_string;
 </%INIT>

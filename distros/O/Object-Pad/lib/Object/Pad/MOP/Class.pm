@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Class 0.806;
+package Object::Pad::MOP::Class 0.808;
 
 use v5.14;
 use warnings;
@@ -62,11 +62,21 @@ sub import_into
 
 I<Since version 0.38.>
 
-Returns the metaclass instance associated with the given class name.
+Returns the metaclass instance associated with the given class name. Throws an
+exception if the requested class is not using C<Object::Pad>.
+
+=head2 try_for_class
+
+   $metaclass = Object::Pad::MOP::Class->try_for_class( $class );
+
+I<Since version 0.808.>
+
+If the given class name is built using C<Object::Pad> then returns the
+metaclass instance for it. If not, returns C<undef>.
 
 =cut
 
-sub for_class
+sub try_for_class
 {
    shift;
    my ( $targetclass ) = @_;
@@ -80,7 +90,19 @@ sub for_class
         "Object::Pad::MOP is experimental and may be changed or removed without notice";
    }
 
-   return $targetclass->META;
+   my $code = $targetclass->can( "META" ) or
+      return undef;
+
+   return $code->( $targetclass );
+}
+
+sub for_class
+{
+   my $self = shift;
+   my ( $targetclass ) = @_;
+
+   return $self->try_for_class( $targetclass ) //
+      croak "Cannot obtain Object::Pad::MOP::Class for '$targetclass' as it does not appear to be based on Object::Pad";
 }
 
 =head2 for_caller

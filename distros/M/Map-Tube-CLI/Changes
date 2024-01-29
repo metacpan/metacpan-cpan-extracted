@@ -1,5 +1,8 @@
 Revision history for Map::Tube::CLI
 
+0.68  Sun Jan 28 18:10:00 2024
+      - Added support for Map::Tube::Bielefeld, thanks Michal Josef Špaček..
+
 0.67  Thu May 19 18:55:00 2022
       - Upgraded dependency on Map::Tube v3.67.
       - Added support for Map::Tube::Hongkong.

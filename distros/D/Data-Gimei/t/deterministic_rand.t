@@ -1,7 +1,8 @@
 # Deterministic random test
 
+use 5.010;
+use strict;
 use warnings;
-use v5.22;
 
 use Data::Gimei;
 use Test::More;

@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetChartLegendRequest.name : The workbook name.  ,
+# PostWorksheetChartLegendRequest.name : The file name.  ,
 # PostWorksheetChartLegendRequest.sheetName : The worksheet name.  ,
 # PostWorksheetChartLegendRequest.chartIndex : The chart index.  ,
 # PostWorksheetChartLegendRequest.legend :   ,
-# PostWorksheetChartLegendRequest.folder : Original workbook folder.  ,
-# PostWorksheetChartLegendRequest.storageName : Storage name.   
+# PostWorksheetChartLegendRequest.folder : The folder where the file is situated.  ,
+# PostWorksheetChartLegendRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_chart_legend' } = { 
-    	summary => 'Updates chart legend in worksheet.',
+    	summary => 'Update chart legend in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -144,7 +144,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -172,14 +172,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

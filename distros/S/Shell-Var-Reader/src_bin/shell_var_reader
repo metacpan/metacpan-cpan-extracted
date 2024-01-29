@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Shell::Var::Reader;
-use TOML         qw(to_toml from_toml);
+use TOML::Tiny   qw(to_toml from_toml);
 use JSON         qw(to_json decode_json);
 use YAML::XS     qw(Load Dump);
 use Getopt::Long qw(:config pass_through);
@@ -20,7 +20,7 @@ use Pod::Usage;
 # prevents Rex from printing out rex is exiting after the script ends
 $::QUIET = 2;
 
-my $version = '0.6.0';
+my $version = $Shell::Var::Reader::VERSION;
 
 my $to_read;
 my $format = 'json';
@@ -63,8 +63,6 @@ if ($version_flag) {
 }
 
 if ($help) {
-	print 'shell_var_reader v. ' . $version . "\n\n";
-
 	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT );
 }
 
@@ -186,6 +184,15 @@ if ( defined($tcmdb) ) {
 		}
 	} ## end if ( !defined($cmdb_host) )
 
+	my $cmdb_type = 'TOML';
+	if ( -f $tcmdb . '/.cmdb_type' ) {
+		my @cmdb_type_split = grep( !/^[\t\ ]*$/, grep( !/^#/, split( /\n/, read_file( $tcmdb . '/.cmdb_type' ) ) ) );
+		if ( !defined( $cmdb_type_split[0] ) ) {
+			die( $tcmdb . '/.cmdb_type exists but is empty' );
+		}
+		$cmdb_type = $cmdb_type_split[0];
+	}
+
 	# try to get the cmdb env if possible
 	if ( !defined($cmdb_env) ) {
 		# some basic cleanup of the env_vars vars string
@@ -212,7 +219,7 @@ if ( defined($tcmdb) ) {
 	}
 
 	set cmdb => {
-		type           => 'TOML',
+		type           => $cmdb_type,
 		path           => $tcmdb,
 		merge_behavior => 'LEFT_PRECEDENT',
 		use_roles      => $use_roles,
@@ -311,6 +318,7 @@ if ( $format eq 'toml' ) {
 	foreach my $key (@keys) {
 		my $munged_key = $key;
 		$munged_key =~ s/$escape//g;
+		$munged_key =~ s/\-/\_\_/g;
 		print $munged_key . '=' . shell_quote( $found_vars->{$key} ) . "\n";
 	}
 } elsif ( $format eq 'multi' ) {
@@ -318,7 +326,6 @@ if ( $format eq 'toml' ) {
 	eval {
 		write_file(
 			$output_file, JSON->new->canonical(1)->pretty(1)->encode($found_vars)
-
 		);
 
 		$output_file = $output_dir . '/toml_confs/' . $cmdb_host . '.toml';
@@ -347,8 +354,10 @@ if ( $format eq 'toml' ) {
 		foreach my $key (@keys) {
 			my $munged_key = $key;
 			$munged_key =~ s/$escape//g;
+			$munged_key =~ s/\-/\_\_/g;
 			$to_write = $to_write . $munged_key . '=' . shell_quote( $found_vars->{$key} ) . "\n";
 		}
+		write_file( $output_file, $to_write );
 	};
 	if ($@) {
 		die( 'Failed to write out "' . $output_file . '"... ' . $@ );
@@ -363,7 +372,9 @@ shell_var_reader - Read/run a shell script and return set variable in it.
 
 =head1 SYNOPSIS
 
-shell_var_reader B<-r> <file> [B<-o> <format>] [B<-p>] [B<-s>] [B<--tcmdb> <dir>] [B<--cmdb_host> <host>] [B<--host_vars> <vars>] [B<--use_roles> [01]] [B<-m> <munger>] [B<-m> <multi output base dir>]
+shell_var_reader B<-r> <file> [B<-o> <format>] [B<-p>] [B<-s>] [B<--tcmdb> <dir>]
+[B<--cmdb_host> <host>] [B<--host_vars> <vars>] [B<--use_roles> [01]]
+[B<-m> <munger>] [B<-m> <multi output base dir>]
 
 =head1 FLAGS
 
@@ -464,8 +475,13 @@ Includes data from a CMDB and merge it in. Will overwrite everything previous.
 
 =head2 --tcmdb <dir>
 
-Optionally include data from a Rex TOML CMDB. See L<Rex::CMDB::YAML> for more information
-on that.
+Optionally include data from a Rex CMDB.
+
+$tcmdb.'/.cmdb_type' contians the CMDB type to use. Lines matching /^#/ or
+/^[\ \t]$/ are ignored. The first line not matching those is used as the value to
+use for Rex CMDB.
+
+If that file does not exist, TOML, is used. For more info see L<Rex::CMDB::TOML>.
 
 =head2 --cmdb_env <env>
 

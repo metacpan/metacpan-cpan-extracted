@@ -4,12 +4,12 @@ use strict;
 #use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-17'; # DATE
+our $DATE = '2024-01-15'; # DATE
 our $DIST = 'Acme-CPANModules-PortedFrom-Ruby'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 our $LIST = {
-    summary => "Modules/applications that are ported from (or inspired by) ".
+    summary => "List of modules/applications that are ported from (or inspired by) ".
         "Ruby libraries",
     description => <<'_',
 
@@ -65,11 +65,18 @@ _
             ruby_package => 'rails',
             ruby_website_url => 'https://rubyonrails.org/',
         },
+        {
+            module => 'Dotenv',
+            summary => 'Although the 12-factor methodology is not tied to a single language, the original implementation is in Ruby',
+            #tags => ['framework'],
+            ruby_package => 'dotenv',
+            ruby_website_url => 'https://github.com/heroku/12factor',
+        },
     ],
 };
 
 1;
-# ABSTRACT: Modules/applications that are ported from (or inspired by) Ruby libraries
+# ABSTRACT: List of modules/applications that are ported from (or inspired by) Ruby libraries
 
 __END__
 
@@ -79,11 +86,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::PortedFrom::Ruby - Modules/applications that are ported from (or inspired by) Ruby libraries
+Acme::CPANModules::PortedFrom::Ruby - List of modules/applications that are ported from (or inspired by) Ruby libraries
 
 =head1 VERSION
 
-This document describes version 0.009 of Acme::CPANModules::PortedFrom::Ruby (from Perl distribution Acme-CPANModules-PortedFrom-Ruby), released on 2022-10-17.
+This document describes version 0.011 of Acme::CPANModules::PortedFrom::Ruby (from Perl distribution Acme-CPANModules-PortedFrom-Ruby), released on 2024-01-15.
 
 =head1 DESCRIPTION
 
@@ -144,6 +151,16 @@ Author: L<JJNAPIORK|https://metacpan.org/author/JJNAPIORK>
 Ruby project's gem: L<https://rubygems.org/gems/rails>
 
 Ruby project's website: L<https://rubyonrails.org/>
+
+=item L<Dotenv>
+
+Although the 12-factor methodology is not tied to a single language, the original implementation is in Ruby.
+
+Author: L<BOOK|https://metacpan.org/author/BOOK>
+
+Ruby project's gem: L<https://rubygems.org/gems/dotenv>
+
+Ruby project's website: L<https://github.com/heroku/12factor>
 
 =back
 
@@ -225,7 +242,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

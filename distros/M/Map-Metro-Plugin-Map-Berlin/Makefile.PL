@@ -45,6 +45,16 @@ sub MY::postamble {
     my $self = shift;
     my @ret = <<'EOF';
 
+# NOTE: for rebuilding the map it's necessary to checkout the bbbike
+# source code:
+#
+#    git clone https://github.com/eserte/bbbike.git ~/src/bbbike
+#
+# You can do the checkout also to another local directory, but in this
+# case it's necessary to set the make variable BBBIKE_DIR, e.g.
+#
+#    make build-map BBBIKE_DIR=/path/to/bbbike
+
 BBBIKE_DIR=	$(HOME)/src/bbbike
 BBBIKE_DATADIR= $(BBBIKE_DIR)/data
 
@@ -53,7 +63,7 @@ build-map: share/map-berlin.metro
 share/map-berlin.metro: $(BBBIKE_DATADIR)/ubahn $(BBBIKE_DATADIR)/sbahn $(BBBIKE_DATADIR)/ubahnhof $(BBBIKE_DATADIR)/sbahnhof \
 			$(BBBIKE_DIR)/miscsrc/create_map_tube_xml.pl Makefile
 	mkdir -p share
-	$(BBBIKE_DIR)/miscsrc/create_map_tube_xml.pl --ubahn --sbahn --output-format=Map::Metro > share/map-berlin.metro~
+	$(BBBIKE_DIR)/miscsrc/create_map_tube_xml.pl --ubahn --sbahn --output-format=Map::Metro --additional-comment "DO NOT EDIT, please follow instructions in Makefile.PL and re-run 'make build-map'" > share/map-berlin.metro~
 	mv share/map-berlin.metro~ share/map-berlin.metro
 
 EOF

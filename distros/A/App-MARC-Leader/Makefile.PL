@@ -23,7 +23,7 @@ requires 'Class::Utils' => 0;
 requires 'Getopt::Std' => 0;
 requires 'MARC::File::XML' => '1.0.4';
 requires 'MARC::Leader' => 0;
-requires 'MARC::Leader::Print' => 0.02;
+requires 'MARC::Leader::Print' => 0.04;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/App-MARC-Leader/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/App-MARC-Leader';
 resources 'repository' => 'git://github.com/michal-josef-spacek/App-MARC-Leader';
@@ -34,7 +34,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 0;
 tests_recursive;
-version '0.02';
+version '0.04';
 
 # Run.
 WriteAll();

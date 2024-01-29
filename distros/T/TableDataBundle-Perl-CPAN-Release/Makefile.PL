@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "TableData::Munge::Concat" => 0,
     "TableData::Munge::GroupRows" => 0,
     "TableData::Perl::CPAN::Release::Static::2022" => 0,
-    "TableData::Perl::CPAN::Release::Static::2023" => 0,
+    "TableData::Perl::CPAN::Release::Static::2023" => "20231126.0",
     "TableDataBundle::Perl::CPAN::Release::Static::Older" => "20220218.2",
     "TableDataRole::Source::CSVInFiles" => 0,
     "parent" => 0,
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "20231120.3",
+  "VERSION" => "20231126.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,7 +57,7 @@ my %FallbackPrereqs = (
   "TableData::Munge::Concat" => 0,
   "TableData::Munge::GroupRows" => 0,
   "TableData::Perl::CPAN::Release::Static::2022" => 0,
-  "TableData::Perl::CPAN::Release::Static::2023" => 0,
+  "TableData::Perl::CPAN::Release::Static::2023" => "20231126.0",
   "TableDataBundle::Perl::CPAN::Release::Static::Older" => "20220218.2",
   "TableDataRole::Source::CSVInFiles" => 0,
   "Test::More" => 0,

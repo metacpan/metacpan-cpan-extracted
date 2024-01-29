@@ -1,9 +1,12 @@
 ---
-# Set the number of cohort-patient comparison print to STDOUT
+# Set the limit for the number of comparisons between patient-cohort to be printed to STDOUT
 max_out: 50
 
-# Set the key for sorting
+# Set the key for sorting results in patient mode
 sort_by: hamming
+
+# Set the similarity metric for cohort mode
+similarity_metric_cohort: hamming
 
 # Set the primary key for the objects
 primary_key: id
@@ -11,7 +14,7 @@ primary_key: id
 # Set the allowed terms / properties
 allowed_terms: [biosamples,diseases,ethnicity,exposures,files,geographicOrigin,id,info,interpretations,interventionsOrProcedures,karyotypicSex,measurements,measures,medicalActions,metaData,pedigrees,phenotypicFeatures,sex,subject,treatments]
 
-# Set the maximum numbers to variables to be used (if more they will be randomized)
+# Set the limit for the maximum number of variables to be utilized; if the actual number exceeds this limit, variables will be selected randomly
 max_number_var: 10000
 
 # Set the seed number to initialize a pseudorandom number generator for max_number_var:

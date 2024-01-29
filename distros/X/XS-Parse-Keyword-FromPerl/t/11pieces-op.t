@@ -11,19 +11,11 @@ use XS::Parse::Keyword::FromPerl qw(
    register_xs_parse_keyword
 );
 use Optree::Generate qw(
-   opcode
    op_contextualize G_VOID
    newOP newLISTOP newFOROP newSVOP newLOGOP
-);
 
-use constant {
-   # Pull out some OP_* constants
-   OP_LIST  => opcode("list"),
-   OP_UNDEF => opcode("undef"),
-   OP_OR    => opcode("or"),
-   OP_DIE   => opcode("die"),
-   OP_CONST => opcode("const"),
-};
+   OP_LIST OP_UNDEF OP_OR OP_DIE OP_CONST
+);
 
 # twice
 BEGIN {

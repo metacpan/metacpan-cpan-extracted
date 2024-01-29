@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.554';
+our $VERSION = '0.555';
 use Exporter 'import';
 our @EXPORT_OK = qw( read_line );
 
@@ -307,6 +307,8 @@ sub __init_readline {
         $self->{i}{info_row_count} = 0;
     }
     $self->{i}{seps}[0] = $self->{i}{sep} = ''; # in __readline
+    $self->{i}{char_trimmed} = '~ ';
+    $self->{i}{char_trimmed_w} = length $self->{i}{char_trimmed};
     $self->{i}{curr_row} = 0; # in __readlline and __string_and_pos
     $self->{i}{pre_text_row_count} = 0;
     $self->{i}{post_text_row_count} = 0;
@@ -419,7 +421,7 @@ sub readline {
         $self->__before_readline( $m, $term_w );
         $up_before = $self->{i}{pre_text_row_count};
         if ( $self->{hide_cursor} ) {
-            print hide_cursor();
+            print hide_cursor(); # '__print_readline' activates cursor
         }
         if ( length $self->{i}{pre_text} ) {
             print $self->{i}{pre_text}, "\n";
@@ -499,7 +501,7 @@ Term::Form::ReadLine - Read a line from STDIN.
 
 =head1 VERSION
 
-Version 0.554
+Version 0.555
 
 =cut
 
@@ -517,7 +519,7 @@ Version 0.554
 
     use Term::Form::ReadLine qw( read_line );
 
-    my $line = read_line( 'Prompt: ', { default => 'abc' } );
+    $line = read_line( 'Prompt: ', { default => 'abc' } );
 
 =head1 DESCRIPTION
 
@@ -570,7 +572,8 @@ C<readline> reads a line from STDIN.
 
     $line = $new->readline( $prompt, \%options );
 
-The fist argument is the prompt string.
+The fist argument is the prompt string. A prompt is truncated if the length of the prompt exceeds one third of the
+terminal width. A truncated prompt is marked with a trailing C<~>.
 
 The optional second argument is the default string (see option I<default>) if it is not a reference. If the second
 argument is a hash-reference, the hash is used to set the different options. The hash-keys/options are:
@@ -690,7 +693,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022-2023 Matthäus Kiem.
+Copyright 2022-2024 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

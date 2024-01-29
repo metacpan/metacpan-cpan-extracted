@@ -10,11 +10,12 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **file** | **string** | The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers). |
 **format** | **string** | The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers). |
-**password** | **string** | The workbook password. |
-**out_path** | **string** | Path to save result |
-**storage_name** | **string** | Storage name. |
-**check_excel_restriction** | **boolean** |  |
-**stream_format** | **string** |  |  
+**password** | **string** | The password needed to open an Excel file. |
+**out_path** | **string** | Path to save the result. If it's a single file, the `outPath` should encompass both the filename and extension. In the case of multiple files, the `outPath` should only include the folder. |
+**storage_name** | **string** | The storage name where the file is situated. |
+**check_excel_restriction** | **boolean** | Whether check restriction of excel file when user modify cells related objects. |
+**stream_format** | **string** | The format of the input file stream.  |
+**region** | **string** | The regional settings for workbook. |  
 
 [[Back to Model list]](../README.md#documentation-for-requests) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Nds::Any::Nl - Package for language Low German
 
 package Locale::CLDR::Locales::Nds::Any::Nl;
 # This file auto generated from Data\common\main\nds_NL.xml
-#	on Tue  5 Dec  1:24:29 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -36,7 +36,7 @@ has 'characters' => (
 			auxiliary => qr{[á à â ä é è ê ë í ì î ï ó ò ô ö ú ù û ü]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
 			main => qr{[a b c d e f g h i j k l m n o p q r s t u v w x y z]},
-			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
+			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT

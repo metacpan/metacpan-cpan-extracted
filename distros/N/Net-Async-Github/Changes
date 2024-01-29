@@ -1,5 +1,9 @@
 Revision history for Net-Async-Github
 
+0.013     2023-12-30 08:50:11+08:00 Asia/Singapore
+    [Bugs fixed]
+    - Fix missing JSON::MaybeUTF8 dependency declaration (https://github.com/team-at-cpan/Net-Async-Github/issues/7)
+
 0.012     2023-10-27 12:58:59+08:00 Asia/Singapore
     [New features]
     - `->issue_comments` method for retrieving comments attached to issues
@@ -15,7 +19,7 @@ Revision history for Net-Async-Github
     - support for organisation repositories, as opposed to user repos
 
     [Bugs fixed]
-    -Fix missing Adapter::Async and Variable::Disposition dependencies
+    - Fix missing Adapter::Async and Variable::Disposition dependencies
 
 0.010     2021-03-24 10:32:12+08:00 Asia/Kuala_Lumpur
     No new features.

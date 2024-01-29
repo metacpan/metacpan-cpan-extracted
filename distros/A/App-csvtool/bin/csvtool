@@ -1,0 +1,173 @@
+#!/usr/bin/perl
+
+use v5.26;
+use warnings;
+use Carp;
+
+use App::csvtool;
+
+use Commandable::Invocation;
+use Commandable::Finder::Packages 0.10;
+
+use Getopt::Long qw( GetOptionsFromArray );
+use Text::CSV;
+
+Getopt::Long::Configure( "bundling" );
+
+my $DELIM = ",";
+
+sub new_csv
+{
+   return Text::CSV->new({
+      binary => 1,
+      #sep_char => $DELIM,
+      @_,
+   });
+}
+
+my $cinv = Commandable::Invocation->new_from_tokens( @ARGV );
+
+my @common_opts;
+push @common_opts, $cinv->pull_token while ( $cinv->peek_token // "" ) =~ m/^-/;
+
+my $tool = $cinv->pull_token // die "Need TOOL name\n";
+
+my $finder = Commandable::Finder::Packages->new(
+   base             => "App::csvtool",
+   named_by_package => 1,
+);
+$finder->configure( bundling => 1 );
+
+my $cmd = $finder->find_command( $tool ) or die "Unrecognised tool $tool\n";
+
+my $toolpkg = $cmd->package;
+
+GetOptionsFromArray( \@common_opts,
+   'd=s' => \$DELIM,
+   'tab' => sub { $DELIM = "\t" },
+) or exit(1);
+
+my @args = $cmd->parse_invocation( $cinv );
+
+$toolpkg or
+   exit $cmd->code->( @args );
+
+@ARGV = ();
+push @ARGV, $cinv->pull_token while defined $cinv->peek_token;
+
+if( $toolpkg->can( "WANT_READER" ) and $toolpkg->WANT_READER ) {
+   my $csv = new_csv();
+   push @args, sub { $csv->getline( \*ARGV ) };
+}
+
+if( $toolpkg->can( "WANT_OUTPUT" ) and $toolpkg->WANT_OUTPUT ) {
+   my $csv = new_csv( eol => $/ );
+   push @args, sub { $csv->print( \*STDOUT, $_[0] ) or die "Cannot print - $!" };
+}
+
+push @args, @ARGV;
+
+$toolpkg->run( @args );
+
+__END__
+
+=head1 NAME
+
+F<csvtool> - command-line tools for operating on CSV-formatted data
+
+=head1 SYNOPSIS
+
+   $ csvtool COMMAND OPTS... INPUT...
+
+=head1 DESCRIPTION
+
+This tool provides several named sub-commands that act similarly to UNIX
+commands of the same names, but operate on CSV-formatted data rather than
+simple lines of text.
+
+Input is taken from one or more files named on the commandline, and output is
+printed to standard output using CSV formatting.
+
+Columns in the data are named from 1 onwards. Thus, C<-f1> refers to the first
+column of data, C<-f2> the second, and so on.
+
+=head1 COMMANDS
+
+=head2 cut
+
+   $ csvtool cut -fFIELDS INPUT...
+
+Extracts the given field column(s).
+
+=head3 --fields, -f
+
+A comma-separated list of field indexes (defaults to 1).
+
+=head2 grep
+
+   $ csvtool grep PATTERN INPUT...
+
+Filter rows by the given pattern. The pattern is always interpreted as a Perl
+regular expression.
+
+=head3 --ignore-case, -i
+
+Ignore case when matching.
+
+=head3 --invert-match, -v
+
+Output only the lines that do not match the filter pattern.
+
+=head2 head
+
+   $ csvtool head -nLINES INPUT...
+
+Output only the first few rows.
+
+=head3 --lines, -n
+
+Number of lines to output. If negative, will output all but the final few rows
+of the given number.
+
+=head2 sort
+
+   $ csvtool sort INPUT...
+
+Sorts the rows according to the given field.
+
+=head3 --field, -f
+
+The field index to sort by (defaults to 1).
+
+=head3 --numerical, -n
+
+Sorts numerically. If absent, sorting happens alphabetically.
+
+=head3 --reverse, -r
+
+Reverses the order of sorting.
+
+=head2 tail
+
+   $ csvtool tail -nLINES INPUT...
+
+Output only the final few rows.
+
+=head3 --lines, -n
+
+Number of lines to output. If negative, will output all but the first few rows
+of the given number.
+
+=head2 uniq
+
+   $ csvtool uniq -fFIELD INPUT...
+
+Filters rows for unique values of the given field.
+
+=head3 --field, -f
+
+The field index to select rows on (defaults to 1).
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>

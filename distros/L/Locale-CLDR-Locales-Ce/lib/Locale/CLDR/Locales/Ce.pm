@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ce - Package for language Chechen
 
 package Locale::CLDR::Locales::Ce;
 # This file auto generated from Data\common\main\ce.xml
-#	on Tue  5 Dec  1:04:32 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -44,7 +44,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'aa' => 'афарийн',
@@ -72,7 +72,6 @@ has 'display_name_language' => (
  				'awa' => 'авадхи',
  				'ay' => 'аймара',
  				'az' => 'азербайджанийн',
- 				'az@alt=short' => 'азербайджанийн',
  				'ba' => 'башкирийн',
  				'ban' => 'балийн',
  				'bas' => 'баса',
@@ -136,7 +135,6 @@ has 'display_name_language' => (
  				'en_GB' => 'британин ингалсан',
  				'en_GB@alt=short' => 'ингалсан (Британи)',
  				'en_US' => 'американ ингалсан',
- 				'en_US@alt=short' => 'ингалсан (АЦШ)',
  				'eo' => 'эсперанто',
  				'es' => 'испанхойн',
  				'es_419' => 'латинан американ испанхойн',
@@ -341,7 +339,6 @@ has 'display_name_language' => (
  				'ro' => 'румынийн',
  				'ro_MD' => 'молдавийн',
  				'rof' => 'ромбо',
- 				'root' => 'ораман мотт',
  				'ru' => 'оьрсийн',
  				'rup' => 'аруминийн',
  				'rw' => 'киньяруанда',
@@ -478,9 +475,7 @@ has 'display_name_script' => (
  			'Hang' => 'хангыль',
  			'Hani' => 'китайн',
  			'Hans' => 'атта китайн',
- 			'Hans@alt=stand-alone' => 'атта китайн',
  			'Hant' => 'ламастан китайн',
- 			'Hant@alt=stand-alone' => 'ламастан китайн',
  			'Hebr' => 'жугтийн',
  			'Hira' => 'хирагана',
  			'Hrkt' => 'катакана я хирагана',
@@ -522,7 +517,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'Дерригдуьненан',
  			'002' => 'Африка',
@@ -641,7 +636,6 @@ has 'display_name_region' => (
  			'FR' => 'Франци',
  			'GA' => 'Габон',
  			'GB' => 'Йоккха Британи',
- 			'GB@alt=short' => 'Йоккха Британи',
  			'GD' => 'Гренада',
  			'GE' => 'Гуьржийчоь',
  			'GF' => 'Французийн Гвиана',
@@ -710,7 +704,6 @@ has 'display_name_region' => (
  			'MF' => 'Сен-Мартен',
  			'MG' => 'Мадагаскар',
  			'MH' => 'Маршаллан гӀайренаш',
- 			'MK' => 'Македони',
  			'ML' => 'Мали',
  			'MM' => 'Мьянма (Бирма)',
  			'MN' => 'Монголи',
@@ -834,7 +827,7 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'calendar' => 'Календарь',
  			'currency' => 'ахча',
@@ -864,7 +857,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{Метрикин},
  			'UK' => q{Ингалсан},
@@ -878,7 +871,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'Мотт: {0}',
  			'script' => 'Скрипт: {0}',
@@ -909,8 +902,8 @@ has 'characters' => (
 		return {
 			index => ['А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'],
 			main => qr{[а {аь} б в г {гӏ} д е ё ж з и {ий} й к {кк} {ккх} {кх} {кь} {кӏ} л м н о {ов} {оь} п {пп} {пӏ} р {рхӏ} с {сс} т {тт} {тӏ} у {ув} {уь} {уьй} ф х {хь} {хӏ} ц {цӏ} ч {чӏ} ш щ ъ ы ь э ю {юь} я {яь}]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ‚ " “ „ « » ( ) \[ \] \{ \} § @ * / \& #]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ‚ " “ „ « » ( ) \[ \] \{ \} § @ * / \& #]},
 		};
 	},
 EOT
@@ -937,239 +930,557 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
-					'astronomical-unit' => {
-						'name' => q(астрономин дакъош),
-						'one' => q({0} астрономин дакъа),
-						'other' => q({0} астрономин дакъа),
+					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(c),
+						'one' => q({0} c),
+						'other' => q({0} c),
 					},
-					'centimeter' => {
-						'name' => q(сантиметраш),
-						'one' => q({0} сантиметр),
-						'other' => q({0} сантиметр),
-						'per' => q({0} сантиметрехь),
-					},
+					# Core Unit Identifier
 					'century' => {
 						'name' => q(c),
 						'one' => q({0} c),
 						'other' => q({0} c),
 					},
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(денош),
+						'one' => q({0} де),
+						'other' => q({0} де),
+						'per' => q({0} дийнахь),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(денош),
 						'one' => q({0} де),
 						'other' => q({0} де),
 						'per' => q({0} дийнахь),
 					},
-					'decimeter' => {
-						'name' => q(дециметраш),
-						'one' => q({0} дециметр),
-						'other' => q({0} дециметр),
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(сахьташ),
+						'one' => q({0} сахьт),
+						'other' => q({0} сахьт),
+						'per' => q({0} сахьтехь),
 					},
-					'foot' => {
-						'name' => q(футаш),
-						'one' => q({0} фут),
-						'other' => q({0} фут),
-					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(сахьташ),
 						'one' => q({0} сахьт),
 						'other' => q({0} сахьт),
 						'per' => q({0} сахьтехь),
 					},
-					'inch' => {
-						'name' => q(дюймаш),
-						'one' => q({0} дюйм),
-						'other' => q({0} дюйм),
+					# Long Unit Identifier
+					'duration-microsecond' => {
+						'name' => q(микросекундаш),
+						'one' => q({0} микросекунд),
+						'other' => q({0} микросекунд),
 					},
-					'kilometer' => {
-						'name' => q(километраш),
-						'one' => q({0} километр),
-						'other' => q({0} километр),
-					},
+					# Core Unit Identifier
 					'microsecond' => {
 						'name' => q(микросекундаш),
 						'one' => q({0} микросекунд),
 						'other' => q({0} микросекунд),
 					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(миллисекундаш),
+						'one' => q({0} миллисекунд),
+						'other' => q({0} миллисекунд),
+					},
+					# Core Unit Identifier
 					'millisecond' => {
 						'name' => q(миллисекундаш),
 						'one' => q({0} миллисекунд),
 						'other' => q({0} миллисекунд),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(миноташ),
+						'one' => q({0} минот),
+						'other' => q({0} минот),
+						'per' => q({0} минотехь),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(миноташ),
 						'one' => q({0} минот),
 						'other' => q({0} минот),
 						'per' => q({0} минотехь),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(беттанаш),
+						'one' => q({0} бутт),
+						'other' => q({0} бутт),
+						'per' => q({0} баттахь),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(беттанаш),
 						'one' => q({0} бутт),
 						'other' => q({0} бутт),
 						'per' => q({0} баттахь),
 					},
+					# Long Unit Identifier
+					'duration-nanosecond' => {
+						'name' => q(наносекундаш),
+						'one' => q({0} наносекунд),
+						'other' => q({0} наносекунд),
+					},
+					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(наносекундаш),
 						'one' => q({0} наносекунд),
 						'other' => q({0} наносекунд),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(секундаш),
+						'one' => q({0} секунд),
+						'other' => q({0} секунд),
+						'per' => q({0} секундехь),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(секундаш),
 						'one' => q({0} секунд),
 						'other' => q({0} секунд),
 						'per' => q({0} секундехь),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(кӀиранаш),
+						'one' => q({0} кӀира),
+						'other' => q({0} кӀира),
+						'per' => q({0} кӀиранахь),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(кӀиранаш),
 						'one' => q({0} кӀира),
 						'other' => q({0} кӀира),
 						'per' => q({0} кӀиранахь),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(шераш),
+						'one' => q({0} шо),
+						'other' => q({0} шо),
+						'per' => q({0} шарахь),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(шераш),
 						'one' => q({0} шо),
 						'other' => q({0} шо),
 						'per' => q({0} шарахь),
 					},
-				},
-				'narrow' => {
-					'centimeter' => {
-						'name' => q(см),
-						'one' => q({0} см),
-						'other' => q({0} cm),
+					# Long Unit Identifier
+					'length-astronomical-unit' => {
+						'name' => q(астрономин дакъош),
+						'one' => q({0} астрономин дакъа),
+						'other' => q({0} астрономин дакъа),
 					},
-					'day' => {
-						'name' => q(д.),
-						'one' => q({0} д.),
-						'other' => q({0} д.),
-					},
-					'hour' => {
-						'name' => q(сахь),
-						'one' => q({0} сахь.),
-						'other' => q({0} сахь.),
-					},
-					'kilometer' => {
-						'name' => q(км),
-						'one' => q({0} км),
-						'other' => q({0} км),
-					},
-					'millisecond' => {
-						'name' => q(мс),
-						'one' => q({0} мс),
-						'other' => q({0} мс),
-					},
-					'minute' => {
-						'name' => q(мин),
-						'one' => q({0} мин),
-						'other' => q({0} мин),
-					},
-					'month' => {
-						'name' => q(бут),
-						'one' => q({0} б.),
-						'other' => q({0} б.),
-					},
-					'second' => {
-						'name' => q(с),
-						'one' => q({0} с),
-						'other' => q({0} с),
-					},
-					'week' => {
-						'name' => q(кӀир),
-						'one' => q({0} кӀ.),
-						'other' => q({0} кӀ.),
-					},
-					'year' => {
-						'name' => q(ш.),
-						'one' => q({0} ш.),
-						'other' => q({0} ш.),
-					},
-				},
-				'short' => {
+					# Core Unit Identifier
 					'astronomical-unit' => {
-						'name' => q(а. д.),
-						'one' => q({0} а. д.),
-						'other' => q({0} а. д.),
+						'name' => q(астрономин дакъош),
+						'one' => q({0} астрономин дакъа),
+						'other' => q({0} астрономин дакъа),
 					},
+					# Long Unit Identifier
+					'length-centimeter' => {
+						'name' => q(сантиметраш),
+						'one' => q({0} сантиметр),
+						'other' => q({0} сантиметр),
+						'per' => q({0} сантиметрехь),
+					},
+					# Core Unit Identifier
 					'centimeter' => {
-						'name' => q(см),
-						'one' => q({0} см),
-						'other' => q({0} см),
+						'name' => q(сантиметраш),
+						'one' => q({0} сантиметр),
+						'other' => q({0} сантиметр),
+						'per' => q({0} сантиметрехь),
 					},
-					'century' => {
-						'name' => q(c),
-						'one' => q({0} c),
-						'other' => q({0} c),
+					# Long Unit Identifier
+					'length-decimeter' => {
+						'name' => q(дециметраш),
+						'one' => q({0} дециметр),
+						'other' => q({0} дециметр),
 					},
-					'day' => {
-						'name' => q(денош),
-						'one' => q(д.),
-						'other' => q({0} д.),
-					},
+					# Core Unit Identifier
 					'decimeter' => {
-						'name' => q(дм),
-						'one' => q({0} дм),
-						'other' => q({0} дм),
+						'name' => q(дециметраш),
+						'one' => q({0} дециметр),
+						'other' => q({0} дециметр),
 					},
+					# Long Unit Identifier
+					'length-foot' => {
+						'name' => q(футаш),
+						'one' => q({0} фут),
+						'other' => q({0} фут),
+					},
+					# Core Unit Identifier
 					'foot' => {
 						'name' => q(футаш),
 						'one' => q({0} фут),
 						'other' => q({0} фут),
 					},
+					# Long Unit Identifier
+					'length-inch' => {
+						'name' => q(дюймаш),
+						'one' => q({0} дюйм),
+						'other' => q({0} дюйм),
+					},
+					# Core Unit Identifier
+					'inch' => {
+						'name' => q(дюймаш),
+						'one' => q({0} дюйм),
+						'other' => q({0} дюйм),
+					},
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'name' => q(километраш),
+						'one' => q({0} километр),
+						'other' => q({0} километр),
+					},
+					# Core Unit Identifier
+					'kilometer' => {
+						'name' => q(километраш),
+						'one' => q({0} километр),
+						'other' => q({0} километр),
+					},
+				},
+				'narrow' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(д.),
+						'one' => q({0} д.),
+						'other' => q({0} д.),
+					},
+					# Core Unit Identifier
+					'day' => {
+						'name' => q(д.),
+						'one' => q({0} д.),
+						'other' => q({0} д.),
+					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(сахь),
+						'one' => q({0} сахь.),
+						'other' => q({0} сахь.),
+					},
+					# Core Unit Identifier
+					'hour' => {
+						'name' => q(сахь),
+						'one' => q({0} сахь.),
+						'other' => q({0} сахь.),
+					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(мс),
+						'one' => q({0} мс),
+						'other' => q({0} мс),
+					},
+					# Core Unit Identifier
+					'millisecond' => {
+						'name' => q(мс),
+						'one' => q({0} мс),
+						'other' => q({0} мс),
+					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(мин),
+						'one' => q({0} мин),
+						'other' => q({0} мин),
+					},
+					# Core Unit Identifier
+					'minute' => {
+						'name' => q(мин),
+						'one' => q({0} мин),
+						'other' => q({0} мин),
+					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(бут),
+						'one' => q({0} б.),
+						'other' => q({0} б.),
+					},
+					# Core Unit Identifier
+					'month' => {
+						'name' => q(бут),
+						'one' => q({0} б.),
+						'other' => q({0} б.),
+					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(с),
+						'one' => q({0} с),
+						'other' => q({0} с),
+					},
+					# Core Unit Identifier
+					'second' => {
+						'name' => q(с),
+						'one' => q({0} с),
+						'other' => q({0} с),
+					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(кӀир),
+						'one' => q({0} кӀ.),
+						'other' => q({0} кӀ.),
+					},
+					# Core Unit Identifier
+					'week' => {
+						'name' => q(кӀир),
+						'one' => q({0} кӀ.),
+						'other' => q({0} кӀ.),
+					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(ш.),
+						'one' => q({0} ш.),
+						'other' => q({0} ш.),
+					},
+					# Core Unit Identifier
+					'year' => {
+						'name' => q(ш.),
+						'one' => q({0} ш.),
+						'other' => q({0} ш.),
+					},
+					# Long Unit Identifier
+					'length-centimeter' => {
+						'name' => q(см),
+						'one' => q({0} см),
+						'other' => q({0} cm),
+					},
+					# Core Unit Identifier
+					'centimeter' => {
+						'name' => q(см),
+						'one' => q({0} см),
+						'other' => q({0} cm),
+					},
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'name' => q(км),
+						'one' => q({0} км),
+						'other' => q({0} км),
+					},
+					# Core Unit Identifier
+					'kilometer' => {
+						'name' => q(км),
+						'one' => q({0} км),
+						'other' => q({0} км),
+					},
+				},
+				'short' => {
+					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(c),
+						'one' => q({0} c),
+						'other' => q({0} c),
+					},
+					# Core Unit Identifier
+					'century' => {
+						'name' => q(c),
+						'one' => q({0} c),
+						'other' => q({0} c),
+					},
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(денош),
+						'one' => q(д.),
+						'other' => q({0} д.),
+					},
+					# Core Unit Identifier
+					'day' => {
+						'name' => q(денош),
+						'one' => q(д.),
+						'other' => q({0} д.),
+					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(сахь),
+						'one' => q({0} сахь.),
+						'other' => q({0} сахь.),
+						'per' => q({0} сахь.),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(сахь),
 						'one' => q({0} сахь.),
 						'other' => q({0} сахь.),
 						'per' => q({0} сахь.),
 					},
-					'inch' => {
-						'name' => q(дюйм),
-						'one' => q({0} дюйм.),
-						'other' => q({0} дюйм.),
+					# Long Unit Identifier
+					'duration-microsecond' => {
+						'name' => q(мкс),
+						'one' => q({0} мкс),
+						'other' => q({0} мкс),
 					},
-					'kilometer' => {
-						'name' => q(км),
-						'one' => q({0} км),
-						'other' => q({0} км),
-					},
+					# Core Unit Identifier
 					'microsecond' => {
 						'name' => q(мкс),
 						'one' => q({0} мкс),
 						'other' => q({0} мкс),
 					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(мс),
+						'one' => q({0} мс),
+						'other' => q({0} мс),
+					},
+					# Core Unit Identifier
 					'millisecond' => {
 						'name' => q(мс),
 						'one' => q({0} мс),
 						'other' => q({0} мс),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(мин),
+						'one' => q({0} мин),
+						'other' => q({0} мин),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(мин),
 						'one' => q({0} мин),
 						'other' => q({0} мин),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(бут),
+						'one' => q({0} бут.),
+						'other' => q({0} бут.),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(бут),
 						'one' => q({0} бут.),
 						'other' => q({0} бут.),
 					},
+					# Long Unit Identifier
+					'duration-nanosecond' => {
+						'name' => q(нс),
+						'one' => q({0} нс),
+						'other' => q({0} нс),
+					},
+					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(нс),
 						'one' => q({0} нс),
 						'other' => q({0} нс),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(сек),
+						'one' => q({0} сек),
+						'other' => q({0} сек),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(сек),
 						'one' => q({0} сек),
 						'other' => q({0} сек),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(кӀир),
+						'one' => q({0} кӀир.),
+						'other' => q({0} кӀир.),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(кӀир),
 						'one' => q({0} кӀир.),
 						'other' => q({0} кӀир.),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(ш.),
+						'one' => q({0} ш.),
+						'other' => q({0} ш.),
+						'per' => q({0} ш.),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(ш.),
 						'one' => q({0} ш.),
 						'other' => q({0} ш.),
 						'per' => q({0} ш.),
+					},
+					# Long Unit Identifier
+					'length-astronomical-unit' => {
+						'name' => q(а. д.),
+						'one' => q({0} а. д.),
+						'other' => q({0} а. д.),
+					},
+					# Core Unit Identifier
+					'astronomical-unit' => {
+						'name' => q(а. д.),
+						'one' => q({0} а. д.),
+						'other' => q({0} а. д.),
+					},
+					# Long Unit Identifier
+					'length-centimeter' => {
+						'name' => q(см),
+						'one' => q({0} см),
+						'other' => q({0} см),
+					},
+					# Core Unit Identifier
+					'centimeter' => {
+						'name' => q(см),
+						'one' => q({0} см),
+						'other' => q({0} см),
+					},
+					# Long Unit Identifier
+					'length-decimeter' => {
+						'name' => q(дм),
+						'one' => q({0} дм),
+						'other' => q({0} дм),
+					},
+					# Core Unit Identifier
+					'decimeter' => {
+						'name' => q(дм),
+						'one' => q({0} дм),
+						'other' => q({0} дм),
+					},
+					# Long Unit Identifier
+					'length-foot' => {
+						'name' => q(футаш),
+						'one' => q({0} фут),
+						'other' => q({0} фут),
+					},
+					# Core Unit Identifier
+					'foot' => {
+						'name' => q(футаш),
+						'one' => q({0} фут),
+						'other' => q({0} фут),
+					},
+					# Long Unit Identifier
+					'length-inch' => {
+						'name' => q(дюйм),
+						'one' => q({0} дюйм.),
+						'other' => q({0} дюйм.),
+					},
+					# Core Unit Identifier
+					'inch' => {
+						'name' => q(дюйм),
+						'one' => q({0} дюйм.),
+						'other' => q({0} дюйм.),
+					},
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'name' => q(км),
+						'one' => q({0} км),
+						'other' => q({0} км),
+					},
+					# Core Unit Identifier
+					'kilometer' => {
+						'name' => q(км),
+						'one' => q({0} км),
+						'other' => q({0} км),
 					},
 				},
 			} }
@@ -2627,7 +2938,7 @@ has 'currencies' => (
 			},
 		},
 		'XOF' => {
-			symbol => 'CFA',
+			symbol => 'F CFA',
 			display_name => {
 				'currency' => q(Малхбузен Африкан КФА франк),
 				'one' => q(Малхбузен Африкан КФА франк),
@@ -4806,7 +5117,9 @@ has 'time_zone_names' => (
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q#Норфолк#,
+				'daylight' => q#Норфолк, аьхкенан хан#,
+				'generic' => q#Норфолк#,
+				'standard' => q#Норфолк, стандартан хан#,
 			},
 		},
 		'Noronha' => {

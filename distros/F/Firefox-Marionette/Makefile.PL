@@ -66,9 +66,14 @@ elsif ( $EFFECTIVE_USER_ID == 0 ) {    # see RT#131304
         warn
 "Running as root.  Resetting HOME environment variable from $current to $ENV{HOME}\n";
     }
-    if ( exists $ENV{XAUTHORITY} ) {    # see GH#1
-        delete $ENV{XAUTHORITY};
-        warn "Running as root.  Deleting the XAUTHORITY environment variable\n";
+    foreach my $env_name (
+				'XAUTHORITY',           # see GH#1
+				'XDG_RUNTIME_DIR',      # see GH#33
+                         ) {
+        if ( exists $ENV{$env_name} ) {
+            delete $ENV{$env_name};
+            warn "Running as root.  Deleting the $env_name environment variable\n";
+        }
     }
 }
 
@@ -78,14 +83,26 @@ my $dev_null  = File::Spec->devnull();
 sub last_desperate_search {
     if ( ( $OSNAME eq 'MSWin32' ) ) {
         foreach my $possible (@possibles) {
-            warn "Checking for $possible in Path:"
-              . `"$possible.exe" -version 2>$dev_null` . "\n";
+            my $output = `"$possible.exe" -version`;
+            if ($output) {
+                warn
+                  "Version of $possible in Path environment variable:$output";
+            }
+            else {
+                warn "No $possible in Path environment variable";
+            }
         }
     }
     elsif ( ( $OSNAME eq 'darwin' ) or ( $OSNAME eq 'cygwin' ) ) {
         foreach my $possible (@possibles) {
-            warn "Checking for $possible in PATH:"
-              . `$possible -version $dev_null` . "\n";
+            my $output = `$possible -version`;
+            if ($output) {
+                warn
+                  "Version of $possible in PATH environment variable:$output";
+            }
+            else {
+                warn "No $possible in PATH environment variable";
+            }
         }
     }
     my $glob_path = '/usr/share/applications/firefox*.desktop';

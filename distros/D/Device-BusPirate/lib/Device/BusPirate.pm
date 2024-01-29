@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.45;
+use warnings;
+use Object::Pad 0.800;
 
-package Device::BusPirate 0.23;
+package Device::BusPirate 0.24;
 class Device::BusPirate;
 
 use Carp;
@@ -16,7 +17,6 @@ use Future::AsyncAwait;
 use Future::Mutex;
 use Future::IO 0.04; # ->syswrite_exactly
 use IO::Termios 0.07; # cfmakeraw
-use Time::HiRes qw( time );
 
 use Module::Pluggable
    search_path => "Device::BusPirate::Mode",
@@ -81,7 +81,7 @@ appropriately.
 
 =head2 new
 
-   $pirate = Device::BusPirate->new( %args )
+   $pirate = Device::BusPirate->new( %args );
 
 Returns a new C<Device::BusPirate> instance to communicate with the given
 device. Takes the following named arguments:
@@ -103,7 +103,7 @@ change this from its default of C<115200>.
 
 =cut
 
-has $_fh;
+field $_fh;
 
 BUILD ( %args )
 {
@@ -130,8 +130,7 @@ BUILD ( %args )
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented with C<await> expressions L<Future> instances.
 
 =cut
 
@@ -185,7 +184,7 @@ method read ( $n, $name = undef, $timeout = undef )
 
 =head2 sleep
 
-   $pirate->sleep( $timeout )->get
+   await $pirate->sleep( $timeout );
 
 Returns a C<Future> that will become ready after the given timeout (in
 seconds), unless it is cancelled first.
@@ -199,7 +198,7 @@ method sleep ( $timeout )
 
 =head2 enter_mutex
 
-   @result = $pirate->enter_mutex( $code )->get
+   @result = await $pirate->enter_mutex( $code );
 
 Acts as a mutex lock, to ensure only one block of code runs at once. Calls to
 C<enter_mutex> will be queued up; each C<$code> block will only be invoked
@@ -211,7 +210,7 @@ each other.
 
 =cut
 
-has $_mutex;
+field $_mutex;
 
 method enter_mutex ( $code )
 {
@@ -220,7 +219,7 @@ method enter_mutex ( $code )
 
 =head2 enter_mode
 
-   $mode = $pirate->enter_mode( $modename )->get
+   $mode = await $pirate->enter_mode( $modename );
 
 Switches the attached device into the given mode, and returns an object to
 represent that hardware mode to interact with. This will be an instance of a
@@ -253,7 +252,7 @@ information.
 
 =cut
 
-has $_mode;
+field $_mode;
 
 async method enter_mode ( $modename )
 {
@@ -268,7 +267,7 @@ async method enter_mode ( $modename )
 
 =head2 start
 
-   $pirate->start->get
+   await $pirate->start;
 
 Starts binary IO mode on the F<Bus Pirate> device, enabling the module to
 actually communicate with it. Normally it is not necessary to call this method
@@ -276,7 +275,7 @@ explicitly as it will be done by the setup code of the mode object.
 
 =cut
 
-has $_version;
+field $_version;
 
 method start ()
 {
@@ -298,7 +297,7 @@ method start ()
 
 =head2 stop
 
-   $pirate->stop
+   $pirate->stop;
 
 Stops binary IO mode on the F<Bus Pirate> device and returns it to user
 terminal mode. It may be polite to perform this at the end of a program to

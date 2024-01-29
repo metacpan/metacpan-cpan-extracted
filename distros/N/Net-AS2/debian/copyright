@@ -1,14 +1,15 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Source: https://metacpan.org/release/Net-AS2
-Upstream-Contact: Sam Wong <sam@hellosam.net>
+Upstream-Contact: Andrew Maguire <ajm@cpan.org>
 Upstream-Name: Net-AS2
 
 Files: *
-Copyright: Sam Wong <sam@hellosam.net>
+Copyright: 2012, Sam Wong <sam@hellosam.net>
+Copyright: 2019, 2023, Andrew Maguire <ajm@cpan.org>
 License: Artistic or GPL-1+
 
 Files: debian/*
-Copyright: 2019, Andrew Maguire <ajm@cpan.org>
+Copyright: 2019, 2023, Andrew Maguire <ajm@cpan.org>
 License: Artistic or GPL-1+
 
 License: Artistic

@@ -1,20 +1,24 @@
 package GDPR::IAB::TCFv2::Constants::SpecialFeature;
 use strict;
 use warnings;
-use Scalar::Util qw<dualvar>;
 
 require Exporter;
 use base qw<Exporter>;
 
 use constant {
-    Geolocation => dualvar( 1, "Use precise geolocation data" ),
-    DeviceScan  =>
-      dualvar( 2, "Actively scan device characteristics for identification" )
+    Geolocation => 1,
+    DeviceScan  => 2
+};
+
+use constant SpecialFeatureDescription => {
+    Geolocation => "Use precise geolocation data",
+    DeviceScan  => "Actively scan device characteristics for identification"
 };
 
 our @EXPORT_OK = qw<
   Geolocation
   DeviceScan
+  SpecialFeatureDescription
 >;
 
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
@@ -36,15 +40,15 @@ GDPR::IAB::TCFv2::Constants::SpecialFeature - TCF v2.2 special features
 
     use feature 'say';
     
-    say "Special feature id is ". (0+Geolocation), ", and it means " . Geolocation;
+    say "Special feature id is ", Geolocation, ", and it means " , SpecialFeatureDescription->{Geolocation};
     # Output:
     # Special feature id is 1, and it means Use precise geolocation data
 
 =head1 CONSTANTS
 
-All constants are C<dualvar> (see L<Scalar::Util>).
+All constants are integers.
 
-Returns a scalar that has the C<id> in a numeric context and the C<description> in a string context.
+To find the description of a given id you can use the hashref L</SpecialFeatureDescription>.
 
 =head2  Geolocation
 
@@ -58,3 +62,7 @@ Special feature id 2: Actively scan device characteristics for identification
 
 With your acceptance, certain characteristics specific to your device might be requested and used to distinguish it from other devices (such as the installed fonts or plugins, the resolution of your screen) in support of the purposes explained in this notice.
       "description": 
+
+=head2 SpecialFeatureDescription
+
+Returns a hashref with a mapping between all restriction types and their description.

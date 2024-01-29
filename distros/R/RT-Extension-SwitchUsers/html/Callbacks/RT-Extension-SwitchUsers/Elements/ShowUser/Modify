@@ -1,0 +1,13 @@
+<%INIT>
+return unless $m->callers(2)->path eq '/Elements/ShowTransaction';
+
+my $txn = $m->caller_args(2)->{Transaction};
+return unless $txn && $txn->Creator != $User->Id;
+
+$$display .= ' ' . loc('(Acting as [_1])', $txn->CreatorObj->Name);
+</%INIT>
+
+<%ARGS>
+$display
+$User
+</%ARGS>

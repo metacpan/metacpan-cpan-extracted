@@ -15,8 +15,8 @@ package Spreadsheet::Edit;
 # Allow "use <thismodule> <someversion>;" in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
 
-our $VERSION = '1000.011'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-10-28'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.013'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-01-23'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # FIXME: cmd_nesting does nothing except prefix >s to log messages.
 #        Shouldn't it skip that many "public" call frames???
@@ -72,13 +72,13 @@ use Symbol qw/gensym/;
 our @EXPORT = qw(
   alias apply apply_all apply_exceptrx apply_torx attributes
   spectocx data_source delete_col delete_cols delete_row delete_rows
-  transpose join_cols join_cols_sep move_col
+  first_data_rx transpose join_cols join_cols_sep last_data_rx move_col
   move_cols insert_col insert_cols insert_row insert_rows new_sheet only_cols
   options read_spreadsheet rename_cols reverse_cols
   sheet sheetname sort_rows split_col tie_column_vars title2ident title_row
   title_rx unalias write_csv write_spreadsheet );
 
-my @stdvars = qw( $title_rx $num_cols
+my @stdvars = qw( $title_rx $first_data_rx $last_data_rx $num_cols
                   @rows @linenums @meta_info %colx %colx_desc $title_row
                   $rx $linenum @crow %crow );
 
@@ -129,6 +129,8 @@ sub __gen_scalar {
           $canon_ident, $onlyinapply);
 }
 sub _generateScalar_num_cols      { __gen_scalar(@_, "num_cols") }
+sub _generateScalar_first_data_rx { __gen_scalar(@_, "first_data_rx") }
+sub _generateScalar_last_data_rx  { __gen_scalar(@_, "last_data_rx") }
 sub _generateScalar_rx            { __gen_scalar(@_, "current_rx", 1) }
 
 #sub _generateScalar_title_rx      { __gen_scalar(@_, "title_rx") }
@@ -206,10 +208,11 @@ use Spreadsheet::Edit::Log qw/log_call fmt_call log_methcall fmt_methcall oops/,
                            ':btw=SE${lno}:' ;
 
 use Data::Dumper ();
-use Data::Dumper::Interp 6.007 qw/:all/;
+use Data::Dumper::Interp 7.003 qw/:all/;
 
 use Carp;
 our @CARP_NOT = qw(Spreadsheet::Edit
+                   Spreadsheet::Edit::RowsTie
                    Spreadsheet::Edit::IO
                    Tie::Indirect::Array Tie::Indirect::Hash
                    Tie::Indirect::Scalar
@@ -217,7 +220,8 @@ our @CARP_NOT = qw(Spreadsheet::Edit
 
 use Scalar::Util qw(looks_like_number openhandle reftype refaddr blessed);
 use List::Util qw(min max sum0 first any all pairs pairgrep);
-use File::Temp qw(tempfile tempdir);
+use Path::Tiny qw/path/;
+#use File::Temp qw(tempfile tempdir);
 use File::Basename qw(basename dirname fileparse);
 use File::Find ();
 use Symbol qw(gensym);
@@ -284,9 +288,14 @@ sub let2cx(_) {
 }
 
 # Produce the "automatic alias" identifier for an arbitrary title
+#
 sub title2ident($) {
   local $_ = shift;
-  s/^\s+//;  s/\s+$//;  s/\W/_/g;  s/^(?=\d)/_/;
+  s/^\s+//;  s/\s+$//;
+  s/\W/_/g;
+  s/^(?=\d)/_/;
+  # Also avoid the legal identifiers "_" and "ARGV"
+  $_ = "_".$_ if $_ eq "ARGV" || $_ eq "_";
   $_
 }
 
@@ -462,15 +471,24 @@ sub _fmt_colx(;$$) {
          ], $indent, $foldwidth;
 }
 
-# Is a title a special symbol or looks like a cx number?
+# Is a title a special symbol, looks like a cx number, or is a Perl
+# built-in variable?
 sub __unindexed_title($$) {
   my ($title, $num_cols) = @_;
-oops unless defined $title;
+  oops unless defined $title;
+my $r =
   $title eq ""
-  || $title eq '^'
-  || $title eq '$'
-  || ( ($title =~ /^[1-9]\d*$/ || $title eq "0") # not with leading zeros
-       && $title <= $num_cols )
+  || $title =~ /^\W$/    # ^ or $ or any single punctuation or control-char
+  || $title =~ /\^\w+$/  # ^Var to not confuse w Perl "control-character" names
+  || $title =~ /^(?:ARGV|ARGVOUT|_)$/
+  || $title =~ /::/                    # package::qualified::name
+  || $title =~ /^[0-9]$/               # $0 and regex $1 $2 .. $9
+                                       # (regardless of max cx)
+  || ($title =~ /^[1-9]\d+$/a
+       && $title <= $num_cols) # cx values > 9
+;
+#btw ivis 'unindexed: $title' if $r;
+$r
 }
 sub _unindexed_title { #method for use by tests
   my $self = shift;
@@ -965,6 +983,8 @@ sub new { # Strictly OO, this does not affect caller's "current sheet".
       useraliases      => {},     # key exists for user-defined alias names
 
       title_rx         => undef,
+      first_data_rx    => undef,
+      last_data_rx     => undef,
       current_rx       => undef,  # valid during apply()
 
       pkg2tiedvarnames => {},
@@ -1069,6 +1089,8 @@ sub _rows_replaced {  # completely new or replaced rows, linenums, etc.
     unless @$linenums == @$rows;
 
   $hash->{title_rx} = undef;
+  $hash->{first_data_rx} = undef;
+  $hash->{last_data_rx} = undef;
   $hash->{useraliases} = {};
   $self->_rebuild_colx; # Set up colx colx_desc
   $self
@@ -1140,7 +1162,7 @@ sub _tie_col_vars {
       next
     }
 
-btw dvis '##ZZ $ident $safe ${^GLOBAL_PHASE} @safecheck_pkgs\n' if $debug;
+#btw dvis '##ZZ $ident $safe ${^GLOBAL_PHASE} @safecheck_pkgs\n' if $debug;
 
     no strict 'refs';
     if ($safe) {
@@ -1157,17 +1179,16 @@ btw ivis ' Checking pkg $p ident $ident ...\n' if $debug;
         if (exists ${$p.'::'}{$ident}) {
           my $msg = <<EOF ;
 COLSPEC '$ident' clashes with an existing object in package '$p' .
-    This is dis-allowed when tie_column_vars was called with option :safe,
-    in this case at ${file}:${lno} .  In this situation you can not
-    explicitly declare the tied variables, and they must be tied and
-    imported before the compiler sees them.
+    This is dis-allowed when tie_column_vars was called with option :safe.
+    In this situation you can not explicitly declare the tied variables
+    (depends on the Perl version), and in any case they must be tied and
+    imported before the compiler sees any references to them.
 
     Note: The clash might not be with a scalar \$$ident, but something else
     named '${ident}' in the same package (array, hash, sub, filehandle,
     etc.) Unfortunately it is not possible to distinguish a non-existent
     scalar from a declared scalar containing an undef value
-    (see *foo{SCALAR} in 'man perlref').  Therefore, to be safe,
-    nothing is allowed to pre-exist with the name '${ident}'.
+    (see *foo{SCALAR} in 'man perlref').
 EOF
           # We can detect anything other than an undef scalar
           local $Data::Dumper::Maxdepth = 2;
@@ -1263,14 +1284,22 @@ sub tie_column_vars(;@) {
 
   # With ':all' tie all possible variables, now and in the future.
   #
-  # CURRENTLY UNDOCUMENTED: With the ":safe" token, a check is made
-  # that variables do not already exist immediately before tying them;
-  # otherwise an exception is thrown.
+  # TODO: Remove :safe as not useful...
   #
-  # When ':safe' is combined with ':all', variables will not be checked & tied
-  # except during compile time, i.e. within BEGIN{...}.  Therefore a
-  # malicious spreadsheet can not cause an exception after the compilation
-  # phase.
+  # With the ":safe" token, an exception is thrown if any pre-existing
+  # variable (actually any symbol with the same identifier) exists.
+  #
+  # ":safe" is usable only during the compile phase, i.e. within BEGIN{...}
+  # because in other circumstances the user must declare the tied variables
+  # and those declarations will have already been compiled; therefore they
+  # will be detected as "pre-existing".
+  #
+  # However ":safe" doesn't provide any protection from clobbering package
+  # variables declared afterwards (e.g. with "our"), and as of v1000.011
+  # Perl's built-in variables (punctuation vars, etc.) are always protected.
+  # SO THIS FEATURE IS LIKELY TO BE REMOVED.
+  #
+  # Stick to lexical variables to be safe.
   my $safe = delete $tokens{':safe'};
   my ($file, $lno) = __fn_ln_methname();
   my $parms = [$safe, $file, $lno];
@@ -1975,6 +2004,38 @@ sub _autodetect_title_rx {
   }
 }
 
+sub first_data_rx(;$) {
+  my $self = &__self;
+  my $first_data_rx = $$self->{first_data_rx};
+  if (@_ == 0) { # 'get' request
+    $self->_logmethretifv([], [$first_data_rx]);
+    return $first_data_rx;
+  }
+  my $rx = __validate_nonnegi_or_undef( shift() );
+  $self->_logmethretifv([$rx]);
+  # Okay if this points to one past the end
+  $self->_check_rx($rx, 1) if defined $rx;  # one_past_end_ok=1
+  $$self->{first_data_rx} = $rx;
+  $self
+}
+sub last_data_rx(;$) {
+  my $self = &__self;
+  my $last_data_rx = $$self->{last_data_rx};
+  if (@_ == 0) { # 'get' request
+    $self->_logmethretifv([], [$last_data_rx]);
+    return $last_data_rx;
+  }
+  my $rx = __validate_nonnegi_or_undef( shift() );
+  $self->_logmethretifv([$rx]);
+  if (defined $rx) {
+    $self->_check_rx($rx, 1); # one_past_end_ok=1
+    confess "last_data_rx must be >= first_data_rx"
+      unless $rx >= ($$self->{first_data_rx}//0);
+  }
+  $$self->{last_data_rx} = $rx;
+  $self
+}
+
 # move_cols ">COLSPEC",source cols...
 # move_cols "absolute-position",source cols...
 sub move_cols($@) {
@@ -2065,10 +2126,12 @@ sub sort_rows(&) {
   croak "bad args" unless @_ == 1;
   my ($cmpfunc, $first_rx, $last_rx) = @_;
 
-  my ($rows, $linenums, $title_rx) = @$$self{qw/rows linenums title_rx/};
+  my ($rows, $linenums, $title_rx, $first_data_rx, $last_data_rx)
+       = @$$self{qw/rows linenums title_rx first_data_rx last_data_rx/};
 
-  $first_rx //= (defined($title_rx) ? $title_rx+1 : 0);
-  $last_rx  //= $#$rows;
+  $first_rx //= $first_data_rx
+                 // (defined($title_rx) ? $title_rx+1 : 0);
+  $last_rx  //= $last_data_rx // $#$rows;
 
   $self->_logmethifv(\"(sorting rx ${first_rx}..${last_rx})");
 
@@ -2221,6 +2284,7 @@ sub join_cols(&@) {
                ? $separator
                : sub{ $_ = join $separator, @_ } ;
 
+  # Note first/last_data_rx are ignored
   { my $first_rx = ($hash->{title_rx} // -1)+1;
     _apply_to_rows($self, $code, \@source_cxs, undef, $first_rx, undef);
   }
@@ -2263,16 +2327,17 @@ sub rename_cols(@) {
 # apply {code}, colspec*
 #   @_ are bound to the columns in the order specified (if any)
 #   $_ is bound to the first such column
-#   Only visit rows following the title row (if defined).
+#   Only visit rows bounded by first_data_rx and/or last_data_rx,
+#   starting with title_rx+1 if a title row is defined.
 sub apply(&;@) {
   my $self = &__selfmust;
   my ($code, @cols) = @_;
   my $hash = $$self;
   my @cxs = map { scalar $self->_spec2cx($_) } @cols;
 
-  my $first_rx = ($hash->{title_rx} // -1) + 1;
+  my $first_rx = max(($hash->{title_rx} // -1)+1, $hash->{first_data_rx}//0);
 
-  @_ = ($self, $code, \@cxs, undef, $first_rx, $#{$hash->{rows}});
+  @_ = ($self, $code, \@cxs, undef, $first_rx, $hash->{last_data_rx});
   goto &_apply_to_rows
 }
 
@@ -2301,6 +2366,7 @@ sub __arrify_checknotempty($) {
 # apply_torx {code} rx,        colspec*
 # apply_torx {code} [rx list], colspec*
 # Only the specified row(s) are visited
+# first/last_data_rx are ignored.
 sub apply_torx(&$;@) {
   my $self = &__selfmust;
   my ($code, $rxlist_arg, @cols) = @_;
@@ -2383,6 +2449,8 @@ sub transpose() {
 
   $$self->{useraliases} = {};
   $$self->{title_rx} = undef;
+  $$self->{first_data_rx} = undef;
+  $$self->{last_data_rx} = undef;
 
   # Save a copy of the data
   my @old_rows = ( map{ [ @$_ ] } @$rows );
@@ -2419,8 +2487,8 @@ sub delete_rows(@) {
   my $self = &__selfmust;
   my (@rowspecs) = @_;
 
-  my ($rows, $linenums, $title_rx, $current_rx, $verbose)
-    = @$$self{qw/rows linenums title_rx current_rx verbose/};
+  my ($rows, $linenums, $title_rx, $first_data_rx, $last_data_rx, $current_rx, $verbose)
+    = @$$self{qw/rows linenums title_rx first_data_rx last_data_rx current_rx verbose/};
 
   foreach (@rowspecs) {
     $_ = $#$rows if /^(?:LAST|\$)$/;
@@ -2442,6 +2510,18 @@ sub delete_rows(@) {
       }
     }
     $$self->{title_rx} = $title_rx;
+  }
+  if (defined $first_data_rx) {
+    foreach (@rev_sorted_rxs) {
+      if ($_ <= $first_data_rx) { --$first_data_rx }
+    }
+    $$self->{first_data_rx} = $first_data_rx;
+  }
+  if (defined $last_data_rx) {
+    foreach (@rev_sorted_rxs) {
+      if ($_ <= $last_data_rx) { --$last_data_rx }
+    }
+    $$self->{last_data_rx} = $last_data_rx;
   }
 
   # Back up $current_rx to account for deleted rows.
@@ -2478,8 +2558,8 @@ sub insert_rows(;$$) {
   $rx //= 'END';
   $count //= 1;
 
-  my ($rows, $linenums, $num_cols, $title_rx)
-    = @$$self{qw/rows linenums num_cols title_rx/};
+  my ($rows, $linenums, $num_cols, $title_rx, $first_data_rx, $last_data_rx)
+    = @$$self{qw/rows linenums num_cols title_rx first_data_rx last_data_rx/};
 
   $rx = @$rows if $rx =~ /^(?:END|\$)$/;
 
@@ -2490,6 +2570,12 @@ sub insert_rows(;$$) {
 
   if (defined($title_rx) && $rx <= $title_rx) {
     $$self->{title_rx} = ($title_rx += $count);
+  }
+  if (defined($first_data_rx) && $rx <= $first_data_rx) {
+    $$self->{first_data_rx} = ($first_data_rx += $count);
+  }
+  if (defined($last_data_rx) && $rx <= $last_data_rx) {
+    $$self->{last_data_rx} = ($last_data_rx += $count);
   }
 
   for (1..$count) {
@@ -2783,31 +2869,34 @@ sub write_spreadsheet(*;@) {
 
   # {col_formats} may be [list of formats in column order]
   #   or { COLSPEC => fmt, ..., __DEFAULT__ => fmt }
-  # Transform the latter to the former...
-  my $cf = $opts->{col_formats} // croak "{col_formats} is required";
-  if (ref($cf) eq "HASH") {
-    my ($default, @ary);
-    while (my ($key, $fmt) = each %$cf) {
-      ($default = $fmt),next if $key eq "__DEFAULT__";
-      my $cx = $colx->{$key} // croak("Invalid COLSPEC '$key' in col_formats");
-      $ary[$cx] = $fmt;
+  # (we Transform the latter to the former...)
+  my $cf = $opts->{col_formats};
+  if ($cf) {
+    if (ref($cf) eq "HASH") {
+      my ($default, @ary);
+      while (my ($key, $fmt) = each %$cf) {
+        ($default = $fmt),next if $key eq "__DEFAULT__";
+        my $cx = $colx->{$key} // croak("Invalid COLSPEC '$key' in col_formats");
+        $ary[$cx] = $fmt;
+      }
+      foreach (@ary) { $_ = $default if ! defined; }
+      $cf = \@ary;
     }
-    foreach (@ary) { $_ = $default if ! defined; }
-    $cf = \@ary;
   }
-  local $opts->{col_formats} = $cf;
+  local $opts->{col_formats} = $cf; # transformed form, or undef if not given
 
-  my ($csvfh, $csvpath) = tempfile(SUFFIX => ".csv");
+  # First convert to a temporary .csv named "<outputbasename>.csv"
+  # so that the 'sheet name' in the spreadsheet will be <outputbasename>.
+  #
+  my $tdir = Path::Tiny->tempdir(); # auto-delted when destroyed
+  my $csvpath = $tdir->child( path($outpath)->basename(qr/\.\w+$/).".csv" );
   { local $$self->{verbose} = 0;
-    $self->write_csv($csvfh, silent => 1, iolayers => ':encoding(UTF-8)',
-                             @sane_CSV_write_options);
+    $self->write_csv($csvpath->canonpath,
+                     silent => 1, iolayers => ':encoding(UTF-8)',
+                     @sane_CSV_write_options);
   }
-  close $csvfh or die "Error writing $csvpath : $!";
 
-  # Default sheet name to output file basename sans suffix
-  $opts->{sheetname} //= fileparse($outpath, qr/\.\w+/);
-
-  convert_spreadsheet($csvpath,
+  convert_spreadsheet($csvpath->canonpath,
                       %$opts,
                       iolayers => ':encoding(UTF-8)',
                       cvt_from => "csv",
@@ -2914,8 +3003,10 @@ package
 use parent 'Tie::Array';
 
 use Carp;
-#our @CARP_NOT = qw(Tie::Indirect Tie::Indirect::Array
-#                   Tie::Indirect::Hash Tie::Indirect::Scalar);
+our @CARP_NOT = qw(Tie::Indirect Tie::Indirect::Array
+                   Tie::Indirect::Hash Tie::Indirect::Scalar
+                   Tie::Array Tie::Hash
+                   Spreadsheet::Edit);
 use Data::Dumper::Interp 6.009 qw/visnew
                     vis  viso  avis  alvis  ivis  dvis  hvis  hlvis
                     visq visoq avisq alvisq ivisq dvisq hvisq hlvisq
@@ -2944,13 +3035,22 @@ sub STORE {
     unless $index >= 0 && $index <= $#$aref+1;
   croak "Value must be a ref to array of cell values (not $val)"
     if ! Spreadsheet::Edit::__looks_like_aref($val);
-  croak "Cell values may not be undef"
-    if grep{! defined} @$val;
-  croak "Cell values must be strings or numbers"
-    if grep{ ref($_) && !looks_like_number($_) } @$val;
+  # I can't make CARP_NOT skip past Spreadsheet::Edit so doing confess
   if (my $num_cols = $$sheet->{num_cols}) {
-    croak "New row must contain $num_cols cells (not ", $#$val+1, ")"
+    confess "New row must contain $num_cols cells (not ", $#$val+1, ")"
       if @$val != $num_cols;
+  }
+  for my $cx (0..$#$val) {
+    local $_ = $val->[$cx];
+    my $bad;
+    if    (! defined $_) { $bad = "undef" }
+    elsif (ref($_) && !looks_like_number($_)) { $bad = "strange object: $_" }
+    if ($bad) {
+      confess "Attempt to STORE a row at rx $index with $bad at cx $cx (",
+              Spreadsheet::Edit::cx2let($cx).")\n  ",
+              join("\n  ",map{ sprintf("[%d] %s: %s",$_,Spreadsheet::Edit::cx2let($_),u($val->[$_])) } 0..$#$val);
+            #"(".join(",",map{u} @$val).")\n";
+    }
   }
   # else (0 or undef) someone promises to set it later
 
@@ -3317,6 +3417,7 @@ The file may be a .csv or any format supported by Libre Office or gnumeric.
 
 By default column titles are auto-detected and
 an exception is thrown if a plausible title row can not be found.
+
 {OPTIONS} may include:
 
 Auto-detection options:
@@ -3481,8 +3582,13 @@ In addition, variables will be tied in the future I<whenever new identifiers
 become valid> (for example when a new C<alias> is created, column added,
 or another file is read into the same sheet).
 
-Although convenient this is B<insecure> because malicious
-titles could clobber unintended globals.
+Although convenient this is B<insecure> if package (e.g "our") variables are
+used for any other purpose
+because they could be clobbered by malicious spreadsheet titles
+(lexical "my" variables are always safe).
+Perl's built-in punctuation variables and $ARGV can not be clobbered because
+those names are always excluded as column identifiers (see COLSEPCs).
+However names from C<use English;> are not similarly protected!
 
 If VARNAMES are also specified, those variables will be tied
 immediately even if not yet usable; an exception occurs if a tied variable
@@ -3491,13 +3597,13 @@ is referenced before the corresponding alias or title exists.
 
 =head2 Use in BEGIN{} or module import methods
 
-C<tie_column_vars> B<imports> the tied variables into your module,
-or the module specified with package => "pkgname" in {OPTIONS}.
+C<tie_column_vars> also B<imports> the tied variables into your package
+(or as specified with package => "pkgname").
 
-It is unnecessary to declare tied variables if the import
-occurs before code is compiled which references the variables.  This can
-be the case if C<tie_column_vars> is called in a BEGIN{} block or in the
-C<import> method of a module loaded with C<use>.
+It is unnecessary to declare variables if they are imported before any
+code which references them is compiled.
+This can be the case when C<tie_column_vars> is called in a BEGIN{} block
+or in the C<import> method of a module loaded via C<use>.
 
 L<Spreadsheet::Edit::Preload> makes use of this.
 
@@ -3549,6 +3655,8 @@ If a list of COLSPECs is specified, then
 
 C<apply> normally visits all rows which follow the title row, or all rows
 if there is no title row.
+C<first_data_rx> and C<last_data_rx>, if defined, further limit the
+range visited.
 
 C<apply_all> unconditionally visits every row, including any title row.
 
@@ -3563,7 +3671,7 @@ Nested and recursive C<apply>s are allowed.
 When an 'apply' changes the 'current sheet',
 tied variables then refer to the other sheet and
 any C<apply> active for that sheet.
-With nested 'apply's, take care to restore the original sheet
+If using nested I<apply>s, take care to restore the original sheet
 before returning (C<Guard::scope_guard> is useful).
 
 B<MAGIC VARIABLES USED DURING APPLY>
@@ -3661,7 +3769,8 @@ If there is no title row, specify C<undef> for each new title.
 =head2 sort_rows {rx cmp function} $first_rx, $last_rx
 
 If no range is specified, then the range is the
-same as for C<apply> (namely: All rows after the title row).
+same as for C<apply> (namely: All rows after the title row unless
+limited by B<first_data_rx> .. B<last_data_rx>).
 
 In the comparison function, globals $a and $b will contain row objects, which
 are dual-typed to act as either an array or hash ref to the cells
@@ -3705,6 +3814,9 @@ and @_ bound to all named columns in the order given.
 
 It is up to your code to combine the data by reading
 @_ and writing $_ (or, equivalently, by writing $_[0]).
+
+C<first_data_rx> and C<last_data_rx> are ignored, and the title
+is I<not> modified.
 
 =head2 reverse_cols
 
@@ -3870,6 +3982,8 @@ if necessary to this width.
 
 =back
 
+Note: See C<Spreasheet::Edit-E<gt>new> if using the OO API.
+
 =head2 $curr_sheet = sheet ;
 
 =head2 $prev_sheet = sheet $another_sheet ;
@@ -3885,8 +3999,6 @@ tied column variables and STANDARD SHEET VARIABLES (described later).
 
 {OPTIONS} may specify C<< package => 'pkgname' >> to operate on the specified
 package instead of the caller's package.
-
-Note: See C<Spreasheet::Edit-E<gt>new> if using the OO API.
 
 =head1 STANDARD SHEET VARIABLES
 
@@ -3927,6 +4039,12 @@ See C<read_spreadsheet> and C<title_rx> for how to control this.
 
 If a column title is modified, set C<$title_rx = undef;> to force re-detection.
 
+=item $first_data_rx and $last_data_rx
+
+Optional limits on the range of rows visited by C<apply()>
+or sorted by C<sort_rows()>.  By default $first_data_rx
+is the first row following the title row (or 0 if no title row).
+
 =item %colx (column key => column index)
 
 C<< %colx >> maps aliases, titles, etc. (all currently-valid COLSPECs)
@@ -3964,8 +4082,10 @@ Arguments which specify columns may be:
 item listed higher up.
 
 **Titles may be used directly if they can not be confused with
-a user-defined alias, the special names '^' or '$' or a numeric
-column index.  See "CONFLICT RESOLUTION".
+a user-defined alias, Perl's built-in punctuation variables or ARGV,
+the special names '^' or '$', or a numeric column index
+(to access columns with such titles, create an alias using a regex).
+See "CONFLICT RESOLUTION".
 
 B<AUTOMATIC ALIASES> are Perl I<identifiers> derived from column titles by
 first removing leading or trailing spaces, and then
@@ -4008,7 +4128,7 @@ B<Actual Titles> refer to to their columns, except if they:
 
 are the same as a user-defined alias
 
-are '^' or '$'
+are '^' or '$' or conflict with a Perl built-in variable
 
 consist only of digits (without leading 0s) corresponding
 to a valid column index.
@@ -4021,8 +4141,8 @@ unless they conflict with a user-defined alias or an actual title.
 
 =back
 
-Note: To unconditionally refer to numeric titles or titles which
-look like '^' or '$', use a Regexp B<qr/.../>.
+Note: To refer to titles which are excluded by these rules,
+use a Regexp B<qr/.../>.
 Automatic Aliases can also refer to such titles if there are no conflicts.
 
 Column positions always refer to the data before a command is
@@ -4056,6 +4176,10 @@ instead of (or in addition to) an {OPTIONS} hashref.
 =head2 $sheet->colx() ;             # Analogous to \%colx
 
 =head2 $sheet->colx_desc() ;        # Analogous to \%colx_desc
+
+=head2 $sheet->first_data_rx() ;    # Analogous to $first_data_rx
+
+=head2 $sheet->last_data_rx() ;     # Analogous to $last_data_rx
 
 =head2 $sheet->title_rx() ;         # Analogous to to $title_rx
 
@@ -4101,7 +4225,6 @@ the first message string.
 The details of formatting the sheet may be customized with a call-back
 given by a C<{logmsg_pfx_gen}> attribute.  See comments
 in the source for how this works.
-
 
 
 =head1 SEE ALSO

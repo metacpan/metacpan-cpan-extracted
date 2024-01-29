@@ -16,7 +16,7 @@ sdif - side-by-side diff viewer for ANSI terminal
 
 =head1 VERSION
 
-Version 4.29
+Version 4.30
 
 =head1 SYNOPSIS
 
@@ -56,6 +56,12 @@ Version 4.29
     --colormap, --cm	specify color map
     --colortable[=#]	show color table (optional #: 6, 12, 24)
     --[no]256		on/off ANSI 256 color mode (default on)
+    --[no]cc            color command line  (default true)
+    --[no]fc                  file name     (default true)
+    --[no]lc                  line number   (default true)
+    --[no]mc                  diff mark     (default true)
+    --[no]tc                  normal text   (default true)
+    --[no]uc                  unknown text  (default true)
 
     --man		display manual page
     --diff=s		set diff command
@@ -143,6 +149,12 @@ use Getopt::EX::Hashed; {
     has colormap       => 'cm=s@' , default => [] ;
     has colordump      => '     ' ;
     has 256            => '  !  ' , default => $default_256 ;
+    has commandcolor   => 'cc!  ' , default => 1 ;
+    has filecolor      => 'fc!  ' , default => 1 ;
+    has linecolor      => 'lc!  ' , default => 1 ;
+    has markcolor      => 'mc!  ' , default => 1 ;
+    has textcolor      => 'tc!  ' , default => 1 ;
+    has unknowncolor   => 'uc!  ' , default => 1 ;
     has cdif           => '  :s ' , default => '';
     has cdifopts       => '  =s ' ;
     has colortable     => '  :s ' , any => qr/^(|6|12|24)$/;
@@ -284,6 +296,21 @@ $colormap{OUMARK} ||= $colormap{UMARK} || $colormap{OMARK};
 $colormap{NUMARK} ||= $colormap{UMARK} || $colormap{NMARK};
 $colormap{OULINE} ||= $colormap{ULINE} || $colormap{OLINE};
 $colormap{NULINE} ||= $colormap{ULINE} || $colormap{NLINE};
+
+for (
+    [ $app->unknowncolor => q/UNKNOWN/ ],
+    [ $app->commandcolor => q/COMMAND/ ],
+    [ $app->filecolor    => q/FILE/ ],
+    [ $app->linecolor    => q/LINE/ ],
+    [ $app->markcolor    => q/MARK/ ],
+    [ $app->textcolor    => q/TEXT/ ],
+) {
+    my($color, $label) = @$_;
+    $color and next;
+    for (grep /$label/, keys %colormap) {
+	$colormap{$_} = '';
+    }
+}
 
 if ($app->colordump) {
     print $color_handler->colormap(
@@ -1383,6 +1410,20 @@ C<$_>, and the return value of the subroutine will be displayed.
 
 See L<Getopt::EX::Colormap/FUNCTION SPEC> for detail.
 
+=item B<-->[B<no->]B<cc>, B<-->[B<no->]B<commandcolor>
+
+=item B<-->[B<no->]B<fc>, B<-->[B<no->]B<filecolor>
+
+=item B<-->[B<no->]B<lc>, B<-->[B<no->]B<linecolor>
+
+=item B<-->[B<no->]B<mc>, B<-->[B<no->]B<markcolor>
+
+=item B<-->[B<no->]B<tc>, B<-->[B<no->]B<textcolor>
+
+=item B<-->[B<no->]B<uc>, B<-->[B<no->]B<unknowncolor>
+
+Enable/Disable using color for the corresponding field.
+
 =back
 
 
@@ -1427,7 +1468,7 @@ Environment variable B<SDIFOPTS> is used to set default options.
 
 =head1 LICENSE
 
-Copyright 1992-2023 Kazumasa Utashiro
+Copyright 1992-2024 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

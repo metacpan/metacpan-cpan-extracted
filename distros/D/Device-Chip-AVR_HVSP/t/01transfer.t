@@ -29,35 +29,35 @@ $adapter->check_and_clear( 'mount' );
    # bit 0
    $adapter->expect_write_gpios( { sci => 1 } );
    $adapter->expect_write_gpios( { sci => 0, sdi => 0, sii => 1 } );
-   $adapter->expect_read_gpios( [ 'sdo' ] )->returns( { sdo => 0 } );
+   $adapter->expect_read_gpios( [ 'sdo' ] )->will_done( { sdo => 0 } );
    # bit 1
    $adapter->expect_write_gpios( { sci => 1 } );
    $adapter->expect_write_gpios( { sci => 0, sdi => 1, sii => 0 } );
-   $adapter->expect_read_gpios( [ 'sdo' ] )->returns( { sdo => 0 } );
+   $adapter->expect_read_gpios( [ 'sdo' ] )->will_done( { sdo => 0 } );
    # bit 2
    $adapter->expect_write_gpios( { sci => 1 } );
    $adapter->expect_write_gpios( { sci => 0, sdi => 0, sii => 1 } );
-   $adapter->expect_read_gpios( [ 'sdo' ] )->returns( { sdo => 1 } );
+   $adapter->expect_read_gpios( [ 'sdo' ] )->will_done( { sdo => 1 } );
    # bit 3
    $adapter->expect_write_gpios( { sci => 1 } );
    $adapter->expect_write_gpios( { sci => 0, sdi => 1, sii => 0 } );
-   $adapter->expect_read_gpios( [ 'sdo' ] )->returns( { sdo => 1 } );
+   $adapter->expect_read_gpios( [ 'sdo' ] )->will_done( { sdo => 1 } );
    # bit 4
    $adapter->expect_write_gpios( { sci => 1 } );
    $adapter->expect_write_gpios( { sci => 0, sdi => 0, sii => 1 } );
-   $adapter->expect_read_gpios( [ 'sdo' ] )->returns( { sdo => 0 } );
+   $adapter->expect_read_gpios( [ 'sdo' ] )->will_done( { sdo => 0 } );
    # bit 5
    $adapter->expect_write_gpios( { sci => 1 } );
    $adapter->expect_write_gpios( { sci => 0, sdi => 1, sii => 0 } );
-   $adapter->expect_read_gpios( [ 'sdo' ] )->returns( { sdo => 0 } );
+   $adapter->expect_read_gpios( [ 'sdo' ] )->will_done( { sdo => 0 } );
    # bit 6
    $adapter->expect_write_gpios( { sci => 1 } );
    $adapter->expect_write_gpios( { sci => 0, sdi => 0, sii => 1 } );
-   $adapter->expect_read_gpios( [ 'sdo' ] )->returns( { sdo => 1 } );
+   $adapter->expect_read_gpios( [ 'sdo' ] )->will_done( { sdo => 1 } );
    # bit 7
    $adapter->expect_write_gpios( { sci => 1 } );
    $adapter->expect_write_gpios( { sci => 0, sdi => 1, sii => 0 } );
-   $adapter->expect_read_gpios( [ 'sdo' ] )->returns( { sdo => 1 } );
+   $adapter->expect_read_gpios( [ 'sdo' ] )->will_done( { sdo => 1 } );
 
    # 3 dummy bits nobody cares about
    $adapter->expect_write_gpios( { sci => 1 } );

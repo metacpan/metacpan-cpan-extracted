@@ -8,6 +8,6 @@ Locale::CLDR::Transformations - Dummy base class to keep CPAN happy
 
 use version;
 
-our VERSION = version->declare('v0.34.4');
+our VERSION = version->declare('v0.40.1');
 
 1;

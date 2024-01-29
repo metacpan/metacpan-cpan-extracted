@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 use UI::Various::core;
 use UI::Various::Optionmenu;
@@ -108,12 +108,14 @@ sub _prepare($$$)
 	    {   @selected = (-selected => $i);   last;   }
 	}
     }
+    my @attributes = $self->_common_attributes();
     $self->_cui($_->_cui
 		->add($self->_cid,
 		      'Popupmenu', -x => $column, -y => $row,
 		      -values => \@values,
 		      -labels => \%labels,
 		      @selected,
+		      @attributes,
 		      -onchange => sub {
 			  local $_ =$self->_cui->get;
 			  $self->{_selected} = $_;

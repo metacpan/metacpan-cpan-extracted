@@ -13,6 +13,6 @@ use ok 'Locale::CLDR';
 
 my $locale = Locale::CLDR->new('de_DE');
 
-is ($locale->measurement_system_name('uk'), 'Englisches', 'Measurement system UK');
-is ($locale->measurement_system_name('us'), 'Angloamerikanisches', 'Measurement system US');
+is ($locale->measurement_system_name('uk'), 'UK', 'Measurement system UK');
+is ($locale->measurement_system_name('us'), 'US', 'Measurement system US');
 is ($locale->measurement_system_name('metric'), 'Internationales (SI)', 'Measurement system Metric');

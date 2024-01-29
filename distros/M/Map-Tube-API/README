@@ -29,8 +29,8 @@ command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Map-Tube-API
+    BUGS / ISSUES
+        https://github.com/manwar/Map-Tube-API/issues
 
     AnnoCPAN, Annotated CPAN documentation
         http://annocpan.org/dist/Map-Tube-API
@@ -38,12 +38,12 @@ You can also look for information at:
     CPAN Ratings
         http://cpanratings.perl.org/d/Map-Tube-API
 
-    Search CPAN
-        http://search.cpan.org/dist/Map-Tube-API/
+    Search MetaCPAN
+        https://metacpan.org/pod/Map::Tube::API
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 Mohammad S Anwar
+Copyright (C) 2024 Mohammad Sajid Anwar
 
 This program is free software; you can redistribute it and/or modify it under the
 terms of the the Artistic License (2.0).You may obtain a copy of the full license

@@ -2,24 +2,62 @@ NAME
     Sah::Schemas::Re - Various regular-expression schemas
 
 VERSION
-    This document describes version 0.001 of Sah::Schemas::Re (from Perl
-    distribution Sah-Schemas-Re), released on 2022-08-20.
+    This document describes version 0.005 of Sah::Schemas::Re (from Perl
+    distribution Sah-Schemas-Re), released on 2023-09-09.
 
 SAH SCHEMAS
     The following schemas are included in this distribution:
+
+    *   obj::re
+
+        Regexp object.
+
+        This schema can be used as a stricter version of the "re" type.
+        Unlike "re", this schema only accepts "Regexp" object and not
+        string.
 
     *   re_from_str
 
         Regexp object from string using Regexp::From::String's str_to_re().
 
         This schema accepts Regexp object or string which will be coerced to
-        Regexp object using Regexp::From::String's "str_to_re()" function.
+        Regexp object using Regexp::From::String's str_to_re() function.
 
-        Basically, if string is of the form of "/.../" or "qr(...)", then
-        you could specify metacharacters as if you are writing a literal
-        regexp pattern in Perl. Otherwise, your string will be
-        "quotemeta()"-ed first then compiled to Regexp object. This means in
-        the second case you cannot specify metacharacters.
+        Basically, if string is of the form of "/.../" or qr(...), then you
+        could specify metacharacters as if you are writing a literal regexp
+        pattern in Perl. Otherwise, your string will be quotemeta()-ed first
+        then compiled to Regexp object. This means in the second case you
+        cannot specify metacharacters.
+
+    *   re_or_code_from_str
+
+        Regex (convertable from string of the form `/.../`) or coderef
+        (convertable from string of the form `sub { ... }`).
+
+        Either Regexp object or coderef is accepted.
+
+        Coercion from string for Regexp is available if string is of the
+        form of "/.../" or qr(...); it will be compiled into a Regexp
+        object. If the regex pattern inside "/.../" or qr(...) is invalid,
+        value will be rejected. Currently, unlike in normal Perl, for the
+        qr(...) form, only parentheses "(" and ")" are allowed as the
+        delimiter. Currently modifiers "i", "m", and "s" after the second
+        "/" are allowed.
+
+        Coercion from string for coderef is available if string matches the
+        regex "qr/\Asub\s*\{.*\}\z/s", then it will be eval'ed into a
+        coderef. If the code fails to compile, the value will be rejected.
+        Note that this means you accept arbitrary code from the user to
+        execute! Please make sure first and foremost that this is acceptable
+        in your case. Currently string is eval'ed in the "main" package,
+        without "use strict" or "use warnings".
+
+        Unlike the default behavior of the "re" Sah type, coercion from
+        other string not in the form of "/.../" or qr(...) is not available.
+        Thus, such values will be rejected.
+
+        This schema is handy if you want to accept regex or coderef from the
+        command-line.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -35,6 +73,13 @@ SEE ALSO
     Data::Sah - Perl implementation of Sah
 
     Sah::PSchemas::Re
+
+    Sah::Schemas::RegexpPattern
+
+  Related Sah schemas from Sah::Schemas::Str distribution
+    Sah::Schema::str_or_re
+
+    Sah::Schema::str_or_re_or_code
 
 AUTHOR
     perlancar <perlancar@cpan.org>
@@ -56,7 +101,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

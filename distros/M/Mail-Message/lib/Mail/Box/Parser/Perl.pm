@@ -8,7 +8,7 @@
 
 package Mail::Box::Parser::Perl;
 use vars '$VERSION';
-$VERSION = '3.014';
+$VERSION = '3.015';
 
 use base 'Mail::Box::Parser';
 

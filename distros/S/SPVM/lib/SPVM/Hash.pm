@@ -125,7 +125,7 @@ Gets the value specifed by the key $key using the L<"get"> method, and casts it 
 
 Exceptions:
 
-The value of $key must be a L<Byte|SPVM::Byte> object. Otherwise an exception is thrown.
+The type of the value for the key must be the L<Byte|SPVM::Byte> class. Otherwise an exception is thrown.
 
 =head2 get_short
 
@@ -135,17 +135,7 @@ Gets the value specifed by the key $key using the L<"get"> method, and casts it 
 
 Exceptions:
 
-The value of $key must be a L<Short|SPVM::Short> object. Otherwise an exception is thrown.
-
-=head2 get_string
-
-C<method get_string : string ($key : string)>
-
-Gets the value specifed by the key $key using the L<"get"> method, and casts it to the string type, and returns it.
-
-Exceptions:
-
-The value of $key must be a string. Otherwise an exception is thrown.
+The type of the value for the key must be the L<Short|SPVM::Short> class. Otherwise an exception is thrown.
 
 =head2 get_int
 
@@ -155,7 +145,7 @@ Gets the value specifed by the key $key using the L<"get"> method, and casts it 
 
 Exceptions:
 
-The value of $key must be a L<Int|SPVM::Int> object. Otherwise an exception is thrown.
+The type of the value for the key must be the L<Int|SPVM::Int> class. Otherwise an exception is thrown.
 
 =head2 get_long
 
@@ -165,7 +155,7 @@ Gets the value specifed by the key $key using the L<"get"> method, and casts it 
 
 Exceptions:
 
-The value of $key must be a L<Long|SPVM::Long> object. Otherwise an exception is thrown.
+The type of the value for the key must be the L<Long|SPVM::Long> class. Otherwise an exception is thrown.
 
 =head2 get_float
 
@@ -175,7 +165,7 @@ Gets the value specifed by the key $key using the L<"get"> method, and casts it 
 
 Exceptions:
 
-The value of $key must be a L<Float|SPVM::Float> object. Otherwise an exception is thrown.
+The type of the value for the key must be the L<Float|SPVM::Float> class. Otherwise an exception is thrown.
 
 =head2 get_double
 
@@ -185,7 +175,17 @@ Gets the value specifed by the key $key using the L<"get"> method, and casts it 
 
 Exceptions:
 
-The value of $key must be a L<Double|SPVM::Double> object. Otherwise an exception is thrown.
+The type of the value for the key must be the L<Double|SPVM::Double> class. Otherwise an exception is thrown.
+
+=head2 get_string
+
+C<method get_string : string ($key : string)>
+
+Gets the value specifed by the key $key using the L<"get"> method, and casts it to the string type, and returns it.
+
+Exceptions:
+
+The type of the value for the key must be the string type. Otherwise an exception is thrown.
 
 =head2 set
   
@@ -248,6 +248,78 @@ Converts all the key-value pairs in the hash to an array, and returns it.
 If the option $sort is a positive value, the keys are sorted by ascendant order.
 
 If the option $sort is a negative value, the keys are sorted by decendant order.
+
+=head2 get_or_default_byte
+
+C<method get_or_default_byte : int ($key : string, $default : int;>
+
+If the value specified by the key $key exists, this method calls the L</"get_byte"> method
+, and returns the return value of the the L</"get_byte"> method.
+
+If the value specified by the key $key does not exists, returns the default value $default.
+
+=head2 get_or_default_short
+
+C<method get_or_default_short : int ($key : string, $default : int;>
+
+If the value specified by the key $key exists, this method calls the L</"get_short"> method
+, and returns the return value of the the L</"get_short"> method.
+
+If the value specified by the key $key does not exists, returns the default value $default.
+
+=head2 get_or_default_int
+
+C<method get_or_default_int : int ($key : string, $default : int;>
+
+If the value specified by the key $key exists, this method calls the L</"get_int"> method
+, and returns the return value of the the L</"get_int"> method.
+
+If the value specified by the key $key does not exists, returns the default value $default.
+
+=head2 get_or_default_long
+
+C<method get_or_default_long : long ($key : string, $default : long;>
+
+If the value specified by the key $key exists, this method calls the L</"get_long"> method
+, and returns the return value of the the L</"get_long"> method.
+
+If the value specified by the key $key does not exists, returns the default value $default.
+
+=head2 get_or_default_float
+
+C<method get_or_default_float : float ($key : string, $default : float;>
+
+If the value specified by the key $key exists, this method calls the L</"get_float"> method
+, and returns the return value of the the L</"get_float"> method.
+
+If the value specified by the key $key does not exists, returns the default value $default.
+
+=head2 get_or_default_double
+
+C<method get_or_default_double : double ($key : string, $default : double;>
+
+If the value specified by the key $key exists, this method calls the L</"get_double"> method
+, and returns the return value of the the L</"get_double"> method.
+
+If the value specified by the key $key does not exists, returns the default value $default.
+
+=head2 get_or_default_string
+
+C<method get_or_default_string : string ($key : string, $default : string;>
+
+If the value specified by the key $key exists, this method calls the L</"get_string"> method
+, and returns the return value of the the L</"get_string"> method.
+
+If the value specified by the key $key does not exists, returns the default value $default.
+
+=head2 get_or_default
+
+C<method get_or_default : object ($key : string, $default : object;>
+
+If the value specified by the key $key exists, this method calls the L</"get"> method
+, and returns the return value of the the L</"get"> method.
+
+If the value specified by the key $key does not exists, returns the default value $default.
 
 =head2 delete_or_default_byte
 

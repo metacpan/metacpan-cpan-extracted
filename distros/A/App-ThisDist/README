@@ -3,8 +3,8 @@ NAME
     with current directory
 
 VERSION
-    This document describes version 0.019 of App::ThisDist (from Perl
-    distribution App-ThisDist), released on 2023-05-20.
+    This document describes version 0.022 of App::ThisDist (from Perl
+    distribution App-ThisDist), released on 2024-01-05.
 
 DESCRIPTION
     See included scripts:
@@ -17,11 +17,13 @@ FUNCTIONS
   this_dist
     Usage:
 
-     my $dist = this_dist([ $dir ] [ , $extract_version? ]); => e.g. "App-Foo" or "App-Foo 1.23"
+     my $dist = this_dist([ $dir ] [ , $extract_version? ] [ , $detail? ]); => e.g. "App-Foo" or "App-Foo 1.23" or {dist=>"App-Foo", dist_version=>1.23, ...}
 
     If $dir is not specified, will default to current directory. If
     $extract_version is set to true, will also try to extract distribution
-    version and will return "?" for version when version cannot be found.
+    version and will return "?" for version when version cannot be found. If
+    $detail is set to true, then instead of just a string, will return a
+    hash of more detailed information.
 
     Debugging statement are logged using Log::ger.
 
@@ -42,7 +44,7 @@ SOURCE
 SEE ALSO
     App::DistUtils
 
-    "my_dist()" from Dist::Util::Current tries to guess distribution name
+    my_dist() from Dist::Util::Current tries to guess distribution name
     associated with source code file. It uses us when guessing via $DIST or
     .packlist files fail.
 
@@ -66,7 +68,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022, 2021, 2020 by perlancar
+    This software is copyright (c) 2024, 2023, 2022, 2021, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

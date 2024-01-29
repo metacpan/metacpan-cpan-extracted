@@ -17,3 +17,5 @@
 ^bitbucket-pipelines.yml$
 ^cover_db/
 \b.*\.(bak|zip|tmp)$
+^.vscode/
+^Dockerfile$

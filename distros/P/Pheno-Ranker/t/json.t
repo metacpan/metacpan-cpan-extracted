@@ -9,26 +9,27 @@ use lib ( './lib', '../lib' );
 use Pheno::Ranker;
 
 my $data = {
-    "age"                    => 0,
-    "align"                  => undef,
-    "align_basename"         => "alignment",
-    "append_prefixes"        => [],
-    "cli"                    => undef,
-    "debug"                  => undef,
-    "exclude_terms"          => [],
-    "export"                 => undef,
-    "hpo_file"               => undef,
-    "include_hpo_ascendants" => undef,
-    "include_terms"          => [],
-    "log"                    => "",
-    "max_number_var"         => undef,
-    "max_out"                => 36,
-    "patients_of_interest"   => [],
-    "poi_out_dir"            => undef,
-    "sort_by"                => undef,
-    "target_file"            => undef,
-    "verbose"                => undef,
-    "weights_file"           => undef
+    "age"                      => 0,
+    "align"                    => undef,
+    "align_basename"           => "alignment",
+    "append_prefixes"          => [],
+    "cli"                      => undef,
+    "debug"                    => undef,
+    "exclude_terms"            => [],
+    "export"                   => undef,
+    "hpo_file"                 => undef,
+    "include_hpo_ascendants"   => undef,
+    "include_terms"            => [],
+    "log"                      => "",
+    "max_number_var"           => undef,
+    "max_out"                  => 36,
+    "patients_of_interest"     => [],
+    "poi_out_dir"              => undef,
+    "sort_by"                  => undef,
+    "similarity_metric_cohort" => undef,
+    "target_file"              => undef,
+    "verbose"                  => undef,
+    "weights_file"             => undef
 };
 
 ##########

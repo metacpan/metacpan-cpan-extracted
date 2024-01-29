@@ -1,3 +1,9 @@
+2023-12-28  Dave Cross <dave@perlhacks.com>
+
+  * Version 1.6.4
+
+  * Remove unused variable (thanks Steve Rogerson)
+
 2021-01-04  Dave Cross <dave@perlhacks.com>
 
   * Version 1.6.3

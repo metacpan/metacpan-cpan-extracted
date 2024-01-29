@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mg - Package for language Malagasy
 
 package Locale::CLDR::Locales::Mg;
 # This file auto generated from Data\common\main\mg.xml
-#	on Tue  5 Dec  1:20:54 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'Akan',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Andorra',
  			'AE' => 'Emirà Arabo mitambatra',
@@ -217,7 +217,6 @@ has 'display_name_region' => (
  			'MD' => 'Môldavia',
  			'MG' => 'Madagasikara',
  			'MH' => 'Nosy Marshall',
- 			'MK' => 'Makedonia',
  			'ML' => 'Mali',
  			'MM' => 'Myanmar',
  			'MN' => 'Môngôlia',
@@ -333,7 +332,7 @@ has 'characters' => (
 			auxiliary => qr{[c q u w x]},
 			index => ['A', 'B', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'V', 'Y', 'Z'],
 			main => qr{[a à â b d e é è ê ë f g h i ì î ï j k l m n ñ o ô p r s t v y z]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -1174,7 +1173,6 @@ has 'datetime_formats_available_formats' => (
 			MMM => q{MMM},
 			MMMEd => q{E d MMM},
 			MMMMEd => q{E d MMMM},
-			MMMMW => q{'week' W 'of' MMM},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			MMd => q{d/MM},
@@ -1198,7 +1196,6 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{y-MM-dd},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
-			yw => q{'week' w 'of' Y},
 		},
 	} },
 );

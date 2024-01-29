@@ -1,5 +1,6 @@
 package Audio::Nama::Globals;
-use Modern::Perl;
+use Modern::Perl '2020';
+our $VERSION = 1.0;
 
 # set aliases for common indices
 *bn = \%Audio::Nama::Bus::by_name;
@@ -56,6 +57,7 @@ $jack
 $fx
 $fx_cache
 $text
+$term
 $gui
 $midi
 $help
@@ -95,6 +97,7 @@ $jack
 $fx
 $fx_cache
 $text
+$term
 $gui
 $midi
 $help
@@ -162,7 +165,7 @@ $this_track_name
 
 	)],
 );
-our $ui = 'bullwinkle';  # for testing
+our $ui = 'bullwinkle';  # required for testing
 {
 	my %seen;
 	push @{$EXPORT_TAGS{all}}, grep {!$seen{$_}++} @{$EXPORT_TAGS{$_}} foreach
@@ -174,6 +177,8 @@ keys %EXPORT_TAGS;
 __END__
 
 =head1 NAME
+
+=encoding UTF-8
  
 Audio::Nama::Globals - Nama global variables
  
@@ -208,7 +213,7 @@ with object properties as need be.
 
 =over
 
-=item F<var_config>
+=item F<var_namarc>
 
 Maps keys in F<.namarc> (e.g. I<mix_to_disk_format>) to the
 corresponding Nama internal scalar (e.g. C<$config-E<gt>{mix_to_disk_format}>
@@ -218,13 +223,17 @@ corresponding Nama internal scalar (e.g. C<$config-E<gt>{mix_to_disk_format}>
 List of allowed singleton hash keys. 
 
 Keys of variables appearing in ./var_singletons 
-should be listed in var_keys or in var_config.
+should be listed in var_keys or in var_namarc.
 Undeclared keys will trigger warnings during build.
+
+=back
 
 =head2 F<var_lists>
 
 Declares lists of variables used in
 serializing/deserializing.
+
+=over
 
 =item C<@global_effect_chain_vars>
 

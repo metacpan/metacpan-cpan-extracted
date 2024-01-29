@@ -23,6 +23,7 @@
       "build" : {
          "requires" : {
             "Convert::Base32" : "0",
+            "Crypt::JWT" : "0",
             "Email::Sender" : "0",
             "GD::SecurityImage" : "0",
             "HTTP::Message" : "0",
@@ -48,6 +49,7 @@
             "Authen::Radius" : "0",
             "Authen::WebAuthn" : "0",
             "Convert::Base32" : "0",
+            "Crypt::JWT" : "0",
             "DBI" : "0",
             "Email::Sender" : "1.300027",
             "GD::SecurityImage" : "0",
@@ -73,7 +75,7 @@
          },
          "requires" : {
             "Clone" : "0",
-            "Lemonldap::NG::Handler" : "v2.17.0",
+            "Lemonldap::NG::Handler" : "v2.18.1",
             "Regexp::Assemble" : "0"
          }
       }
@@ -90,6 +92,6 @@
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.17.0",
+   "version" : "v2.18.1",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

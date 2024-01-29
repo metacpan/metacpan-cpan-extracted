@@ -6,7 +6,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 use parent qw(Database::Async::Engine);
 
@@ -919,8 +919,10 @@ sub simple_query {
     die 'already have active query' if $self->{active_query};
     $self->{active_query} = my $query = Database::Async::Query->new(
         sql      => $sql,
+        db       => $self->db,
         row_data => my $src = $self->ryu->source
     );
+    $query->completed->on_ready(sub { $src->finish });
     $self->protocol->simple_query($self->encode_text($query->sql));
     return $src;
 }
@@ -1102,5 +1104,5 @@ with contributions from Tortsten Förtsch C<< <OPI@cpan.org> >> and Maryam Nafis
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2023. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2024. Licensed under the same terms as Perl itself.
 

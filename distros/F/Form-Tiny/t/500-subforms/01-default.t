@@ -10,7 +10,7 @@ use Form::Tiny::Utils qw(try);
 	package Form::Nested;
 
 	use Form::Tiny;
-	use Types::Common qw(Str);
+	use Types::Standard qw(Str);
 
 	form_field value1 => (
 		type => Str,

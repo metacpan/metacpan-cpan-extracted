@@ -1,3 +1,11 @@
+1.06      2024-01-10 12:23:54-05:00 America/New_York
+
+  [BUGFIX]
+
+    * Encoders which need to output closing data can provide a
+      'finalize' method which will be called before the sink's 'close'
+      method is called.
+
 1.05      2023-09-26 16:36:38-04:00 America/New_York
 
   [PACKAGING]

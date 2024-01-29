@@ -24,6 +24,7 @@ WriteMakefile(
 	PL_FILES	=> {},
 	TEST_REQUIRES => {
 		'LWP::UserAgent' => 0,
+		'JSON::PP' => 4.02,	# Fix http://www.cpantesters.org/cpan/report/78a1401c-42de-11e9-bf31-80c71e9d5857
 		'Test::Carp' => 0,
 		'Test::Compile' => 0,
 		'Test::Most' => 0,
@@ -51,7 +52,6 @@ WriteMakefile(
 		'String::Clean::XSS' => 0,
 		'Log::Any' => 0,
 		'JSON::MaybeXS' => 0,
-		# 'JSON::PP' => 4.02,	# Fix http://www.cpantesters.org/cpan/report/78a1401c-42de-11e9-bf31-80c71e9d5857
 		# 'String::EscapeCage' => 0.02,
 		'Class::Autouse' => 0,
 		'namespace::clean' => 0,

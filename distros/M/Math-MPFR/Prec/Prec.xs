@@ -50,7 +50,7 @@ void DESTROY(pTHX_ SV *  rop) {
 }
 
 
-MODULE = Math::MPFR::Prec  PACKAGE = Math::MPFR::Prec  
+MODULE = Math::MPFR::Prec  PACKAGE = Math::MPFR::Prec
 
 PROTOTYPES: DISABLE
 

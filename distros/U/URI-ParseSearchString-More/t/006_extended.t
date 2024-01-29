@@ -39,13 +39,13 @@ export TEST_UPM_CACHED=1
 
 =cut
 
-use Test::Most;
+use Test::Most import => [qw( cmp_ok diag done_testing skip )];
 
 use URI::ParseSearchString::More;
 
 my $more = URI::ParseSearchString::More->new();
 
-use Config::General;
+use Config::General ();
 my $conf = Config::General->new(
     -ConfigFile      => 't/extended_urls.cfg',
     -BackslashEscape => 1,

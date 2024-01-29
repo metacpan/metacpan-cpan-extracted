@@ -3,8 +3,8 @@ package PDF::Builder::Docs;
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.025'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 # originally part of Builder.pm, it was split out due to its length
 
@@ -60,7 +60,13 @@ PDF::Builder can make use of some optional libraries, which are not I<required>
 for a successful installation. If you want improved speed and capabilities for
 certain functions, you may want to install and use these libraries:
 
-B<*> Graphics::TIFF -- PDF::Builder inherited a rather slow, buggy, and limited 
+=over
+
+=item * 
+
+Graphics::TIFF
+
+PDF::Builder inherited a rather slow, buggy, and limited 
 TIFF image library from PDF::API2. If Graphics::TIFF (available on CPAN, uses 
 libtiff.a) is installed, PDF::Builder will use that instead, unless you specify 
 that it is to use the old, pure Perl library. The only time you might want to 
@@ -68,7 +74,11 @@ consider this is when you need to pass an open filehandle to C<image_tiff>
 instead of a file name. See resolved bug reports RT 84665 and RT 118047, as well
 as C<image_tiff>, for more information.
 
-B<*> Image::PNG::Libpng -- PDF::Builder inherited a rather slow and buggy pure 
+=item * 
+
+Image::PNG::Libpng
+
+PDF::Builder inherited a rather slow and buggy pure 
 Perl PNG image library from PDF::API2. If Image::PNG::Libpng (available on 
 CPAN, uses libpng.a) is installed, PDF::Builder will use that instead, unless 
 you specify that it is to use the old, pure Perl library. Using the new library 
@@ -76,21 +86,46 @@ will give you improved speed, the ability to use 16 bit samples, and the
 ability to read interlaced PNG files. See resolved bug report RT 124349, as well
 as C<image_png>, for more information.
 
-B<*> HarfBuzz::Shaper -- This library enables PDF::Builder to handle complex
+=item * 
+
+HarfBuzz::Shaper
+
+This library enables PDF::Builder to handle complex
 scripts (Arabic, Devanagari, etc.) as well as non-LTR writing systems. It is
 also useful for Latin and other simple scripts, for ligatures and improved
 kerning. HarfBuzz::Shaper is based on a set of HarfBuzz libraries, which it
 will attempt to build if they are not found. See C<textHS> for more 
 information.
 
-B<*> Text::Markdown -- This library is used if you want to format "Markdown"
+=item * 
+
+Text::Markdown
+
+This library is used if you want to format "Markdown"
 style code in PDF::Builder, via the C<column()> method. It translates a certain
 dialect of Markdown into HTML, which is then further processed.
 
-B<*> HTML::TreeBuilder -- This library is used to format HTML input into a 
+=item * 
+
+HTML::TreeBuilder
+
+This library is used to format HTML input into a 
 data structure which PDF::Builder can interpret, via the C<column()> method.
 Note that if Markdown input is used, it will also need HTML::TreeBuilder to
 handle the HTML the Markdown is translated to.
+
+=item * 
+
+Pod::Simple::XHTML
+
+This library is used if you wish to generate the HTML documentation from the
+POD and PM source, using C<docs/buildDoc.pl>. Note that the full set of
+documentation can also be found online at 
+https://www.catskilltech.com/FreeSW/product/PDF-Builder/title/PDF%3A%3ABuilder/freeSW_full 
+under the "Documentation" link. This online documentation is updated at 
+every CPAN release, but not necessarily when the GitHub repository is updated.
+
+=back
 
 Note that the installation process will B<not> attempt to install these 
 libraries automatically. If you don't wish to use one or more of them, you are
@@ -493,6 +528,43 @@ temporarily exiting (ET) to graphics mode to draw the lines, and then returning
 be easily made. Since "BT" resets some text settings, this needs to be done
 with care!
 
+=head2 Notes on Reader support of features
+
+PDF Readers are complex pieces of software, written by different groups at
+different times. Thus, they may differ in how they support features and handle
+non-standard (i.e., not quite meeting standards) content! Most Readers out 
+there support all or most features up through PDF 1.7, and some support PDF 2.x
+features. Note that PDF::Builder supports PDF 1.4 for the most part, with a few
+PDF 1.5 features added. Most any Reader out there I<should> (in theory) support 
+any PDF produced with PDF::Builder.
+
+There is no official I<reference implementation> of a Reader, although Adobe's
+Acrobat Reader (I<AAR>, a free download) is so prevalent that it is almost a 
+I<de facto> standard. At least, we I<try> to get PDF::Builder and its tests and 
+examples to run on AAR. Sometimes it can be difficult, as, for example, the 
+handling of save (B<q>) and restore (B<Q>) operators (commands) within a text 
+stream. The PDF standard sort of suggests that these apply only to the Graphics 
+Stream, and possibly shouldn't appear in a Text Stream. Most Readers appear to 
+just ignore q and Q within a text stream, and AAR usually seems to, but certain 
+combinations of stream size and compression seem to trigger a warning in AAR 
+upon load! This particular case is now a moot point, as C<save()> and 
+C<restore()> have been reverted to being no-ops (with a single warning message 
+given if found) in a Text Stream.
+
+We have been advised that certain stream operators may not be strictly allowed
+within certain parts of a stream (particularly certain graphics state operators
+after path construction has started). No Reader seems to give problems with 
+this at the moment, but users should be aware that the ordering of their 
+PDF::Builder calls I<may> need to be updated at some point, to get PDFs usable 
+on all Readers. If necessary, we will add code to enforce this (or at least, 
+warn of potential problems). Please feel free to report if you find such
+restrictions are necessary.
+
+Also note that not all I<filters> (including compression methods) may be
+supported on all Readers. For example, at this time, AAR (and a number of other
+Readers) apparently do not support CCITT Group 4 Fax compression (for some TIFF
+images). This remains under investigation.
+
 =head2 PDF Versions Supported
 
 When creating a PDF file using the functions in PDF::Builder, the output is
@@ -531,19 +603,28 @@ In 2017, PDF::Builder was forked by Phil M. Perry, who desired a more aggressive
 schedule of new features and bug fixes than Simms was providing, although some 
 of Simms's work I<has> been ported from PDF::API2.
 
-According to "pdfapi2_for_fun_and_profit_APW2005.pdf" (on 
+According to Alfred Reibenschuh's 2005 presentation 
+"pdfapi2_for_fun_and_profit_APW2005.pdf" (on 
 http://pdfapi2.sourceforge.net, an unmaintained site), the history of PDF::API2
 (the predecessor to PDF::Builder) goes as such:
 
 =over
 
-=item E<nbsp> E<nbsp> E<bull>E<nbsp> First Code implemented based on PDFlib-0.6 (AFPL)
+=item * 
 
-=item E<nbsp> E<nbsp> E<bull>E<nbsp> Changed to Text::PDF with a total rewrite as Text::PDF::API (procedural)
+First Code implemented based on PDFlib-0.6 (AFPL)
 
-=item E<nbsp> E<nbsp> E<bull>E<nbsp> Unmaintainable Code triggered rewrite into new Namespace PDF::API2 (object-oriented, LGPL)
+=item * 
 
-=item E<nbsp> E<nbsp> E<bull>E<nbsp> Object-Structure streamlined in 0.4x
+Changed to Text::PDF with a total rewrite as Text::PDF::API (procedural)
+
+=item * 
+
+Unmaintainable Code triggered rewrite into new Namespace PDF::API2 (object-oriented, LGPL)
+
+=item * 
+
+Object-Structure streamlined in 0.4x
 
 =back
 
@@ -595,21 +676,33 @@ The C<level> parameter accepts the following values:
 
 =over
 
-=item 0 = Do not output any diagnostic messages; just return any version override.
+=item Z<>0 
 
-=item 1 = Output error-level (serious) diagnostic messages, as well as returning any version override.
+Do not output any diagnostic messages; just return any version override.
+
+=item Z<>1 
+
+Output error-level (serious) diagnostic messages, as well as returning any version override.
 
 Errors include, in no place was the /Root object specified, or if it was, the indicated object was not found. An object claims another object as its child (/Kids list), but another object has already claimed that child. An object claims a child, but that child does not list a Parent, or the child lists a different Parent.
 
-=item 2 = Output error- (serious) and warning- (less serious) level diagnostic messages, as well as returning any version override. B<This is the default.>
+=item Z<>2
 
-=item 3 = Output error- (serious), warning- (less serious), and note- (informational) level diagnostic messages, as well as returning any version override.
+Output error- (serious) and warning- (less serious) level diagnostic messages, as well as returning any version override. B<This is the default.>
+
+=item Z<>3
+
+Output error- (serious), warning- (less serious), and note- (informational) level diagnostic messages, as well as returning any version override.
 
 Notes include, in no place was the (optional) /Info object specified, or if it was, the indicated object was not found. An object was referenced, but no entry for it was found among the objects. (This may be OK if the object is not defined, or is on the free list, as the reference will then be ignored.) An object is defined, but it appears that no other object is referencing it.
 
-=item 4 = Output error-, warning-, and note-level diagnostic messages, as well as returning any version override. Also dump the diagnostic data structure.
+=item Z<>4
 
-=item 5 = Output error-, warning-, and note-level diagnostic messages, as well as returning any version override. Also dump the diagnostic data structure and the C<$self> data structure (generally useful only if you have already read in the PDF file).
+Output error-, warning-, and note-level diagnostic messages, as well as returning any version override. Also dump the diagnostic data structure.
+
+=item Z<>5
+
+Output error-, warning-, and note-level diagnostic messages, as well as returning any version override. Also dump the diagnostic data structure and the C<$self> data structure (generally useful only if you have already read in the PDF file).
 
 =back
 
@@ -632,8 +725,6 @@ Controls viewing preferences for the PDF.
 
 =over
 
-=over
-
 =item fullscreen
 
 Full-screen mode, with no menu bar, window controls, or any other window visible.
@@ -648,11 +739,7 @@ Document outline visible.
 
 =back
 
-=back
-
 =head3 Page Layout Options
-
-=over
 
 =over
 
@@ -666,19 +753,15 @@ Display the pages in one column.
 
 =item twocolumnleft
 
-Display the pages in two columns, with oddnumbered pages on the left.
+Display the pages in two columns, with odd-numbered pages on the left.
 
 =item twocolumnright
 
-Display the pages in two columns, with oddnumbered pages on the right.
-
-=back
+Display the pages in two columns, with odd-numbered pages on the right.
 
 =back
 
 =head3 Viewer Options
-
-=over
 
 =over
 
@@ -731,8 +814,6 @@ Print duplex by default and flip on the short edge of the sheet.
 =item duplexfliplongedge
 
 Print duplex by default and flip on the long edge of the sheet.
-
-=back
 
 =back
 
@@ -916,11 +997,11 @@ consider what readers and other PDF tools may be used with a PDF you produce!
 Also note that earlier Acrobat readers had coordinate limits as small as 3240
 User Units (45 inches), and I<minimum> media size of 72 or 3 User Units.
 
-=head3 User Units
+=head3 User Units (userunit)
+
+    $pdf->userunit($number)
 
 =over
-
-=item $pdf->userunit($number)
 
 The default User Unit in the PDF coordinate system is one point (1/72 inch). You
 can think of it as a scale factor to enable larger (or even, smaller) documents.
@@ -968,19 +1049,19 @@ may be scaled down to the current User Unit.
 
 =back
 
-=head3 Media Box
+=head3 Media Box (mediabox)
+
+    $pdf->mediabox($name)
+
+    $pdf->mediabox($name, orient => 'orientation' )
+
+    $pdf->mediabox($w,$h)
+
+    $pdf->mediabox($llx,$lly, $urx,$ury)
+
+    ($llx,$lly, $urx,$ury) = $pdf->mediabox()
 
 =over
-
-=item $pdf->mediabox($name)
-
-=item $pdf->mediabox($name, orient => 'orientation' )
-
-=item $pdf->mediabox($w,$h)
-
-=item $pdf->mediabox($llx,$lly, $urx,$ury)
-
-=item ($llx,$lly, $urx,$ury) = $pdf->mediabox()
 
 Sets the global Media Box (or page's Media Box, if C<< $page-> >> instead). 
 This defines the width and height (or by corner
@@ -994,8 +1075,8 @@ addition, the Media Box defines the overall I<coordinate system> for text and
 graphics operations.
 
 If no arguments are given, the current Media Box (global or page) coordinates
-are returned instead. The former C<get_mediabox> (page only) function is 
-B<deprecated> and will likely be removed some time in the future. In addition,
+are returned instead. The former C<get_mediabox> (page only) function was 
+B<deprecated> and has been removed. In addition,
 when I<setting> the Media Box, the resulting coordinates are returned. This 
 permits you to specify the page size by a name (alias) and get the dimensions 
 back, all in one call.
@@ -1035,6 +1116,8 @@ can't make C<y> I<increase> from top to bottom!).
 
 B<Example:>
 
+=back
+
     $pdf = PDF::Builder->new();
     $pdf->mediabox('A4'); # A4 size (595 Pt wide by 842 Pt high)
     ...
@@ -1050,6 +1133,8 @@ B<Example:>
     ...
     $pdf->saveas('our/new.pdf');
 
+=over
+
 See the L<PDF::Builder::Resource::PaperSizes> source code for the full list of
 supported names (aliases) and their dimensions in points. You are free to add
 additional paper sizes to this file, if you wish. You might want to do this if
@@ -1060,19 +1145,19 @@ size as the full media (Media Box), and you don't mind their starting at 0,0.
 
 =back
 
-=head3 Crop Box
+=head3 Crop Box (cropbox)
+
+    $pdf->cropbox($name)
+
+    $pdf->cropbox($name, orient => 'orientation')
+
+    $pdf->cropbox($w,$h)
+
+    $pdf->cropbox($llx,$lly, $urx,$ury)
+
+    ($llx,$lly, $urx,$ury) = $pdf->cropbox()
 
 =over
-
-=item $pdf->cropbox($name)
-
-=item $pdf->cropbox($name, orient => 'orientation')
-
-=item $pdf->cropbox($w,$h)
-
-=item $pdf->cropbox($llx,$lly, $urx,$ury)
-
-=item ($llx,$lly, $urx,$ury) = $pdf->cropbox()
 
 Sets the global Crop Box (or page's Crop Box, if C<< $page-> >> instead). 
 This will define the media size to which the output will 
@@ -1092,8 +1177,8 @@ may show you the full media size (Media Box) and a 100 Point wide blank area
 (in this example) around the visible content.
 
 If no arguments are given, the current Crop Box (global or page) coordinates
-are returned instead. The former C<get_cropbox> (page only) function is 
-B<deprecated> and will likely be removed some time in the future. If a Crop Box
+are returned instead. The former C<get_cropbox> (page only) function was 
+B<deprecated> and has been removed. If a Crop Box
 has not been defined, the Media Box coordinates (which always exist) will be
 returned instead. In addition,
 when I<setting> the Crop Box, the resulting coordinates are returned. This 
@@ -1127,19 +1212,19 @@ Crop Box (and other boxes).
 
 =back
 
-=head3 Bleed Box
+=head3 Bleed Box (bleedbox)
+
+    $pdf->bleedbox($name)
+
+    $pdf->bleedbox($name, orient => 'orientation')
+
+    $pdf->bleedbox($w,$h)
+
+    $pdf->bleedbox($llx,$lly, $urx,$ury)
+
+    ($llx,$lly, $urx,$ury) = $pdf->bleedbox()
 
 =over
-
-=item $pdf->bleedbox($name)
-
-=item $pdf->bleedbox($name, orient => 'orientation')
-
-=item $pdf->bleedbox($w,$h)
-
-=item $pdf->bleedbox($llx,$lly, $urx,$ury)
-
-=item ($llx,$lly, $urx,$ury) = $pdf->bleedbox()
 
 Sets the global Bleed Box (or page's Bleed Box, if C<< $page-> >> instead). 
 This is typically used in printing on paper, where you want 
@@ -1156,8 +1241,8 @@ alignment dots, etc., while crop marks (trim guides) are at least partly within
 the bleed area (and should be printed after content is printed).
 
 If no arguments are given, the current Bleed Box (global or page) coordinates
-are returned instead. The former C<get_bleedbox> (page only) function is 
-B<deprecated> and will likely be removed some time in the future. If a Bleed Box
+are returned instead. The former C<get_bleedbox> (page only) function was 
+B<deprecated> and has been removed. If a Bleed Box
 has not been defined, the Crop Box coordinates (if defined) will be returned,
 otherwise the Media Box coordinates (which always exist) will be returned. 
 In addition, when I<setting> the Bleed Box, the resulting coordinates are 
@@ -1177,19 +1262,19 @@ the page Bleed Box (and other boxes).
 
 =back
 
-=head3 Trim Box
+=head3 Trim Box (trimbox)
+
+    $pdf->trimbox($name)
+
+    $pdf->trimbox($name, orient => 'orientation')
+
+    $pdf->trimbox($w,$h)
+
+    $pdf->trimbox($llx,$lly, $urx,$ury)
+
+    ($llx,$lly, $urx,$ury) = $pdf->trimbox()
 
 =over
-
-=item $pdf->trimbox($name)
-
-=item $pdf->trimbox($name, orient => 'orientation')
-
-=item $pdf->trimbox($w,$h)
-
-=item $pdf->trimbox($llx,$lly, $urx,$ury)
-
-=item ($llx,$lly, $urx,$ury) = $pdf->trimbox()
 
 Sets the global Trim Box (or page's Trim Box, if C<< $page-> >> instead). 
 This is supposed to be the actual dimensions of the 
@@ -1199,8 +1284,8 @@ the trim box. The default value is equal to Crop Box, but is often a bit
 smaller than any Bleed Box, to allow the desired "bleed" effect.
 
 If no arguments are given, the current Trim Box (global or page) coordinates
-are returned instead. The former C<get_trimbox> (page only) function is 
-B<deprecated> and will likely be removed some time in the future. If a Trim Box
+are returned instead. The former C<get_trimbox> (page only) function was 
+B<deprecated> and has been removed. If a Trim Box
 has not been defined, the Crop Box coordinates (if defined) will be returned,
 otherwise the Media Box coordinates (which always exist) will be returned. 
 In addition, when I<setting> the Trim Box, the resulting coordinates are 
@@ -1220,19 +1305,19 @@ the page Trim Box (and other boxes).
 
 =back
 
-=head3 Art Box
+=head3 Art Box (artbox)
+
+    $pdf->artbox($name)
+
+    $pdf->artbox($name, orient => 'orientation')
+
+    $pdf->artbox($w,$h)
+
+    $pdf->artbox($llx,$lly, $urx,$ury)
+
+    ($llx,$lly, $urx,$ury) = $pdf->artbox()
 
 =over
-
-=item $pdf->artbox($name)
-
-=item $pdf->artbox($name, orient => 'orientation')
-
-=item $pdf->artbox($w,$h)
-
-=item $pdf->artbox($llx,$lly, $urx,$ury)
-
-=item ($llx,$lly, $urx,$ury) = $pdf->artbox()
 
 Sets the global Art Box (or page's Art Box, if C<< $page-> >> instead). 
 This is supposed to define "the extent of the page's 
@@ -1245,8 +1330,8 @@ used for defining "important" content (e.g., I<excluding> advertisements) that
 may or may not be brought over to another page (e.g., N-up printing).
 
 If no arguments are given, the current Art Box (global or page) coordinates
-are returned instead. The former C<get_artbox> (page only) function is 
-B<deprecated> and will likely be removed some time in the future. If an Art Box
+are returned instead. The former C<get_artbox> (page only) function was 
+B<deprecated> and has been removed. If an Art Box
 has not been defined, the Crop Box coordinates (if defined) will be returned,
 otherwise the Media Box coordinates (which always exist) will be returned. 
 In addition, when I<setting> the Art Box, the resulting coordinates are 
@@ -1283,7 +1368,7 @@ bound together into books or magazines. You would usually just supply a PDF
 with all the pages; they would take care of the signature layout (which 
 includes offsets and 180 degree rotations). 
 
-(As an aside, don't count on a printer having
+(As an aside, don't count on a commercial printer having
 any particular font available, so be sure to ask. Usually they will want you
 to embed all fonts used, but ask first, and double-check before handing over
 the print job! TTF/OTF fonts (C<ttfont()>) are embedded by default, but other 
@@ -1311,8 +1396,9 @@ Crop Box, but crop marks for trimming (if used) should go just outside the Trim
 Box (partly or wholly within the Bleed Box), and
 be drawn I<after> all content. If you're I<not> trimming the paper, don't try 
 to do any bleed effects (including solid background color pages/covers), as 
-you will usually have a white edge around the 
-sheet anyway. Don't count on a PDF document I<never> being physically printed,
+you will usually have a white edge around the sheet anyway (printers leave a 
+clean, dry route for the feed rollers). Don't count on a PDF document I<never> 
+being physically printed,
 and not just displayed (where you can do things like bleed all the way to the
 media edge). Finally, for single sheet printing, an Art Box is 
 probably unnecessary, but if you're combining pages into N-up prints, or doing 
@@ -1432,6 +1518,23 @@ See also L<PDF::Builder::Resource::Font::CoreFont>.
 
 =head3 PS Fonts
 
+=head4 WARNING: End of Adobe Support
+
+B<Adobe has announced an end to support for Type 1 (Postscript/T1) fonts in its 
+products. The announcement wordings are a bit vague, sometimes referring to 
+"all products" and other times just to "authoring software". Presumably, Adobe 
+PDF Readers (as well as Readers supplied by other parties) will continue to 
+display PDFs with Type 1 fonts for quite some time, although this is by no 
+means absolutely certain. Note that this does NOT mean that PDF::Builder or 
+other Third Party authoring tools may not continue to support Type 1 fonts. 
+This termination by Adobe of support of a now old and obsolete font format does 
+not affect the use of PDF::Builder for authoring PDFs, nor is it binding on 
+other non-Adobe readers and authoring tools. However, using Adobe products for 
+editing of PDFs with Type 1 fonts, and possibly of displaying them, may no 
+longer be possible. At any rate, users may want to consider starting to move 
+away from Type 1 font usage and switch to TTF or even core fonts, although it 
+is unknown how long Type 1 Reader support will continue.>
+
 PS (T1) fonts are limited to single byte encodings. You cannot use UTF-8 or 
 other multibyte encodings with T1 fonts.
 The default encoding for the T1 fonts is
@@ -1443,11 +1546,15 @@ guarantee that future changes to font files will permit consistent results>.
 B<Note:> many Type1 fonts are limited to 256 glyphs, but some are available
 with more than 256 glyphs. Still, a maximum of 256 at a time are usable.
 
-C<psfont> accepts both ASCII (.pfa) and binary (.pfb) Type1 glyph files.
+C<psfont> accepts ASCII (.pfa), binary (.pfb), and .t1 Type1 glyph files.
 Font metrics can be supplied in either ASCII (.afm) or binary (.pfm) format,
 as can be seen in the examples given below. It is possible to use .pfa with .pfm
 and .pfb with .afm if that's what's available. The ASCII and binary files have
 the same content, just in different formats.
+
+B<Caution:> the file name given for the glyph file (first argument to C<psfont>)
+I<must> have a file extension of .pfa, .pfb, or .t1; as the extension will
+be checked to see how to parse the file.
 
 To allow UTF-8 text and extended glyph counts in one font, you should 
 consider replacing your use of Type1 fonts with TrueType (.ttf) and OpenType
@@ -1604,6 +1711,63 @@ the default list for the appropriate OS. If none can be found, find_ms() is
 tried, and as last resort use the C<.cmap> (if available), even if C<usecmf> 
 is not 1.
 
+B<CAUTION:> There is a "gotcha" with TrueType fonts that you need to be aware
+of when using them. PDF::Builder outputs to the text stream a list of I<glyph
+IDs> as four-digit hex codes, rather than the list of character byte codes 
+used by other
+font types. The B<Tw> operator, if used (C<$text->wordspace(n)>) to adjust
+inter-word spacing, B<will be ignored> by most, if not all, PDF Readers
+(including Adobe products). This is because this operator is looking for actual
+ASCII spaces (x20 bytes) in the stream, to apply the width change to. Note that 
+only ASCII spaces are affected (not other spaces), and not at all for TrueType 
+and OpenType fonts! We are considering adding ways to emulate word spacing for 
+TrueType font support, as well as possibly extending it to non-ASCII spaces for 
+all font types. Note that inter-character spacing (via C<$text->charspace(n)> 
+and the B<Tc> operator) still works for all font types.
+
+PDF::Builder has been updated to attempt to respect the B<Tw> operator when
+using TTF/OTF fonts. If the C<Tw> amount is non-zero, it will split up 
+sentences on ASCII spaces (x20) and individually place words on the page. This 
+necessarily bloats the PDF file size, but is the only way to adjust word 
+spacing via the C<wordspace()> method. Note that again, I<only> ASCII spaces
+(x20) are affected (to match the behavior of the B<Tw> operator for other font
+types), and other spaces (xA0 required/non-breaking space, thin space, etc.)
+are not handled.
+
+B<Where is the font I just added?> Well, sometimes you get lucky and can
+specify the exact directory that the C<.ttf> or C<.otf> file will reside in,
+making it easy to specify the path to the font file (for uses such as 
+C<ttfont()>, C<font()>, or Font Manager calls). Other times, the operating
+system will play hide and seek with you, leaving you to expend much time and
+energy to track down where the file is. Linux distributions tend to have their
+own favorite hiding places for font files, but at least they tend to be
+consistent! On the other hand, Windows often decides that it knows better than
+you, and will put files in an unexpected place, and under an unexpected name!
+
+To find out where your TTF or OTF file ended up, if you don't see an obvious 
+entry in /Windows/Fonts (even if you drag and dropped the font file there), 
+you need to look in /Users/XXXX/AppData/Local/Microsoft/Windows/Fonts, 
+depending on what user name you were signed on as when you installed the font. 
+Even then, you may not be done, as the name may have been changed to something 
+unrecognizable. You may need to look at Windows' mapping of font name to 
+filename.
+
+In the command shell (command line), or whatever equivalent you like to use, 
+enter "regedit" to bring up the registry editor. For the top level, choose 
+(click on) either C<HKEY_LOCAL_MACHINE> (for global font settings, in 
+/Windows/Fonts) or C<HKEY_CURRENT_USER> (for fonts installed by whoever is 
+currently signed on, in /Users/XXXX/AppData...). From there, both have the same 
+path: C<SOFTWARE E<gt> Microsoft E<gt> Windows NT E<gt> CurrentVersion E<gt> 
+Fonts>. This should bring up a listing of all the installed fonts (full name, 
+e.g. "Papyrus Regular") and their actual filename ("PAPYRUS.TTF"). For 
+instance, I just installed (drag and drop into /Windows/Fonts) a blackletter 
+"Gothic" font named I<English Towne Medium>. It ended up in my /Users/XXXX... 
+directory as C<EnglishTowne.ttf>.
+
+You don't need to change anything in the registry, just look. You I<do> have 
+the capability to change things, including hiding/showing the font, if you 
+care to get into those things.
+
 =back
 
 =head3 CJK Fonts
@@ -1729,10 +1893,23 @@ in landscape mode)
 I have found some code that should allow the C<image_jpeg> or C<image> routine
 to auto-rotate to (supposedly) the correct orientation, by looking for the Exif
 metadata "Orientation" tag in the file. However, three problems arise: 
-B<1)> if a photo has been edited, and rotated or flipped in the process, there is no guarantee that the Orientation tag has been corrected. 
-B<2)> more than one Orientation tag may exist (e.g., in the binary APP1/Exif header, I<and> in XML data), and they may not agree with each other -- which should be used? 
-B<3)> the code would need to uncompress the raster data, swap and/or transpose rows and/or columns, and recompress the raster data for inclusion into the PDF. This is costly and error-prone.
+
+=over
+
+=item 1.
+
+If a photo has been edited, and rotated or flipped in the process, there is no guarantee that the Orientation tag has been corrected. 
+
+=item 2.
+
+More than one Orientation tag may exist (e.g., in the binary APP1/Exif header, I<and> in XML data), and they may not agree with each other -- which should be used? 
+
+=item 3.
+
+The code would need to uncompress the raster data, swap and/or transpose rows and/or columns, and recompress the raster data for inclusion into the PDF. This is costly and error-prone.
 In any case, the user would need to be able to override any auto-rotate function.
+
+=back
 
 For the time being, PDF::Builder will simply leave it up to the user of the
 library to take care of rotating and/or flipping an image which displays 
@@ -1792,6 +1969,9 @@ it is available, unless explicitly told not to. Your code can test whether
 Graphics::TIFF is available by examining C<< $tiff->usesLib() >> or
 C<< $pdf->LA_GT() >>.
 
+Note that the first query is only available once the C<$tiff> object has been
+created. This may or may not be too late for your purposes.
+
 =over
 
 =item = -1 
@@ -1835,6 +2015,9 @@ PDF::Builder will use the Image::PNG::Libpng support library for PNG functions,
 if it is available, unless explicitly told not to. Your code can test whether
 Image::PNG::Libpng is available by examining C<< $png->usesLib() >> or
 C<< $pdf->LA_IPL() >>.
+
+Note that the first query is only available once the C<$png> object has been
+created. This may or may not be too late for your purposes.
 
 =over
 
@@ -1970,13 +2153,21 @@ means of one of the following:
 
 =over
 
-=item B<axs> is a value to be I<substituted> for 'ax' (points)
+=item B<axs> 
 
-=item B<axsp> is a I<substituted> value (I<percentage>) of the original 'ax'
+is a value to be I<substituted> for 'ax' (points)
 
-=item B<axr> I<reduces> 'ax' by the value (points). If negative, increase 'ax'
+=item B<axsp> 
 
-=item B<axrp> I<reduces> 'ax' by the given I<percentage>. Again, negative increases 'ax'
+is a I<substituted> value (I<percentage>) of the original 'ax'
+
+=item B<axr> 
+
+I<reduces> 'ax' by the value (points). If negative, increase 'ax'
+
+=item B<axrp> 
+
+I<reduces> 'ax' by the given I<percentage>. Again, negative increases 'ax'
 
 =back
 
@@ -2014,6 +2205,207 @@ Currently, C<textHS()> can only handle a single text string. We are looking at
 how fitting to a line length (splitting up an array) could be done, as well as 
 how words might be split on hard and soft hyphens. At some point, full paragraph
 and page shaping could be possible.
+
+=head2 MARKUP
+
+This section documents the markup capabilities of the C<column()> method.
+It is expected to be updated over time as more functionality is added.
+
+A certain flavor of I<Markdown> is supported, as translated by the 
+Text::Markdown package into HTML. That I<HTML> (and more, as direct input), 
+along with a subset of CSS, is 
+supported by C<column()>. This is I<not> the full Markdown or HTML languages, 
+by any stretch of the imagination, so check before using! Also, a small I<none> 
+markup which only does paragraphs (separated by empty lines) is provided.
+
+In all markup cases, certain CSS settings can be given as parameters or options
+to the C<column()> call, including a CSS <style> section which applies to both
+'none' and Markdown source input.
+
+=head3 Other input formats
+
+PDF::Builder currently only supports the markup languages described above.
+If you want to use something else (e.g., Perl's POD, or I<man> format, or even 
+MS Word or some other WYSIWYG format), you will need to find a converter 
+utility to convert it to a supported flavor of Markdown or HTML. Many such 
+converters already exist, so take a look (although you may well have to do some 
+cleanup before C<column()> accepts it). 
+
+Perhaps in the future, PDF::Builder will directly support additional formats, 
+but no promises. You will probably never see TeX/LaTeX input, as these already 
+have excellent PDF output (and would be a massive undertaking to process).
+
+=head3 Current HTML/Markdown supported
+
+=over
+
+=item * 
+
+B<<iE<gt>> and B<<emE<gt>> tags (Markdown B<_>, B<*>) as italic font style
+
+=item * 
+
+B<<bE<gt>> and B<<strongE<gt>> tags (Markdown B<**>) as bold font weight
+
+=item * 
+
+B<<pE<gt>> tag (Markdown empty line) as a paragraph
+
+=item * 
+
+B<<font face="font-family" color="color" size="font-size"E<gt>> as selecting face, color and size
+
+=item * 
+
+B<<spanE<gt>> needs style= attribute with CSS to do anything useful
+
+=item * 
+
+B<<ulE<gt>> tag (Markdown B<->) unordered (bulleted) list. type to override marker supported
+
+=item * 
+
+B<<olE<gt>> tag (Markdown B<1.>) ordered (numbered) list. start and type supported.
+
+=item * 
+
+B<<liE<gt>> tag list item. value to override ordered list counter, and type to override marker type supported
+
+=item * 
+
+B<<a href="URL"E<gt>> tag (Markdown B<[]()>) anchor/link, web page URL or this document target C<#p[-x-y[-z]]>
+
+=item * 
+
+B<<h1E<gt>> through B<<h6E<gt>> tags (Markdown B<#> through B<######>) headings
+
+=item * 
+
+B<<hr width="length" size="length"E<gt>> tag (Markdown B<--->) horizontal rule. currently no B<align> property (left alignment only). Default is C<width> = full column, and C<size> = 0.5pt.
+
+=item * 
+
+B<<sE<gt>>, B<<strikeE<gt>>, B<<delE<gt>> tags (Markdown B<~~>) text line-through
+
+=item * 
+
+B<<uE<gt>>, B<<insE<gt>> tags text underline
+
+=item * 
+
+B<<blockquoteE<gt>> tag (Markdown B<E<gt>>) indented both sides block of smaller text
+
+=back
+
+I<Numbered> (decimal and hexadecimal) entities are supported, as well as I<named> entities (e.g., C<E<amp>mdash;>). Both lists get a "gutter" (for the marker) of I<marker_width> points wide, so list formats are consistent over the call.
+
+=head3 Current CSS supported
+
+Note that the default CSS also applies to Markdown, unless you give a C<style =E<gt>> entry to the column() call to revise the CSS.
+
+In HTML, you can define B<<styleE<gt>> tags, but B<caution:> these are pulled out into a global style block (cumulative and global, as though they had all been given in the B<<headE<gt>>), applied after the CSS property defaults are defined and then any column() global C<style =E<gt> 'CSS list'> has been applied.
+
+CSS Selectors are very primitive:: a simple tag name (including B<body>), such as B<ol>; a class name such as B<.error>; or an ID such as B<#myID>. There are no hierarchies or combinations supported (e.g., nothing like B<p.abstract> or B<li E<gt> p>). The (decreasing) order of precedence follows a browser's: in a B<style => attribute, as a tag attribute (which may have a different name from the CSS's), an ID, a class, or a tag name. Comments /* and */ are B<NOT> currently supported in CSS.
+
+=over
+
+=item color
+
+foreground color, in standard PDF::Builder formats
+
+=item display 
+
+I<inline> or I<block>
+
+=item font-family
+
+as defined to Font Manager, e.g., I<Times>
+
+=item font-size
+
+I<n> points, I<n>pt, I<n%> of current font size. more units in future
+
+=item font-style
+
+I<normal> or I<italic>
+
+=item font-weight
+
+I<normal> or I<bold>
+
+=item height
+
+I<n> points or I<n>pt, thickness/size of horizontal rule B<ONLY>
+
+=item list-style-position
+
+I<outside> or I<inside>, currently only I<outside> supported
+
+=item list-style-typemarker 
+
+description, per standard CSS, plus "box" for unordered list to give a box outline marker (not a filled "square")
+
+=item margin-top/right/bottom/left
+
+per standard CSS. combined B<margin> in the future
+
+=item _marker-before
+
+I<extension>: text to insert before ordered list marker
+
+=item _marker-after
+
+I<extension>: text to insert after ordered list marker
+
+=item text-decoration
+
+per standard CSS
+
+=item text-height
+
+change leading, ratio of baseline-to-baseline to font size. future: set as a length or % of font size
+
+=item text-indent
+
+paragraph etc. indentation, I<n> points, I<npt>, I<n%> of font size
+
+=item width
+
+I<n> point or, I<npt>, width of horizontal rule B<ONLY>
+
+=back
+
+=head3 Global Settings
+
+There are a number of global settings either required or available for tuning the behavior of C<column()>. In the parameter list you can set
+
+=over
+
+=item font_size
+
+default initial font size (points) to be used, but can be overridden by CSS or C<<font sizeE<gt>>. Initially C<12>.
+
+=item leading
+
+default leading (text-height) ratio. Initially C<1.125>.
+
+=item marker_width
+
+points, set width of gutter where a list's marker goes. Initially C<2 * <font sizeE<gt>>.
+
+=item para
+
+list of indentation (text-indent) and inter-paragraph spacing (margin-top), both in points. These are the defaults for all formatting modes, unless overridden by a style => entry. Initially C<[ <font sizeE<gt>, 0 ]>.
+
+=item color
+
+initial text and graphics color setting, in standard PDF::Builder formats. Initially C<'black'>.
+
+=item style
+
+CSS declarations to be applied after CSS properties initialization and before any global <style> tags, Initially C<''>.
+
+=back
 
 =cut
 

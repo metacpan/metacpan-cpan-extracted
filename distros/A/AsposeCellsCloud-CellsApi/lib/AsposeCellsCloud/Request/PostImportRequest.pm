@@ -59,7 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostImportRequest.File : File to upload   
+# PostImportRequest.File : The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
+# PostImportRequest.outFormat : The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
+# PostImportRequest.password : The password needed to open an Excel file.  ,
+# PostImportRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.  ,
+# PostImportRequest.region : The regional settings for workbook.   
 
 {
     my $params = {
@@ -70,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_import' } = { 
-    	summary => 'Import data into excel file.',
+    	summary => 'Import data into an Excel file and generate output files in various formats.',
         params => $params,
         returns => 'FilesResult',
     };
@@ -96,7 +100,21 @@ sub run_http_request {
     }
     $header_params->{'Content-Type'} = $client->select_header_content_type('multipart/form-data');
  
- 
+    if(defined $self->out_format){
+        $query_params->{'outFormat'} = $client->to_query_value($self->out_format);      
+    }
+
+    if(defined $self->password){
+        $query_params->{'password'} = $client->to_query_value($self->password);      
+    }
+
+    if(defined $self->check_excel_restriction){
+        $query_params->{'checkExcelRestriction'} = $client->to_query_value($self->check_excel_restriction);      
+    }
+
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
+    } 
     my $_body_data;
  
 
@@ -120,7 +138,35 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'File to upload',
+     	description => 'The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)',
+     	format => '',
+     	read_only => '',
+     		},
+     'out_format' => {
+     	datatype => 'string',
+     	base_name => 'outFormat',
+     	description => 'The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)',
+     	format => '',
+     	read_only => '',
+     		},
+     'password' => {
+     	datatype => 'string',
+     	base_name => 'password',
+     	description => 'The password needed to open an Excel file.',
+     	format => '',
+     	read_only => '',
+     		},
+     'check_excel_restriction' => {
+     	datatype => 'string',
+     	base_name => 'checkExcelRestriction',
+     	description => 'Whether check restriction of excel file when user modify cells related objects.',
+     	format => '',
+     	read_only => '',
+     		},
+     'region' => {
+     	datatype => 'string',
+     	base_name => 'region',
+     	description => 'The regional settings for workbook.',
      	format => '',
      	read_only => '',
      		},    
@@ -128,7 +174,11 @@ __PACKAGE__->method_documentation({
 
 
 __PACKAGE__->attribute_map( {
-    'file' => 'File' 
+    'file' => 'File',
+    'out_format' => 'outFormat',
+    'password' => 'password',
+    'check_excel_restriction' => 'checkExcelRestriction',
+    'region' => 'region' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

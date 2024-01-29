@@ -41,6 +41,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
     "Data::Sah::Filter::perl::Re::re_from_str" => 0,
     "Exporter" => "5.57",
+    "File::Basename" => 0,
     "File::Copy::Recursive" => 0,
     "File::HomeDir" => 0,
     "File::Util::Sort" => 0,
@@ -63,7 +64,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -80,6 +81,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
   "Data::Sah::Filter::perl::Re::re_from_str" => 0,
   "Exporter" => "5.57",
+  "File::Basename" => 0,
   "File::Copy::Recursive" => 0,
   "File::HomeDir" => 0,
   "File::Spec" => 0,

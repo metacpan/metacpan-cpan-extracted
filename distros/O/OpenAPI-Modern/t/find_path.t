@@ -37,6 +37,7 @@ $openapi_preamble
 paths: {}
 YAML
 
+  # start line is missing "HTTP/1.1"
   my $request = HTTP::Request->new(GET => 'http://example.com/', [ Host => 'example.com' ]);
   ok(!$openapi->find_path(my $options = { request => $request }),
     'find_path returns false');

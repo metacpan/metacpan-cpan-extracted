@@ -1,12 +1,13 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres.pm
-## Version v0.5.0
+## Version v1.0.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/03/24
+## Modified 2023/11/17
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -20,9 +21,9 @@ BEGIN
     use parent qw( DB::Object );
     use version;
     use vars qw(
-        $VERSION $CACHE_QUERIES $CACHE_SIZE $CACHE_TABLE $CONNECT_VIA $DB_ERRSTR 
+        $VERSION $CACHE_QUERIES $CACHE_SIZE $CONNECT_VIA $DB_ERRSTR 
         @DBH $DEBUG $ERROR $MOD_PERL $USE_BIND $USE_CACHE
-        $PLACEHOLDER_REGEXP $DATATYPES
+        $PLACEHOLDER_REGEXP $DATATYPES_DICT $TABLE_CACHE
     );
     use DBI;
     eval
@@ -34,8 +35,436 @@ BEGIN
     use DateTime;
     use DateTime::Format::Strptime;
     use Module::Generic::DateTime;
+    our $TABLE_CACHE = {};
+    # the 'constant' property in the dictionary hash is added in structure()
+    # <https://www.postgresql.org/docs/13/datatype.html>
+    our $DATATYPES_DICT =
+    {
+        bit => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_BIT',
+            re => qr/^bit(?!>\s+varying)/,
+            type => 'bit',
+        },
+        bool => {
+            alias => [qw( boolean )],
+            constant => '',
+            is_array => 0,
+            name => 'PG_BOOL',
+            re => qr/^(boolean|bool)\b/,
+            type => 'bool',
+        },
+        box => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_BOX',
+            re => qr/^box\b/,
+            type => 'box',
+        },
+        bpchar => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_BPCHAR',
+            re => qr/^bpchar\b/,
+            type => 'bpchar',
+        },
+        bytea => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_BYTEA',
+            re => qr/^bytea\b/ ,
+            type => 'bytea',
+        },
+        # Even if the table field type is CHAR, we use PG_VARCHAR, because PG_CHAR is for a single character, and if we used it, it would truncate the data to one character.
+        # <https://github.com/bucardo/dbdpg/issues/103>
+        char => {
+            alias => [qw( character char )],
+            constant => '',
+            is_array => 0,
+            name => 'PG_VARCHAR',
+            re => qr/^(character|char)\b(?![[:blank:]]+varying)/,
+            type => 'char',
+        },
+        cid => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_CID',
+            re => qr/^cid\b/ ,
+            type => 'cid',
+        },
+        cidr => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_CIDR',
+            re => qr/^cidr\b/ ,
+            type => 'cidr',
+        },
+        circle => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_CIRCLE',
+            re => qr/^circle\b/,
+            type => 'circle',
+        },
+        cstring => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_CSTRING',
+            re => qr/^cstring\b/,
+            type => 'cstring',
+        },
+        date => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_DATE',
+            re => qr/^date\b/,
+            type => 'date',
+        },
+        # <https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-BUILTIN>
+        datemultirange => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_DATEMULTIRANGE',
+            re => qr/^(datemultirange)\b/,
+            type => 'datemultirange',
+        },
+        # <https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-BUILTIN>
+        daterange => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_DATERANGE',
+            re => qr/^(daterange)\b/,
+            type => 'daterange',
+        },
+        float4 => {
+            alias => [qw( real )],
+            constant => '',
+            is_array => 0,
+            name => 'PG_FLOAT4',
+            re => qr/^(real|float4)\b/,
+            type => 'float4',
+        },
+        float8 => {
+            alias => ['double', 'double precision'],
+            constant => '',
+            is_array => 0,
+            name => 'PG_FLOAT8',
+            re => qr/^(double precision|float8)\b/,
+            type => 'float8',
+        },
+        inet => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_INET',
+            re => qr/^inet\b/,
+            type => 'inet',
+        },
+        int2vector => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_INT2VECTOR',
+            re => qr/^(int2vector)\b/,
+            type => 'int2vector',
+        },
+        int2 => {
+            alias => [qw( smallint smallserial serial2 )],
+            constant => '',
+            is_array => 0,
+            name => 'PG_INT2',
+            re => qr/^(smallint|int2|smallserial|serial2)\b/,
+            type => 'int2',
+        },
+        int4 => {
+            alias => [qw( integer int serial serial4 )],
+            constant => '',
+            is_array => 0,
+            name => 'PG_INT4',
+            re => qr/^(integer|int|int4|serial|serial4)\b/,
+            type => 'int4',
+        },
+        # <https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-BUILTIN>
+        int4multirange => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_INT4MULTIRANGE',
+            re => qr/^(int4multirange)\b/,
+            type => 'int4multirange',
+        },
+        int4range => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_INT4RANGE',
+            re => qr/^(int4range)\b/,
+            type => 'int4range',
+        },
+        int8 => {
+            alias => [qw( bigint bigserial serial8 )],
+            constant => '',
+            is_array => 0,
+            name => 'PG_INT8',
+            re => qr/^(bigint|int8|bigserial|serial8)\b/,
+            type => 'int8',
+        },
+        # <https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-BUILTIN>
+        int8multirange => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_INT8MULTIRANGE',
+            re => qr/^(int8multirange)\b/,
+            type => 'int8multirange',
+        },
+        int8range => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_INT8RANGE',
+            re => qr/^(int8range)\b/,
+            type => 'int8range',
+        },
+        interval => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_INTERVAL',
+            re => qr/^interval\b/,
+            type => 'interval',
+        },
+        json => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_JSON',
+            re => qr/^json\b/,
+            type => 'json',
+        },
+        jsonb => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_JSONB',
+            re => qr/^jsonb\b/,
+            type => 'jsonb',
+        },
+        # <https://www.postgresql.org/docs/current/datatype-json.html#DATATYPE-JSONPATH>
+        jsonpath => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_JSONPATH',
+            re => qr/^jsonpath\b/,
+            type => 'jsonpath',
+        },
+        line => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_LINE',
+            re => qr/^line\b/,
+            type => 'line',
+        },
+        lseg => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_LSEG',
+            re => qr/^lseg\b/,
+            type => 'lseg',
+        },
+        macaddr => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_MACADDR',
+            re => qr/^macaddr\b/,
+            type => 'macaddr',
+        },
+        macaddr8 => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_MACADDR8',
+            re => qr/^macaddr8\b/,
+            type => 'macaddr8',
+        },
+        money => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_MONEY',
+            re => qr/^money\b/,
+            type => 'money',
+        },
+        numeric => {
+            alias => [qw( decimal )],
+            constant => '',
+            is_array => 0,
+            name => 'PG_NUMERIC',
+            re => qr/^(numeric|decimal)\b/,
+            type => 'numeric',
+        },
+        # <https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-BUILTIN>
+        nummultirange => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_NUMMULTIRANGE',
+            re => qr/^(nummultirange)\b/,
+            type => 'nummultirange',
+        },
+        # <https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-BUILTIN>
+        numrange => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_NUMRANGE',
+            re => qr/^(numrange)\b/,
+            type => 'numrange',
+        },
+        oid => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_OID',
+            re => qr/^(oid)\b/,
+            type => 'oid',
+        },
+        path => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_PATH',
+            re => qr/^path\b/,
+            type => 'path',
+        },
+        pg_lsn => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_PG_LSN',
+            re => qr/^pg_lsn\b/,
+            type => 'pg_lsn',
+        },
+        point => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_POINT',
+            re => qr/^point\b/,
+            type => 'point',
+        },
+        polygon => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_POLYGON',
+            re => qr/^polygon\b/,
+            type => 'polygon',
+        },
+        text => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_TEXT',
+            re =>  qr/^text\b/,
+            type => 'text',
+        },
+        time => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_TIME',
+            re => qr/^time(\([^\)]+\))?\s+without\s+time\s+zone/,
+            type => 'time',
+        },
+        timestamp => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_TIMESTAMP',
+            re => qr/^timestamp(\([^\)]+\))?\s+without\s+time\s+zone/,
+            type => 'timestamp',
+        },
+        timestamptz => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_TIMESTAMPTZ',
+            re => qr/^(timestamp(\([^\)]+\))?\s+with\s+time\s+zone)|timestamptz/,
+            type => 'timestamptz',
+        },
+        timetz => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_TIMETZ',
+            re => qr/^(time(\([^\)]+\))?\s+with\s+time\s+zone)|timetz/,
+            type => 'timetz',
+        },
+        # <https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-BUILTIN>
+        tsmultirange => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_TSMULTIRANGE',
+            re => qr/^tsmultirange\b/,
+            type => 'tsmultirange',
+        },
+        tsquery => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_TSQUERY',
+            re => qr/^tsquery\b/,
+            type => 'tsquery',
+        },
+        # <https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-BUILTIN>
+        tsrange => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_TSRANGE',
+            re => qr/^tsrange\b/,
+            type => 'tsrange',
+        },
+        # <https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-BUILTIN>
+        tstzmultirange => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_TSTZMULTIRANGE',
+            re => qr/^tstzmultirange\b/,
+            type => 'tstzmultirange',
+        },
+        # <https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-BUILTIN>
+        tstzrange => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_TSTZRANGE',
+            re => qr/^tstzrange\b/,
+            type => 'tstzrange',
+        },
+        tsvector => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_TSVECTOR',
+            re => qr/^tsvector\b/,
+            type => 'tsvector',
+        },
+        txid_snapshot => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_TXID_SNAPSHOT',
+            re => qr/^txid_snapshot\b/,
+            type => 'txid_snapshot',
+        },
+        uuid => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_UUID',
+            re => qr/^uuid\b/,
+            type => 'uuid',
+        },
+        varbit => {
+            alias => ['bit varying'],
+            constant => '',
+            is_array => 0,
+            name => 'PG_VARBIT',
+            re => qr/^(bit\s+varying|varbit)\b/,
+            type => 'varbit',
+        },
+        varchar => {
+            alias => [qw( varchar ), 'character varying'],
+            constant => '',
+            is_array => 0,
+            name => 'PG_VARCHAR',
+            re => qr/^(character varying|varchar)\b/,
+            type => 'varchar',
+        },
+        xml => {
+            constant => '',
+            is_array => 0,
+            name => 'PG_XML',
+            re => qr/^xml\b/,
+            type => 'xml',
+        },
+    };
     our $PLACEHOLDER_REGEXP = qr/(?:\?|\$(?<index>\d+))/;
-    our $VERSION = 'v0.5.0';
+    our $VERSION = 'v1.0.0';
     use Devel::Confess;
 };
 
@@ -61,7 +490,75 @@ if( $INC{ 'Apache/DBI.pm' } &&
     $CONNECT_VIA = "Apache::DBI::connect";
     $MOD_PERL++;
 }
-our $DATATYPES = {};
+foreach my $type ( keys( %$DATATYPES_DICT ) )
+{
+    if( CORE::exists( $DATATYPES_DICT->{ $type }->{alias} ) && 
+        ref( $DATATYPES_DICT->{ $type }->{alias} ) eq 'ARRAY' &&
+        scalar( @{$DATATYPES_DICT->{ $type }->{alias}} ) )
+    {
+        foreach my $alias ( @{$DATATYPES_DICT->{ $type }->{alias}} )
+        {
+            next if( CORE::exists( $DATATYPES_DICT->{ $alias } ) );
+            $DATATYPES_DICT->{ $alias } = $DATATYPES_DICT->{ $type };
+        }
+    }
+}
+
+my $keys = $DBD::Pg::EXPORT_TAGS{pg_types};
+my @constants_to_ignore = qw(
+    PG_ASYNC PG_OLDQUERY_CANCEL PG_OLDQUERY_WAIT PG_ACLITEM PG_ACLITEMARRAY PG_ANY
+    PG_ANYARRAY PG_ANYCOMPATIBLE PG_ANYCOMPATIBLEARRAY PG_ANYCOMPATIBLEMULTIRANGE
+    PG_ANYCOMPATIBLENONARRAY PG_ANYCOMPATIBLERANGE PG_ANYELEMENT PG_ANYENUM PG_ANYMULTIRANGE
+    PG_ANYNONARRAY PG_ANYRANGE PG_EVENT_TRIGGER PG_FDW_HANDLER PG_GTSVECTOR
+    PG_GTSVECTORARRAY PG_INDEX_AM_HANDLER PG_INTERNAL PG_LANGUAGE_HANDLER PG_NAME
+    PG_NAMEARRAY PG_OIDVECTOR PG_OIDVECTORARRAY PG_PG_ATTRIBUTE PG_PG_ATTRIBUTEARRAY
+    PG_PG_BRIN_BLOOM_SUMMARY PG_PG_BRIN_MINMAX_MULTI_SUMMARY PG_PG_CLASS PG_PG_CLASSARRAY
+    PG_PG_DDL_COMMAND PG_PG_DEPENDENCIES PG_PG_MCV_LIST PG_PG_NDISTINCT PG_PG_NODE_TREE
+    PG_PG_PROC PG_PG_PROCARRAY PG_PG_SNAPSHOT PG_PG_SNAPSHOTARRAY PG_PG_TYPE
+    PG_PG_TYPEARRAY PG_RECORD PG_RECORDARRAY PG_REFCURSOR PG_REFCURSORARRAY PG_REGCLASS
+    PG_REGCLASSARRAY PG_REGCOLLATION PG_REGCOLLATIONARRAY PG_REGCONFIG PG_REGCONFIGARRAY
+    PG_REGDICTIONARY PG_REGDICTIONARYARRAY PG_REGNAMESPACE PG_REGNAMESPACEARRAY PG_REGOPER
+    PG_REGOPERARRAY PG_REGOPERATOR PG_REGOPERATORARRAY PG_REGPROC PG_REGPROCARRAY
+    PG_REGPROCEDURE PG_REGPROCEDUREARRAY PG_REGROLE PG_REGROLEARRAY PG_REGTYPE
+    PG_REGTYPEARRAY PG_TABLE_AM_HANDLER PG_TID PG_TIDARRAY PG_TRIGGER PG_TSM_HANDLER
+    PG_UNKNOWN PG_VOID PG_XID PG_XID8 PG_XID8ARRAY PG_XIDARRAY
+);
+foreach my $c ( @$keys )
+{
+    next if( scalar( grep( /^$c$/, @constants_to_ignore ) ) );
+    if( $c =~ /^PG_(\w+)$/ )
+    {
+        my $type = lc( $1 );
+        my $is_array = 0;
+        if( substr( $type, -5 ) eq 'array' )
+        {
+            $is_array++;
+            $type = substr( $type, 0, ( length( $type ) - 5 ) );
+        }
+        my $code = \&{"DBD::Pg::$c"};
+        my $val = $code->();
+        if( !CORE::exists( $DATATYPES_DICT->{ $type } ) )
+        {
+            warn( "Unknown PostgreSQL constant DBD::Pg::${c}" ) if( DB::Object::Postgres->_is_warnings_enabled( 'DB::Object' ) );
+            next;
+        }
+        elsif( $is_array )
+        {
+            my $copy = {};
+            my $keys = [keys( %{$DATATYPES_DICT->{ $type }} )];
+            @$copy{ @$keys } = @{$DATATYPES_DICT->{ $type }}{ @$keys };
+            $copy->{type} = "${type}array";
+            $copy->{name} = $c;
+            $copy->{constant} = $val;
+            $copy->{re} = qr/^(${type}array)\b/;
+            $copy->{is_array} = $is_array;
+            $DATATYPES_DICT->{ "${type}array" } = $copy;
+            next;
+        }
+        $DATATYPES_DICT->{ $type }->{is_array} = $is_array;
+        $DATATYPES_DICT->{ $type }->{constant} = $val;
+    }
+}
 
 # sub new is inherited from DB::Object
 sub init
@@ -234,8 +731,7 @@ sub create_db
 {
     my $self = shift( @_ );
     my $name = shift( @_ ) || return( $self->error( "No database name to create was provided." ) );
-    my $opts = {};
-    $opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
+    my $opts = $self->_get_args_as_hash( @_ );
     my $params = [];
     # https://www.postgresql.org/docs/9.5/sql-createdatabase.html
     push( @$params, sprintf( 'OWNER=%s', $opts->{owner} ) ) if( $opts->{owner} );
@@ -319,25 +815,9 @@ sub create_table
 
 # sub data_type
 
-sub datatypes
-{
-    my $self = shift( @_ );
-    unless( scalar( keys( %$DATATYPES ) ) )
-    {
-        my $keys = $DBD::Pg::EXPORT_TAGS{pg_types};
-        foreach my $c ( @$keys )
-        {
-            if( $c =~ /^PG_(\w+)$/ )
-            {
-                my $type = $1;
-                my $code = \&{"DBD::Pg::$c"};
-                my $val = $code->();
-                $DATATYPES->{ $type } = $val;
-            }
-        }
-    }
-    return( $DATATYPES );
-}
+# NOTE: sub datatype_dict is inherited
+
+# NOTE: sub datatypes is in inherited
 
 # sub database
 
@@ -438,7 +918,21 @@ sub get_sql_type
 {
     my $self = shift( @_ );
     my $type = shift( @_ ) || return( $self->error( "No sql type was provided to get its constant." ) );
-    my $const = $self->{dbh}->can( "DBD::Pg::PG_\U${type}\E" );
+    $type = lc( $type );
+    if( CORE::exists( $DATATYPES_DICT->{ $type } ) &&
+        $type ne $DATATYPES_DICT->{ $type }->{type} )
+    {
+        $type = $DATATYPES_DICT->{ $type }->{type};
+    }
+    my $const;
+    if( substr( $type, 0, 3 ) eq 'pg_' )
+    {
+        $const = $self->{dbh}->can( "DBD::Pg::\U${type}\E" );
+    }
+    else
+    {
+        $const = $self->{dbh}->can( "DBD::Pg::PG_\U${type}\E" );
+    }
     return( '' ) if( !defined( $const ) );
     return( $const->() );
 }
@@ -1048,7 +1542,7 @@ sub _check_default_option
 {
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
-    return( $self->error( "Provided option is not a hash reference." ) ) if( !$self->_is_hash( $opts ) );
+    return( $self->error( "Provided option is not a hash reference." ) ) if( !$self->_is_hash( $opts => 'strict' ) );
     $opts->{client_encoding} = 'utf8' if( !CORE::exists( $opts->{client_encoding} ) );
     # Enabled but with auto-guess
     $opts->{pg_enable_utf8} = -1 if( !CORE::exists( $opts->{pg_enable_utf8} ) && ( $opts->{client_encoding} eq 'utf8' || $opts->{client_encoding} eq 'utf-8' ) );
@@ -1071,7 +1565,7 @@ sub _connection_parameters
 {
     my $self  = shift( @_ );
     my $param = shift( @_ );
-    my $core = [qw( db login passwd host port driver database schema server opt uri debug cache_connections unknown_field )];
+    my $core = [qw( db login passwd host port driver database schema server opt uri debug cache_connections cache_table unknown_field )];
     my @pg_params = grep( /^pg_/, keys( %$param ) );
     # See DBD::mysql for the list of valid parameters
     # E.g.: mysql_client_found_rows, mysql_compression mysql_connect_timeout mysql_write_timeout mysql_read_timeout mysql_init_command mysql_skip_secure_auth mysql_read_default_file mysql_read_default_group mysql_socket mysql_ssl mysql_ssl_client_key mysql_ssl_client_cert mysql_ssl_ca_file mysql_ssl_ca_path mysql_ssl_cipher mysql_local_infile mysql_multi_statements mysql_server_prepare mysql_server_prepare_disable_fallback mysql_embedded_options mysql_embedded_groups mysql_conn_attrs 
@@ -1187,7 +1681,6 @@ sub _convert_json2hash
     {
         if( $types->[$i] eq PG_JSON || $types->[$i] eq PG_JSONB || $types->[$i] eq 'json' || $types->[$i] eq 'jsonb' )
         {
-            # if( $mode eq 'ARRAY' )
             if( $self->_is_array( $data ) )
             {
                 for( my $j = 0; $j < scalar( @$data ); $j++ )
@@ -1197,8 +1690,7 @@ sub _convert_json2hash
                     $data->[ $j ]->{ $names->[ $i ] } = $ref if( $ref );
                 }
             }
-            # elsif( $mode eq 'HASH' )
-            elsif( $self->_is_hash( $data ) )
+            elsif( $self->_is_hash( $data => 'strict' ) )
             {
                 my $ref = $self->_decode_json( $data->{ $names->[ $i ] } );
                 $data->{ $names->[ $i ] } = $ref if( $ref );
@@ -1408,7 +1900,7 @@ DB::Object::Postgres - SQL API
     
 =head1 VERSION
 
-    v0.5.0
+    v1.0.0
 
 =head1 DESCRIPTION
 
@@ -1442,27 +1934,27 @@ You can specify the following parameters:
 
 =over 4
 
-=item I<cache_connections>
+=item * C<cache_connections>
 
 See L<DB::Object/connect> for more information
 
-=item I<database>
+=item * C<database>
 
 The database name you wish to connect to
 
-=item I<login>
+=item * C<login>
 
 The login used to access that database
 
-=item I<password>
+=item * C<password>
 
 The password that goes along
 
-=item I<server>
+=item * C<server>
 
 The server, that is hostname of the machine serving a SQL server.
 
-=item I<driver>
+=item * C<driver>
 
 The driver you want to use. It needs to be of the same type than the server you want to connect to. If you are connecting to a MySQL server, you would use C<mysql>, if you would connecto to an Oracle server, you would use C<oracle>.
 
@@ -1486,271 +1978,271 @@ Valid attributes are:
 
 =over 4
 
-=item I<ActiveKids>
+=item * C<ActiveKids>
 
 Is read-only.
 
-=item I<AutoCommit>
+=item * C<AutoCommit>
 
 Can be changed.
 
-=item I<AutoInactiveDestroy>
+=item * C<AutoInactiveDestroy>
 
 Can be changed.
 
-=item I<CachedKids>
+=item * C<CachedKids>
 
 Is read-only.
 
-=item I<ChildHandles>
+=item * C<ChildHandles>
 
 Is read-only.
 
-=item I<ChopBlanks>
+=item * C<ChopBlanks>
 
 Can be changed.
 
-=item I<CursorName>
+=item * C<CursorName>
 
 Is read-only.
 
-=item I<Driver>
+=item * C<Driver>
 
 Is read-only.
 
-=item I<ErrCount>
+=item * C<ErrCount>
 
 Can be changed.
 
-=item I<Executed>
+=item * C<Executed>
 
 Is read-only.
 
-=item I<FetchHashKeyName>
+=item * C<FetchHashKeyName>
 
 Can be changed.
 
-=item I<HandleError>
+=item * C<HandleError>
 
 Can be changed.
 
-=item I<HandleSetErr>
+=item * C<HandleSetErr>
 
 Can be changed.
 
-=item I<InactiveDestroy>
+=item * C<InactiveDestroy>
 
 Can be changed.
 
-=item I<Kids>
+=item * C<Kids>
 
 Is read-only.
 
-=item I<NAME>
+=item * C<NAME>
 
 Is read-only.
 
-=item I<NULLABLE>
+=item * C<NULLABLE>
 
 Is read-only.
 
-=item I<NUM_OF_FIELDS>
+=item * C<NUM_OF_FIELDS>
 
 Is read-only.
 
-=item I<NUM_OF_PARAMS>
+=item * C<NUM_OF_PARAMS>
 
 Is read-only.
 
-=item I<Name>
+=item * C<Name>
 
 Is read-only.
 
-=item I<PRECISION>
+=item * C<PRECISION>
 
 Is read-only.
 
-=item I<PrintError>
+=item * C<PrintError>
 
 Can be changed.
 
-=item I<PrintWarn>
+=item * C<PrintWarn>
 
 Can be changed.
 
-=item I<Profile>
+=item * C<Profile>
 
 Can be changed.
 
-=item I<RaiseError>
+=item * C<RaiseError>
 
 Can be changed.
 
-=item I<ReadOnly>
+=item * C<ReadOnly>
 
 Can be changed.
 
 Specifies if the current database connection should be in read-only mode or not.
 
-=item I<RowCacheSize>
+=item * C<RowCacheSize>
 
 Is read-only.
 
-=item I<RowsInCache>
+=item * C<RowsInCache>
 
 Is read-only.
 
-=item I<SCALE>
+=item * C<SCALE>
 
 Is read-only.
 
-=item I<ShowErrorStatement>
+=item * C<ShowErrorStatement>
 
 Can be changed.
 
-=item I<Statement>
+=item * C<Statement>
 
 Is read-only.
 
-=item I<TYPE>
+=item * C<TYPE>
 
 Is read-only.
 
-=item I<Taint>
+=item * C<Taint>
 
 Can be changed.
 
-=item I<TaintIn>
+=item * C<TaintIn>
 
 Can be changed.
 
-=item I<TaintOut>
+=item * C<TaintOut>
 
 Can be changed.
 
-=item I<TraceLevel>
+=item * C<TraceLevel>
 
 Can be changed.
 
-=item I<Type>
+=item * C<Type>
 
 Can be changed.
 
-=item I<Username>
+=item * C<Username>
 
 Is read-only.
 
-=item I<Warn>
+=item * C<Warn>
 
 Can be changed.
 
-=item I<pg_INV_READ>
+=item * C<pg_INV_READ>
 
 Is read-only.
 
-=item I<pg_INV_WRITE>
+=item * C<pg_INV_WRITE>
 
 Is read-only.
 
-=item I<pg_async_status>
+=item * C<pg_async_status>
 
 Is read-only.
 
-=item I<pg_bool_tf>
+=item * C<pg_bool_tf>
 
 Can be changed.
 
 If true, boolean values will be returned as the characters 't' and 'f' instead of '1' and '0'.
 
-=item I<pg_db>
+=item * C<pg_db>
 
 Is read-only.
 
-=item I<pg_default_port>
+=item * C<pg_default_port>
 
 Is read-only.
 
-=item I<pg_enable_utf8>
+=item * C<pg_enable_utf8>
 
 Can be changed.
 
-=item I<pg_errorlevel>
+=item * C<pg_errorlevel>
 
 Can be changed.
 
 Valid entries are 0, 1 and 2
 
-=item I<pg_expand_array>
+=item * C<pg_expand_array>
 
 Can be changed.
 
-=item I<pg_host>
+=item * C<pg_host>
 
 Is read-only.
 
-=item I<pg_lib_version>
+=item * C<pg_lib_version>
 
 Is read-only.
 
-=item I<pg_options>
+=item * C<pg_options>
 
 Is read-only.
 
-=item I<pg_pass>
+=item * C<pg_pass>
 
 Is read-only.
 
-=item I<pg_pid>
+=item * C<pg_pid>
 
 Is read-only.
 
-=item I<pg_placeholder_dollaronly>
+=item * C<pg_placeholder_dollaronly>
 
 Can be changed.
 
 When true, question marks inside of statements are not treated as placeholders, e.g. geometric operators
 
-=item I<pg_placeholder_nocolons>
+=item * C<pg_placeholder_nocolons>
 
 Can be changed.
 
 When true, colons inside of statements are not treated as placeholders
 
-=item I<pg_port>
+=item * C<pg_port>
 
 Is read-only.
 
-=item I<pg_prepare_now>
+=item * C<pg_prepare_now>
 
 Can be changed.
 
-=item I<pg_protocol>
+=item * C<pg_protocol>
 
 Is read-only.
 
-=item I<pg_server_prepare>
+=item * C<pg_server_prepare>
 
 Can be changed.
 
 Indicates if L<DBD::Pg> should attempt to use server-side prepared statements. On by default
 
-=item I<pg_server_version>
+=item * C<pg_server_version>
 
 Is read-only.
 
-=item I<pg_socket>
+=item * C<pg_socket>
 
 Is read-only.
 
-=item I<pg_standard_conforming_strings>
+=item * C<pg_standard_conforming_strings>
 
 Is read-only.
 
-=item I<pg_switch_prepared>
+=item * C<pg_switch_prepared>
 
 Can be changed.
 
-=item I<pg_user>
+=item * C<pg_user>
 
 Is read-only.
 
@@ -1786,55 +2278,55 @@ Possible options are:
 
 =over 4
 
-=item I<allowcon>
+=item * C<allowcon>
 
 Sets the C<ALLOW_CONNECTIONS> attribute
 
 "If false then no one can connect to this database. The default is true, allowing connections."
 
-=item I<connlimit>
+=item * C<connlimit>
 
 Sets the C<CONNECTION LIMIT> attribute
 
 "How many concurrent connections can be made to this database. -1 (the default) means no limit."
 
-=item I<encoding>
+=item * C<encoding>
 
 Sets the C<ENCODING> attribute
 
 "Character set encoding to use in the new database."
 
-=item I<lc_collate>
+=item * C<lc_collate>
 
 Sets the C<LC_COLLATE> attribute
 
 "Collation order (LC_COLLATE) to use in the new database."
 
-=item I<lc_ctype>
+=item * C<lc_ctype>
 
 Sets the C<LC_CTYPE> attribute
 
 "Character classification (LC_CTYPE) to use in the new database."
 
-=item I<istemplate>
+=item * C<istemplate>
 
 Sets the C<IS_TEMPLATE> attribute
 
 "If true, then this database can be cloned by any user with CREATEDB privileges; if false (the default), then only superusers or the owner of the database can clone it."
 
-=item I<owner>
+=item * C<owner>
 
 Sets the C<OWNER> attribute
 
 "The role name of the user who will own the new database"
 
-=item I<tablespace>
+=item * C<tablespace>
 
 Sets the C<TABLESPACE> attribute
 
 "The name of the tablespace that will be associated with the new database"
 
-=item I<template>
+=item * C<template>
 
 Sets the C<TEMPLATE> attribute
 
@@ -1855,6 +2347,12 @@ The sql script is executed using L<DB::Object/do> and the returned value is retu
 =head2 databases
 
 Returns a list of all available databases.
+
+=head2 datatype_dict
+
+Returns an hash reference of each data type with their equivalent C<constant>, regular expression (C<re>), constant C<name> and C<type> name.
+
+Each data type is an hash with the following properties for each type: C<constant>, C<name>, C<re>, C<type>
 
 =head2 datatypes
 
@@ -1977,11 +2475,11 @@ It accepts the following options:
 
 =over 4
 
-=item I<anywhere>
+=item * C<anywhere>
 
 If true, this will search anywhere.
 
-=item I<schema>
+=item * C<schema>
 
 A database schema.
 
@@ -2001,11 +2499,11 @@ Optional parameters are:
 
 =over 4
 
-=item I<anywhere>
+=item * C<anywhere>
 
 If true, it will search anywhere.
 
-=item I<schema>
+=item * C<schema>
 
 A database schema.
 
@@ -2019,19 +2517,19 @@ Information retrieved from the PostgreSQL system tables for every table found in
 
 =over 4
 
-=item I<name>
+=item * C<name>
 
 The object name
 
-=item I<owner>
+=item * C<owner>
 
 The object owner (role)
 
-=item I<schema>
+=item * C<schema>
 
 Database schema, if any.
 
-=item I<type>
+=item * C<type>
 
 The object type, which may be one of: C<table>, C<view>, C<materialized view>, C<special>, C<foreign table>
 
@@ -2096,11 +2594,11 @@ Possible parameters are:
 
 =over 4
 
-=item I<data>
+=item * C<data>
 
 An hash reference of data typically returned from a L<DBD::Pg/fetchrow_hashref>
 
-=item I<statement>
+=item * C<statement>
 
 This is the statement from which to check for columns
 
@@ -2116,11 +2614,11 @@ Possible parameters are:
 
 =over 4
 
-=item I<data>
+=item * C<data>
 
 An hash reference of data typically returned from a L<DBD::Pg/fetchrow_hashref>
 
-=item I<statement>
+=item * C<statement>
 
 This is the statement from which to check for columns
 

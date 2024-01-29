@@ -50,7 +50,6 @@ my @files = (
     't/114_init_arg.t',
     't/zzz-check-breaks.t',
     'xt/author/00-compile.t',
-    'xt/author/changes_has_content.t',
     'xt/author/clean-namespaces.t',
     'xt/author/distmeta.t',
     'xt/author/eol.t',

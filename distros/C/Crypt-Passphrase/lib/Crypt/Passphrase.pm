@@ -1,5 +1,5 @@
 package Crypt::Passphrase;
-$Crypt::Passphrase::VERSION = '0.016';
+$Crypt::Passphrase::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -36,6 +36,7 @@ sub import {
 			Carp::croak("Unknown import argument $arg");
 		}
 	}
+	return;
 }
 
 sub _load_extension {
@@ -128,16 +129,15 @@ sub verify_password {
 	return 0;
 }
 
+sub recode_hash {
+	my ($self, @args) = @_;
+	return $self->{encoder}->recode_hash(@args);
+}
+
 sub curry_with_hash {
 	my ($self, $hash) = @_;
 	require Crypt::Passphrase::PassphraseHash;
 	return Crypt::Passphrase::PassphraseHash->new($self, $hash);
-}
-
-sub curry_with_password {
-	my ($self, $password) = @_;
-	my $hash = $self->hash_password($password);
-	return $self->curry_with_hash($hash);
 }
 
 1;
@@ -156,7 +156,7 @@ Crypt::Passphrase - A module for managing passwords in a cryptographically agile
 
 =head1 VERSION
 
-version 0.016
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -165,13 +165,13 @@ version 0.016
      validators => [ 'Bcrypt', 'SHA1::Hex' ],
  );
 
- my ($hash) = $dbh->selectrow_array("SELECT password FROM users WHERE name = ?", {}, $user);
+ my ($hash) = $dbh->selectrow_array("SELECT password_hash FROM users WHERE name = ?", {}, $user);
  if (!$authenticator->verify_password($password, $hash)) {
      die "Invalid password";
  }
  elsif ($authenticator->needs_rehash($hash)) {
      my $new_hash = $authenticator->hash_password($password);
-     $dbh->do("UPDATE users SET password = ? WHERE name = ?", {}, $new_hash, $user);
+     $dbh->do("UPDATE users SET password_hash = ? WHERE name = ?", {}, $new_hash, $user);
  }
 
 =head1 DESCRIPTION
@@ -182,9 +182,14 @@ Note that this module doesn't depend on any backend, your application will have 
 
 =head1 METHODS
 
-=head2 new(%args)
+=head2 new
 
-This creates a new C<Crypt::Passphrase> object. It takes two named arguments:
+ Crypt::Passphrase->new(%args
+     encoder    => 'Bcrypt',
+     validators => [ 'SHA1::Hex' ],
+ )
+
+This creates a new C<Crypt::Passphrase> object. It takes three named arguments:
 
 =over 4
 
@@ -216,29 +221,43 @@ This argument is mandatory.
 
 This is a list of additional validators for passwords. These values can each either be the same an encoder value, except that the last entry may also be a coderef that takes the password and the hash as its arguments and returns a boolean value.
 
-The encoder is always considered as a validator and thus doesn't need to be explicitly specified.
+This argument is optional and defaults to an empty list. The encoder is always considered as a validator and thus doesn't need to be specified.
 
 =item * normalization
 
-This sets the unicode normalization form used for the password. Valid values are C<'C'> (the default), C<'D'>, C<'KC'> and C<'KD'>. You should probably not change this unless it's necessary for compatibility with something else, you should definitely not change this on an existing database as that will break passwords affected by normalization.
+This sets the unicode normalization form used for the password. Valid values are C<'C'> (composed; the the default), C<'D'> (decomposed), C<'KC'> (legacy composed) and C<'KD'> (legacy decomposed). You should probably not change this unless it's necessary for compatibility with something else, you should definitely not change this on an existing database as that will break passwords affected by normalization.
 
 =back
 
-=head2 hash_password($password)
+=head2 hash_password
 
-This will hash a password with the encoder cipher, and return it (in crypt format). This will generally use a salt, and as such will return a different value each time even when called with the same password.
+ $passphrase->hash_password($password)
 
-=head2 verify_password($password, $hash)
+This will hash a C<$password> with the encoder cipher, and return it (in crypt format). This will generally use a salt, and as such will return a different value each time even when called with the same password.
 
-This will check a password satisfies a certain hash.
+=head2 verify_password
 
-=head2 needs_rehash($hash)
+ $passphrase->verify_password($password, $hash)
+
+This will check a C<$password> satisfies a certain C<$hash> and returns success or not. It will always return false if C<$hash> isn't defined.
+
+=head2 needs_rehash
+
+ $passphrase->needs_rehash($hash)
 
 This will check if a hash needs to be rehashed, either because it's in the wrong cipher or because the parameters are insufficient.
 
 Calling this only ever makes sense after a password has been verified.
 
-=head2 curry_with_hash($hash)
+=head2 recode_hash
+
+ $passphrase->recode_hash($hash)
+
+This recodes a hash if possible. This is mainly relevant when upgrading to a new pepper, but can also be relevant when a cipher has multiple known encodings (e.g. scrypt).
+
+=head2 curry_with_hash
+
+ $passphrase->curry_with_hash($hash)
 
 This creates a C<Crypt::Passphrase::PassphraseHash> object for the hash, effectively currying C<Crypt::Passphrase> with that hash. This can be useful for plugging C<Crypt::Passphrase> into some frameworks (e.g. ORMs) that require a singular object to contain everything you need to match passwords against.
 
@@ -256,7 +275,7 @@ C<Crypt::Passphrase> considers passwords to be text, and as such you should ensu
 
 =head2 DOS attacks
 
-Hashing passwords is by its nature a heavy operations. It can be abused by malignant actors who want to try to DOS your application. It may be wise to do some form of DOS protection such as a proof-of-work schemei or a captcha.
+Hashing passwords is by its nature a heavy operations. It can be abused by malignant actors who want to try to DOS your application. It may be wise to do some form of DOS protection such as a proof-of-work scheme or a captcha.
 
 =head2 Levels of security
 
@@ -296,11 +315,17 @@ A first-generation memory-hard algorithm, Argon2 is recommended instead if you w
 
 Your system's C<crypt> implementation. Support for various algorithms varies between platforms and platform versions, and while on some platforms it's a good backend one should not rely on this for a portable result.
 
+=item * L<Crypt::Passphrase::Argon2::AES|Crypt::Passphrase::Argon2::AES>
+
+A peppering implementation that AES encrypts an argon2 hash. Recommended when wanting to pepper with argon2 as it allows offline repeppering and offers strong cryptographic guarantees.
+
 =item * L<Crypt::Passphrase::Pepper::Simple|Crypt::Passphrase::Pepper::Simple>
 
-A meta-encoder that adds peppering to your passwords by pre-hashing the inputs.
+A meta-encoder that adds peppering to your passwords by pre-hashing the inputs. Recommended when wanting to pepper with hashes other than argon2 as it can be combined with any encoder.
 
 =back
+
+Additionally, the following integrations are supported
 
 =head1 INTEGRATIONS
 
@@ -320,7 +345,7 @@ A number of integrations of Crypt::Passphrase exist:
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

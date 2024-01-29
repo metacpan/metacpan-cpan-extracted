@@ -5,9 +5,7 @@ use warnings;
 
 use Future::AsyncAwait 0.47;
 
-use Test::More;
-use Test::Fatal;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use Tangence::Constants;
 use Tangence::Registry;
@@ -40,7 +38,7 @@ my $objproxy = $client->rootobj;
 
    ok( defined $mdef, 'defined $mdef' );
    is( $mdef->name, "method", '$mdef->name' );
-   is_deeply( [ $mdef->argtypes ], [ TYPE_INT, TYPE_STR ], '$mdef->argtypes' );
+   is( [ $mdef->argtypes ], [ TYPE_INT, TYPE_STR ], '$mdef->argtypes' );
    is( $mdef->ret, TYPE_STR, '$mdef->ret' );
 
    my $f = $objproxy->call_method( method => 10, "hello" );
@@ -48,7 +46,7 @@ my $objproxy = $client->rootobj;
    ok( $f->is_ready, '$f ready after MSG_RESULT' );
    is( scalar await $f, "10/hello", 'result of call_method()' );
 
-   ok( exception { $objproxy->call_method( no_such_method => 123 )->get },
+   ok( dies { $objproxy->call_method( no_such_method => 123 )->get },
       'Calling no_such_method fails in proxy'
    );
 }
@@ -59,7 +57,7 @@ my $objproxy = $client->rootobj;
 
    ok( defined $edef, 'defined $edef' );
    is( $edef->name, "event", '$edef->event' );
-   is_deeply( [ $edef->argtypes ], [ TYPE_INT, TYPE_STR ], '$edef->argtypes' );
+   is( [ $edef->argtypes ], [ TYPE_INT, TYPE_STR ], '$edef->argtypes' );
 
    my $event_i;
    my $event_s;
@@ -77,9 +75,9 @@ my $objproxy = $client->rootobj;
 
    $objproxy->unsubscribe_event( "event" );
 
-   ok( exception { $objproxy->subscribe_event( "no_such_event",
-                    on_fire => sub {},
-                  )->get; },
+   ok( dies { $objproxy->subscribe_event( "no_such_event",
+                 on_fire => sub {},
+              )->get; },
       'Subscribing to no_such_event fails in proxy'
    );
 }
@@ -142,7 +140,7 @@ my $objproxy = $client->rootobj;
 
    $objproxy->unwatch_property( "scalar" );
 
-   ok( exception { $objproxy->get_property( "no_such_property" )->get },
+   ok( dies { $objproxy->get_property( "no_such_property" )->get },
       'Getting no_such_property fails in proxy'
    );
 }
@@ -166,17 +164,17 @@ my $objproxy = $client->rootobj;
    my ( $idx, @more ) = await $cursor->next_forward;
 
    is( $idx, 0, 'next_forward starts at element 0' );
-   is_deeply( \@more, [ 1 ], 'next_forward yielded 1 element' );
+   is( \@more, [ 1 ], 'next_forward yielded 1 element' );
 
    ( $idx, @more ) = await $cursor->next_forward( 5 );
 
    is( $idx, 1, 'next_forward starts at element 1' );
-   is_deeply( \@more, [ 2, 3 ], 'next_forward yielded 2 elements' );
+   is( \@more, [ 2, 3 ], 'next_forward yielded 2 elements' );
 
    ( $idx, @more ) = await $cursor->next_backward;
 
    is( $idx, 2, 'next_backward starts at element 2' );
-   is_deeply( \@more, [ 3 ], 'next_forward yielded 1 element' );
+   is( \@more, [ 3 ], 'next_forward yielded 1 element' );
 }
 
 # Smashed Properties

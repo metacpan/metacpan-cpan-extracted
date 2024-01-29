@@ -1,4 +1,5 @@
 Changes
+CITATION.cff
 examples/fives.pl
 examples/README
 INSTALL.SKIP
@@ -7,12 +8,12 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-README.md
 README.pod
 t/load.t
 t/pod.t
 t/pod_coverage.t
 t/test_manifest
 xt/changes.t
+xt/citation.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

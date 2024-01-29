@@ -1,6 +1,6 @@
 package Map::Tube::Node;
 
-$Map::Tube::Node::VERSION   = '3.68';
+$Map::Tube::Node::VERSION   = '3.69';
 $Map::Tube::Node::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Node - Class to represent the station in the map.
 
 =head1 VERSION
 
-Version 3.68
+Version 3.69
 
 =cut
 
@@ -93,7 +93,7 @@ Returns ref to a list of objects of type L<Map::Tube::Line>.
 
 =head1 AUTHOR
 
-Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
+Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
@@ -135,7 +135,7 @@ L<https://metacpan.org/dist/Map-Tube/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 - 2016 Mohammad S Anwar.
+Copyright (C) 2010 - 2024 Mohammad Sajid Anwar.
 
 This program is free software;you can  redistribute it and/or modify it under the
 terms of the the Artistic License(2.0). You may obtain a copy of the full license

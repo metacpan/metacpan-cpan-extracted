@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sbp - Package for language Sangu
 
 package Locale::CLDR::Locales::Sbp;
 # This file auto generated from Data\common\main\sbp.xml
-#	on Tue  5 Dec  1:30:02 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'Ishiyakani',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Andola',
  			'AE' => 'Wutwa wa shiyalabu',
@@ -217,7 +217,6 @@ has 'display_name_region' => (
  			'MD' => 'Molidova',
  			'MG' => 'Bukini',
  			'MH' => 'Figunguli ifya Malishali',
- 			'MK' => 'Masedoniya',
  			'ML' => 'Mali',
  			'MM' => 'Muyama',
  			'MN' => 'Mongoliya',
@@ -333,7 +332,7 @@ has 'characters' => (
 			auxiliary => qr{[q r x z]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'S', 'T', 'U', 'V', 'W', 'Y'],
 			main => qr{[a b c d e f g h i j k l m n o p s t u v w y]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT

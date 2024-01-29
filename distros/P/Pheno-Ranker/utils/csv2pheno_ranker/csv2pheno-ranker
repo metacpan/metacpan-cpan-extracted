@@ -5,15 +5,16 @@
 #   1 - Input file (JSON array of objects)
 #   2 - Configuration file (needed for Pheno-Ranker)
 #
-#   Last Modified: Jul/30/2023
+#   Last Modified: Dec/15/2023
 #
-#   Version 0.00
+#   $VERSION taken from Pheno::Ranker
 #
-#   Copyright (C) 2023 Manuel Rueda - CNAG (manuel.rueda@cnag.crg.eu)
+#   Copyright (C) 2023-2024 Manuel Rueda - CNAG (manuel.rueda@cnag.eu)
 #
 #   License: Artistic License 2.0
 #
 #   If this program helps you in your research, please cite.
+
 use strict;
 use warnings;
 use Getopt::Long qw(:config no_ignore_case);
@@ -26,7 +27,7 @@ exit;
 
 sub process_csv {
 
-    my $VERSION = '0.00';
+    my $VERSION = '0.04';
 
     # Reading arguments
     GetOptions(
@@ -43,9 +44,10 @@ sub process_csv {
     pod2usage(1)                              if $help;
     pod2usage( -verbose => 2, -exitval => 0 ) if $man;
     pod2usage(
-        -message => "Please specify a valid input with --i <file.csv>\n",
+        -message =>
+          "Please specify a valid CSV|TSV input with --i <file.csv>\n",
         -exitval => 1
-    ) unless ( $input && $input =~ m/\.csv/ && -f $input );
+    ) unless ( $input && $input =~ m/\.csv|\.tsv/ && -f $input );
     pod2usage(
         -message => "Please specify a --primary-key <my_string>\n",
         -exitval => 1
@@ -77,7 +79,7 @@ use Data::Dumper;
 use Path::Tiny;
 use File::Basename;
 use Scalar::Util qw(looks_like_number);
-use YAML::XS     qw(LoadFile DumpFile);
+use YAML::XS qw(LoadFile DumpFile);
 use JSON::XS;
 use Text::CSV_XS;
 
@@ -143,7 +145,7 @@ sub read_csv {
     # Create a Text::CSV object with semicolon as the separator
     my $csv =
       Text::CSV_XS->new(
-        { binary => 1, sep_char => $sep // ',', auto_diag => 1 } );
+        { binary => 1, sep_char => define_separator($input, $sep), auto_diag => 1 } );
 
     # Open filehandle
     open my $fh, '<', $input;
@@ -248,7 +250,7 @@ sub create_config {
     if ( scalar @arrays ) {
 
         # NB: Can't use $array more than once in the hash ref below. Need to deref
-        $config->{array_terms}       = [@arrays];
+        $config->{array_terms} = [@arrays];
 
         # @non_arrays, @arrays are sorted, but if we merge them we need to re-sort
         $config->{allowed_terms}     = [ sort @non_arrays, @arrays ];
@@ -265,6 +267,26 @@ sub create_config {
     return $config;
 }
 
+sub define_separator {
+
+    my ( $filepath, $sep ) = @_;
+
+    # Define split record separator from file extension
+    my @exts = qw(.csv .tsv);
+    my ( $undef, undef, $ext ) = fileparse( $filepath, @exts );
+
+    # Defining separator character
+    my $separator =
+        defined($sep)  ? $sep
+      : $ext eq '.csv' ? ','
+      :                          # Use comma for csv files
+      $ext eq '.tsv' ? "\t" :    # Use tab for tsv files
+      ',';                       # Default to comma if no extension match or $sep is undefined
+
+    # Return separator
+    return $separator;
+}
+
 1;
 
 =head1 NAME
@@ -275,8 +297,10 @@ csv2pheno-ranker: A script to convert a CSV to an input suitable for Pheno-Ranke
 
 csv2pheno-ranker -i <input.csv> [-options]
 
-     Options:
+     Arguments:
        -i|input                       CSV file
+
+     Options:
        -primary-key                   Name of the field that you want to use as identifier (MUST BE NON-ARRAY)
        -sep|separator                 Delimiter character for CSV files [;] e.g., --sep $'\t'
        -set-primary-key               To force inserting a primary key (in case your CSV does not have one). The name will be set with --primary-key
@@ -339,7 +363,7 @@ B<Examples:>
 
 =head1 AUTHOR 
 
-Written by Manuel Rueda, PhD. Info about CNAG can be found at L<https://www.cnag.crg.eu>.
+Written by Manuel Rueda, PhD. Info about CNAG can be found at L<https://www.cnag.eu>.
 
 =head1 COPYRIGHT AND LICENSE
 

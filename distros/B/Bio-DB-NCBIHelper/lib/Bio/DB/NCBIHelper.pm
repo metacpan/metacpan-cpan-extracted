@@ -85,7 +85,7 @@ preceded with a _
 # Let the code begin...
 
 package Bio::DB::NCBIHelper;
-$Bio::DB::NCBIHelper::VERSION = '1.7.7';
+$Bio::DB::NCBIHelper::VERSION = '1.7.8';
 use strict;
 
 use Bio::DB::Query::GenBank;

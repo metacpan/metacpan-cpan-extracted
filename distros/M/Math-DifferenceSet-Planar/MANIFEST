@@ -6,6 +6,7 @@ Makefile.PL
 README
 examples/A333852.pl
 examples/A353077.pl
+examples/numlist_deltas
 examples/numlist_sort
 examples/pds_canonize
 examples/pds_databases
@@ -32,7 +33,6 @@ examples/pds_sample
 examples/pds_sort_elements
 examples/pds_translate
 examples/pds_verify
-examples/random_pds
 lib/Math/DifferenceSet/Planar.pm
 lib/Math/DifferenceSet/Planar/Computation.pod
 lib/Math/DifferenceSet/Planar/Data.pm

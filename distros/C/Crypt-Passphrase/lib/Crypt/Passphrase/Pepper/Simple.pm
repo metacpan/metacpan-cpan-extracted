@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Pepper::Simple;
-$Crypt::Passphrase::Pepper::Simple::VERSION = '0.016';
+$Crypt::Passphrase::Pepper::Simple::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -23,7 +23,6 @@ sub new {
 	my $peppers = $args{peppers} or croak('No peppers given');
 	$args{active} //= (sort {; no warnings 'numeric'; $b <=> $a || $b cmp $a } keys %{ $peppers })[0];
 	$args{algorithm} //= 'sha512-hmac';
-	$args{supported_hashes} //= [ keys %algorithms ];
 
 	return $class->SUPER::new(%args);
 }
@@ -33,6 +32,11 @@ sub prehash_password {
 	my $secret = $self->{peppers}{$id} or croak "No such pepper $id";
 	my $func = $algorithms{$algorithm} or croak "No such algorithm $algorithm";
 	return $func->($password, $secret);
+}
+
+sub supported_hashes {
+	my $self = shift;
+	return keys %algorithms;
 }
 
 1;
@@ -51,17 +55,14 @@ Crypt::Passphrase::Pepper::Simple - A pepper-wrapper for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.016
+version 0.019
 
 =head1 SYNOPSIS
 
  my $passphrase = Crypt::Passphrase->new(
      encoder => {
-         module => 'Pepper::Simple',
-         inner => {
-             module      => 'Argon2',
-             output_size => 32,
-         },
+         module  => 'Pepper::Simple',
+         inner   => 'Bcrypt',
          peppers => {
              1 => pack('H*', '0123456789ABCDEF...'),
              2 => pack('H*', 'FEDCBA9876543210...'),
@@ -75,21 +76,19 @@ This module wraps another encoder to pepper the input to the hash. By using iden
 
 It will be able to validate both peppered and unpeppered hashes.
 
-=head1 METHODS
+=head1 CONFIGURATION
 
-=head2 new(%args)
-
-This creates a new pepper encoder. It takes the following named arguments:
+It takes the following configuration arguments:
 
 =over 4
 
 =item * inner
 
-This contains an encoder specification identical to the C<encoder> field of C<Crypt::Passphrase>. It is mandatory.
+This contains an encoder specification identical to the C<encoder> field of C<Crypt::Passphrase>. C<It is mandatory>.
 
 =item * peppers
 
-This is a map of identifier to pepper value. The identifiers should be (probably small) numbers, the values should be random binary strings that are long enough to not be brute-forcable (the output size of the hash is a good choice).
+This is a map of identifier to pepper value. The identifiers should be (probably small) numbers, the values should be random binary strings that are long enough to not be brute-forcable (the output size of the hash is a good choice). B<This is mandatory>.
 
 =item * active
 
@@ -101,13 +100,13 @@ This is the algorithm that's used for peppering. Supported values are C<'sha1-hm
 
 =back
 
-=head2 prehash_password($password, $algorithm, $identifier)
+=head2 Supported types
 
-This prehashes the C<$password> using the given C<$algorithm> and C<$identifier>.
+The supported peppered types are a the inner encoders types cross joined with the algorithms with C<"-pepper-"> (e.g. C<"argon2id-pepper-sha512-hmac">), as well as the underlaying types themselves (e.g. C<"argon2id">.
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

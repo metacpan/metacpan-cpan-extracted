@@ -4,7 +4,7 @@ use warnings;
 
 package Neo4j::Error::Internal;
 # ABSTRACT: Neo4j exception thrown locally by the driver
-$Neo4j::Error::Internal::VERSION = '0.01';
+$Neo4j::Error::Internal::VERSION = '0.02';
 
 use parent 'Neo4j::Error';
 

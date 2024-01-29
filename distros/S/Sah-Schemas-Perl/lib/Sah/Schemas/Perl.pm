@@ -3,9 +3,9 @@
 package Sah::Schemas::Perl;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2023-10-26'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.048'; # VERSION
+our $VERSION = '0.049'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to Perl
@@ -22,7 +22,7 @@ Sah::Schemas::Perl - Sah schemas related to Perl
 
 =head1 VERSION
 
-This document describes version 0.048 of Sah::Schemas::Perl (from Perl distribution Sah-Schemas-Perl), released on 2023-01-19.
+This document describes version 0.049 of Sah::Schemas::Perl (from Perl distribution Sah-Schemas-Perl), released on 2023-10-26.
 
 =head1 SAH SCHEMAS
 
@@ -60,6 +60,12 @@ Perl distribution name, defaults to "this distribution".
 See L<App::ThisDist>'s C<this_dist()> for more details on how "this
 distribution" is determined. Note that C<App::ThisDist> is not added as
 dependency automatically; you will have to add it manually.
+
+Note: be careful when using this schema for actions that are destructive to a
+Perl dist or that change some things, because a user can perform those actions
+without giving an argument (e.g. a C<delete-dist> script). It is safer to use
+this schema to perform a non=destructive action (e.g. C<ls-dist>) and/or
+operate in dry-run mode by default.
 
 
 =item * L<perl::distname_with_optional_ver|Sah::Schema::perl::distname_with_optional_ver>
@@ -201,6 +207,12 @@ Perl module, defaults to "this module".
 See L<App::ThisDist>'s C<this_mod()> for more details on how "this module" is
 determined. Note that C<App::ThisDist> is not added as dependency automatically;
 you will have to add it manually.
+
+Note: be careful when using this schema for actions that are destructive to a
+Perl module or that change some things, because a user can perform those actions
+without giving an argument (e.g. a C<delete-module> script). It is safer to use
+this schema to perform a non=destructive action (e.g. C<man-module>) and/or
+operate in dry-run mode by default.
 
 
 =item * L<perl::modname::installed|Sah::Schema::perl::modname::installed>

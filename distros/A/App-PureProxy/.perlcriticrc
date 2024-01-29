@@ -1,0 +1,68 @@
+# local defaults for perlcritic
+theme = community
+severity = 3
+verbose  = [%s %p] %m at %f:%l:%c, near '%r'\n
+
+[-BuiltinFunctions::ProhibitSleepViaSelect]
+
+[-Community::DiscouragedModules]
+
+[ControlStructures::ProhibitCascadingIfElse]
+max_elsif = 5
+
+[ControlStructures::ProhibitDeepNests]
+max_nests = 6
+
+[-ErrorHandling::RequireCarping]
+
+[-InputOutput::RequireBriefOpen]
+
+[Modules::ProhibitExcessMainComplexity]
+max_mccabe = 30
+
+[NamingConventions::ProhibitAmbiguousNames]
+forbid = last set left right no abstract contract record second
+
+[RegularExpressions::ProhibitComplexRegexes]
+max_characters = 70
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 75
+
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 80
+
+[Subroutines::ProhibitManyArgs]
+max_arguments = 7
+
+[-Subroutines::ProhibitSubroutinePrototypes]
+
+[-Subroutines::ProhibitUnusedPrivateSubroutines]
+
+[Subroutines::RequireArgUnpacking]
+short_subroutine_statements = 2
+
+[-Subroutines::RequireFinalReturn]
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow = vars subs refs
+
+[TestingAndDebugging::ProhibitNoWarnings]
+allow = all
+
+[TestingAndDebugging::ProhibitProlongedStrictureOverride]
+statements = 12
+
+[-ValuesAndExpressions::ProhibitConstantPragma]
+
+[-ValuesAndExpressions::ProhibitFiletest_f]
+
+[-ValuesAndExpressions::ProhibitMixedBooleanOperators]
+
+[Variables::ProhibitPackageVars]
+add_packages = Carp Config Plack::Test
+
+[-Variables::RequireInitializationForLocalVars]
+
+[Variables::RequireLocalizedPunctuationVars]
+allow = $EGID %ENV $EUID %INC %SIG $UID

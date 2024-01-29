@@ -2,7 +2,7 @@ package Net::DNS::RR::DS;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: DS.pm 1909 2023-03-23 11:36:16Z willem $)[2];
+our $VERSION = (qw$Id: DS.pm 1957 2024-01-10 14:54:10Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -20,15 +20,11 @@ use Carp;
 use constant BABBLE => defined eval { require Digest::BubbleBabble };
 
 eval { require Digest::SHA };		## optional for simple Net::DNS RR
-eval { require Digest::GOST12 };
-eval { require Digest::GOST::CryptoPro };
 
 my %digest = (
 	'1' => scalar( eval { Digest::SHA->new(1) } ),
 	'2' => scalar( eval { Digest::SHA->new(256) } ),
-	'3' => scalar( eval { Digest::GOST::CryptoPro->new() } ),
 	'4' => scalar( eval { Digest::SHA->new(384) } ),
-	'5' => scalar( eval { Digest::GOST12->new() } ),
 	);
 
 
@@ -170,17 +166,14 @@ sub verify {
 
 {
 	my @digestbyname = (
-		'SHA-1'		    => 1,			# [RFC3658]
-		'SHA-256'	    => 2,			# [RFC4509]
-		'GOST-R-34.11-94'   => 3,			# [RFC5933]
-		'SHA-384'	    => 4,			# [RFC6605]
-		'GOST-R-34.11-2012' => 5,			# [RFC5933bis]
+		'SHA-1'		  => 1,				# [RFC3658]
+		'SHA-256'	  => 2,				# [RFC4509]
+		'GOST-R-34.11-94' => 3,				# [RFC5933]
+		'SHA-384'	  => 4,				# [RFC6605]
 		);
 
 	my @digestalias = (
 		'SHA'	 => 1,
-		'GOST94' => 3,
-		'GOST12' => 5,
 		);
 
 	my %digestbyval = reverse @digestbyname;

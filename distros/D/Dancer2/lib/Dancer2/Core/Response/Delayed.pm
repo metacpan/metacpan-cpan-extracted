@@ -1,6 +1,6 @@
 package Dancer2::Core::Response::Delayed;
 # ABSTRACT: Delayed responses
-$Dancer2::Core::Response::Delayed::VERSION = '1.0.0';
+$Dancer2::Core::Response::Delayed::VERSION = '1.1.0';
 use Moo;
 use Dancer2::Core::Types qw<CodeRef InstanceOf>;
 
@@ -64,7 +64,7 @@ Dancer2::Core::Response::Delayed - Delayed responses
 
 =head1 VERSION
 
-version 1.0.0
+version 1.1.0
 
 =head1 SYNOPSIS
 

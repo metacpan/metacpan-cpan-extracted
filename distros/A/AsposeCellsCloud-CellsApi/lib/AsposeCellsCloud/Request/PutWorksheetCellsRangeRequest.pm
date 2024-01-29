@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_cells_range' } = { 
-    	summary => 'Inserts a range of cells and shift cells according to the shift option.            ',
+    	summary => 'Inserts a range of cells and shift cells according to the shift option.',
         params => $params,
         returns => 'CellsCloudResponse',
     };

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Uz::Arab - Package for language Uzbek
 
 package Locale::CLDR::Locales::Uz::Arab;
 # This file auto generated from Data\common\main\uz_Arab.xml
-#	on Tue  5 Dec  1:37:31 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'fa' => 'دری',
@@ -66,7 +66,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AF' => 'افغانستان',
 
@@ -96,7 +96,7 @@ has 'characters' => (
 			auxiliary => qr{[‌‍‎‏ ټ ځ څ ډ ړ ږ ښ ګ ڼ ي ۍ ې]},
 			index => ['ء', 'آ', 'أ', 'ؤ', 'ئ', 'ا', 'ب', 'پ', 'ة', 'ت', 'ث', 'ټ', 'ج', 'چ', 'ح', 'خ', 'ځ', 'څ', 'د', 'ذ', 'ډ', 'ر', 'ز', 'ړ', 'ږ', 'ژ', 'س', 'ش', 'ښ', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ک', 'ګ', 'گ', 'ل', 'م', 'ن', 'ڼ', 'ه', 'و', 'ۇ', 'ۉ', 'ي', 'ی', 'ۍ', 'ې'],
 			main => qr{[ً ٌ ٍ َ ُ ِ ّ ْ ٔ ٰ ء آ أ ؤ ئ ا ب پ ة ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن ه و ۇ ۉ ی]},
-			numbers => qr{[‎ \- , ٫ ٬ . % ٪ ‰ ؉ + − 0۰ 1۱ 2۲ 3۳ 4۴ 5۵ 6۶ 7۷ 8۸ 9۹]},
+			numbers => qr{[‎ \- ‑ , ٫ ٬ . % ٪ ‰ ؉ + − 0۰ 1۱ 2۲ 3۳ 4۴ 5۵ 6۶ 7۷ 8۸ 9۹]},
 		};
 	},
 EOT
@@ -130,6 +130,7 @@ has 'number_symbols' => (
 			'exponential' => q(×۱۰^),
 			'group' => q(٬),
 			'percentSign' => q(٪),
+			'timeSeparator' => q(:),
 		},
 		'latn' => {
 			'decimal' => q(,),
@@ -317,8 +318,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'eras' => (

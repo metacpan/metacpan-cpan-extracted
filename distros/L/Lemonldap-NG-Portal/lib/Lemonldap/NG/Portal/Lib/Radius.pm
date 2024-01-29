@@ -4,7 +4,7 @@ use Authen::Radius;
 use strict;
 use Mouse;
 
-our $VERSION = '2.0.17';
+our $VERSION = '2.18.0';
 
 # INITIALIZATION
 
@@ -65,17 +65,20 @@ sub _get_radius {
         }
     }
 
+    my @server_list  = split /[,\s]+/, $self->radius_server;
+    my $first_server = $server_list[0];
     $self->logger->error( $self->modulename . ': connection to server failed' )
       unless (
         $self->radius(
             Authen::Radius->new(
-                Host   => $self->radius_server,
+                Host   => $first_server,
                 Secret => $self->radius_secret,
                 (
                     $self->radius_timeout
                     ? ( TimeOut => $self->radius_timeout )
                     : ()
                 ),
+                ( @server_list > 1 ? ( NodeList => \@server_list ) : () ),
             )
         )
       );
@@ -97,6 +100,15 @@ sub _check_pwd_radius {
         { Name => 4, Value => $nas || '127.0.0.1', Type => 'ipaddr' } );
     $radius->send_packet(Authen::Radius::ACCESS_REQUEST);
     my $rcv = $radius->recv_packet();
+
+    # Authen::Radius does not handle retrying automatically in
+    # failover scenarios
+    if ( $radius->get_error eq "ETIMEOUT" ) {
+        $self->logger->warn(
+            "Radius request has timed out, retrying on all configured hosts");
+        $radius->send_packet( Authen::Radius::ACCESS_REQUEST, 1 );
+        $rcv = $radius->recv_packet();
+    }
 
     unless ( defined($rcv) ) {
         $self->logger->error(

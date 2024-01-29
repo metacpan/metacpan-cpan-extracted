@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 31 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 32 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'TableData/AOA.pm',
@@ -39,6 +39,7 @@ my @module_files = (
     'TableDataRole/Source/DBI.pm',
     'TableDataRole/Source/Iterator.pm',
     'TableDataRole/Util/CSV.pm',
+    'TableDataRole/Util/GetRowByPos.pm',
     'TableDataRoles/Standard.pm'
 );
 

@@ -31,7 +31,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "1.22",
-            "Math::BigInt" : "1.99984",
+            "Math::BigInt" : "2.003001",
             "XSLoader" : "0.02",
             "perl" : "5.008"
          }
@@ -50,6 +50,6 @@
          "web" : "https://github.com/pjacklam/p5-Math-BigInt-GMP"
       }
    },
-   "version" : "1.6013",
+   "version" : "1.7001",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,3 +1,9 @@
+0.010   2024-01-16  Released-By: PERLANCAR; Urgency: medium
+
+        - [role PickItems::RandomPos] Handle the case of infinite number of
+          rows (get_item_count() returns -1).
+
+
 0.009   2023-08-26  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] roles

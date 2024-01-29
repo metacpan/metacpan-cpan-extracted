@@ -55,7 +55,8 @@ sub call {
         $trace = $caught_trace if $caught_trace;
     }
 
-    if ($trace && ($caught || ($self->force && ref $res eq 'ARRAY' && $res->[0] == 500)) ) {
+    # Use ref $trace to avoid overloaded as_string() for bool evaluation
+    if (ref $trace && ($caught || ($self->force && ref $res eq 'ARRAY' && $res->[0] == 500)) ) {
         my $text = $trace->as_string;
         my $html = $trace->as_html;
         $env->{'plack.stacktrace.text'} = $text;

@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetChartLegendRequest.name : The workbook name.  ,
+# GetWorksheetChartLegendRequest.name : The file name.  ,
 # GetWorksheetChartLegendRequest.sheetName : The worksheet name.  ,
 # GetWorksheetChartLegendRequest.chartIndex : The chart index.  ,
-# GetWorksheetChartLegendRequest.folder : Original workbook folder.  ,
-# GetWorksheetChartLegendRequest.storageName : Storage name.   
+# GetWorksheetChartLegendRequest.folder : The folder where the file is situated.  ,
+# GetWorksheetChartLegendRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_chart_legend' } = { 
-    	summary => 'Gets chart legend description in worksheet.',
+    	summary => 'Retrieve chart legend description in the worksheet.',
         params => $params,
         returns => 'LegendResponse',
     };
@@ -137,7 +137,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -158,14 +158,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

@@ -76,3 +76,5 @@ Revision history for Perl extension CGI::Upload
 1.13 2023.05.29
     - Add link to the git repository and to the GitHub issues.
 
+1.14 2023.12.28
+    - Cosmetic changes to make Perl Critic happier.

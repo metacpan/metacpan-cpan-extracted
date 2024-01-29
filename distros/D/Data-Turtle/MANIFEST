@@ -7,6 +7,7 @@ META.yml
 Makefile.PL
 README
 README.md
+cpanfile
 dist.ini
 eg/lindenmayer-gd
 eg/synopsis-gd

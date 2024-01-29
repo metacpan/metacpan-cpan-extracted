@@ -3,11 +3,14 @@
 
 requires "Carp" => "1.35";
 requires "DateTime::Format::ISO8601" => "0.08";
+requires "Digest::base" => "1.16";
 requires "Encode" => "3.19";
+requires "Future" => "0.47";
 requires "I18N::LangTags" => "0.45";
 requires "I18N::LangTags::Detect" => "1.08";
 requires "JSON" => "4.10";
 requires "LWP::UserAgent" => "6.68";
+requires "MIME::Base64" => "3.15";
 requires "Math::BigInt" => "1.999816";
 requires "URI" => "1.5";
 requires "URI::Escape" => "3.31";

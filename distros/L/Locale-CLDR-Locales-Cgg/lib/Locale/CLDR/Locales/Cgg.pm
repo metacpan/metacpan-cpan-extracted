@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Cgg - Package for language Chiga
 
 package Locale::CLDR::Locales::Cgg;
 # This file auto generated from Data\common\main\cgg.xml
-#	on Tue  5 Dec  1:04:44 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'Orukani',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Andora',
  			'AE' => 'Amahanga ga Buharabu ageeteereine',
@@ -216,7 +216,6 @@ has 'display_name_region' => (
  			'MD' => 'Moridova',
  			'MG' => 'Madagasika',
  			'MH' => 'Ebizinga bya Marshaa',
- 			'MK' => 'Masedoonia',
  			'ML' => 'Mari',
  			'MM' => 'Myanamar',
  			'MN' => 'Mongoria',

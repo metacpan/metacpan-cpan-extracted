@@ -100,6 +100,7 @@ t/45-importMetadata.t
 t/50-Combination-Parser.t
 t/60-Session-Cli.t
 t/60-U2F-Migrate.t
+t/70-User-Agent.t
 t/99-pod.t
 t/data/preview-all-test-metadata.xml
 t/TestPsgi.pm

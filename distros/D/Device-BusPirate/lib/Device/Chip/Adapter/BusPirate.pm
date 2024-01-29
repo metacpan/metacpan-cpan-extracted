@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2024 -- leonerd@leonerd.org.uk
 
-use v5.14;
-use Object::Pad 0.45;
+use v5.26;
+use warnings;
+use Object::Pad 0.800;
 
-package Device::Chip::Adapter::BusPirate 0.23;
+package Device::Chip::Adapter::BusPirate 0.24;
 class Device::Chip::Adapter::BusPirate;
 
 # Can't isa Device::Chip::Adapter because it doesn't have a 'new'
@@ -46,8 +47,8 @@ same named arguments as L<Device::BusPirate/new>.
 
 =cut
 
-has $_bp;
-has $_mode = undef;
+field $_bp;
+field $_mode = undef;
 
 BUILD ( %args )
 {
@@ -111,7 +112,7 @@ async method _enter_mode_I2C
    return $_mode;
 }
 
-has $_mutex;
+field $_mutex;
 
 async method make_protocol_I2C
 {
@@ -146,8 +147,8 @@ class
    use Carp;
    use List::Util qw( first );
 
-   has $_mode  :reader :param;
-   has $_mutex :reader :param = undef; # only required for I2C
+   field $_mode  :reader :param;
+   field $_mutex :reader :param = undef; # only required for I2C
 
    method sleep ( $timeout )
    {
@@ -215,7 +216,7 @@ class
 }
 
 class
-   Device::Chip::Adapter::BusPirate::_GPIO isa Device::Chip::Adapter::BusPirate::_base;
+   Device::Chip::Adapter::BusPirate::_GPIO :isa(Device::Chip::Adapter::BusPirate::_base);
 
 use List::Util 1.29 qw( pairmap );
 
@@ -237,7 +238,7 @@ async method read_gpios ( $gpios )
 }
 
 class
-   Device::Chip::Adapter::BusPirate::_SPI isa Device::Chip::Adapter::BusPirate::_base;
+   Device::Chip::Adapter::BusPirate::_SPI :isa(Device::Chip::Adapter::BusPirate::_base);
 
 use Carp;
 
@@ -283,13 +284,13 @@ method release_ss
 }
 
 class
-    Device::Chip::Adapter::BusPirate::_I2C isa Device::Chip::Adapter::BusPirate::_base;
+    Device::Chip::Adapter::BusPirate::_I2C :isa(Device::Chip::Adapter::BusPirate::_base);
 
 use Carp;
 
 my @I2C_SPEEDS = (qw( 400k 100k 50k 5k ));
 
-has $_addr;
+field $_addr;
 
 # TODO - addr ought to be a mount option somehow
 method configure ( %args )
@@ -338,7 +339,7 @@ async method write_then_read ( $write_bytes, $read_len )
    });
 }
 
-has $_txn_helper;
+field $_txn_helper;
 
 method txn ( $code )
 {
@@ -357,8 +358,8 @@ method txn ( $code )
 class
    Device::Chip::Adapter::BusPirate::_I2C::Txn {
 
-   has $_mode :param;
-   has $_addr :param;
+   field $_mode :param;
+   field $_addr :param;
 
    async method write ( $bytes )
    {
@@ -375,7 +376,7 @@ class
 }
 
 class
-   Device::Chip::Adapter::BusPirate::_UART isa Device::Chip::Adapter::BusPirate::_base;
+   Device::Chip::Adapter::BusPirate::_UART :isa(Device::Chip::Adapter::BusPirate::_base);
 
 use Carp;
 

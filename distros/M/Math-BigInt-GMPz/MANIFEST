@@ -48,6 +48,8 @@ xt/author/lib-arithmetic-ternary-_modpow.dat
 xt/author/lib-arithmetic-ternary-_modpow.t
 xt/author/lib-arithmetic-ternary-_rsft.dat
 xt/author/lib-arithmetic-ternary-_rsft.t
+xt/author/lib-arithmetic-unary-_clog10.t
+xt/author/lib-arithmetic-unary-_clog2.t
 xt/author/lib-arithmetic-unary-_dec.dat
 xt/author/lib-arithmetic-unary-_dec.t
 xt/author/lib-arithmetic-unary-_dfac.dat
@@ -56,6 +58,8 @@ xt/author/lib-arithmetic-unary-_fac.dat
 xt/author/lib-arithmetic-unary-_fac.t
 xt/author/lib-arithmetic-unary-_fib.dat
 xt/author/lib-arithmetic-unary-_fib.t
+xt/author/lib-arithmetic-unary-_ilog10.t
+xt/author/lib-arithmetic-unary-_ilog2.t
 xt/author/lib-arithmetic-unary-_inc.dat
 xt/author/lib-arithmetic-unary-_inc.t
 xt/author/lib-arithmetic-unary-_lucas.dat

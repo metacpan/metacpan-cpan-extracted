@@ -1,0 +1,21 @@
+
+ Games::Sudoku::PatternSolver - solve, generate and play standard 9x9 Sudoku.
+
+ A lesser-known approach to solving sudoku by use of distribution patterns. (POM / Pattern Overlay Method)
+ It is a recursive, nondeterministic, depth-first, backtracking way to tackle the 'Exact Cover Problem',
+ just like Donald Knuth described 'Algorithm X', but very different from the DLX implementation.
+ 
+ http://forum.enjoysudoku.com/new-solving-technique-i-think-t30444.html
+ In any standard 9x9 sudoku's solution, the positions of every single number end up in one of 46656 possible patterns.
+ The rules of the game, the number placing constraints, are inherently present in these patterns.
+ They have been pre-created and come as a binary file included with this distribution. 
+ 
+ By default, before the backtracking starts on a puzzle to solve, it is tried to fill more cells with some basic sudoku methods.
+ (Naked/hidden singles, locked sets and locked candidates)
+ This allows to roughly rate the puzzle's difficulty and speeds up the subsequent backtracking:   
+     
+ Solving the puzzle by patterns encompasses two phases:
+  1. depending on count and positions, every symbol is assigned a reduced set of pattern candidates, according to its givens (typically between 4 - 900)
+  2. in a backtracking process, candidates from all sets are tried to combine - inevitably leading to every solution possible
+
+ Steffen Heinrich, Jan. 2024

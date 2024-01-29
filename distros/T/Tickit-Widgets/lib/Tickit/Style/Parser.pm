@@ -1,15 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.66;
+use warnings;
+use Object::Pad 0.807;
 
-package Tickit::Style::Parser 0.55;
-class Tickit::Style::Parser
-   :isa(Parser::MGC)
-   :strict(params);
+package Tickit::Style::Parser 0.56;
+class Tickit::Style::Parser :strict(params);
+
+inherit Parser::MGC;
 
 # Identifiers can include hyphens
 use constant pattern_ident => qr/[A-Z0-9_-]+/i;

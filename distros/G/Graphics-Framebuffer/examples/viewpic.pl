@@ -11,11 +11,11 @@ use Time::HiRes qw(sleep time alarm);
 use Getopt::Long;
 
 BEGIN {
-	our $VERSION = '1.03';
-};
+    our $VERSION = '1.03';
+}
 
 # use Data::Dumper::Simple;$Data::Dumper::Sortkeys=1;
-exit(0) unless(scalar(@ARGV));
+exit(0) unless (scalar(@ARGV));
 my $file = $ARGV[-1];
 
 my $full     = TRUE;
@@ -27,18 +27,18 @@ my $dummy    = FALSE;
 
 GetOptions(
     'nofull'           => \$full,
-	'full'             => \$dummy,
+    'full'             => \$dummy,
     'wait=i'           => \$delay,
     'noclear'          => \$noclear,
     'alpha=i'          => \$alpha,
-	'ignore-x-windows' => \$ignore_x,
+    'ignore-x-windows' => \$ignore_x,
 );
 
 our $f = Graphics::Framebuffer->new(
     'SPLASH'           => FALSE,
     'SHOW_ERRORS'      => FALSE,
     'RESET'            => 1 - $noclear,
-	'IGNORE_X_WINDOWS' => $ignore_x,
+    'IGNORE_X_WINDOWS' => $ignore_x,
 );
 
 $SIG{'KILL'} = $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'HUP'} = sub { $f->text_mode(); exec('reset'); };
@@ -76,7 +76,7 @@ if (ref($image) eq 'ARRAY') {
     }
     $f->blit_write($image);
     sleep $delay if ($delay);
-}
+} ## end else [ if (ref($image) eq 'ARRAY')]
 
 =head1 NAME
 

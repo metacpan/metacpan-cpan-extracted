@@ -1,6 +1,6 @@
 package Tcl;
 
-$Tcl::VERSION = '1.27';
+$Tcl::VERSION = '1.32';
 
 =head1 NAME
 
@@ -99,7 +99,7 @@ Tcl::EVAL_GLOBAL or Tcl::EVAL_DIRECT.
 
 =item $interp->GlobalEval (STRING)
 
-REMOVED.  Evalulate script STRING at global level.
+REMOVED.  Evaluate script STRING at global level.
 Call I<Eval>(STRING, Tcl::EVAL_GLOBAL) instead.
 
 =item $interp->EvalFile (FILENAME)
@@ -185,7 +185,7 @@ spaces embedded in any ARG will not cause it to be split into two Tcl
 arguments before being passed to PROC.  This differs from icall/call in
 that it directly invokes the command name without allowing for command
 tracing or making use of Tcl's unknown (AUTOLOAD) mechanism.  If the
-command does not already exist in the interpreter, and error will be
+command does not already exist in the interpreter, an error will be
 thrown.
 
 Arguments are converted efficiently from Perl SVs to Tcl_Objs.  A Perl AV
@@ -249,15 +249,15 @@ registered commands.
 Creates a COMMAND called TCLNAME calling CODEREF in the interpreter $interp,
 and adds it to the internal tracking structure.
 DESCRNAME and TCLNAME should not begin
-with =
-or @
-or ::perl::
-to avoid colisions
+with C<=>
+or C<@>
+or C<::perl::>
+to avoid collisions.
 If TCLNAME IS blank or undef, it is constructed from the CODEREF address.
 GENCODE starts as TCLNAME but gets @$EVENTS which can contain %vars joined to it.
 
 TCLNAME and DESCRNAME get stored in an internal structure,
-and can be used to purge things fRom the command table via code_destroy or $interp->delete_ref;
+and can be used to purge things from the command table via code_destroy or $interp->delete_ref;
 
 Returns (TCLNAME,GENCODE).
 if you are creating code refs with this you can continue to use the same coderef and it will be converted on each call.
@@ -286,7 +286,7 @@ although
 
   $interp->call('FILEEVENT',$fileref,WRITABLE=>$sub);
 
-will stil work fine too.
+will still work fine, too.
 
 Then you later call
 
@@ -307,14 +307,14 @@ and may initiate destruction of something created thru call or create_tcl_sub
 
 TCLNAME and DESCRNAME get stored in an internal structure,
 and can be used to purge things form the command table.
-calling _code_dispose on a TCLNAME retruned from create_tcl_sub removes all use instances and purges the command table.
-calling _code_dispose on a DESCRNAME passed to create_tcl_sub removes only that instace
+calling _code_dispose on a TCLNAME returned from create_tcl_sub removes all use instances and purges the command table.
+calling _code_dispose on a DESCRNAME passed to create_tcl_sub removes only that instance
 Code used in a DESCRNAME may be used in other places as well,
 only when the last usage is purged does the entry get purged from the command table
 
 While the internal tracking structure saves the INTERP the code was added to,
 it itself does not keep things separated by INTERP,
-A TCLNAME or DESCRNAMe can only exist in one INTERP at a time,
+A TCLNAME or DESCRNAME can only exist in one INTERP at a time,
 using a new INTERP just causes the one in the last INTERP to disappear,
 and probably end up with the Tcl code getting deleted
 
@@ -375,80 +375,9 @@ behaves as in I<SetVar> above.
 Unsets the element VARNAME1(VARNAME2) of a Tcl array.
 The optional argument FLAGS behaves as in I<SetVar> above.
 
-=back
+=item $interp->InterpDeleted ()
 
-=head2 Command table cleanup
-
-In V1.03 command table cleanup was intoduced.
-This tries to keep the internal structure and command table clean.
-In V1.02 and prior heavy use of sub { .. } in Tcl commands could pollute these tables
-as they were never cleared. Command table cleanup tries to alieviate this.
-
-if you call create_tcl_sub the internal reference exists until
-you delete_ref or _code_dispose it, or you call create_tcl_sub with the same DESCRNAME.
-
-if the internal reference was created internaly by call(...) there are two rules
-
-=over
-
-=item 1)
-
-If the command is an "after" the internal references is keept at least until 1 second after the delay.
-If there are still other "users" of the TCLNAME then it is not deleted until the last one goes away.
-If another call with the same CODEREF happens before this,
-then it will get registered as a "user" without any need to delete/recreate the tcl command first.
-
-=item 2)
-
-otherwise a DESCRNAME is created with the text sections of the command, prefaced by "=".
-Like
-"=after 1000"
-or "=:.m.m add command -command -label Exit"
-or "=::button .f3.b8 -text conn -command"
-or "=gets sock9ac2b50"
-or "=fileevent sock9827430 writable"
-
-
-the TCLCODES created for that command will be kept at least until a command with
-the same DESCRNAME and containing a subroutine reference is run again.
-Since many DESCRNAMES can reference the same TCLNAME only when
-the last DESCRNAME referencing a TCLNAME is released is the TCLNAME purged.
-
-NOTE:
-Since
-  $interp->call('fileevent','sock9827430','writable');
-does not contain a subroutine reference, it will not release/free the TCLNAME/DESCRNAME created by
-  $interp->call('fileevent','sock9827430','writable',sub{...});
-even though that is the way you deactivate a writable/readable callback in Tcl.
-
-=back
-
-Prior to V1.06 there was also a problem with the coderef never getting cleared from sas,
-a refcount was kept at the PVCV that prevented it from getting garbage collected,
-but that SV itself got "lost" and could never be garbage collected,
-thereby also keeping anything in that codes PAD.
-
-To assist in tracking chages to the internal table and the commands table 3 trace subs were added,
-set them to non-blank or non-zero to add the tracking output to SYSOUT, like this in your code:
-
-    sub Tcl::TRACE_SHOWCODE(){1}
-
-=over
-
-=item Tcl::TRACE_SHOWCODE
-
-Display all generated Tcl code by call().
-Be aware: Tkx::MainLoop runs by issuing a lot of "winfo exists ." calls, a LOT.
-But this is a nice way to tell what your programs are doing to Tcl.
-
-
-=item Tcl::TRACE_CREATECOMMAND
-
-Display Tcl subroutine creation by call/create_tcl_sub
-
-=item Tcl::TRACE_DELETECOMMAND
-
-Display Tcl subroutine deletion by cleanup/delete_ref/_code_dispose
+See Tcl C API documentation for I<Tcl_InterpDeleted>().
 
 =back
 
@@ -487,51 +416,6 @@ namespace C< ::perl > following objects are created:
    ::perl::Eval
 
 So it is possible to use Perl objects from within Tcl.
-
-=head2 Moving Tcl/Tk around with Tcl.pm
-
-NOTE: explanations below is for developers managing Tcl/Tk installations
-itself, users should skip this section.
-
-In order to create Tcl/Tk application with this module, you need to make
-sure that Tcl/Tk is available within visibility of this module. There are
-many ways to achieve this, varying on ease of starting things up and
-providing flexible moveable archived files.
-
-Following list enumerates them, in order of increased possibility to change
-location.
-
-=over
-
-=item *
-
-First method
-
-Install Tcl/Tk first, then install Perl module Tcl, so installed Tcl/Tk will
-be used. This is most normal approach, and no care of Tcl/Tk distribution is
-taken on Perl side (this is done on Tcl/Tk side)
-
-=item *
-
-Second method
-
-Copy installed Tcl/Tk binaries to some location, then install Perl module Tcl
-with a special action to make Tcl.pm know of this location. This approach
-makes sure that only chosen Tcl installation is used.
-
-=item *
-
-Third method
-
-During compiling Tcl Perl module, Tcl/Tk could be statically linked into
-module's shared library and all other files zipped into a single archive, so
-each file extracted when needed.
-
-To link Tcl/Tk binaries, prepare their libraries and then instruct Makefile.PL
-to use these libraries in a link stage.
-(TODO provide better detailed description)
-
-=back
 
 =cut
 
@@ -623,7 +507,7 @@ sub _anon_refs_cheat { return \%anon_refs;}
 #       where [0] $sub is the perlcoderef,
 #             [1] $interp is the tcl interpreter it is in,
 #             [2] $tclname is the name for the coderef in tcl
-#             [3] is the number of Tcl::Code elemets that reference it.
+#             [3] is the number of Tcl::Code elements that reference it.
 #     The second element [1] is a hash
 #      for each Tcl::Code $descrname there is a $descrname key here,
 #        the value at the key is the number of Tcl::Code of that $descrname pointing to this Tcl::Cmdbase
@@ -837,7 +721,7 @@ sub showcode{
 # Returns tcl script suitable for using in tcl events.
 sub create_tcl_sub {
     my ($interp,$sub,$events,$tclname, $descrname) = @_;
-    # rnames and tclnames begining = or @ or ::perl:: are reserved for internal use
+    # rnames and tclnames beginning = or @ or ::perl:: are reserved for internal use
     unless ($tclname) {
 	# stringify sub, becomes "CODE(0x######)" in ::perl namespace
 	$tclname = "::perl::$sub";
@@ -846,10 +730,10 @@ sub create_tcl_sub {
     #print STDERR "...=$descrname\n";
 
     # the following is a bit more tricky than it seems to.
-    # because the whole intent of the Tcl:Cmdbase entries in %anon_refs hash is to have refcount
+    # because the whole intent of the Tcl::Cmdbase entries in %anon_refs hash is to have refcount
     # of (possibly) anonymous sub that is happen to be passed,
     # and, if passed for the same widget but arguments are same - then
-    # previous instance will be overwriten, and sub will be destroyed due
+    # previous instance will be overwritten, and sub will be destroyed due
     # to no reference count, and command table entry will also be destroyed during
     # Tcl::Cmdbase::DESTROY
 
@@ -860,7 +744,7 @@ sub create_tcl_sub {
                                     ],'Tcl::Cmdbase');
       $interp->CreateCommand($tclname, $sub, undef, undef, 1);
 
-      print "TCL::TRACE_CREATECOMMAND: $interp -> $descrname ( $tclname => $sub ,undef,udef,1 )\n" if TRACE_CREATECOMMAND();
+      print "TCL::TRACE_CREATECOMMAND: $interp -> $descrname ( $tclname => $sub ,undef,undef,1 )\n" if TRACE_CREATECOMMAND();
       delete $anon_refs{$descrname};
     }
     my @newtcl=@{$anon_refs{$tclname}[0]};
@@ -972,7 +856,7 @@ package Tcl::Code;
 # to do cleaning up
 
 sub DESTROY {
-#    my $rsub    = $_[0]->[0]; # dont really need it here anymore,
+#    my $rsub    = $_[0]->[0]; # don't really need it here anymore,
 #    my $interp  = $_[0]->[1];
 
     my $tclname     = $_[0]->[2];
@@ -1006,7 +890,7 @@ sub DESTROY {
     return unless ($tclname);
     if (defined $interp) {
       $interp->DeleteCommand($tclname);
-      print "TCL::TRACE_DELETECOMMAND: $interp -> ( $tclname )\n" if TRACE_DELETECOMMAND();
+      print "TCL::TRACE_DELETECOMMAND: $interp -> ( $tclname )\n" if Tcl::TRACE_DELETECOMMAND();
     }
 }
 
@@ -1044,24 +928,22 @@ sub FIRSTKEY {
 	unless @{$obj} == 2 || @{$obj} == 3;
     my ($interp, $varname, $flags) = @$obj;
     $arraystates{$varname} = $interp->invoke("array","startsearch",$varname);
-    my $r = $interp->invoke("array","nextelement",$varname,$arraystates{$varname});
-    if ($r eq '') {
-	delete $arraystates{$varname};
-	return undef;
-    }
-    return $r;
+    return $obj->_next_element(@_);
 }
 sub NEXTKEY {
     my $obj = shift;
     die "STORE Usage: objdata @{$obj} $#{$obj}, not 2 or 3 (@_)"
 	unless @{$obj} == 2 || @{$obj} == 3;
+    return $obj->_next_element(@_);
+}
+sub _next_element {
+    my $obj = shift;
     my ($interp, $varname, $flags) = @$obj;
-    my $r = $interp->invoke("array","nextelement",$varname,$arraystates{$varname});
-    if ($r eq '') {
+    unless ($interp->invoke('array','anymore',$varname,$arraystates{$varname})) {
 	delete $arraystates{$varname};
 	return undef;
     }
-    return $r;
+    return $interp->invoke('array','nextelement',$varname,$arraystates{$varname});
 }
 sub CLEAR {
     my $obj = shift;
@@ -1299,7 +1181,5 @@ the same terms as Perl itself.
 See http://www.perl.com/perl/misc/Artistic.html
 
 =cut
-
-#use Data::Dumper; print Dumper(\@codes)."codes \n ";
 
 1;

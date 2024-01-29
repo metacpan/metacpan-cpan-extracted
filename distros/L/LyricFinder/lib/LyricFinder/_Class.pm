@@ -7,7 +7,7 @@ use HTTP::Request;
 use HTML::Strip;
 use Carp;
 
-our $AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0";
+our $AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:112.0) Gecko/20100101 Firefox/112.0";
 our $DEBUG = 0; # If you want debug messages, set debug to a true value, and
 				# messages will be output with warn.
 
@@ -152,7 +152,7 @@ sub _web_fetch {
 	);
 	$ua->timeout(10);
 	$ua->agent($self->{'-agent'});
-	$ua->protocols_allowed(['https']);
+	$ua->protocols_allowed(['https', 'http']);
 	$ua->cookie_jar( {} );
 	push @{ $ua->requests_redirectable }, 'GET';
 	(my $referer = $self->{'Url'}) =~ s{^(\w+)\:\/\/}{};
@@ -175,7 +175,7 @@ sub _web_fetch {
 	my $res = $ua->request($req);
 
 	if ($res->is_success) {
-		my $lyrics = $self->_parse($res->decoded_content);
+		my $lyrics = $self->_parse($res->decoded_content, @_);
 		return $lyrics;
 	} else {
 		my $Source = $self->{'Source'};

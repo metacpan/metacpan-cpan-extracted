@@ -1,4 +1,4 @@
-CREATE TABLE user (
+CREATE TABLE "user" (
   id integer PRIMARY KEY AUTOINCREMENT,
   username text UNIQUE NOT NULL,
   password text,

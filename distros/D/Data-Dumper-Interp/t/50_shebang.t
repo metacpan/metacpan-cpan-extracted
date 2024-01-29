@@ -18,8 +18,6 @@ use t_TestCommon ##':silent', # Test2::V0 etc.
                     rawstr showstr showcontrols
                     mycheckeq_literal mycheck @quotes/;
 
-BEGIN{ diag "### BEGIN DEBUG at line ",__LINE__; } # trying to find mysterious failure on one CPAN windows smoker
-
 sub oops(@) {
   @_ = ("TestOOPS:", @_);
   goto &confess;
@@ -28,8 +26,6 @@ sub oops(@) {
 $SIG{__WARN__} = sub { confess("warning trapped: @_") };
 
 use Data::Compare qw(Compare);
-
-BEGIN{ diag "### BEGIN DEBUG at line ",__LINE__; }
 
 # This test mysteriously dies (exit 5) with no visible message
 # on certain Windows machines.  Try to explicitly 'fail' instead of
@@ -62,7 +58,6 @@ confess("Non-zero CHILD_ERROR ($?)") if $? != 0;
 # This script was written before the author knew anything about standard
 # Perl test-harness tools.  So it is a big monolithic thing.
 
-BEGIN{ diag "### BEGIN DEBUG at line ",__LINE__; }
 use Data::Dumper::Interp qw/:all/;
 
 sub visFoldwidth() {
@@ -70,9 +65,6 @@ sub visFoldwidth() {
  ." Foldwidth1=".u($Data::Dumper::Interp::Foldwidth1)
  .($Data::Dumper::Interp::Foldwidth ? ("\n".("." x $Data::Dumper::Interp::Foldwidth)) : "")
 }
-
-BEGIN{ diag "### BEGIN DEBUG at line ",__LINE__; }
-diag "##DEBUG at line ",__LINE__;
 
 confess("Non-zero initial CHILD_ERROR ($?)") if $? != 0;
 
@@ -154,20 +146,12 @@ sub mychecklit(&$$) {
   }
 }#checklit()
 
-BEGIN{ diag "### BEGIN DEBUG at line ",__LINE__; }
-diag "##DEBUG at line ",__LINE__;
-
 # Basic test of OO interfaces
 { my $code="Data::Dumper::Interp->new->vis('foo')  ;"; mycheck $code, '"foo"',     eval $code }
-diag "##DEBUG at line ",__LINE__;
 { my $code="Data::Dumper::Interp->new->avis('foo') ;"; mycheck $code, '("foo")',   eval $code }
-diag "##DEBUG at line ",__LINE__;
 { my $code="Data::Dumper::Interp->new->hvis(k=>'v');"; mycheck $code, '(k => "v")',eval $code }
-diag "##DEBUG at line ",__LINE__;
 { my $code="Data::Dumper::Interp->new->dvis('foo') ;"; mycheck $code, 'foo',       eval $code }
-diag "##DEBUG at line ",__LINE__;
 { my $code="Data::Dumper::Interp->new->ivis('foo') ;"; mycheck $code, 'foo',       eval $code }
-diag "##DEBUG at line ",__LINE__;
 
 foreach (
           ['Foldwidth',0,1,80,9999],
@@ -205,9 +189,6 @@ foreach (
   }
 }
 
-BEGIN{ diag "### BEGIN DEBUG at line ",__LINE__; }
-diag "##DEBUG at line ",__LINE__;
-
 # Changing these are not allowed:
 foreach my $confname (qw/Indent Terse Sparseseen/) {
   no strict 'refs';
@@ -217,9 +198,6 @@ foreach my $confname (qw/Indent Terse Sparseseen/) {
   eval {newvis->$confname(42)};
   like($@,qr/locate.*method.*$confname/, "$confname method does not exist");
 }
-
-BEGIN{ diag "### BEGIN DEBUG at line ",__LINE__; }
-diag "##DEBUG at line ",__LINE__;
 
 # ---------- Check formatting or interpolation --------
 
@@ -231,7 +209,6 @@ sub MyClass::meth {
 # Many tests assume this
 $Data::Dumper::Interp::Foldwidth = 72;
 
-diag "##DEBUG at line ",__LINE__;
 @ARGV = ('fake','argv');
 $. = 1234;
 $ENV{EnvVar} = "Test EnvVar Value";
@@ -240,9 +217,13 @@ my $BS = "\\";
 my $SQ = "'";
 my $DQ = '"';
 
-diag "##DEBUG at line ",__LINE__;
 
-my %toplex_h = ("" => "Emp", A=>111,"B B"=>222,C=>{d=>888,e=>999},D=>{},EEEEEEEEEEEEEEEEEEEEEEEEEE=>\42,F_long_enough_to_force_wrap_FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF=>\\\43, G=>qr/foo.*bar/xsi);
+my %toplex_h = ("" => "Emp",
+                A => 111,"B B" => 222,C => {d => 888,e => 999},
+                D => {},EEEEEEEEEEEEEEEEEEEEEEEEEE => \42, # reference to 42
+                F_long_enough_to_force_wrap_FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF => "\\\43",  # string containing \#
+                G => qr/foo.*bar/xsi
+               );
    # EEE... identifer is long to force linewrap
 my @toplex_a = (0,1,"C",\%toplex_h,[],[0..9]);
 my $toplex_ar = \@toplex_a;
@@ -274,9 +255,6 @@ our $local_regexp = qr/should.*never.*be_seen/;
 our $a = "global-a";  # used specially used by sort()
 our $b = "global-b";
 
-BEGIN{ diag "### BEGIN DEBUG at line ",__LINE__; }
-diag "##DEBUG at line ",__LINE__;
-
 package A::B::C;
 our %ABC_h = %main::global_h;
 our @ABC_a = @main::global_a;
@@ -298,10 +276,8 @@ our @ISA = ("main::Mybase");
 
 package main;
 
-diag "##DEBUG at line ",__LINE__;
 $_ = "GroupA.GroupB";
 /(.*)\W(.*)/sp or confess "nomatch"; # set $1 and $2
-diag "##DEBUG at line ",__LINE__;
 
 { my $code = 'qsh("a b")';           mycheck $code, '"a b"',  eval $code; }
 { my $code = 'qsh(undef)';           mycheck $code, "undef",  eval $code; }
@@ -318,12 +294,10 @@ diag "##DEBUG at line ",__LINE__;
 { my $code = 'qshpath()';            mycheck $code, "${_}",   eval $code; }
 { my $code = 'qshpath';              mycheck $code, "${_}",   eval $code; }
 
-diag "##DEBUG at line ",__LINE__;
 foreach my $os ($^O, 'linux', 'MSWin32') {
   local $^O = "$os"; # re-stringify to avoid undef when setting local $^O = $^O;
 
   if ($^O eq "MSWin32") {
-diag "##DEBUG os=$os at line ",__LINE__;
     { my $code = q(qshlist("a b","c",'$d')); mycheck $code." (OS=$^O)", q("a b" c "$d"),  eval $code; }
     { my $code = q( qsh("a b\\\\")        ); mycheck $code." (OS=$^O)", q("a b\\\\"),     eval $code; }
     { my $code = q( qsh(q<a b">)          ); mycheck $code." (OS=$^O)", q("a b\\""),      eval $code; }
@@ -336,7 +310,6 @@ diag "##DEBUG os=$os at line ",__LINE__;
 }
 
 # Basic checks
-diag "##DEBUG at line ",__LINE__;
 { my $code = 'vis($_)'; mycheck $code, "\"${_}\"", eval $code; }
 { my $code = 'vis()'; mycheck $code, "\"${_}\"", eval $code; }
 { my $code = 'vis'; mycheck $code, "\"${_}\"", eval $code; }
@@ -356,13 +329,11 @@ diag "##DEBUG at line ",__LINE__;
 { my $code = 'vis(\123)'; mycheck $code, "\\123", eval $code; }
 { my $code = 'vis(\"xy")'; mycheck $code, "\\\"xy\"", eval $code; }
 
-diag "##DEBUG at line ",__LINE__;
 { my $code = q/my $s; my @a=sort{ $s=dvis('$a $b'); $a<=>$b }(3,2); "@a $s"/ ;
   mycheck $code, '2 3 a=3 b=2', eval $code;
 }
 
 # Vis v1.147ish+ : Check corner cases of re-parsing code
-diag "##DEBUG at line ",__LINE__;
 { my $code = q(my $v = undef; dvis('$v')); mycheck $code, "v=undef", eval $code; }
 { my $code = q(my $v = \undef; dvis('$v')); mycheck $code, "v=\\undef", eval $code; }
 { my $code = q(my $v = \"abc"; dvis('$v')); mycheck $code, 'v=\\"abc"', eval $code; }
@@ -373,7 +344,6 @@ diag "##DEBUG at line ",__LINE__;
 { my $code = q(open my $fh, "</dev/null" or oops $!; dvisq('$fh'));
   mycheck $code, "fh=\\*{'::\$fh'}", eval $code; }
 
-diag "##DEBUG at line ",__LINE__;
 
 # Data::Dumper::Interp 2.12 : hex escapes including illegal code points:
 #   10FFFF is the highest legal Unicode code point which will ever be assigned.
@@ -393,7 +363,6 @@ diag "##DEBUG at line ",__LINE__;
 { my $code = 'my $vv=123; \' a $vv b\' =~ / (.*)/ && dvis($1) && ($1 eq "a \$vv b") && dvis($1)';
   mycheck $code, 'a vv=123 b', eval $code; }
 
-diag "##DEBUG at line ",__LINE__;
 # Check Deparse support
 { my $data = $test_sub;
   { my $code = 'vis($data)'; mycheck $code, 'sub { "DUMMY" }', eval $code; }
@@ -406,7 +375,6 @@ diag "##DEBUG at line ",__LINE__;
   { my $code = 'vis($data)'; mycheck $code, qr/sub \(\@\) \{\s*my \$x = 42;\s*\}/, eval $code; }
 }
 
-diag "##DEBUG at line ",__LINE__;
 # Floating point values (single values special-cased to show not as 'string')
 { my $code = 'vis(3.14)'; mycheck $code, '3.14', eval $code; }
 # But multiple values are sent through Data::Dumper, so...
@@ -423,10 +391,8 @@ my $bigfstr = '9988776655443322112233445566778899.8877';
 my $bigistr = '9988776655443322112233445566778899887766';
 my $ratstr  = '1/9';
 
-diag "##DEBUG at line ",__LINE__;
 {
   use bignum;  # BigInt and BigFloat together
-diag "##DEBUG at line ",__LINE__;
 
   # stringify everything possible
   local $Data::Dumper::Interp::Objects = 1;  # NOTE: the '1' will be a BigInt !
@@ -453,16 +419,12 @@ diag "##DEBUG at line ",__LINE__;
 {
   # no 'bignum' etc. in effect, just explicit class names
   use Math::BigFloat;
-diag "##DEBUG at line ",__LINE__;
   my $bigf = Math::BigFloat->new($bigfstr);
   oops unless $bigf->isa("Math::BigFloat");
-diag "##DEBUG at line ",__LINE__;
 
   use Math::BigRat;
-diag "##DEBUG at line ",__LINE__;
   my $rat = Math::BigRat->new($ratstr);
   oops unless $rat->isa("Math::BigRat");
-diag "##DEBUG at line ",__LINE__;
 
   # No stringification if disabled
   { local $Data::Dumper::Interp::Objects = 0;
@@ -504,12 +466,11 @@ diag "##DEBUG at line ",__LINE__;
   }
 }
 
-diag "##DEBUG at line ",__LINE__;
 {
   # There is a new (with bigrat 0.51) bug where "use bigrat" immediately and
-  # permanently causes math operations on Math::BitFloat to produce BigRats in all
-  # scopes, not just in the scope of the 'use bigrat'.   This breaks Math::BigFloat
-  # tests which execute after the bigrat package is loaded.
+  # permanently causes math operations on Math::BitFloat to produce BigRats in
+  # all scopes, not just in the scope of the 'use bigrat'.   This breaks
+  # Math::BigFloat tests which execute after the bigrat package is loaded.
   #
   # So we have to do the bigrat test in an eval to defer loading it until after
   # all other bignum tests have run.
@@ -523,7 +484,6 @@ EOF
   oops "urp\n$@" if $@
 }
 
-diag "##DEBUG at line ",__LINE__;
 # Check string truncation, and that the original data is not modified in-place
 { my $orig_str  = '["abcDEFG",["xyzABCD",{bareword => "fghIJKL"}]]';
   my $check_data = eval $orig_str; oops "bug" if $@;
@@ -553,7 +513,6 @@ diag "##DEBUG at line ",__LINE__;
 #
 my $SS = do{ my $x=" "; dvis('$x') =~ /x="(.)"/ or die; $1 }; # spacedots?
 
-diag "##DEBUG at line ",__LINE__;
 mycheck
   'global dvis %toplex_h',
 q!%toplex_h=(
@@ -564,15 +523,13 @@ q!%toplex_h=(
   D => {},
   EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42,
   F_long_enough_to_force_wrap_FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-    => \\\\\\43,
+    => "\\\\#",
   G => qr/foo.*bar/six
 )!,
   dvis('%toplex_h');
-diag "##DEBUG at line ",__LINE__;
 mycheck 'global divs @ARGV', q(@ARGV=("fake","argv")), dvis('@ARGV');
 mycheck 'global divs $.', q($.=1234), dvis('$.');
 mycheck 'global divs $ENV{EnvVar}', q("Test EnvVar Value"), ivis('$ENV{EnvVar}');
-diag "##DEBUG at line ",__LINE__;
 sub func {
   mycheck 'func args', q(@_=(1,2,3)), dvis('@_');
 }
@@ -588,7 +545,40 @@ timed_run {
         '@backtrack_bugtest_data=(42,{A => 0,BBBBBBBBBBBBB => "foo"})',
         dvis('@backtrack_bugtest_data');
 } 0.10; # some cpan test machines are slow!
-diag "##DEBUG at line ",__LINE__;
+
+sub vis_sans_quotes($) {
+  my $r = visnew->Useqq("unicode")->vis($_[0]);
+  $r =~ s/^"(.*)"$/$1/ or oops;
+  $r
+}
+
+{ my @items = (qw/A Z 8 9 ? ! @ $ % ^ & * ( ) _ - = + . ? : ; > < ./,
+                "#", ",", "\0", "\1", "\x{80}", "\x{C0}", "\x{FF}", "\\",
+              );
+  my $repcount = 20;
+  for my $before_item ("X", "0") { # Can't test \0 because it can become \000
+    for my $after_item ("Z", "\0", "0") {
+      for my $item (@items) {
+        my $before = $before_item eq $item ? "" : $before_item;
+        my $after  = $after_item  eq $item ? "" : $after_item;
+        my $str = $before.($item x $repcount).$after;
+        my $got = visnew->Useqq("condense")->vis($str);
+        # Capture special characters which were used just now
+        my ($LB, $MULT, $RB) = ($Data::Dumper::Interp::COND_LB,
+                                $Data::Dumper::Interp::COND_MULT,
+                                $Data::Dumper::Interp::COND_RB);
+        next if $item eq $LB;
+        next if $item eq $MULT;
+        next if $item eq $RB;
+        my $exp = '"'.vis_sans_quotes($before)
+                 .$LB.vis_sans_quotes($item).$MULT.$repcount.$RB
+                 .vis_sans_quotes($after).'"';
+        like($got, $exp, "condense",
+            visnew->Useqq("unicode")->dvis('$before $item $after $str'));
+      }
+    }
+  }
+}
 
 sub doquoting($$) {
   my ($input, $useqq) = @_;
@@ -643,10 +633,8 @@ sub show_white($) {
   $_
 }
 
-diag "##DEBUG at line ",__LINE__;
 my $unicode_str = join "", map { chr($_) } (0x263A .. 0x2650);
 my $byte_str = join "",map { chr $_ } 10..30;
-diag "##DEBUG at line ",__LINE__;
 
 sub get_closure(;$) {
  my ($clobber) = @_;
@@ -753,7 +741,7 @@ sub get_closure(;$) {
      [__LINE__, q($/\n), qq(\$/=\"\\n\"\n) ],
     )),
     [__LINE__, q($\\\n), qq(\$\\=undef\n) ],
-    [__LINE__, q($"\n), qq(\$\"=\" \"\n) ],
+    [__LINE__, q($"\n), qq(\$\"=\"${SS}\"\n) ],
     [__LINE__, q($~\n), qq(\$~=\"STDOUT\"\n) ],
     #20 :
     [__LINE__, q($^\n), qq(\$^=\"STDOUT_TOP\"\n) ],
@@ -761,7 +749,7 @@ sub get_closure(;$) {
      [__LINE__, q($:\n), qq(\$:=\" \N{SYMBOL FOR NEWLINE}-\"\n) ],
      [__LINE__, q($^L\n), qq(\$^L=\"\N{SYMBOL FOR FORM FEED}\"\n) ],
     ):(
-     [__LINE__, q($:\n), qq(\$:=\" \\n-\"\n) ],
+     [__LINE__, q($:\n), qq(\$:=\"${SS}\\n-\"\n) ],
     )),
     [__LINE__, q($?\n), qq(\$?=0\n) ],
     [__LINE__, q($[\n), qq(\$[=0\n) ],
@@ -774,10 +762,10 @@ sub get_closure(;$) {
     [__LINE__, q($;\n), qq(\$;=\"\\34\"\n) ],
     #[__LINE__, q($;\n), qq(\$;=\"\\x{1C}\"\n) ],
     [__LINE__, q(@ARGV\n), qq(\@ARGV=(\"fake\",\"argv\")\n) ],
-    [__LINE__, q($ENV{EnvVar}\n), qq(\$ENV{EnvVar}=\"Test EnvVar Value\"\n) ],
-    [__LINE__, q($ENV{$EnvVarName}\n), qq(\$ENV{\$EnvVarName}=\"Test EnvVar Value\"\n) ],
-    [__LINE__, q(@_\n), <<'EOF' ],  # N.B. Foldwidth was set to 72
-@_=(
+    [__LINE__, q($ENV{EnvVar}\n), qq(\$ENV{EnvVar}=\"Test${SS}EnvVar${SS}Value\"\n) ],
+    [__LINE__, q($ENV{$EnvVarName}\n), qq(\$ENV{\$EnvVarName}=\"Test${SS}EnvVar${SS}Value\"\n) ],
+    [__LINE__, q(@_\n), <<EOF ],  # N.B. Foldwidth was set to 72
+\@_=(
   42,
   [
     0,
@@ -786,12 +774,12 @@ sub get_closure(;$) {
     {
       "" => "Emp",
       A => 111,
-      "B B" => 222,
+      "B${SS}B" => 222,
       C => {d => 888,e => 999},
       D => {},
-      EEEEEEEEEEEEEEEEEEEEEEEEEE => \42,
+      EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42,
       F_long_enough_to_force_wrap_FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        => \\\43,
+        => "\\\\#",
       G => qr/foo.*bar/six
     },
     [],
@@ -803,7 +791,7 @@ EOF
     (CPICS_DEFAULT ? (
      [__LINE__, q($@\n), qq(\$\@=\"FAKE DEATH\N{SYMBOL FOR NEWLINE}\"\n) ],
     ):(
-     [__LINE__, q($@\n), qq(\$\@=\"FAKE DEATH\\n\"\n) ],
+     [__LINE__, q($@\n), qq(\$\@=\"FAKE${SS}DEATH\\n\"\n) ],
     )),
     #37 :
     map({
@@ -829,12 +817,12 @@ EOF
 ${pfx}\%${dollar}${name}_h${r}=(
 ${p}  "" => "Emp",
 ${p}  A => 111,
-${p}  "B B" => 222,
+${p}  "B${SS}B" => 222,
 ${p}  C => {d => 888,e => 999},
 ${p}  D => {},
 ${p}  EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42,
 ${p}  F_long_enough_to_force_wrap_FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-${p}    => \\\\\\43,
+${p}    => "\\\\#",
 ${p}  G => qr/foo.*bar/six
 ${p})
 EOF
@@ -847,12 +835,12 @@ ${p}  "C",
 ${p}  {
 ${p}    "" => "Emp",
 ${p}    A => 111,
-${p}    "B B" => 222,
+${p}    "B${SS}B" => 222,
 ${p}    C => {d => 888,e => 999},
 ${p}    D => {},
 ${p}    EEEEEEEEEEEEEEEEEEEEEEEEEE => \\42,
 ${p}    F_long_enough_to_force_wrap_FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-${p}      => \\\\\\43,
+${p}      => "\\\\#",
 ${p}    G => qr/foo.*bar/six
 ${p}  },
 ${p}  [],
@@ -965,7 +953,7 @@ EOF
       my $actual;
       my $dollarat_val = $@;
       eval { $@ = $dollarat_val;
-        # Verify that special vars are preserved and don't affect Data::Dumper::Interp
+        # Verify that special vars are preserved and don't affect DDI
         # (except if testing a punctuation var, then don't change it's value)
 
         my ($origAt,$origFs,$origBs,$origComma,$origBang,$origCarE,$origCarW)
@@ -984,6 +972,9 @@ EOF
         ($@, $/, $\, $,, $!, $^E, $^W)
           = ($fakeAt,$fakeFs,$fakeBs,$fakeCom,$fakeBang,$fake_cE,$fake_cW);
 
+#say "XXX dvis_input='${dvis_input}'";
+        # 12/13/2023 now dvis enables :spacedots by default
+        # but our test setup can not deal with that
         $actual = $use_oo
            ? Data::Dumper::Interp->new()->dvis($dvis_input)
            : dvis($dvis_input);
@@ -1020,7 +1011,8 @@ EOF
       # if there are any Unicode characters present.
       # So we can not test single-quoted mode in those cases
       next
-        if !$useqq && $input =~ tr/\0-\377//c;
+        #if !$useqq && $input =~ tr/\0-\377//c;
+        if !$useqq && $input =~ /\P{PosixGraph}/a;
       my $exp = doquoting($input, $useqq);
       my $act = Data::Dumper::Interp->new()->Useqq($useqq)->vis($input);
       oops "\n\nUseqq ",u($useqq)," bug:\n"
@@ -1032,7 +1024,6 @@ EOF
   }
  };
 } # get_closure()
-diag "##DEBUG at line ",__LINE__;
 sub f($) {
   get_closure(1);
   my $code = get_closure(0);
@@ -1046,10 +1037,8 @@ sub g($) {
   local $_ = 'SHOULD NEVER SEE THIS';
   goto &f;
 }
-diag "##DEBUG at line ",__LINE__;
 confess "Non-zero CHILD_ERROR ($?)" if $? != 0;
 &g(42,$toplex_ar);
-diag "##DEBUG at line ",__LINE__;
 
 
 #print "Tests passed.\n";
@@ -1059,5 +1048,4 @@ ok(1, "The whole shebang");
 done_testing();
 exit 0;
 
-BEGIN{ diag "### BEGIN DEBUG at line ",__LINE__; }
 # End Tester

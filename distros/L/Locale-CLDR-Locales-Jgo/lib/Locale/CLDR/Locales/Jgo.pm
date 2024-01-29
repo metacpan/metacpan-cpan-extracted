@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Jgo - Package for language Ngomba
 
 package Locale::CLDR::Locales::Jgo;
 # This file auto generated from Data\common\main\jgo.xml
-#	on Tue  5 Dec  1:16:33 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ar' => 'Alâbɛ',
@@ -73,7 +73,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'Mbí',
  			'002' => 'Afɛlîk',
@@ -166,7 +166,7 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'currency' => 'Ŋkáp',
  			'numbers' => 'Pɛnɔ́mba',
@@ -204,8 +204,8 @@ has 'characters' => (
 			auxiliary => qr{[e o q r x]},
 			index => ['A', 'B', 'C', 'D', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'Ɔ', 'P', '{Pf}', 'S', '{Sh}', 'T', '{Ts}', 'U', 'Ʉ', '{Ʉ\u0308}', 'V', 'W', 'Ẅ', 'Y', 'Z', 'Ꞌ'],
 			main => qr{[a á â ǎ b c d ɛ {ɛ́} {ɛ̀} {ɛ̂} {ɛ̌} {ɛ̄} f g h i í î ǐ j k l m ḿ {m̀} {m̄} n ń ǹ {n̄} ŋ {ŋ́} {ŋ̀} {ŋ̄} ɔ {ɔ́} {ɔ̂} {ɔ̌} p {pf} s {sh} t {ts} u ú û ǔ ʉ {ʉ́} {ʉ̂} {ʉ̌} {ʉ̈} v w ẅ y z ꞌ]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- , ; \: ! ? . ‹ › « »]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‑ , ; \: ! ? . ‹ › « »]},
 		};
 	},
 EOT
@@ -256,26 +256,61 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(lɛ́Ꞌ),
+						'one' => q({0} lɛ́Ꞌ),
+						'other' => q({0} lɛ́Ꞌ),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(lɛ́Ꞌ),
 						'one' => q({0} lɛ́Ꞌ),
 						'other' => q({0} lɛ́Ꞌ),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(háwa),
+						'one' => q({0} háwa),
+						'other' => q({0} háwa),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(háwa),
 						'one' => q({0} háwa),
 						'other' => q({0} háwa),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(minút),
+						'one' => q({0} minút),
+						'other' => q({0} minút),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(minút),
 						'one' => q({0} minút),
 						'other' => q({0} minút),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(pɛsaŋ),
+						'one' => q(pɛsaŋ {0}),
+						'other' => q(pɛsaŋ {0}),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(pɛsaŋ),
 						'one' => q(pɛsaŋ {0}),
 						'other' => q(pɛsaŋ {0}),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(ŋguꞋ),
+						'one' => q(ŋguꞋ {0}),
+						'other' => q(ŋguꞋ {0}),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(ŋguꞋ),
 						'one' => q(ŋguꞋ {0}),
@@ -283,18 +318,43 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(lɛ́Ꞌ),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(lɛ́Ꞌ),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(háwa),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(háwa),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(minút),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(minút),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(pɛsaŋ),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(pɛsaŋ),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(ŋguꞋ),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(ŋguꞋ),
 					},

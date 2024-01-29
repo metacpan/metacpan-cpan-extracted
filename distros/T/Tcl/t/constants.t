@@ -19,7 +19,6 @@ ok(Tcl::GLOBAL_ONLY      |
    Tcl::TRACE_WRITES     |
    Tcl::TRACE_UNSETS     |
    Tcl::TRACE_DESTROYED  |
-   Tcl::INTERP_DESTROYED |
    Tcl::LEAVE_ERR_MSG    |
    Tcl::TRACE_ARRAY,
-   0xBFF);
+   0xAFF);

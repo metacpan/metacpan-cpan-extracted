@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ru::Any::Ua - Package for language Russian
 
 package Locale::CLDR::Locales::Ru::Any::Ua;
 # This file auto generated from Data\common\main\ru_UA.xml
-#	on Tue  5 Dec  1:29:57 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AC' => 'О-в Вознесения',
  			'AE' => 'Объединенные Арабские Эмираты',
@@ -69,21 +69,21 @@ has 'day_period_data' => (
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 					return 'evening1' if $time >= 1800
-						&& $time < 2400;
+						&& $time < 2200;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
 				}
 				if($day_period_type eq 'selection') {
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 					return 'evening1' if $time >= 1800
-						&& $time < 2400;
+						&& $time < 2200;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
 				}
 				last SWITCH;
 				}
@@ -94,21 +94,21 @@ has 'day_period_data' => (
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 					return 'evening1' if $time >= 1800
-						&& $time < 2400;
+						&& $time < 2200;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
 				}
 				if($day_period_type eq 'selection') {
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 					return 'evening1' if $time >= 1800
-						&& $time < 2400;
+						&& $time < 2200;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
-					return 'night1' if $time >= 0
-						&& $time < 400;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 400;
 				}
 				last SWITCH;
 				}
@@ -117,8 +117,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'eras' => (
@@ -175,7 +175,6 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
-			GyMMM => q{LLL y 'г'. G},
 			yMEd => q{ccc, d.MM.y},
 		},
 	} },

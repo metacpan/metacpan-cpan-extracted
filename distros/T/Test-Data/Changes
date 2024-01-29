@@ -1,5 +1,8 @@
 Revision history for Perl module Test::Data
 
+1.245 2024-01-29T18:56:07Z
+	* refresh distro, update email address
+
 1.244 2022-01-09T03:24:09Z
 	* no code changes. Fix a link in README.pod.
 

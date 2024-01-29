@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Location;
-$Telegram::Bot::Object::Location::VERSION = '0.024';
+$Telegram::Bot::Object::Location::VERSION = '0.025';
 # ABSTRACT: The base class for Telegram message 'Location' type.
 
 
@@ -27,7 +27,7 @@ Telegram::Bot::Object::Location - The base class for Telegram message 'Location'
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 DESCRIPTION
 
@@ -45,6 +45,10 @@ Justin Hawkins <justin@eatmorecode.com>
 =item *
 
 James Green <jkg@earth.li>
+
+=item *
+
+Julien Fiegehenn <simbabque@cpan.org>
 
 =back
 

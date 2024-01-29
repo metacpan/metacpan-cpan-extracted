@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +23,7 @@ name: Dancer2-Plugin-Cache-CHI
 provides:
   Dancer2::Plugin::Cache::CHI:
     file: lib/Dancer2/Plugin/Cache/CHI.pm
-    version: v2.0.0
+    version: v2.0.1
 requires:
   CHI: '0'
   Carp: '0'
@@ -37,14 +37,21 @@ resources:
   bugtracker: https://github.com/yanick/Dancer2-Plugin-Cache-CHI/issues
   homepage: https://github.com/yanick/Dancer2-Plugin-Cache-CHI
   repository: https://github.com/yanick/Dancer2-Plugin-Cache-CHI.git
-version: 2.0.0
+version: 2.0.1
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK
+x_contributor_covenant:
+  version: 0.02
 x_contributors:
+  - 'Alexis Sukrieh <sukria@cpan.org>'
   - 'David Precious <davidp@preshweb.co.uk>'
   - 'Franck Cuny <franck@lumberjaph.net>'
   - 'girlwithglasses <gwg@Cygnus-X1.local>'
   - 'Kim Hansen <kim@rthansen.dk>'
   - 'Perlover <perlover@perlover.com>'
   - 'Peter Mottram <peter@sysnix.com>'
+  - 'Yanick Champoux <yanick@babyl.ca>'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

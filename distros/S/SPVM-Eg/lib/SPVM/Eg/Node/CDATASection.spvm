@@ -1,0 +1,18 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+# CDATASection in JavaScript
+class Eg::Node::CDATASection extends Eg::Node::Text {
+  
+  allow Eg::Node::Document;
+  
+  # Class Methods
+  private static method new : Eg::Node::CDATASection ($node_value : string) {
+    
+    my $self = new Eg::Node::CDATASection;
+    
+    $self->SUPER::init({node_value => $node_value});
+    
+    return $self;
+  }
+}

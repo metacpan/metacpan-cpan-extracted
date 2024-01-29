@@ -86,20 +86,19 @@ my $string_member = $zip->addString($expected_filecontent, 'testContent.txt');
 $string_member->desiredCompressionMethod( COMPRESSION_DEFLATED );
 die 'ziptest prepare error' unless ($zip->writeToFileNamed('test.zip') == AZ_OK);
 
-getLocalFiles($loads[0]);
-my $result = checkFiles($loads[0]);
+my $result = getLocalFiles($loads[0]);;
 # 4
-is($result,1,"checkFiles \$loads[0] successful");
+is($result,1,"getLocalFiles \$loads[0] successful");
 # 5
-file_exists_ok("testContent.txt","checkFiles/extractArchives testContent.txt");
+file_exists_ok("testContent.txt","extractArchives testContent.txt");
 # 6
-file_contains_like("testContent.txt",qr/$expected_filecontent/,"checkFiles/extractArchives testContent.txt expected content");
+file_contains_like("testContent.txt",qr/$expected_filecontent/,"extractArchives testContent.txt expected content");
 # 7
-is_deeply($loads[0]{process}{filenames}, ["testContent.txt"], "checkFiles/extractArchives \$process{filenames} testContent.txt");
+is_deeply($loads[0]{process}{filenames}, ["testContent.txt"], "extractArchives \$process{filenames} testContent.txt");
 # 8
-is_deeply($loads[0]{process}{archivefilenames}, ["test.zip"], "checkFiles/extractArchives \$process{archivefilenames} test.zip");
+is_deeply($loads[0]{process}{archivefilenames}, ["test.zip"], "extractArchives \$process{archivefilenames} test.zip");
 # 9
-is_deeply($execute{retrievedFiles}, [], "checkFiles/extractArchives \$execute{retrievedFiles} empty");
+is_deeply($execute{retrievedFiles}, [], "extractArchives \$execute{retrievedFiles} empty");
 readFileData($loads[0]);
 # 10
 is_deeply($loads[0]{process}{data},$expected_datastruct,"readFileData expected content");
@@ -115,10 +114,9 @@ file_contains_like("testTarget.txt",qr/$expected_filecontent/,"testTarget.txt ex
 
 openFTPConn($loads[1]);
 uploadFileToFTP($loads[1]);
-getFilesFromFTP($loads[1]);
-$result = checkFiles($loads[1]);
+$result = getFilesFromFTP($loads[1]);
 # 13
-is($result,1,"openFTPConn, uploadFileToFTP, getFilesFromFTP and checkFiles \$loads[1] successful");
+is($result,1,"openFTPConn, uploadFileToFTP and getFilesFromFTP \$loads[1] successful");
 markProcessed($loads[1]);
 processingEnd();
 

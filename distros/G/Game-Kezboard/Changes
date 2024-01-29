@@ -1,0 +1,15 @@
+Revision history for Game::Kezboard
+
+0.04    2024-01-28
+        Add an optional 'mulligan' button for when there is a bad hand.
+
+0.03    2024-01-13
+        And include some of the new assets.
+
+0.02    2024-01-13
+        Adjust score upwards if they start on a level after 1 (a
+        lower score is better). Add a title screen and a trailing
+        score screen.
+
+0.01    2024-01-12
+        First version, released on an unsuspecting world.

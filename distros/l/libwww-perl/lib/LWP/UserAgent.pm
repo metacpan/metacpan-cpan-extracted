@@ -18,7 +18,7 @@ use Module::Load qw( load );
 use Scalar::Util qw(blessed openhandle);
 use Try::Tiny qw(try catch);
 
-our $VERSION = '6.72';
+our $VERSION = '6.76';
 
 sub new
 {
@@ -775,7 +775,7 @@ sub parse_head {
                require HTML::HeadParser;
                $parser = HTML::HeadParser->new;
                $parser->xml_mode(1) if $response->content_is_xhtml;
-               $parser->utf8_mode(1) if $] >= 5.008 && $HTML::Parser::VERSION >= 3.40;
+               $parser->utf8_mode(1) if $HTML::Parser::VERSION >= 3.40;
 
                push(@{$response->{handlers}{response_data}}, {
 		   callback => sub {
@@ -1112,9 +1112,8 @@ sub _need_proxy {
     if ($ua->{no_proxy}) {
         if (my $host = eval { $req->uri->host }) {
             for my $domain (@{$ua->{no_proxy}}) {
-                if ($host =~ /(?:^|\.)\Q$domain\E$/) {
-                    return;
-                }
+                $domain =~ s/^\.//;
+                return if $host =~ /(?:^|\.)\Q$domain\E$/;
             }
         }
     }
@@ -1696,8 +1695,8 @@ C<CGI_HTTP_PROXY> environment variable can be used instead.
     $ua->no_proxy('localhost', 'example.com');
     $ua->no_proxy(); # clear the list
 
-Do not proxy requests to the given domains.  Calling C<no_proxy> without
-any domains clears the list of domains.
+Do not proxy requests to the given domains, including subdomains.
+Calling C<no_proxy> without any domains clears the list of domains.
 
 =head2 proxy
 

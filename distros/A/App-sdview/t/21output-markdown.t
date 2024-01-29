@@ -38,6 +38,12 @@ dotest "Formatting", <<"EOMARKDOWN";
 ~~strikethrough~~
 EOMARKDOWN
 
+dotest "Special characters get encoded as HTML entities", <<"EOMARKDOWN";
+Some content with non-breaking&nbsp;spaces in it.
+
+This &amp; that
+EOMARKDOWN
+
 dotest "Verbatim", <<"EOMARKDOWN";
 # EXAMPLE
 

@@ -238,9 +238,8 @@ EOF
     printf STDERR $format, $self->defaultValuesFile;
     $defaultValues->{locationRules} = $attributes->{locationRules}->{default};
     foreach ( keys %$attributes ) {
-        if (    not /(?:MetaData|vhost)/
-            and $attributes->{$_}->{default}
-            and not $reverseScanResult->{$_} )
+        if ( not /(?:MetaData|vhost)/
+            and $attributes->{$_}->{default} )
         {
             $defaultValues->{$_} = $attributes->{$_}->{default};
         }

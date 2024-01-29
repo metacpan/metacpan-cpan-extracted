@@ -6,13 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/RGBColorUtils.pm'
 );
 
 my @scripts = (
+    'script/mix-2-rgb-colors',
+    'script/mix-rgb-colors',
     'script/rgb-is-dark',
     'script/rgb-is-light'
 );

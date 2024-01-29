@@ -10,7 +10,7 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.038';
+$App::Cme::Command::run::VERSION = '1.040';
 use strict;
 use warnings;
 use v5.20;
@@ -146,14 +146,17 @@ sub replace_vars ($user_args, $script_var, $data, @items) {
 }
 
 sub parse_script_lines ($script, $lines) {
-    # provide default values
-    my %default ;
-    my @load;
-    my @doc;
-    my @code;
-    my @var;
-    my $commit_msg ;
-    my $app;
+    my $parsed_data = {
+        app => '',
+        doc => [],
+        code => [],
+        commit_msg => '',
+        # provide default values
+        default => {},
+        load => [],
+        var => [],
+    };
+
     my $line_nb = 0;
 
     # check content, store app
@@ -181,47 +184,43 @@ sub parse_script_lines ($script, $lines) {
 
         next unless $key ; # empty line
 
-        for ($key) {
-            when (/^app/) {
-                $app = $value[0];
-            }
-            when ('var') {
-                push @var, [ $line_nb, @value ];
-            }
-            when ('default') {
-                # multi-line default value is not supported
-                my ($dk, $dv) = split /[\s:=]+/, $value[0], 2;
-                $default{$dk} = $dv;
-            }
-            when ('code') {
-                die "Error line $line_nb: Cannot mix code and load section\n" if @load;
-                push @code, @value;
-            }
-            when ('doc') {
-                push @doc, @value;
-            }
-            when ('load') {
-                die "Error line $line_nb: Cannot mix code and load section\n" if @code;
-                push @load, @value;
-            }
-            when ('commit') {
-                $commit_msg = join "\n",@value;
-            }
-            default {
-                die "Error in file $script line $line_nb: unexpected '$key' instruction\n";
-            }
-        }
+        parse_command($key, $parsed_data, $line_nb, \@value)
+            or die "Error in cme DSL file $script line $line_nb: unexpected '$key' instruction\n";
     }
 
-    return {
-        app => $app,
-        doc => \@doc,
-        code => \@code,
-        commit_msg => $commit_msg,
-        default => \%default,
-        load => \@load,
-        var => \@var,
+    return $parsed_data;
+}
+
+sub parse_command ($key, $parsed_data, $line_nb, $value) {
+    if ( $key =~ /^app/ ) {
+        $parsed_data->{app} = $value->[0];
     }
+    elsif ( $key eq 'var' ) {
+        push $parsed_data->{var}->@*, [ $line_nb, $value->@* ];
+    }
+    elsif ( $key eq 'default' ) {
+        # multi-line default value is not supported
+        my ( $dk, $dv ) = split /[\s:=]+/, $value->[0], 2;
+        $parsed_data->{default}{$dk} = $dv;
+    }
+    elsif ( $key eq 'code' ) {
+        die "Error line $line_nb: Cannot mix code and load section\n" if $parsed_data->{load}->@*;
+        push $parsed_data->{code}->@*, $value->@*;
+    }
+    elsif ( $key eq 'doc' ) {
+        push $parsed_data->{doc}->@*, $value->@*;
+    }
+    elsif ( $key eq 'load' ) {
+        die "Error line $line_nb: Cannot mix code and load section\n" if $parsed_data->{code}->@*;
+        push $parsed_data->{load}->@*, $value->@*;
+    }
+    elsif ( $key eq 'commit' ) {
+        $parsed_data->{commit_msg} = join "\n", $value->@*;
+    }
+    else {
+        return 0;
+    }
+    return 1;
 }
 
 sub process_script_vars ($user_args, $data) {
@@ -263,38 +262,35 @@ sub process_script_vars ($user_args, $data) {
 sub parse_script ($script, $content, $user_args) {
     my $lines->@* =  split /\n/,$content;
 
-    given ($lines->[0]) {
-        when (/Format: perl/i) {
-            ## no critic (ProhibitStringyEval)
-            my $data = eval($content);
-            die "Error in script $script (Perl format): $@\n" if $@;
-            foreach my $forbidden (qw/load var default/) {
-                die "Unexpected '$forbidden\ section in Perl format script $script\n" if $data->{$forbidden};
-            }
-            die "Unexpected 'code' section in Perl format script $script. Please use a sub section.\n" if $data->{code};
-            return $data;
+    if ($lines->[0] =~ /Format:\s*perl/i) {
+        ## no critic (ProhibitStringyEval)
+        my $data = eval($content);
+        die "Error in script $script (Perl format): $@\n" if $@;
+        foreach my $forbidden (qw/load var default/) {
+            die "Unexpected '$forbidden\ section in Perl format script $script\n" if $data->{$forbidden};
         }
-        when (/Format: yaml/i) {
-            my $ypp = YAML::PP->new;
-            my $data = $ypp->load_string($content);
-            foreach my $key (qw/doc code load var/) {
-                next unless defined $data->{$key};
-                next if ref $data->{$key} eq 'ARRAY';
-                $data->{$key} = [ $data->{$key} ]
-            }
-            if ($data->{default} and ref $data->{default} ne 'HASH') {
-                die "default spec must be a hash ref, not a ", ref $data->{default} // 'scalar', "\n";
-            }
-            $data = process_script_vars ($user_args, $data);
-            return $data;
-        }
-        default {
-            my $data = parse_script_lines ($script, $lines);
-            $data = process_script_vars ($user_args, $data);
-            return $data;
-        }
+        die "Unexpected 'code' section in Perl format script $script. Please use a sub section.\n" if $data->{code};
+        return $data;
     }
 
+    if ($lines->[0] =~ /Format:\s*yaml/i) {
+        my $ypp = YAML::PP->new;
+        my $data = $ypp->load_string($content);
+        foreach my $key (qw/doc code load var/) {
+            next unless defined $data->{$key};
+            next if ref $data->{$key} eq 'ARRAY';
+            $data->{$key} = [ $data->{$key} ]
+        }
+        if ($data->{default} and ref $data->{default} ne 'HASH') {
+            die "default spec must be a hash ref, not a ", ref $data->{default} // 'scalar', "\n";
+        }
+        $data = process_script_vars ($user_args, $data);
+        return $data;
+    }
+
+    my $data = parse_script_lines ($script, $lines);
+    $data = process_script_vars ($user_args, $data);
+    return $data;
 }
 
 sub execute {
@@ -321,9 +317,13 @@ sub execute {
     # parse variables passed on command line
     my %user_args = map { split '=',$_,2; } @{ $opt->{arg} };
 
-    if ($content =~ m/^#!/ or $content =~ /^use/m) {
+    if ($content =~ m/^#!/ and -x $script) {
         splice @ARGV, 0,2; # remove 'run script' arguments
         my $done = eval $script->slurp_utf8."\n1;\n"; ## no critic (BuiltinFunctions::ProhibitStringyEval)
+        if (ref $done eq 'HASH') {
+            warn "script $script_name returns a hash but it's processed as a plain script.",
+                " This may not be what you want\n";
+        }
         die "Error in script $script_name: $@\n" unless $done;
         return;
     }
@@ -396,7 +396,7 @@ sub execute {
 }
 
 package App::Cme::Run::Var; ## no critic (Modules::ProhibitMultiplePackages)
-$App::Cme::Run::Var::VERSION = '1.038';
+$App::Cme::Run::Var::VERSION = '1.040';
 require Tie::Hash;
 
 ## no critic (ClassHierarchies::ProhibitExplicitISA)
@@ -424,7 +424,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.038
+version 1.040
 
 =head1 SYNOPSIS
 
@@ -478,9 +478,9 @@ C<cme run> accepts scripts written with different syntaxes:
 
 =over
 
-=item in text
+=item cme DSL
 
-For simple script, this text specifies the target app, the doc,
+For simple script, this DSL text specifies the target app, the doc,
 optional variables and a load string used by L<Config::Model::Loader> or
 Perl code.
 
@@ -500,6 +500,8 @@ perl subroutine (see below).
 C<cme run> can also run plain Perl script. This is syntactic sugar to
 avoid polluting global namespace, i.e. there's no need to store a
 script using L<cme function|Config::Model/cme> in C</usr/local/bin/>.
+Note that the script must begin with the usual shebang line (C<#!>)
+and be executable.
 
 =back
 

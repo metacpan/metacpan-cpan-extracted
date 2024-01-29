@@ -60,6 +60,6 @@
          "web" : "https://github.com/richterger/Perl-LanguageServer"
       }
    },
-   "version" : "v2.6.1",
+   "version" : "v2.6.2",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

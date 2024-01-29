@@ -5,7 +5,7 @@ package Data::Record::Serialize::Util;
 use v5.12;
 use strict;
 use warnings;
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use parent 'Exporter::Tiny';
 
@@ -100,7 +100,7 @@ Data::Record::Serialize::Util - Useful things
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 INTERNALS
 

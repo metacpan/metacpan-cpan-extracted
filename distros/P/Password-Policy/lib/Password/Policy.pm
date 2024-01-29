@@ -1,5 +1,5 @@
 package Password::Policy;
-$Password::Policy::VERSION = '0.04';
+$Password::Policy::VERSION = '0.06';
 # ABSTRACT: Make managing multiple password strength profiles easy
 
 use strict;
@@ -163,7 +163,7 @@ Password::Policy - Make managing multiple password strength profiles easy
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 UNICODE
 

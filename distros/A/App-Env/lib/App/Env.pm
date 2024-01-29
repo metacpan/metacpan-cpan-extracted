@@ -2,96 +2,26 @@ package App::Env;
 
 # ABSTRACT: manage application specific environments
 
-use 5.00800;
+use v5.10;
 use strict;
 use warnings;
 
+our $VERSION = '1.04';
+
 use Scalar::Util;
 use Storable ();
+use List::Util 1.33;
 
 use Params::Validate ();
 
-# need to distinguish between a non-existent module
-# and one which has compile errors.
-use Module::Find qw( );
-
-our $VERSION = '1.02';
+use App::Env::_Util;
+use App::Env::_app;
 
 use overload
   '%{}'    => '_envhash',
-  '""'     => 'str',
+  q{""}    => 'str',
+  bool     => sub { 1 },
   fallback => 1;
-
-#-------------------------------------------------------
-
-sub _croak {
-    require Carp;
-    goto &Carp::croak;
-}
-
-my %existsModule;
-
-sub _loadModuleList {
-    %existsModule = ();
-
-    for my $path ( Module::Find::findallmod( 'App::Env' ) ) {
-        # greedy match picks up full part of path
-        my ( $base, $app ) = $path =~ /^(.*)::(.*)/;
-
-        # store lowercased module
-        $existsModule{ $base . '::' . lc $app } = $path;
-    }
-
-    return;
-}
-
-sub _existsModule {
-    my ( $path ) = @_;
-
-    # reconstruct path with lowercased application name.
-    # greedy match picks up full part of path
-    my ( $base, $app ) = $path =~ /^(.*)::(.*)/;
-    $path = $base . '::' . lc $app;
-
-    # (re)load cache if we can't find the module in the list
-    _loadModuleList
-      unless $existsModule{$path};
-
-    # really check
-    return $existsModule{$path};
-}
-
-#-------------------------------------------------------
-
-# allow site specific site definition
-use constant APP_ENV_SITE => do {
-    if ( !exists $ENV{APP_ENV_SITE} && _existsModule( 'App::Env::Site' ) ) {
-        eval { require App::Env::Site };
-        _croak( ref $@ ? $@ : "Error loading App::Env::Site: $@\n" ) if $@;
-    }
-
-    # only use the environment variable if defined and not empty.
-    defined $ENV{APP_ENV_SITE}
-      && length $ENV{APP_ENV_SITE} ? $ENV{APP_ENV_SITE} : undef;
-};
-
-# _App_Env_Site ( [$alt_site] );
-# if $alt_site is non-empty, return it.
-# if $alt_site is empty or undefined return ().
-# otherwise return APP_ENV_SITE
-sub _App_Env_Site {
-
-    @_ || return APP_ENV_SITE;
-
-    my $site = shift;
-
-    return () if !defined $site || $site eq '';
-    return $site;
-
-# _croak( "Environment variable APP_ENV_SITE is only obeyed at the time that ${ \__PACKAGE__ } is loaded" )
-#   if ( defined( APP_ENV_SITE ) xor defined $ENV{APP_ENV_SITE} )
-#   || ( defined( APP_ENV_SITE ) && defined $ENV{APP_ENV_SITE} && APP_ENV_SITE ne $ENV{APP_ENV_SITE} );
-}
 
 #-------------------------------------------------------
 
@@ -110,14 +40,11 @@ my %ApplicationOptions = (
     %SharedOptions,
 );
 
-my %CloneOptions = %{
-    Storable::dclone(
-        { map { $_ => $SharedOptions{$_} } qw[ CacheID Cache SysFatal ] } ) };
+my %CloneOptions
+  = %{ Storable::dclone( { map { $_ => $SharedOptions{$_} } qw[ CacheID Cache SysFatal ] } ) };
 $CloneOptions{Cache}{default} = 0;
 
-my %TempOptions = %{
-    Storable::dclone(
-        { map { $_ => $SharedOptions{$_} } qw[ SysFatal Temp ] } ) };
+my %TempOptions = %{ Storable::dclone( { map { $_ => $SharedOptions{$_} } qw[ SysFatal Temp ] } ) };
 
 # options for whom defaults may be changed.  The values
 # in %OptionDefaults are references to the same hashes as in
@@ -126,9 +53,6 @@ my %TempOptions = %{
 my @OptionDefaults = qw( Force Cache Site SysFatal );
 my %OptionDefaults;
 @OptionDefaults{@OptionDefaults} = @ApplicationOptions{@OptionDefaults};
-
-# environment cache
-our %EnvCache;
 
 #-------------------------------------------------------
 #-------------------------------------------------------
@@ -154,12 +78,10 @@ sub import {
     # object method?
     if ( Scalar::Util::blessed $this && $this->isa( __PACKAGE__ ) ) {
         my $self = shift;
-        _croak( __PACKAGE__, "->import: too many arguments\n" )
+        App::Env::_Util::croak( __PACKAGE__, "->import: too many arguments\n" )
           if @_;
 
-        while ( my ( $key, $value ) = each %{$self} ) {
-            $ENV{$key} = $value;
-        }
+        $ENV{$_} = $self->{$_} for keys %$self;    ## no critic (Variables::RequireLocalizedPunctuationVars)
     }
 
     else {
@@ -188,9 +110,9 @@ sub retrieve {
     my ( $cacheid ) = @_;
     my $self;
 
-    if ( defined $EnvCache{$cacheid} ) {
+    if ( defined( my $app = App::Env::_Util::getCacheEntry( $cacheid ) ) ) {
         $self = __PACKAGE__->new();
-        $self->_var( app => $EnvCache{$cacheid} );
+        $self->_var( app => $app );
     }
 
     return $self;
@@ -235,7 +157,7 @@ sub clone {
     $clone->_app->mk_cacheid(
         CacheID => defined $nopt{CacheID}
         ? $nopt{CacheID}
-        : $self->lobject_id
+        : $self->lobject_id,
     );
 
     my %opt = ( %{ $clone->_opt }, %nopt );
@@ -266,8 +188,7 @@ sub _load_envs {
     # an array containing the app name and options), treat @opts as
     # ApplicationOptions, else SharedOptions
 
-    my %opts = Params::Validate::validate( @opts,
-        @apps == 1 && !ref( $apps[0] )
+    my %opts = Params::Validate::validate( @opts, @apps == 1 && !ref( $apps[0] )
         ? \%ApplicationOptions
         : \%SharedOptions );
 
@@ -301,7 +222,7 @@ sub _load_envs {
         # handle application specific options.
         if ( 'ARRAY' eq ref( $app ) ) {
             ( $app, my $opts ) = @$app;
-            _croak( "$app: application options must be a hashref\n" )
+            App::Env::_Util::croak( "$app: application options must be a hashref\n" )
               unless 'HASH' eq ref $opts;
 
             %app_opt = ( %app_opt, %$opts );
@@ -309,9 +230,8 @@ sub _load_envs {
             if ( @apps > 1 ) {
                 for my $iopt ( qw( Cache Force ) ) {
                     if ( exists $app_opt{$iopt} ) {
-                        _croak(
-                            "$app: do not specify the $iopt option for individual applications in a merge\n"
-                        );
+                        App::Env::_Util::croak(
+                            "$app: do not specify the $iopt option for individual applications in a merge\n" );
                         delete $app_opt{$iopt};
                     }
                 }
@@ -327,20 +247,19 @@ sub _load_envs {
 
         # validate possible application options and get default
         # values. Params::Validate wants a real array
-        my ( @opts ) = %app_opt;
+        my ( @app_opts ) = %app_opt;
 
         # return an environment object, but don't load it. we need the
         # module name to create a cacheid for the merged environment.
         # don't load now to prevent unnecessary loading of uncached
         # environments if later it turns out this is a cached
         # multi-application environment
-        %app_opt
-          = ( Params::Validate::validate( @opts, \%ApplicationOptions ) );
+        %app_opt = ( Params::Validate::validate( @app_opts, \%ApplicationOptions ) );
         my $appo = App::Env::_app->new(
             pid    => $self->lobject_id,
             app    => $app,
             NoLoad => 1,
-            opt    => \%app_opt
+            opt    => \%app_opt,
         );
         push @cacheids, $appo->cacheid;
         push @Apps,     $appo;
@@ -348,28 +267,26 @@ sub _load_envs {
 
 
     # create a cacheid for the multi-app environment
-    my $cacheid = $opts{CacheId} || join( $;, @cacheids );
+    my $cacheid = $opts{CacheId} // join( $;, @cacheids );
     my $App;
 
     # use cache if possible
-    if ( !$opts{Force} && exists $EnvCache{$cacheid} ) {
+    if ( !$opts{Force} && defined( my $app = App::Env::_Util::getCacheEntry( $cacheid ) ) ) {
         # if this is a temporary object and a cached version exists,
         # clone it and assign a new cache id.
         if ( $opts{Temp} ) {
-            $App = Storable::dclone( $EnvCache{$cacheid} );
+            $App = Storable::dclone( $app );
 
             # should really call $self->cacheid here, but $self
             # doesn't have an app attached to it yet so that'll fail.
             $App->cacheid( $self->lobject_id );
 
             # update Temp compatible options
-            $App->_opt(
-                { %{ $App->_opt }, map { $_ => $opts{$_} } keys %TempOptions }
-            );
+            $App->opt( { %{ $App->opt }, map { $_ => $opts{$_} } keys %TempOptions } );
         }
 
         else {
-            $App = $EnvCache{$cacheid};
+            $App = $app;
         }
     }
 
@@ -394,7 +311,7 @@ sub _load_envs {
             push @modules, $app->module;
 
             # embrace new merged environment
-            %ENV = %{ $app->load };
+            %ENV = %{ $app->load };    ## no critic (Variables::RequireLocalizedPunctuationVars)
         }
 
         $App = App::Env::_app->new(
@@ -429,7 +346,10 @@ sub _var {
 sub module   { $_[0]->_app->module }
 sub cacheid  { $_[0]->_app->cacheid }
 sub _cacheid { my $self = shift; $self->app->cacheid( @_ ) }
-sub _opt     { my $self = shift; $self->_app->_opt( @_ ) }
+sub _opt {
+    my $self = shift;
+    $self->_app->opt( @_ );
+}
 sub _app     { $_[0]->_var( 'app' ) }
 sub _envhash { $_[0]->_app->{ENV} }
 
@@ -440,17 +360,7 @@ sub _envhash { $_[0]->_app->{ENV} }
 
 # stolen as much as possible from Object::ID to keep the interface the same
 {
-    my $Last_ID = "a";
-
-
-
-
-
-
-
-
-
-
+    my $Last_ID = 'a';
 
     sub lobject_id {
         my $self = shift;
@@ -466,7 +376,7 @@ sub cache {
     my ( $self, $cache ) = @_;
 
     defined $cache
-      or _croak( "missing or undefined cache argument\n" );
+      or App::Env::_Util::croak( "missing or undefined cache argument\n" );
 
     if ( $cache ) {
         $self->_app->cache;
@@ -477,108 +387,9 @@ sub cache {
 }
 
 sub uncache {
-    my %opt = Params::Validate::validate(
-        @_,
-        {
-            All     => { default  => undef, type => Params::Validate::SCALAR },
-            App     => { default  => undef, type => Params::Validate::SCALAR },
-            Site    => { optional => 1,     type => Params::Validate::SCALAR },
-            CacheID => { default  => undef, type => Params::Validate::SCALAR },
-        } );
-
-    if ( $opt{All} ) {
-        delete $opt{All};
-        _croak( "can't specify All option with other options\n" )
-          if grep { defined $_ } values %opt;
-
-        delete $EnvCache{$_} foreach keys %EnvCache;
-    }
-
-    elsif ( defined $opt{CacheID} ) {
-        my $cacheid = delete $opt{CacheID};
-        _croak( "can't specify CacheID option with other options\n" )
-          if grep { defined $_ } values %opt;
-
-        delete $EnvCache{$cacheid};
-    }
-    else {
-        _croak( "must specify App or CacheID options\n" )
-          unless defined $opt{App};
-
-        # don't use normal rules for Site specification as we're trying
-        # to delete a specific one.
-        delete $EnvCache{
-            _modulename(
-                _App_Env_Site( exists $opt{Site} ? ( $opt{Site} ) : () ),
-                $opt{App} ) };
-    }
-
-    return;
+    goto \&App::Env::_Util::uncache;
 }
 
-#-------------------------------------------------------
-
-sub _modulename {
-    return join( '::', 'App::Env', grep { defined $_ } @_ );
-}
-
-
-#-------------------------------------------------------
-
-# construct a module name based upon the current or requested site.
-# requires the module if found.  returns the module name if module is
-# found, false if not, die's if require fails
-
-sub _require_module {
-    my ( $app, %par ) = @_;
-
-    my $app_opts = $par{app_opts} ||= {};
-    my $loop     = $par{loop}     ||= 1;
-
-    _croak( "too many alias loops for $app\n" )
-      if $loop == 10;
-
-    my @sites = _App_Env_Site( exists $par{site} ? $par{site} : () );
-
-    # check possible sites, in turn.
-    my ( $module )
-      = grep { defined $_ }
-      ( map { _existsModule( _modulename( $_, $app ) ) } @sites ),
-      _existsModule( _modulename( $app ) );
-
-    if ( defined $module ) {
-        ## no critic ( ProhibitStringyEval );
-        eval "require $module"
-          or _croak $@;
-
-        # see if this is an alias
-        if ( my $alias = $module->can( 'alias' ) ) {
-            ( $app, my $napp_opts ) = $alias->();
-            @{$app_opts}{ keys %$napp_opts } = @{$napp_opts}{ keys %$napp_opts }
-              if $napp_opts;
-            return _require_module(
-                $app, %par,
-                loop     => ++$loop,
-                app_opts => $app_opts
-            );
-        }
-    }
-
-    else {
-        return;
-    }
-
-    return ( $module, $app_opts );
-}
-
-#-------------------------------------------------------
-
-sub _exclude_param_check {
-    !ref $_[0]
-      || 'ARRAY' eq ref $_[0]
-      || 'Regexp' eq ref $_[0]
-      || 'CODE' eq ref $_[0];
-}
 
 #-------------------------------------------------------
 
@@ -591,29 +402,40 @@ sub env {
         @opts,
         {
             Exclude => {
-                callbacks => { 'type' => \&_exclude_param_check },
-                default   => undef
+                callbacks => { 'type' => \&App::Env::_Util::exclude_param_check },
+                default   => undef,
+            },
+            AllowIllegalVariableNames => {
+                optional => 1,
+                default  => !!1,
             },
         } );
 
     # Exclude is only allowed in scalar calling context where
     # @_ is empty, has more than one element, or the first element
     # is not a scalar.
-    _croak( "Cannot use Exclude in this calling context\n" )
-      if $opt{Exclude} && ( wantarray() || ( @_ == 1 && !ref $_[0] ) );
-
+    App::Env::_Util::croak( "Cannot use Exclude in this calling context\n" )
+      if $opt{Exclude} && ( wantarray() || ( @_ == 1 && !ref $_[0] ) );    ## no critic (Community::Wantarray)
 
     my $include = [ @_ ? @_ : qr/.*/ ];
     my $env     = $self->_envhash;
 
-    my @vars = $self->_filter_env( $include, $opt{Exclude} );
+    my @exclude
+      = defined( $opt{Exclude} )
+      ? ( 'ARRAY' eq ref $opt{Exclude} ? @{ $opt{Exclude} } : ( $opt{Exclude} ) )
+      : ();
 
-    ## no critic ( ProhibitAccessOfPrivateData )
-    if ( wantarray() ) {
+    # exclude any variables with non-word characters
+    push @exclude, qr/\W/
+      unless $opt{AllowIllegalVariableNames};
+
+    my @vars = $self->_filter_env( $include, \@exclude );
+
+    if ( wantarray() ) {    ## no critic (Community::Wantarray)
         return map { exists $env->{$_} ? $env->{$_} : undef } @vars;
     }
     elsif ( @_ == 1 && !ref $_[0] ) {
-        return exists $env->{ $vars[0] } ? $env->{ $vars[0] } : undef;
+        return @vars && exists $env->{ $vars[0] } ? $env->{ $vars[0] } : undef;
     }
     else {
         my %env;
@@ -629,7 +451,7 @@ sub setenv {
     my $var  = shift;
 
     defined $var
-      or _croak( "missing variable name argument\n" );
+      or App::Env::_Util::croak( "missing variable name argument\n" );
 
     if ( @_ ) {
         $self->_envhash->{$var} = $_[0];
@@ -652,24 +474,31 @@ sub str {
         @opts,
         {
             Exclude => {
-                callbacks => { 'type' => \&_exclude_param_check },
-                optional  => 1
+                callbacks => { 'type' => \&App::Env::_Util::exclude_param_check },
+                optional  => 1,
+            },
+            AllowIllegalVariableNames => {
+                optional => 1,
+                default  => !!0,
             },
         } );
 
     my $include = [ @_ ? @_ : qr/.*/ ];
+    my @exclude
+      = defined( $opt{Exclude} )
+      ? ( 'ARRAY' eq ref $opt{Exclude} ? @{ $opt{Exclude} } : ( $opt{Exclude} ) )
+      : ();
 
-    if ( !grep { $_ eq 'TERMCAP' } @$include ) {
-        $opt{Exclude} ||= [];
-        $opt{Exclude} = [ $opt{Exclude} ] unless 'ARRAY' eq ref $opt{Exclude};
-        push @{ $opt{Exclude} }, 'TERMCAP';
-    }
+    push @exclude, 'TERMCAP'
+      if List::Util::none { $_ eq 'TERMCAP' } @$include;
 
-    my $env = $self->_envhash;
-    ## no critic ( ProhibitAccessOfPrivateData )
-    my @vars = grep { exists $env->{$_} }
-      $self->_filter_env( $include, $opt{Exclude} );
-    return join( ' ', map { "$_=" . _shell_escape( $env->{$_} ) } @vars );
+    # exclude any variables with non-word characters
+    push @exclude, qr/\W/
+      unless $opt{AllowIllegalVariableNames};
+
+    my $env  = $self->_envhash;
+    my @vars = grep { exists $env->{$_} } $self->_filter_env( $include, \@exclude );
+    return join( q{ }, map { "$_=" . App::Env::_Util::shell_escape( $env->{$_} ) } @vars );
 }
 
 #-------------------------------------------------------
@@ -704,6 +533,7 @@ sub _match_var {
     for my $spec ( @$match ) {
         next unless defined $spec;
 
+        ## no critic( ControlStructures::ProhibitCascadingIfElse)
         if ( !ref $spec ) {
             # always return a plain name.  this allows
             #   @values = $env->env( @names) to work.
@@ -713,12 +543,13 @@ sub _match_var {
             push @keys, grep { /$spec/ } keys %$env;
         }
         elsif ( 'CODE' eq ref $spec ) {
-            ## no critic ( ProhibitAccessOfPrivateData )
             push @keys, grep { $spec->( $_, $env->{$_} ) } keys %$env;
         }
+        elsif ( 'ARRAY' eq ref $spec ) {
+            push @keys, $self->_match_var( $spec );
+        }
         else {
-            _croak( "match specification is of unsupported type: ",
-                ref $spec, "\n" );
+            App::Env::_Util::croak( 'match specification is of unsupported type: ', ref $spec, "\n" );
         }
     }
 
@@ -728,25 +559,10 @@ sub _match_var {
 #-------------------------------------------------------
 
 
-sub _shell_escape {
-    my $str = shift;
-
-    # empty string
-    if ( $str eq '' ) {
-        $str = "''";
-    }
-
-    # otherwise, escape all but the "known" non-magic characters.
-    else {
-        $str =~ s{([^\w/.:=\-+%])}{\\$1}go;
-    }
-
-    $str;
-}
-
 #-------------------------------------------------------
 
-sub system {
+
+sub system {    ## no critic (Subroutines::ProhibitBuiltinHomonyms)
     my $self = shift;
 
     local %ENV = %{$self};
@@ -769,19 +585,23 @@ sub qexec {
 
     my ( @res, $res );
 
-    if ( wantarray ) {
-        @res = eval { IPC::System::Simple::capture( @_ ) }
-    }
-    else {
-        $res = eval { IPC::System::Simple::capture( @_ ) }
-    }
+    my $wantarray = wantarray;    ## no critic (Community::Wantarray)
 
-    if ( $@ ne '' ) {
-        _croak( $@ ) if $self->_opt->{SysFatal};
-        return;
-    }
+    eval {
+        if ( $wantarray ) {
+            @res = IPC::System::Simple::capture( @_ );
+        }
+        else {
+            $res = IPC::System::Simple::capture( @_ );
+        }
+        1;
+    } // do {
+        App::Env::_Util::croak( $@ ) if $self->_opt->{SysFatal};
+        # should return false, but need to keep API backwards compat
+        return undef;
+    };
 
-    return wantarray ? @res : $res;
+    return $wantarray ? @res : $res;
 }
 
 #-------------------------------------------------------
@@ -792,15 +612,17 @@ sub capture {
 
     local %ENV = %{$self};
 
+    my $wantarray = wantarray;    ## no critic (Community::Wantarray)
+
     require Capture::Tiny;
     require IPC::System::Simple;
+
+    my ( $stdout, $stderr );
 
     my $sub
       = $self->_opt->{SysFatal}
       ? sub { IPC::System::Simple::system( @args ) }
       : sub { CORE::system( @args ) };
-
-    my ( $stdout, $stderr );
 
     # Capture::Tiny::capture is prototyped as (&;@). App::Env
     # lazy-loads Capture::Tiny and thus nominally avoids the prototype
@@ -811,22 +633,23 @@ sub capture {
     # requires an explicit block or sub{}.  So, explicitly
     # ignore prototypes.
 
-    if ( wantarray ) {
-        ( $stdout, $stderr ) = eval { &Capture::Tiny::capture( $sub ) };
+    eval {
+        ## no critic (Subroutines::ProhibitAmpersandSigils,Community::AmpersandSubCalls )
+        if ( $wantarray ) {
+            ( $stdout, $stderr ) = &Capture::Tiny::capture( $sub );
+        }
+        else {
+            $stdout = &Capture::Tiny::capture( $sub );
+        }
+        1;
+    } // App::Env::_Util::croak( $@ );
 
-    }
-    else {
-        $stdout = eval { &Capture::Tiny::capture( $sub ) };
-    }
-
-    _croak( $@ ) if $@ ne '';
-
-    return wantarray ? ( $stdout, $stderr ) : $stdout;
+    return $wantarray ? ( $stdout, $stderr ) : $stdout;
 }
 
 #-------------------------------------------------------
 
-sub exec {
+sub exec {    ## no critic (Subroutines::ProhibitBuiltinHomonyms)
     my $self = shift;
 
     local %ENV = %{$self};
@@ -846,174 +669,6 @@ sub which {
     }
 }
 
-###############################################
-###############################################
-
-package App::Env::_app;
-
-use Carp();
-use Storable ();
-use Digest;
-
-use strict;
-use warnings;
-
-*_croak = \&App::Env::_croak;
-
-# new( pid => $pid, app => $app, opt => \%opt )
-# new( pid => $pid, env => \%env, module => $module, cacheid => $cacheid )
-sub new {
-    my ( $class, %opt ) = @_;
-
-    # make copy of options
-    my $self = bless Storable::dclone( \%opt ), $class;
-
-    if ( exists $self->{env} ) {
-        $self->{opt} = {} unless defined $self->{opt};
-        $self->{ENV} = delete $self->{env};
-    }
-    else {
-
-        ( $self->{module}, my $app_opts ) = eval {
-            App::Env::_require_module(
-                $self->{app},
-                (
-                    exists $self->{opt}{Site}
-                    ? ( site => $self->{opt}{Site} )
-                    : () ) );
-        };
-
-        _croak(
-            ref $@
-            ? $@
-            : "error loading application environment module for $self->{app}:\n",
-            $@
-        ) if $@;
-
-        _croak(
-            "application environment module for $self->{app} does not exist\n" )
-          unless defined $self->{module};
-
-        # merge possible alias AppOpts
-        $self->{opt}{AppOpts} ||= {};
-        $self->{opt}{AppOpts} = { %$app_opts, %{ $self->{opt}{AppOpts} } };
-
-        $self->mk_cacheid;
-    }
-
-    # return cached entry if possible
-    if ( exists $App::Env::EnvCache{ $self->cacheid } && !$opt{opt}{Force} ) {
-        $self = $App::Env::EnvCache{ $self->cacheid };
-    }
-
-    else {
-        $self->load unless $self->{NoLoad};
-        delete $self->{NoLoad};
-    }
-
-    return $self;
-}
-
-#-------------------------------------------------------
-
-sub mk_cacheid {
-    my ( $self, $cacheid ) = @_;
-
-    $cacheid = $self->{opt}{CacheID} unless defined $cacheid;
-
-    my @elements;
-
-    if ( defined $cacheid ) {
-        push @elements, $cacheid eq 'AppID' ? $self->{module} : $cacheid;
-    }
-    else {
-        # create a hash of unique stuff which will be folded
-        # into the cacheid
-        my %uniq;
-        $uniq{AppOpts} = $self->{opt}{AppOpts}
-          if defined $self->{opt}{AppOpts} && keys %{ $self->{opt}{AppOpts} };
-
-        my $digest;
-
-        if ( keys %uniq ) {
-            local $Storable::canonical = 1;
-            $digest = Storable::freeze( \%uniq );
-
-            # use whatever digest aglorithm we can find.  if none is
-            # found, default to the frozen representation of the
-            # options
-            for my $alg ( qw[ SHA-256 SHA-1 MD5 ] ) {
-                my $ctx = eval { Digest->new( $alg ) };
-
-                if ( defined $ctx ) {
-                    $digest = $ctx->add( $digest )->digest;
-                    last;
-                }
-            }
-        }
-        push @elements, $self->{module}, $digest;
-    }
-
-    $self->cacheid( join( $;, grep { defined $_ } @elements ) );
-}
-
-
-#-------------------------------------------------------
-
-sub load {
-    my ( $self ) = @_;
-
-    # only load if we haven't before
-    return $self->{ENV} if exists $self->{ENV};
-
-    my $module = $self->module;
-
-    my $envs;
-    my $fenvs = $module->can( 'envs' );
-
-    _croak( "$module does not have an 'envs' function\n" )
-      unless $fenvs;
-
-    $envs = eval { $fenvs->( $self->{opt}{AppOpts} ) };
-
-    _croak( ref $@ ? $@ : "error in ${module}::envs: $@\n" )
-      if $@;
-
-    # make copy of environment
-    $self->{ENV} = { %{$envs} };
-
-    # cache it
-    $self->cache if $self->{opt}{Cache};
-
-    return $self->{ENV};
-}
-
-#-------------------------------------------------------
-
-sub cache {
-    my ( $self ) = @_;
-    $App::Env::EnvCache{ $self->cacheid } = $self;
-}
-
-#-------------------------------------------------------
-
-sub uncache {
-    my ( $self ) = @_;
-    my $cacheid = $self->cacheid;
-
-    delete $App::Env::EnvCache{$cacheid}
-      if exists $App::Env::EnvCache{$cacheid}
-      && $App::Env::EnvCache{$cacheid}{pid} eq $self->{pid};
-}
-
-#-------------------------------------------------------
-
-sub _opt    { @_ > 1 ? $_[0]->{opt}     = $_[1] : $_[0]->{opt} }
-sub cacheid { @_ > 1 ? $_[0]->{cacheid} = $_[1] : $_[0]->{cacheid} }
-sub module  { $_[0]->{module} }
-
-#-------------------------------------------------------
-
 1;
 
 #
@@ -1030,7 +685,7 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory AllowIllegalVariableNames
 
 =head1 NAME
 
@@ -1038,7 +693,7 @@ App::Env - manage application specific environments
 
 =head1 VERSION
 
-version 1.02
+version 1.04
 
 =head1 SYNOPSIS
 
@@ -1247,11 +902,7 @@ option is specified to ensure that the environment is not being read
 from cache, just in case a prior C<null> environment was inadvertently
 cached.
 
-=begin Pod::Coverage
-
-=item lobject_id
-
-=end Pod::Coverage
+=for Pod::Coverage lobject_id
 
 =head1 INTERFACE
 
@@ -1490,49 +1141,53 @@ Returns the cache id for this environment.
 
 =item env
 
-  # return a hashref of the entire environment (similar to %{$env})
-  $hashref = $env->env( );
+  # Context 1: return a hashref of the entire environment (similar to %{$env}),
+  # with optional filtering.
+  $hashref = $env->env( ?\%options );
 
-  # return the value of a given variable in the environment
-  $value = $env->env( $variable_name )
+  # Context 2: return the value of a given variable in the environment.
+  # no filtering.
+  $value = $env->env( $variable_name );
 
-  # return an array of values of particular variables.
-  # names should be strings
+  # Context 3
+  # return an array of values of specified variables.
   @values = $env->env( @variable_names );
 
+  # Context 4
   # match variable names and return a hashref
-  $hashref = $env->env( @match_specifications );
+  $hashref = $env->env( @match_specifications, ?\%options );
 
   # exclude specific variables
   $hashref = $env->env( { Exclude => $match_spec   } );
   $hashref = $env->env( { Exclude => \@match_specs } );
-  $hashref = $env->env( @match_specs, { Exclude => $match_spec   } );
-  $hashref = $env->env( @match_specs, { Exclude => \@match_specs } );
+  $hashref = $env->env( @match_specifications, { Exclude => $match_spec   } );
+  $hashref = $env->env( @match_specifications, { Exclude => \@match_specs } );
 
-Return all or parts of the environment.  What is returned
+Return all or parts of the environment. What is returned
 depends upon the type of argument and which of the
 following contexts matches:
 
 =over
 
-=item 1
+=item Context 1
 
-If called with no arguments (or just an B<Exclude> option,
-as discussed below) return a hashref containing the environment.
+If called with no variable names or match specifications,
+return the environment after filtering out variables
+via the B<Exclude> or B<AllowIllegalVariableNames> options.
 
-=item 2
+=item Context 2
 
 If called in a scalar context and passed a single variable name
 (which must be a string) return the value for that variable,
 or I<undef> if it is not in the environment.
 
-=item 3
+=item Context 3
 
 If called in a list context and passed a list of variable names
 (which must be strings) return an array of values for those variables
 (I<undef> for those not in the environment).
 
-=item 4
+=item Context 4
 
 If called in a scalar context and passed one or more I<match
 specifications>, return a hashref containing the subset
@@ -1545,7 +1200,7 @@ or a subroutine reference.  The subroutine will be passed two
 arguments, the variable name and its value, and should return true if
 the variable should be excluded, false otherwise.
 
-To avoid mistaking this context for context 1 if the I<match specification>
+To avoid mistaking this context for L</Context 1> if the I<match specification>
 is a single string, enclose it in an array, e.g.
 
    # this is context 1
@@ -1556,10 +1211,25 @@ is a single string, enclose it in an array, e.g.
 
 =back
 
+The B<%options> hash may contain the following entries:
+
+=over
+
+=item Exclude
+
 Variable names may be excluded from the list by passing a hash with
-the key C<Exclude> as the last argument (valid only in contexts 0 and
-3).  The value is either a scalar or an arrayref composed of match
-specifications (as an arrayref) as described in context 3.
+the key C<Exclude> as the last argument (valid only in L</Context 0>
+and L</Context 3>).  The value is either a scalar or an arrayref
+composed of match specifications (as an arrayref) as described in
+L</Context 3>.
+
+=item AllowIllegalVariableNames
+
+Not all variable names may be set with a shell command, but may be
+inherited from the parent environment.  This option controls whether
+such variables are returned by L</env>.  It defaults to true.
+
+=back
 
 =item setenv
 
@@ -1593,7 +1263,7 @@ C<var=value> pairs, with shell magic characters escaped.
 
 The environment may be pared down by passing I<match specifications>
 and an C<Exclude> option; see the documentation for the B<env> method,
-context 3, for more information.
+L</Context 4>, for more information.
 
 Because the B<TERMCAP> environment variable is often riddled with
 escape characters, which are not always handled well by shells, the
@@ -1603,6 +1273,24 @@ included via an exact variable name match specification. For example,
   $envstr = $env->str( qr/.*/, 'TERMCAP );
 
 is the only means of getting all of the environment returned.
+
+B<Note!> By default variables with illegal names (that is,
+characters which match B<qr/\W/> are I<not> output).
+
+To output them, set the B<AllowIllegalVariableNames> option to a true
+value (it defaults to false).
+
+The B<%options> hash may contain the following entries:
+
+=over
+
+=item AllowIllegalVariableNames
+
+Not all variable names may be set with a shell command, but may be
+inherited from the parent environment.  This option controls whether
+such variables are returned by L</str>.  It defaults to false.
+
+=back
 
 =item system
 
@@ -1778,17 +1466,17 @@ any changes will be localized.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-app-env@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env
+Please report any bugs or feature requests to bug-app-env@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env>
 
 =head2 Source
 
 Source is available at
 
-  https://gitlab.com/djerius/App-Env
+  https://gitlab.com/djerius/app-env
 
 and may be cloned from
 
-  https://gitlab.com/djerius/App-Env.git
+  https://gitlab.com/djerius/app-env.git
 
 =head1 SEE ALSO
 

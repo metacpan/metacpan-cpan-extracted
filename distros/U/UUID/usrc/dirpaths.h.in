@@ -1,0 +1,22 @@
+/*
+ * The original blurb....
+ **************************************************************
+ * This file contains the path names for various directories as
+ * controlled by the configure script.
+ **************************************************************
+ *
+ * ... has been canceled due to lack of interest.
+ *
+ * The defines here are not used by the UUID bits, so they've
+ * been removed to keep from scaring the children.
+ *
+ *    #define LOCALEDIR       "@datadir@/local"
+ *    #define ROOT_SYSCONFDIR "@root_sysconfdir@"
+ *
+ * Other places in the UUID headers do include this file, so
+ * it was deemed necessary to maintain a placeholder while
+ * at the same time removing the two otherwise unused
+ * substitutions above.
+ *
+ * Thanks for your attention, and have a Good Day!
+ */

@@ -35,7 +35,7 @@
             "SPVM" : "0.986",
             "SPVM::File::Basename" : "0.02",
             "SPVM::File::Spec" : "0.03",
-            "SPVM::Sys" : "0.39"
+            "SPVM::Sys" : "0.508"
          }
       },
       "test" : {
@@ -50,6 +50,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-File-Path"
       }
    },
-   "version" : "0.011",
+   "version" : "0.011001",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

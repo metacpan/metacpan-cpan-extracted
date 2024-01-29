@@ -8,7 +8,7 @@
 
 package Mail::Message::TransferEnc::Base64;
 use vars '$VERSION';
-$VERSION = '3.014';
+$VERSION = '3.015';
 
 use base 'Mail::Message::TransferEnc';
 

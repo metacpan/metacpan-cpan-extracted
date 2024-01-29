@@ -22,7 +22,7 @@
 	use warnings;
 	use Test::More;
 
-	our $VERSION = "2023.302.1";
+	our $VERSION = "2023.362.1";
 
 	BEGIN{ use_ok('SQL::SimpleOps'); }
 
@@ -1524,6 +1524,16 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
+		f=> "S1108",
+		s=> sub
+		{
+			$mymod->Delete( table => "tab_real1", where => [ "tab_alias1.fld_alias1" => "xx'xx" ], make_only=>1 )
+		},
+		t=> 'Delete( table => "tab_real1", where => [ "tab_alias1.fld_alias1" => "xx\'xx" ], make_only=>1 )',
+		r=> "DELETE FROM tab_real1 WHERE fld_real1 = 'xx\\'xx'",
+	);
+	&my_cmd
+	(
 		f=> "S1200",
 		s=> sub
 		{
@@ -1651,6 +1661,16 @@ sub callWhereWith()
 		},
 		t=> 'Update( table => "tab_real1", fields => { "tab_real1.fld_alias1" => undef }, where => [ "tab_real1.fld_alias1" => [ "!", undef ] ]',
 		r=> "UPDATE tab_real1 SET fld_real1 = NULL WHERE fld_real1 NOT NULL",
+	);
+	&my_cmd
+	(
+		f=> "S1215",
+		s=> sub
+		{
+			$mymod->Update( table => "tab_real1", fields => { "tab_real1.fld_alias1" => "xx'xx" }, where => [ "tab_real1.fld_alias1" => "yy'yy" ], make_only=>1 )
+		},
+		t=> 'Update( table => "tab_real1", fields => { "tab_real1.fld_alias1" => \'xx\\\'xx\' }, where => [ "tab_real1.fld_alias1" => \'yy\\\'yy\' ]',
+		r=> "UPDATE tab_real1 SET fld_real1 = 'xx\\'xx' WHERE fld_real1 = 'yy\\'yy'",
 	);
 	&my_cmd
 	(
@@ -2018,7 +2038,27 @@ sub callWithout()
 		t=> 'Insert( table=>"t1", fields => [ "a","b","c" ], values => [ undef,undef,undef ] )',
 		r=> "INSERT INTO t1 (a) VALUES (NULL),(NULL),(NULL)",
 	);
-
+	&my_cmd
+	(
+		f=> "S0126",
+		s=> sub { $mymod->Insert( table=>"t1", fields => { a => "xx'xx" }, make_only=>1 ) },
+		t=> 'Insert( table=>"t1", fields => { a => "xx\'xx" )',
+		r=> "INSERT INTO t1 (a) VALUES ('xx\\\'xx')",
+	);
+	&my_cmd
+	(
+		f=> "S0127",
+		s=> sub { $mymod->Insert( table=>"t1", fields => [ "a" ], values => [ "xx'xx" ], make_only=>1 ) },
+		t=> 'Insert( table=>"t1", fields => [ "a" ], values => [ "xx\'xx" ] )',
+		r=> "INSERT INTO t1 (a) VALUES ('xx\\\'xx')",
+	);
+	&my_cmd
+	(
+		f=> "S0128",
+		s=> sub { $mymod->Insert( table=>"t1", fields => [ "a" ], values => [ "xx'xx","yy'yy" ], make_only=>1 ) },
+		t=> 'Insert( table=>"t1", fields => [ "a" ], values => [ "xx\'xx","yy\'yy" ] )',
+		r=> "INSERT INTO t1 (a) VALUES ('xx\\\'xx'),('yy\\\'yy')",
+	);
 	&my_cmd
 	(
 		f=> "S0130",
@@ -2352,7 +2392,7 @@ sub callSelectCursorWith()
 		s=> sub { $mymod->SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_NEXT, make_only=>1) },
 		t=> 'SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_NEXT )',
 		n=> '',
-		r=> "SELECT t1.a, t1.b, t2.c FROM t1, t2 WHERE ((t1.a > 'a') OR (t1.a = 'a' AND t2.c > '100')) ORDER BY t1.a ASC, t2.c ASC LIMIT 100",
+		r=> "SELECT t1.a, t1.b, t2.c FROM t1, t2 WHERE (t1.a > 'a' OR (t1.a = 'a' AND t2.c > '100')) ORDER BY t1.a ASC, t2.c ASC LIMIT 100",
 		c=> \%cursor,
 	);
 	$cursor{first} = ['a',1];
@@ -2363,7 +2403,7 @@ sub callSelectCursorWith()
 		s=> sub { $mymod->SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_BACK, make_only=>1) },
 		t=> 'SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_BACK ',
 		n=> '',
-		r=> "SELECT t1.a, t1.b, t2.c FROM t1, t2 WHERE ((t1.a < 'a') OR (t1.a = 'a' AND t2.c < '1')) ORDER BY t1.a DESC, t2.c DESC LIMIT 100",
+		r=> "SELECT t1.a, t1.b, t2.c FROM t1, t2 WHERE (t1.a < 'a' OR (t1.a = 'a' AND t2.c < '1')) ORDER BY t1.a DESC, t2.c DESC LIMIT 100",
 		c=> \%cursor,
 	);
 	$cursor{first} = ['a',1];
@@ -2385,7 +2425,7 @@ sub callSelectCursorWith()
 		s=> sub { $mymod->SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_RELOAD, make_only=>1) },
 		t=> 'SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_RELOAD',
 		n=> '',
-		r=> "SELECT t1.a, t1.b, t2.c FROM t1, t2 WHERE ((t1.a >= 'a') OR (t1.a = 'a' AND t2.c >= '1')) ORDER BY t1.a ASC, t2.c ASC LIMIT 100",
+		r=> "SELECT t1.a, t1.b, t2.c FROM t1, t2 WHERE (t1.a >= 'a' OR (t1.a = 'a' AND t2.c >= '1')) ORDER BY t1.a ASC, t2.c ASC LIMIT 100",
 		c=> \%cursor,
 	);
 	$cursor{first} = ['a',1];
@@ -2407,7 +2447,7 @@ sub callSelectCursorWith()
 		s=> sub { $mymod->SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], where => ["t1.a" => "\\t2.a"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], cursor_command=>SQL_SIMPLE_CURSOR_RELOAD, limit=>100, make_only=>1) },
 		t=> 'SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], where => ["t1.a" => "\\t2.a"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], cursor_command=>SQL_SIMPLE_CURSOR_RELOAD, limit=>100 )',
 		n=> '',
-		r=> "SELECT t1.a, t1.b, t2.c FROM t1, t2 WHERE t1.a = t2.a AND (((t1.a >= 'a') OR (t1.a = 'a' AND t2.c >= '1'))) ORDER BY t1.a ASC, t2.c ASC LIMIT 100",
+		r=> "SELECT t1.a, t1.b, t2.c FROM t1, t2 WHERE t1.a = t2.a AND (t1.a >= 'a' OR (t1.a = 'a' AND t2.c >= '1')) ORDER BY t1.a ASC, t2.c ASC LIMIT 100",
 		c=> \%cursor,
 	);
 	%cursor = {};

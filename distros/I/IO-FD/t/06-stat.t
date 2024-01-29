@@ -1,7 +1,16 @@
+use strict;
+use warnings;
 use Test::More;# skip_all=>"IO::FD::stat is currently broken";
 use IO::FD;
 use File::Basename qw<dirname basename>;
 
+############################################################################
+# sub external_stat {                                                      #
+#   my $path=shift;                                                        #
+#   my $command="stat -f '%d %i %Dp %l %u %g %r %z %a %m %c %k %b' $path"; #
+#   split  " ", `$command`;                                                #
+# }                                                                        #
+############################################################################
 
 my @labels=qw<dev      
              ino      
@@ -18,6 +27,12 @@ my @labels=qw<dev
              blocks   
 >;
 
+# NOTE:
+# core perl  honors the signed/unsigned nature of st_dev. However the st_rdev
+# is of the same type, however core perl always returns as a signed value. I
+# don't know enough about why. All rdev tests are bypassed as IO::FD::stat
+# honours the signed/unsigned st_rdev
+
 #Create a symlink
 my $dir=dirname __FILE__;
 my $basename=basename __FILE__;
@@ -32,6 +47,7 @@ ok symlink($basename, $link), "Create symlink";
 	my @perl=stat __FILE__;
 	my @iofd=IO::FD::stat __FILE__;
 	for(0..$#labels){
+    		next if $labels[$_] eq "rdev";
 		ok $perl[$_] eq $iofd[$_], $labels[$_];
 	}
 }
@@ -40,6 +56,7 @@ ok symlink($basename, $link), "Create symlink";
 	my @perl=stat STDIN;
 	my @iofd=IO::FD::stat fileno STDIN;
 	for(0..$#labels){
+    		next if $labels[$_] eq "rdev";
 		ok $perl[$_] eq $iofd[$_], $labels[$_];
 	}
 }
@@ -48,12 +65,14 @@ ok symlink($basename, $link), "Create symlink";
 	my @perl=stat $link;
 	my @iofd=IO::FD::stat $link;
 	for(0..$#labels){
+		next if $labels[$_] eq "rdev";
 		ok $perl[$_] eq $iofd[$_], $labels[$_];
 	}
 
 	@perl=lstat $link;
 	@iofd=IO::FD::lstat $link;
 	for(0..$#labels){
+		next if $labels[$_] eq "rdev";
 		ok $perl[$_] eq $iofd[$_], $labels[$_];
 	}
 
@@ -67,13 +86,13 @@ ok symlink($basename, $link), "Create symlink";
         #STAT a file name.
         my $perl=stat __FILE__;
         my $iofd=IO::FD::stat __FILE__;
-        ok $perl and $iofd, "Scalar path";
+        ok $perl && $iofd, "Scalar path";
 }
 {
         #STAT a filehandle or descriptor
         my $perl=stat STDIN;
         my $iofd=IO::FD::stat fileno STDIN;
-        ok $perl and $iofd, "Scalar fh";
+        ok $perl && $iofd, "Scalar fh";
 }
 
 {
@@ -83,8 +102,8 @@ ok symlink($basename, $link), "Create symlink";
         my $iofd=IO::FD::stat $link;
         ok !$perl == !$iofd, "Scalar symlink";
 
-        my $perl=lstat $link;
-        my $iofd=IO::FD::lstat $link;
+        $perl=lstat $link;
+        $iofd=IO::FD::lstat $link;
         ok !$perl == !$iofd, "Scalar symlink";
 
 }

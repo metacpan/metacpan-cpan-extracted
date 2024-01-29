@@ -1,7 +1,7 @@
-File-Rename version 2.01
+File-Rename version 2.02
 ========================
 
-This release is a step towards C<use v5.32> or C<use v7> compatibilty:
+This release is compatible with C<use v5.32>.
 * use warnings
 * avoid indirect syntax
 * avoid bareword handles 
@@ -27,27 +27,31 @@ existing rename command.
 
 RECENT CHANGES
 
-In 1.00, File::Rename::Options is a separate module, 
-and is not made visible by C<require File::Rename>. 
+1.30: unicode support
 
-In 1.30, the File::Rename::Unicode module was added.
+- added File::Rename::Unicode module 
 
-In 1.99, the behaviour of requiring options to appear before code or
-files was reintroduced - this requirement was dropped in version 0.30.
+1.99: remove 'no_require_order'
 
-The 'no_require_order' functionality is regarded as unsafe but is 
-available in the script unsafe-rename.
+The behaviour of requiring options to appear before 
+code or files was reintroduced - this requirement 
+was dropped in version 0.30.
 
-In 1.991, added META data ExtUtils::MakeMaker => 7.36 
-to BUILD_REQUIRES and CONFIGURE_REQUIRES
+The 'no_require_order' functionality is regarded as
+unsafe but is available in the script unsafe-rename.
 
-In 1.992, fixed bug #145711: installed script is missing shebang line
-https://rt.cpan.org/Ticket/Display.html?id=145711
+2.00: Build.PL was removed from distribution
 
-In 2.00, Build.PL does not build unsafe-rename, and was removed 
+2.01: minimum perl version is 5.8.0
 
-In 2.01: the min perl version is 5.8.0, and 
-added source/rename source of rename script   
+- added source/rename source of rename script  
+
+2.02: perl-5.032 compatibility
+
+- added C<use 5.032> to all source files
+
+- source files are filtered to replace C<use 5.032;> 
+on older versions of perl. 
 
 INSTALLATION
 
@@ -66,15 +70,16 @@ File::Basename File::Path File::Spec Getopt::Long
 
 Unicode support depends on Perl version 5.12.0.
 
-Testing requires File::Temp and Test::More which are
-available with perl 5.6.0.  I have successfully installed
-those modules for perl 5.005_05 and tested this module.
+Testing requires File::Temp and Test::More which 
+are available with perl 5.6.0.  In the past, 
+I have successfully installed those modules 
+for perl 5.005_05 and tested this distribution.
 
 Testing on earlier versions of Perl is now only done
 on CPAN Testers.  The minimum perl version for this 
 distribution is 5.8.0 - the earlist Perl version which  
 is known to work with recent versions of File::Rename 
-is 5.8.8.
+is 5.8.9.
 
 UNICODE SUPPORT
 

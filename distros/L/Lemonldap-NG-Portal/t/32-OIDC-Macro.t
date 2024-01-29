@@ -1,5 +1,4 @@
 use warnings;
-use lib 'inc';
 use Test::More;
 use strict;
 use IO::String;
@@ -129,6 +128,7 @@ sub op {
                         oidcRPMetaDataOptionsClientSecret      => "rpid",
                         oidcRPMetaDataOptionsUserIDAttr        => "custom_sub",
                         oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
+                        oidcRPMetaDataOptionsRedirectUris => 'http://rp.com/',
                     }
                 },
                 oidcOPMetaDataOptions           => {},

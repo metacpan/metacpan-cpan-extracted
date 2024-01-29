@@ -1,5 +1,5 @@
 # before running this script make sure you have 'tclsh' in your path, 
-# and this 'tcl' distribution is required one.
+# and this 'tcl' distribution is the required one.
 
 use strict;
 use Getopt::Long;
@@ -40,7 +40,7 @@ sub _die ($) {
 my $tclsh_default = 'tclsh';
 # for FreeBSD users, try to guess their name for tclsh; see ticket 6086
 if ($^O eq 'freebsd') {
-    for my $ver (qw(8.9 8.8 8.7 8.6 8.5 8.4 8.3 8.2 8.1 8.0)) {
+    for my $ver (qw(9.0 8.7 8.6 8.5 8.4 8.3 8.2 8.1 8.0)) {
        system "which tclsh$ver >/dev/null 2>&1";
        if ($? == 0) {
 	    $tclsh_default = "tclsh$ver"; # ok will use that as default
@@ -52,7 +52,7 @@ if ($^O eq 'freebsd') {
 GetOptions(
    "tclsh=s",     \(my $tclsh=$tclsh_default),
    "tclconfig=s", \ my $tclconfig,
-   "usestubs!",   \(my $usestubs = $^O =~ /^MSWin32|solaris|linux|hpux|darwin|cygwin|aix|freebsd|netbsd|openbsd$/? 1 : 0),
+   "usestubs!",   \(my $usestubs = 1),
 	# we prefer usestubs, but on windows default is to not use them, because
 	# stubs lib that come with AS TCL is impossible to link with GCC which 
 	# comes with strawberry perl; Have a ticket for this; (XXX) VKON 27-06-2018
@@ -62,8 +62,6 @@ GetOptions(
    "library=s",   \ my $libpath,
    "include=s",   \ my $incpath,
    "define=s",    \(my $defs=''),
-   "hack1!",      \(my $hack1=1),
-   "hack2!",      \(my $hack2=1),
    "help!",       \ my $help,   
 ) || usage();
 usage() if $help;
@@ -80,7 +78,6 @@ Customised usage:
   [--library=...]      \ # Use this specific Tcl library
   [--include=...]      \ # Use this specific include path
   [--define=...]       \ # Use this specific set of defines
-  [--nohack1]          \ # internal usage, please RTFS word 'hack1'
   [--help]             \ # --help
   [<makemaker opts>]     # e.g. LINKTYPE=STATIC
 
@@ -116,16 +113,11 @@ if (defined($libpath) && defined($incpath)) {
 
     my %tclcfg = $tclcfg =~ /^([^=]+)=(.*?)$/gm;
 
-    $defs .= " -DTCLSH_PATH=\\\"".([$tclcfg{tclsh}=~/^(.*)\//]->[0])."\\\""; #haack
-
     if ($^O eq 'darwin' && !defined($tclconfig)) {
         $tclconfig = $tclcfg{'tclConfig.sh'};
     }
-    if ($^O eq 'MSWin32' && !defined($tclconfig) && (1 or !$usestubs)) {
-        $tclconfig = $tclcfg{'tclConfig.sh'};
-    }
 
-    if (!defined($tclconfig) && $arch && $usestubs) {
+    if (0 && !defined($tclconfig) && $arch && $usestubs) {
 	$incpath = "-Itcl-core/include";
 	$libpath = "-Ltcl-core/$arch -l$stub";
 	if ($^O eq 'darwin') {
@@ -138,19 +130,6 @@ if (defined($libpath) && defined($incpath)) {
 	# Retrieve all info based on tclConfig.sh
 	process_tclconfig($tclconfig, \%tclcfg);
 
-	if ($hack1 and q{
-	    HACK1: on $^O eq 'MSWin32' activetcl 866 stub library could not be linked
-	           with gcc which comes with strawberry;
-		   860 is good.
-	     }) { # hopefully this will be:  if (0 and q{....})
-	    if ($usestubs and $^O eq 'MSWin32') {
-	        $stub = "tclstub84"; # use our stub, not their
-		$libpath = "-Ltcl-core/$arch -l$stub";
-		$incpath = "-Itcl-core/include";
-		$tclcfg{TCL_STUB_LIB_SPEC} = $libpath;
-		$tclcfg{TCL_LIB_FILE} = $tclcfg{TCL_DLL_FILE};
-	    }
-	}
 	$libpath = $usestubs ? $tclcfg{TCL_STUB_LIB_SPEC} : $tclcfg{TCL_LIB_SPEC};
 	$incpath = $tclcfg{TCL_INCLUDE_SPEC};
 
@@ -175,28 +154,26 @@ if (defined($libpath) && defined($incpath)) {
 	}
     } else {
 	# no --tclconfig=... -> get values from ./tclcfg.tcl
-
-	my $tclver = $tclcfg{tcl_version};
-
-	if ($tclcfg{tcl_library} =~ /^(.*)[\\\/]lib[\\\/]/) {
-	    $libpath = "-L$1/lib";
-	    $incpath = "-I$1/include";
-	    $defs .= " -DLIB_RUNTIME_DIR=\\\"$1/lib\\\"" if $usestubs;
+	process_tclconfig($tclcfg{'tclConfig.sh'}, \%tclcfg);
+	$libpath = $usestubs ? "$tclcfg{TCL_LIB_SPEC} $tclcfg{TCL_STUB_LIB_SPEC}" : $tclcfg{TCL_LIB_SPEC};
+	$incpath = $tclcfg{TCL_INCLUDE_SPEC};
+	if ($incpath) {
+	    my @tclh = grep {-f "$_/tcl.h"} $incpath=~/-I(\S+)/g;
+	    if ($#tclh==-1) {
+		warn "incpath $incpath from your tclconfig $tclconfig does not provide tcl.h";
+		# on windows users tend to not have correctly edited include path, like this:
+		# -I/C/BawtBuilds/TclMinimal/TclMinimal-8.6.12/Windows/x86/Release/Install/Tcl/include
+		# help them
+		if ($^O eq 'MSWin32') {
+		    $tclcfg{'tclConfig.sh'} =~ /^(.*)[\\\/][^\\\/]+$/;
+		    $incpath = "-I$1/../include";
+		    $libpath = "-L$1 $libpath";
+		} else {_die "can't continue"}
+	    }
 	}
-
-	if ($^O eq 'MSWin32') {
-	    $tclver=~s/\.//;
-	    $defs .= " -DTCL_LIB_FILE=\\\"tcl$tclver.$Config{so}\\\"" if $usestubs; 
-	}
-	elsif ($^O eq 'freebsd' or $^O eq 'openbsd' or $^O eq 'netbsd') {
-	    $tclver=~s/\.//;
-	    $tclsh=~/([\d.]+)$/ and $incpath .= " -I/usr/local/include/tcl$1";
-	    $defs .= " -DTCL_LIB_FILE=\\\"libtcl$tclver.$Config{so}\\\"" if $usestubs; 
-	}
-	else {
-	    $defs .= " -DTCL_LIB_FILE=\\\"libtcl$tclver.$Config{so}\\\"" if $usestubs; 
-	}
-	$libpath .= " -ltcl" . ($usestubs?"stub":"") . $tclver;
+	#?? $defs .= " -DLIB_RUNTIME_DIR=\\\"$1/lib\\\"" if $usestubs;
+	$tclcfg{TCL_LIB_FILE} = $tclcfg{TCL_DLL_FILE} if $^O eq 'MSWin32'; # HACK: WHY TF this is in tclConfig.sh on win32??
+	$defs .= " -DTCL_LIB_FILE=\\\"$tclcfg{TCL_LIB_FILE}\\\"";
     }
     # version must be 8.4+
     _die "Tcl requires Tcl v8.4 or greater, found '$tclcfg{tcl_version}'\n"
@@ -210,7 +187,7 @@ print "tclConfig.sh = ", $tclconfig || "", "\n";
 
 if ($^O eq 'darwin') {
     # darwin has a broken ranlib that requires you to run it anytime
-    # you copy an archive file, so ensure ours it up-to-date
+    # you copy an archive file, so ensure ours is up-to-date
     system("ranlib tcl-core/$arch/libtclstub8.4.a");
     system("git update-index --assume-unchanged tcl-core/$arch/libtclstub8.4.a")
 	if -d ".git";
@@ -230,6 +207,9 @@ my $mm = WriteMakefile(
     META_MERGE => {
         "meta-spec" => { version => 2 },
         resources => {
+            bugtracker => {
+                web => 'https://github.com/gisle/tcl.pm/issues',
+            },
             repository => {
                 type => 'git',
                 web => 'https://github.com/gisle/tcl.pm',
@@ -243,30 +223,45 @@ my $mm = WriteMakefile(
     DEFINE => $defs,
     @extraargs,
 );
-if (0 and $mm->is_make_type('dmake')) { # Mmm. no. d-make welcome. problem was somewhere else
-    unlink('Makefile');
-    _die <<'EOS';
-dmake prohibited. It does bla-bla-bla
-EOS
-}
 
 sub process_tclconfig {
     # Process a tclConfig.sh file for build info
-    my $tclconfig = shift;
-    my $hashref   = shift;
+    my $tclconf = shift;
+    my $hashref = shift;
 
-    open my $fh, $tclconfig or _die "error opening file '$tclconfig': $!\n";
-    print "Using config data in $tclconfig\n";
-    %$hashref = (join '', <$fh>) =~ /^(\w+)=['"]?(.*?)["']?$/gm;
+    if ($^O eq 'MSWin32') {
+	    open my $fh, $tclconf or _die "error opening file '$tclconf': $!\n";
+	    print "Using config data in $tclconf\n";
+	    my %vars = (join '', <$fh>) =~ /^(\w+)=['"]?(.*?)["']?$/gm;
+	    $hashref->{$_} = $vars{$_} for keys %vars;
+	    $hashref->{TCL_EXEC_PREFIX}=~y{\\}{/}; # hack for MSWin32
 
-    for my $k (keys %$hashref) {
-	# Handle sh subs like ${TCL_DBGX}
-	$hashref->{$k} =~ s/\$\{(\w+)\}/(exists $hashref->{$1} ? $hashref->{$1} : $&)/eg;
-	# Handle any cygdrive-style paths
-	$hashref->{$k} =~ s{/cygdrive/(\w)/}{$1:/}ig;
+	    for my $k (keys %$hashref) {
+		# Handle sh subs like ${TCL_DBGX}
+		$hashref->{$k} =~ s/\$\{(\w+)\}/(exists $hashref->{$1} ? $hashref->{$1} : $&)/eg;
+		# Handle any cygdrive-style paths
+		$hashref->{$k} =~ s{/cygdrive/(\w)/}{$1:/}ig;
+	    }
+
+    } else {
+	    # on non-windows we should execute with shell
+	    # because we could have there
+	    # #! /bin/sh
+	    # . /usr/lib/`dpkg-architecture -qDEB_HOST_MULTIARCH`/tcl8.6/tclConfig.sh
+	    -f $tclconf or _die "no file '$tclconf'\n";
+	    my $vars2get = join ';', map {qq/echo 'echo "$_=\$$_"'/} qw (
+		TCL_STUB_LIB_PATH
+		TCL_STUB_LIB_SPEC
+		TCL_LIB_SPEC
+		TCL_LIB_FILE
+		TCL_DLL_FILE
+		TCL_INCLUDE_SPEC
+		TCL_EXEC_PREFIX
+	    );
+	    my %vars = `(cat $tclconf; $vars2get) | sh` =~ /^(\w+)=(.*)$/mg;
+	    $hashref->{$_} = $vars{$_} for keys %vars;
     }
-    $hashref->{tcl_version} = $hashref->{TCL_VERSION};
-    $hashref->{TCL_EXEC_PREFIX}=~y{\\}{/}; # hack for MSWin32; yet we don't go through \->\\ forest;
+    $hashref->{tcl_version} = $hashref->{TCL_VERSION} if exists $hashref->{TCL_VERSION};
 }
 
 sub MY::libscan {

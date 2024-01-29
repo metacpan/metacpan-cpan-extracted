@@ -1,5 +1,25 @@
 Revision history for Perl extension CPAN-Audit
 
+20240117.001 2024-01-17T18:00:26Z
+	* Update for Spreadsheet::ParseXLSX XXE bug. (GitHub #134)
+
+20240110.002 2024-01-10T21:33:57Z
+	* data update for 2024-01-10
+	* A CVE was assigned for Spreadsheet::Parse::XLSX, so a report was
+	updated (briandfoy/cpan-security-advisory#131)
+
+20240110.001 2024-01-10T16:22:34Z
+	* Data update for 2024-01-10
+
+20240103.002 2024-01-04T02:55:45Z
+	* Update database (#55)
+
+20240103.001 2024-01-03T18:23:43Z
+	* Database update for 2024-01-03
+
+20231226.001 2023-12-26T12:58:18Z
+	Data update for 2023-12-26
+
 20231129.001 2023-11-29T20:14:52Z
 	* Update for 2023-11-29. This includes the CVE-2023-47038 and 
 	CVE-2023-47039, both on perl.

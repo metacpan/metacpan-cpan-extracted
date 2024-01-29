@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.30 2024-01-23T02:51:53Z
+
+    - introduce --cc,fc,lc,mc,tc,uc color option to sdif
+
 4.29 2023-11-15T10:16:22Z
 
     - fix bug in lib/cdif/Command.pm

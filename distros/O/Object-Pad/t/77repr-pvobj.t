@@ -10,7 +10,7 @@ BEGIN {
       plan skip_all => "Not supported on Perl $^V";
 }
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 class Test1 :repr(pvobj)
 {
@@ -25,8 +25,9 @@ class Test1 :repr(pvobj)
    is( $obj->where, "(10,20)", 'Basic instances can be created on :repr(pvobj)' );
 }
 
-class Test2 :isa(Test1)
+class Test2
 {
+   inherit Test1;
    field $z :reader = 30;
 
    method where { sprintf "(%d,%d,%d)", $self->x, $self->y, $z }

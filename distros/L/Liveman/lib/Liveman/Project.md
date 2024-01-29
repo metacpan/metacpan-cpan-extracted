@@ -1,6 +1,6 @@
 # NAME
 
-Liveman::Project - maker new perl-repository
+Liveman::Project - maker of the new perl-repository
 
 # SYNOPSIS
 

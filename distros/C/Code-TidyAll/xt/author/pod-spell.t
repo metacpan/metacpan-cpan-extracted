@@ -145,9 +145,11 @@ jslint
 kenneth
 lib
 listref
+lukasmai
 mark
 martin
 masontidy
+mauke
 melo
 mgrimes
 mohammad

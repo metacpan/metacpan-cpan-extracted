@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::code_from_str;
 
-our $DATE = '2023-09-03'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2023-09-05'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 our $rschema = do{my$var={base=>"code",clsets_after_base=>[{description=>"\nThis schema accepts coderef or string which will be eval'ed to coderef. Note\nthat this means allowing your user to provide arbitrary Perl code for you to\nexecute! Make sure first and foremost that security-wise this is acceptable in\nyour case.\n\nBy default `eval()` is performed in the `main` namespace and without stricture\nor warnings. See the parameterized version <pm:Sah::PSchema::code_from_str> if\nyou want to customize the `eval()`.\n\n",examples=>[],prefilters=>[["Code::eval",{}]],summary=>"Coderef from eval\\`ed string"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["code"],type=>"code",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::code_from_str - Coderef from eval\`ed string
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaR::code_from_str (from Perl distribution Sah-Schemas-Code), released on 2023-09-03.
+This document describes version 0.002 of Sah::SchemaR::code_from_str (from Perl distribution Sah-Schemas-Code), released on 2023-09-05.
 
 =head1 DESCRIPTION
 

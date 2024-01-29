@@ -130,7 +130,7 @@ instead of a space:
 The input validation works very much like in L<Term::Completion>. Here
 however the input is first split upon the delimiter character, and then
 each item is validated. Consecutive delimiter characters are treated as one.
-If any single validation fails, the entire input is cancelled. If all items
+If any single validation fails, the entire input is canceled. If all items
 validate OK, then the return value is built by concatenating the items
 returned from validation with the delimiter character.
 

@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,43 +19,43 @@ name: Pg-Explain
 provides:
   Pg::Explain:
     file: lib/Pg/Explain.pm
-    version: '2.6'
+    version: '2.7'
   Pg::Explain::Analyzer:
     file: lib/Pg/Explain/Analyzer.pm
-    version: '2.6'
+    version: '2.7'
   Pg::Explain::Buffers:
     file: lib/Pg/Explain/Buffers.pm
-    version: '2.6'
+    version: '2.7'
   Pg::Explain::From:
     file: lib/Pg/Explain/From.pm
-    version: '2.6'
+    version: '2.7'
   Pg::Explain::FromJSON:
     file: lib/Pg/Explain/FromJSON.pm
-    version: '2.6'
+    version: '2.7'
   Pg::Explain::FromText:
     file: lib/Pg/Explain/FromText.pm
-    version: '2.6'
+    version: '2.7'
   Pg::Explain::FromXML:
     file: lib/Pg/Explain/FromXML.pm
-    version: '2.6'
+    version: '2.7'
   Pg::Explain::FromYAML:
     file: lib/Pg/Explain/FromYAML.pm
-    version: '2.6'
+    version: '2.7'
   Pg::Explain::Hinter:
     file: lib/Pg/Explain/Hinter.pm
-    version: '2.6'
+    version: '2.7'
   Pg::Explain::Hinter::Hint:
     file: lib/Pg/Explain/Hinter/Hint.pm
-    version: '2.6'
+    version: '2.7'
   Pg::Explain::JIT:
     file: lib/Pg/Explain/JIT.pm
-    version: '2.6'
+    version: '2.7'
   Pg::Explain::Node:
     file: lib/Pg/Explain/Node.pm
-    version: '2.6'
+    version: '2.7'
   Pg::Explain::StringAnonymizer:
     file: lib/Pg/Explain/StringAnonymizer.pm
-    version: '2.6'
+    version: '2.7'
 requires:
   Clone: '0'
   Digest::SHA: '0'
@@ -70,5 +70,5 @@ resources:
   homepage: https://gitlab.com/depesz/Pg--Explain
   license: http://dev.perl.org/licenses/
   repository: https://gitlab.com/depesz/Pg--Explain.git
-version: '2.6'
+version: '2.7'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

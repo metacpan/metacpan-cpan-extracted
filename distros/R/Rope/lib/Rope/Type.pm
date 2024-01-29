@@ -39,6 +39,7 @@ sub import {
 			if ($count <= 2) {
 				$caller->property($params[0],
 					type => $type,
+					initable => 1,
 					enumerable => 1,
 					writeable => 1,
 					(defined $params[1] ? (value => $params[1]) : ()),
@@ -62,7 +63,7 @@ Rope::Type - Rope with Type::Tiny
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =cut
 

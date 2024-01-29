@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ImportJsonRequest;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**JsonFileSource** | **FileSource** | XML file source |
+**JsonFileSource** | **FileSource** | Json file source |
 **ImportPosition** | **ImportPosition** | Import position description. |
 **JsonContent** | **string** | Base64String default is null |  
 

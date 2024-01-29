@@ -24,7 +24,7 @@ Rinci - Language-neutral metadata for your code entities
 
 =head1 VERSION
 
-This document describes version 1.1.103 of Rinci (from Perl distribution Rinci), released on 2022-10-21.
+This document describes version 1.1.104 of Rinci (from Perl distribution Rinci), released on 2023-09-30.
 
 =head1 ABSTRACT
 
@@ -463,6 +463,15 @@ Sah is a flexible and extensible schema language, while still not being
 language-specific, making it easy for code generator tools to generate validator
 code in various target languages (Perl, Ruby, etc).
 
+=head2 Where are the metadata stored?
+
+This specification does not specify where the metadata should be stored, for
+flexibility reason. A Perl implementation like L<Perinci::Access::Perl> searches
+for metadata in C<%SPEC> package variable. Another implementation,
+L<Perinci::Access::Lite>, additionally looks for C<_riap()> function in packages
+to request metadata. One can also store the metadata as JSON in database or in
+files.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Rinci>.
@@ -547,7 +556,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

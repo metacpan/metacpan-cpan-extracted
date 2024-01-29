@@ -20,7 +20,8 @@ use constant CODE_REF	=> ref sub {};
 use constant REGEXP_REF	=> ref qr{};
 
 our @EXPORT = qw{
-    application
+    any_greg_time_gm
+    any_greg_time_local
     call_m
     call_m_result
     check_access
@@ -32,6 +33,7 @@ our @EXPORT = qw{
     dump_zones
     dump_zones_init
     execute
+    invocant
     klass
     load_or_skip
     normalize_path
@@ -40,6 +42,16 @@ our @EXPORT = qw{
     INSTANTIATE
     TRUE
 };
+
+{
+    local $@ = undef;
+
+    use constant HAVE_DATETIME => eval {
+	require DateTime;
+	require DateTime::TimeZone;
+	1;
+    } || 0;
+}
 
 BEGIN {
     # If I should need to write a test that uses a dirty environment (or
@@ -74,7 +86,17 @@ use constant TRUE => sub {
     goto &ok;
 };
 
-sub application {
+if ( HAVE_DATETIME ) {
+    *any_greg_time_gm = \&dt_greg_time_gm;
+    *any_greg_time_local = \&dt_greg_time_local;
+} else {
+    require Astro::Coord::ECI::Utils;
+    Astro::Coord::ECI::Utils->VERSION( 0.112 );
+    *any_greg_time_gm = \&Astro::Coord::ECI::Utils::greg_time_gm;
+    *any_greg_time_local = \&Astro::Coord::ECI::Utils::greg_time_local;
+}
+
+sub invocant {
     return $app;
 }
 
@@ -472,9 +494,19 @@ perform tests on this object.
 
 This module exports the following subroutines:
 
-=head2 application
+=head2 any_greg_time_gm
 
-This subroutine returns the current application object.
+If the L<DateTime|DateTime> module can be loaded, this subroutine is an
+alias for L<dt_greg_time_gm()|/dt_greg_time_gm>. Otherwise, it is an
+alias for
+L<Astro::Coord::ECI::Utils::greg_time_gm()|Astro::Coord::ECI::Utils>.
+
+=head2 any_greg_time_local
+
+If the L<DateTime|DateTime> module can be loaded, this subroutine is an
+alias for L<dt_greg_time_local()|/dt_greg_time_local>. Otherwise, it is an
+alias for
+L<Astro::Coord::ECI::Utils::greg_time_local()|Astro::Coord::ECI::Utils>.
 
 =head2 check_access
 
@@ -540,6 +572,10 @@ is the expected result.  All other arguments are arguments to
 C<execute()>.
 
 This is really just a convenience wrapper for L<call_m()|/call_m>.
+
+=head2 invocant
+
+This subroutine returns the current stored object.
 
 =head2 load_or_skip
 

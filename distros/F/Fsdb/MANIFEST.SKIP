@@ -42,6 +42,7 @@ bin/dbcolneaten$
 bin/dbcolpercentile$
 bin/dbcolrename$
 bin/dbcolscorrelate$
+bin/dbcolsdecimate$
 bin/dbcolsplittocols$
 bin/dbcolsplittorows$
 bin/dbcolsregression$

@@ -1,7 +1,7 @@
 ---
 abstract: 'A simple line-oriented configuration file parser'
 author:
-  - 'brian d foy <bdfoy@cpan.org>'
+  - 'brian d foy <briandfoy@pobox.com>'
 build_requires:
   Test::More: '1'
   Test::Output: '0'
@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 keywords:
   - config
 license: artistic_2
@@ -35,6 +35,6 @@ requires:
 resources:
   bugtracker: https://github.com/briandfoy/ConfigReader-Simple/issues
   homepage: https://github.com/briandfoy/ConfigReader-Simple
-  repository: https://github.com/briandfoy/ConfigReader-Simple.git
-version: '1.295'
+  repository: https://github.com/briandfoy/ConfigReader-Simple
+version: '1.296'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

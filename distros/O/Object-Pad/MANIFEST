@@ -3,6 +3,7 @@ Build.PL
 Changes
 hax/cv_copy_flags.c.inc
 hax/dumpers.c.inc
+hax/exec_optree.c.inc
 hax/forbid_outofblock_ops.c.inc
 hax/force_list_keeping_pushmark.c.inc
 hax/lexer-additions.c.inc

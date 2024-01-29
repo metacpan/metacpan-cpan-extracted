@@ -7,9 +7,9 @@ use warnings;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-15'; # DATE
+our $DATE = '2023-11-20'; # DATE
 our $DIST = 'App-FileRenameUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 our @EXPORT_OK = qw(add_filename_suffix find_unique_filename);
 
@@ -48,7 +48,7 @@ App::FileRenameUtils - Utilities related to renaming/moving files
 
 =head1 VERSION
 
-This document describes version 0.012 of App::FileRenameUtils (from Perl distribution App-FileRenameUtils), released on 2023-11-15.
+This document describes version 0.014 of App::FileRenameUtils (from Perl distribution App-FileRenameUtils), released on 2023-11-20.
 
 =head1 DESCRIPTION
 
@@ -56,31 +56,33 @@ This distribution provides the following command-line utilities:
 
 =over
 
-=item 1. L<move-files-here>
+=item 1. L<datestamp>
 
-=item 2. L<mv-add-prefix>
+=item 2. L<move-files-here>
 
-=item 3. L<mv-add-prefix-datestamp>
+=item 3. L<mv-add-prefix>
 
-=item 4. L<mv-add-prefix-number>
+=item 4. L<mv-add-prefix-datestamp>
 
-=item 5. L<mv-files-to-dirs>
+=item 5. L<mv-add-prefix-number>
 
-=item 6. L<mv-reverse>
+=item 6. L<mv-files-to-dirs>
 
-=item 7. L<mv-swap>
+=item 7. L<mv-reverse>
 
-=item 8. L<mv-to-from>
+=item 8. L<mv-swap>
 
-=item 9. L<rename-add-prefix>
+=item 9. L<mv-to-from>
 
-=item 10. L<rename-add-prefix-datestamp>
+=item 10. L<rename-add-prefix>
 
-=item 11. L<rename-add-prefix-number>
+=item 11. L<rename-add-prefix-datestamp>
 
-=item 12. L<rename-swap>
+=item 12. L<rename-add-prefix-number>
 
-=item 13. L<rename-to-from>
+=item 13. L<rename-swap>
+
+=item 14. L<rename-to-from>
 
 =back
 

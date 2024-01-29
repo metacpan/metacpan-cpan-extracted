@@ -23,6 +23,7 @@
 
 #include "perl-additions.c.inc"
 #include "lexer-additions.c.inc"
+#include "exec_optree.c.inc"
 #include "forbid_outofblock_ops.c.inc"
 #include "force_list_keeping_pushmark.c.inc"
 #include "optree-additions.c.inc"
@@ -432,61 +433,15 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
 
   SV *packagever = args[argi++]->sv;
 
-  SV *superclassname = NULL;
-
-  if(args[argi++]->i) {
+  if(args[argi++]->i)
     /* isa */
-    if(type != METATYPE_CLASS)
-      croak("Only a class may extend another");
-
-    if(superclassname)
-      croak("Multiple superclasses are not currently supported");
-
-    superclassname = args[argi++]->sv;
-    if(!superclassname)
-      croak("Expected a superclass name after 'isa'");
-
-    SV *superclassver = args[argi++]->sv;
-
-    HV *superstash = gv_stashsv(superclassname, 0);
-    if(!superstash || !hv_fetchs(superstash, "new", 0)) {
-      /* Try to `require` the module then attempt a second time */
-      /* load_module() will modify the name argument and take ownership of it */
-      load_module(PERL_LOADMOD_NOIMPORT, newSVsv(superclassname), NULL, NULL);
-      superstash = gv_stashsv(superclassname, 0);
-    }
-
-    if(!superstash)
-      croak("Superclass %" SVf " does not exist", superclassname);
-
-    if(superclassver)
-      ensure_module_version(superclassname, superclassver);
-  }
+    croak("ARGH should not have seen any 'isa' keywords");
 
   ClassMeta *meta = mop_create_class(type, packagename);
 
-  if(superclassname && SvOK(superclassname))
-    mop_class_set_superclass(meta, superclassname);
-
   int nimplements = args[argi++]->i;
-  if(nimplements) {
-    int i;
-    for(i = 0; i < nimplements; i++) {
-      int nroles = args[argi++]->i;
-      while(nroles--) {
-        SV *rolename = args[argi++]->sv;
-        if(!rolename)
-          croak("Expected a role name after 'does'");
-
-        SV *rolever = args[argi++]->sv;
-
-        mop_class_load_and_add_role(meta, rolename, rolever);
-      }
-    }
-  }
-
-  if(superclassname)
-    SvREFCNT_dec(superclassname);
+  if(nimplements)
+    croak("ARGH should not have seen any 'does' keywords");
 
   int nattrs = args[argi++]->i;
   if(nattrs) {
@@ -515,8 +470,6 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
   if(hv_fetchs(hints, "Object::Pad/configure(always_strict)", 0)) {
     mop_class_apply_attribute(meta, "strict", sv_2mortal(newSVpvs("params")));
   }
-
-  mop_class_begin(meta);
 
   /* At this point XS::Parse::Keyword has parsed all it can. From here we will
    * take over to perform the odd "block or statement" behaviour of `class`
@@ -625,16 +578,14 @@ static const struct XSParseKeywordPieceType pieces_classlike[] = {
   XPK_VSTRING_OPT,
   XPK_OPTIONAL(
     XPK_LITERAL("isa"),
-    XPK_WARNING_DEPRECATED("'isa' modifier keyword is deprecated; use :isa() attribute instead"),
-    XPK_PACKAGENAME, XPK_VSTRING_OPT
+    XPK_FAILURE("The 'isa' modifier keyword is no longer available; use 'inherit' instead")
   ),
   /* This should really a repeated (tagged?) choice of a number of things, but
    * right now there's only one thing permitted here anyway
    */
   XPK_REPEATED(
     XPK_LITERAL("does"),
-    XPK_WARNING_DEPRECATED("'does' modifier keyword is deprecated; use :does() attribute instead"),
-    XPK_COMMALIST( XPK_PACKAGENAME, XPK_VSTRING_OPT )
+    XPK_FAILURE("The 'does' modifier keyword is no longer available; use 'apply' instead")
   ),
   XPK_ATTRIBUTES,
   {0}
@@ -649,6 +600,81 @@ static const struct XSParseKeywordHooks kwhooks_role = {
   .permit_hintkey = "Object::Pad/role",
   .pieces = pieces_classlike,
   .build = &build_classlike,
+};
+
+static int build_inherit(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
+{
+  int argi = 0;
+
+  SV *supername = args[argi++]->sv;
+  SV *superver  = args[argi++]->sv;
+  OP *argsexpr  = args[argi++]->op;
+
+  ClassMeta *meta = compclassmeta;
+
+  if(meta->begun)
+    croak("Too late to 'inherit' into a class; this must be the first significant declaration within the class");
+
+  AV *argsav = NULL;
+  if(argsexpr) {
+    SAVEFREEOP(argsexpr);
+    argsav = exec_optree_list(argsexpr);
+
+    SAVEFREESV(argsav);
+  }
+
+  mop_class_load_and_set_superclass(meta, supername, superver);
+
+  mop_class_begin(meta);
+
+  if(argsav && av_count(argsav)) {
+    HV *hints = GvHV(PL_hintgv);
+    if(!hv_fetchs(hints, "Object::Pad/experimental(inherit_field)", 0))
+      Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
+        "inheriting fields is experimental and may be changed or removed without notice");
+
+    mop_class_inherit_from_superclass(meta, AvARRAY(argsav), av_count(argsav));
+  }
+
+  return KEYWORD_PLUGIN_STMT;
+}
+
+static const struct XSParseKeywordHooks kwhooks_inherit = {
+  .permit_hintkey = "Object::Pad/inherit",
+  .pieces = (const struct XSParseKeywordPieceType []){
+    XPK_PACKAGENAME,
+    XPK_VSTRING_OPT,
+    XPK_LISTEXPR_LISTCTX_OPT,
+    {0}
+  },
+  .build = &build_inherit,
+};
+
+static int build_apply(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
+{
+  int argi = 0;
+
+  SV *rolename = args[argi++]->sv;
+  SV *rolever  = args[argi++]->sv;
+
+  ClassMeta *meta = compclassmeta;
+
+  mop_class_begin(meta);
+
+  mop_class_load_and_add_role(meta, rolename, rolever);
+
+  return KEYWORD_PLUGIN_STMT;
+}
+
+static const struct XSParseKeywordHooks kwhooks_apply = {
+  .permit_hintkey = "Object::Pad/apply",
+  .pieces = (const struct XSParseKeywordPieceType []){
+    XPK_PACKAGENAME,
+    XPK_VSTRING_OPT,
+    /* TODO: Allow more apply-time args later */
+    {0}
+  },
+  .build = &build_apply,
 };
 
 enum {
@@ -681,7 +707,11 @@ static int build_field(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
   SV *name = args[argi++]->sv;
   char sigil = SvPV_nolen(name)[0];
 
-  FieldMeta *fieldmeta = mop_class_add_field(compclassmeta, name);
+  ClassMeta *classmeta = compclassmeta;
+
+  mop_class_begin(classmeta);
+
+  FieldMeta *fieldmeta = mop_class_add_field(classmeta, name);
   SvREFCNT_dec(name);
 
   int nattrs = args[argi++]->i;
@@ -833,11 +863,11 @@ static void setup_parse_field(pTHX_ bool is_block)
     PadnamePV(pn_self)[1] = '\0';
   }
 
-  FIELDOFFSET next_fieldix = classmeta->next_fieldix;
-  if(classmeta->next_fieldix_for_initfields < next_fieldix) {
-    add_fields_to_pad(classmeta, classmeta->next_fieldix_for_initfields);;
+  U32 nfields = av_count(classmeta->fields);
+  if(classmeta->next_field_for_initfields < nfields) {
+    add_fields_to_pad(classmeta, classmeta->next_field_for_initfields);
     intro_my();
-    classmeta->next_fieldix_for_initfields = next_fieldix;
+    classmeta->next_field_for_initfields = nfields;
   }
 }
 
@@ -975,7 +1005,11 @@ static void parse_method_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, v
      */
     ctx->actions &= ~XS_PARSE_SUBLIKE_ACTION_CVf_ANON;
 
-  prepare_method_parse(compclassmeta);
+  ClassMeta *meta = compclassmeta;
+
+  mop_class_begin(meta);
+
+  prepare_method_parse(meta);
 
   MethodMeta *compmethodmeta;
   Newx(compmethodmeta, 1, MethodMeta);
@@ -1285,7 +1319,9 @@ static int parse_phaser(pTHX_ OP **out, void *hookdata)
       }
     }
 
-    if(classmeta->next_fieldix > classmeta->next_fieldix_for_adjust) {
+    U32 nfields = av_count(classmeta->fields);
+
+    if(classmeta->next_field_for_adjust < nfields) {
       ENTER;
       SAVESPTR(PL_comppad);
       SAVESPTR(PL_comppad_name);
@@ -1297,13 +1333,13 @@ static int parse_phaser(pTHX_ OP **out, void *hookdata)
       PL_comppad_name = PadlistNAMES(CvPADLIST(fieldscope));
       PL_curpad  = AvARRAY(PL_comppad);
 
-      add_fields_to_pad(classmeta, classmeta->next_fieldix_for_adjust);
+      add_fields_to_pad(classmeta, classmeta->next_field_for_adjust);
 
       intro_my();
 
       LEAVE;
 
-      classmeta->next_fieldix_for_adjust = classmeta->next_fieldix;
+      classmeta->next_field_for_adjust = nfields;
     }
 
     CvOUTSIDE_SEQ(PL_compcv) = PL_cop_seqmax;
@@ -1403,7 +1439,11 @@ static int build_requires(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t na
 {
   SV *mname = args[0]->sv;
 
-  mop_class_add_required_method(compclassmeta, mname);
+  ClassMeta *meta = compclassmeta;
+
+  mop_class_begin(meta);
+
+  mop_class_add_required_method(meta, mname);
 
   *out = newOP(OP_NULL, 0);
 
@@ -1428,8 +1468,9 @@ static const struct XSParseKeywordHooks kwhooks_requires = {
 static void dump_fieldmeta(pTHX_ DMDContext *ctx, FieldMeta *fieldmeta)
 {
   DMD_DUMP_STRUCT(ctx, "Object::Pad/FieldMeta", fieldmeta, sizeof(FieldMeta),
-    6, ((const DMDNamedField []){
+    7, ((const DMDNamedField []){
       {"the name SV",          DMD_FIELD_PTR,  .ptr = fieldmeta->name},
+      {"is direct",            DMD_FIELD_BOOL, .b   = fieldmeta->is_direct},
       {"the class",            DMD_FIELD_PTR,  .ptr = fieldmeta->class},
       {"the default value SV", DMD_FIELD_PTR,  .ptr = mop_field_get_default_sv(fieldmeta)},
       /* TODO: Maybe hunt for constants in the defaultexpr optree fragment? */
@@ -1507,7 +1548,7 @@ static void dump_classmeta(pTHX_ DMDContext *ctx, ClassMeta *classmeta)
       {"the stash SV",               DMD_FIELD_PTR,  .ptr = classmeta->stash},           \
       {"the pending submeta AV",     DMD_FIELD_PTR,  .ptr = classmeta->pending_submeta}, \
       {"the hooks AV",               DMD_FIELD_PTR,  .ptr = classmeta->hooks},           \
-      {"the direct fields AV",       DMD_FIELD_PTR,  .ptr = classmeta->direct_fields},   \
+      {"the fields AV",              DMD_FIELD_PTR,  .ptr = classmeta->fields},          \
       {"the direct methods AV",      DMD_FIELD_PTR,  .ptr = classmeta->direct_methods},  \
       {"the param map HV",           DMD_FIELD_PTR,  .ptr = classmeta->parammap},        \
       {"the requiremethods AV",      DMD_FIELD_PTR,  .ptr = classmeta->requiremethods},  \
@@ -1545,8 +1586,8 @@ static void dump_classmeta(pTHX_ DMDContext *ctx, ClassMeta *classmeta)
 
   I32 i;
 
-  for(i = 0; i < av_count(classmeta->direct_fields); i++) {
-    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(classmeta->direct_fields)[i];
+  for(i = 0; i < av_count(classmeta->fields); i++) {
+    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(classmeta->fields)[i];
 
     dump_fieldmeta(aTHX_ ctx, fieldmeta);
   }
@@ -1664,7 +1705,7 @@ static U32 S_deconstruct_object_class(pTHX_ SV *fieldstore, ClassMeta *classmeta
 {
   dSP;
   U32 retcount = 0;
-  AV *fields = classmeta->direct_fields;
+  AV *fields = classmeta->fields;
   U32 nfields = av_count(fields);
 
   EXTEND(SP, nfields * 2);
@@ -1674,6 +1715,8 @@ static U32 S_deconstruct_object_class(pTHX_ SV *fieldstore, ClassMeta *classmeta
   FIELDOFFSET i;
   for(i = 0; i < nfields; i++) {
     FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+    if(!fieldmeta->is_direct)
+      continue;
 
     mPUSHs(newSVpvf("%" SVf ".%" SVf,
         SVfARG(classmeta->name), SVfARG(fieldmeta->name)));
@@ -1707,26 +1750,20 @@ static U32 S_deconstruct_object_class(pTHX_ SV *fieldstore, ClassMeta *classmeta
 #define ref_field_class(want_fieldname, fieldstore, classmeta, offset)  S_ref_field_class(aTHX_ want_fieldname, fieldstore, classmeta, offset)
 static SV *S_ref_field_class(pTHX_ SV *want_fieldname, SV *fieldstore, ClassMeta *classmeta, FIELDOFFSET offset)
 {
-  AV *fields = classmeta->direct_fields;
-  U32 nfields = av_count(fields);
+  FieldMeta *fieldmeta = mop_class_find_field(classmeta, want_fieldname, 0);
 
-  FIELDOFFSET i;
-  for(i = 0; i < nfields; i++) {
-    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+  if(!fieldmeta)
+    return NULL;
 
-    if(!sv_eq(want_fieldname, fieldmeta->name))
-      continue;
+  /* found it */
+  SV *sv = fieldstore_fields(fieldstore)[fieldmeta->fieldix + offset];
+  switch(mop_field_get_sigil(fieldmeta)) {
+    case '$':
+      return newRV_inc(sv);
 
-    /* found it */
-    SV *sv = fieldstore_fields(fieldstore)[fieldmeta->fieldix + offset];
-    switch(SvPV_nolen(fieldmeta->name)[0]) {
-      case '$':
-        return newRV_inc(sv);
-
-      case '@':
-      case '%':
-        return newSVsv(sv);
-    }
+    case '@':
+    case '%':
+      return newSVsv(sv);
   }
 
   return NULL;
@@ -1761,34 +1798,60 @@ register(class, name, ...)
           "Object::Pad::MOP::FieldAttr is experimental and may be changed or removed without notice");
     }
 
-    struct FieldHookFuncs *funcs;
-    Newxz(funcs, 1, struct FieldHookFuncs);
+    struct FieldHookFuncs funcs = {};
 
-    struct CustomFieldHookData *funcdata;
-    Newxz(funcdata, 1, struct CustomFieldHookData);
+    struct CustomFieldHookData funcdata = {};
 
-    funcs->ver = OBJECTPAD_ABIVERSION;
+    funcs.ver = OBJECTPAD_ABIVERSION;
 
-    funcs->apply = &fieldhook_custom_apply;
+    funcs.apply = &fieldhook_custom_apply;
 
     static const char *args[] = {
       "permit_hintkey",
       "apply",
+      "no_value",
+      "must_value",
       NULL,
     };
     while(KWARG_NEXT(args)) {
       switch(kwarg) {
         case 0: /* permit_hintkey */
-          funcs->permit_hintkey = savepv(SvPV_nolen(kwval));
+          funcs.permit_hintkey = SvPV_nolen(kwval);
           break;
 
         case 1: /* apply */
-          funcdata->apply_cb = newSVsv(kwval);
+          funcdata.apply_cb = kwval;
+          break;
+
+        case 2: /* no_value */
+          if(SvTRUE(kwval))
+            funcs.flags |= OBJECTPAD_FLAG_ATTR_NO_VALUE;
+          break;
+
+        case 3: /* must_value */
+          if(SvTRUE(kwval))
+            funcs.flags |= OBJECTPAD_FLAG_ATTR_MUST_VALUE;
           break;
       }
     }
 
-    register_field_attribute(savepv(SvPV_nolen(name)), funcs, funcdata);
+    if((funcs.flags & OBJECTPAD_FLAG_ATTR_NO_VALUE) &&
+       (funcs.flags & OBJECTPAD_FLAG_ATTR_MUST_VALUE))
+       croak("Cannot register a FieldAttr with both 'no_value' and 'must_value'");
+
+    struct FieldHookFuncs *_funcs;
+    Newxz(_funcs, 1, struct FieldHookFuncs);
+    Copy(&funcs, _funcs, 1, struct FieldHookFuncs);
+    if(_funcs->permit_hintkey)
+      _funcs->permit_hintkey = savepv(_funcs->permit_hintkey);
+
+    struct CustomFieldHookData *_funcdata;
+    Newxz(_funcdata, 1, struct CustomFieldHookData);
+    Copy(&funcdata, _funcdata, 1, struct CustomFieldHookData);
+    if(_funcdata->apply_cb)
+      _funcdata->apply_cb = newSVsv(_funcdata->apply_cb);
+
+    register_field_attribute(savepv(SvPV_nolen(name)), _funcs, _funcdata);
   }
 
 MODULE = Object::Pad    PACKAGE = Object::Pad::MetaFunctions
@@ -1939,10 +2002,13 @@ BOOT:
   DMD_SET_PACKAGE_HELPER("Object::Pad::MOP::Class", &dumppackage_class);
 #endif
 
-  boot_xs_parse_keyword(0.37); /* XPK_WARNING_DEPRECATED */
+  boot_xs_parse_keyword(0.39); /* XPK_LISTEXPR_OPT */
 
   register_xs_parse_keyword("class", &kwhooks_class, (void *)METATYPE_CLASS);
   register_xs_parse_keyword("role",  &kwhooks_role,  (void *)METATYPE_ROLE);
+
+  register_xs_parse_keyword("inherit", &kwhooks_inherit, NULL);
+  register_xs_parse_keyword("apply",   &kwhooks_apply,   NULL);
 
   register_xs_parse_keyword("field", &kwhooks_field, "field");
   register_xs_parse_keyword("has",   &kwhooks_has,   "has");

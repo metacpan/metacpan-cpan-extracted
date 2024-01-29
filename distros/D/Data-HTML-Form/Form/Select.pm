@@ -6,10 +6,10 @@ use warnings;
 use Mo qw(build default is);
 use Mo::utils qw(check_array_object check_bool check_number);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 has autofocus => (
-	ro => 1,
+	is => 'ro',
 );
 
 has css_class => (
@@ -21,7 +21,7 @@ has disabled => (
 );
 
 has form => (
-	ro => 1,
+	is => 'ro',
 );
 
 has id => (

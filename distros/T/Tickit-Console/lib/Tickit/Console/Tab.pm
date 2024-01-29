@@ -1,14 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2023 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
-use Object::Pad 0.73 ':experimental(init_expr)';
+use warnings;
+use Object::Pad 0.800 ':experimental(init_expr)';
 
 use Tickit::Widget::Tabbed 0.024;
 
-package Tickit::Console::Tab 0.11;
+package Tickit::Console::Tab 0.12;
 class Tickit::Console::Tab
    :isa(Tickit::Widget::Tabbed::Tab)
    :strict(params);
@@ -81,9 +82,9 @@ field $_localtime        :param = sub ( $time ) { localtime $time };
 
 =head2 set_name
 
-   $name = $tab->name
+   $name = $tab->name;
 
-   $tab->set_name( $name )
+   $tab->set_name( $name );
 
 Returns or sets the tab name text
 
@@ -101,7 +102,7 @@ method set_name ( $name )
 
 =head2 append_line
 
-   $tab->append_line( $string, %opts )
+   $tab->append_line( $string, %opts );
 
 Appends a line of text to the tab. C<$string> may either be a plain perl
 string, or an instance of L<String::Tagged> containing formatting tags, as
@@ -202,7 +203,7 @@ method append_line ( $string, %opts )
 
 =head2 prepend_line
 
-   $tab->prepend_line( $string, %opts )
+   $tab->prepend_line( $string, %opts );
 
 As C<append_line>, but prepends it at the beginning of the scroller.
 
@@ -230,13 +231,13 @@ method prepend_line ( $string, %opts )
 
 =head2 bind_key
 
-   $tab->bind_key( $key, $code )
+   $tab->bind_key( $key, $code );
 
 Installs a callback to invoke if the given key is pressed while this tab has
 focus, overwriting any previous callback for the same key. The code block is
 invoked as
 
-   $result = $code->( $tab, $key )
+   $result = $code->( $tab, $key );
 
 If C<$code> is missing or C<undef>, any existing callback is removed.
 

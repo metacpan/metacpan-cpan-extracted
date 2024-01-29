@@ -1,12 +1,13 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Tables.pm
-## Version v0.6.0
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v1.0.0
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/03/16
+## Modified 2023/11/17
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -26,7 +27,7 @@ BEGIN
     use Devel::Confess;
     use Want;
     our $DEBUG = 0;
-    our $VERSION = 'v0.6.0';
+    our $VERSION = 'v1.0.0';
 };
 
 use strict;
@@ -87,12 +88,16 @@ sub init
             $table = CORE::delete( $opts->{table} );
         }
     }
+    $self->{check}          = {};
     $self->{dbo}            = undef;
-    $self->{default}        = {};
+    # $self->{default}        = {};
+    # Containing all the table field objects
     $self->{fields}         = {};
     # DB::Object::Fields
     $self->{fields_object}  = undef;
-    $self->{null}           = {};
+    $self->{foreign}        = {};
+    $self->{indexes}        = {};
+    # $self->{null}           = {};
     $self->{prefixed}       = 0;
     $self->{primary}        = [];
     $self->{query_object}   = undef;
@@ -102,7 +107,7 @@ sub init
     $self->{schema}         = undef;
     $self->{structure}      = {};
     $self->{table_alias}    = undef;
-    $self->{types}          = {};
+    # $self->{types}          = {};
     # An hash to contain table field to an hash of constant value and constant name:
     # field => { constant => 12, name => PG_JSONB, type => 'jsonb' };
     $self->{types_const}    = {};
@@ -165,11 +170,14 @@ sub as
 
 sub avoid { return( shift->_method_to_query( 'avoid', @_ ) ); }
 
+sub check { return( shift->_set_get_hash_as_mix_object( 'check', @_ ) ); }
+
 sub columns
 {
     my $self = shift( @_ );
     my $fields = $self->fields;
-    my $cols = [sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields )];
+    # my $cols = [sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields )];
+    my $cols = [sort{ $fields->{ $a }->pos <=> $fields->{ $b }->pos } keys( %$fields )];
     return( $self->new_array( $cols ) );
 }
 
@@ -232,10 +240,9 @@ sub default
 {
     my $self = shift( @_ );
     $self->structure || return( $self->pass_error );
-    my $default = $self->{default};
-    # return( wantarray() ? () : undef() ) if( !%$default );
-    # return( wantarray() ? %$default : \%$default );
-    return( $self->_clone( $default ) );
+    my $fields = $self->{fields};
+    my $default = +{ map{ defined( $fields->{ $_ }->default ) ? ( $_ => $fields->{ $_ }->default ) : () } keys( %$fields ) };
+    return( $default );
 }
 
 sub delete
@@ -299,7 +306,37 @@ sub fields
     my $self = shift( @_ );
     $self->structure || return( $self->pass_error );
     my $fields = $self->{fields};
-    return( $self->_clone( $fields ) );
+    if( @_ )
+    {
+        my $field = shift( @_ );
+        my $obj = $fields->{ $field } || return( $self->error( "No field object found for \"${field}\"." ) );
+        return( $obj->clone );
+    }
+    # return( +{ map{ $_ => $fields->{ $_ }->clone } keys( %$fields ) } );
+    my $ref = {};
+    foreach my $f ( keys( %$fields ) )
+    {
+        my $new = $fields->{ $f }->clone || return( $self->pass_error( $fields->{ $f }->error ) );
+        $ref->{ $f } = $new;
+    }
+    return( $ref );
+}
+
+sub fields_as_array
+{
+    my $self = shift( @_ );
+    $self->structure || return( $self->pass_error );
+    my $fields = $self->{fields};
+    return( $self->new_array( [sort{ $fields->{ $a }->pos <=> $fields->{ $b }->pos } keys( %$fields )] ) );
+}
+
+sub field_exists
+{
+    my $self = shift( @_ );
+    my $field = shift( @_ ) || return( $self->error( "No field was provided." ) );
+    $self->structure || return( $self->pass_error );
+    my $fields = $self->{fields};
+    return( CORE::exists( $fields->{ $field } ) );
 }
 
 sub fields_object
@@ -363,6 +400,8 @@ EOT
 
 sub fo { return( shift->fields_object( @_ ) ); }
 
+sub foreign { return( shift->_set_get_hash_as_mix_object( 'foreign', @_ ) ); }
+
 sub format_statement($;\%\%@) { return( shift->_method_to_query( 'format_statement', @_ ) ); }
 
 sub format_update($;%) { return( shift->_method_to_query( 'format_update', @_ ) ); }
@@ -372,6 +411,13 @@ sub from_unixtime { return( shift->_method_to_query( 'from_unixtime', @_ ) ); }
 sub get_query_object { return( shift->_reset_query ); }
 
 sub group { return( shift->_method_to_query( 'group', @_ ) ); }
+
+# sub indexes { return( shift->_set_get_class_array_object( 'indexes', {
+#     is_primary => { type => 'boolean' },
+#     is_unique => { type => 'boolean' },
+#     fields => { type => 'array_as_object' },
+# }, @_ ) ); }
+sub indexes { return( shift->_set_get_hash_as_mix_object( 'indexes', @_ ) ); }
 
 sub insert
 {
@@ -418,6 +464,42 @@ sub name
 {
     # Read-only
     return( shift->{table} );
+}
+
+sub new_check
+{
+    my $self = shift( @_ );
+    my $args = $self->_get_args_as_hash( @_ );
+    $self->_load_class( 'DB::Object::Constraint::Check' ) ||
+        return( $self->pass_error );
+    $args->{debug} = $self->debug if( !CORE::exists( $args->{debug} ) || !defined( $args->{debug} ) );
+    my $this = DB::Object::Constraint::Check->new( %$args ) ||
+        return( $self->pass_error( DB::Object::Constraint::Check->error ) );
+    return( $this );
+}
+
+sub new_foreign
+{
+    my $self = shift( @_ );
+    my $args = $self->_get_args_as_hash( @_ );
+    $self->_load_class( 'DB::Object::Constraint::Foreign' ) ||
+        return( $self->pass_error );
+    $args->{debug} = $self->debug if( !CORE::exists( $args->{debug} ) || !defined( $args->{debug} ) );
+    my $this = DB::Object::Constraint::Foreign->new( %$args ) ||
+        return( $self->pass_error( DB::Object::Constraint::Foreign->error ) );
+    return( $this );
+}
+
+sub new_index
+{
+    my $self = shift( @_ );
+    my $args = $self->_get_args_as_hash( @_ );
+    $self->_load_class( 'DB::Object::Constraint::Index' ) ||
+        return( $self->pass_error );
+    $args->{debug} = $self->debug if( !CORE::exists( $args->{debug} ) || !defined( $args->{debug} ) );
+    my $this = DB::Object::Constraint::Index->new( %$args ) ||
+        return( $self->pass_error( DB::Object::Constraint::Index->error ) );
+    return( $this );
 }
 
 sub no_bind { return( shift->_set_get_boolean( { field => 'no_bind', callbacks =>
@@ -467,9 +549,9 @@ sub null
 {
     my $self = shift( @_ );
     $self->structure || return( $self->pass_error );
-    my $null = $self->{null};
-    # return( wantarray() ? () : undef() ) if( !%$null );
-    # return( wantarray() ? %$null : $null );
+    my $fields = $self->fields;
+    # my $null = $self->{null};
+    my $null = +{ map{ $_ => ( $fields->{ $_ }->is_nullable ? 1 : 0 ) } keys( %$fields ) };
     return( $self->_clone( $null ) );
 }
 
@@ -483,6 +565,8 @@ sub optimize
 }
 
 sub order { return( shift->_method_to_query( 'order', @_ ) ); }
+
+sub parent { return( shift->error( "The table parent() method is not supported by this driver." ) ); }
 
 sub prefix
 {
@@ -694,20 +778,22 @@ sub types
 {
     my $self = shift( @_ );
     $self->structure || return( $self->pass_error );
-    my $types = $self->{types};
-    # return( wantarray() ? () : undef() ) if( !%$types );
-    # return( wantarray() ? %$types : $types );
-    return( $self->_clone( $types ) );
+    # my $types = $self->{types};
+    my $fields = $self->fields;
+    my $types = +{ map{ $_ => $fields->{ $_ }->type } keys( %$fields ) };
+    # return( $self->_clone( $types ) );
+    return( $types );
 }
 
 sub types_const
 {
     my $self = shift( @_ );
     $self->structure || return( $self->pass_error );
-    my $types = $self->{types_const};
-    # return( wantarray() ? () : undef() ) if( !%$types );
-    # return( wantarray() ? %$types : $types );
-    return( $self->_clone( $types ) );
+    my $fields = $self->fields;
+    # my $types = $self->{types_const};
+    my $types = +{ map{ $_ => $fields->{ $_ }->datatype } keys( %$fields ) };
+    # return( $self->_clone( $types ) );
+    return( $types );
 }
 
 sub unlock
@@ -758,7 +844,9 @@ sub _method_to_query
     my $meth = shift( @_ );
     my $q = $self->_reset_query;
     my $code = $q->can( $meth ) || return( $self->error( "Query class '", ref( $q ), "' has no method '$meth'." ) );
-    return( $code->( $q, @_ ) );
+    my $rv = $code->( $q, @_ );
+    return( $self->pass_error( $q->error ) ) if( !defined( $rv ) && $q->error );
+    return( $rv );
 }
 
 sub AUTOLOAD
@@ -803,7 +891,7 @@ DB::Object::Tables - Database Table Object
 
 =head1 VERSION
 
-    v0.6.0
+    v1.0.0
 
 =head1 DESCRIPTION
 
@@ -827,7 +915,7 @@ Possible arguments are:
 
 =over 4
 
-=item I<debug>
+=item * C<debug>
 
 Toggles debug mode on/off
 
@@ -862,6 +950,28 @@ Provided with a table alias and this will call L<DB::Object::Query/table_alias> 
 Takes a list of array reference of column to avoid in the next query.
 
 This is a convenient wrapper around L<DB::Object::Query/avoid>
+
+=head2 check
+
+Sets or gets the L<hash object|Module::Generic::Hash> of L<check constraint objects|DB::Object::Constraint::Check> for this table.
+
+Each key in the hash represents the foreign key constraint name and its value is an L<check constraint object|DB::Object::Constraint::Check> that contains the following methods:
+
+=over 4
+
+=item * C<expr>
+
+The check constraint expression
+
+=item * C<fields>
+
+The L<array object|Module::Generic::Array> of table columns associated with this check constraint.
+
+=item * C<name>
+
+The check constraint name.
+
+=back
 
 =head2 columns
 
@@ -933,13 +1043,26 @@ Sets or gets the boolean value. When true, this will instruct the query object t
 
 This must be implemented by the driver package, so check L<DB::Object::Mysql::Tables/exists>, L<DB::Object::Postgres::Tables/exists> or L<DB::Object::SQLite::Tables/exists>
 
+=head2 field_exists
+
+Provided with a field name, and this returns a boolean value as to whether that field exists in the table or not.
+
+=head2 fields_as_array
+
+Returns the table fields name as an L<array object|Module::Generic::Array>
+
 =head2 fields
 
 This calls L</structure> which may return cached data.
 
-Returns an hash in list context and an hash reference in scalar representing column to its order (integer) in the table pairs.
+Returns an hash of fields to their corresponding L<object|DB::Object::Fields::Field>. Those objects are instantiated once by the L<structure method|DB::Object::Tables/structure>. If you plan on making change, make sure to clone them first.
 
 If nothing is found, it returns an empty list in list context and L<perlfunc/undef> in scalar context.
+
+It takes an optional parameter representing a field name, and will return its corresponding object, such as:
+
+    my $tbl = $dbh->my_database_table || die( "No table 'my_database_table' in database" );
+    my $field_object = $tbl->fields( 'my_table_field' ):
 
 =head2 fields_object
 
@@ -966,6 +1089,40 @@ This is a convenient shortcut for L</fields_object>
     # get the field object for "name"
     my $name = $tbl->fo->name
 
+=head2 foreign
+
+Sets or gets the L<hash object|Module::Generic::Hash> of L<foreign key constraint objects|DB::Object::Constraint::Foreign> for this table.
+
+Each key in the hash represents the foreign key constraint name and its value is an L<foreign key constraint object|DB::Object::Constraint::Foreign> that contains the following methods:
+
+=over 4
+
+=item * C<match>
+
+Typical value is C<full>, C<partial> and C<simple>
+
+=item * C<on_delete>
+
+The action the database is to take upon deletion. For example: C<nothing>, C<restrict>, C<cascade>, C<null> or C<default>
+
+=item * C<on_update>
+
+The action the database is to take upon update. For example: C<nothing>, C<restrict>, C<cascade>, C<null> or C<default>
+
+=item * C<table>
+
+The table name of the foreign key.
+
+=item * C<fields>
+
+The L<array object|Module::Generic::Array> of associated column names for this foreign key constraint.
+
+=item * C<name>
+
+The foreign key constraint name.
+
+=back
+
 =head2 format_statement
 
 This is a convenient wrapper around L<DB::Object::Query/format_statement>
@@ -982,7 +1139,7 @@ Formats update query based on the following arguments provided:
 
 =over 4
 
-=item I<data>
+=item * C<data>
 
 An array of key-value pairs to be used in the update query. This array can be provided as the prime argument as a reference to an array, an array, or as the I<data> element of a hash or a reference to a hash provided.
 
@@ -1024,6 +1181,34 @@ Get the L<DB::Object::Query> object. If none is set yet, it will instantiate one
 
 This is a convenient wrapper around L<DB::Object::Query/group>
 
+=head2 indexes
+
+    my $idx = $tbl->indexes;
+    my $in0 = $idx->{some_index};
+    say "Is primary: ", $in0->is_primary ? 'yes' : 'no';
+    say "Is unique: ", $in0->is_unique ? 'yes' : 'no';
+    say "Associated fields: ", $in0->fields->join( ', ' );
+
+Sets or gets the L<hash object|Module::Generic::Hash> of L<index objects|DB::Object::Constraint::Index> for this table.
+
+Each key in the hash represents the index name and its value is an L<index object|DB::Object::Constraint::Index> that contains the following methods:
+
+=over 4
+
+=item * C<fields>
+
+An L<array object|Module::Generic::Array> of table field names.
+
+=item * C<is_primary>
+
+Boolean value whether this index is the table primary index.
+
+=item * C<is_unique>
+
+Boolean value whether this is a unique index.
+
+=back
+
 =head2 insert
 
 This is a convenient wrapper around L<DB::Object::Query/insert>
@@ -1043,6 +1228,34 @@ This must be implemented by the driver package, so check L<DB::Object::Mysql::Ta
 =head2 name
 
 Returns the table name. This is read-only.
+
+=head2 new_check
+
+This takes an hash or an hash reference of parameters and instantiate a new L<DB::Object::Constraint::Check> object.
+
+If no C<debug> parameter is provided, the one of the current table object will be used.
+
+It returns the new object upon success, or upon error, it sets an L<exception object|Module::Generic::Exception> and return C<undef> in scalar context, or an empty list in list context.
+
+=head2 new_foreign
+
+This takes an hash or an hash reference of parameters and instantiate a new L<DB::Object::Constraint::Foreign> object.
+
+If no C<debug> parameter is provided, the one of the current table object will be used.
+
+It returns the new object upon success, or upon error, it sets an L<exception object|Module::Generic::Exception> and return C<undef> in scalar context, or an empty list in list context.
+
+=head2 new_index
+
+This takes an hash or an hash reference of parameters and instantiate a new L<DB::Object::Constraint::Index> object.
+
+If no C<debug> parameter is provided, the one of the current table object will be used.
+
+It returns the new object upon success, or upon error, it sets an L<exception object|Module::Generic::Exception> and return C<undef> in scalar context, or an empty list in list context.
+
+=head2 no_bind
+
+Boolean. Sets the C<no bind> flags to true or false.
 
 =head2 null
 
@@ -1065,6 +1278,10 @@ This must be implemented by the driver package, so check L<DB::Object::Mysql::Ta
 This is a convenient wrapper around L<DB::Object::Query/order>
 
 Prepares the C<ORDER BY> clause and returns the value of the clause in list context or the C<ORDER BY> clause in full in scalar context, ie. "ORDER BY $clause"
+
+=head2 parent
+
+For the drivers who support it, this will represent the parent table if the current table inherits from another table.
 
 =head2 prefix
 

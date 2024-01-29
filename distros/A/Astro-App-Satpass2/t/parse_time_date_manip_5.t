@@ -3,9 +3,11 @@ package main;
 use strict;
 use warnings;
 
+use Astro::App::Satpass2::ParseTime;
+use Test::More 0.88;
+
 use lib qw{ inc };
 
-use Test::More 0.88;
 use My::Module::Test::App;
 
 BEGIN {
@@ -47,18 +49,14 @@ if ( $DATE_MANIP_5_REALLY ) {
     cmp_ok $ver, '<', 6, 'Date::Manip version is really less than 6';
 }
 
-require_ok 'Astro::App::Satpass2::ParseTime';
-
 klass( 'Astro::App::Satpass2::ParseTime' );
 
 call_m( new => class => 'Astro::App::Satpass2::ParseTime::Date::Manip',
     INSTANTIATE, 'Instantiate' );
 
-call_m( isa => 'Astro::App::Satpass2::ParseTime::Date::Manip::v5', TRUE,
-    'Object is an Astro::App::Satpass2::ParseTime::Date::Manip::v5' );
+isa_ok invocant, 'Astro::App::Satpass2::ParseTime::Date::Manip::v5';
 
-call_m( isa => 'Astro::App::Satpass2::ParseTime', TRUE,
-    'Object is an Astro::App::Satpass2::ParseTime' );
+isa_ok invocant, 'Astro::App::Satpass2::ParseTime';
 
 call_m( 'delegate',
     'Astro::App::Satpass2::ParseTime::Date::Manip::v5',

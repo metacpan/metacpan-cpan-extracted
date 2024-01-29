@@ -6,8 +6,7 @@ use IO::String;
 require 't/test-lib.pm';
 
 my $res;
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel      => 'error',
             useSafeJail   => 1,
@@ -20,10 +19,16 @@ ok( $res = $client->_get( '/', accept => 'text/html' ), 'Firt access' );
 my ( $host, $url, $query ) =
   expectForm( $res, undef, undef, 'user', 'password', 'stayconnected',
     'checkLogins', 'token' );
+like( $query, qr/stayconnected=/, "Stayconnected was offered" );
+
+count(2);
+
 ok( $res = $client->_get( '/', ip => '10.10.10.10', accept => 'text/html' ),
     'Access from external LAN' );
 ( $host, $url, $query ) =
   expectForm( $res, undef, undef, 'user', 'password', 'checkLogins', 'token' );
+unlike( $query, qr/stayconnected=/, "Stayconnected wasn't offered" );
+
 count(2);
 
 $query =~ s/user=/user=dwho/;
@@ -58,7 +63,7 @@ ok(
     'Post fingerprint'
 );
 count(1);
-expectRedirection( $res, 'http://auth.example.com/' );
+expectPortalError( $res, 24 );
 
 $client->logout($id);
 clean_sessions();

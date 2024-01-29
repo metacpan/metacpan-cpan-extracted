@@ -1,0 +1,9 @@
+CREATE TABLE SwitchedUserRealActors (
+    id              INTEGER PRIMARY KEY,
+    ObjectType      VARCHAR(255),
+    ObjectId        INTEGER DEFAULT 0 NOT NULL,
+    Creator         INTEGER DEFAULT 0 NOT NULL,
+    LastUpdatedBy   INTEGER DEFAULT 0 NOT NULL
+);
+
+CREATE INDEX SwitchedUserRealActors1 ON SwitchedUserRealActors (ObjectType, ObjectId);

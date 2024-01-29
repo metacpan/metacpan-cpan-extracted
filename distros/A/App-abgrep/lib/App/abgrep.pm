@@ -12,9 +12,9 @@ use AppBase::Grep::File ();
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-04'; # DATE
+our $DATE = '2024-01-25'; # DATE
 our $DIST = 'App-abgrep'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 our %SPEC;
 
@@ -70,7 +70,7 @@ App::abgrep - Print lines matching a pattern
 
 =head1 VERSION
 
-This document describes version 0.009 of App::abgrep (from Perl distribution App-abgrep), released on 2022-11-04.
+This document describes version 0.010 of App::abgrep (from Perl distribution App-abgrep), released on 2024-01-25.
 
 =head1 FUNCTIONS
 
@@ -103,7 +103,7 @@ Specify when to show color (never, always, or autoE<sol>when interactive).
 
 =item * B<count> => I<true>
 
-Supress normal output, return a count of matching lines.
+Supress normal output; instead return a count of matching lines.
 
 =item * B<dash_prefix_inverts> => I<bool>
 
@@ -121,6 +121,14 @@ Read all files under each directory, recursively, following all symbolic links, 
 =item * B<files> => I<array[filename]>
 
 (No description)
+
+=item * B<files_with_matches> => I<true>
+
+Supress normal output; instead return filenames with matching lines; scanning for each file will stop on the first match.
+
+=item * B<files_without_match> => I<true>
+
+Supress normal output; instead return filenames without matching lines.
 
 =item * B<ignore_case> => I<bool>
 
@@ -196,7 +204,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2022, 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

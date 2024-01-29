@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.60';
+our $VERSION = '2.61';
 
 our @ALL =
 qw(
@@ -161,6 +161,7 @@ qw(
   Antarctica/Palmer
   Antarctica/Rothera
   Antarctica/Troll
+  Antarctica/Vostok
   Asia/Almaty
   Asia/Amman
   Asia/Anadyr
@@ -506,6 +507,7 @@ Mawson
 Palmer
 Rothera
 Troll
+Vostok
 ) ],
   'Asia' => [ qw(
 Almaty
@@ -1697,7 +1699,6 @@ our %LINKS =
   'Antarctica/McMurdo' => 'Pacific/Auckland',
   'Antarctica/South_Pole' => 'Pacific/Auckland',
   'Antarctica/Syowa' => 'Asia/Riyadh',
-  'Antarctica/Vostok' => 'Asia/Urumqi',
   'Arctic/Longyearbyen' => 'Europe/Berlin',
   'Asia/Aden' => 'Asia/Riyadh',
   'Asia/Ashkhabad' => 'Asia/Ashgabat',
@@ -1862,7 +1863,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2023c' }
+sub OlsonVersion { '2023d' }
 
 
 1;
@@ -2036,6 +2037,7 @@ so that applications can easily present a list of timezones.
   Antarctica/Mawson
   Antarctica/Rothera
   Antarctica/Troll
+  Antarctica/Vostok
   Antarctica/Macquarie
   Antarctica/Palmer
 
@@ -2280,7 +2282,7 @@ so that applications can easily present a list of timezones.
   America/Argentina/Salta - Salta (SA, LP, NQ, RN)
   America/Argentina/Jujuy - Jujuy (JY)
   America/Argentina/Tucuman - Tucuman (TM)
-  America/Argentina/Catamarca - Catamarca (CT); Chubut (CH)
+  America/Argentina/Catamarca - Catamarca (CT), Chubut (CH)
   America/Argentina/La_Rioja - La Rioja (LR)
   America/Argentina/San_Juan - San Juan (SJ)
   America/Argentina/Mendoza - Mendoza (MZ)
@@ -2378,7 +2380,7 @@ so that applications can easily present a list of timezones.
 =head3 Brazil (BR)
 
   America/Noronha - Atlantic islands
-  America/Belem - Para (east); Amapa
+  America/Belem - Para (east), Amapa
   America/Fortaleza - Brazil (northeast: MA, PI, CE, RN, PB)
   America/Recife - Pernambuco
   America/Araguaina - Tocantins
@@ -2428,21 +2430,21 @@ so that applications can easily present a list of timezones.
 
 =head3 Canada (CA)
 
-  America/St_Johns - Newfoundland; Labrador (southeast)
-  America/Halifax - Atlantic - NS (most areas); PE
+  America/St_Johns - Newfoundland, Labrador (SE)
+  America/Halifax - Atlantic - NS (most areas), PE
   America/Glace_Bay - Atlantic - NS (Cape Breton)
   America/Moncton - Atlantic - New Brunswick
   America/Goose_Bay - Atlantic - Labrador (most areas)
   America/Blanc-Sablon - AST - QC (Lower North Shore)
-  America/Toronto - Eastern - ON, QC (most areas)
+  America/Toronto - Eastern - ON & QC (most areas)
   America/Iqaluit - Eastern - NU (most areas)
-  America/Atikokan - EST - ON (Atikokan); NU (Coral H)
-  America/Winnipeg - Central - ON (west); Manitoba
+  America/Atikokan - EST - ON (Atikokan), NU (Coral H)
+  America/Winnipeg - Central - ON (west), Manitoba
   America/Resolute - Central - NU (Resolute)
   America/Rankin_Inlet - Central - NU (central)
   America/Regina - CST - SK (most areas)
   America/Swift_Current - CST - SK (midwest)
-  America/Edmonton - Mountain - AB; BC (E); NT (E); SK (W)
+  America/Edmonton - Mountain - AB, BC(E), NT(E), SK(W)
   America/Cambridge_Bay - Mountain - NU (west)
   America/Inuvik - Mountain - NT (west)
   America/Creston - MST - BC (Creston)
@@ -2716,8 +2718,8 @@ so that applications can easily present a list of timezones.
 
   Asia/Jakarta - Java, Sumatra
   Asia/Pontianak - Borneo (west, central)
-  Asia/Makassar - Borneo (east, south); Sulawesi/Celebes, Bali, Nusa Tengarra; Timor (west)
-  Asia/Jayapura - New Guinea (West Papua / Irian Jaya); Malukus/Moluccas
+  Asia/Makassar - Borneo (east, south), Sulawesi/Celebes, Bali, Nusa Tengarra, Timor (west)
+  Asia/Jayapura - New Guinea (West Papua / Irian Jaya), Malukus/Moluccas
 
 =head3 Iran (Islamic Republic of) (IR)
 
@@ -3086,7 +3088,7 @@ so that applications can easily present a list of timezones.
   Asia/Ust-Nera - MSK+07 - Oymyakonsky
   Asia/Magadan - MSK+08 - Magadan
   Asia/Sakhalin - MSK+08 - Sakhalin Island
-  Asia/Srednekolymsk - MSK+08 - Sakha (E); N Kuril Is
+  Asia/Srednekolymsk - MSK+08 - Sakha (E), N Kuril Is
   Asia/Kamchatka - MSK+09 - Kamchatka
   Asia/Anadyr - MSK+09 - Bering Sea
 
@@ -3322,7 +3324,7 @@ so that applications can easily present a list of timezones.
   America/North_Dakota/New_Salem - Central - ND (Morton rural)
   America/North_Dakota/Beulah - Central - ND (Mercer)
   America/Denver - Mountain (most areas)
-  America/Boise - Mountain - ID (south); OR (east)
+  America/Boise - Mountain - ID (south), OR (east)
   America/Phoenix - MST - AZ (except Navajo)
   America/Los_Angeles - Pacific
   America/Anchorage - Alaska (most areas)
@@ -3475,7 +3477,6 @@ A linked zone is an alias from one name to another.
   Antarctica/McMurdo => Pacific/Auckland
   Antarctica/South_Pole => Pacific/Auckland
   Antarctica/Syowa => Asia/Riyadh
-  Antarctica/Vostok => Asia/Urumqi
   Arctic/Longyearbyen => Europe/Berlin
   Asia/Aden => Asia/Riyadh
   Asia/Ashkhabad => Asia/Ashgabat

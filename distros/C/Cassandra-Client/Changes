@@ -1,5 +1,9 @@
 Revision history for Cassandra-Client
 
+0.21    2023/12/18
+
+      * Fix rare compilation error
+
 0.20    2023/07/16
 
       * Fix incorrect handling of varint/decimal on big-endian machines

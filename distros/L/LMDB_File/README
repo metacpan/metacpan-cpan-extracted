@@ -1,4 +1,4 @@
-LMDB_File version 0.12
+LMDB_File version 0.13
 ======================
 
 LMDB_File is a Perl wrapper around the OpenLDAP's LMDB (Lightning
@@ -18,7 +18,7 @@ Right now LMDB needs a 64bits platform.
  Before you can build LMDB_File you need to have the following installed
 on your system:
 
-    * Perl 5.10.0 or greater linked with pthreads.
+    * Perl 5.10.0 up to 5.38 linked with pthreads.
       See https://rt.perl.org/Public/Bug/Display.html?id=122906
 
     * A working C compiler.
@@ -66,10 +66,8 @@ be aware that the API isn't in stone yet. See TODO
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2013-2017 by Salvador Ortiz Garcia
+Copyright (C) 2013-2023 by Salvador Ortiz Garcia
 
-This module is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.1 or,
-at your option, any later version of Perl 5 you may have available.
-
+This library is free software; you can redistribute it and/or modify
+it under the terms of the Artistic License version 2.0.
 

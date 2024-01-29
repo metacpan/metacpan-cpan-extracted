@@ -65,7 +65,7 @@ static sigset_t* S_sv_to_sigset(pTHX_ SV* sigmask, const char* name) {
 	if (!SvOK(sigmask))
 		return NULL;
 	if (!SvROK(sigmask) || !sv_derived_from(sigmask, "POSIX::SigSet"))
-		Perl_croak(aTHX_ "%s is not of type POSIX::SigSet");
+		Perl_croak(aTHX_ "Value is not of type POSIX::SigSet");
 #if PERL_VERSION > 15 || PERL_VERSION == 15 && PERL_SUBVERSION > 2
 	return (sigset_t *) SvPV_nolen(SvRV(sigmask));
 #else
@@ -114,7 +114,7 @@ static uint32_t S_event_names_to_bits(pTHX_ SV* names) {
 		AV* array = (AV*)SvRV(names);
 		uint32_t ret = 0;
 		int i, len;
-		if (!SvTYPE(array) == SVt_PVAV)
+		if (SvTYPE(array) != SVt_PVAV)
 			Perl_croak(aTHX_ "event names must be string or arrayref");
 		len = av_len(array) + 1;
 		for (i = 0; i < len; ++i) {
@@ -166,6 +166,7 @@ MGVTBL weak_magic = { NULL, weak_set, NULL, NULL, weak_free };
 static int weak_free(pTHX_ SV* sv, MAGIC* magic) {
 	struct data* data = (struct data*)magic->mg_ptr;
 	mg_findext(sv, PERL_MAGIC_ext, &weak_magic)->mg_virtual = NULL; /* Cover perl bugs under the carpet */
+	return 0;
 }
 
 #define get_backrefs(epoll) (AV*)mg_findext(SvRV(epoll), PERL_MAGIC_ext, &epoll_magic)->mg_obj
@@ -246,7 +247,6 @@ add(self, fh, events, callback)
 		int efd, ofd;
 		struct epoll_event event;
 		CV* real_callback;
-		MAGIC* mg;
 	CODE:
 		efd = get_fd(self);
 		ofd = get_fd(fh);
@@ -324,7 +324,7 @@ wait(self, maxevents = 1, timeout = undef, sigset = undef)
 		struct epoll_event* events;
 	CODE:
 		if (maxevents <= 0)
-			Perl_croak(aTHX_ "Can't wait for a non-positive number of events (maxevents = %d)", maxevents);
+			Perl_croak(aTHX_ "Can't wait for a non-positive number of events (maxevents = %ld)", maxevents);
 		efd = get_fd(self);
 		real_timeout = SvOK(timeout) ? (int)ceil(SvNV(timeout) * 1000) : -1;
 		real_sigset = SvOK(sigset) ? sv_to_sigset(sigset, "epoll_pwait") : NULL;

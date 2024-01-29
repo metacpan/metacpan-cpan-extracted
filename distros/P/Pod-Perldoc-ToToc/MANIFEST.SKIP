@@ -66,3 +66,4 @@ Pod-.*
 \.icloud$
 \A\.github\b
 \.?appveyor\.ya?ml
+\.gitattributes\b

@@ -1,0 +1,100 @@
+# To read this file, run:
+#    perldoc CONTRIBUTING.pod
+
+=head1 CONTRIBUTING
+
+How to contribute to C<Method-Extension>?
+
+=head1 DESCRIPTION
+
+Patches are welcome!
+
+They must be built against the
+C<L<main|https://github.com/peczenyj/Method-Extension/tree/master>> branch,
+then submitted as pull requests at GitHub.
+
+The documentation is written using the
+L<POD|http://perldoc.perl.org/perlpod.html> format. Use the C<perldoc> tool
+to render it in a terminal:
+
+    perldoc CONTRIBUTING.pod
+
+=head1 PATCHING, STEP BY STEP
+
+=over 4
+
+=item 1. Get the source
+
+    git clone --origin upstream git://github.com/peczenyj/Method-Extension.git
+    cd Method-Extension
+    git checkout main
+
+=item 2. Install build dependencies
+
+Not required for doc patches.
+
+    curl -L https://cpanmin.us | perl - --installdeps --with-develop .
+
+=item 3. Make your fix/feature
+
+    git checkout -b <my-patch> main
+
+    # edit files and add modification
+
+    # Run the testsuite
+    prove -v
+
+    git commit -s -m '<<some nice message>>'
+
+=item 4. Setup a fork
+
+=item 4.1. L<Fork the project on GitHub|https://github.com/peczenyj/Method-Extension/>
+
+=item 4.2. Link your local repo to your fork (just once)
+
+(You are using C<Method-Extension> isn't it?)
+
+    git remote add github <github-user>.github.com:<github-user>/Method-Extension.git
+
+=item 5. Submit your work
+
+=item 5.1 Push!
+
+    git push github <my-patch>
+
+=item 5.2 Submit a pull request on GitHub
+
+=item 6. Loop
+
+Redo from step 3.
+
+=back
+
+=head1 FOR RELEASE MANAGER
+
+=over 4
+
+=item * Bump C<$VERSION>
+
+    git checkout main
+    # Bump version number
+    $EDITOR lib/Method/Extension.pm
+    # Update changelog
+    $EDITOR Changelog
+    # update readme
+    git add .
+    git commit
+
+=item * Release
+
+    git checkout main
+    perl Makefile.PL
+    make
+    make test
+    make manifest # in case of adding new files / tests / examples...
+    make dist
+    ...
+
+=back
+
+=cut

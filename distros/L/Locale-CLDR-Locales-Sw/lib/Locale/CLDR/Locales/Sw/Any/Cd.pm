@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sw::Any::Cd - Package for language Swahili
 
 package Locale::CLDR::Locales::Sw::Any::Cd;
 # This file auto generated from Data\common\main\sw_CD.xml
-#	on Tue  5 Dec  1:33:23 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'Kiakan',
@@ -40,7 +40,6 @@ has 'display_name_language' => (
  				'hup' => 'Kihupa',
  				'jbo' => 'Kilojban',
  				'kac' => 'Kikachin',
- 				'khq' => 'Kikoyra Chiini',
  				'kkj' => 'Kikako',
  				'koi' => 'Kikomipermyak',
  				'kru' => 'Kikurukh',
@@ -48,7 +47,6 @@ has 'display_name_language' => (
  				'ky' => 'Kikirigizi',
  				'lam' => 'Kilamba',
  				'li' => 'Kilimburgi',
- 				'mak' => 'mak',
  				'mdf' => 'Kimoksha',
  				'mic' => 'Kimikmaki',
  				'mk' => 'Kimasedonia',
@@ -78,7 +76,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'030' => 'Asia Mashariki',
  			'AF' => 'Afuganistani',
@@ -86,8 +84,6 @@ has 'display_name_region' => (
  			'BJ' => 'Benini',
  			'CI' => 'Kodivaa',
  			'CX' => 'Kisiwa cha Christmas',
- 			'CY' => 'Saiprasi',
- 			'DK' => 'Denmaki',
  			'HR' => 'Kroeshia',
  			'JO' => 'Yordani',
  			'LB' => 'Lebanoni',
@@ -96,7 +92,6 @@ has 'display_name_region' => (
  			'LV' => 'Lativia',
  			'MA' => 'Moroko',
  			'MM' => 'Myama',
- 			'MV' => 'Maldivi',
  			'NE' => 'Nijeri',
  			'NG' => 'Nijeria',
  			'NO' => 'Norwe',
@@ -108,7 +103,6 @@ has 'display_name_region' => (
  			'ST' => 'Sao Tome na Prinsipe',
  			'TD' => 'Chadi',
  			'TL' => 'Timori ya Mashariki',
- 			'VN' => 'Vietnamu',
 
 		}
 	},
@@ -247,8 +241,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'eras' => (

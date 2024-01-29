@@ -7,7 +7,7 @@ use Mouse;
 use Clone 'clone';
 use Lemonldap::NG::Portal::Main::Constants 'URIRE';
 
-our $VERSION = '2.16.2';
+our $VERSION = '2.18.0';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -194,6 +194,9 @@ sub displayModules {
             elsif ( $module->[0] eq 'OidcConsents' ) {
                 $moduleHash->{'OIDC_CONSENTS'} =
                   $self->p->mkOidcConsent( $req, $req->userData );
+            }
+            elsif ( $module->[0] eq 'ChangePassword' ) {
+                $moduleHash->{'PPOLICY_RULES'} = $self->p->getPpolicyRules;
             }
             push @$displayModules, $moduleHash;
         }

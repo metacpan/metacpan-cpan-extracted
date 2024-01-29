@@ -9,7 +9,7 @@ use Exporter qw(import);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-09-08'; # DATE
 our $DIST = 'Number-Util-Range'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our @EXPORT_OK = qw(convert_number_sequence_to_range);
 our %SPEC;
@@ -29,7 +29,7 @@ MARKDOWN
         array => {
             schema => ['array*', of=>'str*'],
             pos => 0,
-            greedy => 1,
+            slurpy => 1,
             cmdline_src => 'stdin_or_args',
         },
         min_range_len => {
@@ -125,6 +125,8 @@ sub convert_number_sequence_to_range {
         // $args{threshold} # old name, DEPRECATED
         // 4;
     my $max_range_len = $args{max_range_len};
+    die "max_range_len must be >= min_range_len"
+        if defined($max_range_len) && $max_range_len < $min_range_len;
     my $separator = $args{separator} // '..';
     my $ignore_duplicates = $args{ignore_duplicates};
 
@@ -179,7 +181,7 @@ Number::Util::Range - Find sequences in number arrays & convert to range (e.g. 1
 
 =head1 VERSION
 
-This document describes version 0.006 of Number::Util::Range (from Perl distribution Number-Util-Range), released on 2023-09-08.
+This document describes version 0.008 of Number::Util::Range (from Perl distribution Number-Util-Range), released on 2023-09-08.
 
 =head1 FUNCTIONS
 

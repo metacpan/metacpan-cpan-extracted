@@ -7,6 +7,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Net::Clacks',
     VERSION_FROM      => 'lib/Net/Clacks.pm', # finds $VERSION
+    MIN_PERL_VERSION  => '5.36.0',
     PREREQ_PM         => {
         "Array::Contains" => 2.7,
         "XML::Simple" => 0,

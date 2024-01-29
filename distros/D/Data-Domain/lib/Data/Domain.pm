@@ -1,7 +1,9 @@
+use 5.010;
+use utf8;
+
 #======================================================================
 package Data::Domain; # documentation at end of file
 #======================================================================
-use 5.010;
 use strict;
 use warnings;
 use Carp;
@@ -9,16 +11,19 @@ use Data::Dumper;
 use Scalar::Does 0.007;
 use Scalar::Util ();
 use Try::Tiny;
+use List::Util      qw/max uniq/;
 use List::MoreUtils qw/part natatime any/;
 use if $] < 5.037, experimental => 'smartmatch';      # smartmatch no longer experimental after 5.037
 use overload '""' => \&_stringify,
              $] < 5.037 ? ('~~' => \&_matches) : ();  # fully deprecated, so cannot be overloaded
 use match::simple ();
 
-our $VERSION = "1.12";
+our $VERSION = "1.15";
 
-our $MESSAGE;        # global var for last message from _matches()
-our $MAX_DEEP = 100; # limit for recursive calls to inspect()
+our $MESSAGE;            # global var for last message from _matches()
+our $MAX_DEEP = 100;     # limit for recursive calls to inspect()
+our $GLOBAL_MSGS;        # table of default messages -- see below method messages()
+our $USE_OLD_MSG_API;    # flag for backward compatibility
 
 #----------------------------------------------------------------------
 # exports
@@ -44,12 +49,13 @@ BEGIN {
     Regexp    => [ -does    => 'Regexp' ],
     Obj       => [ -blessed => 1        ],
     Class     => [ -package => 1        ],
+    Coderef   => [ -does    => 'CODE'   ],
   );
 }
 
 # setup exports through Sub::Exporter API
 use Sub::Exporter -setup => {
-  exports    => [ 'node_from_path',                                          # no longer documented, but still present for backwards compat
+  exports    => [ 'node_from_path',                                          # no longer used, but still present for backwards compat
                   (map {$_ => \&_wrap_domain          } @CONSTRUCTORS  ),
                   (map {$_ => \&_wrap_shortcut_options} keys %SHORTCUTS) ],
   groups     => { constructors => \@CONSTRUCTORS,
@@ -103,6 +109,13 @@ sub _wrap_shortcut_options {
 # messages
 #----------------------------------------------------------------------
 
+sub _msg_bool { # small closure generator for various messages below
+  my ($must_be, $if_true, $if_false) = @_;
+  return sub {my ($name, $msg_id, $expected) = @_;
+              "$name: $must_be " . ($expected ? $if_true : $if_false)};
+}
+
+
 my $builtin_msgs = {
   english => {
     Generic => {
@@ -111,20 +124,20 @@ my $builtin_msgs = {
       TOO_SMALL     => "smaller than minimum '%s'",
       TOO_BIG       => "bigger than maximum '%s'",
       EXCLUSION_SET => "belongs to exclusion set",
-      MATCH_TRUE    => "data true/false",
+      MATCH_TRUE    => _msg_bool("must be", "true", "false"),
       MATCH_ISA     => "is not a '%s'",
       MATCH_CAN     => "does not have method '%s'",
       MATCH_DOES    => "does not do '%s'",
-      MATCH_BLESSED => "data blessed/unblessed",
-      MATCH_PACKAGE => "data is/is not a package",
-      MATCH_REF     => "is/is not a reference",
+      MATCH_BLESSED => _msg_bool("must be", "blessed", "unblessed"),
+      MATCH_PACKAGE => _msg_bool("must be", "a package", "a non-package"),
+      MATCH_REF     => _msg_bool("must be", "a reference", "a non-reference"),
       MATCH_SMART   => "does not smart-match '%s'",
-      MATCH_ISWEAK  => "weak/strong reference",
-      MATCH_READONLY=> "readonly data",
-      MATCH_TAINTED => "tainted/untainted",
+      MATCH_ISWEAK  => _msg_bool("must be", "a weak reference", "a strong reference"),
+      MATCH_READONLY=> _msg_bool("must be", "readonly", "non-readonly"),
+      MATCH_TAINTED => _msg_bool("must be", "tainted", "untainted"),
     },
     Whatever => {
-      MATCH_DEFINED => "data defined/undefined",
+      MATCH_DEFINED => _msg_bool("must be", "defined", "undefined"),
     },
     Num    => {INVALID => "invalid number",},
     Date   => {INVALID => "invalid date",},
@@ -148,42 +161,42 @@ my $builtin_msgs = {
     },
   },
 
-  "français" => {
+  "franÃ§ais" => {
     Generic => {
-      UNDEFINED     => "donnée non définie",
+      UNDEFINED     => "donnÃ©e non dÃ©finie",
       INVALID       => "incorrect",
       TOO_SMALL     => "plus petit que le minimum '%s'",
       TOO_BIG       => "plus grand que le maximum '%s'",
       EXCLUSION_SET => "fait partie des valeurs interdites",
-      MATCH_TRUE    => "donnée vraie/fausse",
+      MATCH_TRUE    => _msg_bool("doit Ãªtre", "vrai", "faux"),
       MATCH_ISA     => "n'est pas un  '%s'",
-      MATCH_CAN     => "n'a pas la méthode '%s'",
+      MATCH_CAN     => "n'a pas la mÃ©thode '%s'",
       MATCH_DOES    => "ne se comporte pas comme un '%s'",
-      MATCH_BLESSED => "donnée blessed/unblessed",
-      MATCH_PACKAGE => "est/n'est pas un package",
-      MATCH_REF     => "est/n'est pas une référence",
-      MATCH_SMART   => "n'obéit pas au smart-match '%s'",
-      MATCH_ISWEAK  => "référence weak/strong",
-      MATCH_READONLY=> "donnée readonly",
-      MATCH_TAINTED => "tainted/untainted",
+      MATCH_BLESSED => _msg_bool("doit Ãªtre", "blessed", "unblessed"),
+      MATCH_PACKAGE => _msg_bool("doit Ãªtre", "un package", "un non-package"),
+      MATCH_REF     => _msg_bool("doit Ãªtre", "une rÃ©fÃ©rence", "une non-rÃ©fÃ©rence"),
+      MATCH_SMART   => "n'obÃ©it pas au smart-match '%s'",
+      MATCH_ISWEAK  => _msg_bool("doit Ãªtre", "une weak reference", "une strong reference"),
+      MATCH_READONLY=> _msg_bool("doit Ãªtre", "readonly", "non-readonly"),
+      MATCH_TAINTED => _msg_bool("doit Ãªtre", "tainted", "untainted"),
     },
     Whatever => {
-      MATCH_DEFINED => "donnée définie/non définie",
+      MATCH_DEFINED => _msg_bool("doit Ãªtre", "dÃ©fini", "non-dÃ©fini"),
     },
     Num    => {INVALID => "nombre incorrect",},
     Date   => {INVALID => "date incorrecte",},
     String => {
-      TOO_SHORT        => "moins de %d caractères",
-      TOO_LONG         => "plus de %d caractères",
-      SHOULD_MATCH     => "devrait être reconnu par la regex '%s'",
-      SHOULD_NOT_MATCH => "ne devrait pas être reconnu par la regex '%s'",
+      TOO_SHORT        => "moins de %d caractÃ¨res",
+      TOO_LONG         => "plus de %d caractÃ¨res",
+      SHOULD_MATCH     => "devrait Ãªtre reconnu par la regex '%s'",
+      SHOULD_NOT_MATCH => "ne devrait pas Ãªtre reconnu par la regex '%s'",
     },
     Handle => {INVALID     => "n'est pas une filehandle ouverte"},
-    Enum   => {NOT_IN_LIST => "n'appartient pas à la liste énumérée",},
+    Enum   => {NOT_IN_LIST => "n'appartient pas Ã  la liste Ã©numÃ©rÃ©e",},
     List => {
       NOT_A_LIST => "n'est pas une arrayref",
-      TOO_SHORT  => "moins de %d éléments",
-      TOO_LONG   => "plus de %d éléments",
+      TOO_SHORT  => "moins de %d Ã©lÃ©ments",
+      TOO_LONG   => "plus de %d Ã©lÃ©ments",
       ANY        => "doit avoir au moins un '%s'",
     },
     Struct => {
@@ -200,20 +213,25 @@ foreach my $language (keys %$builtin_msgs) {
 }
 
 # default messages : english
-my $global_msgs = $builtin_msgs->{english};
+$GLOBAL_MSGS = $builtin_msgs->{english};
 
 #----------------------------------------------------------------------
 # PUBLIC METHODS
 #----------------------------------------------------------------------
 
-sub messages { # private class method
+sub new {
+  croak "Data::Domain is an abstract class; use subclassses for instantiating domains";
+}
+
+
+sub messages { # class method
   my ($class, $new_messages) = @_;
   croak "messages() is a class method in Data::Domain" 
     if ref $class or $class ne 'Data::Domain';
 
-  $global_msgs = (ref $new_messages) ? $new_messages 
+  $GLOBAL_MSGS = (ref $new_messages) ? $new_messages 
                                      : $builtin_msgs->{$new_messages}
-    or croak "no such builtin messages ($new_messages)";
+    or croak "no such builtin messages: $new_messages";
 }
 
 
@@ -221,15 +239,29 @@ sub inspect {
   my ($self, $data, $context) = @_;
   no warnings 'recursion';
 
-  if (!defined $data) {
-    # success if data was optional;
-    return if $self->{-optional};
+  # build a context if this is the top-level call
+  $context ||= $self->_initial_inspect_context($data);
 
-    # only the 'Whatever' domain can accept undef; other domains will fail
+  if (!defined $data) {
+
+    # in validation mode, insert the default value into the tree of valid data
+    if (exists $context->{gather_valid_data} && exists $self->{-default}) { 
+      $context->{gather_valid_data} = does($self->{-default}, 'CODE') ? $self->{-default}->($context)
+                                                                      : $self->{-default};
+    }
+
+    # success if data was optional;
+    return if $self->{-optional} or exists $self->{-default};
+
+    # otherwise fail, except for the 'Whatever' domain which is the only one to accept undef
     return $self->msg(UNDEFINED => '')
       unless $self->isa("Data::Domain::Whatever");
   }
   else { # if $data is defined
+
+    # remember the value within the tree of valid data
+    $context->{gather_valid_data} = $data if exists $context->{gather_valid_data};
+
     # check some general properties
     if (my $isa = $self->{-isa}) {
       try {$data->isa($isa)}
@@ -273,7 +305,7 @@ sub inspect {
     }
     if (defined $self->{-tainted}) {
       return $self->msg(MATCH_TAINTED => $self->{-tainted})
-        if Scalar::Util::readonly($data) xor $self->{-tainted};
+        if Scalar::Util::tainted($data) xor $self->{-tainted};
     }
   }
 
@@ -289,6 +321,130 @@ sub inspect {
 
   # now call domain-specific _inspect()
   return $self->_inspect($data, $context)
+}
+
+
+sub validate {
+  my ($self, $data) = @_;
+
+  # inspect the data
+  my $context = $self->_initial_inspect_context($data, gather_valid_data => 1);
+  my $msg     = $self->inspect($data, $context);
+  
+  # return the validated data tree if there is no error message
+  return $context->{gather_valid_data} if !$msg;
+
+  # otherwise, die with the error message
+  croak $self->name . ": invalid data because " . $self->stringify_msg($msg);
+}
+
+
+sub stringify_msg {
+  my ($self, $msg) = @_;
+
+  return does($msg, 'ARRAY') ? join ", ", map {$self->stringify_msg($_)} grep {$_} @$msg
+       : does($msg, 'HASH')  ? join ", ", map {"$_:" . $self->stringify_msg($msg->{$_})} grep {$msg->{$_}} sort keys %$msg
+       :                       $msg;
+}
+
+
+
+sub func_signature {
+  my ($self) = @_;
+
+  # this method is overridden in List() and Struct() for dealing with arrays and hashes
+  return sub {my $params = $self->validate(@_); $params};
+}
+
+
+sub meth_signature {
+  my ($self) = @_;
+  my $sig = $self->func_signature;
+
+  # same as func_signature, but the first param is set apart since it is the invocant of the method
+  return sub {my $obj = shift; return ($obj, &$sig)};          # note: &$sig is equivalent to $sig->(@_)
+}
+
+
+
+
+#----------------------------------------------------------------------
+# METHODS FOR INTERNAL USE
+#----------------------------------------------------------------------
+# Note : methods without initial underscore could possibly be useful for subclasses, either through
+# invocation or through subclassing. Methods with initial underscore are really internal mechanics;
+# I doubt that anybody else would want to invoke or subclass them ... but nothing prevents you from
+# doing so !
+
+
+
+sub msg {
+  my ($self, $msg_id, @args) = @_;
+  my $msgs     = $self->{-messages};
+  my $name     = $self->name;
+
+  # if using a coderef, these args will be passed to it
+  my @msgs_call_args = ($name, $msg_id, @args);
+  shift @msgs_call_args if $USE_OLD_MSG_API; # because older versions did not pass the $name arg
+
+  # perl v5.22 and above warns if there are too many @args for sprintf.
+  # The line below prevents that warning
+  no if $] ge '5.022000', warnings => 'redundant';
+
+  # if there is a user-defined message, return it
+  if (defined $msgs) { 
+    for (ref $msgs) {
+      /^CODE/ and return $msgs->(@msgs_call_args);                # user function
+      /^$/    and return "$name: $msgs";                          # user constant string
+      /^HASH/ and do { if (my $msg_string =  $msgs->{$msg_id}) {  # user hash of msgs
+                         return sprintf "$name: $msg_string", @args;
+                       }
+                       else {
+                         last; # not found in this hash - revert to $GLOBAL_MSGS below
+                       }
+                     };
+      # otherwise
+      croak "-messages option should be a coderef, a hashref or a sprintf string";
+    }
+  }
+
+  # there was no user-defined message, so use global messages
+  if (ref $GLOBAL_MSGS eq 'CODE') {
+    return $GLOBAL_MSGS->(@msgs_call_args);
+  }
+  else {
+    my $msg_entry = $GLOBAL_MSGS->{$self->subclass}{$msg_id}
+                  || $GLOBAL_MSGS->{Generic}{$msg_id}
+     or croak "no error string for message $msg_id";
+    return ref $msg_entry eq 'CODE' ? $msg_entry->(@msgs_call_args)
+                                    : sprintf "$name: $msg_entry", @args;
+  }
+}
+
+
+sub name { 
+  my ($self) = @_;
+  return $self->{-name} || $self->subclass;
+}
+
+
+sub subclass { # returns the class name without initial 'Data::Domain::'
+  my ($self) = @_;
+  my $class = ref($self) || $self;
+  (my $subclass = $class) =~ s/^Data::Domain:://;
+  return $subclass;
+}
+
+
+sub _initial_inspect_context {
+  my ($self, $data, %extra) = @_;
+
+  return {root       => $data,
+          flat       => {},
+          path       => [],
+          list       => [],
+          %extra,
+        };
 }
 
 
@@ -343,58 +499,9 @@ sub _check_returns {
 }
 
 
-
-
-#----------------------------------------------------------------------
-# METHODS FOR INTERNAL USE
-#----------------------------------------------------------------------
-
-
-sub msg {
-  my ($self, $msg_id, @args) = @_;
-  my $msgs     = $self->{-messages};
-  my $subclass = $self->subclass;
-  my $name     = $self->{-name} || $subclass;
-  my $msg;
-
-  # perl v5.22 and above warns if there are too many @args for sprintf.
-  # The line below prevents that warning
-  no if $] ge '5.022000', warnings => 'redundant';
-
-  # if there is a user_defined message, return it
-  if (defined $msgs) { 
-    for (ref $msgs) {
-      /^CODE/ and return $msgs->($msg_id, @args); # user function
-      /^$/    and return "$name: $msgs";          # user constant string
-      /^HASH/ and do { $msg =  $msgs->{$msg_id}   # user hash of msgs
-                         and return sprintf "$name: $msg", @args;
-                       last; # not found in this hash - revert to $global_msgs
-                     };
-      croak "invalid -messages option";           # otherwise
-    }
-  }
-
-  # otherwise, try global messages
-  return $global_msgs->($msg_id, @args)      if ref $global_msgs eq 'CODE';
-  $msg = $global_msgs->{$subclass}{$msg_id}  # otherwise
-      || $global_msgs->{Generic}{$msg_id}
-     or croak "no error string for message $msg_id";
-
-  return sprintf "$name: $msg", @args;
-}
-
-
-sub subclass { # returns the class name without initial 'Data::Domain::'
-  my ($self) = @_;
-  my $class = ref($self) || $self;
-  (my $subclass = $class) =~ s/^Data::Domain:://;
-  return $subclass;
-}
-
-
 sub _expand_range {
   my ($self, $range_field, $min_field, $max_field) = @_;
-  my $name = $self->{-name} || $self->subclass;
+  my $name = $self->name;
 
   # the range field will be replaced by min and max fields
   if (my $range = delete $self->{$range_field}) {
@@ -442,12 +549,11 @@ sub _build_subdomain {
   elsif (does($domain, 'CODE')) {
     # this is a lazy domain, need to call the coderef to get a real domain
     $domain = try   {$domain->($context)} 
-      catch {   # remove "at source_file, line ..." from error message
-        (my $error_msg = $_) =~ s/\bat\b.*//s;
-        # return an empty domain that reports the error message
-        Data::Domain::Empty->new(-name => "domain parameters",
-                                 -messages => $error_msg);
-      };
+              catch {(my $error_msg = $_) =~ s/\bat\b.*//s; # remove "at source_file, line ..." from error message
+                     # return an empty domain that reports the error message
+                     Data::Domain::Empty->new(-name     => "domain parameters",
+                                              -messages => $error_msg);
+                   };
     # did we really get a domain ?
     does($domain, "Data::Domain")
       or croak "lazy domain coderef returned an invalid domain";
@@ -467,6 +573,15 @@ sub _build_subdomain {
 }
 
 
+sub _is_proper_subdomain {
+  my ($self, $domain) = @_;
+  return does($_, 'Data::Domain') || does($_, 'CODE') || !ref $_;
+}
+
+
+
+
+
 #----------------------------------------------------------------------
 # UTILITY FUNCTIONS (NOT METHODS) 
 #----------------------------------------------------------------------
@@ -475,7 +590,8 @@ sub _build_subdomain {
 my @common_options = qw/-optional -name -messages
                         -true -isa -can -does -matches -ref
                         -has -returns
-                        -blessed -package -isweak -readonly -tainted/;
+                        -blessed -package -isweak -readonly -tainted
+                        -default/;
 
 sub _parse_args {
   my ($args_ref, $options_ref, $default_option, $arg_type) = @_;
@@ -505,7 +621,7 @@ sub _parse_args {
 }
 
 
-sub node_from_path { # no longer documented, but still present for backwards compat
+sub node_from_path { # no longer used (replaced by Data::Reach); but still present for backwards compat
   my ($root, $path0, @path) = @_;
   return $root if not defined $path0;
   return undef if not defined $root;
@@ -533,6 +649,9 @@ sub _stringify {
   return $dumper->Dump;
 }
 
+#======================================================================
+# END OF PARENT CLASS -- BELOW ARE IMPLEMENTATIONS FOR SPECIFIC DOMAINS
+#======================================================================
 
 
 #======================================================================
@@ -1053,6 +1172,10 @@ sub new {
       croak "$bound does not match -items"
       if $self->{$bound} and $self->{$bound} < @{$self->{-items}};
     }
+
+    # check that all items are associated to proper subdomains
+    my @invalid_fields = grep {!$self->_is_proper_subdomain($self->{-items}[$_])} 0 .. $#{$self->{-items}};
+    croak "invalid subdomain for field: ", join ", ", @invalid_fields  if @invalid_fields;
   }
 
   # check that -all or -any are domains or lists of domains
@@ -1075,6 +1198,11 @@ sub _inspect {
   does($data, 'ARRAY')
     or return $self->msg(NOT_A_LIST => $data);
 
+  # build a shallow copy of the data, so that default values can be inserted
+  my @valid_data;
+  @valid_data = @$data if exists $context->{gather_valid_data};
+
+
   if (defined $self->{-min_size} && @$data < $self->{-min_size}) {
     return $self->msg(TOO_SHORT => $self->{-min_size});
   }
@@ -1086,9 +1214,6 @@ sub _inspect {
   return unless $self->{-items} || $self->{-all} || $self->{-any};
 
   # prepare context for calling lazy subdomains
-  $context ||= {root => $data,
-                flat => {},
-                path => []};
   local $context->{list} = $data;
 
   # initializing some variables
@@ -1105,6 +1230,9 @@ sub _inspect {
       or next;
     $msgs[$i]      = $subdomain->inspect($data->[$i], $context);
     $has_invalid ||= $msgs[$i];
+
+    # re-inject the valid data for that slot
+    $valid_data[$i] = $context->{gather_valid_data} if exists $context->{gather_valid_data};
   }
 
   # check the -all condition (can be a single domain or an arrayref of domains)
@@ -1118,6 +1246,10 @@ sub _inspect {
       my $subdomain  = $self->_build_subdomain($all->[$j], $context);
       $msgs[$i]      = $subdomain->inspect($data->[$i], $context);
       $has_invalid ||= $msgs[$i];
+
+      # re-inject the valid data for that slot
+      $valid_data[$i] = $context->{gather_valid_data} if exists $context->{gather_valid_data}
+                                                      && not defined $valid_data[$i];
     }
   }
 
@@ -1130,7 +1262,7 @@ sub _inspect {
 
     # there must be data to inspect
     $n_data > $n_items
-      or return $self->msg(ANY => ($any->[0]{-name} || $any->[0]->subclass));
+      or return $self->msg(ANY => $any->[0]->name);
 
     # inspect the remaining data for all 'any' conditions
   CONDITION:
@@ -1142,13 +1274,24 @@ sub _inspect {
         my $error  = $subdomain->inspect($data->[$i], $context);
         next CONDITION if not $error;
       }
-      return $self->msg(ANY => ($subdomain->{-name} || $subdomain->subclass));
+      return $self->msg(ANY => $subdomain->name);
     }
   }
+
+  # re-inject the whole valid array into the context
+  $context->{gather_valid_data} = \@valid_data if exists $context->{gather_valid_data};
 
   return; # OK, no error
 }
 
+
+sub func_signature {
+  my ($self) = @_;
+
+  # override the parent method : pass the parameters list as an arrayref to validate(),
+  # and return the validated datatree as an array
+  return sub {my $params =  $self->validate(\@_);  @$params};
+}
 
 #======================================================================
 package Data::Domain::Struct;
@@ -1161,10 +1304,11 @@ our @ISA = 'Data::Domain';
 
 sub new {
   my $class = shift;
-  my @options = qw/-fields -exclude -keys -values/;
+  my @options = qw/-fields -exclude -keys -values -may_ignore/;
   my $self = Data::Domain::_parse_args(\@_, \@options, -fields => 'arrayref');
   bless $self, $class;
 
+  # parse the -fields option
   my $fields = $self->{-fields} || [];
   if (does($fields, 'ARRAY')) {
     # transform arrayref into hashref plus an ordered list of keys
@@ -1178,18 +1322,22 @@ sub new {
   }
   elsif (does($fields, 'HASH')) {
     # keep given hashref, add list of keys
-    $self->{-fields_list} = [keys %$fields];
+    $self->{-fields_list} = [sort keys %$fields];
   }
   else {
     croak "invalid data for -fields option";
   }
 
-  # check that -exclude is an arrayref or a regex or a string
-  if (my $exclude = $self->{-exclude}) {
-    does($exclude, 'ARRAY') || does($exclude, 'Regexp') || !ref($exclude)
-      or croak "invalid data for -exclude option";
-  }
+  # check that all fields are associated to proper subdomains
+  my @invalid_fields = grep {!$self->_is_proper_subdomain($self->{-fields}{$_})} @{$self->{-fields_list}};
+  croak "invalid subdomain for field: ", join ", ", @invalid_fields  if @invalid_fields;
 
+  # check that -exclude and -may_ignore are an arrayref or a regex or a string
+  for my $opt (qw/-exclude -may_ignore/) {
+    my $val = $self->{$opt} or next;
+    does($val, 'ARRAY') || does($val, 'Regexp') || !ref($val)
+      or croak "invalid data for $opt option";
+  }
 
   # check that -keys or -values are List domains
   for my $arg (qw/-keys -values/) {
@@ -1213,30 +1361,34 @@ sub _inspect {
 
   my %msgs;
 
+  # build a shallow copy of the data, so that default values can be inserted
+  my %valid_data;
+  %valid_data = %$data if exists $context->{gather_valid_data};
+
+
   # check if there are any forbidden fields
   if (my $exclude = $self->{-exclude}) {
     my @other_fields = grep {!$self->{-fields}{$_}} keys %$data;
-    my @wrong_fields = match::simple::match($exclude, ['*', 'all'])
-                       ? @other_fields
-                       : grep {match::simple::match($_, $exclude)} @other_fields;
-    $msgs{-exclude} = $self->msg(FORBIDDEN_FIELD => join ", ", map {"'$_'"} sort @wrong_fields)
+    my @wrong_fields = grep {$self->_field_matches(-exclude => $_)} @other_fields;
+    $msgs{-exclude}  = $self->msg(FORBIDDEN_FIELD => join ", ", map {"'$_'"} sort @wrong_fields)
       if @wrong_fields;
   }
 
   # prepare context for calling lazy subdomains
-  $context ||= {root => $data,
-                flat => {},
-                list => [],
-                path => []};
   local $context->{flat} = {%{$context->{flat}}, %$data};
 
   # check fields of the domain
+ FIELD:
   foreach my $field (@{$self->{-fields_list}}) {
+    next FIELD if not exists $data->{$field} and $self->_field_matches(-may_ignore => $field);
     local $context->{path} = [@{$context->{path}}, $field];
     my $field_spec = $self->{-fields}{$field};
     my $subdomain  = $self->_build_subdomain($field_spec, $context);
     my $msg        = $subdomain->inspect($data->{$field}, $context);
     $msgs{$field}  = $msg if $msg;
+
+    # re-inject the valid data for that field
+    $valid_data{$field} = $context->{gather_valid_data} if exists $context->{gather_valid_data};
   }
 
   # check the List domain for keys
@@ -1255,8 +1407,31 @@ sub _inspect {
     $msgs{-values} = $msg if $msg;
   }
 
+  # re-inject the whole valid tree into the context
+  $context->{gather_valid_data} = \%valid_data if exists $context->{gather_valid_data};
+
   return keys %msgs ? \%msgs : undef;
 }
+
+sub _field_matches {
+  my ($self, $spec, $field) = @_;
+
+  my $spec_content = $self->{$spec};
+  return $spec_content && (match::simple::match($spec_content, ['*', 'all'])
+                           ||
+                           match::simple::match($field, $spec_content));
+}
+
+
+sub func_signature {
+  my ($self) = @_;
+
+  # override the parent method : treat the parameters list as a hash,
+  # and return the validated datatree as a hashref
+  return sub {my $params =  $self->validate({@_});  %$params};
+}
+
+
 
 #======================================================================
 package Data::Domain::One_of;
@@ -1293,6 +1468,20 @@ sub _inspect {
 }
 
 
+sub func_signature {
+  my ($self) = @_;
+
+  # take a reference to the func_signature implementation for the
+  # first option ... assuming all remaining options have the same
+  # structure. This wil not work in all cases, but is better than nothing.
+  my $first_sig_ref = $self->{-options}[0]->can("func_signature");
+
+  # invoke that implementation on $self
+  return $self->$first_sig_ref;
+}
+
+
+
 #======================================================================
 package Data::Domain::All_of;
 #======================================================================
@@ -1327,13 +1516,18 @@ sub _inspect {
 }
 
 
+# func_signature : reuse the implementation of the "One_of" domain
+*func_signature = \&Data::Domain::One_of::func_signature;
+
+
 #======================================================================
+
 1;
 
 
 __END__
 
-=encoding ISO8859-1
+=encoding UTF-8
 
 =head1 NAME
 
@@ -1344,13 +1538,13 @@ Data::Domain - Data description and validation
   use Data::Domain qw/:all/;
 
   # some basic domains
-  my $int_dom      = Int(-min => 3, -max => 18);
-  my $nat_dom      = Nat(-max => 100); # natural numbers
+  my $int_dom      = Int(-min => -123, -max => 456);
+  my $nat_dom      = Nat(-max => 100, -default => sub {int(rand(100))});
   my $num_dom      = Num(-min => 3.33, -max => 18.5);
-  my $string_dom   = String(-min_length => 2, -optional => 1);
+  my $string_dom   = String(-min_length => 2);
   my $handle_dom   = Handle;
   my $enum_dom     = Enum(qw/foo bar buz/);
-  my $int_list_dom = List(-min_size => 1, -all => Int);
+  my $int_list_dom = List(-min_size => 1, -all => Int, -default => [1, 2, 3]);
   my $mixed_list   = List(String, Int(-min => 0), Date, True, Defined);
   my $struct_dom   = Struct(foo => String, bar => Int(-optional => 1));
   my $obj_dom      = Obj(-can => 'print');
@@ -1359,6 +1553,26 @@ Data::Domain - Data description and validation
   # using the domain to check data
   my $error_messages = $domain->inspect($some_data);
   reject_form($error_messages) if $error_messages;
+  # or
+  die $domain->stringify_msg($error_messages) if $error_messages;
+
+  # using the domain to get back a tree of validated data
+  my $valid_tree = $domain->validate($initial_tree); # will return a copy with default values inserted;
+                                                     # will die if there are validation errors
+
+  # using the domain for unpacking subroutine arguments
+  my $sig = List(Nat(-max => 20), String(-regex => qr/^hello/), Coderef)->func_signature;
+  sub some_func {
+    my ($i, $s, $code) = &$sig;  # or more verbose: = $sig->(@_);
+    ...
+  }
+
+  # using the domain for unpacking method arguments
+  my $sig = List(Nat(-max => 20), String(-regex => qr/^hello/), Coderef)->meth_signature;
+  sub some_method {
+    my ($self, $i, $s, $code) = &$meth_sig;  # or more verbose: = $meth_sig->(@_);
+    ...
+  }
 
   # custom name and custom messages (2 different ways)
   $domain = Int(-name => 'age', -min => 3, -max => 18, 
@@ -1369,15 +1583,16 @@ Data::Domain - Data description and validation
                  });
 
   # examples of subroutines for specialized domains
-  sub Phone   { String(-regex    => qr/^\+?[0-9() ]+$/, 
-                       -messages => "Invalid phone number", @_) }
-  sub Email   { String(-regex    => qr/^[-.\w]+\@[\w.]+$/,
-                       -messages => "Invalid email", @_) }
-  sub Contact { Struct(-fields => [name   => String,
-                                   phone  => Phone,
-                                   mobile => Phone(-name => 'Mobile',
-                                                   -optional => 1),
-                                   emails => List(-all => Email)   ], @_) }
+  sub Phone         { String(-regex    => qr/^\+?[0-9() ]+$/, 
+                             -messages => "Invalid phone number", @_) }
+  sub Email         { String(-regex    => qr/^[-.\w]+\@[\w.]+$/,
+                             -messages => "Invalid email", @_) }
+  sub Contact       { Struct(-fields => [name   => String,
+                                         phone  => Phone,
+                                         mobile => Phone(-name => 'Mobile',
+                                                         -optional => 1),
+                                         emails => List(-all => Email)   ], @_) }
+  sub UpdateContact { Contact(-may_ignore => '*', @_) }
 
   # lazy subdomain
   $domain = Struct(
@@ -1399,13 +1614,15 @@ Data::Domain - Data description and validation
   # list with repetitive structure (here : triples)
   my $domain = List(-all => [String, Int, Obj(-can => 'print')]);
 
+
 =head1 DESCRIPTION
 
-A data domain is a description of a set of values, either scalar or
-structured (arrays or hashes).  The description can include many
+A I<data domain> is a description of a set of values, either scalar or
+structured (arrays or hashes, possibly nested).  The description can include many
 constraints, like minimal or maximal values, regular expressions,
 required fields, forbidden fields, and also contextual
-dependencies. From that description, one can then invoke the domain's
+dependencies (for ex. one date must be posterior to another date).
+From that description, one can then invoke the domain's
 C<inspect> method to check if a given value belongs to the domain or
 not. In case of mismatch, a structured set of error messages is
 returned, giving detailed explanations about what was wrong.
@@ -1421,14 +1638,46 @@ dependencies within the structure, and with several options to
 finely tune the error messages returned to the user.
 
 The main usage for C<Data::Domain> is to check input from forms in
-interactive applications : structured error messages give detailed
-information about which fields were rejected and why; this can be
-used to display a form again, highlighting the wrong fields.
-Another usage is for writing automatic tests, with the help of
-the companion module L<Test::InDomain>.
+interactive applications. Structured error messages returned by the
+domain give detailed information about which fields were rejected and
+why; this can be used to display a new form to the user, highlighting the wrong
+inputs. 
+
+A domain can also I<validate> a datatree, instead of I<inspecting> it.
+Instead of returning error messages, this returns a copy of the input
+data, where missing components are replaced by default values (if such
+defaults where specified within the domain). In case of failure, the validation
+operation dies with a stringified version of the error messages.
+This usage is quite similar to type systems like L<Type::Tiny> or L<Specio>, or
+to parameter validation modules like L<Params::ValidationCompiler>;
+such systems are more focused on efficiency and on integration with L<Moose>,
+while the present module is more focused on expressivity for describing
+constraints on deeply nested structures.
+
+The validation operation can be encapsulates as a I<signature>, which
+is a reference to an anonymous function that will unpack arguments
+passed to a subroutine or to a method, will validate them, and will return them
+in the form of an array or a hash, as demanded by the context.
+This is probably not as fast nor as elegant as the new "signature" feature introduced
+in Perl 5.20; but it is a convenient way for performing complex validity tests
+on parameters received from the caller.
+
+The companion module L<Test::InDomain> uses domains for checking
+datatrees in the context of automated tests.
 
 There are several other packages in CPAN doing data validation; these
 are briefly listed in the L</"SEE ALSO"> section.
+
+=head1 COMPATIBILITY WARNING : API CHANGE FOR MESSAGE CODEREFS
+
+Starting with version 1.13, the API for calling message coderefs has
+changed and is now in the form
+
+  $coderef->($domain_name, $msg_id, @args);
+
+which is incompatible with previous versions of the module.
+See section L<Backward compatibility for message coderefs> for a workaround.
+
 
 =head1 EXPORTS
 
@@ -1451,7 +1700,7 @@ be tedious to write
     ...
   );
 
-so for each of its builtin domain constructors, C<Data::Domain>
+so for each builtin domain constructor, C<Data::Domain>
 exports a plain function that just calls C<new> on the appropriate
 subclass; these functions are all exported in in a group called
 C<:constructors>, and allow us to write more compact code :
@@ -1471,13 +1720,13 @@ in L</"BUILTIN DOMAIN CONSTRUCTORS">.
   # or
   use Data::Domain qw/:shortcuts/;
   # or
-  use Data::Domain qw/True False Defined Undef Blessed Unblessed Regexp
+  use Data::Domain qw/True False Defined Undef Blessed Unblessed Regexp Coderef
                       Obj Class/;
 
 The C<:shortcuts> export group contains a number of convenience
 functions that call the L</Whatever> domain constructor with
 various pre-built options. Precise definitions for each of these
-functions will be given below in L</"BUILTIN SHORTCUTS">.
+functions are given below in L</"BUILTIN SHORTCUTS">.
 
 =head2 Renaming imported functions
 
@@ -1538,7 +1787,7 @@ So in short, the "default option" is syntactic sugar for using positional
 parameters instead of named parameters.
 
 Each domain constructor has its own list of available options; these will be
-presented below, together with each subclass (for example options for
+presented with each subclass (for example options for
 setting minimal/maximal values, regular expressions, string length,
 etc.).  However, there are also some generic options, available in
 every domain constructor; these are listed here, in several categories.
@@ -1551,6 +1800,17 @@ every domain constructor; these are listed here, in several categories.
 
 If true, the domain will accept C<undef>, without generating an
 error message.
+
+=item C<-default>
+
+Specifies an default value to be inserted by the L</validate> method
+if the input data is C<undef> or nonexistent. For the L</inspect> method,
+this option is equivalent to C<-optional>.
+
+If C<-default> is a coderef, that subroutine will be called with the current
+context as parameter (see L</Structure of context>); the resulting scalar value
+is inserted within the tree.
+
 
 =item C<-name>
 
@@ -1632,26 +1892,25 @@ this is checked through C<< eval {$data->can($method)} >>.
 =item C<-does>
 
 Checks if the data does the supplied role; this is checked
-through L<Scalar::Does>.
+through L<Scalar::Does>. Used for example by the L</Regexp> and L</Coderef> domain shortcuts.
 
 =item C<-matches>
 
-Was originally designed for the smart match operator in perl 5.10.
-Is now implemented through L<match::simple>.
+Was originally designed for the smart match operator in Perl 5.10.
+Smart mach is now deprecated, so this option is now implemented through L<match::simple>.
 
 =back
 
 =head3 Options for checking return values
 
-These options call methods or coderefs within the data, and
+Options in this category call methods or coderefs within the data, and
 then check the results against the supplied domains. This is
 somehow contrary to the principle of "domains", because a function
-call or method call not only inspects the data : I<it might also
-alter the data>. However, one could also argue that peeking into
+call or method call not only inspects the data : I<it might also alter the data>.
+However, one could also argue that peeking into
 an object's internals is contrary to the principle of encapsulation,
 so in this sense, method calls are more appropriate. You decide ...
 but beware of side-effects in your data!
-
 
 =over
 
@@ -1746,7 +2005,73 @@ The client code can then exploit this structure to dispatch
 error messages to appropriate locations (like for example the form
 fields from which the data was gathered).
 
-=head2 stringification
+
+=head2 validate
+
+  my $valid_data = $domain->validate($some_data);
+
+This method builds a copy of the supplied data, where missing items
+are replaced by default values  (if such defaults where specified within the domain).
+If the data is invalid, an error is thrown with a stringified version of the error message.
+
+The returned value is either a scalar or a reference to a nested datastructure (arrayref or hashref).
+
+=head2 func_signature
+
+  my $sig_list = List(...)->func_signature;
+  sub some_func {
+    my ($x, $y, $z) = &$sig_list; # or $sig_list->(@_);
+    ...
+  }
+
+  my $sig_hash = Struct(...)->func_signature;
+  sub some_other_func {
+    my %args = &$sig_hash; # or $sig_hash->(@_);
+    ...
+  }
+
+Returns a reference to an anonymous function that can be used for unpacking arguments
+passed to a subroutine. The arguments array be encapsulated as an
+arrayref or hashref, depending on what is expected by the domain, and will be passed to
+the L</validate> method; the result is dereferenced and returned as a list, so that it
+can be used on the right-hand side of a assignment to variables.
+
+Signatures can be invoked on any list, but in most cases it makes sense to invoke them
+on the parameters array C<@_>. This can be done either explicitly :
+
+  $sig->(@_);
+
+or it can be done implicitly through Perl's arcane syntax for function calls
+
+  &$sig; # current @_ is made visible to the $sig subroutine
+
+Arguments unpacking may not work properly for domains that have varying datastructures,
+like for example C<< Any_of(List(...), Struct(...))  >>. Such a domain would accept either
+an arrayref or a hashref, but this cannot be unpacked deterministically by the C<func_signature>
+method.
+
+
+=head2 meth_signature
+
+  my $sig_list = List(...)->meth_signature;
+  sub some_meth {
+    my ($self, $x, $y, $z) = &$sig_list;
+    ...
+  }
+
+This is like L</func_signature>, except that the first item in C<@_> is kept apart,
+since it is a reference to the invocant object or class, and therefore should
+not be passed to the domain for validation.
+
+=head2 stringify_msg
+
+  my $string_msg = $domain->stringify_msg($messages);
+  die $string_msg;
+
+For clients that need a string instead of a datastructur of error messages,
+method C<stringify_msg> collects all error information into a single string.
+
+=head2 domain stringification
 
 When printed, domains stringify to a compact L<Data::Dumper> representation
 of their internal attributes; these details can be useful for debugging or
@@ -1765,6 +2090,7 @@ logging purposes.
   my $is_of_class   = Whatever(-isa  => 'Some::Class');
   my $does_role     = Whatever(-does => 'Some::Role');
   my $has_methods   = Whatever(-can  => [qw/jump swim dance sing/]);
+  my $is_coderef    = Whatever(-does => 'CODE');
 
 The C<Data::Domain::Whatever> domain can contain any kind of Perl
 value, including C<undef> (actually this is the only domain that
@@ -1778,8 +2104,10 @@ If true, the data must be defined. If false, the data must be undef.
 
 =back
 
-The C<Whatever> is mostly used together with some of the general
+The C<Whatever> domain is mostly used together with some of the general
 options described above, like C<-true>, C<-does>, C<-can>, etc.
+The most common combinations are encapsulated under their own domain
+names : see L</BUILTIN SHORTCUTS>.
 
 
 =head2 Empty
@@ -1975,11 +2303,11 @@ The data must not match the supplied regex.
 
 =item -min
 
-The data must be greater or equal to the supplied value.
+The data must be stringwise greater or equal to the supplied value.
 
 =item -max
 
-The data must be smaller or equal to the supplied value.
+The data must be stringwise smaller or equal to the supplied value.
 
 =item -range
 
@@ -2102,6 +2430,12 @@ and the third item is an object with a C<print> method.
 
 =back
 
+This can also be used for ensuring that the list will not contain
+any other items after the required items :
+
+  List(-items => [Int, Bool, String], -all => Empty); # cannot have anything after the third item
+
+
 =item -any
 
 At least one remaining entry in the array, after the first I<n> entries
@@ -2134,6 +2468,9 @@ a string starting with C<foo> I<or> a number between 1 and 10.
   my $domain = Struct(-fields  => [foo => Int, bar => String],
                       -exclude => '*'); # only 'foo' and 'bar', nothing else
   
+  my $domain = Struct(-fields     => [foo => Int, bar => String],
+                      -may_ignore => '*'); # will not complain for missing fields
+  
   my $domain = Struct(-keys   => List(-all => String(qr/^[abc])),
                       -values => List(-all => Int));
 
@@ -2144,7 +2481,7 @@ Options are:
 
 =item -fields
 
-Supplies a list of keys with their associated domains. The list might
+Supplies a list of fields (hash keys) with their associated domains. The list might
 be given either as a hashref or as an arrayref.  Specifying it as an
 arrayref is useful for controlling the order in which field checks
 will be performed; this may make a difference when there are context
@@ -2154,11 +2491,35 @@ L<"LAZY CONSTRUCTORS"|/"LAZY CONSTRUCTORS (CONTEXT DEPENDENCIES)"> below ).
 
 =item -exclude
 
-Specifies which keys are not allowed in the structure. The exclusion
-may be specified as an arrayref of key names, as a compiled regular
+Specifies which fields are not allowed in the structure. The exclusion
+may be specified as an arrayref of field names, as a compiled regular
 expression, or as the string constant 'C<*>' or 'C<all>' (meaning that
-no key will be allowed except those explicitly listed in the
+no hash key will be allowed except those explicitly listed in the
 C<-fields> option.
+
+
+=item -may_ignore
+
+Specifies which fields may be ignored by the domain, i.e. may not exist
+in the inspected structure. Like for C<-exclude>, this option can be specified
+as an arrayref of field names, as a compiled regular
+expression, or as the string constant 'C<*>' or 'C<all>'.
+Absent fields will not generate errors if their name matches this specification.
+This is especially useful when your application needs to distinguish between
+an INSERT operation, where all fields must be present, and an UPDATE operation,
+where only a subset of fields are updated -- see the example in the L</SYNOPSIS>.
+
+Another way is to use the C<-optional> flag in domains associated with fields; but there
+is a subtle difference : C<-optional> accepts both missing keys or keys
+containing C<undef>, while C<-may_ignore> only accepts missing keys. Consider :
+
+  Struct(
+    -fields     => {a => Int, b => Int(-optional => 1), c => Int, d => Str},
+    -may_ignore => [qw/c d/],
+  )
+
+In this domain, C<a> must always be present, C<b> may be absent or may be undef, C<c> and C<d>
+may be absent but if present cannot be undef.
 
 =item -keys
 
@@ -2270,6 +2631,12 @@ C<< Whatever(-blessed => 1) >> (synonym to C<Blessed>)
 
 C<< Whatever(-blessed => 0, -isa => 'UNIVERSAL') >>
 
+=head2 Coderef
+
+C<< Whatever(-does => 'CODE') >>
+
+
+
 
 =head1 LAZY CONSTRUCTORS (CONTEXT DEPENDENCIES)
 
@@ -2360,7 +2727,7 @@ The domain below accepts hashrefs with a C<country> and a C<city>,
 but also checks that the city actually belongs to the given country :
 
   %SOME_CITIES = {
-     Switzerland => [qw/Genève Lausanne Bern Zurich Bellinzona/],
+     Switzerland => [qw/GenÃ¨ve Lausanne Bern Zurich Bellinzona/],
      France      => [qw/Paris Lyon Marseille Lille Strasbourg/],
      Italy       => [qw/Milano Genova Livorno Roma Venezia/],
   };
@@ -2483,17 +2850,7 @@ validation error within the domain
 =item *
 
 a hashref : keys of the hash should be message identifiers, and
-values should be the associated error strings.
-
-=item *
-
-a coderef : the referenced subroutine is called, and should
-return the error string. The called subroutine receives
-the message identifier as argument.
-
-=back
-
-Here is an example :
+values should be the associated error strings. Here is an example :
 
   sub Phone { 
     String(-regex      => qr/^\+?[0-9() ]+$/, 
@@ -2505,6 +2862,15 @@ Here is an example :
   }
 
 
+=item *
+
+a coderef : the referenced subroutine is called, and should
+return the error string. The called subroutine receives
+as arguments: C<< ($domain_name, $message_id, @optional_domain_args) >>
+
+=back
+
+
 =head2 The C<messages> class method
 
 Default strings associated with message identifiers are stored in a
@@ -2513,7 +2879,7 @@ for english (the default) and for french : these can be chosen through
 the C<messages> class method :
 
   Data::Domain->messages('english');  # the default
-  Data::Domain->messages('français');
+  Data::Domain->messages('franÃ§ais');
 
 The same method can also receive  a custom table.
 
@@ -2521,24 +2887,54 @@ The same method can also receive  a custom table.
   Data::Domain->messages($custom_table);
 
 This should be a two-level hashref : first-level entries in the hash
-correspond to C<Data::Domain> subclasses (i.e C<< Num => {...} >>, C<<
-String => {...} >>), or to the constant C<Generic>; for each of those,
+correspond to C<Data::Domain> subclasses (i.e C<< Num => {...} >>,
+C<< String => {...} >>), or to the constant C<Generic>; for each of those,
 the second-level entries should correspond to message identifiers as
 specified in the doc for each subclass (for example C<TOO_SHORT>,
-C<NOT_A_HASH>, etc.).  Values should be strings suitable to be fed to
-L<sprintf>.  Look at C<$builtin_msgs> in the source code to see an
+C<NOT_A_HASH>, etc.).  Values should be either strings suitable to be fed to
+L<sprintf>, or coderefs. Look at C<$builtin_msgs> in the source code to see an
 example.
 
 Finally, it is also possible to write your own message generation 
 handler : 
 
-  Data::Domain->messages(sub {my ($msg_id, @args) = @_;
+  Data::Domain->messages(sub {my ($domain_name, $msg_id, @args) = @_;
                               return "you just got it wrong ($msg_id)"});
 
 What is received in 
 C<@args> depends on which validation rule is involved;
 it can be for example the minimal or maximal bounds,
 or the regular expression being checked.
+
+Clearly this class method has a global side-effect. In most cases
+this is exactly what is expected. However it is possible to limit
+the impact by localizing the C<$msgs> class variable :
+
+  { local $Data::Domain::GLOBAL_MSGS;
+    Data::Domain->messages($custom_table);
+
+    check_my_data(...);
+  }
+  # end of block; Data::Domain is back to the original messages table
+
+
+
+=head2 Backward compatibility for message coderefs
+
+In the current version of this module, message coderefs are called as
+
+  $coderef->($domain_name, $msg_id, @args);
+
+Versions prior to 1.13 used a different API where the $domain_name was not available :
+
+  $coderef->($msg_id, @args);
+
+So for clients that were using message coderefs in versions prior to 1.13, this is an
+B<incompatible change>. Backward compatibility can be restored by setting a
+global variable to a true value :
+
+  $Data::Domain::USE_OLD_MSG_API = 1;
+
 
 =head2 The C<-name> option to domain constructors
 
@@ -2715,7 +3111,20 @@ borrowed from L<Test::Deep> and from L<Moose::Manual::Types>.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to David Cantrell and Gabor Szabo for their help on issues related to smartmatch deprecation.
+Thanks to
+
+=over
+
+=item *
+
+David Cantrell and Gabor Szabo for their help on issues related to smartmatch deprecation.
+
+=item *
+
+David Schmidt (davewood) for suggesting extensions to the Struct() domain.
+
+=back
+
 
 =head1 AUTHOR
 
@@ -2723,7 +3132,7 @@ Laurent Dami, E<lt>dami at cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2006, 2007, 2012, 2023 by Laurent Dami.
+Copyright 2006-2024 by Laurent Dami.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

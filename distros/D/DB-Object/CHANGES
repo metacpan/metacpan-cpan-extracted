@@ -1,5 +1,25 @@
 Revision history for Perl module DB::Object
 
+v1.1.2 2024-01-05T16:36:00+0900
+
+v1.1.1 2024-01-05T10:36:08+0900
+    - Correcting minor issue with the use of constants in unit tests (Gitlab #2)
+    - Correcting an oversight (bug) in DB::Object::Postgres::Query in method on_conflict()
+    - Correcting number formatting (Gitlab #1)
+
+v1.1.0 2024-01-03T20:15:26+0900
+    - Updated DB::Object::Fields::Field method _op_overload() to create an oversight
+    - Improved DB::Object::Query method format_update() to recognise DB::Object::Placeholder
+
+v1.0.0 2023-12-13T12:53:38+0900
+    - Corrected the use of _is_hash for a stricter and narrower meaning.
+    - Corrected error in _where_having in DB::Object::Query
+    - Corrected method structure() in DB::Object::Postgres::Tables to take under account arrays.
+    - Updated method 'distinct' in DB::Object::Postgres to allow for multiple arguments.
+    - Improved the method structure() in DB::Object:Tables, DB::Object:Postgres::Tables, DB::Object:SQLite::Tables and DB::Object:Mysql::Tables
+    - Updated DB::Object::Fields and DB::Object::Field, extending the later
+    - Implemented a table object caching mechanism, which is disabled by default
+
 v0.11.9 2023-10-11T20:14:44+0900
     - Corrected malformed signature for distribution release
 

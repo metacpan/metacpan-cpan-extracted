@@ -6,36 +6,27 @@ use Test::More;
 
 use_ok 'Data::Turtle';
 
-my $t = Data::Turtle->new;
+my $t = new_ok 'Data::Turtle';
+
+my @x = $t->get_state;
+is_deeply \@x, [250,250,270,1,'black',1], 'get_state';
 
 $t->forward(10);
-my @x = $t->position;
-cmp_ok $x[0], '==', 250, 'forward x';
-cmp_ok $x[1], '==', 240, 'forward y';
+
+@x = $t->position;
+is_deeply \@x, [250,240], 'forward x,y';
 
 $t->backward(10);
 @x = $t->position;
-cmp_ok $x[0], '==', 250, 'backward x';
-cmp_ok $x[1], '==', 250, 'backward y';
+is_deeply \@x, [250,250], 'backward x,y';
 
-@x = $t->goto( 10, 10 );
-
-cmp_ok $x[0], '==', 250, 'goto x0';
-cmp_ok $x[1], '==', 250, 'goto y0';
-cmp_ok $x[2], '==', 10, 'goto x';
-cmp_ok $x[3], '==', 10, 'goto y';
-is $x[4], 'black', 'goto color';
-cmp_ok $x[5], '==', 1, 'goto thick';
+@x = $t->goto(10,10);
+is_deeply \@x, [250,250,10,10,'black',1], 'goto';
 
 $t->home;
-@x = $t->get_state;
 
-cmp_ok $x[0], '==', 250, 'get_state x';
-cmp_ok $x[1], '==', 250, 'get_state y';
-cmp_ok $x[2], '==', 270, 'get_state head';
-cmp_ok $x[3], '==', 1, 'get_state pen';
-is $x[4], 'black', 'get_state color';
-cmp_ok $x[5], '==', 1, 'get_state thick';
+@x = $t->get_state;
+is_deeply \@x, [250,250,270,1,'black',1], 'get_state';
 
 $t->pen_up;
 cmp_ok $t->pen_status, '==', 0, 'pen_up';
@@ -53,20 +44,14 @@ $t->left(1);
 cmp_ok $t->heading, '==', 315, 'left';
 
 @x = $t->position;
-cmp_ok $x[0], '==', 250, 'position x';
-cmp_ok $x[1], '==', 250, 'position y';
+is_deeply \@x, [250,250], 'position x,y';
 
 $t->mirror;
 cmp_ok $t->heading, '==', -315, 'mirror';
 
 $t->set_state( 10, 10, 10, 0, 'red', 10 );
-@x = $t->get_state;
 
-cmp_ok $x[0], '==', 10, 'set_state x';
-cmp_ok $x[1], '==', 10, 'set_state y';
-cmp_ok $x[2], '==', 10, 'set_state head';
-cmp_ok $x[3], '==', 0, 'set_state pen';
-is $x[4], 'red', 'get_state color';
-cmp_ok $x[5], '==', 10, 'set_state thick';
+@x = $t->get_state;
+is_deeply \@x, [10,10,10,0,'red',10], 'get_state';
 
 done_testing();

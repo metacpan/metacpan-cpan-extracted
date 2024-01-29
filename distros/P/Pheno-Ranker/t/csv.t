@@ -21,6 +21,7 @@ my $inc = join ' -I', '', @INC; # prepend -I to each path in @INC
     my $reference_file   = catfile( 't', 'example_ref.json' );
     my $reference_config = catfile( 't', 'example_config_ref.yaml' );
 
+    # The exppected output files from csv2pheno-ranker 
     my $file   = catfile( 't', 'example.json' );
     my $config = catfile( 't', 'example_config.yaml' );
 

@@ -14,7 +14,7 @@ WriteMakefile(
     'script/news',
   ],
   PREREQ_PM => {
-    'Mojolicious' => 0,
+    'Mojolicious' => 9.00,
     'Modern::Perl' => 1.20180701, # for '2018'
     'DateTime::Format::Mail' => 0,
   },

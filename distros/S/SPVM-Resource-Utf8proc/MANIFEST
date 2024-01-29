@@ -1,0 +1,27 @@
+.github/workflows/linux-ubuntu-latest-32bit.yml
+.github/workflows/linux-ubuntu-latest-perl-5.8.9.yml
+.github/workflows/linux-ubuntu-latest.yml
+.github/workflows/macos-latest.yml
+.github/workflows/windows-2019.yml
+.github/workflows/windows-latest.yml
+.gitignore
+Changes
+lib/SPVM/Resource/Utf8proc.config
+lib/SPVM/Resource/Utf8proc.native/include/.gitkeep
+lib/SPVM/Resource/Utf8proc.native/include/utf8proc.h
+lib/SPVM/Resource/Utf8proc.native/include/utf8proc_data.c
+lib/SPVM/Resource/Utf8proc.native/src/.gitkeep
+lib/SPVM/Resource/Utf8proc.native/src/utf8proc.c
+lib/SPVM/Resource/Utf8proc.pm
+lib/SPVM/Resource/Utf8proc.spvm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/basic.t
+t/lib/SPVM/TestCase/Resource/Utf8proc.c
+t/lib/SPVM/TestCase/Resource/Utf8proc.config
+t/lib/SPVM/TestCase/Resource/Utf8proc.spvm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

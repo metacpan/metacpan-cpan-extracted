@@ -15,7 +15,7 @@ my $locale = Locale::CLDR->new('cy_GB');
 my $months = $locale->month_format_wide();
 is_deeply ($months, [qw( Ionawr Chwefror Mawrth Ebrill Mai Mehefin Gorffennaf Awst Medi Hydref Tachwedd Rhagfyr )], 'Month format wide');
 $months = $locale->month_format_abbreviated();
-is_deeply ($months, [qw( Ion Chwef Maw Ebrill Mai Meh Gorff Awst Medi Hyd Tach Rhag )], 'Month format abbreviated');
+is_deeply ($months, [qw( Ion Chwef Maw Ebr Mai Meh Gorff Awst Medi Hyd Tach Rhag )], 'Month format abbreviated');
 $months = $locale->month_format_narrow();
 is_deeply ($months, [qw( I Ch M E M M G A M H T Rh )], 'Month format narrow');
 $months = $locale->month_stand_alone_wide();
@@ -54,21 +54,21 @@ is_deeply ($quarters, [qw( 1 2 3 4 )], 'Quarter stand alone narrow');
 my $am_pm = $locale->am_pm_wide();
 is_deeply ($am_pm, [qw( yb yh )], 'AM PM wide');
 $am_pm = $locale->am_pm_abbreviated();
-is_deeply ($am_pm, [qw( yb yh )], 'AM PM abbreviated');
+is_deeply ($am_pm, [qw( AM PM )], 'AM PM abbreviated');
 $am_pm = $locale->am_pm_narrow();
 is_deeply ($am_pm, [qw( b h )], 'AM PM narrow');
 $am_pm = $locale->am_pm_format_wide();
 is_deeply ($am_pm, { pm => q{yh}, am => q{yb}, morning1 => 'y bore', noon => 'canol dydd', afternoon1 => 'y prynhawn', evening1 => 'yr hwyr', midnight => 'canol nos' }, 'AM PM format wide');
 $am_pm = $locale->am_pm_format_abbreviated();
-is_deeply ($am_pm, { pm => q{yh}, am => q{yb}, morning1 => 'y bore', noon => 'canol dydd', afternoon1 => 'y prynhawn', evening1 => 'yr hwyr', midnight => 'canol nos' }, 'AM PM format abbreviated');
+is_deeply ($am_pm, { pm => q{PM}, am => q{AM}, morning1 => 'y bore', noon => 'canol dydd', afternoon1 => 'y prynhawn', evening1 => 'yr hwyr', midnight => 'canol nos' }, 'AM PM format abbreviated');
 $am_pm = $locale->am_pm_format_narrow();
 is_deeply ($am_pm, { pm => q{h}, am => q{b}, morning1 => 'yn y bore', noon => 'canol dydd', afternoon1 => 'yn y prynhawn', evening1 => 'min nos', midnight => 'canol nos' }, 'AM PM format narrow');
 $am_pm = $locale->am_pm_stand_alone_wide();
-is_deeply ($am_pm, { pm => q{yh}, am => q{yb}, morning1 => 'y bore', noon => 'canol dydd', afternoon1 => 'y prynhawn', evening1 => 'yr hwyr', midnight => 'canol nos' }, 'AM PM stand alone wide');
+is_deeply ($am_pm, { pm => q{PM}, am => q{AM}, morning1 => 'y bore', noon => 'canol dydd', afternoon1 => 'y prynhawn', evening1 => 'yr hwyr', midnight => 'canol nos' }, 'AM PM stand alone wide');
 $am_pm = $locale->am_pm_stand_alone_abbreviated();
-is_deeply ($am_pm, { pm => q{yh}, am => q{yb}, morning1 => 'bore', noon => 'canol dydd', afternoon1 => 'prynhawn', evening1 => 'yr hwyr', midnight => 'canol nos' }, 'AM PM stand alone abbreviated');
+is_deeply ($am_pm, { pm => q{PM}, am => q{AM}, morning1 => 'bore', noon => 'canol dydd', afternoon1 => 'prynhawn', evening1 => 'yr hwyr', midnight => 'canol nos' }, 'AM PM stand alone abbreviated');
 $am_pm = $locale->am_pm_stand_alone_narrow();
-is_deeply ($am_pm, { pm => q{yh}, am => q{yb}, morning1 => 'bore', noon => 'canol dydd', afternoon1 => 'prynhawn', evening1 => 'min nos', midnight => 'canol nos' }, 'AM PM stand alone narrow');
+is_deeply ($am_pm, { pm => q{PM}, am => q{AM}, morning1 => 'bore', noon => 'canol dydd', afternoon1 => 'prynhawn', evening1 => 'min nos', midnight => 'canol nos' }, 'AM PM stand alone narrow');
 
 my $era = $locale->era_wide();
 is_deeply ($era, ['Cyn Crist', 'Oed Crist'], 'Era wide');
@@ -89,15 +89,13 @@ is_deeply ($era, ['CC', 'OC'], 'Era stand alone abbreviated');
 $era = $locale->era_stand_alone_narrow();
 is_deeply ($era, [ 'C', 'O' ], 'Era stand alone narrow');
 
-TODO: {
-	local $TODO = 'Need to look up how fall back should work';
 my $day_period_data = $locale->get_day_period('0000');
-is($day_period_data, 'AM', 'Day period data AM');
+is($day_period_data, 'canol nos', 'Day period data AM');
 $day_period_data = $locale->get_day_period('1200');
-is($day_period_data, 'PM', 'Day period data Noon');
+is($day_period_data, 'canol dydd', 'Day period data Noon');
 $day_period_data = $locale->get_day_period('1210');
-is($day_period_data, 'PM', 'Day period data PM');
-}
+is($day_period_data, 'y prynhawn', 'Day period data PM');
+
 my $date_format = $locale->date_format_full;
 is($date_format, 'EEEE, d MMMM y', 'Date Format Full');
 $date_format = $locale->date_format_long;

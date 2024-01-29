@@ -11,7 +11,7 @@ use Plack::Session;
 use Tags::HTML::Container;
 use Tags::HTML::Login::Register;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub _css {
 	my ($self, $env) = @_;
@@ -455,6 +455,14 @@ Returns Plack::Component object.
  #   </body>
  # </html>
 
+=begin html
+
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Plack-App-Register/master/images/register_psgi_screenshot.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Plack-App-Register/master/images/register_psgi_screenshot.png" alt="Example screenshot" width="300px" height="300px" />
+</a>
+
+=end html
+
 =head1 DEPENDENCIES
 
 L<Plack::Component::Tags::HTML>,
@@ -491,12 +499,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023 Michal Josef Špaček
+© 2023-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

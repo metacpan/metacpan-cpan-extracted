@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use IO::File;
 use PDF::Builder::Util;
@@ -19,9 +19,11 @@ PDF::Builder::Resource::XObject::Image::JPEG - support routines for JPEG image l
 
 =head1 METHODS
 
-=over
+=head2 new
 
-=item $res = PDF::Builder::Resource::XObject::Image::JPEG->new($pdf, $file, %opts)
+    $res = PDF::Builder::Resource::XObject::Image::JPEG->new($pdf, $file, %opts)
+
+=over
 
 Options:
 

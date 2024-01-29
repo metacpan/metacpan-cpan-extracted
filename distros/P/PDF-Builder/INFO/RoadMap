@@ -1,4 +1,4 @@
-Road Map for Future Development of PDF::Builder                   27 Nov 2022
+Road Map for Future Development of PDF::Builder                   01 Apr 2023
 
 In order to encourage others to contribute code and/or algorithms to the
 effort, I am publishing this road map of where I would like the product to go.
@@ -120,6 +120,14 @@ F. Fix Bar Code generation (CTS 1): there seems to be something quite wrong
    Take a look at package PDF::QRCode. It uses Text::QRCode internally, but 
    the interesting feature is using a code monkey to integrate itself (like
    a retrovirus) into PDF::Builder, and can be called $gfx->qrcode(parms).
+
+   Long term: consider a new package that generates an output-agnostic generic
+   graphics list, along with sample GD, PS, PDF::Builder drivers; as well as 
+   PDF::Builder generic barcode. Grab all sorts of Perl and non-Perl open
+   source generators and snag their algorithms to incorporate into the library.
+   incl PHP tecnickcom/tc-lib/barcode, Perl PDF::QRCode, etc. Allow qw/code1
+   code2/ in use BarCodes statement, as most users will just want to import a
+   very small subset of available codes.
 
 G. Fix Small Caps (and capitalization in general) for ligatures (CTS 13):
    some ligatures given in Unicode or single byte encodings don't get properly

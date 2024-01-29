@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::7_0::Role::API;
-$Search::Elasticsearch::Client::7_0::Role::API::VERSION = '8.00';
+$Search::Elasticsearch::Client::7_0::Role::API::VERSION = '8.12';
 use Moo::Role;
 with 'Search::Elasticsearch::Role::API';
 
@@ -63,7 +63,7 @@ sub api {
             'lang'                   => 'lang',
             'require_alias'          => 'require_alias',
             'refresh'                => 'refresh',
-            'retry_on_conflict'      => 'retru_on_conflict',
+            'retry_on_conflict'      => 'retry_on_conflict',
             'wait_for_active_shards' => 'wait_for_active_shards',
             '_source'                => '_source',
             '_source_excludes'       => '_source_excludes',
@@ -6318,7 +6318,7 @@ Search::Elasticsearch::Client::7_0::Role::API - This class contains the spec for
 
 =head1 VERSION
 
-version 8.00
+version 8.12
 
 =head1 DESCRIPTION
 
@@ -6392,7 +6392,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Elasticsearch BV.
+This software is Copyright (c) 2024 by Elasticsearch BV.
 
 This is free software, licensed under:
 

@@ -22,6 +22,10 @@ my %module_build_args = (
   alien_autoconf_with_pic => 0,
   alien_build_commands =>
     ["%x -I../../inc -MMy::AlienPatch -e alien_patch", $conf_cmd, 'make'],
+  alien_extra_site_config => {
+    CFLAGS => $ENV{CFLAGS},
+    LDFLAGS => $ENV{LDFLAGS},
+  },
 
   # Not using FFI, default_store library only dynamic and needed for XS
   alien_isolate_dynamic => 0,

@@ -1,4 +1,8 @@
 Revision history for TheSchwartz-JobScheduler
 
+0.002     2023-12-25 22:08:16+02:00 Europe/Helsinki
+            * Change Prereqs / TestRequires for DBD::SQLite
+            * Change API to accept dbh_callback when creating client and/or in every call, not with every database definition
+
 0.001     2023-12-02 11:53:04+01:00 Europe/Stockholm
-          * Initial version
+            * Initial version

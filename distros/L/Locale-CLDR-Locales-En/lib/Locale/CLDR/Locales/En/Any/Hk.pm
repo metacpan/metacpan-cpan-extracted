@@ -8,13 +8,13 @@ Locale::CLDR::Locales::En::Any::Hk - Package for language English
 
 package Locale::CLDR::Locales::En::Any::Hk;
 # This file auto generated from Data\common\main\en_HK.xml
-#	on Tue  5 Dec  1:07:58 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -89,8 +89,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'eras' => (

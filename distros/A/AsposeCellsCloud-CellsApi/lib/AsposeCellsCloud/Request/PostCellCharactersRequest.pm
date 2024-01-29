@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostCellCharactersRequest.name : The workbook name.  ,
+# PostCellCharactersRequest.name : The file name.  ,
 # PostCellCharactersRequest.sheetName : The worksheet name.  ,
 # PostCellCharactersRequest.cellName : The cell name.  ,
 # PostCellCharactersRequest.options :   ,
-# PostCellCharactersRequest.folder : Original workbook folder.  ,
-# PostCellCharactersRequest.storageName : Storage name.   
+# PostCellCharactersRequest.folder : The folder where the file is situated.  ,
+# PostCellCharactersRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_cell_characters' } = { 
-    	summary => 'Sets cell characters in worksheet.',
+    	summary => 'Set cell characters in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -144,7 +144,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -172,14 +172,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

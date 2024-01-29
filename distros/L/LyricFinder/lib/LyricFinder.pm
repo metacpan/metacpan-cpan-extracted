@@ -7,7 +7,7 @@ use warnings;
 use Carp;
 use parent 'LyricFinder::_Class';
 
-# LyricFinder - A Derived work, by (c) 2020 Jim Turner <turnerjw784 at yahoo.com> of:
+# LyricFinder - A Derived work, by (c) 2020-2024 Jim Turner <turnerjw784 at yahoo.com> of:
 #
 # Lyrics Fetcher
 #
@@ -34,10 +34,10 @@ use parent 'LyricFinder::_Class';
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-our $VERSION = '1.23';
+our $VERSION = '1.32';
 our $DEBUG = 0;  # If you want debug messages, set debug to a true value
 
-my @supported_mods = (qw(Cache ApiLyricsOvh AZLyrics Genius Letras Musixmatch));
+my @supported_mods = (qw(Cache ApiLyricsOvh AZLyrics ChartLyrics Genius Letras Musixmatch));
 
 my %haveit;
 
@@ -223,7 +223,7 @@ LyricFinder - Fetch song lyrics from several internet lyric sites.
 
 =head1 AUTHOR
 
-This module is Copyright (c) 2020 by
+This module is Copyright (c) 2020-2024 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -289,24 +289,25 @@ lyrics sites for song lyrics, and, if found, returns them as a string.
 
 The supported and currently-installed modules are:  
 L<LyricFinder::ApiLyricsOvh> (for searching api.lyrics.ovh), 
-L<LyricFinder::AZLyrics> (www.azlyrics.com), L<LyricFinder::Genius> 
+L<LyricFinder::AZLyrics> (www.azlyrics.com), 
+L<LyricFinder::ChartLyrics> (api.lyrics.com), L<LyricFinder::Genius> 
 (genius.com), L<LyricFinder::Letras> (www.letras.mus.br), and 
 L<LyricFinder::Musixmatch> (www.musixmatch.com).  There is a 
 special module for storing and / or fetching lyrics (.lrc) files already 
 stored locally, called L<LyricFinder::Cache>.
 
-This module is derived from the (older) Lyrics::Fetcher collection of modules 
-by (c) 2007-2020 David Precious, but currently (as of December, 2020) supports 
-more lyric sites (5) and bundles all the supported site modules together here 
+This module is derived from the (older) L<Lyrics::Fetcher> collection of modules 
+by (c) 2007-2020 David Precious, but currently supports 
+more lyric sites (6) and bundles all the supported site modules together here 
 (simply install this one module).  We have reworked the "Cache" module to 
 cache lyrics files by artist and song title on disk in the user's desired 
 location.  LyricFinder is also truly object-oriented making interaction with 
 the user-facing methods and data easier and more streamlined.
 
 NOTE:  This module is used completely independent of any of those modules, 
-but the code is derived from them, as allowed by and the license and credits 
-are included here, as required by their open-source license.  It is capable 
-of being used as a drop-in replacement, but some function names and 
+but some of the code is derived from them, as allowed by and the license and 
+credits are included here, as required by their open-source license.  It is 
+capable of being used as a drop-in replacement, but some function names and 
 other code changes will be needed.
 
 We've also added methods to easily change the "user-agent" passed to the 
@@ -320,8 +321,10 @@ Media Player" that frequently stream internet radio stations, which can
 impose a "hit" on the lyrics sites each time the song title changes.  This 
 reduces the odds of a user's IP-address possibly being banned by a lyrics site 
 for "too-frequent scraping / usage"!  NOTE:  If you want to prevent the usage 
-of one or more of the specific sites, simply delete or rename that site's 
-submodule file.  If you want to use one or more specific sites, or enforce 
+of one or more of the specific sites, simply specify the I<-omit> argument with 
+a reference to a list of module names to skip, 
+ie. I<-omit => 'AZLyrics,Genius'> in the I<new LyricFinder()> function.  
+If you want to use one or more specific sites, or enforce 
 a specific search order, you can call the fetch() method with a third 
 argument consisting of the site module name, ie. "Musixmatch", or reference to 
 an array of site module names, ie. [Genius, AZLyrics].  If you specify "Cache" 
@@ -392,7 +395,7 @@ receiving a user-agent string that corresponds to a valid / supported
 web-browser to prevent their sites from being "scraped" by programs, such 
 as this.
 
-Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0">.
+Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:112.0) Gecko/20100101 Firefox/112.0">.
 
 NOTE:  This value will be overridden if $founder->agent("agent") is 
 called!  NOTE:  See below how to specify a different agent for a specific 
@@ -480,7 +483,7 @@ Some sites are pickey about receiving a user-agent
 string that corresponds to a valid / supported web-browser to prevent their 
 sites from being "scraped" by programs, such as this.  
 
-Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0">
+Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:112.0) Gecko/20100101 Firefox/112.0">
 
 If no argument is passed, it returns the current GENERAL user-agent string in 
 effect (but a different agent option is specified for a specific module may 
@@ -556,7 +559,8 @@ If an array reference (a list) of modules are provided, they will be searched
 in the order they appear in the list.
 
 The currently-installed and supported modules are:  ApiLyricsOvh, AZLyrics, 
-Genius, Letras, and Musixmatch (NOTE the "x" in the spelling of "Musixmatch")!
+ChartLyrics, Genius, Letras, and Musixmatch 
+(NOTE the "x" in the spelling of "Musixmatch")!
 
 Returns lyrics as a string (includes line-breaks appropriate for the user's 
 operating system), or an empty string, if no lyrics found.
@@ -564,9 +568,10 @@ operating system), or an empty string, if no lyrics found.
 =item I<$scalar> = $finder->B<image_url>()
 
 Returns a URL for a cover-art image, if one found on the lyrics page.  
-Currently, only the LyricFinder::Genius and LyricFinder::Musixmatch 
-sites contain cover-art images.  For the other sites, or if no image 
-is found, an empty string will be returned if this method is called.
+Currently, only the LyricFinder::ChartLyrics, LyricFinder::Genius and 
+LyricFinder::Musixmatch sites contain cover-art images.  For the other sites, 
+or if no image is found, an empty string will be returned if 
+this method is called.
 
 =item I<$scalar> = $finder->B<message>()
 
@@ -591,7 +596,7 @@ the last successful fetch (or "none" if the fetch failed).
 
 =item [ I<$arrayref> | I<@array> ] = $finder->B<sources>()
 
-Returns a list of available site modules.  Similar to Lyric::Fetcher's 
+Returns a list of available site modules.  Similar to Lyrics::Fetcher's 
 I<available_fetchers>() function.
 
 =item [ I<$scalar> | I<@array> ] = $finder->B<tried>()
@@ -621,6 +626,10 @@ The current version# of LyricFinder
 =head1 DEPENDENCIES
 
 L<HTML::Strip>, L<HTTP::Request>, L<LWP::UserAgent>, L<URI::Escape>
+
+=head1 RECOMMENDS
+
+L<XML::Simple> (required to use L<LyricFinder::ChartLyrics>)
 
 =head1 BUGS
 
@@ -658,7 +667,7 @@ L<http://search.cpan.org/dist/LyricFinder/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2020 Jim Turner.
+Copyright (c) 2020-2024 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -701,14 +710,14 @@ Original Lyrics::Fetcher::* work:
 Copyright (C) 2007-2020 David Precious.
 
 This library is free software; you can redistribute it and/or modify it 
-under the same terms as Perl itself, either Perl version 5.8.7 or, at your option, 
-any later version of Perl 5 you may have available.
+under the same terms as Perl itself, either Perl version 5.8.7 or, at your 
+option, any later version of Perl 5 you may have available.
 
-Legal disclaimer: I have no connection with the owners of www.genius.com. Lyrics 
-fetched by this script may be copyrighted by the authors, it's up to you to 
-determine whether this is the case, and if so, whether you are entitled to 
-request/use those lyrics. You will almost certainly not be allowed to use the 
-lyrics obtained for any commercial purposes.  
+Legal disclaimer: I have no connection with the owners of any of these sites.  
+Lyrics fetched by this script may be copyrighted by the authors, it's up to 
+you to determine whether this is the case, and if so, whether you are entitled 
+to request/use those lyrics. You will almost certainly not be allowed to use 
+the lyrics obtained for any commercial purposes.  
 
 All comments / suggestions / 
 bug reports gratefully received (ideally use the RT installation at 

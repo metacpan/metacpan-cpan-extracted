@@ -1,5 +1,11 @@
 Revision history for Perl module YAML::LibYAML::API
 
+v0.14.0 2024-01-04 23:06:22+01:00
+
+    - Add unicode option to emitter functions (before broken
+      unicode was emitted)
+    - Change module versioning scheme
+
 0.013 2022-04-11 23:58:42+02:00
 
     - Change License to MIT because of included libyaml

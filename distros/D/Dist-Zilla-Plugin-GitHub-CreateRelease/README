@@ -2,7 +2,7 @@ NAME
     Dist::Zilla::Plugin::GitHub::CreateRelease - Create a GitHub Release
 
 VERSION
-    version 0.0005
+    version 0.0007
 
 SYNOPSIS
     In your dist.ini:
@@ -181,7 +181,7 @@ AUTHOR
     Timothy Legge
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023 by Timothy Legge.
+    This software is copyright (c) 2024 by Timothy Legge.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

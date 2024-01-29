@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.574-9-gade5d7e0
+package JSON::Schema::Modern; # git description: v0.581-7-g6f026737
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.575';
+our $VERSION = '0.582';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -16,7 +16,7 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use JSON::MaybeXS;
+use Mojo::JSON ();  # for JSON_XS, MOJO_NO_JSON_XS environment variables
 use Carp qw(croak carp);
 use List::Util 1.55 qw(pairs first uniqint pairmap uniq any);
 use Ref::Util 0.100 qw(is_ref is_plain_hashref);
@@ -29,6 +29,7 @@ use File::ShareDir 'dist_dir';
 use Module::Runtime qw(use_module require_module);
 use MooX::TypeTiny 0.002002;
 use Types::Standard 1.016003 qw(Bool Int Str HasMethods Enum InstanceOf HashRef Dict CodeRef Optional Slurpy ArrayRef Undef ClassName Tuple Map);
+use Digest::MD5 'md5';
 use Feature::Compat::Try;
 use JSON::Schema::Modern::Error;
 use JSON::Schema::Modern::Result;
@@ -97,22 +98,32 @@ has [qw(collect_annotations scalarref_booleans stringy_numbers strict)] => (
   isa => Bool,
 );
 
+my $core_types = Enum[qw(null object array boolean string number)];
+my @core_formats = qw(date-time date time duration email idn-email hostname idn-hostname ipv4 ipv6 uri uri-reference iri iri-reference uuid uri-template json-pointer relative-json-pointer regex);
+
+# { $format_name => { type => ..., sub => ... }, ... }
 has _format_validations => (
   is => 'bare',
-  isa => my $format_type = Dict[
-    (map +($_ => Optional[CodeRef]), qw(date-time date time duration email idn-email hostname idn-hostname ipv4 ipv6 uri uri-reference iri iri-reference uuid uri-template json-pointer relative-json-pointer regex)),
-    Slurpy[HashRef[Dict[type => Enum[qw(null object array boolean string number integer)], sub => CodeRef]]],
-  ],
+  isa => my $format_type = HashRef[Dict[
+      type => $core_types|ArrayRef[$core_types],
+      sub => CodeRef,
+    ]],
   init_arg => 'format_validations',
   lazy => 1,
   default => sub { {} },
 );
 
-sub _get_format_validation { $_[0]->{_format_validations}{$_[1]} }
+sub _get_format_validation ($self, $format) { $self->{_format_validations}{$format} }
 
-sub add_format_validation {
-  $format_type->({ @_[1..$#_] });
-  $_[0]->{_format_validations}{$_->[0]} = $_->[1] foreach pairs @_[1..$#_];
+sub add_format_validation ($self, $format, $definition) {
+  $definition = { type => 'string', sub => $definition } if not is_plain_hashref($definition);
+  $format_type->({ $format => $definition });
+
+  # all core formats are of type string (so far); changing type of custom format is permitted
+  croak "Type for override of format $format does not match original type"
+    if any { $format eq $_ } @core_formats and $definition->{type} ne 'string';
+
+  $self->{_format_validations}{$format} = $definition;
 }
 
 around BUILDARGS => sub ($orig, $class, @args) {
@@ -120,6 +131,14 @@ around BUILDARGS => sub ($orig, $class, @args) {
   croak 'output_format: strict_basic can only be used with specification_version: draft2019-09'
     if ($args->{output_format}//'') eq 'strict_basic'
       and ($args->{specification_version}//'') ne 'draft2019-09';
+
+  croak 'collect_annotations cannot be used with specification_version draft7'
+    if $args->{collect_annotations} and ($args->{specification_version}//'') eq 'draft7';
+
+  $args->{format_validations} = +{
+    map +($_->[0] => is_plain_hashref($_->[1]) ? $_->[1] : +{ type => 'string', sub => $_->[1] }),
+      pairs $args->{format_validations}->%*
+  } if $args->{format_validations};
 
   return $args;
 };
@@ -159,13 +178,13 @@ sub add_schema {
   }
 
   if (not grep refaddr($_->{document}) == refaddr($document), $self->_canonical_resources) {
-    my $schema_content = $document->_serialized_schema
-      // $document->_serialized_schema($self->_json_decoder->encode($document->schema));
+    my $schema_checksum = $document->_checksum
+      // $document->_checksum(md5($self->_json_decoder->encode($document->schema)));
 
     if (my $existing_doc = first {
-          my $existing_content = $_->_serialized_schema
-            // $_->_serialized_schema($self->_json_decoder->encode($_->schema));
-          $existing_content eq $schema_content
+          my $existing_checksum = $_->_checksum
+            // $_->_checksum(md5($self->_json_decoder->encode($_->schema)));
+          $existing_checksum eq $schema_checksum
         } uniqint map $_->{document}, $self->_canonical_resources) {
       # we already have this schema content in another document object.
       $document = $existing_doc;
@@ -205,6 +224,7 @@ sub evaluate_json_string ($self, $json_data, $schema, $config_override = {}) {
       exception => 1,
       errors => [
         JSON::Schema::Modern::Error->new(
+          depth => 0,
           keyword => undef,
           instance_location => '',
           keyword_location => '',
@@ -231,9 +251,9 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
   my $state = {
     depth => 0,
     data_path => '',                        # this never changes since we don't have an instance yet
-    initial_schema_uri => $initial_uri,     # the canonical URI as of the start of this method, or last $id
-    traversed_schema_path => $initial_path, # the accumulated traversal path as of the start, or last $id
-    schema_path => '',                      # the rest of the path, since the start of this method, or last $id
+    initial_schema_uri => $initial_uri,     # the canonical URI as of the start of this method or last $id
+    traversed_schema_path => $initial_path, # the accumulated traversal path as of the start or last $id
+    schema_path => '',                      # the rest of the path, since the start of this method or last $id
     effective_base_uri => Mojo::URL->new(''),
     errors => [],
     identifiers => [],
@@ -297,11 +317,12 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
 
   my $state = {
     data_path => $config_override->{data_path} // '',
-    traversed_schema_path => $initial_path, # the accumulated path as of the start of evaluation, or last $id or $ref
-    initial_schema_uri => Mojo::URL->new,   # the canonical URI as of the start of evaluation, or last $id or $ref
-    schema_path => '',                  # the rest of the path, since the start of evaluation, or last $id or $ref
+    traversed_schema_path => $initial_path, # the accumulated path as of the start of evaluation or last $id or $ref
+    initial_schema_uri => Mojo::URL->new,   # the canonical URI as of the start of evaluation or last $id or $ref
+    schema_path => '',                  # the rest of the path, since the start of evaluation or last $id or $ref
     effective_base_uri => $effective_base_uri, # resolve locations against this for errors and annotations
     errors => [],
+    depth => 0,
   };
 
   exists $config_override->{$_} and die $_.' not supported as a config override'
@@ -336,7 +357,6 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
 
     $state = +{
       %$state,
-      depth => 0,
       initial_schema_uri => $schema_info->{canonical_uri}, # the canonical URI as of the start of evaluation, or last $id or $ref
       document => $schema_info->{document},   # the ::Document object containing this schema
       document_path => $schema_info->{document_path}, # the path within the document of this schema, as of the start of evaluation, or last $id or $ref
@@ -353,13 +373,6 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
         defined $val ? ( $_ => $val ) : ()
       } qw(validate_formats validate_content_schemas short_circuit collect_annotations scalarref_booleans stringy_numbers strict)),
     };
-
-    if ($state->{validate_formats}) {
-      $state->{vocabularies} = [
-        map s/^JSON::Schema::Modern::Vocabulary::Format\KAnnotation$/Assertion/r, $state->{vocabularies}->@*
-      ];
-      require JSON::Schema::Modern::Vocabulary::FormatAssertion;
-    }
 
     # we're going to set collect_annotations during evaluation when we see an unevaluated* keyword,
     # but after we pass to a new data scope we'll clear it again.. unless we've got the config set
@@ -403,11 +416,17 @@ sub validate_schema ($self, $schema, $config_override = {}) {
   return $self->evaluate($schema, $metaschema_uri, $config_override);
 }
 
-sub get ($self, $uri) {
-  my $schema_info = $self->_fetch_from_uri($uri);
+sub get ($self, $uri_reference) {
+  my $schema_info = $self->_fetch_from_uri($uri_reference);
   return if not $schema_info;
   my $subschema = is_ref($schema_info->{schema}) ? dclone($schema_info->{schema}) : $schema_info->{schema};
   return wantarray ? ($subschema, $schema_info->{canonical_uri}) : $subschema;
+}
+
+sub get_document ($self, $uri_reference) {
+  my $schema_info = $self->_fetch_from_uri($uri_reference);
+  return if not $schema_info;
+  return $schema_info->{document};
 }
 
 # defined lower down:
@@ -789,6 +808,7 @@ sub _get_metaschema_info ($self, $metaschema_uri, $for_canonical_uri) {
         # absolute location is undef iff the location = '/$schema'
         my $absolute_location = $e->absolute_keyword_location // $for_canonical_uri;
         JSON::Schema::Modern::Error->new(
+          depth => $e->depth,
           keyword => $e->keyword eq '$schema' ? '' : $e->keyword,
           instance_location => $e->instance_location,
           keyword_location => ($for_canonical_uri->fragment//'').($e->keyword_location =~ s{^/\$schema\b}{}r),
@@ -954,7 +974,7 @@ sub _get_or_load_resource ($self, $uri) {
   return;
 };
 
-# returns information necessary to use a schema found at a particular URI:
+# returns information necessary to use a schema found at a particular URI or uri-reference:
 # - a schema (which may not be at a document root)
 # - the canonical uri for that schema,
 # - the JSON::Schema::Modern::Document object that holds that schema
@@ -963,12 +983,12 @@ sub _get_or_load_resource ($self, $uri) {
 # - the vocabularies to use when considering schema keywords
 # - the config overrides to set when considering schema keywords
 # creates a Document and adds it to the resource index, if not already present.
-sub _fetch_from_uri ($self, $uri) {
-  $uri = Mojo::URL->new($uri) if not is_ref($uri);
-  my $fragment = $uri->fragment;
+sub _fetch_from_uri ($self, $uri_reference) {
+  $uri_reference = Mojo::URL->new($uri_reference) if not is_ref($uri_reference);
+  my $fragment = $uri_reference->fragment;
 
   if (not length($fragment) or $fragment =~ m{^/}) {
-    my $base = $uri->clone->fragment(undef);
+    my $base = $uri_reference->clone->fragment(undef);
     if (my $resource = $self->_get_or_load_resource($base)) {
       my $subschema = $resource->{document}->get(my $document_path = $resource->{path}.($fragment//''));
       return if not defined $subschema;
@@ -993,7 +1013,7 @@ sub _fetch_from_uri ($self, $uri) {
     }
   }
   else {  # we are following a URI with a plain-name fragment
-    if (my $resource = $self->_get_resource($uri)) {
+    if (my $resource = $self->_get_resource($uri_reference)) {
       my $subschema = $resource->{document}->get($resource->{path});
       return if not defined $subschema;
       return {
@@ -1007,12 +1027,14 @@ sub _fetch_from_uri ($self, $uri) {
   }
 }
 
+use constant _JSON_BACKEND => Mojo::JSON::JSON_XS ? 'Cpanel::JSON::XS' : 'JSON::PP';
+
 # used for internal encoding as well (when caching serialized schemas)
 has _json_decoder => (
   is => 'ro',
   isa => HasMethods[qw(encode decode)],
   lazy => 1,
-  default => sub { JSON::MaybeXS->new(allow_nonref => 1, canonical => 1, utf8 => 1, allow_bignum => 1, convert_blessed => 1) },
+  default => sub { _JSON_BACKEND->new->allow_nonref(1)->canonical(1)->utf8(1)->allow_bignum(1)->convert_blessed(1) },
 );
 
 # since media types are case-insensitive, all type names must be casefolded on insertion.
@@ -1025,7 +1047,7 @@ has _media_type => (
     my $_json_media_type = sub ($content_ref) {
       # utf-8 decoding is always done, as per the JSON spec.
       # other charsets are not supported: see RFC8259 §11
-      \ JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1)->decode($content_ref->$*);
+      \ _JSON_BACKEND->new->allow_nonref(1)->utf8(1)->decode($content_ref->$*);
     };
     +{
       (map +($_ => $_json_media_type),
@@ -1036,7 +1058,7 @@ has _media_type => (
         \ Mojo::Parameters->new->charset('UTF-8')->parse($content_ref->$*)->to_hash;
       },
       'application/x-ndjson' => sub ($content_ref) {
-        my $decoder = JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1);
+        my $decoder = _JSON_BACKEND->new->allow_nonref(1)->utf8(1);
         my $line = 0; # line numbers start at 1
         \[ map {
             do {
@@ -1100,8 +1122,11 @@ sub FREEZE ($self, $serializer) {
 sub THAW ($class, $serializer, $data) {
   my $self = bless($data, $class);
 
-  # load all vocabulary classes
-  require_module($_) foreach uniq map $_->{vocabularies}->@*, $self->_canonical_resources;
+  # load all vocabulary classes, both those used by loaded schemas, as well as all the core modules
+  require_module($_)
+    foreach uniq(
+      (map $_->{vocabularies}->@*, $self->_canonical_resources),
+      (map $_->[1], values $self->__vocabulary_classes->%*));
 
   return $self;
 }
@@ -1122,7 +1147,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.575
+version 0.582
 
 =head1 SYNOPSIS
 
@@ -1203,6 +1228,12 @@ other, or badly-written schemas that could be optimized. Defaults to 50.
 When true, the C<format> keyword will be treated as an assertion, not merely an annotation. Defaults
 to true when specification_version is draft7, and false for all other versions, but this may change in the future.
 
+Note that the use of a format that does not have a defined handler will B<not> be interpreted as an
+error in this mode; instead, the undefined format will simply be ignored. If you instead want this
+to be treated as an evaluation error, you must define a custom schema dialect that uses the
+format-assertion vocabulary (available in specification version C<draft2020-12>) and reference it in
+your schema with the C<$schema> keyword.
+
 =head2 format_validations
 
 =for stopwords subref
@@ -1236,6 +1267,7 @@ fixed for the next draft.
 
 When true, annotations are collected from keywords that produce them, when validation succeeds.
 These annotations are available in the returned result (see L<JSON::Schema::Modern::Result>).
+Not operational when L</specification_version> is C<draft7>.
 Defaults to false.
 
 =head2 scalarref_booleans
@@ -1248,14 +1280,21 @@ Defaults to false.
 =head2 stringy_numbers
 
 When true, any value that is expected to be a number or integer B<in the instance data> may also be
-expressed as a string. This does B<not> apply to the C<const> or C<enum> keywords, but only
-the following keywords:
+expressed as a string. This applies only to the following keywords:
 
 =over 4
 
 =item *
 
 C<type> (where both C<string> and C<number> (and possibly C<integer>) are considered valid)
+
+=item *
+
+C<const> and C<enum> (where the string C<"1"> will match with C<"const": 1>)
+
+=item *
+
+C<uniqueItems> (where strings and numbers are compared numerically to each other, if either or both are numeric)
 
 =item *
 
@@ -1276,6 +1315,10 @@ C<minimum>
 =item *
 
 C<exclusiveMinimum>
+
+=item *
+
+C<format> (for formats defined to validate numbers)
 
 =back
 
@@ -1298,6 +1341,8 @@ Defaults to false.
 
 When true, unrecognized keywords are disallowed in schemas (they will cause an immediate abort
 in L</traverse> or L</evaluate>).
+
+Defaults to false.
 
 =head1 METHODS
 
@@ -1438,6 +1483,7 @@ Callbacks are not compatible with L</short_circuit> mode.
 =head2 validate_schema
 
   $result = $js->validate_schema($schema);
+  $result = $js->validate_schema($schema, $config_override);
 
 Evaluates the provided schema as instance data against its metaschema. Accepts C<$schema> and
 C<$config_override> parameters in the same form as L</evaluate>.
@@ -1509,13 +1555,20 @@ otherwise returns the L<JSON::Schema::Modern::Document> that contains the added 
 
 =head2 add_format_validation
 
+  $js->add_format_validation(all_lc => sub ($value) { lc($value) eq $value });
+
 =for comment we are the nine Eleven Deniers
+
+or
 
   $js->add_format_validation(no_nines => { type => 'number', sub => sub ($value) { $value =~ m/^[0-8]$$/ });
 
-Adds support for a custom format. The data type that this format applies to must be supplied; all
-values of any other type will automatically be deemed to be valid, and will not be passed to the
-subref.
+Adds support for a custom format. If not supplied, the data type(s) that this format applies to
+defaults to string; all values of any other type will automatically be deemed to be valid, and will
+not be passed to the subref.
+
+Additionally, you can redefine the definition for any core format (see L</Format Validation>), but
+the data type(s) supported by that format may not be changed.
 
 Be careful to not mutate the type of the value while checking it -- for example, if it is a string,
 do not apply arithmetic operators to it -- or subsequent type checks on this value may fail.
@@ -1639,9 +1692,16 @@ You can use it thusly:
   my $schema = $js->get($uri);
   my ($schema, $canonical_uri) = $js->get($uri);
 
-Fetches the Perl data structure representing the JSON Schema at the indicated URI. When called in
-list context, the canonical URI of that location is also returned, as a L<Mojo::URL>. Returns
-C<undef> if the schema with that URI has not been loaded (or cached).
+Fetches the Perl data structure representing the JSON Schema at the indicated identifier (uri or
+uri-reference). When called in list context, the canonical URI of that location is also returned, as
+a L<Mojo::URL>. Returns C<undef> if the schema with that URI has not been loaded (or cached).
+
+=head2 get_document
+
+  my $document = $js->get_document($uri_reference);
+
+Fetches the L<JSON::Schema::Modern::Document> object that contains the provided identifier (uri or
+uri-reference). C<undef> if the schema with that URI has not been loaded (or cached).
 
 =head1 LIMITATIONS
 
@@ -1654,7 +1714,7 @@ string is used in an arithmetic operation), additional flags can be added onto t
 it to resemble the other type. This should not be an issue if data validation is occurring
 immediately after decoding a JSON payload, or if the JSON string itself is passed to this module.
 If you are still having difficulties, make sure you are using Perl's fastest and most trusted and
-reliable JSON decoder, L<Cpanel::JSON::XS> (or its proxy, useful for fatpacking, L<JSON::MaybeXS>).
+reliable JSON decoder, L<Cpanel::JSON::XS>.
 Other JSON decoders are known to produce data with incorrect data types.
 
 For more information, see L<Cpanel::JSON::XS/MAPPING>.
@@ -1769,6 +1829,8 @@ This implementation is now fully specification-compliant (for versions draft7, d
 draft2020-12), but until version 1.000 is released, it is
 still deemed to be missing some optional but quite useful features, such as:
 
+=for stopwords Mojolicious
+
 =over 4
 
 =item *
@@ -1799,7 +1861,13 @@ detect potentially pathological constructs that may pose a security risk, either
 service or by allowing exposure to the internals of your application. B<DO NOT USE SCHEMAS FROM
 UNTRUSTED SOURCES.>
 
+(In particular, see vulnerability
+L<perl5363delta/CVE-2023-47038-Write-past-buffer-end-via-illegal-user-defined-Unicode-property>,
+which is closed in Perl releases 5.34.3, 5.36.3 and 5.38.1.)
+
 =head1 SEE ALSO
+
+=for stopwords OpenAPI
 
 =over 4
 
@@ -1843,9 +1911,19 @@ L<https://json-schema.org/draft-07/json-schema-release-notes.html>
 
 L<Understanding JSON Schema|https://json-schema.org/understanding-json-schema>: tutorial-focused documentation
 
-=back
+=item *
 
-=for stopwords OpenAPI
+L<OpenAPI::Modern>: a parser and evaluator for OpenAPI v3.1 documents
+
+=item *
+
+L<Mojolicious::Plugin::OpenAPI::Modern>: a Mojolicious plugin providing OpenAPI functionality
+
+=item *
+
+L<Test::Mojo::Role::OpenAPI::Modern>: test your Mojolicious application's OpenAPI compliance
+
+=back
 
 =head1 SUPPORT
 

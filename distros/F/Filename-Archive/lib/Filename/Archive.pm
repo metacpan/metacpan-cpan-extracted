@@ -1,16 +1,16 @@
 package Filename::Archive;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-02'; # DATE
-our $DIST = 'Filename-Archive'; # DIST
-our $VERSION = '0.031'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
-require Exporter;
-our @ISA       = qw(Exporter);
+use Exporter 'import';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-08-27'; # DATE
+our $DIST = 'Filename-Archive'; # DIST
+our $VERSION = '0.032'; # VERSION
+
 our @EXPORT_OK = qw(check_archive_filename);
 #list_archive_suffixes
 
@@ -104,7 +104,7 @@ _
 
 Return false if no archive suffixes detected. Otherwise return a hash of
 information, which contains these keys: `archive_name`, `archive_suffix`,
-`compressor_info`.
+`compressor_info`, `filename_without_suffix`.
 
 _
     },
@@ -130,8 +130,8 @@ sub check_archive_filename {
         }
     }
 
-    $filename =~ /(\.\w+)\z/ or return 0;
-    my $suffix = $1;
+    $filename =~ /(.+)(\.\w+)\z/ or return 0;
+    my ($filename_without_suffix, $suffix) = ($1, $2);
 
     my $spec;
     if ($ci) {
@@ -150,6 +150,7 @@ sub check_archive_filename {
     return {
         archive_name       => $spec->{name},
         archive_suffix     => $suffix,
+        filename_without_suffix => $filename_without_suffix,
         (compressor_info    => \@compressor_info) x !!@compressor_info,
     };
 }
@@ -169,7 +170,7 @@ Filename::Archive - Check whether filename indicates being an archive file
 
 =head1 VERSION
 
-This document describes version 0.031 of Filename::Archive (from Perl distribution Filename-Archive), released on 2020-06-02.
+This document describes version 0.032 of Filename::Archive (from Perl distribution Filename-Archive), released on 2023-08-27.
 
 =head1 SYNOPSIS
 
@@ -208,6 +209,8 @@ Whether to match case-insensitively.
 
 =item * B<filename>* => I<str>
 
+(No description)
+
 
 =back
 
@@ -216,7 +219,7 @@ Return value:  (bool|hash)
 
 Return false if no archive suffixes detected. Otherwise return a hash of
 information, which contains these keys: C<archive_name>, C<archive_suffix>,
-C<compressor_info>.
+C<compressor_info>, C<filename_without_suffix>.
 
 =head1 HOMEPAGE
 
@@ -226,14 +229,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Filename-A
 
 Source repository is at L<https://github.com/perlancar/perl-Filename-Archive>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Filename-Archive>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Filename::Compressed>
@@ -242,11 +237,37 @@ L<Filename::Compressed>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2020, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Filename-Archive>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

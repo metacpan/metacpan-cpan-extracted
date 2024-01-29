@@ -40,7 +40,7 @@ Util::H2O - Hash to Object: turns hashrefs into objects with accessors for keys
 
 =cut
 
-our $VERSION = '0.22';
+our $VERSION = '0.24';
 # For AUTHOR, COPYRIGHT, AND LICENSE see the bottom of this file
 
 our @EXPORT = qw/ h2o /;  ## no critic (ProhibitAutomaticExportation)
@@ -500,20 +500,35 @@ If you specify this option, nested arrayrefs are descended into as well.
 
 This option was added in v0.20.
 
+=item C<-->
+
+This string ends the option processing, allowing you to pass scalar values to
+C<o2h> that would otherwise be interpreted as options.
+
+The C<o2h> function is special-cased such that a call C<o2h("--")> returns
+C<"--"> instead of throwing an error.
+
+This was added in v0.24 in order to fix a bug with scalars beginning with
+C<"-"> in earlier versions of this module. Users of C<o2h> are advised to
+upgrade.
+
 =back
 
 =cut
 
 sub o2h {  ## no critic (RequireArgUnpacking)
 	my ($arrays);
-	while ( @_ && $_[0] && !ref$_[0] && $_[0]=~/^-/ ) {
-		if ($_[0] eq '-arrays' ) { $arrays = shift }
-		else { croak "unknown option to o2h: '$_[0]'" }
+	unless ( @_==1 && $_[0] && !ref$_[0] && $_[0]eq'--' ) {  ## no critic (ProhibitNegativeExpressionsInUnlessAndUntilConditions)
+		while ( @_ && $_[0] && !ref$_[0] && $_[0]=~/^-/ ) {
+			if ($_[0] eq '-arrays' ) { $arrays = shift }
+			elsif ($_[0] eq '--') { shift; last }
+			else { croak "unknown option to o2h: '$_[0]'" }
+		}
 	}
 	croak "missing argument to o2h" unless @_;
 	my $h2o = shift;
 	croak "too many arguments to o2h" if @_;
-	my @args = ( $arrays ? (-arrays) : () );
+	my @args = ( ( $arrays ? (-arrays) : () ), '--' );
 	if ( ref($h2o) =~ $_PACKAGE_REGEX )
 		{ return { map { $_ => o2h(@args, $h2o->{$_}) } keys %$h2o } }
 	elsif ( $arrays && ref $h2o eq 'ARRAY' )
@@ -545,7 +560,7 @@ One common use case for this module is to make accessing hashes nicer, like for
 example those you get from L<Config::Tiny|Config::Tiny>. Here's how you can
 create a new C<h2o> object from a configuration file:
 
- use Util::H2O 0.18 qw/ h2o o2h /;  # v0.18 for o2h
+ use Util::H2O 0.24 qw/ h2o o2h /;  # v0.24 for o2h (with bugfixes)
  use Config::Tiny 2.27;             # v2.27 for writing file back out
  
  my $config = h2o -recurse, {%{ Config::Tiny->read($config_filename) }};

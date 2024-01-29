@@ -1,5 +1,8 @@
 Revision history for Perl module App::PPI::Dumper
 
+1.024 2024-01-22T17:59:32Z
+	* refresh distro, update email address
+
 1.023 2022-01-09T01:11:41Z
 	* no code changes. Fix link in README.pod.
 

@@ -1,0 +1,26 @@
+benchmark/ae-native.pl
+benchmark/getaddrinfo.pl
+Changes
+experiments/ae-native.pl
+experiments/ae.pl
+experiments/anyevent.pl
+experiments/basic.pl
+experiments/io-async.pl
+experiments/mem.pl
+experiments/mojo.pl
+lib/Socket/More/Resolver.pm
+lib/Socket/More/Resolver.pod
+lib/Socket/More/Resolver/AE.pm
+lib/Socket/More/Resolver/Async.pm
+lib/Socket/More/Resolver/IO/Async.pm
+lib/Socket/More/Resolver/IOAsync.pm
+lib/Socket/More/Resolver/Mojo/IOLoop.pm
+lib/Socket/More/Resolver/Worker.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README.md
+t/Socket-More-Resolver.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -28,19 +28,20 @@
       "runtime" : {
          "requires" : {
             "XS::Parse::Infix" : "0.26",
+            "meta" : "0.003_002",
             "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Syntax::Operator::Zip" : {
          "file" : "lib/Syntax/Operator/Zip.pm",
-         "version" : "0.06"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -50,6 +51,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.06",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

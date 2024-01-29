@@ -15,6 +15,7 @@ t/17-softfail.t
 t/20-encoding.t
 t/21-encoding.t
 t/22-encoding.t
+t/28-encoding.t
 t/29-encoding.t
 t/test_.dat
 t/test0.dat

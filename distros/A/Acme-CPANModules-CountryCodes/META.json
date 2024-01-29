@@ -48,6 +48,7 @@
          "x_lists" : {
             "App::ListCountries" : "0",
             "App::LocaleCodesUtils" : "0",
+            "Locale::Codes" : "0",
             "Locale::Codes::Country" : "0",
             "Locale::Codes::Country::FR" : "0",
             "Locale::Codes::Country_Codes" : "0",
@@ -65,6 +66,7 @@
          "x_mentions" : {
             "App::ListCountries" : "0",
             "App::LocaleCodesUtils" : "0",
+            "Locale::Codes" : "0",
             "Locale::Codes::Country" : "0",
             "Locale::Codes::Country::FR" : "0",
             "Locale::Codes::Country_Codes" : "0",
@@ -82,7 +84,7 @@
    "provides" : {
       "Acme::CPANModules::CountryCodes" : {
          "file" : "lib/Acme/CPANModules/CountryCodes.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -97,7 +99,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-CountryCodes"
       }
    },
-   "version" : "0.004",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"

@@ -69,3 +69,4 @@ ConfigReader-Simple-*
 \.icloud$
 \A\.github\b
 
+\.gitattributes\b

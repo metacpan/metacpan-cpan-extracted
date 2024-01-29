@@ -23,14 +23,10 @@
        </div>
 
        <div class="buttons">
-         <span id="verify" class="btn btn-info" role="button">
-           <span class="fa fa-check-circle"></span>
-           <span trspan="verify">Verify</span>
-         </span>
-        <span id="register" class="btn btn-success" role="button">
-           <span class="fa fa-floppy-o"></span>
-           <span trspan="register">Register</span>
-         </span>
+         <div class="btn btn-primary" role="button" id="retrybutton">
+           <span class="fa fa-repeat"></span>
+           <span trspan="retry">Retry</span>
+         </div>
        </div>
      </div>
     </div>

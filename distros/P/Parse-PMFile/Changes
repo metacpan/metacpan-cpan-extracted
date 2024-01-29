@@ -1,5 +1,8 @@
 Revision history for Parse-PMFile
 
+0.45 2024/01/21
+  - Make sure to stringify versions so that they are quoted when they are encoded in JSON
+
 0.44 2023/04/27
   - Allow to parse class|role NAME VERSION
 

@@ -2,8 +2,8 @@ NAME
     App::abgrep - Print lines matching a pattern
 
 VERSION
-    This document describes version 0.009 of App::abgrep (from Perl
-    distribution App-abgrep), released on 2022-11-04.
+    This document describes version 0.010 of App::abgrep (from Perl
+    distribution App-abgrep), released on 2024-01-25.
 
 FUNCTIONS
   abgrep
@@ -32,7 +32,7 @@ FUNCTIONS
 
     *   count => *true*
 
-        Supress normal output, return a count of matching lines.
+        Supress normal output; instead return a count of matching lines.
 
     *   dash_prefix_inverts => *bool*
 
@@ -53,6 +53,16 @@ FUNCTIONS
     *   files => *array[filename]*
 
         (No description)
+
+    *   files_with_matches => *true*
+
+        Supress normal output; instead return filenames with matching lines;
+        scanning for each file will stop on the first match.
+
+    *   files_without_match => *true*
+
+        Supress normal output; instead return filenames without matching
+        lines.
 
     *   ignore_case => *bool*
 
@@ -124,7 +134,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2020, 2018 by perlancar
+    This software is copyright (c) 2024, 2022, 2021, 2020, 2018 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

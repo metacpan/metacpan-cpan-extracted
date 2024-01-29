@@ -43,15 +43,17 @@ for my $id (sort @ids) {
 
 @valid = @valid[0..168];
 #@valid = @valid[17..17];
-my @indents = (1 .. 4);
+my @configs = (1 .. 4);
+#@configs = (1);
 
-my @yt = map {
+my @yt;
+map {
     my $cfg = YAML::Tidy::Config->new( configfile => "$Bin/data/configs/config$_.yaml" );
-    YAML::Tidy->new( cfg => $cfg );
-} (0 .. 4);
+    $yt[ $_] = YAML::Tidy->new( cfg => $cfg );
+} @configs;
 
 my %failed;
-for my $i (0 .. 4) {
+for my $i (@configs) {
     diag "============= config $i";
     my $yt = $yt[ $i ];
     for my $id (@valid) {

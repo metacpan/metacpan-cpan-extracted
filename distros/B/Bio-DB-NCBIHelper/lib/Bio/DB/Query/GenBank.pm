@@ -96,7 +96,7 @@ preceded with a _
 # Let the code begin...
 
 package Bio::DB::Query::GenBank;
-$Bio::DB::Query::GenBank::VERSION = '1.7.7';
+$Bio::DB::Query::GenBank::VERSION = '1.7.8';
 use strict;
 use URI::Escape 'uri_unescape';
 use Bio::DB::NCBIHelper;

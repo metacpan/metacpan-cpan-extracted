@@ -45,11 +45,13 @@ my @files = (
     't/lib/My/Test/Encode/store.pm',
     't/lib/My/Test/Encode/types_nis.pm',
     't/lib/My/Test/Encode/types_ns.pm',
+    't/lib/My/Test/Encode/workflow.pm',
     't/lib/My/Test/Util.pm',
     't/nullify.t',
     't/numify.t',
     't/stream.t',
-    't/stringify.t'
+    't/stringify.t',
+    't/workflow.t'
 );
 
 notabs_ok($_) foreach @files;

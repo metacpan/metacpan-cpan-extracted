@@ -1,6 +1,6 @@
 package Poppler;
 
-our $VERSION = "1.0101";
+our $VERSION = "1.0103";
 $VERSION = eval $VERSION;
 
 =encoding utf8
@@ -13,40 +13,42 @@ Poppler - Bindings to the poppler PDF rendering library
 
   use Poppler;
 
-  # initialize using filename 
-  my $pdf = Poppler::Document->new_from_file( 'file.pdf' );
+  use strict;
+  use warnings;
 
-  # or, initialize using scalar data
-  open my $fh, '<:raw', 'file.pdf';
-  read ($fh, my $data, -s 'file.pdf')
-  close $fh;
-  my $pdf = Poppler::Document->new_from_data( $data );
+  # initialize using filename 
+  my $pdf = Poppler::Document->new_from_file( $ARGV[0] );
 
   # get some general info
-  my $n_pages = $pdf->get_n_pages;
-  my $title   = $pdf->get_title; 
+  print "Pages : ", $pdf->get_n_pages, "\n";
+  print "Title : ", $pdf->get_title,   "\n";
   # etc ...
 
   # get the first page
-  my $page = $pdf->get_page( 0 );
+  my $page = $pdf->get_page(0);
 
-  # get page size
-  my ($w, $h)  = $page->get_size;
+  # get page size the simple way
+  my ($w, $h) = $page->get_size;
+  print "Dims1 : $w x $h\n";
 
   # or, for backward compatibility
   my $dims = $page->get_size; # a Poppler::Dimension object
-  my $w = $dims->get_width;
-  my $h = $dims->get_height;
+  $w = $dims->get_width;
+  $h = $dims->get_height;
+  print "Dims2 : $w x $h\n";
 
   # do other fancy things (get page links, annotations, movies, etc)
   # (see poppler-glib documentation for details)
 
   # render to a Cairo surface
-  use Cairo;
-  my $surface = Cairo::ImageSurface->create( 'argb32', 100, 100 );
-  my $cr = Cairo::Context->create( $surface );
-  $page->render_to_cairo( $cr );
-  $cr->show_page;
+  use Cairo::GObject;
+  my ($w_px, $h_px) = map {$_ * 96/72 } ($w,$h); # points to pixels
+  my $surface = Cairo::ImageSurface->create( 'argb32', $w_px, $h_px );
+  my $context = Cairo::Context->create( $surface );
+  $context->scale(96/72, 96/72); # points to pixels
+  $page->render( $context );
+  $context->show_page;
+  $surface->write_to_png( $ARGV[1] );
 
 =head1 ABSTRACT
 
@@ -283,6 +285,42 @@ sub Poppler::Page::get_size {
         if (! wantarray);
     return($w, $h);
 
+}
+
+sub Poppler::Document::new_from_data {
+
+    my ($class, $data, $len, $pwd) = @_;
+
+    #-----------------------------
+    # this is how it should be done, but can't get it to work yet
+    #-----------------------------
+
+    #$data = _unpack_unless_array_ref( $data );
+    #$len = scalar(@$data);
+
+    #return Glib::Object::Introspection->invoke (
+        #$_POPPLER_BASENAME, 'Document', 'new_from_data',
+        #$class, $data, $len
+    #);
+
+    #-----------------------------
+    # this is an ugly hack to make things work
+    #-----------------------------
+
+    use File::Temp;
+    my $tmp = File::Temp->new( UNLINK => 1 );
+    print {$tmp} $data;
+    close $tmp;
+    return Poppler::Document->new_from_file("$tmp", $pwd);
+
+}
+
+sub _unpack_unless_array_ref {
+  my ($data) = @_;
+  local $@;
+  return eval { @{$data} }
+    ? $data
+    : [unpack 'C*', $data];
 }
 
 =back

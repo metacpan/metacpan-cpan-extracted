@@ -43,17 +43,23 @@
       },
       "test" : {
          "requires" : {
+            "File::Find::Wanted" : "0",
+            "File::Path" : "0",
+            "File::Slurper" : "0",
             "File::Spec" : "0",
+            "File::Temp" : "0.2307",
+            "File::chdir" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0"
+            "Test::Exception" : "0",
+            "Test::More" : "0.98"
          }
       }
    },
    "provides" : {
       "File::Util::DirList" : {
          "file" : "lib/File/Util/DirList.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -68,7 +74,7 @@
          "web" : "https://github.com/perlancar/perl-File-Util-DirList"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"
@@ -168,7 +174,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.609"
+            "version" : "0.610"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",

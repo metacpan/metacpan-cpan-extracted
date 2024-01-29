@@ -1,5 +1,13 @@
-1.0.3     2022-12-22 19:10:37-06:00 America/Chicago
+1.0.4     2023-12-11 13:29:46-06:00 America/Chicago
 
+    [ Other ]
+    - Remove dependency on JSON::Parse
+    Bernhard Schmalhofer++
+
+    - Replace my deadname with my proper name
+    Aurelia Peters++
+
+1.0.3    2022-12-15 19:43:48-05:00 America/Chicago
     [ Bug Fixes ]
     - Fix unicode issue in POD
     David Escribano García++

@@ -3,14 +3,16 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'Device::BusPirate' );
+require Device::BusPirate;
 
-use_ok( 'Device::BusPirate::Mode::BB' );
-use_ok( 'Device::BusPirate::Mode::I2C' );
-use_ok( 'Device::BusPirate::Mode::SPI' );
+require Device::BusPirate::Mode::BB;
+require Device::BusPirate::Mode::I2C;
+require Device::BusPirate::Mode::SPI;
+require Device::BusPirate::Mode::UART;
 
-use_ok( 'Device::Chip::Adapter::BusPirate' );
+require Device::Chip::Adapter::BusPirate;
 
+pass( 'Modules loaded' );
 done_testing;

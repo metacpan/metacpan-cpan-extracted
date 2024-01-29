@@ -91,7 +91,7 @@ use constant NULL_REF	=> ref NULL;
 
 use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
 
-our $VERSION = '0.052';
+our $VERSION = '0.053';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -2206,9 +2206,14 @@ sub perl : Tokenize( -noexpand_tilde ) : Verb( eval! setup! ) {
     my $data = $opt->{eval} ?
 	$file :
 	$self->_file_reader( $file, { glob => 1 } );
-    my $rslt = eval $data; ## no critic (BuiltinFunctions::ProhibitStringyEval)
-    $@
-	and $self->wail( "Failed to eval '$file': $@" );
+    my $rslt;
+    {
+	# "random" package to prevent whoopsies in our own name space
+	package qq_eval_namespace; ## no critic (Modules::ProhibitMultiplePackages)
+	$rslt = eval $data; ## no critic (BuiltinFunctions::ProhibitStringyEval)
+	$@
+	    and $self->wail( "Failed to eval '$file': $@" );
+    }
     instance( $rslt, 'Astro::App::Satpass2' )
 	or return $rslt;
     return;

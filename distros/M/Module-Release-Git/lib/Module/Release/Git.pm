@@ -19,7 +19,7 @@ our @EXPORT = qw(
 	vcs_tag
 	);
 
-our $VERSION = '1.016';
+our $VERSION = '1.018';
 
 =encoding utf8
 
@@ -32,6 +32,12 @@ Module::Release::Git - Use Git with Module::Release
 The release script automatically loads this module if it sees a
 F<.git> directory. The module exports C<check_vcs>, C<vcs_tag>, and
 C<make_vcs_tag>.
+
+For git status checks, you can ignore untracked files by setting
+C<ignore_untracked> in F<.releaserc>:
+
+	# .releaserc
+	ignore_untracked 1
 
 =head1 DESCRIPTION
 
@@ -48,7 +54,8 @@ This module depends on the external git binary (so far).
 
 =item check_vcs()
 
-Check the state of the Git repository.
+Check the state of the Git repository. If you set the C<ignore_untracked>
+config to a true value, B<git> will not complain about untracked files.
 
 =cut
 
@@ -58,12 +65,19 @@ sub _get_time {
 	POSIX::strftime( '%Y%m%d%H%M%S', localtime );
 	}
 
+sub _git_status_command {
+	my $self = shift;
+	my $opt = $self->config->ignore_untracked ? '-uno' : '';
+	return "git status -s $opt 2>&1";
+	}
+
 sub check_vcs {
 	my $self = shift;
 
 	$self->_print( "Checking state of Git... " );
 
-	my $git_status = $self->run('git status -s 2>&1');
+	my $command = _git_status_command($self);
+	my $git_status = $self->run( $command );
 
 	no warnings 'uninitialized';
 
@@ -188,6 +202,7 @@ sub vcs_branch {
 
 	my( $self ) = @_;
 	( $branch ) = $self->run('git rev-parse --abbrev-ref HEAD');
+	no warnings qw(uninitialized);
 	chomp( $branch );
 	$branch;
 	}
@@ -287,11 +302,11 @@ This module is in Github:
 
 =head1 AUTHOR
 
-brian d foy, <bdfoy@cpan.org>
+brian d foy, <briandfoy@pobox.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the same terms as the Artistic License 2.0.
 

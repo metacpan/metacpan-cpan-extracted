@@ -19,7 +19,7 @@ my $page = $pdf->page();
 $page->mediabox(595,842);
 
 my $text = $page->text();
-$text->textlabel(50,700, $f2, 20, 'Normal Text in Red', -color=>'red');
+$text->textlabel(50,700, $f2, 20, 'Normal Text in Red (no underline)', -color=>'red');
 $text->textlabel(50,600, $f2, 20, 'Normal Text in Blue Underline in Red+Yellow',
     -color=>'#0000CC',
     -rotate=>-45,

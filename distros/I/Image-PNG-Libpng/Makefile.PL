@@ -25,11 +25,11 @@ if (! $vars) {
 
 my %wm = (
     NAME         => 'Image::PNG::Libpng',
-    VERSION      => '0.57',
+    VERSION      => '0.58',
     ABSTRACT     => 'Perl interface to libpng',
     OBJECT       => 'Libpng.o',
     LIBS         => '-lpng',
-    AUTHOR => 'Ben Bullock <bkb@cpan.org>',
+    AUTHOR => 'Ben Bullock <benkasminbullock@gmail.com>',
     LICENSE => 'perl',
     META_MERGE => {
         resources => {

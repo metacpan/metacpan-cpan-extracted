@@ -1,0 +1,11 @@
+Revision history for Perl extension Text-MustacheTemplate
+
+0.02 2023-12-14T13:42:21Z
+
+    - improve error reporting
+    - fix bugs
+
+0.01 2023-12-13T11:56:13Z
+
+    - original version
+

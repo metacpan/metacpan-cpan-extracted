@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# PostCompressRequest.File : File to upload  ,
-# PostCompressRequest.CompressLevel :   ,
-# PostCompressRequest.password :   ,
-# PostCompressRequest.checkExcelRestriction :    
+# PostCompressRequest.File : Compress level. The compression ratio 1-100.  ,
+# PostCompressRequest.CompressLevel : Compress level. The compression ratio 1-100.  ,
+# PostCompressRequest.password : The password needed to open an Excel file.  ,
+# PostCompressRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_compress' } = { 
-    	summary => 'Compress XLS, XLSX, XLSM, XLSB, ODS and more',
+    	summary => 'Compress files and generate target files in various formats, supported file formats are include Xls, Xlsx, Xlsm, Xlsb, Ods and more.',
         params => $params,
         returns => 'FilesResult',
     };
@@ -133,28 +133,28 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'File to upload',
+     	description => 'Compress level. The compression ratio 1-100.',
      	format => '',
      	read_only => '',
      		},
      'compress_level' => {
      	datatype => 'int',
      	base_name => 'CompressLevel',
-     	description => '',
+     	description => 'Compress level. The compression ratio 1-100.',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
-     	description => '',
+     	description => 'Whether check restriction of excel file when user modify cells related objects.',
      	format => '',
      	read_only => '',
      		},    

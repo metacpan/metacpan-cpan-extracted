@@ -1,9 +1,10 @@
-#!perl -w
+#!perl
+use strict;
+use warnings;
 
 use Test::More tests => 1;
 
 use IPC::Run3;
-use strict;
 
 local $SIG{__DIE__} = sub { ok(0, '__DIE__ handler should not be called'); };
 

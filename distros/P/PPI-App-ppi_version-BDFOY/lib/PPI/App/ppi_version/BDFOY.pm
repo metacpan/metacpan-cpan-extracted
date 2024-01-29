@@ -15,7 +15,7 @@ PPI::App::ppi_version::BDFOY - brian d foy's rip off of Adam's ppi_version
 	% ppi_version change 1.23 1.24
 
 	# call it with less typing. With no arguments, it assumes 'show'.
-	% ppi_version show
+	% ppi_version
 
 	# with arguments that are not 'show' or 'change', assume 'change'
 	% ppi_version 1.23 1.24
@@ -33,7 +33,7 @@ Life would just be easier if Adam did things my way from the start.
 
 =cut
 
-use 5.008;
+use 5.010;
 use strict;
 use version;
 use File::Spec             ();
@@ -42,7 +42,7 @@ use File::Find::Rule       ();
 use File::Find::Rule::Perl ();
 use Term::ANSIColor;
 
-our $VERSION = '1.001';
+our $VERSION = '1.003';
 
 #####################################################################
 # Main Methods
@@ -85,9 +85,9 @@ sub print_file_report {
 	my( $file, $version, $message, $error ) = @_;
 
 	if( defined $version ) {
-		$class->print_info(
-			colored( ['green'], $version ),
-			  " $file" );
+		$version = $version =~ m/\A</ ?
+			$version : colored( ['green'], sprintf '%12s', $version );
+		$class->print_info( "$version $file" );
 		}
 	elsif( $error ) {
 		$class->print_info( "$file... ", colored ['red'], $message );
@@ -135,7 +135,12 @@ sub show {
 
 	my $count = 0;
 	foreach my $file ( @$files ) {
-		my( $version, $message, $error_flag ) = $class->get_version( $file );
+		my( $version, $message, $error_flag ) = eval { $class->get_version( $file ) };
+		if( $@ ) {
+			$error_flag = 1;
+			$message //= $@;
+			}
+		$version //= '<no version>';
 		$class->print_file_report( $file, $version, $message, $error_flag );
 		$count++ if defined $version;
 		}
@@ -302,11 +307,11 @@ This source is part of a Github project:
 Adam Kennedy wrote the original, and I stole some of the code. I even
 inherit from the original.
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2008-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2008-2024, brian d foy briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the same terms as the Artistic License 2.0.
 

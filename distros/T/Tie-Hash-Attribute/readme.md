@@ -1,6 +1,6 @@
 Tie::Hash::Attribute
 ====================
-Just another HTML attribute generator. [![CPAN Version](https://badge.fury.io/pl/Tie-Hash-Attribute.svg)](https://metacpan.org/pod/Tie::Hash::Attribute) [![Build Status](https://api.travis-ci.org/jeffa/Tie-Hash-Attribute.svg?branch=master)](https://travis-ci.org/jeffa/Tie-Hash-Attribute)
+Just another HTML attribute generator. [![CPAN Version](https://badge.fury.io/pl/Tie-Hash-Attribute.svg)](https://metacpan.org/pod/Tie::Hash::Attribute)
 
 Synopsis
 --------

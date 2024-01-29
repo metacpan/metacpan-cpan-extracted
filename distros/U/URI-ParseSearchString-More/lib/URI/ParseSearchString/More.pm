@@ -2,15 +2,15 @@ use warnings;
 use strict;
 
 package URI::ParseSearchString::More;
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 use base qw( URI::ParseSearchString );
 
-use List::Compare        ();
-use LWP::Protocol::https ();
-use Params::Validate qw( validate SCALAR );
-use Try::Tiny qw( catch try );
-use URI ();
-use URI::Heuristic qw(uf_uristr);
+use List::Compare          ();
+use LWP::Protocol::https   ();                      ## no perlimports
+use Params::Validate       qw( SCALAR validate );
+use Try::Tiny              qw( catch try );
+use URI                    ();
+use URI::Heuristic         qw( uf_uristr );
 use URI::QueryParam        ();
 use WWW::Mechanize::Cached ();
 
@@ -80,7 +80,7 @@ my %query_lookup = (
     'googel'                      => ['q'],
     'hotbot.lycos.com'            => ['query'],
     'isearch.com'                 => ['Terms'],
-    'local.google'                => [ 'q', 'near' ],
+    'local.google'                => [ 'q',   'near' ],
     'local.yahoo.com'             => [ 'stx', 'csz' ],
     'looksmart.com'               => ['key'],
     'lycos'                       => ['query'],
@@ -154,6 +154,8 @@ sub parse_search_string {
     my $self = shift;
     my $url  = shift;
 
+    die 'missing url.' unless $url;
+
     foreach my $engine ( keys %url_regex ) {
 
         if ( $url =~ $url_regex{$engine} ) {
@@ -219,15 +221,14 @@ sub parse_more {
 
     if ( $url =~ m{ ( (?: $regex ) .* ?/ ) .* ?\? (.*)\z }xms ) {
 
-        my $domain = $1;
+        my $uri    = URI->new( uf_uristr($url) );
+        my $domain = $uri->host;
 
         # remove trailing slash
         $domain =~ s{/\z}{};
 
         my @param_parts = ();
         my %params      = ();
-
-        my $uri = URI->new($url);
 
     ENGINE:
         foreach my $engine ( $self->_get_engines ) {
@@ -248,7 +249,7 @@ sub parse_more {
             }
         }
 
-        my $params = join( q{ }, @param_parts );
+        my $params      = join( q{ }, @param_parts );
         my $orig_domain = $domain;
         $domain =~ s/\/.*//g;
         unless ( $domain =~ /\w/ ) {
@@ -271,7 +272,7 @@ sub blame {
 
 sub guess {
     my $self = shift;
-    my $url = shift || $self->{'more'}->{'string'};
+    my $url  = shift || $self->{'more'}->{'string'};
 
     my @guesses = ( 'q', 'query', 'searchfor' );
 
@@ -381,7 +382,7 @@ URI::ParseSearchString::More - Extract search strings from more referrers.
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 

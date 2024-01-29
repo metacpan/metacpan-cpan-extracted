@@ -1,0 +1,59 @@
+NAME
+
+    TLV::Parser - A module for parsing TLV strings
+
+SYNOPSIS
+
+    use TLV::Parser;
+
+    $tlv = TLV::Parser->new( { tag_aref => ['80', '5F', '9F01'], l_len =>
+    2, } ); $tlv->parse($tlv_string);
+
+    # Alternative: no l_len is passed in. The default l_len is 2. $tlv =
+    TLV::Parser->new( { tag_aref => ['80', '5F', '9F01'], } );
+    $tlv->parse($tlv_string);
+
+DESCRIPTION
+
+    The TLV::Parser module, provides a simple interface for parsing TLV
+    (Tag-Length-Value) or (Identifier-Length-Contents) strings. It takes in
+    a hashref as the input: tag_aref points to the reference to the array
+    of tags, and l_len is the number of bytes defined for the length
+    segment in TLV.
+
+METHODS
+
+    new(\%args)
+
+      Creates a new TLV::Parser object with the hashref as the input.
+      tag_aref, which points to the array of tags, is mandatory. l_len,
+      which is the number of bytes defined for length segment, is optional
+      with default value of 2.
+
+      Parsing TLV string can be done by continuous regex or by cut the
+      'tag' segment from tlv string and compare it against the defined
+      tags. This module is using cut and compary method, so it stores all
+      the passed in tags into a hash, also store the set of the length of
+      the tags in a hash.
+
+    parse($tlv_string)
+
+      Parses the specified TLV string and store the result in the object
+      itself. If the TLV string cannot be parsed completely, it will store
+      the remaining segment and store error message 'parsing incomplete'
+      'result' => '... ...', 'remain' => '... ...', 'error' => 'parsing
+      incomplete', After parsering, TLV (tag, value) pairs hash are pointed
+      by 'result' in the object.
+
+AUTHOR
+
+    Guangsheng He (何光胜) <heguangsheng@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2024 by Guangsheng He (何光胜)
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,7 +1,7 @@
 package Mail::DKIM::Algorithm::rsa_sha256;
 use strict;
 use warnings;
-our $VERSION = '1.20230911'; # VERSION
+our $VERSION = '1.20240124'; # VERSION
 # ABSTRACT: rsa sha256 algorithm class
 
 # Copyright 2005-2006 Messiah College. All rights reserved.
@@ -66,7 +66,7 @@ Mail::DKIM::Algorithm::rsa_sha256 - rsa sha256 algorithm class
 
 =head1 VERSION
 
-version 1.20230911
+version 1.20240124
 
 =head1 AUTHORS
 

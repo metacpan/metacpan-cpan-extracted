@@ -5,7 +5,7 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 {
    role ARole { method m {} }
@@ -14,7 +14,7 @@ use Object::Pad;
    $SIG{__WARN__} = sub { $warnings .= join "", @_ };
 
    ok( !eval <<'EOPERL',
-      class AClass does ARole { method m {} }
+      class AClass { apply ARole; method m {} }
 EOPERL
       'class with clashing method name fails' );
    like( $@, qr/^Method 'm' clashes with the one provided by role ARole /,
@@ -30,7 +30,7 @@ EOPERL
    role BRole { method bmeth; }
 
    ok( !eval <<'EOPERL',
-      class BClass does BRole { }
+      class BClass { apply BRole; }
 EOPERL
       'class with missing required method fails' );
    like( $@, qr/^Class BClass does not provide a required method named 'bmeth' /,

@@ -426,7 +426,7 @@ A script that uses L<Convert::Pheno> to interconvert common data models for phen
 
 =head1 INSTALLATION
 
-=head2 Containerized (Recommended Method)
+=head2 Containerized
 
 =head3 Method 1: From Docker Hub
 
@@ -635,7 +635,7 @@ B<Examples:>
 
 The author requests that any published work that utilizes C<Convert-Pheno> includes a cite to the the following reference:
 
-Rueda, M et al., (2023). Convert-Pheno: A software toolkit for the interconversion of standard data models for phenotypic data. Journal of Biomedical Informatics.
+Rueda, M et al., (2023). Convert-Pheno: A software toolkit for the interconversion of standard data models for phenotypic data. Journal of Biomedical Informatics. L<DOI|https://doi.org/10.1016/j.jbi.2023.104558>
 
 =head1 AUTHOR 
 

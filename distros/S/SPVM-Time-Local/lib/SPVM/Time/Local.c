@@ -11,7 +11,7 @@ int32_t SPVM__Time__Local__timelocal(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t e;
   
   void* obj_time_info = stack[0].oval;
-  if (!obj_time_info) { return env->die(env, stack,  "Sys::Time::Tm object must be defined", __func__, FILE_NAME, __LINE__); }
+  if (!obj_time_info) { return env->die(env, stack, "$tm must be defined.", __func__, FILE_NAME, __LINE__); }
   
   struct tm* st_tm = env->get_pointer(env, stack, obj_time_info);
   
@@ -27,7 +27,7 @@ int32_t SPVM__Time__Local__timegm(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t e;
   
   void* obj_time_info = stack[0].oval;
-  if (!obj_time_info) { return env->die(env, stack,  "Sys::Time::Tm object must be defined", __func__, FILE_NAME, __LINE__); }
+  if (!obj_time_info) { return env->die(env, stack, "$tm must be defined.", __func__, FILE_NAME, __LINE__); }
   
   struct tm* st_tm = env->get_pointer(env, stack, obj_time_info);
   

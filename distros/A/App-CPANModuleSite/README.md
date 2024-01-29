@@ -1,5 +1,8 @@
 # app-cpanmodulesite
+
 Automatically create a GitHub Pages site for a CPAN module
+
+[![Build Status](https://github.com/davorg-cpan/app-cpanmodulesite/actions/workflows/perltest.yml/badge.svg?branch=main)](https://github.com/davorg-cpan/app-cpanmodulesite/actions/workflows/perltest.yml) [![Coverage Status](https://coveralls.io/repos/github/davorg-cpan/app-cpanmodulesite/badge.svg?branch=main)](https://coveralls.io/github/davorg-cpan/app-cpanmodulesite?branch=main)
 
 ## Description
 

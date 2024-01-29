@@ -1,3 +1,10 @@
+ 03-Jan-2024           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.76
+ + CPAN#149267: "OK" message should go to STDOUT, not STDERR
+ + CPAN#150660: podchecker -quiet does not print "OK" message
+
+
  21-May-2022           Marek Rouchal                        <marekr@cpan.org>
  -----------------------------------------------------------------------------
  Version 1.75

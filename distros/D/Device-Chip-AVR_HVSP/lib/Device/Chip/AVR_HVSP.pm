@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Device::Chip::AVR_HVSP 0.07;
+package Device::Chip::AVR_HVSP 0.08;
 class Device::Chip::AVR_HVSP
    :isa(Device::Chip);
 
@@ -672,14 +672,18 @@ from a byte.
 
 =cut
 
-foreach my $fuse (qw( lfuse hfuse efuse )) {
-   no strict 'refs';
-   *{"read_$fuse"} = async sub {
-      return chr await $_[0]->read_fuse_byte( $fuse );
-   };
-   *{"write_$fuse"} = async sub {
-      await $_[0]->write_fuse_byte( $fuse, ord $_[1] );
-   };
+BEGIN {
+   use Object::Pad 0.800 ':experimental(mop)';
+   my $meta = Object::Pad::MOP::Class->for_caller;
+
+   foreach my $fuse (qw( lfuse hfuse efuse )) {
+      $meta->add_method( "read_$fuse" => async method {
+         return chr await $self->read_fuse_byte( $fuse );
+      } );
+      $meta->add_method( "write_$fuse" => async method {
+         await $self->write_fuse_byte( $fuse, ord $_[0] );
+      } );
+   }
 }
 
 =head2 read_flash

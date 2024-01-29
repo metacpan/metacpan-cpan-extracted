@@ -1,15 +1,16 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-# DB/Object/SQLite/Tables.pm
-# Version 0.3
-# Copyright(c) 2019 Jacques Deguest
-# Author: Jacques Deguest <jack@deguest.jp>
-# Created 2017/07/19
-# Modified 2019/06/18
-# All rights reserved.
-# 
-# This program is free software; you can redistribute it and/or modify it 
-# under the same terms as Perl itself.
+## Database Object Interface - ~/lib/DB/Object/SQLite/Tables.pm
+## Version v1.0.0
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
+## Created 2017/07/19
+## Modified 2023/11/17
+## All rights reserved
+## 
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 # This package's purpose is to separate the object of the tables from the main
 # DB::Object package so that when they get DESTROY'ed, it does not interrupt
@@ -29,13 +30,13 @@ BEGIN
     our $TYPE_TO_CONSTANT =
     {
     qr/^(INT|INTEGER|TINYINT|SMALLINT|MEDIUMINT|BIGINT|UNSIGNED\s+BIG\s+INT|INT2|INT8)/ => { constant => '', name => 'SQLITE_INTEGER', type => 'integer' },
-qr/^(CHARACTER\(\d+\)|VARCHAR\(\d+\)|VARYING\s+CHARACTER\(\d+\)|NCHAR\(\d+\)|NATIVE\s+CHARACTER\(\d+\)|NVARCHAR\(\d+\)|TEXT|CLOB)/  => { constant => '', name => 'SQLITE_TEXT', type => 'text' },
+    qr/^(CHARACTER\(\d+\)|VARCHAR\(\d+\)|VARYING\s+CHARACTER\(\d+\)|NCHAR\(\d+\)|NATIVE\s+CHARACTER\(\d+\)|NVARCHAR\(\d+\)|TEXT|CLOB)/  => { constant => '', name => 'SQLITE_TEXT', type => 'text' },
     qr/^BLOB/                                               => { constant => '', name => 'SQLITE_BLOB', type => 'blob' },
     qr/^(REAL|DOUBLE\s+DOUBLE\s+PRECISION|FLOAT)/           => { constant => '', name => 'SQLITE_FLOAT', type => 'float' },
     qr/^(NUMERIC|DECIMAL\(\d+,\d+\)|BOOLEAN|DATETIME|DATE)/ => { constant => '', name => 'SQLITE_NULL', type => 'bool' },
     };
     our $DEBUG = 0;
-    our $VERSION = 'v0.300.0';
+    our $VERSION = 'v1.0.0';
 };
 
 use strict;
@@ -179,10 +180,7 @@ sub create_info
 # NOTE: sub drop is inherited from DB::Object::Tables
 # sub drop
 
-sub exists
-{
-    return( shift->table_exists( shift( @_ ) ) );
-}
+sub exists { return( shift->table_exists( shift( @_ ) ) ); }
 
 sub lock { return( shift->error( "There is no table locking in SQLite." ) ); }
 
@@ -253,80 +251,86 @@ sub structure
     $self->{type} = $def->{type};
     my $struct  = $self->{structure};
     my $fields  = $self->{fields};
-    my $default = $self->{default};
-    my $null    = $self->{null};
-    my $types   = $self->{types};
-    my $const   = $self->{constant};
-    if( !%$fields || !%$struct || !%$default )
+    my $types_dict = $self->database_object->datatype_dict;
+    $self->_load_class( 'DB::Object::Fields::Field' ) || return( $self->pass_error );
+    my $q = $self->_reset_query;
+    # .header on
+    # PRAGMA table_info('dummy');
+    # cid|name|type|notnull|dflt_value|pk
+    my $query = "PRAGMA table_info(${table})";
+    # <https://www.sqlite.org/pragma.html>
+    my $sth = $self->database_object->prepare_cached( $query ) ||
+        return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $self->errstr() ) );
+    $sth->execute ||
+        return( $self->error( "Error while executing query to get table '$table' columns specification: ", $sth->errstr() ) );
+    my @primary = ();
+    my $ref = '';
+    my $c   = 0;
+    # Mysql: field, type, null, key, default, extra
+    # Postgres: tablename, field, field_num, type, len, comment, is_nullable, key, foreign_key, default 
+    # SQLite: cid, name, type, notnull, dflt_value, pk
+    while( $ref = $sth->fetchrow_hashref() )
     {
-        # my $query = "SELECT * FROM information_schema.columns WHERE table_name = ?";
-        my $query = <<EOT;
-PRAGMA table_info(${table})
-EOT
-        # <http://www.postgresql.org/docs/9.3/interactive/infoschema-columns.html>
-        # select * from information_schema.columns where table_name = 'address'
-        my $sth = $self->prepare_cached( $query ) ||
-            return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $self->errstr() ) );
-        $sth->execute ||
-            return( $self->error( "Error while executing query to get table '$table' columns specification: ", $sth->errstr() ) );
-        my @primary = ();
-        my $ref = '';
-        my $c   = 0;
-        my $type_convert =
+        $self->messagec( 6, "Checking table ${table} field {green}", $ref->{name}, "{/} with type {green}", $ref->{type}, "{/} -> ", sub{ $self->Module::Generic::dump( $ref ) } );
+        my $def =
         {
-        'int' => 'integer',
+        name            => $ref->{name},
+        default         => $ref->{dflt_value},
+        is_nullable     => ( $ref->{notnull} ? 0 : 1 ),
+        is_primary      => ( $ref->{is_primary} ? 1 : 0 ),
+        pos             => ++$c,
+        #query_object    => $q,
+        size            => undef,
+        type            => $ref->{type},
+        #table_object    => $self,
         };
-        # Mysql: field, type, null, key, default, extra
-        # Postgres: tablename, field, field_num, type, len, comment, is_nullable, key, foreign_key, default 
-        # SQLite: cid, name, type, notnull, dflt_value, pk
-        while( $ref = $sth->fetchrow_hashref() )
+        if( $def->{type} =~ /^([^\(]+)\(([^\)]+)\)$/ )
         {
-            my %data = map{ lc( $_ ) => $ref->{ $_ } } keys( %$ref );
-            $data{default} = CORE::delete( $data{dflt_value} );
-            $data{field} = CORE::delete( $data{name} );
-            $data{key} = CORE::delete( $data{pk} );
-            if( exists( $type_convert->{ $data{type} } ) )
-            {
-                $data{type} = $type_convert->{ $data{type} };
-            }
-            $data{default} = '' if( !defined( $data{default} ) );
-            # push( @order, $data{ 'field' } );
-            $fields->{ $data{field} }  = ++$c;
-            $types->{ $data{field} } = $data{type};
-            $default->{ $data{field} } = '';
-            $default->{ $data{field} } = $data{default} if( $data{default} ne '' && $data{notnull} );
-            $null->{ $data{field} } = $data{notnull} ? 0 : 1;
+            @$def{qw( type size )} = ( $1, $2 );
+        }
+
+        my( $const_def, $dict );
+        if( CORE::exists( $types_dict->{ $def->{type} } ) )
+        {
+            $const_def = $types_dict->{ $def->{type} };
+        }
+        else
+        {
             # Get the constant
-            DATA_TYPE_RE: foreach my $re ( keys( %$TYPE_TO_CONSTANT ) )
+            DATA_TYPE_RE: foreach my $type ( keys( %$types_dict ) )
             {
-                if( $data{type} =~ /$re/i )
+                if( $def->{type} =~ /$types_dict->{ $type }->{re}/i )
                 {
-                    my $dict = \%{$TYPE_TO_CONSTANT->{ $re }};
-                    $dict->{constant} = $self->database_object->get_sql_type( $dict->{type} );
-                    $const->{ $data{field} } = $dict;
+                    $const_def = $types_dict->{ $type };
                     last DATA_TYPE_RE;
                 }
             }
-            my @define = ( $data{type} );
-            push( @define, "DEFAULT '$data{default}'" ) if( $data{default} ne '' || $data{notnull} );
-            push( @define, "NOT NULL" ) if( $data{notnull} );
-            push( @primary, $data{field} ) if( $data{key} );
-            $struct->{ $data{field} } = CORE::join( ' ', @define );
         }
-        $sth->finish;
-        if( @primary )
+        if( defined( $const_def ) )
         {
-            $self->{primary} = \@primary;
+            my $const_keys = [keys( %$const_def )];
+            my $dict = {};
+            @$dict{ @$const_keys } = @$const_def{ @$const_keys };
+            $def->{datatype} = $dict;
         }
-        # $self->{ '_structure_real' } = $struct;
-        $self->{constant}  = $const;
-        $self->{default}   = $default;
-        $self->{fields}    = $fields;
-        $self->{structure} = $struct;
-        $self->{types}     = $types;
+        $self->messagec( 6, "\tField {green}", $def->{name}, "{/} has type {green}", $def->{type}, "{/}, not null is {green}", $ref->{notnull}, "{/} and dictionary -> ", sub{ $self->Module::Generic::dump( $def ) } );
+        $def->{query_object} = $q;
+        $def->{table_object} = $self;
+        my @define = ( $def->{type} );
+        push( @define, "DEFAULT '$def->{default}'" ) if( defined( $def->{default} ) && length( $def->{default} // '' ) );
+        push( @define, "NOT NULL" ) if( $ref->{notnull} );
+        push( @primary, $def->{name} ) if( $ref->{pk} );
+        $struct->{ $def->{name} } = CORE::join( ' ', @define );
+        my $field = DB::Object::Fields::Field->new( %$def, debug => $self->debug ) ||
+            return( $self->pass_error( DB::Object::Fields::Field->error ) );
+        $fields->{ $def->{name} } = $field;
     }
-    # return( wantarray() ? () : undef() ) if( !scalar( keys( %$struct ) ) );
-    # return( wantarray() ? %$struct : \%$struct );
+    $sth->finish;
+    if( @primary )
+    {
+        $self->{primary} = \@primary;
+    }
+    $self->{fields} = $fields;
     $self->{_cache_structure} = $struct;
     return( $self->_clone( $struct ) );
 }
@@ -362,7 +366,7 @@ DB::Object::SQLite::Tables - SQLite Table Object
 
 =head1 VERSION
 
-    v0.300.0
+    v1.0.0
 
 =head1 DESCRIPTION
 
@@ -382,11 +386,11 @@ Possible parameters are:
 
 =over 4
 
-=item I<comment>
+=item * C<comment>
 
-=item I<password>
+=item * C<password>
 
-=item I<temporary>
+=item * C<temporary>
 
 If provided, this will create a temporary table.
 
@@ -437,31 +441,31 @@ This method will also set the following object properties:
 
 =over 4
 
-=item L<DB::Object::Tables/type>
+=item * L<DB::Object::Tables/type>
 
 The table type.
 
-=item I<default>
+=item * C<default>
 
 A column name to default value hash reference
 
-=item I<fields>
+=item * C<fields>
 
 A column name to field position (integer) hash reference
 
-=item I<null>
+=item * C<null>
 
 A column name to a boolean representing whether the column is nullable or not.
 
-=item L<DB::Object::Tables/primary>
+=item * L<DB::Object::Tables/primary>
 
 An array reference of column names that are used as primary key for the table.
 
-=item I<structure>
+=item * C<structure>
 
 A column name to its sql definition
 
-=item I<types>
+=item * C<types>
 
 A column name to column data type hash reference
 

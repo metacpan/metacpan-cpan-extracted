@@ -1,0 +1,19 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+# XMLDocument in JavaScript
+class Eg::Node::Document::XML extends Eg::Node::Document {
+  
+  allow Eg::DOM::Implementation;
+  
+  # Class Methods
+  private static method new : Eg::Node::Document::XML () {
+    
+    my $self = new Eg::Node::Document::XML;
+    
+    $self->SUPER::init;
+    
+    return $self;
+  }
+  
+}

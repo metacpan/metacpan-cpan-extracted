@@ -439,6 +439,72 @@ _zeros(Class,n)
     RETVAL
 
 ##############################################################################
+# _to_hex() - return ref to hexadecimal string (unprefixed)
+
+SV *
+_to_hex(Class,n)
+        mpz_t * n
+
+  PREINIT:
+    int len;
+    char *buf;
+
+  CODE:
+    /* len is always >= 1, and accurate (unlike in decimal) */
+    len = mpz_sizeinbase(*n, 16);
+    RETVAL = newSV(len);                /* alloc len bytes */
+    SvPOK_on(RETVAL);
+    buf = SvPVX(RETVAL);                /* get ptr to storage */
+    mpz_get_str(buf, 16, *n);           /* convert to hexadecimal string */
+    SvCUR_set(RETVAL, len);             /* so set real length */
+  OUTPUT:
+    RETVAL
+
+##############################################################################
+# _to_bin() - return ref to binary string (unprefixed)
+
+SV *
+_to_bin(Class,n)
+        mpz_t * n
+
+  PREINIT:
+    int len;
+    char *buf;
+
+  CODE:
+    /* len is always >= 1, and accurate (unlike in decimal) */
+    len = mpz_sizeinbase(*n, 2);
+    RETVAL = newSV(len);                /* alloc len bytes */
+    SvPOK_on(RETVAL);
+    buf = SvPVX(RETVAL);                /* get ptr to storage */
+    mpz_get_str(buf, 2, *n);            /* convert to binary string */
+    SvCUR_set(RETVAL, len);             /* so set real length */
+  OUTPUT:
+    RETVAL
+
+##############################################################################
+# _to_oct() - return ref to octal string (unprefixed)
+
+SV *
+_to_oct(Class,n)
+        mpz_t * n
+
+  PREINIT:
+    int len;
+    char *buf;
+
+  CODE:
+    /* len is always >= 1, and accurate (unlike in decimal) */
+    len = mpz_sizeinbase(*n, 8);
+    RETVAL = newSV(len);                /* alloc len bytes */
+    SvPOK_on(RETVAL);
+    buf = SvPVX(RETVAL);                /* get ptr to storage */
+    mpz_get_str(buf, 8, *n);            /* convert to octal string */
+    SvCUR_set(RETVAL, len);             /* so set real length */
+  OUTPUT:
+    RETVAL
+
+##############################################################################
 # _as_hex() - return ref to hexadecimal string (prefixed with 0x)
 
 SV *
@@ -502,7 +568,7 @@ _as_oct(Class,n)
     SvPOK_on(RETVAL);
     buf = SvPVX(RETVAL);                /* get ptr to storage */
     *buf++ = '0';                       /* prepend '0' */
-    mpz_get_str(buf, 8, *n);            /* convert to binary string */
+    mpz_get_str(buf, 8, *n);            /* convert to octal string */
     SvCUR_set(RETVAL, len);             /* so set real length */
   OUTPUT:
     RETVAL
@@ -847,6 +913,20 @@ _pow(Class,x,y)
     PUSHs( x );
 
 ##############################################################################
+# _lcm() - lcm(m,n)
+
+mpz_t *
+_lcm(Class,x,y)
+        mpz_t*  x
+        mpz_t*  y
+
+  CODE:
+    NEW_GMP_MPZ_T_INIT;
+    mpz_lcm(*RETVAL, *x, *y);
+  OUTPUT:
+    RETVAL
+
+##############################################################################
 # _gcd() - gcd(m,n)
 
 mpz_t *
@@ -859,6 +939,47 @@ _gcd(Class,x,y)
     mpz_gcd(*RETVAL, *x, *y);
   OUTPUT:
     RETVAL
+
+##############################################################################
+# _nok() - n over k (binomial coefficient)
+
+void
+_nok(Class,x,y)
+        SV*     x
+        SV*     y
+  PREINIT:
+        mpz_t* TEMP;
+        mpz_t* TEMP_1;
+  PPCODE:
+    GMP_GET_ARGS_0_1;   /* (TEMP, TEMP_1) = (x,y)  */
+    mpz_bin_ui(*TEMP, *TEMP, mpz_get_ui(*TEMP_1));
+    PUSHs( x );
+
+##############################################################################
+# _fib() - Fibonacci number
+
+void
+_fib(Class,x)
+        SV*     x
+  PREINIT:
+        mpz_t* TEMP;
+  PPCODE:
+    GMP_GET_ARG_0;   /* TEMP = x */
+    mpz_fib_ui(*TEMP, mpz_get_ui(*TEMP));
+    PUSHs( x );
+
+##############################################################################
+# _lucas() - Lucas number
+
+void
+_lucas(Class,x)
+        SV*     x
+  PREINIT:
+        mpz_t* TEMP;
+  PPCODE:
+    GMP_GET_ARG_0;   /* TEMP = x */
+    mpz_lucnum_ui(*TEMP, mpz_get_ui(*TEMP));
+    PUSHs( x );
 
 ##############################################################################
 # _and() - m &= n
@@ -919,6 +1040,20 @@ _fac(Class,x)
   PPCODE:
     GMP_GET_ARG_0;   /* TEMP = x */
     mpz_fac_ui(*TEMP, mpz_get_ui(*TEMP));
+    PUSHs( x );
+
+
+##############################################################################
+# _dfac() - n!! (double factorial)
+
+void
+_dfac(Class,x)
+        SV*     x
+  PREINIT:
+        mpz_t* TEMP;
+  PPCODE:
+    GMP_GET_ARG_0;   /* TEMP = x */
+    mpz_2fac_ui(*TEMP, mpz_get_ui(*TEMP));
     PUSHs( x );
 
 

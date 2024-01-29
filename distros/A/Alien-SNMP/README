@@ -1,87 +1,109 @@
 NAME
+
     Alien::SNMP - Alien package for the Net-SNMP library
 
 SYNOPSIS
+
      use Alien::SNMP;
      # then it's just like SNMP.pm
- 
+     
      say Alien::SNMP->bin_dir;
      # where the net-snmp apps (snmptranslate, etc) live
 
 DESCRIPTION
+
     Alien::SNMP downloads and installs the Net-SNMP library and associated
     perl modules.
 
     The library is built with the following options:
 
-    "--disable-agent"
-    "--disable-manuals"
-    "--disable-scripts"
-    "--disable-mibs"
-    "--enable-ipv6"
-    "--with-mibs="""
-    "--with-perl-modules"
-    "--disable-embedded-perl"
-    "--enable-blumenthal-aes"
-    "--with-defaults"
+    --disable-agent
+
+    --disable-manuals
+
+    --disable-scripts
+
+    --disable-mibs
+
+    --enable-ipv6
+
+    --with-mibs=""
+
+    --with-perl-modules
+
+    --disable-embedded-perl
+
+    --enable-blumenthal-aes
+
+    --with-defaults
 
 METHODS
-  bin_dir
+
+ bin_dir
+
      my $bin_dir = Alien::SNMP->bin_dir;
 
     Returns the location of the net-snmp apps (snmptranslate, etc).
 
-  cflags
+ cflags
+
      my $cflags = Alien::SNMP->cflags;
 
     Returns the C compiler flags.
 
-  libs
+ libs
+
      my $libs = Alien::SNMP->libs;
 
     Returns the linker flags.
 
 SEE ALSO
+
     Alien
+
     Alien::Base
+
     SNMP
-        The Perl5 'SNMP' Extension Module for the Net-SNMP SNMP package.
-        Depends on libnetsnmp and the corresponding version is installed
-        along with the C library.
+
+      The Perl5 'SNMP' Extension Module for the Net-SNMP SNMP package.
+      Depends on libnetsnmp and the corresponding version is installed
+      along with the C library.
 
 AUTHOR
-    Eric A. Miller, "<emiller at cpan.org>"
+
+    Eric A. Miller, <emiller at cpan.org>
 
 LICENSE AND COPYRIGHT
+
     Copyright 2015 Eric A. Miller.
 
     This program is distributed under the (Revised) BSD License:
-    <http://www.opensource.org/licenses/BSD-3-Clause>
+    http://www.opensource.org/licenses/BSD-3-Clause
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are
     met:
 
-    * Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer.
+    * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
 
     * Redistributions in binary form must reproduce the above copyright
     notice, this list of conditions and the following disclaimer in the
     documentation and/or other materials provided with the distribution.
 
-    * Neither the name of Eric A. Miller's Organization nor the names of its
-    contributors may be used to endorse or promote products derived from
-    this software without specific prior written permission.
+    * Neither the name of Eric A. Miller's Organization nor the names of
+    its contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
 
     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
     IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-    PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
-    OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-    EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+    OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 

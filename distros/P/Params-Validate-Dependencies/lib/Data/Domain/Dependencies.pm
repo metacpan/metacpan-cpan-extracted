@@ -10,7 +10,7 @@ use Exporter qw(import);
 use base qw(Data::Domain);
 
 use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS);
-$VERSION = '1.41';
+$VERSION = '2.00';
 
 @EXPORT = ();
 @EXPORT_OK = (
@@ -21,7 +21,7 @@ $VERSION = '1.41';
 
 =head1 NAME
 
-Data::Domain::Dependencies
+Data::Domain::Dependencies - give Data::Domain the same magic as Params::Validate::Dependencies
 
 =head1 DESCRIPTION
 
@@ -31,6 +31,16 @@ functions as Params::Validate::Dependencies.
 
 NB now this only works on perl 5.18 and higher as Data::Domain uses
 some features of more modern perls.
+
+=head1 INCOMPATIBLE CHANGES
+
+As of version 2.00, Data::Domain::Dependencies no longer has the
+C<generate_documentation> method. This is because of incompatible
+changes in the L<Data::Domain> API. If you need this method then
+you should use Data::Domain::Dependencies version 1.41, and
+Data::Domain version 1.13.
+
+See L<https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies/issues/28>
 
 =head1 SYNOPSIS
 
@@ -98,20 +108,6 @@ sub new {
   }
 }
 
-=head2 generate_documentation
-
-This is an additional method, not found in Data::Domain, which
-generates vaguely readable
-documentation for the domain.  Broadly speaking, it spits out the
-source code.
-
-=cut
-
-sub generate_documentation {
-  my $self = shift;
-  $self->_document();
-}
-
 # this is where the magic happens ...
 sub inspect {
   my $sub = shift;
@@ -154,7 +150,7 @@ L<https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies/>
 
 =head1 COPYRIGHT and LICENCE
 
-Copyright 2023 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2024 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used, distributed, and modified under the terms of either the GNU General Public Licence version 2 or the Artistic Licence. It's up to you which one you use. The full text of the licences can be found in the files GPL2.txt and ARTISTIC.txt, respectively.
 

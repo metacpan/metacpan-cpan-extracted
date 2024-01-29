@@ -2,7 +2,7 @@ package Bundle::Locale::CLDR::Africa;
 
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 =head1 NAME
 
@@ -10,12 +10,18 @@ Bundle::Locale::CLDR::Africa
 
 =head1 CONTENTS
 
-Bundle::Locale::CLDR::Middleafrica 0.34.4
-Bundle::Locale::CLDR::Easternafrica 0.34.4
-Bundle::Locale::CLDR::Westernafrica 0.34.4
-Bundle::Locale::CLDR::Northernafrica 0.34.4
-Bundle::Locale::CLDR::Southernafrica 0.34.4
-Bundle::Locale::CLDR::Subsaharanafrica 0.34.4
+Bundle::Locale::CLDR::Middleafrica 0.40.1
+
+Bundle::Locale::CLDR::Easternafrica 0.40.1
+
+Bundle::Locale::CLDR::Westernafrica 0.40.1
+
+Bundle::Locale::CLDR::Northernafrica 0.40.1
+
+Bundle::Locale::CLDR::Southernafrica 0.40.1
+
+Bundle::Locale::CLDR::Subsaharanafrica 0.40.1
+
 
 =cut
 

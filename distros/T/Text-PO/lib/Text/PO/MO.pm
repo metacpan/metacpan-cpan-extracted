@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO/MO.pm
-## Version v0.2.1
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.3.0
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/06/25
-## Modified 2023/10/31
+## Modified 2023/12/10
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -20,9 +20,8 @@ BEGIN
     use vars qw( $VERSION @META $DEF_META );
     use Encode ();
     use IO::File;
-    use Nice::Try;
     use Text::PO;
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -99,7 +98,9 @@ sub decode
     my $enc  = shift( @_ ) || $self->encoding;
     return( $self->error( "Data provided is not an hash reference." ) ) if( ref( $hash ) ne 'HASH' );
     return( $self->error( "No character encoding was provided to decode the mo file data." ) ) if( !CORE::length( $enc ) );
-    try
+    # try-catch
+    local $@;
+    eval
     {
         foreach my $k ( sort( keys( %$hash ) ) )
         {
@@ -109,10 +110,10 @@ sub decode
             CORE::delete( $hash->{ $k } ) if( CORE::length( $k ) );
             $hash->{ $k2 } = $v2;
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to decode mo data using character encoding \"$enc\": $e" ) );
+        return( $self->error( "An error occurred while trying to decode mo data using character encoding \"$enc\": $@" ) );
     }
     return( $hash );
 }
@@ -128,7 +129,9 @@ sub encode
     my $enc  = shift( @_ ) || $self->encoding;
     return( $self->error( "Data provided is not an hash reference." ) ) if( ref( $hash ) ne 'HASH' );
     return( $self->error( "No character encoding was provided to encode data." ) ) if( !CORE::length( $enc ) );
-    try
+    # try-catch
+    local $@;
+    eval
     {
         foreach my $k ( keys( %$hash ) )
         {
@@ -146,10 +149,10 @@ sub encode
                 $hash->{ $k } = $v2;
             }
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to encode data using character encoding \"$enc\": $e" ) );
+        return( $self->error( "An error occurred while trying to encode data using character encoding \"$enc\": $@" ) );
     }
     return( $hash );
 }
@@ -282,7 +285,7 @@ sub write
         my $this = shift( @_ );
         $self->encode( $this => $enc ) || do
         {
-            warnings::warn( "An error occurred trying to encode value for key '${this}': ", $self->error, "\n" ) if( warnings::enabled() );
+            warn( "An error occurred trying to encode value for key '${this}': ", $self->error, "\n" ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
         };
         my $msgstr;
         if( $this->{msgid_plural} )
@@ -491,7 +494,7 @@ Text::PO::MO - Machine Object File Read, Write
 
 =head1 VERSION
 
-    v0.2.1
+    v0.3.0
 
 =head1 DESCRIPTION
 

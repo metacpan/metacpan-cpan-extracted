@@ -15,31 +15,11 @@ NOTE for maintainer: update t/deprecations.t with tests for both old
 
 In order of scheduled removal date:
 
-elementsof()    method in a number of Basic/PDF/ routines
-   This method was renamed to elements(). elementsof() is scheduled to be
-   removed on or after August, 2021.
-
-removeobj()     method in Array.pm
-   Not used internally and not documented. To be removed on or after August,
-   2021.
-
-get_*box()      methods in Page.pm
-   now *box() methods (both $pdf and $page) with no arguments return the 
-   global and current page bounding boxes (media, crop, bleed, trim, art).
-   The get routines are now obsolete, and may be removed on or after 
-   August, 2021.
-
 PDFStr()        method in Basic/PDF/Utils.pm
    NOT scheduled to be removed, but use PDFString() instead. 
 
 PDFUtf()        method in Basic/PDF/Utils.pm
    NOT scheduled to be removed, but use PDFString() instead. 
-
-lead()          method in Content.pm
-   Use leading() instead. May be removed on or after March, 2023.
-
-textlead()      method in Lite.pm
-   Use textleading() instead. May be removed on or after March, 2023.
 
 openpage()      method in Builder.pm
    Use open_page() instead. May be removed on or after June, 2023.
@@ -47,6 +27,11 @@ openpage()      method in Builder.pm
 default()       method in Builder.pm
    May be renamed in the future, as is flagged by Perl::Critic as reserved.
    Use with caution.
+
+width(w),height(h)  methods in Resource/XObject/Image.pm
+   The ability to SET an image's width and/or height is scheduled to be removed
+   after October 2025. This setting ability appears not to work, but in case
+   someone IS using it in some manner, it has not been immediately removed.
 
 *** If I have missed any deprecated interfaces, please let me know! ***
 
@@ -158,4 +143,27 @@ pdfile          method in Outline.pm, NamedDestination.pm
    (multiply width by < 1) or expand (multiply width by > 1) text characters. 
    Use "-condense" instead. -slant is scheduled to be removed on or after
    January, 2021. [Removed February, 2021]
+
+lead()          method in Content.pm
+   Use leading() instead. lead is scheduled to be removed on or after 
+   March, 2023. Notice that the associated global variable 'lead' has also
+   been changed to 'leading'. [Removed September, 2023]
+
+textlead()      method in Lite.pm
+   Use textleading() instead. textlead is scheduled to be removed on or after 
+   March, 2023. [Removed September, 2023]
+
+elementsof()    method in a number of Basic/PDF/ routines
+   This method was renamed to elements(). elementsof() is scheduled to be
+   removed on or after August, 2021. [Removed September, 2023]
+
+removeobj()     method in Array.pm
+   Not used internally and not documented. To be removed on or after August,
+   2021. Replaced by remove_element(). [Removed September, 2023]
+
+get_*box()      methods in Page.pm
+   now *box() methods (both $pdf and $page) with no arguments return the 
+   global and current page bounding boxes (media, crop, bleed, trim, art).
+   The get routines are now obsolete, and may be removed on or after 
+   August, 2021. [Removed October, 2023]
 

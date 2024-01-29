@@ -2,7 +2,7 @@ package ENV::Util;
 use strict;
 use warnings;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub import {
     my ($pkg, $cmd, @args) = @_;
@@ -122,7 +122,7 @@ __END__
 
 =head1 NAME
 
-ENV::Util - parse prefixed environment variables and dotnev (.env) files into Perl
+ENV::Util - parse prefixed environment variables and dotenv (.env) files into Perl
 
 =head1 SYNOPSIS
 

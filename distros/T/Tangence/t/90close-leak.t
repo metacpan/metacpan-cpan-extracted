@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 BEGIN {
    plan skip_all => "No Test::MemoryGrowth" unless eval { require Test::MemoryGrowth };
 }

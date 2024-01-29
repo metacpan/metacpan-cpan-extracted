@@ -18,8 +18,8 @@ package PDF::Builder::Basic::PDF::Filter;
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Filter::ASCII85Decode;
 use PDF::Builder::Basic::PDF::Filter::ASCIIHexDecode;
@@ -56,14 +56,22 @@ the same time.
 
 =head1 METHODS
 
-=over
+=head2 new
 
-=item PDF::Builder::Basic::PDF::Filter->new()
+    PDF::Builder::Basic::PDF::Filter->new()
+
+=over
 
 Creates a new filter object with empty state information ready for processing
 data both input and output.
 
-=item $dat = $f->infilt($str, $isend)
+=back
+
+=head2 infilt
+
+    $dat = $f->infilt($str, $isend)
+
+=over
 
 Filters from output to input the data. Notice that C<$isend == 0> implies that 
 there is more data to come and so following it C<$f> may contain state 
@@ -75,7 +83,13 @@ C<$f> will be that the state information is empty. Error messages are most
 likely to occur here since if there is required state information to be stored 
 following this data, then that would imply an error in the data.
 
-=item $str = $f->outfilt($dat, $isend)
+=back
+
+=head2 outfilt
+
+    $str = $f->outfilt($dat, $isend)
+
+=over
 
 Filter stored data ready for output. Parallels C<infilt>.
 

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,38 +12,43 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 88b38456a181aeb429135fba2f3b48a0ede2676b Changes
-SHA1 4765da8d6dcb9e8847321db30bff1c01ef5cb3e5 Dicom.pm
-SHA1 ecec73beff956fc76e8b8199687ac9bb85103e96 LICENSE
-SHA1 1e1436dc04bc88318e596d6a4a90bd0e14b7a3ca MANIFEST
-SHA1 45c8e5d06719231d178fb33e17f936d92fc2b0d6 META.yml
-SHA1 63f7b67b27821a40dfb80f625ba9a5469b5a9247 Makefile.PL
-SHA1 575ef823908774bf9db035809607c7f464954062 README
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 ec58b0d59769879816b405ee3fbd7fba7b9cbdae t/Task-Dicom/01-use.t
-SHA1 bcd01ef106c90eb1d4658a827e1bb3832973bc1d t/Task-Dicom/02-version.t
-SHA1 f165138d13a5e0d77a07ebe6c17edb0a02323af9 xt/Task-Dicom/01-pod_coverage.t
-SHA1 bbb515232f0fa7532cce830fc321fb845ab548df xt/Task-Dicom/02-pod.t
+SHA256 3b915452cb494a357696f543ef469d813fef22a9af1ca976e40fddaeadf31e22 Changes
+SHA256 3ea189d240901d2f917080e0c859c704dea6718609dc22b55cca7e9c4e7014a2 Dicom.pm
+SHA256 3eda4295af098a9626e4f5855d21c245deb5c775997162e52d29ba812f2c1e7f LICENSE
+SHA256 fb804d1637349372244618f4435f722a612699e8adcf03182ff989410f8af158 MANIFEST
+SHA256 77ed9d84f980bafb74e1c1781a5674b713814c91353c731a8a3fb93c42ecb9bc META.yml
+SHA256 57e5f4a99b0048bc9fecccc6f02629c8e489e3d5f15e0bf8b60fca50cfb8bed5 Makefile.PL
+SHA256 2184fba186190a3addd549f598828b9621ba780bc03a6c1afc49af2b7635c609 README
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 7e8acd2e02f3dbdc7fa3059ca1e4c407d8659b8618a23f81035fc0b917ac1f55 t/Task-Dicom/01-use.t
+SHA256 69555dedea2a2dd9dc9e022662be970324b9cb2e91582e794ab38f05b2eed462 t/Task-Dicom/02-version.t
+SHA256 dad355845384ab257346d63e9e50e1c055c05e62eed62ef30337e977e62fbd8a xt/Task-Dicom/01-pod_coverage.t
+SHA256 f7f5f55c2fdc7efecf344b98a46923bda3231007d03526792d63f450728194ab xt/Task-Dicom/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJXvrq5AAoJEJe+XXKaIuTlQ34IALP4lgKRH94TjMkJ7ACqFgg2
-ouqKqCS3cYewDAIa1P3uO1Tc11Y0o4AgceGEtl0t1Fd8X8deZlmTF80tUhaWA4Fm
-hnHUmooueuEFndhkHaO78U9nodNoP8DJ0yKEq+uU0zOSbSdwCsCggdzI11n3xKvA
-UACAPOtSa6bh5SRKF3SijSqCveFcdUmKBsmOX0o3aWy/WFA1CB2cgQ7/PQ56rD0U
-guHuqioR6NvaBTotE7ntfLsd78qi3Hne/fPjeT+8U5iV4elPq7GSdpBnwfisRdgc
-/4mlMzv4GBpkik6ZvSl3NRqpk+6sqDtJ5O19kmmaq/mPoNppr0PYskIHPSs9H6Q=
-=HY6c
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmV524IACgkQojV9Rpe/
+B8smIw//dlLN5tsxYptVqBwUZNMUm9ax8wWwYh1yXkPSAPC3Xa27tqO1SDiPTKgE
+A9MU50nFszw8C3l6OMTE7OUbFwMvtgyBGVFxni6X0MS4Ei1LmreBeAu4ATUn5Y9h
+8ar7pLxXOv1z9dE1qjU2urQp4xVkkoi0AeNz/NoarOo/IaX8q+xygkpMtwFJFdwX
+vDc6F4UN6myClTxQYtJGNh6+mcRT7EvKgclt607HR8b9hSl7X8vovtibV+F6s330
+WgxYdIWb850PWuSpqRH0wuWXmgKQmjQ5XV+g0FLFp01mm3FH6FBYXKQqy4cSWeww
+rA1RbneTmNhI28hK9ezF4HPIj5s5qlFfBjKv93f6GmXvfyJWznla6yHlHs9kfi6x
+TP00qvKQy2MRUUGSsOFIj5bk2/rU3O69Pel+tpyV3QsztXa6UbkEd5NQIjq2wr+w
+xP0UXZMDAT8GEZjpjpcNtHsWCzLngLqfj930GW+QqOrYlZ4URJGLb60hSkTQGtd8
+twK+sYDdr553ics8bRrpJ0VdyjkSzxxHvhG4n5QWnhY18B0amAFub3ujqKH4+lLc
+wsEAPz8mDq8kTa0oXoa5DGtWkfmtMhJvfCWMqKiIVchSdEshGcACMEOLNhduv36n
+5m7A4ZAX0obPIpZN1OWp7DXtBVPmGnG7oE7ll6TCUomwMW02sYM=
+=z8oa
 -----END PGP SIGNATURE-----

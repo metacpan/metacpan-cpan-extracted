@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sv::Any::Fi - Package for language Swedish
 
 package Locale::CLDR::Locales::Sv::Any::Fi;
 # This file auto generated from Data\common\main\sv_FI.xml
-#	on Tue  5 Dec  1:33:08 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,24 +24,6 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Sv::Any');
-has 'display_name_language' => (
-	is			=> 'ro',
-	isa			=> CodeRef,
-	init_arg	=> undef,
-	default		=> sub { 
-		 sub {
-			 my %languages = (
-				'ky' => 'kirgiziska',
-
-			);
-			if (@_) {
-				return $languages{$_[0]};
-			}
-			return \%languages;
-		}
-	},
-);
-
 has 'display_name_script' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -64,7 +46,7 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'timezone' => 'tidszon',
 
@@ -89,42 +71,35 @@ has 'display_name_type' => (
 	},
 );
 
-has 'characters' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> $^V ge v5.18.0
-	? eval <<'EOT'
-	sub {
-		no warnings 'experimental::regex_sets';
-		return {
-			main => qr{[a à b c d e é f g h i j k l m n o p q r s t u v x y z å ä ö]},
-		};
-	},
-EOT
-: sub {
-		return {};
-},
-);
-
-
 has 'units' => (
 	is			=> 'ro',
 	isa			=> HashRef[HashRef[HashRef[Str]]],
 	init_arg	=> undef,
 	default		=> sub { {
 				'narrow' => {
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'one' => q({0} km/h),
+						'other' => q({0} km/h),
+					},
+					# Core Unit Identifier
 					'kilometer-per-hour' => {
 						'one' => q({0} km/h),
 						'other' => q({0} km/h),
 					},
 				},
-				'short' => {
-					'celsius' => {
-						'name' => q(grader Celsius),
-					},
-				},
 			} }
+);
+
+has 'number_symbols' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'latn' => {
+			'timeSeparator' => q(.),
+		},
+	} }
 );
 
 has 'calendar_quarters' => (
@@ -194,8 +169,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'eras' => (
@@ -214,7 +189,6 @@ has 'date_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
-			'short' => q{dd-MM-y},
 		},
 	} },
 );
@@ -244,6 +218,29 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			Bhm => q{h.mm B},
+			Bhms => q{h.mm.ss B},
+			EBhm => q{E h.mm B},
+			EBhms => q{E h.mm.ss B},
+			EHm => q{E HH.mm},
+			EHms => q{E HH.mm.ss},
+			Ehm => q{E h.mm a},
+			Ehms => q{E h.mm.ss a},
+			Hm => q{HH.mm},
+			Hms => q{HH.mm.ss},
+			Hmsv => q{HH.mm.ss v},
+			Hmv => q{HH.mm v},
+			MEd => q{E d.M},
+			MMd => q{d.M},
+			MMdd => q{dd.MM},
+			Md => q{d.M},
+			hm => q{h.mm a},
+			hms => q{h.mm.ss a},
+			hmsv => q{h.mm.ss a v},
+			hmv => q{h.mm a v},
+			ms => q{mm.ss},
+		},
 	} },
 );
 

@@ -1,0 +1,103 @@
+{
+   "abstract" : "mustache template engine",
+   "author" : [
+      "karupanerura <karupa@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.23",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-MustacheTemplate",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4005"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Data::Section::Simple" : "0",
+            "Devel::Cover" : "0",
+            "Template::Mustache" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "feature" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "HTML::Escape" : "0",
+            "List::Util" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.022000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "JSON::PP" : "0",
+            "Test::Base::Less" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Text::MustacheTemplate" : {
+         "file" : "lib/Text/MustacheTemplate.pm",
+         "version" : "0.02"
+      },
+      "Text::MustacheTemplate::Compiler" : {
+         "file" : "lib/Text/MustacheTemplate/Compiler.pm"
+      },
+      "Text::MustacheTemplate::Evaluator" : {
+         "file" : "lib/Text/MustacheTemplate/Evaluator.pm"
+      },
+      "Text::MustacheTemplate::Generator" : {
+         "file" : "lib/Text/MustacheTemplate/Generator.pm"
+      },
+      "Text::MustacheTemplate::HTML" : {
+         "file" : "lib/Text/MustacheTemplate/HTML.pm"
+      },
+      "Text::MustacheTemplate::Lexer" : {
+         "file" : "lib/Text/MustacheTemplate/Lexer.pm"
+      },
+      "Text::MustacheTemplate::Parser" : {
+         "file" : "lib/Text/MustacheTemplate/Parser.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/karupanerura/Text-MustacheTemplate/issues"
+      },
+      "homepage" : "https://github.com/karupanerura/Text-MustacheTemplate",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/karupanerura/Text-MustacheTemplate.git",
+         "web" : "https://github.com/karupanerura/Text-MustacheTemplate"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

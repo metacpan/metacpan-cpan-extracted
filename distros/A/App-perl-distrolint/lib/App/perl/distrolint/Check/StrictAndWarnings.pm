@@ -4,11 +4,12 @@
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
 use v5.36;
-use Object::Pad 0.800;
+use Object::Pad 0.807;
 
-class App::perl::distrolint::Check::StrictAndWarnings 0.03
-   :does(App::perl::distrolint::CheckRole::EachFile)
-   :does(App::perl::distrolint::CheckRole::TreeSitterPerl);
+class App::perl::distrolint::Check::StrictAndWarnings 0.06;
+
+apply App::perl::distrolint::CheckRole::EachFile;
+apply App::perl::distrolint::CheckRole::TreeSitterPerl;
 
 use Text::Treesitter 0.07; # child_by_field_name
 
@@ -38,10 +39,10 @@ or higher are considered to enable C<warnings>.
 
 method run ( $app )
 {
-   return $self->run_for_each_perl_file( check_file => $app );
+   return $self->run_for_each_perl_file( check_file => );
 }
 
-method check_file ( $file, $app )
+method check_file ( $file )
 {
    my $tree = $self->parse_perl_file( $file );
 
@@ -79,10 +80,10 @@ method check_file ( $file, $app )
       }
 
       if( !$has_strict or !$has_warnings ) {
-         my $line = ( $node->start_point )[0] + 1;
+         my $line = $node->start_row + 1;
 
-         $app->diag( "%s line %d has a statement before use strict", $file, $line ) if !$has_strict;
-         $app->diag( "%s line %d has a statement before use warnings", $file, $line ) if !$has_warnings;
+         App->diag( App->format_file( $file, $line ), " has a statement before use strict" ) if !$has_strict;
+         App->diag( App->format_file( $file, $line ), " has a statement before use warnings" ) if !$has_warnings;
          $ok = 0;
          last;
       }

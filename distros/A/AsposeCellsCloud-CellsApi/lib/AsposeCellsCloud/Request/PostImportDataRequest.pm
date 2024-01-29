@@ -59,10 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostImportDataRequest.name : The workbook name.  ,
-# PostImportDataRequest.importOption :   ,
-# PostImportDataRequest.folder : Original workbook folder.  ,
-# PostImportDataRequest.storageName : Storage name.   
+# PostImportDataRequest.name : The file name.  ,
+# PostImportDataRequest.importOption : Import option. They are include of ImportCSVDataOption, ImportBatchDataOption, ImportPictureOption, ImportStringArrayOption, Import2DimensionStringArrayOption, and so on.    ,
+# PostImportDataRequest.folder : The folder where the file is situated.  ,
+# PostImportDataRequest.storageName : The storage name where the file is situated.  ,
+# PostImportDataRequest.region : The regional settings for workbook.   
 
 {
     my $params = {
@@ -73,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_import_data' } = { 
-    	summary => 'Imports data into workbook.',
+    	summary => 'Import data into the Excel file.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -109,6 +110,10 @@ sub run_http_request {
 
     if(defined $self->storage_name){
         $query_params->{'storageName'} = $client->to_query_value($self->storage_name);      
+    }
+
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
     } 
     my $_body_data;
 
@@ -130,28 +135,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
      'import_option' => {
      	datatype => 'ImportOption',
      	base_name => 'importOption',
-     	description => '',
+     	description => 'Import option. They are include of ImportCSVDataOption, ImportBatchDataOption, ImportPictureOption, ImportStringArrayOption, Import2DimensionStringArrayOption, and so on.  ',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
+     	format => '',
+     	read_only => '',
+     		},
+     'region' => {
+     	datatype => 'string',
+     	base_name => 'region',
+     	description => 'The regional settings for workbook.',
      	format => '',
      	read_only => '',
      		},    
@@ -162,7 +174,8 @@ __PACKAGE__->attribute_map( {
     'name' => 'name',
     'import_option' => 'importOption',
     'folder' => 'folder',
-    'storage_name' => 'storageName' 
+    'storage_name' => 'storageName',
+    'region' => 'region' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

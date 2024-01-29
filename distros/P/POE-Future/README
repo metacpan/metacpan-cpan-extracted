@@ -27,21 +27,21 @@ CONSTRUCTORS
 
  new
 
-       $f = POE::Future->new
+       $f = POE::Future->new;
 
     Returns a new leaf future instance, which will allow waiting for its
     result to be made available, using the await method.
 
  new_delay
 
-       $f = POE::Future->new_delay( $after )
+       $f = POE::Future->new_delay( $after );
 
     Returns a new leaf future instance which will become ready (with an
     empty result) after the specified delay time.
 
  new_alarm
 
-       $f = POE::Future->new_alarm( $at )
+       $f = POE::Future->new_alarm( $at );
 
     Returns a new leaf future instance which will become ready (with an
     empty result) at the specified alarm time.

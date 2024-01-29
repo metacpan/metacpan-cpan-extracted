@@ -34,6 +34,13 @@ subtest "sanity tests" => sub {
                 is_deeply($f->("foob"), "foob ");
                 is_deeply($f->("fooba"), "fooba");
                 is_deeply($f->("foobar"), undef);
+
+                # string-style for passing gen args
+                $f = gen_filter(
+                    filter_names => [ 'Str::try_center=width,5' ],
+                );
+                is_deeply($f->("foo"), " foo ");
+
             };
             subtest "return_type=str_errmsg+val" => sub {
                 my $f = gen_filter(

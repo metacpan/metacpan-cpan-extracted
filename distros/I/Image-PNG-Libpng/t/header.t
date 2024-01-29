@@ -16,10 +16,10 @@ BEGIN: {
     use IPNGLT;
 };
 
-my $png = read_png_file ("$Bin/tantei-san.png");
-cmp_ok ($png->get_image_width (), '==', 293, "get_image_width");
-cmp_ok ($png->height (), '==', 281, "height method");
-cmp_ok ($png->width (), '==', 293, "width method");
-cmp_ok ($png->get_image_height (), '==', 281, "get_image_height");
+my $png = read_png_file ("$Bin/gecko-1200-gray8.png");
+cmp_ok ($png->get_image_width (), '==', 1116, "get_image_width");
+cmp_ok ($png->height (), '==', 624, "height method");
+cmp_ok ($png->width (), '==', 1116, "width method");
+cmp_ok ($png->get_image_height (), '==', 624, "get_image_height");
 
 done_testing ();

@@ -1,5 +1,5 @@
 package Crypt::Passphrase::MD5::Base64;
-$Crypt::Passphrase::MD5::Base64::VERSION = '0.016';
+$Crypt::Passphrase::MD5::Base64::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -40,29 +40,24 @@ Crypt::Passphrase::MD5::Base64 - Validate against base64ed MD5 hashes with Crypt
 
 =head1 VERSION
 
-version 0.016
+version 0.019
+
+=head1 SYNOPSIS
+
+ my $passphrase = Crypt::Passphrase->new(
+     encoder    => 'Bcrypt',
+     validators => [ 'MD5::Base64' ],
+ );
 
 =head1 DESCRIPTION
 
 This module implements a validator for base64-encoded MD5 hashes.
 
-=head1 METHODS
-
-=head2 new()
-
-This creates a new MD5 validator. It takes no arguments.
-
-=head2 accepts_hash($hash)
-
-This (heuristically) determines if we may be dealing with a base64 encoded md5 sum.
-
-=head2 verify_hash($password, $hash)
-
-This determines if the password matches the hash when MD5'ed.
+This has no configuration and will try to match any value that looks like 16 bytes encoded in base64.
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

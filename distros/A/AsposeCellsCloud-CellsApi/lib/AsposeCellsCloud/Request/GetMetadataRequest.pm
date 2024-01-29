@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetMetadataRequest.File : File to upload  ,
-# GetMetadataRequest.type :   ,
-# GetMetadataRequest.password :   ,
-# GetMetadataRequest.checkExcelRestriction :    
+# GetMetadataRequest.File : Cells document property name.  ,
+# GetMetadataRequest.type : Cells document property name.  ,
+# GetMetadataRequest.password : The password needed to open an Excel file.  ,
+# GetMetadataRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_metadata' } = { 
-    	summary => '',
+    	summary => 'Get cells document properties.',
         params => $params,
         returns => 'ARRAY[CellsDocumentProperty]',
     };
@@ -133,28 +133,28 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'File to upload',
+     	description => 'Cells document property name.',
      	format => '',
      	read_only => '',
      		},
      'type' => {
      	datatype => 'string',
      	base_name => 'type',
-     	description => '',
+     	description => 'Cells document property name.',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
-     	description => '',
+     	description => 'Whether check restriction of excel file when user modify cells related objects.',
      	format => '',
      	read_only => '',
      		},    

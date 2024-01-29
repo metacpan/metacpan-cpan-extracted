@@ -132,14 +132,28 @@ SUMMARY
         # Run each search and push the resulting file into the @attachments array
         foreach my $search (@searches){
             my $search_content = $search->{'Attribute'}->Content;
+            my $xlsx;
 
-            my $xlsx = RunComponent(
-                '/Search/Results.xlsx',
-                'Query'   => $search_content->{'Query'} || '',
-                'Order'   => $search_content->{'Order'} || '',
-                'OrderBy' => $search_content->{'OrderBy'} || '',
-                'Format'  => $search_content->{'Format'} || '',
-            );
+            if ( ( $search_content->{SearchType} // '' ) eq 'Chart' ) {
+                $xlsx = RunComponent(
+                    '/Search/Chart.xlsx',
+                    'Query'         => $search_content->{'Query'}         || '',
+                    'GroupBy'       => $search_content->{'GroupBy'}       || '',
+                    'ChartFunction' => $search_content->{'ChartFunction'} || '',
+                    'Class'         => $search_content->{'Class'}         || 'RT::Tickets',
+                );
+            }
+            else {
+                $xlsx = RunComponent(
+                    '/Search/Results.xlsx',
+                    'Query'      => $search_content->{'Query'}   || '',
+                    'Order'      => $search_content->{'Order'}   || '',
+                    'OrderBy'    => $search_content->{'OrderBy'} || '',
+                    'Format'     => $search_content->{'Format'}  || '',
+                    'Class'      => 'RT::' . ( $search_content->{'SearchType'} || 'Ticket' ) . 's',
+                    'ObjectType' => $search_content->{'ObjectType'} || '',
+                );
+            }
 
             # Grab Name for RT System saved searches
             my $search_name = $search->{'Attribute'}->Name;

@@ -1,0 +1,239 @@
+==== start svg ====
+XObject #1
+vb 0, 0, 400, 400 => bb 0.00 -400.00 400.00 0.00
+matrix( 1 0 0 -1 0 0)
+vb rect( 0.00 0.00 400.00 400.00)
+xo fill_color black (initial)
+  start handling style (SVGPDF::Style)
+    style ====
+  end handling style
+  start handling circle (SVGPDF::Circle)
+  circle cx=100 cy=100 r=50
+    xo save
+    circle stroke-width=2 stroke=#808080 fill=none sda=2 2
+    xo stroke (rgb(128,128,128))
+    xo restore
+  end handling circle
+  start handling circle (SVGPDF::Circle)
+  circle cx=300 cy=100 r=50
+    xo save
+    circle stroke-width=2 stroke=#808080 fill=none sda=2 2
+    xo stroke (rgb(128,128,128))
+    xo restore
+  end handling circle
+  start handling circle (SVGPDF::Circle)
+  circle cx=100 cy=300 r=50
+    xo save
+    circle stroke-width=2 stroke=#808080 fill=none sda=2 2
+    xo stroke (rgb(128,128,128))
+    xo restore
+  end handling circle
+  start handling circle (SVGPDF::Circle)
+  circle cx=300 cy=300 r=50
+    xo save
+    circle stroke-width=2 stroke=#808080 fill=none sda=2 2
+    xo stroke (rgb(128,128,128))
+    xo restore
+  end handling circle
+  start handling circle (SVGPDF::Circle)
+  circle cx=50 cy=100 r=6
+    xo save
+    circle stroke-width=2 stroke=green fill=none
+    xo stroke (green)
+    xo restore
+  end handling circle
+  start handling circle (SVGPDF::Circle)
+  circle cx=100 cy=150 r=6
+    xo save
+    circle stroke-width=2 stroke=red fill=none
+    xo stroke (red)
+    xo restore
+  end handling circle
+  start handling circle (SVGPDF::Circle)
+  circle cx=250 cy=100 r=6
+    xo save
+    circle stroke-width=2 stroke=green fill=none
+    xo stroke (green)
+    xo restore
+  end handling circle
+  start handling circle (SVGPDF::Circle)
+  circle cx=300 cy=150 r=6
+    xo save
+    circle stroke-width=2 stroke=red fill=none
+    xo stroke (red)
+    xo restore
+  end handling circle
+  start handling circle (SVGPDF::Circle)
+  circle cx=50 cy=300 r=6
+    xo save
+    circle stroke-width=2 stroke=green fill=none
+    xo stroke (green)
+    xo restore
+  end handling circle
+  start handling circle (SVGPDF::Circle)
+  circle cx=100 cy=350 r=6
+    xo save
+    circle stroke-width=2 stroke=red fill=none
+    xo stroke (red)
+    xo restore
+  end handling circle
+  start handling circle (SVGPDF::Circle)
+  circle cx=250 cy=300 r=6
+    xo save
+    circle stroke-width=2 stroke=green fill=none
+    xo stroke (green)
+    xo restore
+  end handling circle
+  start handling circle (SVGPDF::Circle)
+  circle cx=300 cy=350 r=6
+    xo save
+    circle stroke-width=2 stroke=red fill=none
+    xo stroke (red)
+    xo restore
+  end handling circle
+  start handling path (SVGPDF::Path)
+  path d="M50 100 A 50 50, 0, ..."
+    xo save
+    path stroke-width=3 stroke=black fill=none
+    xo move(50.00,100.00)
+    xo arc(50.00,50.00 0.00 0,0 100.00,150.00)
+    circular_arc(50.00,100.00 100.00,150.00 50.00 move=0 large=0 dir=0 rot=0.00)
+      xo curve( 50.00,106.57 51.29,113.07 53.81,119.13 )
+      xo curve( 56.32,125.20 60.00,130.71 64.64,135.36 )
+      xo curve( 69.29,140.00 74.80,143.68 80.87,146.19 )
+      xo curve( 86.93,148.71 93.43,150.00 100.00,150.00 )
+    xo stroke (black)
+    xo restore
+  end handling path
+  start handling path (SVGPDF::Path)
+  path d="M250 100 A 50 50, 0,..."
+    xo save
+    path stroke-width=3 stroke=black fill=none
+    xo move(250.00,100.00)
+    xo arc(50.00,50.00 0.00 1,0 300.00,150.00)
+    circular_arc(250.00,100.00 300.00,150.00 50.00 move=0 large=1 dir=0 rot=0.00)
+      xo curve( 245.08,100.00 240.19,100.73 235.49,102.15 )
+      xo curve( 230.78,103.58 226.31,105.69 222.22,108.43 )
+      xo curve( 218.13,111.16 214.47,114.48 211.35,118.28 )
+      xo curve( 208.23,122.08 205.69,126.32 203.81,130.87 )
+      xo curve( 201.92,135.41 200.72,140.21 200.24,145.10 )
+      xo curve( 199.76,149.99 200.00,154.93 200.96,159.75 )
+      xo curve( 201.92,164.58 203.59,169.23 205.90,173.57 )
+      xo curve( 208.22,177.91 211.17,181.88 214.64,185.36 )
+      xo curve( 218.12,188.83 222.09,191.78 226.43,194.10 )
+      xo curve( 230.77,196.41 235.42,198.08 240.25,199.04 )
+      xo curve( 245.07,200.00 250.01,200.24 254.90,199.76 )
+      xo curve( 259.79,199.28 264.59,198.08 269.13,196.19 )
+      xo curve( 273.68,194.31 277.92,191.77 281.72,188.65 )
+      xo curve( 285.52,185.53 288.84,181.87 291.57,177.78 )
+      xo curve( 294.31,173.69 296.42,169.22 297.85,164.51 )
+      xo curve( 299.27,159.81 300.00,154.92 300.00,150.00 )
+    xo stroke (black)
+    xo restore
+  end handling path
+  start handling path (SVGPDF::Path)
+  path d="M50 300 A 50,50, 0, ..."
+    xo save
+    path stroke-width=3 stroke=black fill=none
+    xo move(50.00,300.00)
+    xo arc(50.00,50.00 0.00 0,1 100.00,350.00)
+    circular_arc(50.00,300.00 100.00,350.00 50.00 move=0 large=0 dir=1 rot=0.00)
+      xo curve( 56.57,300.00 63.07,301.29 69.13,303.81 )
+      xo curve( 75.20,306.32 80.71,310.00 85.36,314.64 )
+      xo curve( 90.00,319.29 93.68,324.80 96.19,330.87 )
+      xo curve( 98.71,336.93 100.00,343.43 100.00,350.00 )
+      xo curve( 100.00,350.00 100.00,350.00 100.00,350.00 )
+    xo stroke (black)
+    xo restore
+  end handling path
+  start handling path (SVGPDF::Path)
+  path d="M250 300 A 50 50, 0,..."
+    xo save
+    path stroke-width=3 stroke=black fill=none
+    xo move(250.00,300.00)
+    xo arc(50.00,50.00 0.00 1,1 300.00,350.00)
+    circular_arc(250.00,300.00 300.00,350.00 50.00 move=0 large=1 dir=1 rot=0.00)
+      xo curve( 250.00,293.43 251.29,286.93 253.81,280.87 )
+      xo curve( 256.32,274.80 260.00,269.29 264.64,264.64 )
+      xo curve( 269.29,260.00 274.80,256.32 280.87,253.81 )
+      xo curve( 286.93,251.29 293.43,250.00 300.00,250.00 )
+      xo curve( 306.57,250.00 313.07,251.29 319.13,253.81 )
+      xo curve( 325.20,256.32 330.71,260.00 335.36,264.64 )
+      xo curve( 340.00,269.29 343.68,274.80 346.19,280.87 )
+      xo curve( 348.71,286.93 350.00,293.43 350.00,300.00 )
+      xo curve( 350.00,306.57 348.71,313.07 346.19,319.13 )
+      xo curve( 343.68,325.20 340.00,330.71 335.36,335.36 )
+      xo curve( 330.71,340.00 325.20,343.68 319.13,346.19 )
+      xo curve( 313.07,348.71 306.57,350.00 300.00,350.00 )
+    xo stroke (black)
+    xo restore
+  end handling path
+  start handling text (SVGPDF::Text)
+  text  x=100 y=20 anchor="middle"
+    xo save
+    txt translate( 100.00, 20.00 ) scale( 1.00 -1.00 )
+      xo save
+      xo restore
+      xo save
+      tspan  x=100 dy=20 anchor="middle"
+      txt translate( 100.00, 20.00 )
+        xo save
+        xo restore
+      tspan moved to 162.67, 40
+      xo restore
+      xo save
+      xo restore
+    xo restore
+  end handling text
+  start handling text (SVGPDF::Text)
+  text  x=300 y=20 anchor="middle"
+    xo save
+    txt translate( 300.00, 20.00 ) scale( 1.00 -1.00 )
+      xo save
+      xo restore
+      xo save
+      tspan  x=300 dy=20 anchor="middle"
+      txt translate( 300.00, 20.00 )
+        xo save
+        xo restore
+      tspan moved to 362.67, 40
+      xo restore
+      xo save
+      xo restore
+    xo restore
+  end handling text
+  start handling text (SVGPDF::Text)
+  text  x=100 y=220 anchor="middle"
+    xo save
+    txt translate( 100.00, 220.00 ) scale( 1.00 -1.00 )
+      xo save
+      xo restore
+      xo save
+      tspan  x=100 dy=20 anchor="middle"
+      txt translate( 100.00, 20.00 )
+        xo save
+        xo restore
+      tspan moved to 162.67, 240
+      xo restore
+      xo save
+      xo restore
+    xo restore
+  end handling text
+  start handling text (SVGPDF::Text)
+  text  x=300 y=220 anchor="middle"
+    xo save
+    txt translate( 300.00, 220.00 ) scale( 1.00 -1.00 )
+      xo save
+      xo restore
+      xo save
+      tspan  x=300 dy=20 anchor="middle"
+      txt translate( 300.00, 20.00 )
+        xo save
+        xo restore
+      tspan moved to 362.67, 240
+      xo restore
+      xo save
+      xo restore
+    xo restore
+  end handling text
+==== end svg ====

@@ -1,8 +1,9 @@
-#!perl -w
+#!perl
+use strict;
+use warnings;
 
 use Test;
 use IPC::Run3::ProfPP;
-use strict;
 
 my $p = IPC::Run3::ProfPP->new;
 

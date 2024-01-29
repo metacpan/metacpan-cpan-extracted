@@ -1,0 +1,21 @@
+Game::Deckar - a module for managing decks of cards
+
+this module can be installed using cpanm:
+
+  cpanm Game::Deckar
+
+
+run perldoc(1) on Game::Deckar for documentation
+
+
+to author a new release:
+
+  perl Build.PL
+  ./Build testcover
+  RELEASE_TESTING=1 ./Build test
+  ./Build disttest
+  ./Build dist
+  git tag v...
+  cpan-upload ...
+  git push ...
+  ./Build realclean

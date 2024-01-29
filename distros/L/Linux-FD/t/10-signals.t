@@ -1,10 +1,9 @@
 # perl -T
 
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 use Test::More 0.89;
-use Test::Exception;
 
 use Linux::FD 'signalfd';
 use IO::Select;
@@ -36,7 +35,7 @@ is $sig_info->{signo}, SIGUSR1, 'Received SIGUSR1';
 
 ok !$selector->can_read(0), 'Can\'t read signalfd after signal reception';
 
-lives_ok { signalfd(SIGUSR1) } 'signalfd accepts signal number';
-lives_ok { signalfd('USR1') } 'signalfd accepts signal name';
+ok eval { signalfd(SIGUSR1) }, 'signalfd accepts signal number';
+ok eval { signalfd('USR1') }, 'signalfd accepts signal name';
 
 done_testing;

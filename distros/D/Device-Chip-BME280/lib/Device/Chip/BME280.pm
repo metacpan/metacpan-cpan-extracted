@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Device::Chip::BME280 0.06;
+package Device::Chip::BME280 0.07;
 class Device::Chip::BME280
    :isa(Device::Chip::Base::RegisteredI2C);
 
@@ -56,10 +56,22 @@ concepts or features, only the use of this module to access them.
 
 =cut
 
-method I2C_options
+=head1 MOUNT PARAMETERS
+
+=head2 addr
+
+The I²C address of the device. Can be specified in decimal, octal or hex with
+leading C<0> or C<0x> prefixes.
+
+=cut
+
+method I2C_options ( %params )
 {
+   my $addr = delete $params{addr} // 0x76;
+   $addr = oct $addr if $addr =~ m/^0/;
+
    return (
-      addr        => 0x76,
+      addr        => $addr,
       max_bitrate => 400E3,
    );
 }
@@ -101,7 +113,7 @@ instances.
 
 =head2 read_id
 
-   $id = await $chip->read_id
+   $id = await $chip->read_id;
 
 Returns the chip ID.
 
@@ -114,7 +126,7 @@ async method read_id
 
 =head2 read_config
 
-   $config = await $chip->read_config
+   $config = await $chip->read_config;
 
 Returns a C<HASH> reference containing the chip config, using fields named
 from the data sheet.
@@ -138,7 +150,7 @@ async method read_config ()
 
 =head2 change_config
 
-   await $chip->change_config( %changes )
+   await $chip->change_config( %changes );
 
 Writes updates to the configuration registers.
 
@@ -190,7 +202,7 @@ async method read_status ()
 
 =head2 read_raw
 
-   ( $adc_P, $adc_T, $adc_H ) = await $chip->read_raw
+   ( $adc_P, $adc_T, $adc_H ) = await $chip->read_raw;
 
 Returns three integers containing the raw ADC reading values from the sensor.
 
@@ -281,7 +293,7 @@ async method _compensate_humidity ( $adc_H )
 
 =head2 read_sensor
 
-   ( $pressure, $temperature, $humidity ) = await $chip->read_sensor
+   ( $pressure, $temperature, $humidity ) = await $chip->read_sensor;
 
 Returns the sensor readings appropriately converted into units of Pascals for
 pressure, degrees Celcius for temperature, and percentage relative for

@@ -5,14 +5,14 @@ hax/sv_numeq.c.inc
 hax/sv_streq.c.inc
 lib/Syntax/Operator/Identical.pm
 lib/Syntax/Operator/Identical.xs
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01identical.t
 t/11func.t
 t/12deparse.t
 t/80match-identical.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

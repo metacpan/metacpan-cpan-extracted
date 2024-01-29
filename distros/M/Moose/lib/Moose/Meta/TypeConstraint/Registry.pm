@@ -1,5 +1,5 @@
 package Moose::Meta::TypeConstraint::Registry;
-our $VERSION = '2.2206';
+our $VERSION = '2.2207';
 
 use strict;
 use warnings;
@@ -78,7 +78,7 @@ Moose::Meta::TypeConstraint::Registry - registry for type constraints
 
 =head1 VERSION
 
-version 2.2206
+version 2.2207
 
 =head1 DESCRIPTION
 

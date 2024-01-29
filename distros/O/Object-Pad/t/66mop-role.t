@@ -5,7 +5,7 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad ':experimental(mop)';
+use Object::Pad 0.800 ':experimental(mop)';
 
 role Example {
    no warnings 'deprecated';
@@ -23,7 +23,9 @@ ok( !$meta->is_class, '$meta->is_class false' );
 is( [ $meta->required_method_names ], [qw( a_method b_method )],
    '$meta->required_method_names' );
 
-class Implementor :does(Example) {
+class Implementor {
+   apply Example;
+
    method a_method {}
    method b_method {}
 }
@@ -36,7 +38,7 @@ is( [ Object::Pad::MOP::Class->for_class( "Implementor" )->all_roles ],
    [ $meta ],
    '$meta->all_roles on implementing class' );
 
-class Inheritor :isa(Implementor) {}
+class Inheritor { inherit Implementor; }
 
 # Roles via subclass
 {

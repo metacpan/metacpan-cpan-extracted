@@ -32,10 +32,10 @@ Sidef is a modern, high-level, general-purpose programming language, inspired by
 
 ### WWW
 
-* [Beginner's tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/23.11/sidef-tutorial.pdf))
-* [Number theory tutorial](https://codeberg.org/trizen/sidef/src/branch/master/NUMBER_THEORY_TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/23.11/sidef-number-theory.pdf))
+* [Beginner's tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/24.01/sidef-tutorial.pdf))
+* [Number theory tutorial](https://codeberg.org/trizen/sidef/src/branch/master/NUMBER_THEORY_TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/24.01/sidef-number-theory.pdf))
 * RosettaCode: https://rosettacode.org/wiki/Sidef
-* Gitbook: https://trizen.gitbook.io/sidef-lang/ ([legacy](https://trizen.gitbooks.io/sidef-lang)) ([PDF](https://github.com/trizen/sidef/releases/download/23.11/sidef-book.pdf))
+* Gitbook: https://trizen.gitbook.io/sidef-lang/ ([legacy](https://trizen.gitbooks.io/sidef-lang)) ([PDF](https://github.com/trizen/sidef/releases/download/24.01/sidef-book.pdf))
 
 ### Q&A
 
@@ -184,7 +184,7 @@ Output:
 
 ### LICENSE AND COPYRIGHT
 
-* Copyright (C) 2013-2023 Daniel Șuteu, Ioana Fălcușan
+* Copyright (C) 2013-2024 Daniel Șuteu, Ioana Fălcușan
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the *Artistic License (2.0)*. You may obtain a copy

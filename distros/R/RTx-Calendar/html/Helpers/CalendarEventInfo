@@ -1,0 +1,84 @@
+<%args>
+$event
+</%args>
+<%init>
+my @event_details = split /-/, $event;
+my $object_type = $event_details[0]; # ticket or reminder
+my $ticket_id = $event_details[1];
+my $Object = RT::Ticket->new($session{'CurrentUser'});
+$Object->Load($ticket_id);
+
+my $status;
+my $TicketId;
+my $subject = $Object->Subject;
+
+if ($Object->Type eq 'reminder') {
+    if ($Object->RefersTo->First) {
+	my $ticket   = $Object->RefersTo->First->TargetObj;
+	$TicketId = $ticket->Id;
+	$subject = $Object->Subject . " (" . $ticket->Subject . ")";
+        $status = $Object->Status;
+    }
+} else {
+    $TicketId = $Object->Id;
+    $subject = $Object->Subject;
+    $status = $Object->Status;
+}
+
+my @display_fields = ();
+if ( RT->Config->Get('CalendarPopupFields') ) {
+    @display_fields = RT->Config->Get('CalendarPopupFields');
+}
+
+RT->Logger->warning("No CalendarPopupFields defined. Popups will have no extra information.")
+    unless @display_fields;
+
+my %label_of;
+for my $field (@display_fields) {
+    my $label = $field;
+    $label =~ s'Obj-.(?:AsString|Name|ISO)''g;
+    $label =~ s'-\>MemberEmailAddressesAsString''g;
+    $label =~ s/CustomField\.\{(.*)\}/$1/g;
+    $label_of{$field} = $label;
+}
+</%init>
+<a href="<%$RT::WebPath%>/Ticket/Display.html?id=<%$TicketId%>">
+    <% $Object->QueueObj->Name %> #<% $TicketId %>
+</a>
+:</strong> <% $subject%><br />
+<br />
+<%perl>
+# logic taken from Ticket/Search/Results.tsv
+foreach my $attr (@display_fields) {
+    my $value;
+
+    if ($attr =~ /(.*)->ISO$/ and $Object->$1->Unix <= 0) {
+        $value = '-';
+    } elsif ($attr =~ /CustomField\.\{(.*)\}$/) {
+        my $cf = $1;
+        my $cf_obj = $Object->LoadCustomFieldByIdentifier($cf);
+        unless ($cf_obj->id) {
+            $RT::Logger->debug("Custom field '$cf' not available for ticket #".$Object->id);
+            next;
+        }
+        $value = $Object->FirstCustomFieldValue($cf);
+        if (grep { $_ eq $cf_obj->Type} qw(DateTime Date)) {
+            my $date_value = RT::Date->new($session{'CurrentUser'});
+            my $date_format = $cf_obj->Type eq 'DateTime' ? 'ISO' : 'unknown';
+            $date_value->Set(Format => $date_format, Value => $value);
+            $value = $date_value->AsString( Timezone => 'user', Time => $cf_obj->Type eq 'DateTime' ? 1 : 0 );
+        }
+    } else {
+        my $method = '$Object->'.$attr.'()';
+        $method =~ s/->ISO\(\)$/->ISO( Timezone => 'user' )/;
+        $value = eval $method;
+        if ($@) {
+            RT->Logger->error("Check your CalendarPopupFields config. Failed to find \"$attr\" - ". $@);
+            $value = '-';
+        };
+    }
+</%perl>
+	<strong><&|/l&><% $label_of{$attr} %></&>:</strong> <% $value %><br />
+% }
+<br />
+% $m->abort;

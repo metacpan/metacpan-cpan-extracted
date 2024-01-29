@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Bas - Package for language Basaa
 
 package Locale::CLDR::Locales::Bas;
 # This file auto generated from Data\common\main\bas.xml
-#	on Tue  5 Dec  1:01:38 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'Hɔp u akan',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Àŋdɔ̂r',
  			'AE' => 'Àdnà i Bilɔ̀ŋ bi Arābìà',
@@ -214,7 +214,6 @@ has 'display_name_region' => (
  			'MD' => 'Moldavìà',
  			'MG' => 'Màdàgàskâr',
  			'MH' => 'Bìòn bi Marcàl',
- 			'MK' => 'Màsèdonìà',
  			'ML' => 'Màli',
  			'MM' => 'Myànmâr',
  			'MN' => 'Mòŋgolìà',
@@ -330,7 +329,7 @@ has 'characters' => (
 			auxiliary => qr{[q x]},
 			index => ['A', 'B', 'Ɓ', 'C', 'D', 'E', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
 			main => qr{[a á à â ǎ ā {a᷆}{a᷇} b ɓ c d e é è ê ě ē {e᷆}{e᷇} ɛ {ɛ́} {ɛ̀} {ɛ̂} {ɛ̌} {ɛ̄} {ɛ᷆}{ɛ᷇} f g h i í ì î ǐ ī {i᷆}{i᷇} j k l m n ń ǹ ŋ o ó ò ô ǒ ō {o᷆}{o᷇} ɔ {ɔ́} {ɔ̀} {ɔ̂} {ɔ̌} {ɔ̄} {ɔ᷆}{ɔ᷇} p r s t u ú ù û ǔ ū {u᷆}{u᷇} v w y z]},
-			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT

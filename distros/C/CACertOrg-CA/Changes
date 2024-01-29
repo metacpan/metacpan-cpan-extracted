@@ -1,5 +1,9 @@
 Revision history for Perl module CACertOrg::CA
 
+20210114.002 2024-01-14T04:56:48Z
+	* refresh distro, update email addresses
+	* the certificate has not changed
+
 20210114.001 2021-01-15T08:18:50Z
 	* freshen the distro
 	* package the latest Class 1 key from CACert

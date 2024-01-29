@@ -1,0 +1,52 @@
+{
+   "abstract" : "Dates and Times",
+   "author" : [
+      "Yuki Kimoto<kimoto.yuki@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SPVM-Time-Piece",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "SPVM" : "0.989064"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "SPVM" : "0.989064",
+            "SPVM::Sys" : "0.512",
+            "SPVM::Time::Local" : "0.110"
+         }
+      },
+      "test" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git"
+      }
+   },
+   "version" : "0.003",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

@@ -1,6 +1,7 @@
 # CHECKSUMS file written on Mon Jan 28 13:21:04 2008 GMT by CPAN::Checksums (v1.064)
 $cksum = {
   'Bogus-OSUnsupported-0.01.tar.gz' => {
+    'cpan_path' => 'A/AN/ANDK',
     'md5' => '1e054a7da63e22a7b5acb98baaa47eb3',
     'md5-ungz' => '8cf33a880347adb0376b7ab6b5a16dff',
     'mtime' => '2008-01-27',

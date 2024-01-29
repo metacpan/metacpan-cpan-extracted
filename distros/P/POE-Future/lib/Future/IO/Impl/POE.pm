@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
-package Future::IO::Impl::POE;
+package Future::IO::Impl::POE 0.05;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Future::IO::ImplBase );
 

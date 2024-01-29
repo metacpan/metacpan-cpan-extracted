@@ -30,67 +30,99 @@ METHODS
 
     *       "bibliographic_level"
 
-            TODO
+            Bibliographic level flag.
+
+            Default values is undef.
 
     *       "char_coding_scheme"
 
-            TODO
+            Character coding scheme.
+
+            Default values is undef.
 
     *       "data_base_addr"
 
-            TODO
+            Base address of data.
+
+            Default values is undef.
 
     *       "descriptive_cataloging_form"
 
-            TODO
+            Descriptive cataloging form.
+
+            Default values is undef.
 
     *       "encoding_level"
 
-            TODO
+            Encoding level.
+
+            Default values is undef.
 
     *       "impl_def_portion_len"
 
-            TODO
+            Length of the implementation-defined portion.
+
+            Default values is undef.
 
     *       "indicator_count"
 
-            TODO
+            Indicator count.
+
+            Default values is undef.
 
     *       "length"
 
-            TODO
+            Record length.
+
+            Default values is undef.
 
     *       "length_of_field_portion_len"
 
-            TODO
+            Length of the length-of-field portion.
+
+            Default values is undef.
 
     *       "multipart_resource_record_level"
 
-            TODO
+            Multipart resource record level.
+
+            Default values is undef.
 
     *       "starting_char_pos_portion_len"
 
-            TODO
+            Length of the starting-character-position portion.
+
+            Default values is undef.
 
     *       "status"
 
-            TODO
+            Record status.
+
+            Default values is undef.
 
     *       "subfield_code_count"
 
-            TODO
+            Subfield code count.
+
+            Default values is undef.
 
     *       "type"
 
-            TODO
+            Type of record.
+
+            Default values is undef.
 
     *       "type_of_control"
 
-            TODO
+            Type of control.
+
+            Default values is undef.
 
     *       "undefined"
 
-            TODO
+            Undefined.
+
+            Default values is undef.
 
     Returns instance of object.
 
@@ -104,81 +136,152 @@ METHODS
   "char_coding_scheme"
      my $char_coding_scheme = $obj->char_coding_scheme;
 
-    TODO
+    Get character coding scheme.
+
+    Returns character.
 
   "data_base_addr"
      my $data_base_addr = $obj->data_base_addr;
 
-    TODO
+    Get base address of data.
+
+    Returns number.
 
   "descriptive_cataloging_form"
      my $descriptive_cataloging_form = $obj->descriptive_cataloging_form;
 
-    TODO
+    Get descriptive cataloging form.
+
+    Returns character.
 
   "encoding_level"
      my $encoding_level = $obj->encoding_level;
 
-    TODO
+    Get encoding level.
+
+    Returns character.
 
   "impl_def_portion_len"
      my $impl_def_portion_len = $obj->impl_def_portion_len;
 
-    TODO
+    Get length of the implementation-defined portion.
+
+    Returns character.
 
   "indicator_count"
      my $indicator_count = $obj->indicator_count;
 
-    TODO
+    Get indicator count.
+
+    Returns character.
 
   "length"
      my $length = $obj->length;
 
-    TODO
+    Get record length.
+
+    Returns number.
 
   "length_of_field_portion_len"
      my $length_of_field_portion_len = $obj->length_of_field_portion_len;
 
-    TODO
+    Get length of the length-of-field portion
+
+    Returns character.
 
   "multipart_resource_record_level"
      my $multipart_resource_record_level = $obj->multipart_resource_record_level;
 
-    TODO
+    Get multipart resource record level.
+
+    Returns character.
 
   "starting_char_pos_portion_len"
      my $starting_char_pos_portion_len = $obj->starting_char_pos_portion_len;
 
-    TODO
+    Get length of the starting-character-position portion.
+
+    Returns character.
 
   "status"
      my $status = $obj->status;
 
-    TODO
+    Get record status.
+
+    Returns character.
 
   "subfield_code_count"
      my $subfield_code_count = $obj->subfield_code_count;
 
-    TODO
+    Get subfield code count.
+
+    Returns character.
 
   "type"
      my $type = $obj->type;
 
-    TODO
+    Get type of record.
+
+    Returns character.
 
   "type_of_control"
      my $type_of_control = $obj->type_of_control;
 
-    TODO
+    Get type of control.
+
+    Returns character.
 
   "undefined"
      my $undefined = $obj->undefined;
 
-    TODO
+    Get undefined.
+
+    Returns character.
 
 ERRORS
      new():
-             TODO
+             Parameter 'bibliographic_level' must be one of defined strings.
+                     String: %s
+                     Possible strings: a b c d i m s
+             Parameter 'char_coding_scheme' must be one of defined strings.
+                     String: %s
+                     Possible strings: ' ' a
+             Parameter 'descriptive_cataloging_form' must be one of defined strings.
+                     String: %s
+                     Possible strings: ' ' a c i n u
+             Parameter 'encoding_level' must be one of defined strings.
+                     String: %s
+                     Possible strings: ' ' 1 2 3 4 5 7 8 u z
+             Parameter 'impl_def_portion_len' must be one of defined strings.
+                     String: %s
+                     Possible strings: 0
+             Parameter 'indicator_count' must be one of defined strings.
+                     String: %s
+                     Possible strings: 2
+             Parameter 'length_of_field_portion_len' must be one of defined strings.
+                     String: %s
+                     Possible strings: 4
+             Parameter 'multipart_resource_record_level' must be one of defined strings.
+                     String: %s
+                     Possible strings: ' ' a b c
+             Parameter 'starting_char_pos_portion_len' must be one of defined strings.
+                     String: %s
+                     Possible strings: 5
+             Parameter 'status' must be one of defined strings.
+                     String: %s
+                     Possible strings: a c d n p
+             Parameter 'subfield_code_count' must be one of defined strings.
+                     String: %s
+                     Possible strings: 2
+             Parameter 'type' must be one of defined strings.
+                     String: %s
+                     Possible strings: a c d e f g i j k m o p r t
+             Parameter 'type_of_control' must be one of defined strings.
+                     String: %s
+                     Possible strings: ' ' a
+             Parameter 'undefined' must be one of defined strings.
+                     String: %s
+                     Possible strings: 0
 
 EXAMPLE
      use strict;
@@ -251,10 +354,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2023 Michal Josef Špaček
+    © 2023-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

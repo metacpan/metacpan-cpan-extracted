@@ -1,0 +1,104 @@
+# NAME
+
+Socket::More::Lookup - System DNS lookup routines
+
+# SYNOPSIS
+
+```perl
+use Socket::More::Lookup;
+use Socket::More::Constants;
+
+# Converte a host name to one or more address structures
+my $res=getaddrinfo( "www.google.com", 80, {family=>AF_INET}, my @results);
+die gai_strerror($!) unless $res;
+
+# Convert an addres structure to a hostname and port
+my $res=getnameinfo($addr, my $host="", my $port="", $flags);
+die gai_strerror($!) unless $res;
+```
+
+# DESCRIPTION
+
+Bindings to getaddrinfo, getnameinfo, gai\_strerror with calling a convention
+more inline with the C library, and Perl's 'sys\*' subroutines. That is, the
+return value of get\*info is 'true' value on success and `undef` on failure,
+with `$!` containing the error code.
+
+The actual results are stored arguments, not returned as a combined err/results
+list like the [Socket](https://metacpan.org/pod/Socket) implementation.
+
+This module is part of [Socket::More](https://metacpan.org/pod/Socket%3A%3AMore) but exists as a standalone package for
+better reuse and smaller memory footprint 
+
+# API
+
+## getaddrinfo
+
+```perl
+my $res=getaddrinfo($host, $port, $hints, @results)
+```
+
+Calls the `getaddrinfo` library function to resolve the address information of
+`$host`. The `$port` variable is filled into the resulting address structure.
+
+The address structures returned are influenced by the `$hints` hash with keys
+**flags**, **family**, **type** and **protocal**. Please refer to the man page of
+getaddrinfo for details.
+
+Results, if any are are stored in `@results`. Each entry in the results array
+is a hash with the keys **family**, **type**, **protocal**, **addr** and
+`cannonname`. Please refer to the main page of getaddrinfo for details.
+
+Returns true on success, on `undef` on failure. In the later case `$!` is set
+to the numeric error code, which can then be converted to a string via
+`gai_strerror`.
+
+## getnaminfo
+
+```perl
+my $res=getnameinfo($sock_addr, $host, $port);
+my $res=getnameinfo($sock_addr, my $host="", my $port="",$flags);
+```
+
+Calls the `getnameinfo`library function to convert a known address structure
+to a host and port. The resulting hostname and port number are stored in the
+arguments `$host` and `$port`. This must be defined string and writable
+variables.
+
+The output is influenced by the `$flags` argument. Please refer to the man
+page of getnameinfo for details.
+
+Returns true on success, on undef on failure. In the later case `$!` is set to
+the numeric error code, which can then be converted to a string via
+`gai_strerror`
+
+## gai\_strerror
+
+```perl
+my $string=gai_strerror($code)
+```
+
+Converts a numerical error code returned from either getaddrinfo or getnameinfo
+into a human readable string. Please refer to man page of gai\_strerror for more
+details
+
+# AUTHOR
+
+Ruben Westerberg, <drclaw@mac.com>
+
+# REPOSITORTY and BUGS
+
+Please report any bugs via git hub: [http://github.com/drclaw1394/perl-socket-more-lookup](http://github.com/drclaw1394/perl-socket-more-lookup)
+
+# COPYRIGHT AND LICENSE
+
+Copyright (C) 2023 by Ruben Westerberg
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl or the MIT license.
+
+# DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS FOR A PARTICULAR PURPOSE.

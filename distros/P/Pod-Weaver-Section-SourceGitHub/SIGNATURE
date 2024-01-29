@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.80.
+signed via the Module::Signature module, version 0.88.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,35 +12,35 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA256
+Hash: RIPEMD160
 
-SHA1 ea7ccd9aeb4086b0cb5ed1e83b9fd1d7f7b50fbe Changes
-SHA1 dd31f242fe1032bc39b741771b08dfff7a396aaf LICENSE
-SHA1 22050ec806750dd106f8112ba5d9a052464ad8b5 MANIFEST
-SHA1 dfc3b2e64d8af9154ac417d7082892803722040a MANIFEST.SKIP
-SHA1 5030fab256b01952d5003c983262f146daa6c314 META.json
-SHA1 039e5092789255e2047a4422073157eedfeadca6 META.yml
-SHA1 66b934d6999e072a2ef33bb7fe7b53c47e924d9b Makefile.PL
-SHA1 4b339ff55d05a49996b1455c0258bf1e63103cb7 README
-SHA1 3f1ecb453a84a5d05ed5b061281c491a013347fd lib/Pod/Weaver/Section/SourceGitHub.pm
-SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
-SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
-SHA1 19cc343f8a85c6805bbeb02580487483a6283887 t/author-signature.t
-SHA1 b75fb765351465e34c836e8608be1c3c6525d1cf t/compile.t
+SHA256 93a40179372990e04b74ca678a9167a715ee5a002dc27e7ef42d30ea5927357b Changes
+SHA256 7977f11797d726bb1d09592aabbb02a209fc64a6fe1ff7b9bf1ffe3c1f8290ce LICENSE
+SHA256 dc34e9571c84c3f05fa39d9472980595c0e14cb512b3b9858d49cd14de28a626 MANIFEST
+SHA256 869ecc638edbd81b1db408d5c37321bc4cb896a84512018df413492473cbfff2 MANIFEST.SKIP
+SHA256 d9c486ada34401d98829c078174d69f001d669a26701fa667ebfc5a828f37bc5 META.json
+SHA256 b455736d0fa7b079ebdf6203d409198e0c561ffea499ea5b96e0ed8a52194f49 META.yml
+SHA256 6c376710399e50dd7bc54d1bfaf2953f31d04c19bceab4732bbb1cba6ef0f995 Makefile.PL
+SHA256 5f430f18bf1722ae7e85a8e6e0ef46ac3720af291c59a7433ed3a2643b9e0caf README
+SHA256 07a75b7b52fa5f109cbbf88a8288e6037a2cbc7896b675228952a3f3663d0e41 lib/Pod/Weaver/Section/SourceGitHub.pm
+SHA256 b6b98c35caa1713f7b7d10283e033065eb578adc8ac59c71ee2ed97671cfecb1 t/author-pod-coverage.t
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 9a339818bc8fe7f23595b06538321f26436cb3318c81446d88cd8af2d2ff4806 t/author-signature.t
+SHA256 c1ae9e7d5e4aa0bf4929e8e62e018f3516794b7c28e2a977450f8b15bfe65e5e t/compile.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iQIVAwUBWX+GyaQl27WkM10aAQgxMw/+PU7yjwq5kkoLbfPQmJyGNmAV9gxOr15W
-xpaqdw0aCjyVm2/aXjjrFu2so7lgC/7MYXP5sq7H9DwZtQyt3WfQp4A0kfo2qyc0
-gUKmacXjduGfU2A+52c8WyqrJZ960AI4wP/5uU6h6TTVL6jg6fD2bxZTSOzfiP0H
-9LLDN44Py8+GJkus1Cfedg+jHlFHIjtVPLMYUs/iRFx/NWXnCsLkCgv2xVI/PLkX
-x2VfG99ladBkxPQiaA1Ssku6NkzoX2k6LqOJx8NPSvoYNGrcohOgBnJn4wFlCuTD
-npSKVjPYtW2Ylph4idNo1XaarcUw8f/avlkPoFTMLMCj5Z33QYdVMS7D/yAueQ+G
-wJxgPdgm4umhtmfCghk2VZ+dNmGGqLNp4zxQUe9O1ulTPh4Mp3UWqK/2oqEIRGN5
-bw8DrD7LUvHL9wJXtp9Q/RBX6H1xCq8Amyk61J1OzVQFUWIFbttAX2YV2FJXHUoT
-E+hyNcoH4dQk6U2Q7kf2SkjwYJZFT6Um5Vh6OAI4SbGrRKrLaY8mjnVNTSMIbJa9
-BEJak+vxBYlODvCjQdx8RJsINckraU0Q63K+yIwiLr+VDSOk9fjY9+IQqIHTXbng
-4z4WB3FYW/MJowzXJb+Kp/d442jicP9fm0vjdsG3RfHHQ6TwRq4YZl/f+KyC6311
-ll7meLsZcNk=
-=VZKb
+iQJFBAEBAwAvFiEE2EtuRfhGgngE8PsARAzvLrlUzY4FAmWukaYRHG1zY2hvdXRA
+Y3Bhbi5vcmcACgkQRAzvLrlUzY4Hfw//XMrgi8mpFrPKyR177d6enx3XuipdCn5o
+m0lg57JqV084DcO/0vtZS6vpyNipbbuoEBrXkrhgt7oUHfYzUPvbvm94WYjz1R1M
+jSAK8PwTg+LFQuW9OwVNdmOF6mdyOlIhROnzCBzodcSpNkGe2Z8MZ/vqMHbJvHIC
+ZuGBO8cESDgA2jJsMQVrlrDFy5woE+kj4/RKlQEID4CbEAUgjoKq3YljqxqhR74e
+FDwlQeIr6f3E3f05bkgmil7WekNYBeoV6fAS+SNFswPopM6U9OEAnO+WK2Ze4l6v
+iaApGt1xutYJoVmz1Mye/3LHNzjNOF0KOqO+Z9RoSO3wEhl329GwD6FVMhVyXGms
+lKgHlnGTL3GLmCeoHhn5OO6FTUwZe2utqMyN/bkMZCWC6i4jFVO3e5+zF3JVVqWB
+HA9hpGVguIvqp9tRWBd1hYsMoBnP4yaEQjugp60v67fu9vI3e1qZiTsFQqpd9Z2c
+9roKjyBdmmM6F5k4OHIazbk+CquDjsWydujRV3xZPJNrbvQnvm5/Jsq2fMh8wmIs
++IoNVe8Ka7rF+0G4m2oY7yAMPwuypbmOfjGdznbnZn0zWs4Jqoih9FlPmHlOYoO/
+EPE4qPuuLblsE554Yk2Ip4Gs+57+Zr3s/2tM2Ilxqp7KC1eWcbAxVyeHErQNDJhF
+17zAxKcSlZ4=
+=eVGu
 -----END PGP SIGNATURE-----

@@ -1,5 +1,8 @@
 Revision history for Perl extension DBIx::Class::Schema::Loader
 
+0.07052 - 2024-01-06
+        - fix: don't load Test::More in ::Utils
+
 0.07051 - 2022-11-23
         - Make defaulting primary key columns retrieve_on_insert for Pg (GH#28)
 

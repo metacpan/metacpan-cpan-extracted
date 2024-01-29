@@ -1,6 +1,6 @@
 HTML::AutoTag
 =============
-Just another HTML tag generator. [![CPAN Version](https://badge.fury.io/pl/HTML-AutoTag.svg)](https://metacpan.org/pod/HTML::AutoTag) [![Build Status](https://api.travis-ci.org/jeffa/HTML-AutoTag.svg?branch=master)](https://travis-ci.org/jeffa/HTML-AutoTag)
+Just another HTML tag generator. [![CPAN Version](https://badge.fury.io/pl/HTML-AutoTag.svg)](https://metacpan.org/pod/HTML::AutoTag)
 
 Synopsis
 --------

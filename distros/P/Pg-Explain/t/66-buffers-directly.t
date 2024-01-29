@@ -61,7 +61,7 @@ cmp_deeply(
         'shared'  => { 'hit'  => 1,  'read'    => 2, 'dirtied' => 3, 'written' => 4, },
         'local'   => { 'hit'  => 5,  'read'    => 6, 'dirtied' => 7, 'written' => 8, },
         'temp'    => { 'read' => 9,  'written' => 10, },
-        'timings' => { 'read' => 11, 'write'   => 12, },
+        'timings' => { 'read' => 11, 'write'   => 12, 'info' => 'I/O Timings: read=11.000 write=12.000' },
     },
     $ex3->get_struct(),
     'Test 3 struct'
@@ -89,7 +89,7 @@ is(
   );
 is(
     $ex3->as_text,
-    "Buffers: shared hit=1 read=2 dirtied=3 written=4, local hit=5 read=6 dirtied=7 written=8, temp read=9 written=10\nI/O Timings: read=11 write=12",
+    "Buffers: shared hit=1 read=2 dirtied=3 written=4, local hit=5 read=6 dirtied=7 written=8, temp read=9 written=10\nI/O Timings: read=11.000 write=12.000",
     'Test 8 as_text call'
   );
 is(
@@ -97,15 +97,18 @@ is(
     "Buffers: local read=1",
     'Test 9 as_text call'
   );
-$ex1->add_timing( 'I/O Timings: read=1.2 write=3.4' );
-$ex2->add_timing( 'I/O Timings: read=5.6' );
+
+my $ex1_timing = 'I/O Timings: read=1.200 write=3.400';
+my $ex2_timing = 'I/O Timings: read=5.600';
+$ex1->add_timing( $ex1_timing );
+$ex2->add_timing( $ex2_timing );
 
 cmp_deeply(
     {
         'shared'  => { 'hit'  => 1,   'read'    => 2, 'dirtied' => 3, 'written' => 4, },
         'local'   => { 'hit'  => 5,   'read'    => 6, 'dirtied' => 7, 'written' => 8, },
         'temp'    => { 'read' => 9,   'written' => 10, },
-        'timings' => { 'read' => 1.2, 'write'   => 3.4, },
+        'timings' => { 'read' => 1.2, 'write'   => 3.4, 'info' => $ex1_timing },
     },
     $ex1->get_struct(),
     'Test 10 struct, post add_timing'
@@ -113,19 +116,19 @@ cmp_deeply(
 cmp_deeply(
     {
         'shared'  => { 'hit'  => 7, },
-        'timings' => { 'read' => 5.6 },
+        'timings' => { 'read' => 5.6, 'info' => $ex2_timing },
     },
     $ex2->get_struct(),
     'Test 11 struct, post add_timing'
 );
 is(
     $ex1->as_text,
-    "Buffers: shared hit=1 read=2 dirtied=3 written=4, local hit=5 read=6 dirtied=7 written=8, temp read=9 written=10\nI/O Timings: read=1.2 write=3.4",
+    "Buffers: shared hit=1 read=2 dirtied=3 written=4, local hit=5 read=6 dirtied=7 written=8, temp read=9 written=10\nI/O Timings: read=1.200 write=3.400",
     'Test 12 as_text call, post add_timing',
   );
 is(
     $ex2->as_text,
-    "Buffers: shared hit=7\nI/O Timings: read=5.6",
+    "Buffers: shared hit=7\nI/O Timings: read=5.600",
     'Test 13 as_text call, post add_timing'
   );
 

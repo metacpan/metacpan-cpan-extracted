@@ -8,13 +8,13 @@ Locale::CLDR::Locales::En::Any::Be - Package for language English
 
 package Locale::CLDR::Locales::En::Any::Be;
 # This file auto generated from Data\common\main\en_BE.xml
-#	on Tue  5 Dec  1:07:51 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -23,7 +23,7 @@ use if $^V ge v5.12.0, feature => 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
-extends('Locale::CLDR::Locales::En::Any::001');
+extends('Locale::CLDR::Locales::En::Any::150');
 has 'number_symbols' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -34,23 +34,6 @@ has 'number_symbols' => (
 			'group' => q(.),
 		},
 	} }
-);
-
-has 'number_currency_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'pattern' => {
-				'default' => {
-					'standard' => {
-						'positive' => '#,##0.00 ¤',
-					},
-				},
-			},
-		},
-} },
 );
 
 has 'day_period_data' => (
@@ -118,8 +101,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'eras' => (
@@ -157,10 +140,6 @@ has 'time_formats' => (
 		'generic' => {
 		},
 		'gregorian' => {
-			'full' => q{HH:mm:ss zzzz},
-			'long' => q{HH:mm:ss z},
-			'medium' => q{HH:mm:ss},
-			'short' => q{HH:mm},
 		},
 	} },
 );

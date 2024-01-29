@@ -1,15 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
+use warnings;
+use Object::Pad 0.807;
 
-package Tickit::Widget::GridBox 0.37;
-class Tickit::Widget::GridBox
-   :strict(params)
-   :isa(Tickit::ContainerWidget);
+package Tickit::Widget::GridBox 0.41;
+class Tickit::Widget::GridBox :strict(params);
+
+inherit Tickit::ContainerWidget;
 
 use experimental 'postderef';
 
@@ -85,7 +86,7 @@ use constant WIDGET_PEN_FROM_STYLE => 1;
 
 =head2 new
 
-   $gridbox = Tickit::Widget::GridBox->new( %args )
+   $gridbox = Tickit::Widget::GridBox->new( %args );
 
 Constructs a new C<Tickit::Widget::GridBox> object.
 
@@ -151,9 +152,9 @@ method children
 
 =head2 colcount
 
-   $count = $gridbox->rowcount
+   $count = $gridbox->rowcount;
 
-   $count = $gridbox->colcount
+   $count = $gridbox->colcount;
 
 Returns the number of rows or columns in the grid.
 
@@ -171,7 +172,7 @@ method colcount
 
 =head2 add
 
-   $gridbox->add( $row, $col, $child, %opts )
+   $gridbox->add( $row, $col, $child, %opts );
 
 Sets the child widget to display in the given grid cell. Cells do not need to
 be explicitly constructed; the grid will automatically expand to the size
@@ -213,7 +214,7 @@ method add
 
 =head2 remove
 
-   $gridbox->remove( $row, $col )
+   $gridbox->remove( $row, $col );
 
 Removes the child widget on display in the given cell. May shrink the grid if
 this was the last child widget in the given row or column.
@@ -260,7 +261,7 @@ method remove
 
 =head2 get
 
-   $child = $gridbox->get( $row, $col )
+   $child = $gridbox->get( $row, $col );
 
 Returns the child widget at the given cell in the grid. If the row or column
 index are beyond the bounds of the grid, or if there is no widget in the given
@@ -280,9 +281,9 @@ method get
 
 =head2 get_col
 
-   @children = $gridbox->get_row( $row )
+   @children = $gridbox->get_row( $row );
 
-   @children = $gridbox->get_col( $col )
+   @children = $gridbox->get_col( $col );
 
 Convenient shortcut to call C<get> on an entire row or column of the grid.
 
@@ -302,7 +303,7 @@ method get_col
 
 =head2 insert_row
 
-   $gridbox->insert_row( $before_row, [ @children ] )
+   $gridbox->insert_row( $before_row, [ @children ] );
 
 Inserts a new row into the grid by moving the existing rows after it lower
 down. Any child widgets in the referenced array will be set on the cells of
@@ -332,7 +333,7 @@ method insert_row
 
 =head2 insert_col
 
-   $gridbox->insert_col( $before_col, [ @children ] )
+   $gridbox->insert_col( $before_col, [ @children ] );
 
 Inserts a new column into the grid by moving the existing columns after it to
 the right. Any child widgets in the referenced array will be set on the cells
@@ -362,7 +363,7 @@ method insert_col
 
 =head2 append_row
 
-   $gridbox->append_row( [ @children ] )
+   $gridbox->append_row( [ @children ] );
 
 Shortcut to inserting a new row after the end of the current grid.
 
@@ -375,7 +376,7 @@ method append_row
 
 =head2 append_col
 
-   $gridbox->append_col( [ @children ] )
+   $gridbox->append_col( [ @children ] );
 
 Shortcut to inserting a new column after the end of the current grid.
 
@@ -396,7 +397,7 @@ method append_col
 
 =head2 delete_row
 
-   $gridbox->delete_row( $row )
+   $gridbox->delete_row( $row );
 
 Deletes a row of the grid by moving the existing rows after it higher up.
 
@@ -414,7 +415,7 @@ method delete_row
 
 =head2 delete_col
 
-   $gridbox->delete_col( $col )
+   $gridbox->delete_col( $col );
 
 Deletes a column of the grid by moving the existing columns after it to the
 left.

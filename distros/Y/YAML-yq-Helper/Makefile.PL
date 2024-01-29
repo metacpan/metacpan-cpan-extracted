@@ -4,14 +4,14 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-	NAME             => 'YAML::yq::Helper',
-	AUTHOR           => q{Zane C. Bowers-Hadley <vvelox@vvelox.net>},
-	VERSION_FROM     => 'lib/YAML/yq/Helper.pm',
-	ABSTRACT_FROM    => 'lib/YAML/yq/Helper.pm',
-	LICENSE          => 'artistic_2',
-	MIN_PERL_VERSION => '5.006',
-	INST_SCRIPT      => 'bin',
-    EXE_FILES=>['src_bin/yqh'],
+	NAME               => 'YAML::yq::Helper',
+	AUTHOR             => q{Zane C. Bowers-Hadley <vvelox@vvelox.net>},
+	VERSION_FROM       => 'lib/YAML/yq/Helper.pm',
+	ABSTRACT_FROM      => 'lib/YAML/yq/Helper.pm',
+	LICENSE            => 'artistic_2',
+	MIN_PERL_VERSION   => '5.006',
+	INST_SCRIPT        => 'bin',
+	EXE_FILES          => ['src_bin/yqh'],
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => '0',
 	},
@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
 	PREREQ_PM => {
 		'YAML'        => '0',
 		'File::Slurp' => '0',
+		'Pod::Usage'  => '0',
 	},
 	dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean      => { FILES    => 'YAML-yq-Helper-*' },

@@ -92,6 +92,8 @@ $SIG{USR1} = sub {
 # SIGINFO isn't standard.
 $SIG{INFO} = $SIG{USR1} if exists $SIG{INFO};
 
+my $table = Proc::ProcessTable->new;
+
 # TODO: if ptrace is available, it might be possible to attach to the process
 # to do something with the file descriptors.
 if (@pid) {
@@ -103,7 +105,6 @@ if (@pid) {
 
 exit print "Would exec command: @ARGV\n" if $dryrun;
 
-my $table = Proc::ProcessTable->new;
 pipe my ($parent_reader, $child_writer) or die "Can't pipe: $!";
 
 my ($pty, $termios, $ttyfh);

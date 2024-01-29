@@ -1,0 +1,49 @@
+---
+X_No_Archive: Yes
+abstract: 'A Command-line Bluesky Client'
+author:
+  - 'Sanko Robinson <sanko@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Test2::V0: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-bsky
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  App::bsky:
+    file: lib/App/bsky.pm
+    version: '0.03'
+  App::bsky::CLI:
+    file: lib/App/bsky.pm
+requires:
+  At: '0.15'
+  File::HomeDir: '0'
+  Getopt::Long: '0'
+  JSON::Tiny: '0'
+  Path::Tiny: '0'
+  Pod::Text::Color: '0'
+  Term::ANSIColor: '0'
+  perl: v5.38.0
+resources:
+  bugtracker: https://github.com/sanko/App-bsky/issues
+  homepage: https://github.com/sanko/App-bsky
+  repository: https://github.com/sanko/App-bsky.git
+version: '0.03'
+x_authority: cpan:SANKO
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

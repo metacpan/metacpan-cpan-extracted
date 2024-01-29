@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Recurse;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Recurse.pm 1930 2023-08-21 14:10:10Z willem $)[2];
+our $VERSION = (qw$Id: Recurse.pm 1959 2024-01-17 08:55:01Z willem $)[2];
 
 
 =head1 NAME
@@ -15,7 +15,6 @@ Net::DNS::Resolver::Recurse - DNS recursive resolver
     use Net::DNS::Resolver::Recurse;
 
     my $resolver = new Net::DNS::Resolver::Recurse();
-    $resolver->debug(1);
 
     $resolver->hints('198.41.0.4');	# A.ROOT-SERVER.NET.
 
@@ -51,14 +50,13 @@ drawn from a built-in list of IP addresses.
 =cut
 
 my @hints;
-my $root = [];
+my $root;
 
 sub hints {
 	my ( undef, @argument ) = @_;
 	return @hints unless scalar @argument;
-	$root  = [];
-	@hints = @argument;
-	return;
+	undef $root;
+	return @hints = @argument;
 }
 
 
@@ -79,7 +77,7 @@ and invoke send() indirectly.
 
 sub send {
 	my ( $self, @q ) = @_;
-	my @conf = ( recurse => 0, udppacketsize => 1024 );	# RFC8109
+	my @conf = ( recurse => 0, udppacketsize => 1232 );
 	return bless( {persistent => {'.' => $root}, %$self, @conf}, ref($self) )->_send(@q);
 }
 
@@ -95,12 +93,12 @@ sub _send {
 	my ( $self, @q ) = @_;
 	my $query = $self->_make_query_packet(@q);
 
-	unless ( scalar(@$root) ) {
+	unless ($root) {
 		$self->_diag("resolver priming query");
 		$self->nameservers( scalar(@hints) ? @hints : $self->_hints );
 		my $packet = $self->SUPER::send(qw(. NS));
-		$self->_callback($packet);
 		$self->_referral($packet);
+		$self->_callback($packet);
 		$root = $self->{persistent}->{'.'};
 	}
 
@@ -111,16 +109,31 @@ sub _send {
 sub _recurse {
 	my ( $self, $query, $apex ) = @_;
 	$self->_diag("using cached nameservers for $apex");
-	my $nslist = $self->{persistent}->{$apex};
-	$self->nameservers(@$nslist);
-	$query->header->id(undef);
-	my $reply = $self->SUPER::send($query);
+	my $cache  = $self->{persistent}->{$apex};
+	my @nslist = keys %$cache;
+	my @glue   = grep { $$cache{$_} } @nslist;
+	my @noglue = grep { !$$cache{$_} } @nslist;
+	my $reply;
+	foreach my $ns ( @glue, @noglue ) {
+		if ( my $iplist = $$cache{$ns} ) {
+			$self->nameservers(@$iplist);
+		} else {
+			$self->_diag("recover missing glue for $ns");
+			local $SIG{__WARN__} = sub { };		# silence warnings
+			next unless scalar( my @ip = $self->nameservers($ns) );
+			$$cache{$ns} = \@ip;
+		}
+		$query->header->id(undef);
+		last if $reply = $self->SUPER::send($query);
+		$$cache{$ns} = undef;				# park non-responder
+	}
 	$self->_callback($reply);
 	return unless $reply;
-	my $qname = lc( ( $query->question )[0]->qname );
-	my $zone  = $self->_referral($reply) || return $reply;
-	return $reply if grep { lc( $_->owner ) eq $qname } $reply->answer;
-	return $self->_recurse( $query, $zone );
+	my $zone = $self->_referral($reply) || return $reply;
+	die '_recurse exceeded depth limit' if $self->{recurse_depth}++ > 50;
+	my $qname  = lc( ( $query->question )[0]->qname );
+	my $suffix = substr( $qname, -length($zone) );
+	return $zone eq $suffix ? $self->_recurse( $query, $zone ) : undef;
 }
 
 
@@ -132,19 +145,20 @@ sub _referral {
 	return unless scalar(@auth);
 	my $owner = lc( $auth[0]->owner );
 	my $cache = $self->{persistent}->{$owner};
-	return $owner if $cache && scalar(@$cache);
-	my @addr = grep { $_->can('address') } $packet->additional, @ans;
-	my @ip;
-	my @ns = map { lc( $_->nsdname ) } @auth;
+	return scalar(@ans) ? undef : $owner if $cache;
 
-	foreach my $ns (@ns) {
-		push @ip, map { $ns eq lc( $_->owner ) ? $_->address : () } @addr;
+	$self->_diag("caching nameservers for $owner");
+	my %addr;
+	my @addr = grep { $_->can('address') } $packet->additional;
+	push @{$addr{lc $_->owner}}, $_->address foreach @addr;
+
+	my %cache;
+	foreach my $ns ( map { lc( $_->nsdname ) } @auth ) {
+		$cache{$ns} = $addr{$ns};
 	}
-	$self->_diag("resolving missing glue for $owner") unless scalar(@ip);
-	@ip = $self->nameservers( $ns[0], $ns[-1] )	  unless scalar(@ip);
-	$self->_diag("caching nameserver addresses for $owner");
-	$self->{persistent}->{$owner} = \@ip;
-	return $owner;
+
+	$self->{persistent}->{$owner} = \%cache;
+	return scalar(@ans) ? undef : $owner;
 }
 
 

@@ -1,5 +1,5 @@
 package Password::Policy::Rule;
-$Password::Policy::Rule::VERSION = '0.04';
+$Password::Policy::Rule::VERSION = '0.06';
 use strict;
 use warnings;
 
@@ -42,7 +42,7 @@ Password::Policy::Rule
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 AUTHOR
 

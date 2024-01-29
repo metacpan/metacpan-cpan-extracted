@@ -1,6 +1,6 @@
 package Cassandra::Client;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::VERSION = '0.20';
+$Cassandra::Client::VERSION = '0.21';
 # ABSTRACT: Perl library for accessing Cassandra using its binary network protocol
 
 use 5.010;
@@ -554,7 +554,7 @@ Cassandra::Client - Perl library for accessing Cassandra using its binary networ
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 DESCRIPTION
 

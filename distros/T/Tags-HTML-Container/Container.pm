@@ -19,7 +19,7 @@ Readonly::Hash our %VERT_CONV => (
 	'top' => 'flex-start',
 );
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub new {
 	my ($class, @params) = @_;
@@ -65,6 +65,36 @@ sub new {
 	return $self;
 }
 
+sub _cleanup {
+	my ($self, $cleanup_cb) = @_;
+
+	if (defined $cleanup_cb) {
+		$cleanup_cb->($self);
+	}
+
+	return;
+}
+
+sub _init {
+	my ($self, $init_cb) = @_;
+
+	if (defined $init_cb) {
+		$init_cb->($self);
+	}
+
+	return;
+}
+
+sub _prepare {
+	my ($self, $prepare_cb) = @_;
+
+	if (defined $prepare_cb) {
+		$prepare_cb->($self);
+	}
+
+	return;
+}
+
 sub _process {
 	my ($self, $tags_cb) = @_;
 
@@ -88,7 +118,7 @@ sub _process {
 }
 
 sub _process_css {
-	my $self = shift;
+	my ($self, $css_cb) = @_;
 
 	$self->{'css'}->put(
 		['s', '.'.$self->{'css_container'}],
@@ -98,6 +128,9 @@ sub _process_css {
 		['d', 'height', $self->{'height'}],
 		['e'],
 	);
+	if (defined $css_cb) {
+		$css_cb->($self);
+	}
 
 	return;
 }
@@ -119,8 +152,11 @@ Tags::HTML::Container - Tags helper for container.
  use Tags::HTML::Container;
 
  my $obj = Tags::HTML::Container->new(%params);
+ $obj->cleanup($cleanup_cb);
+ $obj->init($init_cb);
+ $obj->prepare($prepare_cb);
  $obj->process($tags_cb);
- $obj->process_css;
+ $obj->process_css($css_cb);
 
 =head1 METHODS
 
@@ -180,20 +216,50 @@ Default value is undef.
 
 =back
 
+=head2 C<cleanup>
+
+ $obj->cleanup($cleanup_cb);
+
+Cleanup L<Tags::HTML> object for container with code defined in C<$cleanup_cb> callback.
+This callback has one argument and this is C<$self> of container object.
+
+Returns undef.
+
+=head2 C<init>
+
+ $obj->init($init_cb);
+
+Initialize L<Tags::HTML> object (in page run) for container with code defined in C<$init_cb> callback.
+This callback has one argument and this is C<$self> of container object.
+
+Returns undef.
+
+=head2 C<prepare>
+
+ $obj->prepare($prepare_cb);
+
+Prepare L<Tags::HTML> object (in page preparation) for container with code defined in C<$prepare_cb> callback.
+This callback has one argument and this is C<$self> of container object.
+
+Returns undef.
+
 =head2 C<process>
 
  $obj->process($tags_cb);
 
-Process Tags structure for container with code defined in C<$tags_cb> callback.
+Process L<Tags> structure for container with code defined in C<$tags_cb> callback.
 This callback has one argument and this is C<$self> of container object.
+C<$tags_cb> is required argument.
 
 Returns undef.
 
 =head2 C<process_css>
 
- $obj->process_css;
+ $obj->process_css($css_cb);
 
-Process CSS::Struct structure for output.
+Process L<CSS::Struct> structure for output with code defined in C<$css_cb>
+callback. This callback has one argument and this is C<$self> of container
+object. C<$css_cb> is optional argument.
 
 Returns undef.
 
@@ -289,12 +355,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023 Michal Josef Špaček
+© 2023-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

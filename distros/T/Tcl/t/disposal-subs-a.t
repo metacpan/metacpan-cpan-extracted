@@ -25,7 +25,7 @@ use strict; use warnings;
 #   2-3-3-3}  $anon_refs{$rname} gets recreated by bless [\$sub, $interp], 'Tcl::Code';
 #
 #
-# but later when tcl tries to use $tclname as a command alias, its been destoryed
+# but later when tcl tries to use $tclname as a command alias, its been destroyed
 #   Tcl error 'invalid command name "::perl::CODE(0x8e4e2a8)"
 #      at ./blib/lib/Tcl.pm line ####.
 #      while invoking scalar result call:
@@ -222,20 +222,11 @@ sub refcts {
 sub flush_afters{
   my $inter=shift;
   while(1) {  # wait for afters to finish
-    my $info0=insure_ptrarray($inter,'after', 'info');
-    last unless (scalar(@$info0));
+    my @info0=$inter->icall('after', 'info');
+    last unless (scalar(@info0));
     $inter->icall('after', 1000, 'set var fafafa');
     $inter->icall('vwait', 'var'); # will wait for 1 seconds
   }
-}
-
-sub insure_ptrarray{
-  my $inter=shift;
-  my $list = $inter->icall(@_);
-  if (ref($list) ne 'Tcl::List') {  # v1.02
-      $list=[split(' ',$list)];
-      }
-return $list;
 }
 
 package FakeTcl::Code;

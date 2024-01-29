@@ -7,6 +7,7 @@ use Test::More 0.88;
 
 use Math::Int64 qw(int64 int64_to_number
                    net_to_int64 int64_to_net
+                   le_to_int64 int64_to_le
                    string_to_int64 int64_to_string
                    native_to_int64 int64_to_native
                    int64_to_BER BER_to_int64 uint64_to_BER BER_length
@@ -245,5 +246,14 @@ is(sprintf("%s", int64("-2251842763358208")), "-2251842763358208", "bug #100861"
     $neg_one >>= 65;
     cmp_ok($neg_one, '==', -1, '-1 >>= 65 == -1');
 }
+
+my $nle = int64_to_le(-1);
+ok (join(" ", unpack "C*" => $nle) eq join(" ", (255) x 8));
+
+my $nle2 = int64_to_le(2);
+ok (join(" ", unpack "C*" => $nle2) eq join(" ", (2, 0, 0, 0, 0, 0, 0, 0)));
+
+ok (int64_to_net(le_to_int64("\x01\x02\x03\x04\x05\x06\x07\x08")) eq "\x08\x07\x06\x05\x04\x03\x02\x01");
+
 
 done_testing();

@@ -51,7 +51,10 @@ use constant PROPERTIES => (
 	_ext_name       => undef,
 	_ext_firstname  => undef,
 	_ext_lastname   => undef,
-	_ext_uid        => undef,
+	_ext_user       => undef,
+	_ext_userid     => undef,
+	_ext_uniqueusername => undef,
+	_ext_uniquename => undef,
 	operation       => 'create',
 	buyer_cookie    => ' ',
 	checkout_url    => undef,
@@ -86,10 +89,10 @@ sub from_node {
 				LastName          => '_ext_lastname',
 				UserFullName      => '_ext_name',
 				UserPrintableName => '_ext_name',
-				User              => '_ext_uid',
-				UserId            => '_ext_uid',
-				UniqueUsername    => '_ext_uid',
-				UniqueName        => '_ext_uid',
+				User              => '_ext_user',
+				UserId            => '_ext_userid',
+				UniqueUsername    => '_ext_uniqueusername',
+				UniqueName        => '_ext_uniquename',
 			},
 		}
 	);
@@ -99,10 +102,9 @@ sub from_node {
 		# 1. Full name
 		# 2. First + last names
 		# 3. User ID is better than nothing
-		$self->{_ext_name} = $self->{_ext_firstname} . ' ' . $self->{_ext_lastname}
-			if !$self->{_ext_name} && $self->{_ext_firstname} && $self->{_ext_lastname};
-		$self->{_ext_name} = $self->{_ext_uid}
-			unless $self->{_ext_name};
+		$self->{_ext_name} ||= $self->{_ext_firstname} . ' ' . $self->{_ext_lastname}
+			if $self->{_ext_firstname} && $self->{_ext_lastname};
+		$self->{_ext_name} ||= $self->{_ext_uniquename} || $self->{_ext_uniqueusername} || $self->{_ext_userid} || $self->{_ext_user};
 		if ($self->{_ext_email} && $self->{_ext_name}) {
 			$self->contacts(
 				new Business::cXML::Contact 'Contact', {

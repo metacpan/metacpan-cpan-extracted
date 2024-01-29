@@ -53,7 +53,8 @@
             "Text::Glob" : "0",
             "Time::Local" : "1.27",
             "XML::LibXML" : "0",
-            "XML::LibXML::Debugging" : "0"
+            "XML::LibXML::Debugging" : "0",
+            "perl" : "5.006"
          }
       },
       "test" : {
@@ -61,8 +62,35 @@
             "Archive::Zip" : "0",
             "Test::File" : "0",
             "Test::More" : "0",
-            "Test::Timer" : "0"
+            "Test::Timer" : "0",
+            "Time::Piece" : "0"
          }
+      }
+   },
+   "provides" : {
+      "EAI::Common" : {
+         "file" : "lib/EAI/Common.pm",
+         "version" : "1.908"
+      },
+      "EAI::DB" : {
+         "file" : "lib/EAI/DB.pm",
+         "version" : "1.908"
+      },
+      "EAI::DateUtil" : {
+         "file" : "lib/EAI/DateUtil.pm",
+         "version" : "1.908"
+      },
+      "EAI::FTP" : {
+         "file" : "lib/EAI/FTP.pm",
+         "version" : "1.908"
+      },
+      "EAI::File" : {
+         "file" : "lib/EAI/File.pm",
+         "version" : "1.908"
+      },
+      "EAI::Wrap" : {
+         "file" : "lib/EAI/Wrap.pm",
+         "version" : "1.908"
       }
    },
    "release_status" : "stable",
@@ -76,6 +104,6 @@
          "web" : "https://github.com/rkapl123/EAI-Wrap"
       }
    },
-   "version" : "1.904",
+   "version" : "1.908",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

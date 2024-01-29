@@ -1,5 +1,20 @@
 Revision history for Catalyst-Plugin-Static-File:
 
+v0.2.2    2023-12-29 15:59:54+00:00 Europe/London
+  [Tests]
+  - Switched package used for the release manifest.
+
+  - Added more author's tests.
+
+  [Toolchain]
+  - Fixed an error with the MANIFEST and remove files from the distribution.
+
+  - Removed use of Generate::ManifestSkip plugin. It is now maintained manually.
+
+  - Added .editorconfig to the repository.
+
+  - Added .perltidyrc to the repository.
+
 v0.2.1    2023-06-19 09:40:45+01:00 Europe/London
   [Bug Fixes]
   - Re-added the file existence check that was removed in v0.1.3.

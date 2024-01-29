@@ -1,0 +1,17 @@
+Aggregate  (cost=20856.57..20856.58 rows=1 width=48) (actual time=63.093..64.902 rows=1 loops=1)
+  Buffers: shared hit=192 read=11331
+  I/O Timings: shared/local read=14.851
+  ->  Gather  (cost=20856.34..20856.55 rows=2 width=72) (actual time=63.022..64.892 rows=3 loops=1)
+          Workers Planned: 2
+          Workers Launched: 2
+        Buffers: shared hit=192 read=11331
+        I/O Timings: shared/local read=14.851
+        ->  Aggregate  (cost=19856.34..19856.35 rows=1 width=72) (actual time=61.133..61.134 rows=1 loops=3)
+              Buffers: shared hit=192 read=11331
+              I/O Timings: shared/local read=14.851
+              ->  Seq Scan on depesz depesz  (cost=0.00..15689.67 rows=416667 width=57) (actual time=0.019..18.222 rows=333333 loops=3)
+                    Buffers: shared hit=192 read=11331
+                    I/O Timings: shared/local read=14.851
+Planning:
+  Buffers: shared hit=53
+Execution time: 64.95 ms

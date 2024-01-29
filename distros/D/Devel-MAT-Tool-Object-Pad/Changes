@@ -1,4 +1,9 @@
 Revision history for Devel-MAT-Tool-Object-Pad
 
+0.02    2024-01-02
+        [BUGFIXES]
+         * Account for newer versions of Devel::MAT and/or Object::Pad
+           (RT150925)
+
 0.01    2022-04-02
         First version, released on an unsuspecting world.

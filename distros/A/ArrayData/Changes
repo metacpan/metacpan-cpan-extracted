@@ -1,3 +1,13 @@
+0.2.6   2024-01-16  Released-By: PERLANCAR; Urgency: medium
+
+        - [spec Basic] Require 'get_item_count'. Allow the possibility of array
+          data with infinite number of elements.
+
+        - [doc] Document provided methods from
+          Role::TinyCommons::Iterator::Resettable and show a table of methods,
+          like in TableData.
+
+
 0.2.5   2021-12-01  Released-By: PERLANCAR; Urgency: low
 
 	- No spec changes.

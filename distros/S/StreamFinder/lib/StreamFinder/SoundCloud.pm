@@ -4,7 +4,7 @@ StreamFinder::SoundCloud - Fetch actual raw streamable URLs from song-entry webs
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2022 by
+This module is Copyright (C) 2023 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -96,11 +96,18 @@ file.
 
 =head1 DESCRIPTION
 
-StreamFinder::SoundCloud accepts a valid artist-ID/song-ID, artist-ID, or URL on 
-SoundCloud.com and returns the actual stream URL(s), title, and cover art icon.  
-The purpose is that one needs one of these URLs in order to have the option to 
-stream the song in one's own choice of media player software rather than 
-using their web browser and accepting any / all flash, ads, javascript, 
+NOTE:  Users should also consider StreamFinder::SoundCloud to now be 
+depreciatedand and may be removed in a later StreamFinder release, as they've 
+added cookie and tracker requirements making it impossible to search for songs 
+on their site without enabling, but song URLs (when known) seem to still work 
+for now, but without channel/artist icons.  (Privacy-minded individuals should 
+now be cautious while using this site).
+
+StreamFinder::SoundCloud accepts a valid artist-ID/song-ID, artist-ID, or URL 
+on SoundCloud.com and returns the actual stream URL(s), title, and cover art 
+icon.  The purpose is that one needs one of these URLs in order to have the 
+option to stream the song in one's own choice of media player software rather 
+than using their web browser and accepting any / all flash, ads, javascript, 
 cookies, trackers, web-bugs, and other crapware that can come with that method 
 of play.  The author uses his own custom all-purpose media player called 
 "fauxdacious" (his custom hacked version of the open-source "audacious" 
@@ -108,8 +115,7 @@ audio player).  "fauxdacious" can incorporate this module to decode and play
 songs from SoundCloud.com.  One or more streams can be returned for each song.  
 
 WARNING:  SoundCloud streams usually EXPIRE VERY QUICKLY, ie. A FEW MINUTES, 
-and become unplayable (403 ERRORS), requiring recording during first play, or 
-repeatedly re-adding to your playlist!
+and become unplayable (403 ERRORS), requiring re-adding to your playlist!
 
 NOTE:  SoundCloud REQUIRES youtube-dl / yt-dlp (StreamFinder::Youtube) to 
 extract the actual stream and only returns a SINGLE valid stream URL for a 
@@ -196,6 +202,9 @@ Most SoundCloud artists have their own art-icon.
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc.) and the actual icon image (binary data), if any.
+
+NOTE:  At most recent testing, artist-icons appear to perhaps no longer be 
+downloadable (embedded SVG images) - ymmv.
 
 =item $song->B<getImageURL>(['artist'])
 
@@ -315,7 +324,7 @@ L<http://search.cpan.org/dist/StreamFinder-SoundCloud/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022 Jim Turner.
+Copyright 2023 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

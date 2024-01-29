@@ -19,6 +19,7 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/01-basic.t',
+    't/author-clean-namespaces.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',
@@ -39,7 +40,7 @@ my @files = (
     't/etc/perlcritic.rc',
     't/lib/Net/Statsd/Lite/Dog.pm',
     't/lib/Net/Statsd/Lite/Test.pm',
-    't/release-check-manifest.t',
+    't/release-dist-manifest.t',
     't/release-fixme.t',
     't/release-kwalitee.t',
     't/release-trailing-space.t'

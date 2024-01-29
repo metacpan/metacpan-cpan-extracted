@@ -7,7 +7,7 @@ use HTTP::Tiny;
 use JSON::PP;
 use Data::CosineSimilarity;
 
-our $VERSION = '1.01';
+our $VERSION = '1.11';
 $VERSION = eval $VERSION;
 
 my $http = HTTP::Tiny->new;
@@ -16,15 +16,15 @@ my $http = HTTP::Tiny->new;
 sub new {
     my $class = shift;
     my %attr  = @_;
-    
+
     $attr{'error'}      = '';
-    
+
     $attr{'api'}        = 'OpenAI' unless $attr{'api'};
     $attr{'error'}      = 'Invalid API' unless $attr{'api'} eq 'OpenAI';
     $attr{'error'}      = 'API Key missing' unless $attr{'key'};
-    
+
     $attr{'model'}      = 'text-embedding-ada-002' unless $attr{'model'};
-    
+
     return bless \%attr, $class;
 }
 
@@ -59,12 +59,12 @@ sub _get_header_openai {
          'Content-type'  => 'application/json'
      };
  }
- 
+
  # Fetch Embedding response
  sub _get_embedding {
      my ($self, $text) = @_;
-     
-     return $http->post($url{$self->{'api'}}, {
+
+     my $response = $http->post($url{$self->{'api'}}, {
          'headers' => {
              'Authorization' => 'Bearer ' . $self->{'key'},
              'Content-type'  => 'application/json'
@@ -74,23 +74,27 @@ sub _get_header_openai {
              model  => $self->{'model'},
          }
      });
+     if ($response->{'content'} =~ 'invalid_api_key') {
+         die 'Incorrect API Key - check your API Key is correct';
+     }
+     return $response;
  }
- 
+
  # TODO:
  # Make 'headers' use $header{$self->{'api'}}
  # Currently hard coded to OpenAI
- 
+
  # Added purely for testing - IGNORE!
  sub _test {
      my $self = shift;
 #    return $self->{'api'};
      return $header{$self->{'api'}};
  }
- 
+
  # Return Embedding as a CSV string
  sub embedding {
      my ($self, $text, $verbose) = @_;
-     
+
      my $response = $self->_get_embedding($text);
      if ($response->{'success'}) {
          my $embedding = decode_json($response->{'content'});
@@ -100,11 +104,11 @@ sub _get_header_openai {
      return $response if defined $verbose;
      return undef;
  }
- 
+
  # Return Embedding as an array
  sub raw_embedding {
      my ($self, $text, $verbose) = @_;
-     
+
      my $response = $self->_get_embedding($text);
      if ($response->{'success'}) {
          my $embedding = decode_json($response->{'content'});
@@ -114,42 +118,47 @@ sub _get_header_openai {
      return $response if defined $verbose;
      return undef;
  }
- 
+
  # Return Test Embedding
  sub test_embedding {
      my ($self, $text, $dimension) = @_;
      $self->{'error'} = '';
-     
+
      $dimension = 1536 unless defined $dimension;
-     
+
      if ($text) {
          srand scalar split /\s+/, $text;
      }
-     
+
      my @vector;
      for (1...$dimension) {
          push @vector, rand(2) - 1;
      }
      return join ',', @vector;
  }
- 
- # Convert a CSV Embedding into a hashref
- sub _make_vector {
-     my ($self, $embed_string) = @_;
-     
-     my %vector;
-     my @embed = split /,/, $embed_string;
-     for (my $i = 0; $i < @embed; $i++) {
-        $vector{'feature' . $i} = $embed[$i];
+
+# Convert a CSV Embedding into a hashref
+sub _make_vector {
+    my ($self, $embed_string) = @_;
+
+    if (!defined $embed_string) {
+        $self->{'error'} = 'Nothing to compare!';
+        return;
     }
-    return \%vector;
-}    
- 
+
+    my %vector;
+    my @embed = split /,/, $embed_string;
+    for (my $i = 0; $i < @embed; $i++) {
+       $vector{'feature' . $i} = $embed[$i];
+   }
+   return \%vector;
+}
+
 # Return a comparator to compare to a set vector
 sub comparator {
     my($self, $embed) = @_;
     $self->{'error'} = '';
-    
+
     my $vector1 = $self->_make_vector($embed);
     return sub {
         my($embed2) = @_;
@@ -161,7 +170,7 @@ sub comparator {
 # Compare 2 Embeddings
 sub compare {
     my ($self, $embed1, $embed2) = @_;
-    
+
     my $vector1 = $self->_make_vector($embed1);
     my $vector2;
     if (defined $embed2) {
@@ -169,21 +178,21 @@ sub compare {
     } else {
         $vector2 = $self->{'comparator'};
     }
-    
+
     if (!defined $vector2) {
         $self->{'error'} = 'Nothing to compare!';
         return;
     }
-    
+
     if (scalar keys %$vector1 != scalar keys %$vector2) {
         $self->{'error'} = 'Embeds are unequal length';
         return;
     }
-    
+
     return $self->_compare_vector($vector1, $vector2);
 }
 
-# Compare 2 Vectors    
+# Compare 2 Vectors
 sub _compare_vector {
     my ($self, $vector1, $vector2) = @_;
     my $cs = Data::CosineSimilarity->new;
@@ -204,7 +213,7 @@ AI::Embedding - Perl module for working with text embeddings using various APIs
 
 =head1 VERSION
 
-Version 1.01
+Version 1.11
 
 =head1 SYNOPSIS
 
@@ -218,7 +227,7 @@ Version 1.01
     my $csv_embedding  = $embedding->embedding('Some sample text');
     my $test_embedding = $embedding->test_embedding('Some sample text');
     my @raw_embedding  = $embedding->raw_embedding('Some sample text');
-    
+
     my $cmp = $embedding->comparator($csv_embedding2);
 
     my $similarity = $cmp->($csv_embedding1);
@@ -245,7 +254,7 @@ When comparing multiple Embeddings to the same Embedding (such as search text) i
 =head2 new
 
     my $embedding = AI::Embedding->new(
-        api         => 'OpenAI', 
+        api         => 'OpenAI',
         key         => 'your-api-key',
         model       => 'text-embedding-ada-002',
     );
@@ -334,7 +343,7 @@ The returned method reference returns the cosine similarity between the Embeddin
 
     my $similarity_with_other_embedding = $embedding->compare($csv_embedding1, $csv_embedding2);
 
-Compares two embeddings and returns the cosine similarity between them. The B<compare> method takes two parameters: $csv_embedding1 and $csv_embedding2 (both comma-separated embedding strings). 
+Compares two embeddings and returns the cosine similarity between them. The B<compare> method takes two parameters: $csv_embedding1 and $csv_embedding2 (both comma-separated embedding strings).
 
 Returns the cosine similarity as a floating-point number between -1 and 1, where 1 represents identical embeddings, 0 represents no similarity, and -1 represents opposite embeddings.
 

@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-06'; # DATE
+our $DATE = '2023-09-06'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.031'; # VERSION
+our $VERSION = '1.033'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_gen/csv_gen",
@@ -41,7 +41,7 @@ csv-gen - Generate CSV data using Perl code
 
 =head1 VERSION
 
-This document describes version 1.031 of csv-gen (from Perl distribution App-CSVUtils), released on 2023-08-06.
+This document describes version 1.033 of csv-gen (from Perl distribution App-CSVUtils), released on 2023-09-06.
 
 =head1 SYNOPSIS
 

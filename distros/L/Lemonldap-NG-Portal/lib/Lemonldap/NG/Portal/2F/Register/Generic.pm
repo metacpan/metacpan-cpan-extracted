@@ -8,7 +8,7 @@ use JSON qw(from_json to_json);
 use Lemonldap::NG::Common::Crypto;
 use Lemonldap::NG::Portal::Main::Constants 'PE_OK';
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.18.0';
 
 extends 'Lemonldap::NG::Portal::2F::Register::Base';
 with 'Lemonldap::NG::Portal::Lib::2fDevices';
@@ -55,6 +55,15 @@ sub run {
             $self->userLogger->info(
                 $self->prefix . "2f: registration -> empty validation form" );
             return $self->p->sendError( $req, 'PE79', 200 );
+        }
+
+        # Validate format
+        unless ( $self->validateFormat($generic) ) {
+            my $error_label = $self->conf->{generic2fFormatErrorLabel}
+              || 'generic2fFormatError';
+            $self->userLogger->info(
+                $self->prefix . "2f: registration -> invalid format" );
+            return $self->p->sendError( $req, $error_label, 200 );
         }
 
         # Generate and send code
@@ -131,6 +140,7 @@ sub run {
             )
           )
         {
+            $self->markRegistered($req);
             return [
                 200,
                 [
@@ -175,6 +185,13 @@ sub run {
         $self->logger->error( $self->prefix . "2f: unknown action ($action)" );
         return $self->p->sendError( $req, 'unknownAction', 400 );
     }
+}
+
+sub validateFormat {
+    my ( $self, $generic ) = @_;
+    my $format_regex = $self->{conf}->{generic2fFormatRegex};
+    return 1 if ( !$format_regex );
+    return scalar $generic =~ $format_regex;
 }
 
 1;

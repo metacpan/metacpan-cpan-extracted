@@ -59,8 +59,8 @@ sub new {
 
 
 # Run Operation Request
-# PostLockRequest.File : File to upload  ,
-# PostLockRequest.password :    
+# PostLockRequest.File : The password needed to open an Excel file.  ,
+# PostLockRequest.password : The password needed to open an Excel file.   
 
 {
     my $params = {
@@ -71,7 +71,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_lock' } = { 
-    	summary => 'Setting access password.',
+    	summary => 'Lock Excel files.',
         params => $params,
         returns => 'FilesResult',
     };
@@ -123,14 +123,14 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'File to upload',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},    

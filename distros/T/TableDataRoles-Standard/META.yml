@@ -14,7 +14,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,97 +23,100 @@ name: TableDataRoles-Standard
 provides:
   TableData::AOA:
     file: lib/TableData/AOA.pm
-    version: '0.019'
+    version: '0.021'
   TableData::AOH:
     file: lib/TableData/AOH.pm
-    version: '0.019'
+    version: '0.021'
   TableData::DBI:
     file: lib/TableData/DBI.pm
-    version: '0.019'
+    version: '0.021'
   TableData::Munge::Concat:
     file: lib/TableData/Munge/Concat.pm
-    version: '0.019'
+    version: '0.021'
   TableData::Munge::Filter:
     file: lib/TableData/Munge/Filter.pm
-    version: '0.019'
+    version: '0.021'
   TableData::Munge::GroupRows:
     file: lib/TableData/Munge/GroupRows.pm
-    version: '0.019'
+    version: '0.021'
   TableData::Munge::MungeColumns:
     file: lib/TableData/Munge/MungeColumns.pm
-    version: '0.019'
+    version: '0.021'
   TableData::Munge::Reverse:
     file: lib/TableData/Munge/Reverse.pm
-    version: '0.019'
+    version: '0.021'
   TableData::Sample::DeNiro:
     file: lib/TableData/Sample/DeNiro.pm
-    version: '0.019'
+    version: '0.021'
   TableData::Test::Source::AOA:
     file: lib/TableData/Test/Source/AOA.pm
-    version: '0.019'
+    version: '0.021'
   TableData::Test::Source::AOH:
     file: lib/TableData/Test/Source/AOH.pm
-    version: '0.019'
+    version: '0.021'
   TableData::Test::Source::CSVInDATA:
     file: lib/TableData/Test/Source/CSVInDATA.pm
-    version: '0.019'
+    version: '0.021'
   TableData::Test::Source::CSVInFile:
     file: lib/TableData/Test/Source/CSVInFile.pm
-    version: '0.019'
+    version: '0.021'
   TableData::Test::Source::CSVInFile::Select:
     file: lib/TableData/Test/Source/CSVInFile/Select.pm
-    version: '0.019'
+    version: '0.021'
   TableData::Test::Source::CSVInFiles:
     file: lib/TableData/Test/Source/CSVInFiles.pm
-    version: '0.019'
+    version: '0.021'
   TableData::Test::Source::DBI:
     file: lib/TableData/Test/Source/DBI.pm
-    version: '0.019'
+    version: '0.021'
   TableData::Test::Source::Iterator:
     file: lib/TableData/Test/Source/Iterator.pm
-    version: '0.019'
+    version: '0.021'
   TableDataRole::Munge::Concat:
     file: lib/TableDataRole/Munge/Concat.pm
-    version: '0.019'
+    version: '0.021'
   TableDataRole::Munge::Filter:
     file: lib/TableDataRole/Munge/Filter.pm
-    version: '0.019'
+    version: '0.021'
   TableDataRole::Munge::GroupRows:
     file: lib/TableDataRole/Munge/GroupRows.pm
-    version: '0.019'
+    version: '0.021'
   TableDataRole::Munge::MungeColumns:
     file: lib/TableDataRole/Munge/MungeColumns.pm
-    version: '0.019'
+    version: '0.021'
   TableDataRole::Munge::Reverse:
     file: lib/TableDataRole/Munge/Reverse.pm
-    version: '0.019'
+    version: '0.021'
   TableDataRole::Source::AOA:
     file: lib/TableDataRole/Source/AOA.pm
-    version: '0.019'
+    version: '0.021'
   TableDataRole::Source::AOH:
     file: lib/TableDataRole/Source/AOH.pm
-    version: '0.019'
+    version: '0.021'
   TableDataRole::Source::CSVInDATA:
     file: lib/TableDataRole/Source/CSVInDATA.pm
-    version: '0.019'
+    version: '0.021'
   TableDataRole::Source::CSVInFile:
     file: lib/TableDataRole/Source/CSVInFile.pm
-    version: '0.019'
+    version: '0.021'
   TableDataRole::Source::CSVInFiles:
     file: lib/TableDataRole/Source/CSVInFiles.pm
-    version: '0.019'
+    version: '0.021'
   TableDataRole::Source::DBI:
     file: lib/TableDataRole/Source/DBI.pm
-    version: '0.019'
+    version: '0.021'
   TableDataRole::Source::Iterator:
     file: lib/TableDataRole/Source/Iterator.pm
-    version: '0.019'
+    version: '0.021'
   TableDataRole::Util::CSV:
     file: lib/TableDataRole/Util/CSV.pm
-    version: '0.019'
+    version: '0.021'
+  TableDataRole::Util::GetRowByPos:
+    file: lib/TableDataRole/Util/GetRowByPos.pm
+    version: '0.021'
   TableDataRoles::Standard:
     file: lib/TableDataRoles/Standard.pm
-    version: '0.019'
+    version: '0.021'
 requires:
   Class::Method::Modifiers: '0'
   DBI: '0'
@@ -134,10 +137,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=TableDataRoles-Standard
   homepage: https://metacpan.org/release/TableDataRoles-Standard
   repository: git://github.com/perlancar/perl-TableDataRoles-Standard.git
-version: '0.019'
+version: '0.021'
 x_Dist_Zilla:
   perl:
-    version: '5.038000'
+    version: '5.038002'
   plugins:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
@@ -155,62 +158,62 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Author::PERLANCAR/@Filter/GatherDir'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::PERLANCAR/@Filter/PruneCruft'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::PERLANCAR/@Filter/ManifestSkip'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::PERLANCAR/@Filter/MetaYAML'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::PERLANCAR/@Filter/License'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::PERLANCAR/@Filter/PodCoverageTests'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::PERLANCAR/@Filter/PodSyntaxTests'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::PERLANCAR/@Filter/ExtraTests'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/@Filter/ExecDir'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::PERLANCAR/@Filter/ShareDir'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::PERLANCAR/@Filter/MakeMaker'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::PERLANCAR/@Filter/Manifest'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/ExecDir script'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
@@ -272,15 +275,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.03'
+      version: '0.02'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::PERLANCAR/MetaConfig'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -289,7 +292,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.030'
+              version: '6.031'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -438,7 +441,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: '@Author::PERLANCAR/PruneFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Pod2Readme
       name: '@Author::PERLANCAR/Pod2Readme'
@@ -526,7 +529,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -534,7 +537,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -542,7 +545,7 @@ x_Dist_Zilla:
           phase: develop
           type: x_spec
       name: DevelopX_Spec
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Extras
       name: 'lint-prereqs / assume-provided'
@@ -550,54 +553,54 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.030'
+      version: '6.031'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: 0
-    version: '6.030'
+    version: '6.031'
 x_authority: cpan:PERLANCAR
-x_generated_by_perl: v5.38.0
+x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

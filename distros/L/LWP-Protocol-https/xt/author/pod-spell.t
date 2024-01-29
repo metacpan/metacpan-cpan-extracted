@@ -10,6 +10,7 @@ set_spell_cmd('aspell list');
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+49699333
 Aas
 Adam
 Alders
@@ -33,6 +34,7 @@ Dan
 Daniel
 David
 Denaxas
+Dmitriy
 Etheridge
 FWILES
 Father
@@ -74,6 +76,7 @@ Merelo
 Michael
 Mike
 Mohammad
+Nicolas
 Olaf
 Ondrej
 Peter
@@ -87,6 +90,7 @@ Rolf
 Schilli
 Schwern
 Sean
+Shamatrin
 Shoichi
 Sjogren
 Skyttä
@@ -131,8 +135,10 @@ dagolden
 david
 davidrw
 denaxas
+dependabot
 dot
 drieux
+dshamatrin
 ether
 gianni
 gisle
@@ -154,6 +160,7 @@ lib
 mark
 mohammad
 murphy
+nicolas
 olaf
 ondrej
 openstrike

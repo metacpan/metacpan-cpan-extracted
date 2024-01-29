@@ -1,0 +1,10 @@
+CREATE TABLE SwitchedUserRealActors (
+    id              INT NOT NULL AUTO_INCREMENT,
+    ObjectType      VARCHAR(255),
+    ObjectId        INT DEFAULT 0 NOT NULL,
+    Creator         INT DEFAULT 0 NOT NULL,
+    LastUpdatedBy   INT DEFAULT 0 NOT NULL,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE INDEX SwitchedUserRealActors1 ON SwitchedUserRealActors (ObjectType, ObjectId);

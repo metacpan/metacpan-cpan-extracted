@@ -52,6 +52,6 @@
       },
       "x_MailingList" : "http://lists.perl.org/list/perl5-porters.html"
    },
-   "version" : "1.32",
+   "version" : "1.33",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

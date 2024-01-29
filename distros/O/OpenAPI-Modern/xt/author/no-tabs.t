@@ -18,6 +18,7 @@ my @files = (
     't/document-paths.t',
     't/document-schemas.t',
     't/document-toplevel.t',
+    't/end-to-end.t',
     't/find_path.t',
     't/lib/Helper.pm',
     't/oas-vocabulary.t',

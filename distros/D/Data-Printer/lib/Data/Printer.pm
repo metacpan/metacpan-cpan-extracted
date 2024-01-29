@@ -5,7 +5,7 @@ use Data::Printer::Object;
 use Data::Printer::Common;
 use Data::Printer::Config;
 
-our $VERSION = '1.001001';
+our $VERSION = '1.002001';
 $VERSION = eval $VERSION;
 
 my $rc_arguments;
@@ -484,7 +484,7 @@ or prefix C<p()> with C<&>:
 
 You can pass custom options that will work only on that particular call:
 
-    p @var, as => "some label", colorized => 0;
+    p @var, as => "some label", colored => 0;
     p %var, show_memsize => 1;
 
 By default, C<p()> prints to STDERR and returns the same variable being
@@ -790,7 +790,7 @@ you want):
     p my @array = qw(a b c d);          # wrong
     my @array = qw(a b c d); p @array;  # right
 
-If you pass a nonexistant key/index to DDP using prototypes, they
+If you pass a nonexistent key/index to DDP using prototypes, they
 will trigger autovivification:
 
     use DDP;
@@ -1099,15 +1099,15 @@ Many thanks to everyone who helped design and develop this module with
 patches, bug reports, wishlists, comments and tests. They are (alphabetically):
 
 Adam Rosenstein, Alexandr Ciornii (chorny), Alexander Hartmaier (abraxxa),
-Allan Whiteford, Anatoly (Snelius30), Andreas König (andk), Andy Bach,
-Anthony DeRobertis, Árpád Szász, Athanasios Douitsis (aduitsis),
+Allan Whiteford, Anatoly (Snelius30), Andre Klärner, Andreas König (andk),
+Andy Bach, Anthony DeRobertis, Árpád Szász, Athanasios Douitsis (aduitsis),
 Baldur Kristinsson, Benct Philip Jonsson (bpj), brian d foy,
 Chad Granum (exodist), Chris Prather (perigrin), Curtis Poe (Ovid),
 David D Lowe (Flimm), David E. Condon (hhg7), David Golden (xdg),
 David Precious (bigpresh), David Raab, David E. Wheeler (theory),
 Damien Krotkine (dams), Denis Howe, dirk, Dotan Dimet, Eden Cardim (edenc),
 Elliot Shank (elliotjs), Elvin Aslanov, Eugen Konkov (KES777),
-Fernando Corrêa (SmokeMachine), Fitz Elliott, Florian (fschlich),
+Fernando Corrêa (SmokeMachine), Fitz Elliott, Florian Schlichting (fschlich),
 Frew Schmidt (frew), GianniGi, Graham Knop (haarg), Graham Todd,
 Gregory J. Oschwald, grr, Håkon Hægland, Iaroslav O. Kosmina (darviarush),
 Ivan Bessarabov (bessarabv), J Mash, James E. Keenan (jkeenan),
@@ -1134,7 +1134,7 @@ If I missed your name, please drop me a line!
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011-2023 Breno G. de Oliveira
+Copyright (C) 2011-2024 Breno G. de Oliveira
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

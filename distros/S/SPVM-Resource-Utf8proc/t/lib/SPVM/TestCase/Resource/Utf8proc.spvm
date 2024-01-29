@@ -1,0 +1,3 @@
+class TestCase::Resource::Utf8proc {
+  native static method test : int ();
+}

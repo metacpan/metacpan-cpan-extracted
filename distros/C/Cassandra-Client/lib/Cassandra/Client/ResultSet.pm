@@ -1,6 +1,6 @@
 package Cassandra::Client::ResultSet;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::ResultSet::VERSION = '0.20';
+$Cassandra::Client::ResultSet::VERSION = '0.21';
 use 5.010;
 use strict;
 use warnings;
@@ -49,7 +49,7 @@ Cassandra::Client::ResultSet
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 METHODS
 

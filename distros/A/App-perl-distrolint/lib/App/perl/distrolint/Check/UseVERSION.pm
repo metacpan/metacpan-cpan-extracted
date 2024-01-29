@@ -4,11 +4,12 @@
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
 use v5.36;
-use Object::Pad 0.800;
+use Object::Pad 0.807;
 
-class App::perl::distrolint::Check::UseVERSION 0.03
-   :does(App::perl::distrolint::CheckRole::EachFile)
-   :does(App::perl::distrolint::CheckRole::TreeSitterPerl);
+class App::perl::distrolint::Check::UseVERSION 0.06;
+
+apply App::perl::distrolint::CheckRole::EachFile;
+apply App::perl::distrolint::CheckRole::TreeSitterPerl;
 
 use Text::Treesitter 0.07; # child_by_field_name
 
@@ -29,10 +30,10 @@ permitted before this, but no other code is allowed.
 
 method run ( $app )
 {
-   return $self->run_for_each_perl_file( check_file => $app );
+   return $self->run_for_each_perl_file( check_file => );
 }
 
-method check_file ( $file, $app )
+method check_file ( $file )
 {
    my $tree = $self->parse_perl_file( $file );
 
@@ -57,8 +58,7 @@ method check_file ( $file, $app )
       }
 
       if( !$has_use_version ) {
-         my $line = ( $node->start_point )[0] + 1;
-         $app->diag( "%s line %d has a statement before use VERSION", $file, $line );
+         App->diag( App->format_file( $file, $node->start_row + 1 ), " has a statement before use VERSION" );
          $ok = 0;
          last;
       }

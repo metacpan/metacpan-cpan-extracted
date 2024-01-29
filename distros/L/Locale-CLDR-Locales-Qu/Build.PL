@@ -12,9 +12,9 @@ my $builder = Module::Build->new(
         'DateTime'                  => '0.72',
         'Moo'                       => '2',
         'MooX::ClassAttribute'      => '0.011',
-		'Type::Tiny'                => 0,
+        'Type::Tiny'                => 0,
         'perl'                      => '5.10.1',
-        'Locale::CLDR'              => '0.34.4',
+        'Locale::CLDR'              => '0.40.1',
     },
     dist_author         => q{John Imrie <john.imrie1@gmail.com>},
     dist_version_from   => 'lib/Locale/CLDR/Locales/Qu.pm',
@@ -24,17 +24,17 @@ my $builder = Module::Build->new(
         'Test::More'        => '0.98',
     },
     add_to_cleanup      => [ 'Locale-CLDR-Locales-Qu-*' ],
-	configure_requires => { 'Module::Build' => '0.40' },
-	release_status => 'stable',
-	dist_abstract => 'Locale::CLDR - Data Package ( Perl localization data for Quechua )',
-	meta_add => {
-		keywords => [ qw( locale CLDR locale-data-pack ) ],
-		resources => {
-			homepage => 'https://github.com/ThePilgrim/perlcldr',
-			bugtracker => 'https://github.com/ThePilgrim/perlcldr/issues',
-			repository => 'https://github.com/ThePilgrim/perlcldr.git',
-		},
-	},
+    configure_requires => { 'Module::Build' => '0.40' },
+    release_status => 'stable',
+    dist_abstract => 'Locale::CLDR - Data Package ( Perl localization data for Quechua )',
+    meta_add => {
+        keywords => [ qw( locale CLDR locale-data-pack ) ],
+        resources => {
+            homepage => 'https://github.com/ThePilgrim/perlcldr',
+            bugtracker => 'https://github.com/ThePilgrim/perlcldr/issues',
+            repository => 'https://github.com/ThePilgrim/perlcldr.git',
+        },
+    },
 );
 
 $builder->create_build_script();

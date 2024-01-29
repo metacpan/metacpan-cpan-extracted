@@ -10,5 +10,5 @@ RUN apk update && apk add \
     wget \
   && true
 
-COPY install-yamltidy.sh /install-yamltidy.sh
+#COPY install-yamltidy.sh /install-yamltidy.sh
 

@@ -11,7 +11,7 @@ use File::Spec::Functions;
 
 use vars qw( $VERSION );
 BEGIN { # needed later in another BEGIN
-	$VERSION = '0.263';
+	$VERSION = '0.264';
 	}
 
 =encoding utf8
@@ -835,11 +835,11 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2009-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2009-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

@@ -19,6 +19,11 @@ WriteMakefile
   PL_FILES			=> {},
   MIN_PERL_VERSION		=> v5.10.1,
 
+  PREREQ_PM => {
+    'MIME::Base64'              => 0,
+    'URI::Escape'               => 0,
+  },
+
   CONFIGURE_REQUIRES => {
     'ExtUtils::MakeMaker'	=> 6.76,
   },
@@ -29,6 +34,8 @@ WriteMakefile
   TEST_REQUIRES  => {
     'Test::More'		=> 0,
     'Test::Exception'		=> 0,
+    'MIME::Base64'              => 0,
+    'URI::Escape'               => 0,
   },
 
   META_MERGE => {

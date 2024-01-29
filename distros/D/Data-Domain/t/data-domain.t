@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Test::More tests => 20;
-use Test::NoWarnings;
+use Test::Warnings;
 use Clone qw/clone/;
 
 
@@ -17,8 +17,6 @@ my $msg;
 # Shortcuts
 #----------------------------------------------------------------------
 subtest "Shortcuts" => sub {
-  plan tests => 32;
-
   $dom = True;
   ok($dom->inspect(undef), "True / undef");
   ok(!$dom->inspect(1), "True / 1");
@@ -75,6 +73,10 @@ subtest "Shortcuts" => sub {
   ok(!$dom->inspect('Foo'),          "Unref / scalar");
   ok(!$dom->inspect(undef),          "Unref / undef");
 
+  $dom = Coderef;
+  ok($dom->inspect("foo"),           "Coderef / string");
+  ok(!$dom->inspect(sub {'Foo'}),    "Coderef / sub");
+  ok(!$dom->inspect(undef),          "Coderef / undef");
 };
 
 
@@ -82,8 +84,6 @@ subtest "Shortcuts" => sub {
 # Whatever
 #----------------------------------------------------------------------
 subtest "Whatever" => sub {
-  plan tests => 15;
-
   $dom = Whatever;
   ok(!$dom->inspect(undef), "Whatever / undef");
   ok(!$dom->inspect(1), "Whatever / 1");
@@ -92,7 +92,9 @@ subtest "Whatever" => sub {
 
   $dom = Whatever(-defined => 1, -true => 0);
   ok($dom->inspect(undef), "Whatever-defined-false / undef");
+  is($dom->inspect(undef), "Whatever: must be defined");
   ok($dom->inspect(1), "Whatever-defined-false / 1");
+  is($dom->inspect(1), "Whatever: must be false");
   ok(!$dom->inspect(0), "Whatever-defined-false / 0");
 
   $dom = Whatever(-isa => "Data::Domain");
@@ -125,7 +127,6 @@ subtest "Whatever" => sub {
 # Empty
 #----------------------------------------------------------------------
 subtest "Empty" => sub {
-  plan tests => 7;
   $dom = Empty(-messages => 'your data is wrong');
   ok($dom->inspect(0),     "Empty, false val");
   ok($dom->inspect(1),     "Empty, true val");
@@ -142,7 +143,6 @@ subtest "Empty" => sub {
 #----------------------------------------------------------------------
 
 subtest "Num" => sub {
-  plan tests => 11;
   $dom = Num;
   ok(!$dom->inspect(-3.33), "Num / ok");
   ok($dom->inspect(undef), "Num / undef");
@@ -167,8 +167,6 @@ subtest "Num" => sub {
 #----------------------------------------------------------------------
 
 subtest "Int&Nat" => sub {
-  plan tests => 7;
-
   $dom = Int;
   ok(!$dom->inspect(1234), "Int / ok");
   ok(!$dom->inspect(-1234), "Int / ok");
@@ -186,8 +184,6 @@ subtest "Int&Nat" => sub {
 #----------------------------------------------------------------------
 
 subtest "Date" => sub {
-  plan tests => 10;
-
   #$dom = Date;
   $dom = "Data::Domain::Date"->new; # try the full OO API
   ok(!$dom->inspect('01.02.2003'), "Date / ok");
@@ -221,8 +217,6 @@ subtest "Date" => sub {
 # Time
 #----------------------------------------------------------------------
 subtest "Time" => sub {
-  plan tests => 7;
-
   $dom = Time;
   ok(!$dom->inspect('10:14'), "Time / ok");
   ok($dom->inspect('foobar'), "Time / invalid");
@@ -242,8 +236,6 @@ subtest "Time" => sub {
 # String
 #----------------------------------------------------------------------
 subtest "String" => sub {
-  plan tests => 15;
-
   $dom = String;
   ok($dom->inspect(undef),            "String / undef");
   ok($dom->inspect({}),               "String / ref");
@@ -280,8 +272,6 @@ subtest "String" => sub {
 # Handle
 #----------------------------------------------------------------------
 subtest "Handle" => sub {
-  plan tests => 3;
-
   $dom = Handle;
   ok(!$dom->inspect(*STDOUT),  "Handle/stdout 1");
   ok(!$dom->inspect(\*STDOUT), "Handle/stdout 2");
@@ -295,8 +285,6 @@ subtest "Handle" => sub {
 #----------------------------------------------------------------------
 
 subtest "Enum" => sub {
-  plan tests => 3;
-
   $dom = Enum(qw/foo bar buz/);
   ok(!$dom->inspect("foo"), "Enum ok");
   ok($dom->inspect("foobar"), "Enum fail");
@@ -311,8 +299,6 @@ subtest "Enum" => sub {
 #----------------------------------------------------------------------
 
 subtest "List" => sub {
-  plan tests => 26;
-
   $dom = List;
   ok(!$dom->inspect([]), "List ok");
   ok(!$dom->inspect([1 .. 4]), "List ok");
@@ -327,6 +313,7 @@ subtest "List" => sub {
   ok($dom->inspect([]), "List fail2");
   ok(!$dom->inspect([1, 2]), "List optional");
   ok($dom->inspect([1, 2, {}]), "List wrong optional");
+  ok(!$dom->inspect([1, 2, 3, 4]), "List with additional items");
 
   $dom = List(-size => [2, 5], -all => Int);
   ok(!$dom->inspect([1, 2, 3]), "List ok");
@@ -354,6 +341,12 @@ subtest "List" => sub {
 
   $dom = eval {List(-items => [String, Num], -size => [5, 2])};
   ok(!$dom && $@ =~ m(min/max), "List invalid min/max size");
+
+  $dom = List(-items => [Int, Num], -all => Empty);
+  ok(!$dom->inspect([1, 2]),   "Fixed list, correct input");
+  my $msg = $dom->inspect([1, 2, 3]);
+  note explain $msg;
+  ok($dom->inspect([1, 2, 3]), "Fixed list, incorrect input");
 };
 
 #----------------------------------------------------------------------
@@ -361,19 +354,28 @@ subtest "List" => sub {
 #----------------------------------------------------------------------
 
 subtest "Struct" => sub {
-  plan tests => 22;
-
   $dom = Struct;
   ok(!$dom->inspect({}), "Struct ok");
   ok($dom->inspect([]), "Struct fail list");
   ok($dom->inspect(undef), "Struct fail undef");
   ok($dom->inspect(123), "Struct fail scalar");
 
-  $dom = Struct(int => Int, str => String, num => Num(-optional => 1));
+  my @fields_spec = (int => Int, str => String, num => Num(-optional => 1));
+
+  $dom = Struct(@fields_spec);
   ok(!$dom->inspect({int => 3, str => "foo"}), "Struct ok");
   ok(!$dom->inspect({int => 3, str => "foo", bar => 123}), "Struct more fields");
   ok(!$dom->inspect({int => 3, str => "foo", num => 123}), "Struct ok num");
   ok($dom->inspect({int => "foo", str => 3, num => 123}), "Struct fail");
+
+  $dom = Struct(-fields => \@fields_spec, -may_ignore => 'all');
+  ok(!$dom->inspect({int => 3}), "str missing, ok1");
+  $dom = Struct(-fields => \@fields_spec, -may_ignore => qr/^s/);
+  ok(!$dom->inspect({int => 3}), "str missing, ok2");
+  $dom = Struct(-fields => \@fields_spec, -may_ignore => [qw/str num/]);
+  ok(!$dom->inspect({int => 3}), "str missing, ok3");
+  $dom = Struct(-fields => \@fields_spec);
+  ok($dom->inspect({int => 3}), "str missing, mandatory");
 
   $dom = Struct(-exclude => [qw/foo bar/], int => Int);
   ok(!$dom->inspect({int => 3, foobar => 4}), "Struct foobar");
@@ -408,8 +410,6 @@ subtest "Struct" => sub {
 #----------------------------------------------------------------------
 
 subtest "One_of" => sub {
-  plan tests => 5;
-
   $dom = One_of(String(qr/^[AEIOU]/), Int(-min => 0));
   ok(!$dom->inspect("Alleluia"), "One_of ok1");
   ok(!$dom->inspect(1234), "One_of ok2");
@@ -423,8 +423,6 @@ subtest "One_of" => sub {
 #----------------------------------------------------------------------
 
 subtest "All_of" => sub {
-  plan tests => 3;
-
   $dom = All_of(String(qr/[24680]/), Int(-min => 0));
   ok(!$dom->inspect(1234), "All_of, positive and contains even digit");
   ok($dom->inspect(135),   "All_of, positive without even digit");
@@ -437,8 +435,6 @@ subtest "All_of" => sub {
 #----------------------------------------------------------------------
 
 subtest "Overloads" => sub {
-  plan tests => 4;
-
   $dom = Unblessed;
   my $string = "$dom";
   like($string, qr/Whatever/, "stringify");
@@ -466,8 +462,6 @@ subtest "Overloads" => sub {
 #----------------------------------------------------------------------
 
 subtest "Lazy" => sub {
-  plan tests => 10;
-
   $dom = Struct(
     d_begin => Date,
     d_end   => sub {my $context = shift;
@@ -558,23 +552,30 @@ subtest "Lazy" => sub {
 #----------------------------------------------------------------------
 
 subtest "messages" => sub {
-  plan tests => 7;
+  { local $Data::Domain::GLOBAL_MSGS;
+    Data::Domain->messages("français");
 
-  Data::Domain->messages("français");
+    $dom = Int;
+    $msg = $dom->inspect("foobar");
+    is($msg, "Int: nombre incorrect", "msg français");
 
+    $dom = Int(-name => "PositiveInt", -min => 0);
+    $msg = $dom->inspect("foobar");
+    is($msg, "PositiveInt: nombre incorrect", "msg français");
+  }
+
+  # same tests, but back to the default english messages
   $dom = Int;
   $msg = $dom->inspect("foobar");
-  is($msg, "Int: nombre incorrect", "msg français");
-
+  is($msg, "Int: invalid number", "english msg");
   $dom = Int(-name => "PositiveInt", -min => 0);
   $msg = $dom->inspect("foobar");
-  is($msg, "PositiveInt: nombre incorrect", "msg français");
+  is($msg, "PositiveInt: invalid number", "english msg");
 
-
+  # custom msg
   $dom = Int(-messages => "fix that number");
   $msg = $dom->inspect("foobar");
   is($msg, "Int: fix that number", "msg string");
-
 
   $dom = Int(-min => 4, 
              -max => 5,
@@ -585,18 +586,26 @@ subtest "messages" => sub {
 
   $dom = Int(-min => 4, 
              -max => 5,
-             -messages => sub {"got an error ($_[0])"});
+             -messages => sub {"$_[0]: got an error ($_[1])"});
   $msg = $dom->inspect(99);
-  is($msg, "got an error (TOO_BIG)", "msg sub");
+  is($msg, "Int: got an error (TOO_BIG)", "msg sub");
 
-  Data::Domain->messages(sub {"validation error ($_[0])"});
+  { local $Data::Domain::USE_OLD_MSG_API = 1;
+    
+    Data::Domain->messages(sub {"validation error ($_[0])"});
+    $dom = Int(-min => 0);
+    $msg = $dom->inspect(-99);
+    is($msg, "validation error (TOO_SMALL)", "msg global sub, old API");
+  }
+
+  Data::Domain->messages(sub {"$_[0]: validation error ($_[1])"});
   $dom = Int(-min => 0);
   $msg = $dom->inspect(-99);
-  is($msg, "validation error (TOO_SMALL)", "msg global sub");
+  is($msg, "Int: validation error (TOO_SMALL)", "msg global sub");
 
-  Data::Domain->messages("english");
+  # back to standard messages
+  Data::Domain->messages('english');
 
-  # with this test, sprintf will get a redundant arg. Needs "no warnings 'redundant'" to become silent
   $dom = String(-regex    => qr/^\+?[0-9() ]+$/,
                 -messages => {SHOULD_MATCH => "illegal char"});
   $msg = $dom->inspect("foobar");
@@ -611,8 +620,6 @@ subtest "messages" => sub {
 #----------------------------------------------------------------------
 
 subtest "doc" => sub {
-  plan tests => 4;
-
   sub Phone   { String(-regex => qr/^\+?[0-9() ]+$/, @_) }
   sub Email   { String(-regex => qr/^[-.\w]+\@[\w.]+$/, @_) }
   sub Contact { Struct(-fields => [name   => String,
@@ -625,6 +632,10 @@ subtest "doc" => sub {
                            emails => ['foo.bar@foo.com']});
 
   ok(!$msg, "contact OK");
+
+  sub UpdateContact { Contact(-may_ignore => '*', @_) }
+  $msg = UpdateContact->inspect({name => "Foobar"});
+  ok(!$msg, "updateContact OK with missing phone");
 
 
   $dom = Struct( foo => 123,

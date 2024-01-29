@@ -26,7 +26,7 @@ has multiValuesSeparator => ( is => 'rw', isa => 'Maybe[Str]' );
 has jail                 => ( is => 'rw' );
 has error                => ( is => 'rw' );
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.18.0';
 our @builtCustomFunctions;
 
 ## @imethod protected build_jail()
@@ -106,7 +106,7 @@ sub build_jail {
     }
 
     $self->jail->share_from( __PACKAGE__,
-        [ @builtCustomFunctions, '&encrypt', '&token', '&listMatch' ] );
+        [ @builtCustomFunctions, '&encrypt', '&decrypt', '&token', '&listMatch' ] );
 
     $self->jail->share_from( 'MIME::Base64', ['&encode_base64'] );
 
@@ -121,6 +121,10 @@ sub build_jail {
 # Import crypto methods for jail
 sub encrypt {
     return &Lemonldap::NG::Handler::Main::tsv->{cipher}->encrypt( $_[0], 1 );
+}
+
+sub decrypt {
+    return &Lemonldap::NG::Handler::Main::tsv->{cipher}->decrypt( $_[0] );
 }
 
 sub token {

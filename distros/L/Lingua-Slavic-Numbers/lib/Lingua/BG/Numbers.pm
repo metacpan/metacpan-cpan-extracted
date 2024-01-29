@@ -6,7 +6,7 @@ use Exporter;
 use vars qw( $VERSION @EXPORT_OK @EXPORT @ISA);
 @EXPORT_OK                = qw( &number_to_bg &ordinate_to_bg );
 @EXPORT = @EXPORT_OK;
-$VERSION = 0.02;
+$VERSION = 0.03;
 @ISA                      = qw(Exporter);
 
 sub ordinate_to_bg { return Lingua::Slavic::Numbers::ordinate_to_slavic(LANG_BG, @_); }
@@ -17,6 +17,8 @@ sub number_to_bg { return Lingua::Slavic::Numbers::number_to_slavic(LANG_BG, @_)
 __END__
 
 =pod
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -58,11 +60,11 @@ This function can be exported by the module.
 
 =head1 DESCRIPTION
 
- See Lingua::Slavic::Numbers
+See L<Lingua::Slavic::Numbers>
 
 =head1 BUGS
 
- See Lingua::Slavic::Numbers
+See L<Lingua::Slavic::Numbers>
 
 =head1 COPYRIGHT
 
@@ -76,5 +78,5 @@ Ted Zlatanov <tzz@lifelogs.com>
 
 =head1 SEE ALSO
 
-Lingua::Slavic::Numbers, Lingua::EN::Numbers, Lingua::Word2Num
+L<Lingua::Slavic::Numbers>, L<Lingua::EN::Numbers>, L<Lingua::Word2Num>
 

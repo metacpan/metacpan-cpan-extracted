@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Spool;
 # ABSTRACT: Spool des fichiers de notices
-$Koha::Contrib::Sudoc::Spool::VERSION = '2.40';
+$Koha::Contrib::Sudoc::Spool::VERSION = '2.43';
 use Moose;
 use Modern::Perl;
 use File::Copy;
@@ -214,7 +214,7 @@ Koha::Contrib::Sudoc::Spool - Spool des fichiers de notices
 
 =head1 VERSION
 
-version 2.40
+version 2.43
 
 =head1 DESCRIPTION
 
@@ -275,7 +275,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Fréderic Demians.
+This software is Copyright (c) 2024 by Fréderic Demians.
 
 This is free software, licensed under:
 

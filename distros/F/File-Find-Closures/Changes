@@ -1,16 +1,10 @@
-Revision history for Perl module 
+Revision history for Perl module
+
+1.116 2024-01-10T16:25:59Z
+	* Refresh the distro for email update
 
 1.113 2021-02-04T00:45:16Z
 	* Freshen distro, remove Travis CI, add Github Actions
-
-1.112_101 2021-01-19T16:20:31Z
-	* try harder with CPAN Testers
-
-1.112_03 2018-03-29T17:24:00Z
-	* Another try for CPAN Testers
-
-1.112_02 2018-03-27T19:14:00Z
-	* Check CPAN Testers for the latest test changes.
 
 1.112_01 2018-03-25T19:48:54Z
 	* See if CPAN Testers likes this verison

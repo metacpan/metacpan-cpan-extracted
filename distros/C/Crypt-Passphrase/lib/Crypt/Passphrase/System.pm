@@ -1,5 +1,5 @@
 package Crypt::Passphrase::System;
-$Crypt::Passphrase::System::VERSION = '0.016';
+$Crypt::Passphrase::System::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -8,22 +8,22 @@ use Crypt::Passphrase -encoder;
 use Carp 'croak';
 
 my @possibilities = (
-	[1   , '$1$'              ,  6, '$1$aaaaaa$FuYJ957Lgsw.eVsENqOok1'                                                                ],
-	[5   , '$5$rounds=535000$', 12, '$5$aaaaaa$9hHgJfCniK4.dU43ykArHVETrhKDDElbS.cioeCajw.'                                           ],
-	[6   , '$6$rounds=656000$', 12, '$6$aaaaaa$RgJSheuY/DBadaBm/5gQ.s3M9a/2n8gubwCE41kMiz1P4KcxORD6LxY2NUCuOQNZawfiD8tWWfRKg9v0CQjbH0'],
+	['1' , '$1$'              ,  6, '$1$aaaaaa$FuYJ957Lgsw.eVsENqOok1'                                                                ],
+	['5' , '$5$rounds=535000$', 12, '$5$aaaaaa$9hHgJfCniK4.dU43ykArHVETrhKDDElbS.cioeCajw.'                                           ],
+	['6' , '$6$rounds=656000$', 12, '$6$aaaaaa$RgJSheuY/DBadaBm/5gQ.s3M9a/2n8gubwCE41kMiz1P4KcxORD6LxY2NUCuOQNZawfiD8tWWfRKg9v0CQjbH0'],
 	['2x', '$2x$12$'          , 16, '$2x$08$......................qrjEXaz4RUVmquy3IT5eLKXLB28ahI2'                                    ],
 	['2a', '$2a$12$'          , 16, '$2a$08$......................qrjEXaz4RUVmquy3IT5eLKXLB28ahI2'                                    ],
 	['2y', '$2y$12$'          , 16, '$2y$08$......................qrjEXaz4RUVmquy3IT5eLKXLB28ahI2'                                    ],
 	['2b', '$2b$12$'          , 16, '$2b$08$......................qrjEXaz4RUVmquy3IT5eLKXLB28ahI2'                                    ],
-	[7   , '$7$DU..../....'   , 16, '$7$AU..../....2Q9obwLhin8qvQl6sisAO/$E1HizYWxBmnIH4sdPkd1UOML9t62Gf.wvNTnt5XFzs8'                ],
+	['7' , '$7$DU..../....'   , 16, '$7$AU..../....2Q9obwLhin8qvQl6sisAO/$E1HizYWxBmnIH4sdPkd1UOML9t62Gf.wvNTnt5XFzs8'                ],
 	['gy', '$gy$j8T$'         , 16, '$gy$j9T$......................$5.2XCu2DhNfGzpifM7X8goEG2Wkio9cWIMtyWnX4tp2'                      ],
 	['y' , '$y$j8T$'          , 16, '$y$j9T$F5Jx5fExrKuPp53xLKQ..1$tnSYvahCwPBHKZUspmcxMfb0.WiB9W.zEaKlOBL35rC'                       ],
 );
 
-my (%algorithm, %salt_for, $default);
+my (%algorithm, $default);
 for my $row (@possibilities) {
 	my ($name, $setting, $salt_size, $value) = @{$row};
-	my $hash = eval { crypt('password', $value) };
+	my $hash = eval { crypt 'password', $value };
 	if (defined $hash and $hash eq $value) {
 		$algorithm{$name} = { settings => $setting, salt_size => $salt_size };
 		$default = $name;
@@ -66,7 +66,7 @@ sub _encode_crypt64 {
 	my $npadbytes = 2 - ($nbytes + 2) % 3;
 	$bytes .= "\0" x $npadbytes;
 	my $digits = '';
-	for(my $i = 0; $i < $nbytes; $i += 3) {
+	for (my $i = 0; $i < $nbytes; $i += 3) {
 		my $v = ord(substr $bytes, $i, 1) |
 			(ord(substr $bytes, $i + 1, 1) << 8) |
 			(ord(substr $bytes, $i + 2, 1) << 16);
@@ -84,7 +84,7 @@ sub hash_password {
 	my ($self, $password) = @_;
 	my $salt = $self->random_bytes($self->{salt_size});
 	my $encoded_salt = _encode_crypt64($salt);
-	return crypt($password, "$self->{settings}$encoded_salt\$");
+	return crypt $password, "$self->{settings}$encoded_salt\$";
 }
 
 my $descrypt = qr{ \A [./0-9A-Za-z]{13} \z }x;
@@ -105,7 +105,7 @@ sub needs_rehash {
 
 sub verify_password {
 	my ($class, $password, $hash) = @_;
-	my $new_hash = crypt($password, $hash);
+	my $new_hash = crypt $password, $hash;
 	return $class->secure_compare($hash, $new_hash);
 }
 
@@ -125,7 +125,7 @@ Crypt::Passphrase::System - An system crypt() encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.016
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -139,17 +139,15 @@ Note that the supported algorithms depend entirely on your platform. The only op
 
 By default it uses the first supported algorithm in this list: C<yescript>, C<scrypt>, C<bcrypt>, C<SHAcrypt>, C<MD5crypt> and C<descrypt>.
 
-=head1 METHODS
+=head2 Configuration
 
-=head2 new(%args)
-
-This creates a new crypt encoder, it takes named parameters that are all optional.
+It takes the following arguments for configuration:
 
 =over 4
 
 =item * type
 
-The type of hash, this must be one of the values returned by the C<crypt_subtypes> method. If none is given it is picked as described above.
+The type of hash, this must be one of the values supported by the system. If none is given it is picked as described above.
 
 =item * settings
 
@@ -161,25 +159,13 @@ This sets the salt size for algorithm, it defaults to something that should be s
 
 =back
 
-=head2 hash_password($password)
-
-This hashes the passwords with argon2 according to the specified settings and a random salt (and will thus return a different result each time).
-
-=head2 needs_rehash($hash)
-
-This returns true if the hash uses a different cipher, or if any of the parameters are different than desired by the encoder.
-
-=head2 crypt_subtypes()
+=head2 Supported crypt types
 
 This returns whatever crypt types it can discover on your system.
 
-=head2 verify_password($password, $hash)
-
-This will check if a password matches linux crypt hash.
-
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

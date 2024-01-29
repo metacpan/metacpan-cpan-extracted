@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Record;
 # ABSTRACT: Container for Cypher result values
-$Neo4j::Driver::Record::VERSION = '0.41';
+$Neo4j::Driver::Record::VERSION = '0.42';
 
 use Carp qw(croak);
 use JSON::MaybeXS 1.003003 qw(is_bool);
@@ -64,6 +64,8 @@ sub get_bool {
 	warnings::warnif deprecated => __PACKAGE__ . "->get_bool is deprecated";
 	
 	my $value = $self->get($field);
+	no if $^V ge v5.36, 'warnings', 'experimental::builtin';
+	return undef if ! $value && $^V ge v5.36 && builtin::is_bool $value;
 	return $value if ! is_bool $value;
 	return $value if !! $value;
 	return undef;  ##no critic (ProhibitExplicitReturnUndef)
@@ -112,7 +114,7 @@ Neo4j::Driver::Record - Container for Cypher result values
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 SYNOPSIS
 
@@ -232,10 +234,7 @@ L<IRecord (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.2/html/ca4ccbd1-2925
 
 =head1 AUTHOR
 
-Arne Johannessen <ajnn@cpan.org>
-
-If you contact me by email, please make sure you include the word
-"Perl" in your subject header to help beat the spam filters.
+Arne Johannessen (L<AJNN|https://arne.johannessen.de/>)
 
 =head1 COPYRIGHT AND LICENSE
 

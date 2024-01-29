@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Bez - Package for language Bena
 
 package Locale::CLDR::Locales::Bez;
 # This file auto generated from Data\common\main\bez.xml
-#	on Tue  5 Dec  1:01:57 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'Hiakan',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Huandola',
  			'AE' => 'Hufalme dza Hihalabu',
@@ -217,7 +217,6 @@ has 'display_name_region' => (
  			'MD' => 'Humoldova',
  			'MG' => 'Hubukini',
  			'MH' => 'Ifisima fya Marshal',
- 			'MK' => 'Humasedonia',
  			'ML' => 'Humali',
  			'MM' => 'Humyama',
  			'MN' => 'Humongolia',

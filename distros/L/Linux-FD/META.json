@@ -4,7 +4,7 @@
       "Leon Timmermans <leont@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Sub::Exporter" : "0",
+            "Exporter" : "5.57",
             "XSLoader" : "0",
             "perl" : "5.006",
             "strict" : "0",
@@ -46,7 +46,6 @@
          "requires" : {
             "IO::Select" : "0",
             "POSIX" : "0",
-            "Test::Exception" : "0",
             "Test::More" : "0.89",
             "Time::HiRes" : "0"
          }
@@ -55,19 +54,19 @@
    "provides" : {
       "Linux::FD" : {
          "file" : "lib/Linux/FD.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Linux::FD::Event" : {
          "file" : "lib/Linux/FD/Event.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Linux::FD::Signal" : {
          "file" : "lib/Linux/FD/Signal.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Linux::FD::Timer" : {
          "file" : "lib/Linux/FD/Timer.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       }
    },
    "release_status" : "stable",
@@ -81,9 +80,9 @@
          "web" : "https://github.com/Leont/linux-fd"
       }
    },
-   "version" : "0.014",
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
+   "version" : "0.015",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

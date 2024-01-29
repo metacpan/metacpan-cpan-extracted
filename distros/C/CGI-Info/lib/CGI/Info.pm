@@ -25,11 +25,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.78
+Version 0.80
 
 =cut
 
-our $VERSION = '0.78';
+our $VERSION = '0.80';
 
 =head1 SYNOPSIS
 
@@ -222,10 +222,17 @@ Returns the file system directory containing the script.
 
 	print 'HTML files are normally stored in ', $info->script_dir(), '/', File::Spec->updir(), "\n";
 
+	# or
+	use lib CGI::Info::script_dir() . '../lib';
+
 =cut
 
 sub script_dir {
 	my $self = shift;
+
+	if(!ref($self)) {
+		$self = __PACKAGE__->new();
+	}
 
 	unless($self->{script_path}) {
 		$self->_find_paths();
@@ -383,7 +390,8 @@ CGI::Info helps you to test your script prior to deployment on a website:
 if it is not in a CGI environment (e.g. the script is being tested from the
 command line), the program's command line arguments (a list of key=value pairs)
 are used, if there are no command line arguments then they are read from stdin
-as a list of key=value lines. Also you can give one of --tablet, --search-engine,
+as a list of key=value lines.
+Also you can give one of --tablet, --search-engine,
 --mobile and --robot to mimic those agents. For example:
 
 	./script.cgi --mobile name=Nigel
@@ -442,9 +450,9 @@ constructor.
 	# ...
 	my $info = CGI::Info->new();
 	my $allowed = {
-		'foo' => qr(^\d*$),	# foo must be a number, or empty
-		'bar' => undef,
-		'xyzzy' => qr(^[\w\s-]+$),	# must be alphanumeric
+		foo => qr/^\d*$/,	# foo must be a number, or empty
+		bar => undef,
+		xyzzy => qr/^[\w\s-]+$/,	# must be alphanumeric
 						# to prevent XSS, and non-empty
 						# as a sanity check
 	};
@@ -744,7 +752,9 @@ sub params {
 
 		if((!defined($ENV{'REQUEST_METHOD'})) || ($ENV{'REQUEST_METHOD'} eq 'GET')) {
 			# From http://www.symantec.com/connect/articles/detection-sql-injection-and-cross-site-scripting-attacks
-			if(($value =~ /(\%27)|(\')|(\-\-)|(\%23)|(\#)/ix) ||
+			# Facebook FBCLID can have "--"
+			# if(($value =~ /(\%27)|(\')|(\-\-)|(\%23)|(\#)/ix) ||
+			if(($value =~ /(\%27)|(\')|(\%23)|(\#)/ix) ||
 			   ($value =~ /((\%3D)|(=))[^\n]*((\%27)|(\')|(\-\-)|(\%3B)|(;))/i) ||
 			   ($value =~ /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))/ix) ||
 			   ($value =~ /((\%27)|(\'))union/ix) ||
@@ -819,7 +829,7 @@ be thrown:
 
 	use CGI::Info;
 	my $allowed = {
-		'foo' => qr(\d+),
+		foo => qr/\d+/
 	};
 	my $xyzzy = $info->params(allow => $allowed);
 	my $bar = $info->param('bar');  # Gives an error message
@@ -857,7 +867,7 @@ sub _warn {
 		%params = %{$_[0]};
 	} elsif(scalar(@_) % 2 == 0) {
 		%params = @_;
-	} else {
+	} elsif(scalar(@_) == 1) {
 		$params{'warning'} = shift;
 	}
 
@@ -1289,6 +1299,38 @@ sub rootdir {
 	return $script_name;
 }
 
+=head2 root_dir
+
+Synonym of rootdir(), for compatibility with L<CHI>.
+
+=cut
+
+sub root_dir
+{
+	if($_[0] && ref($_[0])) {
+		my $self = shift;
+
+		return $self->rootdir(@_);
+	}
+	return __PACKAGE__->rootdir(@_);
+}
+
+=head2 documentroot
+
+Synonym of rootdir(), for compatibility with Apache.
+
+=cut
+
+sub documentroot
+{
+	if($_[0] && ref($_[0])) {
+		my $self = shift;
+
+		return $self->rootdir(@_);
+	}
+	return __PACKAGE__->rootdir(@_);
+}
+
 =head2 logdir
 
 Gets and sets the name of a directory that you can use to store logs in.
@@ -1360,7 +1402,7 @@ sub is_robot {
 		}
 		return 1;
 	}
-	if($agent =~ /.+bot|bytespider|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor 1.0/i) {
+	if($agent =~ /.+bot|bytespider|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru/i) {
 		$self->{is_robot} = 1;
 		return 1;
 	}
@@ -1427,6 +1469,16 @@ sub is_robot {
 				return $self->{is_robot} = ($type eq 'robot');
 			}
 		}
+	}
+
+	# Don't use HTTP_USER_AGENT to detect more than we really have to since
+	# that is easily spoofed
+	if($agent =~ /www\.majestic12\.co\.uk|facebookexternal/) {
+		# Mark Facebook as a search engine, not a robot
+		if($self->{cache}) {
+			$self->{cache}->set($key, 'search', '1 day');
+		}
+		return 0;
 	}
 
 	unless($self->{browser_detect}) {
@@ -1530,7 +1582,7 @@ sub is_search_engine {
 	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
 	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
 
-	if(defined($hostname) && ($hostname =~ /google|msnbot|bingbot|amazonbot/) && ($hostname !~ /^google-proxy/)) {
+	if(defined($hostname) && ($hostname =~ /google|msnbot|bingbot|amazonbot|GPTBot/) && ($hostname !~ /^google-proxy/)) {
 		if($self->{cache}) {
 			$self->{cache}->set($key, 'search', '1 day');
 		}
@@ -1606,7 +1658,7 @@ sub get_cookie {
 		%params = %{$_[0]};
 	} elsif(scalar(@_) % 2 == 0) {
 		%params = @_;
-	} else {
+	} elsif(scalar(@_) == 1) {
 		$params{'cookie_name'} = shift;
 	}
 
@@ -1712,7 +1764,7 @@ sub set_logger {
 		%params = %{$_[0]};
 	} elsif(scalar(@_) % 2 == 0) {
 		%params = @_;
-	} else {
+	} elsif(scalar(@_) == 1) {
 		$params{'logger'} = shift;
 	}
 
@@ -1790,7 +1842,7 @@ You can also look for information at:
 
 =item * MetaCPAN
 
-L<https://metacpan.org/release/CGI-Info>
+L<https://metacpan.org/dist/CGI-Info>
 
 =item * RT: CPAN's request tracker
 
@@ -1808,7 +1860,7 @@ L<http://deps.cpantesters.org/?module=CGI::Info>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2023 Nigel Horne.
+Copyright 2010-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

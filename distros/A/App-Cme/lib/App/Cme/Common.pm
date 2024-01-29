@@ -10,7 +10,7 @@
 #ABSTRACT: Common methods for App::Cme
 
 package App::Cme::Common;
-$App::Cme::Common::VERSION = '1.038';
+$App::Cme::Common::VERSION = '1.040';
 use strict;
 use warnings;
 use 5.10.1;
@@ -214,8 +214,14 @@ sub run_tk_ui {
     $instance->on_message_cb(sub{$cmu->show_message(@_);});
 
     if ($opt->{open_item}) {
-        my $obj = $instance->grab($opt->{open_item});
-        $cmu->force_element_display($obj);
+        my $obj = $instance->grab(step => $opt->{open_item}, autoadd => 0);
+        # using afterIdle avoids geometry problem where the right side
+        # of the widget is not visible
+        $mw->afterIdle( sub {
+            $cmu->force_element_display($obj);
+            my $path = $cmu->{tktree}->selectionGet;
+            $cmu->create_element_widget('edit', $path);
+        })
     }
 
     &MainLoop;    # Tk's
@@ -269,7 +275,7 @@ App::Cme::Common - Common methods for App::Cme
 
 =head1 VERSION
 
-version 1.038
+version 1.040
 
 =head1 SYNOPSIS
 

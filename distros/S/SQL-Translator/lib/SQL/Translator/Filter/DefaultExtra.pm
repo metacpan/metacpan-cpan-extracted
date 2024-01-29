@@ -33,27 +33,27 @@ objects.
 
 use strict;
 use warnings;
-our $VERSION = '1.63';
+our $VERSION = '1.65';
 
 sub filter {
-    my $schema = shift;
-    my %args = { +shift };
+  my $schema = shift;
+  my %args   = { +shift };
 
-    # Tables
-    foreach ( $schema->get_tables ) {
-        my %extra = $_->extra;
+  # Tables
+  foreach ($schema->get_tables) {
+    my %extra = $_->extra;
 
-        $extra{label} ||= ucfirst($_->name);
-        $_->extra( %extra );
-    }
+    $extra{label} ||= ucfirst($_->name);
+    $_->extra(%extra);
+  }
 
-    # Fields
-    foreach ( map { $_->get_fields } $schema->get_tables ) {
-        my %extra = $_->extra;
+  # Fields
+  foreach (map { $_->get_fields } $schema->get_tables) {
+    my %extra = $_->extra;
 
-        $extra{label} ||= ucfirst($_->name);
-        $_->extra( %extra );
-    }
+    $extra{label} ||= ucfirst($_->name);
+    $_->extra(%extra);
+  }
 }
 
 1;

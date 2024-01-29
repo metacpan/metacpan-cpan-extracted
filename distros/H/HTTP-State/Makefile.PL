@@ -7,7 +7,7 @@ WriteMakefile(
       "Log::ger"=>0,
       "Log::OK"=>0,
       "Object::Pad"=>0,
-      "List::Insertion"=>0,
+      "List::Insertion"=>"v0.1.4",
       "Mozilla::PublicSuffix"=>0,
       "Export::These"=>0
     },
@@ -25,7 +25,7 @@ WriteMakefile(
         repository =>{
           type => "git",
           url => "git://github.com/drclaw1394/perl-http-state.git",
-          web => "http://github.com/drclaw1394/perl-http-state",
+          web => "https://github.com/drclaw1394/perl-http-state",
         }
       }
     }

@@ -7,6 +7,20 @@ Bug fixes to PDF::API2 (in PDF::Builder) are not mentioned if they correct
 an error (that produces an error message and/or incorrect output) and do not 
 affect the operation or results of otherwise correct code.
 
+==== A VERY IMPORTANT NOTE =================================================
+
+These notes describe ONLY function known to differ from behavior found in
+PDF::API2. That is, you may well see (somewhat) different behavior or output 
+converting over a program that runs on PDF::API2, to PDF::Builder. It does 
+NOT cover new function such as extended splines, HTML and Markdown 
+formatting of columns, etc. Be aware that using such new function in 
+PDF::Builder may make your code NOT portable to PDF::API2 (i.e., you are now 
+locked in to PDF::Builder). The documentation may or may not mention that
+this is new functionality exclusive to PDF::Builder, so be sure to test on
+PDF::API2 if you have a package or library intended to run on both!
+
+============================================================================
+
 3.024     2022-09-12
 
    PDF::API2 now initializes page display to a fairly tightly zoomed-in
@@ -130,6 +144,9 @@ affect the operation or results of otherwise correct code.
    lib/PDF/Builder/Content.pm  [ref CTS 7] $text->save() and restore() are no
      longer no-ops, if you had them in your code. They issue the same q and Q
      commands as a graphics save() and restore().
+   *** Removed in release 3.26. save/restore are only for graphics context
+   *** and should not be used in text context (will see a one-time warning,
+   *** and the calls are now no-ops)
 
    lib/PDF/Builder.pm
    lib/PDF/Builder/Content.pm

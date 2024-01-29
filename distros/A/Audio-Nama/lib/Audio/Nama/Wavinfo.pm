@@ -1,7 +1,7 @@
 # ------- WAV file info routines ---------
 
 package Audio::Nama;
-use Modern::Perl;
+use Modern::Perl '2020';
 
 ### WAV file length/format/modify_time are cached in $setup->{wav_info} 
 
@@ -53,7 +53,7 @@ sub _update_wav_cache {
 	{ no warnings 'uninitialized';
 	return unless _get_modify_time($path) != $setup->{wav_info}->{$path}{modify_time};
 	}
-	throw("WAV file $path has changed! Updating cache.");
+	# throw("WAV file $path has changed! Updating cache.");
 	_get_wav_info($path) 
 }
 

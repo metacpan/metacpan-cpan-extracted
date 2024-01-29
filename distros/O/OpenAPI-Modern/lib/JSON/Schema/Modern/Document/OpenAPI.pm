@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.052';
+our $VERSION = '0.058';
 
 use 5.020;
 use Moo;
@@ -87,6 +87,7 @@ sub traverse ($self, $evaluator) {
     spec_version => $evaluator->SPECIFICATION_VERSION_DEFAULT,
     vocabularies => [],
     subschemas => [],
+    depth => 0,
   };
 
   # this is an abridged form of https://spec.openapis.org/oas/3.1/schema/latest
@@ -235,23 +236,31 @@ sub _add_vocab_and_default_schemas ($self) {
   my $js = $self->evaluator;
   $js->add_vocabulary('JSON::Schema::Modern::Vocabulary::OpenAPI');
 
-  $js->add_format_validation(
-    int32 => +{ type => 'integer', sub => sub ($x) {
-      require Math::BigInt;
+  $js->add_format_validation(int32 => +{
+    type => 'number',
+    sub => sub ($x) {
+      require Math::BigInt; Math::BigInt->VERSION(1.999701);
       $x = Math::BigInt->new($x);
+      return if $x->is_nan;
       my $bound = Math::BigInt->new(2) ** 31;
       $x >= -$bound && $x < $bound;
-    } },
-    int64 => +{ type => 'integer', sub => sub ($x) {
-      require Math::BigInt;
+    }
+  });
+
+  $js->add_format_validation(int64 => +{
+    type => 'number',
+    sub => sub ($x) {
+      require Math::BigInt; Math::BigInt->VERSION(1.999701);
       $x = Math::BigInt->new($x);
+      return if $x->is_nan;
       my $bound = Math::BigInt->new(2) ** 63;
       $x >= -$bound && $x < $bound;
-    } },
-    float => +{ type => 'number', sub => sub ($) { 1 } },
-    double => +{ type => 'number', sub => sub ($) { 1 } },
-    password => +{ type => 'string', sub => sub ($) { 1 } },
-  );
+    }
+  });
+
+  $js->add_format_validation(float => +{ type => 'number', sub => sub ($x) { 1 } });
+  $js->add_format_validation(double => +{ type => 'number', sub => sub ($x) { 1 } });
+  $js->add_format_validation(password => +{ type => 'string', sub => sub ($) { 1 } });
 
   foreach my $pairs (pairs DEFAULT_SCHEMAS->%*) {
     my ($filename, $uri) = @$pairs;
@@ -306,7 +315,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.052
+version 0.058
 
 =head1 SYNOPSIS
 
@@ -407,7 +416,7 @@ L<https://www.openapis.org/>
 
 =item *
 
-L<https://oai.github.io/Documentation/>
+L<https://learn.openapis.org/>
 
 =item *
 

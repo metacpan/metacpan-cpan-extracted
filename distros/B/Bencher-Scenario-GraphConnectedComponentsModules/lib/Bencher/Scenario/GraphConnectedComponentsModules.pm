@@ -1,0 +1,318 @@
+package Bencher::Scenario::GraphConnectedComponentsModules;
+
+use 5.010001;
+use strict;
+use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-12-20'; # DATE
+our $DIST = 'Bencher-Scenario-GraphConnectedComponentsModules'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+our $scenario = {
+    summary => 'Benchmark graph topological sort modules',
+    modules => {
+    },
+    participants => [
+        {
+            module => 'Data::Graph::Util',
+            function => 'connected_components',
+            code_template  => 'Data::Graph::Util::connected_components(<graph>)',
+            result_is_list => 1,
+        },
+        {
+            module => 'Graph',
+            function => 'connected_components',
+            code_template  => <<'CODE',
+
+my $g = Graph->new(undirected => 1);
+my $connections = <graph>;
+for my $src (keys %$connections) {
+    for my $dest (@{ $connections->{$src} }) {
+        $g->add_edge($src, $dest);
+    }
+}
+
+my @subgraphs = $g->connected_components;
+my @allgraphs;
+
+for my $subgraph (@subgraphs) {
+    push @allgraphs, {};
+    for my $node (@$subgraph) {
+        if (exists $connections->{$node}) {
+            $allgraphs[-1]{$node} = [ @{ $connections->{$node} } ];
+        }
+    }
+}
+@allgraphs;
+CODE
+            result_is_list => 1,
+        },
+    ],
+
+    datasets => [
+        {
+            name => 'empty',
+            args => {
+                graph => {
+                },
+            },
+        },
+
+        {
+            name => '2nodes-1edge',
+            args => {
+                graph => {
+                    a => ['b'],
+                },
+            },
+        },
+
+        {
+            name => '6nodes-5edges-2subgraphs',
+            args => {
+                graph => {
+                    a => ['b'],
+                    b => ['c','d'],
+                    d => ['c'],
+                    e => ['f'],
+                },
+            },
+        },
+
+        {
+            name => '100nodes-500edges-1subgraph',
+            args => {
+                graph => {
+                    (map { (sprintf("%03d",$_) => [$_==1 ? ("002".."021") : (grep {$_<=100} sprintf("%03d", $_+1), sprintf("%03d", $_+2), sprintf("%03d", $_+3), sprintf("%03d", $_+4), sprintf("%03d", $_+5))]) } 1..100)
+                },
+            },
+        },
+    ], # datasets
+};
+
+1;
+# ABSTRACT: Benchmark graph topological sort modules
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Bencher::Scenario::GraphConnectedComponentsModules - Benchmark graph topological sort modules
+
+=head1 VERSION
+
+This document describes version 0.001 of Bencher::Scenario::GraphConnectedComponentsModules (from Perl distribution Bencher-Scenario-GraphConnectedComponentsModules), released on 2023-12-20.
+
+=head1 SYNOPSIS
+
+To run benchmark with default option:
+
+ % bencher -m GraphConnectedComponentsModules
+
+To run module startup overhead benchmark:
+
+ % bencher --module-startup -m GraphConnectedComponentsModules
+
+For more options (dump scenario, list/include/exclude/add participants, list/include/exclude/add datasets, etc), see L<bencher> or run C<bencher --help>.
+
+=head1 DESCRIPTION
+
+Packaging a benchmark script as a Bencher scenario makes it convenient to include/exclude/add participants/datasets (either via CLI or Perl code), send the result to a central repository, among others . See L<Bencher> and L<bencher> (CLI) for more details.
+
+=head1 BENCHMARKED MODULES
+
+Version numbers shown below are the versions used when running the sample benchmark.
+
+L<Data::Graph::Util> 0.007
+
+L<Graph> 0.9727
+
+=head1 BENCHMARK PARTICIPANTS
+
+=over
+
+=item * Data::Graph::Util::connected_components (perl_code)
+
+Code template:
+
+ Data::Graph::Util::connected_components(<graph>)
+
+
+
+=item * Graph::connected_components (perl_code)
+
+Code template:
+
+ 
+ my $g = Graph->new(undirected => 1);
+ my $connections = <graph>;
+ for my $src (keys %$connections) {
+     for my $dest (@{ $connections->{$src} }) {
+         $g->add_edge($src, $dest);
+     }
+ }
+ 
+ my @subgraphs = $g->connected_components;
+ my @allgraphs;
+ 
+ for my $subgraph (@subgraphs) {
+     push @allgraphs, {};
+     for my $node (@$subgraph) {
+         if (exists $connections->{$node}) {
+             $allgraphs[-1]{$node} = [ @{ $connections->{$node} } ];
+         }
+     }
+ }
+ @allgraphs;
+
+
+
+
+=back
+
+=head1 BENCHMARK DATASETS
+
+=over
+
+=item * empty
+
+=item * 2nodes-1edge
+
+=item * 6nodes-5edges-2subgraphs
+
+=item * 100nodes-500edges-1subgraph
+
+=back
+
+=head1 BENCHMARK SAMPLE RESULTS
+
+=head2 Sample benchmark #1
+
+Run on: perl: I<< v5.38.2 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 20.04 >>, OS kernel: I<< Linux version 5.4.0-164-generic >>.
+
+Benchmark command (default options):
+
+ % bencher -m GraphConnectedComponentsModules
+
+Result formatted as table:
+
+ #table1#
+ +-----------------------------------------+-----------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+ | participant                             | dataset                     | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+ +-----------------------------------------+-----------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+ | Graph::connected_components             | 100nodes-500edges-1subgraph |        50 | 20        |                 0.00% |           3896155.63% |   0.00035 |      20 |
+ | Data::Graph::Util::connected_components | 100nodes-500edges-1subgraph |      1720 |  0.582    |              3227.10% |            117006.73% | 3.1e-07   |      20 |
+ | Graph::connected_components             | 6nodes-5edges-2subgraphs    |      1800 |  0.54     |              3460.98% |            109315.22% | 6.5e-07   |      20 |
+ | Graph::connected_components             | 2nodes-1edge                |      4300 |  0.23     |              8302.04% |             46272.75% | 5.1e-07   |      20 |
+ | Graph::connected_components             | empty                       |     37000 |  0.027    |             71599.02% |              5334.18% | 1.3e-07   |      20 |
+ | Data::Graph::Util::connected_components | 6nodes-5edges-2subgraphs    |     93300 |  0.0107   |            180620.43% |              2055.96% |   6e-09   |      20 |
+ | Data::Graph::Util::connected_components | 2nodes-1edge                |    294000 |  0.00341  |            568670.49% |               585.03% | 1.9e-09   |      20 |
+ | Data::Graph::Util::connected_components | empty                       |   2010000 |  0.000497 |           3896155.63% |                 0.00% |   2e-10   |      20 |
+ +-----------------------------------------+-----------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+
+
+The above result formatted in L<Benchmark.pm|Benchmark> style:
+
+                                            Rate  G:c_c 100nodes-500edges-1subgraph  DGU:c_c 100nodes-500edges-1subgraph  G:c_c 6nodes-5edges-2subgraphs  G:c_c 2nodes-1edge  G:c_c empty  DGU:c_c 6nodes-5edges-2subgraphs  DGU:c_c 2nodes-1edge  DGU:c_c empty 
+  G:c_c 100nodes-500edges-1subgraph         50/s                                 --                                 -97%                            -97%                -98%         -99%                              -99%                  -99%           -99% 
+  DGU:c_c 100nodes-500edges-1subgraph     1720/s                              3336%                                   --                             -7%                -60%         -95%                              -98%                  -99%           -99% 
+  G:c_c 6nodes-5edges-2subgraphs          1800/s                              3603%                                   7%                              --                -57%         -95%                              -98%                  -99%           -99% 
+  G:c_c 2nodes-1edge                      4300/s                              8595%                                 153%                            134%                  --         -88%                              -95%                  -98%           -99% 
+  G:c_c empty                            37000/s                             73974%                                2055%                           1900%                751%           --                              -60%                  -87%           -98% 
+  DGU:c_c 6nodes-5edges-2subgraphs       93300/s                            186815%                                5339%                           4946%               2049%         152%                                --                  -68%           -95% 
+  DGU:c_c 2nodes-1edge                  294000/s                            586410%                               16967%                          15735%               6644%         691%                              213%                    --           -85% 
+  DGU:c_c empty                        2010000/s                           4024044%                              117002%                         108551%              46177%        5332%                             2052%                  586%             -- 
+ 
+ Legends:
+   DGU:c_c 100nodes-500edges-1subgraph: dataset=100nodes-500edges-1subgraph participant=Data::Graph::Util::connected_components
+   DGU:c_c 2nodes-1edge: dataset=2nodes-1edge participant=Data::Graph::Util::connected_components
+   DGU:c_c 6nodes-5edges-2subgraphs: dataset=6nodes-5edges-2subgraphs participant=Data::Graph::Util::connected_components
+   DGU:c_c empty: dataset=empty participant=Data::Graph::Util::connected_components
+   G:c_c 100nodes-500edges-1subgraph: dataset=100nodes-500edges-1subgraph participant=Graph::connected_components
+   G:c_c 2nodes-1edge: dataset=2nodes-1edge participant=Graph::connected_components
+   G:c_c 6nodes-5edges-2subgraphs: dataset=6nodes-5edges-2subgraphs participant=Graph::connected_components
+   G:c_c empty: dataset=empty participant=Graph::connected_components
+
+=head2 Sample benchmark #2
+
+Benchmark command (benchmarking module startup overhead):
+
+ % bencher -m GraphConnectedComponentsModules --module-startup
+
+Result formatted as table:
+
+ #table2#
+ +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+ | participant         | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+ | Graph               |        30 |                23 |                 0.00% |               330.30% | 0.00042 |      20 |
+ | Data::Graph::Util   |        10 |                 3 |               183.50% |                51.78% | 0.00013 |      20 |
+ | perl -e1 (baseline) |         7 |                 0 |               330.30% |                 0.00% | 0.00017 |      20 |
+ +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+
+
+The above result formatted in L<Benchmark.pm|Benchmark> style:
+
+                          Rate     G  DG:U  perl -e1 (baseline) 
+  G                     33.3/s    --  -66%                 -76% 
+  DG:U                 100.0/s  200%    --                 -30% 
+  perl -e1 (baseline)  142.9/s  328%   42%                   -- 
+ 
+ Legends:
+   DG:U: mod_overhead_time=3 participant=Data::Graph::Util
+   G: mod_overhead_time=23 participant=Graph
+   perl -e1 (baseline): mod_overhead_time=0 participant=perl -e1 (baseline)
+
+To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Bencher-Scenario-GraphConnectedComponentsModules>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Bencher-Scenario-GraphConnectedComponentsModules>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-GraphConnectedComponentsModules>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

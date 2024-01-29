@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,91 +31,91 @@ no_index:
 provides:
   Protocol::Database::PostgreSQL:
     file: lib/Protocol/Database/PostgreSQL.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend:
     file: lib/Protocol/Database/PostgreSQL/Backend.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::AuthenticationRequest:
     file: lib/Protocol/Database/PostgreSQL/Backend/AuthenticationRequest.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::BackendKeyData:
     file: lib/Protocol/Database/PostgreSQL/Backend/BackendKeyData.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::BindComplete:
     file: lib/Protocol/Database/PostgreSQL/Backend/BindComplete.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::CloseComplete:
     file: lib/Protocol/Database/PostgreSQL/Backend/CloseComplete.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::CommandComplete:
     file: lib/Protocol/Database/PostgreSQL/Backend/CommandComplete.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::CopyBothResponse:
     file: lib/Protocol/Database/PostgreSQL/Backend/CopyBothResponse.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::CopyData:
     file: lib/Protocol/Database/PostgreSQL/Backend/CopyData.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::CopyDone:
     file: lib/Protocol/Database/PostgreSQL/Backend/CopyDone.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::CopyInResponse:
     file: lib/Protocol/Database/PostgreSQL/Backend/CopyInResponse.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::CopyOutResponse:
     file: lib/Protocol/Database/PostgreSQL/Backend/CopyOutResponse.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::DataRow:
     file: lib/Protocol/Database/PostgreSQL/Backend/DataRow.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::EmptyQueryResponse:
     file: lib/Protocol/Database/PostgreSQL/Backend/EmptyQueryResponse.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::ErrorResponse:
     file: lib/Protocol/Database/PostgreSQL/Backend/ErrorResponse.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::FunctionCallResponse:
     file: lib/Protocol/Database/PostgreSQL/Backend/FunctionCallResponse.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::NoData:
     file: lib/Protocol/Database/PostgreSQL/Backend/NoData.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::NoticeResponse:
     file: lib/Protocol/Database/PostgreSQL/Backend/NoticeResponse.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::NotificationResponse:
     file: lib/Protocol/Database/PostgreSQL/Backend/NotificationResponse.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::ParameterDescription:
     file: lib/Protocol/Database/PostgreSQL/Backend/ParameterDescription.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::ParameterStatus:
     file: lib/Protocol/Database/PostgreSQL/Backend/ParameterStatus.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::ParseComplete:
     file: lib/Protocol/Database/PostgreSQL/Backend/ParseComplete.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::PortalSuspended:
     file: lib/Protocol/Database/PostgreSQL/Backend/PortalSuspended.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::ReadyForQuery:
     file: lib/Protocol/Database/PostgreSQL/Backend/ReadyForQuery.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Backend::RowDescription:
     file: lib/Protocol/Database/PostgreSQL/Backend/RowDescription.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Client:
     file: lib/Protocol/Database/PostgreSQL/Client.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Constants:
     file: lib/Protocol/Database/PostgreSQL/Constants.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Error:
     file: lib/Protocol/Database/PostgreSQL/Error.pm
-    version: '2.000'
+    version: '2.001'
   Protocol::Database::PostgreSQL::Message:
     file: lib/Protocol/Database/PostgreSQL/Message.pm
-    version: '2.000'
+    version: '2.001'
 requires:
   Adapter::Async: '0'
   Check::UnitCheck: '0'
@@ -135,8 +135,8 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Protocol-Database-PostgreSQL/issues
   homepage: https://github.com/team-at-cpan/Protocol-Database-PostgreSQL
   repository: https://github.com/team-at-cpan/Protocol-Database-PostgreSQL.git
-version: '2.000'
+version: '2.001'
 x_authority: cpan:TEAM
-x_generated_by_perl: v5.34.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

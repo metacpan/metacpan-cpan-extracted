@@ -1,0 +1,188 @@
+#!perl
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-01-25'; # DATE
+our $DIST = 'App-indent'; # DIST
+our $VERSION = '0.002'; # VERSION
+
+my $indent_opts = {
+    indent => "    ",
+};
+
+my %Opts = (
+    #indent => "    ",
+    #first_line => undef,
+    #first_line_of_para => undef,
+    #subsequent_lines => undef,
+    #indent_blank_lines => 1,
+);
+
+sub parse_cmdline {
+    Getopt::Long::Configure("gnu_getopt", "no_ignore_case");
+    my $res = GetOptions(
+        'indent|i=s' => \$indent_opts->{indent},
+        'first-line|f=s' => \$indent_opts->{first_line_indent},
+        'first-line-of-para|p=s' => \$indent_opts->{first_line_of_para_indent},
+        'subsequent-lines|s=s' => \$indent_opts->{subsequent_lines_indent},
+        'no-indent-blank-lines|B' => sub { $indent_opts->{indent_blank_lines} = 0 },
+        'version|v' => sub {
+            print "indent version ", ($main::VERSION // 'dev'), "\n";
+            exit 0;
+        },
+        'help|h'           => sub {
+            print <<USAGE;
+Usage:
+  indent [OPTIONS]... [FILE]...
+  indent --help, -h
+  indent --version, -v
+Options:
+  --first-line, -f
+  --first-line-of-para, -p
+  --subsequent-lines, -s
+  --no-indent-blank-lines, -B
+For more details, see the manpage/documentation.
+USAGE
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+}
+
+# MAIN
+
+parse_cmdline();
+$/ = undef;
+require String::Indent;
+print String::Indent::indent($indent_opts->{indent}, (scalar <>), $indent_opts);
+
+1;
+# ABSTRACT: Indent text
+# PODNAME: indent
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+indent - Indent text
+
+=head1 VERSION
+
+This document describes version 0.002 of indent (from Perl distribution App-indent), released on 2024-01-25.
+
+=head1 SYNOPSIS
+
+ indent [OPTION]... [FILE]...
+
+=head1 DESCRIPTION
+
+This is a simple utility to indent lines of text. By default it indents lines
+with four spaces. You can specity a different indent characters:
+
+ % someprog ... | indent -i "xxxx"
+
+You can set a different indent for first line (C<-f>), first line of paragraph
+(C<-p>), and subsequent lines (C<-s>). Finally, you can also opt to not indent
+blank lines. Here's an example with how the resulting text might look like:
+
+ % someprog ... | indent -i "iiii" -f "ffff" -p "pppp" -s "ssss" -B
+
+ ffffThis is the first line of text.
+ ssssThis is the second line. The following will be a blank line.
+
+ ppppThis is the start of the second paragraph.
+
+ ppppThe third paragraph.
+ ssssSecond line of third paragraph.
+ ssssThird of third.
+
+=head1 EXIT CODES
+
+0 on success.
+
+99 on command-line options error.
+
+=head1 OPTIONS
+
+=over
+
+=item * --first-line, -f
+
+Give a different indent for first line.
+
+=item * --first-line-of-para, -p
+
+Give a different indent for first line of each paragrah. Paragraphs are
+separated by blank lines.
+
+=item * --subsequent-lines, -s
+
+Give a different indent for subsequent lines.
+
+=item * --no-indent-blank-lines, -B
+
+Do not indent blank lines.
+
+=back
+
+=head1 FAQ
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-indent>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-indent>.
+
+=head1 SEE ALSO
+
+Somewhat related: L<textwrap> et al from L<App::TextWrapUtils>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-indent>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

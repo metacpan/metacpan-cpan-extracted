@@ -1,3 +1,14 @@
+0.104		2023-12-19	T. R. Wyant
+    Return correct item ID. Thanks to DabeDotCom (Dabrien 'Dabe' Murphy)
+    for the pull request.
+
+    Fix fatal error when compiled under Xcode 15 or above The error was
+    introduced when I cut out the pbl back-end, but was previously not
+    fatal -- at least not usually. Thanks to Mike Cappella for finding
+    this for me.
+
+    No flavor tags in Monterey and forward.
+
 0.103		2022-03-13	T. R. Wyant
     Use guarded #pragma to suppress clang warnings.  The warnings ("...
     tokens introducing statement expression appear in different macro

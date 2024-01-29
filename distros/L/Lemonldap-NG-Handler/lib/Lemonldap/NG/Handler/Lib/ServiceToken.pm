@@ -2,7 +2,7 @@ package Lemonldap::NG::Handler::Lib::ServiceToken;
 
 use strict;
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.18.0';
 
 sub fetchId {
     my ( $class, $req ) = @_;
@@ -39,22 +39,23 @@ sub fetchId {
             1;
         }
         else {
-            $class->logger->debug("Found a non valid VHost: $_");
+            $class->logger->warn("Found a non valid VHost: $_");
             0;
         }
     } @vhosts;
 
-    # $_session_id and at least one vhost
-    unless ( @vhosts and $_session_id ) {
+    # $_session_id and at least one vhost or RegExp
+    unless ( $_session_id and ( @vhosts or @vhostRegexp ) ) {
         $class->userLogger->error('Bad service token');
         $class->logger->debug(
-            @vhosts ? 'No _session_id found' : 'No VH found' );
+            $_session_id ? 'No VH or RegExp found' : 'No _session_id found' );
         return 0;
     }
 
     # Is vhost listed in token ?
     if ( grep { $_ eq $vhost } @vhosts ) {
-        $class->logger->debug( "$vhost found in VHosts list: " . join ', ', @vhosts );
+        $class->logger->debug( "$vhost found in VHosts list: " . join ', ',
+            @vhosts );
     }
     elsif ( grep { $vhost =~ $_ } @vhostRegexp ) {
         $class->logger->debug( "$vhost matches a VHost regexp: " . join ', ',
@@ -62,14 +63,16 @@ sub fetchId {
     }
     else {
         $class->userLogger->error( "$vhost not allowed in token scope ("
-              . join( ', ', ( @vhostRegexp, @vhosts, ) )
+              . join( ', ', ( @vhostRegexp, @vhosts ) )
               . ')' );
         return 0;
     }
 
     # Is token in good interval ?
-    my $ttl = $class->tsv->{serviceTokenTTL}->{$vhost}
-      || $class->tsv->{handlerServiceTokenTTL};
+    my $ttl =
+      ( $class->tsv->{serviceTokenTTL}->{$vhost} > 0 )
+      ? $class->tsv->{serviceTokenTTL}->{$vhost}
+      : $class->tsv->{handlerServiceTokenTTL};
     my $now = time;
     unless ( $t <= $now and $t > $now - $ttl ) {
         $class->userLogger->warn('Expired service token');

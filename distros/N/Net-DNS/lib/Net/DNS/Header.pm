@@ -3,7 +3,7 @@ package Net::DNS::Header;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Header.pm 1910 2023-03-30 19:16:30Z willem $)[2];
+our $VERSION = (qw$Id: Header.pm 1953 2023-12-24 09:03:14Z willem $)[2];
 
 
 =head1 NAME
@@ -125,8 +125,7 @@ sub id {
 	my ( $self, @value ) = @_;
 	for (@value) { $$self->{id} = $_ }
 	my $ident = $$self->{id};
-	return $ident if $ident;
-	return $ident if defined($ident) && $self->opcode eq 'DSO';
+	return $ident if defined($ident);
 	( $cache1, $cache2, $limit ) = ( {0 => 1}, $cache1, 50 ) unless $limit--;
 	$ident = int rand(0xffff);				# preserve short-term uniqueness
 	$ident = int rand(0xffff) while $cache1->{$ident}++ + exists( $cache2->{$ident} );

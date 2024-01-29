@@ -1,3 +1,7 @@
+3.0509040004 - 2023-12-13
+
+  * add alien_extra_site_config to pick up CFLAGS and LDFLAGS
+
 3.0509040002 - 2023-11-23
 
   * Update for net-snmp 5.9.4

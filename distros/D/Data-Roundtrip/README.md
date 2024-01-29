@@ -4,7 +4,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 # VERSION
 
-Version 0.25
+Version 0.26
 
 # SYNOPSIS
 
@@ -453,6 +453,7 @@ to create a Data::Dump filter like,
     then be fed back to ["dump2perl"](#dump2perl).
 
 ## `dump2perl`
+
     # CAVEAT: it will eval($dumpstring) internally, so
     #         check $dumpstring for malicious code beforehand
     #         it is a security risk if you don't.
@@ -650,7 +651,14 @@ These are: `json2json.pl`,  `json2yaml.pl`,  `yaml2json.pl`,
 
 # CAVEATS
 
-A valid Perl variable may kill [YAML::PP::Load](https://metacpan.org/pod/YAML%3A%3APP%3A%3ALoad) because
+I have to apologise here to the authors of [YAML::PP](https://metacpan.org/pod/YAML%3A%3APP)
+for defaming them because I clumsily wrote [YAML::PP](https://metacpan.org/pod/YAML%3A%3APP)
+when I wanted to write [YAML](https://metacpan.org/pod/YAML).
+
+So, the reality is that [YAML::PP](https://metacpan.org/pod/YAML%3A%3APP) does not have any
+problem in handling the edge-case below.
+
+A valid Perl variable may kill [YAML](https://metacpan.org/pod/YAML)'s `Load()` because
 of escapes and quotes. For example this:
 
     my $yamlstr = <<'EOS';
@@ -658,7 +666,7 @@ of escapes and quotes. For example this:
     - 682224
     - "\"w": 1
     EOS
-    my $pv = eval { YAML::PP::Load($yamlstr) };
+    my $pv = eval { YAML::Load($yamlstr) };
     if( $@ ){ die "failed(1): ". $@ }
     # it's dead
 
@@ -671,9 +679,21 @@ Strangely, there is no problem for this:
     EOS
     # this is OK also:
     # - \"w: 1
-    my $pv = eval { YAML::PP::Load($yamlstr) };
+    my $pv = eval { YAML::Load($yamlstr) };
     if( $@ ){ die "failed(1): ". $@ }
     # it's OK! still alive.
+
+I have provided an author-only test (`make deficiencies`) which
+tests all three of them on the edge cases. Both [YAML::PP](https://metacpan.org/pod/YAML%3A%3APP)
+and [YAML::XS](https://metacpan.org/pod/YAML%3A%3AXS) pass the tests.
+
+This [YAML issue](https://github.com/ingydotnet/yaml-pm/issues/224) is
+relevant. Many thanks to CPAN authors [TINITA](https://metacpan.org/author/TINITA)
+and [INGY](https://metacpan.org/author/INGY) for their work on this, and
+on `YAML*` too.
+
+For now, the plan is to still use [YAML::PP](https://metacpan.org/pod/YAML%3A%3APP) and avoid explicitly requiring
+[YAML::XS](https://metacpan.org/pod/YAML%3A%3AXS) until [YAML::Any](https://metacpan.org/pod/YAML%3A%3AAny) is ready.
 
 # AUTHOR
 
@@ -729,8 +749,12 @@ Several Monks at [PerlMonks.org ](https://metacpan.org/pod/%20https%3A#PerlMonks
 - [marto](https://perlmonks.org/?node_id=324763)
 - [Haarg](https://perlmonks.org/?node_id=306692)
 - and an anonymous monk
-- CPAN member Slaven Rezić (SREZIC) for testing
+- CPAN author Slaven Rezić
+([SREZIC](https://metacpan.org/author/SREZIC)) for testing
 the code and reporting numerous problems.
+- CPAN authors [TINITA](https://metacpan.org/author/TINITA)
+and [INGY](https://metacpan.org/author/INGY)
+for working on an issue related to [YAML](https://metacpan.org/pod/YAML).
 
 # DEDICATIONS
 

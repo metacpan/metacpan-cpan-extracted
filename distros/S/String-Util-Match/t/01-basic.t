@@ -2,12 +2,42 @@
 
 use strict;
 use warnings;
+use Test::Exception;
 use Test::More 0.98;
 
 use String::Util::Match qw(
+                              match_string
                               match_array_or_regex
                               num_occurs
                       );
+
+subtest match_string => sub {
+    # undef str
+    ok(!match_string(str => undef, matcher => undef));
+
+    # str matcher
+    ok( match_string(str => 'foo', matcher => 'foo'));
+    ok(!match_string(str => 'foo', matcher => 'Foo'));
+    ok( match_string(str => 'foo', matcher => 'FOO', ignore_case=>1));
+    ok(!match_string(str => 'foo', matcher => 'bar'));
+
+    # regexp matcher
+    ok( match_string(str => 'foo', matcher => qr/fo.+/));
+    ok(!match_string(str => 'foo', matcher => qr/bar/));
+
+    # aos matcher
+    ok( match_string(str => 'foo', matcher => ['bar', 'foo']));
+    ok(!match_string(str => 'foo', matcher => ['bar', 'FOO']));
+    ok( match_string(str => 'foo', matcher => ['bar', 'FOO'], ignore_case=>1));
+    ok(!match_string(str => 'foo', matcher => ['bar', 'baz']));
+
+    # code matcher
+    ok( match_string(str => 'foo', matcher => sub {$_[0] eq 'foo'}));
+    ok(!match_string(str => 'foo', matcher => sub {$_[0] eq 'bar'}));
+
+    # other matcher
+    dies_ok { match_string(str => 'foo', matcher => {}) };
+};
 
 subtest match_array_or_regex => sub {
     ok( match_array_or_regex("foo", [qw/foo bar baz/]), "match array 1");

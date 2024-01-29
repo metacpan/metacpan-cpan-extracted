@@ -4,14 +4,12 @@ use strict;
 use warnings;
 use 5.014;
 
-no if $] >= 5.018, warnings => 'experimental::smartmatch';
-
-our $VERSION = '1.90';
+our $VERSION = '1.94';
 
 use Carp qw(confess cluck);
 use DateTime;
 use DateTime::Format::Strptime;
-use List::Util      qw(first);
+use List::Util      qw(none first);
 use List::MoreUtils qw(uniq);
 use List::UtilsBy   qw(uniq_by);
 use LWP::UserAgent;
@@ -237,11 +235,11 @@ sub new {
 
 	for my $ref (@related_stations) {
 
-       # We (the parent) perform transfer processing, so child requests must not
-       # do it themselves. Otherwise, trains from child requests will be
-       # processed twice and may be lost.
-       # Similarly, child requests must not perform requests to related
-       # stations -- we're already doing that right now.
+		# We (the parent) perform transfer processing, so child requests must not
+		# do it themselves. Otherwise, trains from child requests will be
+		# processed twice and may be lost.
+		# Similarly, child requests must not perform requests to related
+		# stations -- we're already doing that right now.
 		my $ref_status = Travel::Status::DE::IRIS->new(
 			datetime       => $self->{datetime},
 			developer_mode => $self->{developer_mode},
@@ -554,8 +552,12 @@ sub get_station {
 		if ( $opt{recursive} and defined $station_node->getAttribute('meta') ) {
 			my @refs
 			  = uniq( split( m{ \| }x, $station_node->getAttribute('meta') ) );
-			@refs = grep { not( $_ ~~ \@seen or $_ ~~ \@queue ) } @refs;
-			push( @queue, @refs );
+			for my $ref (@refs) {
+				if ( none { $_ == $ref } @seen and none { $_ == $ref } @queue )
+				{
+					push( @queue, @refs );
+				}
+			}
 			$opt{root} = 0;
 		}
 	}
@@ -798,13 +800,13 @@ sub parse_realtime {
 			my $msgid = $e_m->getAttribute('id');
 			my $ts    = $e_m->getAttribute('ts');
 
-           # 0 and 1 (with key "f") are related to canceled trains and
-           # do not appear to hold information (or at least none we can access).
-           # All observed cases of message ID 900 were related to bus
-           # connections ("Anschlussbus wartet"). We can't access which bus
-           # it refers to, so we don't show that either.
-           # ID 1000 is a generic free text message, which (as we lack access
-           # to the text itself) is not helpful either.
+			# 0 and 1 (with key "f") are related to canceled trains and
+			# do not appear to hold information (or at least none we can access).
+			# All observed cases of message ID 900 were related to bus
+			# connections ("Anschlussbus wartet"). We can't access which bus
+			# it refers to, so we don't show that either.
+			# ID 1000 is a generic free text message, which (as we lack access
+			# to the text itself) is not helpful either.
 			if ( defined $value and $value > 1 and $value < 100 ) {
 				$messages{$msgid} = [ $ts, $type, $value ];
 			}
@@ -824,9 +826,9 @@ sub parse_realtime {
 				type     => $e_ref->getAttribute('c'),    # S/ICE/ERB/...
 				line_no  => $e_ref->getAttribute('l'),    # 1 -> S1, ...
 
-               #unknown_t => $e_ref->getAttribute('t'),    # p
-               #unknown_o => $e_ref->getAttribute('o'),    # owner: 03/80/R2/...
-               # TODO ps='a' -> rerouted and normally unscheduled train?
+				#unknown_t => $e_ref->getAttribute('t'),    # p
+				#unknown_o => $e_ref->getAttribute('o'),    # owner: 03/80/R2/...
+				# TODO ps='a' -> rerouted and normally unscheduled train?
 			);
 		}
 		if ($e_ar) {
@@ -987,7 +989,7 @@ Non-blocking variant (EXPERIMENTAL):
 
 =head1 VERSION
 
-version 1.90
+version 1.94
 
 =head1 DESCRIPTION
 
@@ -1190,7 +1192,7 @@ L<https://github.com/derf/Travel-Status-DE-IRIS>
 
 =head1 AUTHOR
 
-Copyright (C) 2013-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2013-2024 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

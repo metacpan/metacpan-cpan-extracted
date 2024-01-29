@@ -2,13 +2,13 @@
 
 package Audio::Nama;
 use Audio::Nama::Effect  qw(:all);
-use Modern::Perl;
+use Modern::Perl '2020';
 
 sub setup_grammar {
 
 	### COMMAND LINE PARSER 
 
-	logsub("&setup_grammar");
+	logsub((caller(0))[3]);
 
 	$text->{commands_yml} = get_data_section("commands_yml");
 	$text->{commands_yml} = quote_yaml_scalars($text->{commands_yml});
@@ -51,45 +51,34 @@ sub setup_grammar {
 }
 sub process_line {
 	state $total_effects_count;
-	logsub("&process_line");
+	logsub((caller(0))[3]);
 	no warnings 'uninitialized';
 	my ($user_input) = @_;
-	# convert hyphenated commands to underscore form
-	while( my ($from, $to) = each %{$text->{hyphenated_commands}})
-	{ $user_input =~ s/$from/$to/g }
 	logpkg(__FILE__,__LINE__,'debug',"user input: $user_input");
 	if (defined $user_input and $user_input !~ /^\s*$/) {
-		$text->{term}->addhistory($user_input) 
-			unless $user_input eq $text->{previous_cmd} or ! $text->{term};
+		$term->addhistory($user_input) 
+			unless $user_input eq $text->{previous_cmd} or ! $term;
 		$text->{previous_cmd} = $user_input;
+		
+		# convert hyphenated commands to underscore form
+		while( my($from, $to) = each %{$text->{hyphenated_commands}} ){ $user_input =~ s/$from/$to/g }
 			my $context = context();
 			my $success = nama_cmd( $user_input );
 			my $command_stamp = { context => $context, 
 								  command => $user_input };
 			push(@{$project->{command_buffer}}, $command_stamp);
 			
-			if ( 		$config->{autosave} eq 'undo'
-					and $config->{use_git} 
-					and $project->{name}
-					and $project->{repo}
-					and ! $this_engine->started() 
-			){
-				local $quiet = 1;
-				Audio::Nama::ChainSetup::remove_temporary_tracks();
-				autosave() unless $config->{opts}->{R};
-				reconfigure_engine();
-			}
 			reconfigure_engine();
+
 		# reset current track to Main if it is
 		# undefined, or the track has been removed
 		# from the index
 		$this_track = $tn{Main} if ! $this_track or
 			(ref $this_track and ! $tn{$this_track->name});
-		setup_hotkeys() if $config->{hotkeys_always};
 	}
 	if (! $this_engine->started() ){
 		my $result = check_fx_consistency();
-		logpkg(__FILE__,__LINE__,'logcluck',"Inconsistency found in effects data",
+		pagers("Inconsistency found in effects data",
 			Dumper ($result)) if $result->{is_error};
 	}
 	my $output = delete $text->{output_buffer};
@@ -118,7 +107,7 @@ sub nama_cmd {
 			{
 				throw("bad command: $input_was\n"); 
 				$was_error++;
-				system($config->{beep_command}) if $config->{beep_command};
+				command_error_beep();
 				last;
 			};
 		}
@@ -131,6 +120,7 @@ sub nama_cmd {
 	# select chain operator if appropriate
 	# and there is a current track
 
+	stty(); # try to fix terminal echo
 	$this_engine->valid_setup() or return;
 	if ($this_track){
 		my $FX = fxn($this_track->op);
@@ -196,30 +186,9 @@ sub set_current_track {
 }
 
 
-### allow commands to abbreviate Audio::Nama::Class as ::Class # SKIP_PREPROC
-
-{ my @namespace_abbreviations = qw(
-	Assign 
-	Track
-	Bus
-	Mark
-	IO
-	Graph
-	Wav
-	Insert
-	Fade                                                      
-	Edit
-	Text
-	Effect
-	EffectChain
-	ChainSetup
-);
-
-my $namespace_root = 'Audio::Nama';
-
 sub eval_perl {
 	my $code = shift;
-	map{ $code =~ s/(^|[^A-Za-z])::$_/$1$namespace_root\::$_/ } @namespace_abbreviations; # SKIP_PREPROC
+	$code = expand_root($code);
 	my $err;
 	undef $text->{eval_result};
 	my @result = eval $code;
@@ -234,17 +203,27 @@ sub eval_perl {
 		pager(join "\n", @result) 
 	}	
 }
-} # end namespace abbreviations
 
+sub expand_root {
+	my ($text) = @_;
+	my $new_root = 'Audio::Nama';
+
+		my $new = join "\n",map{ 
+			s/([^\w\}\\\/]|^)(::)([\w:])/$1$new_root$2$3/g unless /SKIP_PREPROC/;
+			s/([^\w\}\\\/]|^)(::)([^\w])/$1$new_root$3/mg unless /SKIP_PREPROC/;
+			$_;
+		} split "\n",$text;
+		$new;
+}
+say expand_root('Audio::Nama', '@Audio::Nama::Tempo::chunks');
 #### Formatted text output
 
 sub show_versions {
 		no warnings 'uninitialized';
 		if (@{$this_track->versions} ){
-			"All versions: ". join(" ", 
+			"Versions: ". join(" ", 
 				map { 
 					my $cached = is_cached($this_track, $_) ? 'c' : '';
-					$cached .= 'C' if $this_track->is_version_comment($_);
 					$_ . $cached } @{$this_track->versions}
 			). $/
 		} else {}
@@ -254,10 +233,20 @@ sub show_track_comment {
 	my $text = $track->is_comment;
 	$text and "Track comment: $text\n";
 }
+sub show_track_comment_brief {
+	my $track = shift;
+	my $text = $track->is_comment;
+	$text and "Comment: $text\n";
+}
 sub show_version_comment {
 	my ($track, $version) = @_;
 	my $text = $track->is_version_comment($version);
 	$text and "Version comment: $text\n";
+}
+sub show_version_comment_brief {
+	my ($track, $version) = @_;
+	my $text = $track->is_version_comment($version);
+	$text and "  $version: $text\n";
 }
 sub show_send { "Send: ". $this_track->send_id. $/ 
 					if ! $this_track->off
@@ -437,9 +426,9 @@ sub showlist {
 	my @list = grep{ ! $_->hide } Audio::Nama::all_tracks();
 	my $section = [undef,undef,@list];
 	my ($screen_lines, $columns);
-	if( $text->{term} )
+	if( $term )
 	{
-		($screen_lines, $columns) = $text->{term}->get_screen_size();
+		($screen_lines, $columns) = $term->get_screen_size();
 	}
 
 	return $section if scalar @list <= $screen_lines - 5
@@ -470,12 +459,10 @@ sub t_load_project {
 	return if $this_engine->started() and Audio::Nama::ChainSetup::really_recording();
 	my $name = shift;
 	my %args = @_;
-	pager("input name: $name\n");
 	$name = sanitize($name);
 	throw("Project $name does not exist\n"), return
 		unless -d join_path(project_root(), $name) or $args{create};
 	stop_transport() if $this_engine->started(); 
-	save_state();
 	load_project( name => $name, %args );
 	pager("loaded project: $project->{name}\n") unless $args{create};
 	{no warnings 'uninitialized';
@@ -536,22 +523,21 @@ sub destroy_current_wav {
 		throw($this_track->name, 
 			": No current version (track set to OFF?) Skipping."), return;
 	my $wav = $this_track->full_path;
-	my $reply = $text->{term}->readline("delete WAV file $wav? [n] ");
-	#my $reply = chr($text->{term}->read_key()); 
+	my $reply = $term->readline("delete WAV file $wav? [n] ");
+	#my $reply = chr($term->read_key()); 
 	if ( $reply =~ /y/i ){
 		# remove version comments, if any
-		delete $this_track->{version_comment}{$this_track->current_version};
+		delete $project->{track_version_comments}{$this_track->name}{$this_track->version};
 		pager("Unlinking.\n");
 		unlink $wav or warn "couldn't unlink $wav: $!\n";
-		restart_wav_memoize();
+		refresh_wav_cache();
 	}
-	$text->{term}->remove_history($text->{term}->where_history);
-	$this_track->set(version => 0);  # reset
-	$this_track->set(version => $this_track->current_version); 
+	$term->remove_history($term->where_history);
+	$this_track->set(version => $this_track->last); 
 	1;
 }
 
-sub pan_check {
+sub pan_set {
 	my ($track, $new_position) = @_;
 	my $current = $track->pan_o->params->[0];
 	$track->set(old_pan_level => $current)
@@ -568,21 +554,21 @@ sub remove_track_cmd {
 	
 	# avoid having ownerless SlaveTracks.  
  	Audio::Nama::ChainSetup::remove_temporary_tracks();
-		$quiet or pager( "Removing track /$track->name/.  All WAV files will be kept. Other data will be lost.");
+		$quiet or pager( "Removing track ".$track->name. ".  WAV files will be kept. Other data will be lost.");
 		remove_submix_helper_tracks($track->name);
 		$track->remove;
 		$this_track = $tn{Main};
 		1
 }
 sub unity {
-	my ($track, $save_level) = @_;
-	if ($save_level){
-		$track->set(old_vol_level => fxn($track->vol)->params->[0]);
+	my ($track, $save) = @_;
+	if ($save){
+		$track->set(old_vol_level => $track->vol_o->params->[0]);
 	}
 	update_effect( 
 		$track->vol, 
 		0, 
-		$config->{unity_level}->{fxn($track->vol)->type}
+		$config->{unity_level}->{$track->vol_o->type}
 	);
 }
 sub vol_back {

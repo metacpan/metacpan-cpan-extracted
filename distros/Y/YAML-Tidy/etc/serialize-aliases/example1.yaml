@@ -1,0 +1,7 @@
+- &color red # first
+- x: *color
+  y: *color
+- &color green
+- x: *color
+  y: *color
+- { color: &color "blue", x: *color, "y": *color}

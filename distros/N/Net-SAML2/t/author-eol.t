@@ -16,6 +16,7 @@ use Test::EOL;
 
 my @files = (
     'lib/Net/SAML2.pm',
+    'lib/Net/SAML2/AttributeConsumingService.pm',
     'lib/Net/SAML2/Binding/POST.pm',
     'lib/Net/SAML2/Binding/Redirect.pm',
     'lib/Net/SAML2/Binding/SOAP.pm',
@@ -26,6 +27,7 @@ my @files = (
     'lib/Net/SAML2/Protocol/AuthnRequest.pm',
     'lib/Net/SAML2/Protocol/LogoutRequest.pm',
     'lib/Net/SAML2/Protocol/LogoutResponse.pm',
+    'lib/Net/SAML2/RequestedAttribute.pm',
     'lib/Net/SAML2/Role/ProtocolMessage.pm',
     'lib/Net/SAML2/Role/VerifyXML.pm',
     'lib/Net/SAML2/SP.pm',
@@ -59,6 +61,8 @@ my @files = (
     't/24-assertion-with-encrypted-attribute-values.t',
     't/25-verify-authn-post-sign_xml.t',
     't/26-test-verify-xml.t',
+    't/27-requested-attribute.t',
+    't/28-attribute-consuming-service.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',

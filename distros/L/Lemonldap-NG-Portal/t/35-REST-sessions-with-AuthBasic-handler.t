@@ -1,5 +1,4 @@
 use warnings;
-use lib 'inc';
 use strict;
 use File::Temp 'tempdir';
 use IO::String;

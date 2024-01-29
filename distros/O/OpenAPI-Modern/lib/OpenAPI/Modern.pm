@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.051-6-g33162f8
+package OpenAPI::Modern; # git description: v0.057-2-g7e4b25a
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.052';
+our $VERSION = '0.058';
 
 use 5.020;
 use utf8;
@@ -93,6 +93,7 @@ sub validate_request ($self, $request, $options = {}) {
     schema_path => '',              # the rest of the path, since the last $id or the last traversed $ref
     effective_base_uri => Mojo::URL->new->scheme('https')->host($request->headers->header('Host')),
     annotations => [],
+    depth => 0,
   };
 
   try {
@@ -100,6 +101,12 @@ sub validate_request ($self, $request, $options = {}) {
     my $path_ok = $self->find_path($options);
     $request = $options->{request};   # now guaranteed to be a Mojo::Message::Request
     $state->{errors} = delete $options->{errors};
+
+    # Reporting a failed find_path as an exception will result in a recommended response of
+    # [ 500, Internal Server Error ], which is warranted if we consider the lack of a specification
+    # entry for this incoming request as an unexpected, server-side error.
+    # Callers can decide if this should instead be reported as a [ 404, Not Found ], but that sort
+    # of response is likely to leave oversights in the specification go unnoticed.
     return $self->_result($state, 1) if not $path_ok;
 
     my ($path_template, $path_captures) = $options->@{qw(path_template path_captures)};
@@ -135,10 +142,10 @@ sub validate_request ($self, $request, $options = {}) {
           ((grep $param_obj->{in} eq $_, qw(path query)) ? 'uri' : ()), $param_obj->{in},
           $param_obj->{name});
         my $valid =
-            $param_obj->{in} eq 'path' ? $self->_validate_path_parameter($state, $param_obj, $path_captures)
-          : $param_obj->{in} eq 'query' ? $self->_validate_query_parameter($state, $param_obj, $request->url)
-          : $param_obj->{in} eq 'header' ? $self->_validate_header_parameter($state, $param_obj->{name}, $param_obj, $request->headers)
-          : $param_obj->{in} eq 'cookie' ? $self->_validate_cookie_parameter($state, $param_obj, $request)
+            $param_obj->{in} eq 'path' ? $self->_validate_path_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj, $path_captures)
+          : $param_obj->{in} eq 'query' ? $self->_validate_query_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj, $request->url)
+          : $param_obj->{in} eq 'header' ? $self->_validate_header_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj->{name}, $param_obj, $request->headers)
+          : $param_obj->{in} eq 'cookie' ? $self->_validate_cookie_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj, $request)
           : abort($state, 'unrecognized "in" value "%s"', $param_obj->{in});
       }
     }
@@ -164,7 +171,8 @@ sub validate_request ($self, $request, $options = {}) {
 
     # RFC9112 §6.3-7: A user agent that sends a request that contains a message body MUST send
     # either a valid Content-Length header field or use the chunked transfer coding.
-    ()= E({ %$state, data_path => jsonp($state->{data_path}, 'header') }, 'missing header: Content-Length')
+    ()= E({ %$state, data_path => jsonp($state->{data_path}, 'header'),
+        recommended_response => [ 411, 'Length Required' ] }, 'missing header: Content-Length')
       if $request->body_size and not $request->headers->content_length
         and not $request->content->is_chunked;
 
@@ -178,7 +186,7 @@ sub validate_request ($self, $request, $options = {}) {
       }
 
       if ($request->body_size) {
-        $self->_validate_body_content($state, $body_obj->{content}, $request);
+        $self->_validate_body_content({ %$state, depth => $state->{depth}+1 }, $body_obj->{content}, $request);
       }
       elsif ($body_obj->{required}) {
         ()= E({ %$state, keyword => 'required' }, 'request body is required but missing');
@@ -220,29 +228,25 @@ sub validate_response ($self, $response, $options = {}) {
     traversed_schema_path => '',    # the accumulated traversal path as of the start, or last $id, or up to the last traversed $ref
     schema_path => '',              # the rest of the path, since the last $id or the last traversed $ref
     annotations => [],
+    depth => 0,
   };
 
   try {
     my $path_ok = $self->find_path($options);
     $state->{errors} = delete $options->{errors};
-    return $self->_result($state, 1) if not $path_ok;
+    return $self->_result($state, 1, 1) if not $path_ok;
 
     my ($path_template, $path_captures) = $options->@{qw(path_template path_captures)};
     my $method = lc $options->{method};
     my $operation = $self->openapi_document->schema->{paths}{$path_template}{$method};
 
-    return $self->_result($state) if not exists $operation->{responses};
+    return $self->_result($state, 0, 1) if not exists $operation->{responses};
 
     $state->{effective_base_uri} = Mojo::URL->new->scheme('https')->host($options->{request}->headers->host)
       if $options->{request};
     $state->{schema_path} = jsonp('/paths', $path_template, $method);
 
     $response = _convert_response($response);   # now guaranteed to be a Mojo::Message::Response
-
-    if (my $error = $response->error) {
-      ()= E($state, $error->{message});
-      return $self->_result($state, 1);
-    }
 
     if ($response->headers->header('Transfer-Encoding')) {
       ()= E({ %$state, data_path => jsonp($state->{data_path}, qw(header Transfer-Encoding)) },
@@ -272,7 +276,7 @@ sub validate_response ($self, $response, $options = {}) {
 
     if (not $response_name) {
       ()= E({ %$state, keyword => 'responses' }, 'no response object found for code %s', $response->code);
-      return $self->_result($state);
+      return $self->_result($state, 0, 1);
     }
 
     my $response_obj = $operation->{responses}{$response_name};
@@ -290,16 +294,17 @@ sub validate_response ($self, $response, $options = {}) {
       }
 
       ()= $self->_validate_header_parameter({ %$state,
-          data_path => jsonp($state->{data_path}, 'header', $header_name) },
+          data_path => jsonp($state->{data_path}, 'header', $header_name), depth => $state->{depth}+1 },
         $header_name, $header_obj, $response->headers);
     }
 
-    $self->_validate_body_content({ %$state, data_path => jsonp($state->{data_path}, 'body') },
+    $self->_validate_body_content({ %$state, data_path => jsonp($state->{data_path}, 'body'), depth => $state->{depth}+1 },
         $response_obj->{content}, $response)
       if exists $response_obj->{content} and $response->headers->content_length // $response->body_size;
   }
   catch ($e) {
     if ($e->$_isa('JSON::Schema::Modern::Result')) {
+      $e->recommended_response(undef);
       return $e;
     }
     elsif ($e->$_isa('JSON::Schema::Modern::Error')) {
@@ -310,7 +315,7 @@ sub validate_response ($self, $response, $options = {}) {
     }
   }
 
-  return $self->_result($state);
+  return $self->_result($state, 0, 1);
 }
 
 sub find_path ($self, $options) {
@@ -324,11 +329,13 @@ sub find_path ($self, $options) {
     schema_path => '',              # the rest of the path, since the last $id or the last traversed $ref
     errors => $options->{errors} //= [],
     $options->{request} ? ( effective_base_uri => Mojo::URL->new->scheme('https')->host($options->{request}->headers->host) ) : (),
+    depth => 0,
   };
 
+  # requests don't have response codes, so if 'error' is set, it is some sort of parsing error
   if ($options->{request} and my $error = $options->{request}->error) {
     ()= E({ %$state, data_path => '/request' }, $error->{message});
-    return $self->_result($state, 1);
+    return $self->_result($state);
   }
 
   my ($method, $path_template);
@@ -374,7 +381,8 @@ sub find_path ($self, $options) {
     my $path_item = $self->openapi_document->schema->{paths}{$path_template};
     return E({ %$state, keyword => 'paths' }, 'missing path-item "%s"', $path_template) if not $path_item;
 
-    return E({ %$state, data_path => '/request/method', schema_path => jsonp('/paths', $path_template), keyword => $method },
+    return E({ %$state, data_path => '/request/method', schema_path => jsonp('/paths', $path_template),
+        keyword => $method, recommended_response => [ 405, 'Method Not Allowed' ] },
         'missing operation for HTTP method "%s"', $method)
       if not $path_item->{$method};
   }
@@ -407,7 +415,9 @@ sub find_path ($self, $options) {
         if $options->{path_captures} and not is_equal($options->{path_captures}, \%path_captures);
 
       $options->{path_captures} = \%path_captures;
-      return E({ %$state, data_path => '/request/method', schema_path => jsonp('/paths', $path_template), keyword => $method },
+      return E({ %$state, data_path => '/request/method',
+          schema_path => jsonp('/paths', $path_template), keyword => $method,
+          recommended_response => [ 405, 'Method Not Allowed' ] },
           'missing operation for HTTP method "%s"', $method)
         if not exists $schema->{paths}{$path_template}{$method};
 
@@ -499,7 +509,7 @@ sub _validate_path_parameter ($self, $state, $param_obj, $path_captures) {
   return E({ %$state, keyword => 'required' }, 'missing path parameter: %s', $param_obj->{name})
     if not exists $path_captures->{$param_obj->{name}};
 
-  return $self->_validate_parameter_content($state, $param_obj, \ $path_captures->{$param_obj->{name}})
+  return $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1 }, $param_obj, \ $path_captures->{$param_obj->{name}})
     if exists $param_obj->{content};
 
   return E({ %$state, keyword => 'style' }, 'only style: simple is supported in path parameters')
@@ -510,8 +520,7 @@ sub _validate_path_parameter ($self, $state, $param_obj, $path_captures) {
     return E($state, 'deserializing to non-primitive types is not yet supported in path parameters');
   }
 
-  $state = { %$state, schema_path => jsonp($state->{schema_path}, 'schema'), stringy_numbers => 1 };
-  $self->_evaluate_subschema(\ $path_captures->{$param_obj->{name}}, $param_obj->{schema}, $state);
+  $self->_evaluate_subschema(\ $path_captures->{$param_obj->{name}}, $param_obj->{schema}, { %$state, schema_path => jsonp($state->{schema_path}, 'schema'), stringy_numbers => 1, depth => $state->{depth}+1 });
 }
 
 sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
@@ -526,7 +535,7 @@ sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
 
   # TODO: check 'allowEmptyValue'; difficult to do without access to the raw request string
 
-  return $self->_validate_parameter_content($state, $param_obj, \ $query_params->{$param_obj->{name}})
+  return $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1 }, $param_obj, \ $query_params->{$param_obj->{name}})
     if exists $param_obj->{content};
 
   # TODO: check 'allowReserved'; difficult to do without access to the raw request string
@@ -544,7 +553,7 @@ sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
     return E($state, 'deserializing to non-primitive types is not yet supported in query parameters');
   }
 
-  $state = { %$state, schema_path => jsonp($state->{schema_path}, 'schema'), stringy_numbers => 1 };
+  $state = { %$state, schema_path => jsonp($state->{schema_path}, 'schema'), stringy_numbers => 1, depth => $state->{depth}+1 };
   $self->_evaluate_subschema(\ $query_params->{$param_obj->{name}}, $param_obj->{schema}, $state);
 }
 
@@ -559,7 +568,7 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
   }
 
   # validate as a single comma-concatenated string, presumably to be decoded
-  return $self->_validate_parameter_content($state, $header_obj, \ $headers->header($header_name))
+  return $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1 }, $header_obj, \ $headers->header($header_name))
     if exists $header_obj->{content};
 
   # RFC9112§5.1-3: "The field line value does not include that leading or trailing whitespace: OWS
@@ -596,7 +605,7 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
     $data = join ', ', map s/^\s*//r =~ s/\s*$//r, $headers->every_header($header_name)->@*;
   }
 
-  $state = { %$state, schema_path => jsonp($state->{schema_path}, 'schema'), stringy_numbers => 1 };
+  $state = { %$state, schema_path => jsonp($state->{schema_path}, 'schema'), stringy_numbers => 1, depth => $state->{depth}+1 };
   $self->_evaluate_subschema(\ $data, $header_obj->{schema}, $state);
 }
 
@@ -627,7 +636,7 @@ sub _validate_parameter_content ($self, $state, $param_obj, $content_ref) {
       'could not decode content as %s: %s', $media_type, $e =~ s/^(.*)\n/$1/r);
   }
 
-  $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type, 'schema') };
+  $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type, 'schema'), depth => $state->{depth}+1 };
   $self->_evaluate_subschema($content_ref, $schema, $state);
 }
 
@@ -642,7 +651,8 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
   my $media_type = (first { $content_type eq fc } keys $content_obj->%*)
     // (first { m{([^/]+)/\*$} && fc($content_type) =~ m{^\F\Q$1\E/[^/]+$} } keys $content_obj->%*);
   $media_type = '*/*' if not defined $media_type and exists $content_obj->{'*/*'};
-  return E({ %$state, keyword => 'content' }, 'incorrect Content-Type "%s"', $content_type)
+  return E({ %$state, keyword => 'content', recommended_response => [ 415, 'Unsupported Media Type' ] },
+      'incorrect Content-Type "%s"', $content_type)
     if not defined $media_type;
 
   if (exists $content_obj->{$media_type}{encoding}) {
@@ -698,20 +708,21 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
 
   return if not defined $schema;
 
-  $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type, 'schema') };
+  $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type, 'schema'), depth => $state->{depth}+1 };
   $self->_evaluate_subschema($content_ref, $schema, $state);
 }
 
 # wrap a result object around the errors
-sub _result ($self, $state, $exception = 0) {
+sub _result ($self, $state, $exception = 0, $response = 0) {
   return JSON::Schema::Modern::Result->new(
     output_format => $self->evaluator->output_format,
     formatted_annotations => 0,
     valid => !$state->{errors}->@*,
-    $exception ? ( exception => 1 ) : (),
+    $exception ? ( exception => 1 ) : (), # -> recommended_response: [ 500, 'Internal Server Error' ]
     !$state->{errors}->@*
       ? (annotations => $state->{annotations}//[])
       : (errors => $state->{errors}),
+    $response ? ( recommended_response => undef ) : (),
   );
 }
 
@@ -771,7 +782,6 @@ sub _evaluate_subschema ($self, $dataref, $schema, $state) {
       data_path => $state->{data_path},
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path},
       effective_base_uri => $state->{effective_base_uri},
-      collect_annotations => 1,
       $state->{stringy_numbers} ? ( stringy_numbers => 1 ) : (),
     },
   );
@@ -853,7 +863,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.052
+version 0.058
 
 =head1 SYNOPSIS
 
@@ -1222,6 +1232,10 @@ L<Mojolicious::Plugin::OpenAPI::Modern>
 
 =item *
 
+L<Test::Mojo::Role::OpenAPI::Modern>
+
+=item *
+
 L<JSON::Schema::Modern::Document::OpenAPI>
 
 =item *
@@ -1238,7 +1252,7 @@ L<https://www.openapis.org/>
 
 =item *
 
-L<https://oai.github.io/Documentation/>
+L<https://learn.openapis.org/>
 
 =item *
 

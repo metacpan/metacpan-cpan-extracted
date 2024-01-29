@@ -1,44 +1,43 @@
 #!/usr/bin/env perl
 
 use strict;
+
 # use warnings; # Use just for development, otherwise leave warnings off.
 #               # Seriously, leave warnings off for live code.
 
 BEGIN {
-	our $VERSION = '0.01'; # Increment this as you develop the code.
-};
+    our $VERSION = '0.01';    # Increment this as you develop the code.
+}
 
-use Graphics::Framebuffer; # There are things to import, if you want, but they
-                           # are usually not needed.
+use Graphics::Framebuffer;    # There are things to import, if you want, but they
+                              # are usually not needed.
 
 ## Initialize any global variables here ######################################
 # $FB is your framebuffer object.  See the documentation, if you want to pass
 # any parameters when initializing the module, but no parameters should be
 # just fine to get started.
-our $FB = Graphics::Framebuffer->new('SPLASH' => 0); # The splash screen is
-                                                     # mainly for testing.
+our $FB = Graphics::Framebuffer->new('SPLASH' => 0);    # The splash screen is
+                                                        # mainly for testing.
 
 ##############################################################################
 
-$FB->cls('OFF'); # Turn off the console cursor
+$FB->cls('OFF');                                        # Turn off the console cursor
 
 # You can optionally set graphics mode here, but remember to turn on text mode
 # before exiting.
 
-$FB->graphics_mode(); # Shuts off all text and cursors.
+$FB->graphics_mode();    # Shuts off all text and cursors.
 
 # Gathers information on the screen for you to use as global information
 our $screen_info = $FB->screen_dimensions();
 
 ## Do your stuff in here #####################################################
 
-
-
 ##############################################################################
 
-$FB->text_mode();  # Turn text and cursor back on.  You MUST do this if
-                   # graphics mode was set.
-$FB->cls('ON');    # Turn the console cursor back on
+$FB->text_mode();        # Turn text and cursor back on.  You MUST do this if
+                         # graphics mode was set.
+$FB->cls('ON');          # Turn the console cursor back on
 exit(0);
 
 __END__

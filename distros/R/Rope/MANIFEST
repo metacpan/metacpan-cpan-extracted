@@ -20,6 +20,9 @@ t/06-overload-extend.t
 t/07-role.t
 t/08-role-lib.t
 t/09-role-fail-instantiate.t
+t/10-new.t
+t/11-initable.t
+t/12-required.t
 t/lib/Custom.pm
 t/lib/One.pm
 t/lib/Role.pm

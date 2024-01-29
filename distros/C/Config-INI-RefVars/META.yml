@@ -1,7 +1,7 @@
 --- #YAML:1.0
 name:               Config-INI-RefVars
-version:            0.04
-abstract:           INI file reader, allows the referencing of INI and environment variables within the INI file.
+version:            0.15
+abstract:           INI file reader that supports make-style variable references and multiple assignment operators.
 author:
     - Abdul al Hazred <451@gmx.eu>
 license:            perl_5
@@ -12,6 +12,7 @@ build_requires:
     ExtUtils::MakeMaker:  0
 requires:
     Carp:                 0
+    Config:               0
     constant:             0
     ExtUtils::MakeMaker:  0
     feature:              0

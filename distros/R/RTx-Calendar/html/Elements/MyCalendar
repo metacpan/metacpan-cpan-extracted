@@ -14,21 +14,68 @@
 </thead>
 <tbody>
 <tr>
-% $date = $begin->clone;
-% while ($date <= $end) {
-%   my @classes = ();
-%   push @classes, "today"     if (DateTime->compare($today,     $date) == 0);
-%   push @classes, "yesterday" if (DateTime->compare($yesterday, $date) == 0);
+<%perl>
+my %week_ticket_position;
+my $day_of_week = 1;
+$date = $begin->clone;
 
-    <td class="<% @classes %>"><div class="inside-day">
+while ($date <= $end) {
+  my @classes = ();
+  push @classes, "today"     if (DateTime->compare($today,     $date) == 0);
+  push @classes, "yesterday" if (DateTime->compare($yesterday, $date) == 0);
+  push @classes, "weekday-$day_of_week";
+  for my $t ( @{ $Tickets->{ $date->strftime("%F") } || [] } ) {
+    # check if ticket was already displayed this week, if not, we need to find a
+    # position for it
+    unless ( grep { $week_ticket_position{$_}{id} eq $t->id } keys %week_ticket_position ) {
+      # new tickets should assume the first empty spot.
+      my $i = 1;
+      my $free_index = 0;
+      for my $index ( sort { $a <=> $b } keys %week_ticket_position ) {
+        if ( $week_ticket_position{$index}{id} eq "" ) {
+          $free_index = $i;
+          last;
+        }
+        $i++;
+      }
+      # if we found a free spot, we place the ticket there
+      if ( $free_index != 0 ) {
+        $week_ticket_position{$free_index}{id} = $t->id;
+        $week_ticket_position{$free_index}{TicketObj} = $t;
+      }
+      # if not, we add it to the end of the array
+      else {
+        $week_ticket_position{((scalar keys %week_ticket_position)+1)}{id} = $t->id;
+        $week_ticket_position{((scalar keys %week_ticket_position))}{TicketObj} = $t;
+      }
+    }
+  }
+</%perl>
+
+    <td class="<% join(' ', @classes) %>"><div class="inside-day">
       <div class="calendardate"><%$date->day%></div>
-
-%     for my $t ( @{ $Tickets{$date->strftime("%F")} } ) {
-        <& /Elements/CalendarEvent, Object => $t, Date => $date, DateTypes => \%DateTypes &>
+%      for my $index ( sort { $a <=> $b } keys %week_ticket_position ) {
+%       if ( grep { $_->id eq $week_ticket_position{$index}{id} }
+%                 @{ $Tickets->{ $date->strftime("%F") } || [] } ) {
+%         my $t = $week_ticket_position{$index}{TicketObj};
+        <& /Elements/CalendarEvent,
+          Object              => $t,
+          Date                => $date,
+          DateTypes           => \%DateTypes,
+          DayOfWeek           => $day_of_week,
+          TicketsSpanningDays => $TicketsSpanningDays,
+          WeekTicketPosition  => \%week_ticket_position,
+          CurrentPostion      => $index,
+        &>
+%       }
+%       else {
+%         # if there's no ticket for this position, we add an empty space
+             <div class="day">&nbsp;</div>
+%       }
 %     }
-
     </div></td>
 % $date = $set->next($date);
+% $day_of_week = $day_of_week + 1;
 % }
 </tr>
 </tbody>
@@ -71,8 +118,23 @@ if ( my $Search = RTx::Calendar::SearchDefaultCalendar($session{CurrentUser}) ) 
 }
 
 # we search all date types in Format string
-my @Dates = grep { $Format =~ m/__${_}(Relative)?__/ } @DateTypes;
+my @CoreDates    = grep { $Format =~ m/__${_}(Relative)?__/ } @DateTypes;
+my @CustomFields = ( $Format =~ /__(CustomField\.\{.*\})__/g );
+my @DateCustomFields;
 
+for my $CustomField (@CustomFields) {
+    my $LintCustomField = $CustomField;
+    $LintCustomField =~ s/CustomField\.\{(.*)\}/$1/;
+    my $CustomFieldObj = RT::CustomField->new( RT->SystemUser );
+    $CustomFieldObj->LoadByName( Name => $LintCustomField );
+    push @DateCustomFields, $CustomField
+        if $CustomFieldObj->id
+        && ( $CustomFieldObj->Type eq 'Date'
+        || $CustomFieldObj->Type eq 'DateTime' );
+}
+
+my @Dates = (@CoreDates, @DateCustomFields);
+@Dates = map { $_ =~ s/^CustomField\.(.*)$/CF.$1/; $_ } @Dates;
 # used to display or not a date in Element/CalendarEvent
 my %DateTypes = map { $_ => 1 } @Dates;
 
@@ -80,6 +142,5 @@ $Query .= RTx::Calendar::DatesClauses(\@Dates, $begin->strftime("%F"), $end->str
 
 $m->callback( CallbackName => 'BeforeFindTickets', ARGSRef => \%ARGS, QueryRef => \$Query, FormatRef => \$Format );
 
-my %Tickets = RTx::Calendar::FindTickets($session{'CurrentUser'}, $Query, \@Dates);
-
+my ($Tickets, $TicketsSpanningDays) = RTx::Calendar::FindTickets($session{'CurrentUser'}, $Query, \@Dates);
 </%INIT>

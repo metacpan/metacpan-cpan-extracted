@@ -3,9 +3,9 @@ NAME
     year 2023
 
 VERSION
-    This document describes version 20231208.0 of
+    This document describes version 20240101.0 of
     TableDataRole::Perl::CPAN::Release::Static::2023 (from Perl distribution
-    TableData-Perl-CPAN-Release-Static-2023), released on 2023-12-08.
+    TableData-Perl-CPAN-Release-Static-2023), released on 2024-01-01.
 
 SYNOPSIS
     To use from Perl code:
@@ -42,7 +42,7 @@ TABLEDATA STATISTICS
      | key         | value |
      +-------------+-------+
      | num_columns | 9     |
-     | num_rows    | 9637  |
+     | num_rows    | 10347 |
      +-------------+-------+
 
     The statistics is available in the %STATS package variable.
@@ -82,7 +82,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2024, 2023 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

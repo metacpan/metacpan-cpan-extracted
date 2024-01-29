@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [6.1.0] - 2024-01-10
+### Added
+- [Python] Support the feature of escaping also in Python ([#144](https://github.com/cucumber/tag-expressions/pull/144))
+
+### Fixed
+- [Python] Added workflow to release to Pypi ([#145](https://github.com/cucumber/tag-expressions/pull/145), [#146](https://github.com/cucumber/tag-expressions/pull/146), [#20](https://github.com/cucumber/tag-expressions/issues/20))
+- [Ruby] Fixed up around 75% of all rubocop offenses ([#138](https://github.com/cucumber/tag-expressions/pull/138))
+
 ## [6.0.0] - 2023-10-13
 ### Added
 - [Ruby] Initial rubocop gems and basic compliance added (More work to come) ([#133](https://github.com/cucumber/tag-expressions/pull/133))
@@ -193,7 +201,8 @@ by [aslakhellesoy](https://github.com/aslakhellesoy))
 ### Added
 - First stable release!
 
-[Unreleased]: https://github.com/cucumber/tag-expressions/compare/v6.0.0...HEAD
+[Unreleased]: https://github.com/cucumber/tag-expressions/compare/v6.1.0...HEAD
+[6.1.0]: https://github.com/cucumber/tag-expressions/compare/v6.0.0...v6.1.0
 [6.0.0]: https://github.com/cucumber/tag-expressions/compare/v5.0.6...v6.0.0
 [5.0.6]: https://github.com/cucumber/tag-expressions/compare/v5.0.5...v5.0.6
 [5.0.5]: https://github.com/cucumber/tag-expressions/compare/v5.0.4...v5.0.5

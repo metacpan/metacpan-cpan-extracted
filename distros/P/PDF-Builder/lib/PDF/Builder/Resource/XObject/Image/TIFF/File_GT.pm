@@ -3,8 +3,8 @@ package PDF::Builder::Resource::XObject::Image::TIFF::File_GT;
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use IO::File;
 use Graphics::TIFF ':all';  # already confirmed to be installed
@@ -12,6 +12,19 @@ use Graphics::TIFF ':all';  # already confirmed to be installed
 =head1 NAME
 
 PDF::Builder::Resource::XObject::Image::TIFF::File_GT - support routines for TIFF image library (Graphics::TIFF enabled)
+
+=head1 METHODS
+
+=head2 new
+
+    PDF::Builder::Resource::XObject::Image::TIFF::File_GT->new()
+
+=over
+
+Create an image object from TIFF input, using the Graphics::TIFF library.
+Remember to use the Builder.pm method image_tiff for this functionality.
+
+=back
 
 =cut
 

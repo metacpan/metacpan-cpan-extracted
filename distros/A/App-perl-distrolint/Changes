@@ -1,5 +1,26 @@
 Revision history for App-perl-distrolint
 
+0.06    2024-01-04
+        [BUGFIXES]
+         * Don't attempt to test unreleased check modules (RT151015)
+         * Declare dependency on `Syntax::Keyword::Match` 0.13 (RT151016)
+
+0.05    2024-01-03
+        [CHANGES]
+         * Added a check for `no strict 'refs'`, to encourage more use of
+           `meta` instead
+         * Permit an optional `my` preceding the var names in a function or
+           method minisynopsis
+         * Renamed UseTest2 check to just Test2
+         * Improvements to `->walk_each_statement` to look in more places for
+           statements
+
+0.04    2023-12-12
+        [CHANGES]
+         * Added a check on filepaths; complain about ':' in filenames
+         * Much expanded checks on contents and style of Pod documentation
+         * Updated to use the new `apply` keyword of Object::Pad v0.807
+
 0.03    2023-09-09
         [CHANGES]
          * Additional checks in POD checker, on the formatting of the

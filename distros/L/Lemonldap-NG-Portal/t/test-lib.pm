@@ -221,6 +221,22 @@ sub getPSession {
     );
 }
 
+sub getSamlSession {
+    my $id           = shift;
+    my @sessionsOpts = (
+        storageModule        => "Apache::Session::File",
+        storageModuleOptions => {
+            Directory     => "$tmpDir/saml",
+            LockDirectory => "$tmpDir/saml/lock",
+        },
+    );
+
+    return Lemonldap::NG::Common::Session->new( {
+            @sessionsOpts, id => $id,
+        }
+    );
+}
+
 =head4 expectRedirection( $res, $location )
 
 Verify that request result is a redirection to $location. $location can be:

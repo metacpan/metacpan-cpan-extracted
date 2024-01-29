@@ -1,13 +1,18 @@
+bin/qmail-deliverabled
 Changes
-Makefile.PL
-MANIFEST
-README
-t/Qmail-Deliverable.t
+init.d/qmail-deliverabled
 lib/Qmail/Deliverable.pm
 lib/Qmail/Deliverable/Client.pm
 lib/Qmail/Deliverable/Comparison.pod
-bin/qmail-deliverabled
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
 qpsmtpd-plugin/qmail_deliverable
-init.d/qmail-deliverabled
-META.yml                                 Module meta-data (added by MakeMaker)
+README
+t/00.syntax.t
+t/fixtures/control/locals
+t/fixtures/control/virtualdomains
+t/fixtures/users/assign
+t/Qmail-Deliverable.t
 TODO
+META.json                                Module JSON meta-data (added by MakeMaker)

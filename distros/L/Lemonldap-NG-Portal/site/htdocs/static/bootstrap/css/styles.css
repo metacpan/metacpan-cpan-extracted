@@ -130,6 +130,13 @@ img.langicon {
   cursor: pointer;
 }
 
+span#languages {
+  padding: 5px;
+  display: block;
+  overflow: auto;
+  max-height: 80px;
+}
+
 button.idploop {
   max-width: 300px;
 }

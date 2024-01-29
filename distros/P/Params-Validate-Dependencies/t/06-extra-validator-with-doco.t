@@ -41,17 +41,6 @@ SKIP: {
 my $domain = Dependencies(@pvd);
     ok(!$domain->inspect({alpha => 1, gamma => 1}), "DDD: correct params");
     ok($domain->inspect({alpha => 1, beta => 1, gamma => 1}), "DDD: incorrect params");
-    
-    is(
-      $domain->generate_documentation(),
-      "two of ('alpha' or one of ('beta' or 'gamma'))",
-      'DDD: auto-doc does tree jibber-jabber'
-    );
-    is(
-      Dependencies(one_of('foo', two_of(qw(bar baz barf))))->generate_documentation(),
-      "one of ('foo' or two of ('bar', 'baz' or 'barf'))",
-      "DDD: auto-doc does tree jibber-jabber t'other way round too"
-    );
 }
 
 sub foo {

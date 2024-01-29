@@ -179,7 +179,7 @@ push @commands, Term::CLI::Command->new(
 
 push @commands, Term::CLI::Command->new(
     name        => 'show',
-    options     => ['verbose|v'],
+    options     => ['verbose|v!'],
     summary     => 'show system properties',
     description => "Show some system-related information,\n"
         . "such as the system clock or load average.",

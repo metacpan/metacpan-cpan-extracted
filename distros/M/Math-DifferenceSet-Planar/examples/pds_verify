@@ -38,7 +38,7 @@ warn "$range set(s) not normalized\n"        if $range;
 warn "$not set(s) proven to be wrong\n"      if $not;
 warn "$proven set(s) proven to be correct\n" if $proven;
 
-exit $syntax + $range + $not? 1: 0;
+exit($syntax + $range + $not ? 1 : 0);
 
 __END__
 

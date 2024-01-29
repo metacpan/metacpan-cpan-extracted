@@ -4,9 +4,10 @@ use warnings;
 
 package Dancer2::Plugin::Syntax::GetPost;
 # ABSTRACT: Syntactic sugar for GET+POST handlers
-our $VERSION = '0.002'; # VERSION
+# VERSION
 
 use Dancer2::Plugin;
+our $VERSION = '0.003';
 
 register get_post => sub {
   my ( $dsl, @args ) = @_;
@@ -24,13 +25,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Dancer2::Plugin::Syntax::GetPost - Syntactic sugar for GET+POST handlers
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -61,14 +64,14 @@ L<Dancer2>
 
 =back
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests through the issue tracker
-at L<https://github.com/dagolden/dancer2-plugin-syntax-getpost/issues>.
+at L<https://github.com/PerlDancer/dancer2-plugin-syntax-getpost/issues>.
 You will be notified automatically of any progress on your issue.
 
 =head2 Source Code
@@ -76,17 +79,23 @@ You will be notified automatically of any progress on your issue.
 This is open source software.  The code repository is available for
 public review and contribution under the terms of the license.
 
-L<https://github.com/dagolden/dancer2-plugin-syntax-getpost>
+L<https://github.com/PerlDancer/dancer2-plugin-syntax-getpost>
 
-  git clone git://github.com/dagolden/dancer2-plugin-syntax-getpost.git
+  git clone https://github.com/PerlDancer/dancer2-plugin-syntax-getpost.git
 
 =head1 AUTHOR
 
 David Golden <dagolden@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Jason A. Crome
+
+Jason A. Crome <jason@crome-plated.com>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by David Golden.
+This software is Copyright (c) 2023 by David Golden.
 
 This is free software, licensed under:
 

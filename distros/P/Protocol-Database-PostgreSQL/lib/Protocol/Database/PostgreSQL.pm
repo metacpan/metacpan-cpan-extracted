@@ -3,7 +3,7 @@ package Protocol::Database::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '2.000';
+our $VERSION = '2.001';
 
 =head1 NAME
 
@@ -312,26 +312,26 @@ our %BACKEND_MESSAGE_CODE = reverse %MESSAGE_TYPE_BACKEND;
 
 # Mapping from name to frontend message code (single byte)
 our %MESSAGE_TYPE_FRONTEND = (
-    Bind            => 'B',
-    Close           => 'C',
-    CopyData        => 'd',
-    CopyDone        => 'c',
-    CopyFail        => 'f',
-    Describe        => 'D',
-    Execute         => 'E',
-    Flush           => 'H',
-    FunctionCall    => 'F',
-    Parse           => 'P',
-    PasswordMessage => 'p',
+    Bind                => 'B',
+    Close               => 'C',
+    CopyData            => 'd',
+    CopyDone            => 'c',
+    CopyFail            => 'f',
+    Describe            => 'D',
+    Execute             => 'E',
+    Flush               => 'H',
+    FunctionCall        => 'F',
+    Parse               => 'P',
+    PasswordMessage     => 'p',
     SASLInitialResponse => 'p',
-    SASLResponse    => 'p',
-    Query           => 'Q',
+    SASLResponse        => 'p',
+    Query               => 'Q',
 # Both of these are handled separately, and for legacy reasons they don't
 # have a byte prefix for the message code
-#   SSLRequest      => '',
-#   StartupMessage  => '',
-    Sync            => 'S',
-    Terminate       => 'X',
+#   SSLRequest          => '',
+#   StartupMessage      => '',
+    Sync                => 'S',
+    Terminate           => 'X',
 );
 our %FRONTEND_MESSAGE_CODE = reverse %MESSAGE_TYPE_FRONTEND;
 
@@ -417,20 +417,22 @@ our %ERROR_CODE = (
     '2202G' => 'invalid_tablesample_repeat',
     '2202H' => 'invalid_tablesample_argument',
     '22030' => 'duplicate_json_object_key_value',
+    '22031' => 'invalid_argument_for_sql_json_datetime_function',
     '22032' => 'invalid_json_text',
-    '22033' => 'invalid_json_subscript',
-    '22034' => 'more_than_one_json_item',
-    '22035' => 'no_json_item',
-    '22036' => 'non_numeric_json_item',
-    '22037' => 'non_unique_keys_in_json_object',
-    '22038' => 'singleton_json_item_required',
-    '22039' => 'json_array_not_found',
-    '2203A' => 'json_member_not_found',
-    '2203B' => 'json_number_not_found',
-    '2203C' => 'object_not_found',
+    '22033' => 'invalid_sql_json_subscript',
+    '22034' => 'more_than_one_sql_json_item',
+    '22035' => 'no_sql_json_item',
+    '22036' => 'non_numeric_sql_json_item',
+    '22037' => 'non_unique_keys_in_a_json_object',
+    '22038' => 'singleton_sql_json_item_required',
+    '22039' => 'sql_json_array_not_found',
+    '2203A' => 'sql_json_member_not_found',
+    '2203B' => 'sql_json_number_not_found',
+    '2203C' => 'sql_json_object_not_found',
     '2203D' => 'too_many_json_array_elements',
     '2203E' => 'too_many_json_object_members',
-    '2203F' => 'json_scalar_required',
+    '2203F' => 'sql_json_scalar_required',
+    '2203G' => 'sql_json_item_cannot_be_cast_to_target_type',
     '22P01' => 'floating_point_exception',
     '22P02' => 'invalid_text_representation',
     '22P03' => 'invalid_binary_representation',
@@ -555,6 +557,7 @@ our %ERROR_CODE = (
     '57P02' => 'crash_shutdown',
     '57P03' => 'cannot_connect_now',
     '57P04' => 'database_dropped',
+    '57P05' => 'idle_session_timeout',
     '58000' => 'system_error',
     '58030' => 'io_error',
     '58P01' => 'undefined_file',

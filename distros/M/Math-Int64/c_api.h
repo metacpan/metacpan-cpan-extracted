@@ -1,10 +1,10 @@
 /*
  * c_api.h - This file is in the public domain
- * Author: "Salvador Fandino <sfandino@yahoo.com>, Dave Rolsky <autarch@urth.org>"
+ * Author: Salvador Fandino <sfandino@yahoo.com>, Dave Rolsky <autarch@urth.org>
  *
- * Generated on: 2016-01-04 10:07:18
- * Math::Int64 version: 0.54
- * Module::CAPIMaker version: 
+ * Generated on: 2024-01-21 22:00:15
+ * Math::Int64 version: 0.56
+ * Module::CAPIMaker version: 0.02
  */
 
 #if !defined (C_API_H_INCLUDED)

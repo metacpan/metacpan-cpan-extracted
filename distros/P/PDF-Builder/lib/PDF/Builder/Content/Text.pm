@@ -9,8 +9,8 @@ use List::Util qw(min max);
 #use Data::Dumper;  # for debugging
 #  $Data::Dumper::Sortkeys = 1;  # hash keys in sorted order
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.025'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -34,9 +34,11 @@ sub new {
 
 =head2 Single Lines from a String
 
-=over
+=head3 text_left
 
-=item $width = $content->text_left($text, %opts)
+    $width = $content->text_left($text, %opts)
+
+=over
 
 Alias for C<text>. Implemented for symmetry, for those who use a lot of
 C<text_center> and C<text_right>, and desire a matching C<text_left>.
@@ -53,12 +55,15 @@ The width used (in points) is B<returned>.
 sub text_left {
     my ($self, $text, @opts) = @_;
 
-    return $self->text($text, @opts);
+    # override any stray 'align' that got through to here
+    return $self->text($text, @opts, 'align'=>'l');
 }
 
-=over
+=head3 text_center
 
-=item $width = $content->text_center($text, %opts)
+    $width = $content->text_center($text, %opts)
+
+=over
 
 As C<text>, but I<centered> on the current point.
 
@@ -72,13 +77,15 @@ The width used (in points) is B<returned>.
 sub text_center {
     my ($self, $text, @opts) = @_;
 
-    my $width = $self->advancewidth($text, @opts);
-    return $self->text($text, 'indent' => -($width/2), @opts);
+    # override any stray 'align' that got through to here
+    return $self->text($text, @opts, 'align'=>'c');
 }
 
-=over
+=head3 text_right
 
-=item $width = $content->text_right($text, %opts)
+    $width = $content->text_right($text, %opts)
+
+=over
 
 As C<text>, but right-aligned to the current point.
 
@@ -94,13 +101,15 @@ The width used (in points) is B<returned>.
 sub text_right {
     my ($self, $text, @opts) = @_;
 
-    my $width = $self->advancewidth($text, @opts);
-    return $self->text($text, 'indent' => -$width, @opts);
+    # override any stray 'align' that got through to here
+    return $self->text($text, @opts, 'align'=>'r');
 }
 
-=over
+=head3 text_justified
 
-=item $width = $content->text_justified($text, $width, %opts)
+    $width = $content->text_justified($text, $width, %opts)
+
+=over
  
 As C<text>, but stretches text using C<wordspace>, C<charspace>, and (as a  
 last resort) C<hscale>, to fill the desired
@@ -302,7 +311,8 @@ sub text_justified {
 
     } # original $overage was not near 0
     # do the output, with wordspace, charspace, and possiby hscale changed
-    $self->text($text, %opts);
+    # override any stray 'align' that got through to here
+    $self->text($text, %opts, 'align'=>'l');
 
     # restore settings
     $self->hscale($hs); $self->wordspace($ws); $self->charspace($cs);
@@ -316,7 +326,7 @@ The string is split at regular blanks (spaces), x20, to find the longest
 substring that will fit the C<$width>. 
 If a single word is longer than C<$width>, it will overflow. 
 To stay strictly within the desired bounds, set the option
-C<spillover>=>0 to disallow spillover.
+C<spillover>=E<gt>0 to disallow spillover.
 
 =head3 Hyphenation
 
@@ -332,7 +342,7 @@ There are hard coded minimums of 2 letters before the split, and 2 letters after
 the split. See C<Hyphenate_basic.pm>. Note that neither hyphenation nor simple
 line splitting makes any attempt to prevent widows and orphans, prevent 
 splitting of the last word in a column or page, or otherwise engage in 
-I<paragraph shaping>.
+more desirable I<paragraph shaping>.
 
 =over
 
@@ -566,16 +576,22 @@ sub _removeSHY {
     return $out;
 }
 
-=over
+=head4 text_fill_left, text_fill
 
-=item ($width, $leftover) = $content->text_fill_left($string, $width, %opts)
+    ($width, $leftover) = $content->text_fill_left($string, $width, %opts)
+
+=over
 
 Fill a line of 'width' with as much text as will fit, 
 and outputs it left justified.
 The width actually used, and the leftover text (that didn't fit), 
 are B<returned>.
 
-=item ($width, $leftover) = $content->text_fill($string, $width, %opts)
+=back
+
+    ($width, $leftover) = $content->text_fill($string, $width, %opts)
+
+=over
 
 Alias for text_fill_left().
 
@@ -590,7 +606,8 @@ sub text_fill_left {
 
     my $over = (not(defined($opts{'spillover'}) and $opts{'spillover'} == 0));
     my ($line, $ret) = $self->_text_fill_line($text, $width, $over, %opts);
-    $width = $self->text($line, %opts);
+    # override any stray 'align' that got through to here
+    $width = $self->text($line, %opts, 'align'=>'l');
     return ($width, $ret);
 }
 
@@ -599,9 +616,11 @@ sub text_fill {
     return $self->text_fill_left(@_); 
 }
 
-=over
+=head4 text_fill_center
 
-=item ($width, $leftover) = $content->text_fill_center($string, $width, %opts)
+    ($width, $leftover) = $content->text_fill_center($string, $width, %opts)
+
+=over
 
 Fill a line of 'width' with as much text as will fit, 
 and outputs it centered.
@@ -623,9 +642,11 @@ sub text_fill_center {
     return ($width, $ret);
 }
 
-=over
+=head4 text_fill_right
 
-=item ($width, $leftover) = $content->text_fill_right($string, $width, %opts)
+    ($width, $leftover) = $content->text_fill_right($string, $width, %opts)
+
+=over
 
 Fill a line of 'width' with as much text as will fit, 
 and outputs it right justified.
@@ -647,9 +668,11 @@ sub text_fill_right {
     return ($width, $ret);
 }
 
-=over
+=head4 text_fill_justified
 
-=item ($width, $leftover) = $content->text_fill_justified($string, $width, %opts)
+    ($width, $leftover) = $content->text_fill_justified($string, $width, %opts)
+
+=over
 
 Fill a line of 'width' with as much text as will fit, 
 and outputs it fully justified (stretched or condensed).
@@ -696,12 +719,13 @@ sub text_fill_justified {
     # if last line, use $align (don't justify)
     if ($ret eq '') {
 	my $lw = $self->advancewidth($line, %opts);
+        # override any stray 'align' that got through to here
 	if      ($align eq 'l') {
-	    $width = $self->text($line, %opts);
+	    $width = $self->text($line, %opts, 'align'=>'l');
 	} elsif ($align eq 'c') {
-	    $width = $self->text($line, 'indent' => ($width-$lw)/2, %opts);
+	    $width = $self->text($line, 'indent' => ($width-$lw)/2, %opts, 'align'=>'l');
 	} else {  # 'r'
-	    $width = $self->text($line, 'indent' => ($width-$lw), %opts);
+	    $width = $self->text($line, 'indent' => ($width-$lw), %opts, 'align'=>'l');
 	}
     } else {
         $width = $self->text_justified($line, $width, %opts);
@@ -711,11 +735,17 @@ sub text_fill_justified {
 
 =head2 Larger Text Segments
 
+=head3 paragraph
+
+    ($overflow_text, $unused_height) = $txt->paragraph($text, $width,$height, $continue, %opts)
+
+    ($overflow_text, $unused_height) = $txt->paragraph($text, $width,$height, %opts)
+
+    $overflow_text = $txt->paragraph($text, $width,$height, $continue, %opts)
+
+    $overflow_text = $txt->paragraph($text, $width,$height, %opts)
+
 =over
-
-=item ($overflow_text, $unused_height) = $txt->paragraph($text, $width,$height, $continue, %opts)
-
-=item $overflow_text = $txt->paragraph($text, $width,$height, $continue, %opts)
 
 Print a single string into a rectangular area on the page, of given width and
 maximum height. The baseline of the first (top) line is at the current text
@@ -725,6 +755,10 @@ Apply the text within the rectangle and B<return> any leftover text (if could
 not fit all of it within the rectangle). If called in an array context, the 
 unused height is also B<returned> (may be 0 or negative if it just filled the 
 rectangle).
+
+C<$continue> is optional, with a default value of 0. An C<%opts> list may be
+given after the fixed parameters, whether or not C<$continue> is explicitly
+given.
 
 If C<$continue> is 1, the first line does B<not> get special treatment for
 indenting or outdenting, because we're printing the continuation of the 
@@ -792,7 +826,16 @@ fit to a given width, and nothing is done for "widows and orphans".
 # TBD for bidi/RTL languages, should indenting be on right?
 
 sub paragraph {
-    my ($self, $text, $width,$height, $continue, %opts) = @_;
+    my ($self, $text, $width,$height, @optsA) = @_;
+    # if odd number of elements in optsA, it contains $continue flag and
+    #   remainder is %opts. if even, paragraph is being called PDF::API2 style
+    #   with no $continue (default to 0).
+    my $continue = 0;
+    if (@optsA % 2) {
+	$continue = splice(@optsA, 0, 1);
+    }
+    my %opts = @optsA;
+
     # copy dashed option names to preferred undashed names
     if (defined $opts{'-align'} && !defined $opts{'align'}) { $opts{'align'} = delete($opts{'-align'}); }
     if (defined $opts{'-pndnt'} && !defined $opts{'pndnt'}) { $opts{'pndnt'} = delete($opts{'-pndnt'}); }
@@ -851,11 +894,13 @@ sub paragraph {
     return $text;
 }
 
+=head3 section, paragraphs
+
+    ($overflow_text, $continue, $unused_height) = $txt->section($text, $width,$height, $continue, %opts)
+
+    $overflow_text = $txt->section($text, $width,$height, $continue, %opts)
+
 =over
-
-=item ($overflow_text, $continue, $unused_height) = $txt->section($text, $width,$height, $continue, %opts)
-
-=item $overflow_text = $txt->section($text, $width,$height, $continue, %opts)
 
 The C<$text> contains a string with one or more paragraphs C<$width> wide, 
 starting at the current text position, with a newline \n between each 
@@ -884,6 +929,10 @@ will also be added after the last paragraph printed.
 =back
 
 See C<paragraph> for other C<%opts> you can use, such as C<align> and C<pndnt>.
+
+B<Alternate name:> paragraphs
+
+This is for compatibiity with PDF::API2.
 
 =back
 
@@ -938,9 +987,11 @@ sub section {
     return $overflow;
 }
 
-=over
+=head3 textlabel
 
-=item $width = $txt->textlabel($x,$y, $font, $size, $text, %opts)
+    $width = $txt->textlabel($x,$y, $font, $size, $text, %opts)
+
+=over
 
 Place a line of text at an arbitrary C<[$x,$y]> on the page, with various text 
 settings (treatments) specified in the call.
@@ -1080,9 +1131,11 @@ sub textlabel {
         $wht = $self->text_center($text, %opts);
     } elsif (defined($opts{'left'}) && $opts{'left'} ||
 	     defined($opts{'align'}) && $opts{'align'} =~ /^l/i) {
-        $wht = $self->text($text, %opts);  # explicitly left aligned
+        # override any stray 'align' that got through to here
+        $wht = $self->text($text, %opts, 'align'=>'l');  # explicitly left aligned
     } else {
-        $wht = $self->text($text, %opts);  # left aligned by default
+        # override any stray 'align' that got through to here
+        $wht = $self->text($text, %opts, 'align'=>'l');  # left aligned by default
     }
 
     $self->textend();
@@ -1097,9 +1150,11 @@ sub textlabel {
 
 =head2 Complex Column Output with Markup
 
-=over
+=head3 column
 
-=item ($rc, $next_y, $unused) = $text->column($page, $text, $grfx, $markup, $txt, %opts)
+    ($rc, $next_y, $unused) = $text->column($page, $text, $grfx, $markup, $txt, %opts)
+
+=over
 
 This method fills out a column of text on a page, returning any unused portion
 that could not be fit, and where it left off on the page.
@@ -1200,6 +1255,7 @@ and CSS. Currently, HTML tags
     'u', 'ins' (underline)
     'ovl' (TBD -- non-HTML, overline)
     'k' (TBD -- non-HTML, kerning left/right shift)
+    'blockquote' (block quote)
 
 are supported (fully or in part I<unless> "TBD"), along with limited CSS for 
 color, font-size, font-family, etc. 
@@ -1226,6 +1282,7 @@ Sorry!
 
 Supported CSS properties: 
 
+    border-* TBD
     color (foreground color)
     display (inline/block)
     font-family (name as defined to FontManager, e.g. Times)
@@ -1236,9 +1293,11 @@ Supported CSS properties:
     list-style-position (outside) TBD inside
     list-style-type (marker description, see also _marker-before/after)
     margin-top/right/bottom/left (pt, bare number = pt, % of font-size)
+      margin TBD update four margin-* properties
     text-decoration (none, underline, line-through, overline)
     text-height (leading, as ratio of baseline-spacing to font-size)
     text-indent (pt, bare number = pt, % of current font-size)
+    text-align (left/right) TBD, future also center/justify?
     width (pt, bare number) width of horizontal rule
 
 Non-standard CSS "properties". You may want to set these in CSS:
@@ -1632,7 +1691,7 @@ It contains nothing to be used.
 
 # TBD, future:
 #  * = not official HTML5 or CSS (i.e., extension)
-# perhaps 3.026?  
+# perhaps 3.027?  
 #   arbitrary paragraph shapes (path)
 #   at a minimum, hyphenate-basic usage including &SHY;
 #   <hr>, <img>, <sup>, <sub>, <pre>, <nobr>, <br>, <dl>/<dt>/<dd>, <center>*
@@ -1669,7 +1728,7 @@ It contains nothing to be used.
 #   <keep>* material to keep together, such as headings and paragraph text
 #   leading (line-height) as a dimension instead of a ratio, convert to ratio
 #
-# 3.027 or later?
+# 3.028 or later?
 #  left/right auto margins? <center> may need this
 #  Text::KnuthLiang hyphenation
 #  <hyp>*, <nohyp>* control hypenation in a word (and remember
@@ -1861,17 +1920,19 @@ sub _default_css {
     $style{'body'}->{'_left'} = '0'; 
     $style{'body'}->{'_right'} = '0'; 
     $style{'body'}->{'text-indent'} = '0'; 
-   #$style{'body'}->{'text-align'} = 'left'; # center, right
+   #$style{'body'}->{'text-align'} = 'left'; # TBD center, right
    #$style{'body'}->{'text-transform'} = 'none'; # capitalize, uppercase, lowercase
-   #$style{'body'}->{'border-style'} = 'none'; # solid, dotted, dashed...
+   #$style{'body'}->{'border-style'} = 'none'; # solid, dotted, dashed... TBD
    #$style{'body'}->{'border-width'} = '1pt'; 
    #$style{'body'}->{'border-color'} = 'inherit'; 
+   #   TBD border-* individually specify for top/right/bottom/left
     $style{'body'}->{'text-decoration'} = 'none';
     $style{'body'}->{'display'} = 'block'; 
     $style{'body'}->{'width'} = '-1';  # TBD currently unused
     $style{'body'}->{'height'} = '-1';  # TBD currently unused ex. hr size
     $style{'body'}->{'_href'} = ''; 
 
+    $style{'p'}->{'display'} = 'block';
     $style{'font'}->{'display'} = 'inline';
     $style{'span'}->{'display'} = 'inline';
 
@@ -1887,12 +1948,12 @@ sub _default_css {
     $style{'ul'}->{'display'} = 'block'; 
     $style{'ul'}->{'margin-bottom'} = '50%'; 
     $style{'ol'}->{'list-style-type'} = '.o'; # decimal, lower-roman, upper-roman, lower-alpha, upper-alpha, none
-    $style{'ol'}->{'list-style-position'} = 'outside'; # inside
+    $style{'ol'}->{'list-style-position'} = 'outside'; # inside TBD
     $style{'ol'}->{'display'} = 'block'; 
     $style{'ol'}->{'margin-bottom'} = '50%'; 
     $style{'ol'}->{'_marker-before'} = ''; # content to add before marker
     $style{'ol'}->{'_marker-after'} = '.'; # content to add after marker
-   #$style{'sl'}->{'list-style-type'} = 'none';
+   #$style{'sl'}->{'list-style-type'} = 'none'; TBD
     $style{'li'}->{'display'} = 'block';  # should inherit from ul or ol
     $style{'li'}->{'margin-top'} = '50%';  # relative to text's font-size
 
@@ -1954,17 +2015,17 @@ sub _default_css {
     $style{'del'}->{'display'} = 'inline';
     $style{'del'}->{'text-decoration'} = 'line-through';
 
-    # non-standard tag for overline
+    # non-standard tag for overline TBD
    #$style{'ovl'}->{'display'} = 'inline';
    #$style{'ovl'}->{'text-decoration'} = 'overline';
     
     # non-standard tag for kerning (+ font-size fraction to move left, - right)
-    # e.g., for vulgar fraction adjust / and denominator <sub>
+    # e.g., for vulgar fraction adjust / and denominator <sub> TBD
    #$style{'k'}->{'display'} = 'inline';
    #$style{'k'}->{'_kern'} = '0.2';
 
     $style{'hr'}->{'display'} = 'block';
-    $style{'hr'}->{'height'} = '1'; # 1pt default thickness
+    $style{'hr'}->{'height'} = '0.5'; # 1/2 pt default thickness
     $style{'hr'}->{'width'} = '-1'; # default width is full column
     $style{'hr'}->{'margin-top'} = '100%'; 
     $style{'hr'}->{'margin-bottom'} = '100%'; 
@@ -1977,9 +2038,9 @@ sub _default_css {
     $style{'blockquote'}->{'text-height'} = '1.00'; # close spacing
     $style{'blockquote'}->{'font-size'} = '80%'; # smaller type
 
-   #$style{'sc'}->{'font-size'} = '80%'; # smaller type
+   #$style{'sc'}->{'font-size'} = '80%'; # smaller type TBD
    #$style{'sc'}->{'_expand'} = '110%'; # wider type   TBD _expand
-   #likewise for pc (petite caps)
+   #likewise for pc (petite caps) TBD
 
     return \%style;
 } # end of _default_css()
@@ -2097,6 +2158,7 @@ sub _output_text {
     my $start = 1; # counter for ordered lists
     my $list_depth = 0; # nesting level of ol and ul
     my $list_marker = ''; # li marker text
+    my $reversed_ol = 0; # count down from start
 
     my $phrase='';
     my $remainder='';
@@ -2227,11 +2289,20 @@ sub _output_text {
 		    $list_depth++;
 		}
 	        if ($tag eq 'ol') { 
+		    # save any existing start and reversed_ol values
+		    $properties[-2]->{'_start'} = $start; # current start
+		    $properties[-2]->{'_reversed_ol'} = $reversed_ol; # cur flag
+
 	            $start = 1;
 	            if (defined $mytext[$el]->{'start'}) {
 	                $start = $mytext[$el]->{'start'};
 		    }
-		    $list_depth++;
+		    if (defined $mytext[$el]->{'reversed'}) {
+			$reversed_ol = 1;
+		    } else {
+			$reversed_ol = 0;
+		    }
+                    $list_depth++;
 	        }
 	        if ($tag eq 'li') {
 		    # paragraph, but label depends on parent (list-style-type)
@@ -2249,7 +2320,11 @@ sub _output_text {
 			# it's a bullet character
 		    } else {
 			# fully formatted ordered list item
-		        $start++;
+			if ($reversed_ol) {
+		            $start--;
+			} else {
+		            $start++;
+			}
 		    }
 		    # sl: use normal marker width, marker is blank. position
 		    #     is always outside (ignore inside if given)
@@ -2378,6 +2453,11 @@ sub _output_text {
 		if ($tag eq 'ol' || $tag eq 'ul') { $list_depth--; }
 		# note that current_prop should be all up to date by the
 		# time you hit the end tag
+		if ($tag eq 'ol') {
+		    # restore any saved start and reversed_ol values
+		    $start = $properties[-2]->{'_start'}; # current start
+		    $reversed_ol = $properties[-2]->{'_reversed_ol'}; # cur flag
+                }
 
 		# ready to pick larger of top and bottom margins (block display)
 		$botm = $current_prop->{'margin-bottom'};
@@ -2462,6 +2542,9 @@ sub _output_text {
 	    # any size as a percentage of font-size will use the current fs
 	    my $fs = $current_prop->{'font-size'};
 
+	    # uncommon to only change font size without also changing something
+	    # else, so make font selection call at the same time, besides,
+	    # there is very little involved in just returning current font.
 	    if ($call_get_font) {
                 $text->font($pdf->get_font(
 		    'face' => $current_prop->{'font-family'}, 
@@ -2536,7 +2619,7 @@ sub _output_text {
 	    $remainder = '';
 
 	    # for now, all whitespace convert to single blanks 
-	    # TBD blank preserve for <code> or <pre>
+	    # TBD blank preserve for <code> or <pre> (CSS white-space)
 	    $phrase =~ s/\s+/ /g;
 
 	    # a phrase may have multiple words. see if entire thing fits, and if
@@ -2775,7 +2858,7 @@ sub _output_text {
 				$pageno = $1;
 				$xpos = $2;
 				$ypos = $3; 
-				$zoom = 1;
+				$zoom = undef;
 			    } elsif ($href =~ m/^#(\d+)-(\d+)-(\d+)-(.+)$/) {
 				# #p-x-y-z format (zoom, at a specific spot)
 				$pageno = $1; # integer > 0
@@ -3021,10 +3104,10 @@ sub _output_text {
 	    # do nothing, leave the font state/colors as-is
 	} else { # 2
 	    # restore to entry with @entry_state
-	    return (2, $next_y, []);
+	    return (2, $next_y-$botm, []);
 	}
 
-	return (0, $next_y, []);
+	return (0, $next_y-$botm, []);
     } else {
 	# we ran out of vertical space in the column. return -1 and 
 	# remainder of mytext list (next_y would be inapplicable)
@@ -3751,6 +3834,25 @@ sub _size2pt {
 # for ordered, returns $prefix.formatted_value.$suffix.blank
 # for unordered, returns string .disc, .circle, .square, or .box
 #   (.box is nonstandard marker)
+#
+# TBD check that 'none' works properly (as <sl>?)
+# TBD for ol, there are many other formats: cjk-decimal, decimal-leading-zero,
+#      lower-greek, upper-greek?, lower-latin = lower-alpha, upper-latin =
+#      upper-alpha, arabic-indic, -moz-arabic-indic, armenian, [-moz-]bengali, 
+#      cambodian (khmer), [-moz-]cjk-earthly-branch, [-moz-]cjk-heavenly-stem, 
+#      cjk-ideographic, [-moz-]devanagari, ethiopi-numeric, georgian,
+#      [-moz-]gujarati, [-moz-]gurmukhi, hebrew, hiragana, hiragana-iroha, 
+#      japanese-formal, japanese-informal, [-moz-]kannada, katakana, 
+#      katakana-iroha, korean-hangul-formal, korean-hanja-formal, 
+#      korean-hanja-informal, [-moz-]lao, lower-armenian, upper-armenian, 
+#      [-moz-]malayalam, mongolian, [-moz-]myanmar, [-moz-]oriya, 
+#      [-moz-]persian, simp-chinese-formal, simp-chinese-informal, [-moz-]tamil,
+#      [-moz-]telugu, [-moz-]thai, tibetan, trad-chinese-formal, 
+#      trad-chinese-informal, disclosure-open, disclosure-closed
+# TBD for ol, some browser-specific formats: -moz-ethiopic-halehame,
+#      -moz-ethiopic-halehame-am, [-moz-]ethiopic-halehame-ti-et, [-moz-]hangul,
+#      [-moz-]hangul-consonant, [-moz-]urdu
+# TBD for ul, ability to select images and possibly other characters
 sub _marker {
     my ($type, $depth, $value, $prefix, $suffix) = @_; 
                                      # type = list-style-type, 
@@ -4007,7 +4109,7 @@ sub _revise_baseline {
 } # end of _revise_baseline()
 
 # just something to pause during debugging
-sub  _pause {
+sub _pause {
     print STDERR "====> Press Enter key to continue...";
     my $input = <>;
     return;

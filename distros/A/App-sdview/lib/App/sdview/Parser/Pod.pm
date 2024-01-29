@@ -1,46 +1,50 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
 
-use Object::Pad 0.800;
+use Object::Pad 0.807;
 
-package App::sdview::Parser::Pod 0.13;
-class App::sdview::Parser::Pod
-   :isa(Pod::Simple)
-   :does(App::sdview::Parser)
-   :strict(params);
+package App::sdview::Parser::Pod 0.14;
+class App::sdview::Parser::Pod :strict(params);
+
+inherit Pod::Simple;
+
+apply App::sdview::Parser;
 
 use List::Keywords qw( any );
 use List::Util qw( min );
 
 use String::Tagged;
 
-use constant format => "POD";
+use constant format => "Pod";
 use constant sort_order => 10;
 
 =head1 NAME
 
-C<App::sdview::Parser::Pod> - parse POD files for L<App::sdview>
+C<App::sdview::Parser::Pod> - parse Pod files for L<App::sdview>
 
 =head1 SYNOPSIS
 
    $ sdview README.pod
 
-   $ sdview -f POD my-document
+   $ sdview -f Pod my-document
 
 =head1 DESCRIPTION
 
 This parser module adds to L<App::sdview> the ability to parse input text in
-POD formatting.
+Pod formatting.
 
 It uses L<Pod::Simple> as its driving parser.
 
-As an extension, it also supports the inline formatting code C<UE<lt>...E<gt>> to
-request underline formatting.
+As an extension, it also supports the inline formatting code C<UE<lt>...E<gt>>
+to request underline formatting.
+
+The C<SE<lt>...E<gt>> formatting code is handled by converting inner spaces to
+non-breaking spaces (U+00A0) characters in the returned string.
 
 =cut
 
@@ -69,6 +73,8 @@ field @_parastack;
 
 field %_curtags;
 field $_curpara;
+
+field $_conv_nbsp;
 
 method parse_file ( $fh )
 {
@@ -134,6 +140,9 @@ method _handle_element_start ( $type, $attrs )
    elsif( my $tag = $FORMAT_TYPES{$type} ) {
       ++$_curtags{$tag};
    }
+   elsif( $type eq "S" ) {
+      $_conv_nbsp = 1;
+   }
    elsif( $type eq "over-block" ) {
       push @_indentstack, $_indentstack[-1] + $attrs->{indent};
    }
@@ -178,6 +187,9 @@ method _handle_element_end ( $type, @ )
    elsif( my $tag = $FORMAT_TYPES{$type} ) {
       delete $_curtags{$tag};
    }
+   elsif( $type eq "S" ) {
+      undef $_conv_nbsp;
+   }
    elsif( $type eq "over-block" ) {
       pop @_indentstack;
    }
@@ -193,14 +205,16 @@ method _handle_element_end ( $type, @ )
    }
 }
 
-method _handle_text
+method _handle_text ( $text )
 {
+   $text =~ s/ /\xA0/g if $_conv_nbsp;
+
    if( $_curpara->type eq "item" and
          $_curpara->listtype eq "text" and !length $_curpara->term ) {
-      $_curpara->term->append_tagged( $_[0], %_curtags );
+      $_curpara->term->append_tagged( $text, %_curtags );
    }
    else {
-      $_curpara->text->append_tagged( $_[0], %_curtags );
+      $_curpara->text->append_tagged( $text, %_curtags );
    }
 }
 

@@ -6,8 +6,6 @@
 use v5.14;
 use warnings;
 
-use Syntax::Keyword::Match;
-
 package # hide
    Devel::MAT::Tool::Object::Pad::classes;
 use base qw( Devel::MAT::Tool );

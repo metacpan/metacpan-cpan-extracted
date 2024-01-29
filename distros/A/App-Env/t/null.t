@@ -16,8 +16,7 @@ ok( !defined $null1->env( 'NULL_TEST' ), 'null 1: still no env' );
 
 my $null2 = App::Env->new( 'null', { Cache => 0 } );
 
-ok( defined $null2->env( 'NULL_TEST' ) && $null2->env( 'NULL_TEST' ) == 1,
-    'null 2: env' );
+ok( defined $null2->env( 'NULL_TEST' ) && $null2->env( 'NULL_TEST' ) == 1, 'null 2: env' );
 
 
 $null2->setenv( NULL_TEST => 3 );

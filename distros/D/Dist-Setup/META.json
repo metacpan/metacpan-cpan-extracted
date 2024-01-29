@@ -1,0 +1,57 @@
+{
+   "abstract" : "Simple opinionated tool to setup a Perl distribution directory.",
+   "author" : [
+      "Mathias Kende <mathias@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Setup",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "local",
+         "vendor"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.09",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Eval::Safe" : "0",
+            "File::ShareDir" : "0",
+            "Template" : "0",
+            "perl" : "5.026"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mkende/dist_setup/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mkende/dist_setup"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

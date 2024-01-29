@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use POE;
 use POE::Future;
@@ -21,7 +21,7 @@ POE::Kernel->run;
       }
    );
 
-   is_deeply( [ $future->get ], [ "result" ], '$future->get on POE::Future' );
+   is( [ $future->get ], [ "result" ], '$future->get on POE::Future' );
 }
 
 done_testing;

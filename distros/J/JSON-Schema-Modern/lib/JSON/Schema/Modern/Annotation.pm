@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Annotation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single annotation from a JSON Schema evaluation
 
-our $VERSION = '0.575';
+our $VERSION = '0.582';
 
 use 5.020;
 use Moo;
@@ -18,6 +18,7 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use Safe::Isa;
 use MooX::TypeTiny;
 use Types::Standard qw(Str InstanceOf Bool);
+use Types::Common::Numeric qw(PositiveOrZeroInt);
 use namespace::clean;
 
 has [qw(
@@ -48,6 +49,12 @@ has unknown => (
   default => 0,
 );
 
+has depth => (
+  is => 'ro',
+  isa => PositiveOrZeroInt,
+  required => 1,
+);
+
 around BUILDARGS => sub ($orig, $class, @args) {
   my $args = $class->$orig(@args);
 
@@ -74,7 +81,12 @@ sub TO_JSON ($self) {
 }
 
 sub dump ($self) {
-  my $encoder = JSON::MaybeXS->new(utf8 => 0, convert_blessed => 1, canonical => 1, indent => 1, space_after => 1);
+  my $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new
+    ->utf8(0)
+    ->convert_blessed(1)
+    ->canonical(1)
+    ->indent(1)
+    ->space_after(1);
   $encoder->indent_length(2) if $encoder->can('indent_length');
   $encoder->encode($self);
 }
@@ -87,7 +99,7 @@ __END__
 
 =encoding UTF-8
 
-=for stopwords schema fragmentless
+=for stopwords schema fragmentless subschemas
 
 =head1 NAME
 
@@ -95,7 +107,7 @@ JSON::Schema::Modern::Annotation - Contains a single annotation from a JSON Sche
 
 =head1 VERSION
 
-version 0.575
+version 0.582
 
 =head1 SYNOPSIS
 
@@ -145,6 +157,11 @@ A boolean flag, indicating whether the keyword is a known vocabulary keyword or 
 =head2 annotation
 
 The actual annotation value (which may or may not be a string).
+
+=head2 depth
+
+An integer which indicates how many subschemas deep this annotation was generated from. Can be used
+to construct a tree-like structure of annotations.
 
 =head1 METHODS
 

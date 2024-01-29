@@ -1,8 +1,8 @@
-AudioFile::Info::MP3::ID3Lib
-============================
+AudioFile::Info::MP3::Info
+==========================
 
-AudioFile::Info::MP3::ID3Lib is a plugin module for AudioFile::Info.
-It extracts information from MP files using the module MP3::ID3Lib.
+AudioFile::Info::MP3::Info is a plugin module for AudioFile::Info.
+It extracts information from MP3 files using the module MP3::Info.
 
 INSTALLATION
 
@@ -20,7 +20,7 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  * MP3::ID3Lib
+  * MP3::Info
   * AudioFile::Info
 
 COPYRIGHT AND LICENCE

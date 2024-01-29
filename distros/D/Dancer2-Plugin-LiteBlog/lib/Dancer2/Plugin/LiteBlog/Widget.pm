@@ -126,6 +126,8 @@ sub elements {
     croak "Must be implemented by child class";
 }
 
+sub css { undef }
+
 =head2 has_routes
 
 If the widget adds route to the Dancer2 application, it should override

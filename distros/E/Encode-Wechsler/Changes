@@ -1,6 +1,11 @@
 Revision history for Encode-Wechsler
 
+1.00
+	- promote to stable
+    - update copyright
+
 0.03
+    - update copyright
 
 0.02
     - pad parameter now determines amount of padding to apply

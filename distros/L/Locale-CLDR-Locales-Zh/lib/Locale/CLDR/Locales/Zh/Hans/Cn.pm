@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Zh::Hans::Cn - Package for language Chinese
 
 package Locale::CLDR::Locales::Zh::Hans::Cn;
 # This file auto generated from Data\common\main\zh_Hans_CN.xml
-#	on Tue  5 Dec  1:40:22 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';

@@ -4,13 +4,13 @@
       "Johan Vromans <jvromans@squirrel.nl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-Music-ChordPro",
    "no_index" : {
@@ -48,18 +48,19 @@
       },
       "runtime" : {
          "requires" : {
-            "App::Packager" : "1.43",
+            "Data::Printer" : "1.001001",
             "File::HomeDir" : "1.004",
-            "File::LoadLines" : "1.021",
+            "File::LoadLines" : "1.044",
             "Image::Info" : "1.41",
             "JSON::PP" : "2.27203",
+            "JavaScript::QuickJS" : "0.18",
             "List::Util" : "1.46",
             "Object::Pad" : "0.78",
             "PDF::API2" : "2.043",
             "Pod::Usage" : "2.03",
             "Storable" : "3.08",
             "String::Interpolate::Named" : "1.03",
-            "Text::Layout" : "0.031",
+            "Text::Layout" : "0.032",
             "perl" : "5.026"
          }
       },
@@ -77,11 +78,11 @@
    "provides" : {
       "App::Music::ChordPro" : {
          "file" : "lib/ChordPro.pm",
-         "version" : "6.030"
+         "version" : "6.042"
       },
       "chordpro" : {
          "file" : "script/chordpro",
-         "version" : "6.030"
+         "version" : "6.042"
       }
    },
    "release_status" : "stable",
@@ -97,6 +98,6 @@
          "url" : "https://github.com/sciurius/chordpro"
       }
    },
-   "version" : "6.030",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "6.042",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

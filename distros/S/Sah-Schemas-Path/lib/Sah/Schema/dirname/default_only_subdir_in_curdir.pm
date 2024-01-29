@@ -3,9 +3,9 @@ package Sah::Schema::dirname::default_only_subdir_in_curdir;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-23'; # DATE
+our $DATE = '2024-01-08'; # DATE
 our $DIST = 'Sah-Schemas-Path'; # DIST
-our $VERSION = '0.025'; # VERSION
+our $VERSION = '0.030'; # VERSION
 
 our $schema = ["dirname" => {
     summary => 'Directory name, defaults to only subdirectory in current directory (if there is one)',
@@ -15,10 +15,15 @@ This is like the `dirname` schema but with a default value of "only subdirectory
 in the current directory". That is, if the current directory has a single
 subdirectory and nothing else.
 
+Difference with `dirname::default_only_subdir_not_file_in_subdir` schema: the
+other schema ignores plain files. Thus, if a directory only contains `file1` and
+`subdir1`, then that other schema will return `subdir1` but this schema will not
+return a default value.
+
 Note: be careful when using this schema for actions that are destructive,
 because a user can perform those actions without giving an argument (e.g. in a
 `delete-files-in` script). It is safer to use this schema when performing a
-non=destructive action (e.g. `ls`) and/or operate in dry-run mode by default.
+non-destructive action (e.g. `ls`) and/or operate in dry-run mode by default.
 
 MARKDOWN
     'x.perl.default_value_rules' => ['Path::only_subdir_in_curdir'],
@@ -39,7 +44,19 @@ Sah::Schema::dirname::default_only_subdir_in_curdir - Directory name, defaults t
 
 =head1 VERSION
 
-This document describes version 0.025 of Sah::Schema::dirname::default_only_subdir_in_curdir (from Perl distribution Sah-Schemas-Path), released on 2023-11-23.
+This document describes version 0.030 of Sah::Schema::dirname::default_only_subdir_in_curdir (from Perl distribution Sah-Schemas-Path), released on 2024-01-08.
+
+=head1 SAH SCHEMA DEFINITION
+
+ [
+   "dirname",
+   {
+     "summary" => "Directory name, defaults to only subdirectory in current directory (if there is one)",
+     "x.perl.default_value_rules" => ["Path::only_subdir_in_curdir"],
+   },
+ ]
+
+Base schema: L<dirname|Sah::Schema::dirname>
 
 =head1 SYNOPSIS
 
@@ -162,10 +179,15 @@ This is like the C<dirname> schema but with a default value of "only subdirector
 in the current directory". That is, if the current directory has a single
 subdirectory and nothing else.
 
+Difference with C<dirname::default_only_subdir_not_file_in_subdir> schema: the
+other schema ignores plain files. Thus, if a directory only contains C<file1> and
+C<subdir1>, then that other schema will return C<subdir1> but this schema will not
+return a default value.
+
 Note: be careful when using this schema for actions that are destructive,
 because a user can perform those actions without giving an argument (e.g. in a
 C<delete-files-in> script). It is safer to use this schema when performing a
-non=destructive action (e.g. C<ls>) and/or operate in dry-run mode by default.
+non-destructive action (e.g. C<ls>) and/or operate in dry-run mode by default.
 
 =head1 HOMEPAGE
 
@@ -199,7 +221,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2020, 2019, 2018, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2020, 2019, 2018, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

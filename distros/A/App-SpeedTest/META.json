@@ -1,79 +1,89 @@
 {
-   "version" : "0.28",
+   "abstract" : "Command line interface to speedtest.net",
+   "license" : [
+      "perl_5"
+   ],
+   "name" : "App-SpeedTest",
    "author" : [
-      "H.Merijn Brand <h.m.brand@xs4all.nl>"
-      ],
-   "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/Tux/speedtest/issues"
-         },
-      "repository" : {
-         "url" : "https://github.com/Tux/speedtest",
-         "web" : "https://github.com/Tux/speedtest",
-         "type" : "git"
-         },
-      "homepage" : "https://metacpan.org/pod/App::SpeedTest",
-      "x_IRC" : "irc://irc.perl.org/#csv",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-         ]
-      },
+      "H.Merijn Brand <hmbrand@cpan.org>"
+   ],
    "meta-spec" : {
       "version" : 2,
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
-      },
-   "dynamic_config" : 1,
-   "name" : "App-SpeedTest",
-   "prereqs" : {
-      "runtime" : {
-         "recommends" : {
-            "XML::Simple" : "2.25",
-            "Text::CSV_XS" : "1.47",
-            "Socket" : "2.032",
-            "LWP::UserAgent" : "6.60",
-            "HTML::TreeBuilder" : "5.07",
-            "Time::HiRes" : "1.9767",
-            "Data::Peek" : "0.50",
-            "Getopt::Long" : "2.52"
-            },
-         "requires" : {
-            "Socket" : "0",
-            "LWP::UserAgent" : "0",
-            "List::Util" : "0",
-            "Getopt::Long" : "0",
-            "Data::Peek" : "0",
-            "XML::Simple" : "0",
-            "perl" : "5.010000",
-            "Data::Dumper" : "0",
-            "HTML::TreeBuilder" : "0",
-            "Math::Trig" : "0",
-            "Time::HiRes" : "0"
-            }
-         },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-            }
-         },
-      "test" : {
-         "recommends" : {
-            "Test::More" : "1.302188"
-            },
-         "requires" : {
-            "Test::More" : "0"
-            }
-         }
-      },
-   "release_status" : "stable",
-   "license" : [
-      "perl_5"
-      ],
+   },
    "generated_by" : "Author",
-   "abstract" : "Command line interface to speedtest.net",
+   "resources" : {
+      "repository" : {
+         "web" : "https://github.com/Tux/speedtest",
+         "url" : "https://github.com/Tux/speedtest",
+         "type" : "git"
+      },
+      "bugtracker" : {
+         "web" : "https://github.com/Tux/speedtest/issues"
+      },
+      "x_IRC" : "irc://irc.perl.org/#csv",
+      "homepage" : "https://metacpan.org/pod/App::SpeedTest",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.29",
    "provides" : {
       "App::SpeedTest" : {
-         "version" : "0.28",
-         "file" : "speedtest"
+         "file" : "speedtest",
+         "version" : "0.29"
+      }
+   },
+   "prereqs" : {
+      "runtime" : {
+         "suggests" : {
+            "Data::Dumper" : "2.188"
+         },
+         "recommends" : {
+            "HTML::TreeBuilder" : "5.07",
+            "Getopt::Long" : "2.57",
+            "LWP::UserAgent" : "6.72",
+            "Data::Dumper" : "2.154",
+            "Data::Peek" : "0.52",
+            "Time::HiRes" : "1.9775",
+            "Socket" : "2.037",
+            "XML::Simple" : "2.25",
+            "Text::CSV_XS" : "1.53"
+         },
+         "requires" : {
+            "Data::Dumper" : "0",
+            "perl" : "5.010000",
+            "Math::Trig" : "0",
+            "Data::Peek" : "0",
+            "XML::Simple" : "0",
+            "List::Util" : "0",
+            "Time::HiRes" : "0",
+            "Socket" : "0",
+            "HTML::TreeBuilder" : "0",
+            "Getopt::Long" : "0",
+            "LWP::UserAgent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         },
+         "recommends" : {
+            "Test::More" : "1.302198"
+         }
+      },
+      "configure" : {
+         "suggests" : {
+            "ExtUtils::MakeMaker" : "7.70"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         },
+         "recommends" : {
+            "ExtUtils::MakeMaker" : "7.22"
          }
       }
-   }
+   },
+   "release_status" : "stable",
+   "dynamic_config" : 1
+}

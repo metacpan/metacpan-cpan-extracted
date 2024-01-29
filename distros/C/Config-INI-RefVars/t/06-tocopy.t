@@ -90,7 +90,13 @@ subtest "basic" => sub {
               },
               'variables()');
 
+    is($obj->current_tocopy_section, Config::INI::RefVars::DFLT_TOCOPY_SECTION,
+       "current_tocopy_section() eq default");
+
     $obj->parse_ini(src => $src, tocopy_section => 'COM_SEC');
+    is($obj->current_tocopy_section, 'COM_SEC', "current_tocopy_section() eq 'COM_SEC'");
+    is($obj->tocopy_section, Config::INI::RefVars::DFLT_TOCOPY_SECTION,
+       "tocopy_section() eq default");
     is_deeply($obj->variables,
               {
                'COM_SEC' => {
@@ -189,7 +195,7 @@ subtest "Environment variables" => sub {
               },
               'variables()');
   };
-  subtest "xxx" => sub {
+  subtest "ENV and env" => sub {
     my $src = [
                '[sec Z]',
                'x= $(=ENV:FOO)',

@@ -1,5 +1,9 @@
 Revision history for ENV-Util
 
+0.04    2023-12-19
+    OTHER:
+        - typo fix in documentation (Ron Savage)
+
 0.03    2023-08-11
     NEW FEATURES:
         - tcsh/csh support for 'env' and 'setenv' keywords.

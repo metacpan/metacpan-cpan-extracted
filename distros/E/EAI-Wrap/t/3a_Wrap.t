@@ -48,7 +48,7 @@ file_exists_ok("test.txt","getLocalFiles test.txt");
 like($process{successfullyDone}, qr/getLocalFiles/, "getLocalFiles set \$process{successfullyDone} for reprocessing");
 
 # 8
-checkFiles({File => {filename => "test.txt"}, process => \%process});
+#checkFiles({File => {filename => "test.txt"}, process => \%process});
 is_deeply($process{filenames},["test.txt"],"checkFiles test.txt");
 markProcessed({File => {filename => "test.txt"}, process => \%process});
 
@@ -81,7 +81,7 @@ is_deeply($process{filenames},["test_1.csv","test_2.csv"],"checkFiles \$process{
 delete $execute{alreadyMovedOrDeleted};
 delete $execute{filesToMoveinHistory};
 markForHistoryDelete({File => {filename => "test_1.csv", dontKeepHistory => 1}});
-is_deeply($execute{filesToDelete},["test_1.csv"],"processingEnd/deleteFiles \$execute{filesToDelete} test_1.csv");
+is_deeply($execute{uploadFilesToDelete},["test_1.csv"],"processingEnd/deleteFiles \$execute{uploadFilesToDelete} test_1.csv");
 
 # 18
 processingEnd();

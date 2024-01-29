@@ -21,4 +21,10 @@ use Syntax::Operator::Zip qw( zip mesh );
       'mesh()' );
 }
 
+no Syntax::Operator::Zip qw( zip );
+
+like( dies { zip( [1,2], [3,4] ) },
+   qr/^Undefined subroutine &main::zip called at /,
+   'unimport' );
+
 done_testing;

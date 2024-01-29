@@ -1,6 +1,6 @@
 package Dancer2::Core::Request;
 # ABSTRACT: Interface for accessing incoming requests
-$Dancer2::Core::Request::VERSION = '1.0.0';
+$Dancer2::Core::Request::VERSION = '1.1.0';
 use strict;
 use warnings;
 use parent 'Plack::Request';
@@ -11,7 +11,7 @@ use URI;
 use URI::Escape;
 use Safe::Isa;
 use Hash::MultiValue;
-use Ref::Util qw< is_ref is_arrayref is_hashref >;
+use Ref::Util qw< is_ref is_arrayref is_hashref is_coderef >;
 
 use Dancer2::Core::Types;
 use Dancer2::Core::Request::Upload;
@@ -77,6 +77,7 @@ sub new {
     $self->{'id'}              = ++$_id;
     $self->{'vars'}            = {};
     $self->{'is_behind_proxy'} = !!$opts{'is_behind_proxy'};
+    $self->{'uri_for_route'}   = $opts{'uri_for_route'};
 
     $opts{'body_params'}
         and $self->{'_body_params'} = $opts{'body_params'};
@@ -314,6 +315,15 @@ sub uri_for {
     return $dont_escape
            ? uri_unescape( ${ $uri->canonical } )
            : ${ $uri->canonical };
+}
+
+sub uri_for_route {
+    my ( $self, @args ) = @_;
+
+    is_coderef( $self->{'uri_for_route'} )
+        or die 'uri_for_route called on a request instance without it';
+
+    return $self->{'uri_for_route'}->(@_);
 }
 
 sub params {
@@ -648,7 +658,7 @@ Dancer2::Core::Request - Interface for accessing incoming requests
 
 =head1 VERSION
 
-version 1.0.0
+version 1.1.0
 
 =head1 SYNOPSIS
 
@@ -1020,6 +1030,13 @@ You get the following behavior:
     print $uri; # http://localhost:5000/foo/bar?baz=baz
 
 C<uri_for> returns a L<URI> object (which can stringify to the value).
+
+=head2 uri_for_route(route_name, route_params, query_params, escape)
+
+Constructs a URI from the base and the path of the specified route name.
+
+Read more about it in the C<Dancer2::Manual::Keywords> document under
+C<uri_for_route>.
 
 =head2 user
 

@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Const::Fast" => 0,
-    "Database::Temp" => 0,
+    "Database::Temp" => "0.003",
     "English" => 0,
     "Log::Any" => 0,
     "Module::Load" => 0,
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +48,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Const::Fast" => 0,
   "DBI" => 0,
-  "Database::Temp" => 0,
+  "Database::Temp" => "0.003",
   "English" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,

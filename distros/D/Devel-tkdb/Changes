@@ -1,5 +1,8 @@
 Revision history for Perl extension Devel::tkdb.
 
+2.4	2023-09-24
+	tktreectrl required
+
 2.3	2023-09-17
 	F6 - selection eval
 	expression window fixes

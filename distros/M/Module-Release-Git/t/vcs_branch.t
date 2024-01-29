@@ -2,10 +2,13 @@
 use strict;
 use vars qw($run_output);
 
+use lib qw(t/lib);
+
 use Test::More;
 
 my $class  = 'Module::Release::Git';
 
+use_ok( 'Local::Config' );
 use_ok( 'Module::Release' );
 
 subtest dummy_releaserc => sub {
@@ -139,16 +142,5 @@ subtest allowed_branch => sub {
 		};
 
 	};
-
-BEGIN { # 5.10 syntax
-package Local::Config;
-sub new { bless $_[1], $_[0] }
-sub DESTROY { 1 }
-sub AUTOLOAD {
-	our $AUTOLOAD;
-	( my $method = $AUTOLOAD ) =~ s/.*:://;
-	exists $_[0]{$method} ? $_[0]{$method} : ()
-	}
-}
 
 done_testing();

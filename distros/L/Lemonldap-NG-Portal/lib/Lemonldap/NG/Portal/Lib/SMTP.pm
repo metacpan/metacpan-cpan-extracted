@@ -10,12 +10,13 @@ use Mouse;
 use JSON qw(from_json);
 use MIME::Entity;
 use Email::Sender::Simple qw(sendmail);
-use Email::Date::Format qw(email_date);
+use Email::Date::Format   qw(email_date);
+use HTML::FormatText::WithLinks;
 use Lemonldap::NG::Common::EmailTransport;
 use MIME::Base64;
 use Encode;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.18.0';
 
 our $transport;
 
@@ -40,6 +41,13 @@ has transport => (
         my $conf = $_[0]->{conf};
         $transport = Lemonldap::NG::Common::EmailTransport->new($conf);
         return $transport;
+    },
+);
+has htmlParser => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        return HTML::FormatText::WithLinks->new;
     },
 );
 
@@ -107,6 +115,11 @@ sub gen_password {
 # @return boolean result
 sub send_mail {
     my ( $self, $mail, $subject, $body, $html ) = @_;
+
+    if ( $mail =~ /^\S+\@\S+$/ ) {
+        $mail = "$mail <$mail>";
+    }
+
     $self->logger->info("send_mail called to send \"$subject\" to $mail");
 
     # Encode the body with the given charset
@@ -149,19 +162,29 @@ sub send_mail {
                     : ()
                 ),
                 Subject => $subject,
-                Type    => 'multipart/related',
+                Type    => 'multipart/mixed',
                 Date    => email_date,
             );
 
+            my $alternative = $message->attach( Type => 'multipart/alternative' );
+
+            # Text message
+            $alternative->attach(
+                Type => 'text/plain; charset=' . $self->charset,
+                Data => $self->htmlParser->parse($body),
+            );
+
+            my $related = $alternative->attach( Type => 'multipart/related' );
+
             # Attach HTML message
-            $message->attach(
+            $related->attach(
                 Type => 'text/html; charset=' . $self->charset,
-                Data => qq{$body},
+                Data => $body,
             );
 
             # Attach included images
             foreach ( keys %cid ) {
-                $message->attach(
+                $related->attach(
                     Type => "image/" . ( $cid{$_} =~ m/\.(\w+)/ )[0],
                     Id   => $_,
                     Path => $self->conf->{templateDir} . "/"

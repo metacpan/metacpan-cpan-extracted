@@ -11,7 +11,6 @@ sub MY::libscan {
 }
 
 my %WriteMakefileArgs = (
-INSTALL_BASE => '/home/andreas/usr',
     NAME             => 'WWW::Mechanize::Chrome::DOMops',
     AUTHOR           => q{Andreas Hadjiprocopis <bliako@cpan.org>},
     VERSION_FROM     => 'lib/WWW/Mechanize/Chrome/DOMops.pm',

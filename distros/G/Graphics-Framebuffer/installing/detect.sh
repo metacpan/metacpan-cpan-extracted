@@ -5,6 +5,8 @@
 # from http://linuxmafia.com/faq/Admin/release-files.html
 #
 
+Green="\033[0;32m"
+Color_Off="\033[0m"
 
 OS=`uname -s`
 REV=`uname -r`
@@ -56,9 +58,7 @@ elif [ "${OS}" = "Linux" ] ; then
 
 fi
 
-echo ${OSSTR}
-
-is_arm=0
+is_arm="NO"
 
 #Distros vars
 known_compatible_distros=(
@@ -84,6 +84,7 @@ known_arm_compatible_distros=(
                         "Parrot arm"
                         "Kali arm"
                         "Debian"
+						"Mint"
                         "Ubuntu"
                     )
 
@@ -121,10 +122,10 @@ function detect_distro_phase2() {
                 extra_os_info=$(cat < ${osversionfile_dir}"os-release" | grep "PRETTY_NAME")
                 if [[ "${extra_os_info}" =~ Raspbian ]]; then
                     distro="Raspbian"
-                    is_arm=1
+                    is_arm="YES"
                 elif [[ "${extra_os_info}" =~ Parrot ]]; then
                     distro="Parrot arm"
-                    is_arm=1
+                    is_arm="YES"
                 fi
             fi
         fi
@@ -149,13 +150,39 @@ function detect_arm_architecture() {
 
         if [ ${distro_already_known} -eq 0 ]; then
             distro="${distro} arm"
-            is_arm=1
+            is_arm="YES"
         fi
     fi
 }
 
 detect_distro_phase1
 detect_distro_phase2
-
-echo "${distro}"
-echo "Is it ARM?  ${is_arm}"
+###############################################################################
+echo "For a comprehensive list, see:"
+echo "  https://en.wikipedia.org/wiki/List_of_Linux_distributions"
+echo ""
+echo "Debian Distributions:"
+echo "  * Debian       * Ubuntu              * Kubuntu"
+echo "  * Xubuntu      * Element OS          * Edubuntu"
+echo "  * Mythbuntu    * Gobuntu             * Eeebuntu"
+echo "  * Emmabuntus   * GendBuntu           * Netrunner"
+echo "  * OpenGEU      * Pinguy OS           * Poseidon Linux"
+echo "  * Sabily       * Trisquel GNULinux   * Ututo"
+echo "  * Knoppix      * Damn Small Linux    * Feather Linux"
+echo "  * LMDE         * PureOS              * SparkyLinux"
+echo "  * BackBox      * Bodhi Linux         * Cub Linux"
+echo "  * EasyPeasy    * elementary OS       * Mint"
+echo "  * Molinux      * Raspian             * Twister OS"
+echo ""
+echo "RedHat Distributions"
+echo "  * RedHat           * Fedora             * CentOS"
+echo "  * ClearOS          * Scientific Linux   * SME"
+echo "  * Amazon Linux 2   * Berry Linux        * EnGarde Secure Linux"
+echo "  * Funduntu         * Korora             * Linpus Linux"
+echo "  * Linux XP         * MeeGo              * Moblin"
+echo "  * Qubes OS         * Trustix            * Sugar-on-a-Stick"
+echo "  * Aurora           * Berry              * Yellow Dog Linux"
+echo ""
+echo "Operating System -> ${OSSTR}"
+echo -e "Distribution -----> ${Green}${distro}${Color_Off}"
+echo "CPU --------------> ${MACH}"

@@ -1,5 +1,8 @@
 # Changes for Mojo::Promise::Role::Any
 
+1.006 2024-01-18T07:08:31Z
+	* refresh distro, update email address
+
 1.005 2021-05-25T16:51:59Z
 	* Fix warnings with unhandled rejected promises (GitHub #1, poti1)
 

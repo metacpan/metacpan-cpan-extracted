@@ -7,13 +7,13 @@ my $build = Module::Build->new(
    module_name => 'Devel::MAT::Tool::Object::Pad',
    requires => {
       'Syntax::Keyword::Match' => 0,
-      'Devel::MAT' => '0.47',
+      'Devel::MAT' => '0.48',
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing
 
       'Devel::MAT::Dumper' => '0.45',
-      'Object::Pad' => '0.64',
+      'Object::Pad' => '0.66',
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

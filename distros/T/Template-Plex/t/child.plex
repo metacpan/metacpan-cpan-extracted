@@ -5,4 +5,4 @@
 ###END OF CHILD
 @{[fill_slot header=>"===HEADER==="]}
 @{[fill_slot footer=>"===FOOTER==="]}
-@{[fill_slot sub=>cache(undef, "sub1.plex")]}
+@{[fill_slot sub=>cache(undef, \"sub1.plex")]}

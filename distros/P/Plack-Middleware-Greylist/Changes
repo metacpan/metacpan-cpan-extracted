@@ -1,5 +1,32 @@
 Revision history for Plack-Middleware-Greylist
 
+v0.7.2    2023-12-22 10:00:50+00:00 Europe/London
+  [Tests]
+  - Removed TAP::Formatter::GitHubActions from prerequisites.
+
+  [Other]
+  - Perltidied source code.
+
+  [Toolchain]
+  - Added .editorconfig to the repository.
+
+  - Added .perltidyrc to the repository.
+
+v0.7.1    2023-12-21 13:20:19+00:00 Europe/London
+  [Bug Fixes]
+  - Fixed initialisation of the default configuration.
+
+  [Tests]
+  - Renamed a test script.
+
+v0.7.0    2023-12-13 18:19:27+00:00 Europe/London
+  [Toolchain]
+  - Build rules were updated to ensure MANIFEST.SKIP is used.
+
+v0.6.1    2023-12-12 17:14:50+00:00 Europe/London (TRIAL RELEASE)
+  [Enhancements]
+  - Added `callback` attribute to override logging method.
+
 v0.6.0    2023-12-05 11:12:59+00:00 Europe/London
   [Enhancements]
   - Added support for IPv6 addresses. (GH#6)

@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Message;
-$Telegram::Bot::Object::Message::VERSION = '0.024';
+$Telegram::Bot::Object::Message::VERSION = '0.025';
 # ABSTRACT: The base class for the Telegram type "Message".
 
 
@@ -28,6 +28,7 @@ use Telegram::Bot::Object::SuccessfulPayment;
 use Telegram::Bot::Object::PassportData;
 use Telegram::Bot::Object::InlineKeyboardMarkup;
 use Telegram::Bot::Object::ReplyKeyboardMarkup;
+use Telegram::Bot::Object::InlineQuery;
 
 use Data::Dumper;
 
@@ -83,6 +84,7 @@ has 'successful_payment'; # SuccessfulPayment
 has 'connected_website';
 has 'passport_data'; # PassportData
 has 'reply_markup'; # Array of InlineKeyboardMarkup/ReplyKeyboardMarkup
+has 'inline_query'; # InlineQuery
 
 sub fields {
   return {
@@ -121,6 +123,7 @@ sub fields {
           'Telegram::Bot::Object::PassportData'         => [qw/passport_data/],
           'Telegram::Bot::Object::InlineKeyboardMarkup' => [qw/reply_markup/],
           'Telegram::Bot::Object::ReplyKeyboardMarkup'  => [qw/reply_markup/],
+          'Telegram::Bot::Object::InlineQuery'          => [qw/inline_query/],
 
   };
 }
@@ -133,7 +136,9 @@ sub arrays {
 sub reply {
   my $self = shift;
   my $text = shift;
-  return $self->_brain->sendMessage({chat_id => $self->chat->id, text => $text});
+  my $args = shift // {};
+
+  return $self->_brain->sendMessage({chat_id => $self->chat->id, text => $text, %$args });
 }
 
 1;
@@ -150,7 +155,7 @@ Telegram::Bot::Object::Message - The base class for the Telegram type "Message".
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 DESCRIPTION
 
@@ -177,6 +182,10 @@ Justin Hawkins <justin@eatmorecode.com>
 =item *
 
 James Green <jkg@earth.li>
+
+=item *
+
+Julien Fiegehenn <simbabque@cpan.org>
 
 =back
 

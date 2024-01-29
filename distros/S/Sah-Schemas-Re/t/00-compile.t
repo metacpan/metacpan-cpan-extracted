@@ -6,11 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'Sah/Schema/obj/re.pm',
     'Sah/Schema/re_from_str.pm',
+    'Sah/Schema/re_or_code_from_str.pm',
+    'Sah/SchemaR/obj/re.pm',
     'Sah/SchemaR/re_from_str.pm',
+    'Sah/SchemaR/re_or_code_from_str.pm',
     'Sah/Schemas/Re.pm'
 );
 

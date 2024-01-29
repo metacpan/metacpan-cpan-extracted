@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.66 ':experimental(init_expr)';
+use warnings;
+use Object::Pad 0.800;
 
-package Tangence::Meta::Type 0.30;
+package Tangence::Meta::Type 0.32;
 class Tangence::Meta::Type :strict(params);
 
 use Carp;
@@ -90,7 +91,7 @@ sub make_from_sig ( $class, $sig )
    return $class->make( $sig );
 }
 
-field $aggregate   :param :reader { "prim" };
+field $aggregate   :param :reader = "prim";
 field $member_type :param;
 
 =head1 ACCESSORS

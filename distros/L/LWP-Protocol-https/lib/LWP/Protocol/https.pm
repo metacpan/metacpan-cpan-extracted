@@ -3,7 +3,7 @@ package LWP::Protocol::https;
 use strict;
 use warnings;
 
-our $VERSION = '6.11';
+our $VERSION = '6.12';
 
 use base qw(LWP::Protocol::http);
 require Net::HTTPS;
@@ -48,7 +48,7 @@ This problem can be fixed by either setting the PERL_LWP_SSL_CA_FILE
 environment variable to the file where your trusted CA are, or by installing
 the Mozilla::CA module for set of commonly trusted CAs.
 
-To completly disable the verification that you talk to the correct SSL peer you
+To completely disable the verification that you talk to the correct SSL peer you
 can set SSL_verify_mode to 0 within ssl_opts.  But, if you do this you can't be
 sure that you communicate with the expected peer.
 EOT
@@ -56,7 +56,7 @@ EOT
         }
     }
     $self->{ssl_opts} = \%ssl_opts;
-    return (%ssl_opts, $self->SUPER::_extra_sock_opts);
+    return (%ssl_opts, MultiHomed => 1, $self->SUPER::_extra_sock_opts);
 }
 
 # This is a subclass of LWP::Protocol::http.
@@ -96,9 +96,12 @@ sub _get_sock_info
 if ( $Net::HTTPS::SSL_SOCKET_CLASS->can('start_SSL')) {
     *_upgrade_sock = sub {
 	my ($self,$sock,$url) = @_;
+    # SNI should be passed there only if it is not an IP address.
+    # Details: https://github.com/libwww-perl/libwww-perl/issues/449#issuecomment-1896175509
+	my $host = $url->host_port() =~ m/:|^[\d.]+$/s ? undef : $url->host();
 	$sock = LWP::Protocol::https::Socket->start_SSL( $sock,
 	    SSL_verifycn_name => $url->host,
-	    SSL_hostname => $url->host,
+	    SSL_hostname => $host,
 	    $self->_extra_sock_opts,
 	);
 	$@ = LWP::Protocol::https::Socket->errstr if ! $sock;

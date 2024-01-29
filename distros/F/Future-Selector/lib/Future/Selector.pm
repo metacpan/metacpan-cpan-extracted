@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
@@ -9,7 +9,7 @@ use warnings;
 use Object::Pad 0.800;
 use Future::AsyncAwait;
 
-package Future::Selector 0.02;
+package Future::Selector 0.03;
 class Future::Selector;
 
 use Carp;
@@ -192,6 +192,10 @@ method _item_is_ready ( $item )
 
    delete $items{ refaddr $item };
 
+   if( $item->gen ) {
+      push @items_needing_regen, $item;
+   }
+
    if( $next_waitf ) {
       if( $f->is_failed ) {
          $f->on_fail( $next_waitf ); # copy the failure
@@ -207,10 +211,6 @@ method _item_is_ready ( $item )
       else {
          push @next_ready, $item->data, $item->f;
       }
-   }
-
-   if( $item->gen ) {
-      push @items_needing_regen, $item;
    }
 }
 
@@ -373,6 +373,22 @@ async method run_until_ready ( $f )
    await $self->select until $f->is_ready;
    return await $f;
 }
+
+=head1 TODO
+
+=over 4
+
+=item *
+
+Convenience ->add_f / ->add_gen
+
+=item *
+
+Configurable behaviour on component future failure
+
+=back
+
+=cut
 
 =head1 AUTHOR
 

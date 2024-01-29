@@ -1,5 +1,5 @@
 package POE::Component::Curl::Multi;
-$POE::Component::Curl::Multi::VERSION = '1.00';
+$POE::Component::Curl::Multi::VERSION = '1.02';
 #ABSTRACT: a fast HTTP POE component
 
 use strict;
@@ -398,7 +398,7 @@ POE::Component::Curl::Multi - a fast HTTP POE component
 
 =head1 VERSION
 
-version 1.00
+version 1.02
 
 =head1 SYNOPSIS
 

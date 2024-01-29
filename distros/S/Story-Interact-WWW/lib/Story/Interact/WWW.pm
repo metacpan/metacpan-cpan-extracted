@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::WWW;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001006';
+our $VERSION   = '0.002000';
 
 use constant DISTRIBUTION => 'Story-Interact-WWW';
 
@@ -35,10 +35,18 @@ sub startup ( $self ) {
 		$self->home->rel_file( 'local/templates' ),
 		Mojo::ShareDir->new( DISTRIBUTION, 'templates' ),
 	);
+
+	my $get_db = sub ( $self ) {
+		state $dsn = $ENV{SIWWW_DB_DSN};
+		state $u   = $ENV{SIWWW_DB_USERNAME} // '';
+		state $p   = $ENV{SIWWW_DB_PASSWORD} // '';
+		$dsn or return;
+		DBI->connect( $dsn, $u, $p );
+	};
 	
 	my $get_session = sub ( $self, $c ) {
-		my $db  = $self->config( 'database' ) or return undef;
-		my $sth = $db->prepare( 'SELECT u.id, u.username, u.email, u.created, s.id AS session_id, s.token AS session FROM user u INNER JOIN session s ON u.id=s.user_id WHERE s.token=?' );
+		my $db  = $self->$get_db or return undef;
+		my $sth = $db->prepare( 'SELECT u.id, u.username, u.email, u.created, s.id AS session_id, s.token AS session FROM "user" u INNER JOIN session s ON u.id=s.user_id WHERE s.token=?' );
 		$sth->execute( ref($c) ? ( $c->req->param('session') // $c->req->json->{session} ) : $c );
 		if ( my $row = $sth->fetchrow_hashref ) {
 			my $sth2 = $db->prepare( 'UPDATE session SET last_access=? WHERE id=?' );
@@ -82,7 +90,7 @@ sub startup ( $self ) {
 				$c->stash->{story_id}       = $story_id;
 				$c->stash->{title}          = $story_config->{title}       // 'Story';
 				$c->stash->{storage_key}    = $story_config->{storage_key} // $story_id;
-				$c->stash->{server_storage} = !!$self->config( 'database' );
+				$c->stash->{server_storage} = !!$self->$get_db;
 				$c->stash->{server_signups} = !!$self->config( 'open_signups' );
 				$c->render( template => $story_config->{template} // 'story' );
 			},
@@ -132,7 +140,7 @@ sub startup ( $self ) {
 				
 				if ( $c->req->json->{session} ) {
 					$Story::Interact::SESSION  = $self->$get_session( $c );
-					$Story::Interact::DATABASE = $self->config( 'database' );
+					$Story::Interact::DATABASE = sub { $self->$get_db };
 				}
 				
 				my $page = $page_source->get_page( $state, $page_id );
@@ -153,13 +161,13 @@ sub startup ( $self ) {
 			cb => sub ( $c ) {
 				$self->config( 'open_signups' ) or die;
 				
-				my $db = $self->config( 'database' ) or die;
+				my $db = $self->$get_db or die;
 				my $u  = $c->req->json->{username};
 				my $p  = $c->req->json->{password} or die;
 				my $e  = $c->req->json->{email};
 				
 				my $hash = sha256_hex( sprintf( '%s:%s', $u, $p ) );
-				my $sth = $db->prepare( 'INSERT INTO user ( username, password, email, created ) VALUES ( ?, ?, ?, ? )' );
+				my $sth = $db->prepare( 'INSERT INTO "user" ( username, password, email, created ) VALUES ( ?, ?, ?, ? )' );
 				if ( $sth->execute( $u, $hash, $e, scalar(time) ) ) {
 					my $id = $db->last_insert_id;
 					my $session_id = Nanoid::generate();
@@ -178,12 +186,12 @@ sub startup ( $self ) {
 	{
 		$self->routes->post( '/api/session/init' )->to(
 			cb => sub ( $c ) {
-				my $db = $self->config( 'database' ) or die;
+				my $db = $self->$get_db or die;
 				my $u  = $c->req->json->{username};
 				my $p  = $c->req->json->{password};
 				
 				my $hash = sha256_hex( sprintf( '%s:%s', $u, $p ) );
-				my $sth = $db->prepare( 'SELECT id, username FROM user WHERE username=? AND password=?' );
+				my $sth = $db->prepare( 'SELECT id, username FROM "user" WHERE username=? AND password=?' );
 				$sth->execute( $u, $hash );
 				if ( my $row = $sth->fetchrow_hashref ) {
 					my $session_id = Nanoid::generate();
@@ -202,7 +210,7 @@ sub startup ( $self ) {
 	{
 		$self->routes->post( '/api/session/destroy' )->to(
 			cb => sub ( $c ) {
-				my $db = $self->config( 'database' ) or die;
+				my $db = $self->$get_db or die;
 				my $session = $self->$get_session( $c );
 				my $sth = $db->prepare( 'DELETE FROM session WHERE id=? AND token=? AND user_id=?' );
 				$sth->execute( $session->{session_id}, $session->{session}, $session->{id} );
@@ -215,7 +223,7 @@ sub startup ( $self ) {
 	{
 		$self->routes->get( '/api/story/:story/bookmark' )->to(
 			cb => sub ( $c ) {
-				my $db = $self->config( 'database' ) or die;
+				my $db = $self->$get_db or die;
 				my $story_id = $c->stash( 'story' );
 				my $session = $self->$get_session( $c );
 				my $sth = $db->prepare( 'SELECT slug, label, created, modified FROM bookmark WHERE user_id=? AND story=?' );
@@ -230,9 +238,9 @@ sub startup ( $self ) {
 		
 		$self->routes->post( '/api/story/:story/bookmark' )->to(
 			cb => sub ( $c ) {
-				my $db = $self->config( 'database' ) or die;
+				my $db = $self->$get_db or die;
 				my $story_id = $c->stash( 'story' );
-				my $session = $self->$get_session( $c );
+				my $session = $self->$get_session( $c ) or die;
 				my $slug = Nanoid::generate( size => 14 );
 				my $label = $c->req->json->{label} // 'Unlabelled';
 				my $data = $c->req->json->{stored_data} or die;
@@ -249,7 +257,7 @@ sub startup ( $self ) {
 		
 		$self->routes->get( '/api/story/:story/bookmark/:slug' )->to(
 			cb => sub ( $c ) {
-				my $db = $self->config( 'database' ) or die;
+				my $db = $self->$get_db or die;
 				my $story_id = $c->stash( 'story' );
 				my $slug = $c->stash( 'slug' );
 				my $session = $self->$get_session( $c );
@@ -266,7 +274,7 @@ sub startup ( $self ) {
 		
 		$self->routes->post( '/api/story/:story/bookmark/:slug' )->to(
 			cb => sub ( $c ) {
-				my $db = $self->config( 'database' ) or die;
+				my $db = $self->$get_db or die;
 				my $story_id = $c->stash( 'story' );
 				my $slug = $c->stash( 'slug' );
 				my $session = $self->$get_session( $c );

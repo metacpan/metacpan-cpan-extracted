@@ -3,7 +3,7 @@ package Unix::Sudo;
 use strict;
 use warnings;
 
-our $VERSION = '4.567.89';
+our $VERSION = '65535';
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -181,7 +181,7 @@ L<git://github.com/DrHyde/perl-modules-Unix-Sudo.git>
 
 =head1 AUTHOR, COPYRIGHT and LICENCE
 
-Copyright 2021 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2024 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used, distributed, and
 modified under the terms of either the GNU General Public Licence version 2 or
@@ -209,6 +209,7 @@ sub sudo(&) {
     foreach my $variable (keys %{$context}) {
         local $Data::Dumper::Deparse = 1;
         local $Data::Dumper::Indent  = 0;
+        local $Data::Dumper::Terse   = 0;
 
         my $value = $context->{$variable};
 
@@ -237,7 +238,7 @@ sub sudo(&) {
     $code .= $deparse->coderef2text(shift);
 
     if($ENV{UNIX_SUDO_SPILLGUTS}) { warn $code }
-    
+
     my $rv = system(
         "sudo", "-p", "Unix::Sudo needs your password: ",
         Probe::Perl->find_perl_interpreter(),

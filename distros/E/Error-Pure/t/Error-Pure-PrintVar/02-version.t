@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Error::Pure::PrintVar::VERSION, 0.31, 'Version.');
+is($Error::Pure::PrintVar::VERSION, 0.33, 'Version.');

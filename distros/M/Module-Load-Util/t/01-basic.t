@@ -22,6 +22,8 @@ use lib "$Bin/lib";
 use Module::Load::Util
     'load_module_with_optional_args',
     'instantiate_class_with_optional_args',
+    'call_module_function_with_optional_args',
+    'call_module_method_with_optional_args',
     ;
 
 subtest load_module_with_optional_args => sub {
@@ -130,6 +132,14 @@ subtest instantiate_class_with_optional_args => sub {
         is(ref $obj, 'Local::Test::Module1');
         is($obj->foo, 3);
     };
+};
+
+subtest call_module_function_with_optional_args => sub {
+    is_deeply([call_module_function_with_optional_args("Module::Load::Util::Test::Module::qux,2,3")], [5]);
+};
+
+subtest call_module_method_with_optional_args => sub {
+    is_deeply([call_module_method_with_optional_args("Module::Load::Util::Test::Module::quux,2,3")], [5]);
 };
 
 done_testing;

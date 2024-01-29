@@ -4,8 +4,12 @@ use warnings;
 use Test::More;
 use Data::Cmp qw<cmp_data>;
 
-use Socket qw<:all>;
+use Socket();
+use Socket::More::Constants;
+use Socket::More::Lookup;
 use feature "say";
+use Data::Dumper;
+$Data::Dumper::Sortkeys=1;
 
 
 
@@ -13,30 +17,77 @@ BEGIN { use_ok('Socket::More') };
   use Socket::More;
 
 {
+  #Pack unpack ipv4
+  my $perl=Socket::pack_sockaddr_in(1234, pack "C4", 0,0,0,1);
+  my $sm=pack_sockaddr_in(1234, pack "C4", 0,0,0,1);
+
+  ok substr($perl, 1) eq substr($sm,1);
+  
+  my($pport,$paddr)=Socket::unpack_sockaddr_in($perl);
+  my($smport,$smaddr)=unpack_sockaddr_in($sm);
+
+  ok $pport eq $smport, "pack_sockaddr_in port";
+  ok $paddr eq $smaddr, "pack_sockaddr_in addr";
+}
+{
+  #Pack unpack ipv6
+  my $perl=Socket::pack_sockaddr_in6(1234, pack "C16",( (0)x16));
+  my $sm=pack_sockaddr_in6(1234, pack "C16", ((0)x16));
+  ok substr($perl, 1) eq substr($sm,1);
+  
+  my($pport,$paddr)=Socket::unpack_sockaddr_in6($perl);
+  my($smport,$smaddr)=unpack_sockaddr_in6($sm);
+
+  ok $pport eq $smport, "pack_sockaddr_in6 port";
+  ok $paddr eq $smaddr,	"pack_sockaddr_in6 addr";
+}
+{
+  # Pack unpack unix
+  my $perl=Socket::pack_sockaddr_un("test");
+  
+  my $sm=pack_sockaddr_un("test");
+  ok substr($perl, 1) eq substr($sm,1);
+  
+  my($pname)=Socket::unpack_sockaddr_un($perl);
+  my($sname)=unpack_sockaddr_un($sm);
+
+  ok $pname eq $sname, "pack_sockaddr_un port";
+}
+{
+  # Sock  family
+  my $in4=Socket::pack_sockaddr_in(1234, pack "C4", 0,0,0,1);
+  my $in6=Socket::pack_sockaddr_in6(1234, pack "C16",( (0)x16));
+
+  my $p=Socket::sockaddr_family($in4);
+  my $sm=sockaddr_family($in4);
+  
+
+}
+
+
+{
 	#Test socket wrapper
-	my $sock_addr=pack_sockaddr_in(1234, inet_pton(AF_INET, "127.0.0.1"));
+  my $res=Socket::More::Lookup::getaddrinfo("127.0.0.1", "1234",{flags=>NI_NUMERICHOST,family=>AF_INET},my @results);
+  die gai_strerror $! unless $res;
+  #my $sock_addr=pack_sockaddr_in(1234, Socket::inet_pton(AF_INET, "127.0.0.1"));
+	my $sock_addr=$results[0]{addr};#pack_sockaddr_in(1234, $results[0]{addr});
 	socket my $normal,AF_INET, SOCK_STREAM, 0;
 	ok $normal, "Normal socket created";
 
-	CORE::socket my $core, AF_INET, SOCK_STREAM,0;
+	CORE::socket my $core, AF_INET, SOCK_STREAM, 0;
 	ok $core, "Core socket created";
-	socket my $wrapper, $sock_addr, SOCK_STREAM,0;
-	ok $wrapper, "Wrapper socket created";
+
+  #socket my $wrapper, $sock_addr, SOCK_STREAM, 0;
+  #ok $wrapper, "Wrapper socket created";
 	
-	my $interface={family=>AF_INET,type=>SOCK_STREAM, protocol=>0};
+	my $interface={family=>AF_INET,socktype=>SOCK_STREAM, protocol=>0};
 	socket(my $hash, $interface);
 	
-	ok getsockname($normal) eq getsockname($core), "Sockets ok";
-	ok getsockname($wrapper) eq getsockname($core), "Sockets ok";
-	ok getsockname($hash) eq getsockname($core), "Socket ok";
-	
+	ok getsockname($normal) eq getsockname($core), "Sockets normal compare";
+  #ok getsockname($wrapper) eq getsockname($core), "Sockets wrapper compare";
+	ok getsockname($hash) eq getsockname($core), "Socket hash compare";
 }
 
-{
-	#Do we get any interfaces at all?
-	my @interfaces=Socket::More::getifaddrs;
-	ok @interfaces>=1, "interfaces returned";
-}
 
 {
 	#No port or no path should give 0 results
@@ -85,16 +136,14 @@ BEGIN { use_ok('Socket::More') };
 			port=>[0,10,12]
 		});
 
-	#ok cmp_deeply(\@results, \@results_family),"Family ok";
-	ok cmp_data(\@results, \@results_family)==0,"Family ok";
-	#ok cmp_deeply(\@results, \@results_family_interface),"Family  and interface ok";
-	ok cmp_data(\@results, \@results_family_interface)==0,"Family  and interface ok";
-	ok cmp_data(\@results, \@results_family_string)==0,"Family ok";
-
+  for(0..$#results){
+    ok cmp_data($results[$_], $results_family[$_])==0, "Result match: implicit family";
+    ok cmp_data($results[$_], $results_family_interface[$_])==0, "Result match: explicity family";
+    ok cmp_data($results[$_], $results_family_string[$_])==0, "Result match: explicit family string";
+  }
 }
 
 {
-	#say STDERR "BIND testing";
 	#Attempt to bind our listeners
 	my $unix_sock_name="test_sock";
 
@@ -111,14 +160,13 @@ BEGIN { use_ok('Socket::More') };
 	});
 
 	for(@results){
-		#say STDERR "ADDRESS/path: ".$_->{address};
 		#unlink $_->{address};
 		die "Could not make socket $!" unless socket my $socket, $_->{family}, SOCK_STREAM, 0;
 		die "Could not bind $!" unless bind $socket, $_->{addr};
 
 		my $name=getsockname($socket);
 		if($_->{family}==AF_UNIX){
-			my $path=unpack_sockaddr_un($name);
+			my $path=Socket::More::unpack_sockaddr_un($name);
 			#ok $path eq $unix_sock_name;
 			close $socket;
 			$u_name=$unix_sock_name."_S";
@@ -129,7 +177,8 @@ BEGIN { use_ok('Socket::More') };
 		}
 		elsif($_->{family} ==AF_INET or  $_->{family}== AF_INET6){
 			#Check whe got a non zero port
-			my($err, $ip, $port)=getnameinfo($name, NI_NUMERICHOST|NI_NUMERICSERV);
+      #my($err, $ip, $port)=getnameinfo($name, NI_NUMERICHOST|NI_NUMERICSERV);
+			my $err=getnameinfo($name, my $ip="", my $port="", NI_NUMERICHOST|NI_NUMERICSERV);
 			ok $port != 0, "Non zero port";
 			close $socket;
 
@@ -142,7 +191,6 @@ BEGIN { use_ok('Socket::More') };
 	
 }
 {
-	#say STDERR "Interger to string tests";
 	#Test the af 2 name and name 2 af 
 	#Each system is different by we assume that AF_INET and AF_INET6 are always available
 	
@@ -164,7 +212,7 @@ BEGIN { use_ok('Socket::More') };
 	my @spec=parse_passive_spec("interface=eth0, family=INET\$,type=STREAM");
 	ok @spec==1, "Parsed ok";
 	ok cmp_data($spec[0]{family},[AF_INET])==0, "Family match ok";
-	ok cmp_data($spec[0]{type},[SOCK_STREAM])==0, "Type match ok";
+	ok cmp_data($spec[0]{socktype},[SOCK_STREAM])==0, "Type match ok";
 
 }
 {
@@ -173,13 +221,13 @@ BEGIN { use_ok('Socket::More') };
 	ok @spec==1, "Parsed ok";
 
 	ok cmp_data($spec[0]{family}, [AF_INET])==0, "Family match ok";
-	ok cmp_data($spec[0]{type}, [SOCK_STREAM])==0, "Type match ok";
+	ok cmp_data($spec[0]{socktype}, [SOCK_STREAM])==0, "Type match ok";
 
 	@spec=parse_passive_spec("path_goes_here,type=STREAM");
 	ok @spec==1, "Parsed ok";
 
 	ok cmp_data($spec[0]{family},[AF_UNIX])==0, "Family match ok";
-	ok cmp_data($spec[0]{type},[SOCK_STREAM])==0, "Type match ok";
+	ok cmp_data($spec[0]{socktype},[SOCK_STREAM])==0, "Type match ok";
 
 
 	@spec=parse_passive_spec(":8084");
@@ -189,7 +237,7 @@ BEGIN { use_ok('Socket::More') };
 	@spec=parse_passive_spec(":8084,family=INET6,type=stream");
 
 	ok cmp_data($spec[0]{family},[AF_INET6])==0, "Family match ok";
-	ok cmp_data($spec[0]{type},[SOCK_STREAM])==0, "Type match ok";
+	ok cmp_data($spec[0]{socktype},[SOCK_STREAM])==0, "Type match ok";
 
 }
 ##################################################################################################################################
@@ -215,6 +263,8 @@ BEGIN { use_ok('Socket::More') };
 	#any/unspecified
 	#Loopback
 	my @results=Socket::More::sockaddr_passive( {address=>"0.0.0.0", port=>0, family=>AF_INET, type=>SOCK_DGRAM});
+
+	
 	ok @results==1, "ipv4 wildcard";
 	ok $results[0]{address} eq "0.0.0.0", "ipv4 wildcard";
 
@@ -238,7 +288,7 @@ BEGIN { use_ok('Socket::More') };
 
     #Test that we can rebind to port immediately
     #
-    ok defined (socket my $sock, $r->{family}, $r->{type}, 0), "Could not create port refied socket";
+    ok defined (socket my $sock, $r->{family}, $r->{socktype}, 0), "Could not create port refied socket";
     ok defined (bind $sock, $r->{addr}), "Could not rebind reified port";
     close $sock;
   }
@@ -265,6 +315,7 @@ BEGIN { use_ok('Socket::More') };
     close $sock;
   }
 }
+
 ##########################################################################
 # {                                                                      #
 #         #IF name and index mapping                                     #
@@ -280,5 +331,6 @@ BEGIN { use_ok('Socket::More') };
 #                                                                        #
 # }                                                                      #
 ##########################################################################
+
 
 done_testing;

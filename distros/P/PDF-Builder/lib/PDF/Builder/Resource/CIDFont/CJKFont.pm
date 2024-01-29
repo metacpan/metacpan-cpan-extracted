@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::CIDFont';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use PDF::Builder::Util;
 use PDF::Builder::Basic::PDF::Utils;
@@ -22,29 +22,49 @@ PDF::Builder::Resource::CIDFont::CJKFont - Base class for CJK fonts
 
 =head1 METHODS
 
-=over
+=head2 new
 
-=item $font = PDF::Builder::Resource::CIDFont::CJKFont->new($pdf, $cjkname, %options)
+    $font = PDF::Builder::Resource::CIDFont::CJKFont->new($pdf, $cjkname, %options)
+
+=over
 
 Returns a cjk-font object.
 
+=back
+
 =over
 
-* Traditional Chinese: Ming Ming-Bold Ming-Italic Ming-BoldItalic
+=item * 
 
-* Simplified Chinese: Song Song-Bold Song-Italic Song-BoldItalic
+Traditional Chinese: Ming, Ming-Bold, Ming-Italic, Ming-BoldItalic
 
-* Korean: MyungJo MyungJo-Bold MyungJo-Italic MyungJo-BoldItalic
+=item * 
 
-* Japanese (Mincho): KozMin KozMin-Bold KozMin-Italic KozMin-BoldItalic
+Simplified Chinese: Song, Song-Bold, Song-Italic, Song-BoldItalic
 
-* Japanese (Gothic): KozGo KozGo-Bold KozGo-Italic KozGo-BoldItalic
+=item * 
+
+Korean: MyungJo, MyungJo-Bold, MyungJo-Italic, MyungJo-BoldItalic
+
+=item * 
+
+Japanese (Mincho): KozMin, KozMin-Bold, KozMin-Italic, KozMin-BoldItalic
+
+=item * 
+
+Japanese (Gothic): KozGo, KozGo-Bold, KozGo-Italic, KozGo-BoldItalic
 
 =back
 
 Defined Options:
 
-    encode ... specify fonts encoding for non-utf8 text.
+=over
+
+=item encode
+
+specify fonts encoding for non-utf8 text.
+
+=back
 
 =cut
 
@@ -318,9 +338,5 @@ BEGIN {
     };
 
 }
-
-=back
-
-=cut
 
 1;

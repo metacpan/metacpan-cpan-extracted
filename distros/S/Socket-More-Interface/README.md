@@ -1,0 +1,117 @@
+# NAME
+
+Socket::More::Interface - Query network interfaces of your system
+
+# SYNOPOSIS
+
+```perl
+use v5.36;
+use Socket::More::Interface;
+
+# Return a list of interface structures (hashes)
+my @interfaces=getifaddrs();
+
+
+# Lookup the interface index from its name
+my $index=if_nametoindex($name);
+
+# Lookup the interface name from its index
+my $name=if_nametoindex($index);
+
+# Get the key/value array of names and indexes
+@kvpairs=if_nameindex;
+```
+
+# DESCRIPTION
+
+Simple wrapper to library calls. Consult you man page for what they do.
+`getifaddrs`, `if_nametoindex`, `if_indextoname` and `if_nameindex` are
+exported by default.
+
+# API
+
+## getifaddrs
+
+```perl
+    my @interfaces=getifaddrs;
+```
+
+Queries the OS via  `getifaddr` for the list of interfaces currently active.
+Returns a list of hash references representing the network interfaces. The keys
+of these hashes include:
+
+- name
+
+    The text name of the interface
+
+- flags
+
+    Flags set on the interface
+
+- addr
+
+    Packed sockaddr structure suitable for use with `bind`
+
+- netmask
+
+    Packed sockaddr structure of the netmask
+
+- dstmask
+
+    Packed sockaddr structure of the dstmask
+
+## if\_nametoindex
+
+```perl
+    my $index=if_nametoindex($name);
+```
+
+Returns the index of an interface by name. If the interface is not found,
+returns 0 and sets `$!` with error code.
+
+## if\_indextoname
+
+```perl
+    my $name=if_indextoname($index);
+```
+
+Returns the name of an interface by index. If the index does not represent an
+interface, `undef` is returned and sets `$!` with error code
+
+## if\_nameindex
+
+```perl
+    my @pairs=if_nameindex;
+```
+
+Returns a list of key value pairs. The key is the interface index, and the
+value is the name of the interface.
+
+Return `undef` on error and sets `$!` with error code.
+
+# TODO
+
+- Network interface queries for byte counts, rates.. etc
+- Expand address family types support(i.e link)
+- Network change events/notifications
+
+# AUTHOR
+
+Ruben Westerberg, &lt;drclaw@mac.com&lt;gt>
+
+# REPOSITORTY and BUGS
+
+Please report any bugs via git hub: [https://github.com/drclaw1394/perl-socket-more-interface](https://github.com/drclaw1394/perl-socket-more-interface)
+
+# COPYRIGHT AND LICENSE
+
+Copyright (C) 2023 by Ruben Westerberg
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl or the MIT license.
+
+# DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS FOR A PARTICULAR PURPOSE.

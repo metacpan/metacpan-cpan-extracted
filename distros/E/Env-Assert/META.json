@@ -71,7 +71,7 @@
    "provides" : {
       "Env::Assert" : {
          "file" : "lib/Env/Assert.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -86,10 +86,11 @@
          "web" : "https://github.com/mikkoi/env-assert.git"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_contributors" : [
       "Ivan Bessarabov <ivan@bessarabov.ru>",
-      "gregor herrmann <gregoa@debian.org>"
+      "gregor herrmann <gregoa@debian.org>",
+      "Ron Savage <ron@savage.net.au>"
    ],
    "x_generated_by_perl" : "v5.34.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.28",

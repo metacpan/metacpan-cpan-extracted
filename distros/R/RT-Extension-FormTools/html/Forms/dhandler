@@ -12,7 +12,7 @@
 my $button_label = loc('Next');
 foreach my $element ( @{$form_config->{'formtools-pages'}{$page}{'content'}} ) {
     if ( $element->{type} eq 'raw_html' ) {
-        $m->out( $element->{html} );
+        $m->out( RT::Extension::FormTools->_ParseContent( TicketObj => $ticket_obj, Content => $element->{html} ) );
     }
     elsif ( $element->{type} eq 'hidden' ) {
         $m->out('<input type="hidden" class="hidden" name="' . $element->{'input-name'}

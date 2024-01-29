@@ -1,9 +1,20 @@
+# -*- cperl; cperl-indent-level: 4 -*-
+## no critic (RequireExplicitPackage RequireEndWithOne)
+use 5.014;
 use strict;
 use warnings;
 use utf8;
+use Readonly;
 
 use Test::More;
-BEGIN { plan tests => 24 }
+our $VERSION = v1.1.7;
+
+BEGIN {
+## no critic (ProhibitCallsToUnexportedSubs)
+    Readonly::Scalar my $BASE_TESTS => 24;
+## use critic;
+    Test::More::plan 'tests' => $BASE_TESTS;
+}
 my %hours = (
     '00000001.JPG' => [ '2000-01-01T00:00:00', '0:00' ],
     '00010001.JPG' => [ '2000-01-01T01:00:00', '1:00' ],
@@ -34,5 +45,10 @@ my %hours = (
 use Date::Extract::P800Picture;
 my $parser = Date::Extract::P800Picture->new();
 while ( my ( $filename, $expect ) = each %hours ) {
-    is( "@{[$parser->extract($filename)]}", $expect->[0], $expect->[1] );
+    Test::More::is(
+        "@{[$parser->extract($filename)]}",
+## no critic (ProhibitAccessOfPrivateData)
+        $expect->[0], $expect->[1],
+## use critic
+    );
 }

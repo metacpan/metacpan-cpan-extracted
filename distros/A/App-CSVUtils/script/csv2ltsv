@@ -8,9 +8,9 @@ use Getopt::Long qw(:config gnu_getopt no_ignore_case);
 use Text::CSV_XS;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-06'; # DATE
+our $DATE = '2023-09-06'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.031'; # VERSION
+our $VERSION = '1.033'; # VERSION
 
 binmode STDIN, ':encoding(utf8)';
 binmode STDOUT, ':encoding(utf8)';
@@ -53,7 +53,7 @@ csv2ltsv - Convert CSV to LTSV
 
 =head1 VERSION
 
-This document describes version 1.031 of csv2ltsv (from Perl distribution App-CSVUtils), released on 2023-08-06.
+This document describes version 1.033 of csv2ltsv (from Perl distribution App-CSVUtils), released on 2023-09-06.
 
 =head1 SYNOPSIS
 

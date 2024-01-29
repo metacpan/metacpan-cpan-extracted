@@ -4,7 +4,7 @@ use warnings;
 
 package Neo4j::Error::Server;
 # ABSTRACT: Neo4j exception thrown by the Neo4j server
-$Neo4j::Error::Server::VERSION = '0.01';
+$Neo4j::Error::Server::VERSION = '0.02';
 
 use parent 'Neo4j::Error';
 
@@ -47,7 +47,7 @@ sub _parse_code {
 	my ($self, $part) = @_;
 	
 	return '' unless defined $self->{code};
-	my @parts = $self->{code} =~ m/^Neo\.([^\.]+)\.([^\.]+)\.(.+)$/i;
+	my @parts = $self->code =~ m/^Neo\.([^\.]+)\.([^\.]+)\.(.+)$/i;
 	return '' unless @parts;
 	
 	$self->{classification} = $parts[0];

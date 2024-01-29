@@ -14,5 +14,5 @@ use ok 'Locale::CLDR';
 my $locale = Locale::CLDR->new('ru_RU');
  
 is ($locale->measurement_system_name('uk'), 'Английская', 'Measurement system UK');
-is ($locale->measurement_system_name('us'), 'Англо-американская', 'Measurement system US');
+is ($locale->measurement_system_name('us'), 'Американская', 'Measurement system US');
 is ($locale->measurement_system_name('metric'), 'Метрическая', 'Measurement system Metric');

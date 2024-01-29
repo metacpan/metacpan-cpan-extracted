@@ -1,372 +1,491 @@
-<?xml version="1.0" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>LyricFinder - Fetch song lyrics from several internet lyric sites.</title>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@localhost" />
-</head>
-
-<body>
-
-
-
-<ul id="index">
-  <li><a href="#NAME">NAME</a></li>
-  <li><a href="#AUTHOR">AUTHOR</a></li>
-  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
-  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
-  <li><a href="#INSTALLATION">INSTALLATION</a></li>
-  <li><a href="#SUBROUTINES-METHODS">SUBROUTINES/METHODS</a></li>
-  <li><a href="#DEPENDENCIES">DEPENDENCIES</a></li>
-  <li><a href="#BUGS">BUGS</a></li>
-  <li><a href="#SUPPORT">SUPPORT</a></li>
-  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
-  <li><a href="#LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</a></li>
-</ul>
-
-<h1 id="NAME">NAME</h1>
-
-<p>LyricFinder - Fetch song lyrics from several internet lyric sites.</p>
-
-<h1 id="AUTHOR">AUTHOR</h1>
-
-<p>This module is Copyright (c) 2020 by</p>
-
-<p>Jim Turner, <code>&lt;turnerjw784 at yahoo.com&gt;</code></p>
-
-<p>All rights reserved.</p>
-
-<p>This library is free software; you can redistribute it and/or modify it under the terms of either the GNU General Public License or the Artistic License, as specified in the Perl README file.</p>
-
-<p>NOTE: This is a &quot;derived work&quot; of <a>Lyrics::Fetcher</a> family of modules, by (c) David Precious (davidp at preshweb.co.uk) (CPAN Id: BIGPRESH), as fair use legal under the terms of, subject to, and licensed in terms compatable and compliant with those modules. Many thanks to David for laying the groundwork for this module!</p>
-
-<h1 id="SYNOPSIS">SYNOPSIS</h1>
-
-<pre><code>    #!/usr/bin/perl
-
-    use LyricFinder;
-
-    # create a new finder object:
-    my $finder = new LyricFinder();
-
-    # fetch lyrics for a song from a specific site (https://www.azlyrics.com):
-    print $finder-&gt;fetch(&#39;Pink Floyd&#39;,&#39;Echoes&#39;,&#39;AZLyrics&#39;);
-
-    # if you omit the site, automatically tries all available
-    # sites in random order:
-    print $finder-&gt;fetch(&#39;Oasis&#39;, &#39;Cast No Shadow&#39;);
-
-    # or you can pass an arrayref of sites you want used in order:
-    print $finder-&gt;fetch(&#39;Oasis&#39;, &#39;Whatever&#39;, [qw(Genius AZLyrics)]);
-
-    # To find out which site modules are available:
-    my @fetchers = $finder-&gt;sources();
-
-    # To fetch the source (site) name and base url:
-    print &quot;(Lyrics courtesy: &quot;.$finder-&gt;source().&quot;)\n&quot;;
-    print &quot;site url:  &quot;.$finder-&gt;site().&quot;)\n&quot;;
-
-    # To show what sites we had to search for these lyrics:
-    print &quot;..Tried sites:  &quot;.$finder-&gt;tried().&quot;.\n&quot;;
-
-    # To do caching:
-    $finder-&gt;cache(&#39;/tmp/lyrics&#39;);
-    #-or-
-    my $localfinder = new LyricFinder(-cache =&gt; &#39;/tmp/lyrics&#39;);
-
-    #-or- to only fetch lyrics from our cache:
-    my $local_lyrics = $localfinder-&gt;fetch(&#39;Oasis&#39;, &#39;Cast No Shadow&#39;, &#39;Cache&#39;);
-    if ($local_lyrics) {
-        print &quot;..Lyrics from disk:\n\n$local_lyrics\n&quot;;
-    } else {
-        print &quot;..No local lyrics found for &#39;Cast No Shadow&#39;, by Oasis.\n&quot;;
-    }</code></pre>
-
-<h1 id="DESCRIPTION">DESCRIPTION</h1>
-
-<p>LyricFinder accepts an artist name and song title, searches supported lyrics sites for song lyrics, and, if found, returns them as a string.</p>
-
-<p>The supported and currently-installed modules are: <a>LyricFinder::ApiLyricsOvh</a> (for searching api.lyrics.ovh), <a>LyricFinder::AZLyrics</a> (www.azlyrics.com), <a>LyricFinder::Genius</a> (genius.com), <a>LyricFinder::Letras</a> (www.letras.mus.br), and <a>LyricFinder::Musixmatch</a> (www.musixmatch.com). There is a special module for storing and / or fetching lyrics (.lrc) files already stored locally, called <a>LyricFinder::Cache</a>.</p>
-
-<p>This module is derived from the (older) Lyrics::Fetcher collection of modules by (c) 2007-2020 David Precious, but currently (as of December, 2020) supports more lyric sites (5) and bundles all the supported site modules together here (simply install this one module). We have reworked the &quot;Cache&quot; module to cache lyrics files by artist and song title on disk in the user&#39;s desired location. LyricFinder is also truly object-oriented making interaction with the user-facing methods and data easier and more streamlined.</p>
-
-<p>NOTE: This module is used completely independent of any of those modules, but the code is derived from them, as allowed by and the license and credits are included here, as required by their open-source license. It is capable of being used as a drop-in replacement, but some function names and other code changes will be needed.</p>
-
-<p>We&#39;ve also added methods to easily change the &quot;user-agent&quot; passed to the lyrics sites, as needed/desired by the user programatically.</p>
-
-<p>We&#39;ve also changed the default to search the supported sites randomly, instead of in the same fixed alphabetical order by module name (&quot;load-balancing&quot; the searches to all the sites). This is helpful when using LyricFinder as a plugin for streaming media players, such as the author&#39;s very own &quot;Fauxdacious Media Player&quot; that frequently stream internet radio stations, which can impose a &quot;hit&quot; on the lyrics sites each time the song title changes. This reduces the odds of a user&#39;s IP-address possibly being banned by a lyrics site for &quot;too-frequent scraping / usage&quot;! NOTE: If you want to prevent the usage of one or more of the specific sites, simply delete or rename that site&#39;s submodule file. If you want to use one or more specific sites, or enforce a specific search order, you can call the fetch() method with a third argument consisting of the site module name, ie. &quot;Musixmatch&quot;, or reference to an array of site module names, ie. [Genius, AZLyrics]. If you specify &quot;Cache&quot; as the single module name (and provide a &quot;-cache&quot; directory containing lyrics files on your hard drive), LyricFinder will only search that directory for lyrics, and not the internet. Otherwise, specifying a &quot;-cache&quot; directory will cause LyricFinder to first look in your cache directory for matching lyrics first, and only search any of the lyrics sites if not found, then will cache the lyrics found on the internet to a new lyric file in your lyrics directory eleminating re-searching the web when you play the same song again later and reducing internet bandwidth usage!</p>
-
-<p>In case of problems with fetching lyrics, the error string will be returned by $finder-&gt;message(). If all goes well, it will have &#39;Ok&#39; in it.</p>
-
-<p>The site selection is made by the &quot;method&quot; parameter passed to the fetch() of this module. You can also omit this parameter, in which case all available fetchers will be tried in random order, or you can supply an arrayref of sites you&#39;d like to try in the order you specify.</p>
-
-<p>The value of the &quot;method&quot; parameter (if specified) must be either the &quot;*&quot; part of one of the installed LyricFinder::* fetcher package name, &quot;all&quot;, or &quot;random&quot;.</p>
-
-<p>If you have another lyrics site that is not supported, please file a feature request via email or the CPAN bug system, or (for faster service), provide a Perl patch module / program source that can extract lyrics from that site and I&#39;ll consider it! The easiest way to do this is to take one of the existing submodules, copy it to &quot;LyricFinder::<i>YOURSITE</i>.pm and modify it (and the POD docs) to your specific site&#39;s needs, test it with several Artist / Title combinations (see the &quot;SYNOPSIS&quot; code above), and send it to me (That&#39;s what I do for new sites)!</p>
-
-<h1 id="INSTALLATION">INSTALLATION</h1>
-
-<pre><code>        To install this module, run the following commands:
-
-        perl Makefile.PL
-
-        make
-
-        make test
-
-        make install</code></pre>
-
-<h1 id="SUBROUTINES-METHODS">SUBROUTINES/METHODS</h1>
-
-<dl>
-
-<dt id="new-LyricFinder-options"><b>new</b> <i>LyricFinder</i>([ <i>options</i> ])</dt>
-<dd>
-
-<p>Creates a new finder object for fetching lyrics. The same finder object can be used for multiple fetches from multiple sites, so this normally only needs to be called once.</p>
-
-<p><i>options</i> is a hash of option/value pairs (ie. &quot;-option&quot; =&gt; &quot;value&quot;). If an &quot;-option&quot; is specified with no &quot;value&quot; given, the default value will be <i>1</i> (&quot;<i>true</i>&quot;). The currently-supported options are:</p>
-
-<dl>
-
-<dt id="agent-user-agent-string"><b>-agent</b> =&gt; <i>&quot;user-agent string&quot;</i></dt>
-<dd>
-
-<p>Specifies an alternate &quot;user-agent&quot; string sent to the lyric sites when attempting to fetch lyrics. Get / set the desired user-agent (ie. browser name) to pass to the lyrics sites. Some sites are pickey about receiving a user-agent string that corresponds to a valid / supported web-browser to prevent their sites from being &quot;scraped&quot; by programs, such as this.</p>
-
-<p>Default: <i>&quot;Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0&quot;</i>.</p>
-
-<p>NOTE: This value will be overridden if $founder-&gt;agent(&quot;agent&quot;) is called! NOTE: See below how to specify a different agent for a specific site module.</p>
-
-</dd>
-<dt id="cache-directory"><b>-cache</b> =&gt; <i>&quot;directory&quot;</i></dt>
-<dd>
-
-<p>Specifies a directory (ie. &quot;/home/user/Music/Lyricsfiles&quot;) to be used for disk caching. If specified, this directory will be searched for a matching lyrics (.lrc) file (in this example, &quot;/home/user/Music/LyricsFiles/<i>artist</i>/<i>title</i>.lrc&quot;). If no matching lyrics file is found (and the search module list is not specifically set to &quot;Cache&quot; (and lyrics are found on the internet), then the lyrics will be saved to the directory under &quot;<i>artist</i>/<i>title</i>.lrc&quot;.</p>
-
-<p>Default: <i>none</i> (no caching)</p>
-
-<p>An optional dirctional indicator (&quot;&lt;&quot; or &quot;&gt;&quot;) can be prepended to the directory to limit caching activity. &quot;&lt;&quot; allows fetching lyrics from the cache directory, but will not cache (write) new lyrics found on the web to the directory. &quot;&gt;&quot; (the opposite) will cache new lyrics but will never attempt to fetch (read) lyrics from the cache directory. These options may be useful if one either simply wants to build a lyrics database but always fetch the latest, or perhaps limit lyrics to a fixed cache but not add to it, or perhaps is using a readonly directory. The default is no indicator which allows both reading and writing.</p>
-
-<p>Directory must be a valid directory, but may be specified as either a path (ie. &quot;/home/user/lyrics&quot;) or a URI (ie. &quot;file:///home/user/lyrics&quot;) or with a limiting directional indicator, ie. &quot;&lt;/home/user/lyrics&quot;. It may or may not have a trailing &quot;/&quot; (ie. &quot;/home/user/lyrics/&quot;).</p>
-
-<p>NOTE: This value will be overridden if $founder-&gt;cache(&quot;directory&quot;) is called! NOTE: See below how to specify a different agent for a specific site module.</p>
-
-</dd>
-<dt id="debug-number"><b>-debug</b> =&gt; <i>number</i></dt>
-<dd>
-
-<p>Specifies whether debug information will be displayed (0: no, &gt;0: yes).</p>
-
-<p>Default <i>0</i> (no). <i>1</i> will display debug info. There is currently only one level of debug verbosity.</p>
-
-</dd>
-<dt id="noextra-0-1-false-or-true"><b>-noextra</b> =&gt; <i>0 | 1</i> (<i>false</i> or <i>true</i>)</dt>
-<dd>
-
-<p>Some sites (currently, only Musixmatch) may append some additional information below the lyrics text. If specified or given a <i>true</i> value, this will be suppressed and only the actual song lyrics returned. Default <i>0</i> (false) - show any additional site-specific information.</p>
-
-</dd>
-<dt id="omit-site-module-site-module2"><b>-omit</b> =&gt; <i>&quot;site-module[,site-module2...]]</i></dt>
-<dd>
-
-<p>Permits omitting specific sites which are currently installed from being searched (namely when using <i>random</i> or <i>all</i>). For example, to exclude the Musixmatch site, specify: <i>-omit</i> =&gt; <i>&quot;Musixmatch&quot;</i>, which will cause LyricFinder::Musixmatch to not be considered for lyrics search. Default is for all installed sites (submodules) to be considered. NOTE: The site list can be specified as a comma-separated string OR as an array reference, ie. <i>-omit =</i> [ qw(Musixmatch Genius) ]&gt;.</p>
-
-</dd>
-<dt id="site-module-name--option-value--option-value"><b>-site-module-name</b> =&gt; { <i>&quot;-option&quot;</i> =&gt; <i>value</i> [, <i>&quot;-option&quot;</i> =&gt; <i>value</i> ... ] }</dt>
-<dd>
-
-<p>Specifies options for a specific site fetcher module. These values will override any of the general option values specified for that specific module or calls to the general <b>agent</b>() method, if it is used to fetch lyrics. Examples would be if one needed to specify a different user-agent for one of the sites, or wished to cache lyrics fetched by sites to specific directories for some reason. By default, top-level options are passed to the various sites, so this should only be needed in special cases.</p>
-
-<p>Example: &quot;-Musixmatch =&gt; { -noextra =&gt; 1 }&quot;</p>
-
-<p>Default: none (no site-specific options)</p>
-
-<p>NOTE: The &quot;-cache&quot; (cache-directory) option is needed by the main LyricFinder module and the site submodules in order to use the caching feature, so passing &quot;-Cache =&gt; {-cache =&gt; <i>directory</i>}&quot; will NOT work (the way one might assume)!</p>
-
-</dd>
-</dl>
-
-</dd>
-<dt id="current-agent-string-finder-agent-user-agent-string">[ <i>$current-agent string</i> = ] $finder-&gt;<b>agent</b>( [ <i>user-agent string</i> ] )</dt>
-<dd>
-
-<p>Set the desired user-agent (ie. browser name) to pass to the lyrics sites. Some sites are pickey about receiving a user-agent string that corresponds to a valid / supported web-browser to prevent their sites from being &quot;scraped&quot; by programs, such as this.</p>
-
-<p>Default: <i>&quot;Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0&quot;</i></p>
-
-<p>If no argument is passed, it returns the current GENERAL user-agent string in effect (but a different agent option is specified for a specific module may have been specified and used by THAT module - see <b>new</b>() options above).</p>
-
-<p>NOTE: This will override any <b>-agent</b> option value specified in <b>new</b>()! NOTE: See above how to specify a different user-agent for a specific site module.</p>
-
-</dd>
-<dt id="current-directory-finder-cache-directory">[ <i>$current-directory</i> = ] $finder-&gt;<b>cache</b>( [ <i>$directory</i> ] )</dt>
-<dd>
-
-<p>Specifies a directory (ie. &quot;/home/user/Music/Lyricsfiles&quot;) to be used for disk caching. If specified, this directory will be searched for a matching lyrics (.lrc) file (in this example, &quot;/home/user/Music/LyricsFiles/<i>artist</i>/<i>title</i>.lrc&quot;). If no matching lyrics file is found (and the search module list is not specifically set to &quot;Cache&quot; (and lyrics are found on the internet), then the lyrics will be saved to the directory under &quot;<i>artist</i>/<i>title</i>.lrc&quot;.</p>
-
-<p>An optional dirctional indicator (&quot;&lt;&quot; or &quot;&gt;&quot;) can be prepended to the directory to limit caching activity. &quot;&lt;&quot; allows fetching lyrics from the cache directory, but will not cache (write) new lyrics found on the web to the directory. &quot;&gt;&quot; (the opposite) will cache new lyrics but will never attempt to fetch (read) lyrics from the cache directory. These options may be useful if one either simply wants to build a lyrics database but always fetch the latest, or perhaps limit lyrics to a fixed cache but not add to it, or perhaps is using a readonly directory. The default is no indicator which allows both reading and writing.</p>
-
-<p>Directory must be a valid directory, but may be specified as either a path (ie. &quot;/home/user/lyrics&quot;) or a URI (ie. &quot;file:///home/user/lyrics&quot;) or with a limiting directional indicator, ie. &quot;&lt;/home/user/lyrics&quot;. It may or may not have a trailing &quot;/&quot; (ie. &quot;/home/user/lyrics/&quot;).</p>
-
-<p>If no argument is passed, it returns the current GENERAL cache directory string in effect (but a different directory option is specified for a specific module may have been specified and used by THAT module - see <b>new</b>() options above).</p>
-
-<p>NOTE: This will override any <b>-cache</b> option value specified in <b>new</b>()!</p>
-
-<p>NOTE: See above how to specify a different directory for a specific site module.</p>
-
-</dd>
-<dt id="scalar-array-finder-credits">[ <i>$scalar</i> | <i>@array</i> ] = $finder-&gt;<b>credits</b>()</dt>
-<dd>
-
-<p>Returns either a comma-separated list or an array of names credited by the site with posting the lyrics on the site (if any) or an empty string, if none found. NOTE: The only site that supports this currently is <b>AZLyrics</b>.</p>
-
-</dd>
-<dt id="string-finder-fetch-artist-title-source-sources-limit"><i>$string</i> = $finder-&gt;<b>fetch</b>(<i>$artist</i>, <i>$title</i> [, <i>$source</i> | <i>\@sources</i> [, <i>$limit</i>]])</dt>
-<dd>
-
-<p>Attempt to fetch the lyrics for the given artist and title. A single source site module can be specified as a string ($source) or multiple source modules, ie. [module1, module2...], or &quot;random&quot; or &quot;Cache&quot;. Default: &quot;random&quot; (search all available sites in random order until lyrics found or all available sites have been searched). This is the primary method call, and the only one required (besides <b>new</b>()) to be called to obtain lyrics. $limit (if specified) is an integer number to limit the max. number of fetchers to try (normally used with $source = &quot;random&quot;) to limit the time needed to search for lyrics (before giving up). If not specified, zero, or higher than the number of installed fetchers, then all available (installed) fetcher submodules (sites) will be tried (until one succefully finds lyrics).</p>
-
-<p>&quot;Cache&quot; is a special value that limits searching to a specified lyrics directory on one&#39;s local hard drive. NOTE: It should NOT be included in a list, but used by itself. If a lyrics directory is specified, Cache will automatically be searched first!</p>
-
-<p>If an array reference (a list) of modules are provided, they will be searched in the order they appear in the list.</p>
-
-<p>The currently-installed and supported modules are: ApiLyricsOvh, AZLyrics, Genius, Letras, and Musixmatch (NOTE the &quot;x&quot; in the spelling of &quot;Musixmatch&quot;)!</p>
-
-<p>Returns lyrics as a string (includes line-breaks appropriate for the user&#39;s operating system), or an empty string, if no lyrics found.</p>
-
-</dd>
-<dt id="scalar-finder-image_url"><i>$scalar</i> = $finder-&gt;<b>image_url</b>()</dt>
-<dd>
-
-<p>Returns a URL for a cover-art image, if one found on the lyrics page. Currently, only the LyricFinder::Genius and LyricFinder::Musixmatch sites contain cover-art images. For the other sites, or if no image is found, an empty string will be returned if this method is called.</p>
-
-</dd>
-<dt id="scalar-finder-message"><i>$scalar</i> = $finder-&gt;<b>message</b>()</dt>
-<dd>
-
-<p>Returns the last error string generated, or &quot;Ok&quot; if all&#39;s well.</p>
-
-</dd>
-<dt id="scalar-array-finder-order">[ <i>$scalar</i> | <i>@array</i> ] = $finder-&gt;<b>order</b>()</dt>
-<dd>
-
-<p>Returns either a comma-separated list or an array of the site modules tried by the last fetch. This is useful to see what sites are being tried and in what order if <i>random</i> order is being used. Similar to <b>tried</b>(), except all sites being considered are shown.</p>
-
-</dd>
-<dt id="scalar-finder-site"><i>$scalar</i> = $finder-&gt;<b>site</b>()</dt>
-<dd>
-
-<p>Returns the actual base URL of the site that successfully fetched the lyrics in the last successful fetch (or an empty string if the fetch failed).</p>
-
-</dd>
-<dt id="scalar-finder-source"><i>$scalar</i> = $finder-&gt;<b>source</b>()</dt>
-<dd>
-
-<p>Returns the name of the module that successfully fetched the lyrics in the last successful fetch (or &quot;none&quot; if the fetch failed).</p>
-
-</dd>
-<dt id="arrayref-array-finder-sources">[ <i>$arrayref</i> | <i>@array</i> ] = $finder-&gt;<b>sources</b>()</dt>
-<dd>
-
-<p>Returns a list of available site modules. Similar to Lyric::Fetcher&#39;s <i>available_fetchers</i>() function.</p>
-
-</dd>
-<dt id="scalar-array-finder-tried">[ <i>$scalar</i> | <i>@array</i> ] = $finder-&gt;<b>tried</b>()</dt>
-<dd>
-
-<p>Returns either a comma-separated list or an array of the site modules actually tried when fetching lyrics. This is useful to see what sites were actually hit and in what order if <i>random</i> order is being used. Similar to <b>order</b>(), except only sites actually hit are shown (the last one is the one that successfully fetched the lyrics.</p>
-
-</dd>
-<dt id="scalar-finder-url"><i>$scalar</i> = $finder-&gt;<b>url</b>()</dt>
-<dd>
-
-<p>Returns the actual URL used to fetch the lyrics from the site (includes the actual formatted search arguments passed to the site). This can be helpful in debugging, etc.</p>
-
-<p>NOTE: If caching is being used and lyrics are found and fetched from the cache directory, <b>site</b>() will return the full filename of the cache file fetched.</p>
-
-</dd>
-<dt id="LyricFinder::VERSION">$LyricFinder::VERSION</dt>
-<dd>
-
-<p>The current version# of LyricFinder</p>
-
-</dd>
-</dl>
-
-<h1 id="DEPENDENCIES">DEPENDENCIES</h1>
-
-<p><a>HTML::Strip</a>, <a>HTTP::Request</a>, <a>LWP::UserAgent</a>, <a>URI::Escape</a></p>
-
-<h1 id="BUGS">BUGS</h1>
-
-<p>Please report any bugs or feature requests to <code>bug-lyricFinder at rt.cpan.org</code>, or through the web interface at <a href="http://rt.cpan.org/NoAuth/ReportBug.html?Queue=LyricFinder">http://rt.cpan.org/NoAuth/ReportBug.html?Queue=LyricFinder</a>. I will be notified, and then you&#39;ll automatically be notified of progress on your bug as I make changes.</p>
-
-<h1 id="SUPPORT">SUPPORT</h1>
-
-<p>You can find documentation for this module with the perldoc command.</p>
-
-<pre><code>    perldoc LyricFinder</code></pre>
-
-<h1 id="SEE-ALSO">SEE ALSO</h1>
-
-<p>Fauxdacious media player - (<a href="https://wildstar84.wordpress.com/fauxdacious">https://wildstar84.wordpress.com/fauxdacious</a>)</p>
-
-<ul>
-
-<li><p>RT: CPAN&#39;s request tracker (report bugs here)</p>
-
-<p><a href="http://rt.cpan.org/NoAuth/Bugs.html?Dist=LyricFinder">http://rt.cpan.org/NoAuth/Bugs.html?Dist=LyricFinder</a></p>
-
-</li>
-<li><p>CPAN Ratings</p>
-
-<p><a href="http://cpanratings.perl.org/d/LyricFinder">http://cpanratings.perl.org/d/LyricFinder</a></p>
-
-</li>
-<li><p>Search CPAN</p>
-
-<p><a href="http://search.cpan.org/dist/LyricFinder/">http://search.cpan.org/dist/LyricFinder/</a></p>
-
-</li>
-</ul>
-
-<h1 id="LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</h1>
-
-<p>Copyright (c) 2020 Jim Turner.</p>
-
-<p>This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:</p>
-
-<p><a href="http://www.perlfoundation.org/artistic_license_2_0">http://www.perlfoundation.org/artistic_license_2_0</a></p>
-
-<p>Any use, modification, and distribution of the Standard or Modified Versions is governed by this Artistic License. By using, modifying or distributing the Package, you accept this license. Do not use, modify, or distribute the Package, if you do not accept this license.</p>
-
-<p>If your Modified Version has been derived from a Modified Version made by someone other than you, you are nevertheless required to ensure that your Modified Version complies with the requirements of this license.</p>
-
-<p>This license does not grant you the right to use any trademark, service mark, tradename, or logo of the Copyright Holder.</p>
-
-<p>This license includes the non-exclusive, worldwide, free-of-charge patent license to make, have made, use, offer to sell, sell, import and otherwise transfer the Package with respect to any patent claims licensable by the Copyright Holder that are necessarily infringed by the Package. If you institute patent litigation (including a cross-claim or counterclaim) against any party alleging that the Package constitutes direct or contributory patent infringement, then this Artistic License to you shall terminate on the date that such litigation is filed.</p>
-
-<p>Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS &quot;AS IS&#39; AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
-
-<p>Original Lyrics::Fetcher::* work:</p>
-
-<p>Copyright (C) 2007-2020 David Precious.</p>
-
-<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.8.7 or, at your option, any later version of Perl 5 you may have available.</p>
-
-<p>Legal disclaimer: I have no connection with the owners of www.genius.com. Lyrics fetched by this script may be copyrighted by the authors, it&#39;s up to you to determine whether this is the case, and if so, whether you are entitled to request/use those lyrics. You will almost certainly not be allowed to use the lyrics obtained for any commercial purposes.</p>
-
-<p>All comments / suggestions / bug reports gratefully received (ideally use the RT installation at <a href="https://rt.cpan.org/">https://rt.cpan.org/</a> or through the web interface at <a href="https://rt.cpan.org/NoAuth/ReportBug.html?Queue=LyricFinder">https://rt.cpan.org/NoAuth/ReportBug.html?Queue=LyricFinder</a>, or mail me direct if you prefer).</p>
-
-<p>Developed on Github at <a href="https://github.com/bigpresh/LyricFinder">https://github.com/bigpresh/LyricFinder</a></p>
-
-<p>Previously: Copyright 2003 Sir Reflog &lt;reflog@mail15.com&gt;. Copyright 2003 Zachary P. Landau &lt;kapheine@hypa.net&gt;</p>
-
-
-</body>
-
-</html>
-
+NAME
+    LyricFinder - Fetch song lyrics from several internet lyric sites.
+
+AUTHOR
+    This module is Copyright (c) 2020-2024 by
+
+    Jim Turner, "<turnerjw784 at yahoo.com>"
+
+    All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of either the GNU General Public License or the Artistic
+    License, as specified in the Perl README file.
+
+    NOTE: This is a "derived work" of Lyrics::Fetcher family of modules, by
+    (c) David Precious (davidp at preshweb.co.uk) (CPAN Id: BIGPRESH), as
+    fair use legal under the terms of, subject to, and licensed in terms
+    compatable and compliant with those modules. Many thanks to David for
+    laying the groundwork for this module!
+
+SYNOPSIS
+        #!/usr/bin/perl
+
+        use LyricFinder;
+
+        # create a new finder object:
+        my $finder = new LyricFinder();
+
+        # fetch lyrics for a song from a specific site (https://www.azlyrics.com):
+        print $finder->fetch('Pink Floyd','Echoes','AZLyrics');
+
+        # if you omit the site, automatically tries all available
+        # sites in random order:
+        print $finder->fetch('Oasis', 'Cast No Shadow');
+
+        # or you can pass an arrayref of sites you want used in order:
+        print $finder->fetch('Oasis', 'Whatever', [qw(Genius AZLyrics)]);
+
+        # To find out which site modules are available:
+        my @fetchers = $finder->sources();
+
+        # To fetch the source (site) name and base url:
+        print "(Lyrics courtesy: ".$finder->source().")\n";
+        print "site url:  ".$finder->site().")\n";
+
+        # To show what sites we had to search for these lyrics:
+        print "..Tried sites:  ".$finder->tried().".\n";
+
+        # To do caching:
+        $finder->cache('/tmp/lyrics');
+        #-or-
+        my $localfinder = new LyricFinder(-cache => '/tmp/lyrics');
+
+        #-or- to only fetch lyrics from our cache:
+        my $local_lyrics = $localfinder->fetch('Oasis', 'Cast No Shadow', 'Cache');
+        if ($local_lyrics) {
+            print "..Lyrics from disk:\n\n$local_lyrics\n";
+        } else {
+            print "..No local lyrics found for 'Cast No Shadow', by Oasis.\n";
+        }
+
+DESCRIPTION
+    LyricFinder accepts an artist name and song title, searches supported
+    lyrics sites for song lyrics, and, if found, returns them as a string.
+
+    The supported and currently-installed modules are:
+    LyricFinder::ApiLyricsOvh (for searching api.lyrics.ovh),
+    LyricFinder::AZLyrics (www.azlyrics.com), LyricFinder::ChartLyrics
+    (api.lyrics.com), LyricFinder::Genius (genius.com), LyricFinder::Letras
+    (www.letras.mus.br), and LyricFinder::Musixmatch (www.musixmatch.com).
+    There is a special module for storing and / or fetching lyrics (.lrc)
+    files already stored locally, called LyricFinder::Cache.
+
+    This module is derived from the (older) Lyrics::Fetcher collection of
+    modules by (c) 2007-2020 David Precious, but currently supports more
+    lyric sites (6) and bundles all the supported site modules together here
+    (simply install this one module). We have reworked the "Cache" module to
+    cache lyrics files by artist and song title on disk in the user's
+    desired location. LyricFinder is also truly object-oriented making
+    interaction with the user-facing methods and data easier and more
+    streamlined.
+
+    NOTE: This module is used completely independent of any of those
+    modules, but some of the code is derived from them, as allowed by and
+    the license and credits are included here, as required by their
+    open-source license. It is capable of being used as a drop-in
+    replacement, but some function names and other code changes will be
+    needed.
+
+    We've also added methods to easily change the "user-agent" passed to the
+    lyrics sites, as needed/desired by the user programatically.
+
+    We've also changed the default to search the supported sites randomly,
+    instead of in the same fixed alphabetical order by module name
+    ("load-balancing" the searches to all the sites). This is helpful when
+    using LyricFinder as a plugin for streaming media players, such as the
+    author's very own "Fauxdacious Media Player" that frequently stream
+    internet radio stations, which can impose a "hit" on the lyrics sites
+    each time the song title changes. This reduces the odds of a user's
+    IP-address possibly being banned by a lyrics site for "too-frequent
+    scraping / usage"! NOTE: If you want to prevent the usage of one or more
+    of the specific sites, simply specify the *-omit* argument with a
+    reference to a list of module names to skip, ie. *-omit =*
+    'AZLyrics,Genius'> in the *new LyricFinder()* function. If you want to
+    use one or more specific sites, or enforce a specific search order, you
+    can call the fetch() method with a third argument consisting of the site
+    module name, ie. "Musixmatch", or reference to an array of site module
+    names, ie. [Genius, AZLyrics]. If you specify "Cache" as the single
+    module name (and provide a "-cache" directory containing lyrics files on
+    your hard drive), LyricFinder will only search that directory for
+    lyrics, and not the internet. Otherwise, specifying a "-cache" directory
+    will cause LyricFinder to first look in your cache directory for
+    matching lyrics first, and only search any of the lyrics sites if not
+    found, then will cache the lyrics found on the internet to a new lyric
+    file in your lyrics directory eleminating re-searching the web when you
+    play the same song again later and reducing internet bandwidth usage!
+
+    In case of problems with fetching lyrics, the error string will be
+    returned by $finder->message(). If all goes well, it will have 'Ok' in
+    it.
+
+    The site selection is made by the "method" parameter passed to the
+    fetch() of this module. You can also omit this parameter, in which case
+    all available fetchers will be tried in random order, or you can supply
+    an arrayref of sites you'd like to try in the order you specify.
+
+    The value of the "method" parameter (if specified) must be either the
+    "*" part of one of the installed LyricFinder::* fetcher package name,
+    "all", or "random".
+
+    If you have another lyrics site that is not supported, please file a
+    feature request via email or the CPAN bug system, or (for faster
+    service), provide a Perl patch module / program source that can extract
+    lyrics from that site and I'll consider it! The easiest way to do this
+    is to take one of the existing submodules, copy it to
+    "LyricFinder::*YOURSITE*.pm and modify it (and the POD docs) to your
+    specific site's needs, test it with several Artist / Title combinations
+    (see the "SYNOPSIS" code above), and send it to me (That's what I do for
+    new sites)!
+
+INSTALLATION
+            To install this module, run the following commands:
+
+            perl Makefile.PL
+
+            make
+
+            make test
+
+            make install
+
+SUBROUTINES/METHODS
+    new *LyricFinder*([ *options* ])
+        Creates a new finder object for fetching lyrics. The same finder
+        object can be used for multiple fetches from multiple sites, so this
+        normally only needs to be called once.
+
+        *options* is a hash of option/value pairs (ie. "-option" =>
+        "value"). If an "-option" is specified with no "value" given, the
+        default value will be *1* ("*true*"). The currently-supported
+        options are:
+
+        -agent => *"user-agent string"*
+            Specifies an alternate "user-agent" string sent to the lyric
+            sites when attempting to fetch lyrics. Get / set the desired
+            user-agent (ie. browser name) to pass to the lyrics sites. Some
+            sites are pickey about receiving a user-agent string that
+            corresponds to a valid / supported web-browser to prevent their
+            sites from being "scraped" by programs, such as this.
+
+            Default: *"Mozilla/5.0 (X11; Linux x86_64; rv:112.0)
+            Gecko/20100101 Firefox/112.0"*.
+
+            NOTE: This value will be overridden if $founder->agent("agent")
+            is called! NOTE: See below how to specify a different agent for
+            a specific site module.
+
+        -cache => *"directory"*
+            Specifies a directory (ie. "/home/user/Music/Lyricsfiles") to be
+            used for disk caching. If specified, this directory will be
+            searched for a matching lyrics (.lrc) file (in this example,
+            "/home/user/Music/LyricsFiles/*artist*/*title*.lrc"). If no
+            matching lyrics file is found (and the search module list is not
+            specifically set to "Cache" (and lyrics are found on the
+            internet), then the lyrics will be saved to the directory under
+            "*artist*/*title*.lrc".
+
+            Default: *none* (no caching)
+
+            An optional dirctional indicator ("<" or ">") can be prepended
+            to the directory to limit caching activity. "<" allows fetching
+            lyrics from the cache directory, but will not cache (write) new
+            lyrics found on the web to the directory. ">" (the opposite)
+            will cache new lyrics but will never attempt to fetch (read)
+            lyrics from the cache directory. These options may be useful if
+            one either simply wants to build a lyrics database but always
+            fetch the latest, or perhaps limit lyrics to a fixed cache but
+            not add to it, or perhaps is using a readonly directory. The
+            default is no indicator which allows both reading and writing.
+
+            Directory must be a valid directory, but may be specified as
+            either a path (ie. "/home/user/lyrics") or a URI (ie.
+            "file:///home/user/lyrics") or with a limiting directional
+            indicator, ie. "</home/user/lyrics". It may or may not have a
+            trailing "/" (ie. "/home/user/lyrics/").
+
+            NOTE: This value will be overridden if
+            $founder->cache("directory") is called! NOTE: See below how to
+            specify a different agent for a specific site module.
+
+        -debug => *number*
+            Specifies whether debug information will be displayed (0: no,
+            >0: yes).
+
+            Default *0* (no). *1* will display debug info. There is
+            currently only one level of debug verbosity.
+
+        -noextra => *0 | 1* (*false* or *true*)
+            Some sites (currently, only Musixmatch) may append some
+            additional information below the lyrics text. If specified or
+            given a *true* value, this will be suppressed and only the
+            actual song lyrics returned. Default *0* (false) - show any
+            additional site-specific information.
+
+        -omit => *"site-module[,site-module2...]]*
+            Permits omitting specific sites which are currently installed
+            from being searched (namely when using *random* or *all*). For
+            example, to exclude the Musixmatch site, specify: *-omit* =>
+            *"Musixmatch"*, which will cause LyricFinder::Musixmatch to not
+            be considered for lyrics search. Default is for all installed
+            sites (submodules) to be considered. NOTE: The site list can be
+            specified as a comma-separated string OR as an array reference,
+            ie. *-omit =* [ qw(Musixmatch Genius) ]>.
+
+        -site-module-name => { *"-option"* => *value* [, *"-option"* =>
+        *value* ... ] }
+            Specifies options for a specific site fetcher module. These
+            values will override any of the general option values specified
+            for that specific module or calls to the general agent() method,
+            if it is used to fetch lyrics. Examples would be if one needed
+            to specify a different user-agent for one of the sites, or
+            wished to cache lyrics fetched by sites to specific directories
+            for some reason. By default, top-level options are passed to the
+            various sites, so this should only be needed in special cases.
+
+            Example: "-Musixmatch => { -noextra => 1 }"
+
+            Default: none (no site-specific options)
+
+            NOTE: The "-cache" (cache-directory) option is needed by the
+            main LyricFinder module and the site submodules in order to use
+            the caching feature, so passing "-Cache => {-cache =>
+            *directory*}" will NOT work (the way one might assume)!
+
+    [ *$current-agent string* = ] $finder->agent( [ *user-agent string* ] )
+        Set the desired user-agent (ie. browser name) to pass to the lyrics
+        sites. Some sites are pickey about receiving a user-agent string
+        that corresponds to a valid / supported web-browser to prevent their
+        sites from being "scraped" by programs, such as this.
+
+        Default: *"Mozilla/5.0 (X11; Linux x86_64; rv:112.0) Gecko/20100101
+        Firefox/112.0"*
+
+        If no argument is passed, it returns the current GENERAL user-agent
+        string in effect (but a different agent option is specified for a
+        specific module may have been specified and used by THAT module -
+        see new() options above).
+
+        NOTE: This will override any -agent option value specified in new()!
+        NOTE: See above how to specify a different user-agent for a specific
+        site module.
+
+    [ *$current-directory* = ] $finder->cache( [ *$directory* ] )
+        Specifies a directory (ie. "/home/user/Music/Lyricsfiles") to be
+        used for disk caching. If specified, this directory will be searched
+        for a matching lyrics (.lrc) file (in this example,
+        "/home/user/Music/LyricsFiles/*artist*/*title*.lrc"). If no matching
+        lyrics file is found (and the search module list is not specifically
+        set to "Cache" (and lyrics are found on the internet), then the
+        lyrics will be saved to the directory under "*artist*/*title*.lrc".
+
+        An optional dirctional indicator ("<" or ">") can be prepended to
+        the directory to limit caching activity. "<" allows fetching lyrics
+        from the cache directory, but will not cache (write) new lyrics
+        found on the web to the directory. ">" (the opposite) will cache new
+        lyrics but will never attempt to fetch (read) lyrics from the cache
+        directory. These options may be useful if one either simply wants to
+        build a lyrics database but always fetch the latest, or perhaps
+        limit lyrics to a fixed cache but not add to it, or perhaps is using
+        a readonly directory. The default is no indicator which allows both
+        reading and writing.
+
+        Directory must be a valid directory, but may be specified as either
+        a path (ie. "/home/user/lyrics") or a URI (ie.
+        "file:///home/user/lyrics") or with a limiting directional
+        indicator, ie. "</home/user/lyrics". It may or may not have a
+        trailing "/" (ie. "/home/user/lyrics/").
+
+        If no argument is passed, it returns the current GENERAL cache
+        directory string in effect (but a different directory option is
+        specified for a specific module may have been specified and used by
+        THAT module - see new() options above).
+
+        NOTE: This will override any -cache option value specified in new()!
+
+        NOTE: See above how to specify a different directory for a specific
+        site module.
+
+    [ *$scalar* | *@array* ] = $finder->credits()
+        Returns either a comma-separated list or an array of names credited
+        by the site with posting the lyrics on the site (if any) or an empty
+        string, if none found. NOTE: The only site that supports this
+        currently is AZLyrics.
+
+    *$string* = $finder->fetch(*$artist*, *$title* [, *$source* |
+    *\@sources* [, *$limit*]])
+        Attempt to fetch the lyrics for the given artist and title. A single
+        source site module can be specified as a string ($source) or
+        multiple source modules, ie. [module1, module2...], or "random" or
+        "Cache". Default: "random" (search all available sites in random
+        order until lyrics found or all available sites have been searched).
+        This is the primary method call, and the only one required (besides
+        new()) to be called to obtain lyrics. $limit (if specified) is an
+        integer number to limit the max. number of fetchers to try (normally
+        used with $source = "random") to limit the time needed to search for
+        lyrics (before giving up). If not specified, zero, or higher than
+        the number of installed fetchers, then all available (installed)
+        fetcher submodules (sites) will be tried (until one succefully finds
+        lyrics).
+
+        "Cache" is a special value that limits searching to a specified
+        lyrics directory on one's local hard drive. NOTE: It should NOT be
+        included in a list, but used by itself. If a lyrics directory is
+        specified, Cache will automatically be searched first!
+
+        If an array reference (a list) of modules are provided, they will be
+        searched in the order they appear in the list.
+
+        The currently-installed and supported modules are: ApiLyricsOvh,
+        AZLyrics, ChartLyrics, Genius, Letras, and Musixmatch (NOTE the "x"
+        in the spelling of "Musixmatch")!
+
+        Returns lyrics as a string (includes line-breaks appropriate for the
+        user's operating system), or an empty string, if no lyrics found.
+
+    *$scalar* = $finder->image_url()
+        Returns a URL for a cover-art image, if one found on the lyrics
+        page. Currently, only the LyricFinder::ChartLyrics,
+        LyricFinder::Genius and LyricFinder::Musixmatch sites contain
+        cover-art images. For the other sites, or if no image is found, an
+        empty string will be returned if this method is called.
+
+    *$scalar* = $finder->message()
+        Returns the last error string generated, or "Ok" if all's well.
+
+    [ *$scalar* | *@array* ] = $finder->order()
+        Returns either a comma-separated list or an array of the site
+        modules tried by the last fetch. This is useful to see what sites
+        are being tried and in what order if *random* order is being used.
+        Similar to tried(), except all sites being considered are shown.
+
+    *$scalar* = $finder->site()
+        Returns the actual base URL of the site that successfully fetched
+        the lyrics in the last successful fetch (or an empty string if the
+        fetch failed).
+
+    *$scalar* = $finder->source()
+        Returns the name of the module that successfully fetched the lyrics
+        in the last successful fetch (or "none" if the fetch failed).
+
+    [ *$arrayref* | *@array* ] = $finder->sources()
+        Returns a list of available site modules. Similar to
+        Lyrics::Fetcher's *available_fetchers*() function.
+
+    [ *$scalar* | *@array* ] = $finder->tried()
+        Returns either a comma-separated list or an array of the site
+        modules actually tried when fetching lyrics. This is useful to see
+        what sites were actually hit and in what order if *random* order is
+        being used. Similar to order(), except only sites actually hit are
+        shown (the last one is the one that successfully fetched the lyrics.
+
+    *$scalar* = $finder->url()
+        Returns the actual URL used to fetch the lyrics from the site
+        (includes the actual formatted search arguments passed to the site).
+        This can be helpful in debugging, etc.
+
+        NOTE: If caching is being used and lyrics are found and fetched from
+        the cache directory, site() will return the full filename of the
+        cache file fetched.
+
+    $LyricFinder::VERSION
+        The current version# of LyricFinder
+
+DEPENDENCIES
+    HTML::Strip, HTTP::Request, LWP::UserAgent, URI::Escape
+
+RECOMMENDS
+    XML::Simple (required to use LyricFinder::ChartLyrics)
+
+BUGS
+    Please report any bugs or feature requests to "bug-lyricFinder at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=LyricFinder>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc LyricFinder
+
+SEE ALSO
+    Fauxdacious media player -
+    (<https://wildstar84.wordpress.com/fauxdacious>)
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=LyricFinder>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/LyricFinder>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/LyricFinder/>
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2020-2024 Jim Turner.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a copy
+    of the full license at:
+
+    <http://www.perlfoundation.org/artistic_license_2_0>
+
+    Any use, modification, and distribution of the Standard or Modified
+    Versions is governed by this Artistic License. By using, modifying or
+    distributing the Package, you accept this license. Do not use, modify,
+    or distribute the Package, if you do not accept this license.
+
+    If your Modified Version has been derived from a Modified Version made
+    by someone other than you, you are nevertheless required to ensure that
+    your Modified Version complies with the requirements of this license.
+
+    This license does not grant you the right to use any trademark, service
+    mark, tradename, or logo of the Copyright Holder.
+
+    This license includes the non-exclusive, worldwide, free-of-charge
+    patent license to make, have made, use, offer to sell, sell, import and
+    otherwise transfer the Package with respect to any patent claims
+    licensable by the Copyright Holder that are necessarily infringed by the
+    Package. If you institute patent litigation (including a cross-claim or
+    counterclaim) against any party alleging that the Package constitutes
+    direct or contributory patent infringement, then this Artistic License
+    to you shall terminate on the date that such litigation is filed.
+
+    Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+    AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+    THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+    PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+    YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+    CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+    Original Lyrics::Fetcher::* work:
+
+    Copyright (C) 2007-2020 David Precious.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.7 or, at
+    your option, any later version of Perl 5 you may have available.
+
+    Legal disclaimer: I have no connection with the owners of any of these
+    sites. Lyrics fetched by this script may be copyrighted by the authors,
+    it's up to you to determine whether this is the case, and if so, whether
+    you are entitled to request/use those lyrics. You will almost certainly
+    not be allowed to use the lyrics obtained for any commercial purposes.
+
+    All comments / suggestions / bug reports gratefully received (ideally
+    use the RT installation at <https://rt.cpan.org/> or through the web
+    interface at
+    <https://rt.cpan.org/NoAuth/ReportBug.html?Queue=LyricFinder>, or mail
+    me direct if you prefer).
+
+    Developed on Github at <https://github.com/bigpresh/LyricFinder>
+
+    Previously: Copyright 2003 Sir Reflog <reflog@mail15.com>. Copyright
+    2003 Zachary P. Landau <kapheine@hypa.net>
 

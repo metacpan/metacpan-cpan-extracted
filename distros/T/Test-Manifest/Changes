@@ -1,5 +1,9 @@
 Revision history for Perl module Test::Manifest
 
+2.024 2024-01-08T15:34:49Z
+	* refresh distro
+	* fix tests for parallel execution (https://rt.cpan.org/Ticket/Display.html?id=92604)
+
 2.023 2022-01-08T21:48:28Z
 	* No code changes. Fix a link in the README.pod.
 

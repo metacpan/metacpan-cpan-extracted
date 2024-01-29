@@ -9,7 +9,7 @@ use Specio::Library::String;
 
 use Moo::Role;
 
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 
 has ignore => (
     is      => 'ro',
@@ -67,7 +67,7 @@ Code::TidyAll::Role::HasIgnore - A role for any class that has a list of ignored
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 SUPPORT
 
@@ -93,7 +93,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2022 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2023 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,12 +4,12 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   ExtUtils::CBuilder: '0'
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
   XS::Parse::Infix::Builder: '0.28'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,15 +18,16 @@ name: Syntax-Operator-In
 provides:
   Syntax::Operator::Elem:
     file: lib/Syntax/Operator/Elem.pm
-    version: '0.06'
+    version: '0.09'
   Syntax::Operator::In:
     file: lib/Syntax/Operator/In.pm
-    version: '0.06'
+    version: '0.09'
 requires:
   XS::Parse::Infix: '0.28'
+  meta: 0.003_002
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.06'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

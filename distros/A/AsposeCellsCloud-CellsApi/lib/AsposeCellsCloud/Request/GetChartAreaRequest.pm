@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# GetChartAreaRequest.name : The workbook name.  ,
+# GetChartAreaRequest.name : The file name.  ,
 # GetChartAreaRequest.sheetName : The worksheet name.  ,
 # GetChartAreaRequest.chartIndex : The chart index.  ,
-# GetChartAreaRequest.folder : Original workbook folder.  ,
-# GetChartAreaRequest.storageName :    
+# GetChartAreaRequest.folder : The folder where the file is situated.  ,
+# GetChartAreaRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_chart_area' } = { 
-    	summary => 'Gets chart area description in worksheet.',
+    	summary => 'Retrieve chart area description in the worksheet.',
         params => $params,
         returns => 'ChartAreaResponse',
     };
@@ -137,7 +137,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -158,14 +158,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

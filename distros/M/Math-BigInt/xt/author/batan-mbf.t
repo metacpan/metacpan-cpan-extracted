@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12 + 42;
+use Test::More;
 
 use Math::BigFloat;
 
@@ -138,3 +138,25 @@ for (my $i = 0; $i <= $#x ; ++$i) {
 }
 
 diag("Maximum relative error = ", $max_relerr -> numify(), "\n");
+
+# Verify that accuracy and precision is restored (CPAN RT #150523).
+
+{
+    $class -> accuracy(10);
+    is($class -> accuracy(), 10, "class accuracy is 10 before batan()");
+    my $x = $class -> new("1.2345");
+    $x -> batan();
+    is($class -> accuracy(), 10, "class accuracy is 10 after batan()");
+}
+
+SKIP: {
+    skip "Test causes accuracy and precision to be set internally. Fixme!", 2;
+
+    $class -> precision(-10);
+    is($class -> precision(), -10, "class precision is -10 before batan()");
+    my $x = $class -> new("1.2345");
+    $x -> batan();
+    is($class -> precision(), -10, "class precision is -10 after batan()");
+}
+
+done_testing();

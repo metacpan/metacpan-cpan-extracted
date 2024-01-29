@@ -5,7 +5,7 @@ use warnings;
 
 use Future::AsyncAwait 0.47;
 
-use Test::More;
+use Test2::V0;
 use Test::HexString;
 
 use Tangence::Constants;
@@ -50,7 +50,7 @@ package Testing::Stream
 my $stream = Testing::Stream->new();
 
 ok( defined $stream, 'defined $stream' );
-isa_ok( $stream, "Tangence::Stream", '$stream isa Tangence::Stream' );
+isa_ok( $stream, [ "Tangence::Stream" ], '$stream isa Tangence::Stream' );
 
 # request Future
 {

@@ -1,5 +1,10 @@
 Revision history for Device-Chip-AVR_HVSP
 
+0.08    2023-12-22
+        [CHANGES]
+         * Updated for Teest::ExpectAndCheck::Future v0.04
+         * Use Object::Pad::MOP rather than `no strict 'refs'` hackery
+
 0.07    2023-09-13
         [CHANGES]
          * General module style updates:

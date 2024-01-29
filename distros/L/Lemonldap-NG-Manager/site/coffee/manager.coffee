@@ -717,13 +717,29 @@ llapp.controller 'TreeCtrl', [
 			, ->
 				console.log('New key cancelled')
 
+		$scope.newEcKeys = ->
+			$scope.waiting = true
+			currentNode = $scope.currentNode
+			$http.post("#{window.confPrefix}/newEcKeys", {"password": ''}).then (response) ->
+				for i in [0..3]
+					currentNode.data[i+4].data = currentNode.data[i].data
+				currentNode.data[0].data = response.data.private
+				currentNode.data[1].data = response.data.public
+				currentNode.data[2].data = response.data.hash
+				currentNode.data[3].data = 'EC'
+				$scope.waiting = false
+			, readError
+
 		$scope.newCertificateNoPassword = ->
 			$scope.waiting = true
 			currentNode = $scope.currentNode
 			$http.post("#{window.confPrefix}/newCertificate", {"password": ''}).then (response) ->
+				for i in [0..3]
+					currentNode.data[i+4].data = currentNode.data[i].data
 				currentNode.data[0].data = response.data.private
 				currentNode.data[1].data = response.data.public
 				currentNode.data[2].data = response.data.hash
+				currentNode.data[3].data = 'RSA'
 				$scope.waiting = false
 			, readError
 
@@ -783,10 +799,10 @@ llapp.controller 'TreeCtrl', [
 						if node.type and node.type.match /^int$/
 							node.data = parseInt(node.data, 10)
 						if node.type and node.type.match /^select$/
-							node.data = node.data.toString()
+							node.data = if node.data then node.data.toString() else ''
 						# Split SAML types
-						else if node.type and node.type.match(/^(saml(Service|Assertion)|blackWhiteList)$/) and not (typeof node.data == 'object')
-							node.data = node.data.split ';'
+						else if node.type and node.type.match(/^(saml(Service|Assertion)|blackWhiteList)$/) and not (node.data and typeof node.data == 'object')
+							node.data = if node.data then node.data.split ';' else []
 						$scope.waiting = false
 						d.resolve node.data
 					, (response) ->

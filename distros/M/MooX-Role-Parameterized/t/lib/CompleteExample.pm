@@ -4,31 +4,32 @@ use Moo::Role;
 use MooX::Role::Parameterized;
 
 role {
-    my ( $params, $p ) = @_;
+    my ( $params, $mop ) = @_;
 
-    $p->has( $params->{attr} => ( is => 'rw' ) );
+    $mop->has( $params->{attr} => ( is => 'rw' ) );
 
-    $p->method(
+    $mop->method(
         $params->{method} => sub {
             1024;
         }
     );
 
-    $p->with( $params->{with} );
+    $mop->with( $params->{with} );
 
-    $p->requires( $params->{requires} );
+    $mop->requires( $params->{requires} );
 
     if ( $params->{after} ) {
-        $p->after( @{ $params->{after} } );
+        $mop->after( @{ $params->{after} } );
     }
 
     if ( $params->{before} ) {
-        $p->before( @{ $params->{before} } );
+        $mop->before( @{ $params->{before} } );
     }
 
     if ( $params->{around} ) {
-        $p->around( @{ $params->{around} } );
+        $mop->around( @{ $params->{around} } );
     }
 };
+
 
 1;

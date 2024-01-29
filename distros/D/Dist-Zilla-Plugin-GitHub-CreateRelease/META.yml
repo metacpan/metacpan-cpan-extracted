@@ -2,11 +2,12 @@
 abstract: 'Create a GitHub Release'
 author:
   - 'Timothy Legge'
-build_requires: {}
+build_requires:
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,23 +16,40 @@ name: Dist-Zilla-Plugin-GitHub-CreateRelease
 provides:
   Dist::Zilla::Plugin::GitHub::CreateRelease:
     file: lib/Dist/Zilla/Plugin/GitHub/CreateRelease.pm
-    version: '0.0005'
+    version: '0.0007'
 requires:
-  Config::Identity: '0.0019'
-  Digest::SHA: '6.02'
-  Dist::Zilla: '2.100921'
+  CPAN::Changes: '0.500002'
+  Config::INI::Reader: '0'
+  Config::Identity: '0'
+  Crypt::OpenPGP: '0'
+  DDP: '0'
+  Digest::SHA: '0'
+  Dist::Zilla::Role::AfterRelease: '0'
+  Exporter: '0'
+  Feature::Compat::Class: '0'
+  File::Basename: '0'
   File::Slurper: '0'
-  Git::Wrapper: '0.048'
-  Moose: '2.2014'
-  Pithub::Repos::Releases: '0.01040'
+  File::Temp: '0'
+  Git::Wrapper: '0'
+  JSON::MaybeXS: '1.004000'
+  LWP::Simple: '0'
+  MetaCPAN::Client: '0'
+  Module::Signature: '0'
+  Moose: '0'
+  Pithub::Repos::Releases: '0'
+  Try::Tiny: '0'
   URI: '0'
   URI::Escape: '0'
-  perl: '5.008'
+  feature: '0'
+  namespace::autoclean: '0'
+  perl: v5.20.0
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/timlegge/perl-Dist-Zilla-Plugin-GitHub-CreateRelease/issues
   homepage: https://metacpan.org/dist/Dist-Zilla-Plugin-GitHub-CreateRelease
   repository: git://github.com/timlegge/perl-Dist-Zilla-Plugin-GitHub-CreateRelease.git
-version: '0.0005'
-x_generated_by_perl: v5.36.1
+version: '0.0007'
+x_generated_by_perl: v5.34.1
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

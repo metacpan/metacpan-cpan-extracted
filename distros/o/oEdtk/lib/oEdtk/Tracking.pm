@@ -1,15 +1,14 @@
 package oEdtk::Tracking;
 my ($_TRACK_SIG, $_TRACK_TRK, @_TRACK_JSON);
 
-# xxx TO CHANGE : test if SQLite table already exist before creation
 
 BEGIN { 
 	$SIG{'__WARN__'} = sub {
-		if ($WARN2LOGGER){
-			&logger (4, $_[0]);
-		} else {
+#		if ($WARN2LOGGER){
+#			&logger (4, $_[0]);
+#		} else {
 			warn $_[0];
-		}
+#		}
 		# when Tracking object is defined, $_TRACK_TRK is defined so that events can be catch and sent to tracker
 		if (defined $_TRACK_TRK && $_TRACK_SIG=~/warn/i) {
 			# http://perldoc.perl.org/functions/warn.html
@@ -44,7 +43,7 @@ use DBI;
 #use JSON;
 use Exporter;
 
-our $VERSION		= 1.5063;
+our $VERSION		= 1.6031;
 our @ISA			= qw(Exporter);
 our @EXPORT_OK		= qw(stats_iddest stats_week stats_month);
 #my  @JSON_TRACE;
@@ -164,7 +163,7 @@ sub new {
 	$self->track('Job', 1, join (' ', @ARGV)); # conserver le join pour placer tous les parametres libres dans la zone de message
 	if (defined $cfg->{'EDTK_TRACK_SIG'} && $cfg->{'EDTK_TRACK_SIG'}!~/no/i) {
 		$_TRACK_SIG = $cfg->{'EDTK_TRACK_SIG'};
-		&logger (4, "tracking catchs SIG messages = '$_TRACK_SIG' (see EDTK_TRACK_SIG : 'warn' for all, 'halt' for die only)");
+		&logger (6, "tracking catchs SIG messages = '$_TRACK_SIG' (see EDTK_TRACK_SIG : 'warn' for all, 'halt' for die only)");
 		$_TRACK_TRK = $self;
 	}
 #	if (defined $cfg->{'EDTK_TRACK_JSON'} && $cfg->{'EDTK_TRACK_JSON'} !~/no/i )  {

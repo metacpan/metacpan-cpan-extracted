@@ -1,5 +1,30 @@
 Revision history for Spreadsheet-ParseXLSX
 
+0.31  2024-01-18
+
+      - CVE-2024-23525: fixed in previous release
+
+0.30  2024-01-17
+
+      - Fix xml external entity (XEE) injection bug
+      - added unit test for support of purl.oclc.org namespace ... see issue #7
+      - removed tidyness tests again as it fails on weaver'ed code
+
+0.29  2024-01-02
+
+      - Merge pull request #1 from theevilapplepie/master: Fix for 'Argument "" isn't numeric in addition (+) at /usr/local/shar…
+      - Merge pull request #2 from oharakouhei/master Incorrect cell values due to phonetic data doy#72
+      - Merge pull request #3 from nickzoic/master: Fix die message in parse()
+      - Merge pull request #4 from mazurin/master: Cannot open password protected SHA1 encrypted files. doy#68
+      - Merge pull request #5 from danderman/master: use date format detection based on Spreadsheet::XLSX
+      - Merge pull request #6 from gquipster/master: Add rudimentary support for hyperlinks in cells
+
+0.28  2024-01-02
+
+      - New maintainer
+      - Fix possible memory bomb as reported in https://github.com/haile01/perl_spreadsheet_excel_rce_poc/blob/main/parse_xlsx_bomb.md
+      - Updated Dist::Zilla configuration fixing deprecation warnings
+
 0.27  2016-08-16
       - Fix issues parsing sheets whose cell elements do not have location
         attributes (dgiordano, #61)

@@ -1,5 +1,10 @@
 Revision history for Perl extension Map::Tube::Berlin.
 
+2023.1210
+	- data changes
+	  - S26 and S85 swap north sections
+	  - changed station names (Flughafen BER ...)
+
 2021.0709
 	- data changes
 	  - new station Museumsinsel
@@ -12,7 +17,7 @@ Revision history for Perl extension Map::Tube::Berlin.
 	- data changes
 	  - U5 between Hauptbahnhof and Alexanderplatz opens
 	    with three "old" and two new stations
-	  - Franoesische Str closes
+	  - Franzoesische Str closes
 
 2020.1101
 	- data changes

@@ -43,6 +43,8 @@ while(<<>>) {
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 pds_find_any_ref - find reference planar difference sets

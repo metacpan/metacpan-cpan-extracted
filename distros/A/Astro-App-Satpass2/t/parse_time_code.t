@@ -3,15 +3,15 @@ package main;
 use strict;
 use warnings;
 
-use lib qw{ inc };
-
 use Test::More 0.88;
 
 use Astro::Coord::ECI::Utils 0.112 qw{ greg_time_gm greg_time_local };
+use Astro::App::Satpass2::ParseTime;
+
+use lib qw{ inc };
 
 use My::Module::Test::App;
 
-require_ok 'Astro::App::Satpass2::ParseTime';
 
 klass( 'Astro::App::Satpass2::ParseTime' );
 
@@ -19,11 +19,9 @@ call_m( new => class => 'Astro::App::Satpass2::ParseTime::Code',
     code	=> \&parser,
     INSTANTIATE, 'Instantiate' );
 
-call_m( isa => 'Astro::App::Satpass2::ParseTime::Code', TRUE,
-    'Object isa Astro::App::Satpass2::ParseTime::Code' );
+isa_ok invocant, 'Astro::App::Satpass2::ParseTime::Code';
 
-call_m( isa => 'Astro::App::Satpass2::ParseTime', TRUE,
-    'Object isa Astro::App::Satpass2::ParseTime' );
+isa_ok invocant, 'Astro::App::Satpass2::ParseTime';
 
 call_m( 'delegate',
     'Astro::App::Satpass2::ParseTime::Code',

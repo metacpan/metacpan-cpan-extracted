@@ -32,6 +32,7 @@ lib/App/DBBrowser/Table.pm
 lib/App/DBBrowser/Table/CommitWriteSQL.pm
 lib/App/DBBrowser/Table/Extensions.pm
 lib/App/DBBrowser/Table/Extensions/Case.pm
+lib/App/DBBrowser/Table/Extensions/ColumnAliases.pm
 lib/App/DBBrowser/Table/Extensions/Maths.pm
 lib/App/DBBrowser/Table/Extensions/ScalarFunctions.pm
 lib/App/DBBrowser/Table/Extensions/ScalarFunctions/SQL.pm

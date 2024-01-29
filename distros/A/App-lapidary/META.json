@@ -1,0 +1,58 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Samuel Bloomfield"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-lapidary",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Extract" : "0",
+            "File::Basename" : "0",
+            "File::Spec::Functions" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "0",
+            "LWP::Simple" : "0",
+            "List::MoreUtils" : "0",
+            "perl" : "5.008004",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/samuelbloomfield/Lapidary.git",
+         "web" : "https://github.com/samuelbloomfield/Lapidary"
+      }
+   },
+   "version" : 1,
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

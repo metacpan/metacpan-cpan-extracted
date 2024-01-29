@@ -5,7 +5,7 @@ use Encode qw(decode);
 use base 'Exporter';
 our @EXPORT = qw(convert_to_ascii);
 our @EXPORT_OK = qw(convert_to_ascii);
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 my %char_map;
 
 =encoding utf8

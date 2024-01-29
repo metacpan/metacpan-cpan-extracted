@@ -29,7 +29,7 @@ use GnuPG::Options;
 use GnuPG::Handles;
 use Scalar::Util 'tainted';
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 has passphrase => (
     isa     => 'Any',
@@ -46,7 +46,7 @@ has call => (
 
 # NB: GnuPG versions
 #
-# There are now two supported versions of GnuPG: legacy 1.4 and stable 2.2
+# There are now three supported versions of GnuPG: legacy 1.4, 2.2, and 2.4.
 # They are detected and each behave slightly differently.
 #
 # When using features specific to branches, check that the system's
@@ -988,16 +988,16 @@ L<perlipc/"Bidirectional Communication with Another Process">.
 
 =head1 GnuPG Versions
 
-As of this version of GnuPG::Interface, there are two supported
-versions of GnuPG: 1.4.x and 2.2.x. The
+As of this version of GnuPG::Interface, there are three supported
+versions of GnuPG: 1.4.x, 2.2.x, and 2.4.x. The
 L<GnuPG download page|https://gnupg.org/download/index.html> has
 updated information on the currently supported versions.
 
 GnuPG released 2.0 and 2.1 versions in the past and some packaging
 systems may still provide these if you install the default C<gpg>,
-C<gnupg>, C<gnupg2>, etc. packages. This modules supports only
-version 2.2.x, so you may need to find additional package
-repositories or build from source to get the updated version.
+C<gnupg>, C<gnupg2>, etc. packages. 2.0 and 2.1 versions are not
+supported, so you may need to find additional package repositories
+or build from source to get the updated version.
 
 =head1 OBJECT METHODS
 

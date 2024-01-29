@@ -58,19 +58,21 @@ $walker = sub ($data, $cb, $path='' ) {
 
 a hash containing the data from the config file. If the environment
 variable CM_CB_OVERRIDE_... is set, the value from the config file is
-overridden with the value from the environment.
+overridden with the value from the environment. All config key characters
+outside of [0-9a-zA-Z] are replaced with _. Note that you can only
+override settings that exist in the config file, you can not create new settings.
 
 Example config file:
 
   BACKEND:
-    cfg_db: 'dbi:SQLite:dbname=/opt/running/cb.db'
+    cfg-db: 'dbi:SQLite:dbname=/opt/running/cb.db'
   LIST:
     - hello
     - world
     
 Example environment override:
     
-    export CB_CFG_OVERRIDE_BACKEND_CFG_DB='dbi:SQLite:dbname=/tmp/cb.db'
+    export CB_CFG_OVERRIDE_BACKEND_cfg_db='dbi:SQLite:dbname=/tmp/cb.db'
     export CB_CFG_OVERRIDE_LIST_0='goodbye'
 
 =cut
@@ -82,7 +84,7 @@ has cfgHash => sub ($self) {
     }
     my $cfg = $walker->($cfgRaw, sub ($path,$data) {
         my $env = 'CB_CFG_OVERRIDE'.$path;
-        $env =~ s/\//_/g;
+        $env =~ s/[^0-9a-zA-Z]/_/g;
         if (exists $ENV{$env} and my $override = $ENV{$env}) {
             $self->log->debug("overriding cfg $path ($data) with ENV \$$env ($override)");
             return $override;

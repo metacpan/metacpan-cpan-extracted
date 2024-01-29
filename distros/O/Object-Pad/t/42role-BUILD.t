@@ -5,7 +5,7 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 my @BUILD;
 my @ADJUST;
@@ -15,9 +15,11 @@ role ARole {
   ADJUST { push @ADJUST, "ARole" }
 }
 
-class AClass :does(ARole) {
-  BUILD { push @BUILD, "AClass" }
-  ADJUST { push @ADJUST, "AClass" }
+class AClass {
+   apply ARole;
+
+   BUILD { push @BUILD, "AClass" }
+   ADJUST { push @ADJUST, "AClass" }
 }
 
 {
@@ -33,8 +35,11 @@ class AClass :does(ARole) {
       'Roles are adjusted before their implementing classes' );
 }
 
-class BClass :isa(AClass) :does(ARole) {
-  BUILD { push @BUILD, "BClass" }
+class BClass {
+   inherit AClass;
+   apply ARole;
+
+   BUILD { push @BUILD, "BClass" }
 }
 
 {

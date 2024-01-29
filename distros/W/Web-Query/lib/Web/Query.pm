@@ -1,7 +1,7 @@
 package Web::Query;
 our $AUTHORITY = 'cpan:TOKUHIROM';
 # ABSTRACT: Yet another scraping library like jQuery
-$Web::Query::VERSION = '1.00';
+$Web::Query::VERSION = '1.01';
 use strict;
 use warnings;
 use 5.008001;
@@ -727,7 +727,7 @@ Web::Query - Yet another scraping library like jQuery
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -744,7 +744,7 @@ version 1.00
 
 Web::Query is a yet another scraping framework, have a jQuery like interface.
 
-Yes, I know Ingy's L<pQuery>. But it's just a alpha quality. It doesn't works.
+Yes, I know Ingy's L<pQuery>. But it's just alpha quality. It doesn't work.
 Web::Query built at top of the CPAN modules, L<HTML::TreeBuilder::XPath>, L<LWP::UserAgent>, and L<HTML::Selector::XPath>.
 
 So, this module uses L<HTML::Selector::XPath> and only supports the CSS 3

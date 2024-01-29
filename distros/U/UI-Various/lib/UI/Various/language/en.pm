@@ -74,7 +74,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 #########################################################################
 
@@ -181,6 +181,8 @@ our %T =
      => "parameter '%s' must be a positive integer",
      parameter__1_must_be_a_positive_integer_in_call_to__2__3
      => "parameter '%s' must be a positive integer in call to %s::%s",
+     parameter__1_must_be_a_valid_colour
+     => "parameter '%s' must be a valid colour (basic colour or hex-code)",
      parameter__1_must_be_in__2__3
      => "parameter '%s' must be in [%s..%s]",
      reset_directory_invalid_symbolic_link

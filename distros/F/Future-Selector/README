@@ -222,6 +222,12 @@ METHODS
     Remember that since this method itself returns a future, it could
     easily serve as the input to another outer-level selector instance.
 
+TODO
+
+      * Convenience ->add_f / ->add_gen
+
+      * Configurable behaviour on component future failure
+
 AUTHOR
 
     Paul Evans <leonerd@leonerd.org.uk>

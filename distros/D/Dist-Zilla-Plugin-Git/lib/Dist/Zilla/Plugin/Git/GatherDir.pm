@@ -9,7 +9,7 @@
 package Dist::Zilla::Plugin::Git::GatherDir;
 # ABSTRACT: Gather all tracked files in a Git working directory
 
-our $VERSION = '2.048';
+our $VERSION = '2.049';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::GatherDir' => { -version => 4.200016 }; # exclude_match
@@ -52,31 +52,21 @@ extends 'Dist::Zilla::Plugin::GatherDir' => { -version => 4.200016 }; # exclude_
 #pod
 #pod =cut
 
-use List::Util 1.45 qw(uniq);
+use List::Util 1.45 qw(uniq any);
 use Types::Standard 'Bool';
 
 use namespace::autoclean;
 
+#pod =head1 ATTRIBUTES
+#pod
+#pod This plugin inherits attributes from L<Dist::Zilla::Plugin::GatherDir>, with the following
+#pod modifications:
+#pod
 #pod =attr root
 #pod
-#pod This is the directory in which to look for files.  If not given, it defaults to
-#pod the dist root -- generally, the place where your F<dist.ini> or other
-#pod configuration file is located.  It may begin with C<~> (or C<~user>)
-#pod to mean your (or some other user's) home directory.  If a relative path,
-#pod it's relative to the dist root.  It does not need to be the root of a
+#pod See L<Dist::Zilla::Plugin::GatherDir/root>.
+#pod It does not need to be the root of a
 #pod Git repository, but it must be inside a repository.
-#pod
-#pod =attr prefix
-#pod
-#pod This parameter can be set to gather all the files found under a common
-#pod directory.  See the L<description|DESCRIPTION> above for an example.
-#pod
-#pod =attr include_dotfiles
-#pod
-#pod By default, files will not be included if they begin with a dot.  This goes
-#pod both for files and for directories relative to the C<root>.
-#pod
-#pod In almost all cases, the default value (false) is correct.
 #pod
 #pod =attr include_untracked
 #pod
@@ -111,17 +101,6 @@ use namespace::autoclean;
 #pod
 #pod Files which are symlinks are always gathered.
 #pod
-#pod =attr exclude_filename
-#pod
-#pod To exclude certain files from being gathered, use the C<exclude_filename>
-#pod option. This may be used multiple times to specify multiple files to exclude.
-#pod
-#pod =attr exclude_match
-#pod
-#pod This is just like C<exclude_filename> but provides a regular expression
-#pod pattern.  Files matching the pattern are not gathered.  This may be used
-#pod multiple times to specify multiple patterns to exclude.
-#pod
 #pod =cut
 
 has include_untracked => (
@@ -142,10 +121,10 @@ around dump_config => sub
         blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
     };
 
-    foreach my $opt (qw(prune_directory follow_symlinks)) {
-      $self->log('WARNING: unused config variable "'.$opt.'"') if exists $config->{+__PACKAGE__}{$opt};
-      delete $config->{+__PACKAGE__}{$opt};
-    }
+    $self->log('WARNING: unused config variable "follow_symlinks"')
+      if $config->{'Dist::Zilla::Plugin::GatherDir'}{follow_symlinks};
+
+    delete @{$config->{'Dist::Zilla::Plugin::GatherDir'}}{qw(follow_symlinks)};
 
     return $config;
 };
@@ -191,6 +170,14 @@ override gather_files => sub {
 
     next if $file =~ $exclude_regex;
     next if $is_excluded{ $file };
+
+    # skip if any directory in the path matches a 'prune_directory' regex.
+    my @dirs = split /\//, $file->dirname;
+    next if any {
+      my $pd = $_;
+      any { $_ =~ $pd } @dirs;
+    }
+    @{ $self->prune_directory };
 
     # DZil can't gather directory symlinks
     my $path = $root->child($file);
@@ -243,7 +230,7 @@ Dist::Zilla::Plugin::Git::GatherDir - Gather all tracked files in a Git working 
 
 =head1 VERSION
 
-version 2.048
+version 2.049
 
 =head1 SYNOPSIS
 
@@ -283,26 +270,14 @@ files into a subdir of your dist, you might write:
 
 =head1 ATTRIBUTES
 
+This plugin inherits attributes from L<Dist::Zilla::Plugin::GatherDir>, with the following
+modifications:
+
 =head2 root
 
-This is the directory in which to look for files.  If not given, it defaults to
-the dist root -- generally, the place where your F<dist.ini> or other
-configuration file is located.  It may begin with C<~> (or C<~user>)
-to mean your (or some other user's) home directory.  If a relative path,
-it's relative to the dist root.  It does not need to be the root of a
+See L<Dist::Zilla::Plugin::GatherDir/root>.
+It does not need to be the root of a
 Git repository, but it must be inside a repository.
-
-=head2 prefix
-
-This parameter can be set to gather all the files found under a common
-directory.  See the L<description|DESCRIPTION> above for an example.
-
-=head2 include_dotfiles
-
-By default, files will not be included if they begin with a dot.  This goes
-both for files and for directories relative to the C<root>.
-
-In almost all cases, the default value (false) is correct.
 
 =head2 include_untracked
 
@@ -336,17 +311,6 @@ a second instance of GatherDir or Git::GatherDir with appropriate
 C<root> and C<prefix> options.
 
 Files which are symlinks are always gathered.
-
-=head2 exclude_filename
-
-To exclude certain files from being gathered, use the C<exclude_filename>
-option. This may be used multiple times to specify multiple files to exclude.
-
-=head2 exclude_match
-
-This is just like C<exclude_filename> but provides a regular expression
-pattern.  Files matching the pattern are not gathered.  This may be used
-multiple times to specify multiple patterns to exclude.
 
 =for Pod::Coverage gather_dir
     gather_files

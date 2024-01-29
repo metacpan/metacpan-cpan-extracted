@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetCellRequest.name : Document name.  ,
+# GetWorksheetCellRequest.name : The file name.  ,
 # GetWorksheetCellRequest.sheetName : The worksheet name.  ,
 # GetWorksheetCellRequest.cellOrMethodName : The cell`s or method name. (Method name like firstcell, endcell etc.)  ,
-# GetWorksheetCellRequest.folder : Document`s folder.  ,
-# GetWorksheetCellRequest.storageName : Storage name.   
+# GetWorksheetCellRequest.folder : The folder where the file is situated.  ,
+# GetWorksheetCellRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_cell' } = { 
-    	summary => 'Gets cell data by cell or method name in worksheet.',
+    	summary => 'Retrieve cell data using either cell reference or method name in the worksheet.',
         params => $params,
         returns => 'string',
     };
@@ -137,7 +137,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'Document name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -158,14 +158,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Document`s folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

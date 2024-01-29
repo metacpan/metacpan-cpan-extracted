@@ -12,7 +12,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-10-21'; # DATE
 our $DIST = 'App-GnuplotUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/GnuplotUtils/xyplot",
@@ -38,7 +38,7 @@ xyplot - Plot XY dataset(s) using gnuplot
 
 =head1 VERSION
 
-This document describes version 0.005 of xyplot (from Perl distribution App-GnuplotUtils), released on 2023-10-21.
+This document describes version 0.006 of xyplot (from Perl distribution App-GnuplotUtils), released on 2023-10-21.
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ B<xyplot> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|
 
 B<xyplot> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<xyplot> [B<L<--chart-title|/"--chart-title=s">>=I<str>] [(B<L<--dataset-data|/"--dataset-datas-json=s">>=I<str>)+|B<L<--dataset-datas-json|/"--dataset-datas-json=s">>=I<json>] [(B<L<--dataset-file|/"--dataset-files-json=s">>=I<L<filename|Sah::Schema::filename>>)+|B<L<--dataset-files-json|/"--dataset-files-json=s">>=I<json>] [(B<L<--dataset-style|/"--dataset-styles-json=s">>=I<str>)+|B<L<--dataset-styles-json|/"--dataset-styles-json=s">>=I<json>] [(B<L<--dataset-title|/"--dataset-titles-json=s">>=I<str>)+|B<L<--dataset-titles-json|/"--dataset-titles-json=s">>=I<json>] [B<L<--field-delimiter|/"--field-delimiter=s, -d">>=I<str>|B<L<-d|/"--field-delimiter=s, -d">>=I<str>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--output-file|/"--output-file=s, -o">>=I<L<filename|Sah::Schema::filename>>|B<L<-o|/"--output-file=s, -o">>=I<L<filename|Sah::Schema::filename>>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<dataset_file|/"--dataset-files-json=s">>] ...
+B<xyplot> [B<L<--chart-title|/"--chart-title=s">>=I<str>] [(B<L<--dataset-data|/"--dataset-datas-json=s">>=I<str>)+|B<L<--dataset-datas-json|/"--dataset-datas-json=s">>=I<json>] [(B<L<--dataset-file|/"--dataset-files-json=s">>=I<L<filename|Sah::Schema::filename>>)+|B<L<--dataset-files-json|/"--dataset-files-json=s">>=I<json>] [(B<L<--dataset-style|/"--dataset-styles-json=s">>=I<str>)+|B<L<--dataset-styles-json|/"--dataset-styles-json=s">>=I<json>] [(B<L<--dataset-title|/"--dataset-titles-json=s">>=I<str>)+|B<L<--dataset-titles-json|/"--dataset-titles-json=s">>=I<json>] [B<L<--field-delimiter|/"--field-delimiter=s, -d">>=I<str>|B<L<-d|/"--field-delimiter=s, -d">>=I<str>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--output-file|/"--output-file=s, -o">>=I<L<filename|Sah::Schema::filename>>|B<L<-o|/"--output-file=s, -o">>=I<L<filename|Sah::Schema::filename>>] [B<L<--output-format|/"--output-format=s">>=I<str>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<dataset_file|/"--dataset-files-json=s">>] ...
 
 =head1 DESCRIPTION
 
@@ -102,6 +102,25 @@ C<xyplot> uses L<Desktop::Open> to view the resulting plot. The module will
 first find a suitable application, and failing that will use the web browser. If
 you specify C<--output-file> (C<-o>), the plot is written to the specified image
 file.
+
+To see in a viewer program or browser and set the image format:
+
+ % xyplot --output-format svg ...
+
+If you want to use to force the browser:
+
+ % PERL_DESKTOP_OPEN_USE_BROWSER=1 xyplot ...
+
+If you want to set the program to use to open:
+
+ % PERL_DESKTOP_OPEN_PROGRAM=google-chrome xyplot --output-format svg ...
+
+B<Tips & Tricks>
+
+B<CSV format.> If you have your data in CSV format, you can use
+L<csv-unquote> to make sure your numbers are not quoted with double quotes,
+or you can use L<csv2tsv> to convert your CSV to TSV first. Both utilities
+are included in L<App::CSVUtils>.
 
 B<Keywords>
 
@@ -175,6 +194,21 @@ See C<--dataset-title>.
 =item B<--field-delimiter>=I<s>, B<-d>
 
 Supply field delimiter character in dataset file instead of the default whitespace(s) or comma(s).
+
+=item B<--output-format>=I<s>
+
+Default value:
+
+ "png"
+
+Valid values:
+
+ ["bmp","gif","jpg","png","webp","pdf","ps","svg"]
+
+The output format is normally determined from the output filename's extension,
+e.g. C<foo.jpg>. This option is for when you do not specify output filename and
+want to change the format from the default C<png>.
+
 
 =back
 

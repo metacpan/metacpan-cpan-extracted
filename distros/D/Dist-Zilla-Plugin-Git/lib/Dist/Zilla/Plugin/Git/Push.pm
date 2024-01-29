@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::Plugin::Git::Push;
 # ABSTRACT: Push current branch
 
-our $VERSION = '2.048';
+our $VERSION = '2.049';
 
 use Moose;
 use MooseX::Has::Sugar;
@@ -122,7 +122,7 @@ Dist::Zilla::Plugin::Git::Push - Push current branch
 
 =head1 VERSION
 
-version 2.048
+version 2.049
 
 =head1 SYNOPSIS
 

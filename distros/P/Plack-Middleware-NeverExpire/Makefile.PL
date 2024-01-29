@@ -21,8 +21,6 @@ our %META = (
 				Plack 0.9942
 				Plack::Middleware 0
 				Plack::Util 0
-				Time::Piece 0
-				Time::Seconds 0
 			)},
 		},
 		test => {

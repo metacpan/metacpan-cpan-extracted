@@ -2,7 +2,7 @@ NAME
     App::GnuplotUtils - Utilities related to plotting data using gnuplot
 
 VERSION
-    This document describes version 0.005 of App::GnuplotUtils (from Perl
+    This document describes version 0.006 of App::GnuplotUtils (from Perl
     distribution App-GnuplotUtils), released on 2023-10-21.
 
 DESCRIPTION
@@ -72,6 +72,25 @@ FUNCTIONS
     browser. If you specify "--output-file" ("-o"), the plot is written to
     the specified image file.
 
+    To see in a viewer program or browser and set the image format:
+
+     % xyplot --output-format svg ...
+
+    If you want to use to force the browser:
+
+     % PERL_DESKTOP_OPEN_USE_BROWSER=1 xyplot ...
+
+    If you want to set the program to use to open:
+
+     % PERL_DESKTOP_OPEN_PROGRAM=google-chrome xyplot --output-format svg ...
+
+    Tips & Tricks
+
+    CSV format. If you have your data in CSV format, you can use csv-unquote
+    to make sure your numbers are not quoted with double quotes, or you can
+    use csv2tsv to convert your CSV to TSV first. Both utilities are
+    included in App::CSVUtils.
+
     Keywords
 
     xychart, XY chart, XY plot
@@ -108,6 +127,13 @@ FUNCTIONS
     *   output_file => *filename*
 
         (No description)
+
+    *   output_format => *str* (default: "png")
+
+        The output format is normally determined from the output filename's
+        extension, e.g. "foo.jpg". This option is for when you do not
+        specify output filename and want to change the format from the
+        default "png".
 
     *   overwrite => *bool*
 

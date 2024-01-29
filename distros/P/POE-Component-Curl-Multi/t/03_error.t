@@ -27,7 +27,7 @@ sub client_start {
   DEBUG and warn "client starting...\n";
 
   my $secure_request = GET(
-    'http://completely.made.up.url.bogus/',
+    'http://completely.made.up.url.bogus./',
     Connection => 'close',
   );
   $kernel->post(

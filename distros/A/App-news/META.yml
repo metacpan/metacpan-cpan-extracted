@@ -20,9 +20,9 @@ no_index:
 requires:
   DateTime::Format::Mail: '0'
   Modern::Perl: '1.20180701'
-  Mojolicious: '0'
+  Mojolicious: '9'
   perl: '5.026000'
 resources:
   repository: https://alexschroeder.ch/cgit/news
-version: 1.07
+version: 1.09
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

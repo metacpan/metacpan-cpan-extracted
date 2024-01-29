@@ -1,12 +1,12 @@
 package Locale::CLDR::RegionContainment;
 # This file auto generated from Data.xml
-#	on Tue  5 Dec 12:58:59 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -52,7 +52,7 @@ has 'region_contains' => (
 		'155' => [ qw( AT BE CH DE FR LI LU MC NL ) ], 
 		'202' => [ qw( 011 017 014 018 ) ], 
 		'419' => [ qw( 013 029 005 ) ], 
-		'EU' => [ qw( AT BE CY CZ DE DK EE ES FI FR GB GR HR HU IE IT LT LU LV MT NL PL PT SE SI SK BG RO ) ], 
+		'EU' => [ qw( AT BE CY CZ DE DK EE ES FI FR GR HR HU IE IT LT LU LV MT NL PL PT SE SI SK BG RO ) ], 
 		'EZ' => [ qw( AT BE CY DE EE ES FI FR GR IE IT LT LU LV MT NL PT SI SK ) ], 
 		'QO' => [ qw( AQ AC CP DG TA ) ], 
 		'UN' => [ qw( AD AE AF AG AL AM AO AR AT AU AZ BA BB BD BE BF BG BH BI BJ BN BO BR BS BT BW BY BZ CA CD CF CG CH CI CL CM CN CO CR CU CV CY CZ DE DJ DK DM DO DZ EC EE EG ER ES ET FI FJ FM FR GA GB GD GE GH GM GN GQ GR GT GW GY HN HR HT HU ID IE IL IN IQ IR IS IT JM JO JP KE KG KH KI KM KN KP KR KW KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MG MH MK ML MM MN MR MT MU MV MX MW MY MZ NA NE NG NI NL NO NR NP NZ OM PA PE PG PH PK PL PT PW PY QA RO RS RU RW SA SB SC SD SE SG SI SK SL SM SN SO SR SS ST SV SY SZ TD TG TH TJ TL TM TN TO TR TT TV TZ UA UG US UY UZ VC VE VN VU WS YE ZA ZM ZW ) ], 

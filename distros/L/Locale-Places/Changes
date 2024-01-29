@@ -1,5 +1,10 @@
 Revision history for Locale::Places
 
+0.09	Mon Jan  8 15:11:04 EST 2024
+	Added US places
+	Latest DB.pm from NJH-Snippets
+	Change the mode of the cachedir to 2755
+
 0.08	Tue Sep 19 11:19:41 EDT 2023
 	New URL for GB.zip
 	Look into http://www.cpantesters.org/cpan/report/a03259ca-6c02-1014-bd5e-9b11492b42cd

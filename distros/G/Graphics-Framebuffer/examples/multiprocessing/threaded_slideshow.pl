@@ -7,7 +7,7 @@ use strict;
 use threads (
     'yield',
     'stringify',
-    'stack_size' => 131076, # No need for a large stack
+    'stack_size' => 131076,           # No need for a large stack
     'exit'       => 'threads_only',
 );
 use threads::shared;
@@ -23,8 +23,8 @@ use File::Basename;
 # use Data::Dumper::Simple; $Data::Dumper::Sortkeys = 1; $Data::Dumper::Purity = 1; $Data::Dumper::Deepcopy = 1;
 
 BEGIN {
-	our $VERSION = '2.00';
-};
+    our $VERSION = '2.00';
+}
 
 my $errors           = FALSE;
 my $auto             = FALSE;
@@ -41,24 +41,24 @@ my $RUNNING : shared = TRUE;
 my $default_path     = '../';
 my $new_x;
 my $new_y;
-our $GO : shared     = FALSE;
+our $GO : shared = FALSE;
 
 GetOptions(
-    'auto'         => \$auto,
-    'errors'       => \$errors,
-    'showall|all'  => \$showall,
-    'help'         => \$help,
-    'delay|wait=i' => \$delay,
-    'heads=i'      => \$heads,
-    'noaccel'      => \$noaccel,
-    'threads=i'    => \$threads,
-    'names'        => \$show_names,
-	'ignore-x-windows' => \$ignore_x,
+    'auto'             => \$auto,
+    'errors'           => \$errors,
+    'showall|all'      => \$showall,
+    'help'             => \$help,
+    'delay|wait=i'     => \$delay,
+    'heads=i'          => \$heads,
+    'noaccel'          => \$noaccel,
+    'threads=i'        => \$threads,
+    'names'            => \$show_names,
+    'ignore-x-windows' => \$ignore_x,
 );
 my @paths : shared = @ARGV;
 
 unless (scalar(@paths) && !$help) {
-    push(@paths,$default_path);
+    push(@paths, $default_path);
 }
 
 if ($help) {
@@ -73,16 +73,16 @@ our @fb;
 
 # Look for all of the framebuffers
 foreach my $dev (0 .. 31) {
-    foreach my $path ('fb','graphics/fb') {
+    foreach my $path ('fb', 'graphics/fb') {
         if (-e "/dev/$path$dev") {
-            push(@devs,"/dev/$path$dev");
+            push(@devs, "/dev/$path$dev");
         }
         last if (scalar(@devs) >= $heads);
-    }
+    } ## end foreach my $path ('fb', 'graphics/fb')
     last if (scalar(@devs) >= $heads);
-}
+} ## end foreach my $dev (0 .. 31)
 
-$SIG{'QUIT'} = $SIG{'INT'}  = $SIG{'KILL'} = $SIG{'TERM'} = $SIG{'HUP'} = \&finish;
+$SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'TERM'} = $SIG{'HUP'} = \&finish;
 
 my $p = gather(@paths);
 
@@ -96,7 +96,7 @@ if ($errors) {
         NOSPLASH        = $nosplash
         CPU             = }, Sys::CPU::cpu_type(), qq{
         THREADS         = $threads
-        DEVICES         = }, join(', ',@devs), qq{
+        DEVICES         = }, join(', ', @devs),  qq{
         PATH(s)         = }, join('; ', @paths), "\n";
 
     sleep 5;
@@ -105,7 +105,7 @@ if ($errors) {
 my @thrd;
 
 $threads /= scalar(@devs);
-$threads = min(20,$threads); # enforce a 20 thread hard limit
+$threads = min(20, $threads);    # enforce a 20 thread hard limit
 
 # Run the slides in threads and have the main thread do housekeeping.
 my $showit = $splash;
@@ -113,11 +113,11 @@ my @params;
 for (my $t = 0; $t < $threads; $t++) {
     foreach my $f (@devs) {
         $params[$t] = (defined($new_x)) ? [$f, $p, $threads, $t, $showit, $delay, $new_x, $new_y] : [$f, $p, $threads, $t, $showit, $delay, $show_names];
-        $thrd[$t] = threads->create({'context' => 'scalar'}, \&show, @{ $params[$t] });
+        $thrd[$t]   = threads->create({ 'context' => 'scalar' }, \&show, @{ $params[$t] });
     }
     sleep $showit if ($showit);
     $showit = FALSE;
-}
+} ## end for (my $t = 0; $t < $threads...)
 
 while ($RUNNING) {    # Monitors the running threads and restores them if one dies
     my $num = scalar(threads::list(threads::running));
@@ -126,15 +126,15 @@ while ($RUNNING) {    # Monitors the running threads and restores them if one di
             if ($RUNNING) {
                 unless ($thrd[$t]->is_running()) {
                     eval { $thrd[$t]->kill('KILL')->detach(); };
-                    $thrd[$t] = threads->create({'context' => 'scalar'}, \&show, @{ $params[$t] });
+                    $thrd[$t] = threads->create({ 'context' => 'scalar' }, \&show, @{ $params[$t] });
                 }
-            }
-        }
+            } ## end if ($RUNNING)
+        } ## end for (my $t = 0; $t < $threads...)
     } elsif ($RUNNING) {
         threads->yield();
         sleep .01;
     }
-}
+} ## end while ($RUNNING)
 
 while (threads->list()) {
     foreach my $thrd (threads->list(threads::joinable)) {
@@ -142,7 +142,7 @@ while (threads->list()) {
     }
     threads->yield();
     sleep .01;
-}
+} ## end while (threads->list())
 
 exec('reset');
 
@@ -195,291 +195,292 @@ sub calculate_window {
     my $height  = shift;
 
     my $cr = [
-        [ # 1
-            [0,0,$width,$height],
+        [    # 1
+            [0, 0, $width, $height],
         ],
-        [ # 2 2x0
-            [0,0,($width/2),$height],
-            [($width/2),0,($width/2),$height],
+        [    # 2 2x0
+            [0,            0, ($width / 2), $height],
+            [($width / 2), 0, ($width / 2), $height],
         ],
-        [ # 3 3x0
-            [0,0,($width/3),$height],
-            [($width/3),0,($width/3),$height],
-            [(2 * ($width/3)), 0, ($width/3), $height ],
+        [    # 3 3x0
+            [0,                  0, ($width / 3), $height],
+            [($width / 3),       0, ($width / 3), $height],
+            [(2 * ($width / 3)), 0, ($width / 3), $height],
         ],
-        [ # 4 2x2
-            [0,0,($width/2),($height/2)],
-            [($width/2),0,($width/2),($height/2)],
+        [    # 4 2x2
+            [0,            0, ($width / 2), ($height / 2)],
+            [($width / 2), 0, ($width / 2), ($height / 2)],
 
-            [0,($height/2),($width/2),($height/2)],
-            [($width/2),($height/2),($width/2),($height/2)],
+            [0, ($height / 2), ($width / 2), ($height / 2)],
+            [($width / 2), ($height / 2), ($width / 2), ($height / 2)],
         ],
-        [ # 5 3x2
-            [0,0,($width/3),($height/2)],
-            [($width/3),0,($width/3),($height/2)],
-            [(2 * ($width/3)),0,($width/3),($height/2)],
+        [    # 5 3x2
+            [0,                  0, ($width / 3), ($height / 2)],
+            [($width / 3),       0, ($width / 3), ($height / 2)],
+            [(2 * ($width / 3)), 0, ($width / 3), ($height / 2)],
 
-            [0,($height/2),($width/2),($height/2)],
-            [($width/2),($height/2),($width/2),($height/2)],
+            [0, ($height / 2), ($width / 2), ($height / 2)],
+            [($width / 2), ($height / 2), ($width / 2), ($height / 2)],
         ],
-        [ # 6 3x3
-            [0,0,($width/3),($height/2)],
-            [($width/3),0,($width/3),($height/2)],
-            [( 2 * ($width/3)), 0, ($width/3), ($height/2)],
+        [    # 6 3x3
+            [0,                  0, ($width / 3), ($height / 2)],
+            [($width / 3),       0, ($width / 3), ($height / 2)],
+            [(2 * ($width / 3)), 0, ($width / 3), ($height / 2)],
 
-            [0,($height/2),($width/3),($height/2)],
-            [($width/3),($height/2),($width/3),($height/2)],
-            [(2 * ($width/3)),($height/2),($width/3),($height/2)],
+            [0, ($height / 2), ($width / 3), ($height / 2)],
+            [($width / 3), ($height / 2), ($width / 3), ($height / 2)],
+            [(2 * ($width / 3)), ($height / 2), ($width / 3), ($height / 2)],
         ],
-        [ # 7 4x3
-            [0, 0, ($width/4), ($height/2)],
-            [($width/4), 0, ($width/4), ($height/2)],
-            [(2 * ($width/4)), 0, ($width/4), ($height/2)],
-            [(3 * ($width/4)), 0, ($width/4), ($height/2)],
+        [    # 7 4x3
+            [0,                  0, ($width / 4), ($height / 2)],
+            [($width / 4),       0, ($width / 4), ($height / 2)],
+            [(2 * ($width / 4)), 0, ($width / 4), ($height / 2)],
+            [(3 * ($width / 4)), 0, ($width / 4), ($height / 2)],
 
-            [0,($height/2),($width/3),($height/2)],
-            [($width/3),($height/2),($width/3),($height/2)],
-            [(2 * ($width/3)), ($height/2), ($width/3)],
+            [0, ($height / 2), ($width / 3), ($height / 2)],
+            [($width / 3), ($height / 2), ($width / 3), ($height / 2)],
+            [(2 * ($width / 3)), ($height / 2), ($width / 3)],
         ],
-        [ # 8 4x4
-            [0, 0, ($width/4), ($height/2)],
-            [($width/4), 0, ($width/4), ($height/2)],
-            [(2 * ($width/4)), 0, ($width/4), ($height/2)],
-            [(3 * ($width/4)), 0, ($width/4), ($height/2)],
+        [    # 8 4x4
+            [0,                  0, ($width / 4), ($height / 2)],
+            [($width / 4),       0, ($width / 4), ($height / 2)],
+            [(2 * ($width / 4)), 0, ($width / 4), ($height / 2)],
+            [(3 * ($width / 4)), 0, ($width / 4), ($height / 2)],
 
-            [0, ($height/2), ($width/4), ($height/2)],
-            [($width/4), ($height/2), ($width/4), ($height/2)],
-            [(2 * ($width/4)), ($height/2), ($width/4), ($height/2)],
-            [(3 * ($width/4)), ($height/2), ($width/4), ($height/2)],
+            [0, ($height / 2), ($width / 4), ($height / 2)],
+            [($width / 4), ($height / 2), ($width / 4), ($height / 2)],
+            [(2 * ($width / 4)), ($height / 2), ($width / 4), ($height / 2)],
+            [(3 * ($width / 4)), ($height / 2), ($width / 4), ($height / 2)],
         ],
-        [ # 9 5x4
-            [0, 0, ($width/5), ($height/2)],
-            [($width/5), 0, ($width/5), ($height/2)],
-            [(2 * ($width/5)), 0, ($width/5), ($height/2)],
-            [(3 * ($width/5)), 0, ($width/5), ($height/2)],
-            [(4 * ($width/5)), 0, ($width/5), ($height/2)],
+        [    # 9 5x4
+            [0,                  0, ($width / 5), ($height / 2)],
+            [($width / 5),       0, ($width / 5), ($height / 2)],
+            [(2 * ($width / 5)), 0, ($width / 5), ($height / 2)],
+            [(3 * ($width / 5)), 0, ($width / 5), ($height / 2)],
+            [(4 * ($width / 5)), 0, ($width / 5), ($height / 2)],
 
-            [0, ($height/2), ($width/4), ($height/2)],
-            [($width/4), ($height/2), ($width/4), ($height/2)],
-            [(2 * ($width/4)), ($height/2), ($width/4), ($height/2)],
-            [(3 * ($width/4)), ($height/2), ($width/4), ($height/2)],
+            [0, ($height / 2), ($width / 4), ($height / 2)],
+            [($width / 4), ($height / 2), ($width / 4), ($height / 2)],
+            [(2 * ($width / 4)), ($height / 2), ($width / 4), ($height / 2)],
+            [(3 * ($width / 4)), ($height / 2), ($width / 4), ($height / 2)],
         ],
-        [ # 10 5x5
-            [0, 0, ($width/5), ($height/2)],
-            [($width/5), 0, ($width/5), ($height/2)],
-            [(2 * ($width/5)), 0, ($width/5), ($height/2)],
-            [(3 * ($width/5)), 0, ($width/5), ($height/2)],
-            [(4 * ($width/5)), 0, ($width/5), ($height/2)],
+        [    # 10 5x5
+            [0,                  0, ($width / 5), ($height / 2)],
+            [($width / 5),       0, ($width / 5), ($height / 2)],
+            [(2 * ($width / 5)), 0, ($width / 5), ($height / 2)],
+            [(3 * ($width / 5)), 0, ($width / 5), ($height / 2)],
+            [(4 * ($width / 5)), 0, ($width / 5), ($height / 2)],
 
-            [0, ($height/2), ($width/5), ($height/2)],
-            [($width/5), ($height/2), ($width/5), ($height/2)],
-            [(2 * ($width/5)), ($height/2), ($width/5), ($height/2)],
-            [(3 * ($width/5)), ($height/2), ($width/5), ($height/2)],
-            [(4 * ($width/5)), ($height/2), ($width/5), ($height/2)],
+            [0, ($height / 2), ($width / 5), ($height / 2)],
+            [($width / 5), ($height / 2), ($width / 5), ($height / 2)],
+            [(2 * ($width / 5)), ($height / 2), ($width / 5), ($height / 2)],
+            [(3 * ($width / 5)), ($height / 2), ($width / 5), ($height / 2)],
+            [(4 * ($width / 5)), ($height / 2), ($width / 5), ($height / 2)],
         ],
-        [ # 11 4x4x3
-            [0, 0, ($width/4), ($height/3)],
-            [($width/4), 0, ($width/4), ($height/3)],
-            [(2 * ($width/4)), 0, ($width/4), ($height/3)],
-            [(3 * ($width/4)), 0, ($width/4), ($height/3)],
+        [    # 11 4x4x3
+            [0,                  0, ($width / 4), ($height / 3)],
+            [($width / 4),       0, ($width / 4), ($height / 3)],
+            [(2 * ($width / 4)), 0, ($width / 4), ($height / 3)],
+            [(3 * ($width / 4)), 0, ($width / 4), ($height / 3)],
 
-            [0, ($height/3), ($width/4), ($height/3)],
-            [($width/4), ($height/3), ($width/4), ($height/3)],
-            [(2 * ($width/4)), ($height/3), ($width/4), ($height/3)],
-            [(3 * ($width/4)), ($height/3), ($width/4), ($height/3)],
+            [0, ($height / 3), ($width / 4), ($height / 3)],
+            [($width / 4), ($height / 3), ($width / 4), ($height / 3)],
+            [(2 * ($width / 4)), ($height / 3), ($width / 4), ($height / 3)],
+            [(3 * ($width / 4)), ($height / 3), ($width / 4), ($height / 3)],
 
-            [0, (2 * ($height/3)), ($width/3), ($height/3)],
-            [($width/3), (2 * ($height/3)), ($width/3), ($height/3)],
-            [(2 * ($width/3)), (2 * ($height/3)), ($width/3), ($height/3)],
+            [0, (2 * ($height / 3)), ($width / 3), ($height / 3)],
+            [($width / 3), (2 * ($height / 3)), ($width / 3), ($height / 3)],
+            [(2 * ($width / 3)), (2 * ($height / 3)), ($width / 3), ($height / 3)],
         ],
-        [ # 12 4x4x4
-            [0, 0, ($width/4),($height/3)],
-            [($width/4), 0, ($width/4),($height/3)],
-            [(2 * ($width/4)), 0, ($width/4),($height/3)],
-            [(3 * ($width/4)), 0, ($width/4),($height/3)],
+        [    # 12 4x4x4
+            [0,                  0, ($width / 4), ($height / 3)],
+            [($width / 4),       0, ($width / 4), ($height / 3)],
+            [(2 * ($width / 4)), 0, ($width / 4), ($height / 3)],
+            [(3 * ($width / 4)), 0, ($width / 4), ($height / 3)],
 
-            [0, ($height/3), ($width/4),($height/3)],
-            [($width/4), ($height/3), ($width/4),($height/3)],
-            [(2 * ($width/4)), ($height/3), ($width/4),($height/3)],
-            [(3 * ($width/4)), ($height/3), ($width/4),($height/3)],
+            [0, ($height / 3), ($width / 4), ($height / 3)],
+            [($width / 4), ($height / 3), ($width / 4), ($height / 3)],
+            [(2 * ($width / 4)), ($height / 3), ($width / 4), ($height / 3)],
+            [(3 * ($width / 4)), ($height / 3), ($width / 4), ($height / 3)],
 
-            [0, (2 * ($height/3)), ($width/4),($height/3)],
-            [($width/4), (2 * ($height/3)), ($width/4),($height/3)],
-            [(2 * ($width/4)), (2 * ($height/3)), ($width/4),($height/3)],
-            [(3 * ($width/4)), (2 * ($height/3)), ($width/4),($height/3)],
+            [0, (2 * ($height / 3)), ($width / 4), ($height / 3)],
+            [($width / 4), (2 * ($height / 3)), ($width / 4), ($height / 3)],
+            [(2 * ($width / 4)), (2 * ($height / 3)), ($width / 4), ($height / 3)],
+            [(3 * ($width / 4)), (2 * ($height / 3)), ($width / 4), ($height / 3)],
         ],
-        [ # 13 5x4x4
-            [0, 0, ($width/5),($height/3)],
-            [($width/5), 0, ($width/5),($height/3)],
-            [(2 * ($width/5)), 0, ($width/5),($height/3)],
-            [(3 * ($width/5)), 0, ($width/5),($height/3)],
-            [(4 * ($width/5)), 0, ($width/5),($height/3)],
+        [    # 13 5x4x4
+            [0,                  0, ($width / 5), ($height / 3)],
+            [($width / 5),       0, ($width / 5), ($height / 3)],
+            [(2 * ($width / 5)), 0, ($width / 5), ($height / 3)],
+            [(3 * ($width / 5)), 0, ($width / 5), ($height / 3)],
+            [(4 * ($width / 5)), 0, ($width / 5), ($height / 3)],
 
-            [0, ($height/3), ($width/4),($height/3)],
-            [($width/4), ($height/3), ($width/4),($height/3)],
-            [(2 * ($width/4)), ($height/3), ($width/4),($height/3)],
-            [(3 * ($width/4)), ($height/3), ($width/4),($height/3)],
+            [0, ($height / 3), ($width / 4), ($height / 3)],
+            [($width / 4), ($height / 3), ($width / 4), ($height / 3)],
+            [(2 * ($width / 4)), ($height / 3), ($width / 4), ($height / 3)],
+            [(3 * ($width / 4)), ($height / 3), ($width / 4), ($height / 3)],
 
-            [0, (2 * ($height/3)), ($width/4),($height/3)],
-            [($width/4), (2 * ($height/3)), ($width/4),($height/3)],
-            [(2 * ($width/4)), (2 * ($height/3)), ($width/4),($height/3)],
-            [(3 * ($width/4)), (2 * ($height/3)), ($width/4),($height/3)],
+            [0, (2 * ($height / 3)), ($width / 4), ($height / 3)],
+            [($width / 4), (2 * ($height / 3)), ($width / 4), ($height / 3)],
+            [(2 * ($width / 4)), (2 * ($height / 3)), ($width / 4), ($height / 3)],
+            [(3 * ($width / 4)), (2 * ($height / 3)), ($width / 4), ($height / 3)],
         ],
-        [ # 14 5x5x4
-            [0, 0, ($width/5),($height/3)],
-            [($width/5), 0, ($width/5),($height/3)],
-            [(2 * ($width/5)), 0, ($width/5),($height/3)],
-            [(3 * ($width/5)), 0, ($width/5),($height/3)],
-            [(4 * ($width/5)), 0, ($width/5),($height/3)],
+        [    # 14 5x5x4
+            [0,                  0, ($width / 5), ($height / 3)],
+            [($width / 5),       0, ($width / 5), ($height / 3)],
+            [(2 * ($width / 5)), 0, ($width / 5), ($height / 3)],
+            [(3 * ($width / 5)), 0, ($width / 5), ($height / 3)],
+            [(4 * ($width / 5)), 0, ($width / 5), ($height / 3)],
 
-            [0, ($height/3), ($width/5),($height/3)],
-            [($width/5), ($height/3), ($width/5),($height/3)],
-            [(2 * ($width/5)), ($height/3), ($width/5),($height/3)],
-            [(3 * ($width/5)), ($height/3), ($width/5),($height/3)],
-            [(4 * ($width/5)), ($height/3), ($width/5),($height/3)],
+            [0, ($height / 3), ($width / 5), ($height / 3)],
+            [($width / 5), ($height / 3), ($width / 5), ($height / 3)],
+            [(2 * ($width / 5)), ($height / 3), ($width / 5), ($height / 3)],
+            [(3 * ($width / 5)), ($height / 3), ($width / 5), ($height / 3)],
+            [(4 * ($width / 5)), ($height / 3), ($width / 5), ($height / 3)],
 
-            [0, (2 * ($height/3)), ($width/4),($height/3)],
-            [($width/4), (2 * ($height/3)), ($width/4),($height/3)],
-            [(2 * ($width/4)), (2 * ($height/3)), ($width/4),($height/3)],
-            [(3 * ($width/4)), (2 * ($height/3)), ($width/4),($height/3)],
+            [0, (2 * ($height / 3)), ($width / 4), ($height / 3)],
+            [($width / 4), (2 * ($height / 3)), ($width / 4), ($height / 3)],
+            [(2 * ($width / 4)), (2 * ($height / 3)), ($width / 4), ($height / 3)],
+            [(3 * ($width / 4)), (2 * ($height / 3)), ($width / 4), ($height / 3)],
         ],
-        [ # 15 5x5x5
-            [0, 0, ($width/5),($height/3)],
-            [($width/5), 0, ($width/5),($height/3)],
-            [(2 * ($width/5)), 0, ($width/5),($height/3)],
-            [(3 * ($width/5)), 0, ($width/5),($height/3)],
-            [(4 * ($width/5)), 0, ($width/5),($height/3)],
+        [    # 15 5x5x5
+            [0,                  0, ($width / 5), ($height / 3)],
+            [($width / 5),       0, ($width / 5), ($height / 3)],
+            [(2 * ($width / 5)), 0, ($width / 5), ($height / 3)],
+            [(3 * ($width / 5)), 0, ($width / 5), ($height / 3)],
+            [(4 * ($width / 5)), 0, ($width / 5), ($height / 3)],
 
-            [0, ($height/3), ($width/5),($height/3)],
-            [($width/5), ($height/3), ($width/5),($height/3)],
-            [(2 * ($width/5)), ($height/3), ($width/5),($height/3)],
-            [(3 * ($width/5)), ($height/3), ($width/5),($height/3)],
-            [(4 * ($width/5)), ($height/3), ($width/5),($height/3)],
+            [0, ($height / 3), ($width / 5), ($height / 3)],
+            [($width / 5), ($height / 3), ($width / 5), ($height / 3)],
+            [(2 * ($width / 5)), ($height / 3), ($width / 5), ($height / 3)],
+            [(3 * ($width / 5)), ($height / 3), ($width / 5), ($height / 3)],
+            [(4 * ($width / 5)), ($height / 3), ($width / 5), ($height / 3)],
 
-            [0, (2 * ($height/3)), ($width/5),($height/3)],
-            [($width/5), (2 * ($height/3)), ($width/5),($height/3)],
-            [(2 * ($width/5)), (2 * ($height/3)), ($width/5),($height/3)],
-            [(3 * ($width/5)), (2 * ($height/3)), ($width/5),($height/3)],
-            [(4 * ($width/5)), (2 * ($height/3)), ($width/5),($height/3)],
+            [0, (2 * ($height / 3)), ($width / 5), ($height / 3)],
+            [($width / 5), (2 * ($height / 3)), ($width / 5), ($height / 3)],
+            [(2 * ($width / 5)), (2 * ($height / 3)), ($width / 5), ($height / 3)],
+            [(3 * ($width / 5)), (2 * ($height / 3)), ($width / 5), ($height / 3)],
+            [(4 * ($width / 5)), (2 * ($height / 3)), ($width / 5), ($height / 3)],
         ],
-        [ # 16 4x4x4x4
-            [0, 0, ($width/4), ($height/4)],
-            [($width/4), 0, ($width/4), ($height/4)],
-            [(2 * ($width/4)), 0, ($width/4), ($height/4)],
-            [(3 * ($width/4)), 0, ($width/4), ($height/4)],
+        [    # 16 4x4x4x4
+            [0,                  0, ($width / 4), ($height / 4)],
+            [($width / 4),       0, ($width / 4), ($height / 4)],
+            [(2 * ($width / 4)), 0, ($width / 4), ($height / 4)],
+            [(3 * ($width / 4)), 0, ($width / 4), ($height / 4)],
 
-            [0, ($height/4), ($width/4), ($height/4)],
-            [($width/4), ($height/4), ($width/4), ($height/4)],
-            [(2 * ($width/4)), ($height/4), ($width/4), ($height/4)],
-            [(3 * ($width/4)), ($height/4), ($width/4), ($height/4)],
+            [0, ($height / 4), ($width / 4), ($height / 4)],
+            [($width / 4), ($height / 4), ($width / 4), ($height / 4)],
+            [(2 * ($width / 4)), ($height / 4), ($width / 4), ($height / 4)],
+            [(3 * ($width / 4)), ($height / 4), ($width / 4), ($height / 4)],
 
-            [0, (2 * ($height/4)), ($width/4), ($height/4)],
-            [($width/4), (2 * ($height/4)), ($width/4), ($height/4)],
-            [(2 * ($width/4)), (2 * ($height/4)), ($width/4), ($height/4)],
-            [(3 * ($width/4)), (2 * ($height/4)), ($width/4), ($height/4)],
+            [0, (2 * ($height / 4)), ($width / 4), ($height / 4)],
+            [($width / 4), (2 * ($height / 4)), ($width / 4), ($height / 4)],
+            [(2 * ($width / 4)), (2 * ($height / 4)), ($width / 4), ($height / 4)],
+            [(3 * ($width / 4)), (2 * ($height / 4)), ($width / 4), ($height / 4)],
 
-            [0, (3 * ($height/4)), ($width/4), ($height/4)],
-            [($width/4), (3 * ($height/4)), ($width/4), ($height/4)],
-            [(2 * ($width/4)), (3 * ($height/4)), ($width/4), ($height/4)],
-            [(3 * ($width/4)), (3 * ($height/4)), ($width/4), ($height/4)],
+            [0, (3 * ($height / 4)), ($width / 4), ($height / 4)],
+            [($width / 4), (3 * ($height / 4)), ($width / 4), ($height / 4)],
+            [(2 * ($width / 4)), (3 * ($height / 4)), ($width / 4), ($height / 4)],
+            [(3 * ($width / 4)), (3 * ($height / 4)), ($width / 4), ($height / 4)],
         ],
-        [ # 17 5x4x4x4
-            [0, 0, ($width/5), ($height/4)],
-            [($width/5), 0, ($width/5), ($height/4)],
-            [(2 * ($width/5)), 0, ($width/5), ($height/4)],
-            [(3 * ($width/5)), 0, ($width/5), ($height/4)],
-            [(4 * ($width/5)), 0, ($width/5), ($height/4)],
+        [    # 17 5x4x4x4
+            [0,                  0, ($width / 5), ($height / 4)],
+            [($width / 5),       0, ($width / 5), ($height / 4)],
+            [(2 * ($width / 5)), 0, ($width / 5), ($height / 4)],
+            [(3 * ($width / 5)), 0, ($width / 5), ($height / 4)],
+            [(4 * ($width / 5)), 0, ($width / 5), ($height / 4)],
 
-            [0, ($height/4), ($width/4), ($height/4)],
-            [($width/4), ($height/4), ($width/4), ($height/4)],
-            [(2 * ($width/4)), ($height/4), ($width/4), ($height/4)],
-            [(3 * ($width/4)), ($height/4), ($width/4), ($height/4)],
+            [0, ($height / 4), ($width / 4), ($height / 4)],
+            [($width / 4), ($height / 4), ($width / 4), ($height / 4)],
+            [(2 * ($width / 4)), ($height / 4), ($width / 4), ($height / 4)],
+            [(3 * ($width / 4)), ($height / 4), ($width / 4), ($height / 4)],
 
-            [0, (2 * ($height/4)), ($width/4), ($height/4)],
-            [($width/4), (2 * ($height/4)), ($width/4), ($height/4)],
-            [(2 * ($width/4)), (2 * ($height/4)), ($width/4), ($height/4)],
-            [(3 * ($width/4)), (2 * ($height/4)), ($width/4), ($height/4)],
+            [0, (2 * ($height / 4)), ($width / 4), ($height / 4)],
+            [($width / 4), (2 * ($height / 4)), ($width / 4), ($height / 4)],
+            [(2 * ($width / 4)), (2 * ($height / 4)), ($width / 4), ($height / 4)],
+            [(3 * ($width / 4)), (2 * ($height / 4)), ($width / 4), ($height / 4)],
 
-            [0, (3 * ($height/4)), ($width/4), ($height/4)],
-            [($width/4), (3 * ($height/4)), ($width/4), ($height/4)],
-            [(2 * ($width/4)), (3 * ($height/4)), ($width/4), ($height/4)],
-            [(3 * ($width/4)), (3 * ($height/4)), ($width/4), ($height/4)],
+            [0, (3 * ($height / 4)), ($width / 4), ($height / 4)],
+            [($width / 4), (3 * ($height / 4)), ($width / 4), ($height / 4)],
+            [(2 * ($width / 4)), (3 * ($height / 4)), ($width / 4), ($height / 4)],
+            [(3 * ($width / 4)), (3 * ($height / 4)), ($width / 4), ($height / 4)],
         ],
-        [ # 18 5x5x4x4
-            [0, 0, ($width/5), ($height/4)],
-            [($width/5), 0, ($width/5), ($height/4)],
-            [(2 * ($width/5)), 0, ($width/5), ($height/4)],
-            [(3 * ($width/5)), 0, ($width/5), ($height/4)],
-            [(4 * ($width/5)), 0, ($width/5), ($height/4)],
+        [    # 18 5x5x4x4
+            [0,                  0, ($width / 5), ($height / 4)],
+            [($width / 5),       0, ($width / 5), ($height / 4)],
+            [(2 * ($width / 5)), 0, ($width / 5), ($height / 4)],
+            [(3 * ($width / 5)), 0, ($width / 5), ($height / 4)],
+            [(4 * ($width / 5)), 0, ($width / 5), ($height / 4)],
 
-            [0, ($height/4), ($width/5), ($height/4)],
-            [($width/5), ($height/4), ($width/5), ($height/4)],
-            [(2 * ($width/5)), ($height/4), ($width/5), ($height/4)],
-            [(3 * ($width/5)), ($height/4), ($width/5), ($height/4)],
-            [(4 * ($width/5)), ($height/4), ($width/5), ($height/4)],
+            [0, ($height / 4), ($width / 5), ($height / 4)],
+            [($width / 5), ($height / 4), ($width / 5), ($height / 4)],
+            [(2 * ($width / 5)), ($height / 4), ($width / 5), ($height / 4)],
+            [(3 * ($width / 5)), ($height / 4), ($width / 5), ($height / 4)],
+            [(4 * ($width / 5)), ($height / 4), ($width / 5), ($height / 4)],
 
-            [0, (2 * ($height/4)), ($width/4), ($height/4)],
-            [($width/4), (2 * ($height/4)), ($width/4), ($height/4)],
-            [(2 * ($width/4)), (2 * ($height/4)), ($width/4), ($height/4)],
-            [(3 * ($width/4)), (2 * ($height/4)), ($width/4), ($height/4)],
+            [0, (2 * ($height / 4)), ($width / 4), ($height / 4)],
+            [($width / 4), (2 * ($height / 4)), ($width / 4), ($height / 4)],
+            [(2 * ($width / 4)), (2 * ($height / 4)), ($width / 4), ($height / 4)],
+            [(3 * ($width / 4)), (2 * ($height / 4)), ($width / 4), ($height / 4)],
 
-            [0, (3 * ($height/4)), ($width/4), ($height/4)],
-            [($width/4), (3 * ($height/4)), ($width/4), ($height/4)],
-            [(2 * ($width/4)), (3 * ($height/4)), ($width/4), ($height/4)],
-            [(3 * ($width/4)), (3 * ($height/4)), ($width/4), ($height/4)],
+            [0, (3 * ($height / 4)), ($width / 4), ($height / 4)],
+            [($width / 4), (3 * ($height / 4)), ($width / 4), ($height / 4)],
+            [(2 * ($width / 4)), (3 * ($height / 4)), ($width / 4), ($height / 4)],
+            [(3 * ($width / 4)), (3 * ($height / 4)), ($width / 4), ($height / 4)],
         ],
-        [ # 19 5x5x5x4
-            [0, 0, ($width/5), ($height/4)],
-            [($width/5), 0, ($width/5), ($height/4)],
-            [(2 * ($width/5)), 0, ($width/5), ($height/4)],
-            [(3 * ($width/5)), 0, ($width/5), ($height/4)],
-            [(4 * ($width/5)), 0, ($width/5), ($height/4)],
+        [    # 19 5x5x5x4
+            [0,                  0, ($width / 5), ($height / 4)],
+            [($width / 5),       0, ($width / 5), ($height / 4)],
+            [(2 * ($width / 5)), 0, ($width / 5), ($height / 4)],
+            [(3 * ($width / 5)), 0, ($width / 5), ($height / 4)],
+            [(4 * ($width / 5)), 0, ($width / 5), ($height / 4)],
 
-            [0, ($height/4), ($width/5), ($height/4)],
-            [($width/5), ($height/4), ($width/5), ($height/4)],
-            [(2 * ($width/5)), ($height/4), ($width/5), ($height/4)],
-            [(3 * ($width/5)), ($height/4), ($width/5), ($height/4)],
-            [(4 * ($width/5)), ($height/4), ($width/5), ($height/4)],
+            [0, ($height / 4), ($width / 5), ($height / 4)],
+            [($width / 5), ($height / 4), ($width / 5), ($height / 4)],
+            [(2 * ($width / 5)), ($height / 4), ($width / 5), ($height / 4)],
+            [(3 * ($width / 5)), ($height / 4), ($width / 5), ($height / 4)],
+            [(4 * ($width / 5)), ($height / 4), ($width / 5), ($height / 4)],
 
-            [0, (2 * ($height/4)), ($width/5), ($height/4)],
-            [($width/5), (2 * ($height/4)), ($width/5), ($height/4)],
-            [(2 * ($width/5)), (2 * ($height/4)), ($width/5), ($height/4)],
-            [(3 * ($width/5)), (2 * ($height/4)), ($width/5), ($height/4)],
-            [(4 * ($width/5)), (2 * ($height/4)), ($width/5), ($height/4)],
+            [0, (2 * ($height / 4)), ($width / 5), ($height / 4)],
+            [($width / 5), (2 * ($height / 4)), ($width / 5), ($height / 4)],
+            [(2 * ($width / 5)), (2 * ($height / 4)), ($width / 5), ($height / 4)],
+            [(3 * ($width / 5)), (2 * ($height / 4)), ($width / 5), ($height / 4)],
+            [(4 * ($width / 5)), (2 * ($height / 4)), ($width / 5), ($height / 4)],
 
-            [0, (3 * ($height/4)), ($width/4), ($height/4)],
-            [($width/4), (3 * ($height/4)), ($width/4), ($height/4)],
-            [(2 * ($width/4)), (3 * ($height/4)), ($width/4), ($height/4)],
-            [(3 * ($width/4)), (3 * ($height/4)), ($width/4), ($height/4)],
+            [0, (3 * ($height / 4)), ($width / 4), ($height / 4)],
+            [($width / 4), (3 * ($height / 4)), ($width / 4), ($height / 4)],
+            [(2 * ($width / 4)), (3 * ($height / 4)), ($width / 4), ($height / 4)],
+            [(3 * ($width / 4)), (3 * ($height / 4)), ($width / 4), ($height / 4)],
         ],
-        [ # 20 5x5x5x5
-            [0, 0, ($width/5), ($height/4)],
-            [($width/5), 0, ($width/5), ($height/4)],
-            [(2 * ($width/5)), 0, ($width/5), ($height/4)],
-            [(3 * ($width/5)), 0, ($width/5), ($height/4)],
-            [(4 * ($width/5)), 0, ($width/5), ($height/4)],
+        [    # 20 5x5x5x5
+            [0,                  0, ($width / 5), ($height / 4)],
+            [($width / 5),       0, ($width / 5), ($height / 4)],
+            [(2 * ($width / 5)), 0, ($width / 5), ($height / 4)],
+            [(3 * ($width / 5)), 0, ($width / 5), ($height / 4)],
+            [(4 * ($width / 5)), 0, ($width / 5), ($height / 4)],
 
-            [0, ($height/4), ($width/5), ($height/4)],
-            [($width/5), ($height/4), ($width/5), ($height/4)],
-            [(2 * ($width/5)), ($height/4), ($width/5), ($height/4)],
-            [(3 * ($width/5)), ($height/4), ($width/5), ($height/4)],
-            [(4 * ($width/5)), ($height/4), ($width/5), ($height/4)],
+            [0, ($height / 4), ($width / 5), ($height / 4)],
+            [($width / 5), ($height / 4), ($width / 5), ($height / 4)],
+            [(2 * ($width / 5)), ($height / 4), ($width / 5), ($height / 4)],
+            [(3 * ($width / 5)), ($height / 4), ($width / 5), ($height / 4)],
+            [(4 * ($width / 5)), ($height / 4), ($width / 5), ($height / 4)],
 
-            [0, (2 * ($height/4)), ($width/5), ($height/4)],
-            [($width/5), (2 * ($height/4)), ($width/5), ($height/4)],
-            [(2 * ($width/5)), (2 * ($height/4)), ($width/5), ($height/4)],
-            [(3 * ($width/5)), (2 * ($height/4)), ($width/5), ($height/4)],
-            [(4 * ($width/5)), (2 * ($height/4)), ($width/5), ($height/4)],
+            [0, (2 * ($height / 4)), ($width / 5), ($height / 4)],
+            [($width / 5), (2 * ($height / 4)), ($width / 5), ($height / 4)],
+            [(2 * ($width / 5)), (2 * ($height / 4)), ($width / 5), ($height / 4)],
+            [(3 * ($width / 5)), (2 * ($height / 4)), ($width / 5), ($height / 4)],
+            [(4 * ($width / 5)), (2 * ($height / 4)), ($width / 5), ($height / 4)],
 
-            [0, (3 * ($height/4)), ($width/5), ($height/4)],
-            [($width/5), (3 * ($height/4)), ($width/5), ($height/4)],
-            [(2 * ($width/5)), (3 * ($height/4)), ($width/5), ($height/4)],
-            [(3 * ($width/5)), (3 * ($height/4)), ($width/5), ($height/4)],
-            [(4 * ($width/5)), (3 * ($height/4)), ($width/5), ($height/4)],
+            [0, (3 * ($height / 4)), ($width / 5), ($height / 4)],
+            [($width / 5), (3 * ($height / 4)), ($width / 5), ($height / 4)],
+            [(2 * ($width / 5)), (3 * ($height / 4)), ($width / 5), ($height / 4)],
+            [(3 * ($width / 5)), (3 * ($height / 4)), ($width / 5), ($height / 4)],
+            [(4 * ($width / 5)), (3 * ($height / 4)), ($width / 5), ($height / 4)],
         ],
     ];
-#    print STDERR "MAX = $max, CURRENT $current\n"; sleep 10;
-    return (@{$cr->[$max - 1]->[$current - 1]});
+
+    #    print STDERR "MAX = $max, CURRENT $current\n"; sleep 10;
+    return (@{ $cr->[$max - 1]->[$current - 1] });
 } ## end sub calculate_window
 
 sub show {
@@ -492,30 +493,30 @@ sub show {
     my $show_name = shift || 0;
     my ($nx, $ny) = @_;
 
-    my $FB = (defined($nx)) ?
-      Graphics::Framebuffer->new(
-          'SHOW_ERRORS' => $errors,
-          'RESET'       => 0,
-          'SPLASH'      => $splash,
-          'FB_DEVICE'   => $dev,
-          'SPLASH'      => $display,
-          'SIMULATED_X' => $nx,
-          'SIMULATED_Y' => $ny,
-		  'IGNORE_X_WINDOWS' => $ignore_x,
+    my $FB =
+      (defined($nx))
+      ? Graphics::Framebuffer->new(
+        'SHOW_ERRORS'      => $errors,
+        'RESET'            => 0,
+        'SPLASH'           => $splash,
+        'FB_DEVICE'        => $dev,
+        'SPLASH'           => $display,
+        'SIMULATED_X'      => $nx,
+        'SIMULATED_Y'      => $ny,
+        'IGNORE_X_WINDOWS' => $ignore_x,
       )
-      :
-      Graphics::Framebuffer->new(
-          'SHOW_ERRORS' => $errors,
-          'RESET'       => 0,
-          'SPLASH'      => $splash,
-          'FB_DEVICE'   => $dev,
-          'SPLASH'      => $display,
-		  'IGNORE_X_WINDOWS' => $ignore_x,
+      : Graphics::Framebuffer->new(
+        'SHOW_ERRORS'      => $errors,
+        'RESET'            => 0,
+        'SPLASH'           => $splash,
+        'FB_DEVICE'        => $dev,
+        'SPLASH'           => $display,
+        'IGNORE_X_WINDOWS' => $ignore_x,
       );
-    local $SIG{'ALRM'} = local $SIG{'INT'}  = local $SIG{'QUIT'} = local $SIG{'KILL'} = local $SIG{'TERM'} = local $SIG{'HUP'} = undef;
+    local $SIG{'ALRM'} = local $SIG{'INT'} = local $SIG{'QUIT'} = local $SIG{'KILL'} = local $SIG{'TERM'} = local $SIG{'HUP'} = undef;
 
     $FB->wait_for_console(1);
-    $FB->acceleration(! $noaccel);
+    $FB->acceleration(!$noaccel);
     $FB->set_color({ 'red' => 0, 'green' => 0, 'blue' => 0, 'alpha' => 255 });
     my @pics = shuffle(@{$ps});
     my $p    = scalar(@pics);
@@ -524,7 +525,7 @@ sub show {
     $X = int($X);
     $Y = int($Y);
     $W = int($W);
-    $H = int($H); 
+    $H = int($H);
     $FB->clip_rset(
         {
             'x'      => $X,
@@ -533,9 +534,10 @@ sub show {
             'height' => $H,
         }
     );
+
     while ($RUNNING && $idx < $p) {
-        my $name = $pics[$idx];
-        my $image = $FB->load_image( # Uninterruptible at the moment
+        my $name  = $pics[$idx];
+        my $image = $FB->load_image(    # Uninterruptible at the moment
             {
                 'x'          => $X,
                 'y'          => ($show_name) ? $Y + 8 : $Y,
@@ -559,25 +561,25 @@ sub show {
                 if ($GO) {
                     sleep $tdelay * $RUNNING;
                 } else {
-                    while (! $GO && $RUNNING) {
+                    while (!$GO && $RUNNING) {
                         threads->yield();
                     }
                 }
-            }
+            } ## end else [ if ($display && $RUNNING)]
             $FB->rbox({ 'x' => $X, 'y' => $Y, 'width' => $W, 'height' => $H, 'filled' => 1 });
-            $FB->wait_for_console() if ($RUNNING); # Results will vary
+            $FB->wait_for_console()                if ($RUNNING);     # Results will vary
             print_it($FB, $X, $Y, basename($name)) if ($show_name);
             if (ref($image) eq 'ARRAY' && $RUNNING) {
                 my $s = time + ($delay * 2);
-                while ($RUNNING && time <= $s) {    # We play it as many times as the delay allows, but at least once.
-                    # We don't use "play_animation" for threads.  This is so we can stop the playback quickly.
+                while ($RUNNING && time <= $s) {                      # We play it as many times as the delay allows, but at least once.
+                                                                      # We don't use "play_animation" for threads.  This is so we can stop the playback quickly.
                     for (my $frame = 0; $frame < scalar(@{$image}); $frame++) {
                         my $begin = time;                     # Mark the start time
                         $FB->blit_write($image->[$frame]);    # Write the frame to the display
-                        # Multiply the 'gif_delay' by 0.01 and then subtract from that the amount of time
-                        # it took to actually display the frame.  This givs the true delay, which should
-                        # show an accurate animation.
-                        threads->yield(); # Yielding takes time, and the delay calculation should be after.
+                                                              # Multiply the 'gif_delay' by 0.01 and then subtract from that the amount of time
+                                                              # it took to actually display the frame.  This givs the true delay, which should
+                                                              # show an accurate animation.
+                        threads->yield();                     # Yielding takes time, and the delay calculation should be after.
                         my $d = (($image->[$frame]->{'tags'}->{'gif_delay'} * .01) - (time - $begin));
                         sleep $d if ($d > 0 && $RUNNING);
                         last unless ($RUNNING);
@@ -590,8 +592,8 @@ sub show {
                 }
                 $FB->blit_write($image);
                 threads->yield();
-            }
-        } ## end if (defined($image))
+            } ## end elsif ($RUNNING)
+        } ## end if (defined($image) &&...)
         $idx++;
         $idx = 0 if ($idx >= $p);
     } ## end while ($RUNNING && $idx <...)
@@ -599,7 +601,7 @@ sub show {
     $FB->attribute_reset();
     $FB->text_mode();
     $FB->cls('ON') if ($display);
-    return(1);
+    return (1);
 } ## end sub show
 
 sub print_it {
@@ -616,19 +618,19 @@ sub print_it {
     my $b = $fb->ttf_print(
         {
             'x'            => $x,
-            'y'            => $y+10,
+            'y'            => $y + 10,
             'height'       => 8,
             'wscale'       => 1.25,
             'color'        => $color,
             'text'         => $message,
             'bounding_box' => 1,
-#            'center'       => CENTER_X,
-            'antialias'    => 0
+
+            #            'center'       => CENTER_X,
+            'antialias' => 0
         }
     );
     $fb->ttf_print($b);
 } ## end sub print_it
-
 
 __END__
 

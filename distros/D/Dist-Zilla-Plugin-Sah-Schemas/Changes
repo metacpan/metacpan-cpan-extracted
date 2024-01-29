@@ -1,3 +1,15 @@
+0.033   2024-01-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Instead of adding modules required by schema manually, compile
+          the schema using Data::Sah and get the list of required modules
+          from the compilation result.
+
+
+0.032   2024-01-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Add dependency to Sah filter and value rule modules.
+
+
 0.031   2023-09-03  Released-By: PERLANCAR; Urgency: medium
 
         - Bump generated prereq's version: Test::Sah::Schema 0.010 ->

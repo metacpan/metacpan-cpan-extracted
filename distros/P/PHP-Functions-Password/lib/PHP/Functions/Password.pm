@@ -26,7 +26,7 @@ our %EXPORT_TAGS = (
 	'consts'  => [ grep /^PASSWORD_/, @EXPORT_OK ],
 	'funcs'   => [ grep /^password_/, @EXPORT_OK ],
 );
-our $VERSION = '1.13';
+our $VERSION = '2.01';
 
 
 # Exported constants
@@ -37,22 +37,9 @@ use constant PASSWORD_DEFAULT  => PASSWORD_BCRYPT;
 
 
 # Internal constants
-Readonly my $PASSWORD_BCRYPT_DEFAULT_COST => 10;        # no such PHP constant
-Readonly my $PASSWORD_BCRYPT_MAX_PASSWORD_LEN => 72;    # no such PHP constant
-Readonly my $PASSWORD_ARGON2_DEFAULT_SALT_LENGTH => 16; # no such PHP constant
-Readonly my $PASSWORD_ARGON2_DEFAULT_MEMORY_COST => 65536;
-Readonly my $PASSWORD_ARGON2_DEFAULT_TIME_COST => 4;
-Readonly my $PASSWORD_ARGON2_DEFAULT_THREADS => 1;
-Readonly my $PASSWORD_ARGON2_DEFAULT_TAG_LENGTH => 32;  # no such PHP constant
-
-Readonly my $SIG_BCRYPT    => '2y'; # PHP default; equivalent of 2b in non-PHP implementations
-Readonly my $SIG_ARGON2I   => 'argon2i';
-Readonly my $SIG_ARGON2ID  => 'argon2id';
-
-Readonly my %SIG_TO_ALGO => (	# not used for bcrypt
-	$SIG_ARGON2I   => PASSWORD_ARGON2I,
-	$SIG_ARGON2ID  => PASSWORD_ARGON2ID,
-);
+Readonly my $SIG_BCRYPT => '2y'; # PHP default; equivalent of 2b in non-PHP implementations
+Readonly my $PASSWORD_BCRYPT_DEFAULT_COST     => 10; # no such PHP constant
+Readonly my $PASSWORD_BCRYPT_MAX_PASSWORD_LEN => 72; # no such PHP constant
 
 # https://en.wikipedia.org/wiki/Bcrypt
 Readonly my $RE_BCRYPT_ALGO => qr#2[abxy]?#;
@@ -68,6 +55,19 @@ Readonly my $RE_BCRYPT_STRING => qr/^
 	($RE_BCRYPT_SALT)  # $3 salt
 	($RE_BCRYPT_HASH)  # $4 hash
 $/x;
+
+
+Readonly my $SIG_ARGON2I   => 'argon2i';
+Readonly my $SIG_ARGON2ID  => 'argon2id';
+Readonly my %ARGON2_SIG_TO_ALGO => (
+	$SIG_ARGON2I   => PASSWORD_ARGON2I,
+	$SIG_ARGON2ID  => PASSWORD_ARGON2ID,
+);
+Readonly my $PASSWORD_ARGON2_DEFAULT_SALT_LENGTH => 16; # no such PHP constant
+Readonly my $PASSWORD_ARGON2_DEFAULT_MEMORY_COST => 65536;
+Readonly my $PASSWORD_ARGON2_DEFAULT_TIME_COST   => 4;
+Readonly my $PASSWORD_ARGON2_DEFAULT_THREADS     => 1;
+Readonly my $PASSWORD_ARGON2_DEFAULT_TAG_LENGTH  => 32;  # no such PHP constant
 
 # See https://www.alexedwards.net/blog/how-to-hash-and-verify-passwords-with-argon2-in-go
 Readonly my $RE_ARGON2_ALGO => qr#argon2id?#;
@@ -101,13 +101,13 @@ See L<http://php.net/manual/en/ref.password.php> for detailed usage instructions
 
 	use PHP::Functions::Password ();
 
-Functional interface, typical use:
+PHP compatible functional interface, typical using defaults:
 
 	use PHP::Functions::Password qw(password_hash);
 	my $password = 'secret';
 	my $crypted_string = password_hash($password);  # uses PASSWORD_BCRYPT algorithm
 
-Functional interface use, using options:
+PHP compatible functional interface use, using options:
 
 	use PHP::Functions::Password qw(:all);
 	my $password = 'secret';
@@ -122,16 +122,21 @@ Functional interface use, using options:
 	use Digest::SHA qw(hmac_sha256);
 	my $pepper = 'Abracadabra and Hocus pocus';  # retrieve this from a secrets config file for example (and don't loose it!)
 	my $peppered_password = hmac_sha256($password, $pepper);
-	my $crypted_string = password_hash($password, PASSWORD_ARGON2ID);  # store this in your database
-	# ... and when verifying passwords, then you pepper then first too.
+	my $crypted_string = password_hash($[peppered_password, PASSWORD_ARGON2ID);  # store this in your database
+	# ... and when verifying passwords, then you must pepper them first.
 
-Class method use, using options:
+Static method use, using defaults:
 
 	use PHP::Functions::Password;
 	my $password = 'secret';
-	my $crypted_string = PHP::Functions::Password->hash($password, cost => 9);
-	# Note that the 2nd argument of password_hash() has been dropped here and may be specified
-	# as an option as should've been the case in the original password_hash() function IMHO.
+	my $crypted_string = PHP::Functions::Password->hash($password);
+
+Static method use, using options:
+
+	use PHP::Functions::Password;
+	my $password = 'secret';
+	my $crypted_string = PHP::Functions::Password->hash($password, algo => PASSWORD_ARGON2ID, time_cost => 8);
+	# Note that the method hash() has a different argument signature compared to the function password_hash(). The algorithm has become one of the hash options.
 
 =head1 EXPORTS
 
@@ -150,19 +155,16 @@ The following names can be imported into the calling namespace by request:
 	:consts - the PASSWORD_* constants
 	:funcs  - the password_* functions
 
-=head1 PHP COMPATIBLE AND EXPORTABLE FUNCTIONS
-
-=over
-
-=item password_algos()
-
-The same as L<http://php.net/manual/en/function.password-algos.php>
-
-Returns an array of supported password algorithm signatures.
-
 =cut
 
-sub password_algos {
+
+### Protected methods that you may override in a subclass. ###
+
+
+# See algos() and password_algos()
+# The same as L<https://php.net/manual/en/function.password-algos.php>
+# Returns an array of supported password algorithm signatures.
+sub _algos {
 	my @result = ($SIG_BCRYPT);
 	if ($INC{'Crypt/Argon2.pm'} || eval { require Crypt::Argon2; }) {
 		push(@result, $SIG_ARGON2I, $SIG_ARGON2ID);
@@ -172,40 +174,33 @@ sub password_algos {
 
 
 
-
-=item password_get_info($crypted)
-
-The same as L<http://php.net/manual/en/function.password-get-info.php>
-with the exception that it returns the following additional keys in the result:
-
-	algoSig	e.g. '2y'
-	salt (encoded)
-	hash (encoded)
-	version (only for argon2 algorithms)
-
-Returns a hash in array context, else a hashref.
-
-=cut
-
-sub password_get_info {
-	my $proto = @_ && UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
+# Called by get_info($crypted) and password_get_info($crypted)
+# Similar to L<https://php.net/manual/en/function.password-get-info.php> with the difference that it returns the following additional keys in the result:
+#
+#	algoSig	e.g. '2y'
+#	salt (encoded)
+#	hash (encoded)
+#	version (only for argon2 algorithms)
+#
+# Returns a hashref if there is a match, else undef.
+sub _get_info {
+	my $proto = @_ && UNIVERSAL::isa($_[0], __PACKAGE__) ? shift : __PACKAGE__;
 	my $crypted = shift;
 	if ($crypted =~ $RE_BCRYPT_STRING) {
-		my $type = $1;
+		my $sig = $1;
 		my $cost = int($2);
 		my $salt = $3;
 		my $hash = $4;
-		my %result = (
+		return {
 			'algo'     => PASSWORD_BCRYPT,
 			'algoName' => 'bcrypt',
-			'algoSig'  => $type,  # extra
+			'algoSig'  => $sig,  # extra
 			'options'  => {
 				'cost'=> $cost,
 			},
 			'salt' => $salt,  # extra
 			'hash' => $hash,  # extra
-		);
-		return wantarray ? %result : \%result;
+		};
 	}
 	elsif ($crypted =~ $RE_ARGON2_STRING) {
 		my $sig = $1;
@@ -217,8 +212,8 @@ sub password_get_info {
 		my $hash = $7;
 		#my $raw_salt = decode_base64($salt);
 		#my $raw_hash = decode_base64($hash);
-		my %result = (
-			'algo'     => $SIG_TO_ALGO{$sig},
+		return {
+			'algo'     => $ARGON2_SIG_TO_ALGO{$sig},
 			'algoName' => $sig,
 			'algoSig'  => $sig,
 			'options'  => {
@@ -229,38 +224,26 @@ sub password_get_info {
 			'salt'    => $salt,
 			'hash'    => $hash,
 			'version' => $version,
-		);
-		return wantarray ? %result : \%result;
-	}
+		};
 
-	# No matches:
-	my %result = (
-		'algo'     => 0,
-		'algoName' => 'unknown',
-		'options'  => {},
-	);
-	return wantarray ? %result : \%result;
+	}
+	return undef;	# meaning no match
 }
 
 
 
 
-=item password_hash($password, $algo, %options)
-
-Similar to L<http://php.net/manual/en/function.password-hash.php> with the difference that the $algo argument is optional and defaults to PASSWORD_DEFAULT for your programming pleasure.
-
-Important notes about the 'salt' option which you shouldn't use in the first place:
-
-	- The PASSWORD_BCRYPT 'salt' option is deprecated since PHP 7.0, but if you do pass it, then it must be 16 bytes long!
-	- For algorithms other than PASSWORD_BCRYPT, PHP doesn't support the 'salt' option, but if you do pass it, then it must be in raw bytes!
-
-=cut
-
-sub password_hash {
-	my $proto = @_ && UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
+# _hash($password, %options)
+# Similar to C<password_hash($password, $algo, %options)> but with a different argument signature.
+# The difference is that this method doesn't have an $algo argument, but instead allows the algorithm to be specified using the 'algo' option (in %options).
+# Important notes about the 'salt' option which you should avoid passing in the first place:
+#	- The PASSWORD_BCRYPT 'salt' option is deprecated since PHP 7.0, but if you do pass it, then it must be 16 bytes long!
+#	- For algorithms other than PASSWORD_BCRYPT, PHP doesn't support the 'salt' option, but if you do pass it, then it must be in raw bytes!
+sub _hash {
+	my $proto = @_ && UNIVERSAL::isa($_[0], __PACKAGE__) ? shift : __PACKAGE__;
 	my $password = shift;
-	my $algo = shift // PASSWORD_DEFAULT;
 	my %options = @_ && ref($_[0]) ? %{$_[0]} : @_;
+	my $algo = $options{'algo'} // PASSWORD_DEFAULT;
 	unless ($algo =~ /^\d$/) {
 		croak("Invalid \$algo parameter ($algo) which should be one of the PASSWORD_* integer constants");
 	}
@@ -308,7 +291,7 @@ sub password_hash {
 	}
 	elsif (($algo == PASSWORD_ARGON2ID) || ($algo == PASSWORD_ARGON2I)) {
 		unless ($INC{'Crypt/Argon2.pm'} || eval { require Crypt::Argon2; }) {
-			my $algo_const_name = $algo == PASSWORD_ARGON2ID ? PASSWORD_ARGON2ID : PASSWORD_ARGON2I;
+			my $algo_const_name = $algo == PASSWORD_ARGON2ID ? $SIG_ARGON2ID : $SIG_ARGON2I;
 			croak("Cannot use the $algo_const_name algorithm because the module Crypt::Argon2 is not installed");
 		}
 		my $salt = $options{'salt'} || Crypt::OpenSSL::Random::random_bytes($PASSWORD_ARGON2_DEFAULT_SALT_LENGTH);	# undocumented; not a PHP option; raw!
@@ -328,56 +311,55 @@ sub password_hash {
 			return Crypt::Argon2::argon2i_pass(@args);
 		}
 	}
-	else {
-		croak("Unimplemented algorithm $algo");
-	}
+
+	croak("Unimplemented algorithm $algo is probably not one of the known PASSWORD_* constants");
 }
 
 
 
 
-=item password_needs_rehash($crypted, $algo, %options)
-
-The same as L<http://php.net/manual/en/function.password-needs-rehash.php>.
-
-=cut
-
-sub password_needs_rehash {
-	my $proto = @_ && UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
+# _needs_rehash($crypted, $algo, %options)
+# The same as L<http://php.net/manual/en/function.password-needs-rehash.php>.
+sub _needs_rehash {
+	my $proto = @_ && UNIVERSAL::isa($_[0], __PACKAGE__) ? shift : __PACKAGE__;
 	my $crypted = shift;
 	my $algo = shift(@_) // PASSWORD_DEFAULT;
 	my %options = @_ && ref($_[0]) ? %{$_[0]} : @_;
-	my %info = password_get_info($crypted);
-	unless ($info{'algo'} == $algo) {
-		$options{'debug'} && warn('Algorithms differ: ' . $info{'algo'} . "<>$algo");
+	my $info = $proto->_get_info($crypted);
+	unless ($info) {
+		$options{'debug'} && warn('Unrecognized format');
+		return 1;
+	}
+	unless ($info->{'algo'} == $algo) {
+		$options{'debug'} && warn('Algorithms differ: ' . $info->{'algo'} . "<>$algo");
 		return 1;
 	}
 	if ($algo == PASSWORD_BCRYPT) {
-		#unless (($info{'algoSig'} eq $SIG_BCRYPT) || ($info{'algoSig'} eq '2b')) {	# also accept 2b as a non-PHP equivalent of 2y
-		unless ($info{'algoSig'} eq $SIG_BCRYPT) {	# this emulates PHP's behaviour (it requires 2b to be rehashed as 2y).
-			$options{'debug'} && warn('Algorithm signatures differ: ' . $info{'algoSig'} . ' vs ' . $SIG_BCRYPT);
+		#unless (($info->{'algoSig'} eq $SIG_BCRYPT) || ($info->{'algoSig'} eq '2b')) {	# also accept 2b as a non-PHP equivalent of 2y
+		unless ($info->{'algoSig'} eq $SIG_BCRYPT) {	# this emulates PHP's behaviour (it requires 2b to be rehashed as 2y).
+			$options{'debug'} && warn('Algorithm signatures differ: ' . $info->{'algoSig'} . ' vs ' . $SIG_BCRYPT);
 			return 1;
 		}
 		my $cost = $options{'cost'} // $PASSWORD_BCRYPT_DEFAULT_COST;
-		unless (defined($info{'options'}->{'cost'}) && ($info{'options'}->{'cost'} == $cost)) {
-			$options{'debug'} && warn('Cost mismatch: ' . $info{'options'}->{'cost'} . "<>$cost");
+		unless (defined($info->{'options'}->{'cost'}) && ($info->{'options'}->{'cost'} == $cost)) {
+			$options{'debug'} && warn('Cost mismatch: ' . $info->{'options'}->{'cost'} . "<>$cost");
 			return 1;
 		}
 	}
 	elsif (($algo == PASSWORD_ARGON2ID) || ($algo == PASSWORD_ARGON2I)) {
 		my $memory_cost = $options{'memory_cost'} // $PASSWORD_ARGON2_DEFAULT_MEMORY_COST;
-		if ($info{'options'}->{'memory_cost'} != $memory_cost) {
-			$options{'debug'} && warn('memory_cost mismatch: ' . $info{'options'}->{'memory_cost'} . "<>$memory_cost");
+		if ($info->{'options'}->{'memory_cost'} != $memory_cost) {
+			$options{'debug'} && warn('memory_cost mismatch: ' . $info->{'options'}->{'memory_cost'} . "<>$memory_cost");
 			return 1;
 		}
 		my $time_cost = $options{'time_cost'} // $PASSWORD_ARGON2_DEFAULT_TIME_COST;
-		if ($info{'options'}->{'time_cost'} != $time_cost) {
-			$options{'debug'} && warn('time_cost mismatch: ' . $info{'options'}->{'time_cost'} . "<>$time_cost");
+		if ($info->{'options'}->{'time_cost'} != $time_cost) {
+			$options{'debug'} && warn('time_cost mismatch: ' . $info->{'options'}->{'time_cost'} . "<>$time_cost");
 			return 1;
 		}
 		my $threads = $options{'threads'} // $PASSWORD_ARGON2_DEFAULT_THREADS;
-		if ($info{'options'}->{'threads'} != $threads) {
-			$options{'debug'} && warn('threads mismatch: ' . $info{'options'}->{'threads'} . "<>$threads");
+		if ($info->{'options'}->{'threads'} != $threads) {
+			$options{'debug'} && warn('threads mismatch: ' . $info->{'options'}->{'threads'} . "<>$threads");
 			return 1;
 		}
 		my $wanted_salt_length = defined($options{'salt'}) && length($options{'salt'}) ? length($options{'salt'}) : $PASSWORD_ARGON2_DEFAULT_SALT_LENGTH;
@@ -385,14 +367,14 @@ sub password_needs_rehash {
 
 		if ($INC{'Crypt/Argon2.pm'} || eval { require Crypt::Argon2; }) {
 			if (Crypt::Argon2->can('argon2_needs_rehash')) {	# since version 0.008
-				return Crypt::Argon2::argon2_needs_rehash($crypted, $info{'algoSig'}, $time_cost, $memory_cost . 'k', $threads, $wanted_tag_length, $wanted_salt_length);
+				return Crypt::Argon2::argon2_needs_rehash($crypted, $info->{'algoSig'}, $time_cost, $memory_cost . 'k', $threads, $wanted_tag_length, $wanted_salt_length);
 			}
 			else {	# as long as Crypt::Argon2 is not required for building, a minimum version requirement cannot be forced, and therefore the workaround below is needed
-				if ($info{'version'} < 19) {
-					$options{'debug'} && warn('Version mismatch: ' . $info{'version'} . '<19');
+				if ($info->{'version'} < 19) {
+					$options{'debug'} && warn('Version mismatch: ' . $info->{'version'} . '<19');
 					return 1;
 				}
-				my $salt_encoded = $info{'salt'};
+				my $salt_encoded = $info->{'salt'};
 				my $salt = decode_base64($salt_encoded);
 				if (!defined($salt)) {
 					$options{'debug'} && warn("decode_base64('$salt_encoded') failed");
@@ -403,7 +385,7 @@ sub password_needs_rehash {
 					$options{'debug'} && warn("wanted salt length ($wanted_salt_length) != actual salt length ($actual_salt_length)");
 					return 1;
 				}
-				my $tag_encoded = $info{'hash'};
+				my $tag_encoded = $info->{'hash'};
 				my $tag = decode_base64($tag_encoded);
 				my $actual_tag_length = length($tag);
 				if ($wanted_tag_length != $actual_tag_length) {
@@ -422,15 +404,15 @@ sub password_needs_rehash {
 
 
 
-=item password_verify($password, $crypted)
+# _verify($password, $crypted)
+# Similar to L<http://php.net/manual/en/function.password-verify.php>, with the difference that undef is returned if the crypted string format is unrecognized.
+sub _verify {
+	my $proto = @_ && UNIVERSAL::isa($_[0], __PACKAGE__) ? shift : __PACKAGE__;
+	my $password = shift;
+	my $crypted = shift;
+	(defined($password) && length($password)) || croak('This first argument (password) must not be empty');
+	(defined($crypted) && length($crypted)) || croak('The second argument (crypted string) must not be empty');
 
-The same as L<http://php.net/manual/en/function.password-verify.php>.
-
-=cut
-
-sub password_verify {
-	my $proto = @_ && UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
-	my ($password, $crypted) = @_;
 	if ($crypted =~ $RE_BCRYPT_STRING) {
 
 		# Treat passwords as strings of bytes
@@ -442,63 +424,175 @@ sub password_verify {
 			$password = substr($password, 0, $PASSWORD_BCRYPT_MAX_PASSWORD_LEN);
 		}
 
-		return Crypt::Bcrypt::bcrypt_check($password, $crypted);
+		return Crypt::Bcrypt::bcrypt_check($password, $crypted) ? 1 : 0;
 	}
+
 	elsif ($crypted =~ $RE_ARGON2_STRING) {
 		unless ($INC{'Crypt/Argon2.pm'} || eval { require Crypt::Argon2; }) {
 			#carp("Verifying the $sig algorithm requires the module Crypt::Argon2 to be installed");
 			return 0;
 		}
-		my $algo = $SIG_TO_ALGO{$1};
+		my $algo = $ARGON2_SIG_TO_ALGO{$1};
 
 		# Treat passwords as strings of bytes
 		utf8::is_utf8($password) && utf8::encode($password);	# "\x{100}"  becomes "\xc4\x80"; preferred equivalent of Encode::is_utf8($string) && Encode::_utf8_off($password);
 
 		my @args = ($crypted, $password);
 		if ($algo == PASSWORD_ARGON2ID) {
-			return Crypt::Argon2::argon2id_verify(@args);
+			return Crypt::Argon2::argon2id_verify(@args) ? 1 : 0;
 		}
 		else {
-			return Crypt::Argon2::argon2i_verify(@args);
+			return Crypt::Argon2::argon2i_verify(@args) ? 1 : 0;
 		}
 	}
-	#carp('Bad crypted argument');
-	return 0;
+
+	return undef;	# meaning unrecognized format
 }
+
+
+
+
+
+
+=head1 PHP COMPATIBLE AND EXPORTABLE FUNCTIONS
+
+=over
+
+=item password_algos()
+
+The same as L<http://php.net/manual/en/function.password-algos.php>
+
+Returns an array of supported password algorithm signatures.
+
+=cut
+
+sub password_algos {
+	my $proto = @_ && UNIVERSAL::isa($_[0], __PACKAGE__) ? shift : __PACKAGE__;
+	return $proto->_algos();
+}
+
+
+
+
+=item password_get_info($crypted)
+
+The same as L<http://php.net/manual/en/function.password-get-info.php> with the difference that it returns the following additional keys in the result:
+
+	algoSig	e.g. '2y'
+	salt (encoded)
+	hash (encoded)
+	version (only for argon2 algorithms)
+
+Returns a hash in array context, else a hashref.
+
+=cut
+
+sub password_get_info {
+	my $proto = @_ && UNIVERSAL::isa($_[0], __PACKAGE__) ? shift : __PACKAGE__;
+	my $info = $proto->_get_info(@_);
+
+	# Emulate awkward PHP result when argument is unrecognized.
+	unless (defined($info)) {
+		$info = {
+			'algo'     => 0,
+			'algoName' => 'unknown',
+			'options'  => {},
+		};
+	}
+
+	return wantarray ? %$info : $info;
+}
+
+
+
+
+=item password_hash($password, $algo, %options)
+
+Similar to L<http://php.net/manual/en/function.password-hash.php> with the difference that the $algo argument is optional and defaults to PASSWORD_DEFAULT for your programming pleasure.
+
+Important notes about the 'salt' option which you shouldn't use in the first place:
+
+	- The PASSWORD_BCRYPT 'salt' option is deprecated since PHP 7.0, but if you do pass it, then it must be 16 bytes long!
+	- For algorithms other than PASSWORD_BCRYPT, PHP doesn't support the 'salt' option, but if you do pass it, then it must be in raw bytes!
+
+Returns a string.
+
+=cut
+
+sub password_hash {
+	my $proto = @_ && UNIVERSAL::isa($_[0], __PACKAGE__) ? shift : __PACKAGE__;
+	my $password = shift;
+	my $algo = shift // PASSWORD_DEFAULT;
+	my %options = @_ && ref($_[0]) ? %{$_[0]} : @_;
+	$options{'algo'} = $algo;
+	return $proto->_hash($password, %options);
+}
+
+
+
+
+
+=item password_needs_rehash($crypted, $algo, %options)
+
+The same as L<http://php.net/manual/en/function.password-needs-rehash.php>.
+
+=cut
+
+sub password_needs_rehash {
+	my $proto = @_ && UNIVERSAL::isa($_[0], __PACKAGE__) ? shift : __PACKAGE__;
+	return $proto->_needs_rehash(@_);
+}
+
+
+
+
+
+=item password_verify($password, $crypted)
+
+The same as L<http://php.net/manual/en/function.password-verify.php>.
+
+=cut
+
+sub password_verify {
+	my $proto = @_ && UNIVERSAL::isa($_[0], __PACKAGE__) ? shift : __PACKAGE__;
+	return $proto->_verify(@_) // 0;
+}
+
+
+
+
 
 =back
 
-
-
-
-=head1 SHORTENED ALIAS METHODS
+=head1 STATIC METHODS
 
 =over
 
 =item algos()
 
-Alias of C<password_algos()>.
+See C<password_algos()>.
 
 =cut
 
 sub algos {
-	my $proto = @_ && UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
-	return $proto->password_algos(@_);
+	my $proto = @_ && UNIVERSAL::isa($_[0], __PACKAGE__) ? shift : __PACKAGE__;
+	return $proto->_algos(@_);
 }
-
 
 
 
 
 =item get_info($crypted)
 
-Alias of C<password_get_info($crypted)>.
+Similar to C<password_get_info($crypted)>, with the difference that this returns undef if the $crypted string format is unrecognized.
+Returns a hashref if there is a match, else undef.
 
 =cut
 
 sub get_info {
-	my $proto = @_ && UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
-	return $proto->password_get_info(@_);
+	my $proto = @_ && UNIVERSAL::isa($_[0], __PACKAGE__) ? shift : __PACKAGE__;
+	my $info = $proto->_get_info(@_); # hashref or undef
+	return wantarray ? %$info : $info;
 }
 
 
@@ -506,19 +600,16 @@ sub get_info {
 
 =item hash($password, %options)
 
-Proxy method for C<password_hash($password, $algo, %options)>.
-The difference is that this method does have an $algo argument,
-but instead allows the algorithm to be specified with the 'algo' option (in %options).
+Similar to C<password_hash($password, $algo, %options)> but with a different argument signature.
+The difference is that this method doesn't have an $algo argument, but instead allows the algorithm to be specified using the 'algo' option (in %options).
 
 =cut
 
 sub hash {
-	my $proto = @_ && UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
+	my $proto = @_ && UNIVERSAL::isa($_[0], __PACKAGE__) ? shift : __PACKAGE__;
 	my $password = shift;
 	my %options = @_ && ref($_[0]) ? %{$_[0]} : @_;
-	my $algo = $options{'algo'} || PASSWORD_DEFAULT;
-	delete($options{'algo'});
-	return $proto->password_hash($password, $algo, %options);
+	return $proto->_hash($password, %options);
 }
 
 
@@ -526,13 +617,13 @@ sub hash {
 
 =item needs_rehash($crypted, $algo, %options)
 
-Alias of C<password_needs_rehash($crypted, $algo, %options)>.
+See C<password_needs_rehash($crypted, $algo, %options)>.
 
 =cut
 
 sub needs_rehash {
-	my $proto = @_ && UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
-	return $proto->password_needs_rehash(@_);
+	my $proto = @_ && UNIVERSAL::isa($_[0], __PACKAGE__) ? shift : __PACKAGE__;
+	return $proto->_needs_rehash(@_);
 }
 
 
@@ -540,20 +631,22 @@ sub needs_rehash {
 
 =item verify($password, $crypted)
 
-Alias of C<verify($password, $crypted)>.
+See C<verify($password, $crypted)>.
 
 =cut
 
 sub verify {
-	my $proto = @_ && UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
-	return $proto->password_verify(@_);
+	my $proto = @_ && UNIVERSAL::isa($_[0], __PACKAGE__) ? shift : __PACKAGE__;
+	return $proto->_verify(@_);
 }
+
+
+
+
 
 =back
 
 =cut
-
-
 
 1;
 
@@ -561,9 +654,9 @@ __END__
 
 =head1 SEE ALSO
 
+ L<Crypt::Argon2> recommended for argon2 algorithm support.
  L<Crypt::Bcrypt> used for all the bcrypt support.
  L<Crypt::OpenSSL::Random> used for random salt generation.
- L<Crypt::Argon2> recommended for argon2 algorithm support.
 
 =head1 COPYRIGHT
 

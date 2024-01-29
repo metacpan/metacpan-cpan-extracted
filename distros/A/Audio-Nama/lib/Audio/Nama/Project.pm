@@ -1,13 +1,13 @@
 # --------- Project related subroutines ---------
-
 {
 package Audio::Nama::Project;
-use Modern::Perl; use Carp;
+use Modern::Perl '2020'; use Carp;
+our $VERSION = 1.0;
 sub hello { my $self = shift; say "hello $self: ",Audio::Nama::Dumper $Audio::Nama::project}
 }
 {
 package Audio::Nama;
-use Modern::Perl;
+use Modern::Perl '2020';
 use Carp;
 use File::Slurp;
 
@@ -38,8 +38,10 @@ sub project_dir {
 }
 # we prepend a slash 
 sub bus_track_display { 
-	my ($busname, $trackname) = ($this_bus, $this_track && $this_track->name || '');
-	($busname eq "Main" ? "": "$busname/" ). $trackname
+	my ($busname, $trackname) = ($this_bus, $this_track ? $this_track->name : '');
+	my $out = ($busname eq "Main" or $busname eq $trackname) ? "": "$busname/";
+	$out .= $trackname;
+	$out
 }
 sub list_projects {
 	my $projects = join "\n", sort map{
@@ -53,7 +55,7 @@ sub list_projects {
 
 sub initialize_project_data {
 
-	logsub("&initialize_project_data");
+	logsub((caller(0))[3]);
 
 	-d Audio::Nama::waveform_dir() or mkdir Audio::Nama::waveform_dir();
 	$ui->destroy_widgets();
@@ -106,28 +108,33 @@ sub initialize_project_data {
 	}
 
 	Audio::Nama::ChainSetup::initialize();
-	reset_hotkey_buffers();
 	reset_command_buffer();
 	$this_engine->reset_ecasound_selections_cache();
 
 }
 
+sub create_project_dirs {
+	map{create_dir($_)} project_dir(), this_wav_dir(), waveform_dir() 
+}
+sub create_file_stubs {
+		write_file($file->state_store, "{}\n") unless -e $file->state_store;
+		write_file($file->midi_store,    "\n") unless -e $file->midi_store; 
+		write_file($file->tempo_map,     "\n") unless -e $file->tempo_map;
+}
 sub load_project {
-	logsub("&load_project");
+	logsub((caller(0))[3]);
 	my %args = @_;
 	logpkg(__FILE__,__LINE__,'debug', sub{json_out \%args});
-	$project->{name} = $args{name} if $args{name};
-	$config->{opts}->{c} and $args{create}++;
-	if (! $project->{name} or $project->{name} and ! -d project_dir() and ! $args{create})
+	
+	$project->{name} = $args{name};
+	if (not $project->{name} or not -d project_dir() and not $args{create})
 	{
 		no warnings 'uninitialized';
-		Audio::Nama::pager_newline(qq(Project "$project->{name}" not found. Loading project "untitled".)); 
-		$project->{name} = "untitled", $args{create}++,
+		Audio::Nama::pager_newline(qq(\nProject "$project->{name}" not found. Loading project "Untitled".)); 
+		load_project(name => 'Untitled', create => 1);
+
 	}
-	if ( ! -d project_dir() )
-	{
-		map{create_dir($_)} project_dir(), this_wav_dir(), waveform_dir() if $args{create};
-	}
+	create_project_dirs() if $args{create};
 
 	# we used to check each project dir for customized .namarc
 	# read_config( global_config() ); 
@@ -137,16 +144,14 @@ sub load_project {
 	initialize_project_data();
 	remove_riff_header_stubs(); 
 	cache_wav_info();
-	restart_wav_memoize();
-	initialize_project_git_repository();
+	refresh_wav_cache();
+	initialize_project_repository();
 	restore_state($args{settings}) unless $config->{opts}->{M} ;
 
 	$config->{opts}->{M} = 0; # enable 
 	
 	initialize_mixer();
-	dig_ruins(); # in case there are audio files, but no tracks present
-
-	git_commit("initialize new project") if $config->{use_git};
+	process_tempo_map() if $config->{use_metronome} and not $config->{opts}->{T};
 
 	# possible null if Text mode
 	
@@ -160,6 +165,7 @@ sub load_project {
  1;
 }	
 sub restore_state {
+	logsub((caller(0))[3]);
 		my $name = shift;
 
 		if( ! $name  or $name =~ /.json$/ or !  $config->{use_git})
@@ -198,7 +204,7 @@ sub initialize_mixer {
 
 sub dig_ruins {
 	
-	logsub("&dig_ruins");
+	logsub((caller(0))[3]);
 	return if user_tracks_present();
 	logpkg(__FILE__,__LINE__,'debug', "looking for audio files");
 
@@ -227,7 +233,7 @@ sub remove_riff_header_stubs {
 	# 44 byte stubs left by a recording chainsetup that is 
 	# connected by not started
 	
-	logsub("&remove_riff_header_stubs");
+	logsub((caller(0))[3]);
 	
 
 	logpkg(__FILE__,__LINE__,'debug', "this wav dir: ", this_wav_dir());
@@ -244,7 +250,7 @@ sub remove_riff_header_stubs {
 }
 
 sub create_system_buses {
-	logsub("&create_system_buses");
+	logsub((caller(0))[3]);
 
 	my $buses = q(
 		Main 		Audio::Nama::SubBus send_type track send_id Main	# master fader track
@@ -309,7 +315,7 @@ sub new_project_template {
 
 	# Throw away command history
 	
-	$text->{term}->SetHistory();
+	$term->SetHistory();
 	
 	# Buses needn't set version info either
 	
@@ -323,8 +329,6 @@ sub new_project_template {
 	
 	save_state( join_path(project_root(), "templates", "$template_name.json"));
 
-	# add description, but where?
-	
 	# recall temp name
 	
  	load_project(  # restore_state() doesn't do the whole job
@@ -352,7 +356,6 @@ sub use_project_template {
  		name     => $project->{name},
  		settings => join_path(project_root(),"templates","$name.json"),
 	);
-	save_state();
 }
 sub list_project_templates {
 	my @templates= map{ /(.+?)\.json$/; $1}  read_dir(join_path(project_root(), "templates"));

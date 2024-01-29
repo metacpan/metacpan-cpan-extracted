@@ -87,7 +87,7 @@ sub _javascript {
 sub _js_tmpl {
     return <<'END_JAVASCRIPT';
 
-/* Copyright 2017 Jeff Anderson */
+/* Copyright 2024 Jeff Anderson */
 /* install JavaScript::Minifier to minify this code */
 
 var ROW = %s;
@@ -95,6 +95,11 @@ var COL = %s;
 var MATRIX;
 var next_x = 0;
 var next_y = 0;
+
+var size = 9;
+var div  = 3;
+var ranges = make_ranges( size, div );
+var zones  = make_zones( size, ranges );
 
 $(document).ready( function() {
 
@@ -126,7 +131,14 @@ $(document).ready( function() {
             seen_c[ MATRIX[i][id_c] ] = true;
         }
 
-        if (seen_r[this.value] || seen_c[this.value]) {
+        var zone = find_zone( id_r, id_c, ranges );
+        var neighbors = zones[zone];
+        var seen_z = {};
+        neighbors.forEach( function(z) {
+            seen_z[ MATRIX[z[0]][z[1]] ] = true;
+        });
+
+        if (seen_r[this.value] || seen_c[this.value] || seen_z[this.value]) {
             this.value = '';
         }
 
@@ -135,6 +147,47 @@ $(document).ready( function() {
 
 });
 
+function make_ranges(size, div) {
+    var ranges = [];
+    var i = 0;
+    while (i < size) {
+        var j = i;
+        i += div - 1;
+        ranges.push( [j,i] );
+        i++;
+    }
+
+    var range_by_zone = {};
+    var j = 0;
+    ranges.forEach( function(x) {
+        ranges.forEach( function(y) {
+            range_by_zone[j++] = { x: x, y: y };
+        });
+    });
+    return range_by_zone;
+}
+
+function make_zones(size, ranges) {
+    var zones = {};
+    for (var x = 0; x < size; x++) {
+        for (var y = 0; y < size; y++) {
+            var zone = find_zone( x, y, ranges );
+            if (!zones[zone]) zones[zone] = [];
+            zones[zone].push( [x,y] );
+        }
+    }
+    return zones;
+}
+
+function find_zone(x, y, ranges) {
+    for (key in ranges) {
+        var zx = ranges[key]['x'];
+        var zy = ranges[key]['y'];
+        if (x >= zx[0] && x <= zx[1] && y >= zy[0] && y <= zy[1]) {
+            return key;
+        }
+    }
+}
 END_JAVASCRIPT
 }
 
@@ -196,7 +249,7 @@ Jeff Anderson, C<< <jeffa at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Jeff Anderson.
+Copyright 2024 Jeff Anderson.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

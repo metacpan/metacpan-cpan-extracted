@@ -1,9 +1,10 @@
-#!perl -w
+#!perl
+use strict;
+use warnings;
 
 use Test;
 use IPC::Run3::ProfLogReader;
 use IPC::Run3::ProfArrayBuffer;
-use strict;
 
 my $h = IPC::Run3::ProfArrayBuffer->new;
 

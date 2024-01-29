@@ -7,9 +7,9 @@ use warnings;
 use Data::Dmp;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-30'; # DATE
+our $DATE = '2024-01-17'; # DATE
 our $DIST = 'Data-Sah-DefaultValue'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 sub meta {
     +{
@@ -49,7 +49,7 @@ Data::Sah::Value::perl::Str::repeat
 
 =head1 VERSION
 
-This document describes version 0.003 of Data::Sah::Value::perl::Str::repeat (from Perl distribution Data-Sah-DefaultValue), released on 2023-03-30.
+This document describes version 0.005 of Data::Sah::Value::perl::Str::repeat (from Perl distribution Data-Sah-DefaultValue), released on 2024-01-17.
 
 =head1 DESCRIPTION
 
@@ -87,7 +87,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 {
-   "abstract" : "meta-programming API (PLACEHOLDER)",
+   "abstract" : "meta-programming API",
    "author" : [
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
@@ -14,6 +14,11 @@
    },
    "name" : "meta",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
       "configure" : {
          "requires" : {
             "Module::Build" : "0.4004"
@@ -33,7 +38,7 @@
    "provides" : {
       "meta" : {
          "file" : "lib/meta.pm",
-         "version" : "0.001"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -42,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.001",
+   "version" : "0.004",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

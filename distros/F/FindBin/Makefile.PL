@@ -8,8 +8,8 @@ my %WriteMakefile_args = (
     'NAME'             => 'FindBin',
     'VERSION_FROM'     => 'lib/FindBin.pm',
     'ABSTRACT_FROM'    => 'lib/FindBin.pm',
-    'LICENSE'          => 'perl',
-    INSTALLDIRS => ($] >= '5.011' ? 'site' : 'perl'),
+    'LICENSE'          => 'perl_5',
+    'INSTALLDIRS'      => ($] >= '5.011' ? 'site' : 'perl'),
     'MIN_PERL_VERSION' => '5.006',
     'PREREQ_PM'        => {
         'Exporter'       => '0',

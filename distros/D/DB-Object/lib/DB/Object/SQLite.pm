@@ -1,12 +1,13 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/SQLite.pm
-## Version v0.400.10
+## Version v1.0.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/06/20
+## Modified 2023/11/17
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -18,9 +19,9 @@ BEGIN
     use strict;
     use warnings;
     use vars qw(
-        $VERSION $CACHE_QUERIES $CACHE_SIZE $CACHE_TABLE $CONNECT_VIA $DB_ERRSTR $ERROR $DEBUG
+        $VERSION $CACHE_QUERIES $CACHE_SIZE $CONNECT_VIA $DB_ERRSTR $ERROR $DEBUG
         $USE_BIND $USE_CACHE $MOD_PERL @DBH
-        $PLACEHOLDER_REGEXP $DATATYPES
+        $PLACEHOLDER_REGEXP $DATATYPES_DICT $TABLE_CACHE
     );
     use DBI qw( :sql_types );
     eval { require DBD::SQLite; };
@@ -31,8 +32,51 @@ BEGIN
     use DateTime::TimeZone;
     use DateTime::Format::Strptime;
     use Module::Generic::File qw( sys_tmpdir );
+    our $TABLE_CACHE = {};
+    # <https://metacpan.org/pod/DBD::SQLite::Constants>
+    # <https://www.sqlite.org/datatype3.html>
+    # <https://metacpan.org/pod/DBD::SQLite::Constants#datatypes-(fundamental_datatypes)>
+    # NULL, INTEGER, REAL, TEXT, BLOB
+    # Check DBD::SQLite::Constants
+    our $DATATYPES_DICT =
+    {
+        blob => {
+            constant => '',
+            name => 'SQLITE_BLOB',
+            re => qr/^BLOB/,
+            type => 'blob'
+        },
+        bool => {
+            alias => [qw( boolean date datetime decimal numeric )],
+            constant => '',
+            name => 'SQLITE_NULL',
+            re => qr/^(NUMERIC|DECIMAL\(\d+,\d+\)|BOOLEAN|DATETIME|DATE)/,
+            type => 'bool'
+        },
+        float => {
+            alias => [qw( double real ), 'double precision', ],
+            constant => '',
+            name => 'SQLITE_FLOAT',
+            re => qr/^(REAL|DOUBLE|DOUBLE\s+PRECISION|FLOAT)/,
+            type => 'float'
+        },
+        integer => {
+            alias => [qw( int tinyint smallint mediumint bigint int2 int8 ), 'unsigned big int' ],
+            constant => '',
+            name => 'SQLITE_INTEGER',
+            re => qr/^(INT|INTEGER|TINYINT|SMALLINT|MEDIUMINT|BIGINT|UNSIGNED\s+BIG\s+INT|INT2|INT8)/,
+            type => 'integer',
+        },
+        text => {
+            alias => [qw( character clob nchar nvarchar varchar ), 'native character', 'varying character' ],
+            constant => '',
+            name => 'SQLITE_TEXT',
+            re => qr/^(CHARACTER\(\d+\)|VARCHAR\(\d+\)|VARYING\s+CHARACTER\(\d+\)|NCHAR\(\d+\)|NATIVE\s+CHARACTER\(\d+\)|NVARCHAR\(\d+\)|TEXT|CLOB)/,
+            type => 'text'
+        },
+    };
     our $PLACEHOLDER_REGEXP = qr/\?(?<index>\d+)/;
-    our $VERSION = 'v0.400.10';
+    our $VERSION = 'v1.0.0';
     use Devel::Confess;
 };
 
@@ -103,6 +147,28 @@ our $PRIVATE_FUNCTIONS =
 # See compile_options method
 # This is very useful to know which features can be used
 our $COMPILE_OPTIONS = [];
+
+foreach my $type ( keys( %$DATATYPES_DICT ) )
+{
+    if( CORE::exists( $DATATYPES_DICT->{ $type }->{alias} ) && 
+        ref( $DATATYPES_DICT->{ $type }->{alias} ) eq 'ARRAY' &&
+        scalar( @{$DATATYPES_DICT->{ $type }->{alias}} ) )
+    {
+        foreach my $alias ( @{$DATATYPES_DICT->{ $type }->{alias}} )
+        {
+            next if( CORE::exists( $DATATYPES_DICT->{ $alias } ) );
+            $DATATYPES_DICT->{ $alias } = $DATATYPES_DICT->{ $type };
+        }
+    }
+}
+
+foreach my $type ( keys( %$DATATYPES_DICT ) )
+{
+    my $c = $DATATYPES_DICT->{ $type }->{name};
+    my $code = \&{"DBD::SQLite::Constants::${c}"};
+    my $val = $code->();
+    $DATATYPES_DICT->{ $type }->{constant} = $val;
+}
 
 sub init
 {
@@ -332,7 +398,11 @@ sub databases
     return( @dbases );
 }
 
+# NOTE: sub datatype_dict is inherited
+
 # NOTE: sub datatype_to_constant is inherited
+
+# NOTE: sub datatypes is in inherited
 
 sub func
 {
@@ -363,7 +433,21 @@ sub get_sql_type
 {
     my $self = shift( @_ );
     my $type = shift( @_ ) || return( $self->error( "No sql type was provided to get its constant." ) );
-    my $const = $self->{dbh}->can( "DBD::SQLite::SQLITE_\U${type}\E" );
+    $type = lc( $type );
+    if( CORE::exists( $DATATYPES_DICT->{ $type } ) &&
+        $type ne $DATATYPES_DICT->{ $type }->{type} )
+    {
+        $type = $DATATYPES_DICT->{ $type }->{type};
+    }
+    my $const;
+    if( substr( $type, 0, 7 ) eq 'sqlite_' )
+    {
+        $const = $self->{dbh}->can( "DBD::SQLite::\U${type}\E" );
+    }
+    else
+    {
+        $const = $self->{dbh}->can( "DBD::SQLite::SQLITE_\U${type}\E" );
+    }
     return( '' ) if( !defined( $const ) );
     return( $const->() );
 }
@@ -425,7 +509,7 @@ sub replace
     my @arg  = @_;
     my %arg  = ();
     my $select = '';
-    if( !%arg && $data && $self->_is_hash( $data ) )
+    if( !%arg && $data && $self->_is_hash( $data => 'strict' ) )
     {
         %arg = %$data;
     }
@@ -477,7 +561,7 @@ sub replace
 sub register_function
 {
     my $self = shift( @_ );
-    return( $self->error( "I was expecting an hash reference of parameters as only argument." ) ) if( !$self->_is_hash( $_[0] ) );
+    return( $self->error( "I was expecting an hash reference of parameters as only argument." ) ) if( !$self->_is_hash( $_[0] => 'strict' ) );
     my $opts = shift( @_ );
     return( $self->error( "Parameter 'code' to register the private function must be a code reference." ) ) if( ref( $opts->{code} ) ne 'CODE' );
     $opts->{flags} = [] if( !CORE::exists( $opts->{flags} ) );
@@ -580,7 +664,7 @@ sub table_info
     my $table = shift( @_ ) || 
     return( $self->error( "You must provide a table name to access the table methods." ) );
     my $opts = {};
-    $opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
+    $opts = shift( @_ ) if( $self->_is_hash( $_[0] => 'strict' ) );
     my $sql = <<'EOT';
 SELECT 
      name
@@ -685,7 +769,7 @@ sub _check_default_option
 {
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
-    return( $self->error( "Provided option is not a hash reference." ) ) if( !$self->_is_hash( $opts ) );
+    return( $self->error( "Provided option is not a hash reference." ) ) if( !$self->_is_hash( $opts => 'strict' ) );
     $opts->{sqlite_unicode} = 1 if( !CORE::exists( $opts->{sqlite_unicode} ) );
     return( $opts );
 }
@@ -706,7 +790,7 @@ sub _connection_parameters
     my $param = shift( @_ );
     # Even though login, password, server, host are not used, I was hesitating, but decided to leave them as ok, and ignore them
     # Or maybe should I issue an error when they are provided?
-    my $core = [qw( db login passwd host port driver database server opt uri debug cache_connections unknown_field )];
+    my $core = [qw( db login passwd host port driver database server opt uri debug cache_connections cache_table unknown_field )];
     my @sqlite_params = grep( /^sqlite_/, keys( %$param ) );
     # See DBD::SQLite for the list of valid parameters
     # E.g.: sqlite_open_flags sqlite_busy_timeout sqlite_use_immediate_transaction sqlite_see_if_its_a_number sqlite_allow_multiple_statements sqlite_unprepared_statements sqlite_unicode sqlite_allow_multiple_statements sqlite_use_immediate_transaction
@@ -1043,13 +1127,14 @@ sub _number_format
     my @args = @_;
     my( $num, $tho, $dec, $prec ) = @args;
     $self->_load_class( 'Module::Generic::Number' ) || return( $self->pass_error );
-    my $fmt = Module::Generic::Number->new( $num,
-        thousands   => $tho,
-        decimal     => $dec,
-        precision   => $prec,
-    );
+    my $fmt = Module::Generic::Number->new( $num );
     # 1 means with trailing zeros
-    return( $fmt->format( precision => $prec, decimal_fill => 1 ) );
+    return( $fmt->format(
+        thousand => $tho,
+        decimal  => $dec,
+        precision => $prec,
+        decimal_fill => 1,
+    ));
 }
 
 sub _placeholder_regexp { return( $PLACEHOLDER_REGEXP ) }
@@ -1329,7 +1414,7 @@ DB::Object::SQLite - DB Object SQLite Driver
     
 =head1 VERSION
 
-    v0.400.10
+    v1.0.0
 
 =head1 DESCRIPTION
 
@@ -1384,179 +1469,179 @@ The authorised parameters are:
 
 =over 4
 
-=item I<ActiveKids>
+=item * C<ActiveKids>
 
 Is read-only.
 
-=item I<AutoCommit>
+=item * C<AutoCommit>
 
 Can be changed.
 
-=item I<AutoInactiveDestroy>
+=item * C<AutoInactiveDestroy>
 
 Can be changed.
 
-=item I<CachedKids>
+=item * C<CachedKids>
 
 Is read-only.
 
-=item I<ChildHandles>
+=item * C<ChildHandles>
 
 Is read-only.
 
-=item I<ChopBlanks>
+=item * C<ChopBlanks>
 
 Can be changed.
 
-=item I<CursorName>
+=item * C<CursorName>
 
 Is read-only.
 
-=item I<Driver>
+=item * C<Driver>
 
 Is read-only.
 
-=item I<ErrCount>
+=item * C<ErrCount>
 
 Can be changed.
 
-=item I<Executed>
+=item * C<Executed>
 
 Is read-only.
 
-=item I<FetchHashKeyName>
+=item * C<FetchHashKeyName>
 
 Can be changed.
 
-=item I<HandleError>
+=item * C<HandleError>
 
 Can be changed.
 
-=item I<HandleSetErr>
+=item * C<HandleSetErr>
 
 Can be changed.
 
-=item I<InactiveDestroy>
+=item * C<InactiveDestroy>
 
 Can be changed.
 
-=item I<Kids>
+=item * C<Kids>
 
 Is read-only.
 
-=item I<NAME>
+=item * C<NAME>
 
 Is read-only.
 
-=item I<NULLABLE>
+=item * C<NULLABLE>
 
 Is read-only.
 
-=item I<NUM_OF_FIELDS>
+=item * C<NUM_OF_FIELDS>
 
 Is read-only.
 
-=item I<NUM_OF_PARAMS>
+=item * C<NUM_OF_PARAMS>
 
 Is read-only.
 
-=item I<Name>
+=item * C<Name>
 
 Is read-only.
 
-=item I<PRECISION>
+=item * C<PRECISION>
 
 Is read-only.
 
-=item I<PrintError>
+=item * C<PrintError>
 
 Can be changed.
 
-=item I<PrintWarn>
+=item * C<PrintWarn>
 
 Can be changed.
 
-=item I<Profile>
+=item * C<Profile>
 
 Can be changed.
 
-=item I<RaiseError>
+=item * C<RaiseError>
 
 Can be changed.
 
-=item I<RowCacheSize>
+=item * C<RowCacheSize>
 
 Is read-only.
 
-=item I<RowsInCache>
+=item * C<RowsInCache>
 
 Is read-only.
 
-=item I<SCALE>
+=item * C<SCALE>
 
 Is read-only.
 
-=item I<ShowErrorStatement>
+=item * C<ShowErrorStatement>
 
 Can be changed.
 
-=item I<Statement>
+=item * C<Statement>
 
 Is read-only.
 
-=item I<TYPE>
+=item * C<TYPE>
 
 Is read-only.
 
-=item I<Taint>
+=item * C<Taint>
 
 Can be changed.
 
-=item I<TaintIn>
+=item * C<TaintIn>
 
 Can be changed.
 
-=item I<TaintOut>
+=item * C<TaintOut>
 
 Can be changed.
 
-=item I<TraceLevel>
+=item * C<TraceLevel>
 
 Can be changed.
 
-=item I<Type>
+=item * C<Type>
 
 Can be changed.
 
-=item I<Username>
+=item * C<Username>
 
 Is read-only.
 
-=item I<Warn>
+=item * C<Warn>
 
 Can be changed.
 
-=item I<sqlite_allow_multiple_statements>
+=item * C<sqlite_allow_multiple_statements>
 
 Can be changed.
 
-=item I<sqlite_see_if_its_a_number>
+=item * C<sqlite_see_if_its_a_number>
 
 Can be changed.
 
-=item I<sqlite_unicode>
+=item * C<sqlite_unicode>
 
 Can be changed.
 
-=item I<sqlite_unprepared_statements>
+=item * C<sqlite_unprepared_statements>
 
 Is read-only.
 
-=item I<sqlite_use_immediate_transaction>
+=item * C<sqlite_use_immediate_transaction>
 
 Can be changed.
 
-=item I<sqlite_version>
+=item * C<sqlite_version>
 
 Is read-only.
 
@@ -1638,6 +1723,12 @@ Returns the file path to the database file.
 
 Returns a list of databases, which in SQLite, means a list of opened sqlite database files.
 
+=head2 datatype_dict
+
+Returns an hash reference of each data type with their equivalent C<constant>, regular expression (C<re>), constant C<name> and C<type> name.
+
+Each data type is an hash with the following properties for each type: C<constant>, C<name>, C<re>, C<type>
+
 =head2 delete
 
 This is an inherited method from L<DB::Object/database>
@@ -1704,19 +1795,19 @@ Possible options are:
 
 =over 4
 
-=item I<code>
+=item * C<code>
 
 Anonymous code to be executed when the function is called.
 
-=item I<func>
+=item * C<func>
 
 This is an hash reference representing registry of functions. The value for each key is the option hash reference.
 
-=item I<flags>
+=item * C<flags>
 
 An array reference of flags
 
-=item I<name>
+=item * C<name>
 
 The function name
 
@@ -1744,19 +1835,19 @@ Possible options are:
 
 =over 4
 
-=item I<argc>
+=item * C<argc>
 
 The function arguments
 
-=item I<code>
+=item * C<code>
 
 Anonymous perl code to be executed when the function is called
 
-=item I<flags>
+=item * C<flags>
 
 An array reference of flags. Those flags are joined with C<|> and L<perlfunc/eval>'ed
 
-=item I<name>
+=item * C<name>
 
 The function name
 

@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::BaseFont';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use Encode qw(:all);
 
@@ -16,6 +16,18 @@ use PDF::Builder::Basic::PDF::Utils;
 =head1 NAME
 
 PDF::Builder::Resource::Font - some common support routines for font files. Inherits from L<PDF::Builder::Resource::BaseFont>
+
+=head1 METHODS
+
+=head2 encodeByData
+
+     $font->encodeByData($enc)
+
+=over
+
+(No Information)
+
+=back
 
 =cut
 
@@ -102,11 +114,11 @@ sub encodeByData {
     return $self;
 }
 
-=head1 METHODS
+=head2 automap
+
+    $font->automap()
 
 =over
-
-=item $font->automap()
 
 This applies to core fonts (C<< $pdf->corefont() >>) and PostScript fonts 
 (C<< $pdf->psfont() >>). These cannot use UTF-8 (or other multibyte character) 
@@ -221,6 +233,18 @@ sub automap {
 
     return @fonts;
 }
+
+=head2 remap
+
+    $font->remap($enc)
+
+=over
+
+(No Information)
+
+=back
+
+=cut
 
 sub remap {
     my ($self, $enc) = @_;

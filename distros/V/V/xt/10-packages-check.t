@@ -14,6 +14,7 @@ my @test_cases = qw<
     XML::LibXML
     XML::Twig
     No::Package
+    Devel::PPPort
 >;
 my %multi_version = (
     'SOAP::Lite' => [qw< SOAP::Lite SOAP::Client >],
@@ -35,8 +36,8 @@ for my $test (@test_cases) {
         else {
             like(
                 $stdout,
-                qr{^$test\n\s+.+: .+},
-                "found version for $test"
+                qr{^$test\n\s+.+: (?!\?)},
+                "found version for $test ($stdout)"
             );
         }
     }

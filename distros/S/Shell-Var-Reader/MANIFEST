@@ -12,9 +12,5 @@ t/pod.t
 src_bin/cmdb_shell_var_reader
 src_bin/shell_var_reader
 bin/.exists
-share/starting_include.sh
-share/ending_include.sh
-share/README.md
-share/example_host.sh
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

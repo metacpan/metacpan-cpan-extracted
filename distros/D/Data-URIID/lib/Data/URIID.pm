@@ -1,5 +1,5 @@
-# Copyright (c) 2023 Löwenfelsen UG (haftungsbeschränkt)
-# Copyright (c) 2023 Philipp Schafft
+# Copyright (c) 2023-2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2023-2024 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -13,14 +13,14 @@ use warnings;
 
 use Carp;
 use URI;
-use LWP::UserAgent;
+use Scalar::Util qw(blessed);
 use I18N::LangTags;
 use I18N::LangTags::Detect;
 
 use Data::URIID::Result;
 use Data::URIID::Service;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 my %names = (
     service => {
@@ -56,6 +56,9 @@ my %names = (
         'grove-art-online'  => 'be8b12e5-b32d-4b89-9301-84827a79589e', # Grove Art Online
         'wikitree'          => '70b9de08-2b73-4c0d-91d2-e89561cf94d2', # WikiTree
         'doi'               => '60387716-fa98-4c92-ae2b-7f4496d6f9be', # doi.org
+        'iconclass'         => '75cbefbb-e622-4b72-9829-348f3986d709', # iconclass.org
+        'iana'              => 'f11657cc-95da-4eae-95fc-62d16fecf473', # iana.org
+        'uriid'             => '772aa1ed-9a3a-4806-94a1-42cbc0e9f962', # uriid.org
     },
     type => {
         'uuid'                          => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31',
@@ -96,6 +99,8 @@ my %names = (
         'grove-art-online-identifier'   => '80c548f6-4d23-43c1-ab50-b4546319c752', # P8406
         'wikitree-person-identifier'    => 'a6f7d17a-ced2-4cf7-8ce7-fcb4a98f7aa0', # P2949
         'doi'                           => '931f155e-5a24-499b-9fbb-ed4efefe27fe', # P356
+        'iconclass-identifier'          => '241348a8-c5d0-4473-9ec1-de7c2ba00fbb', # P1256
+        'media-subtype-identifier'      => 'c1166bf7-c4ab-40ad-9a92-a55103bec509', # P1163, commonly also called media-type or mime-type.
     },
     action => {
         #What about: search/lookup? list? content?
@@ -146,7 +151,19 @@ sub lookup {
 
     croak 'Passed undef as URI' unless defined $uri;
 
-    unless (ref $uri) {
+    if (blessed($uri) && !$uri->isa('URI')) {
+        if (index(blessed($uri), __PACKAGE__) == 0 && $uri->can('ise')) {
+            ($type, $uri) = (ise => $uri->ise);
+        } elsif ($uri->isa('Data::URIID::Result')) {
+            $uri = $uri->url;
+        } elsif ($uri->isa('Mojo::URL')) {
+            $uri = URI->new("$uri"); # convert to URI as per documentation of Mojo::URL
+        } else {
+            croak 'Invalid type of object passed';
+        }
+    }
+
+    unless (blessed $uri) {
         if ($type eq 'qrcode') {
             # Bit more relaxed URLs...
             $uri =~ s#^www\.#https://www.#; # Try to add missing protocol.
@@ -221,14 +238,24 @@ sub _get_language_tags {
 # Private method:
 sub _ua {
     my ($self) = @_;
-    return $self->{ua} //= do {
-        my $ua = LWP::UserAgent->new(agent => $self->{agent});
-        my $x = 1001; # we use 1001 and --$x here instead of 1000 and $x-- as that confuses parsers.
+    unless (defined($self->{ua_error}) || defined($self->{ua})) {
+        unless (LWP::UserAgent->can('new')) {
+            eval { require LWP::UserAgent; };
+        }
 
-        $ua->default_header('Accept-Language' => join(', ', map {sprintf('%s; q=%.3f', $_, --$x/1000)} $self->language_tags));
+        $self->{ua} //= eval {
+            my $ua = LWP::UserAgent->new(agent => $self->{agent});
+            my $x = 1001; # we use 1001 and --$x here instead of 1000 and $x-- as that confuses parsers.
 
-        $ua;
-    };
+            $ua->default_header('Accept-Language' => join(', ', map {sprintf('%s; q=%.3f', $_, --$x/1000)} $self->language_tags));
+
+            $ua;
+        };
+        $self->{ua_error} = 'No user agent found' unless defined $self->{ua};
+    }
+
+    die $self->{ua_error} if defined $self->{ua_error};
+    return $self->{ua} // die 'BUG';
 }
 
 
@@ -261,6 +288,7 @@ sub is_ise {
 }
 
 
+#@returns Data::URIID::Service
 sub service {
     my ($self, $service) = @_;
     my $cache = $self->{service_cache} //= {};
@@ -290,7 +318,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -357,7 +385,9 @@ Useragent to use (L<LWP::UserAgent>).
     my $result = $extractor->lookup( $type, $uri );
 
 Tries to look up the URI and returns the result.
-Takes an L<URI> object or a plain string as argument.
+Takes an L<URI> object (preferred) or a plain string as argument.
+Alternatively can internally also convert from
+L<Mojo::URL>, L<Data::URIID::Service>, L<Data::URIID::Result>, and L<Data::URIID::Colour>.
 
 C<$type> is one of C<uri>, C<ise>, or C<qrcode>. Defaults to C<uri>.
 When C<ise> an UUID or OID can be provided instead of an URI.
@@ -447,7 +477,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2023-2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

@@ -52,7 +52,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.213';
+our $VERSION = '1.214';
 
 use Quiq::Path;
 use Quiq::LockedCounter;
@@ -97,6 +97,7 @@ sub new {
         );
     }
 
+    $p->mkdir("$dir/dup");
     $p->mkdir("$dir/pic");
     my $cnt = Quiq::LockedCounter->new("$dir/cnt.txt");
     my $h = Quiq::Hash::Db->new("$dir/sha1.hash",'rw');
@@ -136,10 +137,7 @@ sub add {
     my $p = Quiq::Path->new;
     my $sha1 = $p->sha1($file);
 
-    if ($h->get($sha1)) {
-        $p->delete($file);
-        return ''; # Bild ist bereits im Speicher
-    }
+    my $doublet = $h->get($sha1)? 1: 0;
 
     my $basename = $p->basename($file);
     my $ext = lc $p->extension($file);
@@ -163,7 +161,8 @@ sub add {
 
     my $n = $cnt->increment->count;
     $basename =~ s/[^-_a-zA-Z0-9]/_/g;
-    my $destFile = sprintf '%s/pic/%07d-%s.jpg',$dir,$n,$basename;
+    my $destFile = sprintf '%s/%s/%07d-%s.jpg',$dir,$doublet? 'dup': 'pic',
+        $n,$basename;
     $p->duplicate('move',$file,$destFile);
     say $destFile;
     $h->{$sha1}++;
@@ -207,7 +206,7 @@ sub addAllByTime {
 
 =head1 VERSION
 
-1.213
+1.214
 
 =head1 AUTHOR
 
@@ -215,7 +214,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2023 Frank Seitz
+Copyright (C) 2024 Frank Seitz
 
 =head1 LICENSE
 

@@ -5,7 +5,7 @@
 # Attribution is requested but is not required.
 #
 # PLEASE NOTE that the above applies to THIS FILE ONLY.  Other files in the
-# same distribution or other collection may have more restrictive terms.
+# same distribution or in other collections may have more restrictive terms.
 
 # NO use strict; use warnings here to avoid conflict with t_Common which sets them
 
@@ -256,10 +256,11 @@ sub run_perlscript(@) {
   #unshift @perlargs, "-MCarp=verbose" if $Carp::Verbose;
   #unshift @perlargs, "-MCarp::Always=verbose" if $Carp::Always::Verbose;
 
-  # For unknown reason some smokers running older perls die with
-  # "...undef value as a subroutine reference at site_perl/5.20.3/TAP/Harness.pm line 612
-  # So trying to see what is happening...
-  unshift @perlargs, "-MCarp::Always=verbose";
+  ##This breaks no-internals-mentioned (AUTHOR_TESTS) in Spreadsheet::Edit
+  ## For unknown reason some smokers running older perls die with
+  ## "...undef value as a subroutine reference at site_perl/5.20.3/TAP/Harness.pm line 612
+  ## So trying to see what is happening...
+  #unshift @perlargs, "-MCarp::Always=verbose";
 
   if ($^O eq "MSWin32") {
     for (my $ix=0; $ix <= $#perlargs; $ix++) {
@@ -622,13 +623,16 @@ our $bs = '\\';  # a single backslash
 sub _expstr2restr($) {
   local $_ = shift;
   confess "bug" if ref($_);
+  return $_ if $_ eq "";
   # In \Q *string* \E the *string* may not end in a backslash because
   # it would be parsed as (\\)(E) instead of (\)(\E).
   # So change them to a unique token and later replace problematic
   # instances with ${bs} variable references.
   s/\\/<BS>/g;
   $_ = '\Q' . $_ . '\E';
-  s#([\$\@\%])#\\E\\$1\\Q#g;
+  s#([\$\@\%]+)# do{ local $_ = $1;
+                     join "", '\\E', (map{ "\\$_" } split(//,$_)), '\\Q'
+                   } #eg;
 
   if (m#qr/#) {
     # Canonical: qr/STUFF/MODIFIERS
@@ -682,7 +686,7 @@ sub expstr2re($) {
   wantarray ? ($xdesc, $output) : $output
 }
 
-# check $test_desc, string_or_regex, result
+# mycheck $test_desc, string_or_regex, result
 sub mycheck($$@) {
   my ($desc, $expected_arg, @actual) = @_;
   local $_;  # preserve $1 etc. for caller

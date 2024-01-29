@@ -55,6 +55,8 @@ sub post_process
 
 __END__
 
+=for stopwords sep
+
 =head1 NAME
 
 Term::Completion::Path - read a path with completion like on a shell

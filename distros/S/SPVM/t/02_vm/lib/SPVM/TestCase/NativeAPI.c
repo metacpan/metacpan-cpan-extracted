@@ -3,6 +3,7 @@
 #include <float.h>
 #include <assert.h>
 #include <fcntl.h>
+#include <errno.h>
 
 #include <spvm_native.h>
 
@@ -210,8 +211,8 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_ids(SPVM_ENV* env, SPVM_VALU
   if ((void*)&env->strerror_string_nolen != &env_array[191]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->strerror != &env_array[192]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->strerror_nolen != &env_array[193]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->new_memory_stack != &env_array[194]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->free_memory_stack != &env_array[195]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->reserved194 != &env_array[194]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->reserved195 != &env_array[195]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->new_stack != &env_array[196]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->free_stack != &env_array[197]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->get_field_object_defined_and_has_pointer_by_name != &env_array[198]) { stack[0].ival = 0; return 0; }
@@ -624,6 +625,66 @@ int32_t SPVM__TestCase__NativeAPI__get_class_var(SPVM_ENV* env, SPVM_VALUE* stac
   
   stack[0].ival = 1;
   
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__get_class_var_byte_native(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* class_var = env->get_class_var(env, stack, "TestCase::NativeAPI", "$BYTE_VALUE");
+  
+  if (!class_var) {
+    stack[0].ival = 0;
+    return 0;
+  }
+  
+  int8_t value = env->get_class_var_byte(env, stack, class_var);
+  
+  if (!(value == 0x0F)) {
+    stack[0].ival = 0;
+    return 0;
+  }
+
+  stack[0].ival = 1;
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__get_class_var_int_native(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* class_var = env->get_class_var(env, stack, "TestCase::NativeAPI", "$INT_VALUE");
+ 
+  if (!class_var) {
+    stack[0].ival = 0;
+    return 0;
+  }
+  
+  int32_t value = env->get_class_var_int(env, stack, class_var);
+  
+  if (!(value == -2147483648)) {
+    stack[0].ival = 0;
+    return 0;
+  }
+
+  stack[0].ival = 1;
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__get_class_var_short_native(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* class_var = env->get_class_var(env, stack, "TestCase::NativeAPI", "$SHORT_VALUE");
+  
+  if (!class_var) {
+    stack[0].ival = 0;
+    return 0;
+  }
+  
+  int16_t value = env->get_class_var_short(env, stack, class_var);
+  
+  if (!(value == -32768)) {
+    stack[0].ival = 0;
+    return 0;
+  }
+
+  stack[0].ival = 1;
   return 0;
 }
 
@@ -2596,6 +2657,19 @@ int32_t SPVM__TestCase__NativeAPI__strerror_value(SPVM_ENV* env, SPVM_VALUE* sta
   void* obj_strerror_value = env->new_string(env, stack, strerror_value, strlen(strerror_value));
   
   stack[0].oval = obj_strerror_value;
+  
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__strerror_string(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t errno_value = -1;
+  
+  void* strerror_string_value = env->strerror_string(env, stack, errno_value, 0);
+  
+  spvm_warn("[Test Output]strerr_string:%s", env->get_chars(env, stack, strerror_string_value));
+  
+  stack[0].ival = 1;
   
   return 0;
 }

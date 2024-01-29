@@ -4,23 +4,48 @@
 # Makefile.PL.tmpl under "no_index/file".
 
 package IPNGLT;
-require Exporter;
-our @ISA = qw(Exporter);
-# We just export everything by default, because this is not a user module.
-our @EXPORT = qw/
-    chunk_ok
-    fake_wpng
-    rmfile
-    round_trip
-    skip_itxt
-    skip_old
-/;
+
 use warnings;
 use strict;
 use utf8;
 use Test::More;
 use Image::PNG::Const ':all';
 use Image::PNG::Libpng ':all';
+
+require Exporter;
+our @ISA = qw(Exporter);
+# We just export everything by default, because this is not a user module.
+our @EXPORT = (qw/
+    chunk_ok
+    fake_wpng
+    rmfile
+    round_trip
+    skip_itxt
+    skip_old
+/,
+@Image::PNG::Const::EXPORT_OK, 
+@Image::PNG::Libpng::EXPORT_OK, 
+@Test::More::EXPORT);
+
+my $builder = Test::More->builder;
+binmode $builder->output,         ":encoding(utf8)";
+binmode $builder->failure_output, ":encoding(utf8)";
+binmode $builder->todo_output,    ":encoding(utf8)";
+binmode STDOUT, ":encoding(utf8)";
+binmode STDERR, ":encoding(utf8)";
+
+sub import
+{
+    my ($class) = @_;
+
+    strict->import ();
+    utf8->import ();
+    warnings->import ();
+    Test::More->import ();
+    Image::PNG::Libpng->import (':all');
+    Image::PNG::Const->import (':all');
+    IPNGLT->export_to_level (1);
+}
 
 # Skip testing if the libpng doesn't seem to support itxt.
 

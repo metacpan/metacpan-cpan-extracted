@@ -19,11 +19,12 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
   PE_NOTOKEN
   PE_SENDRESPONSE
+  PE_BADCREDENTIALS
   PE_TOKENEXPIRED
   PE_NO_SECOND_FACTORS
 );
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.18.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 with qw(
@@ -96,6 +97,8 @@ sub init {
                   $self->p->loadPlugin( $i ? "::2F::Register::$_" : "::2F::$_" )
                   or return 0;
 
+                $self->_registerRoutes($m) unless ($i);
+
                 # Rule and prefix may be modified by 2F module, reread them
                 my $rule = $self->conf->{$ap};
                 $prefix = $m->prefix;
@@ -144,12 +147,14 @@ sub init {
             ),
         ) or return 0;
 
+        $self->_registerRoutes($m);
+
         # Rule and prefix may be modified by 2F module, reread them
         my $rule = $self->conf->{sfExtra}->{$extraKey}->{rule} || 1;
         my $reg_rule;
         my $prefix = $m->prefix;
         if ( $self->conf->{sfExtra}->{$extraKey}->{register} ) {
-            $reg_rule = $rule;
+            $reg_rule = $self->conf->{sfExtra}->{$extraKey}->{regrule} || $rule;
             $rule     = "( $rule ) and has2f('$prefix')";
         }
 
@@ -211,29 +216,22 @@ sub init {
 
     unless (
         $self->sfReq(
-            $self->p->HANDLER->buildSub(
-                $self->p->HANDLER->substitute( $self->conf->{sfRequired} )
-            )
+            $self->p->buildRule( $self->conf->{sfRequired}, 'sfRequired' )
         )
       )
     {
-        $self->error( 'Error in sfRequired rule: '
-              . $self->p->HANDLER->tsv->{jail}->error );
         return 0;
     }
 
     unless (
         $self->sfMsgRule(
-            $self->p->HANDLER->buildSub(
-                $self->p->HANDLER->substitute(
-                    $self->conf->{sfRemovedMsgRule}
-                )
+            $self->p->buildRule(
+                $self->conf->{sfRemovedMsgRule},
+                'sfRemovedMsg'
             )
         )
       )
     {
-        $self->error( 'Error in sfRemovedMsg rule: '
-              . $self->p->HANDLER->tsv->{jail}->error );
         return 0;
     }
 
@@ -377,13 +375,11 @@ sub run {
             $self->logger->debug("2F is required...");
             $self->logger->debug(" -> Register 2F");
             $req->pdata->{sfRegToken} =
-              $self->regOtt->createToken( $req->sessionInfo );
+              $self->regOtt->createToken( $self->save2faSessionInfo($req) );
             $self->logger->debug("Just one 2F is enabled");
             $self->logger->debug(" -> Redirect to 2fregisters/");
-            $req->response( [
-                    302,
-                    [ Location => $self->p->buildUrl('2fregisters') ], []
-                ]
+            $req->response(
+                [ 302, [ Location => $self->p->buildUrl('2fregisters') ], [] ]
             );
             return PE_SENDRESPONSE;
         }
@@ -404,15 +400,9 @@ sub run {
     $self->userLogger->info( 'Second factor required for '
           . $req->sessionInfo->{ $self->conf->{whatToTrace} } );
 
-    # Store user data in a token
-    $req->sessionInfo->{_2fRealSession} = $req->id;
-    $req->sessionInfo->{_2fUrldc}       = $req->urldc;
-    $req->sessionInfo->{_2fUtime}       = $req->{sessionInfo}->{_utime};
-    if ( $self->conf->{impersonationRule} ) {
-        $req->sessionInfo->{_impSpoofId} = $spoofId;
-        $req->sessionInfo->{_impUser}    = $req->user;
-    }
     delete $req->{authResult};
+
+    my $token = $self->ott->createToken( $self->save2faSessionInfo($req) );
 
     # If only one 2F is authorized, display it
     unless ($#am) {
@@ -421,13 +411,10 @@ sub run {
               . '2F selected for '
               . $req->sessionInfo->{ $self->conf->{whatToTrace} } );
 
-        my $token = $self->ott->createToken( $req->sessionInfo );
-        my $res   = $am[0]->run( $req, $token );
+        my $res = $am[0]->run( $req, $token );
         $req->authResult($res);
         return $res;
     }
-
-    my $token = $self->ott->createToken( $req->sessionInfo );
 
     # More than 1 2F has been found, display choice
     $self->logger->debug("Prepare 2F choice");
@@ -455,6 +442,36 @@ sub run {
     return PE_SENDRESPONSE;
 }
 
+sub save2faSessionInfo {
+    my ( $self, $req ) = @_;
+    my $spoofId = $req->param('spoofId') || '';
+
+    my $info = { %{ $req->sessionInfo } };
+
+    # Store user data in a token
+    $info->{_2fRealSession} = $req->id;
+    $info->{_2fUrldc}       = $req->urldc;
+    $info->{_2fUtime}       = $req->sessionInfo->{_utime};
+    if ( $self->conf->{impersonationRule} ) {
+        $info->{_impSpoofId} = $spoofId;
+        $info->{_impUser}    = $req->user;
+    }
+
+    return $info;
+}
+
+sub restore2faSessionInfo {
+    my ( $self, $req, $info ) = @_;
+
+    # Update sessionInfo
+    delete $info->{$_}
+      foreach (qw(tokenSessionStartTimestamp tokenTimeoutTimestamp _type));
+    $req->sessionInfo($info);
+    $req->id( delete $req->sessionInfo->{_2fRealSession} );
+    $req->urldc( delete $req->sessionInfo->{_2fUrldc} );
+    $req->{sessionInfo}->{_utime} = delete $req->{sessionInfo}->{_2fUtime};
+}
+
 # bool public display2fRegisters($req, $session)
 #
 # Return true if at least 1 register module is available for this user.
@@ -473,7 +490,7 @@ sub _choice {
 
     # Restore session
     unless ( $token = $req->param('token') ) {
-        $self->userLogger->error( $self->prefix . ' 2F access without token' );
+        $self->userLogger->error('2F choice requested without token');
         $req->mustRedirect(1);
         return $self->p->do( $req, [ sub { PE_NOTOKEN } ] );
     }
@@ -531,6 +548,15 @@ sub _displayRegister {
     my ( $self, $req, $prefix ) = @_;
     my $_2fDevices = [];
     my @am;
+    my %tplParams;
+
+    if ( $req->params("continue") ) {
+        %tplParams = (
+            %tplParams,
+            MSG   => 'your2faIsRegistered',
+            ALERT => "positive",
+        );
+    }
 
     $self->p->importHandlerData($req);
 
@@ -579,7 +605,10 @@ sub _displayRegister {
     }
 
     # If only one 2F is available, redirect to it
-    return [ 302, [ Location => $self->p->buildUrl('2fregisters', $am[0]->{CODE}) ], [] ]
+    return [
+        302,
+        [ Location => $self->p->buildUrl( '2fregisters', $am[0]->{CODE} ) ], []
+      ]
       if (
         @am == 1
         and not( @$_2fDevices
@@ -623,7 +652,8 @@ sub _displayRegister {
             MSG          => $self->canUpdateSfa($req) || 'choose2f',
             ALERT => ( $self->canUpdateSfa($req) ? 'warning' : 'positive' ),
             SFREGISTERS_URL =>
-              encode_base64( "$self->{conf}->{portal}2fregisters", '' )
+              encode_base64( "$self->{conf}->{portal}2fregisters", '' ),
+            %tplParams,
         }
     );
 }
@@ -694,13 +724,190 @@ sub register {
 
 sub restoreSession {
     my ( $self, $req, @path ) = @_;
-    my $token = $req->pdata->{sfRegToken}
-      or return [ 302, [ Location => $self->conf->{portal} ], [] ];
-    $req->userData( $self->regOtt->getToken( $token, 1 ) );
-    $req->data->{sfRegRequired} = 1;
-    return $req->method eq 'POST'
-      ? $self->register( $req, @path )
-      : $self->_displayRegister( $req, @path );
+
+    if ( my $token = $req->pdata->{sfRegToken} ) {
+        if ( my $sessionData = $self->regOtt->getToken( $token, 1 ) ) {
+
+            unless ( $sessionData->{_2fRealSession} ) {
+                $self->logger->error("Invalid 2FA registration token");
+                return [ 302, [ Location => $self->conf->{portal} ], [] ];
+            }
+            $self->restore2faSessionInfo( $req, $sessionData );
+
+            if ( $req->params("continue") ) {
+                return $self->continueLoginAfterRegistration($req);
+            }
+
+            $req->userData( $req->sessionInfo );
+            $req->data->{sfRegRequired} = 1;
+            if ( $req->method eq 'POST' ) {
+                my $res = $self->register( $req, @path );
+
+                if ( $req->data->{_2fRegistered} ) {
+                    $self->regOtt->updateToken( $token,
+                        "_2f" => $req->userData->{'_2f'} );
+                    if ( my $authnLevel =
+                        $req->userData->{registeredAuthenticationLevel} )
+                    {
+                        $self->regOtt->updateToken( $token,
+                            "newAuthenticationLevel" => $authnLevel );
+                    }
+                }
+                return $res;
+            }
+            else {
+                return $self->_displayRegister( $req, @path );
+            }
+        }
+    }
+    $self->logger->warn(
+        "Cannot restore session state during mandatory 2FA registration");
+    return [ 302, [ Location => $self->conf->{portal} ], [] ];
+}
+
+sub continueLoginAfterRegistration {
+    my ( $self, $req ) = @_;
+
+    # Check if registration was done
+    if ( !$req->sessionInfo->{_2f} ) {
+        $self->logger->error("2FA registration was not completed");
+        return $self->p->do( $req, [ sub { PE_ERROR } ] );
+    }
+
+    # Else restore session
+    $req->mustRedirect(1);
+
+    my $prefix = $req->sessionInfo->{_2f};
+    my $level  = $req->sessionInfo->{newAuthenticationLevel};
+    return $self->_continueLogin( $req, $prefix, $level );
+}
+
+sub _continueLogin {
+    my ( $self, $req, $prefix, $level ) = @_;
+
+    if ($level) {
+        $self->logger->debug(
+            "Update sessionInfo with new authenticationLevel: $level");
+        $req->sessionInfo->{authenticationLevel} = $level;
+
+        # Compute macros & local groups again with new authenticationLevel
+        $self->logger->debug("Compute macros and local groups...");
+        $req->steps( [ 'setMacros', 'setLocalGroups' ] );
+        if ( my $error = $self->p->process($req) ) {
+            $self->logger->debug("SFA: Process returned error: $error");
+            $req->error($error);
+            return $self->p->do( $req, [ sub { $error } ] );
+        }
+        $self->logger->debug("De-duplicate groups...");
+        $req->sessionInfo->{groups} = join $self->conf->{multiValuesSeparator},
+          keys %{ {
+                map { $_ => 1 } split $self->conf->{multiValuesSeparator},
+                $req->sessionInfo->{groups}
+            }
+          };
+
+        $self->logger->debug("Filter macros...");
+        my %macros = (
+            map { $_ => $req->sessionInfo->{$_} }
+              keys %{ $self->{conf}->{macros} }
+        );
+
+        $self->logger->debug(
+"Update session with new authenticationLevel, groups, hGroups and macros"
+        );
+        $self->p->updateSession(
+            $req,
+            {
+                authenticationLevel => $level,
+                groups              => $req->sessionInfo->{groups},
+                hGroups             => $req->sessionInfo->{hGroups},
+                _2f                 => $prefix,
+                %macros
+            }
+        );
+    }
+    else {
+        # Only update _2f session key
+        $self->p->updateSession(
+            $req,
+            {
+                _2f => $prefix,
+            }
+        );
+    }
+
+    $req->authResult(PE_SENDRESPONSE);
+    return $self->p->do(
+        $req,
+        [
+            @{ $self->p->afterData },
+            $self->p->validSession,
+            @{ $self->p->endAuth },
+            sub { PE_OK }
+        ]
+    );
+}
+
+sub _verify {
+    my ( $self, $prefix, $req ) = @_;
+
+    # Locate the module which handles this prefix
+    my ($m) =
+      grep { $_->{m}->prefix eq $prefix } @{ $self->sfModules };
+    return $self->p->sendError( $req, 'Unknown 2F module', 400 )
+      unless $m;
+    my $module = $m->{m};
+
+    # Check token
+    my $token;
+    unless ( $token = $req->param('token') ) {
+        $self->userLogger->error(
+            $module->prefix . ' 2F access without token' );
+        eval { $module->setSecurity($req) };
+        $req->mustRedirect(1);
+        return $self->p->do( $req, [ sub { PE_NOTOKEN } ] );
+    }
+
+    my $session;
+    unless ( $session = $self->ott->getToken($token) ) {
+        $self->userLogger->info(
+            'Invalid token during ' . $module->prefix . '2f validation' );
+        $req->noLoginDisplay(1);
+        return $self->p->do( $req, [ sub { PE_TOKENEXPIRED } ] );
+    }
+    unless ( $session->{_2fRealSession} ) {
+        $self->logger->error("Invalid 2FA session token");
+        $req->noLoginDisplay(1);
+        return $self->p->do( $req, [ sub { PE_ERROR } ] );
+    }
+
+    # Evaluate hook
+    my $h = $self->p->processHook( $req, 'sfBeforeVerify', $module, $session );
+    if ( $h != PE_OK ) {
+        $req->noLoginDisplay(1);
+        return $self->p->do( $req, [ sub { $h } ] );
+    }
+
+    # Launch second factor verification
+    my $res = $module->verify( $req, $session );
+
+    $self->restore2faSessionInfo( $req, $session );
+
+    # Case error
+    if ($res) {
+        $req->noLoginDisplay(1);
+        $req->authResult(PE_BADCREDENTIALS);
+        return $self->p->do( $req, [ 'storeHistory', sub { $res } ] );
+    }
+
+    # Else restore session
+    $req->mustRedirect(1);
+    $self->userLogger->notice( $module->prefix
+          . '2f verification succeeded for '
+          . $req->sessionInfo->{ $self->conf->{whatToTrace} } );
+
+    my $level = $module->authnLevel;
+    return $self->_continueLogin( $req, $module->prefix, $module->authnLevel );
 }
 
 sub searchForAuthorized2Fmodules {
@@ -841,6 +1048,54 @@ sub checkMaxAvailableAuthenticationLevel {
         return 0;
     }
     return 1;
+}
+
+sub _registerRoutes {
+    my ( $self, $m ) = @_;
+    unless ( $m->noRoute ) {
+        my $prefix = $m->prefix;
+        $self->logger->debug( 'Adding ' . $prefix . '2fcheck routes' );
+        $self->addAuthRoute(
+            $prefix . '2fcheck' => sub {
+                my $self = shift;
+                return $self->_verify( $prefix, @_ );
+            },
+            ['POST']
+        );
+        $self->addAuthRoute(
+            $prefix . '2fcheck' => '_redirect',
+            ['GET']
+        );
+        $self->addUnauthRoute(
+            $prefix . '2fcheck' => sub {
+                my $self = shift;
+                return $self->_verify( $prefix, @_ );
+            },
+            ['POST']
+        );
+        $self->addUnauthRoute(
+            $prefix . '2fcheck' => '_redirect',
+            ['GET']
+        );
+    }
+}
+
+sub get2fTplParams {
+    my ( $self, $req, $module ) = @_;
+    my %param;
+    my $checkLogins = $req->param('checkLogins');
+    $self->logger->debug( $module->prefix . '2f: checkLogins set' )
+      if $checkLogins;
+
+    my $stayConnected = $req->param('stayconnected');
+    $self->logger->debug( $module->prefix . '2f: stayConnected set' )
+      if $stayConnected;
+
+
+    $param{CHECKLOGINS}   = $checkLogins;
+    $param{STAYCONNECTED} = $stayConnected;
+
+    return %param;
 }
 
 1;

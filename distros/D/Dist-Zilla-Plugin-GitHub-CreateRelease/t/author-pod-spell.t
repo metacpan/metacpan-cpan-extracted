@@ -29,6 +29,8 @@ SignReleaseNotes
 Timothy
 Zilla
 api
+bin
+createrelease
 gpg
 lib
 plaintext

@@ -1,3 +1,38 @@
+0.030   2024-01-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] [build] Fix links to completion rule module
+          (Pod::Weaver::Plugin::Sah::Schemas 0.077).
+
+
+0.029   2024-01-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] [build] Tweak definition of Sah::Schema modules
+          (Pod::Weaver::Plugin::Sah::Schemas 0.076).
+
+
+0.028   2024-01-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] Show definitions of Sah::Schema modules.
+
+
+0.027   2023-11-23  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Typos.
+
+
+0.026   2023-11-23  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schema: dirname::default_only_subdir_not_file_in_curdir.
+
+
 0.025   2023-11-23  Released-By: PERLANCAR; Urgency: medium
 
         - Add schema: filename::default_only_file_not_dir_in_curdir.

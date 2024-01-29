@@ -1,7 +1,7 @@
 {
 package Audio::Nama::Engine;
 our $VERSION = 1.0;
-use Modern::Perl;
+use Modern::Perl '2020';
 use Carp;
 our @ISA;
 our %by_name;
@@ -121,6 +121,7 @@ sub current_controller_parameter {
 }
 sub valid_setup {
 	my ($self) = @_;
+	$self->ecasound_iam('cs-selected') and 
 	$self->ecasound_iam('cs-is-valid');
 }
 
@@ -137,7 +138,7 @@ sub sync_action {
 {
 package Audio::Nama::NetEngine;
 our $VERSION = 1.0;
-use Modern::Perl;
+use Modern::Perl '2020';
 use Audio::Nama::Log qw(logpkg logit);
 use Audio::Nama::Globals qw(:all);
 use Carp qw(carp);
@@ -233,16 +234,12 @@ sub configure {
 
 	# don't disturb recording/mixing
 	
-	return if Audio::Nama::ChainSetup::really_recording() and $this_engine->started();
+	return if Audio::Nama::ChainSetup::really_recording() and $this_engine->running();
 	
 	# store a lists of wav-recording tracks for the rerecord
 	# function
 	
-	restart_wav_memoize(); # check if someone has snuck in some files
-	
-	find_duplicate_inputs(); # we will warn the user later
-
-	if( $force or $setup->{changed} ){ 
+	if( $setup->{changed} ){ 
 		logpkg(__FILE__,__LINE__,'debug',"reconfigure requested");
 		$setup->{_old_snapshot} = status_snapshot_string();
 } 
@@ -268,7 +265,6 @@ sub configure {
 		map{$_->name => $_->rec_status } rec_hookable_tracks()
 	};
 	if ( $self->setup() ){
-		$self->{valid_setup} = 1;
 
 		reset_latency_compensation() if $config->{opts}->{Q};
 		
@@ -297,7 +293,7 @@ sub configure {
 {
 package Audio::Nama::LibEngine;
 our $VERSION = 1.0;
-use Modern::Perl;
+use Modern::Perl '2020';
 use Audio::Nama::Globals qw(:all);
 use Audio::Nama::Log qw(logit);
 our @ISA = 'Audio::Nama::Engine';
@@ -310,7 +306,7 @@ sub launch_ecasound_server {
 	$self->{audio_ecasound} = Audio::Ecasound->new();
 }
 sub ecasound_iam{
-	#logsub("&ecasound_iam");
+	#logsub((caller(0))[3]);
 	my $self = shift;
 	my $cmd = shift;
 	my $category = Audio::Nama::munge_category(shift());
@@ -331,9 +327,10 @@ sub configure { Audio::Nama::NetEngine::configure(@_) }
 } # end package
 { 
 package Audio::Nama::MidiEngine;
-use Modern::Perl;
+use Modern::Perl '2020';
 use SUPER;
 use Audio::Nama::Globals qw($config %tn);
+our $VERSION = 1.0;
 our @ISA = 'Audio::Nama::Engine';
 
 sub new {

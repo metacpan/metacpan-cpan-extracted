@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Nmg - Package for language Kwasio
 
 package Locale::CLDR::Locales::Nmg;
 # This file auto generated from Data\common\main\nmg.xml
-#	on Tue  5 Dec  1:26:24 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'Kiɛl akan',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Andɔ́ra',
  			'AE' => 'Minlambɔ́ Nsaŋ́nsa mí Arabia',
@@ -217,7 +217,6 @@ has 'display_name_region' => (
  			'MD' => 'Mɔldavia',
  			'MG' => 'Madagaskar',
  			'MH' => 'Maŋ́ má Marshall',
- 			'MK' => 'Macedonia',
  			'ML' => 'Mali',
  			'MM' => 'Myanmar',
  			'MN' => 'Mɔngolia',
@@ -333,7 +332,7 @@ has 'characters' => (
 			auxiliary => qr{[q x z]},
 			index => ['A', 'B', 'Ɓ', 'C', 'D', 'E', 'Ǝ', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y'],
 			main => qr{[a á â ǎ ä ā b ɓ c d e é ê ě ē ǝ {ǝ́} {ǝ̂} {ǝ̌} {ǝ̄} ɛ {ɛ́} {ɛ̂} {ɛ̌} {ɛ̄} f g h i í î ǐ ï ī j k l m n ń ŋ o ó ô ǒ ö ō ɔ {ɔ́} {ɔ̂} {ɔ̌} {ɔ̄} p r ŕ s t u ú û ǔ ū v w y]},
-			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT

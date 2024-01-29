@@ -1,0 +1,31 @@
+---
+abstract: 'a module for wrangling decks of cards'
+author:
+  - 'Jeremy Mates <jmates@thrig.me>'
+build_requires:
+  Scalar::Util: '0'
+  Test2::V0: '0.000060'
+  perl: v5.26.0
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Game-Deckar
+provides:
+  Game::Deckar:
+    file: lib/Game/Deckar.pm
+    version: '0.02'
+  Game::Deckar::Card:
+    file: lib/Game/Deckar.pm
+requires:
+  Object::Pad: '0.66'
+  perl: v5.26.0
+resources:
+  license: http://opensource.org/licenses/BSD-3-Clause
+  repository: https://thrig.me/src/Game-Deckar.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

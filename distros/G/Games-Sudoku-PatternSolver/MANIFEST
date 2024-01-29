@@ -1,0 +1,19 @@
+Changes
+examples/play.pl
+examples/solve.pl
+lib/Games/Sudoku/PatternSolver.pm
+lib/Games/Sudoku/PatternSolver.pod
+lib/Games/Sudoku/PatternSolver/CPLogic.pm
+lib/Games/Sudoku/PatternSolver/Generator.pm
+lib/Games/Sudoku/PatternSolver/Patterns.pm
+lib/Games/Sudoku/PatternSolver/patterns_9x9.bin
+lib/Games/Sudoku/PatternSolver/PlayerIF.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-generate.t
+t/02-solve.t
+t/03-games.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

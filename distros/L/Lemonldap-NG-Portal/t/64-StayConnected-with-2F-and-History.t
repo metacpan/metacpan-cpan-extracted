@@ -229,7 +229,6 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
         ),
         'Post code'
     );
-    $id = expectCookie($res);
     ( $host, $url, $query ) =
       expectForm( $res, undef, '/registerbrowser', 'fg', 'token' );
 
@@ -240,11 +239,11 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
             '/registerbrowser',
             IO::String->new($query),
             length => length($query),
-            cookie => "lemonldap=$id",
             accept => 'text/html',
         ),
         'Post fingerprint'
     );
+    $id = expectCookie($res);
     my $cid = expectCookie( $res, 'llngconnection' );
 
     # History is displayed
@@ -334,6 +333,21 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
         'Push U2F signature'
     );
 
+    ( $host, $url, $query ) =
+      expectForm( $res, undef, '/registerbrowser', 'fg', 'token' );
+
+    # Push fingerprint
+    $query =~ s/fg=/fg=aaa/;
+    ok(
+        $res = $client->_post(
+            '/registerbrowser',
+            IO::String->new($query),
+            length => length($query),
+            accept => 'text/html',
+        ),
+        'Post fingerprint'
+    );
+
     # See https://github.com/mschout/perl-authen-u2f-tester/issues/2
     if ( $Authen::U2F::Tester::VERSION >= 0.03 ) {
         $id = expectCookie($res);
@@ -345,21 +359,6 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
         );
     }
 
-    ( $host, $url, $query ) =
-      expectForm( $res, undef, '/registerbrowser', 'fg', 'token' );
-
-    # Push fingerprint
-    $query =~ s/fg=/fg=aaa/;
-    ok(
-        $res = $client->_post(
-            '/registerbrowser',
-            IO::String->new($query),
-            length => length($query),
-            cookie => "lemonldap=$id",
-            accept => 'text/html',
-        ),
-        'Post fingerprint'
-    );
     $cid = expectCookie( $res, 'llngconnection' );
 
     # History is displayed

@@ -1,19 +1,19 @@
 ---
 abstract: 'Interface to the Minsk Metro Map.'
 author:
-  - 'Michal Spacek <skim@cpan.org>'
+  - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   Encode: 0
   English: 0
   ExtUtils::MakeMaker: 6.36
-  Test::Map::Tube: 0.07
+  Test::Map::Tube: 0.35
   Test::More: 0
   Test::NoWarnings: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.21'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,13 +28,13 @@ no_index:
     - xt
 requires:
   File::Share: 0
-  Map::Tube: '3.06'
+  Map::Tube: '3.62'
   Moo: 0
   namespace::clean: 0
   perl: 5.6.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Map-Tube-Minsk
-  homepage: https://github.com/tupinek/Map-Tube-Minsk
+  bugtracker: https://github.com/michal-josef-spacek/Map-Tube-Minsk/issues
+  homepage: https://github.com/michal-josef-spacek/Map-Tube-Minsk
   license: http://opensource.org/licenses/artistic-license-2.0.php
-  repository: git://github.com/tupinek/Map-Tube-Minsk
-version: '0.05'
+  repository: git://github.com/michal-josef-spacek/Map-Tube-Minsk
+version: '0.06'

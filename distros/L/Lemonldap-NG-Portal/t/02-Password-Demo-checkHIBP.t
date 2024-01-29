@@ -11,101 +11,127 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 require 't/test-lib.pm';
 
-my ( $res, $json );
-
-my $client = LLNG::Manager::Test->new( {
-        ini => {
-            logLevel                    => 'error',
-            passwordDB                  => 'Demo',
-            passwordPolicy              => 1,
-            portalRequireOldPassword    => 0,
-            passwordPolicyMinSize       => 6,
-            passwordPolicyMinLower      => 0,
-            passwordPolicyMinUpper      => 0,
-            passwordPolicyMinDigit      => 0,
-            passwordPolicyMinSpeChar    => 0,
-            passwordPolicySpecialChar   => '[ }\ }',
-            portalDisplayPasswordPolicy => 1,
-            checkHIBP                   => 1,
-            checkHIBPURL      => 'https://api.pwnedpasswords.com/range/',
-            checkHIBPRequired => 1,
-        }
+SKIP: {
+    if ( $ENV{SKIP_NETWORK_TESTS} ) {
+        count(1);
+        skip 'Test skipped because SKIP_NETWORK_TESTS is set';
     }
-);
+    else {
 
-# Try to authenticate
-# -------------------
-ok(
-    $res = $client->_post(
-        '/',
-        IO::String->new('user=dwho&password=dwho'),
-        length => 23
-    ),
-    'Auth query'
-);
-count(1);
-expectOK($res);
-my $id = expectCookie($res);
+        my ( $res, $json );
 
-# Test HIBP API
-# -------------
-ok(
-    $res = $client->_post(
-        '/',
-        IO::String->new(
+        my $client = LLNG::Manager::Test->new( {
+                ini => {
+                    logLevel                    => 'error',
+                    passwordDB                  => 'Demo',
+                    passwordPolicy              => 1,
+                    portalRequireOldPassword    => 0,
+                    passwordPolicyMinSize       => 6,
+                    passwordPolicyMinLower      => 0,
+                    passwordPolicyMinUpper      => 0,
+                    passwordPolicyMinDigit      => 0,
+                    passwordPolicyMinSpeChar    => 0,
+                    passwordPolicySpecialChar   => '[ }\ }',
+                    portalDisplayPasswordPolicy => 1,
+                    checkHIBP                   => 1,
+                    checkHIBPURL => 'https://api.pwnedpasswords.com/range/',
+                    checkHIBPRequired => 1,
+                }
+            }
+        );
+
+        # Try to authenticate
+        # -------------------
+        ok(
+            $res = $client->_post(
+                '/', IO::String->new('user=dwho&password=dwho'),
+                length => 23
+            ),
+            'Auth query'
+        );
+        count(1);
+        expectOK($res);
+        my $id = expectCookie($res);
+
+        $res = $client->_get(
+            '/',
+            cookie => "lemonldap=$id",
+            accept => "text/html",
+        );
+
+        ok(
+            getHtmlElement( $res, '//li/i[@id="ppolicy-checkhibp-feedback"]' ),
+            "Found HIBP ppolicy display (id)"
+        );
+        ok(
+            getHtmlElement( $res, '//li/span[@trspan="passwordCompromised"]' ),
+            "Found HIBP ppolicy display (message)"
+        );
+        count(2);
+
+        # <i id=ppolicy-checkhibp-feedback" class="fa fa-li">
+        # Test HIBP API
+        # -------------
+        ok(
+            $res = $client->_post(
+                '/',
+                IO::String->new(
 'oldpassword=dwho&newpassword=400_BAD_REQ&confirmpassword=400_BAD_REQ'
-        ),
-        cookie => "lemonldap=$id",
-        accept => 'application/json',
-        length => 68
-    ),
-    'Bad request'
-);
-expectBadRequest($res);
-ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
-  or print STDERR "$@\n" . Dumper($res);
-ok(
-    $json->{error} == PE_PP_INSUFFICIENT_PASSWORD_QUALITY,
-    'Response is PE_PP_INSUFFICIENT_PASSWORD_QUALITY'
-) or explain( $json, "error => 28" );
+                ),
+                cookie => "lemonldap=$id",
+                accept => 'application/json',
+                length => 68
+            ),
+            'Bad request'
+        );
+        expectBadRequest($res);
+        ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
+          or print STDERR "$@\n" . Dumper($res);
+        ok(
+            $json->{error} == PE_PP_INSUFFICIENT_PASSWORD_QUALITY,
+            'Response is PE_PP_INSUFFICIENT_PASSWORD_QUALITY'
+        ) or explain( $json, "error => 28" );
 
-ok(
-    $res = $client->_post(
-        '/',
-        IO::String->new(
-            'oldpassword=dwho&newpassword=secret&confirmpassword=secret'),
-        cookie => "lemonldap=$id",
-        accept => 'application/json',
-        length => 58
-    ),
-    'Simple password found in HIBP database'
-);
-expectBadRequest($res);
-ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
-  or print STDERR "$@\n" . Dumper($res);
-ok(
-    $json->{error} == PE_PP_INSUFFICIENT_PASSWORD_QUALITY,
-    'Response is PE_PP_INSUFFICIENT_PASSWORD_QUALITY'
-) or explain( $json, "error => 28" );
+        ok(
+            $res = $client->_post(
+                '/',
+                IO::String->new(
+                    'oldpassword=dwho&newpassword=secret&confirmpassword=secret'
+                ),
+                cookie => "lemonldap=$id",
+                accept => 'application/json',
+                length => 58
+            ),
+            'Simple password found in HIBP database'
+        );
+        expectBadRequest($res);
+        ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
+          or print STDERR "$@\n" . Dumper($res);
+        ok(
+            $json->{error} == PE_PP_INSUFFICIENT_PASSWORD_QUALITY,
+            'Response is PE_PP_INSUFFICIENT_PASSWORD_QUALITY'
+        ) or explain( $json, "error => 28" );
 
-ok(
-    $res = $client->_post(
-        '/',
-        IO::String->new(
+        ok(
+            $res = $client->_post(
+                '/',
+                IO::String->new(
 'oldpassword=dwho&newpassword=T ESTis0k\}&confirmpassword=T ESTis0k\}'
-        ),
-        cookie => "lemonldap=$id",
-        accept => 'application/json',
-        length => 68
-    ),
-    'Complex password not found in HIBP database'
-);
-count(7);
-expectOK($res);
+                ),
+                cookie => "lemonldap=$id",
+                accept => 'application/json',
+                length => 68
+            ),
+            'Complex password not found in HIBP database'
+        );
+        count(7);
+        expectOK($res);
 
-$client->logout($id);
+        $client->logout($id);
 
-clean_sessions();
+        clean_sessions();
+    }
+}
 
 done_testing( count() );
 

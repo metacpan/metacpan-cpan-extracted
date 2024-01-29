@@ -2,10 +2,11 @@ package App::Env::Example;
 
 # ABSTRACT: example application environment module for App::Env.
 
+use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 
 # This example uses Shell::GetEnv to illustrate how to source a shell
 # script which defines the environment for an application.  Other
@@ -18,8 +19,7 @@ sub envs {
     #     my ( $opt ) = @_;
 
     # source the shell script and return the changed environment
-    return Shell::GetEnv->new( 'tcsh', 'source /usr/local/mypkg/setup.csh' )
-      ->envs;
+    return Shell::GetEnv->new( 'tcsh', 'source /usr/local/mypkg/setup.csh' )->envs;
 }
 
 1;
@@ -46,7 +46,7 @@ App::Env::Example - example application environment module for App::Env.
 
 =head1 VERSION
 
-version 1.02
+version 1.04
 
 =head1 DESCRIPTION
 
@@ -129,17 +129,17 @@ See the source of this module for a simple example.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-app-env@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env
+Please report any bugs or feature requests to bug-app-env@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env>
 
 =head2 Source
 
 Source is available at
 
-  https://gitlab.com/djerius/App-Env
+  https://gitlab.com/djerius/app-env
 
 and may be cloned from
 
-  https://gitlab.com/djerius/App-Env.git
+  https://gitlab.com/djerius/app-env.git
 
 =head1 SEE ALSO
 

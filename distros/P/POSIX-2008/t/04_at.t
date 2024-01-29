@@ -6,6 +6,7 @@ use sigtrap qw(die normal-signals error-signals);
 
 use Fcntl qw(:DEFAULT :mode);
 use File::Path 'rmtree';
+use File::Spec;
 use File::Temp 'mktemp';
 use Scalar::Util qw(blessed looks_like_number);
 
@@ -13,6 +14,7 @@ use Test::More tests => 23;
 use POSIX::2008 ':at';
 
 my $rv;
+my $atfdcwd = defined &AT_FDCWD ? &AT_FDCWD : undef;
 my $tmpname = mktemp('tmpXXXXX');
 rmtree($tmpname);
 
@@ -22,7 +24,7 @@ SKIP: {
   }
 
   umask 0;
-  opendir my $dot, '.' or die "Could not opendir(.): $!";
+  opendir my $dot, File::Spec->curdir() or die "Could not opendir(.): $!";
 
   $rv = openat(undef, $tmpname, O_RDWR|O_CREAT|O_TRUNC);
   ok(!defined $rv, 'openat with undef fd');
@@ -34,23 +36,23 @@ SKIP: {
   ok(!defined $rv, 'openat with invalid path');
 
   $rv = openat(AT_FDCWD, $tmpname, O_RDWR|O_CREAT|O_TRUNC);
-  ok(looks_like_number($rv), 'openat(AT_FDCWD, ...) returns file descriptor');
+  ok(looks_like_number($rv), "openat(AT_FDCWD=$atfdcwd, $tmpname) returns file descriptor");
   ok(-e $tmpname, "$tmpname exists");
 
   $rv = openat(\AT_FDCWD, $tmpname, O_RDWR|O_CREAT|O_TRUNC);
-  like(blessed($rv), qr/^POSIX::2008/, 'openat(\AT_FDCWD, ...) returns handle');
+  like(blessed($rv), qr/^IO::File/, "openat(\\AT_FDCWD=\\$atfdcwd, $tmpname) returns file handle");
 
   # Perl < 5.22 doesn't support fileno for directory handles
   if (defined(my $fndot = fileno $dot)) {
     $rv = openat($fndot, $tmpname, O_RDWR|O_CREAT|O_TRUNC);
-    ok(looks_like_number($rv), 'openat(fd, ...) returns file descriptor');
+    ok(looks_like_number($rv), "openat(fd=$fndot, $tmpname) returns file descriptor");
   }
   else {
     pass("This Perl doesn't support fileno for directory handles");
   }
 
   $rv = openat($dot, $tmpname, O_RDWR|O_CREAT|O_TRUNC);
-  like(blessed($rv), qr/^POSIX::2008/, 'openat(fh, ...) returns handle (file)');
+  like(blessed($rv), qr/^IO::File/, "openat(fh, $tmpname) returns file handle");
   ok(-f $rv, 'handle references a regular file');
   ok(unlinkat($dot, $tmpname), "unlinkat(fh, $tmpname)");
   ok(! -e $tmpname, "$tmpname is gone");
@@ -62,17 +64,17 @@ SKIP: {
   ok(mkdirat($dot, $tmpname, 0700), "mkdirat: $tmpname");
 
   my @stat = fstatat($dot, $tmpname);
-  ok(@stat && S_ISDIR($stat[2]) && ($stat[2] & 07777) == 0700, 'fstatat after mkdirat');
+  ok(@stat && S_ISDIR($stat[2]) && ($stat[2] & 0777) == 0700, 'fstatat after mkdirat');
 
   ok(fchmodat($dot, $tmpname, 0755), 'fchmodat');
 
   @stat = fstatat($dot, $tmpname);
-  ok(@stat && S_ISDIR($stat[2]) && ($stat[2] & 07777) == 0755, 'fstatat after fchmodat');
+  ok(@stat && S_ISDIR($stat[2]) && ($stat[2] & 0777) == 0755, 'fstatat after fchmodat');
 
   # Don't use O_DIRECTORY here because it's not always available. We don't need
   # it anyway because we know we've just created a directory.
   $rv = openat($dot, $tmpname, O_RDONLY);
-  like(blessed($rv), qr/^POSIX::2008/, 'openat returns handle (dir))');
+  like(blessed($rv), qr/^IO::Dir/, 'openat returns directory handle');
 
   ok(openat($rv, $tmpname, O_RDWR|O_CREAT|O_TRUNC), 'openat() in subdir');
   ok(readdir $rv, 'readdir() on handle from openat()');

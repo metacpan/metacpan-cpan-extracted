@@ -10,7 +10,9 @@ use PDF::Builder::Util;
 #my $compress = 'none'; # uncompressed streams
 my $compress = 'flate'; # compressed streams
 
+my $section_length = 32;  # examples per old and new methods
 my @labels = (
+# new method page_labels()
 	'upper case Roman numeral I',
 	'upper case Roman numeral II',
 	'upper case Roman numeral III',
@@ -31,12 +33,57 @@ my @labels = (
 	'prefixed B-2',
 	'prefixed C-1',
 	'prefixed C-2',
-	'decimal (Arabic) number 10',
 	'decimal (Arabic) number 11',
+	'decimal (Arabic) number 12',
 	'upper case letter A',
 	'upper case letter B',
 	'lower case Roman numeral i',
 	'lower case Roman numeral ii',
+	'no counter (blank)',
+	'no counter (blank)',
+	'prefix, no counter Z',
+	'prefix, no counter Z',
+	'prefix, uc Roman Index I',
+	'prefix, uc Roman Index II',
+
+# old method pageLabel()
+	'upper case Roman numeral I',
+	'upper case Roman numeral II',
+	'upper case Roman numeral III',
+	'upper case Roman numeral IV',
+	'decimal (Arabic) number 1',
+	'decimal (Arabic) number 2',
+	'decimal (Arabic) number 3',
+	'decimal (Arabic) number 4',
+	'decimal (Arabic) number 5',
+	'decimal (Arabic) number 6',
+	'decimal (Arabic) number 7',
+	'decimal (Arabic) number 8',
+	'decimal (Arabic) number 9',
+	'decimal (Arabic) number 10',
+	'prefixed A-1',
+	'prefixed A-2',
+	'prefixed B-1',
+	'prefixed B-2',
+	'prefixed C-1',
+	'prefixed C-2',
+	'decimal (Arabic) number 11',
+	'decimal (Arabic) number 12',
+	'upper case letter A',
+	'upper case letter B',
+	'lower case Roman numeral i',
+	'lower case Roman numeral ii',
+	'no counter (blank)',
+	'no counter (blank)',
+	'prefix, no counter Z',
+	'prefix, no counter Z',
+	'prefix, uc Roman Index I',
+	'prefix, uc Roman Index II',
+# extra: these two styles (4 pages) combined one call, pageLabel only
+	'lower case letter c', 
+	'lower case letter d',
+	'lc Roman and prefixed App-iv',
+	'lc Roman and prefixed App-v',
 );
 
 my $pdf = PDF::Builder->new(-compress => $compress);
@@ -44,42 +91,93 @@ my $pdf = PDF::Builder->new(-compress => $compress);
 my $f1=$pdf->corefont('Helvetica', -encode=>'latin1');      # unused?
 my $f2=$pdf->corefont('Helvetica-Bold', -encode=>'latin1'); # "Page Index=" text
 
-# initial pass, create 26 pages labeled "Page Index=n" for n=0-25
-foreach my $i (0 .. 25) {
+# initial pass, create 2 x $section_length-1 pages labeled 
+#   "Page Index=n" for n=0-$section_length
+#   extra pages for pageLabel combined -1 -> +3
+foreach my $i (0 .. 2*$section_length+3) {
 	my $page = $pdf->page();
 	$page->mediabox(595,842);
 	
 	my $text=$page->text();
-	$text->textlabel(40,700, $f2, 20, 'Page Index='.$i.',');
+	$text->textlabel(40,700, $f2, 20, 'Page Index='.$i.', Physical Page='.($i+1));
 	$text->textlabel(40,670, $f2, 20, 'thumbnail label should be '.$labels[$i]);
 }
 
 # modify page numbering /Catalog /PageLabels entries
 # note that each style change resets page to 1
 # this number NOT on printed page... only in reader thumbnail
+#                                     and possibly the reader's display page
 
-# pages 0..3 should be Upper Case Roman (I..IV)
-$pdf->pageLabel(0, { -style => 'Roman' });  # 0 << /S /R >> default St 1
+# ---------- NEW method using page_labels()
+# pages 1..4 should be Upper Case Roman (I..IV)
+$pdf->page_labels(1, -style => 'Roman' );  # << /S /R >> default St 1
 
-# pages 4..13 s/b decimal, restart at 1 (1..10)
-$pdf->pageLabel(4, { -start => 1 });  # 4 << /S /D /St 1 >>
+# pages 5..14 s/b decimal, restart at 1 (1..10)
+$pdf->page_labels(5, -start => 1 );  # << /S /D /St 1 >>
 
-# pages 14..15 s/b A-decimal, restart at 1 (A-1, A-2)
-$pdf->pageLabel(14, { -start => 1, -prefix => 'A-' }); # 14 << /P (A-) /S /D /St 1 >>
-# pages 16..17 s/b B-1, B-2
-$pdf->pageLabel(16, { -start => 1, -prefix => 'B-' }); # 16 << /P (B-) /S /D /St 1 >>
-# pages 18..19 s/b C-1, C-2
-$pdf->pageLabel(18, { -start => 1, -prefix => 'C-' }); # 18 << /P (C-) /S /D /St 1 >>
+# pages 15..16 s/b A-decimal, restart at 1 (A-1, A-2)
+$pdf->page_labels(15, -start => 1, -prefix => 'A-' ); # << /P (A-) /S /D /St 1 >>
+# pages 17..18 s/b B-1, B-2
+$pdf->page_labels(17, -start => 1, -prefix => 'B-' ); # << /P (B-) /S /D /St 1 >>
+# pages 19..20 s/b C-1, C-2
+$pdf->page_labels(19, -start => 1, -prefix => 'C-' ); # << /P (C-) /S /D /St 1 >>
 
-# pages 20..21 s/b decimal, restart at 10 (10..11)
-$pdf->pageLabel(20, { -start => 10 }); # 20 << /S /D /St 10 >>
+# pages 21..22 s/b decimal, restart at 11 (11..12)
+$pdf->page_labels(21, -start => 11 ); # << /S /D /St 11 >>
 
-# pages 22..23 s/b Alpha, auto-restarts at 1 (A, B)
-$pdf->pageLabel(22, { -style => 'Alpha' }); # 22 << /S /A >>
+# pages 23..24 s/b Alpha, auto-restarts at 1 (A, B)
+$pdf->page_labels(23, -style => 'Alpha' ); # << /S /A >>
 
-# pages 24..25 s/b lowercase roman, auto-restarts at 1 (i, ii)
-$pdf->pageLabel(24, { -style => 'roman' }); # 24 << /S /r >>
+# pages 25..26 s/b lowercase roman, auto-restarts at 1 (i, ii)
+$pdf->page_labels(25, -style => 'roman' ); # << /S /r >>
 
+# pages 27..28 s/b blank (nocounter)
+$pdf->page_labels(27, -style => 'nocounter' ); 
+
+# pages 29..30 s/b blank (nocounter) with Z prefix
+$pdf->page_labels(29, -style => 'nocounter', -prefix => 'Z' ); 
+
+# pages 31..32 s/b prefix Index plus UC Roman
+$pdf->page_labels(31, style => 'Roman', prefix => 'Index ' ); 
+
+# ---------- OLD method using pageLabel()
+# pages $section_length+0..3 should be Upper Case Roman (I..IV)
+$pdf->pageLabel($section_length+0, { -style => 'Roman' });  # << /S /R >> default St 1
+
+# pages $section_length+4..13 s/b decimal, restart at 1 (1..10)
+$pdf->pageLabel($section_length+4, { -start => 1 });  # << /S /D /St 1 >>
+
+# pages $section_length+14..15 s/b A-decimal, restart at 1 (A-1, A-2)
+$pdf->pageLabel($section_length+14, { -start => 1, -prefix => 'A-' }); # << /P (A-) /S /D /St 1 >>
+# pages $section_length+16..17 s/b B-1, B-2
+$pdf->pageLabel($section_length+16, { -start => 1, -prefix => 'B-' }); # << /P (B-) /S /D /St 1 >>
+# pages $section_length+18..19 s/b C-1, C-2
+$pdf->pageLabel($section_length+18, { -start => 1, -prefix => 'C-' }); # << /P (C-) /S /D /St 1 >>
+
+# pages $section_length+20..21 s/b decimal, restart at 11 (10..11)
+$pdf->pageLabel($section_length+20, { -start => 11 }); # << /S /D /St 11 >>
+
+# pages $section_length+22..23 s/b Alpha, auto-restarts at 1 (A, B)
+$pdf->pageLabel($section_length+22, { -style => 'Alpha' }); # << /S /A >>
+
+# pages $section_length+24..25 s/b lowercase roman, auto-restarts at 1 (i, ii)
+$pdf->pageLabel($section_length+24, { -style => 'roman' }); # << /S /r >>
+
+# pages $section_length+26..27 s/b blank (nocounter)
+$pdf->pageLabel($section_length+26, { -style => 'nocounter' }); 
+
+# pages $section_length+28..29 s/b blank (nocounter) with Z prefix
+$pdf->pageLabel($section_length+28, { -style => 'nocounter', -prefix => 'Z' }); 
+
+# pages $section_length+30..31 s/b prefix Index plus UC Roman
+$pdf->pageLabel($section_length+30, { 'style' => 'Roman', 'prefix' => 'Index ' }); 
+
+# -------------
+
+# combine two calls into one for pageLabel only!
+$pdf->pageLabel($section_length+32, { style => 'alpha', start => 3 },
+	        $section_length+34, { style => 'roman', start => 4, prefix => 'App-' });
+# -------------
 $pdf->saveas("$0.pdf");
 $pdf->end();
 

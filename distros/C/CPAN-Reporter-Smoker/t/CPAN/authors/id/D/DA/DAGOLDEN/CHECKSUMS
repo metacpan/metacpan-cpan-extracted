@@ -1,6 +1,7 @@
 # CHECKSUMS file written on Wed Feb 13 03:44:01 2008 GMT by CPAN::Checksums (v1.064)
 $cksum = {
   'Bogus-Fail-0.01.tar.gz' => {
+    'cpan_path' => 'D/DA/DAGOLDEN',
     'md5' => 'e5967bcb6cb23987db704607fda283b3',
     'md5-ungz' => 'e8c5a6e36636aec8b19b115020026f13',
     'mtime' => '2008-01-27',
@@ -9,6 +10,7 @@ $cksum = {
     'size' => 965
   },
   'Bogus-PL-Fail-0.01.tar.gz' => {
+    'cpan_path' => 'D/DA/DAGOLDEN',
     'md5' => 'a60f2751456efa0e787e9d2b143d1ccc',
     'md5-ungz' => '70580f04a8db2ee4b2fd50614cb38f19',
     'mtime' => '2008-01-27',
@@ -17,6 +19,7 @@ $cksum = {
     'size' => 1007
   },
   'Bogus-Pass-0.01.tar.gz' => {
+    'cpan_path' => 'D/DA/DAGOLDEN',
     'md5' => '6a208561a1c455dfce11ca7a446f4eb9',
     'md5-ungz' => 'ef5b052ce8d8ffc29107a99d0e79016c',
     'mtime' => '2008-01-27',
@@ -25,6 +28,7 @@ $cksum = {
     'size' => 962
   },
   'Bundle-Fake-1.00.tar.gz' => {
+    'cpan_path' => 'D/DA/DAGOLDEN',
     'md5' => '2685146a32c45b6c0fee2dd8807cad68',
     'md5-ungz' => 'ca55cef7ab32536681f5056124570b9c',
     'mtime' => '2008-02-13',

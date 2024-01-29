@@ -1,5 +1,4 @@
 use warnings;
-use lib 'inc';
 use Test::More;
 use strict;
 use IO::String;
@@ -51,6 +50,7 @@ my $op = LLNG::Manager::Test->new(
                     oidcRPMetaDataOptionsBypassConsent         => 1,
                     oidcRPMetaDataOptionsRefreshToken          => 1,
                     oidcRPMetaDataOptionsAllowOffline          => 1,
+                    oidcRPMetaDataOptionsRedirectUris => 'http://rp2.com/',
                 },
                 oauth => {
                     oidcRPMetaDataOptionsDisplayName  => "oauth",
@@ -123,6 +123,9 @@ ok( $refresh_token, 'Refresh token present' );
 my $id_token_payload = id_token_payload($id_token);
 is( $id_token_payload->{id_token_hook}, 1, "Found hooked claim in ID token" );
 
+# Reset conf to make sure to make sure lazy loading works
+$op->p->HANDLER->checkConf(1);
+
 # Get userinfo
 $res = $op->_post(
     "/oauth2/userinfo",
@@ -136,10 +139,15 @@ $res = $op->_post(
 
 $json = expectJSON($res);
 is( $json->{userinfo_hook}, 1, "Found hooked claim in Userinfo token" );
-is( $json->{_auth}, "Demo",    "Found session variable in Userinfo token" );
+is( $json->{_auth}, "Demo",    "Found injected variable in Userinfo token" );
+is( $json->{email}, 'fa@badwolf.org',
+    "Found exported attribute variable in Userinfo token" );
 like( $json->{_scope}, qr/\bopenid\b/, "Scopes are visible in hook" );
 
 expectJWT( $token, access_token_hook => 1 );
+
+# Reset conf to make sure to make sure lazy loading works
+$op->p->HANDLER->checkConf(1);
 
 # Introspect to find scopes
 $query = "token=$token";
@@ -160,6 +168,9 @@ expectOK($res);
 $json = from_json( $res->[2]->[0] );
 like( $json->{scope}, qr/\bmy_hooked_scope\b/, "Found hook defined scope" );
 like( $json->{scope}, qr/\bmyscope\b/, "Found result of oidcResolveScope" );
+
+# Reset conf to make sure to make sure lazy loading works
+$op->p->HANDLER->checkConf(1);
 
 # Refresh access token
 $res  = refreshGrant( $op, 'rpid', $refresh_token );
@@ -188,6 +199,9 @@ $code = codeAuthorize(
 $json = expectJSON( codeGrant( $op, 'rpid', $code, "http://rp2.com/" ) );
 $refresh_token = $json->{refresh_token};
 ok( $refresh_token, 'Refresh token present' );
+
+# Reset conf to make sure to make sure lazy loading works
+$op->p->HANDLER->checkConf(1);
 
 $json = expectJSON( refreshGrant( $op, 'rpid', $refresh_token ) );
 expectJWT( $json->{access_token},

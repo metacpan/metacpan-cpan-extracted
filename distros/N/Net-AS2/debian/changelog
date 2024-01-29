@@ -1,8 +1,17 @@
+libnet-as2-perl (1.0111-1) stable; urgency=low
+
+  * Create dynamic test certificates
+     - tests failed due to expired hard-coded certs in t directory
+
+ -- Andrew Maguire <ajm@cpan.org>  Tue, 19 Dec 2023 17:15:00 +1300
+
 libnet-as2-perl (1.0110-1) stable; urgency=low
 
   * Message-Id and Original-Message-ID
      - RFC4130 requires Message-Id and Original-Message-ID delimited
        by angle brackets in header
+
+ -- Andrew Maguire <ajm@cpan.org>  Mon, 17 Jun 2019 15:31:05 +1300
 
 libnet-as2-perl (1.0101-1) stable; urgency=low
 

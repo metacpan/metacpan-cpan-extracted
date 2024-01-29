@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/AI-descriptions.txt
 eg/chseqcv-set.pl
 eg/chsequl-set.pl
 eg/pfold-set.pl

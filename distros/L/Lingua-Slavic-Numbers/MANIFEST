@@ -17,3 +17,4 @@ t/decimals
 t/numbers
 t/ordinates
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json

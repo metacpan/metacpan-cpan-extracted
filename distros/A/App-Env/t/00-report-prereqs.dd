@@ -46,7 +46,6 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::Test::PodSpelling' => '0',
                                       'Dist::Zilla::Plugin::Test::ReportPrereqs' => '0',
                                       'Dist::Zilla::Plugin::Test::TrailingSpace' => '0',
-                                      'Dist::Zilla::Plugin::Test::UnusedVars' => '0',
                                       'Dist::Zilla::Plugin::Test::Version' => '0',
                                       'Dist::Zilla::PluginBundle::Basic' => '0',
                                       'Dist::Zilla::PluginBundle::Filter' => '0',
@@ -70,7 +69,6 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Spelling' => '0.12',
                                       'Test::TrailingSpace' => '0.0203',
-                                      'Test::Vars' => '0',
                                       'Test::Version' => '1'
                                     }
                     },
@@ -85,6 +83,7 @@ do { my $x = {
                                       'Getopt::Long' => '0',
                                       'IPC::System::Simple' => '0',
                                       'JSON::PP' => '0',
+                                      'List::Util' => '1.33',
                                       'Module::Find' => '0',
                                       'Params::Validate' => '0',
                                       'Pod::Usage' => '0',
@@ -116,7 +115,8 @@ do { my $x = {
                                    'Test2::API' => '0',
                                    'Test2::V0' => '0',
                                    'Test::Lib' => '0',
-                                   'Test::More' => '0'
+                                   'Test::More' => '0',
+                                   'Test::Script' => '0'
                                  }
                  }
      };

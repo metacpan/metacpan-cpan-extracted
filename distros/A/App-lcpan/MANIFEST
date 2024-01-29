@@ -36,6 +36,7 @@ lib/App/lcpan/Cmd/delete_old_data.pm
 lib/App/lcpan/Cmd/delete_rel.pm
 lib/App/lcpan/Cmd/deps.pm
 lib/App/lcpan/Cmd/deps_by_dependent_count.pm
+lib/App/lcpan/Cmd/deps_to_other_author.pm
 lib/App/lcpan/Cmd/dist.pm
 lib/App/lcpan/Cmd/dist2author.pm
 lib/App/lcpan/Cmd/dist2rel.pm
@@ -79,6 +80,7 @@ lib/App/lcpan/Cmd/most_mentioned_mods.pm
 lib/App/lcpan/Cmd/most_mentioned_scripts.pm
 lib/App/lcpan/Cmd/namespaces.pm
 lib/App/lcpan/Cmd/rdeps.pm
+lib/App/lcpan/Cmd/rdeps_from_other_author.pm
 lib/App/lcpan/Cmd/rdeps_scripts.pm
 lib/App/lcpan/Cmd/rel.pm
 lib/App/lcpan/Cmd/related_authors.pm

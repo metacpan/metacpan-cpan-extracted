@@ -2,44 +2,59 @@
   <div class="panel-heading">
     <h3 class="panel-title">{{translateTitle(currentNode)}}</h3>
   </div>
-  <table class="table table-striped">
-    <thead>
+  <table ng-repeat="s in currentNode.nodes"  class="table table-striped">
+    <tbody>
       <tr>
         <th trspan="name"></th>
-        <th trspan="type"></th>
-        <th trspan="registerextra"></th>
-        <th trspan="label"></th>
-        <th trspan="logo"></th>
-        <th trspan="level"></th>
-        <th trspan="rule"></th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr ng-repeat="s in currentNode.nodes">
         <td>
           <input class="form-control" ng-model="s.title" />
         </td>
+      </tr>
+      <tr>
+        <th trspan="type"></th>
         <td>
           <select class="form-control" ng-model="s.data.type">
             <option ng-repeat="item in currentNode.select" ng-selected="item.k==s.data.type" value="{{item.k}}">{{item.v}}</option>
           </select>
         </td>
-        <td class="form-horizontal">
-          <input type="checkbox" class="form-control checkbox-inline" ng-model="s.data.register" />
-        </td>
+      </tr>
+      <tr>
+        <th trspan="label"></th>
         <td>
           <input class="form-control" ng-model="s.data.label" />
         </td>
+      </tr>
+      <tr>
+        <th trspan="logo"></th>
         <td>
           <input class="form-control" ng-model="s.data.logo" />
         </td>
+      </tr>
+      <tr>
+        <th trspan="level"></th>
         <td>
           <input class="form-control" ng-model="s.data.level" />
         </td>
+      </tr>
+      <tr>
+        <th trspan="activationrule"></th>
         <td>
           <input class="form-control" ng-model="s.data.rule" />
         </td>
+      </tr>
+      <tr>
+        <th trspan="registerextra"></th>
+        <td class="form-horizontal">
+          <input type="checkbox" class="form-control checkbox-inline" ng-model="s.data.register" />
+        </td>
+      </tr>
+      <tr>
+        <th trspan="registerrule"></th>
+        <td>
+          <input class="form-control" ng-model="s.data.regrule" />
+        </td>
+      </tr>
+      <tr>
         <td>
           <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.nodes,$index)"></span>
           <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newSfExtra'})"></span>

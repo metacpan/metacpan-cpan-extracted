@@ -1,5 +1,4 @@
 #!perl
-
 use 5.24.0;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -9,12 +8,13 @@ install_share 'levels';
 
 sub merge_key_into {
     my ( $href, $target, $source ) = @_;
-    %{ $href->{$target} } = ( %{ $href->{$target} }, %{ delete $href->{$source} } );
+    %{ $href->{$target} } =
+      ( %{ $href->{$target} }, %{ delete $href->{$source} } );
 }
 
 my %params = (
     NAME          => 'Game::PlatformsOfPeril',
-    AUTHOR        => 'Jeremy Mates <jmates@cpan.org>',
+    AUTHOR        => 'Jeremy Mates <jmates@thrig.me>',
     VERSION_FROM  => 'lib/Game/PlatformsOfPeril.pm',
     ABSTRACT_FROM => 'lib/Game/PlatformsOfPeril.pm',
 
@@ -32,8 +32,8 @@ my %params = (
     },
     BUILD_REQUIRES => {},
     TEST_REQUIRES  => {
-        'Test::More' => 0,
-        'lib'        => 0,
+        'Test2::V0' => '0.000060',
+        'lib'       => 0,
     },
     PREREQ_PM => {
         'File::ShareDir'      => 0,
@@ -50,7 +50,7 @@ my %params = (
 
     META_MERGE => {
         'resources' =>
-          { repository => 'https://github.com/thrig/Game-PlatformsOfPeril', },
+          { repository => 'https://thrig.me/src/Game-PlatformsOfPeril.git', },
     },
 );
 
@@ -76,7 +76,8 @@ if ( $mm_version < 6.51_03 ) {
     merge_key_into \%params, 'PREREQ_PM', 'CONFIGURE_REQUIRES';
 }
 
-WriteMakefile( ( MM->can('signature_target') ? ( SIGN => 1 ) : () ), %params );
+WriteMakefile( ( MM->can('signature_target') ? ( SIGN => 1 ) : () ),
+    %params );
 
 package MY;
 use File::ShareDir::Install qw(postamble);

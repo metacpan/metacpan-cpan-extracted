@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Device::Chip::MAX11200 0.15;
+package Device::Chip::MAX11200 0.16;
 class Device::Chip::MAX11200
    :isa(Device::Chip);
 
@@ -391,26 +391,29 @@ integers.
 
 =cut
 
-foreach (
-   [ "selfcal_offset", REG_SCOC ],
-   [ "selfcal_gain",   REG_SCGC ],
-   [ "syscal_offset",  REG_SOC  ],
-   [ "syscal_gain",    REG_SGC  ],
-) {
-   my ( $name, $reg ) = @$_;
+BEGIN {
+   use Object::Pad 0.800 ':experimental(mop)';
+   my $mop = Object::Pad::MOP::Class->for_caller;
 
-   no strict 'refs';
+   foreach (
+      [ "selfcal_offset", REG_SCOC ],
+      [ "selfcal_gain",   REG_SCGC ],
+      [ "syscal_offset",  REG_SOC  ],
+      [ "syscal_gain",    REG_SGC  ],
+   ) {
+      my ( $name, $reg ) = @$_;
 
-   *{"read_$name"} = async method () {
-      my $bytes = await $self->read_register( $reg, 3 );
-      return unpack "I>", "\0" . $bytes;
-   };
+      $mop->add_method( "read_$name" => async method () {
+         my $bytes = await $self->read_register( $reg, 3 );
+         return unpack "I>", "\0" . $bytes;
+      } );
 
-   *{"write_$name"} = async method ( $value ) {
-      await $self->write_register( $reg,
-         substr( pack( "I>", $value ), 1 )
-      );
-   };
+      $mop->add_method( "write_$name" => async method ( $value ) {
+         await $self->write_register( $reg,
+            substr( pack( "I>", $value ), 1 )
+         );
+      } );
+   }
 }
 
 =head2 as_gpio_adapter

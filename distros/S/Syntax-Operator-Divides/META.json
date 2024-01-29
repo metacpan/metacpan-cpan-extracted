@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -27,6 +27,8 @@
       },
       "runtime" : {
          "requires" : {
+            "XS::Parse::Infix" : "0.27",
+            "meta" : "0.003_002",
             "perl" : "5.016"
          }
       },
@@ -39,7 +41,7 @@
    "provides" : {
       "Syntax::Operator::Divides" : {
          "file" : "lib/Syntax/Operator/Divides.pm",
-         "version" : "0.04"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -49,6 +51,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.04",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

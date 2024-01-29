@@ -1,15 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.57;
+use warnings;
+use Object::Pad 0.807;
 
-package Tickit::Widget::Fill 0.37;
-class Tickit::Widget::Fill
-   :strict(params)
-   :isa(Tickit::Widget);
+package Tickit::Widget::Fill 0.41;
+class Tickit::Widget::Fill :strict(params);
+
+inherit Tickit::Widget;
 
 use Tickit::Style;
 

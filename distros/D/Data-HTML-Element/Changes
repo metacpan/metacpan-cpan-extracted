@@ -1,0 +1,6 @@
+0.09 2024-01-06T19:35:12+01:00
+ - Add check for CSS class.
+ - Update to bigger version because issues in $VERSION.
+
+0.01 2024-01-06T18:02:59+01:00
+ - First version.

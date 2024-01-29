@@ -16,7 +16,7 @@ StreamFinder - Fetch actual raw streamable URLs from various radio-station, vide
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2023 by
+This module is Copyright (C) 2017-2024 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -131,13 +131,13 @@ The currently-supported websites are:
 podcasts.apple.com podcasts (L<StreamFinder::Apple>), 
 bitchute.com videos (L<StreamFinder::Bitchute>), 
 blogger.com videos (L<StreamFinder::Blogger>), 
-brandnewtube.com and ugetube.com videos (L<StreamFinder::BrandNewTube>), 
+ugetube.com videos (L<StreamFinder::BrandNewTube>), 
 brighteon.com videos (L<StreamFinder::Brighteon>), 
 castbox.fm podcasts (L<StreamFinder::Castbox>), 
 podcasts.google.com podcasts (L<StreamFinder::Google>), 
-iheartradio.com radio stations and podcasts (L<StreamFinder::IHeartRadio>), 
-www.internetradio.com radio stations (L<StreamFinder::InternetRadio>), 
-www.linktv.org videos (L<StreamFinder::LinkTV>),
+iheart.com (aka iheartradio.com) radio stations and podcasts 
+(L<StreamFinder::IHeartRadio>), 
+www.internet-radio.com radio stations (L<StreamFinder::InternetRadio>), 
 onlineradiobox.com radio stations (L<StreamFinder::OnlineRadiobox>), 
 odysee.com videos (L<StreamFinder::Odysee>), 
 podbean.com podcasts (L<StreamFinder::Podbean>), 
@@ -147,8 +147,8 @@ radio.net radio stations (L<StreamFinder::RadioNet>),
 rcast.net radio stations (L<StreamFinder::Rcast>), 
 rumble.com videos (L<StreamFinder::Rumble>),
 sermonaudio.com sermons: audio and video (L<StreamFinder::SermonAudio>), 
-soundcloud.com (non-paywalled) songs (L<StreamFinder::SoundCloud>), 
-spreaker.com podcasts (L<StreamFinder::Spreaker>), 
+soundcloud.com (non-paywalled) songs (L<StreamFinder::SoundCloud>) 
+(DEPRECIATED), spreaker.com podcasts (L<StreamFinder::Spreaker>), 
 subsplash.com podcasts (L<StreamFinder::Subsplash>) (EXPERIMENTAL), 
 tunein.com (non-paywalled) radio stations and podcasts 
 (L<StreamFinder::Tunein>), vimeo.com videos (L<StreamFinder::Vimeo>), 
@@ -164,8 +164,19 @@ episode page to fetch streams from, as Podcastaddict.com has javascripted up
 their podcast pages now to the point that it is no longer possible to obtain 
 a playlist or first episode from them via our scripts.  
 
+NOTE:  StreamFinder::LinkTV has been removed as that site no longer provides 
+streams anymore but only links to the various (and diverse) streaming sites 
+that provide their own streams.  Some may possibly work via 
+StreamFinder::Youtube or StreamFinder::AnyStream.
+
 NOTE:  StreamFinder::Goodpods has been removed, as that site has redone itself 
 in javascript as to no longer be scrapable for streams.
+
+NOTE:  Users should also consider StreamFinder::SoundCloud to now be 
+depreciated, as they've added cookie and tracker requirements making it 
+impossible to search for songs on their site without enabling, but song URLs 
+(when known) seem to still work for now, but without channel/artist icons.  
+(Privacy-minded individuals should now be cautious while using this site).
 
 NOTE:  For many sites, ie. Youtube, Vimeo, Apple, Spreaker, Castbox, Google, 
 etc. the "station" object actually refers to a specific video or podcast 
@@ -489,7 +500,7 @@ L<http://search.cpan.org/dist/StreamFinder/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2023 Jim Turner.
+Copyright 2017-2024 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -537,7 +548,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '2.21';
+our $VERSION = '2.23';
 our $DEBUG = 0;
 
 require Exporter;
@@ -546,7 +557,7 @@ require Exporter;
 @EXPORT = qw();
 my @supported_mods = (qw(Anystream Apple Bitchute Blogger BrandNewTube Brighteon Castbox  
 		Google IHeartRadio InternetRadio Odysee OnlineRadiobox Podbean PodcastAddict Podchaser 
-		RadioNet Rcast Rumble SermonAudio SoundCloud	Spreaker	Tunein Vimeo Youtube LinkTV Zeno Subsplash));
+		RadioNet Rcast Rumble SermonAudio SoundCloud	Spreaker	Tunein Vimeo Youtube Zeno Subsplash));
 
 my %useit;
 
@@ -646,9 +657,6 @@ sub new
 	} elsif ($url =~ m#\bpodchaser\.# && $useit{'Podchaser'}) {
 		eval { require 'StreamFinder/Podchaser.pm'; $haveit = 1; };
 		return new StreamFinder::Podchaser($url, @args)  if ($haveit);
-	} elsif ($url =~ m#\blinktv\.# && $useit{'LinkTV'}) {
-		eval { require 'StreamFinder/LinkTV.pm'; $haveit = 1; };
-		return new StreamFinder::LinkTV($url, @args)  if ($haveit);
 	} elsif ($url =~ m#\bzeno\.# && $useit{'Zeno'}) {
 		eval { require 'StreamFinder/Zeno.pm'; $haveit = 1; };
 		return new StreamFinder::Zeno($url, @args)  if ($haveit);

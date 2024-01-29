@@ -10,9 +10,9 @@ use Perinci::CmdLine::Any;
 use Perinci::CmdLineX::CommonOptions::SelfUpgrade;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-09'; # DATE
+our $DATE = '2023-09-26'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.073'; # VERSION
+our $VERSION = '1.074'; # VERSION
 
 my $prefix = '/App/lcpan/';
 my $mods = do {
@@ -67,7 +67,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.073 of lcpan (from Perl distribution App-lcpan), released on 2023-07-09.
+This document describes version 1.074 of lcpan (from Perl distribution App-lcpan), released on 2023-09-26.
 
 =head1 SYNOPSIS
 
@@ -503,6 +503,23 @@ deps-by-dependent-count Foo Bar Baz> will return C<Mod2> (3 dependents), C<Mod3>
 (2 dependents), C<Mod1> (1 dependent).
 
 
+=head2 B<deps-to-other-author>
+
+List dependencies to modules of other authors.
+
+By default only runtime requires are displayed. To see prereqs for other phases
+(e.g. configure, or build, or ALL) or for other relationships (e.g. recommends,
+or ALL), use the C<--phase> and C<--rel> options.
+
+Note that dependencies information are taken from C<META.json> or C<META.yml>
+files. Not all releases (especially older ones) contain them. L<lcpan> (like
+MetaCPAN) does not extract information from C<Makefile.PL> or C<Build.PL> because
+that requires running (untrusted) code.
+
+Also, some releases specify dynamic config, so there might actually be more
+dependencies.
+
+
 =head2 B<dist>
 
 Show a single distribution.
@@ -791,6 +808,10 @@ List namespaces.
 =head2 B<rdeps>
 
 List reverse dependencies.
+
+=head2 B<rdeps-from-other-author>
+
+List reverse dependencies from distributions of other authors.
 
 =head2 B<rdeps-scripts>
 
@@ -2249,6 +2270,192 @@ Default value:
 Default value:
 
  "requires"
+
+=back
+
+=head2 Options for subcommand deps-to-other-author
+
+=over
+
+=item B<--added-or-updated-since-last-index-update>, B<--since-last-index-update>
+
+Include only records that are added/updated since the last index update.
+
+=item B<--added-or-updated-since-last-n-index-updates>=I<s>, B<--since-last-n-index-updates>
+
+Include only records that are added/updated since the last N index updates.
+
+=item B<--added-or-updated-since>=I<s>, B<--since>
+
+Include only records that are added/updated since a certain date.
+
+=item B<--added-since-last-index-update>
+
+Include only records that are added since the last index update.
+
+=item B<--added-since-last-n-index-updates>=I<s>
+
+Include only records that are added since the last N index updates.
+
+=item B<--added-since>=I<s>
+
+Include only records that are added since a certain date.
+
+=item B<--all>
+
+Equivalent to --phase ALL --rel ALL.
+
+See C<--phase>.
+
+=item B<--broken>
+
+Alias for --exclude-indexed --include-unindexed.
+
+See C<--exclude-unindexed>.
+
+=item B<--dist>=I<s@>
+
+Distribution names (with optional version suffix, e.g. Foo-Bar@1.23).
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=item B<--dists-json>=I<s>
+
+Distribution names (with optional version suffix, e.g. Foo-Bar@1.23) (JSON-encoded).
+
+See C<--dist>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--dont-uniquify>
+
+Allow showing multiple modules for different dists.
+
+=item B<--exclude-core>
+
+Exclude core modules.
+
+=item B<--exclude-dep>=I<s@>
+
+Exclude some dependencies from being shown.
+
+Can be specified multiple times.
+
+=item B<--exclude-deps-json>=I<s>
+
+Exclude some dependencies from being shown (JSON-encoded).
+
+See C<--exclude-dep>.
+
+=item B<--exclude-indexed>
+
+Exclude modules that are indexed (listed in 02packages.details.txt.gz).
+
+=item B<--exclude-noncore>
+
+Exclude non-core modules.
+
+=item B<--exclude-unindexed>
+
+Exclude modules that are not indexed (not listed in 02packages.details.txt.gz).
+
+=item B<--flatten>
+
+Instead of showing tree-like information, flatten it.
+
+When recursing, the default is to show the final result in a tree-like table,
+i.e. indented according to levels, e.g.:
+
+ % lcpan deps -R MyModule
+ | module            | author  | version |
+ |-------------------|---------|---------|
+ | Foo               | AUTHOR1 | 0.01    |
+ |   Bar             | AUTHOR2 | 0.23    |
+ |   Baz             | AUTHOR3 | 1.15    |
+ | Qux               | AUTHOR2 | 0       |
+
+To be brief, if C<Qux> happens to also depends on C<Bar>, it will not be shown in
+the result. Thus we don't know the actual C<Bar> version that is needed by the
+dependency tree of C<MyModule>. For example, if C<Qux> happens to depends on C<Bar>
+version 0.45 then C<MyModule> indirectly requires C<Bar> 0.45.
+
+To list all the direct and indirect dependencies on a single flat list, with
+versions already resolved to the largest version required, use the C<flatten>
+option:
+
+ % lcpan deps -R --flatten MyModule
+ | module            | author  | version |
+ |-------------------|---------|---------|
+ | Foo               | AUTHOR1 | 0.01    |
+ | Bar               | AUTHOR2 | 0.45    |
+ | Baz               | AUTHOR3 | 1.15    |
+ | Qux               | AUTHOR2 | 0       |
+
+Note that C<Bar>'s required version is already 0.45 in the above example.
+
+
+=item B<--level>=I<s>, B<-l>
+
+Recurse for a number of levels (-1 means unlimited).
+
+Default value:
+
+ 1
+
+=item B<--module>=I<s@>
+
+(No description)
+
+
+Can be specified multiple times.
+
+=item B<--modules-json>=I<s>
+
+See C<--module>.
+
+=item B<--perl-version>=I<s>, B<-V>
+
+Set base Perl version for determining core modules.
+
+Default value:
+
+ "v5.38.0"
+
+=item B<--phase>=I<s>
+
+Default value:
+
+ "runtime"
+
+=item B<--rel>=I<s>
+
+Default value:
+
+ "requires"
+
+=item B<--updated-since-last-index-update>
+
+Include only records that are updated since the last index update.
+
+=item B<--updated-since-last-n-index-updates>=I<s>
+
+Include only records that are updated since the last N index updates.
+
+=item B<--updated-since>=I<s>
+
+Include only records that are updated since certain date.
+
+=item B<--with-xs-or-pp>
+
+Check each dependency as XS/PP.
+
+=item B<-R>
+
+Recurse (alias for `--level -1`).
+
+See C<--level>.
 
 =back
 
@@ -4533,6 +4740,118 @@ See C<--level>.
 
 =back
 
+=head2 Options for subcommand rdeps-from-other-author
+
+=over
+
+=item B<--added-or-updated-since-last-index-update>, B<--since-last-index-update>
+
+Include only records that are added/updated since the last index update.
+
+=item B<--added-or-updated-since-last-n-index-updates>=I<s>, B<--since-last-n-index-updates>
+
+Include only records that are added/updated since the last N index updates.
+
+=item B<--added-or-updated-since>=I<s>, B<--since>
+
+Include only records that are added/updated since a certain date.
+
+=item B<--added-since-last-index-update>
+
+Include only records that are added since the last index update.
+
+=item B<--added-since-last-n-index-updates>=I<s>
+
+Include only records that are added since the last N index updates.
+
+=item B<--added-since>=I<s>
+
+Include only records that are added since a certain date.
+
+=item B<--all>
+
+Equivalent to --phase ALL --rel ALL.
+
+See C<--phase>.
+
+=item B<--dist>=I<s@>
+
+Distribution names (e.g. Foo-Bar).
+
+Can be specified multiple times.
+
+=item B<--dists-json>=I<s>
+
+Distribution names (e.g. Foo-Bar) (JSON-encoded).
+
+See C<--dist>.
+
+=item B<--dont-uniquify>
+
+Allow showing multiple modules for different dists.
+
+=item B<--flatten>
+
+Instead of showing tree-like information, flatten it.
+
+See deps' I<flatten> argument for more details.
+
+
+=item B<--level>=I<s>, B<-l>
+
+Recurse for a number of levels (-1 means unlimited).
+
+Default value:
+
+ 1
+
+=item B<--module>=I<s@>
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=item B<--modules-json>=I<s>
+
+See C<--module>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--phase>=I<s>
+
+Default value:
+
+ "ALL"
+
+=item B<--rel>=I<s>
+
+Default value:
+
+ "ALL"
+
+=item B<--updated-since-last-index-update>
+
+Include only records that are updated since the last index update.
+
+=item B<--updated-since-last-n-index-updates>=I<s>
+
+Include only records that are updated since the last N index updates.
+
+=item B<--updated-since>=I<s>
+
+Include only records that are updated since certain date.
+
+=item B<-R>
+
+Recurse (alias for `--level 10`).
+
+See C<--level>.
+
+=back
+
 =head2 Options for subcommand rdeps-scripts
 
 =over
@@ -5723,13 +6042,6 @@ List of available configuration parameters:
 
 =head2 Common for all subcommands
 
- cpan (see --cpan)
- format (see --format)
- index_name (see --index-name)
- log_level (see --log-level)
- naked_res (see --naked-res)
- update_db_schema (see --no-update-db-schema)
- use_bootstrap (see --no-use-bootstrap)
 
 =head2 Configuration for subcommand author
 
@@ -5941,6 +6253,32 @@ List of available configuration parameters:
  perl_version (see --perl-version)
  phase (see --phase)
  rel (see --rel)
+
+=head2 Configuration for subcommand deps-to-other-author
+
+ added_or_updated_since (see --added-or-updated-since)
+ added_or_updated_since_last_index_update (see --added-or-updated-since-last-index-update)
+ added_or_updated_since_last_n_index_updates (see --added-or-updated-since-last-n-index-updates)
+ added_since (see --added-since)
+ added_since_last_index_update (see --added-since-last-index-update)
+ added_since_last_n_index_updates (see --added-since-last-n-index-updates)
+ dists (see --dist)
+ dont_uniquify (see --dont-uniquify)
+ exclude_deps (see --exclude-dep)
+ flatten (see --flatten)
+ include_core (see --exclude-core)
+ include_indexed (see --exclude-indexed)
+ include_noncore (see --exclude-noncore)
+ include_unindexed (see --exclude-unindexed)
+ level (see --level)
+ modules (see --module)
+ perl_version (see --perl-version)
+ phase (see --phase)
+ rel (see --rel)
+ updated_since (see --updated-since)
+ updated_since_last_index_update (see --updated-since-last-index-update)
+ updated_since_last_n_index_updates (see --updated-since-last-n-index-updates)
+ with_xs_or_pp (see --with-xs-or-pp)
 
 =head2 Configuration for subcommand dist
 
@@ -6350,6 +6688,25 @@ List of available configuration parameters:
  updated_since_last_index_update (see --updated-since-last-index-update)
  updated_since_last_n_index_updates (see --updated-since-last-n-index-updates)
 
+=head2 Configuration for subcommand rdeps-from-other-author
+
+ added_or_updated_since (see --added-or-updated-since)
+ added_or_updated_since_last_index_update (see --added-or-updated-since-last-index-update)
+ added_or_updated_since_last_n_index_updates (see --added-or-updated-since-last-n-index-updates)
+ added_since (see --added-since)
+ added_since_last_index_update (see --added-since-last-index-update)
+ added_since_last_n_index_updates (see --added-since-last-n-index-updates)
+ dists (see --dist)
+ dont_uniquify (see --dont-uniquify)
+ flatten (see --flatten)
+ level (see --level)
+ modules (see --module)
+ phase (see --phase)
+ rel (see --rel)
+ updated_since (see --updated-since)
+ updated_since_last_index_update (see --updated-since-last-index-update)
+ updated_since_last_n_index_updates (see --updated-since-last-n-index-updates)
+
 =head2 Configuration for subcommand rdeps-scripts
 
  author (see --author)
@@ -6600,6 +6957,32 @@ Sah-Schema-filename" and there is no Sah-Schema-filename distribution.
 
  % lcpan deps Module-List@0.004
 
+=head2 List what modules Module-List requires
+
+ % lcpan deps-to-other-author Module-List
+
+=head2 List modules Module-List requires (module name will be converted to distro name)
+
+ % lcpan deps-to-other-author Module::List
+
+=head2 List what distribution that contains Sah::Schema::filename requires
+
+ % lcpan deps-to-other-author --module Sah::Schema::filename
+
+Sah::Schema::filename is included in Sah-Schemas-Path distribution, so this
+command is equivalent to "lcpan deps Sah-Schemas-Path". You can't do "lcpan deps
+Sah::Schema::filename" because C<lcpan> will assume that you ask "lcpan deps
+Sah-Schema-filename" and there is no Sah-Schema-filename distribution.
+
+
+=head2 List non-core modules Module-List requires
+
+ % lcpan deps-to-other-author Module-List --exclude-core
+
+=head2 List dependencies of a specific distribution release
+
+ % lcpan deps-to-other-author Module-List@0.004
+
 =head2 List all distributions
 
  % lcpan dists --cpan /cpan
@@ -6643,6 +7026,14 @@ Sah-Schema-filename" and there is no Sah-Schema-filename distribution.
 =head2 List what distributions depend on one of the modules in Sah-Schemas-Path
 
  % lcpan rdeps --dist Sah-Schemas-Path
+
+=head2 List what distributions depend on Sah::Schema::filename
+
+ % lcpan rdeps-from-other-author Sah::Schema::filename
+
+=head2 List what distributions depend on one of the modules in Sah-Schemas-Path
+
+ % lcpan rdeps-from-other-author --dist Sah-Schemas-Path
 
 =head1 HOMEPAGE
 

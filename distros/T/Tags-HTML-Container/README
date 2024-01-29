@@ -5,8 +5,11 @@ SYNOPSIS
      use Tags::HTML::Container;
 
      my $obj = Tags::HTML::Container->new(%params);
+     $obj->cleanup($cleanup_cb);
+     $obj->init($init_cb);
+     $obj->prepare($prepare_cb);
      $obj->process($tags_cb);
-     $obj->process_css;
+     $obj->process_css($css_cb);
 
 METHODS
   "new"
@@ -60,19 +63,48 @@ METHODS
 
             Default value is undef.
 
-  "process"
-     $obj->process($tags_cb);
+  "cleanup"
+     $obj->cleanup($cleanup_cb);
 
-    Process Tags structure for container with code defined in $tags_cb
+    Cleanup Tags::HTML object for container with code defined in $cleanup_cb
     callback. This callback has one argument and this is $self of container
     object.
 
     Returns undef.
 
-  "process_css"
-     $obj->process_css;
+  "init"
+     $obj->init($init_cb);
 
-    Process CSS::Struct structure for output.
+    Initialize Tags::HTML object (in page run) for container with code
+    defined in $init_cb callback. This callback has one argument and this is
+    $self of container object.
+
+    Returns undef.
+
+  "prepare"
+     $obj->prepare($prepare_cb);
+
+    Prepare Tags::HTML object (in page preparation) for container with code
+    defined in $prepare_cb callback. This callback has one argument and this
+    is $self of container object.
+
+    Returns undef.
+
+  "process"
+     $obj->process($tags_cb);
+
+    Process Tags structure for container with code defined in $tags_cb
+    callback. This callback has one argument and this is $self of container
+    object. $tags_cb is required argument.
+
+    Returns undef.
+
+  "process_css"
+     $obj->process_css($css_cb);
+
+    Process CSS::Struct structure for output with code defined in $css_cb
+    callback. This callback has one argument and this is $self of container
+    object. $css_cb is optional argument.
 
     Returns undef.
 
@@ -156,10 +188,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2023 Michal Josef Špaček
+    © 2023-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

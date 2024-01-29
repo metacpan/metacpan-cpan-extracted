@@ -9,7 +9,7 @@ use Sys::Hostname;
 use oEdtk::logger;
 
 use Exporter;
-our $VERSION	= 1.5052;
+our $VERSION	= 1.8101;
 our @ISA		= qw(Exporter);
 our @EXPORT_OK	= qw(config_read get_ini_path);
 my  $_INI_PATH;
@@ -47,8 +47,8 @@ sub config_read(@) {
 			#warn "INFO : accessing $ini\n";
 			&logger (6, "Accessing $ini");
 		}
-		my $uchost= hostname();
-		$uchost	  = uc($uchost);
+		my $uchost= uc(hostname());
+		#$uchost	  = uc($uchost);
 
 		my %allcfg = ();
 		for (;;) {

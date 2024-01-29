@@ -1,6 +1,6 @@
 package Map::Tube::CLI::Option;
 
-$Map::Tube::CLI::Option::VERSION   = '0.67';
+$Map::Tube::CLI::Option::VERSION   = '0.68';
 $Map::Tube::CLI::Option::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::CLI::Option - Option as Moo Role for Map::Tube::CLI.
 
 =head1 VERSION
 
-Version 0.67
+Version 0.68
 
 =cut
 
@@ -39,7 +39,7 @@ B<FOR INTERNAL USE ONLY>
 
 =head1 AUTHOR
 
-Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
+Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
@@ -47,8 +47,7 @@ L<https://github.com/manwar/Map-Tube-CLI>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-map-tube-cli at rt.cpan.org>,
-or through the web interface at L<https://github.com/manwar/Map-Tube-CLI/issues>.
+Please report any bugs or feature requests through the web interface at L<https://github.com/manwar/Map-Tube-CLI/issues>.
 I will  be notified and then you'll automatically be notified of progress on your
 bug as I make changes.
 
@@ -62,7 +61,7 @@ You can also look for information at:
 
 =over 4
 
-=item * BUG report
+=item * BUGS / ISSUES
 
 L<https://github.com/manwar/Map-Tube-CLI/issues>
 
@@ -82,7 +81,7 @@ L<http://metacpan.org/dist/Map-Tube-CLI/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 - 2022 Mohammad S Anwar.
+Copyright (C) 2015 - 2024 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain  a copy of the full

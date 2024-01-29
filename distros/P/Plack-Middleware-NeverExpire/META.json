@@ -27,8 +27,6 @@
             "Plack" : "0.9942",
             "Plack::Middleware" : "0",
             "Plack::Util" : "0",
-            "Time::Piece" : "0",
-            "Time::Seconds" : "0",
             "perl" : "5.008001"
          }
       },
@@ -55,7 +53,7 @@
          "web" : "https://github.com/ap/Plack-Middleware-NeverExpire"
       }
    },
-   "version" : "1.007",
+   "version" : "1.101",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
       "year" : 2015

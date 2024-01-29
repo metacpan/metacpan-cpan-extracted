@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/zhmylove/korgwm/issues
   license: https://mit-license.org/
   repository: https://github.com/zhmylove/korgwm.git
-version: '3.0'
+version: '3.1'
 x_authority: cpan:ZHMYLOVE
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

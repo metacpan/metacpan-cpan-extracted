@@ -6,9 +6,9 @@ use warnings;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-14'; # DATE
+our $DATE = '2024-01-19'; # DATE
 our $DIST = 'List-Util-Uniq'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our @EXPORT_OK = qw(
                        uniq
@@ -30,6 +30,11 @@ our @EXPORT_OK = qw(
                        dupestr
 
                        dupe_ci
+
+                       pushuniq
+                       pushuniqint
+                       pushuniqnum
+                       pushuniqstr
                );
 
 sub uniq_adj {
@@ -184,6 +189,44 @@ sub dupe_ci {
     @res;
 }
 
+sub pushuniqstr(\@@) { ## no critic: Subroutines::ProhibitSubroutinePrototypes
+    my $ary = shift;
+
+    my %vals;
+    for (@$ary) { $vals{$_}++ }
+
+    for my $item (@_) {
+        next if $vals{$item}++;
+        push @$ary, $item;
+    }
+}
+
+sub pushuniqnum(\@@) { ## no critic: Subroutines::ProhibitSubroutinePrototypes
+    my $ary = shift;
+
+    my %vals;
+    for (@$ary) { $vals{$_+0}++ }
+
+    for my $item (@_) {
+        next if $vals{$item+0}++;
+        push @$ary, $item;
+    }
+}
+
+sub pushuniqint(\@@) { ## no critic: Subroutines::ProhibitSubroutinePrototypes
+    my $ary = shift;
+
+    my %vals;
+    for (@$ary) { $vals{int $_}++ }
+
+    for my $item (@_) {
+        next if $vals{int $item}++;
+        push @$ary, $item;
+    }
+}
+
+sub pushuniq(\@@) { goto \&pushuniqstr } ## no critic: Subroutines::ProhibitSubroutinePrototypes
+
 1;
 # ABSTRACT: List utilities related to finding unique items
 
@@ -199,11 +242,16 @@ List::Util::Uniq - List utilities related to finding unique items
 
 =head1 VERSION
 
-This document describes version 0.007 of List::Util::Uniq (from Perl distribution List-Util-Uniq), released on 2023-08-14.
+This document describes version 0.008 of List::Util::Uniq (from Perl distribution List-Util-Uniq), released on 2024-01-19.
 
 =head1 SYNOPSIS
 
  use List::Util::Uniq qw(
+     uniq
+     uniqint
+     uniqnum
+     uniqstr
+
      is_monovalued
      is_monovalued_ci
      is_uniq
@@ -211,11 +259,17 @@ This document describes version 0.007 of List::Util::Uniq (from Perl distributio
      uniq_adj
      uniq_adj_ci
      uniq_ci
+
      dupe
      dupeint
      dupenum
      dupestr
      dupe_ci
+
+     pushuniq
+     pushuniqint
+     pushuniqnum
+     pushuniqstr
  );
 
  $res = is_monovalued(qw/a a a/); # => 1
@@ -244,6 +298,10 @@ This document describes version 0.007 of List::Util::Uniq (from Perl distributio
 
  @res = dupe_ci("a", "b", "B", "c", "a"); #  => ("B", "a")
 
+ my @ary = (1,"a",2,1,"a","b"); pushuniqstr @ary, 1,"a","c","c";   # @ary is now (1,"a",2,1,"a","b","c")
+ my @ary = (1,"1.0",1.1,2); pushuniqnum @ary, 2,"1.00",1.2,"1.000",3,3;   # @ary is now (1,"1.0",1.1,2,1.2,3)
+ my @ary = (1,"1.0",1.1,2); pushuniqint @ary, 2,"1.00",1.2,"1.000",3,3;   # @ary is now (1,"1.0",1.1,2,3)
+
 =head1 DESCRIPTION
 
 This module supplements L<List::Util> with functions related to list item's
@@ -254,6 +312,37 @@ uniqueness.
 =head1 FUNCTIONS
 
 None exported by default but exportable.
+
+=head2 uniq
+
+See L</uniqstr>.
+
+=head2 uniqnum
+
+Usage:
+
+ my @uniq = uniqnum(@list);
+
+Like L<List::Util>'s C<uniqnum>. This module provides a pure-Perl implementation
+for convenience and so we do not need to depend on List::Util.
+
+=head2 uniqint
+
+Usage:
+
+ my @uniq = uniqint(@list);
+
+Like L<List::Util>'s C<uniqint>. This module provides a pure-Perl implementation
+for convenience and so we do not need to depend on List::Util.
+
+=head2 uniqstr
+
+Usage:
+
+ my @uniq = uniqstr(@list);
+
+Like L<List::Util>'s C<uniqstr>. This module provides a pure-Perl implementation
+for convenience and so we do not need to depend on List::Util.
 
 =head2 uniq_adj
 
@@ -354,6 +443,43 @@ also provided by this module, for convenience.
 
 Like L</dupe> except case-insensitive.
 
+=head2 pushuniq
+
+See L</pushuniqstr>.
+
+=head2 pushuniqstr
+
+Usage:
+
+ pushuniqstr @ary, LIST;
+
+Push items of I<LIST> to I<@ary> only if items are not already in C<@ary> (using
+string-wise equal comparison operator, C<eq>). Shortcut for something like:
+
+ for my $item (LIST) { push @ary, $_ unless grep { $item eq $_ } @ary }
+
+=head2 pushuniqnum
+
+Usage:
+
+ pushuniqnum @ary, LIST;
+
+Push items of I<LIST> to I<@ary> only if items are not already in C<@ary> (using
+numeric equal comparison operator, C<==>). Shortcut for something like:
+
+ for my $item (LIST) { push @ary, $_ unless grep { $item == $_ } @ary }
+
+=head2 pushuniqint
+
+Usage:
+
+ pushuniqnum @ary, LIST;
+
+Push items of I<LIST> to I<@ary> only if items are not already in C<@ary> (using
+integer equal comparison). Shortcut for something like:
+
+ for my $item (LIST) { push @ary, $_ unless grep { int($item) == int($_) } @ary }
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/List-Util-Uniq>.
@@ -392,7 +518,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

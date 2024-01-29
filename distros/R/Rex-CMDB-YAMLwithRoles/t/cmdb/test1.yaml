@@ -1,0 +1,11 @@
+%YAML 1.1
+---
+
+roles:
+  - suricata
+
+
+foo: "a test"
+
+suricata_extract:
+  enable: 0

@@ -5,8 +5,10 @@ use warnings;
 
 use Future::AsyncAwait 0.47;
 
-use Test::More;
-use Test::Memory::Cycle;
+use Test2::V0;
+use constant HAVE_TEST_MEMORY_CYCLE => defined eval {
+   require Test::Memory::Cycle; Test::Memory::Cycle->import;
+};
 
 use Tangence::Constants;
 use Tangence::Registry;
@@ -61,7 +63,7 @@ my $proxy = $client->rootobj;
       on_del => sub { ( $d_key ) = @_ },
    );
 
-   is_deeply( $hash,
+   is( $hash,
               { one => 1, two => 2, three => 3 },
               'Initial value from watch_property "hash"' );
 
@@ -89,7 +91,7 @@ my $proxy = $client->rootobj;
 
    $obj->push_prop_queue( 6 );
 
-   is_deeply( \@p_values, [ 6 ], 'push queue values' );
+   is( \@p_values, [ 6 ], 'push queue values' );
 
    $obj->shift_prop_queue( 1 );
 
@@ -113,7 +115,7 @@ my $proxy = $client->rootobj;
 
    $obj->push_prop_array( 6 );
 
-   is_deeply( \@p_values, [ 6 ], 'push array values' );
+   is( \@p_values, [ 6 ], 'push array values' );
 
    $obj->shift_prop_array( 1 );
 
@@ -123,7 +125,7 @@ my $proxy = $client->rootobj;
 
    is( $s_index, 1, 'splice array index' );
    is( $s_count, 2, 'splice array count' );
-   is_deeply( \@s_values, [ 7 ], 'splice array values' );
+   is( \@s_values, [ 7 ], 'splice array values' );
 
    $obj->set_prop_array( [ 0 .. 4 ] );
    $obj->move_prop_array( 1, 3 );
@@ -147,13 +149,13 @@ my $proxy = $client->rootobj;
    # put regular ints in
    my $new = $registry->construct( "t::TestObj" );
 
-   is_deeply( $objset, {}, 'Initial value from watch_property "objset"' );
+   is( $objset, {}, 'Initial value from watch_property "objset"' );
 
    undef $objset;
    $obj->set_prop_objset( { $new->id => $new } );
 
    is( ref $objset, "HASH", 'set objset value type' );
-   is_deeply( [ keys %$objset ], [ $new->id ], 'set objset value keys' );
+   is( [ keys %$objset ], [ $new->id ], 'set objset value keys' );
 
    $obj->del_prop_objset( $new );
 
@@ -164,7 +166,7 @@ my $proxy = $client->rootobj;
    is( ref $added, "Tangence::ObjectProxy", 'add objset added' );
 }
 
-{
+if(HAVE_TEST_MEMORY_CYCLE) {
    no warnings 'redefine';
    local *Tangence::Property::Instance::_forbid_arrayification = sub {};
 

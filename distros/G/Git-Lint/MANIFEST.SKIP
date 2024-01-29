@@ -53,3 +53,4 @@ MANIFEST.bak
 perltidyrc
 perlcriticrc
 run_cover
+increment_version.pl

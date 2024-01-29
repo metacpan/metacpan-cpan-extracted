@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::ColorSpace';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Util;
@@ -18,11 +18,15 @@ PDF::Builder::Resource::ColorSpace::Separation - Support for color space separat
 
 =head1 METHODS
 
+=head2 new
+
+    $cs = PDF::Builder::Resource::ColorSpace::Separation->new($pdf, $key, @colors)
+
 =over
 
-=item $cs = PDF::Builder::Resource::ColorSpace::Separation->new($pdf, $key, @colors)
-
 Returns a new colorspace object.
+
+=back
 
 =cut
 
@@ -114,9 +118,15 @@ sub new {
     return $self;
 }
 
-=item @color = $res->color()
+=head2 color
+
+    @color = $res->color()
+
+=over
 
 Returns the base-color of the Separation-Colorspace.
+
+=back
 
 =cut
 
@@ -129,9 +139,15 @@ sub color {
     return @{$self->{' color'}};
 }
 
-=item $tintname = $res->tintname($tintname)
+=head2 tintname
+
+    $tintname = $res->tintname($tintname)
+
+=over
 
 Returns the tint-name of the Separation-Colorspace.
+
+=back
 
 =cut
 
@@ -149,9 +165,5 @@ sub param {
 
     return $_[0];
 }
-
-=back
-
-=cut
 
 1;

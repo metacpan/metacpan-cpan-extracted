@@ -1,3 +1,9 @@
+v2.23, 16.01.2024
+	- no code changes
+	- ignoring Crypt::OpenSSL::Blowfish in test suite, as it is no longer
+		accepting 56 byte keys (as other Blowfish implementations do)
+	- added GPLv2 text
+
 v2.22, 18.05.2020
 	- no code changes
 	- updated GPLv1 text due to address change

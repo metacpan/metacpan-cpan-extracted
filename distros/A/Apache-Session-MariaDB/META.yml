@@ -1,0 +1,35 @@
+---
+abstract: 'An implementation of Apache::Session using MariaDB'
+author:
+  - 'Best Practical Solutions, LLC <modules@bestpractical.com>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.22, Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Apache-Session-MariaDB
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Apache::Session: '0'
+  DBD::MariaDB: '0'
+resources:
+  homepage: https://github.com/bestpractical/apache-session-mariadb
+  repository: https://github.com/bestpractical/apache-session-mariadb.git
+version: '0.01'
+x_contributors:
+  - 'sunnavy <sunnavy@bestpractical.com>'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 1

@@ -2,8 +2,8 @@ NAME
     File::Util::DirList - File utilities involving a list of directories
 
 VERSION
-    This document describes version 0.001 of File::Util::DirList (from Perl
-    distribution File-Util-DirList), released on 2023-11-15.
+    This document describes version 0.002 of File::Util::DirList (from Perl
+    distribution File-Util-DirList), released on 2023-11-20.
 
 FUNCTIONS
   mv_files_to_dirs
@@ -25,10 +25,19 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   files_per_dir => *posint* (default: 1)
+
+        Number of files to move to each diectory.
+
     *   files_then_dirs* => *array[pathname::exists]*
 
         One or more existing file (or directory) names then the same number
         of existing directories.
+
+    *   reverse => *true* (default: 1)
+
+        Reverse processing (so first file will go to the last dir, second
+        file to second-last dir, and so on).
 
     Special arguments:
 

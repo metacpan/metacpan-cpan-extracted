@@ -4,9 +4,9 @@ use Role::Tiny;
 use Role::Tiny::With;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-26'; # DATE
+our $DATE = '2024-01-16'; # DATE
 our $DIST = 'Role-TinyCommons-Collection'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 requires 'get_item_count';
 requires 'get_item_at_pos';
@@ -19,6 +19,12 @@ sub pick_items {
     my $n = $args{n} || 1;
     my $allow_resampling = defined $args{allow_resampling} ? $args{allow_resampling} : 0;
     my $item_count = $self->get_item_count;
+
+    # got an infinite collection?
+    if ($item_count == -1) {
+        warn "Got infinite item count (-1), setting item_count = 2**31 -1";
+        $item_count = 2**31 - 1;
+    }
 
     $n = $item_count if $n > $item_count;
 
@@ -49,7 +55,7 @@ Role::TinyCommons::Collection::PickItems::RandomPos - Provide pick_items() that 
 
 =head1 VERSION
 
-This document describes version 0.009 of Role::TinyCommons::Collection::PickItems::RandomPos (from Perl distribution Role-TinyCommons-Collection), released on 2023-08-26.
+This document describes version 0.010 of Role::TinyCommons::Collection::PickItems::RandomPos (from Perl distribution Role-TinyCommons-Collection), released on 2024-01-16.
 
 =head1 DESCRIPTION
 
@@ -60,6 +66,10 @@ C<get_item_count>, for example when you store your items in a Perl array (e.g.
 L<ArrayDataRole::Source::Array>). If your collection does not support those
 methods, there's an alternative you can use:
 L<Role::TinyCommons::FindItems::Iterator>.
+
+If we get an infinite number of rows (C<get_item_count()> returns -1), then we
+set item count to 2^31 - 1. If you do not like this behavior, you can provide
+your own implementation to handle the case of infinite array data.
 
 Another alternative using binary search:
 L<Role::TinyCommons::Collection::PickItems::RandomSeekLines>, if your items are
@@ -114,7 +124,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

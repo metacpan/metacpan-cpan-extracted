@@ -4,43 +4,52 @@ package DateTime::Format::Atom;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('v1.2.0');
+use version; our $VERSION = qv( 'v1.6.0' );
 
 use DateTime::Format::RFC3339 qw( );
 
 
-use constant FIRST_IDX  => 0;
-use constant IDX_HELPER => FIRST_IDX + 0;
-use constant NEXT_IDX   => FIRST_IDX + 1;
+use constant NEXT_IDX => 0;
+
+
+my $helper = DateTime::Format::RFC3339->new( uc_only => 1 );
 
 
 sub new {
-   my ($class, %opts) = @_;
-   my $helper = DateTime::Format::RFC3339->new( uc_only => 1 );
-   return bless([
-      $helper,  # IDX_HELPER
-   ], $class);
+   my $class = shift;
+   #my %opts = @_;
+
+   my $self = bless( [], $class );
+
+   # $self->[ IDX_HELPER ]->parse_datetime( $str );
+
+   return $self;
 }
 
 
 sub parse_datetime {
-   my ($self, $str) = @_;
+   my $self = shift;
+   my $str  = shift;
 
-   $self = $self->new()
-      if !ref($self);
+   # $self = $default_self //= $self->new()
+   #    if !ref( $self );
+   #
+   # return $self->[ IDX_HELPER ]->parse_datetime( $str );
 
-   return $self->[IDX_HELPER]->parse_datetime($str);
+   return $helper->parse_datetime( $str );
 }
 
 
 sub format_datetime {
-   my ($self, $dt) = @_;
+   my $self = shift;
+   my $dt   = shift;
 
-#   $self = $self->new()
-#      if !ref($self);
-#
-#   return $self->[IDX_HELPER]->format_datetime($dt);
-   return DateTime::Format::RFC3339->format_datetime($dt);
+   # $self = $default_self //= $self->new()
+   #    if !ref( $self );
+   #
+   # return $self->[ IDX_HELPER ]->format_datetime( $dt );
+
+   return $helper->format_datetime( $dt );
 }
 
 
@@ -56,18 +65,18 @@ DateTime::Format::Atom - Parse and format Atom datetime strings
 
 =head1 VERSION
 
-Version 1.2.0
+Version 1.6.0
 
 
 =head1 SYNOPSIS
 
-    use DateTime::Format::Atom;
+   use DateTime::Format::Atom;
 
-    my $f = DateTime::Format::Atom->new();
-    my $dt = $f->parse_datetime( '2002-07-01T13:50:05Z' );
+   my $format = DateTime::Format::Atom->new();
+   my $dt = $format->parse_datetime( '2002-07-01T13:50:05Z' );
 
-    # 2002-07-01T13:50:05Z
-    print $f->format_datetime($dt);
+   # 2002-07-01T13:50:05Z
+   print $format->format_datetime( $dt );
 
 
 =head1 DESCRIPTION
@@ -80,11 +89,19 @@ objects.
 
 All the work is actually done by L<DateTime::Format::RFC3339>.
 
+=head1 CONSTRUCTOR
+
+=head2 new
+
+   my $format = DateTime::Format::Atom->new();
+
+
 =head1 METHODS
 
-=over
+=head2 parse_datetime
 
-=item C<parse_datetime($string)>
+   my $dt = DateTime::Format::Atom->parse_datetime( $string );
+   my $dt = $format->parse_datetime( $string );
 
 Given a Atom datetime string, this method will return a new
 L<DateTime> object.
@@ -93,14 +110,15 @@ If given an improperly formatted string, this method will croak.
 
 For a more flexible parser, see L<DateTime::Format::ISO8601>.
 
-=item C<format_datetime($datetime)>
+
+=head2 format_datetime
+
+   my $string = DateTime::Format::Atom->format_datetime( $dt );
+   my $string = $format->format_datetime( $dt );
 
 Given a L<DateTime> object, this methods returns a Atom datetime
 string.
 
-For simplicity, the datetime will be converted to UTC first.
-
-=back
 
 =head1 SEE ALSO
 
@@ -114,45 +132,51 @@ For simplicity, the datetime will be converted to UTC first.
 
 =item * L<http://tools.ietf.org/html/rfc3339>, "Date and Time on the Internet: Timestamps"
 
-
 =item * L<http://tools.ietf.org/html/rfc4287>, "The Atom Syndication Format"
 
+=back
+
+
+=head1 DOCUMENTATION AND SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc DateTime::Format::Atom
+
+You can also find it online at this location:
+
+=over
+
+=item * L<https://metacpan.org/dist/Datetime-Format-Atom>
+
+=back
+
+If you need help, the following are great resources:
+
+=over
+
+=item * L<https://stackoverflow.com/|StackOverflow>
+
+=item * L<http://www.perlmonks.org/|PerlMonks>
+
+=item * You may also contact the author directly.
 
 =back
 
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-Datetime-Format-Atom at rt.cpan.org>,
-or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DateTime-Format-Atom>.
+Please report any bugs or feature requests using L<https://github.com/ikegami/perl-Datetime-Format-Atom/issues>.
 I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 
-=head1 SUPPORT
+=head1 REPOSITORY
 
-You can find documentation for this module with the perldoc command.
+=over
 
-    perldoc DateTime::Format::Atom
+=item * Web: L<https://github.com/ikegami/perl-Datetime-Format-Atom>
 
-You can also look for information at:
-
-=over 4
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/DateTime-Format-Atom>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Format-Atom>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/DateTime-Format-Atom>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/DateTime-Format-Atom>
+=item * git: L<https://github.com/ikegami/perl-Datetime-Format-Atom.git>
 
 =back
 

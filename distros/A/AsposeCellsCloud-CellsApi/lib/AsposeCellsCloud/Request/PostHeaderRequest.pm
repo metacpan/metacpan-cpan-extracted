@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_header' } = { 
-    	summary => 'Updates page header in worksheet. ',
+    	summary => 'Updates page header in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };

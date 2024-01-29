@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Requires { 'Attean' => '0.024' };
+use Test::Requires { 'Types::Attean' => '0.024' };
 use Types::Namespace qw( to_NamespaceMap to_Namespace to_Uri to_Iri );
 
 use lib 't/lib';

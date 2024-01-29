@@ -1,6 +1,7 @@
 package Audio::Nama::EcasoundSetup;
 use Role::Tiny;
-use Modern::Perl;
+use Modern::Perl '2020';
+our $VERSION = 1.0;
 use Audio::Nama::Globals qw(:all);
 use Audio::Nama::Log qw(logpkg logsub);
 sub setup { 
@@ -9,7 +10,7 @@ sub setup {
 	my $self = shift;
 	# return 1 if successful
 	# catch errors from generate_setup_try() and cleanup
-	logsub("&setup");
+	logsub((caller(0))[3]);
 
 	# extra argument (setup code) will be passed to generate_setup_try()
 	my (@extra_setup_code) = @_;
@@ -21,25 +22,18 @@ sub setup {
 	
 	ecasound_iam('cs-disconnect') if ecasound_iam('cs-connected');
 
+	Audio::Nama::ChainSetup::remove_temporary_tracks();
+	refresh_wav_cache(); # check if someone has snuck in some files
+	find_duplicate_inputs(); # we will warn the user later
 	Audio::Nama::ChainSetup::initialize();
-
 	
-	# this is our chance to save state without the noise
-	# of temporary tracks, avoiding the issue of getting diffs 
-	# in the project data from each new chain setup.
-	autosave() if $config->{autosave} eq 'setup'
-					and $project->{name}
-					and $config->{use_git} 
-					and $project->{repo};
-	
-	# TODO: use try/catch
 	# catch errors unless testing (no-terminal option)
 	local $@ unless $config->{opts}->{T}; 
-	track_memoize(); 			# freeze track state 
+	track_memoize(); 			# cache track methods 
 	my $success = $config->{opts}->{T}      # don't catch errors during testing 
 		?  Audio::Nama::ChainSetup::generate_setup_try(@extra_setup_code)
 		:  eval { Audio::Nama::ChainSetup::generate_setup_try(@extra_setup_code) }; 
-	track_unmemoize(); 			# unfreeze track state
+	track_unmemoize(); 			# clear methods cache
 	if ($@){
 		throw("error caught while generating setup: $@");
 		Audio::Nama::ChainSetup::initialize();
@@ -51,13 +45,13 @@ sub setup {
 ### legacy ecasound support routines in root namespace 
 
 package Audio::Nama;
-use Modern::Perl;
+use Modern::Perl '2020';
 no warnings 'uninitialized';
 sub find_duplicate_inputs { # in Main bus only
 
 	%{$setup->{tracks_with_duplicate_inputs}} = ();
 	%{$setup->{inputs_used}} = ();
-	logsub("&find_duplicate_inputs");
+	logsub((caller(0))[3]);
 	map{	my $source = $_->source;
 			$setup->{tracks_with_duplicate_inputs}->{$_->name}++ if $setup->{inputs_used}->{$source} ;
 		 	$setup->{inputs_used}->{$source} //= $_->name;
@@ -85,9 +79,10 @@ sub teardown_engine {
 }
 
 sub arm {
-	logsub("&arm");
+	logsub((caller(0))[3]);
 	exit_preview_modes();
-	reconfigure_engine('force');
+	request_setup();
+	reconfigure_engine();
 }
 
 # substitute all live inputs by clock-sync'ed 
@@ -122,7 +117,7 @@ sub something_to_run { $en{ecasound}->valid_setup or midi_run_ready()  }
 sub midi_run_ready { $config->{use_midi} and $en{midish} and $en{midish}->is_active }
 
 sub connect_transport {
-	logsub("&connect_transport");
+	logsub((caller(0))[3]);
 	remove_riff_header_stubs();
 	register_other_ports(); # we won't see Nama ports since Nama hasn't started
 	load_ecs($file->chain_setup) or Audio::Nama::throw("failed to load chain setup"), return;
@@ -171,7 +166,7 @@ sub connect_transport {
 sub transport_status {
 	
 	map{ 
-		pager("Warning: $_: input ",$tn{$_}->source,
+		pager(join '',"Warning: $_: input ",$tn{$_}->source,
 		" is already used by track ",$setup->{inputs_used}->{$tn{$_}->source},".")
 		if $setup->{tracks_with_duplicate_inputs}->{$_};
 	} grep { $tn{$_}->rec } $bn{Main}->tracks;

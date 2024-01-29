@@ -1,0 +1,93 @@
+#!perl
+
+use strict;
+use warnings;
+
+use App::ThisDist 'this_mod'; # just for scan_prereqs
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-09-23'; # DATE
+our $DIST = 'App-TableDataUtils'; # DIST
+our $VERSION = '0.052'; # VERSION
+
+exec "this-mod", "--namespace-prefix=TableData", @ARGV;
+
+# ABSTRACT: Return name of TableData:: Perl module associated with the current directory
+# PODNAME: this-tabledata-mod
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+this-tabledata-mod - Return name of TableData:: Perl module associated with the current directory
+
+=head1 VERSION
+
+This document describes version 0.052 of this-tabledata-mod (from Perl distribution App-TableDataUtils), released on 2023-09-23.
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+This is a thin wrapper for L<this-mod>. This:
+
+ % this-tabledata-mod [...]
+
+is equivalent to:
+
+ % this-mod --namespace-prefix=TableData [...]
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-TableDataUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-TableDataUtils>.
+
+=head1 SEE ALSO
+
+L<this-mod> from L<App::ThisDist>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2020, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-TableDataUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

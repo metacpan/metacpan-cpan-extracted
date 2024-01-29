@@ -79,4 +79,6 @@ t/v2_multischema.t
 t/v2_Oracle.t
 t/v2_result_as.t
 t/v3_Oracle12c.t
+t/v3_error_handler.t
+t/v3_with_recursive.t
 xt/pod.t

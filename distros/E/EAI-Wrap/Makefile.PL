@@ -9,6 +9,7 @@ WriteMakefile(
 	LICENSE       => 'MIT',
 	ABSTRACT_FROM => 'lib/EAI/Wrap.pm',
 	VERSION_FROM  => 'lib/EAI/Wrap.pm',
+	MIN_PERL_VERSION => 5.006,
 	PREREQ_PM     => {
 		'Archive::Extract' => 0,
 		'Data::XLSX::Parser' => 0.20,
@@ -34,9 +35,18 @@ WriteMakefile(
 		'Test::File' => 0,
 		'Test::Timer' => 0,
 		'Archive::Zip' => 0,
+		'Time::Piece' => 0,
 	},
 	META_MERGE => {
 		"meta-spec" => { version => 2 },
+		provides => {
+			'EAI::Wrap' => {file => 'lib/EAI/Wrap.pm', version => 1.908},
+			'EAI::Common' => {file => 'lib/EAI/Common.pm', version => 1.908},
+			'EAI::FTP' => {file => 'lib/EAI/FTP.pm', version => 1.908},
+			'EAI::File' => {file => 'lib/EAI/File.pm', version => 1.908},
+			'EAI::DB' => {file => 'lib/EAI/DB.pm', version => 1.908},
+			'EAI::DateUtil' => {file => 'lib/EAI/DateUtil.pm', version => 1.908},
+		},
 		resources => {
 			repository => {
 				type => 'git',

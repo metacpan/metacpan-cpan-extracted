@@ -1,5 +1,4 @@
 use warnings;
-use lib 'inc';
 use Test::More;    # skip_all => 'CAS is in rebuild';
 use strict;
 use IO::String;

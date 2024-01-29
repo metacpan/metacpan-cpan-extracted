@@ -15,7 +15,7 @@ use Try::Tiny;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.2.2';
 
 
 sub serve_static_file {
@@ -75,7 +75,7 @@ Catalyst::Plugin::Static::File - Serve a specific static file
 
 =head1 VERSION
 
-version v0.2.1
+version v0.2.2
 
 =head1 SYNOPSIS
 

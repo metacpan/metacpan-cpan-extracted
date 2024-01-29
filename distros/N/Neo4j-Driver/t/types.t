@@ -31,6 +31,7 @@ use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 plan tests => 4 + 5 + 3 + 1 + $no_warnings;
 
 use JSON::PP ();
+use Neo4j::Types;
 my $transaction = $driver->session->begin_transaction;
 $transaction->{return_stats} = 0;  # optimise sim
 
@@ -62,43 +63,34 @@ eval { $ver = '??'; $ver = $s->server->version; };
 
 
 subtest 'Property types: spatial type semantics' => sub {
-	# may fail on old Neo4j versions and over Bolt
 	plan skip_all => "(spatial types unavailable in server $ver)" if $ver lt 'Neo4j/3.4';
-	plan tests => 1 + 1 unless $ver lt 'Neo4j/3.4';
-	TODO: { local $TODO = 'Spatial not supported by libneo4j-client 2.2.0' if $Neo4j_Test::bolt;
+	plan skip_all => "(spatial types unavailable in old Neo4j::Bolt)" if $Neo4j_Test::bolt && ! eval { require Neo4j::Bolt; Neo4j::Bolt->VERSION('0.4500') };
+	plan tests => 4;
 	$q = <<END;
 RETURN point({ x:3, y:0 })
 END
-	warnings {  # ignore Bolt warnings
 	lives_ok { $r = 0; $r = $s->run($q)->single; } 'get spatial property values';
-	};
-	SKIP: {
-		skip '(read failed)', 1 if ! $r;
-		is ref $r->get(0), 'Neo4j::Driver::Type::Point', 'point blessed';
-		# TODO: further tests
-	}
-	}
+	isa_ok $r->get(0), 'Neo4j::Types::Point';
+	is $r->get(0)->srid, 7203, 'srid';
+	is_deeply [$r->get(0)->coordinates], [3, 0], 'coordinates';
+	# further tests in types-spatial.t
 };
 
 
 subtest 'Property types: temporal type semantics' => sub {
-	# may fail on old Neo4j versions and over Bolt
 	plan skip_all => "(temporal types unavailable in server $ver)" if $ver lt 'Neo4j/3.4';
-	plan tests => 1 + 1 unless $ver lt 'Neo4j/3.4';
-	TODO: { local $TODO = 'Temporal not supported by libneo4j-client 2.2.0' if $Neo4j_Test::bolt;
+	plan skip_all => "(temporal types unavailable in old Neo4j::Types)" unless eval { Neo4j::Types->VERSION('2.00') };
+	plan skip_all => "(temporal types unavailable in old Neo4j::Bolt)" if $Neo4j_Test::bolt && ! eval { require Neo4j::Bolt; Neo4j::Bolt->VERSION('0.4500') };
+	plan tests => 4;
 	$q = <<END;
 RETURN
 duration.between(date('1984-10-11'), date('2015-06-24'))
 END
-	warnings {  # ignore Bolt warnings
 	lives_ok { $r = 0; $r = $s->run($q)->single; } 'get temporal property values';
-	};
-	SKIP: {
-		skip '(read failed)', 1 if ! $r;
-		is ref $r->get(0), 'Neo4j::Driver::Type::Temporal', 'temporal blessed';
-		# TODO: further tests
-	}
-	}
+	isa_ok $r->get(0), 'Neo4j::Types::Duration';
+	is $r->get(0)->months, 368, 'months';
+	is $r->get(0)->days, 13, 'days';
+	# further tests in types-temporal.t
 };
 
 

@@ -129,3 +129,9 @@
 0.3.3 Wed Nov 01 01:05:00 2023
     - made yaml2o an alias for yaml2h2o to be consistent with ini2h2o/ini2o
     - POD update 
+
+0.3.4 Wed Dec 12 01:04:00 2023
+    - pinned module to Util::H2O after critical upstream bug affecting o2d
+      (because it used o2h) fix (#20) - thank you!
+    - pinned Util::H2O::More to Util::H2O 0.24
+    - cleaned up o2d

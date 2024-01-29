@@ -5,104 +5,130 @@ use integer;
 use bytes;
 
 use GDPR::IAB::TCFv2::BitUtils qw<is_set get_uint12 get_uint16>;
-use GDPR::IAB::TCFv2::RangeConsent;
-use Carp qw<croak>;
+use Carp                       qw<croak>;
 
-sub new {
+sub Parse {
     my ( $klass, %args ) = @_;
 
     croak "missing 'data'"      unless defined $args{data};
-    croak "missing 'start_bit'" unless defined $args{start_bit};
-    croak "missing 'vendor_bits_required'"
-      unless defined $args{vendor_bits_required};
+    croak "missing 'data_size'" unless defined $args{data_size};
+    croak "missing 'offset'"    unless defined $args{offset};
+    croak "missing 'max_id'"
+      unless defined $args{max_id};
 
-    my $data                 = $args{data};
-    my $start_bit            = $args{start_bit};
-    my $vendor_bits_required = $args{vendor_bits_required};
+    croak "missing 'options'"      unless defined $args{options};
+    croak "missing 'options.json'" unless defined $args{options}->{json};
 
+    my $data      = $args{data};
+    my $data_size = $args{data_size};
+    my $offset    = $args{offset};
+    my $max_id    = $args{max_id};
+    my $options   = $args{options};
 
-    my $data_size = length($data);
-
-    croak
+    Carp::confess
       "a BitField for vendor consent strings using RangeSections require at least 31 bytes. Got $data_size"
-      if $data_size < 32;
+      if $data_size < 31;
 
-    my $num_entries = get_uint12( $data, $start_bit );
+    my %prefetch;
+    my %cache;
 
-    my $current_offset = $start_bit + 12;
+    if ( exists $options->{prefetch} ) {
+        my $vendor_ids = $options->{prefetch};
 
-    my @consents;
-
-    foreach my $i ( 1 .. $num_entries ) {
-        my ( $consent, $bits_consumed ) = _parse_range_consent(
-            $data, $current_offset,
-            $vendor_bits_required
-        );
-
-        push @consents, $consent;
-
-        $current_offset += $bits_consumed;
+        foreach my $vendor_id ( @{$vendor_ids} ) {
+            $prefetch{$vendor_id} = 1;
+            $cache{$vendor_id}    = 0;
+        }
     }
 
     my $self = {
-        consents             => \@consents,
-        vendor_bits_required => $vendor_bits_required,
-        _current_offset      => $current_offset,
+        ranges  => [],
+        cache   => \%cache,
+        max_id  => $max_id,
+        options => $options,
     };
 
     bless $self, $klass;
 
-    return $self;
+    my $next_offset = $self->_parse( $data, $data_size, $offset, \%prefetch );
+
+    return ( $self, $next_offset );
 }
 
-sub _parse_range_consent {
-    my ( $data, $initial_bit, $max_vendor_id ) = @_;
+sub _parse {
+    my ( $self, $data, $data_size, $offset, $prefetch ) = @_;
 
-    my $data_size = length($data);
+    my ( $num_entries, $next_offset ) = get_uint12( $data, $offset );
 
-    croak
-      "bit $initial_bit was suppose to start a new range entry, but the consent string was only $data_size bytes long"
-      if $data_size <= $initial_bit / 8;
-
-    # If the first bit is set, it's a Range of IDs
-    if ( is_set $data, $initial_bit ) {
-        my $start = get_uint16( $data, $initial_bit + 1 );
-        my $end   = get_uint16( $data, $initial_bit + 17 );
-
-        croak
-          "bit $initial_bit range entry exclusion ends at $end, but the max vendor ID is $max_vendor_id"
-          if $end > $max_vendor_id;
-
-        return GDPR::IAB::TCFv2::RangeConsent->new(
-            start => $start,
-            end   => $end
-          ),
-          33;
+    foreach my $i ( 1 .. $num_entries ) {
+        $next_offset = $self->_parse_range(
+            $data,
+            $data_size,
+            $next_offset,
+            $prefetch,
+        );
     }
 
-    my $vendor_id = get_uint16( $data, $initial_bit + 1 );
+    return $next_offset;
+}
+
+sub _parse_range {
+    my ( $self, $data, $data_size, $offset, $prefetch ) = @_;
 
     croak
-      "bit $initial_bit range entry excludes vendor $vendor_id, but only vendors [1, $max_vendor_id] are valid"
-      if $vendor_id > $max_vendor_id;
+      "bit $offset was suppose to start a new range entry, but the consent string was only $data_size bytes long"
+      if $data_size <= $offset / 8;
 
-    return GDPR::IAB::TCFv2::RangeConsent->new(
-        start => $vendor_id,
-        end   => $vendor_id
-      ),
-      17;
+    my $max_id = $self->{max_id};
+
+    # If the first bit is set, it's a Range of IDs
+    my ( $is_range, $next_offset ) = is_set $data, $offset;
+    if ($is_range) {
+        my ( $start, $end );
+
+        ( $start, $next_offset ) = get_uint16( $data, $next_offset );
+        ( $end,   $next_offset ) = get_uint16( $data, $next_offset );
+
+        croak
+          "bit $offset range entry exclusion starts at $start, but the min vendor ID is 1"
+          if 1 > $start;
+
+        croak
+          "bit $offset range entry exclusion ends at $end, but the max vendor ID is $max_id"
+          if $end > $max_id;
+
+        croak "start $start can't be bigger than end $end" if $start > $end;
+
+        push @{ $self->{ranges} }, [ $start, $end ];
+
+        foreach my $vendor_id ( keys %{$prefetch} ) {
+            $self->{cache}->{$vendor_id} = delete( $prefetch->{$vendor_id} )
+              if $start <= $vendor_id && $vendor_id <= $end;
+        }
+
+        return $next_offset;
+    }
+
+    my $vendor_id;
+
+    ( $vendor_id, $next_offset ) = get_uint16( $data, $next_offset );
+
+    croak
+      "bit $offset range entry exclusion vendor $vendor_id, but only vendors [1, $max_id] are valid"
+      if 1 > $vendor_id || $vendor_id > $max_id;
+
+    push @{ $self->{ranges} }, [ $vendor_id, $vendor_id ];
+
+    $self->{cache}->{$vendor_id} = delete( $prefetch->{$vendor_id} )
+      if exists $prefetch->{$vendor_id};
+
+    return $next_offset;
 }
 
-sub current_offset {
+sub max_id {
     my $self = shift;
 
-    return $self->{_current_offset};
-}
-
-sub max_vendor_id {
-    my $self = shift;
-
-    return $self->{vendor_bits_required};
+    return $self->{max_id};
 }
 
 sub contains {
@@ -111,13 +137,45 @@ sub contains {
     croak "invalid vendor id $id: must be positive integer bigger than 0"
       if $id < 1;
 
-    return if $id > $self->{vendor_bits_required};
+    return $self->{cache}->{$id} if exists $self->{cache}->{$id};
 
-    foreach my $c ( @{ $self->{consents} } ) {
-        return 1 if $c->contains($id);
+    return if $id > $self->{max_id};
+
+    foreach my $range ( @{ $self->{ranges} } ) {
+        return 1 if $range->[0] <= $id && $id <= $range->[1];
     }
 
     return 0;
+}
+
+sub all {
+    my $self = shift;
+
+    my @vendors;
+    foreach my $range ( @{ $self->{ranges} } ) {
+        push @vendors, $range->[0] .. $range->[1];
+    }
+
+    return \@vendors;
+}
+
+sub TO_JSON {
+    my $self = shift;
+
+    return $self->all if !!$self->{options}->{json}->{compact};
+
+    my ( $false, $true ) = @{ $self->{options}->{json}->{boolean_values} };
+
+    my %map;
+    if ( !!$self->{options}->{json}->{verbose} ) {
+        %map = map { $_ => $false } 1 .. $self->{max_id};
+    }
+
+    foreach my $range ( @{ $self->{ranges} } ) {
+        %map = ( %map, map { $_ => $true } $range->[0] .. $range->[1] );
+    }
+
+    return \%map;
 }
 
 1;
@@ -131,25 +189,57 @@ GDPR::IAB::TCFv2::RangeSection - Transparency & Consent String version 2 range s
 
     my $data = unpack "B*", decode_base64url('tcf v2 consent string base64 encoded');
     
-    my $max_vendor_id_consent = << get 16 bits from $data offset 213 >>
+    my $max_id_consent = << get 16 bits from $data offset 213 >>
 
-    my $range_section = GDPR::IAB::TCFv2::RangeSection->new(
-        data                 => $data,
-        start_bit            => 230, # offset for vendor consents
-        vendor_bits_required => $max_vendor_id_consent
+    my ($range_section, $next_offset) = GDPR::IAB::TCFv2::RangeSection->Parse(
+        data      => $data,
+        data_size => length($data),
+        offset    => 230,             # offset for vendor ranges
+        max_id    => $max_id_consent,
+        prefetch  => 284,             # will cache the result of vendor id 284
     );
 
-    if $range_section->contains(284) { ... }
+    say "range section contains id 284" if $range_section->contains(284);
 
 =head1 CONSTRUCTOR
 
-Receive 3 parameters: data (as sequence of bits), start bit offset and vendor bits required (max vendor id).
+Constructor C<Parse> receives an hash parameters: 
+
+=over
+
+=item *
+
+Key C<data> is the binary data
+
+=item *
+
+Key C<data_size> is the original binary data size
+
+=item *
+
+Key C<offset> is the binary data offset. Can be 0.
+
+=item *
+
+Key C<max_id> is the max id (used to validate the ranges if all data is between 1 and  C<max_id>)
+
+=item *
+
+Key C<options> is the L<GDPR::IAB::TCFv2> options (includes the C<json> field to modify the L</TO_JSON> method output.
+
+=item *
+
+Key C<prefetch> is an optional arrayref of vendor ids to populate the result as cache.
+
+=back
 
 Will die if any parameter is missing.
 
 Will die if data does not contain all bits required.
 
 Will die if the range sections are malformed.
+
+Will return an array of two elements: the object itself and the next offset.
 
 =head1 METHODS
 
@@ -161,6 +251,18 @@ Will return false if id is bigger than max vendor id.
 
     my $ok = $range_section->contains(284);
 
-=head2 max_vendor_id
+=head2 max_id
 
 Returns the max vendor id.
+
+=head2 all
+
+Returns an arrayref of all vendors mapped with the bit enabled.
+
+=head2 TO_JSON
+
+By default it returns an hashref mapping id to a boolean, that represent if the id is present or not in all ranges sections.
+
+The json option C<verbose> controls if all ids between 1 to L</max_id> will be present on the C<json> or only the ones that are true.
+
+The json option C<compact> change the response, will return an arrayref of all ids present on the ranges section.

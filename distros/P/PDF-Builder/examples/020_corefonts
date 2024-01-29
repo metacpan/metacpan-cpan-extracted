@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
-# wants one or more font names on the command line. If none, use list of
-# core fonts.
+# wants one or more font names on the command line. If none given, use full
+# list of core fonts. If -s given as first arg, use the short list.
 
 # CAUTION: the displayed Unicode value (U=xxxx) appears to be correct in most
 # cases, except that the MS Smart Quotes (32 characters) are given as U=0080
@@ -21,8 +21,8 @@ use lib '../lib';
 use PDF::Builder;
 use PDF::Builder::Util;
 
-my $compress = 'none';  # uncompressed streams
-#my $compress = 'flate';  # compressed streams
+#my $compress = 'none';  # uncompressed streams
+my $compress = 'flate';  # compressed streams
 
 my $sx = 33;
 my $sy = 45;
@@ -70,6 +70,16 @@ my @fns=qw{
 #   bankgothicbolditalic
 #   bankgothicitalic
 
+my @ARGVcopy = @ARGV;
+# 'short' (-s flag)?
+if (@ARGVcopy > 0 && $ARGVcopy[0] eq '-s') {
+    @ARGVcopy = qw{
+        Courier-Bold
+	Times-Italic
+	Symbol
+    };
+}
+
 # use only with single byte encodings, as multibyte (including UTF-8) don't
 # appear to be compatible with these core fonts
 # there may be a number of aliases available for each encoding.
@@ -111,8 +121,8 @@ my @ecs = qw{
 my ($y, $pdf, $f1);
 
 # override default list with command line entries
-if (scalar @ARGV) {
-    @fns = @ARGV;
+if (scalar @ARGVcopy && $ARGVcopy[0] ne '-s') {
+    @fns = @ARGVcopy;
 }
 
 # loop through list of font names

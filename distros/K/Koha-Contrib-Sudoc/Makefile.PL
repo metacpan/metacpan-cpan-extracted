@@ -57,6 +57,7 @@ my %WriteMakefileArgs = (
     "Moose::Util::TypeConstraints" => 0,
     "MooseX::RW::Reader" => 0,
     "MooseX::RW::Reader::File" => 0,
+    "Net::FTP" => 0,
     "Path::Tiny" => 0,
     "Pod::Usage" => 0,
     "Search::Elasticsearch" => 0,
@@ -68,7 +69,7 @@ my %WriteMakefileArgs = (
     "ZOOM" => 0,
     "utf8" => 0
   },
-  "VERSION" => "2.40",
+  "VERSION" => "2.43",
   "test" => {
     "TESTS" => ""
   }
@@ -104,6 +105,7 @@ my %FallbackPrereqs = (
   "Moose::Util::TypeConstraints" => 0,
   "MooseX::RW::Reader" => 0,
   "MooseX::RW::Reader::File" => 0,
+  "Net::FTP" => 0,
   "Path::Tiny" => 0,
   "Pod::Usage" => 0,
   "Search::Elasticsearch" => 0,

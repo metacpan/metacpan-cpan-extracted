@@ -7,14 +7,14 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 # command line:
 # -5  run perlcritic -5 .  (should be clean)
 # -5x                      exclude certain common errors (none at this time)
 # -4  run perlcritic -4 .  should get a number of common errors
-# -4x                      exclude certain common errors  DEFAULT
+# -4x                      exclude certain common errors  ** DEFAULT **
 # -3  run perlcritic -3 .  should get a number of errors
 # -3x                      exclude certain common errors
 # -2  run perlcritic -2 .  should get more errors
@@ -22,6 +22,8 @@ our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 # -1  run perlcritic -1 .  should get even more errors
 # -1x                      exclude certain common errors
 # 
+# level 5 is apparently the MOST severe set of errors (all should be fixed);
+#   level 1 the LEAST severe (and most numerous)
 # levels 1,2,3 are only for the morbidly curious! 
 #   (although some warnings look like they should be addressed)
 
@@ -60,6 +62,8 @@ my @ignore_list = (
                               # e.g., we define "open" when there is already a 
 			      # system (CORE::) open (ambiguous unless CORE:: 
 			      # added)      TBD consider removing
+     "Subroutine name is a homonym for builtin keyword", 
+                              # e.g., "sub default"
      "Symbols are exported by default", 
                               # it doesn't like something about our use of 
 			      # @EXPORT and @EXPORT_OK

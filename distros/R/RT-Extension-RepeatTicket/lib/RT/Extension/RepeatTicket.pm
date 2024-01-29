@@ -3,7 +3,7 @@ use strict;
 
 package RT::Extension::RepeatTicket;
 
-our $VERSION = "2.02";
+our $VERSION = "2.03";
 
 use RT::Interface::Web;
 use DateTime;
@@ -585,8 +585,6 @@ sub _RepeatTicket {
         $repeat->{"CustomField-$cf_id"} = \@cf_values;
     }
 
-    $repeat->{Status} = 'new';
-
     for ( keys %$repeat ) {
         $args{$_} = $repeat->{$_} if not defined $args{$_};
     }
@@ -609,6 +607,10 @@ sub _RepeatTicket {
     $args{MIMEObj} =
       $parser->ParseMIMEEntityFromScalar(
         $top->ContentAsMIME( Children => 1 )->as_string );
+
+    # Status is not set by design. The ticket Create method will
+    # automatically load the correct "DefaultOnCreate" from the lifecycle
+    # of the provided Queue.
 
     my $ticket = RT::Ticket->new( $repeat_ticket->CurrentUser );
     my ($new_id, $new_txn, $new_msg) = $ticket->Create(%args);

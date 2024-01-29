@@ -1,5 +1,10 @@
 Revision history for Perl extension App-optex-textconv
 
+1.07 2023-12-31T06:04:43Z
+
+    - add plutil to default rule
+    - return empty string when the msdoc file is empty
+
 1.06 2023-06-27T01:52:00Z
 
     - Support .gpg files.

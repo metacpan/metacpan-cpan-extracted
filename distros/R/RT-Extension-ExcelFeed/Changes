@@ -1,3 +1,8 @@
+0.10 2024-01-16
+ - Support to download search results for more collections(transactions and assets)
+ - Support transaction and asset charts
+ - Support txn/asset/chart excel attachments for dashboard emails
+
 0.09 2023-11-15
  - Add option to hide Download as Microsoft Excel Spreadsheet from Charts
 

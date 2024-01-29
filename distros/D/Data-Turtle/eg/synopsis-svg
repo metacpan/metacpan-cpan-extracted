@@ -44,7 +44,7 @@ $turtle->backward(10);
 $turtle->pen_down;
 for my $i (1 .. 4) {
     my @line = $turtle->forward(50);
-    if (@line) {
+    if ( $turtle->pen_down ) {
         $style->line(
             id => "line-$i",
             x1 => $line[0],

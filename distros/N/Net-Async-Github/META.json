@@ -4,7 +4,7 @@
       "Tom Molesworth <TEAM@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -55,6 +55,7 @@
             "Future" : "0.47",
             "IO::Async::Notifier" : "0.78",
             "IO::Async::SSL" : "0.22",
+            "JSON::MaybeUTF8" : "2.000",
             "JSON::MaybeXS" : "1.004003",
             "Log::Any" : "1.709",
             "Net::Async::HTTP" : "0.48",
@@ -87,47 +88,47 @@
    "provides" : {
       "Net::Async::Github" : {
          "file" : "lib/Net/Async/Github.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Net::Async::Github::Branch" : {
          "file" : "lib/Net/Async/Github/Branch.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Net::Async::Github::Comment" : {
          "file" : "lib/Net/Async/Github/Comment.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Net::Async::Github::Common" : {
          "file" : "lib/Net/Async/Github/Common.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Net::Async::Github::Plan" : {
          "file" : "lib/Net/Async/Github/Plan.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Net::Async::Github::PullRequest" : {
          "file" : "lib/Net/Async/Github/PullRequest.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Net::Async::Github::RateLimit" : {
          "file" : "lib/Net/Async/Github/RateLimit.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Net::Async::Github::RateLimit::Core" : {
          "file" : "lib/Net/Async/Github/RateLimit/Core.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Net::Async::Github::Repository" : {
          "file" : "lib/Net/Async/Github/Repository.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Net::Async::Github::Team" : {
          "file" : "lib/Net/Async/Github/Team.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Net::Async::Github::User" : {
          "file" : "lib/Net/Async/Github/User.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       }
    },
    "release_status" : "stable",
@@ -142,7 +143,7 @@
          "web" : "https://github.com/team-at-cpan/Net-Async-Github"
       }
    },
-   "version" : "0.012",
+   "version" : "0.013",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "chylli-binary <52912308+chylli-binary@users.noreply.github.com>",

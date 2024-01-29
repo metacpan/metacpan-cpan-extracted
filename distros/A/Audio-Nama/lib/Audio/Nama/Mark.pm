@@ -6,15 +6,15 @@ our $VERSION = 1.0;
 use Carp;
 use warnings;
 no warnings qw(uninitialized);
-our @ISA;
-use vars qw($n %by_name @all);
+our($n, %by_name, @all, @attributes, %is_attribute, $AUTOLOAD);
 use Audio::Nama::Log qw(logpkg);
 use Audio::Nama::Globals qw(:all);
 use Audio::Nama::Object qw( 
 				 name 
                  time
-				 active
+				 attrib
 				 );
+# attrib is a hash reference
 
 sub initialize {
 	map{ $_->remove} Audio::Nama::Mark::all();
@@ -24,7 +24,7 @@ sub initialize {
 	@Audio::Nama::marks_data = (); # for save/restore
 }
 sub next_id { # returns incremented 4-digit 
-	$project->{mark_sequence_counter} ||= '0000';
+	$project->{mark_sequence_counter} //= '0000';
 	$project->{mark_sequence_counter}++
 }
 sub new {
@@ -37,17 +37,15 @@ sub new {
 	#croak  "name already in use: $vals{name}\n"
 	#	 if $by_name{$vals{name}}; # null name returns false
 	
-	my $self = bless { 
-
-		## 		defaults ##
-
-					active  => 1,
-					name => "",
-
-					@_ 			}, $class;
+	my $self = bless { @_ }, $class;
+	$self->{attrib} //= {}; # attributes hash
 
 	#print "self class: $class, self type: ", ref $self, $/;
 	if ($self->name) {
+		if ( my $old = delete $by_name{$self->name} ) {
+			Audio::Nama::pager("replacing previous mark at " .  $old->time);
+			@all = grep{ $_->name ne $self->name } @all;
+		}
 		$by_name{ $self->name } = $self;
 	}
 	push @all, $self;
@@ -68,6 +66,38 @@ sub set_name {
 		$mark->set(name => $name);
 		$by_name{ $name } = $mark;
 	}
+}
+
+no warnings 'redefine'; # replacing the default accessor
+sub attrib { 
+	my ($mark, $attr) = @_;
+	$mark->{attrib}->{$attr}
+}
+use warnings 'redefine';
+sub matches {
+	my ($mark, %rules) = @_;
+	while( my($k,$v) = each %rules){
+		return 0 unless $mark->$k eq $v
+	}
+	return 1
+}
+
+sub set_attrib {
+	my $mark = shift;
+	my ($attr, $val) = @_;
+	$val = 1 if not $val;
+	pager("attr: $attr\n");
+	if ( defined $mark->{attrib}->{$attr} ){
+		pager("redefining attribute $attr from '$mark->{attrib}->{$attr}' to '$val'");
+	}
+	else {
+		$mark->{attrib}->{$attr} = $val;
+		pager("assigning attribute $attr: $val");
+	}
+}
+sub delete_attrib {
+	my ($mark, $attr) = @_;
+	delete $mark->{attrib}->{$attr}
 }
 
 sub jump_here {
@@ -157,16 +187,58 @@ sub mark_time {
 	$time
 }
 
-
+sub AUTOLOAD {
+	my $self = shift;
+	my ($attr) = $AUTOLOAD =~ /([^:]+)$/;
+	return $self->{attrib}->{$attr}
+}
 
 # ---------- Mark and jump routines --------
 {
 package Audio::Nama;
-use Modern::Perl;
+use Modern::Perl '2020';
 use Audio::Nama::Globals qw(:all);
 
+sub get_marks {
+	my @marks = all(); 	
+	my %rules = @_;
+	my @want;
+MARK: for my $m (@marks){
+		for my $k (keys %rules){
+			next MARK if not $m->$k
+		}
+		push @want, $m
+	}
+	@want;
+}
+sub lint_snip_marks {
+	# do i sstart with snip retain or snip discard
+	# retain command
+    # next toggle discards
+    # snip discard
+
+}
+sub toggle_snip {
+	my @clip = grep{$_->clip} Audio::Nama::Mark::all();
+	retain(), return if (scalar @clip) == 0;
+	$clip[-1]->start ? retain() : discard ();
+}
+sub discard {
+	my $mark = drop_mark("clip-end-".Audio::Nama::Mark::next_id());
+	pager("discarding content from ".ecasound_iam('getpos'));
+	$mark->set_attrib("clip");
+	$mark->set_attrib("end");
+	clip_end_beep();
+}
+sub retain {
+	my $mark = drop_mark("clip-start-".Audio::Nama::Mark::next_id());
+	pager("retaining content from ".ecasound_iam('getpos'));
+	$mark->set_attrib("clip");
+	$mark->set_attrib("start");
+	clip_start_beep();
+}
 sub drop_mark {
-	logsub("&drop_mark");
+	logsub((caller(0))[3]);
 	my $name = shift;
 	my $here = ecasound_iam("getpos");
 
@@ -184,9 +256,10 @@ sub drop_mark {
 							name => $name);
 
 	$ui->marker($mark); # for GUI
+	$mark
 }
 sub mark { # GUI_CODE
-	logsub("&mark");
+	logsub((caller(0))[3]);
 	my $mark = shift;
 	my $pos = $mark->time;
 	if ($gui->{_markers_armed}){ 
@@ -201,57 +274,70 @@ sub mark { # GUI_CODE
 }
 
 sub next_mark {
-	logsub("&next_mark");
-	my $jumps = shift || 0;
-	$jumps and $jumps--;
-	my $here = ecasound_iam("cs-get-position");
+	logsub((caller(0))[3]);
+	my $mark = next_mark_object();
+	set_position($mark->time);
+	$this_mark = $mark;
+}
+sub next_mark_object {
 	my @marks = Audio::Nama::Mark::all();
+	my $here = ecasound_iam("cs-get-position");
 	for my $i ( 0..$#marks ){
 		if ($marks[$i]->time - $here > 0.001 ){
 			logpkg(__FILE__,__LINE__,'debug', "here: $here, future time: ", $marks[$i]->time);
-			set_position($marks[$i+$jumps]->time);
-			$this_mark = $marks[$i];
-			return;
+			return $marks[$i];
+		}
+	}
+}
+sub previous_mark_object {
+	my @marks = Audio::Nama::Mark::all();
+	my $here = ecasound_iam("cs-get-position");
+	for my $i ( reverse 0..$#marks ){
+		if ($marks[$i]->time < $here ){
+			return $marks[$i];
 		}
 	}
 }
 sub previous_mark {
-	logsub("&previous_mark");
-	my $jumps = shift || 0;
-	$jumps and $jumps--;
-	my $here = ecasound_iam("getpos");
-	my @marks = Audio::Nama::Mark::all();
-	for my $i ( reverse 0..$#marks ){
-		if ($marks[$i]->time < $here ){
-			set_position($marks[$i+$jumps]->time);
-			$this_mark = $marks[$i];
-			return;
-		}
-	}
+	logsub((caller(0))[3]);
+	my $mark = previous_mark_object();
+	set_position($mark->time);
+	$this_mark = $mark;
 }
 	
-
-## jump recording head position
-
-sub to_start { 
-	logsub("&to_start");
-	return if Audio::Nama::ChainSetup::really_recording();
-	set_position( 0 );
+sub modify_mark {
+	my ($mark, $newtime, $quiet) = @_;
+	$mark->set( time => $newtime );
+	! $quiet && do {
+	pager($mark->name, ": set to ", d2( $newtime), "\n");
+	pager("adjusted to ",$mark->time, "\n") 
+		if $mark->time != $newtime;
+	};
+	set_position($mark->time);
+	request_setup();
 }
-sub to_end { 
-	logsub("&to_end");
+
+## jump playback head position
+
+sub jump_to_start { 
+	logsub((caller(0))[3]);
+	return if Audio::Nama::ChainSetup::really_recording();
+	jump( 0 );
+}
+sub jump_to_end { 
+	logsub((caller(0))[3]);
 	# ten seconds shy of end
 	return if Audio::Nama::ChainSetup::really_recording();
-	my $end = ecasound_iam('cs-get-length') - 10 ;  
-	set_position( $end);
+	my $end = ecasound_iam('cs-get-length') - $config->{seek_end_margin} ;  
+	jump($end);
 } 
 sub jump {
 	return if Audio::Nama::ChainSetup::really_recording();
 	my $delta = shift;
-	logsub("&jump");
+	logsub((caller(0))[3]);
 	my $here = ecasound_iam('getpos');
-	logpkg(__FILE__,__LINE__,'debug', "delta: $delta, here: $here, unit: $gui->{_seek_unit}");
-	my $new_pos = $here + $delta * $gui->{_seek_unit};
+	logpkg(__FILE__,__LINE__,'debug', "delta: $delta, here: $here");
+	my $new_pos = $here + $delta;
 	if ( $setup->{audio_length} )
 	{
 		$new_pos = $new_pos < $setup->{audio_length} 
@@ -263,7 +349,7 @@ sub jump {
 sub set_position { fade_around(\&_set_position, @_) }
 
 sub _set_position {
-	logsub("&set_position");
+	logsub((caller(0))[3]);
 
     return if Audio::Nama::ChainSetup::really_recording(); # don't allow seek while recording
 
@@ -277,9 +363,31 @@ sub _set_position {
 	update_clock_display();
 }
 
+
+sub delete_current_mark {}
+sub bump_mark_forward  { 
+	my $multiple = shift;
+	# play mark_replay_seconds before mark, stop at mark
+	$this_mark->{time} += $config->{mark_bump_seconds} * $multiple;
+	my $rp = $config->{mark_replay_seconds};
+	if ($rp) {
+		stop_transport();
+		Audio::Nama::ecasound_iam("setpos ".$this_mark->time - $rp);
+		limit_processing_time($rp);
+		request_setup();		
+		start_transport();
+	}
+}
+sub bump_mark_forward_1  { bump_mark_forward(1)   }
+sub bump_mark_forward_10 { bump_mark_forward(10)  }
+sub bump_mark_back_1     { bump_mark_forward(-1)  }
+sub bump_mark_back_10    { bump_mark_forward(-10) }
+
+
 sub forward {
 	my $delta = shift;
 	my $here = ecasound_iam('getpos');
+	return unless $here;
 	my $new = $here + $delta;
 	set_position( $new );
 }
@@ -290,13 +398,21 @@ sub rewind {
 }
 sub jump_forward {
 	my $multiplier = shift;
-	forward( $multiplier * $text->{hotkey_playback_jumpsize})
+	forward( $multiplier * $config->{playback_jump_seconds})
 	}
-sub jump_backward { jump_forward( - shift()) }
 
+sub replay { foward($config->{mark_replay_seconds}) }
+sub set_playback_jump { $config->{playback_jump_seconds} = shift }
+sub set_mark_bump     { $config->{mark_bump_seconds}     = shift }
+sub set_mark_replay   { $config->{mark_replay_seconds}   = shift }
+sub jump_forward_1    { jump_forward(  1) }
+sub jump_forward_10   { jump_forward( 10) }
+sub jump_back_1   { jump_forward( -1) }
+sub jump_back_10  { jump_forward(-10) }
 	
 } # end package
 { package Audio::Nama::HereMark;
+our $VERSION = 1.0;
 our @ISA = 'Audio::Nama::Mark';
 our $last_time;
 sub name { 'Here' }
@@ -304,10 +420,27 @@ sub time { Audio::Nama::ecasound_iam('cs-connected') ? ($last_time = Audio::Nama
 }
 
 { package Audio::Nama::ClipMark;
-use Modern::Perl;
+use Modern::Perl '2020';
+our $VERSION = 1.0;
 our @ISA = 'Audio::Nama::Mark';
 
 
+}
+
+{ package Audio::Nama::TempoMark;
+
+	our $VERSION = 1.0;
+	use Modern::Perl '2020';
+	use Audio::Nama::Log qw(logpkg);
+	use Audio::Nama::Globals qw(:all);
+	our @ISA = 'Audio::Nama::Mark';
+	use SUPER; 
+	use Audio::Nama::Object qw( 
+					 name 
+					bars	
+					beats
+					ticks
+					 );
 }
 
 1;

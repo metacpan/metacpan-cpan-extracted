@@ -2,7 +2,7 @@
 
 #
 # dbcolpercentile.pm
-# Copyright (C) 1997-2022 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1997-2024 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -335,6 +335,7 @@ sub setup ($) {
 	my @sort_args = ('--nolog', $self->{_target_column});
 	unshift(@sort_args, '--descending') if ($self->{_sort_order} == -1);
 	unshift(@sort_args, '--numeric');   # always numeric
+	unshift(@sort_args, '--tmpdir', $self->{_tmpdir}) if (defined($self->{_tmpdir}));
 	my($new_reader, $new_fred) = dbpipeline_filter($self->{_input}, [-comment_handler => $self->create_delay_comments_sub], dbsort(@sort_args));
 	$self->{_pre_sorted_input} = $self->{_input};
 	$self->{_in} = $new_reader;
@@ -499,7 +500,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1997-2024 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

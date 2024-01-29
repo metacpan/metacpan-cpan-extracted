@@ -1,16 +1,16 @@
 package Desktop::Open;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-05'; # DATE
-our $DIST = 'Desktop-Open'; # DIST
-our $VERSION = '0.002'; # VERSION
-
 use strict;
 use warnings;
 use Log::ger;
 
-require Exporter;
-our @ISA       = qw(Exporter);
+use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-10-21'; # DATE
+our $DIST = 'Desktop-Open'; # DIST
+our $VERSION = '0.004'; # VERSION
+
 our @EXPORT_OK = qw(open_desktop);
 
 sub open_desktop {
@@ -18,6 +18,14 @@ sub open_desktop {
 
     my $res;
   OPEN: {
+        if (defined $ENV{PERL_DESKTOP_OPEN_PROGRAM}) {
+            system $ENV{PERL_DESKTOP_OPEN_PROGRAM}, $path_or_url;
+            $res = $?;
+            last;
+        }
+
+        goto BROWSER if ($ENV{PERL_DESKTOP_OPEN_USE_BROWSER} || 0) == 1;
+
         if ($^O eq 'MSWin32') {
             system "start", $path_or_url;
             $res = $?;
@@ -39,6 +47,7 @@ sub open_desktop {
             }
         }
 
+      BROWSER:
         require Browser::Open;
         $res = Browser::Open::open_browser($path_or_url);
     }
@@ -60,7 +69,7 @@ Desktop::Open - Open a file or URL in the user's preferred application
 
 =head1 VERSION
 
-This document describes version 0.002 of Desktop::Open (from Perl distribution Desktop-Open), released on 2021-07-05.
+This document describes version 0.004 of Desktop::Open (from Perl distribution Desktop-Open), released on 2023-10-21.
 
 =head1 SYNOPSIS
 
@@ -87,6 +96,19 @@ TODO: On OSX, use "openit". Any taker?
 
 =head2 open_desktop
 
+=head1 ENVIRONMENT
+
+=head2 PERL_DESKTOP_OPEN_PROGRAM
+
+String. Override which program to use for opening the progrm instead of
+B<xdg-open>. Note that the program is not checked for existence, nor the result
+is checked for success. No other program will be tried.
+
+=head2 PERL_DESKTOP_OPEN_USE_BROWSER
+
+Integer. If set to 1, then will just use L<Browser::Open> directly instead of
+B<xdg-open> program.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Desktop-Open>.
@@ -94,14 +116,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Desktop-Op
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Desktop-Open>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Desktop-Open>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -117,11 +131,37 @@ file. It requires setting up a configuration file to run.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Desktop-Open>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

@@ -59,11 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostMergeRequest.File : The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
-# PostMergeRequest.format :   ,
-# PostMergeRequest.mergeToOneSheet :   ,
-# PostMergeRequest.password :   ,
-# PostMergeRequest.checkExcelRestriction :    
+# PostMergeRequest.File : The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
+# PostMergeRequest.outFormat : The password needed to open an Excel file.  ,
+# PostMergeRequest.mergeToOneSheet : Whether check restriction of excel file when user modify cells related objects.  ,
+# PostMergeRequest.password : The regional settings for workbook.  ,
+# PostMergeRequest.checkExcelRestriction : Upload files.  ,
+# PostMergeRequest.region :    
 
 {
     my $params = {
@@ -74,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_merge' } = { 
-    	summary => 'Merge cells in worksheet.',
+    	summary => 'Merge cells in the worksheet.',
         params => $params,
         returns => 'FileInfo',
     };
@@ -100,8 +101,8 @@ sub run_http_request {
     }
     $header_params->{'Content-Type'} = $client->select_header_content_type('multipart/form-data');
  
-    if(defined $self->format){
-        $query_params->{'format'} = $client->to_query_value($self->format);      
+    if(defined $self->out_format){
+        $query_params->{'outFormat'} = $client->to_query_value($self->out_format);      
     }
 
     if(defined $self->merge_to_one_sheet){
@@ -114,6 +115,10 @@ sub run_http_request {
 
     if(defined $self->check_excel_restriction){
         $query_params->{'checkExcelRestriction'} = $client->to_query_value($self->check_excel_restriction);      
+    }
+
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
     } 
     my $_body_data;
  
@@ -138,34 +143,41 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)',
+     	description => 'The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)',
      	format => '',
      	read_only => '',
      		},
-     'format' => {
+     'out_format' => {
      	datatype => 'string',
-     	base_name => 'format',
-     	description => '',
+     	base_name => 'outFormat',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'merge_to_one_sheet' => {
      	datatype => 'string',
      	base_name => 'mergeToOneSheet',
-     	description => '',
+     	description => 'Whether check restriction of excel file when user modify cells related objects.',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'The regional settings for workbook.',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
+     	description => 'Upload files.',
+     	format => '',
+     	read_only => '',
+     		},
+     'region' => {
+     	datatype => 'string',
+     	base_name => 'region',
      	description => '',
      	format => '',
      	read_only => '',
@@ -175,10 +187,11 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->attribute_map( {
     'file' => 'File',
-    'format' => 'format',
+    'out_format' => 'outFormat',
     'merge_to_one_sheet' => 'mergeToOneSheet',
     'password' => 'password',
-    'check_excel_restriction' => 'checkExcelRestriction' 
+    'check_excel_restriction' => 'checkExcelRestriction',
+    'region' => 'region' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

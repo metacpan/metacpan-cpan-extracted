@@ -6,7 +6,7 @@ use v5.12;
 use strict;
 use warnings;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use Data::Record::Serialize::Error { errors => [qw( internal  )] }, -all;
 
@@ -48,7 +48,7 @@ Data::Record::Serialize::Role::EncodeAndSink - Both an Encode and Sink. handle u
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 INTERNALS
 

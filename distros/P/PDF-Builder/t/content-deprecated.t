@@ -277,13 +277,13 @@ $gfx = $pdf->page->gfx();
 $gfx->wordspace(2);
 like($pdf->to_string, qr/2 Tw/, q{wordspace(2)});
 
-# Text Leading
-
-$pdf = PDF::Builder->new('compress' => 0);
-$gfx = $pdf->page->gfx();
-
-$gfx->lead(14);
-like($pdf->to_string, qr/14 TL/, q{lead(14) (deprecated)});
+## Text Leading
+#
+#$pdf = PDF::Builder->new('compress' => 0);
+#$gfx = $pdf->page->gfx();
+#
+#$gfx->lead(14);
+#like($pdf->to_string, qr/14 TL/, q{lead(14) (deprecated)});
 
 # distance
 

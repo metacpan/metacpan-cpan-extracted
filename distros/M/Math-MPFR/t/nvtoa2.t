@@ -70,11 +70,13 @@ if($Config{nvtype} eq '__float128') {
   # accurately, a bug in the toolset that has built perl).
 
   my $prec = Rmpfr_get_default_prec();
-  Rmpfr_set_default_prec(113);
+  # The subnormal NV 1e-4941 is an 81-bit value
+  Rmpfr_set_default_prec(81);
   my $t1 = Math::MPFR->new('1e-4941'); # $t1 will be assigned correct value
+  Rmpfr_set_default_prec(113);
   my $t2 = Math::MPFR->new( 1e-4941 ); # $t2 will be assigned correct value
                                        # unless the subnormal issue is present
-                                       # is present in this build of perl.
+                                       # in this build of perl.
   $subnormal_issue = 1 if $t1 != $t2;
   Rmpfr_set_default_prec($prec);
 }

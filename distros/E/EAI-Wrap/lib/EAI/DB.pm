@@ -1,4 +1,4 @@
-package EAI::DB 1.904;
+package EAI::DB 1.908;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use DBI qw(:sql_types); use DBD::ODBC (); use Data::Dumper qw(Dumper); use Log::Log4perl qw(get_logger);
@@ -23,8 +23,9 @@ sub newDBH ($$) {
 		};
 		$DB->{longreadlen} = 1024 if !$DB->{longreadlen};
 		$dbh->{LongReadLen} = $DB->{longreadlen};
+		$logger->info("new DB connection established");
 	} else {
-		$logger->debug("DB connection already open, using $DSN");
+		$logger->info("DB connection already open, using $DSN");
 		return 1;
 	}
 }
@@ -715,7 +716,7 @@ returns the DBI handler and the DSN string to allow direct commands with the han
 
 =head1 COPYRIGHT
 
-Copyright (c) 2023 Roland Kapl
+Copyright (c) 2024 Roland Kapl
 
 All rights reserved.  This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.

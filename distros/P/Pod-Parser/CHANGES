@@ -3,7 +3,13 @@ ATTENTION!
 Before using this for any _new_ software, please consider using Pod::Simple,
 it is a modern replacement for this module.
 
- R22-Apr-2023          Marek Rouchal                        <marekr@cpan.org>
+ 03-Jan-2024          Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.67
+ + fix CPAN#149426: format of tar container, thanks HMBRAND
+
+
+ 22-Apr-2023          Marek Rouchal                        <marekr@cpan.org>
  -----------------------------------------------------------------------------
  Version 1.66
  + fix CPAN#145128 - Pod::Find does not work any more with 5.36 on Win32

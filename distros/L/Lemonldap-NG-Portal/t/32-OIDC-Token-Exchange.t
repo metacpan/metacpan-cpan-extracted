@@ -1,5 +1,4 @@
 use warnings;
-use lib 'inc';
 use Test::More;
 use strict;
 use IO::String;
@@ -50,6 +49,7 @@ my $portal = LLNG::Manager::Test->new(
                     oidcRPMetaDataOptionsBypassConsent         => 1,
                     oidcRPMetaDataOptionsRefreshToken          => 1,
                     oidcRPMetaDataOptionsIDTokenForceClaims    => 1,
+                    oidcRPMetaDataOptionsRedirectUris          => 'http://test',
                 },
             },
             oidcRPMetaDataScopeRules => {

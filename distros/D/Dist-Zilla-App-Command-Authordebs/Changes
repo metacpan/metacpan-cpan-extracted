@@ -1,3 +1,25 @@
+0.005 2023-12-13
+
+  This is the last release done on CPAN. Development is moved to
+  Debian's gitlab:
+  https://salsa.debian.org/perl-team/modules/packages/libdist-zilla-app-command-authordebs-perl
+
+  Bug fix:
+    * remove --update-control which has Debian only dependencies
+
+0.004 2023-12-10
+
+  New features:
+    * add --update-control option to udpate debian/control file
+    * add --missing option to match authordeps (with a 'p') behavior
+    * add --verbose option
+
+  Bug fixes:
+    * Avoid duplicates in the list of required debian packages
+
+  Misc change:
+    * depends on Config::Model::Dpkg
+
 0.003 2016-12-12
 
   * Fix skip test on non Debian system

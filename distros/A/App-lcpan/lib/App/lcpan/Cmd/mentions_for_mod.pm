@@ -9,9 +9,9 @@ require App::lcpan;
 require App::lcpan::Cmd::mentions;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-09'; # DATE
+our $DATE = '2023-09-26'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.073'; # VERSION
+our $VERSION = '1.074'; # VERSION
 
 our %SPEC;
 
@@ -67,7 +67,7 @@ App::lcpan::Cmd::mentions_for_mod - List POD mentions for module(s)
 
 =head1 VERSION
 
-This document describes version 1.073 of App::lcpan::Cmd::mentions_for_mod (from Perl distribution App-lcpan), released on 2023-07-09.
+This document describes version 1.074 of App::lcpan::Cmd::mentions_for_mod (from Perl distribution App-lcpan), released on 2023-09-26.
 
 =head1 FUNCTIONS
 

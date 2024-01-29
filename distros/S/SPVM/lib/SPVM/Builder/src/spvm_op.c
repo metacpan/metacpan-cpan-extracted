@@ -170,7 +170,7 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "BIT_OR",
     "BIT_XOR",
     "BIT_NOT",
-    "REMAINDER",
+    "MODULO",
     "LEFT_SHIFT",
     "RIGHT_ARITHMETIC_SHIFT",
     "RIGHT_LOGICAL_SHIFT",
@@ -238,8 +238,8 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "FALSE",
     "DIVIDE_UNSIGNED_INT",
     "DIVIDE_UNSIGNED_LONG",
-    "REMAINDER_UNSIGNED_INT",
-    "REMAINDER_UNSIGNED_LONG",
+    "MODULO_UNSIGNED_INT",
+    "MODULO_UNSIGNED_LONG",
     "NEW_STRING_LEN",
     "IS_READ_ONLY",
     "MAKE_READ_ONLY",
@@ -2130,12 +2130,15 @@ SPVM_OP* SPVM_OP_build_array_init(SPVM_COMPILER* compiler, SPVM_OP* op_array_ini
   
   // Array length
   int32_t length = 0;
-  {
+  if (op_list_elements->id == SPVM_OP_C_ID_LIST) {
     SPVM_OP* op_element = op_list_elements->first;
     int32_t index = 0;
     while ((op_element = SPVM_OP_sibling(compiler, op_element))) {
       length++;
     }
+  }
+  else {
+    length = 1;
   }
   
   if (is_key_value_pairs && length % 2 != 0) {
@@ -2624,8 +2627,8 @@ SPVM_OP* SPVM_OP_build_special_assign(SPVM_COMPILER* compiler, SPVM_OP* op_speci
           culc_op_id = SPVM_OP_C_ID_DIVIDE;
           break;
         }
-        case SPVM_OP_C_FLAG_SPECIAL_ASSIGN_REMAINDER: {
-          culc_op_id = SPVM_OP_C_ID_REMAINDER;
+        case SPVM_OP_C_FLAG_SPECIAL_ASSIGN_MODULO: {
+          culc_op_id = SPVM_OP_C_ID_MODULO;
           break;
         }
         case SPVM_OP_C_FLAG_SPECIAL_ASSIGN_LEFT_SHIFT: {
@@ -3628,7 +3631,7 @@ SPVM_OP* SPVM_OP_new_op(SPVM_COMPILER* compiler, int32_t id, const char* file, i
   return op;
 }
 
-int32_t SPVM_OP_is_allowed(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_type_current, SPVM_BASIC_TYPE* basic_type_dist) {
+int32_t SPVM_OP_is_allowed(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_type_current, SPVM_BASIC_TYPE* basic_type_dist, int32_t is_parent_field) {
   
   SPVM_LIST* allows = basic_type_dist->allows;
   
@@ -3636,7 +3639,7 @@ int32_t SPVM_OP_is_allowed(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_type_
   const char* dist_basic_type_name = basic_type_dist->name;
   
   int32_t is_allowed = 0;
-  if (strcmp(current_basic_type_name, dist_basic_type_name) == 0) {
+  if (!is_parent_field && strcmp(current_basic_type_name, dist_basic_type_name) == 0) {
     is_allowed = 1;
   }
   else {

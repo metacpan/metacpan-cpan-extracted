@@ -1,7 +1,7 @@
 package Rope;
 
 use 5.006; use strict; use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 use Rope::Object;
 my (%META, %PRO);
@@ -74,8 +74,36 @@ BEGIN {
 					value => $options[0],
 					enumerable => 0,
 					writeable => 0,
-					configurable => 1
+					initable => 0,
+					configurable => 0
 				);
+			};
+		},
+		properties => sub {
+			my ($caller) = shift;
+			return sub {
+				my (@properties) = @_;
+				while (@properties) {
+					my ($prop, $options) = (shift @properties, shift @properties);
+
+					my $ref = ref $options;					
+				
+					if (!$ref || $ref ne 'HASH' || ! grep { $options->{$_} } qw/initable writeable enumerable configurable value/) {
+						$options = {
+							initable => 1,
+							enumerable => 1,
+							writeable => 1,
+							configurable => 1,
+							value => $options 
+						};
+					}
+
+					$PRO{set_prop}(
+						$caller,
+						$prop,
+						%{$options}
+					);
+				}
 			};
 		},
 		property => sub {
@@ -104,6 +132,7 @@ BEGIN {
 						enumerable => 1,
 						writeable => 1,
 						configurable => 1,
+						initable => 1,
 						value => $value
 					);
 				}
@@ -193,10 +222,26 @@ BEGIN {
 					prototype => {},
 				};
 				$self = bless $self, $caller;
-				tie %{${$self}->{prototype}}, 'Rope::Object', $PRO{scope}($self, %{$META{$caller}});
+				my $build = $PRO{clone}($META{$caller});
 				for (keys %params) {
-					$self->{$_} = $params{$_};
+					if ($build->{properties}->{$_}) {
+						if ($build->{properties}->{$_}->{initable}) {
+							$build->{properties}->{$_}->{value} = $params{$_};
+						} else {
+							die "Cannot initalise Object ($caller) property ($_) as initable is not set to true.";
+						}
+					} else {
+						$build->{properties}->{$_} = {
+							value => $params{$_},
+							initable => 1,
+							writeable => 1,
+							enumerable => 1,
+							configurable => 1,
+							index => ++$META{$caller}{keys}
+						};;
+					}
 				}
+				tie %{${$self}->{prototype}}, 'Rope::Object', $PRO{scope}($self, %{$build});
 				return $self;
 			};
 		}
@@ -223,7 +268,51 @@ sub import {
 	$PRO{keyword}($caller, $_, $PRO{$_}($caller))
 		for $options->{import} 
 			? @{$options->{import}} 
-			: qw/function property prototyped extends with requires new/;
+			: qw/function property properties prototyped extends with requires new/;
+}
+
+sub new {
+	my ($pkg, $meta, %params) = @_;
+
+	my $name = $meta->{name} || 'Rope::Anonymous' . $META{ANONYMOUS}++;
+
+	if (!$META{$name}) {
+		$META{$name} = {
+			name => $name,
+			locked => 0,
+			properties => {},
+			requires => {},
+			keys => 0
+		};
+		
+		my $use = 'use Rope;';
+		$use .= "use ${_};" for (@{$meta->{use}});
+
+		my $c = sprintf(q|
+			package %s;
+			%s
+			1;
+		|, $name, $use);
+		eval $c;
+	}
+
+	$PRO{requires}($name)(@{$meta->{requires}}) if ($meta->{requires});
+	$PRO{extends}($name)(@{$meta->{extends}}) if ($meta->{extends});
+	$PRO{with}($name)(@{$meta->{with}}) if ($meta->{with});
+	$PRO{properties}($name)(ref $meta->{properties} eq 'ARRAY' ? @{$meta->{properties}} : %{$meta->{properties}}) if ($meta->{properties});
+
+	my $self = \{
+		prototype => {}
+	};
+
+	bless $self, $name;
+
+	tie %{${$self}->{prototype}}, 'Rope::Object', $PRO{scope}($self, %{$PRO{clone}($META{$name})});
+	for (keys %params) {
+		$self->{$_} = $params{$_};
+	}
+
+	return $self;
 }
 
 1;
@@ -236,7 +325,7 @@ Rope - Tied objects
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =cut
 
@@ -262,9 +351,10 @@ Perhaps a little code snippet.
 		bends => {
 			type => sub { $_[0] =~ m/^\d+$/ ? $_[0] : die "$_[0] != integer" },
 			value => 10,
-			writeable => 0,
+			initable => 1,
 			configurable => 1,
 			enumerable => 1,
+			required => 1
 		},
 		...
 	};
@@ -287,6 +377,35 @@ Perhaps a little code snippet.
 	say $k->{loops}; # 6;
 
 	$k->{add_loops} = 5; # errors
+
+... and/or ... 
+
+	my $knot = Rope->new({
+		name => 'Knot',
+		properties => {
+			loops => 1,
+			hitches => {
+				type => Int,
+				value => 10,
+				initable => 0,
+				configurable => 0,
+			},
+			add_loops => sub {
+				my ($self, $loop) = @_;
+				$self->{loops} += $loop;
+			}
+		}
+	});
+
+	my $with = Rope->new({
+		use => [ 'Rope::Autoload' ],
+		with => [ 'Knot' ],
+		requires => [ qw/loops hitches add_loops/ ],
+		properties => [ bends => { type => Int, initable => 1, configurable => 1 }, ... ]
+	}, bends => 5);
+
+	$knot->{loops};
+	$with->loops;
 
 =head1 AUTHOR
 

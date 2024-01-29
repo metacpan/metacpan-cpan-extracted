@@ -1,5 +1,9 @@
 Revision history for Perl module Text::PO
 
+v0.7.0 2023-12-10T17:42:59+0900
+    - Minor improvement when parsing a GNU PO file with dash comments found alone
+    - Code improvement for speed
+
 v0.6.4 2023-10-31T13:55:56+0900
     - Changing objects default value from empty string to undef
 

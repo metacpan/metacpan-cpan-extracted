@@ -5,6 +5,8 @@ use warnings;
 use strict;
 use 5.014;
 
+use List::MoreUtils qw( any );
+
 use Term::Choose       qw();
 use Term::Choose::Util qw();
 
@@ -20,20 +22,29 @@ sub new {
         o => $options,
         d => $d,
     };
-    $sf->{i}{avail_aggr} = [ "AVG(X)", "COUNT(X)", "COUNT(*)", "MAX(X)", "MIN(X)", "SUM(X)" ];
-    if    ( $info->{driver} =~ /^(?:SQLite|mysql|MariaDB)\z/ ) {
-        push @{$sf->{i}{avail_aggr}}, "GROUP_CONCAT(X)";
-    }
-    elsif ( $info->{driver} eq 'Pg' ) {
-        push @{$sf->{i}{avail_aggr}}, "STRING_AGG(X)";
-    }
-    elsif ( $info->{driver} eq 'Firebird' ) {
-        push @{$sf->{i}{avail_aggr}}, "LIST(X)";
-    }
-    elsif ( $info->{driver} =~ /^(?:DB2|Oracle)\z/ ) {
-        push @{$sf->{i}{avail_aggr}}, "LISTAGG(X)";
-    }
     bless $sf, $class;
+    my $driver = $sf->{i}{driver};
+    my $group_concat = '';
+    if ( $driver =~ /^(?:SQLite|mysql|MariaDB)\z/ ) {
+        $group_concat = "GROUP_CONCAT(X)";
+    }
+    elsif ( $driver eq 'Pg' ) {
+        $group_concat = "STRING_AGG(X)";
+    }
+    elsif ( $driver eq 'Firebird' ) {
+        $group_concat = "LIST(X)";
+    }
+    elsif ( $driver =~ /^(?:DB2|Oracle)\z/ ) {
+        $group_concat = "LISTAGG(X)";
+    }
+    my $avail_aggr = [ "AVG(X)", "COUNT(X)", "COUNT(*)", "MAX(X)", "MIN(X)", "SUM(X)" ];
+    if ( $group_concat ) {
+        push @$avail_aggr, $group_concat;
+#        $group_concat =~ s/\(\X\)\z//;
+    }
+    $sf->{i}{avail_aggr} = $avail_aggr;
+    $sf->{i}{group_concat} = $group_concat =~ s/\(\X\)\z//r;
+    return $sf;
 }
 
 
@@ -47,14 +58,12 @@ sub select {
     if ( $sf->{o}{enable}{extended_cols} ) {
         push @pre, $sf->{i}{menu_addition};
     }
-    if ( @{$sql->{group_by_cols}} || @{$sql->{aggr_cols}} ) {
+    if ( $sql->{aggregate_mode} ) {
         $menu = [ @pre, @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} ];
     }
     else {
         $menu = [ @pre, @{$sql->{cols}} ];
     }
-    $sql->{selected_cols} = [];
-    my @bu;
 
     COLUMNS: while ( 1 ) {
         my $info = $ax->get_sql_info( $sql );
@@ -66,23 +75,34 @@ sub select {
         );
         $ax->print_sql_info( $info );
         if ( ! $idx[0] ) {
-            if ( @bu ) {
-                ( $sql->{selected_cols}, $sql->{alias} ) = @{pop @bu};
+            if ( @{$sql->{selected_cols}} ) {
+                my $deleted_col = pop @{$sql->{selected_cols}};
+                if ( exists $sql->{alias}{$deleted_col} ) {
+                    delete $sql->{alias}{$deleted_col};
+                }
                 next COLUMNS;
             }
+            #if ( $sql->{aggregate_mode} ) { ##
+            #    $ax->reset_sql( $sql );
+            #    $sql->{aggregate_mode} = 0;
+            #}
             return;
         }
-        push @bu, [ [ @{$sql->{selected_cols}} ], { %{$sql->{alias}} } ];
         if ( $menu->[$idx[0]] eq $sf->{i}{ok} ) {
             shift @idx;
-            push @{$sql->{selected_cols}}, @{$menu}[@idx];
+            if ( @idx ) {
+                push @{$sql->{selected_cols}}, @{$menu}[@idx];
+            }
             return 1;
         }
         elsif ( $menu->[$idx[0]] eq $sf->{i}{menu_addition} ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $complex_col = $ext->column( $sql, $clause );
             if ( ! defined $complex_col ) {
-                ( $sql->{selected_cols}, $sql->{alias} ) = @{pop @bu};
+                next COLUMNS
+            }
+            elsif ( ref( $complex_col ) eq 'HASH' ) {
+                $sql->{alias} = $complex_col;
             }
             else {
                 my $alias = $ax->alias( $sql, 'select_complex_col', $complex_col );
@@ -104,7 +124,6 @@ sub distinct {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @pre = ( undef, $sf->{i}{ok} );
-    $sql->{distinct_stmt} = '';
 
     DISTINCT: while ( 1 ) {
         my $menu = [ @pre, "ALL", "DISTINCT" ];
@@ -133,168 +152,64 @@ sub distinct {
 sub aggregate {
     my ( $sf, $sql ) = @_;
     my $clause = 'aggregate';
-    $sql->{aggr_cols} = [];
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $bu_selected_cols = [ @{$sql->{selected_cols}} ];
     $sql->{selected_cols} = [];
+    my $bu_aggregate_mode = $sql->{aggregate_mode} // 0;
+    $sql->{aggregate_mode} = 1;
 
     AGGREGATE: while ( 1 ) {
-        my $ret = $sf->__add_aggregate_substmt( $sql, $clause );
-        if ( ! $ret ) {
+        my @pre = ( undef, $sf->{i}{ok} );
+        my $info = $ax->get_sql_info( $sql );
+        # Choose
+        my $aggr = $tc->choose(
+            [ @pre, @{$sf->{i}{avail_aggr}} ],
+            { %{$sf->{i}{lyt_h}}, info => $info }
+        );
+        $ax->print_sql_info( $info );
+        if ( ! defined $aggr ) {
             if ( @{$sql->{aggr_cols}} ) {
                 my $aggr = pop @{$sql->{aggr_cols}};
-                delete $sql->{alias}{$aggr} if exists $sql->{alias}{$aggr};
+                $bu_selected_cols = [ grep { ! /\b\Q$aggr\E(?:\W|\z)/ } @$bu_selected_cols ]; ##
+                delete $sql->{alias}{$aggr};
                 next AGGREGATE;
+            }
+            if ( ! @{$sql->{group_by_cols}} ) {
+                $sql->{aggregate_mode} = 0;
+                $sql->{having_stmt} = '' if $sql->{having_stmt};
+            }
+            if ( $sql->{aggregate_mode} == $bu_aggregate_mode ) {
+                $sql->{selected_cols} = [ @$bu_selected_cols ];
+            }
+            else {
+                $sql->{order_by_stmt} = '';
             }
             return;
         }
-        elsif ( $ret eq $sf->{i}{ok} ) {
-            return 1;
-        }
-    }
-}
-
-sub __add_aggregate_substmt {
-    my ( $sf, $sql, $clause ) = @_;
-    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my @pre = ( undef, $sf->{i}{ok} );
-    my $GROUP_CONCAT;
-    if ( defined $sf->{i}{avail_aggr}[6] ) {
-        $GROUP_CONCAT = $sf->{i}{avail_aggr}[6] =~ s/\(\X\)\z//r;
-    }
-    else {
-        $GROUP_CONCAT = '';
-    }
-    my $i = @{$sql->{aggr_cols}};
-    my $info = $ax->get_sql_info( $sql );
-    # Choose
-    my $aggr = $tc->choose(
-        [ @pre, @{$sf->{i}{avail_aggr}} ],
-        { %{$sf->{i}{lyt_h}}, info => $info }
-    );
-    $ax->print_sql_info( $info );
-    if ( ! defined $aggr ) {
-        return;
-    }
-    elsif ( $aggr eq $sf->{i}{ok} ) {
-        return $aggr;
-    }
-    if ( $aggr eq 'COUNT(*)' ) {
-        $sql->{aggr_cols}[$i] = $aggr;
-    }
-    else {
-        $aggr =~ s/\(\X\)\z//;
-        $sql->{aggr_cols}[$i] = $aggr . "(";
-        my $is_distinct;
-        if ( $aggr =~ /^(?:COUNT|$GROUP_CONCAT)\z/ ) {
-            my $info = $ax->get_sql_info( $sql );
-            my ( $ALL, $DISTINCT ) = ( "ALL", "DISTINCT" );
-            # Choose
-            my $all_or_distinct = $tc->choose(
-                [ undef, $ALL, $DISTINCT ],
-                { %{$sf->{i}{lyt_h}}, info => $info }
-            );
-            $ax->print_sql_info( $info );
-            if ( ! defined $all_or_distinct ) {
-                return;
+        if ( $aggr eq $sf->{i}{ok} ) {
+            if ( ! @{$sql->{aggr_cols}} && ! @{$sql->{group_by_cols}} ) {
+                $sql->{aggregate_mode} = 0;
+                $sql->{having_stmt} = '' if $sql->{having_stmt};
             }
-            if ( $all_or_distinct eq $DISTINCT ) {
-                $sql->{aggr_cols}[$i] .= $DISTINCT . " ";
-                $is_distinct = 1;
-            }
-        }
-        my @pre = ( undef );
-        if ( $sf->{o}{enable}{extended_cols} ) {
-            push @pre, $sf->{i}{menu_addition};
-        }
-        my $qt_col;
-
-        COLUMN: while ( 1 ) {
-            my $info = $ax->get_sql_info( $sql );
-            # Choose
-            $qt_col = $tc->choose(
-                [ @pre, @{$sql->{cols}} ],
-                { %{$sf->{i}{lyt_h}}, info => $info }
-            );
-            $ax->print_sql_info( $info );
-            if ( ! defined $qt_col ) {
-                return;
-            }
-            elsif ( $qt_col eq $sf->{i}{menu_addition} ) {
-                my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                my $info = $ax->get_sql_info( $sql );
-                my $complex_column = $ext->column( $sql, $clause );
-                if ( ! defined $complex_column ) {
-                    next COLUMN;
-                }
-                else {
-                    $qt_col = $complex_column;
-                }
-            }
-            last COLUMN;
-        }
-        if ( $aggr =~ /^$GROUP_CONCAT\z/ ) {
-            if ( $sf->{i}{driver} eq 'Pg' ) {
-                # Pg, STRING_AGG: separator mandatory
-                $sql->{aggr_cols}[$i] .= "${qt_col}::text,',')";
-            }
-            elsif ( $sf->{i}{driver} =~ /^(?:DB2|Oracle)\z/ ) {
-                # DB2, LISTAGG: no default separator
-                $sql->{aggr_cols}[$i] .= "$qt_col,',')";
+            if ( $sql->{aggregate_mode} == $bu_aggregate_mode ) {
+                $sql->{selected_cols} = [ @$bu_selected_cols ];
             }
             else {
-                # https://sqlite.org/forum/info/221c2926f5e6f155
-                # SQLite: GROUP_CONCAT with DISTINCT and custom seperator does not work
-                $sql->{aggr_cols}[$i] .= "$qt_col)";
+                $sql->{order_by_stmt} = '';
             }
-            #my $sep = ',';
-            #if ( $sf->{i}{driver} eq 'SQLite' ) {
-            #    if ( $is_distinct ) {
-            #        # https://sqlite.org/forum/info/221c2926f5e6f155
-            #        # SQLite: GROUP_CONCAT with DISTINCT and custom seperator does not work
-            #        # default separator is ','
-            #        $sql->{aggr_cols}[$i] .= "$qt_col)";
-            #    }
-            #    else {
-            #        $sql->{aggr_cols}[$i] .= "$qt_col,'$sep')";
-            #    }
-            #}
-            #elsif ( $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
-            #    $sql->{aggr_cols}[$i] .= "$qt_col ORDER BY $qt_col SEPARATOR '$sep')";
-            #}
-            #elsif ( $sf->{i}{driver} eq 'Pg' ) {
-            #    # Pg, STRING_AGG:
-            #    # separator mandatory
-            #    # expects text type as argument
-            #    # with DISTINCT the STRING_AGG col and the ORDER BY col must be identical
-            #    $sql->{aggr_cols}[$i] .= "${qt_col}::text,'$sep' ORDER BY ${qt_col}::text)";
-            #}
-            #elsif ( $sf->{i}{driver} eq 'Firebird' ) {
-            #    $sql->{aggr_cols}[$i] .= "$qt_col,'$sep')";
-            #}
-            #elsif ( $sf->{i}{driver} =~ /^(?:DB2|Oracle)\z/ ) {
-            #    if ( $is_distinct ) {
-            #        # DB2 codes: error code -214 - error caused by:
-            #        # DISTINCT is specified in the SELECT clause, and a column name or sort-key-expression in the
-            #        # ORDER BY clause cannot be matched exactly with a column name or expression in the select list.
-            #        $sql->{aggr_cols}[$i] .= "$qt_col,'$sep')";
-            #    }
-            #    else {
-            #        $sql->{aggr_cols}[$i] .= "$qt_col,'$sep') WITHIN GROUP (ORDER BY $qt_col)";
-            #    }
-            #}
-            #else {
-            #    return;
-            #}
+            return 1;
         }
-        else {
-            $sql->{aggr_cols}[$i] .= "$qt_col)";
+        my $prepared_aggr = $sf->get_prepared_aggr_func( $sql, $clause, $aggr );
+        if ( ! defined $prepared_aggr ) {
+            next AGGREGATE;
+        }
+        push @{$sql->{aggr_cols}}, $prepared_aggr;
+        my $alias = $ax->alias( $sql, 'select_complex_col', $prepared_aggr );
+        if ( length $alias ) {
+            $sql->{alias}{$prepared_aggr} = $ax->quote_alias( $alias );
         }
     }
-    my $alias = $ax->alias( $sql, 'select_complex_col', $sql->{aggr_cols}[$i] );
-    if ( length $alias ) {
-        $sql->{alias}{$sql->{aggr_cols}[$i]} = $ax->quote_alias( $alias );
-    }
-    return 1;
 }
 
 
@@ -322,6 +237,7 @@ sub set {
                 $sql->{$stmt} = pop @bu;
                 next COL;
             }
+            $sql->{$stmt} = '';
             return;
         }
         if ( $qt_col eq $sf->{i}{ok} ) {
@@ -346,10 +262,9 @@ sub set {
 sub where {
     my ( $sf, $sql ) = @_;
     my $clause = 'where';
-    my $stmt = 'where_stmt';
-    $sql->{$stmt} = "WHERE";
+    my $substmt_type = "WHERE";
     my $items = [ @{$sql->{cols}} ];
-    my $ret = $sf->__add_condition( $sql, $clause, $stmt, $items );
+    my $ret = $sf->__add_condition( $sql, $clause, $substmt_type, $items );
     return $ret;
 }
 
@@ -359,9 +274,10 @@ sub group_by {
     my $clause = 'group_by';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    $sql->{group_by_stmt} = "GROUP BY";
-    $sql->{group_by_cols} = [];
+    my $bu_selected_cols = [ @{$sql->{selected_cols}} ];
     $sql->{selected_cols} = [];
+    my $bu_aggregate_mode = $sql->{aggregate_mode} // 0;
+    $sql->{aggregate_mode} = 1;
     my @pre = ( undef, $sf->{i}{ok} );
     if ( $sf->{o}{enable}{extended_cols} ) {
         push @pre, $sf->{i}{menu_addition};
@@ -380,19 +296,41 @@ sub group_by {
         $ax->print_sql_info( $info );
         if ( ! $idx[0] ) {
             if ( @{$sql->{group_by_cols}} ) {
-                pop @{$sql->{group_by_cols}};
+                my $removed = pop @{$sql->{group_by_cols}};
+                $bu_selected_cols = [ grep { ! /(?:^|\W)\Q$removed\E(?:\W|\z)/ } @$bu_selected_cols ]; ##
                 next GROUP_BY;
             }
-            return;
-        }
-        elsif ( $menu->[$idx[0]] eq $sf->{i}{ok} ) {
-            shift @idx;
-            push @{$sql->{group_by_cols}}, @{$menu}[@idx];
-            if ( ! @{$sql->{group_by_cols}} ) {
-                $sql->{group_by_stmt} = '';
+            if ( ! @{$sql->{aggr_cols}} ) {
+                $sql->{aggregate_mode} = 0;
+                $sql->{having_stmt} = '' if $sql->{having_stmt};
+            }
+            if ( $sql->{aggregate_mode} == $bu_aggregate_mode ) {
+                $sql->{selected_cols} = [ @$bu_selected_cols ];
             }
             else {
+                $sql->{order_by_stmt} = '';
+            }
+            $sql->{group_by_stmt} = '';
+            return;
+        }
+        if ( $menu->[$idx[0]] eq $sf->{i}{ok} ) {
+            shift @idx;
+            push @{$sql->{group_by_cols}}, @{$menu}[@idx];
+            if ( ! @{$sql->{aggr_cols}} && ! @{$sql->{group_by_cols}} ) {
+                $sql->{aggregate_mode} = 0;
+                $sql->{having_stmt} = '' if $sql->{having_stmt};
+            }
+            if ( $sql->{aggregate_mode} == $bu_aggregate_mode ) {
+                $sql->{selected_cols} = [ @$bu_selected_cols ];
+            }
+            else {
+                $sql->{order_by_stmt} = '';
+            }
+            if ( @{$sql->{group_by_cols}} ) {
                 $sql->{group_by_stmt} = "GROUP BY " . join ', ', @{$sql->{group_by_cols}};
+            }
+            else {
+                $sql->{group_by_stmt} = '';
             }
             return 1;
         }
@@ -417,10 +355,9 @@ sub group_by {
 sub having {
     my ( $sf, $sql ) = @_;
     my $clause = 'having';
-    my $stmt = 'having_stmt';
-    $sql->{$stmt} = "HAVING";
-    my $items = [ @{$sf->{i}{avail_aggr}}, map( '@' . $_, @{$sql->{aggr_cols}} ) ];
-    my $ret = $sf->__add_condition( $sql, $clause, $stmt, $items );
+    my $substmt_type = "HAVING";
+    my $items = [ map( '@' . $_, @{$sql->{aggr_cols}} ), @{$sf->{i}{avail_aggr}} ];
+    my $ret = $sf->__add_condition( $sql, $clause, $substmt_type, $items );
     return $ret;
 }
 
@@ -435,8 +372,8 @@ sub order_by {
         push @pre, $sf->{i}{menu_addition};
     }
     my @tmp_cols;
-    if ( @{$sql->{aggr_cols}} || @{$sql->{group_by_cols}} ) {
-        @tmp_cols = ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} );
+    if ( $sql->{aggregate_mode} ) {
+        @tmp_cols = ( @{$sql->{group_by_cols}}, map( '@' . $_, @{$sql->{aggr_cols}} ), @{$sf->{i}{avail_aggr}} );
     }
     else {
         @tmp_cols = @{$sql->{cols}};
@@ -455,45 +392,53 @@ sub order_by {
     if ( @aliases ) {
         push @cols, @aliases;
     }
-    $sql->{order_by_stmt} = "ORDER BY";
-    my @bu;
+    my @bu = @{$sql->{bu_order_by}//[]};
+    $sql->{order_by_stmt} = pop ( @bu ) // "ORDER BY";
 
     ORDER_BY: while ( 1 ) {
         my $info = $ax->get_sql_info( $sql );
         # Choose
-        my $col = $tc->choose(
+        my $qt_col = $tc->choose(
             [ @pre, @cols ],
             { %{$sf->{i}{lyt_h}}, info => $info }
         );
         $ax->print_sql_info( $info );
-        if ( ! defined $col ) {
+        if ( ! defined $qt_col ) {
             if ( @bu ) {
                 $sql->{order_by_stmt} = pop @bu;
                 next ORDER_BY;
             }
+            $sql->{bu_order_by} = [];
+            $sql->{order_by_stmt} = '';
             return
         }
-        if ( $col eq $sf->{i}{ok} ) {
+        if ( $qt_col eq $sf->{i}{ok} ) {
             if ( ! @bu ) {
                 $sql->{order_by_stmt} = '';
             }
+            else {
+                push @bu, $sql->{order_by_stmt};
+            }
+            $sql->{bu_order_by} = [ @bu ]; ##
             return 1;
         }
-        elsif ( $col eq $sf->{i}{menu_addition} ) {
+        elsif ( $qt_col eq $sf->{i}{menu_addition} ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $complex_column = $ext->column( $sql, $clause );
             if ( ! defined $complex_column ) {
-                if ( @bu ) {
-                    $sql->{order_by_stmt} = pop @bu;
-                }
+                #if ( @bu ) {
+                #    $sql->{order_by_stmt} = pop @bu;
+                #}
                 next ORDER_BY;
             }
-            $col = $complex_column;
+            $qt_col = $complex_column;
+        }
+        elsif ( $sql->{aggregate_mode} ) {
+            $qt_col = $sf->get_prepared_aggr_func( $sql, $clause, $qt_col );
         }
         push @bu, $sql->{order_by_stmt};
-        my $col_sep = @bu == 1 ? ' ' : ', ';
-        $sql->{order_by_stmt} .= $col_sep . $col;
-        $info = $ax->get_sql_info( $sql );
+        $sql->{order_by_stmt} .= ( @bu == 1 ? ' ' : ', ' ) . $qt_col;
+        $info = $ax->get_sql_info( $sql ); # ???
         # Choose
         my $direction = $tc->choose(
             [ undef, "ASC", "DESC" ],
@@ -518,9 +463,8 @@ sub limit_offset {
     my $use_limit = $driver =~ /^(?:SQLite|mysql|MariaDB|Pg|Informix)\z/ ? 1 : 0;
     my @pre = ( undef, $sf->{i}{ok} );
     my ( $limit, $offset ) = ( 'LIMIT', 'OFFSET' );
-    $sql->{limit_stmt}  = '';
-    $sql->{offset_stmt} = '';
-    my @bu;
+    my @bu = @{$sql->{bu_limit_offset}//[['','']]};
+    ( $sql->{limit_stmt}, $sql->{offset_stmt} ) = @{pop @bu};
 
     LIMIT: while ( 1 ) {
         my $info = $ax->get_sql_info( $sql );
@@ -535,9 +479,12 @@ sub limit_offset {
                 ( $sql->{limit_stmt}, $sql->{offset_stmt} )  = @{pop @bu};
                 next LIMIT;
             }
+            $sql->{bu_limit_offset} = [];
             return;
         }
         if ( $choice eq $sf->{i}{ok} ) {
+            push @bu, [ $sql->{limit_stmt}, $sql->{offset_stmt} ];
+            $sql->{bu_limit_offset} = [ @bu ];
             return 1;
         }
         push @bu, [ $sql->{limit_stmt}, $sql->{offset_stmt} ];
@@ -592,13 +539,23 @@ sub limit_offset {
 
 
 sub __add_condition {
-    my ( $sf, $sql, $clause, $stmt, $items ) = @_;
-    # when-clause: $clause != $stmt
+    my ( $sf, $sql, $clause, $substmt_type, $items ) = @_;
+    # when-clause: $clause != $substmt_type
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $so = App::DBBrowser::Table::Substatements::Operators->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $AND_OR = '';
     my @bu;
+    my $stmt;
+    if ( $substmt_type =~ /^\s*(WHEN)\z/i ) {
+        $stmt = lc( $1 ) . '_stmt';
+        $sql->{$stmt} = $substmt_type . " ";
+    }
+    else {
+        $stmt = lc( $substmt_type ) . '_stmt';
+        @bu = @{$sql->{'bu_' . $stmt}//[]};
+        $sql->{$stmt} = pop ( @bu ) // $substmt_type;
+    }
     my @pre = ( undef, $sf->{i}{ok} );
     if ( $sf->{o}{enable}{extended_cols} ) {
         push @pre, $sf->{i}{menu_addition};
@@ -618,12 +575,16 @@ sub __add_condition {
                 $sql->{$stmt} = pop @bu;
                 next COL;
             }
+            $sql->{'bu_' . $stmt} = [];
+            $sql->{$stmt} = '';
             return;
         }
         if ( $qt_col eq $sf->{i}{ok} ) {
             if ( ! @bu ) {
                 $sql->{$stmt} = '';
             }
+            push @bu, $sql->{$stmt};
+            $sql->{'bu_' . $stmt} = [ @bu ];
             return 1;
         }
         if ( $qt_col eq $sf->{i}{menu_addition} ) {
@@ -659,7 +620,7 @@ sub __add_condition {
             next COL;
         }
         if ( $clause eq 'having' ) {
-            $qt_col = $so->build_having_col( $sql, $clause, $qt_col );
+            $qt_col = $sf->get_prepared_aggr_func( $sql, $clause, $qt_col );
             if ( ! defined $qt_col ) {
                 $sql->{$stmt} = pop @bu;
                 next COL;
@@ -674,12 +635,12 @@ sub __add_condition {
 
         OPERATOR: while ( 1 ) {
             my $bu_op = $sql->{$stmt};
-            my $op = $so->choose_and_add_operator( $sql, $clause, $stmt, $qt_col );
-            if ( ! defined $op ) {
+            my $operator = $so->choose_and_add_operator( $sql, $clause, $stmt, $qt_col );
+            if ( ! defined $operator ) {
                 $sql->{$stmt} = pop @bu;
                 next COL;
             }
-            my $ok = $so->read_and_add_value( $sql, $clause, $stmt, $qt_col, $op );
+            my $ok = $so->read_and_add_value( $sql, $clause, $stmt, $qt_col, $operator );
             if ( ! $ok ) {
                 $sql->{$stmt} = $bu_op;
                 next OPERATOR;
@@ -688,6 +649,144 @@ sub __add_condition {
         }
     }
 }
+
+
+sub get_prepared_aggr_func {
+    my ( $sf, $sql, $clause, $aggr ) = @_;
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $rx_aggr_requires_col = join '|', map { quotemeta } grep { /\(X\)\z/ } @{$sf->{i}{avail_aggr}};
+    my $prepared_aggr;
+    if ( $aggr !~ /^(?:$rx_aggr_requires_col)\z/ ) {
+        if ( any { '@' . $_ eq $aggr } @{$sql->{aggr_cols}} ) {
+            $aggr =~ s/^\@//;
+        }
+        $prepared_aggr = $aggr;
+    }
+    else {
+        require Clone;
+        my $tmp_sql = Clone::clone( $sql );
+        $aggr =~ s/\(X\)\z//;
+        $prepared_aggr = $aggr . "(";
+        if ( $clause eq 'aggregate' ) {
+            push @{$tmp_sql->{aggr_cols}}, $prepared_aggr;
+        }
+        else {
+            $tmp_sql->{$clause . '_stmt'} = $sql->{$clause . '_stmt'} . " " . $prepared_aggr;
+        }
+        my $is_distinct;
+        if ( $aggr =~ /^(?:COUNT|$sf->{i}{group_concat})\z/ ) {
+            my $info = $ax->get_sql_info( $tmp_sql );
+            my ( $ALL, $DISTINCT ) = ( "ALL", "DISTINCT" );
+            # Choose
+            my $all_or_distinct = $tc->choose(
+                [ undef, $ALL, $DISTINCT ],
+                { %{$sf->{i}{lyt_h}}, info => $info }
+            );
+            $ax->print_sql_info( $info );
+            if ( ! defined $all_or_distinct ) {
+                return;
+            }
+            if ( $all_or_distinct eq $DISTINCT ) {
+                $prepared_aggr .= $DISTINCT . " ";
+                $is_distinct = 1;
+            }
+        }
+        my @pre = ( undef );
+        if ( $sf->{o}{enable}{extended_cols} ) {
+            push @pre, $sf->{i}{menu_addition};
+        }
+        my $qt_col;
+
+        COLUMN: while ( 1 ) {
+            if ( $clause eq 'aggregate' ) {
+                pop @{$tmp_sql->{aggr_cols}};
+                push @{$tmp_sql->{aggr_cols}}, $prepared_aggr;
+            }
+            else {
+                $tmp_sql->{$clause . '_stmt'} = $sql->{$clause . '_stmt'} . " " . $prepared_aggr;
+            }
+            my $info = $ax->get_sql_info( $tmp_sql );
+            # Choose
+            $qt_col = $tc->choose(
+                [ @pre, @{$tmp_sql->{cols}} ],
+                { %{$sf->{i}{lyt_h}}, info => $info }
+            );
+            $ax->print_sql_info( $info );
+            if ( ! defined $qt_col ) {
+                return;
+            }
+            elsif ( $qt_col eq $sf->{i}{menu_addition} ) {
+                my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
+                my $complex_column = $ext->column( $tmp_sql, $clause );
+                if ( ! defined $complex_column ) {
+                    next COLUMN;
+                }
+                $qt_col = $complex_column;
+            }
+            last COLUMN;
+        }
+        if ( $aggr =~ /^$sf->{i}{group_concat}\z/ ) {
+            if ( $sf->{i}{driver} eq 'Pg' ) {
+                # Pg, STRING_AGG: separator mandatory
+                $prepared_aggr .= "${qt_col}::text,',')";
+            }
+            elsif ( $sf->{i}{driver} =~ /^(?:DB2|Oracle)\z/ ) {
+                # DB2, LISTAGG: no default separator
+                $prepared_aggr .= "$qt_col,',')";
+            }
+            else {
+                # https://sqlite.org/forum/info/221c2926f5e6f155
+                # SQLite: GROUP_CONCAT with DISTINCT and custom seperator does not work
+                $prepared_aggr .= "$qt_col)";
+            }
+            #my $sep = ',';
+            #if ( $sf->{i}{driver} eq 'SQLite' ) {
+            #    if ( $is_distinct ) {
+            #        # https://sqlite.org/forum/info/221c2926f5e6f155
+            #        # SQLite: GROUP_CONCAT with DISTINCT and custom seperator does not work
+            #        # default separator is ','
+            #        $prepared_aggr .= "$qt_col)";
+            #    }
+            #    else {
+            #        $prepared_aggr .= "$qt_col,'$sep')";
+            #    }
+            #}
+            #elsif ( $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
+            #    $prepared_aggr .= "$qt_col ORDER BY $qt_col SEPARATOR '$sep')";
+            #}
+            #elsif ( $sf->{i}{driver} eq 'Pg' ) {
+            #    # Pg, STRING_AGG:
+            #    # separator mandatory
+            #    # expects text type as argument
+            #    # with DISTINCT the STRING_AGG col and the ORDER BY col must be identical
+            #    $prepared_aggr .= "${qt_col}::text,'$sep' ORDER BY ${qt_col}::text)";
+            #}
+            #elsif ( $sf->{i}{driver} eq 'Firebird' ) {
+            #    $prepared_aggr .= "$qt_col,'$sep')";
+            #}
+            #elsif ( $sf->{i}{driver} =~ /^(?:DB2|Oracle)\z/ ) {
+            #    if ( $is_distinct ) {
+            #        # DB2 codes: error code -214 - error caused by:
+            #        # DISTINCT is specified in the SELECT clause, and a column name or sort-key-expression in the
+            #        # ORDER BY clause cannot be matched exactly with a column name or expression in the select list.
+            #        $prepared_aggr .= "$qt_col,'$sep')";
+            #    }
+            #    else {
+            #        $prepared_aggr .= "$qt_col,'$sep') WITHIN GROUP (ORDER BY $qt_col)";
+            #    }
+            #}
+            #else {
+            #    return;
+            #}
+        }
+        else {
+            $prepared_aggr .= "$qt_col)";
+        }
+    }
+    return $prepared_aggr;
+}
+
 
 
 

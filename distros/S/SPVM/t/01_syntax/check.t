@@ -402,22 +402,6 @@ use Test::More;
     my $source = 'class MyClass { static method main : void () { 1 is_type Int; } }';
     compile_not_ok($source, 'The left operand of the is_type operator must be an object type');
   }
-  {
-    my $source = 'class MyClass { static method main : void () { Int->new(1) is_type int; } }';
-    compile_not_ok($source, 'The right type of the is_type operator must be an object type');
-  }
-  {
-    my $source = 'class MyClass { static method main : void () { Int->new(1) is_type object; } }';
-    compile_not_ok($source, q|The right type of the is_type operator cannnot be the any object type|);
-  }
-  {
-    my $source = 'class MyClass { static method main : void () { Int->new(1) is_type object[]; } }';
-    compile_not_ok($source, q|The right type of the is_type operator cannnot be the any object array type|);
-  }
-  {
-    my $source = 'class MyClass { use Stringable; static method main : void () { Int->new(1) is_type Stringable; } }';
-    compile_not_ok($source, q|The right type of the is_type operator cannnot be an interface type|);
-  }
 }
 
 # is_error
@@ -598,27 +582,27 @@ use Test::More;
   }
 }
 
-# divui
+# div_uint
 {
   {
-    my $source = 'class MyClass { static method main : void () { 1L divui 1; } }';
-    compile_not_ok($source, q|The left operand of the divui operator must be the int type|);
+    my $source = 'class MyClass { static method main : void () { 1L div_uint 1; } }';
+    compile_not_ok($source, q|The left operand of the div_uint operator must be the int type|);
   }
   {
-    my $source = 'class MyClass { static method main : void () { 1 divui 1L; } }';
-    compile_not_ok($source, q|The right operand of the divui operator must be the int type|);
+    my $source = 'class MyClass { static method main : void () { 1 div_uint 1L; } }';
+    compile_not_ok($source, q|The right operand of the div_uint operator must be the int type|);
   }
 }
 
-# divul
+# div_ulong
 {
   {
-    my $source = 'class MyClass { static method main : void () { 1 divul 1L; } }';
-    compile_not_ok($source, q|The left operand of the divul operator must be the long type|);
+    my $source = 'class MyClass { static method main : void () { 1 div_ulong 1L; } }';
+    compile_not_ok($source, q|The left operand of the div_ulong operator must be the long type|);
   }
   {
-    my $source = 'class MyClass { static method main : void () { 1L divul 1; } }';
-    compile_not_ok($source, q|The right operand of the divul operator must be the long type|);
+    my $source = 'class MyClass { static method main : void () { 1L div_ulong 1; } }';
+    compile_not_ok($source, q|The right operand of the div_ulong operator must be the long type|);
   }
 }
 
@@ -634,27 +618,27 @@ use Test::More;
   }
 }
 
-# remui
+# mod_uint
 {
   {
-    my $source = 'class MyClass { static method main : void () { 1L remui 1; } }';
-    compile_not_ok($source, q|The left operand of the remui operator must be the int type|);
+    my $source = 'class MyClass { static method main : void () { 1L mod_uint 1; } }';
+    compile_not_ok($source, q|The left operand of the mod_uint operator must be the int type|);
   }
   {
-    my $source = 'class MyClass { static method main : void () { 1 remui 1L; } }';
-    compile_not_ok($source, q|The right operand of the remui operator must be the int type|);
+    my $source = 'class MyClass { static method main : void () { 1 mod_uint 1L; } }';
+    compile_not_ok($source, q|The right operand of the mod_uint operator must be the int type|);
   }
 }
 
-# remul
+# mod_ulong
 {
   {
-    my $source = 'class MyClass { static method main : void () { 1 remul 1L; } }';
-    compile_not_ok($source, q|The left operand of the remul operator must be the long type|);
+    my $source = 'class MyClass { static method main : void () { 1 mod_ulong 1L; } }';
+    compile_not_ok($source, q|The left operand of the mod_ulong operator must be the long type|);
   }
   {
-    my $source = 'class MyClass { static method main : void () { 1L remul 1; } }';
-    compile_not_ok($source, q|The right operand of the remul operator must be the long type|);
+    my $source = 'class MyClass { static method main : void () { 1L mod_ulong 1; } }';
+    compile_not_ok($source, q|The right operand of the mod_ulong operator must be the long type|);
   }
 }
 
@@ -1186,6 +1170,26 @@ use Test::More;
   }
   compile_not_ok_file('CompileError::Method::TooManyArguments', qr/The width of the arguments must be less than or equal to 255/);
   compile_not_ok_file('CompileError::Method::TooManyArgumentsMulnum', qr/The width of the arguments must be less than or equal to 255/);
+  
+  {
+    my $source = 'class MyClass { use Complex_2d; static method main : void ($arg1 : int = 0.0) { } }';
+    compile_not_ok($source, q|The default value of the optional argument "$arg1" must be able to be assigned to the argument.|);
+  }
+  
+  {
+    my $source = 'class MyClass { use Complex_2d; static method main : void ($arg1 : float = 0.0) { } }';
+    compile_not_ok($source, q|The default value of the optional argument "$arg1" must be able to be assigned to the argument.|);
+  }
+  
+  {
+    my $source = 'class MyClass { use Complex_2d; static method main : void ($arg1 : int = -2147483648L) { } }';
+    compile_ok($source);
+  }
+  
+  {
+    my $source = 'class MyClass { use Complex_2d; static method main : void ($arg1 : int = -2147483649L) { } }';
+    compile_not_ok($source, q|The default value of the optional argument "$arg1" must be able to be assigned to the argument.|);
+  }
 }
 
 # Return type
@@ -1253,6 +1257,30 @@ use Test::More;
       'class MyClass { use Point; use Point3D; method main : void ($point : Point3D) {} }',
     ];
     compile_not_ok($source, q|The 1th argument of the "main" method in the "MyClass2" class which argument type is "Point" must be able to be assigned to the 1th argument of the "main" method in the "MyClass" class which argument type is "Point3D".|);
+  }
+  
+  {
+    my $source = [
+      'class MyClass extends MyClassParent : public { method main : void () { my $my_class = new MyClass; $my_class->{foo}; } }',
+      'class MyClassParent { has foo : int; }',
+    ];
+    compile_not_ok($source, q|The private "foo" field in the "MyClass" class cannnot be accessed from the current class "MyClass".|);
+  }
+  
+  {
+    my $source = [
+      'class MyClass extends MyClassParent : public { method main : void () { my $my_class = new MyClass; $my_class->{foo}; } }',
+      'class MyClassParent { has foo : protected int; }',
+    ];
+    compile_ok($source);
+  }
+  
+  {
+    my $source = [
+      'class MyClass extends MyClassParent : public { method main : void () { my $my_class = new MyClass; $my_class->{foo}; } }',
+      'class MyClassParent { has foo : public int; }',
+    ];
+    compile_ok($source);
   }
 }
 
@@ -1423,13 +1451,13 @@ use Test::More;
 
 # Extra
 {
-   {
+  {
     my $source = [
       'class MyClass { use Point; static method main : int () { my $point = Point->new; warn "AAA " . type_name $point . " " . $point can splitpath; } }',
     ];
     compile_not_ok($source, 'The right operand of the . operator must be the string type or the byte[] type');
   }
-
+  
   {
   
     my $source = <<'EOS';
@@ -1445,6 +1473,20 @@ EOS
     
     compile_not_ok($source, q|line 4|);
   }
-
+  
+  {
+    my $source = [
+      'class MyClass { use Point; static method main : int () { 1 && my $x = 3; } }',
+    ];
+    compile_not_ok($source, q|The left operand of the assign operator must be mutable|);
+  }
+  
+  {
+    my $source = [
+      'class MyClass { use Point; static method main : int () { 1 && (my $x = 3); } }',
+    ];
+    compile_ok($source);
+  }
+  
 }
 done_testing;

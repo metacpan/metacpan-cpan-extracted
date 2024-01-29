@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Text::Treesitter::Tree 0.11;
+package Text::Treesitter::Tree 0.12;
 class Text::Treesitter::Tree
    :strict(params);
 

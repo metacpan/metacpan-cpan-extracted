@@ -1,7 +1,7 @@
 ---
 abstract: 'Install the Graph::Reader modules.'
 author:
-  - 'Michal Spacek <skim@cpan.org>'
+  - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: 6.36
   Test::More: 0
@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.21'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,16 +22,17 @@ no_index:
     - t
     - xt
 requires:
-  Graph::Reader: '2.07'
+  Graph::Reader: '2.10'
+  Graph::Reader::Graph6: 9
   Graph::Reader::LoadClassHierarchy: 0.01
-  Graph::Reader::OID: 0.03
-  Graph::Reader::TGF: 0.03
-  Graph::Reader::TGF::CSV: 0.02
-  Graph::Reader::UnicodeTree: 0.02
+  Graph::Reader::OID: 0.05
+  Graph::Reader::TGF: 0.04
+  Graph::Reader::TGF::CSV: 0.03
+  Graph::Reader::UnicodeTree: 0.03
   perl: 5.6.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Task-Graph-Reader
-  homepage: https://github.com/tupinek/Task-Graph-Reader
+  bugtracker: https://github.com/michal-josef-spacek/Task-Graph-Reader/issues
+  homepage: https://github.com/michal-josef-spacek/Task-Graph-Reader
   license: http://opensource.org/licenses/bsd-license.php
-  repository: git://github.com/tupinek/Task-Graph-Reader
-version: '0.03'
+  repository: git://github.com/michal-josef-spacek/Task-Graph-Reader
+version: '0.04'

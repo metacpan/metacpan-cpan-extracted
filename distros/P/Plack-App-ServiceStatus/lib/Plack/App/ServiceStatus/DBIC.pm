@@ -2,7 +2,7 @@ package Plack::App::ServiceStatus::DBIC;
 
 # ABSTRACT: Check DBIC connection
 
-our $VERSION = '0.912'; # VERSION
+our $VERSION = '0.913'; # VERSION
 
 use 5.018;
 use strict;
@@ -35,7 +35,7 @@ Plack::App::ServiceStatus::DBIC - Check DBIC connection
 
 =head1 VERSION
 
-version 0.912
+version 0.913
 
 =head1 SYNOPSIS
 

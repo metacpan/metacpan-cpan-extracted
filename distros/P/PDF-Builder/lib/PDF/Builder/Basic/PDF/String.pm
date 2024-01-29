@@ -20,8 +20,8 @@ use base 'PDF::Builder::Basic::PDF::Objind';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -29,8 +29,6 @@ PDF::Builder::Basic::PDF::String - PDF String type objects and superclass
 for simple objects that are basically stringlike (Number, Name, etc.)
 
 =head1 METHODS
-
-=over
 
 =cut
 
@@ -56,11 +54,17 @@ our %out_trans = (
     ')' => ')',
 );
 
-=item PDF::Builder::Basic::PDF::String->from_pdf($string)
+=head2 from_pdf
+
+    PDF::Builder::Basic::PDF::String->from_pdf($string)
+
+=over
 
 Creates a new string object (not a full object yet) from a given
 string.  The string is parsed according to input criteria with
 escaping working.
+
+=back
 
 =cut
 
@@ -74,11 +78,17 @@ sub from_pdf {
     return $self;
 }
 
-=item PDF::Builder::Basic::PDF::String->new($string)
+=head2 new
+
+    PDF::Builder::Basic::PDF::String->new($string)
+
+=over
 
 Creates a new string object (not a full object yet) from a given
 string. The string is parsed according to input criteria with
 escaping working.
+
+=back
 
 =cut
 
@@ -92,9 +102,15 @@ sub new {
     return $self;
 }
 
-=item $s->convert($str)
+=head2 convert
+
+    $s->convert($str)
+
+=over
 
 Returns $str converted as per criteria for input from PDF file
+
+=back
 
 =cut
 
@@ -171,9 +187,15 @@ sub convert {
     return $output;
 }
 
-=item $s->val()
+=head2 val
+
+    $s->val()
+
+=over
 
 Returns the value of this string (the string itself).
+
+=back
 
 =cut
 
@@ -181,9 +203,15 @@ sub val {
     return $_[0]->{'val'};
 }
 
-=item $s->as_pdf()
+=head2 as_pdf
+
+    $s->as_pdf()
+
+=over
 
 Returns the string formatted for output as PDF for PDF File object $pdf.
+
+=back
 
 =cut
 
@@ -210,9 +238,15 @@ sub as_pdf {
     }
 }
 
-=item $s->outobjdeep($fh, $pdf)
+=head2 outobjdeep
+
+    $s->outobjdeep($fh, $pdf)
+
+=over
 
 Outputs the string in PDF format, complete with necessary conversions.
+
+=back
 
 =cut
 
@@ -222,9 +256,5 @@ sub outobjdeep {
     $fh->print($self->as_pdf($pdf));
     return;
 }
-
-=back
-
-=cut
 
 1;

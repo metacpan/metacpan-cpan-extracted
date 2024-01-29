@@ -15,6 +15,10 @@ is(subst(qw(--dict t/JA.dict t/JA-bad.txt))->run->{result}, 0);
 
 line(subst(qw(--dict t/JA.dict t/JA-bad.txt))
      ->run->{stdout}, 9, "--dict");
+line(subst(qw(--dict t/JA.dict t/JA-bad.txt --select=1))
+     ->run->{stdout}, 2, "--select=1");
+line(subst(qw(--dict t/JA.dict t/JA-bad.txt --select=1,5:8))
+     ->run->{stdout}, 6, "--select=1,5:8");
 line(subst(qw(--dict t/JA.dict t/JA-bad.txt --stat))
      ->run->{stdout}, 11, "--stat");
 line(subst(qw(--dict t/JA.dict t/JA-bad.txt --with-stat))

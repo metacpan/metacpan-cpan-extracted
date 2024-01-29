@@ -45,7 +45,7 @@ close $file_in or die $!;
 my $file_out_name = "$Bin/test-write.png";
 my $png_out = Image::PNG::Libpng::create_write_struct ();
 
-my $png3 = Image::PNG::Libpng::read_png_file ("$Bin/tantei-san.png");
+my $png3 = Image::PNG::Libpng::read_png_file ("$Bin/gecko-1200-gray8.png");
 eval {
     Image::PNG::Libpng::destroy_read_struct ($png3);
 };

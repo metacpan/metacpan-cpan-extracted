@@ -1,13 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
 
-use v5.14;
-use Object::Pad 0.45;
+use v5.26;
+use warnings;
+use Object::Pad 0.800;
 
-package Device::BusPirate::Mode::UART 0.23;
-class Device::BusPirate::Mode::UART isa Device::BusPirate::Mode;
+package Device::BusPirate::Mode::UART 0.24;
+class Device::BusPirate::Mode::UART :isa(Device::BusPirate::Mode);
 
 use Carp;
 
@@ -43,17 +44,16 @@ transmit bytes.
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented with C<await> expressions L<Future> instances.
 
 =cut
 
-has $_open_drain :mutator;
-has $_bits       :mutator;
-has $_parity     :mutator;
-has $_stop       :mutator;
-has $_baud;
-has $_version;
+field $_open_drain :mutator;
+field $_bits       :mutator;
+field $_parity     :mutator;
+field $_stop       :mutator;
+field $_baud;
+field $_version;
 
 async method start
 {
@@ -74,7 +74,7 @@ async method start
 
 =head2 configure
 
-   $uart->configure( %args )->get
+   await $uart->configure( %args );
 
 Change configuration options. The following options exist:
 
@@ -171,7 +171,7 @@ method configure ( %args )
 
 =head2 write
 
-   $uart->write( $bytes )->get
+   await $uart->write( $bytes );
 
 Sends the given bytes over the TX wire.
 

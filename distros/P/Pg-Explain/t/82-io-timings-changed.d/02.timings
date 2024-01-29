@@ -1,0 +1,5 @@
+{
+    "read" => 324,
+    "write" => 49.767,
+    "info" => "I/O Timings: shared write=23.77, local write=25.997, temp read=324",
+}

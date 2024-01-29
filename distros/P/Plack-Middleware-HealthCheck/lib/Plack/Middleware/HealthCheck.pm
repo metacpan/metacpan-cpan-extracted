@@ -2,7 +2,7 @@ package Plack::Middleware::HealthCheck;
 
 # ABSTRACT: A health check endpoint for your Plack app
 use version;
-our $VERSION = 'v0.0.5'; # VERSION
+our $VERSION = 'v0.1.0'; # VERSION
 
 use 5.010;
 use strict;
@@ -115,7 +115,7 @@ sub serve_health_check {
 
 sub health_check_response {
     my ( $self, $result, $req ) = @_;
-    my $json = JSON->new->utf8;
+    my $json = JSON->new->allow_blessed->convert_blessed->utf8;
     $json->canonical->pretty
         if $req and exists $req->query_parameters->{pretty};
     return [
@@ -138,7 +138,7 @@ Plack::Middleware::HealthCheck - A health check endpoint for your Plack app
 
 =head1 VERSION
 
-version v0.0.5
+version v0.1.0
 
 =head1 SYNOPSIS
 
@@ -280,7 +280,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 - 2020 by Grant Street Group.
+This software is Copyright (c) 2019 - 2024 by Grant Street Group.
 
 This is free software, licensed under:
 

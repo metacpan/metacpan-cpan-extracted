@@ -1,7 +1,7 @@
 package Net::SAML2::Binding::SOAP;
 use Moose;
 
-our $VERSION = '0.74'; # VERSION
+our $VERSION = '0.76'; # VERSION
 
 use Carp qw(croak);
 use HTTP::Request::Common;
@@ -232,7 +232,7 @@ Net::SAML2::Binding::SOAP - SOAP binding for SAML
 
 =head1 VERSION
 
-version 0.74
+version 0.76
 
 =head1 SYNOPSIS
 
@@ -337,7 +337,7 @@ Timothy Legge <timlegge@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Venda Ltd, see the CONTRIBUTORS file for others.
+This software is copyright (c) 2024 by Venda Ltd, see the CONTRIBUTORS file for others.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

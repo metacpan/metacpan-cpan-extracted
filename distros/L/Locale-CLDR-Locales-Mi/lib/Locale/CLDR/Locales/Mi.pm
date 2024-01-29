@@ -2,19 +2,19 @@
 
 =head1 NAME
 
-Locale::CLDR::Locales::Mi - Package for language Maori
+Locale::CLDR::Locales::Mi - Package for language Māori
 
 =cut
 
 package Locale::CLDR::Locales::Mi;
 # This file auto generated from Data\common\main\mi.xml
-#	on Tue  5 Dec  1:20:57 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -44,7 +44,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'de' => 'Tiamana',
@@ -66,13 +66,14 @@ has 'display_name_language' => (
  				'fr_CH' => 'Wīwī Huiterangi',
  				'it' => 'Ītariana',
  				'ja' => 'Hapanihi',
- 				'mi' => 'Māori',
- 				'pt' => 'Pōtikī',
- 				'pt_BR' => 'Pōtikī Parahi',
- 				'pt_PT' => 'Pōtikī Uropi',
+ 				'mi' => 'te reo Māori',
+ 				'pt' => 'Pōtukīhi',
+ 				'pt_BR' => 'Pōtukīhi Parahi',
+ 				'pt_PT' => 'Pōtukīhi Uropi',
  				'ru' => 'Ruhiana',
  				'und' => 'Reo Tē Mōhiotia',
  				'zh' => 'Hainamana',
+ 				'zh@alt=menu' => 'Hainamana Manarini',
  				'zh_Hans' => 'Hainamana Māmā',
  				'zh_Hant' => 'Hainamana Tukuiho',
 
@@ -115,7 +116,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'BR' => 'Parahi',
  			'CN' => 'Haina',
@@ -125,6 +126,7 @@ has 'display_name_region' => (
  			'IN' => 'Inia',
  			'IT' => 'Itāria',
  			'JP' => 'Hapani',
+ 			'MK' => 'Makerōnia ki te Raki',
  			'NZ' => 'Aotearoa',
  			'RU' => 'Rūhia',
  			'US' => 'Hononga o Amerika',
@@ -158,7 +160,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{Ngahuru},
  			'UK' => q{UK},
@@ -172,11 +174,11 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
-			'language' => '{0}',
- 			'script' => '{0}',
- 			'region' => '{0}',
+			'language' => 'Reo: {0}',
+ 			'script' => 'Momotuhi: {0}',
+ 			'region' => 'Rohe: {0}',
 
 		}
 	},
@@ -274,27 +276,6 @@ has 'listPatterns' => (
 				end => q({0}, {1}),
 				2 => q({0}, {1}),
 		} }
-);
-
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has native_numbering_system => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has 'minimum_grouping_digits' => (
-	is			=>'ro',
-	isa			=> Int,
-	init_arg	=> undef,
-	default		=> 1,
 );
 
 has 'number_symbols' => (
@@ -483,221 +464,60 @@ has 'currencies' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'ANG' => {
-			symbol => 'ANG',
-			display_name => {
-				'currency' => q(ANG),
-				'other' => q(ANG),
-			},
-		},
-		'ARS' => {
-			symbol => 'ARS',
-			display_name => {
-				'currency' => q(ARS),
-				'other' => q(ARS),
-			},
-		},
-		'AWG' => {
-			symbol => 'AWG',
-			display_name => {
-				'currency' => q(AWG),
-				'other' => q(AWG),
-			},
-		},
-		'BBD' => {
-			symbol => 'BBD',
-			display_name => {
-				'currency' => q(BBD),
-				'other' => q(BBD),
-			},
-		},
-		'BMD' => {
-			symbol => 'BMD',
-			display_name => {
-				'currency' => q(BMD),
-				'other' => q(BMD),
-			},
-		},
 		'BRL' => {
-			symbol => 'R$',
 			display_name => {
 				'currency' => q(Real Parahi),
-				'other' => q(Ngā real Parahi),
-			},
-		},
-		'BSD' => {
-			symbol => 'BSD',
-			display_name => {
-				'currency' => q(BSD),
-				'other' => q(BSD),
-			},
-		},
-		'BZD' => {
-			symbol => 'BZD',
-			display_name => {
-				'currency' => q(BZD),
-				'other' => q(BZD),
-			},
-		},
-		'CAD' => {
-			symbol => 'CA$',
-			display_name => {
-				'currency' => q(CAD),
-				'other' => q(CAD),
+				'other' => q(real Parahi),
 			},
 		},
 		'CNY' => {
-			symbol => 'CN¥',
 			display_name => {
 				'currency' => q(Yuan Haina),
-				'other' => q(Yuan Haina),
-			},
-		},
-		'CRC' => {
-			symbol => 'CRC',
-			display_name => {
-				'currency' => q(CRC),
-				'other' => q(CRC),
-			},
-		},
-		'CUC' => {
-			symbol => 'CUC',
-			display_name => {
-				'currency' => q(CUC),
-				'other' => q(CUC),
-			},
-		},
-		'CUP' => {
-			symbol => 'CUP',
-			display_name => {
-				'currency' => q(CUP),
-				'other' => q(CUP),
-			},
-		},
-		'DOP' => {
-			symbol => 'DOP',
-			display_name => {
-				'currency' => q(DOP),
-				'other' => q(DOP),
+				'other' => q(yuan Haina),
 			},
 		},
 		'EUR' => {
-			symbol => '€',
 			display_name => {
 				'currency' => q(Euro),
-				'other' => q(euros),
+				'other' => q(euro),
 			},
 		},
 		'GBP' => {
-			symbol => '£',
 			display_name => {
 				'currency' => q(Pāuna Piritene),
-				'other' => q(Ngā pāuna Piritene),
-			},
-		},
-		'GTQ' => {
-			symbol => 'GTQ',
-			display_name => {
-				'currency' => q(GTQ),
-				'other' => q(GTQ),
-			},
-		},
-		'HNL' => {
-			symbol => 'HNL',
-			display_name => {
-				'currency' => q(HNL),
-				'other' => q(HNL),
-			},
-		},
-		'HTG' => {
-			symbol => 'HTG',
-			display_name => {
-				'currency' => q(HTG),
-				'other' => q(HTG),
+				'other' => q(pāuna Piritene),
 			},
 		},
 		'INR' => {
-			symbol => '₹',
 			display_name => {
-				'currency' => q(Rupee Iniana),
-				'other' => q(Ngā rupee Iniana),
-			},
-		},
-		'JMD' => {
-			symbol => 'JMD',
-			display_name => {
-				'currency' => q(JMD),
-				'other' => q(JMD),
+				'currency' => q(Rupī Iniana),
+				'other' => q(rupī Iniana),
 			},
 		},
 		'JPY' => {
 			symbol => '¥',
 			display_name => {
 				'currency' => q(Yen Hapanihi),
-				'other' => q(Yen Hapanihi),
-			},
-		},
-		'KYD' => {
-			symbol => 'KYD',
-			display_name => {
-				'currency' => q(KYD),
-				'other' => q(KYD),
-			},
-		},
-		'MXN' => {
-			symbol => 'MX$',
-			display_name => {
-				'currency' => q(MXN),
-				'other' => q(MXN),
-			},
-		},
-		'NIO' => {
-			symbol => 'NIO',
-			display_name => {
-				'currency' => q(NIO),
-				'other' => q(NIO),
+				'other' => q(yen Hapanihi),
 			},
 		},
 		'NZD' => {
 			symbol => '$',
 			display_name => {
 				'currency' => q(Tāra o Aotearoa),
-				'other' => q(Ngā tāra o Aotearoa),
-			},
-		},
-		'PAB' => {
-			symbol => 'PAB',
-			display_name => {
-				'currency' => q(PAB),
-				'other' => q(PAB),
+				'other' => q(tāra o Aotearoa),
 			},
 		},
 		'RUB' => {
-			symbol => 'RUB',
 			display_name => {
 				'currency' => q(Rūpera Ruhiana),
-				'other' => q(Ngā rūpera Ruhiana),
-			},
-		},
-		'TTD' => {
-			symbol => 'TTD',
-			display_name => {
-				'currency' => q(TTD),
-				'other' => q(TTD),
+				'other' => q(rūpera Ruhiana),
 			},
 		},
 		'USD' => {
-			symbol => 'US$',
 			display_name => {
 				'currency' => q(Tāra US),
-				'other' => q(Ngā tāra US),
-			},
-		},
-		'XCD' => {
-			symbol => 'EC$',
-			display_name => {
-				'currency' => q(XCD),
-				'other' => q(XCD),
+				'other' => q(tāra US),
 			},
 		},
 		'XXX' => {
@@ -843,19 +663,6 @@ has 'calendar_days' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-			'generic' => {
-				'format' => {
-					wide => {
-						mon => 'Mane',
-						tue => 'Tūrei',
-						wed => 'Wenerei',
-						thu => 'Tāite',
-						fri => 'Paraire',
-						sat => 'Hātarei',
-						sun => 'Rātapu'
-					},
-				},
-			},
 			'gregorian' => {
 				'format' => {
 					abbreviated => {
@@ -1045,16 +852,16 @@ has 'date_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{G y MMMM d, EEEE},
-			'long' => q{G y MMMM d},
-			'medium' => q{G y MMM d},
-			'short' => q{GGGGG y-MM-dd},
+			'full' => q{EEEE, d MMMM y G},
+			'long' => q{d MMMM y G},
+			'medium' => q{d MMM y G},
+			'short' => q{dd-MM-y GGGGG},
 		},
 		'gregorian' => {
-			'full' => q{y MMMM d, EEEE},
-			'long' => q{y MMMM d},
-			'medium' => q{y MMM d},
-			'short' => q{y-MM-dd},
+			'full' => q{EEEE, d MMMM y},
+			'long' => q{d MMMM y},
+			'medium' => q{d MMM y},
+			'short' => q{dd-MM-y},
 		},
 	} },
 );
@@ -1069,8 +876,8 @@ has 'time_formats' => (
 		'gregorian' => {
 			'full' => q{h:mm:ss a zzzz},
 			'long' => q{h:mm:ss a z},
-			'medium' => q{h:mm:ss},
-			'short' => q{h:mm},
+			'medium' => q{h:mm:ss a},
+			'short' => q{h:mm a},
 		},
 	} },
 );
@@ -1100,6 +907,54 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{E, d},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{y G},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E, d MMM y G},
+			GyMMMd => q{d MMM y G},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss v},
+			Hmv => q{HH:mm v},
+			M => q{L},
+			MEd => q{E, dd-MM},
+			MMM => q{LLL},
+			MMMEd => q{E, d MMM},
+			MMMMW => q{'wiki' W 'o' MMMM},
+			MMMMd => q{d MMMM},
+			MMMd => q{d MMM},
+			Md => q{dd-MM},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a v},
+			hmv => q{h:mm a v},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{MM-y},
+			yMEd => q{E, dd-MM-y},
+			yMMM => q{MMM y},
+			yMMMEd => q{E, d MMM y},
+			yMMMM => q{MMMM y},
+			yMMMd => q{d MMM y},
+			yMd => q{dd-MM-y},
+			yQQQ => q{QQQ y},
+			yQQQQ => q{QQQQ y},
+			yw => q{'wiki' w 'o' Y},
+		},
 	} },
 );
 

@@ -4,9 +4,10 @@
 #  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.45;
+use warnings;
+use Object::Pad 0.800;
 
-package Device::BusPirate::Mode 0.23;
+package Device::BusPirate::Mode 0.24;
 class Device::BusPirate::Mode;
 
 use Carp;
@@ -32,20 +33,22 @@ The following methods are implemented by all the various mode subclasses.
 
 =cut
 
-has $_pirate :reader :param;
+field $_pirate :reader :param;
 
-has $_cs     = 0;
-has $_power  = 0;
-has $_pullup = 0;
-has $_aux    = 0;
+field $_cs     = 0;
+field $_power  = 0;
+field $_pullup = 0;
+field $_aux    = 0;
 
 =head1 METHODS
+
+The following methods documented with C<await> expressions L<Future> instances.
 
 =cut
 
 =head2 pirate
 
-   $pirate = $mode->pirate
+   $pirate = $mode->pirate;
 
 Returns the underlying L<Device::BusPirate> instance.
 
@@ -66,7 +69,7 @@ async method _start_mode_and_await ( $send, $await )
 
 =head2 power
 
-   $mode->power( $power )->get
+   await $mode->power( $power );
 
 Enable or disable the C<VREG> 5V and 3.3V power outputs.
 
@@ -80,7 +83,7 @@ method power ( $on )
 
 =head2 pullup
 
-   $mode->pullup( $pullup )->get
+   await $mode->pullup( $pullup );
 
 Enable or disable the IO pin pullup resistors from C<Vpu>. These are connected
 to the C<MISO>, C<CLK>, C<MOSI> and C<CS> pins.
@@ -95,7 +98,7 @@ method pullup ( $on )
 
 =head2 aux
 
-   $mode->aux( $aux )->get
+   await $mode->aux( $aux );
 
 Set the C<AUX> output pin level.
 
@@ -109,7 +112,7 @@ method aux ( $on )
 
 =head2 cs
 
-   $mode->cs( $cs )->get
+   await $mode->cs( $cs );
 
 Set the C<CS> output pin level.
 
@@ -135,7 +138,7 @@ method _update_peripherals
 
 =head2 set_pwm
 
-   $mode->set_pwm( freq => $freq, duty => $duty )->get
+   await $mode->set_pwm( freq => $freq, duty => $duty );
 
 Sets the PWM generator to the given frequency and duty cycle, as a percentage.
 If unspecified, duty cycle will be 50%. Set frequency to 0 to disable.
@@ -181,7 +184,7 @@ method set_pwm ( %args )
 
 =head2 read_adc_voltage
 
-   $voltage = $mode->read_adc_voltage->get
+   $voltage = await $mode->read_adc_voltage;
 
 Reads the voltage on the ADC pin and returns it as a numerical value in volts.
 

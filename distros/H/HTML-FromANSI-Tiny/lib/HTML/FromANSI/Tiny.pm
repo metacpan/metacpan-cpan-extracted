@@ -11,11 +11,11 @@ use strict;
 use warnings;
 
 package HTML::FromANSI::Tiny;
-# git description: v0.104-2-g306f93b
+# git description: v0.106-2-g1454a0d
 
 our $AUTHORITY = 'cpan:RWSTAUNER';
 # ABSTRACT: Easily convert colored command line output to HTML
-$HTML::FromANSI::Tiny::VERSION = '0.105';
+$HTML::FromANSI::Tiny::VERSION = '0.107';
 our @COLORS = map { "#$_" }
 qw(
   000  f33  2c2  bb0  55c  d3d  0cc  bbb
@@ -80,6 +80,11 @@ sub ansi_parser {
 }
 
 
+sub attr_to_class {
+  $_[1];
+}
+
+
 sub css {
   my ($self) = @_;
   my $prefix = $self->{selector_prefix} . '.' . $self->{class_prefix};
@@ -87,7 +92,12 @@ sub css {
   my $styles = $self->_css_class_attr;
 
   my @css = (
-    map { "${prefix}$_ { " . $self->_css_attr_string($styles->{$_}) . " }" }
+    map {
+      sprintf "%s%s { %s }",
+        ${prefix},
+        $self->attr_to_class($_),
+        $self->_css_attr_string($styles->{$_})
+    }
       sort keys %$styles
   );
 
@@ -151,7 +161,7 @@ sub html {
         sprintf q[<%s %s="%s">%s</%s>], $tag,
           ($self->{inline_style}
             ? (style => join ' ', map { $self->_css_attr_string($styles->{$_}) } @$attr)
-            : (class => join ' ', map { $prefix . $_ } @$attr)
+            : (class => join ' ', map { $prefix . $self->attr_to_class($_) } @$attr)
           ), $h, $tag;
       }
 
@@ -202,8 +212,8 @@ __END__
 =encoding UTF-8
 
 =for :stopwords Randy Stauner ACKNOWLEDGEMENTS inline hashrefs html customizable cpan
-testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto
-metadata placeholders metacpan
+testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata
+placeholders metacpan
 
 =head1 NAME
 
@@ -211,7 +221,7 @@ HTML::FromANSI::Tiny - Easily convert colored command line output to HTML
 
 =head1 VERSION
 
-version 0.105
+version 0.107
 
 =head1 SYNOPSIS
 
@@ -296,6 +306,19 @@ and C<remove_escapes>.
 
 Returns the L<Parse::ANSIColor::Tiny> instance in use.
 Creates one if necessary.
+
+=head2 attr_to_class
+
+Takes an ANSI attribute name such as 'red' or 'bold'
+and returns the corresponding class name.
+
+This allows subclasses to override the class names used.
+This can be useful for utilizing pre-existing CSS definitions
+(such as mapping C<'red'> to C<'text-danger'>).
+
+The default returns the string provided.
+
+  $hfat->attr_to_class('red'); # default returns 'red'
 
 =head2 css
 
@@ -467,7 +490,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/HTML-FromANSI-Tiny>
+L<https://metacpan.org/release/HTML-FromANSI-Tiny>
 
 =back
 

@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 use UI::Various::core;
 use UI::Various::Box;
@@ -343,8 +343,10 @@ sub _show($$$$$)
     # 6. final reformatting of whole block:
     $outer_prefix = ' ' x length($outer_prefix);
     my @text = split m/\n/, $text;
-    return
+    $text =
 	$self->_format($outer_prefix, '', '', \@text, '', '', $width, $height);
+    $text = $self->_color_simplify($text);
+    return $text;
 }
 
 1;

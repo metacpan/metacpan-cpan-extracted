@@ -5,7 +5,7 @@ LABEL maintainer Manuel Rueda <manuel.rueda@cnag.eu>
 
 # Install Linux tools
 RUN apt-get update && \
-    apt-get -y install gcc unzip make git cpanminus perl-doc vim sudo libperl-dev
+    apt-get -y install gcc unzip make git cpanminus perl-doc vim sudo libperl-dev python3-pip libzbar0
 
 # Download Pheno-Ranker
 WORKDIR /usr/share/
@@ -14,6 +14,9 @@ RUN git clone https://github.com/CNAG-Biomedical-Informatics/pheno-ranker.git
 # Install Perl modules
 WORKDIR /usr/share/pheno-ranker
 RUN cpanm --notest --installdeps .
+
+# Install Python packages (utils/barcode)
+RUN pip3 install qrcode[pil] Pillow pyzbar pandas reportlab
 
 # Add user "dockeruser"
 ARG UID=1000

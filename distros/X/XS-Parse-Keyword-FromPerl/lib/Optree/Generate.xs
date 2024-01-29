@@ -145,6 +145,7 @@ SV *
 newLISTOP(I32 type, I32 flags, ...)
   CODE:
     ENTER_and_setup_pad("newLISTOP");
+    /* Can't use newLISTOPn() here because of a variable number of kid ops */
     OP *o = newLISTOP(OP_LIST, 0, NULL, NULL);
     for(U32 i = 2; i < items; i++)
       o = op_append_elem(OP_LIST, o, SvOPo(ST(i)));

@@ -369,6 +369,7 @@ void SPVM_CHECK_check_basic_types_field(SPVM_COMPILER* compiler) {
             new_field->current_basic_type = current_basic_type;
             new_field->type = field->type;
             new_field->access_control_type = field->access_control_type;
+            new_field->is_parent_field = field->is_parent_field;
           }
           SPVM_LIST_push(merged_fields, new_field);
           merged_fields_index++;
@@ -1933,8 +1934,8 @@ void SPVM_CHECK_check_ast_check_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE*
               }
 
               SPVM_BASIC_TYPE* current_basic_type = method->current_basic_type;
-              if (!SPVM_CHECK_can_access(compiler, current_basic_type, new_basic_type, new_basic_type->access_control_type)) {
-                if (!SPVM_OP_is_allowed(compiler, current_basic_type, new_basic_type)) {
+              if (!SPVM_CHECK_can_access(compiler, current_basic_type, new_basic_type, new_basic_type->access_control_type, 0)) {
+                if (!SPVM_OP_is_allowed(compiler, current_basic_type, new_basic_type, 0)) {
                   SPVM_COMPILER_error(compiler, "The object of the %s \"%s\" class cannnot be created from the current class \"%s\".\n  at %s line %d", SPVM_ATTRIBUTE_get_name(compiler, new_basic_type->access_control_type), new_basic_type->name, current_basic_type->name, op_new->file, op_new->line);
                   return;
                 }
@@ -1969,29 +1970,25 @@ void SPVM_CHECK_check_ast_check_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE*
             
             SPVM_TYPE* right_type = op_type->uv.type;
             
-            int32_t compile_time_check;
-            if (SPVM_TYPE_is_numeric_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag)) {
-              compile_time_check = 1;
-            }
-            else if (SPVM_TYPE_is_mulnum_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag)) {
-              compile_time_check = 1;
-            }
-            else if (SPVM_TYPE_is_any_object_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag)) {
-              compile_time_check = 1;
-            }
-            else if (SPVM_TYPE_is_ref_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag)) {
-              compile_time_check = 1;
-            }
-            else if (SPVM_TYPE_is_object_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag)) {
-              compile_time_check = 0;
-            }
-            else {
-              assert(0);
-            }
-            
-            if (compile_time_check) {
-              // If left type is same as right type, this return true, otherwise return false
-              if (left_operand_type->basic_type->id == right_type->basic_type->id && left_operand_type->dimension == right_type->dimension) {
+            if (SPVM_TYPE_is_numeric_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag)
+              || SPVM_TYPE_is_mulnum_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag)
+              || SPVM_TYPE_is_ref_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag)
+              || SPVM_TYPE_is_any_object_array_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag)
+              || SPVM_TYPE_is_any_object_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag))
+            {
+              int32_t need_implicite_conversion = 0;
+              int32_t allow_narrowing_conversion = 0;
+              
+              int32_t assignability = SPVM_TYPE_can_assign(
+                compiler,
+                right_type->basic_type->id, right_type->dimension, right_type->flag,
+                left_operand_type->basic_type->id, left_operand_type->dimension, left_operand_type->flag,
+                &need_implicite_conversion, allow_narrowing_conversion
+              );
+              
+              int32_t assignability_without_implicite_conversion = assignability && !need_implicite_conversion;
+              
+              if (assignability_without_implicite_conversion) {
                 SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
                 SPVM_OP* op_constant_true = SPVM_OP_new_op_constant_int(compiler, 1, op_cur->file, op_cur->line);
                 SPVM_OP_replace_op(compiler, op_stab, op_constant_true);
@@ -2004,12 +2001,14 @@ void SPVM_CHECK_check_ast_check_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE*
                 op_cur = op_constant_false;
               }
             }
-            else {
-              // Left left_operand must be object type
+            else if (SPVM_TYPE_is_object_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag)) {
               if (!SPVM_TYPE_is_object_type(compiler, left_operand_type->basic_type->id, left_operand_type->dimension, left_operand_type->flag)) {
                 SPVM_COMPILER_error(compiler, "The left operand of the isa operator must be an object type.\n  at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
+            }
+            else {
+              assert(0);
             }
             
             break;
@@ -2034,35 +2033,38 @@ void SPVM_CHECK_check_ast_check_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE*
             break;
           }
           case SPVM_OP_C_ID_IS_TYPE: {
-            
             SPVM_TYPE* left_operand_type = SPVM_CHECK_get_type(compiler, op_cur->first);
             SPVM_OP* op_type = op_cur->last;
             
             SPVM_TYPE* right_type = op_type->uv.type;
             
-            if (!SPVM_TYPE_is_object_type(compiler, left_operand_type->basic_type->id, left_operand_type->dimension, left_operand_type->flag)) {
-              SPVM_COMPILER_error(compiler, "The left operand of the is_type operator must be an object type.\n  at %s line %d", op_cur->file, op_cur->line);
-              return;
+            if (SPVM_TYPE_is_numeric_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag)
+              || SPVM_TYPE_is_mulnum_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag)
+              || SPVM_TYPE_is_ref_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag)
+              || SPVM_TYPE_is_any_object_array_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag)
+              || SPVM_TYPE_is_any_object_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag))
+            {
+              if (left_operand_type->basic_type->id == right_type->basic_type->id && left_operand_type->dimension == right_type->dimension) {
+                SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
+                SPVM_OP* op_constant_true = SPVM_OP_new_op_constant_int(compiler, 1, op_cur->file, op_cur->line);
+                SPVM_OP_replace_op(compiler, op_stab, op_constant_true);
+                op_cur = op_constant_true;
+              }
+              else {
+                SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
+                SPVM_OP* op_constant_false = SPVM_OP_new_op_constant_int(compiler, 0, op_cur->file, op_cur->line);
+                SPVM_OP_replace_op(compiler, op_stab, op_constant_false);
+                op_cur = op_constant_false;
+              }
             }
-            
-            if (!SPVM_TYPE_is_object_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag)) {
-              SPVM_COMPILER_error(compiler, "The right type of the is_type operator must be an object type.\n  at %s line %d", op_cur->file, op_cur->line);
-              return;
+            else if (SPVM_TYPE_is_object_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag)) {
+              if (!SPVM_TYPE_is_object_type(compiler, left_operand_type->basic_type->id, left_operand_type->dimension, left_operand_type->flag)) {
+                SPVM_COMPILER_error(compiler, "The left operand of the is_type operator must be an object type.\n  at %s line %d", op_cur->file, op_cur->line);
+                return;
+              }
             }
-            
-            if (SPVM_TYPE_is_any_object_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag)) {
-              SPVM_COMPILER_error(compiler, "The right type of the is_type operator cannnot be the any object type.\n  at %s line %d", op_cur->file, op_cur->line);
-              return;
-            }
-            
-            if (SPVM_TYPE_is_any_object_array_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag)) {
-              SPVM_COMPILER_error(compiler, "The right type of the is_type operator cannnot be the any object array type.\n  at %s line %d", op_cur->file, op_cur->line);
-              return;
-            }
-            
-            if (SPVM_TYPE_is_interface_type(compiler, right_type->basic_type->id, right_type->dimension, right_type->flag)) {
-              SPVM_COMPILER_error(compiler, "The right type of the is_type operator cannnot be an interface type.\n  at %s line %d", op_cur->file, op_cur->line);
-              return;
+            else {
+              assert(0);
             }
             
             break;
@@ -2374,13 +2376,13 @@ void SPVM_CHECK_check_ast_check_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE*
             
             // Left operand must be a numeric type
             if (!SPVM_TYPE_is_int_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-              SPVM_COMPILER_error(compiler, "The left operand of the divui operator must be the int type.\n  at %s line %d", op_cur->file, op_cur->line);
+              SPVM_COMPILER_error(compiler, "The left operand of the div_uint operator must be the int type.\n  at %s line %d", op_cur->file, op_cur->line);
               return;
             }
 
             // Right operand must be a numeric type
             if (!SPVM_TYPE_is_int_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-              SPVM_COMPILER_error(compiler, "The right operand of the divui operator must be the int type.\n  at %s line %d", op_cur->file, op_cur->line);
+              SPVM_COMPILER_error(compiler, "The right operand of the div_uint operator must be the int type.\n  at %s line %d", op_cur->file, op_cur->line);
               return;
             }
             
@@ -2392,19 +2394,19 @@ void SPVM_CHECK_check_ast_check_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE*
             
             // Left operand must be a numeric type
             if (!SPVM_TYPE_is_long_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-              SPVM_COMPILER_error(compiler, "The left operand of the divul operator must be the long type.\n  at %s line %d", op_cur->file, op_cur->line);
+              SPVM_COMPILER_error(compiler, "The left operand of the div_ulong operator must be the long type.\n  at %s line %d", op_cur->file, op_cur->line);
               return;
             }
 
             // Right operand must be a numeric type
             if (!SPVM_TYPE_is_long_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-              SPVM_COMPILER_error(compiler, "The right operand of the divul operator must be the long type.\n  at %s line %d", op_cur->file, op_cur->line);
+              SPVM_COMPILER_error(compiler, "The right operand of the div_ulong operator must be the long type.\n  at %s line %d", op_cur->file, op_cur->line);
               return;
             }
             
             break;
           }
-          case SPVM_OP_C_ID_REMAINDER: {
+          case SPVM_OP_C_ID_MODULO: {
             SPVM_TYPE* first_type = SPVM_CHECK_get_type(compiler, op_cur->first);
             SPVM_TYPE* last_type = SPVM_CHECK_get_type(compiler, op_cur->last);
             
@@ -2428,37 +2430,37 @@ void SPVM_CHECK_check_ast_check_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE*
                                             
             break;
           }
-          case SPVM_OP_C_ID_REMAINDER_UNSIGNED_INT: {
+          case SPVM_OP_C_ID_MODULO_UNSIGNED_INT: {
             SPVM_TYPE* first_type = SPVM_CHECK_get_type(compiler, op_cur->first);
             SPVM_TYPE* last_type = SPVM_CHECK_get_type(compiler, op_cur->last);
             
             // Left operand must be a numeric type
             if (!SPVM_TYPE_is_int_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-              SPVM_COMPILER_error(compiler, "The left operand of the remui operator must be the int type.\n  at %s line %d", op_cur->file, op_cur->line);
+              SPVM_COMPILER_error(compiler, "The left operand of the mod_uint operator must be the int type.\n  at %s line %d", op_cur->file, op_cur->line);
               return;
             }
 
             // Right operand must be a numeric type
             if (!SPVM_TYPE_is_int_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-              SPVM_COMPILER_error(compiler, "The right operand of the remui operator must be the int type.\n  at %s line %d", op_cur->file, op_cur->line);
+              SPVM_COMPILER_error(compiler, "The right operand of the mod_uint operator must be the int type.\n  at %s line %d", op_cur->file, op_cur->line);
               return;
             }
             
             break;
           }
-          case SPVM_OP_C_ID_REMAINDER_UNSIGNED_LONG: {
+          case SPVM_OP_C_ID_MODULO_UNSIGNED_LONG: {
             SPVM_TYPE* first_type = SPVM_CHECK_get_type(compiler, op_cur->first);
             SPVM_TYPE* last_type = SPVM_CHECK_get_type(compiler, op_cur->last);
             
             // Left operand must be a numeric type
             if (!SPVM_TYPE_is_long_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-              SPVM_COMPILER_error(compiler, "The left operand of the remul operator must be the long type.\n  at %s line %d", op_cur->file, op_cur->line);
+              SPVM_COMPILER_error(compiler, "The left operand of the mod_ulong operator must be the long type.\n  at %s line %d", op_cur->file, op_cur->line);
               return;
             }
 
             // Right operand must be a numeric type
             if (!SPVM_TYPE_is_long_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-              SPVM_COMPILER_error(compiler, "The right operand of the remul operator must be the long type.\n  at %s line %d", op_cur->file, op_cur->line);
+              SPVM_COMPILER_error(compiler, "The right operand of the mod_ulong operator must be the long type.\n  at %s line %d", op_cur->file, op_cur->line);
               return;
             }
             
@@ -2840,8 +2842,8 @@ void SPVM_CHECK_check_ast_check_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE*
                 SPVM_CLASS_VAR* class_var = class_var_access->class_var;
                 SPVM_BASIC_TYPE* class_var_access_basic_type = class_var->current_basic_type;
                 
-                if (!SPVM_CHECK_can_access(compiler, method->current_basic_type, class_var_access_basic_type, class_var_access->class_var->access_control_type)) {
-                  if (!SPVM_OP_is_allowed(compiler, method->current_basic_type, class_var_access_basic_type)) {
+                if (!SPVM_CHECK_can_access(compiler, method->current_basic_type, class_var_access_basic_type, class_var_access->class_var->access_control_type, 0)) {
+                  if (!SPVM_OP_is_allowed(compiler, method->current_basic_type, class_var_access_basic_type, 0)) {
                     SPVM_COMPILER_error(compiler, "The %s \"%s\" class variable in the \"%s\" class cannnot be accessed from the current class \"%s\".\n  at %s line %d", SPVM_ATTRIBUTE_get_name(compiler, class_var_access->class_var->access_control_type), class_var->name, class_var_access_basic_type->name,  method->current_basic_type->name, op_class_var_access->file, op_class_var_access->line);
                     return;
                   }
@@ -2879,8 +2881,8 @@ void SPVM_CHECK_check_ast_check_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE*
             SPVM_CALL_METHOD* call_method = op_call_method->uv.call_method;
             const char* method_name = call_method->method->name;
 
-            if (!SPVM_CHECK_can_access(compiler, method->current_basic_type, call_method->method->current_basic_type, call_method->method->access_control_type)) {
-              if (!SPVM_OP_is_allowed(compiler, method->current_basic_type, call_method->method->current_basic_type)) {
+            if (!SPVM_CHECK_can_access(compiler, method->current_basic_type, call_method->method->current_basic_type, call_method->method->access_control_type, 0)) {
+              if (!SPVM_OP_is_allowed(compiler, method->current_basic_type, call_method->method->current_basic_type, 0)) {
                 SPVM_COMPILER_error(compiler, "The %s \"%s\" method in the \"%s\" class cannnot be called from the current class \"%s\".\n  at %s line %d", SPVM_ATTRIBUTE_get_name(compiler, call_method->method->access_control_type), call_method->method->name, call_method->method->current_basic_type->name,  method->current_basic_type->name, op_cur->file, op_cur->line);
                 return;
               }
@@ -3069,8 +3071,12 @@ void SPVM_CHECK_check_ast_check_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE*
 
             SPVM_FIELD_ACCESS* field_access = op_cur->uv.field_access;
             
-            if (!SPVM_CHECK_can_access(compiler, method->current_basic_type,  field_access->field->current_basic_type, field_access->field->access_control_type)) {
-              if (!SPVM_OP_is_allowed(compiler, method->current_basic_type, field->current_basic_type)) {
+            SPVM_FIELD* found_field_in_current_basic_type = SPVM_HASH_get(method->current_basic_type->unmerged_field_symtable, field_access->field->name, strlen(field_access->field->name));
+            
+            int32_t is_parent_field = !found_field_in_current_basic_type && !method->current_basic_type->is_anon;
+            
+            if (!SPVM_CHECK_can_access(compiler, method->current_basic_type,  field_access->field->current_basic_type, field_access->field->access_control_type, is_parent_field)) {
+              if (!SPVM_OP_is_allowed(compiler, method->current_basic_type, field->current_basic_type, is_parent_field)) {
                 SPVM_COMPILER_error(compiler, "The %s \"%s\" field in the \"%s\" class cannnot be accessed from the current class \"%s\".\n  at %s line %d", SPVM_ATTRIBUTE_get_name(compiler, field_access->field->access_control_type), field->name, field->current_basic_type->name, method->current_basic_type->name, op_cur->file, op_cur->line);
                 return;
               }
@@ -3249,9 +3255,9 @@ void SPVM_CHECK_check_ast_assign_unassigned_op_to_var(SPVM_COMPILER* compiler, S
               case SPVM_OP_C_ID_DIVIDE:
               case SPVM_OP_C_ID_DIVIDE_UNSIGNED_INT:
               case SPVM_OP_C_ID_DIVIDE_UNSIGNED_LONG:
-              case SPVM_OP_C_ID_REMAINDER:
-              case SPVM_OP_C_ID_REMAINDER_UNSIGNED_INT:
-              case SPVM_OP_C_ID_REMAINDER_UNSIGNED_LONG:
+              case SPVM_OP_C_ID_MODULO:
+              case SPVM_OP_C_ID_MODULO_UNSIGNED_INT:
+              case SPVM_OP_C_ID_MODULO_UNSIGNED_LONG:
               case SPVM_OP_C_ID_BIT_AND:
               case SPVM_OP_C_ID_BIT_OR:
               case SPVM_OP_C_ID_BIT_XOR:
@@ -3736,7 +3742,7 @@ SPVM_FIELD* SPVM_CHECK_search_unmerged_field(SPVM_COMPILER* compiler, SPVM_BASIC
   return found_field;
 }
 
-int32_t SPVM_CHECK_can_access(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_type_from, SPVM_BASIC_TYPE* basic_type_to, int32_t access_controll_flag_to) {
+int32_t SPVM_CHECK_can_access(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_type_from, SPVM_BASIC_TYPE* basic_type_to, int32_t access_controll_flag_to, int32_t is_parent_field) {
   
   int32_t can_access = 0;
   
@@ -3745,11 +3751,16 @@ int32_t SPVM_CHECK_can_access(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_ty
   }
   
   if (access_controll_flag_to == SPVM_ATTRIBUTE_C_ID_PRIVATE) {
-    if (strcmp(basic_type_from->name, basic_type_to->name) == 0) {
-      can_access = 1;
+    if (is_parent_field) {
+      can_access = 0;
     }
     else {
-      can_access = 0;
+      if (strcmp(basic_type_from->name, basic_type_to->name) == 0) {
+        can_access = 1;
+      }
+      else {
+        can_access = 0;
+      }
     }
   }
   else if (access_controll_flag_to == SPVM_ATTRIBUTE_C_ID_PROTECTED) {
@@ -4183,9 +4194,9 @@ SPVM_TYPE* SPVM_CHECK_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_DIVIDE:
     case SPVM_OP_C_ID_DIVIDE_UNSIGNED_INT:
     case SPVM_OP_C_ID_DIVIDE_UNSIGNED_LONG:
-    case SPVM_OP_C_ID_REMAINDER:
-    case SPVM_OP_C_ID_REMAINDER_UNSIGNED_INT:
-    case SPVM_OP_C_ID_REMAINDER_UNSIGNED_LONG:
+    case SPVM_OP_C_ID_MODULO:
+    case SPVM_OP_C_ID_MODULO_UNSIGNED_INT:
+    case SPVM_OP_C_ID_MODULO_UNSIGNED_LONG:
     case SPVM_OP_C_ID_INC:
     case SPVM_OP_C_ID_PRE_INC:
     case SPVM_OP_C_ID_POST_INC:

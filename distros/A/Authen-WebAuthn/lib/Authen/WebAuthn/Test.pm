@@ -1,5 +1,5 @@
 package Authen::WebAuthn::Test;
-$Authen::WebAuthn::Test::VERSION = '0.001';
+$Authen::WebAuthn::Test::VERSION = '0.002';
 use Mouse;
 use CBOR::XS;
 use MIME::Base64 qw(encode_base64url decode_base64url);
@@ -246,29 +246,3 @@ sub get_assertion_response {
 
 1;
 
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-Authen::WebAuthn::Test
-
-=head1 VERSION
-
-version 0.001
-
-=head1 AUTHOR
-
-Maxime Besson <mbesson@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2022 by Maxime Besson.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

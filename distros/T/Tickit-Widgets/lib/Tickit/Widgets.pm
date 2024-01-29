@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widgets 0.37;
+package Tickit::Widgets 0.41;
 
 use v5.14;
 use warnings;

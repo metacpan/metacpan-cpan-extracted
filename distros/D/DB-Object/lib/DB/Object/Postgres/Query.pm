@@ -1,12 +1,13 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres/Query.pm
-## Version v0.1.8
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/02/24
+## Modified 2024/01/05
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -20,7 +21,7 @@ BEGIN
     use vars qw( $VERSION $DEBUG );
     use Devel::Confess;
     use Want;
-    our $VERSION = 'v0.1.8';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -121,6 +122,7 @@ sub format_to_epoch
     }
 }
 
+# NOTE: For select or insert queries
 sub format_statement
 {
     my $self = shift( @_ );
@@ -170,15 +172,17 @@ sub format_statement
     my $query_type = $self->{query_type};
     my @sorted   = ();
     my @types    = ();
-    if( @$args && !( @$args % 2 ) )
+    if( $self->query_type eq 'insert' &&
+        @$args && 
+        !( @$args % 2 ) )
     {
-        for( my $i = 0; $i < @$args; $i++ )
+        for( my $i = 0; $i < @$args; $i += 2 )
         {
             push( @sorted, $args->[ $i ] ) if( exists( $order->{ $args->[ $i ] } ) );
-            $i++;
+            $data->{ $args->[ $i ] } = $args->[ $i + 1 ] if( !exists( $data->{ $args->[ $i ] } ) );
         }
     }
-    @sorted = sort{ $order->{ $a } <=> $order->{ $b } } keys( %$order ) if( !@sorted );
+    @sorted = sort{ $order->{ $a }->pos <=> $order->{ $b }->pos } keys( %$order ) if( !@sorted );
     # Used for insert or update so that execute can take a hash of key => value pair and we would bind the values in the right order
     # But or that we need to know the order of the fields.
     $self->{sorted} = \@sorted;
@@ -322,7 +326,7 @@ sub format_statement
                     $elem->format( $tbl_o->database_object->quote( $value, { pg_type => $const } ) );
                 }
                 # Value is a hash and the data type is json, so we transform this value into a json data
-                elsif( $self->_is_hash( $value ) && ( lc( $types->{ $field } ) eq 'jsonb' || lc( $types->{ $field } ) eq 'json' ) )
+                elsif( $self->_is_hash( $value => 'strict' ) && ( lc( $types->{ $field } ) eq 'jsonb' || lc( $types->{ $field } ) eq 'json' ) )
                 {
                     my $this_json = $self->_encode_json( $value );
                     # push( @format_values, $tbl_o->database_object->quote( $this_json, ( lc( $types->{ $field } ) eq 'jsonb' ? DBD::Pg::PG_JSONB : DBD::Pg::PG_JSON ) ) );
@@ -422,7 +426,6 @@ sub format_statement
     $self->binded_types->push( @types ) if( scalar( @types ) );
     if( !wantarray() && scalar( @{$self->{_extra}} ) )
     {
-        # push( @format_fields, @{$self->{_extra}} );
         foreach my $this ( @{$self->{_extra}} )
         {
             $elems->push({
@@ -431,9 +434,6 @@ sub format_statement
             });
         }
     }
-    # $values = CORE::join( ', ', @format_values );
-    # $fields = CORE::join( ', ', @format_fields );
-    # wantarray ? return( $fields, $values ) : return( $fields );
     return( $elems );
 }
 
@@ -544,7 +544,6 @@ sub on_conflict
                         # Need to account for placeholders
                         # Let's check values only
                         $self->is_upsert(1);
-                        # my $inherited_fields = $self->format_update( $f_ref );
                         my $elems = $self->format_update( $f_ref );
                         my $inherited_fields = $elems->formats->join( ', ' );
                         push( @comp, 'DO UPDATE SET' );
@@ -552,14 +551,16 @@ sub on_conflict
                         $hash->{query} = join( ' ', @comp );
                         $self->{_on_conflict} = $hash;
                         $self->{on_conflict} = join( ' ', @comp );
+                        $self->elements->push( $elems->elements->list );
+                        $self->messagec( 5, "There are now {green}", $elems->length, "{/} elements for this UPSERT query." );
                         # Usable only once
                         CORE::delete( $self->{_on_conflict_callback} );
                     };
                     # Return empty, not undef; undef is error
                     return( '' );
                 }
-                return( $self->error( "Fields property to update for on conflict do update clause is not a hash reference nor an array of fields." ) ) if( !$self->_is_hash( $opts->{fields} ) && !$self->_is_array( $opts->{fields} ) && !$self->{_on_conflict_callback} );
-                if( $self->_is_hash( $opts->{fields} ) )
+                return( $self->error( "Fields property to update for on conflict do update clause is not a hash reference nor an array of fields." ) ) if( !$self->_is_hash( $opts->{fields} => 'strict' ) && !$self->_is_array( $opts->{fields} ) && !$self->{_on_conflict_callback} );
+                if( $self->_is_hash( $opts->{fields} => 'strict' ) )
                 {
                     return( $self->error( "Fields property to update for on conflict do update clause contains no fields!" ) ) if( !scalar( keys( %{$opts->{fields}} ) ) );
                 }
@@ -749,7 +750,7 @@ DB::Object::Postgres::Query - Query Object for PostgreSQL
 
 =head1 VERSION
 
-    v0.1.8
+    v0.2.1
 
 =head1 DESCRIPTION
 

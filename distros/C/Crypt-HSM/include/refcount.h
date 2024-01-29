@@ -62,7 +62,7 @@ typedef struct {
 	UV counter;
 } Refcount;
 
-#  define refcount_inited(refcount) (refcount->counter != 0)
+#  define refcount_inited(refcount) ((refcount)->counter != 0)
 
 static inline UV S_refcount_load(pTHX_ Refcount* refcount) {
 	MUTEX_LOCK(&refcount->mutex);

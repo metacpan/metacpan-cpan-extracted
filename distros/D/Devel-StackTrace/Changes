@@ -1,3 +1,13 @@
+2.05   2024-01-08
+
+- Added explicit boolean overloading for trace objects. Without this, Perl
+  will use the object's string overloading and then check the truthiness of
+  the returned string, which is a lot of extra work. This can produce
+  significant slowdowns in some cases, as seen in
+  https://github.com/plack/Plack/pull/697. Requested by Tatsuhiko
+  Miyagawa. GH #23.
+
+
 2.04   2019-05-24
 
 - Add a partial workaround for "Bizarre copy" errors (GH #11) that come when

@@ -1,5 +1,19 @@
 Revision history for CGI-Info
 
+0.80	Fri Jan 19 08:05:29 EST 2024
+	Added documentroot() as a synonym to rootdir()
+		For compatability with Apache
+	Allow "use lib CGI::Info::script_dir() . '../lib';"
+	Mark Facebook as a search engine, not a robot
+
+0.79	Wed Jan  3 14:25:42 EST 2024
+	Better arg count checking
+	Mark techiaith.cymru as a robot
+	Facebook FBCLID can have "--" which can cause false positives
+	Mark ChatGPT as a search engine
+	Added root_dir() as synonym to rootdir()
+		That's the naming that CHI uses
+
 0.78	Fri Oct  6 13:59:51 EDT 2023
 	Set HTTP status to 403 on HTTP_USER_AGENT SQL injection attack
 	Test::Exception hasn't been used for sometime, so removed dependancy

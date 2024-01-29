@@ -6,6 +6,8 @@ use Plack::Util;
 use URI;
 use URI::Escape;
 
+our $VERSION = '2.18.0';
+
 # Build Plack::Request (inspired from Plack::Handler::Apache2)
 sub new {
     my ( $class, $r ) = @_;
@@ -17,11 +19,8 @@ sub new {
     my $env      = {
 
         #%ENV,
-        HTTP_HOST   => $r->hostname,
-        REMOTE_ADDR => (
-              $r->connection->can('remote_ip') ? $r->connection->remote_ip
-            : $r->connection->client_ip
-        ),
+        HTTP_HOST         => $r->hostname,
+        REMOTE_ADDR       => $r->useragent_ip,
         QUERY_STRING      => $args,
         REQUEST_URI       => $uri_full,
         PATH_INFO         => '',

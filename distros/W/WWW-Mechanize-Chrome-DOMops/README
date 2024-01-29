@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.06
+    Version 0.09
 
 SYNOPSIS
 
@@ -398,12 +398,22 @@ SUBROUTINES/METHODS
 ELEMENT SELECTORS
 
     Element selectors are how one selects HTML elements from the DOM. There
-    are 5 ways to select HTML elements: by id, class, tag, name or via a
-    CSS selector. Multiple selectors can be specified as well as multiple
-    criteria in each selector (e.g. multiple class names in a element-class
-    selector). The results from each selector are combined into a list of
-    unique HTML elements (BEWARE of missing id fields) by means of UNION or
-    INTERSECTION of the individual matches
+    are 5 ways to select HTML elements: by class (element-class), tag
+    (element-tag), id (element-id), name (element-name) or via a CSS
+    selector (element-cssselector).
+
+    Multiple selectors can be specified by combining the various selector
+    types, above. For example, one can select by element-class and
+    element-tag (and ...). In this selection mode, the matched elements
+    from each selector type (e.g. set A contains the HTML elements matched
+    via element-class and set B contains the HTML elements matched via
+    element-tag) must be combined by means of either the UNION (||) or
+    INTERSECTION (&&) of the two sets A and B.
+
+    Each selector can take one or more values. If you want to select by
+    just one class then provide that one class as a string scalar. If you
+    want to select an HTML elements which may belong to two classes, then
+    provide the two class names as an array.
 
     These are the valid selectors:
 
@@ -418,7 +428,7 @@ ELEMENT SELECTORS
       * element-cssselector : find DOM element matching this CSS selector
 
     And one of these two must be used to combine the results into a final
-    list
+    list:
 
       * && : Intersection. When set to 1 the result is the intersection of
       all individual results. Meaning that an element will make it to the
@@ -428,6 +438,16 @@ ELEMENT SELECTORS
       * || : Union. When set to 1 the result is the union of all individual
       results. Meaning that an element will make it to the final list if it
       was matched by at least one of the selectors specified.
+
+      As an example, the following selects all HTML elements which belong
+      to class X AND class Y. It also selects all HTML elements of the div
+      tag. And calculates the union of the two sets:
+
+        {
+          'element-class' => ['X', 'Y'],
+          'element-tag' => 'div',
+          '&&' => 1,
+        }
 
 CREATING THE MECH OBJECT
 

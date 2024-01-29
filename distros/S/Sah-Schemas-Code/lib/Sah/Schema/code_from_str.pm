@@ -3,9 +3,9 @@ package Sah::Schema::code_from_str;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2023-09-05'; # DATE
 our $DIST = 'Sah-Schemas-Code'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $schema = [
     code => {
@@ -45,7 +45,7 @@ Sah::Schema::code_from_str - Coderef from string
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schema::code_from_str (from Perl distribution Sah-Schemas-Code), released on 2023-09-03.
+This document describes version 0.002 of Sah::Schema::code_from_str (from Perl distribution Sah-Schemas-Code), released on 2023-09-05.
 
 =for Pod::Coverage ^(.+)$
 

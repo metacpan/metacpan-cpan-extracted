@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.70 ':experimental(init_expr adjust_params)';
+use warnings;
+use Object::Pad 0.800 ':experimental(adjust_params)';
 
-package Tangence::Registry 0.30;
+package Tangence::Registry 0.32;
 class Tangence::Registry :isa(Tangence::Object);
 
 use Carp;
@@ -67,7 +68,7 @@ objects it creates, so it can dispatch incoming messages from clients to them.
 
 =head2 new
 
-   $registry = Tangence::Registry->new
+   $registry = Tangence::Registry->new;
 
 Returns a new instance of a C<Tangence::Registry> object. An entire server
 requires one registry object; it will be shared among all the client
@@ -85,7 +86,7 @@ sub BUILDARGS ( $class, %args )
    );
 }
 
-field $_nextid { 1 };
+field $_nextid  = 1;
 field @_freeids;
 field %_objects;
 
@@ -108,7 +109,7 @@ ADJUST :params (
 
 =head2 get_by_id
 
-   $obj = $registry->get_by_id( $id )
+   $obj = $registry->get_by_id( $id );
 
 Returns the object with the given object ID.
 
@@ -128,7 +129,7 @@ method method_get_by_id ( $ctx, $id )
 
 =head2 construct
 
-   $obj = $registry->construct( $type, @args )
+   $obj = $registry->construct( $type, @args );
 
 Constructs a new exposed object of the given type, and returns it. Any
 additional arguments are passed to the object's constructor.
@@ -174,7 +175,7 @@ method destroy_object ( $obj )
 
 =head2 load_tanfile
 
-   $registry->load_tanfile( $tanfile )
+   $registry->load_tanfile( $tanfile );
 
 Loads additional Tangence class and struct definitions from the given F<.tan>
 file.

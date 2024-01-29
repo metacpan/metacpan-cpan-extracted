@@ -1,5 +1,5 @@
 NAME
-    UUID - DCE compatible Universally Unique Identifier library for Perl
+    UUID - Universally Unique Identifier library for Perl
 
 SYNOPSIS
         use UUID 'uuid';
@@ -22,6 +22,11 @@ SYNOPSIS
         UUID::clear( $uuid );                # set binary UUID to NULL
         UUID::is_null( $uuid );              # compare binary UUID to NULL
 
+        UUID::type( $uuid );                 # return UUID type
+        UUID::variant( $uuid );              # return UUID variant
+
+        UUID::time( $uuid );                 # return internal UUID time
+
 DESCRIPTION
     The UUID library is used to generate unique identifiers for objects that
     may be accessible beyond the local system. For instance, they could be
@@ -32,6 +37,10 @@ DESCRIPTION
     system, and unique across all systems, and are compatible with those
     created by the Open Software Foundation (OSF) Distributed Computing
     Environment (DCE) utility uuidgen.
+
+    All generated UUIDs are either type 1 from UUID::generate_time(), or
+    type 4 from UUID::generate_random(). And all are variant 1, meaning
+    compliant with the OSF DCE standard as described in RFC4122.
 
 FUNCTIONS
     Most of the UUID functions expose the underlying libuuid C interface
@@ -44,13 +53,30 @@ FUNCTIONS
     All take or return UUIDs in either binary or string format. The string
     format resembles the following:
 
-        1b4e28ba-2fa1-11d2-883f-0016d3cca427
+        21b081a3-de83-4480-a14f-e89a1dcf8f0f
 
     Or, in terms of printf(3) format:
 
         "%08x-%04x-%04x-%04x-%012x"
 
-    The binary format is simply a packed 16 byte binary value.
+    The binary form is simply a packed 16 byte binary value.
+
+  clear( $uuid )
+    Sets $uuid equal to the value of the NULL UUID.
+
+  copy( $dst, $src )
+    Copies the binary $src UUID to $dst.
+
+    If $src isn't a UUID, $dst is set to the NULL UUID.
+
+  compare( $uuid1, $uuid2 )
+    Compares two binary UUIDs.
+
+    Returns an integer less than, equal to, or greater than zero if $uuid1
+    is less than, equal to, or greater than $uuid2.
+
+    However, if either operand is not a UUID, falls back to a simple string
+    comparison returning similar values.
 
   generate( $uuid )
     Generates a new binary UUID based on high quality randomness from
@@ -84,12 +110,42 @@ FUNCTIONS
     function only uses this algorithm if a high-quality source of randomness
     is not available.
 
+  is_null( $uuid )
+    Compares the value of $uuid to the NULL UUID.
+
+    Returns 1 if NULL, and 0 otherwise.
+
+  parse( $string, $uuid )
+    Converts the string format UUID in $string to binary and returns in
+    $uuid. The previous content of $uuid, if any, is lost.
+
+    Returns 0 on success and -1 on failure. Additionally on failure, the
+    content of $uuid is unchanged.
+
+  time( $uuid )
+    Returns the time element of a binary UUID in seconds since the epoch,
+    the same as Perl's time function.
+
+    Keep in mind this only works for type 1 UUIDs. Values returned from
+    other types range from non-standardized to totally random.
+
+  type( $uuid )
+    Returns the type of binary $uuid.
+
+    This module only generates type 1 (time) and type 4 (random) UUIDs, but
+    others may be found in the wild.
+
+    Known types: 1 a.k.a. Version 1 - date/time and MAC address 2 a.k.a.
+    Version 2 - date/time and MAC address, security version 3 a.k.a. Version
+    3 - namespace based, MD5 hash 4 a.k.a. Version 4 - random 5 a.k.a.
+    Version 5 - namespace based, SHA-1 hash
+
   unparse( $uuid, $string )
     Converts the binary UUID in $uuid to string format and returns in
     $string. The previous content of $string, if any, is lost.
 
     The case of the hex digits returned may be upper or lower case, and is
-    dependent on the system-dependent local default.
+    dependent on the local system default.
 
   unparse_lower( $uuid, $string )
     Same as unparse() but $string is forced to lower case.
@@ -97,49 +153,29 @@ FUNCTIONS
   unparse_upper( $uuid, $string )
     Same as unparse() but $string is forced to upper case.
 
-  $rc = parse( $string, $uuid )
-    Converts the string format UUID in $string to binary and returns in
-    $uuid. The previous content of $uuid, if any, is lost.
-
-    Returns 0 on success and -1 on failure. Additionally on failure, the
-    content of $uuid is unchanged.
-
-  clear( $uuid )
-    Sets $uuid equal to the value of the NULL UUID.
-
-  is_null( $uuid )
-    Compares the value of $uuid to the NULL UUID.
-
-    Returns 1 if NULL, and 0 otherwise.
-
-  copy( $dst, $src )
-    Copies the binary $src UUID to $dst.
-
-    If $src isn't a UUID, $dst is set to the NULL UUID.
-
-  compare( $uuid1, $uuid2 )
-    Compares two binary UUIDs.
-
-    Returns an integer less than, equal to, or greater than zero if $uuid1
-    is less than, equal to, or greater than $uuid2.
-
-    However, if either operand is not a UUID, falls back to a simple string
-    comparison returning similar values.
-
-  $string = uuid()
+  uuid()
     Creates a new string format UUID and returns it in a more Perlish way.
 
     Functionally the equivalent of calling generate() and then unparse(),
     but throwing away the intermediate binary UUID.
 
-UUID LIBRARY
-    On some systems external packages will need to be installed first.
-    Notably, uuid-dev, libuuid-devel, or uuid-devel, depending on your
-    platform.
+  variant( $uuid )
+    Returns the variant of binary $uuid.
 
-    Some may also have more than one package available. It should be safe to
-    install all variations. The UUID installer will then opt towards the
-    older, faster library.
+    This module only generates variant 1 UUIDs, but others may be found in
+    the wild.
+
+    Known variants:
+
+        0  NCS
+        1  DCE
+        2  Microsoft
+        3  Other
+
+UUID LIBRARY
+    Prior to version 0.32, UUID required libuuid or similar be installed
+    first. This is no longer the case. UUID now builds against a private
+    copy of the e2fsprogs UUID code.
 
 EXPORTS
     None by default. All functions may be imported in the usual manner,

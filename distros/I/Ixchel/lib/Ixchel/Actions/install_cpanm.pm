@@ -3,29 +3,30 @@ package Ixchel::Actions::install_cpanm;
 use 5.006;
 use strict;
 use warnings;
-use File::Slurp;
 use Ixchel::functions::install_cpanm;
+use base 'Ixchel::Actions::base';
 
 =head1 NAME
 
-Ixchel::Actions::install_cpanm :: Install cpanm via packages.
+Ixchel::Actions::install_cpanm - Install cpanm via packages.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.2.0';
 
-=head1 SYNOPSIS
+=head1 CLI SYNOPSIS
+
+ixchel -a install_cpanm
+
+=head1 CODE SYNOPSIS
 
     use Data::Dumper;
 
-    my $results=$ixchel->action(action=>'instal_cpanm', opts=>{});
-
-
-=head1 FLAGS
+    my $results=$ixchel->action(action=>'install_cpanm', opts=>{});
 
 =head1 RESULT HASH REF
 
@@ -35,54 +36,7 @@ our $VERSION = '0.0.1';
 
 =cut
 
-sub new {
-	my ( $empty, %opts ) = @_;
-
-	my $self = {
-		config => {},
-		vars   => {},
-		arggv  => [],
-		opts   => {},
-	};
-	bless $self;
-
-	if ( defined( $opts{config} ) ) {
-		$self->{config} = $opts{config};
-	}
-
-	if ( defined( $opts{t} ) ) {
-		$self->{t} = $opts{t};
-	} else {
-		die('$opts{t} is undef');
-	}
-
-	if ( defined( $opts{share_dir} ) ) {
-		$self->{share_dir} = $opts{share_dir};
-	}
-
-	if ( defined( $opts{opts} ) ) {
-		$self->{opts} = \%{ $opts{opts} };
-	}
-
-	if ( defined( $opts{argv} ) ) {
-		$self->{argv} = $opts{argv};
-	}
-
-	if ( defined( $opts{vars} ) ) {
-		$self->{vars} = $opts{vars};
-	}
-
-	if ( defined( $opts{ixchel} ) ) {
-		$self->{ixchel} = $opts{ixchel};
-	}
-
-	$self->{results}={
-		errors      => [],
-		status_text => '',
-		ok          => 0,
-	};
-
-	return $self;
+sub new_extra {
 } ## end sub new
 
 sub action {
@@ -99,51 +53,17 @@ sub action {
 		$self->status_add(status=>'cpanm installed');
 	}
 
+	if (!defined($self->{results}{errors}[0])) {
+		$self->{results}{ok}=1;
+	}else {
+		$self->{results}{ok}=0;
+	}
+
 	return $self->{results};
 } ## end sub action
-
-sub help {
-	return 'Install cpanm via packages.
-';
-} ## end sub help
 
 sub short {
 	return 'Install cpanm via packages.';
 }
-
-sub opts_data {
-	return '
-';
-}
-
-sub status_add {
-        my ( $self, %opts ) = @_;
-
-        if ( !defined( $opts{status} ) ) {
-                return;
-        }
-
-        if ( !defined( $opts{error} ) ) {
-                $opts{error} = 0;
-        }
-
-        if ( !defined( $opts{type} ) ) {
-                $opts{type} = 'install_cpanm';
-        }
-
-		my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime(time);
-		my $timestamp = sprintf ( "%04d-%02d-%02dT%02d:%02d:%02d",
-									   $year+1900,$mon+1,$mday,$hour,$min,$sec);
-
-        my $status = '['.$timestamp.'] ['.$opts{type}.', ' . $opts{error} . '] ' . $opts{status};
-
-        print $status."\n";
-
-        $self->{results}{status_text} = $self->{results}{status_text} . $status;
-
-        if ( $opts{error} ) {
-                push( @{ $self->{results}{errors} }, $opts{status} );
-        }
-} ## end sub status_add
 
 1;

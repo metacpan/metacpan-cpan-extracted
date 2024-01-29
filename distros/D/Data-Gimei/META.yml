@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Data::Gimei:
     file: lib/Data/Gimei.pm
-    version: v0.4.0
+    version: v0.4.2
   Data::Gimei::Address:
     file: lib/Data/Gimei/Address.pm
   Data::Gimei::Name:
@@ -39,13 +39,13 @@ requires:
   Class::Tiny: '0'
   File::Share: '0'
   YAML::XS: '0'
-  perl: v5.22.0
+  perl: '5.010'
   version: '0'
 resources:
-  bugtracker: https://github.com/youpong/pl-gimei/issues
-  homepage: https://github.com/youpong/pl-gimei
-  repository: https://github.com/youpong/pl-gimei.git
-version: v0.4.0
+  bugtracker: https://github.com/youpong/Data-Gimei/issues
+  homepage: https://github.com/youpong/Data-Gimei
+  repository: https://github.com/youpong/Data-Gimei.git
+version: v0.4.2
 x_authority: cpan:YOUPONG
 x_contributors:
   - 'NAKAJIMA Yusaku <yupong7@gmail.com>'

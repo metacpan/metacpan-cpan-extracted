@@ -1,5 +1,20 @@
 Lingua::Slavic::Numbers Changelog
 -----------------------------
 
+0.06
+     - git repository in META.*
+
+0.05
+     - pod improvements and fixes (RT #37187)
+
+0.04
+     - fix regexp warnings (RT #116382)
+
+0.03
+     - documentation updates
+
+0.02
+     - include Lingua::BG::Numbers
+
 0.01 - Initial releases
      - Copied from Lingua::FR::Numbers :)

@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_row_style' } = { 
-    	summary => 'Applies formats for a whole row in worksheet.            ',
+    	summary => 'Applies formats for a whole row in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };

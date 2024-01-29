@@ -1,5 +1,6 @@
+use 5.010;
+use strict;
 use warnings;
-use v5.22;
 use utf8;
 
 use Data::Gimei;

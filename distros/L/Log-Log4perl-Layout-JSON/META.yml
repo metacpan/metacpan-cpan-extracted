@@ -26,7 +26,7 @@ name: Log-Log4perl-Layout-JSON
 provides:
   Log::Log4perl::Layout::JSON:
     file: lib/Log/Log4perl/Layout/JSON.pm
-    version: '0.60'
+    version: '0.61'
 requires:
   Carp: '0'
   Class::Tiny: '0'
@@ -44,7 +44,7 @@ resources:
   bugtracker: https://github.com/mschout/Log-Log4perl-Layout-JSON/issues
   homepage: https://github.com/mschout/Log-Log4perl-Layout-JSON
   repository: https://github.com/mschout/Log-Log4perl-Layout-JSON.git
-version: '0.60'
-x_generated_by_perl: v5.30.3
+version: '0.61'
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

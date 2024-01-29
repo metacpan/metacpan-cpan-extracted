@@ -1,15 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.57;
+use warnings;
+use Object::Pad 0.807;
 
-package Tickit::Widget::VBox 0.52;
-class Tickit::Widget::VBox
-   :strict(params)
-   :isa(Tickit::Widget::LinearBox);
+package Tickit::Widget::VBox 0.53;
+class Tickit::Widget::VBox :strict(params);
+
+inherit Tickit::Widget::LinearBox;
 
 use Tickit::Style;
 use Tickit::RenderBuffer qw( CAP_BOTH );

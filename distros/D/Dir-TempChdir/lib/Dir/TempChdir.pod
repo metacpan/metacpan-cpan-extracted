@@ -1,0 +1,183 @@
+=pod
+
+=head1 NAME
+
+Dir::TempChdir - Temporarily change current working directory, return safely.
+
+=head1 SYNOPSIS
+
+  use Cwd 'getcwd';
+  use Dir::TempChdir;
+
+  chdir '/tmp';
+  mkdir 'foo';
+  mkdir 'foo/bar';
+  print getcwd(), "\n"; # prints /tmp
+
+  {
+    my $tcd = Dir::TempChdir->new('foo'); # chdir to foo
+    print "$tcd\n"; # prints /tmp/foo
+
+    $tcd->pushd('bar'); # chdir to bar
+    print "$tcd\n"; # prints /tmp/foo/bar
+
+    rename '/tmp/foo', '/tmp/foo.old'; # Mallory tries to fool us
+
+    $tcd->popd(); # chdir back to the directory formerly known as foo
+    print "$tcd\n"; # prints /tmp/foo.old (Phew! We're still safe!)
+  }
+
+  # $tcd went out of scope: we're back in /tmp/.
+  print getcwd(), "\n"; # prints /tmp
+
+=head1 DESCRIPTION
+
+Dir::TempChdir allows to change the current working directory temporarily,
+returning to the previous directory on demand or when the instance goes out of
+scope.
+
+It uses a directory handle instead of a path to remember the previous
+directory, and it maintains a directory stack so that you can change
+directories back and forth as much as you like.
+
+Using handles ensures you can return to the actual directory you came from (in
+terms of the inode) even if it was renamed, removed or replaced by a symlink
+in the meantime (both File::chdir and File::pushd are susceptible to such
+attacks). However, not all systems support this approach. See L</"USING THE
+MODULE UNSAFELY"> if you're up for a thrill.
+
+=head1 METHODS
+
+=over 4
+
+=item C<new()>
+
+=item C<new($dir)>
+
+Creates a new Dir::TempChdir instance.
+
+If called with a path or handle C<$dir>, it calls L<C<pushd($dir)>|"pushd"> to
+change to the corresponding directory.
+
+Returns undef on error.
+
+The instance stringifies to the absolute path of the current working directory
+obtained by calling L<getcwd()|Cwd/getcwd>. This might be undef if
+L<getcwd(2)> encountered an error.
+
+=item C<pushd($dir)>
+
+Changes to the directory given by the path or handle C<$dir> and pushes a
+handle referring to the origin directory onto the directory stack (see also
+L</"NOTES">).
+
+Returns undef on error.
+
+=item C<popd()>
+
+Removes the top entry from the directory stack, changes to the corresponding
+directory and closes it's handle.
+
+Returns undef on error or when the directory stack is empty. You can
+distinguish these two situations by checking if C<$!> is set.
+
+=item C<backout()>
+
+Changes to the directory at the bottom end of the directory stack and clears
+the stack (thereby closing all open directory handles).
+
+This is done automatically when the instance created by L<C<new()>|"new"> goes
+out of scope or is undef'd.
+
+Returns undef on error or when the directory stack is empty. You can
+distinguish these two situations by checking if C<$!> is set.
+
+=item C<stack_size()>
+
+Returns the number of elements on the directory stack.
+
+=item C<errno()>
+
+Returns the value of C<$!> from the last L<C<pushd()>|"pushd">,
+L<C<popd()>|"popd"> or L<C<backout()>|"backout">.
+
+=item C<error()>
+
+Returns a descriptive text of the last error from L<C<pushd()>|"pushd">,
+L<C<popd()>|"popd"> or L<C<backout()>|"backout">.
+
+=back
+
+=head1 ERROR HANDLING
+
+If L<C<pushd()>|"pushd">, L<C<popd()>|"popd"> or L<C<backout()>|"backout">
+fail they return undef. You can get the corresponding errno from C<$!> as
+usual or from L<C<< $tcd->errno() >>|"errno">. If it is set, a more
+descriptive error message is available from L<C<< $tcd->error() >>|"error">.
+
+If an error occurs when the instance goes out of scope or during
+initialization with L<C<new($dir)>|"new"> you can get the errno via L<C<<
+Dir::TempChdir->errno() >>|"errno"> and the descriptive error message via
+L<C<< Dir::TempChdir->error() >>|"error">.
+
+The descriptive error messages contain the original directory path (if
+available) which will be wrong if a directory was renamed, removed or replaced
+by a symlink during the lifetime of the TempChdir instance.
+
+=head1 USING THE MODULE UNSAFELY
+
+If your system lacks support for L<fchdir(2)>, C<use Dir::TempChdir;> will die
+on purpose because the core feature of this module is the use of directory
+handles.
+
+If you still want to use the module on such a system, you can do so at your
+own peril with C<use Dir::TempChdir '-IGNORE_UNSAFE_CHDIR_SECURITY_RISK';>.
+This is in all caps and inconveniently long to make it unmistakably clear to
+everybody that you wish to invite a cornucopia of troubles.
+
+In this case, L<C<popd()>|"popd"> calls L<chdir()|perlfunc/chdir EXPR> with
+the absolute path of the previous directory (which L<C<pushd()>|"pushd">
+determined by calling L<getcwd()|Cwd/getcwd>). Good luck.
+
+=head1 NOTES
+
+Don't use Dir::TempChdir with threads (processes are okay, though). You might
+want to take a look at L<openat()|POSIX::2008/openat> and friends from
+L<POSIX::2008> to avoid changing directories in the first place.
+
+As a non-root user you might not be able to change back to a previous
+directory if its permissions have changed.
+
+On systems that support fchdir() but neither the O_PATH nor the O_SEARCH
+open() flag you cannot change away from a directory to which you do not have
+read access. This is because in this case pushd() opens the current directory
+(i.e. ".")  with O_RDONLY to obtain a handle and this requires read
+permission.
+
+This module lives in the Dir namespace because it deals with directories and
+nothing but directories.
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+L<File::chdir>
+
+=item *
+L<File::pushd>
+
+=back
+
+=head1 AUTHOR
+
+Initially hacked together by Carsten Gaebler.
+
+=head1 LICENSE
+
+This library is free software. You can redistribute and/or modify it under the
+terms of the Do What The Fuck You Want To Public License, Version 2, as
+published by Sam Hocevar. See the COPYING file or L<http://www.wtfpl.net/> for
+more details.
+
+=cut

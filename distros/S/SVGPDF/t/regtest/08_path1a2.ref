@@ -1,0 +1,63 @@
+==== start svg ====
+XObject #1
+vb 0 0 320 320 (inferred) => bb 0.00 -320.00 320.00 0.00
+matrix( 1 0 0 -1 0 0)
+vb rect( 0.00 0.00 320.00 320.00)
+xo fill_color black (initial)
+  start handling path (SVGPDF::Path)
+  path d="M 10 315 L 110 215 A..."
+    xo save
+    path stroke-width=2 stroke=black fill=green
+    xo move(10.00,315.00)
+    xo line(110.00,215.00)
+    xo arc(36.00,60.00 0.00 0,1 150.71,170.29)
+    elliptic_arc(110.00,215.00 150.71,170.29 36.00,60.00 move=0 large=0 dir=1 rot=0.00)
+      xo curve( 111.08,207.76 112.97,200.92 115.55,194.83 )
+      xo curve( 118.14,188.75 121.39,183.52 125.12,179.41 )
+      xo curve( 128.86,175.31 133.02,172.40 137.40,170.84 )
+      xo curve( 141.78,169.28 146.29,169.09 150.71,170.29 )
+    xo line(172.55,152.45)
+    xo arc(30.00,50.00 -45.00 0,1 215.10,109.90)
+    elliptic_arc(172.55,152.45 215.10,109.90 30.00,50.00 move=0 large=0 dir=1 rot=-45.00)
+      xo curve( 167.89,147.79 163.83,142.63 160.60,137.26 )
+      xo curve( 157.37,131.89 155.03,126.41 153.71,121.15 )
+      xo curve( 152.39,115.88 152.12,110.92 152.92,106.56 )
+      xo curve( 153.72,102.19 155.57,98.51 158.37,95.72 )
+      xo curve( 161.16,92.92 164.84,91.07 169.21,90.27 )
+      xo curve( 173.57,89.47 178.53,89.74 183.80,91.06 )
+      xo curve( 189.06,92.38 194.54,94.72 199.91,97.95 )
+      xo curve( 205.28,101.18 210.44,105.24 215.10,109.90 )
+      xo curve( 215.10,109.90 215.10,109.90 215.10,109.90 )
+    xo line(315.00,10.00)
+    xo paint (black green)
+    xo restore
+  end handling path
+  start handling circle (SVGPDF::Circle)
+  circle cx=150.71 cy=170.29 r=2
+    xo save
+    circle stroke=none fill=red
+    xo fill (none)
+    xo restore
+  end handling circle
+  start handling circle (SVGPDF::Circle)
+  circle cx=110 cy=215 r=2
+    xo save
+    circle stroke=none fill=red
+    xo fill (none)
+    xo restore
+  end handling circle
+  start handling ellipse (SVGPDF::Ellipse)
+  ellipse cx=144.931 cy=229.512 rx=36 ry=60
+    xo save
+    ellipse stroke=blue fill=none
+    xo stroke (blue)
+    xo restore
+  end handling ellipse
+  start handling ellipse (SVGPDF::Ellipse)
+  ellipse cx=115.779 cy=155.778 rx=36 ry=60
+    xo save
+    ellipse stroke=blue fill=none
+    xo stroke (blue)
+    xo restore
+  end handling ellipse
+==== end svg ====

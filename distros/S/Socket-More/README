@@ -1,28 +1,19 @@
 NAME
-    Socket::More - Interface scoped passive/listener addressing
+    Socket::More - Scoped listening/passive addresses and network utility
+    routines
 
 SYNOPSIS
-    Bring into your namespace. This overrides "socket" also:
+    Bring into your namespace.
 
             use v5.36;
-            use Socket::More ":all";
-
-    Or import any of the functions by name:
-
-            use v5.36;
-            use Socket::More qw<getifaddrs sockaddr_passive ...>;
-
-    Simple list of all network interfaces:
-
-            #List basic interface information on all available interfaces
-            my @ifs=getifaddrs;
-            say $_->{name} for @ifs;
+            use Socket::More;
 
     Flexible way to create interface scoped passive (listen) address across
     families. Special 'unix' interface for ease of use. All invalid
     combinations of family, port and paths are discarded:
 
-            #Create passive (listening) sockets for selected interfaces
+            # Create passive (listening) sockets for selected interfaces
+      #
             my @passive=sockaddr_passive {
                     interface=>     ["eth0", "unix"],
                     port=>          [5566, 7788],
@@ -31,19 +22,19 @@ SYNOPSIS
                 
             #All invalid family/interface/port/path  combinations are filtered out
             #leaving only valid info for socket creation and binding:
+      #
             for(@passive){
                     say $_->{address};
-                    socket my $socket, $_->{family}, $_->{type}, 0;
+                    socket my $socket, $_->{family}, $_->{socktype}, 0;
                     bind $socket $_->{addr};
             }
 
-DESCRIPTION
-    This module makes it easier to generate the data structures to bind
-    multiple sockets of multiple addresses, types, and families (including
-    unix) on a particular set of interfaces by name.
+    Please see EXAMPLES section for more.
 
-    It implements "sockaddr_passive", which facilitates solutions to
-    requirements like these:
+DESCRIPTION
+    Intended as an alternative for Socket, implementing only 'modern subset'
+    of routines. It providing extra routines to make listening addresses
+    easy, to solve problems like this:
 
             'listen on interfaces eth0 and eth1, using IPv6 and port numbers 9090
             and 9091, but limit to link local addresses, and stream types'.
@@ -54,19 +45,51 @@ DESCRIPTION
             'listen on all interfaces on port 8080 and 8081, but only on link local
             ipv6 address'
 
-    In addition it also makes it easy to specify multiple listen/passive
-    addresses from the command line, using concise key/value notation and
-    string to socket family/type conversions.
+    It also is a umbrella package, which reexports Socket::More::Constants,
+    Socket::More::Lookup and Socket::More::Interface for you.
 
     It also makes it easy to generate 'random' ports to bind to, before your
-    program binds, to aid in testing scenarios.
+    program binds, to aid in testing server scenarios.
 
-    Several 'inet.h' and similar routines are also implemented (eg
-    "getifaddrs", "if_nametoindex", "if_indextoname", "if_nameindex").
+    Note this is a subset of Socket functionality. The 'old school' inet_*
+    functions are deliberately not included, to encourage the usage of
+    getnameinfo/getaddrinfo.
 
-    No symbols are exported by default. All symbols can be exported with the
-    ":all" tag or individually by name. Please see the API section for a
-    complete listing.
+    From version v0.5.0, the module has been decomposed to to separate
+    modules on CPAN for targeted usage:
+
+    Socket::More (This Module)
+
+        wrapper over "socket" to make it more flexible
+        Methods for creating address structure for listening (passive)
+        sockets using a query and consise command line syntax
+        String/constant mapping
+        General pack/unpack of address structures
+        Address family and socket types as string names
+        Imports and rexports the modules listed below.
+
+    Socket::More::Constants
+        Contains all the networking constants (ie "AF_INET",
+        "NI_NUMERICHOST", etc) for your platform.
+
+    Socket::More::Lookup
+        Implements and exports "getaddrinfo", "getnameinfo" and
+        "gai_strerror", with a different calling convention then Perl core
+        Socket implementation. More like "sysread" convention
+
+    Socket::More::Interface
+        Implements and exports "getifaddrs", "if_nametoindex",
+        "if_indextoname" and "if_nameindex" to query the interfaces of your
+        system
+
+    Other packages/distributions not reexported but part of the family:
+
+    Socket::More::Resolver
+        Non blocking and event loop integration of system resolver
+        functions.
+
+    Socket::More::IPRanges
+        Grouping information on IP addresses
 
 MOTIVATION
     I wanted an easy way to listen on a particular interface ONLY. The
@@ -79,51 +102,23 @@ MOTIVATION
     Manually creating the multitude of potential addresses on the same
     interface (especially for IPv6) is a pain to maintain. This module
     reduces the effort by generating all combinations of parameters and then
-    filters out what doesn't make sense and what you don't want
+    filters out what doesn't make sense and what you don't want. See
+    "sockaddr_passive" below for more information.
 
 API
-  getifaddrs
-            my @interfaces=getifaddrs;
+    From version v0.5.0 the structure of the module has been refactored into
+    other modules. The same API is accessible from this module, as it
+    imports them and reexports their subroutines/constants. If you don't
+    need the easy listening features of this module, then you can use these
+    modules independently.
 
-    Queries the OS via "getifaddr" for the list of interfaces currently
-    active. Returns a list of hash references representing the network
-    interfaces. The keys of these hashes include:
-
-    name
-        The text name of the interface
-
-    flags
-        Flags set on the interface
-
-    addr
-        Packed sockaddr structure suitable for use with "bind"
-
-    netmask
-        Packed sockaddr structure of the netmask
-
-    dstmask
-        Packed sockaddr structure of the dstmask
-
-  if_nametoindex
-            my $index=if_nametoindex($name);
-
-    Returns the index of an interface by name. If the interface is not
-    found, returns 0 and sets $! with error code.
-
-  if_indextoname
-            my $name=if_indextoname($index);
-
-    Returns the name of an interface by index. If the index does not
-    represent an interface, "undef" is returned and sets $! with error code
-
-  if_nameindex
-            my @pairs=if_nameindex;
-
-    Returns a list of key value pairs. The key is the interface index, and
-    the value is the name of the interface.
-
-    Return "undef" on error and sets $! with error code.
-
+  getifaddrs (Socket::More::Interface)
+  if_nametoindex (Socket::More::Interface)
+  if_indextoname (Socket::More::Interface)
+  if_nameindex (Socket::More::Interface)
+  getaddrinfo (Socket::More::Lookup)
+  getnameinfo (Socket::More::Lookup)
+  gai_strerror (Socket::More::Lookup)
   family_to_string
             my $string=family_to_string($family);
 
@@ -144,15 +139,15 @@ API
     This is useful for handling address families supplied from the command
     line, as abbreviated names can be matched.
 
-  sock_to_string
-            my $string=sock_to_string($type);
+  socktype_to_string or sock_to_string
+            my $string=socktype_to_string($type);
 
     Returns a string label representing a socket type $type. For example,
     calling with the integer constant "SOCK_STREAM", will return a string
     "SOCK_STREAM"
 
-  string_to_sock
-            my @type=string_to_family($string);
+  string_to_socktype  or string_to_type
+            my @type=string_to_socktype($string);
 
     Performs a match of all SOCK_.* names against $pattern. Returns a list
     of integers for the corresponding socket types that matched. Returns an
@@ -171,12 +166,15 @@ API
     Returns a list of 'interface' structures (similar to getifaddr above)
     which provide meta data and packed address structures suitable for
     passive use (i.e bind) and matching the $specification. The resulting
-    data is sorted by interface name, then but family and finally by type.
+    data is sorted by interface name, then by family and finally by type.
 
     It has some overlapping function of "getaddrinfo", however it is
     specifically for creating addresses for binding, allows the use of
     interface names and operates with UNIX domain configurations through a
     synthetic 'unix' interface.
+
+    From v0.5.0 the results will return interface information in an addition
+    field.
 
     A specification hash has optional keys which dictate what addresses are
     generated and filtered:
@@ -192,8 +190,8 @@ API
     address generation and not as a filter. Without at least one of these
     keys, no results will be generated.
 
-    Other keys like "interface", "family" and "type" for example are used to
-    restrict addresses created to the match
+    Other keys like "interface", "family" and "socktype" for example are
+    used to restrict addresses created to the match
 
     Keys like "address" and "group" are a filter which are directly matched
     against the address and group.
@@ -209,7 +207,7 @@ API
                     po=>...         #port
                     pa=>...         #path
                     a=>...          #address
-                    t=>...          #type
+                    s=>...          #socktype
                     g=>...          #group
             }
 
@@ -226,7 +224,7 @@ API
         A string or array ref of strings which are used as regex to match
         interface names currently available.
 
-    familiy
+    family
                 examples: family=>AF_INET family=>[AF_INET, AF_INET6, AF_UNIX]
 
         A integer or array ref of integers representing the family type an
@@ -236,8 +234,8 @@ API
         matched against supported families. See "parse_passive_spec" for
         matching details
 
-    type
-                examples: type=>SOCK_STREAM type=>[SOCK_STREAM, SOCK_DGRAM]
+    socktype (was type)
+                examples: socktype=>SOCK_STREAM socktype=>[SOCK_STREAM, SOCK_DGRAM]
 
         A integer or array ref of integers representing the socket type an
         interface supports.
@@ -311,9 +309,9 @@ API
 
     "port" and "path" keys take literal values.
 
-    "family" and "type" keys take regex values, which match against the
-    family/type names (using "string_to_sock" and "string_to_family") and
-    are replaced with the integer values internally.
+    "family" and "socktype" keys take regex values, which match against the
+    family/socktype names (using "string_to_sock" and "string_to_family")
+    and are replaced with the integer values internally.
 
     Other keys treat the value as a string/regex to match against.
 
@@ -337,7 +335,7 @@ API
     which would match SOCK_STREAM sockets, for both AF_INET and AF_INET6
     families, on all available interfaces.
 
-            family=INET,type=STREAM #Full key name
+            family=INET,socktype=STREAM #Full key name
             f=INET,t=STREAM         #Shortest unique string for keys
 
     The special case of a field not in key value format (i.e. with out a
@@ -360,14 +358,14 @@ API
     a pair of [] and will need to be escaped or quoted in the shell
 
   socket
-            socket $socket, $domain_or_addr, $type, $proto
+            socket $socket, $domain, $socktype, $proto
+      socket $socket, $hash
 
 
             example:
                     die "$!" unless socket my $socket, AF_INET, SOCK_STREAM,0;
 
-                
-                    die "$!" unless socket my $socket, $sockaddr, SOCK_STREAM,0;
+                    die "$!" unless socket my $socket, {family=>AF_INET, protocol=>0, socktype=>SOCK_STREAM};
 
     A wrapper around "CORE::socket". It checks if the "DOMAIN" is a number.
     If so, it simply calls "CORE::socket" with the supplied arguments.
@@ -486,7 +484,7 @@ EXAMPLES
     On interface en0,lo and unix, port 1000, path mypath.sock, and stream
     type only
 
-            perl examples/cli.pl -l interface='en0|lo|unix',port=1000,path=mypath.sock,type=stream
+            perl examples/cli.pl -l interface='en0|lo|unix',port=1000,path=mypath.sock,socktype=stream
 
             Interface Address                   Family   Group              Port Path          Type        Data
             en0       192.168.1.103             AF_INET  PRIVATE            1000               SOCK_STREAM
@@ -523,11 +521,6 @@ EXAMPLES
             lo0       fe80::1                   AF_INET6 LINK-LOCAL-UNICAST 1010      SOCK_STREAM ca=test,key=path
             lo0       fe80::1                   AF_INET6 LINK-LOCAL-UNICAST 1010      SOCK_DGRAM  ca=test,key=path
 
-TODO
-    Network interface queries for byte counts, rates.. etc
-    Expand address family types support(i.e link)
-    Network change events/notifications
-
 SEE ALSO
     Other modules provide network interface queries: Net::Interface seems
     broken at the time of writing IO::Interface works with IPv4 addressing
@@ -541,7 +534,7 @@ REPOSITORTY and BUGS
     <http://github.com/drclaw1394/perl-socket-more>
 
 COPYRIGHT AND LICENSE
-    Copyright (C) 2022 by Ruben Westerberg
+    Copyright (C) 2023 by Ruben Westerberg
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl or the MIT license.

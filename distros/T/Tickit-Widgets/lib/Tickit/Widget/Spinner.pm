@@ -1,15 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.75 ':experimental(adjust_params init_expr)';
+use warnings;
+use Object::Pad 0.807;
 
-package Tickit::Widget::Spinner 0.37;
-class Tickit::Widget::Spinner
-   :strict(params)
-   :isa(Tickit::Widget);
+package Tickit::Widget::Spinner 0.41;
+class Tickit::Widget::Spinner :strict(params);
+
+inherit Tickit::Widget;
 
 use experimental 'postderef';
 
@@ -52,7 +53,7 @@ use constant WIDGET_PEN_FROM_STYLE => 1;
 
 =head2 new
 
-   $spinner = Tickit::Widget::Spinner->new( %args )
+   $spinner = Tickit::Widget::Spinner->new( %args );
 
 Constructs a new C<Tickit::Widget::Spinner> object.
 
@@ -106,7 +107,7 @@ method cols
 
 =head2 start
 
-   $spinner->start
+   $spinner->start;
 
 Starts the animation effect.
 
@@ -121,7 +122,7 @@ method start
 
 =head2 stop
 
-   $spinner->stop
+   $spinner->stop;
 
 Stops the animation effect.
 

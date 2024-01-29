@@ -1,6 +1,6 @@
 package Map::Tube::API::Exception;
 
-$Map::Tube::API::Exception::VERSION   = '0.05';
+$Map::Tube::API::Exception::VERSION   = '0.07';
 $Map::Tube::API::Exception::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::API::Exception - Interface to exception class for Map::Tube::API.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =cut
 
@@ -35,7 +35,7 @@ B<FOR INTERNAL USE ONLY>
 
 =head1 AUTHOR
 
-Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
+Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
@@ -58,9 +58,9 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * BUGS / ISSUES
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Map-Tube-API>
+L<https://github.com/manwar/Map-Tube-API/issues>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -70,15 +70,15 @@ L<http://annocpan.org/dist/Map-Tube-API>
 
 L<http://cpanratings.perl.org/d/Map-Tube-API>
 
-=item * Search CPAN
+=item * Search MetaCPAN
 
-L<http://search.cpan.org/dist/Map-Tube-API/>
+L<https://metacpan.org/pod/Map::Tube::API>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 Mohammad S Anwar.
+Copyright (C) 2024 Mohammad Sajid Anwar.
 
 This  program  is  free software; you can redistribute it and/or  modify it under
 the  terms  of the the Artistic License (2.0).  You may obtain a copy of the full

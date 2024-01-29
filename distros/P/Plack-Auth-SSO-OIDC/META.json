@@ -4,40 +4,40 @@
       "Nicolas Franck, C<< <nicolas.franck at ugent.be> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
-      "perl_5"
+      "gpl_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Plack-Auth-SSO-OIDC",
    "no_index" : {
       "directory" : [
-         "eg",
-         "examples",
+         "t",
+         "xt",
          "inc",
          "share",
-         "t",
-         "xt"
+         "eg",
+         "examples",
+         "author",
+         "builder"
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.28"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.28"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.17",
-            "Test::Pod" : "1.41"
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
          }
       },
       "runtime" : {
@@ -58,6 +58,12 @@
          }
       }
    },
+   "provides" : {
+      "Plack::Auth::SSO::OIDC" : {
+         "file" : "lib/Plack/Auth/SSO/OIDC.pm",
+         "version" : "0.014"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -70,10 +76,9 @@
          "web" : "https://github.com/LibreCat/Plack-Auth-SSO-OIDC"
       }
    },
-   "version" : "0.013",
+   "version" : "0.014",
    "x_contributors" : [
       "Nicolas Franck <nicolas.franck@ugent.be>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27"
+   "x_static_install" : 1
 }
-

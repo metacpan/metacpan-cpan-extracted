@@ -4,6 +4,7 @@
 
 # Timings:
 #   07 March 2023: 1.136s (with MPU)
+#   13 November 2023: 1.516s (with MPU) (after adding more tests)
 
 do {
     {|n| assert_eq(mbe_factor(n).prod, n||1) }.each(0..30)
@@ -19,6 +20,8 @@ do {
     {|n| assert_eq(holf_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(pm1_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(pp1_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(rho_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(rho_brent_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(chebyshev_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(ecm_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(squfof_factor(n).prod, n||1) }.each(0..30)
@@ -26,6 +29,7 @@ do {
     {|n| assert_eq(trial_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(trial_factor(n, 100).prod, n||1) }.each(0..30)
     {|n| assert_eq(cyclotomic_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(germain_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(special_factors(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(Math.gcd_factors(n, n.isqrt.primes).prod, n||1) }.each(0..30)
 }
@@ -70,6 +74,14 @@ do {
     verify_factors(phi_finder_factor(622882096110539), 622882096110539)
     verify_factors(phi_finder_factor(132750061135361, 1e5), 132750061135361)
 
+    with (170296437766520678260984540689850857933985582784142928557942562632249992969239530014613965028536428517542093436236756805) {|n|
+        verify_factors(germain_factor(n), n)
+    }
+
+    with (681185751066082713043938162759403431735942331136571714231766350676201018716794593662979976783654271745458522802602418805) {|n|
+        verify_factors(germain_factor(n), n)
+    }
+
     with (283874509653487424333753053009549245120760303237063459589551) {|n|
         verify_factors(n.phi_finder_factor, n)
         verify_factors(n.fermat_factor(1e5), n)
@@ -78,11 +90,38 @@ do {
     verify_factors(fibonacci_factor(480.fib), 480.fib)
     verify_factors(fibonacci_factor(480.lucas), 480.lucas)
 
+    with (361494908604432818459) {|n|
+        verify_factors(lucas_factor(n, 1, n.len), n)
+        verify_factors(lucas_factor(n, nil, n.len), n)
+    }
+
+    with (122738580838512721992324860157572874494433031849) { |n|
+        verify_factors(miller_factor(n), n)
+        verify_factors(lucas_factor(n), n)
+    }
+
     with (58571442634534443082821160508299574798027946748324125518533225605795841) {|n|
         verify_factors(miller_factor(n), n)
         verify_factors(lucas_factor(n), n)
         verify_factors(lucas_factor(n, -1), n)
         verify_factors(lucas_factor(n, +1), n)
+    }
+
+    with (2425361208749736840354501506901183117777758034612345610725789878400467) { |n|
+        verify_factors(lucas_factor(n), n)
+        verify_factors(lucas_factor(n, 1), n)
+    }
+
+    with (25146460461623166913490810823197266974843794278877515084905712445246121858131556222638844737348348326802623652186762883978066753427481665955853173368561245789586498697625601) { |n|
+        verify_factors(miller_factor(n), n)
+        verify_factors(lucas_factor(n), n)
+        verify_factors(lucas_factor(n, -1), n)
+        verify_factors(lucas_factor(n, +1), n)
+    }
+
+    with (12810195243021764561861712454144132816027333806396076328657799091081731188973323792862969472203379046137906472535989245982808404394090155128185793637753278955521) {|n|
+        verify_factors(miller_factor(n), n)
+        verify_factors(lucas_factor(n), n)
     }
 }
 

@@ -1,7 +1,7 @@
 ---
 abstract: 'Use the PPI to dump the structure of a Perl file'
 author:
-  - 'brian d foy <bdfoy@cpan.org>'
+  - 'brian d foy <briandfoy@pobox.com>'
 build_requires:
   Test::More: '1'
   Test::Output: '0'
@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,6 +27,6 @@ requires:
 resources:
   bugtracker: https://github.com/briandfoy/app-ppi-dumper/issues
   homepage: https://github.com/briandfoy/app-ppi-dumper
-  repository: https://github.com/briandfoy/app-ppi-dumper.git
-version: '1.023'
+  repository: https://github.com/briandfoy/app-ppi-dumper
+version: '1.024'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Dumps pre defined scripts!",
+   "abstract" : "Filehandle made simple.",
    "author" : [
       "Ariel Vieira <ariel.vieira@yandex.com>"
    ],
@@ -19,6 +19,12 @@
             "Module::Build" : "0.4004"
          }
       },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : "2.52",
+            "Progress::Awesome" : "0.01"
+         }
+      },
       "test" : {
          "requires" : {
             "Test::More" : "0"
@@ -28,10 +34,10 @@
    "provides" : {
       "App::FileComposer" : {
          "file" : "lib/App/FileComposer.pm",
-         "version" : "0.02"
+         "version" : "1.00"
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "1.00",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

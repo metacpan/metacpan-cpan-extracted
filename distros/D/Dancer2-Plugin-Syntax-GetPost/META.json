@@ -49,7 +49,7 @@
       "test" : {
          "requires" : {
             "Dancer2" : "0",
-            "Dancer2::Test" : "0",
+            "Plack::Test" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Find" : "0",
             "File::Spec::Functions" : "0",

@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>52b3258c-b5c6-4bb3-a74f-678e11e1c3b0</MessageSerialNumber>
-  <MessageDate>Thu, 30 Nov 2023 03:41:09 GMT</MessageDate>
+  <MessageSerialNumber>b7365a83-1ae6-4a22-9ae6-db1f04f42336</MessageSerialNumber>
+  <MessageDate>Fri, 26 Jan 2024 03:41:17 GMT</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -71,11 +71,11 @@
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>1000000-1299999</Range>
+          <Range>1000000-1599999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>1300000-7999999</Range>
+          <Range>1600000-7999999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
@@ -525,8 +525,12 @@
           <Length>7</Length>
         </Rule>
         <Rule>
-          <Range>9850000-9999999</Range>
+          <Range>9850000-9995999</Range>
           <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>9996000-9999999</Range>
+          <Length>4</Length>
         </Rule>
       </Rules>
     </Group>
@@ -2353,7 +2357,399 @@
           <Length>3</Length>
         </Rule>
         <Rule>
-          <Range>6000000-8999999</Range>
+          <Range>6000000-6387999</Range>
+          <Length>4</Length>
+        </Rule>
+        <Rule>
+          <Range>6388000-6388099</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6388100-6388199</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6388200-6388399</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6388400-6388599</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6388600-6388699</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6388700-6388999</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6389000-6395999</Range>
+          <Length>4</Length>
+        </Rule>
+        <Rule>
+          <Range>6396000-6396099</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6396100-6396299</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6396300-6396399</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6396400-6396499</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6396500-6396599</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6396600-6396999</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6397000-6399999</Range>
+          <Length>4</Length>
+        </Rule>
+        <Rule>
+          <Range>6400000-6400099</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6400100-6400499</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6400500-6400599</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6400600-6400699</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6400700-6400899</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6400900-6400999</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6401000-6406999</Range>
+          <Length>4</Length>
+        </Rule>
+        <Rule>
+          <Range>6407000-6407399</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6407400-6407499</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6407500-6407599</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6407600-6407799</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6407800-6407999</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6408000-6419999</Range>
+          <Length>4</Length>
+        </Rule>
+        <Rule>
+          <Range>6420000-6420199</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6420200-6420299</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6420300-6420399</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6420400-6420499</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6420500-6420699</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6420700-6420799</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6420800-6420899</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6420900-6420999</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6421000-6432999</Range>
+          <Length>4</Length>
+        </Rule>
+        <Rule>
+          <Range>6433000-6433199</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6433200-6433299</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6433300-6433399</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6433400-6433599</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6433600-6433699</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6433700-6433799</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6433800-6433999</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6434000-6435999</Range>
+          <Length>4</Length>
+        </Rule>
+        <Rule>
+          <Range>6436000-6436099</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6436100-6436399</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6436400-6436599</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6436600-6436699</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6436700-6436799</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6436800-6436999</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6437000-6443999</Range>
+          <Length>4</Length>
+        </Rule>
+        <Rule>
+          <Range>6444000-6444099</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6444100-6444199</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6444200-6444299</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6444300-6444399</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6444400-6444499</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6444500-6444699</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6444700-6444899</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6444900-6444999</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6445000-6450999</Range>
+          <Length>4</Length>
+        </Rule>
+        <Rule>
+          <Range>6451000-6451299</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6451300-6451399</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6451400-6451599</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6451600-6451999</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6452000-6458999</Range>
+          <Length>4</Length>
+        </Rule>
+        <Rule>
+          <Range>6459000-6459099</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6459100-6459299</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6459300-6459499</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6459500-6459699</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6459700-6459899</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6459900-6459999</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6460000-6465999</Range>
+          <Length>4</Length>
+        </Rule>
+        <Rule>
+          <Range>6466000-6466099</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6466100-6466299</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6466300-6466599</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6466600-6466699</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6466700-6466899</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6466900-6466999</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6467000-6474999</Range>
+          <Length>4</Length>
+        </Rule>
+        <Rule>
+          <Range>6475000-6475199</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6475200-6475399</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6475400-6475499</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6475500-6475599</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6475600-6475799</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6475800-6475899</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6475900-6475999</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6476000-6476999</Range>
+          <Length>4</Length>
+        </Rule>
+        <Rule>
+          <Range>6477000-6477089</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6477090-6477099</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>6477100-6477199</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6477200-6477999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>6478000-6478099</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6478100-6478199</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6478200-6478299</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6478300-6478699</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6478700-6478799</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>6478800-6478999</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>6479000-8999999</Range>
           <Length>4</Length>
         </Rule>
         <Rule>
@@ -2473,11 +2869,11 @@
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>1500000-4799999</Range>
+          <Range>1500000-4599999</Range>
           <Length>3</Length>
         </Rule>
         <Rule>
-          <Range>4800000-4999999</Range>
+          <Range>4600000-4999999</Range>
           <Length>5</Length>
         </Rule>
         <Rule>
@@ -3369,11 +3765,15 @@
           <Length>3</Length>
         </Rule>
         <Rule>
-          <Range>8500000-8929999</Range>
+          <Range>8500000-8739999</Range>
           <Length>5</Length>
         </Rule>
         <Rule>
-          <Range>8930000-8949999</Range>
+          <Range>8740000-8899999</Range>
+          <Length>4</Length>
+        </Rule>
+        <Rule>
+          <Range>8900000-8949999</Range>
           <Length>3</Length>
         </Rule>
         <Rule>
@@ -3381,11 +3781,11 @@
           <Length>4</Length>
         </Rule>
         <Rule>
-          <Range>9000000-9899999</Range>
+          <Range>9000000-9699999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>9900000-9999999</Range>
+          <Range>9700000-9999999</Range>
           <Length>3</Length>
         </Rule>
       </Rules>
@@ -3815,23 +4215,23 @@
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>0100000-0599999</Range>
+          <Range>0100000-0899999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>0600000-7299999</Range>
+          <Range>0900000-7099999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>7300000-7999999</Range>
+          <Range>7100000-7999999</Range>
           <Length>3</Length>
         </Rule>
         <Rule>
-          <Range>8000000-9399999</Range>
+          <Range>8000000-9249999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>9400000-9999999</Range>
+          <Range>9250000-9999999</Range>
           <Length>4</Length>
         </Rule>
       </Rules>
@@ -6785,8 +7185,12 @@
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>9000000-9999999</Range>
+          <Range>9000000-9799999</Range>
           <Length>3</Length>
+        </Rule>
+        <Rule>
+          <Range>9800000-9999999</Range>
+          <Length>2</Length>
         </Rule>
       </Rules>
     </Group>
@@ -7519,15 +7923,15 @@
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>3000000-5999999</Range>
+          <Range>3000000-6499999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>6000000-7499999</Range>
+          <Range>6500000-6999999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>7500000-9999999</Range>
+          <Range>7000000-9999999</Range>
           <Length>3</Length>
         </Rule>
       </Rules>
@@ -7840,6 +8244,32 @@
         </Rule>
         <Rule>
           <Range>9800000-9999999</Range>
+          <Length>3</Length>
+        </Rule>
+      </Rules>
+    </Group>
+    <Group>
+      <Prefix>978-99994</Prefix>
+      <Agency>Haiti</Agency>
+      <Rules>
+        <Rule>
+          <Range>0000000-0999999</Range>
+          <Length>1</Length>
+        </Rule>
+        <Rule>
+          <Range>1000000-4999999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>5000000-5299999</Range>
+          <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>5300000-9849999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>9850000-9999999</Range>
           <Length>3</Length>
         </Rule>
       </Rules>

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-my $VERSION = (qw$LastChangedRevision: 1944 $)[1];
+my $VERSION = (qw$LastChangedRevision: 1957 $)[1];
 
 =head1 NAME
 
@@ -174,7 +174,7 @@ my @conf = (
 	debug => ( $option{d} || 0 ),				# -d	enable diagnostics
 	igntc => ( $option{t} || 0 ),				# -t	ignore truncation
 
-	udppacketsize => 1024
+	udppacketsize => 1232
 	);
 
 my $negtest = $option{n};					# -n	report NCACHE TTL
@@ -195,7 +195,7 @@ $resolver->nameservers(@nameserver) or die $resolver->string;
 
 my $zone = find_zonecut($domain);				# (also inverts IP address/prefix)
 
-my @ns = ( $zone ne '.' ) ? NS($zone) : ();			# find NS serving zone
+my @ns = NS($zone);						# find NS serving zone
 die "\ninvalid: $domain\n\n", $resolver->string unless @ns;	# game over
 
 
@@ -256,6 +256,7 @@ my @ncache = $negtest ? NCACHE($zone) : ();			# report observed NCACHE TTL
 
 displayRR( $zone, 'NS' ) if @nameserver;			# show NS if testing specific nameserver
 
+@server = ( shift @server ) if $zone eq '.';			# minimal test for root zone
 
 $resolver->usevc(1);						# no longer ok to query ANY over UDP
 $resolver->nameservers(@server);

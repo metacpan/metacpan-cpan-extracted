@@ -1,3 +1,10 @@
+libnet-as2-psgi-perl (1.0001-1) stable; urgency=low
+
+  * Create dynamic test certificates
+    - tests failed due to expired hard-coded certs in t directory
+
+ -- Andrew Maguire <ajm@cpan.org>  Mon, 8 Jan 2024 13:19:00 +1300
+
 libnet-as2-psgi-perl (1.0-1) stable; urgency=low
 
   * Content-Disposition

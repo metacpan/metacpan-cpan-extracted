@@ -2,7 +2,7 @@ NAME
     IO::Tty - Low-level allocate a pseudo-Tty, import constants.
 
 VERSION
-    1.18
+    1.20
 
 SYNOPSIS
         use IO::Tty qw(TIOCNOTTY);

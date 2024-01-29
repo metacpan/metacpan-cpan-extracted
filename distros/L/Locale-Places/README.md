@@ -4,11 +4,11 @@ Locale::Places - Translate places between different languages using http://downl
 
 # VERSION
 
-Version 0.08
+Version 0.09
 
 # SYNOPSIS
 
-Translates towns and cities between different languages, for example
+Translates places between different languages, for example
 London is Londres in French.
 
 # METHODS
@@ -34,11 +34,13 @@ at least one of which must be given.
 If neither $to nor $from is given,
 the code makes a best guess based on the environment.
 If no translation can be found, returns place in the original language.
+Takes an optional argument 'country' which can be either GB (the default) or US
+which is the country of that 'place' is in.
 
     use Locale::Places;
 
     # Prints "Douvres"
-    print Locale::Places->new()->translate({ place => 'Dover', from => 'en', to => 'fr' });
+    print Locale::Places->new()->translate({ place => 'Dover', country => 'GB', from => 'en', to => 'fr' });
 
     # Prints "Douvres" if we're working on a French system
     print Locale::Places->new()->translate('Dover');
@@ -49,7 +51,7 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 
 # BUGS
 
-Only supports towns and cities in GB at the moment.
+Only supports places in GB and US at the moment.
 
 Canterbury no longer translates to Cantorbéry in French.
 This is a problem with the data, which has this line:
@@ -96,7 +98,7 @@ You can also look for information at:
 
 # LICENCE AND COPYRIGHT
 
-Copyright 2020-2023 Nigel Horne.
+Copyright 2020-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

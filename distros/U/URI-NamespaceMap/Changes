@@ -8,6 +8,14 @@ Maintainer:   Kjetil Kjernsmo <kjetilk@cpan.org>
 Maintainer:   Gregory Todd Williams <gwilliams@cpan.org>
 Maintainer:   Chris Prather (PERIGRIN) <chris@prather.org>
 
+1.12	2024-01-11	Add new automations and small fixes.
+
+ - Added: Add explicit DESTROY.
+   Zakariyya Mughal++
+ - Removed: Remove Travis CI.
+   Zakariyya Mughal++
+ - Updated: Add new Github CI automations.
+
 1.10	2019-11-20	Add more coercions.
 
  - Added: Add coercions for RDF::Trine and Attean classes.
@@ -38,12 +46,12 @@ Maintainer:   Chris Prather (PERIGRIN) <chris@prather.org>
 
  - Added: Prefixes that will conflict with existing methods will throw an
    error.
-   Paul Williams++
+   kwakwa++
  - Improve the BUILDARGS code.
    Chris Prather++
  - Minor cleanups.
  - Removed: Remove strict/warnings pragmas where Moo is used.
-   Paul Williams++
+   kwakwa++
 
 0.32	2016-12-29	New guessing method and improved diagnostics.
 

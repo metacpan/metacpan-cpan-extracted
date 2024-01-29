@@ -14,6 +14,7 @@ use Encode::Locale    qw();
 
 use Term::Choose           qw();
 use Term::Choose::LineFold qw( line_fold print_columns );
+use Term::Choose::Screen   qw( clear_screen );
 use Term::Choose::Util     qw( get_term_size get_term_width unicode_sprintf insert_sep );
 use Term::Form             qw();
 
@@ -30,7 +31,6 @@ sub new {
     bless $sf, $class;
 }
 
-use Term::Choose::Screen qw( clear_screen );
 
 sub __print_waiting_str {
     my ( $sf ) = @_;

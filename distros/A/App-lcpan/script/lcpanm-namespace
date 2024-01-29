@@ -10,9 +10,9 @@ use App::lcpan;
 use Perinci::CmdLine::Util::Config;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-09'; # DATE
+our $DATE = '2023-09-26'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.073'; # VERSION
+our $VERSION = '1.074'; # VERSION
 
 my $res = Perinci::CmdLine::Util::Config::read_config(
     program_name => "lcpan",
@@ -89,7 +89,7 @@ lcpanm-namespace - cpanm wrapper (set mirror to local CPAN by default, install a
 
 =head1 VERSION
 
-This document describes version 1.073 of lcpanm-namespace (from Perl distribution App-lcpan), released on 2023-07-09.
+This document describes version 1.074 of lcpanm-namespace (from Perl distribution App-lcpan), released on 2023-09-26.
 
 =head1 SYNOPSIS
 

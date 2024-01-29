@@ -22,7 +22,10 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Date::Parse" : "0",
+            "HTTP::Request::Common" : "0",
             "JSON" : "0",
+            "LWP::UserAgent" : "0",
             "Moo" : "0"
          }
       },
@@ -33,7 +36,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Date::Parse" : "0",
+            "HTTP::Request::Common" : "0",
             "JSON" : "0",
+            "LWP::UserAgent" : "0",
             "Moo" : "0"
          }
       }
@@ -47,6 +53,6 @@
          "https://opensource.org/license/agpl-v3/"
       ]
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

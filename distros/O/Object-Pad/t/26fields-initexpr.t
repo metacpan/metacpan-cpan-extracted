@@ -5,7 +5,7 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad ':experimental(init_expr)';
+use Object::Pad 0.800 ':experimental(init_expr)';
 
 # initexprs can capture regular class-level lexicals
 {

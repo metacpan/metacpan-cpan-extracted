@@ -9,7 +9,7 @@
 
 package Audio::Nama;
 
-use Modern::Perl;
+use Modern::Perl '2020';
 no warnings 'uninitialized';
 
 use Audio::Nama::Globals qw(:all);
@@ -58,7 +58,7 @@ sub read_config {
 	#
 	# use the embedded default file if none other is present
 	
-	logsub("&read_config");
+	logsub((caller(0))[3]);
 	
 	my $config_file = shift;
 	
@@ -78,8 +78,6 @@ sub read_config {
 	$config->{root_dir} = $config->{opts}->{d} if $config->{opts}->{d};
 	$config->{root_dir} = expand_tilde($config->{root_dir});
 	$config->{sample_rate} = $cfg{abbreviations}{frequency};
-	$config->{hotkeys}->{' '} = $config->{hotkeys}->{Space}; 
-
 	$config->{use_git} and ! git_executable_found() and 
 		say("Config file requests Git version control,
 but the git executable could not be found.
@@ -105,7 +103,7 @@ loads initial_mix.json");
 sub git_executable_found { qx(which git) }
 
 sub walk_tree {
-	#logsub("&walk_tree");
+	#logsub((caller(0))[3]);
 	my $ref = shift;
 	map { substitute($ref, $_) } 
 		grep {$_ ne q(abbreviations)} 

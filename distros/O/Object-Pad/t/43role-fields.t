@@ -5,14 +5,16 @@ use warnings;
 
 use Test2::V0 0.000148; # is_refcount
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 role ARole {
    field $one = 1;
    method one { $one }
 }
 
-class AClass :does(ARole) {
+class AClass {
+   apply ARole;
+
    field $two = 2;
    method two { $two }
 }
@@ -25,7 +27,24 @@ class AClass :does(ARole) {
    is( $obj->two, 2, 'AClass has a ->two method' );
 }
 
-class BClass :isa(AClass) {
+class AClassLate {
+   field $two = 2;
+   method two { $two }
+
+   apply ARole;
+}
+
+{
+   my $obj = AClassLate->new;
+   isa_ok( $obj, [ "AClassLate" ], '$obj' );
+
+   is( $obj->one, 1, 'AClassLate has a ->one method' );
+   is( $obj->two, 2, 'AClassLate has a ->two method' );
+}
+
+class BClass {
+   inherit AClass;
+
    field $three = 3;
    method three { $three }
 }
@@ -38,12 +57,16 @@ class BClass :isa(AClass) {
    is( $obj->three, 3, 'BClass has a ->three method' );
 }
 
-role CRole :does(ARole) {
+role CRole {
+   apply ARole;
+
    field $three = 3;
    method three { $three }
 }
 
-class CClass :does(CRole) {}
+class CClass {
+   apply CRole;
+}
 
 # role fields via composition
 {
@@ -61,17 +84,17 @@ class CClass :does(CRole) {}
       method field { $field }
    }
 
-   role D1Role :does(DRole) {}
-   role D2Role :does(DRole) {}
+   role D1Role { apply DRole; }
+   role D2Role { apply DRole; }
 
-   role DxRole :does(D1Role) :does(D2Role) {}
+   role DxRole { apply D1Role; apply D2Role; }
 
-   class DClass :does(D1Role) :does(D2Role) {}
+   class DClass { apply D1Role; apply D2Role; }
 
    my $obj1 = DClass->new;
    is( $obj1->field, 2, 'DClass->field is 2 via diamond' );
 
-   class DxClass :does(DxRole) {}
+   class DxClass { apply DxRole; }
 
    my $obj2 = DxClass->new;
    is( $obj2->field, 2, 'DxClass->field is 2 via diamond' );
@@ -85,7 +108,7 @@ class CClass :does(CRole) {}
       field $field :param :weak;
    }
 
-   class implWithWeak :does(WithWeakRole) {}
+   class implWithWeak { apply WithWeakRole; }
 
    my $obj = implWithWeak->new( field => $arr );
    is_oneref( $arr, '$arr has one reference after implWithWeak constructor' );

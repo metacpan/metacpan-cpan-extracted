@@ -90,6 +90,10 @@ file.
 
 =head1 DESCRIPTION
 
+NOTE:  brandnewtube.com appears to no longer be scrapable for video-streams, 
+but ugetube.com still seems to work, but I'm hesitant for now to rename 
+this module to StreamFinder::UGetube.
+
 StreamFinder::BrandNewTube accepts a valid brandnewtube.com video ID or 
 page URL -OR- a ugetube.com page URL (either one of their ".html" or "embed" 
 URL) and returns the actual stream URL, title, and cover art icon for that 

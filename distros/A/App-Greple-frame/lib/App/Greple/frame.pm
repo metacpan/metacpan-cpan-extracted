@@ -1,6 +1,6 @@
 package App::Greple::frame;
 
-our $VERSION = "1.00";
+our $VERSION = "1.03";
 
 =encoding utf-8
 
@@ -32,14 +32,15 @@ B<--no-join-blocks> option.
 =for comment
 =item B<--frame-fold>
 
+=begin html
+
+<p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-frame/main/images/terminal-3.png">
+
+=end html
+
 Set frame and fold long lines with frame-friendly prefix string.
 Folding width is taken from the terminal.  Or you can specify the
 width by calling B<set> function with module option.
-
-=item B<--set-frame-width>=I<#>
-
-Set frame width.  You have to put this option before B<--frame>
-option.  See B<set> function in L</FUNCTION> section.
 
 =begin comment
 
@@ -49,10 +50,26 @@ Set frame without folding.
 
 =end comment
 
+=item B<--frame-cols>
+
+Output results in multi-column format to fit the width of the
+terminal.  The number of columns is automatically calculated from the
+terminal width.
+
 =item B<--frame-pages>
 
-Output results in multi-column, paginated format to fit the width of the 
-terminal.
+Output results in multi-column and paginated format.
+
+=begin html
+
+<p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-frame/main/images/terminal-frame-pages.png">
+
+=end html
+
+=item B<--set-frame-width>=I<#>
+
+Set frame width.  You have to put this option before B<--frame>
+option.  See B<set> function in L</FUNCTION> section.
 
 =back
 
@@ -65,12 +82,6 @@ Put next line in your F<~/.greplerc> to autoload B<App::Greple::frame> module.
 Then you can use B<--frame> option whenever you want.
 
 =end comment
-
-=begin html
-
-<p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-frame/main/images/terminal-3.png">
-
-=end html
 
 =head1 FUNCTION
 
@@ -104,6 +115,8 @@ You can use like this:
 
 L<App::ansifold>
 
+L<App::ansicolumn>
+
 L<Math::RPN>
 
 =head1 AUTHOR
@@ -123,6 +136,10 @@ use 5.014;
 use warnings;
 use utf8;
 use Data::Dumper;
+
+$ENV{GREPLE_FRAME_PAGES_WIDTH}    //= '80';
+$ENV{GREPLE_FRAME_PAGES_MARGIN}   //= '0';
+$ENV{GREPLE_FRAME_PAGES_BOUNDARY} //= 'none';
 
 my($mod, $argv);
 my($head, $blockend, $file_start, $file_end);
@@ -154,7 +171,7 @@ my %frame_base = (
     top    => '      ┌─' ,
     middle => '    ⋮ ├╶' ,
     bottom => '──────┴─' ,
-    );
+);
 
 sub opt_frame {
     my $pos = shift;
@@ -200,9 +217,10 @@ __DATA__
 mode function
 
 option --set-frame-width  &set(width=$<shift>)
+option --set-frame-column &set(column=$<shift>)
 
 option --ansifold-with-width \
-       --pf "ansifold -x --discard=EL --padding --prefix '      │ ' $<shift> --width=$<shift>"
+       --pf "ansifold --expand --discard=EL --padding --prefix '      │ ' $<shift> --width=$<shift>"
 
 option --ansifold \
        --ansifold-with-width &get(fold,width)
@@ -226,25 +244,56 @@ option --frame-fold  --frame-plain --ansifold
 option --frame       --frame-fold
 
 option --frame-classic-plain --frame-simple --show-frame-top --show-frame-bottom
-option --frame-classic-fold  --frame-classic-plain &opt_ansifold
+option --frame-classic-fold  --frame-classic-plain --ansifold
 option --frame-classic       --frame-classic-fold
 
 ##
-## EXPERIMENTAL: --frame-pages
+## EXPERIMENTAL: --frame-pages, --frame-cols
 ##
 
-define $FRAME_WIDTH 3
-define $COL_WIDTH   80:8+:$FRAME_WIDTH+
-define $PREFIX      '      │ '
-define $FOLD        ansifold -x --discard=EL --padding --prefix $PREFIX
-define $COLUMN      ansicolumn --border=box -P
-define $FOLD_COLUMN $FOLD $<shift> --width=$<shift> | $COLUMN -C $<shift>
+# RPN
+define @TEXT_WIDTH  $ENV{GREPLE_FRAME_PAGES_WIDTH}
+define @MARGIN      $ENV{GREPLE_FRAME_PAGES_MARGIN}
+define @LINE_FIELD  8
+define @FRAME_GAP   3
+define @COL_WIDTH   @TEXT_WIDTH:@LINE_FIELD:+:@FRAME_GAP:+
+define @COLUMN      @COL_WIDTH:/:INT:DUP:1:GE:EXCH:1:IF
+define @WIDTH       DUP:@COLUMN:/:@FRAME_GAP:-:@MARGIN:-
 
-option --frame-column-with-param \
-       --pf $FOLD_COLUMN
+define $FOLD \
+       ansifold --expand --discard=EL --padding \
+       --width =@WIDTH \
+       --prefix '      │ ' \
+       --boundary=$ENV{GREPLE_FRAME_PAGES_BOUNDARY} \
+       --linebreak=all --runin=@MARGIN --runout=@MARGIN
+
+define $COLS \
+       ansicolumn --border=box -U @COLUMN
+
+define $PAGES \
+       ansicolumn --border=box -P -C @COLUMN
+
+option --frame-set-params \
+       &set(width=@WIDTH)
+
+option --frame-col \
+       --frame-set-params \
+       --pf "$FOLD" \
+       --frame-plain
 
 option --frame-pages \
-       &set(width=DUP:$COL_WIDTH/:INT:DUP:1:GE:EXCH:1:IF:/:$FRAME_WIDTH-) \
-       &set(column=$COL_WIDTH/:INT:DUP:1:GE:EXCH:1:IF) \
-       --frame-plain \
-       --frame-column-with-param &get(fold,width) &get(column)
+       --frame-set-params \
+       --pf "$FOLD | $PAGES" \
+       --frame-plain
+
+option --frame-cols \
+       --frame-set-params \
+       --pf "$FOLD | $COLS" \
+       --frame-plain
+
+option --frame-columns --frame-cols
+
+option --frame-pages-classic \
+       --frame-set-params \
+       --pf "$FOLD | $PAGES" \
+       --frame-classic-plain

@@ -10,8 +10,11 @@ WriteMakefile(
     AUTHOR         => 'Yadd <yadd@>',
     LICENSE        => 'perl',
     BUILD_REQUIRES => {
-        'JSON' => 0,
-        'Moo'  => 0,
+        'Date::Parse'           => 0,
+        'HTTP::Request::Common' => 0,
+        'JSON'                  => 0,
+        'LWP::UserAgent'        => 0,
+        'Moo'                   => 0,
     },
     META_MERGE => {
         resources => {
@@ -26,7 +29,10 @@ WriteMakefile(
         },
     },
     PREREQ_PM => {
-        'JSON' => 0,
-        'Moo'  => 0,
+        'Date::Parse'           => 0,
+        'HTTP::Request::Common' => 0,
+        'JSON'                  => 0,
+        'LWP::UserAgent'        => 0,
+        'Moo'                   => 0,
     },
 );

@@ -43,7 +43,7 @@ use Text::Wrap;
 $Text::Wrap::huge = 'overflow';
 $Text::Wrap::unexpand = 0;
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 use UI::Various::core;
 
@@ -96,7 +96,8 @@ use constant DECO_UTF8 => (W7 => "\x{2554}", W8 => "\x{2550}", W9 => "\x{2557}",
 			   SL1 => "\e[7m", SL0 => "\e[27m",
 			   UL1 => "\e[4m", UL0 => "\e[24m");
 
-our %D = DECO_ASCII;
+our %D =
+    defined $ENV{LANG} && $ENV{LANG} =~ m/\.UTF-?8/i ? DECO_UTF8 : DECO_ASCII;
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -178,6 +179,84 @@ sub _size($$$)
 
 #########################################################################
 
+=head2 B<_color_on_off> - compute escape sequences needed for colours
+
+    ($colour_on, $colour_off) = $ui_element->_color_on_off();
+
+=head3 example:
+
+    my ($col_on, $col_off) = $ui_element->_color_on_off();
+
+=head3 description:
+
+This method determines the escape sequences needed to set background and
+foreground colours, and to switch them off again.
+
+=head3 returns:
+
+escape sequence to set the colours and escape sequence to turn them of
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+sub _color_on_off($)
+{
+    my ($self) = @_;
+    my ($col_on, $col_off) = ('', '');
+    if (defined $self->{bg}  or  defined $self->{fg})
+    {
+	defined $self->{bg}  and
+	    $col_on .= "\e[48;5;" .
+	    (16 + UI::Various::core::_tui_color($self->{bg})) . 'm';
+	defined $self->{fg}  and
+	    $col_on .= "\e[38;5;" .
+	    (16 + UI::Various::core::_tui_color($self->{fg})) . 'm';
+	$col_off = "\e[39;49m";		# reset colours to default
+    }
+    return ($col_on, $col_off);
+}
+
+#########################################################################
+
+=head2 B<_color_simplify> - remove unnecessary escape sequences
+
+    $simplified = $ui_element->_color_simplify($coloured_text);
+
+=head3 example:
+
+    $text = $ui_element->_color_simplify($text);
+
+=head3 description:
+
+This method removes unnecessary escape sequences from a text.  It might cost
+a bit of performance, but eases debugging of wrong colours.
+
+=head3 returns:
+
+simplified text
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+sub _color_simplify($$)
+{
+    my ($self, $text) = @_;
+    if (defined $self->{bg}  or  defined $self->{fg})
+    {
+	$text =~ s{(?:\e\[[34]8;5;\d{1,3}m)+(?=\e\[39;49m)}{}g;
+	$text =~ s{(?:\e\[38;5;\d{1,3}m)+(?=\e\[38;5;\d{1,3}m)}{}g;
+	$text =~ s{(?:\e\[48;5;\d{1,3}m)+(?=\e\[48;5;\d{1,3}m)}{}g;
+	$text =~ s{(?:\e\[48;5;\d{1,3}m\e\[38;5;\d{1,3}m)+(?=\e\[48;5;\d{1,3}m\e\[38;5;\d{1,3}m)}{}g;
+	$text =~ s{(?:\e\[39;49m)+(?=\e\[39;49m)}{}g;
+	$text =~ s{(\e\[39;49m +)(?:\e\[39;49m)+}{$1}g;
+    }
+    return $text;
+}
+
+#########################################################################
+
 =head2 B<_format> - format text according to given options
 
     $string = $ui_element->_format($prefix, $decoration_before, $effect_before,
@@ -248,7 +327,7 @@ sub _format($$$$$$$$$;$)
     my $blank_prefix = ' ' x $len_p;
     local $_;
 
-    # TODO L8R: handle colour (add to front of DECO-1, reset after DECO-2)
+    my ($col_on, $col_off) = $self->_color_on_off;
 
     # format text-box:
     # wrap text, if applicable:
@@ -285,14 +364,17 @@ sub _format($$$$$$$$$;$)
 		$pad1 = ' ' x $l1;
 		$pad2 = ' ' x $l2;
 	    }
-	    $text[$_] = $pad1 . $text[$_] . $pad2;
+	    $text[$_] = $pad1 . $text[$_] . $col_on . $pad2 . $col_off;
 	}
-	$text[$_] = ($_ == 0 ? $prefix : $blank_prefix)
-	    . $deco_before . $text[$_] . $deco_after;
+	$text[$_] = ($_ == 0 ? $prefix : $blank_prefix) .
+	    $col_on . $deco_before . $text[$_] .
+	    $col_on . $deco_after . $col_off;
     }
     if ($h > @text)
     {
-	my $empty = $blank_prefix . (' ' x ($len_d_bef + $w + $len_d_aft));
+	my $empty =
+	    $blank_prefix .
+	    $col_off . (' ' x ($len_d_bef + $w + $len_d_aft)) . $col_off;
 	my $l = $h - @text;
 	# default alignments 7-9:
 	if (not defined $self->{align}  or  $self->{align} >= 7)

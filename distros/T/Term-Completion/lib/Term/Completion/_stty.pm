@@ -70,6 +70,8 @@ sub get_key
 
 __END__
 
+=for stopwords CTRL
+
 =head1 NAME
 
 Term::Completion::_stty - utility package for Term::Completion using stty
@@ -93,7 +95,7 @@ L<Term::Completion::_POSIX> implementation should be used.
 
 Uses C<stty raw -echo> to set the terminal into
 "raw" mode, i.e. switch off the meaning of any control characters like
-CRTL-C etc. Also the echo of characters is switched off, so that the
+CTRL-C etc. Also the echo of characters is switched off, so that the
 program has full control of what is typed and displayed.
 
 Before doing that, tries to capture the terminal's current

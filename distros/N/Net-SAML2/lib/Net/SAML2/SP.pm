@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::SP;
-our $VERSION = '0.74'; # VERSION
+our $VERSION = '0.76'; # VERSION
 
 use Moose;
 
@@ -45,6 +45,9 @@ has 'slo_url_post'     => (isa => 'Str', is => 'ro', required => 0);
 has 'slo_url_redirect' => (isa => 'Str', is => 'ro', required => 0);
 has 'acs_url_post'     => (isa => 'Str', is => 'ro', required => 0);
 has 'acs_url_artifact' => (isa => 'Str', is => 'ro', required => 0);
+
+has 'attribute_consuming_service' =>
+  (isa => 'Net::SAML2::AttributeConsumingService', is => 'ro', predicate => 'has_attribute_consuming_service');
 
 has '_cert_text' => (isa => 'Str', is => 'ro', init_arg => undef, builder => '_build_cert_text', lazy => 1);
 
@@ -354,6 +357,7 @@ sub generate_metadata {
             $self->_generate_single_logout_service($x),
 
             $self->_generate_assertion_consumer_service($x),
+            $self->has_attribute_consuming_service ? $self->attribute_consuming_service->to_xml : (),
 
         ),
         $x->Organization(
@@ -474,7 +478,7 @@ Net::SAML2::SP - SAML Service Provider object
 
 =head1 VERSION
 
-version 0.74
+version 0.76
 
 =head1 SYNOPSIS
 
@@ -725,7 +729,7 @@ Timothy Legge <timlegge@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Venda Ltd, see the CONTRIBUTORS file for others.
+This software is copyright (c) 2024 by Venda Ltd, see the CONTRIBUTORS file for others.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

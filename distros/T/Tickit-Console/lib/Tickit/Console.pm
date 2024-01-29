@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2023 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
-use Object::Pad 0.70 ':experimental(adjust_params)';
+use warnings;
+use Object::Pad 0.800 ':experimental(adjust_params)';
 
-package Tickit::Console 0.11;
+package Tickit::Console 0.12;
 class Tickit::Console
    :isa(Tickit::Widget::VBox);
 
@@ -46,7 +47,7 @@ widget for a L<Tickit> instance.
 
 =head2 new
 
-   $console = Tickit::Console->new( %args )
+   $console = Tickit::Console->new( %args );
 
 Returns a new instance of a C<Tickit::Console>. Takes the following named
 arguments:
@@ -57,7 +58,7 @@ arguments:
 
 Callback to invoke when a line of text is entered in the entry widget.
 
-   $on_line->( $active_tab, $text )
+   $on_line->( $active_tab, $text );
 
 =item tab_class => STRING
 
@@ -117,7 +118,7 @@ ADJUST :params (
 
 =head2 add_tab
 
-   $tab = $console->add_tab( %args )
+   $tab = $console->add_tab( %args );
 
 Adds a new tab to the console, and returns a L<Tickit::Console::Tab> object
 representing it.
@@ -144,7 +145,7 @@ sort of widget tree with that inside it, and return it. This can be used to
 apply a decorative frame, place the scroller in a split box or other layout
 along with other widgets, or various other effects.
 
-   $tab_widget = $make_widget->( $scroller )
+   $tab_widget = $make_widget->( $scroller );
 
 =back
 
@@ -174,53 +175,58 @@ method add_tab ( %args )
 
 =head2 active_tab_index
 
-   $index = $console->active_tab_index
+   $index = $console->active_tab_index;
 
 =head2 active_tab
 
-   $tab = $console->active_tab
+   $tab = $console->active_tab;
 
 =head2 remove_tab
 
-   $console->remove_tab( $tab_or_index )
+   $console->remove_tab( $tab_or_index );
 
 =head2 move_tab
 
-   $console->move_tab( $tab_or_index, $delta )
+   $console->move_tab( $tab_or_index, $delta );
 
-=head2 active_tab
+=head2 activate_tab
 
-   $console->activate_tab( $tab_or_index )
+   $console->activate_tab( $tab_or_index );
 
 =head2 next_tab
 
-   $console->next_tab
+   $console->next_tab;
 
 =head2 prev_tab
 
-   $console->prev_tab
+   $console->prev_tab;
 
 These methods are all passed through to the underlying
 L<Tickit::Widget::Tabbed> object.
 
 =cut
 
-foreach my $method (qw( active_tab_index active_tab
-      remove_tab move_tab activate_tab next_tab prev_tab )) {
-   no strict 'refs';
-   *$method = method {
-      $_tabbed->$method( @_ );
-   };
+BEGIN {
+   use Object::Pad 0.800 ':experimental(mop)';
+
+   my $meta = Object::Pad::MOP::Class->for_caller;
+
+   foreach my $method (qw( active_tab_index active_tab
+         remove_tab move_tab activate_tab next_tab prev_tab )) {
+      $meta->add_method( $method => method {
+         $_tabbed->$method( @_ );
+      } );
+   }
 }
 
 =head2 bind_key
 
-   $console->bind_key( $key, $code )
+   $console->bind_key( $key, $code );
 
 Installs a callback to invoke if the given key is pressed, overwriting any
 previous callback for the same key. The code block is invoked as
 
-   $code->( $console, $key )
+   $code->( $console, $key );
 
 If C<$code> is missing or C<undef>, any existing callback is removed.
 

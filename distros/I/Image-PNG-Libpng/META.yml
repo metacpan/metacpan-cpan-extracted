@@ -1,13 +1,13 @@
 ---
 abstract: 'Perl interface to libpng'
 author:
-  - 'Ben Bullock <bkb@cpan.org>'
+  - 'Ben Bullock <benkasminbullock@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ requires:
 resources:
   bugtracker: https://github.com/benkasminbullock/image-png-libpng/issues
   repository: https://github.com/benkasminbullock/image-png-libpng
-version: '0.57'
+version: '0.58'
 x_contributors:
   - 'Aaron Crane <arc@cpan.org>'
   - 'Greg Kennedy <gregk@cpan.org>'

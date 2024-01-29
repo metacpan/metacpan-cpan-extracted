@@ -52,9 +52,8 @@ sub run {
         $req,
         'totp2fcheck',
         params => {
-            TOKEN         => $token,
-            CHECKLOGINS   => $checkLogins,
-            STAYCONNECTED => $stayConnected
+            TOKEN => $token,
+            $self->get2fTplParams($req),
         }
     );
     $self->logger->debug( $self->prefix . '2f: prepare verification' );

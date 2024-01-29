@@ -4,13 +4,13 @@
       "Dominique Dumont"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dist-Zilla-App-Command-Authordebs",
    "prereqs" : {
@@ -55,7 +55,9 @@
          "web" : "http://github.com/dod38fr/dist-zilla-app-command-authordebs"
       }
    },
-   "version" : "0.003",
-   "x_serialization_backend" : "JSON::XS version 3.03"
+   "version" : "0.005",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "GPL-2.0-only"
 }
 

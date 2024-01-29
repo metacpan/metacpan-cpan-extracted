@@ -122,6 +122,7 @@ foreach my $job (keys %{$config{checkLookup}}) {
 		$logger->info("failed logcheck for '".$job."', sending mail to: '".$mailsendTo);
 		#            sendGeneralMail($From, $To, $Cc, $Bcc, $Subject, $Data, $Type, $Encoding, $AttachType, $AttachFile)
 		EAI::Common::sendGeneralMail("", $mailsendTo,"","","Starting problem detected for $job",$infos,'text/plain');
+		$doneError{$job} = 1;
 	}
 }
 my $jobErrors = "";
@@ -142,7 +143,7 @@ checkLogExist.pl - checks Log-entries at given times
 
 =head1 DESCRIPTION
 
-checkLogExist should be called frequently in a separate job and checks if defined log entries exist in the defined log files, (hinting that the task was run/started), resp. whether the Logfile exists at all.
+checkLogExist is supposed to be called frequently in a separate timed job and checks if defined log entries exist in the defined log files, (hinting that the task was run/started), respectively whether the logfile exists at all. Missing logfiles or missing entries are being notified by e-mail, for multiple runs of checkLogExist already notified log check failures are stored to avoid too much error e-mails.
 
 Configuration is done in sub-hash C<$config{checkLookup}>, being the same place for the errmailaddress/errmailsubject of error mails being sent in the tasks themselves:
 
@@ -201,7 +202,7 @@ hash of environment => delay entries, delay (in minutes) will be added to timeTo
 
 set to 1 if the production and other environments logs for this scriptname are in separate Paths defined by folderEnvironmentMapping (prod=root/Prod, test=root/Test, etc.), set to 0 if the production log is in the root folder and all other environments are below that folder (prod=root, test=root/Test, etc.)
 
-= item splitcharacter
+=item splitcharacter
 
 character being used to separate the log entries of this logfile into columns (date, user, process, message, etc.)
 

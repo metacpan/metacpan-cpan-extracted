@@ -97,11 +97,11 @@
    "provides" : {
       "Database::Async::Engine::PostgreSQL" : {
          "file" : "lib/Database/Async/Engine/PostgreSQL.pm",
-         "version" : "1.003"
+         "version" : "1.004"
       },
       "Database::Async::Engine::PostgreSQL::DDL" : {
          "file" : "lib/Database/Async/Engine/PostgreSQL/DDL.pm",
-         "version" : "1.003"
+         "version" : "1.004"
       }
    },
    "release_status" : "stable",
@@ -116,7 +116,7 @@
          "web" : "https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL"
       }
    },
-   "version" : "1.003",
+   "version" : "1.004",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Torsten Foertsch <torsten@binary.com>",

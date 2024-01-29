@@ -1,9 +1,9 @@
-Neo4j::Error 0.01
+Neo4j::Error 0.02
 
 Common Neo4j exception representations.
 
 More information about this software:
-https://metacpan.org/release/Neo4j-Error
+https://metacpan.org/dist/Neo4j-Error
 
 
 INSTALLATION
@@ -17,7 +17,7 @@ For example:
 If you already have downloaded the distribution, you can alternatively
 point your tool directly at the archive file or the directory:
 
-  cpanm Neo4j-Error-0.01.tar.gz
+  cpanm Neo4j-Error-0.02.tar.gz
 
 You can also install the module manually by following these steps:
 

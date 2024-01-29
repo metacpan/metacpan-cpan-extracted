@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 115 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 119 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CSVUtils.pm',
@@ -53,6 +53,8 @@ my @module_files = (
     'App/CSVUtils/csv_shuf_fields.pm',
     'App/CSVUtils/csv_shuf_rows.pm',
     'App/CSVUtils/csv_sort_fields.pm',
+    'App/CSVUtils/csv_sort_fields_by_example.pm',
+    'App/CSVUtils/csv_sort_fields_by_spec.pm',
     'App/CSVUtils/csv_sort_rows.pm',
     'App/CSVUtils/csv_sorted_fields.pm',
     'App/CSVUtils/csv_sorted_rows.pm',
@@ -109,6 +111,8 @@ my @scripts = (
     'script/csv-shuf-rows',
     'script/csv-sort',
     'script/csv-sort-fields',
+    'script/csv-sort-fields-by-example',
+    'script/csv-sort-fields-by-spec',
     'script/csv-sort-rows',
     'script/csv-sorted',
     'script/csv-sorted-fields',

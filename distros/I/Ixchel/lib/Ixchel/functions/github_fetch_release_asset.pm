@@ -7,7 +7,7 @@ use File::Slurp;
 use Exporter 'import';
 our @EXPORT = qw(github_fetch_release_asset);
 use Ixchel::functions::github_releases;
-use LWP::Simple;
+use LWP::UserAgent ();
 use JSON;
 
 =head1 NAME
@@ -66,8 +66,7 @@ The following are optional.
     - return :: Return the fetched item instead of writing it to a file.
         Default :: 0
 
-If the $ENV variables below are set, they will be used for proxy info,
-but the ones above will take president over that and set the env vars.
+If the $ENV variables below are set, they will be used for proxy info.
 
     $ENV{FTP_PROXY}
     $ENV{HTTP_PROXY}
@@ -131,9 +130,30 @@ sub github_fetch_release_asset {
 				}
 
 				if ($fetch_it) {
-					my $content = get( $asset->{browser_download_url} );
-					if ( !defined($content) ) {
-						die( 'Fetching "' . $asset->{browser_download_url} . '" failed' );
+					my $asset_url = $asset->{browser_download_url};
+					my $content;
+					eval {
+						my $ua = LWP::UserAgent->new( timeout => 10 );
+						if ( defined( $ENV{HTTP_PROXY} ) ) {
+							$ua->proxy( ['http'], $ENV{HTTP_PROXY} );
+						}
+						if ( defined( $ENV{HTTPS_PROXY} ) ) {
+							$ua->proxy( ['https'], $ENV{HTTPS_PROXY} );
+						}
+						if ( defined( $ENV{FTP_PROXY} ) ) {
+							$ua->proxy( ['ftp'], $ENV{FTP_PROXY} );
+						}
+
+						my $response = $ua->get($asset_url);
+
+						if ( $response->is_success ) {
+							$content = $response->decoded_content;
+						} else {
+							die( $response->status_line );
+						}
+					};
+					if ($@) {
+						die( 'Fetching "' . $asset_url . '" failed' ... $@ );
 					}
 
 					if ( $opts{return} ) {

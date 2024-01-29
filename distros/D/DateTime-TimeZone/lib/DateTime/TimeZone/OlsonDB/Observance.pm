@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.60';
+our $VERSION = '2.61';
 
 use DateTime::Duration;
 use DateTime::TimeZone::OlsonDB;
@@ -209,31 +209,7 @@ sub _sorted_rules_for_year {
     # in northern Africa.
     my @final_rules;
     for my $month ( sort { $a <=> $b } keys %rules_by_month ) {
-        my @r = @{ $rules_by_month{$month} };
-        if ( @r == 2 ) {
-            my ($repeating) = grep { !defined $_->max_year() } @r;
-            my ($this_year)
-                = grep { $_->max_year() && $_->max_year() == $year } @r;
-            if ( $repeating && $this_year ) {
-
-                # We used to pick the repeating rule for year 2037 only
-                # because it seemed like that's what zic did in the past. Now
-                # it seems to pick the "this year" rule instead.
-                if ($DateTime::TimeZone::OlsonDB::DEBUG) {
-                    ## no critic (InputOutput::RequireCheckedSyscalls)
-                    print
-                        "Found two rules for the same month, picking the one for this year\n";
-                }
-
-                push @final_rules, $this_year;
-                next;
-            }
-
-            push @final_rules, @r;
-        }
-        else {
-            push @final_rules, @r;
-        }
+        push @final_rules, @{ $rules_by_month{$month} };
     }
 
     return @final_rules;

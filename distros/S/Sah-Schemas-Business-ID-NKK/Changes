@@ -1,0 +1,9 @@
+0.002   2024-01-09  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Rebuild with Dist::Zilla::Plugin::Sah::Schemas 0.033 to add
+          missing dependencies.
+
+
+0.001   2024-01-09  Released-By: PERLANCAR
+
+        - First release.

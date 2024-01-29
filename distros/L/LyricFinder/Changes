@@ -68,3 +68,21 @@ Revision history for LyricFinder
 1.23    2022/09/23
         LyricFinder::Genius - It's Baaaaack!  Remove more spam from end of 
         lyrics text added by Genius, so we had to rejigger our filter.
+1.30    2024/01/25
+        - Added LyricFinder::ChartLyrics to fetch lyrics and album-covers from 
+        api.chartlyrics.com.
+        - Update default user-agent to Firefox 112.0.
+        - LyricFinder::_Class:  Allow http (in addition to https) - needed by 
+        LyricFinder::ChartLyrics.  Also pass the artist and song title 
+        parameters back to _fetch() - also needed by LyricFinder::ChartLyrics.
+1.31    2024/01/26
+        - LyricFinder::ChartLyrics - Polish off a cpl. rough edges.
+1.32    2024/01/27
+        - LyricFinder::Letras - Make work again (discovered during general 
+        testing that Letras was no longer working due to aparent site changes).
+        - LyricFinder::ChartLyrics - Shush an improper error msg. (sites don't 
+        normally "carp" an error msg. for simple "no matching lyrics found").
+        Also add a fix for titles and artist names that contain Perl regex 
+        special characters.
+        - LyricFinder::Genius - Add a note in the docs about potential spam 
+        embedded in lyrics text returned.

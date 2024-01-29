@@ -1,0 +1,56 @@
+---
+abstract: 'mustache template engine'
+author:
+  - 'karupanerura <karupa@cpan.org>'
+build_requires:
+  JSON::PP: '0'
+  Test::Base::Less: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.4005'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-MustacheTemplate
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Text::MustacheTemplate:
+    file: lib/Text/MustacheTemplate.pm
+    version: '0.02'
+  Text::MustacheTemplate::Compiler:
+    file: lib/Text/MustacheTemplate/Compiler.pm
+  Text::MustacheTemplate::Evaluator:
+    file: lib/Text/MustacheTemplate/Evaluator.pm
+  Text::MustacheTemplate::Generator:
+    file: lib/Text/MustacheTemplate/Generator.pm
+  Text::MustacheTemplate::HTML:
+    file: lib/Text/MustacheTemplate/HTML.pm
+  Text::MustacheTemplate::Lexer:
+    file: lib/Text/MustacheTemplate/Lexer.pm
+  Text::MustacheTemplate::Parser:
+    file: lib/Text/MustacheTemplate/Parser.pm
+requires:
+  Exporter: '5.57'
+  HTML::Escape: '0'
+  List::Util: '0'
+  Scalar::Util: '0'
+  perl: '5.022000'
+resources:
+  bugtracker: https://github.com/karupanerura/Text-MustacheTemplate/issues
+  homepage: https://github.com/karupanerura/Text-MustacheTemplate
+  repository: https://github.com/karupanerura/Text-MustacheTemplate.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

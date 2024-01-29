@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Async::Util;
-$Search::Elasticsearch::Async::Util::VERSION = '8.00';
+$Search::Elasticsearch::Async::Util::VERSION = '8.12';
 use Moo;
 use Scalar::Util qw(blessed);
 use Sub::Exporter -setup => { exports => ['thenable'] };
@@ -46,7 +46,7 @@ Search::Elasticsearch::Async::Util - A utility class for internal use by Elastic
 
 =head1 VERSION
 
-version 8.00
+version 8.12
 
 =head1 AUTHOR
 
@@ -54,7 +54,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Elasticsearch BV.
+This software is Copyright (c) 2024 by Elasticsearch BV.
 
 This is free software, licensed under:
 

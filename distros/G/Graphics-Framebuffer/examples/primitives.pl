@@ -15,8 +15,8 @@ use Getopt::Long;
 # use Data::Dumper;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
 
 BEGIN {
-	our $VERSION = '5.00';
-};
+    our $VERSION = '5.00';
+}
 
 our $F;
 
@@ -39,22 +39,22 @@ GetOptions(
     'noaccel'          => \$noaccel,
     'nosplash'         => \$nosplash,
     'delay=i'          => \$delay,
-	'func=s'           => \$show_func,
-	'ignore-x-windows' => \$ignore_x,
-	'small'            => \$small,
+    'func=s'           => \$show_func,
+    'ignore-x-windows' => \$ignore_x,
+    'small'            => \$small,
 );
 
 $noaccel = ($noaccel) ? 1 : 0;    # Only 1 or 0 please
 if ($small) {
-	$new_x = 320;
-	$new_y = 200;
+    $new_x = 320;
+    $new_y = 200;
 }
 
 my $images_path = (-e 'images/4KTest_Pattern.png') ? 'images' : 'examples/images';
 
 my $splash = ($nosplash) ? 0 : 2;
 print "\n\nGathering images...\n";
-$|=1;
+$| = 1;
 opendir(my $DIR, $images_path);
 chomp(my @files = readdir($DIR));
 closedir($DIR);
@@ -77,11 +77,11 @@ my $screen_height = $sinfo->{'height'};
 
 # Everything is based on a 1920x1080 screen, but different resolutions
 # are mathematically scaled.
-my $xm       = $screen_width / 1920;
-my $ym       = $screen_height / 1080;
+my $xm = $screen_width / 1920;
+my $ym = $screen_height / 1080;
 
-my $XX       = $screen_width;
-my $YY       = $screen_height;
+my $XX = $screen_width;
+my $YY = $screen_height;
 
 my $center_x = $F->{'X_CLIP'} + ($F->{'W_CLIP'} / 2);
 my $center_y = $F->{'Y_CLIP'} + ($F->{'H_CLIP'} / 2);
@@ -107,7 +107,7 @@ my $DORKSMILE;
 $benchmark->{'Image Load'} = time;
 foreach my $file (@files) {
     next if ($file =~ /^\.+/ || $file =~ /Test|gif/i || -d "$images_path/$file");
-    print_it($F,"Loading Image > $file", '00FFFFFF', undef, 1);
+    print_it($F, "Loading Image > $file", '00FFFFFF', undef, 1);
     my $image = $F->load_image(
         {
             'x'            => 0,
@@ -125,8 +125,8 @@ foreach my $file (@files) {
         } else {
             push(@IMAGES, $image);
         }
-    }
-}
+    } ## end if (defined($image))
+} ## end foreach my $file (@files)
 
 $benchmark->{'Image Load'} = time - $benchmark->{'Image Load'};
 $F->cls();
@@ -135,16 +135,16 @@ $F->cls();
 my %func = (
     'Color Mapping'                     => sub { color_mapping(shift); },
     'Plotting'                          => sub { plotting(shift); },
-    'Lines'                             => sub { lines(shift,0); },
-    'Angle Lines'                       => sub { angle_lines(shift,0); },
-    'Polygons'                          => sub { polygons(shift,0); },
-    'Antialiased Lines'                 => sub { lines(shift,1); },
-    'Antialiased Angle Lines'           => sub { angle_lines(shift,1); },
-    'Antialiased Polygons'              => sub { polygons(shift,1); },
+    'Lines'                             => sub { lines(shift, 0); },
+    'Angle Lines'                       => sub { angle_lines(shift, 0); },
+    'Polygons'                          => sub { polygons(shift, 0); },
+    'Antialiased Lines'                 => sub { lines(shift, 1); },
+    'Antialiased Angle Lines'           => sub { angle_lines(shift, 1); },
+    'Antialiased Polygons'              => sub { polygons(shift, 1); },
     'Boxes'                             => sub { boxes(shift); },
     'Rounded Boxes'                     => sub { rounded_boxes(shift); },
     'Circles'                           => sub { circles(shift); },
-    'Ellipses'                          => sub {ellipses(shift); },
+    'Ellipses'                          => sub { ellipses(shift); },
     'Arcs'                              => sub { arcs(shift); },
     'Poly Arcs'                         => sub { poly_arcs(shift); },
     'Beziers'                           => sub { beziers(shift); },
@@ -160,18 +160,18 @@ my %func = (
     'Hatch Filled Ellipses'             => sub { hatch_filled_ellipses(shift); },
     'Hatch Filled Pies'                 => sub { hatch_filled_pies(shift); },
     'Hatch Filled Polygons'             => sub { hatch_filled_polygons(shift); },
-    'Vertical Gradient Boxes'           => sub { gradient_boxes(shift,'vertical'); },
-    'Vertical Gradient Rounded Boxes'   => sub { gradient_rounded_boxes(shift,'vertical'); },
-    'Vertical Gradient Circles'         => sub { gradient_circles(shift,'vertical'); },
-    'Vertical Gradient Ellipses'        => sub { gradient_ellipses(shift,'vertical'); },
-    'Vertical Gradient Pies'            => sub { gradient_pies(shift,'vertical'); },
-    'Vertical Gradient Polygons'        => sub { gradient_polygons(shift,'vertical'); },
-    'Horizontal Gradient Boxes'         => sub { gradient_boxes(shift,'horizontal'); },
-    'Horizontal Gradient Rounded Boxes' => sub { gradient_rounded_boxes(shift,'horizontal'); },
-    'Horizontal Gradient Circles'       => sub { gradient_circles(shift,'horizontal'); },
-    'Horizontal Gradient Ellipses'      => sub { gradient_ellipses(shift,'horizontal'); },
-    'Horizontal Gradient Pies'          => sub { gradient_pies(shift,'horizontal'); },
-    'Horizontal Gradient Polygons'      => sub { gradient_polygons(shift,'horizontal'); },
+    'Vertical Gradient Boxes'           => sub { gradient_boxes(shift, 'vertical'); },
+    'Vertical Gradient Rounded Boxes'   => sub { gradient_rounded_boxes(shift, 'vertical'); },
+    'Vertical Gradient Circles'         => sub { gradient_circles(shift, 'vertical'); },
+    'Vertical Gradient Ellipses'        => sub { gradient_ellipses(shift, 'vertical'); },
+    'Vertical Gradient Pies'            => sub { gradient_pies(shift, 'vertical'); },
+    'Vertical Gradient Polygons'        => sub { gradient_polygons(shift, 'vertical'); },
+    'Horizontal Gradient Boxes'         => sub { gradient_boxes(shift, 'horizontal'); },
+    'Horizontal Gradient Rounded Boxes' => sub { gradient_rounded_boxes(shift, 'horizontal'); },
+    'Horizontal Gradient Circles'       => sub { gradient_circles(shift, 'horizontal'); },
+    'Horizontal Gradient Ellipses'      => sub { gradient_ellipses(shift, 'horizontal'); },
+    'Horizontal Gradient Pies'          => sub { gradient_pies(shift, 'horizontal'); },
+    'Horizontal Gradient Polygons'      => sub { gradient_polygons(shift, 'horizontal'); },
     'Texture Filled Boxes'              => sub { texture_filled_boxes(shift); },
     'Texture Filled Rounded Boxes'      => sub { texture_filled_rounded_boxes(shift); },
     'Texture Filled Circles'            => sub { texture_filled_circles(shift); },
@@ -182,8 +182,8 @@ my %func = (
     'TrueType Fonts'                    => sub { truetype_fonts(shift); },
     'TrueType Printing'                 => sub { truetype_printing(shift); },
     'Rotate TrueType Fonts'             => sub { rotate_truetype_fonts(shift); },
-    'Color Replace None-Clipped'        => sub { color_replace(shift,0); },
-    'Color Replace Clipped'             => sub { color_replace(shift,1); },
+    'Color Replace None-Clipped'        => sub { color_replace(shift, 0); },
+    'Color Replace Clipped'             => sub { color_replace(shift, 1); },
     'Blitting'                          => sub { blitting(shift); },
     'Blit Move'                         => sub { blit_move(shift); },
     'Rotate'                            => sub { rotate(shift); },
@@ -204,83 +204,83 @@ my %func = (
 
 my @order;
 if (defined($show_func)) {
-	@order = split(/,/,$show_func);
+    @order = split(/,/, $show_func);
 } else {
-	@order = (
-		'Color Mapping',
-		'Plotting',
-		'Lines',
-		'Angle Lines',
-		'Polygons',
-		'Antialiased Lines',
-		'Antialiased Angle Lines',
-		'Antialiased Polygons',
-		'Boxes',
-		'Rounded Boxes',
-		'Circles',
-		'Ellipses',
-		'Arcs',
-		'Poly Arcs',
-		'Beziers',
-		'Filled Boxes',
-		'Filled Rounded Boxes',
-		'Filled Circles',
-		'Filled Ellipses',
-		'Filled Pies',
-		'Filled Polygons',
-		'Hatch Filled Boxes',
-		'Hatch Filled Rounded Boxes',
-		'Hatch Filled Circles',
-		'Hatch Filled Ellipses',
-		'Hatch Filled Pies',
-		'Hatch Filled Polygons',
-		'Vertical Gradient Boxes',
-		'Vertical Gradient Rounded Boxes',
-		'Vertical Gradient Circles',
-		'Vertical Gradient Ellipses',
-		'Vertical Gradient Pies',
-		'Vertical Gradient Polygons',
-		'Horizontal Gradient Boxes',
-		'Horizontal Gradient Rounded Boxes',
-		'Horizontal Gradient Circles',
-		'Horizontal Gradient Ellipses',
-		'Horizontal Gradient Pies',
-		'Horizontal Gradient Polygons',
-		'Texture Filled Boxes',
-		'Texture Filled Rounded Boxes',
-		'Texture Filled Circles',
-		'Texture Filled Ellipses',
-		'Texture Filled Pies',
-		'Texture Filled Polygons',
-		'Flood Fill',
-		'TrueType Fonts',
-		'TrueType Printing',
-		'Rotate TrueType Fonts',
-		'Color Replace None-Clipped',
-		'Color Replace Clipped',
-		'Blitting',
-		'Blit Move',
-		'Rotate',
-		'Flipping',
-		'Monochrome',
-		'XOR Mode Drawing',
-		'OR Mode Drawing',
-		'AND Mode Drawing',
-		'MASK Mode Drawing',
-		'UNMASK Mode Drawing',
-		'ALPHA Mode Drawing',
-		'ADD Mode Drawing',
-		'SUBTRACT Mode Drawing',
-#       'MULTIPLY Mode Drawing',
-#       'DIVIDE Mode Drawing',
-		'Animated',
-	);
-}
+    @order = (
+        'Color Mapping',
+        'Plotting',
+        'Lines',
+        'Angle Lines',
+        'Polygons',
+        'Antialiased Lines',
+        'Antialiased Angle Lines',
+        'Antialiased Polygons',
+        'Boxes',
+        'Rounded Boxes',
+        'Circles',
+        'Ellipses',
+        'Arcs',
+        'Poly Arcs',
+        'Beziers',
+        'Filled Boxes',
+        'Filled Rounded Boxes',
+        'Filled Circles',
+        'Filled Ellipses',
+        'Filled Pies',
+        'Filled Polygons',
+        'Hatch Filled Boxes',
+        'Hatch Filled Rounded Boxes',
+        'Hatch Filled Circles',
+        'Hatch Filled Ellipses',
+        'Hatch Filled Pies',
+        'Hatch Filled Polygons',
+        'Vertical Gradient Boxes',
+        'Vertical Gradient Rounded Boxes',
+        'Vertical Gradient Circles',
+        'Vertical Gradient Ellipses',
+        'Vertical Gradient Pies',
+        'Vertical Gradient Polygons',
+        'Horizontal Gradient Boxes',
+        'Horizontal Gradient Rounded Boxes',
+        'Horizontal Gradient Circles',
+        'Horizontal Gradient Ellipses',
+        'Horizontal Gradient Pies',
+        'Horizontal Gradient Polygons',
+        'Texture Filled Boxes',
+        'Texture Filled Rounded Boxes',
+        'Texture Filled Circles',
+        'Texture Filled Ellipses',
+        'Texture Filled Pies',
+        'Texture Filled Polygons',
+        'Flood Fill',
+        'TrueType Fonts',
+        'TrueType Printing',
+        'Rotate TrueType Fonts',
+        'Color Replace None-Clipped',
+        'Color Replace Clipped',
+        'Blitting',
+        'Blit Move',
+        'Rotate',
+        'Flipping',
+        'Monochrome',
+        'XOR Mode Drawing',
+        'OR Mode Drawing',
+        'AND Mode Drawing',
+        'MASK Mode Drawing',
+        'UNMASK Mode Drawing',
+        'ALPHA Mode Drawing',
+        'ADD Mode Drawing',
+        'SUBTRACT Mode Drawing',
+        #       'MULTIPLY Mode Drawing',
+        #       'DIVIDE Mode Drawing',
+        'Animated',
+    );
+} ## end else [ if (defined($show_func...))]
 
 foreach my $name (@order) {
-	if (exists($func{$name})) {
-		$func{$name}->($name);
-	}
+    if (exists($func{$name})) {
+        $func{$name}->($name);
+    }
 }
 
 ##################################
@@ -289,21 +289,21 @@ $F->clip_reset();
 $F->attribute_reset();
 $F->text_mode();
 $F->cls('ON');
-
+undef($F);
 foreach my $name (@order) {
     next if ($name =~ /Mode/);
     if ($name =~ /Image Load|Flood/i) {
         print STDOUT sprintf('%-33s = %.02f seconds', $name, $benchmark->{$name}), "\n";
     } elsif ($name eq 'Animated') {
-        print STDOUT sprintf('%-33s = %.02f frames per second', "$name Native", ($benchmark->{"$name Native"} / $delay)), "\n";
+        print STDOUT sprintf('%-33s = %.02f frames per second', "$name Native", ($benchmark->{"$name Native"} / $delay)),         "\n";
         print STDOUT sprintf('%-33s = %.02f frames per second', "$name Fullscreen", ($benchmark->{"$name Fullscreen"} / $delay)), "\n";
     } elsif ($name eq 'Rotate') {
-        print STDOUT sprintf('%-33s = %.02f per second', "Clockwise $name", ($benchmark->{"Clockwise $name"} / $delay)), "\n";
+        print STDOUT sprintf('%-33s = %.02f per second', "Clockwise $name", ($benchmark->{"Clockwise $name"} / $delay)),                 "\n";
         print STDOUT sprintf('%-33s = %.02f per second', "Counter Clockwise $name", ($benchmark->{"Counter Clockwise $name"} / $delay)), "\n";
     } else {
         print STDOUT sprintf('%-33s = %.02f per second', $name, ($benchmark->{$name} / $delay)), "\n";
     }
-}
+} ## end foreach my $name (@order)
 
 print STDOUT "Press [ENTER] to exit...\n";
 <>;
@@ -393,7 +393,7 @@ sub lines {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->line({ 'x' => int(rand($XX)), 'y' => int(rand($YY)), 'xx' => int(rand($XX)), 'yy' => int(rand($YY)), 'antialiased' => $aa, 'pixel_size' => $psize });
         $benchmark->{$name}++;
-    } ## end while (time < $s)
+    }
 } ## end sub lines
 
 sub angle_lines {
@@ -436,7 +436,6 @@ sub filled_boxes {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->box({ 'x' => int(rand($XX)), 'y' => int(rand($YY)), 'xx' => int(rand($XX)), 'yy' => int(rand($YY)), 'filled' => 1 });
 
-        $F->vsync();
         $benchmark->{$name}++;
     } ## end while (time < $s)
 } ## end sub filled_boxes
@@ -1120,7 +1119,7 @@ sub truetype_fonts {
         my $x    = int(rand(600 * $xm));
         my $y    = int(rand(1080 * $ym));
         my $h    = ($YY <= 240 || $F->{'BITS'} == 16) ? (6 + rand(60)) : (8 + int(rand(300 * $ym)));
-        my $ws   = ($XX <= 320 || $F->{'BITS'} == 16) ? rand(2) : rand(4);
+        my $ws   = ($XX <= 320 || $F->{'BITS'} == 16) ? rand(2)        : rand(4);
         my $font = $fonts[int(rand(scalar(@fonts)))];
         my $b    = $F->ttf_print(
             {
@@ -1156,7 +1155,7 @@ sub truetype_printing {
             'y'       => 30,
             'text'    => 'The quick brown fox jumps over the lazy dog.  ' x 400,
             'justify' => 'justified',
-            'size'    => int($YY/75),
+            'size'    => int($YY / 75),
             'color'   => sprintf('%02x%02x%02x%02x', int(rand(256)), int(rand(256)), int(rand(256)), 255),
         }
     );
@@ -1164,10 +1163,10 @@ sub truetype_printing {
     sleep $delay;
     $F->clip_set(
         {
-            'x'       => $XX / 4,
-            'y'       => $YY / 3,
-            'xx'      => (3 * ($XX /4)),
-            'yy'      => (2 * ($YY / 3)),
+            'x'  => $XX / 4,
+            'y'  => $YY / 3,
+            'xx' => (3 * ($XX / 4)),
+            'yy' => (2 * ($YY / 3)),
         }
     );
     $F->ttf_paragraph(
@@ -1176,13 +1175,13 @@ sub truetype_printing {
             'y'       => ($YY / 4) + 30,
             'text'    => 'The quick brown fox jumps over the lazy dog.  ' x 200,
             'justify' => 'justified',
-            'size'    => int($YY/33),
+            'size'    => int($YY / 33),
             'color'   => sprintf('%02x%02x%02x%02x', int(rand(256)), int(rand(256)), int(rand(256)), 255),
         }
     );
     $F->clip_reset();
     sleep $delay;
-}
+} ## end sub truetype_printing
 
 sub rotate_truetype_fonts {
     my $name = shift;
@@ -1194,17 +1193,18 @@ sub rotate_truetype_fonts {
     my $y     = $YY / 2;
     my $h     = ($YY <= 240 || $F->{'BITS'} == 16) ? 12 * $ym : 60 * $ym;
     my $ws    = 1;
+
     while (time < $g) {
         my $b = $F->ttf_print(
             {
-                'x'      => $x,
-                'y'      => $y,
-                'height' => $h,
-                'wscale' => $ws,
-                'color'  => sprintf('%02x%02x%02x%02x', int(rand(256)), int(rand(256)), int(rand(256)), 255),
-                'text'   => "   $angle degrees   ",
-                'rotate' => $angle,
-                'bounding_box' => 1,
+                'x'            => $x,
+                'y'            => $y,
+                'height'       => $h,
+                'wscale'       => $ws,
+                'color'        => sprintf('%02x%02x%02x%02x', int(rand(256)), int(rand(256)), int(rand(256)), 255),
+                'text'         => "   $angle DEGREES   ",
+                'rotate'       => $angle,
+                'bounding_box' => TRUE,
                 'center'       => CENTER_XY,
             }
         );
@@ -1212,7 +1212,7 @@ sub rotate_truetype_fonts {
             $F->ttf_print($b);
         }
         $angle++;
-        $angle = 270 if ($angle >= 360);
+        $angle = 0 if ($angle >= 360);
 
         $benchmark->{$name}++;
     } ## end while (time < $g)
@@ -1223,7 +1223,7 @@ sub flood_fill {
     print_it($F, $name);
     $F->clip_reset();
     $benchmark->{$name} = time;
-    if ($XX > 255) { # && !$rpi) {
+    if ($XX > 255) {    # && !$rpi) {
         my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->polygon({ 'coordinates' => [220 * $xm, 190 * $ym, 1520 * $xm, 80 * $xm, 1160 * $xm, $YY, 960 * $xm, 540 * $ym, 760 * $xm, 780 * $ym] });
@@ -1246,7 +1246,7 @@ sub flood_fill {
 
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->fill({ 'x' => 3, 'y' => 3 });
-    } ## end else [ if ($XX > 255 && !$rpi)]
+    } ## end else [ if ($XX > 255) ]
     $benchmark->{$name} = (time - $benchmark->{$name});
     sleep $delay if ($F->acceleration());
 } ## end sub flood_fill
@@ -1265,15 +1265,15 @@ sub color_replace {
     $F->clip_set({ 'x' => $x, 'y' => $y, 'xx' => $x * 3, 'yy' => $y * 3 }) if ($clipped);
     my $s = time + $delay;
     while (time < $s) {
-        my $pixel = $F->pixel({'x' => $XX / 2, 'y' => $YY / 2});
-        my $r = $pixel->{'red'};
-        my $g = $pixel->{'green'};
-        my $b = $pixel->{'blue'};
-        my $a = $pixel->{'alpha'};
-        my $R = int(rand(256));
-        my $G = int(rand(256));
-        my $B = int(rand(256));
-        my $A = 255;
+        my $pixel = $F->pixel({ 'x' => $XX / 2, 'y' => $YY / 2 });
+        my $r     = $pixel->{'red'};
+        my $g     = $pixel->{'green'};
+        my $b     = $pixel->{'blue'};
+        my $a     = $pixel->{'alpha'};
+        my $R     = int(rand(256));
+        my $G     = int(rand(256));
+        my $B     = int(rand(256));
+        my $A     = 255;
         $F->replace_color(
             {
                 'old' => {
@@ -1299,12 +1299,12 @@ sub blitting {
     my $name = shift;
     print_it($F, $name);
     $benchmark->{$name} = 0;
-    my $s = time + $delay;
+    my $s     = time + $delay;
     my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
     $image = $F->blit_transform(
         {
             'blit_data' => $image,
-            'scale' => {
+            'scale'     => {
                 'x'      => 0,
                 'y'      => 0,
                 'width'  => $XX * .5,
@@ -1331,7 +1331,7 @@ sub blit_move {
     $image = $F->blit_transform(
         {
             'blit_data' => $image,
-            'scale' => {
+            'scale'     => {
                 'x'      => 0,
                 'y'      => 0,
                 'width'  => $XX * .5,
@@ -1345,12 +1345,14 @@ sub blit_move {
     $image->{'y'} = $y;
     $F->blit_write($image);
     my $s = time + $delay;
+
     while (time < $s) {
-        $image = $F->blit_move({ %{$image}, 'x_dest' => abs($x), 'y_dest' => abs($y)});
+        $image = $F->blit_move({ %{$image}, 'x_dest' => abs($x), 'y_dest' => abs($y) });
         $x++;
         $y++;
 
         $benchmark->{$name}++;
+        $F->vsync();
     } ## end while (time < $s)
 } ## end sub blit_move
 
@@ -1362,7 +1364,7 @@ sub rotate {
     $image = $F->blit_transform(
         {
             'blit_data' => $image,
-            'scale' => {
+            'scale'     => {
                 'x'      => 0,
                 'y'      => 0,
                 'width'  => $XX * .5,
@@ -1401,7 +1403,7 @@ sub rotate {
         $angle++;
         $angle = 0 if ($angle >= 360);
         $count++;
-    }
+    } ## end while (time < $s || $count...)
 
     $angle = 0;
     $benchmark->{"Clockwise $name"} = 0;
@@ -1438,7 +1440,7 @@ sub flipping {
     my $name  = shift;
     my $r     = rand(scalar(@IMAGES));
     my $image = $IMAGES[$r];
-    $image->{'image'}          = "$IMAGES[$r]->{'image'}";
+    $image->{'image'} = "$IMAGES[$r]->{'image'}";
     $benchmark->{$name} = 0;
     my $s    = time + $delay * 2;
     my $zoom = time + $delay;
@@ -1461,6 +1463,7 @@ sub flipping {
             } ## end else
 
             $benchmark->{$name}++;
+            $F->vsync();
         } ## end foreach my $dir (qw(normal horizontal vertical both))
     } ## end while (time < $s)
 } ## end sub flipping
@@ -1471,7 +1474,7 @@ sub monochrome {
     $image = $F->blit_transform(
         {
             'blit_data' => $image,
-            'scale' => {
+            'scale'     => {
                 'x'      => 0,
                 'y'      => 0,
                 'width'  => $XX * .5,
@@ -1493,7 +1496,7 @@ sub monochrome {
 
         $benchmark->{$name}++;
     } ## end while (time < $s)
-    sleep  $delay;
+    sleep $delay;
 } ## end sub monochrome
 
 sub animated {
@@ -1629,7 +1632,7 @@ sub mode_drawing {
 
         } ## end if ($mode == XOR_MODE)
         sleep $delay;
-    }
+    } ## end else [ if ($mode == MASK_MODE)]
 } ## end sub mode_drawing
 
 sub alpha_drawing {
@@ -1727,7 +1730,7 @@ sub print_it {
             {
                 'x'            => 5 * $xm,
                 'y'            => max(18, 25 * $ym),
-                'height'       => max(9, 20 * $ym),
+                'height'       => max(9,  20 * $ym),
                 'wscale'       => 1.25,
                 'color'        => $color,
                 'text'         => uc($message),
@@ -1812,6 +1815,14 @@ This tells the module to draw with larger pixels (larger means slower)
 =item B<--noaccel>
 
 Turns off C acceleration.  Uses only the Perl routines.
+
+=item B<--delay>=seconds
+
+Changes the amount of time given to each function
+
+=item B<--func>="function name"
+
+Instead of running all functions, just run one or more (separated by commas)
 
 =back
 

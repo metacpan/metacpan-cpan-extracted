@@ -2,8 +2,8 @@ NAME
     App::ImageMagickUtils - Utilities related to ImageMagick
 
 VERSION
-    This document describes version 0.021 of App::ImageMagickUtils (from
-    Perl distribution App-ImageMagickUtils), released on 2023-06-26.
+    This document describes version 0.022 of App::ImageMagickUtils (from
+    Perl distribution App-ImageMagickUtils), released on 2024-01-15.
 
 DESCRIPTION
     This distribution includes the following CLI utilities related to
@@ -394,7 +394,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022, 2021, 2020 by perlancar
+    This software is copyright (c) 2024, 2023, 2022, 2021, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

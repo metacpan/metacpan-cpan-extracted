@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Cxn::LWP;
-$Search::Elasticsearch::Cxn::LWP::VERSION = '8.00';
+$Search::Elasticsearch::Cxn::LWP::VERSION = '8.12';
 use Moo;
 with 'Search::Elasticsearch::Role::Cxn', 'Search::Elasticsearch::Role::Is_Sync';
 
@@ -112,7 +112,7 @@ Search::Elasticsearch::Cxn::LWP - A Cxn implementation which uses LWP
 
 =head1 VERSION
 
-version 8.00
+version 8.12
 
 =head1 DESCRIPTION
 
@@ -288,7 +288,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Elasticsearch BV.
+This software is Copyright (c) 2024 by Elasticsearch BV.
 
 This is free software, licensed under:
 

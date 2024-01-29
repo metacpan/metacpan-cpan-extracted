@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Device::Chip::DAC75xx 0.15;
+package Device::Chip::DAC75xx 0.16;
 class Device::Chip::DAC75xx
    :isa(Device::Chip);
 

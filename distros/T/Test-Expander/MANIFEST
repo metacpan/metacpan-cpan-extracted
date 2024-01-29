@@ -23,6 +23,7 @@ t/Test/Expander/_set_env.t
 t/Test/Expander/_subtest_conditional.t
 t/Test/Expander/_subtest_selection.t
 t/Test/Expander/_use_imports.t
+t/Test/Expander/bail_on_failure.t
 t/Test/Expander/dies_ok.t
 t/Test/Expander/import.t
 t/Test/Expander/is_deeply.t
@@ -34,6 +35,7 @@ t/Test/Expander/NoCLASS/MyModule.pm
 t/Test/Expander/NoCLASS/NoMETHOD.t
 t/Test/Expander/NoCLASS/NoMETHOD_only.t
 t/Test/Expander/require_ok.t
+t/Test/Expander/restore_failure_handler.t
 t/Test/Expander/throws_ok.t
 t/Test/Expander/use_ok.t
 Test-Expander-2.1.5.tar.gz

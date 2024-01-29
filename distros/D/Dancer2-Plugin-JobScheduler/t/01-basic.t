@@ -17,7 +17,7 @@ my %plugin_config = (
         theschwartz => {
             package    => 'TheSchwartz',
             parameters => {
-                database_handle_callback => 'Database::ManagedHandle->instance->dbh',
+                database_handle_callback => 'Database::ManagedHandle->instance',
                 databases                => [
                     {
                         id     => 'theschwartz_db1',

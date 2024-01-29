@@ -1,5 +1,10 @@
 Revision history for perl module Net::AS2
 
+1.0111 2023-12-19
+
+ [Create dynamic test certificates]
+ - tests failed due to expired hard-coded certs in t directory
+
 1.0110 2019-06-17
 
  [Message-Id and Original-Message-ID]

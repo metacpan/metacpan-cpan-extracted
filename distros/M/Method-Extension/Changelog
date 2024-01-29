@@ -1,0 +1,6 @@
+0.02	Thu Jab 4 11:07:39 CEST 2015
+  - attribute must receive package name instead complete package :: method, no aliases supported at this time
+  - revamp project
+
+0.01	Sat Aug 29 15:07:39 CEST 2015
+  - Initial version

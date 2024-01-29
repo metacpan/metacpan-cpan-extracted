@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v0.11.9
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v1.1.2
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/10/11
+## Modified 2024/01/05
 ## All rights reserved
 ## 
 ## 
@@ -25,7 +25,6 @@ BEGIN
         $VERSION $AUTOLOAD @AVAILABLE_DATABASES $CACHE_DIR $CACHE_QUERIES $CACHE_SIZE 
         $CACHE_TABLE $CONNECT_VIA $CONSTANT_QUERIES_CACHE $DB_ERRSTR @DBH $DRIVER2PACK 
         $ERROR $DEBUG $MOD_PERL $QUERIES_CACHE $USE_BIND $USE_CACHE $PLACEHOLDER_REGEXP
-        $DATATYPES
     );
     use Regexp::Common;
     use Scalar::Util qw( blessed );
@@ -36,7 +35,7 @@ BEGIN
     use POSIX ();
     use Want;
     our $PLACEHOLDER_REGEXP = qr/\b\?\b/;
-    our $VERSION = 'v0.11.9';
+    our $VERSION = 'v1.1.2';
     use Devel::Confess;
 };
 
@@ -69,7 +68,6 @@ mysql  => 'DB::Object::Mysql',
 Pg     => 'DB::Object::Postgres',
 SQLite => 'DB::Object::SQLite',
 };
-our $DATATYPES = {};
 
 sub new
 {
@@ -85,6 +83,7 @@ sub init
     my $self = shift( @_ );
     $self->{cache_connections} = 1;
     $self->{cache_dir} = sys_tmpdir();
+    $self->{cache_table} = 0;
     $self->{driver} = '';
     # Auto-decode json data into perl hash
     $self->{auto_decode_json} = 1;
@@ -291,6 +290,8 @@ sub cache_query_set
     return( $QUERIES_CACHE->{ $name } = $sth );
 }
 
+sub cache_table { return( shift->_set_get_boolean( 'cache_table', @_ ) ); }
+
 sub cache_tables { return( shift->_set_get_object( 'cache_tables', 'DB::Object::Cache::Tables', @_ ) ); }
 
 sub check_driver()
@@ -390,6 +391,7 @@ sub connect
     # Needed to be specified if the user does not want to cache connections
     # Will be used in _dbi_connect()
     $self->{cache_connections} = CORE::delete( $param->{cache_connections} ) if( CORE::exists( $param->{cache_connections} ) );
+    $self->{cache_table} = CORE::delete( $param->{cache_table} ) if( CORE::exists( $param->{cache_table} ) );
     
     # If parameters starting with an upper case are provided, they are DBI database parameters
     #my @dbi_opts = grep( /^[A-Z][a-zA-Z]+/, keys( %$param ) );
@@ -517,9 +519,9 @@ sub copy
     return(1);
 }
 
-sub create_db { return( shift->error( "THe driver has not implemented the create database method create_db." ) ); }
+sub create_db { return( shift->error( "The driver has not implemented the create database method create_db." ) ); }
 
-sub create_table { return( shift->error( "THe driver has not implemented the create table method create_table." ) ); }
+sub create_table { return( shift->error( "The driver has not implemented the create table method create_table." ) ); }
 
 sub data_sources($;\%)
 {
@@ -583,33 +585,42 @@ sub database
 
 sub databases { return( shift->error( "Method databases() is not implemented by driver." ) ); }
 
+sub datatype_dict
+{
+    my $self = shift( @_ );
+    my $class = ( ref( $self ) || $self );
+    no strict 'refs';
+    my $sym = $self->_get_symbol( $class => '$DATATYPES_DICT' );
+    if( !defined( $sym ) )
+    {
+        return( $self->pass_error ) if( $self->error );
+        return( $self->error( "No global variable \$DATATYPES_DICT defined in class $class" ) );
+    }
+    my $dict = $$sym;
+    return( $self->error( "Symbol found for \$DATATYPES_DICT in class $class did not resolve into an expecxted hash reference." ) ) if( ref( $dict ) ne 'HASH' );
+    if( @_ )
+    {
+        return( $dict->{ lc( shift( @_ ) ) } );
+    }
+    return( $dict );
+}
+
 # See also constant_to_datatype()
 sub datatype_to_constant
 {
     my $self = shift( @_ );
-    my $ref = $self->datatypes;
+    my $ref = $self->datatypes || return( $self->pass_error );
     return unless( scalar( @_ ) && defined( $_[0] ) );
-    return( $ref->{ uc( shift( @_ ) ) } );
+    return( $ref->{ lc( shift( @_ ) ) } );
 }
 
+# Returns an hash of SQL constant name to its value
 sub datatypes
 {
     my $self = shift( @_ );
-    unless( scalar( keys( %$DATATYPES ) ) )
-    {
-        my $keys = $DBI::EXPORT_TAGS{sql_types};
-        foreach my $c ( @$keys )
-        {
-            if( $c =~ /^SQL_(\w+)$/ )
-            {
-                my $type = $1;
-                my $code = \&{"DBI::$c"};
-                my $val = $code->();
-                $DATATYPES->{ $type } = $val;
-            }
-        }
-    }
-    return( $DATATYPES );
+    my $dict = $self->datatype_dict || return( $self->pass_error );
+    my $ref = +{ map{ $_ => $dict->{ $_ }->{constant} } keys( %$dict ) };
+    return( $ref );
 }
 
 sub disconnect($)
@@ -877,6 +888,7 @@ sub prepare($;$)
         my $dbh = $dbo->_dbi_connect || return;
         $self->{dbh} = $dbo->{dbh} = $dbh;
     }
+    local $@;
     my $sth = eval
     {
         local( $SIG{__DIE__} )  = sub{ };
@@ -1106,41 +1118,38 @@ sub table
     $self->_load_class( $table_class ) || return( $self->pass_error );
     my $host   = $self->{server} // '';
     my $db     = $self->{database} // '';
-    no strict 'refs';
-    my $cache_table = ${ $base_class . '::CACHE_TABLE' };
-    return( $self->error( "CACHE_TABLE is not set in base class $base_class" ) ) if( !$self->_is_hash( $cache_table ) );
-    $cache_table->{ "${host}:${db}" } = {} if( !CORE::exists( $cache_table->{ "${host}:${db}" } ) );
-    my $tables = $cache_table->{ "${host}:${db}" };
-    # my $tables = {};
-    my $tbl    = $tables->{ $table };
-    if( !$tbl )
+    my $tbl;
+    if( $self->cache_table )
     {
-        # Prepare what we want to share with DB::Object::Tables *before* creating the object
-        # Because, during DB::Object::Tables object initialization, 'dbh' is required
-        my $hash = 
-        {
-        # The database handler must be shared here because during the initiation process
-        dbh => $self->{dbh},
-        dbo => $self,
-        debug => $self->debug,
-        };
-        $tbl = $table_class->new( $table, %$hash ) || return( $self->pass_error( $table_class->error ) );
-        $tbl->reset;
-        # $tbl->_query_object_get_or_create;
-        # $tbl->_reset_query;
-        # TODO: Suspend caching. It creates segfault and I do not have time right now to deal with it. Putting it in the TODO
-        # $tables->{ $table } = $tbl;
+        $tbl = $self->_cache_table(
+            database => $self->database,
+            table => $table,
+        );
+        return( $self->pass_error ) if( !defined( $tbl ) );
+        $tbl->reset if( $tbl );
     }
     else
     {
-        $tbl = $tbl->clone;
-        $tbl->debug( $self->debug );
-        # INFO: Need to set the current dbo because in threaded environment, DBI will raise an error if we share dbh across threads
-        $tbl->database_object( $self );
+        # cache_table is not enabled.
+    }
+    
+    if( !$tbl )
+    {
+        $tbl = $table_class->new( $table, 
+            dbh => $self->{dbh},
+            dbo => $self,
+            debug => $self->debug,
+        ) || return( $self->pass_error( $table_class->error ) );
         $tbl->reset;
+        if( $self->cache_table )
+        {
+            $self->_cache_table(
+                database => $self->database,
+                table => $tbl,
+            ) || return( $self->pass_error );
+        }
     }
     $tbl->no_bind( $self->no_bind );
-    $tbl->{dbo} = $self;
     # We set debug and again here in case it changed since the table object was instantiated
     $tbl->debug( $self->debug );
     return( $tbl );
@@ -1199,8 +1208,7 @@ sub tables
 {
     my $self = shift( @_ );
     my $db   = shift( @_ ) || $self->database;
-    my $opts = {};
-    $opts = pop( @_ ) if( @_ && $self->_is_hash( $_[-1] ) );
+    my $opts = $self->_get_args_as_hash( @_ );
     $db = $opts->{database} if( $opts->{database} );
     my $all = [];
     if( !$opts->{no_cache} && !$opts->{live} )
@@ -1228,16 +1236,13 @@ sub tables
     }
     my @tables = ();
     @tables = map( $_->{name}, @$all ) if( scalar( @$all ) );
-#     return( wantarray() ? () : [] ) if( !@tables );
-#     return( wantarray() ? @tables : \@tables );
     return( \@tables );
 }
 
 sub tables_cache
 {
     my $self = shift( @_ );
-    my $opts = {};
-    $opts    = shift( @_ ) if( @_ && $self->_is_hash( $_[0] ) );
+    my $opts = $self->_get_args_as_hash( @_ );
     my $cache_tables = $self->cache_tables;
     my $cache = $cache_tables->get({
         host => $self->host,
@@ -1345,6 +1350,57 @@ sub _cache_queries
     no strict 'refs';
     my $cachedb = ${"${base_class}\::CACHE_QUERIES"};
     return( $cachedb );
+}
+
+# When the table schema caching is enabled, we store the table field objects in an hash reference
+# database->table => table_object
+sub _cache_table
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $class = ( ref( $self ) || $self );
+    my $sym = $self->_get_symbol( '$TABLE_CACHE' );
+    if( !defined( $sym ) )
+    {
+        return( $self->pass_error ) if( $self->error );
+        return( $self->error( "No variable ${class}::TABLE_CACHE could be found!" ) );
+    }
+    ref( $$sym ) eq 'HASH' or return( $self->error( "Variable ${class}::TABLE_CACHE is not an hash reference." ) );
+    my $cache = $$sym;
+    if( CORE::exists( $opts->{database} ) )
+    {
+        my( $database, $table ) = @$opts{qw( database table )};
+        return( $self->error( "A database name was provided, but is undefined or empty." ) ) if( !defined( $database ) || !CORE::length( $database // '' ) );
+        if( !defined( $cache->{ $database } ) )
+        {
+            $cache->{ $database } = {} if( !CORE::exists( $cache->{ $database } ) || ref( $cache->{ $database } ) ne 'HASH' );
+        }
+        $self->messagec( 6, "There are {green}", scalar( keys( %{$cache->{ $database }} ) ), "{/} eements in hash reference \$cache->\{ $database \}" );
+        return( $cache->{ $database } ) if( !defined( $table ) );
+        if( $self->_is_a( $table => 'DB::Object::Tables' ) )
+        {
+            my $name = $table->name || 
+                return( $self->error( "No table name associated with this table object." ) );
+            my $dbo = $table->database_object;
+            $table->database_object( undef );
+            my $clone = $table->clone;
+            $table->database_object( $dbo );
+            $cache->{ $database }->{ "$name" } = $clone;
+        }
+        elsif( !ref( $table ) || ( ref( $table ) && $self->_can_overload( $table => '""' ) ) )
+        {
+            return( '' ) if( !CORE::exists( $cache->{ $database }->{ "$table" } ) || !defined( $cache->{ $database }->{ "$table" } ) );
+            my $tbl = $cache->{ $database }->{ "$table" };
+            my $clone = $tbl->clone;
+            $clone->database_object( $self );
+            return( $clone );
+        }
+        else
+        {
+            return( $self->error( "I do not understand the value provided for the 'table' option -> ", overload::StrVal( $table ) ) );
+        }
+    }
+    return( $cache // {} );
 }
 
 sub _cache_this
@@ -1485,7 +1541,7 @@ sub _check_default_option
 {
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
-    return( $self->error( "Provided option is not a hash reference." ) ) if( !$self->_is_hash( $opts ) );
+    # return( $self->error( "Provided option is not a hash reference." ) ) if( !$self->_is_hash( $opts ) );
     # This method should be superseded by an inherited class
     return( $opts );
 }
@@ -1518,7 +1574,7 @@ sub _connection_options
     my $param = shift( @_ );
     my @dbi_opts = grep( /^[A-Z][a-zA-Z]+/, keys( %$param ) );
     my $opt = {};
-    $opt = CORE::delete( $param->{opt} ) if( $param->{opt} && $self->_is_hash( $param->{opt} ) );
+    $opt = CORE::delete( $param->{opt} ) if( $param->{opt} && $self->_is_hash( $param->{opt} => 'strict' ) );
     @$opt{ @dbi_opts } = @$param{ @dbi_opts };
     return( $opt );
 }
@@ -1527,7 +1583,7 @@ sub _connection_parameters
 {
     my $self  = shift( @_ );
     my $param = shift( @_ );
-    return( [qw( db login passwd host port driver database server opt uri debug cache_connections unknown_field )] );
+    return( [qw( db login passwd host port driver database server opt uri debug cache_connections cache_dir cache_table unknown_field )] );
 }
 
 sub _connection_params2hash
@@ -1666,7 +1722,7 @@ sub _connection_params2hash
         {
             warn( "Database connection parameter file \"$db_con_file\" was provided, but I encountered the following error while trying to read its json data: $@\n" );
         }
-        $json = {} if( !$self->_is_hash( $json ) );
+        $json = {} if( !$self->_is_hash( $json => 'strict' ) );
         my $ref = {};
         if( exists( $json->{databases} ) )
         {
@@ -1701,6 +1757,8 @@ sub _connection_params2hash
                 $param->{ $k } = $ref->{ $k } if( !length( $param->{ $k } ) && length( $ref->{ $k } ) );
             }
         }
+        $param->{cache_table} = $json->{cache_table} if( CORE::exists( $json->{cache_table} ) );
+        $param->{cache_dir} = $json->{cache_dir} if( CORE::exists( $json->{cache_dir} ) );
     }
     if( CORE::exists( $param->{host} ) && index( $param->{host}, ':' ) != -1 )
     {
@@ -1812,7 +1870,7 @@ sub _encode_json
     my $self = shift( @_ );
     return if( !scalar( @_ ) || ( scalar( @_ ) == 1 && !defined( $_[0] ) ) );
     my $this = shift( @_ );
-    return( $self->error( "Value provided is not a hash reference. I was expecting a hash reference to encode data into json." ) ) if( !$self->_is_hash( $this ) );
+    return( $self->error( "Value provided is not a hash reference. I was expecting a hash reference to encode data into json." ) ) if( !$self->_is_hash( $this => 'strict' ) );
     my $j = JSON->new;
     my $json = eval
     {
@@ -1877,7 +1935,7 @@ sub _param2hash
     my $opts = {};
     if( scalar( @_ ) )
     {
-        if( $self->_is_hash( $_[0] ) )
+        if( $self->_is_hash( $_[0] => 'strict' ) )
         {
             $opts = shift( @_ );
         }
@@ -1912,9 +1970,11 @@ sub _query_object_create
     my $self = shift( @_ );
     my $base = $self->base_class;
     my $query_class = "${base}::Query";
+    $self->messagec( 6, "Loading query class {green}${query_class}{/}" );
     $self->_load_class( $query_class ) ||
         return( $self->error( "Unable to load Query builder module $query_class: ", $self->error->message ) );
     $self->messagec( 5, "Creating new query object with class $query_class for table '{green}", ( $self->isa( 'DB::Object::Tables' ) ? $self->name : '' ), "{/}' and alias {green}", ( $self->isa( 'DB::Object::Tables' ) ? $self->as : '' ), "{/}." );
+    $self->messagec( 6, "Instantiating new object for query class {green}${query_class}{/}" );
     my $o = $query_class->new;
     $o->debug( $self->debug );
     $o->enhance( $self->{enhance} ) if( CORE::length( $self->{enhance} ) );
@@ -2604,7 +2664,7 @@ DB::Object - SQL API
     # Now dump the result to a file
     $login->select->dump( "my_file.txt" );
 
-Using fields objects
+Using L<fields objects|DB::Object::Fields::Field>
 
     $cust->where( $dbh->OR( $cust->fo->email == 'john@example.org', $cust->fo->id == 2 ) );
     my $ref = $cust->select->fetchrow_hashref;
@@ -2650,9 +2710,21 @@ Sometimes, having placeholders in expression makes it difficult to work, so you 
     my $order_ip_sth = $orders_tbl->select( 'id' ) || fail( "An error has occurred while trying to create a select by ip query for table orders: " . $orders_tbl->error );
     # SELECT id FROM orders WHERE ip_addr = inet ? OR inet ? << ip_addr
 
+Be careful though, when using L<fields objects|DB::Object::Fields::Field>, not to do this:
+
+    my $tbl = $dbh->some_table;
+    $tbl->where( $tbl->fo->some_field => '?', $tbl->fo->other_field => '?' );
+    my $sth = $tbl->select || die( $tbl->error );
+
+Because the L<fields objects|DB::Object::Fields::Field> are overloaded, instead do this:
+
+    my $tbl = $dbh->some_table;
+    $tbl->where( $tbl->fo->some_field == '?', $tbl->fo->other_field == '?' );
+    my $sth = $tbl->select || die( $tbl->error );
+
 =head1 VERSION
 
-    v0.11.9
+    v1.1.2
 
 =head1 DESCRIPTION
 
@@ -3106,6 +3178,40 @@ What this does simply is store the statement object in a global C<$QUERIES_CACHE
 
 It returns the statement object cached.
 
+=head2 cache_table
+
+Sets or gets a boolean value whether to cache the table fields object.
+
+When this is enabled, the second time a database table is accessed, it will retrieve its field objects from the cache rather than recreating them after reading the structure from the database. This is much faster.
+
+By default, this is set to false.
+
+This can be specified in the configuration file passed when instantiating a new C<DB::Object> object with the property C<cache_table>
+
+=head2 cache_table_fields
+
+    my $all_dbs = $dbh->cache_table_fields;
+    my $all_tables = $dbh->cache_table_fields( database => $some_database );
+    my $all_fields = $dbh->cache_table_fields(
+        database => $some_database,
+        table => $some_table,
+    );
+    $dbh->cache_table_fields(
+        database => $some_database,
+        table => $some_table,
+        fields => $some_hash_reference,
+    );
+
+Sets or gets the hash reference of database table field name to their L<corresponding object|DB::Object::Fields::Field>.
+
+If no parameter is provided, it will return the entire cache for all databases for a given driver.
+
+If only a database name is provided, it will return the cache hash reference for all the tables in the given database.
+
+If a database and a table name is provided, this will return an hash reference of field name to their L<corresponding object|DB::Object::Fields::Field>.
+
+If a database and a table name and an hash reference of field names to their L<corresponding objects|DB::Object::Fields::Field> is provided, it will set this hash as the cache for the given database and table.
+
 =head2 cache_tables
 
 Sets or gets the L<DB::Object::Cache::Tables> object.
@@ -3201,6 +3307,14 @@ Return the name of the current database.
 This returns the list of available databases.
 
 This is a method that must be implemented by the driver package.
+
+=head2 datatype_dict
+
+Returns an hash reference of each data type with their equivalent C<constant>, regular expression (C<re>), constant C<name> and C<type> name.
+
+Each data type is an hash with the following properties for each type: C<constant>, C<name>, C<re>, C<type>
+
+The data returned is dependent on each driver.
 
 =head2 datatype_to_constant
 
@@ -3447,6 +3561,10 @@ Same as L</prepare> except the query is cached.
 =head2 query
 
 It prepares and executes the given SQL query with the options provided and return L<perlfunc/undef> upon error or the statement handler upon success.
+
+=head2 query_object
+
+Sets or gets the L<query object|DB::Object::Query>.
 
 =head2 quote
 

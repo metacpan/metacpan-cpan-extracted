@@ -4,6 +4,7 @@ use warnings;
 use Test::More;
 
 use Config::INI::RefVars;
+use Config;
 
 #use File::Spec::Functions;
 #
@@ -289,6 +290,9 @@ EOT
   subtest "mixed" => sub {
     my $src = <<'EOT';
 [the section]
+a=omethin
+a:=s$(a)g
+b:=$(b)
 AX=x
 X=$(A$(empty)X)
 Y=y
@@ -309,6 +313,8 @@ EOT
     is_deeply($obj->variables,
               {
                'the section' => {
+                                 'a'                 => 'something',
+                                 'b'                 => '',
                                  'AX'                => 'x',
                                  'X'                 => 'x',
                                  'Y'                 => 'y',
@@ -345,6 +351,23 @@ EOT
   };
 };
 
+
+subtest "ENV and CONFIG" => sub {
+  my $src = <<'EOT';
+     [SEC]
+     the PATH=$(=ENV:PATH)
+     the archlib=$(=CONFIG:archlib)
+EOT
+  my $obj = Config::INI::RefVars->new->parse_ini(src => $src);
+  is_deeply($obj->variables,
+            {
+             'SEC' => {
+                       'the PATH'    => $ENV{PATH},
+                       'the archlib' => $Config{archlib}
+                      }
+            },
+            'variables()');
+};
 
 
 #==================================================================================================

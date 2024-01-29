@@ -1,0 +1,9 @@
+{{$NEXT}}
+
+0.240030 -- Tue Jan 02 23:56:16 PST 2024
+  - Add include_client_errors option
+  - Avoid warning when User-Agent isn't set
+  - Documentation fixes
+
+0.233360 -- Sat Dec 02 11:21:06 PST 2023
+  * Initial Release

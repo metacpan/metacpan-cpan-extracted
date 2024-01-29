@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.046'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.22, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   App::Gimei:
     file: lib/App/Gimei.pm
-    version: v0.2.2
+    version: v0.2.4
   App::Gimei::Generator:
     file: lib/App/Gimei/Generator.pm
   App::Gimei::Parser:
@@ -39,13 +39,14 @@ requires:
   Data::Gimei: '>= v0.4.0, < v0.5.0'
   Getopt::Long: '2.54'
   Pod::Find: '1.66'
+  Pod::Text: '< 5.00'
   Pod::Usage: '2.03'
-  perl: '5.022001'
+  perl: v5.36.0
 resources:
   bugtracker: https://github.com/youpong/App-Gimei/issues
   homepage: https://github.com/youpong/App-Gimei
   repository: https://github.com/youpong/App-Gimei.git
-version: v0.2.2
+version: v0.2.4
 x_authority: cpan:YOUPONG
 x_contributors:
   - 'NAKAJIMA Yusaku <yupong7@gmail.com>'

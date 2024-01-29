@@ -1,5 +1,5 @@
 package JSON::Path;
-$JSON::Path::VERSION = '1.0.3';
+$JSON::Path::VERSION = '1.0.4';
 use strict;
 use warnings;
 
@@ -134,7 +134,7 @@ JSON::Path
 
 =head1 VERSION
 
-version 1.0.3
+version 1.0.4
 
 =head1 SYNOPSIS
 
@@ -366,31 +366,39 @@ L<Data::Hierarchy>... yes, the idea's not especially new. What's different
 is that JSON::Path uses a vaguely standardised syntax with implementations
 in at least three other programming languages.
 
-=head1 AUTHOR
+-head1 AUTHOR
 
-Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
-
-=head1 MAINTAINER
-
-Kit Peters E<lt>popefelix@cpan.orgE<gt>
+Aurelia Peters https://github.com/popefelix
 
 =head1 CONTRIBUTORS
 
-Szymon Nieznański E<lt>s.nez@member.fsf.orgE<gt>
+Toby Inkster https://github.com/tobyink
 
-Kit Peters E<lt>popefelix@cpan.orgE<gt>
+Szymon Nieznański https://github.com/s-nez
 
-Heiko Jansen E<lt>hjansen@cpan.orgE<gt>.
+Heiko Jansen https://github.com/heikojansen
 
-Mitsuhiro Nakamura E<lt>m.nacamura@gmail.comE<gt>
+Mitsuhiro Nakamura https://github.com/mnacamura
 
 David Escribano García https://github.com/DavidEGx
+
+Thomas Helsel https://github.com/thelsel
+
+Patrick Cronin https://github.com/PatrickCronin
+
+James Bowery https://github.com/jabowery
+
+Slaven Rezić https://github.com/eserte
+
+Max Laager https://github.com/mlaagerc2c
 
 =head1 COPYRIGHT AND LICENCE
 
 Copyright 2007 Stefan Goessner.
 
 Copyright 2010-2013 Toby Inkster.
+
+Copyright 2021-2024 Aurelia Peters
 
 This module is tri-licensed. It is available under the X11 (a.k.a. MIT)
 licence; you can also redistribute it and/or modify it under the same
@@ -416,13 +424,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 AUTHOR
 
-Kit Peters <popefelix@gmail.com>
+Aurelia Peters <popefelix@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Kit Peters.
+This software is copyright (c) 2022 by Aurelia Peters.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ln - Package for language Lingala
 
 package Locale::CLDR::Locales::Ln;
 # This file auto generated from Data\common\main\ln.xml
-#	on Tue  5 Dec  1:19:43 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'af' => 'afrikansi',
@@ -109,7 +109,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'Mabelé',
  			'002' => 'Afríka',
@@ -285,8 +285,6 @@ has 'display_name_region' => (
  			'MF' => 'Sántu Martin',
  			'MG' => 'Madagasikari',
  			'MH' => 'Bisanga bya Marishalɛ',
- 			'MK' => 'Masedwanɛ',
- 			'MK@alt=variant' => 'Masedoni (RYYYK)',
  			'ML' => 'Malí',
  			'MM' => 'Birmanie',
  			'MN' => 'Mongolí',
@@ -402,7 +400,7 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'calendar' => 'Manáka',
  			'currency' => 'Mbɔ́ngɔ',
@@ -430,7 +428,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'lokótá {0}',
  			'region' => 'ndámbo na mokili {0}',
@@ -451,7 +449,7 @@ has 'characters' => (
 			auxiliary => qr{[j q x]},
 			index => ['A', 'B', 'C', 'D', 'E', 'Ɛ', 'F', 'G', '{Gb}', 'H', 'I', 'K', 'L', 'M', '{Mb}', '{Mp}', 'N', '{Nd}', '{Ng}', '{Nk}', '{Ns}', '{Nt}', '{Ny}', '{Nz}', 'O', 'Ɔ', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
 			main => qr{[a á â ǎ b c d e é ê ě ɛ {ɛ́} {ɛ̂} {ɛ̌} f g {gb} h i í î ǐ k l m {mb} {mp} n {nd} {ng} {nk} {ns} {nt} {ny} {nz} o ó ô ǒ ɔ {ɔ́} {ɔ̂} {ɔ̌} p r s t u ú v w y z]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -513,61 +511,143 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(sekúlo),
+						'one' => q({0} sekúlo),
+						'other' => q({0} sekúlo),
+					},
+					# Core Unit Identifier
 					'century' => {
 						'name' => q(sekúlo),
 						'one' => q({0} sekúlo),
 						'other' => q({0} sekúlo),
 					},
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(mikɔlɔ),
+						'one' => q({0} mokɔlɔ),
+						'other' => q({0} mikɔlɔ),
+						'per' => q({0}/d),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(mikɔlɔ),
 						'one' => q({0} mokɔlɔ),
 						'other' => q({0} mikɔlɔ),
 						'per' => q({0}/d),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(ngonga),
+						'one' => q({0} ngonga),
+						'other' => q({0} ngonga),
+						'per' => q({0}/h),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(ngonga),
 						'one' => q({0} ngonga),
 						'other' => q({0} ngonga),
 						'per' => q({0}/h),
 					},
+					# Long Unit Identifier
+					'duration-microsecond' => {
+						'name' => q(mikrosekundí),
+						'one' => q({0} mikrosekundí),
+						'other' => q({0} mikrosekundí),
+					},
+					# Core Unit Identifier
 					'microsecond' => {
 						'name' => q(mikrosekundí),
 						'one' => q({0} mikrosekundí),
 						'other' => q({0} mikrosekundí),
 					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(millisekundí),
+						'one' => q({0} millisekundí),
+						'other' => q({0} millisekundí),
+					},
+					# Core Unit Identifier
 					'millisecond' => {
 						'name' => q(millisekundí),
 						'one' => q({0} millisekundí),
 						'other' => q({0} millisekundí),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(minúti),
+						'one' => q({0} monúti),
+						'other' => q({0} minúti),
+						'per' => q({0}/monúti),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(minúti),
 						'one' => q({0} monúti),
 						'other' => q({0} minúti),
 						'per' => q({0}/monúti),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(sánzá),
+						'one' => q({0} sánzá),
+						'other' => q({0} sánzá),
+						'per' => q({0}/sán),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(sánzá),
 						'one' => q({0} sánzá),
 						'other' => q({0} sánzá),
 						'per' => q({0}/sán),
 					},
+					# Long Unit Identifier
+					'duration-nanosecond' => {
+						'name' => q(nanosekundí),
+						'one' => q({0} nanosekundí),
+						'other' => q({0} nanosekundí),
+					},
+					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(nanosekundí),
 						'one' => q({0} nanosekundí),
 						'other' => q({0} nanosekundí),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(sekundí),
+						'one' => q({0} sekundí),
+						'other' => q({0} sekundí),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(sekundí),
 						'one' => q({0} sekundí),
 						'other' => q({0} sekundí),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(mpɔ́sɔ),
+						'one' => q({0} mpɔ́sɔ),
+						'other' => q({0} mpɔ́sɔ),
+						'per' => q({0}/mps),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(mpɔ́sɔ),
 						'one' => q({0} mpɔ́sɔ),
 						'other' => q({0} mpɔ́sɔ),
 						'per' => q({0}/mps),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(mibú),
+						'one' => q({0} mobú),
+						'other' => q({0} mibú),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(mibú),
 						'one' => q({0} mobú),
@@ -575,36 +655,85 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(mokɔlɔ),
+						'one' => q({0} d),
+						'other' => q({0} d),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(mokɔlɔ),
 						'one' => q({0} d),
 						'other' => q({0} d),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(ngonga),
+						'one' => q({0} h),
+						'other' => q({0} h),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(ngonga),
 						'one' => q({0} h),
 						'other' => q({0} h),
 					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(ms),
+						'one' => q({0} ms),
+						'other' => q({0} ms),
+					},
+					# Core Unit Identifier
 					'millisecond' => {
 						'name' => q(ms),
 						'one' => q({0} ms),
 						'other' => q({0} ms),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(min),
+						'one' => q({0} min),
+						'other' => q({0} min),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(min),
 						'one' => q({0} min),
 						'other' => q({0} min),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(sánzá),
+						'one' => q({0} sán),
+						'other' => q({0} sán),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(sánzá),
 						'one' => q({0} sán),
 						'other' => q({0} sán),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(s),
+						'one' => q({0} s),
+						'other' => q({0} s),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(s),
 						'one' => q({0} s),
 						'other' => q({0} s),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(mps),
+						'one' => q({0} mps),
+						'other' => q({0} mps),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(mps),
 						'one' => q({0} mps),
@@ -612,62 +741,143 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(sek),
+						'one' => q({0} sek),
+						'other' => q({0} sek),
+					},
+					# Core Unit Identifier
 					'century' => {
 						'name' => q(sek),
 						'one' => q({0} sek),
 						'other' => q({0} sek),
 					},
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(mikɔlɔ),
+						'one' => q({0} mokɔlɔ),
+						'other' => q({0} mikɔlɔ),
+						'per' => q({0}/d),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(mikɔlɔ),
 						'one' => q({0} mokɔlɔ),
 						'other' => q({0} mikɔlɔ),
 						'per' => q({0}/d),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(ngonga),
+						'one' => q({0} h),
+						'other' => q({0} h),
+						'per' => q({0}/h),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(ngonga),
 						'one' => q({0} h),
 						'other' => q({0} h),
 						'per' => q({0}/h),
 					},
+					# Long Unit Identifier
+					'duration-microsecond' => {
+						'name' => q(μs),
+						'one' => q({0} μs),
+						'other' => q({0} μs),
+					},
+					# Core Unit Identifier
 					'microsecond' => {
 						'name' => q(μs),
 						'one' => q({0} μs),
 						'other' => q({0} μs),
 					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(ms),
+						'one' => q({0} ms),
+						'other' => q({0} ms),
+					},
+					# Core Unit Identifier
 					'millisecond' => {
 						'name' => q(ms),
 						'one' => q({0} ms),
 						'other' => q({0} ms),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(min),
+						'one' => q({0} min),
+						'other' => q({0} min),
+						'per' => q({0}/min),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(min),
 						'one' => q({0} min),
 						'other' => q({0} min),
 						'per' => q({0}/min),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(sánzá),
+						'one' => q({0} sán),
+						'other' => q({0} sán),
+						'per' => q({0}/sán),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(sánzá),
 						'one' => q({0} sán),
 						'other' => q({0} sán),
 						'per' => q({0}/sán),
 					},
+					# Long Unit Identifier
+					'duration-nanosecond' => {
+						'name' => q(ns),
+						'one' => q({0} ns),
+						'other' => q({0} ns),
+					},
+					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(ns),
 						'one' => q({0} ns),
 						'other' => q({0} ns),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(s),
+						'one' => q({0} s),
+						'other' => q({0} s),
+						'per' => q({0}/s),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(s),
 						'one' => q({0} s),
 						'other' => q({0} s),
 						'per' => q({0}/s),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(mpɔ́sɔ),
+						'one' => q({0} mps),
+						'other' => q({0} mps),
+						'per' => q({0}/mps),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(mpɔ́sɔ),
 						'one' => q({0} mps),
 						'other' => q({0} mps),
 						'per' => q({0}/mps),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(mibú),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(mibú),
 					},

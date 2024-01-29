@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2023-09-23'; # DATE
 our $DIST = 'App-BPOMUtils-Table-FoodCategory'; # DIST
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/Table/FoodCategory/bpom_list_food_categories_old",
@@ -21,6 +21,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
     log => 1,
     read_config => 0,
     read_env => 0,
+    use_utf8 => 1,
 );
 
 $cmdline->run;
@@ -40,7 +41,7 @@ bpom-daftar-kategori-pangan-lama - List food categories in BPOM processed food d
 
 =head1 VERSION
 
-This document describes version 0.018 of bpom-daftar-kategori-pangan-lama (from Perl distribution App-BPOMUtils-Table-FoodCategory), released on 2023-09-03.
+This document describes version 0.020 of bpom-daftar-kategori-pangan-lama (from Perl distribution App-BPOMUtils-Table-FoodCategory), released on 2023-09-23.
 
 =head1 SYNOPSIS
 

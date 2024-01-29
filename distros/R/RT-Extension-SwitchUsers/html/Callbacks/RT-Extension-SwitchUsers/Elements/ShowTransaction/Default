@@ -1,0 +1,12 @@
+<%INIT>
+my $real_actor = RT::SwitchedUserRealActor->new($session{CurrentUser});
+$real_actor->LoadByCols( ObjectType => ref $Transaction, ObjectId => $Transaction->Id );
+return unless $real_actor->Id;
+
+$$CreatorObj = $real_actor->CreatorObj;
+</%INIT>
+
+<%ARGS>
+$Transaction
+$CreatorObj
+</%ARGS>

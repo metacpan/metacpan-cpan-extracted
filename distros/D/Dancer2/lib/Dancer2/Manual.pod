@@ -13,7 +13,7 @@ Dancer2::Manual - A gentle introduction to Dancer2
 
 =head1 VERSION
 
-version 1.0.0
+version 1.1.0
 
 =head1 DESCRIPTION
 
@@ -222,6 +222,12 @@ coderef to execute, which returns the response.
 
 The above route specifies that, for GET requests to C</hello/...>, the code
 block provided should be executed.
+
+You can also provide routes with a name:
+
+    get 'hi_to' => '/hello/:name' => sub {...};
+
+See L<Dancer2::Manual::Keywords/uri_for_route> on how this can be used.
 
 =head3 Retrieving request parameters
 

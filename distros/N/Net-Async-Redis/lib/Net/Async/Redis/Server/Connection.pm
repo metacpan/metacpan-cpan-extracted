@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(IO::Async::Notifier);
 
-our $VERSION = '5.001'; # VERSION
+our $VERSION = '6.000'; # VERSION
 
 =head1 NAME
 
@@ -107,23 +107,25 @@ sub on_message {
     $self->{last_command} = $command;
     $self->{last_command_at} = $self->server->time;
     $log->tracef('Database method: %s', $code);
-    (
-        $code
-        ? $code->($db, @data)
-        : Future->done(qq{ERR unknown command '$command'})
-    )->then(sub {
-        my $data = shift;
-        $self->stream->write(
-            $self->protocol->encode($data)
-        )
-    }, sub {
-        my $err = shift;
-        $self->stream->write(
-            $self->protocol->encode(
-                qq{ERR failed to process '$command' - $err}
+    $self->adopt_future(
+        (
+            $code
+            ? $code->($db, @data)
+            : Future->done(qq{ERR unknown command '$command'})
+        )->then(sub {
+            my $data = shift;
+            $self->stream->write(
+                $self->protocol->encode($data)
             )
-        );
-    })->retain;
+        }, sub {
+            my $err = shift;
+            $self->stream->write(
+                $self->protocol->encode(
+                    qq{ERR failed to process '$command' - $err}
+                )
+            );
+        })
+    );
 }
 
 sub db {
@@ -175,5 +177,5 @@ L<Net::Async::Redis/CONTRIBUTORS>.
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2015-2023. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2015-2024. Licensed under the same terms as Perl itself.
 

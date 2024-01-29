@@ -4,7 +4,7 @@
       "Enrico Zimuel <enrico.zimuel@elastic.co>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -33,7 +33,7 @@
             "Promises" : "0",
             "Scalar::Util" : "0",
             "Search::Elasticsearch::Async::Util" : "0",
-            "Search::Elasticsearch::Client::8_0" : "8.00",
+            "Search::Elasticsearch::Client::8_0" : "8.12",
             "Search::Elasticsearch::Client::8_0::Role::API" : "0",
             "Search::Elasticsearch::Client::8_0::Role::Bulk" : "0",
             "Search::Elasticsearch::Client::8_0::Role::Scroll" : "0",
@@ -80,9 +80,9 @@
          "web" : "https://github.com/elastic/elasticsearch-perl"
       }
    },
-   "version" : "8.00",
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "version" : "8.12",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Apache-2.0"
 }
 

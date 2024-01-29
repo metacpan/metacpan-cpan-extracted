@@ -115,7 +115,7 @@ For example:
 
 =head1 DESCRIPTION
 
-This is a placeholder representation class, because sometime, putting a placeholder in complex or even simple sql expression makes it impossible for this API to detect it.
+This is a placeholder representation class, because sometime, putting a placeholder in complex or even simple SQL expression makes it impossible for this API to detect it.
 
 Using this class, you can place placeholder in your query, specify what data type they represent and allow this api to recognise them and benefit from them even.
 

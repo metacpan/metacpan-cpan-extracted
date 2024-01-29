@@ -2,7 +2,7 @@ NAME
     Log::ger::Output::Composite - Composite output
 
 VERSION
-    version 0.017
+    version 0.018
 
 SYNOPSIS
      use Log::ger::Output Composite => (
@@ -52,15 +52,15 @@ DESCRIPTION
 
 CONFIGURATION
   outputs => hash
-    Specify outputs. It's a hash with output name as keys and output
-    specification as values.
+    Hash. Specify outputs. Hash key is output name and and hash value is
+    output specification.
 
     Output name is the name of output module without the
     "Log::ger::Output::" prefix, e.g. Screen or File.
 
     Output specification is either a hashref or arrayref of hashrefs to
     specify multiple outputs per type (e.g. if you want to output to two
-    File's). Known hashref keys:
+    File's). Known hashref keys for output specification:
 
     *   conf => hashref
 
@@ -105,9 +105,9 @@ CONFIGURATION
         applied before the per-output layout.
 
   category_level => hash
-    Specify per-category level. Optional. Hash key is category name, value
-    is level (which can be a string/numeric level or a two-element array
-    containing minimum and maximum level).
+    Hash, optional. Specify per-category level. Hash key is category name,
+    value is level (which can be a string/numeric level or a two-element
+    array containing minimum and maximum level).
 
 FAQS
   Why doesn't re-setting log level using Log::ger::Util::set_level() work?
@@ -126,19 +126,18 @@ FAQS
     highest precedence so all levels settings will use this instead. If
     previously you have:
 
-     Log::ger::Output->set(Composite => {
-         default_level => 'error',
+     Log::ger::Output->set(Composite => (
          outputs => {
-             File => {path=>'/foo', level=>'debug'},
+             File   => {conf=>{path=>'/foo'}, level=>'debug'},
              Screen => {level=>'info', category_level=>{MyApp=>'warn'}},
          },
          category_level => {
              'MyApp::SubModule1' => 'debug',
          },
-     });
+     ));
 
-    then after the "Log::ger::Output::Composite::set_level('trace')", all
-    the above per-category and per-output levels will be set to "trace".
+    then after the Log::ger::Output::Composite::set_level('trace'), all the
+    above per-category and per-output levels will be set to "trace".
 
 ENVIRONMENT
   LOG_LOG_GER_OUTPUT_COMPOSITE_CODE
@@ -149,11 +148,15 @@ ENVIRONMENT
     Bool. If set to true, will print some debugging messages to stderr.
 
 SEE ALSO
+    Log::ger::App as an example on module that uses
+    Log::ger::Output::Composite.
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2024, 2020, 2019, 2017 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Client 0.30;
+package Tangence::Client 0.32;
 
 use v5.26;
 use warnings;
@@ -92,7 +92,7 @@ sub objectproxies { shift->{objectproxies} ||= {} }
 
 =head2 rootobj
 
-   $rootobj = $client->rootobj
+   $rootobj = $client->rootobj;
 
 Returns a L<Tangence::ObjectProxy> to the server's root object
 
@@ -107,7 +107,7 @@ sub rootobj
 
 =head2 registry
 
-   $registry = $client->registry
+   $registry = $client->registry;
 
 Returns a L<Tangence::ObjectProxy> to the server's object registry if one has
 been received, or C<undef> if not.
@@ -128,7 +128,7 @@ sub registry
 
 =head2 get_registry
 
-   $registry = $client->get_registry->get
+   $registry = await $client->get_registry;
 
 Returns a L<Future> that will yield a L<Tangence::ObjectProxy> to the server's
 registry object.
@@ -164,7 +164,7 @@ sub on_error
 
 =head2 tangence_connected
 
-   $client->tangence_connected( %args )
+   $client->tangence_connected( %args );
 
 Once the base connection to the server has been established, this method
 should be called to perform the initial work of requesting the root object and
@@ -184,19 +184,19 @@ to be disabled.
 Optional callback to be invoked once the root object has been returned. It
 will be passed a L<Tangence::ObjectProxy> to the root object.
 
-   $on_root->( $rootobj )
+   $on_root->( $rootobj );
 
 =item on_registry => CODE
 
 Optional callback to be invoked once the registry has been returned. It will
 be passed a L<Tangence::ObjectProxy> to the registry.
 
-   $on_registry->( $registry )
+   $on_registry->( $registry );
 
 Note that in the case that the server does not permit access to the registry
 or an error occurs while requesting it, this is invoked with an empty list.
 
-   $on_registry->()
+   $on_registry->();
 
 =item version_minor_min => INT
 
@@ -353,7 +353,7 @@ These methods are intended for implementation classes to override.
 
 =head2 new_future
 
-   $f = $client->new_future
+   $f = $client->new_future;
 
 Returns a new L<Future> instance for basing asynchronous operations on.
 

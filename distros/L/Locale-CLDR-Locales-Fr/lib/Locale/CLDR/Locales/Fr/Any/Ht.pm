@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Fr::Any::Ht - Package for language French
 
 package Locale::CLDR::Locales::Fr::Any::Ht;
 # This file auto generated from Data\common\main\fr_HT.xml
-#	on Tue  5 Dec  1:11:23 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -30,32 +30,72 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
-					'cubic-centimeter' => {
-						'per' => q({0} pour chaque centimetre cube),
+					# Long Unit Identifier
+					'area-hectare' => {
+						'name' => q(carreau),
+						'one' => q({0}carreau),
+						'other' => q({0}carreaux),
 					},
-					'cubic-meter' => {
-						'per' => q({0} pour chaque metre cube),
-					},
+					# Core Unit Identifier
 					'hectare' => {
 						'name' => q(carreau),
 						'one' => q({0}carreau),
 						'other' => q({0}carreaux),
 					},
+					# Long Unit Identifier
+					'volume-cubic-centimeter' => {
+						'per' => q({0} pour chaque centimetre cube),
+					},
+					# Core Unit Identifier
+					'cubic-centimeter' => {
+						'per' => q({0} pour chaque centimetre cube),
+					},
+					# Long Unit Identifier
+					'volume-cubic-meter' => {
+						'per' => q({0} pour chaque metre cube),
+					},
+					# Core Unit Identifier
+					'cubic-meter' => {
+						'per' => q({0} pour chaque metre cube),
+					},
 				},
 				'narrow' => {
+					# Long Unit Identifier
+					'mass-gram' => {
+						'name' => q(gr.),
+					},
+					# Core Unit Identifier
 					'gram' => {
 						'name' => q(gr.),
 					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(sec),
+					},
+					# Core Unit Identifier
+					'century' => {
+						'name' => q(sec),
+					},
+					# Long Unit Identifier
+					'mass-carat' => {
+						'name' => q(kr),
+						'one' => q({0}kr),
+						'other' => q({0}kr),
+					},
+					# Core Unit Identifier
 					'carat' => {
 						'name' => q(kr),
 						'one' => q({0}kr),
 						'other' => q({0}kr),
 					},
-					'century' => {
-						'name' => q(sec),
+					# Long Unit Identifier
+					'mass-gram' => {
+						'one' => q({0}gr),
+						'other' => q({0}gr),
 					},
+					# Core Unit Identifier
 					'gram' => {
 						'one' => q({0}gr),
 						'other' => q({0}gr),
@@ -116,8 +156,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'day_periods' => (

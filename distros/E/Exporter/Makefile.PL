@@ -11,8 +11,8 @@ WriteMakefile(
     PREREQ_PM => {
         'Carp' => '1.05',
     },
-    ( $] >= 5.005           ? ( ABSTRACT_FROM => 'lib/Exporter.pm' ) : () ),
-    ( $EUMM_VERSION >= 6.31 ? ( LICENSE       => 'perl' )            : () ),
+    ABSTRACT_FROM => 'lib/Exporter.pm',
+    ( $EUMM_VERSION >= 6.31 ? ( LICENSE => 'perl_5' ) : () ),
     dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     META_MERGE => {
         recommends => {

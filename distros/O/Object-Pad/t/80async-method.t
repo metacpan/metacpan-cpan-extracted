@@ -80,7 +80,7 @@ BEGIN {
    my $waitf;
 
    role Role { async method m { await $waitf = Future->new } }
-   class Class :does(Role) {}
+   class Class { apply Role; }
 
    my $obj = Class->new;
 

@@ -1,20 +1,22 @@
 {
-   "abstract" : "run a subprocess with input/ouput redirection",
+   "abstract" : "run a subprocess with input/output redirection",
    "author" : [
       "Barrie Slaymaker <barries@slaysys.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.92, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "IPC-Run3",
    "no_index" : {
       "directory" : [
+         "t",
+         "inc",
          "lib/IPC/Run3"
       ],
       "file" : [
@@ -45,5 +47,6 @@
          "url" : "http://github.com/rjbs/IPC-Run3/"
       }
    },
-   "version" : "0.048"
+   "version" : "0.049",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

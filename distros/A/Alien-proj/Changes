@@ -1,5 +1,9 @@
 Revision history for Alien::proj
 
+1.27 2023-09025
+    - Share builds: fix linking of system libtiff,
+      probably caused by a CMake change in Proj.
+
 1.26 2023-09025
     - Share builds: add bin dirs to PATH on Windows
 

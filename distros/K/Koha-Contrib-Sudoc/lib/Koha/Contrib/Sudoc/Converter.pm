@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Converter;
 # ABSTRACT: Classe de base pour convertir les notices
-$Koha::Contrib::Sudoc::Converter::VERSION = '2.40';
+$Koha::Contrib::Sudoc::Converter::VERSION = '2.43';
 use Moose;
 use utf8;
 use Modern::Perl;
@@ -222,7 +222,7 @@ Koha::Contrib::Sudoc::Converter - Classe de base pour convertir les notices
 
 =head1 VERSION
 
-version 2.40
+version 2.43
 
 =head1 DESCRIPTION
 
@@ -337,7 +337,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Fréderic Demians.
+This software is Copyright (c) 2024 by Fréderic Demians.
 
 This is free software, licensed under:
 

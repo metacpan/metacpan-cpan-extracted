@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Binding::POST;
-our $VERSION = '0.74'; # VERSION
+our $VERSION = '0.76'; # VERSION
 
 use Moose;
 use Carp qw(croak);
@@ -18,7 +18,6 @@ use URI::Escape;
 with 'Net::SAML2::Role::VerifyXML';
 
 
-has 'cert_text' => (isa => 'Str', is => 'ro');
 has 'cacert' => (isa => 'Maybe[Str]', is => 'ro');
 
 has 'cert' => (isa => 'Str', is => 'ro', required => 0, predicate => 'has_cert');
@@ -34,9 +33,6 @@ sub handle_response {
     $self->verify_xml(
         $xml,
         no_xml_declaration => 1,
-        $self->cert_text ? (
-            cert_text => $self->cert_text
-        ) : (),
         $self->cacert ? (
             cacert => $self->cacert
         ) : (),
@@ -100,7 +96,7 @@ Net::SAML2::Binding::POST - HTTP POST binding for SAML
 
 =head1 VERSION
 
-version 0.74
+version 0.76
 
 =head1 SYNOPSIS
 
@@ -158,7 +154,7 @@ Timothy Legge <timlegge@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Venda Ltd, see the CONTRIBUTORS file for others.
+This software is copyright (c) 2024 by Venda Ltd, see the CONTRIBUTORS file for others.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

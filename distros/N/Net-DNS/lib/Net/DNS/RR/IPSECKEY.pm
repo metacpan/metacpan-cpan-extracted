@@ -2,7 +2,7 @@ package Net::DNS::RR::IPSECKEY;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: IPSECKEY.pm 1909 2023-03-23 11:36:16Z willem $)[2];
+our $VERSION = (qw$Id: IPSECKEY.pm 1957 2024-01-10 14:54:10Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -32,7 +32,7 @@ my %wireformat = (
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my ( $self, $data, $offset ) = @_;
+	my ( $self, $data, $offset, @opaque ) = @_;
 
 	my $limit = $offset + $self->{rdlength};
 
@@ -41,7 +41,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 
 	my $gatetype = $self->{gatetype};
 	if ( not $gatetype ) {
-		$self->{gateway} = undef;			# no gateway
+		delete $self->{gateway};			# no gateway
 
 	} elsif ( $gatetype == 1 ) {
 		$self->{gateway} = unpack "\@$offset a4", $$data;
@@ -53,7 +53,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 
 	} elsif ( $gatetype == 3 ) {
 		my $name;
-		( $name, $offset ) = Net::DNS::DomainName->decode( $data, $offset );
+		( $name, $offset ) = Net::DNS::DomainName->decode( $data, $offset, @opaque );
 		$self->{gateway} = $name->encode;
 
 	} else {
@@ -69,7 +69,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
 	my $gatetype   = $self->gatetype;
-	my $gateway    = $self->{gateway};
+	my $gateway    = $self->{gateway} || '';
 	my $precedence = $self->precedence;
 	my $algorithm  = $self->algorithm;
 	my $keybin     = $self->keybin;
@@ -123,7 +123,7 @@ sub gateway {
 	for (@value) {
 		/^\.*$/ && do {
 			$self->{gatetype} = 0;
-			$self->{gateway}  = '';			# no gateway
+			delete $self->{gateway};		# no gateway
 			last;
 		};
 		/:.*:/ && do {

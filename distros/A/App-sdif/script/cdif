@@ -200,15 +200,18 @@ my $color_handler = Getopt::EX::Colormap
     ->new(HASH => \%colormap)
     ->load_params(@{$app->colormap});
 
-map  { $colormap{$_} = "" }
-map  { splice @$_, 1 }
-grep { not $_->[0] }
-(
-    [ $app->unknowncolor => 'UNKNOWN' ],
-    [ $app->commandcolor => 'COMMAND' ],
-    [ $app->markcolor    =>  grep /MARK$/, keys %colormap ],
-    [ $app->textcolor    =>  grep /TEXT$/, keys %colormap ],
-);
+for (
+    [ $app->unknowncolor => q/UNKNOWN/ ],
+    [ $app->commandcolor => q/COMMAND/ ],
+    [ $app->markcolor    => q/MARK/ ],
+    [ $app->textcolor    => q/TEXT/ ],
+) {
+    my($color, $label) = @$_;
+    $color and next;
+    for (grep /$label/, keys %colormap) {
+	$colormap{$_} = '';
+    }
+}
 
 warn 'colormap = ', Dumper \%colormap if $debug{c};
 
@@ -893,7 +896,7 @@ cdif - word context diff
 
 =head1 VERSION
 
-Version 4.29
+Version 4.30
 
 =head1 SYNOPSIS
 
@@ -917,10 +920,10 @@ Options:
 	--sdif              sdif friendly option
 	--[no]color         color or not            (default true)
 	--[no]256           ANSI 256 color mode     (default true)
-	--[no]commandcolor  color for command line  (default true)
-	--[no]markcolor     color for diff mark     (default true)
-	--[no]textcolor     color for normal text   (default true)
-	--[no]unknowncolor  color for unknown text  (default true)
+	--[no]cc            color command line      (default true)
+	--[no]mc            color diff mark         (default true)
+	--[no]tc            color normal text       (default true)
+	--[no]uc            color unknown text      (default true)
 	--[no]old	    print old text          (default true)
 	--[no]new	    print new text          (default true)
 	--[no]mrg	    print merged text       (default true)
@@ -943,8 +946,10 @@ by default).  If you want to compare text character-by-character, use
 option B<--unit=char>.  Option B<--unit=mecab> tells to use external
 B<mecab> command as a tokenizer for Japanese text.
 
-If single or no file is specified, cdif reads that file or STDIN as an
-output from diff command.
+If single or no file is specified, B<cdif> reads that file or STDIN as
+an output from diff command.  In addition to normal diff, context
+diff, and unified (combined) diff, the L<git(1)>-compatible conflict
+marker format is supported as input format.
 
 Lines those don't look like diff output are simply ignored and
 printed.
@@ -1181,13 +1186,13 @@ Next option produces L<wdiff>-like formatted output.
 
 See L<Getopt::EX::Colormap/FUNCTION SPEC> for detail.
 
-=item B<-->[B<no->]B<commandcolor>, B<-->[B<no->]B<cc>
+=item B<-->[B<no->]B<cc>, B<-->[B<no->]B<commandcolor>
 
-=item B<-->[B<no->]B<markcolor>, B<-->[B<no->]B<mc>
+=item B<-->[B<no->]B<mc>, B<-->[B<no->]B<markcolor>
 
-=item B<-->[B<no->]B<textcolor>, B<-->[B<no->]B<tc>
+=item B<-->[B<no->]B<tc>, B<-->[B<no->]B<textcolor>
 
-=item B<-->[B<no->]B<unknowncolor>, B<-->[B<no->]B<uc>
+=item B<-->[B<no->]B<uc>, B<-->[B<no->]B<unknowncolor>
 
 Enable/Disable using color for the corresponding field.
 
@@ -1331,7 +1336,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 1992-2023 Kazumasa Utashiro
+Copyright 1992-2024 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,7 +1,9 @@
 package Liveman::Append;
 use common::sense;
 
+use File::Spec qw//;
 use File::Slurper qw/read_text write_text/;
+use File::Find::Wanted qw/find_wanted/;
 use Term::ANSIColor qw/colored/;
 use Text::Trim qw/trim/;
 
@@ -15,7 +17,11 @@ sub new {
 
 # Пакет из пути
 sub _pkg($) {
-    ( shift =~ s!^lib/(.*)\.\w+$!$1!r ) =~ s!/!::!gr
+    my ($pkg) = @_;
+    my @pkg = File::Spec->splitdir($pkg);
+    shift @pkg; # Удаляем lib/
+    $pkg[$#pkg] =~ s!\.\w+$!!; # Удаляем расширение
+    join "::", @pkg
 }
 
 # Переменная из пакета
@@ -64,11 +70,10 @@ ${var}->$has\t# -> .5
 END
 }
 
-
 # Добавить разделы функций в *.md из *.pm
 sub appends {
     my ($self) = @_;
-    my $files = $self->{files} // [split /\n/, `find lib -name '*.pm' -a -type f`];
+    my $files = $self->{files} // [ find_wanted(sub { /\.pm$/ && -f }, "lib") ];
     $self->append($_) for @$files;
     $self
 }

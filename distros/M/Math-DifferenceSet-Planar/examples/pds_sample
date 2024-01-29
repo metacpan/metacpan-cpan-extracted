@@ -9,11 +9,13 @@ use constant PDS => Math::DifferenceSet::Planar::;
 
 $| = 1;
 
-my $USAGE = "usage: pds_sample [-s|-l|-g|-z|-r] [-D database] (p n|order)\n";
+my $USAGE =
+    "usage: pds_sample [-s|-l|-g|-z|-r] [-nnn] [-D database] (p n|order)\n";
 
 my $type = 'new';
 my $db   = undef;
 my $rand = 0;
+my $mult = 1;
 while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
     my $opt = $1;
     shift @ARGV;
@@ -23,6 +25,7 @@ while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
     $type = 'new', $rand = 1, next if 'r' eq $opt;
     $db   = shift(@ARGV),     next if 'D' eq $opt && @ARGV;
     $db   = $1,               next if $opt =~ /^D(.+)s/;
+    $mult = $opt,             next if $opt =~ /^[1-9][0-9]*\z/;
     die $USAGE;
 }
 $rand &&= $type eq 'new';
@@ -41,17 +44,20 @@ if (!defined $s) {
     $type =~ tr/_/ /;
     die "$order: no $type set of this order available\n";
 }
-if ($rand) {
-    my $modulus = $s->modulus;
-    my $factor  = 1 + urandomm($modulus - 1);
-    while (gcd($factor, $modulus) != 1) {
-        $factor = 1 + urandomm($modulus - 1);
+
+foreach my $i (1..$mult) {
+    if ($rand) {
+        my $modulus = $s->modulus;
+        my $factor  = 1 + urandomm($modulus - 1);
+        while (gcd($factor, $modulus) != 1) {
+            $factor = 1 + urandomm($modulus - 1);
+        }
+        my $delta = urandomm($modulus);
+        $s = $s->multiply($factor)->translate($delta);
     }
-    my $delta = urandomm($modulus);
-    $s = $s->multiply($factor)->translate($delta);
+    my @e = $s->elements_sorted;
+    print "@e\n";
 }
-my @e = $s->elements_sorted;
-print "@e\n";
 
 __END__
 
@@ -61,17 +67,21 @@ pds_sample - print a planar difference set sample of a given order
 
 =head1 SYNOPSIS
 
-  pds_sample [-s|-l|-g|-z|-r] [-D database] p n
-  pds_sample [-s|-l|-g|-z|-r] [-D database] order
+  pds_sample [-s|-l|-g|-z|-r] [-nnn] [-D database] p n
+  pds_sample [-s|-l|-g|-z|-r] [-nnn] [-D database] order
 
 =head1 DESCRIPTION
 
-This example program writes one planar difference set of a given type and
-order to standard output.  The order can be specified as a prime number
-and an exponent, or as a prime power.  The output will be a line with
-one representative difference set of the given order.  If the order is
-not a prime power or exceeds an implementation specific size restriction,
-the program fails with an error message.
+This example program writes one or more planar difference sets of a
+given type and order to standard output.  The order can be specified
+as a prime number and an exponent, or as a prime power.  The output
+will be lines with representative difference sets of the given order.
+If the order is not a prime power or exceeds an implementation specific
+size restriction, the program fails with an error message.
+
+An option in the form of a negative integer means that multiple sets
+are generated, as many as the absolute value of the integer.  This of
+course only makes sense for random samples.
 
 Option C<-s> chooses the standard reference set.
 
@@ -85,6 +95,15 @@ Currently, the standard reference set is the same set.
 Option C<-r> chooses a random set.
 
 Parameter C<-D> specifies an alternate sample database.
+
+=head1 BUGS AND LIMITATIONS
+
+When generating random sets, the randomness of the first result depends on
+the amount of entropy available on the platform the tool is running on.
+Additional results are distributed uniformly over the solution domain
+using a pseudo random number generator.  It is sufficiently deep to
+cover the whole domain but may exhibit subtle regularities due to its
+deterministic nature.
 
 =head1 AUTHOR
 

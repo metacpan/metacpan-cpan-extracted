@@ -5,7 +5,7 @@
 # Attribution is requested but is not required.
 #
 # PLEASE NOTE that the above applies to THIS FILE ONLY.  Other files in the
-# same distribution or other collection may have more restrictive terms.
+# same distribution or in other collections may have more restrictive terms.
 
 # Common setup stuff, not specifically for test cases.
 # This file is intended to be identical in all my module distributions.

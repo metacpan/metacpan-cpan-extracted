@@ -19,11 +19,11 @@ Lilith - Work with Suricata/Sagan EVE logs and PostgreSQL.
 
 =head1 VERSION
 
-Version 0.5.0
+Version 0.6.0
 
 =cut
 
-our $VERSION = '0.5.0';
+our $VERSION = '0.6.0';
 
 =head1 SYNOPSIS
 
@@ -92,6 +92,9 @@ The args taken by this are as below.
     - suricata :: Name of the table for Suricata alerts.
       Default :: suricata_alerts
 
+    - cape :: Name of the table for CAPEv2 alerts.
+      Default :: cape_alerts
+
     - user :: Name for use with DBI for the DB connection.
       Default :: lilith
 
@@ -143,6 +146,10 @@ sub new {
 		$opts{suricata} = 'suricata_alerts';
 	}
 
+	if ( !defined( $opts{cape} ) ) {
+		$opts{cape} = 'cape_alerts';
+	}
+
 	if ( !defined( $opts{sid_ignore} ) ) {
 		my @empty_array;
 		$opts{sid_ignore} = \@empty_array;
@@ -185,6 +192,7 @@ sub new {
 		pass                  => $opts{pass},
 		sagan                 => $opts{sagan},
 		suricata              => $opts{suricata},
+		cape                  => $opts{cape},
 		debug                 => $opts{debug},
 		class_map             => {
 			'Not Suspicious Traffic'                                      => '!SusT',
@@ -261,10 +269,10 @@ sub new {
 		$self->{snmp_class_map}{$lc_key}                            = $self->{class_map}{$key};
 		$self->{snmp_class_map}{$lc_key} =~ s/^\!/not\_/;
 		$self->{snmp_class_map}{$lc_key} =~ s/\ /\_/;
-	}
+	} ## end foreach my $key (@keys)
 
 	return $self;
-}
+} ## end sub new
 
 =head2 run
 
@@ -287,7 +295,7 @@ Start processing. This method is not expected to return.
 One argument named 'files' is taken and it is hash of
 hashes. The keys are below.
 
-    - type :: Either 'suricata' or 'sagan', depending
+    - type :: Either 'suricata', 'sagan', or 'cape', depending
               on the type it is.
 
     - eve :: Path to the EVE file to read.
@@ -320,6 +328,8 @@ sub run {
 
 		if ( !defined( $item->{type} ) ) {
 			die( 'No type specified for ' . $item->{instance} );
+		} elsif ( $item->{type} ne 'suricata' && $item->{type} ne 'sagan' && $item->{type} ne 'cape' ) {
+			die( 'Type, ' . $item->{type} . ', for instance ' . $item->{instance} . ' is not a known type' );
 		}
 
 		if ( !defined( $item->{eve} ) ) {
@@ -387,7 +397,7 @@ sub run {
 									$json->{alert}{signature_id}, $json->{alert}{rev},
 									$_[ARG0]
 								);
-							}
+							} ## end if ( $_[HEAP]{type} eq 'suricata' )
 
 							#handle if sagan
 							elsif ( $_[HEAP]{type} eq 'sagan' ) {
@@ -412,15 +422,140 @@ sub run {
 									$json->{alert}{signature_id}, $json->{alert}{rev},
 									$_[ARG0],
 								);
-							}
-						}
+							} elsif ( $_[HEAP]{type} eq 'cape' ) {
+								my $sth
+									= $dbh->prepare( 'insert into '
+										. $self->{cape}
+										. ' ( instance, target, instance_host, task, start, stop, malscore, subbed_from_ip, subbed_from_host, pkg, md5, sha1, sha256, slug, url, url_hostname, proto, src_ip, src_port, dest_ip, dest_port, size, raw ) '
+										. ' VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );'
+									);
+
+								my $url;
+								if ( defined( $json->{http} ) && defined( $json->{http}{url} ) ) {
+									$url = $json->{http}{url};
+								}
+
+								my $url_hostname;
+								if ( defined( $json->{http} ) && defined( $json->{http}{hostname} ) ) {
+									$url_hostname = $json->{http}{hostname};
+								}
+
+								my $proto;
+								if ( defined( $json->{proto} ) ) {
+									$proto = $json->{proto};
+								}
+
+								my $src_ip;
+								if ( defined( $json->{src_ip} ) ) {
+									$src_ip = $json->{src_ip};
+								}
+
+								my $src_port;
+								if ( defined( $json->{src_port} ) ) {
+									$src_port = $json->{src_port};
+								}
+
+								my $dest_ip;
+								if ( defined( $json->{dest_ip} ) ) {
+									$dest_ip = $json->{dest_ip};
+								}
+
+								my $dest_port;
+								if ( defined( $json->{dest_port} ) ) {
+									$dest_port = $json->{dest_port};
+								}
+
+								my $size;
+								if ( defined( $json->{cape_submit} ) && defined( $json->{cape_submit}{size} ) ) {
+									$size = $json->{cape_submit}{size};
+								} elsif ( defined( $json->{fileinfo} ) && defined( $json->{fileinfo}{size} ) ) {
+									$size = $json->{fileinfo}{size};
+								}
+
+								# figure out what to use for the target
+								my $target;
+								if ( defined( $json->{cape_submit} ) && defined( $json->{cape_submit}{name} ) ) {
+									$target = $json->{cape_submit}{name};
+								} elsif ( defined( $json->{suricata_extract_submit} )
+									&& defined( $json->{suricata_extract_submit}{name} ) )
+								{
+									$target = $json->{suricata_extract_submit}{name};
+								} else {
+									$target = $json->{row}{target};
+								}
+
+								my $subbed_from_ip;
+								if ( defined( $json->{cape_submit} ) && defined( $json->{cape_submit}{remote_ip} ) )
+								{
+									$subbed_from_ip = $json->{cape_submit}{remote_ip};
+								}
+
+								my $subbed_from_host;
+								if (   defined( $json->{suricata_extract_submit} )
+									&& defined( $json->{suricata_extract_submit}{host} ) )
+								{
+									$subbed_from_host = $json->{suricata_extract_submit}{host};
+								}
+
+								my $md5;
+								if ( defined( $json->{cape_submit} ) && defined( $json->{cape_submit}{md5} ) ) {
+									$md5 = $json->{cape_submit}{md5};
+								} elsif ( defined( $json->{suricata_extract_submit} )
+									&& defined( $json->{suricata_extract_submit}{md5} ) )
+								{
+									$md5 = $json->{suricata_extract_submit}{md5};
+								}
+
+								my $sha1;
+								if ( defined( $json->{cape_submit} ) && defined( $json->{cape_submit}{sha1} ) ) {
+									$sha1 = $json->{cape_submit}{sha1};
+								} elsif ( defined( $json->{suricata_extract_submit} )
+									&& defined( $json->{suricata_extract_submit}{sha1} ) )
+								{
+									$sha1 = $json->{suricata_extract_submit}{sha1};
+								}
+
+								my $sha256;
+								if ( defined( $json->{cape_submit} ) && defined( $json->{cape_submit}{sha256} ) ) {
+									$sha256 = $json->{cape_submit}{sha256};
+								} elsif ( defined( $json->{suricata_extract_submit} )
+									&& defined( $json->{suricata_extract_submit}{sha256} ) )
+								{
+									$sha256 = $json->{suricata_extract_submit}{sha256};
+								}
+
+								my $slug;
+								if ( defined( $json->{suricata_extract_submit}{slug} ) ) {
+									$slug = $json->{suricata_extract_submit}{slug};
+								} elsif ( defined( $json->{cape_submit} ) && defined( $json->{cape_submit}{slug} ) )
+								{
+									$slug = $json->{cape_submit}{slug};
+								}
+
+								$target =~ s/^.*\///g;
+								$sth->execute(
+									$_[HEAP]{instance},       $target,
+									$_[HEAP]{host},           $json->{row}{id},
+									$json->{row}{started_on}, $json->{row}{completed_on},
+									$json->{malscore},        $subbed_from_ip,
+									$subbed_from_host,        $json->{row}{package},
+									$md5,                     $sha1,
+									$sha256,                  $slug,
+									$url,                     $url_hostname,
+									$proto,                   $src_ip,
+									$src_port,                $dest_ip,
+									$dest_port,               $size,
+									$_[ARG0],
+								);
+							} ## end elsif ( $_[HEAP]{type} eq 'cape' )
+						} ## end if ( defined($json) && defined( $json->{event_type...}))
 						if ($@) {
 							warn( 'SQL INSERT issue... ' . $@ );
 							openlog( 'lilith', undef, 'daemon' );
 							syslog( 'LOG_ERR', 'SQL INSERT issue... ' . $@ );
 							closelog;
 						}
-					}
+					} ## end eval
 
 				},
 			},
@@ -433,10 +568,10 @@ sub run {
 			},
 		);
 
-	}
+	} ## end foreach my $item_key ( keys( %{ $opts{files} } ...))
 
 	POE::Kernel->run;
-}
+} ## end sub run
 
 =head2 create_tables
 
@@ -511,7 +646,38 @@ sub create_tables {
 			. 'raw json NOT NULL, '
 			. 'PRIMARY KEY(id) );' );
 	$sth->execute();
-}
+
+	$sth
+		= $dbh->prepare( 'create table '
+			. $self->{cape} . ' ('
+			. 'id bigserial NOT NULL, '
+			. 'instance varchar(255)  NOT NULL, '
+			. 'target varchar(255)  NOT NULL, '
+			. 'instance_host varchar(255)  NOT NULL, '
+			. 'task bigserial NOT NULL, '
+			. 'start TIMESTAMP WITH TIME ZONE, '
+			. 'stop TIMESTAMP WITH TIME ZONE, '
+			. 'malscore bigint NOT NULL, '
+			. 'subbed_from_ip inet, '
+			. 'subbed_from_host varchar(255), '
+			. 'pkg varchar(255), '
+			. 'md5 varchar(255), '
+			. 'sha1 varchar(255), '
+			. 'sha256 varchar(255), '
+			. 'slug varchar(255), '
+			. 'url varchar(255), '
+			. 'url_hostname varchar(255), '
+			. 'proto varchar(255), '
+			. 'src_ip inet, '
+			. 'src_port integer, '
+			. 'dest_ip inet, '
+			. 'dest_port integer, '
+			. 'size integer, '
+			. 'raw jsonb NOT NULL, '
+			. 'PRIMARY KEY(id) );' );
+	$sth->execute();
+
+} ## end sub create_tables
 
 =head2 extend
 
@@ -619,14 +785,12 @@ sub extend {
 		my $snmp_class = $self->get_short_class_snmp( $row->{classification} );
 		if ( !defined( $to_return->{data}{totals}{$snmp_class} ) ) {
 			$to_return->{data}{totals}{$snmp_class} = 1;
-		}
-		else {
+		} else {
 			$to_return->{data}{totals}{$snmp_class}++;
 		}
 		if ( !defined( $to_return->{data}{suricata_totals}{$snmp_class} ) ) {
 			$to_return->{data}{suricata_totals}{$snmp_class} = 1;
-		}
-		else {
+		} else {
 			$to_return->{data}{suricata_totals}{$snmp_class}++;
 		}
 		if ( !defined( $to_return->{data}{suricata_instances}{ $row->{instance} } ) ) {
@@ -635,11 +799,10 @@ sub extend {
 		$to_return->{data}{suricata_instances}{ $row->{instance} }{total}++;
 		if ( !defined( $to_return->{data}{suricata_instances}{ $row->{instance} }{$snmp_class} ) ) {
 			$to_return->{data}{suricata_instances}{ $row->{instance} }{$snmp_class} = 1;
-		}
-		else {
+		} else {
 			$to_return->{data}{suricata_instances}{ $row->{instance} }{$snmp_class}++;
 		}
-	}
+	} ## end foreach my $row ( @{$suricata_found} )
 
 	foreach my $row ( @{$sagan_found} ) {
 		$to_return->{data}{totals}{total}++;
@@ -647,14 +810,12 @@ sub extend {
 		my $snmp_class = $self->get_short_class_snmp( $row->{classification} );
 		if ( !defined( $to_return->{data}{totals}{$snmp_class} ) ) {
 			$to_return->{data}{totals}{$snmp_class} = 1;
-		}
-		else {
+		} else {
 			$to_return->{data}{totals}{$snmp_class}++;
 		}
 		if ( !defined( $to_return->{data}{sagan_totals}{$snmp_class} ) ) {
 			$to_return->{data}{sagan_totals}{$snmp_class} = 1;
-		}
-		else {
+		} else {
 			$to_return->{data}{sagan_totals}{$snmp_class}++;
 		}
 		if ( !defined( $to_return->{data}{sagan_instances}{ $row->{instance} } ) ) {
@@ -663,14 +824,13 @@ sub extend {
 		$to_return->{data}{sagan_instances}{ $row->{instance} }{total}++;
 		if ( !defined( $to_return->{data}{sagan_instances}{ $row->{instance} }{$snmp_class} ) ) {
 			$to_return->{data}{sagan_instances}{ $row->{instance} }{$snmp_class} = 1;
-		}
-		else {
+		} else {
 			$to_return->{data}{sagan_instances}{ $row->{instance} }{$snmp_class}++;
 		}
-	}
+	} ## end foreach my $row ( @{$sagan_found} )
 
 	return $to_return;
-}
+} ## end sub extend
 
 =head2 generate_baphomet_yamls
 
@@ -688,11 +848,9 @@ sub generate_baphomet_yamls {
 	# run some basic checks prior to starting trying to write them all
 	if ( !defined($dir) ) {
 		die('No directory specified to write files to');
-	}
-	elsif ( !-d $dir ) {
+	} elsif ( !-d $dir ) {
 		die( '"' . $dir . '" is not a directory' );
-	}
-	elsif ( !-w $dir ) {
+	} elsif ( !-w $dir ) {
 		die( '"' . $dir . '" is not writable' );
 	}
 
@@ -789,10 +947,10 @@ sub generate_baphomet_yamls {
 		my $name = 'fastlog_' . $snmp_name;
 		$name =~ s/\ /_/g;
 		write_file( $dir . '/' . $name . '.yaml', $yaml );
-	}
+	} ## end foreach my $class ( sort(@keys) )
 
 	return 1;
-}
+} ## end sub generate_baphomet_yamls
 
 =head2 get_short_class
 
@@ -814,7 +972,7 @@ sub get_short_class {
 	}
 
 	return ('unknownC');
-}
+} ## end sub get_short_class
 
 =head2 get_short_class_snmp
 
@@ -838,7 +996,7 @@ sub get_short_class_snmp {
 	}
 
 	return ('unknownC');
-}
+} ## end sub get_short_class_snmp
 
 =head2 get_short_class_snmp_list
 
@@ -861,13 +1019,13 @@ sub get_short_class_snmp_list {
 	}
 
 	return $snmp_classes;
-}
+} ## end sub get_short_class_snmp_list
 
 =head2 search
 
 Searches the specified table and returns a array of found rows.
 
-    - table :: 'suricata' or 'sagan' depending on the desired table to
+    - table :: 'suricata', 'cape', 'sagan' depending on the desired table to
                use. Will die if something other is specified. The table
                name used is based on what was passed to new(if not the
                default).
@@ -884,6 +1042,7 @@ Searches the specified table and returns a array of found rows.
 
     - order_by :: Column to order by.
       Default :: timetamp
+      Cape Default :: id
 
     - order_dir :: Direction to order.
       Default :: ASC
@@ -893,6 +1052,10 @@ Below are simple search items that if given will be matched via a basic equality
     - src_ip
     - dest_ip
     - event_id
+    - md5
+    - sha1
+    - sha256
+    - subbed_from_ip
 
     # will become "and src_ip = '192.168.1.2'"
     src_ip => '192.168.1.2',
@@ -906,6 +1069,9 @@ prefixed '!' with add as a and not equal.
     - sid
     - rev
     - id
+    - size
+    - malscore
+    - task
 
     # will become "and src_port = '22' and src_port != ''512'"
     src_port => ['22', '!512'],
@@ -920,6 +1086,10 @@ any of those with '_like' or '_not' will my modified respectively.
     - signature
     - app_proto
     - in_iface
+    - url
+    - url_hostname
+    - slug
+    - pkg
 
     # will become "and host = 'foo.bar'"
     host => 'foo.bar',
@@ -959,17 +1129,15 @@ sub search {
 
 	if ( !defined( $opts{table} ) ) {
 		$opts{table} = 'suricata';
-	}
-	else {
-		if ( $opts{table} ne 'suricata' && $opts{table} ne 'sagan' ) {
+	} else {
+		if ( $opts{table} ne 'suricata' && $opts{table} ne 'sagan' && $opts{table} ne 'cape' ) {
 			die( '"' . $opts{table} . '" is not a known table type' );
 		}
 	}
 
 	if ( !defined( $opts{go_back_minutes} ) ) {
 		$opts{go_back_minutes} = '1440';
-	}
-	else {
+	} else {
 		if ( $opts{go_back_minutes} !~ /^[0-9]+$/ ) {
 			die( '"' . $opts{go_back_minutes} . '" for go_back_minutes is not numeric' );
 		}
@@ -989,18 +1157,23 @@ sub search {
 
 	if ( defined( $opts{order_dir} ) && $opts{order_dir} ne 'ASC' && $opts{order_dir} ne 'DESC' ) {
 		die( '"' . $opts{order_dir} . '" for order_dir must by either ASC or DESC' );
-	}
-	elsif ( !defined( $opts{order_dir} ) ) {
+	} elsif ( !defined( $opts{order_dir} ) ) {
 		$opts{order_dir} = 'ASC';
 	}
 
 	if ( !defined( $opts{order_by} ) ) {
-		$opts{order_by} = 'timestamp';
+		if ( $opts{table} ne 'cape' ) {
+			$opts{order_by} = 'timestamp';
+		} else {
+			$opts{order_by} = 'stop';
+		}
 	}
 
 	my $table = $self->{suricata};
 	if ( $opts{table} eq 'sagan' ) {
 		$table = $self->{sagan};
+	} elsif ( $opts{table} eq 'cape' ) {
+		$table = $self->{cape};
 	}
 
 	#
@@ -1026,10 +1199,16 @@ sub search {
 	#
 
 	my @order_by = (
-		'src_ip',        'src_port',      'dest_ip',   'dest_port', 'host',  'host_like',
-		'instance_host', 'instance_host', 'instance',  'instance',  'class', 'class',
-		'signature',     'signature',     'app_proto', 'app_proto', 'proto', 'gid',
-		'sid',           'rev',           'timestamp', 'id',        'in_iface'
+		'src_ip',    'src_port',  'dest_ip',          'dest_port',
+		'host',      'host_like', 'instance_host',    'instance_host',
+		'instance',  'instance',  'class',            'class',
+		'signature', 'signature', 'app_proto',        'app_proto',
+		'proto',     'gid',       'sid',              'rev',
+		'timestamp', 'id',        'in_iface',         'url_hostname',
+		'url',       'slug',      'sha256',           'sha1',
+		'md5',       'pkg',       'subbed_from_host', 'subbed_from_ip',
+		'malscore',  'task',      'target',           'proto',
+		'size',      'id',        'stop',             'start'
 	);
 
 	my $valid_order_by;
@@ -1055,17 +1234,24 @@ sub search {
 	my $sql = 'select * from ' . $table . ' where';
 	if ( defined( $opts{no_time} ) && $opts{no_time} ) {
 		$sql = $sql . ' id >= 0';
-	}
-	else {
-
-		$sql = $sql . " timestamp >= CURRENT_TIMESTAMP - interval '" . $opts{go_back_minutes} . " minutes'";
-	}
+	} else {
+		my $go_back_column = 'timestamp';
+		if ( $opts{table} eq 'cape' ) {
+			$go_back_column = 'stop';
+		}
+		$sql
+			= $sql . " "
+			. $go_back_column
+			. " >= CURRENT_TIMESTAMP - interval '"
+			. $opts{go_back_minutes}
+			. " minutes'";
+	} ## end else [ if ( defined( $opts{no_time} ) && $opts{no_time...})]
 
 	#
 	# add simple items
 	#
 
-	my @simple = ( 'src_ip', 'dest_ip', 'proto', 'event_id' );
+	my @simple = ( 'src_ip', 'dest_ip', 'proto', 'event_id', 'md5', 'sha1', 'sha256', 'subbed_from_ip' );
 
 	foreach my $item (@simple) {
 		if ( defined( $opts{$item} ) ) {
@@ -1077,7 +1263,7 @@ sub search {
 	# add numeric items
 	#
 
-	my @numeric = ( 'src_port', 'dest_port', 'gid', 'sid', 'rev', 'id' );
+	my @numeric = ( 'src_port', 'dest_port', 'gid', 'sid', 'rev', 'id', 'size', 'malscore', 'task' );
 
 	foreach my $item (@numeric) {
 		if ( defined( $opts{$item} ) ) {
@@ -1092,66 +1278,60 @@ sub search {
 				# match the start of the item
 				if ( $arg =~ /^[0-9]+$/ ) {
 					$sql = $sql . " and " . $item . " = '" . $arg . "'";
-				}
-				elsif ( $arg =~ /^\<\=[0-9]+$/ ) {
+				} elsif ( $arg =~ /^\<\=[0-9]+$/ ) {
 					$arg =~ s/^\<\=//;
 					$sql = $sql . " and " . $item . " <= '" . $arg . "'";
-				}
-				elsif ( $arg =~ /^\<[0-9]+$/ ) {
+				} elsif ( $arg =~ /^\<[0-9]+$/ ) {
 					$arg =~ s/^\<//;
 					$sql = $sql . " and " . $item . " < '" . $arg . "'";
-				}
-				elsif ( $arg =~ /^\>\=[0-9]+$/ ) {
+				} elsif ( $arg =~ /^\>\=[0-9]+$/ ) {
 					$arg =~ s/^\>\=//;
 					$sql = $sql . " and " . $item . " >= '" . $arg . "'";
-				}
-				elsif ( $arg =~ /^\>[0-9]+$/ ) {
+				} elsif ( $arg =~ /^\>[0-9]+$/ ) {
 					$arg =~ s/^\>\=//;
 					$sql = $sql . " and " . $item . " > '" . $arg . "'";
-				}
-				elsif ( $arg =~ /^\![0-9]+$/ ) {
+				} elsif ( $arg =~ /^\![0-9]+$/ ) {
 					$arg =~ s/^\!//;
 					$sql = $sql . " and " . $item . " != '" . $arg . "'";
-				}
-				elsif ( $arg =~ /^$/ ) {
+				} elsif ( $arg =~ /^$/ ) {
 
 					# only exists for skipping when some one has passes something starting
 					# with a ,, ending with a,, or with ,, in it.
-				}
-				else {
+				} else {
 					# if we get here, it means we don't have a valid use case for what ever was passed and should error
 					die( '"' . $arg . '" does not appear to be a valid item for a numeric search for the ' . $item );
 				}
-			}
-		}
-	}
+			} ## end foreach my $arg (@arg_split)
+		} ## end if ( defined( $opts{$item} ) )
+	} ## end foreach my $item (@numeric)
 
 	#
 	# handle string items
 	#
 
-	my @strings = ( 'host', 'instance_host', 'instance', 'class', 'signature', 'app_proto', 'in_iface' );
+	my @strings = (
+		'host',         'instance_host', 'instance', 'class',
+		'signature',    'app_proto',     'in_iface', 'url',
+		'url_hostname', 'slug',          'pkg',      'subbed_from_host'
+	);
 
 	foreach my $item (@strings) {
 		if ( defined( $opts{$item} ) ) {
 			if ( defined( $opts{ $item . '_like' } ) && $opts{ $item . '_like' } ) {
 				if ( defined( $opts{$item} . '_not' ) && !$opts{ $item . '_not' } ) {
 					$sql = $sql . " and " . $item . " like '" . $opts{$item} . "'";
-				}
-				else {
+				} else {
 					$sql = $sql . " and " . $item . " not like '" . $opts{$item} . "'";
 				}
-			}
-			else {
+			} else {
 				if ( defined( $opts{$item} . '_not' ) && !$opts{ $item . '_not' } ) {
 					$sql = $sql . " and " . $item . " = '" . $opts{$item} . "'";
-				}
-				else {
+				} else {
 					$sql = $sql . " and " . $item . " != '" . $opts{$item} . "'";
 				}
 			}
-		}
-	}
+		} ## end if ( defined( $opts{$item} ) )
+	} ## end foreach my $item (@strings)
 
 	#
 	# more complex items
@@ -1200,7 +1380,7 @@ sub search {
 	$dbh->disconnect;
 
 	return $found;
-}
+} ## end sub search
 
 =head1 AUTHOR
 

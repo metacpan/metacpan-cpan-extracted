@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-19'; # DATE
+our $DATE = '2023-09-23'; # DATE
 our $DIST = 'App-tabledata'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our %SPEC;
 
@@ -203,6 +203,10 @@ sub tabledata {
             $action = 'stream_as_csv';
         } else {
             $action = 'dump_as_aoaos';
+            require Module::Installed::Tiny;
+            if (Module::Installed::Tiny::module_installed('Text::ANSITable')) {
+                $ENV{FORMAT_PRETTY_TABLE_BACKEND} //= 'Text::ANSITable';
+            }
         }
     }
 
@@ -305,7 +309,7 @@ App::tabledata - Show content of TableData modules (plus a few other things)
 
 =head1 VERSION
 
-This document describes version 0.007 of App::tabledata (from Perl distribution App-tabledata), released on 2023-04-19.
+This document describes version 0.008 of App::tabledata (from Perl distribution App-tabledata), released on 2023-09-23.
 
 =head1 SYNOPSIS
 

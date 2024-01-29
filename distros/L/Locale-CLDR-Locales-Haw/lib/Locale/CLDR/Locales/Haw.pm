@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Haw - Package for language Hawaiian
 
 package Locale::CLDR::Locales::Haw;
 # This file auto generated from Data\common\main\haw.xml
-#	on Tue  5 Dec  1:13:11 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ar' => 'ʻAlapia',
@@ -82,7 +82,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AU' => 'Nūhōlani',
  			'CA' => 'Kanakā',
@@ -113,7 +113,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{Mekalika},
  			'US' => q{ʻAmelika Hui Pū ʻIa},
@@ -134,7 +134,7 @@ has 'characters' => (
 			auxiliary => qr{[b c d f g j q r s t v x y z]},
 			index => ['A', 'E', 'I', 'O', 'U', 'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'ʻ', 'X', 'Y', 'Z'],
 			main => qr{[a ā e ē i ī o ō u ū h k l m n p w ʻ]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -150,36 +150,85 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(lā),
+						'one' => q({0} lā),
+						'other' => q({0} lā),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(lā),
 						'one' => q({0} lā),
 						'other' => q({0} lā),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(hola),
+						'one' => q({0} hola),
+						'other' => q({0} hola),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(hola),
 						'one' => q({0} hola),
 						'other' => q({0} hola),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(minuke),
+						'one' => q({0} minuke),
+						'other' => q({0} minuke),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(minuke),
 						'one' => q({0} minuke),
 						'other' => q({0} minuke),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(mahina),
+						'one' => q({0} mahina),
+						'other' => q({0} mahina),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(mahina),
 						'one' => q({0} mahina),
 						'other' => q({0} mahina),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(kekona),
+						'one' => q({0} kekona),
+						'other' => q({0} kekona),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(kekona),
 						'one' => q({0} kekona),
 						'other' => q({0} kekona),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(pule),
+						'one' => q({0} pule),
+						'other' => q({0} pule),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(pule),
 						'one' => q({0} pule),
 						'other' => q({0} pule),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(makahiki),
+						'one' => q({0} makahiki),
+						'other' => q({0} makahiki),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(makahiki),
 						'one' => q({0} makahiki),
@@ -187,34 +236,81 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'one' => q({0}°C),
+						'other' => q({0}°C),
+					},
+					# Core Unit Identifier
 					'celsius' => {
 						'one' => q({0}°C),
 						'other' => q({0}°C),
 					},
+					# Long Unit Identifier
+					'temperature-fahrenheit' => {
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Core Unit Identifier
 					'fahrenheit' => {
 						'one' => q({0}°),
 						'other' => q({0}°),
 					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(lā),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(lā),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(hola),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(hola),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(minuke),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(minuke),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(mahina),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(mahina),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(kekona),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(kekona),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(pule),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(pule),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(makahiki),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(makahiki),
 					},
@@ -704,7 +800,6 @@ has 'datetime_formats_available_formats' => (
 			MEd => q{E, d/M},
 			MMM => q{LLL},
 			MMMEd => q{E, d MMM},
-			MMMMW => q{'week' W 'of' MMM},
 			MMMMd => q{MMMM d},
 			MMMd => q{d MMM},
 			Md => q{d/M},
@@ -725,7 +820,6 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{d/M/y},
 			yQQQ => q{y QQQ},
 			yQQQQ => q{y QQQQ},
-			yw => q{'week' w 'of' Y},
 		},
 	} },
 );

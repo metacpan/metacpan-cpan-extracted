@@ -16,7 +16,7 @@ no if "$]" >= 5.020, feature => qw{ signatures };
 # This occurs in both inc/My/Module/Meta.pm and inc/My/Module/Test.pm
 use constant CAN_USE_UNICODE	=> "$]" >= 5.008004;
 
-our $VERSION = '0.103';
+our $VERSION = '0.104';
 
 our @EXPORT =		## no critic (ProhibitAutomaticExportation)
 qw{
@@ -305,7 +305,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2022 by Thomas R. Wyant, III
+Copyright (C) 2013-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

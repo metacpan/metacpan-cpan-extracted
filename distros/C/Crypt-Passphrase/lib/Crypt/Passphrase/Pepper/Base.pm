@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Pepper::Base;
-$Crypt::Passphrase::Pepper::Base::VERSION = '0.016';
+$Crypt::Passphrase::Pepper::Base::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -14,6 +14,7 @@ sub new {
 
 	croak('No peppers given') if not defined $args{active};
 	croak("Invalid pepper name '$args{active}'") if $args{active} =~ /\W/;
+	croak('No hashing algorithm given') if not defined $args{algorithm};
 
 	my $self = bless {
 		%args,
@@ -27,16 +28,9 @@ sub _to_inner {
 	my $hash = shift;
 	if ($hash =~ s/ (?<= \A \$) ([\w-]+?)-pepper-([\w-]+) \$ v=1 , id=([^\$,]+) /$1/x) {
 		return ($hash, $2, $3);
-	} elsif ($hash =~ s/ (?<= \A \$) peppered-(\w+) \$ v=1 , alg=([^\$,]+) , id=([^\$,]+) /$1/x) {
-		return ($hash, $2, $3);
 	} else {
 		return;
 	}
-}
-
-sub supported_hashes {
-	my $self = shift;
-	@{ $self->{supported_hashes} || [] };
 }
 
 sub prehash_password;
@@ -55,7 +49,7 @@ sub crypt_subtypes {
 	my @result;
 	my @supported = $self->supported_hashes;
 	for my $inner ($self->{inner}->crypt_subtypes) {
-		push @result, $inner, map { "$inner-pepper-$_" } @supported
+		push @result, $inner, map { "$inner-pepper-$_" } @supported;
 	}
 	return @result;
 }
@@ -98,41 +92,47 @@ Crypt::Passphrase::Pepper::Base - A base class for pre-hashing pepper implementa
 
 =head1 VERSION
 
-version 0.016
+version 0.019
 
 =head1 DESCRIPTION
 
-This is a base-class for pre-peppering implementations. You probably want to use L<Crypt::Passphrase::Pepper::Basic> instead.
+This is a base-class for pre-peppering implementations. You probably want to use L<Crypt::Passphrase::Pepper::Simple> instead.
 
-=head1 METHODS
+=head1 SUBCLASSING
 
-=head2 new(%args)
+=head2 Creation
 
-This creates a new C<Crypt::Passphrase::Pepper::Base>. As it's an abstract class you shouldn't call this unless you're writing a subclass.
+Any subclass is expected to call this class' method new with at least the following arguments.
 
-=head2 hash_password($password)
+=head3 inner
 
-This hashes the passwords with the active pepper.
+This must contain an encoder specification identical to the C<encoder> field of C<Crypt::Passphrase>.
 
-=head2 needs_rehash($hash)
+=head3 active
 
-This returns true if the hash uses a different cipher or pepper, or if any of the encoder parameters is lower that desired by the encoder.
+The identifier of the active pepper.
 
-=head2 crypt_subtypes()
+=head3 algorithm
 
-This returns all the types supported by the underlaying encoder cross joined with all supported hashes using the string C<"-pepper-"> (e.g. C<"argon2id-pepper-sha512-hmac">), as well as the underlaying types themselves.
+The hash that is used for password creation.
 
-=head2 verify_password($password, $hash)
+=head2 Mandatory methods
 
-This will check if a password matches the hash, supporting both peppered and unpeppered hashed with the encoder.
+It expects the subclass to implement the following method:
 
-=head2 supported_hashes()
+=head3 prehash_password
 
-This returns the hashes that are supported for prehashing.
+ $pepper->prehash_password($password, $algorithm, $id)
+
+This should prehash the C<$password> with C<$algorithm> and the pepper named by C<$id>.
+
+=head3 supported_hashes
+
+This should return a list of hashes that are supported.
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

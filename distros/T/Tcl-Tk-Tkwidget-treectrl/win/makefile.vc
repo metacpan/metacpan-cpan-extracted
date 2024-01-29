@@ -1,0 +1,68 @@
+#------------------------------------------------------------- -*- makefile -*-
+#
+# Makefile for tktreectrl
+#
+# Basic build, test and install
+#   nmake /f makefile.vc INSTALLDIR=c:\tcl TCLDIR=c:\path\to\tcl\sources TKDIR=c:\path\to\tk\sources
+#   nmake /f makefile.vc INSTALLDIR=c:\tcl test TCLDIR=c:\path\to\tcl\sources TKDIR=c:\path\to\tk\sources
+#   nmake /f makefile.vc INSTALLDIR=c:\tcl install TCLDIR=c:\path\to\tcl\sources TKDIR=c:\path\to\tk\sources
+# Note this extension needs both Tcl and Tk *source* to build.
+#
+# For other build options (debug, static etc.),
+# See TIP 477 (https://core.tcl.tk/tips/doc/trunk/tip/477.md) for
+# detailed documentation.
+# 
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+#------------------------------------------------------------------------------
+
+
+PROJECT = treectrl
+NEED_TK_SOURCE = 1
+NEED_TCL_SOURCE = 1
+PRJ_MANIFEST = ..\treectrl.dll.manifest.in
+
+!include "rules-ext.vc"
+
+PRJ_OBJS = \
+	$(TMP_DIR)\qebind.obj \
+	$(TMP_DIR)\tkTreeColumn.obj \
+	$(TMP_DIR)\tkTreeCtrl.obj \
+	$(TMP_DIR)\tkTreeDisplay.obj \
+	$(TMP_DIR)\tkTreeDrag.obj \
+	$(TMP_DIR)\tkTreeElem.obj \
+	$(TMP_DIR)\tkTreeHeader.obj \
+	$(TMP_DIR)\tkTreeItem.obj \
+	$(TMP_DIR)\tkTreeMarquee.obj \
+	$(TMP_DIR)\tkTreeNotify.obj \
+	$(TMP_DIR)\tkTreeStyle.obj \
+	$(TMP_DIR)\tkTreeTheme.obj \
+	$(TMP_DIR)\tkTreeUtils.obj \
+	$(TMP_DIR)\tkWinTree.obj
+
+!if [echo PACKAGE_PATCHLEVEL = \> versions.vc] && \
+    [nmakehlp -V $(ROOT)\configure.ac PACKAGE_PATCHLEVEL >> versions.vc]
+!endif
+!include versions.vc
+
+PRJ_DEFINES	=  -DHAVE_INTPTR_T=1 -DNO_VIZ=/\*\*/ -DPACKAGE_PATCHLEVEL=\"$(PACKAGE_PATCHLEVEL)\" -D_CRT_SECURE_NO_WARNINGS
+
+!include "$(_RULESDIR)\targets.vc"
+
+install: default-install-docs-html install-demos
+
+pkgindex: 
+        @type << >"$(OUT_DIR)\pkgIndex.tcl"
+	if {[catch {package require Tcl $(TCL_MAJOR_VERSION).$(TCL_MINOR_VERSION)} o]} return
+	set script ""
+	if {![info exists ::env(TREECTRL_LIBRARY)]
+	   && [file exists [file join $$dir treectrl.tcl]]} {
+	    append script "[list set ::treectrl_library $$dir]\n"
+	}
+	append script [list load [file join $$dir $(PRJLIBNAME)] $(PROJECT)]
+	package ifneeded $(PROJECT) $(DOTVERSION) $$script
+<<
+
+install-demos: default-install-demos
+

@@ -16,33 +16,25 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-    DateTime
+    ExtUtils::MakeMaker 6.52    (For installation only)
+    Software::License::CC0_1_0  (For installation only)
+    Test::More                  (For testing only)
     DateTime::Format::RFC3339
-    Test::More
     strict
     version
     warnings
 
-SUPPORT AND DOCUMENTATION
+
+DOCUMENTATION
 
 After installing, you can find documentation for this module with the
 perldoc command.
 
-    perldoc DateTime::Format::RFC3339
+    perldoc DateTime::Format::Atom
 
-You can also look for information at:
+You can also find it online at this location:
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Format-Atom
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/DateTime-Format-Atom
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/DateTime-Format-Atom
-
-    Search CPAN
-        http://search.cpan.org/dist/DateTime-Format-Atom
+    https://metacpan.org/dist/DateTime-Format-Atom
 
 
 COPYRIGHT AND LICENCE

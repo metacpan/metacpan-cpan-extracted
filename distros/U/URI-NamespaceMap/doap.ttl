@@ -52,7 +52,7 @@
 	doap:maintainer      <http://kasei.us/about/foaf.xrdf#greg>, <http://purl.org/NET/cpan-uri/person/perigrin>, <http://www.kjetil.kjernsmo.net/foaf#me>;
 	doap:name            "URI-NamespaceMap";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_01>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_02>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_04>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_06>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_08>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_10>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_12>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_20>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_21>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_22>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_24>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_26>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_28>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_30>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_32>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_00>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_02>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_04>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_06>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_08>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_10>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_01>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_02>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_04>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_06>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_08>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_10>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_12>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_20>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_21>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_22>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_24>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_26>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_28>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_30>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_32>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_00>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_02>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_04>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_06>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_08>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_10>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_12>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/kjetilk/URI-NamespaceMap/>;
@@ -376,6 +376,27 @@
 	doap:revision        "1.10"^^xsd:string;
 	owl:sameAs           <http://packages.qa.debian.org/liburi-namespacemap-perl#upstreamsrc_1.10>.
 
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_12>
+	a                    doap:Version;
+	rdfs:label           "Add new automations and small fixes."@en;
+	dc:issued            "2024-01-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Add new Github CI automations."@en;
+		], [
+			a doap-changeset:Removal;
+			rdfs:label "Remove Travis CI."@en;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/zmughal>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add explicit DESTROY."@en;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/zmughal>;
+		];
+	];
+	doap:revision        "1.12"^^xsd:string;
+	owl:sameAs           <http://packages.qa.debian.org/liburi-namespacemap-perl#upstreamsrc_1.12>.
+
 <http://purl.org/NET/cpan-uri/person/kjetilk>
 	a                    foaf:Person;
 	foaf:mbox            <mailto:kjetilk@cpan.org>;
@@ -384,11 +405,6 @@
 	owl:sameAs           <http://www.kjetil.kjernsmo.net/foaf#me>, <https://solid.kjernsmo.net/profile/card#me>;
 	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>;
 	wot:hasKey           _:B1.
-
-<http://purl.org/NET/cpan-uri/person/kwakwa>
-	a                    foaf:Person;
-	foaf:name            "Paul Williams";
-	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FURI-NamespaceMap&serialization=PROV-O#user-Paul-Williams>.
 
 <http://purl.org/NET/cpan-uri/person/perigrin>
 	a                    foaf:Person;
@@ -404,6 +420,10 @@
 	foaf:mbox            <mailto:tobyink@cpan.org>;
 	foaf:name            "Toby Inkster";
 	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FURI-NamespaceMap&serialization=PROV-O#user-Toby-Inkster>, <http://tobyinkster.co.uk/#i>.
+
+<http://purl.org/NET/cpan-uri/person/zmughal>
+	a                    foaf:Person;
+	foaf:name            "Zakariyya Mughal".
 
 <http://www.kjetil.kjernsmo.net/foaf#me>
 	a                    foaf:Person;

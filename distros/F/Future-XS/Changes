@@ -1,5 +1,12 @@
 Revision history for Future-XS
 
+0.12    2023-12-27
+        [BUGFIXES]
+         * Ensure the "not yet ready ..." exception is thrown from the correct
+           caller
+         * Include the current state name in exception message for forbidden
+           state changes
+
 0.11    2023-10-26
         [CHANGES]
          * Module style updates:

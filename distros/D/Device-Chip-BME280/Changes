@@ -1,5 +1,10 @@
 Revision history for Device-Chip-BME280
 
+0.07    2024-01-08
+        [CHANGES]
+         * Support `addr` mount parameter for setting non-default I²C device
+           address
+
 0.06    2023-09-13
         [CHANGES]
          * General module style updates:

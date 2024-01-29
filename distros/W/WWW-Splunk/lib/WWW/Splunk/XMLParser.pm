@@ -22,7 +22,7 @@ use warnings;
 use XML::LibXML qw/:libxml/;
 use Carp;
 
-our $VERSION = '2.08';
+our $VERSION = '2.09';
 
 =head2 B<parse> (F<string>)
 
@@ -111,7 +111,7 @@ L<WWW::Splunk>, L<WWW::Splunk::API>, L<XML::LibXML>
 Lubomir Rintel, L<< <lkundrak@v3.sk> >>,
 Michal Josef Špaček L<< <skim@cpan.org> >>
 
-The code is hosted on GitHub L<http://github.com/tupinek/perl-WWW-Splunk>.
+The code is hosted on GitHub L<http://github.com/michal-josef-spacek/perl-WWW-Splunk>.
 Bug fixes and feature enhancements are always welcome.
 
 =head1 LICENSE

@@ -27,14 +27,12 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "File::ShareDir::Install" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Data::Dumper" : "0",
-            "File::ShareDir" : "0",
             "File::Slurp" : "0",
             "Hash::Flatten" : "0",
             "Hash::Merge" : "0",
@@ -42,8 +40,9 @@
             "JSON::Path" : "v1.0.3",
             "Rex" : "v1.14.2",
             "Rex::CMDB::TOML" : "v0.0.1",
+            "Rex::CMDB::YAMLwithRoles" : "0",
             "String::ShellQuote" : "0",
-            "TOML" : "0",
+            "TOML::Tiny" : "0",
             "YAML::XS" : "0",
             "perl" : "5.006"
          }
@@ -61,6 +60,6 @@
          "web" : "https://github.com/VVelox/Shell-Var-Reader"
       }
    },
-   "version" : "v0.6.0",
+   "version" : "v0.8.2",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

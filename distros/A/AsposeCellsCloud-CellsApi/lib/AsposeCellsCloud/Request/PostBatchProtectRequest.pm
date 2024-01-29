@@ -59,7 +59,7 @@ sub new {
 
 
 # Run Operation Request
-# PostBatchProtectRequest.batchProtectRequest :    
+# PostBatchProtectRequest.batchProtectRequest : BatchProtectRequest Batch protection file request.     
 
 {
     my $params = {
@@ -70,7 +70,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_batch_protect' } = { 
-    	summary => '',
+    	summary => 'Batch protecting files that meet specific matching conditions.',
         params => $params,
         returns => 'string',
     };
@@ -117,7 +117,7 @@ __PACKAGE__->method_documentation({
      'batch_protect_request' => {
      	datatype => 'BatchProtectRequest',
      	base_name => 'batchProtectRequest',
-     	description => '',
+     	description => 'BatchProtectRequest Batch protection file request.  ',
      	format => '',
      	read_only => '',
      		},    

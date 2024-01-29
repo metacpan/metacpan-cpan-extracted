@@ -15,10 +15,10 @@ use Encode      qw(decode encode);
 use JSON;
 use LWP::UserAgent;
 use Travel::Routing::DE::HAFAS::Connection;
-use Travel::Routing::DE::HAFAS::Location;
+use Travel::Status::DE::HAFAS::Location;
 use Travel::Status::DE::HAFAS::Message;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 # {{{ Endpoint Definition
 
@@ -216,8 +216,9 @@ sub new {
 
 	my $req;
 
-	my $date = ( $conf{datetime} // $now )->strftime('%Y%m%d');
-	my $time = ( $conf{datetime} // $now )->strftime('%H%M%S');
+	my $date    = ( $conf{datetime} // $now )->strftime('%Y%m%d');
+	my $time    = ( $conf{datetime} // $now )->strftime('%H%M%S');
+	my $outFrwd = $conf{arrival} ? \0 : undef;
 
 	my ( $from_lid, $to_lid );
 	if ( $self->{from_stop} =~ m{ ^ [0-9]+ $ }x ) {
@@ -243,7 +244,7 @@ sub new {
 					numF       => 6,
 					maxChg     => undef,
 					minChgTime => undef,
-					outFrwd    => undef,
+					outFrwd    => $outFrwd,
 					viaLocL    => undef,
 					trfReq     => {
 						cType    => 'PK',
@@ -517,7 +518,7 @@ sub check_mgate {
 sub parse_trips {
 	my ($self) = @_;
 
-	my @locL = map { Travel::Routing::DE::HAFAS::Location->new( loc => $_ ) }
+	my @locL = map { Travel::Status::DE::HAFAS::Location->new( loc => $_ ) }
 	  @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
 
 	my @conL = @{ $self->{raw_json}{svcResL}[0]{res}{outConL} // [] };
@@ -647,7 +648,8 @@ Travel::Routing::DE::HAFAS - Interface to HAFAS itinerary services
 		for my $sec ($con->sections) {
 			if ( $sec->type eq 'JNY' ) {
 				printf("%s -> %s\n%s ab %s\n%s an %s\n\n",
-					$sec->name, $sec->direction,
+					$sec->journey->name,
+					$sec->journey->direction,
 					$sec->dep->strftime('%H:%M'),
 					$sec->dep_loc->name,
 					$sec->arr->strftime('%H:%M'),
@@ -660,7 +662,7 @@ Travel::Routing::DE::HAFAS - Interface to HAFAS itinerary services
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 DESCRIPTION
 
@@ -690,6 +692,12 @@ must be specified either by name or by EVA ID (e.g. 8000080 for Dortmund Hbf).
 
 Destination stop, e.g. "Essen HBf" or "Alfredusbad, Essen (Ruhr)". The stop
 must be specified either by name or by EVA ID (e.g. 8000080 for Dortmund Hbf).
+
+=item B<arrival> => I<bool>
+
+If true: request connections that arrive at the destination before the
+specified time. If false (default): request connections that leave at the
+origin after the specified time.
 
 =item B<cache> => I<Cache::File object>
 

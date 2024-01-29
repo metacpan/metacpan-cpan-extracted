@@ -1,7 +1,7 @@
 package Dancer2::Plugin::Cache::CHI;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Dancer plugin to cache response content (and anything else)
-$Dancer2::Plugin::Cache::CHI::VERSION = '2.0.0';
+$Dancer2::Plugin::Cache::CHI::VERSION = '2.0.1';
 use strict;
 use warnings;
 use Carp;
@@ -170,7 +170,7 @@ Dancer2::Plugin::Cache::CHI - Dancer plugin to cache response content (and anyth
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 SYNOPSIS
 
@@ -336,7 +336,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Yanick Champoux.
+This software is copyright (c) 2023 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

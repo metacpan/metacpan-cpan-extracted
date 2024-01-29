@@ -24,6 +24,7 @@ WriteMakefile(
         'JSON'                      => '0',
         'YAML'                      => '0',
         'Data::Dump'                => '0',
+        'Time::HiRes'               => '0',
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

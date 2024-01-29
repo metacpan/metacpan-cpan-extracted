@@ -34,11 +34,11 @@ Bundle::BDFOY - install all modules by BDFOY
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2006-2021, brian d foy.
+Copyright © 2006-2024, brian d foy.
 
 This code is licensed under the Artisitic License 2.0
 

@@ -7,7 +7,7 @@
 
 {
 package Audio::Nama::EffectChain;
-use Modern::Perl;
+use Modern::Perl '2020';
 use Data::Dumper::Concise;
 use Carp;
 use Exporter qw(import);
@@ -106,15 +106,12 @@ sub new {
 		$vals{ops_list} 	||= [];
 		$vals{ops_data} 	||= {};
 		$vals{fade_data}    ||= [];
-		croak "undeclared field in: @_" if grep{ ! $_is_field{$_} } keys %vals;
+		my @und = grep{ ! $_is_field{$_} } keys %vals;
+		croak "undeclared field @und in: @_" if @und;
 		croak "must have exactly one of 'global' or 'project' fields defined" 
 			unless ($vals{attrib}{global} xor $vals{attrib}{project});
 
 		logpkg(__FILE__,__LINE__,'debug','constructor arguments ', sub{ json_out(\%vals) });
-
-		# we expect some effects
-		logpkg(__FILE__,__LINE__,'warn',"Nether ops_list or nor insert_data is present") 
-			if ! scalar @{$vals{ops_list}} and ! scalar @{$vals{inserts_data}};
 
 		my $ops_data = {};
 		# ops data is taken preferentially 
@@ -124,7 +121,7 @@ sub new {
 		# in both cases, we clone the data structures
 		# to ensure we don't damage the original
 		
-		map { 	
+		for (@{$vals{ops_list}}){ 	
 
 			if ( $vals{ops_data}->{$_} )
 											
@@ -139,7 +136,7 @@ sub new {
 				$ops_data->{$_} = $filtered_op_data;
 			}
 
-		} @{$vals{ops_list}};
+		} ;
 		
 
 		$vals{ops_data} = $ops_data;
@@ -258,7 +255,7 @@ sub add_ops {
 	} else {
 		@ops_list = @{$self->ops_list};
 	}
-	map 
+	for (@ops_list)
 	{	
 		my $args = 
 		{
@@ -293,8 +290,7 @@ sub add_ops {
 			map{ $self->parent_id($_) =~ s/^$orig_id$/$new_id/  } @{$self->ops_list}
 		}
 		
-	} @ops_list;
-	\@added
+	}
 }
 sub add_inserts {
 	my ($self, $track) = @_;
@@ -326,19 +322,20 @@ sub add_region {
 }
 
 sub add {
-	my ($self, $track, $successor) = @_;
+	my ($self, $track) = @_;
 	# TODO stop_do_start should take place at this level
 	# possibly reconfiguring engine
 	my $args = {};
-	$args->{before} = $successor;
 	$args->{surname} = $self->name if $self->name;
-	my $added = $self->add_ops($track, $args);
+	$self->add_ops($track, $args);
+	#$track->{ops} = dclone($self->ops_list);
 	$self->add_inserts($track);
 	$self->add_region($track) if $self->region;
 	$self->add_fades($track) if $self->fade_data;
-	$added
+	1 # succeeded 
 
 }
+
 sub add_fades {
 	my ($self, $track) = @_;
 	map{ 
@@ -426,18 +423,18 @@ sub DESTROY {}
 
 package Audio::Nama;
 sub add_effect_chain {
-	my ($name, $track, $successor) = @_;
+	my ($name, $track) = @_;
 	my ($ec) = Audio::Nama::EffectChain::find(
 		unique => 1, 
 		user   => 1, 
 		name   => $name,
 	);
-	if( $ec ){ $ec->add($Audio::Nama::this_track, $successor) }
+	if( $ec ){ $ec->add($Audio::Nama::this_track) }
 	else { Audio::Nama::throw("$name: effect chain not found") }
 	1;
 }
 sub new_effect_profile {
-	logsub("&new_effect_profile");
+	logsub((caller(0))[3]);
 	my ($bunch, $profile) = @_;
 	my @tracks = bunch_tracks($bunch);
 	Audio::Nama::pager( qq(effect profile "$profile" created for tracks: @tracks) );
@@ -453,14 +450,14 @@ sub new_effect_profile {
 	} @tracks;
 }
 sub delete_effect_profile { 
-	logsub("&delete_effect_profile");
+	logsub((caller(0))[3]);
 	my $name = shift;
 	Audio::Nama::pager( qq(deleting effect profile: $name) );
 	map{ $_->destroy} Audio::Nama::EffectChain::find( profile => $name );
 }
 
 sub apply_effect_profile {  # overwriting current effects
-	logsub("&apply_effect_profile");
+	logsub((caller(0))[3]);
 	my ($profile) = @_;
 	my @chains = Audio::Nama::EffectChain::find(profile => $profile);
 

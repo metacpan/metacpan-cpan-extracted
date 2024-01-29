@@ -3,7 +3,10 @@ abstract: 'CrowdSec client'
 author:
   - 'Yadd <yadd@>'
 build_requires:
+  Date::Parse: '0'
+  HTTP::Request::Common: '0'
   JSON: '0'
+  LWP::UserAgent: '0'
   Moo: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -19,10 +22,13 @@ no_index:
     - t
     - inc
 requires:
+  Date::Parse: '0'
+  HTTP::Request::Common: '0'
   JSON: '0'
+  LWP::UserAgent: '0'
   Moo: '0'
 resources:
   bugtracker: https://github.com/linagora/perl-crowdsec-client/issues
   license: https://opensource.org/license/agpl-v3/
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

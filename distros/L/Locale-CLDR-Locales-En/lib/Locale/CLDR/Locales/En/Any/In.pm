@@ -8,13 +8,13 @@ Locale::CLDR::Locales::En::Any::In - Package for language English
 
 package Locale::CLDR::Locales::En::Any::In;
 # This file auto generated from Data\common\main\en_IN.xml
-#	on Tue  5 Dec  1:07:59 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -25,19 +25,19 @@ use Moo;
 
 extends('Locale::CLDR::Locales::En::Any::001');
 has 'valid_algorithmic_formats' => (
-	is => 'ro',
-	isa => ArrayRef,
-	init_arg => undef,
-	default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-numbering-verbose','spellout-cardinal','spellout-cardinal-verbose','spellout-ordinal','spellout-ordinal-verbose','digits-ordinal' ]},
+    is => 'ro',
+    isa => ArrayRef,
+    init_arg => undef,
+    default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-numbering-verbose','spellout-cardinal','spellout-cardinal-verbose','spellout-ordinal','spellout-ordinal-verbose','digits-ordinal' ]},
 );
 
 has 'algorithmic_number_format_data' => (
-	is => 'ro',
-	isa => HashRef,
-	init_arg => undef,
-	default => sub { 
-		use bigfloat;
-		return {
+    is => 'ro',
+    isa => HashRef,
+    init_arg => undef,
+    default => sub {
+        use bigfloat;
+        return {
 		'2d-year' => {
 			'private' => {
 				'0' => {
@@ -924,17 +924,18 @@ has 'algorithmic_number_format_data' => (
 				},
 			},
 		},
-	} },
+    } },
 );
 
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'bn' => 'Bengali',
+ 				'ro_MD' => 'Moldavian',
 
 			);
 			if (@_) {
@@ -984,19 +985,74 @@ has 'units' => (
 	isa			=> HashRef[HashRef[HashRef[Str]]],
 	init_arg	=> undef,
 	default		=> sub { {
+				'long' => {
+					# Long Unit Identifier
+					'temperature-generic' => {
+						'name' => q(°),
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Core Unit Identifier
+					'generic' => {
+						'name' => q(°),
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+				},
 				'narrow' => {
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'one' => q({0}kph),
+						'other' => q({0}kph),
+					},
+					# Core Unit Identifier
 					'kilometer-per-hour' => {
 						'one' => q({0}kph),
 						'other' => q({0}kph),
 					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'one' => q({0} kph),
+						'other' => q({0} kph),
+					},
+					# Core Unit Identifier
 					'kilometer-per-hour' => {
 						'one' => q({0} kph),
 						'other' => q({0} kph),
 					},
+					# Long Unit Identifier
+					'temperature-generic' => {
+						'name' => q(°),
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Core Unit Identifier
+					'generic' => {
+						'name' => q(°),
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Long Unit Identifier
+					'volume-cubic-centimeter' => {
+						'per' => q({0}/cm³),
+					},
+					# Core Unit Identifier
+					'cubic-centimeter' => {
+						'per' => q({0}/cm³),
+					},
 				},
 			} }
+);
+
+has 'listPatterns' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+				end => q({0}, and {1}),
+		} }
 );
 
 has 'number_formats' => (
@@ -1006,8 +1062,106 @@ has 'number_formats' => (
 	default		=> sub { {
 		decimalFormat => {
 			'default' => {
+				'1000' => {
+					'one' => '0T',
+					'other' => '0T',
+				},
+				'10000' => {
+					'one' => '00T',
+					'other' => '00T',
+				},
+				'100000' => {
+					'one' => '0L',
+					'other' => '0L',
+				},
+				'1000000' => {
+					'one' => '00L',
+					'other' => '00L',
+				},
+				'10000000' => {
+					'one' => '0Cr',
+					'other' => '0Cr',
+				},
+				'100000000' => {
+					'one' => '00Cr',
+					'other' => '00Cr',
+				},
+				'1000000000' => {
+					'one' => '000Cr',
+					'other' => '000Cr',
+				},
+				'10000000000' => {
+					'one' => '0TCr',
+					'other' => '0TCr',
+				},
+				'100000000000' => {
+					'one' => '00TCr',
+					'other' => '00TCr',
+				},
+				'1000000000000' => {
+					'one' => '0LCr',
+					'other' => '0LCr',
+				},
+				'10000000000000' => {
+					'one' => '00LCr',
+					'other' => '00LCr',
+				},
+				'100000000000000' => {
+					'one' => '000LCr',
+					'other' => '000LCr',
+				},
 				'standard' => {
 					'default' => '#,##,##0.###',
+				},
+			},
+			'short' => {
+				'1000' => {
+					'one' => '0T',
+					'other' => '0T',
+				},
+				'10000' => {
+					'one' => '00T',
+					'other' => '00T',
+				},
+				'100000' => {
+					'one' => '0L',
+					'other' => '0L',
+				},
+				'1000000' => {
+					'one' => '00L',
+					'other' => '00L',
+				},
+				'10000000' => {
+					'one' => '0Cr',
+					'other' => '0Cr',
+				},
+				'100000000' => {
+					'one' => '00Cr',
+					'other' => '00Cr',
+				},
+				'1000000000' => {
+					'one' => '000Cr',
+					'other' => '000Cr',
+				},
+				'10000000000' => {
+					'one' => '0TCr',
+					'other' => '0TCr',
+				},
+				'100000000000' => {
+					'one' => '00TCr',
+					'other' => '00TCr',
+				},
+				'1000000000000' => {
+					'one' => '0LCr',
+					'other' => '0LCr',
+				},
+				'10000000000000' => {
+					'one' => '00LCr',
+					'other' => '00LCr',
+				},
+				'100000000000000' => {
+					'one' => '000LCr',
+					'other' => '000LCr',
 				},
 			},
 		},
@@ -1030,7 +1184,7 @@ has 'number_currency_formats' => (
 			'pattern' => {
 				'default' => {
 					'standard' => {
-						'positive' => '¤ #,##,##0.00',
+						'positive' => '¤#,##,##0.00',
 					},
 				},
 			},
@@ -1043,6 +1197,9 @@ has 'currencies' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'USD' => {
+			symbol => '$',
+		},
 		'VEF' => {
 			display_name => {
 				'currency' => q(Venezuelan Bolívar),
@@ -1151,8 +1308,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'eras' => (
@@ -1182,6 +1339,7 @@ has 'date_formats' => (
 		},
 		'gregorian' => {
 			'full' => q{EEEE, d MMMM, y},
+			'long' => q{d MMMM y},
 			'medium' => q{dd-MMM-y},
 			'short' => q{dd/MM/yy},
 		},
@@ -1202,6 +1360,10 @@ has 'time_formats' => (
 		'generic' => {
 		},
 		'gregorian' => {
+			'full' => q{h:mm:ss a zzzz},
+			'long' => q{h:mm:ss a z},
+			'medium' => q{h:mm:ss a},
+			'short' => q{h:mm a},
 		},
 		'islamic' => {
 		},
@@ -1214,8 +1376,16 @@ has 'datetime_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
+			'full' => q{{1} 'at' {0}},
+			'long' => q{{1} 'at' {0}},
+			'medium' => q{{1}, {0}},
+			'short' => q{{1}, {0}},
 		},
 		'gregorian' => {
+			'full' => q{{1} 'at' {0}},
+			'long' => q{{1} 'at' {0}},
+			'medium' => q{{1}, {0}},
+			'short' => q{{1}, {0}},
 		},
 		'islamic' => {
 		},
@@ -1231,6 +1401,7 @@ has 'datetime_formats_available_formats' => (
 			GyMMM => q{MMM, y G},
 			GyMMMEd => q{E, d MMM, y G},
 			GyMMMd => q{d MMM, y G},
+			MEd => q{E, d/M},
 			Md => q{d/M},
 			yyyyM => q{M/y GGGGG},
 			yyyyMEd => q{E, d/M/y GGGGG},
@@ -1253,6 +1424,7 @@ has 'datetime_formats_available_formats' => (
 			GyMMM => q{MMM, y G},
 			GyMMMEd => q{E, d MMM, y G},
 			GyMMMd => q{d MMM, y G},
+			MEd => q{E, d/M},
 			Md => q{d/M},
 			yyyyM => q{M/y GGGGG},
 			yyyyMEd => q{E d/M/y G},
@@ -1279,6 +1451,18 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
+			GyMEd => {
+				G => q{E, d/M/y GGGGG – E, d/M/y GGGGG},
+				M => q{E, d/M/y – E, d/M/y GGGGG},
+				d => q{E, d/M/y – E, d/M/y GGGGG},
+				y => q{E, d/M/y – E, d/M/y GGGGG},
+			},
+			GyMd => {
+				G => q{d/M/y GGGGG – d/M/y GGGGG},
+				M => q{d/M/y – d/M/y GGGGG},
+				d => q{d/M/y – d/M/y GGGGG},
+				y => q{d/M/y – d/M/y GGGGG},
+			},
 			MEd => {
 				M => q{E, dd/MM – E, dd/MM},
 				d => q{E, dd/MM – E, dd/MM},

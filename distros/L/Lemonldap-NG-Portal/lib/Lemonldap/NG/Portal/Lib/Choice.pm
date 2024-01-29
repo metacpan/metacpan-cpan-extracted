@@ -7,7 +7,7 @@ use Safe;
 extends 'Lemonldap::NG::Portal::Lib::Wrapper';
 with 'Lemonldap::NG::Portal::Lib::OverConf';
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.18.0';
 
 has modules    => ( is => 'rw', default => sub { {} } );
 has rules      => ( is => 'rw', default => sub { {} } );
@@ -120,6 +120,10 @@ sub checkChoice {
     if ( defined $req->pdata->{_choice} ) {
         $name = $req->pdata->{_choice};
         $self->logger->debug("Choice $name selected from pdata");
+    }
+    elsif ( (defined $req->data->{_authChoice}) or (defined $req->data->{_choice}) ) {
+        $name = $req->data->{_authChoice} || $req->data->{_choice};
+        $self->logger->debug("Choice $name selected from req->data");
     }
 
     unless ($name) {

@@ -1,6 +1,6 @@
 Changes
-examples/ex1.pl
-examples/ex2.pl
+examples/list_of_acad_identifiers.pl
+examples/list_of_acad_identifiers_real.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

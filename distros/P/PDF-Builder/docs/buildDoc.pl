@@ -15,9 +15,10 @@
 use strict;
 use warnings;
 use Getopt::Long;
+use Pod::Simple::XHTML;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 # =============
 # CONFIGURATION  these may be overridden by command-line flags. If reading from
@@ -319,48 +320,48 @@ do {
  	    mkdir_list($target);
 	    # assuming no problem with overwriting .html output
 
-	    # run pod2html and produce .html file
-	    if (-e "pod2html.stderr") {
-	        unlink "pod2html.stderr";
-	    }
 	    print STDERR "processing $source\n";
-	    system("pod2html --podpath=$libtop $source --outfile=$target 2>pod2html.stderr");
-	    # always produces pod2html.stderr, hopefully empty
+            # run Pod::Simple::XHTML and produce .html string
+            # see https://metacpan.org/pod/Pod::Simple::XHTML for args
+            my $p = Pod::Simple::XHTML->new();
+             
+            # output to $htmlfile variable, later to $target file
+            my $htmlfile;
+            $p->output_string(\$htmlfile);
 
-	    if (-e $target) {
-	        # will stick any error messages in just-created 
-	        #   .html file
-	        $htmlfile = slurp($target);
-	        $file_list[$i]{'status'} = 1;  # OK (so far)
-            } else {
-	        # create dummy .html file to hold error messages
-	        $htmlfile = empty();
-	        $file_list[$i]{'status'} = 3;  # serious error
-	    }
-	    # always put in a title
-	    $htmlfile =~ s#<title></title>#<title>$file_list[$i]{'pmname'}</title>#;
-	    # is it empty?
-	    if ($htmlfile =~ m#<body>\s*</body>#) {
+	    $p->html_charset('UTF-8');
+	    $p->html_encode_chars(q{&<>'"});
+	    $p->html_doctype('<!DOCTYPE html>');
+
+            # want an index at the top
+            $p->index(1);
+            # parse the file containing POD
+            $p->parse_file($source);
+            # if errors, a section "POD errors" is inserted at the end (also index)
+	    # $htmlfile is a string containing output HTML, including errors
+            # no separate .stderr file
+#if ($target =~ m/Issue155/) { spew($htmlfile, "raw.html"); }
+	     
+	    # also if only invalid POD
+ 	    if ($htmlfile eq '') {
 		print "$source INFO  no POD content\n";
 		$file_list[$i]{'status'} = 0;
-		$htmlfile =~ s#</body>#No documentation (POD) in this module</body>#;
+		$htmlfile = "<html>\n<head>\n<title>$source</title>\n</head>\n";
+		$htmlfile .= "<body>\nNo documentation (POD) in this module</body>\n</html>\n";
+	    } else {
+	        # possibly a good run (OK so far)
+		$file_list[$i]{'status'} = 1;
+	        # always put in a title
+	        $htmlfile =~ s#<title></title>#<title>$file_list[$i]{'pmname'}</title>#;
+	        # add lang="en" to html tag
+	        $htmlfile =~ s#<html>#<html lang="en">#;
 	    }
-	    # POD errors and warnings reported?
-	    if ($htmlfile =~ m#id="POD-ERRORS"#) {
-		print "$source WARNING  internal POD errors reported by pod2html\n";
-		$file_list[$i]{'status'} = 2;
-	    }
-	    # errors output to STDERR?
-	    if (!-z "pod2html.stderr") {
-		print "$source ERROR  POD errors reported by pod2html\n";
+
+            # POD conversion errors reported? already in index section
+	    # empty string if no valid POD at all
+	    if ($htmlfile =~ m#id="POD_ERRORS"#) {
+		print "$source ERROR  POD errors reported\n";
 		$file_list[$i]{'status'} = 3;
-		my $errorfile = slurp("pod2html.stderr");
-		$htmlfile =~ s#</body>#<h1 id="POD-STDERR">SEVERE ERRORS</h1><pre>$errorfile</pre>\n</body>#;
-		# put entry in "index" section, if exists
-		if ($htmlfile =~ m#<ul id="index">#) {
-		# first end-list at beginning of line
-		    $htmlfile =~ s#\n</ul>#\n  <li><a href="\#POD-STDERR">SEVERE ERRORS</a></li>\n</ul>#;
-	        }
 	    }
 
 	    # examine and modify $htmlfile contents:
@@ -470,9 +471,9 @@ do {
 		my $abstract = $1;
 		$abstract =~ s#^[^ ]*##;
 		$abstract =~ s#^$abstract_sep##;
-		# kill any links in the abstract
-		$abstract =~ s#<a href="[^"]+">##g;
-		$abstract =~ s#</a>##g;
+	       ## kill any links in the abstract
+	       #$abstract =~ s#<a href="[^"]+">##s;
+	       #$abstract =~ s#</a>##s;
 		$file_list[$i]{'abstract'} = $abstract;
 	    }
 
@@ -510,11 +511,12 @@ if ($leading ne '') { $fname .= "/$leading"; }
 
 open my $fh, '>', "$fname/$TOC" or 
     die "$fname/$TOC ERROR  unable to open output index file\n";
-print $fh "<html>\n<head>\n<title>Master index for $file_list[0]{'pmname'}";
-print $fh "</title>\n<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />\n";
+print $fh "<!DOCTYPE html>\n";
+print $fh "<html lang=\"en\">\n<head>\n<title>Master index for $file_list[0]{'pmname'}";
+print $fh "</title>\n<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">\n";
 print $fh "<style>\n";
-#print $fh "body { max-width: 50em; margins: 10px; }\n";
-print $fh "body { margins: 10px; }\n";
+#print $fh "body { max-width: 50em; margin: 10px; }\n";
+print $fh "body { margin: 10px; }\n";
 print $fh "h1, h2, h3 { text-align: center; }\n";
 print $fh ".fixedwidth { display: inline-block; width: 2em; }\n";
 print $fh ".dummy {color: #999; }\n";
@@ -524,10 +526,10 @@ print $fh "</style>\n";
 print $fh "</head>\n<body>\n";
 
 print $fh "<h1>T A B L E &nbsp; O F &nbsp; C O N T E N T S</h1>\n";
-print $fh "X = not accessible from root via chain of links<br/>\n";
-print $fh "<span class=\"errormsg\">ERROR</span> = POD errors of some sort reported<br/>\n";
-print $fh "(<span class=\"dummy\">no link</span>) = no POD, so empty .html file generated<br/>\n";
-print $fh " <br/>\n";
+print $fh "X = not accessible from root via chain of links<br>\n";
+print $fh "<span class=\"errormsg\">ERROR</span> = POD errors of some sort reported<br>\n";
+print $fh "(<span class=\"dummy\">no link</span>) = no POD, so empty .html file generated<br>\n";
+print $fh " <br>\n";
 
 for (my $i=0; $i<scalar @file_list; $i++) {
     # should not have any status -2 or -1 at this point
@@ -565,10 +567,40 @@ for (my $i=0; $i<scalar @file_list; $i++) {
 	# rather than one long line that wraps to left side. div with
 	# display:inline-block almost does it, but if too long doesn't 
 	# wrap, but puts entire div onto next line
-       #print $fh " &nbsp; - &nbsp; <div>$file_list[$i]{'abstract'}</div>";
-	print $fh " &nbsp; - &nbsp; $file_list[$i]{'abstract'}";
+	#
+	# Pod::Simple::XHTML has expanded L<> to metacpan URL, want our own
+	#
+	# change links to https://metacpan.org/pod/PDF::Builder::... to
+	# ../.. etc. /PDF/Builder/... .html
+	# don't forget some will have #id anchor on the end
+	my $string = $file_list[$i]{'abstract'};
+	my $pos = 0;
+	while ($pos > -1) {
+	    $pos = index $string, "href=\"https://metacpan.org/pod/PDF::";
+	    if ($pos < 0) { last; }
+	    $pos += 6;
+	    # $pos points to start of a link to metacpan https://...
+            my $pos2 = index $string, "\">", $pos;
+	    # $pos2 points to closing "> (which we'll keep)
+	    my $strLink = substr($string, $pos+25, $pos2-$pos-25);
+	    # $strLink should contain something like "PDF::Builder::Content"
+	    # if it contains an anchor (#), split off #anchor_id move $pos2
+	    my $pos3 = index $strLink, "#";
+	    if ($pos3 >= 0) {
+                $pos2 -= length($strLink)-$pos3;  # should start at # now
+		$strLink = substr($strLink, 0, $pos3);
+	    }
+	    # change :: to directory structure
+	    $strLink =~ s#::#/#g;
+	    # go up by one level, leading PDF/ not needed at this level
+	    $strLink = go_up($file_list[$i]{'depth'}) . "../$strLink.html";
+	    $string = substr($string, 0, $pos) . $strLink . substr($string, $pos2);
+	}
+
+       #print $fh " &nbsp; - &nbsp; <div>$string</div>";
+	print $fh " &nbsp; - &nbsp; $string";
     }
-    print $fh "<br/>\n";
+    print $fh "<br>\n";
 }
 print $fh "<h3>###</h3>\n";
 
@@ -582,8 +614,6 @@ print $fh "</body>\n</html>\n";
 close $fh;
 
 # cleanup
-unlink "pod2htmd.tmp";
-unlink "pod2html.stderr";
 
 # now that the individual HTML files and the master index are done,
 # 1) generate pmnameA array for each entry in @file_list
@@ -645,17 +675,22 @@ sub update_HTML{
 
 	# update link directory at top of file
 	# guaranteed there's at least one parent entry
-	$pos = index $string, '<ul id="index">';
+	# TBD shouldn't there be </li> at end of indexItem li's?
+	# if empty index list, replace by a real one
+	$pos = index $string, "<div class='indexgroupEmpty'></div>";
+	if ($pos > 0) {
+	    # is empty, replace with skeleton of real one
+	    $newstring = "<div class='indexgroup'>\n" .
+	                 "<ul   class='indexList indexList1'>\n" .
+			 "</ul>\n</div>";
+            $string = substr($string, 0, $pos) . $newstring . substr($string, $pos+36);
+	}
+	$pos = index $string, "<h1 id=\"NAME\">";
 	if ($pos < 0) {
 	    print "ERROR: can't find link index in file $fname.\n";
 	    next;
 	}
-	$pos = index $string, "\n</ul>", $pos;
-	if ($pos < 0) {
-	    print "ERROR: can't find end of link index in file $fname.\n";
-	    next;
-	}
-	# split point is $pos+1 (just before </ul>)
+	$pos -= 8; # new last item in top level list
 	
         $newstring =  "  <li><a href=\"#NAVIGATION-LINKS\">NAVIGATION LINKS</a>\n" .
 	              "    <ul>\n" .
@@ -673,7 +708,8 @@ sub update_HTML{
 	$string = substr($string, 0, $pos+1) . $newstring . substr($string, $pos+1);
 	
 	# just before </body> will be location of new section
-	$pos = index $string, "\n</body>\n";
+	$pos = index $string, "</body>";
+	$pos--;
 
 	$newstring =  "<h1 id=\"NAVIGATION-LINKS\">NAVIGATION LINKS</h1>\n";
 
@@ -681,10 +717,10 @@ sub update_HTML{
 	$newstring .= "\n<h2 id=\"Up-Parents\">Up (Parents)</h2>\n";
 	# add ever-present master index entry at same level as [0] entry
 	# note: omitting id= because it's not used anywhere
-	# emulate a 'simple' (unbulleted) list with definition list empty dd
-	$newstring .= "\n<dl>\n\n<dt>" .
+	# just a paragraph with each line ending in a break
+	$newstring .= "\n<p>" .
 	              "<a href=\"".go_up($file_list[$i]{'depth'}-1) .
-		      "${rootname}_index.html\">Master Index</a>&nbsp;</dt>\n<dd>\n\n</dd>\n";
+		      "${rootname}_index.html\">Master Index</a><br>\n";
 
         $ref = $file_list[$i]{'parents'};
         if (defined $ref && scalar(@$ref)) {
@@ -693,24 +729,24 @@ sub update_HTML{
 	    @list = @$ref;
 	    foreach (@list) {
 	        $newstring .= "<a href=\"".go_up($file_list[$i]{'depth'}) .
-		              "$file_list[$_]{'htmlname'}\">$file_list[$_]{'pmname'}</a> -- $file_list[$_]{'abstract'}</dt>\n<dd>\n\n</dd>\n";
+		              "$file_list[$_]{'htmlname'}\">$file_list[$_]{'pmname'}</a> -- $file_list[$_]{'abstract'}<br>\n";
             }
         }
-	$newstring .= "</dl>\n";
+	$newstring .= "</p>\n";
 
         # if any siblings, output that section
 	if ($count[1]) {
             $ref = $file_list[$i]{'siblings'};
             if (defined $ref && scalar(@$ref)) {
-	        $newstring .= "\n<h2 id=\"Siblings\">Siblings</h2>\n";
+	        $newstring .= "\n<h2 id=\"Siblings\">Siblings</h2>\n<p>\n";
 	        # @$ref is an ordered array of @file_list indice(s)
 	        # pointing back to any siblings
 	        @list = @$ref;
 	        foreach (@list) {
 	            $newstring .= "<a href=\"".go_up($file_list[$i]{'depth'}) .
-		                  "$file_list[$_]{'htmlname'}\">$file_list[$_]{'pmname'}</a> -- $file_list[$_]{'abstract'}</dt>\n<dd>\n\n</dd>\n";
+		                  "$file_list[$_]{'htmlname'}\">$file_list[$_]{'pmname'}</a> -- $file_list[$_]{'abstract'}<br>\n";
                 }
-	        $newstring .= "</dl>\n";
+	        $newstring .= "</p>\n";
             }
         }
 
@@ -718,22 +754,74 @@ sub update_HTML{
 	if ($count[2]) {
             $ref = $file_list[$i]{'children'};
             if (defined $ref && scalar(@$ref)) {
-	        $newstring .= "\n<h2 id=\"Down-Children\">Down (Children)</h2>\n";
+	        $newstring .= "\n<h2 id=\"Down-Children\">Down (Children)</h2>\n<p>\n";
 	        # @$ref is an ordered array of @file_list indice(s)
 	        # pointing back to any children
 	        @list = @$ref;
 	        foreach (@list) {
 	            $newstring .= "<a href=\"".go_up($file_list[$i]{'depth'}) .
-		                  "$file_list[$_]{'htmlname'}\">$file_list[$_]{'pmname'}</a> -- $file_list[$_]{'abstract'}</dt>\n<dd>\n\n</dd>\n";
+		                  "$file_list[$_]{'htmlname'}\">$file_list[$_]{'pmname'}</a> -- $file_list[$_]{'abstract'}<br>\n";
                 }
-	        $newstring .= "</dl>\n";
+	        $newstring .= "</p>\n";
             }
         }
 
 	# bottom of page mark
-	$newstring .= "<p><center>###</center></p>\n";
+	$newstring .= "<h3>###</h3>\n";
         # write file back out
 	$string = substr($string, 0, $pos+1) . $newstring . substr($string, $pos+1);
+	# change links to https://metacpan.org/pod/PDF::Builder::... to
+	# ../.. etc. /PDF/Builder/... .html
+	# don't forget some will have #id anchor on the end
+	$pos = 0;
+	while ($pos > -1) {
+	    $pos = index $string, "href=\"https://metacpan.org/pod/PDF::";
+	    if ($pos < 0) { last; }
+	    $pos += 6;
+	    # $pos points to start of a link to metacpan https://...
+            my $pos2 = index $string, "\">", $pos;
+	    # $pos2 points to closing "> (which we'll keep)
+	    my $strLink = substr($string, $pos+25, $pos2-$pos-25);
+	    # $strLink should contain something like "PDF::Builder::Content"
+	    # if it contains an anchor (#), split off #anchor_id move $pos2
+	    my $pos3 = index $strLink, "#";
+	    if ($pos3 >= 0) {
+                $pos2 -= length($strLink)-$pos3;  # should start at # now
+		$strLink = substr($strLink, 0, $pos3);
+	    }
+	    # change :: to directory structure
+	    $strLink =~ s#::#/#g;
+	    $strLink = go_up($file_list[$i]{'depth'}) . "$strLink.html";
+	    $string = substr($string, 0, $pos) . $strLink . substr($string, $pos2);
+	}
+	# FIXUP of Pod::Simple::XHTML problems
+	#  self-closing tags disallowed in HTML 5
+	$string =~ s# />#>#g;
+	#  current bug: indented paragraphs are <p> under <ul>, which the
+	#    validator dislikes. remove <ul> and change <p> to <blockquote>
+	#    (other solutions would be preferable, but PSX owner has
+	#    indicated he plans to do this)
+	$pos = 0;
+	while (1) {
+	    $pos = index($string, "<ul>\n\n<p>", $pos);
+	    if ($pos < 0) { last; }
+
+	    # $pos marks beginning of problem section
+	    my $pos2 = index($string, "\n</ul>\n", $pos);
+	    if ($pos2 < 0) { last; } # SHOULDN'T happen!
+	    # $pos2 marks end of problem section
+
+            $newstring = substr($string, $pos+6, $pos2-$pos-7);
+	    # should be <p> through last </p> of section
+            $newstring =~ s#<p>#<blockquote>#gs;
+            $newstring =~ s#</p>#</blockquote>#gs;
+
+	    # put it back together, omitting the <ul> and </ul> tags
+	    $string = substr($string, 0, $pos) . 
+	              $newstring . 
+		      substr($string, $pos2+6);
+	}
+
 	spew($string, $fname);
     }
     return;
@@ -923,6 +1011,17 @@ sub make_pmnameA {
 sub spew {
     my ($string, $fname) = @_;
     open(my $fh, '>', $fname) or die "$fname ERROR  can't open file for output\n";
+    # warn if a wide character and give string and offset
+    my $first = 1;  # only one dump of string
+    for (my $i=0; $i<length($string); $i++) {
+	if (ord(substr($string, $i, 1)) > 127) {
+	    if ($first) {
+		print "String: '$string'\n";
+		$first = 0;
+	    }
+	    print "Wide character ".ord(substr($string, $i, 1))." found at $i\n";
+	}
+    }
     print $fh $string;
     close $fh;
     return;
@@ -1064,8 +1163,9 @@ sub toFP {
 sub help {
     my $message = <<"END_OF_TEXT";
 
-buildDoc.pl: build, using pod2html utility, all the .html documentation files
-  for a package, from all the .pm (or .pod) files in the package.
+buildDoc.pl: build, using the Pod::Simple::XHTML utility, all the .html 
+documentation files for a package, from all the .pm (or .pod) files in 
+the package.
 
 Using buildDoc.pl
 
@@ -1169,10 +1269,10 @@ in Builder/docs (also on the Desktop), run
 
     buildDoc.pl --leading='' --libtop=../../SVG-2.87/lib -rootname=SVG
 
-  The .pod or .pm file(s) are fed to pod2html utility (usually part of Perl 
-installation) to produce .html files stored in the current directory or below 
-(see configuration section). .html files with any links in them (L<> tag) are 
-fixed up to correct the href (path) to the referenced HTML files.
+  The .pod or .pm file(s) are fed to Pod::Simple::XHTML utility to produce 
+.html files stored in the current directory or below (see configuration 
+section). .html files with any links in them (L<> tag) are fixed up to correct 
+the href (path) to the referenced HTML files.
 
 If there are both .pod and .pm versions of a given filename, the .pod version
 will be preferably used. Presumably it has the documentation in it.
@@ -1219,7 +1319,7 @@ Messages:
   <filename> WARNING  top-level .pod or .pm file not readable
      One or more of the top level .pod or .pm files (<rootname> .pod or .pm) 
      was missing or not readable.
-  <filename> WARNING  internal POD errors reported by pod2html
+  <filename> WARNING  internal POD errors reported by Pod::Simple::XHTML
      At the end of the .html file, problems are listed. You should examine them 
      and attempt to correct the issue(s). Usually these are formatting issues.
   <filename> WARNING  is not a directory or file, ignored
@@ -1231,7 +1331,7 @@ Messages:
      and cannot be an empty string. It must be a name.
   <filename> ERROR  no <rootname> .pod or .pm files found
      The specified file(s) were not found.
-  <filename> ERROR  POD errors reported by pod2html
+  <filename> ERROR  POD errors reported by Pod::Simple::XHTML
      One or more error messages were written to STDERR. You should examine them 
      and attempt to correct the issue(s).
   <PMname> ERROR  does not appear to exist, called from <sourcefile>
@@ -1279,8 +1379,8 @@ sub empty {
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title></title>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rev="made" href="mailto:">
 </head>
 
 <body>

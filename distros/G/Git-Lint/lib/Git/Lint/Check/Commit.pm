@@ -7,7 +7,7 @@ use parent 'Git::Lint::Check';
 
 use Git::Lint::Command;
 
-our $VERSION = '0.016';
+our $VERSION = '1.000';
 
 sub diff {
     my $self = shift;
@@ -33,7 +33,7 @@ sub _against {
     # the previous way we were checking for initial commit, but seemed more
     # brittle over the long term to check for a specific error string.
     if ( $exit && $stderr ) {
-        die "git-lint: $stderr\n";
+        die "$stderr\n";
     }
 
     if ($stdout) {
@@ -55,7 +55,7 @@ sub _diff_index {
 
     my ( $stdout, $stderr, $exit ) = Git::Lint::Command::run( \@git_diff_index_cmd );
 
-    die "git-lint: $stderr\n" if $exit;
+    die "$stderr\n" if $exit;
 
     return [ split( /\n/, $stdout ) ];
 }

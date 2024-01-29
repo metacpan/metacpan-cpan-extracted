@@ -12,7 +12,7 @@ BEGIN {
    Test::MemoryGrowth->import;
 }
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 # RT132332
 {
@@ -20,7 +20,7 @@ use Object::Pad;
        # Needs at least one field member to trigger failures
        field $thing;
        # ... and we need to refer to it in a method as well
-       BUILD { $thing }
+       ADJUST { $thing }
    }
 
    no_growth { Example->new };
@@ -31,7 +31,7 @@ use Object::Pad;
       field @array;
       field %hash;
 
-      BUILD {
+      ADJUST {
          @array = ();
          %hash  = ();
       }

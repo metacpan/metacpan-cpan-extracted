@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use CSS::Struct::Output::Indent;
-use Data::HTML::A;
+use Data::HTML::Element::A;
 use Tags::HTML::Table::View;
 use Tags::Output::Indent;
 
@@ -17,7 +17,7 @@ my $obj = Tags::HTML::Table::View->new(
 );
 
 # Table data.
-my $prague = Data::HTML::A->new(
+my $prague = Data::HTML::Element::A->new(
         'data' => ['Prague'],
         'url' => 'https://prague.cz',
 );

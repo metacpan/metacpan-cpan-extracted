@@ -26,7 +26,7 @@
   use strict;
   use warnings;
   use vars qw(%areanames %fixed_line_regexes %mobile_regexes);
-our $VERSION = 1.20230903131350;
+our $VERSION = 1.20231210185843;
 
 
 
@@ -2148,6 +2148,7 @@ our $VERSION = 1.20230903131350;
     '122592' => "Baton\ Rouge\,\ LA",
     '1226' => "Ontario",
     '1226663' => "London\,\ ON",
+    '1227' => "Maryland",
     '1228' => "Mississippi",
     '1228206' => "Gulfport\,\ MS",
     '1228207' => "Biloxi\,\ MS",
@@ -6989,6 +6990,7 @@ our $VERSION = 1.20230903131350;
     '1325947' => "San\ Angelo\,\ TX",
     '1325949' => "San\ Angelo\,\ TX",
     '1326' => "Ohio",
+    '1329' => "New\ York",
     '1330' => "Ohio",
     '1330220' => "Brunswick\,\ OH",
     '1330225' => "Brunswick\,\ OH",
@@ -8131,6 +8133,7 @@ our $VERSION = 1.20230903131350;
     '1365' => "Ontario",
     '1367' => "Quebec",
     '1368' => "Alberta",
+    '1369' => "California",
     '1380' => "Ohio",
     '1382' => "Ontario",
     '1385' => "Utah",
@@ -22299,6 +22302,7 @@ our $VERSION = 1.20230903131350;
     '1727943' => "Tarpon\ Springs\,\ FL",
     '1727944' => "Tarpon\ Springs\,\ FL",
     '1727945' => "Tarpon\ Springs\,\ FL",
+    '1730' => "Illinois",
     '1731' => "Tennessee",
     '1731235' => "Greenfield\,\ TN",
     '1731253' => "Tiptonville\,\ TN",

@@ -1,7 +1,15 @@
-0.006   2023-12-08  Released-By: PERLANCAR; Urgency: medium
+0.007   2023-12-12  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Do not add original file's directory as target name.
+
+
+0.006   2023-12-08  Released-By: PERLANCAR; Urgency: medium; Broken: yes
 
         - [clis mv-*-download-here] Add options --overwrite (-O), --as; by
           default do not overwrite.
+
+        - UPDATE: this version introduces a bug regarding target filename,
+          please use 0.007+.
 
 
 0.005   2023-11-28  Released-By: PERLANCAR; Urgency: medium

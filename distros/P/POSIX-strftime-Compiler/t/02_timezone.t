@@ -15,6 +15,10 @@ eval {
     if ($d !~ m!^\+0200!) {
         die "tzdada is not enough: $d";
     }
+    $d = `"$^X" $inc $dir/02_timezone.pl %z 0 0 0 1 1 112`;
+    if ($d !~ m!^\+0100!) {
+        die "tzdada is not enough: $d";
+    }
 };
 if ( $@ ) {
     plan skip_all => $@;

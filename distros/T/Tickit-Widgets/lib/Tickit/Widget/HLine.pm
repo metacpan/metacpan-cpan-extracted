@@ -4,12 +4,13 @@
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.73;
+use warnings;
+use Object::Pad 0.807;
 
-package Tickit::Widget::HLine 0.37;
-class Tickit::Widget::HLine
-   :strict(params)
-   :isa(Tickit::Widget);
+package Tickit::Widget::HLine 0.41;
+class Tickit::Widget::HLine :strict(params);
+
+inherit Tickit::Widget;
 
 use Tickit::Style;
 use Tickit::RenderBuffer qw( LINE_SINGLE CAP_BOTH );
@@ -22,7 +23,6 @@ C<Tickit::Widget::HLine> - a widget displaying a horizontal line
 
 =head1 SYNOPSIS
 
-   use Tickit::Widget::HLine;
    use Tickit::Widget::VBox;
    use Tickit::Widget::HLine;
 
@@ -85,7 +85,7 @@ my %symbolics = (
 
 =head2 new
 
-   $hline = Tickit::Widget::HLine->new( %args )
+   $hline = Tickit::Widget::HLine->new( %args );
 
 Constructs a new C<Tickit::Widget::HLine> object.
 

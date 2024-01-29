@@ -1,5 +1,5 @@
-# Copyright (c) 2023 Löwenfelsen UG (haftungsbeschränkt)
-# Copyright (c) 2023 Philipp Schafft
+# Copyright (c) 2023-2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2023-2024 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -7,18 +7,22 @@
 
 package Data::URIID::Result;
 
-use v5.10;
+use v5.16;
 use strict;
 use warnings;
 
 use Carp;
 use URI;
 use URI::Escape;
+use Scalar::Util qw(blessed);
 use List::Util qw(any);
 use UUID::Tiny ':std';
 use Math::BigInt;
+use MIME::Base64;
 
 use Data::URIID::Service;
+use Data::URIID::Digest;
+use Data::URIID::Future;
 
 use constant {
     ISEORDER_UOR => ['uuid', 'oid', 'uri'],
@@ -28,7 +32,17 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
 use constant RE_UINT => qr/^[1-9][0-9]*$/;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
+
+my %digest_name_converter = (
+    fc('md5')   => 'md-5-128',
+    fc('sha1')  => 'sha-1-160',
+    fc('sha-1') => 'sha-1-160',
+    (map {
+            fc('sha-'.$_)  => 'sha-2-'.$_,
+            fc('sha3-'.$_) => 'sha-3-'.$_,
+        } qw(224 256 384 512)),
+);
 
 my %attributes = (
     action      => {
@@ -37,9 +51,7 @@ my %attributes = (
     displayname => {
         source_type => 'string',
     },
-    displaycolour => {
-        source_type => 'rgb',
-    },
+    displaycolour => {},
     description => {
         source_type => 'string',
     },
@@ -48,6 +60,7 @@ my %attributes = (
     },
     icon => {},
     thumbnail => {},
+    website => {},
     final_file_size => {
         source_type => 'uint',
     },
@@ -55,6 +68,30 @@ my %attributes = (
     best_service => {},
     (map {$_ => {source_type => 'number'}} qw(altitude latitude longitude)),
     space_object => {},
+
+    sex_or_gender => {},
+
+    media_subtype => {
+        source_type => 'media_subtype',
+    },
+
+    roles => {},
+
+    sources => {
+        cb => sub {
+            my ($self) = @_;
+            my Data::URIID $extractor = $self->extractor;
+            my %sources;
+
+            foreach my $key (keys(%{$self->{offline_results}}), keys(%{$self->{online_results}})) {
+                if (scalar(keys %{$self->{offline_results}{$key} // {}}) || scalar(keys %{$self->{online_results}{$key} // {}})) {
+                    $sources{$extractor->name_to_ise(service => $key)} = undef;
+                }
+            }
+
+            return [map {$extractor->service($_)} sort keys %sources];
+        },
+    },
 
     # TODO: define type.
     (map {$_ => {source_type => 'string'}} qw(date_of_birth date_of_death)),
@@ -67,23 +104,7 @@ my %id_conv = (
     doi  => [qw(grove-art-online-identifier)],
 );
 
-my %lookup_services = (
-    'uuid'                          => [qw(Data::URIID)],
-    'oid'                           => [qw(Data::URIID)],
-    'uri'                           => [qw(Data::URIID)],
-    'tagname'                       => [], # none.
-    'wikidata-identifier'           => [qw(wikidata)],
-    'musicbrainz-identifier'        => [qw(musicbrainz)],
-    'british-museum-term'           => [qw(britishmuseum)],
-    'gnd-identifier'                => [qw(dnb)],
-    'fellig-box-number'             => [qw(fellig)],
-    'fellig-identifier'             => [qw(fellig)],
-    'youtube-video-identifier'      => [qw(youtube)],
-    'e621tagtype'                   => [qw(e621)],
-    'wikimedia-commons-identifier'  => [qw(wikimedia-commons)],
-    'e621-post-identifier'          => [qw(e621)],
-    'xkcd-num'                      => [qw(xkcd)],
-);
+my %lookup_services;
 
 my %best_services = (
     'wikidata-identifier'           => 'wikidata',
@@ -100,7 +121,6 @@ my %best_services = (
     'osm-way'                       => 'osm',
     'osm-relation'                  => 'osm',
     'xkcd-num'                      => 'xkcd',
-    #'factgrid-identifier'           => '',
     'viaf-identifier'               => 'viaf',
     'open-library-identifier'       => 'open-library',
     #'unesco-thesaurus-identifier'   => '',
@@ -121,6 +141,8 @@ my %best_services = (
     'grove-art-online-identifier'   => 'grove-art-online',
     'wikitree-person-identifier'    => 'wikitree-person',
     'doi'                           => 'doi',
+    'iconclass-identifier'          => 'iconclass',
+    'media-subtype-identifier'      => 'iana',
 );
 
 # Load extra services:
@@ -158,7 +180,7 @@ my %url_templates = (
     ],
     'e621' => [
         ['e621tagtype'          => 'https://e621.net/wiki_pages/show_or_new?title=%s', undef, [qw(info)]],
-        ['e621-post-identifier' => 'https://e621.net/posts/%u',                        undef, [qw(render)]],
+        ['e621-post-identifier' => 'https://e621.net/posts/%u',                        undef, [qw(info render)]],
     ],
     'dnb' => [
         ['gnd-identifier' => 'https://d-nb.info/gnd/%s', undef, [qw(info)]],
@@ -230,6 +252,13 @@ my %url_templates = (
         ['doi' => 'https://doi.org/%s',    undef, [qw(info)], {no_escape => 1}],
         ['doi' => 'https://dx.doi.org/%s', undef, [qw(metadata)], {no_escape => 1}],
     ],
+    'iconclass' => [
+        ['iconclass-identifier' => 'https://iconclass.org/%s', undef, [qw(info)]],
+        ['iconclass-identifier' => 'https://iconclass.org/%s.jsonld', undef, [qw(metadata)]],
+    ],
+    'iana' => [
+        ['media-subtype-identifier' => 'https://www.iana.org/assignments/media-types/%s', undef, [qw(info)], {no_escape => 1}],
+    ],
 );
 
 my $re_yt_vid = qr#[^/]{11}#;
@@ -298,8 +327,8 @@ my %url_parser = (
             action => 'metadata',
         },
         {
-            host => 'www.youtube.com',
-            path => qr#^/(?:embed|shorts)/($re_yt_vid)$#,
+            host => qr#^(?:www\.)?youtube\.com$#,
+            path => qr#^/(?:embed|shorts|live)/($re_yt_vid)$#,
             source => 'youtube',
             type => 'youtube-video-identifier',
             id => \1,
@@ -386,8 +415,8 @@ my %url_parser = (
             action => 'info',
         },
         {
-            host => qr#^(?:www,de,es,fr,fr-ca,it,nl,sv,pt)\.findagrave\.com$#,
-            path => qr#^/memorial/([1-9][0-9]*)$#,
+            host => qr#^(?:www|de|es|fr|fr-ca|it|nl|sv|pt)\.findagrave\.com$#,
+            path => qr#^/memorial/([1-9][0-9]*)(?:/[^/]*)?$#,
             source => 'find-a-grave',
             type => 'find-a-grave-identifier',
             id => \1,
@@ -443,6 +472,14 @@ my %url_parser = (
         },
         {
             host => 'database.factgrid.de',
+            path => qr#^/entity/(?:Property:)?([QP][1-9][0-9]*)$#,
+            source => 'factgrid',
+            type => 'factgrid-identifier',
+            id => \1,
+            ise_order => ISEORDER_RUO,
+        },
+        {
+            host => 'database.factgrid.de',
             path => qr#^/wiki/(?:Item|Property):([QP][1-9][0-9]*)$#,
             source => 'factgrid',
             type => 'factgrid-identifier',
@@ -483,6 +520,30 @@ my %url_parser = (
             id => \1,
             action => 'metadata',
         },
+        {
+            host => 'iconclass.org',
+            path => qr#^/(?:(?:de|en)/)?([0-9].*)\.[a-z]+$#,
+            source => 'iconclass',
+            type => 'iconclass-identifier',
+            id => \1,
+            action => 'metadata',
+        },
+        {
+            host => 'iconclass.org',
+            path => qr#^/(?:(?:de|en)/)?([0-9].*)$#,
+            source => 'iconclass',
+            type => 'iconclass-identifier',
+            id => \1,
+            action => 'info',
+        },
+        {
+            host => 'www.iana.org',
+            path => qr#^/assignments/media-types/([a-z0-9\.\-\+]+\/[a-z0-9\.\-\+]+)$#,
+            source => 'iana',
+            type => 'media-subtype-identifier',
+            id => \1,
+            action => 'info',
+        },
     ],
 );
 
@@ -506,8 +567,16 @@ my %syntax = (
     'grove-art-online-identifier'   => qr/^T(?:0|20|22)\d{5}$/,
     'wikitree-person-identifier'    => qr/^\D+-[1-9][0-9]*$/,
     'doi'                           => qr/^10\.[0-9]{4,9}\/.+$/,
+    'iconclass-identifier'          => qr/^[0-9].*$/,
+    'media-subtype-identifier'      => qr/^[a-z0-9\.\-\+]+\/[a-z0-9\.\-\+]+$/,
+    'europeana-entity-identifier'   => qr/^(?:place|agent|concept|organisation)\/base\/[1-9][0-9]+$/,
+    'open-library-identifier'       => qr/^(?:(?:person|place|time):)?[^:\n]+$/,
+    'viaf-identifier'               => qr/^[1-9][0-9]+$/,
+    'isni'                          => qr/^[0]{4} [0-9]{4} [0-9]{4} [0-9]{3}[0-9X]$/,
+    'aev-identifier'                => qr/^[\w\/\d]+$/,
+    'unesco-thesaurus-identifier'   => qr/^concept[0-9]+$/,
     (map {'osm-'.$_ => RE_UINT} qw(node way relation)),
-    (map {$_        => RE_UINT} qw(e621-post-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier)),
+    (map {$_        => RE_UINT} qw(e621-post-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier)),
 );
 
 my %fellig_tables = (
@@ -618,22 +687,28 @@ sub _lookup_one {
     my Data::URIID $extractor = $self->extractor;
     my $mode = $opts{mode} // 'online';
     my $have = $self->{$mode.'_results'} //= {};
-    my $res;
+    my $f;
 
-    return $have->{$service} if $have->{$service};
+    return undef if defined $have->{$service};
 
-    $res = eval {
+    $f = eval {
         my $_service = $extractor->service($service);
         my $_func = $_service->can(sprintf('_%s_lookup', $mode));
         $_service->$_func($self, %opts)
-    } // {};
-    $have->{$service} = $res;
-    foreach my $id_type (keys %{$res->{id} // {}}) {
-        my $ise = $extractor->name_to_ise(type => $id_type);
-        $self->{id}{$ise} //= $res->{id}{$id_type};
-    }
+    } // Data::URIID::Future->die($@ // 'No data');
+    $f = $f->then(sub {
+            my ($res) = @_;
+            $have->{$service} = $res;
+            foreach my $id_type (keys %{$res->{id} // {}}) {
+                my $ise = $extractor->name_to_ise(type => $id_type);
+                $self->{id}{$ise} //= $res->{id}{$id_type};
+            }
+            return $res;
+        })->else(sub {
+            return $have->{$service} = {};
+        });
 
-    return $res;
+    return $f;
 }
 
 sub _lookup_with_mode {
@@ -646,9 +721,12 @@ sub _lookup_with_mode {
     foreach my $pass (0..2) {
         foreach my $id_type_ise (keys %{$self->{id}}) {
             my $id_type = eval {$extractor->ise_to_name(type => $id_type_ise)} // next;
-            foreach my $service (@{$lookup_services{$id_type}}) {
-                $self->_lookup_one($service, %opts);
-            }
+            my $f = Data::URIID::Future->combine(
+                grep {defined}
+                map {$self->_lookup_one($_, %opts)}
+                @{$lookup_services{$id_type}}
+            );
+            $f->await if defined $f;
         }
     }
 }
@@ -668,7 +746,7 @@ sub _lookup__https {
             # We need to do this very early as we cannot store it as an ID before we did an online lookup.
             my Data::URIID::Service $service = $self->extractor->service('wikipedia');
             if ($service->_is_online) {
-                my $json = $service->_get_json(sprintf('https://%s/w/api.php', $host),
+                my $json = $service->_get_json(url => sprintf('https://%s/w/api.php', $host),
                     query => {
                         action      => 'query',
                         format      => 'json',
@@ -676,7 +754,7 @@ sub _lookup__https {
                         prop        => 'pageprops',
                         ppprop      => 'wikibase_item',
                         titles      => $page,
-                    });
+                    })->get;
                 if (defined $json) {
                     my $wikidata_identifier = eval {$json->{query}{pages}{(keys %{$json->{query}{pages}})[0]}{pageprops}{wikibase_item}};
                     if (defined $wikidata_identifier) {
@@ -691,8 +769,46 @@ sub _lookup__https {
         # We need to do this very early as we cannot store it as an ID before we did an online lookup.
         my Data::URIID::Service $service = $self->extractor->service('xkcd');
         if ($service->_is_online) {
-            my $res = $self->_lookup_one($service->name, metadata_url => 'https://xkcd.com/info.0.json');
+            my $res = $self->_lookup_one($service->name, metadata_url => 'https://xkcd.com/info.0.json')->get || {};
             $self->_set(xkcd => 'xkcd-num' => $res->{id}{'xkcd-num'}, undef, $path eq '/' ? 'render' : 'metadata') if defined $res->{id}{'xkcd-num'};
+        }
+    } elsif ($host eq 'uriid.org' && $path =~ m#^/(?:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}|[a-z]+|[a-zA-Z])/.+$#) {
+        my ($prefix, $type, $id) = $uri->path_segments;
+        if ($prefix eq '') {
+            my Data::URIID::Service $uriid = $self->extractor->service('uriid');
+            my $types = $uriid->_get_uriid_decompiled_types_json->{forward}{types};
+            my $type_uuid;
+            if ($type =~ RE_UUID) {
+                $type_uuid = lc($type);
+            } elsif (defined $types->{$type}{alias_for}) {
+                $type_uuid = $types->{$type}{alias_for};
+            }
+            $self->_set(uriid => $type_uuid => $id, undef, 'info');
+        }
+    } elsif ($host eq 'uriid.org' || $host eq 'api.uriid.org') {
+        my Data::URIID $extractor = $self->extractor;
+        my %query = $uri->query_form;
+        my $action = $host eq 'uriid.org' ? 'info' : 'metadata';
+
+        if (defined($query{type}) && length($query{type}) && defined($query{id}) && length($query{id})) {
+            my Data::URIID::Service $uriid = $extractor->service('uriid');
+            my $types = $uriid->_get_uriid_decompiled_types_json->{forward}{types};
+            my $type_uuid;
+            if ($query{type} =~ RE_UUID) {
+                $type_uuid = lc($query{type});
+            } elsif (defined $types->{$query{type}}{alias_for}) {
+                $type_uuid = $types->{$query{type}}{alias_for};
+            }
+            $self->_set(uriid => $type_uuid => $query{id}, undef, $action);
+        } elsif (defined($query{for}) && length($query{for})) {
+            my $old_online = $extractor->online;
+            my $result;
+            $extractor->online(0);
+            $result = eval {$extractor->lookup($query{for})};
+            $extractor->online($old_online);
+            if (defined $result) {
+                $self->_set(uriid => $result->id_type => $result->id, undef, $action);
+            }
         }
     }
 }
@@ -783,16 +899,147 @@ sub _as_lookup {
 
     return $res;
 }
+sub _cast {
+    my ($self, $key, $value, $source_type, $as, %opts) = @_;
+    if ($as eq $source_type) {
+        return $value;
+    } else {
+        if ($as eq 'string' && $source_type eq 'media_subtype') {
+            return $value;
+        } elsif ($as eq 'ise' && $source_type eq 'media_subtype') {
+            return $self->_media_subtype_to_uuid($value);
+        } elsif ($as eq 'string' && eval {$value->isa('URI')}) {
+            return $value->as_string;
+        } elsif ($as eq __PACKAGE__ && eval {$value->isa('URI')}) {
+            return $self->_as_lookup([$value], %opts);
+        } elsif ($as eq __PACKAGE__ && eval {$value->can('ise')}) {
+            return $self->_as_lookup([ise => $value->ise], %opts);
+        } elsif ($as eq 'ise' && eval {$value->can('ise')}) {
+            return $value->ise;
+        } elsif ($as eq 'rgb' && eval {$value->can('rgb')}) {
+            return $value->rgb;
+        }
+
+        if ($as eq __PACKAGE__ && defined(my $ise = eval{$self->attribute($key, %opts, as => 'ise')})) {
+            return $self->_as_lookup([ise => $ise], %opts);
+        }
+    }
+
+    croak sprintf('Cannot convert from type "%s" to "%s" for attribute "%s"', $source_type, $as, $key);
+}
+sub _cache_key {
+    my ($self) = @_;
+    return $self->{cache_key} //= sprintf('%s/%s', $self->{primary}{type}, $self->{primary}{id});
+}
 sub attribute {
     my ($self, $key, %opts) = @_;
     my $info = $attributes{$key} // croak sprintf('Unknown attribute "%s"', $key);
-    my $attributes = $self->{attributes} //= {};
-    my $value = $attributes->{$key};
     my $as = $opts{as} // $info->{default_as} // $info->{source_type};
-    my $default_value;
+    my $value = $self->{primary}{$key};
+    my @value;
+
+    if (defined(my $cb = $info->{cb})) {
+        $value = $self->$cb($key, %opts);
+        @value = @{$value} if ref($value) eq 'ARRAY';
+    } else {
+        my $default_value;
+
+        unless (defined($value) || ref($value) eq 'ARRAY') {
+            $self->{offline_results} //= {};
+            $self->{online_results}  //= {};
+
+            @value = @{$value} if ref($value) eq 'ARRAY';
+
+            foreach my $result (values(%{$self->{offline_results}}), values(%{$self->{online_results}})) {
+                next unless defined($result) && defined($result->{attributes});
+                if (defined($value = $result->{attributes}->{$key})) {
+                    if (ref($value) eq 'HASH') {
+                        my $new;
+                        foreach my $language_tag ($self->extractor->_get_language_tags(%opts)) {
+                            $new = $value->{$language_tag} and last;
+                        }
+                        $default_value = $value->{'*'};
+                        $value = $new;
+                    }
+
+                    if (defined($value)) {
+                        next unless defined $value;
+
+                        if (ref($value) eq 'ARRAY') {
+                            push(@value, @{$value});
+                        } else {
+                            last;
+                        }
+                    } elsif (ref($default_value) eq 'ARRAY') {
+                        push(@value, @{$default_value});
+                    }
+                }
+            }
+        }
+
+        $value //= $default_value;
+    }
+
+    if (defined $value) {
+        my $cache = ($self->{attributes_cache} //= {})->{$key} //= {};
+        my $source_type;
+
+        $source_type = ref($value[0]) || ref($value) || $info->{source_type};
+        $as //= $source_type;
+
+        if (ref($value) eq 'ARRAY' xor $opts{list}) {
+            croak sprintf('Invalid list mode for attribute "%s"', $key);
+        }
+
+        if (ref($value) eq 'ARRAY') {
+            my %uniq;
+
+            return @{$cache->{$as}} if defined $cache->{$as};
+
+            foreach my $item (@value) {
+                if (blessed $item) {
+                    $uniq{$item->ise} = $item;
+                } else {
+                    my __PACKAGE__ $result = $self->_as_lookup($item, %opts);
+                    $uniq{$result->_cache_key} = $result;
+                }
+            }
+
+            $cache->{$as} = [map{$self->_cast($key => $_, $source_type => $as, %opts)} values %uniq];
+            return @{$cache->{$as}};
+        } else {
+            return $cache->{$as} //= $self->_cast($key => $value, $source_type => $as, %opts);
+        }
+    }
+
+    if (exists $opts{default}) {
+        if ($opts{list}) {
+            return @{$opts{default}};
+        } else {
+            return $opts{default};
+        }
+    }
+
+    croak sprintf('No value found for attribute "%s"', $key);
+}
+
+
+sub digest {
+    my ($self, $key, %opts) = @_;
+    my $as = $opts{as} // 'hex';
+    my $value;
+
+    # convert L<Digest> name into utag name if needed:
+    $key = $digest_name_converter{fc($key)} // $key;
+
+    # Check utag name:
+    if ($key !~ /^[a-z]+-[0-9]+-[1-9][0-9]*$/) {
+        croak sprintf('Unknown digest format "%s"', $key);
+    }
 
     unless (defined $value) {
-        $value = $self->{primary}{$key};
+        $self->{primary}{digest} //= {};
+        $value = $self->{primary}{digest}{$key};
     }
 
     unless (defined $value) {
@@ -800,50 +1047,62 @@ sub attribute {
         $self->{online_results}  //= {};
 
         foreach my $result (values(%{$self->{offline_results}}), values(%{$self->{online_results}})) {
-            next unless defined($result) && defined($result->{attributes});
-            if (defined($value = $result->{attributes}->{$key})) {
-                if (ref($value) eq 'HASH') {
-                    my $new;
-                    foreach my $language_tag ($self->extractor->_get_language_tags(%opts)) {
-                        $new = $value->{$language_tag} and last;
-                    }
-                    $default_value = $value->{'*'};
-                    $value = $new;
-                }
-                last if defined $value;
-            }
+            next unless defined($result) && defined($result->{digest});
+            last if defined($value = $result->{digest}{$key});
         }
     }
 
-    $value //= $default_value;
-
     if (defined $value) {
-        my $source_type;
-
-        $source_type = ref($value) || $info->{source_type};
-        $as //= $source_type;
-
-        if ($as eq $source_type) {
+        if ($as eq 'hex') {
             return $value;
-        } else {
-            my $cache = ($self->{attributes_cache} //= {})->{$key} //= {};
-            if ($as eq 'string' && eval {$value->isa('URI')}) {
-                return $cache->{$as} //= $value->as_string;
-            } elsif ($as eq __PACKAGE__ && eval {$value->isa('URI')}) {
-                return $cache->{$as} //= $self->_as_lookup([$value], %opts);
-            } elsif ($as eq __PACKAGE__ && eval {$value->can('ise')}) {
-                return $cache->{$as} //= $self->_as_lookup([ise => $value->ise], %opts);
-            } elsif ($as eq 'ise' && eval {$value->can('ise')}) {
-                return $cache->{$as} //= $value->ise;
+        } elsif ($as eq 'binary') {
+            return pack('H*', $value);
+        } elsif ($as eq 'base64' || $as eq 'b64') {
+            return MIME::Base64::encode(pack('H*', $value), '') =~ s/=+$//r;
+        } elsif ($as eq 'base64_padded') {
+            return MIME::Base64::encode(pack('H*', $value), '');
+        } elsif ($as eq 'utag') {
+            if (defined(my $size = eval {$self->attribute('final_file_size')})) {
+                return sprintf('v0 %s bytes 0-%u/%u %s', $key, $size - 1, $size, $value);
             }
+
+            return sprintf('v0 %s bytes 0-/* %s', $key, $value);
+        } elsif ($as eq 'Digest') {
+            return Data::URIID::Digest->_new($value);
         }
 
-        croak sprintf('Cannot convert from type "%s" to "%s" for attribute "%s"', $source_type, $as, $key);
+        croak sprintf('Cannot convert from type "%s" to "%s" for digest "%s"', 'hex', $as, $key);
     }
 
     return $opts{default} if exists $opts{default};
 
-    croak sprintf('No value found for attribute "%s"', $key);
+    croak sprintf('No value found for digest "%s"', $key);
+}
+
+
+sub available_keys {
+    my ($self, $class) = @_;
+
+    croak 'No class given' unless defined $class;
+
+    if ($class eq 'attribute') {
+        return keys %attributes;
+    } elsif ($class eq 'digest') {
+        # TODO: optimise this later.
+        my %digest = %{$self->{primary}{digest} // {}};
+
+        $self->{offline_results} //= {};
+        $self->{online_results}  //= {};
+
+        foreach my $result (values(%{$self->{offline_results}}), values(%{$self->{online_results}})) {
+            next unless defined($result) && defined($result->{digest});
+            %digest = (%digest, %{$result->{digest}});
+        }
+
+        return keys %digest;
+    } else {
+        croak 'Unknown class given: '.$class;
+    }
 }
 
 
@@ -928,14 +1187,39 @@ sub url {
         }
     }
 
+    if ($service eq 'uriid') {
+        my Data::URIID::Service $uriid = $extractor->service($service);
+        my $types = $uriid->_get_uriid_decompiled_types_json;
+        my $type = $self->id_type;
+
+        $type = $types->{backward}{$type} // $type;
+
+        if (defined($opts{action}) && $opts{action} eq 'info') {
+            my $u = URI->new("https://uriid.org/");
+            $u->path_segments('', $type, $self->id);
+            return $u;
+        }
+    }
+
     croak 'Identifier does not generate a URL for the selected service';
 }
 
 # Converters:
 
+sub _media_subtype_to_uuid {
+    my ($pkg, $media_subtype) = @_;
+    state $uuids = {};
+    return $uuids->{$media_subtype} //= create_uuid_as_string(UUID_SHA1, '50d7c533-2d9b-4208-b560-bcbbf75ce3f9', lc $media_subtype);
+}
+
 sub _id_conv__uuid__wikidata_identifier {
     my ($self, $type_want, $type_name_have, $id) = @_;
     $self->{id}{$type_want} = create_uuid_as_string(UUID_SHA1, '9e10aca7-4a99-43ac-9368-6cbfa43636df', lc $id);
+}
+
+sub _id_conv__uuid__media_subtype_identifier {
+    my ($self, $type_want, $type_name_have, $id) = @_;
+    $self->{id}{$type_want} = $self->_media_subtype_to_uuid($id);
 }
 
 sub _id_conv__uuid__fellig_identifier {
@@ -992,7 +1276,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -1031,7 +1315,7 @@ This method will return the ISE if successful or C<die> otherwise.
 
 =head2 attribute
 
-    my $ise = $result->attribute( $key, [%opts] );
+    my $value = $result->attribute( $key, [%opts] );
 
 Get a attribute of the result or the default or C<die>.
 Attributes are subject to the settings passed to L<Data::URIID/"new">.
@@ -1099,9 +1383,29 @@ The reference system is not specified.
 The longitude of the item.
 The reference system is not specified.
 
+=item C<media_subtype>
+
+Media subtype of the item.
+
+B<Warning:> This is an experimental attribute and may be removed or changed later!
+
+=item C<roles>
+
+List of roles returned by the lookup for the subject.
+This attribute requires C<list> to be set true.
+
 =item C<service>
 
 The L<Data::URIID::Service> the original URL was using.
+
+=item C<sources>
+
+The list of L<Data::URIID::Service> that returned data in the lookup. Useful to provide a bibliography.
+This attribute requires C<list> to be set true.
+
+=item C<sex_or_gender>
+
+The sex or gender of the object. This is useful when addressing people.
 
 =item C<space_object>
 
@@ -1110,6 +1414,10 @@ The object in space (astronomical body) this item is on.
 =item C<thumbnail>
 
 A thumbnail image that can be used for the item.
+
+=item C<website>
+
+A website that represents the item. For example if the item is a company the website of that company.
 
 =back
 
@@ -1133,12 +1441,61 @@ This can also be set to C<undef> to allow returning C<undef> in case of no value
 Overrides the default language tags from the C<$result-E<gt>extractor> object.
 May be an arrayref with a list of exact matches or a string that is parsed as a list (and supers being added).
 
+=item C<list>
+
+Sets the function in list mode. List mode is used for special attributes that are lists.
+In this mode this method will return a list. C<default> if used needs to be set to some array reference.
+This mode is only available with list mode keys.
+
 =item C<online>
 
 Overrides the L<Data::URIID/"online"> flag used for the lookup if C<as> is set to L<Data::URIID::Result>.
 This is very useful to prevent network traffic for auxiliary lookups.
 
 =back
+
+=head2 digest
+
+    my $digest = $result->digest( $algorithm, [%opts] );
+
+Returns a digest of the referenced file or object. This refers to the result of URLs for the C<fetch> or C<file-fetch> actions.
+
+Supported algorithms depend on the providing service. Algorithm names are given in the universal tag form but
+aliases for names as by L<Digest> are supported.
+
+Common values include: C<md-5-128>, C<sha-1-160>, C<sha-2-256>, and C<sha-3-512>.
+
+The following options are defined:
+
+=over
+
+=item C<as>
+
+Return the value as the given type.
+This is the package name of the type, C<hex> for hex values, or C<base64> (or C<b64>) for Base64 encoding without padding
+and C<base64_padded> for Base64 encoding with padding.
+To get an object that is compatible with the L<Digest> API use C<Digest>. Do not try to use specific types such as C<Digest::MD5>.
+If the given type is not supported for the given attribute the function C<die>s.
+
+=item C<default>
+
+Returns the given value if no value is found.
+This can also be set to C<undef> to allow returning C<undef> in case of no value found instead of C<die>-ing.
+
+=back
+
+=head2 available_keys
+
+    my @keys = $result->available_keys( $class );
+
+Returns the list of keys available for C<$class>.
+Currently C<attribute> for keys valid for L<"attribute"> and
+C<digest> for keys valid for L<"digest"> are supported.
+
+The caller must not assume that all values for keys returned by this method are actually set/available.
+This method may return an empty list.
+
+On any error this method will C<die>.
 
 =head2 url
 
@@ -1182,7 +1539,7 @@ Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2023-2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
 
 This is free software, licensed under:
 

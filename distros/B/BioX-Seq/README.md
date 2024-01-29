@@ -1,7 +1,7 @@
 BioX::Seq
 =========
 
-[![Build Status](https://travis-ci.org/jvolkening/p5-BioX-Seq.svg?branch=master)](https://travis-ci.org/jvolkening/p5-BioX-Seq)
+[![Tests](https://github.com/jvolkening/p5-BioX-Seq/actions/workflows/tests.yml/badge.svg)](https://github.com/jvolkening/p5-BioX-Seq/actions/workflows/tests.yml)
 [![Coverage Status](https://coveralls.io/repos/github/jvolkening/p5-BioX-Seq/badge.svg?branch=master)](https://coveralls.io/github/jvolkening/p5-BioX-Seq?branch=master)
 [![CPAN version](https://badge.fury.io/pl/BioX-Seq.svg)](https://badge.fury.io/pl/BioX-Seq)
 

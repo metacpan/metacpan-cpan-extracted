@@ -9,8 +9,13 @@ my $build_requires = {
 
 my $prereq_pm = {
         'Mojolicious'           => 7.94,    # Ubuntu = libmojolicious-perl          RHEL = perl-Mojolicious
-        'Sys::Syslog'           => 0,
-        'WWW::Suffit'           => 1.00,    # Ubuntu = libwww-suffit-perl           RHEL = perl-WWW-Suffit
+        'Mojolicious::Plugin::ConfigGeneral' => 1.02, # RHEL = perl-Mojolicious-Plugin-ConfigGeneral
+        'WWW::Suffit'           => 1.06,    # Ubuntu = libwww-suffit-perl           RHEL = perl-WWW-Suffit
+        'WWW::Suffit::API'      => 1.00,    # Ubuntu = libwww-suffit-api-perl       RHEL = perl-WWW-Suffit-API
+        'WWW::Suffit::Plugin::BasicAuth'        => 1.00,    # Ubuntu = libwww-suffit-plugin-basicauth-perl      RHEL = perl-WWW-Suffit-Plugin-BasicAuth
+        'WWW::Suffit::Plugin::CommonHelpers'    => 1.00,    # Ubuntu = libwww-suffit-plugin-commonhelpers-perl  RHEL = perl-WWW-Suffit-Plugin-CommonHelpers
+        'WWW::Suffit::Plugin::ServerInfo'       => 1.01,    # Ubuntu = libwww-suffit-plugin-serverinfo-perl     RHEL = perl-WWW-Suffit-Plugin-ServerInfo
+        'WWW::Suffit::Plugin::Syslog'           => 1.00,    # Ubuntu = libwww-suffit-plugin-syslog-perl         RHEL = perl-WWW-Suffit-Plugin-Syslog
     };
 
 WriteMakefile(

@@ -92,7 +92,7 @@ sub write_index {
             $bl_mismatch = 0;
             $ll_mismatch = 0;
         }
-        elsif ($line =~ /^[A-Za-z\-]+(\r?\n?)$/) {
+        elsif ($line =~ /^[A-Za-z\-\*\.]+(\r?\n?)$/) {
             if ($bl_mismatch) {
                 close $idx;
                 unlink $fn_idx;
@@ -291,13 +291,13 @@ samtools-compatible index files automatically if they are missing.
 
     my $parser = BioX::Seq::Fetch->new(
         $filename,
-        with_descriptions => 1,
+        with_description => 1,
     );
 
 Create a new C<BioX::Seq::Fetch> parser. Requires an input filename (STDIN or
 open filehandles are not supported, as a filename is needed to find the
 corresponding index file and to ensure than C<seek()>-ing is supported). Takes
-one optional boolean argument ('with_descriptions') indicating whether to
+one optional boolean argument ('with_description') indicating whether to
 enable backtracking to find and include any sequence description present
 (normally this is absent as the FASTA index includes the offset to the
 sequence itself and not the defline). This option is currently experimental

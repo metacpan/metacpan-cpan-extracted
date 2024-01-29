@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA256 1120e3508687214c2c82743a398116c44b5d70a6cd8ab91a87cd0c760f7eef13 Build.PL
+SHA256 31200ca6f2d4cabf86aca781ad3aa38688152d336096eb32d8fce470d6a85761 Changes
+SHA256 13d8ca7ca030b27e552c3cfcdd1851f096d575f4b0c86d2e74617a0bb26805ff LICENSE
+SHA256 57834434361fc13f20ea13de931478d1d6ca00f36274f0cff6c0e48eeeb90cac MANIFEST
+SHA256 8213d9085e7b715277439833c901e000318e60777d9b896063fa7c9d3806814e META.json
+SHA256 7be5373935926bb210ea4dcf0c2cb25765a3cf642a16205bd0110ff72cd9c184 META.yml
+SHA256 9cfe9d090f7c7dadc00fffc5c2e8b8c3fb2a8f545df64f4f079dee64222ae2bc README
+SHA256 b3ef41d0eef1a08590cf4976cd76734481aa5eff2cf48118590f8a37291dc5c6 cpanfile
+SHA256 f010faf2602984c9a250c328dced3fe9f5d0c0609fe2dea4cd3a653c0a30ad24 dist.ini
+SHA256 6ea38983205264e2592b4a4a8343b2333c815d2b385c7f014843be544b482938 lib/Apache/Session/Lock/MariaDB.pm
+SHA256 19d0047cf560889873b854b08181aedf37aa884a7d82a5b496ca8d1e745bfe75 lib/Apache/Session/MariaDB.pm
+SHA256 a94c12e73de557907c1f579db00eb0c7f3d5ccd30de81d159cb789d31832568e lib/Apache/Session/MariaDB/NoLock.pm
+SHA256 25014bd200fcaacfc7eb241a028056677a5408b778284fe31dc143f1ddfa0012 lib/Apache/Session/Store/MariaDB.pm
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 1c51acd00a991bfb241ddc0e6ea5bdeb6e4483be5be15c94d51fad3ddee4201d t/basics.t
+SHA256 d2c4bc42f7944b7f2616d622dfd6796b7b9fef30aea4050d0e277ac19c8cdb81 t/load.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEExJs3Lyv4ShkBFmAnDfCig/6sgLIFAmWqix0ACgkQDfCig/6s
+gLJ/Cwf+NFYpQGLeGeLC4wnnb7t+7LnfGCNu7v97z+1hTY/4ht9g0JqkOmZULQGU
+LW8PDDuYLH2k/aye0wn7Cxq5tmjXCBP3v1mFFKRSi7/hLwEKZiDCNCpBKWbNZwzv
+GFeEMx9VjJIJ6UWhxsXrzSBjmsVavq42+bStUKee9u3bbGgp1RbA7rLYw5OWuBxF
+rIHNJsAZfNX6w26GCbllUQwU5amE1Ox+TwOUXMx9mbjNGbSDcdqAblDCna8zYHWY
+2eU6frqim8UMxclebcQVCMtq4JlPvDogKdpRKpye82thKLJjczpD4y4pXDjjrHRf
+ViGbE2JuoIVDC+ck3fW6LE+dcbpT/A==
+=rMYJ
+-----END PGP SIGNATURE-----

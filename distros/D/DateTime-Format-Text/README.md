@@ -4,7 +4,7 @@ DateTime::Format::Text - Find a Date in Text
 
 # VERSION
 
-Version 0.06
+Version 0.07
 
 # SYNOPSIS
 
@@ -32,7 +32,18 @@ arbitrary text.
 
 Can be called as a class or object method.
 
-When called in an array context, returns an array containing all of the matches
+When called in an array context, returns an array containing all of the matches.
+
+If the given test is an object, it's sent the message as\_string() and that is parsed
+
+    use Class::Simple;
+    my $foo = Class::Simple->new();
+    $foo->as_string('25/12/2022');
+    my $dt = $dft->parse($foo);
+
+    # or
+
+    print DateTime::Format::Text->parse('25 Dec 2021, 11:00 AM UTC')->epoch(), "\n";
 
 # AUTHOR
 
@@ -41,10 +52,10 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 Based on [https://github.com/etiennetremel/PHP-Find-Date-in-String](https://github.com/etiennetremel/PHP-Find-Date-in-String).
 Here's the author information from that:
 
-    author   Etienne Tremel
-    license  L<https://creativecommons.org/licenses/by/3.0/> CC by 3.0
-    link     L<http://www.etiennetremel.net>
-    version  0.2.0
+author   Etienne Tremel
+license  [https://creativecommons.org/licenses/by/3.0/](https://creativecommons.org/licenses/by/3.0/) CC by 3.0
+link     [http://www.etiennetremel.net](http://www.etiennetremel.net)
+version  0.2.0
 
 # BUGS
 

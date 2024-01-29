@@ -1,6 +1,8 @@
 Changes
-examples/ex1.pl
+examples/fetch_kacur_capek.pl
 inc/Module/Install.pm
+inc/Module/Install/AuthorRequires.pm
+inc/Module/Install/AuthorTests.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
 inc/Module/Install/Fetch.pm
@@ -16,7 +18,10 @@ MANIFEST			This list of files
 META.yml
 README
 SIGNATURE
-t/WWW-Search-KacurCZ/00-use.t
-t/WWW-Search-KacurCZ/01-version.t
-t/WWW-Search-KacurCZ/02-pod_coverage.t
-t/WWW-Search-KacurCZ/03-pod.t
+t/data/kacur_cz-20231212-Capek.html
+t/WWW-Search-KacurCZ/01-use.t
+t/WWW-Search-KacurCZ/02-version.t
+t/WWW-Search-KacurCZ/03-new.t
+t/WWW-Search-KacurCZ/04-search_from_file.t
+xt/WWW-Search-KacurCZ/01-pod_coverage.t
+xt/WWW-Search-KacurCZ/02-pod.t

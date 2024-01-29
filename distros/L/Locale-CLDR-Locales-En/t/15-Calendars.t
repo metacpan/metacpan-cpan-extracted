@@ -15,13 +15,13 @@ my $locale = Locale::CLDR->new('en_GB');
 my $months = $locale->month_format_wide();
 is_deeply ($months, [qw( January February March April May June July August September October November December )], 'Month format wide');
 $months = $locale->month_format_abbreviated();
-is_deeply ($months, [qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec )], 'Month format abbreviated');
+is_deeply ($months, [qw( Jan Feb Mar Apr May Jun Jul Aug Sept Oct Nov Dec )], 'Month format abbreviated');
 $months = $locale->month_format_narrow();
 is_deeply ($months, [qw( J F M A M J J A S O N D )], 'Month format narrow');
 $months = $locale->month_stand_alone_wide();
 is_deeply ($months, [qw( January February March April May June July August September October November December )], 'Month stand alone wide');
 $months = $locale->month_stand_alone_abbreviated();
-is_deeply ($months, [qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec )], 'Month stand alone abbreviated');
+is_deeply ($months, [qw( Jan Feb Mar Apr May Jun Jul Aug Sept Oct Nov Dec )], 'Month stand alone abbreviated');
 $months = $locale->month_stand_alone_narrow();
 is_deeply ($months, [qw( J F M A M J J A S O N D )], 'Month stand alone narrow');
 

@@ -10,6 +10,8 @@ my @files = (
     'lib/App/Env.pm',
     'lib/App/Env/Example.pm',
     'lib/App/Env/Null.pm',
+    'lib/App/Env/_Util.pm',
+    'lib/App/Env/_app.pm',
     'script/appexec',
     't/00-compile.t',
     't/00-report-prereqs.dd',

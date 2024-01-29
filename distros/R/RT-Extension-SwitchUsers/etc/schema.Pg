@@ -1,0 +1,10 @@
+CREATE SEQUENCE switcheduserrealactors_id_req;
+CREATE TABLE SwitchedUserRealActors (
+    id              INTEGER DEFAULT nextval('switcheduserrealactors_id_req'),
+    ObjectType      VARCHAR(255),
+    ObjectId        INT DEFAULT 0 NOT NULL,
+    Creator         INT DEFAULT 0 NOT NULL,
+    LastUpdatedBy   INT DEFAULT 0 NOT NULL
+);
+
+CREATE INDEX SwitchedUserRealActors1 ON SwitchedUserRealActors (ObjectType, ObjectId);

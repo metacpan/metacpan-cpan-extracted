@@ -1,5 +1,9 @@
 Revision history for App-sdview-Output-Tickit
 
+0.05    2024-01-13
+        [CHANGES]
+         * Better handling of paragraph indent and leader leader text
+
 0.04    2023-10-02
         [CHANGES]
          * Better handling of non-breaking spaces and soft hyphens

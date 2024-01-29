@@ -26,11 +26,11 @@ Then, in your Dancer2 PSGI startup script:
 
 =head1 VERSION
 
-Version 0.07
+Version 0.10
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 use strict;
 use warnings;
@@ -94,7 +94,7 @@ sub BUILD {
             }
 
             foreach my $k (keys %{ _default_tokens() }) {
-                $tokens->{$k} = _default_tokens()->{$k};
+                $tokens->{$k} //= _default_tokens()->{$k};
             }
 
             # build Google fonts source if any defined in settings
@@ -109,10 +109,23 @@ sub BUILD {
                 }
             }
 
+            # If a navigation entry is specific to this widget_route, override
+            # the previous one
+            if (exists $liteblog->{route_widgets}) {
+                my $route = $plugin->dsl->request->path_info;
+                if (exists $liteblog->{route_widgets}->{$route} && 
+                    exists $liteblog->{route_widgets}->{$route}->{navigation}) {
+                    my $route_nav = $liteblog->{route_widgets}->{$route}->{navigation};
+                    $tokens->{navigation} = $route_nav if defined $route_nav;
+                }
+            }
+
             return $tokens;
         }
     ));
 
+    # The home page is created by default, using the 'widgets' config entry.
+    # Which is populated by default in the tokens.
     $plugin->dsl->info("LiteBlog Init: registering route GET /");
     $plugin->app->add_route(
         method => 'get',
@@ -179,9 +192,10 @@ sub _init_footer_token {
 
 =head2 liteblog_init
 
-A Liteblog app must call this keyword right after having C<use>'ed Dancer2::Plugin::Liteblog.
-This allows to declare widget-specific routes (defined in the Widget's classes) once the 
-config is fully read by Dancer2 (which is not the case at BUILD time).
+A Liteblog app must call this keyword right after having C<use>'ed
+Dancer2::Plugin::Liteblog.  This allows to declare widget-specific routes
+(defined in the Widget's classes) once the config is fully read by Dancer2
+(which is not the case at BUILD time).
 
 This method also initializes all default tokens that will be passed to template
 calls.
@@ -196,7 +210,9 @@ sub liteblog_init {
     $plugin->dsl->info("Liteblog init");
 
     my $liteblog = $plugin->dsl->config->{'liteblog'};
-    my $widgets = _load_widgets($plugin, $liteblog);
+   
+    # load the home's widgets (under 'widgets' config entry).
+    my $widgets = _load_widgets($plugin, $liteblog->{widgets});
 
     # init default tokens once for all
     my $tokens = {};
@@ -233,6 +249,35 @@ sub liteblog_init {
         $plugin->dsl->info("Widget '".$widget->{name}."' has routes to declare");
         $w->declare_routes($plugin, $widget);
     }
+
+    # Now, if any, load the "route_widgets" (those cannot declare routes).
+    if ($liteblog->{route_widgets}) {
+        $tokens->{route_widgets} = {};
+        foreach my $route (keys %{ $liteblog->{route_widgets} }) {
+
+
+            my $widget_config = $liteblog->{route_widgets}->{$route}->{widgets};
+            if (ref($widget_config) ne 'ARRAY') {
+                croak "Widget config for route '$route' must be a valid array";
+            }
+
+            my $route_widgets = _load_widgets($plugin, $widget_config);
+
+            # Now delcare this route (like anpother home page).
+            $plugin->dsl->info("LiteBlog Init: registering 'widget' route GET $route");
+            $plugin->app->add_route(
+                method => 'get',
+                regexp => $route,
+                code   => sub {
+                    $plugin->dsl->info("in the route: $route");
+                    return $plugin->dsl->template(
+                        'liteblog/index', {widgets => $route_widgets}, 
+                            { layout => 'liteblog' }
+                    );
+                }
+            );
+        }
+    }
 }
 
 =head2 render_client_error($message)
@@ -268,12 +313,12 @@ plugin_keywords 'liteblog_init';
 # in public/css/liteblog/widgets/$widget.css and views in
 # views/liteblog/$widget.
 sub _load_widgets {
-    my ($plugin, $liteblog) = @_;
+    my ($plugin, $widget_config) = @_;
+    $widget_config //= [];
 
-    # Load all widgets and initialize them 
     my @widgets;
     my $id = 1;
-    foreach my $w (@{ $liteblog->{widgets} }) {
+    foreach my $w (@{ $widget_config }) {
         my $elements = [];
         my $widget;
         
@@ -312,7 +357,7 @@ sub _load_widgets {
 
         $elements = $widget->elements;
 
-        if (scalar(@$elements)) {
+       # if (scalar(@$elements)) {
             push @widgets, { 
                 id => $id++,
                 name => $w->{name}, 
@@ -320,8 +365,10 @@ sub _load_widgets {
                 view => $w->{name}.'.tt',
                 instance => $widget,
                 elements => $elements,
+                has_elements => scalar(@$elements),
+                css => $widget->css,
             };
-        }
+        #}
     }
     return \@widgets;
 }

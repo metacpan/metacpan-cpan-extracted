@@ -15,8 +15,8 @@ apt-get -y install \
 	libtest-compile-perl libtest-pod-perl \
 	libtest-simple-perl wget
 
-wget https://lib.finalrewind.org/deb/libtravel-status-de-deutschebahn-perl_4.19-1_all.deb
-dpkg -i libtravel-status-de-deutschebahn-perl_4.19-1_all.deb
+wget https://lib.finalrewind.org/deb/libtravel-status-de-deutschebahn-perl_5.01-1_all.deb
+dpkg -i libtravel-status-de-deutschebahn-perl_5.01-1_all.deb
 
 apt-file update
 apt-cache dumpavail | dpkg --merge-avail

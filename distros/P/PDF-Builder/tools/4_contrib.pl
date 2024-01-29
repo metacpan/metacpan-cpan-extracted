@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
+our $VERSION = '3.026'; # VERSION
 our $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 # command line:
@@ -96,6 +96,7 @@ system("contrib".$dirSep."text2pdf.pl contrib/text2pdf.pl");
 print "Press Enter to continue\n";
 $pause = <>;
 
+print "I will NOT erase the input files from examples/ -- you have to do that\n";
 print "\nIf you are done with the output files, should I erase them now?[n]\n";
 $pause = <>;
 if ($pause =~ m/^y/i) {

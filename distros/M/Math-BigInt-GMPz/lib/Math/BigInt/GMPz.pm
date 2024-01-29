@@ -8,22 +8,22 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '0.0013';
+our $VERSION = '0.0016';
 
 use Math::GMPz 0.36 qw< :mpz >;
 
-###############################################################################
-# It might be that Math::GMPz was built with an newer version of GMP than the
-# one that is currently available. Checking Math::GMPz::gmp_v() won't help,
-# since it returns the version of GMP used when Math::GMPz was built, not the
-# version of GMP that is currently available.
+BEGIN {
+    # We need GMP 5.1.0 or newer for Rmpz_2fac_ui(). If Rmpz_2fac_ui() is not
+    # implemented, Math::GMPz dies with the message:
+    # "Rmpz_2fac_ui not implemented - gmp-5.1.0 (or later) is needed"
 
-eval { my $x = Rmpz_init(); Rmpz_2fac_ui($x, 0); };
-
-# If Rmpz_2fac_ui() is not implemented, Math::GMPz dies with the message:
-# "Rmpz_2fac_ui not implemented - gmp-5.1.0 (or later) is needed"
-
-die "gmp-5.1.0 (or later) is needed" if $@;
+    my $gmp_v = Math::GMPz::gmp_v();
+    my @gmp_v = split /\./, $gmp_v;
+    my $gmp_v_int = 1e6 * $gmp_v[0] + 1e3 * $gmp_v[1] + $gmp_v[0];
+    die "GMP library is not recent enough;",
+      " we have $gmp_v, but we need 5.1.0 or later"
+      unless $gmp_v_int >= 5_100_000;
+}
 
 ###############################################################################
 
@@ -229,7 +229,139 @@ sub _lsft {
     return $_[1];
 }
 
-#sub _log_int { }
+sub _log_int {
+    my ($class, $x, $b) = @_;
+
+    # Return undef for the logarithm of zero.
+
+    return if $class -> _is_zero($x);
+
+    # Rmpz_sizeinbase() requires that the base is <= 62.
+
+    my $bscl;                   # the base as a Perl scalar
+    if (ref $b) {
+        $bscl = $class -> _num($b);
+    }  else {
+        ($bscl, $b) = ($b, $class -> _new($b));
+    }
+
+    # A base < 2 is invalid.
+
+    return if $bscl < 2;
+
+    # A base > 62 can't be handled by Math::GMPz.
+
+    return $class -> SUPER::_log_int($x, $b) if $bscl > 62;
+
+    # Rmpz_sizeinbase() returns a Perl scalar that is either 1 or 2 too big
+    # compared to the output we want, i.e., int(log(x) / log(b)).
+
+    my $y = Rmpz_sizeinbase($x, $bscl);
+    $y = $class -> _new($y - 1);
+
+    # To determine whether we need to subtract one more, we need to go
+    # backwards and compute $b ** $y, unfortunately.
+
+    my $trial = $class -> _pow($class -> _copy($b), $y);
+    my $acmp  = $class -> _acmp($trial, $x);
+
+    # Did we get the exact result?
+
+    return wantarray ? ($y, 1) : $y if $acmp == 0;
+
+    # Decrement $y once more, if the output was too large.
+
+    $y = $class -> _dec($y) if $acmp > 0;
+    return $y unless wantarray;
+
+    # If the user wants to know whether the output is exact or not, we need to
+    # update $acmp after the decrement above.
+
+    $trial = $class -> _div($trial, $b);
+    $acmp  = $class -> _acmp($trial, $x);
+    return wantarray ? ($y, 1) : $y if $acmp == 0;      # result is exact
+    return wantarray ? ($y, 0) : $y;                    # result is too small
+}
+
+sub _ilog2 {
+    my ($class, $x) = @_;
+
+    # Return undef for the logarithm of zero.
+
+    return if $class -> _is_zero($x);
+
+    # Rmpz_sizeinbase() returns a Perl scalar that is either 1 or 2 too big
+    # compared to the output we want, i.e., int(log(x) / log(2)).
+
+    my $y = Rmpz_sizeinbase($x, 2) - 1;
+
+    # To determine whether we need to subtract one more, we need to go
+    # backwards and compute 2 ** $y, unfortunately.
+
+    my $trial = Rmpz_init_set_str("1", 10);     # $trial = 1
+    Rmpz_mul_2exp($trial, $trial, $y);          # $trial = 2**$y
+
+    # Make $y an object.
+
+    $y = Rmpz_init_set_ui($y);
+
+    # Did we get the exact result?
+
+    my $acmp = Rmpz_cmp($trial, $x);
+
+    return wantarray ? ($y, 1) : $y if $acmp == 0;
+
+    # Decrement $y once more, if the output was too large.
+
+    Rmpz_sub_ui($y, $y, 1) if $acmp > 0;        # $y -= 1
+
+    return $y unless wantarray;
+
+    # If the user wants to know whether the output is exact or not, we need to
+    # update $acmp after the decrement above.
+
+    Rmpz_div_2exp($trial, $trial, 1);
+    $acmp = Rmpz_cmp($trial, $x);
+    return wantarray ? ($y, 1) : $y if $acmp == 0;      # result is exact
+    return wantarray ? ($y, 0) : $y;                    # result is too small
+}
+
+sub _clog2 {
+    my ($class, $x) = @_;
+    # Return undef for the logarithm of zero.
+
+    return if $class -> _is_zero($x);
+
+    # Rmpz_sizeinbase() returns a Perl scalar that is either correct or 1 too
+    # big compared to the output we want, i.e., ceil(log(x) / log(2)).
+
+    my $y = Rmpz_sizeinbase($x, 2) - 1;         # assume 1 too big
+
+    # Go backwards and compute 2 ** $y.
+
+    my $trial = Rmpz_init_set_str("1", 10);     # $trial = 1
+    Rmpz_mul_2exp($trial, $trial, $y);          # $trial = 2**$y
+    $y = Rmpz_init_set_ui($y);                  # make $y an object
+
+    # Did we get the exact result?
+
+    my $acmp = Rmpz_cmp($trial, $x);
+
+    return wantarray ? ($y, 1) : $y if $acmp == 0;
+
+    # Increment $y by one, if the output was too small.
+
+    Rmpz_add_ui($y, $y, 1) if $acmp < 0;        # $y += 1
+    return $y unless wantarray;
+
+    # If the user wants to know whether the output is exact or not, we need to
+    # update $acmp after the increment above.
+
+    Rmpz_mul_2exp($trial, $trial, 1);
+    $acmp = Rmpz_cmp($trial, $x);
+    return wantarray ? ($y, 1) : $y if $acmp == 0;      # result is exact
+    return wantarray ? ($y, 0) : $y;                    # result is too small
+}
 
 sub _gcd {
     Rmpz_gcd($_[1], $_[1], $_[2]);
@@ -514,6 +646,12 @@ The following methods are implemented.
 =item _rsft()
 
 =item _lsft()
+
+=item _log_int()
+
+=item _ilog2()
+
+=item _clog2()
 
 =item _gcd()
 

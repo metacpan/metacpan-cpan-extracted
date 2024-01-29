@@ -2,14 +2,14 @@ package Plack::App::ServiceStatus;
 
 # ABSTRACT: Check and report status of various services needed by your app
 
-our $VERSION = '0.912'; # VERSION
+our $VERSION = '0.913'; # VERSION
 
 use 5.024;
 use strict;
 use warnings;
 
 use base 'Class::Accessor::Fast';
-__PACKAGE__->mk_accessors(qw(app version checks show_hostname buildinfo));
+__PACKAGE__->mk_accessors(qw(app version checks show_hostname buildinfo _buildinfo_data));
 
 use Try::Tiny;
 use Plack::Response;
@@ -54,19 +54,11 @@ sub new {
         };
     }
 
-    return bless \%attr, $class;
-}
-
-sub to_app {
-    my $self = shift;
-
-    my $hostname = $self->show_hostname ? hostname() : '';
-
-    my $buildinfo;
-    if ( $self->buildinfo ) {
-        if ( -f $self->buildinfo ) {
+    if ( my $buildinfo_file = $attr{buildinfo} ) {
+        my $buildinfo;
+        if ( -f $buildinfo_file ) {
             $buildinfo =
-              eval { decode_json( path( $self->buildinfo )->slurp_utf8 ) };
+              eval { decode_json( path( $buildinfo_file )->slurp_utf8 ) };
             if ($@) {
                 $buildinfo = { status => 'error', message => $@ };
             }
@@ -74,10 +66,19 @@ sub to_app {
         else {
             $buildinfo = {
                 status  => 'error',
-                message => 'cannot read buildinfo from ' . $self->buildinfo
+                message => 'cannot read buildinfo from ' . $buildinfo_file
             };
         }
+        $attr{_buildinfo_data} = $buildinfo
     }
+
+    return bless \%attr, $class;
+}
+
+sub to_app {
+    my $self = shift;
+
+    my $hostname = $self->show_hostname ? hostname() : '';
 
     my $app = sub {
         my $env = shift;
@@ -90,7 +91,7 @@ sub to_app {
         };
         $json->{version}   = $self->version;
         $json->{hostname}  = $hostname  if $hostname;
-        $json->{buildinfo} = $buildinfo if $buildinfo;
+        $json->{buildinfo} = $self->_buildinfo_data if $self->_buildinfo_data;
 
         my @results = (
             {
@@ -137,7 +138,7 @@ Plack::App::ServiceStatus - Check and report status of various services needed b
 
 =head1 VERSION
 
-version 0.912
+version 0.913
 
 =head1 SYNOPSIS
 

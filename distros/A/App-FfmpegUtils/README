@@ -2,8 +2,8 @@ NAME
     App::FfmpegUtils - Utilities related to ffmpeg
 
 VERSION
-    This document describes version 0.012 of App::FfmpegUtils (from Perl
-    distribution App-FfmpegUtils), released on 2022-09-22.
+    This document describes version 0.013 of App::FfmpegUtils (from Perl
+    distribution App-FfmpegUtils), released on 2023-12-13.
 
 FUNCTIONS
   cut_video_by_duration
@@ -66,11 +66,19 @@ FUNCTIONS
 
     *   duration => *duration|percent_str*
 
+        (No description)
+
     *   end => *duration|percent_str*
+
+        (No description)
 
     *   files* => *array[filename]*
 
+        (No description)
+
     *   start => *duration|percent_str*
+
+        (No description)
 
     Special arguments:
 
@@ -147,15 +155,23 @@ FUNCTIONS
 
     *   crf => *int*
 
+        (No description)
+
     *   ffmpeg_path => *filename*
 
+        (No description)
+
     *   files* => *array[filename]*
+
+        (No description)
 
     *   frame_rate => *ufloat*
 
         Set frame rate, in fps.
 
     *   preset => *str* (default: "veryslow")
+
+        (No description)
 
     *   scale => *str* (default: "1080^>")
 
@@ -220,9 +236,15 @@ FUNCTIONS
 
     *   every => *duration|percent_str*
 
+        (No description)
+
     *   files* => *array[filename]*
 
+        (No description)
+
     *   parts => *posint*
+
+        (No description)
 
     Special arguments:
 
@@ -272,7 +294,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2020 by perlancar
+    This software is copyright (c) 2023, 2022, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

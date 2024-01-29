@@ -8,7 +8,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.18.0';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -52,6 +52,15 @@ sub _wrapEntryPoint {
         else {
             $self->userLogger->warn(
                 "Missing $self->{sessionKey} key in session");
+        }
+    }
+    elsif ( my $mod = $req->sessionInfo->{ $self->sessionKey } ) {
+        if ( $self->modules->{$mod} ) {
+            @t = ( $self->modules->{$mod} );
+        }
+        else {
+            $self->userLogger->error(
+                "Bad $self->{sessionKey} value in session ($name)");
         }
     }
     elsif ( ref $req->data->{ "enabledMods" . $self->type } ) {

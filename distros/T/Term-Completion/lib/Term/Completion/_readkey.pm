@@ -46,6 +46,8 @@ if($^O =~ /interix|win/i) {
 
 __END__
 
+=for stopwords CTRL
+
 =head1 NAME
 
 Term::Completion::_readkey - utility package for Term::Completion using Term::ReadKey
@@ -65,7 +67,7 @@ be portable across many systems.
 
 Uses L<Term::ReadKey>'s C<ReadMode 4> to set the terminal into
 "raw" mode, i.e. switch off the meaning of any control characters like
-CRTL-C etc. Also the echo of characters is switched off, so that the
+CTRL-C etc. Also the echo of characters is switched off, so that the
 program has full control of what is typed and displayed.
 
 Uses the "in" field of the L<Term::Completion> object to get the

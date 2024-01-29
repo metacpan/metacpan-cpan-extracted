@@ -32,11 +32,13 @@ my %WriteMakefileArgs = (
     "HTTP::Response" => 0,
     "JSON::PP" => 0,
     "Mock::Quick" => 0,
+    "Neo4j::Types" => "1.00",
     "Test::Exception" => 0,
     "Test::More" => "0.94",
+    "Test::Neo4j::Types" => "0.03",
     "Test::Warnings" => "0.010"
   },
-  "VERSION" => "0.41",
+  "VERSION" => "0.42",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,6 +57,7 @@ my %FallbackPrereqs = (
   "Neo4j::Types" => "1.00",
   "Test::Exception" => 0,
   "Test::More" => "0.94",
+  "Test::Neo4j::Types" => "0.03",
   "Test::Warnings" => "0.010",
   "Time::Piece" => "1.20",
   "Try::Tiny" => 0,

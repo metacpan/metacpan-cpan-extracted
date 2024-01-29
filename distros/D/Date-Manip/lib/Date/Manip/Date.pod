@@ -1,4 +1,4 @@
-# Copyright (c) 1995-2023 Sullivan Beck. All rights reserved.
+# Copyright (c) 1995-2024 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -826,14 +826,15 @@ an optional abbreviation:
    2001-07-01-00:00:00 -04:00 EDT
    2001-07-01-00:00:00 -04:00:00 EDT
 
-The offset almost never sufficient to uniquely determine the time zone
-(and it is not even guaranteed that both the offset and abbreviation
-will, though in practice, it is probably sufficient). In this
-instance, the time zone will be determined by testing all time zones
-which have the given offset (and abbreviation if it is included) until
-one is found which matches both pieces of information. For more
-information about how this testing is done, refer to the def_zone
-method of the Date::Manip::TZ documentation.
+As with the abbreviation, the offset is almost never sufficient to
+uniquely determine the time zone (and it is not even guaranteed that
+both the offset and abbreviation will, though in practice, it is
+probably sufficient). In this instance, the time zone will be
+determined by testing all time zones which have the given offset (and
+abbreviation if it is included) until one is found which matches the
+pieces of information supplied. For more information about how this
+testing is done, refer to the def_zone method of the Date::Manip::TZ
+documentation.
 
 =head1 VALID DATE FORMATS
 

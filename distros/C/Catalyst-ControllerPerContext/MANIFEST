@@ -10,4 +10,5 @@ dist.ini
 lib/Catalyst/ControllerPerContext.pm
 lib/Catalyst/ControllerRole/URI.pm
 lib/Catalyst/ControllerRole/View.pm
+lib/CatalystX/Moose.pm
 t/basic.t

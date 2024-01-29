@@ -22,6 +22,7 @@ README
 t/cachepropagate-tcp.t
 t/cachepropagate-udp.t
 t/cachepropagate-unix.t
+t/gh17447.t
 t/IO.t
 t/io_const.t
 t/io_dir.t
@@ -29,6 +30,7 @@ t/io_dup.t
 t/io_file.t
 t/io_file_export.t
 t/io_getline.t
+t/io_handle.t
 t/io_leak.t
 t/io_linenum.t
 t/io_multihomed.t
@@ -36,6 +38,7 @@ t/io_pipe.t
 t/io_poll.t
 t/io_sel.t
 t/io_sock.t
+t/io_sock_errstr.t
 t/io_taint.t
 t/io_tell.t
 t/io_udp.t

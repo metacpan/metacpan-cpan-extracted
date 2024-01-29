@@ -26,9 +26,9 @@ my %WriteMakefileArgs = (
     "Test::Simple" => "1.302191",
     "XXX" => "0.38",
     "YAML::PP" => "0.036",
-    "YAMLScript" => "v0.1.9"
+    "YAMLScript::Lingy" => "v0.2.1"
   },
-  "VERSION" => "0.1.6",
+  "VERSION" => "0.1.7",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,7 +39,7 @@ my %FallbackPrereqs = (
   "Test::Simple" => "1.302191",
   "XXX" => "0.38",
   "YAML::PP" => "0.036",
-  "YAMLScript" => "0.1.9"
+  "YAMLScript::Lingy" => "0.2.1"
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {

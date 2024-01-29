@@ -33,7 +33,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PP_INSUFFICIENT_PASSWORD_QUALITY
 );
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.18.0';
 
 extends qw(
   Lemonldap::NG::Portal::Lib::SMTP
@@ -113,6 +113,84 @@ sub resetPwd {
     # Display form
     my ( $tpl, $prms ) = $self->display($req);
     return $self->p->sendHtml( $req, $tpl, params => $prms );
+}
+
+sub searchUser {
+    my $self         = shift;
+    my $req          = shift;
+    my $searchByMail = shift;
+
+    # Search user in database
+    $req->steps( [
+            'getUser',                 'setSessionInfo',
+            $self->p->groupsAndMacros, 'setPersistentSessionInfo',
+            'setLocalGroups'
+        ]
+    );
+    if ( my $error = $self->p->process( $req, useMail => $searchByMail ) ) {
+        if ( $error == PE_USERNOTFOUND or $error == PE_BADCREDENTIALS ) {
+            $self->userLogger->warn(
+                'Reset asked for an invalid user (' . $req->{user} . ')' );
+
+            # To avoid mail enumeration, return OK
+            # unless portalErrorOnMailNotFound is set
+
+            if ( $self->conf->{portalErrorOnMailNotFound} ) {
+                $self->setSecurity($req);
+                return PE_MAILNOTFOUND;
+            }
+
+            my $mailTimeout =
+              $self->conf->{mailTimeout} || $self->conf->{timeout};
+            my $expTimestamp = time() + $mailTimeout;
+            $req->data->{expMailDate} =
+              strftime( '%d/%m/%Y', localtime $expTimestamp );
+            $req->data->{expMailTime} =
+              strftime( '%H:%M', localtime $expTimestamp );
+            return PE_MAILCONFIRMOK;
+        }
+        return $error;
+    }
+    return PE_OK;
+}
+
+sub createMailSession {
+    my $self = shift;
+    my $req  = shift;
+
+    # Create a new session
+    my $infos = {};
+
+    # Set _utime for session autoremove
+    # Use default session timeout and mail session timeout to compute it
+    my $time        = time();
+    my $timeout     = $self->conf->{timeout};
+    my $mailTimeout = $self->conf->{mailTimeout} || $timeout;
+
+    $infos->{_utime} = $time + ( $mailTimeout - $timeout );
+
+    # Store expiration timestamp for further use
+    $infos->{mailSessionTimeoutTimestamp} = $time + $mailTimeout;
+
+    # Store start timestamp for further use
+    $infos->{mailSessionStartTimestamp} = $time;
+
+    # Store mail
+    $infos->{ $self->conf->{mailSessionKey} } =
+      $self->p->getFirstValue(
+        $req->{sessionInfo}->{ $self->conf->{mailSessionKey} } );
+
+    # Store user
+    $infos->{user} = $req->{user};
+
+    # Store type
+    $infos->{_type} = 'mail';
+
+    # Store pdata
+    $infos->{_pdata} = $req->pdata;
+
+    # create session
+    return $self->p->getApacheSession( undef, kind => "TOKEN", info => $infos );
 }
 
 sub _reset {
@@ -196,78 +274,12 @@ sub _reset {
         }
     }
 
-    # Search user in database
-    $req->steps( [
-            'getUser',                 'setSessionInfo',
-            $self->p->groupsAndMacros, 'setPersistentSessionInfo',
-            'setLocalGroups'
-        ]
-    );
-    if ( my $error = $self->p->process( $req, useMail => $searchByMail ) ) {
-        if ( $error == PE_USERNOTFOUND or $error == PE_BADCREDENTIALS ) {
-            $self->userLogger->warn( 'Reset asked for an invalid user ('
-                  . $req->param('mail')
-                  . ')' );
+    my $searchUserCode = $self->searchUser( $req, $searchByMail );
+    return $searchUserCode unless $searchUserCode == PE_OK;
 
-            # To avoid mail enumeration, return OK
-            # unless portalErrorOnMailNotFound is set
-
-            if ( $self->conf->{portalErrorOnMailNotFound} ) {
-                $self->setSecurity($req);
-                return PE_MAILNOTFOUND;
-            }
-
-            my $mailTimeout =
-              $self->conf->{mailTimeout} || $self->conf->{timeout};
-            my $expTimestamp = time() + $mailTimeout;
-            $req->data->{expMailDate} =
-              strftime( '%d/%m/%Y', localtime $expTimestamp );
-            $req->data->{expMailTime} =
-              strftime( '%H:%M', localtime $expTimestamp );
-            return PE_MAILCONFIRMOK;
-        }
-        return $error;
-    }
-
-    # Build temporary session
     my $mailSession = $self->getMailSession( $req->{user} );
     unless ( $mailSession or $mailToken ) {
-
-        # Create a new session
-        my $infos = {};
-
-        # Set _utime for session autoremove
-        # Use default session timeout and mail session timeout to compute it
-        my $time        = time();
-        my $timeout     = $self->conf->{timeout};
-        my $mailTimeout = $self->conf->{mailTimeout} || $timeout;
-
-        $infos->{_utime} = $time + ( $mailTimeout - $timeout );
-
-        # Store expiration timestamp for further use
-        $infos->{mailSessionTimeoutTimestamp} = $time + $mailTimeout;
-
-        # Store start timestamp for further use
-        $infos->{mailSessionStartTimestamp} = $time;
-
-        # Store mail
-        $infos->{ $self->conf->{mailSessionKey} } =
-          $self->p->getFirstValue(
-            $req->{sessionInfo}->{ $self->conf->{mailSessionKey} } );
-
-        # Store user
-        $infos->{user} = $req->{user};
-
-        # Store type
-        $infos->{_type} = 'mail';
-
-        # Store pdata
-        $infos->{_pdata} = $req->pdata;
-
-        # create session
-        $mailSession =
-          $self->p->getApacheSession( undef, kind => "TOKEN", info => $infos );
-
+        $mailSession = $self->createMailSession( $req, $mailToken );
         $req->id( $mailSession->id );
     }
     elsif ($mailSession) {
@@ -496,10 +508,11 @@ sub changePwd {
     }
 
     # Check password quality if enabled
-    require Lemonldap::NG::Portal::Password::Base;
+    require Lemonldap::NG::Portal::Plugins::BasePasswordPolicy;
     my $cpq =
-      $self->passwordPolicyActivationRule->( $req, $req->sessionInfo )
-      ? $self->Lemonldap::NG::Portal::Password::Base::checkPasswordQuality(
+        $self->passwordPolicyActivationRule->( $req, $req->sessionInfo )
+      ? $self
+      ->Lemonldap::NG::Portal::Plugins::BasePasswordPolicy::checkBasicPolicy(
         $req->data->{newpassword} )
       : PE_OK;
     unless ( $cpq == PE_OK ) {
@@ -583,19 +596,6 @@ sub setSecurity {
 
 sub display {
     my ( $self, $req ) = @_;
-    my $speChars =
-      $self->conf->{passwordPolicySpecialChar} eq '__ALL__'
-      ? ''
-      : $self->conf->{passwordPolicySpecialChar};
-    $speChars =~ s/\s+/ /g;
-    $speChars =~ s/(?:^\s|\s$)//g;
-    my $isPP =
-         $self->conf->{passwordPolicyMinSize}
-      || $self->conf->{passwordPolicyMinLower}
-      || $self->conf->{passwordPolicyMinUpper}
-      || $self->conf->{passwordPolicyMinDigit}
-      || $self->conf->{passwordPolicyMinSpeChar}
-      || $speChars;
     $self->logger->debug( 'Display called with code: ' . $req->error );
 
     my %tplPrm = (
@@ -625,17 +625,9 @@ sub display {
         DISPLAY_MAILSENT        => 0,
         DISPLAY_PASSWORD_FORM   => 0,
         ENABLE_PASSWORD_DISPLAY => $self->conf->{portalEnablePasswordDisplay},
-        ENABLE_CHECKHIBP        => $self->conf->{checkHIBP},
         DONT_STORE_PASSWORD     => $self->conf->{browsersDontStorePassword},
-        DISPLAY_PPOLICY  => $self->conf->{portalDisplayPasswordPolicy} && $isPP,
-        PPOLICY_MINSIZE  => $self->conf->{passwordPolicyMinSize},
-        PPOLICY_MINLOWER => $self->conf->{passwordPolicyMinLower},
-        PPOLICY_MINUPPER => $self->conf->{passwordPolicyMinUpper},
-        PPOLICY_MINDIGIT => $self->conf->{passwordPolicyMinDigit},
-        PPOLICY_MINSPECHAR          => $self->conf->{passwordPolicyMinSpeChar},
-        PPOLICY_ALLOWEDSPECHAR      => $speChars,
-        PPOLICY_ALLOWEDSPECHAR_JSON =>
-          to_json( $speChars, { allow_nonref => 1 } ),
+        %{ $self->p->getPasswordPolicyTemplateVars },
+        PPOLICY_RULES             => $self->p->getPpolicyRules,
         DISPLAY_GENERATE_PASSWORD =>
           $self->conf->{portalDisplayGeneratePassword},
     );

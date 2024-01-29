@@ -25,61 +25,6 @@ sub new {
 }
 
 
-sub build_having_col {
-    my ( $sf, $sql, $clause, $aggr ) = @_;
-    my $qt_aggr;
-    if ( any { '@' . $_ eq $aggr } @{$sql->{aggr_cols}} ) {
-        $qt_aggr = $aggr =~ s/^\@//r;
-    }
-    elsif ( $aggr eq 'COUNT(*)' ) {
-        $qt_aggr = $aggr;
-    }
-    elsif ( any { $aggr eq $_ } @{$sf->{i}{avail_aggr}} ) {
-        my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-        my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-        my @pre = ( undef );
-        if ( $sf->{o}{enable}{extended_cols} ) {
-            push @pre, $sf->{i}{menu_addition};
-        }
-        $aggr =~ s/\(\S\)\z//;
-        my $bu_having_stmt = $sql->{having_stmt};
-        $sql->{having_stmt} .= ' ' . $aggr . "(";
-        $qt_aggr          =       $aggr . "(";
-        my $info = $ax->get_sql_info( $sql );
-        $sql->{having_stmt} = $bu_having_stmt;
-        my $qt_col;
-
-        COLUMN: while( 1 ) {
-            # Choose
-            my $qt_col = $tc->choose(
-                [ @pre, @{$sql->{cols}} ],
-                { %{$sf->{i}{lyt_h}}, info => $info }
-            );
-            $ax->print_sql_info( $info );
-            if ( ! defined $qt_col ) {
-                return;
-            }
-            elsif ( $qt_col eq $sf->{i}{menu_addition} ) {
-                my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                my $complex_column = $ext->column( $sql, $clause );
-                if ( ! defined $complex_column ) {
-                    next COLUMN;
-                }
-                else {
-                    $qt_col = $complex_column;
-                }
-            }
-            $qt_aggr .= $qt_col . ")";
-            last COLUMN;
-        }
-    }
-    else { # SQ
-        $qt_aggr = $aggr;
-    }
-    return $qt_aggr;
-}
-
-
 sub choose_and_add_operator {
     my ( $sf, $sql, $clause, $stmt, $qt_col ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -90,30 +35,30 @@ sub choose_and_add_operator {
     }
 
     OPERATOR: while( 1 ) {
-        my $op;
+        my $operator;
         if ( @operators == 1 ) {
-            $op = $operators[0];
+            $operator = $operators[0];
         }
         else {
             my @pre = ( undef );
             my $info = $ax->get_sql_info( $sql );
             # Choose
-            $op = $tc->choose(
+            $operator = $tc->choose(
                 [ @pre, @operators ],
                 { %{$sf->{i}{lyt_h}}, info => $info }
             );
             $ax->print_sql_info( $info );
-            if ( ! defined $op ) {
+            if ( ! defined $operator ) {
                 return;
             }
         }
-        $op =~ s/^\s+|\s+\z//g;
+        $operator =~ s/^\s+|\s+\z//g;
         my $bu_stmt = $sql->{$stmt};
         $ax->print_sql_info( $ax->get_sql_info( $sql ) );
-        if ( $op =~ /REGEXP(_i)?\z/ ) {
+        if ( $operator =~ /REGEXP(_i)?\z/ ) {
             $sql->{$stmt} =~ s/ (?: (?<=\() | \s ) \Q$qt_col\E \z //x;
-            my $do_not_match_regexp = $op =~ /^NOT/ ? 1 : 0;
-            my $case_sensitive      = $op =~ /REGEXP_i\z/ ? 0 : 1;
+            my $do_not_match_regexp = $operator =~ /^NOT/ ? 1 : 0;
+            my $case_sensitive      = $operator =~ /REGEXP_i\z/ ? 0 : 1;
             my $regex_op;
             if ( ! eval {
                 $regex_op = $sf->_regexp( $qt_col, $do_not_match_regexp, $case_sensitive );
@@ -125,46 +70,46 @@ sub choose_and_add_operator {
             $regex_op =~ s/^\s// if $sql->{$stmt} =~ /\(\z/;
             $sql->{$stmt} .= $regex_op;
         }
-        elsif ( $op =~ /^(?:ALL|ANY)\z/) {
+        elsif ( $operator =~ /^(?:ALL|ANY)\z/) {
             my $not_equal = ( any { $_ =~ /^\s?!=\s?\z/ } @operators ) ? "!=" : "<>";
-            my @comb_op = ( "= $op", "$not_equal $op", "> $op", "< $op", ">= $op", "<= $op" );
+            my @comb_op = ( "= $operator", "$not_equal $operator", "> $operator", "< $operator", ">= $operator", "<= $operator" );
             my @pre = ( undef );
             my $info = $ax->get_sql_info( $sql );
             # Choose
-            $op = $tc->choose(
+            $operator = $tc->choose(
                 [ @pre, @comb_op ],
                 { %{$sf->{i}{lyt_h}}, info => $info }
             );
             $ax->print_sql_info( $info );
-            if ( ! defined $op ) {
+            if ( ! defined $operator ) {
                 next OPERATOR;
             }
-            $sql->{$stmt} .= ' ' . $op;
+            $sql->{$stmt} .= ' ' . $operator;
         }
         else {
-            $sql->{$stmt} .= ' ' . $op;
+            $sql->{$stmt} .= ' ' . $operator;
         }
         $ax->print_sql_info( $ax->get_sql_info( $sql ) );
-        return $op;
+        return $operator;
     }
 }
 
 
 sub read_and_add_value {
-    my ( $sf, $sql, $clause, $stmt, $qt_col, $op ) = @_;
+    my ( $sf, $sql, $clause, $stmt, $qt_col, $operator ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    if ( $op =~ /^IS\s(?:NOT\s)?NULL\z/ ) {
+    if ( $operator =~ /^IS\s(?:NOT\s)?NULL\z/ ) {
         return 1;
     }
-    elsif ( $op =~ /^(?:NOT\s)?IN\z/ ) {
+    elsif ( $operator =~ /^(?:NOT\s)?IN\z/ ) {
         $sql->{$stmt} .= ' (';
         my $prev_value;
         my @bu;
 
         IN: while ( 1 ) {
             # Readline
-            my $value = $ext->value( $sql, $clause, {}, $op );
+            my $value = $ext->value( $sql, $clause, {}, $operator );
             if ( ! defined $value ) {
                 if ( @bu ) {
                     $sql->{$stmt} = pop @bu;
@@ -191,24 +136,24 @@ sub read_and_add_value {
             $sql->{$stmt} .= $col_sep . $value;
         }
     }
-    elsif ( $op =~ /^(?:NOT\s)?BETWEEN\z/ ) {
+    elsif ( $operator =~ /^(?:NOT\s)?BETWEEN\z/ ) {
         # Readline
-        my $value_1 = $ext->value( $sql, $clause, {}, $op );
+        my $value_1 = $ext->value( $sql, $clause, {}, $operator );
         if ( ! defined $value_1 ) {
             return;
         }
         $sql->{$stmt} .= ' ' . $value_1 . ' AND';
         # Readline
-        my $value_2 = $ext->value( $sql, $clause, {}, $op );
+        my $value_2 = $ext->value( $sql, $clause, {}, $operator );
         if ( ! defined $value_2 ) {
             return;
         }
         $sql->{$stmt} .= ' ' . $value_2;
         return 1;
     }
-    elsif ( $op =~ /REGEXP(_i)?\z/ ) {
+    elsif ( $operator =~ /REGEXP(_i)?\z/ ) {
         # Readline
-        my $value = $ext->value( $sql, $clause, {}, $op );
+        my $value = $ext->value( $sql, $clause, {}, $operator );
         if ( ! defined $value ) {
             return;
         }
@@ -223,7 +168,7 @@ sub read_and_add_value {
     }
     else {
         # Readline
-        my $value = $ext->value( $sql, $clause, {}, $op );
+        my $value = $ext->value( $sql, $clause, {}, $operator );
         if ( ! defined $value ) {
             return;
         }

@@ -1,7 +1,7 @@
 # ------------ Set region for current track ----------
 
 package Audio::Nama;
-use Modern::Perl; use Carp;
+use Modern::Perl '2020'; use Carp;
 
 sub set_region {
 	my ($beg, $end) = @_;
@@ -35,7 +35,7 @@ sub remove_region {
 sub undefine_region {
 	$this_track->set(region_start => undef );
 	$this_track->set(region_end => undef );
-	pager($this_track->name, ": Region definition removed.  Full track will play.\n");
+	pager($this_track->name. ": Region definition removed.  Full track will play.\n");
 }
 1;
 __END__

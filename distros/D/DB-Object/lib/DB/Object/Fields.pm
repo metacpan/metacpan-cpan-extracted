@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Fields.pm
-## Version v1.1.1
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v1.2.0
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/01/01
-## Modified 2023/03/24
+## Modified 2023/11/10
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -20,7 +21,7 @@ BEGIN
     use vars qw( $VERSION );
     use DB::Object::Fields::Field;
     use Devel::Confess;
-    our $VERSION = 'v1.1.1';
+    our $VERSION = 'v1.2.0';
 };
 
 use strict;
@@ -41,6 +42,56 @@ sub init
 }
 
 sub database_object { return( shift->table_object->database_object ); }
+
+# To manually create a new table field
+sub new_field
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    if( !exists( $opts->{name} ) || 
+        $self->_is_empty( $opts->{name} ) )
+    {
+        return( $self->error( "No field name was provided." ) );
+    }
+    elsif( !exists( $opts->{type} ) || 
+        $self->_is_empty( $opts->{type} ) )
+    {
+        return( $self->error( "No field type was provided." ) );
+    }
+    $opts->{type} = lc( $opts->{type} );
+    # But actually we ignore it; users should not provide it
+    if( exists( $opts->{constant} ) &&
+        defined( $opts->{constant} ) &&
+        ref( $opts->{constant} ) eq 'HASH' )
+    {
+        $opts->{datatype} = delete( $opts->{constant} );
+    }
+    my $datatype_dict = $self->database_object->datatype_dict;
+    if( !exists( $datatype_dict->{ $opts->{type} } ) )
+    {
+        return( $self->error( "Field type provided ($opts->{type}) is not supported by driver ", $self->database_object->driver ) );
+    }
+    my $def = $datatype_dict->{ $opts->{type} };
+    $opts->{debug} = $self->debug unless( exists( $opts->{debug} ) && length( $opts->{debug} // '' ) );
+    my $fo = DB::Object::Fields::Field->new(
+        datatype => {
+            constant => $def->{constant},
+            name => $def->{name},
+            type => $def->{type},
+        },
+        debug => $opts->{debug},
+        ( !$self->_is_empty( $opts->{default} ) ? ( default => $opts->{default} ) : () ),
+        ( !$self->_is_empty( $opts->{is_array} ) ? ( is_array => $opts->{is_array} ) : () ),
+        ( !$self->_is_empty( $opts->{is_nullable} ) ? ( is_nullable => $opts->{is_nullable} ) : () ),
+        name => $opts->{name},
+        ( !$self->_is_empty( $opts->{pos} ) ? ( pos => $opts->{pos} ) : () ),
+        query_object => $self->query_object,
+        ( !$self->_is_empty( $opts->{size} ) ? ( size => $opts->{size} ) : () ),
+        table_object => $self->table_object,
+        type => $opts->{type},
+    ) || return( $self->pass_error( DB::Object::Fields::Field->error ) );
+    return( $fo );
+}
 
 sub prefixed
 {
@@ -75,56 +126,30 @@ sub _initiate_field_object
     my $field = shift( @_ ) || return( $self->error( "No field was provided to get its object." ) );
     my $class = ref( $self ) || $self;
     my $tbl = $self->table_object;
-    $self->messagec( 5, "Instantiating field {green}${field}{/} object for class {green}${class}{/} and table {green}", $tbl->name, "{/} having alias of {green}", ( $tbl->as // 'undef' ), "{/} ({green}", $self->{prefixed}, "{/})" );
     my $fields = $tbl->fields;
+    $self->messagec( 5, "Instantiating field {green}${field}{/} object for class {green}${class}{/} and table {green}", $tbl->name, "{/} having alias of {green}", ( $tbl->as // 'undef' ), "{/} ({green}", $self->{prefixed}, "{/})" );
     return( $self->error( "Table ", $tbl->name, " has no such field \"$field\"." ) ) if( !CORE::exists( $fields->{ $field } ) );
-    my $qo    = $tbl->query_object;
-    my $def   = $tbl->default;
-    my $types = $tbl->types;
-    my $const = $tbl->types_const;
-    my $debug = $self->debug;
-    $const->{ $field }->{constant} //= q{''};
-    $const->{ $field }->{name} //= '';
-    $const->{ $field }->{type} //= '';
-    my $hash  =
+    my $code = $self->can( $field );
+    unless( defined( $code ) )
     {
-    debug        => ( $self->debug || 0 ),
-    name         => $field,
-    type         => ( $types->{ $field } // '' ),
-    default      => ( $def->{ $field } // '' ),
-    pos          => ( $fields->{ $field } // '' ),
-    const        => $const->{ $field },
-    prefixed     => $self->{prefixed},
-    query_object => $qo,
-    table_object => $tbl,
-    };
-    my $perl = <<EOT;
-package ${class};
-sub ${field}
-{
-    my \$self = shift( \@_ );
-    unless( \$self->{$field} )
-    {
-        \$self->{$field} = DB::Object::Fields::Field->new(
-            debug => ( \$self->debug // 0 ),
-            name => '$field',
-            type => '$hash->{type}',
-            default => '$hash->{default}',
-            pos => $hash->{pos},
-            constant => { constant => $hash->{const}->{constant}, name => '$hash->{const}->{name}', type => '$hash->{const}->{type}' },
-            prefixed => \$self->{prefixed},
-            query_object => \$self->table_object->query_object,
-            table_object => \$self->table_object,
-        );
+        $code = sub
+        {
+            my $self = shift( @_ );
+            unless( $self->{ $field } )
+            {
+                my $fo = $tbl->fields( $field );
+                $fo->debug( ( $self->debug // 0 ) );
+                $fo->prefixed( $self->{prefixed} );
+                $fo->query_object( $self->table_object->query_object );
+                $fo->table_object( $self->table_object );
+                $self->{ $field } = $fo;
+            }
+            return( $self->{ $field } );
+        };
+        no strict 'refs';
+        *{"$field"} = $code;
     }
-    return( \$self->{$field} );
-}
-EOT
-    eval( $perl );
-    die( $@ ) if( $@ );
-    # my $o = DB::Object::Fields::Field->new( $hash );
-    my $o = $self->$field;
-    # $self->$field( $o ) || return( $self->error( "Unable to set field '$field' object to '$o': ", $self->error ) );
+    my $o = $code->( $self );
     return( $o );
 }
 
@@ -243,7 +268,7 @@ DB::Object::Fields - Tables Fields Object Accessor
 
 =head1 VERSION
 
-    v1.1.1
+    v1.2.0
 
 =head1 DESCRIPTION
 
@@ -334,6 +359,12 @@ Toggles debug mode on/off
 =head2 database_object
 
 The database object, which is a L<DB::Object> object or one of its descendant.
+
+=head2 new_field
+
+This takes an hash or hash reference of parameters and instantiate a new L<DB::Object::Fields::Field> object and return it.
+
+If an error occurred, it sets an L<error object|Module::Generic::Exception> and return an empty list in list context or C<undef> in scalar context.
 
 =head2 prefixed
 

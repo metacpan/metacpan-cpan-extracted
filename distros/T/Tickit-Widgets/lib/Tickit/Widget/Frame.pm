@@ -1,15 +1,18 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
+use warnings;
+use Object::Pad 0.807;
 
-package Tickit::Widget::Frame 0.38;
-class Tickit::Widget::Frame
-   :strict(params)
-   :isa(Tickit::SingleChildWidget);
+package Tickit::Widget::Frame 0.41;
+class Tickit::Widget::Frame :strict(params);
+
+inherit Tickit::ContainerWidget;
+
+apply Tickit::WidgetRole::SingleChildContainer;
 
 use Tickit::Style;
 
@@ -70,7 +73,7 @@ The following style keys are used:
 Controls the type of line characters used to draw the frame. Must be one of
 the following names:
 
- ascii single double thick solid_inside solid_outside
+   ascii single double thick solid_inside solid_outside
 
 The C<ascii> linetype is default, and uses only the C<-|+> ASCII characters.
 Other linetypes use Unicode box-drawing characters. These may not be supported
@@ -110,7 +113,7 @@ use constant WIDGET_PEN_FROM_STYLE => 1;
 
 =head2 new
 
-   $frame = Tickit::Widget::Frame->new( %args )
+   $frame = Tickit::Widget::Frame->new( %args );
 
 Constructs a new C<Tickit::Widget::Static> object.
 
@@ -210,7 +213,7 @@ my %LINESTYLES = (
 
 =head2 title
 
-   $title = $frame->title
+   $title = $frame->title;
 
 =cut
 
@@ -218,7 +221,7 @@ my %LINESTYLES = (
 
 =head2 set_title
 
-   $frame->set_title( $title )
+   $frame->set_title( $title );
 
 Accessor for the C<title> property, a string written in the top of the
 frame.
@@ -235,9 +238,9 @@ method set_title
 
 =head2 set_title_align
 
-   $title_align = $frame->title_align
+   $title_align = $frame->title_align;
 
-   $frame->set_title_align( $title_align )
+   $frame->set_title_align( $title_align );
 
 Accessor for the C<title_align> property. Gives a vlaue in the range C<0.0> to
 C<1.0> to align the title in the top of the frame.

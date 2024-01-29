@@ -16,19 +16,17 @@ in the process.
 
 =head1 SOURCE AVAILABILITY
 
-=head1 SOURCE AVAILABILITY
-
 The source is in Github:
 
-	http://github.com/briandfoy/ConfigReader-Simple/
+	http://github.com/briandfoy/configreader-simple/
 
 =head1 AUTHORS
 
-brian d foy, E<lt>bdfoy@cpan.orgE<gt>
+brian d foy, E<lt>briandfoy@pobox.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -37,8 +35,7 @@ it under the same terms as Perl itself.
 
 my $config = '';
 
-while( <> )
-	{
+while( <> ) {
 	next if m/\s*#/;
 	chomp;
 	my( $directive, $description ) = split m/\s+/, $_, 2;
@@ -50,8 +47,7 @@ while( <> )
 
 print $config;
 
-sub prompt
-	{
+sub prompt maps {
 	my $message = shift;
 
 	print "$message> ";

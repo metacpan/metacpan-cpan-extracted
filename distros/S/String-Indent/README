@@ -1,29 +1,79 @@
+NAME
+    String::Indent - String indenting routines
+
+VERSION
+    This document describes version 0.040 of String::Indent (from Perl
+    distribution String-Indent), released on 2024-01-25.
+
 FUNCTIONS
-
- indent($indent, $str, \%opts) => STR
-
+  indent($indent, $str, \%opts) => STR
     Indent every line in $str with $indent. Example:
 
      indent('  ', "one\ntwo\nthree") # "  one\n  two\n  three"
 
     %opts is optional. Known options:
 
-      * indent_blank_lines => bool (default: 1)
+    *   indent_blank_lines => bool (default: 1)
 
-      If set to false, does not indent blank lines (i.e., lines containing
-      only zero or more whitespaces).
+        If set to false, does not indent blank lines (i.e., lines containing
+        only zero or more whitespaces).
 
-      * first_line_indent => str
+    *   first_line_indent => str
 
-      If set, then the first line will be set to this instead of the normal
-      indent.
+        If set, then the first line will be set to this instead of the
+        normal indent.
 
-      * subsequent_lines_indent => str
+    *   first_line_of_para_indent => str
 
-      If set, then all lines but the first line will be set to this instead
-      of the normal indent.
+        If set, then the first line of each paragraph will be set to this
+        instead of the normal indent.
+
+    *   subsequent_lines_indent => str
+
+        If set, then all lines but the first line will be set to this
+        instead of the normal indent.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/String-Indent>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-String-Indent>.
 
 SEE ALSO
+    Indent::String, String::Nudge, Text::Indent
 
-    Indent::String, String::Nudge
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024, 2015, 2014 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=String-Indent>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

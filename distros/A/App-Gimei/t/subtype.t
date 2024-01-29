@@ -1,81 +1,85 @@
-use warnings;
-use v5.22;
+use v5.36;
 
 use lib ".";
-use t::CLI;
+use t::Util qw(run);
 
-use Test::More;
-
-my $app = t::CLI->new;
-
-{    # subtype_name
-    $app->run('name:family');
-    is $app->exit_code, 0;
-    like $app->stdout, qr/^\S+$/;
-    ok !$app->stderr;
-    ok !$app->error_message;
-
-    $app->run('name:last');
-    is $app->exit_code, 0;
-    like $app->stdout, qr/^\S+$/;
-    ok !$app->stderr;
-    ok !$app->error_message;
-
-    $app->run('male:given');
-    is $app->exit_code, 0;
-    like $app->stdout, qr/^\S+$/;
-    ok !$app->stderr;
-    ok !$app->error_message;
-
-    $app->run('female:first');
-    is $app->exit_code, 0;
-    like $app->stdout, qr/^\S+$/;
-    ok !$app->stderr;
-    ok !$app->error_message;
-
-    $app->run('name:gender');
-    is $app->exit_code, 0;
-    like $app->stdout, qr/^\S+$/;
-    ok !$app->stderr;
-    ok !$app->error_message;
-
-    $app->run('name:sex');
-    is $app->exit_code, 0;
-    like $app->stdout, qr/^\S+$/;
-    ok !$app->stderr;
-    ok !$app->error_message;
-
-    $app->run('female:unknown');
-    is $app->exit_code, 255;
-    ok !$app->stdout;
-    ok !$app->stderr;
-    is $app->error_message, "Error: unknown subtype or rendering: unknown\n";
-}
-
-{    #subtype_address
-    $app->run('address:prefecture');
-    is $app->exit_code, 0;
-    like $app->stdout, qr/^\S+$/;
-    ok !$app->stderr;
-    ok !$app->error_message;
-
-    $app->run('address:city');
-    is $app->exit_code, 0;
-    like $app->stdout, qr/^\S+$/;
-    ok !$app->stderr;
-    ok !$app->error_message;
-
-    $app->run('address:town');
-    is $app->exit_code, 0;
-    like $app->stdout, qr/^\S+$/;
-    ok !$app->stderr;
-    ok !$app->error_message;
-
-    $app->run('address:unknown');
-    is $app->exit_code, 255;
-    ok !$app->stdout;
-    ok !$app->stderr;
-    is $app->error_message, "Error: unknown subtype or rendering: unknown\n";
-}
-
-done_testing;
+my @tests = (
+    {
+        Name                   => 'family',
+        args                   => ['name:family'],
+        expected_error_message => '',
+        expected_stdout        => qr/^\S+$/,
+        expected_stderr        => '',
+    },
+    {
+        Name                   => 'last',
+        args                   => ['name:last'],
+        expected_error_message => '',
+        expected_stdout        => qr/^\S+$/,
+        expected_stderr        => '',
+    },
+    {
+        Name                   => 'given',
+        args                   => ['male:given'],
+        expected_error_message => '',
+        expected_stdout        => qr/^\S+$/,
+        expected_stderr        => '',
+    },
+    {
+        Name                   => 'first',
+        args                   => ['female:first'],
+        expected_error_message => '',
+        expected_stdout        => qr/^\S+$/,
+        expected_stderr        => '',
+    },
+    {
+        Name                   => 'gender',
+        args                   => ['name:gender'],
+        expected_error_message => '',
+        expected_stdout        => qr/^\S+$/,
+        expected_stderr        => '',
+    },
+    {
+        Name                   => 'sex',
+        args                   => ['name:sex'],
+        expected_error_message => '',
+        expected_stdout        => qr/^\S+$/,
+        expected_stderr        => '',
+    },
+    {
+        Name                   => 'unknown',
+        args                   => ['female:unknown'],
+        expected_error_message => "Error: unknown subtype or rendering: unknown\n",
+        expected_stdout        => '',
+        expected_stderr        => '',
+    },
+    {
+        Name                   => 'prefecture',
+        args                   => ['address:prefecture'],
+        expected_error_message => '',
+        expected_stdout        => qr/^\S+$/,
+        expected_stderr        => '',
+    },
+    {
+        Name                   => 'city',
+        args                   => ['address:city'],
+        expected_error_message => '',
+        expected_stdout        => qr/^\S+$/,
+        expected_stderr        => '',
+    },
+    {
+        Name                   => 'town',
+        args                   => ['address:town'],
+        expected_error_message => '',
+        expected_stdout        => qr/^\S+$/,
+        expected_stderr        => '',
+    },
+    {
+        Name                   => 'unknown',
+        args                   => ['address:unknown'],
+        expected_error_message => "Error: unknown subtype or rendering: unknown\n",
+        expected_stdout        => '',
+        expected_stderr        => '',
+    },
+);
+run(@tests);

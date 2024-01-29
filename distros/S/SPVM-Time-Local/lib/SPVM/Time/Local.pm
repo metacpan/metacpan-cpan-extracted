@@ -1,55 +1,65 @@
 package SPVM::Time::Local;
 
-our $VERSION = '0.10';
+our $VERSION = '0.111';
 
 1;
 
 =head1 Name
 
-SPVM::Time::Local - Reverse Manipulation of localtime and gmtime Functions.
+SPVM::Time::Local - Reverse Operations of localtime and gmtime.
 
 =head1 Description
 
-The Time::Local class of L<SPVM> has methods for reverse manipulations of L<localtime|SPVM::Sys::Time/"localtime"> and L<gmtime|SPVM::Sys::Time/"gmtime"> functions.
+The Time::Local class in L<SPVM> has methods to do reverse operations of L<localtime|SPVM::Sys/"localtime"> and L<gmtime|SPVM::Sys/"gmtime"> functions.
 
 =head1 Usage
   
-  use Sys::Time
+  use Sys;
   use Time::Local;
   
-  my $epoch = Sys::Time->time;
-  my $time_info_local = Sys::Time->localtime($epoch);
-  my $time_info_utc = Sys::Time->gmtime($epoch);
+  # timegm
+  {
+    my $epoch = Sys::Time->time;
+    
+    my $tm = Sys->gmtime($epoch);
+    
+    my $epoch_again = Time::Local->timegm($tm);
+  }
   
-  my $epoch = Time::Local->timelocal($time_info_local);
+  # timelocal
+  {
+    my $epoch = Sys::Time->time;
+    
+    my $tm_local = Sys->localtime($epoch);
+    
+    my $epoch_again = Time::Local->timelocal($tm_local);
+  }
   
-  my $epoch = Time::Local->timegm($time_info_utc);
-
 =head1 Class Methods
 
 =head2 timelocal
 
-  static method timelocal : long ($time_info : Sys::Time::Tm);
+C<static method timelocal : long ($tm : L<Sys::Time::Tm|SPVM::Sys::Time::Tm>);>
 
-Converts a L<Sys::Time::Tm|SPVM::Sys::Time::Tm> object that is local time to the epoch time.
+Converts a L<Sys::Time::Tm|SPVM::Sys::Time::Tm> object to the epoch time.
 
-This method is the reverse manipulation of L<localtime|SPVM::Sys::Time/"localtime">.
+This method does the reverse operation of the L<localtime|SPVM::Sys/"localtime"> method in the Sys class.
 
-This method is the same as C<timelocal> function of C<Linux>.
+Exceptions:
 
-  my $epoch = Time::Local->timelocal($time_info_local);
+$tm must be defined. Otherwise an exception is thrown.
 
 =head2 timegm
 
-  static method timegm : long ($time_info : Sys::Time::Tm);
+C<static method timegm : long ($tm : L<Sys::Time::Tm|SPVM::Sys::Time::Tm>);>
 
 Converts a L<Sys::Time::Tm|SPVM::Sys::Time::Tm> object that is C<UTC> to the epoch time.
 
-This method is the reverse manipulation of L<gmtime|SPVM::Sys::Time/"gmtime">.
+This method does the reverse operation of the L<gmtime|SPVM::Sys/"gmtime"> method in the Sys class.
 
-This method is the same as C<timegm> function of C<Linux>.
+Exceptions:
 
-  my $epoch = Time::Local->timegm($time_info_utc);
+$tm must be defined. Otherwise an exception is thrown.
 
 =head1 Repository
 

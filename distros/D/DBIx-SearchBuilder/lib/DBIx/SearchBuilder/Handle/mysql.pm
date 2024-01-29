@@ -372,4 +372,14 @@ sub HasSupportForCombineSearchAndCount {
     }
 }
 
+sub CastAsDecimal {
+    my $self  = shift;
+    my $field = shift or return;
+
+    # CAST($field AS DECIMAL) rounds values to integers by default. It supports
+    # specific precisions like CAST($field AS DECIMAL(5,2)), but we don't know
+    # the precisions in advance. +0 works like other dbs.
+    return "($field+0)";
+}
+
 1;

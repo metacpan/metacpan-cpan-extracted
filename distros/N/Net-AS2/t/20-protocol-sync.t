@@ -4,9 +4,15 @@ use utf8;
 use strict;
 use warnings;
 
+use File::Basename qw(dirname);
+use Cwd            qw(abs_path);
+
 use Encode;
 use HTTP::Response;
+
 use_ok('Net::AS2');
+
+my $cert_dir = abs_path(dirname(__FILE__) . '/certificates');
 
 my %config_1 = (
     MyId => 'Mr 1', MyKey => key(1), MyCertificate => cert(1),
@@ -62,7 +68,7 @@ sub key {
     my $i = shift;
 
     local $/;
-    open my $fh, '<', "t/test.$i.key";
+    open my $fh, '<', "$cert_dir/test.$i.key";
     return <$fh>;
 }
 
@@ -70,7 +76,7 @@ sub cert {
     my $i = shift;
 
     local $/;
-    open my $fh, '<', "t/test.$i.cert";
+    open my $fh, '<', "$cert_dir/test.$i.cert";
     return <$fh>;
 }
 

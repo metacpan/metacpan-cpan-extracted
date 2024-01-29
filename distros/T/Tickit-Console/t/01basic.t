@@ -1,10 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
-use Test2::V0;
-use Test::Refcount;
+use Test2::V0 0.000148;
 
 use Tickit::Test;
 

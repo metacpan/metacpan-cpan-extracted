@@ -52,10 +52,10 @@ sub check_usage : Test(no_plan) {
         'usage text for simple command is correct'
     );
 
-    $cmd_1->options( [ 'verbose|v', 'debug|d=i', 'run|r:i' ] );
+    $cmd_1->options( [ 'verbose|v!', 'debug|d=i', 'run|r:i' ] );
 
     $txt = $cmd_1->usage_text();
-    $expected = 'B<mv> [B<--verbose>]'
+    $expected = 'B<mv> [B<--verbose>|B<--no-verbose>]'
               . ' [B<--debug>=I<i>] [B<-d>I<i>]'
               . ' [B<--run>[=I<i>]] [B<-r>[I<i>]]'
               . ' [B<-v>]'
@@ -71,7 +71,8 @@ sub check_usage : Test(no_plan) {
     );
 
     $txt = $cmd_1->usage_text( with_options => 'long' );
-    $expected = 'B<mv> [B<--verbose>] [B<--debug>=I<i>]'
+    $expected = 'B<mv> [B<--verbose>|B<--no-verbose>]'
+              . ' [B<--debug>=I<i>]'
               . ' [B<--run>[=I<i>]] I<path1> I<path2>';
     is($txt, $expected,
         'usage text for command with long options is correct'

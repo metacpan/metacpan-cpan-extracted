@@ -1,6 +1,6 @@
 #MIT License
 #
-#Copyright (c) 2022 IP2Location.com
+#Copyright (c) 2024 IP2Location.com
 #
 #Permission is hereby granted, free of charge, to any person obtaining a copy
 #of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ use strict;
 use vars qw(@ISA $VERSION @EXPORT);
 use Math::BigInt;
 
-$VERSION = '3.30';
+$VERSION = '3.40';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -1153,7 +1153,7 @@ __END__
 
 =head1 NAME
 
-Geo::IP2Proxy - Reverse search of IP address to detect VPN servers, open proxies, web proxies, Tor exit nodes, search engine robots, data center ranges and residential proxies using IP2Proxy BIN databases. Other information available includes proxy type, country, state, city, ISP, domain name, usage type, AS number, AS name, threats, last seen date and provider names.
+Geo::IP2Proxy - Reverse search of IP addresses to detect VPN servers, open proxies, web proxies, Tor exit nodes, search engine robots, data center ranges, residential proxies, consumer privacy networks, and enterprise private networks using IP2Proxy BIN databases. Other available information includes proxy type, country, state, city, ISP, domain name, usage type, AS number, AS name, threats, last seen date, and provider names.
 
 This pure Perl module uses a file based IP2Proxy .BIN database available at L<IP2Proxy Proxy Detection|https://www.ip2location.com/database/ip2proxy> upon subscription. You can visit L<Libraries|https://www.ip2location.com/development-libraries> to download sample BIN files. IP2Proxy supports both IPv4 and IPv6 addressing.
 
@@ -1200,7 +1200,7 @@ This pure Perl module uses a file based IP2Proxy .BIN database available at L<IP
 
 =head1 DESCRIPTION
 
-This Perl module provides fast reverse lookup of IP address to detect VPN servers, open proxies, web proxies, Tor exit nodes, search engine robots, data center ranges and residential proxies using IP2Proxy BIN databases. Other information available includes proxy type, country, state, city, ISP, domain name, usage type, AS number, AS name, threat, last seen date and provider names.
+This Perl module provides quick reverse lookup of IP addresses to detect VPN servers, open proxies, web proxies, Tor exit nodes, search engine robots, data center ranges, residential proxies, consumer privacy networks, and enterprise private networks using IP2Proxy BIN databases. Other available information includes proxy type, country, state, city, ISP, domain name, usage type, AS number, AS name, threats, last seen date, and provider names.
 
 This pure Perl module uses a file based IP2Proxy .BIN database available at L<IP2Proxy Product Page|https://www.ip2location.com/database/ip2proxy> upon subscription. You can visit L<Libraries|https://www.ip2location.com/development-libraries> to download sample BIN files. IP2Proxy supports both IPv4 and IPv6 addressing.
 
@@ -1239,13 +1239,15 @@ Returns 0 if IP address is not a proxy. Returns 1 if it is proxy excluding data 
 
 Returns the proxy type of proxy's IP address or domain name. Returns "-" if not a proxy.
 
-  VPN   Anonymizing VPN services.
+  VPN   Virtual Private Networks.
   TOR   Tor Exit Nodes.
   PUB   Public Proxies.
   WEB   Web Proxies.
   DCH   Hosting Providers/Data Center.
   SES   Search Engine Robots.
-  RES   Residential Proxies [PX10+]
+  RES   Residential Proxies. [PX10+]
+  CPN   Consumer Privacy Networks. [PX11+]
+  EPN   Enterprise Private Networks. [PX11+]
 
 =item $countryshort = $obj->getCountryShort( $ip );
 
@@ -1340,11 +1342,11 @@ L<IP2Proxy Product|https://www.ip2location.com/database/ip2proxy>
 
 =head1 VERSION
 
-3.30
+3.40
 
 =head1 AUTHOR
 
-Copyright (c) 2022 IP2Location.com
+Copyright (c) 2024 IP2Location.com
 
 All rights reserved. This package is free software. It is licensed under the MIT. See the LICENSE file for full license information.
 

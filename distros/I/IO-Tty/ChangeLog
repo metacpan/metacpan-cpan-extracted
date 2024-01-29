@@ -1,3 +1,10 @@
+1.20 2023-12-28 Todd Rinaldo <toddr@cpan.org>
+    * #32 - Skip t/pty_get_winsize.t tests on AIX
+    * #27 - Fix patchlevel check for util.h
+
+1.19 2023-12-28 Todd Rinaldo <toddr@cpan.org>
+    * #37 - Remove --no-undefined from compiler test which is not compatible with all platforms.
+
 1.18 2023-11-27 Todd Rinaldo <toddr@cpan.org>
     * #35 - Address Freebsd build issue: Make function checks more robust within shared lib
 

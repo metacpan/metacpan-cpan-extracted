@@ -71,8 +71,6 @@ sub fetch {
 	$self->{'Url'} =~ s/ +/\-/g;
 	$self->{'Url'} = $Site . '/' . $self->{'Url'};
 	$self->{'Url'} =~ tr/A-Z/a-z/;
-	$self->{'_confirm_title'} = $song_in;
-	$self->{'_confirm_artist'} = $artist_in;
 	my $lyrics = $self->_web_fetch($artist, $song);
 	if ($lyrics && $haveLyricsCache && $self->{'-cache'} && $self->{'-cache'} !~ /^\</) {
 		$self->_debug("=== WILL CACHE LYRICS! ===");
@@ -86,36 +84,40 @@ sub fetch {
 sub _parse {
 	my $self = shift;
 	my $html = shift;
+	my ($artist_in, $song_in) = @_;
 
 	$self->_debug("Letras::_parse()!");
-	if (my ($goodbit) = $html =~
-			m{\<div\s+class\=\"cnt\-letra\s+p\d+\_premium\"\>(.+?)\<\/div\>}msi)
+	if ($html =~
+			m{\<div\s+class\=\"(?:lyric-original|cnt\-letra\s+p\d+\_premium)\"\>(.+?)\<\/div\>}msi)
 	{
+		my $goodbit = $1;
 		my $hs = HTML::Strip->new();
 
 		#LETRAS SOMETIMES RETURNS "BEST GUESS" (WRONG) SONG LYRICS IF NOT FOUND, AND WE
 		#DON'T WANT THIS, SO WE MUST CONFIRM THAT THE TITLE AND ARTIST MATCH WHAT WE
 		#REQUESTED, AND PUNT IF THEY DON'T!:
-		if ($html =~ m#\<div\s+class\=\"cnt\-head\_title\"\>(.+?)\<\/div\>#msi) {
+		if ($html =~ m#\"artist\_name\"\:\"\Q$artist_in\E\"#i && $html =~ m#\"track\_name\"\:\"\Q$song_in\E\"#i) {
+			goto HAVEIT;
+		} elsif ($html =~ m#\<div\s+class\=\"cnt\-head\_title\"\>(.+?)\<\/div\>#msi) {
 			my $headers = $1;
 			my $title = ($headers =~ m#\<h1\>(.+?)\<\/h1\>#si) ? $hs->parse($1) : '';
 			$title =~ s/^\s+//;
 			$title =~ s/\s+$//;
 			if ($title) {
-				if ($self->{'_confirm_title'} !~ /^${title}$/i) {
+				if ($song_in !~ /^${title}$/i) {
 					$self->{'Error'} = "e:$Source - Results did not match title ($title).";
 					return '';
 				}
 				my $artist = ($headers =~ m#\<h2\>(.+?)\<\/h2\>#si) ? $hs->parse($1) : '';
 				$artist =~ s/^\s+//;
 				$artist =~ s/\s+$//;
-				if ($artist && $self->{'_confirm_artist'} !~ /^${artist}$/i) {
+				if ($artist && $artist_in !~ /^${artist}$/i) {
 					$self->{'Error'} = "e:$Source - Results did not match artist ($artist).";
 					return '';
 				}
 			}
 		}
-
+HAVEIT:
 		$goodbit =~ s#\<\/?p\>#\r\n#gsi;
 		$goodbit =~ s#\<br\/?\>#\r\n#gsi;
 		my $text = $hs->parse($goodbit);
@@ -221,7 +223,7 @@ pass to www.letras.net.  Some sites are pickey about receiving a user-agent
 string that corresponds to a valid / supported web-browser to prevent their 
 sites from being "scraped" by programs, such as this.  
 
-Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0">.
+Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:112.0) Gecko/20100101 Firefox/112.0">.
 
 NOTE:  This value will be overridden if $founder->agent("agent") is 
 called!
@@ -271,7 +273,7 @@ Some sites are pickey about receiving a user-agent
 string that corresponds to a valid / supported web-browser to prevent their 
 sites from being "scraped" by programs, such as this.  
 
-Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0">
+Default:  I<"Mozilla/5.0 (X11; Linux x86_64; rv:112.0) Gecko/20100101 Firefox/112.0">
 
 If no argument is passed, it returns the current GENERAL user-agent string in 
 effect (but a different agent option is specified for a specific module may 

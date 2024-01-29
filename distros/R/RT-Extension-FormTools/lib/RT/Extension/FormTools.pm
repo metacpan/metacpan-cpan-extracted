@@ -3,7 +3,7 @@ use strict;
 
 package RT::Extension::FormTools;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 RT->AddStyleSheets('rt-extension-formtools.css');
 RT->AddJavaScript('rt-extension-formtools.js');
@@ -47,6 +47,21 @@ sub GeneratePageId {
 
 sub _GeneratePageId {
     return substr( sha1_hex( time . int rand 10000 ), 0, 8 );
+}
+
+sub _ParseContent {
+    shift if ( $_[0] // '' ) eq __PACKAGE__;
+    my %args = (
+        Content   => undef,
+        TicketObj => undef,
+        @_,
+    );
+    return $args{Content} unless $args{TicketObj} && $args{Content} && $args{Content} =~ /\{\s*\$\w+\s*\}/;
+    require RT::Template;
+    return RT::Template->_ParseContentSimple(
+        TemplateArgs => { Ticket => $args{TicketObj} },
+        Content      => $args{Content},
+    );
 }
 
 {
@@ -174,7 +189,7 @@ for the right task.
 =head3 Advanced
 
 The advanced page shows the raw JSON representation of the configured pages
-in your form. We recommend no editing the JSON directly. However, you can
+in your form. We recommend not editing the JSON directly. However, you can
 copy the content and paste it into another page if you want to migrate
 a form from development to production. You can also save the JSON to a file
 and use the C<rt-insert-formtools-config> utility to load it into another RT.

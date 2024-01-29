@@ -4,7 +4,7 @@ StreamFinder::Rumble - Fetch actual raw streamable URLs from Rumble.com.
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2023 by
+This module is Copyright (C) 2017-2024 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -113,8 +113,8 @@ L<URI::Escape>, L<HTML::Entities>, and L<LWP::UserAgent>.
 =over 4
 
 =item B<new>(I<ID>|I<url> [, I<-keep> => I<streamtypes>] 
-[, "-quality" => I<quality>] [, I<-secure> [ => 0|1 ]] 
-[, I<-debug> [ => 0|1|2 ]])
+[, "-quality" => I<quality>] [, "-bitrate" => I<bitrate>] 
+[, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ]])
 
 Accepts a rumble.com video ID or URL and creates and returns a new video object, 
 or I<undef> if the URL is not a valid Rumble video or no streams are found.  
@@ -134,6 +134,14 @@ followed by all webm streams, then all of any others found.
 The optional I<-quality> argument, which can be set to a "p number".  
 This limits the video quality.. For example:  "720" would mean select 
 a stream "<= 720p".  
+
+The optional I<-bitrate> argument, which can be set to a number (kbps).
+This limits the maximum stream bitrate.  For example most 720p Rumble 
+streams now exceed bitrate 2000, so limiting bitrate to a lower number 
+will exclude these streams.  
+
+If both I<-quality> and I<-bitrate> options are specified, video streams 
+will be limited to the most restrictive limit.
 
 DEFAULT I<-quality> is accept streams without resolution limit.
 
@@ -252,8 +260,7 @@ I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.
 Options specified here override any specified in 
 I<~/.config/StreamFinder/config>.
 
-Among options valid for Rumble streams are the I<-keep> option 
-described in the B<new()> function.
+Options valid for Rumble streams are described in the B<new()> function.
 
 =item ~/.config/StreamFinder/config
 
@@ -319,7 +326,7 @@ L<http://search.cpan.org/dist/StreamFinder-Rumble/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2023 Jim Turner.
+Copyright 2017-2024 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -391,6 +398,9 @@ sub new
 		} elsif ($_[0] =~ /^\-?quality$/o) {
 			shift;
 			$self->{'quality'} = (defined $_[0]) ? shift : 0;
+		} elsif ($_[0] =~ /^\-?bitrate$/o) {
+			shift;
+			$self->{'bitrate'} = (defined $_[0]) ? shift : 0;
 		} else {
 			shift;
 		}
@@ -400,6 +410,7 @@ sub new
 	}
 	@okStreams = (qw(mp4 webm any))  unless (defined $okStreams[0]);
 	$self->{'quality'} = 32767  unless (defined($self->{'quality'}) && $self->{'quality'} =~ /^[0-9]+$/);
+	$self->{'bitrate'} = 32767  unless (defined($self->{'bitrate'}) && $self->{'bitrate'} =~ /^[0-9]+$/);
 
 	my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
 	$ua->timeout($self->{'timeout'});
@@ -467,6 +478,10 @@ sub new
 		if ($html && $html =~ m#\"embedUrl\"\:\"([^\"]+)#s) {
 			my $url2 = $1;
 
+			if ($DEBUG > 1 && open DBG, ">/tmp/rumble_page.htm") {
+				print DBG $html;
+				close DBG;
+			}
 			$self->{'title'} = ($html =~ m#\<title\>([^\<]+)\<\/title\>#s) ? $1 : '';
 			$self->{'title'} ||= $1  if ($html =~ m#\<meta\s+property\=\"?og\:title\"?\s+content\=\"([^\"]+)\"#s);
 
@@ -528,6 +543,10 @@ sub new
 		}
 		if ($html) {
 			$html =~ s#\\\/#\/#gs;
+			if ($DEBUG > 1 && open DBG, ">/tmp/rumble_embed.htm") {
+				print DBG $html;
+				close DBG;
+			}
 			$self->{'title'} ||= ($html =~ m#\<title\>([^\<]+)\<\/title\>#s) ? $1 : '';
 			my $url2 = ($html =~ m#\<link\s+rel\=\"canonical\"\s+href\=\"([^\"]+)#s) ? $1 : undef;
 			$html =~ s#^.+\"u\"\:\{##s;
@@ -537,9 +556,13 @@ sub new
 			#BASED ON THEIR EXTENSION, WE CONVERT THE NON-RESOLUTION ONES TO VERY LOW NUMBERS (<=30)
 			#IN ORDER FOR THEM TO BE SORTED LAST (FOR GIVEN CLASS, WE WANT HIGHEST RESOLUTIONS FIRST!:
 			my $lowclass;
-			while ($html =~ s#\"(\w+)\"\:\{\"url\"\:\"([^\"]+)\"##s) {
+			while ($html =~ s#^.+?\"(\w+)\"\:\{\"url\"\:\"([^\"]+)\"##so) {
 				$lowclass = 30;
 				my ($class, $stream) = ($1, $2);
+				my $bitrate = ($html =~ m#\"bitrate\"\:(\d+)#o) ? $1 : 0;
+				print STDERR "...class=$class= bitrate=$bitrate= stream=$stream= lowclass=$lowclass=\n"  if ($DEBUG);
+				next  if ($bitrate > $self->{'bitrate'});
+
 				for (my $i=0;$i<=$#okStreams;$i++) {
 					if ($class =~ /$okStreams[$i]/) {
 						$class = $lowclass;
@@ -549,7 +572,7 @@ sub new
 				$class = 1  if ($lowclass == 30 && $class =~ /\D/io);
 				push @{$streamsets{$class}}, $stream;
 			}
-			print STDERR "--Max resolution=".$self->{'quality'}."=\n"  if ($DEBUG);
+			print STDERR "--Max resolution=".$self->{'quality'}."= bitrate=".$self->{'bitrate'}."=\n"  if ($DEBUG);
 			my %streamHash;  #USE THIS HASH TO PREVENT ANY DUPLICATE STREAM URLS:
 			foreach my $streamtype (@okStreams) {
 				print STDERR "\n--keep type=$streamtype:\n"  if ($DEBUG);
@@ -561,8 +584,6 @@ sub new
 							unless (defined $streamHash{$stream}
 									|| ($self->{'secure'} && $stream !~ /^https/o)
 									|| $class > $self->{'quality'}) {
-#$stream =~ s#hugh\.cdn\.rumble\.cloud\/video\/#sp\.rmbl\.ws\/#o;  #JWT:RANDOMLY GETTING THIS SITE THAT DOESN'T WORK?!
-print STDERR "w:Rumble converted $stream!\n"  if ($stream =~ s#hugh\.cdn\.rumble\.cloud\/video\/#sp\.rmbl\.ws\/#o);  #JWT:RANDOMLY GETTING THIS SITE THAT DOESN'T WORK?!
 								push @{$self->{'streams'}}, $stream;
 								$streamHash{$stream} = $stream;
 							}

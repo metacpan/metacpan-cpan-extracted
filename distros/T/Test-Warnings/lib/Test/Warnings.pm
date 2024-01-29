@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Test::Warnings; # git description: v0.031-5-g17d6729
+package Test::Warnings; # git description: v0.032-4-ge6f3f36
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Test for warnings and the lack of them
 # KEYWORDS: testing tests warnings
 
-our $VERSION = '0.032';
+our $VERSION = '0.033';
 
 use parent 'Exporter';
 use Test::Builder;
@@ -14,6 +14,8 @@ our @EXPORT_OK = qw(
     allow_warnings allowing_warnings
     had_no_warnings
     warnings warning
+    allow_patterns
+    disallow_patterns
 );
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
@@ -24,6 +26,7 @@ my $no_end_test;
 my $fail_on_warning;
 my $report_warnings;
 my @collected_warnings;
+my @allowed_patterns;
 
 sub import {
     my $class = shift @_;
@@ -40,7 +43,7 @@ sub import {
     __PACKAGE__->export_to_level(1, $class, keys %names);
 }
 
-# for testing this module only!
+# swap this out for testing this module only!
 my $tb;
 sub _builder(;$) {
     if (not @_) {
@@ -53,7 +56,7 @@ sub _builder(;$) {
 
 my $_orig_warn_handler = $SIG{__WARN__};
 $SIG{__WARN__} = sub {
-    if ($warnings_allowed) {
+    if ($warnings_allowed or grep +($_[0] =~ $_), @allowed_patterns) {
         Test::Builder->new->note($_[0]);
     }
     else {
@@ -121,6 +124,27 @@ if (Test::Builder->can('done_testing')) {
     };
 }
 
+if ($INC{'Test2/Tools/Basic.pm'}) {
+    # monkeypatch Test2::Tools::Basic::done_testing:
+    # check for any forbidden warnings, and record that we have done so
+    # so we do not check again via END
+
+    no strict 'refs';
+    my $orig = *{'Test2::Tools::Basic::done_testing'}{CODE};
+    no warnings 'redefine';
+    *{'Test2::Tools::Basic::done_testing'} = sub {
+        if (not $no_end_test) {
+            # we could use $ctx to create the test, which means not having to adjust Level,
+            # but then we need to make _builder Test2-compatible, which seems like a PITA.
+            local $Test::Builder::Level = $Test::Builder::Level + 3;
+            had_no_warnings('no (unexpected) warnings (via done_testing)');
+            $done_testing_called = 1;
+        }
+
+        $orig->(@_);
+    };
+}
+
 END {
     if (not $no_end_test
         and not $done_testing_called
@@ -159,6 +183,34 @@ sub had_no_warnings(;$) {
     }
 }
 
+# pass one or more regexes (in qr format)
+# when called in void context, lasting effect is universal
+# otherwise, returns objects: when they go out of scope, the effect is removed
+#   (warning disallowed again).
+sub allow_patterns(@) {
+  push @allowed_patterns, @_;
+  return if not defined wantarray;
+  return [ map +Test::Warnings::TemporaryWarning->new($_), @_ ];
+}
+
+sub disallow_patterns(@) {
+  foreach my $pattern (@_) {
+    @allowed_patterns = grep +($_ ne $pattern), @allowed_patterns;
+  }
+}
+
+package # hide from PAUSE
+  Test::Warnings::TemporaryWarning;
+
+sub new {
+  my ($class, $pattern) = @_;
+  bless \$pattern, $class;
+}
+
+sub DESTROY {
+  Test::Warnings::disallow_patterns(${$_[0]});
+}
+
 1;
 
 __END__
@@ -173,7 +225,7 @@ Test::Warnings - Test for warnings and the lack of them
 
 =head1 VERSION
 
-version 0.032
+version 0.033
 
 =head1 SYNOPSIS
 
@@ -337,6 +389,24 @@ So instead, change your test to:
         'got a warning from foo()',
     ) or diag 'got warning(s): ', explain($warning);
 
+=head2 allow_patterns
+
+  allow_patterns(qr/always allow this warning/);
+  {
+    my $temp = allow_patterns(qr/only allow in this scope/, qr/another temporary warning/);
+    ... stuff ...
+  }
+
+Given one or more regular expressions, in C<qr/.../> form, add them to the allow-list (warnings will
+be emitted with C<note> rather than triggering the warning handler). If the return value is saved in
+a local variable, the warning exemption will only be in effect for that local scope (the addition is
+reversed at the end of the scope); otherwise, the effect is global.
+
+=head2 disallow_patterns
+
+Given one or more regular expressions, in C<qr/.../> form, remove it from the allow-list. The
+pattern must exactly match a pattern previously provided to L</allow_patterns>.
+
 =head1 IMPORT OPTIONS
 
 =head2 C<:all>
@@ -409,6 +479,12 @@ the test name, "foo appears in the warning" will itself be matched by the
 regex (see F<examples/warning_like.t>).  Instead, write this:
 
   like( warning { ... }, qr/foo/, 'foo appears in the warning' );
+
+=head1 CAVEATS
+
+If you are using another module that sets its own warning handler (for example L<Devel::Confess> or
+L<diagnostics>) your results may be mixed, as those handlers will interfere with this module's
+ability to properly detect and capture warnings in their original form.
 
 =head1 TO DO (or: POSSIBLE FEATURES COMING IN FUTURE RELEASES)
 

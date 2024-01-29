@@ -39,7 +39,7 @@ mv-reverse - Rename a file, with reversed order of arguments
 
 =head1 VERSION
 
-This document describes version 0.012 of mv-reverse (from Perl distribution App-FileRenameUtils), released on 2023-11-15.
+This document describes version 0.014 of mv-reverse (from Perl distribution App-FileRenameUtils), released on 2023-11-20.
 
 =head1 SYNOPSIS
 

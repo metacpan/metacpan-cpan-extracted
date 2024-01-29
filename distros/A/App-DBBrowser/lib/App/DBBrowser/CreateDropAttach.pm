@@ -1,4 +1,5 @@
-package App::DBBrowser::CreateDropAttach;
+package # hide from PAUSE
+App::DBBrowser::CreateDropAttach;
 
 use warnings;
 use strict;

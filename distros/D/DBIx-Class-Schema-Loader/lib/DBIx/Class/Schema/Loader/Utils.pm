@@ -3,7 +3,6 @@ package # hide from PAUSE
 
 use strict;
 use warnings;
-use Test::More;
 use String::CamelCase 'wordsplit';
 use Carp::Clan qw/^DBIx::Class/;
 use List::Util 'all';
@@ -136,7 +135,7 @@ sub no_warnings(&;$) {
 
     $code->();
 
-    ok ((not $failed), $test_name);
+    Test::More::ok ((not $failed), $test_name);
 }
 
 sub warnings_exist(&$$) {
@@ -156,7 +155,7 @@ sub warnings_exist(&$$) {
 
     $code->();
 
-    ok $matched, $test_name;
+    Test::More::ok $matched, $test_name;
 }
 
 sub warnings_exist_silent(&$$) {
@@ -168,7 +167,7 @@ sub warnings_exist_silent(&$$) {
 
     $code->();
 
-    ok $matched, $test_name;
+    Test::More::ok $matched, $test_name;
 }
 
 sub slurp_file($) {

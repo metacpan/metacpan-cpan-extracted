@@ -1,5 +1,20 @@
 Revision history for Dancer2-Plugin-LiteBlog
 
+0.10
+
+        * Support for 'route_widgets' to declare any route using the same 
+          widget and navigation entries as the global site. 
+          (Alexis Sukrieh)
+
+0.09
+        * Custom widget: load any HTML you want and inject that where you want 
+          in the home 'widget' layout.
+        * Disable blog's elements widget in the home screen, if 'no_widget' is
+          set in the blog-meta.yml file. 
+          (Alexis Sukrieh)
+0.08
+        * Caroussel widget: same as the Splash but with slides.
+
 0.07     2023-11-10
 
         [FEATURES]

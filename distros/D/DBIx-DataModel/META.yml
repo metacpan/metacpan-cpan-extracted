@@ -7,7 +7,6 @@ build_requires:
   DBD::SQLite: '1.38'
   FindBin: '0'
   SQL::Abstract::Test: '0'
-  Task::Weaken: '0'
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
@@ -20,7 +19,7 @@ name: DBIx-DataModel
 provides:
   DBIx::DataModel:
     file: lib/DBIx/DataModel.pm
-    version: '3.06'
+    version: '3.09'
   DBIx::DataModel::Compatibility::V0:
     file: lib/DBIx/DataModel/Compatibility/V0.pm
   DBIx::DataModel::Compatibility::V1:
@@ -112,20 +111,21 @@ requires:
   Clone: '0'
   DBI: '0'
   Data::Structure::Util: '0'
+  Hash::Util: '0'
   MRO::Compat: '0'
   Module::Build: '0'
   Module::Load: '0'
   Params::Validate: '0'
   SQL::Abstract::Classic: '1.91'
-  SQL::Abstract::More: '1.4'
+  SQL::Abstract::More: '1.41'
   Scalar::Util: '1.07'
   Storable: '0'
   Try::Tiny: '0'
   namespace::clean: '0'
-  perl: '5.008'
+  perl: '5.01'
   version: '0'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/DBIx-DataModel
-version: '3.06'
+version: '3.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

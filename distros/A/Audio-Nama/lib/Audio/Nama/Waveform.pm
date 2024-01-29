@@ -1,7 +1,7 @@
 package Audio::Nama::Waveform;
 use Audio::Nama::Globals qw($project $config $gui %ti);
 use Audio::Nama::Util qw(join_path);
-use Modern::Perl;
+use Modern::Perl '2020';
 use Try::Tiny;
 use vars qw(%by_name);
 use Audio::Nama::Object qw(wav track project start end);
@@ -41,7 +41,7 @@ sub generate_waveform {
 	$height //= $config->{waveform_height};
 	$width //= int( $self->track->wav_length * $pixels_per_second);
 	my $name = waveform_name($self->track->full_path, $width, $height, $pixels_per_second);
-	my $cmd = join ' ', 'waveform', "-b #c2d6d6 -c #0080ff -W $width -H $height", $self->full_path, $name;
+	my $cmd = join ' ', 'waveform', "-b #c2d6d6 -c #0080ff -W $width -H $height", $self->track->full_path, $name;
 	say $cmd;
 	system($cmd);
 	$name;
@@ -52,6 +52,7 @@ sub waveform_name {
 	my($path, $width, $height, $pixels, $start, $end) = @_;
 			"$path."  . $width . 'x' . "$height-$pixels" . region_def($start,$end) . ".png"
 }
+sub region_def {}
 sub find_waveform {
 
 	my $self = shift;

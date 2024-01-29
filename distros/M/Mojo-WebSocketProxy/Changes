@@ -1,4 +1,12 @@
 Revision history for Perl module Mojo::WebSocketProxy
+
+0.16      2023-12-15 07:48:13+00:00 UTC
+
+    Mojo::WebSocketProxy::Dispatcher changes:
+    - Use Log::Any instead of Mojo::Log in Dispatcher;
+    - Avoid string interpolation to solve warning due to the uninitialised value of $c->tx->remote_address;
+    - Add fallback value for cases when remote_address can't be resolved;
+
 0.15      2023-10-27 14:29:50+08:00 Asia/Shanghai
     -Logger Wrapper added to Proxy for logging context with request 
 

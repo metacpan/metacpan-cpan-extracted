@@ -57,7 +57,7 @@ diag "generate data" if $ENV{TEST_VERBOSE};
 
 my @fields = (
     'Name',
-    $d eq 'Oracle' ? 'TO_CHAR(Name)' : $d eq 'mysql' ? 'BINARY(Name)' : 'CAST(Name AS TEXT)'
+    $d eq 'Oracle' ? 'TO_CHAR(Name)' : ($d eq 'mysql' || $d eq 'MariaDB') ? 'BINARY(Name)' : 'CAST(Name AS TEXT)'
 );
 
 diag "test ordering objects by fields on Tags table" if $ENV{TEST_VERBOSE};
@@ -168,6 +168,21 @@ sub schema_mysql { [
         Object integer NOT NULL,
         Name varchar(36),
       	PRIMARY KEY (id)
+    )",
+    "CREATE INDEX Tags1 ON Tags (Name)"
+] }
+
+sub schema_mariadb { [
+    "CREATE TEMPORARY TABLE Objects (
+        id integer AUTO_INCREMENT,
+        Name varchar(36),
+        PRIMARY KEY (id)
+    )",
+    "CREATE TEMPORARY TABLE Tags (
+        id integer AUTO_INCREMENT,
+        Object integer NOT NULL,
+        Name varchar(36),
+        PRIMARY KEY (id)
     )",
     "CREATE INDEX Tags1 ON Tags (Name)"
 ] }

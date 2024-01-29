@@ -70,7 +70,7 @@
    "provides" : {
       "App::sort_by_spec" : {
          "file" : "lib/App/sort_by_spec.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -85,7 +85,7 @@
          "web" : "https://github.com/perlancar/perl-App-sort_by_spec"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"

@@ -1,0 +1,70 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 00c84d41be8dde30cd8d479b0e3a6cd6e413f91cbb3e63d66f3962588093b079 CONCEPT
+SHA256 04bb84dab6905bfdd1acdad3512604a4ef919029fd33ac5fa7c983b07d922cbf Changes
+SHA256 8fe735228348a2644f842b30c1a661c29e2626829e609fec35f42e9d3a25d25a LICENSE
+SHA256 27fa55a4562118bb71ec6b3878657401f2a317c2504bc7fb11bd2c06caa078c1 MANIFEST
+SHA256 7542b759eb8a21cc568bfcf8b2c18adbe78dbf3335257e4499f101d6691843a0 META.yml
+SHA256 611b1c8116ec101552d5995bc8e6500557e3792e710f00b17c1dfe4e45d3fa68 Makefile.PL
+SHA256 f6cf4cfd1a4e28e2525d33b48b7b12b5bec00bf7eb3b16515974f0b7d16e593f README
+SHA256 0f5c5fd1ed9b543f1080c6946c4cd56383d405f672c9849e77bb580f5eb5b492 Textarea.pm
+SHA256 c2e94e209d8533282343da8205fde3ab06a2918a80daaf7f2f8d3359c519780d examples/textarea.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 2e786974853bf0bca7ae2d7916b21b448a830a4886299ea5557f91d70332b951 t/Data-HTML-Textarea/01-use.t
+SHA256 b205501d0c13037cb100b4c9deed94bda9ab16741325b058e8936b4deec7e6ce t/Data-HTML-Textarea/02-version.t
+SHA256 d8f33277855cf669b7abdcdb8f4fe57ac29bfabf7ff17ed88ef7e30a313e791a t/Data-HTML-Textarea/03-new.t
+SHA256 44a64f3622aad25e0169dfb1ea3660b8cfe6d7c4fc7652d9bb597b84b0a5d9be t/Data-HTML-Textarea/04-autofocus.t
+SHA256 7395961b1d6484fea308e550d1b97e4eef03edf85ccb5a2501a9faeabc79622a t/Data-HTML-Textarea/05-cols.t
+SHA256 3b2497d80fb309d24906c534e55c4b55c21d54143a3279c3bc7af33721e1f245 t/Data-HTML-Textarea/06-css_class.t
+SHA256 299a1ca77bb5174289ccdd23abe13ff4415abccdf553b078eac2934648eeb878 t/Data-HTML-Textarea/07-disabled.t
+SHA256 c8208d3b4e7043509f1d00e44243d2f37da2e9649635d12f37dbaaa22a482f06 t/Data-HTML-Textarea/08-form.t
+SHA256 43f613dacccfaad2fe6084980cf6a8099f1db146534a9dc1932ba5b538398d37 t/Data-HTML-Textarea/09-id.t
+SHA256 7d543ea9d49a311fdec43870c0cc7d0a136e57e7ddc89e60422a861bd6807ff1 t/Data-HTML-Textarea/10-label.t
+SHA256 69912b67e48ec5e0d74fb4ef3978ab4b272318874e6620498e12dbb76d29ab01 t/Data-HTML-Textarea/11-name.t
+SHA256 c9679e85b7053c53a3867dc0605ca291bde834934626b1bc1f4d3c92309e06c5 t/Data-HTML-Textarea/12-placeholder.t
+SHA256 0b406c112b5493fd99195abc344af9bc7d7249a0b31a44a21c69d1612bcedc4d t/Data-HTML-Textarea/13-readonly.t
+SHA256 5bfe69aa54efa765692a03f69839a4eea7cac5f93f7e32593724d006aee51352 t/Data-HTML-Textarea/14-required.t
+SHA256 36f157d9342973543fb3289045b680522288a96b4baa3f3dcd47374d37987bb4 t/Data-HTML-Textarea/15-rows.t
+SHA256 1aba7677782ec536ca1a55b072ecfda434da55742b4a7dcddacf04b567202699 t/Data-HTML-Textarea/16-value.t
+SHA256 d69651b6064538ce27d0c39604acc442fab72aef9a88ec7a97dd62e056a4b7bf xt/Data-HTML-Textarea/01-pod_coverage.t
+SHA256 2e898413bc8d46bc0528bf6644d21c5ffbe34b0f9c1265b7e48bb84b972b0af1 xt/Data-HTML-Textarea/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmWQIv0ACgkQojV9Rpe/
+B8sd8A//VXc8QywiS96TY4YhnPFlK5B+0CLU9EzqlgRtP87W+aFHRXgttjq15Tj5
+BQV3izNtBB/zvX3I9twHCHuvY+SgzQklLs/cab6Gs07KRkxWyvdZzCU/az08FfwT
+eItrkEWBnazhrA9IpNoKMWT+RMrhltnPdW7a5T5hxWVZ4tALF3Mx/y6/k+ETnRTS
+b56oNbm39ClyW39ak/e8tx7hSrc0/Ogm1gpOjvl1t1f9har46c8nowxW4A4VTK3L
+4h7YkbHnnyd7zWicudF2n52c6CBBA4dR3LWf39FfAqCh77JPFRpIp6IIORQ5HjWD
+zvm2OlXM/c3hyeJ9VQ9Ys2rCXsNyEbYBTizveviyVnqkYqUUoCelgjRTNeF8wYXT
+WLtbyGKJBVtcOW4MHv5Lfkf9rB+NNjzNQYqPmBmhI5jbaKkTKGjId475v4900Fz1
+BIB0a1LKxt4We6oQOCjD/XLAiqNiI2ZGuep/FKGIfrlTbMePboMxHJgMG2udYi0i
+v2KAmd0NNWMJriwLYhrCuQrrMxWUdRW1t4mB9s8yj62gt5uM4v1BW1Gc5t/06h2T
+DYWN4mt8djnhDEpbnmU/5fQjRlEe1YLsgoULCLDv6foGOb3Ykk7zVZWdD/McnI3O
+cFDu7JiPsgDQ4sSQ2lhK0rMv08UD2hCPiIGVwfD9LPuOlpKuyoQ=
+=91Nt
+-----END PGP SIGNATURE-----

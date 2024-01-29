@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Koha;
 # ABSTRACT: Lien à Koha
-$Koha::Contrib::Sudoc::Koha::VERSION = '2.40';
+$Koha::Contrib::Sudoc::Koha::VERSION = '2.43';
 use Moose;
 use Modern::Perl;
 use Carp;
@@ -191,8 +191,9 @@ sub get_biblio_by_ppn {
                 query => {  match => { ppn => $ppn }  }
             }
         );
-        if ( $res->{hits}->{total} != 0 ) {
-            my $source = $res->{hits}->{hits}->[0]->{_source};
+        my $hits = $res->{hits}->{hits};
+        if ( @$hits != 0 ) {
+            my $source = $hits->[0]->{_source};
             $record = _record_from_es($source);
         }
     }
@@ -227,8 +228,9 @@ sub get_biblios_by_authid {
                 query => {  match => { "Koha-Auth-Number" => $authid }  }
             }
         );
-        if ( $res->{hits}->{total} != 0 ) {
-            for my $source ( @{$res->{hits}->{hits}} ) {
+        my $hits = $res->{hits}->{hits};
+        if ( @$hits != 0 ) {
+            for my $source ( @$hits ) {
                 $source = $source->{_source};
                 my $record = _record_from_es($source);
                 next unless $record;
@@ -333,8 +335,9 @@ sub get_auth_by_ppn {
                 query => {  match => { ppn => $ppn }  }
             }
         );
-        if ( $res->{hits}->{total} != 0 ) {
-            my $source = $res->{hits}->{hits}->[0]->{_source};
+        my $hits = $res->{hits}->{hits};
+        if ( @$hits != 0 ) {
+            my $source = $hits->[0]->{_source};
             $record = _record_from_es($source);
         }
     }
@@ -369,7 +372,7 @@ Koha::Contrib::Sudoc::Koha - Lien à Koha
 
 =head1 VERSION
 
-version 2.40
+version 2.43
 
 =head1 DESCRIPTION
 
@@ -408,7 +411,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Fréderic Demians.
+This software is Copyright (c) 2024 by Fréderic Demians.
 
 This is free software, licensed under:
 

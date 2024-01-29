@@ -3,24 +3,59 @@ use warnings;
 use strict;
 use Term::ANSIColor qw(:constants);
 use App::FileComposer;
+use Getopt::Long 'HelpMessage';
 use feature 'say';
+use v5.14;
+
+
+# ---------------------- Getopt::Long settings -----------------------
+my($reconf, $version);
+
+GetOptions(
+  'reconf'  => \ $reconf,
+  'version' => \ $version,
+  'help'    => sub { HelpMessage(1) },
+) or HelpMessage(0);
+
+no warnings;
+given(@ARGV) {
+  &reconf() when (defined $reconf);
+  &version() when (defined $version);
+  when ($ARGV[0] =~ /\b(\w+\..{1,5})\b/i) {
+        &withparameters($ARGV[0]);
+
+       }
+      
+  }
+
+
+#------------------------------ POD ----------------------------------
 
 =head1 NAME
 
-Mkscript - dumps pre defined files
+Mkscript - simple and lightweight Template engine
 
 =head1 SYNOPSIS
 
-mkscript [OPTION]... [FILE]...
+  --version, -v         Print the current version
+  --reconf, -r          Reconfigure the path to the templates directory
+  --help, -h            Display this message
 
 =head1 USAGE
 
  will look for some script file in .app-mkscript
  and copy its contents to the new foo.sh file:
 
-% mkscript foo.sh   
+ mkscript [OPTION]... [FILE]...
 
 =head1 DESCRIPTION
+
+mkscript is a easy, lightweight and simple Template engine
+written in Perl, it is easy customize it by putting your
+own templates inside the engine directory.
+
+In case the directory not exists, there are options 
+to generate one, or create the new one by hand. 
 
 I wrote this program with intention of making
 life easier for programmers who work with many 
@@ -33,7 +68,8 @@ output version info and exit.
 
 =head2 --reconf
 
-reload the default configurations and create  a /home/user/.app-filecomposer directory!
+reload the default configurations and create  a raw /home/user/.app-filecomposer directory!
+All the templates you wish to use must be inside this directory
 
 =head1 AUTHOR
 
@@ -50,27 +86,36 @@ The GNU General Public License, Version 2, June 1991
 
 =cut 
 
-#run scripts
-&withparameters(@ARGV) if $ARGV[0] =~ /\b(\w+\..{1,5})\b/i;
+# -------------------------- CLI Arguments ----------------------------
+sub version {
+	say "Fc engine $App::FileComposer::VERSION";
+}
 
-#reload directory configuration
-&reconf() if $ARGV[0] =~ /(--reconf)/;
+sub reconf {
+  my $home = "$ENV{\"HOME\"}/.app-filecomposer";
+  mkdir $home 
+    or die BRIGHT_YELLOW ,"direcotry already exists \n", RESET,"system: $!\n";
 
-#//Display version number
-&version() if $ARGV[0] =~ /((-v)|(--version))/;
+      say BRIGHT_YELLOW, "Default directory created in: ", RESET, $home;
+}
 
 
+#-------------------------- Create Template -----------------------------
 sub withparameters {
+    #receive the file from @ARGV
     my $newfile = shift;
-
+    our $bar;
+   # dies if not match extensions like:  foo.css, foo.js, foo.c, foo.py
    die "Error: Invalid parameter, you forgot to load the file extension."
    unless $newfile =~ /(\.\w+)\b/i;
 
+            # create the new template and load the defaults
             my $obj = App::FileComposer->new($newfile);
             my $source_file = $obj->load(); 
 
             &postmsg($obj->get_sourcePath, $source_file) if $source_file;
             $obj->write();
+ 
 
 }
 
@@ -82,15 +127,4 @@ sub postmsg {
         say "source sample file: ", CYAN, "$file \n", RESET,
         "Type: ", GREEN, $file_comand, RESET;
 
-}
-sub version {
-	say "Mkscript 1.0.1";
-}
-
-sub reconf {
-  my $home = "$ENV{\"HOME\"}/.app-filecomposer";
-  mkdir $home 
-    or die BRIGHT_YELLOW ,"direcotry already exists \n", RESET,"system: $!\n";
-
-      say BRIGHT_YELLOW, "Default directory created in: ", RESET, $home;
 }

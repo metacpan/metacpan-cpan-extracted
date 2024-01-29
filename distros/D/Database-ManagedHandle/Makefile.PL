@@ -30,6 +30,7 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Const::Fast" => 0,
+    "DBD::SQLite" => 0,
     "Database::Temp" => 0,
     "File::Spec" => 0,
     "File::Temp" => 0,
@@ -44,7 +45,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,6 +55,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Const::Fast" => 0,
+  "DBD::SQLite" => 0,
   "DBI" => 0,
   "Database::Temp" => 0,
   "English" => 0,

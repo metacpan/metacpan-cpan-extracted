@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 1.49
+    Version 1.51
 
 SYNOPSIS
 
@@ -368,6 +368,30 @@ SUBROUTINES/METHODS
     This will be true for Firefox versions less than 55, as -safe-mode
     <http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29>
     cannot be automated.
+
+ agent
+
+    accepts an optional value for the User-Agent
+    <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent>
+    header and sets this using the profile preferences. This value will be
+    used on the next page load. It returns the current value, such as
+    'Mozilla/5.0 (<system-information>) <platform> (<platform-details>)
+    <extensions>'. This value is retrieved with navigator.userAgent
+    <https://developer.mozilla.org/en-US/docs/Web/API/Navigator/userAgent>.
+
+    This method can be used to set a user agent string like so;
+
+        use Firefox::Marionette();
+        use strict;
+    
+        # useragents.me should only be queried once a month or less.
+        # these UA strings should be cached locally.
+    
+        my %user_agent_strings = map { $_->{ua} => $_->{pct} } @{$firefox->json("https://www.useragents.me/api")->{data}};
+        my ($user_agent) = reverse sort { $user_agent_strings{$a} <=> $user_agent_strings{$b} } keys %user_agent_strings;
+    
+        my $firefox = Firefox::Marionette->new();
+        $firefox->agent($user_agent); # agent is now the most popular agent from useragents.me
 
  alert_text
 
@@ -1304,6 +1328,49 @@ SUBROUTINES/METHODS
     full screens the firefox window. This method returns itself to aid in
     chaining methods.
 
+ geo
+
+    accepts an optional geo location object or the parameters for a geo
+    location object, turns on the Geolocation API
+    <https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API> and
+    returns the current value returned by calling the javascript
+    getCurrentPosition
+    <https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition>
+    method. This method is further discussed in the GEO LOCATION section.
+
+    NOTE: firefox will only allow Geolocation
+    <https://developer.mozilla.org/en-US/docs/Web/API/Geolocation> calls to
+    be made from secure contexts
+    <https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts>
+    and bizarrely, this does not include about:blank or similar. Therefore,
+    you will need to load a page before calling the geo method.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new( proxy => 'https://this.is.another.location:3128', geo => 1 );
+    
+        # Get geolocation for this.is.another.location (via proxy)
+    
+        $firefox->geo($firefox->json('https://freeipapi.com/api/json/'));
+    
+        # now google maps will show us in this.is.another.location
+    
+        $firefox->go('https://maps.google.com/');
+    
+        my $geo = $firefox->geo();
+    
+        warn "Apparently, we're now at " . join q[, ], $geo->latitude(), $geo->longitude();
+    
+        # OR the quicker setup (run this with perl -C)
+    
+        warn "Apparently, we're now at " . Firefox::Marionette->new( proxy => 'https://this.is.another.location:3128', geo => 'https://freeipapi.com/api/json/' )->go('https://maps.google.com/')->geo();
+
+    NOTE: currently this call sets the location to be exactly what is
+    specified. It doesn't change anything else relevant (yet, but it may in
+    future), such as languages or the timezone
+    <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset>.
+    This function should be considered experimental. Feedback welcome.
+
  go
 
     Navigates the current browsing context to the given URI and waits for
@@ -1696,6 +1763,17 @@ SUBROUTINES/METHODS
     
         say Firefox::Marionette->new()->go('https://fastapi.metacpan.org/v1/download_url/Firefox::Marionette")->json()->{version};
 
+    In addition, this method can accept a URI as a parameter and retrieve
+    that URI via the firefox fetch call
+    <https://developer.mozilla.org/en-US/docs/Web/API/fetch> and
+    transforming the body to JSON via firefox
+    <https://developer.mozilla.org/en-US/docs/Web/API/Response/json_static>
+
+        use Firefox::Marionette();
+        use v5.10;
+    
+        say Firefox::Marionette->new()->json('https://freeipapi.com/api/json/')->{ipAddress};
+
  key_down
 
     accepts a parameter describing a key and returns an action for use in
@@ -1728,6 +1806,13 @@ SUBROUTINES/METHODS
                                      $firefox->key_up('l'),
                                      $firefox->key_up(CONTROL())
                                    )->content();
+
+ languages
+
+    accepts an optional list of values for the Accept-Language
+    <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language>
+    header and sets this using the profile preferences. It returns the
+    current values as a list, such as ('en-US', 'en').
 
  loaded
 
@@ -1966,6 +2051,16 @@ SUBROUTINES/METHODS
       <https://developer.mozilla.org/en-US/docs/Tools> window opened in a
       separate window.
 
+      * geo - setup the browser preferences
+      <http://kb.mozillazine.org/About:config> to allow the Geolocation API
+      <https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API> to
+      work. If the value for this key is a URI object or a string beginning
+      with '^(?:data|http)', this object will be retrieved using the json
+      method and the response will used to build a GeoLocation object,
+      which will be sent to the geo method. If the value for this key is a
+      hash, the hash will be used to build a GeoLocation object, which will
+      be sent to the geo method.
+
       * height - set the height
       <http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29>
       of the initial firefox window
@@ -2203,6 +2298,7 @@ SUBROUTINES/METHODS
       will be returned.
 
       * scale - Scale of the webpage rendering. Defaults to 1.
+      shrink_to_fit should be disabled to make scale work.
 
       * size - The desired size (width and height) of the pdf, specified by
       name. See the page key for an alternative and the paper_sizes method
@@ -2905,13 +3001,12 @@ SUBROUTINES/METHODS
     Javascript.
 
         use Firefox::Marionette();
-        use 5.010;
     
         my $firefox = Firefox::Marionette->new();
         my $original_window = $firefox->window_handle();
         my $javascript_window = $firefox->script('return window'); # only works for Firefox 121 and later
         if ($javascript_window ne $original_window) {
-          die "That was unexpected!!! What happened?";
+            die "That was unexpected!!! What happened?";
         }
 
  window_handles
@@ -3020,6 +3115,9 @@ NETWORK ARCHITECTURE
     See SETTING UP SOCKS SERVERS USING SSH for easy proxying via ssh
     <https://man.openbsd.org/ssh>
 
+    See GEO LOCATION section for how to combine this with providing
+    appropriate browser settings for the end point.
+
 AUTOMATING THE FIREFOX PASSWORD MANAGER
 
     This module allows you to login to a website without ever directly
@@ -3062,6 +3160,56 @@ AUTOMATING THE FIREFOX PASSWORD MANAGER
         $firefox->go('https://pause.perl.org/pause/authenquery')->accept_alert(); # this goes to the page and submits the http auth popup
     
         $firefox->go('https://github.com/login')->fill_login(); # fill the login and password fields without needing to see them
+
+GEO LOCATION
+
+    The firefox Geolocation API
+    <https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API> can
+    be used by supplying the geo parameter to the new method and then
+    calling the geo method (from a secure context
+    <https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts>.
+
+    The geo method can accept various specific latitude and longitude
+    parameters as a list, such as;
+
+        $firefox->geo(latitude => -37.82896, longitude => 144.9811);
+    
+        OR
+    
+        $firefox->geo(lat => -37.82896, long => 144.9811);
+    
+        OR
+    
+        $firefox->geo(lat => -37.82896, lng => 144.9811);
+    
+        OR
+    
+        $firefox->geo(lat => -37.82896, lon => 144.9811);
+
+    or it can be passed in as a reference, such as;
+
+        $firefox->geo({ latitude => -37.82896, longitude => 144.9811 });
+
+    the combination of a variety of parameter names and the ability to pass
+    parameters in as a reference means it can be deal with various geo
+    location websites, such as;
+
+        $firefox->geo($firefox->json('https://freeipapi.com/api/json/')); # get geo location from IP address
+    
+        $firefox->geo($firefox->json('https://geocode.maps.co/search?street=101+Collins+St&city=Melbourne&state=VIC&postalcode=3000&country=AU&format=json')->[0]); # get geo location of street address
+    
+        $firefox->geo($firefox->json('http://api.positionstack.com/v1/forward?access_key=' . $access_key . '&query=101+Collins+St,Melbourne,VIC+3000')->{data}->[0]); # get geo location of street address using api key
+    
+        $firefox->geo($firefox->json('https://api.ipgeolocation.io/ipgeo?apiKey=' . $api_key)); # get geo location from IP address
+
+    These sites were active at the time this documentation was written, but
+    mainly function as an illustration of the flexibility of geo and json
+    methods in providing the desired location to the Geolocation API
+    <https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API>.
+
+    The country_code and timezone_offset methods can be used to help set
+    the languages method and possibly in the future change the timezone of
+    the browser.
 
 CONSOLE LOGGING
 

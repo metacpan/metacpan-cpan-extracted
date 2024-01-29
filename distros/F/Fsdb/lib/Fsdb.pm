@@ -3,7 +3,7 @@
 #
 # Fsdb.pm
 #
-# Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2024 by John Heidemann <johnh@isi.edu>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License,
@@ -33,7 +33,7 @@ Fsdb - a flat-text database for shell scripting
 
 
 =cut
-our $VERSION = '3.1';
+our $VERSION = '3.4';
 
 =head1 SYNOPSIS
 
@@ -243,19 +243,23 @@ L<http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html>.
 
 =head1 WHAT'S NEW
 
-=head2 3.1, 2022-11-22
-A post-3.0 cleanup release with minor fixes.
+=head2 3.4, 2024-01-05
+Correct propagation of TMPDIR options into subprograms.
 
 =over 4
 
 =item ENHANCEMENT
 
-Type specifications in a few more programs that I missed:
-L<dbrowuniq>, L<dbcolpercentile>.
+L<dbcolsdecimate> now has examples in its documentation.
 
-=item ENHANCEMENT
+=item BUG FIX
 
-Minor documentation improvements.
+L<dbcolsstats>, L<dbmapreduce>, L<dbcolpercentile>,
+L<dbfilepivot>, and L<dbmultistats>
+now correctly propagate the temporary directory into the sort route, if required.
+All of these programs sometimes require sort internally, and
+previously may have failed to use the correct tmpdir when it was set
+on the command line as an option.
 
 =back
 
@@ -305,12 +309,14 @@ ExtUtil::MakeMaker(3), so the quick answer to installation is to type:
     perl Makefile.PL
     make
     make test
-    make install
+    sudo make install
 
 Or, if you want to install it somewhere else, change the first line to
 
     perl Makefile.PL PREFIX=$HOME
 
+then the other commands (C<make; make test; make install>;
+but now without the sudo),
 and it will go in your home directory's F<bin>, etc.
 (See L<ExtUtil::MakeMaker(3)> for more details.)
 
@@ -353,7 +359,7 @@ c, s, l, q are signed 8, 16, 32, and 64-bit integers,
 f is a float, d is double float,
 a is utf-8 string, and &gt; and &lt; can force big or little endianness.
 
-By default, columns are delimited by whitespace.  
+By default, columns are delimited by any amount of whitespace.  
 With this default configuration, the contents of a field
 cannot contain whitespace.
 However, this limitation can be relaxed by changing the field separator
@@ -606,6 +612,10 @@ compute histograms over a column of data
 =item dbcolscorrelate
 
 compute the coefficient of correlation over several columns
+
+=item dbcolsdecimate
+
+drop rows selectively, keeping large changes and periodic samples
 
 =item dbcolsregression
 
@@ -1122,7 +1132,7 @@ and was
 distributed from 1995 to 2007.
 Fsdb 2.0 is a significant re-write of the 1.x versions
 to systematically use a library and threads
-(although threads were abandoned in 2.44).
+(although threads were replaced with full processes in 2.44).
 Fsdb 3.0 in 2022 adds type specifiers to the schema,
 mostly to support use in languages with stronger typing (like Python, Go, and C).
 
@@ -1136,13 +1146,15 @@ Major changes:
 
 =over 4
 
+=item 0.1 1991: begun for my personal use, to replace awk.
+
 =item 1.0 1997-07-22: first public release.
 
 =item 2.0 2008-01-25: rewrite to use a common library, and starting to use threads.
 
 =item 2.12 2008-10-16: completion of the rewrite, and first RPM package.
 
-=item 2.44 2013-10-02: abandoning threads for improved performance
+=item 2.44 2013-10-02: replacing threads with processes for improved performance
 
 =item 3.0 2022-04-04: adding type specifiers to the schema
 
@@ -1194,8 +1206,50 @@ Fsdb-2.0 preserves backwards compatibility where possible,
 but breaks it where necessary to accomplish the above goals.
 In August 2008, Fsdb-2.7 was declared preferred over the 1.x versions.
 Benchmarking in 2013 showed that threading performed much worse than
-just using pipes, so Fsdb-2.44 uses threading "style",
+just using pipes, because Perl's requirements for data that is
+shared between multiple threads is quite heavyweight.
+Fsdb-2.44 therefore uses threading "style",
 but implemented with processes (via my "Freds" library).
+
+
+=head2 Fsdb And Muliple Processors
+
+Fsdb's use of Unix pipelines means Fsdb automatically benefits for
+multiprocessor computers---each pipeline stage can run on a separate core.
+In addition, compute-intensive Fsdb modules like L<dbsort>
+and L<dbmapreduce> are explicitly multi-process and will use as many
+cores as they can, up to the number of cores on the local computer.
+
+Although Fsdb takes advanatage of as much parallelism as it can,
+a five stage pipeline won't necessarily saturate five cores.
+Pipeline stages almost always have different amounts of work to do,
+and some stages are often data limited.
+(Dbsort is attempts as much parallelism as it can, and can run
+10-way parallel or more over a large enough input dataset.
+But it cannot sustain high parallelism because
+of the requirement that it produce one global output.)
+
+
+=head2 Fsdb 3.0 Rationale
+
+There are two motiviations for adding optional typing to Fsdb.
+First, languages such as Python and Go would really like type information.
+As of 2022 there are now users of those languages,
+so the basic system should support them.
+
+Second, while pure text is flexible, it's very
+inefficient---converting numbers to and from decimal is thousands
+of instructions,
+and binary encodings are often much smaller than text.
+In the future, I would love to have a flag that enables a binary encoding.
+
+Typing is optional---omitting types is never wrong.
+
+One somewhat odd thing about typing is that we reuse the Perl pack
+definitions of types, so q (for "quadword") stands for 64-bit integer.
+These are perhaps not the most mnemonic choices in 2022,
+but I would rather pick someone's existing set than try to define my own.
+
 
 =head2 Contributors
 
@@ -1260,7 +1314,7 @@ Fsdb leaves editing to text editors like emacs or vi.
 
 In August, 2002 I found out Carlo Strozzi extended RDB with his
 package NoSQL L<http://www.linux.it/~carlos/nosql/>.  According to
-Mr. Strozzi, he implemented NoSQL in awk to avoid the Perl start-up of
+Mr. Strozzi, he implemented NoSQL in awk to avoid Perl start-up costs in
 RDB.  Although I haven't found Perl startup overhead to be a big
 problem on my platforms (from old Sparcstation IPCs to 2GHz
 Pentium-4s), you may want to evaluate his system.
@@ -3853,6 +3907,57 @@ L<dbcoltype> redefines column types, or clears them with the C<-v> option.
 
 =back
 
+=head2 3.1, 2022-11-22
+A post-3.0 cleanup release with minor fixes.
+
+=over 4
+
+=item ENHANCEMENT
+
+Type specifications in a few more programs that I missed:
+L<dbrowuniq>, L<dbcolpercentile>.
+
+=item ENHANCEMENT
+
+Minor documentation improvements.
+
+=back
+
+=head2 3.2, 2023-10-11
+Add new module L<dbcolsdecimate> 
+
+=over 4
+
+=item NEW
+
+L<dbcolsdecimate> reduces density in timeseries data
+to make graphs with overly dense points visually similar but smaller.
+
+=item ENHANCEMENT
+
+L<yaml_to_db> now flattens one level of arrays into comma-separated lists.
+
+=item ENHANCEMENT
+
+Clearer installation instructions.
+
+=back
+
+=head2 3.3, 2023-10-13
+Quickly making L<dbcolsdecimate> more flexible.
+
+=over 4
+
+=item INCOMPATBILE ENHANCEMENT
+
+L<dbcolsdecimate> now takes either relative (B<-p>)
+or absolute (B<-P>) precision, and precision now affects only
+subsequent columns.  Also, if absolute precisions are given
+for all columns, data is not buffered.
+
+=back
+
+
 
 =head1 AUTHOR
 
@@ -3864,7 +3969,7 @@ bug reports and fixes.
 
 =head1 COPYRIGHT
 
-Fsdb is Copyright (C) 1991-2022 by John Heidemann <johnh@isi.edu>.
+Fsdb is Copyright (C) 1991-2024 by John Heidemann <johnh@isi.edu>.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of version 2 of the GNU General Public License as

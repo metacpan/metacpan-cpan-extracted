@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostUpdateWorksheetRangeStyleRequest.name : The workbook name.  ,
+# PostUpdateWorksheetRangeStyleRequest.name : The file name.  ,
 # PostUpdateWorksheetRangeStyleRequest.sheetName : The worksheet name.  ,
 # PostUpdateWorksheetRangeStyleRequest.range : Represents the range to which the specified cells applies.  ,
 # PostUpdateWorksheetRangeStyleRequest.style : Style with update style settings.  ,
-# PostUpdateWorksheetRangeStyleRequest.folder : Original workbook folder.  ,
-# PostUpdateWorksheetRangeStyleRequest.storageName : Storage name.   
+# PostUpdateWorksheetRangeStyleRequest.folder : The folder where the file is situated.  ,
+# PostUpdateWorksheetRangeStyleRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_update_worksheet_range_style' } = { 
-    	summary => 'Updates cell`s range style in worksheet.',
+    	summary => 'Update cell range styles in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -142,7 +142,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -170,14 +170,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

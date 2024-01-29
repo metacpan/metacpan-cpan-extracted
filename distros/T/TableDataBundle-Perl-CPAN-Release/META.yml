@@ -20,25 +20,25 @@ name: TableDataBundle-Perl-CPAN-Release
 provides:
   Bencher::Scenario::TableData::Perl::CPAN::Release::Static:
     file: lib/Bencher/Scenario/TableData/Perl/CPAN/Release/Static.pm
-    version: '20231120.3'
+    version: '20231126.0'
   TableData::Perl::CPAN::Release::Static:
     file: lib/TableData/Perl/CPAN/Release/Static.pm
-    version: '20231120.3'
+    version: '20231126.0'
   TableData::Perl::CPAN::Release::Static::FromNewest:
     file: lib/TableData/Perl/CPAN/Release/Static/FromNewest.pm
-    version: '20231120.3'
+    version: '20231126.0'
   TableData::Perl::CPAN::Release::Static::GroupedDaily:
     file: lib/TableData/Perl/CPAN/Release/Static/GroupedDaily.pm
-    version: '20231120.3'
+    version: '20231126.0'
   TableData::Perl::CPAN::Release::Static::GroupedMonthly:
     file: lib/TableData/Perl/CPAN/Release/Static/GroupedMonthly.pm
-    version: '20231120.3'
+    version: '20231126.0'
   TableData::Perl::CPAN::Release::Static::GroupedWeekly:
     file: lib/TableData/Perl/CPAN/Release/Static/GroupedWeekly.pm
-    version: '20231120.3'
+    version: '20231126.0'
   TableDataBundle::Perl::CPAN::Release:
     file: lib/TableDataBundle/Perl/CPAN/Release.pm
-    version: '20231120.3'
+    version: '20231126.0'
 requires:
   DateTime: '0'
   File::ShareDir: '0'
@@ -47,7 +47,7 @@ requires:
   TableData::Munge::Concat: '0'
   TableData::Munge::GroupRows: '0'
   TableData::Perl::CPAN::Release::Static::2022: '0'
-  TableData::Perl::CPAN::Release::Static::2023: '0'
+  TableData::Perl::CPAN::Release::Static::2023: '20231126.0'
   TableDataBundle::Perl::CPAN::Release::Static::Older: '20220218.2'
   TableDataRole::Source::CSVInFiles: '0'
   parent: '0'
@@ -58,7 +58,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=TableDataBundle-Perl-CPAN-Release
   homepage: https://metacpan.org/release/TableDataBundle-Perl-CPAN-Release
   repository: git://github.com/perlancar/perl-TableDataBundle-Perl-CPAN-Release.git
-version: '20231120.3'
+version: '20231126.0'
 x_Dist_Zilla:
   perl:
     version: '5.038000'

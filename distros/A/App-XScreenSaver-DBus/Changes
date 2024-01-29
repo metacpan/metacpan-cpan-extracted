@@ -1,3 +1,6 @@
+1.0.5     2023-12-10 16:12:36+00:00 Europe/London
+  - fix typo that broke un-inhibiting the screensaver
+
 1.0.4     2023-10-22 21:03:17+01:00 Europe/London
   - simpler proxy object
 

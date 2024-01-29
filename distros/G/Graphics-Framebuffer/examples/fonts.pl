@@ -4,18 +4,18 @@ use strict;
 
 use Graphics::Framebuffer;
 use Time::HiRes qw(sleep);
+use Getopt::Long;
 
-my $joined = join('', @ARGV);
+my $dump = 0;
+my $wait = 0.25;
+
+GetOptions(
+    'dump'   => \$dump,
+    'wait=i' => \$wait,
+);
 my $device = (exists($ENV{'DISPLAY'})) ? 1 : 0;
 
-# $wait = $joined =~ /(\d+)/ if (scalar(@ARGV));
-my $dump = ($joined =~ /dump/)   ? 1 : 0;
-my $wait = ($joined =~ /nowait/) ? 0 : .75;
-if ($joined =~ /(\d+)/) {
-    $device = $1;
-}
-
-my $fb = Graphics::Framebuffer->new('SPLASH' => 0, 'SHOW_ERRORS' => 1, 'FB_DEVICE' => "/dev/fb$device");    # ,'SIMULATED_X'=>1280,'SIMULATED_Y'=>720);
+my $fb = Graphics::Framebuffer->new('SPLASH' => 0, 'SHOW_ERRORS' => 1, 'FB_DEVICE' => "/dev/fb$device", 'RESET' => 0);    # ,'SIMULATED_X'=>1280,'SIMULATED_Y'=>720);
 
 $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'HUP'} = $SIG{'KILL'} = $SIG{'TERM'} = sub { exec('reset'); };
 
@@ -56,11 +56,11 @@ foreach my $font (@fonts) {
         if ($wait) {
             sleep $wait;
         }
-		$count--;
+        $count--;
     } else {
         print STDOUT "$font\n";
     }
-} ## end foreach my $font (sort(keys...))
+} ## end foreach my $font (@fonts)
 
 $fb->cls('ON') unless ($dump);
 
@@ -74,7 +74,7 @@ This displays (in the actual font) all of the system fonts the Graphics::Framebu
 
 =head1 SYNOPSIS
 
- perl fonts.pl [wait time] [dump]
+ perl fonts.pl [options]
 
 =head2 Example
 
@@ -88,11 +88,11 @@ This displays (in the actual font) all of the system fonts the Graphics::Framebu
 
 =over 2
 
-=item B<wait time> (a decimal number)
+=item B<--wait>=(a decimal number)
 
-Tells the script to wait "wait time" seconds before showing the next font.  This can be fractions of a second.  The default is "0.5" seconds.
+Tells the script to wait x seconds before showing the next font.  This can be fractions of a second.  The default is "0.25" seconds.
 
-=item B<dump>
+=item B<--dump>
 
 Tells the script to dump a list of the font names to STDOUT.
 
@@ -100,7 +100,7 @@ Tells the script to dump a list of the font names to STDOUT.
 
 =head1 COPYRIGHT
 
-Copyright 2003 - 2019 Richard Kelsch
+Copyright 2003 - 2023 Richard Kelsch
 All Rights Reserved
 
 =head1 LICENSE

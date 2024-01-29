@@ -14,7 +14,14 @@ DESCRIPTION
 
     With the extension installed, perform your search, then click anywhere
     in the ticket row in the search results. The history for that ticket
-    will be displayed at the bottom of the page.
+    will be displayed at the bottom of the page. With RT 5, if you have
+    inline edit enabled for some search fields, click anywhere outside the
+    inline edit fields. You'll see the pencil icon appear if you are in an
+    inline edit area.
+
+    To make it easier to see the ticket history with less scrolling, you can
+    set the Rows per page setting on the search to a smaller number. A
+    "$SideBySidePreview" mode is also available.
 
 RT VERSIONS
     Works with RT 4.2, 4.4, 5.0
@@ -25,38 +32,42 @@ INSTALLATION
     make install
         May need root permissions
 
+    Patch RT
+        For RT 5 prior to 5.0.6, apply the patches:
+
+            patch -d /opt/rt5 -p1 < 0001-Add-ModifyPaths-Callback.patch
+
     Edit your /opt/rt4/etc/RT_SiteConfig.pm
         Add this line:
-
-            Set(@Plugins, qw(RT::Extension::PreviewInSearch));
-
-        or add RT::Extension::PreviewInSearch to your existing @Plugins
-        line. Starting with RT 4.2 you can also use:
 
             Plugin( "RT::Extension::PreviewInSearch" );
 
     Clear your mason cache
-            rm -rf /opt/rt4/var/mason_data/obj
+            rm -rf /opt/rt5/var/mason_data/obj
 
     Restart your webserver
 
 CONFIGURATION
   $SideBySidePreview
-    This allow the preview box to be displayed aside of search results box.
+    Set this option to divide the search results page in half and display
+    the selected ticket history on the right of search results.
 
         Set($SideBySidePreview, 1);
 
 AUTHOR
-    Best Practical Solutions, LLC <modules@bestpractical.com>
+    Best Practical Solutions, LLC
 
 BUGS
     All bugs should be reported via email to
 
-        L<bug-RT-Extension-PreviewInSearch@rt.cpan.org|mailto:bug-RT-Extension-PreviewInSearch@rt.cpan.org>
+    bug-RT-Extension-PreviewInSearch@rt.cpan.org
+    <mailto:bug-RT-Extension-PreviewInSearch@rt.cpan.org>
 
     or via the web at
 
-        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-PreviewInSearch>.
+    rt.cpan.org
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-PreviewIn
+    Search>.
 
 LICENSE AND COPYRIGHT
     This software is Copyright (c) 2007-2023 by Best Practical Solutions,

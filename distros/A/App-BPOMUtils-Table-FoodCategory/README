@@ -3,9 +3,9 @@ NAME
     processed food division (old, pre-RBA version)
 
 VERSION
-    This document describes version 0.018 of
+    This document describes version 0.020 of
     App::BPOMUtils::Table::FoodCategory (from Perl distribution
-    App-BPOMUtils-Table-FoodCategory), released on 2023-09-03.
+    App-BPOMUtils-Table-FoodCategory), released on 2023-09-23.
 
 DESCRIPTION
     This distribution contains the following CLIs:

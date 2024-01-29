@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Util 0.058002;
+package Term::CLI::Util 0.059000;
 
 use 5.014;
 use warnings;
@@ -211,7 +211,7 @@ Term::CLI::Util - utility functions for Term::CLI(3p)
 
 =head1 VERSION
 
-version 0.058002
+version 0.059000
 
 =head1 SYNOPSIS
 

@@ -11,11 +11,11 @@ DateTime::Format::Text - Find a Date in Text
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 our @month_names = (
 	'january',
@@ -129,6 +129,10 @@ If the given test is an object, it's sent the message as_string() and that is pa
     my $foo = Class::Simple->new();
     $foo->as_string('25/12/2022');
     my $dt = $dft->parse($foo);
+
+    # or
+
+    print DateTime::Format::Text->parse('25 Dec 2021, 11:00 AM UTC')->epoch(), "\n";
 
 =cut
 
@@ -259,6 +263,7 @@ sub parse {
 						return DateTime->new(day => $day, month => $i + 1, year => $year);
 					}
 				}
+				# This code should be unreachable
 				Carp::croak(__PACKAGE__, ": unknown month $month");
 				return;
 			} else {
@@ -277,10 +282,10 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 Based on L<https://github.com/etiennetremel/PHP-Find-Date-in-String>.
 Here's the author information from that:
 
-    author   Etienne Tremel
-    license  L<https://creativecommons.org/licenses/by/3.0/> CC by 3.0
-    link     L<http://www.etiennetremel.net>
-    version  0.2.0
+author   Etienne Tremel
+license  L<https://creativecommons.org/licenses/by/3.0/> CC by 3.0
+link     L<http://www.etiennetremel.net>
+version  0.2.0
 
 =head1 BUGS
 

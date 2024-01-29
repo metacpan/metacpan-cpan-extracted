@@ -4,11 +4,12 @@
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
 use v5.36;
-use Object::Pad 0.800;
+use Object::Pad 0.807;
 
-class App::perl::distrolint::Check::UseUTF8 0.03
-   :does(App::perl::distrolint::CheckRole::EachFile)
-   :does(App::perl::distrolint::CheckRole::TreeSitterPerl);
+class App::perl::distrolint::Check::UseUTF8 0.06;
+
+apply App::perl::distrolint::CheckRole::EachFile;
+apply App::perl::distrolint::CheckRole::TreeSitterPerl;
 
 use constant DESC => "check that every perl file sets 'use utf8' if required";
 use constant SORT => 11;
@@ -30,7 +31,7 @@ C<utf8> pragma.
 
 method run ( $app )
 {
-   return $self->run_for_each_perl_file( check_file => $app );
+   return $self->run_for_each_perl_file( check_file => );
 }
 
 my $EXTRAS_QUERY = <<'EOF';
@@ -38,7 +39,7 @@ my $EXTRAS_QUERY = <<'EOF';
 (pod) @pod
 EOF
 
-method check_file ( $file, $app )
+method check_file ( $file )
 {
    my $tree = $self->parse_perl_file( $file );
 
@@ -69,13 +70,13 @@ method check_file ( $file, $app )
 
    if( !defined $use_utf8_at and
        $all_source =~ m/[^[:ascii:]]/ ) {
-      $app->diag( "%s contains non-ASCII characters but no `use utf8`", $file );
+      App->diag( App->format_file( $file ), " contains non-ASCII characters but no ", App->format_literal( "use utf8" ) );
       return 0;
    }
 
    if( defined $use_utf8_at and
        do { use bytes; substr( $all_source, 0, $use_utf8_at ) } =~ m/[^[:ascii:]]/ ) {
-      $app->diag( "%s contains non-ASCII characters before the `use utf8`", $file );
+      App->diag( App->format_file( $file ), " contains non-ASCII characters before the ", App->format_literal( "use utf8" ) );
       return 0;
    }
 

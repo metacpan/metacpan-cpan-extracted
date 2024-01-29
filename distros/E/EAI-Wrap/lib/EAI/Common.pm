@@ -1,4 +1,4 @@
-package EAI::Common 1.904;
+package EAI::Common 1.908;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import); use EAI::DateUtil; use Data::Dumper qw(Dumper); use Getopt::Long qw(:config no_ignore_case); use Log::Log4perl qw(get_logger); use MIME::Lite (); use Scalar::Util qw(looks_like_number);
@@ -29,6 +29,7 @@ my %hashCheck = (
 		historyFolderUpload => {}, # ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, folders where uploaded files are historized, lookup key as in checkLookup, default in "" => "defaultfolder"
 		logCheckHoliday => "", # calendar for business days in central logcheck/errmail sending. builtin calendars are AT (Austria), TG (Target), UK (United Kingdom) and WE (for only weekends). Calendars can be added with EAI::DateUtil::addCalendar
 		logs_to_be_ignored_in_nonprod => qr//, # regular expression to specify logs to be ignored in central logcheck/errmail sending
+		logprefixForLastLogfile => sub {}, # prefix for previous (day) logs to be set in error mail (link), if not given, defaults to get_curdate(). In case Log::Dispatch::FileRotate is used as the File Appender in Log4perl config, the previous log is identified with <logname>.1
 		logRootPath => {}, # ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, paths to log file root folders (environment is added to that if non production), lookup key as checkLookup, default in "" => "defaultfolder"
 		prodEnvironmentInSeparatePath => 1, # set to 1 if the production scripts/logs etc. are in a separate Path defined by folderEnvironmentMapping (prod=root/Prod, test=root/Test, etc.), set to 0 if the production scripts/logs are in the root folder and all other environments are below that folder (prod=root, test=root/Test, etc.)
 		redoDir => {}, # ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, folders where files for redo are contained, lookup key as checkLookup, default in "" => "defaultfolder"
@@ -43,18 +44,16 @@ my %hashCheck = (
 		task => {},
 	},
 	execute => { # hash of parameters for current task execution which is not set by the user but can be used to set other parameters and control the flow
-		alreadyMovedOrDeleted => {}, # hash for checking the already moved or deleted files, to avoid moving/deleting them again at cleanup
+		alreadyMovedOrDeleted => {}, # hash for checking the already moved or deleted local files, to avoid moving/deleting them again at cleanup
 		addToScriptName => "", # this can be set to be added to the scriptname for config{checkLookup} keys, e.g. some passed parameter.
 		env => "", # Prod, Test, Dev, whatever is defined as the lookup value in folderEnvironmentMapping. homedir as fetched from the File::basename::dirname of the executing script using /^.*[\\\/](.*?)$/ is used as the key for looking up this value.
 		envraw => "", # Production has a special significance here as being an empty string. Otherwise like env.
-		errmailaddress => "", # for central logcheck/errmail sending in current process
-		errmailsubject => "", # for central logcheck/errmail sending in current process
+		errmailaddress => "", # target address for central logcheck/errmail sending in current process
+		errmailsubject => "", # mail subject for central logcheck/errmail sending in current process
 		failcount => 1, # for counting failures in processing to switch to longer wait period or finish altogether
-		filesToArchive => [], # list of files to be moved in archiveDir on FTP server, necessary for cleanup at the end of the process
-		filesToDelete => [], # list of files to be deleted on FTP server, necessary for cleanup at the end of the process
+		filesToDelete => [], # list of files to be deleted locally after download, necessary for cleanup at the end of the process
 		filesToMoveinHistory => [], # list of files to be moved in historyFolder locally, necessary for cleanup at the end of the process
 		filesToMoveinHistoryUpload => [], # list of files to be moved in historyFolderUpload locally, necessary for cleanup at the end of the process
-		filesToRemove => [], # list of files to be deleted locally, necessary for cleanup at the end of the process
 		firstRunSuccess => 1, # for planned retries (process=>plannedUntil filled) -> this is set after the first run to avoid error messages resulting of files having been moved/removed.
 		freqToCheck => "", # for logchecker:  frequency to check entries (B,D,M,M1) ...
 		homedir => "", # the home folder of the script, mostly used to return from redo and other folders for globbing files.
@@ -70,6 +69,7 @@ my %hashCheck = (
 		retrySeconds => 60, # how many seconds are passed between retries. This is set on error with process=>retrySecondsErr and if planned retry is defined with process=>retrySecondsPlanned
 		scriptname => "", # name of the current process script, also used in log/history setup together with addToScriptName for config{checkLookup} keys
 		timeToCheck => "", # for logchecker: scheduled time of job (don't look earlier for log entries)
+		uploadFilesToDelete => [], # list of files to be deleted locally after upload, necessary for cleanup at the end of the process
 	},
 	load => {
 		DB => {},
@@ -166,8 +166,8 @@ my %hashCheck = (
 		dontDoUtime => 1, # don't set time stamp of local file to that of remote file
 		dontUseQuoteSystemForPwd => 0, # for windows, a special quoting is used for passing passwords to Net::SFTP::Foreign that contain [()"<>& . This flag can be used to disable this quoting.
 		dontUseTempFile => 1, # directly upload files, without temp files
-		fileToArchive => 1, # should file be archived on FTP server? if archiveDir is not set, then file is archived (rolled) in the same folder
-		fileToRemove => 1, # should file be removed on FTP server?
+		fileToArchive => 1, # should files be archived on FTP server? if archiveDir is not set, then file is archived (rolled) in the same folder
+		fileToRemove => 1, # should files be removed on FTP server?
 		FTPdebugLevel => 0, # debug ftp: 0 or ~(1|2|4|8|16|1024|2048), loglevel automatically set to debug for module EAI::FTP
 		hostkey => "", # hostkey to present to the server for Net::SFTP::Foreign, either directly (insecure -> visible) or via sensitive lookup
 		hostkey2 => "", # additional hostkey to be presented (e.g. in case of round robin DNS)
@@ -199,7 +199,7 @@ my %hashCheck = (
 		filesProcessed => {}, # hash for checking the processed files, necessary for cleanup at the end of the whole task
 		hadErrors => 1, # set to 1 if there were any errors in the process
 		interactive_ => "", # interactive options (are not checked), can be used to pass arbitrary data via command line into the script (eg a selected date for the run with interactive_date).
-		onlyExecFor => qr//, # mark loads to only be executed when $common{task}{execOnly} !~ $load->{process}{onlyExecFor}
+		onlyExecFor => qr//, # define loads to only be executed when $common{task}{execOnly} !~ $load->{process}{onlyExecFor}. Empty onlyExecFor loads are always executed regardless of $common{task}{execOnly}
 		successfullyDone => "", # accumulates API sub names to prevent most API calls that ran successfully from being run again.
 		uploadCMD => "", # upload command for use with uploadFileCMD
 		uploadCMDPath => "", # path of upload command
@@ -207,7 +207,7 @@ my %hashCheck = (
 	},
 	task => { # contains parameters used on the task script level
 		customHistoryTimestamp => "", # optional custom timestamp to be added to filenames moved to History/HistoryUpload/FTP archive, if not given, get_curdatetime is used (YYYYMMDD_hhmmss)
-		execOnly => "", # used to remove loads where $common{task}{execOnly} !~ $load->{process}{onlyExecFor}
+		execOnly => "", # do not execute loads where $common{task}{execOnly} !~ $load->{process}{onlyExecFor}. Empty onlyExecFor loads are always executed regardless of $common{task}{execOnly}
 		ignoreNoTest => 0, # ignore the notest file in the process-script folder, usually preventing all runs that are not in production
 		plannedUntil => 2359, # latest time that planned repetition should start, this can be given either as HHMM (HourMinute) or HHMMSS (HourMinuteSecond), in case of HHMM the "Second" part is attached as 59
 		redoFile => 1, # flag for specifying a redo
@@ -324,7 +324,7 @@ sub setupConfigMerge {
 	# remove load elements where $common{task}{execOnly} !~ $load->{process}{onlyExecFor}
 	my $i=0;
 	while ($i <= $#loads) {
-		if ($common{task}{execOnly} and $common{task}{execOnly} !~ $loads[$i]{process}{onlyExecFor}) {
+		if ($common{task}{execOnly} and $loads[$i]{process}{onlyExecFor} and $common{task}{execOnly} !~ $loads[$i]{process}{onlyExecFor}) {
 			$logger->debug("removing load $i because \$common{task}{execOnly} given and $common{task}{execOnly} !~ $loads[$i]{process}{onlyExecFor} (\$load{process}{onlyExecFor}), \$#loads: $#loads");
 			splice @loads, $i, 1;
 		} else {
@@ -383,7 +383,7 @@ sub getOptions {
 sub extractConfigs ($$$;@) {
 	my ($contextSub,$arg,@required) = @_;
 	my $logger = get_logger();
-	$logger->debug(($contextSub ? "setting err subject $contextSub for " : "").(caller(1))[3]) if caller(1);
+	$logger->debug(($contextSub ? "setting err subject <$contextSub> for " : "").(caller(1))[3]) if caller(1);
 	setErrSubject($contextSub) if $contextSub;
 	my @ret;
 	if (ref($arg) eq "HASH") {
@@ -464,8 +464,9 @@ sub checkParam ($$) {
 # path of logfile and path of yesterdays logfile (after rolling) - getLogFPathForMail and getLogFPath can be used in site-wide log.config
 our ($LogFPath, $LogFPathDayBefore);
 sub getLogFPathForMail {
-	return 'file://'.$LogFPath.', or '.'file://'.$LogFPathDayBefore;
+	return 'file://'.$LogFPath.($LogFPathDayBefore ? ', or '.'file://'.$LogFPathDayBefore : '');
 };
+# called by log4perl.appender.FILE.filename = ... so always provide the logfile path here
 sub getLogFPath {
 	return $LogFPath;
 };
@@ -485,13 +486,14 @@ sub setErrSubject ($) {
 
 # setup logging for Log4perl
 sub setupLogging {
-	my $prodEnvironmentInSeparatePath = ($config{checkLookup}{$execute{scriptname}.$execute{addToScriptName}}{prodEnvironmentInSeparatePath} ne "" ? $config{checkLookup}{$execute{scriptname}.$execute{addToScriptName}}{prodEnvironmentInSeparatePath} : $config{prodEnvironmentInSeparatePath});
+	my $extendedScriptname = $execute{scriptname}.$execute{addToScriptName};
+	my $prodEnvironmentInSeparatePath = ($config{checkLookup}{$extendedScriptname}{prodEnvironmentInSeparatePath} ne "" ? $config{checkLookup}{$extendedScriptname}{prodEnvironmentInSeparatePath} : $config{prodEnvironmentInSeparatePath});
 
 	# get logRootPath, historyFolder, historyFolderUpload and redoDir from lookups in config.
 	# if they are not in the script home directory (having an absolute path) then build environment-path separately for end folder (script home directory is already in its environment)
 	for my $foldKey ("redoDir","logRootPath","historyFolder","historyFolderUpload") {
 		warn ("\$config{$foldKey} is not a hash, cannot get $foldKey from it !") if (ref($config{$foldKey}) ne "HASH");
-		my $folder = $config{$foldKey}{$execute{scriptname}.$execute{addToScriptName}} if (ref($config{$foldKey}) eq "HASH");
+		my $folder = $config{$foldKey}{$extendedScriptname} if (ref($config{$foldKey}) eq "HASH");
 		my $defaultFolder;
 		if (!$folder) {
 			$folder = $config{$foldKey}{""}; # take default, if no lookup defined for script
@@ -520,19 +522,23 @@ sub setupLogging {
 	# if logFolder doesn't exist, warn and log to $execute{homedir}.
 	my $noLogFolderErr;
 	if (! -e $logFolder) {
-		$noLogFolderErr = "can't log to logfolder $logFolder (set specially for script with \$config{logRootPath}{".$execute{scriptname}.$execute{addToScriptName}."} or default with \$config{logRootPath}{\"\"}), folder doesn't exist. Setting to $execute{homedir}";
+		$noLogFolderErr = "can't log to logfolder $logFolder (set specially for script with \$config{logRootPath}{$extendedScriptname} or default with \$config{logRootPath}{\"\"}), folder doesn't exist. Setting to $execute{homedir}";
 		$logFolder = $execute{homedir};
 	}
-	$LogFPath = $logFolder."/".$execute{scriptname}.$execute{addToScriptName}.".log";
-	$LogFPathDayBefore = $logFolder."/".get_curdate().".". $execute{scriptname}.$execute{addToScriptName}.".log"; # if mail is watched next day, show the rolled file here
+	$LogFPath = $logFolder."/".$extendedScriptname.".log";
 	$logConfig = $EAI_WRAP_CONFIG_PATH."/".$execute{env}."/log.config"; # environment dependent log config, Prod is either in EAI_WRAP_CONFIG_PATH/.$execute{env} or EAI_WRAP_CONFIG_PATH
 	$logConfig = $EAI_WRAP_CONFIG_PATH."/log.config" if (! -e $logConfig); # fall back to main config log.config
 	die "log.config neither in $logConfig nor in ".$EAI_WRAP_CONFIG_PATH."/log.config" if (! -e $logConfig);
 	Log::Log4perl::init($logConfig);
 	my $logger = get_logger();
-	$logger->warn($noLogFolderErr) if $noLogFolderErr;
-	if (Log::Log4perl->appenders()->{"FILE"} and Log::Log4perl->appenders()->{"FILE"}->{"appender"}->{"fh"}) {
-		Log::Log4perl->appenders()->{"FILE"}->{"appender"}->{"fh"}->autoflush;
+	$logger->warn($noLogFolderErr) if $noLogFolderErr; # log later when emergency log folder was set...
+	my $logAppender = Log::Log4perl->appenders()->{"FILE"}->{"appender"} if Log::Log4perl->appenders() and Log::Log4perl->appenders()->{"FILE"};
+	if ($logAppender) {
+		my $logprefix = get_curdate();
+		eval {$logprefix = $config{logprefixForLastLogfile}->()} if $config{logprefixForLastLogfile};
+		$logger->warn("error getting logprefix from \$config{logprefixForLastLogfile}: $@") if $@;
+		# if mail is watched next day, the rolled file is in $LogFPathDayBefore. Depending on appender, either append ".1" to filename or prepend $logprefix to it (default assumed date rotator, with current date in format yyyymmdd)
+		$LogFPathDayBefore = $logFolder."/".($logAppender->isa("Log::Dispatch::FileRotate") ? "" : $logprefix.".").$extendedScriptname.".log".($logAppender->isa("Log::Dispatch::FileRotate") ? ".1" : "");
 	}
 	if ($config{smtpServer}) {
 		# remove explicitly enumerated lookups (1:scriptname.pl, 2:scriptname.pl), the first such entry will be taken here
@@ -547,8 +553,8 @@ sub setupLogging {
 		# configure err mail sending
 		MIME::Lite->send('smtp', $config{smtpServer}, AuthUser=>$config{sensitive}{smtpAuth}{user}, AuthPass=>$config{sensitive}{smtpAuth}{pwd}, Timeout=>$config{smtpTimeout});
 		# get email from central log error handling $config{checkLookup}{<>};
-		$execute{errmailaddress} = $config{checkLookup}{$execute{scriptname}.$execute{addToScriptName}}{errmailaddress}; # errmailaddress for the task script
-		$execute{errmailsubject} = $config{checkLookup}{$execute{scriptname}.$execute{addToScriptName}}{errmailsubject}; # errmailsubject for the task script
+		$execute{errmailaddress} = $config{checkLookup}{$extendedScriptname}{errmailaddress}; # errmailaddress for the task script
+		$execute{errmailsubject} = $config{checkLookup}{$extendedScriptname}{errmailsubject}; # errmailsubject for the task script
 		$execute{errmailaddress} = $config{errmailaddress} if !$execute{errmailaddress};
 		$execute{errmailsubject} = $config{errmailsubject} if !$execute{errmailsubject};
 		$execute{errmailaddress} = $config{testerrmailaddress} if $execute{envraw};
@@ -560,7 +566,7 @@ sub setupLogging {
 			if ($execute{envraw}) {
 				$logger->error("no errmailaddress found, no entry found in \$config{testerrmailaddress}");
 			} else {
-				$logger->error("no errmailaddress found for ".$execute{scriptname}.$execute{addToScriptName}.", no entry found in \$config{checkLookup}{$execute{scriptname}$execute{addToScriptName}}");
+				$logger->error("no errmailaddress found for ".$extendedScriptname.", no entry found in \$config{checkLookup}{$extendedScriptname}");
 			}
 		}
 		setErrSubject("Setting up EAI::Wrap"); # general context after logging initialization: setup of EAI::Wrap by script
@@ -889,7 +895,7 @@ Example:
 
 =head1 COPYRIGHT
 
-Copyright (c) 2023 Roland Kapl
+Copyright (c) 2024 Roland Kapl
 
 All rights reserved.  This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.

@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# GetChartAreaFillFormatRequest.name : The workbook name.  ,
+# GetChartAreaFillFormatRequest.name : The file name.  ,
 # GetChartAreaFillFormatRequest.sheetName : The worksheet name.  ,
 # GetChartAreaFillFormatRequest.chartIndex : The chart index.  ,
-# GetChartAreaFillFormatRequest.folder : Original workbook folder.  ,
-# GetChartAreaFillFormatRequest.storageName :    
+# GetChartAreaFillFormatRequest.folder : The folder where the file is situated.  ,
+# GetChartAreaFillFormatRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_chart_area_fill_format' } = { 
-    	summary => 'Gets chart area fill format description in worksheet.',
+    	summary => 'Retrieve chart area fill format description in the worksheet.',
         params => $params,
         returns => 'FillFormatResponse',
     };
@@ -137,7 +137,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -158,14 +158,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

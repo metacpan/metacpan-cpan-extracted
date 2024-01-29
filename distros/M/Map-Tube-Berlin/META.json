@@ -4,7 +4,7 @@
       "Slaven Rezic <srezic@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -53,6 +53,6 @@
          "web" : "https://github.com/eserte/Map-Tube-Berlin"
       }
    },
-   "version" : "2021.0709",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "2023.1210",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

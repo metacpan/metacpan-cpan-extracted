@@ -4,7 +4,7 @@
       "Rob Casey <rob.casey@bluebottle.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4232",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -25,14 +25,15 @@
             "Carp" : "0",
             "File::MMagic" : "1.16",
             "HTTP::BrowserDetect" : "0.97",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "perl" : "5.006"
          }
       }
    },
    "provides" : {
       "CGI::Upload" : {
          "file" : "lib/CGI/Upload.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       }
    },
    "release_status" : "stable",
@@ -47,6 +48,6 @@
          "url" : "https://github.com/szabgab/CGI-Upload/"
       }
    },
-   "version" : "1.13",
+   "version" : "1.14",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -6,7 +6,7 @@ use curry;
 use Net::DBus;
 use IPC::Run;
 use Log::Any;
-our $VERSION = '1.0.4'; # VERSION
+our $VERSION = '1.0.5'; # VERSION
 # ABSTRACT: implements the logind "inhibitor locks" and "session lock" protocols
 
 
@@ -120,7 +120,7 @@ App::XScreenSaver::DBus::Logind - implements the logind "inhibitor locks" and "s
 
 =head1 VERSION
 
-version 1.0.4
+version 1.0.5
 
 =head1 SYNOPSIS
 

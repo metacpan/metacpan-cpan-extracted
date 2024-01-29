@@ -59,8 +59,8 @@ sub new {
 
 
 # Run Operation Request
-# PostUnlockRequest.File : File to upload  ,
-# PostUnlockRequest.password :    
+# PostUnlockRequest.File : The password needed to open an Excel file.  ,
+# PostUnlockRequest.password : The password needed to open an Excel file.   
 
 {
     my $params = {
@@ -71,7 +71,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_unlock' } = { 
-    	summary => 'Unprotect password protected Excel file.',
+    	summary => 'Unlock Excel files.',
         params => $params,
         returns => 'FilesResult',
     };
@@ -123,14 +123,14 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'File to upload',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},    

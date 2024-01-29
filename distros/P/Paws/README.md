@@ -12,7 +12,7 @@ The project is actually generating all of it's classes from botocore
 
 Project info:
 
-Travis CI status: [![Build Status](https://travis-ci.org/pplu/aws-sdk-perl.svg?branch=master)](https://travis-ci.org/pplu/aws-sdk-perl)
+GitHub Actions status: ![Build Status](https://github.com/pplu/aws-sdk-perl/actions/workflows/test.yml/badge.svg)
 
 Version on CPAN: [![CPAN version](https://badge.fury.io/pl/Paws.svg)](https://badge.fury.io/pl/Paws)
 
@@ -142,7 +142,7 @@ Perl versions
 The SDK is targeted at modern Perl versions. Since a new perl gets released every year, distributions perl tend to lag behind, so
 support for perl versions on any modern, widespread distribution is our target.
 Very old versions may work, but no intention to support them is made. You can always install a modern version of perl with perlbrew or
-plenv in a breeze. We're running the test cases on Travis for all "supported" perl versions. If you want to support a lower version,
+plenv in a breeze. We're running the test cases on GitHub Actions for all "supported" perl versions. If you want to support a lower version,
 you can contribute back. Acceptance of patches for older versions of Perl won't mean that the compatibility will be maintained
 long-term, although it will be tried :).
 
@@ -202,7 +202,7 @@ Commit everything up till now and push
 git push origin release/X.XX
 ```
 
-Take a look at Travis pipelines to see if the branch you're going to release is green: https://travis-ci.org/pplu/aws-sdk-perl/branches
+Take a look at Github Actions to see if the branch you're going to release is green: https://github.com/pplu/aws-sdk-perl/actions/
 
 We don't want to ship Paws when it's failing it's tests.
 
@@ -416,7 +416,9 @@ Grinzz
  - many bugs, suggestions and fixes
  - Installation speedup with Module::Builder::Tiny
 
-Dakkar for solving issues with parameter passing
+Dakkar
+  - solving issues with parameter passing
+  - fixing dns and other tests when a proxy is in use
 
 Arthur Axel fREW Schmidt for speeding up credential refreshing
 
@@ -472,3 +474,7 @@ aeruder for contributing
  - Completing speedups and benchmarking code
  - Substituting Config::INI for Config::AWS 
  - Parrallelizing and fixing generation inconsistencies of the SDK
+
+dheffx for making ContainerProfile credential provider more robust
+
+0leksii for building support for Instance Metadata Service v2 (IMDSv2)

@@ -4,6 +4,7 @@ author:
   - 'Xavier Guimard <x.guimard@free.fr>, Clement Oudot <clement@oodo.net>, Christophe Maudoux <chrmdx@gmail.com>, Maxime Besson <maxime.besson@worteks.com>'
 build_requires:
   Convert::Base32: '0'
+  Crypt::JWT: '0'
   Email::Sender: '0'
   GD::SecurityImage: '0'
   HTTP::Message: '0'
@@ -34,6 +35,7 @@ recommends:
   Authen::Radius: '0'
   Authen::WebAuthn: '0'
   Convert::Base32: '0'
+  Crypt::JWT: '0'
   DBI: '0'
   Email::Sender: '1.300027'
   GD::SecurityImage: '0'
@@ -58,7 +60,7 @@ recommends:
   Web::ID: '0'
 requires:
   Clone: '0'
-  Lemonldap::NG::Handler: v2.17.0
+  Lemonldap::NG::Handler: v2.18.1
   Regexp::Assemble: '0'
 resources:
   MailingList: mailto:lemonldap-ng-dev@ow2.org
@@ -66,5 +68,5 @@ resources:
   bugtracker: https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues
   homepage: https://lemonldap-ng.org/
   license: http://opensource.org/licenses/GPL-2.0
-version: v2.17.0
+version: v2.18.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

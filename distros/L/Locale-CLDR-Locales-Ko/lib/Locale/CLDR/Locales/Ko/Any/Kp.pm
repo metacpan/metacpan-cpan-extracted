@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ko::Any::Kp - Package for language Korean
 
 package Locale::CLDR::Locales::Ko::Any::Kp;
 # This file auto generated from Data\common\main\ko_KP.xml
-#	on Tue  5 Dec  1:18:46 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'KP' => '조선민주주의인민공화국',
 

@@ -1,5 +1,10 @@
 Release history for Plack-Middleware-NeverExpire
 
+1.101 Mon 29 Jan 2024
+	- No dependency on Time::Piece (whose day and month name lists are mutable global state)
+	- Strict RFC 7231 compliance
+	- Caching of the formatted timestamp while valid
+
 1.007 Sun 04 Sep 2022
 	- Minor performance optimisation
 	- No more Test::More or parent.pm dependencies

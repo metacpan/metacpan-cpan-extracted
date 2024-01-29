@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Gv::Any::Im - Package for language Manx
 
 package Locale::CLDR::Locales::Gv::Any::Im;
 # This file auto generated from Data\common\main\gv_IM.xml
-#	on Tue  5 Dec  1:13:09 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';

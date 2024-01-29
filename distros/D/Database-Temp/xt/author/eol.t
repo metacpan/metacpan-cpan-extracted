@@ -15,6 +15,7 @@ my @files = (
     't/integration/database-temp-csv.t',
     't/integration/database-temp-pg.t',
     't/integration/database-temp-sqlite.t',
+    't/lib/Database/Temp/Driver/DummyForTesting.pm',
     't/unit/Database/Temp.t',
     't/unit/Database/Temp/DB.t'
 );

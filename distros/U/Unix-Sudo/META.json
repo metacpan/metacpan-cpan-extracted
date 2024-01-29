@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown",
       "open_source"
@@ -53,6 +53,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Unix-Sudo"
       }
    },
-   "version" : "v4.567.89",
+   "version" : "65535",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

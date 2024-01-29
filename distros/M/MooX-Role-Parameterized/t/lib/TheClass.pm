@@ -5,9 +5,8 @@ use warnings;
 use Moo;
 use TheParameterizedRole;
 
-TheParameterizedRole->apply(
-    [
-        { attribute => 'foo', method => 'xxx' },
+TheParameterizedRole->apply_roles_to_target(
+    [   { attribute => 'foo', method => 'xxx' },
         { attribute => 'bar', method => 'yyy' }
     ]
 );

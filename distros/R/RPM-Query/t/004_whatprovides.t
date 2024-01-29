@@ -7,10 +7,16 @@ BEGIN { use_ok('RPM::Query') };
 my $rpm  = RPM::Query->new;
 isa_ok($rpm, 'RPM::Query');
 
-my $skip = $^O eq 'linux' ? do {qx{rpm --version}; $?} : 1;
+my $skip = 1;
+foreach (1) {
+  last unless $^O eq 'linux';
+  last unless qx{rpm -q perl};
+  last if $?;
+  $skip = 0;
+}
 
 SKIP: {
-  skip 'rpm command not found', 4 if $skip;
+  skip 'rpm command not found or perl not installed by rpm', 4 if $skip;
   my $whatprovides = $rpm->whatprovides('perl(strict)');
   isa_ok($whatprovides, 'ARRAY');
   is(@$whatprovides, 1, 'size of whatprovides');

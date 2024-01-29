@@ -1,0 +1,23 @@
+class Eg::OS::Windows::API::Window extends Eg::OS::API {
+  use List;
+  use Eg::Node;
+  use Eg::Runtime;
+  
+  static method new : Eg::OS::Windows::API::Window ($runtime : Eg::Runtime) {
+    
+    my $self = new Eg::OS::Windows::API::Window;
+    
+    $self->{runtime} = $runtime;
+    
+    return $self;
+  }
+  
+  native method inner_width : int ();
+  
+  native method inner_height : int ();
+  
+  native method outer_width : int ();
+  
+  native method outer_height : int ();
+  
+}

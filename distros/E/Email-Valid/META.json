@@ -4,7 +4,7 @@
       "Maurice Aubrey <maurice@hevanet.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.026, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -25,9 +25,9 @@
       },
       "runtime" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "Carp" : "0",
             "File::Spec" : "0",
-            "IO::CaptureOutput" : "0",
             "IO::File" : "0",
             "Mail::Address" : "0",
             "Net::DNS" : "0",
@@ -61,10 +61,10 @@
          "web" : "https://github.com/Perl-Email-Project/Email-Valid"
       }
    },
-   "version" : "1.203",
+   "version" : "1.204",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.037000"
+         "version" : "5.038000"
       },
       "plugins" : [
          {
@@ -73,7 +73,6 @@
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [],
                   "exclude_match" : [],
-                  "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
                   "prefix" : "",
                   "prune_directory" : [],
@@ -84,12 +83,12 @@
                }
             },
             "name" : "@Filter/Git::GatherDir",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckPrereqsIndexed",
             "name" : "@Filter/CheckPrereqsIndexed",
-            "version" : "0.021"
+            "version" : "0.022"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckExtraTests",
@@ -111,7 +110,7 @@
                }
             },
             "name" : "@Filter/RJBS-Outdated",
-            "version" : "0.057"
+            "version" : "0.058"
          },
          {
             "class" : "Dist::Zilla::Plugin::PromptIfStale",
@@ -128,67 +127,67 @@
                }
             },
             "name" : "@Filter/CPAN-Outdated",
-            "version" : "0.057"
+            "version" : "0.058"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "@Filter/@Filter/PruneCruft",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Filter/@Filter/ManifestSkip",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Filter/@Filter/MetaYAML",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@Filter/@Filter/License",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Readme",
             "name" : "@Filter/@Filter/Readme",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Filter/@Filter/ExecDir",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@Filter/@Filter/ShareDir",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Filter/@Filter/Manifest",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@Filter/@Filter/TestRelease",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Filter/@Filter/ConfirmRelease",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Filter/@Filter/UploadToCPAN",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "@Filter/AutoPrereqs",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::NextVersion",
@@ -199,32 +198,32 @@
                   "version_regexp" : "(?^:^([0-9]+\\.[0-9]+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.32.1 (Apple Git-133)",
+                  "git_version" : "2.43.0",
                   "repo_root" : "."
                }
             },
             "name" : "@Filter/Git::NextVersion",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::PkgVersion",
             "name" : "@Filter/PkgVersion",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Filter/MetaConfig",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Filter/MetaJSON",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
             "name" : "@Filter/NextRelease",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::ChangesHasContent",
@@ -234,12 +233,12 @@
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Filter/PodSyntaxTests",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
             "name" : "@Filter/Test::ReportPrereqs",
-            "version" : "0.028"
+            "version" : "0.029"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Remote::Check",
@@ -255,7 +254,7 @@
                }
             },
             "name" : "@Filter/TestMoreWithSubtests",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",
@@ -266,93 +265,93 @@
                   ],
                   "finder" : [
                      ":InstallModules",
-                     ":ExecFiles"
+                     ":PerlExecFiles"
                   ],
                   "plugins" : [
                      {
                         "class" : "Pod::Weaver::Plugin::EnsurePod5",
                         "name" : "@CorePrep/EnsurePod5",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@CorePrep/H1Nester",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::SingleEncoding",
                         "name" : "@RJBS/SingleEncoding",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Name",
                         "name" : "@RJBS/Name",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Version",
                         "name" : "@RJBS/Version",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@RJBS/Prelude",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@RJBS/Synopsis",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@RJBS/Description",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@RJBS/Overview",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@RJBS/Stability",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::GenerateSection",
                         "name" : "@RJBS/PerlSupport",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "Attributes",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "Methods",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "Functions",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Leftovers",
                         "name" : "@RJBS/Leftovers",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@RJBS/postlude",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Authors",
                         "name" : "@RJBS/Authors",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Contributors",
@@ -362,23 +361,23 @@
                      {
                         "class" : "Pod::Weaver::Section::Legal",
                         "name" : "@RJBS/Legal",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Transformer",
                         "name" : "@RJBS/List",
-                        "version" : "4.018"
+                        "version" : "4.019"
                      }
                   ]
                }
             },
             "name" : "@Filter/PodWeaver",
-            "version" : "4.009"
+            "version" : "4.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::RJBSMisc",
             "name" : "@Filter/RJBSMisc",
-            "version" : "5.020"
+            "version" : "5.026"
          },
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
@@ -400,12 +399,12 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.32.1 (Apple Git-133)",
+                  "git_version" : "2.43.0",
                   "repo_root" : "."
                }
             },
             "name" : "@Filter/@Git/Check",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -424,7 +423,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.32.1 (Apple Git-133)",
+                  "git_version" : "2.43.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -432,7 +431,7 @@
                }
             },
             "name" : "@Filter/@Git/Commit",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -441,12 +440,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1.203",
+                  "tag" : "1.204",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.32.1 (Apple Git-133)",
+                  "git_version" : "2.43.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -454,7 +453,7 @@
                }
             },
             "name" : "@Filter/@Git/Tag",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -466,18 +465,18 @@
                   "remotes_must_exist" : 0
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.32.1 (Apple Git-133)",
+                  "git_version" : "2.43.0",
                   "repo_root" : "."
                }
             },
             "name" : "@Filter/@Git/Push",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.32.1 (Apple Git-133)",
+                  "git_version" : "2.43.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -495,57 +494,57 @@
                }
             },
             "name" : "MakeMaker::Runner",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.026"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.026"
+            "version" : "6.031"
          }
       ],
       "zilla" : {
@@ -553,28 +552,29 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.026"
+         "version" : "6.031"
       }
    },
    "x_contributors" : [
       "Alexandr Ciornii <alexchorny@gmail.com>",
+      "Arne Johannessen <ajnn@cpan.org>",
       "Dan Book <grinnz@gmail.com>",
       "Gene Hightower <gene@digilicious.com>",
+      "James E Keenan <jkeenan@cpan.org>",
       "Karel Miko <karel.miko@gmail.com>",
       "McA <McA@github.com>",
       "Michael Schout <mschout@gkg.net>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Neil Bowers <neil@bowers.com>",
-      "Ricardo Signes <rjbs@cpan.org>",
       "Ricardo Signes <rjbs@semiotic.systems>",
       "Steve Bertrand <steveb@cpan.org>",
       "Svetlana <svetlana.wiczer@gmail.com>",
       "Troy Morehouse <troymore@nbnet.nb.ca>",
       "Yanick Champoux <yanick@babyl.dyndns.org>"
    ],
-   "x_generated_by_perl" : "v5.37.0",
+   "x_generated_by_perl" : "v5.38.0",
    "x_rjbs_perl_window" : "long-term",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

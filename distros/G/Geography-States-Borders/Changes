@@ -1,0 +1,23 @@
+Revision history for Geography-States-Borders
+
+0.0106 2024-01-24 20:55:31
+    - Improve documentation.
+
+0.0105 2024-01-24 20:26:15
+    - Add Australia.
+
+0.0104 2024-01-24 19:11:33
+    - Add The Netherlands.
+
+0.0103 2024-01-24 18:13:06
+    - Improve test.
+    - Add Brazil.
+
+0.0102 2024-01-24 15:07:08
+    - Oh Canada!
+
+0.0101 2024-01-24 12:54:01
+    - Remove the unneeded verbose attribute.
+
+0.0100 2024-01-24 11:02:16
+    - Mint with Dist::Zilla.

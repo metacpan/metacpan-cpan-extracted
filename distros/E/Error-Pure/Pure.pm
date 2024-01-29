@@ -13,7 +13,7 @@ Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $TYPE_DEFAULT => 'Die';
 Readonly::Scalar my $LEVEL_DEFAULT => 4;
 
-our $VERSION = 0.31;
+our $VERSION = 0.33;
 
 # Type of error.
 our $TYPE;
@@ -70,6 +70,22 @@ Error::Pure - Perl module for structured errors.
  use Error::Pure qw(err);
 
  err 'This is a fatal error', 'name', 'value';
+
+=head1 DESCRIPTION
+
+L<Error::Pure> system is replacement for usage of Perl C<die> or L<Carp> C<croak>.
+
+Main features are:
+
+=over
+
+=item * Structured and defined output
+
+=item * Stack trace support inside
+
+=back
+
+Full description of intent is in L<Error::Pure::Intent>.
 
 =head1 SUBROUTINES
 
@@ -243,12 +259,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2008-2023 Michal Josef Špaček
+© 2008-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.31
+0.33
 
 =cut

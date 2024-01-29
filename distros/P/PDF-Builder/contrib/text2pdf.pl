@@ -5,6 +5,8 @@
 # $Date: 2013/08/14 20:26:56 $
 # $RCSfile: text2pdf.pl,v $
 #
+# Revision: by Phil M Perry  September 2023
+#   change textlead() reference to textleading()
 # Revision: by Phil M Perry  June 2018
 #   make Perl::Critic happy over handling of bareword filehandles and loop
 #     iterator declarations
@@ -72,7 +74,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
+our $VERSION = '3.026'; # VERSION
 our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 use PDF::Builder;
@@ -108,7 +110,7 @@ my $CLFontName;     		# cmd line fontname
   my $DEFFontName = 'Courier';	#  default font Courier (fixed pitch)
 my $CLfontsize;               	# font size
   my $DEFfontsize = 7;          #   default = 7pt
-my $CLspacing;              	# text spacing ($pdf->textlead)
+my $CLspacing;              	# text spacing ($pdf->textleading)
   				#   default = 115% of font size
 my $CLtabs; 			# tab expansion definition
   my $DEFtabs = '9 17';		#   default = at 9, 17, 25, 33,...

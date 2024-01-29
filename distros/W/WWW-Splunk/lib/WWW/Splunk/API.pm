@@ -27,8 +27,7 @@ use Carp;
 use strict;
 use warnings;
 
-our $VERSION = '2.08';
-our $prefix = '/services';
+our $VERSION = '2.09';
 
 =head2 B<new> (F<params>)
 
@@ -43,6 +42,15 @@ A constructor.
           verbose => 0,
   });
 
+Default values are:
+ - port - 8089
+ - host - localhost
+ - url - https://$host:$port
+ - verbose - 0
+ - unsafe_ssl - 0
+ - service_prefix - /services
+ - search - 1
+
 =cut
 
 sub new {
@@ -52,19 +60,22 @@ sub new {
 	$self->{host} ||= 'localhost';
 	$self->{url} ||= 'https://'.$self->{host}.':'.$self->{port};
 	$self->{verbose} ||= 0;
+	$self->{service_prefix} ||= '/services';
+	$self->{search} ||= 1;
 
 	# Set up user agent unless an existing one was passed
 	unless ($self->{agent}) {
-		$self->{agent} = new LWP::UserAgent
-			(ssl_opts =>  {verify_hostname => (not $self->{unsafe_ssl})});
+		$self->{agent} = LWP::UserAgent->new(
+			ssl_opts =>  {verify_hostname => (not $self->{unsafe_ssl})},
+		);
 		$self->{agent}->cookie_jar ({});
-		$self->{agent}->credentials (
+		$self->{agent}->credentials(
 			delete ($self->{host}).':'.(delete $self->{port}),
 			'/splunk',
 			delete $self->{login},
 			delete $self->{password},
 		) if exists $self->{login};
-		$self->{agent}->agent ("$class/$VERSION ");
+		$self->{agent}->agent("$class/$VERSION ");
 	}
 
 	return bless $self, $class;
@@ -80,7 +91,7 @@ sub delete {
 	my ($self, @args) = @_;
 
 	print "DELETE" if $self->{verbose};
-	$self->request (\&DELETE, @args);
+	$self->request(\&DELETE, @args);
 }
 
 =head2 B<post> (F<parameters>)
@@ -93,7 +104,7 @@ sub post {
 	my ($self, @args) = @_;
 
 	print "POST" if $self->{verbose};
-	$self->request (\&POST, @args);
+	$self->request(\&POST, @args);
 }
 
 =head2 B<get> (F<parameters>)
@@ -106,7 +117,7 @@ sub get {
 	my ($self, @args) = @_;
 
 	print "GET" if $self->{verbose};
-	$self->request (\&GET, @args);
+	$self->request(\&GET, @args);
 }
 
 =head2 B<head> (F<parameters>)
@@ -120,7 +131,7 @@ sub head {
 	my ($self, @args) = @_;
 
 	print "HEAD" if $self->{verbose};
-	$self->request (\&HEAD, @args);
+	$self->request(\&HEAD, @args);
 }
 
 =head2 B<put> (F<parameters>)
@@ -134,7 +145,7 @@ sub put {
 	my ($self, @args) = @_;
 
 	print "PUT" if $self->{verbose};
-	$self->request (\&PUT, @args);
+	$self->request(\&PUT, @args);
 }
 
 =head2 B<request> (F<method>, F<location>, [F<data>], [F<callback>])
@@ -156,7 +167,7 @@ of <results> elements is expected.
 sub request {
 	my ($self, $method, $location, $data, $callback) = @_;
 
-	my $url = $self->{url}.$prefix.$location;
+	my $url = $self->{url}.$self->{service_prefix}.$location;
 	if ($self->{verbose}) {
 		print " $url\n";
 		if (defined $data) {
@@ -179,15 +190,15 @@ sub request {
 		}
 	} else {
 		# A method string
-		$request = new HTTP::Request ($method, $url);
+		$request = HTTP::Request->($method, $url);
 	}
 
 	my $content_type = '';
 	my $buffer;
 
-	$self->{agent}->remove_handler ('response_header');
-	$self->{agent}->add_handler (response_header => sub {
-		my($response, $ua, $h) = @_;
+	$self->{agent}->remove_handler('response_header');
+	$self->{agent}->add_handler(response_header => sub {
+		my ($response, $ua, $h) = @_;
 
 		# Do not think of async processing of error responses
 		return 0 unless $response->is_success;
@@ -207,8 +218,8 @@ sub request {
 		}
 	});
 
-	$self->{agent}->remove_handler ('response_data');
-	$self->{agent}->add_handler (response_data => sub {
+	$self->{agent}->remove_handler('response_data');
+	$self->{agent}->add_handler(response_data => sub {
 		my ($response, $ua, $h, $data) = @_;
 
 		return 1 unless defined $buffer;
@@ -219,15 +230,15 @@ sub request {
 				last;
 			}
 
-			my $xml = XML::LibXML->load_xml (string => $_);
-			$callback->(WWW::Splunk::XMLParser::parse ($xml));
+			my $xml = XML::LibXML->load_xml(string => $_);
+			$callback->(WWW::Splunk::XMLParser::parse($xml));
 		}
 
 		return 1;
 	}) if $callback;
 
 	# Run it
-	my $response = $self->{agent}->request ($request);
+	my $response = $self->{agent}->request($request);
 	croak $response->header ('X-Died') if $response->header ('X-Died');
 
 	# Deal with HTTP errors
@@ -278,7 +289,7 @@ L<WWW::Splunk>, L<sc>
 Lubomir Rintel, L<< <lkundrak@v3.sk> >>,
 Michal Josef Špaček L<< <skim@cpan.org> >>
 
-The code is hosted on GitHub L<http://github.com/tupinek/perl-WWW-Splunk>.
+The code is hosted on GitHub L<http://github.com/michal-josef-spacek/perl-WWW-Splunk>.
 Bug fixes and feature enhancements are always welcome.
 
 =head1 LICENSE

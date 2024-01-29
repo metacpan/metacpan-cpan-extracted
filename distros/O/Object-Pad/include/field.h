@@ -2,14 +2,18 @@
 #define __OBJECT_PAD__FIELD_H__
 
 struct FieldMeta {
+  /* Flags first */
+  unsigned int is_direct : 1;
+  unsigned int def_if_undef : 1;
+  unsigned int def_if_false : 1;
+  unsigned int is_inheritable : 1;
+
   SV *name;
   ClassMeta *class;
   OP *defaultexpr;
   FIELDOFFSET fieldix;
   SV *paramname;
   AV *hooks; /* NULL, or AV of raw pointers directly to FieldHook structs */
-  unsigned int def_if_undef : 1;
-  unsigned int def_if_false : 1;
 };
 
 #define MOP_FIELD_RUN_HOOKS_NOARGS(fieldmeta, func)                                       \

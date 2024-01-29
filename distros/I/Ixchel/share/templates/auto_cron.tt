@@ -16,7 +16,7 @@
 [% END %]
 
 [% IF config.sneck.enable && config.snmp.extends.sneck.enable %]
-*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] sneck -u -b
+*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] sneck -u -b 2> /dev/null > /dev/null
 [% END %]
 [% IF config.fail2ban.enable && config.snmp.extends.fail2ban.enable %]
 */5 * * * * root /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/fail2ban -u 2> /dev/null > /dev/null
@@ -34,24 +34,31 @@
 [% config.snmp.extends.osupdate.interval %] root /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/osupdate > /var/cache/osupdate.extend 2> /dev/null
 [% END %]
 [% IF config.snmp.extends.logsize.enable %]
-*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/logsize 2> /dev/null > /dev/null
+*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/logsize -b 2> /dev/null > /dev/null
 [% END %]
 [% IF config.snmp.extends.hv_monitor.enable %]
 */5 * * * * root /usr/bin/env [% config.snmp.extend_env %] hv_monitor -c > /var/cache/hv_monitor.json -c 2> /dev/null
 [% END %]
-[% IF config.suricata.enable && config.suricata_extract.enable && config.snmp.extends.suricata_extract.enable %]
-[% config.suricata_extract.interval %] root /usr/bin/env [% config.snmp.extend_env %]
+[% IF config.suricata.enable && config.suricata_extract.enable %]
+[% config.suricata_extract.interval %] root /usr/bin/env [% config.snmp.extend_env %] suricata_extract_submit 2> /dev/null > /dev/null
 [% END %]
 [% IF config.snmp.extends.smart.enable %]
-*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/smart -c [% config.snmp.extends.smart.config %] -u 2> /dev/null > /dev/null
+*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/smart -c [% config.snmp.extends.smart.config %] -u -Z 2> /dev/null > /dev/null
 [% IF config.snmp.extends.smart.enable && config.snmp.extends.smart.nightly_test_enable  %]
 @daily root /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/smart -c [% config.snmp.extends.smart.config %] -t [% config.snmp.extends.smart.nightly_test %] 2> /dev/null > /dev/null
 [% END %]
+[% END %]
+[% IF config.snmp.extends.mdadm.enable %]
+*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/mdadm 2> /dev/null >  /var/cache/mdadm.extend
 [% END %]
 
 [% IF config.snmp.extends.sagan.enable %]
 */5 * * * * root /usr/bin/env [% config.snmp.extend_env %] sagan_stat_check -u [% config.snmp.extends.sagan.args %] > /dev/null 2> /dev/null
 [% END %]
 [% IF config.snmp.extends.suricata.enable %]
-*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] suricata_stat_check -u [% config.snmp.extends.suricata.args %] > /dev/null 2> /dev/null
+30 0 * * * root /usr/bin/env [% config.snmp.extend_env %] suricata_stat_check -u [% config.snmp.extends.suricata.args %] > /dev/null 2> /dev/null
 [% END %]
+[% IF config.suricata.update.enable %]
+[% config.suricata.update.when %] root /usr/bin/env [% config.snmp.extend_env %] suricata-update update-sources > /dev/null ; /usr/bin/env [% config.snmp.extend_env %] suricata-update [% IF config.suricata.update.no_reload %] --no-reload [% END %] [% IF config.suricata.update.no_test %] --no-test [% END %] [% IF config.suricata.update.offline %] --offline [% END %] [% IF config.suricata.update.fail %] --fail [% END %] [% IF file_exists( config.suricata.update.conf_file ) %] --suricata-conf [% config.suricata.update.conf_file %] [% END %] [% IF file_exists( config.suricata.update.update_file ) %] -c [% config.suricata.update.update_file %] [% END %] [% IF config.suricata.update.disable_conf && file_exists( config.suricata.update.disable_file ) %] --disable-conf [% config.suricata.update.disable_file %] [% END %] [% IF config.suricata.update.enable_conf && file_exists( config.suricata.update.enable_file ) %] --enable-conf [% config.suricata.update.enable_file %] [% END %] [% IF config.suricata.update.modify_conf && file_exists( config.suricata.update.modify_file ) %] --modify-conf [% config.suricata.update.modify_file %] [% END %] [% IF config.suricata.update.drop_conf && file_exists( config.suricata.update.drop_file ) %] --drop-conf [% config.suricata.update.drop_file %] [% END %] > /dev/null
+[% END %]
+

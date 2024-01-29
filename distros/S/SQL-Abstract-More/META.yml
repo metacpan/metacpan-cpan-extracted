@@ -19,7 +19,7 @@ name: SQL-Abstract-More
 provides:
   SQL::Abstract::More:
     file: lib/SQL/Abstract/More.pm
-    version: '1.40'
+    version: '1.42'
 requires:
   MRO::Compat: '0'
   Params::Validate: '0'
@@ -31,5 +31,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/SQL-Abstract-More
-version: '1.40'
+version: '1.42'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -39,11 +39,11 @@ my %eumm_args = (
   ABSTRACT => 'Perl bindings for OpenSSL and LibreSSL',
   LICENSE => 'artistic_2',
   AUTHOR => [
-    'Sampo Kellomäki <sampo@iki.fi>',
+    'Sampo Kellomaki <sampo@iki.fi>',
     'Florian Ragwitz <rafl@debian.org>',
     'Mike McCauley <mikem@airspayce.com>',
-    'Chris Novakovic <chris@chrisn.me.uk>',
     'Tuure Vartiainen <vartiait@radiatorsoftware.com>',
+    'Chris Novakovic <chris@chrisn.me.uk>',
     'Heikki Vatiainen <hvn@radiatorsoftware.com>'
   ],
   VERSION_FROM => 'lib/Net/SSLeay.pm',
@@ -111,17 +111,30 @@ my %eumm_args = (
   ssleay(),
 );
 
+# CCFLAGS is used internally by Makefile.PL to define various C preprocessor
+# macros (as opposed to DEFINE, which is user-facing).
+$eumm_args{CCFLAGS} = $Config{ccflags};
+
+# Expose the current Perl version to the C preprocessor. This is used in
+# SSLeay.xs before perl.h is included (and therefore before its PERL_VERSION_*
+# macros are available).
+add_ccflag( $eumm_args{CCFLAGS}, "-DNET_SSLEAY_PERL_VERSION=" . $] * 1e6 );
+
+# Suppress deprecation warnings during compilation.
+# https://www.openssl.org/docs/manmaster/man7/openssl_user_macros.html
+add_ccflag( $eumm_args{CCFLAGS}, '-DOPENSSL_API_COMPAT=908' );
+
 # See if integers are only 32 bits long. If they are, add a flag to
 # CCFLAGS. Since OpenSSL 1.1.0, a growing number of APIs are using 64
 # bit integers. This causes a problem if Perl is compiled without 64
-# bit integers. DEFINE is not used because Makefile.PL command line
-# DEFINE argument is used for enabling compile time PR1
-# etc. debugging.
+# bit integers.
 #
 # Note: 32bit integers are treated as the non-default case. When you
 # use this define, do it so that 64bit case is the default whenever
 # possible. This is safer for future library and Net::SSLeay releases.
-$eumm_args{CCFLAGS} = "-DNET_SSLEAY_32BIT_INT_PERL $Config{ccflags}" if !defined $Config{use64bitint} || $Config{use64bitint} ne 'define';
+if ( !defined $Config{use64bitint} || $Config{use64bitint} ne 'define' ) {
+    add_ccflag( $eumm_args{CCFLAGS}, '-DNET_SSLEAY_32BIT_INT_PERL' );
+}
 
 # This can go when EU::MM older than 6.58 are gone
 $eumm_args{AUTHOR} = join(', ', @{$eumm_args{AUTHOR}}) unless eval { ExtUtils::MakeMaker->VERSION(6.58); };
@@ -136,6 +149,12 @@ sub MY::postamble {
 SSLeay$Config{'obj_ext'} : constants.c
 
 MAKE
+}
+
+# Prepends the C compiler flag in the second parameter to the string of compiler
+# flags in the first parameter.
+sub add_ccflag {
+    substr $_[0], 0, 0, $_[1] . ( length $_[0] ? ' ' : '' );
 }
 
 sub ssleay {
@@ -241,17 +260,22 @@ sub ssleay_get_build_opts {
     }
 
     print <<EOM;
-*** Be sure to use the same compiler and options to compile your OpenSSL, perl,
-    and Net::SSLeay. Mixing and matching compilers is not supported.
+*** If there are build errors, test failures or run-time malfunctions,
+    try to use the same compiler and options to compile your OpenSSL,
+    Perl, and Net::SSLeay.
 EOM
 
     if ($^O eq 'MSWin32') {
         if ($win_link_statically) {
             # Link to static libs
             push @{ $opts->{lib_paths} }, "$prefix/lib/VC/static" if -d "$prefix/lib/VC/static";
+            push @{ $opts->{lib_paths} }, "$prefix/lib/VC/x86/MT" if -d "$prefix/lib/VC/x86/MT"; # Shining Light 32bit OpenSSL 3.2.0
+            push @{ $opts->{lib_paths} }, "$prefix/lib/VC/x64/MT" if -d "$prefix/lib/VC/x64/MT"; # Shining Light 64bit OpenSSL 3.2.0
         }
         else {
             push @{ $opts->{lib_paths} }, "$prefix/lib/VC" if -d "$prefix/lib/VC";
+            push @{ $opts->{lib_paths} }, "$prefix/lib/VC/x86/MD" if -d "$prefix/lib/VC/x86/MD"; # Shining Light 32bit OpenSSL 3.2.0
+            push @{ $opts->{lib_paths} }, "$prefix/lib/VC/x64/MD" if -d "$prefix/lib/VC/x64/MD"; # Shining Light 64bit OpenSSL 3.2.0
         }
 
         my $found = 0;
@@ -259,14 +283,14 @@ EOM
         # Library names depend on the compiler
         @pairs = (['eay32','ssl32'],['crypto.dll','ssl.dll'],['crypto','ssl']) if $Config{cc} =~ /gcc/;
         @pairs = (['libeay32','ssleay32'],['libeay32MD','ssleay32MD'],['libeay32MT','ssleay32MT'],['libcrypto','libssl'],['crypto','ssl']) if $Config{cc} =~ /cl/;
-        for my $dir (@{$opts->{lib_paths}}) {
+        FOUND: for my $dir (@{$opts->{lib_paths}}) {
           for my $p (@pairs) {
             $found = 1 if ($Config{cc} =~ /gcc/ && -f "$dir/lib$p->[0].a" && -f "$dir/lib$p->[1].a");
             $found = 1 if ($Config{cc} =~ /cl/ && -f "$dir/$p->[0].lib" && -f "$dir/$p->[1].lib");
             if ($found) {
               $opts->{lib_links} = [$p->[0], $p->[1], 'crypt32']; # Some systems need this system lib crypt32 too
               $opts->{lib_paths} = [$dir];
-              last;
+              last FOUND;
             }
           }
         }
@@ -351,12 +375,15 @@ sub find_openssl_prefix {
 	'/usr/sfw/bin/openssl'           => '/usr/sfw', # Open Solaris
 	'C:\OpenSSL\bin\openssl.exe'     => 'C:\OpenSSL',
 	'C:\OpenSSL-Win32\bin\openssl.exe'        => 'C:\OpenSSL-Win32',
+	'C:\Program Files (x86)\OpenSSL-Win32\bin\openssl.exe' => 'C:\Program Files (x86)\OpenSSL-Win32', # Shining Light 32bit OpenSSL 1.1.1w, 3.0.12, 3.1.4 and 3.2.0
+	'C:\Program Files\OpenSSL-Win64\bin\openssl.exe'       => 'C:\Program Files\OpenSSL-Win64',       # Shining Light 64bit OpenSSL 1.1.1w, 3.0.12, 3.1.4 and 3.2.0
 	$Config{prefix} . '\bin\openssl.exe'      => $Config{prefix},           # strawberry perl
 	$Config{prefix} . '\..\c\bin\openssl.exe' => $Config{prefix} . '\..\c', # strawberry perl
 	'/sslexe/openssl.exe'            => '/sslroot',  # VMS, openssl.org
 	'/ssl111$exe/openssl.exe'        => '/ssl111$root',# VMS, VSI install
 	'/ssl1$exe/openssl.exe'          => '/ssl1$root',# VMS, VSI or HPE install
 	'/ssl$exe/openssl.exe'           => '/ssl$root', # VMS, HP install
+	$Config{prefix} . '/bin/openssl' => $Config{prefix}, # Custom prefix, e.g. Termux
     );
 
     while (my $k = shift @guesses

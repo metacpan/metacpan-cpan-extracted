@@ -4,23 +4,25 @@
 
 =for html <a href="https://cpants.cpanauthors.org/dist/GDPR-IAB-TCFv2"><img src="https://cpants.cpanauthors.org/dist/GDPR-IAB-TCFv2.svg" alt='Kwalitee'/></a>
 
-=for html <a href="https://github.com/peczenyj/GDPR-IAB-TCFv2/actions/workflows/linux.yml"><img src="https://github.com/peczenyj/GDPR-IAB-TCFv2/actions/workflows/linux.yml/badge.svg" alt='tests"/></a>
+=for html <a href="https://github.com/peczenyj/GDPR-IAB-TCFv2/actions/workflows/linux.yml"><img src="https://github.com/peczenyj/GDPR-IAB-TCFv2/actions/workflows/linux.yml/badge.svg" alt='tests'/></a>
 
-=for html <a href='https://ci.appveyor.com/project/peczenyj/gdpr-iab-tcfv2'><img src='https://ci.appveyor.com/api/projects/status/p2e2478cufcdqanl?svg=true' alt='appveyor'/></a>
+=for html <a href="https://github.com/peczenyj/GDPR-IAB-TCFv2/actions/workflows/windows.yml"><img src="https://github.com/peczenyj/GDPR-IAB-TCFv2/actions/workflows/windows.yml/badge.svg" alt='tests'/></a>
 
-=for html <a href='https://coveralls.io/github/peczenyj/GDPR-IAB-TCFv2?branch=main'><img src='https://coveralls.io/repos/github/peczenyj/GDPR-IAB-TCFv2/badge.svg?branch=main' alt='Coverage Status' /></a>
+=for html <a href="https://github.com/peczenyj/GDPR-IAB-TCFv2/actions/workflows/macos.yml"><img src="https://github.com/peczenyj/GDPR-IAB-TCFv2/actions/workflows/macos.yml/badge.svg" alt='tests'/></a>
+
+=for html <a href="https://github.com/peczenyj/GDPR-IAB-TCFv2/actions/workflows/perltidy.yml"><img src="https://github.com/peczenyj/GDPR-IAB-TCFv2/actions/workflows/perltidy.yml/badge.svg" alt='tests'/></a>
+
+=for html <a href="https://github.com/peczenyj/GDPR-IAB-TCFv2/actions/workflows/perlcritic.yml"><img src="https://github.com/peczenyj/GDPR-IAB-TCFv2/actions/workflows/perlcritic.yml/badge.svg" alt='tests'/></a>
+
+=for html <a href="https://coveralls.io/github/peczenyj/GDPR-IAB-TCFv2?branch=main"><img src="https://coveralls.io/repos/github/peczenyj/GDPR-IAB-TCFv2/badge.svg?branch=main" alt='Coverage Status' /></a>
 
 =for html <a href="https://github.com/peczenyj/GDPR-IAB-TCFv2/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/GDPR-IAB-TCFv2.svg" alt='license'/></a>
 
-=for html <a href="https://metacpan.org/dist/GDPR-IAB-TCFv2"><img src="https://img.shields.io/cpan/v/GDPR-IAB-TCFv2.svg" alt='cpan'/></A>
+=for html <a href="https://metacpan.org/dist/GDPR-IAB-TCFv2"><img src="https://img.shields.io/cpan/v/GDPR-IAB-TCFv2.svg" alt='cpan'/></a>
 
 =head1 NAME
 
 GDPR::IAB::TCFv2 - Transparency & Consent String version 2 parser 
-
-=head1 VERSION
-
-Version 0.07
 
 =head1 SYNOPSIS
 
@@ -94,7 +96,84 @@ Will die if can't decode the string.
         'CLcVDxRMWfGmWAVAHCENAXCkAKDAADnAABRgA5mdfCKZuYJez-NQm0TBMYA4oCAAGQYIAAAAAAEAIAEgAA.argAC0gAAAAAAAAAAAA'
     );
 
+or
+
+    use GDPR::IAB::TCFv2;
+
+    my $consent = GDPR::IAB::TCFv2->Parse(
+        'CLcVDxRMWfGmWAVAHCENAXCkAKDAADnAABRgA5mdfCKZuYJez-NQm0TBMYA4oCAAGQYIAAAAAAEAIAEgAA.argAC0gAAAAAAAAAAAA',
+        json => {
+            verbose        => 0,
+            compact        => 1,
+            use_epoch      => 0,
+            boolean_values => [ 0, 1 ],
+            date_format    => '%Y%m%d',    # yyymmdd
+        },
+        strict => 1,
+        prefetch => 284,
+    );
+
+Parse may receive an optional hash with the following parameters:
+
+=over
+
+=item *
+
+On C<strict> mode we will validate if the version of the consent string is the version 2 (or die with an exception).
+
+The C<strict> mode is disabled by default.
+
+=item *
+
+The C<prefetch> option receives one (as scalar) or more (as arrayref) vendor ids. 
+
+This is useful when parsing a range based consent string, since we need to visit all ranges to find a particular id.
+
+=item *
+
+C<json> is hashref with the following properties used to customize the json format:
+
+=over 
+
+=item *
+
+C<verbose> changes the json encoding. By default we omit some false values such as C<vendor_consents> to create 
+a compact json representation. With C<verbose> we will present everything. See L</TO_JSON> for more details.
+
+=item *
+
+C<compact> changes the json encoding. All fields that are a mapping of something to a boolean will be changed to an array
+of all elements keys where the value is true. This affects the following fields:  C<special_features_opt_in>,
+C<purpose/consents>, C<purpose/legitimate_interests>, C<vendor/consents> and C<vendor/legitimate_interests>. See L</TO_JSON> for more details.
+
+=item *
+
+C<use_epoch> changes the json encode. By default we format the C<created> and C<last_updated> are converted to string using 
+L<ISO_8601|https://en.wikipedia.org/wiki/ISO_8601>. With C<use_epoch> we will return the unix epoch in seconds.
+See L</TO_JSON> for more details.
+
+=item *
+
+C<boolean_values> if present, expects an arrayref if two elements: the C<false> and the C<true> values to be used in json encoding.
+If omit, we will try to use C<JSON::false> and C<JSON::true> if the package L<JSON> is available, else we will fallback to C<0> and C<1>.
+
+=item *
+
+C<date_format> if present accepts two kinds of value: an C<string> (to be used on C<POSIX::strftime>) or a code reference to a subroutine that
+will be called with two arguments: epoch in seconds and nanoseconds. If omitted the format L<ISO_8601|https://en.wikipedia.org/wiki/ISO_8601> will be used
+except if the option C<use_epoch> is true.
+
+=back
+
+=back
+
 =head1 METHODS
+
+=head2 tc_string
+
+Returns the original consent string.
+
+The consent object L<GDPR::IAB::TCFv2> will call this method on string interpolations.
 
 =head2 version
 
@@ -195,7 +274,7 @@ See also: L<GDPR::IAB::TCFv2::Constants::Purpose>.
 
 =head2 purpose_one_treatment
 
-CMPs can use the PublisherCC field to indicate the legal jurisdiction the publisher is under to help vendors determine whether the vendor needs consent for Purpose 1.
+CMPs can use the C<publisher_country_code> field to indicate the legal jurisdiction the publisher is under to help vendors determine whether the vendor needs consent for Purpose 1.
 
 Returns true if Purpose 1 was NOT disclosed at all.
 
@@ -240,7 +319,14 @@ It true, there is a publisher restriction of certain type, for a given purpose i
 
     # return true if there is publisher restriction to vendor 284 regarding purpose id 1 
     # with restriction type 0 'Purpose Flatly Not Allowed by Publisher'
-    my $ok = $instance->check_publisher_restriction(1, 0, 204);
+    my $ok = $instance->check_publisher_restriction(1, 0, 284);
+
+or
+
+    my $ok = $instance->check_publisher_restriction(
+        purpose_id       => 1, 
+        restriction_type => 0,  
+        vendor_id        => 284);
 
 Version 2.0 of the Framework introduced the ability for publishers to signal restrictions on how vendors may process personal data. Restrictions can be of two types:
 
@@ -261,7 +347,9 @@ Publisher restrictions are custom requirements specified by a publisher. In orde
 =over
 
 =item 1
-Vendors must always respect a restriction signal that disallows them the processing for a specific purpose regardless of whether or not they have declared that purpose to be “flexible”.
+
+Vendors must always respect a restriction signal that disallows them the processing for a specific purpose regardless of whether or not they have declared that purpose to be "flexible".
+
 =item 2
 
 Vendors that declared a purpose with a default legal basis (consent or legitimate interest respectively) but also declared this purpose as flexible must respect a legal basis restriction if present. That means for example in case they declared a purpose as legitimate interest but also declared that purpose as flexible and there is a legal basis restriction to require consent, they must then check for the consent signal and must not apply the legitimate interest signal.
@@ -271,6 +359,114 @@ Vendors that declared a purpose with a default legal basis (consent or legitimat
 For the avoidance of doubt:
 
 In case a vendor has declared flexibility for a purpose and there is no legal basis restriction signal it must always apply the default legal basis under which the purpose was registered aside from being registered as flexible. That means if a vendor declared a purpose as legitimate interest and also declared that purpose as flexible it may not apply a "consent" signal without a legal basis restriction signal to require consent.
+
+=head2 publisher_restrictions
+
+Similar to L</check_publisher_restriction> but return an hashref of purpose => { restriction type => bool } for a given vendor.
+
+=head2 publisher_tc
+
+If the consent string has a C<Publisher TC> section, we will decode this section as an instance of L<GDPR::IAB::TCFv2::PublisherTC>.
+
+Will return undefined if there is no C<Publisher TC> section.
+
+=head2 TO_JSON
+
+Will serialize the consent object into a hash reference. The objective is to be used by L<JSON> package.
+
+With option C<convert_blessed>, the encoder will call this method.
+
+    use strict;
+    use warnings;
+    use feature qw<say>;
+
+    use JSON;
+    use DateTime;
+    use DateTimeX::TO_JSON formatter => 'DateTime::Format::RFC3339';
+    use GDPR::IAB::TCFv2;
+
+    my $consent = GDPR::IAB::TCFv2->Parse(
+        'COyiILmOyiILmADACHENAPCAAAAAAAAAAAAAE5QBgALgAqgD8AQACSwEygJyAAAAAA.argAC0gAAAAAAAAAAAA',
+        json => {
+            compact     => 1,
+            date_format => sub { # can be omitted, with DateTimeX::TO_JSON
+                my ( $epoch, $ns ) = @_;
+
+                return DateTime->from_epoch( epoch => $epoch )
+                ->set_nanosecond($ns);
+            },
+        },
+    );
+
+    my $json    = JSON->new->convert_blessed;
+    my $encoded = $json->pretty->encode($consent);
+
+    say $encoded;
+
+Outputs:
+
+    {
+        "tc_string" : "COyiILmOyiILmADACHENAPCAAAAAAAAAAAAAE5QBgALgAqgD8AQACSwEygJyAAAAAA",
+        "consent_language" : "EN",
+        "purpose" : {
+            "consents" : [],
+            "legitimate_interests" : []
+        },
+        "cmp_id" : 3,
+        "purpose_one_treatment" : false,
+        "publisher" : {
+            "consents" : [
+                2,
+                4,
+                6,
+                8,
+                9,
+                10
+            ],
+            "legitimate_interests" : [
+                2,
+                4,
+                5,
+                7,
+                10
+            ],
+            "custom_purpose" : {
+                "consents" : [],
+                "legitimate_interests" : []
+            },
+            "restrictions" : {}
+        },
+        "special_features_opt_in" : [],
+        "last_updated" : "2020-04-27T20:27:54.200000000Z",
+        "use_non_standard_stacks" : false,
+        "policy_version" : 2,
+        "version" : 2,
+        "is_service_specific" : false,
+        "created" : "2020-04-27T20:27:54.200000000Z",
+        "consent_screen" : 7,
+        "vendor_list_version" : 15,
+        "cmp_version" : 2,
+        "publisher_country_code" : "AA",
+        "vendor" : {
+            "consents" : [
+                23,
+                42,
+                126,
+                127,
+                128,
+                587,
+                613,
+                626
+            ],
+            "legitimate_interests" : []
+        }
+    }
+
+
+If L<JSON> is installed, the L</TO_JSON> method will use C<JSON::true> and C<JSON::false> as boolean value.
+
+By default it returns a compacted format where we omit the C<false> on fields like C<vendor_consents> and we convert the dates 
+using L<ISO_8601|https://en.wikipedia.org/wiki/ISO_8601>. This behaviour can be changed by extra option in the L<Parse> constructor.
 
 =head1 FUNCTIONS
 
@@ -285,6 +481,10 @@ The original documentation of the L<TCF v2 from IAB documentation|https://github
 =head1 AUTHOR
 
 Tiago Peczenyj L<mailto:tiago.peczenyj+gdpr-iab-tcfv2@gmail.com>
+
+=head1 THANKS
+
+Special thanks to L<ikegami|https://metacpan.org/author/IKEGAMI> for the patience on several question about Perl on L<Stack Overflow|https://stackoverflow.com>.
 
 =head1 BUGS
 

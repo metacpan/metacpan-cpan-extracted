@@ -1,10 +1,10 @@
 {
    "abstract" : "test functions for particular variable types",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -54,10 +54,10 @@
       "homepage" : "https://github.com/briandfoy/test-data",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/test-data.git",
+         "url" : "https://github.com/briandfoy/test-data",
          "web" : "https://github.com/briandfoy/test-data"
       }
    },
-   "version" : "1.244",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "1.245",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,4 +1,4 @@
-require 5.004;
+require 5.006; # uses 'our'
 use strict;
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ WriteMakefile(
     },
     dist => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     ( $ExtUtils::MakeMaker::VERSION >= 6.3002 ? ( 'LICENSE' => 'perl', ) : () ),
-    ( $] >= 5.008 && $] < 5.011 ) ? ( INSTALLDIRS => 'perl' ) : (),
+    INSTALLDIRS => ( $] < 5.011 ? 'perl' : 'site' ),
 
     # If under a version with Maketext in core, overwrite that core file.
     META_MERGE => {
@@ -28,8 +28,15 @@ WriteMakefile(
 );
 
 sub MY::postamble {
-    return <<'MAKE_FRAG';
-.PHONY: tags critic
+    # .PHONY is not portable
+    my $self = shift;
+    my $phony_line = $self->can('is_make_type')
+                     && ($self->is_make_type('gmake')
+                         || $self->is_make_type('bsdmake'))
+                     ? '.PHONY: tags critic'
+                     : '';
+
+    return "$phony_line\n\n" . <<'MAKE_FRAG';
 
 tags:
 	ctags -f tags --recurse --totals \

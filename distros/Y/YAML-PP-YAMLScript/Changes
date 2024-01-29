@@ -1,2 +1,5 @@
+0.0.2 Fri Dec 29 10:09:28 AM PST 2023
+ - Use YAMLScript::Lingy instead of YAMLScript for now
+
 0.0.1 Tue Jul 11 07:40:19 AM EDT 2023
  - Initial release

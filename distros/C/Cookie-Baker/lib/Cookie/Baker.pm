@@ -7,7 +7,7 @@ use base qw/Exporter/;
 use URI::Escape;
 
 BEGIN {
-    our $VERSION = "0.11";
+    our $VERSION = "0.12";
     our @EXPORT = qw/bake_cookie crush_cookie/;
     my $use_pp = $ENV{COOKIE_BAKER_PP};
     if (!$use_pp) {
@@ -33,6 +33,11 @@ sub bake_cookie {
 
     return '' unless defined $val;
     my %args = ref $val ? %{$val} : (value => $val);
+    if ($args{partitioned}) {
+        # enforce SameSite=None; and secure; on CHIPS (Cookies Having Independent Partitioned State)
+        $args{samesite} = 'none';
+        $args{secure} = 1;
+    }
     $name = URI::Escape::uri_escape($name) if $name =~ m![^a-zA-Z\-\._~]!;
     my $cookie = "$name=" . URI::Escape::uri_escape($args{value}) . '; ';
     $cookie .= 'domain=' . $args{domain} . '; '  if $args{domain};
@@ -40,10 +45,14 @@ sub bake_cookie {
     $cookie .= 'expires=' . _date($args{expires}) . '; ' if exists $args{expires} && defined $args{expires};
     $cookie .= 'max-age=' . $args{"max-age"} . '; ' if exists $args{"max-age"};
     if (exists $args{samesite} && $args{samesite} =~ m/^(?:lax|strict|none)/i) {
-        $cookie .= 'SameSite=' . ucfirst(lc($args{samesite})) . '; '
+        $cookie .= 'SameSite=' . ucfirst(lc($args{samesite})) . '; ';
+        # secure flag must be set when SameSite=None
+        $args{secure} = 1 if $cookie =~ m/SameSite=None; /;
     }
     $cookie .= 'secure; '                     if $args{secure};
     $cookie .= 'HttpOnly; '                   if $args{httponly};
+    $cookie .= 'Partitioned; '                if $args{partitioned};
+
     substr($cookie,-2,2,'');
     $cookie;
 }
@@ -167,6 +176,11 @@ Cookie's value.
 =item domain
 
 Cookie's domain.
+
+=item partitioned
+
+If true, sets Partitioned flag, and also enforces secure, SameSite=None. false by default.
+L<Cookies Having Independent Partitioned State specification|https://www.ietf.org/archive/id/draft-cutler-httpbis-partitioned-cookies-00.html>
 
 =item expires
 

@@ -153,7 +153,7 @@ use MIME::Parser::Results;
 #------------------------------
 
 ### The package version, both in 1.23 style *and* usable by MakeMaker:
-$VERSION = "5.510";
+$VERSION = "5.513";
 
 ### How to catenate:
 $CAT = '/bin/cat';
@@ -164,7 +164,26 @@ $CRLF = "\015\012";
 ### Who am I?
 my $ME = 'MIME::Parser';
 
+# The presence of more than one of the following headers
+# in a given MIME entity could indicate an ambiguous parse
+# and hence a security risk
 
+my $singleton_headers =
+    [
+     'content-type',
+     'content-disposition',
+     'content-transfer-encoding',
+     'content-id',
+    ];
+
+# The presence of a duplicated parameters in one of the following
+# headers in a given MIME entity could indicate an ambiguous parse and
+# hence a security risk
+my $singleton_parameter_headers =
+    [
+     'content-type',
+     'content-disposition',
+    ];
 
 #------------------------------------------------------------
 
@@ -221,6 +240,7 @@ sub init {
     $self->{MP5_UUDecode}        = 0;
     $self->{MP5_MaxParts}        = -1;
     $self->{MP5_TmpDir}          = undef;
+    $self->{MP5_AmbiguousContent} = 0;
 
     $self->interface(ENTITY_CLASS => 'MIME::Entity');
     $self->interface(HEAD_CLASS   => 'MIME::Head');
@@ -249,6 +269,7 @@ sub init_parse {
     $self->{MP5_Filer}->purgeable([]);
     $self->{MP5_Filer}->init_parse();
     $self->{MP5_NumParts} = 0;
+    $self->{MP5_AmbiguousContent} = 0;
     1;
 }
 
@@ -1040,6 +1061,24 @@ sub process_part {
     my ($type, $subtype) = (split('/', $head->mime_type, -1), '');
     $self->debug("type = $type, subtype = $subtype");
 
+    if (!$self->{MP5_AmbiguousContent}) {
+        foreach my $hdr (@$singleton_headers) {
+            if ($head->count($hdr) > 1) {
+                $self->{MP5_AmbiguousContent} = 1;
+                last;
+            }
+        }
+    }
+
+    if (!$self->{MP5_AmbiguousContent}) {
+        foreach my $hdr (@$singleton_parameter_headers) {
+            if ($head->mime_attr($hdr . '.@duplicate_parameters')) {
+                $self->{MP5_AmbiguousContent} = 1;
+                last;
+            }
+        }
+    }
+
     ### Handle, according to the MIME type:
     if ($type eq 'multipart') {
 	return undef unless defined($self->process_multipart($in, $rdr, $ent));
@@ -1732,6 +1771,31 @@ sub last_error {
     join '', shift->results->errors;
 }
 
+=item ambiguous_content
+
+I<Instance method.>
+Returns true if the most recently parsed message has one or more of
+the following properties:
+
+=over 4
+
+More than one Content-Type, Content-ID, Content-Transfer-Encoding or
+Content-Disposition header.
+
+A Content-Type or Content-Disposition header contains a repeated
+parameter.
+
+=back
+
+Messages with ambiguous content should be treated as a security risk.
+In particular, if MIME::Parser is used in an email security tool,
+ambiguous messages should not be delivered to end-users.
+
+=cut
+sub ambiguous_content {
+    my ($self) = @_;
+    return $self->{MP5_AmbiguousContent};
+}
 
 #------------------------------
 

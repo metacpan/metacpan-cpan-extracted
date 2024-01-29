@@ -20,13 +20,13 @@ name: Thread-CSP
 provides:
   Thread::CSP:
     file: lib/Thread/CSP.pm
-    version: '0.011'
+    version: '0.013'
   Thread::CSP::Channel:
     file: lib/Thread/CSP/Channel.pm
-    version: '0.011'
+    version: '0.013'
   Thread::CSP::Promise:
     file: lib/Thread/CSP/Promise.pm
-    version: '0.011'
+    version: '0.013'
 requires:
   XSLoader: '0'
   perl: '5.008001'
@@ -35,7 +35,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/threads-csp/issues
   repository: git://github.com/Leont/threads-csp.git
-version: '0.011'
+version: '0.013'
 x_generated_by_perl: v5.38.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

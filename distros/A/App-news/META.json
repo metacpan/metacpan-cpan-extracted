@@ -34,7 +34,7 @@
          "requires" : {
             "DateTime::Format::Mail" : "0",
             "Modern::Perl" : "1.20180701",
-            "Mojolicious" : "0",
+            "Mojolicious" : "9",
             "perl" : "5.026000"
          }
       }
@@ -47,6 +47,6 @@
          "web" : "https://alexschroeder.ch/cgit/news/about/"
       }
    },
-   "version" : 1.07,
+   "version" : 1.09,
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

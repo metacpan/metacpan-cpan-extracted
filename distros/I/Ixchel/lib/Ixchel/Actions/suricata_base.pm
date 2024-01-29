@@ -8,26 +8,35 @@ use YAML::XS qw(Dump);
 use Ixchel::functions::file_get;
 use YAML::yq::Helper;
 use File::Temp qw/ tempfile  /;
+use base 'Ixchel::Actions::base';
 
 =head1 NAME
 
-Ixchel::Actions::suricata_base :: Reels in the base Suricata config and uses it for generating the base config for each instance.
+Ixchel::Actions::suricata_base - Reels in the base Suricata config and uses it for generating the base config for each instance.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.4.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.4.0';
 
-=head1 SYNOPSIS
+=head1 CLI SYNOPSIS
+
+ixchel -a suricata_base [B<-d> <base_dir>]
+
+ixchel -a suricata_base B<-w> [B<-o> <file>] [B<--np>] [B<-d> <base_dir>]
+
+=head1 CODE SYNOPSIS
 
     use Data::Dumper;
 
     my $results=$ixchel->action(action=>'suricata_base', opts=>{np=>1, w=>1, });
 
     print Dumper($results);
+
+=head1 DESCRIPTION
 
 This will fetch the file specied via .suricata.base_config in the config. This is
 a URL to the config file to use, by default it is
@@ -37,18 +46,17 @@ This will be fetched using proxies as defined under .proxy .
 
 The following keys are removed.
 
-   .logging
+   .logging.outputs
    .outputs
    .af-packet
    .pcap
    .include
    .rule-files
+   .af-xdp
+   .dpdk
+   .sensor-name
 
 =head1 FLAGS
-
-=head2 --np
-
-Do not print the status of it.
 
 =head2 -w
 
@@ -58,6 +66,10 @@ Write the generated services to service files.
 
 A instance to operate on.
 
+=head2 -d <base_dir>
+
+Use this as the base dir instead of .suricata.config_base from the config.
+
 =head1 RESULT HASH REF
 
     .errors :: A array of errors encountered.
@@ -66,65 +78,25 @@ A instance to operate on.
 
 =cut
 
-sub new {
-	my ( $empty, %opts ) = @_;
+sub new_extra { }
 
-	my $self = {
-		config  => {},
-		vars    => {},
-		arggv   => [],
-		opts    => {},
-		results => {
-			errors => [],
-			status => '',
-			ok     => 0,
-		},
-	};
-	bless $self;
-
-	if ( defined( $opts{config} ) ) {
-		$self->{config} = $opts{config};
-	}
-
-	if ( defined( $opts{t} ) ) {
-		$self->{t} = $opts{t};
-	} else {
-		die('$opts{t} is undef');
-	}
-
-	if ( defined( $opts{share_dir} ) ) {
-		$self->{share_dir} = $opts{share_dir};
-	}
-
-	if ( defined( $opts{opts} ) ) {
-		$self->{opts} = \%{ $opts{opts} };
-	}
-
-	if ( defined( $opts{argv} ) ) {
-		$self->{argv} = $opts{argv};
-	}
-
-	if ( defined( $opts{vars} ) ) {
-		$self->{vars} = $opts{vars};
-	}
-
-	if ( defined( $opts{ixchel} ) ) {
-		$self->{ixchel} = $opts{ixchel};
-	}
-
-	return $self;
-} ## end sub new
-
-sub action {
+sub action_extra {
 	my $self = $_[0];
 
-	$self->{results} = {
-		errors => [],
-		status => '',
-		ok     => 0,
-	};
+	my $config_base;
+	if ( !defined( $self->{opts}{d} ) ) {
+		$config_base = $self->{config}{suricata}{config_base};
+	} else {
+		if ( !-d $self->{opts}{d} ) {
+			$self->status_add(
+				status => '-d, "' . $self->{opts}{d} . '" is not a directory',
+				error  => 1
+			);
 
-	my $config_base = $self->{config}{suricata}{config_base};
+			return undef;
+		}
+		$config_base = $self->{opts}{d};
+	} ## end else [ if ( !defined( $self->{opts}{d} ) ) ]
 
 	my $base_config_url = $self->{config}{suricata}{base_config};
 
@@ -134,29 +106,17 @@ sub action {
 			status =>
 				'The config value .config.base_config is undef. It should be the value for URL to fetch it from'
 		);
-		return $self->{results};
+		return undef;
 	}
 
 	my $base_config_raw;
 	eval {
-		if ( defined( $self->{config}{proxy}{ftp} ) && $self->{config}{proxy}{ftp} ne '' ) {
-			$ENV{FTP_PROXY} = $self->{config}{proxy}{ftp};
-			$self->status_add( status => 'FTP_PROXY=' . $self->{config}{proxy}{ftp} );
-		}
-		if ( defined( $self->{config}{proxy}{http} ) && $self->{config}{proxy}{http} ne '' ) {
-			$ENV{HTTP_PROXY} = $self->{config}{proxy}{http};
-			$self->status_add( status => 'HTTP_PROXY=' . $self->{config}{proxy}{http} );
-		}
-		if ( defined( $self->{config}{proxy}{https} ) && $self->{config}{proxy}{https} ne '' ) {
-			$ENV{HTTPS_PROXY} = $self->{config}{proxy}{https};
-			$self->status_add( status => 'HTTPS_PROXY=' . $self->{config}{proxy}{https} );
-		}
 		$self->status_add( status => 'Fetching ' . $base_config_url );
 		$base_config_raw = file_get( url => $base_config_url );
 	};
 	if ($@) {
 		$self->status_add( error => 1, status => 'Fetch Error... ' . $@ );
-		return $self->{results};
+		return undef;
 	}
 
 	# rebuild the file
@@ -195,7 +155,11 @@ sub action {
 	# remove unwanted paths
 	#
 	#
-	my @to_remove = ( '.logging.outputs', '.outputs', '.af-packet', '.pcap', '.include', '.rule-files' );
+	my @to_remove = (
+		'.logging.outputs', '.outputs',     '.af-packet', '.pcap',
+		'.include',         '.rule-files',  '.af-xdp',    '.napatech',
+		'.dpdk',            '.sensor-name', '.nflog',     '.netmap'
+	);
 	eval {
 		my ( $tnp_fh, $tmp_file ) = tempfile();
 		write_file( $tmp_file, $base_config_raw );
@@ -211,7 +175,7 @@ sub action {
 	};
 	if ($@) {
 		$self->status_add( error => 1, status => 'Errored removing paths... ' . $@ );
-		return $self->{results};
+		return undef;
 	}
 	$new_status = 'Path removal finished';
 	if ( $self->{opts}{pr} ) {
@@ -233,8 +197,35 @@ sub action {
 			@instances = keys( %{ $self->{config}{suricata}{instances} } );
 		}
 		foreach my $instance (@instances) {
+			eval {
+				my ( $tnp_fh, $tmp_file ) = tempfile();
+				write_file( $tmp_file, $base_config_raw );
 
-		}
+				my @include_paths = (
+					$config_base . '/' . $instance . '-include.yaml',
+					$config_base . '/' . $instance . '-outputs.yaml',
+				);
+
+				my $yq = YAML::yq::Helper->new( file => $tmp_file );
+				if ( $yq->is_array( var => '.include' ) ) {
+					$yq->set_array( var => '.include', vals => \@include_paths );
+				} else {
+					$yq->create_array( var => '.include', vals => \@include_paths );
+				}
+
+				$self->status_add( status => 'Adding .include finished' );
+
+				$base_config_raw = read_file($tmp_file);
+				$self->status_add( status => "Config... \n" . $base_config_raw );
+				if ( $self->{opts}{w} ) {
+					$self->status_add(
+						status => 'Writing out to ' . $config_base . '/suricata-' . $instance . '.yaml' );
+					write_file( $config_base . '/suricata-' . $instance . '.yaml', $base_config_raw );
+				}
+
+				unlink($tmp_file);
+			} ## end eval
+		} ## end foreach my $instance (@instances)
 	} elsif ( defined( $self->{opts}{i} ) && !$self->{config}{suricata}{multi_instance} ) {
 		$self->status_add(
 			error  => 1,
@@ -254,46 +245,28 @@ sub action {
 				$yq->create_array( var => '.include', vals => \@include_paths );
 			}
 
+			$self->status_add( status => 'Adding .include finished' );
+
 			$base_config_raw = read_file($tmp_file);
-			if ($self->{opts}{w}) {
+			$self->status_add( status => "Config... \n" . $base_config_raw );
+			if ( $self->{opts}{w} ) {
+				$self->status_add( status => 'Writing out to ' . $config_base . '/suricata.yaml' );
 				write_file( $config_base . '/suricata.yaml', $base_config_raw );
 			}
+
+			unlink($tmp_file);
 		};
 		if ($@) {
-			$self->status_add( error => 1, status => 'Errored adding in include paths or writing file out(if asked)... ' . $@ );
-			return $self->{results};
-		} else {
-			$new_status = 'Adding .include finished';
-			if ( $self->{opts}{pi} ) {
-				$new_status = $new_status . "...\n" . $base_config_raw;
-			}
-			$self->status_add( status => $new_status );
+			$self->status_add(
+				error  => 1,
+				status => 'Errored adding in include paths or writing file out(if asked)... ' . $@
+			);
+			return undef;
 		}
 	} ## end else [ if ( $self->{config}{suricata}{multi_instance...})]
 
-	if ( !defined( $self->{results}{errors}[0] ) ) {
-		$self->{results}{ok} = 1;
-	}
-
-	return $self->{results};
-} ## end sub action
-
-sub help {
-	return 'Generates the instance specific include for a suricata instance.
-
---np          Do not print the status of it.
-
--w            Write the generated includes out.
-
--i <instance> A instance to operate on.
-
--pp           Include the config in the status post initial processing.
-
--pr           Include the config in the status post paths removal.
-
--pi           Include the config in the status post adding includes.
-';
-} ## end sub help
+	return undef;
+} ## end sub action_extra
 
 sub short {
 	return 'Reels in the base Suricata config and uses it for generating the base config for each instance.';
@@ -301,41 +274,12 @@ sub short {
 
 sub opts_data {
 	return 'i=s
-np
 w
 pp
 pr
 pi
+d=s
 ';
 }
-
-sub status_add {
-	my ( $self, %opts ) = @_;
-
-	if ( !defined( $opts{status} ) ) {
-		return;
-	}
-
-	if ( !defined( $opts{error} ) ) {
-		$opts{error} = 0;
-	}
-
-	if ( !defined( $opts{type} ) ) {
-		$opts{type} = 'suricata_base';
-	}
-
-	my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) = localtime(time);
-	my $timestamp = sprintf( "%04d-%02d-%02dT%02d:%02d:%02d", $year + 1900, $mon + 1, $mday, $hour, $min, $sec );
-
-	my $status = '[' . $timestamp . '] [' . $opts{type} . ', ' . $opts{error} . '] ' . $opts{status};
-
-	print $status. "\n";
-
-	$self->{results}{status} = $self->{results}{status} . $status;
-
-	if ( $opts{error} ) {
-		push( @{ $self->{results}{errors} }, $opts{status} );
-	}
-} ## end sub status_add
 
 1;

@@ -62,7 +62,7 @@ sub check {
     }
     my $content = $resp->decoded_content;
     if ( !$content or $content eq 'null' ) {
-        $self->userLogger->info("$ip isn't known by CrowsSec");
+        $self->userLogger->info("$ip isn't known by CrowdSec");
         return PE_OK;
     }
     my $json_hash;

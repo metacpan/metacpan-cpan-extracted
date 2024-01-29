@@ -2,6 +2,7 @@
 .gitignore
 bin/convert-pheno
 Changes
+CITATION.cff
 cpanfile
 Dockerfile
 lib/Convert/Pheno.pm

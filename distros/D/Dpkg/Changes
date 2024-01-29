@@ -1,3 +1,139 @@
+dpkg (1.22.4) unstable; urgency=medium
+
+  [ Guillem Jover ]
+  * Code internals:
+    - dpkg: Rename r variable for readlink() return value to symlink_len.
+    - dpkg: Rename r variable for fd_read() return value to n.
+    - dpkg-deb: Rename r variable for fd_read() return value to nread.
+    - dpkg-deb: Rename r variables for fd_read() call chain return value to rc.
+    - dpkg-split: Rename r variable for strtoimax() return value to ret.
+    - libdpkg: Rename r variable for path_quote_filename() return to ret.
+    - libdpkg: Rename r variable for fclose() return value to rc.
+    - libdpkg: Rename r variables for printf()-like return values to n.
+    - libdpkg: Handle tar long GNU names and links not being NUL terminated.
+      Closes: #1061404
+    - perl: Use qw() when importing symbols.
+    - dpkg-gensymbols: Move foreach inlined array elements into a list.
+    - dpkg-scansources: Fix newline breaks for ternary operators.
+  * Packaging:
+    - Update copyright years.
+
+ -- Guillem Jover <guillem@debian.org>  Wed, 24 Jan 2024 13:12:31 +0100
+
+dpkg (1.22.3) experimental; urgency=medium
+
+  [ Guillem Jover ]
+  * dpkg-buildtree: New program.
+  * Perl modules:
+    - Dpkg::Vendor::Debian: Parametrize fortify level.
+    - Dpkg::Vendor::Ubuntu: Default to fortify level 3.
+    - Dpkg::OpenPGP::Backend::SOP: Add reference to another gosop blocker.
+    - Dpkg::OpenPGP::Backend::GnuPG: Accept keybox format keyrings as-is.
+    - Dpkg::OpenPGP::Backend: Remove unused strict_verify option.
+    - Dpkg::OpenPGP::Backend::GnuPG: Look harder for trustedkeys keyring.
+    - Dpkg::Changelog::Debian: Remove wrong import arguments.
+    - Dpkg::Vendor::Debian: Split bug-implicit-func from bug feature in qa
+      area.
+  * Documentation:
+    - man: Use semantic line breaks (must requirements).
+    - man: Remove trailing full stop before parenthetical.
+    - man: Use «package maintainer script» instead of «Debian package
+      scripts».
+  * Code internals:
+    - libcompat: Make long_options array const.
+  * Packaging:
+    - Make the logdir variable local to its function in postrm.
+    - Install start-stop-daemon under /usr/sbin. Closes: #1059982
+    - Make get_vendor honor DEB_VENDOR environment variable.
+    - Check for usrmerge in bug-script on the same vendors as postinst.
+    - Do not install dpkg-fsys-usrunmess on Debian and Ubuntu.
+  * Localization:
+    - Fix L<> markup.
+    - Unfuzzy translations after semantic line break changes.
+    - Update Dutch man pages translation.
+      Thanks to Frans Spiesschaert <Frans.Spiesschaert@yucom.be>.
+      Closes: #1061085
+    - Update Swedish translations.
+      Thanks to Peter Krefting <peter@softwolves.pp.se>. Closes: #1059527
+
+  [ Helge Kreutzmann ]
+  * Localization:
+    - Update German man pages translation.
+    - Update German scripts translation.
+
+ -- Guillem Jover <guillem@debian.org>  Fri, 19 Jan 2024 12:10:52 +0100
+
+dpkg (1.22.2) unstable; urgency=medium
+
+  [ Guillem Jover ]
+  * dpkg-shlibdeps: Do not require debian/control when parsing CLI options.
+    Closes: #1055536
+  * Architecture support:
+    - Remove arm64ilp32 support.
+      See https://lists.debian.org/debian-dpkg/2023/11/msg00007.html.
+    - Remove uclinux support.
+      See https://lists.debian.org/debian-dpkg/2023/11/msg00012.html.
+    - Remove knetbsd-any support.
+    - Restrict kfreebsd ports to amd64 and i386.
+    - Restrict kopensolaris ports to amd64 and i386.
+    - Restrict hurd ports to amd64 and i386.
+    - Restrict dragonflybsd ports to amd64.
+    - Restrict aix ports to powerpc and ppc64.
+    - Restrict solaris ports to amd64, i386, sparc and sparc64.
+    - Restrict darwin ports to amd64, arm, arm64, i386, powerpc and ppc64.
+    - Restrict freebsd ports to amd64, arm, arm64, i386, powerpc, ppc64, riscv.
+    - Split tupletable header names description into two paragraphs.
+  * Perl modules:
+    - Dpkg::OpenPGP::Backend::Sequoia: Switch to use --signer-file.
+    - Dpkg::Vendor::Debian: Mask PIE for alpha and ia64. Closes: #1040062
+    - Dpkg::Control::Types: Add aliases for type enumerations.
+  * Documentation:
+    - man: Add dpkg-build-api behavior for Rules-Requires-Root field defaults.
+    - man: Improve description for dpkg-build-api v1 items.
+    - doc, man: Clarify terminology for Debian control files.
+  * Code internals:
+    - libcompat: Disable VLA usage for gettext.h.
+    - libdpkg: Remove dead code after non-returning error function call.
+    - libdpkg: Mark varbuf constructor as explicit.
+    - Reduce variables scope.
+    - update-alternatives: Wrap the bad_format() function pointer call into a
+      new function.
+    - start-stop-daemon: Rename local variables shadowing global info()
+      function name.
+    - libdpkg: Add underscore after NO to FHFF_NONEW and FHFF_NOCOPY enum
+      values.
+    - Use FHFF_NONE instead of a literal 0 in calls to fsys_hash_find_node().
+      Reported by Alexandre Detiste <alexandre.detiste@gmail.com>.
+    - dpkg-split: Change heading print logic to use a proper boolean.
+    - dpkg-shlibdeps: Defer add_library_dir() calls after option parsing.
+    - libdpkg: Remove unused DEFAULTSHELL and DEFAULTPAGER macros.
+    - dpkg-buildapi: Do not include newline in Usage text to be translated.
+  * Build system:
+    - Check whether we need to linkg against libtinfo explicitly.
+    - Add support for structured procfs via struct psinfo.
+    - Replace action-if-found with : for extra libselinux check.
+    - Check and print sizeof off_t and time_t on the configure summary.
+  * Packaging:
+    - Use installtest instead of test target in autopkgtests.
+  * Test suite:
+    - Reorder check on whether pkg is NULL.
+    - Split and sort cppcheck arguments to be one per line.
+    - Remove unused cppcheck suppressions.
+    - Improve cppcheck coverage.
+    - Pass -I<builddir> to cppcheck instead of «.» if <builddir> is defined.
+  * Localization:
+    - Update Catalan translations.
+    - Update Dutch translations.
+      Thanks to Frans Spiesschaert <Frans.Spiesschaert@yucom.be>.
+      Closes: #1058631, #1058637
+
+  [ Helge Kreutzmann ]
+  * Localization:
+    - Update German man pages translation.
+    - Update German scripts translation.
+
+ -- Guillem Jover <guillem@debian.org>  Mon, 18 Dec 2023 03:37:08 +0100
+
 dpkg (1.22.1) unstable; urgency=medium
 
   [ Guillem Jover ]

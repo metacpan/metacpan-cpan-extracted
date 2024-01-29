@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mgh - Package for language Makhuwa-Meetto
 
 package Locale::CLDR::Locales::Mgh;
 # This file auto generated from Data\common\main\mgh.xml
-#	on Tue  5 Dec  1:20:56 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'Ikan',
@@ -89,7 +89,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Uandora',
  			'AF' => 'Ufugustani',
@@ -165,7 +165,6 @@ has 'display_name_region' => (
  			'LY' => 'Ulibya',
  			'ME' => 'Umantegro',
  			'MG' => 'Ubukini',
- 			'MK' => 'Umasedonia',
  			'MW' => 'Umalawi',
  			'MZ' => 'Umozambiki',
  			'NE' => 'Unijeri',
@@ -245,7 +244,7 @@ has 'characters' => (
 			auxiliary => qr{[q x]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
 			main => qr{[a b c d e f g h i j k l m n o p r s t u v w y z]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT

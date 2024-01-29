@@ -22,7 +22,7 @@ use namespace::autoclean;
 # RECOMMEND PREREQ: Ref::Util::XS
 # RECOMMEND PREREQ: Type::Tiny::XS
 
-our $VERSION = 'v0.7.0';
+our $VERSION = 'v0.7.1';
 
 
 has host => (
@@ -227,7 +227,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 =head1 VERSION
 
-version v0.7.0
+version v0.7.1
 
 =head1 SYNOPSIS
 
@@ -243,7 +243,7 @@ version v0.7.0
 
     $stats->increment('this.counter');
 
-    $stats->set_add( $username ) if $username;
+    $stats->set_add( 'this.users', $username ) if $username;
 
     $stats->timing( $run_time * 1000 );
 

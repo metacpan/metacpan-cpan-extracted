@@ -200,6 +200,16 @@ my $tests =
             second => 30,
             offset => 32400,
         },
+        q{2001-03-12 17:07+JST} =>
+        {
+            year => 2001,
+            month => 3,
+            day => 12,
+            hour => 17,
+            minute => 7,
+            second => 00,
+            offset => 32400,
+        },
         q{03/Feb/1994:00:00:00 0000} =>
         {
             year => 1994,

@@ -132,27 +132,20 @@ sub join {
   my $source = bless {__schema => $schema}, $meta_source->class;
   my @stmt_args = ($source, -where => \%criteria);
 
-  # keep a reference to @left_cols so that Source::join can bind them
-  push @stmt_args, -_left_cols => \@left_cols;
-
   # TODO: should add -select_as => 'firstrow' if all multiplicities are 1
 
   # build and return the new statement
   my $statement = $meta_schema->statement_class->new(@stmt_args);
 
   if (!$self->_is_called_as_class_method) { # called as instance method
-    my $left_cols = $statement->{args}{-_left_cols}
-      or die "statement had no {left_cols} entry";
-
     # check that all foreign keys are present
-    my $missing = join ", ", grep {not exists $self->{$_}} @$left_cols;
+    my $missing = join ", ", grep {not exists $self->{$_}} @left_cols;
     not $missing
       or croak "cannot follow role '$first_role': missing column '$missing'";
 
     # bind to foreign keys
-    $statement->bind(map {($_ => $self->{$_})} @$left_cols);
+    $statement->bind(map {($_ => $self->{$_})} @left_cols);
   }
-
 
   return $statement;
 }

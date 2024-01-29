@@ -12,7 +12,8 @@ on 'test' => sub {
     requires 'JSON', '0';
     requires 'Test::Requires';
     requires 'File::Temp';
-    requires 'Mock::Quick'
+    requires 'Mock::Quick';
+    requires 'URI::db';
 };
 
 on 'develop' => sub {

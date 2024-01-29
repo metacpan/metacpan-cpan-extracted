@@ -43,9 +43,10 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.213';
+our $VERSION = '1.214';
 
 use Filesys::SmbClient ();
+use Quiq::Path;
 
 # -----------------------------------------------------------------------------
 
@@ -269,6 +270,49 @@ sub ls {
 
 # -----------------------------------------------------------------------------
 
+=head3 put() - Übertrage Datei auf Server
+
+=head4 Synopsis
+
+  $smb->put($from,$to);
+
+=head4 Arguments
+
+=over 4
+
+=item $from
+
+(String) Pfad der Quelldatei.
+
+=item $to
+
+(String) Pfad der Zieldatei
+
+=back
+
+=head4 Description
+
+Kopiere Datei $from nach $to.
+
+=head4 Example
+
+  $smb->put('test.xls','smb://zeppelin.corp/zbm/Transfer/elbrusfse/test.xls');
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub put {
+    my ($self,$from,$to) = @_;
+
+    my $data = Quiq::Path->read($from);
+    $self->putData($data,$to);
+    
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 putData() - Übertrage Daten auf Server
 
 =head4 Synopsis
@@ -295,7 +339,7 @@ Schreibe Datei $file mit Inhalt $data.
 
 =head4 Example
 
-  $smb->put($data,'smb://ZBM-MOM-T/XRECHNUNG$/S-001191090X_Original.pdf');
+  $smb->putData($data,'smb://ZBM-MOM-T/XRECHNUNG$/S-001191090X_Original.pdf');
 
 =cut
 
@@ -378,7 +422,7 @@ sub rename {
 
 =head1 VERSION
 
-1.213
+1.214
 
 =head1 AUTHOR
 
@@ -386,7 +430,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2023 Frank Seitz
+Copyright (C) 2024 Frank Seitz
 
 =head1 LICENSE
 

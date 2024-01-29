@@ -1,7 +1,7 @@
+use v5.36;
+
 package App::Gimei::Runner;
 
-use warnings;
-use v5.22;
 binmode STDOUT, ":utf8";
 
 use Getopt::Long;
@@ -60,15 +60,15 @@ sub execute {
         push @args, 'name:kanji';
     }
 
-    my @generators = App::Gimei::Parser::parse_args( @args );
-    
-    semantic_analysis( @generators );
+    my @generators = App::Gimei::Parser::parse_args(@args);
+
+    semantic_analysis(@generators);
 
     foreach ( 1 .. $opts{n} ) {
-	my ( @words, %cache );
-	foreach my $g (@generators) {
-	    push @words, $g->execute( \%cache );
-	}
+        my ( @words, %cache );
+        foreach my $g (@generators) {
+            push @words, $g->execute( \%cache );
+        }
         say join $opts{sep}, @words;
     }
 
@@ -76,12 +76,12 @@ sub execute {
 }
 
 sub semantic_analysis {
-    my ( @generators ) = @_;
-    
+    my (@generators) = @_;
+
     foreach my $gen (@generators) {
-	if ($gen->word_class eq 'Data::Gimei::Address' && $gen->render eq 'romaji') {
-	    die "Error: rendering romaji is not supported for address\n";
-	}
+        if ( $gen->word_class eq 'Data::Gimei::Address' && $gen->render eq 'romaji' ) {
+            die "Error: rendering romaji is not supported for address\n";
+        }
     }
 }
 

@@ -1,3 +1,8 @@
+0.091   2024-01-10  Released-By: PERLANCAR; Urgency: medium
+
+        - Allow 16-digit NPWP and check NIK as NPWP.
+
+
 0.090   2019-11-21  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.
@@ -25,7 +30,7 @@
 	  dependencies on our dist.
 
 
-0.05     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.05     2014-08-16  Released-By: SHARYANTO; Message: Happy 19th CPAN Day!
 
          - Add CLI script(s).
 

@@ -1,3 +1,8 @@
+0.03 2024-01-06T14:08:39+01:00
+ - Add basic tests.
+ - Add screenshot of example app to doc.
+ - Update copyright years.
+
 0.02 2023-06-27T01:50:29+02:00
  - Add support of autofocus.
  - Improve and fix example in doc.

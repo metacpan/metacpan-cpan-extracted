@@ -1,3 +1,6 @@
+0.89 Sat 27 Jan 2024 01:44:08 AM CET
+ - Recognise core booleans on Perl 5.36+ at dump time (PR#114 PEVANS++)
+
 0.88 Fri May 12 05:28:05 AM PDT 2023
  - REVERT "Turn off internal POK flag for number scalars"
 
@@ -29,7 +32,7 @@
  - Breaking Change: Set $YAML::XS::LoadBlessed default to false to make it
    more secure
 
-0.8 Thu 22 Aug 2019 01:17:13 PM CEST
+0.80 Thu 22 Aug 2019 01:17:13 PM CEST
  - Fix memory leak when loading invalid YAML (PR#93 tinita)
 
 0.79 Tue 11 Jun 2019 09:35:22 PM CEST
@@ -65,7 +68,7 @@
  - When disabling $LoadBlessed, return scalars not refs (tinita)
  - Save anchors also for blessed scalars (tinita)
 
-0.7 Sat Jun  9 21:53:05 CEST 2018
+0.70 Sat Jun  9 21:53:05 CEST 2018
  - Fix format specifier/argument mismatch PR#79 @a3f++
  - Travis CI: Test on Perl 5.26 PR#80 @a3f++
  - Fix a C90-compatibility issue PR#81 @stphnlyd++
@@ -111,7 +114,7 @@
 0.61 Sat Feb 20 18:04:19 UTC 2016
  - Apply PR/37 @perlpunk++ (includes PR/36 @lameventanas++)
 
-0.6 Tue Feb  9 14:36:09 EST 2016
+0.60 Tue Feb  9 14:36:09 EST 2016
  - Apply PR/33. @andygrundman++. Solaris fixes.
 
 0.59 Mon Jan 26 15:04:10 PST 2015
@@ -145,7 +148,7 @@
 0.51 Sat Aug 16 14:28:45 PDT 2014
  - Remove =travis section
 
-0.5 Sat Aug 16 12:57:04 PDT 2014
+0.50 Sat Aug 16 12:57:04 PDT 2014
  - Meta 0.0.2
 
 0.49 Sat Aug 16 04:23:17 PDT 2014
@@ -178,7 +181,7 @@
 0.41 Wed Mar 13 10:34:55 PDT 2013
  - Removed another C++ // style comment. jdb++
 
-0.4 Tue Mar 12 11:05:34 PDT 2013
+0.40 Tue Mar 12 11:05:34 PDT 2013
  - Removed C++ // style comments, for better portability. jdb++
 
 0.39 Mon Feb 11 18:08:04 PST 2013
@@ -222,7 +225,7 @@
  - Fix the leak test so it doesn't load an unused, undeclared dependency
    (Test::LongString)
 
-0.3 Sun Jan 11 12:53:55 IST 2009
+0.30 Sun Jan 11 12:53:55 IST 2009
  - Plug a leak in Load
  - More efficient intermediate structure allocation
 
@@ -265,7 +268,7 @@
  - Support !foo private tags for Load - for David Garamond
  - Support Dump/Load of strings with nulls
 
-0.2 Mon Jun 18 16:29:33 PDT 2007
+0.20 Mon Jun 18 16:29:33 PDT 2007
  - Better parse error messaging
 
 0.19 Mon Jun 18 00:54:40 PDT 2007
@@ -299,7 +302,7 @@
  - Fixed false YAML::Tiny dependency
  - Support blessed hashes and arrays
 
-0.1 Mon May 28 03:17:29 PDT 2007
+0.10 Mon May 28 03:17:29 PDT 2007
  - Integrated with YAML::Tests test suite.
 
 0.09 Mon May 28 00:38:19 PDT 2007

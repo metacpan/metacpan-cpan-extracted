@@ -8,13 +8,13 @@ Locale::CLDR::Locales::En::Any::Pw - Package for language English
 
 package Locale::CLDR::Locales::En::Any::Pw;
 # This file auto generated from Data\common\main\en_PW.xml
-#	on Tue  5 Dec  1:08:06 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -30,10 +30,22 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'narrow' => {
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'one' => q({0}°C),
+						'other' => q({0}°C),
+					},
+					# Core Unit Identifier
 					'celsius' => {
 						'one' => q({0}°C),
 						'other' => q({0}°C),
 					},
+					# Long Unit Identifier
+					'temperature-fahrenheit' => {
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Core Unit Identifier
 					'fahrenheit' => {
 						'one' => q({0}°),
 						'other' => q({0}°),

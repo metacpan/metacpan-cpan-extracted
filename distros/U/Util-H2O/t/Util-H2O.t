@@ -20,7 +20,7 @@ L<http://perldoc.perl.org/perlartistic.html>.
 
 =cut
 
-use Test::More tests => 332;
+use Test::More tests => 343;
 use Scalar::Util qw/blessed/;
 use Symbol qw/delete_package/;
 
@@ -31,7 +31,7 @@ sub warns (&) { my @w; { local $SIG{__WARN__} = sub { push @w, shift }; shift->(
 
 diag "This is Perl $] at $^X on $^O";
 BEGIN { use_ok 'Util::H2O' }
-is $Util::H2O::VERSION, '0.22';
+is $Util::H2O::VERSION, '0.24';
 
 diag "If all tests pass, you can ignore the \"this Perl is too old\" warnings"
 	if $] lt '5.008009';
@@ -186,6 +186,21 @@ my $PACKRE = $Util::H2O::_PACKAGE_REGEX;  ## no critic (ProtectPrivateVars)
 	is $h->{h}{z}{foo}->def, 456;
 	is ref $h->{c}, 'CODE';
 	is $h->{h}{x}, 'y';
+	# values that look like options
+	my $o2 = h2o { foo => -bar, x => -arrays, y=>'z' };
+	is $o2->foo, '-bar';
+	my $h2 = o2h $o2;
+	is ref $h2, 'HASH';
+	is_deeply $h2, { foo => '-bar', x => '-arrays', y=>'z' };
+	my $h3 = o2h -arrays, [ '--', 47 ];
+	is ref $h3, 'ARRAY';
+	is_deeply $h3, [ '--', 47 ];
+	is o2h(42), 42;
+	is o2h(0), 0;  # coverage
+	ok exception { o2h(-42) };
+	is o2h('--', -42), -42;
+	is o2h('--'), '--';
+	ok exception { o2h('-arrays', '--') };
 }
 # o2h + -lock + -ro
 {

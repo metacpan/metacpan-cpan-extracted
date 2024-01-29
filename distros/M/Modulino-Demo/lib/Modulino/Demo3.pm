@@ -8,7 +8,7 @@ use warnings;
 
 require Modulino::Base;
 
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 
 =encoding utf8
 
@@ -137,11 +137,11 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2012-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2012-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

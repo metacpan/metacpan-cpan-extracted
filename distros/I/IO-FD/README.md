@@ -427,6 +427,11 @@ Alias to `IO::FD::fcntl`
 
 ### IO::FD::stat
 
+Almost the same as CORE::stat. If your system uses a signed dev\_t for st\_dev
+and st\_rdev, (ie macos), this module will preserve both. At the time of
+writing, Perl CORE::stat will only preserve the sign of st\_dev, and assume
+st\_rdev is signed in all cases.
+
 Attempts to replicate string expansion of values for some stat values as
 CORE::stat does. Tests of equality should be done using the `eq` operator
 (just like CORE::stat results) if your Perl is not 64bit.

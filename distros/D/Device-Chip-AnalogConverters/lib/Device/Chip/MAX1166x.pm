@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Device::Chip::MAX1166x 0.15;
+package Device::Chip::MAX1166x 0.16;
 class Device::Chip::MAX1166x
    :isa(Device::Chip);
 

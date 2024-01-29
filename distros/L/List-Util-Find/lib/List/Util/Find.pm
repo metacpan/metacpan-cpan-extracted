@@ -1,14 +1,15 @@
 package List::Util::Find;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-10'; # DATE
-our $DIST = 'List-Util-Find'; # DIST
-our $VERSION = '0.003'; # VERSION
-
 use strict;
 use warnings;
 
 use Exporter 'import';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-09-16'; # DATE
+our $DIST = 'List-Util-Find'; # DIST
+our $VERSION = '0.005'; # VERSION
+
 our @EXPORT_OK = qw(
                        hasnum
                        hasstr
@@ -65,7 +66,7 @@ List::Util::Find - List utilities related to finding items
 
 =head1 VERSION
 
-This document describes version 0.003 of List::Util::Find (from Perl distribution List-Util-Find), released on 2021-06-10.
+This document describes version 0.005 of List::Util::Find (from Perl distribution List-Util-Find), released on 2023-09-16.
 
 =head1 SYNOPSIS
 
@@ -97,7 +98,14 @@ Usage:
 
 Like C<< grep { $_ == $num } ... >> except: 1) it short-circuits (exits early as
 soon as an item is found); 2) it makes sure C<undef> does not match; 3) it makes
-sure non-numeric scalars don't match when C<$num> is zero.
+sure non-numeric scalars don't match when C<$num> is zero. It is equivalent to
+something like:
+
+ use List::Util qw(first);
+ use Scalar::Util qw(looks_like_number);
+ defined(first { defined && looks_like_number($_) && $_ == $num } @list);
+
+except it does not use any module.
 
 =head2 hasstr
 
@@ -107,7 +115,23 @@ Usage:
 
 Like C<< grep { $_ eq $num } ... >> except: 1) it short-circuits (exits early as
 soon as an item is found); 2) it makes sure C<undef> does not match empty
-string.
+string. It is equivalent to something like:
+
+ use List::Util qw(first);
+ defined(first { defined && $_ eq $str } @list);
+
+except it does not use any module.
+
+=head1 FAQ
+
+=head2 How about hasundef, hasref, hasarrayref, ...?
+
+They are trivial enough:
+
+ first { !defined } @list;
+ first { ref $_ } @list;
+ first { ref $_ eq 'ARRAY' } @list;
+ # and so on
 
 =head1 HOMEPAGE
 
@@ -117,14 +141,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/List-Util-
 
 Source repository is at L<https://github.com/perlancar/perl-List-Util-Find>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=List-Util-Find>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<List::Util>
@@ -133,11 +149,37 @@ L<List::Util>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=List-Util-Find>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

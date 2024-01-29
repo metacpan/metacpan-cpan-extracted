@@ -7,7 +7,7 @@ class Net::Async::Redis::XS :isa(Net::Async::Redis);
 use strict;
 use warnings;
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 =head1 NAME
 
@@ -68,9 +68,9 @@ method wire_protocol {
 
 Tom Molesworth <TEAM@cpan.org>
 
-with contributions from C<< PEVANS@cpan.org >>.
+with contributions from C<< PEVANS@cpan.org >> and C<< Cellisti >>.
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2022-2023. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2022-2024. Licensed under the same terms as Perl itself.
 

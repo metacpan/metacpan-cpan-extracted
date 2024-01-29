@@ -5,7 +5,7 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 my $MATCH_ARGCOUNT =
    # Perl since 5.33.6 adds got-vs-expected counts to croak message

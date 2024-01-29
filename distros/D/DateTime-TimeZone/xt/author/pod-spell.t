@@ -80,6 +80,7 @@ Boise
 Bolivarian
 Bonaire
 Bougainville
+Brian
 Brisbane
 Broken_Hill
 Bron
@@ -177,6 +178,7 @@ Fiji
 Floating
 Fort_Nelson
 Fortaleza
+Fraser
 FromEnv
 Futuna
 GF
@@ -510,6 +512,7 @@ Vilnius
 Vincennes
 Vladivostok
 Volgograd
+Vostok
 WET
 WF
 WS
@@ -536,6 +539,7 @@ alexey
 alfiej
 apaprocki
 autarch
+brian
 brong
 d'Ivoire
 da

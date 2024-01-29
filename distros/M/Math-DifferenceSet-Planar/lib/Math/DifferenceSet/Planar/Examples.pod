@@ -21,6 +21,10 @@ besides command line parameters are marked [P].
 
 [P] Generate terms of OEIS A353077.
 
+=item numlist_deltas
+
+[F] Convert lists of numbers to lists of differences and vice versa.
+
 =item numlist_sort
 
 [F] Sort a list of lists of integer numbers.
@@ -36,6 +40,10 @@ besides command line parameters are marked [P].
 =item pds_enumerate
 
 [F] Enumerate all the translates of planar difference sets.
+
+=item pds_find_any_ref
+
+[F] Find various reference sets from arbitrary planar difference sets.
 
 =item pds_find_delta
 
@@ -121,10 +129,6 @@ besides command line parameters are marked [P].
 
 [F] Verify lists of integers as planar difference sets.
 
-=item random_pds
-
-[P] Generate a random planar difference set.
-
 =back
 
 =head1 HISTORY
@@ -175,6 +179,10 @@ Now part of pds_info.
 =item pds_zeta_canonize
 
 Now part of pds_canonize.
+
+=item random_pds
+
+Now part of pds_sample.
 
 =back
 

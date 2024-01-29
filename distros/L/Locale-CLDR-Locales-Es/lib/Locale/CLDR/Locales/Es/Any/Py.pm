@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Es::Any::Py - Package for language Spanish
 
 package Locale::CLDR::Locales::Es::Any::Py;
 # This file auto generated from Data\common\main\es_PY.xml
-#	on Tue  5 Dec  1:08:45 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ace' => 'acehnés',
@@ -59,12 +59,11 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'BA' => 'Bosnia y Herzegovina',
  			'GB@alt=short' => 'RU',
  			'TA' => 'Tristán de Acuña',
- 			'TL' => 'Timor-Leste',
  			'UM' => 'Islas menores alejadas de EE. UU.',
 
 		}
@@ -77,69 +76,147 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'duration-year' => {
+						'per' => q({0}/año),
+					},
+					# Core Unit Identifier
+					'year' => {
+						'per' => q({0}/año),
+					},
+					# Long Unit Identifier
+					'electric-ampere' => {
+						'name' => q(amperios),
+						'one' => q({0} amperio),
+						'other' => q({0} amperios),
+					},
+					# Core Unit Identifier
 					'ampere' => {
 						'name' => q(amperios),
 						'one' => q({0} amperio),
 						'other' => q({0} amperios),
 					},
+					# Long Unit Identifier
+					'electric-milliampere' => {
+						'name' => q(miliamperios),
+						'one' => q({0} miliamperio),
+						'other' => q({0} miliamperios),
+					},
+					# Core Unit Identifier
 					'milliampere' => {
 						'name' => q(miliamperios),
 						'one' => q({0} miliamperio),
 						'other' => q({0} miliamperios),
 					},
+					# Long Unit Identifier
+					'electric-ohm' => {
+						'one' => q({0} ohmio),
+						'other' => q({0} ohmios),
+					},
+					# Core Unit Identifier
 					'ohm' => {
 						'one' => q({0} ohmio),
 						'other' => q({0} ohmios),
 					},
-					'volt' => {
-						'one' => q({0} voltio),
-						'other' => q({0} voltios),
-					},
-					'year' => {
-						'per' => q({0}/año),
-					},
 				},
 				'narrow' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(día),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(día),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(mes),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(mes),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(año),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(año),
 					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(días),
+						'one' => q({0} día),
+						'other' => q({0} días),
+						'per' => q({0}/día),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(días),
 						'one' => q({0} día),
 						'other' => q({0} días),
 						'per' => q({0}/día),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(meses),
+						'one' => q({0} mes),
+						'other' => q({0} meses),
+						'per' => q({0}/mes),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(meses),
 						'one' => q({0} mes),
 						'other' => q({0} meses),
 						'per' => q({0}/mes),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(seg.),
+						'one' => q({0} seg.),
+						'other' => q({0} seg.),
+						'per' => q({0}/seg.),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(seg.),
 						'one' => q({0} seg.),
 						'other' => q({0} seg.),
 						'per' => q({0}/seg.),
 					},
-					'volt' => {
-						'name' => q(voltios),
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(años),
+						'one' => q({0} año),
+						'other' => q({0} años),
+						'per' => q({0}/año),
 					},
-					'watt' => {
-						'name' => q(vatios),
-					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(años),
 						'one' => q({0} año),
 						'other' => q({0} años),
 						'per' => q({0}/año),
+					},
+					# Long Unit Identifier
+					'electric-volt' => {
+						'name' => q(voltios),
+					},
+					# Core Unit Identifier
+					'volt' => {
+						'name' => q(voltios),
+					},
+					# Long Unit Identifier
+					'power-watt' => {
+						'name' => q(vatios),
+					},
+					# Core Unit Identifier
+					'watt' => {
+						'name' => q(vatios),
 					},
 				},
 			} }
@@ -319,8 +396,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'day_periods' => (
@@ -329,29 +406,9 @@ has 'day_periods' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
-			'format' => {
-				'abbreviated' => {
-					'am' => q{a. m.},
-					'pm' => q{p. m.},
-				},
-				'wide' => {
-					'am' => q{a. m.},
-					'pm' => q{p. m.},
-				},
-			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{a. m.},
-					'pm' => q{p. m.},
-				},
 				'narrow' => {
-					'am' => q{a. m.},
 					'noon' => q{m.},
-					'pm' => q{p. m.},
-				},
-				'wide' => {
-					'am' => q{a. m.},
-					'pm' => q{p. m.},
 				},
 			},
 		},

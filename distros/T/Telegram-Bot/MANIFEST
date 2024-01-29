@@ -26,6 +26,7 @@ lib/Telegram/Bot/Object/EncryptedPassportElement.pm
 lib/Telegram/Bot/Object/Game.pm
 lib/Telegram/Bot/Object/InlineKeyboardButton.pm
 lib/Telegram/Bot/Object/InlineKeyboardMarkup.pm
+lib/Telegram/Bot/Object/InlineQuery.pm
 lib/Telegram/Bot/Object/Invoice.pm
 lib/Telegram/Bot/Object/KeyboardButton.pm
 lib/Telegram/Bot/Object/Location.pm
@@ -49,3 +50,4 @@ t/02-message-location.t
 t/02-message-photo.t
 t/02-message-sticker.t
 t/03-listeners.t
+t/04-message-inline_query.t

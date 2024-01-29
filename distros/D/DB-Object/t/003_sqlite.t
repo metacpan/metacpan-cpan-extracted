@@ -9,6 +9,7 @@ BEGIN
     use DateTime::TimeZone;
     use DateTime::Format::Strptime;
     use IO::File;
+	our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
 SKIP:
@@ -121,11 +122,11 @@ SKIP:
 
     my $dbh = DB::Object->connect(
     'uri'       => $con_uri,
-    ## 'host'       => 'localhost',
+    # 'host'       => 'localhost',
     'driver'    => 'SQLite',
-    ## 'login'      => 'n',
-    ## 'passwd' => '',
-    # 'debug'       => 3,
+    # 'login'      => 'n',
+    # 'passwd' => '',
+    'debug'       => $DEBUG,
     ) || die( $DB::Object::ERROR );
     $dbh->verbose( 0 );
     #$dbh->quiet( 1 );

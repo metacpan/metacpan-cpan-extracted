@@ -5,7 +5,7 @@ use warnings;
 
 use Future::AsyncAwait 0.47;
 
-use Test::More;
+use Test2::V0;
 
 use Tangence::Registry;
 
@@ -35,21 +35,21 @@ my $proxy = $client->rootobj;
 {
    await $proxy->set_property( "array", [ 4, 5, 6 ] );
 
-   is_deeply( $obj->get_prop_array, [ 4, 5, 6 ], 'set_property on array' );
+   is( $obj->get_prop_array, [ 4, 5, 6 ], 'set_property on array' );
 }
 
 # queue
 {
    await $proxy->set_property( "queue", [ 4, 5, 6 ] );
 
-   is_deeply( $obj->get_prop_queue, [ 4, 5, 6 ], 'set_property on queue' );
+   is( $obj->get_prop_queue, [ 4, 5, 6 ], 'set_property on queue' );
 }
 
 # hash
 {
    await $proxy->set_property( "hash", { four => 4, five => 5 } );
 
-   is_deeply( $obj->get_prop_hash, { four => 4, five => 5 }, 'set_property on hash' );
+   is( $obj->get_prop_hash, { four => 4, five => 5 }, 'set_property on hash' );
 }
 
 done_testing;

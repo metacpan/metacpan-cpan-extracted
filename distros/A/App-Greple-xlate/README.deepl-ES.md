@@ -10,17 +10,17 @@ App::Greple::xlate - módulo de traducción para greple
 
 # VERSION
 
-Version 0.28
+Version 0.29
 
 # DESCRIPTION
 
-El módulo **Greple** **xlate** encuentra bloques de texto y los sustituye por el texto traducido. Actualmente DeepL (`deepl.pm`) y el módulo ChatGPT (`gpt3.pm`) están implementados como motor back-end.
+El módulo **Greple** **xlate** encuentra los bloques de texto deseados y los sustituye por el texto traducido. Actualmente se implementan los módulos DeepL (`deepl.pm`) y ChatGPT (`gpt3.pm`) como motor back-end.
 
-Si desea traducir bloques de texto normales escritos en el estilo [pod](https://metacpan.org/pod/pod), utilice el comando **greple** con el módulo `xlate::deepl` y `perl` de esta forma:
+Si desea traducir bloques de texto normal en un documento escrito en el estilo vaina de Perl, utilice el comando **greple** con el módulo `xlate::deepl` y `perl` de la siguiente manera:
 
     greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
 
-El patrón `^(\w.*\n)+` significa líneas consecutivas que comienzan con una letra alfanumérica. Este comando muestra el área a traducir. La opción **--all** se utiliza para producir el texto completo.
+En este comando, la cadena patrón `^(\w.*\n)+` significa líneas consecutivas que comienzan con una letra alfanumérica. Este comando muestra el área a traducir resaltada. La opción **--all** se utiliza para producir el texto completo.
 
 <div>
     <p>
@@ -28,7 +28,7 @@ El patrón `^(\w.*\n)+` significa líneas consecutivas que comienzan con una let
     </p>
 </div>
 
-A continuación, añada la opción `--xlate` para traducir el área seleccionada. Las encontrará y reemplazará por la salida del comando **deepl**.
+A continuación, añada la opción `--xlate` para traducir el área seleccionada. Entonces, encontrará las secciones deseadas y las reemplazará por la salida del comando **deepl**.
 
 Por defecto, el texto original y traducido se imprime en el formato "marcador de conflicto" compatible con [git(1)](http://man.he.net/man1/git). Usando el formato `ifdef`, puede obtener la parte deseada mediante el comando [unifdef(1)](http://man.he.net/man1/unifdef) fácilmente. El formato de salida puede especificarse mediante la opción **--xlate-format**.
 
@@ -76,7 +76,7 @@ Si desea traducir todo el texto, utilice la opción **--match-all**. Es un atajo
 
     - **conflict**, **cm**
 
-        Imprima el texto original y traducido en formato de marcador de conflicto [git(1)](http://man.he.net/man1/git).
+        El texto original y el convertido se imprimen en formato de marcador de conflicto [git(1)](http://man.he.net/man1/git).
 
             <<<<<<< ORIGINAL
             original text
@@ -90,7 +90,7 @@ Si desea traducir todo el texto, utilice la opción **--match-all**. Es un atajo
 
     - **ifdef**
 
-        Imprime el texto original y traducido en formato [cpp(1)](http://man.he.net/man1/cpp) `#ifdef`.
+        El texto original y el convertido se imprimen en formato [cpp(1)](http://man.he.net/man1/cpp) `#ifdef`.
 
             #ifdef ORIGINAL
             original text
@@ -105,7 +105,7 @@ Si desea traducir todo el texto, utilice la opción **--match-all**. Es un atajo
 
     - **space**
 
-        Imprime el texto original y el traducido separados por una sola línea en blanco.
+        El texto original y el convertido se imprimen separados por una sola línea en blanco.
 
     - **xtxt**
 
@@ -196,6 +196,8 @@ Debe instalar las herramientas de línea de comandos para DeepL y ChatGPT.
 
 [App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
 
+[https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
     DeepL Librería Python y comando CLI.
@@ -220,13 +222,27 @@ Debe instalar las herramientas de línea de comandos para DeepL y ChatGPT.
 
     Utilice **sdif** para mostrar el formato del marcador de conflicto junto con la opción **-V**.
 
+## ARTICLES
+
+- [https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250](https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250)
+
+    Módulo Greple para traducir y sustituir sólo las partes necesarias con DeepL API (en japonés)
+
+- [https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6](https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6)
+
+    Generación de documentos en 15 idiomas con el módulo API DeepL (en japonés)
+
+- [https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd](https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd)
+
+    Entorno Docker de traducción automática con DeepL API (en japonés)
+
 # AUTHOR
 
 Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023 Kazumasa Utashiro.
+Copyright © 2023-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

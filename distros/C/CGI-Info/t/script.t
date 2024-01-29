@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 61;
+use Test::Most tests => 64;
 use File::Spec;
 use Cwd;
 use Test::NoWarnings;
@@ -22,6 +22,7 @@ PATHS: {
 	ok($i->script_path() =~ /.+script\.t$/);
 	ok($i->script_name() eq 'script.t');
 	ok($i->script_path() eq File::Spec->catfile($i->script_dir(), $i->script_name()));
+	ok($i->script_path() eq File::Spec->catfile(CGI::Info::script_dir(), $i->script_name()));
 	# Check calling twice return path
 	ok($i->script_name() eq 'script.t');
 
@@ -212,4 +213,10 @@ PATHS: {
 	ok(!defined($p{barney}));
 	ok($i->fred() eq 'wilma');
 	ok(!defined($i->barney()));
+
+	$ENV{'SCRIPT_FILENAME'} = '/tulip';
+	delete $ENV{'SCRIPT_NAME'};
+	delete $ENV{'DOCUMENT_ROOT'};
+	$i = new_ok('CGI::Info');
+	cmp_ok($i->script_path(), 'eq', '/tulip', 'SCRIPT_FILENAME is read from the environment');
 }

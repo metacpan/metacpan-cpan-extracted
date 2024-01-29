@@ -1,0 +1,72 @@
+<& /Elements/Header, Title => $title &>
+<& /Elements/Tabs &>
+
+<& /Elements/ListActions, actions => \@results &>
+
+<form name="SwitchUsers" method="POST" action="<% RT->Config->Get('WebPath') %>/Tools/SwitchUsers.html">
+    <div class="form-row">
+      <div class="col-auto">
+        <select name="SwitchUser" class="selectpicker">
+% for my $user ( @users )  {
+          <option <% $user->id == $session{'CurrentUser'}->id ? q{selected="selected"} : '' |n %> value="<% $user->id %>">
+            <% $user->Name %>
+% if ( $user->id == $users[0]->id ) {
+            (<% loc('Base User') %>)
+% }
+
+% if ( $user->id == $session{'CurrentUser'}->id ) {
+            (<% loc('Current User') %>)
+% }
+          </option>
+% }
+        </select>
+      </div>
+      <div class="col-auto">
+        <& /Elements/Submit, Label => loc("Switch")&>
+      </div>
+    </div>
+</form>
+
+<%INIT>
+my $title = loc( 'Switch Users' );
+my @results;
+
+my @users = RT::Extension::SwitchUsers->GetUsersToSwitch();
+Abort( loc("Permission Denied") ) unless @users;
+
+if ( $SwitchUser ) {
+    if ( $SwitchUser =~ /^\d+$/ && grep { $SwitchUser == $_->id } @users ) {
+        if ( $SwitchUser == $session{CurrentUser}->id ) {
+            push @results, loc( "Current user is already '[_1]'", $session{CurrentUser}->Name );
+        }
+        else {
+            my $previous_user_name = $session{CurrentUser}->Name;
+            my $external_authed = $session{WebExternallyAuthed};
+            RT::Interface::Web::InstantiateNewSession();
+            $session{CurrentUser} = RT::CurrentUser->new;
+            $session{CurrentUser}->Load( $SwitchUser );
+            $session{WebExternallyAuthed} ||= $external_authed;
+            my $current_user_name = $session{CurrentUser}->Name;
+
+            # $users[0] is always the base user.
+            if ( $session{CurrentUser}->id == $users[0]->id ) {
+                RT->Logger->warning("Switched user back to $current_user_name from $previous_user_name");
+            }
+            else {
+                RT->Logger->warning("Switched user from $previous_user_name to $current_user_name");
+                $session{'SwitchUsers-BaseUser'} = $users[0]->id;
+            }
+            push @results, loc( "Switched to user '[_1]'", $current_user_name );
+        }
+    }
+    else {
+        push @results, loc( "Invalid SwitchUser" );
+    }
+    MaybeRedirectForResults( Actions => \@results );
+}
+
+</%INIT>
+
+<%ARGS>
+$SwitchUser => undef
+</%ARGS>

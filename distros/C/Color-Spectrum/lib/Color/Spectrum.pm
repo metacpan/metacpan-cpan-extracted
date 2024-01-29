@@ -1,7 +1,7 @@
 package Color::Spectrum;
 use strict;
 use warnings FATAL => 'all';
-our $VERSION = '1.14';
+our $VERSION = '1.16';
 
 use POSIX;
 use Carp;
@@ -240,7 +240,7 @@ This package is maintained by Jeff Anderson, C<< <jeffa at cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright 2017 Mark Mills.
+Copyright 2024 Mark Mills.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

@@ -11,7 +11,7 @@
 #   1-2}  its an after command
 #   1-2-1}  the constructed after command is run $interp->icall(@args)
 #   1-2-2}  the calls bundled in @calls get saved to a new $anon_refs{$synthname}
-#   1-2-3}  $anon_refs{$rname} gets deleted, but there is a copy in @calls/$anon_refs{$synthname}, nothing is descroyed
+#   1-2-3}  $anon_refs{$rname} gets deleted, but there is a copy in @calls/$anon_refs{$synthname}, nothing is destroyed
 #   1-2-3}  after gets called in $delay+1 secs to delete $anon_refs{$synthname}
 #
 # that repeats until 1  second after the first delay in the after chain
@@ -24,7 +24,7 @@
 #   2-1-2-2)  $interp->DeleteCommand($tclname} runs and destroys the new command
 #  but that same $tclname may still be scheduled in later after calls still pending
 #
-# but later when tcl tries to use $tclname as a command alias, its been destoryed
+# but later when tcl tries to use $tclname as a command alias, its been destroyed
 #   Tcl error 'invalid command name "::perl::CODE(0x8e4e2a8)"
 #      at ./blib/lib/Tcl.pm line ####.
 #      while invoking scalar result call:
@@ -69,19 +69,10 @@ sub run_cmd{
 sub flush_afters{
   my $inter=shift;
   while(1) {  # wait for afters to finish
-    my $info0=insure_ptrarray($inter,'after', 'info');
-    last unless (scalar(@$info0));
+    my @info0=$inter->icall('after', 'info');
+    last unless (scalar(@info0));
     $inter->icall('after', 300, 'set var fafafa');
     $inter->icall('vwait', 'var'); # will wait for .3 seconds
   }
 } # flush afters
 
-
-sub insure_ptrarray{
-  my $inter=shift;
-  my $list = $inter->icall(@_);
-  if (ref($list) ne 'Tcl::List') {  # v1.02
-      $list=[split(' ',$list)];
-      }
-return $list;
-}

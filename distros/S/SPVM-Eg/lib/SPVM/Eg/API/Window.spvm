@@ -1,0 +1,14 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Eg::API::Window : interface_t {
+  
+  method outer_width : int ();
+  
+  method inner_width : int ();
+  
+  method outer_height : int ();
+  
+  method inner_height : int ();
+  
+}

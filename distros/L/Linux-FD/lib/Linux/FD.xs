@@ -25,7 +25,7 @@ static sigset_t* S_sv_to_sigset(pTHX_ SV* sigmask, const char* name) {
 	if (!SvOK(sigmask))
 		return NULL;
 	if (!SvROK(sigmask) || !sv_derived_from(sigmask, "POSIX::SigSet"))
-		Perl_croak(aTHX_ "%s is not of type POSIX::SigSet");
+		Perl_croak(aTHX_ "Value is not of type POSIX::SigSet");
 #if PERL_VERSION > 15 || PERL_VERSION == 15 && PERL_SUBVERSION > 2
 	return (sigset_t *) SvPV_nolen(SvRV(sigmask));
 #else
@@ -344,7 +344,7 @@ receive(self)
 MODULE = Linux::FD				PACKAGE = Linux::FD::Timer
 
 SV*
-new(classname, clock)
+new(classname, clock, ...)
 	const char* classname;
 	SV* clock;
 	PREINIT:

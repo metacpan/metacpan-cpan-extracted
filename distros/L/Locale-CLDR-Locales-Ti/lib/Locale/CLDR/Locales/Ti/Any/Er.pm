@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ti::Any::Er - Package for language Tigrinya
 
 package Locale::CLDR::Locales::Ti::Any::Er;
 # This file auto generated from Data\common\main\ti_ER.xml
-#	on Tue  5 Dec  1:34:30 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,6 +24,30 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Ti::Any');
+has 'display_name_language' => (
+	is			=> 'ro',
+	isa			=> CodeRef,
+	init_arg	=> undef,
+	default		=> sub {
+		 sub {
+			 my %languages = (
+				'ar_001' => 'ዘመናዊ ምዱብ ዓረብ',
+ 				'nds_NL' => 'ትሑት ሳክሰን',
+ 				'nl_BE' => 'ፍላሚሽ',
+ 				'zh_Hans' => 'ቀሊል ቻይንኛ',
+ 				'zh_Hans@alt=long' => 'ቀሊል ማንዳሪን ቻይንኛ',
+ 				'zh_Hant' => 'ባህላዊ ቻይንኛ',
+ 				'zh_Hant@alt=long' => 'ባህላዊ ማንዳሪን ቻይንኛ',
+
+			);
+			if (@_) {
+				return $languages{$_[0]};
+			}
+			return \%languages;
+		}
+	},
+);
+
 has 'characters' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -59,20 +83,6 @@ has 'quote_end' => (
 	default		=> qq{’},
 );
 
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
 has 'currencies' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -84,21 +94,6 @@ has 'currencies' => (
 	} },
 );
 
-
-has 'calendar_days' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-			'gregorian' => {
-				'stand-alone' => {
-					narrow => {
-						tue => 'ሰ'
-					},
-				},
-			},
-	} },
-);
 
 has 'eras' => (
 	is			=> 'ro',

@@ -1,6 +1,7 @@
 # CHECKSUMS file written on Mon Feb  4 15:50:30 2008 GMT by CPAN::Checksums (v1.064)
 $cksum = {
   'Test-Harness-2.62.tar.gz' => {
+    'cpan_path' => 'P/PE/PETDANCE',
     'md5' => '4e62bf6e872ffa5eae6ce1dd2cc45a6e',
     'md5-ungz' => '74f91dc11e218373a467d80df5a483ef',
     'mtime' => '2008-02-04',

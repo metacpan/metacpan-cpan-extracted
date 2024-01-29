@@ -60,7 +60,8 @@ WriteMakefile(
         'Data::Fake'      => '0.006',
         'JSON::XS'        => '4.03',
         'YAML::XS'        => '0.88',
-        'Text::CSV_XS'    => '1.50'
+        'Text::CSV_XS'    => '1.50',
+        'List::MoreUtils' => '0.430'
     },
     test               => { TESTS => 't/*.t' },
     CONFIGURE_REQUIRES => {

@@ -59,11 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostExportRequest.File : workbook/worksheet/chart/comment/picture/shape/listobject/oleobject  ,
-# PostExportRequest.objectType : workbook/worksheet/chart/comment/picture/shape/listobject/oleobject  ,
-# PostExportRequest.format : The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
-# PostExportRequest.password :   ,
-# PostExportRequest.checkExcelRestriction :    
+# PostExportRequest.File : Exported object type:workbook/worksheet/chart/comment/picture/shape/listobject/oleobject.  ,
+# PostExportRequest.objectType : Exported object type:workbook/worksheet/chart/comment/picture/shape/listobject/oleobject.  ,
+# PostExportRequest.format : The conversion format(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).  ,
+# PostExportRequest.password : The password needed to open an Excel file.  ,
+# PostExportRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.  ,
+# PostExportRequest.region : The regional settings for workbook.   
 
 {
     my $params = {
@@ -74,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_export' } = { 
-    	summary => 'Export excel internal elements or itself to kinds of format files.',
+    	summary => 'Export Excel internal elements or the workbook itself to various format files.',
         params => $params,
         returns => 'FilesResult',
     };
@@ -114,6 +115,10 @@ sub run_http_request {
 
     if(defined $self->check_excel_restriction){
         $query_params->{'checkExcelRestriction'} = $client->to_query_value($self->check_excel_restriction);      
+    }
+
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
     } 
     my $_body_data;
  
@@ -138,35 +143,42 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'workbook/worksheet/chart/comment/picture/shape/listobject/oleobject',
+     	description => 'Exported object type:workbook/worksheet/chart/comment/picture/shape/listobject/oleobject.',
      	format => '',
      	read_only => '',
      		},
      'object_type' => {
      	datatype => 'string',
      	base_name => 'objectType',
-     	description => 'workbook/worksheet/chart/comment/picture/shape/listobject/oleobject',
+     	description => 'Exported object type:workbook/worksheet/chart/comment/picture/shape/listobject/oleobject.',
      	format => '',
      	read_only => '',
      		},
      'format' => {
      	datatype => 'string',
      	base_name => 'format',
-     	description => 'The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)',
+     	description => 'The conversion format(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
-     	description => '',
+     	description => 'Whether check restriction of excel file when user modify cells related objects.',
+     	format => '',
+     	read_only => '',
+     		},
+     'region' => {
+     	datatype => 'string',
+     	base_name => 'region',
+     	description => 'The regional settings for workbook.',
      	format => '',
      	read_only => '',
      		},    
@@ -178,7 +190,8 @@ __PACKAGE__->attribute_map( {
     'object_type' => 'objectType',
     'format' => 'format',
     'password' => 'password',
-    'check_excel_restriction' => 'checkExcelRestriction' 
+    'check_excel_restriction' => 'checkExcelRestriction',
+    'region' => 'region' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Yi - Package for language Yiddish
 
 package Locale::CLDR::Locales::Yi;
 # This file auto generated from Data\common\main\yi.xml
-#	on Tue  5 Dec  1:38:07 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -44,7 +44,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'aa' => 'אַפֿאַר',
@@ -170,7 +170,6 @@ has 'display_name_language' => (
  				'sk' => 'סלאוואַקיש',
  				'sl' => 'סלאוועניש',
  				'sli' => 'אונטער שלעזיש',
- 				'sly' => 'sly',
  				'sm' => 'סאַמאאַניש',
  				'sn' => 'שאנאַ',
  				'so' => 'סאמאַליש',
@@ -234,7 +233,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'וועלט',
  			'002' => 'אַפֿריקע',
@@ -373,7 +372,6 @@ has 'display_name_region' => (
  			'ME' => 'מאנטענעגרא',
  			'MG' => 'מאַדאַגאַסקאַר',
  			'MH' => 'מאַרשאַל אינזלען',
- 			'MK' => 'מאַקעדאניע',
  			'ML' => 'מאַלי',
  			'MM' => 'מיאַנמאַר',
  			'MN' => 'מאנגאליי',
@@ -469,7 +467,7 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'numbers' => 'נומערן',
 
@@ -495,7 +493,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{מעטריש},
 
@@ -507,7 +505,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'שפראַך: {0}',
  			'script' => 'שריפֿט: {0}',
@@ -539,8 +537,8 @@ has 'characters' => (
 			auxiliary => qr{[‎‏]},
 			index => ['\u05C2', '\u05BC', '\u05BF', 'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'כ', 'ל', 'מ', 'נ', 'ס', 'ע', 'פ', 'צ', 'ק', 'ר', 'ש', 'ת'],
 			main => qr{[א {אַ} {אָ} ב {בֿ} ג ד {דזש} ה ו {וּ} {וו} {וי} ז {זש} ח ט {טש} י {יִ} {יי} {ײַ} {כּ} כ ך ל מ ם נ ן ס ע {פּ} {פֿ} ף צ ץ ק ר ש {שׂ} {תּ} ת]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- ‐ – — , ; \: ! ? . ׳ ' " ( ) \[ \] / ״ ־]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . ׳ ' " ( ) \[ \] / ״ ־]},
 		};
 	},
 EOT
@@ -859,13 +857,13 @@ has 'calendar_months' => (
 							'אלול'
 						],
 						leap => [
-							'',
-							'',
-							'',
-							'',
-							'',
-							'',
-							'אדר ב׳'
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							
 						],
 					},
 					narrow => {
@@ -885,13 +883,13 @@ has 'calendar_months' => (
 							'אל'
 						],
 						leap => [
-							'',
-							'',
-							'',
-							'',
-							'',
-							'',
-							'א2'
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							
 						],
 					},
 					wide => {
@@ -911,13 +909,13 @@ has 'calendar_months' => (
 							'אלול'
 						],
 						leap => [
-							'',
-							'',
-							'',
-							'',
-							'',
-							'',
-							'אדר ב׳'
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							
 						],
 					},
 				},
@@ -939,13 +937,13 @@ has 'calendar_months' => (
 							'אלול'
 						],
 						leap => [
-							'',
-							'',
-							'',
-							'',
-							'',
-							'',
-							'אדר ב׳'
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							
 						],
 					},
 					narrow => {
@@ -965,13 +963,13 @@ has 'calendar_months' => (
 							'אל'
 						],
 						leap => [
-							'',
-							'',
-							'',
-							'',
-							'',
-							'',
-							'א2'
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							
 						],
 					},
 					wide => {
@@ -991,13 +989,13 @@ has 'calendar_months' => (
 							'אלול'
 						],
 						leap => [
-							'',
-							'',
-							'',
-							'',
-							'',
-							'',
-							'אדר ב׳'
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							
 						],
 					},
 				},

@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::Font';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use Math::Trig;    # CAUTION: deg2rad(0) = deg2rad(360) = 0!
 use Unicode::UCD 'charinfo';
@@ -49,9 +49,11 @@ This is for compatibility with recent changes to PDF::API2.
 
 =head1 METHODS
 
-=over
+=head2 new
 
-=item $font = PDF::Builder::Resource::Font::SynFont->new($pdf, $fontobj, %opts)
+    $font = PDF::Builder::Resource::Font::SynFont->new($pdf, $fontobj, %opts)
+
+=over
 
 Returns a synfont object. C<$fontobj> is a normal font object read in from
 a file, and C<$font> is the modified output.

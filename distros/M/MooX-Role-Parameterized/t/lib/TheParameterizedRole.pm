@@ -5,20 +5,19 @@ use warnings;
 use MooX::Role::Parameterized;
 
 role {
-    my $params = shift;
-    my $p      = shift;
+    my ( $params, $mop ) = @_;
 
     my $attribute = $params->{attribute};
     my $method    = $params->{method};
 
-    $p->has(
+    $mop->has(
         $attribute => (
             is      => 'ro',
             default => 'this works'
         )
     );
 
-    $p->method( $method => sub { 'dummy' } );
+    $mop->method( $method => sub {'dummy'} );
 };
 
 use Moo::Role;

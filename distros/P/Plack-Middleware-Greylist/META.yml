@@ -15,7 +15,7 @@ build_requires:
   Plack::Middleware::ReverseProxy: '0'
   Plack::Response: '0'
   Plack::Test: '0'
-  TAP::Formatter::GitHubActions: '0'
+  Test2::Tools::Compare: '0'
   Test2::V0: '0'
   Test::More: '0'
   strict: '0'
@@ -38,7 +38,7 @@ name: Plack-Middleware-Greylist
 provides:
   Plack::Middleware::Greylist:
     file: lib/Plack/Middleware/Greylist.pm
-    version: v0.6.0
+    version: v0.7.2
 recommends:
   Cache::FastMmap: '0'
   Ref::Util::XS: '0'
@@ -56,7 +56,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Plack-Middleware-Greylist/issues
   repository: git://github.com/robrwo/Plack-Middleware-Greylist.git
-version: v0.6.0
+version: v0.7.2
 x_authority: cpan:RRWO
 x_contributors:
   - 'Gabor Szabo <gabor@szabgab.com>'

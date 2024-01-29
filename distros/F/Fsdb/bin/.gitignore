@@ -16,6 +16,7 @@ dbcolneaten
 dbcolpercentile
 dbcolrename
 dbcolscorrelate
+dbcolsdecimate
 dbcolsplittocols
 dbcolsplittorows
 dbcolsregression

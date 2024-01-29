@@ -85,6 +85,8 @@ DESCRIPTION
     
        use Object::Pad ':experimental(composed_adjust)';
     
+       use Object::Pad ':experimental(inherit_field)';
+    
        use Object::Pad ':experimental';  # all of the above
 
     Since version 0.64.
@@ -171,36 +173,6 @@ KEYWORDS
     
        class Name VERSION;
 
-    A single superclass is supported by the keyword isa
-
-    Since version 0.41.
-
-       class Name isa BASECLASS {
-          ...
-       }
-    
-       class Name isa BASECLASS BASEVER {
-          ...
-       }
-
-    Prior to version 0.41 this was called extends, but since version 0.73
-    this is no longer recognised. The isa keyword is now deprecated, in
-    favour of the ":isa" attribute which is preferred because it follows a
-    more standard grammar without this special-case.
-
-    One or more roles can be composed into the class by the keyword does
-
-    Since version 0.41.
-
-       class Name does ROLE, ROLE,... {
-          ...
-       }
-
-    Prior to version 0.41 this was called implements, but since version
-    0.73 this is no longer recognised. The does keyword is now deprecated,
-    in favour of the ":does" attribute which is preferred because it
-    follows a more standard grammar without this special-case.
-
     An optional list of attributes may be supplied in similar syntax as for
     subs or lexical variables. (These are annotations about the class
     itself; the concept should not be confused with per-object-instance
@@ -252,8 +224,7 @@ KEYWORDS
     Since version 0.57.
 
     Composes a role into the class; optionally requiring a version check on
-    the role package. This is a newer form of the implements and does
-    keywords and should be preferred for new code.
+    the role package.
 
     Multiple roles can be composed by using multiple :does attributes, one
     per role.
@@ -439,6 +410,78 @@ KEYWORDS
     all existing code is using Object::Pad then this attribute can be
     removed from the role.
 
+ inherit
+
+       inherit Classname;
+       inherit Classname VER;
+    
+       inherit Classname LIST...;
+       inherit Classname VER LIST...;
+
+    Declares a superclass that this class extends. At most one superclass
+    is supported. If present, this declaration must come before any methods
+    or fields are declared, or any roles applied. (Other compile-time
+    declarations such as use statements that import utility functions or
+    other behaviours may be permitted before this, however, provided that
+    they do not interact with the class structure in any way).
+
+    This is a newer form of the :isa attribute intended to be more flexible
+    if import arguments or other features are added at a later time.
+
+    If the package providing the superclass does not exist, an attempt is
+    made to load it by code equivalent to
+
+       require Classname;
+
+    and thus it must either already exist, or be locatable via the usual
+    @INC mechanisms.
+
+    An optional version check can also be supplied; it performs the
+    equivalent of
+
+       Classname->VERSION( $ver )
+
+    Experimentally since version 0.807, an optional list of arguments can
+    also be provided, in similar syntax to those in a use statement.
+    Currently this list of arguments must be names of fields to be
+    inherited. Only fields in the base class that are annotated with the
+    :inheritable attribute may be inherited. Once a field is inherited,
+    methods and other expressions in the class body can use that field
+    identically to any fields defined by that class itself.
+
+       class Class1 {
+          field $x :inheritable = 123;
+       }
+    
+       class Class2 {
+          inherit Class1 '$x';
+          field $y = 456;
+          method describe { say "Class2(x=$x,y=$y)" }
+       }
+    
+       Class2->new->describe;
+
+ apply
+
+       apply Rolename;
+    
+       apply Rolename VER;
+
+    Since version 0.807.
+
+    Composes a role into the class; optionally requiring a version check on
+    the role package. This is a newer form of the :does attribute intended
+    to be more flexible if import arguments or other features are added at
+    a later time.
+
+    Multiple roles can be composed by using multiple :does attributes, one
+    per role.
+
+    apply statements can be freely mixed with other statements inside the
+    body of the class. In particular, an apply statement that adds fields
+    or methods may appear before or after the class has defined some of its
+    own. It is not required that they appear first.
+
  field
 
        field $var;
@@ -604,6 +647,13 @@ KEYWORDS
 
     Values for fields are assigned by the constructor before any BUILD
     blocks are invoked.
+
+  :inheritable
+
+    Experimentally since version 0.807 fields may be optionally inherited
+    when deriving a subclass from another. Not every field is allowed to be
+    inherited. This attribute marks a field as being available for
+    subclasses to inherit.
 
   Field Initialiser Expressions
 

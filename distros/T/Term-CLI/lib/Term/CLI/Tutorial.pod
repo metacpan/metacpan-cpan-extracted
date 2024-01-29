@@ -22,7 +22,7 @@ Term::CLI::Tutorial - tips, tricks, and examples for Term::CLI
 
 =head1 VERSION
 
-version 0.058002
+version 0.059000
 
 =head1 SYNOPSIS
 
@@ -1359,7 +1359,7 @@ the L<Term::CLI::Command> constructor call:
 
     push @commands, Term::CLI::Command->new(
         name => 'show',
-        options => [ 'verbose|v' ],
+        options => [ 'verbose|v!' ],
         commands => [
             Term::CLI::Command->new( name => 'clock',
                 options => [ 'timezone|tz|t=s' ],
@@ -1398,28 +1398,50 @@ on C<bundling> (allow grouping of single letter options, i.e. C<-a>
 and C<-b> can be written as C<-ab>) and C<require_order> (no mixing of
 options and arguments).
 
-Above, we've added a C<--verbose> option to the C<show> command, and a
-specific C<--timezone> option to the C<clock> sub-command.
+Above, we've added a negatable C<--verbose> option to the C<show>
+command, and a specific C<--timezone> option to the C<clock> sub-command.
 
-The following commands should be allowed now:
+The help text for C<show> will now include the verbose options
+(note that both C<--verbose> and C<--no-verbose> are included):
 
     bash$ perl tutorial/example_16_options.pl
 
     [Welcome to BSSH]
+    bssh> help show
+    Usage:
+        show [--verbose|--no-verbose] [-v] {clock|load|terminal}
+    
+    Description:
+        Show some system-related information, such as the system clock
+        or load average.
+    
+      Sub-Commands:
+        show clock       show system time
+        show load        show system load
+        show terminal    show terminal information
+
+Similarly, the help text for C<show clock> will include the time zone
+option:
+
     bssh> help show clock
-      Usage:
+    Usage:
         show clock [--timezone=s] [--tz=s] [-ts]
 
-      Description:
+    Description:
         Show system time and date.
+
+This will allow the following commands:
+
     bssh> show clock
     Wed Feb 21 15:40:46 2018
+
     bssh> show --verbose clock --tz=UTC
     Wed Feb 21 14:41:02 2018
+
     bssh> show clock -t UTC
     Wed Feb 21 14:41:05 2018
 
-However, the C<--verbose> option cannot be specified after C<clock>:
+However, the C<--verbose> option cannot be specified I<after> C<clock>:
 
     bssh> show clock --verbose --tz=UTC
     ERROR: Unknown option: verbose
@@ -1451,7 +1473,7 @@ If you want C<--verbose> to be valid after C<clock>, you'll need to
 specify it explicitly in its options:
 
     Term::CLI::Command->new( name => 'clock',
-        options => [ 'verbose|v', 'timezone|tz|t=s' ],
+        options => [ 'verbose|v!', 'timezone|tz|t=s' ],
         ...
     ),
 

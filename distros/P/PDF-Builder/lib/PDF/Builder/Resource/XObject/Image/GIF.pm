@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use IO::File;
 use PDF::Builder::Util;
@@ -161,6 +161,21 @@ sub deGIF {
     }
     return $out;
 }
+
+=head1 METHODS
+
+=head2 new
+
+     PDF::Builder::Resource::XObject::Image::GIF->new()
+
+=over
+
+Create an image object from a GIF input file.
+Remember that this should be invoked via the Builder.pm method!
+
+=back
+
+=cut
 
 sub new {
     my ($class, $pdf, $file, %opts) = @_;

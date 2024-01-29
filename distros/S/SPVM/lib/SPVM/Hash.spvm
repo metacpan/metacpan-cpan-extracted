@@ -262,7 +262,7 @@ class Hash {
     my $object = $self->get($key);
     
     unless ($object is_type Byte) {
-      die "The value of \$key must be a Byte object.";
+      die "The type of the value for the key \"$key\" must be the Byte class.";
     }
     
     return (int)(byte)$object;
@@ -272,7 +272,7 @@ class Hash {
     my $object = $self->get($key);
     
     unless ($object is_type Short) {
-      die "The value of \$key must be a Short object.";
+      die "The type of the value for the key \"$key\" must be the Short class.";
     }
     
     return (int)(short)$object;
@@ -282,46 +282,154 @@ class Hash {
     my $object = $self->get($key);
     
     unless ($object is_type Int) {
-      die "The value of \$key must be a Int object.";
+      die "The type of the value for the key \"$key\" must be the Int class.";
     }
     
     return (int)$object;
   }
-  method get_string : string ($key : string) {
-    my $object = $self->get($key);
-    
-    unless ($object is_type string) {
-      die "The value of \$key must be a string.";
-    }
-    
-    return (string)$object;
-  }
+  
   method get_long : long ($key : string) {
     my $object = $self->get($key);
     
     unless ($object is_type Long) {
-      die "The value of \$key must be a Byte object.";
+      die "The type of the value for the key \"$key\" must be the Long class.";
     }
     
     return (long)$object;
   }
+  
   method get_float : float ($key : string) {
     my $object = $self->get($key);
     
     unless ($object is_type Float) {
-      die "The value of \$key must be a Byte object.";
+      die "The type of the value for the key \"$key\" must be the Float class.";
     }
     
     return (float)$object;
   }
+  
   method get_double : double ($key : string) {
     my $object = $self->get($key);
     
     unless ($object is_type Double) {
-      die "The value of \$key must be a Byte object.";
+      die "The type of the value for the key \"$key\" must be the Double class.";
     }
     
     return (double)$object;
+  }
+  
+  method get_string : string ($key : string) {
+    my $object = $self->get($key);
+    
+    unless (!$object || $object is_type string) {
+      die "The type of the value for the key \"$key\" must be the string type.";
+    }
+    
+    return (string)$object;
+  }
+  
+  method get_or_default_byte : int ($key : string, $default : int) {
+    
+    my $value = 0;
+    if ($self->exists($key)) {
+      $value = $self->get_byte($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
+  }
+  
+  method get_or_default_short : int ($key : string, $default : int) {
+    
+    my $value = 0;
+    if ($self->exists($key)) {
+      $value = $self->get_short($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
+  }
+  
+  method get_or_default_int : int ($key : string, $default : int) {
+    
+    my $value = 0;
+    if ($self->exists($key)) {
+      $value = $self->get_int($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
+  }
+  
+  method get_or_default_long : long ($key : string, $default : long) {
+    
+    my $value = 0L;
+    if ($self->exists($key)) {
+      $value = $self->get_long($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
+  }
+  
+  method get_or_default_float : float ($key : string, $default : float) {
+    
+    my $value = 0f;
+    if ($self->exists($key)) {
+      $value = $self->get_float($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
+  }
+  
+  method get_or_default_double : double ($key : string, $default : double) {
+    
+    my $value = 0.0;
+    if ($self->exists($key)) {
+      $value = $self->get_double($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
+  }
+  
+  method get_or_default_string : string ($key : string, $default : string) {
+    
+    my $value = (string)undef;
+    if ($self->exists($key)) {
+      $value = $self->get_string($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
+  }
+  
+  method get_or_default : object ($key : string, $default : object) {
+    
+    my $value = (object)undef;
+    if ($self->exists($key)) {
+      $value = $self->get($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
   }
   
   method delete_or_default_byte : int ($key : string, $default : int) {
@@ -447,7 +555,7 @@ class Hash {
     my $default_seed = $self->{seed};
     
     my $hash = Hash->_siphash13($key, $default_seed);
-    my $index_by_key = (int)($hash remul (long)$entries_length);
+    my $index_by_key = (int)($hash mod_ulong (long)$entries_length);
     
     return $index_by_key;
   }

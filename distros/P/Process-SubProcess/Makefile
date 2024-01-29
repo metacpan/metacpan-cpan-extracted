@@ -20,7 +20,7 @@
 #     META_MERGE => { meta-spec=>{ version=>q[2] }, resources=>{ bugtracker=>{ web=>q[https://github.com/bodo-hugo-barwich/Process/issues] }, repository=>{ type=>q[git], url=>q[https://github.com/bodo-hugo-barwich/Process.git], web=>q[https://github.com/bodo-hugo-barwich/Process] } } }
 #     MIN_PERL_VERSION => q[5.010]
 #     NAME => q[Process::SubProcess]
-#     PREREQ_PM => { Capture::Tiny=>q[0], Data::Dump=>q[0], ExtUtils::MakeMaker=>q[6.46], Getopt::Long::Descriptive=>q[0], JSON=>q[0], Path::Tiny=>q[0], Test::More=>q[0], YAML=>q[0] }
+#     PREREQ_PM => { Capture::Tiny=>q[0], Data::Dump=>q[0], ExtUtils::MakeMaker=>q[6.46], Getopt::Long::Descriptive=>q[0], JSON=>q[0], Path::Tiny=>q[0], Test::More=>q[0], Time::HiRes=>q[0], YAML=>q[0] }
 #     TEST_REQUIRES => { Capture::Tiny=>q[0], Test::More=>q[0] }
 #     VERSION_FROM => q[lib/Process/SubProcess.pm]
 #     test => { TESTS=>q[t/*.t] }
@@ -62,11 +62,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Process::SubProcess
 NAME_SYM = Process_SubProcess
-VERSION = 2.1.9
+VERSION = 2.1.12
 VERSION_MACRO = VERSION
-VERSION_SYM = 2_1_9
+VERSION_SYM = 2_1_12
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 2.1.9
+XS_VERSION = 2.1.12
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -267,7 +267,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Process-SubProcess
-DISTVNAME = Process-SubProcess-2.1.9
+DISTVNAME = Process-SubProcess-2.1.12
 
 
 # --- MakeMaker macro section:
@@ -542,12 +542,13 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  Getopt::Long::Descriptive: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  JSON: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Path::Tiny: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Time::HiRes: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  YAML: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  perl: '\''5.010'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'resources:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  bugtracker: https://github.com/bodo-hugo-barwich/Process/issues' >> META_new.yml
 	$(NOECHO) $(ECHO) '  repository: https://github.com/bodo-hugo-barwich/Process.git' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: v2.1.9' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: v2.1.12' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.018'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
@@ -589,6 +590,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '            "Getopt::Long::Descriptive" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "JSON" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Path::Tiny" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Time::HiRes" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "YAML" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "perl" : "5.010"' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
@@ -611,7 +613,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '         "web" : "https://github.com/bodo-hugo-barwich/Process"' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "v2.1.9",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "v2.1.12",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.02"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
@@ -897,7 +899,7 @@ testdb_static :: static pure_all
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Process-SubProcess" VERSION="2.1.9">' > Process-SubProcess.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Process-SubProcess" VERSION="2.1.12">' > Process-SubProcess.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>Library to manage Sub Processes as objects</ABSTRACT>' >> Process-SubProcess.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Bodo (Hugo) Barwich &lt;b.barwich@hotmail.com&gt;</AUTHOR>' >> Process-SubProcess.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> Process-SubProcess.ppd
@@ -906,6 +908,7 @@ ppd :
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Getopt::Long::Descriptive" />' >> Process-SubProcess.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="JSON::" />' >> Process-SubProcess.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Path::Tiny" />' >> Process-SubProcess.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Time::HiRes" />' >> Process-SubProcess.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="YAML::" />' >> Process-SubProcess.ppd
 	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-gnu-thread-multi-5.30" />' >> Process-SubProcess.ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> Process-SubProcess.ppd

@@ -5,7 +5,7 @@ use warnings;
 
 use Future::AsyncAwait 0.47;
 
-use Test::More;
+use Test2::V0;
 
 use Tangence::Constants;
 use Tangence::Registry;

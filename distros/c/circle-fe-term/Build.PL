@@ -9,7 +9,7 @@ my $build = Module::Build->new(
    dist_name   => 'circle-fe-term',
    requires => {
       'perl' => '5.026',
-      'Object::Pad' => 0,
+      'Object::Pad' => '0.800',
       'Syntax::Keyword::Match' => 0,
 
       'Convert::Color' => '0.06',

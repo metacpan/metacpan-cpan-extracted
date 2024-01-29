@@ -1,5 +1,13 @@
 Go to http://github.com/plack/Plack/issues for the roadmap and known issues.
 
+1.0051  2024-01-05 15:09:37 PST
+    [BUG FIXES]
+        - Fix a bug where $req->headers can pick up non-PSGI header values from environment #703
+
+    [IMPROVEMENTS]
+        - Performance improvements on StackTrace middleware by avoiding overloaded methods #697
+        - Added tests for Plack::Runner::mangle_host_port_socket #700
+
 1.0050  2022-09-05 08:46:44 PDT
     [BUG FIXES]
         - Revert #660 where POST requests failed when Middleware::Static was used with a code in `path` (#683)

@@ -1,12 +1,13 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres/Tables.pm
-## Version v0.5.1
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v1.0.0
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2022/11/03
+## Modified 2023/11/17
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -21,59 +22,10 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object::Tables DB::Object::Postgres );
-    use vars qw( $VERSION $DEBUG $TYPE_TO_CONSTANT );
+    use vars qw( $VERSION $DEBUG );
     use Devel::Confess;
-    # the 'constant' property in the dictionary hash is added in structure()
-    # <https://www.postgresql.org/docs/13/datatype.html>
-    our $TYPE_TO_CONSTANT =
-    {
-    qr/^(bigint|int8)/                  => { constant => '', name => 'PG_INT8', type => 'int8' },
-    qr/^(bigserial|serial8)/            => { constant => '', name => 'PG_INT8', type => 'int8' },
-    qr/^bit(?!>\s+varying)/             => { constant => '', name => 'PG_BIT', type => 'bit' },
-    qr/^(bit\s+varying|varbit)/         => { constant => '', name => 'PG_VARBIT', type => 'varbit' },
-    qr/^(boolean|bool)/                 => { constant => '', name => 'PG_BOOL', type => 'bool' },
-    qr/^box/                            => { constant => '', name => 'PG_BOX', type => 'box' },
-    qr/^bytea/                          => { constant => '', name => 'PG_BYTEA', type => 'bytea' },
-    # Even if the table field type is CHAR, we use PG_VARCHAR, because PG_CHAR is for a single character, and if we used it, it would truncate the data to one character.
-    # <https://github.com/bucardo/dbdpg/issues/103>
-    qr/^(character|char)\b(?![[:blank:]]+varying)/             => { constant => '', name => 'PG_VARCHAR', type => 'varchar' },
-    qr/^(character varying|varchar)/    => { constant => '', name => 'PG_VARCHAR', type => 'varchar' },
-    qr/^cidr\b/                         => { constant => '', name => 'PG_CIDR', type => 'cidr' },
-    qr/^circle/                         => { constant => '', name => 'PG_CIRCLE', type => 'circle' },
-    qr/^date\b/                         => { constant => '', name => 'PG_DATE', type => 'date' },
-    qr/^(double precision|float8)/      => { constant => '', name => 'PG_FLOAT8', type => 'float8' },
-    qr/^inet/                           => { constant => '', name => 'PG_INET', type => 'inet' },
-    qr/^(integer|int|int4)\b/           => { constant => '', name => 'PG_INT4', type => 'int4' },
-    qr/^interval/                       => { constant => '', name => 'PG_INTERVAL', type => 'interval' },
-    qr/^json\b/                         => { constant => '', name => 'PG_JSON', type => 'json' },
-    qr/^jsonb\b/                        => { constant => '', name => 'PG_JSONB', type => 'jsonb' },
-    qr/^line/                           => { constant => '', name => 'PG_LINE', type => 'line' },
-    qr/^lseg/                           => { constant => '', name => 'PG_LSEG', type => 'lseg' },
-    qr/^macaddr/                        => { constant => '', name => 'PG_MACADDR', type => 'macaddr' },
-    qr/^macaddr8/                       => { constant => '', name => 'PG_MACADDR8', type => 'macaddr8' },
-    qr/^money/                          => { constant => '', name => 'PG_MONEY', type => 'money' },
-    qr/^(numeric|decimal)/              => { constant => '', name => 'PG_NUMERIC', type => 'numeric' },
-    qr/^path/                           => { constant => '', name => 'PG_PATH', type => 'path' },
-    qr/^pg_lsn/                         => { constant => '', name => 'PG_PG_LSN', type => 'pg_lsn' },
-    qr/^point/                          => { constant => '', name => 'PG_POINT', type => 'point' },
-    qr/^polygon/                        => { constant => '', name => 'PG_POLYGON', type => 'polygon' },
-    qr/^(real|float4)/                  => { constant => '', name => 'PG_FLOAT4', type => 'float4' },
-    qr/^(smallint|int2)/                => { constant => '', name => 'PG_INT2', type => 'int2' },
-    qr/^(smallserial|serial2)/          => { constant => '', name => 'PG_INT2', type => 'int2' },
-    qr/^(serial|serial4)/               => { constant => '', name => 'PG_INT4', type => 'int4' },
-    qr/^text/                           => { constant => '', name => 'PG_TEXT', type => 'text' },
-    qr/^time(\([^\)]+\))?\s+without\s+time\s+zone/          => { constant => '', name => 'PG_TIME', type => 'time' },
-    qr/^(time(\([^\)]+\))?\s+with\s+time\s+zone)|timetz/    => { constant => '', name => 'PG_TIMETZ', type => 'timetz' },
-    qr/^timestamp(\([^\)]+\))?\s+without\s+time\s+zone/     => { constant => '', name => 'PG_TIMESTAMP', type => 'timestamp' },
-    qr/^(timestamp(\([^\)]+\))?\s+with\s+time\s+zone)|timestamptz/  => { constant => '', name => 'PG_TIMESTAMPTZ', type => 'timestamptz' },
-    qr/^tsquery/                        => { constant => '', name => 'PG_TSQUERY', type => 'tsquery' },
-    qr/^tsvector/                       => { constant => '', name => 'PG_TSVECTOR', type => 'tsvector' },
-    qr/^txid_snapshot/                  => { constant => '', name => 'PG_TXID_SNAPSHOT', type => 'txid_snapshot' },
-    qr/^uuid/                           => { constant => '', name => 'PG_UUID', type => 'uuid' },
-    qr/^xml/                            => { constant => '', name => 'PG_XML', type => 'xml' },
-    };
     our $DEBUG = 0;
-    our $VERSION = 'v0.5.1';
+    our $VERSION = 'v1.0.0';
 };
 
 use strict;
@@ -307,10 +259,7 @@ sub enable_trigger
     return( $sth );
 }
 
-sub exists
-{
-    return( shift->table_exists( shift( @_ ) ) );
-}
+sub exists { return( shift->table_exists( shift( @_ ) ) ); }
 
 # NOTE: sub fields is inherited from DB::Object::Tables
 # sub fields
@@ -350,6 +299,7 @@ sub on_conflict
 {
     my $self = shift( @_ );
     my $q = $self->_reset_query;
+    # Void
     return( $q->on_conflict( @_ ) ) if( !defined( wantarray() ) );
     if( wantarray() )
     {
@@ -365,6 +315,8 @@ sub on_conflict
 }
 
 sub optimize { return( shift->error( "optimize() is not implemented PostgreSQL." ) ); }
+
+sub parent { return( shift->_set_get_scalar( 'parent', @_ ) ); }
 
 sub qualified_name
 {
@@ -403,157 +355,288 @@ sub repair { return( shift->error( "repair() is not implemented PostgreSQL." ) )
 
 sub stat { return( shift->error( "stat() is not implemented PostgreSQL." ) ); }
 
-# TODO: Must implement a cache mechanism for DB::Object::Postgres::structure()
 sub structure
 {
     my $self  = shift( @_ );
     return( $self->_clone( $self->{_cache_structure} ) ) if( $self->{_cache_structure} && !CORE::length( $self->{_reset_structure} // '' ) );
     my $table = $self->{table} ||
         return( $self->error( "No table provided to get its structure." ) );
-    my $struct  = $self->{structure};
-    my $fields  = $self->{fields};
-    my $default = $self->{default};
-    my $null    = $self->{null};
-    my $types   = $self->{types};
-    # <https://www.postgresql.org/docs/10/datatype.html>
-    my $const   = $self->{types_const};
+    my $struct  = $self->{structure} // {};
+    my $fields  = $self->{fields} // {};
+    my $types_dict = $self->database_object->datatype_dict;
+    $self->_load_class( 'DB::Object::Fields::Field' ) || return( $self->pass_error );
+    my $q = $self->_reset_query;
+    # <https://stackoverflow.com/questions/6777456/list-all-index-names-column-names-and-its-table-name-of-a-postgresql-database>
+
     # If we have a cache, use it instead of reprocessing it.
-    if( !%$fields || !%$struct || !%$default )
-    {
-        # my $query = "SELECT * FROM information_schema.columns WHERE table_name = ?";
-#         my $query = <<EOT;
-# SELECT 
-#      pg_tables.schemaname as "schema_name"
-#     ,pg_tables.tablename as "table_name"
-#     ,CASE pg_class.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' WHEN 'm' THEN 'materialized view' WHEN 's' THEN 'special' WHEN 'f' THEN 'foreign table' WHEN 'p' THEN 'table' END as "table_type"
-#     ,pg_attribute.attname AS field
-#     ,pg_attribute.attnum as field_num
-#     ,format_type(pg_attribute.atttypid, NULL) AS "type"
-#     ,pg_attribute.atttypmod AS len
-#     ,(SELECT col_description(pg_attribute.attrelid, pg_attribute.attnum)) AS comment
-#     ,CASE pg_attribute.attnotnull WHEN false THEN 1  ELSE 0 END AS "is_nullable"
-#     ,pg_constraint.conname AS "key"
-#     ,pc2.conname AS foreign_key
-#     ,(SELECT pg_attrdef.adsrc FROM pg_attrdef 
-#         WHERE pg_attrdef.adrelid = pg_class.oid 
-#         AND pg_attrdef.adnum = pg_attribute.attnum) AS "default" 
-# FROM pg_tables, pg_class 
-# JOIN pg_attribute ON pg_class.oid = pg_attribute.attrelid 
-#     AND pg_attribute.attnum > 0 
-# LEFT JOIN pg_constraint ON pg_constraint.contype = 'p'::"char" 
-#     AND pg_constraint.conrelid = pg_class.oid AND
-#     (pg_attribute.attnum = ANY (pg_constraint.conkey)) 
-# LEFT JOIN pg_constraint AS pc2 ON pc2.contype = 'f'::"char" 
-#     AND pc2.conrelid = pg_class.oid 
-#     AND (pg_attribute.attnum = ANY (pc2.conkey)) 
-# WHERE pg_class.relname = pg_tables.tablename  
-#     AND pg_attribute.atttypid <> 0::oid  
-#     AND tablename = ?
-# ORDER BY field_num ASC
+    # <https://stackoverflow.com/questions/52376045/why-does-atttypmod-differ-from-character-maximum-length>
+#     my $query = <<EOT;
+# SELECT
+#      a.table_schema AS "schema_name"
+#     ,CASE c.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' WHEN 'm' THEN 'materialized view' WHEN 's' THEN 'special' WHEN 'f' THEN 'foreign table' WHEN 'p' THEN 'table' END as "table_type"
+#     ,a.column_name AS "field"
+#     ,a.ordinal_position AS "field_num"
+#     ,a.column_default AS "default"
+#     ,a.*
+# FROM information_schema.columns a
+# LEFT JOIN pg_catalog.pg_class c ON c.relname = a.table_name
+# WHERE a.table_name = ?
+# ORDER BY a.ordinal_position
 # EOT
-        my $query;
-        if( $self->database_object->version <= 10 )
-        {
-            $query = <<EOT;
+    # <https://www.postgresql.org/docs/14/catalog-pg-attrdef.html>
+    # We could use:
+    # generate_subscripts(i.indkey, 1)
+    # instead of:
+    # generate_series(1,array_upper(string_to_array(i.indkey::text, ' ' )::int2[],1))
+    # but this is not supported by PostgreSQL v8.0; only from v8.4 onward
+    my $query = <<EOT;
 SELECT 
      n.nspname AS "schema_name"
     ,c.relname AS "table_name"
-    ,CASE c.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' WHEN 'm' THEN 'materialized view' WHEN 's' THEN 'special' WHEN 'f' THEN 'foreign table' WHEN 'p' THEN 'table' END as "table_type"
+    ,CASE c.relkind
+        WHEN 'r' THEN 'table'
+        WHEN 'v' THEN 'view'
+        WHEN 'm' THEN 'materialized view'
+        WHEN 's' THEN 'special'
+        WHEN 'f' THEN 'foreign table'
+        WHEN 'p' THEN 'table'
+     END as "table_type"
     ,a.attname AS "field"
     ,a.attnum AS "field_num"
-    ,pg_catalog.format_type(a.atttypid,a.atttypmod) AS "type"
-    ,CASE a.attnotnull WHEN false THEN TRUE ELSE FALSE END AS "is_nullable"
-    ,(SELECT pg_attrdef.adsrc FROM pg_attrdef 
+    ,CASE
+        WHEN a.atttypmod = -1 THEN null
+        WHEN t.oid IN (1042, 1043) THEN a.atttypmod - 4
+        WHEN t.oid IN (1560, 1562) THEN a.atttypmod
+        ELSE NULL
+     END AS "character_maximum_length"
+    ,CASE SUBSTRING(t.typname,1,1)
+        WHEN '_' THEN SUBSTRING(t.typname,2)
+        ELSE t.typname
+     END AS "data_type"
+    ,pg_catalog.format_type(a.atttypid,a.atttypmod) AS "format_type"
+    ,a.attndims > 0 AS "is_array"
+    ,CASE a.attnotnull
+        WHEN FALSE THEN TRUE
+        ELSE FALSE
+     END AS "is_nullable"
+    ,COALESCE(i.indisprimary,false) AS "is_primary"
+    ,COALESCE(i.indisunique,false) AS "is_unique"
+    ,r.oid IS NOT NULL AS "is_foreign"
+    ,r2.oid IS NOT NULL AS "is_check"
+    ,(SELECT pg_get_expr(pg_attrdef.adbin, pg_attrdef.adrelid) FROM pg_attrdef 
         WHERE pg_attrdef.adrelid = c.oid 
-        AND pg_attrdef.adnum = a.attnum) AS "default" 
+        AND pg_attrdef.adnum = a.attnum) AS "default"
+    ,(SELECT pg_description.description FROM pg_description
+        WHERE pg_description.objoid = c.oid AND pg_description.objsubid = a.attnum) AS "comment"
+    ,(SELECT c2.relname FROM pg_inherits LEFT JOIN pg_class c2 ON c2.oid = pg_inherits.inhparent
+        WHERE pg_inherits.inhrelid = c.oid) AS "table_parent"
+    ,c2.relname AS "index_name"
+    ,i.indnatts AS "index_n_columns"
+    ,i.indkey AS "index_columns"
+    ,ARRAY(
+        SELECT pg_get_indexdef(i.indexrelid, k, TRUE)
+        FROM generate_series(1,array_upper(string_to_array(i.indkey::text, ' ' )::int2[],1)) AS s(k)
+        ORDER BY k
+    ) AS "index_keys"
+    ,r.conname AS "foreign_name"
+    ,CASE
+        WHEN r.conindid > 0 THEN (SELECT c3.relname FROM pg_catalog.pg_class c3 WHERE c3.oid = r.conindid)
+        ELSE NULL
+     END AS "foreign_index_name"
+    ,CASE
+        WHEN r.confrelid > 0 THEN (SELECT c4.relname FROM pg_catalog.pg_class c4 WHERE c4.oid = r.confrelid)
+        ELSE NULL
+     END AS "foreign_table"
+    ,CASE r.confupdtype
+        WHEN 'a' THEN 'nothing'
+        WHEN 'r' THEN 'restrict'
+        WHEN 'c' THEN 'cascade'
+        WHEN 'n' THEN 'null'
+        WHEN 'd' THEN 'default'
+        ELSE NULL
+     END AS "foreign_update_action"
+    ,CASE r.confdeltype
+        WHEN 'a' THEN 'nothing'
+        WHEN 'r' THEN 'restrict'
+        WHEN 'c' THEN 'cascade'
+        WHEN 'n' THEN 'null'
+        WHEN 'd' THEN 'default'
+        ELSE NULL
+     END AS "foreign_delete_action"
+    ,CASE r.confmatchtype
+        WHEN 'f' THEN 'full'
+        WHEN 'p' THEN 'partial'
+        WHEN 's' THEN 'simple'
+        ELSE NULL
+     END AS "foreign_match"
+    ,r.conkey AS "foreign_columns"
+    ,ARRAY(
+        SELECT a2.attname
+        FROM generate_series(1,array_upper(r.conkey,1)) AS z(j), pg_catalog.pg_attribute a2
+        WHERE a2.attrelid = c.oid AND a2.attnum = r.conkey[j]
+    ) AS "foreign_keys"
+    ,CASE
+        WHEN r.oid IS NOT NULL THEN pg_get_constraintdef(r.oid,TRUE)
+        ELSE NULL
+     END AS "foreign_expression"
+    ,r2.conname AS "check_name"
+    ,CASE
+        WHEN r2.conindid > 0 THEN (SELECT c3.relname FROM pg_catalog.pg_class c3 WHERE c3.oid = r2.conindid)
+        ELSE NULL
+     END AS "check_index_name"
+    ,r2.conkey AS "check_columns"
+    ,ARRAY(
+        SELECT a2.attname
+        FROM generate_series(1,array_upper(r2.conkey,1)) AS z(j), pg_catalog.pg_attribute a2
+        WHERE a2.attrelid = c.oid AND a2.attnum = r2.conkey[j]
+    ) AS "check_keys"
+    ,CASE
+        WHEN r2.oid IS NOT NULL THEN pg_get_constraintdef(r2.oid,TRUE)
+        ELSE NULL
+     END AS "check_expression"
 FROM pg_catalog.pg_class c
 LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
 LEFT JOIN pg_catalog.pg_attribute a ON a.attrelid = c.oid
-WHERE c.relname = ? AND a.attnum > 0 AND NOT a.attisdropped
+LEFT JOIN pg_catalog.pg_type t ON t.oid = a.atttypid
+LEFT JOIN pg_catalog.pg_index i ON i.indrelid = c.oid AND a.attnum = ANY (i.indkey::int[])
+LEFT JOIN pg_catalog.pg_class c2 ON c2.oid = i.indexrelid
+LEFT JOIN pg_catalog.pg_constraint r ON r.conrelid = c.oid AND r.contype = 'f' AND a.attnum = ANY (r.conkey)
+LEFT JOIN pg_catalog.pg_constraint r2 ON r2.conrelid = c.oid AND r2.contype = 'c' AND a.attnum = ANY (r2.conkey)
+WHERE
+    c.relname = ? AND
+    a.attnum > 0 AND
+    NOT a.attisdropped
 ORDER BY a.attnum
 EOT
+    # http://www.postgresql.org/docs/9.3/interactive/infoschema-columns.html
+    # select * from information_schema.columns where table_name = 'address'
+    $self->messagec( 5, "Executing SQL query to get the table structure for table {green}${table}{/}" );
+    my $sth = $self->database_object->prepare_cached( $query ) ||
+        return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $self->database_object->errstr ) );
+    $sth->execute( $table ) ||
+        return( $self->error( "Error while executing query to get table '$table' columns specification: ", $sth->errstr ) );
+    my $check = {};
+    my $foreign = {};
+    my $index = {};
+    my @primary = ();
+    my $ref = '';
+    my $c   = 0;
+    # Mysql: field, type, null, key, default, extra
+    # Postgres: tablename, field, field_num, type, len, comment, is_nullable, key, foreign_key, default 
+    while( $ref = $sth->fetchrow_hashref() )
+    {
+        $self->messagec( 6, "Checking table ${table} field {green}", $ref->{field}, "{/} with type {green}", $ref->{data_type}, "{/} -> ", sub{ $self->Module::Generic::dump( $ref ) } );
+        my $def =
+        {
+        name            => $ref->{field},
+        comment         => $ref->{comment},
+        default         => $ref->{default},
+        ( $ref->{check_name} ? ( check_name => $ref->{check_name} ) : () ),
+        ( $ref->{foreign_name} ? ( foreign_name => $ref->{foreign_name} ) : () ),
+        ( $ref->{index_name} ? ( index_name => $ref->{index_name} ) : () ),
+        is_array        => ( $ref->{is_array} ? 1 : 0 ),
+        is_check        => ( $ref->{is_check} ? 1 : 0 ),
+        is_foreign      => ( $ref->{is_foreign} ? 1 : 0 ),
+        is_nullable     => ( $ref->{is_nullable} ? 1 : 0 ),
+        is_primary      => ( $ref->{is_primary} ? 1 : 0 ),
+        is_unique       => ( $ref->{is_unique} ? 1 : 0 ),
+        pos             => $ref->{field_num},
+        # query_object    => $q,
+        size            => $ref->{character_maximum_length},
+        # When the field is an array, the data type will start with an underscore
+        type            => ( substr( $ref->{data_type}, 0, 1 ) eq '_' ? substr( $ref->{data_type}, 1 ) : $ref->{data_type} ),
+        # table_object    => $self,
+        };
+        $self->{type} = $ref->{table_type} if( !$self->{type} );
+        $self->{schema} = $ref->{schema_name} if( !$self->{schema} );
+        $self->{parent} = $ref->{table_parent} if( !$self->{table_parent} );
+        if( $ref->{index_name} &&
+            !CORE::exists( $index->{ $ref->{index_name} } ) )
+        {
+            my $constraint = $self->new_index(
+                is_primary  => $ref->{is_primary},
+                is_unique   => $ref->{is_unique},
+                fields      => $ref->{index_keys},
+                name        => $ref->{index_name},
+            ) || return( $self->pass_error );
+            $index->{ $ref->{index_name} } = $constraint;
+        }
+        if( $ref->{check_name} &&
+            !CORE::exists( $check->{ $ref->{check_name} } ) )
+        {
+            my $constraint = $self->new_check(
+                expr    => $ref->{check_expression},
+                fields  => $ref->{check_keys},
+                name    => $ref->{check_name},
+            ) || return( $self->pass_error );
+            $check->{ $ref->{check_name} } = $constraint;
+        }
+        if( $ref->{foreign_name} &&
+            !CORE::exists( $foreign->{ $ref->{foreign_name} } ) )
+        {
+            my $constraint = $self->new_foreign(
+                expr        => $ref->{foreign_expression},
+                match       => $ref->{foreign_match},
+                on_delete   => $ref->{foreign_delete_action},
+                on_update   => $ref->{foreign_update_action},
+                table       => $ref->{foreign_table},
+                fields      => $ref->{foreign_keys},
+                name        => $ref->{foreign_name},
+            ) || return( $self->pass_error );
+            $foreign->{ $ref->{foreign_name} } = $constraint;
+        }
+
+        my( $const_def, $dict );
+        if( $def->{is_array} &&
+            CORE::exists( $types_dict->{ "$def->{type}array" } ) )
+        {
+            $const_def = $types_dict->{ "$def->{type}array" };
+        }
+        elsif( CORE::exists( $types_dict->{ $def->{type} } ) )
+        {
+            $const_def = $types_dict->{ $def->{type} };
         }
         else
         {
-            $query = <<EOT;
-SELECT 
-     n.nspname AS "schema_name"
-    ,c.relname AS "table_name"
-    ,CASE c.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' WHEN 'm' THEN 'materialized view' WHEN 's' THEN 'special' WHEN 'f' THEN 'foreign table' WHEN 'p' THEN 'table' END as "table_type"
-    ,a.attname AS "field"
-    ,a.attnum AS "field_num"
-    ,pg_catalog.format_type(a.atttypid,a.atttypmod) AS "type"
-    ,CASE a.attnotnull WHEN false THEN TRUE ELSE FALSE END AS "is_nullable"
-FROM pg_catalog.pg_class c
-LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-LEFT JOIN pg_catalog.pg_attribute a ON a.attrelid = c.oid
-WHERE c.relname = ? AND a.attnum > 0 AND NOT a.attisdropped
-ORDER BY a.attnum
-EOT
-        }
-        # http://www.postgresql.org/docs/9.3/interactive/infoschema-columns.html
-        # select * from information_schema.columns where table_name = 'address'
-        $self->messagec( 5, "Executing SQL query to get the table structure for table {green}${table}{/}" );
-        my $sth = $self->database_object->prepare_cached( $query ) ||
-            return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $self->database_object->errstr() ) );
-        $sth->execute( $table ) ||
-            return( $self->error( "Error while executing query to get table '$table' columns specification: ", $sth->errstr() ) );
-        my @primary = ();
-        my $ref = '';
-        my $c   = 0;
-        my $type_convert =
-        {
-        'character varying' => 'varchar',
-        # Even if the table field type is CHAR, we use PG_VARCHAR, because PG_CHAR is for a single character, and if we used it, it would truncate the data to one character.
-        # <https://github.com/bucardo/dbdpg/issues/103>
-        'character'         => 'varchar',
-        };
-        # Mysql: field, type, null, key, default, extra
-        # Postgres: tablename, field, field_num, type, len, comment, is_nullable, key, foreign_key, default 
-        while( $ref = $sth->fetchrow_hashref() )
-        {
-            $self->{type} = $ref->{table_type} if( !$self->{type} );
-            $self->{schema} = $ref->{schema_name} if( !$self->{schema} );
-            my %data = map{ lc( $_ ) => $ref->{ $_ } } keys( %$ref );
-            if( exists( $type_convert->{ $data{type} } ) )
-            {
-                $data{type} = $type_convert->{ $data{type} };
-            }
-            $data{default} = '' if( !defined( $data{default} ) );
-            # push( @order, $data{ 'field' } );
-            $fields->{ $data{field} }  = ++$c;
-            $types->{ $data{field} } = $data{type};
-            $default->{ $data{field} } = '';
-            if( CORE::length( $data{default} ) )
-            {
-                $default->{ $data{field} } = $data{default} if( $data{default} ne '' && !$data{is_nullable} );
-            }
-            $null->{ $data{field} } = $data{is_nullable} ? 1 : 0;
             # Get the constant
-            DATA_TYPE_RE: foreach my $re ( keys( %$TYPE_TO_CONSTANT ) )
+            DATA_TYPE_RE: foreach my $type ( keys( %$types_dict ) )
             {
-                if( $data{type} =~ /$re/i )
+                if( $def->{type} =~ /$types_dict->{ $type }->{re}/i )
                 {
-                    my $dict = \%{$TYPE_TO_CONSTANT->{ $re }};
-                    $dict->{constant} = $self->database_object->get_sql_type( $dict->{type} ) unless( length( $dict->{constant} ) );
-                    $const->{ $data{field} } = $dict;
+                    $const_def = $types_dict->{ $type };
                     last DATA_TYPE_RE;
                 }
             }
-            my @define = ( $data{type} );
-            push( @define, "DEFAULT '$data{default}'" ) if( $data{default} ne '' || !$data{is_nullable} );
-            push( @define, "NOT NULL" ) if( !$data{is_nullable} );
-            push( @primary, $data{field} ) if( $data{key} );
-            $struct->{ $data{field} } = CORE::join( ' ', @define );
         }
-        $sth->finish;
-        if( @primary )
+        if( defined( $const_def ) )
         {
-            $self->{primary} = \@primary;
+            my $const_keys = [keys( %$const_def )];
+            my $dict = {};
+            @$dict{ @$const_keys } = @$const_def{ @$const_keys };
+            $def->{datatype} = $dict;
+            # $def->{type} = $dict->{type};
         }
+        $self->messagec( 6, "\tField {green}", $def->{name}, "{/} has type {green}", $def->{type}, "{/} and dictionary -> ", sub{ $self->Module::Generic::dump( $def ) } );
+        $def->{query_object} = $q;
+        $def->{table_object} = $self;
+        my @define = ( $def->{type} );
+        push( @define, "DEFAULT '$def->{default}'" ) if( defined( $def->{default} ) && length( $def->{default} // '' ) );
+        push( @define, "NOT NULL" ) if( !$def->{is_nullable} );
+        push( @primary, $def->{name} ) if( $ref->{key} );
+        $struct->{ $def->{name} } = CORE::join( ' ', @define );
+        my $field = DB::Object::Fields::Field->new( %$def, debug => $self->debug ) ||
+            return( $self->pass_error( DB::Object::Fields::Field->error ) );
+        $fields->{ $def->{name} } = $field;
     }
-    # return( wantarray() ? () : undef() ) if( !scalar( keys( %$struct ) ) );
-    # return( wantarray() ? %$struct : \%$struct );
+    $sth->finish;
+    if( @primary )
+    {
+        $self->{primary} = \@primary;
+    }
+    $self->{check}   = $check;
+    $self->{fields}  = $fields;
+    $self->{foreign} = $foreign;
+    $self->{indexes} = $index;
     $self->{_cache_structure} = $struct;
     return( $self->_clone( $struct ) );
 }
@@ -602,13 +685,35 @@ DB::Object::Postgres::Tables - PostgreSQL Table Object
 
 =head1 VERSION
 
-    v0.5.1
+    v1.0.0
 
 =head1 DESCRIPTION
 
 This is a PostgreSQL table object class. It inherits from L<DB::Object::Tables>
 
 =head1 METHODS
+
+=head2 check
+
+Sets or gets an hash reference of check constraint name to an hash of properties for that constraint.
+
+See each driver for the value provided, but available properties typically are:
+
+=over 4
+
+=item * C<expr>
+
+The check constraint expression
+
+=item * C<fields>
+
+The L<array object|Module::Generic::Array> of table columns associated with this check constraint.
+
+=item * C<name>
+
+The check constraint name.
+
+=back
 
 =head2 create
 
@@ -622,25 +727,25 @@ Possible parameters are:
 
 =over 4
 
-=item I<comment>
+=item * C<comment>
 
-=item I<inherits>
+=item * C<inherits>
 
 Takes the name of another table to inherit from
 
-=item I<on commit>
+=item * C<on commit>
 
-=item I<tablespace>
+=item * C<tablespace>
 
-=item I<temporary>
+=item * C<temporary>
 
 If provided, this will create a temporary table.
 
-=item I<with oids>
+=item * C<with oids>
 
 If true, this will enable table oid
 
-=item I<without oids>
+=item * C<without oids>
 
 If true, this will disable table oid
 
@@ -672,13 +777,13 @@ It takes the following options:
 
 =over 4
 
-=item I<all>
+=item * C<all>
 
 If true, this will disable all trigger on the table. Please note that, as per the L<PostgreSQL documentation|https://www.postgresql.org/docs/10/sql-altertable.html> this requires super user privilege.
 
 If false, this will disable only the user triggers, i.e. not including the system ones.
 
-=item I<name>
+=item * C<name>
 
 If a trigger name is provided, it will be used to specifically disable this trigger.
 
@@ -694,17 +799,17 @@ It takes the following options:
 
 =over 4
 
-=item I<cascade>
+=item * C<cascade>
 
 If true, C<CASCADE> will be added to the C<DROP> query.
 
-=item I<if_exists>
+=item * C<if_exists>
 
 If true, this will add a C<IF EXISTS> to the C<DROP> query.
 
 You can also use I<if-exists>
 
-=item I<restrict>
+=item * C<restrict>
 
 If true, C<RESTRICT> will be added to the C<DROP> query.
 
@@ -730,13 +835,13 @@ It takes the following options:
 
 =over 4
 
-=item I<all>
+=item * C<all>
 
 If true, this will enable all trigger on the table. Please note that, as per the L<PostgreSQL documentation|https://www.postgresql.org/docs/10/sql-altertable.html> this requires super user privilege.
 
 If false, this will enable only the user triggers, i.e. not including the system ones.
 
-=item I<name>
+=item * C<name>
 
 If a trigger name is provided, it will be used to specifically enable this trigger.
 
@@ -745,6 +850,44 @@ If a trigger name is provided, it will be used to specifically enable this trigg
 =head2 exists
 
 Returns true if the current table exists, or false otherwise.
+
+=head2 foreign
+
+Sets or gets an hash reference of foreign key constraint name to an hash of properties for that constraint.
+
+Available properties are:
+
+=over 4
+
+=item * C<expr>
+
+The foreign key expression used when creating the table schema.
+
+=item * C<match>
+
+Typical value is C<full>, C<partial> and C<simple>
+
+=item * C<on_delete>
+
+The action the database is to take upon deletion. For example: C<nothing>, C<restrict>, C<cascade>, C<null> or C<default>
+
+=item * C<on_update>
+
+The action the database is to take upon update. For example: C<nothing>, C<restrict>, C<cascade>, C<null> or C<default>
+
+=item * C<table>
+
+The table name of the foreign key.
+
+=item * C<fields>
+
+The associated table column names for this foreign key constraint.
+
+=item * C<name>
+
+The foreign key constraint name.
+
+=back
 
 =head2 lock
 
@@ -783,6 +926,10 @@ A convenient wrapper to L<DB::Object::Postgres::Query/on_conflict>
 =head2 optimize
 
 Not implemented in PostgreSQL.
+
+=head2 parent
+
+This will return the parent table if the current table inherits from another table.
 
 =head2 qualified_name
 
@@ -835,35 +982,35 @@ This method will also set the following object properties:
 
 =over 4
 
-=item L<DB::Object::Tables/type>
+=item * L<DB::Object::Tables/type>
 
 The table type.
 
-=item L<DB::Object::Tables/schema>
+=item * L<DB::Object::Tables/schema>
 
 The table schema.
 
-=item I<default>
+=item * C<default>
 
 A column name to default value hash reference
 
-=item I<fields>
+=item * C<fields>
 
 A column name to field position (integer) hash reference
 
-=item I<null>
+=item * C<null>
 
 A column name to a boolean representing whether the column is nullable or not.
 
-=item L<DB::Object::Tables/primary>
+=item * L<DB::Object::Tables/primary>
 
 An array reference of column names that are used as primary key for the table.
 
-=item I<structure>
+=item * C<structure>
 
 A column name to its sql definition
 
-=item I<types>
+=item * C<types>
 
 A column name to column data type hash reference
 

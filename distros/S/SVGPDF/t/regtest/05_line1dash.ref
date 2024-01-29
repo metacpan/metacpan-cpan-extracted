@@ -1,0 +1,26 @@
+==== start svg ====
+XObject #1
+vb 0 0 200 150 (inferred) => bb 0.00 -150.00 200.00 0.00
+matrix( 1 0 0 -1 0 0)
+vb rect( 0.00 0.00 200.00 150.00)
+xo fill_color black (initial)
+  start handling path (SVGPDF::Path)
+  path d="M 10 75 Q 50 10 100 ..."
+    xo save
+    path linecap=1 stroke=black fill=none sda=5 10 5
+    xo move(10.00,75.00)
+    xo spline(50.00,10.00 100.00,75.00)
+    xo spline(150.00,140.00 190.00,75.00)
+    xo stroke (black)
+    xo restore
+  end handling path
+  start handling path (SVGPDF::Path)
+  path d="M 10 75 L 190 75"
+    xo save
+    path stroke-width=1 linecap=1 stroke=red fill=none sda=5 5
+    xo move(10.00,75.00)
+    xo line(190.00,75.00)
+    xo stroke (red)
+    xo restore
+  end handling path
+==== end svg ====

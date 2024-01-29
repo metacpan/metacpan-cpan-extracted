@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sg - Package for language Sango
 
 package Locale::CLDR::Locales::Sg;
 # This file auto generated from Data\common\main\sg.xml
-#	on Tue  5 Dec  1:30:26 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'Akâan',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Andôro',
  			'AE' => 'Arâbo Emirâti Ôko',
@@ -217,7 +217,6 @@ has 'display_name_region' => (
  			'MD' => 'Moldavùii',
  			'MG' => 'Madagaskära',
  			'MH' => 'Âzûâ Märshâl',
- 			'MK' => 'Maseduäni',
  			'ML' => 'Malïi',
  			'MM' => 'Myämâra',
  			'MN' => 'Mongolïi',
@@ -334,7 +333,7 @@ has 'characters' => (
 			auxiliary => qr{[c q x]},
 			index => ['A', 'B', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
 			main => qr{[a â ä b d e ê ë f g h i î ï j k l m n o ô ö p r s t u ù û ü v w y z]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT

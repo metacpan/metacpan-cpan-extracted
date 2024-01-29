@@ -1,0 +1,34 @@
+<svg height="400" id="svgb-56" viewBox="0, 0, 400, 400" width="400" class="graph-100-10-rw">
+<style>
+.l2      { stroke-width: 2 }
+.s-gray2 { stroke: rgb(128,128,128) }
+.s-green { stroke: green }
+.s-red   { stroke: red }
+.f-none  { fill: none }
+</style>
+        <circle cx="100" cy="100" r="50" stroke-dasharray="2,2" class="l2 s-gray2 f-none"></circle>
+        <circle cx="300" cy="100" r="50" stroke-dasharray="2,2" class="l2 s-gray2 f-none"></circle>
+        <circle cx="100" cy="300" r="50" stroke-dasharray="2,2" class="l2 s-gray2 f-none"></circle>
+        <circle cx="300" cy="300" r="50" stroke-dasharray="2,2" class="l2 s-gray2 f-none"></circle>
+        <circle cx="50" cy="100" r="6" class="l2  f-none s-green"></circle>
+        <circle cx="100" cy="150" r="6" class="l2  f-none s-red"></circle>
+        <circle cx="250" cy="100" r="6" class="l2  f-none s-green"></circle>
+        <circle cx="300" cy="150" r="6" class="l2  f-none s-red"></circle>
+        <circle cx="50" cy="300" r="6" class="l2  f-none s-green"></circle>
+        <circle cx="100" cy="350" r="6" class="l2  f-none s-red"></circle>
+        <circle cx="250" cy="300" r="6" class="l2  f-none s-green"></circle>
+        <circle cx="300" cy="350" r="6" class="l2  f-none s-red"></circle>
+        <path d="M50 100 A 50 50, 0, 0, 0, 100 150" fill="none" stroke="black" stroke-width="3"></path>
+        <path d="M250 100 A 50 50, 0, 1, 0, 300 150" fill="none" stroke="black" stroke-width="3"></path>
+        <path d="M50 300 A 50,50, 0, 0, 1, 100 350" fill="none" stroke="black" stroke-width="3"></path>
+        <path d="M250 300 A 50 50, 0, 1, 1, 300 350" fill="none" stroke="black" stroke-width="3"></path>
+        <text text-anchor="middle" x="100" y="20">large-arc-flag="0"<tspan dy="20" x="100">sweep-flag="0"</tspan>
+        </text>
+        <text text-anchor="middle" x="300" y="20">large-arc-flag="1"<tspan dy="20" x="300">sweep-flag="0"</tspan>
+        </text>
+        <text text-anchor="middle" x="100" y="220">large-arc-flag="0"<tspan dy="20" x="100">sweep-flag="1"</tspan>
+        </text>
+        <text text-anchor="middle" x="300" y="220">large-arc-flag="1"<tspan dy="20" x="300">sweep-flag="1"</tspan>
+        </text>
+    </svg>
+         

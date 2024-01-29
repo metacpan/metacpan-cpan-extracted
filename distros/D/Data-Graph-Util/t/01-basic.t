@@ -3,10 +3,15 @@
 use 5.010001;
 use strict;
 use warnings;
-
-use Data::Graph::Util qw(toposort is_cyclic is_acyclic);
 use Test::Exception;
 use Test::More 0.98;
+
+use Data::Graph::Util qw(
+                            toposort
+                            is_cyclic
+                            is_acyclic
+                            connected_components
+                    );
 
 subtest "toposort" => sub {
     is_deeply([toposort({})], []);
@@ -55,6 +60,14 @@ subtest "is_acyclic" => sub {
     ok(!is_acyclic({a=>["b"], b=>["a"]}));
     ok( is_acyclic({a=>["b"], b=>["c"], c=>[]}));
     ok(!is_acyclic({a=>["b"], b=>["a"], c=>["a"]}));
+};
+
+subtest "connected_components" => sub {
+    is_deeply([connected_components({})], []);
+    is_deeply([connected_components({a=>["b"]})], [{a=>["b"]}]);
+    is_deeply([connected_components({a=>["b"], b=>["c"], c=>["a"]})], [{a=>["b"], b=>["c"], c=>["a"]}]);
+    is_deeply([connected_components({a=>["b"], b=>["c","d"], d=>["c"], e=>["f"]})], [{a=>["b"], b=>["c","d"], d=>["c"]}, {e=>["f"]}]);
+    is_deeply([connected_components({a=>["b"], b=>["c","d"], d=>["c"], e=>["f"], g=>["a"]})], [{a=>["b"], b=>["c","d"], d=>["c"], g=>["a"]}, {e=>["f"]}]);
 };
 
 done_testing;

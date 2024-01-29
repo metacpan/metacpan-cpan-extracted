@@ -154,12 +154,11 @@ sub run {
         $req,
         'ext2fcheck',
         params => {
-            TOKEN         => $token,
-            TARGET        => '/yubikey2fcheck?skin=' . $self->p->getSkin($req),
-            INPUTLOGO     => $self->logo,
-            LEGEND        => 'clickOnYubikey',
-            CHECKLOGINS   => $checkLogins,
-            STAYCONNECTED => $stayConnected
+            TOKEN     => $token,
+            TARGET    => '/yubikey2fcheck?skin=' . $self->p->getSkin($req),
+            INPUTLOGO => $self->logo,
+            LEGEND    => 'clickOnYubikey',
+            $self->get2fTplParams($req),
         }
     );
     $self->logger->debug( $self->prefix . '2f: display form' );

@@ -7,9 +7,6 @@ use 5.022;
 use strict;
 use warnings;
 
-no warnings 'experimental::smartmatch';
-use feature 'switch';
-
 use App::PTP::Files qw(write_side_output read_side_input write_handle);
 use App::PTP::PerlEnv;
 use App::PTP::Util;
@@ -315,10 +312,12 @@ sub do_perl {
           my $r = eval { $wrapped_code->() };
           # We can't use return as we're not in a sub.
           if (warn_or_die_if_needed("Perl code failed in ${scmd}", $modes)) {
-            given ($cmd) {
-              1 when 'filter';
-              $input when 'n';
-              $markers[$.] when 'mark-line';
+            if ($cmd eq 'filter') {
+              1;
+            } elsif ($cmd eq 'n') {
+              $input;
+            } elsif ($cmd eq 'mark-line') {
+              $markers[$.];
             }
           } else {
             $r;

@@ -9,7 +9,7 @@ BEGIN {
    $] >= 5.026000 or plan skip_all => "No parse_subsignature()";
 }
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 # See also
 #   https://rt.cpan.org/Ticket/Display.html?id=134456

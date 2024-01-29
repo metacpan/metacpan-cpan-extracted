@@ -2,7 +2,7 @@ package HealthCheck::Diagnostic;
 
 # ABSTRACT: A base clase for writing health check diagnositics
 use version;
-our $VERSION = 'v1.8.1'; # VERSION
+our $VERSION = 'v1.8.2'; # VERSION
 
 use 5.010;
 use strict;
@@ -476,7 +476,7 @@ HealthCheck::Diagnostic - A base clase for writing health check diagnositics
 
 =head1 VERSION
 
-version v1.8.1
+version v1.8.2
 
 =head1 SYNOPSIS
 

@@ -27,16 +27,6 @@ t/Math/BigInt/Lib/TestUtil.pm
 t/mbi_rand.t
 t/mbimbf.inc
 t/mbimbf.t
-xt/author/batan-mbf.t
-xt/author/batan2-mbf.t
-xt/author/bexp-mbf.t
-xt/author/blog-mbf.t
-xt/author/blog-mbi.t
-xt/author/bmod-bdiv-mbi.t
-xt/author/bnok-mbi.t
-xt/author/bpi-mbf.t
-xt/author/btmod-btdiv-mbi.t
-xt/author/constructors-a-p-r.t
 xt/author/lib-arithmetic-binary-_add.dat
 xt/author/lib-arithmetic-binary-_add.t
 xt/author/lib-arithmetic-binary-_div.dat
@@ -67,6 +57,8 @@ xt/author/lib-arithmetic-ternary-_modpow.dat
 xt/author/lib-arithmetic-ternary-_modpow.t
 xt/author/lib-arithmetic-ternary-_rsft.dat
 xt/author/lib-arithmetic-ternary-_rsft.t
+xt/author/lib-arithmetic-unary-_clog10.t
+xt/author/lib-arithmetic-unary-_clog2.t
 xt/author/lib-arithmetic-unary-_dec.dat
 xt/author/lib-arithmetic-unary-_dec.t
 xt/author/lib-arithmetic-unary-_dfac.dat
@@ -75,6 +67,8 @@ xt/author/lib-arithmetic-unary-_fac.dat
 xt/author/lib-arithmetic-unary-_fac.t
 xt/author/lib-arithmetic-unary-_fib.dat
 xt/author/lib-arithmetic-unary-_fib.t
+xt/author/lib-arithmetic-unary-_ilog10.t
+xt/author/lib-arithmetic-unary-_ilog2.t
 xt/author/lib-arithmetic-unary-_inc.dat
 xt/author/lib-arithmetic-unary-_inc.t
 xt/author/lib-arithmetic-unary-_lucas.dat
@@ -148,9 +142,6 @@ xt/author/lib.ini
 xt/author/lib.t
 xt/author/lib_load-mbf-mbi.t
 xt/author/lib_load-mbi-mbf.t
-xt/author/numify-mbf.t
-xt/author/numify-mbi.t
-xt/author/relop-mbi-mbf.t
 xt/release/changelog.t
 xt/release/cpan-changes.t
 xt/release/dist-manifest.t

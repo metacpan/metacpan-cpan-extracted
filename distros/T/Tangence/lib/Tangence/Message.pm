@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.66;
+use warnings;
+use Object::Pad 0.800;
 
-package Tangence::Message 0.30;
+package Tangence::Message 0.32;
 class Tangence::Message;
 
 use Carp;
@@ -25,6 +26,17 @@ use Tangence::Object;
 
 use List::Util 1.29 qw( pairmap );
 use Scalar::Util qw( weaken blessed );
+
+=head1 NAME
+
+C<Tangence::Message> - contains a single C<Tangence> protocol message
+
+=head1 DESCRIPTION
+
+This module is a component of L<Tangence::Client> or L<Tangence::Server>. It
+is not intended for end-user use directly.
+
+=cut
 
 # Normally we don't care about hash key order. But, when writing test scripts
 # that will assert on the serialisation bytes, we do. Setting this to some

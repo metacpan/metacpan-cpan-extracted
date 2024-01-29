@@ -1,3 +1,7 @@
+0.67 2023-12-30
+
+ * Fix CPAN RT #147806 (cpanratings.perl.org no longer exists)
+
 0.66 2022-05-16
 
  * Fix documentation errors.

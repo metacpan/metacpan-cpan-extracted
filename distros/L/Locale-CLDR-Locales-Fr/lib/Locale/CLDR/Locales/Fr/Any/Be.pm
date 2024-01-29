@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Fr::Any::Be - Package for language French
 
 package Locale::CLDR::Locales::Fr::Any::Be;
 # This file auto generated from Data\common\main\fr_BE.xml
-#	on Tue  5 Dec  1:11:13 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -25,19 +25,19 @@ use Moo;
 
 extends('Locale::CLDR::Locales::Fr::Any');
 has 'valid_algorithmic_formats' => (
-	is => 'ro',
-	isa => ArrayRef,
-	init_arg => undef,
-	default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal-masculine','spellout-cardinal-feminine','spellout-ordinal-masculine-plural','spellout-ordinal-masculine','spellout-ordinal-feminine-plural','spellout-ordinal-feminine' ]},
+    is => 'ro',
+    isa => ArrayRef,
+    init_arg => undef,
+    default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal-masculine','spellout-cardinal-feminine','spellout-ordinal-masculine-plural','spellout-ordinal-masculine','spellout-ordinal-feminine-plural','spellout-ordinal-feminine' ]},
 );
 
 has 'algorithmic_number_format_data' => (
-	is => 'ro',
-	isa => HashRef,
-	init_arg => undef,
-	default => sub { 
-		use bigfloat;
-		return {
+    is => 'ro',
+    isa => HashRef,
+    init_arg => undef,
+    default => sub {
+        use bigfloat;
+        return {
 		'cents-f' => {
 			'private' => {
 				'0' => {
@@ -657,14 +657,14 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(100),
 					rule => q(←%spellout-cardinal-masculine←-cent→%%cents-m→),
 				},
-				'10000' => {
-					base_value => q(10000),
-					divisor => q(10000),
+				'2000' => {
+					base_value => q(2000),
+					divisor => q(1000),
 					rule => q(=%spellout-numbering=),
 				},
 				'max' => {
-					base_value => q(10000),
-					divisor => q(10000),
+					base_value => q(2000),
+					divisor => q(1000),
 					rule => q(=%spellout-numbering=),
 				},
 			},
@@ -975,14 +975,14 @@ has 'algorithmic_number_format_data' => (
 				},
 			},
 		},
-	} },
+    } },
 );
 
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'frp' => 'franco-provençal',
@@ -1003,10 +1003,9 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
-			'BN' => 'Brunei',
- 			'GS' => 'Îles Géorgie du Sud et Sandwich du Sud',
+			'GS' => 'Îles Géorgie du Sud et Sandwich du Sud',
 
 		}
 	},
@@ -1077,8 +1076,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'eras' => (

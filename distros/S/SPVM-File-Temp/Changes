@@ -1,3 +1,16 @@
+0.022 2023-12-25
+  [Prerequirement Changes]
+    * Require SPVM 0.989065.
+    * Require SPVM::Sys 0.513.
+    * SPVM::File::Path 0.011001
+    * SPVM::File::Spec 0.081003
+    * SPVM::IO 0.211002
+
+  [Document Improvement]
+    * Improve the doc of File::Temp::Dir.
+    * Improve the doc of File::Temp.
+  [Internal Changes]
+    * Remove using unused modules.
 0.021 2023-05-23
   [Prerequirement Changes]
     * SPVM::Sys 0.481001 is required.

@@ -44,8 +44,8 @@ subtest '$y = $x -> copy()' => sub {
 
     # accuracy and precision
 
-    is($y->{_a}, $x->{_a}, 'accuracy');
-    is($y->{_p}, $x->{_p}, 'precision');
+    is($y->{accuracy}, $x->{accuracy}, 'accuracy');
+    is($y->{precision}, $x->{precision}, 'precision');
 };
 
 # testing copy() as a class method
@@ -79,6 +79,6 @@ subtest '$y = Math::BigInt -> copy($x)' => sub {
 
     # accuracy and precision
 
-    is($y->{_a}, $x->{_a}, 'accuracy');
-    is($y->{_p}, $x->{_p}, 'precision');
+    is($y->{accuracy}, $x->{accuracy}, 'accuracy');
+    is($y->{precision}, $x->{precision}, 'precision');
 };

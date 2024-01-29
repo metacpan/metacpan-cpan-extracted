@@ -97,6 +97,6 @@
          "web" : "https://github.com/shlomif/perl-XML-LibXML"
       }
    },
-   "version" : "2.0209",
+   "version" : "2.0210",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -40,13 +40,18 @@ define FOREACH
 $(foreach file,$(XLATE_FILES),
 $(foreach lang,$(or $(shell cat $(file).LANG 2> /dev/null),$(XLATE_LANG)),
 $(foreach form,$(or $(shell cat $(file).FORMAT 2> /dev/null),$(XLATE_FORMAT)),
+$(foreach ecnt,$(words $(or $(shell cat $(file).ENGINE 2> /dev/null),$(XLATE_ENGINE))),
 $(foreach engn,$(or $(shell cat $(file).ENGINE 2> /dev/null),$(XLATE_ENGINE)),
-$(call $1,$(lang),$(form),$(file),$(engn))
-))))
+$(call $1,$(lang),$(form),$(file),$(engn),$(ecnt))
+)))))
 endef
 
 define ADD_TARGET
+ifeq ($5,1)
+  TARGET += $$(addsuffix .$1.$2,$$(basename $3))
+else
   TARGET += $$(addsuffix .$4-$1.$2,$$(basename $3))
+endif
 endef
 $(eval $(call FOREACH,ADD_TARGET))
 
@@ -66,8 +71,13 @@ STXT = $(if $(findstring $(suffix $1),$(CONVERT:%=.%)),$(basename $1).$(SRCEXT))
 TEMPFILES += $(foreach file,$(XLATE_FILES),$(call STXT,$(file)))
 
 define DEFINE_RULE
+ifeq ($5,1)
+$(basename $3).$1.$2: $3 $(call STXT,$3)
+	$$(XLATE) -e $4 -t $1 -o $2 $$< > $$@
+else
 $(basename $3).$4-$1.$2: $3 $(call STXT,$3)
 	$$(XLATE) -e $4 -t $1 -o $2 $$< > $$@
+endif
 endef
 $(eval $(call FOREACH,DEFINE_RULE))
 

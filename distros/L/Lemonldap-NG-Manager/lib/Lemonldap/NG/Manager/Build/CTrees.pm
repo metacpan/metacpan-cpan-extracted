@@ -14,7 +14,7 @@
 
 package Lemonldap::NG::Manager::Build::CTrees;
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.17.2';
 
 sub cTrees {
     return {
@@ -225,7 +225,8 @@ sub cTrees {
                     'oidcRPMetaDataOptionsPublic',
                     'oidcRPMetaDataOptionsClientID',
                     'oidcRPMetaDataOptionsClientSecret',
-                    'oidcRPMetaDataOptionsRedirectUris'
+                    'oidcRPMetaDataOptionsRedirectUris',
+                    'oidcRPMetaDataOptionsAuthMethod',
                 ]
             },
             'oidcRPMetaDataExportedVars',
@@ -263,9 +264,25 @@ sub cTrees {
                             'oidcRPMetaDataOptionsAllowOffline',
                             'oidcRPMetaDataOptionsAllowPasswordGrant',
                             'oidcRPMetaDataOptionsAllowClientCredentialsGrant',
+                            'oidcRPMetaDataOptionsRequestUris',
                             'oidcRPMetaDataOptionsAuthnLevel',
                             'oidcRPMetaDataOptionsRule',
+                            'oidcRPMetaDataOptionsAccessTokenEncKeyMgtAlg',
+                            'oidcRPMetaDataOptionsAccessTokenEncContentEncAlg',
+                            'oidcRPMetaDataOptionsIdTokenEncKeyMgtAlg',
+                            'oidcRPMetaDataOptionsIdTokenEncContentEncAlg',
+                            'oidcRPMetaDataOptionsUserInfoEncKeyMgtAlg',
+                            'oidcRPMetaDataOptionsUserInfoEncContentEncAlg',
+                            'oidcRPMetaDataOptionsLogoutEncKeyMgtAlg',
+                            'oidcRPMetaDataOptionsLogoutEncContentEncAlg',
                         ]
+                    },
+                    {
+                        title => 'keys',
+                        nodes => [
+                            'oidcRPMetaDataOptionsJwksUri',
+                            'oidcRPMetaDataOptionsJwks',
+                        ],
                     },
                     {
                         title => 'oidcRPMetaDataOptionsTimeouts',
@@ -288,7 +305,7 @@ sub cTrees {
                             'oidcRPMetaDataOptionsPostLogoutRedirectUris',
                         ]
                     },
-                    'oidcRPMetaDataOptionsComment'
+                    'oidcRPMetaDataOptionsComment',
                 ]
             },
             'oidcRPMetaDataMacros',
@@ -344,9 +361,7 @@ sub cTrees {
             {
                 title => 'casAppMetaDataOptionsDisplay',
                 form  => 'simpleInputContainer',
-                nodes => [
-                    'casAppMetaDataOptionsDisplayName',
-                ],
+                nodes => [ 'casAppMetaDataOptionsDisplayName', ],
             },
             'casAppMetaDataMacros',
         ],

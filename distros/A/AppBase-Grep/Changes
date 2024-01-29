@@ -1,3 +1,21 @@
+0.013   2024-01-25  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Edit Changes.
+
+
+0.012   2024-01-25  Released-By: PERLANCAR; Urgency: medium
+
+        - Add options --files-with-matches (-l) and --files-without-match (-L).
+          Also note that starting from now, AppBase::Grep might pass an
+          `$instruction` argument to the source callback, which can have the
+          value of 1 to mean to skip to the next "file" (or source). When a
+          source is unaware of this and keep returning the remaining lines of
+          the same "file"/source, `-l` mgiht report multiple lines of the same
+          filename.
+
+
 0.011   2023-07-22  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] [dist] Forgot to add $VERSION to AppBase::Grep::File.

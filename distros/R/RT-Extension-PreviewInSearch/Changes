@@ -1,5 +1,9 @@
 Revision history for RT-Extension-PreviewInSearch
 
+0.06 2023-12-12
+ - Correct the EmailRecordPath path in ModifyPaths callback
+ - Document required patch to add ModifyPaths callback
+
 0.05 2023-09-26
  - Update for RT 5.0
 

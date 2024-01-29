@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Git::Lint::Check::Commit';
 
-our $VERSION = '0.016';
+our $VERSION = '1.000';
 
 my $check_name = 'trailing whitespace';
 

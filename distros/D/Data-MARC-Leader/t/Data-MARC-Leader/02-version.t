@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Data::MARC::Leader::VERSION, 0.03, 'Version.');
+is($Data::MARC::Leader::VERSION, 0.04, 'Version.');

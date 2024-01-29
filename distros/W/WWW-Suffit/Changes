@@ -1,5 +1,12 @@
 # Version/Revision history
 
+1.07 Sun 17 Dec 2023 16:10:16 MSK
+    * Added randchars function into WWW::Suffit::Util
+
+1.06 Mon 11 Dec 2023 21:43:00 MSK
+    * Added new constants and lowercase versions of tag-names
+    * Added humanize_duration function into WWW::Suffit::Util
+
 1.05 Tue 05 Dec 2023 16:32:18 MSK
     * Added RefUtil 'as' functions
 

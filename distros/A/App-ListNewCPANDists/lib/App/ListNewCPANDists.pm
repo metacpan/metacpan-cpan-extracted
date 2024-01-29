@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-08'; # DATE
+our $DATE = '2023-03-28'; # DATE
 our $DIST = 'App-ListNewCPANDists'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 our %SPEC;
 
@@ -355,8 +355,12 @@ sub list_new_cpan_dists {
         unless $api_res->[0] == 200;
 
     my @rows;
+    my %seen_dists; # MetaCPAN API often returns duplicate result for a single dist where both first=1
+
+  HIT:
     for my $row0 (@{ $api_res->[2] }) {
         next unless $row0->{first};
+        next if $seen_dists{ $row0->{distribution} }++;
         my $row = {
             dist => $row0->{distribution},
             author => $row0->{author},
@@ -618,7 +622,7 @@ App::ListNewCPANDists - List new CPAN distributions in a given time period
 
 =head1 VERSION
 
-This document describes version 0.021 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2023-02-08.
+This document describes version 0.023 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2023-03-28.
 
 =head1 FUNCTIONS
 

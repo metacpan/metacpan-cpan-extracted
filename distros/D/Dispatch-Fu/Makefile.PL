@@ -17,9 +17,11 @@ my %WriteMakefileArgs = (
   "NAME" => "Dispatch::Fu",
   "PREREQ_PM" => {},
   "TEST_REQUIRES" => {
-    "Test::More" => 0
+    "Test::Exception" => 0,
+    "Test::More" => 0,
+    "Test::Warn" => 0
   },
-  "VERSION" => "0.99",
+  "VERSION" => "1.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -27,7 +29,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Test::More" => 0
+  "Test::Exception" => 0,
+  "Test::More" => 0,
+  "Test::Warn" => 0
 );
 
 

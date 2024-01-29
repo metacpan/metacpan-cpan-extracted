@@ -1,3 +1,15 @@
+0.620   2024-01-23  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Unhide the ununiquify_answer() function.
+
+
+0.619   2023-12-26  Released-By: PERLANCAR; Urgency: medium
+
+        - Add functions: get_answer_words(), get_answer_summaries().
+
+
 0.618   2023-12-01  Released-By: PERLANCAR; Urgency: medium
 
         - Add function: complete_hash_value.

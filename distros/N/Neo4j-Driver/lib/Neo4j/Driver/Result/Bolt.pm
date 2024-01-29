@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::Bolt;
 # ABSTRACT: Bolt result handler
-$Neo4j::Driver::Result::Bolt::VERSION = '0.41';
+$Neo4j::Driver::Result::Bolt::VERSION = '0.42';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -14,8 +14,16 @@ use parent 'Neo4j::Driver::Result';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Net::Bolt Neo4j::Driver::Result);
+use List::Util ();
 
 use Neo4j::Driver::Net::Bolt;
+
+my @valid_bolt_neo4j_types = qw(
+	JSON::PP::Boolean
+	Neo4j::Bolt::DateTime
+	Neo4j::Bolt::Duration
+	Neo4j::Bolt::Point
+);
 
 
 our $gather_results = 0;  # 1: detach from the stream immediately (yields JSON-style result; used for testing)
@@ -187,7 +195,7 @@ sub _deep_bless {
 	if (ref $data eq '') {  # scalar
 		return $data;
 	}
-	if (ref $data eq 'JSON::PP::Boolean') {  # boolean
+	if ( List::Util::first { ref $data eq $_ } @valid_bolt_neo4j_types ) {
 		return $data;
 	}
 	

@@ -3,8 +3,8 @@
  * Copyright (c) 1996-2003 Sampo Kellomäki <sampo@iki.fi>
  * Copyright (c) 2005-2010 Florian Ragwitz <rafl@debian.org>
  * Copyright (c) 2005-2018 Mike McCauley <mikem@airspayce.com>
+ * Copyright (c) 2018 Tuure Vartiainen <vartiait@radiatorsoftware.com>
  * Copyright (c) 2018- Chris Novakovic <chris@chrisn.me.uk>
- * Copyright (c) 2018- Tuure Vartiainen <vartiait@radiatorsoftware.com>
  * Copyright (c) 2018- Heikki Vatiainen <hvn@radiatorsoftware.com>
  * 
  * All rights reserved.
@@ -132,27 +132,26 @@
  */
 
 /* Prevent warnings about strncpy from Windows compilers */
-#define _CRT_SECURE_NO_DEPRECATE
 
-#ifdef __cplusplus
-extern "C" {
+#ifndef _CRT_SECURE_NO_DEPRECATE
+#  define _CRT_SECURE_NO_DEPRECATE
 #endif
+
+/* Silence compound-token-split-by-macro warnings from perl.h when building for
+ * Perl < 5.35.2 with Clang >= 12 - see GH-383
+ */
+#if NET_SSLEAY_PERL_VERSION < 5035002 && defined(__clang__) && defined(__clang_major__) && __clang_major__ >= 12
+#pragma clang diagnostic ignored "-Wunknown-warning-option"
+#pragma clang diagnostic ignored "-Wcompound-token-split-by-macro"
+#pragma clang diagnostic warning "-Wunknown-warning-option"
+#endif
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
 #include <stdarg.h>
-#define NEED_newRV_noinc
-#define NEED_sv_2pv_flags
 #define NEED_my_snprintf
 #include "ppport.h"
-#ifdef __cplusplus
-}
-#endif
-
-/* OpenSSL-0.9.3a has some strange warning about this in
- *    openssl/des.h
- */
-#undef _
 
 /* Sigh: openssl 1.0 has
  typedef void *BLOCK;
@@ -161,6 +160,7 @@ which conflicts with perls
 */
 #define BLOCK OPENSSL_BLOCK
 #include <openssl/err.h>
+#include <openssl/conf.h>
 #include <openssl/lhash.h>
 #include <openssl/rand.h>
 #include <openssl/buffer.h>
@@ -178,16 +178,11 @@ which conflicts with perls
 #ifndef OPENSSL_NO_MD5
 #include <openssl/md5.h>     /* openssl-SNAP-20020227 does not automatically include this */
 #endif
-#if OPENSSL_VERSION_NUMBER >= 0x00905000L
 #include <openssl/ripemd.h>
-#endif
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
-#if OPENSSL_VERSION_NUMBER >= 0x0090700fL
-/* requires 0.9.7+ */
 #ifndef OPENSSL_NO_ENGINE
 #include <openssl/engine.h>
-#endif
 #endif
 #ifdef OPENSSL_FIPS
 #include <openssl/fips.h>
@@ -230,7 +225,7 @@ which conflicts with perls
 #define PR4(s,t,u,v)
 #endif
 
-static void TRACE(int level,char *msg,...) {
+static void TRACE(int level,const char *msg,...) {
     va_list args;
     SV *trace = get_sv("Net::SSLeay::trace",0);
     if (trace && SvIOK(trace) && SvIV(trace)>=level) {
@@ -428,7 +423,7 @@ static void handler_list_md_fn(const EVP_MD *m, const char *from, const char *to
   if (EVP_MD_flags(m) & EVP_MD_FLAG_PKEY_DIGEST) return;    /* Skip clones */
 #endif
   if (strchr(mname, ' ')) mname= EVP_MD_name(m);
-  av_push(arg, newSVpv(mname,0));
+  av_push((AV *)arg, newSVpv(mname,0));
 }
 #endif
 
@@ -599,7 +594,7 @@ static int ssleay_verify_callback_invoke (int ok, X509_STORE_CTX* x509_store)
     SV *cb_func;
 
     PR1("STARTED: ssleay_verify_callback_invoke\n");
-    ssl = X509_STORE_CTX_get_ex_data(x509_store, SSL_get_ex_data_X509_STORE_CTX_idx());
+    ssl = (SSL *)X509_STORE_CTX_get_ex_data(x509_store, SSL_get_ex_data_X509_STORE_CTX_idx());
     cb_func = cb_data_advanced_get(ssl, "ssleay_verify_callback!!func");
     
     if (!SvOK(cb_func)) {
@@ -686,7 +681,6 @@ static int ssleay_ctx_passwd_cb_invoke(char *buf, int size, int rwflag, void *us
 
 #if OPENSSL_VERSION_NUMBER >= 0x1010006fL /* In OpenSSL 1.1.0 but actually called for $ssl from 1.1.0f */
 #ifndef LIBRESSL_VERSION_NUMBER
-#ifndef OPENSSL_IS_BORINGSSL
 static int ssleay_ssl_passwd_cb_invoke(char *buf, int size, int rwflag, void *userdata)
 {
     dSP;
@@ -731,7 +725,6 @@ static int ssleay_ssl_passwd_cb_invoke(char *buf, int size, int rwflag, void *us
 
     return strlen(buf);
 }
-#endif /* !BoringSSL */
 #endif /* !LibreSSL */
 #endif /* >= 1.1.0f */
 
@@ -741,20 +734,11 @@ int ssleay_ctx_cert_verify_cb_invoke(X509_STORE_CTX* x509_store_ctx, void* data)
     int count = -1;
     int res;
     SV * cb_func, *cb_data;
-    void *ptr;
-    SSL *ssl;
 
     PR1("STARTED: ssleay_ctx_cert_verify_cb_invoke\n");
-#if OPENSSL_VERSION_NUMBER < 0x0090700fL
-    ssl = X509_STORE_CTX_get_ex_data(x509_store_ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
-    ptr = (void*) SSL_get_SSL_CTX(ssl);
-#else
-    ssl = NULL;
-    ptr = (void*) data;
-#endif
 
-    cb_func = cb_data_advanced_get(ptr, "ssleay_ctx_cert_verify_cb!!func");
-    cb_data = cb_data_advanced_get(ptr, "ssleay_ctx_cert_verify_cb!!data");
+    cb_func = cb_data_advanced_get(data, "ssleay_ctx_cert_verify_cb!!func");
+    cb_data = cb_data_advanced_get(data, "ssleay_ctx_cert_verify_cb!!data");
 
     if(!SvOK(cb_func))
         croak ("Net::SSLeay: ssleay_ctx_cert_verify_cb_invoke called, but not set to point to any perl function.\n");
@@ -911,7 +895,7 @@ int session_ticket_ext_cb_invoke(SSL *ssl, const unsigned char *data, int len, v
 
 #endif
 
-#if defined(SSL_F_SSL_SET_HELLO_EXTENSION) || defined(SSL_F_SSL_SET_SESSION_TICKET_EXT)
+#ifdef SSL_F_SSL_SET_SESSION_TICKET_EXT
 
 int ssleay_session_secret_cb_invoke(SSL* s, void* secret, int *secret_len,
                                     STACK_OF(SSL_CIPHER) *peer_ciphers,
@@ -935,7 +919,7 @@ int ssleay_session_secret_cb_invoke(SSL* s, void* secret, int *secret_len,
     SAVETMPS;
 
     PUSHMARK(SP);
-    secretsv = sv_2mortal( newSVpv(secret, *secret_len));
+    secretsv = sv_2mortal( newSVpv((const char *)secret, *secret_len));
     XPUSHs(secretsv);
     for (i=0; i<sk_SSL_CIPHER_num(peer_ciphers); i++) {
         const SSL_CIPHER *c = sk_SSL_CIPHER_value(peer_ciphers,i);
@@ -965,7 +949,10 @@ int ssleay_session_secret_cb_invoke(SSL* s, void* secret, int *secret_len,
 	    /* Use any new master secret set by the callback function in secret */
 	    STRLEN newsecretlen;
 	    char* newsecretdata = SvPV(secretsv, newsecretlen);
+	    if (*secret_len < 0 || newsecretlen > (STRLEN)*secret_len)
+		croak("Net::SSLeay: ssleay_session_secret_cb_invoke perl function returned too long secret: %ld > %ld.\n", (long)newsecretlen, (long)*secret_len);
 	    memcpy(secret, newsecretdata, newsecretlen);
+	    *secret_len = newsecretlen;
 	}
 #endif
     }
@@ -1013,7 +1000,7 @@ unsigned int ssleay_set_psk_client_callback_invoke(SSL *ssl, const char *hint,
 
     PUTBACK;
 
-    count = call_sv( cb_func, G_ARRAY );
+    count = call_sv( cb_func, G_LIST );
 
     SPAGAIN;
 
@@ -1073,7 +1060,7 @@ unsigned int ssleay_ctx_set_psk_client_callback_invoke(SSL *ssl, const char *hin
 
     PUTBACK;
 
-    count = call_sv( cb_func, G_ARRAY );
+    count = call_sv( cb_func, G_LIST );
 
     SPAGAIN;
 
@@ -1099,6 +1086,332 @@ unsigned int ssleay_ctx_set_psk_client_callback_invoke(SSL *ssl, const char *hin
     return psk_len;
 }
 
+unsigned int ssleay_set_psk_server_callback_invoke(SSL *ssl, const char *identity,
+                                                   unsigned char *psk, unsigned int max_psk_len)
+{
+    dSP;
+    int count = -1;
+    unsigned int psk_len = 0;
+    SV * cb_func, *psk_sv;
+
+    PR1("STARTED: ssleay_set_psk_server_callback_invoke\n");
+
+    cb_func = cb_data_advanced_get(ssl, "ssleay_set_psk_server_callback!!func");
+    if(!SvOK(cb_func))
+        croak ("Net::SSLeay: ssleay_set_psk_server_callback_invoke called, but not set to point to any perl function.\n");
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    EXTEND(SP, 3);
+    PUSHs(sv_2mortal(newSViv(PTR2IV(ssl))));
+    PUSHs(sv_2mortal(newSVpv(identity, 0)));
+    PUSHs(sv_2mortal(newSViv(max_psk_len)));
+
+    PUTBACK;
+
+    count = call_sv( cb_func, G_SCALAR );
+
+    SPAGAIN;
+
+    if (count != 1)
+        croak ("Net::SSLeay: ssleay_set_psk_server_callback_invoke perl function did not return 1 value.\n");
+
+    psk_sv = POPs;
+    if (SvOK(psk_sv)) {
+      STRLEN new_psk_len;
+      char *new_psk = SvPV(psk_sv, new_psk_len);
+
+      if (!SvPOK(psk_sv))
+        croak ("Net::SSLeay: ssleay_set_psk_server_callback_invoke PSK is not a string.\n");
+
+      if (new_psk_len > max_psk_len)
+        croak ("Net::SSLeay: ssleay_set_psk_server_callback_invoke PSK is longer than allowed (%lu > %u).\n", new_psk_len, max_psk_len);
+      memcpy(psk, new_psk, new_psk_len);
+      psk_len = new_psk_len;
+    }
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return psk_len;
+}
+
+unsigned int ssleay_ctx_set_psk_server_callback_invoke(SSL *ssl, const char *identity,
+                                                       unsigned char *psk, unsigned int max_psk_len)
+{
+    dSP;
+    SSL_CTX *ctx;
+    int count = -1;
+    unsigned int psk_len = 0;
+    SV * cb_func, *psk_sv;
+
+    PR1("STARTED: ssleay_ctx_set_psk_server_callback_invoke\n");
+
+    ctx = SSL_get_SSL_CTX(ssl);
+    cb_func = cb_data_advanced_get(ctx, "ssleay_ctx_set_psk_server_callback!!func");
+    if(!SvOK(cb_func))
+        croak ("Net::SSLeay: ssleay_ctx_set_psk_server_callback_invoke called, but not set to point to any perl function.\n");
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    EXTEND(SP, 3);
+    PUSHs(sv_2mortal(newSViv(PTR2IV(ssl))));
+    PUSHs(sv_2mortal(newSVpv(identity, 0)));
+    PUSHs(sv_2mortal(newSViv(max_psk_len)));
+
+    PUTBACK;
+
+    count = call_sv( cb_func, G_SCALAR );
+
+    SPAGAIN;
+
+    if (count != 1)
+        croak ("Net::SSLeay: ssleay_ctx_set_psk_server_callback_invoke perl function did not return 1 value.\n");
+
+    psk_sv = POPs;
+    if (SvOK(psk_sv)) {
+      STRLEN new_psk_len;
+      char *new_psk = SvPV(psk_sv, new_psk_len);
+
+      if (!SvPOK(psk_sv))
+        croak ("Net::SSLeay: ssleay_ctx_set_psk_server_callback_invoke PSK is not a string.\n");
+
+      if (new_psk_len > max_psk_len)
+        croak ("Net::SSLeay: ssleay_ctx_set_psk_server_callback_invoke PSK is longer than allowed (%lu > %u).\n", new_psk_len, max_psk_len);
+      memcpy(psk, new_psk, new_psk_len);
+      psk_len = new_psk_len;
+    }
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return psk_len;
+}
+
+#if OPENSSL_VERSION_NUMBER >= 0x10101001L
+
+/* TLS 1.3 has its own callbacks */
+int ssleay_set_psk_find_session_callback_invoke(SSL *ssl, const unsigned char *identity,
+                                                size_t identity_len,
+                                                SSL_SESSION **sess)
+{
+    dSP;
+    int count = -1, ret;
+    SV * cb_func, *sess_sv;
+
+    PR1("STARTED: ssleay_psk_find_session_callback_callback_invoke\n");
+
+    cb_func = cb_data_advanced_get(ssl, "ssleay_set_psk_find_session_callback!!func");
+    if(!SvOK(cb_func))
+        croak ("Net::SSLeay: ssleay_psk_find_session_callback_callback_invoke called, but not set to point to any perl function.\n");
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    EXTEND(SP, 2);
+    PUSHs(sv_2mortal(newSViv(PTR2IV(ssl))));
+    PUSHs(sv_2mortal(newSVpvn((const char *)identity, identity_len)));
+
+    PUTBACK;
+
+    count = call_sv( cb_func, G_LIST );
+
+    SPAGAIN;
+
+    if (count != 2)
+        croak ("Net::SSLeay: ssleay_psk_find_session_callback_callback_invoke perl function did not return 2 values.\n");
+
+    *sess = NULL;
+    sess_sv = POPs;
+    if (SvOK(sess_sv))
+      *sess = INT2PTR(SSL_SESSION *, SvIV(sess_sv));
+
+    ret = POPi;
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return ret;
+}
+
+int ssleay_ctx_set_psk_find_session_callback_invoke(SSL *ssl, const unsigned char *identity,
+                                                    size_t identity_len,
+                                                    SSL_SESSION **sess)
+{
+    dSP;
+    SSL_CTX *ctx;
+    int count = -1, ret;
+    SV * cb_func, *sess_sv;
+
+    ctx = SSL_get_SSL_CTX(ssl);
+
+    PR1("STARTED: ssleay_ctx_psk_find_session_callback_callback_invoke\n");
+
+    cb_func = cb_data_advanced_get(ctx, "ssleay_ctx_set_psk_find_session_callback!!func");
+    if(!SvOK(cb_func))
+        croak ("Net::SSLeay: ssleay_ctx_psk_find_session_callback_callback_invoke called, but not set to point to any perl function.\n");
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    EXTEND(SP, 2);
+    PUSHs(sv_2mortal(newSViv(PTR2IV(ssl))));
+    PUSHs(sv_2mortal(newSVpvn((const char *)identity, identity_len)));
+
+    PUTBACK;
+
+    count = call_sv( cb_func, G_LIST );
+
+    SPAGAIN;
+
+    if (count != 2)
+        croak ("Net::SSLeay: ssleay_ctx_psk_find_session_callback_callback_invoke perl function did not return 2 values.\n");
+
+    *sess = NULL;
+    sess_sv = POPs;
+    if (SvOK(sess_sv))
+      *sess = INT2PTR(SSL_SESSION *, SvIV(sess_sv));
+
+    ret = POPi;
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return ret;
+}
+
+int ssleay_set_psk_use_session_callback_invoke(SSL *ssl, const EVP_MD *md,
+                                               const unsigned char **id,
+                                               size_t *idlen,
+                                               SSL_SESSION **sess)
+{
+    dSP;
+    int count = -1, ret;
+    SV * cb_func, *sess_sv, *id_sv;
+
+    PR1("STARTED: ssleay_psk_use_session_callback_invoke\n");
+
+    cb_func = cb_data_advanced_get(ssl, "ssleay_set_psk_use_session_callback!!func");
+    if(!SvOK(cb_func))
+        croak ("Net::SSLeay: ssleay_psk_use_session_callback_invoke called, but not set to point to any perl function.\n");
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    EXTEND(SP, 2);
+    PUSHs(sv_2mortal(newSViv(PTR2IV(ssl))));
+    PUSHs(sv_2mortal(newSViv(PTR2IV(md))));
+
+    PUTBACK;
+
+    count = call_sv( cb_func, G_LIST );
+
+    SPAGAIN;
+
+    if (count != 3)
+        croak ("Net::SSLeay: ssleay_psk_use_session_callback_invoke perl function did not return 3 values.\n");
+
+    *sess = NULL;
+    *id = NULL;
+    *idlen = 0;
+    sess_sv = POPs;
+    id_sv = POPs;
+    ret = POPi;
+    if (ret && SvOK(sess_sv)) {
+        /* Returning with success but without NULL SSL_SESSION is
+         * permissible. In this case the handshake continues with
+         * certificate authentication */
+        char *id_sv_ptr;
+        STRLEN id_sv_len;
+        *sess = INT2PTR(SSL_SESSION *, SvIV(sess_sv));
+        id_sv_ptr = SvPVbyte(id_sv, id_sv_len);
+        *id = (const unsigned char *)id_sv_ptr;
+        *idlen = id_sv_len;
+        sv_dump(id_sv);
+        SSL_SESSION_print_fp(stdout, *sess);
+    }
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return ret;
+}
+
+int ssleay_ctx_set_psk_use_session_callback_invoke(SSL *ssl, const EVP_MD *md,
+                                                   const unsigned char **id,
+                                                   size_t *idlen,
+                                                   SSL_SESSION **sess)
+{
+    dSP;
+    SSL_CTX *ctx;
+    int count = -1, ret;
+    SV * cb_func, *sess_sv, *id_sv;
+
+    ctx = SSL_get_SSL_CTX(ssl);
+
+    PR1("STARTED: ssleay_ctx_psk_use_session_callback_invoke\n");
+
+    cb_func = cb_data_advanced_get(ctx, "ssleay_ctx_set_psk_use_session_callback!!func");
+    if(!SvOK(cb_func))
+        croak ("Net::SSLeay: ssleay_ctx_psk_use_session_callback_invoke called, but not set to point to any perl function.\n");
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    EXTEND(SP, 2);
+    PUSHs(sv_2mortal(newSViv(PTR2IV(ssl))));
+    PUSHs(sv_2mortal(newSViv(PTR2IV(md))));
+
+    PUTBACK;
+
+    count = call_sv( cb_func, G_LIST );
+
+    SPAGAIN;
+
+    if (count != 3)
+        croak ("Net::SSLeay: ssleay_ctx_psk_use_session_callback_invoke perl function did not return 2 values.\n");
+
+    *sess = NULL;
+    *id = NULL;
+    *idlen = 0;
+    sess_sv = POPs;
+    id_sv = POPs;
+    ret = POPi;
+    if (ret && SvOK(sess_sv)) {
+        /* Returning with success but without NULL SSL_SESSION is
+         * permissible. In this case the handshake continues with
+         * certificate authentication */
+        char *id_sv_ptr;
+        STRLEN id_sv_len;
+        *sess = INT2PTR(SSL_SESSION *, SvIV(sess_sv));
+        id_sv_ptr = SvPVbyte(id_sv, id_sv_len);
+        *id = (const unsigned char *)id_sv_ptr;
+        *idlen = id_sv_len;
+        sv_dump(id_sv);
+        SSL_SESSION_print_fp(stdout, *sess);
+    }
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return ret;
+}
+
+#endif
 #endif
 
 #if (OPENSSL_VERSION_NUMBER >= 0x10001000L && !defined(OPENSSL_NO_NEXTPROTONEG)) || (OPENSSL_VERSION_NUMBER >= 0x10002000L && !defined(OPENSSL_NO_TLSEXT))
@@ -1173,7 +1486,7 @@ int next_proto_select_cb_invoke(SSL *ssl, unsigned char **out, unsigned char *ou
         XPUSHs(sv_2mortal(newRV_inc((SV*)list)));
         XPUSHs(sv_2mortal(newSVsv(cb_data)));
         PUTBACK;
-        count = call_sv( cb_func, G_ARRAY );
+        count = call_sv( cb_func, G_LIST );
         SPAGAIN;
         if (count != 2)
             croak ("Net::SSLeay: next_proto_select_cb_invoke perl function did not return 2 values.\n");
@@ -1303,7 +1616,7 @@ int alpn_select_cb_invoke(SSL *ssl, const unsigned char **out, unsigned char *ou
         XPUSHs(sv_2mortal(newRV_inc((SV*)list)));
         XPUSHs(sv_2mortal(newSVsv(cb_data)));
         PUTBACK;
-        count = call_sv( cb_func, G_ARRAY );
+        count = call_sv( cb_func, G_LIST );
         SPAGAIN;
         if (count != 1)
             croak ("Net::SSLeay: alpn_select_cb perl function did not return exactly 1 value.\n");
@@ -1600,7 +1913,7 @@ int tlsext_ticket_key_cb_invoke(
 
     PUTBACK;
 
-    count = call_sv( cb_func, G_ARRAY );
+    count = call_sv( cb_func, G_LIST );
 
     SPAGAIN;
 
@@ -1736,7 +2049,7 @@ int ossl_provider_do_all_cb_invoke(OSSL_PROVIDER *provider, void *cbdata) {
     dSP;
     int ret = 1;
     int count = -1;
-    simple_cb_data_t *cb = cbdata;
+    simple_cb_data_t *cb = (simple_cb_data_t *)cbdata;
 
     PR1("STARTED: ossl_provider_do_all_cb_invoke\n");
     if (cb->func && SvOK(cb->func)) {
@@ -1767,11 +2080,11 @@ int ossl_provider_do_all_cb_invoke(OSSL_PROVIDER *provider, void *cbdata) {
 }
 #endif
 
-#if OPENSSL_VERSION_NUMBER >= 0x10101001 && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10101001 && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x3050000fL)
 void ssl_ctx_keylog_cb_func_invoke(const SSL *ssl, const char *line)
 {
     dSP;
-    SV *cb_func, *cb_data;
+    SV *cb_func;
     SSL_CTX *ctx = SSL_get_SSL_CTX(ssl);
 
     PR1("STARTED: ssl_ctx_keylog_cb_func_invoke\n");
@@ -1797,6 +2110,47 @@ void ssl_ctx_keylog_cb_func_invoke(const SSL *ssl, const char *line)
     LEAVE;
 
     return;
+}
+#endif
+
+#if OPENSSL_VERSION_NUMBER >= 0x10101001L && !defined(LIBRESSL_VERSION_NUMBER)
+int ssl_client_hello_cb_fn_invoke(SSL *ssl, int *al, void *arg)
+{
+    dSP;
+    int count, res;
+    SV *cb_func, *cb_arg;
+    SSL_CTX *ctx = SSL_get_SSL_CTX(ssl);
+
+    PR1("STARTED: ssl_client_hello_cb_fn_invoke\n");
+    cb_func = cb_data_advanced_get(ctx, "ssleay_ssl_ctx_client_hello_cb!!func");
+    cb_arg  = cb_data_advanced_get(ctx, "ssleay_ssl_ctx_client_hello_cb!!arg");
+    if(!SvOK(cb_func))
+	croak ("Net::SSLeay: ssl_client_hello_cb_fn_invoke called, but not set to point to any perl function.\n");
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSViv(PTR2IV(ssl))));
+    XPUSHs(sv_2mortal(newSVsv(cb_arg)));
+
+    PUTBACK;
+
+    count = call_sv(cb_func, G_LIST);
+
+    SPAGAIN;
+
+    if (count < 1 || count > 2)
+      croak ("Net::SSLeay: ssl_client_hello_cb_fn perl function returned %d values, 1 or 2 expected\n", count);
+    if (count == 2)
+      *al = POPi;
+    res = POPi;
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return res;
 }
 #endif
 
@@ -1914,10 +2268,10 @@ X509 * find_issuer(X509 *cert,X509_STORE *store, STACK_OF(X509) *chain) {
     return issuer;
 }
 
-SV* bn2sv(BIGNUM* p_bn)
+static SV *bn2sv(const BIGNUM* p_bn)
 {
     return p_bn != NULL
-        ? sv_2mortal(newSViv((IV) BN_dup(p_bn)))
+        ? sv_2mortal(newSViv(PTR2IV(BN_dup(p_bn))))
         : &PL_sv_undef;
 }
 
@@ -2082,6 +2436,8 @@ SSL_CTX_v23_new()
      OUTPUT:
      RETVAL
 
+#if !defined(OPENSSL_NO_TLS1_METHOD)
+
 SSL_CTX *
 SSL_CTX_tlsv1_new()
      CODE:
@@ -2089,7 +2445,9 @@ SSL_CTX_tlsv1_new()
      OUTPUT:
      RETVAL
 
-#ifdef SSL_TXT_TLSV1_1
+#endif
+
+#if (OPENSSL_VERSION_NUMBER >= 0x10001001L && !defined(OPENSSL_NO_TLS1_1_METHOD)) /* OpenSSL 1.0.1-beta1 */
 
 SSL_CTX *
 SSL_CTX_tlsv1_1_new()
@@ -2100,7 +2458,7 @@ SSL_CTX_tlsv1_1_new()
 
 #endif
 
-#ifdef SSL_TXT_TLSV1_2
+#if (OPENSSL_VERSION_NUMBER >= 0x10001001L && !defined(OPENSSL_NO_TLS1_2_METHOD)) /* OpenSSL 1.0.1-beta1 */
 
 SSL_CTX *
 SSL_CTX_tlsv1_2_new()
@@ -2180,7 +2538,7 @@ SSL_CTX_set_verify(ctx,mode,callback=&PL_sv_undef)
         SSL_CTX_set_verify(ctx, mode, &ssleay_verify_callback_invoke);
     }
 
-#if OPENSSL_VERSION_NUMBER >= 0x10100001L && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10100001L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x3060000fL)
 
 void
 SSL_CTX_set_security_level(SSL_CTX * ctx, int level)
@@ -2190,7 +2548,7 @@ SSL_CTX_get_security_level(SSL_CTX * ctx)
 
 #endif
 
-#if OPENSSL_VERSION_NUMBER >= 0x10101007L && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10101007L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x3050000fL)
 
 int
 SSL_CTX_set_num_tickets(SSL_CTX *ctx, size_t num_tickets)
@@ -2200,7 +2558,7 @@ SSL_CTX_get_num_tickets(SSL_CTX *ctx)
 
 #endif
 
-#if OPENSSL_VERSION_NUMBER >= 0x10101003L && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10101003L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x3040000fL)
 
 int
 SSL_CTX_set_ciphersuites(SSL_CTX *ctx, const char *str)
@@ -2259,13 +2617,6 @@ SSL_free(s)
      CODE:
         SSL_free(s);
         cb_data_advanced_drop(s); /* clean callback related data from global hash */
-
-#if 0 /* this seems to be gone in 0.9.0 */
-void
-SSL_debug(file)
-       char *  file
-
-#endif
 
 int
 SSL_accept(s)
@@ -2351,7 +2702,7 @@ SSL_read(s,max=32768)
 	 *   first return value:  data gotten, or undef on error (got<0)
 	 *   second return value: result from SSL_read()
 	 */
-	if (GIMME_V==G_ARRAY) {
+	if (GIMME_V==G_LIST) {
 	    EXTEND(SP, 2);
 	    PUSHs(sv_2mortal(succeeded ? newSVpvn(buf, got) : newSV(0)));
 	    PUSHs(sv_2mortal(newSViv(got)));
@@ -2383,7 +2734,7 @@ SSL_peek(s,max=32768)
 	 *   first return value:  data gotten, or undef on error (got<0)
 	 *   second return value: result from SSL_peek()
 	 */
-	if (GIMME_V==G_ARRAY) {
+	if (GIMME_V==G_LIST) {
 	    EXTEND(SP, 2);
 	    PUSHs(sv_2mortal(succeeded ? newSVpvn(buf, got) : newSV(0)));
 	    PUSHs(sv_2mortal(newSViv(got)));
@@ -2639,6 +2990,97 @@ SSL_has_pending(s)
 
 #endif
 
+#if (OPENSSL_VERSION_NUMBER >= 0x10100003L && !defined(LIBRESSL_VERSION_NUMBER)) /* OpenSSL 1.1.0-pre3 */
+ #
+ # /* LibreSSL 2.7.0 has OPENSSL_init_{ssl,crypto} but it does not
+ #  * have a definition of OPENSSL_INIT_SETTINGS and uses void * as
+ #  * the second argument type.
+ #  */
+
+#ifdef NET_SSLEAY_32BIT_INT_PERL
+int
+OPENSSL_init_ssl(double opts, SV *sv_settings = &PL_sv_undef)
+    PREINIT:
+	const OPENSSL_INIT_SETTINGS *settings = NULL;
+    CODE:
+	if (sv_settings != &PL_sv_undef)
+	    settings = INT2PTR(OPENSSL_INIT_SETTINGS *, SvIV(sv_settings));
+	RETVAL = OPENSSL_init_ssl(opts, settings);
+    OUTPUT:
+        RETVAL
+
+int
+OPENSSL_init_crypto(double opts, SV *sv_settings = &PL_sv_undef)
+    PREINIT:
+	const OPENSSL_INIT_SETTINGS *settings = NULL;
+    CODE:
+	if (sv_settings != &PL_sv_undef)
+	    settings = INT2PTR(OPENSSL_INIT_SETTINGS *, SvIV(sv_settings));
+	RETVAL = OPENSSL_init_crypto(opts, settings);
+    OUTPUT:
+        RETVAL
+
+#else
+int
+OPENSSL_init_ssl(uint64_t opts, SV *sv_settings = &PL_sv_undef)
+    PREINIT:
+	const OPENSSL_INIT_SETTINGS *settings = NULL;
+    CODE:
+	if (sv_settings != &PL_sv_undef)
+	    settings = INT2PTR(OPENSSL_INIT_SETTINGS *, SvIV(sv_settings));
+	RETVAL = OPENSSL_init_ssl(opts, settings);
+    OUTPUT:
+        RETVAL
+
+int
+OPENSSL_init_crypto(uint64_t opts, SV *sv_settings = &PL_sv_undef)
+    PREINIT:
+	const OPENSSL_INIT_SETTINGS *settings = NULL;
+    CODE:
+	if (sv_settings != &PL_sv_undef)
+	    settings = INT2PTR(OPENSSL_INIT_SETTINGS *, SvIV(sv_settings));
+	RETVAL = OPENSSL_init_crypto(opts, settings);
+    OUTPUT:
+        RETVAL
+
+#endif /* NET_SSLEAY_32BIT_INT_PERL */
+
+#endif /* OpenSSL 1.1.0-pre3 */
+
+#if (OPENSSL_VERSION_NUMBER >= 0x10100003L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x3060000fL) /* OpenSSL 1.1.0-pre3 or LibreSSL 3.6.0 */
+
+void
+OPENSSL_cleanup()
+
+#endif /* OpenSSL 1.1.0-pre3 or LibreSSL 3.6.0 */
+
+#if OPENSSL_VERSION_NUMBER >= 0x10100003L && !defined(LIBRESSL_VERSION_NUMBER) /* OpenSSL 1.1.0-pre3 */
+
+OPENSSL_INIT_SETTINGS *
+OPENSSL_INIT_new()
+
+#endif /* OpenSSL 1.1.0-pre3 */
+
+#if OPENSSL_VERSION_NUMBER >= 0x1010102fL && !defined(LIBRESSL_VERSION_NUMBER) /* OpenSSL 1.1.1b */
+
+int
+OPENSSL_INIT_set_config_filename(OPENSSL_INIT_SETTINGS *init, const char *filename)
+
+int
+OPENSSL_INIT_set_config_appname(OPENSSL_INIT_SETTINGS *init, const char *name)
+
+void
+OPENSSL_INIT_free(OPENSSL_INIT_SETTINGS *init)
+
+#endif /* OpenSSL 1.1.0-pre3 */
+
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L && !defined(LIBRESSL_VERSION_NUMBER) /* OpenSSL 3.0.0-alpha1 */
+
+void
+OPENSSL_INIT_set_config_file_flags(OPENSSL_INIT_SETTINGS *init, unsigned long flags)
+
+#endif /* OpenSSL 3.0.0-alpha1 */
+
 int
 SSL_CTX_set_cipher_list(s,str)
      SSL_CTX *              s
@@ -2774,9 +3216,10 @@ SSL_verify_client_post_handshake(SSL *ssl)
 void
 i2d_SSL_SESSION(sess)
 	SSL_SESSION * sess
-    PPCODE:
+    PREINIT:
 	STRLEN len;
 	unsigned char *pc,*pi;
+    PPCODE:
 	if (!(len = i2d_SSL_SESSION(sess,NULL))) croak("invalid SSL_SESSION");
 	Newx(pc,len,unsigned char);
 	if (!pc) croak("out of memory");
@@ -3082,7 +3525,6 @@ SSL_CTX_set_tlsext_servername_callback(ctx,callback=&PL_sv_undef,data=&PL_sv_und
 
 #if OPENSSL_VERSION_NUMBER >= 0x1010006fL /* In OpenSSL 1.1.0 but actually called for $ssl starting from 1.1.0f */
 #ifndef LIBRESSL_VERSION_NUMBER
-#ifndef OPENSSL_IS_BORINGSSL
 void
 SSL_set_default_passwd_cb(ssl,callback=&PL_sv_undef)
         SSL * ssl
@@ -3112,11 +3554,10 @@ SSL_set_default_passwd_cb_userdata(ssl,data=&PL_sv_undef)
             cb_data_advanced_put(ssl, "ssleay_ssl_passwd_cb!!data", newSVsv(data));
         }
 
-#endif /* !BoringSSL */
 #endif /* !LibreSSL */
 #endif /* >= 1.1.0f */
 
-#if OPENSSL_VERSION_NUMBER >= 0x10100001L && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10100001L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x3060000fL)
 
 void
 SSL_set_security_level(SSL * ssl, int level)
@@ -3126,7 +3567,7 @@ SSL_get_security_level(SSL * ssl)
 
 #endif
 
-#if OPENSSL_VERSION_NUMBER >= 0x10101007L && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10101007L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x3050000fL)
 
 int
 SSL_set_num_tickets(SSL *ssl, size_t num_tickets)
@@ -3136,7 +3577,7 @@ SSL_get_num_tickets(SSL *ssl)
 
 #endif
 
-#if OPENSSL_VERSION_NUMBER >= 0x10101003L && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10101003L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x3040000fL)
 
 int
 SSL_set_ciphersuites(SSL *ssl, const char *str)
@@ -3226,8 +3667,6 @@ SSL_library_init()
 	OUTPUT:
 	RETVAL
 
-#if OPENSSL_VERSION_NUMBER >= 0x0090700fL
-#define REM5 "NOTE: requires 0.9.7+"
 #ifndef OPENSSL_NO_ENGINE
 
 void
@@ -3246,7 +3685,6 @@ ENGINE_set_default(e, flags)
         int flags
 
 #endif /* OPENSSL_NO_ENGINE */
-#endif
 
 void
 ERR_load_SSL_strings()
@@ -3343,7 +3781,7 @@ RAND_seed(buf)
      PREINIT:
      STRLEN len;
      INPUT:
-     char *  buf = SvPV( ST(1), len);
+     char *buf = SvPV(ST(0), len);
      CODE:
      RAND_seed (buf, (int)len);
 
@@ -3548,9 +3986,6 @@ X509_NAME_get_text_by_NID(name,nid)
                Safefree(buf);
        }
 
-#if OPENSSL_VERSION_NUMBER >= 0x0090500fL
-#define REM17 "requires 0.9.5+"
-
 int
 X509_NAME_add_entry_by_NID(name,nid,type,bytes,loc=-1,set=0)
         X509_NAME *name
@@ -3599,8 +4034,6 @@ X509_NAME_add_entry_by_txt(name,field,type,bytes,loc=-1,set=0)
     OUTPUT:
         RETVAL
 
-#endif
-
 int
 X509_NAME_cmp(const X509_NAME *a, const X509_NAME *b)
 
@@ -3622,9 +4055,6 @@ X509_CRL_free(X509_CRL *x)
 X509_CRL *
 X509_CRL_new()
 
-#if OPENSSL_VERSION_NUMBER >= 0x0090700fL
-#define REM19 "requires 0.9.7+"
-
 int
 X509_CRL_set_version(X509_CRL *x, long version)
 
@@ -3632,15 +4062,7 @@ int
 X509_CRL_set_issuer_name(X509_CRL *x, X509_NAME *name)
 
 int
-X509_CRL_set_lastUpdate(X509_CRL *x, ASN1_TIME *tm)
-
-int
-X509_CRL_set_nextUpdate(X509_CRL *x, ASN1_TIME *tm)
-
-int
 X509_CRL_sort(X509_CRL *x)
-
-#endif
 
 long
 X509_CRL_get_version(X509_CRL *x)
@@ -3648,20 +4070,57 @@ X509_CRL_get_version(X509_CRL *x)
 X509_NAME *
 X509_CRL_get_issuer(X509_CRL *x)
 
+#if (OPENSSL_VERSION_NUMBER >= 0x1010000f && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
+
+const ASN1_TIME *
+X509_CRL_get0_lastUpdate(const X509_CRL *crl)
+	  ALIAS:
+		X509_CRL_get_lastUpdate = 1
+
+const ASN1_TIME *
+X509_CRL_get0_nextUpdate(const X509_CRL *crl)
+	  ALIAS:
+		X509_CRL_get_nextUpdate = 1
+
+int
+X509_CRL_set1_lastUpdate(X509_CRL *x, ASN1_TIME *tm)
+	  ALIAS:
+		X509_CRL_set_lastUpdate = 1
+
+int
+X509_CRL_set1_nextUpdate(X509_CRL *x, ASN1_TIME *tm)
+	  ALIAS:
+		X509_CRL_set_nextUpdate = 1
+
+#else /* plain get/set is deprecated */
+
 ASN1_TIME *
 X509_CRL_get_lastUpdate(X509_CRL *x)
+	  ALIAS:
+		X509_CRL_get0_lastUpdate = 1
 
 ASN1_TIME *
 X509_CRL_get_nextUpdate(X509_CRL *x)
+	  ALIAS:
+		X509_CRL_get0_nextUpdate = 1
+
+int
+X509_CRL_set_lastUpdate(X509_CRL *x, ASN1_TIME *tm)
+	  ALIAS:
+		X509_CRL_set1_lastUpdate = 1
+
+int
+X509_CRL_set_nextUpdate(X509_CRL *x, ASN1_TIME *tm)
+	  ALIAS:
+		X509_CRL_set1_nextUpdate = 1
+
+#endif
 
 int
 X509_CRL_verify(X509_CRL *a, EVP_PKEY *r)
 
 int
 X509_CRL_sign(X509_CRL *x, EVP_PKEY *pkey, const EVP_MD *md)
-
-#if OPENSSL_VERSION_NUMBER >= 0x0090700fL
-#define REM20 "requires 0.9.7+"
 
 int
 P_X509_CRL_set_serial(crl,crl_number)
@@ -3736,8 +4195,6 @@ P_X509_CRL_add_revoked_serial_hex(crl,serial_hex,rev_time,reason_code=0,comp_tim
         if(!X509_CRL_add0_revoked(crl, rev)) XSRETURN_IV(0);
         XSRETURN_IV(1);
 
-#endif
-
 X509_REQ *
 X509_REQ_new()
 
@@ -3791,9 +4248,6 @@ X509_REQ_add1_attr_by_NID(req,nid,type,bytes)
     OUTPUT:
         RETVAL
 
-#if OPENSSL_VERSION_NUMBER >= 0x0090700fL
-#define REM21 "requires 0.9.7+"
-
 void
 P_X509_REQ_get_attr(req,n)
         X509_REQ *req
@@ -3811,8 +4265,6 @@ P_X509_REQ_get_attr(req,n)
 	    s = t->value.asn1_string;
             XPUSHs(sv_2mortal(newSViv(PTR2IV(s))));
 	}
-
-#endif
 
 int
 P_X509_REQ_add_extensions(x,...)
@@ -4035,15 +4487,16 @@ X509_get_fingerprint(cert,type)
 void
 X509_get_subjectAltNames(cert)
 	X509 *      cert
-	PPCODE:
+	PREINIT:
 	int                    i, j, count = 0;
 	X509_EXTENSION         *subjAltNameExt = NULL;
 	STACK_OF(GENERAL_NAME) *subjAltNameDNs = NULL;
 	GENERAL_NAME           *subjAltNameDN  = NULL;
 	int                    num_gnames;
+	PPCODE:
 	if (  (i = X509_get_ext_by_NID(cert, NID_subject_alt_name, -1)) >= 0
 		&& (subjAltNameExt = X509_get_ext(cert, i))
-		&& (subjAltNameDNs = X509V3_EXT_d2i(subjAltNameExt)))
+		&& (subjAltNameDNs = (STACK_OF(GENERAL_NAME) *)X509V3_EXT_d2i(subjAltNameExt)))
 	{
 		num_gnames = sk_GENERAL_NAME_num(subjAltNameDNs);
 
@@ -4057,7 +4510,11 @@ X509_get_subjectAltNames(cert)
                          EXTEND(SP, 2);
                          count++;
                          PUSHs(sv_2mortal(newSViv(subjAltNameDN->type)));
+#if (OPENSSL_VERSION_NUMBER >= 0x1010000f && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
+                         PUSHs(sv_2mortal(newSVpv((const char*)ASN1_STRING_get0_data(subjAltNameDN->d.otherName->value->value.utf8string), ASN1_STRING_length(subjAltNameDN->d.otherName->value->value.utf8string))));
+#else
                          PUSHs(sv_2mortal(newSVpv((const char*)ASN1_STRING_data(subjAltNameDN->d.otherName->value->value.utf8string), ASN1_STRING_length(subjAltNameDN->d.otherName->value->value.utf8string))));
+#endif
                          break;
 
                      case GEN_EMAIL:
@@ -4066,7 +4523,11 @@ X509_get_subjectAltNames(cert)
                          EXTEND(SP, 2);
                          count++;
                          PUSHs(sv_2mortal(newSViv(subjAltNameDN->type)));
+#if (OPENSSL_VERSION_NUMBER >= 0x1010000f && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
+                         PUSHs(sv_2mortal(newSVpv((const char*)ASN1_STRING_get0_data(subjAltNameDN->d.ia5), ASN1_STRING_length(subjAltNameDN->d.ia5))));
+#else
                          PUSHs(sv_2mortal(newSVpv((const char*)ASN1_STRING_data(subjAltNameDN->d.ia5), ASN1_STRING_length(subjAltNameDN->d.ia5))));
+#endif
                          break;
 
                      case GEN_DIRNAME:
@@ -4105,8 +4566,6 @@ X509_get_subjectAltNames(cert)
 	}
 	XSRETURN(count * 2);
 
-#if OPENSSL_VERSION_NUMBER >= 0x0090700fL
-
 void
 P_X509_get_crl_distribution_points(cert)
         X509 * cert
@@ -4117,8 +4576,7 @@ P_X509_get_crl_distribution_points(cert)
         DIST_POINT *p;
         int i, j;
     PPCODE:
-        points = X509_get_ext_d2i(cert, NID_crl_distribution_points, NULL, NULL);
-        if (points)
+        points = (STACK_OF(DIST_POINT) *)X509_get_ext_d2i(cert, NID_crl_distribution_points, NULL, NULL);
         for (i = 0; i < sk_DIST_POINT_num(points); i++) {
             p = sk_DIST_POINT_value(points, i);
             if (!p->distpoint)
@@ -4130,7 +4588,11 @@ P_X509_get_crl_distribution_points(cert)
                     gn = sk_GENERAL_NAME_value(gnames, j);
 
                     if (gn->type == GEN_URI) {
+#if (OPENSSL_VERSION_NUMBER >= 0x1010000f && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
+                        XPUSHs(sv_2mortal(newSVpv((char*)ASN1_STRING_get0_data(gn->d.ia5),ASN1_STRING_length(gn->d.ia5))));
+#else
                         XPUSHs(sv_2mortal(newSVpv((char*)ASN1_STRING_data(gn->d.ia5),ASN1_STRING_length(gn->d.ia5))));
+#endif
                     }
                 }
             }
@@ -4157,27 +4619,37 @@ P_X509_get_crl_distribution_points(cert)
                 */
             }
         }
+        sk_DIST_POINT_pop_free(points, DIST_POINT_free);
 
 void
 P_X509_get_ocsp_uri(cert)
 	X509 * cert
-    PPCODE:
+	PREINIT:
 	AUTHORITY_INFO_ACCESS *info;
 	int i;
-	info = X509_get_ext_d2i(cert, NID_info_access, NULL, NULL);
+    PPCODE:
+	info = (AUTHORITY_INFO_ACCESS *)X509_get_ext_d2i(cert, NID_info_access, NULL, NULL);
 	if (!info) XSRETURN_UNDEF;
 
 	for (i = 0; i < sk_ACCESS_DESCRIPTION_num(info); i++) {
 	    ACCESS_DESCRIPTION *ad = sk_ACCESS_DESCRIPTION_value(info, i);
 	    if (OBJ_obj2nid(ad->method) == NID_ad_OCSP
 		&& ad->location->type == GEN_URI) {
+#if (OPENSSL_VERSION_NUMBER >= 0x1010000f && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
+		XPUSHs(sv_2mortal(newSVpv(
+		    (char*)ASN1_STRING_get0_data(ad->location->d.uniformResourceIdentifier),
+		    ASN1_STRING_length(ad->location->d.uniformResourceIdentifier)
+		)));
+#else
 		XPUSHs(sv_2mortal(newSVpv(
 		    (char*)ASN1_STRING_data(ad->location->d.uniformResourceIdentifier),
 		    ASN1_STRING_length(ad->location->d.uniformResourceIdentifier)
 		)));
-		if (GIMME == G_SCALAR) break; /* get only first */
+#endif
+		if (GIMME_V == G_SCALAR) break; /* get only first */
 	    }
 	}
+	AUTHORITY_INFO_ACCESS_free(info);
 
 
 void
@@ -4190,7 +4662,7 @@ P_X509_get_ext_key_usage(cert,format=0)
         char buffer[100]; /* openssl doc: a buffer length of 80 should be more than enough to handle any OID encountered in practice */
         ASN1_OBJECT *o;
     PPCODE:
-        extusage = X509_get_ext_d2i(cert, NID_ext_key_usage, NULL, NULL);
+        extusage = (EXTENDED_KEY_USAGE *)X509_get_ext_d2i(cert, NID_ext_key_usage, NULL, NULL);
         for(i = 0; i < sk_ASN1_OBJECT_num(extusage); i++) {
            o = sk_ASN1_OBJECT_value(extusage,i);
            nid = OBJ_obj2nid(o);
@@ -4204,8 +4676,7 @@ P_X509_get_ext_key_usage(cert,format=0)
            else if(format==3 && nid>0)
                XPUSHs(sv_2mortal(newSVpv(OBJ_nid2ln(nid),0))); /* format 3: longname */
         }
-
-#endif
+        EXTENDED_KEY_USAGE_free(extusage);
 
 void
 P_X509_get_key_usage(cert)
@@ -4213,7 +4684,7 @@ P_X509_get_key_usage(cert)
     INIT:
         ASN1_BIT_STRING * u;
     PPCODE:
-        u = X509_get_ext_d2i(cert, NID_key_usage, NULL, NULL);
+        u = (ASN1_BIT_STRING *)X509_get_ext_d2i(cert, NID_key_usage, NULL, NULL);
         if (u) {
             if (ASN1_BIT_STRING_get_bit(u,0)) XPUSHs(sv_2mortal(newSVpv("digitalSignature",0)));
             if (ASN1_BIT_STRING_get_bit(u,1)) XPUSHs(sv_2mortal(newSVpv("nonRepudiation",0)));
@@ -4224,6 +4695,7 @@ P_X509_get_key_usage(cert)
             if (ASN1_BIT_STRING_get_bit(u,6)) XPUSHs(sv_2mortal(newSVpv("cRLSign",0)));
             if (ASN1_BIT_STRING_get_bit(u,7)) XPUSHs(sv_2mortal(newSVpv("encipherOnly",0)));
             if (ASN1_BIT_STRING_get_bit(u,8)) XPUSHs(sv_2mortal(newSVpv("decipherOnly",0)));
+            ASN1_BIT_STRING_free(u);
         }
 
 void
@@ -4232,7 +4704,7 @@ P_X509_get_netscape_cert_type(cert)
     INIT:
         ASN1_BIT_STRING * u;
     PPCODE:
-        u = X509_get_ext_d2i(cert, NID_netscape_cert_type, NULL, NULL);
+        u = (ASN1_BIT_STRING *)X509_get_ext_d2i(cert, NID_netscape_cert_type, NULL, NULL);
         if (u) {
             if (ASN1_BIT_STRING_get_bit(u,0)) XPUSHs(sv_2mortal(newSVpv("client",0)));
             if (ASN1_BIT_STRING_get_bit(u,1)) XPUSHs(sv_2mortal(newSVpv("server",0)));
@@ -4242,6 +4714,7 @@ P_X509_get_netscape_cert_type(cert)
             if (ASN1_BIT_STRING_get_bit(u,5)) XPUSHs(sv_2mortal(newSVpv("sslCA",0)));
             if (ASN1_BIT_STRING_get_bit(u,6)) XPUSHs(sv_2mortal(newSVpv("emailCA",0)));
             if (ASN1_BIT_STRING_get_bit(u,7)) XPUSHs(sv_2mortal(newSVpv("objCA",0)));
+            ASN1_BIT_STRING_free(u);
         }
 
 int
@@ -4521,17 +4994,47 @@ P_ASN1_STRING_get(s,utf8_decode=0)
     PREINIT:
         SV * u8;
     PPCODE:
+#if (OPENSSL_VERSION_NUMBER >= 0x1010000f && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
+        u8 = newSVpv((const char*)ASN1_STRING_get0_data(s), ASN1_STRING_length(s));
+#else
         u8 = newSVpv((const char*)ASN1_STRING_data(s), ASN1_STRING_length(s));
+#endif
         if (utf8_decode) sv_utf8_decode(u8);
         XPUSHs(sv_2mortal(u8));
 
-ASN1_TIME *
-X509_get_notBefore(cert)
-     X509 *	cert
+#if (OPENSSL_VERSION_NUMBER >= 0x1010000f && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
+
+const ASN1_TIME *
+X509_get0_notBefore(const X509 *cert)
+
+const ASN1_TIME *
+X509_get0_notAfter(const X509 *cert)
 
 ASN1_TIME *
-X509_get_notAfter(cert)
-     X509 *	cert
+X509_getm_notBefore(const X509 *cert)
+	ALIAS:
+		X509_get_notBefore = 1
+
+ASN1_TIME *
+X509_getm_notAfter(const X509 *cert)
+	ALIAS:
+		X509_get_notAfter = 1
+
+#else /* plain get_ is deprecated */
+
+ASN1_TIME *
+X509_get_notBefore(X509 *cert)
+	ALIAS:
+		X509_get0_notBefore = 1
+		X509_getm_notBefore = 2
+
+ASN1_TIME *
+X509_get_notAfter(X509 *cert)
+	ALIAS:
+		X509_get0_notAfter = 1
+		X509_getm_notAfter = 2
+
+#endif
 
 ASN1_TIME *
 X509_gmtime_adj(s, adj)
@@ -4580,9 +5083,6 @@ P_ASN1_TIME_put2string(tm)
              BIO_free(bp);
          }
      }
-
-#if OPENSSL_VERSION_NUMBER >= 0x0090705f
-#define REM15 "NOTE: requires 0.9.7e+"
 
 void
 P_ASN1_TIME_get_isotime(tm)
@@ -4659,8 +5159,6 @@ P_ASN1_TIME_set_isotime(tm,str)
      ST(0) = sv_newmortal();
      sv_setiv(ST(0), rv); /* 1 = success, undef = failure */
 
-#endif
-
 int
 EVP_PKEY_copy_parameters(to,from)
      EVP_PKEY *		to
@@ -4677,6 +5175,13 @@ EVP_PKEY_assign_RSA(EVP_PKEY *pkey, RSA *key)
 
 int
 EVP_PKEY_bits(EVP_PKEY *pkey)
+
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x3060000fL)
+
+int
+EVP_PKEY_security_bits(EVP_PKEY *pkey)
+
+#endif
 
 int
 EVP_PKEY_size(EVP_PKEY *pkey)
@@ -4801,16 +5306,13 @@ CTX_use_PKCS12_file(ctx, file, password=NULL)
         PKCS12 *p12;
         EVP_PKEY *private_key;
         X509 *certificate;
-        FILE *fp;
+        BIO *bio;
     CODE:
         RETVAL = 0;
-        if ((fp = fopen (file, "rb"))) {
-#if OPENSSL_VERSION_NUMBER >= 0x0090700fL
+        bio = BIO_new_file(file, "rb");
+        if (bio) {
             OPENSSL_add_all_algorithms_noconf();
-#else
-            OpenSSL_add_all_algorithms();
-#endif
-            if ((p12 = d2i_PKCS12_fp(fp, NULL))) {
+            if ((p12 = d2i_PKCS12_bio(bio, NULL))) {
                 if (PKCS12_parse(p12, password, &private_key, &certificate, NULL)) {
                     if (private_key) {
                         if (SSL_CTX_use_PrivateKey(ctx, private_key)) RETVAL = 1;
@@ -4824,7 +5326,7 @@ CTX_use_PKCS12_file(ctx, file, password=NULL)
                 PKCS12_free(p12);
             }
             if (!RETVAL) ERR_print_errors_fp(stderr);
-            fclose(fp);
+            BIO_free(bio);
         }
     OUTPUT:
         RETVAL
@@ -4840,16 +5342,13 @@ P_PKCS12_load_file(file, load_chain=0, password=NULL)
         X509 *certificate = NULL;
         STACK_OF(X509) *cachain = NULL;
         X509 *x;
-        FILE *fp;
+        BIO *bio;
         int i, result;
     PPCODE:
-        if ((fp = fopen (file, "rb"))) {
-#if OPENSSL_VERSION_NUMBER >= 0x0090700fL
+        bio = BIO_new_file(file, "rb");
+        if (bio) {
             OPENSSL_add_all_algorithms_noconf();
-#else
-            OpenSSL_add_all_algorithms();
-#endif
-            if ((p12 = d2i_PKCS12_fp(fp, NULL))) {
+            if ((p12 = d2i_PKCS12_bio(bio, NULL))) {
                 if(load_chain)
                     result= PKCS12_parse(p12, password, &private_key, &certificate, &cachain);
                 else
@@ -4873,7 +5372,7 @@ P_PKCS12_load_file(file, load_chain=0, password=NULL)
                 }
                 PKCS12_free(p12);
             }
-            fclose(fp);
+            BIO_free(bio);
         }
 
 #ifndef OPENSSL_NO_MD2
@@ -4932,8 +5431,6 @@ MD5(data)
 
 #endif
 
-#if OPENSSL_VERSION_NUMBER >= 0x00905000L
-
 void
 RIPEMD160(data)
      PREINIT:
@@ -4947,8 +5444,6 @@ RIPEMD160(data)
      } else {
 	  XSRETURN_UNDEF;
      }
-
-#endif
 
 #if !defined(OPENSSL_NO_SHA)
 
@@ -5027,6 +5522,8 @@ SSLv23_server_method()
 const SSL_METHOD *
 SSLv23_client_method()
 
+#if !defined(OPENSSL_NO_TLS1_METHOD)
+
 const SSL_METHOD *
 TLSv1_method()
 
@@ -5036,7 +5533,9 @@ TLSv1_server_method()
 const SSL_METHOD *
 TLSv1_client_method()
 
-#ifdef SSL_TXT_TLSV1_1
+#endif
+
+#if (OPENSSL_VERSION_NUMBER >= 0x10001001L && !defined(OPENSSL_NO_TLS1_1_METHOD)) /* OpenSSL 1.0.1-beta1 */
 
 const SSL_METHOD *
 TLSv1_1_method()
@@ -5049,7 +5548,7 @@ TLSv1_1_client_method()
 
 #endif
 
-#ifdef SSL_TXT_TLSV1_2
+#if (OPENSSL_VERSION_NUMBER >= 0x10001001L && !defined(OPENSSL_NO_TLS1_2_METHOD)) /* OpenSSL 1.0.1-beta1 */
 
 const SSL_METHOD *
 TLSv1_2_method()
@@ -5102,7 +5601,7 @@ SSL_set_max_proto_version(ssl, version)
 #endif /* OpenSSL 1.1.0-pre2 or LibreSSL 2.6.0 */
 
 
-#if OPENSSL_VERSION_NUMBER >= 0x1010007fL && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x1010007fL && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x3040000fL)
 
 int
 SSL_CTX_get_min_proto_version(ctx)
@@ -5120,7 +5619,7 @@ int
 SSL_get_max_proto_version(ssl)
      SSL *  ssl
 
-#endif /* OpenSSL 1.1.0g */
+#endif /* OpenSSL 1.1.0g or LibreSSL 3.4.0 */
 
 
 #if OPENSSL_VERSION_NUMBER < 0x10000000L
@@ -5280,6 +5779,20 @@ SSL_CIPHER_get_bits(c, ...)
 const char *
 SSL_CIPHER_get_version(const SSL_CIPHER *cipher)
 
+#if OPENSSL_VERSION_NUMBER >= 0x10101001L && !defined(LIBRESSL_VERSION_NUMBER)
+
+const EVP_MD *
+SSL_CIPHER_get_handshake_digest(const SSL_CIPHER *c)
+
+#endif /* OpenSSL 1.1.1-pre1 */
+
+#if (OPENSSL_VERSION_NUMBER >= 0x1000200fL && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x3040000fL) /* LibreSSL >= 3.4.0 */
+
+const SSL_CIPHER *
+SSL_CIPHER_find(SSL *ssl, const unsigned char *ptr)
+
+#endif
+
 #ifndef OPENSSL_NO_COMP
 
 int
@@ -5348,11 +5861,7 @@ SSL_CTX_set_cert_verify_callback(ctx,callback,data=&PL_sv_undef)
         else {
             cb_data_advanced_put(ctx, "ssleay_ctx_cert_verify_cb!!func", newSVsv(callback));
             cb_data_advanced_put(ctx, "ssleay_ctx_cert_verify_cb!!data", newSVsv(data));
-#if OPENSSL_VERSION_NUMBER >= 0x0090700fL
             SSL_CTX_set_cert_verify_callback(ctx, ssleay_ctx_cert_verify_cb_invoke, ctx);
-#else
-            SSL_CTX_set_cert_verify_callback(ctx, ssleay_ctx_cert_verify_cb_invoke, (char*)ctx);
-#endif
         }
 
 X509_NAME_STACK *
@@ -5451,7 +5960,7 @@ SSL_CTX_use_certificate_chain_file(ctx,file)
      const char * file
 
 
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x3030200fL) /* OpenSSL 1.1.0-pre1 or LibreSSL 3.3.2 */
 
 int
 SSL_use_certificate_chain_file(ssl,file)
@@ -5698,7 +6207,7 @@ SSL_CTX_set_msg_callback(ctx,callback,data=&PL_sv_undef)
         }
 
 
-#if OPENSSL_VERSION_NUMBER >= 0x10101001 && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10101001 && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x3050000fL)
 
 void
 SSL_CTX_set_keylog_callback(SSL_CTX *ctx, SV *callback)
@@ -5723,6 +6232,131 @@ SSL_CTX_get_keylog_callback(const SSL_CTX *ctx)
 
 #endif
 
+#if OPENSSL_VERSION_NUMBER >= 0x10101001L && !defined(LIBRESSL_VERSION_NUMBER)
+
+void
+SSL_CTX_set_client_hello_cb(SSL_CTX *ctx, SV *callback, SV *arg=&PL_sv_undef)
+    CODE:
+	if (callback==NULL || !SvOK(callback)) {
+	    SSL_CTX_set_client_hello_cb(ctx, NULL, NULL);
+	    cb_data_advanced_put(ctx, "ssleay_ssl_ctx_client_hello_cb!!func", NULL);
+            cb_data_advanced_put(ctx, "ssleay_ssl_ctx_client_hello_cb!!arg", NULL);
+	} else {
+	    cb_data_advanced_put(ctx, "ssleay_ssl_ctx_client_hello_cb!!func", newSVsv(callback));
+	    cb_data_advanced_put(ctx, "ssleay_ssl_ctx_client_hello_cb!!arg", newSVsv(arg));
+	    SSL_CTX_set_client_hello_cb(ctx, ssl_client_hello_cb_fn_invoke, NULL);
+	}
+
+int
+SSL_client_hello_isv2(SSL *s)
+
+unsigned int
+SSL_client_hello_get0_legacy_version(SSL *s)
+
+void
+SSL_client_hello_get0_random(SSL *s)
+    PREINIT:
+	const unsigned char *out = NULL;
+	size_t outlen;
+    CODE:
+	outlen = SSL_client_hello_get0_random(s, &out);
+	if (outlen == 0) XSRETURN_PV("");
+	ST(0) = sv_newmortal();
+	sv_setpvn(ST(0), (const char *)out, (STRLEN)outlen);
+
+void
+SSL_client_hello_get0_session_id(SSL *s)
+    PREINIT:
+	const unsigned char *out = NULL;
+	size_t outlen;
+    CODE:
+	outlen = SSL_client_hello_get0_session_id(s, &out);
+	if (outlen == 0) XSRETURN_PV("");
+	ST(0) = sv_newmortal();
+	sv_setpvn(ST(0), (const char *)out, (STRLEN)outlen);
+
+void
+SSL_client_hello_get0_ciphers(SSL *s)
+    PREINIT:
+	const unsigned char *out = NULL;
+	size_t outlen;
+    CODE:
+	outlen = SSL_client_hello_get0_ciphers(s, &out);
+	if (outlen == 0) XSRETURN_PV("");
+	ST(0) = sv_newmortal();
+	sv_setpvn(ST(0), (const char *)out, (STRLEN)outlen);
+
+void
+SSL_client_hello_get0_compression_methods(SSL *s)
+    PREINIT:
+	const unsigned char *out = NULL;
+	size_t outlen;
+    CODE:
+	outlen = SSL_client_hello_get0_compression_methods(s, &out);
+	if (outlen == 0) XSRETURN_PV("");
+	ST(0) = sv_newmortal();
+	sv_setpvn(ST(0), (const char *)out, (STRLEN)outlen);
+
+void
+SSL_client_hello_get1_extensions_present(SSL *s)
+    PREINIT:
+	int ret, *out = NULL, i;
+	size_t outlen;
+	AV *av;
+    PPCODE:
+	ret = SSL_client_hello_get1_extensions_present(s, &out, &outlen);
+	if (ret != 1) XSRETURN_UNDEF;
+
+	av = newAV();
+	mXPUSHs(newRV_noinc((SV*)av));
+	for (i=0; i < outlen; i++) {
+	    av_push(av, newSViv(*(out + i)));
+	}
+	OPENSSL_free(out);
+
+#if OPENSSL_VERSION_NUMBER >= 0x30200000L && !defined(LIBRESSL_VERSION_NUMBER)
+
+void
+SSL_client_hello_get_extension_order(SSL *s)
+    PREINIT:
+	int ret, i;
+	uint16_t *exts;
+	size_t num_exts;
+	AV *av;
+    PPCODE:
+	ret = SSL_client_hello_get_extension_order(s, NULL, &num_exts);
+	if (ret != 1) XSRETURN_UNDEF;
+
+	Newx(exts, num_exts, uint16_t);
+	ret = SSL_client_hello_get_extension_order(s, exts, &num_exts);
+	if (ret != 1) {
+	    Safefree(exts);
+	    XSRETURN_UNDEF;
+	}
+
+	av = newAV();
+	mXPUSHs(newRV_noinc((SV*)av));
+	for (i=0; i < num_exts; i++) {
+	    av_push(av, newSViv(*(exts + i)));
+	}
+	Safefree(exts);
+
+#endif
+
+void
+SSL_client_hello_get0_ext(SSL *s, unsigned int type)
+    PREINIT:
+	int ret;
+	const unsigned char *out = NULL;
+	size_t outlen;
+    CODE:
+	ret = SSL_client_hello_get0_ext(s, type, &out, &outlen);
+	if (ret != 1) XSRETURN_UNDEF;
+
+	ST(0) = sv_newmortal();
+	sv_setpvn(ST(0), (const char *)out, (STRLEN)outlen);
+
+#endif
 
 int
 SSL_set_purpose(s,purpose)
@@ -5771,6 +6405,9 @@ SSL_version(ssl)
 int
 SSL_client_version(ssl)
      const SSL * ssl
+
+#endif
+#if (OPENSSL_VERSION_NUMBER >= 0x10100006L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x3030200fL)  /* 1.1.0-pre6 or LibreSSL 3.3.2 */
 
 int
 SSL_is_dtls(ssl)
@@ -5996,11 +6633,11 @@ EVP_PKEY_assign_EC_KEY(pkey,key)
 EC_KEY *
 EC_KEY_generate_key(curve)
 	SV *curve;
-    CODE:
+	PREINIT:
 	EC_GROUP *group = NULL;
 	EC_KEY *eckey = NULL;
 	int nid;
-
+    CODE:
 	RETVAL = 0;
 	if (SvIOK(curve)) {
 	    nid = SvIV(curve);
@@ -6199,6 +6836,18 @@ SSL_set_tmp_rsa(ssl,rsa)
 
 #endif
 
+BIGNUM *
+BN_dup(const BIGNUM *from)
+
+void
+BN_clear(BIGNUM *bn)
+
+void
+BN_clear_free(BIGNUM *bn)
+
+void
+BN_free(BIGNUM *bn)
+
 #if OPENSSL_VERSION_NUMBER >= 0x0090800fL
 
 RSA *
@@ -6209,6 +6858,14 @@ RSA_generate_key(bits,ee,perl_cb=&PL_sv_undef,perl_data=&PL_sv_undef)
         SV* perl_data
     PREINIT:
         simple_cb_data_t* cb_data = NULL;
+        int rc;
+        RSA * ret;
+        BIGNUM *e;
+#if (OPENSSL_VERSION_NUMBER >= 0x10100001L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
+        BN_GENCB *new_cb;
+#else
+        BN_GENCB new_cb;
+#endif
     CODE:
        /* openssl 0.9.8 deprecated RSA_generate_key. */
        /* This equivalent was contributed by Brian Fraser for Android, */
@@ -6216,9 +6873,6 @@ RSA_generate_key(bits,ee,perl_cb=&PL_sv_undef,perl_data=&PL_sv_undef)
        /* It should now be more versatile. */
        /* as of openssl 1.1.0-pre1 it is not possible anymore to generate the BN_GENCB structure directly. */
        /* instead BN_EGNCB_new() has to be used. */
-       int rc;
-       RSA * ret;
-       BIGNUM *e;
        e = BN_new();
        if(!e)
            croak("Net::SSLeay: RSA_generate_key perl function could not create BN structure.\n");
@@ -6232,7 +6886,6 @@ RSA_generate_key(bits,ee,perl_cb=&PL_sv_undef,perl_data=&PL_sv_undef)
            croak("Net::SSLeay: RSA_generate_key perl function could not create RSA structure.\n");
        }
 #if (OPENSSL_VERSION_NUMBER >= 0x10100001L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
-       BN_GENCB *new_cb;
        new_cb = BN_GENCB_new();
        if(!new_cb) {
 	   simple_cb_data_free(cb_data);
@@ -6244,7 +6897,6 @@ RSA_generate_key(bits,ee,perl_cb=&PL_sv_undef,perl_data=&PL_sv_undef)
        rc = RSA_generate_key_ex(ret, bits, e, new_cb);
        BN_GENCB_free(new_cb);
 #else
-       BN_GENCB new_cb;
        BN_GENCB_set_old(&new_cb, ssleay_RSA_generate_key_cb_invoke, cb_data);
        rc = RSA_generate_key_ex(ret, bits, e, &new_cb);
 #endif
@@ -6278,13 +6930,31 @@ RSA_generate_key(bits,e,perl_cb=&PL_sv_undef,perl_data=&PL_sv_undef)
 
 #endif
 
-#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER)
-
 void
 RSA_get_key_parameters(rsa)
 	    RSA * rsa
+PREINIT:
+#if (!defined(LIBRESSL_VERSION_NUMBER) && (OPENSSL_VERSION_NUMBER >= 0x1010000fL)) || (defined(LIBRESSL_VERSION_NUMBER) && (LIBRESSL_VERSION_NUMBER >= 0x3050000fL))
+    const BIGNUM *n, *e, *d;
+    const BIGNUM *p, *q;
+    const BIGNUM *dmp1, *dmq1, *iqmp;
+#endif
 PPCODE:
 {
+#if (!defined(LIBRESSL_VERSION_NUMBER) && (OPENSSL_VERSION_NUMBER >= 0x1010000fL)) || (defined(LIBRESSL_VERSION_NUMBER) && (LIBRESSL_VERSION_NUMBER >= 0x3050000fL))
+    RSA_get0_key(rsa, &n, &e, &d);
+    RSA_get0_factors(rsa, &p, &q);
+    RSA_get0_crt_params(rsa, &dmp1, &dmq1, &iqmp);
+    /* Caution: returned list consists of SV pointers to BIGNUMs, which would need to be blessed as Crypt::OpenSSL::Bignum for further use */
+    XPUSHs(bn2sv(n));
+    XPUSHs(bn2sv(e));
+    XPUSHs(bn2sv(d));
+    XPUSHs(bn2sv(p));
+    XPUSHs(bn2sv(q));
+    XPUSHs(bn2sv(dmp1));
+    XPUSHs(bn2sv(dmq1));
+    XPUSHs(bn2sv(iqmp));
+#else
     /* Caution: returned list consists of SV pointers to BIGNUMs, which would need to be blessed as Crypt::OpenSSL::Bignum for further use */
     XPUSHs(bn2sv(rsa->n));
     XPUSHs(bn2sv(rsa->e));
@@ -6294,9 +6964,8 @@ PPCODE:
     XPUSHs(bn2sv(rsa->dmp1));
     XPUSHs(bn2sv(rsa->dmq1));
     XPUSHs(bn2sv(rsa->iqmp));
-}
-
 #endif
+}
 
 void
 RSA_free(r)
@@ -6310,30 +6979,30 @@ X509_free(a)
     X509 * a
 
 X509_CRL *
-d2i_X509_CRL_bio(BIO *bp,void *unused=NULL)
+d2i_X509_CRL_bio(BIO *bp,X509_CRL **unused=NULL)
 
 X509_REQ *
-d2i_X509_REQ_bio(BIO *bp,void *unused=NULL)
+d2i_X509_REQ_bio(BIO *bp,X509_REQ **unused=NULL)
 
 X509 *
-d2i_X509_bio(BIO *bp,void *unused=NULL)
+d2i_X509_bio(BIO *bp,X509 **unused=NULL)
 
 DH *
 PEM_read_bio_DHparams(bio,x=NULL,cb=NULL,u=NULL)
 	BIO  * bio
-	void * x
+	DH ** x
 	pem_password_cb * cb
 	void * u
 
 X509_CRL *
 PEM_read_bio_X509_CRL(bio,x=NULL,cb=NULL,u=NULL)
 	BIO  * bio
-	void * x
+	X509_CRL ** x
 	pem_password_cb * cb
 	void * u
 
 X509 *
-PEM_read_bio_X509(BIO *bio,void *x=NULL,void *cb=NULL,void *u=NULL)
+PEM_read_bio_X509(BIO *bio,X509 **x=NULL,pem_password_cb *cb=NULL,void *u=NULL)
 
 STACK_OF(X509_INFO) *
 PEM_X509_INFO_read_bio(bio, stack=NULL, cb=NULL, u=NULL)
@@ -6409,7 +7078,7 @@ P_X509_INFO_get_x509(info)
         RETVAL
 
 X509_REQ *
-PEM_read_bio_X509_REQ(BIO *bio,void *x=NULL,pem_password_cb *cb=NULL,void *u=NULL)
+PEM_read_bio_X509_REQ(BIO *bio,X509_REQ **x=NULL,pem_password_cb *cb=NULL,void *u=NULL)
 
 EVP_PKEY *
 PEM_read_bio_PrivateKey(bio,perl_cb=&PL_sv_undef,perl_data=&PL_sv_undef)
@@ -6489,6 +7158,34 @@ SSL_SESSION_set_master_key(s,key)
 
 #endif
 
+#if (OPENSSL_VERSION_NUMBER >= 0x10101001L && !defined(LIBRESSL_VERSION_NUMBER))
+
+int
+SSL_SESSION_set1_master_key(SSL_SESSION *sess, in)
+   PREINIT:
+	STRLEN len;
+   INPUT:
+	const unsigned char *in = (unsigned char*)SvPV(ST(1), len);
+   CODE:
+	RETVAL = SSL_SESSION_set1_master_key(sess, in, len);
+   OUTPUT:
+	RETVAL
+
+int
+SSL_SESSION_set_cipher(SSL_SESSION *s, const SSL_CIPHER *cipher)
+
+int
+SSL_SESSION_set_protocol_version(SSL_SESSION *s, int version)
+
+#endif
+
+#if (OPENSSL_VERSION_NUMBER >= 0x1010000fL && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x3040000fL)
+
+const SSL_CIPHER *
+SSL_SESSION_get0_cipher(const SSL_SESSION *s)
+
+#endif
+
 #if (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
 
 void
@@ -6543,16 +7240,26 @@ SSL_get_server_random(s)
 
 #endif
 
+ # AEAD ciphers require an Initialization Vector that has nonce
+ # qualities. A part of the IV comes from PRF. This part is called
+ # 'implicit'. See RFC 5246 section 6.2.3.3. Length of the 'implicit'
+ # part of nonce for GCM and CCM mode ciphers is defined to be 4 by RFCs
+ # 5288 and 6655, respectively, and the total length of nonce is 12
+ # octets.  Because of the above, SSL_get_keyblock_size adjusts
+ # iv_length and does not fetch full nonce length from the PRF.
 int
 SSL_get_keyblock_size(s)
      SSL *   s
-     CODE:
+     PREINIT:
 #if (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
         const SSL_CIPHER *ssl_cipher;
 	int cipher = NID_undef, digest = NID_undef, mac_secret_size = 0;
 	const EVP_CIPHER *c = NULL;
 	const EVP_MD *h = NULL;
+#endif
 
+     CODE:
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
 	ssl_cipher = SSL_get_current_cipher(s);
 	if (ssl_cipher)
 	    cipher = SSL_CIPHER_get_cipher_nid(ssl_cipher);
@@ -6567,9 +7274,14 @@ SSL_get_keyblock_size(s)
 	    mac_secret_size = EVP_MD_size(h);
 
 	RETVAL = -1;
-	if (c)
+	if (c) {
+	    int iv_length = EVP_CIPHER_iv_length(c);
+	    if (EVP_CIPHER_mode(c) == EVP_CIPH_GCM_MODE ||
+		EVP_CIPHER_mode(c) == EVP_CIPH_CCM_MODE)
+		    iv_length = 4;
 	    RETVAL = 2 * (EVP_CIPHER_key_length(c) + mac_secret_size +
-		          EVP_CIPHER_iv_length(c));
+			  iv_length);
+	}
 #else
      if (s == NULL ||
 	 s->enc_read_ctx == NULL ||
@@ -6582,9 +7294,14 @@ SSL_get_keyblock_size(s)
      {
 	const EVP_CIPHER *c;
 	const EVP_MD *h;
+	int iv_length = -1;
 	int md_size = -1;
 	c = s->enc_read_ctx->cipher;
+	iv_length = EVP_CIPHER_iv_length(c);
 #if OPENSSL_VERSION_NUMBER >= 0x10001000L
+	if (EVP_CIPHER_mode(c) == EVP_CIPH_GCM_MODE ||
+	    EVP_CIPHER_mode(c) == EVP_CIPH_CCM_MODE)
+		iv_length = 4;
 	h = NULL;
 	if (s->s3)
 	    md_size = s->s3->tmp.new_mac_secret_size;
@@ -6598,7 +7315,7 @@ SSL_get_keyblock_size(s)
 	/* No digest if e.g., AEAD cipher */
 	RETVAL = (md_size >= 0) ? (2 * (EVP_CIPHER_key_length(c) +
 				       md_size +
-				       EVP_CIPHER_iv_length(c)))
+				       iv_length))
 			       : -1;
      }
 #endif
@@ -6608,23 +7325,7 @@ SSL_get_keyblock_size(s)
 
 
 
-#if defined(SSL_F_SSL_SET_HELLO_EXTENSION)
-int
-SSL_set_hello_extension(s, type, data)
-     SSL *   s
-     int     type
-     PREINIT:
-     STRLEN len;
-     INPUT:
-     char *  data = SvPV( ST(2), len);
-     CODE:
-     RETVAL = SSL_set_hello_extension(s, type, data, len);
-     OUTPUT:
-     RETVAL
-
-#endif
-
-#if defined(SSL_F_SSL_SET_HELLO_EXTENSION) || defined(SSL_F_SSL_SET_SESSION_TICKET_EXT)
+#ifdef SSL_F_SSL_SET_SESSION_TICKET_EXT
 
 void 
 SSL_set_session_secret_cb(s,callback=&PL_sv_undef,data=&PL_sv_undef)
@@ -6675,6 +7376,99 @@ SSL_CTX_set_psk_client_callback(ctx,callback=&PL_sv_undef)
             SSL_CTX_set_psk_client_callback(ctx, ssleay_ctx_set_psk_client_callback_invoke);
         }
 
+int
+SSL_use_psk_identity_hint(SSL *ssl, const char *hint)
+
+int
+SSL_CTX_use_psk_identity_hint(SSL_CTX *ctx, const char *hint)
+
+void
+SSL_set_psk_server_callback(ssl,cb=&PL_sv_undef)
+        SSL * ssl
+        SV * cb
+    CODE:
+        if (cb==NULL || !SvOK(cb)) {
+            SSL_set_psk_server_callback(ssl, NULL);
+            cb_data_advanced_put(ssl, "ssleay_set_psk_server_callback!!func", NULL);
+        }
+        else {
+            cb_data_advanced_put(ssl, "ssleay_set_psk_server_callback!!func", newSVsv(cb));
+            SSL_set_psk_server_callback(ssl, ssleay_set_psk_server_callback_invoke);
+        }
+
+void
+SSL_CTX_set_psk_server_callback(ctx,cb=&PL_sv_undef)
+        SSL_CTX * ctx
+        SV * cb
+    CODE:
+        if (cb==NULL || !SvOK(cb)) {
+            SSL_CTX_set_psk_server_callback(ctx, NULL);
+            cb_data_advanced_put(ctx, "ssleay_ctx_set_psk_server_callback!!func", NULL);
+        }
+        else {
+            cb_data_advanced_put(ctx, "ssleay_ctx_set_psk_server_callback!!func", newSVsv(cb));
+            SSL_CTX_set_psk_server_callback(ctx, ssleay_ctx_set_psk_server_callback_invoke);
+        }
+
+#if OPENSSL_VERSION_NUMBER >= 0x10101001L
+
+void
+SSL_set_psk_find_session_callback(s,cb=&PL_sv_undef)
+        SSL * s
+        SV * cb
+    CODE:
+        if (cb==NULL || !SvOK(cb)) {
+            SSL_set_psk_find_session_callback(s, NULL);
+            cb_data_advanced_put(s, "ssleay_set_psk_find_session_callback!!func", NULL);
+        }
+        else {
+            cb_data_advanced_put(s, "ssleay_set_psk_find_session_callback!!func", newSVsv(cb));
+            SSL_set_psk_find_session_callback(s, ssleay_set_psk_find_session_callback_invoke);
+        }
+
+void
+SSL_CTX_set_psk_find_session_callback(ctx,cb=&PL_sv_undef)
+        SSL_CTX * ctx
+        SV * cb
+    CODE:
+        if (cb==NULL || !SvOK(cb)) {
+            SSL_CTX_set_psk_find_session_callback(ctx, NULL);
+            cb_data_advanced_put(ctx, "ssleay_ctx_set_psk_find_session_callback!!func", NULL);
+        }
+        else {
+            cb_data_advanced_put(ctx, "ssleay_ctx_set_psk_find_session_callback!!func", newSVsv(cb));
+            SSL_CTX_set_psk_find_session_callback(ctx, ssleay_ctx_set_psk_find_session_callback_invoke);
+        }
+
+void
+SSL_set_psk_use_session_callback(s,cb=&PL_sv_undef)
+        SSL * s
+        SV * cb
+    CODE:
+        if (cb==NULL || !SvOK(cb)) {
+            SSL_set_psk_use_session_callback(s, NULL);
+            cb_data_advanced_put(s, "ssleay_set_psk_use_session_callback!!func", NULL);
+        }
+        else {
+            cb_data_advanced_put(s, "ssleay_set_psk_use_session_callback!!func", newSVsv(cb));
+            SSL_set_psk_use_session_callback(s, ssleay_set_psk_use_session_callback_invoke);
+        }
+
+void
+SSL_CTX_set_psk_use_session_callback(ctx,cb=&PL_sv_undef)
+        SSL_CTX * ctx
+        SV * cb
+    CODE:
+        if (cb==NULL || !SvOK(cb)) {
+            SSL_CTX_set_psk_use_session_callback(ctx, NULL);
+            cb_data_advanced_put(ctx, "ssleay_ctx_set_psk_use_session_callback!!func", NULL);
+        }
+        else {
+            cb_data_advanced_put(ctx, "ssleay_ctx_set_psk_use_session_callback!!func", newSVsv(cb));
+            SSL_CTX_set_psk_use_session_callback(ctx, ssleay_ctx_set_psk_use_session_callback_invoke);
+        }
+
+#endif
 #endif
 
 #ifdef NET_SSLEAY_CAN_TICKET_KEY_CB
@@ -6699,17 +7493,7 @@ SSL_CTX_set_tlsext_ticket_getkey_cb(ctx,callback=&PL_sv_undef,data=&PL_sv_undef)
 
 #endif
 
-
-#if OPENSSL_VERSION_NUMBER < 0x0090700fL
-#define REM11 "NOTE: before 0.9.7"
-
-int EVP_add_digest(EVP_MD *digest)
-
-#else
-
 int EVP_add_digest(const EVP_MD *digest)
-
-#endif
 
 #ifndef OPENSSL_NO_SHA
 
@@ -6734,6 +7518,19 @@ int EVP_MD_type(const EVP_MD *md)
 
 int EVP_MD_size(const EVP_MD *md)
 
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+
+const char *
+EVP_MD_get0_description(const EVP_MD *md)
+
+const char *
+EVP_MD_get0_name(const EVP_MD *md)
+
+int
+EVP_MD_get_type(const EVP_MD *md)
+
+#endif
+
 #if OPENSSL_VERSION_NUMBER >= 0x1000000fL
 
 SV*
@@ -6748,9 +7545,6 @@ P_EVP_MD_list_all()
         RETVAL
 
 #endif
-
-#if OPENSSL_VERSION_NUMBER >= 0x0090700fL
-#define REM16 "NOTE: requires 0.9.7+"
 
 const EVP_MD *EVP_MD_CTX_md(const EVP_MD_CTX *ctx)
 
@@ -6812,23 +7606,17 @@ EVP_Digest(...)
      else
          XSRETURN_UNDEF;
 
-#endif
-
 const EVP_CIPHER *
 EVP_get_cipherbyname(const char *name)
 
 void
 OpenSSL_add_all_algorithms()
 
-#if OPENSSL_VERSION_NUMBER >= 0x0090700fL
-
 void
 OPENSSL_add_all_algorithms_noconf()
 
 void
 OPENSSL_add_all_algorithms_conf()
-
-#endif
 
 #if OPENSSL_VERSION_NUMBER >= 0x10000003L
 
@@ -7010,6 +7798,7 @@ X509_VERIFY_PARAM_get0_peername(param)
 
 #endif /* OpenSSL 1.0.2-beta2, LibreSSL 2.7.0 */
 
+#if !defined(LIBRESSL_VERSION_NUMBER) || (LIBRESSL_VERSION_NUMBER < 0x3080000fL) /* LibreSSL < 3.8.0 */
 void
 X509_policy_tree_free(tree)
     X509_POLICY_TREE *tree
@@ -7052,6 +7841,7 @@ const X509_POLICY_NODE *
 X509_policy_node_get0_parent(node)
     const X509_POLICY_NODE *node
 
+#endif /* LibreSSL < 3.8.0 */
 #endif
 
 ASN1_OBJECT *
@@ -7091,20 +7881,9 @@ OBJ_obj2txt(a, no_name=0)
     ST(0) = sv_newmortal();
     sv_setpvn(ST(0), buf, len);
 
-#if OPENSSL_VERSION_NUMBER < 0x0090700fL
-#define REM14 "NOTE: before 0.9.7"
-
-int
-OBJ_txt2nid(s)
-    char *s
-
-#else
-
 int
 OBJ_txt2nid(s)
     const char *s
-
-#endif
 
 int
 OBJ_ln2nid(s)
@@ -7119,8 +7898,6 @@ OBJ_cmp(a, b)
     ASN1_OBJECT *a
     ASN1_OBJECT *b
 
-#if OPENSSL_VERSION_NUMBER >= 0x0090700fL
-
 void
 X509_pubkey_digest(data,type)
         const X509 *data
@@ -7133,8 +7910,6 @@ X509_pubkey_digest(data,type)
             XSRETURN_PVN((char *)md, md_size);
         else
             XSRETURN_UNDEF;
-
-#endif
 
 void
 X509_digest(data,type)
@@ -7197,7 +7972,7 @@ ASN1_OBJECT *
 P_X509_get_signature_alg(x)
         X509 * x
     CODE:
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x3050000fL)
         RETVAL = (X509_get0_tbs_sigalg(x)->algorithm);
 #else
         RETVAL = (x->cert_info->signature->algorithm);
@@ -7225,10 +8000,11 @@ P_X509_get_pubkey_alg(x)
 void
 X509_get_X509_PUBKEY(x)
    const X509 *x
-   PPCODE:
+   PREINIT:
    X509_PUBKEY *pkey;
    STRLEN len;
    unsigned char *pc, *pi;
+   PPCODE:
    if (!(pkey = X509_get_X509_PUBKEY(x))) croak("invalid certificate");
    if (!(len = i2d_X509_PUBKEY(pkey, NULL))) croak("invalid certificate public key");
    Newx(pc,len,unsigned char);
@@ -7428,9 +8204,10 @@ d2i_OCSP_RESPONSE(pv)
 void
 i2d_OCSP_RESPONSE(r)
 	OCSP_RESPONSE * r
-    PPCODE:
+	PREINIT:
 	STRLEN len;
 	unsigned char *pc,*pi;
+    PPCODE:
 	if (!(len = i2d_OCSP_RESPONSE(r,NULL))) croak("invalid OCSP response");
 	Newx(pc,len,unsigned char);
 	if (!pc) croak("out of memory");
@@ -7461,9 +8238,10 @@ d2i_OCSP_REQUEST(pv)
 void
 i2d_OCSP_REQUEST(r)
 	OCSP_REQUEST * r
-    PPCODE:
+	PREINIT:
 	STRLEN len;
 	unsigned char *pc,*pi;
+    PPCODE:
 	if (!(len = i2d_OCSP_REQUEST(r,NULL))) croak("invalid OCSP request");
 	Newx(pc,len,unsigned char);
 	if (!pc) croak("out of memory");
@@ -7487,7 +8265,7 @@ OCSP_response_status(OCSP_RESPONSE *r)
 void
 SSL_OCSP_cert2ids(ssl,...)
 	SSL *ssl
-    PPCODE:
+PREINIT:
 	SSL_CTX *ctx;
 	X509_STORE *store;
 	STACK_OF(X509) *chain;
@@ -7496,6 +8274,7 @@ SSL_OCSP_cert2ids(ssl,...)
 	int i;
 	STRLEN len;
 	unsigned char *pi;
+    PPCODE:
 
 	if (!ssl) croak("not a SSL object");
 	ctx = SSL_get_SSL_CTX(ssl);
@@ -7526,10 +8305,11 @@ SSL_OCSP_cert2ids(ssl,...)
 
 OCSP_REQUEST *
 OCSP_ids2req(...)
-    CODE:
+	PREINIT:
 	OCSP_REQUEST *req;
 	OCSP_CERTID *id;
 	int i;
+    CODE:
 
 	req = OCSP_REQUEST_new();
 	if (!req) croak("out of memory");
@@ -7621,17 +8401,18 @@ SSL_OCSP_response_verify(ssl,rsp,svreq=NULL,flags=0)
 void
 OCSP_response_results(rsp,...)
 	OCSP_RESPONSE *rsp
-    PPCODE:
+    PREINIT:
 	OCSP_BASICRESP *bsr;
 	int i,want_array;
 	time_t nextupd = 0;
 	time_t gmtoff = -1;
 	int getall,sksn;
+    PPCODE:
 
 	bsr = OCSP_response_get1_basic(rsp);
 	if (!bsr) croak("invalid OCSP response");
 
-	want_array = (GIMME == G_ARRAY);
+	want_array = (GIMME_V == G_LIST);
 	getall = (items <= 1);
 	sksn = OCSP_resp_count(bsr);
 
@@ -7690,7 +8471,7 @@ OCSP_response_results(rsp,...)
 		if (!idsv) {
 		    /* getall: create new SV with OCSP_CERTID */
 		    unsigned char *pi,*pc;
-#if OPENSSL_VERSION_NUMBER >= 0x10100003L && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10100003L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x3050000fL)
 		    int len = i2d_OCSP_CERTID((OCSP_CERTID *)OCSP_SINGLERESP_get0_id(sir),NULL);
 #else
 		    int len = i2d_OCSP_CERTID(sir->certId,NULL);
@@ -7699,7 +8480,7 @@ OCSP_response_results(rsp,...)
 		    Newx(pc,len,unsigned char);
 		    if (!pc) croak("out of memory");
 		    pi = pc;
-#if OPENSSL_VERSION_NUMBER >= 0x10100003L && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10100003L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x3050000fL)
 		    i2d_OCSP_CERTID((OCSP_CERTID *)OCSP_SINGLERESP_get0_id(sir),&pi);
 #else
 		    i2d_OCSP_CERTID(sir->certId,&pi);
@@ -7885,8 +8666,9 @@ OSSL_LIB_CTX_get0_global_default()
 
 OSSL_PROVIDER *
 OSSL_PROVIDER_load(SV *libctx, const char *name)
-    CODE:
+    PREINIT:
         OSSL_LIB_CTX *ctx = NULL;
+    CODE:
         if (libctx != &PL_sv_undef)
 	    ctx = INT2PTR(OSSL_LIB_CTX *, SvIV(libctx));
         RETVAL = OSSL_PROVIDER_load(ctx, name);
@@ -7897,8 +8679,9 @@ OSSL_PROVIDER_load(SV *libctx, const char *name)
 
 OSSL_PROVIDER *
 OSSL_PROVIDER_try_load(SV *libctx, const char *name, int retain_fallbacks)
-    CODE:
+    PREINIT:
         OSSL_LIB_CTX *ctx = NULL;
+    CODE:
         if (libctx != &PL_sv_undef)
 	    ctx = INT2PTR(OSSL_LIB_CTX *, SvIV(libctx));
         RETVAL = OSSL_PROVIDER_try_load(ctx, name, retain_fallbacks);
@@ -7912,8 +8695,9 @@ OSSL_PROVIDER_unload(OSSL_PROVIDER *prov)
 
 int
 OSSL_PROVIDER_available(SV *libctx, const char *name)
-    CODE:
+    PREINIT:
         OSSL_LIB_CTX *ctx = NULL;
+    CODE:
         if (libctx != &PL_sv_undef)
 	    ctx = INT2PTR(OSSL_LIB_CTX *, SvIV(libctx));
         RETVAL = OSSL_PROVIDER_available(ctx, name);
@@ -7924,8 +8708,8 @@ int
 OSSL_PROVIDER_do_all(SV *libctx, SV *perl_cb, SV *perl_cbdata = &PL_sv_undef)
     PREINIT:
         simple_cb_data_t* cbdata = NULL;
-    CODE:
         OSSL_LIB_CTX *ctx = NULL;
+    CODE:
         if (libctx != &PL_sv_undef)
 	    ctx = INT2PTR(OSSL_LIB_CTX *, SvIV(libctx));
 

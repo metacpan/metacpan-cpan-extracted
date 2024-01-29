@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Rw - Package for language Kinyarwanda
 
 package Locale::CLDR::Locales::Rw;
 # This file auto generated from Data\common\main\rw.xml
-#	on Tue  5 Dec  1:29:57 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'af' => 'Ikinyafurikaneri',
@@ -150,9 +150,10 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
-			'RW' => 'U Rwanda',
+			'MK' => 'Masedoniya y’Amajyaruguru',
+ 			'RW' => 'U Rwanda',
  			'TO' => 'Tonga',
 
 		}
@@ -170,7 +171,7 @@ has 'characters' => (
 		return {
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
 			main => qr{[a b c d e f g h i j k l m n o p q r s t u v w x y z]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -347,7 +348,7 @@ has 'calendar_months' => (
 							'Gashyantare',
 							'Werurwe',
 							'Mata',
-							'Gicuransi',
+							'Gicurasi',
 							'Kamena',
 							'Nyakanga',
 							'Kanama',
@@ -406,7 +407,7 @@ has 'calendar_months' => (
 							'Gashyantare',
 							'Werurwe',
 							'Mata',
-							'Gicuransi',
+							'Gicurasi',
 							'Kamena',
 							'Nyakanga',
 							'Kanama',
@@ -689,7 +690,7 @@ has 'datetime_formats_available_formats' => (
 			MEd => q{MM-dd, E},
 			MMM => q{LLL},
 			MMMEd => q{MMM d, E},
-			MMMMW => q{'week' W 'of' MMM},
+			MMMMW => q{'week' W 'of' MMMM},
 			MMMMd => q{MMMM d},
 			MMMd => q{MMM d},
 			Md => q{MM-dd},

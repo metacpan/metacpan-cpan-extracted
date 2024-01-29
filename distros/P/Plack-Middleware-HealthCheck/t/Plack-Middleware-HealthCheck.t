@@ -6,7 +6,9 @@ use charnames qw( :full );
 
 use Test::Exception;
 use Test::More;
+use Test2::Tools::Mock  qw( mock );
 use Plack::Test;
+use Hash::MultiValue '>= 0.10'; # set method implemented in v0.10
 use HTTP::Request::Common;
 use JSON;
 use File::Temp qw();
@@ -369,6 +371,18 @@ is_deeply(
         [ 200, [@content_type], [qq({"status":"OK"}) ] ],
         "OK with an OK result";
 
+    is_deeply $mw->health_check_response( $mw ),
+        [ 503, [@content_type], [ 'null' ]],
+        'Blessed object lacking TO_JSON method encodes as "null"';
+
+    my $mock = mock 'Plack::Middleware::HealthCheck' => (
+        add => [ TO_JSON => sub { 'Your JSON here' } ]
+    );
+    is_deeply $mw->health_check_response( $mw ),
+        [ 503, [@content_type], [ '"Your JSON here"' ]],
+        'Blessed object with TO_JSON method encodes accordingly';
+    $mock = undef;
+
     foreach my $status (qw( UNKNOWN WARNING CRITICAL other )) {
         is_deeply $mw->health_check_response( { status => $status } ), [
             503, [@content_type],
@@ -389,7 +403,7 @@ is_deeply(
         [ 200, [@content_type], [qq({"status":"OK"}) ] ],
         "JSON encoded result is compact";
 
-    # Make sure it just needs to exist, not be set
+    # Make sure 'pretty' just needs to exist, not be set
     $req->query_parameters->set( pretty => undef );
 
     # Hopefully JSON keeps making this pretty in the same way

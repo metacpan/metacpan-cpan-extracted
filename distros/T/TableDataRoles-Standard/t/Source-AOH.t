@@ -10,6 +10,7 @@ use TableData::Test::Source::AOH;
 my $t = TableData::Test::Source::AOH->new(aoh => [{i=>1}, {i=>2}, {i=>3}]);
 
 is($t->get_column_count, 1);
+is_deeply($t->get_next_item, [1]);
 is_deeply([$t->get_column_names], [qw/i/]);
 $t->reset_iterator;
 is_deeply($t->get_next_item, [1]);

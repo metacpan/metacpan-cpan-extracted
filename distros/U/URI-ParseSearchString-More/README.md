@@ -4,7 +4,7 @@ URI::ParseSearchString::More - Extract search strings from more referrers.
 
 # VERSION
 
-version 0.18
+version 0.19
 
 # SYNOPSIS
 
@@ -14,16 +14,16 @@ version 0.18
 
 # DESCRIPTION
 
-This module is a subclass of [URI::ParseSearchString](https://metacpan.org/pod/URI::ParseSearchString), so you can call any
+This module is a subclass of [URI::ParseSearchString](https://metacpan.org/pod/URI%3A%3AParseSearchString), so you can call any
 methods on this object that you would call on a URI::ParseSearchString object.
 This module works a little harder than its SuperClass to get you results. If
-it fails, it will return to you the results that [URI::ParseSearchString](https://metacpan.org/pod/URI::ParseSearchString)
+it fails, it will return to you the results that [URI::ParseSearchString](https://metacpan.org/pod/URI%3A%3AParseSearchString)
 would have returned to you anyway, so it should function well as a drop-in
 replacement.
 
-[WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize) is used to extract search strings from some URLs
+[WWW::Mechanize](https://metacpan.org/pod/WWW%3A%3AMechanize) is used to extract search strings from some URLs
 which contain session info rather than search params.  Optionally,
-[WWW::Mechanize::Cached](https://metacpan.org/pod/WWW::Mechanize::Cached) can be used to cache your lookups. There is additional
+[WWW::Mechanize::Cached](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3ACached) can be used to cache your lookups. There is additional
 parsing and also a guess() method which will return good results in many cases
 of doubt.
 
@@ -99,8 +99,8 @@ Returns 1 if caching is currently on, 0 if it is not.
 ## get\_mech
 
 This gives you direct access to the Mechanize object.  If caching is enabled,
-a [WWW::Mechanize::Cached](https://metacpan.org/pod/WWW::Mechanize::Cached) object will be returned.  If caching is disabled,
-a [WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize) object will be returned.
+a [WWW::Mechanize::Cached](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3ACached) object will be returned.  If caching is disabled,
+a [WWW::Mechanize](https://metacpan.org/pod/WWW%3A%3AMechanize) object will be returned.
 
 If you know what you're doing, play around with it.  Caveat emptor.
 

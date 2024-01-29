@@ -3,8 +3,8 @@ package PDF::Builder::ViewerPreferences;
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.025'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use Carp;
 use PDF::Builder::Basic::PDF::Utils;
@@ -26,8 +26,6 @@ PDF::Builder::ViewerPreferences - How the PDF should be displayed or printed
 
 This has been split out from C<preferences()> in L<PDF::Builder>.
 
-=over
-
 =cut
 
 sub _snake_case {
@@ -47,9 +45,15 @@ sub _camel_case {
     return $name;
 }
 
-=item $self = $class->new($pdf)
+=head2 new
+
+    $self = $class->new($pdf)
+
+=over
 
 Creates a new ViewerPreferences object from a PDF::Builder object.
+
+=back
 
 =cut
 
@@ -60,10 +64,16 @@ sub new {
     return $self;
 }
 
-=item %preferences = $self->get_preferences()
+=head2 get_preferences
+
+    %preferences = $self->get_preferences()
+
+=over
 
 Returns a hash containing all of the viewer preferences that are defined in the
 PDF.
+
+=back
 
 =cut
 
@@ -107,10 +117,16 @@ sub get_preferences {
     return %values;
 }
 
-=item $value = $self->get_preference($name)
+=head2 get_preference
+
+    $value = $self->get_preference($name)
+
+=over
 
 Returns the value of the specified viewer preference if present, or C<undef> if
 not.
+
+=back
 
 =cut
 
@@ -120,10 +136,16 @@ sub get_preference {
     return $values{$name};
 }
 
-=item $self->set_preferences(%values)
+=head2 set_preferences
+
+    $self->set_preferences(%values)
+
+=over
 
 Sets one or more viewer preferences, as described in the preferences section
 below.
+
+=back
 
 =cut
 
@@ -214,8 +236,6 @@ sub set_preferences {
     }
     return $self;
 }
-
-=back
 
 =head1 PREFERENCES
 

@@ -2,7 +2,7 @@ NAME
     Net::SAML2 - SAML2 bindings and protocol implementation
 
 VERSION
-    version 0.74
+    version 0.76
 
 SYNOPSIS
       See TUTORIAL.md for implementation documentation and
@@ -104,7 +104,7 @@ AUTHORS
     *   Timothy Legge <timlegge@gmail.com>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023 by Venda Ltd, see the CONTRIBUTORS
+    This software is copyright (c) 2024 by Venda Ltd, see the CONTRIBUTORS
     file for others.
 
     This is free software; you can redistribute it and/or modify it under

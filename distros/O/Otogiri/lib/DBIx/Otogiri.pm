@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Class::Accessor::Lite (
-    ro => [qw/connect_info strict/],
+    ro => [qw/connect_info strict dburl/],
     rw => [qw/maker owner_pid row_class_schema/],
     new => 0,
 );
@@ -12,10 +12,15 @@ use Class::Accessor::Lite (
 use SQL::Maker;
 use DBIx::Sunny;
 use DBIx::Otogiri::Iterator;
+use URI::db;
 
 sub new {
     my ($class, %opts) = @_;
     my $self = bless {%opts}, $class;
+    if ($self->{dburl}) {
+        my $dburl = URI::db->new($self->{dburl});
+        $self->{connect_info} = [$dburl->dbi_dsn, $dburl->user, $dburl->password];
+    }
     ( $self->{dsn}{scheme},
       $self->{dsn}{driver},
       $self->{dsn}{attr_str},
@@ -197,6 +202,9 @@ DBIx::Otogiri - Core of Otogiri
 
     use Otogiri;
     my $db = Otogiri->new(connect_info => ['dbi:SQLite:...', '', '']);
+    
+    # or use with DBURL
+    my $db = Otogiri->new(dburl => 'sqlite://...');
     
     $db->insert(book => {title => 'mybook1', author => 'me', ...});
 

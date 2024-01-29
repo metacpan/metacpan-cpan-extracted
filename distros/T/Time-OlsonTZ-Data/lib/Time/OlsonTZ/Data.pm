@@ -37,7 +37,7 @@ package Time::OlsonTZ::Data;
 use warnings;
 use strict;
 
-our $VERSION = "0.202303";
+our $VERSION = "0.202304";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -77,7 +77,7 @@ retain this format in the future.
 
 =cut
 
-use constant olson_version => "2023c";
+use constant olson_version => "2023d";
 
 =item olson_code_version
 
@@ -89,7 +89,7 @@ piece of information.
 
 =cut
 
-use constant olson_code_version => "2023c";
+use constant olson_code_version => "2023d";
 
 =item olson_data_version
 
@@ -101,7 +101,7 @@ piece of information.
 
 =cut
 
-use constant olson_data_version => "2023c";
+use constant olson_data_version => "2023d";
 
 =back
 
@@ -163,9 +163,9 @@ my $cn = q(+{ map { ($_ => undef) } qw(
 	America/Thule America/Tijuana America/Toronto America/Vancouver
 	America/Whitehorse America/Winnipeg America/Yakutat Antarctica/Casey
 	Antarctica/Davis Antarctica/Macquarie Antarctica/Mawson
-	Antarctica/Palmer Antarctica/Rothera Antarctica/Troll Asia/Almaty
-	Asia/Amman Asia/Anadyr Asia/Aqtau Asia/Aqtobe Asia/Ashgabat Asia/Atyrau
-	Asia/Baghdad Asia/Baku Asia/Bangkok Asia/Barnaul Asia/Beirut
+	Antarctica/Palmer Antarctica/Rothera Antarctica/Troll Antarctica/Vostok
+	Asia/Almaty Asia/Amman Asia/Anadyr Asia/Aqtau Asia/Aqtobe Asia/Ashgabat
+	Asia/Atyrau Asia/Baghdad Asia/Baku Asia/Bangkok Asia/Barnaul Asia/Beirut
 	Asia/Bishkek Asia/Chita Asia/Choibalsan Asia/Colombo Asia/Damascus
 	Asia/Dhaka Asia/Dili Asia/Dubai Asia/Dushanbe Asia/Famagusta Asia/Gaza
 	Asia/Hebron Asia/Ho_Chi_Minh Asia/Hong_Kong Asia/Hovd Asia/Irkutsk
@@ -344,7 +344,6 @@ my $li = q(+{
 	"Antarctica/McMurdo" => "Pacific/Auckland",
 	"Antarctica/South_Pole" => "Pacific/Auckland",
 	"Antarctica/Syowa" => "Asia/Riyadh",
-	"Antarctica/Vostok" => "Asia/Urumqi",
 	"Arctic/Longyearbyen" => "Europe/Berlin",
 	"Asia/Aden" => "Asia/Riyadh",
 	"Asia/Ashkhabad" => "Asia/Ashgabat",

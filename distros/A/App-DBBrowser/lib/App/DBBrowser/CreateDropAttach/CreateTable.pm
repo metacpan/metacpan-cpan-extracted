@@ -520,6 +520,9 @@ sub __insert_data {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $columns = $ax->column_names( $sql->{table} );
+    if ( ! defined $columns ) {
+        return;
+    }
     if ( length $sf->{col_auto} ) {
         shift @$columns;
     }

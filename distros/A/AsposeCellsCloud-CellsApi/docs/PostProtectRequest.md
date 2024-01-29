@@ -8,9 +8,9 @@ use AsposeCellsCloud::Request::PostProtect;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**file** | **string** | File to upload |
+**file** | **string** | The password needed to open an Excel file. |
 **protect_workbook_request** | **ProtectWorkbookRequest** |  |
-**password** | **string** |  |  
+**password** | **string** | The password needed to open an Excel file. |  
 
 [[Back to Model list]](../README.md#documentation-for-requests) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

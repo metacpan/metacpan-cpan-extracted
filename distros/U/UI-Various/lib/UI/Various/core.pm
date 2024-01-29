@@ -37,7 +37,7 @@ use warnings 'once';
 use Carp;
 use Storable ();
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 use UI::Various::language::en;
 
@@ -259,6 +259,9 @@ Otherwise this method just exports the core functions to our other modules.
 	    }
 	}
 
+	# STDOUT and STDERR should be UTF-8:
+	binmode(STDOUT, ':utf8');
+	binmode(STDERR, ':utf8');
 	# now we really know how to STDERR (e.g. for value 1):
 	stderr($stderr);
 
@@ -1129,6 +1132,49 @@ a scalar reference to an empty variable
 BEGIN {
     sub dummy_varref()
     {   my $dummy = '';   return \$dummy;   }
+}
+
+#########################################################################
+
+=head2 B<_tui_color> - translate any colour into internal terminal colour
+
+    my $tui_colour = _tui_color($colour);
+
+=head3 description:
+
+For the given colour (6 character hex-value) this internal function returns
+the corresponding valid terminal colour index (one of 216 possible, for
+details see C<bg> in L<UI::Various::widget|Attributes>).
+
+Note that the interface of this function is internal and may change in the
+future or even disappear at all.
+
+=head3 returns:
+
+TUI colour index, a number in [0, 215]
+
+=cut
+
+sub _tui_color($)
+{
+    my ($hex) = @_;
+    local $_ = 0;
+    if ($hex =~ m/^([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i)
+    {
+	# map [0..255] -> [0..5], boundary ranges 32 wide, others 48
+	my $r = int((hex($1) + 16) / 48);
+	my $g = int((hex($2) + 16) / 48);
+	my $b = int((hex($3) + 16) / 48);
+	# mix values into sequence 16 less than the 216 ANSI colour codes:
+	# https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
+	$_ = (($r * 6) + $g) * 6 + $b;
+    }
+    else
+    {
+	error('invalid_value__1_for_parameter__2_in_call_to__3__4',
+	      $hex, 'hex', __PACKAGE__, '_tui_color');
+    }
+    return $_;
 }
 
 # TODO L8R: add option to disable sanity checks

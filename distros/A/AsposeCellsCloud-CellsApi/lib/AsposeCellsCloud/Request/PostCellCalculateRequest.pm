@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostCellCalculateRequest.name : The workbook name.  ,
+# PostCellCalculateRequest.name : The file name.  ,
 # PostCellCalculateRequest.sheetName : The worksheet name.  ,
 # PostCellCalculateRequest.cellName : The cell name.  ,
 # PostCellCalculateRequest.options : Calculation Options  ,
-# PostCellCalculateRequest.folder : Original workbook folder.  ,
-# PostCellCalculateRequest.storageName : Storage name.   
+# PostCellCalculateRequest.folder : The folder where the file is situated.  ,
+# PostCellCalculateRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_cell_calculate' } = { 
-    	summary => 'Calculates cell formula in worksheet.',
+    	summary => 'Calculate cell formula in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -144,7 +144,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -172,14 +172,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

@@ -61,21 +61,24 @@ sub do_test {
       sub {
         my %test_dbs = ( $db_name => $db, );
         my $get_dbh  = sub {
-            my ($id) = @_;
-            return DBI->connect( $test_dbs{$id}->connection_info );
+            my ($id)        = @_;
+            my (@conn_info) = $test_dbs{$id}->connection_info;
+            ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
+            # Don't print error in STDERR.
+            # It just dirties the test output.
+            $conn_info[3]->{PrintError} = 0;
+            return DBI->connect(@conn_info);
         };
         my %databases;
         foreach my $id ( keys %test_dbs ) {
-            $databases{$id} = {
-                dbh_callback => $get_dbh,
-                prefix       => q{}
-            };
+            $databases{$id} = { prefix => q{} };
         }
 
         # Start
         my $client = TheSchwartz::JobScheduler->new(
-            databases => \%databases,
-            opts      => {
+            databases    => \%databases,
+            dbh_callback => $get_dbh,
+            opts         => {
                 handle_uniqkey => 'no_check',
             }
         );
@@ -86,12 +89,16 @@ sub do_test {
             uniqkey  => 'UNIQUE_STR_A',
         );
 
-        my $jobid_1 = $client->insert($job);
+        my $jobid_1 = $client->insert( job => $job );
         ok( $jobid_1, 'Got a job id' );
 
         $job->arg( { an_item => 'value B' } );
-        ## no critic (RegularExpressions::RequireExtendedFormatting)
-        like( dies { $client->insert($job); }, qr/DBD::[[:word:]]{1,}::st execute failed:/ms, 'Failed as expected', );
+        like(
+            ## no critic (RegularExpressions::RequireExtendedFormatting)
+            dies { $client->insert( job => $job ); },
+            qr/DBD::[[:word:]]{1,}::st execute failed:/ms,
+            'Failed as expected',
+        );
 
         done_testing;
       };
@@ -105,16 +112,14 @@ sub do_test {
         };
         my %databases;
         foreach my $id ( keys %test_dbs ) {
-            $databases{$id} = {
-                dbh_callback => $get_dbh,
-                prefix       => q{}
-            };
+            $databases{$id} = { prefix => q{} };
         }
 
         # Start
         my $client = TheSchwartz::JobScheduler->new(
-            databases => \%databases,
-            opts      => {
+            databases    => \%databases,
+            dbh_callback => $get_dbh,
+            opts         => {
                 handle_uniqkey => 'acknowledge',
             }
         );
@@ -125,11 +130,11 @@ sub do_test {
             uniqkey  => 'UNIQUE_STR_A',
         );
 
-        my $jobid_1 = $client->insert($job);
+        my $jobid_1 = $client->insert( job => $job );
         ok( $jobid_1, 'Got a job id' );
 
         $job->arg( { an_item => 'value B' } );
-        my $jobid_2 = $client->insert($job);
+        my $jobid_2 = $client->insert( job => $job );
         ok( $jobid_2, 'Got a job id' );
 
         is( $jobid_1, $jobid_2, 'job ids are the same' );
@@ -137,7 +142,7 @@ sub do_test {
         # Create one more
         $job->arg( { an_item => 'value C' } );
         $job->uniqkey(undef);
-        my $jobid_3 = $client->insert($job);
+        my $jobid_3 = $client->insert( job => $job );
         ok( $jobid_3,            'Got a job id' );
         ok( $jobid_3 > $jobid_2, 'New jobid is greater than previous' );
 

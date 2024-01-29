@@ -5,7 +5,7 @@ use Path::Tiny qw(path);
 plugin 'PkgConfig' => 'libmaxminddb';
 
 share {
-  start_url 'https://github.com/maxmind/libmaxminddb/releases/download/1.7.1/libmaxminddb-1.7.1.tar.gz';
+  start_url 'https://github.com/maxmind/libmaxminddb/releases/download/1.9.1/libmaxminddb-1.9.1.tar.gz';
   plugin 'Download';
   plugin 'Extract' => 'tar.gz';
   plugin 'Build::Autoconf';

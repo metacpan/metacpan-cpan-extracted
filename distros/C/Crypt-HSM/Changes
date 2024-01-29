@@ -1,5 +1,8 @@
 Revision history for Crypt-HSM
 
+0.016     2024-01-05 18:38:07+01:00 Europe/Brussels
+          - Add missing parentheses to refcount.h
+
 0.015     2023-10-24 19:27:30+02:00 Europe/Brussels
           - Allocate right sized structs for Slot and Mechanism
           - Properly refcount Slot and Mechanism objects

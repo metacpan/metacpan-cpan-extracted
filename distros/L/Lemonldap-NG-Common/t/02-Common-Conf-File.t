@@ -16,12 +16,12 @@ BEGIN { use_ok('Lemonldap::NG::Common::Conf') }
 # Insert your test code below, the Test::More module is use()ed here so read
 # its man page ( perldoc Test::More ) for help writing this test script.
 
-my $h;
+my $confAcc;
 use File::Temp;
 my $dir = File::Temp::tempdir( CLEANUP => 1 );
 
 ok(
-    $h = new Lemonldap::NG::Common::Conf(
+    $confAcc = new Lemonldap::NG::Common::Conf(
         {
             type    => 'File',
             dirName => $dir,
@@ -44,11 +44,11 @@ my @test = (
 );
 
 for ( my $i = 0 ; $i < @test ; $i++ ) {
-    ok( $h->store( $test[$i] ) == 1, "Test $i is stored" )
+    ok( $confAcc->store( $test[$i] ) == 1, "Test $i is stored" )
       or print STDERR "$Lemonldap::NG::Common::Conf::msg $!";
     $count++;
     my $cfg;
-    ok( $cfg = $h->load(1), "Test $i can be read" )
+    ok( $cfg = $confAcc->load(1), "Test $i can be read" )
       or print STDERR $Lemonldap::NG::Common::Conf::msg;
     ok( $cfg->{test} eq $test[$i]->{test}, "Test $i is restored" )
       or print STDERR "Expect $cfg->{test} eq $test[$i]->{test}\n";

@@ -1,5 +1,11 @@
 Revision history for Perl extension DBIx::SearchBuilder.
 
+1.81 2024-01-18
+ - Add explicit support for MariaDB in addition to MySQL
+
+1.80 2023-12-13
+ - Add CastAsDecimal helper method
+
 1.79 2023-11-27
  - Produce correct query hints
 

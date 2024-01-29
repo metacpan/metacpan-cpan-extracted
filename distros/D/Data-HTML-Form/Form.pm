@@ -15,7 +15,7 @@ Readonly::Array our @ENCTYPES => (
 	'text/plain',
 );
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 has action => (
 	is => 'ro',
@@ -97,8 +97,6 @@ Data::HTML::Form - Data object for HTML form.
 
 Constructor.
 
-Returns instance of object.
-
 =over 8
 
 =item * C<action>
@@ -156,6 +154,8 @@ Possible methods are: get and post
 
 =back
 
+Returns instance of object.
+
 =head2 C<action>
 
  my $action = $obj->action;
@@ -183,17 +183,23 @@ Returns string.
 
 =head2 C<id>
 
+ my $id = $obj->id;
+
 Get form identifier.
 
 Returns string.
 
 =head2 C<label>
 
+ my $label = $obj->label;
+
 Get form label.
 
 Returns string.
 
 =head2 C<method>
+
+ my $method = $obj->method;
 
 Get form method.
 
@@ -277,12 +283,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022 Michal Josef Špaček
+© 2022-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

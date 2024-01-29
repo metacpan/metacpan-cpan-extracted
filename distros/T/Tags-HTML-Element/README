@@ -1,0 +1,41 @@
+NAME
+    Data::HTML::Element - Data objects for HTML elements.
+
+SEE ALSO
+    Tags::HTML::Element::A
+        Tags helper for HTML a element.
+
+    Tags::HTML::Element::Button
+        Tags helper for HTML button element.
+
+    Tags::HTML::Element::Form
+        Tags helper for HTML form element.
+
+    Tags::HTML::Element::Input
+        Tags helper for HTML input element.
+
+    Tags::HTML::Element::Option
+        Tags helper for HTML option element.
+
+    Tags::HTML::Element::Select
+        Tags helper for HTML select element.
+
+    Tags::HTML::Element::Textarea
+        Tags helper for HTML textarea element.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tags-HTML-Element>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2022-2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

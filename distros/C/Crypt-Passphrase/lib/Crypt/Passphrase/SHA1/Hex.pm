@@ -1,5 +1,5 @@
 package Crypt::Passphrase::SHA1::Hex;
-$Crypt::Passphrase::SHA1::Hex::VERSION = '0.016';
+$Crypt::Passphrase::SHA1::Hex::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ sub accepts_hash {
 
 sub verify_password {
 	my ($self, $password, $hash) = @_;
-	return sha1($password) eq pack('H40', $hash);
+	return sha1($password) eq pack 'H40', $hash;
 }
 
 1;
@@ -38,29 +38,24 @@ Crypt::Passphrase::SHA1::Hex - Validate against hexed SHA1 hashes with Crypt::Pa
 
 =head1 VERSION
 
-version 0.016
+version 0.019
+
+=head1 SYNOPSIS
+
+ my $passphrase = Crypt::Passphrase->new(
+     encoder    => 'Argon2',
+     validators => [ 'SHA1::Hex' ],
+ );
 
 =head1 DESCRIPTION
 
-This module implements a validator for hex-encoded SHA-1 hashes.
+This module implements a validator for base64-encoded SHA-1 hashes.
 
-=head1 METHODS
-
-=head2 new()
-
-This creates a new SHA-1 validator. It takes no arguments.
-
-=head2 accepts_hash($hash)
-
-This (heuristically) determines if we may be dealing with a hex encoded sha1 sum.
-
-=head2 verify_hash($password, $hash)
-
-This determines if the password matches the hash when SHA1'ed.
+This has no configuration and will try to match any value that looks like 20 bytes encoded in hex.
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

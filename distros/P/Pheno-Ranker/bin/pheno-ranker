@@ -2,11 +2,11 @@
 #
 #   A script that performs semantic similarity in PXF|BFF data structures
 #
-#   Last Modified: Nov/27/2023
+#   Last Modified: Dec/22/2023
 #
 #   Version 0.00
 #
-#   Copyright (C) 2023 Manuel Rueda - CNAG (manuel.rueda@cnag.eu)
+#   Copyright (C) 2023-2024 Manuel Rueda - CNAG (manuel.rueda@cnag.eu)
 #
 #   License: Artistic License 2.0
 #
@@ -41,29 +41,30 @@ my $cli              = 1;
 
 # Reading arguments
 GetOptions(
-    'reference|r=s{1,}'              => \my @reference_files,           # array
-    'target|t=s'                     => \my $target_file,               # string
-    'weights|w=s'                    => \my $weights_file,              # string
-    'append-prefixes=s{1,}'          => \my @append_prefixes,           # array
-    'out-file|o=s'                   => \my $out_file_arg,              # string
-    'max-out:i'                      => \my $max_out,                   # integer
-    'max-number-var:i'               => \my $max_number_var,            # integer
-    'include-hpo-ascendants'         => \my $include_hpo_ascendants,    # flag
-    'export|e:s'                     => \my $export,                    # opt-string (defined)
-    'align|a:s'                      => \my $align,                     # opt-string (defined)
-    'sort-by=s'                      => \my $sort_by,                   # string
-    'patients-of-interest|poi=s{1,}' => \my @patients_of_interest,      # array
-    'poi-out-dir=s'                  => \my $poi_out_dir,               # string
-    'include-terms=s{1,11}'          => \my @include_terms,             # array
-    'exclude-terms=s{1,11}'          => \my @exclude_terms,             # array
-    'config=s'                       => \my $config_file,               # string
-    'age!'                           => \$age,                          # flag
-    'help|?'                         => \my $help,                      # flag
-    'log:s'                          => \my $log,                       # opt-string (defined)
-    'man'                            => \my $man,                       # flag
-    'debug=i'                        => \my $debug,                     # integer
-    'verbose|'                       => \my $verbose,                   # flag
-    'color!'                         => \$color,                        # flag
+    'reference|r=s{1,}'              => \my @reference_files,             # array
+    'target|t=s'                     => \my $target_file,                 # string
+    'weights|w=s'                    => \my $weights_file,                # string
+    'append-prefixes=s{1,}'          => \my @append_prefixes,             # array
+    'out-file|o=s'                   => \my $out_file_arg,                # string
+    'max-out:i'                      => \my $max_out,                     # integer
+    'max-number-var:i'               => \my $max_number_var,              # integer
+    'include-hpo-ascendants'         => \my $include_hpo_ascendants,      # flag
+    'export|e:s'                     => \my $export,                      # opt-string (defined)
+    'align|a:s'                      => \my $align,                       # opt-string (defined)
+    'sort-by=s'                      => \my $sort_by,                     # string
+    'similarity-metric-cohort=s'     => \my $similarity_metric_cohort,    # string
+    'patients-of-interest|poi=s{1,}' => \my @patients_of_interest,        # array
+    'poi-out-dir=s'                  => \my $poi_out_dir,                 # string
+    'include-terms=s{1,11}'          => \my @include_terms,               # array
+    'exclude-terms=s{1,11}'          => \my @exclude_terms,               # array
+    'config=s'                       => \my $config_file,                 # string
+    'age!'                           => \$age,                            # flag
+    'help|?'                         => \my $help,                        # flag
+    'log:s'                          => \my $log,                         # opt-string (defined)
+    'man'                            => \my $man,                         # flag
+    'debug=i'                        => \my $debug,                       # integer
+    'verbose|'                       => \my $verbose,                     # flag
+    'color!'                         => \$color,                          # flag
     'version|V'                      => sub { say "$0 Version $VERSION"; exit; }
 ) or pod2usage(2);
 pod2usage(1)                              if $help;
@@ -89,30 +90,31 @@ say BOLD CYAN program_header($VERSION), RESET if $verbose;
 
 # Load data as hashref
 my $data = {
-    reference_files        => \@reference_files,
-    target_file            => $target_file,
-    weights_file           => $weights_file,
-    include_hpo_ascendants => $include_hpo_ascendants,
-    hpo_file               => undef,
-    align                  => $align,
-    align_basename         => $align_basename,
-    export                 => $export,
-    export_basename        => $export_basename,
-    out_file               => $out_file,
-    max_out                => $max_out,
-    max_number_var         => $max_number_var,
-    sort_by                => $sort_by,
-    patients_of_interest   => \@patients_of_interest,
-    poi_out_dir            => $poi_out_dir,
-    include_terms          => \@include_terms,
-    exclude_terms          => \@exclude_terms,
-    config_file            => $config_file,
-    age                    => $age,                      # Solution, use ageRange in PXF/BFF, measures' values more difficult
-    cli                    => $cli,
-    append_prefixes        => \@append_prefixes,
-    log                    => $log,
-    debug                  => $debug,
-    verbose                => $verbose
+    reference_files          => \@reference_files,
+    target_file              => $target_file,
+    weights_file             => $weights_file,
+    include_hpo_ascendants   => $include_hpo_ascendants,
+    hpo_file                 => undef,
+    align                    => $align,
+    align_basename           => $align_basename,
+    export                   => $export,
+    export_basename          => $export_basename,
+    out_file                 => $out_file,
+    max_out                  => $max_out,
+    max_number_var           => $max_number_var,
+    sort_by                  => $sort_by,
+    similarity_metric_cohort => $similarity_metric_cohort,
+    patients_of_interest     => \@patients_of_interest,
+    poi_out_dir              => $poi_out_dir,
+    include_terms            => \@include_terms,
+    exclude_terms            => \@exclude_terms,
+    config_file              => $config_file,
+    age                      => $age,                        # Solution, use ageRange in PXF/BFF, measures' values more difficult
+    cli                      => $cli,
+    append_prefixes          => \@append_prefixes,
+    log                      => $log,
+    debug                    => $debug,
+    verbose                  => $verbose
 };
 
 # Create object
@@ -216,6 +218,7 @@ pheno-ranker -r <individuals.json> -t <patient.json> [-options]
        -o|out-file                    Output file path [-r matrix.txt|-t rank.txt]
        -poi|patients-of-interest      Export JSON files for the selected individual ids (dry-run)
        -poi-out-dir                   Directory where to write JSON files (to be used with --poi)
+       -similarity-metric-cohort      Similarity metric for cohort mode [>hamming|jaccard]
        -sort-by                       Sort reference-patient comparison by Hamming-distance or Jaccard-index [>hamming|jaccard]
        -w|weights                     YAML file with weights
 
@@ -325,6 +328,11 @@ B<Option 2:> Install the dependencies at C<~/perl5>:
 To ensure Perl recognizes your local modules every time you start a new terminal, you should type:
 
   echo 'eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)' >> ~/.bashrc
+
+I<Optional:> If you want to use C<utils/barcode>:
+
+  sudo apt-get install python3-pip libzbar0
+  pip3 install qrcode[pil] Pillow pyzbar pandas reportlab
 
 =head3 From CPAN
 

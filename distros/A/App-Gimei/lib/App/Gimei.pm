@@ -1,9 +1,8 @@
+use v5.36;
+
 package App::Gimei;
 
-use warnings;
-use v5.22;
-
-use version; our $VERSION = version->declare("v0.2.2");
+use version; our $VERSION = version->declare("v0.2.4");
 
 use App::Gimei::Runner;
 use App::Gimei::Parser;
@@ -84,7 +83,7 @@ You can also look for information at:
 
 =head1 LICENSE
 
-MIT
+MIT License
 
 =head1 AUTHOR
 

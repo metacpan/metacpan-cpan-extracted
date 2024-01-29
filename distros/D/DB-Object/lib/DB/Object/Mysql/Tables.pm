@@ -1,12 +1,16 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql/Tables.pm
-## Version v0.300.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Version v1.0.0
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2020/05/22
+## Modified 2023/11/17
+## All rights reserved
 ## 
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 ## This package's purpose is to separate the object of the tables from the main
 ## DB::Object package so that when they get DESTROY'ed, it does not interrupt
@@ -18,11 +22,55 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object::Mysql DB::Object::Tables );
-    use vars qw( $VERSION $DEBUG );
+    use vars qw( $VERSION $DEBUG $TYPE_TO_CONSTANT );
     use Devel::Confess;
     # <https://dev.mysql.com/doc/refman/8.0/en/data-types.html>
+    # the 'constant' property in the dictionary hash is added in structure()
+    # See also: SELECT DISTINCT(data_type) FROM information_schema.columns ORDER by data_type
+    # but this does not provide a complete list of datatype
+    our $TYPE_TO_CONSTANT =
+    {
+    qr/^(bit)/                          => { constant => '', name => 'SQL_BIT', type => 'bit' },
+    qr/^(tinyint)/                      => { constant => '', name => 'SQL_TINYINT', type => 'tinyint' },
+    qr/^(smallint)/                     => { constant => '', name => 'SQL_SMALLINT', type => 'smallint' },
+    qr/^(mediumint)/                    => { constant => '', name => 'SQL_BIT', type => 'mediumint' },
+    qr/^(integer|int)/                  => { constant => '', name => 'SQL_INTEGER', type => 'int' },
+    qr/^(bigint)/                       => { constant => '', name => 'SQL_BIGINT', type => 'bigint' },
+    qr/^(dec|decimal)/                  => { constant => '', name => 'SQL_DECIMAL', type => 'decimal' },
+    qr/^(float)/                        => { constant => '', name => 'SQL_FLOAT', type => 'float' },
+    qr/^(double\s+precision|double)/    => { constant => '', name => 'SQL_DOUBLE', type => 'double' },
+    qr/^(date)\b/                       => { constant => '', name => 'SQL_DATE', type => 'date' },
+    qr/^(datetime)/                     => { constant => '', name => 'SQL_DATETIME', type => 'datetime' },
+    qr/^(timestamp)/                    => { constant => '', name => 'SQL_TIMESTAMP', type => 'timestamp' },
+    qr/^(year)/                         => { constant => '', name => 'SQL_INTERVAL_YEAR', type => 'year' },
+    qr/^(character|char)\b(?![[:blank:]]+varying)/ => { constant => '', name => 'SQL_VARCHAR', type => 'varchar' },
+    qr/^(character varying|varchar)/    => { constant => '', name => 'SQL_WVARCHAR', type => 'varchar' },
+    qr/^blob/                           => { constant => '', name => 'SQL_BLOB', type => 'blob' },
+    qr/^text/                           => { constant => '', name => 'SQL_LONGVARCHAR', type => 'text' },
+    qr/^binary/                         => { constant => '', name => 'SQL_BINARY', type => 'binary' },
+    qr/^varbinary/                      => { constant => '', name => 'SQL_VARBINARY', type => 'varbinary' },
+    qr/^(tinyblob)\b/                   => { constant => '', name => 'SQL_BLOB', type => 'tinyblob' },
+    qr/^(mediumblob)\b/                 => { constant => '', name => 'SQL_BLOB', type => 'mediumblob' },
+    qr/^(longlob)\b/                    => { constant => '', name => 'SQL_BLOB', type => 'longlob' },
+    qr/^(tinytext)\b/                   => { constant => '', name => 'SQL_LONGVARCHAR', type => 'tinytext' },
+    qr/^(mediumtext)\b/                 => { constant => '', name => 'SQL_LONGVARCHAR', type => 'mediumtext' },
+    qr/^(longtext)\b/                   => { constant => '', name => 'SQL_LONGVARCHAR', type => 'longtext' },
+    qr/^(enum)\b/                       => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'enum' },
+    qr/^(set)\b/                        => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'set' },
+    qr/^(geometry)\b/                   => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'geometry' },
+    qr/^(linestring)\b/                 => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'linestring' },
+    qr/^(point)\b/                      => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'point' },
+    qr/^(polygon)\b/                    => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'polygon' },
+    qr/^(curve)\b/                      => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'curve' },
+    qr/^(multipolygon)\b/               => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'multipolygon' },
+    qr/^(multilinestring)\b/            => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'multilinestring' },
+    qr/^(multipoint)\b/                 => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'multipoint' },
+    qr/^(geometrycollection)\b/         => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'geometrycollection' },
+    qr/^(multicurve)\b/                 => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'multicurve' },
+    qr/^(json)\b/                       => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'json' },
+    };
     our $DEBUG = 0;
-    our $VERSION = 'v0.300.1';
+    our $VERSION = 'v1.0.0';
 };
 
 use strict;
@@ -412,6 +460,11 @@ sub structure
 {
     my $self    = shift( @_ );
     return( $self->_clone( $self->{_cache_structure} ) ) if( $self->{_cache_structure} && !CORE::length( $self->{_reset_structure} // '' ) );
+    my $struct  = $self->{structure};
+    my $fields  = $self->{fields};
+    my $types_dict = $self->database_object->datatype_dict;
+    $self->_load_class( 'DB::Object::Fields::Field' ) || return( $self->pass_error );
+    my $q = $self->_reset_query;
     my $table   = $self->{table} ||
         return( $self->error( "No table provided to get its structure." ) );
     my $sth1 = $self->prepare_cached( "SELECT * FROM information_schema.tables WHERE table_name = ?" ) ||
@@ -422,57 +475,82 @@ sub structure
     $sth1->finish;
     $self->{type} = lc( $def->{table_type} );
     $self->{type} = 'table' if( $self->{type} eq 'base table' );
-    # $self->_reset_query();
-    # delete( $self->{ 'query_reset' } );
-    # my $struct  = $self->{ '_structure_real' } || $self->{ 'struct' }->{ $table };
-    my $struct  = $self->{structure};
-    my $fields  = $self->{fields};
-    my $default = $self->{default};
-    my $null    = $self->{null};
-    my $types   = $self->{types};
-    if( !%$fields || !%$struct || !%$default )
-    {
-        my $sth = $self->prepare( "SHOW COLUMNS FROM $table" ) ||
-        return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $self->errstr() ) );
-        $sth->execute() ||
+    my $query = <<EOT;
+SELECT
+   a.column_name AS "field"
+  ,a.ordinal_position AS "field_num"
+  ,a.column_default AS "default"
+  ,a.*
+FROM information_schema.columns
+WHERE table_name = ?
+ORDER BY a.ordinal_position
+EOT
+    $self->messagec( 5, "Executing SQL query to get the table structure for table {green}${table}{/}" );
+    my $sth = $self->database_object->prepare_cached( $query ) ||
+        return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $self->database_object->errstr() ) );
+    $sth->execute( $table ) ||
         return( $self->error( "Error while executing query to get table '$table' columns specification: ", $sth->errstr() ) );
-## Returns:
-## +-----------+---------------------+------+-----+---------+----------------+
-## | Field     | Type                | Null | Key | Default | Extra          |
-## +-----------+---------------------+------+-----+---------+----------------+
-        my @primary = ();
-        my $ref = '';
-        my $c   = 0;
-        while( $ref = $sth->fetchrow_hashref() )
+
+    my @primary = ();
+    my $ref = '';
+    my $c   = 0;
+    while( $ref = $sth->fetchrow_hashref() )
+    {
+        $self->messagec( 6, "Checking table ${table} field {green}", $ref->{field}, "{/} with type {green}", $ref->{type}, "{/}" );
+        my $def =
         {
-            my %data = map{ lc( $_ ) => $ref->{ $_ } } keys( %$ref );
-            $data{default} = '' if( !defined( $data{default} ) );
-            # push( @order, $data{ 'field' } );
-            $fields->{ $data{field} }  = ++$c;
-            $types->{ $data{field} } = $data{type};
-            $default->{ $data{field} } = '';
-            $default->{ $data{field} } = $data{default} if( $data{default} ne '' && !$data{null} );
-            $null->{ $data{field} } = $data{null} ? 1 : 0;
-            my @define = ( $data{type} );
-            push( @define, "DEFAULT '$data{default}'" ) if( $data{default} ne '' || !$data{null} );
-            push( @define, "NOT NULL" ) if( !$data{null} );
-            push( @primary, $data{field} ) if( $data{key} );
-            $struct->{ $data{field} } = CORE::join( ' ', @define );
-        }
-        $sth->finish();
-        if( @primary )
+        name            => $ref->{field},
+        default         => $ref->{column_default},
+        is_nullable     => ( $ref->{is_nullable} ? 1 : 0 ),
+        pos             => $ref->{field_num},
+        # query_object    => $q,
+        size            => $ref->{character_maximum_length},
+        type            => $ref->{data_type},
+        # table_object    => $self,
+        };
+
+        my( $const_def, $dict );
+        if( CORE::exists( $types_dict->{ $def->{type} } ) )
         {
-            # $struct->{ '_primary' } = \@primary;
-            $self->{primary} = \@primary;
+            $const_def = $types_dict->{ $def->{type} };
         }
-        # $self->{ '_structure_real' } = $struct;
-        $self->{default}   = $default;
-        $self->{fields}    = $fields;
-        $self->{structure} = $struct;
-        $self->{types}     = $types;
+        else
+        {
+            # Get the constant
+            DATA_TYPE_RE: foreach my $type ( keys( %$types_dict ) )
+            {
+                if( $def->{type} =~ /$types_dict->{ $type }->{re}/i )
+                {
+                    $const_def = $types_dict->{ $type };
+                    last DATA_TYPE_RE;
+                }
+            }
+        }
+        if( defined( $const_def ) )
+        {
+            my $const_keys = [keys( %$const_def )];
+            my $dict = {};
+            @$dict{ @$const_keys } = @$const_def{ @$const_keys };
+            $def->{datatype} = $dict;
+        }
+        $self->messagec( 6, "\tField {green}", $def->{name}, "{/} has type {green}", $def->{type}, "{/} and dictionary -> ", sub{ $self->Module::Generic::dump( $def ) } );
+        $def->{query_object} = $q;
+        $def->{table_object} = $self;
+        my @define = ( $def->{type} );
+        push( @define, "DEFAULT '$def->{default}'" ) if( defined( $def->{default} ) && length( $def->{default} // '' ) );
+        push( @define, "NOT NULL" ) if( !$def->{is_nullable} );
+        push( @primary, $def->{name} ) if( $ref->{column_key} eq 'PRI' );
+        $struct->{ $def->{name} } = CORE::join( ' ', @define );
+        my $field = DB::Object::Fields::Field->new( %$def, debug => $self->debug ) ||
+            return( $self->pass_error( DB::Object::Fields::Field->error ) );
+        $fields->{ $def->{name} } = $field;
     }
-    # return( wantarray() ? () : undef() ) if( !%$struct );
-    # return( wantarray() ? %$struct : \%$struct );
+    $sth->finish;
+    if( @primary )
+    {
+        $self->{primary} = \@primary;
+    }
+    $self->{fields} = $fields;
     $self->{_cache_structure} = $struct;
     return( $self->_clone( $struct ) );
 }
@@ -522,7 +600,7 @@ DB::Object::Mysql::Tables - MySQL Table Object
 
 =head1 VERSION
 
-    v0.300.1
+    v1.0.0
 
 =head1 DESCRIPTION
 

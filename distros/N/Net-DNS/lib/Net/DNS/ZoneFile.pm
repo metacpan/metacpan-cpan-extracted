@@ -3,7 +3,7 @@ package Net::DNS::ZoneFile;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: ZoneFile.pm 1910 2023-03-30 19:16:30Z willem $)[2];
+our $VERSION = (qw$Id: ZoneFile.pm 1957 2024-01-10 14:54:10Z willem $)[2];
 
 
 =head1 NAME
@@ -44,18 +44,17 @@ automatically to all subsequent records.
 
 use integer;
 use Carp;
-use IO::File;
 
 use base qw(Exporter);
 our @EXPORT = qw(parse read readfh);
-
-use constant PERLIO => defined eval { require PerlIO };
 
 use constant UTF8 => scalar eval {	## not UTF-EBCDIC  [see Unicode TR#16 3.6]
 	require Encode;
 	Encode::encode_utf8( chr(182) ) eq pack( 'H*', 'C2B6' );
 };
 
+require IO::File;
+require PerlIO;
 require Net::DNS::Domain;
 require Net::DNS::RR;
 
@@ -558,7 +557,7 @@ sub _include {				## open $INCLUDE file
 	my $filename = _filename($include);
 	die qq(\$INCLUDE $filename: Unexpected recursion) if $self->{fileopen}->{$filename}++;
 
-	my $discipline = PERLIO ? join( ':', '<', PerlIO::get_layers $self->{filehandle} ) : '<';
+	my $discipline = join( ':', '<', PerlIO::get_layers $self->{filehandle} );
 	my $filehandle = IO::File->new( $filename, $discipline ) or die qq(\$INCLUDE $filename: $!);
 
 	delete $self->{latest};					# forget previous owner

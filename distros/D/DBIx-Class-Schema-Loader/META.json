@@ -106,6 +106,6 @@
       "x_IRC" : "irc://irc.perl.org/#dbix-class",
       "x_MailingList" : "http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/dbix-class"
    },
-   "version" : "0.07051",
+   "version" : "0.07052",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

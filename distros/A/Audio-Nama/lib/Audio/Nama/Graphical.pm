@@ -1,9 +1,9 @@
 # ------------ Graphical User Interface ------------
 
 package Audio::Nama::Graphical;  ## gui routines
-use Modern::Perl; use Carp;
+use Modern::Perl '2020'; use Carp;
 our $VERSION = 1.071;
-use Audio::Nama::Globals qw($text $prompt);
+use Audio::Nama::Globals qw($term $prompt);
 
 use Module::Load::Conditional qw(can_load);
 use Audio::Nama::Assign qw(:all);
@@ -19,10 +19,10 @@ our @ISA = 'Audio::Nama';      ## default to root namespace, e.g.  Refresh_subs,
 
 sub hello {"make a window";}
 sub loop {
-	$text->{term_attribs}->{already_prompted} = 0;
-	$text->{term}->tkRunning(1);
+	$term->Attribs->{already_prompted} = 0;
+	$term->tkRunning(1);
   	while (1) {
-  		my ($user_input) = $text->{term}->readline($prompt) ;
+  		my ($user_input) = $term->readline($prompt) ;
   		Audio::Nama::process_line( $user_input );
   	}
 }
@@ -48,7 +48,7 @@ package Audio::Nama;
 
 sub init_gui {
 
-	logsub("&init_gui");
+	logsub((caller(0))[3]);
 
 	init_palettefields(); # keys only
 
@@ -205,7 +205,7 @@ sub init_gui {
 				stop_transport() if $this_engine->started;
 				save_state($gui->{_save_id});
 				pager("Exiting... \n");
-				#$text->{term}->tkRunning(0);
+				#$term->tkRunning(0);
 				#$gui->{ew}->destroy;
 				#$gui->{mw}->destroy;
 				#Audio::Nama::nama_cmd('quit');
@@ -287,7 +287,7 @@ sub wh {
 
 sub transport_gui {
 	my $ui = shift;
-	logsub("&transport_gui");
+	logsub((caller(0))[3]);
 
 	$gui->{engine_label} = $gui->{transport_frame}->Label(
 		-text => 'TRANSPORT',
@@ -316,7 +316,7 @@ sub transport_gui {
 }
 sub time_gui {
 	my $ui = shift;
-	logsub("&time_gui");
+	logsub((caller(0))[3]);
 
 	my $time_label = $gui->{clock_frame}->Label(
 		-text => 'TIME', 
@@ -353,21 +353,21 @@ sub time_gui {
 	my @minuses = map{ - $_ } reverse @pluses;
 	my @fw = map{ my $d = $_; $gui->{seek_frame}->Button(
 			-text => $d,
-			-command => sub { jump($d) },
+			-command => sub { jump($d * $gui->{_seek_unit} ) },
 			)
 		}  @pluses ;
 	my @rew = map{ my $d = $_; $gui->{seek_frame}->Button(
 			-text => $d,
-			-command => sub { jump($d) },
+			-command => sub { jump($d * $gui->{_seek_unit} ) },
 			)
 		}  @minuses ;
 	my $beg = $gui->{seek_frame}->Button(
 			-text => 'Beg',
-			-command => \&to_start,
+			-command => \&jump_to_start,
 			);
 	my $end = $gui->{seek_frame}->Button(
 			-text => 'End',
-			-command => \&to_end,
+			-command => \&jump_to_end,
 			);
 
 	$gui->{seek_unit} = $gui->{seek_frame}->Button( 
@@ -544,7 +544,7 @@ sub global_version_buttons {
  	}
 }
 sub track_gui { 
-	logsub("&track_gui");
+	logsub((caller(0))[3]);
 	my $ui = shift;
 	my $n = shift;
 	pager("track_gui already generated"), return
@@ -694,7 +694,7 @@ sub track_gui {
 		 logpkg(__FILE__,__LINE__,'debug',sub{my %q = %p; delete $q{parent}; print
 		 "=============\n%p\n",json_out(\%q)});
 
-		$vol = make_scale ( \%p );
+		$vol = make_scale( \%p );
 		# Mute
 
 		$mute = $gui->{track_frame}->Button(
@@ -747,7 +747,7 @@ sub track_gui {
 				p_num		=> $p_num,
 				);
 		# logpkg(__FILE__,__LINE__,'debug',sub{ my %q = %p; delete $q{parent}; print "x=============\n%p\n",json_out(\%q) });
-		$pan = make_scale ( \%q );
+		$pan = make_scale( \%q );
 
 		# Center
 
@@ -836,7 +836,7 @@ sub track_gui {
 sub remove_track_gui {
  	my $ui = shift;
  	my $n = shift;
-	logsub("&remove_track_gui");
+	logsub((caller(0))[3]);
 	return unless $gui->{tracks_remove}->{$n};
  	map {$_->destroy  } @{ $gui->{tracks_remove}->{$n} };
 	delete $gui->{tracks_remove}->{$n};
@@ -852,7 +852,7 @@ sub paint_mute_buttons {
 }
 
 sub create_master_and_mix_tracks { 
-	logsub("&create_master_and_mix_tracks");
+	logsub((caller(0))[3]);
 
 
 	my @rw_items = (
@@ -892,13 +892,12 @@ sub update_version_button {
 }
 
 sub add_effect_gui {
-		logsub("&add_effect_gui");
+		logsub((caller(0))[3]);
 		my $ui = shift;
 		my %p 			= %{shift()};
-		my ($n,$code,$id,$parent,$parameter) =
-			@p{qw(chain type id parent parameter)};
+		my ($n,$code,$id,$parent,$parameter,$FX) =
+			@p{qw(chain type id parent parameter self)};
 		my $i = $fx_cache->{full_label_to_index}->{$code};
-		my $FX = fxn($id);
 
 		logpkg(__FILE__,__LINE__,'debug', sub{json_out(\%p)});
 
@@ -973,6 +972,7 @@ sub add_effect_gui {
 			{	parent => \$frame,
 				id => $id, 
 				p_num  => $p,
+				self => $FX,
 			};
 			push @sliders,make_scale($v);
 		}
@@ -1011,7 +1011,7 @@ sub destroy_widgets {
 }
 sub remove_effect_gui { 
 	my $ui = shift;
-	logsub("&remove_effect_gui");
+	logsub((caller(0))[3]);
 	my $id = shift;
 	my $FX = fxn($id);
 	my $n = $FX->chain;
@@ -1026,7 +1026,7 @@ sub remove_effect_gui {
 }
 
 sub effect_button {
-	logsub("&effect_button");
+	logsub((caller(0))[3]);
 	my ($n, $label, $start, $end) = @_;
 	logpkg(__FILE__,__LINE__,'debug', "chain $n label $label start $start end $end");
 	my @items;
@@ -1059,7 +1059,7 @@ sub effect_button {
 
 sub make_scale {
 	
-	logsub("&make_scale");
+	logsub((caller(0))[3]);
 	my $ref = shift;
 	my %p = %{$ref};
 # 	%p contains following:
@@ -1068,7 +1068,7 @@ sub make_scale {
 # 	p_num      => parameter number, starting at 0
 # 	length       => length widget # optional 
 	my $id = $p{id};
-	my $FX = fxn($id);
+	my $FX = fxn($id) // $p{self};
 	my $n = $FX->chain;
 	my $code = $FX->type;
 	my $p  = $p{p_num};
@@ -1227,7 +1227,7 @@ sub update_indicator {
 }
 
 sub get_saved_colors {
-	logsub("&get_saved_colors");
+	logsub((caller(0))[3]);
 
 	# aliases
 	
@@ -1309,7 +1309,7 @@ sub namaset {
 }
 
 sub colorchooser { 
-	logsub("&colorchooser");
+	logsub((caller(0))[3]);
 	my ($field, $initialcolor) = @_;
 	logpkg(__FILE__,__LINE__,'debug', "field: $field, initial color: $initialcolor");
 	my $new_color = $gui->{mw}->chooseColor(
@@ -1388,7 +1388,7 @@ sub generate_timeline {
 	my $length = ecasound_iam('cs-get-length');
 	$length = int($length + 5.5);
 	$args{seconds} = $length;
-	my $pps = 10; # HARDCODED
+	my $pps = $config->{waveform_pixels_per_second};
 	for (0..$args{seconds})
 	{
 		my $xpos = $_ * $pps;
@@ -1428,7 +1428,7 @@ sub set_widget_color {
 }
 sub refresh_group { 
 	# main group, in this case we want to skip null group
-	logsub("&refresh_group");
+	logsub((caller(0))[3]);
 	
 	
 		my $status;
@@ -1463,7 +1463,7 @@ sub refresh_track {
 	
 	my $ui = shift;
 	my $n = shift;
-	logsub("&refresh_track");
+	logsub((caller(0))[3]);
 	
 	my $rec_status = $ti{$n}->rec_status;
 	logit(__LINE__,'Audio::Nama::Refresh','debug', "track: $n rec_status: $rec_status");

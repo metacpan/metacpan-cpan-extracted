@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ca::Any::Es::Valencia - Package for language Catalan
 
 package Locale::CLDR::Locales::Ca::Any::Es::Valencia;
 # This file auto generated from Data\common\main\ca_ES_VALENCIA.xml
-#	on Tue  5 Dec  1:04:13 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'an' => 'aragonés',
@@ -42,7 +42,6 @@ has 'display_name_language' => (
  				'dum' => 'neerlandés mitjà',
  				'en' => 'anglés',
  				'en_GB@alt=short' => 'anglés (GB)',
- 				'en_US@alt=short' => 'anglés (EUA)',
  				'enm' => 'anglés mitjà',
  				'fi' => 'finés',
  				'fo' => 'feroés',

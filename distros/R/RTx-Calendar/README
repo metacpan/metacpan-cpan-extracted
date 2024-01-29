@@ -1,32 +1,25 @@
 NAME
-    RTx::Calendar - Calendar for RT due dates
+    RTx::Calendar - Calendar view for RT ticket dates and custom fields
 
 DESCRIPTION
-    This RT extension provides a calendar view for your tickets and your
-    reminders so you see when is your next due ticket. You can find it in
-    ticket search sub navigation menu.
-
-    Date fields in the search results are displayed/used in the calendar,
-    for example if you have a ticket with a due date, it won't be displayed
-    on that date unless the Due field is included in the search result
-    format.
-
-    There's a portlet to put on your home page (see Prefs/MyRT.html), see
-    the CONFIGURATION section below for details on adding it.
+    RTx::Calendar provides a calendar view to display tickets and reminders
+    based on selected dates. Once the extension is installed, if you perform
+    a ticket search using the Query Builder, you will see a new Calendar
+    entry in the page menu. You can click that menu to see the calendar view
+    of your search. A portlet is also available to add to any dashboard,
+    including on the RT home page.
 
 RT VERSION
-    Works with RT 4.2, 4.4, 5.0
+    Works with RT 5.
+
+    For older versions of RT, see the CHANGES file for compatible earlier
+    versions.
 
 INSTALLATION
     perl Makefile.PL
     make
     make install
         May need root permissions
-
-    patch RT
-        Apply for versions prior to 4.4.2:
-
-            patch -p1 -d /path/to/rt < etc/tabs_privileged_callback.patch
 
     Edit your /opt/rt5/etc/RT_SiteConfig.pm
         Add this line:
@@ -38,30 +31,225 @@ INSTALLATION
 
     Restart your webserver
 
+USAGE
+    To view a Calendar, first perform a ticket search in the ticket Query
+    Builder and load the search results. Then click the Calendar item in the
+    page menu to see the calendar view based on the results from that
+    search.
+
+    By default, RTx::Calendar will display the Starts and Due date fields of
+    each ticket from your search results as events on the Calendar.
+
+    Other date fields added to the Format of a ticket search are displayed
+    on the Calendar as events. You can also display events based on Date or
+    DateTime custom fields by adding them to the Format of a ticket search
+    as well.
+
+    Hover over events in the calendar to see additional details for that
+    event. You can click on entries to go to the ticket.
+
+  Displaying Other Date Fields
+    You can show other date fields as events on the Calendar by adding them
+    to the Format section at the Advanced tab of your query. You can add and
+    remove dates from search results using the Display Columns section at
+    the bottom of the Query Builder.
+
+    Changes made using the Display Columns settings automatically update the
+    search Format. You can also edit the Format directly on the Advanced
+    page.
+
+  Calendar Portlet Saved Searches
+    As described above, you can see a calendar for any ticket search using
+    the calendar link in the search results.
+
+    You can also create a saved search for the calendar to be used in
+    calendar portlets on dashboards. See "CONFIGURATION" for details on
+    adding the calendar portlets.
+
+    By default, the calendar looks for a saved search with the name
+    "calendar" and will use that search for calendar portlets. Saved
+    searches can be saved with different privacy settings, so your system
+    can have multiple saved "calendar" searches. For a given user, the
+    calendar first checks for a user-level saved search (personal to that
+    user), then for a group-level saved search for groups the user is in,
+    and finally, for a system-level saved search.
+
+  Displaying Reminders
+    Reminders are displayed on the Calendar only if you explicitly add the
+    following clause to your query:
+
+        AND ( Type = 'ticket' OR Type = 'reminder' )
+
 CONFIGURATION
-  Base configuration
-    To use the MyCalendar portlet, you must add MyCalendar to
-    $HomepageComponents in etc/RT_SiteConfig.pm:
+  Use the Calendar on Dashboard
+    The Calendar comes with 3 different portlets that can be added to your
+    RT dashboards:
 
-      Set($HomepageComponents, [qw(QuickCreate Quicksearch MyCalendar
-         MyAdminQueues MySupportQueues MyReminders RefreshHomepage)]);
+    MyCalendar
+        A summary of the events for the current week.
 
-  Display configuration
-    You can show the owner in each day box by adding this line to your
-    etc/RT_SiteConfig.pm:
+    Calendar
+        A full-month view of the Calendar.
+
+    CalendarWithSidebar
+        A full-month view of the Calendar, with a sidebar that includes an
+        extra status filter and legends of the Calendar events.
+
+    To make these portlets available in RT, add them to the
+    $HomepageComponents configuration in your etc/RT_SiteConfig.pm:
+
+        Set($HomepageComponents, [qw(QuickCreate Quicksearch
+            MyAdminQueues MySupportQueues MyReminders RefreshHomepage
+            MyCalendar Calendar CalendarWithSidebar)]);
+
+    Users can then select them when building dashboards.
+
+  Display Configuration
+   Display Owner
+    You can show the owner of the ticket in each event box by adding this
+    line to your etc/RT_SiteConfig.pm:
 
         Set($CalendarDisplayOwner, 1);
 
-    You can change which fields show up in the popup display when you mouse
-    over a date in etc/RT_SiteConfig.pm:
+   Choosing the fields to be displayed in the popup
+    When you mouse over events on the calendar, a popup window shows
+    additional details from the ticket associated with that event. You can
+    configure which fields are displayed with @CalendarPopupFields. This is
+    the default configuration:
 
-        Set(@CalendarPopupFields, ('Status', 'OwnerObj->Name', 'DueObj->ISO'));
+        Set(@CalendarPopupFields, (
+            "OwnerObj->Name",
+            "CreatedObj->ISO",
+            "StartsObj->ISO",
+            "StartedObj->ISO",
+            "LastUpdatedObj->ISO",
+            "DueObj->ISO",
+            "ResolvedObj->ISO",
+            "Status",
+            "Priority",
+            "Requestors->MemberEmailAddressesAsString",
+        ));
 
-USAGE
-    A small help section is available in /Search/Calendar.html
+    To show custom field values, add them using the custom field name in
+    this format: "CustomField.{Maintenance Start}".
+
+    Valid values are all fields on an RT ticket. See the RT documentation
+    for RT::Ticket for a list.
+
+    As shown above, for ticket fields that can have multiple output formats,
+    like dates and users, you can also use the Obj associated with the field
+    to call a specific method to display the format you want. The ticket
+    dates shown above will display dates in ISO format. The documentation
+    for RT::Date has other format options. User fields, like Owner, can use
+    the methods shown in the RT::User documentation to show values like
+    EmailAddress or RealName, for example.
+
+   Event Colors
+    The Calendar shows events in different colors based on the ticket
+    status. Use $CalendarStatusColorMap to set alternate colors or add
+    custom statuses. The following is the default configuration:
+
+        Set(%CalendarStatusColorMap, (
+            '_default_'                             => '#5555f8',
+            'new'                                   => '#87873c',
+            'open'                                  => '#5555f8',
+            'rejected'                              => '#FF0000',
+            'resolved'                              => '#72b872',
+            'stalled'                               => '#FF0000',
+        ));
+
+    You can use any color declaration that CSS supports, including hex
+    codes, color names, and RGB values.
+
+    The _default_ key is used for events that don't have a status in the
+    $CalendarStatusColorMap hash. The default color is a dark tone of blue.
+
+   Filter on Status
+    The Calendar has a Filter on Status section that allows you to filter
+    events by status without having to change the original query. The
+    @CalendarFilterStatuses setting controls which statuses are available
+    for filtering. The following is the default:
+
+        Set(@CalendarFilterStatuses, qw(new open stalled rejected resolved));
+
+    You can change the default selected statuses of the Filter On Status
+    section by defining @CalendarFilterDefaultStatuses. The following is the
+    default:
+
+        Set(@CalendarFilterDefaultStatuses, qw(new open));
+
+   Custom Icons
+    The calendar shows different icons for events based on the date fields
+    used to display the event on that day. The %CalendarIcons setting
+    controls which icons are used for each date field. The following is the
+    default using provided icons:
+
+        Set(%CalendarIcons, (
+            'Reminder'     => 'reminder.png',
+            'Resolved'     => 'resolved.png',
+            'Starts, Due'  => 'starts_due.png',
+            'Created, Due' => 'created_due.png',
+            'Created'      => 'created.png',
+            'Due'          => 'due.png',
+            'Starts'       => 'starts.png',
+            'Started'      => 'started.png',
+            'LastUpdated'  => 'updated.png',
+        ));
+
+    You can also define icons for custom fields by using the following
+    format:
+
+            'CF.{Maintenance Start}' => 'maintstart.png',
+            'CF.{Maintenance Stop}'  => 'maintstop.png',
+
+    To add custom images, create a directory local/static/images in your
+    installed RT directory (usually /opt/rt5) and copy images files there.
+
+    You can use any image format that your browser supports, but PNGs and
+    GIFs with transparent backgrounds are recommended because they will
+    display better to the background color of the events. The recommended
+    size is 10 pixels wide and 7 pixels in high.
+
+   Multiple Days Events
+    By default, calendars display individual events on each day based on the
+    dates in the query.
+
+    To display events that span multiple days, such as the full expected
+    duration of a change blackout period, define the fields using the
+    %CalendarMultipleDaysEvents configuration. This option accepts named
+    keys that each define the field to reference for the start (Starts) and
+    end (Ends) of multi-day events. For example:
+
+        Set( %CalendarMultipleDaysEvents, (
+            'Project Task' => {
+                'Starts' => 'Starts',
+                'Ends'   => 'Due',
+            },
+        ));
+
+    The keys, like Project Task, are arbitrary labels to group each set, so
+    you can use a name that helps you identify the entry.
+
+    You can also define multiple day events for custom fields by using the
+    following format:
+
+        Set( %CalendarMultipleDaysEvents, (
+            'Maintenance' => {
+                "Starts" => "CF.{Maintenance Start}",
+                "Ends"   => "CF.{Maintenance Stop}",
+            },
+            'Project Task' => {
+                'Starts' => 'Starts',
+                'Ends'   => 'Due',
+            },
+        ));
+
+    As with all calendar entries, the date fields referenced in the
+    configuration must be included in the search result Format to display
+    the event on the Calendar.
 
 AUTHOR
-    Best Practical Solutions, LLC <modules@bestpractical.com>
+    Best Practical Solutions, LLC
 
     Originally written by Nicolas Chuche <nchuche@barna.be>
 
@@ -75,7 +263,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RTx-Calendar>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2010-2022 by Best Practical Solutions
+    This software is Copyright (c) 2010-2023 by Best Practical Solutions
 
     Copyright 2007-2009 by Nicolas Chuche
 

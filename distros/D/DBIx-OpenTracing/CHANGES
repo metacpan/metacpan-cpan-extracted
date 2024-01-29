@@ -1,3 +1,7 @@
+v0.2.0 2023-05-25
+
+* Improve error reporting
+
 v0.1.0 2020-10-09
 
 * Hide wrapper methods from caller

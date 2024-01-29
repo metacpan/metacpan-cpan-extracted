@@ -49,7 +49,6 @@ sub init_db {
 #
 sub do_test {
     my ($db) = @_;
-    my $dbh = DBI->connect( $db->connection_info );
     my ( $db_driver, $db_name ) = ( $db->driver, $db->name );
 
     subtest "Testing with $db_driver in db $db_name" => sub {
@@ -59,27 +58,38 @@ sub do_test {
         # for each database type (SQLite, Pg, ...)
         my %test_dbs = ( $db_name => $db, );
         my $get_dbh  = sub {
-            my ($id) = @_;
-            return DBI->connect( $test_dbs{$id}->connection_info );
+            my ($id)        = @_;
+            my (@conn_info) = $test_dbs{$id}->connection_info;
+            ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
+            # Don't print error in STDERR.
+            # It just dirties the test output.
+            $conn_info[3]->{PrintError} = 0;
+            return DBI->connect(@conn_info);
         };
+        my $dbh = $get_dbh->($db_name);
         my %databases;
         foreach my $id ( keys %test_dbs ) {
-            $databases{$id} = {
-                dbh_callback => $get_dbh,
-                prefix       => q{}
-            };
+            $databases{$id} = { prefix => q{} };
         }
-        my $client = TheSchwartz::JobScheduler->new( databases => \%databases, );
+        my $client = TheSchwartz::JobScheduler->new(
+            databases    => \%databases,
+            dbh_callback => $get_dbh,
+        );
 
         # No transactions. We have autocommit active.
         #     &{ $get_dbh }()->start_work;
-        my $jobid_1 = $client->insert( 'fetch', 'https://example.com/' );
+        # my $jobid_1 = $client->insert('fetch', 'https://example.com/');
+        my $job1 = TheSchwartz::JobScheduler::Job->new(
+            funcname => 'fetch',
+            arg      => { type => 'site', url => 'https://example.com/1' },
+        );
+        my $jobid_1 = $client->insert( job => $job1 );
 
         #     &{ $get_dbh }()->end_work;
         is( $jobid_1, 1, 'Job id is 1' );
 
         my $jobid_2 = $client->insert(
-            TheSchwartz::JobScheduler::Job->new(
+            job => TheSchwartz::JobScheduler::Job->new(
                 funcname => 'fetch',
                 arg      => { type => 'site', url => 'https://example.com/' },
                 priority => 3,
@@ -87,7 +97,7 @@ sub do_test {
         );
         is( $jobid_2, 2, 'Job id is 2' );
 
-        my @jobs = $client->list_jobs( { funcname => 'fetch' } );
+        my @jobs = $client->list_jobs( search_params => { funcname => 'fetch' } );
         is( scalar @jobs, 2, 'two jobs with funcname fetch' );
         my $row = $jobs[0];
         ok( $row, 'Jobs[0] exists' );
@@ -97,8 +107,8 @@ sub do_test {
             $client->funcname_to_id( $dbh, $databases{$db_name}->{'prefix'}, 'fetch' ),
             'funcid matches with funcname_to_id()'
         );
-        is( $row->arg,      'https://example.com/', 'arg(scalar) is correct' );
-        is( $row->priority, undef,                  'priority is correct' );
+        is( $row->arg,      { type => 'site', url => 'https://example.com/1' }, 'arg(hash) is correct' );
+        is( $row->priority, undef,                                              'priority is correct' );
 
         $row = $jobs[1];
         ok( $row, 'Jobs[1] exists' );
@@ -111,9 +121,17 @@ sub do_test {
         is( $row->arg,      { type => 'site', url => 'https://example.com/' }, 'arg(hash) is correct' );
         is( $row->priority, 3,                                                 'priority is correct' );
 
-        my $jobid_3 = $client->insert( 'push', 'https://example.com/' );
+        # my $jobid_3 = $client->insert('push', 'https://example.com/');
+        my $jobid_3 = $client->insert(
+            job => TheSchwartz::JobScheduler::Job->new(
+                funcname => 'push',
+                arg      => 'https://example.com/3',
 
-        my @push_jobs = $client->list_jobs( { funcname => 'push' } );
+                # priority => 3,
+            )
+        );
+
+        my @push_jobs = $client->list_jobs( search_params => { funcname => 'push' } );
         is( scalar @push_jobs, 1, 'two jobs with funcname fetch' );
         $row = $push_jobs[0];
         is( $row->jobid, 3, 'jobs[0]->jobid is 3' );
@@ -121,13 +139,14 @@ sub do_test {
         # This will throw an exception but it is normal behaviour!
         # DBD::Pg::st execute failed: ERROR:  duplicate key value violates unique constraint "funcmap_funcname_key"
         # DETAIL:  Key (funcname)=(push) already exists. [..].
+        # $get_dbh turns off PrintError: no msg in STDERR.
         is(
             $row->funcid,
             $client->funcname_to_id( $dbh, $databases{$db_name}->{'prefix'}, 'push' ),
             'funcid matches with funcname_to_id()'
         );
-        is( $row->arg,      'https://example.com/', 'arg(scalar) is correct' );
-        is( $row->priority, undef,                  'priority is correct' );
+        is( $row->arg,      'https://example.com/3', 'arg(string) is correct' );
+        is( $row->priority, undef,                   'priority is correct' );
 
         done_testing;
     };

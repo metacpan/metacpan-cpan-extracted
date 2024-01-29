@@ -1,0 +1,4 @@
+{
+    "read" => 0.02,
+    "info" => "I/O Timings: shared/local read=0.020",
+}

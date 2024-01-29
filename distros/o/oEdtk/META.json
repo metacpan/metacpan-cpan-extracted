@@ -4,7 +4,7 @@
       "oEdtk group <oedtk@free.fr>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -48,11 +48,14 @@
             "File::Basename" : "0",
             "File::Copy" : "0",
             "File::Path" : "0",
+            "Image::Size" : "0",
             "JSON" : "0",
             "List::MoreUtils" : "0",
             "List::Util" : "0",
+            "Log::Log4perl" : "0",
             "Math::Round" : "0.06",
             "Net::FTP" : "0",
+            "PDF::Create" : "0",
             "Roman" : "0",
             "Scalar::Util" : "0",
             "Spreadsheet::WriteExcel" : "1.00",
@@ -66,11 +69,11 @@
             "YAML" : "0",
             "charnames" : "0",
             "overload" : "0",
-            "perl" : "5.01"
+            "perl" : "5.010"
          }
       }
    },
    "release_status" : "stable",
-   "version" : 1.5093,
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : 1.8122,
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

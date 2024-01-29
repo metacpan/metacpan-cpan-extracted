@@ -35,6 +35,11 @@ The cache file to use.
 
 Default :: /var/cache/sneck.cache
 
+A secondary cache file based on this name
+is also created. By default it is
+/var/cache/sneck.cache.snmp and is used for
+storing the compressed version.
+
 =head2 -u
 
 Update the cache file. Will also print the was written to it.
@@ -62,39 +67,16 @@ use File::Slurp;
 use JSON;
 use Monitoring::Sneck;
 use MIME::Base64;
-use Gzip::Faster;
+use IO::Compress::Gzip qw(gzip $GzipError);
+use Pod::Usage;
 
-sub version {
-	print "sneck v. 0.1.0\n";
+sub main::VERSION_MESSAGE {
+	print 'sneck v. '.$Monitoring::Sneck::VERSION."\n";
+	exit 255;
 }
 
-sub help {
-	&version;
-
-	print '
-
--f <config>              Config file to use.
-                         Default: /usr/local/etc/sneck.conf
-
--c                       Print the cache and exit. Requires -u being used previously.
-
--C                       Cache file.
-                         Default: /var/cache/sneck.cache
-
--u                       Run and write to cache.
-
--b                       base64+gzip the printing of the cache.
-
--p                       Pretty print. Does not affect -c.
-
--i                       Include the raw config in the JSON.
-
--h                       Print help info.
---help                   Print help info.
--v                       Print version info.
---version                Print version info.
-
-';
+sub main::HELP_MESSAGE {
+	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT, );
 }
 
 my $cache_file  = '/var/cache/sneck.cache';
@@ -125,16 +107,20 @@ GetOptions(
 
 # print version or help if requested
 if ($help) {
-	&help;
+	main::HELP_MESSAGE;
 	exit 42;
 }
 if ($version) {
-	&version;
+	main::VERSION_MESSAGE;
 	exit 42;
 }
 
 # prints the cache and exit if requested
 if ($print_cache) {
+	if ($compress) {
+		$cache_file=$cache_file.'.snmp';
+	}
+
 	if ( !-f $cache_file || !-r $cache_file ) {
 		my $error = 'Cache file does not exist or is not readable "' . $cache_file . '"';
 		my $possible_error
@@ -143,18 +129,6 @@ if ($print_cache) {
 		exit 3;
 	}
 	my $cache = read_file($cache_file);
-
-	if ($compress) {
-		my $compressed = encode_base64( gzip($cache) );
-		$compressed =~ s/\n//g;
-		$compressed = $compressed . "\n";
-
-		# check which is smaller and prints it
-		if ( length($compressed) < length($cache) ) {
-			print $compressed;
-			exit;
-		}
-	}
 
 	print $cache;
 
@@ -171,19 +145,24 @@ if ($pretty) {
 }
 my $raw_json = $json->encode($returned);
 
-my $compressed = encode_base64( gzip($raw_json) );
+my $compressed_string;
+gzip \$raw_json => \$compressed_string;
+my $compressed = encode_base64($compressed_string);
 $compressed =~ s/\n//g;
 $compressed = $compressed . "\n";
+my $snmp=$raw_json;
+if ( length($compressed) < length($raw_json) ) {
+	$snmp=$compressed;
+}
 
 # non-pretty does not include a new line, so add it
 if ( !$pretty ) {
 	$raw_json = $raw_json . "\n";
 }
+
 print $raw_json;
 
 if ($update) {
-	my $fh;
-	open( $fh, '>', $cache_file );
-	print $fh $raw_json;
-	close($fh);
+	write_file($cache_file, $raw_json);
+	write_file($cache_file.'.snmp', $snmp);
 }

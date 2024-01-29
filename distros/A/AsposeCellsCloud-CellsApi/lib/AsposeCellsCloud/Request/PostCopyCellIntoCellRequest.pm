@@ -59,15 +59,15 @@ sub new {
 
 
 # Run Operation Request
-# PostCopyCellIntoCellRequest.name : The workbook name.  ,
-# PostCopyCellIntoCellRequest.destCellName : Destination cell name  ,
-# PostCopyCellIntoCellRequest.sheetName : Destination worksheet name.  ,
-# PostCopyCellIntoCellRequest.worksheet : Source worksheet name.  ,
-# PostCopyCellIntoCellRequest.cellname : Source cell name  ,
-# PostCopyCellIntoCellRequest.row : Source row  ,
-# PostCopyCellIntoCellRequest.column : Source column  ,
-# PostCopyCellIntoCellRequest.folder : Original workbook folder.  ,
-# PostCopyCellIntoCellRequest.storageName : Storage name.   
+# PostCopyCellIntoCellRequest.name : The file name.  ,
+# PostCopyCellIntoCellRequest.destCellName : The destination cell name.  ,
+# PostCopyCellIntoCellRequest.sheetName : The destination worksheet name.  ,
+# PostCopyCellIntoCellRequest.worksheet : The source worksheet name.  ,
+# PostCopyCellIntoCellRequest.cellname : The source cell name.  ,
+# PostCopyCellIntoCellRequest.row : The source row index.  ,
+# PostCopyCellIntoCellRequest.column : The source column index.  ,
+# PostCopyCellIntoCellRequest.folder : The folder where the file is situated.  ,
+# PostCopyCellIntoCellRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -78,7 +78,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_copy_cell_into_cell' } = { 
-    	summary => 'Copies data to destination cell from a source cell in worksheet.',
+    	summary => 'Copy data from a source cell to a destination cell in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -157,63 +157,63 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
      'dest_cell_name' => {
      	datatype => 'string',
      	base_name => 'destCellName',
-     	description => 'Destination cell name',
+     	description => 'The destination cell name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => 'Destination worksheet name.',
+     	description => 'The destination worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'worksheet' => {
      	datatype => 'string',
      	base_name => 'worksheet',
-     	description => 'Source worksheet name.',
+     	description => 'The source worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'cellname' => {
      	datatype => 'string',
      	base_name => 'cellname',
-     	description => 'Source cell name',
+     	description => 'The source cell name.',
      	format => '',
      	read_only => '',
      		},
      'row' => {
      	datatype => 'int',
      	base_name => 'row',
-     	description => 'Source row',
+     	description => 'The source row index.',
      	format => '',
      	read_only => '',
      		},
      'column' => {
      	datatype => 'int',
      	base_name => 'column',
-     	description => 'Source column',
+     	description => 'The source column index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

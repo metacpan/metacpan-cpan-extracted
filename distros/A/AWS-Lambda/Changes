@@ -1,5 +1,14 @@
 Revision history for Perl extension aws-lambda
 
+0.4.3 2024-01-22T01:05:31Z
+    - bump Paws v0.46 #138
+    - bump YAML 1.31 #136
+    - bump Net::SSLeay 1.94 #137
+
+0.4.2 2023-12-22T00:18:48Z
+    - ca-west-1 is available
+    - bump Mozilla::CA 20231213
+
 0.4.1 2023-12-01T14:13:48Z
     - Perl 5.38.2 and 5.36.3 are released
 

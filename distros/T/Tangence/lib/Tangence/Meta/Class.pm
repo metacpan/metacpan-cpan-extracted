@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.66 ':experimental(init_expr)';
+use warnings;
+use Object::Pad 0.800;
 
-package Tangence::Meta::Class 0.30;
+package Tangence::Meta::Class 0.32;
 class Tangence::Meta::Class :strict(params);
 
 use Carp;
@@ -35,7 +36,7 @@ Returns a new instance representing the given name.
 =cut
 
 field $name    :param :reader;
-field $defined        :reader { 0 };
+field $defined        :reader = 0;
 
 field @superclasses;
 field %methods;

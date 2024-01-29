@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Tg - Package for language Tajik
 
 package Locale::CLDR::Locales::Tg;
 # This file auto generated from Data\common\main\tg.xml
-#	on Tue  5 Dec  1:33:59 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -44,7 +44,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'af' => 'африкаанс',
@@ -71,16 +71,23 @@ has 'display_name_language' => (
  				'cy' => 'валлӣ',
  				'da' => 'даниягӣ',
  				'de' => 'немисӣ',
+ 				'de_AT' => 'немисии австриягӣ',
+ 				'de_CH' => 'немисии швейсарии болоӣ',
  				'dsb' => 'сербии поёнӣ',
  				'dv' => 'дивеҳӣ',
  				'dz' => 'дзонгха',
  				'el' => 'юнонӣ',
  				'en' => 'англисӣ',
+ 				'en_AU' => 'англисии австралиягӣ',
+ 				'en_CA' => 'англисии канадагӣ',
+ 				'en_GB' => 'англисии британӣ',
  				'en_GB@alt=short' => 'англисӣ (ШМ)',
- 				'en_US@alt=short' => 'англисӣ (ИМ)',
+ 				'en_US' => 'англисии америкоӣ',
  				'eo' => 'эсперанто',
  				'es' => 'испанӣ',
- 				'es_419' => 'испанӣ (Америкаи Лотинӣ)',
+ 				'es_419' => 'испании америкоии лотинӣ',
+ 				'es_ES' => 'испании аврупоӣ',
+ 				'es_MX' => 'испании мексикоӣ',
  				'et' => 'эстонӣ',
  				'eu' => 'баскӣ',
  				'fa' => 'форсӣ',
@@ -89,6 +96,8 @@ has 'display_name_language' => (
  				'fil' => 'филиппинӣ',
  				'fo' => 'фарерӣ',
  				'fr' => 'франсузӣ',
+ 				'fr_CA' => 'франсузии канадагӣ',
+ 				'fr_CH' => 'франсузии швейсарӣ',
  				'fy' => 'фризии ғарбӣ',
  				'ga' => 'ирландӣ',
  				'gd' => 'шотландии гэлӣ',
@@ -156,6 +165,8 @@ has 'display_name_language' => (
  				'pl' => 'лаҳистонӣ',
  				'ps' => 'пушту',
  				'pt' => 'португалӣ',
+ 				'pt_BR' => 'португалии бразилиягӣ',
+ 				'pt_PT' => 'португалии аврупоӣ',
  				'qu' => 'кечуа',
  				'quc' => 'киче',
  				'rm' => 'ретороманӣ',
@@ -188,7 +199,7 @@ has 'display_name_language' => (
  				'to' => 'тонганӣ',
  				'tr' => 'туркӣ',
  				'tt' => 'тоторӣ',
- 				'tzm' => 'тамазайти атласи марказӣ',
+ 				'tzm' => 'тамазайти Атласи Марказӣ',
  				'ug' => 'ӯйғурӣ',
  				'uk' => 'украинӣ',
  				'und' => 'забони номаълум',
@@ -200,8 +211,11 @@ has 'display_name_language' => (
  				'yi' => 'идиш',
  				'yo' => 'йоруба',
  				'zh' => 'хитоӣ',
+ 				'zh@alt=menu' => 'хитоӣ, мандаринӣ',
  				'zh_Hans' => 'хитоии осонфаҳм',
+ 				'zh_Hans@alt=long' => 'хитоии мандаринии осонфаҳм',
  				'zh_Hant' => 'хитоии анъанавӣ',
+ 				'zh_Hant@alt=long' => 'хитоии мандаринии анъанавӣ',
  				'zu' => 'Зулу',
 
 			);
@@ -243,7 +257,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AC' => 'Асунсон',
  			'AD' => 'Андорра',
@@ -318,7 +332,7 @@ has 'display_name_region' => (
  			'FK' => 'Ҷазираҳои Фолкленд',
  			'FM' => 'Штатҳои Федеративии Микронезия',
  			'FO' => 'Ҷазираҳои Фарер',
- 			'FR' => 'Франсия',
+ 			'FR' => 'Фаронса',
  			'GA' => 'Габон',
  			'GB' => 'Шоҳигарии Муттаҳида',
  			'GD' => 'Гренада',
@@ -387,8 +401,7 @@ has 'display_name_region' => (
  			'MF' => 'Ҷазираи Сент-Мартин',
  			'MG' => 'Мадагаскар',
  			'MH' => 'Ҷазираҳои Маршалл',
- 			'MK' => 'Мақдун',
- 			'MK@alt=variant' => 'Мақдун (ҶСЮМ)',
+ 			'MK' => 'Македонияи Шимолӣ',
  			'ML' => 'Мали',
  			'MM' => 'Мянма',
  			'MN' => 'Муғулистон',
@@ -528,7 +541,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{Метрӣ},
  			'UK' => q{БК},
@@ -542,7 +555,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => '{0}',
  			'script' => '{0}',
@@ -562,45 +575,18 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			auxiliary => qr{[ц щ ы ь]},
-			index => ['А', 'Б', 'В', 'Г', 'Ғ', 'Д', 'Е', 'Ж', 'З', 'И', 'Й', 'К', 'Қ', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ҳ', 'Ч', 'Ҷ', 'Ш', 'Ъ', 'Э', 'Ю', 'Я'],
+			index => ['А', 'Б', 'В', 'Г', 'Ғ', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Ӣ', 'Й', 'К', 'Қ', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ӯ', 'Ф', 'Х', 'Ҳ', 'Ч', 'Ҷ', 'Ш', 'Ъ', 'Э', 'Ю', 'Я'],
 			main => qr{[а б в г ғ д е ё ж з и ӣ й к қ л м н о п р с т у ӯ ф х ҳ ч ҷ ш ъ э ю я]},
-			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['А', 'Б', 'В', 'Г', 'Ғ', 'Д', 'Е', 'Ж', 'З', 'И', 'Й', 'К', 'Қ', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ҳ', 'Ч', 'Ҷ', 'Ш', 'Ъ', 'Э', 'Ю', 'Я'], };
+		return { index => ['А', 'Б', 'В', 'Г', 'Ғ', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Ӣ', 'Й', 'К', 'Қ', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ӯ', 'Ф', 'Х', 'Ҳ', 'Ч', 'Ҷ', 'Ш', 'Ъ', 'Э', 'Ю', 'Я'], };
 },
 );
 
-
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{«},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{»},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{«},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{»},
-);
 
 has 'duration_units' => (
 	is			=> 'ro',
@@ -619,20 +605,6 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 			} }
-);
-
-has 'yesstr' => (
-	is			=> 'ro',
-	isa			=> RegexpRef,
-	init_arg	=> undef,
-	default		=> sub { qr'^(?i:ҳа|ҳ|yes|y)$' }
-);
-
-has 'nostr' => (
-	is			=> 'ro',
-	isa			=> RegexpRef,
-	init_arg	=> undef,
-	default		=> sub { qr'^(?i:не|н|no|n)$' }
 );
 
 has 'listPatterns' => (
@@ -695,8 +667,120 @@ has 'number_formats' => (
 	default		=> sub { {
 		decimalFormat => {
 			'default' => {
+				'1000' => {
+					'other' => '0 ҳзр'.'',
+				},
+				'10000' => {
+					'other' => '00 ҳзр'.'',
+				},
+				'100000' => {
+					'other' => '000 ҳзр'.'',
+				},
+				'1000000' => {
+					'other' => '0 млн'.'',
+				},
+				'10000000' => {
+					'other' => '00 млн'.'',
+				},
+				'100000000' => {
+					'other' => '000 млн'.'',
+				},
+				'1000000000' => {
+					'other' => '0 млрд'.'',
+				},
+				'10000000000' => {
+					'other' => '00 млрд'.'',
+				},
+				'100000000000' => {
+					'other' => '000 млрд'.'',
+				},
+				'1000000000000' => {
+					'other' => '0 трлн'.'',
+				},
+				'10000000000000' => {
+					'other' => '00 трлн'.'',
+				},
+				'100000000000000' => {
+					'other' => '000 трлн'.'',
+				},
 				'standard' => {
 					'default' => '#,##0.###',
+				},
+			},
+			'long' => {
+				'1000' => {
+					'other' => '0 ҳазор',
+				},
+				'10000' => {
+					'other' => '00 ҳазор',
+				},
+				'100000' => {
+					'other' => '000 ҳазор',
+				},
+				'1000000' => {
+					'other' => '0 миллион',
+				},
+				'10000000' => {
+					'other' => '00 миллион',
+				},
+				'100000000' => {
+					'other' => '000 миллион',
+				},
+				'1000000000' => {
+					'other' => '0 миллиард',
+				},
+				'10000000000' => {
+					'other' => '00 миллиард',
+				},
+				'100000000000' => {
+					'other' => '000 миллиард',
+				},
+				'1000000000000' => {
+					'other' => '0 триллион',
+				},
+				'10000000000000' => {
+					'other' => '00 триллион',
+				},
+				'100000000000000' => {
+					'other' => '000 триллион',
+				},
+			},
+			'short' => {
+				'1000' => {
+					'other' => '0 ҳзр'.'',
+				},
+				'10000' => {
+					'other' => '00 ҳзр'.'',
+				},
+				'100000' => {
+					'other' => '000 ҳзр'.'',
+				},
+				'1000000' => {
+					'other' => '0 млн'.'',
+				},
+				'10000000' => {
+					'other' => '00 млн'.'',
+				},
+				'100000000' => {
+					'other' => '000 млн'.'',
+				},
+				'1000000000' => {
+					'other' => '0 млрд'.'',
+				},
+				'10000000000' => {
+					'other' => '00 млрд'.'',
+				},
+				'100000000000' => {
+					'other' => '000 млрд'.'',
+				},
+				'1000000000000' => {
+					'other' => '0 трлн'.'',
+				},
+				'10000000000000' => {
+					'other' => '00 трлн'.'',
+				},
+				'100000000000000' => {
+					'other' => '000 трлн'.'',
 				},
 			},
 		},
@@ -940,6 +1024,132 @@ has 'calendar_months' => (
 					},
 				},
 			},
+			'islamic' => {
+				'format' => {
+					abbreviated => {
+						nonleap => [
+							'Муҳ.',
+							'Саф.',
+							'Раб. I',
+							'Раб. II',
+							'Ҷум. I',
+							'Ҷум. II',
+							'Раҷ.',
+							'Ша.',
+							'Рам.',
+							'Шав.',
+							'Дхул-Қ.',
+							'Дхул-Ҳ.'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'муҳаррам',
+							'сафар',
+							'Рабеъ I',
+							'Рабеъ II',
+							'ҷимоди-ул-уло',
+							'ҷимоди-ул-сони',
+							'раҷаб',
+							'Шабан',
+							'Рамадан',
+							'Шаввал',
+							'Дхут-Қидаҳ',
+							'Дхут-Ҳиҷҷаҳ'
+						],
+						leap => [
+							
+						],
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'Муҳ.',
+							'Саф.',
+							'Раб. I',
+							'Раб. II',
+							'Ҷум. I',
+							'Ҷум. II',
+							'Раҷ.',
+							'Ша.',
+							'Рам.',
+							'Шав.',
+							'Дхул-Қ.',
+							'Дхул-Ҳ.'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'муҳаррам',
+							'сафар',
+							'Рабеъ I',
+							'Рабеъ II',
+							'ҷимоди-ул-уло',
+							'ҷимоди-ул-сони',
+							'раҷаб',
+							'Шабан',
+							'Рамадан',
+							'Шаввал',
+							'Дхул-Қидаҳ',
+							'Дхул-Ҳиҷҷаҳ'
+						],
+						leap => [
+							
+						],
+					},
+				},
+			},
+			'persian' => {
+				'format' => {
+					wide => {
+						nonleap => [
+							'фарвардин',
+							'урдибиҳишт',
+							'хурдод',
+							'тир',
+							'мурдод',
+							'шаҳривар',
+							'меҳр',
+							'обон',
+							'озар',
+							'дей',
+							'баҳман',
+							'исфанд'
+						],
+						leap => [
+							
+						],
+					},
+				},
+				'stand-alone' => {
+					wide => {
+						nonleap => [
+							'фарвардин',
+							'урдибиҳишт',
+							'хурдод',
+							'тир',
+							'мурдод',
+							'шаҳривар',
+							'меҳр',
+							'обон',
+							'озар',
+							'дей',
+							'баҳман',
+							'исфанд'
+						],
+						leap => [
+							
+						],
+					},
+				},
+			},
 	} },
 );
 
@@ -1080,13 +1290,9 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{пе. чо.},
-					'pm' => q{па. чо.},
-				},
 				'wide' => {
-					'am' => q{пе. чо.},
-					'pm' => q{па. чо.},
+					'am' => q{AM},
+					'pm' => q{PM},
 				},
 			},
 		},
@@ -1107,8 +1313,15 @@ has 'eras' => (
 			},
 			wide => {
 				'0' => 'Пеш аз милод',
-				'1' => 'ПаМ'
+				'1' => 'Пас аз милод'
 			},
+		},
+		'islamic' => {
+			abbreviated => {
+				'0' => 'САНА'
+			},
+		},
+		'persian' => {
 		},
 	} },
 );
@@ -1130,6 +1343,16 @@ has 'date_formats' => (
 			'medium' => q{dd MMM y},
 			'short' => q{dd/MM/yy},
 		},
+		'islamic' => {
+			'full' => q{EEEE, d MMMM'и' y G},
+			'long' => q{d MMMM'и' y G},
+			'medium' => q{d MMM y G},
+			'short' => q{M/d/y GGGGG},
+		},
+		'persian' => {
+			'full' => q{EEEE, d MMMM'и' y G},
+			'long' => q{d MMMM'и' y G},
+		},
 	} },
 );
 
@@ -1145,6 +1368,10 @@ has 'time_formats' => (
 			'long' => q{HH:mm:ss z},
 			'medium' => q{HH:mm:ss},
 			'short' => q{HH:mm},
+		},
+		'islamic' => {
+		},
+		'persian' => {
 		},
 	} },
 );
@@ -1166,6 +1393,10 @@ has 'datetime_formats' => (
 			'medium' => q{{1} {0}},
 			'short' => q{{1} {0}},
 		},
+		'islamic' => {
+		},
+		'persian' => {
+		},
 	} },
 );
 
@@ -1175,12 +1406,24 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
 			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
 			Ed => q{d, E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E, d MMM y G},
 			GyMMMd => q{d MMM y G},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
 			M => q{L},
 			MEd => q{E, dd-MM},
 			MMM => q{LLL},
@@ -1189,6 +1432,10 @@ has 'datetime_formats_available_formats' => (
 			MMMd => q{d MMM},
 			Md => q{dd-MM},
 			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			ms => q{mm:ss},
 			y => q{y G},
 			yyyy => q{y G},
 			yyyyM => q{MM-y GGGGG},
@@ -1202,10 +1449,17 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQQ => q{QQQQ y G},
 		},
 		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
 			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
 			EHm => q{E HH:mm},
 			EHms => q{E HH:mm:ss},
 			Ed => q{d, E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E, d MMM, y G},
@@ -1219,11 +1473,16 @@ has 'datetime_formats_available_formats' => (
 			MEd => q{E, dd-MM},
 			MMM => q{LLL},
 			MMMEd => q{E, d MMM},
-			MMMMW => q{'ҳафтаи' W, MMM},
+			MMMMW => q{'ҳафтаи' W, MMMM},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{dd-MM},
 			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a v},
+			hmv => q{h:mm a v},
 			ms => q{mm:ss},
 			y => q{y},
 			yM => q{MM-y},
@@ -1236,6 +1495,33 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 			yw => q{'ҳафтаи' w, Y},
+		},
+		'islamic' => {
+			E => q{ccc},
+			Ed => q{d E},
+			Gy => q{y G},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E, MMM d, y G},
+			GyMMMd => q{MMM d, y G},
+			M => q{L},
+			MEd => q{E, M/d},
+			MMM => q{LLL},
+			MMMEd => q{E, MMM d},
+			MMMMd => q{MMMM d},
+			MMMd => q{MMM d},
+			Md => q{M/d},
+			d => q{d},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{M/y GGGGG},
+			yyyyMEd => q{E, M/d/y GGGGG},
+			yyyyMMM => q{MMM y G},
+			yyyyMMMEd => q{E, MMM d, y G},
+			yyyyMMMM => q{MMMM y G},
+			yyyyMMMd => q{MMM d, y G},
+			yyyyMd => q{M/d/y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
 		},
 	} },
 );
@@ -1257,10 +1543,255 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
+			Bh => {
+				B => q{h B – h B},
+				h => q{h – h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+				h => q{h:mm – h:mm B},
+				m => q{h:mm – h:mm B},
+			},
+			Gy => {
+				G => q{y G – y G},
+				y => q{y – y G},
+			},
+			GyM => {
+				G => q{M/y GGGGG – M/y GGGGG},
+				M => q{M/y – M/y GGGGG},
+				y => q{M/y – M/y GGGGG},
+			},
+			GyMEd => {
+				G => q{E, M/d/y GGGGG – E, M/d/y GGGGG},
+				M => q{E, M/d/y – E, M/d/y GGGGG},
+				d => q{E, M/d/y – E, M/d/y GGGGG},
+				y => q{E, M/d/y – E, M/d/y GGGGG},
+			},
+			GyMMM => {
+				G => q{MMM y G – MMM y G},
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			GyMMMEd => {
+				G => q{E, MMM d, y G – E, MMM d, y G},
+				M => q{E, MMM d – E, MMM d, y G},
+				d => q{E, MMM d – E, MMM d, y G},
+				y => q{E, MMM d, y – E, MMM d, y G},
+			},
+			GyMMMd => {
+				G => q{MMM d, y G – MMM d, y G},
+				M => q{MMM d – MMM d, y G},
+				d => q{MMM d – d, y G},
+				y => q{MMM d, y – MMM d, y G},
+			},
+			GyMd => {
+				G => q{M/d/y GGGGG – M/d/y GGGGG},
+				M => q{M/d/y – M/d/y GGGGG},
+				d => q{M/d/y – M/d/y GGGGG},
+				y => q{M/d/y – M/d/y GGGGG},
+			},
+			M => {
+				M => q{M – M},
+			},
+			MEd => {
+				M => q{E, M/d – E, M/d},
+				d => q{E, M/d – E, M/d},
+			},
+			MMM => {
+				M => q{MMM – MMM},
+			},
+			MMMEd => {
+				M => q{E, MMM d – E, MMM d},
+				d => q{E, MMM d – E, MMM d},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d – d},
+			},
+			Md => {
+				M => q{M/d – M/d},
+				d => q{M/d – M/d},
+			},
+			d => {
+				d => q{d – d},
+			},
 			fallback => '{0} – {1}',
+			y => {
+				y => q{y – y G},
+			},
+			yM => {
+				M => q{M/y – M/y GGGGG},
+				y => q{M/y – M/y GGGGG},
+			},
+			yMEd => {
+				M => q{E, M/d/y – E, M/d/y GGGGG},
+				d => q{E, M/d/y – E, M/d/y GGGGG},
+				y => q{E, M/d/y – E, M/d/y GGGGG},
+			},
+			yMMM => {
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			yMMMEd => {
+				M => q{E, MMM d – E, MMM d, y G},
+				d => q{E, MMM d – E, MMM d, y G},
+				y => q{E, MMM d, y – E, MMM d, y G},
+			},
+			yMMMM => {
+				M => q{MMMM – MMMM'и' y G},
+				y => q{MMMM'и' y – MMMM'и' y G},
+			},
+			yMMMd => {
+				M => q{MMM d – MMM d, y G},
+				d => q{MMM d – d, y G},
+				y => q{MMM d, y – MMM d, y G},
+			},
+			yMd => {
+				M => q{M/d/y – M/d/y GGGGG},
+				d => q{M/d/y – M/d/y GGGGG},
+				y => q{M/d/y – M/d/y GGGGG},
+			},
 		},
 		'gregorian' => {
+			Bh => {
+				B => q{h B – h B},
+				h => q{h – h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+				h => q{h:mm – h:mm B},
+				m => q{h:mm – h:mm B},
+			},
+			Gy => {
+				G => q{y G – y G},
+				y => q{y – y G},
+			},
+			GyM => {
+				G => q{M/y GGGGG – M/y GGGGG},
+				M => q{M/y – M/y GGGGG},
+				y => q{M/y – M/y GGGGG},
+			},
+			GyMEd => {
+				G => q{E, M/d/y GGGGG – E, M/d/y GGGGG},
+				M => q{E, M/d/y – E, M/d/y GGGGG},
+				d => q{E, M/d/y – E, M/d/y GGGGG},
+				y => q{E, M/d/y – E, M/d/y GGGGG},
+			},
+			GyMMM => {
+				G => q{MMM y G – MMM y G},
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			GyMMMEd => {
+				G => q{E, MMM d, y G – E, MMM d, y G},
+				M => q{E, MMM d – E, MMM d, y G},
+				d => q{E, MMM d – E, MMM d, y G},
+				y => q{E, MMM d, y – E, MMM d, y G},
+			},
+			GyMMMd => {
+				G => q{MMM d, y G – MMM d, y G},
+				M => q{MMM d – MMM d, y G},
+				d => q{MMM d – d, y G},
+				y => q{MMM d, y – MMM d, y G},
+			},
+			GyMd => {
+				G => q{M/d/y GGGGG – M/d/y GGGGG},
+				M => q{M/d/y – M/d/y GGGGG},
+				d => q{M/d/y – M/d/y GGGGG},
+				y => q{M/d/y – M/d/y GGGGG},
+			},
+			H => {
+				H => q{HH – HH},
+			},
+			Hm => {
+				H => q{HH:mm – HH:mm},
+				m => q{HH:mm – HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm – HH:mm v},
+				m => q{HH:mm – HH:mm v},
+			},
+			Hv => {
+				H => q{HH – HH v},
+			},
+			M => {
+				M => q{M – M},
+			},
+			MEd => {
+				M => q{E, M/d – E, M/d},
+				d => q{E, M/d – E, M/d},
+			},
+			MMM => {
+				M => q{MMM – MMM},
+			},
+			MMMEd => {
+				M => q{E, MMM d – E, MMM d},
+				d => q{E, MMM d – E, MMM d},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d – d},
+			},
+			Md => {
+				M => q{M/d – M/d},
+				d => q{M/d – M/d},
+			},
+			d => {
+				d => q{d – d},
+			},
 			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h – h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm – h:mm a},
+				m => q{h:mm – h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm – h:mm a v},
+				m => q{h:mm – h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h – h a v},
+			},
+			y => {
+				y => q{y – y},
+			},
+			yM => {
+				M => q{M/y – M/y},
+				y => q{M/y – M/y},
+			},
+			yMEd => {
+				M => q{E, M/d/y – E, M/d/y},
+				d => q{E, M/d/y – E, M/d/y},
+				y => q{E, M/d/y – E, M/d/y},
+			},
+			yMMM => {
+				M => q{MMM – MMM y},
+				y => q{MMM y – MMM y},
+			},
+			yMMMEd => {
+				M => q{E, MMM d – E, MMM d, y},
+				d => q{E, MMM d – E, MMM d, y},
+				y => q{E, MMM d, y – E, MMM d, y},
+			},
+			yMMMM => {
+				y => q{MMMM'и' y – MMMM'и' y},
+			},
+			yMMMd => {
+				M => q{MMM d – MMM d, y},
+				d => q{MMM d – d, y},
+				y => q{MMM d, y – MMM d, y},
+			},
+			yMd => {
+				M => q{M/d/y – M/d/y},
+				d => q{M/d/y – M/d/y},
+				y => q{M/d/y – M/d/y},
+			},
 		},
 	} },
 );
@@ -1301,7 +1832,7 @@ has 'time_zone_names' => (
 		'America_Pacific' => {
 			long => {
 				'daylight' => q#Вақти рӯзонаи Уқёнуси Ором#,
-				'generic' => q#Вақти Уёнуси Ором#,
+				'generic' => q#Вақти Уқёнуси Ором#,
 				'standard' => q#Вақти стандартии Уқёнуси Ором#,
 			},
 		},

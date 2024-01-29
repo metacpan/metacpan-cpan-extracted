@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 25;
+use Test::Most tests => 29;
 use File::Spec;
 use Test::NoWarnings;
 
@@ -25,7 +25,11 @@ ROOTDIR: {
 	}
 
 	ok(CGI::Info->rootdir() eq $dir);
+	ok(CGI::Info->root_dir() eq $dir);
 	ok(CGI::Info::rootdir() eq $dir);
+	ok(CGI::Info::root_dir() eq $dir);
+	ok(CGI::Info::documentroot() eq $dir);
+	ok(CGI::Info::documentroot() eq $dir);
 
 	$ENV{'DOCUMENT_ROOT'} = File::Spec->catdir(File::Spec->tmpdir(), 'xyzzy');
 	$dir = CGI::Info->rootdir();
@@ -35,14 +39,14 @@ ROOTDIR: {
 	delete $ENV{'C_DOCUMENT_ROOT'};
 	$ENV{'DOCUMENT_ROOT'} = File::Spec->catdir(File::Spec->tmpdir(), 'xyzzy');
 	$i = new_ok('CGI::Info');
-	$dir = $i->rootdir();
+	$dir = $i->documentroot();
 	ok(-r $dir);
 	ok(-d $dir);
 
 	$ENV{'DOCUMENT_ROOT'} = '/';
 	$i = new_ok('CGI::Info');
-	$dir = $i->rootdir();
-	ok($dir eq '/');
+	$dir = $i->root_dir();
+	cmp_ok($dir, 'eq', '/', 'Recognises DOCUMENT_ROOT');
 
 	delete $ENV{'DOCUMENT_ROOT'};
 	$ENV{'C_DOCUMENT_ROOT'} = File::Spec->catdir(File::Spec->tmpdir(), 'xyzzy');
@@ -64,7 +68,7 @@ ROOTDIR: {
 	ok(-d $dir);
 
 	$ENV{'DOCUMENT_ROOT'} = File::Spec->catdir(File::Spec->tmpdir());
-	$dir = $i->rootdir();
+	$dir = $i->root_dir();
 	ok($dir eq File::Spec->catdir(File::Spec->tmpdir()));
 	ok(-r $dir);
 	ok(-d $dir);

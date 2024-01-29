@@ -3,12 +3,13 @@ abstract: 'AS2 Protocol implementation (RFC 4130) used in Electronic Data Exchan
 author:
   - 'Andrew Maguire <ajm@cpan.org>'
 build_requires:
+  Net::SSLeay: '0'
   Test::Exception: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,5 +30,7 @@ requires:
 resources:
   homepage: https://github.com/andrewjmaguire/Net-AS2
   repository: https://github.com/andrewjmaguire/Net-AS2.git
-version: '1.0110'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '1.0111'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

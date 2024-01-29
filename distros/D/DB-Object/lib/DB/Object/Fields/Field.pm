@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Fields/Field.pm
-## Version v1.0.2
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v1.1.1
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/01/01
-## Modified 2023/06/12
+## Modified 2024/01/03
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -36,8 +37,8 @@ BEGIN
         '!='    => sub{ &_op_overload( @_, '<>' ) },
         '<<'    => sub{ &_op_overload( @_, '<<' ) },
         '>>'    => sub{ &_op_overload( @_, '>>' ) },
-        'lt'     => sub{ &_op_overload( @_, '<' ) },
-        'gt'     => sub{ &_op_overload( @_, '>' ) },
+        'lt'    => sub{ &_op_overload( @_, '<' ) },
+        'gt'    => sub{ &_op_overload( @_, '>' ) },
         'le'    => sub{ &_op_overload( @_, '<=' ) },
         'ge'    => sub{ &_op_overload( @_, '>=' ) },
         'ne'    => sub{ &_op_overload( @_, '<>' ) },
@@ -51,7 +52,7 @@ BEGIN
         fallback => 1,
     );
     use Want;
-    our $VERSION = 'v1.0.2';
+    our $VERSION = 'v1.1.1';
 };
 
 use strict;
@@ -60,16 +61,32 @@ use warnings;
 sub init
 {
     my $self = shift( @_ );
-    $self->{default}        = '';
-    $self->{name}           = '';
-    $self->{pos}            = '';
+    $self->{check_name}     = undef;
+    $self->{comment}        = undef;
+    $self->{datatype}       = undef;
+    $self->{default}        = undef;
+    $self->{foreign_name}   = undef;
+    $self->{index_name}     = undef;
+    $self->{is_array}       = undef;
+    $self->{is_check}       = undef;
+    $self->{is_foreign}     = undef;
+    $self->{is_nullable}    = undef;
+    $self->{is_primary}     = undef;
+    $self->{is_unique}      = undef;
+    $self->{name}           = undef;
+    $self->{pos}            = undef;
     $self->{prefixed}       = 0;
-    $self->{query_object}   = '';
-    $self->{table_object}   = '';
-    $self->{type}           = '';
+    $self->{query_object}   = undef;
+    $self->{size}           = undef;
+    $self->{table_object}   = undef;
+    $self->{type}           = undef;
     $self->{_init_params_order}   = [qw( table_object query_object default pos type prefixed name )];
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
+    $self->{_fields} = [qw(
+        check_name comment datatype default foreign_name index_name is_array is_check
+        is_foreign is_nullable is_primary is_unique name pos prefixed size type
+    )];
     return( $self->error( "No table object was provided." ) ) if( !$self->{table_object} );
     return( $self->error( "Table object provided is not an object." ) ) if( !$self->_is_object( $self->{table_object} ) );
     return( $self->error( "Table object provided is not a DB::Object::Tables object." ) ) if( !$self->{table_object}->isa( 'DB::Object::Tables' ) );
@@ -80,16 +97,76 @@ sub init
 
 sub as_string { return( shift->name ); }
 
+sub clone
+{
+    my $self = shift( @_ );
+    # Fields to clone: we explicitly want to avoid cloning query_object, because it is not necessary and because it contains an object to the database connection that we do not want to clone.
+    # Likewise, the query object, we do not want to clone either.
+    # my $keys = [qw( default is_nullable name pos prefixed size type )];
+    my $keys = $self->_fields;
+    my $hash = {};
+    @$hash{ @$keys } = @$self{ @$keys };
+    # $hash->{datatype} = {};
+    # for( qw( alias constant name re type ) )
+    # {
+    #     $hash->{datatype}->{ $_ } = $self->datatype->$_;
+    # }
+    my $dt = $self->datatype;
+    $hash->{datatype} = 
+    {
+    alias => $dt->alias->clone,
+    constant => $dt->{constant},
+    name => $dt->{name},
+    re => $dt->{re},
+    type => $dt->{type},
+    };
+    $self->_load_class( 'Clone' ) || return( $self->pass_error );
+    my $copy = Clone::clone( $hash );
+    $copy->{query_object} = $self->query_object;
+    $copy->{table_object} = $self->table_object;
+    my $new = $self->new( %$copy, debug => $self->debug ) || return( $self->pass_error );
+    return( $new );
+}
+
+sub check_name { return( shift->_set_get_scalar( 'check_name', @_ ) ); }
+
+sub comment { return( shift->_set_get_scalar( 'comment', @_ ) ); }
+
 # A data type constant
-sub constant { return( shift->_set_get_hash_as_object( 'constant', @_ ) ); }
+# sub constant { return( shift->_set_get_hash_as_object( 'constant', @_ ) ); }
+sub constant { return( shift->datatype->constant( @_ ) ); }
 
 sub database { return( shift->database_object->database ); }
 
 sub database_object { return( shift->table_object->database_object ); }
 
+sub datatype { return( shift->_set_get_class( 'datatype', {
+    alias => { type => 'array_as_object' },
+    constant => { type => 'scalar' },
+    name => { type => 'scalar_as_object' },
+    re => { type => 'object', package => 'Regexp' },
+    type => { type => 'scalar_as_object' },
+}, @_ ) ); }
+
 sub default { return( shift->_set_get_scalar( 'default', @_ ) ); }
 
+sub foreign_name { return( shift->_set_get_scalar( 'foreign_name', @_ ) ); }
+
 sub first { return( shift->_find_siblings(1) ); }
+
+sub index_name { return( shift->_set_get_scalar( 'index_name', @_ ) ); }
+
+sub is_array { return( shift->_set_get_boolean( 'is_array', @_ ) ); }
+
+sub is_check { return( shift->_set_get_boolean( 'is_check', @_ ) ); }
+
+sub is_foreign { return( shift->_set_get_boolean( 'is_foreign', @_ ) ); }
+
+sub is_nullable { return( shift->_set_get_boolean( 'is_nullable', @_ ) ); }
+
+sub is_primary { return( shift->_set_get_boolean( 'is_primary', @_ ) ); }
+
+sub is_unique { return( shift->_set_get_boolean( 'is_unique', @_ ) ); }
 
 sub last
 {
@@ -163,9 +240,10 @@ sub prev
 }
 
 sub query_object { return( shift->_set_get_object_without_init( 'query_object', 'DB::Object::Query', @_ ) ); }
-# sub query_object { return( shift->table_object->query_object ); }
 
 sub schema { return( shift->table_object->schema ); }
+
+sub size { return( shift->_set_get_number( 'size', @_ ) ); }
 
 sub table { return( shift->table_object->name ); }
 
@@ -174,6 +252,8 @@ sub table_name { return( shift->table_object->name ); }
 sub table_object { return( shift->_set_get_object_without_init( 'table_object', 'DB::Object::Tables', @_ ) ); }
 
 sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
+
+sub _fields { return( shift->_set_get_array_as_object( '_fields', @_ ) ); }
 
 sub _find_siblings
 {
@@ -230,6 +310,7 @@ sub _op_overload
     my $dbo = $self->database_object;
     my $qo = $self->query_object;
     my $placeholder_re = $dbo->_placeholder_regexp;
+    my $const = $self->datatype->constant;
     # $op = 'IS' if( $op eq '=' and $val eq 'NULL' );
     # If the value specified in the operation is a placeholder, or a field object or a statement object, we do not want to quote process it
     unless( $val =~ /^$placeholder_re$/ || 
@@ -243,18 +324,20 @@ sub _op_overload
             $self->_is_scalar( $val ) ||
             uc( $val ) eq 'NULL' )
     {
-        $val = $dbo->quote( $val, $self->constant->constant ) if( $dbo );
+        $val = $dbo->quote( $val, $const ) if( $dbo );
     }
     
     my $types;
     # If the value is a statement object, stringify it, surround it with parenthesis and use it
     if( $self->_is_a( $val, 'DB::Object::Statement' ) )
     {
+        $self->messagec( 5, "Merging {green}", $val->query_object->elements->length, "{/} elements from this statement object associated with out field {green}", $self->as_string, "{/}" );
+        $qo->elements->merge( $val->query_object->elements );
         $val = '(' . $val->as_string . ')';
     }
     elsif( $dbo->placeholder->has( $self->_is_scalar( $val ) ? $val : \$val ) )
     {
-        $types = $dbo->placeholder->replace( \$val );
+        $types = $dbo->placeholder->replace( $self->_is_scalar( $val ) ? $val : \$val );
     }
     # A placeholder, but don't know the type
     elsif( $val =~ /^$placeholder_re$/ )
@@ -282,7 +365,6 @@ sub _op_overload
 #         # binded_offset => ( $val =~ /^$placeholder_re$/ && defined( $+{offset} ) ) ? ( $+{offset} - 1 ) : undef,
 #         # types => $types,
 #     ) );
-    my $const = $self->constant->constant;
     my $over = DB::Object::Fields::Overloaded->new(
         expression => 
             (
@@ -334,12 +416,21 @@ DB::Object::Fields::Field - Table Field Object
     printf( "Name: %s\n", $c->name );
     printf( "Type: %s\n", $c->type );
     printf( "Default: %s\n", $c->default );
+    printf( "Is nullable: %s\n", $c->is_nullable );
+    printf( "Is primary key: %s\n", $c->is_primary );
+    printf( "Is an array: %s\n", $c->is_array );
     printf( "Position: %s\n", $c->pos );
+    # For example for varchar, this could be 255 based on the table schema
+    printf( "Size: %s\n", $c->size );
     printf( "Table: %s\n", $c->table );
     printf( "Database: %s\n", $c->database );
     printf( "Schema: %s\n", $c->schema );
+    printf( "Field comment: %s\n", $c->comment );
+    printf( "Constant value: %s\n", $c->datatype->constant ); # 12
+    printf( "Constant name: %s\n", $c->datatype->name ); # For example: SQL_VARCHAR
+    printf( "Constant type: %s\n", $c->datatype->type ); # varchar
     printf( "Next field: %s (%s)\n", $c->next, ref( $c->next ) );
-    print( "Showing name fully qualified: ", $c->prefixed( 3 )->name, "\n" );
+    print( "Showing name fully qualified: ", $c->prefixed(3)->name, "\n" );
     # would print: my_shop.public.customers.currency
     print( "Trying again (should keep prefix): ", $c->name, "\n" );
     # would print again: my_shop.public.customers.currency
@@ -374,7 +465,7 @@ This would yield:
 
 =head1 VERSION
 
-    v1.0.2
+    v1.1.1
 
 =head1 DESCRIPTION
 
@@ -388,37 +479,89 @@ Takes an hash or hash reference of parameters and this will create a new L<DB::O
 
 =over 4
 
-=item I<debug>
+=item * C<check_name>
+
+Specifies the name of the check constraint associated wit this field.
+
+=item * C<comment>
+
+Specifies the field comment, if any.
+
+=item * C<datatype>
+
+Specifies an hash of key-value pairs, namely: C<name>, C<constant>, C<type> and C<re>
+
+=item * C<debug>
 
 Toggles debug mode on/off
 
-=item I<default>
+=item * C<default>
 
-=item I<name>
+Specifies the  default field value.
+
+=item * C<foreign_name>
+
+Specifies the name of the foreign key constraint associated wit this field.
+
+=item * C<index_name>
+
+Specifies the index name to which this field is related.
+
+=item * C<is_array>
+
+Specifies a boolean value whether the field value represents an array or not.
+
+=item * C<is_check>
+
+Specifies a boolean value whether the field is associated with a check constraint or not.
+
+=item * C<is_foreign>
+
+Specifies a boolean value whether the field is associated with a foreign key constraint or not.
+
+=item * C<is_nullable>
+
+Specifies a boolean value whether the field value can be null or not.
+
+=item * C<is_primary>
+
+Specifies a boolean value whether the field is the primary key for its table or not.
+
+=item * C<is_unique>
+
+Specifies a boolean value whether the field is part of a unique index or not.
+
+=item * C<name>
 
 The table column name.
 
 An error will be returned if this value is not provided upon instantiation.
 
-=item I<pos>
+=item * C<pos>
 
 The table column position in the table.
 
-=item I<prefixed>
+=item * C<prefixed>
 
 Defaults to 0
 
-=item I<query_object>
+=item * C<query_object>
 
 The L<DB::Object::Query> object.
 
-=item I<table_object>
+=item * C<size>
+
+Set the field size, such as for varchar.
+
+Defaults to C<undef>
+
+=item * C<table_object>
 
 The L<DB::Object::Tables> object.
 
 An error will be returned if this value is not provided upon instantiation.
 
-=item I<type>
+=item * C<type>
 
 The column data type.
 
@@ -434,6 +577,12 @@ This is also called to stringify the object
 
     print( "Field is: $field\n" );
 
+=head2 clone
+
+Makes a clone of the object and returns it.
+
+However, it does not makes a clone of the entire field object, but instead leaves out the L<query object|DB::Object::Query> and the L<table object|DB::Object::Tables>
+
 =head2 constant
 
 A data type constant set by L<DB::Object::Table/structure>. This helps determine how to deal with some fields.
@@ -442,23 +591,31 @@ This is an hash object that contains 3 properties:
 
 =over 4
 
-=item I<constant>
+=item * C<constant>
 
 An integer set by the database driver to represent the constant
 
-=item I<name>
+=item * C<name>
 
 The constant name, e.g. C<PG_JSONB>
 
-=item I<type>
+=item * C<type>
 
 The data type, e.g. C<jsonb>
 
 =back
 
+=head2 check_name
+
+Sets or gets the optional name of the check constraint associated with this field.
+
+=head2 comment
+
+Sets or gets the optional comment that may have been set for this table field.
+
 =head2 database
 
-Returns the name of the database this field is attached to.
+Sets or gets the name of the database this field is attached to.
 
 =head2 database_object
 
@@ -466,11 +623,45 @@ Returns the database object, ie the one used to make sql queries
 
 =head2 default
 
-Returns the default value, if any, for that field.
+Sets or gets the default value, if any, for that field.
+
+=head2 foreign_name
+
+Sets or gets the optional name of the foreign key constraint associated with this field.
 
 =head2 first
 
 Returns the first field in the table.
+
+=head2 index_name
+
+Sets or gets the index name to which this field is related. Defaults to C<undef>
+
+=head2 is_array
+
+Sets or gets true if the field is an array, or false otherwise.
+
+=head2 is_check
+
+Sets or gets true if the field is associated with a check constraint, or false otherwise.
+
+=head2 is_foreign
+
+Sets or gets true if the field is associated with a foreign key constraint, or false otherwise.
+
+=head2 is_nullable
+
+Sets or gets true if the field can be null, or false otherwise.
+
+=head2 is_primary
+
+Sets or gets true if the field is the primary key of the table, or false otherwise.
+
+=head2 is_unique
+
+Sets or gets true if the field is part of a unique index, or false otherwise.
+
+If it is, check out the value for L<index_name|/index_name>
 
 =head2 last
 
@@ -478,7 +669,7 @@ Returns the last field in the table.
 
 =head2 name
 
-Returns the field name. This is also what is returned when object is stringified. For example
+Sets or gets the field name. This is also what is returned when object is stringified. For example
 
     my $c = $tbl_object->fo->last_name;
     print( "$c\n" );
@@ -492,7 +683,7 @@ Returns the next field object.
 
 =head2 pos
 
-Returns the position of the field in the table. This is an integer starting from 1.
+Sets or gets the position of the field in the table. This is an integer starting from 1.
 
 =head2 prefixed
 
@@ -509,11 +700,15 @@ Returns the previous field object.
 
 =head2 query_object
 
-The query object (L<DB::Object::Query> or one of its descendant)
+Sets or gets the query object (L<DB::Object::Query> or one of its descendant)
 
 =head2 schema
 
 Returns the table schema to which this field is attached.
+
+=head2 size
+
+Sets or gets the size of the field when appropriate, such as when the type is C<varchar> or C<char>
 
 =head2 table
 
@@ -525,11 +720,11 @@ Same as above. This returns the table name.
 
 =head2 table_object
 
-Returns the table object which is a L<DB::Object::Tables> object.
+Sets or gets the table object which is a L<DB::Object::Tables> object.
 
 =head2 type
 
-Returns the field type such as C<jsonb>, Cjson>, C<varchar>, C<integer>, etc.
+Returns the field type such as C<jsonb>, C<json>, C<varchar>, C<integer>, etc.
 
 See also L</constant> for an even more accurate data type, and the driver associated constant that is used for binding values to placeholders.
 

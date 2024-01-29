@@ -31,8 +31,8 @@ while (1) {
 		print "Use setDebugLevel to change the following entries from $logconfig (enter 0 to switch to common log.config and back):\n\n";
 		do {
 			print "$i: $datalines[$i-1]\n";
-			($toChange{$i},$levelToChange{$i}) = ($datalines[$i-1] =~ /(.+?) = (.+?)$/) if $datalines[$i-1] =~ /(.+?) = (.+?)$/;
-			($toChange{$i},$levelToChange{$i}) = ($datalines[$i-1] =~ /(.+?) = (.+?),.*$/) if $datalines[$i-1] =~ /(.+?) = (.+?),.*$/;
+			($toChange{$i},$levelToChange{$i}) = ($datalines[$i-1] =~ /(.+?)= (.+?)$/) if $datalines[$i-1] =~ /(.+?)= (.+?)$/;
+			($toChange{$i},$levelToChange{$i}) = ($datalines[$i-1] =~ /(.+?)= (.+?),.*$/) if $datalines[$i-1] =~ /(.+?)= (.+?),.*$/;
 			$i+=1;
 		} until($datalines[$i-1] eq "" or $datalines[$i-1] eq "\r");
 		# ask user for choices of logger to change
@@ -83,16 +83,16 @@ while (1) {
 				# toggle comment for this logger
 				if ($toChange{$loggerToChange} =~ /^#.+$/) {
 					$toChange{$loggerToChange} =~ s/#//;
-					$data =~ s/^#$toChange{$loggerToChange} = (.*?)$/$toChange{$loggerToChange} = $1/gm;
+					$data =~ s/^#$toChange{$loggerToChange}=(.*?)$/$toChange{$loggerToChange}=$1/gm;
 				} else {
-					$data =~ s/^$toChange{$loggerToChange} = (.*?)$/#$toChange{$loggerToChange} = $1/gm;
+					$data =~ s/^$toChange{$loggerToChange}=(.*?)$/#$toChange{$loggerToChange}=$1/gm;
 				}
 			} elsif ($toChange{$loggerToChange} and $levels{$level}) {
 				# change level and appenders (except for root logger)
 				if ($toChange{$loggerToChange} =~ /rootLogger/) {
-					$data =~ s/^$toChange{$loggerToChange} = $levelToChange{$loggerToChange}(.*?)$/$toChange{$loggerToChange} = $levels{$level}$1/gm;
+					$data =~ s/^$toChange{$loggerToChange}= $levelToChange{$loggerToChange}(.*?)$/$toChange{$loggerToChange}= $levels{$level}$1/gm;
 				} else {
-					$data =~ s/^$toChange{$loggerToChange} = $levelToChange{$loggerToChange}(.*?)$/$toChange{$loggerToChange} = $levels{$level}$appenders/gm;
+					$data =~ s/^$toChange{$loggerToChange}= $levelToChange{$loggerToChange}(.*?)$/$toChange{$loggerToChange}= $levels{$level}$appenders/gm;
 				}
 			} else {
 				print "press enter";

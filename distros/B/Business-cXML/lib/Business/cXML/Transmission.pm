@@ -278,7 +278,7 @@ C<undef>) and the XML string.
 
 sub _valid_string {
 	my ($self) = @_;
-	my $head = qq(<?xml version="1.0"?>\n)
+	my $head = qq(<?xml version="1.0" encoding="UTF-8"?>\n)
 		. qq(<!DOCTYPE cXML SYSTEM "http://xml.cxml.org/schemas/cXML/)
 		. $Business::cXML::CXML_VERSION
 		. qq(/cXML.dtd">\n);
@@ -288,7 +288,7 @@ sub _valid_string {
 	if ($@) {
 		return ($@, $head . qq(<cXML timestamp=") . $self->{_timestamp} . qq(" payloadID=") . $self->{_id} .  qq(" xml:lang="en-US"><Response><Status code="500" text="Internal Server Error">) . encode_entities($@) . qq(</Status></Response></cXML>));
 	};
-	return (undef, $head . $self->{xml_root}->toString);
+	return (undef, $self->{xml_doc}->toString);
 }
 
 sub toString {

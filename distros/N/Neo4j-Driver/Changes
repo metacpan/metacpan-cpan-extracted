@@ -1,5 +1,9 @@
 Revision history for Neo4j::Driver
 
+0.42  2023-12-14
+
+ - Add support for spatial and temporal Cypher values (Neo4j::Types v2).
+
 0.41  2023-11-21
 
  - Calling element_id() on nodes and relationships from Neo4j version 4

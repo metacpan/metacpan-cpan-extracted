@@ -1,4 +1,9 @@
-0.04 Feb 2 2015
+0.05 2023-01-25
+
+    - Fix some unicode handling
+
+
+0.04 2015-02-02
 
     - fix random exception order
     - fix tests

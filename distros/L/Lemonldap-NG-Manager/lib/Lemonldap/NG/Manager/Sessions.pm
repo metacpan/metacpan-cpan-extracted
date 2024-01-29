@@ -16,13 +16,14 @@ extends qw(
   Lemonldap::NG::Common::Conf::AccessLib
 );
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.18.0';
 
 #############################
 # I. INITIALIZATION METHODS #
 #############################
 
 use constant defaultRoute => 'sessions.html';
+use constant icon         => 'duplicate';
 
 sub init {
     my ( $self, $conf ) = @_;

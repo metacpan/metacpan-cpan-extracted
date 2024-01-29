@@ -59,7 +59,7 @@ sub new {
 
 
 # Run Operation Request
-# PostBatchConvertRequest.batchConvertRequest :    
+# PostBatchConvertRequest.batchConvertRequest : BatchConvertRequest Batch conversion file request.    
 
 {
     my $params = {
@@ -70,7 +70,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_batch_convert' } = { 
-    	summary => '',
+    	summary => 'Batch converting files that meet specific matching conditions.',
         params => $params,
         returns => 'string',
     };
@@ -117,7 +117,7 @@ __PACKAGE__->method_documentation({
      'batch_convert_request' => {
      	datatype => 'BatchConvertRequest',
      	base_name => 'batchConvertRequest',
-     	description => '',
+     	description => 'BatchConvertRequest Batch conversion file request. ',
      	format => '',
      	read_only => '',
      		},    

@@ -21,7 +21,8 @@ our (%tn, $jack, $config);
 #      + illegal track method call generate an exception
 
 package Audio::Nama::IO;
-use Modern::Perl; use Carp;
+use Modern::Perl '2020';
+use Carp;
 use Data::Dumper::Concise;
 our $VERSION = 1.0;
 
@@ -304,6 +305,7 @@ sub soundcard_output_device_string {
 
 sub jack_multi_route {
 	my (@ports)  = @_;
+	@ports or return;
 	join q(,),q(jack_multi),
 	map{quote_jack_port($_)} @ports
 }
@@ -316,28 +318,33 @@ sub jack_multi_ports {
 	# can we route to these channels?
 	my $end   = $start + $width - 1;
 
-	# the following logic avoids deferencing undef for a 
-	# non-existent client, and correctly handles
-	# the case of a portname (containing colon)
-	
- 	my $channel_count = scalar @{$jack->{clients}->{$client}{$direction}};
+	my $c = client_info($client, $direction);
+	$c or return;
+ 	my $channel_count = scalar @{ $c->{$direction} };
 	my $source_or_send = $direction eq 'input' ? 'send' : 'source';
   	die(qq(
 Track $trackname: $source_or_send would cover channels $start - $end,
 out of bounds for JACK client "$client" ($channel_count channels max).
 Change $source_or_send setting, or set track OFF.)) 
 	if $end > $channel_count and $config->{enforce_channel_bounds};
-		return @{$jack->{clients}->{$client}{$direction}}[$start-1..$end-1]
-		 	if $jack->{clients}->{$client}{$direction};
+		return @{$c->{$direction}}[$start-1..$end-1]
+		 	if $c->{$direction};
 
 }
 #sub one_port { $jack->{clients}->{$client}->{$direction}->[$start-1] }
 
+sub client_info {
+	my ($client, $direction) = @_;
+ 	my $info = $jack->{clients}->{$client};
+}
+
 sub quote_jack_port {
 	my $port = shift;
+	defined $port or return;
 	($port =~ /\s/ and $port !~ /^"/) ? qq("$port") : $port
 }
 sub rectified { # client name from number
+	defined $_[0] or return;
 	$_[0] =~ /^\d+$/ 
 		? 'system'
 		: $_[0]
@@ -349,31 +356,41 @@ sub rectified { # client name from number
 
 {
 package Audio::Nama::IO::from_null;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO';
 sub _device_id { 'null' }  
 }
 
 {
 package Audio::Nama::IO::to_null;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO';
 sub _device_id { 'null' }
 }
 
 {
 package Audio::Nama::IO::from_rtnull;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO';
 sub _device_id { 'rtnull' }  
 }
 
 {
 package Audio::Nama::IO::to_rtnull;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO';
 sub _device_id { 'rtnull' }  
 }
 
 {
 package Audio::Nama::IO::from_wav;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO';
 sub device_id { 
 	my $self = shift;
 	my @modifiers;
@@ -390,14 +407,18 @@ sub ports { 'system:capture_1' }
 }
 {
 package Audio::Nama::IO::to_wav;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO';
 sub device_id { $_[0]->full_path }
 sub _format_template { $config->{raw_to_disk_format} } 
 }
 
 {
 package Audio::Nama::IO::from_loop;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO';
 sub new {
 	my $class = shift;
 	my %vals = @_;
@@ -412,12 +433,16 @@ sub _format_template { $config->{cache_to_disk_format} }
 }
 {
 package Audio::Nama::IO::to_loop;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO::from_loop';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO::from_loop';
 }
 
 {
 package Audio::Nama::IO::from_soundcard;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO';
 sub new {
 	shift; # throw away class
 	my $class = $io_class{Audio::Nama::IO::soundcard_input_type_string()};
@@ -426,7 +451,9 @@ sub new {
 }
 {
 package Audio::Nama::IO::to_soundcard;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO';
 sub new {
 	shift; # throw away class
 	my $class = $io_class{Audio::Nama::IO::soundcard_output_type_string()};
@@ -435,7 +462,9 @@ sub new {
 }
 {
 package Audio::Nama::IO::to_jack_multi;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO';
 sub client { 
 	my $self = shift;
 #  	say "to_jack_multi: target_id: ",$self->target_id;
@@ -450,13 +479,17 @@ sub device_id {
 
 {
 package Audio::Nama::IO::from_jack_multi;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO::to_jack_multi';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO::to_jack_multi';
 sub ecs_extra { $_[0]->mono_to_stereo }
 }
 
 {
 package Audio::Nama::IO::to_jack_port;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO';
 sub format_template { $config->{devices}->{jack}->{signal_format} }
 sub device_id { 'jack,,'.$_[0]->port_name.'_out' }
 sub ports { $config->{ecasound_jack_client_name}. ":".$_[0]->port_name. '_out_1' } # at least this one port
@@ -464,7 +497,9 @@ sub ports { $config->{ecasound_jack_client_name}. ":".$_[0]->port_name. '_out_1'
 
 {
 package Audio::Nama::IO::from_jack_port;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO::to_jack_port';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO::to_jack_port';
 sub device_id { 'jack,,'.$_[0]->port_name.'_in' }
 sub ecs_extra { $_[0]->mono_to_stereo }
 sub ports { $config->{ecasound_jack_client_name}.":".$_[0]->port_name. '_in_1' } # at least this one port
@@ -472,14 +507,18 @@ sub ports { $config->{ecasound_jack_client_name}.":".$_[0]->port_name. '_in_1' }
 
 {
 package Audio::Nama::IO::to_jack_client;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO';
 sub device_id { "jack," . Audio::Nama::IO::quote_jack_port($_[0]->send_id); }
 sub client { Audio::Nama::IO::rectified($_[0]->send_id) }
 }
 
 {
 package Audio::Nama::IO::from_jack_client;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO';
 sub device_id { 'jack,'.  Audio::Nama::IO::quote_jack_port($_[0]->source_id); }
 sub ecs_extra { $_[0]->mono_to_stereo}
 sub client { Audio::Nama::IO::rectified($_[0]->source_id) }
@@ -487,7 +526,9 @@ sub client { Audio::Nama::IO::rectified($_[0]->source_id) }
 
 {
 package Audio::Nama::IO::from_alsa_soundcard_device;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO';
 sub ecs_extra { join ' ', $_[0]->rec_route, $_[0]->mono_to_stereo }
 sub device_id { $config->{devices}->{$config->{alsa_capture_device}}->{ecasound_id} }
 sub input_channel { $_[0]->source_id }
@@ -507,7 +548,9 @@ sub rec_route {
 }
 {
 package Audio::Nama::IO::to_alsa_soundcard_device;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO';
 sub device_id { $config->{devices}->{$config->{alsa_playback_device}}{ecasound_id} }
 sub ecs_extra {route($_[0]->width,$_[0]->output_channel) }
 sub output_channel { $_[0]->send_id }
@@ -530,7 +573,9 @@ sub route {
 }
 {
 package Audio::Nama::IO::from_bus;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO';
 sub new {
 	my $class = shift;
 	my %vals = @_;
@@ -540,7 +585,9 @@ sub new {
 }
 {
 package Audio::Nama::IO::any;
-use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO';
+use Modern::Perl '2020';
+our $VERSION = 1.0;
+our @ISA = 'Audio::Nama::IO';
 }
 
 

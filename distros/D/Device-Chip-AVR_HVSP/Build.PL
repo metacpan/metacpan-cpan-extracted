@@ -16,6 +16,7 @@ my $build = Module::Build->new(
    },
    test_requires => {
       'Test::Device::Chip::Adapter' => 0,
+      'Test::ExpectAndCheck::Future' => '0.04',
       'Test::Future::Deferred' => 0,
       'Test2::V0' => 0,
    },

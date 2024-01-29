@@ -1,7 +1,7 @@
 # Test the transfer of null and various unicode data through assorted APIs.
 # The \x{2030} is the permille sign.
 #
-# On Unix this progam shows different wrong behaviour depending
+# On Unix this program shows different wrong behaviour depending
 # on what kind of locale it runs under.
 
 use strict;

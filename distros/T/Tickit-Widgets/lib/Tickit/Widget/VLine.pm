@@ -4,12 +4,13 @@
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.73;
+use warnings;
+use Object::Pad 0.807;
 
-package Tickit::Widget::VLine 0.37;
-class Tickit::Widget::VLine
-   :strict(params)
-   :isa(Tickit::Widget);
+package Tickit::Widget::VLine 0.41;
+class Tickit::Widget::VLine :strict(params);
+
+inherit Tickit::Widget;
 
 use Tickit::Style;
 use Tickit::RenderBuffer qw( LINE_SINGLE CAP_BOTH );
@@ -18,23 +19,22 @@ use constant WIDGET_PEN_FROM_STYLE => 1;
 
 =head1 NAME
 
-C<Tickit::Widget::HLine> - a widget displaying a vertical line
+C<Tickit::Widget::VLine> - a widget displaying a vertical line
 
 =head1 SYNOPSIS
 
-   use Tickit::Widget::HLine;
-   use Tickit::Widget::VBox;
-   use Tickit::Widget::HLine;
+   use Tickit::Widget::HBox;
+   use Tickit::Widget::VLine;
 
-   my $vbox = Tickit::Widget::VBox->new;
+   my $hbox = Tickit::Widget::HBox->new;
 
-   $vbox->add( ... );
+   $hbox->add( ... );
 
-   $vbox->add( Tickit::Widget::HLine->new );
+   $hbox->add( Tickit::Widget::VLine->new );
 
-   $vbox->add( ... );
+   $hbox->add( ... );
 
-   Tickit->new( root => $vbox )->run;
+   Tickit->new( root => $hbox )->run;
 
 =head1 DESCRIPTION
 
@@ -85,9 +85,9 @@ my %symbolics = (
 
 =head2 new
 
-   $hline = Tickit::Widget::HLine->new( %args )
+   $vline = Tickit::Widget::VLine->new( %args );
 
-Constructs a new C<Tickit::Widget::HLine> object.
+Constructs a new C<Tickit::Widget::VLine> object.
 
 =cut
 

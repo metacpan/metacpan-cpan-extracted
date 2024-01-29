@@ -1,3 +1,6 @@
+1.32
+ - Avoid monitoring PL_markstack_ptr in MPC.xs, Ball.xs and Radius.xs
+
 1.31
  - Add new functions Rmpcr_out_str_win, Rmpc_say_win & Rmpcr_print_win.
  - Add Rmpcb_out_str (mpc-1.3.2 and later only).

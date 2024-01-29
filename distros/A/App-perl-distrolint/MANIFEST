@@ -5,11 +5,13 @@ Changes
 lib/App/perl/distrolint.pm
 lib/App/perl/distrolint/Check/DeprecatedFeatures.pm
 lib/App/perl/distrolint/Check/Editorconfig.pm
+lib/App/perl/distrolint/Check/FilePaths.pm
 lib/App/perl/distrolint/Check/HardTabs.pm
-lib/App/perl/distrolint/Check/POD.pm
+lib/App/perl/distrolint/Check/NoStrictRefs.pm
+lib/App/perl/distrolint/Check/Pod.pm
 lib/App/perl/distrolint/Check/StrictAndWarnings.pm
+lib/App/perl/distrolint/Check/Test2.pm
 lib/App/perl/distrolint/Check/Unimport.pm
-lib/App/perl/distrolint/Check/UseTest2.pm
 lib/App/perl/distrolint/Check/UseUTF8.pm
 lib/App/perl/distrolint/Check/UseVERSION.pm
 lib/App/perl/distrolint/Check/VersionVar.pm

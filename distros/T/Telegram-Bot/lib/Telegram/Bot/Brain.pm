@@ -1,5 +1,5 @@
 package Telegram::Bot::Brain;
-$Telegram::Bot::Brain::VERSION = '0.024';
+$Telegram::Bot::Brain::VERSION = '0.025';
 # ABSTRACT: A base class to make your very own Telegram bot
 
 
@@ -16,6 +16,7 @@ use Log::Any;
 use Data::Dumper;
 
 use Telegram::Bot::Object::Message;
+use Telegram::Bot::Object::InlineQuery;
 
 # base class for building telegram robots with Mojolicious
 has longpoll_time => 60;
@@ -147,6 +148,24 @@ sub forwardMessage {
 }
 
 
+sub deleteMessage {
+  my $self = shift;
+  my $args = shift || {};
+  my $send_args = {};
+  croak "no chat_id supplied" unless $args->{chat_id};
+  $send_args->{chat_id} = $args->{chat_id};
+ 
+  croak "no message_id supplied" unless $args->{message_id};
+  $send_args->{message_id} = $args->{message_id};
+  
+  my $token = $self->token || croak "no token?";
+  my $url = "https://api.telegram.org/bot${token}/deleteMessage";
+  my $api_response = $self->_post_request($url, $send_args);
+ 
+  return $api_response;
+}
+
+
 sub sendPhoto {
   my $self = shift;
   my $args = shift || {};
@@ -203,6 +222,30 @@ sub sendDocument {
 }
 
 
+sub answerInlineQuery {
+  my $self = shift;
+  my $args = shift || {};
+  my $send_args = {};
+
+  croak "no inline_query_id supplied" unless $args->{inline_query_id};
+  $send_args->{inline_query_id} = $args->{inline_query_id};
+
+  croak "no results supplied" unless $args->{results};
+  $send_args->{results} = $args->{results};
+
+  # these are optional, send if they are supplied
+  $send_args->{cache_time} = $args->{cache_time} if exists $args->{cache_time};
+  $send_args->{is_personal} = $args->{is_personal} if exists $args->{is_personal};
+  $send_args->{next_offset} = $args->{next_offset} if exists $args->{next_offset};
+  $send_args->{button} = $args->{button} if exists $args->{button};
+
+  my $token = $self->token || croak "no token?";
+  my $url = "https://api.telegram.org/bot${token}/answerInlineQuery";
+  my $api_response = $self->_post_request($url, $send_args);
+
+  return $api_response;
+}
+
 sub _add_getUpdates_handler {
   my $self = shift;
 
@@ -250,6 +293,7 @@ sub _process_message {
     $update = Telegram::Bot::Object::Message->create_from_hash($item->{edited_message}, $self)      if $item->{edited_message};
     $update = Telegram::Bot::Object::Message->create_from_hash($item->{channel_post}, $self)        if $item->{channel_post};
     $update = Telegram::Bot::Object::Message->create_from_hash($item->{edited_channel_post}, $self) if $item->{edited_channel_post};
+    $update = Telegram::Bot::Object::InlineQuery->create_from_hash($item->{inline_query}, $self)    if $item->{inline_query};
 
     # if we got to this point without creating a response, it must be a type we
     # don't handle yet
@@ -291,7 +335,7 @@ Telegram::Bot::Brain - A base class to make your very own Telegram bot
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -383,6 +427,26 @@ See L<https://core.telegram.org/bots/api#forwardmessage>.
 
 Returns a L<Telegram::Bot::Object::Message> object.
 
+=head2 deleteMessage
+
+See L<https://core.telegram.org/bots/api#deletemessage>.
+
+Takes a hash C<$ags> that contains exactly two keys:
+
+=over
+
+=item C<chat_id>
+
+the id of the chat we want to delete the message from
+
+=item C<message_id>
+
+the id of the message we want to delete
+
+=back
+
+Returns true on success.
+
 =head2 sendPhoto
 
 See L<https://core.telegram.org/bots/api#sendphoto>.
@@ -455,6 +519,50 @@ Returns a L<Telegram::Bot::Object::Message> object.
       );
     }
 
+=head2 answerInlineQuery
+
+Use this method to send answers to an inline query. On success, True is returned.
+No more than 50 results per query are allowed.
+
+See L<https://core.telegram.org/bots/api#answerinlinequery>.
+
+Takes an argument hash C<$args> with the following values.
+
+=over
+
+=item C<inline_query_id>
+
+Required. Unique identifier for the answered query. You get that 
+from the incoming L<Telegram::Bot::Object::InlineQuery>.
+
+=item C<results>
+
+Required. A JSON-serialized array of results for the inline query.
+You need to pass in a string of JSON.
+
+See L<https://core.telegram.org/bots/api#inlinequeryresult> for the format
+of the response.
+
+=item C<cache_time>
+
+Optional. The maximum amount of time in seconds that the result of the inline query may be cached on the server. Defaults to 300.
+
+=item C<is_personal>
+
+Optional. Pass True if results may be cached on the server side only for the user that sent the query. By default, results may be returned to any user who sends the same query.
+
+=item C<next_offset>
+
+Optional. Pass the offset that a client should send in the next query with the same text to receive more results. Pass an empty string if there are no more results or if you don't support pagination. Offset length can't exceed 64 bytes.
+
+=item C<button>
+
+Optional. A JSON-serialized object describing a button to be shown above inline query results.
+
+=back
+
+See L<Telegram::Bot::Object::InlineQuery/reply> for a more convenient way to use this.
+
 =head1 AUTHORS
 
 =over 4
@@ -466,6 +574,10 @@ Justin Hawkins <justin@eatmorecode.com>
 =item *
 
 James Green <jkg@earth.li>
+
+=item *
+
+Julien Fiegehenn <simbabque@cpan.org>
 
 =back
 

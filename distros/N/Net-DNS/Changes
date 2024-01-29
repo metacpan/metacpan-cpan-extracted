@@ -1,4 +1,31 @@
-$Id: Changes 1952 2023-11-27 13:22:08Z willem $                       -*-text-*-
+$Id: Changes 1964 2024-01-26 14:49:12Z willem $                       -*-text-*-
+
+
+**** 1.43 Jan 26, 2024
+
+	Update b.root-servers.net addresses in resolver hints.
+	Improve accuracy and completeness of dependency metadata.
+	Nameserver: hangs on persistent TCP connection (Windows).
+	IPSECKEY: leave gateway undefined for gatetype 0.
+	Remove remaining support for GOST.
+
+Fix rt.cpan.org #151240
+	Nameserver.pm: DoS vulnerability in TCP handling
+
+Fix rt.cpan.org #151232
+	Net::DNS::Resolver::new hangs for 150s on Win32 with no active DNS
+
+Fix rt.cpan.org #151075
+	Bug in Net::DNS::Resolver::Recurse::_referral
+
+Fix rt.cpan.org #151074
+	Deep recursion in Net::DNS::Resolver::Recurse
+
+
+**** 1.42 Dec 24, 2023
+
+Fix rt.cpan.org #150695
+	Hang in Net::DNS::Nameserver on Windows
 
 
 **** 1.41 Nov 28, 2023
@@ -16,7 +43,7 @@ Fix rt.cpan.org #150550
 	Add support for SVCB dohpath and ohttp parameters.
 	More robust test of bgbusy() SpamAssassin workaround.
 
-Fix rt.cpan.org #149456 
+Fix rt.cpan.org #149456
 	t/05-SOA.t test fails in 2038
 
 Fix rt.cpan.org #149280

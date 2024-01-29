@@ -2,11 +2,11 @@
 
 =encoding utf8
 
-=for HTML <a href="../../actions?query=workflow%3Amacos"><img src="../../workflows/macos/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/scriptdist/actions?query=workflow%3Amacos"><img src="https://www.github.com/briandfoy/scriptdist/workflows/macos/badge.svg"></a>
 
-=for HTML <a href="../../actions?query=workflow%3Aubuntu"><img src="../../workflows/ubuntu/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/scriptdist/actions?query=workflow%3Aubuntu"><img src="https://www.github.com/briandfoy/scriptdist/workflows/ubuntu/badge.svg"></a>
 
-=for HTML <a href="../../actions?query=workflow%3Awindows"><img src="../../workflows/windows/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/scriptdist/actions?query=workflow%3Awindows"><img src="https://www.github.com/briandfoy/scriptdist/workflows/windows/badge.svg"></a>
 
 =for HTML <a href="https://ci.appveyor.com/project/briandfoy/scriptdist"><img src="https://ci.appveyor.com/api/projects/status/ecrprlft60phjowx?svg=true"></a>
 
@@ -16,7 +16,7 @@
 
 =for HTML <a href="https://metacpan.org/pod/App::scriptdist"><img src="https://img.shields.io/cpan/v/App-scriptdist.svg" /></A>
 
-.=head1 The App::scriptdist module
+=head1 The App::scriptdist module
 
 This is the I<README> for the L<App::scriptdist> Perl module. You're probably
 looking at this because you don't know where else to find what you're
@@ -115,6 +115,6 @@ you wrote code that you didn't.
 
 Enjoy,
 
-brian d foy, bdfoy@cpan.org
+brian d foy, briandfoy@pobox.com
 
 =cut

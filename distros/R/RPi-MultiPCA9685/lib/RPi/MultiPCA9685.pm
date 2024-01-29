@@ -1,6 +1,6 @@
 package RPi::MultiPCA9685;
 use 5.006;
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 our @ISA = qw();
 use strict;
 use warnings;
@@ -18,14 +18,14 @@ sub init_PWM {
   my $i2c_address=shift;
   my $i2c_freq=shift;
   my $num_servos=shift;
-  my $presc=int(25000000/(4096/$i2c_freq));# calc the prescaler value for register FEh(254)
+  my $presc=int(25000000/(4096*$i2c_freq));# calc the prescaler value for register FEh(254)
   my $num_PWMPCBs=ceil($num_servos/16);
   my $j;
   @dev=();
   for ($j=0;$j<=$num_PWMPCBs;$j++){	   # init all PWM PCBs - every 16 ports switch to the next i2c address
     $dev[$j] = RPi::I2C->new($i2c_address+$j,$i2cport);
-    $dev[$j]->write(16,0);                 # allow to program the prescale register (only possible when PWM is inactive)
-    $dev[$j]->write($presc,254);           # set the calculated prescaler value to achieve the desired frequency
+    $dev[$j]->write_byte(16,0);            # allow to program the prescale register (only possible when PWM is inactive)
+    $dev[$j]->write_byte($presc,254);      # set the calculated prescaler value to achieve the desired frequency
     $dev[$j]->write_block([32,14],0);      # init the pca9685 chip to output the PWM 
   }  
   return 1;

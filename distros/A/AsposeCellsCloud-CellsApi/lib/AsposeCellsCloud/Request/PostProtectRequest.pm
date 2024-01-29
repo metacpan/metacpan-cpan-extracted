@@ -59,9 +59,9 @@ sub new {
 
 
 # Run Operation Request
-# PostProtectRequest.File : File to upload  ,
+# PostProtectRequest.File : The password needed to open an Excel file.  ,
 # PostProtectRequest.protectWorkbookRequest :   ,
-# PostProtectRequest.password :    
+# PostProtectRequest.password : The password needed to open an Excel file.   
 
 {
     my $params = {
@@ -72,7 +72,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_protect' } = { 
-    	summary => 'Protect MS Excel and OpenDocument Spreadsheet by making them password protected.',
+    	summary => 'Excel files encryption.',
         params => $params,
         returns => 'FilesResult',
     };
@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'File to upload',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
@@ -143,7 +143,7 @@ __PACKAGE__->method_documentation({
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},    

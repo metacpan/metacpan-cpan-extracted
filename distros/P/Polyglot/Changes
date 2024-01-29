@@ -1,5 +1,8 @@
 Revision history for Perl module Polyglot
 
+1.005 2024-01-19T17:53:36Z
+	* distro refresh, update email address
+
 1.004 2021-02-06T01:15:11Z
 	* Freshen distro, remove Travis, add Github Actions
 

@@ -2,12 +2,11 @@
 # MIT License
 
 class File::Path {
-  version "0.011";
+  version "0.011001";
   
   use Hash;
   use StringBuffer;
   use StringList;
-  use Sys::FileTest;
   use Sys::IO;
   use Cwd;
   use File::Basename;
@@ -37,11 +36,11 @@ class File::Path {
   }
   
   private static method _mkpath_recursive : void ($path : string, $created_ref : int*, $mode : int) {
-    unless (Sys::FileTest->d($path)) {
+    unless (Sys->d($path)) {
       
       my $parent = File::Basename->dirname($path);
       
-      unless (Sys::FileTest->d($parent) || $path eq $parent ) {
+      unless (Sys->d($parent) || $path eq $parent ) {
         &_mkpath_recursive($parent, $created_ref, $mode);
       }
       
@@ -74,7 +73,7 @@ class File::Path {
     my $curdir = File::Spec->curdir;
     my $updir  = File::Spec->updir;
     
-    if (Sys::FileTest->d($path)) {
+    if (Sys->d($path)) {
       my $dh = Sys::IO->opendir($path);
       my $file_base_names_list = StringList->new;
       

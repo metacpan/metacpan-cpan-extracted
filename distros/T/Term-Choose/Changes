@@ -1,5 +1,10 @@
 Revision history for Term::Choose
 
+
+1.763   2024-01-18
+    - Unicode 15.1.
+    - Zero width for Hangul Jamo Extended-B.
+
 1.762   2023-05-16
     - line_fold: update option color.
 

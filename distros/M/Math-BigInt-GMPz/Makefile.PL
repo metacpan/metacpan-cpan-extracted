@@ -27,7 +27,7 @@ WriteMakefile
    # A hash of modules that are needed to run the module.
 
    'PREREQ_PM'          => {
-                            'Math::BigInt'        => 1.999840,
+                            'Math::BigInt'        => 2.003001,
                             'Math::GMPz'          => 0.36,
                            },
 

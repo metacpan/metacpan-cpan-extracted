@@ -1,0 +1,7 @@
+Revision history for Perl extension Date::Holidays::NYSE.
+
+0.02 2023-12-28
+  - Fixed function exports to use correct naming convention
+
+0.01 2023-12-27
+  - original version; forked from Date::Holidays::US

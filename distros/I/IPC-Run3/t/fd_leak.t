@@ -1,9 +1,10 @@
-#!perl -w
+#!perl
+use strict;
+use warnings;
 
 use Test::More;
 
 use IPC::Run3;
-use strict;
 
 my ( $in, $out, $err ) = @_;
 
@@ -13,20 +14,17 @@ sub leaky
 
     my $before_fd = IPC::Run3::_max_fd();
     my $desc = join ",", map {
-	defined $_
-	    ? ref $_
-		? ( $_ == \undef )
-		    ? "\\undef"
-		    : ref $_
-		: "'$_'"
-	    : 'undef';
+      defined $_ ? ref $_ ? ( $_ == \undef ) ? "\\undef"
+                                             : ref $_
+                          : "'$_'"
+                 : 'undef';
     } @$what;
 
     run3 [$^X, '-e1' ], @$what;
 
     my $after_fd = IPC::Run3::_max_fd();
 
-    # on a sane system we'd expect == below, 
+    # on a sane system we'd expect == below,
     # but apparently Darwin 7.2 is stranger than fiction
     ok($after_fd <= $before_fd, "run3 [...],$desc");
 }

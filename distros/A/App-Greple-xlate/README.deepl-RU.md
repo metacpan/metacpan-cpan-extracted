@@ -10,17 +10,17 @@ App::Greple::xlate - модуль поддержки перевода для gre
 
 # VERSION
 
-Version 0.28
+Version 0.29
 
 # DESCRIPTION
 
-Модуль **Greple** **xlate** находит текстовые блоки и заменяет их переведенным текстом. В настоящее время в качестве back-end движка реализованы модули DeepL (`deepl.pm`) и ChatGPT (`gpt3.pm`).
+Модуль **Greple** **xlate** находит нужные текстовые блоки и заменяет их переведенным текстом. В настоящее время в качестве back-end движка реализованы модули DeepL (`deepl.pm`) и ChatGPT (`gpt3.pm`).
 
-Если вы хотите перевести обычные текстовые блоки, написанные в стиле [pod](https://metacpan.org/pod/pod), используйте команду **greple** с модулем `xlate::deepl` и `perl` следующим образом:
+Если вы хотите перевести обычные текстовые блоки в документе, написанном в стиле Perl's pod, используйте команду **greple** с модулем `xlate::deepl` и `perl` следующим образом:
 
     greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
 
-Шаблон `^(\w.*\n)+` означает последовательные строки, начинающиеся с буквенно-цифровой буквы. Эта команда показывает область, которая должна быть переведена. Опция **--all** используется для создания всего текста.
+В этой команде шаблонная строка `^(\w.*\n)+` означает последовательные строки, начинающиеся с буквенно-цифрового символа. В этой команде выделяется область, подлежащая переводу. Опция **--all** используется для создания всего текста.
 
 <div>
     <p>
@@ -28,7 +28,7 @@ Version 0.28
     </p>
 </div>
 
-Затем добавьте опцию `--xlate` для перевода выделенной области. Она найдет и заменит их на вывод команды **deepl**.
+Затем добавьте опцию `--xlate` для перевода выделенной области. После этого программа найдет нужные участки и заменит их выводом команды **--deepl**.
 
 По умолчанию оригинальный и транслированный текст печатается в формате "маркер конфликта", совместимом с [git(1)](http://man.he.net/man1/git). Используя формат `ifdef`, можно легко получить нужную часть командой [unifdef(1)](http://man.he.net/man1/unifdef). Выходной формат может быть задан опцией **--xlate-format**.
 
@@ -76,7 +76,7 @@ Version 0.28
 
     - **conflict**, **cm**
 
-        Выведите оригинальный и переведенный текст в формате маркера конфликта [git(1)](http://man.he.net/man1/git).
+        Оригинальный и преобразованный текст печатаются в формате [git(1)](http://man.he.net/man1/git) маркеров конфликтов.
 
             <<<<<<< ORIGINAL
             original text
@@ -90,7 +90,7 @@ Version 0.28
 
     - **ifdef**
 
-        Печать оригинального и переведенного текста в формате [cpp(1)](http://man.he.net/man1/cpp) `#ifdef`.
+        Оригинальный и преобразованный текст печатаются в формате [cpp(1)](http://man.he.net/man1/cpp) `#ifdef`.
 
             #ifdef ORIGINAL
             original text
@@ -105,7 +105,7 @@ Version 0.28
 
     - **space**
 
-        Вывести оригинальный и переведенный текст, разделенные одной пустой строкой.
+        Оригинальный и преобразованный текст печатаются разделенными одной пустой строкой.
 
     - **xtxt**
 
@@ -196,6 +196,8 @@ Version 0.28
 
 [App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
 
+[https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
     DeepL Библиотека Python и команда CLI.
@@ -220,13 +222,27 @@ Version 0.28
 
     Используйте **sdif**, чтобы показать формат маркера конфликта бок о бок с опцией **-V**.
 
+## ARTICLES
+
+- [https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250](https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250)
+
+    Модуль Greple для перевода и замены только необходимых частей с помощью DeepL API (на японском языке)
+
+- [https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6](https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6)
+
+    Генерация документов на 15 языках с помощью модуля DeepL API (на японском языке)
+
+- [https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd](https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd)
+
+    Автоматический перевод Docker-окружения с помощью DeepL API (на японском языке)
+
 # AUTHOR
 
 Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023 Kazumasa Utashiro.
+Copyright © 2023-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

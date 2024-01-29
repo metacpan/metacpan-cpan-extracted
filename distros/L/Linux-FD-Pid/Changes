@@ -1,5 +1,9 @@
 Revision history for Linux-FD-Pid
 
+0.007     2024-01-27 16:48:47+01:00 Europe/Brussels
+          * Make sure Linux::FD::Pid isa IO::Handle
+          * Make wait return value a proper wait status
+
 0.006     2023-01-03 00:45:16+01:00 Europe/Amsterdam
           * Eliminate dependency on glibc 2.36+
 

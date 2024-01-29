@@ -1,18 +1,18 @@
 package Color::RGB::Util;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-06'; # DATE
-our $DIST = 'Color-RGB-Util'; # DIST
-our $VERSION = '0.606'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 #use List::Util qw(min);
 
-require Exporter;
-our @ISA = qw(Exporter);
+use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-12-12'; # DATE
+our $DIST = 'Color-RGB-Util'; # DIST
+our $VERSION = '0.607'; # VERSION
+
 our @EXPORT_OK = qw(
                        assign_rgb_color
                        assign_rgb_dark_color
@@ -38,6 +38,7 @@ our @EXPORT_OK = qw(
                        rgb_is_light
                        rgb_luminance
                        tint_rgb_color
+                       rgb_closest_to
                );
 
 my $re_rgb = qr/\A#?([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})\z/;
@@ -519,6 +520,37 @@ sub hsv2rgb {
     return sprintf("%02x%02x%02x", $r*255, $g*255, $b*255);
 }
 
+my $basic_colors = {
+    black   => "000000",
+    blue    => "0000ff",
+    brown   => "663333",
+    cyan    => "00ffff", # a.k.a. aqua
+    green   => "00ff00",
+    grey    => "808080",
+    magenta => "ff00ff", # a.k.a. fuchsia
+    orange  => "ff8000",
+    pink    => "ffcccc",
+    purple  => "800080", # a.k.a. violet
+    red     => "ff0000",
+    white   => "ffffff",
+    yellow  => "ffff00",
+};
+sub rgb_closest_to {
+    my $opts = ref($_[0]) eq 'HASH' ? shift : {};
+    my $colors = $opts->{colors} // $basic_colors;
+    my $rgb = shift;
+
+    my $min_diff; my $closest_color;
+    for my $colorname (sort keys %$colors) {
+        my $diff = rgb_diff($rgb, $colors->{$colorname}, 'hsv_hue1');
+        if (!defined($min_diff) || $min_diff > $diff) {
+            $closest_color = $colorname;
+            $min_diff = $diff;
+        }
+    }
+    $closest_color;
+}
+
 1;
 # ABSTRACT: Utilities related to RGB colors
 
@@ -534,7 +566,7 @@ Color::RGB::Util - Utilities related to RGB colors
 
 =head1 VERSION
 
-This document describes version 0.606 of Color::RGB::Util (from Perl distribution Color-RGB-Util), released on 2021-08-06.
+This document describes version 0.607 of Color::RGB::Util (from Perl distribution Color-RGB-Util), released on 2023-12-12.
 
 =head1 SYNOPSIS
 
@@ -551,6 +583,7 @@ This document describes version 0.606 of Color::RGB::Util (from Perl distributio
      rgb2grayscale
      rgb2int
      rgb2sepia
+     rgb_closest_to
      rgb_diff
      rgb_distance
      rgb_is_dark
@@ -587,6 +620,8 @@ This document describes version 0.606 of Color::RGB::Util (from Perl distributio
  say rgb2int("ffffff");                          # 16777215 (which is 0xffffff)
 
  say rgb2sepia('0033CC');                        # => 4d4535
+
+ say rgb_closest_to('cc211e');                   # => "red"
 
  say rgb_distance('000000', '000000')            # => 0
  say rgb_distance('01f000', '04f400')            # => 5
@@ -851,6 +886,38 @@ Convert C<$rgb> to sepia tone RGB value.
 
 See also L<rgb2grayscale>.
 
+=head2 rgb_closest_to
+
+Usage:
+
+ my $colorname = rgb_closest_to( [ \%opts , ] $color);
+
+Return the primary color C<$color> is closest to. Options:
+
+=over
+
+=item * colors
+
+A hash of color names and RGB values. If unspecified, the default is:
+
+ {
+  black   => "000000",
+  blue    => "0000ff",
+  brown   => "663333",
+  cyan    => "00ffff", # a.k.a. aqua
+  green   => "00ff00",
+  grey    => "808080",
+  magenta => "ff00ff", # a.k.a. fuchsia
+  orange  => "ff8000",
+  pink    => "ffcccc",
+  purple  => "800080", # a.k.a. violet
+  red     => "ff0000",
+  white   => "ffffff",
+  yellow  => "ffff00",
+ }
+
+=back
+
 =head2 rgb_diff
 
 Usage:
@@ -978,15 +1045,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Color-RGB-
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-SHARYANTO-Color-Util>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Color-RGB-Util>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Source repository is at L<https://github.com/perlancar/perl-Color-RGB-Util>.
 
 =head1 SEE ALSO
 
@@ -996,27 +1055,43 @@ L<Color::ANSI::Util>
 
 perlancar <perlancar@cpan.org>
 
-=head1 CONTRIBUTORS
+=head1 CONTRIBUTOR
 
-=for stopwords ryosh2 (on pc-office) Steven Haryanto
+=for stopwords Steven Haryanto
 
-=over 4
+Steven Haryanto <stevenharyanto@gmail.com>
 
-=item *
+=head1 CONTRIBUTING
 
-ryosh2 (on pc-office) <ryosharyanto@gmail.com>
 
-=item *
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
 
-Steven Haryanto <sharyanto@cpan.org>
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
 
-=back
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2021, 2020, 2019, 2018, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Color-RGB-Util>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

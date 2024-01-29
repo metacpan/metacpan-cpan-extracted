@@ -32,9 +32,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Export::These" : "0",
+            "Export::These" : "v0.2.1",
             "constant::more" : "v0.3.0",
-            "perl" : "5.036000"
+            "perl" : "5.024000"
          }
       },
       "test" : {
@@ -48,9 +48,9 @@
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/drclaw1394/perl-socket-more-constants.git",
-         "web" : "http://github.com/drclaw1394/perl-socket-more-constants"
+         "web" : "https://github.com/drclaw1394/perl-socket-more-constants"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.1",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

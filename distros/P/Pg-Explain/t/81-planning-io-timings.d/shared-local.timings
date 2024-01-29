@@ -1,3 +1,4 @@
 {
-    'read' => '0.645'
+    'read' => '0.645',
+    'info' => 'I/O Timings: shared/local read=0.645'
 }

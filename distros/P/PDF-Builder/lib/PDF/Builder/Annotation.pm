@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use List::Util qw(min max);
@@ -41,13 +41,17 @@ available icon set may be larger or smaller than given here, and some Readers
 activate an annotation on a single mouse click, while others require a double
 click. Not all features provided here may be available on all PDF Readers.
 
-=over
+=head2 new
 
-=item $annotation = PDF::Builder::Annotation->new()
+    $annotation = PDF::Builder::Annotation->new()
+
+=over
 
 Returns an annotation object (called from $page->annotation()).
 
 It is normally I<not> necessary to explicitly call this method (see examples).
+
+=back
 
 =cut
 
@@ -77,13 +81,13 @@ sub new {
 # note that %opts is given as the only format in most cases, as rect
 # is a mandatory "option"
 
-=back
-
 =head2 Annotation types
 
-=over
+=head3 link
 
-=item $annotation->link($page, %opts)
+    $annotation->link($page, %opts)
+
+=over
 
 Defines the annotation as a launch-page with page C<$page> (within I<this>
 document) and opts %opts (rect, border, color, I<fit>: see 
@@ -92,6 +96,8 @@ descriptions below).
 B<Note> that C<$page> is I<not> a simple page number, but is a page structure
 such as C<$pdf-E<gt>openpage(page_number)>, I<or> a Named Destination defined
 elsewhere. 
+
+=back
 
 =cut
 
@@ -123,7 +129,11 @@ sub link {
     return $self;
 }
 
-=item $annotation->pdf($pdffile, $page_number, %opts)
+=head3 pdf, pdfile, pdf_file
+
+    $annotation->pdf($pdffile, $page_number, %opts)
+
+=over
 
 Defines the annotation as a PDF-file with filepath C<$pdffile>, on page 
 C<$page_number>, and opts %opts (rect, border, color, I<fit>: see 
@@ -137,6 +147,8 @@ B<Alternate names:> C<pdfile> and C<pdf_file>
 Originally this method was named C<pdfile>, and then C<pdf_file> but a recent 
 PDF::API2 change made it C<pdf>. For compatibility, it has been changed to 
 C<pdf>, with C<pdfile> and C<pdf_file> still available as aliases.
+
+=back
 
 =cut
 
@@ -165,7 +177,11 @@ sub pdf {
     return $self;
 }
 
-=item $annotation->launch($file, %opts)
+=head3 launch, file
+
+    $annotation->launch($file, %opts)
+
+=over
 
 Defines the annotation as a launch-file with filepath C<$file> (a local file)
 and options %opts (rect, border, color: see descriptions below). 
@@ -177,6 +193,8 @@ B<Alternate name:> C<file>
 Originally this method was named C<file>, but a recent PDF::API2 change made it
 C<launch>. For compatibility, it has been changed to C<launch>, with C<file> 
 still available as an alias.
+
+=back
 
 =cut
 
@@ -201,7 +219,11 @@ sub launch {
     return $self;
 }
 
-=item $annotation->uri($url, %opts)
+=head3 uri, url
+
+    $annotation->uri($url, %opts)
+
+=over
 
 Defines the annotation as a launch-url with url C<$url> and
 options %opts (rect, border, color: see descriptions below). 
@@ -212,6 +234,8 @@ B<Alternate name:> C<url>
 Originally this method was named C<url>, but a recent PDF::API2 change made it
 C<uri>. For compatibility, it has been changed to C<uri>, with C<url> still
 available as an alias.
+
+=back
 
 =cut
 
@@ -236,7 +260,11 @@ sub uri {
     return $self;
 }
 
-=item $annotation->text($text, %opts)
+=head3 text
+
+    $annotation->text($text, %opts)
+
+=over
 
 Defines the annotation as a text note with content string C<$text> and
 options %opts (rect, color, text, open: see descriptions below). 
@@ -251,6 +279,8 @@ and its active clickable area is fixed by the icon (it is I<not> equal to the
 rectangle). The icon size is fixed, and its fill color set by C<color>.
 
 Additional options:
+
+=back
 
 =over
 
@@ -317,7 +347,11 @@ sub text {
     return $self;
 }
 
-=item $annotation->markup($text, $PointList, $highlight, %opts)
+=head3 markup
+
+    $annotation->markup($text, $PointList, $highlight, %opts)
+
+=over
 
 Defines the annotation as a text note with content string C<$text> and
 options %opts (color, text, open, opacity: see descriptions below). 
@@ -327,6 +361,8 @@ C<text> is the popup's label string, not to be confused with the main C<$text>.
 
 There is no icon. Instead, the annotated text marked by C<$PointList> is
 highlighted in one of four ways specified by C<$highlight>. 
+
+=back
 
 =over
 
@@ -428,7 +464,11 @@ sub markup {
     return $self;
 }
 
-=item $annotation->movie($file, $contentType, %opts)
+=head3 movie
+
+    $annotation->movie($file, $contentType, %opts)
+
+=over
 
 Defines the annotation as a movie from C<$file> with 
 content (MIME) type C<$contentType> and
@@ -439,6 +479,8 @@ should be of usable size and aspect ratio. It does not use a separate popup
 player. It is known to play .avi and .wav files -- others have not been tested.
 Using Adobe Reader, it will not play .mpg files (unsupported type). More work
 is probably needed on this annotation method.
+
+=back
 
 =cut
 
@@ -475,7 +517,11 @@ sub movie {
     return $self;
 }
 
-=item $annotation->file_attachment($file, %opts)
+=head3 file_attachment
+
+    $annotation->file_attachment($file, %opts)
+
+=over
 
 Defines the annotation as a file attachment with file $file and options %opts
 (rect, color: see descriptions below). Note that C<color> applies to
@@ -501,6 +547,8 @@ the displayed name to exactly match the path that was passed to the call,
 including the path, give the C<notrimpath> option.
 
 Options: 
+
+=back
 
 =over 
 
@@ -639,13 +687,13 @@ sub file_attachment {
 
 # =============== end of annotation types ========================
 
-=back
-
 =head2 Internal routines and common options
 
-=over
+=head3 rect
 
-=item $annotation->rect($llx,$lly, $urx,$ury)
+    $annotation->rect($llx,$lly, $urx,$ury)
+
+=over
 
 Sets the rectangle (active click area) of the annotation, given by 'rect' 
 option. This is any pair of diagonally opposite corners of the rectangle.
@@ -653,6 +701,8 @@ option. This is any pair of diagonally opposite corners of the rectangle.
 The default clickable area is the icon itself.
 
 Defining option. I<Note that this "option" is actually B<required>.>
+
+=back
 
 =over
 
@@ -673,7 +723,11 @@ sub rect {
     return $self;
 }
 
-=item $annotation->border(@b)
+=head3 border
+
+    $annotation->border(@b)
+
+=over
 
 Sets the border-style of the annotation, if applicable, as given by the
 border option. There are three entries in the array:
@@ -691,6 +745,8 @@ with PDF::API2's longstanding practice, PDF::Builder defaults to no visible
 border C<[0 0 0]> (solid line of width 0, and thus invisible).
 
 Defining option:
+
+=back
 
 =over
 
@@ -731,10 +787,16 @@ sub border {
     return $self;
 }
 
-=item $annotation->content(@lines)
+=head3 content
+
+    $annotation->content(@lines)
+
+=over
 
 Sets the text-content of the C<text()> annotation.
 This is a text string or array of strings.
+
+=back
 
 =cut
 
@@ -753,7 +815,11 @@ sub name {
     return $self;
 }
 
-=item $annotation->open($bool)
+=head3 open
+
+    $annotation->open($bool)
+
+=over
 
 Display the C<text()> annotation either open or closed, if applicable.
 
@@ -761,6 +827,8 @@ Both are editable; the "open" form brings up the page with the entry area
 already open for editing, while "closed" has to be clicked on to edit it.
 
 Defining option:
+
+=back
 
 =over
 
@@ -779,7 +847,11 @@ sub open {  ## no critic
     return $self;
 }
 
-=item $annotation->dest($page, I<fit_setting>)
+=head3 dest
+
+    $annotation->dest($page, I<fit_setting>)
+
+=over
 
 For certain annotation types (C<link> or C<pdf_file>), the I<fit_setting> 
 specifies how the content of the page C<$page> is to be fit to the window,
@@ -789,10 +861,16 @@ These fit settings are listed in L<PDF::Builder::Docs/Page Fit Options>.
 "xyz" is the B<default> fit setting, with position (left and top) and zoom
 the same as the calling page's ([undef, undef, undef]).
 
-=item $annotation->dest($name)
+=back
+
+    $annotation->dest($name)
+
+=over
 
 Connect the Annotation to a "Named Destination" defined elsewhere, including
 the optional desired I<fit> (default: xyz undef*3).
+
+=back
 
 =cut
 
@@ -842,7 +920,11 @@ sub dest {
     return $self;
 }
 
-=item $annotation->Color(@color)
+=head3 Color
+
+    $annotation->Color(@color)
+
+=over
 
 Set the icon's fill color. The color is an array of 1, 3, or 4 numbers, each
 in the range 0.0 to 1.0. If 1 number is given, it is the grayscale value (0 = 
@@ -859,7 +941,9 @@ is black.
 
 Defining option:
 
-Named colors are not supported at this time.
+Named colors (e.g., 'black') are not supported at this time.
+
+=back
 
 =over
 
@@ -912,10 +996,16 @@ sub Color {
     return $self;
 }
 
-=item text => string
+=head3 text string
+
+    text => string
+
+=over
 
 Specify an optional B<text label> for annotation. This text or comment only
 shows up I<as a title> in the pop-up containing the file or text.
+
+=back
 
 =cut
 
@@ -1038,9 +1128,5 @@ sub icon_appearance {
 
     return $self;
 }
-
-=back
-
-=cut
 
 1;

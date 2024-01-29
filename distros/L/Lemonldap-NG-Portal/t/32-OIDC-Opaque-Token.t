@@ -1,5 +1,4 @@
 use warnings;
-use lib 'inc';
 use Test::More;
 use strict;
 use IO::String;
@@ -51,6 +50,7 @@ my $op = LLNG::Manager::Test->new(
                     oidcRPMetaDataOptionsBypassConsent         => 1,
                     oidcRPMetaDataOptionsRefreshToken          => 1,
                     oidcRPMetaDataOptionsAllowOffline          => 1,
+                    oidcRPMetaDataOptionsRedirectUris => 'http://rp2.com/',
                 },
                 oauth => {
                     oidcRPMetaDataOptionsDisplayName  => "oauth",

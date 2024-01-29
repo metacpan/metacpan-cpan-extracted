@@ -1,35 +1,38 @@
 Revision history for App-RunStopRun
 
-0.08  Sun Nov 26 20:38:16 UTC 2023
+0.09  2024-01-06
+    - Prevent a run-time error when -c was used.
+
+0.08  2023-11-26
     - Re-enable signal tests; skip child test if parent didn't reap it.
     - Add verbose message upon receipt of SIGCHLD.
 
-0.07_01  Sun Nov 26 16:08:13 UTC 2023
+0.07_01  2023-11-26
     - Re-throw handled signal in controller.
     - Disable failing signal tests; print diagnostics.
 
-0.07  Thu Nov 23 22:42:42 UTC 2023
+0.07  2023-11-23
     - Skip signal test if system has issues with it.
     - Fix operator precedence in call to exit. (RT #150537)
 
-0.06  Wed Nov 15 09:28:22 UTC 2023
+0.06  2023-11-15
     - Fix the INT and TERM signal handlers to exit with the correct status.
 
-0.05  Fri Dec 16 04:20:09 UTC 2022
+0.05  2022-12-16
     - Convert the limit to a percentage if given as a decimal fraction.
 
-0.04  Mon May  2 15:15:35 UTC 2022
+0.04  2022-05-02
     - Add an option to disable creating a new process group or determining
       associated PGIDs.
 
-0.03  Sat Apr 30 23:05:19 UTC 2022
+0.03  2022-04-30
     - Update prereqs; List::Util 1.45 needed for uniq().
 
-0.02  Sat Apr 30 17:59:26 UTC 2022
+0.02  2022-04-30
     - Add separate tty options, a la SSH.
     - Test if SIGINFO exists before localizing it.
     - Set a default value for exit status.
     - Don't operate on groups unless option is set.
 
-0.01  Thu Apr 28 22:57:54 UTC 2022
+0.01  2022-04-28
     - Initial distribution.

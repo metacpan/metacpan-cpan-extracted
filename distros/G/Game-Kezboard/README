@@ -1,0 +1,33 @@
+Game::Kezboard - a SDL game where cards are used to move around a board
+
+This module can be installed using cpanm,
+
+  cpanm Game::Kezboard
+
+though on some systems it may be better to first install SDL via the
+ports or package system, e.g. on OpenBSD 7.4:
+
+  doas pkg_add p5-SDL
+  # ... setup local::lib and App::cpanminus here ...
+  cpanm Game::Kezboard
+
+
+Run perldoc(1) on Game::Kezboard for documentation, or run "kezboard" in
+a terminal to start the game. It's a SDL game, so it may help to have
+something like X11 available.
+
+
+To author a new release:
+
+  perl Makefile.PL
+  make && make test && make dist
+  cpanm Game-Kezboard-*.tar.gz
+  kezboard                            # does it actually start?
+  git tag v...
+  cpan-upload ...
+  git push ...
+  make realclean
+
+kezboard can be run in-place via something like:
+
+  perl kezboard --prefix=data --level=6

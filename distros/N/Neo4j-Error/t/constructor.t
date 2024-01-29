@@ -5,14 +5,16 @@ use lib qw(./lib t/lib);
 
 use Test::More 0.94;
 use Test::Exception;
-use Test::Warnings;
+use Test::Warnings 0.010 qw(:no_end_test);
+my $no_warnings;
+use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
 
 use Neo4j::Error;
 use Neo4j_Test::ErrorNoSource;
 use Devel::StackTrace;
 
-plan tests => 8 + 1;
+plan tests => 8 + $no_warnings;
 
 my ($e, $v);
 
@@ -114,7 +116,8 @@ subtest 'stack trace' => sub {
 	isa_ok $e->trace(), 'Devel::StackTrace', 'trace';
 	ok $v = $e->trace->frame(0), 'trace frame';
 	is $v->line(), __LINE__ - 3, 'trace line';
-	is $v->filename(), __FILE__, 'trace file';
+	my $file = __FILE__; $file =~ tr[\\/][.];
+	like $v->filename(), qr{\b$file\b}, 'trace file';
 	is $v->subroutine(), 'Neo4j::Error::new', 'trace sub';
 	SKIP: { skip 'Devel::StackTrace < 2.03', 1 unless $can_message;
 		is $e->trace->message(), undef, 'trace no message';
@@ -123,7 +126,7 @@ subtest 'stack trace' => sub {
 	$v = { skip_frames => -1 };
 	ok $e = Neo4j::Error->new(Internal => {trace => $v}), 'new config 1';
 	ok $v = $e->trace->frame(0), 'trace up frame';
-	like $v->filename(), qr{\bNeo4j/Error\.pm$}, 'trace up file';
+	like $v->filename(), qr{\bNeo4j.Error\.pm$}, 'trace up file';
 	is $v->subroutine(), 'Devel::StackTrace::new', 'trace up sub';
 	
 	$v = { message => 'foo' };

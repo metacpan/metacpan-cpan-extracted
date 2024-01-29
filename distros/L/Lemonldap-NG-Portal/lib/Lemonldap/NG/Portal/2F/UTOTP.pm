@@ -53,9 +53,8 @@ sub run {
 
     my ( $checkLogins, $stayConnected ) = $self->getFormParams($req);
     my %tplPrms = (
-        TOKEN         => $token,
-        CHECKLOGINS   => $checkLogins,
-        STAYCONNECTED => $stayConnected
+        TOKEN => $token,
+        $self->get2fTplParams($req),
     );
 
     if ( my $res = $self->u2f->loadUser( $req, $req->sessionInfo ) ) {

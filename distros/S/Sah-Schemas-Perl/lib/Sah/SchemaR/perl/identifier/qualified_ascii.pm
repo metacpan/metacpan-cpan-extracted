@@ -4,8 +4,8 @@ package Sah::SchemaR::perl::identifier::qualified_ascii;
 # preamble code
 no warnings 'experimental::regex_sets';
 
-our $DATE = '2023-01-19'; # DATE
-our $VERSION = '0.048'; # VERSION
+our $DATE = '2023-10-26'; # DATE
+our $VERSION = '0.049'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\n",examples=>[{summary=>"Empty",valid=>0,value=>""},{summary=>"Not qualified",valid=>0,value=>"foo"},{valid=>1,value=>"foo::bar"},{summary=>"This schema does not accept the old (soon-to-be-deprecated) namespace separator",valid=>0,value=>"foo'bar"},{valid=>1,value=>"_foo::bar"},{summary=>"Cannot start with a digit",valid=>0,value=>"0foo::bar"},{summary=>"Secondary+ parts are allowed to start with a digit (1)",valid=>1,value=>"foo::0"},{summary=>"Secondary+ parts are allowed to start with a digit (2)",valid=>1,value=>"foo::0bar"},{valid=>1,value=>"foo0::bar"},{summary=>"Invalid character (dash)",valid=>0,value=>"foo::bar-baz"},{summary=>"Sigil not accepted",valid=>0,value=>"\$foo::bar"},{summary=>"Non-latin letter not accepted",valid=>0,value=>"foo::b\xE9b\xE9"}],match=>qr(\A[A-Za-z_][A-Za-z_0-9]*(?:::[A-Za-z_0-9]+)+\z),max_len=>251,summary=>"Qualified identifier in Perl, without \"use utf8\" in effect"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -24,7 +24,7 @@ Sah::SchemaR::perl::identifier::qualified_ascii - Qualified identifier in Perl, 
 
 =head1 VERSION
 
-This document describes version 0.048 of Sah::SchemaR::perl::identifier::qualified_ascii (from Perl distribution Sah-Schemas-Perl), released on 2023-01-19.
+This document describes version 0.049 of Sah::SchemaR::perl::identifier::qualified_ascii (from Perl distribution Sah-Schemas-Perl), released on 2023-10-26.
 
 =head1 DESCRIPTION
 

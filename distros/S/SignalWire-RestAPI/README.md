@@ -1,4 +1,4 @@
-SignalWire-RestAPI version 1.0
+SignalWire-RestAPI version 1.4
 ===========================
 
 SignalWire::RestAPI is a flexible, extensible API for SignalWire written in

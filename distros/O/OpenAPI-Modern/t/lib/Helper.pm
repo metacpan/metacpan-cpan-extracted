@@ -65,7 +65,7 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
   }
 
   if ($TYPE eq 'plack') {
-    test_needs('Plack::Request', 'HTTP::Message::PSGI');
+    test_needs('Plack::Request', 'HTTP::Message::PSGI', { 'HTTP::Headers::Fast' => 0.21 });
     my $uri = $req->uri;
     $req = Plack::Request->new($req->to_psgi);
 
@@ -99,7 +99,7 @@ sub response ($code, $headers = [], $body_content = undef) {
     $res->fix_headers;
   }
   elsif ($TYPE eq 'plack') {
-    test_needs('Plack::Response');
+    test_needs('Plack::Response', 'HTTP::Message::PSGI', { 'HTTP::Headers::Fast' => 0.21 });
     $res = Plack::Response->new($code, $headers, $body_content);
     $res->headers->header('Content-Length' => length($body_content))
       if defined $body_content and not defined $res->headers->header('Content-Length');

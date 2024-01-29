@@ -32,6 +32,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Text::ANSITable" : "0.602"
+         },
          "requires" : {
             "Data::Sah::Compiler::perl::TH::array" : "0.914",
             "Data::Sah::Compiler::perl::TH::bool" : "0.914",
@@ -39,6 +42,7 @@
             "Data::Sah::Compiler::perl::TH::str" : "0.914",
             "Exporter" : "5.57",
             "Log::ger" : "0.038",
+            "Module::Installed::Tiny" : "0.011",
             "Perinci::CmdLine::Any" : "0.154",
             "Perinci::CmdLine::Lite" : "1.924",
             "Perinci::Sub::Gen::AccessTable" : "0.592",
@@ -61,11 +65,11 @@
    "provides" : {
       "App::BPOMUtils::Table::FoodCategory" : {
          "file" : "lib/App/BPOMUtils/Table/FoodCategory.pm",
-         "version" : "0.018"
+         "version" : "0.020"
       },
       "App::BPOMUtils::Table::FoodCategoryRBA" : {
          "file" : "lib/App/BPOMUtils/Table/FoodCategoryRBA.pm",
-         "version" : "0.018"
+         "version" : "0.020"
       }
    },
    "release_status" : "stable",
@@ -80,7 +84,7 @@
          "web" : "https://github.com/perlancar/perl-App-BPOMUtils-Table-FoodCategory"
       }
    },
-   "version" : "0.018",
+   "version" : "0.020",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"
@@ -612,6 +616,17 @@
                }
             },
             "name" : "Prereqs",
+            "version" : "6.030"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "recommends"
+               }
+            },
+            "name" : "RuntimeRecommends",
             "version" : "6.030"
          },
          {

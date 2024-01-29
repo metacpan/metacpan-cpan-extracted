@@ -17,12 +17,12 @@ is ($locale->locale_name('nl_BE'), 'фламандски', 'Name with known regi
 is ($locale->locale_name('fr_BE'), 'френски (Белгия)', 'Name with unknown region');
 is ($locale->locale_name('fr_BE'), 'френски (Белгия)', 'Cached method');
 is ($locale->language_name, 'български', 'Language name');
-is ($locale->language_name('wibble'), 'неопределен', 'Unknown Language name');
+is ($locale->language_name('wibble'), 'непознат език', 'Unknown Language name');
 is ($locale->script_name('Cher'), 'Чероки', 'Script name');
 is ($locale->script_name('wibl'), 'непозната писменост', 'Invalid Script name');
 is ($locale->region_name('GB'), 'Обединеното кралство', 'Region name');
 is ($locale->region_name('wibble'), 'непознат регион', 'Invalid Region name');
-is ($locale->variant_name('AREVMDA'), 'Западно арменски', 'Variant name');
+is ($locale->variant_name('PINYIN'), 'Пинин романизация', 'Variant name');
 throws_ok { $locale->variant_name('WIBBLE') } qr{ \A Invalid \s variant }xms, 'Invalid Variant name';
 is ($locale->language_name('i_klingon'), 'клингонски', 'Language alias');
 is ($locale->region_name('BQ'), 'Карибска Нидерландия', 'Region alias');

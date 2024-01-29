@@ -10,17 +10,17 @@ App::Greple::xlate - ενότητα υποστήριξης μετάφρασης 
 
 # VERSION
 
-Version 0.28
+Version 0.29
 
 # DESCRIPTION
 
-Η ενότητα **Greple** **xlate** βρίσκει μπλοκ κειμένου και τα αντικαθιστά με το μεταφρασμένο κείμενο. Επί του παρόντος, η ενότητα DeepL (`deepl.pm`) και η ενότητα ChatGPT (`gpt3.pm`) υλοποιούνται ως μηχανή back-end.
+Η ενότητα **Greple** **xlate** βρίσκει τα επιθυμητά τμήματα κειμένου και τα αντικαθιστά με το μεταφρασμένο κείμενο. Επί του παρόντος, η ενότητα DeepL (`deepl.pm`) και η ενότητα ChatGPT (`gpt3.pm`) υλοποιούνται ως μηχανή back-end.
 
-Αν θέλετε να μεταφράσετε κανονικά μπλοκ κειμένου γραμμένα στο στυλ [pod](https://metacpan.org/pod/pod), χρησιμοποιήστε την εντολή **greple** με την ενότητα `xlate::deepl` και `perl` ως εξής:
+Αν θέλετε να μεταφράσετε κανονικά μπλοκ κειμένου σε ένα έγγραφο γραμμένο στο στυλ pod της Perl, χρησιμοποιήστε την εντολή **greple** με την ενότητα `xlate::deepl` και `perl` ως εξής:
 
     greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
 
-Το πρότυπο `^(\w.*\n)+` σημαίνει διαδοχικές γραμμές που αρχίζουν με αλφαριθμητικό γράμμα. Αυτή η εντολή δείχνει την περιοχή που πρέπει να μεταφραστεί. Η επιλογή **--all** χρησιμοποιείται για την παραγωγή ολόκληρου του κειμένου.
+Σε αυτή την εντολή, η συμβολοσειρά προτύπων `^(\w.*\n)+` σημαίνει διαδοχικές γραμμές που αρχίζουν με αλφαριθμητικό γράμμα. Αυτή η εντολή εμφανίζει την περιοχή που πρόκειται να μεταφραστεί επισημασμένη. Η επιλογή **--all** χρησιμοποιείται για την παραγωγή ολόκληρου του κειμένου.
 
 <div>
     <p>
@@ -28,7 +28,7 @@ Version 0.28
     </p>
 </div>
 
-Στη συνέχεια, προσθέστε την επιλογή `--xlate` για να μεταφράσετε την επιλεγμένη περιοχή. Θα τα βρει και θα τα αντικαταστήσει με την έξοδο της εντολής **deepl**.
+Στη συνέχεια, προσθέστε την επιλογή `--xlate` για να μεταφράσετε την επιλεγμένη περιοχή. Στη συνέχεια, θα βρει τα επιθυμητά τμήματα και θα τα αντικαταστήσει με την έξοδο της εντολής **deepl**.
 
 Από προεπιλογή, το πρωτότυπο και το μεταφρασμένο κείμενο εκτυπώνονται σε μορφή "conflict marker" συμβατή με το [git(1)](http://man.he.net/man1/git). Χρησιμοποιώντας τη μορφή `ifdef`, μπορείτε να πάρετε εύκολα το επιθυμητό μέρος με την εντολή [unifdef(1)](http://man.he.net/man1/unifdef). Η μορφή εξόδου μπορεί να καθοριστεί με την επιλογή **--xlate-format**.
 
@@ -76,7 +76,7 @@ Version 0.28
 
     - **conflict**, **cm**
 
-        Εκτυπώστε το πρωτότυπο και το μεταφρασμένο κείμενο σε μορφή δείκτη σύγκρουσης [git(1)](http://man.he.net/man1/git).
+        Το αρχικό και το μετατρεπόμενο κείμενο εκτυπώνονται σε μορφή δείκτη σύγκρουσης [git(1)](http://man.he.net/man1/git).
 
             <<<<<<< ORIGINAL
             original text
@@ -90,7 +90,7 @@ Version 0.28
 
     - **ifdef**
 
-        Εκτύπωση πρωτότυπου και μεταφρασμένου κειμένου σε μορφή [cpp(1)](http://man.he.net/man1/cpp) `#ifdef`.
+        Το αρχικό και το μετατρεπόμενο κείμενο εκτυπώνονται σε μορφή [cpp(1)](http://man.he.net/man1/cpp) `#ifdef`.
 
             #ifdef ORIGINAL
             original text
@@ -105,7 +105,7 @@ Version 0.28
 
     - **space**
 
-        Εκτύπωση του πρωτότυπου και του μεταφρασμένου κειμένου χωρισμένα με μία μόνο κενή γραμμή.
+        Το αρχικό και το μετασχηματισμένο κείμενο εκτυπώνονται χωριστά με μία κενή γραμμή.
 
     - **xtxt**
 
@@ -196,6 +196,8 @@ Version 0.28
 
 [App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
 
+[https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
     DeepL βιβλιοθήκη Python και εντολή CLI.
@@ -220,13 +222,27 @@ Version 0.28
 
     Χρησιμοποιήστε την εντολή **sdif** για να εμφανίσετε τη μορφή του δείκτη σύγκρουσης δίπλα-δίπλα με την επιλογή **-V**.
 
+## ARTICLES
+
+- [https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250](https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250)
+
+    Μονάδα Greple για τη μετάφραση και την αντικατάσταση μόνο των απαραίτητων τμημάτων με το DeepL API (στα ιαπωνικά)
+
+- [https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6](https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6)
+
+    Δημιουργία εγγράφων σε 15 γλώσσες με την ενότητα DeepL API (στα ιαπωνικά)
+
+- [https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd](https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd)
+
+    Αυτόματη μετάφραση περιβάλλοντος Docker με DeepL API (στα ιαπωνικά)
+
 # AUTHOR
 
 Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023 Kazumasa Utashiro.
+Copyright © 2023-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -4,7 +4,7 @@
 # well-defined interfaces
 
 package Audio::Nama::Util;
-use Modern::Perl; 
+use Modern::Perl '2020'; 
 use Carp;
 use Data::Dumper::Concise;
 use Audio::Nama::Assign qw(json_out);

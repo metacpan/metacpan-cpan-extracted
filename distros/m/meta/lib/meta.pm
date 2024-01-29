@@ -1,23 +1,39 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
-package meta 0.001;
+package meta 0.004;
 
 use v5.14;
 use warnings;
 
+require XSLoader;
+XSLoader::load( __PACKAGE__, our $VERSION );
+
+# Hackery to make warnings::warnif callable from XS, on perls too old to have
+# warnif_at_level
+$^V ge v5.28 or
+   *warnif_trampoline = sub { warnings::warnif(@_); };
+
 =head1 NAME
 
-C<meta> - meta-programming API (PLACEHOLDER)
+C<meta> - meta-programming API
+
+=head1 SYNOPSIS
+
+   use v5.14;
+   use meta;
+
+   my $metapkg = meta::get_package( "MyApp::Some::Package" );
+
+   $metapkg->add_symbol(
+      '&a_function' => sub { say "New function was created" }
+   );
+
+   MyApp::Some::Package::a_function();
 
 =head1 DESCRIPTION
-
-This is a placeholder module for what will hopefully become a new dual-life
-core module, which is currently in development.
-
-The module description may eventually be something like:
 
 This package provides an API for metaprogramming; that is, allowing code to
 inspect or manipulate parts of its own program structure.  Parts of the perl
@@ -30,6 +46,292 @@ tricks such as C<no strict 'refs'> and using globrefs, and also to be a more
 consistent place to add new abilities, such as more APIs for inspection and
 alteration of internal structures, metaprogramming around the new C<'class'>
 feature, and other such uses.
+
+This module should be considered B<experimental>; no API stability guarantees
+are made at this time. Behaviour may be added, altered, or removed in later
+versions. Once a workable API shape has been found, it is hoped that this
+module will eventually become dual-life and shipped as part of Perl core, as
+the implementation for PPC 0022. See the link in the L</SEE ALSO> section.
+
+I<Since version 0.003_002> all the entry-point functions and constructors in
+this module will provoke warnings in the C<meta::experimental> category. They
+can be silenced by
+
+   use meta;
+   no warnings 'meta::experimental';
+
+I<Since version 0.003_003> the various C<undef>-returning variants of
+C<can_...> like functions or methods have aliases called C<try_get_...> as
+this may be a more suitable naming pattern. The older C<can_...> variants are
+likely to be removed soon.
+
+=cut
+
+=head1 FUNCTIONS
+
+=head2 get_package
+
+   $metapkg = meta::get_package( $pkgname );
+
+Returns a metapackage reference representing the given package name, creating
+it if it did not previously exist.
+
+An alternative to C<< meta::package->get >> in a plain function style.
+
+=head2 get_this_package
+
+   $metapkg = meta::get_this_package;
+
+I<Since version 0.02.>
+
+Returns a metapackage reference representing the package of the code that
+called the function.
+
+Useful for performing meta-programming on the contents of a module during its
+C<BEGIN> or loading time. Equivalent to but more efficient than the following:
+
+   meta::get_package(__PACKAGE__)
+
+=cut
+
+=head1 METHODS ON C<meta::package>
+
+=head2 get
+
+   $metapkg = meta::package->get( $pkgname );
+
+I<Since version 0.003_001.>
+
+Returns a metapackage reference representing the given package name, creating
+it if it did not previously exist.
+
+An alternative to C<meta::get_package> in an object constructor style.
+
+=head2 name
+
+   $name = $metapkg->name;
+
+Returns the name of the package being represented.
+
+=head2 get_glob
+
+   $metaglob = $metapkg->get_glob( $name );
+
+Returns a metaglob reference representing the given symbol name within the
+package, if it exists. Throws an exception if not.
+
+=head2 try_get_glob, can_glob
+
+   $metaglob = $metapkg->try_get_glob( $name );
+   $metaglob = $metapkg->can_glob( $name );
+
+Similar to L</get_glob> but returns undef if the glob does not exist.
+
+=head2 get_symbol
+
+   $metasym = $metapkg->get_symbol( $name );
+
+Returns a metasymbol reference representing the given symbol name within the
+package. The symbol name should include the leading sigil; one of the
+characters C<*>, C<$>, C<@>, C<%> or C<&>. Throws an exception if the symbol
+does not exist.
+
+=head2 try_get_symbol, can_symbol
+
+   $metasym = $metapkg->try_get_symbol( $name );
+   $metasym = $metapkg->can_symbol( $name );
+
+Similar to L</get_symbol> but returns undef if the symbol does not exist.
+
+=head2 add_symbol
+
+   $metasym = $metapkg->add_symbol( $name, $valueref );
+
+Creates a new symbol of the given name in the given package. The new symbol
+will refer to the item given by reference, whose type must match the sigil
+of the symbol name. Returns a metasymbol reference as per L</get_symbol>. If
+a symbol already existed of the given name then an exception is thrown.
+
+I<Note> that this does not create a copy of a variable, but stores an alias
+to the referred item itself within the symbol table.
+
+   $metapkg->add_symbol( '@things', \my @array );
+
+   push @array, "more", "values";
+   # these values are now visible in the @things array
+
+If adding a scalar, array or hash variable, the C<$valueref> argument is
+optional. If not provided then a new, blank variable of the correct type will
+be created.
+
+=head2 get_or_add_symbol
+
+   $metasym = $metapkg->get_or_add_symbol( $name, $valueref );
+
+I<Since version 0.003_003.>
+
+Similar to L</get_symbol> but creates a new symbol if it didn't already exist
+as per L</add_symbol>.
+
+Note that if the symbol did already exist it is returned and C<$valueref> will
+be ignored. The symbol will not be modified in that case to point to the value
+referred to instead.
+
+=head2 remove_symbol
+
+   $metapkg->remove_symbol( $name );
+
+Removes a symbol of the given name from the given package. If the symbol was
+the last item in the glob then the glob too is removed from the package. If
+the named symbol did not previously exist then an exception is thrown.
+
+To only conditionally remove a symbol if it already exists, test for it first
+by using L</try_get_symbol>:
+
+   $metapkg->try_get_symbol( '$variable' ) and
+      $metapkg->remove_symbol( '$variable' );
+
+=cut
+
+=head1 METHODS ON METASYMBOLS
+
+=head2 is_glob, is_scalar, ...
+
+   $bool = $metasym->is_glob;
+   $bool = $metasym->is_scalar;
+   $bool = $metasym->is_array;
+   $bool = $metasym->is_hash;
+   $bool = $metasym->is_subroutine;
+
+Returns true if the symbol being referred to is of the given type, or false if
+not.
+
+=head2 reference
+
+   $ref = $metasym->reference;
+
+Returns a regular Perl reference to the symbol being represented.
+
+=cut
+
+=head1 METHODS ON C<meta::glob>
+
+=cut
+
+@meta::glob::ISA = qw( meta::symbol );
+
+=head2 get
+
+   $metaglob = meta::glob->get( $globname );
+
+I<Since version 0.003_001.>
+
+Returns a metaglob reference representing the given symbol from the symbol
+table from a fully-qualified name, if it exists. Throws an exception if not.
+
+=head2 try_get
+
+   $metaglob = meta::glob->try_get( $globname );
+
+I<Since version 0.003_003.>
+
+Similar to L</get> but returns undef if the given symbol does not exist.
+
+=head2 get_or_add
+
+   $metaglob = meta::glob->get_or_add( $globname );
+
+I<Since version 0.003_003.>
+
+Similar to L</get> but creates the symbol if it didn't already exist.
+
+=head2 name
+
+   $name = $metaglob->basename;
+
+Returns the name of the glob I<within its package>.
+
+=head2 get_scalar, get_array, ...
+
+   $metasym = $metaglob->get_scalar;
+   $metasym = $metaglob->get_array;
+   $metasym = $metaglob->get_hash;
+   $metasym = $metaglob->get_code;
+
+Returns a metasymbol reference representing the symbol in the given slot of
+the glob, if it exists. Throws an exception if not.
+
+=head2 try_get_scalar, try_get_array, ...
+
+Similar to L</get_scalar>, L</get_array>, etc... but returns undef if the
+given slot does not exist.
+
+=cut
+
+=head1 METHODS ON METAVARIABLES
+
+=cut
+
+@meta::variable::ISA = qw( meta::symbol );
+
+=head2 value
+
+   $scalar = $metavar->value;
+   @array  = $metavar->value;
+   %hash   = $metavar->value;
+
+   $count = scalar $metavar->value;
+
+Returns the current value of the variable, as if it appeared in regular Perl
+code.
+
+=cut
+
+=head1 METHODS ON METASUBROUTINES
+
+=cut
+
+@meta::subroutine::ISA = qw( meta::symbol );
+
+=head2 subname
+
+   $name = $metasub->subname;
+
+Returns the (fully-qualified) name of the subroutine.
+
+=head2 prototype
+
+   $proto = $metasub->prototype;
+
+Returns the prototype of the subroutine.
+
+=cut
+
+=head1 TODO
+
+=over 4
+
+=item
+
+Setting the subname or prototype of a subroutine, inspired by the
+C<Sub::Util> functions of the same.
+
+=item
+
+Some kind of access around the signature of a signatured sub.
+
+=item
+
+Access to the new parts of API introduced by Perl 5.38 to deal with classes,
+methods, fields.
+
+=back
+
+=cut
+
+=head1 SEE ALSO
+
+L<PPC 0022 "metaprogramming"|https://github.com/Perl/PPCs/blob/main/ppcs/ppc0022-metaprogramming.md>
 
 =cut
 

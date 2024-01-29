@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::JSON;
 # ABSTRACT: JSON/REST result handler
-$Neo4j::Driver::Result::JSON::VERSION = '0.41';
+$Neo4j::Driver::Result::JSON::VERSION = '0.42';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -208,7 +208,14 @@ sub _deep_bless {
 		return $rest;
 	}
 	if (ref $data eq '' && ref $rest eq '' && ref $meta eq 'HASH' && $meta->{type} && $meta->{type} =~ m/date|time|duration/) {  # temporal (depends on meta => doesn't always work)
-		$data = bless { data => $data, type => $meta->{type} }, $cypher_types->{temporal};
+		my $type = $cypher_types->{temporal};
+		if ($type eq 'Neo4j::Driver::Type::Temporal') {
+			$type = 'Neo4j::Driver::Type::DateTime';
+			$type = 'Neo4j::Driver::Type::Duration' if $data =~ m/^-?P/;
+			require Neo4j::Driver::Type::DateTime;
+			require Neo4j::Driver::Type::Duration;
+		}
+		$data = bless { data => $data, type => $meta->{type} }, $type;
 		$cypher_types->{init}->($data) if $cypher_types->{init};
 		return $data;
 	}

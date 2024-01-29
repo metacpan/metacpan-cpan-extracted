@@ -55,7 +55,6 @@ my %WriteMakefileArgs = (
     "Getopt::Long" => 0,
     "HTML::Entities" => 0,
     "HTML::HeadParser" => "3.71",
-    "HTTP::CookieJar::LWP" => 0,
     "HTTP::Cookies" => 6,
     "HTTP::Date" => 6,
     "HTTP::Negotiate" => 6,
@@ -83,13 +82,14 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "FindBin" => 0,
+    "HTTP::CookieJar::LWP" => 0,
     "HTTP::Daemon" => "6.12",
     "Test::Fatal" => 0,
     "Test::More" => "0.96",
     "Test::Needs" => 0,
     "Test::RequiresInternet" => 0
   },
-  "VERSION" => "6.72",
+  "VERSION" => "6.76",
   "test" => {
     "TESTS" => "t/*.t t/base/*.t t/base/protocols/*.t t/leak/*.t t/local/*.t t/robot/*.t"
   }

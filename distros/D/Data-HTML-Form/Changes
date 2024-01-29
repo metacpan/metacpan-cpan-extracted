@@ -1,3 +1,10 @@
+0.07 2023-12-29T07:44:37+01:00
+ - Fix Mo is => ro.
+ - Improve constructor doc.
+ - Sort used modules in tests.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.06 2022-11-05T16:16:34+01:00
  - Add autofocus to Input object.
 

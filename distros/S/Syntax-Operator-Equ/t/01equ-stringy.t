@@ -33,6 +33,15 @@ ok(!(""    equ undef), 'undef is not empty string');
    ok(!($greedy equ "abc"), 'Greedy is not abc when unset' );
 }
 
+# unimport
+{
+   no Syntax::Operator::Equ;
+
+   sub equ { return "normal function" }
+
+   is( equ, "normal function", 'equ() parses as a normal function call' );
+}
+
 ok(!$warnings, 'no warnings');
 
 done_testing;

@@ -109,7 +109,7 @@ while (@ARGV && $ARGV[0] =~ /^-(.+)/ && (shift, ($_ = $1), 1)) {
 
     if (s/^o//) {
 	warn "-o option already used" if $offsetspaces;
-	$offsetspaces=shift;
+	$offsetspaces = checknum(shift);
 	redo OPTION;
     }
 
@@ -125,9 +125,9 @@ while (@ARGV && $ARGV[0] =~ /^-(.+)/ && (shift, ($_ = $1), 1)) {
     }
 
     # Accept -2, -3, etc...
-    if (s/^(\d.*)//) {
+    if (s/\A([0-9]+)//) {
         $columns = $1;
-        next OPTION;
+        redo OPTION;
     }
 
     usage("unexpected option: -$_");
@@ -154,18 +154,26 @@ my $pageno=$startpageno;
 foreach(1..$columns) {
 	push(@COLINFO, &create_col);
 }
-foreach(@ARGV) {
-	if (-d $_) {
-		warn "$Program: '$_' is a directory\n";
-		exit EX_FAILURE;
+if (scalar(@ARGV) == 0) {
+	@ARGV = ('-');
+}
+foreach my $file (@ARGV) {
+	my $fh;
+	if ($file eq '-') {
+		$fh = *STDIN;
+	} else {
+		if (-d $file) {
+			warn "$Program: '$file' is a directory\n";
+			exit EX_FAILURE;
+		}
+		$fh = FileHandle->new($file, 'r');
+		if (! $fh) {
+			next if ($quietskip);
+			warn "$Program: Can't open '$file': $!\n";
+			exit EX_FAILURE;
+		}
 	}
-	my $fh= FileHandle->new("$_", "r");
-	if (! $fh) {
-		next if ($quietskip);
-		warn "$Program: Can't open '$_': $!\n";
-		exit EX_FAILURE;
-	}
-	push(@FINFO, {  name  => $_,
+	push(@FINFO, {  name  => $file,
 			handle=> $fh,
 			lineno=> 0,
 			});
@@ -224,13 +232,23 @@ USAGE
 	exit EX_FAILURE;
 }
 
-#
-# FUNCTIONS
-#
+sub checknum {
+	my $n = shift;
+	if (length($n) == 0 || $n !~ m/\A[0-9]+\Z/) {
+		warn "$Program: invalid number: '$n'\n";
+		exit EX_FAILURE;
+	}
+	return int($n);
+}
+
 sub create_col  {
 	my($col)=@_;
 
 	my $pagelen=$length-($trailerlength*2);
+	if ($pagelen <= 0) {
+		$trailer = 0;
+		$pagelen = 1;
+	}
 	if($doublespace) {
 		$pagelen=($pagelen%2 == 0)?$pagelen/2:int($pagelen/2)+1;
 	}
@@ -337,7 +355,7 @@ sub printpage {
 			print $numbering;
 			print $numberchar if ($number);
 
-			if (!$column_sep) {
+			if (!$column_sep && $trailer) {
 				$pfmt="%-${colwidth}s";
 				printf("$pfmt", $$column{text}[$line-1]{text});
 			} else {

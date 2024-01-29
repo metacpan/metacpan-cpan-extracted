@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 9f1d583b489e00f68db0e32a8f3946ec022c09f6321ec785d64045d1407007d2 Build.PL
+SHA256 fee0433b70b43daed19c46900a9c49d0b8a5392d955d005016283584e23f7d85 Changes
+SHA256 db739608563af2d9f1763883315451cc38032cb67bdd42a443bfcc7eef1a49b2 LICENSE
+SHA256 f6a0bf3805bfaa157a809dd5fa22067b8c5bc2642844330383f7c5ca6f1ab49b MANIFEST
+SHA256 3df5e3b7bf0ee40f26aa32a8d5be89e166ff3af2a39b4990585215085b937fcc META.json
+SHA256 787c58eb61ad0bad242ca8c81c66503e7b03bace1d24db462a2c4c397ad076b6 META.yml
+SHA256 45b1783976a0f08ffb142a7387f82a630ba5850855800c952b555523a1738c53 README
+SHA256 fd2f56f8fcaa2bb6504c7a4d73b5beb244944f85da4a3fba10c67a663c888f59 lib/Game/Deckar.pm
+SHA256 d43c7590968aeec354c597fb9c837992194e16ed7b824c9ffebf6dab1ce0fcee t/00-load.t
+SHA256 2a67659ace0c730b3e7de9c20f0282b6c157df9ff81bcda1e59ac60ea83a1872 t/10-card.t
+SHA256 cd1ce6bac6360a6be298d5529197e31c3d6f951f88a64e3368859ad1f207d667 t/20-deck.t
+SHA256 aa09da0ed8a03c93c94ca3fdf6632fab8751f4daccb65749220ab230f4aa0ebe t/pod-coverage.t
+SHA256 39d4efa36d3549b633ab1051b43b815abccde472e8448ccd1e89598d8c948083 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEElPO2YAAs9b/plKLEs1lvXE/ryKcFAmWR+4EACgkQs1lvXE/r
+yKdwfQv+PaUkN9ZAhs3RnA+gJqlxFbW7hAT5V57MMLzJSc2R+lZMsOJyiHmfihUX
+96KPeB0KgNVsgV632/TmnD8wnPM+nA8l0uUdRrAcJZthCr4s3uUch2vV8LzRb7ht
+qogqK7l7F9kUo19dzUtHGKpSmUY81TmemtFGmI1jYISKVtiKYJbe18MsNGPiTUGy
+qpjX/w7psrDw1DOL/KwnnuZE53lDdsQupIUuNvOOPYip4ZgtdASwq1siw66veLsd
+fehfxeTtIgf9x4Z2tgKe1GtuQnm0xSM8EhqFzMounYk7Phh0Zpczp2LVFqebYGkD
+iqq4/xxFoV9w3yW0vr688hqOkweeAto1B3dOjj+lCkksuvNQgKTs6haqfR5rkkQI
+yvJ61EpPyIK0P/XDzoWbYi8TdADpIfXgB/2OcoJ8fcQ3YVwwHx+hxJIsy5ZNWACl
+j8VFsBalSn1km1c5N6jD+ZMWXi93pvFtFXRkFZtngc5CVhONKmTCnvBZsBEn+udG
+pLusouua
+=Z1KO
+-----END PGP SIGNATURE-----

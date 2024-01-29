@@ -2,6 +2,7 @@ Build.PL
 lib/Locale/CLDR/Locales/Ms.pm
 lib/Locale/CLDR/Locales/Ms/Any.pm
 lib/Locale/CLDR/Locales/Ms/Any/Bn.pm
+lib/Locale/CLDR/Locales/Ms/Any/Id.pm
 lib/Locale/CLDR/Locales/Ms/Any/My.pm
 lib/Locale/CLDR/Locales/Ms/Any/Sg.pm
 MANIFEST			This list of files

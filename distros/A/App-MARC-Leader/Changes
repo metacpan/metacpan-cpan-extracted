@@ -1,3 +1,13 @@
+0.04 2024-01-12T09:42:43+01:00
+ - Add test for decoding from string.
+ - Fix decoding without description.
+
+0.03 2024-01-11T22:35:35+01:00
+ - Add test for processing of leader.
+ - Fix examples in doc.
+ - Simplify examples in doc.
+ - Update copyright years.
+
 0.02 2023-11-20T14:09:54+01:00
  - Add support of ANSI color output.
 

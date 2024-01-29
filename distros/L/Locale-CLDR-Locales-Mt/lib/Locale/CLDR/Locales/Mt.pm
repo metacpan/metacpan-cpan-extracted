@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mt - Package for language Maltese
 
 package Locale::CLDR::Locales::Mt;
 # This file auto generated from Data\common\main\mt.xml
-#	on Tue  5 Dec  1:22:27 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -25,19 +25,19 @@ use Moo;
 
 extends('Locale::CLDR::Locales::Root');
 has 'valid_algorithmic_formats' => (
-	is => 'ro',
-	isa => ArrayRef,
-	init_arg => undef,
-	default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal-masculine','spellout-cardinal-feminine' ]},
+    is => 'ro',
+    isa => ArrayRef,
+    init_arg => undef,
+    default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal-masculine','spellout-cardinal-feminine' ]},
 );
 
 has 'algorithmic_number_format_data' => (
-	is => 'ro',
-	isa => HashRef,
-	init_arg => undef,
-	default => sub { 
-		use bigfloat;
-		return {
+    is => 'ro',
+    isa => HashRef,
+    init_arg => undef,
+    default => sub {
+        use bigfloat;
+        return {
 		'and-type-a-feminine' => {
 			'private' => {
 				'0' => {
@@ -1251,7 +1251,7 @@ has 'algorithmic_number_format_data' => (
 				},
 			},
 		},
-	} },
+    } },
 );
 
 # Need to add code for Key type pattern
@@ -1274,7 +1274,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'aa' => 'Afar',
@@ -1394,9 +1394,7 @@ has 'display_name_language' => (
  				'en_AU' => 'Ingliż Awstraljan',
  				'en_CA' => 'Ingliż Kanadiż',
  				'en_GB' => 'Ingliż Brittaniku',
- 				'en_GB@alt=short' => 'Ingliż (UK)',
  				'en_US' => 'Ingliż Amerikan',
- 				'en_US@alt=short' => 'Ingliż (US)',
  				'enm' => 'Ingliż Medjevali',
  				'eo' => 'Esperanto',
  				'es' => 'Spanjol',
@@ -1651,7 +1649,6 @@ has 'display_name_language' => (
  				'ro_MD' => 'Moldovan',
  				'rof' => 'Rombo',
  				'rom' => 'Romanesk',
- 				'root' => 'Root',
  				'ru' => 'Russu',
  				'rup' => 'Aromanjan',
  				'rw' => 'Kinjarwanda',
@@ -1713,7 +1710,7 @@ has 'display_name_language' => (
  				'teo' => 'Teso',
  				'ter' => 'Tereno',
  				'tet' => 'Tetum',
- 				'tg' => 'Tajik',
+ 				'tg' => 'Taġik',
  				'th' => 'Tajlandiż',
  				'ti' => 'Tigrinya',
  				'tig' => 'Tigre',
@@ -1825,7 +1822,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'Dinja',
  			'002' => 'Affrika',
@@ -1938,7 +1935,7 @@ has 'display_name_region' => (
  			'FJ' => 'Fiġi',
  			'FK' => 'il-Gżejjer Falkland',
  			'FK@alt=variant' => 'Il-Gżejjer Falkland (il-Gżejjer Malvinas)',
- 			'FM' => 'Mikroneżja',
+ 			'FM' => 'il-Mikroneżja',
  			'FO' => 'il-Gżejjer Faeroe',
  			'FR' => 'Franza',
  			'GA' => 'il-Gabon',
@@ -1977,7 +1974,7 @@ has 'display_name_region' => (
  			'IO' => 'Territorju Brittaniku tal-Oċean Indjan',
  			'IQ' => 'l-Iraq',
  			'IR' => 'l-Iran',
- 			'IS' => 'l-iżlanda',
+ 			'IS' => 'l-Iżlanda',
  			'IT' => 'l-Italja',
  			'JE' => 'Jersey',
  			'JM' => 'il-Ġamajka',
@@ -2012,8 +2009,7 @@ has 'display_name_region' => (
  			'MF' => 'Saint Martin',
  			'MG' => 'Madagascar',
  			'MH' => 'Gżejjer Marshall',
- 			'MK' => 'l-Eks-Repubblika Jugoslava tal-Maċedonia',
- 			'MK@alt=variant' => 'l-Eks Repubblika Jugoslava tal-Maċedonia',
+ 			'MK' => 'il-Maċedonja ta’ Fuq',
  			'ML' => 'il-Mali',
  			'MM' => 'il-Myanmar/Burma',
  			'MN' => 'il-Mongolja',
@@ -2064,7 +2060,7 @@ has 'display_name_region' => (
  			'RS' => 'is-Serbja',
  			'RU' => 'ir-Russja',
  			'RW' => 'ir-Rwanda',
- 			'SA' => 'l-Arabia Sawdija',
+ 			'SA' => 'l-Arabja Sawdija',
  			'SB' => 'il-Gżejjer Solomon',
  			'SC' => 'is-Seychelles',
  			'SD' => 'is-Sudan',
@@ -2084,7 +2080,7 @@ has 'display_name_region' => (
  			'SV' => 'El Salvador',
  			'SX' => 'Sint Maarten',
  			'SY' => 'is-Sirja',
- 			'SZ' => 'is-Swaziland',
+ 			'SZ' => 'l-Eswatini',
  			'TA' => 'Tristan da Cunha',
  			'TC' => 'il-Gżejjer Turks u Caicos',
  			'TD' => 'iċ-Chad',
@@ -2135,7 +2131,7 @@ has 'display_name_variant' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'REVISED' => 'Ortografija Irriveda',
 
@@ -2147,7 +2143,7 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'calendar' => 'Kalendarju',
  			'collation' => 'Kollazjoni',
@@ -2198,7 +2194,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{Metriku},
  			'UK' => q{UK},
@@ -2212,7 +2208,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'Lingwa: {0}',
  			'script' => 'Skript: {0}',
@@ -2234,8 +2230,8 @@ has 'characters' => (
 			auxiliary => qr{[c y]},
 			index => ['A', 'B', 'Ċ', 'C', 'D', 'E', 'F', 'Ġ', 'G', '{GĦ}', 'H', 'Ħ', 'I', '{IE*}', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Ż', 'Z'],
 			main => qr{[a à b ċ d e è f ġ g {għ} h ħ i ì j k l m n o ò p q r s t u ù v w x ż z]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- , ; \: ! ? . ' ‘ ’ " “ ” ( ) \[ \] \{ \}]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‑ , ; \: ! ? . ' ‘ ’ " “ ” ( ) \[ \] \{ \}]},
 		};
 	},
 EOT
@@ -2302,12 +2298,29 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'angle-arc-minute' => {
+						'few' => q({0}′),
+						'many' => q({0}′),
+						'one' => q({0}′),
+						'other' => q({0}′),
+					},
+					# Core Unit Identifier
 					'arc-minute' => {
 						'few' => q({0}′),
 						'many' => q({0}′),
 						'one' => q({0}′),
 						'other' => q({0}′),
 					},
+					# Long Unit Identifier
+					'concentr-karat' => {
+						'few' => q({0} kt),
+						'many' => q({0} kt),
+						'name' => q(karati),
+						'one' => q({0} kt),
+						'other' => q({0} kt),
+					},
+					# Core Unit Identifier
 					'karat' => {
 						'few' => q({0} kt),
 						'many' => q({0} kt),
@@ -2315,6 +2328,15 @@ has 'units' => (
 						'one' => q({0} kt),
 						'other' => q({0} kt),
 					},
+					# Long Unit Identifier
+					'consumption-liter-per-kilometer' => {
+						'few' => q({0} litri kull kilometru),
+						'many' => q({0} litri kull kilometru),
+						'name' => q(L/km),
+						'one' => q({0} litru kull kilometru),
+						'other' => q({0} litri kull kilometru),
+					},
+					# Core Unit Identifier
 					'liter-per-kilometer' => {
 						'few' => q({0} litri kull kilometru),
 						'many' => q({0} litri kull kilometru),
@@ -2322,13 +2344,15 @@ has 'units' => (
 						'one' => q({0} litru kull kilometru),
 						'other' => q({0} litri kull kilometru),
 					},
-					'lux' => {
-						'few' => q({0} lx),
-						'many' => q({0} lx),
-						'name' => q(lx),
-						'one' => q({0} lx),
-						'other' => q({0} lx),
+					# Long Unit Identifier
+					'digital-megabyte' => {
+						'few' => q({0} megabytes),
+						'many' => q({0} megabytes),
+						'name' => q(megabytes),
+						'one' => q({0} megabyte),
+						'other' => q({0} megabytes),
 					},
+					# Core Unit Identifier
 					'megabyte' => {
 						'few' => q({0} megabytes),
 						'many' => q({0} megabytes),
@@ -2336,13 +2360,15 @@ has 'units' => (
 						'one' => q({0} megabyte),
 						'other' => q({0} megabytes),
 					},
-					'millisecond' => {
-						'few' => q({0} millisekondi),
-						'many' => q({0} millisekondi),
-						'name' => q(millisekondi),
-						'one' => q({0} millisekonda),
-						'other' => q({0} millisekondi),
+					# Long Unit Identifier
+					'digital-terabit' => {
+						'few' => q({0} terabits),
+						'many' => q({0} terabits),
+						'name' => q(terabits),
+						'one' => q({0} terabit),
+						'other' => q({0} terabits),
 					},
+					# Core Unit Identifier
 					'terabit' => {
 						'few' => q({0} terabits),
 						'many' => q({0} terabits),
@@ -2350,6 +2376,15 @@ has 'units' => (
 						'one' => q({0} terabit),
 						'other' => q({0} terabits),
 					},
+					# Long Unit Identifier
+					'digital-terabyte' => {
+						'few' => q({0} terabytes),
+						'many' => q({0} terabytes),
+						'name' => q(terabytes),
+						'one' => q({0} terabyte),
+						'other' => q({0} terabytes),
+					},
+					# Core Unit Identifier
 					'terabyte' => {
 						'few' => q({0} terabytes),
 						'many' => q({0} terabytes),
@@ -2357,8 +2392,49 @@ has 'units' => (
 						'one' => q({0} terabyte),
 						'other' => q({0} terabytes),
 					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'few' => q({0} millisekondi),
+						'many' => q({0} millisekondi),
+						'name' => q(millisekondi),
+						'one' => q({0} millisekonda),
+						'other' => q({0} millisekondi),
+					},
+					# Core Unit Identifier
+					'millisecond' => {
+						'few' => q({0} millisekondi),
+						'many' => q({0} millisekondi),
+						'name' => q(millisekondi),
+						'one' => q({0} millisekonda),
+						'other' => q({0} millisekondi),
+					},
+					# Long Unit Identifier
+					'light-lux' => {
+						'few' => q({0} lx),
+						'many' => q({0} lx),
+						'name' => q(lx),
+						'one' => q({0} lx),
+						'other' => q({0} lx),
+					},
+					# Core Unit Identifier
+					'lux' => {
+						'few' => q({0} lx),
+						'many' => q({0} lx),
+						'name' => q(lx),
+						'one' => q({0} lx),
+						'other' => q({0} lx),
+					},
 				},
 				'narrow' => {
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'few' => q({0}ms),
+						'many' => q({0}ms),
+						'name' => q(millisek),
+						'one' => q({0}ms),
+						'other' => q({0}ms),
+					},
+					# Core Unit Identifier
 					'millisecond' => {
 						'few' => q({0}ms),
 						'many' => q({0}ms),
@@ -2368,6 +2444,15 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'concentr-karat' => {
+						'few' => q({0} kt),
+						'many' => q({0} kt),
+						'name' => q(kt),
+						'one' => q({0} kt),
+						'other' => q({0} kt),
+					},
+					# Core Unit Identifier
 					'karat' => {
 						'few' => q({0} kt),
 						'many' => q({0} kt),
@@ -2375,6 +2460,15 @@ has 'units' => (
 						'one' => q({0} kt),
 						'other' => q({0} kt),
 					},
+					# Long Unit Identifier
+					'consumption-liter-per-kilometer' => {
+						'few' => q({0} L/km),
+						'many' => q({0} L/km),
+						'name' => q(L/km),
+						'one' => q({0} L/km),
+						'other' => q({0} L/km),
+					},
+					# Core Unit Identifier
 					'liter-per-kilometer' => {
 						'few' => q({0} L/km),
 						'many' => q({0} L/km),
@@ -2382,19 +2476,29 @@ has 'units' => (
 						'one' => q({0} L/km),
 						'other' => q({0} L/km),
 					},
-					'lux' => {
-						'few' => q({0} lx),
-						'many' => q({0} lx),
-						'name' => q(lx),
-						'one' => q({0} lx),
-						'other' => q({0} lx),
+					# Long Unit Identifier
+					'digital-megabit' => {
+						'few' => q({0} Mb),
+						'many' => q({0} Mb),
+						'one' => q({0} Mb),
+						'other' => q({0} Mb),
 					},
+					# Core Unit Identifier
 					'megabit' => {
 						'few' => q({0} Mb),
 						'many' => q({0} Mb),
 						'one' => q({0} Mb),
 						'other' => q({0} Mb),
 					},
+					# Long Unit Identifier
+					'digital-megabyte' => {
+						'few' => q({0} MB),
+						'many' => q({0} MB),
+						'name' => q(MB),
+						'one' => q({0} MB),
+						'other' => q({0} MB),
+					},
+					# Core Unit Identifier
 					'megabyte' => {
 						'few' => q({0} MB),
 						'many' => q({0} MB),
@@ -2402,13 +2506,15 @@ has 'units' => (
 						'one' => q({0} MB),
 						'other' => q({0} MB),
 					},
-					'millisecond' => {
-						'few' => q({0} ms),
-						'many' => q({0} ms),
-						'name' => q(millisek),
-						'one' => q({0} ms),
-						'other' => q({0} ms),
+					# Long Unit Identifier
+					'digital-terabit' => {
+						'few' => q({0} Tb),
+						'many' => q({0} Tb),
+						'name' => q(Tb),
+						'one' => q({0} Tb),
+						'other' => q({0} Tb),
 					},
+					# Core Unit Identifier
 					'terabit' => {
 						'few' => q({0} Tb),
 						'many' => q({0} Tb),
@@ -2416,12 +2522,53 @@ has 'units' => (
 						'one' => q({0} Tb),
 						'other' => q({0} Tb),
 					},
+					# Long Unit Identifier
+					'digital-terabyte' => {
+						'few' => q({0} TB),
+						'many' => q({0} TB),
+						'name' => q(TB),
+						'one' => q({0} TB),
+						'other' => q({0} TB),
+					},
+					# Core Unit Identifier
 					'terabyte' => {
 						'few' => q({0} TB),
 						'many' => q({0} TB),
 						'name' => q(TB),
 						'one' => q({0} TB),
 						'other' => q({0} TB),
+					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'few' => q({0} ms),
+						'many' => q({0} ms),
+						'name' => q(millisek),
+						'one' => q({0} ms),
+						'other' => q({0} ms),
+					},
+					# Core Unit Identifier
+					'millisecond' => {
+						'few' => q({0} ms),
+						'many' => q({0} ms),
+						'name' => q(millisek),
+						'one' => q({0} ms),
+						'other' => q({0} ms),
+					},
+					# Long Unit Identifier
+					'light-lux' => {
+						'few' => q({0} lx),
+						'many' => q({0} lx),
+						'name' => q(lx),
+						'one' => q({0} lx),
+						'other' => q({0} lx),
+					},
+					# Core Unit Identifier
+					'lux' => {
+						'few' => q({0} lx),
+						'many' => q({0} lx),
+						'name' => q(lx),
+						'one' => q({0} lx),
+						'other' => q({0} lx),
 					},
 				},
 			} }
@@ -2551,421 +2698,126 @@ has 'currencies' => (
 	default		=> sub { {
 		'AED' => {
 			symbol => 'AED',
-			display_name => {
-				'currency' => q(AED),
-				'few' => q(AED),
-				'many' => q(AED),
-				'one' => q(AED),
-				'other' => q(AED),
-			},
 		},
 		'AFN' => {
 			symbol => 'AFN',
-			display_name => {
-				'currency' => q(AFN),
-				'few' => q(AFN),
-				'many' => q(AFN),
-				'one' => q(AFN),
-				'other' => q(AFN),
-			},
 		},
 		'ALL' => {
 			symbol => 'ALL',
-			display_name => {
-				'currency' => q(ALL),
-				'few' => q(ALL),
-				'many' => q(ALL),
-				'one' => q(ALL),
-				'other' => q(ALL),
-			},
 		},
 		'AMD' => {
 			symbol => 'AMD',
-			display_name => {
-				'currency' => q(AMD),
-				'few' => q(AMD),
-				'many' => q(AMD),
-				'one' => q(AMD),
-				'other' => q(AMD),
-			},
 		},
 		'ANG' => {
 			symbol => 'ANG',
-			display_name => {
-				'currency' => q(ANG),
-				'few' => q(ANG),
-				'many' => q(ANG),
-				'one' => q(ANG),
-				'other' => q(ANG),
-			},
 		},
 		'AOA' => {
 			symbol => 'AOA',
-			display_name => {
-				'currency' => q(AOA),
-				'few' => q(AOA),
-				'many' => q(AOA),
-				'one' => q(AOA),
-				'other' => q(AOA),
-			},
 		},
 		'ARS' => {
 			symbol => 'ARS',
-			display_name => {
-				'currency' => q(ARS),
-				'few' => q(ARS),
-				'many' => q(ARS),
-				'one' => q(ARS),
-				'other' => q(ARS),
-			},
 		},
 		'AUD' => {
 			symbol => 'A$',
-			display_name => {
-				'currency' => q(AUD),
-				'few' => q(AUD),
-				'many' => q(AUD),
-				'one' => q(AUD),
-				'other' => q(AUD),
-			},
 		},
 		'AWG' => {
 			symbol => 'AWG',
-			display_name => {
-				'currency' => q(AWG),
-				'few' => q(AWG),
-				'many' => q(AWG),
-				'one' => q(AWG),
-				'other' => q(AWG),
-			},
 		},
 		'AZN' => {
 			symbol => 'AZN',
-			display_name => {
-				'currency' => q(AZN),
-				'few' => q(AZN),
-				'many' => q(AZN),
-				'one' => q(AZN),
-				'other' => q(AZN),
-			},
 		},
 		'BAM' => {
 			symbol => 'BAM',
-			display_name => {
-				'currency' => q(BAM),
-				'few' => q(BAM),
-				'many' => q(BAM),
-				'one' => q(BAM),
-				'other' => q(BAM),
-			},
 		},
 		'BBD' => {
 			symbol => 'BBD',
-			display_name => {
-				'currency' => q(BBD),
-				'few' => q(BBD),
-				'many' => q(BBD),
-				'one' => q(BBD),
-				'other' => q(BBD),
-			},
 		},
 		'BDT' => {
 			symbol => 'BDT',
-			display_name => {
-				'currency' => q(BDT),
-				'few' => q(BDT),
-				'many' => q(BDT),
-				'one' => q(BDT),
-				'other' => q(BDT),
-			},
 		},
 		'BGN' => {
 			symbol => 'BGN',
-			display_name => {
-				'currency' => q(BGN),
-				'few' => q(BGN),
-				'many' => q(BGN),
-				'one' => q(BGN),
-				'other' => q(BGN),
-			},
 		},
 		'BHD' => {
 			symbol => 'BHD',
-			display_name => {
-				'currency' => q(BHD),
-				'few' => q(BHD),
-				'many' => q(BHD),
-				'one' => q(BHD),
-				'other' => q(BHD),
-			},
 		},
 		'BIF' => {
 			symbol => 'BIF',
-			display_name => {
-				'currency' => q(BIF),
-				'few' => q(BIF),
-				'many' => q(BIF),
-				'one' => q(BIF),
-				'other' => q(BIF),
-			},
 		},
 		'BMD' => {
 			symbol => 'BMD',
-			display_name => {
-				'currency' => q(BMD),
-				'few' => q(BMD),
-				'many' => q(BMD),
-				'one' => q(BMD),
-				'other' => q(BMD),
-			},
 		},
 		'BND' => {
 			symbol => 'BND',
-			display_name => {
-				'currency' => q(BND),
-				'few' => q(BND),
-				'many' => q(BND),
-				'one' => q(BND),
-				'other' => q(BND),
-			},
 		},
 		'BOB' => {
 			symbol => 'BOB',
-			display_name => {
-				'currency' => q(BOB),
-				'few' => q(BOB),
-				'many' => q(BOB),
-				'one' => q(BOB),
-				'other' => q(BOB),
-			},
 		},
 		'BRL' => {
 			symbol => 'R$',
-			display_name => {
-				'currency' => q(BRL),
-				'few' => q(BRL),
-				'many' => q(BRL),
-				'one' => q(BRL),
-				'other' => q(BRL),
-			},
 		},
 		'BSD' => {
 			symbol => 'BSD',
-			display_name => {
-				'currency' => q(BSD),
-				'few' => q(BSD),
-				'many' => q(BSD),
-				'one' => q(BSD),
-				'other' => q(BSD),
-			},
 		},
 		'BTN' => {
 			symbol => 'BTN',
-			display_name => {
-				'currency' => q(BTN),
-				'few' => q(BTN),
-				'many' => q(BTN),
-				'one' => q(BTN),
-				'other' => q(BTN),
-			},
 		},
 		'BWP' => {
 			symbol => 'BWP',
-			display_name => {
-				'currency' => q(BWP),
-				'few' => q(BWP),
-				'many' => q(BWP),
-				'one' => q(BWP),
-				'other' => q(BWP),
-			},
 		},
 		'BYN' => {
 			symbol => 'BYN',
-			display_name => {
-				'currency' => q(BYN),
-				'few' => q(BYN),
-				'many' => q(BYN),
-				'one' => q(BYN),
-				'other' => q(BYN),
-			},
 		},
 		'BYR' => {
 			symbol => 'BYR',
-			display_name => {
-				'currency' => q(BYR),
-				'few' => q(BYR),
-				'many' => q(BYR),
-				'one' => q(BYR),
-				'other' => q(BYR),
-			},
 		},
 		'BZD' => {
 			symbol => 'BZD',
-			display_name => {
-				'currency' => q(BZD),
-				'few' => q(BZD),
-				'many' => q(BZD),
-				'one' => q(BZD),
-				'other' => q(BZD),
-			},
-		},
-		'CAD' => {
-			display_name => {
-				'currency' => q(CAD),
-				'few' => q(CAD),
-				'many' => q(CAD),
-				'one' => q(CAD),
-				'other' => q(CAD),
-			},
 		},
 		'CDF' => {
 			symbol => 'CDF',
-			display_name => {
-				'currency' => q(CDF),
-				'few' => q(CDF),
-				'many' => q(CDF),
-				'one' => q(CDF),
-				'other' => q(CDF),
-			},
 		},
 		'CHF' => {
 			symbol => 'CHF',
-			display_name => {
-				'currency' => q(CHF),
-				'few' => q(CHF),
-				'many' => q(CHF),
-				'one' => q(CHF),
-				'other' => q(CHF),
-			},
 		},
 		'CLP' => {
 			symbol => 'CLP',
-			display_name => {
-				'currency' => q(CLP),
-				'few' => q(CLP),
-				'many' => q(CLP),
-				'one' => q(CLP),
-				'other' => q(CLP),
-			},
 		},
 		'COP' => {
 			symbol => 'COP',
-			display_name => {
-				'currency' => q(COP),
-				'few' => q(COP),
-				'many' => q(COP),
-				'one' => q(COP),
-				'other' => q(COP),
-			},
 		},
 		'CRC' => {
 			symbol => 'CRC',
-			display_name => {
-				'currency' => q(CRC),
-				'few' => q(CRC),
-				'many' => q(CRC),
-				'one' => q(CRC),
-				'other' => q(CRC),
-			},
 		},
 		'CUC' => {
 			symbol => 'CUC',
-			display_name => {
-				'currency' => q(CUC),
-				'few' => q(CUC),
-				'many' => q(CUC),
-				'one' => q(CUC),
-				'other' => q(CUC),
-			},
 		},
 		'CUP' => {
 			symbol => 'CUP',
-			display_name => {
-				'currency' => q(CUP),
-				'few' => q(CUP),
-				'many' => q(CUP),
-				'one' => q(CUP),
-				'other' => q(CUP),
-			},
 		},
 		'CVE' => {
 			symbol => 'CVE',
-			display_name => {
-				'currency' => q(CVE),
-				'few' => q(CVE),
-				'many' => q(CVE),
-				'one' => q(CVE),
-				'other' => q(CVE),
-			},
 		},
 		'CZK' => {
 			symbol => 'CZK',
-			display_name => {
-				'currency' => q(CZK),
-				'few' => q(CZK),
-				'many' => q(CZK),
-				'one' => q(CZK),
-				'other' => q(CZK),
-			},
 		},
 		'DJF' => {
 			symbol => 'DJF',
-			display_name => {
-				'currency' => q(DJF),
-				'few' => q(DJF),
-				'many' => q(DJF),
-				'one' => q(DJF),
-				'other' => q(DJF),
-			},
 		},
 		'DOP' => {
 			symbol => 'DOP',
-			display_name => {
-				'currency' => q(DOP),
-				'few' => q(DOP),
-				'many' => q(DOP),
-				'one' => q(DOP),
-				'other' => q(DOP),
-			},
 		},
 		'DZD' => {
 			symbol => 'DZD',
-			display_name => {
-				'currency' => q(DZD),
-				'few' => q(DZD),
-				'many' => q(DZD),
-				'one' => q(DZD),
-				'other' => q(DZD),
-			},
 		},
 		'EGP' => {
 			symbol => 'EGP',
-			display_name => {
-				'few' => q(EGP),
-				'many' => q(EGP),
-				'one' => q(EGP),
-				'other' => q(EGP),
-			},
 		},
 		'ERN' => {
 			symbol => 'ERN',
-			display_name => {
-				'currency' => q(ERN),
-				'few' => q(ERN),
-				'many' => q(ERN),
-				'one' => q(ERN),
-				'other' => q(ERN),
-			},
 		},
 		'ETB' => {
 			symbol => 'ETB',
-			display_name => {
-				'currency' => q(ETB),
-				'few' => q(ETB),
-				'many' => q(ETB),
-				'one' => q(ETB),
-				'other' => q(ETB),
-			},
 		},
 		'EUR' => {
 			symbol => '€',
@@ -2979,431 +2831,129 @@ has 'currencies' => (
 		},
 		'FJD' => {
 			symbol => 'FJD',
-			display_name => {
-				'currency' => q(FJD),
-				'few' => q(FJD),
-				'many' => q(FJD),
-				'one' => q(FJD),
-				'other' => q(FJD),
-			},
 		},
 		'FKP' => {
 			symbol => 'FKP',
-			display_name => {
-				'currency' => q(FKP),
-				'few' => q(FKP),
-				'many' => q(FKP),
-				'one' => q(FKP),
-				'other' => q(FKP),
-			},
 		},
 		'GEL' => {
 			symbol => 'GEL',
-			display_name => {
-				'currency' => q(GEL),
-				'few' => q(GEL),
-				'many' => q(GEL),
-				'one' => q(GEL),
-				'other' => q(GEL),
-			},
 		},
 		'GHS' => {
 			symbol => 'GHS',
-			display_name => {
-				'currency' => q(GHS),
-				'few' => q(GHS),
-				'many' => q(GHS),
-				'one' => q(GHS),
-				'other' => q(GHS),
-			},
 		},
 		'GIP' => {
 			symbol => 'GIP',
-			display_name => {
-				'currency' => q(GIP),
-				'few' => q(GIP),
-				'many' => q(GIP),
-				'one' => q(GIP),
-				'other' => q(GIP),
-			},
 		},
 		'GMD' => {
 			symbol => 'GMD',
-			display_name => {
-				'currency' => q(GMD),
-				'few' => q(GMD),
-				'many' => q(GMD),
-				'one' => q(GMD),
-				'other' => q(GMD),
-			},
 		},
 		'GNF' => {
 			symbol => 'GNF',
-			display_name => {
-				'currency' => q(GNF),
-				'few' => q(GNF),
-				'many' => q(GNF),
-				'one' => q(GNF),
-				'other' => q(GNF),
-			},
 		},
 		'GTQ' => {
 			symbol => 'GTQ',
-			display_name => {
-				'currency' => q(GTQ),
-				'few' => q(GTQ),
-				'many' => q(GTQ),
-				'one' => q(GTQ),
-				'other' => q(GTQ),
-			},
 		},
 		'GYD' => {
 			symbol => 'GYD',
-			display_name => {
-				'currency' => q(GYD),
-				'few' => q(GYD),
-				'many' => q(GYD),
-				'one' => q(GYD),
-				'other' => q(GYD),
-			},
 		},
 		'HNL' => {
 			symbol => 'HNL',
-			display_name => {
-				'currency' => q(HNL),
-				'few' => q(HNL),
-				'many' => q(HNL),
-				'one' => q(HNL),
-				'other' => q(HNL),
-			},
 		},
 		'HRK' => {
 			symbol => 'HRK',
-			display_name => {
-				'currency' => q(HRK),
-				'few' => q(HRK),
-				'many' => q(HRK),
-				'one' => q(HRK),
-				'other' => q(HRK),
-			},
 		},
 		'HTG' => {
 			symbol => 'HTG',
-			display_name => {
-				'currency' => q(HTG),
-				'few' => q(HTG),
-				'many' => q(HTG),
-				'one' => q(HTG),
-				'other' => q(HTG),
-			},
 		},
 		'HUF' => {
 			symbol => 'HUF',
-			display_name => {
-				'currency' => q(HUF),
-				'few' => q(HUF),
-				'many' => q(HUF),
-				'one' => q(HUF),
-				'other' => q(HUF),
-			},
 		},
 		'IDR' => {
 			symbol => 'IDR',
-			display_name => {
-				'currency' => q(IDR),
-				'few' => q(IDR),
-				'many' => q(IDR),
-				'one' => q(IDR),
-				'other' => q(IDR),
-			},
 		},
 		'ILS' => {
 			symbol => '₪',
-			display_name => {
-				'currency' => q(ILS),
-				'few' => q(ILS),
-				'many' => q(ILS),
-				'one' => q(ILS),
-				'other' => q(ILS),
-			},
 		},
 		'INR' => {
 			symbol => '₹',
-			display_name => {
-				'currency' => q(INR),
-				'few' => q(INR),
-				'many' => q(INR),
-				'one' => q(INR),
-				'other' => q(INR),
-			},
 		},
 		'IQD' => {
 			symbol => 'IQD',
-			display_name => {
-				'currency' => q(IQD),
-				'few' => q(IQD),
-				'many' => q(IQD),
-				'one' => q(IQD),
-				'other' => q(IQD),
-			},
 		},
 		'IRR' => {
 			symbol => 'IRR',
-			display_name => {
-				'currency' => q(IRR),
-				'few' => q(IRR),
-				'many' => q(IRR),
-				'one' => q(IRR),
-				'other' => q(IRR),
-			},
 		},
 		'JMD' => {
 			symbol => 'JMD',
-			display_name => {
-				'currency' => q(JMD),
-				'few' => q(JMD),
-				'many' => q(JMD),
-				'one' => q(JMD),
-				'other' => q(JMD),
-			},
 		},
 		'JOD' => {
 			symbol => 'JOD',
-			display_name => {
-				'currency' => q(JOD),
-				'few' => q(JOD),
-				'many' => q(JOD),
-				'one' => q(JOD),
-				'other' => q(JOD),
-			},
 		},
 		'KES' => {
 			symbol => 'KES',
-			display_name => {
-				'currency' => q(KES),
-				'few' => q(KES),
-				'many' => q(KES),
-				'one' => q(KES),
-				'other' => q(KES),
-			},
 		},
 		'KGS' => {
 			symbol => 'KGS',
-			display_name => {
-				'currency' => q(KGS),
-				'few' => q(KGS),
-				'many' => q(KGS),
-				'one' => q(KGS),
-				'other' => q(KGS),
-			},
 		},
 		'KHR' => {
 			symbol => 'KHR',
-			display_name => {
-				'currency' => q(KHR),
-				'few' => q(KHR),
-				'many' => q(KHR),
-				'one' => q(KHR),
-				'other' => q(KHR),
-			},
 		},
 		'KMF' => {
 			symbol => 'KMF',
-			display_name => {
-				'currency' => q(KMF),
-				'few' => q(KMF),
-				'many' => q(KMF),
-				'one' => q(KMF),
-				'other' => q(KMF),
-			},
 		},
 		'KPW' => {
 			symbol => 'KPW',
-			display_name => {
-				'few' => q(KPW),
-				'many' => q(KPW),
-				'one' => q(KPW),
-				'other' => q(KPW),
-			},
 		},
 		'KRW' => {
 			symbol => '₩',
-			display_name => {
-				'currency' => q(KRW),
-				'few' => q(KRW),
-				'many' => q(KRW),
-				'one' => q(KRW),
-				'other' => q(KRW),
-			},
 		},
 		'KWD' => {
 			symbol => 'KWD',
-			display_name => {
-				'currency' => q(KWD),
-				'few' => q(KWD),
-				'many' => q(KWD),
-				'one' => q(KWD),
-				'other' => q(KWD),
-			},
 		},
 		'KYD' => {
 			symbol => 'KYD',
-			display_name => {
-				'currency' => q(KYD),
-				'few' => q(KYD),
-				'many' => q(KYD),
-				'one' => q(KYD),
-				'other' => q(KYD),
-			},
 		},
 		'KZT' => {
 			symbol => 'KZT',
-			display_name => {
-				'currency' => q(KZT),
-				'few' => q(KZT),
-				'many' => q(KZT),
-				'one' => q(KZT),
-				'other' => q(KZT),
-			},
 		},
 		'LAK' => {
 			symbol => 'LAK',
-			display_name => {
-				'currency' => q(LAK),
-				'few' => q(LAK),
-				'many' => q(LAK),
-				'one' => q(LAK),
-				'other' => q(LAK),
-			},
 		},
 		'LBP' => {
 			symbol => 'LBP',
-			display_name => {
-				'currency' => q(LBP),
-				'few' => q(LBP),
-				'many' => q(LBP),
-				'one' => q(LBP),
-				'other' => q(LBP),
-			},
 		},
 		'LKR' => {
 			symbol => 'LKR',
-			display_name => {
-				'currency' => q(LKR),
-				'few' => q(LKR),
-				'many' => q(LKR),
-				'one' => q(LKR),
-				'other' => q(LKR),
-			},
 		},
 		'LRD' => {
 			symbol => 'LRD',
-			display_name => {
-				'currency' => q(LRD),
-				'few' => q(LRD),
-				'many' => q(LRD),
-				'one' => q(LRD),
-				'other' => q(LRD),
-			},
 		},
 		'LYD' => {
 			symbol => 'LYD',
-			display_name => {
-				'currency' => q(LYD),
-				'few' => q(LYD),
-				'many' => q(LYD),
-				'one' => q(LYD),
-				'other' => q(LYD),
-			},
 		},
 		'MAD' => {
 			symbol => 'MAD',
-			display_name => {
-				'currency' => q(MAD),
-				'few' => q(MAD),
-				'many' => q(MAD),
-				'one' => q(MAD),
-				'other' => q(MAD),
-			},
 		},
 		'MDL' => {
 			symbol => 'MDL',
-			display_name => {
-				'currency' => q(MDL),
-				'few' => q(MDL),
-				'many' => q(MDL),
-				'one' => q(MDL),
-				'other' => q(MDL),
-			},
 		},
 		'MGA' => {
 			symbol => 'MGA',
-			display_name => {
-				'currency' => q(MGA),
-				'few' => q(MGA),
-				'many' => q(MGA),
-				'one' => q(MGA),
-				'other' => q(MGA),
-			},
 		},
 		'MKD' => {
 			symbol => 'MKD',
-			display_name => {
-				'currency' => q(MKD),
-				'few' => q(MKD),
-				'many' => q(MKD),
-				'one' => q(MKD),
-				'other' => q(MKD),
-			},
 		},
 		'MMK' => {
 			symbol => 'MMK',
-			display_name => {
-				'currency' => q(MMK),
-				'few' => q(MMK),
-				'many' => q(MMK),
-				'one' => q(MMK),
-				'other' => q(MMK),
-			},
 		},
 		'MNT' => {
 			symbol => 'MNT',
-			display_name => {
-				'currency' => q(MNT),
-				'few' => q(MNT),
-				'many' => q(MNT),
-				'one' => q(MNT),
-				'other' => q(MNT),
-			},
 		},
 		'MOP' => {
 			symbol => 'MOP',
-			display_name => {
-				'currency' => q(MOP),
-				'few' => q(MOP),
-				'many' => q(MOP),
-				'one' => q(MOP),
-				'other' => q(MOP),
-			},
 		},
 		'MRO' => {
 			symbol => 'MRO',
-			display_name => {
-				'currency' => q(MRO),
-				'few' => q(MRO),
-				'many' => q(MRO),
-				'one' => q(MRO),
-				'other' => q(MRO),
-			},
-		},
-		'MRU' => {
-			display_name => {
-				'currency' => q(MRU),
-				'few' => q(MRU),
-				'many' => q(MRU),
-				'one' => q(MRU),
-				'other' => q(MRU),
-			},
 		},
 		'MTL' => {
 			display_name => {
@@ -3412,615 +2962,186 @@ has 'currencies' => (
 		},
 		'MUR' => {
 			symbol => 'MUR',
-			display_name => {
-				'currency' => q(MUR),
-				'few' => q(MUR),
-				'many' => q(MUR),
-				'one' => q(MUR),
-				'other' => q(MUR),
-			},
 		},
 		'MVR' => {
 			symbol => 'MVR',
-			display_name => {
-				'currency' => q(MVR),
-				'few' => q(MVR),
-				'many' => q(MVR),
-				'one' => q(MVR),
-				'other' => q(MVR),
-			},
 		},
 		'MWK' => {
 			symbol => 'MWK',
-			display_name => {
-				'currency' => q(MWK),
-				'few' => q(MWK),
-				'many' => q(MWK),
-				'one' => q(MWK),
-				'other' => q(MWK),
-			},
 		},
 		'MXN' => {
 			symbol => 'MX$',
-			display_name => {
-				'currency' => q(MXN),
-				'few' => q(MXN),
-				'many' => q(MXN),
-				'one' => q(MXN),
-				'other' => q(MXN),
-			},
 		},
 		'MYR' => {
 			symbol => 'MYR',
-			display_name => {
-				'currency' => q(MYR),
-				'few' => q(MYR),
-				'many' => q(MYR),
-				'one' => q(MYR),
-				'other' => q(MYR),
-			},
 		},
 		'MZN' => {
 			symbol => 'MZN',
-			display_name => {
-				'currency' => q(MZN),
-				'few' => q(MZN),
-				'many' => q(MZN),
-				'one' => q(MZN),
-				'other' => q(MZN),
-			},
 		},
 		'NAD' => {
 			symbol => 'NAD',
-			display_name => {
-				'currency' => q(NAD),
-				'few' => q(NAD),
-				'many' => q(NAD),
-				'one' => q(NAD),
-				'other' => q(NAD),
-			},
 		},
 		'NGN' => {
 			symbol => 'NGN',
-			display_name => {
-				'currency' => q(NGN),
-				'few' => q(NGN),
-				'many' => q(NGN),
-				'one' => q(NGN),
-				'other' => q(NGN),
-			},
 		},
 		'NIO' => {
 			symbol => 'NIO',
-			display_name => {
-				'currency' => q(NIO),
-				'few' => q(NIO),
-				'many' => q(NIO),
-				'one' => q(NIO),
-				'other' => q(NIO),
-			},
 		},
 		'NPR' => {
 			symbol => 'Rs',
-			display_name => {
-				'currency' => q(NPR),
-				'few' => q(NPR),
-				'many' => q(NPR),
-				'one' => q(NPR),
-				'other' => q(NPR),
-			},
 		},
 		'NZD' => {
 			symbol => 'NZ$',
-			display_name => {
-				'currency' => q(NZD),
-				'few' => q(NZD),
-				'many' => q(NZD),
-				'one' => q(NZD),
-				'other' => q(NZD),
-			},
 		},
 		'OMR' => {
 			symbol => 'OMR',
-			display_name => {
-				'currency' => q(OMR),
-				'few' => q(OMR),
-				'many' => q(OMR),
-				'one' => q(OMR),
-				'other' => q(OMR),
-			},
 		},
 		'PAB' => {
 			symbol => 'PAB',
-			display_name => {
-				'currency' => q(PAB),
-				'few' => q(PAB),
-				'many' => q(PAB),
-				'one' => q(PAB),
-				'other' => q(PAB),
-			},
 		},
 		'PEN' => {
 			symbol => 'PEN',
-			display_name => {
-				'currency' => q(PEN),
-				'few' => q(PEN),
-				'many' => q(PEN),
-				'one' => q(PEN),
-				'other' => q(PEN),
-			},
 		},
 		'PGK' => {
 			symbol => 'PGK',
-			display_name => {
-				'currency' => q(PGK),
-				'few' => q(PGK),
-				'many' => q(PGK),
-				'one' => q(PGK),
-				'other' => q(PGK),
-			},
 		},
 		'PHP' => {
 			symbol => 'PHP',
-			display_name => {
-				'currency' => q(PHP),
-				'few' => q(PHP),
-				'many' => q(PHP),
-				'one' => q(PHP),
-				'other' => q(PHP),
-			},
 		},
 		'PKR' => {
 			symbol => 'PKR',
-			display_name => {
-				'currency' => q(PKR),
-				'few' => q(PKR),
-				'many' => q(PKR),
-				'one' => q(PKR),
-				'other' => q(PKR),
-			},
 		},
 		'PLN' => {
 			symbol => 'PLN',
-			display_name => {
-				'currency' => q(PLN),
-				'few' => q(PLN),
-				'many' => q(PLN),
-				'one' => q(PLN),
-				'other' => q(PLN),
-			},
 		},
 		'PYG' => {
 			symbol => 'PYG',
-			display_name => {
-				'currency' => q(PYG),
-				'few' => q(PYG),
-				'many' => q(PYG),
-				'one' => q(PYG),
-				'other' => q(PYG),
-			},
 		},
 		'QAR' => {
 			symbol => 'QAR',
-			display_name => {
-				'currency' => q(QAR),
-				'few' => q(QAR),
-				'many' => q(QAR),
-				'one' => q(QAR),
-				'other' => q(QAR),
-			},
 		},
 		'RON' => {
 			symbol => 'RON',
-			display_name => {
-				'currency' => q(RON),
-				'few' => q(RON),
-				'many' => q(RON),
-				'one' => q(RON),
-				'other' => q(RON),
-			},
 		},
 		'RSD' => {
 			symbol => 'RSD',
-			display_name => {
-				'currency' => q(RSD),
-				'few' => q(RSD),
-				'many' => q(RSD),
-				'one' => q(RSD),
-				'other' => q(RSD),
-			},
 		},
 		'RUB' => {
 			symbol => 'RUB',
-			display_name => {
-				'currency' => q(RUB),
-				'few' => q(RUB),
-				'many' => q(RUB),
-				'one' => q(RUB),
-				'other' => q(RUB),
-			},
 		},
 		'RWF' => {
 			symbol => 'RWF',
-			display_name => {
-				'currency' => q(RWF),
-				'few' => q(RWF),
-				'many' => q(RWF),
-				'one' => q(RWF),
-				'other' => q(RWF),
-			},
 		},
 		'SAR' => {
 			symbol => 'SAR',
-			display_name => {
-				'currency' => q(SAR),
-				'few' => q(SAR),
-				'many' => q(SAR),
-				'one' => q(SAR),
-				'other' => q(SAR),
-			},
 		},
 		'SBD' => {
 			symbol => 'SBD',
-			display_name => {
-				'currency' => q(SBD),
-				'few' => q(SBD),
-				'many' => q(SBD),
-				'one' => q(SBD),
-				'other' => q(SBD),
-			},
 		},
 		'SCR' => {
 			symbol => 'SCR',
-			display_name => {
-				'currency' => q(SCR),
-				'few' => q(SCR),
-				'many' => q(SCR),
-				'one' => q(SCR),
-				'other' => q(SCR),
-			},
 		},
 		'SDG' => {
 			symbol => 'SDG',
-			display_name => {
-				'currency' => q(SDG),
-				'few' => q(SDG),
-				'many' => q(SDG),
-				'one' => q(SDG),
-				'other' => q(SDG),
-			},
 		},
 		'SEK' => {
 			symbol => 'SEK',
 		},
 		'SGD' => {
 			symbol => 'SGD',
-			display_name => {
-				'currency' => q(SGD),
-				'few' => q(SGD),
-				'many' => q(SGD),
-				'one' => q(SGD),
-				'other' => q(SGD),
-			},
 		},
 		'SHP' => {
 			symbol => 'SHP',
-			display_name => {
-				'currency' => q(SHP),
-				'few' => q(SHP),
-				'many' => q(SHP),
-				'one' => q(SHP),
-				'other' => q(SHP),
-			},
 		},
 		'SLL' => {
 			symbol => 'SLL',
-			display_name => {
-				'currency' => q(SLL),
-				'few' => q(SLL),
-				'many' => q(SLL),
-				'one' => q(SLL),
-				'other' => q(SLL),
-			},
 		},
 		'SOS' => {
 			symbol => 'SOS',
-			display_name => {
-				'currency' => q(SOS),
-				'few' => q(SOS),
-				'many' => q(SOS),
-				'one' => q(SOS),
-				'other' => q(SOS),
-			},
 		},
 		'SRD' => {
 			symbol => 'SRD',
-			display_name => {
-				'currency' => q(SRD),
-				'few' => q(SRD),
-				'many' => q(SRD),
-				'one' => q(SRD),
-				'other' => q(SRD),
-			},
 		},
 		'SSP' => {
 			symbol => 'SSP',
-			display_name => {
-				'currency' => q(SSP),
-				'few' => q(SSP),
-				'many' => q(SSP),
-				'one' => q(SSP),
-				'other' => q(SSP),
-			},
 		},
 		'STD' => {
 			symbol => 'STD',
-			display_name => {
-				'currency' => q(STD),
-				'few' => q(STD),
-				'many' => q(STD),
-				'one' => q(STD),
-				'other' => q(STD),
-			},
 		},
 		'STN' => {
 			symbol => 'STN',
-			display_name => {
-				'currency' => q(STN),
-				'few' => q(STN),
-				'many' => q(STN),
-				'one' => q(STN),
-				'other' => q(STN),
-			},
 		},
 		'SYP' => {
 			symbol => 'SYP',
-			display_name => {
-				'currency' => q(SYP),
-				'few' => q(SYP),
-				'many' => q(SYP),
-				'one' => q(SYP),
-				'other' => q(SYP),
-			},
 		},
 		'SZL' => {
 			symbol => 'SZL',
-			display_name => {
-				'currency' => q(SZL),
-				'few' => q(SZL),
-				'many' => q(SZL),
-				'one' => q(SZL),
-				'other' => q(SZL),
-			},
 		},
 		'THB' => {
 			symbol => 'THB',
-			display_name => {
-				'currency' => q(THB),
-				'few' => q(THB),
-				'many' => q(THB),
-				'one' => q(THB),
-				'other' => q(THB),
-			},
 		},
 		'TJS' => {
 			symbol => 'TJS',
-			display_name => {
-				'currency' => q(TJS),
-				'few' => q(TJS),
-				'many' => q(TJS),
-				'one' => q(TJS),
-				'other' => q(TJS),
-			},
 		},
 		'TMT' => {
 			symbol => 'TMT',
-			display_name => {
-				'currency' => q(TMT),
-				'few' => q(TMT),
-				'many' => q(TMT),
-				'one' => q(TMT),
-				'other' => q(TMT),
-			},
 		},
 		'TND' => {
 			symbol => 'TND',
-			display_name => {
-				'currency' => q(TND),
-				'few' => q(TND),
-				'many' => q(TND),
-				'one' => q(TND),
-				'other' => q(TND),
-			},
 		},
 		'TOP' => {
 			symbol => 'TOP',
-			display_name => {
-				'currency' => q(TOP),
-				'few' => q(TOP),
-				'many' => q(TOP),
-				'one' => q(TOP),
-				'other' => q(TOP),
-			},
 		},
 		'TRY' => {
 			symbol => 'TRY',
-			display_name => {
-				'currency' => q(TRY),
-				'few' => q(TRY),
-				'many' => q(TRY),
-				'one' => q(TRY),
-				'other' => q(TRY),
-			},
 		},
 		'TTD' => {
 			symbol => 'TTD',
-			display_name => {
-				'currency' => q(TTD),
-				'few' => q(TTD),
-				'many' => q(TTD),
-				'one' => q(TTD),
-				'other' => q(TTD),
-			},
 		},
 		'TWD' => {
 			symbol => 'NT$',
-			display_name => {
-				'currency' => q(TWD),
-				'few' => q(TWD),
-				'many' => q(TWD),
-				'one' => q(TWD),
-				'other' => q(TWD),
-			},
 		},
 		'TZS' => {
 			symbol => 'TZS',
-			display_name => {
-				'currency' => q(TZS),
-				'few' => q(TZS),
-				'many' => q(TZS),
-				'one' => q(TZS),
-				'other' => q(TZS),
-			},
 		},
 		'UAH' => {
 			symbol => 'UAH',
-			display_name => {
-				'currency' => q(UAH),
-				'few' => q(UAH),
-				'many' => q(UAH),
-				'one' => q(UAH),
-				'other' => q(UAH),
-			},
 		},
 		'UGX' => {
 			symbol => 'UGX',
-			display_name => {
-				'currency' => q(UGX),
-				'few' => q(UGX),
-				'many' => q(UGX),
-				'one' => q(UGX),
-				'other' => q(UGX),
-			},
 		},
 		'USD' => {
 			symbol => 'US$',
-			display_name => {
-				'currency' => q(USD),
-				'few' => q(USD),
-				'many' => q(USD),
-				'one' => q(USD),
-				'other' => q(USD),
-			},
 		},
 		'UYU' => {
 			symbol => 'UYU',
-			display_name => {
-				'currency' => q(UYU),
-				'few' => q(UYU),
-				'many' => q(UYU),
-				'one' => q(UYU),
-				'other' => q(UYU),
-			},
 		},
 		'UZS' => {
 			symbol => 'UZS',
-			display_name => {
-				'currency' => q(UZS),
-				'few' => q(UZS),
-				'many' => q(UZS),
-				'one' => q(UZS),
-				'other' => q(UZS),
-			},
 		},
 		'VEF' => {
 			symbol => 'VEF',
-			display_name => {
-				'currency' => q(VEF),
-				'few' => q(VEF),
-				'many' => q(VEF),
-				'one' => q(VEF),
-				'other' => q(VEF),
-			},
-		},
-		'VES' => {
-			display_name => {
-				'currency' => q(VES),
-				'few' => q(VES),
-				'many' => q(VES),
-				'one' => q(VES),
-				'other' => q(VES),
-			},
 		},
 		'VND' => {
 			symbol => '₫',
-			display_name => {
-				'currency' => q(VND),
-				'few' => q(VND),
-				'many' => q(VND),
-				'one' => q(VND),
-				'other' => q(VND),
-			},
 		},
 		'VUV' => {
 			symbol => 'VUV',
-			display_name => {
-				'currency' => q(VUV),
-				'few' => q(VUV),
-				'many' => q(VUV),
-				'one' => q(VUV),
-				'other' => q(VUV),
-			},
 		},
 		'WST' => {
 			symbol => 'WST',
-			display_name => {
-				'currency' => q(WST),
-				'few' => q(WST),
-				'many' => q(WST),
-				'one' => q(WST),
-				'other' => q(WST),
-			},
 		},
 		'XAF' => {
 			symbol => 'FCFA',
-			display_name => {
-				'currency' => q(XAF),
-				'few' => q(XAF),
-				'many' => q(XAF),
-				'one' => q(XAF),
-				'other' => q(XAF),
-			},
 		},
 		'XCD' => {
 			symbol => 'EC$',
-			display_name => {
-				'currency' => q(XCD),
-				'few' => q(XCD),
-				'many' => q(XCD),
-				'one' => q(XCD),
-				'other' => q(XCD),
-			},
 		},
 		'XOF' => {
-			symbol => 'CFA',
-			display_name => {
-				'currency' => q(XOF),
-				'few' => q(XOF),
-				'many' => q(XOF),
-				'one' => q(XOF),
-				'other' => q(XOF),
-			},
+			symbol => 'F CFA',
 		},
 		'XPF' => {
 			symbol => 'CFPF',
-			display_name => {
-				'currency' => q(XPF),
-				'few' => q(XPF),
-				'many' => q(XPF),
-				'one' => q(XPF),
-				'other' => q(XPF),
-			},
 		},
 		'XXX' => {
 			display_name => {
@@ -4033,33 +3154,12 @@ has 'currencies' => (
 		},
 		'YER' => {
 			symbol => 'YER',
-			display_name => {
-				'currency' => q(YER),
-				'few' => q(YER),
-				'many' => q(YER),
-				'one' => q(YER),
-				'other' => q(YER),
-			},
 		},
 		'ZAR' => {
 			symbol => 'ZAR',
-			display_name => {
-				'currency' => q(ZAR),
-				'few' => q(ZAR),
-				'many' => q(ZAR),
-				'one' => q(ZAR),
-				'other' => q(ZAR),
-			},
 		},
 		'ZMW' => {
 			symbol => 'ZMW',
-			display_name => {
-				'currency' => q(ZMW),
-				'few' => q(ZMW),
-				'many' => q(ZMW),
-				'one' => q(ZMW),
-				'other' => q(ZMW),
-			},
 		},
 	} },
 );
@@ -4458,7 +3558,7 @@ has 'datetime_formats_available_formats' => (
 			yyyyMEd => q{GGGGG E, dd-MM-y},
 			yyyyMMM => q{GGGGG MMM y},
 			yyyyMMMEd => q{GGGGG E, dd MMM y},
-			yyyyMMMM => q{GGGGG MMM y},
+			yyyyMMMM => q{GGGGG MMMM y},
 			yyyyMMMd => q{GGGGG dd MMM y},
 			yyyyMd => q{GGGGG dd-MM-y},
 			yyyyQQQ => q{G y QQQ},

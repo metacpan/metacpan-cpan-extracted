@@ -1,3 +1,32 @@
+Revision history for RTx-Calendar
+
+1.09 2023-12-18
+ - Add French translation (thanks elacour!)
+ - Restrict image width for better display on metacpan
+
+1.08 2023-12-15
+ - Prevent loss of filter selection when changing months w/select boxes
+ - Restore the default popup configuration
+ - Don't die in the popup helper if attributes are not found
+ - Fix Status Color typo
+ - Add a default color for unmapped states
+
+Versions 1.06 and 1.07 were internal releases and thus not published to CPAN.
+
+1.07 2023-11-16
+ - Fix display of multiple day events
+ - Prevent infinite loops when rendering multiple days events
+ - Allow the calendar to be correctly changed to January
+ - Fix crash when changing months using the select boxes
+
+1.06 2023-10-24
+ - Minimum version of RT 5.0
+ - Add color-coded display of events by ticket status
+ - Filter event display by ticket status
+ - Added help panel
+ - Add multi-day event support
+ - Add dark mode support
+
 1.05 2023-01-29
  - add a callback named BeforeFindTickets so user can modify the query
    or format of the calendar search

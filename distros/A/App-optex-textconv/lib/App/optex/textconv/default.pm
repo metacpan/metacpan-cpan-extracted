@@ -9,6 +9,7 @@ our @CONVERTER = (
     [ qr/\.jpe?g$/i  => 'exif "%s"' ],
     [ qr[^https?://] => 'w3m -dump "%s"' ],
     [ qr/\.gpg$/i  => 'gpg --quiet --no-mdc-warning --decrypt "%s"' ],
+    [ qr/\.(plist|strings)$/  => 'plutil -p "%s"' ],
     );
 
 1;

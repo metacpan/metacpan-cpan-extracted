@@ -63,8 +63,8 @@ sub new {
 # DeleteWorksheetFilterRequest.sheetName : The worksheet name.  ,
 # DeleteWorksheetFilterRequest.fieldIndex : The integer offset of the field on which you want to base the filter (from the left of the list; the leftmost field is field 0).  ,
 # DeleteWorksheetFilterRequest.criteria : The custom criteria.  ,
-# DeleteWorksheetFilterRequest.folder : Original workbook folder.  ,
-# DeleteWorksheetFilterRequest.storageName : Storage name.   
+# DeleteWorksheetFilterRequest.folder : The folder where the file is situated.  ,
+# DeleteWorksheetFilterRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_worksheet_filter' } = { 
-    	summary => 'Deletes a filter for a filter column in worksheet.            ',
+    	summary => 'Delete a filter for a column in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -168,14 +168,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

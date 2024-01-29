@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.66;
+use warnings;
+use Object::Pad 0.800;
 
-package Tangence::Class 0.30;
+package Tangence::Class 0.32;
 class Tangence::Class :isa(Tangence::Meta::Class);
 
 use Tangence::Constants;
@@ -19,7 +20,20 @@ use Tangence::Meta::Argument;
 
 use Carp;
 
+use meta 0.003_002;
+no warnings 'meta::experimental';
 use Sub::Util 1.40 qw( set_subname );
+
+=head1 NAME
+
+C<Tangence::Class> - server implementation of a C<Tangence> class
+
+=head1 DESCRIPTION
+
+This module is a component of L<Tangence::Server>. It is not intended for
+end-user use directly.
+
+=cut
 
 our %CLASSES; # cache one per class, keyed by _Tangence_ class name
 
@@ -102,6 +116,7 @@ method define
    $self->SUPER::define( @_ );
 
    my $class = $self->perlname;
+   my $classmeta = meta::package->get( $class );
 
    my %subs;
 
@@ -109,10 +124,13 @@ method define
       $prop->build_accessor( \%subs );
    }
 
-   no strict 'refs';
    foreach my $name ( keys %subs ) {
-      next if defined &{"${class}::${name}"};
-      *{"${class}::${name}"} = set_subname "${class}::${name}" => $subs{$name};
+      next if $classmeta->can_symbol( '&' . $name );
+      $classmeta->add_symbol(
+         # TODO: It'd be great if meta did the set_subname, or at least,
+         # offered an accessor method to do so
+         '&' . $name => set_subname "${class}::${name}" => $subs{$name}
+      );
    }
 }
 

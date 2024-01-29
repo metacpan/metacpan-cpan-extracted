@@ -32,12 +32,15 @@ sub table_write_access {
     my $cs = App::DBBrowser::Table::CommitWriteSQL->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my @stmt_types;
-    if ( ! $sf->{d}{special_table} ) {
+    if ( $sf->{d}{table_origin} eq 'ordinary' ) {
+        # ordinary tables: use tablename without alias:
+        my $table_key = $sf->{d}{table_key};
+        $sql->{table} = $ax->quote_table( $sf->{d}{tables_info}{$table_key} );
         push @stmt_types, 'Insert' if $sf->{o}{enable}{insert_into};
         push @stmt_types, 'Update' if $sf->{o}{enable}{update};
         push @stmt_types, 'Delete' if $sf->{o}{enable}{delete};
     }
-    elsif ( $sf->{d}{special_table} eq 'join' && $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
+    elsif ( $sf->{d}{table_origin} eq 'join' && $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
         push @stmt_types, 'Update' if $sf->{o}{enable}{update};
     }
     if ( ! @stmt_types ) {
@@ -68,10 +71,6 @@ sub table_write_access {
         $stmt_type =~ s/^-\ //;
         $sf->{d}{stmt_types} = [ $stmt_type ];
         $ax->reset_sql( $sql );
-        ##
-        my $table_key = $sf->{d}{table_key};
-        $sql->{table} = $ax->quote_table( $sf->{d}{tables_info}{$table_key} ); # table name without alias
-        ##
         if ( $stmt_type eq 'Insert' ) {
             my $ok = $sf->__build_insert_stmt( $sql );
             if ( $ok ) {
@@ -109,19 +108,12 @@ sub table_write_access {
                 }
                 $old_idx = $idx;
             }
-            my $backup_sql = $ax->backup_href( $sql );
             my $custom = $menu->[$idx];
             if ( $custom eq $cu{'set'} ) {
-                my $ok = $sb->set( $sql );
-                if ( ! $ok ) {
-                    $sql = $backup_sql;
-                }
+                $sb->set( $sql );
             }
             elsif ( $custom eq $cu{'where'} ) {
-                my $ok = $sb->where( $sql );
-                if ( ! $ok ) {
-                    $sql = $backup_sql;
-                }
+                $sb->where( $sql );
             }
             elsif ( $custom eq $cu{'commit'} ) {
                 my $ok = $cs->commit_sql( $sql );

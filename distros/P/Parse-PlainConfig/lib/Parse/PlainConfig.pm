@@ -2,7 +2,7 @@
 #
 # (c) 2002 - 2023, Arthur Corliss <corliss@digitalmages.com>,
 #
-# $Id: lib/Parse/PlainConfig.pm, 3.06 2023/09/23 19:24:20 acorliss Exp $
+# $Id: lib/Parse/PlainConfig.pm, 3.07 2024/01/10 13:32:06 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -23,7 +23,7 @@ use strict;
 use warnings;
 use vars qw($VERSION);
 
-($VERSION) = ( q$Revision: 3.06 $ =~ /(\d+(?:\.(\d+))+)/sm );
+($VERSION) = ( q$Revision: 3.07 $ =~ /(\d+(?:\.(\d+))+)/sm );
 
 use Class::EHierarchy qw(:all);
 use Parse::PlainConfig::Constants qw(:all);
@@ -294,20 +294,41 @@ sub get {
 
     my $obj = shift;
     my $p   = shift;
-    my $valp;
+    my ( $valp, $valt, $rv );
 
     subPreamble( PPCDLEVEL1, '$$', $obj, $p );
 
     if ( defined $p ) {
         $valp = scalar grep /^\Q$p\E$/s, $obj->properties;
+        if ($valp) {
+            ($valt) = $obj->settings->subset( 'property types', $p );
+            $valt = PPC_SCALAR if $valt == PPC_HDOC;
+        }
     }
     $obj->error(
         pdebug( 'specified invalid parameter name: %s', PPCDLEVEL1, $p ) )
         unless $valp;
 
-    subPostamble( PPCDLEVEL1, '' );
+    # Return values get a little dicier because of different data types
+    if ( defined $valt ) {
+        if ( $valt == PPC_SCALAR ) {
+            $rv = $obj->SUPER::get($p);
+            subPostamble( PPCDLEVEL1, '$', $rv );
+            return $rv;
+        } elsif ( $valt == PPC_ARRAY ) {
+            $rv = [ $obj->SUPER::get($p) ];
+            subPostamble( PPCDLEVEL1, '@', @$rv );
+            return @$rv;
+        } else {
+            $rv = { $obj->SUPER::get($p) };
+            subPostamble( PPCDLEVEL1, '%', %$rv );
+            return %$rv;
+        }
+    }
 
-    return $valp ? $obj->SUPER::get($p) : undef;
+    subPostamble( PPCDLEVEL1, '$', $rv );
+
+    return $rv;
 }
 
 sub set {
@@ -793,7 +814,7 @@ Parse::PlainConfig - Configuration file class
 
 =head1 VERSION
 
-$Id: lib/Parse/PlainConfig.pm, 3.06 2023/09/23 19:24:20 acorliss Exp $
+$Id: lib/Parse/PlainConfig.pm, 3.07 2024/01/10 13:32:06 acorliss Exp $
 
 =head1 SYNOPSIS
 

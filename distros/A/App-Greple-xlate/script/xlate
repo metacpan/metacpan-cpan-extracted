@@ -46,7 +46,7 @@ define pod <<"=cut"
 
 =head1 VERSION
 
-    Version 0.28
+    Version 0.29
 
 =cut
 
@@ -255,7 +255,7 @@ case $1 in
 	area=(--re '^(.+\n)+')
 	;;
     *.md)
-	area=(--re '(?x) ^[-+#].*\n | ^(\S.*\n)+ ')
+	area=(--re '(?x) ^[-+#].*\n | ^[\t ]+\K.*\n | ^(.+\n)+ ')
 	;;
     *.pm|*.pod)
 	module+=(-Mperl)

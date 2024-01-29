@@ -37,9 +37,8 @@ use lib 't/lib';
     use Moo;
     use CompleteExample;
 
-    CompleteExample->apply(
-        {
-            attr     => 'a',
+    CompleteExample->apply_roles_to_target(
+        {   attr     => 'a',
             method   => 'b',
             requires => 'r',
             with     => 'RoleA',
@@ -57,9 +56,8 @@ use lib 't/lib';
     use Moo;
     use CompleteExample;
 
-    CompleteExample->apply(
-        {
-            attr     => 'a',
+    CompleteExample->apply_roles_to_target(
+        {   attr     => 'a',
             method   => 'b',
             requires => 'r',
             with     => 'RoleB',
@@ -75,13 +73,12 @@ use lib 't/lib';
     use Moo;
     use CompleteExample;
 
-    CompleteExample->apply(
-        {
-            attr     => 'a',
+    CompleteExample->apply_roles_to_target(
+        {   attr     => 'a',
             method   => 'b',
             requires => 'r',
             with     => 'RoleC',
-            around   => [ r => sub { 1024 } ],
+            around   => [ r => sub {1024} ],
         }
     );
 }

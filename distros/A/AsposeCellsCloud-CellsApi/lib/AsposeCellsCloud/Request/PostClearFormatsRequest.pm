@@ -59,15 +59,15 @@ sub new {
 
 
 # Run Operation Request
-# PostClearFormatsRequest.name : The workbook name.  ,
+# PostClearFormatsRequest.name : The file name.  ,
 # PostClearFormatsRequest.sheetName : The worksheet name.  ,
 # PostClearFormatsRequest.range : Represents the range to which the specified cells applies.  ,
-# PostClearFormatsRequest.startRow : The start row.  ,
-# PostClearFormatsRequest.startColumn : The start column.  ,
-# PostClearFormatsRequest.endRow : The end row.  ,
-# PostClearFormatsRequest.endColumn : The end column.  ,
-# PostClearFormatsRequest.folder : Original workbook folder.  ,
-# PostClearFormatsRequest.storageName : Storage name.   
+# PostClearFormatsRequest.startRow : The start row index.  ,
+# PostClearFormatsRequest.startColumn : The start column index.  ,
+# PostClearFormatsRequest.endRow : The end row index.  ,
+# PostClearFormatsRequest.endColumn : The end column index.  ,
+# PostClearFormatsRequest.folder : The folder where the file is situated.  ,
+# PostClearFormatsRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -78,7 +78,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_clear_formats' } = { 
-    	summary => 'Clear cells formats in worksheet.',
+    	summary => 'Clear cell formats in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -155,7 +155,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -176,42 +176,42 @@ __PACKAGE__->method_documentation({
      'start_row' => {
      	datatype => 'int',
      	base_name => 'startRow',
-     	description => 'The start row.',
+     	description => 'The start row index.',
      	format => '',
      	read_only => '',
      		},
      'start_column' => {
      	datatype => 'int',
      	base_name => 'startColumn',
-     	description => 'The start column.',
+     	description => 'The start column index.',
      	format => '',
      	read_only => '',
      		},
      'end_row' => {
      	datatype => 'int',
      	base_name => 'endRow',
-     	description => 'The end row.',
+     	description => 'The end row index.',
      	format => '',
      	read_only => '',
      		},
      'end_column' => {
      	datatype => 'int',
      	base_name => 'endColumn',
-     	description => 'The end column.',
+     	description => 'The end column index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

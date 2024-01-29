@@ -64,10 +64,10 @@ sub new {
 # PutWorksheetColorFilterRequest.range : Represents the range to which the specified AutoFilter applies.  ,
 # PutWorksheetColorFilterRequest.fieldIndex : The integer offset of the field on which you want to base the filter (from the left of the list; the leftmost field is field 0).  ,
 # PutWorksheetColorFilterRequest.colorFilter : color filter request.  ,
-# PutWorksheetColorFilterRequest.matchBlanks : Match all blank or  not blank cell in the list.(true/false)  ,
-# PutWorksheetColorFilterRequest.refresh : If true, hide the filtered rows.  ,
-# PutWorksheetColorFilterRequest.folder : Original workbook folder.  ,
-# PutWorksheetColorFilterRequest.storageName : Storage name.   
+# PutWorksheetColorFilterRequest.matchBlanks : Match all blank cell in the list.  ,
+# PutWorksheetColorFilterRequest.refresh : Refresh auto filters to hide or unhide the rows.  ,
+# PutWorksheetColorFilterRequest.folder : The folder where the file is situated.  ,
+# PutWorksheetColorFilterRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -78,7 +78,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_color_filter' } = { 
-    	summary => 'Adds a color filter in worksheet.',
+    	summary => 'Add a color filter in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -192,28 +192,28 @@ __PACKAGE__->method_documentation({
      'match_blanks' => {
      	datatype => 'string',
      	base_name => 'matchBlanks',
-     	description => 'Match all blank or  not blank cell in the list.(true/false)',
+     	description => 'Match all blank cell in the list.',
      	format => '',
      	read_only => '',
      		},
      'refresh' => {
      	datatype => 'string',
      	base_name => 'refresh',
-     	description => 'If true, hide the filtered rows.',
+     	description => 'Refresh auto filters to hide or unhide the rows.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

@@ -130,11 +130,11 @@ This source is in GitHub
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2023, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
+Copyright © 2007-2024, brian d foy C<< <briandfoy@pobox.com> >>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the Artistic License 2.0.

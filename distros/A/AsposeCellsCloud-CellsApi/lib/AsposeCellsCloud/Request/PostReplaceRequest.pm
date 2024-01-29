@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostReplaceRequest.File : File to upload  ,
-# PostReplaceRequest.text :   ,
-# PostReplaceRequest.newtext :   ,
-# PostReplaceRequest.password :   ,
-# PostReplaceRequest.sheetname :   ,
-# PostReplaceRequest.checkExcelRestriction :    
+# PostReplaceRequest.File : Find content  ,
+# PostReplaceRequest.text : Find content  ,
+# PostReplaceRequest.newtext : Replace content  ,
+# PostReplaceRequest.password : The password needed to open an Excel file.  ,
+# PostReplaceRequest.sheetname : The worksheet name. Locate the specified text content in the worksheet.  ,
+# PostReplaceRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_replace' } = { 
-    	summary => 'Use new text to replace specify the text from excel files.',
+    	summary => 'Replace specified text with new text in Excel files.',
         params => $params,
         returns => 'FilesResult',
     };
@@ -143,42 +143,42 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'File to upload',
+     	description => 'Find content',
      	format => '',
      	read_only => '',
      		},
      'text' => {
      	datatype => 'string',
      	base_name => 'text',
-     	description => '',
+     	description => 'Find content',
      	format => '',
      	read_only => '',
      		},
      'newtext' => {
      	datatype => 'string',
      	base_name => 'newtext',
-     	description => '',
+     	description => 'Replace content',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'sheetname' => {
      	datatype => 'string',
      	base_name => 'sheetname',
-     	description => '',
+     	description => 'The worksheet name. Locate the specified text content in the worksheet.',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
-     	description => '',
+     	description => 'Whether check restriction of excel file when user modify cells related objects.',
      	format => '',
      	read_only => '',
      		},    

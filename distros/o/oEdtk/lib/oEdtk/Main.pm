@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Exporter;
-our $VERSION 	=1.5091;		# release number : Y.YMMS -> Year, Month, Sequence
+our $VERSION 	=1.8122;		# release number : Y.YMMS -> Year, Month, Sequence
 
 our @ISA	=	qw(Exporter);
 our @EXPORT = 	qw(
@@ -93,42 +93,43 @@ use oEdtk::Run		qw(oe_status_to_msg oe_compo_run oe_after_compo oe_outmngr_outpu
 
 # METHODE GENERIQUE D'EXTRACTION ET DE TRAITEMENT DES DONNEES
 
- our @DATATAB;			# le tableau dans lequel les enregistrements sont ventilés
- 					# changer en OE_DATATAB
+ our @DATATAB;				# le tableau dans lequel les enregistrements sont ventilés
+							# 	changer en OE_DATATAB
  our $LAST_ENR		="";	# QUID LAST_ENR ????
  our $CURRENT_REC	="";	# enrgistrement courant
  our $PREVIOUS_REC	="";	# enregistrement précédent
 
- our %motifs;			#rendre privée
- our %ouTags;			#rendre privée
- our %evalSsTrt;		#rendre privée
+ our %motifs;				#rendre privée
+ our %ouTags;				#rendre privée
+ our %evalSsTrt;			#rendre privée
 
  my $_ID_LDOC		='';	# initialisation de l'identifiant unique de document (un par run)
  my $PUSH_VALUE	="";
 
 
-# PLANNED : CONFIGURATION OF OUTPUT SYSTEM
-# 		return "\\long\\gdef\\$name\{$value\}";
-my $TAG_MODE = 'C7';
-my ($TAG_OPEN, $TAG_CLOSE, $TAG_MARKER, $TAG_ASSIGN, $TAG_ASSIGN_CLOS, $TAG_COMMENT, $TAG_L_SET, $TAG_R_SET);
+ # PLANNED : CONFIGURATION OF OUTPUT SYSTEM
+ # 		return "\\long\\gdef\\$name\{$value\}";
+ my $TAG_MODE = 'C7';
+ my ($TAG_OPEN, $TAG_CLOSE, $TAG_MARKER, $TAG_ASSIGN, $TAG_ASSIGN_CLOS, $TAG_COMMENT, $TAG_L_SET, $TAG_R_SET);
 
-sub oe_define_TeX_output(){
-	$TAG_MODE = 'TEX';
-	# \\long\\gdef\\$name\{$value\}
-	# \long\gdef\NUMCONT{000014770}
-	# \long\gdef\PRENOM{MIREILLE}\long\gdef\DATE{01/08/2009}\long\gdef\NICY{10}\STARTGAR
-	$TAG_OPEN	= "\\";		# une ouverture de balise (open)
-	$TAG_CLOSE	= "";		# une fermeture de balise (close)
-	$TAG_MARKER	= "";		# un marqueur de début de balise
-	$TAG_ASSIGN	= "long\\gdef\\\{";	# un marqueur d'attribution de valeur
-	$TAG_ASSIGN_CLOS= "\}"; 	# un marqueur fermeture d'attribution de valeur
-	$TAG_COMMENT	= "%";		# un commentaire (rem)
-	$TAG_L_SET	= "";		# attribution de variable : partie gauche
-	$TAG_R_SET	= "";		# attribution de variable : partie droite
+	sub oe_define_TeX_output(){
+		$TAG_MODE = 'TEX';
+		# \\long\\gdef\\$name\{$value\}
+		# \long\gdef\NUMCONT{000014770}
+		# \long\gdef\PRENOM{MIREILLE}\long\gdef\DATE{01/08/2009}\long\gdef\NICY{10}\STARTGAR
+		$TAG_OPEN	= "\\";				# une ouverture de balise (open)
+		$TAG_CLOSE	= "";				# une fermeture de balise (close)
+		$TAG_MARKER	= "";				# un marqueur de début de balise
+		$TAG_ASSIGN	= "long\\gdef\\\{";	# un marqueur d'attribution de valeur
+		$TAG_ASSIGN_CLOS= "\}"; 		# un marqueur fermeture d'attribution de valeur
+		$TAG_COMMENT	= "%";			# un commentaire (rem)
+		$TAG_L_SET	= "";				# attribution de variable : partie gauche
+		$TAG_R_SET	= "";				# attribution de variable : partie droite
 
-# \long\gdef\xProdApp\}
-1;
-}
+		# \long\gdef\xProdApp\}
+	1;
+	}
+
 oe_define_TeX_output();		# valeurs par défaut
 
 
@@ -1608,7 +1609,8 @@ my $_backup_date ;
 
 END {
 	_restore_sys_date;
-	#warn "(c) 2005-2020 daunay\@cpan.org - edtk\@free.fr - oEdtk v$VERSION\n";
+	# doublon avec oEdtk.pm  :
+	#warn "(c) 2005-2020 grechary\@cpan.org - edtk\@free.fr - oEdtk v$VERSION\n";
 }
 
 1;

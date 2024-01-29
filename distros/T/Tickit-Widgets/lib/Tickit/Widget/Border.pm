@@ -1,15 +1,18 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
+use warnings;
+use Object::Pad 0.807;
 
-package Tickit::Widget::Border 0.37;
-class Tickit::Widget::Border
-   :strict(params)
-   :isa(Tickit::SingleChildWidget);
+package Tickit::Widget::Border 0.41;
+class Tickit::Widget::Border :strict(params);
+
+inherit Tickit::ContainerWidget;
+
+apply Tickit::WidgetRole::SingleChildContainer;
 
 use Tickit::Style;
 
@@ -53,7 +56,7 @@ The default style pen is used as the widget pen.
 
 =head2 new
 
-   $border = Tickit::Widget::Border->new( %args )
+   $border = Tickit::Widget::Border->new( %args );
 
 Constructs a new C<Tickit::Widget::Border> object.
 
@@ -100,9 +103,9 @@ method cols
 
 =head2 set_top_border
 
-   $lines = $border->top_border
+   $lines = $border->top_border;
 
-   $border->set_top_border( $lines )
+   $border->set_top_border( $lines );
 
 Return or set the number of lines of border at the top of the widget
 
@@ -120,9 +123,9 @@ method set_top_border
 
 =head2 set_bottom_border
 
-   $lines = $border->bottom_border
+   $lines = $border->bottom_border;
 
-   $border->set_bottom_border( $lines )
+   $border->set_bottom_border( $lines );
 
 Return or set the number of lines of border at the bottom of the widget
 
@@ -140,9 +143,9 @@ method set_bottom_border
 
 =head2 set_left_border
 
-   $cols = $border->left_border
+   $cols = $border->left_border;
 
-   $border->set_left_border( $cols )
+   $border->set_left_border( $cols );
 
 Return or set the number of cols of border at the left of the widget
 
@@ -160,9 +163,9 @@ method set_left_border
 
 =head2 set_right_border
 
-   $cols = $border->right_border
+   $cols = $border->right_border;
 
-   $border->set_right_border( $cols )
+   $border->set_right_border( $cols );
 
 Return or set the number of cols of border at the right of the widget
 
@@ -178,7 +181,7 @@ method set_right_border
 
 =head2 set_h_border
 
-   $border->set_h_border( $cols )
+   $border->set_h_border( $cols );
 
 Set the number of cols of both horizontal (left and right) borders simultaneously
 
@@ -193,7 +196,7 @@ method set_h_border
 
 =head2 set_v_border
 
-   $border->set_v_border( $cols )
+   $border->set_v_border( $cols );
 
 Set the number of lines of both vertical (top and bottom) borders simultaneously
 
@@ -208,7 +211,7 @@ method set_v_border
 
 =head2 set_border
 
-   $border->set_border( $count )
+   $border->set_border( $count );
 
 Set the number of cols or lines in all four borders simultaneously
 

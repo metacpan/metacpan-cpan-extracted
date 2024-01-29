@@ -1,5 +1,18 @@
 Revision history for Music-CreatingRhythms
 
+0.0806 2023-12-27 13:26:07
+    - Improve documentation based on SIMCOP's AI method description experiments.
+
+0.0805 2023-12-26 14:36:45
+    - Add more b2int test cases inspired by SIMCOP.
+
+0.0804 2023-12-26 11:58:01
+    - Conditionally subtest the cfsqrt() method if Math::NumSeq::SqrtContinued is installed.
+
+0.0803 2023-12-26 11:22:30
+    - Improve documentation.
+    - Add the count_digits() method as a generic version of the count_*() methods.
+
 0.0802 2023-05-20 09:56:57
     - Comment-out tests that will fail without the Math::NumSeq::SqrtContinued module.
 

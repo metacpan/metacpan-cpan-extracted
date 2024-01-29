@@ -2,7 +2,7 @@ NAME
     CPAN::Reporter::Smoker - Turnkey CPAN Testers smoking
 
 VERSION
-    version 0.29
+    version 0.30
 
 SYNOPSIS
          $ perl -MCPAN::Reporter::Smoker -e start
@@ -406,12 +406,16 @@ AUTHOR
 CONTRIBUTORS
     *   Alexandr Ciornii <alexchorny@gmail.com>
 
+    *   Breno G. de Oliveira <garu@cpan.org>
+
     *   Christian Walde <walde.christian@googlemail.com>
 
     *   gregor herrmann <gregoa@cpan.org>
 
+    *   gregor herrmann <gregoa@debian.org>
+
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2017 by David Golden.
+    This software is Copyright (c) 2024 by David Golden.
 
     This is free software, licensed under:
 

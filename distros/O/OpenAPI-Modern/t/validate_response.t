@@ -60,6 +60,7 @@ YAML
   my $req = Mojo::Message::Request->new(method => 'GET', url => Mojo::URL->new('http://example.com/'));
   $req->headers->header('Host', 'example.com');
   cmp_deeply(
+    # start line is missing "HTTP/1.1"
     ($result = $openapi->validate_response(HTTP::Response->new(404), { request => $req }))->TO_JSON,
     {
       valid => false,
@@ -68,11 +69,13 @@ YAML
           instanceLocation => '/response',
           keywordLocation => jsonp(qw(/paths / get)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths / get)))->to_string,
-          error => 'Bad response start-line',
+          error => re(qr/EXCEPTION/),
         },
       ],
     },
-    'invalid response object is detected early',
+    # we can't do much about this because there is no reliable flag on the response object telling
+    # us that parsing failed
+    'sadly, invalid response object is not detected gracefully',
   );
 };
 
@@ -758,30 +761,6 @@ YAML
       ],
     },
     'unevaluatedProperties can be used in schemas',
-  );
-
-  cmp_deeply(
-    ($result = $openapi->validate_response(
-      response(200, [ 'Content-Type' => 'application/json' ], '{"bar":1}'),
-      { path_template => '/foo', method => 'post' }))->format('basic', 1),
-    {
-      valid => true,
-      annotations => [
-        {
-          instanceLocation => '/response/body',
-          keywordLocation => jsonp(qw(/paths /foo post responses 200 content application/json schema properties)),
-          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo post responses 200 content application/json schema properties)))->to_string,
-          annotation => ['bar'],
-        },
-        {
-          instanceLocation => '/response/body',
-          keywordLocation => jsonp(qw(/paths /foo post responses 200 content application/json schema unevaluatedProperties)),
-          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo post responses 200 content application/json schema unevaluatedProperties)))->to_string,
-          annotation => [],
-        },
-      ],
-    },
-    'annotations are collected when evaluating valid response',
   );
 };
 

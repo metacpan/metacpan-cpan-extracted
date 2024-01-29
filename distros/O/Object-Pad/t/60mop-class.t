@@ -5,7 +5,7 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad ':experimental(mop)';
+use Object::Pad 0.800 ':experimental(mop)';
 
 class Example { }
 
@@ -20,10 +20,13 @@ is( [ $meta->superclasses ], [], '$meta->superclasses' );
 is( [ $meta->direct_roles ], [], '$meta->direct_roles' );
 is( [ $meta->all_roles    ], [], '$meta->all_roles' );
 
-class Example2 :isa(Example) {}
+class Example2 { inherit Example; }
 
 is( [ Object::Pad::MOP::Class->for_class( "Example2" )->superclasses ],
    [ $meta ],
    '$meta->superclasses on subclass' );
+
+is( Object::Pad::MOP::Class->try_for_class( "main" ), undef,
+   '->try_for_class does not throw' );
 
 done_testing;

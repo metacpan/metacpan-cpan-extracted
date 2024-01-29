@@ -1,6 +1,6 @@
 =head1 NAME
 
-Params::Validate::Dependencies::Extending
+Params::Validate::Dependencies::Extending - how to extend Params::Validate::Dependencies
 
 =head1 DESCRIPTION
 
@@ -15,8 +15,8 @@ understand objects in perl.
 
 =head1 WHAT THE *_of FUNCTIONS REALLY DO
 
-If you've read the documentation for Params::Validate::Dependencies
-and Data::Domain::Dependencies, then you'd think that they return
+If you've read the documentation for Params::Validate::Dependencies,
+then you'd think that it returns
 a code-ref which is a closure over the original arguments, and that
 they're implemented something like this:
 
@@ -190,8 +190,6 @@ things may happen:
 
 L<Params::Validate::Dependencies>
 
-L<Data::Domain::Dependencies>
-
 =head1 SOURCE CODE REPOSITORY
 
 L<git://github.com/DrHyde/perl-modules-Params-Validate-Dependencies.git>
@@ -200,7 +198,7 @@ L<https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies/>
 
 =head1 COPYRIGHT and LICENCE
 
-Copyright 2023 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2024 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This documentation is free-as-in-speech software.  It may be used, distributed, and modified under the terms of the Creative Commons Attribution-Share Alike 2.0 UK: England & Wales License, whose text you may read at L<http://creativecommons.org/licenses/by-sa/2.0/uk/>.
 

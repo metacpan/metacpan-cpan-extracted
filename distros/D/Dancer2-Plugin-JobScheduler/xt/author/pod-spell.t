@@ -12,6 +12,7 @@ all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Client
 Dancer2
+Gearman
 JobScheduler
 Koivunalho
 Mikko

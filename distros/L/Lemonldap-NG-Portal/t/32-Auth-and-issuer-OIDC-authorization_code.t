@@ -1,5 +1,4 @@
 use warnings;
-use lib 'inc';
 use Test::More;
 use strict;
 use IO::String;
@@ -447,7 +446,9 @@ sub op {
                         oidcRPMetaDataOptionsAccessTokenExpiration  => 3600,
                         oidcRPMetaDataOptionsPostLogoutRedirectUris =>
                           "http://auth.rp.com/?logout=1",
-                        oidcRPMetaDataOptionsRule => '$uid eq "french"',
+                        oidcRPMetaDataOptionsRule         => '$uid eq "french"',
+                        oidcRPMetaDataOptionsRedirectUris =>
+                          'http://auth.rp.com/?openidconnectcallback=1',
                     }
                 },
                 oidcOPMetaDataOptions           => {},

@@ -9,7 +9,7 @@ use Exporter qw(import);
 our @EXPORT_OK = qw(add subtract multiply);
 our %EXPORT_TAGS =  ( all => [ @EXPORT_OK ] );
 
-our $VERSION = '1.114';
+our $VERSION = '1.115';
 
 =encoding utf8
 
@@ -219,11 +219,11 @@ This source is in GitHub:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

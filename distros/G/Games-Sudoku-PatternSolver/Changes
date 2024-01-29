@@ -1,0 +1,26 @@
+v0.05 2024.01.12
+
+    Fixed a hard coded skip of advanced methods in CPLogic::apply_logic().
+
+v0.04 2024.01.12
+
+    Fixed test 'solution equals seed grid' (01-generate.pl)
+      to allow puzzles with < 9 different clues. 
+    Cut down on redundant tests in 03-games.t.
+
+v0.03 2024.01.11
+
+    Fixed inadvertent edit in PatterSolver::Generator 
+
+v0.02 2024.01.11
+
+    Dependencies corrected.
+    Require perl 5.10.0.
+    $Games::Sudoku::PatternSolver::VERBOSE defaulting to false.
+    Set attribute endTime even without backtracking, if logic solved.
+    POD updated to catch up with actual state.
+
+v0.01 2024.01.09
+
+    Releasing first version of Games::Sudoku::PatternSolver
+

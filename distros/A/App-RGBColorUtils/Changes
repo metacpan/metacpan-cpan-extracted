@@ -1,3 +1,15 @@
+0.004   2023-12-16  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [ux][doc] Add examples.
+
+
+0.003   2023-03-29  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utilities: mix-2-rgb-colors, mix-rgb-colors.
+
+
 0.002   2021-05-26  Released-By: PERLANCAR; Urgency: high
 
 	- [build] Rebuild to update Sah coercion module names (old Sah coercion

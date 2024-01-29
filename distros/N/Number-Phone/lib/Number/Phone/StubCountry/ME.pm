@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230903131448;
+our $VERSION = 1.20231210185945;
 
 my $formatters = [
                 {
@@ -94,16 +94,16 @@ my $validators = {
                 'voip' => '78[1-49]\\d{5}'
               };
 my %areanames = ();
-$areanames{en} = {"38231", "Herceg\ Novi",
-"38241", "Cetinje",
-"38230", "Bar\/Ulcinj",
-"38232", "Kotor\/Tivat",
-"38233", "Budva",
-"38240", "Niksic\/Pluzine\/Savnik",
-"38250", "Bijelo\ Polje\/Mojkovac",
+$areanames{en} = {"38230", "Bar\/Ulcinj",
 "38252", "Pljevlja\/Zabljak",
+"38240", "Niksic\/Pluzine\/Savnik",
+"38232", "Kotor\/Tivat",
+"38250", "Bijelo\ Polje\/Mojkovac",
+"38241", "Cetinje",
+"38231", "Herceg\ Novi",
+"38251", "Andrijevica\/Berane\/Blue\/Gusinje\/Petnitsa\/Rožaje",
 "3822", "Danilovgad\/Kolasin\/Podgorica",
-"38251", "Andrijevica\/Berane\/Blue\/Gusinje\/Petnitsa\/Rožaje",};
+"38233", "Budva",};
 
     sub new {
       my $class = shift;

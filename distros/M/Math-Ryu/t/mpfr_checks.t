@@ -90,11 +90,23 @@ my $f = Math::MPFR->new();
 my $nan = Math::MPFR::Rmpfr_get_NV($f, 0);
 cmp_ok(lc(d2s($nan)), 'eq', lc(Math::MPFR::nvtoa($nan)), "nan stringification is ok");
 
+cmp_ok(d2s($nan), 'eq', n2s($nan), 'n2s() and d2s() stringify NaN the same');
+
+my $nanstr = d2s($nan);
+# Check that $nanstr numifies to a NaN
+cmp_ok(d2s($nanstr + 0), 'eq', $nanstr, 'd2s(NaN) numifies to NaN');
+
 Math::MPFR::Rmpfr_set_inf($f, 0);
 
 my $pinf = Math::MPFR::Rmpfr_get_NV($f, 0);
 like(lc(d2s($pinf)), qr/^\+?inf/i, "+inf stringification is ok");
 like(lc(d2s(-$pinf)), qr/^\-inf/i, "-inf stringification is ok");
+
+cmp_ok(d2s($pinf),  '==',  $pinf, 'd2s(): +inf stringification "round-trips" ok');
+cmp_ok(d2s(-$pinf), '==', -$pinf, 'd2s(): -inf stringification "round-trips" ok');
+
+cmp_ok(n2s($pinf),  '==',  $pinf, 'n2s(): +inf stringification "round-trips" ok');
+cmp_ok(n2s(-$pinf), '==', -$pinf, 'n2s(): -inf stringification "round-trips" ok');
 
 cmp_ok(uc(d2s(0.0)), 'eq', '0E0', "zero stringifies as expected (0E0)"); # or 0e0
 

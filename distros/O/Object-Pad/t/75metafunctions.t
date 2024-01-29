@@ -5,7 +5,7 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad ':experimental(mop)';
+use Object::Pad 0.800 ':experimental(mop inherit_field)';
 use Object::Pad::MetaFunctions qw(
    metaclass
    deconstruct_object
@@ -40,7 +40,10 @@ class AClass {
 role BRole {
    field $b = "b";
 }
-class CClass :isa(AClass) :does(BRole) {
+class CClass {
+   inherit AClass;
+   apply BRole;
+
    field $c = "c";
 }
 
@@ -50,6 +53,21 @@ is( [ deconstruct_object( CClass->new ) ],
      'BRole.$b'  => "b",
      'AClass.$a' => "a", ],
    'deconstruct_object on CClass' );
+
+# Inherited fields don't deconstruct
+{
+   class DClass {
+      field $x :inheritable;
+   }
+   class EClass {
+      inherit DClass qw( $x );
+      ADJUST { $x = 123; }
+   }
+   is( [ deconstruct_object( EClass->new ) ],
+      [ 'EClass',
+        'DClass.$x' => 123, ],
+      'deconstruct_object does not dump inherited fields' );
+}
 
 # ref_field
 {

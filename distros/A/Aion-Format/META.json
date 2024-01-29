@@ -64,7 +64,7 @@
    "provides" : {
       "Aion::Format" : {
          "file" : "lib/Aion/Format.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.10"
       },
       "Aion::Format::Html" : {
          "file" : "lib/Aion/Format/Html.pm"
@@ -88,7 +88,7 @@
          "web" : "https://github.com/darviarush/perl-aion-format"
       }
    },
-   "version" : "0.0.3",
+   "version" : "0.0.10",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Yaroslav O. Kosmina <dart@cpan.org>",

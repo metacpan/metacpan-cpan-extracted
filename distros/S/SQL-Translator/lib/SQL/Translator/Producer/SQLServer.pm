@@ -2,8 +2,8 @@ package SQL::Translator::Producer::SQLServer;
 
 use strict;
 use warnings;
-our ( $DEBUG, $WARN );
-our $VERSION = '1.63';
+our ($DEBUG, $WARN);
+our $VERSION = '1.65';
 $DEBUG = 1 unless defined $DEBUG;
 
 use SQL::Translator::Schema::Constants;
@@ -13,9 +13,9 @@ use SQL::Translator::Generator::DDL::SQLServer;
 sub produce {
   my $translator = shift;
   SQL::Translator::Generator::DDL::SQLServer->new(
-    add_comments    => !$translator->no_comments,
+    add_comments   => !$translator->no_comments,
     add_drop_table => $translator->add_drop_table,
-  )->schema($translator->schema)
+  )->schema($translator->schema);
 }
 
 1;

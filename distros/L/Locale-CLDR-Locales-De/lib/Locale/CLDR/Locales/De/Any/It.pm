@@ -8,13 +8,13 @@ Locale::CLDR::Locales::De::Any::It - Package for language German
 
 package Locale::CLDR::Locales::De::Any::It;
 # This file auto generated from Data\common\main\de_IT.xml
-#	on Tue  5 Dec  1:06:35 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -161,8 +161,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'eras' => (

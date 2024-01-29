@@ -1,6 +1,6 @@
 package App::Greple::xlate::gpt3;
 
-our $VERSION = "0.28";
+our $VERSION = "0.29";
 
 use v5.14;
 use warnings;
@@ -20,22 +20,24 @@ our $auth_key;
 our $method = 'gpt3';
 
 my %param = (
-    gpt3 => { engine => 'gpt-3.5-turbo', temp => '0', max => 1000, sub => \&gpty },
+    gpt3 => { engine => 'gpt-3.5-turbo', temp => '0.0', max => 1000, sub => \&gpty },
 );
 
 sub gpty {
     state $gpty = App::cdif::Command->new;
+    my $text = shift;
     my $param = $param{$method};
-    my $prompt = sprintf("Translate following text into %s, line-by-line.",
+    my $system = sprintf("Translate following entire text into %s, line-by-line.",
 			 $LANGNAME{$lang_to} // die "$lang_to: unknown lang.\n");
     my @command = (
 	'gpty',
 	-e => $param->{engine},
 	-t => $param->{temp},
-	$prompt, '-',
+	-s => $system,
+	'-',
     );
     warn Dumper \@command if opt('debug');
-    $gpty->command(\@command)->setstdin(+shift)->update->data;
+    $gpty->command(\@command)->setstdin($text)->update->data;
 }
 
 sub _progress {

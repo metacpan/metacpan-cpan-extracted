@@ -1,0 +1,30 @@
+* dist-zilla-app-command-authordebs
+  :PROPERTIES:
+  :CUSTOM_ID: dist-zilla-app-command-authordebs
+  :END:
+A [[http://dzil.org/][Dist::Zilla]] command to list or install author
+dependencies with Debian perl packages.
+
+This command is useful to work on the source of a Perl module that uses
+Dist::Zilla.
+
+To install the author dependencies (i,e, all the =Dist::Zilla= plugins
+and extensions) required to build a module, run either:
+
+#+begin_example
+$ dzil authordebs --install  # require sudo to allow apt-get install
+$ sudo apt-get install $(dzil authordebs)
+#+end_example
+
+The former command is preferred as only =apt-get= command is run as
+root.
+
+* Installation
+  :PROPERTIES:
+  :CUSTOM_ID: installation
+  :END:
+On Debian (soon) and derivatives:
+
+#+begin_example
+$ sudo apt install libdist-zilla-app-command-authordebs-perl
+#+end_example

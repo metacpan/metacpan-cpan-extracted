@@ -9,6 +9,7 @@ MANIFEST.SKIP
 README.pod
 t/compile.t
 t/find_by_directory_contains.t
+t/find_by_extension.t
 t/find_by_group.t
 t/find_by_max_size.t
 t/find_by_min_size.t

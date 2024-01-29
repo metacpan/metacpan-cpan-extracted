@@ -1,0 +1,14 @@
+==== start svg ====
+XObject #1
+vb 0 0 200 250 (inferred) => bb 0.00 -250.00 200.00 0.00
+matrix( 1 0 0 -1 0 0)
+vb rect( 0.00 0.00 200.00 250.00)
+xo fill_color black (initial)
+  start handling ellipse (SVGPDF::Ellipse)
+  ellipse cx=75 cy=75 rx=20 ry=5
+    xo save
+    ellipse stroke=none fill=(current) fill=black
+    xo fill (none)
+    xo restore
+  end handling ellipse
+==== end svg ====

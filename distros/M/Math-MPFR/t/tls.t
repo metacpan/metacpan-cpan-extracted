@@ -11,15 +11,6 @@ print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
 print  "# Using gmp library version ", Math::MPFR::gmp_v(), "\n";
 
 if($cut) {
-
-  if($^O =~ /cygwin/i) {
-    warn "Skipping all tests - failures known to occur on Cygwin\n";
-    print "ok 1\n";
-    print "ok 2\n";
-    print "ok 3\n";
-    exit(0);
-  }
-
   if($threads::VERSION < 1.71) {
     warn "Skipping all tests - need at least threads-1.71, we have version $threads::VERSION\n";
     print "ok 1\n";
@@ -27,6 +18,14 @@ if($cut) {
     print "ok 3\n";
     exit(0);
   }
+}
+
+if($cut && $^O =~ /cygwin/i) {
+  warn "Skipping all tests - failures known to occur on Cygwin\n";
+  print "ok 1\n";
+  print "ok 2\n";
+  print "ok 3\n";
+  exit(0);
 }
 
 my ($tls, $ok, $pid);

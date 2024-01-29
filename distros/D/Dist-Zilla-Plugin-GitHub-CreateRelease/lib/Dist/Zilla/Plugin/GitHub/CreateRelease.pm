@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Dist::Zilla::Plugin::GitHub::CreateRelease;
-our $VERSION = '0.0005'; # VERSION
+our $VERSION = '0.0007'; # VERSION
 
 # ABSTRACT: Create a GitHub Release
 
@@ -16,6 +16,7 @@ use File::Slurper qw/read_text read_binary/;
 use Exporter qw(import);
 use Moose;
 use Try::Tiny;
+use JSON::MaybeXS 1.004000;
 with 'Dist::Zilla::Role::AfterRelease';
 
 use namespace::autoclean;
@@ -55,7 +56,6 @@ sub _create_release {
   );
   die "Unable to instantiate Pithub::Repos::Releases" if (! defined $releases);
 
-  require JSON::MaybeXS;
   my $release = $releases->create(
     data => {
       tag_name         => "$tag",
@@ -338,7 +338,7 @@ Dist::Zilla::Plugin::GitHub::CreateRelease - Create a GitHub Release
 
 =head1 VERSION
 
-version 0.0005
+version 0.0007
 
 =head1 SYNOPSIS
 
@@ -540,7 +540,7 @@ Timothy Legge
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Timothy Legge.
+This software is copyright (c) 2024 by Timothy Legge.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

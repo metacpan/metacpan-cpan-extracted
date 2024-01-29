@@ -1,7 +1,7 @@
 # ----------- Latency Compensation -----------
 
 package Audio::Nama;
-use Modern::Perl;
+use Modern::Perl '2020';
 no warnings 'uninitialized';
 use Audio::Nama::Globals qw(:all);
 use Storable qw(dclone);
@@ -29,7 +29,7 @@ sub initialize_jack_graph {
 
 
 sub propagate_latency {   
-	logsub('&propagate_latency');
+	logsub((caller(0))[3]);
 
 	initialize_jack_graph();
 	logpkg(__FILE__,__LINE__,'debug',"jack graph\n","$lg");
@@ -48,7 +48,7 @@ sub propagate_capture_latency {
 }
 
 sub propagate_playback_latency {
-	logsub('&propagate_playback_latency'); 
+	logsub((caller(0))[3]); 
  	logpkg(__FILE__,__LINE__,'debug',"jack graph\n","$lg");
     my @sources = grep{ $lg->is_source_vertex($_) } $lg->vertices();
  	logpkg(__FILE__,__LINE__,'debug',"recurse through latency graph starting at sources: @sources");

@@ -54,6 +54,7 @@ $CPAN::Config = {
                  'urllist' => [qq[file://$cwd/t/CPAN]],
                  'wait_list' => [q[wait://ls6.informatik.uni-dortmund.de:1404]],
                  #'wget' => q[/usr/bin/wget],
+                 'pushy_https' => 0,
                 };
 
 __END__

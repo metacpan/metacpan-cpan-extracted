@@ -1,0 +1,31 @@
+Changelog for HealthCheck-Diagnostic-SSH
+
+v0.1.0 2023-12-14T18:21:01
+ - Document some internals (Andrew Hewus Fresh)
+ - Update distribution files (Andrew Hewus Fresh)
+ - Pull request #1: SM-1345 (Sam Kim)
+ - Remove the anonymous sub-routine (Brandon Messineo)
+ - Re-structure the run_command method (Brandon Messineo)
+ - Only define used variables (Brandon Messineo)
+ - Do not use the helper for the base cases (Brandon Messineo)
+ - Change `display` to `return_output` (Brandon Messineo)
+ - Make ssh_connect take a hash instead of a hashref (Brandon Messineo)
+ - Replaced back to Test2::V0 (Sam Kim)
+ - Updated anonymous hash function to make it more readable (Sam Kim)
+ - Re-structure code (Brandon Messineo)
+ - Do not use camel-casing for perl variables (Brandon Messineo)
+ - Remove unused module from cpanfile (Brandon Messineo)
+ - Updated Pod to clarify and to include display tag (Sam Kim)
+ - Mock the entire SSH process and update tests accordingly (Sam Kim)
+ - Refactored to clearly show the process and to reflect the new update
+   (Sam Kim)
+ - Allow for optional display of output when $command is specified (Sam
+   Kim)
+ - Updated pod (Sam Kim)
+ - Add tests to check commands are run properly through the new features
+   (Sam Kim)
+ - Add features to run commands through the healthcheck (Sam Kim)
+ - Healthcheck::Diagnostic::SSH implemented (Sam Kim)
+ - Added tests for healthcheck (Sam Kim)
+ - Create distribution files (Sam Kim)
+ - Initial Commit (Sam Kim)

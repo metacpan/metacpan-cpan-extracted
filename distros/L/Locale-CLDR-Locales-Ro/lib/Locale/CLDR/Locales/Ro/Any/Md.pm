@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ro::Any::Md - Package for language Romanian
 
 package Locale::CLDR::Locales::Ro::Any::Md;
 # This file auto generated from Data\common\main\ro_MD.xml
-#	on Tue  5 Dec  1:29:08 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'sw_CD' => 'swahili (R. D. Congo)',
@@ -47,7 +47,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'MM' => 'Myanmar',
 
@@ -61,41 +61,73 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'narrow' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'few' => q({0} zile),
+						'one' => q({0} zi),
+						'other' => q({0} zile),
+					},
+					# Core Unit Identifier
 					'day' => {
-						'few' => q({0}zile),
-						'one' => q({0}zi),
-						'other' => q({0}zile),
+						'few' => q({0} zile),
+						'one' => q({0} zi),
+						'other' => q({0} zile),
 					},
-					'millisecond' => {
-						'few' => q({0}ms),
+					# Long Unit Identifier
+					'duration-millisecond' => {
 						'name' => q(msec),
-						'one' => q({0}ms),
-						'other' => q({0}ms),
 					},
-					'minute' => {
-						'few' => q({0}min.),
+					# Core Unit Identifier
+					'millisecond' => {
+						'name' => q(msec),
+					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'few' => q({0} min.),
 						'name' => q(min),
-						'one' => q({0}min.),
-						'other' => q({0}min.),
+						'one' => q({0} min.),
+						'other' => q({0} min.),
 					},
-					'month' => {
-						'few' => q({0}luni),
+					# Core Unit Identifier
+					'minute' => {
+						'few' => q({0} min.),
+						'name' => q(min),
+						'one' => q({0} min.),
+						'other' => q({0} min.),
+					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'few' => q({0} luni),
 						'name' => q(lună),
-						'one' => q({0}lună),
-						'other' => q({0}luni),
+						'one' => q({0} lună),
+						'other' => q({0} luni),
 					},
-					'week' => {
-						'few' => q({0}săpt.),
-						'one' => q({0}săpt.),
-						'other' => q({0}săpt.),
+					# Core Unit Identifier
+					'month' => {
+						'few' => q({0} luni),
+						'name' => q(lună),
+						'one' => q({0} lună),
+						'other' => q({0} luni),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'few' => q({0} ani),
+						'one' => q({0} an),
+						'other' => q({0} ani),
+					},
+					# Core Unit Identifier
 					'year' => {
-						'few' => q({0}ani),
-						'one' => q({0}an),
-						'other' => q({0}ani),
+						'few' => q({0} ani),
+						'one' => q({0} an),
+						'other' => q({0} ani),
 					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(milisec.),
+					},
+					# Core Unit Identifier
 					'millisecond' => {
 						'name' => q(milisec.),
 					},
@@ -257,8 +289,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'day_periods' => (

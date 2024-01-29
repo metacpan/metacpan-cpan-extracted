@@ -2,9 +2,6 @@ use 5.006;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-use File::ShareDir::Install;
-
-install_share 'share';
 
 my %WriteMakefileArgs = (
 	NAME               => 'Shell::Var::Reader',
@@ -17,25 +14,24 @@ my %WriteMakefileArgs = (
 	MIN_PERL_VERSION   => '5.006',
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker'     => '0',
-		'File::ShareDir::Install' => '0',
 	},
 	TEST_REQUIRES => {
 		'Test::More' => '0',
 	},
 	PREREQ_PM => {
-		'File::Slurp'        => '0',
-		'JSON'               => '0',
-		'TOML'               => '0',
-		'YAML::XS'           => '0',
-		'Data::Dumper'       => '0',
-		'String::ShellQuote' => '0',
-		'Hash::Merge'        => '0',
-		'Rex'                => '1.14.2',
-		'Rex::CMDB::TOML'    => '0.0.1',
-		'JSON::Path'         => '1.0.3',
-		'Hash::Flatten'      => '0',
-		'File::Slurp'        => '0',
-		'File::ShareDir'     => '0',
+		'File::Slurp'              => '0',
+		'JSON'                     => '0',
+		'TOML::Tiny'               => '0',
+		'YAML::XS'                 => '0',
+		'Data::Dumper'             => '0',
+		'String::ShellQuote'       => '0',
+		'Hash::Merge'              => '0',
+		'Rex'                      => '1.14.2',
+		'Rex::CMDB::TOML'          => '0.0.1',
+		'JSON::Path'               => '1.0.3',
+		'Hash::Flatten'            => '0',
+		'File::Slurp'              => '0',
+		'Rex::CMDB::YAMLwithRoles' => '0',
 	},
 	dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean      => { FILES    => 'Shell-Var-Reader-*' },
@@ -71,6 +67,3 @@ delete $WriteMakefileArgs{LICENSE}
 	unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);
-
-package MY;
-use File::ShareDir::Install qw(postamble);

@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Base;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Base.pm 1947 2023-11-23 09:40:45Z willem $)[2];
+our $VERSION = (qw$Id: Base.pm 1957 2024-01-10 14:54:10Z willem $)[2];
 
 
 #
@@ -25,7 +25,7 @@ our $VERSION = (qw$Id: Base.pm 1947 2023-11-23 09:40:45Z willem $)[2];
 # [Revised March 2016, June 2018]
 
 
-use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1;';    ## no critic
+use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1;';	## no critic
 require IO::Socket::INET unless USE_SOCKET_IP;
 
 use constant IPv6 => USE_SOCKET_IP;
@@ -45,7 +45,7 @@ use Carp;
 use IO::File;
 use IO::Select;
 use IO::Socket;
-use Socket;
+use Socket qw( AI_NUMERICHOST IPPROTO_UDP );
 
 use Net::DNS::RR;
 use Net::DNS::Packet;
@@ -920,34 +920,28 @@ sub _create_udp_socket {
 }
 
 
-{
-	no strict 'subs';		## no critic ProhibitNoStrict
-	use constant AI_NUMERICHOST => Socket::AI_NUMERICHOST;
-	use constant IPPROTO_UDP    => Socket::IPPROTO_UDP;
+my $ip4 = {
+	family	 => AF_INET,
+	flags	 => AI_NUMERICHOST,
+	protocol => IPPROTO_UDP,
+	socktype => SOCK_DGRAM
+	};
+my $ip6 = {
+	family	 => AF_INET6,
+	flags	 => AI_NUMERICHOST,
+	protocol => IPPROTO_UDP,
+	socktype => SOCK_DGRAM
+	};
 
-	my $ip4 = {
-		family	 => AF_INET,
-		flags	 => AI_NUMERICHOST,
-		protocol => IPPROTO_UDP,
-		socktype => SOCK_DGRAM
-		};
-	my $ip6 = {
-		family	 => AF_INET6,
-		flags	 => AI_NUMERICHOST,
-		protocol => IPPROTO_UDP,
-		socktype => SOCK_DGRAM
-		};
+sub _create_dst_sockaddr {		## create UDP destination sockaddr structure
+	my ( $self, $ip, $port ) = @_;
 
-	sub _create_dst_sockaddr {	## create UDP destination sockaddr structure
-		my ( $self, $ip, $port ) = @_;
-
-		unless (USE_SOCKET_IP) {			# NB: errors raised in socket->send
-			return _ipv6($ip) ? undef : sockaddr_in( $port, inet_aton($ip) );
-		}
-
-		my @addrinfo = Socket::getaddrinfo( $ip, $port, _ipv6($ip) ? $ip6 : $ip4 );
-		return ( grep {ref} @addrinfo, {} )[0]->{addr};
+	unless (USE_SOCKET_IP) {				# NB: errors raised in socket->send
+		return _ipv6($ip) ? undef : sockaddr_in( $port, inet_aton($ip) );
 	}
+
+	my @addrinfo = Socket::getaddrinfo( $ip, $port, _ipv6($ip) ? $ip6 : $ip4 );
+	return ( grep {ref} @addrinfo, {} )[0]->{addr};
 }
 
 
@@ -1211,17 +1205,16 @@ L<perl> L<Net::DNS> L<Net::DNS::Resolver>
 
 __DATA__	## DEFAULT HINTS
 
-; <<>> DiG 9.18.8 <<>> @b.root-servers.net . -t NS
+; <<>> DiG 9.18.20 <<>> @b.root-servers.net . -t NS
 ; (2 servers found)
 ;; global options: +cmd
 ;; Got answer:
-;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 4847
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 938
 ;; flags: qr aa rd; QUERY: 1, ANSWER: 13, AUTHORITY: 0, ADDITIONAL: 27
 ;; WARNING: recursion requested but not available
 
 ;; OPT PSEUDOSECTION:
 ; EDNS: version: 0, flags:; udp: 1232
-; COOKIE: 93d86b753941ac2f0100000063c009ad51783c108e36cf16 (good)
 ;; QUESTION SECTION:
 ;.				IN	NS
 
@@ -1243,8 +1236,8 @@ __DATA__	## DEFAULT HINTS
 ;; ADDITIONAL SECTION:
 a.root-servers.net.	518400	IN	A	198.41.0.4
 a.root-servers.net.	518400	IN	AAAA	2001:503:ba3e::2:30
-b.root-servers.net.	518400	IN	A	199.9.14.201
-b.root-servers.net.	518400	IN	AAAA	2001:500:200::b
+b.root-servers.net.	518400	IN	A	170.247.170.2
+b.root-servers.net.	518400	IN	AAAA	2801:1b8:10::b
 c.root-servers.net.	518400	IN	A	192.33.4.12
 c.root-servers.net.	518400	IN	AAAA	2001:500:2::c
 d.root-servers.net.	518400	IN	A	199.7.91.13
@@ -1268,8 +1261,8 @@ l.root-servers.net.	518400	IN	AAAA	2001:500:9f::42
 m.root-servers.net.	518400	IN	A	202.12.27.33
 m.root-servers.net.	518400	IN	AAAA	2001:dc3::35
 
-;; Query time: 15 msec
-;; SERVER: 199.9.14.201#53(b.root-servers.net) (UDP)
-;; WHEN: Thu Jan 12 13:22:53 GMT 2023
-;; MSG SIZE  rcvd: 1031
+;; Query time: 19 msec
+;; SERVER: 170.247.170.2#53(b.root-servers.net) (UDP)
+;; WHEN: Fri Dec 29 22:01:37 GMT 2023
+;; MSG SIZE  rcvd: 1003
 

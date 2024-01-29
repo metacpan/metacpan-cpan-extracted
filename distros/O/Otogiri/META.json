@@ -60,7 +60,8 @@
             "Test::Exception" : "0",
             "Test::More" : "0.98",
             "Test::Requires" : "0",
-            "Test::Time" : "0"
+            "Test::Time" : "0",
+            "URI::db" : "0"
          }
       }
    },
@@ -73,7 +74,7 @@
       },
       "Otogiri" : {
          "file" : "lib/Otogiri.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       }
    },
    "release_status" : "stable",
@@ -88,7 +89,7 @@
          "web" : "https://github.com/ytnobody/Otogiri"
       }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Takuya Tsuchida <tsucchi@cpan.org>",

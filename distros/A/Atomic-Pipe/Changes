@@ -1,3 +1,7 @@
+0.021     2023-12-28 09:03:42-08:00 America/Los_Angeles
+
+    - Make peek test more reliable, and provide more diagnostics on fail
+
 0.020     2023-04-06 09:41:11-07:00 America/Los_Angeles
 
     - Add ability to peek at a line that is being buffered

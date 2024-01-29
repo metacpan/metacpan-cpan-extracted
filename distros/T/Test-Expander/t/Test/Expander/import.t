@@ -109,7 +109,7 @@ test_test( $title );
 
 path( $TEMP_DIR )->child( 'my_root' )->mkdir;
 path( $TEMP_DIR )->child( qw( my_root foo.pm ) )->spew( "package foo;\n1;\n" );
-$title = "valid value of '-lib' containing expression to be substituted (successfully executed)";
+$title = "valid value of '-lib' containing expression to be substituted, '-bail' set (successfully executed)";
 readonly_off( $CLASS );
 readonly_off( $METHOD );
 readonly_off( $METHOD_REF );
@@ -121,7 +121,7 @@ test_out( "ok 1 - $title" );
   my $mock_importer = mock 'Importer'  => ( override => [ import_into     => sub {} ] );
   my $mock_test2    = mock 'Test2::V0' => ( override => [ import          => sub {} ] );
   my $mock_this     = mock $CLASS      => ( override => [ _export_symbols => sub {} ] );
-  is( $CLASS->$METHOD( -lib => [ 'path( $TEMP_DIR )->child( qw( my_root ) )->stringify' ] ), undef, $title );
+  is( $CLASS->$METHOD( -lib => [ 'path( $TEMP_DIR )->child( qw( my_root ) )->stringify' ], -bail => 1 ), undef, $title );
 }
 test_test( $title );
 
@@ -215,7 +215,7 @@ test_out(
 }
 test_test( $title );
 
-$title    = "valid '-method' (assigned method name)";
+$title    = "undetectable '-method' (method name unassigned)";
 $expected = undef;
 test_out( "ok 1 - $title" );
 is( $METHOD, $expected, $title );

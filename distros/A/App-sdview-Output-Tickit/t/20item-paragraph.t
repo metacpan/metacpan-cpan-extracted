@@ -22,7 +22,7 @@ my $rb = Tickit::RenderBuffer->new( lines => 10, cols => 30 );
 {
    my $item = App::sdview::Output::Tickit::_ParagraphItem->new(
       text => $str,
-      indent => 2,
+      indent => 0,
       margin_left => 4,
       margin_right => 2,
    );
@@ -66,9 +66,39 @@ my $rb = Tickit::RenderBuffer->new( lines => 10, cols => 30 );
 
    is_display( [
          [BLANK(4), TEXT("Some plain and "), TEXT("bold",b=>1)],
-         [BLANK(6), TEXT("text")],
+         [BLANK(4), TEXT("text")],
       ],
       'Display contains reflowed item' );
+}
+
+clear_term;
+
+# RT150015
+{
+   my $item = App::sdview::Output::Tickit::_ParagraphItem->new(
+      text => String::Tagged->new( "A " )
+         ->append_tagged( "B C", bold => 1 )
+         ->append_tagged( " D E" ),
+      indent => 0,
+      margin_left => 0,
+      margin_right => 0,
+   );
+
+   $item->height_for_width( 30 );
+
+   $item->render( $rb,
+      firstline => 0,
+      lastline => 0,
+
+      width => 30,
+      height => 1,
+   );
+   $rb->flush_to_term( $term );
+
+   is_display( [
+         [TEXT("A "), TEXT("B C",b=>1), TEXT(" D E")],
+      ],
+      'Display contains correct formatting' );
 }
 
 clear_term;
@@ -235,6 +265,96 @@ clear_term;
          [TEXT("Som"), TEXT("e",@SELPEN), TEXT(" plain and "), TEXT("bold",b=>1), TEXT(" t"), TEXT("e",@HLPEN), TEXT("xt")],
       ],
       'Display highlight selected' );
+}
+
+clear_term;
+
+# indent
+{
+   my $item = App::sdview::Output::Tickit::_ParagraphItem->new(
+      text => String::Tagged->new( "AAAAA " x 12 ),
+      indent => 6,
+      margin_left => 4,
+      margin_right => 2,
+   );
+
+   is( $item->height_for_width( 30 ), 4, 'item is 4 lines tall at width=30' );
+
+   $item->render( $rb,
+      firstline => 0,
+      lastline => 3,
+
+      width => 30,
+      height => 4,
+   );
+   $rb->flush_to_term( $term );
+
+   is_display( [
+         [BLANK(4+6), TEXT("AAAAA AAAAA AAAAA")],
+         [BLANK(4+6), TEXT("AAAAA AAAAA AAAAA")],
+         [BLANK(4+6), TEXT("AAAAA AAAAA AAAAA")],
+         [BLANK(4+6), TEXT("AAAAA AAAAA AAAAA")],
+      ],
+      'Display contains item indented' );
+}
+
+clear_term;
+
+# leader (compact)
+{
+   my $item = App::sdview::Output::Tickit::_ParagraphItem->new(
+      leader => String::Tagged->new( "*" ),
+      text => String::Tagged->new( "the line contents" ),
+      indent => 4,
+      margin_left => 4,
+      margin_right => 2,
+   );
+
+   is( $item->height_for_width( 30 ), 1, 'item is 1 lines tall at width=30' );
+
+   $item->render( $rb,
+      firstline => 0,
+      lastline => 0,
+
+      width => 30,
+      height => 1,
+   );
+   $rb->flush_to_term( $term );
+
+   is_display( [
+         [BLANK(4), TEXT("*   the line contents")],
+      ],
+      'Display contains item with leader (compact)' );
+}
+
+clear_term;
+
+# leader (split)
+{
+   my $item = App::sdview::Output::Tickit::_ParagraphItem->new(
+      leader => String::Tagged->new( "<===>" ),
+      text => String::Tagged->new( "the line contents" ),
+      indent => 4,
+      margin_left => 4,
+      margin_right => 2,
+   );
+
+   is( $item->height_for_width( 30 ), 2, 'item is 2 lines tall at width=30' );
+
+   $item->render( $rb,
+      firstline => 0,
+      lastline => 1,
+
+      width => 30,
+      height => 2,
+   );
+   $rb->flush_to_term( $term );
+
+   is_display( [
+         [BLANK(4), TEXT("<===>")],
+         [BLANK(4), TEXT("    the line contents")],
+      ],
+      'Display contains item with leader (split)' );
 }
 
 done_testing;

@@ -1,11 +1,9 @@
 package Task::Dicom;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Version.
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 1;
 
@@ -75,21 +73,22 @@ Common rules for searching for DICOM things.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Task-Dicom>
+L<https://github.com/michal-josef-spacek/Task-Dicom>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2015-2016 Michal Špaček
- BSD 2-Clause License
+© 2015-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

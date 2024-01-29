@@ -1,5 +1,14 @@
 Revision history for Circle-FE-Term
 
+0.240250 2024-01-26
+        [CHANGES]
+         * Display the hidden count label in the format of the highest hidden
+           level window
+
+        [BUGFIXES]
+         * Use Object::Pad for defining the Tickit::Widget::Entry subclass
+           (RT151034)
+
 0.232470 2023-09-04
         [CHANGES]
          * Updated for Tickit::Widget::Tabbed v0.028; bugfix `tab_position`

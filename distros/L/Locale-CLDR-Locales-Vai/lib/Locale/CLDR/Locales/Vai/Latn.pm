@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Vai::Latn - Package for language Vai
 
 package Locale::CLDR::Locales::Vai::Latn;
 # This file auto generated from Data\common\main\vai_Latn.xml
-#	on Tue  5 Dec  1:37:37 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'Akaŋ',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Aŋdóra',
  			'AE' => 'Yunaitɛ Arabhi Ɛmire',
@@ -216,7 +216,6 @@ has 'display_name_region' => (
  			'MD' => 'Mɔlidova',
  			'MG' => 'Madagasita',
  			'MH' => 'Masha Tiŋŋɛ',
- 			'MK' => 'Masedoninya',
  			'ML' => 'Mali',
  			'MM' => 'Miyamaha',
  			'MN' => 'Mɔngoliya',
@@ -331,7 +330,7 @@ has 'characters' => (
 		return {
 			index => ['A', 'B', 'Ɓ', 'C', 'D', 'Ɗ', 'E', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
 			main => qr{[a á ã b ɓ c d ɗ e é ẽ ɛ {ɛ́} {ɛ̃} f g h i í ĩ j k l m n ŋ o ó õ ɔ {ɔ́} {ɔ̃} p q r s t u ú ũ v w x y z]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -734,37 +733,6 @@ has 'currencies' => (
 	} },
 );
 
-
-has 'calendar_months' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-			'gregorian' => {
-				'format' => {
-					wide => {
-						nonleap => [
-							'luukao kemã',
-							'ɓandaɓu',
-							'vɔɔ',
-							'fulu',
-							'goo',
-							'6',
-							'7',
-							'kɔnde',
-							'saah',
-							'galo',
-							'kenpkato ɓololɔ',
-							'luukao lɔma'
-						],
-						leap => [
-							
-						],
-					},
-				},
-			},
-	} },
-);
 
 has 'calendar_days' => (
 	is			=> 'ro',

@@ -36,7 +36,7 @@ use vars qw ($VERSION $Debug $Opt %Vpassert_Conversions
 	     %Files %Files_Read
 	     %File_Dest
 	     );
-$VERSION = '3.480';
+$VERSION = '3.482';
 
 ######################################################################
 # configuration
@@ -1495,7 +1495,7 @@ Exclude processing any files which begin with the specified prefix.
 
 Displays this message and program version and exits.
 
-=item --language <1364-1995|1364-2001|1364-2005|1800-2005|1800-2009|1800-2012|1800-2017>
+=item --language <1364-1995|1364-2001|1364-2005|1800-2005|1800-2009|1800-2012|1800-2017|1800-2023>
 
 Set the language standard for the files.  This determines which tokens are
 signals versus keywords, such as the ever-common "do" (data-out signal,
@@ -1687,7 +1687,7 @@ Verilog-Perl is part of the L<https://www.veripool.org/> free Verilog EDA
 software tool suite.  The latest version is available from CPAN and from
 L<https://www.veripool.org/verilog-perl>.
 
-Copyright 2000-2022 by Wilson Snyder.  This package is free software; you
+Copyright 2000-2024 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 

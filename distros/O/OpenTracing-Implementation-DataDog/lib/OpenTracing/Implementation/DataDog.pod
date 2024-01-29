@@ -7,7 +7,7 @@ OpenTracing::Implementation::DataDog - Sending traces to DataDog using Agent
 
 =head1 VERSION
 
-This is version 'v0.47.0'
+This is version 'v0.47.1'
 
 
 

@@ -21,7 +21,7 @@ Readonly::Hash our %PRESETS => (
 	],
 );
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -60,6 +60,12 @@ sub run {
 			print $key.': '.$PRESETS{$key}[1]."\n";
 		}
 		return 0;
+	}
+
+	# Check presets.
+	if (! exists $PRESETS{$self->{'_opts'}->{'p'}}) {
+		print STDERR 'Bad preset. Possible values are \''.(join "', '", (sort keys %PRESETS))."'.\n";
+		return 1;
 	}
 
 	if ($PRESETS{$self->{'_opts'}->{'p'}}[0] > @ARGV) {
@@ -182,6 +188,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

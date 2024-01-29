@@ -65,6 +65,7 @@
             "DBI" : "1.54",
             "Digest::SHA" : "0",
             "File::ShareDir" : "1.0",
+            "List::Util" : "1.33",
             "Moo" : "1.000003",
             "Package::Variant" : "1.001001",
             "Parse::RecDescent" : "1.967009",
@@ -78,7 +79,7 @@
          "requires" : {
             "JSON::MaybeXS" : "1.003003",
             "Test::Differences" : "0",
-            "Test::Exception" : "0.31",
+            "Test::Exception" : "0.42",
             "Test::More" : "0.88",
             "Text::ParseWords" : "0",
             "XML::Writer" : "0.500",
@@ -89,8 +90,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-SQL-Translator@rt.cpan.org",
-         "web" : "https://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-Translator"
+         "web" : "https://github.com/dbsrgits/sql-translator/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -102,7 +102,7 @@
       "x_IRC" : "irc://irc.perl.org/#sql-translator",
       "x_Ratings" : "http://cpanratings.perl.org/d/SQL-Translator"
    },
-   "version" : "1.63",
+   "version" : "1.65",
    "x_authority" : "cpan:JROBINSON",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

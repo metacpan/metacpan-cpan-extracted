@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_value' } = { 
-    	summary => 'Puts a value into the range, if appropriate the value will be converted to other data type and cell`s number format will be reset.            ',
+    	summary => 'Puts a value into the range, if appropriate the value will be converted to other data type and cell`s number format will be reset.',
         params => $params,
         returns => 'CellsCloudResponse',
     };

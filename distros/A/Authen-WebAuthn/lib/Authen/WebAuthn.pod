@@ -13,11 +13,11 @@ Authen::WebAuthn - A library to add Web Authentication support to server applica
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
-This module lets you validate WebAuthn registration and authentication responses.
+This module lets you validate L<Web Authentication|https://www.w3.org/TR/webauthn/> registration and authentication responses.
 
 Currently, it does not handle the generation of registration and authentication requests.
 
@@ -67,6 +67,7 @@ To authenticate a user:
             signature_b64          => ...,
             extension_results      => ...,
             token_binding_id_b64   => ...,
+            trust_anchors          => ...,
         )
     };
     if ($@) {
@@ -120,6 +121,33 @@ The base64url-encoded Token Binding ID for the current connection. Usually this
 comes from a C<Sec-Provided-Token-Binding-ID> HTTP header. If you are not using
 Token Binding, you can omit this parameter.
 
+=item trust_anchors
+
+If the authenticator response contains an attestation, C<validate_registration> will
+attempt to chain it to a trusted root certificate.
+You need to explicitely specify which certificates to trust if your authenticator provides an attestation.
+
+If you requested "none" as an attestation format while initiating the registration flow, there is no need to provide any trust anchors.
+
+This optional parameter can either be an arrayref of strings representing PEM-encoded certificates, or a subref which returns a arrayref of PEM-encoded certificates:
+
+    sub {
+        my (%params) = @_;
+        my $aaguid = $params{'aaguid'};
+        my $attestation_type = $params{'attestation_type'};
+        my $attestation_format = $params{'attestation_format'};
+        ...
+        return [ $pem1, $pem2, ...];
+    }
+
+=item allowed_attestation_types
+
+If you want to restrict the allowed attestation types, you can pass an arrayref of strings as the C<allowed_attestation_types> parameter.
+
+Currently supported values are C<None>,C<Self>,C<Basic>
+
+By default, all attestation types are allowed
+
 =back
 
 This method croaks on errors. If the registration was successful, it returns a hashref with the following subkeys:
@@ -141,6 +169,32 @@ The initial signature count of this authenticator
 =back
 
 This information is supposed to be persisted in the Relying Party, usually in some sort of database
+
+The following keys are also returned:
+
+=over 4
+
+=item attestation_result
+
+Contains information about the result of the attestation validation
+
+=over 4
+
+=item type
+
+The type of attestation used by the authenticator: C<None>, C<Self>, C<Basic>, ...
+
+=item trust_path
+
+An arrayref of DER-encoded certificates provided by the authenticator
+
+=item aaguid
+
+The verified AAGUID of the authenticator, this is only provided if the attestation was verified successfully
+
+=back
+
+=back
 
 =head2 validate_assertion
 
@@ -228,6 +282,8 @@ This limitation may be addressed in a future version.
 =head1 SEE ALSO
 
 =over 4
+
+=item L<W3C Web Authentication specification|https://www.w3.org/TR/webauthn/>
 
 =item L<FIDO::Raw>
 

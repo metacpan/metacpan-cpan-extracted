@@ -3,9 +3,9 @@ package Sah::Schemas::Code;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2023-09-05'; # DATE
 our $DIST = 'Sah-Schemas-Code'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Various schemas related to 'code' type and coderefs
@@ -22,7 +22,7 @@ Sah::Schemas::Code - Various schemas related to 'code' type and coderefs
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schemas::Code (from Perl distribution Sah-Schemas-Code), released on 2023-09-03.
+This document describes version 0.002 of Sah::Schemas::Code (from Perl distribution Sah-Schemas-Code), released on 2023-09-05.
 
 =head1 SAH SCHEMAS
 

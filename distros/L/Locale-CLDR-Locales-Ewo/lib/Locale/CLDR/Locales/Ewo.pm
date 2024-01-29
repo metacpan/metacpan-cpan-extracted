@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ewo - Package for language Ewondo
 
 package Locale::CLDR::Locales::Ewo;
 # This file auto generated from Data\common\main\ewo.xml
-#	on Tue  5 Dec  1:09:21 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'Ǹkɔ́bɔ akán',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Andór',
  			'AE' => 'Bemirá yá Arábə uní',
@@ -217,7 +217,6 @@ has 'display_name_region' => (
  			'MD' => 'Molədaví',
  			'MG' => 'Madagasəkárə',
  			'MH' => 'Minlán Mí Maresál',
- 			'MK' => 'Masedónia',
  			'ML' => 'Malí',
  			'MM' => 'Mianəmár',
  			'MN' => 'Mɔngɔ́lia',
@@ -333,7 +332,7 @@ has 'characters' => (
 			auxiliary => qr{[c j q x]},
 			index => ['A', 'B', 'D', 'E', 'Ə', 'Ɛ', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
 			main => qr{[a á à â ǎ b d {dz} e é è ê ě ə {ə́} {ə̀} {ə̂} {ə̌} ɛ {ɛ́} {ɛ̀} {ɛ̂} {ɛ̌} f g h i í ì î ǐ k {kp} l m n ń ǹ {ng} {nk} ŋ o ó ò ô ǒ ɔ {ɔ́} {ɔ̀} {ɔ̂} {ɔ̌} p r s t {ts} u ú ù û ǔ v w y z]},
-			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT

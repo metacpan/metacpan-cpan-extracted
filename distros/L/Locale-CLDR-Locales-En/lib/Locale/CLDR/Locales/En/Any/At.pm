@@ -8,13 +8,13 @@ Locale::CLDR::Locales::En::Any::At - Package for language English
 
 package Locale::CLDR::Locales::En::Any::At;
 # This file auto generated from Data\common\main\en_AT.xml
-#	on Tue  5 Dec  1:07:49 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -30,6 +30,8 @@ has 'number_symbols' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'latn' => {
+			'decimal' => q(,),
+			'group' => q(.),
 			'superscriptingExponent' => q(·),
 		},
 	} }

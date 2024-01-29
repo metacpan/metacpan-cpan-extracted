@@ -9,8 +9,8 @@ my $build = Module::Build->new(
    dist_abstract => 'Linting tests for perl distributions',
    requires => {
       perl => '5.036',
-      'Object::Pad' => '0.800',
-      'Syntax::Keyword::Match' => 0,
+      'Object::Pad' => '0.807',
+      'Syntax::Keyword::Match' => '0.13',
 
       'File::Basename' => 0,
       'File::Find' => 0,
@@ -18,7 +18,7 @@ my $build = Module::Build->new(
       'List::Util' => '1.29',
       'Module::Pluggable::Object' => 0,
       'String::Tagged::Terminal' => 0,
-      'Text::Treesitter' => '0.10',
+      'Text::Treesitter' => '0.11',
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

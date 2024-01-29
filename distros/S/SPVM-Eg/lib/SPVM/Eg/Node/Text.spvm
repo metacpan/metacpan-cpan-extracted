@@ -1,0 +1,19 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+# Text in JavaScript
+class Eg::Node::Text extends Eg::Node::CharacterData {
+  
+  allow Eg::Node::Document;
+  
+  # Class Methods
+  private static method new : Eg::Node::Text ($node_value : string) {
+    
+    my $self = new Eg::Node::Text;
+    
+    $self->SUPER::init({node_type => Eg::Node->TYPE_TEXT_NODE, node_value => $node_value});
+    
+    return $self;
+  }
+  
+}

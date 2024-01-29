@@ -65,6 +65,12 @@ has timeout => (
     default => 30
 );
 
+has preserve => (
+    is  => 'rw',
+    isa => 'Bool',
+    default => 0,
+);
+
 has _scp_option => (
     is  => 'rw',
     isa => 'ArrayRef',
@@ -96,6 +102,7 @@ sub _init_scp_option {
     push @options, '-P'. $self->port() if ($self->port());
     push @options, '-F'. $self->sshconfig() if ($self->sshconfig());
     push @options, '-i'. $self->identity() if ($self->identity());
+    push @options, '-p' if ($self->preserve());
 
     return \@options;
 
@@ -395,6 +402,11 @@ Path to an ssh client configuration, added with "-F" to the command line.
 =item timeout, optional
 
 Abort the transfer after timeout seconds.
+
+=item preserve, optional
+
+Boolean, adds the "-p" option to the scp command (some servers seem to
+require this to carry over the permissions).
 
 =back
 

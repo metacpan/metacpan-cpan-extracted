@@ -14,7 +14,7 @@ use Package::Constants;
 use Scalar::Util qw[ blessed looks_like_number ];
 use Scope::Context;
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.2.0';
 
 hide_package(__PACKAGE__);
 
@@ -370,7 +370,7 @@ sub _gen_wrapper {
         my $error = $@;
 
         if ($failed or defined $handle->err) {
-            $span->add_tag(error => 1);
+            $span->add_tags( generate_error_tags($handle, $failed) );
         }
         elsif ($can_count_rows->($handle)) {
             my $rows = sum0(map { $row_counter->($_) } $wantarray ? @$result : $result);
@@ -404,6 +404,24 @@ sub suspend {
     disable();
     $is_suspended = 1;
     Scope::Context->up->reap(sub { $is_suspended = 0; enable() if $was_enabled });
+}
+
+sub generate_error_tags {
+    my ($handle, $failed) = @_;
+    
+    my $error_message = sprintf ("DBI Error: SQLSTATE_%s - [%s]",
+        $handle->state || '-----',
+        $handle->err   || '-',
+    );
+    my $error_kind = sprintf("SQLSTATE_%s",
+        $handle->state || '-----',
+    );
+    
+    return (
+        'error'      => 1,
+        'message'    => $error_message,
+        'error.kind' => $error_kind,
+    );
 }
 
 1;

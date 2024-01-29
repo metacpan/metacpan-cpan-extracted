@@ -5,7 +5,8 @@ use warnings;
 use strict;
 use 5.014;
 
-use List::MoreUtils qw( any );
+use List::MoreUtils      qw( any );
+use String::Substitution qw( sub_modify gsub_modify );
 
 use Term::Choose       qw();
 use Term::Choose::Util qw();
@@ -23,6 +24,7 @@ sub new {
         d => $d
     };
     bless $sf, $class;
+    return $sf;
 }
 
 
@@ -40,17 +42,15 @@ sub search_and_replace {
     my $used_names = [];
     $sf->{s_back} = $back;
     my @bu;
-    my ( $hidden, $add ) = ( 'Your choice:', '  NEW' );
+    my ( $hidden, $add ) = ( 'Your choice:', '  * NEW *' );
     my $available = [ sort { $a cmp $b } keys %$saved  ];
 
     ADD_SEARCH_AND_REPLACE: while ( 1 ) {
-        my @tmp_info = ( '', $filter_str );
+        my @tmp_info = ( $filter_str );
         for my $sr_group ( @$all_sr_groups ) {
-            for my $sr_single ( @$sr_group ) {
-                push @tmp_info, '  s/' . join( '/', @$sr_single ) . ';';
-            }
+            push @tmp_info, map { '  ' . $_ } _stringified_sr_group( $sr_group );
         }
-        push @tmp_info, '';
+        push @tmp_info, '' if @$all_sr_groups;
         my @pre = ( $hidden, undef, $sf->{i}{_confirm}, $add );
         my $prefixed_available = [];
         for my $name ( @$available ) {
@@ -77,7 +77,7 @@ sub search_and_replace {
         }
         my $choice = $menu->[$idx];
         if ( $choice eq $hidden ) {
-            $sf->__history( $sql );
+            $sf->__saved_search_and_replace( $sql );
             $saved = $ax->read_json( $sf->{i}{f_search_and_replace} ) // {};
             $available = [ sort { $a cmp $b } keys %$saved  ];
             next ADD_SEARCH_AND_REPLACE;
@@ -90,7 +90,14 @@ sub search_and_replace {
             if ( ! defined $col_idxs ) {
                 next ADD_SEARCH_AND_REPLACE;
             }
-            $sf->__execute_substitutions( $aoa, $col_idxs, $all_sr_groups ); # modifies $aoa
+            if ( ! eval {
+                print 'Search and replace ... ' . "\r" if @$aoa * @$col_idxs > 50_000;
+                $sf->__execute_substitutions( $aoa, $col_idxs, $all_sr_groups ); # modifies $aoa
+                1 }
+            ) {
+                $ax->print_error_message( $@ );
+                next ADD_SEARCH_AND_REPLACE;
+            }
             $sql->{insert_args} = $aoa;
             my $header_changed = 0;
             if ( $sf->{d}{stmt_types}[0] =~ /^Create_table\z/i ) {
@@ -130,7 +137,7 @@ sub search_and_replace {
             my $separator_key = ' ';
             my $skip_regex = qr/^\Q${separator_key}\E\z/;
             my $fields = [];
-            for my $nr ( 1 .. 7 ) {
+            for my $nr ( 1 .. 5 ) {
                 push @$fields,
                     [ $separator_key,       ],
                     [ $nr . ' Pattern',     ],
@@ -178,11 +185,17 @@ sub search_and_replace {
 }
 
 
-sub __filter_modifiers {
-    my ( $sf, $modifiers ) = @_;
-    $modifiers =~ s/[^geis]+//g;
-    $modifiers =~ tr/gis/gis/s; #;;
-    return $modifiers;
+sub __from_form_to_sr_group_data {
+    my ( $sf, $form ) = @_;
+    my @sr_group_data;
+    my @copy = @$form;
+    while ( @copy ) {
+        my ( $section_separator, $pattern, $replacement, $modifiers ) = map { $_->[1] // '' } splice @copy, 0, 4;
+        if ( length $pattern ) {
+            push @sr_group_data, { pattern => $pattern, replacement => $replacement, modifiers => $modifiers };
+        }
+    }
+    return @sr_group_data;
 }
 
 
@@ -204,39 +217,34 @@ sub __get_col_idxs {
     return $col_idxs;
 }
 
+
 sub __execute_substitutions {
     my ( $sf, $aoa, $col_idxs, $all_sr_groups ) = @_;
     my $c;
-    for my $row ( @$aoa ) { # modifies $aoa
-        for my $i ( @$col_idxs ) {
-            for my $sr_group ( @$all_sr_groups ) {
-                for my $sr_single ( @$sr_group ) {
-                    my ( $pattern, $replacement, $modifiers ) = @$sr_single;
-                    my $regex = $modifiers =~ /i/ ? qr/(?i:${pattern})/ : qr/${pattern}/;
-                    my $replacement_code = sub { return $replacement };
-                    for ( grep { /^e\z/ } split( //, $modifiers ) ) {
-                        my $recurse = $replacement_code;
-                        $replacement_code = sub { return eval $recurse->() }; # execute (e) substitution
-                    }
+    for my $sr_group ( @$all_sr_groups ) {
+        for my $sr_single ( @$sr_group ) {
+            my ( $pattern, $replacement, $modifiers ) = @$sr_single{qw(pattern replacement modifiers)};
+            my $global = $modifiers =~ tr/g//;
+            my $replacement_code = sub { $replacement };
+            while ( $modifiers =~ /e/g ) {
+                my $recurse = $replacement_code;
+                $replacement_code = sub { eval $recurse->() }; # execute (e) substitution
+            }
+            #$modifiers =~ tr/imnsxadlup//dc         if length $modifiers;
+            $modifiers =~ tr/imnsxa//dc             if length $modifiers;
+            $pattern = "(?${modifiers}:{$pattern})" if length $modifiers;
+
+            for my $row ( @$aoa ) {
+                for my $i ( @$col_idxs ) {
                     $c = 0;
                     if ( ! defined $row->[$i] ) {
                         next;
                     }
-                    elsif ( $modifiers =~ /g/ ) {
-                        if ( $modifiers =~ /s/ ) { # s not documented
-                            $row->[$i] =~ s/$regex/$replacement_code->()/gse;
-                        }
-                        else {
-                            $row->[$i] =~ s/$regex/$replacement_code->()/ge;
-                        }
+                    elsif ( $global ) {
+                        gsub_modify( $row->[$i], $pattern, $replacement_code );   # modifies $aoa
                     }
                     else {
-                        if ( $modifiers =~ /s/ ) { # s not documented
-                            $row->[$i] =~ s/$regex/$replacement_code->()/se;
-                        }
-                        else {
-                            $row->[$i] =~ s/$regex/$replacement_code->()/e;
-                        }
+                        sub_modify( $row->[$i], $pattern, $replacement_code );    # modifies $aoa
                     }
                 }
             }
@@ -245,34 +253,36 @@ sub __execute_substitutions {
 }
 
 
-sub _stringified_code {
+sub _stringified_sr_group {
     my ( $sr_group ) = @_;
-    return ( map { 's/' . join( '/', @$_ ) . ';' } @$sr_group );
+    return map { sprintf 's/%s/%s/%s;', @$_{qw(pattern replacement modifiers)} } @$sr_group;
 }
 
 
-sub __history {
+sub __saved_search_and_replace {
     my ( $sf, $sql ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $tf = Term::Form->new( $sf->{i}{tf_default} );
-    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $separator_key = ' ';
     my $skip_regex = qr/^\Q${separator_key}\E\z/;
+    my $saved = $ax->read_json( $sf->{i}{f_search_and_replace} ) // {};
+    my $save_data = 0;
     my $old_idx_history = 0;
 
     HISTORY: while ( 1 ) {
-        my $saved = $ax->read_json( $sf->{i}{f_search_and_replace} ) // {};
-        my $top = join "\n", 'Saved s_&_r', map( '  ' . $_, sort { $a cmp $b } keys %$saved ), ' ';
+        my $info = 'Saved "search & replace":';
+        $info = join "\n", $info, map( '  ' . $_, sort { $a cmp $b } keys %$saved ), ' ';
         my ( $add, $edit, $remove ) = ( '- Add ', '- Edit', '- Remove' );
         my $menu = [ undef, $add, $edit, $remove ];
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, clear_screen => 1, info => $top, undef => '  <=', index => 1,
-              default => $old_idx_history }
+            { %{$sf->{i}{lyt_v}}, info => $info, undef => '  <=', index => 1, default => $old_idx_history }
         );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
+            if ( $save_data ) {
+                $ax->write_json( $sf->{i}{f_search_and_replace}, $saved );
+            }
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
@@ -283,204 +293,84 @@ sub __history {
             $old_idx_history = $idx;
         }
         my $choice = $menu->[$idx];
+        my $changed;
         if ( $choice eq $add ) {
-            my $separator_key = ' ';
-            my $skip_regex = qr/^\Q${separator_key}\E\z/;
-            my $fields = [];
-            for my $nr ( 1 .. 9 ) {
-                push @$fields,
-                    [ $separator_key,       ],
-                    [ $nr . ' Pattern',     ],
-                    [ $nr . ' Replacement', ],
-                    [ $nr . ' Modifiers',   ];
-            }
-
-            ADD_CODE: while ( 1 ) {
-                # Fill_form
-                my $form = $tf->fill_form(
-                    $fields,
-                    { prompt => 'Add s_&_r:', clear_screen => 1, info => $top,
-                      skip_items => $skip_regex,
-                      confirm => '  ' . $sf->{i}{confirm}, back => '  ' . $sf->{i}{back} . '   ' }
-                );
-                if ( ! defined $form ) {
-                    next HISTORY;
-                }
-                my $sr_group = [ $sf->__from_form_to_sr_group_data( $form ) ];
-                if ( ! @$sr_group ) {
-                    next HISTORY;
-                }
-                if ( ! eval {
-                    $sf->__execute_substitutions( [ [ 'test_string' ] ], [ 0 ], [ $sr_group ] );
-                    1 }
-                ) {
-                    $ax->print_error_message( $@ );
-                    $fields = $form;
-                    next ADD_CODE;
-                }
-                my @code = _stringified_code( $sr_group );
-                my $info = join( "\n", map { "      $_" } @code );
-                $info =~ s/\s{5}/\nCode:/;
-                $info = $top . $info;
-                my $name = $sf->__get_entry_name( $info, 'Name: ', $saved, $sr_group );
-                if ( ! length $name ) {
-                    $fields = $form;
-                    next ADD_CODE;
-                }
-                else {
-                    $saved->{$name} = [ @$sr_group ];
-                    $ax->write_json( $sf->{i}{f_search_and_replace}, $saved );
-                    last ADD_CODE;
-                }
-            }
+            $changed = $sf->__add_saved( $saved );
         }
         elsif ( $choice eq $edit ) {
-            my $old_idx_choose_entry = 0;
-
-            CHOOSE_ENTRY: while ( 1 ) {
-                my $saved = $ax->read_json( $sf->{i}{f_search_and_replace} ) // {};
-                my @pre = ( undef );
-                my $menu = [ @pre, map( '- ' . $_, sort { $a cmp $b } keys %$saved ) ];
-                my $top = "Saved s_&_r";
-                # Choose
-                my $idx = $tc->choose(
-                    $menu,
-                    { %{$sf->{i}{lyt_v}}, clear_screen => 1, prompt => 'Edit item:', index => 1,
-                        undef => '  <=', default => $old_idx_choose_entry, info => $top }
-                );
-                if ( ! defined $idx || ! defined $menu->[$idx] ) {
-                    next HISTORY;
-                }
-                my $name = $menu->[$idx] =~ s/^- //r;
-                $top = join "\n", 'Saved s_&_r', map( '  ' . $_, sort { $a cmp $b } keys %$saved ), ' ';
-                my $sr_group = delete $saved->{$name};
-                my $old_idx_edit = 0;
-
-                EDIT_ENTRY: while ( 1 ) {
-                    my $fields = [
-                        [ $separator_key   ],
-                        [ '  Pattern',     ],
-                        [ '  Replacement', ],
-                        [ '  Modifiers',   ]
-                    ];
-                    my $c = 0;
-                    for my $sr_single ( @$sr_group ) {
-                        my ( $pattern, $replacement, $modifiers ) = @$sr_single;
-                        $c++;
-                        push @$fields,
-                            [ $separator_key ],
-                            [ $c . ' Pattern',     $pattern     ],
-                            [ $c . ' Replacement', $replacement ],
-                            [ $c . ' Modifiers',   $modifiers   ],
-                            [ $separator_key ],
-                            [ '  Pattern',     ],
-                            [ '  Replacement', ],
-                            [ '  Modifiers',   ];
-                    }
-                    my $old_code_str = join "\n" . ( ' ' x 6 ),  _stringified_code( $sr_group );
-                    my $info_add_fmt = "\n\nName: \"%s\"\nCode: %s\n";
-                    my $info_add = sprintf $info_add_fmt, $name, $old_code_str;
-                    my $info = $top . $info_add;
-                    # Fill_form
-                    my $form = $tf->fill_form(
-                        $fields,
-                        { prompt => "Edit \"$name\":", clear_screen => 1, info => $info, skip_items => $skip_regex,
-                          confirm => '  ' . $sf->{i}{confirm}, back => '  ' . $sf->{i}{back} . '   ' }
-                    );
-                    if ( ! defined $form ) {
-                        $saved->{$name} = [ @$sr_group ];
-                        next CHOOSE_ENTRY;
-                    }
-
-                    my $new_sr_group = [ $sf->__from_form_to_sr_group_data( $form ) ];
-                    if ( ! @$new_sr_group ) {
-                        $saved->{$name} = [ @$sr_group ];
-                        next CHOOSE_ENTRY;
-                    }
-                    my $code_str = join "\n" . ( ' ' x 6 ),  _stringified_code( $new_sr_group );
-                    if ( $name eq $old_code_str && $old_code_str ne $code_str) {
-                        $name = $code_str;
-                    }
-                    $info = sprintf $info_add_fmt, $name, $code_str;
-                    my $new_name = $sf->__get_entry_name( $top . $info, 'Edit name: ', $saved, $new_sr_group, $name );
-                    if ( ! length $new_name ) {
-                        next EDIT_ENTRY;
-                    }
-                    else {
-                        $name = $new_name;
-                        $saved->{$name} = [ @$new_sr_group ];
-                        $ax->write_json( $sf->{i}{f_search_and_replace}, $saved );
-                        $top = join "\n", 'Saved s_&_r', map( '  ' . $_, sort { $a cmp $b } keys %$saved ), ' ';
-                        next CHOOSE_ENTRY;
-                    }
-                }
-            }
+            $changed = $sf->__edit_saved( $saved );
         }
         elsif ( $choice eq $remove ) {
-            my $list = [ sort { $a cmp $b } keys %$saved ];
-            my $info = 'Saved s_&_r';
-            # Choose
-            my $idxs = $tu->choose_a_subset(
-                $list,
-                { prefix => '- ', info => $info, cs_label => 'Chosen items:' . "\n  ", cs_separator => "\n  ", cs_end => "\n",
-                  layout => 2, all_by_default => 0, index => 1, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back},
-                  clear_screen => 1, prompt => 'Choose items to remove:' }
-            );
-            if ( ! defined $idxs ) {
-                next HISTORY;
-            }
-            my @names = @{$list}[@$idxs];
-            REMOVE_ENTRY: for my $name ( @names ) {
-                my $sr_group = $saved->{$name};
-                my $code_str = join "\n" . ( ' ' x 6 ), _stringified_code( $sr_group );
-                my $info_add_fmt = "\nName: \"%s\"\nCode: %s\n";
-                my $info_add = sprintf $info_add_fmt, $name, $code_str;
-                my ( $no, $yes ) = ( '- NO', '- YES' );
-                my $menu = [ undef, $no, $yes ];
-                my $info = $top . $info_add;
-                # Choose
-                my $idx = $tc->choose(
-                    $menu,
-                    { %{$sf->{i}{lyt_v}}, clear_screen => 1, prompt => "Remove \"$name\"?", index => 1,
-                        undef => '  <=', info => $info }
-                );
-                if ( ! defined $idx || ! defined $menu->[$idx] ) {
-                    next HISTORY;
-                }
-                elsif ( $menu->[$idx] eq $no ) {
-                    next REMOVE_ENTRY;
-                }
-                delete $saved->{$name};
-                $top = join "\n", 'Saved s_&_r', map( '  ' . $_, sort { $a cmp $b } keys %$saved ), ' ';
-            }
-            $ax->write_json( $sf->{i}{f_search_and_replace}, $saved );
+            $changed = $sf->__remove_saved( $saved );
+        }
+        if ( $changed && ! $save_data ) {
+            $save_data = 1;
         }
     }
 }
 
 
-sub __from_form_to_sr_group_data {
-    my ( $sf, $form ) = @_;
-    my @sr_group_data;
-    my @copy = @$form;
-    while ( @copy ) {
-        my ( $section_separator, $pattern, $replacement, $modifiers ) = map { $_->[1] // '' } splice @copy, 0, 4;
-        if ( length $pattern ) {
-            $modifiers = $sf->__filter_modifiers( $modifiers );
-            push @sr_group_data, [ $pattern, $replacement, $modifiers ];
-        }
+sub __add_saved {
+    my ( $sf, $saved ) = @_;
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $tf = Term::Form->new( $sf->{i}{tf_default} );
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $separator_key = ' ';
+    my $skip_regex = qr/^\Q${separator_key}\E\z/;
+    my $fields = [];
+    for my $nr ( 1 .. 9 ) {
+        push @$fields,
+            [ $separator_key,       ],
+            [ $nr . ' Pattern',     ],
+            [ $nr . ' Replacement', ],
+            [ $nr . ' Modifiers',   ];
     }
-    return @sr_group_data;
+    my $prompt = 'Add "search & replace":';
+
+    ADD_CODE: while ( 1 ) {
+        # Fill_form
+        my $form = $tf->fill_form(
+            $fields,
+            { prompt => $prompt, skip_items => $skip_regex,
+              confirm => '  ' . $sf->{i}{confirm}, back => '  ' . $sf->{i}{back} . '   ' }
+        );
+        if ( ! defined $form ) {
+            return;
+        }
+        my $sr_group = [ $sf->__from_form_to_sr_group_data( $form ) ];
+        if ( ! @$sr_group ) {
+            return;
+        }
+        if ( ! eval {
+            $sf->__execute_substitutions( [ [ 'test_string' ] ], [ 0 ], [ $sr_group ] );
+            1 }
+        ) {
+            $ax->print_error_message( $@ );
+            $fields = $form;
+            next ADD_CODE;
+        }
+        my @code = _stringified_sr_group( $sr_group );
+        my $info = join "\n", map { ( ' ' x 6 ) . $_ } @code;
+        $info =~ s/^\s{5}/Code:/;
+        $info = $prompt . "\n\n" . $info;
+        my $name = $sf->__get_new_name( $info, 'Name: ', $saved, $sr_group );
+        if ( ! length $name ) {
+            $fields = $form;
+            next ADD_CODE;
+        }
+        $saved->{$name} = [ @$sr_group ];
+        return 1;
+    }
 }
 
 
-sub __get_entry_name {
-    my ( $sf, $info, $prompt, $saved, $sr_group, $name ) = @_;
+sub __get_new_name {
+    my ( $sf, $info, $prompt, $saved, $sr_group ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
-    my $name_default = $name;
-    if ( ! length $name && @$sr_group < 3 ) {
-        $name_default = join ' ', _stringified_code( $sr_group );
+    my $name_default = '';
+    if ( @$sr_group == 1 ) {
+        $name_default = ( _stringified_sr_group( $sr_group ) )[0];
     }
     my $count = 1;
 
@@ -512,6 +402,121 @@ sub __get_entry_name {
         return $new_name;
     }
 }
+
+
+sub __edit_saved {
+    my ( $sf, $saved ) = @_;
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $tf = Term::Form->new( $sf->{i}{tf_default} );
+    my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
+    my @pre = ( undef );
+    my $menu = [ @pre, map( '- ' . $_, sort { $a cmp $b } keys %$saved ) ];
+    my $prompt = 'Edit "search & replace":';
+    # Choose
+    my $idx = $tc->choose(
+        $menu,
+        { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, undef => '  <=' }
+    );
+    if ( ! defined $idx || ! defined $menu->[$idx] ) {
+        return;
+    }
+    my $name = $menu->[$idx] =~ s/^- //r;
+    my $separator_key = ' ';
+    my $skip_regex = qr/^\Q${separator_key}\E\z/;
+    my $sr_group = $saved->{$name};
+    my $fields = [
+        [ $separator_key   ],
+        [ '  Pattern',     ],
+        [ '  Replacement', ],
+        [ '  Modifiers',   ]
+    ];
+    my $c = 0;
+    for my $sr_single ( @$sr_group ) {
+        $c++;
+        push @$fields,
+            [ $separator_key ],
+            [ $c . ' Pattern',     $sr_single->{pattern}     ],
+            [ $c . ' Replacement', $sr_single->{replacement} ],
+            [ $c . ' Modifiers',   $sr_single->{modifiers}   ],
+            [ $separator_key ],
+            [ '  Pattern',     ],
+            [ '  Replacement', ],
+            [ '  Modifiers',   ];
+    }
+    my $info_fmt = "$prompt\n\nName: \"%s\"\nCode: %s\n";
+    my $code_str = join "\n" . ( ' ' x 6 ),  _stringified_sr_group( $sr_group );
+    my $info = sprintf $info_fmt, $name, $code_str;
+    # Readline
+    my $new_name = $tr->readline(
+        'Confirm name: ',
+        { info => $info, default => $name, history => [] }
+    );
+    if ( ! length $new_name ) {
+        return;
+    }
+    my $old_code_str = join "\n" . ( ' ' x 6 ),  _stringified_sr_group( $sr_group );
+    $info = sprintf $info_fmt, $new_name, $old_code_str;
+    # Fill_form
+    my $form = $tf->fill_form(
+        $fields,
+        { prompt => "Edit \"$new_name\":", info => $info, skip_items => $skip_regex,
+            confirm => '  ' . $sf->{i}{confirm}, back => '  ' . $sf->{i}{back} . '   ' }
+    );
+    if ( ! defined $form ) {
+        return;
+    }
+    my $new_sr_group = [ $sf->__from_form_to_sr_group_data( $form ) ];
+    if ( ! @$new_sr_group ) {
+        return;
+    }
+    if ( $new_name ne $name ) {
+        delete $saved->{$name};
+    }
+    $saved->{$new_name} = [ @$new_sr_group ];
+    return 1;
+}
+
+
+sub __remove_saved {
+    my ( $sf, $saved ) = @_;
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my @pre = ( undef );
+    my $prompt = 'Remove "search & replace":';
+    my $menu = [ @pre, map { '- ' . $_ } sort { $a cmp $b } keys %$saved ];
+    # Choose
+    my $idx = $tc->choose(
+        $menu,
+        { %{$sf->{i}{lyt_v}}, index => 1, undef => '  <=', prompt => $prompt }
+    );
+    if ( ! defined $idx || ! defined $menu->[$idx] ) {
+        return;
+    }
+    my $name = $menu->[$idx] =~ s/^- //r;
+    my $sr_group = $saved->{$name};
+    my $code_str = join "\n" . ( ' ' x 6 ), _stringified_sr_group( $sr_group );
+    my $info_fmt = "$prompt\n\nName: \"%s\"\nCode: %s\n";
+    my $info = sprintf $info_fmt, $name, $code_str;
+    my ( $no, $yes ) = ( '- NO', '- YES' );
+    $menu = [ undef, $no, $yes ];
+    # Choose
+    $idx = $tc->choose(
+        $menu,
+        { %{$sf->{i}{lyt_v}}, prompt => "Remove \"$name\"?", index => 1, undef => '  <=', info => $info }
+    );
+    if ( ! defined $idx || ! defined $menu->[$idx] ) {
+        return;
+    }
+    elsif ( $menu->[$idx] eq $yes ) {
+        delete $saved->{$name};
+        return 1;
+    }
+    else {
+        return;
+    }
+}
+
+
+
 
 
 1;

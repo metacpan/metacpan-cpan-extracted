@@ -1,12 +1,16 @@
 use Test::More tests => 2;
 use Test::Exception;
 
+use File::Basename qw(dirname);
+use Cwd            qw(abs_path);
+
 use strict;
 use warnings;
 
 use_ok('Net::AS2');
 
 my ($a1, $a2);
+my $cert_dir = abs_path(dirname(__FILE__) . '/certificates');
 
 subtest 'Constructor' => sub {
     lives_ok {
@@ -95,7 +99,7 @@ sub key {
     my $i = shift;
 
     local $/;
-    open my $fh, '<', "t/test.$i.key";
+    open my $fh, '<', "$cert_dir/test.$i.key";
     return <$fh>;
 }
 
@@ -103,7 +107,7 @@ sub cert {
     my $i = shift;
 
     local $/;
-    open my $fh, '<', "t/test.$i.cert";
+    open my $fh, '<', "$cert_dir/test.$i.cert";
     return <$fh>;
 }
 

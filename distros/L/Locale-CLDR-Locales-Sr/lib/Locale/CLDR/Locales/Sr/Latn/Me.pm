@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sr::Latn::Me - Package for language Serbian
 
 package Locale::CLDR::Locales::Sr::Latn::Me;
 # This file auto generated from Data\common\main\sr_Latn_ME.xml
-#	on Tue  5 Dec  1:32:44 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'arn' => 'mapudungun',
@@ -59,14 +59,13 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'BY' => 'Bjelorusija',
  			'CG' => 'Kongo',
  			'CZ' => 'Češka Republika',
  			'DE' => 'Njemačka',
  			'KN' => 'Sveti Kits i Nevis',
- 			'MK@alt=variant' => 'BJR Makedonija',
  			'PM' => 'Sveti Pjer i Mikelon',
  			'RE' => 'Reunion',
  			'UM' => 'Manja udaljena ostrva SAD',
@@ -87,18 +86,15 @@ has 'calendar_months' => (
 				'format' => {
 					abbreviated => {
 						nonleap => [
-							'jan.',
-							'feb.',
+							undef(),
+							undef(),
 							'mart',
-							'apr.',
+							undef(),
 							'maj',
 							'jun',
 							'jul',
-							'avg.',
-							'sept.',
-							'okt.',
-							'nov.',
-							'dec.'
+							undef(),
+							'sept'
 						],
 						leap => [
 							
@@ -108,18 +104,15 @@ has 'calendar_months' => (
 				'stand-alone' => {
 					abbreviated => {
 						nonleap => [
-							'jan.',
-							'feb.',
+							undef(),
+							undef(),
 							'mart',
-							'apr.',
+							undef(),
 							'maj',
 							'jun',
 							'jul',
-							'avg.',
-							'sept.',
-							'okt.',
-							'nov.',
-							'dec.'
+							undef(),
+							'sept'
 						],
 						leap => [
 							
@@ -137,15 +130,6 @@ has 'calendar_days' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {
-						mon => 'pon.',
-						tue => 'ut.',
-						wed => 'sr.',
-						thu => 'čet.',
-						fri => 'pet.',
-						sat => 'sub.',
-						sun => 'ned.'
-					},
 					wide => {
 						mon => 'ponedeljak',
 						tue => 'utorak',
@@ -157,15 +141,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'pon.',
-						tue => 'ut.',
-						wed => 'sr.',
-						thu => 'čet.',
-						fri => 'pet.',
-						sat => 'sub.',
-						sun => 'ned.'
-					},
 					wide => {
 						mon => 'ponedeljak',
 						tue => 'utorak',
@@ -245,8 +220,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'day_periods' => (
@@ -354,7 +329,7 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
-			MMMMW => q{W. 'sjedmica' 'u' MMM},
+			MMMMW => q{W. 'sjedmica' 'u' MMMM},
 			yw => q{w. 'sjedmica' 'u' Y.},
 		},
 	} },

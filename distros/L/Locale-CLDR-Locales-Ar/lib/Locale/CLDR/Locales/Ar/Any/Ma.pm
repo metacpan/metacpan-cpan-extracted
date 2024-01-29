@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ar::Any::Ma - Package for language Arabic
 
 package Locale::CLDR::Locales::Ar::Any::Ma;
 # This file auto generated from Data\common\main\ar_MA.xml
-#	on Tue  5 Dec  1:00:39 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -34,7 +34,7 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			auxiliary => qr{[‌‍‎‏ پ چ ژ ڜ ڢ ڤ ڥ ٯ ڧ ڨ ک ڭ گ ݣ ی]},
-			numbers => qr{[‎ \- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[‎ \- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -72,16 +72,16 @@ has 'calendar_months' => (
 				'format' => {
 					abbreviated => {
 						nonleap => [
-							'يناير',
-							'فبراير',
-							'مارس',
+							undef(),
+							undef(),
+							undef(),
 							'أبريل',
 							'ماي',
-							'يونيو',
+							undef(),
 							'يوليوز',
 							'غشت',
 							'شتنبر',
-							'أكتوبر',
+							undef(),
 							'نونبر',
 							'دجنبر'
 						],
@@ -91,14 +91,14 @@ has 'calendar_months' => (
 					},
 					narrow => {
 						nonleap => [
-							'ي',
-							'ف',
-							'م',
+							undef(),
+							undef(),
+							undef(),
 							'أ',
 							'م',
 							'ن',
 							'ل',
-							'غ',
+							undef(),
 							'ش',
 							'ك',
 							'ب',
@@ -110,16 +110,16 @@ has 'calendar_months' => (
 					},
 					wide => {
 						nonleap => [
-							'يناير',
-							'فبراير',
-							'مارس',
+							undef(),
+							undef(),
+							undef(),
 							'أبريل',
 							'ماي',
-							'يونيو',
+							undef(),
 							'يوليوز',
 							'غشت',
 							'شتنبر',
-							'أكتوبر',
+							undef(),
 							'نونبر',
 							'دجنبر'
 						],
@@ -131,16 +131,16 @@ has 'calendar_months' => (
 				'stand-alone' => {
 					abbreviated => {
 						nonleap => [
-							'يناير',
-							'فبراير',
-							'مارس',
-							'أبريل',
+							undef(),
+							undef(),
+							undef(),
+							undef(),
 							'ماي',
-							'يونيو',
+							undef(),
 							'يوليوز',
 							'غشت',
 							'شتنبر',
-							'أكتوبر',
+							undef(),
 							'نونبر',
 							'دجنبر'
 						],
@@ -150,14 +150,14 @@ has 'calendar_months' => (
 					},
 					narrow => {
 						nonleap => [
-							'ي',
-							'ف',
-							'م',
+							undef(),
+							undef(),
+							undef(),
 							'أ',
 							'م',
 							'ن',
 							'ل',
-							'غ',
+							undef(),
 							'ش',
 							'ك',
 							'ب',
@@ -169,16 +169,16 @@ has 'calendar_months' => (
 					},
 					wide => {
 						nonleap => [
-							'يناير',
-							'فبراير',
-							'مارس',
+							undef(),
+							undef(),
+							undef(),
 							'أبريل',
 							'ماي',
-							'يونيو',
+							undef(),
 							'يوليوز',
 							'غشت',
 							'شتنبر',
-							'أكتوبر',
+							undef(),
 							'نونبر',
 							'دجنبر'
 						],
@@ -241,8 +241,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'eras' => (

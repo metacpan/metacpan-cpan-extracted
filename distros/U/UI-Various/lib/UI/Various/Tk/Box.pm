@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 use UI::Various::core;
 use UI::Various::Box;
@@ -91,10 +91,14 @@ sub _prepare($$$)
 	error('_1_element_must_be_accompanied_by_parent', __PACKAGE__);
 	return 1;
     }
-    my @border = ($self->border ? (-relief => 'solid', -borderwidth => 1) : ());
-    my @attributes = ($self->_attributes(), @border);
+    my @attr2 = ($self->border ? (-relief => 'solid', -borderwidth => 1) : ());
+    my @attributes = ($self->_attributes(), @attr2);
     my $grid = $_->_tk->Frame(@attributes)
 	->grid(-row => $row, -column => $column);
+    if (defined $self->{bg})
+    {   push @attr2, '-background' => '#' . $self->{bg};   }
+    if (defined $self->{fg})
+    {   push @attr2, '-foreground' => '#' . $self->{fg};   }
     my $errors = 0;
     my @tk = ();
     # From now on $row and $column are those of the box itself:
@@ -104,7 +108,7 @@ sub _prepare($$$)
 	{
 	    # We temporarily store the frame for the field in the main Tk
 	    # member variable as that's what our children expect from us:
-	    $self->_tk($grid->Frame(@border)
+	    $self->_tk($grid->Frame(@attr2)
 		       ->grid(-row => $row, -column => $column,
 			      -sticky => 'nswe'));
 	    $_ = $self->field($row, $column);

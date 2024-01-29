@@ -36,45 +36,50 @@ if($Config{'osname'} ne 'MSWin32') {
 }
 
 my $dir = 'lib/Locale/Places/databases';
-my $csv = File::Spec->catdir($dir, 'GB.csv');
-my $sqlite = File::Spec->catdir($dir, 'GB.sql');
+foreach my $country('GB', 'US') {
+	my $csv = File::Spec->catdir($dir, "$country.csv");
+	my $sqlite = File::Spec->catdir($dir, "$country.sql");
 
-if(-r $sqlite) {
-	if((-s $sqlite) > 0) {
-		# Don't bother downloading if the file is less than a day old
-		exit if(-M $sqlite < 1);
+	if(-r $sqlite) {
+		if((-s $sqlite) > 0) {	# Non empty?
+			# Don't bother building if the file is less than a day old
+			next if(-M $sqlite < 1);
+		}
+		unlink $sqlite;
 	}
-	unlink $sqlite;
-}
 
-my $fin;
-if($Config{'osname'} eq 'MSWin32') {
-	open($fin, '<', $csv);
-} else {
-	$csv = File::Open::NoCache::ReadOnly->new($csv);
-	$fin = $csv->fd();
-	aio_readahead($fin, 0, AIO_READAHEAD_SIZE);
-}
+	print "Building $sqlite\n";
 
-if(my $dbh = DBI->connect("dbi:SQLite:dbname=$sqlite", undef, undef, { RaiseError => 1, AutoCommit => 0, synchronous => 0, locking_mode => 'EXCLUSIVE' })) {
-	$dbh->do('CREATE TABLE gb(code1 INTEGER, code2 INTEGER, type VARCHAR(4), data VARCHAR NOT NULL, ispreferredname BIT, isshortname BIT)');
-	# keys
-	# if($place = $self->{'gb'}->fetchrow_hashref({ type => $from, data => $place })) {
-		# if(my $line = $self->{'gb'}->fetchrow_hashref({ type => $to, code2 => $place->{'code2'} })) {
-	$dbh->do('PRAGMA cache_size = -65536');	# 64MB
-	$dbh->do('PRAGMA journal_mode = OFF');
+	my $fin;
+	if($Config{'osname'} eq 'MSWin32') {
+		open($fin, '<', $csv);
+	} else {
+		$csv = File::Open::NoCache::ReadOnly->new($csv);
+		$fin = $csv->fd();
+		aio_readahead($fin, 0, AIO_READAHEAD_SIZE);
+	}
 
-	my $queue = doit($dbh, $fin);
+	if(my $dbh = DBI->connect("dbi:SQLite:dbname=$sqlite", undef, undef, { RaiseError => 1, AutoCommit => 0, synchronous => 0, locking_mode => 'EXCLUSIVE' })) {
+		my $table = lc($country);
+		$dbh->do("CREATE TABLE $table(code1 INTEGER, code2 INTEGER, type VARCHAR(4), data VARCHAR NOT NULL, ispreferredname BIT, isshortname BIT)");
+		# keys
+		# if($place = $self->{$table}->fetchrow_hashref({ type => $from, data => $place })) {
+			# if(my $line = $self->{$table}->fetchrow_hashref({ type => $to, code2 => $place->{'code2'} })) {
+		$dbh->do('PRAGMA cache_size = -65536');	# 64MB
+		$dbh->do('PRAGMA journal_mode = OFF');
 
-	$csv = undef;
+		my $queue = doit($dbh, $fin);
 
-	flush($dbh, $queue);
-	$dbh->commit();
-	$dbh->disconnect();
+		$csv = undef;
 
-	File::Copy::copy($sqlite, File::Spec->catfile('blib', $sqlite));
-} else {
-	die "$sqlite: $!";
+		flush($dbh, $table, $queue);
+		$dbh->commit();
+		$dbh->disconnect();
+
+		File::Copy::copy($sqlite, File::Spec->catfile('blib', $sqlite));
+	} else {
+		die "$sqlite: $!";
+	}
 }
 
 sub doit($$) {
@@ -87,8 +92,10 @@ sub doit($$) {
 
 		my ($code1, $code2, $type, $data, $ispreferredname, $isshortname) = split(/\t/, $line);
 		die "Can't parse the line '$line'" unless(defined($type));
-		next if($type eq 'link');
-		next if($type eq 'wkdt');
+		# next if($type eq 'link');
+		# next if($type eq 'wkdt');
+		# next if($type eq 'post');
+		next if(length($type) != 2);
 
 		# print __LINE__, ": $code1=>$data=>$ispreferredname\n";
 
@@ -108,15 +115,15 @@ sub doit($$) {
 	return \%queue;
 }
 
-sub flush($$)
+sub flush($$$)
 {
-	my ($dbh, $queue) = @_;
+	my ($dbh, $table, $queue) = @_;
 
 	my $query;
 
 	while(my ($key, $value) = each (%{$queue})) {
 		if(!defined($query)) {
-			$query = 'INSERT INTO gb(code1, code2, type, data, ispreferredname, isshortname) VALUES (';
+			$query = "INSERT INTO $table(code1, code2, type, data, ispreferredname, isshortname) VALUES (";
 		} else {
 			$query .= ',(';
 		}

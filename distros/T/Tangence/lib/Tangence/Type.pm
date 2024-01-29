@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use warnings;
+use Object::Pad 0.800;
 
-package Tangence::Type 0.30;
+package Tangence::Type 0.32;
 class Tangence::Type :isa(Tangence::Meta::Type);
 
 =head1 NAME
@@ -26,13 +27,13 @@ implementations.
 
 =head2 make
 
-   $type = Tangence::Type->make( $primitive_sig )
+   $type = Tangence::Type->make( $primitive_sig );
 
 Returns an instance to represent a primitive type of the given signature.
 
-   $type = Tangence::Type->make( list => $member_type )
+   $type = Tangence::Type->make( list => $member_type );
 
-   $type = Tangence::Type->make( dict => $member_type )
+   $type = Tangence::Type->make( dict => $member_type );
 
 Returns an instance to represent a list or dict aggregation containing members
 of the given type.
@@ -70,19 +71,19 @@ sub make
 
 =head2 default_value
 
-   $value = $type->default_value
+   $value = $type->default_value;
 
 Returns a value suitable to use as an initial value for object properties.
 
 =head2 pack_value
 
-   $type->pack_value( $message, $value )
+   $type->pack_value( $message, $value );
 
 Appends a value of this type to the end of a L<Tangence::Message>.
 
 =head2 unpack_value
 
-   $value = $type->unpack_value( $message )
+   $value = $type->unpack_value( $message );
 
 Removes a value of this type from the start of a L<Tangence::Message>.
 

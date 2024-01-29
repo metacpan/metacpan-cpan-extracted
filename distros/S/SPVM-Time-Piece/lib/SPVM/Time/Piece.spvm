@@ -1,0 +1,631 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Time::Piece {
+  version "0.003";
+  
+  use Sys;
+  use Time::Seconds;
+  use Time::Local;
+  use Sys::Time::Tm;
+  
+  # Interfaces
+  interface Cloneable;
+  
+  # Class Variables
+  our $DATE_SEP : string;
+  our $TIME_SEP : string;
+  our $MON_LIST : string[];
+  our $FULLMON_LIST : string[];
+  our $DAY_LIST : string[];
+  our $FULLDAY_LIST : string[];
+  
+  our $LOCALE : string[];
+  
+  # Fields
+  has is_localtime : byte;
+  
+  has tm : Sys::Time::Tm;
+  
+  has epoch : ro long;
+  
+  INIT {
+    $DATE_SEP = "-";
+    $TIME_SEP = ":";
+    $MON_LIST = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    $FULLMON_LIST = ["January", "February", "March", "April", "May", "June", "July", 
+                      "August", "September", "October", "November", "December"];
+    $DAY_LIST = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    $FULLDAY_LIST = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  }
+  
+  # Class Methods
+  private static method new : Time::Piece ($epoch : long = -1, $is_localtime : int = 0, $allow_minus : int = 0) {
+    
+    unless ($allow_minus) {
+      if ($epoch < 0) {
+        $epoch = Sys->time;
+      }
+    }
+    
+    my $new_tp = new Time::Piece;
+    
+    my $new_tm = (Sys::Time::Tm)undef;
+    if ($is_localtime) {
+      $new_tm = Sys->localtime($epoch);
+    }
+    else {
+      $new_tm = Sys->gmtime($epoch);
+    }
+    
+    $new_tp->{tm} = $new_tm;
+    
+    $new_tp->{is_localtime} = (byte)$is_localtime;
+    
+    $new_tp->{epoch} = $epoch;
+    
+    return $new_tp;
+  }
+  
+  static method localtime : Time::Piece ($epoch : long = -1, $allow_minus :int = 0) {
+    
+    my $new_tp = &new($epoch, 1, $allow_minus);
+    
+    return $new_tp;
+  }
+  
+  static method localtime_tp : Time::Piece ($tp : Time::Piece) {
+    
+    unless ($tp) {
+      die "\$tp must be defined.";
+    }
+    
+    my $new_tp = &new(0, 1);
+    
+    my $new_tm = Sys->localtime(0);
+    
+    $new_tm->set_tm_sec($tp->{tm}->tm_sec);
+    $new_tm->set_tm_min($tp->{tm}->tm_min);
+    $new_tm->set_tm_hour($tp->{tm}->tm_hour);
+    $new_tm->set_tm_mday($tp->{tm}->tm_mday);
+    $new_tm->set_tm_mon($tp->{tm}->tm_mon);
+    $new_tm->set_tm_year($tp->{tm}->tm_year);
+    $new_tm->set_tm_wday($tp->{tm}->tm_wday);
+    $new_tm->set_tm_yday($tp->{tm}->tm_yday);
+    $new_tm->set_tm_isdst($tp->{tm}->tm_isdst);
+    
+    $new_tp->{tm} = $new_tm;
+    
+    $new_tp->{epoch} = Time::Local->timelocal($new_tm);
+    
+    return $new_tp;
+  }
+  
+  static method gmtime : Time::Piece ($epoch : long = -1, $allow_minus : int = 0) {
+    
+    my $new_tp = &new($epoch, 0, $allow_minus);
+    
+    return $new_tp;
+  }
+  
+  static method gmtime_tp : Time::Piece ($tp : Time::Piece) {
+    
+    unless ($tp) {
+      die "\$tp must be defined.";
+    }
+    
+    my $new_tp = &new(0, 1);
+    
+    my $new_tm = Sys->gmtime(0);
+    
+    $new_tm->set_tm_sec($tp->{tm}->tm_sec);
+    $new_tm->set_tm_min($tp->{tm}->tm_min);
+    $new_tm->set_tm_hour($tp->{tm}->tm_hour);
+    $new_tm->set_tm_mday($tp->{tm}->tm_mday);
+    $new_tm->set_tm_mon($tp->{tm}->tm_mon);
+    $new_tm->set_tm_year($tp->{tm}->tm_year);
+    $new_tm->set_tm_wday($tp->{tm}->tm_wday);
+    $new_tm->set_tm_yday($tp->{tm}->tm_yday);
+    $new_tm->set_tm_isdst($tp->{tm}->tm_isdst);
+    
+    $new_tp->{tm} = $new_tm;
+    
+    $new_tp->{epoch} = Time::Local->timelocal($new_tm);
+    
+    return $new_tp;
+  }
+  
+  static method strptime : Time::Piece ($string : string, $format : string) {
+    
+    my $new_tm = &strptime_tm($string, $format);
+    
+    my $new_tp = &new(0, 0);
+    
+    $new_tp->{tm} = $new_tm;
+    
+    my $epoch = Time::Local->timegm($new_tm);
+    
+    my $wday = &dayofweek($epoch);
+    
+    $new_tp->{tm}->set_tm_wday($wday);
+    
+    $new_tp->{epoch} = $epoch;
+    
+    return $new_tp;
+  }
+  
+  private native static method strptime_tm : Sys::Time::Tm ($string : string, $format : string);
+  
+  static method _is_leap_year : int ($year : int) {
+    
+    return (($year %4 == 0) && !($year % 100 == 0)) || ($year % 400 == 0);
+  }
+  
+  # Instance Methods
+  method sec : int () {
+    
+    return $self->{tm}->tm_sec;
+  }
+  
+  method second : int () {
+    
+    return $self->sec;
+  }
+  
+  method min : int () {
+    
+    return $self->{tm}->tm_min;
+  }
+  
+  method minute : int () {
+    
+    return $self->min;
+  }
+  
+  method hour : int () {
+    
+    return $self->{tm}->tm_hour;
+  }
+  
+  method mday : int () {
+    
+    return $self->{tm}->tm_mday;
+  }
+  
+  method day_of_month : int () {
+    
+    return $self->mday;
+  }
+  
+  method mon : int () {
+    
+    return $self->{tm}->tm_mon + 1;
+  }
+  
+  method _mon : int () {
+    
+    return $self->{tm}->tm_mon;
+  }
+  
+  method month : string ($mon_list : string[] = undef) {
+    
+    if ($mon_list) {
+      return $mon_list->[$self->{tm}->tm_mon];
+    }
+    else {
+      return $MON_LIST->[$self->{tm}->tm_mon];
+    }
+  }
+  
+  method monname : string ($mon_list : string[] = undef) {
+    
+    return $self->month($mon_list);
+  }
+  
+  method fullmonth : string ($mon_list : string[] = undef) {
+      
+    if ($mon_list) {
+      return $mon_list->[$self->{tm}->tm_mon];
+    }
+    else {
+      return $FULLMON_LIST->[$self->{tm}->tm_mon];
+    }
+  }
+  
+  method year : int () {
+    
+    return $self->{tm}->tm_year + 1900;
+  }
+  
+  method _year : int () {
+    
+    return $self->{tm}->tm_year;
+  }
+  
+  method yy : int () {
+    
+    my $res = $self->{tm}->tm_year % 100;
+    
+    return $res;
+  }
+  
+  method wday : int () {
+    
+    return $self->{tm}->tm_wday + 1;
+  }
+  
+  method _wday : int () {
+      
+    return $self->{tm}->tm_wday;
+  }
+  
+  method day_of_week : int () {
+    
+    return $self->_wday;
+  }
+  
+  private static method dayofweek : int ($now : long, $tz_offset : int = 0) {
+    # Calculate number of seconds since midnight 1 Jan 1970 local time
+    my $localtime = $now + ($tz_offset * 60 * 60);
+    
+    # Convert to number of days since 1 Jan 1970
+    my $days_since_epoch = $localtime / 86400;
+    
+    # 1 Jan 1970 was a Thursday, so add 4 so Sunday is day 0, and mod 7
+    my $day_of_week = (int)(($days_since_epoch + 4) % 7); 
+    
+    return $day_of_week;
+  }
+  
+  method wdayname : string ($day_list : string[] = undef) {
+    
+    if ($day_list) {
+      return $day_list->[$self->{tm}->tm_wday];
+    }
+    else {
+      return $DAY_LIST->[$self->{tm}->tm_wday];
+    }
+  }
+  
+  method day : string ($day_list : string[] = undef) {
+    
+    return $self->wdayname($day_list);
+  }
+  
+  method fullday : string ($day_list : string[] = undef) {
+    
+    if ($day_list) {
+      return $day_list->[$self->{tm}->tm_wday];
+    }
+    else {
+      return $FULLDAY_LIST->[$self->{tm}->tm_wday];
+    }
+  }
+  
+  method yday : int () {
+    
+    return $self->{tm}->tm_yday;
+  }
+  
+  method day_of_year : int () {
+    
+    return $self->yday;
+  }
+  
+  method isdst : int () {
+    
+    return $self->{tm}->tm_isdst;
+  }
+  
+  method daylight_savings : int () {
+    
+    return $self->isdst;
+  }
+  
+  method tzoffset : Time::Seconds () {
+    
+    unless ($self->{is_localtime}) {
+      return Time::Seconds->new(0);
+    }
+    
+    my $epoch = $self->{epoch};
+    
+    my $jd_localtime = $self->_jd(Sys->localtime($epoch));
+    
+    my $jd_gmtime = $self->_jd(Sys->gmtime($epoch));
+    
+    my $tzoffset = 24 * ($jd_localtime - $jd_gmtime);
+    
+    my $minite_round = 0.5;
+    if ($tzoffset < 0) {
+      $minite_round = -$minite_round;
+    }
+    
+    my $seconds = (int)($tzoffset * 60 + ($minite_round)) * 60;
+    
+    return Time::Seconds->new($seconds);
+  }
+  
+  method hms : string ($sep : string = undef) {
+    
+    unless ($sep) {
+      $sep = $TIME_SEP;
+    }
+    
+    return Format->sprintf("%02d$sep%02d$sep%02d", [(object)$self->{tm}->tm_hour, $self->{tm}->tm_min, $self->{tm}->tm_sec]);
+  }
+  
+  method time : string ($sep : string = undef) {
+    return $self->hms($sep);
+  }
+  
+  method ymd : string ($sep : string = undef) {
+    
+    unless ($sep) {
+      $sep = $DATE_SEP;
+    }
+    
+    return Format->sprintf("%d$sep%02d$sep%02d", [(object)$self->year, $self->mon, $self->{tm}->tm_mday]);
+  }
+  
+  method date : string ($sep : string = undef) {
+    
+    return $self->ymd($sep);
+  }
+  
+  method mdy : string ($sep : string = undef) {
+    
+    unless ($sep) {
+      $sep = $DATE_SEP;
+    }
+    
+    return Format->sprintf("%02d$sep%02d$sep%d", [(object)$self->mon, $self->{tm}->tm_mday, $self->year]);
+  }
+  
+  method dmy : string ($sep : string = undef) {
+    
+    unless ($sep) {
+      $sep = $DATE_SEP;
+    }
+    
+    return Format->sprintf("%02d$sep%02d$sep%d", [(object)$self->{tm}->tm_mday, $self->mon, $self->year]);
+  }
+  
+  method datetime : string () {
+    
+    return Fn->join("T", [$self->date($DATE_SEP), $self->time($TIME_SEP)]);
+  }
+  
+  method julian_day : double () {
+    
+    my $tm = Sys->gmtime($self->{epoch});
+    
+    my $jd = $self->_jd($tm);
+    
+    return $jd;
+  }
+  
+  method mjd : double () {
+    
+    return (double)$self->julian_day - 2_400_000.5;
+  }
+  
+  method _jd : double ($tm : Sys::Time::Tm) {
+    
+    my $y = $tm->tm_year + 1900;
+    my $m = $tm->tm_mon + 1;
+    my $d = $tm->tm_mday;
+    my $h = $tm->tm_hour;
+    my $n = $tm->tm_min;
+    my $s = $tm->tm_sec;
+    
+    if ($m > 2) {
+      $m = $m - 3;
+    }
+    else {
+      $y = $y - 1;
+      $m = $m + 9;
+    }
+    
+    my $J = (double)(int)( 365.25 *( $y + 4712) )
+      + (double)(int)( (30.6 * $m) + 0.5)
+        + 59
+          + $d
+            - 0.5;
+    
+    my $G = 38 - (double)(int)( 0.75 * (double)(int)(49 + ($y / 100)));
+    
+    # Calculate the actual Julian Date
+    my $JD = $J + $G;
+    
+    my $ret = $JD + ($h + ($n + (double)$s / 60) / 60) / 24;
+    
+    unless ($ret isa double) {
+      die "Unexpected Error.";
+    }
+    
+    return $ret;
+  }
+  
+  method week : int () {
+    
+    my $J  = $self->julian_day;
+    # Julian day is independent of time zone so add on tzoffset
+    # if we are using local time here since we want the week day
+    # to reflect the local time rather than UTC
+    if ($self->{is_localtime}) {
+      $J += ((double)$self->tzoffset->{seconds} / (24*3600));
+    }
+    
+    # Now that we have the Julian day including fractions
+    # convert it to an integer Julian Day Number using nearest
+    # int (since the day changes at midday we convert all Julian
+    # dates to following midnight).
+    my $J_int = (int)($J+0.5);
+    
+    my $d4 = ((($J_int + 31741 - ($J_int % 7)) % 146097) % 36524) % 1461;
+    my $L  = $d4 / 1460;
+    my $d1 = (($d4 - $L) % 365) + $L;
+    return $d1 / 7 + 1;
+  }
+  
+  method is_leap_year : int () {
+    
+    my $year = $self->year;
+    
+    return &_is_leap_year($year);
+  }
+  
+  method month_last_day : int () {
+    
+    my $MON_LAST = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    
+    my $year = $self->year;
+    my $_mon = $self->_mon;
+    
+    my $add_leap_year = 0;
+    if ($_mon == 1) {
+      $add_leap_year = &_is_leap_year($year);
+    }
+    
+    return $MON_LAST->[$_mon] + $add_leap_year;
+  }
+  
+  native method strftime : string ($format : string = undef);
+  
+  method cdate : string () {
+    
+    return $self->strftime("%a %b %d %H:%M:%S %Y");
+  }
+  
+  method add : Time::Piece ($tsec : Time::Seconds) {
+    
+    return &new($self->{epoch} + (long)$tsec->{seconds}, $self->{is_localtime});
+  }
+  
+  method subtract : Time::Piece ($tsec : Time::Seconds) {
+    
+    return &new($self->{epoch} - (long)$tsec->{seconds}, $self->{is_localtime});
+  }
+  
+  method subtract_tp : Time::Seconds ($tp :Time::Piece) {
+    
+    return Time::Seconds->new($self->{epoch} - $tp->{epoch});
+  }
+  
+  method compare : int ($tp : Time::Piece) {
+    return $self->{epoch} <=> $tp->epoch;
+  }
+  
+  method add_months : Time::Piece ($num_months : int) {
+    
+    my $final_month = $self->_mon + $num_months;
+    my $num_years = 0;
+    if ($final_month > 11 || $final_month < 0) {
+      if ($final_month < 0 && $final_month % 12 == 0) {
+        $num_years = (int)($final_month / 12) + 1;
+      }
+      else {
+        $num_years = (int)($final_month / 12);
+      }
+      
+      if ($final_month < 0) {
+        $num_years--;
+      }
+      
+      $final_month = $final_month % 12;
+    }
+    
+    my $new_tp = $self->clone;
+    
+    $new_tp->{tm}->set_tm_mon($final_month);
+    $new_tp->{tm}->set_tm_year($self->{tm}->tm_year + $num_years);
+    
+    return $new_tp;
+  }
+  
+  method add_years : Time::Piece ($years : int) {
+    return $self->add_months($years * 12);
+  }
+  
+  method truncate : Time::Piece ($options : object[]) {
+  
+    Fn->check_option_names($options, ["to"]);
+    
+    my $options_h = Hash->new($options);
+    
+    my $to = $options_h->get_string("to");
+    
+    unless ($to) {
+      die "The \"to\" option must be defined.";
+    }
+    
+    my $tp_truncate = $self->clone;
+    
+    my $tm = $tp_truncate->{tm};
+    
+    if ($to eq "second") {
+      $tm->set_tm_sec(0);
+    }
+    elsif ($to eq "minute") {
+      $tm->set_tm_sec(0);
+      $tm->set_tm_min(0);
+    }
+    elsif ($to eq "hour") {
+      $tm->set_tm_sec(0);
+      $tm->set_tm_min(0);
+      $tm->set_tm_hour(0);
+    }
+    elsif ($to eq "day") {
+      $tm->set_tm_sec(0);
+      $tm->set_tm_min(0);
+      $tm->set_tm_hour(0);
+      $tm->set_tm_mday(1);
+    }
+    elsif ($to eq "month") {
+      $tm->set_tm_sec(0);
+      $tm->set_tm_min(0);
+      $tm->set_tm_hour(0);
+      $tm->set_tm_mday(1);
+      $tm->set_tm_mon(0);
+    }
+    elsif ($to eq "quarter") {
+      $tm->set_tm_sec(0);
+      $tm->set_tm_min(0);
+      $tm->set_tm_hour(0);
+      $tm->set_tm_mday(1);
+      $tm->set_tm_mon(($self->_mon / 3) * 3);
+    }
+    elsif ($to eq "year") {
+      $tm->set_tm_sec(0);
+      $tm->set_tm_min(0);
+      $tm->set_tm_hour(0);
+      $tm->set_tm_mday(1);
+      $tm->set_tm_mon(0);
+      $tm->set_tm_year($self->_year);
+    }
+    else {
+      die "The value of the \"$to\" option is invalid.";
+    }
+    
+    my $epoch = 0L;
+    if ($tp_truncate->{is_localtime}) {
+      $epoch = Time::Local->timelocal($tm);
+    }
+    else {
+      $epoch = Time::Local->timegm($tm);
+    }
+    
+    $tp_truncate->{epoch} = $epoch;
+    
+    return $tp_truncate;
+  }
+  
+  method clone : Time::Piece () {
+    
+    my $clone_tp = &new($self->{epoch}, $self->{is_localtime});
+    
+    return $clone_tp;
+  }
+  
+}

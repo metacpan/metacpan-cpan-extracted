@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Device::Chip::ADS1115 0.15;
+package Device::Chip::ADS1115 0.16;
 class Device::Chip::ADS1115
    :isa(Device::Chip::Base::RegisteredI2C);
 

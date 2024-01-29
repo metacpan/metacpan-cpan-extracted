@@ -13,8 +13,8 @@ use ok 'Locale::CLDR';
 
 my $locale = Locale::CLDR->new('ca');
 
-is($locale->unit(1, 'acre', 'narrow'), '1ac.', 'Catalan narrow 1 acre');
-is($locale->unit(2, 'acre', 'narrow'), '2ac.', 'Catalan narrow 2 acres');
+is($locale->unit(1, 'acre', 'narrow'), '1 ac', 'Catalan narrow 1 acre');
+is($locale->unit(2, 'acre', 'narrow'), '2 ac', 'Catalan narrow 2 acres');
 is($locale->unit(1, 'acre', 'short'), '1 ac', 'Catalan short 1 acre');
 is($locale->unit(2, 'acre', 'short'), '2 ac', 'Catalan short 2 acres');
 is($locale->unit(1, 'acre'), '1 acre', 'Catalan long 1 acre');

@@ -1,15 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
+use warnings;
+use Object::Pad 0.807;
 
-package Tickit::Widget::Static 0.57;
-class Tickit::Widget::Static
-   :strict(params)
-   :isa(Tickit::Widget);
+package Tickit::Widget::Static 0.58;
+class Tickit::Widget::Static :strict(params);
+
+inherit Tickit::Widget;
 
 use Tickit::Style;
 
@@ -60,7 +61,7 @@ changed.
 
 =head2 new
 
-   $static = Tickit::Widget::Static->new( %args )
+   $static = Tickit::Widget::Static->new( %args );
 
 Constructs a new C<Tickit::Widget::Static> object.
 
@@ -120,7 +121,7 @@ method cols
 
 =head2 text
 
-   $text = $static->text
+   $text = $static->text;
 
 =cut
 
@@ -131,7 +132,7 @@ method text
 
 =head2 set_text
 
-   $static->set_text( $text )
+   $static->set_text( $text );
 
 Accessor for C<text> property; the actual text on display in the widget
 
@@ -157,9 +158,9 @@ method set_text
 
 =head2 set_align
 
-   $align = $static->align
+   $align = $static->align;
 
-   $static->set_align( $align )
+   $static->set_align( $align );
 
 Accessor for horizontal alignment value.
 

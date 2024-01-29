@@ -13,7 +13,7 @@ print "1..1\n";
 
   my $inter=Tcl->new();
 
-  my $precmd=insure_ptrarray($inter,'info', 'commands', '::perl::*');
+  my $precmd=[$inter->icall('info', 'commands', '::perl::*')];
 
   my $ct1=0;
   my $sub1=sub{ $ct1++; } ;
@@ -51,7 +51,7 @@ print "1..1\n";
 sub newcmds {
   my $precmd=shift;
   my $print=shift;
-  my $postcmd =insure_ptrarray($inter,'info', 'commands', '::perl::*');
+  my $postcmd =[$inter->icall('info', 'commands', '::perl::*')];
   my %start;
   my $newct=0;
   my @newcmds;
@@ -72,19 +72,10 @@ sub dump_refs {
 sub flush_afters{
   my $inter=shift;
   while(1) {  # wait for afters to finish
-    my $info0=insure_ptrarray($inter,'after', 'info');
-    last unless (scalar(@$info0));
+    my @info0=$inter->icall('after', 'info');
+    last unless (scalar(@info0));
     $inter->icall('after', 300, 'set var fafafa');
     $inter->icall('vwait', 'var'); # will wait for .3 seconds
   }
 } # flush afters
 
-
-sub insure_ptrarray{
-  my $inter=shift;
-  my $list = $inter->icall(@_);
-  if (ref($list) ne 'Tcl::List') {  # v1.02
-      $list=[split(' ',$list)];
-      }
-return $list;
-}

@@ -40,7 +40,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 use UI::Various::core;
 use UI::Various::widget;
@@ -315,10 +315,7 @@ sub child($;$)
 	elsif (exists $self->{children}[$index])
 	{   $_ = $self->{children}[$index];   }
 	else
-	{
-	    # TODO: Do we really want this warning or is the empty $_ enough?
-	    warning('no_element_found_for_index__1', $index);
-	}
+	{   warning('no_element_found_for_index__1', $index);   }
     }
     # called with undef -> reset iterator:
     elsif (exists $_[1])	# $index can't distinguish undef / missing!

@@ -1,7 +1,7 @@
 ---
 abstract: 'Create or read 02packages.details.txt.gz'
 author:
-  - 'brian d foy <bdfoy@cpan.org>'
+  - 'brian d foy <briandfoy@pobox.com>'
 build_requires:
   Test::More: '1'
   Test::Output: '0.10'
@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,6 +28,6 @@ requires:
 resources:
   bugtracker: https://github.com/briandfoy/cpan-packagedetails/issues
   homepage: https://github.com/briandfoy/cpan-packagedetails
-  repository: https://github.com/briandfoy/cpan-packagedetails.git
-version: '0.263'
+  repository: https://github.com/briandfoy/cpan-packagedetails
+version: '0.264'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

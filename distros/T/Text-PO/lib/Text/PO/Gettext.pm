@@ -111,7 +111,7 @@ sub dngettext
     my $plural = $self->plural;
     if( !exists( $hash->{ $opts->{locale} } ) )
     {
-        warnings::warn( "No locale \"$opts->{locale}\" found for the domain \"${domain}\".\n" ) if( warnings::enabled() );
+        warn( "No locale \"$opts->{locale}\" found for the domain \"${domain}\".\n" ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
         return( Text::PO::String->new( $default ) );
     }
     my $l10n = $hash->{ $opts->{locale} };
@@ -147,7 +147,7 @@ sub dngettext
     }
     else
     {
-        warnings::warn( "No dictionary was found for msgid \"${msgid}\" and domain \"${domain}\"" ) if( warnings::enabled() );
+        warn( "No dictionary was found for msgid \"${msgid}\" and domain \"${domain}\"" ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
     }
     return( $default );
 }

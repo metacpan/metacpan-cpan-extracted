@@ -1,16 +1,19 @@
 ---
 abstract: 'Class for searching http://valentinska.cz .'
 author:
-  - 'Michal Spacek <skim@cpan.org>'
+  - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: 6.36
+  File::Object: 0
   Test::More: 0
   Test::NoWarnings: 0
+  Unicode::UTF8: 0
+  WWW::Search: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.21'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,14 +28,15 @@ no_index:
 requires:
   Encode: 0
   LWP::UserAgent: 0
+  Perl6::Slurp: 0
   Readonly: 0
   URI: 0
   WWW::Search: 0
   Web::Scraper: 0
   perl: 5.6.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Search-ValentinskaCZ
-  homepage: https://github.com/tupinek/WWW-Search-ValentinskaCZ
+  bugtracker: https://github.com/michal-josef-spacek/WWW-Search-ValentinskaCZ/issues
+  homepage: https://github.com/michal-josef-spacek/WWW-Search-ValentinskaCZ
   license: http://opensource.org/licenses/bsd-license.php
-  repository: git://github.com/tupinek/WWW-Search-ValentinskaCZ
-version: '0.03'
+  repository: git://github.com/michal-josef-spacek/WWW-Search-ValentinskaCZ
+version: '0.06'

@@ -8,7 +8,7 @@ use Object::Pad 0.800;
 
 role App::perl::distrolint::CheckRole::TreeSitterPerl 0.01;
 
-use Syntax::Keyword::Match;
+use Syntax::Keyword::Match 0.13; # case if
 
 use File::Slurper qw( read_text );
 use Text::Treesitter;
@@ -93,20 +93,26 @@ returns true if the invoked method returns true for every call.
 
 =cut
 
+method _walk_block ( $node, $method, @args )
+{
+   foreach my $kid ( $node->child_nodes ) {
+      next if $kid->is_extra;
+
+      $self->walk_each_statement( $kid, $method, @args )
+         or return 0;
+   }
+
+   return 1;
+}
+
 method walk_each_statement ( $node, $method, @args )
 {
    my $type = $node->is_named ? sprintf( "(%s)", $node->type ) : $node->type;
 
    match( $type : eq ) {
       # Containers of statements
-      case("(source_file)"), case("(block)") {
-         foreach my $kid ( $node->child_nodes ) {
-            next if $node->is_extra;
-
-            $self->walk_each_statement( $kid, $method, @args )
-               or return 0;
-         }
-
+      case("(source_file)"), case("(block_statement)") {
+         $self->_walk_block( $node, $method, @args ) or return 0;
          return 1;
       }
       case("(phaser_statement)") {
@@ -115,9 +121,24 @@ method walk_each_statement ( $node, $method, @args )
          return $self->walk_each_statement( $block, $method, @args );
       }
 
+      case("(subroutine_declaration_statement)"),
+      case("(method_declaration_statement") {
+         my $block = $node->try_child_by_field_name( "body" ) or return 1;
+         $self->_walk_block( $block, $method, @args ) or return 0;
+         return 1;
+      }
+
       # Direct statements
       case if( $type =~ m/^\(.*_statement\)$/ ) {
-         return $self->$method( $node, @args );
+         $self->$method( $node, @args )
+            or return 0;
+
+         # Certain kinds of statements have a body block
+         if( my $block = $node->try_child_by_field_name( "block" ) ) {
+            $self->_walk_block( $block, $method, @args ) or return 0;
+         }
+
+         return 1;
       }
    }
    return 1;

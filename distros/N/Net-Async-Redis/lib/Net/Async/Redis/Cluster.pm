@@ -11,7 +11,7 @@ use utf8;
 
 use parent qw(Net::Async::Redis::Commands);
 
-our $VERSION = '5.001'; # VERSION
+our $VERSION = '6.000'; # VERSION
 
 =encoding utf8
 
@@ -737,6 +737,6 @@ L<Net::Async::Redis/CONTRIBUTORS>.
 
 =head1 LICENSE
 
-Copyright Tom Molesworth and others 2015-2023.
+Copyright Tom Molesworth and others 2015-2024.
 Licensed under the same terms as Perl itself.
 

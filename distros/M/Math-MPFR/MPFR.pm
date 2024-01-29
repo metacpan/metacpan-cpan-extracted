@@ -192,7 +192,7 @@ prec_cast q_add_fr q_cmp_fr q_div_fr q_mul_fr q_sub_fr rndna
 
     @Math::MPFR::EXPORT_OK = (@tags, 'bytes');
 
-    our $VERSION = '4.27';
+    our $VERSION = '4.28';
     #$VERSION = eval $VERSION;
 
     Math::MPFR->DynaLoader::bootstrap($VERSION);
@@ -442,13 +442,19 @@ sub new {
 }
 
 sub Rmpfr_printf {
-    if(@_ == 3){wrap_mpfr_printf_rnd(@_)}
+    if(@_ == 3){
+      if(_itsa($_[1]) == 2) {wrap_mpfr_printf_rnd(@_)}
+      else {die "The second (of 3) arguments given to Rmpfr_printf() is not a valid rounding argument"}
+    }
     else {die "Rmpfr_printf must take 2 or 3 arguments: format string, [rounding,], and variable" if @_ != 2;
     wrap_mpfr_printf(@_)}
 }
 
 sub Rmpfr_fprintf {
-    if(@_ == 4){wrap_mpfr_fprintf_rnd(@_)}
+    if(@_ == 4){
+      if(_itsa($_[2]) == 2) {wrap_mpfr_fprintf_rnd(@_)}
+      else {die "The third (of 4) arguments given to Rmpfr_fprintf() is not a valid rounding argument"}
+    }
     else {die "Rmpfr_fprintf must take 3 or 4 arguments: filehandle, format string, [rounding,], and variable" if @_ != 3;
     wrap_mpfr_fprintf(@_)}
 }
@@ -456,8 +462,11 @@ sub Rmpfr_fprintf {
 sub Rmpfr_sprintf {
     my $len;
     if(@_ == 5){
-      $len = wrap_mpfr_sprintf_rnd(@_);
-      return $len;
+      if(_itsa($_[2]) == 2) {
+        $len = wrap_mpfr_sprintf_rnd(@_);
+        return $len;
+      }
+      else {die "The third (of 5) arguments given to Rmpfr_sprintf() is not a valid rounding argument"}
     }
     die "Rmpfr_sprintf must take 4 or 5 arguments: buffer, format string, [rounding,], variable and buffer size" if @_ != 4;
     $len = wrap_mpfr_sprintf(@_);
@@ -467,8 +476,11 @@ sub Rmpfr_sprintf {
 sub Rmpfr_snprintf {
     my $len;
     if(@_ == 6){
-      $len = wrap_mpfr_snprintf_rnd(@_);
-      return $len;
+      if(_itsa($_[3]) == 2) {
+        $len = wrap_mpfr_snprintf_rnd(@_);
+        return $len;
+      }
+      else {die "The fourth (of 6) arguments given to Rmpfr_snprintf() is not a valid rounding argument"}
     }
     die "Rmpfr_snprintf must take 5 or 6 arguments: buffer, bytes written, format string, [rounding,], variable and buffer size" if @_ != 5;
     $len = wrap_mpfr_snprintf(@_);

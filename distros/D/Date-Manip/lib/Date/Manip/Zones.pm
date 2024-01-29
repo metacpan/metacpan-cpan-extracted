@@ -1,13 +1,13 @@
 package Date::Manip::Zones;
-# Copyright (c) 2008-2023 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2024 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Jun  7 12:25:41 EDT 2023
-#    Data version: tzdata2023c
-#    Code version: tzcode2023c
+#    Generated on: Tue Jan  9 14:21:49 EST 2024
+#    Data version: tzdata2023d
+#    Code version: tzcode2023d
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -18,7 +18,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.93';
+$VERSION='6.94';
 END { undef $VERSION; }
 
 our ($TzdataVersion,$TzcodeVersion,
@@ -37,11 +37,11 @@ END {
    undef %Offmod;
 }
 
-$TzdataVersion = 'tzdata2023c';
-$TzcodeVersion = 'tzcode2023c';
+$TzdataVersion = 'tzdata2023d';
+$TzcodeVersion = 'tzcode2023d';
 $FirstDate     = '0001010200:00:00';
 $LastDate      = '9999123100:00:00';
-$LastYear      = '2093';
+$LastYear      = '2094';
 
 
 %Module = (
@@ -191,6 +191,7 @@ $LastYear      = '2093';
   'antarctica/palmer'                  => 'anpalm00',
   'antarctica/rothera'                 => 'anroth00',
   'antarctica/troll'                   => 'antrol00',
+  'antarctica/vostok'                  => 'anvost00',
   'asia/almaty'                        => 'asalma00',
   'asia/amman'                         => 'asamma00',
   'asia/anadyr'                        => 'asanad00',
@@ -563,6 +564,7 @@ $LastYear      = '2093';
   'antarctica/palmer'                  => 'Antarctica/Palmer',
   'antarctica/rothera'                 => 'Antarctica/Rothera',
   'antarctica/troll'                   => 'Antarctica/Troll',
+  'antarctica/vostok'                  => 'Antarctica/Vostok',
   'asia/almaty'                        => 'Asia/Almaty',
   'asia/amman'                         => 'Asia/Amman',
   'asia/anadyr'                        => 'Asia/Anadyr',
@@ -936,6 +938,7 @@ $LastYear      = '2093';
   'antarctica/palmer'                  => 'antarctica/palmer',
   'antarctica/rothera'                 => 'antarctica/rothera',
   'antarctica/troll'                   => 'antarctica/troll',
+  'antarctica/vostok'                  => 'antarctica/vostok',
   'asia/almaty'                        => 'asia/almaty',
   'asia/amman'                         => 'asia/amman',
   'asia/anadyr'                        => 'asia/anadyr',
@@ -1245,7 +1248,6 @@ $LastYear      = '2093';
   'antarctica/mcmurdo'                 => 'pacific/auckland',
   'antarctica/south_pole'              => 'pacific/auckland',
   'antarctica/syowa'                   => 'asia/riyadh',
-  'antarctica/vostok'                  => 'asia/urumqi',
   'arctic/longyearbyen'                => 'europe/berlin',
   'asia/aden'                          => 'asia/riyadh',
   'asia/ashkhabad'                     => 'asia/ashgabat',
@@ -1475,6 +1477,8 @@ $LastYear      = '2093';
   'africa/porto-novo'                  => 'africa/lagos',
   'africa/timbuktu'                    => 'africa/abidjan',
   'alaskan standard time'              => 'america/anchorage',
+  'aleutian standard time'             => 'america/adak',
+  'altai standard time'                => 'asia/barnaul',
   'america/anguilla'                   => 'america/puerto_rico',
   'america/antigua'                    => 'america/puerto_rico',
   'america/argentina/comodrivadavia'   => 'america/argentina/catamarca',
@@ -1527,7 +1531,6 @@ $LastYear      = '2093';
   'antarctica/mcmurdo'                 => 'pacific/auckland',
   'antarctica/south_pole'              => 'pacific/auckland',
   'antarctica/syowa'                   => 'asia/riyadh',
-  'antarctica/vostok'                  => 'asia/urumqi',
   'arab standard time'                 => 'asia/riyadh',
   'arabian standard time'              => 'asia/dubai',
   'arabic standard time'               => 'asia/baghdad',
@@ -1557,11 +1560,13 @@ $LastYear      = '2093';
   'asia/ujung_pandang'                 => 'asia/makassar',
   'asia/ulan_bator'                    => 'asia/ulaanbaatar',
   'asia/vientiane'                     => 'asia/bangkok',
+  'astrakhan standard time'            => 'europe/astrakhan',
   'atlantic standard time'             => 'america/halifax',
   'atlantic/faeroe'                    => 'atlantic/faroe',
   'atlantic/jan_mayen'                 => 'europe/berlin',
   'atlantic/reykjavik'                 => 'africa/abidjan',
   'atlantic/st_helena'                 => 'africa/abidjan',
+  'aus central w. standard time'       => 'australia/eucla',
   'australia/act'                      => 'australia/sydney',
   'australia/canberra'                 => 'australia/sydney',
   'australia/currie'                   => 'australia/hobart',
@@ -1580,6 +1585,8 @@ $LastYear      = '2093';
   'brwst4brwdt'                        => 'america/campo_grande',
   'bahia standard time'                => 'america/bahia',
   'bangladesh standard time'           => 'asia/dhaka',
+  'belarus standard time'              => 'europe/minsk',
+  'bougainville standard time'         => 'pacific/bougainville',
   'brazil/acre'                        => 'america/rio_branco',
   'brazil/denoronha'                   => 'america/noronha',
   'brazil/east'                        => 'america/sao_paulo',
@@ -1609,14 +1616,16 @@ $LastYear      = '2093';
   'central pacific standard time'      => 'pacific/guadalcanal',
   'central standard time'              => 'america/chicago',
   'central standard time (mexico)'     => 'america/mexico_city',
+  'chatham islands standard time'      => 'pacific/chatham',
   'chile/continental'                  => 'america/santiago',
   'chile/easterisland'                 => 'pacific/easter',
   'china standard time'                => 'asia/shanghai',
   'cuba'                               => 'america/havana',
+  'cuba standard time'                 => 'america/havana',
   'dateline standard time'             => 'etc/gmt+12',
   'e. africa standard time'            => 'africa/nairobi',
   'e. australia standard time'         => 'australia/brisbane',
-  'e. europe standard time'            => 'asia/nicosia',
+  'e. europe standard time'            => 'europe/chisinau',
   'e. south america standard time'     => 'america/sao_paulo',
   'eet-2eetdst'                        => 'europe/helsinki',
   'est-10edt'                          => 'australia/melbourne',
@@ -1628,7 +1637,9 @@ $LastYear      = '2093';
   'est5edt#indiana'                    => 'america/indiana/indianapolis',
   'est5est'                            => 'america/indiana/indianapolis',
   'est6cdt'                            => 'america/indiana/indianapolis',
+  'easter island standard time'        => 'pacific/easter',
   'eastern standard time'              => 'america/new_york',
+  'eastern standard time (mexico)'     => 'america/cancun',
   'egypt'                              => 'africa/cairo',
   'egypt standard time'                => 'africa/cairo',
   'eire'                               => 'europe/dublin',
@@ -1666,6 +1677,7 @@ $LastYear      = '2093';
   'europe/vatican'                     => 'europe/rome',
   'europe/zagreb'                      => 'europe/belgrade',
   'europe/zaporozhye'                  => 'europe/kyiv',
+  'fle standard time'                  => 'europe/kyiv',
   'fiji standard time'                 => 'pacific/fiji',
   'gb'                                 => 'europe/london',
   'gb-eire'                            => 'europe/london',
@@ -1674,10 +1686,12 @@ $LastYear      = '2093';
   'gmt+0'                              => 'etc/gmt',
   'gmt-0'                              => 'etc/gmt',
   'gmt0'                               => 'etc/gmt',
-  'gtb standard time'                  => 'europe/istanbul',
+  'gtb standard time'                  => 'europe/bucharest',
   'georgian standard time'             => 'asia/tbilisi',
   'greenland standard time'            => 'america/nuuk',
   'greenwich'                          => 'etc/gmt',
+  'greenwich standard time'            => 'africa/abidjan',
+  'haiti standard time'                => 'america/port-au-prince',
   'hawaiian standard time'             => 'pacific/honolulu',
   'hongkong'                           => 'asia/hong_kong',
   'iceland'                            => 'africa/abidjan',
@@ -1701,6 +1715,9 @@ $LastYear      = '2093';
   'korea standard time'                => 'asia/seoul',
   'kwajalein'                          => 'pacific/kwajalein',
   'libya'                              => 'africa/tripoli',
+  'libya standard time'                => 'africa/tripoli',
+  'line islands standard time'         => 'pacific/kiritimati',
+  'lord howe standard time'            => 'australia/lord_howe',
   'met-1metdst'                        => 'met',
   'mez-1mesz'                          => 'cet',
   'msm7mdm'                            => 'america/chihuahua',
@@ -1709,6 +1726,8 @@ $LastYear      = '2093';
   'mxst6mxdt'                          => 'america/mexico_city',
   'mxst6mxdt#mexico'                   => 'america/mexico_city',
   'magadan standard time'              => 'asia/magadan',
+  'magallanes standard time'           => 'america/punta_arenas',
+  'marquesas standard time'            => 'pacific/marquesas',
   'mauritius standard time'            => 'indian/mauritius',
   'mexico/bajanorte'                   => 'america/tijuana',
   'mexico/bajasur'                     => 'america/mazatlan',
@@ -1717,7 +1736,7 @@ $LastYear      = '2093';
   'montevideo standard time'           => 'america/montevideo',
   'morocco standard time'              => 'africa/casablanca',
   'mountain standard time'             => 'america/denver',
-  'mountain standard time (mexico)'    => 'america/chihuahua',
+  'mountain standard time (mexico)'    => 'america/mazatlan',
   'myanmar standard time'              => 'asia/yangon',
   'n. central asia standard time'      => 'asia/novosibirsk',
   'nst3:30ndt'                         => 'america/st_johns',
@@ -1729,13 +1748,17 @@ $LastYear      = '2093';
   'nepal standard time'                => 'asia/kathmandu',
   'new zealand standard time'          => 'pacific/auckland',
   'newfoundland standard time'         => 'america/st_johns',
+  'norfolk standard time'              => 'pacific/norfolk',
   'north asia east standard time'      => 'asia/irkutsk',
   'north asia standard time'           => 'asia/krasnoyarsk',
+  'north korea standard time'          => 'asia/pyongyang',
+  'omsk standard time'                 => 'asia/omsk',
   'prc'                                => 'asia/shanghai',
   'pst8pdt#canada'                     => 'america/vancouver',
   'pwt0pst'                            => 'europe/lisbon',
   'pacific sa standard time'           => 'america/santiago',
   'pacific standard time'              => 'america/los_angeles',
+  'pacific standard time (mexico)'     => 'america/tijuana',
   'pacific/chuuk'                      => 'pacific/port_moresby',
   'pacific/enderbury'                  => 'pacific/kanton',
   'pacific/funafuti'                   => 'pacific/tarawa',
@@ -1754,27 +1777,41 @@ $LastYear      = '2093';
   'paraguay standard time'             => 'america/asuncion',
   'poland'                             => 'europe/warsaw',
   'portugal'                           => 'europe/lisbon',
+  'qyzylorda standard time'            => 'asia/qyzylorda',
   'roc'                                => 'asia/taipei',
   'rok'                                => 'asia/seoul',
   'romance standard time'              => 'europe/paris',
+  'russia time zone 10'                => 'asia/srednekolymsk',
+  'russia time zone 11'                => 'asia/kamchatka',
+  'russia time zone 3'                 => 'europe/samara',
   'russian standard time'              => 'europe/moscow',
   'sa eastern standard time'           => 'america/cayenne',
   'sa pacific standard time'           => 'america/bogota',
   'sa western standard time'           => 'america/la_paz',
   'sast-2'                             => 'africa/johannesburg',
   'se asia standard time'              => 'asia/bangkok',
+  'saint pierre standard time'         => 'america/miquelon',
+  'sakhalin standard time'             => 'asia/sakhalin',
   'samoa standard time'                => 'pacific/apia',
+  'sao tome standard time'             => 'africa/sao_tome',
+  'saratov standard time'              => 'europe/saratov',
   'singapore'                          => 'asia/singapore',
   'singapore standard time'            => 'asia/singapore',
   'south africa standard time'         => 'africa/johannesburg',
+  'south sudan standard time'          => 'africa/juba',
   'sri lanka standard time'            => 'asia/colombo',
+  'sudan standard time'                => 'africa/khartoum',
   'syria standard time'                => 'asia/damascus',
   'taipei standard time'               => 'asia/taipei',
   'tasmania standard time'             => 'australia/hobart',
+  'tocantins standard time'            => 'america/araguaina',
   'tokyo standard time'                => 'asia/tokyo',
+  'tomsk standard time'                => 'asia/tomsk',
   'tonga standard time'                => 'pacific/tongatapu',
+  'transbaikal standard time'          => 'asia/chita',
   'turkey'                             => 'europe/istanbul',
   'turkey standard time'               => 'europe/istanbul',
+  'turks and caicos standard time'     => 'america/grand_turk',
   'uct'                                => 'etc/utc',
   'us eastern standard time'           => 'america/indiana/indianapolis',
   'us mountain standard time'          => 'america/phoenix',
@@ -1792,16 +1829,21 @@ $LastYear      = '2093';
   'us/samoa'                           => 'pacific/pago_pago',
   'utc'                                => 'etc/utc',
   'utc+12'                             => 'etc/gmt-12',
+  'utc+13'                             => 'etc/gmt-13',
   'utc-02'                             => 'etc/gmt+2',
+  'utc-08'                             => 'etc/gmt+8',
+  'utc-09'                             => 'etc/gmt+9',
   'utc-11'                             => 'etc/gmt+11',
   'ulaanbaatar standard time'          => 'asia/ulaanbaatar',
   'universal'                          => 'etc/utc',
   'venezuela standard time'            => 'america/caracas',
   'vladivostok standard time'          => 'asia/vladivostok',
+  'volgograd standard time'            => 'europe/volgograd',
   'w-su'                               => 'europe/moscow',
   'w. australia standard time'         => 'australia/perth',
   'w. central africa standard time'    => 'africa/lagos',
   'w. europe standard time'            => 'europe/berlin',
+  'w. mongolia standard time'          => 'asia/hovd',
   'wet0wetdst'                         => 'wet',
   'wst-10wstdst'                       => 'asia/vladivostok',
   'wst-11wstdst'                       => 'asia/srednekolymsk',
@@ -1816,8 +1858,10 @@ $LastYear      = '2093';
   'wst-8wstdst'                        => 'asia/irkutsk',
   'wst-9wstdst'                        => 'asia/yakutsk',
   'west asia standard time'            => 'asia/tashkent',
+  'west bank standard time'            => 'asia/hebron',
   'west pacific standard time'         => 'pacific/port_moresby',
   'yakutsk standard time'              => 'asia/yakutsk',
+  'yukon standard time'                => 'america/whitehorse',
   'zulu'                               => 'etc/utc',
 );
 

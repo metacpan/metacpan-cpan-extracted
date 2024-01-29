@@ -3,14 +3,21 @@ abstract: unknown
 author:
   - unknown
 build_requires:
-  Benchmark: '0'
-  File::Find: '0'
+  Benchmark: '0.1'
+  Carp: '0.1'
+  Data::Dumper: '0.1'
+  Exporter: '0.1'
+  File::Basename: '0.1'
+  File::Find: '0.1'
+  File::Spec: '0.1'
+  File::Temp: '0.1'
+  Getopt::Long: '0.1'
   Path::Iterator::Rule: '1.015'
   Test::More: '0.47'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,5 +31,5 @@ requires:
   perl: '5.012000'
 resources:
   repository: git://github.com/lskatz/file-find-fast
-version: v0.2.1
+version: v0.4.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

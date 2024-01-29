@@ -1,3 +1,8 @@
+1.074   2023-09-26  Released-By: PERLANCAR; Urgency: medium
+
+        - Add subcommands: deps-to-other-author, rdeps-from-other-author.
+
+
 1.073   2023-07-09  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

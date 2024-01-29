@@ -3,10 +3,8 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0 0.000149;
 use Test::HexString;
-use Test::Identity;
-use Test::Refcount;
 
 use Tangence::Constants;
 use Tangence::Registry;

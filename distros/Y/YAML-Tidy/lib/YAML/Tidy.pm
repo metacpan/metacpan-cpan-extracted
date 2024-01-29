@@ -7,7 +7,7 @@ use v5.20;
 use experimental qw/ signatures /;
 package YAML::Tidy;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = 'v0.9.0'; # VERSION
 
 use YAML::Tidy::Node;
 use YAML::Tidy::Config;
@@ -129,8 +129,16 @@ sub _process($self, $parent, $node) {
         return;
     }
     else {
+        if (defined (my $anchor = $node->{anchor})) {
+            $self->_rename_anchor($node);
+            $line = $lines->[ $startline ];
+        }
         my $ignore_firstlevel = ($self->partial and $level == 0);
-        if ($node->empty_scalar) {
+        if ($node->empty_leaf) {
+            return;
+        }
+        if ($node->is_alias) {
+            $self->_rename_alias($node);
             return;
         }
         if ($node->{name} eq 'alias_event') {
@@ -262,7 +270,7 @@ sub _process($self, $parent, $node) {
         elsif ($node->{style} == YAML_PLAIN_SCALAR_STYLE or
                 $node->{style} == YAML_SINGLE_QUOTED_SCALAR_STYLE or
                 $node->{style} == YAML_DOUBLE_QUOTED_SCALAR_STYLE) {
-            if ($node->empty_scalar) {
+            if ($node->empty_leaf) {
                 return;
             }
             my $remove = 0;
@@ -361,7 +369,7 @@ sub _change_style($self, $node, $style) {
 }
 
 sub _emit_value($self, $value, $style) {
-    my $options = {};
+    my $options = { unicode => 0 };
     my $events = [
         { name => 'stream_start_event' },
         { name => 'document_start_event', implicit => 1 },
@@ -372,8 +380,81 @@ sub _emit_value($self, $value, $style) {
     return YAML::LibYAML::API::XS::emit_string_events($events, $options);
 }
 
+sub _collect_aliases($self, $node) {
+    if ($node->is_alias) {
+        my $alias = $node->{value} // '???';
+        $alias =~ s/_[0-9]+$//;
+        $self->{doc}->{aliases}->{ $alias }++;
+    }
+    else {
+        if (defined(my $anchor = $node->{anchor})) {
+            $anchor =~ s/_[0-9]+$//;
+            $self->{doc}->{anchors}->{ $anchor }++;
+        }
+        if ($node->is_collection) {
+            for my $c (@{ $node->{children} }) {
+                $self->_collect_aliases($c);
+            }
+        }
+    }
+}
+
+sub _serialize_aliases($self, $node) {
+    $self->_collect_aliases($node);
+    my $doc = $self->{doc};
+    my $anchors = $doc->{anchors};
+    for my $name (sort keys %$anchors) {
+        delete $anchors->{ $name }, next if $anchors->{ $name } < 2;
+        $anchors->{ $name } = ['', map {
+            $name ."_$_"
+        } 1 .. $anchors->{ $name } ];
+
+    }
+}
+
+sub _rename($self, $type, $node, $anchor, $new_anchor) {
+    my $lines = $self->{lines};
+    my $startline = $node->line;
+    my $line = $lines->[ $startline ];
+    my $col = $node->indent;
+
+    if ($anchor ne $new_anchor) {
+        $self->{doc}->{rename}->{ $anchor } = $new_anchor;
+    }
+    my $end_column = $node->end->{column};
+    substr $line, $col, 1+length($anchor), {anchor=>'&',alias=>'*'}->{$type} . $new_anchor;
+    $lines->[ $startline ] = $line;
+    my $diff = length($new_anchor) - length($anchor);
+    $self->{tree}->_move_columns($node->start->{line}, $node->start->{column} + 1, $diff);
+}
+
+sub _rename_anchor($self, $node) {
+    my $anchor = $node->{anchor};
+    my $group = $anchor =~ s/_[0-9]+$//r;
+    my $usage = $self->{doc}->{anchors}->{ $group } or return;
+    shift @$usage;
+    return unless @$usage;
+    my $new_anchor = $usage->[0];
+    if ($new_anchor ne $group) {
+        $self->_rename(anchor => $node, $anchor, $new_anchor);
+    }
+}
+
+sub _rename_alias($self, $node) {
+    my $anchor = $node->{value};
+    my $new_anchor = $self->{doc}->{rename}->{ $anchor } or return;
+    my $group = $anchor =~ s/_[0-9]+$//r;
+    if ($new_anchor ne $group) {
+        $self->_rename(alias => $node, $anchor, $new_anchor);
+    }
+}
+
 sub _process_doc($self, $parent, $node) {
     DEBUG and say STDERR "_process_doc($node)";
+    $self->{doc} = {};
+    if ($self->cfg->serialize_aliases) {
+        $self->_serialize_aliases($node);
+    }
     my $lines = $self->{lines};
     my $open = $node->open;
     my $close = $node->close;
@@ -390,7 +471,7 @@ sub _process_doc($self, $parent, $node) {
     elsif ($node->{index} == 1 and not $open->{implicit} and $self->cfg->removeheader and not $self->partial) {
         # remove first ---
         my $child = $node->{children}->[0];
-        if ($open->{version_directive} or $open->{tag_directives} or not $child->is_collection and $child->empty_scalar) {
+        if ($open->{version_directive} or $open->{tag_directives} or not $child->is_collection and $child->empty_leaf) {
         }
         else {
             my $startline = $open->{start}->{line};
@@ -466,6 +547,13 @@ sub _process_flow($self, $parent, $node, $block_indent = undef) {
     $block_indent //= $parent->indent + $self->cfg->indent;
     $block_indent = 0 if $level == 0;
 
+    if (defined (my $anchor = $node->{anchor})) {
+        $self->_rename_anchor($node);
+    }
+    if ($node->is_alias) {
+        $self->_rename_alias($node);
+    }
+
     unless ($node->is_collection) {
         $self->_process_flow_scalar($parent, $node, $block_indent);
         return;
@@ -500,7 +588,7 @@ sub _process_flow($self, $parent, $node, $block_indent = undef) {
 }
 
 sub _process_flow_scalar($self, $parent, $node, $block_indent) {
-    if ($node->empty_scalar) {
+    if ($node->empty_leaf) {
         return;
     }
     my $startline = $node->line;
@@ -700,6 +788,9 @@ sub _tree($self, $yaml, $lines) {
         elsif ($name =~ m/mapping_start/) {
             $type = 'MAP';
         }
+        elsif ($name eq 'alias_event') {
+            $type = 'ALI';
+        }
 
         $event->{id} = $id;
         if ($name =~ m/_start_event/) {
@@ -743,6 +834,13 @@ sub _tree($self, $yaml, $lines) {
             $level--;
             $event->{level} = $level;
             $flow-- if $flow;
+        }
+        elsif ($name eq 'alias_event') {
+            $event = YAML::Tidy::Node::Alias->new(%$event, flow => $flow);
+            $ref->{elements}++;
+            $event->{index} = $ref->{elements};
+            $event->{level} = $level;
+            push @{ $ref->{children} }, $event;
         }
         else {
             $event = YAML::Tidy::Node::Scalar->new(%$event, flow => $flow);
@@ -849,16 +947,46 @@ YAML::Tidy - Tidy YAML files
       b:
         c: d
 
-For documentation see L<https://github.com/perlpunk/yamltidy>
+=head1 DESCRIPTION
+
+yamltidy is a linter or rather a formatter for YAML files.
+
+It can adjust formatting without removing comments or blank lines.
 
 For examples see L<https://perlpunk.github.io/yamltidy>
 
-=head1 DESCRIPTION
+The code can be found at L<https://github.com/perlpunk/yamltidy>.
 
-yamltidy can automatically tidy formatting in your YAML files, for example
-adjust indentation and remove trailing spaces.
+=head1 FEATURES
 
-For more information, see L<https://github.com/perlpunk/yamltidy>.
+=over
+
+=item Trim trailing spaces
+
+=item Adjust indentation
+
+=item Add or remove headers and footers
+
+=item Remove unnecessary quotes (currently according to the YAML 1.2 Core Schema)
+
+=item Serialize reused aliases
+
+=back
+
+=head2 Plans
+
+=over
+
+=item Add option for batch processing multiple files, e.g. by extension
+
+=item Use exit code to signal if yamltidy did any changes
+
+=item Quoting: Allow to add patterns for strings that should be quoted
+
+=item For more, see L<https://github.com/perlpunk/yamltidy/issues>. Suggestions
+      welcome!
+
+=back
 
 =head1 METHODS
 
@@ -907,7 +1035,7 @@ Tina Müller E<lt>tinita@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2020 by Tina Müller
+Copyright 2024 by Tina Müller
 
 This library is free software and may be distributed under the same terms
 as perl itself.

@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Bcrypt;
-$Crypt::Passphrase::Bcrypt::VERSION = '0.007';
+$Crypt::Passphrase::Bcrypt::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -43,10 +43,6 @@ sub verify_password {
 	return bcrypt_check_prehashed($password, $hash);
 }
 
-sub binary_safe {
-	return 0;
-}
-
 1;
 
 #ABSTRACT: A bcrypt encoder for Crypt::Passphrase
@@ -63,7 +59,7 @@ Crypt::Passphrase::Bcrypt - A bcrypt encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -79,9 +75,9 @@ version 0.007
 
 This class implements a bcrypt encoder for Crypt::Passphrase. For high-end parameters L<Crypt::Passphrase::Argon2|Crypt::Passphrase::Argon2> is recommended over this module as an encoder, as that provides memory-hardness and more easily allows for long passwords.
 
-=head1 METHODS
+=head2 Configuration
 
-=head2 new(%args)
+It accepts the following arguments:
 
 =over 4
 
@@ -119,25 +115,13 @@ Pre-hash the password using the specified hash. It will support any hash support
 
 =back
 
-=head2 hash_password($password)
+=head2 SUPPORTED CRYPT TYPES
 
-This hashes the passwords with bcrypt according to the specified settings and a random salt (and will thus return a different result each time).
-
-=head2 needs_rehash($hash)
-
-This returns true if the hash uses a different cipher or subtype, if any of the cost is lower that desired by the encoder or if the prehashing doesn't match.
-
-=head2 crypt_types()
-
-This returns the above described subtypes, as well as C<bcrypt-sha256> for prehashed bcrypt.
-
-=head2 verify_password($password, $hash)
-
-This will check if a password matches a bcrypt hash.
+It supports the above described subtypes, as well as C<bcrypt-sha256>, C<bcrypt-sha384> and C<bcrypt-sha512> for prehashed bcrypt.
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -15,6 +15,7 @@ use Test::More 0.88;
 use Test::EOL;
 
 my @files = (
+    'bin/createrelease.pl',
     'lib/Dist/Zilla/Plugin/GitHub/CreateRelease.pm',
     't/00-load.t',
     't/author-critic.t',

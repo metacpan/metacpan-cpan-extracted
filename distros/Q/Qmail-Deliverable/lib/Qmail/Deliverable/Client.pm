@@ -146,10 +146,21 @@ The server on which I benchmarked this, the client+daemon combination (on
 localhost) reached 300 deliverability checks per second for assigned/virtual
 users. Real users are slower: around 150 checks per second.
 
-=head1 LEGAL
+=head1 LICENSE
 
-This software is released into the public domain, and does not come with
-warranty or guarantee of any kind. Use it at your own risk.
+This software does not come with warranty or guarantee of any kind. Use it at
+your own risk.
+
+This software may be redistributed under the terms of the GPL, LGPL, modified
+BSD, or Artistic license, or any of the other OSI approved licenses listed at
+http://www.opensource.org/licenses/alphabetical. Distribution is allowed under
+all of these these licenses, or any smaller subset of multiple or just one of
+these licenses.
+
+When using a packaged version, please refer to the package metadata to see
+under which license terms it was distributed. Alternatively, a distributor may
+choose to replace the LICENSE section of the documentation and/or include a
+LICENSE file to reflect the license(s) they chose to redistribute under.
 
 =head1 AUTHOR
 

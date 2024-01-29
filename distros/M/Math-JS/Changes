@@ -1,0 +1,21 @@
+Changes file for Math::JS
+
+0.04
+ - The overloading of '""' (stringification of values held by Math::JS
+   objects) now automaticaly utilizes Math::Ryu if version 0.06 or later
+   of that module is found. Otherwise, sprintf(%.17g, ...) is still used.
+
+0.03
+ - Provide sub urs() to perform unsigned 32-bit right shift as per
+   JavaScript's '>>>' operator.
+ - Overload '%' operator to mimic JS '%' operation (by wrapping C's fmod
+   function).
+ - Add new test files t/switch_args.t, t/inc_dec.t.
+
+0.02
+ - Avoid dealing with buggy floating-point assignments by not supporting
+   perls older than 5.30.
+ - Address portability issues regarding is_ok().
+
+0.01
+ - first release.

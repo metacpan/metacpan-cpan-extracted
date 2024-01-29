@@ -16,7 +16,7 @@ Cookie::Baker provides simple cookie string generator and parser.
 
 # XS IMPLEMENTATION
 
-This module tries to use [Cookie::Baker::XS](https://metacpan.org/pod/Cookie::Baker::XS)'s crush\_cookie by default.
+This module tries to use [Cookie::Baker::XS](https://metacpan.org/pod/Cookie%3A%3ABaker%3A%3AXS)'s crush\_cookie by default.
 If this fails, it will use Cookie::Baker's pure Perl crush\_cookie.
 
 There is no XS implementation of bake\_cookie yet.
@@ -45,6 +45,11 @@ There is no XS implementation of bake\_cookie yet.
     - domain
 
         Cookie's domain.
+
+    - partitioned
+
+        If true, sets Partitioned flag, and also enforces secure, SameSite=None. false by default.
+        [Cookies Having Independent Partitioned State specification](https://www.ietf.org/archive/id/draft-cutler-httpbis-partitioned-cookies-00.html)
 
     - expires
 
@@ -93,7 +98,7 @@ There is no XS implementation of bake\_cookie yet.
 
 CPAN already has many cookie related modules. But there is no simple cookie string generator and parser module.
 
-[CGI](https://metacpan.org/pod/CGI), [CGI::Simple](https://metacpan.org/pod/CGI::Simple), [Plack](https://metacpan.org/pod/Plack), [Dancer::Cookie](https://metacpan.org/pod/Dancer::Cookie)
+[CGI](https://metacpan.org/pod/CGI), [CGI::Simple](https://metacpan.org/pod/CGI%3A%3ASimple), [Plack](https://metacpan.org/pod/Plack), [Dancer::Cookie](https://metacpan.org/pod/Dancer%3A%3ACookie)
 
 # LICENSE
 

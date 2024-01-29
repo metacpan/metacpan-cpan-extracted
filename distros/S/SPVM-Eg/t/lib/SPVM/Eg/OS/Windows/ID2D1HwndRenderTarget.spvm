@@ -1,0 +1,1 @@
+class Eg::OS::Windows::ID2D1HwndRenderTarget : pointer;

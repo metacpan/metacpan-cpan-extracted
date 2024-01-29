@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
-package Future::Queue 0.51;
+package Future::Queue 0.52;
 
 use v5.14;
 use warnings;
@@ -165,7 +165,7 @@ sub push :method
    push @{ $self->{push_waiters} //= [] }, sub {
       my $count = $max - @$items;
       push @$items, splice @more, 0, $count;
-      $self->_manage_push_waiters;
+      $self->_manage_shift_waiters;
 
       return 0 if @more;
 

@@ -9,7 +9,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(Complete);
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 our %DEFAULTS = (
     # input/output channels
@@ -203,7 +203,7 @@ sub complete
               }
             }
             my $add = $l - $r;
-            if($add) {
+	    if($add > 0) {
               $this->{out}->print($test = substr($test, $r, $add));
               # reset counter if something was added
               $tab_pressed = 0;
@@ -584,6 +584,8 @@ sub post_process
 1;
 __END__
 
+=for stopwords CTRL
+
 =head1 NAME
 
 Term::Completion - read one line of user input, with convenience functions
@@ -706,6 +708,10 @@ In the example above, you can manipulate the choice list:
 Note that the constructor won't actually execute the query -
 that is done by the C<complete()> method.
 
+=item show_help()
+
+Print the text stored in the object's C<helptext> member variable.
+
 =item complete()
 
 This method executes the query and returns the result string.
@@ -717,11 +723,11 @@ however be empty or 0.
 This method is called on the answer string entered by the user
 after the ENTER key was pressed. The implementation in the base
 class is just stripping any leading and trailing whitespace.
-The method returnes the postprocessed answer string.
+The method returns the post-processed answer string.
 
 =item validate($answer)
 
-This method is called on the postprocessed answer and returns:
+This method is called on the post-processed answer and returns:
 
 1. in case of success
 
@@ -739,14 +745,14 @@ maximum portability:
   $this->{out}->print("ERROR: no such choice available",
                       $this->{eol});
 
-Validation is turned on by the C<validation> parameter.
+Validation is turned on by the C<validate> parameter.
 See L<"Predefined Validations"> for a list of available
 validation options.
 
 You can override this method in derived classes to implement
 your own validation strategy - but in some situations this
-could be too much overhead. So the base class understands
-this callback:
+could be too much overhead. So the base class accepts an array
+reference for a custom validation callback:
 
   my $tc = Term::Completion->new(
     prompt => 'Enter voltage: ',
@@ -757,10 +763,10 @@ this callback:
     ]
   );
 
-Note that the given code reference will be passed the one single
-argument, namely the current input string, and is supposed to return
-I<undef> if the input is invalid, or the (potentially corrected) string,
-like in the example above.
+Note that the given code reference will be passed one single argument,
+namely the current input string, and is supposed to return I<undef> if
+the input is invalid, or the (potentially corrected) string, like in the
+example above.
 
 =item get_choices($answer)
 
@@ -786,7 +792,7 @@ then poor man's paging is enabled, comparable to the UNIX C<more>
 command. The user can use ENTER to proceed by one line, SPACE to proceed
 to the next page and Q or CTRL-C to quit paging. After listing the
 choices and return from this method, the prompt and the current answer
-are redisplayed.
+are displayed again.
 
 Override this method if you have a better pretty-printer/pager. :-)
 
@@ -942,6 +948,13 @@ overridden by the C<new(...)> constructor. Has to be an array reference.
 Default is the empty array reference C<[]>. Undefined items are
 filtered out.
 
+=item C<validate>
+
+Enable validation of the entered string. The value can be either a string
+of comma or blank-separated words, see below for available options; or an
+array reference, containing two scalars: the validation error string and
+a code reference that implements the check.
+
 =back
 
 =head2 Predefined Validations
@@ -955,7 +968,7 @@ C<new(...)> constructor:
   my $tc = Term::Completion->new(
     prompt => 'Fruit: ',
     choices => [ qw(apple banana cherry) ],
-    validation => 'nonblank fromchoices'
+    validate => 'nonblank fromchoices'
   );
 
 In the example above, you are guaranteed the user will choose one of the
@@ -1035,7 +1048,7 @@ welcome, but there is probably little that can be fixed here.
 =head2 Terminal size changes
 
 This package does the best it can to handle changes of the terminal size
-during the completion process. It redisplays the prompt and the current
+during the completion process. It displays the prompt again and the current
 entry during completion, and restarts paging when showing the list of
 choices. The latter however only after you press a key - the bell
 sounds to indicate that something happened. This is because it does not

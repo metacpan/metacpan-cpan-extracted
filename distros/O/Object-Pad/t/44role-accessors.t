@@ -5,13 +5,14 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 role ARole {
    field $one :reader = 1;
 }
 
-class AClass :does(ARole) {
+class AClass {
+   apply ARole;
 }
 
 # RT136507
@@ -24,7 +25,8 @@ role BRole {
    field $data :reader :param;
 }
 
-class BClass :does(BRole) {
+class BClass {
+   apply BRole;
 }
 
 {

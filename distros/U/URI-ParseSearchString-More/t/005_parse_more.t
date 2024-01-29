@@ -20,13 +20,14 @@ export TEST_UPM_CACHED=1
 
 =cut
 
-use Test::Most;
+use Test::Most import => [qw( diag done_testing is like )];
+use Test::Fatal qw( exception );
 use Test::RequiresInternet;
 use URI::ParseSearchString::More ();
 
 my $more = URI::ParseSearchString::More->new();
 
-use Config::General;
+use Config::General ();
 my $conf = Config::General->new(
     -ConfigFile      => 't/urls.cfg',
     -BackslashEscape => 1,
@@ -38,6 +39,12 @@ if ( exists $ENV{'TEST_UPM_CACHED'}
     $more->set_cached(1);
     diag('caching is enabled...');
 }
+
+like(
+    exception { $more->parse_search_string; },
+    qr/missing url/,
+    'dies on missing URL',
+);
 
 foreach my $test ( @{ $config{'urls'} } ) {
     next unless $test->{'terms'};
@@ -51,7 +58,7 @@ foreach my $test ( @{ $config{'urls'} } ) {
         exit(0);
     }
 
-    is( $terms, $test->{'terms'}, "got $terms" );
+    is( $terms,         $test->{'terms'},               "got $terms" );
     is( $more->blame(), 'URI::ParseSearchString::More', 'parsed by More' );
 
 }

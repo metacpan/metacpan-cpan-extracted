@@ -5,7 +5,7 @@ package Lemonldap::NG::Handler::PSGI::Main;
 
 use strict;
 use base 'Lemonldap::NG::Handler::Main';
-our $VERSION = '2.0.6';
+our $VERSION = '2.18.0';
 
 # Specific modules and constants for Test or CGI
 use constant FORBIDDEN         => 403;
@@ -105,6 +105,40 @@ sub cgiName {
     my $h = uc(shift);
     $h =~ s/-/_/g;
     return "HTTP_$h";
+}
+
+sub logout_app {
+    my $class = shift;
+    my $u = shift || $class->tsv->{portal}->();
+    $class->logger->debug("Nginx logout_app redirect to $u");
+    return (
+        sub {
+            my ( $req, $session ) = @_;
+            $class->logger->debug("logout_app_sso: sending internal_lemonldap_logout_url with $u");
+            $class->set_header_out( $req, ( "internal_lemonldap_logout_url" => "$u" ) );
+            1;
+        },
+        0
+    );
+}
+
+sub logout_app_sso {
+    my $class = shift;
+    my $u = shift || $class->tsv->{portal}->();
+    $class->logger->debug("Nginx logout_app_sso redirect to $u");
+    return (
+        sub {
+            my ( $req, $session ) = @_;
+            $class->localUnlog( $req, @_ );
+            my $rurl = &{ $class->tsv->{portal} }() . "?url="
+                                           . $class->encodeUrl( $req, $u )
+                                           . "&logout=1";
+            $class->logger->debug( "logout_app: sending internal_lemonldap_logout_url with $rurl" );
+            $class->set_header_out( $req, ( "internal_lemonldap_logout_url" => "$rurl" ) );
+            1;
+        },
+        0
+    );
 }
 
 *setPostParams = *addToHtmlHead;

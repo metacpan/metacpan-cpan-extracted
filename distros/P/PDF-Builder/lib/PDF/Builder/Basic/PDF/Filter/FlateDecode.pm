@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Filter';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use POSIX qw(ceil floor);
 
@@ -18,18 +18,17 @@ PDF::Builder::Basic::PDF::Filter::FlateDecode - compress and uncompress stream f
 
 =cut
 
+# not specifying a minimum version
 BEGIN {
     eval { require Compress::Zlib };
     $havezlib = !$@;
 }
 
 sub new {
-    return unless $havezlib;
+    return unless $havezlib;  # undef returned should prove fatal
     my ($class, $decode_parms) = @_;
 
-    my ($self) = {
-        DecodeParms => $decode_parms,
-    };
+    my ($self) = { 'DecodeParms' => $decode_parms };
 
     $self->{'outfilt'} = Compress::Zlib::deflateInit(
         -Level   => 9,
@@ -54,7 +53,7 @@ sub infilt {
 
     if ($self->{'DecodeParms'} and $self->{'DecodeParms'}->{'Predictor'}) {
         my $predictor = $self->{'DecodeParms'}->{'Predictor'}->val();
-        if ($predictor == 2) {
+        if      ($predictor == 2) {
             die "The TIFF predictor logic has not been implemented";
         } elsif ($predictor >= 10 and $predictor <= 15) {
             $result = $self->_depredict_png($result);
@@ -74,11 +73,11 @@ sub _depredict_png {
     $stream = $self->{'_depredict_next'} . $stream if defined $self->{'_depredict_next'};
     $prev   = $self->{'_depredict_prev'}           if defined $self->{'_depredict_prev'};
 
-    my $alpha   = $param->{'Alpha'}           ? $param->{'Alpha'}->val(): 0;
-    my $bpc     = $param->{'BitsPerComponent'}? $param->{'BitsPerComponent'}->val(): 8;
-    my $colors  = $param->{'Colors'}          ? $param->{'Colors'}->val(): 1;
-    my $columns = $param->{'Columns'}         ? $param->{'Columns'}->val(): 1;
-    my $height  = $param->{'Height'}          ? $param->{'Height'}->val(): 0;
+    my $alpha   = $param->{'Alpha'}            ? $param->{'Alpha'}->val(): 0;
+    my $bpc     = $param->{'BitsPerComponent'} ? $param->{'BitsPerComponent'}->val(): 8;
+    my $colors  = $param->{'Colors'}           ? $param->{'Colors'}->val(): 1;
+    my $columns = $param->{'Columns'}          ? $param->{'Columns'}->val(): 1;
+    my $height  = $param->{'Height'}           ? $param->{'Height'}->val(): 0;
 
     my $comp     = $colors + $alpha;
     my $bpp      = ceil($bpc * $comp / 8);

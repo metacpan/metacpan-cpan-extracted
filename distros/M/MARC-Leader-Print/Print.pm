@@ -8,7 +8,7 @@ use Data::MARC::Leader::Utils;
 use English;
 use Error::Pure qw(err);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -110,9 +110,11 @@ sub _print {
 	my $ret;
 	if ($self->{'mode_desc'}) {
 		$ret = eval "\$self->{'_utils'}->desc_$method_name(\$ret_value);";
-	}
-	if (defined $value) {
-		$ret .= ' ('.$ret_value.')';
+		if (defined $value) {
+			$ret .= ' ('.$ret_value.')';
+		}
+	} else {
+		$ret = $ret_value;
 	}
 
 	return $ret;
@@ -197,7 +199,7 @@ Returns array of string in array context.
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
 
-=head1 EXAMPLE
+=head1 EXAMPLE1
 
 =for comment filename=print_data_marc_leader.pl
 
@@ -251,6 +253,62 @@ Returns array of string in array context.
  # Length of the implementation-defined portion: Number of characters in the implementation-defined portion of a Directory entry (0)
  # Undefined: Undefined
 
+=head1 EXAMPLE2
+
+=for comment filename=print_data_marc_leader_raw.pl
+
+ use strict;
+ use warnings;
+
+ use Data::MARC::Leader;
+ use MARC::Leader::Print;
+
+ # Print object.
+ my $print = MARC::Leader::Print->new(
+         'mode_desc' => 0,
+ );
+
+ # Data object.
+ my $data_marc_leader = Data::MARC::Leader->new(
+         'bibliographic_level' => 'm',
+         'char_coding_scheme' => 'a',
+         'data_base_addr' => 541,
+         'descriptive_cataloging_form' => 'i',
+         'encoding_level' => ' ',
+         'impl_def_portion_len' => '0',
+         'indicator_count' => '2',
+         'length' => 2200,
+         'length_of_field_portion_len' => '4',
+         'multipart_resource_record_level' => ' ',
+         'starting_char_pos_portion_len' => '5',
+         'status' => 'c',
+         'subfield_code_count' => '2',
+         'type' => 'e',
+         'type_of_control' => ' ',
+         'undefined' => '0',
+ );
+
+ # Print to output.
+ print scalar $print->print($data_marc_leader), "\n";
+
+ # Output:
+ # Record length: 2200
+ # Record status: c
+ # Type of record: e
+ # Bibliographic level: m
+ # Type of control:  
+ # Character coding scheme: a
+ # Indicator count: 2
+ # Subfield code count: 2
+ # Base address of data: 541
+ # Encoding level:  
+ # Descriptive cataloging form: i
+ # Multipart resource record level:  
+ # Length of the length-of-field portion: 4
+ # Length of the starting-character-position portion: 5
+ # Length of the implementation-defined portion: 0
+ # Undefined: 0
+
 =head1 DEPENDENCIES
 
 L<Class::Utils>,
@@ -282,12 +340,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023 Michal Josef Špaček
+© 2023-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

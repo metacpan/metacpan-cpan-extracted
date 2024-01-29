@@ -4,7 +4,7 @@ package Lemonldap::NG::Handler::Lib::StatusConstants;
 use strict;
 use Exporter 'import';
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.18.0';
 
 sub portalConsts {
     return {
@@ -66,7 +66,7 @@ sub portalConsts {
         '53'  => 'PE_SAML_DESTINATION_ERROR',
         '54'  => 'PE_SAML_CONDITIONS_ERROR',
         '55'  => 'PE_SAML_IDPSSOINITIATED_NOTALLOWED',
-        '56'  => 'PE_SAML_SLO_ERROR',
+        '56'  => 'PE_SLO_ERROR',
         '57'  => 'PE_SAML_SIGNATURE_ERROR',
         '58'  => 'PE_SAML_ART_ERROR',
         '59'  => 'PE_SAML_SESSION_ERROR',

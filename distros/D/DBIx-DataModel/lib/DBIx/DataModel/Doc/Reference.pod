@@ -1120,6 +1120,9 @@ allowed at any time, except when a transaction is in course.  However,
 a nested transaction may temporarily change the database handle by
 supplying it as argument to the L</"do_transaction()"> method.
 
+While setting the schema to a new C<$dbh>, the C<HandleError> attribute of that C<$dbh> may
+be modified -- see L</handleError_policy()>.
+
 To unset the database handle, call C<< $schema->dbh(undef) >>.
 
 =head3 debug()
@@ -1268,6 +1271,43 @@ C<db_schema> attribute set to $string. The original C<$schema> is left
 untouched. This is useful for a I<temporary> switch of database
 schema, as opposed to the C<db_schema()> method above that performs a
 permanent change.
+
+
+=head3 handleError_policy()
+
+  $schema->handleError_policy('none'); # default is 'combine'
+
+Decides which policy will be applied regarding C<< $dbh->{HandleError} >> handlers.
+Whenever a schema receives a handle to a dbh through the C<< $schema->dbh($new_dbh, ..) >>
+method, C<DBIx::DataModel> may add or modify the C<< $dbh->{HandleError} >> handler,
+so that SQL errrors are signaled from the caller's perspective instead of being signaled
+as errors within L<DBIx::DataModel::Statement>. Allowed policies are :
+
+=over
+
+=item combine
+
+A new C<< $dbh->{HandleError} >> handler will be installed. If a previous handler
+was already present, that handler will be called, and then the C<DBIx::DataModel>
+handler runs on top of the previous one. If the previous handler was already installed
+by C<DBIx::DataModel>, this handler remains in place without any new installation.
+
+This is the default policy.
+
+=item none
+
+C<DBIx::DataModel> leaves the previous  C<< $dbh->{HandleError} >> handler in place without any interference.
+
+=item override
+
+C<DBIx::DataModel> forces installation of a new   C<< $dbh->{HandleError} >>, ignoring the previous handler.
+
+=item if_absent
+
+C<DBIx::DataModel> installs a new  C<< $dbh->{HandleError} >> handler only if there was no previous handler.
+
+=back
+
 
 
 =head3 localize_state()
@@ -1599,6 +1639,8 @@ Proxy for C<< $self->source->schema >>.
      -page_index      => $page_index,
      -column_types    => \%column_types,
      -join_with_USING => $boolean,
+     -sql_abstract    => $an_sql_abstract_instance,
+       # OR : -with   => $an_sql_abstract_instance, # '-with' is a synonym for '-sql_abstract'
      -result_as       => 'rows' || 'firstrow' || [hashref => @cols] || etc.
   );
   
@@ -1721,19 +1763,19 @@ allowed.
 
 =item C<< -where_on => \%where_on_criteria >> 
 
-  $schema->join(qw/Employee => activities => department/)->select(
+  $schema->join(qw/Employee => activities => department|dpt/)->select(
     -where => {firstname => 'Hector',
                dpt_name  => 'Music'},
     -where_on => {
-       T_Activity   => {d_end => {"<" => '01.01.2001'}},
-       T_Department => {dpt_head => 999},
+       activities => {d_end => {"<" => '01.01.2001'}},
+       dpt        => {dpt_head => 999},
      },
   );
 
 Adds some additional criteria into the 
 C<< JOIN ... ON ... >> SQL statement.
 These criteria are expressed as a hashref; keys of that hashref
-are names of database tables participating in the join.
+are aliases or association names of tables participating in the join.
 The criteria will be combined with regular foreign key constraints
 produced by the join; so in the (silly) example above, the generated
 SQL is :
@@ -1741,15 +1783,17 @@ SQL is :
      SELECT * FROM T_Employee 
        LEFT OUTER JOIN T_Activity
          ON T_Employee.emp_id = T_Activity.emp_id AND d_end < ?
-       LEFT OUTER JOIN T_Department 
-         ON T_Activity.dpt_id = T_Department.dpt_id AND dpt_head = ?
+       LEFT OUTER JOIN T_Department dpt
+         ON T_Activity.dpt_id = dpt.dpt_id AND dpt_head = ?
        WHERE dpt_name = ? AND firstname = ?
 
-Depending on the database system, 
-results from such additional criteria within the C<ON> clauses
-I<may be different> from a usual C<WHERE> criteria at the end
-of the statement; if in doubt, read your vendor's manual and do
-experiments. 
+For some database systems (Oracle is an example), conditions on columns of a left join
+B<must> be expressed as criteria within the C<ON> clauses instead of usual C<WHERE> criteria at the end
+of the statement; otherwise the left join becomes an inner join.
+
+In versions prior to DBIx::DataModel v3.07, keys in the C<-where_on> hash were names
+of database tables. This is still supported but is now deprecated : the recommanded way
+is to use table aliases (if present in the join) or association names.
 
 
 =item C<< -union => [ %select_subargs ] >>
@@ -1879,7 +1923,32 @@ overrides the L</dbi_prepare_method()> specified at the schema level.
 
 =item C<< -join_with_USING => $boolean >>
 
-overrides the L</join_with_USING()> parameter specified at the schema level.
+overrides the L</join_with_USING> parameter specified at the schema level.
+
+
+=item C<< -sql_abstract => $an_sql_abstract_instance >>
+
+overrides the L</sql_abstract> parameter specified at the schema level.
+
+=item C<< -with => $an_sql_abstract_instance >>
+
+synonym for C<< -sql_abstract >>, in order to facilitate the generation of
+I<common table expressions> in collaboration with L<SQL::Abstract::More/with_recursive, with> :
+
+  my $sqla_with_added_CTE = $schema->sql_abstract->with_recursive(
+   [ -table     => $CTE_table_name,
+     -columns   => \@CTE_columns,
+     -as_select => \%select_args ],
+  );
+  
+  my $rows = $schema->join(...)->select(
+    -with    => $sqla_with_added_CTE,
+    -columns => ...,
+    -where   => ...,
+  );
+
+
+See L<the cookbook|DBIx::DataModel::Doc::Cookbook/"Common table expressions (WITH RECURSIVE)"> for an example.
 
 
 =item C<< -result_as => $result_kind >>
@@ -2025,6 +2094,24 @@ L<SQL::Abstract|SQL::Abstract>, as in :
       -columns => ...,
       -where   => {foo => 123, bar => {-not_in => $subquery}}
    );
+
+A subquery can also take an optional argument which will be used
+as a column alias, for inserting the subquery as a column in a
+select list :
+
+  my $subquery = $source1->select(..., -result_as => [subquery => 'col3']);
+  my $rows     = $source2->select(
+      -columns => ['col1', 'col2', $subquery, 'col4'],
+      -where   => ...
+   );
+
+This will generate SQL of shape
+
+  SELECT col1, col2, (SELECT ... <subquery content>) col3, col4
+  FROM ...
+
+and bind values from the subquery will be inserted at the beginning
+of the bind list.
 
 
 =item L<count|DBIx::DataModel::Schema::ResultAs::Count>

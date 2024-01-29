@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Fr::Any::Cm - Package for language French
 
 package Locale::CLDR::Locales::Fr::Any::Cm;
 # This file auto generated from Data\common\main\fr_CM.xml
-#	on Tue  5 Dec  1:11:21 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -64,8 +64,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'day_periods' => (

@@ -22,7 +22,7 @@ is ($locale->script_name('Cyrs'), 'skritur dianav', 'Script name');
 is ($locale->script_name('wibl'), 'skritur dianav', 'Invalid Script name');
 is ($locale->region_name('GB'), 'Rouantelezh-Unanet', 'Region name');
 is ($locale->region_name('wibble'), 'Rannved dianav', 'Invalid Region name');
-is ($locale->variant_name('AREVMDA'), 'armenianeg ar Cʼhornôg', 'Variant name');
+is ($locale->variant_name('PINYIN'), 'romanekadur pinyin', 'Variant name');
 throws_ok { $locale->variant_name('WIBBLE') } qr{ \A Invalid \s variant }xms, 'Invalid Variant name';
 is ($locale->language_name('i_klingon'), 'klingon', 'Language alias');
 is ($locale->region_name('BQ'), 'Karib Nederlandat', 'Region alias');

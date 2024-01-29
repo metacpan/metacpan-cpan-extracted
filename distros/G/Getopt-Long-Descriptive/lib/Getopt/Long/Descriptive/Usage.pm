@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Getopt::Long::Descriptive::Usage 0.112;
+package Getopt::Long::Descriptive::Usage 0.114;
 # ABSTRACT: the usage description for GLD
 
 use List::Util qw(max);
@@ -79,7 +79,7 @@ sub option_text {
   my @options  = @{ $self->{options} || [] };
   my @specs    = map { $_->{spec} } grep { $_->{desc} ne 'spacer' } @options;
   my $length   = (max(map { _option_length($_) } @specs) || 0);
-  my $spec_fmt = "\t%-${length}s";
+  my $spec_fmt = "    %-${length}s";
 
   while (@options) {
     my $opt  = shift @options;
@@ -91,7 +91,7 @@ sub option_text {
         $string .= "${ $opt->{spec} }\n";
         next;
       } else {
-        my @lines = $self->_split_description($length, $opt->{spec});
+        my @lines = $self->_split_description(0, $opt->{spec});
 
         $string .= length($_) ? sprintf("$spec_fmt\n", $_) : "\n" for @lines;
         next;
@@ -131,7 +131,7 @@ sub option_text {
 
     $string .= sprintf "$spec_fmt  %s\n", $spec, shift @desc;
     for my $line (@desc) {
-        $string .= "\t";
+        $string .= "    ";
         $string .= q{ } x ( $length + 2 );
         $string .= "$line\n";
     }
@@ -280,7 +280,7 @@ Getopt::Long::Descriptive::Usage - the usage description for GLD
 
 =head1 VERSION
 
-version 0.112
+version 0.114
 
 =head1 SYNOPSIS
 

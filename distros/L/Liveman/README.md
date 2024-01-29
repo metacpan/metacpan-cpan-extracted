@@ -1,11 +1,11 @@
-[![Actions Status](https://github.com/darviarush/perl-liveman/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-liveman/actions)
+[![Actions Status](https://github.com/darviarush/perl-liveman/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-liveman/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Liveman.svg)](https://metacpan.org/release/Liveman)
 # NAME
 
 Liveman - markdown compiller to test and pod
 
 # VERSION
 
-1.2
+2.0
 
 # SYNOPSIS
 

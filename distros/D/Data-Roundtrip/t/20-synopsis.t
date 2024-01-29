@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION='0.25';
+our $VERSION='0.26';
 
 use Test::More;
 use Test2::Plugin::UTF8;

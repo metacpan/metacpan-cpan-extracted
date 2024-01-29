@@ -1,5 +1,15 @@
 Revision history for Dist::Zilla::Plugin::Git
 
+2.049     2023-12-31 00:04:38Z
+  - fixed implementation of 'push_url' in [Git::Init] (Mikko Koivunalho, PR#6)
+  - new 'stage' option in [Git::Init], to control whether minted files are
+    included in the initial commit (Mikko Koivunalho, PR#7)
+  - amend [Git::GatherDir] docs to not duplicate documentation for attributes
+    inherited from [GatherDir] (ether)
+  - amend [Git::Init] docs to reference init.defaultBranch, not master (ether)
+  - fix warning about disregarded [Git::GatherDir] configs (ether)
+  - support the 'prune_directory' config in [Git::GatherDir] (ether)
+
 2.048     2021-07-10 01:26:31Z
   - added 'push_url' config option to cause Git::Init to configure a separate
     url to push to with 'git remote set-url --push' (Curtis Jewell)

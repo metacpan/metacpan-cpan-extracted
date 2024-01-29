@@ -2,7 +2,6 @@
 
 use v5.26;
 use warnings;
-use experimental 'signatures';
 
 use Test2::V0;
 use Test::Device::Chip::Adapter;
@@ -27,6 +26,8 @@ $adapter->check_and_clear( 'mount' );
 # A quick mocking setup for the ->_transfer method, now that t/01transfer.t
 # has asserted it correct
 {
+   use experimental 'signatures';
+
    my @expectations;
 
    no warnings 'redefine';
@@ -71,7 +72,7 @@ $adapter->check_and_clear( 'mount' );
 
    sub expect_sdo_high
    {
-      $adapter->expect_read_gpios( [ 'sdo' ] )->returns( { sdo => 1 } );
+      $adapter->expect_read_gpios( [ 'sdo' ] )->will_done( { sdo => 1 } );
    }
 
    sub expect_done ( $title )

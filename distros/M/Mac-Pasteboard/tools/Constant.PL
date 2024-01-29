@@ -6,7 +6,7 @@ use warnings;
 use Getopt::Long 2.33 qw{ :config auto_version };
 use Pod::Usage;
 
-our $VERSION = '0.103';
+our $VERSION = '0.104';
 
 my %opt;
 
@@ -148,20 +148,25 @@ $_[0] ()
 eod
     },
 );
-while (<DATA>) {
-    last if $_ eq "__END__\n";
-    chomp;
-    s/^\s+//;
-    $_ or next;
-    substr ($_, 0, 1) eq '#' and next;
-    s/\s+$//;
-    my ($type, $name, $remark) = split '\s+', $_, 3;
-    my $code = $type{$type}
-	or die "Data type '$type' is unknown";
-    $const{$name} = {
-	code => $code,
-	remark => $remark || $name,
-    };
+
+{
+    local $_ = undef;	# while (<>) ... does not localize $_.
+
+    while (<DATA>) {
+	last if $_ eq "__END__\n";
+	chomp;
+	s/^\s+//;
+	$_ or next;
+	substr ($_, 0, 1) eq '#' and next;
+	s/\s+$//;
+	my ($type, $name, $remark) = split '\s+', $_, 3;
+	my $code = $type{$type}
+	    or die "Data type '$type' is unknown";
+	$const{$name} = {
+	    code => $code,
+	    remark => $remark || $name,
+	};
+    }
 }
 
 foreach my $sfx (qw{h c xs}) {
@@ -239,7 +244,7 @@ Tom Wyant (wyant at cpan dot org)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2022 by Thomas R. Wyant, III
+Copyright (C) 2022-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

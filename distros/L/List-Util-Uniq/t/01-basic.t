@@ -24,7 +24,25 @@ use List::Util::Uniq qw(
                            dupestr
 
                            dupe_ci
+
+                           pushuniq
+                           pushuniqstr
+                           pushuniqnum
+                           pushuniqint
                         );
+
+subtest "uniq, uniqstr" => sub {
+    is_deeply([uniq   (1,"a",2,1,"a","b")], [1,"a",2,"b"]);
+    is_deeply([uniqstr(1,"a",2,1,"a","b")], [1,"a",2,"b"]);
+};
+
+subtest "uniqnum" => sub {
+    is_deeply([uniqnum(1,2,"1.0","1.1")], [1,2,"1.1"]);
+};
+
+subtest "uniqint" => sub {
+    is_deeply([uniqint(1,2,"1.0","1.1")], [1,2]);
+};
 
 subtest "uniq_adj" => sub {
     is_deeply([uniq_adj(1, 2, 4, 4, 4, 2, 4)], [1, 2, 4, 2, 4]);
@@ -113,6 +131,34 @@ subtest "dupestr" => sub {
 subtest "dupe_ci" => sub {
     is_deeply([dupe_ci(qw/a b B a b C c/)], [qw/B a b c/]);
     is_deeply([dupe_ci("a","b","B",undef,"c",undef)], ["B",undef]);
+};
+
+subtest "pushuniq, pushuniqstr" => sub {
+    my @ary;
+
+    @ary = (1,"a",2,1,"a","b");
+    pushuniq @ary, 1,"a","c","c";
+    is_deeply(\@ary, [1,"a",2,1,"a","b","c"]);
+
+    @ary = (1,"a",2,1,"a","b");
+    pushuniqstr @ary, 1,"a","c","c";
+    is_deeply(\@ary, [1,"a",2,1,"a","b","c"]);
+};
+
+subtest "pushuniqnum" => sub {
+    my @ary;
+
+    @ary = (1,"1.0",1.1,2);
+    pushuniqnum @ary, 2,"1.00",1.2,"1.000",3,3;
+    is_deeply(\@ary, [1,"1.0",1.1,2,1.2,3]);
+};
+
+subtest "pushuniqint" => sub {
+    my @ary;
+
+    @ary = (1,"1.0",1.1,2);
+    pushuniqint @ary, 2,"1.00",1.2,"1.000",3,3;
+    is_deeply(\@ary, [1,"1.0",1.1,2,3]);
 };
 
 DONE_TESTING:

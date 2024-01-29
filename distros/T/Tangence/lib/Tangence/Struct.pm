@@ -1,18 +1,33 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use warnings;
+use Object::Pad 0.800;
 
-package Tangence::Struct 0.30;
+package Tangence::Struct 0.32;
 class Tangence::Struct :isa(Tangence::Meta::Struct);
 
 use Carp;
 
+use meta 0.003_002;
+no warnings 'meta::experimental';
+
 use Tangence::Type;
 use Tangence::Meta::Field;
+
+=head1 NAME
+
+C<Tangence::Struct> - server implementation of a C<Tangence> struct
+
+=head1 DESCRIPTION
+
+This module is a component of L<Tangence::Server>. It is not intended for
+end-user use directly.
+
+=cut
 
 our %STRUCTS_BY_NAME;
 our %STRUCTS_BY_PERLNAME;
@@ -65,6 +80,7 @@ sub define
    $self->SUPER::define( @_ );
 
    my $class = $self->perlname;
+   my $classmeta = meta::package->get( $class );
    my @fieldnames = map { $_->name } $self->fields;
 
    # Now construct the actual perl package
@@ -76,10 +92,9 @@ sub define
    );
    $subs{$fieldnames[$_]} = do { my $i = $_; sub { shift->[$i] } } for 0 .. $#fieldnames;
 
-   no strict 'refs';
    foreach my $name ( keys %subs ) {
-      next if defined &{"${class}::${name}"};
-      *{"${class}::${name}"} = $subs{$name};
+      next if $classmeta->can_symbol( '&' . $name );
+      $classmeta->add_symbol( '&' . $name => $subs{$name} );
    }
 }
 
@@ -139,5 +154,11 @@ Tangence::Struct->declare_builtin(
       smashed   => "bool",
    ],
 );
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
 
 0x55AA;

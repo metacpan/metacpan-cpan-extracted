@@ -32,8 +32,7 @@ requires:
   IO::File: '1.41'
   JSON: '4.07'
   JSON::XS: '4.03'
-  Module::Generic: v0.30.5
-  Nice::Try: v1.3.4
+  Module::Generic: v0.32.8
   POSIX: 1.53_01
   Scalar::Util: '1.50'
   Text::Wrap: '2021.0814'
@@ -47,5 +46,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Text-PO/issues
   repository: https://gitlab.com/jackdeguest/Text-PO
-version: v0.6.4
+version: v0.7.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

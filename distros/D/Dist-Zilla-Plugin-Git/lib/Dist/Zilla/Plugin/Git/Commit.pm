@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::Plugin::Git::Commit;
 # ABSTRACT: Commit dirty files
 
-our $VERSION = '2.048';
+our $VERSION = '2.049';
 
 use namespace::autoclean;
 use File::Temp           qw{ tempfile };
@@ -132,7 +132,7 @@ Dist::Zilla::Plugin::Git::Commit - Commit dirty files
 
 =head1 VERSION
 
-version 2.048
+version 2.049
 
 =head1 SYNOPSIS
 

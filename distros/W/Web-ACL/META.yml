@@ -1,0 +1,29 @@
+---
+abstract: 'A helper for creating basic apikey/slug/IP based ACLs.'
+author:
+  - 'Zane C. Bowers-Hadley <vvelox@vvelox.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Web-ACL
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dumper: '0'
+  Error::Helper: '0'
+  Net::Subnet: '0'
+  perl: '5.006'
+resources:
+  repository: https://github.com/LilithSec/Web-ACL
+version: v0.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

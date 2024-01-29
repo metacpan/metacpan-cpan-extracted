@@ -1,0 +1,266 @@
+NAME
+    Data::HTML::Textarea - Data object for HTML textarea.
+
+SYNOPSIS
+     use Data::HTML::Textarea;
+
+     my $obj = Data::HTML::Textarea->new(%params);
+     my $autofocus = $obj->autofocus;
+     my $cols = $obj->cols;
+     my $css_class = $obj->css_class;
+     my $disabled = $obj->disabled;
+     my $form = $obj->form;
+     my $id = $obj->id;
+     my $label = $obj->label;
+     my $name = $obj->name;
+     my $placeholder = $obj->placeholder;
+     my $readonly = $obj->readonly;
+     my $required = $obj->required;
+     my $rows = $obj->rows;
+     my $value = $obj->value;
+
+METHODS
+  "new"
+     my $obj = Data::HTML::Textarea->new(%params);
+
+    Constructor.
+
+    *       "autofocus"
+
+            Textarea autofocus flag.
+
+            Default value is 0.
+
+    *       "cols"
+
+            Textarea columns number.
+
+            Default value is undef.
+
+    *       "css_class"
+
+            Textarea CSS class.
+
+            Default value is undef.
+
+    *       "disabled"
+
+            Textarea disabled flag.
+
+            Default value is 0.
+
+    *       "form"
+
+            Textarea form id.
+
+            Default value is undef.
+
+    *       "id"
+
+            Form identifier.
+
+            Default value is undef.
+
+    *       "label"
+
+            Form label.
+
+            Default value is undef.
+
+    *       "name"
+
+            Form name.
+
+            Default value is undef.
+
+    *       "placeholder"
+
+            Form placeholder.
+
+            Default value is undef.
+
+    *       "readonly"
+
+            Textarea readonly flag.
+
+            Default value is 0.
+
+    *       "required"
+
+            Textarea required flag.
+
+            Default value is 0.
+
+    *       "rows"
+
+            Textarea rows number.
+
+            Default value is undef.
+
+    *       "value"
+
+            Textarea value.
+
+            Default value is undef.
+
+    Returns instance of object.
+
+  "autofocus"
+     my $autofocus = $obj->autofocus;
+
+    Get autofocus boolean flag for textarea.
+
+    Returns 0/1.
+
+  "cols"
+     my $cols = $obj->cols;
+
+    Get textarea column number.
+
+    Returns number.
+
+  "css_class"
+     my $css_class = $obj->css_class;
+
+    Get CSS class for textarea.
+
+    Returns string.
+
+  "disabled"
+     my $disabled = $obj->disabled;
+
+    Get disabled boolean flag for textarea.
+
+    Returns 0/1.
+
+  "form"
+     my $form = $obj->form;
+
+    Get form id for textarea.
+
+    Returns string.
+
+  "id"
+     my $id = $obj->id;
+
+    Get textarea identifier.
+
+    Returns string.
+
+  "label"
+     my $label = $obj->label;
+
+    Get textarea label.
+
+    Returns string.
+
+  "name"
+     my $name = $obj->name;
+
+    Get textarea name.
+
+    Returns string.
+
+  "placeholder"
+     my $placeholder = $obj->placeholder;
+
+    Get textarea placeholder.
+
+    Returns string.
+
+  "readonly"
+     my $readonly = $obj->readonly;
+
+    Get readonly boolean flag for textarea.
+
+    Returns 0/1.
+
+  "required"
+     my $required = $obj->required;
+
+    Get required boolean flag for textarea.
+
+    Returns 0/1.
+
+  "rows"
+     my $rows = $obj->rows;
+
+    Get textarea rows number.
+
+    Returns number.
+
+  "value"
+     my $value = $obj->value;
+
+    Get textarea value.
+
+    Returns string.
+
+ERRORS
+     new():
+             Parameter 'autofocus' must be a bool (0/1).
+                     Value: %s
+             Parameter 'cols' must be a number.
+                     Value: %s
+             Parameter 'disabled' must be a bool (0/1).
+                     Value: %s
+             Parameter 'readonly' must be a bool (0/1).
+                     Value: %s
+             Parameter 'required' must be a bool (0/1).
+                     Value: %s
+             Parameter 'rows' must be a number.
+                     Value: %s
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Data::HTML::Textarea;
+
+     my $obj = Data::HTML::Textarea->new(
+            'autofocus' => 1,
+            'css_class' => 'textarea',
+            'id' => 'textarea-id',
+            'label' => 'Textarea label',
+            'value' => 'Textarea value',
+     );
+
+     # Print out.
+     print 'Autofocus: '.$obj->autofocus."\n";
+     print 'CSS class: '.$obj->css_class."\n";
+     print 'Disabled: '.$obj->disabled."\n";
+     print 'Id: '.$obj->id."\n";
+     print 'Label: '.$obj->label."\n";
+     print 'Readonly: '.$obj->readonly."\n";
+     print 'Required: '.$obj->required."\n";
+     print 'Value: '.$obj->value."\n";
+
+     # Output:
+     # Autofocus: 1
+     # CSS class: textarea
+     # Disabled: 0
+     # Id: textarea-id
+     # Label: Textarea label
+     # Readonly: 0
+     # Required: 0
+     # Value: Textarea value
+
+DEPENDENCIES
+    Mo, Mo::utils.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-HTML-Textarea>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2022-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

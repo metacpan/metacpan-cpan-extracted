@@ -1,5 +1,12 @@
 Revision history for Test-Future-IO
 
+0.06    2024-01-13
+        [CHANGES]
+         * Added expectations for ->accept and ->connect
+         * General module style updates:
+            + `use VERSION` in every file
+            + Swapped unit tests from `Test::More` to `Test2::V0`
+
 0.05    2022-10-07
         [CHANGES]
          * Added `->use_sysread_buffer` and supporting methods

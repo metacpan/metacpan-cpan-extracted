@@ -1,25 +1,23 @@
-use warnings;
-use v5.22;
+use v5.36;
 
 use lib ".";
-use t::CLI;
+use t::Util qw(run);
 
-use Test::More;
+my @tests = (
+    {
+        Name                   => '-sep :',
+        args                   => [ '-sep', ':' ],
+        expected_stdout        => qr/^\S+\s\S+$/,
+        expected_stderr        => '',
+        expected_error_message => '',
+    },
+    {
+        Name                   => '-sep : pref, city',
+        args                   => [ '-sep', ':', 'address:prefecture', 'address:city' ],
+        expected_stdout        => qr/^[^:]+:[^:]+$/,
+        expected_stderr        => '',
+        expected_error_message => '',
+    },
+);
 
-my $app = t::CLI->new;
-
-{
-    $app->run(qw|-sep :|);
-    is $app->exit_code, 0;
-    like $app->stdout, qr/^\S+\s\S+$/;
-    ok !$app->stderr;
-    ok !$app->error_message;
-
-    $app->run(qw|-sep : address:prefecture address:city|);
-    is $app->exit_code, 0;
-    like $app->stdout, qr/^[^:]+:[^:]+$/;
-    ok !$app->stderr;
-    ok !$app->error_message;
-}
-
-done_testing;
+run(@tests);

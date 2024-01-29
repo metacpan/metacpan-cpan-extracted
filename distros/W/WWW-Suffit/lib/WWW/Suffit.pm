@@ -50,9 +50,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.05';
-
-# . . . coming soon . . .
+our $VERSION = '1.07';
 
 1;
 

@@ -1,0 +1,29 @@
+benchmark/ae-native.pl
+benchmark/getaddrinfo.pl
+Changes
+const-c.inc
+const-xs.inc
+experiments/ae-native.pl
+experiments/ae.pl
+experiments/anyevent.pl
+experiments/basic.pl
+experiments/io-async.pl
+experiments/mem.pl
+experiments/mojo.pl
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Socket/More/Lookup.pm
+lib/Socket/More/Lookup.pod
+LICENSE
+Lookup.bs
+Lookup.c
+Lookup.o
+Lookup.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+README.md
+t/Socket-More-Lookup.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

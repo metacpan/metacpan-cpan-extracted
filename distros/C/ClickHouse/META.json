@@ -4,7 +4,7 @@
       "Ilya Rassadin, C<< <elcamlost at gmail.com> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.022",
+   "generated_by" : "App::ModuleBuildTiny version 0.043",
    "license" : [
       "artistic_2"
    ],
@@ -16,12 +16,12 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.034"
+            "Module::Build::Tiny" : "0.039"
          }
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.022"
+            "App::ModuleBuildTiny" : "0.043"
          }
       },
       "runtime" : {
@@ -35,9 +35,11 @@
    "provides" : {
       "ClickHouse" : {
          "file" : "lib/ClickHouse.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
-   "version" : "0.04"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_spdx_expression" : "Artistic-2.0"
 }

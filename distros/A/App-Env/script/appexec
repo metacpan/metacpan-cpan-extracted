@@ -13,27 +13,27 @@ use File::Basename;
 use File::Spec::Functions qw( file_name_is_absolute );
 use File::Which;
 use App::Env;
+use List::Util 1.33 'any';
+use App::Env::_Util;
 
-our $VERSION = '1.02';
-our $prog    = basename( $0, '.pl' );
+our $VERSION = '1.04';
+my $prog = basename( $0, '.pl' );
 
-our %ShellMap = (
+my %ShellMap = (
     ksh  => 'korn',
     bash => 'bash',
     tcsh => 'tc',
     sh   => 'bourne',
-    csh  => 'c'
+    csh  => 'c',
 );
 
 # program options; see parse_args();
-our %opt;
+my %opt;
 
-eval { main() };
-
-if ( $@ ) {
-    print STDERR "# $prog: $_\n" foreach split /\n/, $@;
+eval { main() } // do {
+    say STDERR "# $prog: $_" foreach split /\n/, $@;    ## no critic(InputOutput::RequireCheckedSyscalls)
     exit 1;
-}
+};
 
 exit 0;
 
@@ -43,33 +43,33 @@ sub main {
     help( 1 ) if $opt{help};
     help( 2 ) if $opt{usage};
 
-    do { print "$prog $VERSION\n"; return }
+    return ( print "$prog $VERSION\n" )
       if $opt{version};
 
     die "please specify an environment\n"
       unless defined $opt{env};
 
     if ( $opt{clear} ) {
+        ## no critic( Variables::RequireLocalizedPunctuationVars )
         %ENV = map { $_ => $ENV{$_} }
           grep { exists $ENV{$_} } qw[ HOME LOGNAME SHELL ];
     }
 
-    my @envs = split( ',', $opt{env} );
+    my @envs = split( /,/, $opt{env} );
 
-  # if more than one environment, sort out possible environment specific appopts
+    # if more than one environment, sort out possible environment specific appopts
     my %appopts;
     @appopts{@envs} = map { {} } 1 .. @envs;
 
     if ( @envs > 1 ) {
 
-        while ( my ( $k, $value ) = each %{ $opt{appopts} } ) {
+        for my $k ( keys %{ $opt{appopts} } ) {
             my ( $env, $key ) = $k =~ /^([^:]*):(.*)$/;
 
-            die(
-                "appopts ($key) not specific to one of the specified environments"
-            ) unless exists $appopts{$env};
+            die( "appopts ($key) not specific to one of the specified environments" )
+              unless exists $appopts{$env};
 
-            $appopts{$env}{$key} = $value;
+            $appopts{$env}{$key} = $opt{appopts}->{$k};
         }
     }
 
@@ -81,9 +81,7 @@ sub main {
         App::Env->new(
             ( map { [ $_ => { AppOpts => $appopts{$_} } ] } @envs ),
             { ( defined $opt{site} ? ( Site => $opt{site} ) : () ), } );
-    };
-    die( "error setting up environment `$opt{env}': $@\n" )
-      if $@;
+    } // die( "error setting up environment `$opt{env}': $@\n" );
 
     $env->setenv( $_ ) for @{ $opt{delete} };
     $env->setenv( $_, $opt{define}{$_} ) for keys %{ $opt{define} };
@@ -91,10 +89,10 @@ sub main {
     dumpenv( $env, $opt{dumpenv}, $opt{dumpvar} ) if $opt{dumpenv};
 
     if ( @ARGV ) {
-        print join( ' ', @ARGV ), "\n"
+        say join( q{ }, @ARGV )    ## no critic(InputOutput::RequireCheckedSyscalls)
           if $opt{verbose};
 
-        %ENV = %$env;
+        %ENV = %$env;              ## no critic( Variables::RequireLocalizedPunctuationVars )
 
         die( "$ARGV[0] does not exist, is not executable, or is not in PATH\n" )
           unless ( file_name_is_absolute( $ARGV[0] ) && -e $ARGV[0] )
@@ -103,20 +101,28 @@ sub main {
         exec { $ARGV[0] } @ARGV
           or die( "can't exec $ARGV[0]: not in path?\n" );
     }
+
+    return !!1;
 }
 
+sub _is_valid_env_name {
+    my $name = shift;
+    return $name !~ /\P{IsWord}/ && substr( $name, 0, 1 ) =~ /\P{IsDigit}/;
+}
 
 sub dumpenv {
     my ( $env, $fmt, $vars ) = @_;
 
     $vars = [ keys %$env ] unless @$vars;
 
+    ## no critic (InputOutput::RequireCheckedSyscalls)
+    ## no critic (ControlStructures::ProhibitCascadingIfElse)
     if ( $fmt eq 'raw' ) {
         say "$_=",
           (
             length $env->{$_}
-            ? App::Env::_shell_escape( $env->{$_} )
-            : ''
+            ? App::Env::_Util::shell_escape( $env->{$_} )
+            : q{}
           ) for @$vars;
     }
 
@@ -145,7 +151,7 @@ sub dumpenv {
     elsif ( $fmt eq 'delta-args' ) {
         my ( $delete, $add ) = delta( $env );
         say join q{ }, ( map { "-X $_" } @$delete ),
-          ( map { "-D $_=" . App::Env::_shell_escape( $env->{$_} ) } @$add );
+          ( map { "-D $_=" . App::Env::_Util::shell_escape( $env->{$_} ) } @$add );
     }
 
     else {
@@ -156,27 +162,26 @@ sub dumpenv {
         }
         else {
             die( "unknown dump format: $fmt\n" )
-              unless my $mth
-              = Shell::Guess->can( ( $ShellMap{$fmt} // $fmt ) . '_shell' );
+              unless my $mth = Shell::Guess->can( ( $ShellMap{$fmt} // $fmt ) . '_shell' );
             $fmt = Shell::Guess->$mth;
         }
         require Shell::Config::Generate;
-        my $config = Shell::Config::Generate->new;
-        $config->set( $_, $env->{$_} ) for @$vars;
+        my $config    = Shell::Config::Generate->new;
+        my $extracted = $env->env( $vars, { AllowIllegalVariableNames => !!0 } );
+        $config->set( $_, $extracted->{$_} ) for keys %$extracted;
         print $config->generate( $fmt );
     }
+
+    return;
 }
 
 sub delta {
     my ( $env ) = @_;
     my @delete = grep { !exists $env->{$_} } keys %ENV;
 
-    my @add = grep {
-            !exists $ENV{$_}
-          || exists $ENV{$_}
-          && exists $env->{$_}
-          && $ENV{$_} ne $env->{$_}
-    } keys %$env;
+    my @add
+      = grep { !exists $ENV{$_} || exists $ENV{$_} && exists $env->{$_} && $ENV{$_} ne $env->{$_} }
+      keys %$env;
     return ( \@delete, \@add );
 }
 
@@ -216,20 +221,19 @@ sub parse_args {
               version
               /,
         );
-    };
-
-    die $@ if $@;
+        1;
+    } // die $@;
 
     return if $opt{version} || $opt{help} || $opt{usage};
 
     my @notset = grep { !defined $opt{$_} } keys %opt;
-    die( 'parameters `', join( "`, `", @notset ), "' are not set\n" )
+    die( 'parameters `', join( q{`, `}, @notset ), "' are not set\n" )
       if @notset;
 
     # ensure that the dumpenv option is correct
     if ( exists $opt{dumpenv} ) {
         die( "unsupported dumpenv format: $opt{dumpenv}\n" )
-          unless grep { $opt{dumpenv} eq $_ } keys %ShellMap,
+          unless any { $opt{dumpenv} eq $_ } keys %ShellMap,
           qw( auto delta-args delta-json json raw unquoted values );
     }
 
@@ -268,7 +272,7 @@ appexec - execute a command under a specified environment
 
 =head1 VERSION
 
-version 1.02
+version 1.04
 
 =head1 SYNOPSIS
 
@@ -424,17 +428,17 @@ Run the B<dmlist> tool from the CIAO version 3.4 application suite:
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-app-env@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env
+Please report any bugs or feature requests to bug-app-env@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env>
 
 =head2 Source
 
 Source is available at
 
-  https://gitlab.com/djerius/App-Env
+  https://gitlab.com/djerius/app-env
 
 and may be cloned from
 
-  https://gitlab.com/djerius/App-Env.git
+  https://gitlab.com/djerius/app-env.git
 
 =head1 SEE ALSO
 

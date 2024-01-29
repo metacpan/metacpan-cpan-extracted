@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Fr - Package for language French
 
 package Locale::CLDR::Locales::Fr;
 # This file auto generated from Data\common\main\fr.xml
-#	on Tue  5 Dec  1:10:48 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -25,19 +25,19 @@ use Moo;
 
 extends('Locale::CLDR::Locales::Root');
 has 'valid_algorithmic_formats' => (
-	is => 'ro',
-	isa => ArrayRef,
-	init_arg => undef,
-	default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal-masculine','spellout-cardinal-feminine','spellout-ordinal-masculine-plural','spellout-ordinal-masculine','spellout-ordinal-feminine-plural','spellout-ordinal-feminine','digits-ordinal-masculine','digits-ordinal-feminine','digits-ordinal-masculine-plural','digits-ordinal-feminine-plural','digits-ordinal' ]},
+    is => 'ro',
+    isa => ArrayRef,
+    init_arg => undef,
+    default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal-masculine','spellout-cardinal-feminine','spellout-ordinal-masculine-plural','spellout-ordinal-masculine','spellout-ordinal-feminine-plural','spellout-ordinal-feminine','digits-ordinal-masculine','digits-ordinal-feminine','digits-ordinal-masculine-plural','digits-ordinal-feminine-plural','digits-ordinal' ]},
 );
 
 has 'algorithmic_number_format_data' => (
-	is => 'ro',
-	isa => HashRef,
-	init_arg => undef,
-	default => sub { 
-		use bigfloat;
-		return {
+    is => 'ro',
+    isa => HashRef,
+    init_arg => undef,
+    default => sub {
+        use bigfloat;
+        return {
 		'cents-f' => {
 			'private' => {
 				'0' => {
@@ -728,14 +728,14 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(100),
 					rule => q(←%spellout-cardinal-masculine←-cent→%%cents-m→),
 				},
-				'10000' => {
-					base_value => q(10000),
-					divisor => q(10000),
+				'2000' => {
+					base_value => q(2000),
+					divisor => q(1000),
 					rule => q(=%spellout-numbering=),
 				},
 				'max' => {
-					base_value => q(10000),
-					divisor => q(10000),
+					base_value => q(2000),
+					divisor => q(1000),
 					rule => q(=%spellout-numbering=),
 				},
 			},
@@ -1098,7 +1098,7 @@ has 'algorithmic_number_format_data' => (
 				},
 			},
 		},
-	} },
+    } },
 );
 
 # Need to add code for Key type pattern
@@ -1121,7 +1121,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'aa' => 'afar',
@@ -1165,7 +1165,7 @@ has 'display_name_language' => (
  				'avk' => 'kotava',
  				'awa' => 'awadhi',
  				'ay' => 'aymara',
- 				'az' => 'azéri',
+ 				'az' => 'azerbaïdjanais',
  				'az@alt=short' => 'azéri',
  				'ba' => 'bachkir',
  				'bal' => 'baloutchi',
@@ -1179,7 +1179,7 @@ has 'display_name_language' => (
  				'bej' => 'bedja',
  				'bem' => 'bemba',
  				'bew' => 'betawi',
- 				'bez' => 'béna',
+ 				'bez' => 'bena',
  				'bfd' => 'bafut',
  				'bfq' => 'badaga',
  				'bg' => 'bulgare',
@@ -1212,6 +1212,7 @@ has 'display_name_language' => (
  				'car' => 'caribe',
  				'cay' => 'cayuga',
  				'cch' => 'atsam',
+ 				'ccp' => 'changma kodha',
  				'ce' => 'tchétchène',
  				'ceb' => 'cebuano',
  				'cgg' => 'kiga',
@@ -1226,6 +1227,7 @@ has 'display_name_language' => (
  				'chr' => 'cherokee',
  				'chy' => 'cheyenne',
  				'ckb' => 'sorani',
+ 				'ckb@alt=menu' => 'kurde sorani',
  				'co' => 'corse',
  				'cop' => 'copte',
  				'cps' => 'capiznon',
@@ -1259,7 +1261,7 @@ has 'display_name_language' => (
  				'dyu' => 'dioula',
  				'dz' => 'dzongkha',
  				'dzg' => 'dazaga',
- 				'ebu' => 'embou',
+ 				'ebu' => 'embu',
  				'ee' => 'éwé',
  				'efi' => 'éfik',
  				'egl' => 'émilien',
@@ -1271,9 +1273,7 @@ has 'display_name_language' => (
  				'en_AU' => 'anglais australien',
  				'en_CA' => 'anglais canadien',
  				'en_GB' => 'anglais britannique',
- 				'en_GB@alt=short' => 'anglais (R.-U.)',
  				'en_US' => 'anglais américain',
- 				'en_US@alt=short' => 'anglais (É.-U.)',
  				'enm' => 'moyen anglais',
  				'eo' => 'espéranto',
  				'es' => 'espagnol',
@@ -1286,6 +1286,7 @@ has 'display_name_language' => (
  				'ewo' => 'éwondo',
  				'ext' => 'estrémègne',
  				'fa' => 'persan',
+ 				'fa_AF' => 'dari',
  				'fan' => 'fang',
  				'fat' => 'fanti',
  				'ff' => 'peul',
@@ -1328,7 +1329,7 @@ has 'display_name_language' => (
  				'grb' => 'grebo',
  				'grc' => 'grec ancien',
  				'gsw' => 'suisse allemand',
- 				'gu' => 'goudjerati',
+ 				'gu' => 'goudjarati',
  				'guc' => 'wayuu',
  				'gur' => 'gurenne',
  				'guz' => 'gusii',
@@ -1421,7 +1422,7 @@ has 'display_name_language' => (
  				'ks' => 'cachemiri',
  				'ksb' => 'shambala',
  				'ksf' => 'bafia',
- 				'ksh' => 'francique ripuaire',
+ 				'ksh' => 'kölsch',
  				'ku' => 'kurde',
  				'kum' => 'koumyk',
  				'kut' => 'kutenai',
@@ -1575,6 +1576,7 @@ has 'display_name_language' => (
  				'rap' => 'rapanui',
  				'rar' => 'rarotongien',
  				'rgn' => 'romagnol',
+ 				'rhg' => 'rohingya',
  				'rif' => 'rifain',
  				'rm' => 'romanche',
  				'rn' => 'roundi',
@@ -1582,7 +1584,6 @@ has 'display_name_language' => (
  				'ro_MD' => 'moldave',
  				'rof' => 'rombo',
  				'rom' => 'romani',
- 				'root' => 'racine',
  				'rtm' => 'rotuman',
  				'ru' => 'russe',
  				'rue' => 'ruthène',
@@ -1732,6 +1733,7 @@ has 'display_name_language' => (
  				'yo' => 'yoruba',
  				'yrl' => 'nheengatou',
  				'yue' => 'cantonais',
+ 				'yue@alt=menu' => 'chinois cantonais',
  				'za' => 'zhuang',
  				'zap' => 'zapotèque',
  				'zbl' => 'symboles Bliss',
@@ -1739,8 +1741,11 @@ has 'display_name_language' => (
  				'zen' => 'zenaga',
  				'zgh' => 'amazighe standard marocain',
  				'zh' => 'chinois',
+ 				'zh@alt=menu' => 'chinois mandarin',
  				'zh_Hans' => 'chinois simplifié',
+ 				'zh_Hans@alt=long' => 'mandarin simplifié',
  				'zh_Hant' => 'chinois traditionnel',
+ 				'zh_Hant@alt=long' => 'mandarin traditionnel',
  				'zu' => 'zoulou',
  				'zun' => 'zuñi',
  				'zxx' => 'sans contenu linguistique',
@@ -1768,6 +1773,7 @@ has 'display_name_script' => (
  			'Ahom' => 'ahom',
  			'Arab' => 'arabe',
  			'Arab@alt=variant' => 'arabo-persan',
+ 			'Aran' => 'nastaliq',
  			'Armi' => 'araméen impérial',
  			'Armn' => 'arménien',
  			'Avst' => 'avestique',
@@ -1788,12 +1794,15 @@ has 'display_name_script' => (
  			'Cari' => 'carien',
  			'Cham' => 'cham',
  			'Cher' => 'cherokee',
+ 			'Chrs' => 'chorasmien',
  			'Cirt' => 'cirth',
  			'Copt' => 'copte',
+ 			'Cpmn' => 'syllabaire chypro-minoen',
  			'Cprt' => 'syllabaire chypriote',
  			'Cyrl' => 'cyrillique',
  			'Cyrs' => 'cyrillique (variante slavonne)',
  			'Deva' => 'dévanagari',
+ 			'Diak' => 'dives akuru',
  			'Dogr' => 'dogri',
  			'Dsrt' => 'déséret',
  			'Dupl' => 'sténographie Duployé',
@@ -1801,6 +1810,7 @@ has 'display_name_script' => (
  			'Egyh' => 'hiératique égyptien',
  			'Egyp' => 'hiéroglyphes égyptiens',
  			'Elba' => 'elbasan',
+ 			'Elym' => 'élymaïque',
  			'Ethi' => 'éthiopique',
  			'Geok' => 'géorgien khoutsouri',
  			'Geor' => 'géorgien',
@@ -1825,6 +1835,7 @@ has 'display_name_script' => (
  			'Hira' => 'hiragana',
  			'Hluw' => 'hiéroglyphes hittites',
  			'Hmng' => 'pahawh hmong',
+ 			'Hmnp' => 'nyiakeng puachue hmong',
  			'Hrkt' => 'katakana ou hiragana',
  			'Hung' => 'ancien hongrois',
  			'Inds' => 'indus',
@@ -1838,6 +1849,7 @@ has 'display_name_script' => (
  			'Khar' => 'kharochthî',
  			'Khmr' => 'khmer',
  			'Khoj' => 'khodjki',
+ 			'Kits' => 'petite écriture khitan',
  			'Knda' => 'kannara',
  			'Kore' => 'coréen',
  			'Kpel' => 'kpelle',
@@ -1873,6 +1885,7 @@ has 'display_name_script' => (
  			'Mtei' => 'meitei mayek',
  			'Mult' => 'multani',
  			'Mymr' => 'birman',
+ 			'Nand' => 'nandinagari',
  			'Narb' => 'nord-arabique',
  			'Nbat' => 'nabatéen',
  			'Newa' => 'néwa',
@@ -1885,6 +1898,7 @@ has 'display_name_script' => (
  			'Orya' => 'odia',
  			'Osge' => 'osage',
  			'Osma' => 'osmanais',
+ 			'Ougr' => 'ancien ouïgour',
  			'Palm' => 'palmyrénien',
  			'Pauc' => 'paou chin haou',
  			'Perm' => 'ancien permien',
@@ -1895,6 +1909,7 @@ has 'display_name_script' => (
  			'Phnx' => 'phénicien',
  			'Plrd' => 'phonétique de Pollard',
  			'Prti' => 'parthe des inscriptions',
+ 			'Qaag' => 'zawgyi',
  			'Rjng' => 'rejang',
  			'Rohg' => 'hanifi',
  			'Roro' => 'rongorongo',
@@ -1934,13 +1949,18 @@ has 'display_name_script' => (
  			'Thai' => 'thaï',
  			'Tibt' => 'tibétain',
  			'Tirh' => 'tirhouta',
+ 			'Tnsa' => 'tangsa',
+ 			'Toto' => 'toto',
  			'Ugar' => 'ougaritique',
  			'Vaii' => 'vaï',
  			'Visp' => 'parole visible',
+ 			'Vith' => 'vithkuqi',
  			'Wara' => 'warang citi',
+ 			'Wcho' => 'wantcho',
  			'Wole' => 'woléaï',
  			'Xpeo' => 'cunéiforme persépolitain',
  			'Xsux' => 'cunéiforme suméro-akkadien',
+ 			'Yezi' => 'yézidi',
  			'Yiii' => 'yi',
  			'Zanb' => 'zanabazar carré',
  			'Zinh' => 'hérité',
@@ -1964,7 +1984,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'Monde',
  			'002' => 'Afrique',
@@ -2025,7 +2045,7 @@ has 'display_name_region' => (
  			'BJ' => 'Bénin',
  			'BL' => 'Saint-Barthélemy',
  			'BM' => 'Bermudes',
- 			'BN' => 'Brunéi Darussalam',
+ 			'BN' => 'Brunei',
  			'BO' => 'Bolivie',
  			'BQ' => 'Pays-Bas caribéens',
  			'BR' => 'Brésil',
@@ -2079,8 +2099,8 @@ has 'display_name_region' => (
  			'FI' => 'Finlande',
  			'FJ' => 'Fidji',
  			'FK' => 'Îles Malouines',
- 			'FK@alt=variant' => 'Îles Falkland',
- 			'FM' => 'États fédérés de Micronésie',
+ 			'FK@alt=variant' => 'Îles Malouines (Îles Falkland)',
+ 			'FM' => 'Micronésie',
  			'FO' => 'Îles Féroé',
  			'FR' => 'France',
  			'GA' => 'Gabon',
@@ -2098,14 +2118,14 @@ has 'display_name_region' => (
  			'GP' => 'Guadeloupe',
  			'GQ' => 'Guinée équatoriale',
  			'GR' => 'Grèce',
- 			'GS' => 'Géorgie du Sud et îles Sandwich du Sud',
+ 			'GS' => 'Géorgie du Sud-et-les Îles Sandwich du Sud',
  			'GT' => 'Guatemala',
  			'GU' => 'Guam',
  			'GW' => 'Guinée-Bissau',
  			'GY' => 'Guyana',
  			'HK' => 'R.A.S. chinoise de Hong Kong',
  			'HK@alt=short' => 'Hong Kong',
- 			'HM' => 'Îles Heard et McDonald',
+ 			'HM' => 'Îles Heard-et-MacDonald',
  			'HN' => 'Honduras',
  			'HR' => 'Croatie',
  			'HT' => 'Haïti',
@@ -2126,7 +2146,7 @@ has 'display_name_region' => (
  			'JO' => 'Jordanie',
  			'JP' => 'Japon',
  			'KE' => 'Kenya',
- 			'KG' => 'Kirghizistan',
+ 			'KG' => 'Kirghizstan',
  			'KH' => 'Cambodge',
  			'KI' => 'Kiribati',
  			'KM' => 'Comores',
@@ -2141,7 +2161,7 @@ has 'display_name_region' => (
  			'LC' => 'Sainte-Lucie',
  			'LI' => 'Liechtenstein',
  			'LK' => 'Sri Lanka',
- 			'LR' => 'Libéria',
+ 			'LR' => 'Liberia',
  			'LS' => 'Lesotho',
  			'LT' => 'Lituanie',
  			'LU' => 'Luxembourg',
@@ -2154,8 +2174,7 @@ has 'display_name_region' => (
  			'MF' => 'Saint-Martin',
  			'MG' => 'Madagascar',
  			'MH' => 'Îles Marshall',
- 			'MK' => 'Macédoine',
- 			'MK@alt=variant' => 'Macédoine (ARYM)',
+ 			'MK' => 'Macédoine du Nord',
  			'ML' => 'Mali',
  			'MM' => 'Myanmar (Birmanie)',
  			'MN' => 'Mongolie',
@@ -2176,7 +2195,7 @@ has 'display_name_region' => (
  			'NC' => 'Nouvelle-Calédonie',
  			'NE' => 'Niger',
  			'NF' => 'Île Norfolk',
- 			'NG' => 'Nigéria',
+ 			'NG' => 'Nigeria',
  			'NI' => 'Nicaragua',
  			'NL' => 'Pays-Bas',
  			'NO' => 'Norvège',
@@ -2227,7 +2246,8 @@ has 'display_name_region' => (
  			'SV' => 'Salvador',
  			'SX' => 'Saint-Martin (partie néerlandaise)',
  			'SY' => 'Syrie',
- 			'SZ' => 'Swaziland',
+ 			'SZ' => 'Eswatini',
+ 			'SZ@alt=variant' => 'Swaziland',
  			'TA' => 'Tristan da Cunha',
  			'TC' => 'Îles Turques-et-Caïques',
  			'TD' => 'Tchad',
@@ -2256,14 +2276,16 @@ has 'display_name_region' => (
  			'UY' => 'Uruguay',
  			'UZ' => 'Ouzbékistan',
  			'VA' => 'État de la Cité du Vatican',
- 			'VC' => 'Saint-Vincent-et-les-Grenadines',
+ 			'VC' => 'Saint-Vincent-et-les Grenadines',
  			'VE' => 'Venezuela',
  			'VG' => 'Îles Vierges britanniques',
  			'VI' => 'Îles Vierges des États-Unis',
- 			'VN' => 'Vietnam',
+ 			'VN' => 'Viêt Nam',
  			'VU' => 'Vanuatu',
  			'WF' => 'Wallis-et-Futuna',
  			'WS' => 'Samoa',
+ 			'XA' => 'pseudo-accents',
+ 			'XB' => 'pseudo-bidi',
  			'XK' => 'Kosovo',
  			'YE' => 'Yémen',
  			'YT' => 'Mayotte',
@@ -2280,7 +2302,7 @@ has 'display_name_variant' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'1901' => 'orthographe allemande traditionnelle',
  			'1994' => 'orthographe normalisée de Resia',
@@ -2288,48 +2310,76 @@ has 'display_name_variant' => (
  			'1606NICT' => 'françoys de 1606',
  			'1694ACAD' => 'françois académique de 1694',
  			'1959ACAD' => 'académique de 1959',
+ 			'ABL1943' => 'orthographe brésilienne de 1943',
+ 			'AKUAPEM' => 'akuapem',
  			'ALALC97' => 'romanisation ALA-LC de 1997',
  			'ALUKU' => 'dialecte aluku',
+ 			'AO1990' => 'orthographe portugaise de 1990',
+ 			'ARANES' => 'aranais',
  			'AREVELA' => 'arménien oriental',
  			'AREVMDA' => 'arménien occidental',
+ 			'ASANTE' => 'asante',
+ 			'AUVERN' => 'auvergnat',
  			'BAKU1926' => 'alphabet latin altaïque unifié',
  			'BALANKA' => 'dialecte balanka d’Anii',
  			'BARLA' => 'groupe dialectal capverdien barlavento',
+ 			'BASICENG' => 'anglais basic',
  			'BAUDDHA' => 'variante hybride bouddhiste',
  			'BISCAYAN' => 'biscayen',
  			'BISKE' => 'dialecte de San Giorgio / Bila',
  			'BOHORIC' => 'alphabet Bohorič',
  			'BOONT' => 'dialecte boontling',
+ 			'CISAUP' => 'cisalpin',
+ 			'COLB1945' => 'orthographe brésilienne de 1945',
+ 			'CORNU' => 'cornique',
+ 			'CREISS' => 'parlers du Croissant',
  			'DAJNKO' => 'alphabet Dajnko',
  			'EKAVSK' => 'prononciation serbe ékavienne',
  			'EMODENG' => 'ancien anglais moderne',
  			'FONIPA' => 'alphabet phonétique international',
+ 			'FONKIRSH' => 'alphabet phonétique de Kirshenbaum',
+ 			'FONNAPA' => 'alphabet phonétique nord-américain',
  			'FONUPA' => 'alphabet phonétique ouralique',
  			'FONXSAMP' => 'alphabet phonétique X-SAMPA',
+ 			'GASCON' => 'gascon',
+ 			'GRCLASS' => 'orthographe occitane classique',
+ 			'GRITAL' => 'orthographe occitane italisante',
+ 			'GRMISTR' => 'orthographe occitane mistralienne',
  			'HEPBURN' => 'romanisation Hepburn',
  			'HOGNORSK' => 'dialecte høgnorsk',
+ 			'HSISTEMO' => 'système orthographique H de l’espéranto',
  			'IJEKAVSK' => 'prononciation serbe ijékavienne',
  			'ITIHASA' => 'variante épique',
+ 			'IVANCHOV' => 'orthographe bulgare de 1899',
  			'JAUER' => 'dialecte jauer',
  			'JYUTPING' => 'romanisation Jyutping',
  			'KKCOR' => 'orthographe commune',
  			'KOCIEWIE' => 'dialecte polonais kociewiacy',
  			'KSCOR' => 'orthographe standard',
  			'LAUKIKA' => 'variante classique',
+ 			'LEMOSIN' => 'limousin',
+ 			'LENGADOC' => 'languedocien',
  			'LIPAW' => 'dialecte lipovaz de Resia',
  			'LUNA1918' => 'orthographe russe réformée de 1918',
  			'METELKO' => 'alphabet Metelko',
  			'MONOTON' => 'monotonique',
  			'NDYUKA' => 'dialecte ndyuka',
  			'NEDIS' => 'dialecte de Natisone',
+ 			'NEWFOUND' => 'anglais de Terre-Neuve',
+ 			'NICARD' => 'niçard',
  			'NJIVA' => 'dialecte de Gniva / Njiva',
  			'NULIK' => 'volapük moderne',
  			'OSOJS' => 'dialecte d’Oseacco / Osojane',
+ 			'OXENDICT' => 'orthographe anglaise du dictionnaire d’Oxford',
+ 			'PAHAWH2' => 'orthographe réduite pahawh hmong phase 2',
+ 			'PAHAWH3' => 'orthographe réduite pahawh hmong phase 3',
+ 			'PAHAWH4' => 'orthographe pahawh hmong version finale',
  			'PAMAKA' => 'dialecte pamaka',
  			'PETR1708' => 'orthographe pétrine de 1708',
  			'PINYIN' => 'pinyin',
  			'POLYTON' => 'polytonique',
  			'POSIX' => 'informatique',
+ 			'PROVENC' => 'provençal',
  			'PUTER' => 'idiome puter',
  			'REVISED' => 'orthographe révisée',
  			'RIGIK' => 'volapük classique',
@@ -2338,8 +2388,10 @@ has 'display_name_variant' => (
  			'SAAHO' => 'dialecte saho',
  			'SCOTLAND' => 'anglais standard écossais',
  			'SCOUSE' => 'dialecte scouse',
+ 			'SIMPLE' => 'simplifié',
  			'SOLBA' => 'dialecte de Stolvizza / Solbica',
  			'SOTAV' => 'groupe dialectal capverdien sotavento',
+ 			'SPANGLIS' => 'spanglish',
  			'SURMIRAN' => 'idiome surmiran',
  			'SURSILV' => 'idiome sursilvan',
  			'SUTSILV' => 'idiome sutsilvan',
@@ -2351,7 +2403,9 @@ has 'display_name_variant' => (
  			'VAIDIKA' => 'variante védique',
  			'VALENCIA' => 'valencien',
  			'VALLADER' => 'idiome vallader',
+ 			'VIVARAUP' => 'vivaro-alpin',
  			'WADEGILE' => 'Wade-Giles',
+ 			'XSISTEMO' => 'système orthographique X de l’espéranto',
 
 		}
 	},
@@ -2361,26 +2415,26 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'calendar' => 'calendrier',
  			'cf' => 'format de devise',
- 			'colalternate' => 'Tri ne tenant pas compte des symboles',
- 			'colbackwards' => 'Tri inversé des caractères accentués',
- 			'colcasefirst' => 'Classement basé sur les majuscules et les minuscules',
- 			'colcaselevel' => 'Tri sensible à la casse',
+ 			'colalternate' => 'tri ne tenant pas compte des symboles',
+ 			'colbackwards' => 'tri inversé des caractères accentués',
+ 			'colcasefirst' => 'classement basé sur les majuscules et les minuscules',
+ 			'colcaselevel' => 'tri sensible à la casse',
  			'collation' => 'ordre de tri',
- 			'colnormalization' => 'Tri normalisé',
- 			'colnumeric' => 'Tri numérique',
- 			'colstrength' => 'Priorité du tri',
+ 			'colnormalization' => 'tri normalisé',
+ 			'colnumeric' => 'tri numérique',
+ 			'colstrength' => 'priorité du tri',
  			'currency' => 'devise',
  			'hc' => 'système horaire (12 ou 24 heures)',
  			'lb' => 'style de saut de ligne',
  			'ms' => 'système de mesure',
  			'numbers' => 'nombres',
- 			'timezone' => 'Fuseau horaire',
- 			'va' => 'Variante locale',
- 			'x' => 'Usage privé',
+ 			'timezone' => 'fuseau horaire',
+ 			'va' => 'variante locale',
+ 			'x' => 'usage privé',
 
 		}
 	},
@@ -2506,6 +2560,7 @@ has 'display_name_type' => (
  				'cham' => q{chiffres chams},
  				'cyrl' => q{nombres cyrilliques},
  				'deva' => q{chiffres dévanagaris},
+ 				'diak' => q{chiffres dives akuru},
  				'ethi' => q{chiffres éthiopiens},
  				'finance' => q{Chiffres financiers},
  				'fullwide' => q{chiffres pleine chasse},
@@ -2523,6 +2578,7 @@ has 'display_name_type' => (
  				'hantfin' => q{chiffres financiers en chinois traditionnel},
  				'hebr' => q{chiffres hébreux},
  				'hmng' => q{chiffres pahawh hmongs},
+ 				'hmnp' => q{chiffres nyiakeng puachue hmong},
  				'java' => q{chiffres javanais},
  				'jpan' => q{chiffres japonais},
  				'jpanfin' => q{chiffres japonais financiers},
@@ -2570,9 +2626,11 @@ has 'display_name_type' => (
  				'thai' => q{chiffres thaïs},
  				'tibt' => q{chiffres tibétains},
  				'tirh' => q{chiffres tirhutas},
+ 				'tnsa' => q{chiffres tangsas},
  				'traditional' => q{Chiffres traditionnels},
  				'vaii' => q{Chiffres en vaï},
  				'wara' => q{chiffres warang-citis},
+ 				'wcho' => q{chiffres wantcho},
  			},
 
 		}
@@ -2583,7 +2641,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{métrique},
  			'UK' => q{impérial},
@@ -2597,7 +2655,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'langue : {0}',
  			'script' => 'écriture : {0}',
@@ -2619,8 +2677,8 @@ has 'characters' => (
 			auxiliary => qr{[á å ä ã ā ć ē í ì ī ĳ ñ ó ò ö õ ø ř š ſ ß ú ǔ]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
 			main => qr{[a à â æ b c ç d e é è ê ë f g h i î ï j k l m n o ô œ p q r s t u ù û ü v w x y ÿ z]},
-			numbers => qr{[  \- , . % ‰ + − 0 1 2 ² 3 ³ 4 5 6 7 8 9 ᵈ ᵉ ʳ ˢ]},
-			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ’ " “ ” « » ( ) \[ \] § @ * / \& # † ‡]},
+			numbers => qr{[  \- ‑ , . % ‰ + − 0 1 2 ² 3 ³ 4 5 6 7 8 9 ᵈ ᵉ ʳ ˢ]},
+			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ’ " “ ” « » ( ) \[ \] § @ * / \& # † ‡]},
 		};
 	},
 EOT
@@ -2698,2208 +2756,7087 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
 					'' => {
 						'name' => q(direction),
 					},
-					'acre' => {
-						'name' => q(acres anglo-saxonnes),
-						'one' => q({0} acre anglo-saxonne),
-						'other' => q({0} acres anglo-saxonnes),
+					# Core Unit Identifier
+					'' => {
+						'name' => q(direction),
 					},
-					'acre-foot' => {
-						'name' => q(acres-pieds),
-						'one' => q({0} acre-pied),
-						'other' => q({0} acres-pieds),
+					# Long Unit Identifier
+					'1024p1' => {
+						'1' => q(kibi{0}),
 					},
-					'ampere' => {
-						'name' => q(ampères),
-						'one' => q({0} ampère),
-						'other' => q({0} ampères),
+					# Core Unit Identifier
+					'1024p1' => {
+						'1' => q(kibi{0}),
 					},
-					'arc-minute' => {
-						'name' => q(minutes d’arc),
-						'one' => q({0} minute d’arc),
-						'other' => q({0} minutes d’arc),
+					# Long Unit Identifier
+					'1024p2' => {
+						'1' => q(mébi{0}),
 					},
-					'arc-second' => {
-						'name' => q(secondes d’arc),
-						'one' => q({0} seconde d’arc),
-						'other' => q({0} secondes d’arc),
+					# Core Unit Identifier
+					'1024p2' => {
+						'1' => q(mébi{0}),
 					},
-					'astronomical-unit' => {
-						'name' => q(unités astronomiques),
-						'one' => q({0} unité astronomique),
-						'other' => q({0} unités astronomiques),
+					# Long Unit Identifier
+					'1024p3' => {
+						'1' => q(gibi{0}),
 					},
-					'atmosphere' => {
-						'name' => q(atmosphères),
-						'one' => q({0} atmosphère),
-						'other' => q({0} atmosphères),
+					# Core Unit Identifier
+					'1024p3' => {
+						'1' => q(gibi{0}),
 					},
-					'bit' => {
-						'name' => q(bits),
-						'one' => q({0} bit),
-						'other' => q({0} bits),
+					# Long Unit Identifier
+					'1024p4' => {
+						'1' => q(tébi{0}),
 					},
-					'bushel' => {
-						'name' => q(boisseaux),
-						'one' => q({0} boisseau),
-						'other' => q({0} boisseaux),
+					# Core Unit Identifier
+					'1024p4' => {
+						'1' => q(tébi{0}),
 					},
-					'byte' => {
-						'name' => q(octets),
-						'one' => q({0} octet),
-						'other' => q({0} octets),
+					# Long Unit Identifier
+					'1024p5' => {
+						'1' => q(pébi{0}),
 					},
-					'calorie' => {
-						'name' => q(calories),
-						'one' => q({0} calorie),
-						'other' => q({0} calories),
+					# Core Unit Identifier
+					'1024p5' => {
+						'1' => q(pébi{0}),
 					},
-					'carat' => {
-						'name' => q(carats),
-						'one' => q({0} carat),
-						'other' => q({0} carats),
+					# Long Unit Identifier
+					'1024p6' => {
+						'1' => q(exbi{0}),
 					},
-					'celsius' => {
-						'name' => q(degrés Celsius),
-						'one' => q({0} degré Celsius),
-						'other' => q({0} degrés Celsius),
+					# Core Unit Identifier
+					'1024p6' => {
+						'1' => q(exbi{0}),
 					},
-					'centiliter' => {
-						'name' => q(centilitres),
-						'one' => q({0} centilitre),
-						'other' => q({0} centilitres),
+					# Long Unit Identifier
+					'1024p7' => {
+						'1' => q(zébi{0}),
 					},
-					'centimeter' => {
-						'name' => q(centimètres),
-						'one' => q({0} centimètre),
-						'other' => q({0} centimètres),
-						'per' => q({0} par centimètre),
+					# Core Unit Identifier
+					'1024p7' => {
+						'1' => q(zébi{0}),
 					},
-					'century' => {
-						'name' => q(siècles),
-						'one' => q({0} siècle),
-						'other' => q({0} siècles),
+					# Long Unit Identifier
+					'1024p8' => {
+						'1' => q(yobi{0}),
 					},
-					'coordinate' => {
-						'east' => q({0} est),
-						'north' => q({0} nord),
-						'south' => q({0} sud),
-						'west' => q({0} ouest),
+					# Core Unit Identifier
+					'1024p8' => {
+						'1' => q(yobi{0}),
 					},
-					'cubic-centimeter' => {
-						'name' => q(centimètres cubes),
-						'one' => q({0} centimètre cube),
-						'other' => q({0} centimètres cubes),
-						'per' => q({0} par centimètre cube),
+					# Long Unit Identifier
+					'10p-1' => {
+						'1' => q(déci{0}),
 					},
-					'cubic-foot' => {
-						'name' => q(pieds cubes),
-						'one' => q({0} pied cube),
-						'other' => q({0} pieds cubes),
+					# Core Unit Identifier
+					'1' => {
+						'1' => q(déci{0}),
 					},
-					'cubic-inch' => {
-						'name' => q(pouces cubes),
-						'one' => q({0} pouce cube),
-						'other' => q({0} pouces cubes),
+					# Long Unit Identifier
+					'10p-12' => {
+						'1' => q(pico{0}),
 					},
-					'cubic-kilometer' => {
-						'name' => q(kilomètres cubes),
-						'one' => q({0} kilomètre cube),
-						'other' => q({0} kilomètres cubes),
+					# Core Unit Identifier
+					'12' => {
+						'1' => q(pico{0}),
 					},
-					'cubic-meter' => {
-						'name' => q(mètres cubes),
-						'one' => q({0} mètre cube),
-						'other' => q({0} mètres cubes),
-						'per' => q({0} par mètre cube),
+					# Long Unit Identifier
+					'10p-15' => {
+						'1' => q(femto{0}),
 					},
-					'cubic-mile' => {
-						'name' => q(milles cubes),
-						'one' => q({0} mille cube),
-						'other' => q({0} milles cubes),
+					# Core Unit Identifier
+					'15' => {
+						'1' => q(femto{0}),
 					},
-					'cubic-yard' => {
-						'name' => q(yards cubes),
-						'one' => q({0} yard cube),
-						'other' => q({0} yards cubes),
+					# Long Unit Identifier
+					'10p-18' => {
+						'1' => q(atto{0}),
 					},
-					'cup' => {
-						'name' => q(tasses),
-						'one' => q({0} tasse),
-						'other' => q({0} tasses),
+					# Core Unit Identifier
+					'18' => {
+						'1' => q(atto{0}),
 					},
-					'cup-metric' => {
-						'name' => q(tasses métriques),
-						'one' => q({0} tasse métrique),
-						'other' => q({0} tasses métriques),
+					# Long Unit Identifier
+					'10p-2' => {
+						'1' => q(centi{0}),
 					},
-					'day' => {
-						'name' => q(jours),
-						'one' => q({0} jour),
-						'other' => q({0} jours),
-						'per' => q({0} par jour),
+					# Core Unit Identifier
+					'2' => {
+						'1' => q(centi{0}),
 					},
-					'deciliter' => {
-						'name' => q(décilitres),
-						'one' => q({0} décilitre),
-						'other' => q({0} décilitres),
+					# Long Unit Identifier
+					'10p-21' => {
+						'1' => q(zepto{0}),
 					},
-					'decimeter' => {
-						'name' => q(décimètres),
-						'one' => q({0} décimètre),
-						'other' => q({0} décimètres),
+					# Core Unit Identifier
+					'21' => {
+						'1' => q(zepto{0}),
 					},
-					'degree' => {
-						'name' => q(degrés),
-						'one' => q({0} degré),
-						'other' => q({0} degrés),
+					# Long Unit Identifier
+					'10p-24' => {
+						'1' => q(yocto{0}),
 					},
-					'fahrenheit' => {
-						'name' => q(degrés Fahrenheit),
-						'one' => q({0} degré Fahrenheit),
-						'other' => q({0} degrés Fahrenheit),
+					# Core Unit Identifier
+					'24' => {
+						'1' => q(yocto{0}),
 					},
-					'fathom' => {
-						'name' => q(brasses),
-						'one' => q({0} brasse),
-						'other' => q({0} brasses),
+					# Long Unit Identifier
+					'10p-3' => {
+						'1' => q(milli{0}),
 					},
-					'fluid-ounce' => {
-						'name' => q(onces liquides),
-						'one' => q({0} once liquide),
-						'other' => q({0} onces liquides),
+					# Core Unit Identifier
+					'3' => {
+						'1' => q(milli{0}),
 					},
-					'foodcalorie' => {
-						'name' => q(kilocalories),
-						'one' => q({0} kilocalorie),
-						'other' => q({0} kilocalories),
+					# Long Unit Identifier
+					'10p-6' => {
+						'1' => q(micro{0}),
 					},
-					'foot' => {
-						'name' => q(pieds),
-						'one' => q({0} pied),
-						'other' => q({0} pieds),
-						'per' => q({0} par pied),
+					# Core Unit Identifier
+					'6' => {
+						'1' => q(micro{0}),
 					},
-					'furlong' => {
-						'name' => q(furlongs),
-						'one' => q({0} furlong),
-						'other' => q({0} furlongs),
+					# Long Unit Identifier
+					'10p-9' => {
+						'1' => q(nano{0}),
 					},
-					'g-force' => {
+					# Core Unit Identifier
+					'9' => {
+						'1' => q(nano{0}),
+					},
+					# Long Unit Identifier
+					'10p1' => {
+						'1' => q(déca{0}),
+					},
+					# Core Unit Identifier
+					'10p1' => {
+						'1' => q(déca{0}),
+					},
+					# Long Unit Identifier
+					'10p12' => {
+						'1' => q(téra{0}),
+					},
+					# Core Unit Identifier
+					'10p12' => {
+						'1' => q(téra{0}),
+					},
+					# Long Unit Identifier
+					'10p15' => {
+						'1' => q(péta{0}),
+					},
+					# Core Unit Identifier
+					'10p15' => {
+						'1' => q(péta{0}),
+					},
+					# Long Unit Identifier
+					'10p18' => {
+						'1' => q(exa{0}),
+					},
+					# Core Unit Identifier
+					'10p18' => {
+						'1' => q(exa{0}),
+					},
+					# Long Unit Identifier
+					'10p2' => {
+						'1' => q(hecto{0}),
+					},
+					# Core Unit Identifier
+					'10p2' => {
+						'1' => q(hecto{0}),
+					},
+					# Long Unit Identifier
+					'10p21' => {
+						'1' => q(zetta{0}),
+					},
+					# Core Unit Identifier
+					'10p21' => {
+						'1' => q(zetta{0}),
+					},
+					# Long Unit Identifier
+					'10p24' => {
+						'1' => q(yotta{0}),
+					},
+					# Core Unit Identifier
+					'10p24' => {
+						'1' => q(yotta{0}),
+					},
+					# Long Unit Identifier
+					'10p3' => {
+						'1' => q(kilo{0}),
+					},
+					# Core Unit Identifier
+					'10p3' => {
+						'1' => q(kilo{0}),
+					},
+					# Long Unit Identifier
+					'10p6' => {
+						'1' => q(méga{0}),
+					},
+					# Core Unit Identifier
+					'10p6' => {
+						'1' => q(méga{0}),
+					},
+					# Long Unit Identifier
+					'10p9' => {
+						'1' => q(giga{0}),
+					},
+					# Core Unit Identifier
+					'10p9' => {
+						'1' => q(giga{0}),
+					},
+					# Long Unit Identifier
+					'acceleration-g-force' => {
+						'1' => q(feminine),
 						'name' => q(accélération de pesanteur terrestre),
 						'one' => q({0} fois l’accélération de pesanteur terrestre),
 						'other' => q({0} fois l’accélération de pesanteur terrestre),
 					},
-					'gallon' => {
-						'name' => q(gallons),
-						'one' => q({0} gallon),
-						'other' => q({0} gallons),
-						'per' => q({0} par gallon),
+					# Core Unit Identifier
+					'g-force' => {
+						'1' => q(feminine),
+						'name' => q(accélération de pesanteur terrestre),
+						'one' => q({0} fois l’accélération de pesanteur terrestre),
+						'other' => q({0} fois l’accélération de pesanteur terrestre),
 					},
-					'gallon-imperial' => {
-						'name' => q(gallons impériaux),
-						'one' => q({0} gallon impérial),
-						'other' => q({0} gallons impériaux),
-						'per' => q({0} par gallon impérial),
-					},
-					'generic' => {
-						'name' => q(degrés),
-						'one' => q({0} degré),
-						'other' => q({0} degrés),
-					},
-					'gigabit' => {
-						'name' => q(gigabits),
-						'one' => q({0} gigabit),
-						'other' => q({0} gigabits),
-					},
-					'gigabyte' => {
-						'name' => q(gigaoctets),
-						'one' => q({0} gigaoctet),
-						'other' => q({0} gigaoctets),
-					},
-					'gigahertz' => {
-						'name' => q(gigahertz),
-						'one' => q({0} gigahertz),
-						'other' => q({0} gigahertz),
-					},
-					'gigawatt' => {
-						'name' => q(gigawatts),
-						'one' => q({0} gigawatt),
-						'other' => q({0} gigawatts),
-					},
-					'gram' => {
-						'name' => q(grammes),
-						'one' => q({0} gramme),
-						'other' => q({0} grammes),
-						'per' => q({0} par gramme),
-					},
-					'hectare' => {
-						'name' => q(hectares),
-						'one' => q({0} hectare),
-						'other' => q({0} hectares),
-					},
-					'hectoliter' => {
-						'name' => q(hectolitres),
-						'one' => q({0} hectolitre),
-						'other' => q({0} hectolitres),
-					},
-					'hectopascal' => {
-						'name' => q(hectopascals),
-						'one' => q({0} hectopascal),
-						'other' => q({0} hectopascals),
-					},
-					'hertz' => {
-						'name' => q(hertz),
-						'one' => q({0} hertz),
-						'other' => q({0} hertz),
-					},
-					'horsepower' => {
-						'name' => q(chevaux-vapeur),
-						'one' => q({0} cheval-vapeur),
-						'other' => q({0} chevaux-vapeur),
-					},
-					'hour' => {
-						'name' => q(heures),
-						'one' => q({0} heure),
-						'other' => q({0} heures),
-						'per' => q({0} par heure),
-					},
-					'inch' => {
-						'name' => q(pouces),
-						'one' => q({0} pouce),
-						'other' => q({0} pouces),
-						'per' => q({0} par pouce),
-					},
-					'inch-hg' => {
-						'name' => q(pouces de mercure),
-						'one' => q({0} pouce de mercure),
-						'other' => q({0} pouces de mercure),
-					},
-					'joule' => {
-						'name' => q(joules),
-						'one' => q({0} joule),
-						'other' => q({0} joules),
-					},
-					'karat' => {
-						'name' => q(carats),
-						'one' => q({0} carat),
-						'other' => q({0} carats),
-					},
-					'kelvin' => {
-						'name' => q(kelvins),
-						'one' => q({0} kelvin),
-						'other' => q({0} kelvins),
-					},
-					'kilobit' => {
-						'name' => q(kilobits),
-						'one' => q({0} kilobit),
-						'other' => q({0} kilobits),
-					},
-					'kilobyte' => {
-						'name' => q(kilooctets),
-						'one' => q({0} kilooctet),
-						'other' => q({0} kilooctets),
-					},
-					'kilocalorie' => {
-						'name' => q(kilocalories),
-						'one' => q({0} kilocalorie),
-						'other' => q({0} kilocalories),
-					},
-					'kilogram' => {
-						'name' => q(kilogrammes),
-						'one' => q({0} kilogramme),
-						'other' => q({0} kilogrammes),
-						'per' => q({0} par kg),
-					},
-					'kilohertz' => {
-						'name' => q(kilohertz),
-						'one' => q({0} kilohertz),
-						'other' => q({0} kilohertz),
-					},
-					'kilojoule' => {
-						'name' => q(kilojoules),
-						'one' => q({0} kilojoule),
-						'other' => q({0} kilojoules),
-					},
-					'kilometer' => {
-						'name' => q(kilomètres),
-						'one' => q({0} kilomètre),
-						'other' => q({0} kilomètres),
-						'per' => q({0} par kilomètre),
-					},
-					'kilometer-per-hour' => {
-						'name' => q(kilomètres par heure),
-						'one' => q({0} kilomètre par heure),
-						'other' => q({0} kilomètres par heure),
-					},
-					'kilowatt' => {
-						'name' => q(kilowatts),
-						'one' => q({0} kilowatt),
-						'other' => q({0} kilowatts),
-					},
-					'kilowatt-hour' => {
-						'name' => q(kilowattheures),
-						'one' => q({0} kilowattheure),
-						'other' => q({0} kilowattheures),
-					},
-					'knot' => {
-						'name' => q(nœuds),
-						'one' => q({0} nœud),
-						'other' => q({0} nœuds),
-					},
-					'light-year' => {
-						'name' => q(années-lumière),
-						'one' => q({0} année-lumière),
-						'other' => q({0} années-lumière),
-					},
-					'liter' => {
-						'name' => q(litres),
-						'one' => q({0} litre),
-						'other' => q({0} litres),
-						'per' => q({0} par litre),
-					},
-					'liter-per-100kilometers' => {
-						'name' => q(litres aux 100 km),
-						'one' => q({0} litre aux 100 km),
-						'other' => q({0} litres aux 100 km),
-					},
-					'liter-per-kilometer' => {
-						'name' => q(litres au kilomètre),
-						'one' => q({0} litre au kilomètre),
-						'other' => q({0} litres au kilomètre),
-					},
-					'lux' => {
-						'name' => q(lux),
-						'one' => q({0} lux),
-						'other' => q({0} lux),
-					},
-					'megabit' => {
-						'name' => q(mégabits),
-						'one' => q({0} mégabit),
-						'other' => q({0} mégabits),
-					},
-					'megabyte' => {
-						'name' => q(mégaoctets),
-						'one' => q({0} mégaoctet),
-						'other' => q({0} mégaoctets),
-					},
-					'megahertz' => {
-						'name' => q(mégahertz),
-						'one' => q({0} mégahertz),
-						'other' => q({0} mégahertz),
-					},
-					'megaliter' => {
-						'name' => q(mégalitres),
-						'one' => q({0} mégalitre),
-						'other' => q({0} mégalitres),
-					},
-					'megawatt' => {
-						'name' => q(mégawatts),
-						'one' => q({0} mégawatt),
-						'other' => q({0} mégawatts),
-					},
-					'meter' => {
-						'name' => q(mètres),
-						'one' => q({0} mètre),
-						'other' => q({0} mètres),
-						'per' => q({0} par mètre),
-					},
-					'meter-per-second' => {
-						'name' => q(mètres par seconde),
-						'one' => q({0} mètre par seconde),
-						'other' => q({0} mètres par seconde),
-					},
-					'meter-per-second-squared' => {
+					# Long Unit Identifier
+					'acceleration-meter-per-square-second' => {
+						'1' => q(masculine),
 						'name' => q(mètres par seconde carrée),
 						'one' => q({0} mètre par seconde carrée),
 						'other' => q({0} mètres par seconde carrée),
 					},
-					'metric-ton' => {
-						'name' => q(tonnes),
-						'one' => q({0} tonne),
-						'other' => q({0} tonnes),
+					# Core Unit Identifier
+					'meter-per-square-second' => {
+						'1' => q(masculine),
+						'name' => q(mètres par seconde carrée),
+						'one' => q({0} mètre par seconde carrée),
+						'other' => q({0} mètres par seconde carrée),
 					},
-					'microgram' => {
-						'name' => q(microgrammes),
-						'one' => q({0} microgramme),
-						'other' => q({0} microgrammes),
+					# Long Unit Identifier
+					'angle-arc-minute' => {
+						'1' => q(feminine),
+						'name' => q(minutes d’arc),
+						'one' => q({0} minute d’arc),
+						'other' => q({0} minutes d’arc),
 					},
-					'micrometer' => {
-						'name' => q(micromètres),
-						'one' => q({0} micromètre),
-						'other' => q({0} micromètres),
+					# Core Unit Identifier
+					'arc-minute' => {
+						'1' => q(feminine),
+						'name' => q(minutes d’arc),
+						'one' => q({0} minute d’arc),
+						'other' => q({0} minutes d’arc),
 					},
-					'microsecond' => {
-						'name' => q(microsecondes),
-						'one' => q({0} microseconde),
-						'other' => q({0} microsecondes),
+					# Long Unit Identifier
+					'angle-arc-second' => {
+						'1' => q(feminine),
+						'name' => q(secondes d’arc),
+						'one' => q({0} seconde d’arc),
+						'other' => q({0} secondes d’arc),
 					},
-					'mile' => {
-						'name' => q(miles),
-						'one' => q({0} mile),
-						'other' => q({0} miles),
+					# Core Unit Identifier
+					'arc-second' => {
+						'1' => q(feminine),
+						'name' => q(secondes d’arc),
+						'one' => q({0} seconde d’arc),
+						'other' => q({0} secondes d’arc),
 					},
-					'mile-per-gallon' => {
-						'name' => q(miles par gallon),
-						'one' => q({0} mile par gallon),
-						'other' => q({0} miles par gallon),
+					# Long Unit Identifier
+					'angle-degree' => {
+						'1' => q(masculine),
+						'name' => q(degrés),
+						'one' => q({0} degré),
+						'other' => q({0} degrés),
 					},
-					'mile-per-gallon-imperial' => {
-						'name' => q(miles par gallon impérial),
-						'one' => q({0} mile par gallon impérial),
-						'other' => q({0} miles par gallon impérial),
+					# Core Unit Identifier
+					'degree' => {
+						'1' => q(masculine),
+						'name' => q(degrés),
+						'one' => q({0} degré),
+						'other' => q({0} degrés),
 					},
-					'mile-per-hour' => {
-						'name' => q(miles par heure),
-						'one' => q({0} mile par heure),
-						'other' => q({0} miles par heure),
-					},
-					'mile-scandinavian' => {
-						'name' => q(milles scandinaves),
-						'one' => q({0} mille scandinave),
-						'other' => q({0} milles scandinaves),
-					},
-					'milliampere' => {
-						'name' => q(milliampères),
-						'one' => q({0} milliampère),
-						'other' => q({0} milliampères),
-					},
-					'millibar' => {
-						'name' => q(millibars),
-						'one' => q({0} millibar),
-						'other' => q({0} millibars),
-					},
-					'milligram' => {
-						'name' => q(milligrammes),
-						'one' => q({0} milligramme),
-						'other' => q({0} milligrammes),
-					},
-					'milligram-per-deciliter' => {
-						'name' => q(milligrammes par décilitre),
-						'one' => q({0} milligramme par décilitre),
-						'other' => q({0} milligrammes par décilitre),
-					},
-					'milliliter' => {
-						'name' => q(millilitres),
-						'one' => q({0} millilitre),
-						'other' => q({0} millilitres),
-					},
-					'millimeter' => {
-						'name' => q(millimètres),
-						'one' => q({0} millimètre),
-						'other' => q({0} millimètres),
-					},
-					'millimeter-of-mercury' => {
-						'name' => q(millimètres de mercure),
-						'one' => q({0} millimètre de mercure),
-						'other' => q({0} millimètres de mercure),
-					},
-					'millimole-per-liter' => {
-						'name' => q(millimoles par litre),
-						'one' => q({0} millimole par litre),
-						'other' => q({0} millimoles par litre),
-					},
-					'millisecond' => {
-						'name' => q(millisecondes),
-						'one' => q({0} milliseconde),
-						'other' => q({0} millisecondes),
-					},
-					'milliwatt' => {
-						'name' => q(milliwatts),
-						'one' => q({0} milliwatt),
-						'other' => q({0} milliwatts),
-					},
-					'minute' => {
-						'name' => q(minutes),
-						'one' => q({0} minute),
-						'other' => q({0} minutes),
-						'per' => q({0} par minute),
-					},
-					'month' => {
-						'name' => q(mois),
-						'one' => q({0} mois),
-						'other' => q({0} mois),
-						'per' => q({0} par mois),
-					},
-					'nanometer' => {
-						'name' => q(nanomètres),
-						'one' => q({0} nanomètre),
-						'other' => q({0} nanomètres),
-					},
-					'nanosecond' => {
-						'name' => q(nanosecondes),
-						'one' => q({0} nanoseconde),
-						'other' => q({0} nanosecondes),
-					},
-					'nautical-mile' => {
-						'name' => q(milles marins),
-						'one' => q({0} mille marin),
-						'other' => q({0} milles marins),
-					},
-					'ohm' => {
-						'name' => q(ohms),
-						'one' => q({0} ohm),
-						'other' => q({0} ohms),
-					},
-					'ounce' => {
-						'name' => q(onces),
-						'one' => q({0} once),
-						'other' => q({0} onces),
-						'per' => q({0} par once),
-					},
-					'ounce-troy' => {
-						'name' => q(onces troy),
-						'one' => q({0} once troy),
-						'other' => q({0} onces troy),
-					},
-					'parsec' => {
-						'name' => q(parsecs),
-						'one' => q({0} parsec),
-						'other' => q({0} parsecs),
-					},
-					'part-per-million' => {
-						'name' => q(parts par million),
-						'one' => q({0} part par million),
-						'other' => q({0} parts par million),
-					},
-					'per' => {
-						'1' => q({0} par {1}),
-					},
-					'percent' => {
-						'name' => q(pour cent),
-						'one' => q({0} pour cent),
-						'other' => q({0}%),
-					},
-					'permille' => {
-						'name' => q(pour mille),
-						'one' => q({0} pour mille),
-						'other' => q({0} pour mille),
-					},
-					'petabyte' => {
-						'name' => q(pétaoctets),
-						'one' => q({0} pétaoctet),
-						'other' => q({0} pétaoctets),
-					},
-					'picometer' => {
-						'name' => q(picomètres),
-						'one' => q({0} picomètre),
-						'other' => q({0} picomètres),
-					},
-					'pint' => {
-						'name' => q(pintes),
-						'one' => q({0} pinte),
-						'other' => q({0} pintes),
-					},
-					'pint-metric' => {
-						'name' => q(pintes métriques),
-						'one' => q({0} pinte métrique),
-						'other' => q({0} pintes métriques),
-					},
-					'point' => {
-						'name' => q(points),
-						'one' => q({0} point),
-						'other' => q({0} points),
-					},
-					'pound' => {
-						'name' => q(livres),
-						'one' => q({0} livre),
-						'other' => q({0} livres),
-						'per' => q({0} par livre),
-					},
-					'pound-per-square-inch' => {
-						'name' => q(livres par pouce carré),
-						'one' => q({0} livre par pouce carré),
-						'other' => q({0} livres par pouce carré),
-					},
-					'quart' => {
-						'name' => q(quarts),
-						'one' => q({0} quart),
-						'other' => q({0} quarts),
-					},
-					'radian' => {
+					# Long Unit Identifier
+					'angle-radian' => {
+						'1' => q(masculine),
 						'name' => q(radians),
 						'one' => q({0} radian),
 						'other' => q({0} radians),
 					},
-					'revolution' => {
+					# Core Unit Identifier
+					'radian' => {
+						'1' => q(masculine),
+						'name' => q(radians),
+						'one' => q({0} radian),
+						'other' => q({0} radians),
+					},
+					# Long Unit Identifier
+					'angle-revolution' => {
+						'1' => q(masculine),
 						'name' => q(tour),
 						'one' => q({0} tour),
 						'other' => q({0} tours),
 					},
-					'second' => {
-						'name' => q(secondes),
-						'one' => q({0} seconde),
-						'other' => q({0} secondes),
-						'per' => q({0} par seconde),
+					# Core Unit Identifier
+					'revolution' => {
+						'1' => q(masculine),
+						'name' => q(tour),
+						'one' => q({0} tour),
+						'other' => q({0} tours),
 					},
-					'square-centimeter' => {
+					# Long Unit Identifier
+					'area-acre' => {
+						'1' => q(feminine),
+						'name' => q(acres anglo-saxonnes),
+						'one' => q({0} acre anglo-saxonne),
+						'other' => q({0} acres anglo-saxonnes),
+					},
+					# Core Unit Identifier
+					'acre' => {
+						'1' => q(feminine),
+						'name' => q(acres anglo-saxonnes),
+						'one' => q({0} acre anglo-saxonne),
+						'other' => q({0} acres anglo-saxonnes),
+					},
+					# Long Unit Identifier
+					'area-dunam' => {
+						'name' => q(dounams),
+						'one' => q({0} dounam),
+						'other' => q({0} dounams),
+					},
+					# Core Unit Identifier
+					'dunam' => {
+						'name' => q(dounams),
+						'one' => q({0} dounam),
+						'other' => q({0} dounams),
+					},
+					# Long Unit Identifier
+					'area-hectare' => {
+						'1' => q(masculine),
+						'name' => q(hectares),
+						'one' => q({0} hectare),
+						'other' => q({0} hectares),
+					},
+					# Core Unit Identifier
+					'hectare' => {
+						'1' => q(masculine),
+						'name' => q(hectares),
+						'one' => q({0} hectare),
+						'other' => q({0} hectares),
+					},
+					# Long Unit Identifier
+					'area-square-centimeter' => {
+						'1' => q(masculine),
 						'name' => q(centimètres carrés),
 						'one' => q({0} centimètre carré),
 						'other' => q({0} centimètres carrés),
 						'per' => q({0} par centimètre carré),
 					},
-					'square-foot' => {
+					# Core Unit Identifier
+					'square-centimeter' => {
+						'1' => q(masculine),
+						'name' => q(centimètres carrés),
+						'one' => q({0} centimètre carré),
+						'other' => q({0} centimètres carrés),
+						'per' => q({0} par centimètre carré),
+					},
+					# Long Unit Identifier
+					'area-square-foot' => {
+						'1' => q(masculine),
 						'name' => q(pieds carrés),
 						'one' => q({0} pied carré),
 						'other' => q({0} pieds carrés),
 					},
+					# Core Unit Identifier
+					'square-foot' => {
+						'1' => q(masculine),
+						'name' => q(pieds carrés),
+						'one' => q({0} pied carré),
+						'other' => q({0} pieds carrés),
+					},
+					# Long Unit Identifier
+					'area-square-inch' => {
+						'name' => q(pouces carrés),
+						'one' => q({0} pouce carré),
+						'other' => q({0} pouces carrés),
+						'per' => q({0} par pouce carré),
+					},
+					# Core Unit Identifier
 					'square-inch' => {
 						'name' => q(pouces carrés),
 						'one' => q({0} pouce carré),
 						'other' => q({0} pouces carrés),
 						'per' => q({0} par pouce carré),
 					},
-					'square-kilometer' => {
+					# Long Unit Identifier
+					'area-square-kilometer' => {
+						'1' => q(masculine),
 						'name' => q(kilomètres carrés),
 						'one' => q({0} kilomètre carré),
 						'other' => q({0} kilomètres carrés),
 						'per' => q({0}/km²),
 					},
+					# Core Unit Identifier
+					'square-kilometer' => {
+						'1' => q(masculine),
+						'name' => q(kilomètres carrés),
+						'one' => q({0} kilomètre carré),
+						'other' => q({0} kilomètres carrés),
+						'per' => q({0}/km²),
+					},
+					# Long Unit Identifier
+					'area-square-meter' => {
+						'name' => q(mètres carrés),
+						'one' => q({0} mètre carré),
+						'other' => q({0} mètres carrés),
+						'per' => q({0} par mètre carré),
+					},
+					# Core Unit Identifier
 					'square-meter' => {
 						'name' => q(mètres carrés),
 						'one' => q({0} mètre carré),
 						'other' => q({0} mètres carrés),
 						'per' => q({0} par mètre carré),
 					},
-					'square-mile' => {
+					# Long Unit Identifier
+					'area-square-mile' => {
+						'1' => q(masculine),
 						'name' => q(milles carrés),
 						'one' => q({0} mille carré),
 						'other' => q({0} milles carrés),
 						'per' => q({0}/mi²),
 					},
+					# Core Unit Identifier
+					'square-mile' => {
+						'1' => q(masculine),
+						'name' => q(milles carrés),
+						'one' => q({0} mille carré),
+						'other' => q({0} milles carrés),
+						'per' => q({0}/mi²),
+					},
+					# Long Unit Identifier
+					'area-square-yard' => {
+						'name' => q(yards carrés),
+						'one' => q({0} yard carré),
+						'other' => q({0} yards carrés),
+					},
+					# Core Unit Identifier
 					'square-yard' => {
 						'name' => q(yards carrés),
 						'one' => q({0} yard carré),
 						'other' => q({0} yards carrés),
 					},
-					'stone' => {
-						'name' => q(stones),
-						'one' => q({0} stone),
-						'other' => q({0} stones),
+					# Long Unit Identifier
+					'concentr-item' => {
+						'name' => q(items),
+						'one' => q({0} items),
+						'other' => q({0} items),
 					},
-					'tablespoon' => {
-						'name' => q(cuillères à soupe),
-						'one' => q({0} cuillère à soupe),
-						'other' => q({0} cuillères à soupe),
+					# Core Unit Identifier
+					'item' => {
+						'name' => q(items),
+						'one' => q({0} items),
+						'other' => q({0} items),
 					},
-					'teaspoon' => {
-						'name' => q(cuillères à café),
-						'one' => q({0} cuillère à café),
-						'other' => q({0} cuillères à café),
+					# Long Unit Identifier
+					'concentr-karat' => {
+						'1' => q(masculine),
+						'name' => q(carats),
+						'one' => q({0} carat),
+						'other' => q({0} carats),
 					},
+					# Core Unit Identifier
+					'karat' => {
+						'1' => q(masculine),
+						'name' => q(carats),
+						'one' => q({0} carat),
+						'other' => q({0} carats),
+					},
+					# Long Unit Identifier
+					'concentr-milligram-ofglucose-per-deciliter' => {
+						'name' => q(milligrammes par décilitre),
+						'one' => q({0} milligramme par décilitre),
+						'other' => q({0} milligrammes par décilitre),
+					},
+					# Core Unit Identifier
+					'milligram-ofglucose-per-deciliter' => {
+						'name' => q(milligrammes par décilitre),
+						'one' => q({0} milligramme par décilitre),
+						'other' => q({0} milligrammes par décilitre),
+					},
+					# Long Unit Identifier
+					'concentr-millimole-per-liter' => {
+						'name' => q(millimoles par litre),
+						'one' => q({0} millimole par litre),
+						'other' => q({0} millimoles par litre),
+					},
+					# Core Unit Identifier
+					'millimole-per-liter' => {
+						'name' => q(millimoles par litre),
+						'one' => q({0} millimole par litre),
+						'other' => q({0} millimoles par litre),
+					},
+					# Long Unit Identifier
+					'concentr-mole' => {
+						'1' => q(feminine),
+						'name' => q(moles),
+						'one' => q({0} mole),
+						'other' => q({0} moles),
+					},
+					# Core Unit Identifier
+					'mole' => {
+						'1' => q(feminine),
+						'name' => q(moles),
+						'one' => q({0} mole),
+						'other' => q({0} moles),
+					},
+					# Long Unit Identifier
+					'concentr-percent' => {
+						'1' => q(masculine),
+						'name' => q(pour cent),
+						'one' => q({0} pour cent),
+						'other' => q({0} pour cent),
+					},
+					# Core Unit Identifier
+					'percent' => {
+						'1' => q(masculine),
+						'name' => q(pour cent),
+						'one' => q({0} pour cent),
+						'other' => q({0} pour cent),
+					},
+					# Long Unit Identifier
+					'concentr-permille' => {
+						'1' => q(masculine),
+						'name' => q(pour mille),
+						'one' => q({0} pour mille),
+						'other' => q({0} pour mille),
+					},
+					# Core Unit Identifier
+					'permille' => {
+						'1' => q(masculine),
+						'name' => q(pour mille),
+						'one' => q({0} pour mille),
+						'other' => q({0} pour mille),
+					},
+					# Long Unit Identifier
+					'concentr-permillion' => {
+						'1' => q(feminine),
+						'name' => q(parts par million),
+						'one' => q({0} part par million),
+						'other' => q({0} parts par million),
+					},
+					# Core Unit Identifier
+					'permillion' => {
+						'1' => q(feminine),
+						'name' => q(parts par million),
+						'one' => q({0} part par million),
+						'other' => q({0} parts par million),
+					},
+					# Long Unit Identifier
+					'concentr-permyriad' => {
+						'1' => q(masculine),
+						'name' => q(pour dix mille),
+						'one' => q({0} pour dix mille),
+						'other' => q({0} pour dix mille),
+					},
+					# Core Unit Identifier
+					'permyriad' => {
+						'1' => q(masculine),
+						'name' => q(pour dix mille),
+						'one' => q({0} pour dix mille),
+						'other' => q({0} pour dix mille),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-100-kilometer' => {
+						'1' => q(masculine),
+						'name' => q(litres aux 100 km),
+						'one' => q({0} litre aux 100 km),
+						'other' => q({0} litres aux 100 km),
+					},
+					# Core Unit Identifier
+					'liter-per-100-kilometer' => {
+						'1' => q(masculine),
+						'name' => q(litres aux 100 km),
+						'one' => q({0} litre aux 100 km),
+						'other' => q({0} litres aux 100 km),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-kilometer' => {
+						'name' => q(litres au kilomètre),
+						'one' => q({0} litre au kilomètre),
+						'other' => q({0} litres au kilomètre),
+					},
+					# Core Unit Identifier
+					'liter-per-kilometer' => {
+						'name' => q(litres au kilomètre),
+						'one' => q({0} litre au kilomètre),
+						'other' => q({0} litres au kilomètre),
+					},
+					# Long Unit Identifier
+					'consumption-mile-per-gallon' => {
+						'1' => q(masculine),
+						'name' => q(miles par gallon),
+						'one' => q({0} mile par gallon),
+						'other' => q({0} miles par gallon),
+					},
+					# Core Unit Identifier
+					'mile-per-gallon' => {
+						'1' => q(masculine),
+						'name' => q(miles par gallon),
+						'one' => q({0} mile par gallon),
+						'other' => q({0} miles par gallon),
+					},
+					# Long Unit Identifier
+					'consumption-mile-per-gallon-imperial' => {
+						'1' => q(masculine),
+						'name' => q(miles par gallon impérial),
+						'one' => q({0} mile par gallon impérial),
+						'other' => q({0} miles par gallon impérial),
+					},
+					# Core Unit Identifier
+					'mile-per-gallon-imperial' => {
+						'1' => q(masculine),
+						'name' => q(miles par gallon impérial),
+						'one' => q({0} mile par gallon impérial),
+						'other' => q({0} miles par gallon impérial),
+					},
+					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0} est),
+						'north' => q({0} nord),
+						'south' => q({0} sud),
+						'west' => q({0} ouest),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0} est),
+						'north' => q({0} nord),
+						'south' => q({0} sud),
+						'west' => q({0} ouest),
+					},
+					# Long Unit Identifier
+					'digital-bit' => {
+						'1' => q(masculine),
+						'name' => q(bits),
+						'one' => q({0} bit),
+						'other' => q({0} bits),
+					},
+					# Core Unit Identifier
+					'bit' => {
+						'1' => q(masculine),
+						'name' => q(bits),
+						'one' => q({0} bit),
+						'other' => q({0} bits),
+					},
+					# Long Unit Identifier
+					'digital-byte' => {
+						'1' => q(masculine),
+						'name' => q(octets),
+						'one' => q({0} octet),
+						'other' => q({0} octets),
+					},
+					# Core Unit Identifier
+					'byte' => {
+						'1' => q(masculine),
+						'name' => q(octets),
+						'one' => q({0} octet),
+						'other' => q({0} octets),
+					},
+					# Long Unit Identifier
+					'digital-gigabit' => {
+						'name' => q(gigabits),
+						'one' => q({0} gigabit),
+						'other' => q({0} gigabits),
+					},
+					# Core Unit Identifier
+					'gigabit' => {
+						'name' => q(gigabits),
+						'one' => q({0} gigabit),
+						'other' => q({0} gigabits),
+					},
+					# Long Unit Identifier
+					'digital-gigabyte' => {
+						'name' => q(gigaoctets),
+						'one' => q({0} gigaoctet),
+						'other' => q({0} gigaoctets),
+					},
+					# Core Unit Identifier
+					'gigabyte' => {
+						'name' => q(gigaoctets),
+						'one' => q({0} gigaoctet),
+						'other' => q({0} gigaoctets),
+					},
+					# Long Unit Identifier
+					'digital-kilobit' => {
+						'name' => q(kilobits),
+						'one' => q({0} kilobit),
+						'other' => q({0} kilobits),
+					},
+					# Core Unit Identifier
+					'kilobit' => {
+						'name' => q(kilobits),
+						'one' => q({0} kilobit),
+						'other' => q({0} kilobits),
+					},
+					# Long Unit Identifier
+					'digital-kilobyte' => {
+						'name' => q(kilooctets),
+						'one' => q({0} kilooctet),
+						'other' => q({0} kilooctets),
+					},
+					# Core Unit Identifier
+					'kilobyte' => {
+						'name' => q(kilooctets),
+						'one' => q({0} kilooctet),
+						'other' => q({0} kilooctets),
+					},
+					# Long Unit Identifier
+					'digital-megabit' => {
+						'name' => q(mégabits),
+						'one' => q({0} mégabit),
+						'other' => q({0} mégabits),
+					},
+					# Core Unit Identifier
+					'megabit' => {
+						'name' => q(mégabits),
+						'one' => q({0} mégabit),
+						'other' => q({0} mégabits),
+					},
+					# Long Unit Identifier
+					'digital-megabyte' => {
+						'name' => q(mégaoctets),
+						'one' => q({0} mégaoctet),
+						'other' => q({0} mégaoctets),
+					},
+					# Core Unit Identifier
+					'megabyte' => {
+						'name' => q(mégaoctets),
+						'one' => q({0} mégaoctet),
+						'other' => q({0} mégaoctets),
+					},
+					# Long Unit Identifier
+					'digital-petabyte' => {
+						'name' => q(pétaoctets),
+						'one' => q({0} pétaoctet),
+						'other' => q({0} pétaoctets),
+					},
+					# Core Unit Identifier
+					'petabyte' => {
+						'name' => q(pétaoctets),
+						'one' => q({0} pétaoctet),
+						'other' => q({0} pétaoctets),
+					},
+					# Long Unit Identifier
+					'digital-terabit' => {
+						'name' => q(térabits),
+						'one' => q({0} térabit),
+						'other' => q({0} térabits),
+					},
+					# Core Unit Identifier
 					'terabit' => {
 						'name' => q(térabits),
 						'one' => q({0} térabit),
 						'other' => q({0} térabits),
 					},
+					# Long Unit Identifier
+					'digital-terabyte' => {
+						'name' => q(téraoctets),
+						'one' => q({0} téraoctet),
+						'other' => q({0} téraoctets),
+					},
+					# Core Unit Identifier
 					'terabyte' => {
 						'name' => q(téraoctets),
 						'one' => q({0} téraoctet),
 						'other' => q({0} téraoctets),
 					},
-					'ton' => {
-						'name' => q(tonnes courtes),
-						'one' => q({0} tonne courte),
-						'other' => q({0} tonnes courtes),
+					# Long Unit Identifier
+					'duration-century' => {
+						'1' => q(masculine),
+						'name' => q(siècles),
+						'one' => q({0} siècle),
+						'other' => q({0} siècles),
 					},
-					'volt' => {
-						'name' => q(volts),
-						'one' => q({0} volt),
-						'other' => q({0} volts),
+					# Core Unit Identifier
+					'century' => {
+						'1' => q(masculine),
+						'name' => q(siècles),
+						'one' => q({0} siècle),
+						'other' => q({0} siècles),
 					},
-					'watt' => {
-						'name' => q(watts),
-						'one' => q({0} watt),
-						'other' => q({0} watts),
+					# Long Unit Identifier
+					'duration-day' => {
+						'1' => q(masculine),
+						'name' => q(jours),
+						'one' => q({0} jour),
+						'other' => q({0} jours),
+						'per' => q({0} par jour),
 					},
-					'week' => {
+					# Core Unit Identifier
+					'day' => {
+						'1' => q(masculine),
+						'name' => q(jours),
+						'one' => q({0} jour),
+						'other' => q({0} jours),
+						'per' => q({0} par jour),
+					},
+					# Long Unit Identifier
+					'duration-day-person' => {
+						'1' => q(masculine),
+					},
+					# Core Unit Identifier
+					'day-person' => {
+						'1' => q(masculine),
+					},
+					# Long Unit Identifier
+					'duration-decade' => {
+						'1' => q(feminine),
+						'name' => q(décennies),
+						'one' => q({0} décennie),
+						'other' => q({0} décennies),
+					},
+					# Core Unit Identifier
+					'decade' => {
+						'1' => q(feminine),
+						'name' => q(décennies),
+						'one' => q({0} décennie),
+						'other' => q({0} décennies),
+					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'1' => q(feminine),
+						'name' => q(heures),
+						'one' => q({0} heure),
+						'other' => q({0} heures),
+						'per' => q({0} par heure),
+					},
+					# Core Unit Identifier
+					'hour' => {
+						'1' => q(feminine),
+						'name' => q(heures),
+						'one' => q({0} heure),
+						'other' => q({0} heures),
+						'per' => q({0} par heure),
+					},
+					# Long Unit Identifier
+					'duration-microsecond' => {
+						'name' => q(microsecondes),
+						'one' => q({0} microseconde),
+						'other' => q({0} microsecondes),
+					},
+					# Core Unit Identifier
+					'microsecond' => {
+						'name' => q(microsecondes),
+						'one' => q({0} microseconde),
+						'other' => q({0} microsecondes),
+					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(millisecondes),
+						'one' => q({0} milliseconde),
+						'other' => q({0} millisecondes),
+					},
+					# Core Unit Identifier
+					'millisecond' => {
+						'name' => q(millisecondes),
+						'one' => q({0} milliseconde),
+						'other' => q({0} millisecondes),
+					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'1' => q(feminine),
+						'name' => q(minutes),
+						'one' => q({0} minute),
+						'other' => q({0} minutes),
+						'per' => q({0} par minute),
+					},
+					# Core Unit Identifier
+					'minute' => {
+						'1' => q(feminine),
+						'name' => q(minutes),
+						'one' => q({0} minute),
+						'other' => q({0} minutes),
+						'per' => q({0} par minute),
+					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'1' => q(masculine),
+						'name' => q(mois),
+						'one' => q({0} mois),
+						'other' => q({0} mois),
+						'per' => q({0} par mois),
+					},
+					# Core Unit Identifier
+					'month' => {
+						'1' => q(masculine),
+						'name' => q(mois),
+						'one' => q({0} mois),
+						'other' => q({0} mois),
+						'per' => q({0} par mois),
+					},
+					# Long Unit Identifier
+					'duration-nanosecond' => {
+						'name' => q(nanosecondes),
+						'one' => q({0} nanoseconde),
+						'other' => q({0} nanosecondes),
+					},
+					# Core Unit Identifier
+					'nanosecond' => {
+						'name' => q(nanosecondes),
+						'one' => q({0} nanoseconde),
+						'other' => q({0} nanosecondes),
+					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'1' => q(feminine),
+						'name' => q(secondes),
+						'one' => q({0} seconde),
+						'other' => q({0} secondes),
+						'per' => q({0} par seconde),
+					},
+					# Core Unit Identifier
+					'second' => {
+						'1' => q(feminine),
+						'name' => q(secondes),
+						'one' => q({0} seconde),
+						'other' => q({0} secondes),
+						'per' => q({0} par seconde),
+					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'1' => q(feminine),
 						'name' => q(semaines),
 						'one' => q({0} semaine),
 						'other' => q({0} semaines),
 						'per' => q({0} par semaine),
 					},
-					'yard' => {
-						'name' => q(yards),
-						'one' => q({0} yard),
-						'other' => q({0} yards),
+					# Core Unit Identifier
+					'week' => {
+						'1' => q(feminine),
+						'name' => q(semaines),
+						'one' => q({0} semaine),
+						'other' => q({0} semaines),
+						'per' => q({0} par semaine),
 					},
-					'year' => {
+					# Long Unit Identifier
+					'duration-year' => {
+						'1' => q(masculine),
 						'name' => q(ans),
 						'one' => q({0} an),
 						'other' => q({0} ans),
 						'per' => q({0} par an),
 					},
+					# Core Unit Identifier
+					'year' => {
+						'1' => q(masculine),
+						'name' => q(ans),
+						'one' => q({0} an),
+						'other' => q({0} ans),
+						'per' => q({0} par an),
+					},
+					# Long Unit Identifier
+					'electric-ampere' => {
+						'1' => q(masculine),
+						'name' => q(ampères),
+						'one' => q({0} ampère),
+						'other' => q({0} ampères),
+					},
+					# Core Unit Identifier
+					'ampere' => {
+						'1' => q(masculine),
+						'name' => q(ampères),
+						'one' => q({0} ampère),
+						'other' => q({0} ampères),
+					},
+					# Long Unit Identifier
+					'electric-milliampere' => {
+						'name' => q(milliampères),
+						'one' => q({0} milliampère),
+						'other' => q({0} milliampères),
+					},
+					# Core Unit Identifier
+					'milliampere' => {
+						'name' => q(milliampères),
+						'one' => q({0} milliampère),
+						'other' => q({0} milliampères),
+					},
+					# Long Unit Identifier
+					'electric-ohm' => {
+						'1' => q(masculine),
+						'name' => q(ohms),
+						'one' => q({0} ohm),
+						'other' => q({0} ohms),
+					},
+					# Core Unit Identifier
+					'ohm' => {
+						'1' => q(masculine),
+						'name' => q(ohms),
+						'one' => q({0} ohm),
+						'other' => q({0} ohms),
+					},
+					# Long Unit Identifier
+					'electric-volt' => {
+						'1' => q(masculine),
+						'name' => q(volts),
+						'one' => q({0} volt),
+						'other' => q({0} volts),
+					},
+					# Core Unit Identifier
+					'volt' => {
+						'1' => q(masculine),
+						'name' => q(volts),
+						'one' => q({0} volt),
+						'other' => q({0} volts),
+					},
+					# Long Unit Identifier
+					'energy-british-thermal-unit' => {
+						'name' => q(British Thermal Units),
+						'one' => q({0} British Thermal Unit),
+						'other' => q({0} British Thermal Units),
+					},
+					# Core Unit Identifier
+					'british-thermal-unit' => {
+						'name' => q(British Thermal Units),
+						'one' => q({0} British Thermal Unit),
+						'other' => q({0} British Thermal Units),
+					},
+					# Long Unit Identifier
+					'energy-calorie' => {
+						'1' => q(feminine),
+						'name' => q(calories),
+						'one' => q({0} calorie),
+						'other' => q({0} calories),
+					},
+					# Core Unit Identifier
+					'calorie' => {
+						'1' => q(feminine),
+						'name' => q(calories),
+						'one' => q({0} calorie),
+						'other' => q({0} calories),
+					},
+					# Long Unit Identifier
+					'energy-electronvolt' => {
+						'name' => q(électronvolts),
+						'one' => q({0} électronvolt),
+						'other' => q({0} électronvolts),
+					},
+					# Core Unit Identifier
+					'electronvolt' => {
+						'name' => q(électronvolts),
+						'one' => q({0} électronvolt),
+						'other' => q({0} électronvolts),
+					},
+					# Long Unit Identifier
+					'energy-foodcalorie' => {
+						'1' => q(feminine),
+						'name' => q(kilocalories),
+						'one' => q({0} kilocalorie),
+						'other' => q({0} kilocalories),
+					},
+					# Core Unit Identifier
+					'foodcalorie' => {
+						'1' => q(feminine),
+						'name' => q(kilocalories),
+						'one' => q({0} kilocalorie),
+						'other' => q({0} kilocalories),
+					},
+					# Long Unit Identifier
+					'energy-joule' => {
+						'1' => q(masculine),
+						'name' => q(joules),
+						'one' => q({0} joule),
+						'other' => q({0} joules),
+					},
+					# Core Unit Identifier
+					'joule' => {
+						'1' => q(masculine),
+						'name' => q(joules),
+						'one' => q({0} joule),
+						'other' => q({0} joules),
+					},
+					# Long Unit Identifier
+					'energy-kilocalorie' => {
+						'1' => q(feminine),
+						'name' => q(kilocalories),
+						'one' => q({0} kilocalorie),
+						'other' => q({0} kilocalories),
+					},
+					# Core Unit Identifier
+					'kilocalorie' => {
+						'1' => q(feminine),
+						'name' => q(kilocalories),
+						'one' => q({0} kilocalorie),
+						'other' => q({0} kilocalories),
+					},
+					# Long Unit Identifier
+					'energy-kilojoule' => {
+						'name' => q(kilojoules),
+						'one' => q({0} kilojoule),
+						'other' => q({0} kilojoules),
+					},
+					# Core Unit Identifier
+					'kilojoule' => {
+						'name' => q(kilojoules),
+						'one' => q({0} kilojoule),
+						'other' => q({0} kilojoules),
+					},
+					# Long Unit Identifier
+					'energy-kilowatt-hour' => {
+						'name' => q(kilowattheures),
+						'one' => q({0} kilowattheure),
+						'other' => q({0} kilowattheures),
+					},
+					# Core Unit Identifier
+					'kilowatt-hour' => {
+						'name' => q(kilowattheures),
+						'one' => q({0} kilowattheure),
+						'other' => q({0} kilowattheures),
+					},
+					# Long Unit Identifier
+					'energy-therm-us' => {
+						'name' => q(therms US),
+						'one' => q({0} therm US),
+						'other' => q({0} therms US),
+					},
+					# Core Unit Identifier
+					'therm-us' => {
+						'name' => q(therms US),
+						'one' => q({0} therm US),
+						'other' => q({0} therms US),
+					},
+					# Long Unit Identifier
+					'force-kilowatt-hour-per-100-kilometer' => {
+						'name' => q(kilowattheure pour 100 kilomètres),
+						'one' => q({0} kilowattheure pour 100 kilomètres),
+						'other' => q({0} kilowattheures pour 100 kilomètres),
+					},
+					# Core Unit Identifier
+					'kilowatt-hour-per-100-kilometer' => {
+						'name' => q(kilowattheure pour 100 kilomètres),
+						'one' => q({0} kilowattheure pour 100 kilomètres),
+						'other' => q({0} kilowattheures pour 100 kilomètres),
+					},
+					# Long Unit Identifier
+					'force-newton' => {
+						'1' => q(masculine),
+						'name' => q(newtons),
+						'one' => q({0} newton),
+						'other' => q({0} newtons),
+					},
+					# Core Unit Identifier
+					'newton' => {
+						'1' => q(masculine),
+						'name' => q(newtons),
+						'one' => q({0} newton),
+						'other' => q({0} newtons),
+					},
+					# Long Unit Identifier
+					'force-pound-force' => {
+						'name' => q(livres-force),
+						'one' => q({0} livre-force),
+						'other' => q({0} livres-force),
+					},
+					# Core Unit Identifier
+					'pound-force' => {
+						'name' => q(livres-force),
+						'one' => q({0} livre-force),
+						'other' => q({0} livres-force),
+					},
+					# Long Unit Identifier
+					'frequency-gigahertz' => {
+						'name' => q(gigahertz),
+						'one' => q({0} gigahertz),
+						'other' => q({0} gigahertz),
+					},
+					# Core Unit Identifier
+					'gigahertz' => {
+						'name' => q(gigahertz),
+						'one' => q({0} gigahertz),
+						'other' => q({0} gigahertz),
+					},
+					# Long Unit Identifier
+					'frequency-hertz' => {
+						'1' => q(masculine),
+						'name' => q(hertz),
+						'one' => q({0} hertz),
+						'other' => q({0} hertz),
+					},
+					# Core Unit Identifier
+					'hertz' => {
+						'1' => q(masculine),
+						'name' => q(hertz),
+						'one' => q({0} hertz),
+						'other' => q({0} hertz),
+					},
+					# Long Unit Identifier
+					'frequency-kilohertz' => {
+						'name' => q(kilohertz),
+						'one' => q({0} kilohertz),
+						'other' => q({0} kilohertz),
+					},
+					# Core Unit Identifier
+					'kilohertz' => {
+						'name' => q(kilohertz),
+						'one' => q({0} kilohertz),
+						'other' => q({0} kilohertz),
+					},
+					# Long Unit Identifier
+					'frequency-megahertz' => {
+						'name' => q(mégahertz),
+						'one' => q({0} mégahertz),
+						'other' => q({0} mégahertz),
+					},
+					# Core Unit Identifier
+					'megahertz' => {
+						'name' => q(mégahertz),
+						'one' => q({0} mégahertz),
+						'other' => q({0} mégahertz),
+					},
+					# Long Unit Identifier
+					'graphics-dot' => {
+						'name' => q(point),
+						'one' => q({0} point),
+						'other' => q({0} pts),
+					},
+					# Core Unit Identifier
+					'dot' => {
+						'name' => q(point),
+						'one' => q({0} point),
+						'other' => q({0} pts),
+					},
+					# Long Unit Identifier
+					'graphics-dot-per-centimeter' => {
+						'name' => q(points par centimètre),
+						'one' => q({0} point par centimètre),
+						'other' => q({0} points par centimètre),
+					},
+					# Core Unit Identifier
+					'dot-per-centimeter' => {
+						'name' => q(points par centimètre),
+						'one' => q({0} point par centimètre),
+						'other' => q({0} points par centimètre),
+					},
+					# Long Unit Identifier
+					'graphics-dot-per-inch' => {
+						'name' => q(points par pouce),
+						'one' => q({0} point par pouce),
+						'other' => q({0} points par pouce),
+					},
+					# Core Unit Identifier
+					'dot-per-inch' => {
+						'name' => q(points par pouce),
+						'one' => q({0} point par pouce),
+						'other' => q({0} points par pouce),
+					},
+					# Long Unit Identifier
+					'graphics-em' => {
+						'1' => q(masculine),
+						'name' => q(cadratin),
+						'one' => q({0} cadratin),
+						'other' => q({0} cadratins),
+					},
+					# Core Unit Identifier
+					'em' => {
+						'1' => q(masculine),
+						'name' => q(cadratin),
+						'one' => q({0} cadratin),
+						'other' => q({0} cadratins),
+					},
+					# Long Unit Identifier
+					'graphics-megapixel' => {
+						'name' => q(mégapixels),
+						'one' => q({0} mégapixel),
+						'other' => q({0} mégapixels),
+					},
+					# Core Unit Identifier
+					'megapixel' => {
+						'name' => q(mégapixels),
+						'one' => q({0} mégapixel),
+						'other' => q({0} mégapixels),
+					},
+					# Long Unit Identifier
+					'graphics-pixel' => {
+						'1' => q(masculine),
+						'name' => q(pixels),
+						'one' => q({0} pixel),
+						'other' => q({0} pixels),
+					},
+					# Core Unit Identifier
+					'pixel' => {
+						'1' => q(masculine),
+						'name' => q(pixels),
+						'one' => q({0} pixel),
+						'other' => q({0} pixels),
+					},
+					# Long Unit Identifier
+					'graphics-pixel-per-centimeter' => {
+						'name' => q(pixels par centimètre),
+						'one' => q({0} pixel par centimètre),
+						'other' => q({0} pixels par centimètre),
+					},
+					# Core Unit Identifier
+					'pixel-per-centimeter' => {
+						'name' => q(pixels par centimètre),
+						'one' => q({0} pixel par centimètre),
+						'other' => q({0} pixels par centimètre),
+					},
+					# Long Unit Identifier
+					'graphics-pixel-per-inch' => {
+						'name' => q(pixels par pouce),
+						'one' => q({0} pixel par pouce),
+						'other' => q({0} pixels par pouce),
+					},
+					# Core Unit Identifier
+					'pixel-per-inch' => {
+						'name' => q(pixels par pouce),
+						'one' => q({0} pixel par pouce),
+						'other' => q({0} pixels par pouce),
+					},
+					# Long Unit Identifier
+					'length-astronomical-unit' => {
+						'name' => q(unités astronomiques),
+						'one' => q({0} unité astronomique),
+						'other' => q({0} unités astronomiques),
+					},
+					# Core Unit Identifier
+					'astronomical-unit' => {
+						'name' => q(unités astronomiques),
+						'one' => q({0} unité astronomique),
+						'other' => q({0} unités astronomiques),
+					},
+					# Long Unit Identifier
+					'length-centimeter' => {
+						'1' => q(masculine),
+						'name' => q(centimètres),
+						'one' => q({0} centimètre),
+						'other' => q({0} centimètres),
+						'per' => q({0} par centimètre),
+					},
+					# Core Unit Identifier
+					'centimeter' => {
+						'1' => q(masculine),
+						'name' => q(centimètres),
+						'one' => q({0} centimètre),
+						'other' => q({0} centimètres),
+						'per' => q({0} par centimètre),
+					},
+					# Long Unit Identifier
+					'length-decimeter' => {
+						'name' => q(décimètres),
+						'one' => q({0} décimètre),
+						'other' => q({0} décimètres),
+					},
+					# Core Unit Identifier
+					'decimeter' => {
+						'name' => q(décimètres),
+						'one' => q({0} décimètre),
+						'other' => q({0} décimètres),
+					},
+					# Long Unit Identifier
+					'length-earth-radius' => {
+						'name' => q(rayon terrestre),
+						'one' => q({0} rayon terrestre),
+						'other' => q({0} rayons terrestres),
+					},
+					# Core Unit Identifier
+					'earth-radius' => {
+						'name' => q(rayon terrestre),
+						'one' => q({0} rayon terrestre),
+						'other' => q({0} rayons terrestres),
+					},
+					# Long Unit Identifier
+					'length-fathom' => {
+						'name' => q(brasses),
+						'one' => q({0} brasse),
+						'other' => q({0} brasses),
+					},
+					# Core Unit Identifier
+					'fathom' => {
+						'name' => q(brasses),
+						'one' => q({0} brasse),
+						'other' => q({0} brasses),
+					},
+					# Long Unit Identifier
+					'length-foot' => {
+						'1' => q(masculine),
+						'name' => q(pieds),
+						'one' => q({0} pied),
+						'other' => q({0} pieds),
+						'per' => q({0} par pied),
+					},
+					# Core Unit Identifier
+					'foot' => {
+						'1' => q(masculine),
+						'name' => q(pieds),
+						'one' => q({0} pied),
+						'other' => q({0} pieds),
+						'per' => q({0} par pied),
+					},
+					# Long Unit Identifier
+					'length-furlong' => {
+						'name' => q(furlongs),
+						'one' => q({0} furlong),
+						'other' => q({0} furlongs),
+					},
+					# Core Unit Identifier
+					'furlong' => {
+						'name' => q(furlongs),
+						'one' => q({0} furlong),
+						'other' => q({0} furlongs),
+					},
+					# Long Unit Identifier
+					'length-inch' => {
+						'1' => q(masculine),
+						'name' => q(pouces),
+						'one' => q({0} pouce),
+						'other' => q({0} pouces),
+						'per' => q({0} par pouce),
+					},
+					# Core Unit Identifier
+					'inch' => {
+						'1' => q(masculine),
+						'name' => q(pouces),
+						'one' => q({0} pouce),
+						'other' => q({0} pouces),
+						'per' => q({0} par pouce),
+					},
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'1' => q(masculine),
+						'name' => q(kilomètres),
+						'one' => q({0} kilomètre),
+						'other' => q({0} kilomètres),
+						'per' => q({0} par kilomètre),
+					},
+					# Core Unit Identifier
+					'kilometer' => {
+						'1' => q(masculine),
+						'name' => q(kilomètres),
+						'one' => q({0} kilomètre),
+						'other' => q({0} kilomètres),
+						'per' => q({0} par kilomètre),
+					},
+					# Long Unit Identifier
+					'length-light-year' => {
+						'name' => q(années-lumière),
+						'one' => q({0} année-lumière),
+						'other' => q({0} années-lumière),
+					},
+					# Core Unit Identifier
+					'light-year' => {
+						'name' => q(années-lumière),
+						'one' => q({0} année-lumière),
+						'other' => q({0} années-lumière),
+					},
+					# Long Unit Identifier
+					'length-meter' => {
+						'1' => q(masculine),
+						'name' => q(mètres),
+						'one' => q({0} mètre),
+						'other' => q({0} mètres),
+						'per' => q({0} par mètre),
+					},
+					# Core Unit Identifier
+					'meter' => {
+						'1' => q(masculine),
+						'name' => q(mètres),
+						'one' => q({0} mètre),
+						'other' => q({0} mètres),
+						'per' => q({0} par mètre),
+					},
+					# Long Unit Identifier
+					'length-micrometer' => {
+						'name' => q(micromètres),
+						'one' => q({0} micromètre),
+						'other' => q({0} micromètres),
+					},
+					# Core Unit Identifier
+					'micrometer' => {
+						'name' => q(micromètres),
+						'one' => q({0} micromètre),
+						'other' => q({0} micromètres),
+					},
+					# Long Unit Identifier
+					'length-mile' => {
+						'1' => q(masculine),
+						'name' => q(miles),
+						'one' => q({0} mile),
+						'other' => q({0} miles),
+					},
+					# Core Unit Identifier
+					'mile' => {
+						'1' => q(masculine),
+						'name' => q(miles),
+						'one' => q({0} mile),
+						'other' => q({0} miles),
+					},
+					# Long Unit Identifier
+					'length-mile-scandinavian' => {
+						'1' => q(masculine),
+						'name' => q(milles scandinaves),
+						'one' => q({0} mille scandinave),
+						'other' => q({0} milles scandinaves),
+					},
+					# Core Unit Identifier
+					'mile-scandinavian' => {
+						'1' => q(masculine),
+						'name' => q(milles scandinaves),
+						'one' => q({0} mille scandinave),
+						'other' => q({0} milles scandinaves),
+					},
+					# Long Unit Identifier
+					'length-millimeter' => {
+						'1' => q(masculine),
+						'name' => q(millimètres),
+						'one' => q({0} millimètre),
+						'other' => q({0} millimètres),
+					},
+					# Core Unit Identifier
+					'millimeter' => {
+						'1' => q(masculine),
+						'name' => q(millimètres),
+						'one' => q({0} millimètre),
+						'other' => q({0} millimètres),
+					},
+					# Long Unit Identifier
+					'length-nanometer' => {
+						'name' => q(nanomètres),
+						'one' => q({0} nanomètre),
+						'other' => q({0} nanomètres),
+					},
+					# Core Unit Identifier
+					'nanometer' => {
+						'name' => q(nanomètres),
+						'one' => q({0} nanomètre),
+						'other' => q({0} nanomètres),
+					},
+					# Long Unit Identifier
+					'length-nautical-mile' => {
+						'name' => q(milles marins),
+						'one' => q({0} mille marin),
+						'other' => q({0} milles marins),
+					},
+					# Core Unit Identifier
+					'nautical-mile' => {
+						'name' => q(milles marins),
+						'one' => q({0} mille marin),
+						'other' => q({0} milles marins),
+					},
+					# Long Unit Identifier
+					'length-parsec' => {
+						'1' => q(masculine),
+						'name' => q(parsecs),
+						'one' => q({0} parsec),
+						'other' => q({0} parsecs),
+					},
+					# Core Unit Identifier
+					'parsec' => {
+						'1' => q(masculine),
+						'name' => q(parsecs),
+						'one' => q({0} parsec),
+						'other' => q({0} parsecs),
+					},
+					# Long Unit Identifier
+					'length-picometer' => {
+						'1' => q(masculine),
+						'name' => q(picomètres),
+						'one' => q({0} picomètre),
+						'other' => q({0} picomètres),
+					},
+					# Core Unit Identifier
+					'picometer' => {
+						'1' => q(masculine),
+						'name' => q(picomètres),
+						'one' => q({0} picomètre),
+						'other' => q({0} picomètres),
+					},
+					# Long Unit Identifier
+					'length-point' => {
+						'name' => q(points),
+						'one' => q({0} point typographique),
+						'other' => q({0} points),
+					},
+					# Core Unit Identifier
+					'point' => {
+						'name' => q(points),
+						'one' => q({0} point typographique),
+						'other' => q({0} points),
+					},
+					# Long Unit Identifier
+					'length-solar-radius' => {
+						'1' => q(masculine),
+						'name' => q(rayons solaires),
+						'one' => q({0} rayon solaire),
+						'other' => q({0} rayons solaires),
+					},
+					# Core Unit Identifier
+					'solar-radius' => {
+						'1' => q(masculine),
+						'name' => q(rayons solaires),
+						'one' => q({0} rayon solaire),
+						'other' => q({0} rayons solaires),
+					},
+					# Long Unit Identifier
+					'length-yard' => {
+						'1' => q(masculine),
+						'name' => q(yards),
+						'one' => q({0} yard),
+						'other' => q({0} yards),
+					},
+					# Core Unit Identifier
+					'yard' => {
+						'1' => q(masculine),
+						'name' => q(yards),
+						'one' => q({0} yard),
+						'other' => q({0} yards),
+					},
+					# Long Unit Identifier
+					'light-candela' => {
+						'1' => q(feminine),
+					},
+					# Core Unit Identifier
+					'candela' => {
+						'1' => q(feminine),
+					},
+					# Long Unit Identifier
+					'light-lumen' => {
+						'1' => q(masculine),
+						'name' => q(lumen),
+						'one' => q({0} lumen),
+						'other' => q({0} lumens),
+					},
+					# Core Unit Identifier
+					'lumen' => {
+						'1' => q(masculine),
+						'name' => q(lumen),
+						'one' => q({0} lumen),
+						'other' => q({0} lumens),
+					},
+					# Long Unit Identifier
+					'light-lux' => {
+						'1' => q(masculine),
+						'name' => q(lux),
+						'one' => q({0} lux),
+						'other' => q({0} lux),
+					},
+					# Core Unit Identifier
+					'lux' => {
+						'1' => q(masculine),
+						'name' => q(lux),
+						'one' => q({0} lux),
+						'other' => q({0} lux),
+					},
+					# Long Unit Identifier
+					'light-solar-luminosity' => {
+						'1' => q(feminine),
+						'name' => q(luminosités solaires),
+						'one' => q({0} luminosité solaire),
+						'other' => q({0} luminosités solaires),
+					},
+					# Core Unit Identifier
+					'solar-luminosity' => {
+						'1' => q(feminine),
+						'name' => q(luminosités solaires),
+						'one' => q({0} luminosité solaire),
+						'other' => q({0} luminosités solaires),
+					},
+					# Long Unit Identifier
+					'mass-carat' => {
+						'1' => q(masculine),
+						'name' => q(carats),
+						'one' => q({0} carat),
+						'other' => q({0} carats),
+					},
+					# Core Unit Identifier
+					'carat' => {
+						'1' => q(masculine),
+						'name' => q(carats),
+						'one' => q({0} carat),
+						'other' => q({0} carats),
+					},
+					# Long Unit Identifier
+					'mass-dalton' => {
+						'1' => q(masculine),
+						'name' => q(daltons),
+						'one' => q({0} dalton),
+						'other' => q({0} daltons),
+					},
+					# Core Unit Identifier
+					'dalton' => {
+						'1' => q(masculine),
+						'name' => q(daltons),
+						'one' => q({0} dalton),
+						'other' => q({0} daltons),
+					},
+					# Long Unit Identifier
+					'mass-earth-mass' => {
+						'1' => q(feminine),
+						'name' => q(masses terrestres),
+						'one' => q({0} masse terrestre),
+						'other' => q({0} masses terrestres),
+					},
+					# Core Unit Identifier
+					'earth-mass' => {
+						'1' => q(feminine),
+						'name' => q(masses terrestres),
+						'one' => q({0} masse terrestre),
+						'other' => q({0} masses terrestres),
+					},
+					# Long Unit Identifier
+					'mass-grain' => {
+						'1' => q(masculine),
+						'one' => q({0} grain),
+						'other' => q({0} grains),
+					},
+					# Core Unit Identifier
+					'grain' => {
+						'1' => q(masculine),
+						'one' => q({0} grain),
+						'other' => q({0} grains),
+					},
+					# Long Unit Identifier
+					'mass-gram' => {
+						'1' => q(masculine),
+						'name' => q(grammes),
+						'one' => q({0} gramme),
+						'other' => q({0} grammes),
+						'per' => q({0} par gramme),
+					},
+					# Core Unit Identifier
+					'gram' => {
+						'1' => q(masculine),
+						'name' => q(grammes),
+						'one' => q({0} gramme),
+						'other' => q({0} grammes),
+						'per' => q({0} par gramme),
+					},
+					# Long Unit Identifier
+					'mass-kilogram' => {
+						'1' => q(masculine),
+						'name' => q(kilogrammes),
+						'one' => q({0} kilogramme),
+						'other' => q({0} kilogrammes),
+						'per' => q({0} par kg),
+					},
+					# Core Unit Identifier
+					'kilogram' => {
+						'1' => q(masculine),
+						'name' => q(kilogrammes),
+						'one' => q({0} kilogramme),
+						'other' => q({0} kilogrammes),
+						'per' => q({0} par kg),
+					},
+					# Long Unit Identifier
+					'mass-metric-ton' => {
+						'1' => q(feminine),
+						'name' => q(tonnes),
+						'one' => q({0} tonne),
+						'other' => q({0} tonnes),
+					},
+					# Core Unit Identifier
+					'metric-ton' => {
+						'1' => q(feminine),
+						'name' => q(tonnes),
+						'one' => q({0} tonne),
+						'other' => q({0} tonnes),
+					},
+					# Long Unit Identifier
+					'mass-microgram' => {
+						'name' => q(microgrammes),
+						'one' => q({0} microgramme),
+						'other' => q({0} microgrammes),
+					},
+					# Core Unit Identifier
+					'microgram' => {
+						'name' => q(microgrammes),
+						'one' => q({0} microgramme),
+						'other' => q({0} microgrammes),
+					},
+					# Long Unit Identifier
+					'mass-milligram' => {
+						'1' => q(masculine),
+						'name' => q(milligrammes),
+						'one' => q({0} milligramme),
+						'other' => q({0} milligrammes),
+					},
+					# Core Unit Identifier
+					'milligram' => {
+						'1' => q(masculine),
+						'name' => q(milligrammes),
+						'one' => q({0} milligramme),
+						'other' => q({0} milligrammes),
+					},
+					# Long Unit Identifier
+					'mass-ounce' => {
+						'1' => q(feminine),
+						'name' => q(onces),
+						'one' => q({0} once),
+						'other' => q({0} onces),
+						'per' => q({0} par once),
+					},
+					# Core Unit Identifier
+					'ounce' => {
+						'1' => q(feminine),
+						'name' => q(onces),
+						'one' => q({0} once),
+						'other' => q({0} onces),
+						'per' => q({0} par once),
+					},
+					# Long Unit Identifier
+					'mass-ounce-troy' => {
+						'name' => q(onces troy),
+						'one' => q({0} once troy),
+						'other' => q({0} onces troy),
+					},
+					# Core Unit Identifier
+					'ounce-troy' => {
+						'name' => q(onces troy),
+						'one' => q({0} once troy),
+						'other' => q({0} onces troy),
+					},
+					# Long Unit Identifier
+					'mass-pound' => {
+						'1' => q(feminine),
+						'name' => q(livres),
+						'one' => q({0} livre),
+						'other' => q({0} livres),
+						'per' => q({0} par livre),
+					},
+					# Core Unit Identifier
+					'pound' => {
+						'1' => q(feminine),
+						'name' => q(livres),
+						'one' => q({0} livre),
+						'other' => q({0} livres),
+						'per' => q({0} par livre),
+					},
+					# Long Unit Identifier
+					'mass-solar-mass' => {
+						'1' => q(feminine),
+						'name' => q(masses solaires),
+						'one' => q({0} masse solaire),
+						'other' => q({0} masses solaires),
+					},
+					# Core Unit Identifier
+					'solar-mass' => {
+						'1' => q(feminine),
+						'name' => q(masses solaires),
+						'one' => q({0} masse solaire),
+						'other' => q({0} masses solaires),
+					},
+					# Long Unit Identifier
+					'mass-stone' => {
+						'name' => q(stones),
+						'one' => q({0} stone),
+						'other' => q({0} stones),
+					},
+					# Core Unit Identifier
+					'stone' => {
+						'name' => q(stones),
+						'one' => q({0} stone),
+						'other' => q({0} stones),
+					},
+					# Long Unit Identifier
+					'mass-ton' => {
+						'name' => q(tonnes courtes),
+						'one' => q({0} tonne courte),
+						'other' => q({0} tonnes courtes),
+					},
+					# Core Unit Identifier
+					'ton' => {
+						'name' => q(tonnes courtes),
+						'one' => q({0} tonne courte),
+						'other' => q({0} tonnes courtes),
+					},
+					# Long Unit Identifier
+					'per' => {
+						'1' => q({0} par {1}),
+					},
+					# Core Unit Identifier
+					'per' => {
+						'1' => q({0} par {1}),
+					},
+					# Long Unit Identifier
+					'power-gigawatt' => {
+						'name' => q(gigawatts),
+						'one' => q({0} gigawatt),
+						'other' => q({0} gigawatts),
+					},
+					# Core Unit Identifier
+					'gigawatt' => {
+						'name' => q(gigawatts),
+						'one' => q({0} gigawatt),
+						'other' => q({0} gigawatts),
+					},
+					# Long Unit Identifier
+					'power-horsepower' => {
+						'name' => q(chevaux-vapeur),
+						'one' => q({0} cheval-vapeur),
+						'other' => q({0} chevaux-vapeur),
+					},
+					# Core Unit Identifier
+					'horsepower' => {
+						'name' => q(chevaux-vapeur),
+						'one' => q({0} cheval-vapeur),
+						'other' => q({0} chevaux-vapeur),
+					},
+					# Long Unit Identifier
+					'power-kilowatt' => {
+						'name' => q(kilowatts),
+						'one' => q({0} kilowatt),
+						'other' => q({0} kilowatts),
+					},
+					# Core Unit Identifier
+					'kilowatt' => {
+						'name' => q(kilowatts),
+						'one' => q({0} kilowatt),
+						'other' => q({0} kilowatts),
+					},
+					# Long Unit Identifier
+					'power-megawatt' => {
+						'name' => q(mégawatts),
+						'one' => q({0} mégawatt),
+						'other' => q({0} mégawatts),
+					},
+					# Core Unit Identifier
+					'megawatt' => {
+						'name' => q(mégawatts),
+						'one' => q({0} mégawatt),
+						'other' => q({0} mégawatts),
+					},
+					# Long Unit Identifier
+					'power-milliwatt' => {
+						'name' => q(milliwatts),
+						'one' => q({0} milliwatt),
+						'other' => q({0} milliwatts),
+					},
+					# Core Unit Identifier
+					'milliwatt' => {
+						'name' => q(milliwatts),
+						'one' => q({0} milliwatt),
+						'other' => q({0} milliwatts),
+					},
+					# Long Unit Identifier
+					'power-watt' => {
+						'1' => q(masculine),
+						'name' => q(watts),
+						'one' => q({0} watt),
+						'other' => q({0} watts),
+					},
+					# Core Unit Identifier
+					'watt' => {
+						'1' => q(masculine),
+						'name' => q(watts),
+						'one' => q({0} watt),
+						'other' => q({0} watts),
+					},
+					# Long Unit Identifier
+					'power2' => {
+						'one' => q({0} carré),
+						'other' => q({0} carrés),
+					},
+					# Core Unit Identifier
+					'power2' => {
+						'one' => q({0} carré),
+						'other' => q({0} carrés),
+					},
+					# Long Unit Identifier
+					'power3' => {
+						'one' => q({0} cube),
+						'other' => q({0} cubes),
+					},
+					# Core Unit Identifier
+					'power3' => {
+						'one' => q({0} cube),
+						'other' => q({0} cubes),
+					},
+					# Long Unit Identifier
+					'pressure-atmosphere' => {
+						'1' => q(feminine),
+						'name' => q(atmosphères),
+						'one' => q({0} atmosphère),
+						'other' => q({0} atmosphères),
+					},
+					# Core Unit Identifier
+					'atmosphere' => {
+						'1' => q(feminine),
+						'name' => q(atmosphères),
+						'one' => q({0} atmosphère),
+						'other' => q({0} atmosphères),
+					},
+					# Long Unit Identifier
+					'pressure-bar' => {
+						'1' => q(masculine),
+						'name' => q(bars),
+						'one' => q({0} bar),
+						'other' => q({0} bars),
+					},
+					# Core Unit Identifier
+					'bar' => {
+						'1' => q(masculine),
+						'name' => q(bars),
+						'one' => q({0} bar),
+						'other' => q({0} bars),
+					},
+					# Long Unit Identifier
+					'pressure-hectopascal' => {
+						'name' => q(hectopascals),
+						'one' => q({0} hectopascal),
+						'other' => q({0} hectopascals),
+					},
+					# Core Unit Identifier
+					'hectopascal' => {
+						'name' => q(hectopascals),
+						'one' => q({0} hectopascal),
+						'other' => q({0} hectopascals),
+					},
+					# Long Unit Identifier
+					'pressure-inch-ofhg' => {
+						'name' => q(pouces de mercure),
+						'one' => q({0} pouce de mercure),
+						'other' => q({0} pouces de mercure),
+					},
+					# Core Unit Identifier
+					'inch-ofhg' => {
+						'name' => q(pouces de mercure),
+						'one' => q({0} pouce de mercure),
+						'other' => q({0} pouces de mercure),
+					},
+					# Long Unit Identifier
+					'pressure-kilopascal' => {
+						'1' => q(masculine),
+						'name' => q(kilopascals),
+						'one' => q({0} kilopascal),
+						'other' => q({0} kilopascals),
+					},
+					# Core Unit Identifier
+					'kilopascal' => {
+						'1' => q(masculine),
+						'name' => q(kilopascals),
+						'one' => q({0} kilopascal),
+						'other' => q({0} kilopascals),
+					},
+					# Long Unit Identifier
+					'pressure-megapascal' => {
+						'name' => q(mégapascals),
+						'one' => q({0} mégapascal),
+						'other' => q({0} mégapascals),
+					},
+					# Core Unit Identifier
+					'megapascal' => {
+						'name' => q(mégapascals),
+						'one' => q({0} mégapascal),
+						'other' => q({0} mégapascals),
+					},
+					# Long Unit Identifier
+					'pressure-millibar' => {
+						'name' => q(millibars),
+						'one' => q({0} millibar),
+						'other' => q({0} millibars),
+					},
+					# Core Unit Identifier
+					'millibar' => {
+						'name' => q(millibars),
+						'one' => q({0} millibar),
+						'other' => q({0} millibars),
+					},
+					# Long Unit Identifier
+					'pressure-millimeter-ofhg' => {
+						'name' => q(millimètres de mercure),
+						'one' => q({0} millimètre de mercure),
+						'other' => q({0} millimètres de mercure),
+					},
+					# Core Unit Identifier
+					'millimeter-ofhg' => {
+						'name' => q(millimètres de mercure),
+						'one' => q({0} millimètre de mercure),
+						'other' => q({0} millimètres de mercure),
+					},
+					# Long Unit Identifier
+					'pressure-pascal' => {
+						'1' => q(masculine),
+						'name' => q(pascals),
+						'one' => q({0} pascal),
+						'other' => q({0} pascals),
+					},
+					# Core Unit Identifier
+					'pascal' => {
+						'1' => q(masculine),
+						'name' => q(pascals),
+						'one' => q({0} pascal),
+						'other' => q({0} pascals),
+					},
+					# Long Unit Identifier
+					'pressure-pound-force-per-square-inch' => {
+						'name' => q(livres par pouce carré),
+						'one' => q({0} livre par pouce carré),
+						'other' => q({0} livres par pouce carré),
+					},
+					# Core Unit Identifier
+					'pound-force-per-square-inch' => {
+						'name' => q(livres par pouce carré),
+						'one' => q({0} livre par pouce carré),
+						'other' => q({0} livres par pouce carré),
+					},
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'1' => q(masculine),
+						'name' => q(kilomètres par heure),
+						'one' => q({0} kilomètre par heure),
+						'other' => q({0} kilomètres par heure),
+					},
+					# Core Unit Identifier
+					'kilometer-per-hour' => {
+						'1' => q(masculine),
+						'name' => q(kilomètres par heure),
+						'one' => q({0} kilomètre par heure),
+						'other' => q({0} kilomètres par heure),
+					},
+					# Long Unit Identifier
+					'speed-knot' => {
+						'name' => q(nœuds),
+						'one' => q({0} nœud),
+						'other' => q({0} nœuds),
+					},
+					# Core Unit Identifier
+					'knot' => {
+						'name' => q(nœuds),
+						'one' => q({0} nœud),
+						'other' => q({0} nœuds),
+					},
+					# Long Unit Identifier
+					'speed-meter-per-second' => {
+						'1' => q(masculine),
+						'name' => q(mètres par seconde),
+						'one' => q({0} mètre par seconde),
+						'other' => q({0} mètres par seconde),
+					},
+					# Core Unit Identifier
+					'meter-per-second' => {
+						'1' => q(masculine),
+						'name' => q(mètres par seconde),
+						'one' => q({0} mètre par seconde),
+						'other' => q({0} mètres par seconde),
+					},
+					# Long Unit Identifier
+					'speed-mile-per-hour' => {
+						'1' => q(masculine),
+						'name' => q(miles par heure),
+						'one' => q({0} mile par heure),
+						'other' => q({0} miles par heure),
+					},
+					# Core Unit Identifier
+					'mile-per-hour' => {
+						'1' => q(masculine),
+						'name' => q(miles par heure),
+						'one' => q({0} mile par heure),
+						'other' => q({0} miles par heure),
+					},
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'1' => q(masculine),
+						'name' => q(degrés Celsius),
+						'one' => q({0} degré Celsius),
+						'other' => q({0} degrés Celsius),
+					},
+					# Core Unit Identifier
+					'celsius' => {
+						'1' => q(masculine),
+						'name' => q(degrés Celsius),
+						'one' => q({0} degré Celsius),
+						'other' => q({0} degrés Celsius),
+					},
+					# Long Unit Identifier
+					'temperature-fahrenheit' => {
+						'1' => q(masculine),
+						'name' => q(degrés Fahrenheit),
+						'one' => q({0} degré Fahrenheit),
+						'other' => q({0} degrés Fahrenheit),
+					},
+					# Core Unit Identifier
+					'fahrenheit' => {
+						'1' => q(masculine),
+						'name' => q(degrés Fahrenheit),
+						'one' => q({0} degré Fahrenheit),
+						'other' => q({0} degrés Fahrenheit),
+					},
+					# Long Unit Identifier
+					'temperature-generic' => {
+						'1' => q(masculine),
+						'name' => q(degrés),
+						'one' => q({0} degré),
+						'other' => q({0} degrés),
+					},
+					# Core Unit Identifier
+					'generic' => {
+						'1' => q(masculine),
+						'name' => q(degrés),
+						'one' => q({0} degré),
+						'other' => q({0} degrés),
+					},
+					# Long Unit Identifier
+					'temperature-kelvin' => {
+						'1' => q(masculine),
+						'name' => q(kelvins),
+						'one' => q({0} kelvin),
+						'other' => q({0} kelvins),
+					},
+					# Core Unit Identifier
+					'kelvin' => {
+						'1' => q(masculine),
+						'name' => q(kelvins),
+						'one' => q({0} kelvin),
+						'other' => q({0} kelvins),
+					},
+					# Long Unit Identifier
+					'torque-newton-meter' => {
+						'name' => q(newtons-mètres),
+						'one' => q({0} newton-mètre),
+						'other' => q({0} newtons-mètres),
+					},
+					# Core Unit Identifier
+					'newton-meter' => {
+						'name' => q(newtons-mètres),
+						'one' => q({0} newton-mètre),
+						'other' => q({0} newtons-mètres),
+					},
+					# Long Unit Identifier
+					'torque-pound-force-foot' => {
+						'name' => q(livres-pieds),
+						'one' => q({0} livre-pied),
+						'other' => q({0} livres-pieds),
+					},
+					# Core Unit Identifier
+					'pound-force-foot' => {
+						'name' => q(livres-pieds),
+						'one' => q({0} livre-pied),
+						'other' => q({0} livres-pieds),
+					},
+					# Long Unit Identifier
+					'volume-acre-foot' => {
+						'name' => q(acres-pieds),
+						'one' => q({0} acre-pied),
+						'other' => q({0} acres-pieds),
+					},
+					# Core Unit Identifier
+					'acre-foot' => {
+						'name' => q(acres-pieds),
+						'one' => q({0} acre-pied),
+						'other' => q({0} acres-pieds),
+					},
+					# Long Unit Identifier
+					'volume-barrel' => {
+						'name' => q(barils),
+						'one' => q({0} baril),
+						'other' => q({0} barils),
+					},
+					# Core Unit Identifier
+					'barrel' => {
+						'name' => q(barils),
+						'one' => q({0} baril),
+						'other' => q({0} barils),
+					},
+					# Long Unit Identifier
+					'volume-bushel' => {
+						'name' => q(boisseaux),
+						'one' => q({0} boisseau),
+						'other' => q({0} boisseaux),
+					},
+					# Core Unit Identifier
+					'bushel' => {
+						'name' => q(boisseaux),
+						'one' => q({0} boisseau),
+						'other' => q({0} boisseaux),
+					},
+					# Long Unit Identifier
+					'volume-centiliter' => {
+						'1' => q(masculine),
+						'name' => q(centilitres),
+						'one' => q({0} centilitre),
+						'other' => q({0} centilitres),
+					},
+					# Core Unit Identifier
+					'centiliter' => {
+						'1' => q(masculine),
+						'name' => q(centilitres),
+						'one' => q({0} centilitre),
+						'other' => q({0} centilitres),
+					},
+					# Long Unit Identifier
+					'volume-cubic-centimeter' => {
+						'1' => q(masculine),
+						'name' => q(centimètres cubes),
+						'one' => q({0} centimètre cube),
+						'other' => q({0} centimètres cubes),
+						'per' => q({0} par centimètre cube),
+					},
+					# Core Unit Identifier
+					'cubic-centimeter' => {
+						'1' => q(masculine),
+						'name' => q(centimètres cubes),
+						'one' => q({0} centimètre cube),
+						'other' => q({0} centimètres cubes),
+						'per' => q({0} par centimètre cube),
+					},
+					# Long Unit Identifier
+					'volume-cubic-foot' => {
+						'1' => q(masculine),
+						'name' => q(pieds cubes),
+						'one' => q({0} pied cube),
+						'other' => q({0} pieds cubes),
+					},
+					# Core Unit Identifier
+					'cubic-foot' => {
+						'1' => q(masculine),
+						'name' => q(pieds cubes),
+						'one' => q({0} pied cube),
+						'other' => q({0} pieds cubes),
+					},
+					# Long Unit Identifier
+					'volume-cubic-inch' => {
+						'name' => q(pouces cubes),
+						'one' => q({0} pouce cube),
+						'other' => q({0} pouces cubes),
+					},
+					# Core Unit Identifier
+					'cubic-inch' => {
+						'name' => q(pouces cubes),
+						'one' => q({0} pouce cube),
+						'other' => q({0} pouces cubes),
+					},
+					# Long Unit Identifier
+					'volume-cubic-kilometer' => {
+						'name' => q(kilomètres cubes),
+						'one' => q({0} kilomètre cube),
+						'other' => q({0} kilomètres cubes),
+					},
+					# Core Unit Identifier
+					'cubic-kilometer' => {
+						'name' => q(kilomètres cubes),
+						'one' => q({0} kilomètre cube),
+						'other' => q({0} kilomètres cubes),
+					},
+					# Long Unit Identifier
+					'volume-cubic-meter' => {
+						'name' => q(mètres cubes),
+						'one' => q({0} mètre cube),
+						'other' => q({0} mètres cubes),
+						'per' => q({0} par mètre cube),
+					},
+					# Core Unit Identifier
+					'cubic-meter' => {
+						'name' => q(mètres cubes),
+						'one' => q({0} mètre cube),
+						'other' => q({0} mètres cubes),
+						'per' => q({0} par mètre cube),
+					},
+					# Long Unit Identifier
+					'volume-cubic-mile' => {
+						'1' => q(masculine),
+						'name' => q(milles cubes),
+						'one' => q({0} mille cube),
+						'other' => q({0} milles cubes),
+					},
+					# Core Unit Identifier
+					'cubic-mile' => {
+						'1' => q(masculine),
+						'name' => q(milles cubes),
+						'one' => q({0} mille cube),
+						'other' => q({0} milles cubes),
+					},
+					# Long Unit Identifier
+					'volume-cubic-yard' => {
+						'name' => q(yards cubes),
+						'one' => q({0} yard cube),
+						'other' => q({0} yards cubes),
+					},
+					# Core Unit Identifier
+					'cubic-yard' => {
+						'name' => q(yards cubes),
+						'one' => q({0} yard cube),
+						'other' => q({0} yards cubes),
+					},
+					# Long Unit Identifier
+					'volume-cup' => {
+						'1' => q(feminine),
+						'name' => q(tasses),
+						'one' => q({0} tasse),
+						'other' => q({0} tasses),
+					},
+					# Core Unit Identifier
+					'cup' => {
+						'1' => q(feminine),
+						'name' => q(tasses),
+						'one' => q({0} tasse),
+						'other' => q({0} tasses),
+					},
+					# Long Unit Identifier
+					'volume-cup-metric' => {
+						'1' => q(feminine),
+						'name' => q(tasses métriques),
+						'one' => q({0} tasse métrique),
+						'other' => q({0} tasses métriques),
+					},
+					# Core Unit Identifier
+					'cup-metric' => {
+						'1' => q(feminine),
+						'name' => q(tasses métriques),
+						'one' => q({0} tasse métrique),
+						'other' => q({0} tasses métriques),
+					},
+					# Long Unit Identifier
+					'volume-deciliter' => {
+						'1' => q(masculine),
+						'name' => q(décilitres),
+						'one' => q({0} décilitre),
+						'other' => q({0} décilitres),
+					},
+					# Core Unit Identifier
+					'deciliter' => {
+						'1' => q(masculine),
+						'name' => q(décilitres),
+						'one' => q({0} décilitre),
+						'other' => q({0} décilitres),
+					},
+					# Long Unit Identifier
+					'volume-dessert-spoon' => {
+						'1' => q(feminine),
+						'name' => q(cuillère à dessert),
+						'one' => q({0} cuillère à dessert),
+						'other' => q({0} cuillères à dessert),
+					},
+					# Core Unit Identifier
+					'dessert-spoon' => {
+						'1' => q(feminine),
+						'name' => q(cuillère à dessert),
+						'one' => q({0} cuillère à dessert),
+						'other' => q({0} cuillères à dessert),
+					},
+					# Long Unit Identifier
+					'volume-dessert-spoon-imperial' => {
+						'1' => q(feminine),
+						'name' => q(cuillère à dessert impériale),
+						'one' => q({0} cuillère à dessert impériale),
+						'other' => q({0} cuillères à dessert impériales),
+					},
+					# Core Unit Identifier
+					'dessert-spoon-imperial' => {
+						'1' => q(feminine),
+						'name' => q(cuillère à dessert impériale),
+						'one' => q({0} cuillère à dessert impériale),
+						'other' => q({0} cuillères à dessert impériales),
+					},
+					# Long Unit Identifier
+					'volume-dram' => {
+						'1' => q(feminine),
+						'name' => q(drachme),
+						'one' => q({0} drachme),
+						'other' => q({0} drachmes),
+					},
+					# Core Unit Identifier
+					'dram' => {
+						'1' => q(feminine),
+						'name' => q(drachme),
+						'one' => q({0} drachme),
+						'other' => q({0} drachmes),
+					},
+					# Long Unit Identifier
+					'volume-drop' => {
+						'1' => q(feminine),
+						'name' => q(goutte),
+						'one' => q({0} goutte),
+						'other' => q({0} gouttes),
+					},
+					# Core Unit Identifier
+					'drop' => {
+						'1' => q(feminine),
+						'name' => q(goutte),
+						'one' => q({0} goutte),
+						'other' => q({0} gouttes),
+					},
+					# Long Unit Identifier
+					'volume-fluid-ounce' => {
+						'1' => q(feminine),
+						'name' => q(onces liquides),
+						'one' => q({0} once liquide),
+						'other' => q({0} onces liquides),
+					},
+					# Core Unit Identifier
+					'fluid-ounce' => {
+						'1' => q(feminine),
+						'name' => q(onces liquides),
+						'one' => q({0} once liquide),
+						'other' => q({0} onces liquides),
+					},
+					# Long Unit Identifier
+					'volume-fluid-ounce-imperial' => {
+						'1' => q(feminine),
+						'name' => q(onces liquides impériales),
+						'one' => q({0} once liquide impériale),
+						'other' => q({0} onces liquides impériales),
+					},
+					# Core Unit Identifier
+					'fluid-ounce-imperial' => {
+						'1' => q(feminine),
+						'name' => q(onces liquides impériales),
+						'one' => q({0} once liquide impériale),
+						'other' => q({0} onces liquides impériales),
+					},
+					# Long Unit Identifier
+					'volume-gallon' => {
+						'1' => q(masculine),
+						'name' => q(gallons),
+						'one' => q({0} gallon),
+						'other' => q({0} gallons),
+						'per' => q({0} par gallon),
+					},
+					# Core Unit Identifier
+					'gallon' => {
+						'1' => q(masculine),
+						'name' => q(gallons),
+						'one' => q({0} gallon),
+						'other' => q({0} gallons),
+						'per' => q({0} par gallon),
+					},
+					# Long Unit Identifier
+					'volume-gallon-imperial' => {
+						'1' => q(masculine),
+						'name' => q(gallons impériaux),
+						'one' => q({0} gallon impérial),
+						'other' => q({0} gallons impériaux),
+						'per' => q({0} par gallon impérial),
+					},
+					# Core Unit Identifier
+					'gallon-imperial' => {
+						'1' => q(masculine),
+						'name' => q(gallons impériaux),
+						'one' => q({0} gallon impérial),
+						'other' => q({0} gallons impériaux),
+						'per' => q({0} par gallon impérial),
+					},
+					# Long Unit Identifier
+					'volume-hectoliter' => {
+						'name' => q(hectolitres),
+						'one' => q({0} hectolitre),
+						'other' => q({0} hectolitres),
+					},
+					# Core Unit Identifier
+					'hectoliter' => {
+						'name' => q(hectolitres),
+						'one' => q({0} hectolitre),
+						'other' => q({0} hectolitres),
+					},
+					# Long Unit Identifier
+					'volume-jigger' => {
+						'1' => q(masculine),
+						'name' => q(jigger),
+						'one' => q({0} jigger),
+						'other' => q({0} jiggers),
+					},
+					# Core Unit Identifier
+					'jigger' => {
+						'1' => q(masculine),
+						'name' => q(jigger),
+						'one' => q({0} jigger),
+						'other' => q({0} jiggers),
+					},
+					# Long Unit Identifier
+					'volume-liter' => {
+						'1' => q(masculine),
+						'name' => q(litres),
+						'one' => q({0} litre),
+						'other' => q({0} litres),
+						'per' => q({0} par litre),
+					},
+					# Core Unit Identifier
+					'liter' => {
+						'1' => q(masculine),
+						'name' => q(litres),
+						'one' => q({0} litre),
+						'other' => q({0} litres),
+						'per' => q({0} par litre),
+					},
+					# Long Unit Identifier
+					'volume-megaliter' => {
+						'name' => q(mégalitres),
+						'one' => q({0} mégalitre),
+						'other' => q({0} mégalitres),
+					},
+					# Core Unit Identifier
+					'megaliter' => {
+						'name' => q(mégalitres),
+						'one' => q({0} mégalitre),
+						'other' => q({0} mégalitres),
+					},
+					# Long Unit Identifier
+					'volume-milliliter' => {
+						'1' => q(masculine),
+						'name' => q(millilitres),
+						'one' => q({0} millilitre),
+						'other' => q({0} millilitres),
+					},
+					# Core Unit Identifier
+					'milliliter' => {
+						'1' => q(masculine),
+						'name' => q(millilitres),
+						'one' => q({0} millilitre),
+						'other' => q({0} millilitres),
+					},
+					# Long Unit Identifier
+					'volume-pinch' => {
+						'1' => q(feminine),
+						'name' => q(pincée),
+						'one' => q({0} pincée),
+						'other' => q({0} pincées),
+					},
+					# Core Unit Identifier
+					'pinch' => {
+						'1' => q(feminine),
+						'name' => q(pincée),
+						'one' => q({0} pincée),
+						'other' => q({0} pincées),
+					},
+					# Long Unit Identifier
+					'volume-pint' => {
+						'1' => q(feminine),
+						'name' => q(pintes),
+						'one' => q({0} pinte),
+						'other' => q({0} pintes),
+					},
+					# Core Unit Identifier
+					'pint' => {
+						'1' => q(feminine),
+						'name' => q(pintes),
+						'one' => q({0} pinte),
+						'other' => q({0} pintes),
+					},
+					# Long Unit Identifier
+					'volume-pint-metric' => {
+						'1' => q(feminine),
+						'name' => q(pintes métriques),
+						'one' => q({0} pinte métrique),
+						'other' => q({0} pintes métriques),
+					},
+					# Core Unit Identifier
+					'pint-metric' => {
+						'1' => q(feminine),
+						'name' => q(pintes métriques),
+						'one' => q({0} pinte métrique),
+						'other' => q({0} pintes métriques),
+					},
+					# Long Unit Identifier
+					'volume-quart' => {
+						'1' => q(masculine),
+						'name' => q(quarts),
+						'one' => q({0} quart),
+						'other' => q({0} quarts),
+					},
+					# Core Unit Identifier
+					'quart' => {
+						'1' => q(masculine),
+						'name' => q(quarts),
+						'one' => q({0} quart),
+						'other' => q({0} quarts),
+					},
+					# Long Unit Identifier
+					'volume-quart-imperial' => {
+						'1' => q(masculine),
+						'name' => q(quart impérial),
+						'one' => q({0} quart impérial),
+						'other' => q({0} quarts impériaux),
+					},
+					# Core Unit Identifier
+					'quart-imperial' => {
+						'1' => q(masculine),
+						'name' => q(quart impérial),
+						'one' => q({0} quart impérial),
+						'other' => q({0} quarts impériaux),
+					},
+					# Long Unit Identifier
+					'volume-tablespoon' => {
+						'1' => q(feminine),
+						'name' => q(cuillères à soupe),
+						'one' => q({0} cuillère à soupe),
+						'other' => q({0} cuillères à soupe),
+					},
+					# Core Unit Identifier
+					'tablespoon' => {
+						'1' => q(feminine),
+						'name' => q(cuillères à soupe),
+						'one' => q({0} cuillère à soupe),
+						'other' => q({0} cuillères à soupe),
+					},
+					# Long Unit Identifier
+					'volume-teaspoon' => {
+						'1' => q(feminine),
+						'name' => q(cuillères à café),
+						'one' => q({0} cuillère à café),
+						'other' => q({0} cuillères à café),
+					},
+					# Core Unit Identifier
+					'teaspoon' => {
+						'1' => q(feminine),
+						'name' => q(cuillères à café),
+						'one' => q({0} cuillère à café),
+						'other' => q({0} cuillères à café),
+					},
 				},
 				'narrow' => {
+					# Long Unit Identifier
 					'' => {
 						'name' => q(direction),
 					},
-					'acre' => {
-						'name' => q(ac),
-						'one' => q({0}ac),
-						'other' => q({0}ac),
+					# Core Unit Identifier
+					'' => {
+						'name' => q(direction),
 					},
-					'acre-foot' => {
-						'name' => q(acpi),
-						'one' => q({0}acpi),
-						'other' => q({0}acpi),
+					# Long Unit Identifier
+					'acceleration-g-force' => {
+						'name' => q(G),
+						'one' => q({0}G),
+						'other' => q({0}G),
 					},
-					'ampere' => {
-						'name' => q(A),
-						'one' => q({0}A),
-						'other' => q({0}A),
-					},
-					'arc-minute' => {
-						'name' => q(′),
-						'one' => q({0}′),
-						'other' => q({0}′),
-					},
-					'arc-second' => {
-						'name' => q(″),
-						'one' => q({0}″),
-						'other' => q({0}″),
-					},
-					'astronomical-unit' => {
-						'name' => q(ua),
-						'one' => q({0}ua),
-						'other' => q({0}ua),
-					},
-					'atmosphere' => {
-						'name' => q(atm),
-						'one' => q({0}atm),
-						'other' => q({0}atm),
-					},
-					'bit' => {
-						'name' => q(bit),
-						'one' => q({0}bit),
-						'other' => q({0}bit),
-					},
-					'bushel' => {
-						'name' => q(bu),
-						'one' => q({0}bu),
-						'other' => q({0}bu),
-					},
-					'byte' => {
-						'name' => q(o),
-						'one' => q({0}o),
-						'other' => q({0}o),
-					},
-					'calorie' => {
-						'name' => q(cal),
-						'one' => q({0}cal),
-						'other' => q({0}cal),
-					},
-					'carat' => {
-						'name' => q(ct),
-						'one' => q({0}ct),
-						'other' => q({0}ct),
-					},
-					'celsius' => {
-						'name' => q(°C),
-						'one' => q({0}°C),
-						'other' => q({0}°C),
-					},
-					'centiliter' => {
-						'name' => q(cl),
-						'one' => q({0}cl),
-						'other' => q({0}cl),
-					},
-					'centimeter' => {
-						'name' => q(cm),
-						'one' => q({0}cm),
-						'other' => q({0}cm),
-						'per' => q({0}/cm),
-					},
-					'century' => {
-						'name' => q(s.),
-						'one' => q({0} s.),
-						'other' => q({0} s.),
-					},
-					'coordinate' => {
-						'east' => q({0}E),
-						'north' => q({0}N),
-						'south' => q({0}S),
-						'west' => q({0}O),
-					},
-					'cubic-centimeter' => {
-						'name' => q(cm³),
-						'one' => q({0}cm³),
-						'other' => q({0}cm³),
-						'per' => q({0}/cm³),
-					},
-					'cubic-foot' => {
-						'name' => q(pi³),
-						'one' => q({0}pi³),
-						'other' => q({0}pi³),
-					},
-					'cubic-inch' => {
-						'name' => q(po³),
-						'one' => q({0}po³),
-						'other' => q({0}po³),
-					},
-					'cubic-kilometer' => {
-						'name' => q(km³),
-						'one' => q({0}km³),
-						'other' => q({0}km³),
-					},
-					'cubic-meter' => {
-						'name' => q(m³),
-						'one' => q({0}m³),
-						'other' => q({0}m³),
-						'per' => q({0}/m³),
-					},
-					'cubic-mile' => {
-						'name' => q(mi³),
-						'one' => q({0}mi³),
-						'other' => q({0}mi³),
-					},
-					'cubic-yard' => {
-						'name' => q(yd³),
-						'one' => q({0}yd³),
-						'other' => q({0}yd³),
-					},
-					'cup' => {
-						'name' => q(ta),
-						'one' => q({0}ta),
-						'other' => q({0}ta),
-					},
-					'cup-metric' => {
-						'name' => q(tm),
-						'one' => q({0}tm),
-						'other' => q({0}tm),
-					},
-					'day' => {
-						'name' => q(j),
-						'one' => q({0}j),
-						'other' => q({0}j),
-						'per' => q({0}/j),
-					},
-					'deciliter' => {
-						'name' => q(dl),
-						'one' => q({0}dl),
-						'other' => q({0}dl),
-					},
-					'decimeter' => {
-						'name' => q(dm),
-						'one' => q({0} dm),
-						'other' => q({0} dm),
-					},
-					'degree' => {
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					'fahrenheit' => {
-						'name' => q(°F),
-						'one' => q({0}°F),
-						'other' => q({0}°F),
-					},
-					'fathom' => {
-						'name' => q(fm),
-						'one' => q({0} fth),
-						'other' => q({0} fth),
-					},
-					'fluid-ounce' => {
-						'name' => q(fl oz),
-						'one' => q({0}fl oz),
-						'other' => q({0}fl oz),
-					},
-					'foodcalorie' => {
-						'name' => q(kcal),
-						'one' => q({0}kcal),
-						'other' => q({0}kcal),
-					},
-					'foot' => {
-						'name' => q(pi),
-						'one' => q({0}′),
-						'other' => q({0}′),
-						'per' => q({0}/pi),
-					},
-					'furlong' => {
-						'name' => q(fur),
-						'one' => q({0} fur),
-						'other' => q({0} fur),
-					},
+					# Core Unit Identifier
 					'g-force' => {
 						'name' => q(G),
 						'one' => q({0}G),
 						'other' => q({0}G),
 					},
-					'gallon' => {
-						'name' => q(gal),
-						'one' => q({0}gal),
-						'other' => q({0}gal),
-						'per' => q({0}/gal),
+					# Long Unit Identifier
+					'acceleration-meter-per-square-second' => {
+						'name' => q(m/s²),
+						'one' => q({0}m/s²),
+						'other' => q({0}m/s²),
 					},
-					'gallon-imperial' => {
-						'name' => q(galIm),
-						'one' => q({0}galIm),
-						'other' => q({0}galIm),
-						'per' => q({0}/galIm),
+					# Core Unit Identifier
+					'meter-per-square-second' => {
+						'name' => q(m/s²),
+						'one' => q({0}m/s²),
+						'other' => q({0}m/s²),
 					},
-					'generic' => {
+					# Long Unit Identifier
+					'angle-arc-minute' => {
+						'name' => q(′),
+						'one' => q({0}′),
+						'other' => q({0}′),
+					},
+					# Core Unit Identifier
+					'arc-minute' => {
+						'name' => q(′),
+						'one' => q({0}′),
+						'other' => q({0}′),
+					},
+					# Long Unit Identifier
+					'angle-arc-second' => {
+						'name' => q(″),
+						'one' => q({0}″),
+						'other' => q({0}″),
+					},
+					# Core Unit Identifier
+					'arc-second' => {
+						'name' => q(″),
+						'one' => q({0}″),
+						'other' => q({0}″),
+					},
+					# Long Unit Identifier
+					'angle-degree' => {
 						'name' => q(°),
 						'one' => q({0}°),
 						'other' => q({0}°),
 					},
-					'gigabit' => {
-						'name' => q(Gbit),
-						'one' => q({0}Gbit),
-						'other' => q({0}Gbit),
-					},
-					'gigabyte' => {
-						'name' => q(Go),
-						'one' => q({0}Go),
-						'other' => q({0}Go),
-					},
-					'gigahertz' => {
-						'name' => q(GHz),
-						'one' => q({0}GHz),
-						'other' => q({0}GHz),
-					},
-					'gigawatt' => {
-						'name' => q(GW),
-						'one' => q({0}GW),
-						'other' => q({0}GW),
-					},
-					'gram' => {
-						'name' => q(g),
-						'one' => q({0}g),
-						'other' => q({0}g),
-						'per' => q({0}/g),
-					},
-					'hectare' => {
-						'name' => q(ha),
-						'one' => q({0}ha),
-						'other' => q({0}ha),
-					},
-					'hectoliter' => {
-						'name' => q(hl),
-						'one' => q({0}hl),
-						'other' => q({0}hl),
-					},
-					'hectopascal' => {
-						'name' => q(hPa),
-						'one' => q({0}hPa),
-						'other' => q({0}hPa),
-					},
-					'hertz' => {
-						'name' => q(Hz),
-						'one' => q({0}Hz),
-						'other' => q({0}Hz),
-					},
-					'horsepower' => {
-						'name' => q(ch),
-						'one' => q({0}ch),
-						'other' => q({0}ch),
-					},
-					'hour' => {
-						'name' => q(h),
-						'one' => q({0}h),
-						'other' => q({0}h),
-						'per' => q({0}/h),
-					},
-					'inch' => {
-						'name' => q(po),
-						'one' => q({0}″),
-						'other' => q({0}″),
-						'per' => q({0}/po),
-					},
-					'inch-hg' => {
-						'name' => q(″Hg),
-						'one' => q({0}″ Hg),
-						'other' => q({0}″ Hg),
-					},
-					'joule' => {
-						'name' => q(J),
-						'one' => q({0}J),
-						'other' => q({0}J),
-					},
-					'karat' => {
-						'name' => q(ct),
-						'one' => q({0}ct),
-						'other' => q({0}ct),
-					},
-					'kelvin' => {
-						'name' => q(K),
-						'one' => q({0} K),
-						'other' => q({0} K),
-					},
-					'kilobit' => {
-						'name' => q(kbit),
-						'one' => q({0}kbit),
-						'other' => q({0}kbit),
-					},
-					'kilobyte' => {
-						'name' => q(ko),
-						'one' => q({0}ko),
-						'other' => q({0}ko),
-					},
-					'kilocalorie' => {
-						'name' => q(kcal),
-						'one' => q({0}kcal),
-						'other' => q({0}kcal),
-					},
-					'kilogram' => {
-						'name' => q(kg),
-						'one' => q({0}kg),
-						'other' => q({0}kg),
-						'per' => q({0}/kg),
-					},
-					'kilohertz' => {
-						'name' => q(kHz),
-						'one' => q({0}kHz),
-						'other' => q({0}kHz),
-					},
-					'kilojoule' => {
-						'name' => q(kJ),
-						'one' => q({0}kJ),
-						'other' => q({0}kJ),
-					},
-					'kilometer' => {
-						'name' => q(km),
-						'one' => q({0}km),
-						'other' => q({0}km),
-						'per' => q({0}/km),
-					},
-					'kilometer-per-hour' => {
-						'name' => q(km/h),
-						'one' => q({0}km/h),
-						'other' => q({0}km/h),
-					},
-					'kilowatt' => {
-						'name' => q(kW),
-						'one' => q({0}kW),
-						'other' => q({0}kW),
-					},
-					'kilowatt-hour' => {
-						'name' => q(kWh),
-						'one' => q({0}kWh),
-						'other' => q({0}kWh),
-					},
-					'knot' => {
-						'name' => q(nd),
-						'one' => q({0} nd),
-						'other' => q({0} nd),
-					},
-					'light-year' => {
-						'name' => q(al),
-						'one' => q({0}a.l.),
-						'other' => q({0}a.l.),
-					},
-					'liter' => {
-						'name' => q(l),
-						'one' => q({0}l),
-						'other' => q({0}l),
-						'per' => q({0}/l),
-					},
-					'liter-per-100kilometers' => {
-						'name' => q(l/100km),
-						'one' => q({0}l/100km),
-						'other' => q({0}l/100km),
-					},
-					'liter-per-kilometer' => {
-						'name' => q(L/km),
-						'one' => q({0}l/km),
-						'other' => q({0}l/km),
-					},
-					'lux' => {
-						'name' => q(lx),
-						'one' => q({0}lx),
-						'other' => q({0}lx),
-					},
-					'megabit' => {
-						'name' => q(Mbit),
-						'one' => q({0}Mbit),
-						'other' => q({0}Mbit),
-					},
-					'megabyte' => {
-						'name' => q(Mo),
-						'one' => q({0}Mo),
-						'other' => q({0}Mo),
-					},
-					'megahertz' => {
-						'name' => q(MHz),
-						'one' => q({0}MHz),
-						'other' => q({0}MHz),
-					},
-					'megaliter' => {
-						'name' => q(Ml),
-						'one' => q({0}Ml),
-						'other' => q({0}Ml),
-					},
-					'megawatt' => {
-						'name' => q(MW),
-						'one' => q({0}MW),
-						'other' => q({0}MW),
-					},
-					'meter' => {
-						'name' => q(m),
-						'one' => q({0}m),
-						'other' => q({0}m),
-						'per' => q({0}/m),
-					},
-					'meter-per-second' => {
-						'name' => q(m/s),
-						'one' => q({0}m/s),
-						'other' => q({0}m/s),
-					},
-					'meter-per-second-squared' => {
-						'name' => q(m/s²),
-						'one' => q({0} m/s²),
-						'other' => q({0} m/s²),
-					},
-					'metric-ton' => {
-						'name' => q(t),
-						'one' => q({0} t),
-						'other' => q({0} t),
-					},
-					'microgram' => {
-						'name' => q(µg),
-						'one' => q({0} µg),
-						'other' => q({0} µg),
-					},
-					'micrometer' => {
-						'name' => q(µm),
-						'one' => q({0} µm),
-						'other' => q({0} µm),
-					},
-					'microsecond' => {
-						'name' => q(μs),
-						'one' => q({0} μs),
-						'other' => q({0} μs),
-					},
-					'mile' => {
-						'name' => q(mi),
-						'one' => q({0}mi),
-						'other' => q({0}mi),
-					},
-					'mile-per-gallon' => {
-						'name' => q(mi/gal),
-						'one' => q({0}mi/gal),
-						'other' => q({0}mi/gal),
-					},
-					'mile-per-gallon-imperial' => {
-						'name' => q(mi/gIm),
-						'one' => q({0}mi/gIm),
-						'other' => q({0}mi/gIm),
-					},
-					'mile-per-hour' => {
-						'name' => q(mi/h),
-						'one' => q({0}mi/h),
-						'other' => q({0}mi/h),
-					},
-					'mile-scandinavian' => {
-						'name' => q(smi),
-						'one' => q({0} smi),
-						'other' => q({0} smi),
-					},
-					'milliampere' => {
-						'name' => q(mA),
-						'one' => q({0}mA),
-						'other' => q({0}mA),
-					},
-					'millibar' => {
-						'name' => q(mbar),
-						'one' => q({0}mbar),
-						'other' => q({0}mbar),
-					},
-					'milligram' => {
-						'name' => q(mg),
-						'one' => q({0} mg),
-						'other' => q({0} mg),
-					},
-					'milligram-per-deciliter' => {
-						'name' => q(mg/dl),
-						'one' => q({0}mg/dl),
-						'other' => q({0}mg/dl),
-					},
-					'milliliter' => {
-						'name' => q(ml),
-						'one' => q({0}ml),
-						'other' => q({0}ml),
-					},
-					'millimeter' => {
-						'name' => q(mm),
-						'one' => q({0}mm),
-						'other' => q({0}mm),
-					},
-					'millimeter-of-mercury' => {
-						'name' => q(mmHg),
-						'one' => q({0} mmHg),
-						'other' => q({0} mmHg),
-					},
-					'millimole-per-liter' => {
-						'name' => q(mmol/l),
-						'one' => q({0}mmol/l),
-						'other' => q({0}mmol/l),
-					},
-					'millisecond' => {
-						'name' => q(ms),
-						'one' => q({0}ms),
-						'other' => q({0}ms),
-					},
-					'milliwatt' => {
-						'name' => q(mW),
-						'one' => q({0}mW),
-						'other' => q({0}mW),
-					},
-					'minute' => {
-						'name' => q(min),
-						'one' => q({0} min),
-						'other' => q({0} min),
-						'per' => q({0}/min),
-					},
-					'month' => {
-						'name' => q(m.),
-						'one' => q({0}m.),
-						'other' => q({0}m.),
-						'per' => q({0}/m.),
-					},
-					'nanometer' => {
-						'name' => q(nm),
-						'one' => q({0} nm),
-						'other' => q({0} nm),
-					},
-					'nanosecond' => {
-						'name' => q(ns),
-						'one' => q({0} ns),
-						'other' => q({0} ns),
-					},
-					'nautical-mile' => {
-						'name' => q(nmi),
-						'one' => q({0} nmi),
-						'other' => q({0} nmi),
-					},
-					'ohm' => {
-						'name' => q(Ω),
-						'one' => q({0}Ω),
-						'other' => q({0}Ω),
-					},
-					'ounce' => {
-						'name' => q(oz),
-						'one' => q({0}oz),
-						'other' => q({0}oz),
-						'per' => q({0}/oz),
-					},
-					'ounce-troy' => {
-						'name' => q(oz t),
-						'one' => q({0}oz t),
-						'other' => q({0}oz t),
-					},
-					'parsec' => {
-						'name' => q(pc),
-						'one' => q({0} pc),
-						'other' => q({0} pc),
-					},
-					'part-per-million' => {
-						'name' => q(ppm),
-						'one' => q({0}ppm),
-						'other' => q({0}ppm),
-					},
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					'percent' => {
-						'name' => q(%),
-						'one' => q({0}%),
-						'other' => q({0}%),
-					},
-					'permille' => {
-						'name' => q(‰),
-						'one' => q({0}‰),
-						'other' => q({0}‰),
-					},
-					'petabyte' => {
-						'name' => q(Po),
-						'one' => q({0}Po),
-						'other' => q({0}Po),
-					},
-					'picometer' => {
-						'name' => q(pm),
-						'one' => q({0}pm),
-						'other' => q({0}pm),
-					},
-					'pint' => {
-						'name' => q(pte),
-						'one' => q({0}pte),
-						'other' => q({0}pte),
-					},
-					'pint-metric' => {
-						'name' => q(mpt),
-						'one' => q({0}mpt),
-						'other' => q({0}mpt),
-					},
-					'point' => {
-						'name' => q(pt),
-						'one' => q({0} pt),
-						'other' => q({0} pt),
-					},
-					'pound' => {
-						'name' => q(lb),
-						'one' => q({0}lb),
-						'other' => q({0}lb),
-						'per' => q({0}/lb),
-					},
-					'pound-per-square-inch' => {
-						'name' => q(lb/po²),
-						'one' => q({0} lb/po²),
-						'other' => q({0} lb/po²),
-					},
-					'quart' => {
-						'name' => q(qt),
-						'one' => q({0}qt),
-						'other' => q({0}qt),
-					},
+					# Core Unit Identifier
+					'degree' => {
+						'name' => q(°),
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Long Unit Identifier
+					'angle-radian' => {
+						'name' => q(rad),
+						'one' => q({0} rad),
+						'other' => q({0} rad),
+					},
+					# Core Unit Identifier
 					'radian' => {
 						'name' => q(rad),
 						'one' => q({0} rad),
 						'other' => q({0} rad),
 					},
+					# Long Unit Identifier
+					'angle-revolution' => {
+						'name' => q(tr),
+						'one' => q({0}tr),
+						'other' => q({0}tr),
+					},
+					# Core Unit Identifier
 					'revolution' => {
 						'name' => q(tr),
 						'one' => q({0}tr),
 						'other' => q({0}tr),
 					},
-					'second' => {
-						'name' => q(s),
-						'one' => q({0}s),
-						'other' => q({0}s),
-						'per' => q({0}/s),
+					# Long Unit Identifier
+					'area-acre' => {
+						'name' => q(ac),
+						'one' => q({0}ac),
+						'other' => q({0}ac),
 					},
+					# Core Unit Identifier
+					'acre' => {
+						'name' => q(ac),
+						'one' => q({0}ac),
+						'other' => q({0}ac),
+					},
+					# Long Unit Identifier
+					'area-dunam' => {
+						'name' => q(dounam),
+						'one' => q({0}dounam),
+						'other' => q({0}dounams),
+					},
+					# Core Unit Identifier
+					'dunam' => {
+						'name' => q(dounam),
+						'one' => q({0}dounam),
+						'other' => q({0}dounams),
+					},
+					# Long Unit Identifier
+					'area-hectare' => {
+						'name' => q(ha),
+						'one' => q({0}ha),
+						'other' => q({0}ha),
+					},
+					# Core Unit Identifier
+					'hectare' => {
+						'name' => q(ha),
+						'one' => q({0}ha),
+						'other' => q({0}ha),
+					},
+					# Long Unit Identifier
+					'area-square-centimeter' => {
+						'name' => q(cm²),
+						'one' => q({0}cm²),
+						'other' => q({0}cm²),
+						'per' => q({0}/cm²),
+					},
+					# Core Unit Identifier
 					'square-centimeter' => {
 						'name' => q(cm²),
 						'one' => q({0}cm²),
 						'other' => q({0}cm²),
 						'per' => q({0}/cm²),
 					},
+					# Long Unit Identifier
+					'area-square-foot' => {
+						'name' => q(pi²),
+						'one' => q({0}pi²),
+						'other' => q({0}pi²),
+					},
+					# Core Unit Identifier
 					'square-foot' => {
 						'name' => q(pi²),
 						'one' => q({0}pi²),
 						'other' => q({0}pi²),
 					},
+					# Long Unit Identifier
+					'area-square-inch' => {
+						'name' => q(po²),
+						'one' => q({0}po²),
+						'other' => q({0}po²),
+						'per' => q({0}/po²),
+					},
+					# Core Unit Identifier
 					'square-inch' => {
 						'name' => q(po²),
 						'one' => q({0}po²),
 						'other' => q({0}po²),
 						'per' => q({0}/po²),
 					},
+					# Long Unit Identifier
+					'area-square-kilometer' => {
+						'name' => q(km²),
+						'one' => q({0}km²),
+						'other' => q({0}km²),
+						'per' => q({0}/km²),
+					},
+					# Core Unit Identifier
 					'square-kilometer' => {
 						'name' => q(km²),
 						'one' => q({0}km²),
 						'other' => q({0}km²),
 						'per' => q({0}/km²),
 					},
+					# Long Unit Identifier
+					'area-square-meter' => {
+						'name' => q(m²),
+						'one' => q({0}m²),
+						'other' => q({0}m²),
+						'per' => q({0}/m²),
+					},
+					# Core Unit Identifier
 					'square-meter' => {
 						'name' => q(m²),
 						'one' => q({0}m²),
 						'other' => q({0}m²),
 						'per' => q({0}/m²),
 					},
+					# Long Unit Identifier
+					'area-square-mile' => {
+						'name' => q(mi²),
+						'one' => q({0}mi²),
+						'other' => q({0}mi²),
+						'per' => q({0}/mi²),
+					},
+					# Core Unit Identifier
 					'square-mile' => {
 						'name' => q(mi²),
 						'one' => q({0}mi²),
 						'other' => q({0}mi²),
 						'per' => q({0}/mi²),
 					},
+					# Long Unit Identifier
+					'area-square-yard' => {
+						'name' => q(yd²),
+						'one' => q({0}yd²),
+						'other' => q({0}yd²),
+					},
+					# Core Unit Identifier
 					'square-yard' => {
 						'name' => q(yd²),
 						'one' => q({0}yd²),
 						'other' => q({0}yd²),
 					},
-					'stone' => {
-						'name' => q(st),
-						'one' => q({0} st),
-						'other' => q({0} st),
+					# Long Unit Identifier
+					'concentr-item' => {
+						'one' => q({0}item),
+						'other' => q({0}items),
 					},
-					'tablespoon' => {
-						'name' => q(CàS),
-						'one' => q({0}CàS),
-						'other' => q({0}CàS),
+					# Core Unit Identifier
+					'item' => {
+						'one' => q({0}item),
+						'other' => q({0}items),
 					},
-					'teaspoon' => {
-						'name' => q(CàC),
-						'one' => q({0}CàC),
-						'other' => q({0}CàC),
+					# Long Unit Identifier
+					'concentr-karat' => {
+						'name' => q(ct),
+						'one' => q({0}ct),
+						'other' => q({0}ct),
 					},
+					# Core Unit Identifier
+					'karat' => {
+						'name' => q(ct),
+						'one' => q({0}ct),
+						'other' => q({0}ct),
+					},
+					# Long Unit Identifier
+					'concentr-milligram-ofglucose-per-deciliter' => {
+						'name' => q(mg/dl),
+						'one' => q({0}mg/dl),
+						'other' => q({0}mg/dl),
+					},
+					# Core Unit Identifier
+					'milligram-ofglucose-per-deciliter' => {
+						'name' => q(mg/dl),
+						'one' => q({0}mg/dl),
+						'other' => q({0}mg/dl),
+					},
+					# Long Unit Identifier
+					'concentr-millimole-per-liter' => {
+						'name' => q(mmol/l),
+						'one' => q({0}mmol/l),
+						'other' => q({0}mmol/l),
+					},
+					# Core Unit Identifier
+					'millimole-per-liter' => {
+						'name' => q(mmol/l),
+						'one' => q({0}mmol/l),
+						'other' => q({0}mmol/l),
+					},
+					# Long Unit Identifier
+					'concentr-mole' => {
+						'name' => q(mol),
+						'one' => q({0}mol),
+						'other' => q({0}mol),
+					},
+					# Core Unit Identifier
+					'mole' => {
+						'name' => q(mol),
+						'one' => q({0}mol),
+						'other' => q({0}mol),
+					},
+					# Long Unit Identifier
+					'concentr-percent' => {
+						'name' => q(%),
+						'one' => q({0} %),
+						'other' => q({0} %),
+					},
+					# Core Unit Identifier
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0} %),
+						'other' => q({0} %),
+					},
+					# Long Unit Identifier
+					'concentr-permille' => {
+						'name' => q(‰),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					# Core Unit Identifier
+					'permille' => {
+						'name' => q(‰),
+						'one' => q({0}‰),
+						'other' => q({0}‰),
+					},
+					# Long Unit Identifier
+					'concentr-permillion' => {
+						'name' => q(ppm),
+						'one' => q({0}ppm),
+						'other' => q({0}ppm),
+					},
+					# Core Unit Identifier
+					'permillion' => {
+						'name' => q(ppm),
+						'one' => q({0}ppm),
+						'other' => q({0}ppm),
+					},
+					# Long Unit Identifier
+					'concentr-permyriad' => {
+						'name' => q(‱),
+						'one' => q({0}‱),
+						'other' => q({0}‱),
+					},
+					# Core Unit Identifier
+					'permyriad' => {
+						'name' => q(‱),
+						'one' => q({0}‱),
+						'other' => q({0}‱),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-100-kilometer' => {
+						'name' => q(l/100km),
+						'one' => q({0}l/100km),
+						'other' => q({0}l/100km),
+					},
+					# Core Unit Identifier
+					'liter-per-100-kilometer' => {
+						'name' => q(l/100km),
+						'one' => q({0}l/100km),
+						'other' => q({0}l/100km),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-kilometer' => {
+						'one' => q({0}l/km),
+						'other' => q({0}l/km),
+					},
+					# Core Unit Identifier
+					'liter-per-kilometer' => {
+						'one' => q({0}l/km),
+						'other' => q({0}l/km),
+					},
+					# Long Unit Identifier
+					'consumption-mile-per-gallon' => {
+						'name' => q(mi/gal),
+						'one' => q({0}mi/gal),
+						'other' => q({0}mi/gal),
+					},
+					# Core Unit Identifier
+					'mile-per-gallon' => {
+						'name' => q(mi/gal),
+						'one' => q({0}mi/gal),
+						'other' => q({0}mi/gal),
+					},
+					# Long Unit Identifier
+					'consumption-mile-per-gallon-imperial' => {
+						'one' => q({0}mi/gal imp.),
+						'other' => q({0}mi/gal imp.),
+					},
+					# Core Unit Identifier
+					'mile-per-gallon-imperial' => {
+						'one' => q({0}mi/gal imp.),
+						'other' => q({0}mi/gal imp.),
+					},
+					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0}E),
+						'north' => q({0}N),
+						'south' => q({0}S),
+						'west' => q({0}O),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0}E),
+						'north' => q({0}N),
+						'south' => q({0}S),
+						'west' => q({0}O),
+					},
+					# Long Unit Identifier
+					'digital-bit' => {
+						'name' => q(bit),
+						'one' => q({0}bit),
+						'other' => q({0}bit),
+					},
+					# Core Unit Identifier
+					'bit' => {
+						'name' => q(bit),
+						'one' => q({0}bit),
+						'other' => q({0}bit),
+					},
+					# Long Unit Identifier
+					'digital-byte' => {
+						'name' => q(o),
+						'one' => q({0}o),
+						'other' => q({0}o),
+					},
+					# Core Unit Identifier
+					'byte' => {
+						'name' => q(o),
+						'one' => q({0}o),
+						'other' => q({0}o),
+					},
+					# Long Unit Identifier
+					'digital-gigabit' => {
+						'name' => q(Gbit),
+						'one' => q({0}Gbit),
+						'other' => q({0}Gbit),
+					},
+					# Core Unit Identifier
+					'gigabit' => {
+						'name' => q(Gbit),
+						'one' => q({0}Gbit),
+						'other' => q({0}Gbit),
+					},
+					# Long Unit Identifier
+					'digital-gigabyte' => {
+						'name' => q(Go),
+						'one' => q({0}Go),
+						'other' => q({0}Go),
+					},
+					# Core Unit Identifier
+					'gigabyte' => {
+						'name' => q(Go),
+						'one' => q({0}Go),
+						'other' => q({0}Go),
+					},
+					# Long Unit Identifier
+					'digital-kilobit' => {
+						'name' => q(kbit),
+						'one' => q({0}kbit),
+						'other' => q({0}kbit),
+					},
+					# Core Unit Identifier
+					'kilobit' => {
+						'name' => q(kbit),
+						'one' => q({0}kbit),
+						'other' => q({0}kbit),
+					},
+					# Long Unit Identifier
+					'digital-kilobyte' => {
+						'name' => q(ko),
+						'one' => q({0}ko),
+						'other' => q({0}ko),
+					},
+					# Core Unit Identifier
+					'kilobyte' => {
+						'name' => q(ko),
+						'one' => q({0}ko),
+						'other' => q({0}ko),
+					},
+					# Long Unit Identifier
+					'digital-megabit' => {
+						'name' => q(Mbit),
+						'one' => q({0}Mbit),
+						'other' => q({0}Mbit),
+					},
+					# Core Unit Identifier
+					'megabit' => {
+						'name' => q(Mbit),
+						'one' => q({0}Mbit),
+						'other' => q({0}Mbit),
+					},
+					# Long Unit Identifier
+					'digital-megabyte' => {
+						'name' => q(Mo),
+						'one' => q({0}Mo),
+						'other' => q({0}Mo),
+					},
+					# Core Unit Identifier
+					'megabyte' => {
+						'name' => q(Mo),
+						'one' => q({0}Mo),
+						'other' => q({0}Mo),
+					},
+					# Long Unit Identifier
+					'digital-petabyte' => {
+						'name' => q(Po),
+						'one' => q({0}Po),
+						'other' => q({0}Po),
+					},
+					# Core Unit Identifier
+					'petabyte' => {
+						'name' => q(Po),
+						'one' => q({0}Po),
+						'other' => q({0}Po),
+					},
+					# Long Unit Identifier
+					'digital-terabit' => {
+						'name' => q(Tbit),
+						'one' => q({0}Tbit),
+						'other' => q({0}Tbit),
+					},
+					# Core Unit Identifier
 					'terabit' => {
 						'name' => q(Tbit),
 						'one' => q({0}Tbit),
 						'other' => q({0}Tbit),
 					},
+					# Long Unit Identifier
+					'digital-terabyte' => {
+						'name' => q(To),
+						'one' => q({0}To),
+						'other' => q({0}To),
+					},
+					# Core Unit Identifier
 					'terabyte' => {
 						'name' => q(To),
 						'one' => q({0}To),
 						'other' => q({0}To),
 					},
-					'ton' => {
-						'name' => q(sh tn),
-						'one' => q({0} sh tn),
-						'other' => q({0} sh tn),
+					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(s.),
+						'one' => q({0} s.),
+						'other' => q({0} s.),
 					},
-					'volt' => {
-						'name' => q(V),
-						'one' => q({0}V),
-						'other' => q({0}V),
+					# Core Unit Identifier
+					'century' => {
+						'name' => q(s.),
+						'one' => q({0} s.),
+						'other' => q({0} s.),
 					},
-					'watt' => {
-						'name' => q(W),
-						'one' => q({0}W),
-						'other' => q({0}W),
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(j),
+						'one' => q({0}j),
+						'other' => q({0}j),
+						'per' => q({0}/j),
 					},
+					# Core Unit Identifier
+					'day' => {
+						'name' => q(j),
+						'one' => q({0}j),
+						'other' => q({0}j),
+						'per' => q({0}/j),
+					},
+					# Long Unit Identifier
+					'duration-decade' => {
+						'name' => q(déc.),
+						'one' => q({0}déc.),
+						'other' => q({0}déc.),
+					},
+					# Core Unit Identifier
+					'decade' => {
+						'name' => q(déc.),
+						'one' => q({0}déc.),
+						'other' => q({0}déc.),
+					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(h),
+						'one' => q({0}h),
+						'other' => q({0}h),
+						'per' => q({0}/h),
+					},
+					# Core Unit Identifier
+					'hour' => {
+						'name' => q(h),
+						'one' => q({0}h),
+						'other' => q({0}h),
+						'per' => q({0}/h),
+					},
+					# Long Unit Identifier
+					'duration-microsecond' => {
+						'name' => q(μs),
+						'one' => q({0}μs),
+						'other' => q({0}μs),
+					},
+					# Core Unit Identifier
+					'microsecond' => {
+						'name' => q(μs),
+						'one' => q({0}μs),
+						'other' => q({0}μs),
+					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(ms),
+						'one' => q({0}ms),
+						'other' => q({0}ms),
+					},
+					# Core Unit Identifier
+					'millisecond' => {
+						'name' => q(ms),
+						'one' => q({0}ms),
+						'other' => q({0}ms),
+					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(min),
+						'one' => q({0}min),
+						'other' => q({0}min),
+						'per' => q({0}/min),
+					},
+					# Core Unit Identifier
+					'minute' => {
+						'name' => q(min),
+						'one' => q({0}min),
+						'other' => q({0}min),
+						'per' => q({0}/min),
+					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(m.),
+						'one' => q({0}m.),
+						'other' => q({0}m.),
+						'per' => q({0}/m.),
+					},
+					# Core Unit Identifier
+					'month' => {
+						'name' => q(m.),
+						'one' => q({0}m.),
+						'other' => q({0}m.),
+						'per' => q({0}/m.),
+					},
+					# Long Unit Identifier
+					'duration-nanosecond' => {
+						'name' => q(ns),
+						'one' => q({0}ns),
+						'other' => q({0}ns),
+					},
+					# Core Unit Identifier
+					'nanosecond' => {
+						'name' => q(ns),
+						'one' => q({0}ns),
+						'other' => q({0}ns),
+					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(s),
+						'one' => q({0}s),
+						'other' => q({0}s),
+						'per' => q({0}/s),
+					},
+					# Core Unit Identifier
+					'second' => {
+						'name' => q(s),
+						'one' => q({0}s),
+						'other' => q({0}s),
+						'per' => q({0}/s),
+					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(sem.),
+						'one' => q({0}sem.),
+						'other' => q({0}sem.),
+						'per' => q({0}/sem.),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(sem.),
 						'one' => q({0}sem.),
 						'other' => q({0}sem.),
 						'per' => q({0}/sem.),
 					},
-					'yard' => {
-						'name' => q(yd),
-						'one' => q({0}yd),
-						'other' => q({0}yd),
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(a),
+						'one' => q({0}a),
+						'other' => q({0}a),
+						'per' => q({0}/a),
 					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(a),
 						'one' => q({0}a),
 						'other' => q({0}a),
 						'per' => q({0}/a),
 					},
-				},
-				'short' => {
-					'' => {
-						'name' => q(direction),
+					# Long Unit Identifier
+					'electric-ampere' => {
+						'name' => q(A),
+						'one' => q({0}A),
+						'other' => q({0}A),
 					},
-					'acre' => {
-						'name' => q(ac),
-						'one' => q({0} ac),
-						'other' => q({0} ac),
-					},
-					'acre-foot' => {
-						'name' => q(ac pi),
-						'one' => q({0} ac pi),
-						'other' => q({0} ac pi),
-					},
+					# Core Unit Identifier
 					'ampere' => {
 						'name' => q(A),
-						'one' => q({0} A),
-						'other' => q({0} A),
+						'one' => q({0}A),
+						'other' => q({0}A),
 					},
-					'arc-minute' => {
-						'name' => q(′),
-						'one' => q({0}′),
-						'other' => q({0}′),
+					# Long Unit Identifier
+					'electric-milliampere' => {
+						'name' => q(mA),
+						'one' => q({0}mA),
+						'other' => q({0}mA),
 					},
-					'arc-second' => {
-						'name' => q(″),
-						'one' => q({0}″),
-						'other' => q({0}″),
+					# Core Unit Identifier
+					'milliampere' => {
+						'name' => q(mA),
+						'one' => q({0}mA),
+						'other' => q({0}mA),
 					},
-					'astronomical-unit' => {
-						'name' => q(ua),
-						'one' => q({0} ua),
-						'other' => q({0} ua),
+					# Long Unit Identifier
+					'electric-ohm' => {
+						'name' => q(Ω),
+						'one' => q({0}Ω),
+						'other' => q({0}Ω),
 					},
-					'atmosphere' => {
-						'name' => q(atm),
-						'one' => q({0} atm),
-						'other' => q({0} atm),
+					# Core Unit Identifier
+					'ohm' => {
+						'name' => q(Ω),
+						'one' => q({0}Ω),
+						'other' => q({0}Ω),
 					},
-					'bit' => {
-						'name' => q(bit),
-						'one' => q({0} bit),
-						'other' => q({0} bit),
+					# Long Unit Identifier
+					'electric-volt' => {
+						'name' => q(V),
+						'one' => q({0}V),
+						'other' => q({0}V),
 					},
-					'bushel' => {
-						'name' => q(bu),
-						'one' => q({0} bu),
-						'other' => q({0} bu),
+					# Core Unit Identifier
+					'volt' => {
+						'name' => q(V),
+						'one' => q({0}V),
+						'other' => q({0}V),
 					},
-					'byte' => {
-						'name' => q(octet),
-						'one' => q({0} o),
-						'other' => q({0} o),
+					# Long Unit Identifier
+					'energy-british-thermal-unit' => {
+						'name' => q(BTU),
+						'one' => q({0}Btu),
+						'other' => q({0}Btu),
 					},
+					# Core Unit Identifier
+					'british-thermal-unit' => {
+						'name' => q(BTU),
+						'one' => q({0}Btu),
+						'other' => q({0}Btu),
+					},
+					# Long Unit Identifier
+					'energy-calorie' => {
+						'name' => q(cal),
+						'one' => q({0}cal),
+						'other' => q({0}cal),
+					},
+					# Core Unit Identifier
 					'calorie' => {
 						'name' => q(cal),
-						'one' => q({0} cal),
-						'other' => q({0} cal),
+						'one' => q({0}cal),
+						'other' => q({0}cal),
 					},
-					'carat' => {
-						'name' => q(ct),
-						'one' => q({0} ct),
-						'other' => q({0} ct),
+					# Long Unit Identifier
+					'energy-electronvolt' => {
+						'name' => q(eV),
+						'one' => q({0}eV),
+						'other' => q({0}eV),
 					},
-					'celsius' => {
-						'name' => q(°C),
-						'one' => q({0} °C),
-						'other' => q({0} °C),
+					# Core Unit Identifier
+					'electronvolt' => {
+						'name' => q(eV),
+						'one' => q({0}eV),
+						'other' => q({0}eV),
 					},
-					'centiliter' => {
-						'name' => q(cl),
-						'one' => q({0} cl),
-						'other' => q({0} cl),
+					# Long Unit Identifier
+					'energy-foodcalorie' => {
+						'name' => q(kcal),
+						'one' => q({0}kcal),
+						'other' => q({0}kcal),
 					},
-					'centimeter' => {
-						'name' => q(cm),
-						'one' => q({0} cm),
-						'other' => q({0} cm),
-						'per' => q({0}/cm),
-					},
-					'century' => {
-						'name' => q(siècles),
-						'one' => q({0} siècle),
-						'other' => q({0} siècles),
-					},
-					'coordinate' => {
-						'east' => q({0} E),
-						'north' => q({0} N),
-						'south' => q({0} S),
-						'west' => q({0} O),
-					},
-					'cubic-centimeter' => {
-						'name' => q(cm³),
-						'one' => q({0} cm³),
-						'other' => q({0} cm³),
-						'per' => q({0}/cm³),
-					},
-					'cubic-foot' => {
-						'name' => q(pi³),
-						'one' => q({0} pi³),
-						'other' => q({0} pi³),
-					},
-					'cubic-inch' => {
-						'name' => q(po³),
-						'one' => q({0} po³),
-						'other' => q({0} po³),
-					},
-					'cubic-kilometer' => {
-						'name' => q(km³),
-						'one' => q({0} km³),
-						'other' => q({0} km³),
-					},
-					'cubic-meter' => {
-						'name' => q(m³),
-						'one' => q({0} m³),
-						'other' => q({0} m³),
-						'per' => q({0}/m³),
-					},
-					'cubic-mile' => {
-						'name' => q(mi³),
-						'one' => q({0} mi³),
-						'other' => q({0} mi³),
-					},
-					'cubic-yard' => {
-						'name' => q(yd³),
-						'one' => q({0} yd³),
-						'other' => q({0} yd³),
-					},
-					'cup' => {
-						'name' => q(tasses),
-						'one' => q({0} tasse),
-						'other' => q({0} tasses),
-					},
-					'cup-metric' => {
-						'name' => q(tm),
-						'one' => q({0} tm),
-						'other' => q({0} tm),
-					},
-					'day' => {
-						'name' => q(j),
-						'one' => q({0} j),
-						'other' => q({0} j),
-						'per' => q({0}/j),
-					},
-					'deciliter' => {
-						'name' => q(dl),
-						'one' => q({0} dl),
-						'other' => q({0} dl),
-					},
-					'decimeter' => {
-						'name' => q(dm),
-						'one' => q({0} dm),
-						'other' => q({0} dm),
-					},
-					'degree' => {
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					'fahrenheit' => {
-						'name' => q(°F),
-						'one' => q({0} °F),
-						'other' => q({0} °F),
-					},
-					'fathom' => {
-						'name' => q(fm),
-						'one' => q({0} fth),
-						'other' => q({0} fth),
-					},
-					'fluid-ounce' => {
-						'name' => q(fl oz),
-						'one' => q({0} fl oz),
-						'other' => q({0} fl oz),
-					},
+					# Core Unit Identifier
 					'foodcalorie' => {
 						'name' => q(kcal),
-						'one' => q({0} kcal),
-						'other' => q({0} kcal),
+						'one' => q({0}kcal),
+						'other' => q({0}kcal),
 					},
-					'foot' => {
+					# Long Unit Identifier
+					'energy-joule' => {
+						'name' => q(J),
+						'one' => q({0}J),
+						'other' => q({0}J),
+					},
+					# Core Unit Identifier
+					'joule' => {
+						'name' => q(J),
+						'one' => q({0}J),
+						'other' => q({0}J),
+					},
+					# Long Unit Identifier
+					'energy-kilocalorie' => {
+						'name' => q(kcal),
+						'one' => q({0}kcal),
+						'other' => q({0}kcal),
+					},
+					# Core Unit Identifier
+					'kilocalorie' => {
+						'name' => q(kcal),
+						'one' => q({0}kcal),
+						'other' => q({0}kcal),
+					},
+					# Long Unit Identifier
+					'energy-kilojoule' => {
+						'name' => q(kJ),
+						'one' => q({0}kJ),
+						'other' => q({0}kJ),
+					},
+					# Core Unit Identifier
+					'kilojoule' => {
+						'name' => q(kJ),
+						'one' => q({0}kJ),
+						'other' => q({0}kJ),
+					},
+					# Long Unit Identifier
+					'energy-kilowatt-hour' => {
+						'name' => q(kWh),
+						'one' => q({0}kWh),
+						'other' => q({0}kWh),
+					},
+					# Core Unit Identifier
+					'kilowatt-hour' => {
+						'name' => q(kWh),
+						'one' => q({0}kWh),
+						'other' => q({0}kWh),
+					},
+					# Long Unit Identifier
+					'energy-therm-us' => {
+						'name' => q(thm US),
+						'one' => q({0}thm US),
+						'other' => q({0}thm US),
+					},
+					# Core Unit Identifier
+					'therm-us' => {
+						'name' => q(thm US),
+						'one' => q({0}thm US),
+						'other' => q({0}thm US),
+					},
+					# Long Unit Identifier
+					'force-kilowatt-hour-per-100-kilometer' => {
+						'one' => q({0}kWh/100km),
+						'other' => q({0}kWh/100km),
+					},
+					# Core Unit Identifier
+					'kilowatt-hour-per-100-kilometer' => {
+						'one' => q({0}kWh/100km),
+						'other' => q({0}kWh/100km),
+					},
+					# Long Unit Identifier
+					'force-newton' => {
+						'name' => q(N),
+						'one' => q({0}N),
+						'other' => q({0}N),
+					},
+					# Core Unit Identifier
+					'newton' => {
+						'name' => q(N),
+						'one' => q({0}N),
+						'other' => q({0}N),
+					},
+					# Long Unit Identifier
+					'force-pound-force' => {
+						'name' => q(lbf),
+						'one' => q({0}lbf),
+						'other' => q({0}lbf),
+					},
+					# Core Unit Identifier
+					'pound-force' => {
+						'name' => q(lbf),
+						'one' => q({0}lbf),
+						'other' => q({0}lbf),
+					},
+					# Long Unit Identifier
+					'frequency-gigahertz' => {
+						'name' => q(GHz),
+						'one' => q({0}GHz),
+						'other' => q({0}GHz),
+					},
+					# Core Unit Identifier
+					'gigahertz' => {
+						'name' => q(GHz),
+						'one' => q({0}GHz),
+						'other' => q({0}GHz),
+					},
+					# Long Unit Identifier
+					'frequency-hertz' => {
+						'name' => q(Hz),
+						'one' => q({0}Hz),
+						'other' => q({0}Hz),
+					},
+					# Core Unit Identifier
+					'hertz' => {
+						'name' => q(Hz),
+						'one' => q({0}Hz),
+						'other' => q({0}Hz),
+					},
+					# Long Unit Identifier
+					'frequency-kilohertz' => {
+						'name' => q(kHz),
+						'one' => q({0}kHz),
+						'other' => q({0}kHz),
+					},
+					# Core Unit Identifier
+					'kilohertz' => {
+						'name' => q(kHz),
+						'one' => q({0}kHz),
+						'other' => q({0}kHz),
+					},
+					# Long Unit Identifier
+					'frequency-megahertz' => {
+						'name' => q(MHz),
+						'one' => q({0}MHz),
+						'other' => q({0}MHz),
+					},
+					# Core Unit Identifier
+					'megahertz' => {
+						'name' => q(MHz),
+						'one' => q({0}MHz),
+						'other' => q({0}MHz),
+					},
+					# Long Unit Identifier
+					'graphics-dot-per-centimeter' => {
+						'one' => q({0}pt/cm),
+						'other' => q({0}pt/cm),
+					},
+					# Core Unit Identifier
+					'dot-per-centimeter' => {
+						'one' => q({0}pt/cm),
+						'other' => q({0}pt/cm),
+					},
+					# Long Unit Identifier
+					'graphics-dot-per-inch' => {
+						'one' => q({0}pt/po),
+						'other' => q({0}pt/po),
+					},
+					# Core Unit Identifier
+					'dot-per-inch' => {
+						'one' => q({0}pt/po),
+						'other' => q({0}pt/po),
+					},
+					# Long Unit Identifier
+					'graphics-em' => {
+						'one' => q({0}em),
+						'other' => q({0}em),
+					},
+					# Core Unit Identifier
+					'em' => {
+						'one' => q({0}em),
+						'other' => q({0}em),
+					},
+					# Long Unit Identifier
+					'graphics-megapixel' => {
+						'one' => q({0}Mpx),
+						'other' => q({0}Mpx),
+					},
+					# Core Unit Identifier
+					'megapixel' => {
+						'one' => q({0}Mpx),
+						'other' => q({0}Mpx),
+					},
+					# Long Unit Identifier
+					'graphics-pixel' => {
+						'one' => q({0}px),
+						'other' => q({0}px),
+					},
+					# Core Unit Identifier
+					'pixel' => {
+						'one' => q({0}px),
+						'other' => q({0}px),
+					},
+					# Long Unit Identifier
+					'graphics-pixel-per-centimeter' => {
+						'one' => q({0}px/cm),
+						'other' => q({0}px/cm),
+					},
+					# Core Unit Identifier
+					'pixel-per-centimeter' => {
+						'one' => q({0}px/cm),
+						'other' => q({0}px/cm),
+					},
+					# Long Unit Identifier
+					'graphics-pixel-per-inch' => {
+						'one' => q({0}px/po),
+						'other' => q({0}px/po),
+					},
+					# Core Unit Identifier
+					'pixel-per-inch' => {
+						'one' => q({0}px/po),
+						'other' => q({0}px/po),
+					},
+					# Long Unit Identifier
+					'length-astronomical-unit' => {
+						'name' => q(ua),
+						'one' => q({0}ua),
+						'other' => q({0}ua),
+					},
+					# Core Unit Identifier
+					'astronomical-unit' => {
+						'name' => q(ua),
+						'one' => q({0}ua),
+						'other' => q({0}ua),
+					},
+					# Long Unit Identifier
+					'length-centimeter' => {
+						'name' => q(cm),
+						'one' => q({0}cm),
+						'other' => q({0}cm),
+						'per' => q({0}/cm),
+					},
+					# Core Unit Identifier
+					'centimeter' => {
+						'name' => q(cm),
+						'one' => q({0}cm),
+						'other' => q({0}cm),
+						'per' => q({0}/cm),
+					},
+					# Long Unit Identifier
+					'length-decimeter' => {
+						'name' => q(dm),
+					},
+					# Core Unit Identifier
+					'decimeter' => {
+						'name' => q(dm),
+					},
+					# Long Unit Identifier
+					'length-fathom' => {
+						'name' => q(fm),
+					},
+					# Core Unit Identifier
+					'fathom' => {
+						'name' => q(fm),
+					},
+					# Long Unit Identifier
+					'length-foot' => {
 						'name' => q(pi),
-						'one' => q({0} pi),
-						'other' => q({0} pi),
+						'one' => q({0}′),
+						'other' => q({0}′),
 						'per' => q({0}/pi),
 					},
+					# Core Unit Identifier
+					'foot' => {
+						'name' => q(pi),
+						'one' => q({0}′),
+						'other' => q({0}′),
+						'per' => q({0}/pi),
+					},
+					# Long Unit Identifier
+					'length-furlong' => {
+						'name' => q(fur),
+						'one' => q({0} fur),
+						'other' => q({0} fur),
+					},
+					# Core Unit Identifier
 					'furlong' => {
 						'name' => q(fur),
 						'one' => q({0} fur),
 						'other' => q({0} fur),
 					},
-					'g-force' => {
-						'name' => q(force g),
-						'one' => q({0} force g),
-						'other' => q({0} force g),
+					# Long Unit Identifier
+					'length-inch' => {
+						'name' => q(po),
+						'one' => q({0}″),
+						'other' => q({0}″),
+						'per' => q({0}/po),
 					},
-					'gallon' => {
-						'name' => q(gal),
-						'one' => q({0} gal),
-						'other' => q({0} gal),
-						'per' => q({0}/gal),
+					# Core Unit Identifier
+					'inch' => {
+						'name' => q(po),
+						'one' => q({0}″),
+						'other' => q({0}″),
+						'per' => q({0}/po),
 					},
-					'gallon-imperial' => {
-						'name' => q(gal imp.),
-						'one' => q({0} gal imp.),
-						'other' => q({0} gal imp.),
-						'per' => q({0} gal imp.),
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'name' => q(km),
+						'one' => q({0}km),
+						'other' => q({0}km),
+						'per' => q({0}/km),
 					},
+					# Core Unit Identifier
+					'kilometer' => {
+						'name' => q(km),
+						'one' => q({0}km),
+						'other' => q({0}km),
+						'per' => q({0}/km),
+					},
+					# Long Unit Identifier
+					'length-light-year' => {
+						'name' => q(al),
+					},
+					# Core Unit Identifier
+					'light-year' => {
+						'name' => q(al),
+					},
+					# Long Unit Identifier
+					'length-meter' => {
+						'name' => q(m),
+						'one' => q({0}m),
+						'other' => q({0}m),
+						'per' => q({0}/m),
+					},
+					# Core Unit Identifier
+					'meter' => {
+						'name' => q(m),
+						'one' => q({0}m),
+						'other' => q({0}m),
+						'per' => q({0}/m),
+					},
+					# Long Unit Identifier
+					'length-micrometer' => {
+						'name' => q(μm),
+					},
+					# Core Unit Identifier
+					'micrometer' => {
+						'name' => q(μm),
+					},
+					# Long Unit Identifier
+					'length-mile' => {
+						'name' => q(mi),
+						'one' => q({0}mi),
+						'other' => q({0}mi),
+					},
+					# Core Unit Identifier
+					'mile' => {
+						'name' => q(mi),
+						'one' => q({0}mi),
+						'other' => q({0}mi),
+					},
+					# Long Unit Identifier
+					'length-mile-scandinavian' => {
+						'name' => q(smi),
+					},
+					# Core Unit Identifier
+					'mile-scandinavian' => {
+						'name' => q(smi),
+					},
+					# Long Unit Identifier
+					'length-millimeter' => {
+						'name' => q(mm),
+						'one' => q({0}mm),
+						'other' => q({0}mm),
+					},
+					# Core Unit Identifier
+					'millimeter' => {
+						'name' => q(mm),
+						'one' => q({0}mm),
+						'other' => q({0}mm),
+					},
+					# Long Unit Identifier
+					'length-nanometer' => {
+						'name' => q(nm),
+					},
+					# Core Unit Identifier
+					'nanometer' => {
+						'name' => q(nm),
+					},
+					# Long Unit Identifier
+					'length-nautical-mile' => {
+						'name' => q(nmi),
+					},
+					# Core Unit Identifier
+					'nautical-mile' => {
+						'name' => q(nmi),
+					},
+					# Long Unit Identifier
+					'length-parsec' => {
+						'name' => q(pc),
+					},
+					# Core Unit Identifier
+					'parsec' => {
+						'name' => q(pc),
+					},
+					# Long Unit Identifier
+					'length-picometer' => {
+						'name' => q(pm),
+						'one' => q({0}pm),
+						'other' => q({0}pm),
+					},
+					# Core Unit Identifier
+					'picometer' => {
+						'name' => q(pm),
+						'one' => q({0}pm),
+						'other' => q({0}pm),
+					},
+					# Long Unit Identifier
+					'length-solar-radius' => {
+						'name' => q(R☉),
+						'one' => q({0}R☉),
+						'other' => q({0}R☉),
+					},
+					# Core Unit Identifier
+					'solar-radius' => {
+						'name' => q(R☉),
+						'one' => q({0}R☉),
+						'other' => q({0}R☉),
+					},
+					# Long Unit Identifier
+					'length-yard' => {
+						'name' => q(yd),
+						'one' => q({0}yd),
+						'other' => q({0}yd),
+					},
+					# Core Unit Identifier
+					'yard' => {
+						'name' => q(yd),
+						'one' => q({0}yd),
+						'other' => q({0}yd),
+					},
+					# Long Unit Identifier
+					'light-candela' => {
+						'one' => q({0}cd),
+						'other' => q({0}cd),
+					},
+					# Core Unit Identifier
+					'candela' => {
+						'one' => q({0}cd),
+						'other' => q({0}cd),
+					},
+					# Long Unit Identifier
+					'light-lumen' => {
+						'one' => q({0}lm),
+						'other' => q({0}lm),
+					},
+					# Core Unit Identifier
+					'lumen' => {
+						'one' => q({0}lm),
+						'other' => q({0}lm),
+					},
+					# Long Unit Identifier
+					'light-lux' => {
+						'name' => q(lx),
+						'one' => q({0}lx),
+						'other' => q({0}lx),
+					},
+					# Core Unit Identifier
+					'lux' => {
+						'name' => q(lx),
+						'one' => q({0}lx),
+						'other' => q({0}lx),
+					},
+					# Long Unit Identifier
+					'light-solar-luminosity' => {
+						'name' => q(L☉),
+						'one' => q({0}L☉),
+						'other' => q({0}L☉),
+					},
+					# Core Unit Identifier
+					'solar-luminosity' => {
+						'name' => q(L☉),
+						'one' => q({0}L☉),
+						'other' => q({0}L☉),
+					},
+					# Long Unit Identifier
+					'mass-carat' => {
+						'name' => q(ct),
+						'one' => q({0}ct),
+						'other' => q({0}ct),
+					},
+					# Core Unit Identifier
+					'carat' => {
+						'name' => q(ct),
+						'one' => q({0}ct),
+						'other' => q({0}ct),
+					},
+					# Long Unit Identifier
+					'mass-dalton' => {
+						'name' => q(Da),
+						'one' => q({0}Da),
+						'other' => q({0}Da),
+					},
+					# Core Unit Identifier
+					'dalton' => {
+						'name' => q(Da),
+						'one' => q({0}Da),
+						'other' => q({0}Da),
+					},
+					# Long Unit Identifier
+					'mass-earth-mass' => {
+						'name' => q(M⊕),
+						'one' => q({0}M⊕),
+						'other' => q({0}M⊕),
+					},
+					# Core Unit Identifier
+					'earth-mass' => {
+						'name' => q(M⊕),
+						'one' => q({0}M⊕),
+						'other' => q({0}M⊕),
+					},
+					# Long Unit Identifier
+					'mass-grain' => {
+						'one' => q({0} grain),
+						'other' => q({0} grains),
+					},
+					# Core Unit Identifier
+					'grain' => {
+						'one' => q({0} grain),
+						'other' => q({0} grains),
+					},
+					# Long Unit Identifier
+					'mass-gram' => {
+						'name' => q(g),
+						'one' => q({0}g),
+						'other' => q({0}g),
+						'per' => q({0}/g),
+					},
+					# Core Unit Identifier
+					'gram' => {
+						'name' => q(g),
+						'one' => q({0}g),
+						'other' => q({0}g),
+						'per' => q({0}/g),
+					},
+					# Long Unit Identifier
+					'mass-kilogram' => {
+						'name' => q(kg),
+						'one' => q({0}kg),
+						'other' => q({0}kg),
+						'per' => q({0}/kg),
+					},
+					# Core Unit Identifier
+					'kilogram' => {
+						'name' => q(kg),
+						'one' => q({0}kg),
+						'other' => q({0}kg),
+						'per' => q({0}/kg),
+					},
+					# Long Unit Identifier
+					'mass-metric-ton' => {
+						'name' => q(t),
+						'one' => q({0}t),
+						'other' => q({0}t),
+					},
+					# Core Unit Identifier
+					'metric-ton' => {
+						'name' => q(t),
+						'one' => q({0}t),
+						'other' => q({0}t),
+					},
+					# Long Unit Identifier
+					'mass-microgram' => {
+						'name' => q(μg),
+						'one' => q({0}μg),
+						'other' => q({0}μg),
+					},
+					# Core Unit Identifier
+					'microgram' => {
+						'name' => q(μg),
+						'one' => q({0}μg),
+						'other' => q({0}μg),
+					},
+					# Long Unit Identifier
+					'mass-milligram' => {
+						'name' => q(mg),
+						'one' => q({0}mg),
+						'other' => q({0}mg),
+					},
+					# Core Unit Identifier
+					'milligram' => {
+						'name' => q(mg),
+						'one' => q({0}mg),
+						'other' => q({0}mg),
+					},
+					# Long Unit Identifier
+					'mass-ounce' => {
+						'name' => q(oz),
+						'one' => q({0}oz),
+						'other' => q({0}oz),
+						'per' => q({0}/oz),
+					},
+					# Core Unit Identifier
+					'ounce' => {
+						'name' => q(oz),
+						'one' => q({0}oz),
+						'other' => q({0}oz),
+						'per' => q({0}/oz),
+					},
+					# Long Unit Identifier
+					'mass-ounce-troy' => {
+						'name' => q(oz t),
+						'one' => q({0}oz t),
+						'other' => q({0}oz t),
+					},
+					# Core Unit Identifier
+					'ounce-troy' => {
+						'name' => q(oz t),
+						'one' => q({0}oz t),
+						'other' => q({0}oz t),
+					},
+					# Long Unit Identifier
+					'mass-pound' => {
+						'name' => q(lb),
+						'one' => q({0}lb),
+						'other' => q({0}lb),
+						'per' => q({0}/lb),
+					},
+					# Core Unit Identifier
+					'pound' => {
+						'name' => q(lb),
+						'one' => q({0}lb),
+						'other' => q({0}lb),
+						'per' => q({0}/lb),
+					},
+					# Long Unit Identifier
+					'mass-solar-mass' => {
+						'name' => q(M☉),
+						'one' => q({0}M☉),
+						'other' => q({0}M☉),
+					},
+					# Core Unit Identifier
+					'solar-mass' => {
+						'name' => q(M☉),
+						'one' => q({0}M☉),
+						'other' => q({0}M☉),
+					},
+					# Long Unit Identifier
+					'mass-stone' => {
+						'name' => q(st),
+						'one' => q({0} st),
+						'other' => q({0} st),
+					},
+					# Core Unit Identifier
+					'stone' => {
+						'name' => q(st),
+						'one' => q({0} st),
+						'other' => q({0} st),
+					},
+					# Long Unit Identifier
+					'mass-ton' => {
+						'name' => q(sh tn),
+						'one' => q({0} sh tn),
+						'other' => q({0} sh tn),
+					},
+					# Core Unit Identifier
+					'ton' => {
+						'name' => q(sh tn),
+						'one' => q({0} sh tn),
+						'other' => q({0} sh tn),
+					},
+					# Long Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Core Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Long Unit Identifier
+					'power-gigawatt' => {
+						'name' => q(GW),
+						'one' => q({0}GW),
+						'other' => q({0}GW),
+					},
+					# Core Unit Identifier
+					'gigawatt' => {
+						'name' => q(GW),
+						'one' => q({0}GW),
+						'other' => q({0}GW),
+					},
+					# Long Unit Identifier
+					'power-horsepower' => {
+						'name' => q(ch),
+						'one' => q({0}ch),
+						'other' => q({0}ch),
+					},
+					# Core Unit Identifier
+					'horsepower' => {
+						'name' => q(ch),
+						'one' => q({0}ch),
+						'other' => q({0}ch),
+					},
+					# Long Unit Identifier
+					'power-kilowatt' => {
+						'name' => q(kW),
+						'one' => q({0}kW),
+						'other' => q({0}kW),
+					},
+					# Core Unit Identifier
+					'kilowatt' => {
+						'name' => q(kW),
+						'one' => q({0}kW),
+						'other' => q({0}kW),
+					},
+					# Long Unit Identifier
+					'power-megawatt' => {
+						'name' => q(MW),
+						'one' => q({0}MW),
+						'other' => q({0}MW),
+					},
+					# Core Unit Identifier
+					'megawatt' => {
+						'name' => q(MW),
+						'one' => q({0}MW),
+						'other' => q({0}MW),
+					},
+					# Long Unit Identifier
+					'power-milliwatt' => {
+						'name' => q(mW),
+						'one' => q({0}mW),
+						'other' => q({0}mW),
+					},
+					# Core Unit Identifier
+					'milliwatt' => {
+						'name' => q(mW),
+						'one' => q({0}mW),
+						'other' => q({0}mW),
+					},
+					# Long Unit Identifier
+					'power-watt' => {
+						'name' => q(W),
+						'one' => q({0}W),
+						'other' => q({0}W),
+					},
+					# Core Unit Identifier
+					'watt' => {
+						'name' => q(W),
+						'one' => q({0}W),
+						'other' => q({0}W),
+					},
+					# Long Unit Identifier
+					'pressure-atmosphere' => {
+						'name' => q(atm),
+						'one' => q({0}atm),
+						'other' => q({0}atm),
+					},
+					# Core Unit Identifier
+					'atmosphere' => {
+						'name' => q(atm),
+						'one' => q({0}atm),
+						'other' => q({0}atm),
+					},
+					# Long Unit Identifier
+					'pressure-bar' => {
+						'one' => q({0}bar),
+						'other' => q({0}bar),
+					},
+					# Core Unit Identifier
+					'bar' => {
+						'one' => q({0}bar),
+						'other' => q({0}bar),
+					},
+					# Long Unit Identifier
+					'pressure-hectopascal' => {
+						'name' => q(hPa),
+						'one' => q({0}hPa),
+						'other' => q({0}hPa),
+					},
+					# Core Unit Identifier
+					'hectopascal' => {
+						'name' => q(hPa),
+						'one' => q({0}hPa),
+						'other' => q({0}hPa),
+					},
+					# Long Unit Identifier
+					'pressure-inch-ofhg' => {
+						'one' => q({0} inHg),
+						'other' => q({0}″ Hg),
+					},
+					# Core Unit Identifier
+					'inch-ofhg' => {
+						'one' => q({0} inHg),
+						'other' => q({0}″ Hg),
+					},
+					# Long Unit Identifier
+					'pressure-kilopascal' => {
+						'name' => q(kPa),
+						'one' => q({0}kPa),
+						'other' => q({0}kPa),
+					},
+					# Core Unit Identifier
+					'kilopascal' => {
+						'name' => q(kPa),
+						'one' => q({0}kPa),
+						'other' => q({0}kPa),
+					},
+					# Long Unit Identifier
+					'pressure-megapascal' => {
+						'name' => q(MPa),
+						'one' => q({0}MPa),
+						'other' => q({0}MPa),
+					},
+					# Core Unit Identifier
+					'megapascal' => {
+						'name' => q(MPa),
+						'one' => q({0}MPa),
+						'other' => q({0}MPa),
+					},
+					# Long Unit Identifier
+					'pressure-millibar' => {
+						'name' => q(mbar),
+						'one' => q({0}mbar),
+						'other' => q({0}mbar),
+					},
+					# Core Unit Identifier
+					'millibar' => {
+						'name' => q(mbar),
+						'one' => q({0}mbar),
+						'other' => q({0}mbar),
+					},
+					# Long Unit Identifier
+					'pressure-millimeter-ofhg' => {
+						'name' => q(mmHg),
+						'one' => q({0} mmHg),
+						'other' => q({0} mmHg),
+					},
+					# Core Unit Identifier
+					'millimeter-ofhg' => {
+						'name' => q(mmHg),
+						'one' => q({0} mmHg),
+						'other' => q({0} mmHg),
+					},
+					# Long Unit Identifier
+					'pressure-pascal' => {
+						'one' => q({0}Pa),
+						'other' => q({0}Pa),
+					},
+					# Core Unit Identifier
+					'pascal' => {
+						'one' => q({0}Pa),
+						'other' => q({0}Pa),
+					},
+					# Long Unit Identifier
+					'pressure-pound-force-per-square-inch' => {
+						'name' => q(lb/po²),
+						'one' => q({0} lb/po²),
+						'other' => q({0} lb/po²),
+					},
+					# Core Unit Identifier
+					'pound-force-per-square-inch' => {
+						'name' => q(lb/po²),
+						'one' => q({0} lb/po²),
+						'other' => q({0} lb/po²),
+					},
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'name' => q(km/h),
+						'one' => q({0}km/h),
+						'other' => q({0}km/h),
+					},
+					# Core Unit Identifier
+					'kilometer-per-hour' => {
+						'name' => q(km/h),
+						'one' => q({0}km/h),
+						'other' => q({0}km/h),
+					},
+					# Long Unit Identifier
+					'speed-knot' => {
+						'name' => q(nd),
+						'one' => q({0} nd),
+						'other' => q({0} nd),
+					},
+					# Core Unit Identifier
+					'knot' => {
+						'name' => q(nd),
+						'one' => q({0} nd),
+						'other' => q({0} nd),
+					},
+					# Long Unit Identifier
+					'speed-meter-per-second' => {
+						'name' => q(m/s),
+						'one' => q({0}m/s),
+						'other' => q({0}m/s),
+					},
+					# Core Unit Identifier
+					'meter-per-second' => {
+						'name' => q(m/s),
+						'one' => q({0}m/s),
+						'other' => q({0}m/s),
+					},
+					# Long Unit Identifier
+					'speed-mile-per-hour' => {
+						'name' => q(mi/h),
+						'one' => q({0}mi/h),
+						'other' => q({0}mi/h),
+					},
+					# Core Unit Identifier
+					'mile-per-hour' => {
+						'name' => q(mi/h),
+						'one' => q({0}mi/h),
+						'other' => q({0}mi/h),
+					},
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'name' => q(°C),
+						'one' => q({0}°C),
+						'other' => q({0}°C),
+					},
+					# Core Unit Identifier
+					'celsius' => {
+						'name' => q(°C),
+						'one' => q({0}°C),
+						'other' => q({0}°C),
+					},
+					# Long Unit Identifier
+					'temperature-fahrenheit' => {
+						'name' => q(°F),
+						'one' => q({0}°F),
+						'other' => q({0}°F),
+					},
+					# Core Unit Identifier
+					'fahrenheit' => {
+						'name' => q(°F),
+						'one' => q({0}°F),
+						'other' => q({0}°F),
+					},
+					# Long Unit Identifier
+					'temperature-generic' => {
+						'name' => q(°),
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Core Unit Identifier
 					'generic' => {
 						'name' => q(°),
 						'one' => q({0}°),
 						'other' => q({0}°),
 					},
-					'gigabit' => {
-						'name' => q(Gbit),
-						'one' => q({0} Gbit),
-						'other' => q({0} Gbit),
+					# Long Unit Identifier
+					'temperature-kelvin' => {
+						'name' => q(K),
+						'one' => q({0}K),
+						'other' => q({0}K),
 					},
-					'gigabyte' => {
-						'name' => q(Go),
-						'one' => q({0} Go),
-						'other' => q({0} Go),
-					},
-					'gigahertz' => {
-						'name' => q(GHz),
-						'one' => q({0} GHz),
-						'other' => q({0} GHz),
-					},
-					'gigawatt' => {
-						'name' => q(GW),
-						'one' => q({0} GW),
-						'other' => q({0} GW),
-					},
-					'gram' => {
-						'name' => q(g),
-						'one' => q({0} g),
-						'other' => q({0} g),
-						'per' => q({0}/g),
-					},
-					'hectare' => {
-						'name' => q(ha),
-						'one' => q({0} ha),
-						'other' => q({0} ha),
-					},
-					'hectoliter' => {
-						'name' => q(hl),
-						'one' => q({0} hl),
-						'other' => q({0} hl),
-					},
-					'hectopascal' => {
-						'name' => q(hPa),
-						'one' => q({0} hPa),
-						'other' => q({0} hPa),
-					},
-					'hertz' => {
-						'name' => q(Hz),
-						'one' => q({0} Hz),
-						'other' => q({0} Hz),
-					},
-					'horsepower' => {
-						'name' => q(ch),
-						'one' => q({0} ch),
-						'other' => q({0} ch),
-					},
-					'hour' => {
-						'name' => q(h),
-						'one' => q({0} h),
-						'other' => q({0} h),
-						'per' => q({0}/h),
-					},
-					'inch' => {
-						'name' => q(po),
-						'one' => q({0} po),
-						'other' => q({0} po),
-						'per' => q({0}/po),
-					},
-					'inch-hg' => {
-						'name' => q(inHg),
-						'one' => q({0} inHg),
-						'other' => q({0} inHg),
-					},
-					'joule' => {
-						'name' => q(J),
-						'one' => q({0} J),
-						'other' => q({0} J),
-					},
-					'karat' => {
-						'name' => q(ct),
-						'one' => q({0} ct),
-						'other' => q({0} ct),
-					},
+					# Core Unit Identifier
 					'kelvin' => {
 						'name' => q(K),
-						'one' => q({0} K),
-						'other' => q({0} K),
+						'one' => q({0}K),
+						'other' => q({0}K),
 					},
-					'kilobit' => {
-						'name' => q(kbit),
-						'one' => q({0} kbit),
-						'other' => q({0} kbit),
+					# Long Unit Identifier
+					'times' => {
+						'1' => q({0}-{1}),
 					},
-					'kilobyte' => {
-						'name' => q(ko),
-						'one' => q({0} ko),
-						'other' => q({0} ko),
+					# Core Unit Identifier
+					'times' => {
+						'1' => q({0}-{1}),
 					},
-					'kilocalorie' => {
-						'name' => q(kcal),
-						'one' => q({0} kcal),
-						'other' => q({0} kcal),
+					# Long Unit Identifier
+					'torque-newton-meter' => {
+						'name' => q(N⋅m),
+						'one' => q({0}N⋅m),
+						'other' => q({0}N⋅m),
 					},
-					'kilogram' => {
-						'name' => q(kg),
-						'one' => q({0} kg),
-						'other' => q({0} kg),
-						'per' => q({0}/kg),
+					# Core Unit Identifier
+					'newton-meter' => {
+						'name' => q(N⋅m),
+						'one' => q({0}N⋅m),
+						'other' => q({0}N⋅m),
 					},
-					'kilohertz' => {
-						'name' => q(kHz),
-						'one' => q({0} kHz),
-						'other' => q({0} kHz),
+					# Long Unit Identifier
+					'torque-pound-force-foot' => {
+						'name' => q(lbf⋅ft),
+						'one' => q({0}lbf⋅ft),
+						'other' => q({0}lbf⋅ft),
 					},
-					'kilojoule' => {
-						'name' => q(kJ),
-						'one' => q({0} kJ),
-						'other' => q({0} kJ),
+					# Core Unit Identifier
+					'pound-force-foot' => {
+						'name' => q(lbf⋅ft),
+						'one' => q({0}lbf⋅ft),
+						'other' => q({0}lbf⋅ft),
 					},
-					'kilometer' => {
-						'name' => q(km),
-						'one' => q({0} km),
-						'other' => q({0} km),
-						'per' => q({0}/km),
+					# Long Unit Identifier
+					'volume-acre-foot' => {
+						'name' => q(acpi),
+						'one' => q({0}acpi),
+						'other' => q({0}acpi),
 					},
-					'kilometer-per-hour' => {
-						'name' => q(km/h),
-						'one' => q({0} km/h),
-						'other' => q({0} km/h),
+					# Core Unit Identifier
+					'acre-foot' => {
+						'name' => q(acpi),
+						'one' => q({0}acpi),
+						'other' => q({0}acpi),
 					},
-					'kilowatt' => {
-						'name' => q(kW),
-						'one' => q({0} kW),
-						'other' => q({0} kW),
+					# Long Unit Identifier
+					'volume-barrel' => {
+						'name' => q(bbl),
+						'one' => q({0}bbl),
+						'other' => q({0}bbl),
 					},
-					'kilowatt-hour' => {
-						'name' => q(kWh),
-						'one' => q({0} kWh),
-						'other' => q({0} kWh),
+					# Core Unit Identifier
+					'barrel' => {
+						'name' => q(bbl),
+						'one' => q({0}bbl),
+						'other' => q({0}bbl),
 					},
-					'knot' => {
-						'name' => q(nd),
-						'one' => q({0} nd),
-						'other' => q({0} nd),
+					# Long Unit Identifier
+					'volume-bushel' => {
+						'name' => q(bu),
+						'one' => q({0}bu),
+						'other' => q({0}bu),
 					},
-					'light-year' => {
-						'name' => q(al),
-						'one' => q({0} al),
-						'other' => q({0} al),
+					# Core Unit Identifier
+					'bushel' => {
+						'name' => q(bu),
+						'one' => q({0}bu),
+						'other' => q({0}bu),
 					},
-					'liter' => {
+					# Long Unit Identifier
+					'volume-centiliter' => {
+						'name' => q(cl),
+						'one' => q({0}cl),
+						'other' => q({0}cl),
+					},
+					# Core Unit Identifier
+					'centiliter' => {
+						'name' => q(cl),
+						'one' => q({0}cl),
+						'other' => q({0}cl),
+					},
+					# Long Unit Identifier
+					'volume-cubic-centimeter' => {
+						'name' => q(cm³),
+						'one' => q({0}cm³),
+						'other' => q({0}cm³),
+						'per' => q({0}/cm³),
+					},
+					# Core Unit Identifier
+					'cubic-centimeter' => {
+						'name' => q(cm³),
+						'one' => q({0}cm³),
+						'other' => q({0}cm³),
+						'per' => q({0}/cm³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-foot' => {
+						'name' => q(pi³),
+						'one' => q({0}pi³),
+						'other' => q({0}pi³),
+					},
+					# Core Unit Identifier
+					'cubic-foot' => {
+						'name' => q(pi³),
+						'one' => q({0}pi³),
+						'other' => q({0}pi³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-inch' => {
+						'name' => q(po³),
+						'one' => q({0}po³),
+						'other' => q({0}po³),
+					},
+					# Core Unit Identifier
+					'cubic-inch' => {
+						'name' => q(po³),
+						'one' => q({0}po³),
+						'other' => q({0}po³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-kilometer' => {
+						'name' => q(km³),
+						'one' => q({0}km³),
+						'other' => q({0}km³),
+					},
+					# Core Unit Identifier
+					'cubic-kilometer' => {
+						'name' => q(km³),
+						'one' => q({0}km³),
+						'other' => q({0}km³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-meter' => {
+						'name' => q(m³),
+						'one' => q({0}m³),
+						'other' => q({0}m³),
+						'per' => q({0}/m³),
+					},
+					# Core Unit Identifier
+					'cubic-meter' => {
+						'name' => q(m³),
+						'one' => q({0}m³),
+						'other' => q({0}m³),
+						'per' => q({0}/m³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-mile' => {
+						'name' => q(mi³),
+						'one' => q({0}mi³),
+						'other' => q({0}mi³),
+					},
+					# Core Unit Identifier
+					'cubic-mile' => {
+						'name' => q(mi³),
+						'one' => q({0}mi³),
+						'other' => q({0}mi³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-yard' => {
+						'name' => q(yd³),
+						'one' => q({0}yd³),
+						'other' => q({0}yd³),
+					},
+					# Core Unit Identifier
+					'cubic-yard' => {
+						'name' => q(yd³),
+						'one' => q({0}yd³),
+						'other' => q({0}yd³),
+					},
+					# Long Unit Identifier
+					'volume-cup' => {
+						'name' => q(ta),
+						'one' => q({0}ta),
+						'other' => q({0}ta),
+					},
+					# Core Unit Identifier
+					'cup' => {
+						'name' => q(ta),
+						'one' => q({0}ta),
+						'other' => q({0}ta),
+					},
+					# Long Unit Identifier
+					'volume-cup-metric' => {
+						'name' => q(tm),
+						'one' => q({0}tm),
+						'other' => q({0}tm),
+					},
+					# Core Unit Identifier
+					'cup-metric' => {
+						'name' => q(tm),
+						'one' => q({0}tm),
+						'other' => q({0}tm),
+					},
+					# Long Unit Identifier
+					'volume-deciliter' => {
+						'name' => q(dl),
+						'one' => q({0}dl),
+						'other' => q({0}dl),
+					},
+					# Core Unit Identifier
+					'deciliter' => {
+						'name' => q(dl),
+						'one' => q({0}dl),
+						'other' => q({0}dl),
+					},
+					# Long Unit Identifier
+					'volume-dessert-spoon' => {
+						'name' => q(CàD),
+						'one' => q({0}CàD),
+						'other' => q({0}CàD),
+					},
+					# Core Unit Identifier
+					'dessert-spoon' => {
+						'name' => q(CàD),
+						'one' => q({0}CàD),
+						'other' => q({0}CàD),
+					},
+					# Long Unit Identifier
+					'volume-dessert-spoon-imperial' => {
+						'name' => q(CàD imp.),
+						'one' => q({0}CàD imp.),
+						'other' => q({0}CàD imp.),
+					},
+					# Core Unit Identifier
+					'dessert-spoon-imperial' => {
+						'name' => q(CàD imp.),
+						'one' => q({0}CàD imp.),
+						'other' => q({0}CàD imp.),
+					},
+					# Long Unit Identifier
+					'volume-dram' => {
+						'name' => q(fl dr),
+						'one' => q({0}fl dr),
+						'other' => q({0}fl dr),
+					},
+					# Core Unit Identifier
+					'dram' => {
+						'name' => q(fl dr),
+						'one' => q({0}fl dr),
+						'other' => q({0}fl dr),
+					},
+					# Long Unit Identifier
+					'volume-drop' => {
+						'one' => q({0}gte),
+						'other' => q({0}gte),
+					},
+					# Core Unit Identifier
+					'drop' => {
+						'one' => q({0}gte),
+						'other' => q({0}gte),
+					},
+					# Long Unit Identifier
+					'volume-fluid-ounce' => {
+						'name' => q(fl oz),
+						'one' => q({0}fl oz),
+						'other' => q({0}fl oz),
+					},
+					# Core Unit Identifier
+					'fluid-ounce' => {
+						'name' => q(fl oz),
+						'one' => q({0}fl oz),
+						'other' => q({0}fl oz),
+					},
+					# Long Unit Identifier
+					'volume-fluid-ounce-imperial' => {
+						'name' => q(fl oz imp.),
+						'one' => q({0}fl oz imp),
+						'other' => q({0}fl oz imp),
+					},
+					# Core Unit Identifier
+					'fluid-ounce-imperial' => {
+						'name' => q(fl oz imp.),
+						'one' => q({0}fl oz imp),
+						'other' => q({0}fl oz imp),
+					},
+					# Long Unit Identifier
+					'volume-gallon' => {
+						'name' => q(gal),
+						'one' => q({0}gal),
+						'other' => q({0}gal),
+						'per' => q({0}/gal),
+					},
+					# Core Unit Identifier
+					'gallon' => {
+						'name' => q(gal),
+						'one' => q({0}gal),
+						'other' => q({0}gal),
+						'per' => q({0}/gal),
+					},
+					# Long Unit Identifier
+					'volume-gallon-imperial' => {
+						'one' => q({0}gal imp.),
+						'other' => q({0}gal imp.),
+						'per' => q({0}/gal imp.),
+					},
+					# Core Unit Identifier
+					'gallon-imperial' => {
+						'one' => q({0}gal imp.),
+						'other' => q({0}gal imp.),
+						'per' => q({0}/gal imp.),
+					},
+					# Long Unit Identifier
+					'volume-hectoliter' => {
+						'name' => q(hl),
+						'one' => q({0}hl),
+						'other' => q({0}hl),
+					},
+					# Core Unit Identifier
+					'hectoliter' => {
+						'name' => q(hl),
+						'one' => q({0}hl),
+						'other' => q({0}hl),
+					},
+					# Long Unit Identifier
+					'volume-liter' => {
 						'name' => q(l),
-						'one' => q({0} l),
-						'other' => q({0} l),
+						'one' => q({0}l),
+						'other' => q({0}l),
 						'per' => q({0}/l),
 					},
-					'liter-per-100kilometers' => {
-						'name' => q(l/100 km),
-						'one' => q({0} l/100 km),
-						'other' => q({0} l/100 km),
+					# Core Unit Identifier
+					'liter' => {
+						'name' => q(l),
+						'one' => q({0}l),
+						'other' => q({0}l),
+						'per' => q({0}/l),
 					},
-					'liter-per-kilometer' => {
-						'name' => q(l/km),
-						'one' => q({0} l/km),
-						'other' => q({0} l/km),
+					# Long Unit Identifier
+					'volume-megaliter' => {
+						'name' => q(Ml),
+						'one' => q({0}Ml),
+						'other' => q({0}Ml),
 					},
-					'lux' => {
-						'name' => q(lx),
-						'one' => q({0} lx),
-						'other' => q({0} lx),
-					},
-					'megabit' => {
-						'name' => q(Mbit),
-						'one' => q({0} Mbit),
-						'other' => q({0} Mbit),
-					},
-					'megabyte' => {
-						'name' => q(Mo),
-						'one' => q({0} Mo),
-						'other' => q({0} Mo),
-					},
-					'megahertz' => {
-						'name' => q(MHz),
-						'one' => q({0} MHz),
-						'other' => q({0} MHz),
-					},
+					# Core Unit Identifier
 					'megaliter' => {
 						'name' => q(Ml),
-						'one' => q({0} Ml),
-						'other' => q({0} Ml),
+						'one' => q({0}Ml),
+						'other' => q({0}Ml),
 					},
-					'megawatt' => {
-						'name' => q(MW),
-						'one' => q({0} MW),
-						'other' => q({0} MW),
+					# Long Unit Identifier
+					'volume-milliliter' => {
+						'name' => q(ml),
+						'one' => q({0}ml),
+						'other' => q({0}ml),
 					},
-					'meter' => {
-						'name' => q(m),
-						'one' => q({0} m),
-						'other' => q({0} m),
-						'per' => q({0}/m),
+					# Core Unit Identifier
+					'milliliter' => {
+						'name' => q(ml),
+						'one' => q({0}ml),
+						'other' => q({0}ml),
 					},
-					'meter-per-second' => {
-						'name' => q(m/s),
-						'one' => q({0} m/s),
-						'other' => q({0} m/s),
+					# Long Unit Identifier
+					'volume-pint' => {
+						'name' => q(pte),
+						'one' => q({0}pte),
+						'other' => q({0}pte),
 					},
-					'meter-per-second-squared' => {
+					# Core Unit Identifier
+					'pint' => {
+						'name' => q(pte),
+						'one' => q({0}pte),
+						'other' => q({0}pte),
+					},
+					# Long Unit Identifier
+					'volume-pint-metric' => {
+						'name' => q(mpt),
+						'one' => q({0}mpt),
+						'other' => q({0}mpt),
+					},
+					# Core Unit Identifier
+					'pint-metric' => {
+						'name' => q(mpt),
+						'one' => q({0}mpt),
+						'other' => q({0}mpt),
+					},
+					# Long Unit Identifier
+					'volume-quart' => {
+						'name' => q(qt),
+						'one' => q({0}qt),
+						'other' => q({0}qt),
+					},
+					# Core Unit Identifier
+					'quart' => {
+						'name' => q(qt),
+						'one' => q({0}qt),
+						'other' => q({0}qt),
+					},
+					# Long Unit Identifier
+					'volume-quart-imperial' => {
+						'one' => q({0}qt imp.),
+						'other' => q({0}qt imp.),
+					},
+					# Core Unit Identifier
+					'quart-imperial' => {
+						'one' => q({0}qt imp.),
+						'other' => q({0}qt imp.),
+					},
+					# Long Unit Identifier
+					'volume-tablespoon' => {
+						'name' => q(CàS),
+						'one' => q({0}CàS),
+						'other' => q({0}CàS),
+					},
+					# Core Unit Identifier
+					'tablespoon' => {
+						'name' => q(CàS),
+						'one' => q({0}CàS),
+						'other' => q({0}CàS),
+					},
+					# Long Unit Identifier
+					'volume-teaspoon' => {
+						'name' => q(CàC),
+						'one' => q({0}CàC),
+						'other' => q({0}CàC),
+					},
+					# Core Unit Identifier
+					'teaspoon' => {
+						'name' => q(CàC),
+						'one' => q({0}CàC),
+						'other' => q({0}CàC),
+					},
+				},
+				'short' => {
+					# Long Unit Identifier
+					'' => {
+						'name' => q(direction),
+					},
+					# Core Unit Identifier
+					'' => {
+						'name' => q(direction),
+					},
+					# Long Unit Identifier
+					'acceleration-g-force' => {
+						'name' => q(force g),
+						'one' => q({0} force g),
+						'other' => q({0} force g),
+					},
+					# Core Unit Identifier
+					'g-force' => {
+						'name' => q(force g),
+						'one' => q({0} force g),
+						'other' => q({0} force g),
+					},
+					# Long Unit Identifier
+					'acceleration-meter-per-square-second' => {
 						'name' => q(m/s²),
 						'one' => q({0} m/s²),
 						'other' => q({0} m/s²),
 					},
-					'metric-ton' => {
-						'name' => q(t),
-						'one' => q({0} t),
-						'other' => q({0} t),
+					# Core Unit Identifier
+					'meter-per-square-second' => {
+						'name' => q(m/s²),
+						'one' => q({0} m/s²),
+						'other' => q({0} m/s²),
 					},
-					'microgram' => {
-						'name' => q(µg),
-						'one' => q({0} µg),
-						'other' => q({0} µg),
+					# Long Unit Identifier
+					'angle-arc-minute' => {
+						'name' => q(′),
+						'one' => q({0}′),
+						'other' => q({0}′),
 					},
-					'micrometer' => {
-						'name' => q(µm),
-						'one' => q({0} µm),
-						'other' => q({0} µm),
+					# Core Unit Identifier
+					'arc-minute' => {
+						'name' => q(′),
+						'one' => q({0}′),
+						'other' => q({0}′),
 					},
-					'microsecond' => {
-						'name' => q(μs),
-						'one' => q({0} μs),
-						'other' => q({0} μs),
+					# Long Unit Identifier
+					'angle-arc-second' => {
+						'name' => q(″),
+						'one' => q({0}″),
+						'other' => q({0}″),
 					},
-					'mile' => {
-						'name' => q(mi),
-						'one' => q({0} mi),
-						'other' => q({0} mi),
+					# Core Unit Identifier
+					'arc-second' => {
+						'name' => q(″),
+						'one' => q({0}″),
+						'other' => q({0}″),
 					},
-					'mile-per-gallon' => {
-						'name' => q(mi/gal),
-						'one' => q({0} mi/gal),
-						'other' => q({0} mi/gal),
+					# Long Unit Identifier
+					'angle-degree' => {
+						'name' => q(°),
+						'one' => q({0}°),
+						'other' => q({0}°),
 					},
-					'mile-per-gallon-imperial' => {
-						'name' => q(mi/gal imp.),
-						'one' => q({0} mi/gal imp.),
-						'other' => q({0} mi/gal imp.),
+					# Core Unit Identifier
+					'degree' => {
+						'name' => q(°),
+						'one' => q({0}°),
+						'other' => q({0}°),
 					},
-					'mile-per-hour' => {
-						'name' => q(mi/h),
-						'one' => q({0} mi/h),
-						'other' => q({0} mi/h),
+					# Long Unit Identifier
+					'angle-radian' => {
+						'name' => q(rad),
+						'one' => q({0} rad),
+						'other' => q({0} rad),
 					},
-					'mile-scandinavian' => {
-						'name' => q(smi),
-						'one' => q({0} smi),
-						'other' => q({0} smi),
-					},
-					'milliampere' => {
-						'name' => q(mA),
-						'one' => q({0} mA),
-						'other' => q({0} mA),
-					},
-					'millibar' => {
-						'name' => q(mbar),
-						'one' => q({0} mbar),
-						'other' => q({0} mbar),
-					},
-					'milligram' => {
-						'name' => q(mg),
-						'one' => q({0} mg),
-						'other' => q({0} mg),
-					},
-					'milligram-per-deciliter' => {
-						'name' => q(mg/dl),
-						'one' => q({0} mg/dl),
-						'other' => q({0} mg/dl),
-					},
-					'milliliter' => {
-						'name' => q(ml),
-						'one' => q({0} ml),
-						'other' => q({0} ml),
-					},
-					'millimeter' => {
-						'name' => q(mm),
-						'one' => q({0} mm),
-						'other' => q({0} mm),
-					},
-					'millimeter-of-mercury' => {
-						'name' => q(mmHg),
-						'one' => q({0} mmHg),
-						'other' => q({0} mmHg),
-					},
-					'millimole-per-liter' => {
-						'name' => q(mmol/l),
-						'one' => q({0} mmol/l),
-						'other' => q({0} mmol/l),
-					},
-					'millisecond' => {
-						'name' => q(ms),
-						'one' => q({0} ms),
-						'other' => q({0} ms),
-					},
-					'milliwatt' => {
-						'name' => q(mW),
-						'one' => q({0} mW),
-						'other' => q({0} mW),
-					},
-					'minute' => {
-						'name' => q(min),
-						'one' => q({0} min),
-						'other' => q({0} min),
-						'per' => q({0}/min),
-					},
-					'month' => {
-						'name' => q(m.),
-						'one' => q({0} m.),
-						'other' => q({0} m.),
-						'per' => q({0}/m.),
-					},
-					'nanometer' => {
-						'name' => q(nm),
-						'one' => q({0} nm),
-						'other' => q({0} nm),
-					},
-					'nanosecond' => {
-						'name' => q(ns),
-						'one' => q({0} ns),
-						'other' => q({0} ns),
-					},
-					'nautical-mile' => {
-						'name' => q(nmi),
-						'one' => q({0} nmi),
-						'other' => q({0} nmi),
-					},
-					'ohm' => {
-						'name' => q(Ω),
-						'one' => q({0} Ω),
-						'other' => q({0} Ω),
-					},
-					'ounce' => {
-						'name' => q(oz),
-						'one' => q({0} oz),
-						'other' => q({0} oz),
-						'per' => q({0}/oz),
-					},
-					'ounce-troy' => {
-						'name' => q(oz t),
-						'one' => q({0} oz t),
-						'other' => q({0} oz t),
-					},
-					'parsec' => {
-						'name' => q(pc),
-						'one' => q({0} pc),
-						'other' => q({0} pc),
-					},
-					'part-per-million' => {
-						'name' => q(ppm),
-						'one' => q({0} ppm),
-						'other' => q({0} ppm),
-					},
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					'percent' => {
-						'name' => q(%),
-						'one' => q({0} %),
-						'other' => q({0} %),
-					},
-					'permille' => {
-						'name' => q(‰),
-						'one' => q({0} ‰),
-						'other' => q({0} ‰),
-					},
-					'petabyte' => {
-						'name' => q(Po),
-						'one' => q({0} Po),
-						'other' => q({0} Po),
-					},
-					'picometer' => {
-						'name' => q(pm),
-						'one' => q({0} pm),
-						'other' => q({0} pm),
-					},
-					'pint' => {
-						'name' => q(pte),
-						'one' => q({0} pte),
-						'other' => q({0} pte),
-					},
-					'pint-metric' => {
-						'name' => q(mpt),
-						'one' => q({0} mpt),
-						'other' => q({0} mpt),
-					},
-					'point' => {
-						'name' => q(points),
-						'one' => q({0} pt),
-						'other' => q({0} pt),
-					},
-					'pound' => {
-						'name' => q(lb),
-						'one' => q({0} lb),
-						'other' => q({0} lb),
-						'per' => q({0}/lb),
-					},
-					'pound-per-square-inch' => {
-						'name' => q(lb/po²),
-						'one' => q({0} lb/po²),
-						'other' => q({0} lb/po²),
-					},
-					'quart' => {
-						'name' => q(qt),
-						'one' => q({0} qt),
-						'other' => q({0} qt),
-					},
+					# Core Unit Identifier
 					'radian' => {
 						'name' => q(rad),
 						'one' => q({0} rad),
 						'other' => q({0} rad),
 					},
+					# Long Unit Identifier
+					'angle-revolution' => {
+						'name' => q(tr),
+						'one' => q({0} tr),
+						'other' => q({0} tr),
+					},
+					# Core Unit Identifier
 					'revolution' => {
 						'name' => q(tr),
 						'one' => q({0} tr),
 						'other' => q({0} tr),
 					},
-					'second' => {
-						'name' => q(s),
-						'one' => q({0} s),
-						'other' => q({0} s),
-						'per' => q({0}/s),
+					# Long Unit Identifier
+					'area-acre' => {
+						'name' => q(ac),
+						'one' => q({0} ac),
+						'other' => q({0} ac),
 					},
+					# Core Unit Identifier
+					'acre' => {
+						'name' => q(ac),
+						'one' => q({0} ac),
+						'other' => q({0} ac),
+					},
+					# Long Unit Identifier
+					'area-dunam' => {
+						'name' => q(dounam),
+						'one' => q({0} dounam),
+						'other' => q({0} dounam),
+					},
+					# Core Unit Identifier
+					'dunam' => {
+						'name' => q(dounam),
+						'one' => q({0} dounam),
+						'other' => q({0} dounam),
+					},
+					# Long Unit Identifier
+					'area-hectare' => {
+						'name' => q(ha),
+						'one' => q({0} ha),
+						'other' => q({0} ha),
+					},
+					# Core Unit Identifier
+					'hectare' => {
+						'name' => q(ha),
+						'one' => q({0} ha),
+						'other' => q({0} ha),
+					},
+					# Long Unit Identifier
+					'area-square-centimeter' => {
+						'name' => q(cm²),
+						'one' => q({0} cm²),
+						'other' => q({0} cm²),
+						'per' => q({0}/cm²),
+					},
+					# Core Unit Identifier
 					'square-centimeter' => {
 						'name' => q(cm²),
 						'one' => q({0} cm²),
 						'other' => q({0} cm²),
 						'per' => q({0}/cm²),
 					},
+					# Long Unit Identifier
+					'area-square-foot' => {
+						'name' => q(pi²),
+						'one' => q({0} pi²),
+						'other' => q({0} pi²),
+					},
+					# Core Unit Identifier
 					'square-foot' => {
 						'name' => q(pi²),
 						'one' => q({0} pi²),
 						'other' => q({0} pi²),
 					},
+					# Long Unit Identifier
+					'area-square-inch' => {
+						'name' => q(po²),
+						'one' => q({0} po²),
+						'other' => q({0} po²),
+						'per' => q({0}/po²),
+					},
+					# Core Unit Identifier
 					'square-inch' => {
 						'name' => q(po²),
 						'one' => q({0} po²),
 						'other' => q({0} po²),
 						'per' => q({0}/po²),
 					},
+					# Long Unit Identifier
+					'area-square-kilometer' => {
+						'name' => q(km²),
+						'one' => q({0} km²),
+						'other' => q({0} km²),
+						'per' => q({0}/km²),
+					},
+					# Core Unit Identifier
 					'square-kilometer' => {
 						'name' => q(km²),
 						'one' => q({0} km²),
 						'other' => q({0} km²),
 						'per' => q({0}/km²),
 					},
+					# Long Unit Identifier
+					'area-square-meter' => {
+						'name' => q(m²),
+						'one' => q({0} m²),
+						'other' => q({0} m²),
+						'per' => q({0}/m²),
+					},
+					# Core Unit Identifier
 					'square-meter' => {
 						'name' => q(m²),
 						'one' => q({0} m²),
 						'other' => q({0} m²),
 						'per' => q({0}/m²),
 					},
+					# Long Unit Identifier
+					'area-square-mile' => {
+						'name' => q(mi²),
+						'one' => q({0} mi²),
+						'other' => q({0} mi²),
+						'per' => q({0}/mi²),
+					},
+					# Core Unit Identifier
 					'square-mile' => {
 						'name' => q(mi²),
 						'one' => q({0} mi²),
 						'other' => q({0} mi²),
 						'per' => q({0}/mi²),
 					},
+					# Long Unit Identifier
+					'area-square-yard' => {
+						'name' => q(yd²),
+						'one' => q({0} yd²),
+						'other' => q({0} yd²),
+					},
+					# Core Unit Identifier
 					'square-yard' => {
 						'name' => q(yd²),
 						'one' => q({0} yd²),
 						'other' => q({0} yd²),
 					},
-					'stone' => {
-						'name' => q(st),
-						'one' => q({0} st),
-						'other' => q({0} st),
+					# Long Unit Identifier
+					'concentr-item' => {
+						'one' => q({0} items),
+						'other' => q({0} items),
 					},
-					'tablespoon' => {
-						'name' => q(c. à s.),
-						'one' => q({0} c. à s.),
-						'other' => q({0} c. à s.),
+					# Core Unit Identifier
+					'item' => {
+						'one' => q({0} items),
+						'other' => q({0} items),
 					},
-					'teaspoon' => {
-						'name' => q(c. à c.),
-						'one' => q({0} c. à c.),
-						'other' => q({0} c. à c.),
+					# Long Unit Identifier
+					'concentr-karat' => {
+						'name' => q(ct),
+						'one' => q({0} ct),
+						'other' => q({0} ct),
 					},
+					# Core Unit Identifier
+					'karat' => {
+						'name' => q(ct),
+						'one' => q({0} ct),
+						'other' => q({0} ct),
+					},
+					# Long Unit Identifier
+					'concentr-milligram-ofglucose-per-deciliter' => {
+						'name' => q(mg/dl),
+						'one' => q({0} mg/dl),
+						'other' => q({0} mg/dl),
+					},
+					# Core Unit Identifier
+					'milligram-ofglucose-per-deciliter' => {
+						'name' => q(mg/dl),
+						'one' => q({0} mg/dl),
+						'other' => q({0} mg/dl),
+					},
+					# Long Unit Identifier
+					'concentr-millimole-per-liter' => {
+						'name' => q(mmol/l),
+						'one' => q({0} mmol/l),
+						'other' => q({0} mmol/l),
+					},
+					# Core Unit Identifier
+					'millimole-per-liter' => {
+						'name' => q(mmol/l),
+						'one' => q({0} mmol/l),
+						'other' => q({0} mmol/l),
+					},
+					# Long Unit Identifier
+					'concentr-mole' => {
+						'one' => q({0} mol),
+						'other' => q({0} mol),
+					},
+					# Core Unit Identifier
+					'mole' => {
+						'one' => q({0} mol),
+						'other' => q({0} mol),
+					},
+					# Long Unit Identifier
+					'concentr-percent' => {
+						'name' => q(%),
+						'one' => q({0} %),
+						'other' => q({0} %),
+					},
+					# Core Unit Identifier
+					'percent' => {
+						'name' => q(%),
+						'one' => q({0} %),
+						'other' => q({0} %),
+					},
+					# Long Unit Identifier
+					'concentr-permille' => {
+						'name' => q(‰),
+						'one' => q({0} ‰),
+						'other' => q({0} ‰),
+					},
+					# Core Unit Identifier
+					'permille' => {
+						'name' => q(‰),
+						'one' => q({0} ‰),
+						'other' => q({0} ‰),
+					},
+					# Long Unit Identifier
+					'concentr-permillion' => {
+						'name' => q(ppm),
+						'one' => q({0} ppm),
+						'other' => q({0} ppm),
+					},
+					# Core Unit Identifier
+					'permillion' => {
+						'name' => q(ppm),
+						'one' => q({0} ppm),
+						'other' => q({0} ppm),
+					},
+					# Long Unit Identifier
+					'concentr-permyriad' => {
+						'one' => q({0} ‱),
+						'other' => q({0} ‱),
+					},
+					# Core Unit Identifier
+					'permyriad' => {
+						'one' => q({0} ‱),
+						'other' => q({0} ‱),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-100-kilometer' => {
+						'name' => q(l/100 km),
+						'one' => q({0} l/100 km),
+						'other' => q({0} l/100 km),
+					},
+					# Core Unit Identifier
+					'liter-per-100-kilometer' => {
+						'name' => q(l/100 km),
+						'one' => q({0} l/100 km),
+						'other' => q({0} l/100 km),
+					},
+					# Long Unit Identifier
+					'consumption-liter-per-kilometer' => {
+						'name' => q(l/km),
+						'one' => q({0} l/km),
+						'other' => q({0} l/km),
+					},
+					# Core Unit Identifier
+					'liter-per-kilometer' => {
+						'name' => q(l/km),
+						'one' => q({0} l/km),
+						'other' => q({0} l/km),
+					},
+					# Long Unit Identifier
+					'consumption-mile-per-gallon' => {
+						'name' => q(mi/gal),
+						'one' => q({0} mi/gal),
+						'other' => q({0} mi/gal),
+					},
+					# Core Unit Identifier
+					'mile-per-gallon' => {
+						'name' => q(mi/gal),
+						'one' => q({0} mi/gal),
+						'other' => q({0} mi/gal),
+					},
+					# Long Unit Identifier
+					'consumption-mile-per-gallon-imperial' => {
+						'name' => q(mi/gal imp.),
+						'one' => q({0} mi/gal imp.),
+						'other' => q({0} mi/gal imp.),
+					},
+					# Core Unit Identifier
+					'mile-per-gallon-imperial' => {
+						'name' => q(mi/gal imp.),
+						'one' => q({0} mi/gal imp.),
+						'other' => q({0} mi/gal imp.),
+					},
+					# Long Unit Identifier
+					'coordinate' => {
+						'east' => q({0} E),
+						'north' => q({0} N),
+						'south' => q({0} S),
+						'west' => q({0} O),
+					},
+					# Core Unit Identifier
+					'coordinate' => {
+						'east' => q({0} E),
+						'north' => q({0} N),
+						'south' => q({0} S),
+						'west' => q({0} O),
+					},
+					# Long Unit Identifier
+					'digital-bit' => {
+						'name' => q(bit),
+						'one' => q({0} bit),
+						'other' => q({0} bit),
+					},
+					# Core Unit Identifier
+					'bit' => {
+						'name' => q(bit),
+						'one' => q({0} bit),
+						'other' => q({0} bit),
+					},
+					# Long Unit Identifier
+					'digital-byte' => {
+						'name' => q(octet),
+						'one' => q({0} o),
+						'other' => q({0} o),
+					},
+					# Core Unit Identifier
+					'byte' => {
+						'name' => q(octet),
+						'one' => q({0} o),
+						'other' => q({0} o),
+					},
+					# Long Unit Identifier
+					'digital-gigabit' => {
+						'name' => q(Gbit),
+						'one' => q({0} Gbit),
+						'other' => q({0} Gbit),
+					},
+					# Core Unit Identifier
+					'gigabit' => {
+						'name' => q(Gbit),
+						'one' => q({0} Gbit),
+						'other' => q({0} Gbit),
+					},
+					# Long Unit Identifier
+					'digital-gigabyte' => {
+						'name' => q(Go),
+						'one' => q({0} Go),
+						'other' => q({0} Go),
+					},
+					# Core Unit Identifier
+					'gigabyte' => {
+						'name' => q(Go),
+						'one' => q({0} Go),
+						'other' => q({0} Go),
+					},
+					# Long Unit Identifier
+					'digital-kilobit' => {
+						'name' => q(kbit),
+						'one' => q({0} kbit),
+						'other' => q({0} kbit),
+					},
+					# Core Unit Identifier
+					'kilobit' => {
+						'name' => q(kbit),
+						'one' => q({0} kbit),
+						'other' => q({0} kbit),
+					},
+					# Long Unit Identifier
+					'digital-kilobyte' => {
+						'name' => q(ko),
+						'one' => q({0} ko),
+						'other' => q({0} ko),
+					},
+					# Core Unit Identifier
+					'kilobyte' => {
+						'name' => q(ko),
+						'one' => q({0} ko),
+						'other' => q({0} ko),
+					},
+					# Long Unit Identifier
+					'digital-megabit' => {
+						'name' => q(Mbit),
+						'one' => q({0} Mbit),
+						'other' => q({0} Mbit),
+					},
+					# Core Unit Identifier
+					'megabit' => {
+						'name' => q(Mbit),
+						'one' => q({0} Mbit),
+						'other' => q({0} Mbit),
+					},
+					# Long Unit Identifier
+					'digital-megabyte' => {
+						'name' => q(Mo),
+						'one' => q({0} Mo),
+						'other' => q({0} Mo),
+					},
+					# Core Unit Identifier
+					'megabyte' => {
+						'name' => q(Mo),
+						'one' => q({0} Mo),
+						'other' => q({0} Mo),
+					},
+					# Long Unit Identifier
+					'digital-petabyte' => {
+						'name' => q(Po),
+						'one' => q({0} Po),
+						'other' => q({0} Po),
+					},
+					# Core Unit Identifier
+					'petabyte' => {
+						'name' => q(Po),
+						'one' => q({0} Po),
+						'other' => q({0} Po),
+					},
+					# Long Unit Identifier
+					'digital-terabit' => {
+						'name' => q(Tbit),
+						'one' => q({0} Tbit),
+						'other' => q({0} Tbit),
+					},
+					# Core Unit Identifier
 					'terabit' => {
 						'name' => q(Tbit),
 						'one' => q({0} Tbit),
-						'other' => q({0} Tb),
+						'other' => q({0} Tbit),
 					},
+					# Long Unit Identifier
+					'digital-terabyte' => {
+						'name' => q(To),
+						'one' => q({0} To),
+						'other' => q({0} To),
+					},
+					# Core Unit Identifier
 					'terabyte' => {
 						'name' => q(To),
 						'one' => q({0} To),
 						'other' => q({0} To),
 					},
-					'ton' => {
-						'name' => q(sh tn),
-						'one' => q({0} sh tn),
-						'other' => q({0} sh tn),
+					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(siècles),
+						'one' => q({0} siècle),
+						'other' => q({0} siècles),
 					},
-					'volt' => {
-						'name' => q(V),
-						'one' => q({0} V),
-						'other' => q({0} V),
+					# Core Unit Identifier
+					'century' => {
+						'name' => q(siècles),
+						'one' => q({0} siècle),
+						'other' => q({0} siècles),
 					},
-					'watt' => {
-						'name' => q(W),
-						'one' => q({0} W),
-						'other' => q({0} W),
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(j),
+						'one' => q({0} j),
+						'other' => q({0} j),
+						'per' => q({0}/j),
 					},
+					# Core Unit Identifier
+					'day' => {
+						'name' => q(j),
+						'one' => q({0} j),
+						'other' => q({0} j),
+						'per' => q({0}/j),
+					},
+					# Long Unit Identifier
+					'duration-decade' => {
+						'name' => q(décennies),
+						'one' => q({0} décennie),
+						'other' => q({0} décennies),
+					},
+					# Core Unit Identifier
+					'decade' => {
+						'name' => q(décennies),
+						'one' => q({0} décennie),
+						'other' => q({0} décennies),
+					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(h),
+						'one' => q({0} h),
+						'other' => q({0} h),
+						'per' => q({0}/h),
+					},
+					# Core Unit Identifier
+					'hour' => {
+						'name' => q(h),
+						'one' => q({0} h),
+						'other' => q({0} h),
+						'per' => q({0}/h),
+					},
+					# Long Unit Identifier
+					'duration-microsecond' => {
+						'name' => q(μs),
+						'one' => q({0} μs),
+						'other' => q({0} μs),
+					},
+					# Core Unit Identifier
+					'microsecond' => {
+						'name' => q(μs),
+						'one' => q({0} μs),
+						'other' => q({0} μs),
+					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(ms),
+						'one' => q({0} ms),
+						'other' => q({0} ms),
+					},
+					# Core Unit Identifier
+					'millisecond' => {
+						'name' => q(ms),
+						'one' => q({0} ms),
+						'other' => q({0} ms),
+					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(min),
+						'one' => q({0} min),
+						'other' => q({0} min),
+						'per' => q({0}/min),
+					},
+					# Core Unit Identifier
+					'minute' => {
+						'name' => q(min),
+						'one' => q({0} min),
+						'other' => q({0} min),
+						'per' => q({0}/min),
+					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(m.),
+						'one' => q({0} m.),
+						'other' => q({0} m.),
+						'per' => q({0}/m.),
+					},
+					# Core Unit Identifier
+					'month' => {
+						'name' => q(m.),
+						'one' => q({0} m.),
+						'other' => q({0} m.),
+						'per' => q({0}/m.),
+					},
+					# Long Unit Identifier
+					'duration-nanosecond' => {
+						'name' => q(ns),
+						'one' => q({0} ns),
+						'other' => q({0} ns),
+					},
+					# Core Unit Identifier
+					'nanosecond' => {
+						'name' => q(ns),
+						'one' => q({0} ns),
+						'other' => q({0} ns),
+					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(s),
+						'one' => q({0} s),
+						'other' => q({0} s),
+						'per' => q({0}/s),
+					},
+					# Core Unit Identifier
+					'second' => {
+						'name' => q(s),
+						'one' => q({0} s),
+						'other' => q({0} s),
+						'per' => q({0}/s),
+					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(sem.),
+						'one' => q({0} sem.),
+						'other' => q({0} sem.),
+						'per' => q({0}/sem.),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(sem.),
 						'one' => q({0} sem.),
 						'other' => q({0} sem.),
 						'per' => q({0}/sem.),
 					},
-					'yard' => {
-						'name' => q(yd),
-						'one' => q({0} yd),
-						'other' => q({0} yd),
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(ans),
+						'one' => q({0} an),
+						'other' => q({0} ans),
+						'per' => q({0}/an),
 					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(ans),
 						'one' => q({0} an),
 						'other' => q({0} ans),
 						'per' => q({0}/an),
+					},
+					# Long Unit Identifier
+					'electric-ampere' => {
+						'name' => q(A),
+						'one' => q({0} A),
+						'other' => q({0} A),
+					},
+					# Core Unit Identifier
+					'ampere' => {
+						'name' => q(A),
+						'one' => q({0} A),
+						'other' => q({0} A),
+					},
+					# Long Unit Identifier
+					'electric-milliampere' => {
+						'name' => q(mA),
+						'one' => q({0} mA),
+						'other' => q({0} mA),
+					},
+					# Core Unit Identifier
+					'milliampere' => {
+						'name' => q(mA),
+						'one' => q({0} mA),
+						'other' => q({0} mA),
+					},
+					# Long Unit Identifier
+					'electric-ohm' => {
+						'name' => q(Ω),
+						'one' => q({0} Ω),
+						'other' => q({0} Ω),
+					},
+					# Core Unit Identifier
+					'ohm' => {
+						'name' => q(Ω),
+						'one' => q({0} Ω),
+						'other' => q({0} Ω),
+					},
+					# Long Unit Identifier
+					'electric-volt' => {
+						'name' => q(V),
+						'one' => q({0} V),
+						'other' => q({0} V),
+					},
+					# Core Unit Identifier
+					'volt' => {
+						'name' => q(V),
+						'one' => q({0} V),
+						'other' => q({0} V),
+					},
+					# Long Unit Identifier
+					'energy-british-thermal-unit' => {
+						'name' => q(BTU),
+						'one' => q({0} Btu),
+						'other' => q({0} Btu),
+					},
+					# Core Unit Identifier
+					'british-thermal-unit' => {
+						'name' => q(BTU),
+						'one' => q({0} Btu),
+						'other' => q({0} Btu),
+					},
+					# Long Unit Identifier
+					'energy-calorie' => {
+						'name' => q(cal),
+						'one' => q({0} cal),
+						'other' => q({0} cal),
+					},
+					# Core Unit Identifier
+					'calorie' => {
+						'name' => q(cal),
+						'one' => q({0} cal),
+						'other' => q({0} cal),
+					},
+					# Long Unit Identifier
+					'energy-electronvolt' => {
+						'one' => q({0} eV),
+						'other' => q({0} eV),
+					},
+					# Core Unit Identifier
+					'electronvolt' => {
+						'one' => q({0} eV),
+						'other' => q({0} eV),
+					},
+					# Long Unit Identifier
+					'energy-foodcalorie' => {
+						'name' => q(kcal),
+						'one' => q({0} kcal),
+						'other' => q({0} kcal),
+					},
+					# Core Unit Identifier
+					'foodcalorie' => {
+						'name' => q(kcal),
+						'one' => q({0} kcal),
+						'other' => q({0} kcal),
+					},
+					# Long Unit Identifier
+					'energy-joule' => {
+						'name' => q(J),
+						'one' => q({0} J),
+						'other' => q({0} J),
+					},
+					# Core Unit Identifier
+					'joule' => {
+						'name' => q(J),
+						'one' => q({0} J),
+						'other' => q({0} J),
+					},
+					# Long Unit Identifier
+					'energy-kilocalorie' => {
+						'name' => q(kcal),
+						'one' => q({0} kcal),
+						'other' => q({0} kcal),
+					},
+					# Core Unit Identifier
+					'kilocalorie' => {
+						'name' => q(kcal),
+						'one' => q({0} kcal),
+						'other' => q({0} kcal),
+					},
+					# Long Unit Identifier
+					'energy-kilojoule' => {
+						'name' => q(kJ),
+						'one' => q({0} kJ),
+						'other' => q({0} kJ),
+					},
+					# Core Unit Identifier
+					'kilojoule' => {
+						'name' => q(kJ),
+						'one' => q({0} kJ),
+						'other' => q({0} kJ),
+					},
+					# Long Unit Identifier
+					'energy-kilowatt-hour' => {
+						'name' => q(kWh),
+						'one' => q({0} kWh),
+						'other' => q({0} kWh),
+					},
+					# Core Unit Identifier
+					'kilowatt-hour' => {
+						'name' => q(kWh),
+						'one' => q({0} kWh),
+						'other' => q({0} kWh),
+					},
+					# Long Unit Identifier
+					'energy-therm-us' => {
+						'name' => q(therm US),
+						'one' => q({0} therm US),
+						'other' => q({0} therms US),
+					},
+					# Core Unit Identifier
+					'therm-us' => {
+						'name' => q(therm US),
+						'one' => q({0} therm US),
+						'other' => q({0} therms US),
+					},
+					# Long Unit Identifier
+					'force-kilowatt-hour-per-100-kilometer' => {
+						'name' => q(kWh/100 km),
+						'one' => q({0} kWh/100 km),
+						'other' => q({0} kWh/100 km),
+					},
+					# Core Unit Identifier
+					'kilowatt-hour-per-100-kilometer' => {
+						'name' => q(kWh/100 km),
+						'one' => q({0} kWh/100 km),
+						'other' => q({0} kWh/100 km),
+					},
+					# Long Unit Identifier
+					'force-newton' => {
+						'one' => q({0} N),
+						'other' => q({0} N),
+					},
+					# Core Unit Identifier
+					'newton' => {
+						'one' => q({0} N),
+						'other' => q({0} N),
+					},
+					# Long Unit Identifier
+					'force-pound-force' => {
+						'one' => q({0} lbf),
+						'other' => q({0} lbf),
+					},
+					# Core Unit Identifier
+					'pound-force' => {
+						'one' => q({0} lbf),
+						'other' => q({0} lbf),
+					},
+					# Long Unit Identifier
+					'frequency-gigahertz' => {
+						'name' => q(GHz),
+						'one' => q({0} GHz),
+						'other' => q({0} GHz),
+					},
+					# Core Unit Identifier
+					'gigahertz' => {
+						'name' => q(GHz),
+						'one' => q({0} GHz),
+						'other' => q({0} GHz),
+					},
+					# Long Unit Identifier
+					'frequency-hertz' => {
+						'name' => q(Hz),
+						'one' => q({0} Hz),
+						'other' => q({0} Hz),
+					},
+					# Core Unit Identifier
+					'hertz' => {
+						'name' => q(Hz),
+						'one' => q({0} Hz),
+						'other' => q({0} Hz),
+					},
+					# Long Unit Identifier
+					'frequency-kilohertz' => {
+						'name' => q(kHz),
+						'one' => q({0} kHz),
+						'other' => q({0} kHz),
+					},
+					# Core Unit Identifier
+					'kilohertz' => {
+						'name' => q(kHz),
+						'one' => q({0} kHz),
+						'other' => q({0} kHz),
+					},
+					# Long Unit Identifier
+					'frequency-megahertz' => {
+						'name' => q(MHz),
+						'one' => q({0} MHz),
+						'other' => q({0} MHz),
+					},
+					# Core Unit Identifier
+					'megahertz' => {
+						'name' => q(MHz),
+						'one' => q({0} MHz),
+						'other' => q({0} MHz),
+					},
+					# Long Unit Identifier
+					'graphics-dot' => {
+						'name' => q(pt),
+						'one' => q({0} pt),
+						'other' => q({0} pts),
+					},
+					# Core Unit Identifier
+					'dot' => {
+						'name' => q(pt),
+						'one' => q({0} pt),
+						'other' => q({0} pts),
+					},
+					# Long Unit Identifier
+					'graphics-dot-per-centimeter' => {
+						'name' => q(pt/cm),
+						'one' => q({0} pt/cm),
+						'other' => q({0} pt/cm),
+					},
+					# Core Unit Identifier
+					'dot-per-centimeter' => {
+						'name' => q(pt/cm),
+						'one' => q({0} pt/cm),
+						'other' => q({0} pt/cm),
+					},
+					# Long Unit Identifier
+					'graphics-dot-per-inch' => {
+						'name' => q(pt/po),
+						'one' => q({0} pt/po),
+						'other' => q({0} pt/po),
+					},
+					# Core Unit Identifier
+					'dot-per-inch' => {
+						'name' => q(pt/po),
+						'one' => q({0} pt/po),
+						'other' => q({0} pt/po),
+					},
+					# Long Unit Identifier
+					'graphics-em' => {
+						'name' => q(em),
+						'one' => q({0} em),
+						'other' => q({0} em),
+					},
+					# Core Unit Identifier
+					'em' => {
+						'name' => q(em),
+						'one' => q({0} em),
+						'other' => q({0} em),
+					},
+					# Long Unit Identifier
+					'graphics-megapixel' => {
+						'name' => q(Mpx),
+						'one' => q({0} Mpx),
+						'other' => q({0} Mpx),
+					},
+					# Core Unit Identifier
+					'megapixel' => {
+						'name' => q(Mpx),
+						'one' => q({0} Mpx),
+						'other' => q({0} Mpx),
+					},
+					# Long Unit Identifier
+					'graphics-pixel' => {
+						'name' => q(px),
+						'one' => q({0} px),
+						'other' => q({0} px),
+					},
+					# Core Unit Identifier
+					'pixel' => {
+						'name' => q(px),
+						'one' => q({0} px),
+						'other' => q({0} px),
+					},
+					# Long Unit Identifier
+					'graphics-pixel-per-centimeter' => {
+						'name' => q(px/cm),
+						'one' => q({0} px/cm),
+						'other' => q({0} px/cm),
+					},
+					# Core Unit Identifier
+					'pixel-per-centimeter' => {
+						'name' => q(px/cm),
+						'one' => q({0} px/cm),
+						'other' => q({0} px/cm),
+					},
+					# Long Unit Identifier
+					'graphics-pixel-per-inch' => {
+						'name' => q(px/po),
+						'one' => q({0} px/po),
+						'other' => q({0} px/po),
+					},
+					# Core Unit Identifier
+					'pixel-per-inch' => {
+						'name' => q(px/po),
+						'one' => q({0} px/po),
+						'other' => q({0} px/po),
+					},
+					# Long Unit Identifier
+					'length-astronomical-unit' => {
+						'name' => q(ua),
+						'one' => q({0} ua),
+						'other' => q({0} ua),
+					},
+					# Core Unit Identifier
+					'astronomical-unit' => {
+						'name' => q(ua),
+						'one' => q({0} ua),
+						'other' => q({0} ua),
+					},
+					# Long Unit Identifier
+					'length-centimeter' => {
+						'name' => q(cm),
+						'one' => q({0} cm),
+						'other' => q({0} cm),
+						'per' => q({0}/cm),
+					},
+					# Core Unit Identifier
+					'centimeter' => {
+						'name' => q(cm),
+						'one' => q({0} cm),
+						'other' => q({0} cm),
+						'per' => q({0}/cm),
+					},
+					# Long Unit Identifier
+					'length-decimeter' => {
+						'name' => q(dm),
+						'one' => q({0} dm),
+						'other' => q({0} dm),
+					},
+					# Core Unit Identifier
+					'decimeter' => {
+						'name' => q(dm),
+						'one' => q({0} dm),
+						'other' => q({0} dm),
+					},
+					# Long Unit Identifier
+					'length-fathom' => {
+						'name' => q(fm),
+						'one' => q({0} fm),
+						'other' => q({0} fm),
+					},
+					# Core Unit Identifier
+					'fathom' => {
+						'name' => q(fm),
+						'one' => q({0} fm),
+						'other' => q({0} fm),
+					},
+					# Long Unit Identifier
+					'length-foot' => {
+						'name' => q(pi),
+						'one' => q({0} pi),
+						'other' => q({0} pi),
+						'per' => q({0}/pi),
+					},
+					# Core Unit Identifier
+					'foot' => {
+						'name' => q(pi),
+						'one' => q({0} pi),
+						'other' => q({0} pi),
+						'per' => q({0}/pi),
+					},
+					# Long Unit Identifier
+					'length-furlong' => {
+						'name' => q(fur),
+						'one' => q({0} fur),
+						'other' => q({0} fur),
+					},
+					# Core Unit Identifier
+					'furlong' => {
+						'name' => q(fur),
+						'one' => q({0} fur),
+						'other' => q({0} fur),
+					},
+					# Long Unit Identifier
+					'length-inch' => {
+						'name' => q(po),
+						'one' => q({0} po),
+						'other' => q({0} po),
+						'per' => q({0}/po),
+					},
+					# Core Unit Identifier
+					'inch' => {
+						'name' => q(po),
+						'one' => q({0} po),
+						'other' => q({0} po),
+						'per' => q({0}/po),
+					},
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'name' => q(km),
+						'one' => q({0} km),
+						'other' => q({0} km),
+						'per' => q({0}/km),
+					},
+					# Core Unit Identifier
+					'kilometer' => {
+						'name' => q(km),
+						'one' => q({0} km),
+						'other' => q({0} km),
+						'per' => q({0}/km),
+					},
+					# Long Unit Identifier
+					'length-light-year' => {
+						'name' => q(al),
+						'one' => q({0} al),
+						'other' => q({0} al),
+					},
+					# Core Unit Identifier
+					'light-year' => {
+						'name' => q(al),
+						'one' => q({0} al),
+						'other' => q({0} al),
+					},
+					# Long Unit Identifier
+					'length-meter' => {
+						'name' => q(m),
+						'one' => q({0} m),
+						'other' => q({0} m),
+						'per' => q({0}/m),
+					},
+					# Core Unit Identifier
+					'meter' => {
+						'name' => q(m),
+						'one' => q({0} m),
+						'other' => q({0} m),
+						'per' => q({0}/m),
+					},
+					# Long Unit Identifier
+					'length-micrometer' => {
+						'name' => q(μm),
+						'one' => q({0} μm),
+						'other' => q({0} μm),
+					},
+					# Core Unit Identifier
+					'micrometer' => {
+						'name' => q(μm),
+						'one' => q({0} μm),
+						'other' => q({0} μm),
+					},
+					# Long Unit Identifier
+					'length-mile' => {
+						'name' => q(mi),
+						'one' => q({0} mi),
+						'other' => q({0} mi),
+					},
+					# Core Unit Identifier
+					'mile' => {
+						'name' => q(mi),
+						'one' => q({0} mi),
+						'other' => q({0} mi),
+					},
+					# Long Unit Identifier
+					'length-mile-scandinavian' => {
+						'name' => q(smi),
+						'one' => q({0} smi),
+						'other' => q({0} smi),
+					},
+					# Core Unit Identifier
+					'mile-scandinavian' => {
+						'name' => q(smi),
+						'one' => q({0} smi),
+						'other' => q({0} smi),
+					},
+					# Long Unit Identifier
+					'length-millimeter' => {
+						'name' => q(mm),
+						'one' => q({0} mm),
+						'other' => q({0} mm),
+					},
+					# Core Unit Identifier
+					'millimeter' => {
+						'name' => q(mm),
+						'one' => q({0} mm),
+						'other' => q({0} mm),
+					},
+					# Long Unit Identifier
+					'length-nanometer' => {
+						'name' => q(nm),
+						'one' => q({0} nm),
+						'other' => q({0} nm),
+					},
+					# Core Unit Identifier
+					'nanometer' => {
+						'name' => q(nm),
+						'one' => q({0} nm),
+						'other' => q({0} nm),
+					},
+					# Long Unit Identifier
+					'length-nautical-mile' => {
+						'name' => q(nmi),
+						'one' => q({0} nmi),
+						'other' => q({0} nmi),
+					},
+					# Core Unit Identifier
+					'nautical-mile' => {
+						'name' => q(nmi),
+						'one' => q({0} nmi),
+						'other' => q({0} nmi),
+					},
+					# Long Unit Identifier
+					'length-parsec' => {
+						'name' => q(pc),
+						'one' => q({0} pc),
+						'other' => q({0} pc),
+					},
+					# Core Unit Identifier
+					'parsec' => {
+						'name' => q(pc),
+						'one' => q({0} pc),
+						'other' => q({0} pc),
+					},
+					# Long Unit Identifier
+					'length-picometer' => {
+						'name' => q(pm),
+						'one' => q({0} pm),
+						'other' => q({0} pm),
+					},
+					# Core Unit Identifier
+					'picometer' => {
+						'name' => q(pm),
+						'one' => q({0} pm),
+						'other' => q({0} pm),
+					},
+					# Long Unit Identifier
+					'length-point' => {
+						'name' => q(points typographiques),
+						'one' => q({0} pt typog.),
+						'other' => q({0} pts typog.),
+					},
+					# Core Unit Identifier
+					'point' => {
+						'name' => q(points typographiques),
+						'one' => q({0} pt typog.),
+						'other' => q({0} pts typog.),
+					},
+					# Long Unit Identifier
+					'length-solar-radius' => {
+						'name' => q(R☉),
+						'one' => q({0} R☉),
+						'other' => q({0} R☉),
+					},
+					# Core Unit Identifier
+					'solar-radius' => {
+						'name' => q(R☉),
+						'one' => q({0} R☉),
+						'other' => q({0} R☉),
+					},
+					# Long Unit Identifier
+					'length-yard' => {
+						'name' => q(yd),
+						'one' => q({0} yd),
+						'other' => q({0} yd),
+					},
+					# Core Unit Identifier
+					'yard' => {
+						'name' => q(yd),
+						'one' => q({0} yd),
+						'other' => q({0} yd),
+					},
+					# Long Unit Identifier
+					'light-lux' => {
+						'name' => q(lx),
+						'one' => q({0} lx),
+						'other' => q({0} lx),
+					},
+					# Core Unit Identifier
+					'lux' => {
+						'name' => q(lx),
+						'one' => q({0} lx),
+						'other' => q({0} lx),
+					},
+					# Long Unit Identifier
+					'light-solar-luminosity' => {
+						'name' => q(L☉),
+						'one' => q({0} L☉),
+						'other' => q({0} L☉),
+					},
+					# Core Unit Identifier
+					'solar-luminosity' => {
+						'name' => q(L☉),
+						'one' => q({0} L☉),
+						'other' => q({0} L☉),
+					},
+					# Long Unit Identifier
+					'mass-carat' => {
+						'name' => q(ct),
+						'one' => q({0} ct),
+						'other' => q({0} ct),
+					},
+					# Core Unit Identifier
+					'carat' => {
+						'name' => q(ct),
+						'one' => q({0} ct),
+						'other' => q({0} ct),
+					},
+					# Long Unit Identifier
+					'mass-dalton' => {
+						'one' => q({0} Da),
+						'other' => q({0} Da),
+					},
+					# Core Unit Identifier
+					'dalton' => {
+						'one' => q({0} Da),
+						'other' => q({0} Da),
+					},
+					# Long Unit Identifier
+					'mass-earth-mass' => {
+						'name' => q(M⊕),
+						'one' => q({0} M⊕),
+						'other' => q({0} M⊕),
+					},
+					# Core Unit Identifier
+					'earth-mass' => {
+						'name' => q(M⊕),
+						'one' => q({0} M⊕),
+						'other' => q({0} M⊕),
+					},
+					# Long Unit Identifier
+					'mass-grain' => {
+						'one' => q({0} grains),
+						'other' => q({0} grains),
+					},
+					# Core Unit Identifier
+					'grain' => {
+						'one' => q({0} grains),
+						'other' => q({0} grains),
+					},
+					# Long Unit Identifier
+					'mass-gram' => {
+						'name' => q(g),
+						'one' => q({0} g),
+						'other' => q({0} g),
+						'per' => q({0}/g),
+					},
+					# Core Unit Identifier
+					'gram' => {
+						'name' => q(g),
+						'one' => q({0} g),
+						'other' => q({0} g),
+						'per' => q({0}/g),
+					},
+					# Long Unit Identifier
+					'mass-kilogram' => {
+						'name' => q(kg),
+						'one' => q({0} kg),
+						'other' => q({0} kg),
+						'per' => q({0}/kg),
+					},
+					# Core Unit Identifier
+					'kilogram' => {
+						'name' => q(kg),
+						'one' => q({0} kg),
+						'other' => q({0} kg),
+						'per' => q({0}/kg),
+					},
+					# Long Unit Identifier
+					'mass-metric-ton' => {
+						'name' => q(t),
+						'one' => q({0} t),
+						'other' => q({0} t),
+					},
+					# Core Unit Identifier
+					'metric-ton' => {
+						'name' => q(t),
+						'one' => q({0} t),
+						'other' => q({0} t),
+					},
+					# Long Unit Identifier
+					'mass-microgram' => {
+						'name' => q(μg),
+						'one' => q({0} μg),
+						'other' => q({0} μg),
+					},
+					# Core Unit Identifier
+					'microgram' => {
+						'name' => q(μg),
+						'one' => q({0} μg),
+						'other' => q({0} μg),
+					},
+					# Long Unit Identifier
+					'mass-milligram' => {
+						'name' => q(mg),
+						'one' => q({0} mg),
+						'other' => q({0} mg),
+					},
+					# Core Unit Identifier
+					'milligram' => {
+						'name' => q(mg),
+						'one' => q({0} mg),
+						'other' => q({0} mg),
+					},
+					# Long Unit Identifier
+					'mass-ounce' => {
+						'name' => q(oz),
+						'one' => q({0} oz),
+						'other' => q({0} oz),
+						'per' => q({0}/oz),
+					},
+					# Core Unit Identifier
+					'ounce' => {
+						'name' => q(oz),
+						'one' => q({0} oz),
+						'other' => q({0} oz),
+						'per' => q({0}/oz),
+					},
+					# Long Unit Identifier
+					'mass-ounce-troy' => {
+						'name' => q(oz t),
+						'one' => q({0} oz t),
+						'other' => q({0} oz t),
+					},
+					# Core Unit Identifier
+					'ounce-troy' => {
+						'name' => q(oz t),
+						'one' => q({0} oz t),
+						'other' => q({0} oz t),
+					},
+					# Long Unit Identifier
+					'mass-pound' => {
+						'name' => q(lb),
+						'one' => q({0} lb),
+						'other' => q({0} lb),
+						'per' => q({0}/lb),
+					},
+					# Core Unit Identifier
+					'pound' => {
+						'name' => q(lb),
+						'one' => q({0} lb),
+						'other' => q({0} lb),
+						'per' => q({0}/lb),
+					},
+					# Long Unit Identifier
+					'mass-solar-mass' => {
+						'name' => q(M☉),
+						'one' => q({0} M☉),
+						'other' => q({0} M☉),
+					},
+					# Core Unit Identifier
+					'solar-mass' => {
+						'name' => q(M☉),
+						'one' => q({0} M☉),
+						'other' => q({0} M☉),
+					},
+					# Long Unit Identifier
+					'mass-stone' => {
+						'name' => q(st),
+						'one' => q({0} st),
+						'other' => q({0} st),
+					},
+					# Core Unit Identifier
+					'stone' => {
+						'name' => q(st),
+						'one' => q({0} st),
+						'other' => q({0} st),
+					},
+					# Long Unit Identifier
+					'mass-ton' => {
+						'name' => q(sh tn),
+						'one' => q({0} sh tn),
+						'other' => q({0} sh tn),
+					},
+					# Core Unit Identifier
+					'ton' => {
+						'name' => q(sh tn),
+						'one' => q({0} sh tn),
+						'other' => q({0} sh tn),
+					},
+					# Long Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Core Unit Identifier
+					'per' => {
+						'1' => q({0}/{1}),
+					},
+					# Long Unit Identifier
+					'power-gigawatt' => {
+						'name' => q(GW),
+						'one' => q({0} GW),
+						'other' => q({0} GW),
+					},
+					# Core Unit Identifier
+					'gigawatt' => {
+						'name' => q(GW),
+						'one' => q({0} GW),
+						'other' => q({0} GW),
+					},
+					# Long Unit Identifier
+					'power-horsepower' => {
+						'name' => q(ch),
+						'one' => q({0} ch),
+						'other' => q({0} ch),
+					},
+					# Core Unit Identifier
+					'horsepower' => {
+						'name' => q(ch),
+						'one' => q({0} ch),
+						'other' => q({0} ch),
+					},
+					# Long Unit Identifier
+					'power-kilowatt' => {
+						'name' => q(kW),
+						'one' => q({0} kW),
+						'other' => q({0} kW),
+					},
+					# Core Unit Identifier
+					'kilowatt' => {
+						'name' => q(kW),
+						'one' => q({0} kW),
+						'other' => q({0} kW),
+					},
+					# Long Unit Identifier
+					'power-megawatt' => {
+						'name' => q(MW),
+						'one' => q({0} MW),
+						'other' => q({0} MW),
+					},
+					# Core Unit Identifier
+					'megawatt' => {
+						'name' => q(MW),
+						'one' => q({0} MW),
+						'other' => q({0} MW),
+					},
+					# Long Unit Identifier
+					'power-milliwatt' => {
+						'name' => q(mW),
+						'one' => q({0} mW),
+						'other' => q({0} mW),
+					},
+					# Core Unit Identifier
+					'milliwatt' => {
+						'name' => q(mW),
+						'one' => q({0} mW),
+						'other' => q({0} mW),
+					},
+					# Long Unit Identifier
+					'power-watt' => {
+						'name' => q(W),
+						'one' => q({0} W),
+						'other' => q({0} W),
+					},
+					# Core Unit Identifier
+					'watt' => {
+						'name' => q(W),
+						'one' => q({0} W),
+						'other' => q({0} W),
+					},
+					# Long Unit Identifier
+					'pressure-atmosphere' => {
+						'name' => q(atm),
+						'one' => q({0} atm),
+						'other' => q({0} atm),
+					},
+					# Core Unit Identifier
+					'atmosphere' => {
+						'name' => q(atm),
+						'one' => q({0} atm),
+						'other' => q({0} atm),
+					},
+					# Long Unit Identifier
+					'pressure-bar' => {
+						'one' => q({0} bar),
+						'other' => q({0} bars),
+					},
+					# Core Unit Identifier
+					'bar' => {
+						'one' => q({0} bar),
+						'other' => q({0} bars),
+					},
+					# Long Unit Identifier
+					'pressure-hectopascal' => {
+						'name' => q(hPa),
+						'one' => q({0} hPa),
+						'other' => q({0} hPa),
+					},
+					# Core Unit Identifier
+					'hectopascal' => {
+						'name' => q(hPa),
+						'one' => q({0} hPa),
+						'other' => q({0} hPa),
+					},
+					# Long Unit Identifier
+					'pressure-inch-ofhg' => {
+						'name' => q(inHg),
+						'one' => q({0} inHg),
+						'other' => q({0} inHg),
+					},
+					# Core Unit Identifier
+					'inch-ofhg' => {
+						'name' => q(inHg),
+						'one' => q({0} inHg),
+						'other' => q({0} inHg),
+					},
+					# Long Unit Identifier
+					'pressure-kilopascal' => {
+						'one' => q({0} kPa),
+						'other' => q({0} kPa),
+					},
+					# Core Unit Identifier
+					'kilopascal' => {
+						'one' => q({0} kPa),
+						'other' => q({0} kPa),
+					},
+					# Long Unit Identifier
+					'pressure-megapascal' => {
+						'one' => q({0} MPa),
+						'other' => q({0} MPa),
+					},
+					# Core Unit Identifier
+					'megapascal' => {
+						'one' => q({0} MPa),
+						'other' => q({0} MPa),
+					},
+					# Long Unit Identifier
+					'pressure-millibar' => {
+						'name' => q(mbar),
+						'one' => q({0} mbar),
+						'other' => q({0} mbar),
+					},
+					# Core Unit Identifier
+					'millibar' => {
+						'name' => q(mbar),
+						'one' => q({0} mbar),
+						'other' => q({0} mbar),
+					},
+					# Long Unit Identifier
+					'pressure-millimeter-ofhg' => {
+						'name' => q(mmHg),
+						'one' => q({0} mmHg),
+						'other' => q({0} mmHg),
+					},
+					# Core Unit Identifier
+					'millimeter-ofhg' => {
+						'name' => q(mmHg),
+						'one' => q({0} mmHg),
+						'other' => q({0} mmHg),
+					},
+					# Long Unit Identifier
+					'pressure-pascal' => {
+						'one' => q({0} Pa),
+						'other' => q({0} Pa),
+					},
+					# Core Unit Identifier
+					'pascal' => {
+						'one' => q({0} Pa),
+						'other' => q({0} Pa),
+					},
+					# Long Unit Identifier
+					'pressure-pound-force-per-square-inch' => {
+						'name' => q(lb/po²),
+						'one' => q({0} lb/po²),
+						'other' => q({0} lb/po²),
+					},
+					# Core Unit Identifier
+					'pound-force-per-square-inch' => {
+						'name' => q(lb/po²),
+						'one' => q({0} lb/po²),
+						'other' => q({0} lb/po²),
+					},
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'name' => q(km/h),
+						'one' => q({0} km/h),
+						'other' => q({0} km/h),
+					},
+					# Core Unit Identifier
+					'kilometer-per-hour' => {
+						'name' => q(km/h),
+						'one' => q({0} km/h),
+						'other' => q({0} km/h),
+					},
+					# Long Unit Identifier
+					'speed-knot' => {
+						'name' => q(nd),
+						'one' => q({0} nd),
+						'other' => q({0} nd),
+					},
+					# Core Unit Identifier
+					'knot' => {
+						'name' => q(nd),
+						'one' => q({0} nd),
+						'other' => q({0} nd),
+					},
+					# Long Unit Identifier
+					'speed-meter-per-second' => {
+						'name' => q(m/s),
+						'one' => q({0} m/s),
+						'other' => q({0} m/s),
+					},
+					# Core Unit Identifier
+					'meter-per-second' => {
+						'name' => q(m/s),
+						'one' => q({0} m/s),
+						'other' => q({0} m/s),
+					},
+					# Long Unit Identifier
+					'speed-mile-per-hour' => {
+						'name' => q(mi/h),
+						'one' => q({0} mi/h),
+						'other' => q({0} mi/h),
+					},
+					# Core Unit Identifier
+					'mile-per-hour' => {
+						'name' => q(mi/h),
+						'one' => q({0} mi/h),
+						'other' => q({0} mi/h),
+					},
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'name' => q(°C),
+						'one' => q({0} °C),
+						'other' => q({0} °C),
+					},
+					# Core Unit Identifier
+					'celsius' => {
+						'name' => q(°C),
+						'one' => q({0} °C),
+						'other' => q({0} °C),
+					},
+					# Long Unit Identifier
+					'temperature-fahrenheit' => {
+						'name' => q(°F),
+						'one' => q({0} °F),
+						'other' => q({0} °F),
+					},
+					# Core Unit Identifier
+					'fahrenheit' => {
+						'name' => q(°F),
+						'one' => q({0} °F),
+						'other' => q({0} °F),
+					},
+					# Long Unit Identifier
+					'temperature-generic' => {
+						'name' => q(°),
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Core Unit Identifier
+					'generic' => {
+						'name' => q(°),
+						'one' => q({0}°),
+						'other' => q({0}°),
+					},
+					# Long Unit Identifier
+					'temperature-kelvin' => {
+						'name' => q(K),
+						'one' => q({0} K),
+						'other' => q({0} K),
+					},
+					# Core Unit Identifier
+					'kelvin' => {
+						'name' => q(K),
+						'one' => q({0} K),
+						'other' => q({0} K),
+					},
+					# Long Unit Identifier
+					'times' => {
+						'1' => q({0}-{1}),
+					},
+					# Core Unit Identifier
+					'times' => {
+						'1' => q({0}-{1}),
+					},
+					# Long Unit Identifier
+					'torque-newton-meter' => {
+						'one' => q({0} N⋅m),
+						'other' => q({0} N⋅m),
+					},
+					# Core Unit Identifier
+					'newton-meter' => {
+						'one' => q({0} N⋅m),
+						'other' => q({0} N⋅m),
+					},
+					# Long Unit Identifier
+					'torque-pound-force-foot' => {
+						'name' => q(lbf⋅ft),
+						'one' => q({0} lbf⋅ft),
+						'other' => q({0} lbf⋅ft),
+					},
+					# Core Unit Identifier
+					'pound-force-foot' => {
+						'name' => q(lbf⋅ft),
+						'one' => q({0} lbf⋅ft),
+						'other' => q({0} lbf⋅ft),
+					},
+					# Long Unit Identifier
+					'volume-acre-foot' => {
+						'name' => q(ac pi),
+						'one' => q({0} ac pi),
+						'other' => q({0} ac pi),
+					},
+					# Core Unit Identifier
+					'acre-foot' => {
+						'name' => q(ac pi),
+						'one' => q({0} ac pi),
+						'other' => q({0} ac pi),
+					},
+					# Long Unit Identifier
+					'volume-barrel' => {
+						'one' => q({0} bbl),
+						'other' => q({0} bbl),
+					},
+					# Core Unit Identifier
+					'barrel' => {
+						'one' => q({0} bbl),
+						'other' => q({0} bbl),
+					},
+					# Long Unit Identifier
+					'volume-bushel' => {
+						'name' => q(bu),
+						'one' => q({0} bu),
+						'other' => q({0} bu),
+					},
+					# Core Unit Identifier
+					'bushel' => {
+						'name' => q(bu),
+						'one' => q({0} bu),
+						'other' => q({0} bu),
+					},
+					# Long Unit Identifier
+					'volume-centiliter' => {
+						'name' => q(cl),
+						'one' => q({0} cl),
+						'other' => q({0} cl),
+					},
+					# Core Unit Identifier
+					'centiliter' => {
+						'name' => q(cl),
+						'one' => q({0} cl),
+						'other' => q({0} cl),
+					},
+					# Long Unit Identifier
+					'volume-cubic-centimeter' => {
+						'name' => q(cm³),
+						'one' => q({0} cm³),
+						'other' => q({0} cm³),
+						'per' => q({0}/cm³),
+					},
+					# Core Unit Identifier
+					'cubic-centimeter' => {
+						'name' => q(cm³),
+						'one' => q({0} cm³),
+						'other' => q({0} cm³),
+						'per' => q({0}/cm³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-foot' => {
+						'name' => q(pi³),
+						'one' => q({0} pi³),
+						'other' => q({0} pi³),
+					},
+					# Core Unit Identifier
+					'cubic-foot' => {
+						'name' => q(pi³),
+						'one' => q({0} pi³),
+						'other' => q({0} pi³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-inch' => {
+						'name' => q(po³),
+						'one' => q({0} po³),
+						'other' => q({0} po³),
+					},
+					# Core Unit Identifier
+					'cubic-inch' => {
+						'name' => q(po³),
+						'one' => q({0} po³),
+						'other' => q({0} po³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-kilometer' => {
+						'name' => q(km³),
+						'one' => q({0} km³),
+						'other' => q({0} km³),
+					},
+					# Core Unit Identifier
+					'cubic-kilometer' => {
+						'name' => q(km³),
+						'one' => q({0} km³),
+						'other' => q({0} km³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-meter' => {
+						'name' => q(m³),
+						'one' => q({0} m³),
+						'other' => q({0} m³),
+						'per' => q({0}/m³),
+					},
+					# Core Unit Identifier
+					'cubic-meter' => {
+						'name' => q(m³),
+						'one' => q({0} m³),
+						'other' => q({0} m³),
+						'per' => q({0}/m³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-mile' => {
+						'name' => q(mi³),
+						'one' => q({0} mi³),
+						'other' => q({0} mi³),
+					},
+					# Core Unit Identifier
+					'cubic-mile' => {
+						'name' => q(mi³),
+						'one' => q({0} mi³),
+						'other' => q({0} mi³),
+					},
+					# Long Unit Identifier
+					'volume-cubic-yard' => {
+						'name' => q(yd³),
+						'one' => q({0} yd³),
+						'other' => q({0} yd³),
+					},
+					# Core Unit Identifier
+					'cubic-yard' => {
+						'name' => q(yd³),
+						'one' => q({0} yd³),
+						'other' => q({0} yd³),
+					},
+					# Long Unit Identifier
+					'volume-cup' => {
+						'name' => q(tasses),
+						'one' => q({0} tasse),
+						'other' => q({0} tasses),
+					},
+					# Core Unit Identifier
+					'cup' => {
+						'name' => q(tasses),
+						'one' => q({0} tasse),
+						'other' => q({0} tasses),
+					},
+					# Long Unit Identifier
+					'volume-cup-metric' => {
+						'name' => q(tm),
+						'one' => q({0} tm),
+						'other' => q({0} tm),
+					},
+					# Core Unit Identifier
+					'cup-metric' => {
+						'name' => q(tm),
+						'one' => q({0} tm),
+						'other' => q({0} tm),
+					},
+					# Long Unit Identifier
+					'volume-deciliter' => {
+						'name' => q(dl),
+						'one' => q({0} dl),
+						'other' => q({0} dl),
+					},
+					# Core Unit Identifier
+					'deciliter' => {
+						'name' => q(dl),
+						'one' => q({0} dl),
+						'other' => q({0} dl),
+					},
+					# Long Unit Identifier
+					'volume-dessert-spoon' => {
+						'name' => q(c. à d.),
+						'one' => q({0} c. à d.),
+						'other' => q({0} c. à d.),
+					},
+					# Core Unit Identifier
+					'dessert-spoon' => {
+						'name' => q(c. à d.),
+						'one' => q({0} c. à d.),
+						'other' => q({0} c. à d.),
+					},
+					# Long Unit Identifier
+					'volume-dessert-spoon-imperial' => {
+						'name' => q(c. à d. imp.),
+						'one' => q({0} c. à d. imp.),
+						'other' => q({0} c. à d. imp.),
+					},
+					# Core Unit Identifier
+					'dessert-spoon-imperial' => {
+						'name' => q(c. à d. imp.),
+						'one' => q({0} c. à d. imp.),
+						'other' => q({0} c. à d. imp.),
+					},
+					# Long Unit Identifier
+					'volume-dram' => {
+						'name' => q(drachme fluide),
+						'one' => q({0} fl dr),
+						'other' => q({0} fl dr),
+					},
+					# Core Unit Identifier
+					'dram' => {
+						'name' => q(drachme fluide),
+						'one' => q({0} fl dr),
+						'other' => q({0} fl dr),
+					},
+					# Long Unit Identifier
+					'volume-drop' => {
+						'name' => q(gte),
+						'one' => q({0} gte),
+						'other' => q({0} gte),
+					},
+					# Core Unit Identifier
+					'drop' => {
+						'name' => q(gte),
+						'one' => q({0} gte),
+						'other' => q({0} gte),
+					},
+					# Long Unit Identifier
+					'volume-fluid-ounce' => {
+						'name' => q(fl oz),
+						'one' => q({0} fl oz),
+						'other' => q({0} fl oz),
+					},
+					# Core Unit Identifier
+					'fluid-ounce' => {
+						'name' => q(fl oz),
+						'one' => q({0} fl oz),
+						'other' => q({0} fl oz),
+					},
+					# Long Unit Identifier
+					'volume-fluid-ounce-imperial' => {
+						'name' => q(fl oz imp.),
+						'one' => q({0} fl oz imp.),
+						'other' => q({0} fl oz imp.),
+					},
+					# Core Unit Identifier
+					'fluid-ounce-imperial' => {
+						'name' => q(fl oz imp.),
+						'one' => q({0} fl oz imp.),
+						'other' => q({0} fl oz imp.),
+					},
+					# Long Unit Identifier
+					'volume-gallon' => {
+						'name' => q(gal),
+						'one' => q({0} gal),
+						'other' => q({0} gal),
+						'per' => q({0}/gal),
+					},
+					# Core Unit Identifier
+					'gallon' => {
+						'name' => q(gal),
+						'one' => q({0} gal),
+						'other' => q({0} gal),
+						'per' => q({0}/gal),
+					},
+					# Long Unit Identifier
+					'volume-gallon-imperial' => {
+						'name' => q(gal imp.),
+						'one' => q({0} gal imp.),
+						'other' => q({0} gal imp.),
+						'per' => q({0} gal imp.),
+					},
+					# Core Unit Identifier
+					'gallon-imperial' => {
+						'name' => q(gal imp.),
+						'one' => q({0} gal imp.),
+						'other' => q({0} gal imp.),
+						'per' => q({0} gal imp.),
+					},
+					# Long Unit Identifier
+					'volume-hectoliter' => {
+						'name' => q(hl),
+						'one' => q({0} hl),
+						'other' => q({0} hl),
+					},
+					# Core Unit Identifier
+					'hectoliter' => {
+						'name' => q(hl),
+						'one' => q({0} hl),
+						'other' => q({0} hl),
+					},
+					# Long Unit Identifier
+					'volume-jigger' => {
+						'name' => q(jigger),
+						'one' => q({0} jigger),
+						'other' => q({0} jiggers),
+					},
+					# Core Unit Identifier
+					'jigger' => {
+						'name' => q(jigger),
+						'one' => q({0} jigger),
+						'other' => q({0} jiggers),
+					},
+					# Long Unit Identifier
+					'volume-liter' => {
+						'name' => q(l),
+						'one' => q({0} l),
+						'other' => q({0} l),
+						'per' => q({0}/l),
+					},
+					# Core Unit Identifier
+					'liter' => {
+						'name' => q(l),
+						'one' => q({0} l),
+						'other' => q({0} l),
+						'per' => q({0}/l),
+					},
+					# Long Unit Identifier
+					'volume-megaliter' => {
+						'name' => q(Ml),
+						'one' => q({0} Ml),
+						'other' => q({0} Ml),
+					},
+					# Core Unit Identifier
+					'megaliter' => {
+						'name' => q(Ml),
+						'one' => q({0} Ml),
+						'other' => q({0} Ml),
+					},
+					# Long Unit Identifier
+					'volume-milliliter' => {
+						'name' => q(ml),
+						'one' => q({0} ml),
+						'other' => q({0} ml),
+					},
+					# Core Unit Identifier
+					'milliliter' => {
+						'name' => q(ml),
+						'one' => q({0} ml),
+						'other' => q({0} ml),
+					},
+					# Long Unit Identifier
+					'volume-pinch' => {
+						'name' => q(pincée),
+						'one' => q({0} pincée),
+						'other' => q({0} pincées),
+					},
+					# Core Unit Identifier
+					'pinch' => {
+						'name' => q(pincée),
+						'one' => q({0} pincée),
+						'other' => q({0} pincées),
+					},
+					# Long Unit Identifier
+					'volume-pint' => {
+						'name' => q(pte),
+						'one' => q({0} pte),
+						'other' => q({0} pte),
+					},
+					# Core Unit Identifier
+					'pint' => {
+						'name' => q(pte),
+						'one' => q({0} pte),
+						'other' => q({0} pte),
+					},
+					# Long Unit Identifier
+					'volume-pint-metric' => {
+						'name' => q(mpt),
+						'one' => q({0} mpt),
+						'other' => q({0} mpt),
+					},
+					# Core Unit Identifier
+					'pint-metric' => {
+						'name' => q(mpt),
+						'one' => q({0} mpt),
+						'other' => q({0} mpt),
+					},
+					# Long Unit Identifier
+					'volume-quart' => {
+						'name' => q(qt),
+						'one' => q({0} qt),
+						'other' => q({0} qt),
+					},
+					# Core Unit Identifier
+					'quart' => {
+						'name' => q(qt),
+						'one' => q({0} qt),
+						'other' => q({0} qt),
+					},
+					# Long Unit Identifier
+					'volume-quart-imperial' => {
+						'name' => q(qt imp.),
+						'one' => q({0} qt imp.),
+						'other' => q({0} qt imp.),
+					},
+					# Core Unit Identifier
+					'quart-imperial' => {
+						'name' => q(qt imp.),
+						'one' => q({0} qt imp.),
+						'other' => q({0} qt imp.),
+					},
+					# Long Unit Identifier
+					'volume-tablespoon' => {
+						'name' => q(c. à s.),
+						'one' => q({0} c. à s.),
+						'other' => q({0} c. à s.),
+					},
+					# Core Unit Identifier
+					'tablespoon' => {
+						'name' => q(c. à s.),
+						'one' => q({0} c. à s.),
+						'other' => q({0} c. à s.),
+					},
+					# Long Unit Identifier
+					'volume-teaspoon' => {
+						'name' => q(c. à c.),
+						'one' => q({0} c. à c.),
+						'other' => q({0} c. à c.),
+					},
+					# Core Unit Identifier
+					'teaspoon' => {
+						'name' => q(c. à c.),
+						'one' => q({0} c. à c.),
+						'other' => q({0} c. à c.),
 					},
 				},
 			} }
@@ -5136,6 +10073,7 @@ has 'number_formats' => (
 		decimalFormat => {
 			'default' => {
 				'1000' => {
+					'1' => 'mille',
 					'one' => '0 k',
 					'other' => '0 k',
 				},
@@ -5189,6 +10127,7 @@ has 'number_formats' => (
 			},
 			'long' => {
 				'1000' => {
+					'1' => 'mille',
 					'one' => '0 millier',
 					'other' => '0 mille',
 				},
@@ -6516,7 +11455,6 @@ has 'currencies' => (
 			},
 		},
 		'LSL' => {
-			symbol => 'lLS',
 			display_name => {
 				'currency' => q(loti lesothan),
 				'one' => q(loti lesothan),
@@ -7294,7 +12232,7 @@ has 'currencies' => (
 		'TTD' => {
 			symbol => '$TT',
 			display_name => {
-				'currency' => q(dollar trinidadien),
+				'currency' => q(dollar de Trinité-et-Tobago),
 				'one' => q(dollar de Trinité-et-Tobago),
 				'other' => q(dollars de Trinité-et-Tobago),
 			},
@@ -7395,6 +12333,14 @@ has 'currencies' => (
 				'other' => q(pesos uruguayens),
 			},
 		},
+		'UYW' => {
+			symbol => 'UYW',
+			display_name => {
+				'currency' => q(unité de salaire nominal uruguayenne),
+				'one' => q(unité de salaire nominal uruguayenne),
+				'other' => q(unités de salaire nominales uruguayennes),
+			},
+		},
 		'UZS' => {
 			symbol => 'UZS',
 			display_name => {
@@ -7452,7 +12398,7 @@ has 'currencies' => (
 			},
 		},
 		'WST' => {
-			symbol => 'WS$',
+			symbol => '$WS',
 			display_name => {
 				'currency' => q(tala samoan),
 				'one' => q(tala samoan),
@@ -7556,7 +12502,7 @@ has 'currencies' => (
 			},
 		},
 		'XOF' => {
-			symbol => 'CFA',
+			symbol => 'F CFA',
 			display_name => {
 				'currency' => q(franc CFA \(BCEAO\)),
 				'one' => q(franc CFA \(BCEAO\)),
@@ -8387,13 +13333,13 @@ has 'calendar_months' => (
 							'él.'
 						],
 						leap => [
-							'',
-							'',
-							'',
-							'',
-							'',
-							'',
-							'ad.II'
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							
 						],
 					},
 					narrow => {
@@ -8413,13 +13359,13 @@ has 'calendar_months' => (
 							'13'
 						],
 						leap => [
-							'',
-							'',
-							'',
-							'',
-							'',
-							'',
-							'7'
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							
 						],
 					},
 					wide => {
@@ -8439,13 +13385,13 @@ has 'calendar_months' => (
 							'éloul'
 						],
 						leap => [
-							'',
-							'',
-							'',
-							'',
-							'',
-							'',
-							'adar II'
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							
 						],
 					},
 				},
@@ -8467,13 +13413,13 @@ has 'calendar_months' => (
 							'él.'
 						],
 						leap => [
-							'',
-							'',
-							'',
-							'',
-							'',
-							'',
-							'ad.II'
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							
 						],
 					},
 					narrow => {
@@ -8493,13 +13439,13 @@ has 'calendar_months' => (
 							'13'
 						],
 						leap => [
-							'',
-							'',
-							'',
-							'',
-							'',
-							'',
-							'7'
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							
 						],
 					},
 					wide => {
@@ -8519,13 +13465,13 @@ has 'calendar_months' => (
 							'éloul'
 						],
 						leap => [
-							'',
-							'',
-							'',
-							'',
-							'',
-							'',
-							'adar II'
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							
 						],
 					},
 				},
@@ -9363,8 +14309,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'day_periods' => (
@@ -9508,9 +14454,6 @@ has 'eras' => (
 		'hebrew' => {
 			abbreviated => {
 				'0' => 'A. M.'
-			},
-			narrow => {
-				'0' => 'AM'
 			},
 			wide => {
 				'0' => 'Anno Mundi'
@@ -10258,9 +15201,6 @@ has 'eras' => (
 			abbreviated => {
 				'0' => 'A. P.'
 			},
-			narrow => {
-				'0' => 'AP'
-			},
 			wide => {
 				'0' => 'Anno Persico'
 			},
@@ -10410,7 +15350,7 @@ has 'datetime_formats' => (
 		'gregorian' => {
 			'full' => q{{1} 'à' {0}},
 			'long' => q{{1} 'à' {0}},
-			'medium' => q{{1} 'à' {0}},
+			'medium' => q{{1}, {0}},
 			'short' => q{{1} {0}},
 		},
 		'hebrew' => {
@@ -10489,16 +15429,17 @@ has 'datetime_formats_available_formats' => (
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E d MMM y G},
 			GyMMMd => q{d MMM y G},
+			GyMd => q{dd/MM/y GGGGG},
 			H => q{HH},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
-			MEd => q{E d/M},
+			MEd => q{E dd/MM},
 			MMM => q{LLL},
 			MMMEd => q{E d MMM},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
-			Md => q{d/M},
+			Md => q{dd/MM},
 			d => q{d},
 			h => q{h a},
 			hm => q{h:mm a},
@@ -10506,13 +15447,13 @@ has 'datetime_formats_available_formats' => (
 			ms => q{mm:ss},
 			y => q{y G},
 			yyyy => q{y G},
-			yyyyM => q{M/y GGGGG},
-			yyyyMEd => q{E d/M/y GGGGG},
+			yyyyM => q{MM/y GGGGG},
+			yyyyMEd => q{E dd/MM/y GGGGG},
 			yyyyMMM => q{MMM y G},
 			yyyyMMMEd => q{E d MMM y G},
 			yyyyMMMM => q{MMMM y G},
 			yyyyMMMd => q{d MMM y G},
-			yyyyMd => q{d/M/y GGGGG},
+			yyyyMd => q{dd/MM/y GGGGG},
 			yyyyQQQ => q{QQQ y G},
 			yyyyQQQQ => q{QQQQ y G},
 		},
@@ -10532,6 +15473,7 @@ has 'datetime_formats_available_formats' => (
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E d MMM y G},
 			GyMMMd => q{d MMM y G},
+			GyMd => q{dd/MM/y GGGGG},
 			H => q{HH 'h'},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -10637,7 +15579,94 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'buddhist' => {
+			Bh => {
+				h => q{h–h B},
+			},
+			Bhm => {
+				h => q{h:mm–h:mm B},
+				m => q{h:mm–h:mm B},
+			},
+		},
+		'chinese' => {
+			Bh => {
+				B => q{h B – h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+			},
+		},
+		'coptic' => {
+			Bh => {
+				h => q{h–h B},
+			},
+			Bhm => {
+				h => q{h:mm–h:mm B},
+				m => q{h:mm–h:mm B},
+			},
+		},
+		'dangi' => {
+			Bhm => {
+				h => q{h:mm–h:mm B},
+			},
+		},
+		'ethiopic' => {
+			Bh => {
+				h => q{h–h B},
+			},
+			Bhm => {
+				h => q{h:mm–h:mm B},
+				m => q{h:mm–h:mm B},
+			},
+		},
 		'generic' => {
+			Bh => {
+				B => q{h B – h B},
+				h => q{h – h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+				h => q{h:mm – h:mm B},
+				m => q{h:mm – h:mm B},
+			},
+			Gy => {
+				G => q{y G 'à' y G},
+				y => q{y–y G},
+			},
+			GyM => {
+				G => q{M/y G 'à' M/y G},
+				M => q{M–M/y G},
+				y => q{M/y 'à' M/y G},
+			},
+			GyMEd => {
+				G => q{E d/M/y G 'à' E d/M/y G},
+				M => q{E d/M 'à' E d/M/y G},
+				d => q{E d 'à' E d/M/y G},
+				y => q{E d/M/y 'à' E d/M/y G},
+			},
+			GyMMM => {
+				G => q{MMM y G 'à' MMM y G},
+				M => q{MMM 'à' MMM y G},
+				y => q{MMM y 'à' MMM y G},
+			},
+			GyMMMEd => {
+				G => q{E d MMM y G 'à' E d MMM y G},
+				M => q{E d MMM 'à' E d MMM y G},
+				d => q{E d 'à' E d MMM y G},
+				y => q{E d MMM y 'à' E d MMM y G},
+			},
+			GyMMMd => {
+				G => q{d MMM y G 'à' d MMM y G},
+				M => q{d MMM 'à' d MMM y G},
+				d => q{d–d MMM y G},
+				y => q{d MMM y 'à' d MMM y G},
+			},
+			GyMd => {
+				G => q{d/M/y G 'à' d/M/y G},
+				M => q{d/M 'à' d/M/y G},
+				d => q{d–d/M/y G},
+				y => q{d/M/y 'à' d/M/y G},
+			},
 			H => {
 				H => q{HH – HH},
 			},
@@ -10733,6 +15762,53 @@ has 'datetime_formats_interval' => (
 			},
 		},
 		'gregorian' => {
+			Bh => {
+				B => q{h B – h B},
+				h => q{h – h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+				h => q{h:mm – h:mm B},
+				m => q{h:mm – h:mm B},
+			},
+			Gy => {
+				G => q{y G 'à' y G},
+				y => q{y–y G},
+			},
+			GyM => {
+				G => q{M/y G 'à' M/y G},
+				M => q{M–M/y G},
+				y => q{M/y 'à' M/y G},
+			},
+			GyMEd => {
+				G => q{E d/M/y G 'à' E d/M/y G},
+				M => q{E d/M 'à' E d/M/y G},
+				d => q{E d 'à' E d/M/y G},
+				y => q{E d/M/y 'à' E d/M/y G},
+			},
+			GyMMM => {
+				G => q{MMM y G 'à' MMM y G},
+				M => q{MMM 'à' MMM y G},
+				y => q{MMM y 'à' MMM y G},
+			},
+			GyMMMEd => {
+				G => q{E d MMM y G 'à' E d MMM y G},
+				M => q{E d MMM 'à' E d MMM y G},
+				d => q{E d 'à' E d MMM y G},
+				y => q{E d MMM y 'à' E d MMM y G},
+			},
+			GyMMMd => {
+				G => q{d MMM y G 'à' d MMM y G},
+				M => q{d MMM 'à' d MMM y G},
+				d => q{d–d MMM y G},
+				y => q{d MMM y 'à' d MMM y G},
+			},
+			GyMd => {
+				G => q{d/M/y G 'à' d/M/y G},
+				M => q{d/M 'à' d/M/y G},
+				d => q{d–d/M/y G},
+				y => q{d/M/y 'à' d/M/y G},
+			},
 			H => {
 				H => q{HH – HH},
 			},
@@ -10825,6 +15901,60 @@ has 'datetime_formats_interval' => (
 				M => q{dd/MM/y – dd/MM/y},
 				d => q{dd/MM/y – dd/MM/y},
 				y => q{dd/MM/y – dd/MM/y},
+			},
+		},
+		'hebrew' => {
+			Bh => {
+				h => q{h–h B},
+			},
+			Bhm => {
+				h => q{h:mm–h:mm B},
+				m => q{h:mm–h:mm B},
+			},
+		},
+		'indian' => {
+			Bh => {
+				h => q{h–h B},
+			},
+			Bhm => {
+				h => q{h:mm–h:mm B},
+				m => q{h:mm–h:mm B},
+			},
+		},
+		'islamic' => {
+			Bh => {
+				h => q{h–h B},
+			},
+			Bhm => {
+				h => q{h:mm–h:mm B},
+				m => q{h:mm–h:mm B},
+			},
+		},
+		'japanese' => {
+			Bh => {
+				h => q{h–h B},
+			},
+			Bhm => {
+				h => q{h:mm–h:mm B},
+				m => q{h:mm–h:mm B},
+			},
+		},
+		'persian' => {
+			Bh => {
+				h => q{h–h B},
+			},
+			Bhm => {
+				h => q{h:mm–h:mm B},
+				m => q{h:mm–h:mm B},
+			},
+		},
+		'roc' => {
+			Bh => {
+				h => q{h–h B},
+			},
+			Bhm => {
+				h => q{h:mm–h:mm B},
+				m => q{h:mm–h:mm B},
 			},
 		},
 	} },
@@ -12029,6 +17159,9 @@ has 'time_zone_names' => (
 		'Asia/Qatar' => {
 			exemplarCity => q#Qatar#,
 		},
+		'Asia/Qostanay' => {
+			exemplarCity => q#Kostanaï#,
+		},
 		'Asia/Qyzylorda' => {
 			exemplarCity => q#Kzyl Orda#,
 		},
@@ -12129,7 +17262,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Cap-Vert#,
 		},
 		'Atlantic/Faeroe' => {
-			exemplarCity => q#Féroé#,
+			exemplarCity => q#Îles Féroé#,
 		},
 		'Atlantic/Madeira' => {
 			exemplarCity => q#Madère#,
@@ -12260,6 +17393,11 @@ has 'time_zone_names' => (
 				'standard' => q#heure normale du Cap-Vert#,
 			},
 		},
+		'Casey' => {
+			long => {
+				'standard' => q#heure de Casey#,
+			},
+		},
 		'Chamorro' => {
 			long => {
 				'standard' => q#heure des Chamorro#,
@@ -12358,7 +17496,10 @@ has 'time_zone_names' => (
 		},
 		'Etc/UTC' => {
 			long => {
-				'standard' => q#Temps universel coordonné#,
+				'standard' => q#temps universel coordonné#,
+			},
+			short => {
+				'standard' => q#TU#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -12563,6 +17704,11 @@ has 'time_zone_names' => (
 				'generic' => q#heure d’Europe de l’Est#,
 				'standard' => q#heure normale d’Europe de l’Est#,
 			},
+			short => {
+				'daylight' => q#EEDT#,
+				'generic' => q#EET#,
+				'standard' => q#EEST#,
+			},
 		},
 		'Europe_Further_Eastern' => {
 			long => {
@@ -12574,6 +17720,11 @@ has 'time_zone_names' => (
 				'daylight' => q#heure d’été d’Europe de l’Ouest#,
 				'generic' => q#heure d’Europe de l’Ouest#,
 				'standard' => q#heure normale d’Europe de l’Ouest#,
+			},
+			short => {
+				'daylight' => q#WEDT#,
+				'generic' => q#WET#,
+				'standard' => q#WEST#,
 			},
 		},
 		'Falkland' => {
@@ -12603,6 +17754,9 @@ has 'time_zone_names' => (
 		'GMT' => {
 			long => {
 				'standard' => q#heure moyenne de Greenwich#,
+			},
+			short => {
+				'standard' => q#GMT#,
 			},
 		},
 		'Galapagos' => {
@@ -12978,7 +18132,9 @@ has 'time_zone_names' => (
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q#heure de l’île Norfolk#,
+				'daylight' => q#heure d’été de l’île Norfolk#,
+				'generic' => q#heure de l’île Norfolk#,
+				'standard' => q#heure normale de l’île Norfolk#,
 			},
 		},
 		'Noronha' => {
@@ -13051,6 +18207,11 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Honolulu#,
+			short => {
+				'daylight' => q#HDT#,
+				'generic' => q#HT#,
+				'standard' => q#HST#,
+			},
 		},
 		'Pacific/Johnston' => {
 			exemplarCity => q#Johnston#,
@@ -13192,6 +18353,13 @@ has 'time_zone_names' => (
 		'Pyongyang' => {
 			long => {
 				'standard' => q#heure de Pyongyang#,
+			},
+		},
+		'Qyzylorda' => {
+			long => {
+				'daylight' => q#heure d’été de Kyzylorda#,
+				'generic' => q#heure de Kyzylorda#,
+				'standard' => q#heure normale de Kyzylorda#,
 			},
 		},
 		'Reunion' => {
@@ -13368,6 +18536,11 @@ has 'time_zone_names' => (
 				'daylight' => q#heure d’été d’Ekaterinbourg#,
 				'generic' => q#heure d’Ekaterinbourg#,
 				'standard' => q#heure normale d’Ekaterinbourg#,
+			},
+		},
+		'Yukon' => {
+			long => {
+				'standard' => q#heure normale du Yukon#,
 			},
 		},
 	 } }

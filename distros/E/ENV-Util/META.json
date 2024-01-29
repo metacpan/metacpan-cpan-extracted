@@ -1,10 +1,10 @@
 {
-   "abstract" : "parse prefixed environment variables and dotnev (.env) files into Perl",
+   "abstract" : "parse prefixed environment variables and dotenv (.env) files into Perl",
    "author" : [
       "Breno G. de Oliveira <garu@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -48,6 +48,6 @@
          "url" : "https://github.com/garu/ENV-Util"
       }
    },
-   "version" : 0.03,
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : 0.04,
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

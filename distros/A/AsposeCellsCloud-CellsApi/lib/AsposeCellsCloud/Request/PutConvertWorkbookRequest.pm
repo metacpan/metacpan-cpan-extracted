@@ -61,11 +61,12 @@ sub new {
 # Run Operation Request
 # PutConvertWorkbookRequest.File : The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).  ,
 # PutConvertWorkbookRequest.format : The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).  ,
-# PutConvertWorkbookRequest.password : The workbook password.  ,
-# PutConvertWorkbookRequest.outPath : Path to save result  ,
-# PutConvertWorkbookRequest.storageName : Storage name.  ,
-# PutConvertWorkbookRequest.checkExcelRestriction :   ,
-# PutConvertWorkbookRequest.streamFormat :    
+# PutConvertWorkbookRequest.password : The password needed to open an Excel file.  ,
+# PutConvertWorkbookRequest.outPath : Path to save the result. If it`s a single file, the `outPath` should encompass both the filename and extension. In the case of multiple files, the `outPath` should only include the folder.  ,
+# PutConvertWorkbookRequest.storageName : The storage name where the file is situated.  ,
+# PutConvertWorkbookRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.  ,
+# PutConvertWorkbookRequest.streamFormat : The format of the input file stream.   ,
+# PutConvertWorkbookRequest.region : The regional settings for workbook.   
 
 {
     my $params = {
@@ -76,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_convert_workbook' } = { 
-    	summary => 'Converts workbook from request content to some format.',
+    	summary => 'Convert the workbook from the requested content into files in different formats.',
         params => $params,
         returns => 'string',
     };
@@ -124,6 +125,10 @@ sub run_http_request {
 
     if(defined $self->stream_format){
         $query_params->{'streamFormat'} = $client->to_query_value($self->stream_format);      
+    }
+
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
     } 
     my $_body_data;
  
@@ -162,35 +167,42 @@ __PACKAGE__->method_documentation({
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => 'The workbook password.',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'out_path' => {
      	datatype => 'string',
      	base_name => 'outPath',
-     	description => 'Path to save result',
+     	description => 'Path to save the result. If it`s a single file, the `outPath` should encompass both the filename and extension. In the case of multiple files, the `outPath` should only include the folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
-     	description => '',
+     	description => 'Whether check restriction of excel file when user modify cells related objects.',
      	format => '',
      	read_only => '',
      		},
      'stream_format' => {
      	datatype => 'string',
      	base_name => 'streamFormat',
-     	description => '',
+     	description => 'The format of the input file stream. ',
+     	format => '',
+     	read_only => '',
+     		},
+     'region' => {
+     	datatype => 'string',
+     	base_name => 'region',
+     	description => 'The regional settings for workbook.',
      	format => '',
      	read_only => '',
      		},    
@@ -204,7 +216,8 @@ __PACKAGE__->attribute_map( {
     'out_path' => 'outPath',
     'storage_name' => 'storageName',
     'check_excel_restriction' => 'checkExcelRestriction',
-    'stream_format' => 'streamFormat' 
+    'stream_format' => 'streamFormat',
+    'region' => 'region' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -1,5 +1,8 @@
 Revision history for Perl extension RPM::Query.
 
+0.03 2023-06-12
+  - skip tests unless perl is installed by rpm
+
 0.02 2023-06-08
   - skip tests unless linux and has rpm in path
 

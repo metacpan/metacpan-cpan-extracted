@@ -232,6 +232,7 @@ subtest 'path parameters' => sub {
       traversed_schema_path => '',
       schema_path => $schema_path,
       errors => [],
+      depth => 0,
     };
 
     my $name = $test->{param_obj}{name};
@@ -389,6 +390,7 @@ subtest 'query parameters' => sub {
       traversed_schema_path => '',
       schema_path => $schema_path,
       errors => [],
+      depth => 0,
     };
 
     my $name = $test->{param_obj}{name};
@@ -561,6 +563,7 @@ subtest 'header parameters' => sub {
       traversed_schema_path => '',
       schema_path => $schema_path,
       errors => [],
+      depth => 0,
     };
 
     my $name = $test->{name};

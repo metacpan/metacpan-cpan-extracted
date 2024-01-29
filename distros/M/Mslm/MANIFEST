@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+ignore.txt
+t/00-load.t
+t/01-usage.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+lib/Mslm.pm
+lib/Mslm/Common.pm
+lib/Mslm/EmailVerify.pm
+lib/Mslm/OTP.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

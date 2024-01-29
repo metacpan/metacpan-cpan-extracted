@@ -1,3 +1,16 @@
+0.020   2023-09-23  Released-By: PERLANCAR; Urgency: low
+
+        - Add a runtime-recommends dep to Text::ANSITable.
+
+        - Only use Text::ANSITable if it's installed.
+
+
+0.019   2023-09-03  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] By default make summary more readable: use Text::ANSITable to
+          reformat in multiple rows, separate paragraphs and bullet-points.
+
+
 0.018   2023-09-03  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] In --detail mode, show the 'status' field as the first column to

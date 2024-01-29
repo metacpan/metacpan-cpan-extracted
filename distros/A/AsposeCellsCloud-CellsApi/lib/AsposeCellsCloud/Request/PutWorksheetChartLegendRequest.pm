@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetChartLegendRequest.name : The workbook name.  ,
+# PutWorksheetChartLegendRequest.name : The file name.  ,
 # PutWorksheetChartLegendRequest.sheetName : The worksheet name.  ,
 # PutWorksheetChartLegendRequest.chartIndex : The chart index.  ,
-# PutWorksheetChartLegendRequest.folder : Original workbook folder.  ,
-# PutWorksheetChartLegendRequest.storageName : Storage name.   
+# PutWorksheetChartLegendRequest.folder : The folder where the file is situated.  ,
+# PutWorksheetChartLegendRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -137,7 +137,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -158,14 +158,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

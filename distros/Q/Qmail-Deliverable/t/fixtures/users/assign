@@ -1,0 +1,4 @@
+#+prefix:user:uid:gid:directory:dash:prepend:
++example.com-:example.com:89:89:t/fixtures/domains/example.com:-::
++luser-:vpopmail:89:89:t/fixtures/domains/example.com:-:luser-
+.

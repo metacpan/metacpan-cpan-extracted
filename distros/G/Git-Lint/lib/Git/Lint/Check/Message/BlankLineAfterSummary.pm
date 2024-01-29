@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Git::Lint::Check::Message';
 
-our $VERSION = '0.016';
+our $VERSION = '1.000';
 
 my $check_name        = 'blank line after summary';
 my $check_description = 'first line must be followed by a blank line';

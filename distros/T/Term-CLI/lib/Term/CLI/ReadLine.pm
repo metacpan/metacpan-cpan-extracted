@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::ReadLine 0.058002;
+package Term::CLI::ReadLine 0.059000;
 
 use 5.014;
 use warnings;
@@ -511,7 +511,7 @@ Term::CLI::ReadLine - Term::ReadLine compatibility layer for Term::CLI
 
 =head1 VERSION
 
-version 0.058002
+version 0.059000
 
 =head1 SYNOPSIS
 

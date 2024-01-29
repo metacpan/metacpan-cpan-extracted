@@ -204,6 +204,17 @@ Le fonctionnement du daemon `sudoc trans` est piloté par la section
 écrire le fichier MBOX de la boîte aux lettres contenant les courriels envoyés
 par l'ABES.
 
+**Méthode GET** — S'il n'est pas possible de mettre en place un serveur SFTP
+sur le serveur Koha, la méthode GET peut être utilisée pour récupérer les
+fichiers sur une machine intermédiaire de l'ABES. Il faut juste définir les
+infos suivantes dans la section `trans` du fichier de configuration :
+
+```yaml
+  ftp_host: vermeil.sudoc.abes.fr
+  login: ilnXXX
+  password: abcefg1234
+```
+
 #### Précautions
 
 Dans certaines circonstances, il peut être nécessaire d'envoyer à l'ABES une

@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# GetChartValueAxisRequest.name :   ,
-# GetChartValueAxisRequest.sheetName :   ,
-# GetChartValueAxisRequest.chartIndex :   ,
-# GetChartValueAxisRequest.folder :   ,
-# GetChartValueAxisRequest.storageName :    
+# GetChartValueAxisRequest.name : The file name.  ,
+# GetChartValueAxisRequest.sheetName : The worksheet name.  ,
+# GetChartValueAxisRequest.chartIndex : The chart index.  ,
+# GetChartValueAxisRequest.folder : The folder where the file is situated.  ,
+# GetChartValueAxisRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -137,35 +137,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'chart_index' => {
      	datatype => 'int',
      	base_name => 'chartIndex',
-     	description => '',
+     	description => 'The chart index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

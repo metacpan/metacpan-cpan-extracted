@@ -8,6 +8,11 @@ BEGIN {
    eval { require Devel::MAT; } or
       plan skip_all => "No Devel::MAT";
 
+   eval { require Devel::MAT::Dumper; Devel::MAT::Dumper->VERSION( '0.45' ) } or
+      plan skip_all => "No Devel::MAT::Dumper version 0.45 or above";
+   eval { require Object::Pad; Object::Pad->VERSION( '0.66' ) } or
+      plan skip_all => "No Object::Pad version 0.66 or above";
+
    require Devel::MAT::Dumper;
 }
 
@@ -17,7 +22,7 @@ use Object::Pad;
 
 class AClass
 {
-   has $afield :param :reader;
+   field $afield :param :reader;
 }
 
 my $obj = AClass->new( afield => 123 );
@@ -48,7 +53,10 @@ $pmat->available_tools;
    is( $classmeta->objectpad_name, "AClass", '$classmeta name' );
 
    # Field
-   my @fieldmetas = $classmeta->field_named( "the direct fields AV" )->elems;
+   my @fieldmetas = $classmeta->field_named(
+      # Field was renamed in 0.807
+      $Object::Pad::VERSION ge 0.807 ? "the fields AV" : "the direct fields AV"
+   )->elems;
    is( scalar @fieldmetas, 1, '$classmeta has 1 fieldmeta' );
 
    my $fieldmeta = $fieldmetas[0];

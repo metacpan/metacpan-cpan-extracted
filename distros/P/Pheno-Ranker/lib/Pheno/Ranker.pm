@@ -8,6 +8,7 @@ use Data::Dumper;
 use File::Basename qw(dirname);
 use Cwd qw(abs_path);
 use File::Spec::Functions qw(catdir catfile);
+use Term::ANSIColor qw(:constants);
 use Moo;
 use Types::Standard qw(Str Int Num Enum ArrayRef HashRef Undef Bool);
 use File::ShareDir::ProjectDistDir qw(dist_dir);
@@ -19,15 +20,21 @@ use Pheno::Ranker::Stats;
 use Exporter 'import';
 our @EXPORT_OK = qw($VERSION write_json);
 
+# Personalize warn and die functions
+$SIG{__WARN__} = sub { warn BOLD YELLOW "Warn: ", @_ };
+$SIG{__DIE__}  = sub { die BOLD RED "Error: ", @_ };
+
 # Global variables:
 $Data::Dumper::Sortkeys = 1;
-our $VERSION   = '0.03';
+our $VERSION   = '0.04';
 our $share_dir = dist_dir('Pheno-Ranker');
+
+# Set developoent mode
 use constant DEVEL_MODE => 0;
 
 # Misc variables
 my (
-    $config_sort_by, $config_max_out, $config_max_number_var,
+    $config_sort_by, $config_similarity_metric_cohort, $config_max_out, $config_max_number_var,
     $config_seed,    @config_allowed_terms
 );
 my $default_config_file = catfile( $share_dir, 'conf', 'config.yaml' );
@@ -38,75 +45,97 @@ my $default_config_file = catfile( $share_dir, 'conf', 'config.yaml' );
 
 # Complex defaults here
 has 'config_file' => (
+    is  => 'ro',
+    isa =>
+      sub { die "Config file '$_[0]' is not a valid file" unless -e $_[0] },
     default => $default_config_file,
-    coerce  => sub {
-        $_[0] // $default_config_file;
-    },
-    is      => 'ro',
-    isa     => sub { die "$_[0] is not a valid file" unless -e $_[0] },
+    coerce  => sub { $_[0] // $default_config_file },
     trigger => sub {
         my ( $self, $config_file ) = @_;
         my $config = read_yaml($config_file);
 
-        #####################
-        # Set config params #
-        #####################
+        # Set basic configuration parameters
+        $self->_set_basic_config($config);
 
-        $config_sort_by        = $config->{sort_by}        // 'hamming';
-        $config_max_out        = $config->{max_out}        // 50;
-        $config_max_number_var = $config->{max_number_var} // 10_000;
+        # Validate and set exclusive configuration parameters
+        $self->_validate_and_set_exclusive_config( $config, $config_file );
 
-        # Validate $config->{allowed_terms}
-        unless ( exists $config->{allowed_terms}
-            && ArrayRef->check( $config->{allowed_terms} )
-            && @{ $config->{allowed_terms} } )
-        {
-            die
-"No <allowed terms> provided or not an array ref at\n$config_file\n";
-        }
-        @config_allowed_terms = @{ $config->{allowed_terms} };
-
-        ###############################
-        # Set config exclusive params #
-        ###############################
-        $config_seed =
-          ( defined $config->{seed} && Int->check( $config->{seed} ) )
-          ? $config->{seed}
-          : 123456789;
-
-        # Set on $self
-        $self->{primary_key}              = $config->{primary_key} // 'id';    # setter;
-        $self->{exclude_properties_regex} = $config->{exclude_properties_regex}
-          // '';                                                               # setter
-        $self->{array_terms} = $config->{array_terms} // ['foo'];              # setter - To validate
-        $self->{array_regex} = $config->{array_regex} // '^(\w+):(\d+)';       # setter - To validate
-        $self->{format}      = $config->{format};                              # setter
-
-        # Validate $config->{id_correspondence} if we have "real" array_terms
-        if ( $self->{array_terms}[0] ne 'foo' ) {
-            unless ( exists $config->{id_correspondence}
-                && HashRef->check( $config->{id_correspondence} ) )
-            {
-                die
-"No <id_correspondence> provided or not a hash ref at\n$config_file\n";
-            }
-            $self->{id_correspondence} = $config->{id_correspondence};    # setter
-
-            # Validate format if exists and check that has a match in config->{id_correspondence}
-            if ( exists $config->{format} && Str->check( $config->{format} ) ) {
-                die
-"<$config->{format}> does not match any key from <id_correspondence>\n"
-                  unless
-                  exists $config->{id_correspondence}{ $config->{format} };
-            }
-        }
+        # Set additional configuration parameters on $self
+        $self->_set_additional_config( $config, $config_file );
     }
 );
+
+# Private Method: _set_basic_config
+# Sets basic configuration parameters from the provided config.
+sub _set_basic_config {
+    my ( $self, $config ) = @_;
+    $config_sort_by        = $config->{sort_by}        // 'hamming';
+    $config_similarity_metric_cohort        = $config->{similarity_metric_cohort}        // 'hamming';
+    $config_max_out        = $config->{max_out}        // 50;
+    $config_max_number_var = $config->{max_number_var} // 10_000;
+    $config_seed =
+      ( defined $config->{seed} && Int->check( $config->{seed} ) )
+      ? $config->{seed}
+      : 123456789;
+}
+
+# Private Method: _validate_and_set_exclusive_config
+# Validates and sets configuration parameters that are exclusive or conditional.
+sub _validate_and_set_exclusive_config {
+    my ( $self, $config, $config_file ) = @_;
+
+    # Validate $config->{allowed_terms}
+    unless ( exists $config->{allowed_terms}
+        && ArrayRef->check( $config->{allowed_terms} )
+        && @{ $config->{allowed_terms} } )
+    {
+        die "No <allowed terms> provided or not an array ref at $config_file\n";
+    }
+    @config_allowed_terms = @{ $config->{allowed_terms} };
+}
+
+# Private Method: _set_additional_config
+# Sets additional configuration parameters on $self.
+sub _set_additional_config {
+    my ( $self, $config, $config_file ) = @_;
+    $self->{primary_key}              = $config->{primary_key} // 'id';       # setter
+    $self->{exclude_properties_regex} = $config->{exclude_properties_regex}
+      // '';                                                                  # setter
+    $self->{array_terms} = $config->{array_terms} // ['foo'];                 # setter (TBV)
+    $self->{array_regex} = $config->{array_regex} // '^(\w+):(\d+)';          # setter (TBV)
+    $self->{format}      = $config->{format};                                 #setter
+
+    # Validate $config->{id_correspondence} for "real" array_terms
+    if ( $self->{array_terms}[0] ne 'foo' ) {
+        unless ( exists $config->{id_correspondence}
+            && HashRef->check( $config->{id_correspondence} ) )
+        {
+            die
+"No <id_correspondence> provided or not a hash ref at $config_file\n";
+        }
+        $self->{id_correspondence} = $config->{id_correspondence};
+
+        # Validate format and check match in config->{id_correspondence}
+        if ( exists $config->{format} && Str->check( $config->{format} ) ) {
+            die
+"<$config->{format}> does not match any key from <id_correspondence>\n"
+              unless exists $config->{id_correspondence}{ $config->{format} };
+        }
+    }
+}
 
 has sort_by => (
     default => $config_sort_by,
     is      => 'ro',
     coerce  => sub { $_[0] // $config_sort_by },
+    lazy    => 1,
+    isa     => Enum [qw(hamming jaccard)]
+);
+
+has similarity_metric_cohort => (
+    default => $config_similarity_metric_cohort,
+    is      => 'ro',
+    coerce  => sub { $_[0] // $config_similarity_metric_cohort },
     lazy    => 1,
     isa     => Enum [qw(hamming jaccard)]
 );
@@ -133,7 +162,7 @@ has hpo_file => (
         $_[0] // catfile( $share_dir, 'db', 'hp.json' );
     },
     is  => 'ro',
-    isa => sub { die "$_[0] is not a valid file" unless -e $_[0] },
+    isa => sub { die "Error <$_[0]> is not a valid file" unless -e $_[0] },
 );
 
 has poi_out_dir => (
@@ -142,26 +171,26 @@ has poi_out_dir => (
         $_[0] // catdir('./');
     },
     is  => 'ro',
-    isa => sub { die "$_[0] dir does not exist" unless -d $_[0] },
+    isa => sub { die "<$_[0]> dir does not exist" unless -d $_[0] },
 );
 
 has [qw /include_terms exclude_terms/] => (
     is   => 'ro',
     lazy => 1,
-
-    #isa     =>  ArrayRef [Enum $config->{allowed_terms}], # It's created at compile time and we don't have $config->{allowed_terms}
-    isa => sub {
+    isa  => sub {
         my $value = shift;
-        die "<--include_terms> and <--exclude_terms> must be an array ref"
+
+        # Ensure the value is an array reference
+        die "<--include_terms> and <--exclude_terms> must be an array ref\n"
           unless ref $value eq 'ARRAY';
-        die
-qq/Invalid term in <--include_terms> or <--exclude_terms>. Allowed values are:\n/,
-          ( join ',', @config_allowed_terms ), "\n"
-          unless all {
-            my $term = $_;
-            grep { $_ eq $term } @config_allowed_terms
+
+        # Validate each term against allowed terms
+        foreach my $term (@$value) {
+            die
+"Invalid term '$term' in <--include_terms> or <--exclude_terms>. Allowed values are: "
+              . join( ', ', @config_allowed_terms ) . "\n"
+              unless grep { $_ eq $term } @config_allowed_terms;
         }
-        @$value;
     },
     default => sub { [] },
 );
@@ -195,24 +224,23 @@ sub BUILD {
     # Start Miscellanea checks
     # ************************
 
-    # APPEND_PREFIXES
-    # Check that we have the right numbers of array elements
+    # Check append_prefixes if provided
     if ( @{ $self->{append_prefixes} } ) {
 
-        # die if used without $self->{append_prefixes}
-        die "<--append_prefixes> needs at least 2 cohort files!\n"
+        # Ensure there are more than one reference files
+        die "<--append_prefixes> requires at least 2 cohort files!\n"
           unless @{ $self->{reference_files} } > 1;
 
-        # die if #cohorts and #append-prefixes don't match
-        die "Numbers of items in <--r> and <--append-prefixes> don't match!\n"
+        # Ensure numbers of cohorts and append-prefixes match
+        die "The number of items in <--r> and <--append-prefixes> must match!\n"
           unless @{ $self->{reference_files} } == @{ $self->{append_prefixes} };
     }
 
-    # PATIENTS-OF-INTEREST
+    # Check patients_of_interest if provided
     if ( @{ $self->{patients_of_interest} } ) {
 
-        # die if used without $self->{append_prefixes}
-        die "<--patients-of-interest> needs to be used with <--r>\n"
+        # Ensure reference files are provided when using patients_of_interest
+        die "<--patients-of-interest> must be used with <--r>\n"
           unless @{ $self->{reference_files} };
     }
 
@@ -240,8 +268,6 @@ sub run {
     my $out_file               = $self->{out_file};
     my $cohort_files           = $self->{cohort_files};
     my $append_prefixes        = $self->{append_prefixes};
-    my $max_out                = $self->{max_out};
-    my $sort_by                = $self->{sort_by};
     my $primary_key            = $self->{primary_key};
     my $poi                    = $self->{patients_of_interest};
     my $poi_out_dir            = $self->{poi_out_dir};
@@ -282,7 +308,7 @@ sub run {
     # $ref_data is an array array where each element is the content of the file (e.g, [] or {})
     my $ref_data = [];
     for my $cohort_file ( @{$reference_files} ) {
-        die "$cohort_file does not exist\n" unless -f $cohort_file;
+        die "<$cohort_file> does not exist\n" unless -f $cohort_file;
 
         # Load JSON file as Perl data structure
         my $json_data = io_yaml_or_json(
@@ -295,7 +321,7 @@ sub run {
         # Check for existence of primary_key otherwise die
         my $msg =
 "Sorry, <$cohort_file> does not contain primary_key <$primary_key>. Are you using the right config file?\n";
-        if ( ref $json_data eq ref [] ) {    # array
+        if ( ref $json_data eq ref [] ) {    # array - 1st element only
             die $msg unless exists $json_data->[0]->{$primary_key};
         }
         else {                               # hash
@@ -339,6 +365,13 @@ sub run {
 
     # We will process $ref_data to get stats on coverage
     my $coverage_stats = coverage_stats($ref_data);
+
+    # Now check existance of include_terms within the data
+    #print Dumper $self->{include_terms} and die;
+    die
+"--include-terms <@{$self->{include_terms}}> does not exist in the cohort(s)\n"
+      unless check_existence_of_include_terms( $coverage_stats,
+        $self->{include_terms} );
 
     # We have to check if we have BFF|PXF or others unless defined at config
     add_attribute( $self, 'format', check_format($ref_data) )
@@ -447,6 +480,7 @@ sub run {
               if defined $align;
         }
     }
+
 
     # Dump to JSON if <--export>
     # NB: Must work for -r and -t

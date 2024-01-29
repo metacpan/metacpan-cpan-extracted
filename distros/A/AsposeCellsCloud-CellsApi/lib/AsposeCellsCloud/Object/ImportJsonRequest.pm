@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'json_file_source' => {
      	datatype => 'FileSource',
      	base_name => 'JsonFileSource',
-     	description => 'XML file source',
+     	description => 'Json file source',
      	format => '',
      	read_only => '',
      		},

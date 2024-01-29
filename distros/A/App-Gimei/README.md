@@ -69,7 +69,7 @@ You can also look for information at:
 
 # LICENSE
 
-MIT
+MIT License
 
 # AUTHOR
 

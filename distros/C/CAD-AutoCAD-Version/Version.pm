@@ -10,10 +10,10 @@ use Readonly;
 # Based on https://autodesk.blogs.com/between_the_lines/autocad-release-history.html
 Readonly::Hash my %ACADVER => (
 	# ACADVER => Version of AutoCAD
-	'MC0.0' => 'Version 1.0',
+	'MC0.0' => 'Version 1.1',
 	'AC1.2' => 'Version 1.2',
 	'AC1.3' => 'Version 1.3',
-	'AC1.40' => 'Version 1.40',
+	'AC1.40' => 'Version 1.4',
 	'AC1.50' => 'Version 2.05',
 	'AC2.10' => 'Version 2.10',
 	'AC2.21' => 'Version 2.21',
@@ -27,30 +27,16 @@ Readonly::Hash my %ACADVER => (
 	'AC1012' => 'Release 13',
 	'AC1013' => 'Release 13c3',
 	'AC1014' => 'Release 14',
+	'AC1500' => 'AutoCAD 2000 beta',
 	'AC1015' => 'AutoCAD 2000',
-	'AC1016' => 'AutoCAD 2000i',
-	'AC1017' => 'AutoCAD 2002',
 	'AC1018' => 'AutoCAD 2004',
-	'AC1019' => 'AutoCAD 2005',
-	'AC1020' => 'AutoCAD 2006',
 	'AC1021' => 'AutoCAD 2007',
-	'AC1022' => 'AutoCAD 2008',
-	'AC1023' => 'AutoCAD 2009',
 	'AC1024' => 'AutoCAD 2010',
-	'AC1025' => 'AutoCAD 2011',
-	'AC1026' => 'AutoCAD 2012',
 	'AC1027' => 'AutoCAD 2013',
-	'AC1028' => 'AutoCAD 2014',
-	'AC1029' => 'AutoCAD 2015',
-	'AC1030' => 'AutoCAD 2016',
-	'AC1031' => 'AutoCAD 2017',
 	'AC1032' => 'AutoCAD 2018',
-	'AC1033' => 'AutoCAD 2019',
-	'AC1034' => 'AutoCAD 2020',
-	'AC1035' => 'AutoCAD 2021',
 );
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -149,6 +135,8 @@ Returns array of identifiers.
 
 =head1 EXAMPLE1
 
+=for comment filename=list_of_acad_identifiers.pl
+
  use strict;
  use warnings;
 
@@ -180,33 +168,21 @@ Returns array of identifiers.
  #     [11] "AC1013",
  #     [12] "AC1014",
  #     [13] "AC1015",
- #     [14] "AC1016",
- #     [15] "AC1017",
- #     [16] "AC1018",
- #     [17] "AC1019",
- #     [18] "AC1020",
- #     [19] "AC1021",
- #     [20] "AC1022",
- #     [21] "AC1023",
- #     [22] "AC1024",
- #     [23] "AC1025",
- #     [24] "AC1026",
- #     [25] "AC1027",
- #     [26] "AC1028",
- #     [27] "AC1029",
- #     [28] "AC1030",
- #     [29] "AC1031",
- #     [30] "AC1032",
- #     [31] "AC1033",
- #     [32] "AC1034",
- #     [33] "AC1035",
- #     [34] "AC2.10",
- #     [35] "AC2.21",
- #     [36] "AC2.22",
- #     [37] "MC0.0"
+ #     [14] "AC1018",
+ #     [15] "AC1021",
+ #     [16] "AC1024",
+ #     [17] "AC1027",
+ #     [18] "AC1032",
+ #     [19] "AC1500",
+ #     [20] "AC2.10",
+ #     [21] "AC2.21",
+ #     [22] "AC2.22",
+ #     [23] "MC0.0"
  # ]
 
 =head1 EXAMPLE2
+
+=for comment filename=list_of_acad_identifiers_real.pl
 
  use strict;
  use warnings;
@@ -225,7 +201,7 @@ Returns array of identifiers.
 
  # Output:
  # [
- #     [0]  "MC0.0"
+ #     [0]  "MC0.0",
  #     [1]  "AC1.2",
  #     [2]  "AC1.3",
  #     [3]  "AC1.40",
@@ -243,26 +219,12 @@ Returns array of identifiers.
  #     [15] "AC1013",
  #     [16] "AC1014",
  #     [17] "AC1015",
- #     [18] "AC1016",
- #     [19] "AC1017",
- #     [20] "AC1018",
- #     [21] "AC1019",
- #     [22] "AC1020",
- #     [23] "AC1021",
- #     [24] "AC1022",
- #     [25] "AC1023",
- #     [26] "AC1024",
- #     [27] "AC1025",
- #     [28] "AC1026",
- #     [29] "AC1027",
- #     [30] "AC1028",
- #     [31] "AC1029",
- #     [32] "AC1030",
- #     [33] "AC1031",
- #     [34] "AC1032",
- #     [35] "AC1033",
- #     [36] "AC1034",
- #     [37] "AC1035",
+ #     [18] "AC1018",
+ #     [19] "AC1021",
+ #     [20] "AC1024",
+ #     [21] "AC1027",
+ #     [22] "AC1032",
+ #     [23] "AC1500"
  # ]
 
 =head1 DEPENDENCIES
@@ -296,12 +258,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2021 Michal Josef Špaček
+© 2020-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

@@ -1,15 +1,22 @@
 #!perl
-use 5.006;
-use strict;
+use 5.24.0;
 use warnings;
-use Test::More;
+use Test2::V0;
 
-plan tests => 1;
+my @modules = <<'EOM' =~ m/([A-Z][A-Za-z0-9:]+)/g;
+Game::PlatformsOfPeril
+EOM
 
-BEGIN {
-    use_ok('Game::PlatformsOfPeril') || print "Bail out!\n";
+my $loaded = 0;
+for my $m (@modules) {
+    local $@;
+    eval "require $m";
+    if ($@) { bail_out("require failed '$m': $@") }
+    $loaded++;
 }
 
 diag(
     "Testing Game::PlatformsOfPeril $Game::PlatformsOfPeril::VERSION, Perl $], $^X"
 );
+is( $loaded, scalar @modules );
+done_testing;

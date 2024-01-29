@@ -4,11 +4,12 @@
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
 use v5.36;
-use Object::Pad 0.800;
+use Object::Pad 0.807;
 
-class App::perl::distrolint::Check::Unimport 0.03
-   :does(App::perl::distrolint::CheckRole::EachFile)
-   :does(App::perl::distrolint::CheckRole::TreeSitterPerl);
+class App::perl::distrolint::Check::Unimport 0.06;
+
+apply App::perl::distrolint::CheckRole::EachFile;
+apply App::perl::distrolint::CheckRole::TreeSitterPerl;
 
 use Text::Treesitter 0.07; # child_by_field_name
 
@@ -28,14 +29,14 @@ normally provides at import time can be undone by the C<no ...> syntax.
 
 method run ( $app )
 {
-   return $self->run_for_each_perl_file( check_file => $app );
+   return $self->run_for_each_perl_file( check_file => );
 }
 
 my $QUERY = <<'EOF';
 (subroutine_declaration_statement name: _ @name)
 EOF
 
-method check_file ( $file, $app )
+method check_file ( $file )
 {
    my $tree = $self->parse_perl_file( $file );
 
@@ -53,7 +54,7 @@ method check_file ( $file, $app )
 
    return 1 if $have_unimport or !$have_import;
 
-   $app->diag( "%s has sub import but no sub unimport", $file );
+   App->diag( App->format_file( $file ), " has sub import but no sub unimport" );
    return 0;
 }
 

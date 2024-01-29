@@ -5,26 +5,35 @@ use strict;
 use warnings;
 use File::Slurp;
 use YAML::XS qw(Dump);
+use base 'Ixchel::Actions::base';
 
 =head1 NAME
 
-Ixchel::Actions::suricata_include :: Generates the instance specific include for a suricata instance.
+Ixchel::Actions::suricata_include - Generates the instance specific include for a suricata instance.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.2.0';
 
-=head1 SYNOPSIS
+=head1 CLI SYNOPSIS
+
+ixchel -a suricata_include [B<-i> <instance>] [B<-d> <base_dir>]
+
+ixchel -a suricata_include [B<-w>] [B<--np>] [B<-i> <instance>] [B<-d> <base_dir>]
+
+=head1 CODE SYNOPSIS
 
     use Data::Dumper;
 
     my $results=$ixchel->action(action=>'suricata_include', opts=>{np=>1, w=>1, });
 
     print Dumper($results);
+
+=head1 DESCRIPTION
 
 This generates a the general purpose include for Suricata.
 
@@ -33,7 +42,6 @@ then if multiple instances are enabled, then .suricata.instances.$instance is me
 into it. Arrays are replaced with the new array while the rest are just merged using
 L<Hash::Merge> with the spec below.
 
-```
     {
         'SCALAR' => {
             'SCALAR' => sub { $_[1] },
@@ -51,16 +59,11 @@ L<Hash::Merge> with the spec below.
             'HASH'   => sub { Hash::Merge::_merge_hashes( $_[0], $_[1] ) },
         },
     }
-```
 
 If told to write it out, it will be written out to undef .suricata.config_base with  the name "include.yaml"
 or "include-$instance.yaml" if multiple instances are in use.
 
 =head1 FLAGS
-
-=head2 --np
-
-Do not print the status of it.
 
 =head2 -w
 
@@ -70,6 +73,10 @@ Write the generated services to service files.
 
 A instance to operate on.
 
+=head2 -d <base_dir>
+
+Use this as the base dir instead of .suricata.config_base from the config.
+
 =head1 RESULT HASH REF
 
     .errors :: A array of errors encountered.
@@ -78,60 +85,24 @@ A instance to operate on.
 
 =cut
 
-sub new {
-	my ( $empty, %opts ) = @_;
+sub new_extra { }
 
-	my $self = {
-		config => {},
-		vars   => {},
-		arggv  => [],
-		opts   => {},
-	};
-	bless $self;
-
-	if ( defined( $opts{config} ) ) {
-		$self->{config} = $opts{config};
-	}
-
-	if ( defined( $opts{t} ) ) {
-		$self->{t} = $opts{t};
-	} else {
-		die('$opts{t} is undef');
-	}
-
-	if ( defined( $opts{share_dir} ) ) {
-		$self->{share_dir} = $opts{share_dir};
-	}
-
-	if ( defined( $opts{opts} ) ) {
-		$self->{opts} = \%{ $opts{opts} };
-	}
-
-	if ( defined( $opts{argv} ) ) {
-		$self->{argv} = $opts{argv};
-	}
-
-	if ( defined( $opts{vars} ) ) {
-		$self->{vars} = $opts{vars};
-	}
-
-	if ( defined( $opts{ixchel} ) ) {
-		$self->{ixchel} = $opts{ixchel};
-	}
-
-	return $self;
-} ## end sub new
-
-sub action {
+sub action_extra {
 	my $self = $_[0];
 
-	my $results = {
-		errors      => [],
-		status_text => '',
-		ok          => 0,
-	};
-
-	my $config_base = $self->{config}{suricata}{config_base};
+	my $config_base;
+	if ( !defined( $self->{opts}{d} ) ) {
+		$config_base = $self->{config}{suricata}{config_base};
+	} else {
+		if ( !-d $self->{opts}{d} ) {
+			$self->status_add(
+				status => '-d, "' . $self->{opts}{d} . '" is not a directory',
+				error  => 1,
+			);
+			return undef;
+		}
+		$config_base = $self->{opts}{d};
+	} ## end else [ if ( !defined( $self->{opts}{d} ) ) ]
 
 	if ( $self->{config}{suricata}{multi_instance} ) {
 		my @instances;
@@ -147,7 +118,11 @@ sub action {
 				my $base_config = $self->{config}{suricata}{config};
 
 				if ( !defined( $self->{config}{suricata}{instances}{$instance} ) ) {
-					die( $instance . ' does not exist under .suricata.instances' );
+					$self->status_add(
+						status => $instance . ' does not exist under .suricata.instances',
+						error  => 1,
+					);
+					return undef;
 				}
 
 				my $config = $self->{config}{suricata}{instances}{$instance};
@@ -181,30 +156,29 @@ sub action {
 				$filled_in = '%YAML 1.1' . "\n" . Dump($merged);
 
 				if ( $self->{opts}{w} ) {
-					write_file( $config_base . '/include-' . $instance . '.yaml', $filled_in );
+					write_file( $config_base . '/' . $instance . '-include.yaml', $filled_in );
 				}
 			};
 			if ($@) {
-				$results->{status_text}
-					= $results->{status_text}
-					. '-----[ Errored: '
-					. $instance
-					. ' ]-------------------------------------' . "\n" . '# '
-					. $@ . "\n";
+				$self->status_add(
+					status => '-----[ Errored: '
+						. $instance
+						. ' ]-------------------------------------' . "\n" . '# '
+						. $@,
+					error => 1,
+				);
 				$self->{ixchel}{errors_count}++;
 			} else {
-				$results->{status_text}
-					= $results->{status_text}
-					. '-----[ '
-					. $instance
-					. ' ]-------------------------------------' . "\n"
-					. $filled_in . "\n";
+				$self->status_add( status => '-----[ '
+						. $instance
+						. ' ]-------------------------------------' . "\n"
+						. $filled_in
+						. "\n" );
 			}
-
 		} ## end foreach my $instance (@instances)
 	} else {
 		if ( defined( $self->{opts}{i} ) ) {
-			die('-i may not be used in single instance mode, .suricata.multi_instance=1, ,');
+			$self->status_add( status => '-i may not be used in single instance mode, .suricata.multi_instance=-' );
 		}
 
 		my $filled_in;
@@ -217,35 +191,14 @@ sub action {
 			}
 		};
 		if ($@) {
-			$results->{status_text} = '# ' . $@;
-			$self->{ixchel}{errors_count}++;
+			$self->status_add( status => '# ' . $@, error => 1, );
 		} else {
-			$results->{status_text} = $filled_in;
+			$self->status_add( status => $filled_in );
 		}
 	} ## end else [ if ( $self->{config}{suricata}{multi_instance...})]
 
-	if ( !$self->{opts}{np} ) {
-		print $results->{status_text};
-	}
-
-	if ( !defined( $results->{errors}[0] ) ) {
-		$results->{ok} = 1;
-	}
-
-	return $results;
-} ## end sub action
-
-sub help {
-	return 'Generates the instance specific include for a suricata instance.
-
---np          Do not print the status of it.
-
--w            Write the generated includes out.
-
--i <instance> A instance to operate on.
-
-';
-} ## end sub help
+	return undef;
+} ## end sub action_extra
 
 sub short {
 	return 'Generates the instance specific include for a suricata instance.';
@@ -253,8 +206,8 @@ sub short {
 
 sub opts_data {
 	return 'i=s
-np
 w
+d=s
 ';
 }
 

@@ -53,6 +53,6 @@
          "url" : "https://github.com/garu/Data-Printer"
       }
    },
-   "version" : "1.001001",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "1.002001",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

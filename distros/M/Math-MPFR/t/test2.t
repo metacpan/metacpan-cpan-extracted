@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use Config;
 use Math::MPFR qw(:mpfr);
 
 print "1..8\n";
@@ -7,6 +8,10 @@ print "1..8\n";
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
 print  "# Using gmp library version ", Math::MPFR::gmp_v(), "\n";
+
+my $expected_refcnt = 1;
+$expected_refcnt++
+  if $Config{ccflags} =~ /\-DPERL_RC_STACK/;
 
 my ($have_mpz, $have_gmp) = (0, 0);
 my $c = Rmpfr_init();
@@ -25,7 +30,7 @@ if($have_gmp || $have_mpz) {
   if($have_gmp) {$z = Math::GMP->new("1123")}
   else {$z = Math::GMPz->new("1123")}
   Rmpfr_set_z($c, $z, GMP_RNDN);
-  if($c == 1123 && Math::MPFR::get_refcnt($z) == 1
+  if($c == 1123 && Math::MPFR::get_refcnt($z) == $expected_refcnt
      && (Math::MPFR::get_package_name($z) eq "Math::GMP"
          || Math::MPFR::get_package_name($z) eq "Math::GMPz")) {print "ok 1\n"}
   else {print "not ok 1\n"}
@@ -73,7 +78,7 @@ if($have_gmp || $have_mpz) {
   if($have_gmp) {$z = Math::GMP->new("1123")}
   else {$z = Math::GMPz->new("1123")}
   my ($c, $cmp) = Rmpfr_init_set_z($z, GMP_RNDN);
-  if($c == 1123 && Math::MPFR::get_refcnt($z) == 1
+  if($c == 1123 && Math::MPFR::get_refcnt($z) == $expected_refcnt
      && (Math::MPFR::get_package_name($z) eq "Math::GMP"
          || Math::MPFR::get_package_name($z) eq "Math::GMPz")) {print "ok 4\n"}
   else {print "not ok 4\n"}

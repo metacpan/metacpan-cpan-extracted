@@ -5,9 +5,9 @@ use strict 'subs', 'vars';
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-16'; # DATE
+our $DATE = '2024-01-17'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 our %SPEC;
 
@@ -50,8 +50,19 @@ sub get_filter_rules {
 
     my @rules;
     for my $entry (@{ $args{filter_names} }) {
-        my $filter_name = ref $entry eq 'ARRAY' ? $entry->[0] : $entry;
-        my $filter_gen_args = ref $entry eq 'ARRAY' ? $entry->[1] : undef;
+        my ($filter_name, $filter_gen_args);
+        if (ref $entry eq 'ARRAY') {
+            $filter_name = $entry->[0];
+            $filter_gen_args = $entry->[1];
+        } else {
+            if ($entry =~ /(.*?)=(.*)/) {
+                $filter_name = $1;
+                $filter_gen_args = {split /,/, $2};
+            } else {
+                $filter_name = $entry;
+                $filter_gen_args = undef;
+            }
+        }
 
         my $mod = $prefix . $filter_name;
         (my $mod_pm = "$mod.pm") =~ s!::!/!g;
@@ -90,7 +101,7 @@ Data::Sah::FilterCommon - Common stuffs for Data::Sah::Filter and Data::Sah::Fil
 
 =head1 VERSION
 
-This document describes version 0.022 of Data::Sah::FilterCommon (from Perl distribution Data-Sah-Filter), released on 2023-08-16.
+This document describes version 0.024 of Data::Sah::FilterCommon (from Perl distribution Data-Sah-Filter), released on 2024-01-17.
 
 =head1 FUNCTIONS
 
@@ -167,7 +178,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

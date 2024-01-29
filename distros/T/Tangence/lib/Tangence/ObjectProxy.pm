@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.66;
+use warnings;
+use Object::Pad 0.800;
 
-package Tangence::ObjectProxy 0.30;
+package Tangence::ObjectProxy 0.32;
 class Tangence::ObjectProxy;
 
 use Carp;
@@ -75,7 +76,7 @@ method STRING
 
 =head2 id
 
-   $id = $proxy->id
+   $id = $proxy->id;
 
 Returns the object ID for the C<Tangence> object being proxied for.
 
@@ -85,7 +86,7 @@ Returns the object ID for the C<Tangence> object being proxied for.
 
 =head2 classname
 
-   $classname = $proxy->classname
+   $classname = $proxy->classname;
 
 Returns the name of the class of the C<Tangence> object being proxied for.
 
@@ -98,7 +99,7 @@ method classname
 
 =head2 class
 
-   $class = $proxyobj->class
+   $class = $proxyobj->class;
 
 Returns the L<Tangence::Meta::Class> object representing the class of this
 object.
@@ -109,7 +110,7 @@ object.
 
 =head2 can_method
 
-   $method = $proxy->can_method( $name )
+   $method = $proxy->can_method( $name );
 
 Returns the L<Tangence::Meta::Method> object representing the named method, or
 C<undef> if no such method exists.
@@ -123,7 +124,7 @@ method can_method
 
 =head2 can_event
 
-   $event = $proxy->can_event( $name )
+   $event = $proxy->can_event( $name );
 
 Returns the L<Tangence::Meta::Event> object representing the named event, or
 C<undef> if no such event exists.
@@ -137,7 +138,7 @@ method can_event
 
 =head2 can_property
 
-   $property = $proxy->can_property( $name )
+   $property = $proxy->can_property( $name );
 
 Returns the L<Tangence::Meta::Property> object representing the named
 property, or C<undef> if no such property exists.
@@ -179,7 +180,7 @@ method grab ( $smashdata )
 
 =head2 call_method
 
-   $result = await $proxy->call_method( $mname, @args )
+   $result = await $proxy->call_method( $mname, @args );
 
 Calls the given method on the server object, passing in the given arguments.
 Returns a L<Future> that will yield the method's result.
@@ -218,7 +219,7 @@ async method call_method ( $method, @args )
 
 =head2 subscribe_event
 
-   await $proxy->subscribe_event( $event, %callbacks )
+   await $proxy->subscribe_event( $event, %callbacks );
 
 Subscribes to the given event on the server object, installing a callback
 function which will be invoked whenever the event is fired.
@@ -231,7 +232,7 @@ Takes the following named callbacks:
 
 Callback function to invoke whenever the event is fired
 
-   $on_fire->( @args )
+   $on_fire->( @args );
 
 The returned C<Future> it is guaranteed to be completed before any invocation
 of the C<on_fire> event handler.
@@ -292,7 +293,7 @@ method handle_request_EVENT ( $message )
 
 =head2 unsubscribe_event
 
-   $proxy->unsubscribe_event( $event )
+   $proxy->unsubscribe_event( $event );
 
 Removes an event subscription on the given event on the server object that was
 previously installed using C<subscribe_event>.
@@ -317,7 +318,7 @@ method unsubscribe_event ( $event )
 
 =head2 get_property
 
-   await $value = $proxy->get_property( $prop )
+   await $value = $proxy->get_property( $prop );
 
 Requests the current value of the property from the server object.
 
@@ -350,7 +351,7 @@ async method get_property ( $property )
 
 =head2 get_property_element
 
-   await $value = $proxy->get_property_element( $property, $index_or_key )
+   await $value = $proxy->get_property_element( $property, $index_or_key );
 
 Requests the current value of an element of the property from the server
 object.
@@ -398,7 +399,7 @@ async method get_property_element ( $property, $index_or_key )
 
 =head2 prop
 
-   $value = $proxy->prop( $property )
+   $value = $proxy->prop( $property );
 
 Returns the locally-cached value of a smashed property. If the named property
 is not a smashed property, an exception is thrown.
@@ -416,7 +417,7 @@ method prop ( $property )
 
 =head2 set_property
 
-   await $proxy->set_property( $prop, $value )
+   await $proxy->set_property( $prop, $value );
 
 Sets the value of the property in the server object.
 
@@ -452,11 +453,11 @@ async method set_property ( $property, $value )
 
 =head2 watch_property
 
-   await $proxy->watch_property( $property, %callbacks )
+   await $proxy->watch_property( $property, %callbacks );
 
 =head2 watch_property_with_initial
 
-   await $proxy->watch_property_with_initial( $property, %callbacks )
+   await $proxy->watch_property_with_initial( $property, %callbacks );
 
 Watches the given property on the server object, installing callback functions
 which will be invoked whenever the property value changes. The latter form
@@ -472,7 +473,7 @@ Takes the following named arguments:
 
 Optional. Callback function to invoke whenever the property value changes.
 
-   $on_updated->( $new_value )
+   $on_updated->( $new_value );
 
 If not provided, then individual handlers for individual change types must be
 provided.
@@ -578,7 +579,7 @@ async method _watch_property ( $property, $want_initial, %args )
 =head2 watch_property_with_cursor
 
    ( $cursor, $first_idx, $last_idx ) =
-      await $proxy->watch_property_with_cursor( $property, $from, %callbacks )
+      await $proxy->watch_property_with_cursor( $property, $from, %callbacks );
 
 A variant of C<watch_property> that installs a watch on the given property of
 the server object, and additionally returns an cursor object that can be used
@@ -810,7 +811,7 @@ method _update_property_objset ( $p, $type, $how, $message )
 
 =head2 unwatch_property
 
-   $proxy->unwatch_property( $property )
+   $proxy->unwatch_property( $property );
 
 Removes a property watches on the given property on the server object that was
 previously installed using C<watch_property>.
@@ -872,11 +873,11 @@ by the C<watch_property_with_cursor> method.
 
 =head2 next_forward
 
-   ( $index, @more ) = await $cursor->next_forward( $count )
+   ( $index, @more ) = await $cursor->next_forward( $count );
 
 =head2 next_backward
 
-   ( $index, @more ) = await $cursor->next_backward( $count )
+   ( $index, @more ) = await $cursor->next_backward( $count );
 
 Requests the next items from the cursor. C<next_forward> moves forwards
 towards higher-numbered indices, and C<next_backward> moves backwards towards

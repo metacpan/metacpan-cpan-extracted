@@ -1,14 +1,14 @@
 package #
 Date::Manip::TZ::amnuuk00;
-# Copyright (c) 2008-2023 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2024 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Jun  7 12:24:40 EDT 2023
-#    Data version: tzdata2023c
-#    Code version: tzcode2023c
+#    Generated on: Tue Jan  9 14:20:57 EST 2024
+#    Data version: tzdata2023d
+#    Code version: tzcode2023d
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.93';
+$VERSION='6.94';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -431,11 +431,8 @@ END { undef $VERSION; }
    2023 =>
      [
         [ [2023,3,26,1,0,0],[2023,3,25,23,0,0],'-02:00:00',[-2,0,0],
-          '-02',1,[2023,10,29,0,59,59],[2023,10,28,22,59,59],
-          '2023032601:00:00','2023032523:00:00','2023102900:59:59','2023102822:59:59' ],
-        [ [2023,10,29,1,0,0],[2023,10,28,23,0,0],'-02:00:00',[-2,0,0],
           '-02',0,[2024,3,31,0,59,59],[2024,3,30,22,59,59],
-          '2023102901:00:00','2023102823:00:00','2024033100:59:59','2024033022:59:59' ],
+          '2023032601:00:00','2023032523:00:00','2024033100:59:59','2024033022:59:59' ],
      ],
    2024 =>
      [
@@ -1066,6 +1063,15 @@ END { undef $VERSION; }
         [ [2093,10,25,1,0,0],[2093,10,24,23,0,0],'-02:00:00',[-2,0,0],
           '-02',0,[2094,3,28,0,59,59],[2094,3,27,22,59,59],
           '2093102501:00:00','2093102423:00:00','2094032800:59:59','2094032722:59:59' ],
+     ],
+   2094 =>
+     [
+        [ [2094,3,28,1,0,0],[2094,3,28,0,0,0],'-01:00:00',[-1,0,0],
+          '-01',1,[2094,10,31,0,59,59],[2094,10,30,23,59,59],
+          '2094032801:00:00','2094032800:00:00','2094103100:59:59','2094103023:59:59' ],
+        [ [2094,10,31,1,0,0],[2094,10,30,23,0,0],'-02:00:00',[-2,0,0],
+          '-02',0,[2095,3,27,0,59,59],[2095,3,26,22,59,59],
+          '2094103101:00:00','2094103023:00:00','2095032700:59:59','2095032622:59:59' ],
      ],
 );
 

@@ -162,7 +162,7 @@ $out.='
 		$id=$path.join "", caller;
 		my $template=$self->cache($id, $path,$var, @opts);
 		if($template){
-			return $template->render;
+			return $template->render($var);
 		}
 		"";
 	}
@@ -220,7 +220,7 @@ sub _prepare_template{
       end_offset=>5,
       limit=>1
     );
-    # Replace the sudo filename with the file name if we have one 
+    # Replace the pseudo filename with the file name if we have one 
     my $filename=$meta{file};
     $context=~s/(\(eval \d+\))/$filename/g;
     # Rethrow the exception, translated context line numbers
@@ -316,12 +316,35 @@ sub new{
 			$options{file}="$path";
 			join "", @$path;
 		}
+    elsif(ref($path) eq "SCALAR"){
+      # Make relative to callers path
+      my $cpath=$options{caller}->meta->{file};
+      use File::Basename "dirname";
+      my $rpath=dirname $cpath;
+      $rpath.="/".$$path;
+      $options{file}=$rpath;
+
+			my $fh;
+			if(open $fh, "<", $rpath){
+				<$fh> 
+			}
+			else {
+				die "Could not open file: $rpath $!";
+				"";
+			}
+    }
 		else{
 			#Assume a path
-			#Prepend the root if present
+			#Prepend the root if present and if not absolute
+      
+
+      # only prepend root if relative path
+      unless($path=~m|^/|){
+        # Assume working dir if no root
+        $path=join "/", $root, $path if $root;
+      }
 			$options{file}=$path;
-      #$path=catfile $root, $path if $root;
-      $path=join "/", $root, $path if $root;
+
 			my $fh;
 			if(open $fh, "<", $path){
 				<$fh> 

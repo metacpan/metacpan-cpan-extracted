@@ -5,7 +5,7 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
+our $VERSION = '3.026'; # VERSION
 our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use Compress::Zlib;
@@ -26,9 +26,11 @@ Inherits from L<PDF::Builder::Resource::XObject::Image>
 
 =head1 METHODS
 
-=over
+=head2 new
 
-=item $res = PDF::Builder::Resource::XObject::Image::PNG_IPL->new($pdf, $file, %opts)
+    $res = PDF::Builder::Resource::XObject::Image::PNG_IPL->new($pdf, $file, %opts)
+
+=over
 
 Returns a PNG-image object. C<$pdf> is the PDF object being added to, C<$file>
 is the input PNG file, and the optional C<$name> of the new parent image object
@@ -57,6 +59,8 @@ channels to 8bps, permitting use on PDF 1.4 output.
 This is the name you can give for the PNG image object. The default is Pxnnnn.
 
 =back
+
+Remember that you need to use Builder.pm's image_png to process PNG images.
 
 =back 
 
@@ -578,9 +582,11 @@ sub new {
     return($self);
 }
 
-=over
+=head2 usesLib
 
-=item  $mode = $png->usesLib()
+    $mode = $png->usesLib()
+
+=over
 
 Returns 1 if Image::PNG::Libpng installed and used, 0 if not installed, or -1 
 if installed but not used (nouseIPL option given to C<image_png>).

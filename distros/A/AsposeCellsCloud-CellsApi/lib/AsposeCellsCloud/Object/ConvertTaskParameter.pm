@@ -141,6 +141,13 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
+     'region' => {
+     	datatype => 'string',
+     	base_name => 'Region',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'save_options' => {
      	datatype => 'SaveOptions',
      	base_name => 'SaveOptions',
@@ -153,12 +160,14 @@ __PACKAGE__->method_documentation({
 __PACKAGE__->swagger_types( {
     'workbook' => 'FileSource',
     'destination_file' => 'string',
+    'region' => 'string',
     'save_options' => 'SaveOptions' 
 } );
 
 __PACKAGE__->attribute_map( {
     'workbook' => 'Workbook',
     'destination_file' => 'DestinationFile',
+    'region' => 'Region',
     'save_options' => 'SaveOptions' 
 } );
 

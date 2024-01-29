@@ -1,3 +1,13 @@
+0.023   2023-03-28  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Forgot to declare label.
+
+
+0.022   2023-02-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Workaround duplicate results returned by MetaCPAN API.
+
+
 0.021   2023-02-08  Released-By: PERLANCAR; Urgency: medium
 
         - Sort releases by name.

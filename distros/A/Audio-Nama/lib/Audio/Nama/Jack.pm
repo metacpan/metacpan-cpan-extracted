@@ -1,6 +1,6 @@
 # ------- Jack port connect routines -------
 package Audio::Nama;
-use Modern::Perl;
+use Modern::Perl '2020';
 use File::Slurp;
 no warnings 'uninitialized';
 
@@ -8,7 +8,7 @@ no warnings 'uninitialized';
 
 sub update_jack_client_list {
 	state $warn_count;
-	#logsub("&update_jack_client_list");
+	#logsub((caller(0))[3]);
 	# cache current JACK status
 	
 	# skip if Ecasound is busy
@@ -62,7 +62,7 @@ sub jack_client_array {
 }
 
 sub jacks_get_port_latency {
-	logsub('&jacks_get_port_latency');
+	logsub((caller(0))[3]);
 	delete $jack->{clients};
 
 my $jc;
@@ -209,7 +209,7 @@ sub parse_ports_list {
 
 	# default to output of jack_lsp -p
 	
-	logsub("&parse_ports_list");
+	logsub((caller(0))[3]);
 	my $j = shift || qx(jack_lsp -tp 2> /dev/null); 
 	logpkg(__FILE__,__LINE__,'debug', "input: $j");
 

@@ -1,5 +1,45 @@
 Revision history for JSON-Schema-Modern
 
+0.582     2024-01-23 03:18:31Z
+          - change the status of some format tests that rely on optional
+            modules so they are not reported as specification failures
+          - fix forking test that failed on MSWin32
+
+0.581     2024-01-18 05:35:16Z
+          - make automated tests much quieter when some optional modules (e.g.
+            used for format tests) are not installed
+
+0.580     2024-01-18 04:38:33Z
+          - update a format test to be more amenable to 32-bit architectures
+
+0.579     2024-01-15 03:32:27Z
+          - improve performance by checking for duplicates by comparing the
+            checksum of a schema rather than the content itself
+          - fix error occurring when using the FormatAssertion vocabulary in
+            an evaluator object that was loaded from a serialized object
+          - fixed custom format definitions to not allow 'integer' types, as
+            per the specification
+          - support custom format definitions that operate on more than one
+            core data type
+          - fixed handling of unrecognized formats in draft2020-12 and later
+            (but only when the FormatAssertion vocabulary is explicitly
+            requested, not with validate_formats=1)
+          - the format keyword now respects the "stringy_numbers" option
+
+0.578     2023-12-29 23:13:44Z
+          - remove use of JSON::MaybeXS, to avoid potential use of JSON::XS;
+            now we use Cpanel::JSON::XS or JSON::PP directly, using the same
+            environment variables as in Mojo::JSON for customization.
+          - new helper interface, get_document()
+
+0.577     2023-12-19 05:27:04Z
+          - new attribute on Error and Result objects: "recommended_response",
+            for use when validating HTTP requests
+
+0.576     2023-12-10 06:10:57Z
+          - the "stringy_numbers" feature now also applies to the "enum",
+            "const", and "uniqueItems" keywords
+
 0.575     2023-11-26 05:11:10Z
           - properly handle some edge cases where the "$schema" keyword can
             change the dialect to a different specification version with

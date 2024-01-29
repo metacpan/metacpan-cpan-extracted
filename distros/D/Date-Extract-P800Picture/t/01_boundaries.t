@@ -1,9 +1,13 @@
+# -*- cperl; cperl-indent-level: 4 -*-
+## no critic (RequireExplicitPackage RequireEndWithOne)
+use 5.014;
 use strict;
 use warnings;
 use utf8;
 
 use Test::More;
 
+our $VERSION = v1.1.7;
 my %boundaries = (
     '00000000.JPG',
     [ '2000-01-01T00:00:00', 'lower boundary works' ],
@@ -37,10 +41,15 @@ my %boundaries = (
     [ '2004-01-01T00:00:00', 'rollover to januari 1st 2004 works' ],
 );
 
-plan tests => 0 + keys %boundaries;
+Test::More::plan 'tests' => 0 + keys %boundaries;
 
 use Date::Extract::P800Picture;
 my $parser = Date::Extract::P800Picture->new();
 while ( my ( $filename, $expect ) = each %boundaries ) {
-    is( "@{[$parser->extract($filename)]}", $expect->[0], $expect->[1] );
+    Test::More::is(
+        "@{[$parser->extract($filename)]}",
+## no critic (ProhibitAccessOfPrivateData)
+        $expect->[0], $expect->[1],
+    );
+## use critic
 }

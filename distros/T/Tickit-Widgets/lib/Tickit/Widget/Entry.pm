@@ -1,15 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.75 ':experimental(init_expr)';
+use warnings;
+use Object::Pad 0.807;
 
-package Tickit::Widget::Entry 0.37;
-class Tickit::Widget::Entry
-   :strict(params)
-   :isa(Tickit::Widget);
+package Tickit::Widget::Entry 0.41;
+class Tickit::Widget::Entry :strict(params);
+
+inherit Tickit::Widget;
 
 use Carp;
 
@@ -157,7 +158,7 @@ Move the cursor one word right
 
 =head2 new
 
-   $entry = Tickit::Widget::Entry->new( %args )
+   $entry = Tickit::Widget::Entry->new( %args );
 
 Constructs a new C<Tickit::Widget::Entry> object.
 
@@ -450,16 +451,16 @@ method on_mouse
 
 =head2 on_enter
 
-   $on_enter = $entry->on_enter
+   $on_enter = $entry->on_enter;
 
 =head2 set_on_enter
 
-   $entry->set_on_enter( $on_enter )
+   $entry->set_on_enter( $on_enter );
 
 Return or set the CODE reference to be called when the C<key_enter_line>
 action is invoked; usually bound to the C<Enter> key.
 
- $on_enter->( $entry, $line )
+   $on_enter->( $entry, $line );
 
 =cut
 
@@ -472,7 +473,7 @@ method set_on_enter
 
 =head2 position
 
-   $offset = $entry->position
+   $offset = $entry->position;
 
 Returns the current entry position, in terms of characters within the text.
 
@@ -482,7 +483,7 @@ Returns the current entry position, in terms of characters within the text.
 
 =head2 set_position
 
-   $entry->set_position( $position )
+   $entry->set_position( $position );
 
 Set the text entry position, moving the cursor
 
@@ -504,14 +505,14 @@ method set_position
 
 =head2 bind_keys
 
-   $entry->bind_keys( $keystr => $value, ... )
+   $entry->bind_keys( $keystr => $value, ... );
 
 Associate methods or CODE references with keypresses. On receipt of a the key
 the method or CODE reference will be invoked, being passed the stringified key
 representation and the underlying C<Term::TermKey::Key> structure.
 
-   $ret = $entry->method( $keystr, $key )
-   $ret = $coderef->( $entry, $keystr, $key )
+   $ret = $entry->method( $keystr, $key );
+   $ret = $coderef->( $entry, $keystr, $key );
 
 This method takes a hash of keystring/value pairs. Binding a value of C<undef>
 will remove it.
@@ -535,7 +536,7 @@ method bind_keys
 
 =head2 make_popup_at_cursor
 
-   $win = $entry->make_popup_at_cursor( $top_offset, $left_offset, $lines, $cols )
+   $win = $entry->make_popup_at_cursor( $top_offset, $left_offset, $lines, $cols );
 
 I<Since version 0.33.>
 
@@ -548,12 +549,12 @@ the cursor; this is likely not what you want.
 
 To position the popup just below the widget, use a top offset of +1:
 
-   $win = $entry->make_popup_at_cursor( +1, 0, $lines, $cols )
+   $win = $entry->make_popup_at_cursor( +1, 0, $lines, $cols );
 
 To position the popup just above the widget, use a top offset of negative the
 number of lines:
 
-   $win = $entry->make_popup_at_cursor( -$lines, 0, $lines, $cols )
+   $win = $entry->make_popup_at_cursor( -$lines, 0, $lines, $cols );
 
 =cut
 
@@ -579,7 +580,7 @@ used by a program to directly manipulate the text.
 
 =head2 text
 
-   $text = $entry->text
+   $text = $entry->text;
 
 Returns the currently entered text.
 
@@ -589,7 +590,7 @@ Returns the currently entered text.
 
 =head2 set_text
 
-   $entry->set_text( $text )
+   $entry->set_text( $text );
 
 Replace the text in the entry box. This completely redraws the widget's
 window. It is largely provided for initialisation; for normal edits (such as
@@ -610,7 +611,7 @@ method set_text
 
 =head2 text_insert
 
-   $entry->text_insert( $text, $pos_ch )
+   $entry->text_insert( $text, $pos_ch );
 
 Insert the given text at the given character position.
 
@@ -625,7 +626,7 @@ method text_insert
 
 =head2 text_delete
 
-   $deleted = $entry->text_delete( $pos_ch, $len_ch )
+   $deleted = $entry->text_delete( $pos_ch, $len_ch );
 
 Delete the given section of text. Returns the deleted text.
 
@@ -640,7 +641,7 @@ method text_delete
 
 =head2 text_splice
 
-   $deleted = $entry->text_splice( $pos_ch, $len_ch, $text )
+   $deleted = $entry->text_splice( $pos_ch, $len_ch, $text );
 
 Replace the given section of text with the given replacement. Returns the
 text deleted from the section.
@@ -683,7 +684,7 @@ method text_splice
 
 =head2 find_bow_forward
 
-   $pos = $entry->find_bow_forward( $initial, $else )
+   $pos = $entry->find_bow_forward( $initial, $else );
 
 Search forward in the string, returning the character position of the next
 beginning of word from the initial position. If none is found, returns
@@ -722,7 +723,7 @@ method find_eow_forward
 
 =head2 find_bow_backward
 
-   $pos = $entry->find_bow_backward( $initial )
+   $pos = $entry->find_bow_backward( $initial );
 
 Search backward in the string, returning the character position of the
 previous beginning of word from the initial position. If none is found,
@@ -741,7 +742,7 @@ method find_bow_backward
 
 =head2 find_eow_backward
 
-   $pos = $entry->find_eow_backward( $initial )
+   $pos = $entry->find_eow_backward( $initial );
 
 Search backward in the string, returning the character position of the
 previous end of word from the initial position. If none is found, returns

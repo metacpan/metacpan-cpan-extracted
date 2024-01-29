@@ -34,7 +34,7 @@ my %tests_info = (
 		'salt'		=> 'f5VgvyHCr0OiPbvjdZ8zJu',
 		'hash'		=> 'PBHD6Tul6nleZSWUVkk/HSOKOC8DmFy',
 	},
-	'yabadabadoo' => {
+	'yabadabadoo' => {	# This is the expected result for password_get_info(). The get_info() method will return undef instead.
 		'algo'		=> 0,
 		'algoName'	=> 'unknown',
 		'options'	=> {},
@@ -106,7 +106,7 @@ foreach my $crypted (sort keys %tests_info) {
 
 	my $info = $class->get_info($crypted);
 	#note(JSON::PP::encode_json($info));
-	is_deeply($info, $expect, "$class->get_info(\"$crypted\")");
+	is_deeply($info, $expect->{'algo'} eq 0 ? undef : $expect, "$class->get_info(\"$crypted\")");
 
 	$info = password_get_info($crypted);
 	#note(JSON::PP::encode_json($info));
@@ -127,4 +127,6 @@ foreach my $crypted (sort keys %tests_info) {
 		#note("$json\n");
 		is_deeply($info, $expect, "PHP's password_get_info(\"$crypted\") matches ours");
 	}
+
+
 }

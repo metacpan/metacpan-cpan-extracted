@@ -4,7 +4,7 @@ use strict;
 use Lemonldap::NG::Common::UserAgent;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.18.0';
 
 #parameter baseUrl, user, password, realm, lwpOpts
 
@@ -32,7 +32,8 @@ sub prereq {
 sub ua {
     my ($self) = @_;
     return $self->{ua} if ( $self->{ua} );
-    my $ua = Lemonldap::NG::Common::UserAgent->new();
+    my $ua = Lemonldap::NG::Common::UserAgent->new(
+        { lwpOpts => $self->{lwpOpts}, lwpSslOpts => $self->{lwpSslOpts} } );
     if ( $self->{user} ) {
         my $url  = $self->{baseUrl};
         my $port = ( $url =~ /^https/ ? 443 : 80 );

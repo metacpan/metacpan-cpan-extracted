@@ -6,7 +6,7 @@ use parent q/Exporter/;
 use Util::H2O ();
 
 our @EXPORT_OK = (qw/baptise opt2h2o h2o o2h d2o o2d o2h2o ini2h2o ini2o h2o2ini o2ini Getopt2h2o ddd dddie tr4h2o yaml2h2o yaml2o/);
-our $VERSION = q{0.3.3};
+our $VERSION = q{0.3.4};
 
 use feature 'state';
 
@@ -229,7 +229,7 @@ sub o2d($) {
         }
         $thing = Util::H2O::o2h $thing;
     }
-    return Util::H2O::o2h $thing;
+    return $thing;
 }
 
 # handy, poor man's debug wrappers

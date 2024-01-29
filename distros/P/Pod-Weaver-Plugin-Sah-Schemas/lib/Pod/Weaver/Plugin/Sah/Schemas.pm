@@ -5,10 +5,21 @@ use Moose;
 with 'Pod::Weaver::Role::AddTextToSection';
 with 'Pod::Weaver::Role::Section';
 
+has show_source => (is=>'rw', default=>sub {1});
+has include_schema_module => (is=>'rw');
+has exclude_schema_module => (is=>'rw');
+has include_schemas_module => (is=>'rw');
+has exclude_schemas_module => (is=>'rw');
+
+sub mvp_multivalue_args { qw(
+                                include_schema_module exclude_schema_module
+                                include_schemas_module exclude_schemas_module
+                        ) }
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-15'; # DATE
+our $DATE = '2024-01-08'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Sah-Schemas'; # DIST
-our $VERSION = '0.074'; # VERSION
+our $VERSION = '0.078'; # VERSION
 
 sub weave_section {
     no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
@@ -27,6 +38,13 @@ sub weave_section {
         $package_pm .= ".pm";
 
         if ($package =~ /^Sah::Schemas::/) {
+
+            if ($self->include_schemas_module && @{ $self->include_schemas_module }) {
+                do { $self->log_debug(["Skipping module %s (not in include_schmeas_module)", $package]); return } unless grep {$_ eq $package || "Sah::Schemas::$_" eq $package} @{ $self->include_schemas_module };
+            }
+            if ($self->exclude_schemas_module && @{ $self->exclude_schemas_module }) {
+                do { $self->log_debug(["Skipping module %s (in exclude_schmeas_module)", $package]);     return } if     grep {$_ eq $package || "Sah::Schemas::$_" eq $package} @{ $self->exclude_schemas_module };
+            }
 
             {
                 local @INC = ("lib", @INC);
@@ -102,6 +120,67 @@ sub weave_section {
                 require $package_pm;
             }
             my $sch = ${"$package\::schema"};
+
+            if ($self->include_schema_module && @{ $self->include_schema_module }) {
+                do { $self->log_debug(["Skipping module %s (not in include_schmea_module)", $package]); return } unless grep {$_ eq $package || "Sah::Schema::$_" eq $package} @{ $self->include_schema_module };
+            }
+            if ($self->exclude_schema_module && @{ $self->exclude_schema_module }) {
+                do { $self->log_debug(["Skipping module %s (in exclude_schmea_module)", $package]);     return } if     grep {$_ eq $package || "Sah::Schema::$_" eq $package} @{ $self->exclude_schema_module };
+            }
+
+            # add POD section: SAH SCHEMA DEFINITION
+            {
+                last unless $self->show_source;
+
+                require Data::Clone;
+                require Data::Dump;
+                require Data::Sah::Util::Type;
+
+                my @pod;
+                my $sch = Data::Clone::clone($sch);
+                delete $sch->[1]{description};
+                delete $sch->[1]{examples};
+
+                my $dump = Data::Dump::dump($sch);
+                $dump =~ s/^/ /mg;
+                push @pod, $dump, "\n\n";
+
+                # link to base schema/type
+                my $type = Data::Sah::Util::Type::get_type($sch);
+                if (Data::Sah::Util::Type::is_type($type)) {
+                    push @pod, "Base type: L<$type|Data::Sah::Type::$type>\n\n";
+                } else {
+                    push @pod, "Base schema: L<$type|Sah::Schema::$type>\n\n";
+                }
+
+                # link to prefilters modules
+                my $prefilters = $sch->[1]{prefilters};
+                if ($prefilters && @$prefilters) {
+                    push @pod, "Used prefilters: ";
+                    for my $i (0 .. $#{$prefilters}) {
+                        my $fname = ref $prefilters->[$i] ? $prefilters->[$i][0] : $prefilters->[$i];
+                        push @pod, ", " if $i; push @pod, "L<$fname|Data::Sah::Filter::perl::$fname>" }
+                    push @pod, "\n\n";
+                }
+
+                # TODO: link to perl coercion rule modules
+                # TODO: link to js coercion rule modules
+
+                # link to completion modules
+                my $xcompletions = $sch->[1]{'x.completion'};
+                if ($xcompletions && @$xcompletions) {
+                    push @pod, "Used completion: ";
+                    for my $i (0 .. $#{$xcompletions}) {
+                        my $cname = ref $xcompletions->[$i] ? $xcompletions->[$i][0] : $xcompletions->[$i];
+                        push @pod, ", " if $i; push @pod, "L<$cname|Perinci::Sub::XCompletion::$cname>" }
+                    push @pod, "\n\n";
+                }
+
+                $self->add_text_to_section(
+                    $document, join("", @pod), 'SAH SCHEMA DEFINITION',
+                    {ignore => 1},
+                );
+            } # add POD section: SAH SCHEMA DEFINITION
 
             # add POD section: Synopsis
             {
@@ -367,7 +446,7 @@ Pod::Weaver::Plugin::Sah::Schemas - Plugin to use when building Sah::Schemas::* 
 
 =head1 VERSION
 
-This document describes version 0.074 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2023-07-15.
+This document describes version 0.078 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2024-01-08.
 
 =head1 SYNOPSIS
 
@@ -398,7 +477,34 @@ It does the following to L<lib/Sah/Schema/*> .pm files:
 
 =back
 
-=for Pod::Coverage weave_section
+=for Pod::Coverage ^(weave_section|mvp_multivalue_args)$
+
+=head1 CONFIGURATION
+
+=head2 show_source
+
+Bool. Default true. If set to true, will add a C<SAH SCHEMA DEFINITION> section
+containing the source (dump) of the schema. Examples will be stripped.
+
+=head2 include_schema_module
+
+Filter only certain scenario modules that get processed. Can be specified
+multiple times. The C<Sah::Schema::> prefix can be omitted.
+
+=head2 exclude_schema_module
+
+Exclude certain scenario modules from being processed. Can be specified multiple
+times. The C<Sah::Schems::> prefix can be omitted.
+
+=head2 include_schemas_module
+
+Filter only certain scenario modules that get processed. Can be specified
+multiple times. The C<Sah::Schemas::> prefix can be omitted.
+
+=head2 exclude_schemas_module
+
+Exclude certain scenario modules from being processed. Can be specified multiple
+times. The C<Sah::Schemas::> prefix can be omitted.
 
 =head1 HOMEPAGE
 
@@ -444,7 +550,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2020, 2019, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2020, 2019, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

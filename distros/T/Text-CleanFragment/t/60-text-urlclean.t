@@ -1,6 +1,6 @@
 #!perl -w
 use strict;
-use Test::More;
+use Test2::V0 '-no_srand';
 use Data::Dumper;
 
 use Text::CleanFragment;
@@ -28,7 +28,7 @@ for (@tests) {
     is clean_fragment($_->[1]), $_->[1], "'$_->[1]' is idempotent";
 };
 
-is_deeply [clean_fragment(
+is [clean_fragment(
     'Lenny', 'Motörhead'
 )], ['Lenny','Motorhead'], "Multiple arguments also work";
 

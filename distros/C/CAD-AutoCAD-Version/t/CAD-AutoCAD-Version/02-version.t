@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($CAD::AutoCAD::Version::VERSION, 0.05, 'Version.');
+is($CAD::AutoCAD::Version::VERSION, 0.06, 'Version.');

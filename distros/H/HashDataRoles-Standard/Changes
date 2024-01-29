@@ -1,3 +1,16 @@
+0.003   2024-01-15  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfixes] Fixes for HashDataRole::Source::LinesInDATA,
+          HashData::Sample::DeNiro.
+
+
+0.002   2024-01-15  Released-By: PERLANCAR; Urgency: medium
+
+        - [role Source::LinesInData] Add argument 'separator'.
+
+        - Add role: Sample::DeNiro.
+
+
 0.001   2021-05-21  Released-By: PERLANCAR
 
         - First release.

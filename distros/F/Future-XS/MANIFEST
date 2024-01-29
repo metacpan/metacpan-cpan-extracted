@@ -2,6 +2,7 @@
 Build.PL
 Changes
 hax/av-utils.c.inc
+hax/croak_from_caller.c.inc
 hax/cv_set_anysv_refcounted.c.inc
 hax/perl-backcompat.c.inc
 include/future.h

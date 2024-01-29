@@ -573,8 +573,6 @@ Revision history for StreamFinder
         seems to now work again, at least for audio streams on some sites.
         - StreamFinder::Anystream - doc. touchups.
 2.20    2023/10/24
-        - Restored StreamFinder::Subsplash (still fetches audio streams for 
-        some channels, though any video versions seem to be behind javascript).
         - Update default user-agent to:
         "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0"
         - StreamFinder::Apple - Handle "embedded" Apple podcasts 
@@ -599,3 +597,17 @@ Revision history for StreamFinder
         Also:  try harder to fetch artist, albumartist, and icon (from "embed" 
         URLs), since some channels allow public access to the "embed" version 
         of their URLs but NOT always to their main (html) ones (go figure).
+2.22    2024/01/20
+        - Remove StreamFinder::LinkTV (site no longer hosts videos onsite).
+        - Mark StreamFinder::SoundCloud DEPRECIATED (now requires cookies and 
+        trackers to be enabled onsite to browse, but song URLs still work here.
+        - Minor module doc touchups (to note recent depreciations, etc.)
+        - StreamFinder::Rumble - Add -bitrate (max kbps) option.
+2.23    2024/01/28
+        - StreamFinder::Rumble - Stop converting Rumble's "new" streaming URLs 
+        to their "old" format (initiated by v2.20) since the new URLS now seem 
+        to work properly and Rumble seems to be bandwidth-throttling the old 
+        ones, I assume to force usage of the new ones and close the hold hosts.
+        - StreamFinder::Bitchute - Silence cpl. stray debug messages when 
+        debug mode is not on.
+        - Update copyright year to 2024.

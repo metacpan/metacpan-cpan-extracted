@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 139;
+use Test::More tests => 143;
 
 my $scalar_util_ok = eval { require Scalar::Util; };
 Scalar::Util -> import('refaddr') if $scalar_util_ok;
@@ -88,6 +88,24 @@ while (<DATA>) {
         is_deeply($y, $yo, 'second input arg is unmodified');
     };
 
+}
+
+# Verify that accuracy and precision is restored (CPAN RT #150523).
+
+{
+    $class -> accuracy(10);
+    is($class -> accuracy(), 10, "class accuracy is 10 before blog()");
+    my $x = $class -> new(12345);
+    $x -> blog();
+    is($class -> accuracy(), 10, "class accuracy is 10 after blog()");
+}
+
+{
+    $class -> precision(-10);
+    is($class -> precision(), -10, "class precision is -10 before blog()");
+    my $x = $class -> new(12345);
+    $x -> blog();
+    is($class -> precision(), -10, "class precision is -10 after blog()");
 }
 
 __END__

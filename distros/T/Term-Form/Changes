@@ -1,6 +1,9 @@
 Revision history for Term::Form
 
 
+0.555   2024-01-12
+    - Truncated strings are marked with a trailing '~'.
+
 0.554   2023-07-23
     - Bugfix 'auto_up' 0 and 1: preserve info output.
 

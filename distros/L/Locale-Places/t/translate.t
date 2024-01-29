@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 22;
+use Test::Most tests => 24;
 use lib 't/lib';
 use MyLogger;
 
@@ -21,6 +21,8 @@ TRANSLATE: {
 	like($places->translate(place => 'London', from => 'en', to => 'fr'), qr/Londres$/, 'French for London is Londres');
 	like($places->translate(place => 'Londres', from => 'fr', to => 'en'), qr/London$/, 'English for Londres is London');
 	is($places->translate({ place => 'London', from => 'en', to => 'en' }), 'London', 'English for London is London');
+	is($places->translate({ place => 'Baltimore', from => 'en', to => 'it', country => 'US' }), 'Baltimora', 'Baltimore is Baltimora in Italian');
+	is($places->translate({ place => 'Virginia', from => 'en', to => 'fr', country => 'US' }), 'Virginie', 'Virginia is Virginie in French');
 	is($places->translate({ place => 'foo', from => 'bar' }), undef, 'Translating gibberish returns undef');
 
 	delete $ENV{'LC_MESSAGES'};

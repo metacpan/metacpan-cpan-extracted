@@ -1,4 +1,7 @@
 
+0.20   2024-01-24
+- Switch to using File::LibMagic instead of File::MMagic
+
 0.10   2023-10-24
 - Detect XML files and shell scripts via File::MMagic Specials patterns
 

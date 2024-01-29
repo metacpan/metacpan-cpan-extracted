@@ -8,7 +8,7 @@ use XS::Parse::Infix::Builder;
 my $build = Module::Build->new(
    module_name => "Syntax::Operator::Zip",
    test_requires => {
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
@@ -16,6 +16,7 @@ my $build = Module::Build->new(
    },
    requires => {
       'perl' => '5.014', # pluggable keywords, XOP
+      'meta' => '0.003_002',
       'XS::Parse::Infix' => '0.26',
    },
    license => 'perl',

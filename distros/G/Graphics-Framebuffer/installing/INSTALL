@@ -22,6 +22,12 @@ DETERMINING IF YOUR SYSTEM HAS A FRAMEBUFFER FIRST
 
      *  https://github.com/marioroy/mce-examples/tree/master/framebuffer
 
+  ** Raspberry PI Users!  Change the settings to use a 24/32 bit framebuffer.
+     The PI defaults to 16 bit color and this module is much faster using
+	 24/32 bit color mode.  This module's 16 bit mode is a hack layered on
+	 top of the 24/32 bit routines, so more CPU time is involved in
+	 conversion.
+
 MAKE SURE YOUR USER ACCOUNT HAS ACCESS TO THE VIDEO DEVICE
 
   *  sudo usermod -a -G video username
@@ -43,7 +49,7 @@ DETERMINE YOUR DISTRIBUTION
     *  Debian
     *  Ubuntu
     *  Kubuntu
-    *  Xunbuntu
+    *  Xubuntu
     *  Mint
     *  Raspian
 

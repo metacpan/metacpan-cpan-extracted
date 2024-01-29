@@ -1,0 +1,117 @@
+==== start svg ====
+XObject #1
+SVG: disproportional vbox/width/height - not fully implemented, expect strange results.
+vb 0 0 1200 400 => bb 0.00 -400.00 1200.00 0.00
+matrix( 1 0 0 -1 0 0)
+vb rect( 0.00 0.00 1200.00 400.00)
+xo fill_color black (initial)
+  start handling title (SVGPDF::Element)
+  skipping title (not implemented)
+  end handling title
+  start handling desc (SVGPDF::Element)
+  skipping desc (not implemented)
+  end handling desc
+  start handling rect (SVGPDF::Rect)
+  rect x=1 y=1 w=1198 h=398
+    xo save
+    rect stroke-width=1 stroke=blue fill=none
+    xo stroke (blue)
+    xo restore
+  end handling rect
+  start handling path (SVGPDF::Path)
+  path d="M300,200 h-150 a150,..."
+    xo save
+    path stroke-width=5 stroke=blue fill=red
+    xo move(300.00,200.00)
+    xo hline(150.00)
+    xo arc(150.00,150.00 0.00 1,0 300.00,50.00)
+    circular_arc(150.00,200.00 300.00,50.00 150.00 move=0 large=1 dir=0 rot=0.00)
+      xo curve( 150.00,219.70 153.88,239.20 161.42,257.40 )
+      xo curve( 168.96,275.60 180.01,292.14 193.93,306.07 )
+      xo curve( 207.86,319.99 224.40,331.04 242.60,338.58 )
+      xo curve( 260.80,346.12 280.30,350.00 300.00,350.00 )
+      xo curve( 319.70,350.00 339.20,346.12 357.40,338.58 )
+      xo curve( 375.60,331.04 392.14,319.99 406.07,306.07 )
+      xo curve( 419.99,292.14 431.04,275.60 438.58,257.40 )
+      xo curve( 446.12,239.20 450.00,219.70 450.00,200.00 )
+      xo curve( 450.00,180.30 446.12,160.80 438.58,142.60 )
+      xo curve( 431.04,124.40 419.99,107.86 406.07,93.93 )
+      xo curve( 392.14,80.01 375.60,68.96 357.40,61.42 )
+      xo curve( 339.20,53.88 319.70,50.00 300.00,50.00 )
+    xo z
+    xo paint (blue red)
+    xo restore
+  end handling path
+  start handling path (SVGPDF::Path)
+  path d="M275,175 v-150 a150,..."
+    xo save
+    path stroke-width=5 stroke=blue fill=yellow
+    xo move(275.00,175.00)
+    xo vline(25.00)
+    xo arc(150.00,150.00 0.00 0,0 125.00,175.00)
+    circular_arc(275.00,25.00 125.00,175.00 150.00 move=0 large=0 dir=0 rot=0.00)
+      xo curve( 255.30,25.00 235.80,28.88 217.60,36.42 )
+      xo curve( 199.40,43.96 182.86,55.01 168.93,68.93 )
+      xo curve( 155.01,82.86 143.96,99.40 136.42,117.60 )
+      xo curve( 128.88,135.80 125.00,155.30 125.00,175.00 )
+    xo z
+    xo paint (blue yellow)
+    xo restore
+  end handling path
+  start handling path (SVGPDF::Path)
+  path d="M600,350 l 50,-25 a2..."
+    xo save
+    path stroke-width=5 stroke=red fill=none
+    xo move(600.00,350.00)
+    xo line(650.00,325.00)
+    xo arc(25.00,25.00 -30.00 0,1 700.00,300.00)
+    circular_arc(650.00,325.00 700.00,300.00 25.00 move=0 large=0 dir=1 rot=-30.00)
+      xo curve( 648.36,321.72 647.38,318.14 647.12,314.48 )
+      xo curve( 646.86,310.82 647.32,307.14 648.48,303.66 )
+      xo curve( 649.64,300.18 651.48,296.96 653.88,294.19 )
+      xo curve( 656.29,291.41 659.22,289.14 662.50,287.50 )
+      xo curve( 665.78,285.86 669.36,284.88 673.02,284.62 )
+      xo curve( 676.68,284.36 680.36,284.82 683.84,285.98 )
+      xo curve( 687.32,287.14 690.54,288.98 693.31,291.38 )
+      xo curve( 696.09,293.79 698.36,296.72 700.00,300.00 )
+    xo line(750.00,275.00)
+    xo arc(25.00,50.00 -30.00 0,1 800.00,250.00)
+    elliptic_arc(750.00,275.00 800.00,250.00 25.00,50.00 move=0 large=0 dir=1 rot=-30.00)
+      xo curve( 746.47,268.66 743.60,262.06 741.56,255.58 )
+      xo curve( 739.52,249.10 738.36,242.85 738.12,237.20 )
+      xo curve( 737.88,231.54 738.58,226.58 740.19,222.59 )
+      xo curve( 741.79,218.61 744.25,215.67 747.45,213.95 )
+      xo curve( 750.65,212.23 754.52,211.76 758.83,212.56 )
+      xo curve( 763.15,213.36 767.84,215.42 772.63,218.63 )
+      xo curve( 777.42,221.83 782.23,226.12 786.78,231.25 )
+      xo curve( 791.33,236.38 795.54,242.26 799.17,248.54 )
+      xo curve( 799.45,249.03 799.73,249.51 800.00,250.00 )
+    xo line(850.00,225.00)
+    xo arc(25.00,75.00 -30.00 0,1 900.00,200.00)
+    elliptic_arc(850.00,225.00 900.00,200.00 25.00,75.00 move=0 large=0 dir=1 rot=-30.00)
+      xo curve( 844.60,215.51 839.90,205.78 836.14,196.38 )
+      xo curve( 832.39,186.98 829.67,178.08 828.13,170.19 )
+      xo curve( 826.59,162.29 826.26,155.55 827.16,150.35 )
+      xo curve( 828.06,145.15 830.18,141.59 833.38,139.86 )
+      xo curve( 836.59,138.14 840.83,138.28 845.86,140.29 )
+      xo curve( 850.90,142.30 856.62,146.13 862.72,151.57 )
+      xo curve( 868.82,157.02 875.18,163.96 881.43,172.02 )
+      xo curve( 887.68,180.07 893.71,189.09 899.17,198.55 )
+      xo curve( 899.45,199.03 899.72,199.51 900.00,200.00 )
+    xo line(950.00,175.00)
+    xo arc(25.00,100.00 -30.00 0,1 1000.00,150.00)
+    elliptic_arc(950.00,175.00 1000.00,150.00 25.00,100.00 move=0 large=0 dir=1 rot=-30.00)
+      xo curve( 942.75,162.34 936.22,149.49 930.77,137.16 )
+      xo curve( 925.31,124.83 921.04,113.27 918.20,103.14 )
+      xo curve( 915.36,93.00 914.00,84.49 914.20,78.07 )
+      xo curve( 914.41,71.66 916.16,67.47 919.38,65.74 )
+      xo curve( 922.59,64.01 927.19,64.78 932.93,67.99 )
+      xo curve( 938.67,71.21 945.44,76.82 952.84,84.50 )
+      xo curve( 960.24,92.19 968.14,101.79 976.08,112.78 )
+      xo curve( 984.03,123.76 991.87,135.92 999.17,148.55 )
+      xo curve( 999.44,149.03 999.72,149.52 1000.00,150.00 )
+    xo line(1050.00,125.00)
+    xo stroke (red)
+    xo restore
+  end handling path
+==== end svg ====

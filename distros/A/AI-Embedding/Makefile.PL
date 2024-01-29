@@ -9,7 +9,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/AI/Embedding.pm',
     ABSTRACT_FROM    => 'lib/AI/Embedding.pm',
     LICENSE          => 'perl_5',
-    MIN_PERL_VERSION => '5.006',
+    MIN_PERL_VERSION => '5.010',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },

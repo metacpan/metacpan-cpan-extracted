@@ -5,8 +5,8 @@ use warnings;
 
 use Test::More;
 
-if ( $^O =~ m!^(solaris|nto)$! ) {
-    plan skip_all => 'Problems on Solaris and QNX with this test';
+if ( $^O =~ m!^(solaris|nto|aix)$! ) {
+    plan skip_all => 'Problems on Solaris, QNX and AIX with this test';
 }
 else {
     plan tests => 1;

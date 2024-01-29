@@ -1,3 +1,20 @@
+Travel::Status::DE::IRIS 1.94 - Mon Jan 29 2024
+
+    * Update stations list
+    * Do not use now-deprecated smartmatch features
+
+Travel::Status::DE::IRIS 1.93 - Fri Dec 22 2023
+
+    * Update stations list
+
+Travel::Status::DE::IRIS 1.92 - Tue Dec 12 2023
+
+    * Update meta database (accidentally omitted in 1.91)
+
+Travel::Status::DE::IRIS 1.91 - Sun Dec 10 2023
+
+    * Update stations list. Frohes neues Fahrplanjahr.
+
 Travel::Status::DE::IRIS 1.90 - Sun Sep 17 2023
 
     * Update stations list

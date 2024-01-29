@@ -1,0 +1,10 @@
+0.003  2023-12-26
+  [Bug Fix]
+    * Fix the bug that FILE_NAME in native source file does not have the file scope.
+0.002  2023-12-25
+  [Requrement Changes]
+    * Require SPVM::Resource::Utf8proc 0.001.
+0.001  2023-12-23
+  [Changes]
+    * First release
+  

@@ -1,5 +1,5 @@
 package Thread::CSP;
-$Thread::CSP::VERSION = '0.011';
+$Thread::CSP::VERSION = '0.013';
 use strict;
 use warnings;
 
@@ -24,7 +24,7 @@ Thread::CSP - Communicating sequential processes threading for Perl
 
 =head1 VERSION
 
-version 0.011
+version 0.013
 
 =head1 SYNOPSIS
 

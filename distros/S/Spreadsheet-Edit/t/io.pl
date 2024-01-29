@@ -4,8 +4,6 @@ use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp etc.
 
-$Carp::Verbose = 1; # show backtrace on errors
-
 use t_TestCommon ':no-Test2',
          qw/$verbose $silent $debug dprint dprintf
             bug mycheckeq_literal expect1 mycheck
@@ -13,6 +11,10 @@ use t_TestCommon ':no-Test2',
             insert_loc_in_evalstr verif_eval_err
             arrays_eq hash_subset
             @quotes/;
+
+# This doesn't break the no-internals-mentioned test in t/60_all.t
+# because 'carp' is never (normally) called, i.e. no warnings to users occur
+$Carp::Verbose = 1; # show backtrace on errors
 
 use t_SSUtils;
 use Encode qw/encode decode/;

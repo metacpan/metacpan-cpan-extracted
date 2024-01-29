@@ -1,8 +1,11 @@
-Makefile.PL
-MANIFEST			This list of files
+Changes
 lib/HTML/Selector/Element.pm
 lib/HTML/Selector/Element.pod
 lib/HTML/Selector/Element/Trait.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 t/000_load.t
 t/001_subclass.t
 t/002_monkeypatch.t
@@ -12,6 +15,5 @@ t/005_nth-of-type.t
 t/006_is.t
 t/007_attr.t
 t/008_query.t
-t/008_select.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+t/009_select.t
+t/010_find_closure.t

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Khq - Package for language Koyra Chiini
 
 package Locale::CLDR::Locales::Khq;
 # This file auto generated from Data\common\main\khq.xml
-#	on Tue  5 Dec  1:17:30 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'Akan senni',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Andoora',
  			'AE' => 'Laaraw Imaarawey Margantey',
@@ -217,7 +217,6 @@ has 'display_name_region' => (
  			'MD' => 'Moldovi',
  			'MG' => 'Madagascar',
  			'MH' => 'Maršal gungey',
- 			'MK' => 'Maacedooni',
  			'ML' => 'Maali',
  			'MM' => 'Maynamar',
  			'MN' => 'Mongooli',
@@ -333,7 +332,7 @@ has 'characters' => (
 			auxiliary => qr{[v]},
 			index => ['A', 'Ã', 'B', 'C', 'D', 'E', 'Ẽ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ɲ', 'Ŋ', 'O', 'Õ', 'P', 'Q', 'R', 'S', 'Š', 'T', 'U', 'W', 'X', 'Y', 'Z', 'Ž'],
 			main => qr{[a ã b c d e ẽ f g h i j k l m n ɲ ŋ o õ p q r s š t u w x y z ž]},
-			numbers => qr{[  \- . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[  \- ‑ . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT

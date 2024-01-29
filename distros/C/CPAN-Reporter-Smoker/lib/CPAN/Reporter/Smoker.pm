@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package CPAN::Reporter::Smoker;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Carp;
 use Config;
@@ -560,7 +560,7 @@ CPAN::Reporter::Smoker - Turnkey CPAN Testers smoking
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -1023,7 +1023,7 @@ L<CPAN::Mini::Devel>
 
 =back
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -1048,7 +1048,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexandr Ciornii Christian Walde gregor herrmann
+=for stopwords Alexandr Ciornii Breno G. de Oliveira Christian Walde gregor herrmann
 
 =over 4
 
@@ -1058,17 +1058,25 @@ Alexandr Ciornii <alexchorny@gmail.com>
 
 =item *
 
+Breno G. de Oliveira <garu@cpan.org>
+
+=item *
+
 Christian Walde <walde.christian@googlemail.com>
 
 =item *
 
 gregor herrmann <gregoa@cpan.org>
 
+=item *
+
+gregor herrmann <gregoa@debian.org>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by David Golden.
+This software is Copyright (c) 2024 by David Golden.
 
 This is free software, licensed under:
 

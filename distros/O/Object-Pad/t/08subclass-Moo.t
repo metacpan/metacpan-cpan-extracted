@@ -10,7 +10,7 @@ BEGIN {
       unless eval { require Moo };
 }
 
-use Object::Pad;
+use Object::Pad 0.800;
 
 my $moocount;
 package Base::Class {
@@ -23,7 +23,9 @@ package Base::Class {
 }
 
 my $opcount;
-class Derived::Class :isa(Base::Class) {
+class Derived::Class {
+   inherit Base::Class;
+
    field $field;
    BUILD {
       my ( $args ) = @_;

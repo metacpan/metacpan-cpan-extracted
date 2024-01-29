@@ -2,7 +2,7 @@ package Plack::App::ServiceStatus::NetStomp;
 
 # ABSTRACT: Check Net::Stomp connection
 
-our $VERSION = '0.912'; # VERSION
+our $VERSION = '0.913'; # VERSION
 
 use 5.018;
 use strict;
@@ -60,7 +60,7 @@ Plack::App::ServiceStatus::NetStomp - Check Net::Stomp connection
 
 =head1 VERSION
 
-version 0.912
+version 0.913
 
 =head1 SYNOPSIS
 

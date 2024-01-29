@@ -1,5 +1,5 @@
 package CGI::Application::Plugin::Authentication::Driver::Dummy;
-$CGI::Application::Plugin::Authentication::Driver::Dummy::VERSION = '0.23';
+$CGI::Application::Plugin::Authentication::Driver::Dummy::VERSION = '0.24';
 use strict;
 use warnings;
 

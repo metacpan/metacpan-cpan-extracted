@@ -8,15 +8,14 @@ use 5.014;
 
 use parent 'Class::Accessor';
 use DateTime::Format::Strptime;
-use List::Util   qw(any);
-use Scalar::Util qw(weaken);
+use List::Util qw(any);
 use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '5.01';
+our $VERSION = '5.04';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
-	  is_cancelled is_partially_cancelled
+	  is_additional is_cancelled is_partially_cancelled
 	  station station_eva platform sched_platform rt_platform operator
 	  id name type type_long class number line line_no load delay
 	  route_end route_start origin destination direction)
@@ -120,8 +119,6 @@ sub new {
 			datetime_ref => $datetime_ref,
 		};
 
-		weaken( $stopref->{hafas} );
-
 		push( @stops, $stopref );
 
 		$route_end = $loc->name;
@@ -164,6 +161,7 @@ sub new {
 			$ref->{destination} = $ref->{route_end};
 			$ref->{is_cancelled} ||= $journey->{stbStop}{dCncl};
 		}
+		$ref->{is_additional} = $journey->{stbStop}{isAdd};
 	}
 	else {
 		$ref->{route_start} = $stops[0]{loc}->name;
@@ -302,7 +300,7 @@ sub route_interesting {
 	# HB:  swiss main station (Hbf in .ch)
 	# hl.n.: czech main station (Hbf in .cz)
 	for my $stop (@via) {
-		if ( $stop->{name}
+		if ( $stop->loc->name
 			=~ m{ HB $ | hl\.n\. $ | Hbf | Hauptbahnhof | Bf | Bahnhof | Centraal | Flughafen }x
 		  )
 		{
@@ -311,14 +309,15 @@ sub route_interesting {
 	}
 	$last_stop = pop(@via);
 
-	if ( @via_main and $via_main[-1]{name} eq $last_stop->{name} ) {
+	if ( @via_main and $via_main[-1]->loc->name eq $last_stop->loc->name ) {
 		pop(@via_main);
 	}
-	if ( @via and $via[-1]{name} eq $last_stop->{name} ) {
+	if ( @via and $via[-1]->loc->name eq $last_stop->loc->name ) {
 		pop(@via);
 	}
 
-	if ( @via_main and @via and $via[0]{name} eq $via_main[0]{name} ) {
+	if ( @via_main and @via and $via[0]->loc->name eq $via_main[0]->loc->name )
+	{
 		shift(@via_main);
 	}
 
@@ -335,17 +334,13 @@ sub route_interesting {
 
 		while ( @via_show < $max_parts and @via_main ) {
 			my $stop = shift(@via_main);
-			if ( any { $_->{name} eq $stop->{name} } @via_show
-				or $stop->{name} eq $last_stop->{name} )
+			if ( any { $_->loc->name eq $stop->loc->name } @via_show
+				or $stop->loc->name eq $last_stop->loc->name )
 			{
 				next;
 			}
 			push( @via_show, $stop );
 		}
-	}
-
-	for my $stop (@via_show) {
-		$stop->{name} =~ s{ \s? Hbf .* }{}x;
 	}
 
 	return @via_show;
@@ -403,7 +398,7 @@ journey received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 5.01
+version 5.04
 
 =head1 DESCRIPTION
 
@@ -484,6 +479,11 @@ undef if neither is available.
 
 Delay in minutes, or undef if it is unknown.
 Also returns undef if the arrival/departure has been cancelled.
+
+=item $journey->is_additional (station only)
+
+True if the journey's stop at the requested station is an unscheduled addition
+to its route.
 
 =item $journey->is_cancelled
 

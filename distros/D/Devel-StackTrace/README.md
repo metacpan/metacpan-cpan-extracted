@@ -4,7 +4,7 @@ Devel::StackTrace - An object representing a stack trace
 
 # VERSION
 
-version 2.04
+version 2.05
 
 # SYNOPSIS
 
@@ -27,16 +27,16 @@ version 2.04
 # DESCRIPTION
 
 The `Devel::StackTrace` module contains two classes, `Devel::StackTrace` and
-[Devel::StackTrace::Frame](https://metacpan.org/pod/Devel::StackTrace::Frame). These objects encapsulate the information that
-can retrieved via Perl's `caller` function, as well as providing a simple
+[Devel::StackTrace::Frame](https://metacpan.org/pod/Devel%3A%3AStackTrace%3A%3AFrame). These objects encapsulate the information that can
+retrieved via Perl's `caller` function, as well as providing a simple
 interface to this data.
 
 The `Devel::StackTrace` object contains a set of `Devel::StackTrace::Frame`
 objects, one for each level of the stack. The frames contain all the data
 available from `caller`.
 
-This code was created to support my [Exception::Class::Base](https://metacpan.org/pod/Exception::Class::Base) class (part of
-[Exception::Class](https://metacpan.org/pod/Exception::Class)) but may be useful in other contexts.
+This code was created to support my [Exception::Class::Base](https://metacpan.org/pod/Exception%3A%3AClass%3A%3ABase) class (part of
+[Exception::Class](https://metacpan.org/pod/Exception%3A%3AClass)) but may be useful in other contexts.
 
 # 'TOP' AND 'BOTTOM' OF THE STACK
 
@@ -88,15 +88,14 @@ Takes the following parameters:
     If this parameter is true, `frame_filter` will be called as soon as the
     stacktrace is created, and before refs are stringified (if
     `unsafe_ref_capture` is not set), rather than being filtered lazily when
-    [Devel::StackTrace::Frame](https://metacpan.org/pod/Devel::StackTrace::Frame) objects are first needed.
+    [Devel::StackTrace::Frame](https://metacpan.org/pod/Devel%3A%3AStackTrace%3A%3AFrame) objects are first needed.
 
-    This is useful if you want to filter based on the frame's arguments and want
-    to be able to examine object properties, for example.
+    This is useful if you want to filter based on the frame's arguments and want to
+    be able to examine object properties, for example.
 
 - ignore\_package => $package\_name OR \\@package\_names
 
-    Any frames where the package is one of these packages will not be on the
-    stack.
+    Any frames where the package is one of these packages will not be on the stack.
 
 - ignore\_class => $package\_name OR \\@package\_names
 
@@ -111,8 +110,8 @@ Takes the following parameters:
 
     This will cause this number of stack frames to be excluded from top of the
     stack trace. This prevents the frames from being captured at all, and applies
-    before the `frame_filter`, `ignore_package`, or `ignore_class` options,
-    even with `filter_frames_early`.
+    before the `frame_filter`, `ignore_package`, or `ignore_class` options, even
+    with `filter_frames_early`.
 
 - unsafe\_ref\_capture => $boolean
 
@@ -137,9 +136,8 @@ Takes the following parameters:
 
     By default, Devel::StackTrace will call `overload::AddrRef` to get the
     underlying string representation of an object, instead of respecting the
-    object's stringification overloading. If you would prefer to see the
-    overloaded representation of objects in stack traces, then set this parameter
-    to true.
+    object's stringification overloading. If you would prefer to see the overloaded
+    representation of objects in stack traces, then set this parameter to true.
 
 - max\_arg\_length => $integer
 
@@ -161,14 +159,15 @@ Takes the following parameters:
 
 ## $trace->next\_frame
 
-Returns the next [Devel::StackTrace::Frame](https://metacpan.org/pod/Devel::StackTrace::Frame) object on the stack, going
-down. If this method hasn't been called before it returns the first frame. It
-returns `undef` when it reaches the bottom of the stack and then resets its
-pointer so the next call to `$trace->next_frame` or `$trace->prev_frame` will work properly.
+Returns the next [Devel::StackTrace::Frame](https://metacpan.org/pod/Devel%3A%3AStackTrace%3A%3AFrame) object on the stack, going down.
+If this method hasn't been called before it returns the first frame. It returns
+`undef` when it reaches the bottom of the stack and then resets its pointer so
+the next call to `$trace->next_frame` or `$trace->prev_frame` will
+work properly.
 
 ## $trace->prev\_frame
 
-Returns the next [Devel::StackTrace::Frame](https://metacpan.org/pod/Devel::StackTrace::Frame) object on the stack, going up. If
+Returns the next [Devel::StackTrace::Frame](https://metacpan.org/pod/Devel%3A%3AStackTrace%3A%3AFrame) object on the stack, going up. If
 this method hasn't been called before it returns the last frame. It returns
 undef when it reaches the top of the stack and then resets its pointer so the
 next call to `$trace->next_frame` or `$trace->prev_frame` will work
@@ -182,11 +181,11 @@ appropriate.
 ## $trace->frames
 
 When this method is called with no arguments, it returns a list of
-[Devel::StackTrace::Frame](https://metacpan.org/pod/Devel::StackTrace::Frame) objects. They are returned in order from top (most
+[Devel::StackTrace::Frame](https://metacpan.org/pod/Devel%3A%3AStackTrace%3A%3AFrame) objects. They are returned in order from top (most
 recent) to bottom.
 
 This method can also be used to set the object's frames if you pass it a list
-of [Devel::StackTrace::Frame](https://metacpan.org/pod/Devel::StackTrace::Frame) objects.
+of [Devel::StackTrace::Frame](https://metacpan.org/pod/Devel%3A%3AStackTrace%3A%3AFrame) objects.
 
 This is useful if you want to filter the list of frames in ways that are more
 complex than can be handled by the `$trace->filter_frames` method:
@@ -195,9 +194,9 @@ complex than can be handled by the `$trace->filter_frames` method:
 
 ## $trace->frame($index)
 
-Given an index, this method returns the relevant frame, or undef if there is
-no frame at that index. The index is exactly like a Perl array. The first
-frame is 0 and negative indexes are allowed.
+Given an index, this method returns the relevant frame, or undef if there is no
+frame at that index. The index is exactly like a Perl array. The first frame is
+0 and negative indexes are allowed.
 
 ## $trace->frame\_count
 
@@ -224,8 +223,6 @@ method returns `undef`.
 
 Bugs may be submitted at [https://github.com/houseabsolute/Devel-StackTrace/issues](https://github.com/houseabsolute/Devel-StackTrace/issues).
 
-I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
-
 # SOURCE
 
 The source code repository for Devel-StackTrace can be found at [https://github.com/houseabsolute/Devel-StackTrace](https://github.com/houseabsolute/Devel-StackTrace).
@@ -245,7 +242,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~autarch/fs-donation.html).
+button at [https://houseabsolute.com/foss-donations/](https://houseabsolute.com/foss-donations/).
 
 # AUTHOR
 
@@ -263,7 +260,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2000 - 2019 by David Rolsky.
+This software is Copyright (c) 2000 - 2024 by David Rolsky.
 
 This is free software, licensed under:
 

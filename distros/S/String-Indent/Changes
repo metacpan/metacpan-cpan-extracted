@@ -1,17 +1,20 @@
-Revision history for String-Indent
+0.040   2024-01-25  Released-By: PERLANCAR; Urgency: medium
 
-0.03    2015-03-06 (PERLANCAR)
+        - Add option: first_line_of_para_indent.
+
+
+0.03    2015-03-06  Released-By: PERLANCAR
 
 	- Add options: first_line_indent, subsequent_lines_indent.
 
 
-0.02    2015-01-03 (PERLANCAR)
+0.02    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.01    2014-12-10 (PERLANCAR)
+0.01    2014-12-10  Released-By: PERLANCAR
 
         - First release. Split from SHARYANTO-String-Util.

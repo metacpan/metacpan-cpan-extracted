@@ -5,18 +5,26 @@ use Test::More;
 
 use Config::INI::RefVars;
 
+use Config;
 use Storable qw(dclone);
+use File::Spec::Functions qw(catdir catfile rel2abs splitpath);
 
-# use File::Spec::Functions qw(catdir catfile rel2abs splitpath);
-#
 #sub test_data_file { catfile(qw(t 09-data), $_[0]) }
 
 #
 # For heredocs containing INI data always use the single quote variant!
 #
 
+my $Dir_Sep = catdir("", "");
+my $VERSION = $Config::INI::RefVars::VERSION;
+my %Global = ('=:'        => $Dir_Sep,
+              '=::'       => $Config{path_sep},
+              '=VERSION'  => $VERSION,
+             );
+
 subtest "use all args of new()" => sub {
-  my $obj = Config::INI::RefVars->new(tocopy_section => "TOCOPY!",
+  my $initial_tocopy_section = "TOCOPY!";
+  my $obj = Config::INI::RefVars->new(tocopy_section => $initial_tocopy_section,
                                       tocopy_vars    => { '#hash' => 'maria',
                                                           'f~27'  => 42,
                                                           'foo'   => 'sec:$(=)'
@@ -24,6 +32,8 @@ subtest "use all args of new()" => sub {
                                       not_tocopy     => ['#hash'],
                                       separator      => '/'
                                      );
+  is($obj->current_tocopy_section, undef, 'current_tocopy_section()');
+
   subtest "simple tests" => sub {
     my $src = [
                '[sec-A]',
@@ -31,6 +41,7 @@ subtest "use all args of new()" => sub {
               ];
     subtest "parse_ini() - no further args" => sub {
       $obj->parse_ini(src => $src);
+      is($obj->current_tocopy_section, $initial_tocopy_section, 'current_tocopy_section()');
       is_deeply($obj->variables,
                 {
                  'TOCOPY!' => {
@@ -164,33 +175,33 @@ subtest "use all args of new()" => sub {
     is_deeply($obj->variables,
               {
                'TOCOPY!' => {
-                             '#foo' => 'foo with hash',
-                             '#hash' => 'other value',
-                             '12=ab' => '42',
-                             '=' => 'TOCOPY!',
-                             '=:' => '/',
-                             '=srcname' => 'INI data',
+                             '#foo'       => 'foo with hash',
+                             '#hash'      => 'other value',
+                             '12=ab'      => '42',
+                             '='          => 'TOCOPY!',
+                             %Global,
+                             '=srcname'   => 'INI data',
                              'additional' => 'yet another tocopy var!',
-                             'foo' => 'override!'
+                             'foo'        => 'override!'
                             },
                'sec-A' => {
-                           '#foo' => 'foo with hash',
-                           '12=ab' => '42',
-                           '=' => 'sec-A',
-                           '=:' => '/',
-                           '=srcname' => 'INI data',
-                           'a var' => '42',
+                           '#foo'       => 'foo with hash',
+                           '12=ab'      => '42',
+                           '='          => 'sec-A',
+                           %Global,
+                           '=srcname'   => 'INI data',
+                           'a var'      => '42',
                            'additional' => 'yet another tocopy var!',
-                           'foo' => 'override!'
+                           'foo'        => 'override!'
                           },
                'sec-B' => {
-                           '#foo' => 'foo with hash',
-                           '12=ab' => '42',
-                           '=' => 'sec-B',
-                           '=:' => '/',
-                           '=srcname' => 'INI data',
+                           '#foo'       => 'foo with hash',
+                           '12=ab'      => '42',
+                           '='          => 'sec-B',
+                           %Global,
+                           '=srcname'   => 'INI data',
                            'additional' => 'yet another tocopy var!',
-                           'foo' => 'override!'
+                           'foo'        => 'override!'
                           }
 
               },
@@ -321,6 +332,27 @@ subtest 'src_name' => sub {
 
   $obj->parse_ini(src => $src);  # No explicite 'src_name => ...'!
   is($obj->src_name, "INI data", 'src_name: back to "INI data"');
+};
+
+subtest 'cmnt_vl' => sub {
+  my $obj = Config::INI::RefVars->new(cmnt_vl => 1);
+  my $src = [
+             '[section]',
+             'var 1 =val 1 ; comment',
+             'var 2=val 2  ; ;  ; comment',
+             'var 3 =val 3; no comment',
+             'var 4=val 4 $(); no comment',
+            ];
+  $obj->parse_ini(src => $src);
+  is_deeply($obj->variables,
+            {
+             section => {'var 1' => 'val 1',
+                         'var 2' => 'val 2',
+                         'var 3' => 'val 3; no comment',
+                         'var 4' => 'val 4 ; no comment',
+                        }
+            },
+            'variables()');
 };
 
 #==================================================================================================

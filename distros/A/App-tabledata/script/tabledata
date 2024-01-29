@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-19'; # DATE
+our $DATE = '2023-09-23'; # DATE
 our $DIST = 'App-tabledata'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/tabledata/tabledata",
@@ -39,7 +39,7 @@ tabledata - Show content of TableData modules (plus a few other things)
 
 =head1 VERSION
 
-This document describes version 0.007 of tabledata (from Perl distribution App-tabledata), released on 2023-04-19.
+This document describes version 0.008 of tabledata (from Perl distribution App-tabledata), released on 2023-09-23.
 
 =head1 SYNOPSIS
 
@@ -99,15 +99,15 @@ Default value:
 
  1
 
-=item B<-C>
-
-List TableData::* on CPAN.
-
-See C<--action>.
-
 =item B<-c>
 
 List TableData::* on local CPAN mirror.
+
+See C<--action>.
+
+=item B<-C>
+
+List TableData::* on CPAN.
 
 See C<--action>.
 

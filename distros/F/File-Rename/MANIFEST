@@ -34,5 +34,7 @@ source/rename
 rename.PL
 unsafe.PL
 examples/rename.pl
+examples/using-options.pl
+examples/using-options-code.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

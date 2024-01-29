@@ -17,7 +17,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,16 +33,16 @@ no_index:
 provides:
   Net::Async::Redis::Cluster::Node::XS:
     file: lib/Net/Async/Redis/Cluster/Node/XS.pm
-    version: '1.000'
+    version: '1.001'
   Net::Async::Redis::Cluster::XS:
     file: lib/Net/Async/Redis/Cluster/XS.pm
-    version: '1.000'
+    version: '1.001'
   Net::Async::Redis::Protocol::XS:
     file: lib/Net/Async/Redis/XS.pm
-    version: '1.000'
+    version: '1.001'
   Net::Async::Redis::XS:
     file: lib/Net/Async/Redis/XS.pm
-    version: '1.000'
+    version: '1.001'
 requires:
   Future::AsyncAwait: '0.61'
   IO::Async::Loop: '0'
@@ -53,7 +53,7 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Redis-XS/issues
   homepage: https://github.com/team-at-cpan/Net-Async-Redis-XS
   repository: https://github.com/team-at-cpan/Net-Async-Redis-XS.git
-version: '1.000'
+version: '1.001'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Tom Molesworth <tom@deriv.com>'

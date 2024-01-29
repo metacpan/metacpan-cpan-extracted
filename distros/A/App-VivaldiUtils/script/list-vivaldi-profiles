@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Vivaldi/Util/Profile/list_vivaldi_profiles
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-07'; # DATE
+our $DATE = '2023-10-28'; # DATE
 our $DIST = 'App-VivaldiUtils'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Vivaldi/Util/Profile/list_vivaldi_profiles",
@@ -40,11 +40,15 @@ list-vivaldi-profiles - List available Vivaldi profiles
 
 =head1 VERSION
 
-This document describes version 0.010 of list-vivaldi-profiles (from Perl distribution App-VivaldiUtils), released on 2022-10-07.
+This document describes version 0.011 of list-vivaldi-profiles (from Perl distribution App-VivaldiUtils), released on 2023-10-28.
 
 =head1 SYNOPSIS
 
-B<list-vivaldi-profiles> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--detail>|B<-l>|B<--no-detail>|B<--nodetail>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]]
+B<list-vivaldi-profiles> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<list-vivaldi-profiles> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<list-vivaldi-profiles> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
 
 =head1 DESCRIPTION
 
@@ -59,6 +63,9 @@ C<*> marks required options.
 =over
 
 =item B<--detail>, B<-l>
+
+(No description)
+
 
 =back
 
@@ -241,7 +248,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

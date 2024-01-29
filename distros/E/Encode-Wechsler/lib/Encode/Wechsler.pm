@@ -1,7 +1,7 @@
 package Encode::Wechsler;
 use strict;
 use warnings FATAL => 'all';
-our $VERSION = '0.03';
+our $VERSION = '1.00';
 
 my $i = 0;
 # {0, 1, 2, ..., 8, 9, a, b, ..., v} correspond to the bitstrings {'00000', '00001', '00010', ..., '11111'}.
@@ -287,7 +287,7 @@ Jeff Anderson, C<< <jeffa at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Jeff Anderson.
+Copyright 2024 Jeff Anderson.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

@@ -51,11 +51,11 @@ L<Task>.
 
 =head1 AUTHOR
 
-brian d foy C<< <bdfoy@gmail.com> >>
+brian d foy C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright © 2014-2021, brian d foy.
+Copyright © 2014-2024, brian d foy.
 
 This code is licensed under the Artisitic License 2.0
 

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Nds - Package for language Low German
 
 package Locale::CLDR::Locales::Nds;
 # This file auto generated from Data\common\main\nds.xml
-#	on Tue  5 Dec  1:24:28 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -44,7 +44,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'aa' => 'Afar',
@@ -383,7 +383,6 @@ has 'display_name_language' => (
  				'ro' => 'Rumäänsch',
  				'ro_MD' => 'Moldaawsch',
  				'rom' => 'Romani',
- 				'root' => 'Wortel',
  				'ru' => 'Russ’sch',
  				'rup' => 'Aromuunsch',
  				'rw' => 'Ruandsch',
@@ -656,7 +655,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'Welt',
  			'002' => 'Afrika',
@@ -945,7 +944,7 @@ has 'display_name_variant' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'1901' => 'Ole düütsche Rechtschrievung',
  			'1994' => 'Standardiseert Resiaansch Rechtschrievung',
@@ -983,7 +982,7 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'calendar' => 'Klenner',
  			'collation' => 'Bookstaven-Folgreeg',
@@ -1033,7 +1032,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{Metersch},
  			'UK' => q{Engelsch},
@@ -1047,7 +1046,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'Spraak: {0}',
  			'script' => 'Schrift: {0}',
@@ -1069,7 +1068,8 @@ has 'characters' => (
 			auxiliary => qr{[á à ă â ā æ ç é è ĕ ê ë ę ē í ì ĭ î ï ī ñ ó ò ŏ ô ø ō œ ú ù ŭ û ū ÿ]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'ẞ', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
 			main => qr{[a å ä b c d e f g h i j k l m n o ö p q r s t u ü v w x y z]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ‚ " “ „ « » ( ) \[ \] \{ \} § @ * / \& #]},
 		};
 	},
 EOT
@@ -1124,213 +1124,519 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
-					'celsius' => {
-						'name' => q(Graad Celsius),
-						'other' => q({0} Graad Celsius),
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(Daag),
+						'other' => q({0} Daag),
 					},
-					'centimeter' => {
-						'name' => q(Zentimeters),
-						'other' => q({0} Zentimeter),
-					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(Daag),
 						'other' => q({0} Daag),
 					},
-					'gram' => {
-						'name' => q(Gramm),
-						'other' => q({0} Gramm),
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(Stünnen),
+						'other' => q({0} Stünnen),
 					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(Stünnen),
 						'other' => q({0} Stünnen),
 					},
-					'kilogram' => {
-						'name' => q(Kilogramm),
-						'other' => q({0} Kilogramm),
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(Millisekunnen),
+						'other' => q({0} Millisekunnen),
 					},
-					'kilometer' => {
-						'name' => q(Kilometers),
-						'other' => q({0} Kilometer),
-					},
-					'kilometer-per-hour' => {
-						'name' => q(Kilometers per Stünn),
-						'other' => q({0} Kilometer per Stünn),
-					},
-					'liter' => {
-						'name' => q(Liters),
-						'other' => q({0} Liter),
-					},
-					'meter' => {
-						'name' => q(Meters),
-						'other' => q({0} Meter),
-					},
-					'millimeter' => {
-						'name' => q(Millimeters),
-						'other' => q({0} Millimeter),
-					},
+					# Core Unit Identifier
 					'millisecond' => {
 						'name' => q(Millisekunnen),
 						'other' => q({0} Millisekunnen),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(Minuten),
+						'other' => q({0} Minuten),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(Minuten),
 						'other' => q({0} Minuten),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(Maanden),
+						'other' => q({0} Maanden),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(Maanden),
 						'other' => q({0} Maanden),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(Sekunnen),
+						'other' => q({0} Sekunnen),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(Sekunnen),
 						'other' => q({0} Sekunnen),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(Weken),
+						'other' => q({0} Weken),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(Weken),
 						'other' => q({0} Weken),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(Johr),
+						'other' => q({0} Johren),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(Johr),
 						'other' => q({0} Johren),
 					},
-				},
-				'narrow' => {
-					'celsius' => {
-						'name' => q(°C),
-						'other' => q({0}°C),
+					# Long Unit Identifier
+					'length-centimeter' => {
+						'name' => q(Zentimeters),
+						'other' => q({0} Zentimeter),
 					},
+					# Core Unit Identifier
 					'centimeter' => {
-						'name' => q(cm),
-						'other' => q({0} cm),
+						'name' => q(Zentimeters),
+						'other' => q({0} Zentimeter),
 					},
-					'day' => {
-						'name' => q(d),
-						'other' => q({0}d),
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'name' => q(Kilometers),
+						'other' => q({0} Kilometer),
 					},
-					'gram' => {
-						'name' => q(g),
-						'other' => q({0} g),
-					},
-					'hour' => {
-						'name' => q(h),
-						'other' => q({0}h),
-					},
-					'kilogram' => {
-						'name' => q(kg),
-						'other' => q({0} kg),
-					},
+					# Core Unit Identifier
 					'kilometer' => {
-						'name' => q(km),
-						'other' => q({0} km),
+						'name' => q(Kilometers),
+						'other' => q({0} Kilometer),
 					},
-					'kilometer-per-hour' => {
-						'name' => q(km/h),
-						'other' => q({0} km/h),
+					# Long Unit Identifier
+					'length-meter' => {
+						'name' => q(Meters),
+						'other' => q({0} Meter),
 					},
-					'liter' => {
-						'name' => q(l),
-						'other' => q({0}l),
-					},
+					# Core Unit Identifier
 					'meter' => {
-						'name' => q(m),
-						'other' => q({0} m),
+						'name' => q(Meters),
+						'other' => q({0} Meter),
 					},
+					# Long Unit Identifier
+					'length-millimeter' => {
+						'name' => q(Millimeters),
+						'other' => q({0} Millimeter),
+					},
+					# Core Unit Identifier
 					'millimeter' => {
-						'name' => q(mm),
-						'other' => q({0} mm),
+						'name' => q(Millimeters),
+						'other' => q({0} Millimeter),
 					},
-					'millisecond' => {
-						'name' => q(ms),
-						'other' => q({0}ms),
+					# Long Unit Identifier
+					'mass-gram' => {
+						'name' => q(Gramm),
+						'other' => q({0} Gramm),
 					},
-					'minute' => {
-						'name' => q(min),
-						'other' => q({0}min),
-					},
-					'month' => {
-						'name' => q(M.),
-						'other' => q({0}M.),
-					},
-					'second' => {
-						'name' => q(s),
-						'other' => q({0}s),
-					},
-					'week' => {
-						'name' => q(W.),
-						'other' => q({0}W.),
-					},
-					'year' => {
-						'name' => q(a),
-						'other' => q({0}a),
-					},
-				},
-				'short' => {
-					'celsius' => {
-						'name' => q(°Cels.),
-						'other' => q({0}°Cels.),
-					},
-					'centimeter' => {
-						'name' => q(cm),
-						'other' => q({0} cm),
-					},
-					'day' => {
-						'name' => q(Dg.),
-						'other' => q({0} Dg.),
-					},
+					# Core Unit Identifier
 					'gram' => {
 						'name' => q(Gramm),
 						'other' => q({0} Gramm),
 					},
-					'hour' => {
-						'name' => q(Stn.),
-						'other' => q({0} Stn.),
+					# Long Unit Identifier
+					'mass-kilogram' => {
+						'name' => q(Kilogramm),
+						'other' => q({0} Kilogramm),
 					},
+					# Core Unit Identifier
 					'kilogram' => {
-						'name' => q(kg),
-						'other' => q({0} kg),
+						'name' => q(Kilogramm),
+						'other' => q({0} Kilogramm),
 					},
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'name' => q(Kilometers per Stünn),
+						'other' => q({0} Kilometer per Stünn),
+					},
+					# Core Unit Identifier
+					'kilometer-per-hour' => {
+						'name' => q(Kilometers per Stünn),
+						'other' => q({0} Kilometer per Stünn),
+					},
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'name' => q(Graad Celsius),
+						'other' => q({0} Graad Celsius),
+					},
+					# Core Unit Identifier
+					'celsius' => {
+						'name' => q(Graad Celsius),
+						'other' => q({0} Graad Celsius),
+					},
+					# Long Unit Identifier
+					'volume-liter' => {
+						'name' => q(Liters),
+						'other' => q({0} Liter),
+					},
+					# Core Unit Identifier
+					'liter' => {
+						'name' => q(Liters),
+						'other' => q({0} Liter),
+					},
+				},
+				'narrow' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(d),
+						'other' => q({0}d),
+					},
+					# Core Unit Identifier
+					'day' => {
+						'name' => q(d),
+						'other' => q({0}d),
+					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(h),
+						'other' => q({0}h),
+					},
+					# Core Unit Identifier
+					'hour' => {
+						'name' => q(h),
+						'other' => q({0}h),
+					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(ms),
+						'other' => q({0}ms),
+					},
+					# Core Unit Identifier
+					'millisecond' => {
+						'name' => q(ms),
+						'other' => q({0}ms),
+					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(min),
+						'other' => q({0}min),
+					},
+					# Core Unit Identifier
+					'minute' => {
+						'name' => q(min),
+						'other' => q({0}min),
+					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(M.),
+						'other' => q({0}M.),
+					},
+					# Core Unit Identifier
+					'month' => {
+						'name' => q(M.),
+						'other' => q({0}M.),
+					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(s),
+						'other' => q({0}s),
+					},
+					# Core Unit Identifier
+					'second' => {
+						'name' => q(s),
+						'other' => q({0}s),
+					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(W.),
+						'other' => q({0}W.),
+					},
+					# Core Unit Identifier
+					'week' => {
+						'name' => q(W.),
+						'other' => q({0}W.),
+					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(a),
+						'other' => q({0}a),
+					},
+					# Core Unit Identifier
+					'year' => {
+						'name' => q(a),
+						'other' => q({0}a),
+					},
+					# Long Unit Identifier
+					'length-centimeter' => {
+						'name' => q(cm),
+						'other' => q({0} cm),
+					},
+					# Core Unit Identifier
+					'centimeter' => {
+						'name' => q(cm),
+						'other' => q({0} cm),
+					},
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'name' => q(km),
+						'other' => q({0} km),
+					},
+					# Core Unit Identifier
 					'kilometer' => {
 						'name' => q(km),
 						'other' => q({0} km),
 					},
-					'kilometer-per-hour' => {
-						'name' => q(km/h),
-						'other' => q({0} km/h),
+					# Long Unit Identifier
+					'length-meter' => {
+						'name' => q(m),
+						'other' => q({0} m),
 					},
-					'liter' => {
-						'name' => q(L),
-						'other' => q({0} L),
-					},
+					# Core Unit Identifier
 					'meter' => {
 						'name' => q(m),
 						'other' => q({0} m),
 					},
+					# Long Unit Identifier
+					'length-millimeter' => {
+						'name' => q(mm),
+						'other' => q({0} mm),
+					},
+					# Core Unit Identifier
 					'millimeter' => {
 						'name' => q(mm),
 						'other' => q({0} mm),
 					},
+					# Long Unit Identifier
+					'mass-gram' => {
+						'name' => q(g),
+						'other' => q({0} g),
+					},
+					# Core Unit Identifier
+					'gram' => {
+						'name' => q(g),
+						'other' => q({0} g),
+					},
+					# Long Unit Identifier
+					'mass-kilogram' => {
+						'name' => q(kg),
+						'other' => q({0} kg),
+					},
+					# Core Unit Identifier
+					'kilogram' => {
+						'name' => q(kg),
+						'other' => q({0} kg),
+					},
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'name' => q(km/h),
+						'other' => q({0} km/h),
+					},
+					# Core Unit Identifier
+					'kilometer-per-hour' => {
+						'name' => q(km/h),
+						'other' => q({0} km/h),
+					},
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'name' => q(°C),
+						'other' => q({0}°C),
+					},
+					# Core Unit Identifier
+					'celsius' => {
+						'name' => q(°C),
+						'other' => q({0}°C),
+					},
+					# Long Unit Identifier
+					'volume-liter' => {
+						'name' => q(l),
+						'other' => q({0}l),
+					},
+					# Core Unit Identifier
+					'liter' => {
+						'name' => q(l),
+						'other' => q({0}l),
+					},
+				},
+				'short' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(Dg.),
+						'other' => q({0} Dg.),
+					},
+					# Core Unit Identifier
+					'day' => {
+						'name' => q(Dg.),
+						'other' => q({0} Dg.),
+					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(Stn.),
+						'other' => q({0} Stn.),
+					},
+					# Core Unit Identifier
+					'hour' => {
+						'name' => q(Stn.),
+						'other' => q({0} Stn.),
+					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'name' => q(ms),
+						'other' => q({0} ms),
+					},
+					# Core Unit Identifier
 					'millisecond' => {
 						'name' => q(ms),
 						'other' => q({0} ms),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(Min.),
+						'other' => q({0} Min.),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(Min.),
 						'other' => q({0} Min.),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(Mnd.),
+						'other' => q({0} Mnd.),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(Mnd.),
 						'other' => q({0} Mnd.),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(Sek.),
+						'other' => q({0} Sek.),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(Sek.),
 						'other' => q({0} Sek.),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(Wk.),
+						'other' => q({0} Wk.),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(Wk.),
 						'other' => q({0} Wk.),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(J.),
+						'other' => q({0} J.),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(J.),
 						'other' => q({0} J.),
+					},
+					# Long Unit Identifier
+					'length-centimeter' => {
+						'name' => q(cm),
+						'other' => q({0} cm),
+					},
+					# Core Unit Identifier
+					'centimeter' => {
+						'name' => q(cm),
+						'other' => q({0} cm),
+					},
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'name' => q(km),
+						'other' => q({0} km),
+					},
+					# Core Unit Identifier
+					'kilometer' => {
+						'name' => q(km),
+						'other' => q({0} km),
+					},
+					# Long Unit Identifier
+					'length-meter' => {
+						'name' => q(m),
+						'other' => q({0} m),
+					},
+					# Core Unit Identifier
+					'meter' => {
+						'name' => q(m),
+						'other' => q({0} m),
+					},
+					# Long Unit Identifier
+					'length-millimeter' => {
+						'name' => q(mm),
+						'other' => q({0} mm),
+					},
+					# Core Unit Identifier
+					'millimeter' => {
+						'name' => q(mm),
+						'other' => q({0} mm),
+					},
+					# Long Unit Identifier
+					'mass-gram' => {
+						'name' => q(Gramm),
+						'other' => q({0} Gramm),
+					},
+					# Core Unit Identifier
+					'gram' => {
+						'name' => q(Gramm),
+						'other' => q({0} Gramm),
+					},
+					# Long Unit Identifier
+					'mass-kilogram' => {
+						'name' => q(kg),
+						'other' => q({0} kg),
+					},
+					# Core Unit Identifier
+					'kilogram' => {
+						'name' => q(kg),
+						'other' => q({0} kg),
+					},
+					# Long Unit Identifier
+					'speed-kilometer-per-hour' => {
+						'name' => q(km/h),
+						'other' => q({0} km/h),
+					},
+					# Core Unit Identifier
+					'kilometer-per-hour' => {
+						'name' => q(km/h),
+						'other' => q({0} km/h),
+					},
+					# Long Unit Identifier
+					'temperature-celsius' => {
+						'name' => q(°Cels.),
+						'other' => q({0}°Cels.),
+					},
+					# Core Unit Identifier
+					'celsius' => {
+						'name' => q(°Cels.),
+						'other' => q({0}°Cels.),
+					},
+					# Long Unit Identifier
+					'volume-liter' => {
+						'name' => q(L),
+						'other' => q({0} L),
+					},
+					# Core Unit Identifier
+					'liter' => {
+						'name' => q(L),
+						'other' => q({0} L),
 					},
 				},
 			} }

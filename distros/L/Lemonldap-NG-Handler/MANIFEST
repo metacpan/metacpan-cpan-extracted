@@ -11,7 +11,6 @@ lib/Lemonldap/NG/Handler/ApacheMP2/DevOps.pm
 lib/Lemonldap/NG/Handler/ApacheMP2/DevOpsCDA.pm
 lib/Lemonldap/NG/Handler/ApacheMP2/DevOpsST.pm
 lib/Lemonldap/NG/Handler/ApacheMP2/Fail.pm
-lib/Lemonldap/NG/Handler/ApacheMP2/FCGIClient.pm
 lib/Lemonldap/NG/Handler/ApacheMP2/Main.pm
 lib/Lemonldap/NG/Handler/ApacheMP2/Menu.pm
 lib/Lemonldap/NG/Handler/ApacheMP2/OAuth2.pm
@@ -84,6 +83,7 @@ t/64-Lemonldap-NG-Handler-PSGI-DevOps-vhostOptions.t
 t/64-Lemonldap-NG-Handler-PSGI-DevOps-with-param.t
 t/64-Lemonldap-NG-Handler-PSGI-DevOps.t
 t/65-Lemonldap-NG-Handler-Nginx-ServiceToken.t
+t/65-Lemonldap-NG-Handler-PSGI-ServiceToken-regexp_only.t
 t/65-Lemonldap-NG-Handler-PSGI-ServiceToken.t
 t/66-Lemonldap-NG-Handler-PSGI-wildcard.t
 t/67-Lemonldap-NG-Handler-PSGI-vhostOptions-with-reload.t

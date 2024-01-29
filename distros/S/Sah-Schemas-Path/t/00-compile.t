@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 80 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 86 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Coerce/perl/To_array/From_str/expand_glob.pm',
@@ -19,13 +19,16 @@ my @module_files = (
     'Data/Sah/Filter/perl/Path/strip_slashes.pm',
     'Data/Sah/Filter/perl/Path/strip_slashes_when_on_unix.pm',
     'Data/Sah/Value/perl/Path/curdir_abs.pm',
+    'Data/Sah/Value/perl/Path/newest_file_in_curdir.pm',
     'Data/Sah/Value/perl/Path/only_file_in_curdir.pm',
     'Data/Sah/Value/perl/Path/only_file_not_dir_in_curdir.pm',
     'Data/Sah/Value/perl/Path/only_subdir_in_curdir.pm',
+    'Data/Sah/Value/perl/Path/only_subdir_not_file_in_curdir.pm',
     'Sah/Schema/dirname.pm',
     'Sah/Schema/dirname/default_curdir.pm',
     'Sah/Schema/dirname/default_curdir_abs.pm',
     'Sah/Schema/dirname/default_only_subdir_in_curdir.pm',
+    'Sah/Schema/dirname/default_only_subdir_not_file_in_curdir.pm',
     'Sah/Schema/dirname/exists.pm',
     'Sah/Schema/dirname/exists/default_only_subdir_in_curdir.pm',
     'Sah/Schema/dirname/not_exists.pm',
@@ -35,6 +38,7 @@ my @module_files = (
     'Sah/Schema/dirname/unix/not_exists.pm',
     'Sah/Schema/dirnames/exist.pm',
     'Sah/Schema/filename.pm',
+    'Sah/Schema/filename/default_newest_file_in_curdir.pm',
     'Sah/Schema/filename/default_only_file_in_curdir.pm',
     'Sah/Schema/filename/default_only_file_not_dir_in_curdir.pm',
     'Sah/Schema/filename/exists.pm',
@@ -59,6 +63,7 @@ my @module_files = (
     'Sah/SchemaR/dirname/default_curdir.pm',
     'Sah/SchemaR/dirname/default_curdir_abs.pm',
     'Sah/SchemaR/dirname/default_only_subdir_in_curdir.pm',
+    'Sah/SchemaR/dirname/default_only_subdir_not_file_in_curdir.pm',
     'Sah/SchemaR/dirname/exists.pm',
     'Sah/SchemaR/dirname/exists/default_only_subdir_in_curdir.pm',
     'Sah/SchemaR/dirname/not_exists.pm',
@@ -68,6 +73,7 @@ my @module_files = (
     'Sah/SchemaR/dirname/unix/not_exists.pm',
     'Sah/SchemaR/dirnames/exist.pm',
     'Sah/SchemaR/filename.pm',
+    'Sah/SchemaR/filename/default_newest_file_in_curdir.pm',
     'Sah/SchemaR/filename/default_only_file_in_curdir.pm',
     'Sah/SchemaR/filename/default_only_file_not_dir_in_curdir.pm',
     'Sah/SchemaR/filename/exists.pm',

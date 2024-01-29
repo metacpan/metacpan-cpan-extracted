@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Agq - Package for language Aghem
 
 package Locale::CLDR::Locales::Agq;
 # This file auto generated from Data\common\main\agq.xml
-#	on Tue  5 Dec 12:59:58 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'agq' => 'Aghem',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Àndolà',
  			'AE' => 'Yùnaetɛ Alab ɛmelɛ̀',
@@ -217,7 +217,6 @@ has 'display_name_region' => (
  			'MD' => 'Mòodovà',
  			'MG' => 'Màdàgasɨkà',
  			'MH' => 'Chwɨlà fɨ Mashà',
- 			'MK' => 'Mɨ̀sɨ̀donyìa',
  			'ML' => 'Malè',
  			'MM' => 'Mǐanmà',
  			'MN' => 'Mùŋgolìa',
@@ -333,7 +332,7 @@ has 'characters' => (
 			auxiliary => qr{[q r x]},
 			index => ['A', 'B', 'C', 'D', 'E', 'Ɛ', 'F', 'G', 'H', 'I', 'Ɨ', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'S', 'T', 'U', 'Ʉ', 'V', 'W', 'Y', 'Z', 'ʔ'],
 			main => qr{[a à â ǎ ā b c d e è ê ě ē ɛ {ɛ̀} {ɛ̂} {ɛ̌} {ɛ̄} f g h i ì î ǐ ī ɨ {ɨ̀} {ɨ̂} {ɨ̌} {ɨ̄} k l m n ŋ o ò ô ǒ ō ɔ {ɔ̀} {ɔ̂} {ɔ̌} {ɔ̄} p s t u ù û ǔ ū ʉ {ʉ̀} {ʉ̂} {ʉ̌} {ʉ̄} v w y z ʔ]},
-			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT

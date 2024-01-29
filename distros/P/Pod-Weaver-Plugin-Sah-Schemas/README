@@ -199,9 +199,9 @@ NAME
     Sah::Schemas::* distribution
 
 VERSION
-    This document describes version 0.074 of
+    This document describes version 0.078 of
     Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution
-    Pod-Weaver-Plugin-Sah-Schemas), released on 2023-07-15.
+    Pod-Weaver-Plugin-Sah-Schemas), released on 2024-01-08.
 
 SYNOPSIS
     In your weaver.ini:
@@ -222,6 +222,28 @@ DESCRIPTION
     It does the following to "Sah/Schema/*" in lib .pm files:
 
     *   Add "DESCRIPTION" POD section schema's description
+
+CONFIGURATION
+  show_source
+    Bool. Default true. If set to true, will add a "SAH SCHEMA DEFINITION"
+    section containing the source (dump) of the schema. Examples will be
+    stripped.
+
+  include_schema_module
+    Filter only certain scenario modules that get processed. Can be
+    specified multiple times. The "Sah::Schema::" prefix can be omitted.
+
+  exclude_schema_module
+    Exclude certain scenario modules from being processed. Can be specified
+    multiple times. The "Sah::Schems::" prefix can be omitted.
+
+  include_schemas_module
+    Filter only certain scenario modules that get processed. Can be
+    specified multiple times. The "Sah::Schemas::" prefix can be omitted.
+
+  exclude_schemas_module
+    Exclude certain scenario modules from being processed. Can be specified
+    multiple times. The "Sah::Schemas::" prefix can be omitted.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -259,8 +281,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022, 2020, 2019, 2016 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2024, 2023, 2022, 2020, 2019, 2016 by
+    perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

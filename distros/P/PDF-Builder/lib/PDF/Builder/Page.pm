@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Pages';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.025'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use Carp;
 use POSIX qw(floor);
@@ -55,11 +55,15 @@ PDF::Builder::Page - Methods to interact with individual pages
     
 =head1 METHODS
 
+=head2 new
+
+    $page = PDF::Builder::Page->new($pdf, $parent, $index)
+
 =over
 
-=item $page = PDF::Builder::Page->new($pdf, $parent, $index)
-
 Returns a page object (called from $pdf->page()).
+
+=back
 
 =cut
 
@@ -94,9 +98,15 @@ sub new {
     return $self;
 }
 
-#=item $page = PDF::Builder::Page->coerce($pdf, $pdfpage)
+#=head2 coerce
+#
+#    $page = PDF::Builder::Page->coerce($pdf, $pdfpage)
+#
+#=over
 #
 #Returns a page object converted from $pdfpage (called from $pdf->open_page()).
+#
+#=back
 #
 #=cut
 
@@ -111,9 +121,15 @@ sub coerce {
     return $self;
 }
 
-#=item $page->update()
+#=head2 update
+#
+#    $page->update()
+#
+#=over
 #
 #Marks a page to be updated (by $pdf->update()).
+#
+#=back
 #
 #=cut
 
@@ -133,16 +149,18 @@ sub update {
     return $self;
 }
 
-=back
-
 =head2 Page Size Methods
+
+=head3 userunit
+
+    $page->userunit($value)
 
 =over
 
-=item $page->userunit($value)
-
 Sets the User Unit for this one page.  
 See L<PDF::Builder::Docs/User Units> for more information.
+
+=back
 
 =cut
 
@@ -235,19 +253,25 @@ sub _bbox {
     return @corners;
 }
 
-=item $page->mediabox($alias)
+=head3 mediabox
 
-=item $page->mediabox($alias, 'orient' => 'orientation')
+    $page->mediabox($alias)
 
-=item $page->mediabox($w,$h)
+    $page->mediabox($alias, 'orient' => 'orientation')
 
-=item $page->mediabox($llx,$lly, $urx,$ury)
+    $page->mediabox($w,$h)
 
-=item ($llx,$lly, $urx,$ury) = $page->mediabox()
+    $page->mediabox($llx,$lly, $urx,$ury)
+
+    ($llx,$lly, $urx,$ury) = $page->mediabox()
+
+=over
 
 Sets or gets the Media Box for this one page.  
 See L<PDF::Builder::Docs/Media Box> for more information.
 The method always returns the current bounds (after any set operation).
+
+=back
 
 =cut
 
@@ -255,35 +279,47 @@ sub mediabox {
     return _bbox('MediaBox', @_);
 }
 
-=item ($llx,$lly, $urx,$ury) = $page->get_mediabox()
+=head4 get_mediabox
+
+    ($llx,$lly, $urx,$ury) = $page->get_mediabox()
+
+=over
 
 Gets the Media Box corner coordinates based on best estimates or the default.
 These are in the order given in a mediabox call (4 coordinates).
 
-This method is B<Deprecated>, and will likely be removed in the future. Use
+This method is B<Deprecated>, and has been B<removed>. Use
 the global (C<$pdf>) or page (C<$page>) mediabox() call with no parameters
 instead.
 
+=back
+
 =cut
 
-sub get_mediabox {
-    my $self = shift();
-    return $self->mediabox();
-}
+#sub get_mediabox {
+#    my $self = shift();
+#    return $self->mediabox();
+#}
 
-=item $page->cropbox($alias)
+=head3 cropbox
 
-=item $page->cropbox($alias, 'orient' => 'orientation')
+    $page->cropbox($alias)
 
-=item $page->cropbox($w,$h)
+    $page->cropbox($alias, 'orient' => 'orientation')
 
-=item $page->cropbox($llx,$lly, $urx,$ury)
+    $page->cropbox($w,$h)
 
-=item ($llx,$lly, $urx,$ury) = $page->cropbox()
+    $page->cropbox($llx,$lly, $urx,$ury)
+
+    ($llx,$lly, $urx,$ury) = $page->cropbox()
+
+=over
 
 Sets or gets the Crop Box for this one page.  
 See L<PDF::Builder::Docs/Crop Box> for more information.
 The method always returns the current bounds (after any set operation).
+
+=back
 
 =cut
 
@@ -291,34 +327,46 @@ sub cropbox {
     return _bbox('CropBox', @_);
 }
 
-=item ($llx,$lly, $urx,$ury) = $page->get_cropbox()
+=head4 get_cropbox
+
+    ($llx,$lly, $urx,$ury) = $page->get_cropbox()
+
+=over
 
 Gets the Crop Box based on best estimates or the default.
 
-This method is B<Deprecated>, and will likely be removed in the future. Use
+This method is B<Deprecated>, and has been B<removed>. Use
 the global (C<$pdf>) or page (C<$page>) cropbox() call with no parameters
 instead.
 
+=back
+
 =cut
 
-sub get_cropbox {
-    my $self = shift();
-    return $self->cropbox();
-}
+#sub get_cropbox {
+#    my $self = shift();
+#    return $self->cropbox();
+#}
 
-=item $page->bleedbox($alias)
+=head3 bleedbox
 
-=item $page->bleedbox($alias, 'orient' => 'orientation')
+    $page->bleedbox($alias)
 
-=item $page->bleedbox($w,$h)
+    $page->bleedbox($alias, 'orient' => 'orientation')
 
-=item $page->bleedbox($llx,$lly, $urx,$ury)
+    $page->bleedbox($w,$h)
 
-=item ($llx,$lly, $urx,$ury) = $page->bleedbox()
+    $page->bleedbox($llx,$lly, $urx,$ury)
+
+    ($llx,$lly, $urx,$ury) = $page->bleedbox()
+
+=over
 
 Sets or gets or gets the Bleed Box for this one page.  
 See L<PDF::Builder::Docs/Bleed Box> for more information.
 The method always returns the current bounds (after any set operation).
+
+=back
 
 =cut
 
@@ -326,34 +374,46 @@ sub bleedbox {
     return _bbox('BleedBox', @_);
 }
 
-=item ($llx,$lly, $urx,$ury) = $page->get_bleedbox()
+=head4 get_bleedbox
+
+    ($llx,$lly, $urx,$ury) = $page->get_bleedbox()
+
+=over
 
 Gets the Bleed Box based on best estimates or the default.
 
-This method is B<Deprecated>, and will likely be removed in the future. Use
+This method is B<Deprecated>, and has been B<removed>. Use
 the global (C<$pdf>) or page (C<$page>) bleedbox() call with no parameters
 instead.
 
+=back
+
 =cut
 
-sub get_bleedbox {
-    my $self = shift();
-    return $self->bleedbox();
-}
+#sub get_bleedbox {
+#    my $self = shift();
+#    return $self->bleedbox();
+#}
 
-=item $page->trimbox($alias)
+=head3 trimbox
 
-=item $page->trimbox($alias, 'orient' => 'orientation')
+    $page->trimbox($alias)
 
-=item $page->trimbox($w,$h)
+    $page->trimbox($alias, 'orient' => 'orientation')
 
-=item $page->trimbox($llx,$lly, $urx,$ury)
+    $page->trimbox($w,$h)
 
-=item ($llx,$lly, $urx,$ury) = $page->trimbox()
+    $page->trimbox($llx,$lly, $urx,$ury)
+
+    ($llx,$lly, $urx,$ury) = $page->trimbox()
+
+=over
 
 Sets or gets the Trim Box for this one page.  
 See L<PDF::Builder::Docs/Trim Box> for more information.
 The method always returns the current bounds (after any set operation).
+
+=back
 
 =cut
 
@@ -361,34 +421,46 @@ sub trimbox {
     return _bbox('TrimBox', @_);
 }
 
-=item ($llx,$lly, $urx,$ury) = $page->get_trimbox()
+=head4 get_trimbox
+
+    ($llx,$lly, $urx,$ury) = $page->get_trimbox()
+
+=over
 
 Gets the Trim Box based on best estimates or the default.
 
-This method is B<Deprecated>, and will likely be removed in the future. Use
+This method is B<Deprecated>, and has been B<removed>. Use
 the global (C<$pdf>) or page (C<$page>) trimbox() call with no parameters
 instead.
 
+=back
+
 =cut
 
-sub get_trimbox {
-    my $self = shift();
-    return $self->trimbox();
-}
+#sub get_trimbox {
+#    my $self = shift();
+#    return $self->trimbox();
+#}
 
-=item $page->artbox($alias)
+=head3 artbox
 
-=item $page->artbox($alias, 'orient' => 'orientation')
+    $page->artbox($alias)
 
-=item $page->artbox($w,$h)
+    $page->artbox($alias, 'orient' => 'orientation')
 
-=item $page->artbox($llx,$lly, $urx,$ury)
+    $page->artbox($w,$h)
 
-=item ($llx,$lly, $urx,$ury) = $page->artbox()
+    $page->artbox($llx,$lly, $urx,$ury)
+
+    ($llx,$lly, $urx,$ury) = $page->artbox()
+
+=over
 
 Sets or gets the Art Box for this one page.  
 See L<PDF::Builder::Docs/Art Box> for more information.
 The method always returns the current bounds (after any set operation).
+
+=back
 
 =cut
 
@@ -396,22 +468,32 @@ sub artbox {
     return _bbox('ArtBox', @_);
 }
 
-=item ($llx,$lly, $urx,$ury) = $page->get_artbox()
+=head4 get_artbox
+
+    ($llx,$lly, $urx,$ury) = $page->get_artbox()
+
+=over
 
 Gets the Art Box based on best estimates or the default.
 
-This method is B<Deprecated>, and will likely be removed in the future. Use
+This method is B<Deprecated>, and has been B<removed>. Use
 the global (C<$pdf>) or page (C<$page>) artbox() call with no parameters
 instead.
 
+=back
+
 =cut
 
-sub get_artbox {
-    my $self = shift();
-    return $self->artbox();
-}
+#sub get_artbox {
+#    my $self = shift();
+#    return $self->artbox();
+#}
 
-=item $page->rotate($deg)
+=head3 rotate, rotation
+
+    $page->rotate($deg)
+
+=over
 
 Rotates the page by the given degrees, which must be a multiple of 90.
 An angle that is not a multiple of 90 will be rounded to the nearest 90 
@@ -442,6 +524,8 @@ B<Alternate name:> C<rotation>
 
 This has been added for PDF::API2 compatibility.
 
+=back
+
 =cut
 
 sub rotation { return rotate(@_); } ## no critic
@@ -464,9 +548,13 @@ sub rotate {
     return $self;
 }
 
-=item $page->size($size)  # Set
+=head3 size
 
-=item @rectangle = $page->size()  # Get
+    $page->size($size)  # Set
+
+    @rectangle = $page->size()  # Get
+
+=over
 
 Set the physical page size or return the coordinates of the rectangle enclosing
 the physical page size.
@@ -492,6 +580,8 @@ to the following:
     # Get
     @rectangle = $page->boundaries()->{'media'}->@*;
 
+=back
+
 =cut
    
 sub size {
@@ -505,9 +595,13 @@ sub size {
     }
 }
 
-=item $page = $page->boundaries(%boundaries)
+=head3 boundaries
 
-=item \%boundaries = $page->boundaries()
+    $page = $page->boundaries(%boundaries)
+
+    \%boundaries = $page->boundaries()
+
+=over
 
 Set prepress page boundaries to facilitate printing. Returns the current page 
 boundaries if called without arguments.
@@ -646,6 +740,8 @@ directly as an array.
 
 Finally, the absolute (raw) coordinates of the bottom-left and top-right corners
 of a rectangle can be specified.
+
+=back
 
 =cut
 
@@ -817,11 +913,15 @@ sub precontent {
     return;
 }
 
-=item $gfx = $page->gfx(%opts)
+=head3 gfx, graphics
 
-=item $gfx = $page->gfx($prepend)
+    $gfx = $page->gfx(%opts)
 
-=item $gfx = $page->gfx()
+    $gfx = $page->gfx($prepend)
+
+    $gfx = $page->gfx()
+
+=over
 
 Returns a graphics content object, for drawing paths and shapes. 
 
@@ -880,24 +980,22 @@ at the first call to each object, so that you are starting from a known base.
 This may most easily be done by using $I<type>->restore() and ->save() just
 after creating $I<type>:
 
-=over
-
- $text1 = $page->text(); 
-   $text1->save();
- $grfx1 = $page->gfx();
-   $grfx1->restore();
-   $grfx1->save();
- $text2 = $page->text();
-   $text2->restore();
-   $text2->save();
- $grfx2 = $page->gfx();
-   $grfx1->restore();
-
-=back
+    $text1 = $page->text(); 
+      $text1->save();
+    $grfx1 = $page->gfx();
+      $grfx1->restore();
+      $grfx1->save();
+    $text2 = $page->text();
+      $text2->restore();
+      $text2->save();
+    $grfx2 = $page->gfx();
+      $grfx1->restore();
 
 B<Alternate name:> C<graphics>
 
 This has been added for PDF::API2 compatibility.
+
+=back
 
 =cut
 
@@ -927,8 +1025,8 @@ sub gfx {
 	if (defined $hash{'compress'}) { $compress = $hash{'compress'}; }
     }
     if ($prepend) { $prepend = 1; }
-    $compress //= $self->{' api'}->{'forcecompress'} eq 'flate' ||
-                  $self->{' api'}->{'forcecompress'} =~ m/^[1-9]\d*$/;
+    if ($self->{' api'}->{'forcecompress'} eq 'flate' ||
+        $self->{' api'}->{'forcecompress'} =~ m/^[1-9]\d*$/) { $compress = 1; }
 
     my $gfx = PDF::Builder::Content->new();
     $gfx->compressFlate() if $compress;
@@ -937,11 +1035,15 @@ sub gfx {
     return $gfx;
 }
 
-=item $text = $page->text(%opts)
+=head3 text
 
-=item $text = $page->text($prepend)
+    $text = $page->text(%opts)
 
-=item $text = $page->text()
+    $text = $page->text($prepend)
+
+    $text = $page->text()
+
+=over
 
 Returns a text content object, for writing text.
 See L<PDF::Builder::Content> for details.
@@ -984,6 +1086,8 @@ with graphics (I<gfx>), such as strokecolor, fillcolor, linewidth, linedash,
 and the like. Thus there is some overlap in attributes, and graphics and text
 calls can affect each other.
 
+=back
+
 =cut
 
 sub text {
@@ -1010,8 +1114,8 @@ sub text {
 	if (defined $hash{'compress'}) { $compress = $hash{'compress'}; }
     }
     if ($prepend) { $prepend = 1; }
-    $compress //= $self->{' api'}->{'forcecompress'} eq 'flate' ||
-                  $self->{' api'}->{'forcecompress'} =~ m/^[1-9]\d*$/;
+    if ($self->{' api'}->{'forcecompress'} eq 'flate' ||
+        $self->{' api'}->{'forcecompress'} =~ m/^[1-9]\d*$/) { $compress = 1; }
 
     my $text = PDF::Builder::Content::Text->new();
     $text->compressFlate() if $compress;
@@ -1020,10 +1124,16 @@ sub text {
     return $text;
 }
 
-=item $page = $page->object($object, $x,$y, $scale_x,$scale_y)
+=head3 object
+
+    $page = $page->object($object, $x,$y, $scale_x,$scale_y)
+
+=over
 
 Places an image or other external object (a.k.a. XObject) on the page in the
 specified location.
+
+If C<$x> and C<$y> are omitted, the object will be placed at C<[0, 0]>.
 
 For images, C<$scale_x> and C<$scale_y> represent the width and height of the
 image on the page in points.  If C<$scale_x> is omitted, it will default to 72
@@ -1037,6 +1147,8 @@ If the object to be placed depends on a coordinate transformation (e.g. rotation
 or skew), first create a content object using L</"graphics">, then call
 L<PDF::Builder::Content/"object"> after making the appropriate transformations.
 
+=back
+
 =cut
 
 sub object {
@@ -1045,9 +1157,15 @@ sub object {
     return $self;
 }
 
-=item $ant = $page->annotation()
+=head3 annotation
+
+    $ant = $page->annotation()
+
+=over
 
 Returns a new annotation object.
+
+=back
 
 =cut
 
@@ -1077,7 +1195,11 @@ sub annotation {
     return $ant;
 }
 
-=item $page->resource($type, $key, $obj)
+=head3 resource
+
+    $page->resource($type, $key, $obj)
+
+=over
 
 Adds a resource to the page-inheritance tree.
 
@@ -1091,6 +1213,8 @@ B<Example:>
 B<Note:> You only have to add the required resources if
 they are NOT handled by the *font*, *image*, *shade* or *space*
 methods.
+
+=back
 
 =cut
 
@@ -1143,9 +1267,5 @@ sub ship_out {
 #    }
 #    return $self->SUPER::outobjdeep(@opts);
 #}
-
-=back
-
-=cut
 
 1;

@@ -1,5 +1,15 @@
 Revision history for Spreadsheet-HTML
 
+1.22
+    - update copyright
+
+1.21
+    - update copyright
+    - fix select and list unit tests
+    - sudoku javascript updated to check neighbors of current cell
+    - checkerboard now accepts 'class' param (rotates class names)
+    - checkers() moved and aliased to Spreadsheet::HTML::Presets::Draughts::draughts()
+
 1.20
     - update copyright
     - require HTML::AutoTag v1.06

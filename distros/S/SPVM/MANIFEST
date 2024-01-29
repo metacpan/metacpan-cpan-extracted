@@ -223,7 +223,6 @@ lib/SPVM/Dist.pm
 lib/SPVM/Document/Benchmark.pm
 lib/SPVM/Document/ExchangeAPI.pm
 lib/SPVM/Document/Language.pm
-lib/SPVM/Document/LanguageSpecification.pm
 lib/SPVM/Document/Modules.pm
 lib/SPVM/Document/NativeAPI.pm
 lib/SPVM/Document/NativeAPI/Allocator.pm
@@ -241,7 +240,6 @@ lib/SPVM/Document/NativeAPI/Runtime.pm
 lib/SPVM/Document/NativeAPI/StringBuffer.pm
 lib/SPVM/Document/NativeAPI/Type.pm
 lib/SPVM/Document/NativeClass.pm
-lib/SPVM/Document/NativeModule.pm
 lib/SPVM/Document/Resource.pm
 lib/SPVM/Document/Tutorial.pm
 lib/SPVM/Document/Tutorial/Complex.pm
@@ -520,6 +518,12 @@ t/01_syntax/lib/SPVM/CompileError/Method/MethodNameContainsUnderScoreTwice.spvm
 t/01_syntax/lib/SPVM/CompileError/Method/MethodNameStartDigit.spvm
 t/01_syntax/lib/SPVM/CompileError/Method/TooManyArguments.spvm
 t/01_syntax/lib/SPVM/CompileError/Method/TooManyArgumentsMulnum.spvm
+t/01_syntax/lib/SPVM/CompileError/Modulo/LeftIsNotIntegral.spvm
+t/01_syntax/lib/SPVM/CompileError/Modulo/RemuiLeftIsNotInt.spvm
+t/01_syntax/lib/SPVM/CompileError/Modulo/RemuiRightIsNotInt.spvm
+t/01_syntax/lib/SPVM/CompileError/Modulo/RemulLeftIsNotLong.spvm
+t/01_syntax/lib/SPVM/CompileError/Modulo/RemulRightIsNotLong.spvm
+t/01_syntax/lib/SPVM/CompileError/Modulo/RightIsNotIntegral.spvm
 t/01_syntax/lib/SPVM/CompileError/MultiNumeric/Fields17.spvm
 t/01_syntax/lib/SPVM/CompileError/MultiNumeric/Fields256.spvm
 t/01_syntax/lib/SPVM/CompileError/MultiNumeric/FieldsZero.spvm
@@ -528,12 +532,6 @@ t/01_syntax/lib/SPVM/CompileError/Multiply/RightIsNotNumeric.spvm
 t/01_syntax/lib/SPVM/CompileError/New/Private.spvm
 t/01_syntax/lib/SPVM/CompileError/OArray/AssignNumeric.spvm
 t/01_syntax/lib/SPVM/CompileError/OArray/AssignNumericArray.spvm
-t/01_syntax/lib/SPVM/CompileError/Remainder/LeftIsNotIntegral.spvm
-t/01_syntax/lib/SPVM/CompileError/Remainder/RemuiLeftIsNotInt.spvm
-t/01_syntax/lib/SPVM/CompileError/Remainder/RemuiRightIsNotInt.spvm
-t/01_syntax/lib/SPVM/CompileError/Remainder/RemulLeftIsNotLong.spvm
-t/01_syntax/lib/SPVM/CompileError/Remainder/RemulRightIsNotLong.spvm
-t/01_syntax/lib/SPVM/CompileError/Remainder/RightIsNotIntegral.spvm
 t/01_syntax/lib/SPVM/CompileError/String/AssignNonMutableToMutable.spvm
 t/01_syntax/lib/SPVM/CompileError/String/CharacterAssign.spvm
 t/01_syntax/lib/SPVM/CompileError/Sub/Begin.spvm
@@ -825,6 +823,7 @@ t/02_vm/lib/SPVM/TestCase/Module/Sync/Mutex.spvm
 t/02_vm/lib/SPVM/TestCase/ModuleContainsMultiClass.spvm
 t/02_vm/lib/SPVM/TestCase/ModuleContainsMultiClass/FloatMatrix.spvm
 t/02_vm/lib/SPVM/TestCase/ModuleContainsMultiPackage.spvm
+t/02_vm/lib/SPVM/TestCase/Modulo.spvm
 t/02_vm/lib/SPVM/TestCase/Move.spvm
 t/02_vm/lib/SPVM/TestCase/Mulnum.spvm
 t/02_vm/lib/SPVM/TestCase/MulnumArray.spvm
@@ -874,7 +873,6 @@ t/02_vm/lib/SPVM/TestCase/PrecompileClassAttribute.spvm
 t/02_vm/lib/SPVM/TestCase/Print.spvm
 t/02_vm/lib/SPVM/TestCase/Private.spvm
 t/02_vm/lib/SPVM/TestCase/Ref.spvm
-t/02_vm/lib/SPVM/TestCase/Remainder.spvm
 t/02_vm/lib/SPVM/TestCase/Resource/Mylib1.config
 t/02_vm/lib/SPVM/TestCase/Resource/Mylib1.mode1.config
 t/02_vm/lib/SPVM/TestCase/Resource/Mylib1.native/include/mylib1_source1.h
@@ -914,6 +912,7 @@ t/02_vm/lib/SPVM/TestCase/UseResource/Mylib1.spvm
 t/02_vm/lib/SPVM/TestCase/UseResource/Mylib2.c
 t/02_vm/lib/SPVM/TestCase/UseResource/Mylib2.config
 t/02_vm/lib/SPVM/TestCase/UseResource/Mylib2.spvm
+t/02_vm/lib/SPVM/TestCase/Util/Node.spvm
 t/02_vm/lib/SPVM/TestCase/Util/Thread.config
 t/02_vm/lib/SPVM/TestCase/Util/Thread.cpp
 t/02_vm/lib/SPVM/TestCase/Util/Thread.spvm

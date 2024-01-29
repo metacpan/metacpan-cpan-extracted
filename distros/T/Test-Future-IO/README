@@ -37,6 +37,10 @@ EXPECTATIONS
     object which has additional methods to control the behaviour of that
     invocation.
 
+       $exp = $controller->expect_accept( $fh );
+    
+       $exp = $controller->expect_connect( $fh, $name );
+    
        $exp = $controller->expect_sleep( $secs );
     
        $exp = $controller->expect_sysread( $fh, $len );
@@ -65,8 +69,8 @@ EXPECTATIONS
 
     As a convenience, a syswrite expectation will default to returning a
     future that will complete yielding its length (as is usual for
-    successful writes), and a sleep expectation will return a future that
-    completes yielding nothing.
+    successful writes), and a sleep or connect expectation will return a
+    future that completes yielding nothing.
 
     Testing event-based code with expect_sysread can be fragile, as it
     relies on exact ordering, buffer sizes, and so on. A more flexible

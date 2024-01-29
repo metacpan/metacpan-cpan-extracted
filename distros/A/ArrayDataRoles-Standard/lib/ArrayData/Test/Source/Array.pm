@@ -5,9 +5,9 @@ use strict;
 use alias::module 'ArrayData::Array';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-01'; # DATE
+our $DATE = '2024-01-15'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 
 1;
@@ -25,7 +25,7 @@ ArrayData::Test::Source::Array - Alias package for ArrayData::Array
 
 =head1 VERSION
 
-This document describes version 0.007 of ArrayData::Test::Source::Array (from Perl distribution ArrayDataRoles-Standard), released on 2021-12-01.
+This document describes version 0.008 of ArrayData::Test::Source::Array (from Perl distribution ArrayDataRoles-Standard), released on 2024-01-15.
 
 =head1 HOMEPAGE
 
@@ -56,13 +56,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

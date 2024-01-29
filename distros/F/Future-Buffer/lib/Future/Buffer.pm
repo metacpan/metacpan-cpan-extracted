@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
 
-package Future::Buffer 0.05;
+package Future::Buffer 0.06;
 
 use v5.14;
 use warnings;
@@ -123,11 +123,10 @@ sub _fill
    # Arm the fill loop
    my $f = $self->{fill_f} = $fill->(); # TODO: give it a size hint?
 
-   no warnings $^V ge v5.28 ? 'shadow' : 'misc';
-   weaken( my $self = $self );
+   weaken( my $weakself = $self );
 
    $f->on_done( sub {
-      $self or return;
+      my $self = $weakself or return;
 
       undef $self->{fill_f};
 

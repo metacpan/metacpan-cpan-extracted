@@ -849,20 +849,30 @@ class TestCase::Method {
           return 0;
         }
       }
+      
       {
         my $value = &optional_args_byte0(127);
         unless ($value == 127) {
           return 0;
         }
       }
+      
       {
-        my $value = &optional_args_byte_min;
+        my $value = &optional_args_byte_max;
         unless ($value == 127) {
           return 0;
         }
       }
+      
       {
-        my $value = &optional_args_byte_max;
+        my $value = &optional_args_byte_min;
+        unless ($value == -128) {
+          return 0;
+        }
+      }
+      
+      {
+        my $value = &optional_args_byte_min_long;
         unless ($value == -128) {
           return 0;
         }
@@ -878,20 +888,30 @@ class TestCase::Method {
           return 0;
         }
       }
+      
       {
         my $value = &optional_args_short0(32767);
         unless ($value == 32767) {
           return 0;
         }
       }
+      
       {
-        my $value = &optional_args_short_min;
+        my $value = &optional_args_short_max;
         unless ($value == 32767) {
           return 0;
         }
       }
+      
       {
-        my $value = &optional_args_short_max;
+        my $value = &optional_args_short_min;
+        unless ($value == -32768) {
+          return 0;
+        }
+      }
+      
+      {
+        my $value = &optional_args_short_min_long;
         unless ($value == -32768) {
           return 0;
         }
@@ -906,20 +926,30 @@ class TestCase::Method {
           return 0;
         }
       }
+      
       {
         my $value = &optional_args_int0(2147483647);
         unless ($value == 2147483647) {
           return 0;
         }
       }
+      
       {
-        my $value = &optional_args_int_min;
+        my $value = &optional_args_int_max;
         unless ($value == 2147483647) {
           return 0;
         }
       }
+      
       {
-        my $value = &optional_args_int_max;
+        my $value = &optional_args_int_min;
+        unless ($value == -2147483648) {
+          return 0;
+        }
+      }
+      
+      {
+        my $value = &optional_args_int_min_long;
         unless ($value == -2147483648) {
           return 0;
         }
@@ -934,6 +964,14 @@ class TestCase::Method {
           return 0;
         }
       }
+      
+      {
+        my $value = &optional_args_long_int_minus1;
+        unless ($value == -1) {
+          return 0;
+        }
+      }
+      
       {
         my $value = &optional_args_long0(9223372036854775807L);
         unless ($value == 9223372036854775807L) {
@@ -968,9 +1006,24 @@ class TestCase::Method {
           return 0;
         }
       }
+      
       {
         my $value = &optional_args_float0(2.5f);
         unless ($value == 2.5f) {
+          return 0;
+        }
+      }
+      
+      {
+        my $value = &optional_args_float_int_minus1;
+        unless ($value == -1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $value = &optional_args_float_long_minus1;
+        unless ($value == -1) {
           return 0;
         }
       }
@@ -984,9 +1037,31 @@ class TestCase::Method {
           return 0;
         }
       }
+      
       {
         my $value = &optional_args_double0(2147483647.55);
         unless ($value == 2147483647.55) {
+          return 0;
+        }
+      }
+      
+      {
+        my $value = &optional_args_double_int_minus1;
+        unless ($value == -1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $value = &optional_args_double_long_minus1;
+        unless ($value == -1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $value = &optional_args_double_float_minus1_5;
+        unless ($value == -1.5) {
           return 0;
         }
       }
@@ -1124,34 +1199,49 @@ class TestCase::Method {
   static method optional_args_byte0 : byte ($arg : byte = 0) {
     return $arg;
   }
-  static method optional_args_byte_min : byte ($arg : byte = 127) {
+  static method optional_args_byte_max : byte ($arg : byte = 127) {
     return $arg;
   }
-  static method optional_args_byte_max : byte ($arg : byte = -128) {
+  static method optional_args_byte_min : byte ($arg : byte = -128) {
     return $arg;
   }
-
+  
+  static method optional_args_byte_min_long : byte ($arg : byte = -128L) {
+    return $arg;
+  }
+  
   static method optional_args_short0 : short ($arg : short = 0) {
     return $arg;
   }
-  static method optional_args_short_min : short ($arg : short = 32767) {
+  static method optional_args_short_max : short ($arg : short = 32767) {
     return $arg;
   }
-  static method optional_args_short_max : short ($arg : short = -32768) {
+  static method optional_args_short_min : short ($arg : short = -32768) {
+    return $arg;
+  }
+  
+  static method optional_args_short_min_long : short ($arg : short = -32768L) {
     return $arg;
   }
 
   static method optional_args_int0 : int ($arg : int = 0) {
     return $arg;
   }
-  static method optional_args_int_min : int ($arg : int = 2147483647) {
+  static method optional_args_int_max : int ($arg : int = 2147483647) {
     return $arg;
   }
-  static method optional_args_int_max : int ($arg : int = -2147483648) {
+  static method optional_args_int_min : int ($arg : int = -2147483648) {
     return $arg;
   }
-
+  
+  static method optional_args_int_min_long : int ($arg : int = -2147483648L) {
+    return $arg;
+  }
+  
   static method optional_args_long0 : long ($arg : long = 0) {
+    return $arg;
+  }
+  static method optional_args_long_int_minus1 : long ($arg : long = -1) {
     return $arg;
   }
   static method optional_args_long_min : long ($arg : long = 9223372036854775807L) {
@@ -1168,7 +1258,27 @@ class TestCase::Method {
     return $arg;
   }
   
+  static method optional_args_float_int_minus1 : float ($arg : float = -1) {
+    return $arg;
+  }
+  
+  static method optional_args_float_long_minus1 : float ($arg : float = -1L) {
+    return $arg;
+  }
+  
   static method optional_args_double0 : double ($arg : double = 2147483647.5) {
+    return $arg;
+  }
+  
+  static method optional_args_double_int_minus1 : double ($arg : double = -1) {
+    return $arg;
+  }
+  
+  static method optional_args_double_long_minus1 : double ($arg : double = -1L) {
+    return $arg;
+  }
+  
+  static method optional_args_double_float_minus1_5 : double ($arg : double = -1.5f) {
     return $arg;
   }
   
@@ -1594,6 +1704,19 @@ class TestCase::Method {
         return 0;
       }
     }
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method call_recursive : int () {
+    
+    eval { TestCase::Simple->call_recursive; }
+    
+    unless (Fn->contains($@, "Deep recursion occurs.")) {
+      return 0;
+    }
+    
     $@ = undef;
     
     return 1;

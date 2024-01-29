@@ -4,25 +4,17 @@ package Connector::Proxy::HTTP;
 
 use strict;
 use warnings;
+use Data::Dumper;
 use English;
 use Template;
+use URI::Escape;
 
 use Moose;
 extends 'Connector::Proxy';
-with qw( 
-    Connector::Role::SSLUserAgent 
+with qw(
+    Connector::Role::SSLUserAgent
     Connector::Role::LocalPath
 );
- 
-# If not set, the path items are added to the base url as uri path
-# if set, the keys from named parameters are combined and used as query string
-# not implemented
-#has named_parameters => (
-#    is => 'rw',
-#    isa => 'ArrayRef|Str|Undef',
-#    trigger => \&_convert_parameters,
-#    );
- 
 
 has content => (
     is  => 'rw',
@@ -50,6 +42,12 @@ has http_auth => (
     isa => 'HashRef',
     );
 
+has query_param => (
+    is  => 'rw',
+    isa => 'HashRef',
+    predicate => 'has_query_param',
+    );
+
 has undef_on_404 => (
     is  => 'ro',
     isa => 'Bool',
@@ -63,47 +61,18 @@ has chomp_result => (
     );
 
 
-# If named_parameters is set using a string (necessary atm for Config::Std)
-# its converted to an arrayref. Might be removed if Config::* improves
-# This might create indefinite loops if something goes wrong on the conversion!
-sub _convert_parameters {
-    my ( $self, $new, $old ) = @_;
-
-    # Test if the given value is a non empty scalar
-    if ($new && !ref $new && (!$old || $new ne $old)) {
-        my @attrs = split(" ", $new);
-        $self->named_parameters( \@attrs )
-    }
-
-}
- 
 sub get {
     my $self = shift;
+    my $args = shift;
 
-    my @args = $self->_build_path( shift );
-
-    my $url = $self->LOCATION();
-    if (@args) {
-        $url .= '/'.join('/', @args);
-    }
+    my $url = $self->_sanitize_path( $args );
     $self->log()->debug('Make LWP call to ' . $url );
 
     my $req = HTTP::Request->new('GET' => $url);
-
-    # use basic auth if supplied
-    my $auth=$self->http_auth();
-    if ($auth){
-        $req->authorization_basic($auth->{user},$auth->{pass});
-    }
-
-    # extra headers
-    my $header = $self->header();
-    foreach my $key (%{$header}) {
-        $req->header($key, $header->{$key} );
-    }
+    $self->_init_request( $req );
 
     my $response = $self->agent()->request($req);
-    
+
     if (!$response->is_success) {
         if ( $response->code == 404 && $self->undef_on_404()) {
             $self->log()->warn("Resource not found");
@@ -119,10 +88,10 @@ sub get {
 sub set {
 
     my $self = shift;
-    my $file = shift;
+    my $args = shift;
     my $data = shift;
     # build url
-    my $url = $self->_sanitize_path( $file, $data );
+    my $url = $self->_sanitize_path( $args, $data );
     # create content from template
     my $content;
     if ($self->content()) {
@@ -141,21 +110,7 @@ sub set {
 
     # create request
     my $req = HTTP::Request->new($self->http_method() => $url);
-    # use basic auth if supplied
-    my $auth=$self->http_auth();
-    if ($auth){
-        $req->authorization_basic($auth->{user},$auth->{pass});
-    }
-    # set content_type if supplied
-    if ($self->content_type()){
-        $req->content_type($self->content_type());
-    }
-
-    # extra headers
-    my $header = $self->header();
-    foreach my $key (%{$header}) {
-        $req->header($key, $header->{$key} );
-    }
+    $self->_init_request( $req );
 
     # set generated content
     $req->content($content);
@@ -187,15 +142,46 @@ sub get_meta {
 }
 
 
+sub _init_request {
+
+    my $self = shift;
+    my $req = shift;
+
+    # use basic auth if supplied
+    my $auth = $self->http_auth();
+    if ($auth){
+        $req->authorization_basic($auth->{user}, $auth->{pass});
+    }
+
+    # set content_type if supplied (does not make much sense with GET)
+    if ($self->content_type()){
+        $req->content_type($self->content_type());
+    }
+
+    # extra headers
+    my $header = $self->header();
+    foreach my $key (%{$header}) {
+        $req->header($key, $header->{$key} );
+    }
+
+    $self->log()->trace(Dumper $req) if ($self->log()->is_trace());
+
+}
+
 sub _sanitize_path {
 
     my $self = shift;
     my $inargs = shift;
-    my $data = shift;
+    my $data = shift || {};
 
     my @args = $self->_build_path_with_prefix( $inargs );
 
-    my $file = $self->_render_local_path( \@args, $data );
+    my $file;
+    if ($self->file() || $self->path()) {
+        $file = $self->_render_local_path( \@args, $data );
+    } else {
+        $file = join("/", @args);
+    }
 
     my $filename = $self->LOCATION();
     if (defined $file && $file ne "") {
@@ -203,6 +189,16 @@ sub _sanitize_path {
     }
 
     $self->log()->debug('Filename evaluated to ' . $filename);
+
+    if ($self->has_query_param()) {
+        my $param = $self->query_param;
+        my @chunks = map {
+            $_ .'='. uri_escape($param->{$_}//'')
+        } keys %$param;
+        my $qsa = join('&', @chunks);
+        $self->log()->debug('Attach extra query params ' . $qsa);
+        $filename .= '?'.$qsa;
+    }
 
     return $filename;
 }
@@ -222,6 +218,7 @@ no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;
+
 __END__
 
 =head1 NAME
@@ -248,9 +245,20 @@ See Connector::Role::SSLUserAgent for SSL and HTTP related settings
 
 =over
 
-=item named_parameters
+=item file/path
 
-not implemented yet
+The default behaviour is to append the list of given path arguments to
+LOCATION as url path components "as is" by joining them with a slash.
+
+If you set I<file> or I<path>, the value is taken as a template string,
+rendered and appended to LOCATION. In this case the path arguments are
+NOT appended to the location but the.
+See Connector::Role::LocalPath for details on the template part.
+
+=item query_param
+
+A HashRef, the key/value pairs are appended to the URI as query string.
+Any values are escaped using uri_escape, keys are taken as is.
 
 =item header
 
@@ -279,11 +287,6 @@ will be obeyed.
 
 =over
 
-=item file/path
-
-You can append a templated string to the LOCATION by setting I<file>,
-I<path> or simply pass I<ARGS>. See Connector::Role::LocalPath for details.
-
 =item content
 
 A template toolkit string to generate the payload, receives the payload
@@ -298,7 +301,6 @@ The Content-Type header to use, default is no header.
 The http method to use, default is PUT.
 
 =back
-
 
 =head1 Result Handling
 

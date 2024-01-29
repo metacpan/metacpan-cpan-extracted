@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ar::Any::Ae - Package for language Arabic
 
 package Locale::CLDR::Locales::Ar::Any::Ae;
 # This file auto generated from Data\common\main\ar_AE.xml
-#	on Tue  5 Dec  1:00:37 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'CI@alt=variant' => 'ساحل العاج',
  			'TL@alt=variant' => 'التيمور الشرقية',
@@ -41,7 +41,7 @@ has 'default_numbering_system' => (
 	is			=> 'ro',
 	isa			=> Str,
 	init_arg	=> undef,
-	default		=> 'arab',
+	default		=> 'latn',
 );
 
 has 'currencies' => (
@@ -106,8 +106,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'eras' => (

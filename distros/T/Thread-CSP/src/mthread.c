@@ -18,14 +18,9 @@
 #  include <thread.h>
 #endif
 
-static Refcount thread_counter;
-
 void global_init(pTHX) {
-	if (!refcount_inited(&thread_counter)) {
-		refcount_init(&thread_counter, 1);
+	mark_clonable_pvs("Thread::CSP::Channel");
 
-		mark_clonable_pvs("Thread::CSP::Channel");
-	}
 	if (!PL_perl_destruct_level)
 		PL_perl_destruct_level = 1;
 
@@ -36,14 +31,6 @@ void global_init(pTHX) {
 		sv_setpvs(threads, "threads::csp");
 
 	mark_clonable_pvs("threads::shared::tie");
-}
-
-static void thread_count_inc() {
-	refcount_inc(&thread_counter);
-}
-
-static void thread_count_dec() {
-	refcount_dec(&thread_counter);
 }
 
 void boot_DynaLoader(pTHX_ CV* cv);
@@ -68,8 +55,6 @@ static void*
 run_thread(void* arg) {
 	static const char* argv[] = { "perl", "-e", "0", NULL };
 	static const int argc = sizeof argv / sizeof *argv - 1;
-
-	thread_count_inc();
 
 	mthread* thread = (mthread*)arg;
 	struct promise* at_inc_promise = thread->at_inc;
@@ -117,12 +102,9 @@ run_thread(void* arg) {
 	CATCH {
 		promise_set_exception(output, ERRSV);
 	}
-	promise_refcount_dec(output);
 
 	perl_destruct(my_perl);
 	perl_free(my_perl);
-
-	thread_count_dec();
 
 	return NULL;
 }

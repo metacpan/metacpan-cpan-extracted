@@ -10,9 +10,9 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Capture::Tiny' => '0',
                                       'Carp' => '0',
                                       'File::Spec' => '0',
-                                      'IO::CaptureOutput' => '0',
                                       'IO::File' => '0',
                                       'Mail::Address' => '0',
                                       'Net::DNS' => '0',

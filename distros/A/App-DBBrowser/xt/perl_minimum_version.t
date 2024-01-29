@@ -22,7 +22,7 @@ close $fh_m or die $!;
 my $pod_minimum;
 open my $fh_p, '<', 'bin/db-browser' or die $!;
 while ( my $line = <$fh_p> ) {
-    if ( $line =~ /^=head2\s+Perl\s+version/ .. $line =~ /^=head2\s+Modules/ ) {
+    if ( $line =~ /^=head2\s+Perl\s+[Vv]ersion/ .. $line =~ /^=head2\s+Modules/ ) {
         if ( $line =~ /(5\.\d\d?\.\d+)\s/ ) {
             my $version  = Perl::Version->new( $1 );
             $pod_minimum = $version->numify;

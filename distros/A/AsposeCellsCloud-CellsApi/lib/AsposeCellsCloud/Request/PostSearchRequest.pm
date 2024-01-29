@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostSearchRequest.File : File to upload  ,
-# PostSearchRequest.text :   ,
-# PostSearchRequest.password :   ,
-# PostSearchRequest.sheetname :   ,
-# PostSearchRequest.checkExcelRestriction :    
+# PostSearchRequest.File : Find content  ,
+# PostSearchRequest.text : Find content  ,
+# PostSearchRequest.password : The password needed to open an Excel file.  ,
+# PostSearchRequest.sheetname : The worksheet name. Locate the specified text content in the worksheet.  ,
+# PostSearchRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_search' } = { 
-    	summary => 'Search specify the text from excel files.',
+    	summary => 'Search for specified text within Excel files.',
         params => $params,
         returns => 'ARRAY[TextItem]',
     };
@@ -138,35 +138,35 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'File to upload',
+     	description => 'Find content',
      	format => '',
      	read_only => '',
      		},
      'text' => {
      	datatype => 'string',
      	base_name => 'text',
-     	description => '',
+     	description => 'Find content',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'sheetname' => {
      	datatype => 'string',
      	base_name => 'sheetname',
-     	description => '',
+     	description => 'The worksheet name. Locate the specified text content in the worksheet.',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
-     	description => '',
+     	description => 'Whether check restriction of excel file when user modify cells related objects.',
      	format => '',
      	read_only => '',
      		},    

@@ -7,9 +7,9 @@ use warnings;
 use Role::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-25'; # DATE
+our $DATE = '2024-01-15'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 with 'TableDataRole::Spec::Basic';
 
@@ -20,13 +20,26 @@ sub new {
     die "Unknown argument(s): ". join(", ", sort keys %args)
         if keys %args;
 
-    bless {
+    my $self = {
         aoh => $aoh,
         pos => 0,
         # buffer => undef,
         # column_names => undef,
         # column_idxs  => undef,
-    }, $class;
+    };
+
+    $self->{column_names} = [];
+    $self->{column_idxs} = {};
+    if (@$aoh) {
+        my $row = $aoh->[0];
+        my $i = -1;
+        for (sort keys %$row) {
+            push @{ $self->{column_names} }, $_;
+            $self->{column_idxs}{$_} = ++$i;
+        }
+    }
+
+    bless $self, $class;
 }
 
 sub get_column_count {
@@ -40,19 +53,6 @@ sub get_column_count {
 
 sub get_column_names {
     my $self = shift;
-    unless ($self->{column_names}) {
-        my $aoh = $self->{aoh};
-        $self->{column_names} = [];
-        $self->{column_idxs} = {};
-        if (@$aoh) {
-            my $row = $aoh->[0];
-            my $i = -1;
-            for (sort keys %$row) {
-                push @{ $self->{column_names} }, $_;
-                $self->{column_idxs}{$_} = ++$i;
-            }
-        }
-    }
     wantarray ? @{ $self->{column_names} } : $self->{column_names};
 }
 
@@ -112,7 +112,7 @@ TableDataRole::Source::AOH - Get table data from an array of hashes
 
 =head1 VERSION
 
-This document describes version 0.019 of TableDataRole::Source::AOH (from Perl distribution TableDataRoles-Standard), released on 2023-11-25.
+This document describes version 0.021 of TableDataRole::Source::AOH (from Perl distribution TableDataRoles-Standard), released on 2024-01-15.
 
 =head1 SYNOPSIS
 
@@ -166,7 +166,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

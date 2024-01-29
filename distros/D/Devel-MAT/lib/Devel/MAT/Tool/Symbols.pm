@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2017-2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Symbols 0.51;
+package Devel::MAT::Tool::Symbols 0.52;
 
 use v5.14;
 use warnings;
@@ -177,7 +177,19 @@ sub _versionof
    my $versiongv = $stash->value( 'VERSION' ) or return "";
    my $versionsv = $versiongv->scalar or return "";
 
-   my $version = $versionsv->pv // $versionsv->nv // $versionsv->uv;
+   my $rv;
+   my $version;
+   if( $versionsv->type eq "REF" and 
+      ( $rv = $versionsv->rv )->blessed and 
+      $rv->blessed->stashname eq "version" ) {
+      # Stringify a "version" object
+      $versionsv = $rv->value( "original" );
+      $version = ( $versionsv->pv // $versionsv->nv // $versionsv->uv );
+      $version =~ m/^v/ or $version = "v$version";
+   }
+   else {
+      $version = $versionsv->pv // $versionsv->nv // $versionsv->uv;
+   }
    return " " . Devel::MAT::Cmd->format_value( $version );
 }
 

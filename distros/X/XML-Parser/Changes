@@ -1,5 +1,15 @@
 Revision history for Perl extension XML::Parser.
 
+2.47 2023-12-28 (by Todd Rinaldo)
+    - #84 use $fh instead of $foo
+	- #85 Fix typo in documentation
+	- #89 Devel::CheckLib to from 0.99 -> 1.14
+	- Devel::CheckLibn 1.16
+	- #91 POD fix for verbatim text
+	- #97 Add a LICENSE file
+	- #94 Don't ship Expat/Makefile
+	- Various github workflow improvements. Windows is still not working.
+
 2.46 2019-09-24 (by Todd Rinaldo)
     - use foreach not for for loops
     - produce README.md so travis will show up on github

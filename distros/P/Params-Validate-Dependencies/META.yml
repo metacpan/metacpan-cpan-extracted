@@ -31,5 +31,5 @@ requires:
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies/issues
   repository: https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies
-version: '1.41'
+version: '2.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

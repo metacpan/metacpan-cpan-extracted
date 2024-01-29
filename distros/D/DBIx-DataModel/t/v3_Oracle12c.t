@@ -23,6 +23,10 @@ SKIP: {
   # connect to DB
   my $dbh = DBI->connect(undef, undef, undef, 
                          {RaiseError => 1, AutoCommit => 1});
+  my $server_version = $dbh->func('ora_server_version');
+  $server_version->[0] >= 12
+    or plan skip_all => "need Oracle v12 or higher; this is only version " . join(",", @$server_version);
+
   ORA->dbh($dbh);
   my $source = ORA->table('All_tables');
 

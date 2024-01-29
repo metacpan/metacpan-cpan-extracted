@@ -1,5 +1,5 @@
 ---
-abstract: 'Dumps pre defined scripts!'
+abstract: 'Filehandle made simple.'
 author:
   - 'Ariel Vieira <ariel.vieira@yandex.com>'
 build_requires:
@@ -16,6 +16,9 @@ name: App-FileComposer
 provides:
   App::FileComposer:
     file: lib/App/FileComposer.pm
-    version: '0.02'
-version: '0.02'
+    version: '1.00'
+requires:
+  Getopt::Long: '2.52'
+  Progress::Awesome: '0.01'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

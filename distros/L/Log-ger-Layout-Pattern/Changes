@@ -1,3 +1,9 @@
+0.009   2024-01-22  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Remove leading space in %l if caller subroutine is empty
+          (thanks Vladimir Varlamov).
+
+
 0.008   2021-08-24  Released-By: PERLANCAR; Urgency: medium
 
 	- Fix stack trace/location for %F, %L, %l, %C.

@@ -6,7 +6,7 @@ use Mouse;
 use JSON qw(from_json to_json);
 use MIME::Base64 qw(encode_base64url decode_base64url);
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.18.0';
 
 extends qw(
   Lemonldap::NG::Portal::2F::Register::Base
@@ -92,6 +92,7 @@ sub run {
                     )
                   )
                 {
+                    $self->markRegistered($req);
                     return [
                         200,
                         [

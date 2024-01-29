@@ -55,6 +55,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies"
       }
    },
-   "version" : "1.41",
+   "version" : "2.00",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

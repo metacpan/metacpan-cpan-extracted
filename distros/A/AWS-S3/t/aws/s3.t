@@ -27,7 +27,7 @@ use_ok('AWS::S3');
 my $s3 = AWS::S3->new(
   access_key_id     => $ENV{AWS_ACCESS_KEY_ID}     // 'foo',
   secret_access_key => $ENV{AWS_SECRET_ACCESS_KEY} // 'bar',
-  endpoint          => 'bad.hostname',
+  endpoint          => 'bad.hostname.',
 );
 
 my $bucket_name = "aws-s3-test-" . int(rand() * 1_000_000) . '-' . time() . "-foo";
@@ -58,7 +58,7 @@ subtest 'create bucket strange temporary redirect' => sub {
 
             # first PUT request, send a forward
             is( $req->method, 'PUT', 'bucket creation with PUT request' );
-            is( $req->uri->as_string, 'http://bar.bad.hostname/', '... and with correct URI' );
+            is( $req->uri->as_string, 'http://bar.bad.hostname./', '... and with correct URI' );
 
             $i++;
             return HTTP::Response->new(
@@ -81,7 +81,7 @@ subtest 'create bucket strange temporary redirect' => sub {
         else {
             # there is a call to ->bucket, which does ->buckets, which is empty.
             is( $req->method, 'GET', '->buckets with GET' );
-            is( $req->uri->as_string, 'http://bad.hostname/', '... and with correct URI' );
+            is( $req->uri->as_string, 'http://bad.hostname./', '... and with correct URI' );
 
             # we need to return XML in the body or xpc doesn't work
             return Mocked::HTTP::Response->new( 200,

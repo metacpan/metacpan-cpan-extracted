@@ -2,18 +2,19 @@
 
 use lib 'inc';
 
-use Net::SSLeay;
+use Net::SSLeay qw( ERROR_SSL );
 use Test::Net::SSLeay qw(
     can_fork data_file_path initialise_libssl is_protocol_usable new_ctx
     tcp_socket
 );
 
 use Storable;
+use English qw( $EVAL_ERROR $OSNAME $PERL_VERSION -no_match_vars );
 
 if (not can_fork()) {
     plan skip_all => "fork() not supported on this system";
 } else {
-    plan tests => 58;
+    plan tests => 67;
 }
 
 initialise_libssl();
@@ -34,6 +35,13 @@ my %usable =
 my $pid;
 alarm(30);
 END { kill 9,$pid if $pid }
+
+# For old Perls on Windows. See GH-356 for the details.
+sub maybe_sleep
+{
+    sleep(1) if $OSNAME eq 'MSWin32' && $PERL_VERSION < 5.020000;
+    return;
+}
 
 my (%server_stats, %client_stats);
 
@@ -142,6 +150,7 @@ sub server_remove_cb
 my ($server_ctx, $client_ctx, $server_ssl, $client_ssl);
 
 my $server = tcp_socket();
+my $proto_count = 0;
 
 sub server
 {
@@ -212,6 +221,14 @@ sub server
 		set_server_stat($round, 'old_session_is_resumable', $is_resumable);
 	    }
 
+	    if (defined &Net::SSLeay::SESSION_get0_cipher) {
+		my $cipher = Net::SSLeay::SESSION_get0_cipher($sess);
+		my $name = Net::SSLeay::CIPHER_get_name($cipher);
+		my $get0_cipher_ok = (length $name && $name ne '(NONE)') ? 1 : 0;
+		diag("SESSION_get0_cipher not ok: round $round, name: '$name'") unless $get0_cipher_ok;
+		set_server_stat($round, 'get0_cipher', $get0_cipher_ok);
+	    }
+
 	    Net::SSLeay::SESSION_free($sess) unless $ret; # Not cached, undo get1
 	    Net::SSLeay::free($ssl);
 	    close($cl) || die("server close: $!");
@@ -241,6 +258,7 @@ sub client {
 	( my $proto = $round ) =~ s/-.*?$//;
 	next unless $usable{$proto};
 
+	maybe_sleep();
 	$cl = $server->connect();
 
 	$ctx = new_ctx( $proto, $proto );
@@ -256,6 +274,14 @@ sub client {
 	Net::SSLeay::set_fd($ssl, $cl);
 	my $ret = Net::SSLeay::connect($ssl);
 	if ($ret <= 0) {
+	    # Connection might fail due to attempted use of algorithm in key
+	    # exchange that is forbidden by security policy, resulting in ERROR_SSL
+	    my $ssl_err = Net::SSLeay::get_error($ssl, $ret);
+	    if ($ssl_err == ERROR_SSL) {
+	        diag("Protocol $proto, connect() failed, maybe due to security policy");
+	        $usable{$round} = 0;
+	        next;
+	    }
 	    diag("Protocol $proto, connect() returns $ret, Error: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error()));
 	}
 	my $msg = Net::SSLeay::read($ssl);
@@ -272,11 +298,21 @@ sub client {
 	    set_client_stat($round, 'old_session_is_resumable', $is_resumable);
 	}
 
+	if (defined &Net::SSLeay::SESSION_get0_cipher) {
+	    my $cipher = Net::SSLeay::SESSION_get0_cipher($sess);
+	    my $name = Net::SSLeay::CIPHER_get_name($cipher);
+	    my $get0_cipher_ok = (length $name && $name ne '(NONE)') ? 1 : 0;
+	    diag("SESSION_get0_cipher not ok: round $round, name: '$name'") unless $get0_cipher_ok;
+	    set_client_stat($round, 'get0_cipher', $get0_cipher_ok);
+	}
+
 	Net::SSLeay::shutdown($ssl);
 	Net::SSLeay::free($ssl);
 	close($cl) || die("client close: $!");
+	$proto_count += 1;
     }
 
+    maybe_sleep();
     $cl = $server->connect();
     chomp( my $server_end = <$cl> );
     is( $server_end, 'end', 'Successful termination' );
@@ -302,7 +338,7 @@ sub test_stats {
 
         if (!$usable{$round}) {
             SKIP: {
-                skip( "$round not available in this libssl", 12 );
+                skip( "$round not available in this libssl", 14 );
             }
             next;
         }
@@ -338,6 +374,15 @@ sub test_stats {
                 skip( 'Do not have Net::SSLeay::SESSION_is_resumable', 4 );
             }
         }
+
+	if (defined &Net::SSLeay::SESSION_get0_cipher) {
+	    is( $s->{get0_cipher}, 1, "Server $round SESSION_get0_cipher appears correct" );
+	    is( $c->{get0_cipher}, 1, "Client $round SESSION_get0_cipher appears correct" );
+	} else {
+	  SKIP: {
+	      skip( 'Do not have &Net::SSLeay::SESSION_get0_cipher', 2 );
+	    }
+	}
     }
 
     if ($usable{'TLSv1.3'}) {
@@ -358,6 +403,8 @@ sub test_stats {
             skip( 'TLSv1.3 not available in this libssl', 9 );
         }
     }
+
+    cmp_ok($proto_count, '>=', 1, "At least one protocol fully testable");
 
     #  use Data::Dumper; print "Server:\n" . Dumper(\%srv_stats);
     #  use Data::Dumper; print "Client:\n" . Dumper(\%clt_stats);

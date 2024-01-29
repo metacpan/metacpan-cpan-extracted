@@ -8,7 +8,7 @@ configure_requires:
   Module::Build: '0.42'
   YAML: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +19,7 @@ provides:
     file: lib/AudioFile/Info/Build.pm
   AudioFile::Info::MP3::Tag:
     file: lib/AudioFile/Info/MP3/Tag.pm
-    version: v1.6.3
+    version: v1.6.4
 requires:
   AudioFile::Info: '0'
   MP3::Tag: '0'
@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/davorg/audiofile-info-mp3-tag/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/davorg/audiofile-info-mp3-tag.git
-version: v1.6.3
+version: v1.6.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

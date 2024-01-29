@@ -1,4 +1,6 @@
-#!perl -w
+#!perl
+use strict;
+use warnings;
 
 use Test::More;
 BEGIN {
@@ -7,5 +9,5 @@ BEGIN {
 }
 use Test::Pod::Coverage 1.04;
 all_pod_coverage_ok(
-	{ trustme => [ qr/_for_(?:created|modified)_(?:on|after|before)\Z/ ] }
+  { trustme => [ qr/_for_(?:created|modified)_(?:on|after|before)\Z/ ] }
 );

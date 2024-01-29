@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Fur - Package for language Friulian
 
 package Locale::CLDR::Locales::Fur;
 # This file auto generated from Data\common\main\fur.xml
-#	on Tue  5 Dec  1:11:27 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -44,7 +44,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'aa' => 'afar',
@@ -324,7 +324,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'Mont',
  			'002' => 'Afriche',
@@ -506,8 +506,6 @@ has 'display_name_region' => (
  			'MF' => 'Sant Martin',
  			'MG' => 'Madagascar',
  			'MH' => 'Isulis Marshall',
- 			'MK' => 'Macedonie',
- 			'MK@alt=variant' => 'Macedonie (FYROM)',
  			'ML' => 'Mali',
  			'MM' => 'Birmanie',
  			'MN' => 'Mongolie',
@@ -624,7 +622,7 @@ has 'display_name_variant' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'1901' => 'Ortografie todescje tradizionâl',
  			'1994' => 'Ortografie resiane standard',
@@ -650,7 +648,7 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'calendar' => 'calendari',
  			'collation' => 'ordenament',
@@ -699,7 +697,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{metric},
  			'UK' => q{Ream Unît},
@@ -713,7 +711,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'Lenghe: {0}',
  			'script' => 'Scriture: {0}',
@@ -735,7 +733,7 @@ has 'characters' => (
 			auxiliary => qr{[å č é ë ğ ï ñ ó š ü]},
 			index => ['A', 'B', 'C', 'Ç', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
 			main => qr{[a à â b c ç d e è ê f g h i ì î j k l m n o ò ô p q r s t u ù û v w x y z]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -779,36 +777,85 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(zornadis),
+						'one' => q({0} zornade),
+						'other' => q({0} zornadis),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(zornadis),
 						'one' => q({0} zornade),
 						'other' => q({0} zornadis),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(oris),
+						'one' => q({0} ore),
+						'other' => q({0} oris),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(oris),
 						'one' => q({0} ore),
 						'other' => q({0} oris),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(minûts),
+						'one' => q({0} minût),
+						'other' => q({0} minûts),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(minûts),
 						'one' => q({0} minût),
 						'other' => q({0} minûts),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(mês),
+						'one' => q({0} mês),
+						'other' => q({0} mês),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(mês),
 						'one' => q({0} mês),
 						'other' => q({0} mês),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(seconts),
+						'one' => q({0} secont),
+						'other' => q({0} seconts),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(seconts),
 						'one' => q({0} secont),
 						'other' => q({0} seconts),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(setemanis),
+						'one' => q({0} setemane),
+						'other' => q({0} setemanis),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(setemanis),
 						'one' => q({0} setemane),
 						'other' => q({0} setemanis),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(agns),
+						'one' => q({0} an),
+						'other' => q({0} agns),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(agns),
 						'one' => q({0} an),
@@ -816,24 +863,59 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(zornadis),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(zornadis),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(oris),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(oris),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(minûts),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(minûts),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(mês),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(mês),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(seconts),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(seconts),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(setemanis),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(setemanis),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(agns),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(agns),
 					},

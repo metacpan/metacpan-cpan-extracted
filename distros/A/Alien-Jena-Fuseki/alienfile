@@ -1,0 +1,18 @@
+use alienfile;
+
+plugin 'Probe::CommandLine' => (
+  command => 'fuseki-server',
+  args    => [ '--version' ],
+  match   => qr/Apache Jena Fuseki/,
+  version => qr/Apache Jena Fuseki version ([0-9\.]+)/,
+);
+
+share {
+  start_url 'https://archive.apache.org/dist/jena/binaries/';
+  plugin Download => (
+    filter  => qr/^apache-jena-fuseki-([0-9\.]+)\.tar\.gz$/,
+    version => qr/([0-9\.]+)/,
+  );
+  plugin Extract => 'tar.gz';
+  plugin 'Build::Copy';
+}

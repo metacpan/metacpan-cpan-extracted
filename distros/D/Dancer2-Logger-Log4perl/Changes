@@ -1,3 +1,14 @@
+0.07      2023-12-16 20:33:07-05:00 America/New_York
+
+    [ BUG FIXES ]
+    * None
+
+    [ ENHANCEMENTS ]
+    * Add category setting for logs created from Dancer2
+
+    [ DOCUMENTATION ]
+    * Explain how Dancer2's log_format and Log4perl's layouts interact
+
 0.06      2018-11-10 01:05:33-05:00 America/New_York
 
     [ BUG FIXES ]

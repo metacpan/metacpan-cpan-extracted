@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc;
 # ABSTRACT: Chargeur Koha par Tamil
-$Koha::Contrib::Sudoc::VERSION = '2.40';
+$Koha::Contrib::Sudoc::VERSION = '2.43';
 use Moose;
 use Modern::Perl;
 use YAML qw( LoadFile Dump );
@@ -13,6 +13,7 @@ use Path::Tiny;
 use Mail::Box::Manager;
 use DateTime;
 use File::ShareDir ':ALL';
+use Net::FTP;
 
 
 # L'instance de Koha de l'ILN courant
@@ -159,12 +160,15 @@ sub reset_email_log {
 # Envoi courriel GTD
 sub send_gtd_email {
     my ($self, $jobid, $dir) = @_;
+
+    my $c = $self->c->{trans};
+    my $ftp_host = $c->{ftp_host};
+
     $dir ||= 'staged';
+    $dir = '' if $ftp_host =~ /abes/;
 
     # La date
     my $year = DateTime->now->year;
-
-    my $c = $self->c->{trans};
 
     my $head = Mail::Message::Head->new;
     $head->add( From    => $c->{email}->{koha} );
@@ -173,13 +177,35 @@ sub send_gtd_email {
     my @data = (
         "GTD_ILN = " . $self->c->{iln},
         "GTD_YEAR = $year",
-        "GTD_FILE_TO = " . $c->{ftp_host},
+        "GTD_FILE_TO = $ftp_host",
         "GTD_REMOTE_DIR = $dir",
     );
     push @data, "GTD_ORDER = TR$jobid*"  if $jobid;
     my $body = Mail::Message::Body::Lines->new(data => join("\n", @data));
     my $message = Mail::Message->new(head => $head, body => $body);
     $message->send;
+}
+
+
+# Méthode GET
+sub get {
+    my $self = shift;
+
+    my $c = $self->c->{trans};
+
+    # Si le serveur FTP n'est pas celui de l'ABES, on n'est pas en mode GET
+    return if $c->{ftp_host} !~ /abes/;
+
+    my $ftp = Net::FTP->new($c->{ftp_host}, Debug => 0);
+    $ftp->login($c->{login}, $c->{password})
+      or die "Login au serveur FTP impossible : ", $ftp->message;
+    $ftp->binary();
+    chdir($self->root . "/var/spool/waiting");
+    my @files = $ftp->ls();
+    for my $file (@files) {
+        $ftp->get($file);
+        $ftp->delete($file);
+    }
 }
 
 
@@ -266,7 +292,7 @@ Koha::Contrib::Sudoc - Chargeur Koha par Tamil
 
 =head1 VERSION
 
-version 2.40
+version 2.43
 
 =head1 DESCRIPTION
 
@@ -280,7 +306,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Fréderic Demians.
+This software is Copyright (c) 2024 by Fréderic Demians.
 
 This is free software, licensed under:
 

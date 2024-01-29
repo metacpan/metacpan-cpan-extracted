@@ -189,6 +189,26 @@ CREATE TEMPORARY TABLE `Groups` (
     ]
 }
 
+sub schema_mariadb {
+    [   q{
+CREATE TEMPORARY TABLE Users (
+    id integer primary key AUTO_INCREMENT,
+    Login varchar(36)
+) },
+        q{
+CREATE TEMPORARY TABLE UsersToGroups (
+    id integer primary key AUTO_INCREMENT,
+    UserId  integer,
+    GroupId integer
+) },
+        q{
+CREATE TEMPORARY TABLE `Groups` (
+    id integer primary key AUTO_INCREMENT,
+    Name varchar(36)
+) },
+    ]
+}
+
 sub schema_pg {
     [   q{
 CREATE TEMPORARY TABLE Users (

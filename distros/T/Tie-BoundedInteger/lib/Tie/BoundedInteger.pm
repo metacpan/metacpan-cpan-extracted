@@ -3,7 +3,7 @@ use strict;
 
 use Carp qw(croak);
 
-our $VERSION = '1.005';
+our $VERSION = '1.073';
 
 sub TIESCALAR {
 	my $class = shift;
@@ -45,10 +45,12 @@ Tie::BoundedInteger - Limit the magnitude of a number in a scalar
 
 =head1 SYNOPSIS
 
-	use v5.10.1;
 	use Tie::BoundedInteger;
-
+	my( $min, $max ) = ( 1, 4 );
 	tie my $bounded, 'Tie::BoundedInteger', $min, $max;
+
+	$bounded = 3;  # works fine
+	$bounded = 5;  # doesn't work
 
 
 =head1 DESCRIPTION
@@ -65,11 +67,11 @@ This module is on Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2005-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2005-2024, brian d foy <bdfoy@cpan.org>. All rights reserved.
 This software is available under the terms of the Artistic License 2.0.
 
 

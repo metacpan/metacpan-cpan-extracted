@@ -1,0 +1,873 @@
+class TestCase::Eg {
+  use Eg;
+  use Eg::Node;
+  use Eg::DOM::Implementation;
+  
+  static method tag : Eg::Node::Element::HTML ($tag_name : string, $child_nodes_or_text : object of Eg::Node[]|string = undef) {
+    
+    my $dom_impl = Eg::DOM::Implementation->new;
+    
+    my $document = $dom_impl->create_html_document;
+    
+    my $child_nodes = (Eg::Node[])undef;
+    if ($child_nodes_or_text) {
+      if ($child_nodes_or_text is_type string) {
+        $child_nodes = [$document->create_text_node((string)$child_nodes_or_text)];
+      }
+      elsif ($child_nodes_or_text isa Eg::Node[]) {
+        $child_nodes = (Eg::Node[])$child_nodes_or_text;
+      }
+      else {
+        die "The type of \$child_nodes_or_text must inherit Eg::Node::Element or must be string.";
+      }
+    }
+    
+    my $new_element_node = $document->create_element($tag_name);
+    
+    if ($child_nodes) {
+      for my $child_node (@$child_nodes) {
+        $new_element_node->append_child($child_node);
+      }
+    }
+    
+    return $new_element_node;
+  }
+  
+  static method tag_ : Eg::Node::Element::HTML ($tag_name : string, $attribute_pairs : object[] = undef, $child_nodes_or_text : object of Eg::Node[]|string = undef) {    
+    my $dom_impl = Eg::DOM::Implementation->new;
+    
+    my $document = $dom_impl->create_html_document;
+    
+    my $child_nodes = (Eg::Node[])undef;
+    if ($child_nodes_or_text) {
+      if ($child_nodes_or_text is_type string) {
+        $child_nodes = [$document->create_text_node((string)$child_nodes_or_text)];
+      }
+      elsif ($child_nodes_or_text isa Eg::Node[]) {
+        $child_nodes = (Eg::Node[])$child_nodes_or_text;
+      }
+      else {
+        die "The type of \$child_nodes_or_text must inherit Eg::Node or must be string.";
+      }
+    }
+    
+    my $new_element_node = $document->create_element($tag_name);
+    
+    if ($child_nodes) {
+      for my $child_node (@$child_nodes) {
+        $new_element_node->append_child($child_node);
+      }
+    }
+    
+    my $attributes_h = Hash->new($attribute_pairs);
+    
+    my $style_pairs = (object[])$attributes_h->delete("style");
+    
+    if ($style_pairs) {
+      my $styles_h = Hash->new($style_pairs);
+      
+      $new_element_node->set_styles_h($styles_h);
+    }
+    
+    for my $attribute_name (@{$attributes_h->keys}) {
+      my $attribute_value = $attributes_h->get($attribute_name);
+      
+      if ($attribute_value) {
+        $new_element_node->set_attribute($attribute_name, (string)$attribute_value);
+      }
+    }
+    
+    return $new_element_node;
+  }
+  
+  static method test : int () {
+    
+    my $dom_impl = Eg::DOM::Implementation->new;
+    
+    my $document = $dom_impl->create_html_document;
+    
+    {
+      unless (Eg::Node->TYPE_ELEMENT_NODE == 1) {
+        return 0;
+      }
+      
+      unless (Eg::Node->TYPE_ATTRIBUTE_NODE == 2) {
+        return 0;
+      }
+      
+      unless (Eg::Node->TYPE_TEXT_NODE == 3) {
+        return 0;
+      }
+      
+      unless (Eg::Node->TYPE_CDATA_SECTION_NODE == 4) {
+        return 0;
+      }
+      
+      unless (Eg::Node->TYPE_PROCESSING_INSTRUCTION_NODE == 7) {
+        return 0;
+      }
+      
+      unless (Eg::Node->TYPE_COMMENT_NODE == 8) {
+        return 0;
+      }
+      
+      unless (Eg::Node->TYPE_DOCUMENT_NODE == 9) {
+        return 0;
+      }
+      
+      unless (Eg::Node->TYPE_DOCUMENT_TYPE_NODE == 10) {
+        return 0;
+      }
+      
+      unless (Eg::Node->TYPE_DOCUMENT_FRAGMENT_NODE == 11) {
+        return 0;
+      }
+    }
+    
+    {
+      my $div = &tag_("div", {style => {color => "red"}});
+      
+      unless ($div->css("color") eq "red") {
+        return 0;
+      }
+    }
+    
+    {
+      my $div = &tag("div", [$document->create_text_node("foo")]);
+      
+      unless ($div->tag_name eq "DIV") {
+        return 0;
+      }
+      
+      unless ($div->node_type == Eg::Node->TYPE_ELEMENT_NODE) {
+        return 0;
+      }
+      
+    }
+    
+    # attribute
+    {
+      my $div = &tag_("div", {attribute1 => "attributeval1"});
+      
+      unless ($div->get_attribute("attribute1") eq "attributeval1") {
+        return 0;
+      }
+      
+      if ($div->get_attribute("attribute2")) {
+        return 0;
+      }
+    }
+    
+    # set_attribute
+    {
+      my $div = $document->create_element("div");
+      
+      $div->set_attribute("attribute1", "attributeval1");
+      
+      unless ($div->get_attribute("attribute1") eq "attributeval1") {
+        return 0;
+      }
+      
+    }
+    
+    # has_attribute
+    {
+      my $div = &tag_("div", {attribute1 => "attributeval1", attribute2 => ""});
+      
+      unless ($div->has_attribute("attribute1")) {
+        return 0;
+      }
+      
+      unless ($div->has_attribute("attribute2")) {
+        return 0;
+      }
+      
+      if ($div->has_attribute("attribute3")) {
+        return 0;
+      }
+    }
+    
+    # remove_attribute
+    {
+      my $div = &tag_("div", {attribute1 => "attributeval1", attribute2 => "attributeval2"});
+      
+      $div->remove_attribute("attribute1");
+      
+      $div->remove_attribute("attribute3");
+      
+      unless (Array->equals_string($div->attribute_pairs, ["attribute2" => "attributeval2"])) {
+        return 0;
+      }
+    }
+    
+    # attribute_pairs
+    {
+      my $div = &tag_("div", {attr1 => "attrval1", attr2 => "attrval2"});
+      
+      my $attribute_pairs = $div->attribute_pairs;
+      
+      unless (Array->equals_string($attribute_pairs, ["attr1", "attrval1", "attr2", "attrval2"])) {
+        return 0;
+      }
+    }
+    
+    # css
+    {
+      my $div = &tag_("div", {style => {css1 => "cssval1"}});
+      
+      unless ($div->css("css1") eq "cssval1") {
+        return 0;
+      }
+      
+      if ($div->css("css2")) {
+        return 0;
+      }
+    }
+    
+    # set_css
+    {
+      my $div = &tag_("div", {style => {}});
+      
+      $div->set_css("css1", "cssval1");
+      
+      unless ($div->css("css1") eq "cssval1") {
+        return 0;
+      }
+      
+    }
+    
+    # exists_css
+    {
+      my $div = &tag_("div", {style => {css1 => "cssval1", css2 => undef}});
+      
+      unless ($div->exists_css("css1")) {
+        return 0;
+      }
+      
+      unless ($div->exists_css("css2")) {
+        return 0;
+      }
+      
+      if ($div->exists_css("css3")) {
+        return 0;
+      }
+    }
+    
+    # delete_css
+    {
+      my $div = &tag_("div", {style => {css1 => "cssval1", css2 => "cssval2"}});
+      
+      $div->remove_css("css1");
+      
+      $div->remove_css("css3");
+      
+      unless (Array->equals_string($div->style_pairs, ["css2" => "cssval2"])) {
+        return 0;
+      }
+    }
+    
+    # style_pairs
+    {
+      my $div = &tag_("div", {style => {css1 => "cssval1", css2 => "cssval2"}});
+      
+      my $style_pairs = $div->style_pairs;
+      
+      unless (Array->equals_string($style_pairs, ["css1", "cssval1", "css2", "cssval2"])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $div = &tag_("div", {class => "foo bar", id => "foo", style => {color => "red"}},
+        [(Eg::Node)&tag("div", "foo")],
+      );
+    }
+    
+    {
+      my $div = &tag_("div", {class => "foo bar", id => "foo", style => {color => "red"}},
+        [&tag("div"), &tag("span", "foo")],
+      );
+    }
+    
+    {
+      my $div = &tag_("div", {class => "foo bar", id => "foo", style => {color => "red"}},
+        [
+          &tag("div"),
+          # Foo
+          &tag("span", "foo"),
+
+=pod
+
+Foo
+
+=cut
+
+          &tag("span", "bar")
+        ],
+      );
+    }
+    
+    {
+      my $ul = &tag_("ul",
+        {class => "foo bar", id => "foo", style => {color => "red"}},
+        [
+          &tag("li", "1"),
+          &tag("li", "2"),
+          &tag("li", "3"),
+        ],
+      );
+      
+      unless ($ul->child_nodes->[0]->child_nodes->[0]->node_value eq "1") {
+        return 0;
+      }
+      
+      unless ($ul->child_nodes->[1]->child_nodes->[0]->node_value eq "2") {
+        return 0;
+      }
+    }
+    
+    # child_nodes
+    {
+      {
+        my $ul = &tag_("ul",
+          {class => "foo bar", id => "foo", style => {color => "red"}},
+          [
+            &tag("li", "1"),
+            &tag("li", "2"),
+            &tag("li", "3"),
+          ],
+        );
+        
+        my $child_nodes = $ul->child_nodes;
+        
+        unless (@$child_nodes == 3) {
+          return 0;
+        }
+        
+        unless ($child_nodes->[0]->(Eg::Node::Element)->text eq "1") {
+          return 0;
+        }
+        
+        unless ($child_nodes->[1]->(Eg::Node::Element)->text eq "2") {
+          return 0;
+        }
+        
+        unless ($child_nodes->[2]->(Eg::Node::Element)->text eq "3") {
+          return 0;
+        }
+      }
+      
+      {
+        my $ul = &tag_("ul",
+          {class => "foo bar", id => "foo", style => {color => "red"}},
+        );
+        
+        my $child_nodes = $ul->child_nodes;
+        
+        unless (@$child_nodes == 0) {
+          return 0;
+        }
+      }
+    }
+    
+    {
+      my $table = &tag_("table",
+        {class => "foo bar", id => "foo", style => {color => "red"}},
+        [
+          &tag("tr", [
+            &tag("td", "1-1"), &tag("td", "1-2")
+          ]),
+          &tag("tr", [
+            &tag("td", "2-1"), &tag("td", "2-2")
+          ]),
+        ],
+      );
+    }
+    
+    {
+      my $text = $document->create_text_node("foo");
+      
+      unless ($text->node_type == Eg::Node->TYPE_TEXT_NODE) {
+        return 0;
+      }
+      
+      unless ($text->data eq "foo") {
+        return 0;
+      }
+    }
+    
+    {
+      my $div = $document->create_element("div");
+      
+      unless ($div->text eq "") {
+        return 0;
+      }
+      
+      $div->set_text("bar");
+      
+      unless ($div->text eq "bar") {
+        return 0;
+      }
+    }
+    
+    {
+      my $div = $document->create_element("div");
+        
+      $div->set_text("foo");
+      
+      
+      unless ($div->text eq "foo") {
+        return 0;
+      }
+      
+      $div->set_text("bar");
+      
+      unless ($div->text eq "bar") {
+        return 0;
+      }
+    }
+    
+    {
+      my $div = $document->create_element("div");
+        
+      $div->set_attribute(atrr => "value");
+      
+      $div->set_text("foo");
+      
+      unless ($div->text eq "foo") {
+        return 0;
+      }
+      
+      $div->set_text("bar");
+      
+      unless ($div->text eq "bar") {
+        return 0;
+      }
+    }
+    
+    # jQuery
+    {
+      # attr
+      {
+        my $div = $document->create_element("div");
+        
+        $div->set_attribute(attr1 => "attrval1");
+        
+        unless ($div->attr("attr1") eq "attrval1") {
+          return 0;
+        }
+        
+        if ($div->attr("attr2")) {
+          return 0;
+        }
+      }
+      
+      # set_attr
+      {
+        my $div = $document->create_element("div");
+        
+        $div->set_attr("attr1", "attrval1");
+        
+        unless ($div->attr("attr1") eq "attrval1") {
+          return 0;
+        }
+        
+      }
+      
+      # remove_attr
+      {
+        my $div = $document->create_element("div");
+        
+        $div->set_attribute(attr1 => "attrval1");
+        $div->set_attribute(attr2 => "attrval2");
+        
+        $div->remove_attr("attr1");
+        
+        $div->remove_attr("attr3");
+        
+        unless (Array->equals_string($div->attribute_pairs, ["attr2" => "attrval2"])) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method dom_implementation : int () {
+    
+    {
+      my $dom_impl = Eg::DOM::Implementation->new;
+      
+      my $document = $dom_impl->create_html_document;
+      
+      my $html_element = $document->first_child;
+      
+      unless ($html_element && $html_element == $document->last_child) {
+        return 0;
+      }
+      
+      unless ($html_element is_type Eg::Node::Element::HTML::Html) {
+        return 0;
+      }
+      
+      my $head_element = $html_element->first_child;
+      
+      my $body_element = $html_element->last_child;
+      
+      unless ($head_element && $head_element == $html_element->first_child) {
+        return 0;
+      }
+      
+      unless ($body_element && $body_element == $html_element->last_child) {
+        return 0;
+      }
+      
+      unless ($head_element->next_sibling == $body_element) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method element : int () {
+    
+    # tag_name
+    {
+      # tag_name - HTML
+      {
+        my $dom_impl = Eg::DOM::Implementation->new;
+        
+        my $document = $dom_impl->create_html_document;
+        
+        {
+          my $div = $document->create_element("div");
+          
+          unless ($div->tag_name eq "DIV") {
+            return 0;
+          }
+        }
+        
+        {
+          my $div = $document->create_element("DIV");
+          
+          unless ($div->tag_name eq "DIV") {
+            return 0;
+          }
+        }
+      }
+      
+      # tag_name - XML
+      {
+        my $dom_impl = Eg::DOM::Implementation->new;
+        
+        my $document = $dom_impl->create_document(undef, "root");
+        
+        {
+          my $div = $document->create_element("div");
+          
+          unless ($div->tag_name eq "div") {
+            return 0;
+          }
+        }
+        
+        {
+          my $div = $document->create_element("DIV");
+          
+          unless ($div->tag_name eq "DIV") {
+            return 0;
+          }
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method node : int () {
+    
+    # append_child
+    {
+      {
+        my $dom_impl = Eg::DOM::Implementation->new;
+        
+        my $document = $dom_impl->create_html_document;
+        
+        {
+          my $root = $document->create_element("ROOT");
+          
+          my $child_0 = $document->create_element("CHILD_0");
+          
+          $root->append_child($child_0);
+          
+          unless ($root->first_child == $child_0) {
+            return 0;
+          }
+          
+          unless ($root->last_child == $child_0) {
+            return 0;
+          }
+        }
+        
+        {
+          my $root = $document->create_element("ROOT");
+          
+          my $child_0 = $document->create_element("CHILD_0");
+          
+          $root->append_child($child_0);
+          
+          my $child_1 = $document->create_element("CHILD_1");
+          
+          $root->append_child($child_1);
+          
+          unless ($root->first_child == $child_0) {
+            return 0;
+          }
+          
+          unless ($root->last_child == $child_1) {
+            return 0;
+          }
+          
+          unless ($child_0->next_sibling == $child_1) {
+            return 0;
+          }
+          
+          unless ($child_1->previous_sibling == $child_0) {
+            return 0;
+          }
+          
+          unless ($child_0->parent_node == $root) {
+            return 0;
+          }
+          
+          unless ($child_1->parent_node == $root) {
+            return 0;
+          }
+        }
+        
+        {
+          my $root = $document->create_element("ROOT");
+          
+          my $child_0 = $document->create_element("CHILD_0");
+          
+          $root->append_child($child_0);
+          
+          my $child_1 = $document->create_element("CHILD_1");
+          
+          $root->append_child($child_1);
+          
+          my $child_2 = $document->create_element("CHILD_2");
+          
+          $root->append_child($child_2);
+          
+          unless ($root->first_child == $child_0) {
+            return 0;
+          }
+          
+          unless ($root->last_child == $child_2) {
+            return 0;
+          }
+          
+          unless ($child_0->next_sibling == $child_1) {
+            return 0;
+          }
+          
+          unless ($child_1->next_sibling == $child_2) {
+            return 0;
+          }
+          
+          unless ($child_1->previous_sibling == $child_0) {
+            return 0;
+          }
+          
+          unless ($child_2->previous_sibling == $child_1) {
+            return 0;
+          }
+          
+          unless ($child_0->parent_node == $root) {
+            return 0;
+          }
+          
+          unless ($child_1->parent_node == $root) {
+            return 0;
+          }
+          
+          unless ($child_2->parent_node == $root) {
+            return 0;
+          }
+        }
+      }
+    }
+    
+    # insert_before
+    {
+      {
+        my $dom_impl = Eg::DOM::Implementation->new;
+        
+        my $document = $dom_impl->create_html_document;
+        
+        {
+          my $root = $document->create_element("ROOT");
+          
+          my $child_0 = $document->create_element("CHILD_0");
+          
+          $root->insert_before($child_0, undef);
+          
+          unless ($root->first_child == $child_0) {
+            return 0;
+          }
+          
+          unless ($root->last_child == $child_0) {
+            return 0;
+          }
+        }
+        
+        {
+          my $root = $document->create_element("ROOT");
+          
+          my $child_0 = $document->create_element("CHILD_0");
+          
+          $root->insert_before($child_0, undef);
+          
+          my $child_1 = $document->create_element("CHILD_1");
+          
+          $root->insert_before($child_1, $child_0);
+          
+          unless ($root->first_child == $child_1) {
+            return 0;
+          }
+          
+          unless ($root->last_child == $child_0) {
+            return 0;
+          }
+          
+          unless ($child_1->next_sibling == $child_0) {
+            return 0;
+          }
+          
+          unless ($child_0->previous_sibling == $child_1) {
+            return 0;
+          }
+          
+          unless ($child_1->parent_node == $root) {
+            return 0;
+          }
+          
+          unless ($child_0->parent_node == $root) {
+            return 0;
+          }
+          
+        }
+        
+        {
+          my $root = $document->create_element("ROOT");
+          
+          my $child_0 = $document->create_element("CHILD_0");
+          
+          $root->insert_before($child_0, undef);
+          
+          my $child_1 = $document->create_element("CHILD_1");
+          
+          $root->insert_before($child_1, $child_0);
+          
+          my $child_2 = $document->create_element("CHILD_2");
+          
+          $root->insert_before($child_2, $child_1);
+          
+          unless ($root->first_child == $child_2) {
+            return 0;
+          }
+          
+          unless ($root->last_child == $child_0) {
+            return 0;
+          }
+          
+          unless ($child_2->next_sibling == $child_1) {
+            return 0;
+          }
+          
+          unless ($child_1->next_sibling == $child_0) {
+            return 0;
+          }
+          
+          unless ($child_0->previous_sibling == $child_1) {
+            return 0;
+          }
+          
+          unless ($child_1->previous_sibling == $child_2) {
+            return 0;
+          }
+          
+          unless ($child_2->parent_node == $root) {
+            return 0;
+          }
+          
+          unless ($child_1->parent_node == $root) {
+            return 0;
+          }
+          
+          unless ($child_0->parent_node == $root) {
+            return 0;
+          }
+        }
+        
+        {
+          my $root = $document->create_element("ROOT");
+          
+          my $child_0 = $document->create_element("CHILD_0");
+          
+          $root->insert_before($child_0, undef);
+          
+          my $child_1 = $document->create_element("CHILD_1");
+          
+          $root->insert_before($child_1, $child_0);
+          
+          my $child_2 = $document->create_element("CHILD_2");
+          
+          $root->insert_before($child_2, $child_0);
+          
+          # 1 -> 2 -> 0
+          unless ($root->first_child == $child_1) {
+            return 0;
+          }
+          
+          unless ($root->last_child == $child_0) {
+            return 0;
+          }
+          
+          unless ($child_1->next_sibling == $child_2) {
+            return 0;
+          }
+          
+          unless ($child_2->next_sibling == $child_0) {
+            return 0;
+          }
+          
+          unless ($child_0->previous_sibling == $child_2) {
+            return 0;
+          }
+          
+          unless ($child_2->previous_sibling == $child_1) {
+            return 0;
+          }
+          
+          unless ($child_1->parent_node == $root) {
+            return 0;
+          }
+          
+          unless ($child_2->parent_node == $root) {
+            return 0;
+          }
+          
+          unless ($child_0->parent_node == $root) {
+            return 0;
+          }
+        }
+      }
+    }
+    
+    return 1;
+  }
+}

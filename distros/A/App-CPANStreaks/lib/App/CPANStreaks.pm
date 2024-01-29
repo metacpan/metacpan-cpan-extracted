@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-25'; # DATE
+our $DATE = '2023-12-11'; # DATE
 our $DIST = 'App-CPANStreaks'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our %SPEC;
 
@@ -34,6 +34,24 @@ our @tables = sort keys %tables;
 $SPEC{cpan_streaks} = {
     v => 1.1,
     summary => 'Calculate and display CPAN streaks',
+    description => <<'MARKDOWN',
+
+This utility calculates one of various CPAN streaks, e.g. `daily-releases` to
+see which authors have the longest streaks of releasing at least one CPAN
+distribution daily.
+
+The data used to calculate the streaks are CPAN module releases packaged in
+<pm:TableData::Perl::CPAN::Release::Static::GroupedDaily>,
+<pm:TableData::Perl::CPAN::Release::Static::GroupedWeekly>, and
+<pm:TableData::Perl::CPAN::Release::Static::GroupedMonthly>, so make you update
+those modules first from CPAN. These modules in turn get the data from MetaCPAN
+API from <https://metacpan.org>.
+
+*See also*
+- <http://onceaweek.cjmweb.net> (defunct) by CJM.
+- <http://cpan.io/board/once-a/> boards by NEILB.
+
+MARKDOWN
     args => {
         action => {
             schema => ['str*', {in=>\@actions, 'x.in.summaries' => [map { $actions{$_} } @actions]}],
@@ -55,6 +73,9 @@ $SPEC{cpan_streaks} = {
         exclude_broken => {
             schema => 'bool*',
             default => 1,
+        },
+        min_len => {
+            schema => 'posint*',
         },
     },
 };
@@ -106,6 +127,7 @@ sub cpan_streaks {
         my $rows = Set::Streak::gen_longest_streaks_table(
             sets => \@sets,
             exclude_broken => $args{exclude_broken},
+            min_len => $args{min_len},
         );
         for my $row (@$rows) {
             $row->{start_date} = $period_names[ $row->{start} ];
@@ -140,7 +162,7 @@ App::CPANStreaks - Calculate various CPAN streaks
 
 =head1 VERSION
 
-This document describes version 0.002 of App::CPANStreaks (from Perl distribution App-CPANStreaks), released on 2023-11-25.
+This document describes version 0.004 of App::CPANStreaks (from Perl distribution App-CPANStreaks), released on 2023-12-11.
 
 =head1 DESCRIPTION
 
@@ -154,6 +176,21 @@ Usage:
  cpan_streaks(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Calculate and display CPAN streaks.
+
+This utility calculates one of various CPAN streaks, e.g. C<daily-releases> to
+see which authors have the longest streaks of releasing at least one CPAN
+distribution daily.
+
+The data used to calculate the streaks are CPAN module releases packaged in
+L<TableData::Perl::CPAN::Release::Static::GroupedDaily>,
+L<TableData::Perl::CPAN::Release::Static::GroupedWeekly>, and
+L<TableData::Perl::CPAN::Release::Static::GroupedMonthly>, so make you update
+those modules first from CPAN. These modules in turn get the data from MetaCPAN
+API from L<https://metacpan.org>.
+
+I<See also>
+- L<http://onceaweek.cjmweb.net> (defunct) by CJM.
+- L<http://cpan.io/board/once-a/> boards by NEILB.
 
 This function is not exported.
 
@@ -170,6 +207,10 @@ Arguments ('*' denotes required arguments):
 Only calculate streaks for certain authors.
 
 =item * B<exclude_broken> => I<bool> (default: 1)
+
+(No description)
+
+=item * B<min_len> => I<posint>
 
 (No description)
 

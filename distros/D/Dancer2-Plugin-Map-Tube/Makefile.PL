@@ -7,7 +7,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME               => 'Dancer2::Plugin::Map::Tube',
-    AUTHOR             => q{Mohammad S Anwar <mohammad.anwar@yahoo.com>},
+    AUTHOR             => q{Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>},
     VERSION_FROM       => 'lib/Dancer2/Plugin/Map/Tube.pm',
     ABSTRACT_FROM      => 'lib/Dancer2/Plugin/Map/Tube.pm',
     LICENSE            => 'artistic_2',
@@ -32,9 +32,9 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Dancer2::Plugin::Map::Tube'        => { file => 'lib/Dancer2/Plugin/Map/Tube.pm'      , version => '0.02' },
-            'Dancer2::Plugin::Map::Tube::API'   => { file => 'lib/Dancer2/Plugin/Map/Tube/API.pm'  , version => '0.02' },
-            'Dancer2::Plugin::Map::Tube::Error' => { file => 'lib/Dancer2/Plugin/Map/Tube/Error.pm', version => '0.02' },
+            'Dancer2::Plugin::Map::Tube'        => { file => 'lib/Dancer2/Plugin/Map/Tube.pm'      , version => '0.03' },
+            'Dancer2::Plugin::Map::Tube::API'   => { file => 'lib/Dancer2/Plugin/Map/Tube/API.pm'  , version => '0.03' },
+            'Dancer2::Plugin::Map::Tube::Error' => { file => 'lib/Dancer2/Plugin/Map/Tube/Error.pm', version => '0.03' },
         },
         resources => {
             repository => {

@@ -9,7 +9,7 @@ use Error::Pure qw(err);
 use Plack::Util::Accessor qw(component constructor_args data data_css data_init data_prepare);
 use Symbol::Get;
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 sub _css {
 	my ($self, $env) = @_;
@@ -172,9 +172,9 @@ Default value is undef.
 
 =item * C<data_prepare>
 
-Reference to array with structure for input argument of L<Tags::HTML::init()|Tags::HTML/init>.
+Reference to array with structure for input argument of L<Tags::HTML::prepare()|Tags::HTML/prepare>.
 
-This structure is used in init phase of preparation of web app.
+This structure is used in prepare phase of web app run.
 
 Default value is undef.
 
@@ -322,12 +322,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2023 Michal Josef Špaček
+© 2021-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

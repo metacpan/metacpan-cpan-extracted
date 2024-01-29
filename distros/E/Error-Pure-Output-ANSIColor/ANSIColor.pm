@@ -19,7 +19,7 @@ our $EPANSI_OTHER_COLOR = 'cyan';
 our $EPANSI_SCRIPT_COLOR = 'yellow';
 our $EPANSI_SUB_COLOR = 'green';
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Pretty print of backtrace.
 sub err_bt_pretty {
@@ -217,78 +217,120 @@ Error::Pure::Output::ANSIColor - ANSIColor Output subroutines for Error::Pure.
 
 =head1 SUBROUTINES
 
-=over 8
+=head2 C<err_bt_pretty>
 
-=item C<err_bt_pretty(@errors)>
+ my $ret = err_bt_pretty(@errors);
+ my @ret = err_bt_pretty(@errors);
 
- Returns string with full backtrace in scalar context.
- Returns array of full backtrace lines in array context.
- Both with ANSI sequences for terminals.
- Format of error is:
-         ERROR: %s
-         %s: %s
-         ...
-         %s %s %s %s
-         ...
- Values of error are:
-         message
-         message as key, $message as value
-         ...
-         sub, caller, program, line
+Returns string with full backtrace in scalar context.
 
-=item C<err_bt_pretty_rev(@errors)>
+Returns array of full backtrace lines in array context.
 
- Reverse version of print for err_bt_pretty().
- Returns string with full backtrace in scalar context.
- Returns array of full backtrace lines in array context.
- Both with ANSI sequences for terminals.
- Format of error is:
-         ERROR: %s
-         %s: %s
-         ...
-         %s %s %s %s
-         ...
- Values of error are:
-         message
-         message as key, $message as value
-         ...
-         sub, caller, program, line
+Both with ANSI sequences for terminals.
 
-=item C<err_die(@errors)>
+Format of error is:
 
- Returns string with error in classic die style with colors with ANSI sequences for terminals.
- Format of error line is: "%s at %s line %s".
- Values of error line are: $message(s), $program, $line
+ ERROR: %s
+ %s: %s
+ ...
+ %s %s %s %s
+ ...
 
-=item C<err_line(@errors)>
+Values of error are:
 
- Returns string with error on one line with ANSI sequences for terminals.
- Use last error in @errors structure..
- Format of error is: "#Error [%s:%s] %s\n"
- Values of error are: $program, $line, $message
+ message
+ message as key, $message as value
+ ...
+ sub, caller, program, line
+ ...
 
-=item C<err_line_all(@errors)>
+=head2 C<err_bt_pretty_rev>
 
- Returns string with errors each on one line with ANSI sequences for terminals.
- Use all errors in @errors structure.
- Format of error line is: "#Error [%s:%s] %s\n"
- Values of error line are: $program, $line, $message
+ my $ret = err_bt_pretty_rev(@errors);
+ my @ret = err_bt_pretty_rev(@errors);
 
-=item C<err_print(@errors)>
+Reverse version of print for L<err_bt_pretty()>.
 
- Print first error with ANSI sequences for terminals.
- If error comes from class, print class name before error.
- Returns string with error.
+Returns string with full backtrace in scalar context.
 
-=item C<err_print_var(@errors)>
+Returns array of full backtrace lines in array context.
 
- Print first error with all variables with ANSI sequences for terminals.
- Returns error string in scalar mode.
- Returns lines of error in array mode.
+Both with ANSI sequences for terminals.
 
-=back
+Format of error is:
+
+ ERROR: %s
+ %s: %s
+ ...
+ %s %s %s %s
+ ...
+
+Values of error are:
+
+ message
+ message as key, $message as value
+ ...
+ sub, caller, program, line
+ ...
+
+=head2 C<err_die(@errors)>
+
+ my $ret = err_die(@errors);
+
+Returns string with error in classic die style with colors with ANSI sequences for terminals.
+
+Format of error line is: "%s at %s line %s".
+
+Values of error line are: $message(s), $program, $line
+
+=head2 C<err_line>
+
+ my $ret = err_line(@errors);
+
+Returns string with error on one line with ANSI sequences for terminals.
+
+Use last error in C<@errors> structure.
+
+Format of error is: "#Error [%s:%s] %s\n"
+
+Values of error are: $program, $line, $message
+
+=head2 C<err_line_all>
+
+ my $ret = err_line_all(@errors);
+
+Returns string with errors each on one line with ANSI sequences for terminals.
+
+Use all errors in C<@errors> structure.
+
+Format of error line is: "#Error [%s:%s] %s\n"
+
+Values of error line are: $program, $line, $message
+
+=head2 C<err_print>
+
+ my $ret = err_print(@errors);
+
+Print first error with ANSI sequences for terminals.
+
+If error comes from class, print class name before error.
+
+Returns string with error.
+
+=head2 C<err_print_var>
+
+ my $ret = err_print_var(@errors);
+ my @ret = err_print_var(@errors);
+
+Print first error with all variables with ANSI sequences for terminals.
+
+Returns error string in scalar mode.
+
+Returns lines of error in array mode.
 
 =head1 EXAMPLE1
+
+=for comment filename=err_bt_pretty.pl
 
  use strict;
  use warnings;
@@ -329,6 +371,8 @@ Error::Pure::Output::ANSIColor - ANSIColor Output subroutines for Error::Pure.
  # main  eval {...}  script.pl  20
 
 =head1 EXAMPLE2
+
+=for comment filename=err_line_all.pl
 
  use strict;
  use warnings;
@@ -380,6 +424,8 @@ Error::Pure::Output::ANSIColor - ANSIColor Output subroutines for Error::Pure.
 
 =head1 EXAMPLE3
 
+=for comment filename=err_line.pl
+
  use strict;
  use warnings;
 
@@ -415,6 +461,8 @@ Error::Pure::Output::ANSIColor - ANSIColor Output subroutines for Error::Pure.
  # #Error [script.pl:1] FOO
 
 =head1 EXAMPLE4
+
+=for comment filename=err_bt_pretty_eval.pl
 
  use strict;
  use warnings;
@@ -470,6 +518,8 @@ Error::Pure::Output::ANSIColor - ANSIColor Output subroutines for Error::Pure.
 
 =head1 EXAMPLE5
 
+=for comment filename=err_bt_pretty_rev_eval.pl
+
  use strict;
  use warnings;
 
@@ -524,6 +574,8 @@ Error::Pure::Output::ANSIColor - ANSIColor Output subroutines for Error::Pure.
 
 =head1 EXAMPLE6
 
+=for comment filename=err_print_main.pl
+
  use strict;
  use warnings;
 
@@ -560,6 +612,8 @@ Error::Pure::Output::ANSIColor - ANSIColor Output subroutines for Error::Pure.
 
 =head1 EXAMPLE7
 
+=for comment filename=err_print_class.pl
+
  use strict;
  use warnings;
 
@@ -595,6 +649,8 @@ Error::Pure::Output::ANSIColor - ANSIColor Output subroutines for Error::Pure.
  # Class: FOO
 
 =head1 EXAMPLE8
+
+=for comment filename=err_print_var.pl
 
  use strict;
  use warnings;
@@ -636,6 +692,8 @@ Error::Pure::Output::ANSIColor - ANSIColor Output subroutines for Error::Pure.
  # KEY2: VALUE2
 
 =head1 EXAMPLE9
+
+=for comment filename=err_die.pl
 
  use strict;
  use warnings;
@@ -702,12 +760,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2013-2022 Michal Josef Špaček
+© 2013-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

@@ -5,7 +5,7 @@ use warnings;
 # this is the interface name
 use Net::DBus::Exporter qw(org.freedesktop.ScreenSaver);
 use parent 'Net::DBus::ProxyObject';
-our $VERSION = '1.0.4'; # VERSION
+our $VERSION = '1.0.5'; # VERSION
 # ABSTRACT: proxy dbus object
 
 dbus_method('Inhibit',['string','string','caller'],['uint32']);
@@ -25,7 +25,7 @@ App::XScreenSaver::DBus::SaverProxy - proxy dbus object
 
 =head1 VERSION
 
-version 1.0.4
+version 1.0.5
 
 =head1 AUTHOR
 

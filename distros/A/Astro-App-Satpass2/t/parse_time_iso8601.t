@@ -3,10 +3,8 @@ package main;
 use strict;
 use warnings;
 
-use lib qw{ inc };
-
-use Test::More 0.88;
-
+# NOTE that this must be loaded BEFORE anything that might actually use
+# the time.
 use constant TEST_MOCKTIME	=> do {
     local $@ = undef;
 
@@ -18,22 +16,12 @@ use constant TEST_MOCKTIME	=> do {
 
 };
 
-use Astro::App::Satpass2::Utils qw{ HAVE_DATETIME };
+use Astro::App::Satpass2::ParseTime;
+use Test::More 0.88;
+
+use lib qw{ inc };
 
 use My::Module::Test::App;
-
-BEGIN {
-    local $@ = undef;
-    if ( HAVE_DATETIME ) {
-	*greg_time_gm = \&dt_greg_time_gm;
-	*greg_time_local = \&dt_greg_time_local;
-    } else {
-	require Astro::Coord::ECI::Utils;
-	Astro::Coord::ECI::Utils->VERSION( 0.112 );
-	Astro::Coord::ECI::Utils->import(
-	    qw{ greg_time_gm greg_time_local } );
-    }
-}
 
 # >>>> THIS MUST BE DONE BEFORE ANY TESTS <<<<
 #
@@ -44,18 +32,14 @@ check_datetime_timezone_local()
 
 dump_zones_init();
 
-require_ok 'Astro::App::Satpass2::ParseTime';
-
 klass( 'Astro::App::Satpass2::ParseTime' );
 
 call_m( new => class => 'Astro::App::Satpass2::ParseTime::ISO8601',
     INSTANTIATE, 'Instantiate' );
 
-call_m( isa => 'Astro::App::Satpass2::ParseTime::ISO8601', TRUE,
-    'Object isa Astro::App::Satpass2::ParseTime::ISO8601' );
+isa_ok invocant, 'Astro::App::Satpass2::ParseTime::ISO8601';
 
-call_m( isa => 'Astro::App::Satpass2::ParseTime', TRUE,
-    'Object isa Astro::App::Satpass2::ParseTime' );
+isa_ok invocant, 'Astro::App::Satpass2::ParseTime';
 
 call_m( 'delegate',
     'Astro::App::Satpass2::ParseTime::ISO8601',
@@ -64,7 +48,7 @@ call_m( 'delegate',
 
 call_m( 'use_perltime', FALSE, 'Does not use perltime' );
 
-my $base = greg_time_gm( 0, 0, 0, 1, 3, 2009 );	# April 1, 2009 GMT;
+my $base = any_greg_time_gm( 0, 0, 0, 1, 3, 2009 );	# April 1, 2009 GMT;
 use constant ONE_DAY => 86400;			# One day, in seconds.
 use constant HALF_DAY => 43200;			# 12 hours, in seconds.
 
@@ -94,13 +78,13 @@ call_m( parse => '-0 12', $base - HALF_DAY,
 
 call_m( perltime => 1, TRUE, 'Set perltime true' );
 
-my $time_local = greg_time_local( 0, 0, 0, 1, 0, 2009 );
+my $time_local = any_greg_time_local( 0, 0, 0, 1, 0, 2009 );
 call_m( parse => '20090101T000000',
     $time_local,
     'Parse ISO-8601 20090101T000000' )
     or dump_zones( $time_local );
 
-$time_local = greg_time_local( 0, 0, 0, 1, 6, 2009 );
+$time_local = any_greg_time_local( 0, 0, 0, 1, 6, 2009 );
 call_m( parse => '20090701T000000',
     $time_local,
     'Parse ISO-8601 20090701T000000' )
@@ -108,242 +92,242 @@ call_m( parse => '20090701T000000',
 
 call_m( perltime => 0, TRUE, 'Set perltime false' );
 
-$time_local = greg_time_local( 0, 0, 0, 1, 0, 2009 );
+$time_local = any_greg_time_local( 0, 0, 0, 1, 0, 2009 );
 call_m( parse => '20090101T000000',
     $time_local,
     'Parse ISO-8601 20090101T000000, no help from perltime' )
     or dump_zones( $time_local );
 
-$time_local = greg_time_local( 0, 0, 0, 1, 6, 2009 );
+$time_local = any_greg_time_local( 0, 0, 0, 1, 6, 2009 );
 call_m( parse => '20090701T000000',
     $time_local,
     'Parse ISO-8601 20090701T000000, no help from perltime' )
     or dump_zones( $time_local );
 
-my $time_gm = greg_time_gm( 0, 0, 0, 1, 0, 2009 );
+my $time_gm = any_greg_time_gm( 0, 0, 0, 1, 0, 2009 );
 call_m( parse => '20090101T000000Z',
     $time_gm,
     'Parse ISO-8601 20090101T000000Z' )
     or dump_zones( $time_gm );
 
-$time_gm = greg_time_gm( 0, 0, 0, 1, 6, 2009 );
+$time_gm = any_greg_time_gm( 0, 0, 0, 1, 6, 2009 );
 call_m( parse => '20090701T000000Z',
     $time_gm,
     'Parse ISO-8601 20090701T000000Z' )
     or dump_zones( $time_gm );
 
-$time_local = greg_time_local( 37, 23, 16, 2, 6, 2009 );
+$time_local = any_greg_time_local( 37, 23, 16, 2, 6, 2009 );
 call_m( parse => '20090702T162337',
     $time_local,
     q{Parse ISO-8601 '20090702162337'} )
     or dump_zones( $time_local );
 
-$time_gm = greg_time_gm( 37, 23, 16, 2, 6, 2009 );
+$time_gm = any_greg_time_gm( 37, 23, 16, 2, 6, 2009 );
 call_m( parse => '20090702162337Z',
     $time_gm,
     q{Parse ISO-8601 '20090702162337Z'} )
     or dump_zones( $time_gm );
 
-$time_local = greg_time_local( 0, 23, 16, 2, 6, 2009 );
+$time_local = any_greg_time_local( 0, 23, 16, 2, 6, 2009 );
 call_m( parse => '200907021623',
     $time_local,
     q{Parse ISO-8601 '200907021623'} )
     or dump_zones( $time_local );
 
 call_m( parse => '200907021623Z',
-    greg_time_gm( 0, 23, 16, 2, 6, 2009 ),
+    any_greg_time_gm( 0, 23, 16, 2, 6, 2009 ),
     q{Parse ISO-8601 '200907021623Z'} );
 
 call_m( parse => '2009070216',
-    greg_time_local( 0, 0, 16, 2, 6, 2009 ),
+    any_greg_time_local( 0, 0, 16, 2, 6, 2009 ),
     q{Parse ISO-8601 '2009070216'} );
 
 call_m( parse => '2009070216Z',
-    greg_time_gm( 0, 0, 16, 2, 6, 2009 ),
+    any_greg_time_gm( 0, 0, 16, 2, 6, 2009 ),
     q{Parse ISO-8601 '2009070216Z'} );
 
 call_m( parse => '20090702',
-    greg_time_local( 0, 0, 0, 2, 6, 2009 ),
+    any_greg_time_local( 0, 0, 0, 2, 6, 2009 ),
     q{Parse ISO-8601 '20090702'} );
 
 call_m( parse => '20090702Z',
-    greg_time_gm( 0, 0, 0, 2, 6, 2009 ),
+    any_greg_time_gm( 0, 0, 0, 2, 6, 2009 ),
     q{Parse ISO-8601 '20090702Z'} );
 
 call_m( parse => '200907',
-    greg_time_local( 0, 0, 0, 1, 6, 2009 ),
+    any_greg_time_local( 0, 0, 0, 1, 6, 2009 ),
     q{Parse ISO-8601 '200907'} );
 
 call_m( parse => '200907Z',
-    greg_time_gm( 0, 0, 0, 1, 6, 2009 ),
+    any_greg_time_gm( 0, 0, 0, 1, 6, 2009 ),
     q{Parse ISO-8601 '200907Z'} );
 
 call_m( parse => '2009',
-    greg_time_local( 0, 0, 0, 1, 0, 2009 ),
+    any_greg_time_local( 0, 0, 0, 1, 0, 2009 ),
     q{Parse ISO-8601 '2009'} );
 
 call_m( parse => '2009Z',
-    greg_time_gm( 0, 0, 0, 1, 0, 2009 ),
+    any_greg_time_gm( 0, 0, 0, 1, 0, 2009 ),
     q{Parse ISO-8601 '2009Z'} );
 
 call_m( parse => '19801013T000000Z',
-    greg_time_gm( 0, 0, 0, 13, 9, 1980 ),
+    any_greg_time_gm( 0, 0, 0, 13, 9, 1980 ),
     q{Parse ISO-8601 '19801013T000000Z'} );
 
 call_m( parse => '20090102162337',
-    greg_time_local( 37, 23, 16, 2, 0, 2009 ),
+    any_greg_time_local( 37, 23, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '20090102162337'} );
 
 call_m( parse => '20090102162337Z',
-    greg_time_gm( 37, 23, 16, 2, 0, 2009 ),
+    any_greg_time_gm( 37, 23, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '20090102162337Z'} );
 
 call_m( parse => '200901021623',
-    greg_time_local( 0, 23, 16, 2, 0, 2009 ),
+    any_greg_time_local( 0, 23, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '200901021623'} );
 
 call_m( parse => '200901021623Z',
-    greg_time_gm( 0, 23, 16, 2, 0, 2009 ),
+    any_greg_time_gm( 0, 23, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '200901021623Z'} );
 
 call_m( parse => '2009010216',
-    greg_time_local( 0, 0, 16, 2, 0, 2009 ),
+    any_greg_time_local( 0, 0, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '2009010216'} );
 
 call_m( parse => '2009010216Z',
-    greg_time_gm( 0, 0, 16, 2, 0, 2009 ),
+    any_greg_time_gm( 0, 0, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '2009010216Z'} );
 
 call_m( parse => '20090102',
-    greg_time_local( 0, 0, 0, 2, 0, 2009 ),
+    any_greg_time_local( 0, 0, 0, 2, 0, 2009 ),
     q{Parse ISO-8601 '20090102'} );
 
 call_m( parse => '20090102Z',
-    greg_time_gm( 0, 0, 0, 2, 0, 2009 ),
+    any_greg_time_gm( 0, 0, 0, 2, 0, 2009 ),
     q{Parse ISO-8601 '20090102Z'} );
 
 call_m( parse => '200901',
-    greg_time_local( 0, 0, 0, 1, 0, 2009 ),
+    any_greg_time_local( 0, 0, 0, 1, 0, 2009 ),
     q{Parse ISO-8601 '200901'} );
 
 call_m( parse => '200901Z',
-    greg_time_gm( 0, 0, 0, 1, 0, 2009 ),
+    any_greg_time_gm( 0, 0, 0, 1, 0, 2009 ),
     q{Parse ISO-8601 '200901Z'} );
 
 call_m( parse => '20090102162337+00',
-    greg_time_gm( 37, 23, 16, 2, 0, 2009 ),
+    any_greg_time_gm( 37, 23, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '20090102162337+00'} );
 
 call_m( parse => '20090102162337+0030',
-    greg_time_gm( 37, 53, 15, 2, 0, 2009 ),
+    any_greg_time_gm( 37, 53, 15, 2, 0, 2009 ),
     q{Parse ISO-8601 '20090102162337+0030'} );
 
 call_m( parse => '20090102162337+01',
-    greg_time_gm( 37, 23, 15, 2, 0, 2009 ),
+    any_greg_time_gm( 37, 23, 15, 2, 0, 2009 ),
     q{Parse ISO-8601 '20090102162337+01'} );
 
 call_m( parse => '20090102162337-0030',
-    greg_time_gm( 37, 53, 16, 2, 0, 2009 ),
+    any_greg_time_gm( 37, 53, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '20090102162337-0030'} );
 
 call_m( parse => '20090102162337-01',
-    greg_time_gm( 37, 23, 17, 2, 0, 2009 ),
+    any_greg_time_gm( 37, 23, 17, 2, 0, 2009 ),
     q{Parse ISO-8601 '20090102162337-01'} );
 
 call_m( parse => '20090102T162337',
-    greg_time_local( 37, 23, 16, 2, 0, 2009 ),
+    any_greg_time_local( 37, 23, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '20090102T162337'} );
 
 call_m( parse => '20090102T162337Z',
-    greg_time_gm( 37, 23, 16, 2, 0, 2009 ),
+    any_greg_time_gm( 37, 23, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '20090102T162337Z'} );
 
 call_m( parse => '2009/1/2 16:23:37',
-    greg_time_local( 37, 23, 16, 2, 0, 2009 ),
+    any_greg_time_local( 37, 23, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '2009/1/2 16:23:37'} );
 
 call_m( parse => '2009/1/2 16:23:37 Z',
-    greg_time_gm( 37, 23, 16, 2, 0, 2009 ),
+    any_greg_time_gm( 37, 23, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '2009/1/2 16:23:37 Z'} );
 
 call_m( parse => '2009/1/2 16:23',
-    greg_time_local( 0, 23, 16, 2, 0, 2009 ),
+    any_greg_time_local( 0, 23, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '2009/1/2 16:23'} );
 
 call_m( parse => '2009/1/2 16:23 Z',
-    greg_time_gm( 0, 23, 16, 2, 0, 2009 ),
+    any_greg_time_gm( 0, 23, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '2009/1/2 16:23 Z'} );
 
 call_m( parse => '2009/1/2 16',
-    greg_time_local( 0, 0, 16, 2, 0, 2009 ),
+    any_greg_time_local( 0, 0, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '2009/1/2 16'} );
 
 call_m( parse => '2009/1/2 16 Z',
-    greg_time_gm( 0, 0, 16, 2, 0, 2009 ),
+    any_greg_time_gm( 0, 0, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '2009/1/2 16 Z'} );
 
 call_m( parse => '2009/1/2',
-    greg_time_local( 0, 0, 0, 2, 0, 2009 ),
+    any_greg_time_local( 0, 0, 0, 2, 0, 2009 ),
     q{Parse ISO-8601 '2009/1/2'} );
 
 call_m( parse => '2009/1/2 Z',
-    greg_time_gm( 0, 0, 0, 2, 0, 2009 ),
+    any_greg_time_gm( 0, 0, 0, 2, 0, 2009 ),
     q{Parse ISO-8601 '2009/1/2 Z'} );
 
 call_m( parse => '2009/1',
-    greg_time_local( 0, 0, 0, 1, 0, 2009 ),
+    any_greg_time_local( 0, 0, 0, 1, 0, 2009 ),
     q{Parse ISO-8601 '2009/1'} );
 
 call_m( parse => '2009/1 Z',
-    greg_time_gm( 0, 0, 0, 1, 0, 2009 ),
+    any_greg_time_gm( 0, 0, 0, 1, 0, 2009 ),
     q{Parse ISO-8601 '2009/1 Z'} );
 
 call_m( parse => '2009',
-    greg_time_local( 0, 0, 0, 1, 0, 2009 ),
+    any_greg_time_local( 0, 0, 0, 1, 0, 2009 ),
     q{Parse ISO-8601 '2009'} );
 
 call_m( parse => '2009 Z',
-    greg_time_gm( 0, 0, 0, 1, 0, 2009 ),
+    any_greg_time_gm( 0, 0, 0, 1, 0, 2009 ),
     q{Parse ISO-8601 '2009 Z'} );
 
 call_m( parse => '09/1/2 16:23:37',
-    greg_time_local( 37, 23, 16, 2, 0, 2009 ),
+    any_greg_time_local( 37, 23, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '09/1/2 16:23:37'} );
 
 call_m( parse => '09/1/2 16:23:37 Z',
-    greg_time_gm( 37, 23, 16, 2, 0, 2009 ),
+    any_greg_time_gm( 37, 23, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '09/1/2 16:23:37 Z'} );
 
 call_m( parse => '09/1/2 16:23',
-    greg_time_local( 0, 23, 16, 2, 0, 2009 ),
+    any_greg_time_local( 0, 23, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '09/1/2 16:23'} );
 
 call_m( parse => '09/1/2 16:23 Z',
-    greg_time_gm( 0, 23, 16, 2, 0, 2009 ),
+    any_greg_time_gm( 0, 23, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '09/1/2 16:23 Z'} );
 
 call_m( parse => '09/1/2 16',
-    greg_time_local( 0, 0, 16, 2, 0, 2009 ),
+    any_greg_time_local( 0, 0, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '09/1/2 16'} );
 
 call_m( parse => '09/1/2 16 Z',
-    greg_time_gm( 0, 0, 16, 2, 0, 2009 ),
+    any_greg_time_gm( 0, 0, 16, 2, 0, 2009 ),
     q{Parse ISO-8601 '09/1/2 16 Z'} );
 
 call_m( parse => '09/1/2',
-    greg_time_local( 0, 0, 0, 2, 0, 2009 ),
+    any_greg_time_local( 0, 0, 0, 2, 0, 2009 ),
     q{Parse ISO-8601 '09/1/2'} );
 
 call_m( parse => '09/1/2 Z',
-    greg_time_gm( 0, 0, 0, 2, 0, 2009 ),
+    any_greg_time_gm( 0, 0, 0, 2, 0, 2009 ),
     q{Parse ISO-8601 '09/1/2 Z'} );
 
 call_m( parse => '09/1',
-    greg_time_local( 0, 0, 0, 1, 0, 2009 ),
+    any_greg_time_local( 0, 0, 0, 1, 0, 2009 ),
     q{Parse ISO-8601 '09/1'} );
 
 call_m( parse => '09/1 Z',
-    greg_time_gm( 0, 0, 0, 1, 0, 2009 ),
+    any_greg_time_gm( 0, 0, 0, 1, 0, 2009 ),
     q{Parse ISO-8601 '09/1 Z'} );
 
 SKIP: {
@@ -355,55 +339,55 @@ SKIP: {
 	set_fixed_time('2009-07-01T06:00:00Z');
 
 	call_m( parse => 'yesterday Z',
-	    greg_time_gm( 0, 0, 0, 30, 5, 2009 ),
+	    any_greg_time_gm( 0, 0, 0, 30, 5, 2009 ),
 	    q{Parse ISO-8601 'yesterday Z'} );
 
 	call_m( parse => 'yesterday 9:30Z',
-	    greg_time_gm( 0, 30, 9, 30, 5, 2009 ),
+	    any_greg_time_gm( 0, 30, 9, 30, 5, 2009 ),
 	    q{Parse ISO-8601 'yesterday 9:30Z'} );
 
 	call_m( parse => 'today Z',
-	    greg_time_gm( 0, 0, 0, 1, 6, 2009 ),
+	    any_greg_time_gm( 0, 0, 0, 1, 6, 2009 ),
 	    q{Parse ISO-8601 'today Z'} );
 
 	call_m( parse => 'today 9:30Z',
-	    greg_time_gm( 0, 30, 9, 1, 6, 2009 ),
+	    any_greg_time_gm( 0, 30, 9, 1, 6, 2009 ),
 	    q{Parse ISO-8601 'today 9:30Z'} );
 
 	call_m( parse => 'tomorrow Z',
-	    greg_time_gm( 0, 0, 0, 2, 6, 2009 ),
+	    any_greg_time_gm( 0, 0, 0, 2, 6, 2009 ),
 	    q{Parse ISO-8601 'tomorrow Z'} );
 
 	call_m( parse => 'tomorrow 9:30Z',
-	    greg_time_gm( 0, 30, 9, 2, 6, 2009 ),
+	    any_greg_time_gm( 0, 30, 9, 2, 6, 2009 ),
 	    q{Parse ISO-8601 'tomorrow 9:30Z'} );
 
 	restore_time();
 
-	set_fixed_time( greg_time_local( 0, 0, 6, 1, 6, 2009 ) );
+	set_fixed_time( any_greg_time_local( 0, 0, 6, 1, 6, 2009 ) );
 
 	call_m( parse => 'yesterday',
-	    greg_time_local( 0, 0, 0, 30, 5, 2009 ),
+	    any_greg_time_local( 0, 0, 0, 30, 5, 2009 ),
 	    q{Parse ISO-8601 'yesterday'} );
 
 	call_m( parse => 'yesterday 9:30',
-	    greg_time_local( 0, 30, 9, 30, 5, 2009 ),
+	    any_greg_time_local( 0, 30, 9, 30, 5, 2009 ),
 	    q{Parse ISO-8601 'yesterday 9:30'} );
 
 	call_m( parse => 'today',
-	    greg_time_local( 0, 0, 0, 1, 6, 2009 ),
+	    any_greg_time_local( 0, 0, 0, 1, 6, 2009 ),
 	    q{Parse ISO-8601 'today'} );
 
 	call_m( parse => 'today 9:30',
-	    greg_time_local( 0, 30, 9, 1, 6, 2009 ),
+	    any_greg_time_local( 0, 30, 9, 1, 6, 2009 ),
 	    q{Parse ISO-8601 'today 9:30'} );
 
 	call_m( parse => 'tomorrow',
-	    greg_time_local( 0, 0, 0, 2, 6, 2009 ),
+	    any_greg_time_local( 0, 0, 0, 2, 6, 2009 ),
 	    q{Parse ISO-8601 'tomorrow'} );
 
 	call_m( parse => 'tomorrow 9:30',
-	    greg_time_local( 0, 30, 9, 2, 6, 2009 ),
+	    any_greg_time_local( 0, 30, 9, 2, 6, 2009 ),
 	    q{Parse ISO-8601 'tomorrow 9:30'} );
 
 	restore_time();

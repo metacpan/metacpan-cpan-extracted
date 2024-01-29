@@ -7,7 +7,7 @@ use JSON qw(from_json to_json);
 use MIME::Base64 qw(encode_base64url decode_base64url);
 use Crypt::URandom;
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.18.0';
 
 extends 'Lemonldap::NG::Portal::2F::Register::Base';
 with 'Lemonldap::NG::Portal::Lib::WebAuthn';
@@ -52,6 +52,20 @@ has rpName => (
     }
 );
 
+# Split content of webauthn2fAttestationTrust into an array ref of PEM certificates
+sub _build_trust_anchors {
+    my ($self) = shift;
+    my $pem_data = $self->conf->{webauthn2fAttestationTrust};
+    if ($pem_data) {
+        my @split_certs = $pem_data =~
+          /(-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----)/sg;
+        if ( @split_certs > 0 ) {
+            return \@split_certs;
+        }
+    }
+    return [];
+}
+
 # RUNNING METHODS
 
 # Return a Base64url encoded user handle
@@ -82,16 +96,9 @@ sub _registrationchallenge {
     my @alldevices       = $self->find2fDevicesByType( $req, $req->userData );
     my $challenge_base64 = encode_base64url( Crypt::URandom::urandom(32) );
 
-    # Challenge is persisted on the server
-    my $token = $self->ott->createToken( {
-            registration_options => {
-                challenge => $challenge_base64,
-            }
-        }
-    );
-
     my $displayName      = $req->userData->{ $self->displayname_attr } || $user;
     my $userVerification = $self->conf->{webauthn2fUserVerification};
+    my $attestation      = $self->conf->{webauthn2fAttestation} || "none";
     my $request          = {
         rp => {
             name => $self->rpName,
@@ -102,6 +109,7 @@ sub _registrationchallenge {
             displayName => $displayName,
         },
         challenge              => $challenge_base64,
+        attestation            => $attestation,
         pubKeyCredParams       => [],
         authenticatorSelection => { (
                 $userVerification
@@ -110,6 +118,13 @@ sub _registrationchallenge {
             )
         }
     };
+
+    # Challenge is persisted on the server
+    my $token = $self->ott->createToken( {
+            registration_options => $request,
+        }
+    );
+
 
     $self->logger->debug( "Register parameters " . to_json($request) );
     return $self->p->sendJSONresponse( $req,
@@ -163,11 +178,16 @@ sub _registration {
     my $credential_id     = $validation->{credential_id};
     my $credential_pubkey = $validation->{credential_pubkey};
     my $signature_count   = $validation->{signature_count};
-    $self->logger->debug( $self->prefix
+    my $aaguid            = $validation->{attestation_result}->{aaguid};
+    $self->logger->debug(
+            $self->prefix
           . "2f: registering new credential: \n"
-          . "ID: $credential_id\n"
-          . "Public key: $credential_pubkey\n"
-          . "Signature count: $signature_count" );
+          . join( "\n",
+            "ID: $credential_id",
+            "Public key: $credential_pubkey",
+            "Signature count: $signature_count",
+            ( $aaguid ? "AAGUID: $aaguid" : () ) )
+    );
 
     return $self->p->sendError( $req, 'webauthnAlreadyRegistered', 400 )
       if $self->find2fDevicesByKey( $req, $req->userData, $self->type,
@@ -185,13 +205,15 @@ sub _registration {
                 _credentialId        => $credential_id,
                 _credentialPublicKey => $credential_pubkey,
                 _signCount           => $signature_count,
-                type                 => $self->type,
-                name                 => $keyName,
-                epoch                => time()
+                ( $aaguid ? ( _aaguid => $aaguid ) : () ),
+                type  => $self->type,
+                name  => $keyName,
+                epoch => time(),
             }
         )
       )
     {
+        $self->markRegistered($req);
         return $self->p->sendJSONresponse( $req, { result => 1 } );
     }
     else {

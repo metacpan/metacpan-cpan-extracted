@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
-package Optree::Generate 0.07;
+package Optree::Generate 0.09;
 
 use v5.26; # XS code needs op_class() and the OPclass_* constants
 use warnings;
@@ -13,20 +13,15 @@ BEGIN {
    XSLoader::load( __PACKAGE__, our $VERSION );
 }
 
-BEGIN {
-   if( $^V ge v5.36 ) {
-      warnings->unimport(qw( experimental::builtin ));
-      builtin->import(qw( blessed reftype ));
-   }
-   else {
-      require Scalar::Util;
-      Scalar::Util->import(qw( blessed reftype ));
-   }
-}
+use builtin qw( blessed reftype );
+no warnings 'experimental::builtin';
+
+use meta 0.003_002;
+no warnings 'meta::experimental';
 
 require B; # for the B::OP classes
 
-use Exporter 'import';
+use Exporter ();
 push our @EXPORT_OK, qw(
    opcode
    op_contextualize
@@ -71,6 +66,12 @@ search across the entire C<PL_op_name> array you may wish to perform this just
 once and store the result, perhaps using C<use constant> for convenience.
 
    use constant OP_CONST => opcode("const");
+
+I<Since version 0.08> as an extra convenience for users, requesting to import
+any symbol named C<OP_...> will dynamically create the required constant
+functions with this mechanism.
+
+   use Optree::Generate qw( OP_CONST );
 
 =head2 op_contextualize
 
@@ -235,6 +236,24 @@ flag will always be set.
 
 =cut
 
+sub import
+{
+   my $self = shift;
+   my @opcodes;
+   @_ = grep { m/^OP_/ ? ( (push @opcodes, $_), 0 ) : 1 } @_;
+
+   if( @opcodes ) {
+      my $callerpkg = meta::package->get( scalar caller );
+      foreach my $name ( @opcodes ) {
+         my $val = opcode( lc +( $name =~ m/^OP_(.*)$/ )[0] );
+         $callerpkg->add_symbol( '&'.$name => sub () { $val } );
+      }
+   }
+
+   unshift @_, $self;
+   goto &Exporter::import;
+}
+
 use constant {
    OP_CONST    => opcode("const"),
    OP_ENTERSUB => opcode("entersub"),
@@ -254,7 +273,7 @@ sub make_entersub_op
       $cvop = newSVOP(OP_CONST, 0, $cv);
    }
    else {
-      my $gv = do { no strict 'refs'; \*$cv };
+      my $gv = meta::glob->get( $cv )->reference;
       $cvop = newUNOP(OP_RV2CV, 0, newGVOP(OP_GV, 0, $gv));
    }
 

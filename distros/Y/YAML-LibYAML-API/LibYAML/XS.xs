@@ -124,6 +124,7 @@ emit_string_events(AV *perl_events, HV *options)
         yaml_emitter_t emitter;
         SV **val;
         SV *yaml = newSVpvn("", 0);
+        int unicode = 1;
 
         XCPT_TRY_START
         {
@@ -140,7 +141,14 @@ emit_string_events(AV *perl_events, HV *options)
             }
             yaml_emitter_set_output(&emitter, &append_output, (void *) yaml);
             yaml_emitter_set_canonical(&emitter, 0);
-            yaml_emitter_set_unicode(&emitter, 0);
+            yaml_emitter_set_unicode(&emitter, 1);
+            val = hv_fetch(options, "unicode", 7, TRUE);
+            if (val && SvOK(*val) && SvTRUE(*val)) {
+                unicode = 1;
+            }
+            else if (val && SvOK(*val) && ! SvTRUE(*val)) {
+                unicode = 0;
+            }
 
             emit_events(&emitter, perl_events);
 
@@ -155,7 +163,13 @@ emit_string_events(AV *perl_events, HV *options)
         }
 
         if (yaml) {
-            SvUTF8_off(yaml);
+            if (unicode) {
+                SvUTF8_off(yaml);
+            }
+            else {
+                (void)sv_utf8_decode(yaml);
+                SvUTF8_on(yaml);
+            }
         }
         RETVAL = yaml;
 
@@ -188,7 +202,7 @@ emit_file_events(const char *filename, AV *perl_events, HV *options)
             output = fopen(filename, "wb");
             yaml_emitter_set_output_file(&emitter, output);
             yaml_emitter_set_canonical(&emitter, 0);
-            yaml_emitter_set_unicode(&emitter, 0);
+            yaml_emitter_set_unicode(&emitter, 1);
 
             emit_events(&emitter, perl_events);
 
@@ -240,7 +254,7 @@ emit_filehandle_events(FILE *output, AV *perl_events, HV *options)
 
             yaml_emitter_set_output_file(&emitter, output);
             yaml_emitter_set_canonical(&emitter, 0);
-            yaml_emitter_set_unicode(&emitter, 0);
+            yaml_emitter_set_unicode(&emitter, 1);
 
             emit_events(&emitter, perl_events);
 

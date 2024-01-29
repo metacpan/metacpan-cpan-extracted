@@ -1,3 +1,42 @@
+2.003002 2024-01-05
+
+ * Improved interaction between Math::BigInt and the backend libraries.
+
+ * Much faster versions of _ilog2() and _clog2() implemented in the
+   Math::BigInt::Calc backend library. This should speed up bilog2() and
+   bclog2() in Math::BigInt when "Calc" is used as the backend liberary.
+
+2.003001 2023-12-26
+
+ * Add configuration methods trap_inf() and trap_nan(). Previously it was only
+   possible to modify these properties by using the config() method.
+
+ * Fix CPAN RT #150796 so that config() no longer modifies the input when it is
+   a hash ref.
+
+ * Fix CPAN RT #150797 so that both accuracy and precision can be set
+   simultaneously with config().
+
+ * Add the following methods to Math::BigInt
+
+   - bilog2()   base 2 logarithm rounded downwards, i.e., int(log2(x))
+   - bilog10()  base 10 logarithm rounded downwards, i.e., int(log10(x))
+   - bclog2()   base 2 logarithm rounded upwards, i.e., ceil(log2(x))
+   - bclog10()  base 10 logarithm rounded upwards, i.e., ceil(log10(x))
+
+ * Add the following backend library methods to Math::BigInt::Lib. These
+   methods do the core computations for the corresponding methods in
+   Math::BigInt (see above).
+
+   - _ilog2()   base 2 logarithm rounded downwards
+   - _ilog10()  base 10 logarithm rounded downwards
+   - _clog2()   base 2 logarithm rounded upwards
+   - _clog10()  base 10 logarithm rounded upwards
+
+2.002001 2023-12-09
+
+ * Fix CPAN RT #150523
+
 2.002000 2023-12-02
 
  * Fix bug in Math::BigFloat method bsin(). It can now handle any argument to

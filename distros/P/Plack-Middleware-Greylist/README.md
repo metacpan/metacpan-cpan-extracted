@@ -4,7 +4,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 # VERSION
 
-version v0.6.0
+version v0.7.2
 
 # SYNOPSIS
 
@@ -52,6 +52,8 @@ Rate limiting 192.168.0.12 after 101/100 for default
 
 This will allow you to use something like [fail2ban](https://metacpan.org/pod/fail2ban) to block repeat offenders, since bad
 robots are like houseflies that repeatedly bump against closed windows.
+
+Note, if a ["callback"](#callback) is specified, then nothing will be logged, but the log message will be sent to the callback.
 
 # ATTRIBUTES
 
@@ -155,6 +157,65 @@ block).
 
 If you customise this, then you need to ensure that the counter resets or expires counts after a set period of time,
 e.g. one minute.  If you use a different time interval, then you may need to adjust the ["retry\_after"](#retry_after) time.
+
+## callback
+
+This is a code reference for a function that is called when rate limits are exceeded. The function is called with a hash
+reference containing the following keys:
+
+- `env`
+
+    The [Plack](https://metacpan.org/pod/Plack) environment.
+
+- `ip`
+
+    The IP address being blocked, generally `$env-`{REMOTE\_ADDR}>.
+
+- `hits`
+
+    This is the number of hits.
+
+- `rate`
+
+    This is the rate limit.
+
+- `block`
+
+    This is the network block that the `rate` applies to, or "default".
+
+- `message`
+
+    This is the message that would be logged.
+
+If a callback is defined, it will be used instead of logging.
+
+The callback must return a true value to indicate that the request should be blocked. Otherwise it will still be
+allowed. (Note that the hit count will still be incremented, even if the request is allowed.)
+
+A sample callback might look something like
+
+```perl
+callback => sub {
+    my ($info) = @_;
+
+    my $env = $info->{env};
+
+    my $log = $env->{'psgix.logger'};
+    $log->({
+        level   => "warn",
+        message => $info->{message},
+    });
+
+    # See Plack::Middleware::Statsd
+    my $statsd = $env->{'psgix.monitor.statsd'};
+    $statsd->increment( "myapp.psgi.greylist.blocked" );
+    $statsd->set_add( "myapp.psgi.greplist.ips", $ip );
+
+    return 1;
+};
+```
+
+The callback attribute was added in v0.6.1.
 
 # KNOWN ISSUES
 

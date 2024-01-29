@@ -134,7 +134,7 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 
 	return ''  unless (defined $firstStream);
 
-	if (($arglist =~ /\b\-?nopls\b/ && $firstStream =~ /\.(pls)$/i)
+	if (($arglist =~ /\b\-?nopls\b/ && $firstStream =~ /\.(pls|m3u)$/i)
 			|| (defined($self->{'hls_bandwidth'}) && $firstStream =~ /\.(m3u8)$/i)
 			|| ($arglist =~ /\b\-?noplaylists\b/ && $firstStream =~ /\.(pls|m3u8?)$/i)) {
 		my $plType = $1;

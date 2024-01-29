@@ -23,6 +23,7 @@ t/08-data/mix.ini
 t/09-args.t
 t/10-arg_error.t
 t/11-ini_error.t
+t/12-global_mode.t
 t/99-data/dummy.ini
 t/99-examples.t
 t/manifest.t

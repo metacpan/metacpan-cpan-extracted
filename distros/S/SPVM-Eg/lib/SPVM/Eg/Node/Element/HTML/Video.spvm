@@ -1,0 +1,17 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Eg::Node::Element::HTML::Video extends Eg::Node::Element::HTML::Media {
+  
+  allow Eg::Node::Document::HTML;
+  
+  # Class Methods
+  private static method new : Eg::Node::Element::HTML::Video () {
+    
+    my $self = new Eg::Node::Element::HTML::Video;
+    
+    $self->SUPER::init;
+    
+    return $self;
+  }
+}

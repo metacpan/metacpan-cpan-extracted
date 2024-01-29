@@ -5,7 +5,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 use Devel::StackTrace::Frame;
 use File::Spec;
@@ -13,6 +13,7 @@ use Scalar::Util qw( blessed );
 
 use overload
     '""'     => \&as_string,
+    bool     => sub {1},
     fallback => 1;
 
 sub new {
@@ -324,7 +325,7 @@ Devel::StackTrace - An object representing a stack trace
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 SYNOPSIS
 
@@ -347,8 +348,8 @@ version 2.04
 =head1 DESCRIPTION
 
 The C<Devel::StackTrace> module contains two classes, C<Devel::StackTrace> and
-L<Devel::StackTrace::Frame>. These objects encapsulate the information that
-can retrieved via Perl's C<caller> function, as well as providing a simple
+L<Devel::StackTrace::Frame>. These objects encapsulate the information that can
+retrieved via Perl's C<caller> function, as well as providing a simple
 interface to this data.
 
 The C<Devel::StackTrace> object contains a set of C<Devel::StackTrace::Frame>
@@ -412,13 +413,12 @@ stacktrace is created, and before refs are stringified (if
 C<unsafe_ref_capture> is not set), rather than being filtered lazily when
 L<Devel::StackTrace::Frame> objects are first needed.
 
-This is useful if you want to filter based on the frame's arguments and want
-to be able to examine object properties, for example.
+This is useful if you want to filter based on the frame's arguments and want to
+be able to examine object properties, for example.
 
 =item * ignore_package => $package_name OR \@package_names
 
-Any frames where the package is one of these packages will not be on the
-stack.
+Any frames where the package is one of these packages will not be on the stack.
 
 =item * ignore_class => $package_name OR \@package_names
 
@@ -433,8 +433,8 @@ you create a subclass of Devel::StackTrace it will not be ignored.
 
 This will cause this number of stack frames to be excluded from top of the
 stack trace. This prevents the frames from being captured at all, and applies
-before the C<frame_filter>, C<ignore_package>, or C<ignore_class> options,
-even with C<filter_frames_early>.
+before the C<frame_filter>, C<ignore_package>, or C<ignore_class> options, even
+with C<filter_frames_early>.
 
 =item * unsafe_ref_capture => $boolean
 
@@ -459,9 +459,8 @@ arguments in stack trace frames at all.
 
 By default, Devel::StackTrace will call C<overload::AddrRef> to get the
 underlying string representation of an object, instead of respecting the
-object's stringification overloading. If you would prefer to see the
-overloaded representation of objects in stack traces, then set this parameter
-to true.
+object's stringification overloading. If you would prefer to see the overloaded
+representation of objects in stack traces, then set this parameter to true.
 
 =item * max_arg_length => $integer
 
@@ -485,11 +484,11 @@ tab character, just like C<Carp::confess>.
 
 =head2 $trace->next_frame
 
-Returns the next L<Devel::StackTrace::Frame> object on the stack, going
-down. If this method hasn't been called before it returns the first frame. It
-returns C<undef> when it reaches the bottom of the stack and then resets its
-pointer so the next call to C<< $trace->next_frame >> or C<<
-$trace->prev_frame >> will work properly.
+Returns the next L<Devel::StackTrace::Frame> object on the stack, going down.
+If this method hasn't been called before it returns the first frame. It returns
+C<undef> when it reaches the bottom of the stack and then resets its pointer so
+the next call to C<< $trace->next_frame >> or C<< $trace->prev_frame >> will
+work properly.
 
 =head2 $trace->prev_frame
 
@@ -521,9 +520,9 @@ complex than can be handled by the C<< $trace->filter_frames >> method:
 
 =head2 $trace->frame($index)
 
-Given an index, this method returns the relevant frame, or undef if there is
-no frame at that index. The index is exactly like a Perl array. The first
-frame is 0 and negative indexes are allowed.
+Given an index, this method returns the relevant frame, or undef if there is no
+frame at that index. The index is exactly like a Perl array. The first frame is
+0 and negative indexes are allowed.
 
 =head2 $trace->frame_count
 
@@ -550,8 +549,6 @@ method returns C<undef>.
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Devel-StackTrace/issues>.
 
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
-
 =head1 SOURCE
 
 The source code repository for Devel-StackTrace can be found at L<https://github.com/houseabsolute/Devel-StackTrace>.
@@ -571,7 +568,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<http://www.urth.org/~autarch/fs-donation.html>.
+button at L<https://houseabsolute.com/foss-donations/>.
 
 =head1 AUTHOR
 
@@ -615,7 +612,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2000 - 2019 by David Rolsky.
+This software is Copyright (c) 2000 - 2024 by David Rolsky.
 
 This is free software, licensed under:
 

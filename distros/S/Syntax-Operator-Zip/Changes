@@ -1,5 +1,18 @@
 Revision history for Syntax-Operator-Zip
 
+0.09    2024-01-06
+        [CHANGES]
+         * Quiet the meta::experimental warnings of meta 0.003_002
+
+0.08    2024-01-03
+        [CHANGES]
+         * Use the nicer `meta::package->get` syntax from meta 0.003_001
+
+0.07    2023-12-29
+        [CHANGES]
+         * Use `meta` instead of `no strict 'refs'` hackery to implement
+           symbol export
+
 0.06    2023-07-21
         [CHANGES]
          * Swap all unit tests from `Test::More` to `Test2::V0`

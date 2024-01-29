@@ -6,7 +6,7 @@ use warnings;
 use File::Slurp;
 use Exporter 'import';
 our @EXPORT = qw(github_releases);
-use LWP::Simple;
+use LWP::UserAgent ();
 use JSON;
 
 =head1 NAME
@@ -69,9 +69,29 @@ sub github_releases {
 	}
 
 	my $url     = 'https://api.github.com/repos/' . $opts{owner} . '/' . $opts{repo} . '/releases';
-	my $content = get($url);
-	if ( !defined($content) ) {
-		die( 'Fetching "' . $url . '" failed' );
+	my $content;
+	eval{
+		my $ua = LWP::UserAgent->new(timeout => 10);
+		if (defined($ENV{HTTP_PROXY})) {
+			$ua->proxy(['http'], $ENV{HTTP_PROXY});
+		}
+		if (defined($ENV{HTTPS_PROXY})) {
+			$ua->proxy(['https'], $ENV{HTTPS_PROXY});
+		}
+		if (defined($ENV{FTP_PROXY})) {
+			$ua->proxy(['ftp'], $ENV{FTP_PROXY});
+		}
+
+		my $response = $ua->get($url);
+
+		if ($response->is_success) {
+			$content=$response->decoded_content;
+		}else {
+			die($response->status_line);
+		}
+	};
+	if ($@) {
+		die( 'Fetching "' . $url . '" failed'... $@ );
 	}
 
 	if ( $opts{raw} ) {

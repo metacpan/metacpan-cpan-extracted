@@ -475,6 +475,8 @@ The optional context.
 
 The fuzzy flag set when the entry has been created but not yet translated
 
+See also the L<GNU PO documentation|https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html#index-fuzzy-flag>
+
 =item * C<comment>
 
 The optional comment that can be added to provide some explanations to the translator
@@ -487,6 +489,19 @@ The optional comment added automatically
 
 An optional set of flags, stored as an array reference
 
+For example:
+
+    #: src/msgcmp.c:338 src/po-lex.c:699
+    #, c-format
+    msgid "found %d fatal error"
+    msgid_plural "found %d fatal errors"
+    msgstr[0] "s'ha trobat %d error fatal"
+    msgstr[1] "s'han trobat %d errors fatals"
+
+Here the flag would be C<c-format>
+
+See also the L<GNU PO documentation|https://www.gnu.org/software/gettext/manual/html_node/c_002dformat-Flag.html> and L<here|https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html#index-no_002dc_002dformat-flag>
+
 =item * C<plural>
 
 Whether this has a plural form
@@ -498,6 +513,14 @@ The character encoding
 =item * C<file>
 
 The file in which this l10n string was found. This is set when automatic parsing was executed
+
+For example:
+
+    #: lib/error.c:116
+    msgid "Unknown system error"
+    msgstr "Error desconegut del sistema"
+
+This would specify a file C<lib/error.c> and a line number C<116>
 
 =item * C<line>
 

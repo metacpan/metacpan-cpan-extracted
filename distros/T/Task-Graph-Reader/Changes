@@ -1,3 +1,18 @@
+0.04 2024-01-03T13:23:04+01:00
+ - Add Graph::Reader::Graph6.
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Move bugtracker to github.
+ - Update Graph::Reader to 2.10 version.
+ - Update Graph::Reader::OID to 0.05 version.
+ - Update Graph::Reader::TGF to 0.04 version.
+ - Update Graph::Reader::TGF::CSV to 0.03 version.
+ - Update Graph::Reader::UnicodeTree to 0.03 version.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.03 2015-11-03T23:07:46+01:00
  - Update Graph::Reader::OID to 0.03 version.
  - Update Graph::Reader::TGF to 0.03 version.

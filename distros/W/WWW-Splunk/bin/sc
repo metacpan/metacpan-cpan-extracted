@@ -33,20 +33,20 @@ use Pod::Usage;
 use strict;
 use warnings;
 
-our $VERSION = '2.07';
+our $VERSION = '2.09';
 
 # Subcommand dispatch
 
 my %commands = (
-	search	=> \&search,
+	search => \&search,
 );
 
 # Command line options
 
 my $host = 'localhost';
 my $port = 8089;
-my $login = 'admin';
-my $password = 'changeme';
+my $login = $ENV{SPLUNK_LOGIN} || 'admin';
+my $password = $ENV{SPLUNK_PASSWORD} || 'changeme';
 my $insecure = 0;
 
 =head1 OPTIONS
@@ -84,38 +84,33 @@ Subcommand to run. Currently defined is just B<search>.
 
 =cut
 
-new Getopt::Long::Parser (
+Getopt::Long::Parser->new(
         config => [qw/require_order/]
-)->getoptions (
-	"host=s"	=> \$host,
-	"port=i"	=> \$port,
-	"login=s"	=> \$login,
-	"password=s"	=> \$password,
-	"insecure"	=> \$insecure,
-	"h|help"	=> sub { pod2usage (0) },
-	"m|man"		=> sub { pod2usage (-verbose => 2) },
+)->getoptions(
+	"host=s" => \$host,
+	"port=i" => \$port,
+	"login=s" => \$login,
+	"password=s" => \$password,
+	"insecure" => \$insecure,
+	"h|help" => sub { pod2usage(0) },
+	"m|man" => sub { pod2usage(-verbose => 2) },
 ) or die "Could not parse command line";
-
-# Dispatch
 
 my $subcommand = shift @ARGV;
 die "Missing subcommand" unless $subcommand;
 die "Invalid subcommand" unless exists $commands{$subcommand};
 
-my $splunk = new WWW::Splunk ({
-	host	=> $host,
-	port	=> $port,
-	login	=> $login,
+my $splunk = WWW::Splunk->new({
+	host => $host,
+	port => $port,
+	login => $login,
 	password => $password,
 	unsafe_ssl => $insecure,
 });
 
 exit $commands{$subcommand}->(@ARGV);
 
-# Implementation
-
-sub print_results
-{
+sub print_results {
 	my $format = shift;
 	return unless @_;
 
@@ -181,28 +176,43 @@ Switch output format style.
 sub search
 {
 	my ($since, $until, $format);
-        GetOptionsFromArray (\@_,
-                't|since=s' => \$since,
-                'T|until=s' => \$until,
-                'f|format=s' => \$format,
-        ) or die 'Bad arguments to search';
+	GetOptionsFromArray(\@_,
+		't|since=s' => \$since,
+		'T|until=s' => \$until,
+		'f|format=s' => \$format,
+	) or die 'Bad arguments to search';
 
 	if (($since and $since =~ /^rt/) or ($until and $until =~ /^rt/)) {
+
 		# Real time search
-		$splunk->rt_search (join (' ', @_), sub {
-			print_results ($format => @_);
+		$splunk->rt_search(join(' ', @_), sub {
+			print_results($format => @_);
 		}, $since, $until);
 	} else {
-		my $sid = $splunk->start_search (join (' ', @_), $since, $until);
+		my $sid = $splunk->start_search(join(' ', @_), $since, $until);
 
-		until ($splunk->results_read ($sid)) {
-			my @results = $splunk->search_results ($sid);
-			print_results ($format => @results);
+		until ($splunk->results_read($sid)) {
+			my @results = $splunk->search_results($sid);
+			print_results($format => @results);
 		}
 	}
 
 	return 0;
 }
+
+=head1 ENVIRONMENT VARIABLES
+
+=over
+
+=item B<SPLUNK_LOGIN>
+
+Splunk login.
+
+=item B<SPLUNK_PASSWORD>
+
+Splunk password.
+
+=back
 
 =head1 EXAMPLES
 
@@ -227,7 +237,7 @@ L<WWW::Splunk>, L<WWW::Splunk::API>
 Lubomir Rintel, L<< <lkundrak@v3.sk> >>,
 Michal Josef Špaček L<< <skim@cpan.org> >>
 
-The code is hosted on GitHub L<http://github.com/tupinek/perl-WWW-Splunk>.
+The code is hosted on GitHub L<http://github.com/michal-josef-spacek/perl-WWW-Splunk>.
 Bug fixes and feature enhancements are always welcome.
 
 =cut

@@ -1,6 +1,11 @@
 Revision history for Term::TablePrint
 
 
+0.162   2024-01-02
+        - Don't prefix references with 'ref'.
+        - Use a string instead of a 'qr' object to save the search regex.
+        - Bugfix: deactivate 'hide_cursor' in the 'choose' functions.
+
 0.161   2023-05-16
         - Option color: reset to normal at the end of a table field.
 

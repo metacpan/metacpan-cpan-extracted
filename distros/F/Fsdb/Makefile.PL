@@ -1,6 +1,5 @@
 #
 # Makefile.PL
-# $Id: e28b850c14158405548326f2f897887a35550066 $
 #
 # made by module-starter,  8-Nov-07
 #
@@ -35,6 +34,7 @@ my @modularized_db_programs = qw(
 	dbcolpercentile
 	dbcolrename
 	dbcolscorrelate 
+	dbcolsdecimate
 	dbcolsplittocols 
 	dbcolsplittorows
 	dbcolsregression

@@ -2,9 +2,8 @@
 
 #
 # Filter.pm
-# $Id: 7843a6bb9a62b736e670fcf61fdb3e66994cf79f $
 #
-# Copyright (C) 2007-2008 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 2007-2024 by John Heidemann <johnh@isi.edu>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -177,6 +176,7 @@ Figure out a tmpdir, from environment variables if necessary.
 sub set_default_tmpdir($;$) {
     my $self = shift @_;
 
+    return if (defined($self->{_tmpdir}));
     foreach ($_[0], $ENV{'TMPDIR'}, "/tmp") {
 	if (defined($_)) {
 	    $self->{_tmpdir} = $_;

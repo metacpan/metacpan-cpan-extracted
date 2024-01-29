@@ -1,5 +1,5 @@
 package HTML::Selector::Element;
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 ## Adapted from HTML::Selector::XPath
 ## The parser is basically the same, the difference is in what it produces.
@@ -121,14 +121,15 @@ sub consume {
     my ($self, $rule) = @_;
 
     my @alt;
-    my $last_rule = '';
     my $set = { static => my $static = [] }; 
     my $hold;  # last valid set
     my $sibling_root;   # root element of search space is sibling of start element
+    my $root_child;     # root element of search space is child of start element
     my($any);  # flags
     my $start_combinators = '';
 
-    $rule =~ s/^\s+//; 
+    $rule =~ s/^\s+//;
+    my $original = $rule;
     # Loop through each "unit" of the rule
     while() {
         # Match elements
@@ -246,9 +247,12 @@ sub consume {
             # ending one rule and beginning another
             $set->{tag} ||= do { push  @$static, _tag => qr/^(?!~)/; '*' };
             $set->{sibling_root} ||= $sibling_root if $sibling_root;
+            $set->{root_child} ||= $root_child if $root_child;
+            ($set->{selector} = length $rule ? substr($original, 0, -length $rule) : $original) =~ s/[,\s]+$//;
+            $original = $rule;
             push @alt, $set;
             $set = { static => $static = [] };
-            ($any, $hold, $sibling_root) = ();
+            ($any, $hold, $sibling_root, $root_child) = ();
         }
         # Match combinators (whitespace, >, + and ~)
         elsif ($rule =~ s/$reg->{combinator}//) {
@@ -267,15 +271,23 @@ sub consume {
             # new context
             ($any, $hold) = ();
             $hold = $set unless $1;
+            ($set->{selector} = length $rule ? substr($original, 0, -length $rule) : $original) =~ s/[+~>\s]+$//;
             $set = { static => $static = [], chained => my $chained = $set, combinator => $combinator };
-            if($chained->{is_root} || $chained->{sibling_root}) {
-                if($combinator =~ /([+~])/) {
-                    $set->{sibling_root}  = ($chained->{sibling_root} || '') . $1;
-                    $sibling_root = $set;
-                }
+            if(($chained->{is_root} || $chained->{sibling_root}) && $combinator =~ /([+~])/) {
+                $set->{sibling_root}  = ($chained->{sibling_root} || '') . $1;
+                $sibling_root = $set;
+            }
+            if($chained->{is_root} && $combinator =~ />/) {
+                $set->{root_child} = '>';
+                $root_child = $set;
+            }
+            elsif($chained->{root_child} && $combinator =~ /([+~])/) {
+                $set->{root_child} = $chained->{root_child} . $1;
+                $root_child = $set;
             }
         }
         else {
+            ($set->{selector} = length $rule ? substr($original, 0, -length $rule) : $original) =~ s/\s+$//;
             last;
         }
     }
@@ -284,6 +296,7 @@ sub consume {
     $set = $hold if $hold;
     $set->{tag} ||= do { push  @$static, _tag => qr/^(?!~)/; '*' };
     $set->{sibling_root} ||= $sibling_root if $sibling_root;
+    $set->{root_child} ||= $root_child if $root_child;
 
     push @alt, $set;
     return \@alt, $rule; 
@@ -292,7 +305,8 @@ sub consume {
 sub criteria {     
     # returns criteria for look_down, with bound closures
     my($set, $refroot, $strategy) = @_;
-    $strategy ||= { banroot => 1 };
+    $strategy ||= !$refroot && 'banroot';
+    my($rootparent);
     my $recurse;
     for my $root ($refroot ? $$refroot : 0) {
         $recurse = sub {
@@ -313,6 +327,7 @@ sub criteria {
             }
 
             if($set->{chained}) {
+                $banroot = 0 if $set->{chained}{is_root};  # unnecessary as we know where root should be
                 push @params, do {
                     # Value is an anonymous sub
                     # Recurse into linked list
@@ -397,7 +412,7 @@ sub criteria {
     if(ref $set eq 'ARRAY') {
         if(@$set > 1) {
             my %tags;
-            my @alt = map { $tags{$_->{tag}||'*'} = 1; [ $recurse->($_, !$refroot) ] } @$set;
+            my @alt = map { $tags{$_->{tag}||'*'} = 1; [ $recurse->($_, $refroot) ] } @$set;
             my @params = sub { my($this) = @_; look_self($this, @$_) and return 1 foreach @alt; return 0 };;
             unshift @params, sub { $tags{(shift)->{_tag}} } unless $tags{'*'};
             return wantarray ? @params : \@params;
@@ -439,11 +454,23 @@ sub find_closure {
     foreach my $array(\@down, \@via_right, \@right_filter) {
         @$array = criteria($array, \$root) if @$array;
     }
+
     unless(@via_right) {
         # the most common case: down only
-        return sub {
-            $root = shift; return $root->look_down(@down)
-        };
+        if(grep { !$_->{root_child} or ref $_->{root_child} } @$sets) {
+            # keep it simple
+            return sub {
+                $root = shift; return $root->look_down(@down)
+            };
+        }
+        else {
+            # only direct children
+            return sub {
+                $root = shift;
+                my @result = grep { ref and look_self($_, @down) } $root->content_list;
+                return wantarray ? @result : shift @result;
+            };
+        }
     }
     else {
         return sub {
@@ -469,7 +496,8 @@ sub find_closure {
                     push @result, $_->look_down(@via_right) foreach @right;
                 }
             }
-            return @result;
+            wantarray and return @result;
+            return;
         };
     }
 }

@@ -4,7 +4,7 @@
       "Breno G. de Oliveira <garu@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -50,6 +50,6 @@
          "url" : "https://github.com/garu/Acme-CPANAuthors-Brazilian"
       }
    },
-   "version" : "0.28",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.29",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

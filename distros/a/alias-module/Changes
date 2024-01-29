@@ -1,8 +1,15 @@
-0.002   2018-12-15 (PERLANCAR)
+0.003   2023-09-30  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Check argument.
+
+        - [ux] Warn if user tries to alias to the same package.
+
+
+0.002   2018-12-15  Released-By: PERLANCAR
 
 	- Add import option -norequire, like in parent.pm.
 
 
-0.001   2018-01-06 (PERLANCAR)
+0.001   2018-01-06  Released-By: PERLANCAR
 
         - First release.

@@ -1,7 +1,7 @@
 use strict; use warnings;
 package YAML::PP::YAMLScript;
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 use base 'YAML::PP';
 

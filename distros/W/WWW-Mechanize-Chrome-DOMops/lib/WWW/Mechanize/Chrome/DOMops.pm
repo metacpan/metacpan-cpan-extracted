@@ -11,10 +11,10 @@ our @EXPORT = qw(
 	VERBOSE_DOMops
 );
 
+our $VERSION = '0.09';
+
 use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
  
-our $VERSION = '0.06';
-
 # caller can set this to 0,1,2,3
 our $VERBOSE_DOMops = 0;
 
@@ -58,11 +58,11 @@ sub find {
 	my $parent = ( caller(1) )[3] || "N/A";
 	my $whoami = ( caller(0) )[3];
 
-	if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 0 ){ print STDOUT "$whoami (via $parent) : called ...\n" }
+	if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 0 ){ print STDOUT "$whoami (via $parent), line ".__LINE__." : called ...\n" }
 
 	my $amech_obj = exists($params->{'mech-obj'}) ? $params->{'mech-obj'} : undef;
 	if( ! $amech_obj ){
-		my $anerrmsg = "$whoami (via $parent) : a mech-object is required via 'mech-obj'.";
+		my $anerrmsg = "$whoami (via $parent), line ".__LINE__." : a mech-object is required via 'mech-obj'.";
 		print STDERR $anerrmsg."\n";
 		return {
 			'status' => -3,
@@ -82,7 +82,7 @@ sub find {
 		} elsif( ref($params->{$asel}) eq 'ARRAY' ){
 			$selectors{$asel} = '["' . join('","', @{$params->{$asel}}) . '"]';
 		} else {
-			my $anerrmsg = "$whoami (via $parent) : error, parameter '$asel' expects a scalar or an ARRAYref and not '".ref($params->{$asel})."'.";
+			my $anerrmsg = "$whoami (via $parent), line ".__LINE__." : error, parameter '$asel' expects a scalar or an ARRAYref and not '".ref($params->{$asel})."'.";
 			print STDERR $anerrmsg."\n";
 			return {
 				'status' => -3,
@@ -90,10 +90,10 @@ sub find {
 			}
 		}
 		$have_a_selector = 1;
-		if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 1 ){ print STDOUT "$whoami (via $parent) : found selector '$asel' with value '".$selectors{$asel}."'.\n" }
+		if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 1 ){ print STDOUT "$whoami (via $parent), line ".__LINE__." : found selector '$asel' with value '".$selectors{$asel}."'.\n" }
 	}
 	if( not $have_a_selector ){
-		my $anerrmsg = "$whoami (via $parent) : at least one selector must be specified by supplying one or more parameters from these: '".join("','", @known_selectors)."'.";
+		my $anerrmsg = "$whoami (via $parent), line ".__LINE__." : at least one selector must be specified by supplying one or more parameters from these: '".join("','", @known_selectors)."'.";
 		print STDERR $anerrmsg."\n";
 		return {
 			'status' => -3,
@@ -126,7 +126,7 @@ sub find {
 		if( exists($params->{$acbname}) && defined($m=$params->{$acbname}) ){
 			# one or more callbacks must be contained in an ARRAY
 			if( ref($m) ne 'ARRAY' ){
-				my $anerrmsg = "$whoami (via $parent) : error callback parameter '$acbname' must be an array of hashes each containing a 'code' and a 'name' field. You supplied a '".ref($m)."'.";
+				my $anerrmsg = "$whoami (via $parent), line ".__LINE__." : error callback parameter '$acbname' must be an array of hashes each containing a 'code' and a 'name' field. You supplied a '".ref($m)."'.";
 				print STDERR $anerrmsg."\n";
 				return { 'status' => -3, 'message' => $anerrmsg }
 			}
@@ -135,13 +135,13 @@ sub find {
 				if( ! exists($acbitem->{'code'})
 				 || ! exists($acbitem->{'name'})
 				){
-					my $anerrmsg = "$whoami (via $parent) : error callback parameter '$acbname' must be an array of hashes each containing a 'code' and a 'name' field.";
+					my $anerrmsg = "$whoami (via $parent), line ".__LINE__." : error callback parameter '$acbname' must be an array of hashes each containing a 'code' and a 'name' field.";
 					print STDERR $anerrmsg."\n";
 					return { 'status' => -3, 'message' => $anerrmsg }
 				}
 			}
 			$callbacks{$acbname} = $m;
-			if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 0 ){ print STDOUT "$whoami (via $parent) : adding ".scalar(@$m)." callback(s) of type '$acbname' ...\n" }
+			if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 0 ){ print STDOUT "$whoami (via $parent), line ".__LINE__." : adding ".scalar(@$m)." callback(s) of type '$acbname' ...\n" }
 		}
 	}
 
@@ -159,7 +159,7 @@ sub find {
 		 || 0 # <<< default is intersection (superfluous but verbose)
 	;
 
-	if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 1 ){ print "$whoami (via $parent) : using ".($Union?'UNION':'INTERSECTION')." to combine the matched elements.\n"; }
+	if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 1 ){ print "$whoami (via $parent), line ".__LINE__." : using ".($Union?'UNION':'INTERSECTION')." to combine the matched elements.\n"; }
 	# there is no way to break a JS eval'ed via perl and return something back unless
 	# one uses gotos or an anonymous function, see
 	#    https://www.perlmonks.org/index.pl?node_id=1232479
@@ -280,10 +280,10 @@ EOJ
 		}
 		allfound = allfound.length > 0 ? [...allfound, ...anelems] : anelems;
 		if( VERBOSE_DOMops > 1 ){
-			console.log("$whoami (via $parent) via js-eval : found "+elems["${aselname}"].length+" elements selected with ${aselname} '"+asel+"'");
+			console.log("$whoami (via $parent) via js-eval : found "+elems["${aselname}"].length+" elements selected with ${aselname} '"+asel+"' (there may be duplicates which will be sorted later)");
 			if( (VERBOSE_DOMops > 2) && (elems["${aselname}"].length>0) ){
 				for(let el of elems["${aselname}"]){ console.log("  tag: '"+el.tagName+"', id: '"+el.id+"'"); }
-				console.log("--- end of the elements selected with ${aselname}.");
+				console.log("--- end of the elements selected with ${aselname} (list may contain duplicate, they will be sorted out later).");
 			}
 		}
 	}
@@ -441,23 +441,23 @@ EOJ
 })(); // end of anonymous function and now execute it
 }; // end our eval scope
 EOJ
-	if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 2 ){ print "--begin javascript code to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent) : evaluating above javascript code.\n" }
+	if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 2 ){ print "--begin javascript code to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : evaluating above javascript code.\n" }
 
 	if( defined $js_outfile ){
 		if( open(my $FH, '>', $js_outfile) ){ print $FH $jsexec; close $FH }
-		else { print STDERR "$whoami (via $parent) : warning, failed to open file '$js_outfile' for writing the output javascript code, skipping it ...\n" }
+		else { print STDERR "$whoami (via $parent), line ".__LINE__." : warning, failed to open file '$js_outfile' for writing the output javascript code, skipping it ...\n" }
 	}
 	my ($retval, $typ);
 	eval { ($retval, $typ) = $amech_obj->eval($jsexec) };
 	if( $@ ){
-		print STDERR "--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent) : eval of above javascript has failed: $@\n";
+		print STDERR "--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : eval of above javascript has failed: $@\n";
 		return {
 			'status' => -2,
 			'message' => "eval has failed: $@"
 		};
 	};
 	if( ! defined $retval ){
-		print STDERR "--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent) : eval of above javascript has returned an undefined result.\n";
+		print STDERR "--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : eval of above javascript has returned an undefined result.\n";
 		return {
 			'status' => -2,
 			'message' => "eval returned un undefined result."
@@ -485,10 +485,10 @@ sub zap {
 	my $parent = ( caller(1) )[3] || "N/A";
 	my $whoami = ( caller(0) )[3];
 
-	if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 0 ){ print STDOUT "$whoami (via $parent) : called ...\n" }
+	if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 0 ){ print STDOUT "$whoami (via $parent), line ".__LINE__." : called ...\n" }
 
 	my $amech_obj = exists($params->{'mech-obj'}) ? $params->{'mech-obj'} : undef;
-	if( ! $amech_obj ){ print STDERR "$whoami (via $parent) : a mech-object is required via 'mech-obj'.\n"; return 0 }
+	if( ! $amech_obj ){ print STDERR "$whoami (via $parent), line ".__LINE__." : a mech-object is required via 'mech-obj'.\n"; return 0 }
 
 	my $cbex = exists($params->{'find-cb-on-matched'}) && defined($params->{'find-cb-on-matched'})
 		? [ @{$params->{'find-cb-on-matched'}} ] : [];
@@ -515,7 +515,7 @@ sub zap {
 	});
 
 	if( ! defined $ret ){
-		my $anerrmsg = perl2dump($params)."$whoami (via $parent) : error, call to find() has failed for above parameters.";
+		my $anerrmsg = ($WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops>2 ? perl2dump($params) : "")."$whoami (via $parent), line ".__LINE__." : error, call to find()/1 has failed for above parameters.";
 		print STDERR $anerrmsg."\n";
 		return {
 			'status' => -2,
@@ -523,7 +523,7 @@ sub zap {
 		}
 	}
 	if( $ret->{'status'} < 0 ){
-		my $anerrmsg = perl2dump($params)."$whoami (via $parent) : error, call to find() has failed for above parameters with this error message: ".$ret->{'message'};
+		my $anerrmsg = ($WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops>2 ? perl2dump($params) : "")."$whoami (via $parent), line ".__LINE__." : error, call to find()/2 has failed for above parameters with this error message: ".$ret->{'message'};
 		print STDERR $anerrmsg."\n";
 		return {
 			'status' => -2,
@@ -544,7 +544,7 @@ WWW::Mechanize::Chrome::DOMops - Operations on the DOM loaded in Chrome
 
 =head1 VERSION
 
-Version 0.06
+Version 0.09
 
 =head1 SYNOPSIS
 
@@ -978,13 +978,25 @@ to adjust verbosity. C<0> implies no verbosity.
 =head1 ELEMENT SELECTORS
 
 C<Element selectors> are how one selects HTML elements from the DOM.
-There are 5 ways to select HTML elements: by id, class, tag, name
-or via a CSS selector. Multiple selectors can be specified
-as well as multiple criteria in each selector (e.g. multiple
-class names in a C<element-class> selector). The results
-from each selector are combined into a list of
-unique HTML elements (BEWARE of missing id fields) by
-means of UNION or INTERSECTION of the individual matches
+There are 5 ways to select HTML elements: by class (C<element-class>),
+tag (C<element-tag>), id (C<element-id>), name (C<element-name>)
+or via a CSS selector (C<element-cssselector>).
+
+Multiple selectors can be specified
+by combining the various selector types, above.
+For example,
+one can select by C<element-class> and C<element-tag> (and ...).
+In this selection mode, the matched elements from each selector type
+(e.g. set A contains the HTML elements matched via C<element-class>
+and set B contains the HTML elements matched via C<element-tag>)
+must be combined by means of either the UNION (C<||>)
+or INTERSECTION (C<&&>) of the two sets A and B.
+
+Each selector can take one or more values. If you want to select
+by just one class then provide that one class as a string scalar.
+If you want to select an HTML elements which may belong to two classes,
+then provide the two class names as an array.
+
 
 These are the valid selectors:
 
@@ -1003,7 +1015,7 @@ These are the valid selectors:
 =back
 
 And one of these two must be used to combine the results
-into a final list
+into a final list:
 
 =over 2
 
@@ -1014,6 +1026,17 @@ by every selector specified. This is the default.
 =item * C<||> : Union. When set to 1 the result is the union of all individual results.
 Meaning that an element will make it to the final list if it was matched
 by at least one of the selectors specified.
+
+As an example, the following selects all HTML elements which belong to class X AND class Y.
+It also selects all HTML elements of the C<div> tag. And calculates
+the union of the two sets:
+
+  {
+    'element-class' => ['X', 'Y'],
+    'element-tag' => 'div',
+    '&&' => 1,
+  }
+
 
 =back
 

@@ -4,7 +4,7 @@ use warnings;
 use Dist::Zilla     1.093250;
 use Test::DZil;
 use Path::Tiny 0.012 qw( path );
-use Test::More      tests => 5;
+use Test::More      tests => 6;
 
 use lib 't/lib';
 use Util;
@@ -44,7 +44,11 @@ for my $test (
     name   => 'exclude_filename',
     config => simple_ini([ 'Git::GatherDir', { exclude_filename => 'tracked' } ]),
     files  => [ qw(lib/DZT/Sample.pm share/tracked) ],
-
+  },
+  {
+    name   => 'prune_directory',
+    config => simple_ini([ 'Git::GatherDir', { prune_directory => '^share$' } ]),
+    files  => [ qw(lib/DZT/Sample.pm tracked) ],
   },
 ) {
  SKIP: {

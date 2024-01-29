@@ -91,10 +91,9 @@ sub run {
             $req,
             'u2fcheck',
             params => {
-                DATA          => $data,
-                TOKEN         => $token,
-                CHECKLOGINS   => $checkLogins,
-                STAYCONNECTED => $stayConnected
+                DATA  => $data,
+                TOKEN => $token,
+                $self->get2fTplParams($req),
             }
         );
 

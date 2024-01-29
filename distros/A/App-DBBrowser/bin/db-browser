@@ -2,8 +2,7 @@
 use warnings;
 use strict;
 use 5.014;
-
-our $VERSION = '2.344';
+our $VERSION = '2.403';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -47,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.344
+Version 2.403
 
 =head1 SYNOPSIS
 
@@ -57,28 +56,28 @@ Version 2.344
 
     db-browser data source, ...
 
-When the C<db-browser> is called with the argument C<-h|--help>, it shows a menu. The menu entry I<Help> shows this
+When the C<db-browser> is called with the argument C<-h|--help>, it displays a menu. The menu entry I<Help> shows this
 documentation - see L</OPTIONS>.
 
 If C<db-browser> is called without arguments, the user can choose from the databases offered by the database plugin.
 
-If C<db-browser> is called with arguments, the arguments are used as the available data sources.
+If C<db-browser> is called with arguments, those arguments are used as the available data sources.
 
 =head2 SQLite/Firebird
 
     db-browser -s|--search
 
-C<db-browser> called with C<-s|--search> causes a new search for databases instead of using the cached data.
+Calling C<db-browser> with C<-s|--search> initiates a new search for databases instead of using cached data.
 
 =head1 DESCRIPTION
 
-Before using C<db-browser>, make sure you backed up your databases.
+Before using C<db-browser>, ensure you have backed up your databases.
 
-Search and read in SQL databases: one can browse databases and their tables interactively.
+Search and read in SQL databases: one can interactively browse databases and their tables.
 
 C<App::DBBrowser> provides and supports plugins for the DBI drivers C<DBD::SQLite>, C<DBD::mysql>, C<DBD::MariaDB>,
-C<DBD::Pg>, C<DBD::Firebird>, C<DBD::DB2>, C<DBD::Informix>, C<DBD::Oracle> and C<DBD::ODBC>. See L<App::DBBrowser::DB>
-how to write a database plugin.
+C<DBD::Pg>, C<DBD::Firebird>, C<DBD::DB2>, C<DBD::Informix>, C<DBD::Oracle> and C<DBD::ODBC>. Refer to
+L<App::DBBrowser::DB> for guidance on writing a database plugin.
 
 =head1 NAVIGATION
 
@@ -88,28 +87,29 @@ how to write a database plugin.
 
 =item *
 
-the C<Arrow> keys (or C<h,j,k,l>) to move up and down and to move to the right and to the left.
+Use the C<Arrow> keys (or C<h,j,k,l>) to move up and down and to move right or left.
 
 =item *
 
-the C<PageUp> key (or C<Ctrl-P>) to go to the previous page, the C<PageDown> key (or C<Ctrl-N>) to go to the next page.
+Press the C<PageUp> key (or C<Ctrl-P>) to go to the previous page and the C<PageDown> key (or C<Ctrl-N>) to go to the
+next page.
 
 =item *
 
-the C<Home> key (or C<Ctrl-A>) to jump to the beginning of the menu, the C<End> key (or C<Ctrl-E>) to jump to the end
-of the menu.
+Press the C<Home> key (or C<Ctrl-A>) to jump to the beginning of the menu and the C<End> key (or C<Ctrl-E>) to jump to
+the end of the menu.
 
 =back
 
-With the option I<mouse> enabled it can be used the mouse with the left mouse key to navigate through the menus.
+When the I<mouse> option is enabled, you can use the left mouse key to navigate through the menus.
 
-To confirm a chosen menu item use the C<Return> key.
+To confirm a chosen menu item, use the C<Return> key.
 
-In some sub-menus it is possible to select more then one item before C<Return> is pressed (e.g. the input filters
-I<Choose Rows> and I<Choose Cols>); in such sub-menus the list of items marked with the C<SpaceBar> are added to the
-chosen items when C<Return> is pressed. If a mouse mode is enabled, it can be used the right mouse key instead of the
-C<SpaceBar>. A C<Ctrl-SpaceBar> inverts the made choices - so for example to select all but one select the one with the
-C<SpaceBar> and then press C<Ctrl-SpaceBar>.
+In some submenus, it is possible to select more than one item before pressing C<Return> (e.g., the input filters
+I<Choose Rows> and I<Choose Cols>); in such submenus, the list of items marked with the C<SpaceBar> is added to the
+chosen items when C<Return> is pressed. If the mouse mode is enabled, you can use the right mouse key instead of the
+C<SpaceBar>. Pressing C<Ctrl-SpaceBar> inverts the made choices - for example, to select all but one, select the one
+with the C<SpaceBar> and then press C<Ctrl-SpaceBar>.
 
 =head2 Read-line
 
@@ -117,48 +117,49 @@ C<SpaceBar> and then press C<Ctrl-SpaceBar>.
 
 =item *
 
-C<BackSpace> or C<Strg-H> to delete the character behind the cursor, C<Delete> to delete  the  character at point.
+Use C<BackSpace> or C<Strg-H> to delete the character behind the cursor and C<Delete> to delete the character at the
+cursor.
 
 =item *
 
-C<Strg-U> to delete the text backward from the cursor to the beginning of the line, C<Strg-K> to delete the text from
-the cursor to the end of the line.
+Press C<Strg-U> to delete the text backward from the cursor to the beginning of the line and C<Strg-K> to delete the
+text from the cursor to the end of the line.
 
 =item *
 
-C<Right-Arrow> to move forward a character, C<Left-Arrow> to move back a character.
+Use C<Right-Arrow> to move forward a character and C<Left-Arrow> to move back a character.
 
 =item *
 
-C<Page-Up> to move back 10 characters, C<Page-Down> to move forward 10 characters.
+Press C<Page-Up> to move back 10 characters and C<Page-Down> to move forward 10 characters.
 
 =item *
 
-C<Home> or C<Strg-A> to move to the start of the line, C<End> or C<Strg-E> to move to the end of the line.
+Use C<Home> or C<Strg-A> to move to the start of the line and C<End> or C<Strg-E> to move to the end of the line.
 
 =back
 
-Some C<read-line>s have predefined values. These values can be accessed with the C<Up-Arrow> and C<Down-Arrow> keys.
+Some C<read-line>s have predefined values. You can access these values with the C<Up-Arrow> and C<Down-Arrow> keys.
 
-To leave a C<read-line> without returning anything press C<Ctrl-X>. When the input puffer is empty and an C<Enter> is
+To exit a C<read-line> without returning anything, press C<Ctrl-X>. When the input buffer is empty and C<Enter> is
 pressed, C<read-line> returns an empty string.
 
 =head1 OUTPUT
 
-The elements are right-justified if they look like a number else they are left-justified.
+The elements are right-justified if they look like a number; otherwise, they are left-justified.
 
-If the option I<squash_spaces> is enabled, leading and trailing spaces are removed from the elements and spaces are
-squashed to a single white-space.
+If the option I<squash_spaces> is enabled, leading and trailing spaces are removed from the elements, and spaces are
+squashed to a single white space.
 
-Tab characters (C<\t>) are replaces with a space.
+Tab characters (C<\t>) are replaced with a space.
 
-Vertical spaces (C<\v>) are squashed to two spaces
+Vertical spaces (C<\v>) are squashed to two spaces.
 
 Control characters, code points of the surrogate ranges and non-characters are removed.
 
 See also the option group L</Output>.
 
-C<Ctrl-F> opens a prompt. A regular expression is expected as input. This enables one to only display rows where at
+C<Ctrl-F> opens a prompt. A regular expression is expected as input. This enables one to display only rows where at
 least one column matches the entered pattern. See option L</Search>.
 
 =head1 MENUS
@@ -167,19 +168,19 @@ least one column matches the entered pattern. See option L</Search>.
 
 Choosing a plugin leads to the I<Databases Menu>.
 
-(If there is only one plugin, the plugins menu is not shown but the plugin is chosen automatically.)
+(If there is only one plugin, the plugins menu is not shown, but the plugin is chosen automatically.)
 
 =head2 Databases Menu
 
 Choosing a database leads to the I<Schemas Menu>.
 
-(If there is only one database, the databases menu is not shown but the database is chosen automatically.)
+(If there is only one database, the databases menu is not shown, but the database is chosen automatically.)
 
 =head2 Schemas Menu
 
 Choosing a schema leads to the I<Tables Menu>.
 
-(If there is not more than one schema, the schemas menu is not shown but the schema is chosen automatically.)
+(If there is not more than one schema, the schemas menu is not shown, but the schema is chosen automatically.)
 
 =head2 Tables Menu
 
@@ -221,14 +222,13 @@ DB Settings
 
 =back
 
-For I<Create Table>, I<Drop Table>, I<Create View> and I<Drop View> see L</WRITE ACCESS>.
+For I<Create Table>, I<Drop Table>, I<Create View> and I<Drop View>, see L</WRITE ACCESS>.
 
 These entries are available if enabled in L</Extensions>.
 
-I<Attache DB> is available for C<SQLite> databases. I<Attach DB> can be used to attach databases to the current
-database.
+I<Attach DB> is available for C<SQLite> databases. I<Attach DB> can be used to attach databases to the current database.
 
-For DB Settings see L</DB Settings>.
+For DB Settings, see L</DB Settings>.
 
 =head3 Tables Entries
 
@@ -256,7 +256,7 @@ This entry is available if enabled in L</Extensions>.
 
 =head2 SQL Menu
 
-In this menu it can be formed the SQL query.
+SQL statements are created in this menu.
 
 The SQL Menu has the following menu entries:
 
@@ -282,29 +282,39 @@ Delete
 
 See L</WRITE ACCESS>. These entries are available if enabled in L</Extensions>.
 
+=head3 BACK
+
+If the user has set substatements, selecting C<BACK> will reset all changes made.
+
+If no changes have been made or if the changes have been reset, selecting C<BACK> will exit the SQL menu.
+
 =head3 Print TABLE
 
 Select I<Print TABLE> to show the result of the formed statement on the screen.
 
 =head3 The Sub-Statements Entries
 
-To reset a SQL "sub-statement" (e.g C<WHERE>) re-enter into the respective menu and choose C<-OK->.
+In a SQL submenu (e.g., C<WHERE>), the back arrow resets the subquery step by step. With no items left, the SQL submenu
+is left when the back arrow is chosen.
+
+Adding AGGREGATE functions or GROUP BY columns enables the I<aggregate mode>. In I<aggregate mode>, the available
+columns in the SELECT substatement are the added aggregate functions and the group-by columns, not the table columns.
 
 See also L</Extensions> and L</Operators>
 
 =head4 SELECT
 
-Choose the required columns for the C<SELECT> sub-statement.
+Choose the required columns for the C<SELECT> substatement.
 
-It is possible to ad many columns at once by marking them with the C<SpaceBar> key. If columns are marked with the
+It is possible to add many columns at once by marking them with the C<SpaceBar> key. If columns are marked with the
 C<SpaceBar>, the highlighted column is not added to the chosen when C<Return> is pressed.
-
-If an I<AGGREGATE> function or a I<GROUP BY> columns is selected, the available choices of this sub-statement are the
-selected aggregate functions and the selected group-by columns.
 
 =head4 AGGREGATE
 
 C<AVG>, C<COUNT>, C<COUNT(*)>, C<GROUP_CONCAT>, C<MAX>, C<MIN>, C<SUM>
+
+If the user has selected columns in the SELECT submenu: While in this submenu, the available columns are displayed in
+the SELECT substatement instead of the selected columns.
 
 =head4 DISTINCT
 
@@ -312,8 +322,8 @@ C<AVG>, C<COUNT>, C<COUNT(*)>, C<GROUP_CONCAT>, C<MAX>, C<MIN>, C<SUM>
 
 =head4 GROUP BY
 
-It is possible to ad many columns at once by marking them with the C<SpaceBar> key. If columns are marked with the
-C<SpaceBar>, the highlighted column is not added to the chosen when C<Return> is pressed.
+If the user has selected columns in the SELECT submenu: While in this submenu, the available columns are displayed in
+the SELECT substatement instead of the selected columns.
 
 =head4 HAVING
 
@@ -329,23 +339,23 @@ Export the result of the chosen SQL statement to a C<CSV>-file. See options L<Ex
 
 =head2 Create/Drop Table/View
 
-I<Create/Drop Table/View> can be reached by selecting the prompt-line in the L</Tables Menu> if the respective option is
-activated.
+I<Create/Drop Table/View> can be accessed by selecting the prompt-line in the L</Tables Menu> if the respective option
+is activated.
 
-Selecting the prompt line of the I<Create/Drop Table/View> sub-menu allows one to set the parse settings described in
+Selecting the prompt line of the I<Create/Drop Table/View> submenu allows you to set the parse settings described in
 L</Import data>.
 
 =head3 Create Table
 
-If the option I<Source type> is set to I<menu>, selecting I<Create Table> opens a sub-menu where one can
-choose the type of the data source. If I<Source type> is set to I<plain> or I<file>, the set data source
-type is used automatically without showing a menu.
+If the option I<Source type> is set to I<menu>, selecting I<Create Table> opens a submenu where you can choose the type
+of the data source. If I<Source type> is set to I<plain> or I<file>, the set data source type is automatically used
+without displaying a menu.
 
-For the meaning of the different data source types see L<Source type>.
+For the meaning of the different data source types, see L<Data source>.
 
-If the data has been read from a file, the user can apply different input filters (See L<Input filters>).
+If the data has been read from a file, you can apply different input filters (See L<Input filters>).
 
-The user is then asked
+You will be prompted:
 
 =over
 
@@ -355,7 +365,7 @@ for the table name
 
 =item
 
-if the first data row should be used as header
+if the first data row should be used as a header
 
 =item
 
@@ -371,40 +381,38 @@ to edit the column data types
 
 =item
 
-to confirm the creating of the table
+to confirm the creation of the table
 
 =back
 
-=head3 Drop table
+=head3 Drop Table
 
-Drop a table. The whole table is shown before the user confirms to drop the table.
+Dropping a table displays the entire table before confirming the deletion.
 
 =head3 Create View
 
-Before creating a view: print the required select-statement to make it available in the subquery menu.
+Before creating a view, print the required select statement to make it available in the subquery menu.
 
 =head3 Drop View
 
-Drop a view. The whole view is shown before the user confirms to drop the view.
+Drop a view. The entire view is shown before the user confirms dropping it.
 
 =head2 Insert/Update/Delete
 
-I<Insert>, I<Update> and I<Delete> can be reached by selecting the prompt-line in the L</SQL Menu> if the respective
+I<Insert>, I<Update> and I<Delete> can be accessed by selecting the prompt-line in the L</SQL Menu> if the respective
 option is activated.
 
-I<Delete>, I<Update> or I<Insert>  may not be available with C<Join> and C<Union>/C<Intersect>/C<Except> statements.
+I<Delete>, I<Update>, or I<Insert> may not be available with C<Join> and C<Union>/C<Intersect>/C<Except> statements.
 
 =head3 Insert
 
-If the option I<Source type> is set to I<menu>, selecting I<Insert> opens a sub-menu where one can
-choose the type of the data source. If I<Source type> is set to I<plain> or I<file>, the set data source
-type is used without showing a menu.
+If the option I<Source type> is set to I<menu>, selecting I<Insert> opens a submenu where one can choose the type of
+the data source. If I<Source type> is set to I<plain> or I<file>, the set data source type is used without showing a
+menu.
 
-For the meaning of the different data source types see L<Source type>.
+For the meaning of the different data source types, see L<Source type>.
 
-After the data has been read the user can apply different input filters (See L<Input filters>).
-
-If the first column of a table is an auto-increment column, the C<INSERT INTO> statement is build without this first
+If the first column of a table is an auto-increment column, the C<INSERT INTO> statement is built without this first
 column. This feature is available if supported by the database plugin.
 
 =head3 Update
@@ -430,22 +438,24 @@ Insert the data cell by cell.
 The data is read from a chosen file.
 
 Supported file formats: text files and file formats supported by L<Spreadsheet::Read>. C<Spreadsheet::Read> uses
-different parser modules for the different file formats - see L<Spreadsheet::Read/SEE-ALSO>. The parser modules are
-not installed automatically. It is up to the user to install the required parser modules.
+different parser modules for the different file formats - see L<Spreadsheet::Read/DESCRIPTION>. The parser modules are not
+installed automatically. It is up to the user to install the required parser modules.
 
-Selecting I<From File> opens the I<Source directory> sub-menu where one can choose the directory which should be
+Selecting I<From File> opens the I<Source directory> submenu where one can choose the directory which should be
 searched for files.
 
-If the L<Directory history> is set to C<1>, the I<Source directory> sub-menu is skipped and the directory is chosen
+If the L<Directory history> is set to C<1>, the I<Source directory> submenu is skipped and the directory is chosen
 automatically.
 
-After a directory has been chosen a sub-menu is opened where one can choose the source file.
+After a directory has been chosen, a submenu is opened where one can choose the source file.
 
-If the previous sub-menu I<Source directory> is not shown due to the settings described before, it is possible to
-change the source directory in this sub-menu by selecting I<Change dir>.
+If the previous submenu I<Source directory> is not shown due to the settings described before, it is possible to change
+the source directory in this submenu by selecting I<Change dir>.
 
-Selecting the prompt line of the I<Files> sub-menu (I<Choose a File:>) allows one to set the parse settings described in
+Selecting the prompt line of the I<Files> submenu (I<Choose a File:>) allows one to set the parse settings described in
 L</Import data>.
+
+After the data has been read, the user can apply different input filters (See L<Input filters>).
 
 =back
 
@@ -457,12 +467,12 @@ L</Import data>.
 
 Use only selected columns of the imported data.
 
-If the data has empty columns (C<-->), the non-empty columns are preselected. Columns are regarded as
-empty if the values of all fields in the column - including the column header - have no length.
+If the data has empty columns (C<-->), the non-empty columns are preselected. Columns are regarded as empty if the
+values of all fields in the column - including the column header - have no length.
 
 Columns added with the filter I<Append Col> are empty and therefore not preselected.
 
-If a column is not empty, but has no header name the header is named temporarily C<tmp>.
+If a column is not empty but has no header name, the header is named temporarily C<tmp>.
 
 =item Choose Rows
 
@@ -477,8 +487,8 @@ Use only a range of rows.
 
 =item Row Groups
 
-If the input has rows with different numbers of columns, I<Row Groups> sorts rows with the same number of columns in a
-group. The user can then choose one or more groups of rows. There is only one group, if all rows have the same column
+If the input has rows with different numbers of columns, I<Row Groups> sorts rows with the same number of columns into a
+group. The user can then choose one or more groups of rows. There is only one group if all rows have the same column
 count.
 
 =item Remove Cell
@@ -495,31 +505,32 @@ Append an empty column. Appends a header element to the header row and adjusts t
 header row. If the input has rows with different numbers of cells, use the I<Row Group> filter first to select the right
 row-group.
 
+
 =item Split Column
 
      Item | length/width/height             Item | length | width | height
     ------|---------------------            -----|--------|-------|------
       423 |            40/30/25              423 |     40 |    30 |    25
-    ------|---------------------              64 |     80 |    60 |    30
-       64 |            80/60/30              705 |     50 |    50 |    40
-    ------|---------------------
-      705 |            50/50/40
+    ------|---------------------            -----|--------|-------|------
+       64 |            80/60/30               64 |     80 |    60 |    30
+    ------|---------------------            -----|--------|-------|------
+      705 |            50/50/40              705 |     50 |    50 |    40
 
 =item Search & Replace
 
      y  | factor                            y  | factor
     ----|---------                          ---|-------
      62 | 8,975.1                           62 | 8975.1
-    ----|---------                          63 | 9745.8
-     63 | 9,745.8                           64 | 9818.2
-    ----|---------
-     64 | 9,818.2
+    ----|---------                          ---|-------
+     63 | 9,745.8                           63 | 9745.8
+    ----|---------                          ---|-------
+     64 | 9,818.2                           64 | 9818.2
 
-In the replacement it can be used the variable C<$c> as a counter. C<$c> is set to C<0> before each C<s///>.
+In the replacement, the variable C<$c> can be used as a counter. C<$c> is set to C<0> before each C<s///>.
 
-Available modifiers: C<g>, C<i>, C<e>.
+Supported modifiers: C<imnsxage>.
 
-By selecting the prompt line (C<Your choice:>) one can save I<search & replace>-instructions for later use.
+By selecting the prompt line (I<Your choice:>), one can save I<search & replace> instructions for later use.
 
 If a I<search & replace> has altered the first row of the input data, a menu entry named C<RESTORE header row> is
 offered.
@@ -529,9 +540,13 @@ offered.
      y  | factor  | y  | factor             y  | factor
     ----|---------|----|---------           ---|--------
      62 | 8,975.1 | 64 | 9,986.5            62 | 8,975.1
-    ----|---------|----|---------           63 | 9,745.8
-     63 | 9,745.8 | 65 | 9,782.7            y  | factor
+    ----|---------|----|---------           ---|--------
+     63 | 9,745.8 | 65 | 9,782.7            63 | 9,745.8
+                                            ---|--------
+                                            y  | factor
+                                            ---|--------
                                             64 | 9,818.2
+                                            ---|--------
                                             65 | 9,986.5
 
 =item Merge Rows
@@ -539,8 +554,8 @@ offered.
      Month | Average | Average              Month | Average MinTemp | Average MaxTemp
     -------|---------|---------             ------|-----------------|----------------
            | MinTemp | MaxTemp              Jan   |               9 |              22
-    -------|---------|---------             Feb   |              10 |              23
-     Jan   |       9 |      22
+    -------|---------|---------             ------|-----------------|----------------
+     Jan   |       9 |      22              Feb   |              10 |              23
     -------|---------|---------
      Feb   |      10 |      23
 
@@ -551,19 +566,19 @@ I<Merge Rows> can be used to edit a row by selecting only one row.
      Item | length | width | height          Item | length/width/height
     ------|--------|-------|--------         -----|-------------------
       423 |     40 |    30 |     25           423 | 40/30/25
-    ------|--------|-------|--------           64 | 80/60/30
-       64 |     80 |    60 |     30           705 | 50/50/40
-    ------|--------|-------|--------
-      705 |     50 |    50 |     40
+    ------|--------|-------|--------         -----|-------------------
+       64 |     80 |    60 |     30            64 | 80/60/30
+    ------|--------|-------|--------         -----|-------------------
+      705 |     50 |    50 |     40           705 | 50/50/40
 
 I<Join Columns> can be used to edit a column by selecting only one column.
 
 =item Fill up Rows
 
 If the input table rows have different numbers of cells, this filter appends empty cells to the rows until the cell
-count of the rows are equal to the cell count of the row with highest cell count.
+count of each row is equal to the cell count of the row with the highest cell count.
 
-One can enter in the I<Row Group> filter to see if the table has rows with different length. If I<Row Group> shows only
+You can enter the I<Row Group> filter to check if the table has rows with different lengths. If I<Row Group> shows only
 one group, all rows have the same length.
 
 =item Cols to Rows
@@ -573,14 +588,16 @@ Transpose columns to rows.
      Year | 2000 | 2001 | 2002              Year | Max | Min
     ------|------|------|------             -----|-----|----
      Max  |   14 |   22 |   17              2000 |  14 |  11
-    ------|------|------|------             2001 |  22 |  10
-     Min  |   11 |   10 |    9              2002 |  17 |   9
+    ------|------|------|------             -----|-----|----
+     Min  |   11 |   10 |    9              2001 |  22 |  10
+                                            -----|-----|----
+                                            2002 |  17 |   9
 
 =item Empty to NULL
 
 Convert fields containing an empty string to NULL (undefined).
 
-The default values for this filter can be set with the option L<Empty to Null>.
+The default values for this filter can be set using the option L<Empty to Null>.
 
 =item Reset
 
@@ -594,7 +611,7 @@ Change the parse settings and reparse the data with the new settings.
 
 =head1 OPTIONS
 
-The options menu is called with C<db-browser -h>.
+The options menu is accessed with C<db-browser -h>.
 
 =head2 Plugins
 
@@ -602,14 +619,14 @@ Choose the required database plugins.
 
 =head2 DB Settings
 
-These driver specific I<DB Settings> are used as the default database settings.
+These driver-specific I<DB Settings> are used as the default database settings.
 
-In the prompt line menu of the L</Tables Menu> the entry I<DB Settings> (if enabled in L</Extensions>) allows one to
-make database specific settings. If no database specific settings are set, these global (to the database plugin)
-I<DB Settings> are used.
+In the prompt line menu of the L</Tables Menu>, the entry I<DB Settings> (if enabled in L</Extensions>) allows users to
+make database-specific settings. If no database-specific settings are set, these global settings (for the database
+plugin) I<DB Settings> are used.
 
-User defined database plugins: it depends on the plugin which items are offered to be set in each option and whether the
-selections made by the user are considered.
+User-defined database plugins: The options offered to be set in each option and whether the user's selections are
+considered depend on the plugin.
 
 =over
 
@@ -619,21 +636,21 @@ Set which fields are required to connect to a database.
 
 =item Login Data
 
-The entered login data is saved in a configuration file and used to connect to the database (the password can not be
+The entered login data is saved in a configuration file and used to connect to the database (the password cannot be
 saved).
 
 =item ENV Variables
 
-The user can choose environment variables form a list of environment variables that should be used - if set - to connect
+The user can choose environment variables from a list of environment variables that should be used - if set - to connect
 to the database.
 
 =item Attributes
 
-For the meaning of these driver specific attributes check the appropriate driver documentation.
+For the meaning of these driver-specific attributes, refer to the appropriate driver documentation.
 
 =item Reset DB
 
-Reset database specific parameter to the global I<DB Settings>.
+Reset database-specific parameters to the global I<DB Settings>.
 
 =back
 
@@ -645,53 +662,43 @@ Add menu entries to menus:
 
 =over
 
-=item
+=item Derived (table)
 
-Derived (table)
+Enter a subquery and use it as a table.
 
-One can enter a subquery and use it as a table.
-
-By selecting the I<Read-Line> menu entry the user is ask for the query.
+By selecting the I<Read-Line> menu entry, the user is asked for the query.
 
 If stored statements are available, it is also possible to select one of those statements instead of entering a query.
 
-The previously entered query and the last statements printed with I<Print TABLE> are stored temporarily.
+Previously entered queries and the last statements printed with I<Print TABLE> are stored temporarily.
 
-Statements can be saved permanently in the sub-menu which opens by selecting the prompt line in the I<Subquery> menu
+Statements can be saved permanently in the submenu, which opens by selecting the prompt line in the I<Subquery> menu
 (I<Choose:>).
 
-=item
+=item Cte
 
-Cte
+The user is asked for the CTE query and the CTE name. The syntax of the CTE name is:
 
-The user is ask for the CTE query and the CTE name. The syntax of the CTE name is
-
-  [RECURSIVE] cte_name [(col_name [, col_name] ...)]
+    [RECURSIVE] cte_name [(col_name [, col_name] ...)]
 
 Some database types build recursive CTEs without the C<RECURSIVE> keyword.
 
-By selecting the I<Read-Line> menu entry the user can enter the query.
+By selecting the I<Read-Line> menu entry, the user can enter the query.
 
 If stored statements are available, it is also possible to select one of those statements instead of entering a query.
 
-The previously entered queries and the last statements printed with I<Print TABLE> are stored temporarily.
+Previously entered queries and the last statements printed with I<Print TABLE> are stored temporarily.
 
-Statements can be saved permanently in the sub-menu which opens by selecting the prompt line in the I<CTE> menu
+Statements can be saved permanently in the submenu, which opens by selecting the prompt line in the I<CTE> menu
 (I<Choose:>).
 
-If a menu entry other than I<Cte> is chosen, all ctes are reset.
+Certain uses of CTEs are not supported.
 
-=item
+=item Join menu
 
-Join menu
+=item Union
 
-=item
-
-Union
-
-=item
-
-DB settings
+=item DB settings
 
 =back
 
@@ -699,13 +706,9 @@ DB settings
 
 =over
 
-=item
+=item Derived (table)
 
-Derived (table)
-
-=item
-
-Cte
+=item Cte
 
 =back
 
@@ -713,25 +716,17 @@ Cte
 
 =over
 
-=item
+=item Derived (table)
 
-Derived (table)
+=item Cte
 
-=item
+=item Where
 
-Cte
-
-=item
-
-Where
-
-=item
-
-Parentheses
+=item Parentheses
 
 =back
 
-Parentheses are not available in C<SQLite> and C<Firebird>.
+Note: Parentheses are not available in C<SQLite> and C<Firebird>.
 
 These settings are also valid when C<Intersect> or C<Except> is used.
 
@@ -743,16 +738,16 @@ These settings are also valid when C<Intersect> or C<Except> is used.
 
 Extended Columns
 
-If enabled, C<%%> is shown as additionally menu entry in the column menus. Selecting C<%%> lets one choose between the
+If enabled, C<%%> is shown as an additional menu entry in the column menus. Selecting C<%%> lets one choose between the
 available extensions.
 
 =item
 
 Extended Values
 
-If enabled, then - in addition to constants - subqueries, functions and more (see the following list) are available for the
-right side of operators. Places where extended values are available: C<SET> in update, C<WHEN>, C<THEN> and
-C<ELSE> in case expressions and C<WHERE> and C<HAVING>.
+If enabled, then - in addition to constants - subqueries, functions and more (see the following list) are available for
+the right side of operators. Places where extended values are available: C<SET> in update, C<WHEN>, C<THEN> and C<ELSE>
+in case expressions, and C<WHERE> and C<HAVING>.
 
 =item
 
@@ -773,7 +768,7 @@ This option can also be enabled later in the functions menu by selecting the pro
 
 Selecting C<SQ> opens the subqueries menu.
 
-By selecting the I<Read-Line> menu entry one can enter a subquery or an expression.
+By selecting the I<Read-Line> menu entry, one can enter a subquery or an expression.
 
 If stored subqueries are available, it is also possible to select one of those subqueries instead of entering a
 subquery.
@@ -781,7 +776,7 @@ subquery.
 The last subqueries entered in the subquery menu and the last statements printed with I<Print TABLE> are stored
 temporarily.
 
-A subquery can be saved permanently in the sub-menu which opens by selecting the prompt line of a subquery menu
+A subquery can be saved permanently in the submenu, which opens by selecting the prompt line of a subquery menu
 (I<Choose SQ:>).
 
 Entries matching C</^\s*(?:SELECT|WITH)\s/i> are automatically enclosed in parentheses.
@@ -793,9 +788,12 @@ Selecting C<func()> opens the menu, where the user can choose from a list of sca
 Extended arguments for scalar functions can be temporarily enabled by selecting the prompt line (I<Scalar functions:>)
 of the scalar function menu.
 
-Function C<EXTRACT>: use the keys C<Up-Arrow> and C<Down-Arrow> to choose one of the predefined fields.
+Function C<DATEADD> and C<EXTRACT>: use the keys C<Up-Arrow> and C<Down-Arrow> to choose one of the predefined fields
+(in C<Value> if the extended arguments are enabled).
 
-Non ANSI SQL scalar functions may not work with the C<ODBC> plugin.
+To subtract from a date, use C<DATEADD> with a negative amount.
+
+Non-ANSI SQL scalar functions may not work with the C<ODBC> plugin.
 
 =item Window functions
 
@@ -820,6 +818,10 @@ Available after the C<SET> in an C<UPDATE> statement.
 =item Parentheses
 
 C<WHERE>, C<WHEN> and C<HAVING>: in the C<%%> menu are also available parentheses.
+
+=item Column aliases
+
+Selecting C<as> allows one to set aliases for the selected columns.
 
 =back
 
@@ -861,23 +863,23 @@ Drop View
 
 =head2 SQL Settings
 
-=head3 System data
+=head3 System Data
 
-If I<System data> is enabled, system tables/schemas/databases are appended to the respective list.
+If I<System data> is enabled, system tables/schemas/databases are appended to their respective lists.
 
 =head3 Operators
 
 Choose the required operators.
 
-There are two regexp entries: C<REGEXP> matches case sensitive while C<REGEXP_i> matches case insensitive.
+There are two regexp entries: C<REGEXP> matches case-sensitive, while C<REGEXP_i> matches case-insensitive.
 
-With C<MySQL> the sensitive match is achieved by enabling the C<BINARY> operator.
+With C<MySQL>, the sensitive match is achieved by enabling the C<BINARY> operator.
 
 With C<Firebird>, C<SIMILAR TO> is used instead of C<REGEXP>.
 
 =head3 Aliases
 
-Alias settings for
+Alias settings for:
 
 =over
 
@@ -897,51 +899,69 @@ Non-unique columns in JOIN
 
 Derived table
 
+C<Postgres>, C<MySQL> and C<MariaDB>: ensure that aliases for derived tables are enabled.
+
 =item
 
 Ordinary table
 
 =back
 
+Possible settings:
+
+=over
+
+=item C<NO>: no alias
+
+=item C<AUTO>: a default alias is used
+
+=item C<ASK>: the user is asked for the alias; if nothing is entered, no alias is added
+
+=item C<ASK/AUTO>: the user is asked for the alias; if nothing is entered, a default alias is added
+
+=back
+
+Not all of these settings are available for any alias type.
+
 =head3 Identifiers
 
 =over
 
-=item Qualified table names
+=item Qualified Table Names
 
 C<SQLite>: if the current database has attached databases, the use of qualified table names is enabled automatically.
 
-=item Quote table names
+=item Quote Table Names
 
-=item Quote column names
+=item Quote Column Names
 
-=item Quote aliases
+=item Quote Aliases
 
 =back
 
-C<Informix>: set the C<DELIMIDENT> environment variable to allow quoted identifier.
+C<Informix>: set the C<DELIMIDENT> environment variable to allow quoted identifiers.
 
 C<SQLite>: database names in SQL statements (C<ATTACH DATABASE>) are always quoted.
 
-=head3 View prefix
+=head3 View Prefix
 
-Enter a string which should be automatically put in front of all view names.
+Enter a string that should be automatically placed in front of all view names.
 
-=head3 Auto increment
+=head3 Auto Increment
 
-Setting I<Auto increment> to a value which is not the empty string enables the option to set an auto increment column
-when creating a table. The value set here is then used as the default name for the auto increment column.
+Setting I<Auto increment> to a value other than an empty string enables the option to set an auto-increment column when
+creating a table. The value set here is then used as the default name for the auto-increment column.
 
-=head3 Column data types
+=head3 Column Data Types
 
 If this option is enabled and a table is created, C<SQL::Type::Guess> is used to detect the data types. These data types
 are then used as default values when the user is asked for the data types.
 
 =head2 Output
 
-=head3 Binary filter
+=head3 Binary Filter
 
-Set I<Binary filter> to C<NO>, C<BNRY> or C<Hexadecimal>.
+Set I<Binary filter> to C<NO>, C<BNRY>, or C<Hexadecimal>.
 
 C<NO> - print the binary data as it is
 
@@ -949,30 +969,31 @@ C<BNRY> - "BNRY" is printed instead of the binary data
 
 C<Hexadecimal> - the binary data is printed in hexadecimal format
 
-If the first 100 characters of the data match the repexp C</[\x00-\x08\x0B-\x0C\x0E-\x1F]/>, the data is considered
+If the first 100 characters of the data match the regexp C</[\x00-\x08\x0B-\x0C\x0E-\x1F]/>, the data is considered
 arbitrary binary data.
 
 Printing unfiltered arbitrary binary data could break the output.
 
-=head3 Squash spaces
+=head3 Squash Spaces
 
-If I<squash_spaces> is enabled, consecutive spaces are squashed to one space and leading and trailing spaces are removed.
+If I<squash_spaces> is enabled, consecutive spaces are squashed to one space, and leading and trailing spaces are
+removed.
 
 =head3 Indentation
 
 Set the indentation width for the SQL substatements.
 
-=head3 Undef string
+=head3 Undef String
 
 Set the string that will be shown on the screen instead of an undefined field.
 
-On C<MSWin32> only single-byte character sets are supported when entering the setting I<Undef string>, I<user>, I<host>
-or I<port> with the C<db-browser>s readline. But it is possible to edit the entry in configuration files directly after
-the entry was created with this options menu.
+On C<MSWin32>, only single-byte character sets are supported when entering the setting I<Undef string>, I<user>,
+I<host>, or I<port> with the C<db-browser>'s readline. However, it is possible to edit the entry in configuration files
+directly after the entry was created with this options menu.
 
 =head3 Warnings
 
-Enable/disable
+Enable/disable:
 
 =over
 
@@ -982,41 +1003,40 @@ C<File::Find> warnings when searching for C<SQLite> databases.
 
 =item
 
-warnings - e.g. utf8 warnings - when printing a table.
+Warnings (e.g., UTF-8 warnings) when printing a table.
 
 =back
 
-=head3 Progress bar
+=head3 Progress Bar
 
-Set the progress bar threshold. If the number of fields (rows x columns) is higher than the threshold, a progress bar is
-shown while preparing the data for the output.
+Set the progress bar threshold. If the number of fields (rows x columns) exceeds the threshold, a progress bar is shown
+while preparing the data for output.
 
-=head3 Tab width
+=head3 Tab Width
 
 Set the number of spaces between columns.
 
 =head3 Color
 
-Enables the support for color and text formatting escape sequences (SGR) if set to C<Enable>. Before the output it is
-added a reset (C<\e[0m>) at the end of each row.
+Enable support for color and text formatting escape sequences (SGR) by setting it to C<Enable>. Before the output, a
+reset (C<\e[0m>) is added at the end of each row.
 
-=head3 Truncate fractions first
+=head3 Truncate Fractions First
 
-If the terminal width is not wide enough and I<Trunc fract first> is enabled, the first step to reduce the width of the
-columns is to truncate the fraction part of numbers to 2 decimal places.
+If the terminal width is insufficient and I<Trunc fract first> is enabled, the first step to reduce the column width is
+to truncate the fraction part of numbers to 2 decimal places.
 
-=head3 Truncate column threshold
+=head3 Truncate Column Threshold
 
-Columns with a width below or equal I<Trunc col threshold> are only trimmed if it is still required to lower the row
-width despite all columns wider than I<Trunc col threshold> have been trimmed to I<Trunc col threshold>.
+Columns with a width below or equal to I<Trunc col threshold> are only trimmed if it is still necessary to reduce the
+row width, even after all columns wider than I<Trunc col threshold> have been trimmed to I<Trunc col threshold>.
 
-=head2 Import data
+=head2 Import Data
 
-=head3 Parse tool
+=head3 Parse Tool
 
-Set how to parse text files. Files where C<-T $filename> returns true are considered text files.
-
-If a file is not a text file, then it is always used C<Spreadsheet::Read> to parse the file regardless of this setting.
+Set how to parse text files. Files for which C<-T $filename> returns true are considered text files. If a file isn't a
+text file, C<Spreadsheet::Read> is always used to parse it, regardless of this setting.
 
 =over
 
@@ -1024,15 +1044,13 @@ If a file is not a text file, then it is always used C<Spreadsheet::Read> to par
 
 Text::CSV
 
-To decode the files it is used the L</File encoding in>.
-
 Advantages:
 
 =over
 
 =item
 
-Allows to set different csv-related options.
+Allows different CSV-related options.
 
 =item
 
@@ -1048,10 +1066,10 @@ Speed
 
 split
 
-Reads to whole input at once and splits the input with the input record separator (IRS) to get the records (rows). Then
-it splits the records with the input field separator (IFS) to get the fields (columns) of each record.
+Reads the entire input at once and splits it using the input record separator (IRS) to obtain the records (rows). It
+then splits the records using the input field separator (IFS) to acquire the fields (columns) of each record.
 
-To decode the files it is used the L</File encoding in>.
+To decode the files, the L</File encoding> is used.
 
 Advantages:
 
@@ -1059,7 +1077,8 @@ Advantages:
 
 =item
 
-The values assigned to the IRS and the IFS are treated as regexps.
+The values assigned to the input record separator (IRS) and the input field separator (IFS) are treated as regex
+patterns.
 
 =back
 
@@ -1077,8 +1096,8 @@ Uses C<unpack> with the C<A> character to break up input lines.
 
 =item
 
-If the row length is greater than the screen width, make notes of the number of columns and the length of each column
-before using I<Template>.
+If the row length exceeds the screen width, take note of the number of columns and the length of each column before
+using I<Template>.
 
 =item
 
@@ -1091,8 +1110,8 @@ integer of 1 or greater; I<Sep width> expects an integer of 0 or greater.
 
 =item
 
-Set the widths of the columns (1 or greater). For the last column one can also enter an asterisk (C<*>). The last
-column with an asterisk means: Use the remaining part of the row for the last column.
+Set the widths of the columns (1 or greater). For the last column, one can also enter an asterisk (C<*>). An asterisk in
+the last column means: Use the remaining part of the row for the last column.
 
 =item
 
@@ -1106,7 +1125,7 @@ Advantages:
 
 =item
 
-Good for fixed column length inputs containing only single width characters.
+Ideal for fixed-length inputs containing only single-width characters.
 
 =back
 
@@ -1118,13 +1137,13 @@ Good for fixed column length inputs containing only single width characters.
 
 Spreadsheet::Read
 
-If C<Spreadsheet::Read> is chosen, the default settings from L<Spreadsheet::Read> are used.
+If C<Spreadsheet::Read> is chosen, the default settings from L<Spreadsheet::Read> are utilized.
 
-C<Spreadsheet::Read> will use the first line of the file to auto-detect the separation character if the file is a
-csv-file.
+C<Spreadsheet::Read> will use the first line of the file to auto-detect the separation character if the file is a CSV
+file.
 
-C<Spreadsheet::Read::rows> fills up uneven rows automatically so the filter L<Fill up Rows> and L<Row Groups> have no
-meaning if C<Spreadsheet::Read> is used.
+C<Spreadsheet::Read::rows> automatically fills up uneven rows, so the filters L<Fill up Rows> and L<Row Groups> have no
+significance when C<Spreadsheet::Read> is used.
 
 Advantages:
 
@@ -1132,26 +1151,21 @@ Advantages:
 
 =item
 
-Auto-detects the separation character for csv-files
+Automatically detects the separation character for CSV files.
 
 =back
 
 =back
 
-=head3 CSV options in a
+=head3 CSV Options in a
 
-Set C<sep_char>, C<quote_char>, C<escape_char>, C<eol> and C<comment_str>.
+Set C<sep_char>, C<quote_char>, C<escape_char>, C<eol> and C<comment_str>. If left empty, default values are used. For
+details on these options, refer to L<Text::CSV_XS>.
 
-If entered nothing, default values are used.
-
-For the meaning of the different options see L<Text::CSV_XS>.
-
-=head3 CSV options in b
+=head3 CSV Options in b
 
 Set C<allow_loose_escapes>, C<allow_loose_quotes>, C<allow_whitespace>, C<blank_is_undef>, C<binary>, C<decode_utf8>,
-C<empty_is_undef> and C<skip_empty_rows>.
-
-For the meaning of the different options see L<Text::CSV_XS>.
+C<empty_is_undef> and C<skip_empty_rows>. For meanings of these options, refer to L<Text::CSV_XS>.
 
 =head3 Settings 'split'
 
@@ -1159,43 +1173,43 @@ For the meaning of the different options see L<Text::CSV_XS>.
 
 =item
 
-Record separator
+Record Separator
 
 Set the input record separator (regexp).
 
 =item
 
-Trim record left
+Trim Record Left
 
-Expects a regex pattern. If set, removes leading characters matching regexp from each record.
-
-=item
-
-Trim record right
-
-Expects a regex pattern. If set, removes trailing characters matching regexp from each record.
+Expects a regex pattern. If set, removes leading characters matching the regexp from each record.
 
 =item
 
-Field separator
+Trim Record Right
+
+Expects a regex pattern. If set, removes trailing characters matching the regexp from each record.
+
+=item
+
+Field Separator
 
 Set the input field separator (regexp).
 
 =item
 
-Trim field left
+Trim Field Left
 
-Expects a regex pattern. If set, removes leading characters matching regexp from each field.
+Expects a regex pattern. If set, removes leading characters matching the regexp from each field.
 
 =item
 
-Trim field right
+Trim Field Right
 
-Expects a regex pattern. If set, removes trailing characters matching regexp from each field.
+Expects a regex pattern. If set, removes trailing characters matching the regexp from each field.
 
 =back
 
-=head3 Input filter
+=head3 Input Filter
 
 Enable the input filter menu.
 
@@ -1205,11 +1219,11 @@ Enabling I<input filter> will cause a second copy of the data to be kept in memo
 
 Set the I<empty_to_null> defaults for the different data source types.
 
-=head3 File encoding in
+=head3 File Encoding In
 
 How to decode text files.
 
-=head3 Directory history
+=head3 Directory History
 
 Set how many searched directories should be saved in the directory history.
 
@@ -1218,71 +1232,69 @@ A value of C<0> disables the history.
 If I<Directory history> is set to C<1> and a directory has been saved, the directory is chosen automatically without
 showing the history menu.
 
-=head3 File filter
+=head3 File Filter
 
-This option expects as its value a string. The string is used as a glob pattern.
+This option expects a string as its value, used as a glob pattern.
 
 If I<file> is selected as the data source type, only files matching this glob pattern are part of the available files.
 
-=head3 Hidden files
+=head3 Hidden Files
 
-If I<file> is selected as the data source type, this setting determines if hidden files are part of the available files
-or not.
+If I<file> is selected as the data source type, this setting determines if hidden files are included in the available
+files or not.
 
-=head3 Source type
+=head3 Source Type
 
-Set the data source type to C<plain>, C<file> or C<menu> for C<Insert Into> and for C<Create Table>.
+Set the data source type to C<plain>, C<file>, or C<menu> for C<Insert Into> and for C<Create Table>.
 
-If this option is set to C<menu>, a menu is offered where the user can choose the type of the data source. If this
-option is set to C<plain> or C<file>, the respective setting is used directly without any menu.
+If set to C<menu>, a menu is offered where the user can choose the type of the data source. If set to C<plain> or
+C<file>, the respective setting is used directly without any menu.
 
-=head2 Export data
+=head2 Export Data
 
-=head3 Destination folder
+=head3 Destination Folder
 
 Set the folder where the data to be exported will be saved as a CSV file.
 
-=head3 File name
+=head3 File Name
 
 =over
 
-=item File extension csv
+=item File Extension CSV
 
-If this option is enabled, the file extension C<csv> is added automatically to the file name.
+If enabled, the file extension C<csv> is automatically added to the file name.
 
-=item Default file name
+=item Default File Name
 
 If enabled, the table name will be used as the default file name.
 
 =back
 
-=head3 CSV options out a
+=head3 CSV Options Out a
 
 Set C<sep_char>, C<quote_char>, C<escape_char>, C<eol> and C<undef_str>.
 
-If entered nothing, default values are used except for C<eol> which is then set to C<$/> (input record separator).
+If left empty, default values are used except for C<eol>, which is then set to C<$/> (input record separator).
 
-For the meaning of the different options see L<Text::CSV_XS>.
+For the meaning of the different options, see L<Text::CSV_XS>.
 
-=head3 CSV options out b
+=head3 CSV Options Out b
 
 Set C<always_quote>, C<binary>, C<escape_null>, C<quote_binary>, C<quote_empty> and C<quote_space>.
 
-For the meaning of the different options see L<Text::CSV_XS>.
+For the meaning of the different options, see L<Text::CSV_XS>.
 
-=head3 File encoding out
+=head3 File Encoding Out
 
 The encoding of the exported CSV file.
 
-=head2 Misc
+=head2 Miscellaneous
 
-Set the behavior of
+=head3 Menu Memory
 
-=head3 Menu memory
+If enabled, saves the menu position while entering a submenu.
 
-If enabled: saves the menu position while entering in a sub menu.
-
-=head3 Expand table
+=head3 Expand Table
 
 Expand table rows:
 
@@ -1290,12 +1302,12 @@ Expand table rows:
 
 =item C<YES>
 
-if C<Return> is pressed, the selected table row is printed with each column in its own line. The first row is not
-expanded if the cursor auto-jumped to the first row.
+If C<Return> is pressed, the selected table row is printed with each column in its line. The first row is not expanded
+if the cursor auto-jumped to the first row.
 
 =item C<NO>
 
-don't expand table rows.
+Don't expand table rows.
 
 =back
 
@@ -1305,68 +1317,61 @@ Set the search behavior (C<Ctrl-F>).
 
 =over
 
-=item
+=item C<disabled>
 
-C<disabled>
+=item C<case-insensitive search>
 
-=item
-
-C<case-insensitive search>
-
-=item
-
-C<case-sensitive search>
+=item C<case-sensitive search>
 
 =back
 
-=head3 Mouse mode
+=head3 Mouse Mode
 
 Set the I<Mouse mode> (see L<Term::Choose/mouse>).
 
-=head3 DB2 encoding
+=head3 DB2 Encoding
 
-C<DB2> databases only: set the application code set.
+For C<DB2> databases only: set the application code set.
 
-Data coming from a DB2 database is decoded with this encoding.
+Data from a DB2 database is decoded using this encoding.
 
 =head2 Help
 
-Show this documentation.
+Display this documentation.
 
 =head2 Path
 
-Shows the version and the path of the running C<db-browser> and the path of the application directory.
+Displays the version and path of the running C<db-browser>, along with the application directory path.
 
 =head1 CONFIGURATION FILES
 
-To find out the location of the configuration files call C<db-browser -h> and choose I<Path>. The data is saved in JSON
-format.
+To locate the configuration files, run C<db-browser -h> and select I<Path>. The data is saved in JSON format.
 
 =head1 REQUIREMENTS
 
-=head2 Perl version
+=head2 Perl Version
 
-Requires Perl version 5.14.0 or greater.
+Requires Perl version 5.14.0 or later.
 
-=head2 Decoded strings
+=head2 Decoded Strings
 
 C<db-browser> expects decoded strings.
 
-Non mappable characters will break the output.
+Non-mappable characters can disrupt the output.
 
 =head2 Terminal
 
-It is required a terminal that uses a monospaced font which supports the printed characters.
+Requires a terminal with a monospaced font supporting the printed characters.
 
-The terminal has to understand ANSI escape sequences. If the OS is MSWin32 C<App::DBBrowser> uses
-L<Win32::Console::ANSI> which emulates an ANSI console for the C<db-browser>.
+The terminal must comprehend ANSI escape sequences. For MSWin32, C<App::DBBrowser> utilizes L<Win32::Console::ANSI> to
+emulate an ANSI console for the C<db-browser>.
 
 =head2 Permissions
 
-To be able to browse the database-, schema- and table-lists and the content of tables the user must have the database
-privileges required for fetching the requested data.
+To browse the database, schema, table lists and table content, the user must possess the necessary database privileges
+for fetching the requested data.
 
-The C<db-browser> expects an existing home directory with read and write permissions for the user of the C<db-browser>.
+C<db-browser> expects an existing home directory with read and write permissions for the user of the C<db-browser>.
 
 =head1 CREDITS
 
@@ -1379,7 +1384,7 @@ Matthäus Kiem <cuer2s@gmail.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2023 Matthäus Kiem.
+Copyright 2012-2024 Matthäus Kiem.
 
 THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
 IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

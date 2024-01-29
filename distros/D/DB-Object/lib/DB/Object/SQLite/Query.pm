@@ -1,12 +1,13 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/SQLite/Query.pm
-## Version v0.3.9
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.3.10
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/06/16
-## Modified 2023/02/24
+## Modified 2023/10/20
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -20,7 +21,7 @@ BEGIN
     use vars qw( $VERSION $DEBUG );
     use Want;
     our $DEBUG = 0;
-    our $VERSION = 'v0.3.9';
+    our $VERSION = 'v0.3.10';
 };
 
 use strict;
@@ -43,7 +44,7 @@ sub format_from_epoch
 {
     my $self = shift( @_ );
     my $opts = {};
-    $opts = shift( @_ ) if( scalar( @_ ) == 1 && $self->_is_hash( $_[0] ) );
+    $opts = shift( @_ ) if( scalar( @_ ) == 1 && $self->_is_hash( $_[0] => 'strict' ) );
     if( $opts->{bind} )
     {
         return( "DATETIME(?, 'unixepoch', 'localtime')" );
@@ -58,7 +59,7 @@ sub format_to_epoch
 {
     my $self = shift( @_ );
     my $opts = {};
-    $opts = shift( @_ ) if( scalar( @_ ) == 1 && $self->_is_hash( $_[0] ) );
+    $opts = shift( @_ ) if( scalar( @_ ) == 1 && $self->_is_hash( $_[0] => 'strict' ) );
     if( $opts->{bind} )
     {
         return( "STRFTIME('%s',?)" );
@@ -206,8 +207,8 @@ sub on_conflict
                     # Return empty, not undef; undef is error
                     return( '' );
                 }
-                return( $self->error( "Fields property to update for on conflict do update clause is not a hash reference nor an array of fields." ) ) if( !$self->_is_hash( $opts->{fields} ) && !$self->_is_array( $opts->{fields} ) && !$self->{_on_conflict_callback} );
-                if( $self->_is_hash( $opts->{fields} ) )
+                return( $self->error( "Fields property to update for on conflict do update clause is not a hash reference nor an array of fields." ) ) if( !$self->_is_hash( $opts->{fields} => 'strict' ) && !$self->_is_array( $opts->{fields} ) && !$self->{_on_conflict_callback} );
+                if( $self->_is_hash( $opts->{fields} => 'strict' ) )
                 {
                     return( $self->error( "Fields property to update for on conflict do update clause contains no fields!" ) ) if( !scalar( keys( %{$opts->{fields}} ) ) );
                 }
@@ -385,7 +386,7 @@ DB::Object::SQLite::Query - SQLite Query Object
 
 =head1 VERSION
 
-    v0.3.9
+    v0.3.10
 
 =head1 DESCRIPTION
 
@@ -423,7 +424,7 @@ Provided with some options and this will build a C<ON CONFLICT> clause (L<DB::Ob
 
 =over 4
 
-=item I<action>
+=item * C<action>
 
 Valid value can be C<nothing> and in which case, nothing will be done by the database upon conflict.
 
@@ -443,7 +444,7 @@ If the original C<insert> or C<update> uses placeholders, then the C<DO UPDATE> 
 
 The callback will be called by L<DB::Object::Query/insert> or L<DB::Object::Query/update>, because the L</on_conflict> relies on query columns being previously set.
 
-=item I<fields>
+=item * C<fields>
 
 An array (or array object) of fields to use with I<action> set to C<update>
 
@@ -459,7 +460,7 @@ This will turn the C<DO UPDATE> prepending each field with the special keyword C
         VALUES (5, 'Gizmo Transglobal'), (6, 'Associated Computing, Inc')
         ON CONFLICT (did) DO UPDATE SET dname = EXCLUDED.dname;
 
-=item I<target>
+=item * C<target>
 
 Target can be a table column.
 
@@ -486,7 +487,7 @@ Value for I<target> can also be an array or array object (like L<Module::Generic
 
 If no I<target> argument was provided, then I<action> must be set to C<nothing> or this will return an error.
 
-=item I<where>
+=item * C<where>
 
 You can also provide a C<WHERE> expression in the conflict and it will be added literally.
 

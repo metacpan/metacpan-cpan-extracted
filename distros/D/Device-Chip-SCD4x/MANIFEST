@@ -1,0 +1,16 @@
+.editorconfig
+Build.PL
+Changes
+examples/sdc40.pl
+lib/Device/Chip/SCD4x.pm
+MANIFEST			This list of files
+t/00use.t
+t/01get_serial_number.t
+t/02config.t
+t/03read.t
+t/70sensors.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

@@ -1,0 +1,395 @@
+#!perl
+use App::bsky;
+exit App::bsky::CLI->new->run(@ARGV);
+
+#~ |-------------------------------------13---13-11----11---------------------|
+#~ |--13-11-------13--11--11-11-11-11-11------------13-----14--14-14-14-14-14-|
+#~ |--------11-11-------------------------------------------------------------|
+#~ |--------------------------------------------------------------------------|
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+bsky - A Command-line Bluesky Client
+
+=head1 SYNOPSIS
+
+    # create user session
+    $ bsky login [handle] [password]
+
+    # view recent posts
+    $ bsky timeline ...
+
+    # create a post
+    $ bsky post ...
+
+=head1 DESCRIPTION
+
+C<bsky> is a simple command line client for Bluesky in Perl.
+
+=head1 Commands
+
+   bsky [global options] command [command options] [arguments...]
+
+=head2 config
+
+    # Print all configuration values
+    bsky config
+
+    # Print a single config value and exit
+    bsky config wrap
+
+    # Set a configuration value
+    bsky config wrap 100
+
+View or change configuration values. See L<Configuration|/Configuration> for a list of current options.
+
+=head3 Options
+
+    key         optional
+    value       optional
+
+=head2 show-profile
+
+    bsky show-profile
+
+    bsky show-profile --handle sankor.bsky.social
+
+    bsky show-profile --json
+
+Show profile.
+
+=head3 Options
+
+    --handle handle     user handle; defaults to the logged in account
+    -H handle           alternative to --handle
+    --json              boolean flag; content is printed as JSON objects if given
+
+=head2 update-profile
+
+    bsky update-profile --description "Looks like we made it!"
+
+    bsky update-profile --name "John Smith"
+
+    bsky update-profile --avatar https://cataas.com/cat?width=100 --banner https://cataas.com/cat?width=1000
+
+Update profile elements.
+
+=head3 Options
+
+    --avatar        optional, avatar image (url or local path)
+    --banner        optional, banner image (url or local path)
+    --description   optional, blurb about yourself
+    --name          optional, display name
+
+=head2 show-session
+
+    bsky show-session
+
+    bsky show-session --json
+
+Show current session.
+
+=head3 Options
+
+    --json              boolean flag; content is printed as JSON objects if given
+
+=head2 timeline
+
+    bsky timeline
+
+    bsky timeline --json
+
+    # shorthand:
+    bsky tl
+
+Display posts from timeline.
+
+=head3 Options
+
+    --json      boolean flag; content is printed as JSON objects if given
+
+=head2 thread
+
+    thread at://did:plc:pwqewimhd3rxc4hg6ztwrcyj/app.bsky.feed.post/3kjyoh75qne2w
+
+Show a thread.
+
+=head3 Options
+
+    --json      boolean flag; content is printed as JSON objects if given
+    -n   value  number of items
+
+=head2 post
+
+    post "This is a test"
+
+Create a new post.
+
+=head2 like
+
+    bsky like at://did:plc:pwqewimhd3rxc4hg6ztwrcyj/app.bsky.feed.post/3kjyoh75qne2w
+
+Like a post.
+
+=head2 unlike
+
+    bsky unlike at://did:plc:pwqewimhd3rxc4hg6ztwrcyj/app.bsky.feed.post/3kjyoh75qne2w
+
+    bsky unlike at://did:plc:pwqewimhd3rxc4hg6ztwrcyj/app.bsky.feed.like/3kjyml72tqu2y
+
+Unlike a post. Either the direct feed URI or the like URI printed by C<bsky like ...>.
+
+=head2 likes
+
+    bsky likes at://did:plc:pwqewimhd3rxc4hg6ztwrcyj/app.bsky.feed.post/3kjyoh75qne2w
+
+Show likes on a post.
+
+=head3 Options
+
+    --json              boolean flag; content is printed as JSON objects if given
+
+=head2 repost
+
+    bsky repost at://did:plc:pwqewimhd3rxc4hg6ztwrcyj/app.bsky.feed.post/3kjyoh75qne2w
+
+Repost the post.
+
+=head2 reposts
+
+    bsky reposts at://did:plc:pwqewimhd3rxc4hg6ztwrcyj/app.bsky.feed.post/3kjyoh75qne2w
+
+Show reposts of the post.
+
+=head3 Options
+
+    --json              boolean flag; content is printed as JSON objects if given
+
+=head2 follow
+
+    bsky follow [handle]
+
+    bsky follow sankor.bsky.social
+
+    bsky follow did:plc:2lk3pbakx2erxgotvzyeuyem
+
+Follow the handle
+
+=head3 Options
+
+    handle          user handle or DID
+
+=head2 unfollow
+
+    bsky unfollow [handle]
+
+    bsky unfollow sankor.bsky.social
+
+    bsky unfollow did:plc:2lk3pbakx2erxgotvzyeuyem
+
+Unfollow the handle
+
+=head3 Options
+
+    handle          user handle or DID
+
+=head2 follows
+
+    bsky follows
+
+    bsky follows --handle sankor.bsky.social
+
+    bsky follows --json
+
+Show follows.
+
+=head3 Options
+
+    --handle handle     user handle; defaults to the logged in account
+    -H handle           alternative to --handle
+    --json              boolean flag; content is printed as JSON objects if given
+
+=head2 followers
+
+    bsky followers
+
+    bsky followers --handle sankor.bsky.social
+
+    bsky followers --json
+
+Show followers.
+
+=head3 Options
+
+    --handle handle     user handle; defaults to the logged in account
+    -H handle           alternative to --handle
+    --json              boolean flag; content is printed as JSON objects if given
+
+=head2 block
+
+    bsky block [handle]
+
+    bsky block sankor.bsky.social
+
+    bsky block did:plc:2lk3pbakx2erxgotvzyeuyem
+
+Block the handle.
+
+=head3 Options
+
+    handle          user handle or DID
+
+=head2 unblock
+
+    bsky unblock [handle]
+
+    bsky unblock sankor.bsky.social
+
+    bsky unblock did:plc:2lk3pbakx2erxgotvzyeuyem
+
+Unblock the handle.
+
+=head3 Options
+
+    handle          user handle or DID
+
+=head2 blocks
+
+    bsky blocks
+
+    bsky blocks --json
+
+Show blocks.
+
+=head3 Options
+
+    --json              boolean flag; content is printed as JSON objects if given
+
+=head2 delete
+
+    bsky delete at://did:p...
+
+Delete a post, repost, etc.
+
+=head2 notifications
+
+    bsky notifications
+
+    bsky notifications --all
+
+    bsky notifications --json
+
+    # shorthand
+    bsky notif --all
+
+Show notifications.
+
+=head3 Options
+
+    --all               boolean flag, show all notifications
+    --json              boolean flag; content is printed as JSON objects if given
+
+=head2 invite-codes
+
+    bsky invite-codes
+
+    bsky invite-codes --json
+
+Show invite codes.
+
+Note that you must be logged in with the account password to view invite codes.
+
+=head3 Options
+
+    --json              boolean flag; content is printed as JSON objects if given
+
+=head2 add-app-password
+
+    bsky add-app-password "Your app name"
+
+Create a new App password.
+
+Note that you must be logged in with the account password to add a new app password.
+
+=head2 revoke-app-password
+
+    bsky revoke-app-password "Your app name"
+
+Delete App password.
+
+Note that you must be logged in with the account password to revoke an app password.
+
+=head2 list-app-passwords
+
+    bsky list-app-passwords
+
+    bsky list-app-passwords --json
+
+Show App passwords.
+
+=head3 Options
+
+    --json              boolean flag; content is printed as JSON objects if given
+
+=head2 login
+
+    bsky login [ident] [password] [--host http://bsky.social]
+
+Log into a Bluesky account.
+
+=head3 Options
+
+    ident
+    password
+    --host        optional, defaults to https://bsky.social
+
+=head2 help
+
+shows a list of commands or help for one command
+
+=head1 Global Options
+
+   --help, -h     show help
+   --version, -v  print the version
+   -V             print verbose version info
+
+=head1 Configuration
+
+Current configuration values include:
+
+=over
+
+=item C<wrap>
+
+    bsky config wrap 100
+
+Sets word wrap width in characters for terminal output. The default is C<0> which disables word wrap.
+
+=back
+
+=head1 See Also
+
+L<At>.pm
+
+L<https://github.com/mattn/bsky> - Original Golang client
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2. Other copyrights, terms, and conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=begin stopwords
+
+
+=end stopwords
+
+=cut

@@ -74,7 +74,6 @@ subtest "whitelisted" => sub {
 
 };
 
-
 subtest "greylist (blocked)" => sub {
 
     @logs = ();

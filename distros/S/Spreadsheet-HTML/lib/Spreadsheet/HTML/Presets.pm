@@ -9,6 +9,7 @@ use Spreadsheet::HTML::Presets::Beadwork;
 use Spreadsheet::HTML::Presets::Calculator;
 use Spreadsheet::HTML::Presets::Conway;
 use Spreadsheet::HTML::Presets::Chess;
+use Spreadsheet::HTML::Presets::Draughts;
 use Spreadsheet::HTML::Presets::TicTacToe;
 use Spreadsheet::HTML::Presets::Handson;
 use Spreadsheet::HTML::Presets::Sudoku;
@@ -47,12 +48,13 @@ sub checkerboard {
     $self = shift if ref($_[0]) =~ /^Spreadsheet::HTML/;
     ($self,$data,$args) = $self ? $self->_args( @_ ) : Spreadsheet::HTML::_args( @_ );
 
-    my $colors = $args->{colors} ? $args->{colors} : [qw(red green)];
+    my $colors = $args->{colors} ? $args->{colors} : $args->{class} ? $args->{class} : [qw(red green)];
     $colors = [ $colors ] unless ref $colors;
 
     my @rows;
     for my $row (0 .. $args->{_max_rows} - 1) {
-        push @rows, ( "-r$row" => { style => { 'background-color' => [@$colors] } } );
+        my $attr = $args->{class} ? { class => [@$colors] } : { style => { 'background-color' => [@$colors] } };
+        push @rows, ( "-r$row" => $attr );
         Tie::Hash::Attribute::_rotate( $colors );
     }
 
@@ -267,69 +269,13 @@ sub calendar {
     return $self ? $self->generate( @args ) : Spreadsheet::HTML::generate( @args );
 }
 
-sub checkers {
-    my ($self,$data,$args);
-    $self = shift if ref($_[0]) =~ /^Spreadsheet::HTML/;
-    ($self,$data,$args) = $self ? $self->_args( @_ ) : Spreadsheet::HTML::_args( @_ );
-
-    my @data = (
-        [ '', '&#9922;', '', '&#9922;', '', '&#9922;', '', '&#9922;' ],
-        [ '&#9922;', '', '&#9922;', '', '&#9922;', '', '&#9922;', '' ],
-        [ '', '&#9922;', '', '&#9922;', '', '&#9922;', '', '&#9922;' ],
-        [ ('') x 8 ], [ ('') x 8 ],
-        [ '&#9920;', '', '&#9920;', '', '&#9920;', '', '&#9920;', '' ],
-        [ '', '&#9920;', '', '&#9920;', '', '&#9920;', '', '&#9920;' ],
-        [ '&#9920;', '', '&#9920;', '', '&#9920;', '', '&#9920;', '' ],
-    );
-
-    my $on  = $args->{on}  || 'red';
-    my $off = $args->{off} || 'white';
-
-    my @args = (
-        table => {
-            width => '65%',
-            style => {
-                border => 'thick outset',
-                %{ $args->{table}{style} || {} },
-            },
-            %{ $args->{table} || {} },
-        },
-        @_,
-        td => [
-            {
-                height => 65,
-                width  => 65,
-                align  => 'center',
-                style  => { 
-                    'font-size'         => 'xx-large',
-                    border              => 'thin inset',
-                    'background-color'  => [ ($off, $on)x4, ($on, $off)x4 ],
-                    %{ $args->{td}{style} || {} },
-                },
-                %{ $args->{td} || {} },
-            }, sub { $_[0] ? qq(<div class="game-piece">$_[0]</div>) : '' }
-        ],
-        tgroups  => 0,
-        headless => 0,
-        pinhead  => 0,
-        matrix   => 1,
-        wrap     => 0,
-        fill     => '8x8',
-        data     => \@data,
-    );
-
-    my $js    = Spreadsheet::HTML::Presets::Chess::_javascript( %$args );
-    my $table = $self ? $self->generate( @args ) : Spreadsheet::HTML::generate( @args );
-    return $js . $table;
-}
-
 sub _js_wrapper {
     my %args = @_;
 
     unless ($NO_MINIFY) {
         $args{code} = JavaScript::Minifier::minify(
             input      => $args{code},
-            copyright  => $args{copyright} || 'Copyright 2017 Jeff Anderson',
+            copyright  => $args{copyright} || 'Copyright 2024 Jeff Anderson',
             stripDebug => 1,
         );
     }
@@ -386,6 +332,10 @@ Preset for tables with checkerboard colors.
 Forms diagonal patterns by alternating the starting background
 colors for each row. C<colors> defaults to red and green.
 
+  checkerboard( class => [qw(foo bar baz)] )
+
+Same thing but alternate class names (for external CSS).
+
 =item * C<banner( dir, text, emboss, on, off, fill, %params )>
 
 Will generate and display a banner using the given C<text> in the
@@ -422,15 +372,6 @@ Generates a static maze.
 
   maze( fill => '10x10', on => 'red', off => 'black' ) 
 
-=item * C<checkers( on, off, %params )>
-
-Generates a checkers game board (US). Currently you can only
-move the pieces around without regard to any rules. Defaults
-to red and white squares which can be overriden with C<on>
-and C<off>, respectively:
-
-  checkers( on => 'blue', off => 'gray' ) 
-
 =back
 
 =head1 MORE PRESETS
@@ -460,6 +401,11 @@ Turn cell backgrounds into Conway's game of life.
 =item * L<Spreadsheet::HTML::Presets::TicTacToe>
 
 Creats a Tic-Tac-Toe board.
+
+=item * L<Spreadsheet::HTML::Presets::Draughts>
+
+AKA Checkers. Work in progress. Hope to interface with pre-existing
+Javascript Chess engine someday (or write my own).
 
 =item * L<Spreadsheet::HTML::Presets::Chess>
 
@@ -492,7 +438,7 @@ Jeff Anderson, C<< <jeffa at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Jeff Anderson.
+Copyright 2024 Jeff Anderson.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

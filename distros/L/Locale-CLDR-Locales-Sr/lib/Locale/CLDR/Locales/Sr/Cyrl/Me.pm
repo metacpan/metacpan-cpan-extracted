@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sr::Cyrl::Me - Package for language Serbian
 
 package Locale::CLDR::Locales::Sr::Cyrl::Me;
 # This file auto generated from Data\common\main\sr_Cyrl_ME.xml
-#	on Tue  5 Dec  1:32:21 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'arn' => 'мапудунгун',
@@ -59,14 +59,13 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'BY' => 'Бјелорусија',
  			'CG' => 'Конго',
  			'CZ' => 'Чешка Република',
  			'DE' => 'Њемачка',
  			'KN' => 'Свети Китс и Невис',
- 			'MK@alt=variant' => 'БЈР Македонија',
  			'PM' => 'Свети Пјер и Микелон',
  			'RE' => 'Реунион',
  			'UM' => 'Мања удаљена острва САД',
@@ -87,18 +86,18 @@ has 'calendar_months' => (
 				'format' => {
 					abbreviated => {
 						nonleap => [
-							'јан.',
-							'феб.',
+							'јан',
+							'феб',
 							'март',
-							'апр.',
+							'апр',
 							'мај',
 							'јун',
 							'јул',
-							'авг.',
-							'септ.',
-							'окт.',
-							'нов.',
-							'дец.'
+							'авг',
+							'септ',
+							'окт',
+							'нов',
+							'дец'
 						],
 						leap => [
 							
@@ -108,18 +107,18 @@ has 'calendar_months' => (
 				'stand-alone' => {
 					abbreviated => {
 						nonleap => [
-							'јан.',
-							'феб.',
+							'јан',
+							'феб',
 							'март',
-							'апр.',
+							'апр',
 							'мај',
 							'јун',
 							'јул',
-							'авг.',
-							'септ.',
-							'окт.',
-							'нов.',
-							'дец.'
+							'авг',
+							'септ',
+							'окт',
+							'нов',
+							'дец'
 						],
 						leap => [
 							
@@ -137,15 +136,6 @@ has 'calendar_days' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {
-						mon => 'пон.',
-						tue => 'ут.',
-						wed => 'ср.',
-						thu => 'чет.',
-						fri => 'пет.',
-						sat => 'суб.',
-						sun => 'нед.'
-					},
 					wide => {
 						mon => 'понедељак',
 						tue => 'уторак',
@@ -157,15 +147,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'пон.',
-						tue => 'ут.',
-						wed => 'ср.',
-						thu => 'чет.',
-						fri => 'пет.',
-						sat => 'суб.',
-						sun => 'нед.'
-					},
 					wide => {
 						mon => 'понедељак',
 						tue => 'уторак',
@@ -245,8 +226,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'day_periods' => (
@@ -354,7 +335,7 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
-			MMMMW => q{W. 'сједмица' 'у' MMM},
+			MMMMW => q{W. 'сједмица' 'у' MMMM},
 			yw => q{w. 'сједмица' 'у' Y.},
 		},
 	} },

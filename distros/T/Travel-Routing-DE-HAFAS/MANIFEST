@@ -7,7 +7,6 @@ Dockerfile
 lib/Travel/Routing/DE/HAFAS.pm
 lib/Travel/Routing/DE/HAFAS/Connection.pm
 lib/Travel/Routing/DE/HAFAS/Connection/Section.pm
-lib/Travel/Routing/DE/HAFAS/Location.pm
 lib/Travel/Routing/DE/HAFAS/Utils.pm
 MANIFEST			This list of files
 README.md

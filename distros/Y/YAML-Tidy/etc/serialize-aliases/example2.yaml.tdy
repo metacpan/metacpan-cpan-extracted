@@ -1,0 +1,13 @@
+- &color_1 red
+- x: *color_1
+  y: *color_1
+- &color_2 green
+- x: *color_2
+  y: *color_2
+- &color_3 '#coffee'
+- x: *color_3
+  y: *color_3
+- &color_4 blue
+- x: *color_4
+  y: *color_4
+  green: *color_2

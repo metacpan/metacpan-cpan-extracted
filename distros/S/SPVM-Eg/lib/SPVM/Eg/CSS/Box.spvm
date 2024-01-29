@@ -1,0 +1,9 @@
+class Eg::CSS::Box : pointer {
+  
+  # Class Methods
+  native static method new : Eg::CSS::Box ();
+  
+  # Instance Methods
+  native method DESTROY : void ();
+
+}

@@ -1,0 +1,56 @@
+* dist-zilla-app-command-authordebs
+  :PROPERTIES:
+  :CUSTOM_ID: dist-zilla-app-command-authordebs
+  :END:
+
+** Moved to Debian's gitlab
+
+With version 0.004, I've added a feature to edit =debian/control=
+file. This feature relies on =Config::Model::Dpkg= (aka
+[[https://salsa.debian.org/perl-team/modules/packages/libconfig-model-dpkg-perl][libconfig-model-dpkg-perl]]) which is only available in Debian.
+
+Which means that this module is no longer suitable for CPAN.
+
+For CPAN, I've reverted the Debian only change and released version 0.005.
+
+Any further development of this module will be done
+on [[https://salsa.debian.org/perl-team/modules/packages/libdist-zilla-app-command-authordebs-perl][Debian Perl Group / libdist-zilla-app-command-authordebs]].
+
+No new release will be done on CPAN.
+
+** What is dist-zilla-app-command-authordebs ?
+
+It's a [[http://dzil.org/][Dist::Zilla]] command to list or install author
+dependencies with Debian perl packages.
+
+This command is useful to work on the source of a Perl module that
+uses =Dist::Zilla=. This list or install missing author dependencies,
+i.e. mostly =Dist::Zilla= dependencies.
+
+These dependencies can be used in Debian's =BuildDepends= list. Note
+that other dependencies (runtime or used in tests) are not handled.
+
+To install the author dependencies (i,e, all the =Dist::Zilla= plugins
+and extensions) required to build a module, run either:
+
+#+begin_src shell
+  dzil authordebs --install  # require sudo to allow apt-get install
+#+end_src
+
+#+begin_src shell
+  sudo apt-get install $(dzil authordebs)
+#+end_src
+
+The former command is preferred as only =apt-get= command is run as
+root.
+
+* Installation
+  :PROPERTIES:
+  :CUSTOM_ID: installation
+  :END:
+
+On Debian and derivatives:
+
+#+begin_src shell
+  sudo apt install libdist-zilla-app-command-authordebs-perl
+#+end_src

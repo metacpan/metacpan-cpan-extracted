@@ -1651,3 +1651,17 @@ Revision history for Graphics-Framebuffer
        "slideshow.pl" and "viewpic.pl" added the option "--small" to make it
 	   easy to diagnose bus errors.  It sets an artificial 320x200 screen.
 	   It's a shortcut for "--x=320 --y=200".
+
+6.57   Oct 29, 2023
+
+       Added preliminary checks for a framebuffer device in the Makefile.PL
+	   stage.
+	   
+	   Added a better explanation of the 'make test' process and the caveats
+	   of perl versus C accelerated operation.
+
+6.58   Nov 16, 2023
+
+       Improved the Makefile.PL script
+
+       Tests completely revamped

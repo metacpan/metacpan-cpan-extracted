@@ -13,12 +13,14 @@ sub main {
     my %opts = (
         download => 1,
         tests    => 1,
+        compile  => 1,
     );
 
     GetOptions(
         'download!' => \$opts{download},
         'dir:s'     => \$opts{dir},
         'tests!'    => \$opts{tests},
+        'compile!'  => \$opts{compile},
     );
 
     my $olson_version;
@@ -34,7 +36,9 @@ sub main {
         ($olson_version) = $dir =~ m{/([^/]+)$};
     }
 
-    _compile_tzdata($dir);
+    if ( $opts{compile} ) {
+        _compile_tzdata($dir);
+    }
     _parse_olson( $dir, $olson_version, $opts{tests} );
 }
 

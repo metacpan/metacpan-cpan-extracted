@@ -232,6 +232,7 @@ lib/Locale/CLDR/Transformations/Any/My/Ar.pm
 lib/Locale/CLDR/Transformations/Any/My/Chr.pm
 lib/Locale/CLDR/Transformations/Any/My/Fa.pm
 lib/Locale/CLDR/Transformations/Any/My/My_fonipa.pm
+lib/Locale/CLDR/Transformations/Any/My/My_latn.pm
 lib/Locale/CLDR/Transformations/Any/My/Zawgyi.pm
 lib/Locale/CLDR/Transformations/Any/Nl/Title.pm
 lib/Locale/CLDR/Transformations/Any/Numericpinyin/Latin.pm

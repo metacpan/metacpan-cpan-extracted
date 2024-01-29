@@ -2,8 +2,8 @@ NAME
     Data::Sah::Filter - Filtering for Data::Sah
 
 VERSION
-    This document describes version 0.022 of Data::Sah::Filter (from Perl
-    distribution Data-Sah-Filter), released on 2023-08-16.
+    This document describes version 0.024 of Data::Sah::Filter (from Perl
+    distribution Data-Sah-Filter), released on 2024-01-17.
 
 SYNOPSIS
      use Data::Sah::Filter qw(gen_filter);
@@ -16,6 +16,13 @@ SYNOPSIS
      my $val = $c->("foo");        # unchanged, "foo"
      my $val = $c->(" foo ");      # "foo"
 
+    Another example:
+
+     my $c = gen_filter(
+         filter_names       => [ ['Str::remove_comment' => {style=>'shell'}] ],
+         #filter_names      => ['Str::remove_comment=style,shell'], # same as above
+     );
+
 DESCRIPTION
     This distribution contains a standard set of filter rules for Data::Sah
     (to be used in "prefilters" and "postfilters" clauses). It is separated
@@ -26,12 +33,13 @@ DESCRIPTION
     example: Data::Sah::Filter::perl::Str::trim for trimming whitespace at
     the beginning and end of string.
 
-    Basically, a filter rule will provide a Perl expression ("expr_filter")
-    to convert one data to another. Multiple filter rules can be combined to
-    form the final filtering code. This code can be used by "Data::Sah" when
-    generating validator code from Sah schema, or can be used directly. Some
-    projects which use filtering rules directly include: App::orgadb (which
-    lets users specify filters from the command-line).
+    Basically, a filter rule will provide an expression (in "expr_filter")
+    in the target language (e.g. Perl, JavaScript, or others) to convert one
+    data to another. Multiple filter rules can be combined to form the final
+    filtering code. This code can be used by "Data::Sah" when generating
+    validator code from Sah schema, or can be used directly. Some projects
+    which use filtering rules directly include: App::orgadb (which lets
+    users specify filters from the command-line).
 
   meta()
     The filter rule module must contain "meta" subroutine which must return
@@ -142,17 +150,20 @@ DESCRIPTION
     33. Data::Sah::Filter::perl::Str::ltrim
     34. Data::Sah::Filter::perl::Str::oneline
     35. Data::Sah::Filter::perl::Str::remove_comment
-    36. Data::Sah::Filter::perl::Str::remove_nondigit
-    37. Data::Sah::Filter::perl::Str::remove_whitespace
-    38. Data::Sah::Filter::perl::Str::replace_map
-    39. Data::Sah::Filter::perl::Str::rtrim
-    40. Data::Sah::Filter::perl::Str::trim
-    41. Data::Sah::Filter::perl::Str::try_center
-    42. Data::Sah::Filter::perl::Str::uc
-    43. Data::Sah::Filter::perl::Str::ucfirst
-    44. Data::Sah::Filter::perl::Str::upcase
-    45. Data::Sah::Filter::perl::Str::uppercase
-    46. Data::Sah::Filter::perl::Str::wrap
+    36. Data::Sah::Filter::perl::Str::remove_non_latin_alphanum
+    37. Data::Sah::Filter::perl::Str::remove_nondigit
+    38. Data::Sah::Filter::perl::Str::remove_whitespace
+    39. Data::Sah::Filter::perl::Str::replace_map
+    40. Data::Sah::Filter::perl::Str::rtrim
+    41. Data::Sah::Filter::perl::Str::trim
+    42. Data::Sah::Filter::perl::Str::try_center
+    43. Data::Sah::Filter::perl::Str::uc
+    44. Data::Sah::Filter::perl::Str::ucfirst
+    45. Data::Sah::Filter::perl::Str::underscore_non_latin_alphanum
+    46. Data::Sah::Filter::perl::Str::underscore_non_latin_alphanums
+    47. Data::Sah::Filter::perl::Str::upcase
+    48. Data::Sah::Filter::perl::Str::uppercase
+    49. Data::Sah::Filter::perl::Str::wrap
 
 VARIABLES
   $Log_Filter_Code => bool (default: from ENV or 0)
@@ -233,7 +244,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022, 2020 by perlancar
+    This software is copyright (c) 2024, 2023, 2022, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

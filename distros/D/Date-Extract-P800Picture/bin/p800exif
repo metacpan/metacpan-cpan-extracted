@@ -7,33 +7,33 @@ use warnings;
 use utf8;
 use 5.014000;
 
-BEGIN { our $VERSION = v1.1.6; }
+BEGIN { our $VERSION = v1.1.7; }
 
 use Image::ExifTool            ();
 use Date::Extract::P800Picture ();
 
-use DateTime ();
-use English qw(-no_match_vars);
-use File::Basename ();
-use File::stat     ();
-use File::Slurp    ();
-use Getopt::Long   ();
-use Log::Log4perl qw(:easy get_logger);
+use DateTime                ();
+use English                 qw(-no_match_vars);
+use File::Basename          ();
+use File::stat              ();
+use File::Slurp             ();
+use Getopt::Long            ();
+use Log::Log4perl           qw(:easy get_logger);
 use Pod::Usage              ();
 use Pod::Usage::CommandLine ();
 
 use Readonly ();
 ## no critic (ProhibitCallsToUnexportedSubs)
-Readonly::Scalar my $EMPTY       => q{};
-Readonly::Scalar my $SPACE       => q{ };
-Readonly::Scalar my $MAKE        => q{Sony Ericsson};
-Readonly::Scalar my $MODEL       => q{P800};
-Readonly::Scalar my $RIGHTS      => q{CC BY-NC-SA 3.0 Unported};
-Readonly::Scalar my $USER        => q{USER};
-Readonly::Scalar my $FULLNAME    => 6;
-Readonly::Scalar my $LOG_CONF    => q{p800exif_log.conf};
+Readonly::Scalar my $EMPTY    => q{};
+Readonly::Scalar my $SPACE    => q{ };
+Readonly::Scalar my $MAKE     => q{Sony Ericsson};
+Readonly::Scalar my $MODEL    => q{P800};
+Readonly::Scalar my $RIGHTS   => q{CC BY-NC-SA 3.0 Unported};
+Readonly::Scalar my $USER     => q{USER};
+Readonly::Scalar my $FULLNAME => 6;
+Readonly::Scalar my $LOG_CONF => q{p800exif_log.conf};
 Readonly::Array my @DEBUG_LEVELS => ( $FATAL, $INFO, $WARN, $DEBUG );
-Readonly::Hash my %LOG           => (
+Readonly::Hash my %LOG => (
     'FILENAME'          => q{processing file '%s'},
     'NO_FILE'           => q{could not find file '%s'},
     'PRESERVING'        => q{preserving the hour fraction in '%s'},
@@ -54,7 +54,7 @@ Readonly::Array my @GETOPTIONS => (
     q{make|brand|b=s}, q{model|m=s},  q{rights=s},  q{artist=s},
     q{exif!},          q{timestamp!}, q{preserve!}, q{verbose|v+},
 );
-Readonly::Scalar my $ARTIST     => @{ [ getpwnam $ENV{$USER} ] }[$FULLNAME];
+Readonly::Scalar my $ARTIST => @{ [ getpwnam $ENV{$USER} ] }[$FULLNAME];
 Readonly::Hash my %OPTS_DEFAULT => (
     'make'      => $MAKE,
     'model'     => $MODEL,
@@ -103,7 +103,7 @@ while ( my $filename = shift @ARGV ) {
     my $stat = File::stat::stat($filename)
       or $log->croak( $LOG{'NO_FILE'}, $filename );
     my $mtime    = DateTime->from_epoch( 'epoch' => $stat->mtime );
-    my $dt       = $p->extract( File::Basename::basename $filename);
+    my $dt       = $p->extract( File::Basename::basename $filename );
     my $datetime = $dt . $EMPTY;
 
     if ( $opts{'preserve'}

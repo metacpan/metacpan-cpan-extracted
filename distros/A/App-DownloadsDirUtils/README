@@ -2,8 +2,8 @@ NAME
     App::DownloadsDirUtils - Utilities related to downloads directories
 
 VERSION
-    This document describes version 0.006 of App::DownloadsDirUtils (from
-    Perl distribution App-DownloadsDirUtils), released on 2023-12-08.
+    This document describes version 0.007 of App::DownloadsDirUtils (from
+    Perl distribution App-DownloadsDirUtils), released on 2023-12-12.
 
 DESCRIPTION
     This distribution provides the following command-line utilities:

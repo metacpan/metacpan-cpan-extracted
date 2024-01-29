@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Form::BarCode';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -14,11 +14,14 @@ PDF::Builder::Resource::XObject::Form::BarCode::code128 - Code 128 and EAN-128 b
 
 =head1 METHODS
 
+=head2 new
+
+    $res = PDF::Builder::Resource::XObject::Form::BarCode::code128->new($pdf, %options)
+
 =over
 
-=item $res = PDF::Builder::Resource::XObject::Form::BarCode::code128->new($pdf, %options)
-
 Returns a code128 object. Use 'ean' option to encode using EAN128 mode.
+Note that this should be invoked via the Builder.pm method!
 
 =back
 

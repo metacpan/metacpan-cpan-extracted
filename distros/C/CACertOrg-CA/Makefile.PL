@@ -49,7 +49,7 @@ my %WriteMakefile = (
 	'NAME'          => $module,
 	'VERSION_FROM'  => $main_file,
 	'ABSTRACT_FROM' => $main_file,
-	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
+	'AUTHOR'        => 'brian d foy <briandfoy@pobox.com>',
 	'LICENSE'       => 'mozilla_1_1 gpl-2 lgpl_2_1',
 
 	'CONFIGURE_REQUIRES' => {
@@ -72,7 +72,7 @@ my %WriteMakefile = (
 		resources => {
 			repository => {
 				type => 'git',
-				url  => "$github.git",
+				url  => $github,
 				web  => $github,
 				},
 			bugtracker => {

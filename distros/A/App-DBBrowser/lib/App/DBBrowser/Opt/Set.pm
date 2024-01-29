@@ -30,7 +30,7 @@ sub new {
             " = ", " != ", " <> ", " < ", " > ", " >= ", " <= ",
             "REGEXP", "REGEXP_i", "NOT REGEXP", "NOT REGEXP_i", "LIKE", "NOT LIKE",
             "IS NULL", "IS NOT NULL", "IN", "NOT IN", "BETWEEN", "NOT BETWEEN",
-            "ANY", "ALL"
+            "ANY", "ALL",
         ],
     }, $class;
 }
@@ -85,29 +85,29 @@ sub _options {
             { name => '_data_type_guessing',     text => "- Guess data types", section => 'create' },
         ],
         group_output => [
-            { name => '_binary_filter',      text => "- Binary filter",       section => 'table' },
-            { name => '_squash_spaces',      text => "- Squash spaces",       section => 'table' },
-            { name => '_base_indent',        text => "- Indentation",         section => 'G'     },
-            { name => '_set_string',         text => "- Undef string",        section => 'table' },
-            { name => '_warningss',          text => "- Warnings",            section => 'G'     },
-            { name => 'progress_bar',        text => "- Progress bar",        section => 'table' },
-            { name => 'tab_width',           text => "- Tab width",           section => 'table' },
-            { name => '_color',              text => "- Color",               section => 'table' },
-            { name => 'trunc_fract_first',   text => "- Trunc fract first",   section => 'table' },
-            { name => 'min_col_width',       text => "- Trunc col threshold", section => 'table' },
+            { name => '_binary_filter',    text => "- Binary filter",       section => 'table' },
+            { name => '_squash_spaces',    text => "- Squash spaces",       section => 'table' },
+            { name => '_base_indent',      text => "- Indentation",         section => 'G'     },
+            { name => '_set_string',       text => "- Undef string",        section => 'table' },
+            { name => '_warningss',        text => "- Warnings",            section => 'G'     },
+            { name => 'progress_bar',      text => "- Progress bar",        section => 'table' },
+            { name => 'tab_width',         text => "- Tab width",           section => 'table' },
+            { name => '_color',            text => "- Color",               section => 'table' },
+            { name => 'trunc_fract_first', text => "- Trunc fract first",   section => 'table' },
+            { name => 'min_col_width',     text => "- Trunc col threshold", section => 'table' },
         ],
         group_import => [
-            { name => '_parse_file',        text => "- Parse tool",         section => 'insert' },
-            { name => '_csv_in_char',       text => "- CSV options in a",   section => 'csv_in' },
-            { name => '_csv_in_options',    text => "- CSV options in b",   section => 'csv_in' },
-            { name => '_split_config',      text => "- Settings 'split'",   section => 'split'  },
-            { name => '_input_filter',      text => "- Input filter",       section => 'insert' },
-            { name => '_empty_to_null',     text => "- Empty to Null",      section => 'insert' },
-            { name => '_file_encoding_in',  text => "- File encoding in",   section => 'insert' },
-            { name => 'history_dirs',       text => "- Directory history",  section => 'insert' },
-            { name => '_file_filter',       text => "- File filter",        section => 'insert' },
-            { name => '_show_hidden_files', text => "- Hidden files",       section => 'insert' },
-            { name => '_data_source_type',  text => "- Source type",        section => 'insert' },
+            { name => '_parse_file',        text => "- Parse tool",        section => 'insert' },
+            { name => '_csv_in_char',       text => "- CSV options in a",  section => 'csv_in' },
+            { name => '_csv_in_options',    text => "- CSV options in b",  section => 'csv_in' },
+            { name => '_split_config',      text => "- Settings 'split'",  section => 'split'  },
+            { name => '_input_filter',      text => "- Input filter",      section => 'insert' },
+            { name => '_empty_to_null',     text => "- Empty to Null",     section => 'insert' },
+            { name => '_file_encoding_in',  text => "- File encoding in",  section => 'insert' },
+            { name => 'history_dirs',       text => "- Directory history", section => 'insert' },
+            { name => '_file_filter',       text => "- File filter",       section => 'insert' },
+            { name => '_show_hidden_files', text => "- Hidden files",      section => 'insert' },
+            { name => '_data_source_type',  text => "- Source type",       section => 'insert' },
         ],
         group_export => [
             { name => 'export_dir',         text => "- Destination folder", section => 'export'  },
@@ -117,11 +117,11 @@ sub _options {
             { name => '_file_encoding_out', text => "- File encoding out",  section => 'export'  },
         ],
         group_misc => [
-            { name => '_menu_memory',   text => "- Menu memory",  section => 'G'     },
-            { name => '_table_expand',  text => "- Expand table", section => 'table' },
-            { name => '_search',        text => "- Search",       section => 'table' },
-            { name => '_mouse',         text => "- Mouse mode",   section => 'table' },
-            { name => '_db2_encoding',  text => "- DB2 encoding", section => 'G'     },
+            { name => '_menu_memory',  text => "- Menu memory",  section => 'G'     },
+            { name => '_table_expand', text => "- Expand table", section => 'table' },
+            { name => '_search',       text => "- Search",       section => 'table' },
+            { name => '_mouse',        text => "- Mouse mode",   section => 'table' },
+            { name => '_db2_encoding', text => "- DB2 encoding", section => 'G'     },
         ],
     };
     return $groups->{$group_name};
@@ -338,11 +338,11 @@ sub set_options {
             elsif ( $opt eq '_alias' ) {
                 my $prompt = 'Enable alias for:';
                 my $sub_menu = [
-                    [ 'select_complex_col', "- Functions/Subqueries in SELECT",  [ $no, 'ASK'    ] ],
-                    [ 'join_table',         "- Tables in join",                  [ 'AUTO', 'ASK' ] ],
-                    [ 'join_columns',       "- Non-unique columns in join",      [ $no, 'AUTO'   ] ],
-                    [ 'derived_table',      "- Derived table",                   [ 'AUTO', 'ASK' ] ],
-                    [ 'table',              "- Ordinary table",                  [ $no, 'AUTO'   ] ],
+                    [ 'select_complex_col', "- Functions/Subqueries in SELECT",  [ 'NO',   undef, 'ASK',   undef     ] ],
+                    [ 'join_table',         "- Tables in join",                  [ undef, 'AUTO',  undef, 'ASK/AUTO' ] ],
+                    [ 'join_columns',       "- Non-unique columns in join",      [ 'NO',  'AUTO', 'ASK',  'ASK/AUTO' ] ],
+                    [ 'derived_table',      "- Derived table",                   [ 'NO',  'AUTO', 'ASK',  'ASK/AUTO' ] ],
+                    [ 'table',              "- Ordinary table",                  [ 'NO',  'AUTO', 'ASK',  'ASK/AUTO' ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

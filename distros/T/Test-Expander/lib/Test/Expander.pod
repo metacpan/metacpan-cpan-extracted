@@ -50,6 +50,9 @@ B<Test::Expander> - Expansion of test functionalities that appear to be frequent
     -builtins => { close => sub { $close_success ? CORE::close( shift ) : 0 } },
     -target   => 'My::Class';
 
+  # Activates immediate stop of test execution if any assertion fails:
+  use Test::Expander -bail => 1;
+
 =head1 DESCRIPTION
 
 The primary objective of B<Test::Expander> is to provide additional convenience while testing based on
@@ -96,7 +99,7 @@ via the options supported by B<Test::Expander>:
 
 Another fuctionality frequently used in tests relates to the work with files and directories:
 reading, writing, creation, etc. Because almost all features required in such cases are provided by
-L<Path::Tiny|https://metacpan.org/pod/Path::Tiny>, some functions of this module is also exported from
+L<Path::Tiny|https://metacpan.org/pod/Path::Tiny>, some functions of this module are also exported from
 B<Test::Expander>.
 
 =item
@@ -111,7 +114,7 @@ makes tests smaller, more maintainable, and much more reliable.
 
 =item
 
-Last but not least. I stole the idea of subtest selection from
+I stole the idea of subtest selection from
 L<Test::Builder::SubtestSelection|https://metacpan.org/pod/Test::Builder::SubtestSelection>.
 That's why the subtest selection supported by B<Test::Expander> is partially compatible with the implementation provided
 by L<Test::Builder::SubtestSelection|https://metacpan.org/pod/Test::Builder::SubtestSelection>.
@@ -127,6 +130,18 @@ by names and other ones by numbers.
 
 In both cases the options have to be supplied as arguments to the test script.
 To do so separate the arguments from prove's own arguments with the arisdottle (C<::>).
+
+=item
+
+Another idea inspired by other module namely by L<Test::Most|https://metacpan.org/pod/Test::Most> is the idea of
+immediate stop of test file execution if one of the tests fails.
+
+This feature can be applied both for the whole test file using the B<-bail> option
+
+  use Test::Expander -bail => 1;
+
+and for a part of it using the functions B<bail_on_failure> and B<restore_failure_handler> to activate and deactivate
+this reaction, correspondingly.
 
 =over 2
 
@@ -182,7 +197,7 @@ I.e. if you would try to run the following command
 the subtest B<my next higher level subtest> including all embedded subtests will be skipped, so that even the subtest
 B<my deepest subtest> will not be executed although this was your goal.
 
-This restriction, however, can be avoided using the subset selection by number.
+This restriction, however, can be avoided using the subtest selection by number.
 
 =item Selection by number
 
@@ -240,7 +255,7 @@ you do not need to specify this explicitly if the path to the test file is in ac
 of class / module to be tested i.e. file B<t/Foo/Bar/baz.t> corresponds to class / module B<Foo::Bar>.
 
 If such automated recognition is not intended, this can be deactivated by explicitly supplied
-undefined class / module name along with the option B<-target>.
+undefined class / module name along with the option C<-target>.
 
 A similar recognition is provided in regard to the method / subroutine to be tested
 (see variables B<$METHOD> and B<$METHOD_REF> below) if the base name (without extension) of test file is
@@ -262,13 +277,21 @@ Options specific for this module only are always expected to have values and the
 
 =item
 
-B<-builtins> - override builtins in the name space of class / module to be tested.
+B<-bail> - activates immediate stop of test file execution if any test case in this file fails.
+The expected value is boolean. Defaults to B<false> i.e. the execution continues even if tests fail.
+
+Even if activated, this behaviour can be deactivated at any point in the test file using the function
+B<restore_failure_handler>.
+
+=item
+
+B<-builtins> - overrides builtins in the name space of class / module to be tested.
 The expected value is a hash reference, where keys are the names of builtins and
 the values are code references overriding default behavior.
 
 =item
 
-B<-lib> - prepend directory list used by the Perl interpreter for search of modules to be loaded
+B<-lib> - prepends directory list used by the Perl interpreter for search of modules to be loaded
 (i.e. the B<@INC> array) with values supplied in form of array reference.
 Each element of this array is evaluated using L<string eval|https://perldoc.perl.org/functions/eval> so that
 any valid expression evaluated to string is supported if it is based on modules used by B<Test::Expander> or
@@ -282,7 +305,7 @@ e.g. B<$TEMP_DIR> can be used in the expressions determining such directories (s
 
 =item
 
-B<-method> - prevent any attempt to automatically determine method / subroutine to be tested.
+B<-method> - prevents any attempt to automatically determine method / subroutine to be tested.
 If the value supplied along with this option is defined and found in the class / module to be test
 (see B<-target> below), this will be considered such method / subroutine so that the variables
 B<$METHOD> and B<$METHOD_REF> (see description of exported variables below) will be imported and accessible in test.
@@ -664,21 +687,7 @@ In this case they are logged to STDOUT using L<note|https://metacpan.org/pod/Tes
 
 B<Test::Expander> is recommended to be the very first module in your test file.
 
-The known exceptions are:
-
-=over 2
-
-=item 1
-
-When another module is used, which in turn is based on L<Test::Builder|https://metacpan.org/pod/Test::Builder> e.g.
-L<Test::Output|https://metacpan.org/pod/Test::Output>:
-
-  use Test::Output;
-  use Test::Expander;
-
-=item 2
-
-When some actions performed on the module level (e.g. determination of constants)
+The only known exception is when some actions performed on the module level (e.g. determination of constants)
 rely upon results of other actions (e.g. mocking of built-ins).
 
 To explain this let us assume that your test file should globally mock the built-in B<close>
@@ -693,8 +702,6 @@ For this purpose a reasonable implementation might look as follows:
   }
 
   use Test::Expander;
-
-=back
 
 =item
 

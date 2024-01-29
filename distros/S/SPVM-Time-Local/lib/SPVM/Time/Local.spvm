@@ -2,9 +2,12 @@
 # MIT License
 
 class Time::Local {
+  version "0.111";
+  
   use Sys::Time::Tm;
   
-  native static method timelocal : long ($time_info : Sys::Time::Tm);
+  # Class Methods
+  native static method timelocal : long ($tm : Sys::Time::Tm);
   
-  native static method timegm : long ($time_info : Sys::Time::Tm);
+  native static method timegm : long ($tm : Sys::Time::Tm);
 }

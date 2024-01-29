@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION='0.25';
+our $VERSION='0.26';
 
 # NO UTF8 here, we are checking with random
 # data structure which provides no unicode
@@ -32,6 +32,8 @@ use Data::Random::Structure;
 # This is not our problem and solving this not our responsibility.
 # a seed of 397 will produce a data structure which makes
 # YAML::Load() to fail.
+
+# but at the moment we are using YAML::PP, so no worries
 
 my $seed = 397+1;
 

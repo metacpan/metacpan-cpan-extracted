@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2008-2020, Roland van Ipenburg
-package Date::Extract::P800Picture v1.1.6;
+package Date::Extract::P800Picture v1.1.7;
 
 use strict;
 use warnings;
@@ -10,8 +10,8 @@ use 5.014000;
 
 use Moose;
 
-use POSIX ();
-use English qw( -no_match_vars);
+use POSIX    ();
+use English  qw( -no_match_vars);
 use DateTime ();
 
 use Date::Extract::P800Picture::Exceptions ();
@@ -24,7 +24,7 @@ Readonly::Scalar my $MAX_DAYS_IN_MONTH => 31;
 Readonly::Scalar my $HOURS_IN_DAY      => 24;
 Readonly::Scalar my $BASE_N            => 36;
 Readonly::Scalar my $TZ                => 'UTC';
-Readonly::Hash my %ERR                 => (
+Readonly::Hash my %ERR => (
     'MISSING_DATE'     => q{No date found in filename '%s'},
     'MISSING_FILENAME' => q{Filename is not set, nothing to extract},
 );
@@ -130,7 +130,7 @@ Date::Extract::P800Picture - extract the date from Sony Ericsson P800 pictures
 
 =head1 VERSION
 
-This document describes Date::Extract::P800Picture version C<v1.1.6>.
+This document describes Date::Extract::P800Picture version C<v1.1.7>.
 
 =head1 SYNOPSIS
 

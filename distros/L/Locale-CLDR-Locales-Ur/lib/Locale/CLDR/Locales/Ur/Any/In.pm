@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ur::Any::In - Package for language Urdu
 
 package Locale::CLDR::Locales::Ur::Any::In;
 # This file auto generated from Data\common\main\ur_IN.xml
-#	on Tue  5 Dec  1:37:15 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ar_001' => 'جدید معیاری عربی',
@@ -58,7 +58,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AC' => 'جزیرہ اسینشن',
  			'AX' => 'جزائر آلینڈ',
@@ -111,6 +111,13 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'length-astronomical-unit' => {
+						'name' => q(فلکیاتی اکائیاں),
+						'one' => q({0} فلکیاتی اکائی),
+						'other' => q({0} فلکیاتی اکائیاں),
+					},
+					# Core Unit Identifier
 					'astronomical-unit' => {
 						'name' => q(فلکیاتی اکائیاں),
 						'one' => q({0} فلکیاتی اکائی),
@@ -203,13 +210,6 @@ has 'currencies' => (
 				'other' => q(کیپ ورڈی اسکیوڈو),
 			},
 		},
-		'ERN' => {
-			display_name => {
-				'currency' => q(اریٹیریائی ناکفا),
-				'one' => q(اریٹیریائی ناکفا),
-				'other' => q(اریٹیریائی ناکفا),
-			},
-		},
 		'GBP' => {
 			display_name => {
 				'currency' => q(برطانوی پاونڈ سٹرلنگ),
@@ -249,7 +249,6 @@ has 'time_zone_names' => (
 	default	=> sub { {
 		gmtFormat => q(GMT{0}),
 		regionFormat => q({0} دن کا وقت),
-		regionFormat => q({0} معیاری وقت),
 		'Afghanistan' => {
 			long => {
 				'standard' => q#افغانستان ٹائم#,

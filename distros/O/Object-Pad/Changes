@@ -1,5 +1,21 @@
 Revision history for Object-Pad
 
+0.808   2023-12-28
+        [CHANGES]
+         * Added `Object::Pad::MOP::Class->try_for_class`
+         * Nicer error message when calling `->for_class` on a package not
+           implemented using Object::Pad
+
+0.807   2023-12-11
+        [CHANGES]
+         * Added `inherit` and `apply` keywords in an attempt to make
+           subclassing and role-application more flexible in future
+         * Experimental new ability to "import" fields from superclasses into
+           subclasses, permitting subclasses to interact with base class
+           fields directly
+         * Allow setting the `OBJECTPAD_FLAG_ATTR_*_VALUE` flags when
+           registering a custom attribute via the Perl-level MOP API
+
 0.806   2023-11-14
         [CHANGES]
          * Allow field initialiser expressions to see the values of other

@@ -1,4 +1,4 @@
-requires 'perl', 'v5.22.0';
+requires 'perl', '5.010';
 
 requires 'Class::Tiny';
 requires 'File::Share';

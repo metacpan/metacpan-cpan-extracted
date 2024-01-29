@@ -2,8 +2,8 @@ NAME
     App::wordlist - Grep words from (or test them against) WordList::*
 
 VERSION
-    This document describes version 0.291 of App::wordlist (from Perl
-    distribution App-wordlist), released on 2022-08-28.
+    This document describes version 0.292 of App::wordlist (from Perl
+    distribution App-wordlist), released on 2024-01-05.
 
 SYNOPSIS
     See the included script wordlist.
@@ -158,9 +158,11 @@ FUNCTIONS
         the selected wordlists.
 
         Action "test" (shortcut option "-t") will check whether words are in
-        one of the wordlist, using "word_exists()" method on each wordlist.
+        one of the wordlist, using word_exists() method on each wordlist.
 
     *   arg => *array[str]*
+
+        (No description)
 
     *   chars_ordered => *str*
 
@@ -185,13 +187,19 @@ FUNCTIONS
 
     *   exclude_dynamic_wordlists => *bool*
 
+        (No description)
+
     *   exclude_wordlist_pattern => *re_from_str*
+
+        (No description)
 
     *   exclude_wordlists => *array[str]*
 
         Exclude wordlist modules.
 
     *   ignore_case => *bool* (default: 1)
+
+        (No description)
 
     *   langs => *array[str]*
 
@@ -209,9 +217,15 @@ FUNCTIONS
 
     *   len => *int*
 
+        (No description)
+
     *   max_len => *int*
 
+        (No description)
+
     *   min_len => *int*
+
+        (No description)
 
     *   num => *int* (default: 0)
 
@@ -292,6 +306,8 @@ FUNCTIONS
 
     *   arg => *array[str]*
 
+        (No description)
+
     *   color => *str* (default: "auto")
 
         When to highlight search string/matching pattern with color.
@@ -307,13 +323,19 @@ FUNCTIONS
 
     *   exclude_dynamic_wordlists => *bool*
 
+        (No description)
+
     *   exclude_wordlist_pattern => *re_from_str*
+
+        (No description)
 
     *   exclude_wordlists => *array[str]*
 
         Exclude wordlist modules.
 
     *   ignore_case => *bool* (default: 1)
+
+        (No description)
 
     *   langs => *array[str]*
 
@@ -327,9 +349,15 @@ FUNCTIONS
 
     *   len => *int* (default: 5)
 
+        (No description)
+
     *   max_len => *int*
 
+        (No description)
+
     *   min_len => *int*
+
+        (No description)
 
     *   num => *int* (default: 0)
 
@@ -419,8 +447,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2016, 2015,
-    2014 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2024, 2022, 2021, 2020, 2018, 2017, 2016,
+    2015, 2014 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -20,7 +20,7 @@ Options:
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
@@ -127,7 +127,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2022-2023 Kazumasa Utashiro.
+Copyright 2022-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -138,7 +138,7 @@ package App::Greple::update;
 use v5.14;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use utf8;
 use open IO => ':utf8';
@@ -296,7 +296,7 @@ sub update_file {
 __DATA__
 
 builtin diffcmd=s     $opt_update_diffcmd
-builtin suffix=s      $opt_suffix
+builtin update-suffix=s      $opt_suffix
 builtin U=i           $opt_U
 builtin remember!     $remember_data
 builtin with-backup:s $opt_backup
@@ -307,7 +307,7 @@ option default \
 
 expand ++dump --all --need 0 -h --color=never --no-newline --no-line-number
 option --update::diff    ++dump --of &update_diff
-option --update::create  ++dump --begin update_divert --end update_file() --suffix=.new
+option --update::create  ++dump --begin update_divert --end update_file() --update-suffix=.new
 option --update::update  ++dump --begin update_divert --end update_file(replace)
 option --update::discard ++dump --begin update_divert --end update_file(discard)
 

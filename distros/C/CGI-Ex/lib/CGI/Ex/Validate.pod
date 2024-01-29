@@ -4,7 +4,7 @@ CGI::Ex::Validate - The "Just Right" form validator with javascript in parallel
 
 =head1 VERSION
 
-version 2.54
+version 2.55
 
 =head1 SYNOPSIS
 
@@ -347,6 +347,11 @@ and replace (replace is a MODIFICATION TYPE).
 
 =over 4
 
+=item C<coerce>
+
+Specialty item for type:array.  Will turn a single non-array item into
+an array.
+
 =item C<compare>
 
 Allows for custom comparisons.  Available types are
@@ -529,6 +534,10 @@ It has been common for code to try C<required => 0> which essentially has
 no effect - instead use C<validate_if => 'fieldname', required => 1>.  This
 results in the fieldname only being required if the fieldname is present.
 
+=item C<req>
+
+Alias of required.  Will use required_error.
+
 =item C<required_if>
 
 Requires the form field if the condition is satisfied.  The conditions
@@ -571,15 +580,52 @@ $self->{dbh} is a coderef - they will be called and should return a dbh.
 =item C<type>
 
 Allows for more strict type checking.  Currently supported types
-include CC (credit card), EMAIL, DOMAIN, IP, URL, INT, UINT, and NUM.
-Other types will be added upon request provided we can add a perl and
-a javascript version (extra types often aren't necessary as the custom and
-custom_js options give arbitrary checking).  If a type checks fails - other
-compare, custom, or length checks will not be ran.
+include CC (credit card), EMAIL, DOMAIN, IP, URL, INT, UINT, NUM,
+UNUM, STR, CODE, ARRAY, and HASH.  Additionally [] or {} acan be used
+to indicate ARRAY and HASH.  If a type checks fails - other compare,
+custom, or length checks will not be ran.  The C<type_ne_required>
+parameter can be used to indicate not to run checks if the value
+is not defined (separates required from type).
 
     {
         field => 'credit_card',
         type  => 'CC',
+    }
+
+In Validate.pm (not supported in validate.js) it is possible to have a
+nested type definition.  The value of C<type> can be a validation hash
+specification.  In that case, the type of the sub element must be a hash
+and must satisfy the type requirements.  Default thrown errors contain
+the nested key name.
+
+    {
+        field => 'credit_card',
+        type  => {
+            num => {required => 1, type => 'CC'},
+            exp => {required => 1, match => 'm|^\d\d\d\d/\d\d$|'},
+        },
+    }
+
+The nested validation also allows for an array of subtypes:
+
+    {
+        field => 'foo',
+        type  => [{
+            bar => {required => 1},   # needs foo[0].bar
+            baz => {required => 1, type => {bingo => {required => 1}}}, # wants foo[0].baz.bingo
+        }],
+    }
+
+There is a little bit of ambiguity between what the required stands for in the case
+of an array parameter.  At the moment, the required applies to each sub element
+of the array.  For arrays it is often appropriate to say the following:
+
+    {
+        field      => 'foo',
+        type       => [],    # or array
+        required   => 1,     # each element of foo must be defined
+        min_values => 1,     # make sure the element contains at least one value
+        coerce     => 1,     # translate an item passed as a single item to always be an array
     }
 
 =over 4
@@ -971,6 +1017,17 @@ the "if" conditions are met.
 
 This group would only validate all fields if the email field
 was present.
+
+=item C<type_ne_required>
+
+Sometime in early 200x the type and other checks began imposing
+requirement if the field was not defined.  This gets in the way of API
+specification where we want to define the type, enum, match, length -
+but only if the field is present.  There is already the required
+parameter for enforcing required.  Adding 'group type_ne_required'
+allows for letting required mean required, and type specification
+define the type.  When set, an error will not be thrown if the input
+data is undefined.
 
 =item C<raise_error>
 

@@ -18,8 +18,9 @@ name: App-MusicTools
 provides:
   App::MusicTools:
     file: lib/App/MusicTools.pm
-    version: '1.37'
+    version: '1.38'
 requires:
+  Capture::Tiny: '0'
   Carp: '0'
   File::Spec: '0'
   File::Temp: '0'
@@ -44,5 +45,5 @@ requires:
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
   repository: https://thrig.me/src/App-MusicTools.git
-version: '1.37'
+version: '1.38'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

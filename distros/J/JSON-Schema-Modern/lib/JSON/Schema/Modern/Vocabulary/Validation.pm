@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Validation vocabulary
 
-our $VERSION = '0.575';
+our $VERSION = '0.582';
 
 use 5.020;
 use Moo;
@@ -19,7 +19,7 @@ use List::Util 'any';
 use Ref::Util 0.100 'is_plain_arrayref';
 use Scalar::Util 'looks_like_number';
 use if "$]" >= 5.022, POSIX => 'isinf';
-use JSON::Schema::Modern::Utilities qw(is_type get_type is_equal is_elements_unique E assert_keyword_type assert_pattern jsonp sprintf_num);
+use JSON::Schema::Modern::Utilities qw(is_type get_type is_bignum is_equal is_elements_unique E assert_keyword_type assert_pattern jsonp sprintf_num);
 use Math::BigFloat;
 use namespace::clean;
 
@@ -88,7 +88,7 @@ sub _traverse_keyword_enum ($class, $schema, $state) {
 
 sub _eval_keyword_enum ($class, $data, $schema, $state) {
   my @s; my $idx = 0;
-  my %s = ( scalarref_booleans => $state->{scalarref_booleans} );
+  my %s = $state->%{qw(scalarref_booleans stringy_numbers)};
   return 1 if any { is_equal($data, $_, $s[$idx++] = {%s}) } $schema->{enum}->@*;
   return E($state, 'value does not match'
     .(!(grep $_->{path}, @s) ? ''
@@ -98,10 +98,10 @@ sub _eval_keyword_enum ($class, $data, $schema, $state) {
 sub _traverse_keyword_const { 1 }
 
 sub _eval_keyword_const ($class, $data, $schema, $state) {
-  my %s = ( scalarref_booleans => $state->{scalarref_booleans} );
-  return 1 if is_equal($data, $schema->{const}, my $s = { scalarref_booleans => $state->{scalarref_booleans} });
+  my %s = $state->%{qw(scalarref_booleans stringy_numbers)};
+  return 1 if is_equal($data, $schema->{const}, \%s);
   return E($state, 'value does not match'
-    .($s->{path} ? ' (differences start at "'.$s->{path}.'")' : ''));
+    .($s{path} ? ' (differences start at "'.$s{path}.'")' : ''));
 }
 
 sub _traverse_keyword_multipleOf ($class, $schema, $state) {
@@ -116,11 +116,11 @@ sub _eval_keyword_multipleOf ($class, $data, $schema, $state) {
       and do { $data = 0+$data; 1 });
 
   # if either value is a float, use the bignum library for the calculation for an accurate remainder
-  if (ref($data) =~ /^Math::Big(?:Int|Float)$/
-      or ref($schema->{multipleOf}) =~ /^Math::Big(?:Int|Float)$/
+  if (is_bignum($data) or is_bignum($schema->{multipleOf})
       or get_type($data) eq 'number' or get_type($schema->{multipleOf}) eq 'number') {
-    $data = ref($data) =~ /^Math::Big(?:Int|Float)$/ ? $data->copy : Math::BigFloat->new($data);
-    my $divisor = ref($schema->{multipleOf}) =~ /^Math::Big(?:Int|Float)$/ ? $schema->{multipleOf} : Math::BigFloat->new($schema->{multipleOf});
+    $data = is_bignum($data) ? $data->copy : Math::BigFloat->new($data);
+    my $divisor = is_bignum($schema->{multipleOf}) ? $schema->{multipleOf} : Math::BigFloat->new($schema->{multipleOf});
+
     my ($quotient, $remainder) = $data->bdiv($divisor);
     return E($state, 'overflow while calculating quotient') if $quotient->is_inf;
     return 1 if $remainder == 0;
@@ -225,7 +225,7 @@ sub _traverse_keyword_uniqueItems ($class, $schema, $state) {
 sub _eval_keyword_uniqueItems ($class, $data, $schema, $state) {
   return 1 if not is_type('array', $data);
   return 1 if not $schema->{uniqueItems};
-  return 1 if is_elements_unique($data, my $equal_indices = []);
+  return 1 if is_elements_unique($data, my $equal_indices = [], $state);
   return E($state, 'items at indices %d and %d are not unique', @$equal_indices);
 }
 
@@ -331,7 +331,7 @@ JSON::Schema::Modern::Vocabulary::Validation - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.575
+version 0.582
 
 =head1 DESCRIPTION
 

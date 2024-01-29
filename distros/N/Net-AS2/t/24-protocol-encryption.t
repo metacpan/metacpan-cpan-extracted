@@ -7,9 +7,11 @@ use warnings;
 use Encode;
 
 use File::Basename qw(dirname);
+use Cwd            qw(abs_path);
 
 use_ok('Net::AS2');
-my $cert_dir = dirname(__FILE__);
+
+my $cert_dir = abs_path(dirname(__FILE__) . '/certificates');
 
 my %config_1 = (
     CertificateDirectory => $cert_dir,

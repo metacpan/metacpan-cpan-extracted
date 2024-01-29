@@ -1,10 +1,10 @@
 {
    "abstract" : "search nested hashref/arrayref structures using JSONPath",
    "author" : [
-      "Kit Peters <popefelix@gmail.com>"
+      "Aurelia Peters <popefelix@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -24,7 +24,6 @@
             "Carp::Assert" : "0",
             "Exporter::Tiny" : "0",
             "JSON::MaybeXS" : "0",
-            "JSON::Parse" : "0",
             "LV" : "0",
             "List::Util" : "1.45",
             "Readonly" : "0",
@@ -42,19 +41,19 @@
    "provides" : {
       "JSON::Path" : {
          "file" : "lib/JSON/Path.pm",
-         "version" : "v1.0.3"
+         "version" : "v1.0.4"
       },
       "JSON::Path::Constants" : {
          "file" : "lib/JSON/Path/Constants.pm",
-         "version" : "v1.0.3"
+         "version" : "v1.0.4"
       },
       "JSON::Path::Evaluator" : {
          "file" : "lib/JSON/Path/Evaluator.pm",
-         "version" : "v1.0.3"
+         "version" : "v1.0.4"
       },
       "JSON::Path::Tokenizer" : {
          "file" : "lib/JSON/Path/Tokenizer.pm",
-         "version" : "v1.0.3"
+         "version" : "v1.0.4"
       }
    },
    "release_status" : "stable",
@@ -69,9 +68,9 @@
          "web" : "https://github.com/popefelix/p5-json-path"
       }
    },
-   "version" : "1.0.3",
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "version" : "1.0.4",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

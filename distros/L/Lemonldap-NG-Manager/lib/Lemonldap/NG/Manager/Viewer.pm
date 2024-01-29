@@ -12,13 +12,14 @@ extends 'Lemonldap::NG::Manager::Conf';
 has diffRule => ( is => 'rw', default => sub { 0 } );
 has brwRule  => ( is => 'rw', default => sub { 0 } );
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.18.0';
 
 #############################
 # I. INITIALIZATION METHODS #
 #############################
 
 use constant defaultRoute => 'viewer.html';
+use constant icon         => 'eye-open';
 
 has ua => ( is => 'rw' );
 

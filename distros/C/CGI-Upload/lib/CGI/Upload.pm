@@ -15,7 +15,7 @@ require Exporter;
 @ISA = qw/ Exporter /;
 @EXPORT_OK = qw/ file_handle file_name file_type mime_magic mime_type query /;
 
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 
 sub AUTOLOAD {
@@ -173,7 +173,7 @@ sub new {
         if ("CGI::Simple" eq $module) {
             $CGI::Simple::DISABLE_UPLOADS = 0;
         } 
-        $query = new $module;
+        $query = $module->new;
     }
             
     if ($module eq "CGI::Simple" and $CGI::Simple::VERSION < '0.075') {
@@ -267,7 +267,7 @@ or
  use CGI::Upload;
  use CGI::Simple;
  $CGI::Simple::DISABLE_UPLOADS = 0;   # you have to set this before creating the instance
- my $q = new CGI::Simple;
+ my $q = CGI::Simple->new;
  CGI::Upload->new({ query => $q});
 
 =item B<query>

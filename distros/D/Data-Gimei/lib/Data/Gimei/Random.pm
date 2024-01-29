@@ -3,8 +3,9 @@ package Data::Gimei::Random;
 # Pseudo random number generator(PRNG)
 # Park & Miller comp.lang.c FAQ list Question 13.15
 
+use 5.010;
+use strict;
 use warnings;
-use v5.22;
 
 use Class::Tiny qw (
   seed

@@ -8,7 +8,7 @@
 
 package Mail::Message::Body;
 use vars '$VERSION';
-$VERSION = '3.014';
+$VERSION = '3.015';
 
 # Mail::Message::Body::Construct adds functionality to Mail::Message::Body
 

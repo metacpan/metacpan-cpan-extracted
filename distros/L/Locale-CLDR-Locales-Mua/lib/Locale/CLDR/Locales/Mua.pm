@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mua - Package for language Mundang
 
 package Locale::CLDR::Locales::Mua;
 # This file auto generated from Data\common\main\mua.xml
-#	on Tue  5 Dec  1:22:37 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'akaŋ',
@@ -68,7 +68,6 @@ has 'display_name_language' => (
  				'so' => 'Somaliya',
  				'sv' => 'Swedia',
  				'ta' => 'Tamul',
- 				'th' => 'th',
  				'tr' => 'Turk',
  				'uk' => 'Ukrainia',
  				'ur' => 'Urdu',
@@ -90,7 +89,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'andorra',
  			'AE' => 'Sǝr Arabiya ma taini',
@@ -217,7 +216,6 @@ has 'display_name_region' => (
  			'MD' => 'Moldoviya',
  			'MG' => 'Madagaskar',
  			'MH' => 'Sǝr Marshall ma laŋne',
- 			'MK' => 'Macedoniya',
  			'ML' => 'Sǝr Mali',
  			'MM' => 'Sǝr Myanmar',
  			'MN' => 'Mongoliya',
@@ -333,7 +331,7 @@ has 'characters' => (
 			auxiliary => qr{[q x]},
 			index => ['A', 'B', 'Ɓ', 'C', 'D', 'Ɗ', 'E', 'Ǝ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
 			main => qr{[a ã b ɓ c d ɗ e ë ǝ f g h i ĩ j k l m n ŋ o õ p r s t u v ṽ w y z]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT

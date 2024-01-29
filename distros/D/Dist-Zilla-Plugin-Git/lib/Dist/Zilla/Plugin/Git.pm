@@ -10,10 +10,10 @@ use 5.008;
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Git; # git description: v2.047-4-g1da1f49
+package Dist::Zilla::Plugin::Git; # git description: v2.048-11-g5e1a731
 # ABSTRACT: Update your git repository after release
 
-our $VERSION = '2.048';
+our $VERSION = '2.049';
 
 1;
 
@@ -29,7 +29,7 @@ Dist::Zilla::Plugin::Git - Update your git repository after release
 
 =head1 VERSION
 
-version 2.048
+version 2.049
 
 =head1 DESCRIPTION
 
@@ -116,7 +116,7 @@ Jerome Quelin
 
 =head1 CONTRIBUTORS
 
-=for stopwords Christopher J. Madsen Jérôme Quelin Karen Etheridge Kent Fredric Yanick Champoux Ricardo Signes David Golden Graham Knop Mike Friedman Chris Weyl Stephen R. Scaffidi Apocalypse Curtis Jewell Barr Doherty Randy Stauner Alessandro Ghedini Alexandr Ciornii Brendan Byrd Brian Phillips Steinbrunner Geoffrey Broadwell Harley Pig Jesse Luehrs Matt Follett Michael McClimon Schout Nigel Metheringham Olivier Mengué Sean Whitton Tatsuhiko Miyagawa Tuomas Jormola
+=for stopwords Christopher J. Madsen Jérôme Quelin Karen Etheridge Kent Fredric Yanick Champoux Ricardo Signes David Golden Graham Knop Mike Friedman Chris Weyl Stephen R. Scaffidi Apocalypse Curtis Jewell Barr Doherty Mikko Koivunalho Randy Stauner Alessandro Ghedini Alexandr Ciornii Brendan Byrd Brian Phillips Steinbrunner Geoffrey Broadwell Harley Pig Jesse Luehrs Matt Follett Michael McClimon Schout Nigel Metheringham Olivier Mengué Sean Whitton Tatsuhiko Miyagawa Tuomas Jormola
 
 =over 4
 
@@ -179,6 +179,10 @@ Graham Barr <gbarr@pobox.com>
 =item *
 
 Mike Doherty <doherty@cs.dal.ca>
+
+=item *
+
+Mikko Koivunalho <mikkoi@cpan.org>
 
 =item *
 

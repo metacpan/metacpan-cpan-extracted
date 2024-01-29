@@ -10,17 +10,17 @@ App::Greple::xlate - greple을 위한 번역 지원 모듈
 
 # VERSION
 
-Version 0.28
+Version 0.29
 
 # DESCRIPTION
 
-**Greple** **xlate** 모듈은 텍스트 블록을 찾아 번역된 텍스트로 대체합니다. 현재 DeepL (`deepl.pm`)과 ChatGPT (`gpt3.pm`) 모듈이 백엔드 엔진으로 구현되어 있습니다.
+**Greple** **xlate** 모듈은 원하는 텍스트 블록을 찾아 번역된 텍스트로 대체합니다. 현재 DeepL (`deepl.pm`) 및 ChatGPT (`gpt3.pm`) 모듈이 백엔드 엔진으로 구현되어 있습니다.
 
-[pod](https://metacpan.org/pod/pod) 스타일로 작성된 일반 텍스트 블록을 번역하려면 다음과 같이 `xlate::deepl`과 `perl` 모듈을 사용하는 **greple** 명령을 사용하십시오:
+만약 Perl의 pod 스타일로 작성된 문서에서 일반 텍스트 블록을 번역하려면 다음과 같이 `xlate::deepl`과 `perl` 모듈을 사용하는 **greple** 명령을 사용하십시오.
 
     greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
 
-패턴 `^(\w.*\n)+`은 알파벳과 숫자로 시작하는 연속된 줄을 의미합니다. 이 명령은 번역할 영역을 보여줍니다. 옵션 **--all**은 전체 텍스트를 생성하는 데 사용됩니다.
+이 명령에서 패턴 문자열 `^(\w.*\n)+`은 알파벳과 숫자로 시작하는 연속된 줄을 의미합니다. 이 명령은 번역할 영역을 강조 표시합니다. 옵션 **--all**은 전체 텍스트를 생성하는 데 사용됩니다.
 
 <div>
     <p>
@@ -28,7 +28,7 @@ Version 0.28
     </p>
 </div>
 
-그런 다음 선택한 영역을 번역하기 위해 `--xlate` 옵션을 추가하십시오. 이 옵션은 **deepl** 명령의 출력으로 찾아서 대체합니다.
+그런 다음 선택한 영역을 번역하려면 `--xlate` 옵션을 추가하십시오. 그러면 원하는 섹션을 찾아 **deepl** 명령의 출력으로 대체합니다.
 
 기본적으로 원본 및 번역된 텍스트는 [git(1)](http://man.he.net/man1/git)과 호환되는 "충돌 마커" 형식으로 출력됩니다. `ifdef` 형식을 사용하면 [unifdef(1)](http://man.he.net/man1/unifdef) 명령을 사용하여 원하는 부분을 쉽게 얻을 수 있습니다. 출력 형식은 **--xlate-format** 옵션으로 지정할 수 있습니다.
 
@@ -76,7 +76,7 @@ Version 0.28
 
     - **conflict**, **cm**
 
-        원본 및 번역된 텍스트를 [git(1)](http://man.he.net/man1/git) 충돌 마커 형식으로 출력합니다.
+        원본과 변환된 텍스트는 [git(1)](http://man.he.net/man1/git) 충돌 표시자 형식으로 출력됩니다.
 
             <<<<<<< ORIGINAL
             original text
@@ -90,7 +90,7 @@ Version 0.28
 
     - **ifdef**
 
-        원본 및 번역된 텍스트를 [cpp(1)](http://man.he.net/man1/cpp) `#ifdef` 형식으로 출력합니다.
+        원본과 변환된 텍스트는 [cpp(1)](http://man.he.net/man1/cpp) `#ifdef` 형식으로 출력됩니다.
 
             #ifdef ORIGINAL
             original text
@@ -105,7 +105,7 @@ Version 0.28
 
     - **space**
 
-        원본 및 번역된 텍스트를 빈 줄로 구분하여 출력합니다.
+        원본과 변환된 텍스트는 한 줄의 공백으로 구분되어 출력됩니다.
 
     - **xtxt**
 
@@ -196,6 +196,8 @@ DeepL과 ChatGPT의 명령 줄 도구를 설치해야 합니다.
 
 [App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
 
+[https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
     DeepL Python 라이브러리 및 CLI 명령입니다.
@@ -220,13 +222,27 @@ DeepL과 ChatGPT의 명령 줄 도구를 설치해야 합니다.
 
     **-V** 옵션과 함께 충돌 마커 형식을 옆에 나란히 표시하려면 **sdif**를 사용하십시오.
 
+## ARTICLES
+
+- [https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250](https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250)
+
+    DeepL API를 사용하여 필요한 부분만 번역 및 교체하는 Greple 모듈 (일본어로)
+
+- [https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6](https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6)
+
+    DeepL API 모듈을 사용하여 15개 언어로 문서 생성 (일본어로)
+
+- [https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd](https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd)
+
+    DeepL API를 사용한 자동 번역 Docker 환경 (일본어로)
+
 # AUTHOR
 
 Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023 Kazumasa Utashiro.
+Copyright © 2023-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

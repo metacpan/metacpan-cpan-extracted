@@ -1,3 +1,9 @@
+0.06 2024-01-01T23:10:35+01:00
+ - Remove no-existent versions.
+ - Rename example files to better names.
+ - Update Module::Version to 1.21 version.
+ - Update copyright years.
+
 0.05 2021-05-29T17:36:08+02:00
  - Add AC1035.
  - Fix releases against libredwg.

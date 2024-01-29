@@ -30,6 +30,8 @@ lib/Neo4j/Driver/StatementResult.pm
 lib/Neo4j/Driver/SummaryCounters.pm
 lib/Neo4j/Driver/TODO.pod
 lib/Neo4j/Driver/Transaction.pm
+lib/Neo4j/Driver/Type/DateTime.pm
+lib/Neo4j/Driver/Type/Duration.pm
 lib/Neo4j/Driver/Type/Node.pm
 lib/Neo4j/Driver/Type/Path.pm
 lib/Neo4j/Driver/Type/Point.pm
@@ -115,6 +117,8 @@ t/statement-result.t
 t/summary.t
 t/transaction.t
 t/tx-concurrent.t
+t/types-spatial.t
+t/types-temporal.t
 t/types.t
 xt/author/compatibility.t
 xt/author/cpan-distros.t

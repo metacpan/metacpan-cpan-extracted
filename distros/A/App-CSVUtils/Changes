@@ -1,3 +1,13 @@
+1.033   2023-09-06  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utility: csv-sort-fields-by-spec.
+
+
+1.032   2023-09-05  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utility: csv-sort-fields-by-example.
+
+
 1.031   2023-08-06  Released-By: PERLANCAR; Urgency: medium
 
         - [cli csv2vcf] [ux] Detect Indonesian words 'nama' and

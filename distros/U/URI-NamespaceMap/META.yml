@@ -36,7 +36,7 @@ provides:
     version: '1.10'
   URI::NamespaceMap:
     file: lib/URI/NamespaceMap.pm
-    version: '1.10'
+    version: '1.12'
   URI::NamespaceMap::ReservedLocalParts:
     file: lib/URI/NamespaceMap/ReservedLocalParts.pm
     version: '1.10'
@@ -63,10 +63,10 @@ resources:
   homepage: https://metacpan.org/module/URI::NamespaceMap
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kjetilk/URI-NamespaceMap/
-version: '1.10'
+version: '1.12'
 x_contributors:
   - 'Dorian Taylor <dorian@cpan.org>'
   - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
-  - 'Paul Williams (KWAKWA) <kwakwa@cpan.org>'
+  - 'KWAKWA <kwakwa@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

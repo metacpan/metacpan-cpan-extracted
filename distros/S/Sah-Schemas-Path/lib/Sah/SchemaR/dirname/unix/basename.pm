@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::dirname::unix::basename;
 
-our $DATE = '2023-11-23'; # DATE
-our $VERSION = '0.025'; # VERSION
+our $DATE = '2024-01-08'; # DATE
+our $VERSION = '0.030'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nThis is like the `dirname::unix` schema but not allowing parent directory parts.\nDifference with `filename::unix::basename` and `pathname::unix::basename`: the\ncompletion rule.\n\n",examples=>[{valid=>0,value=>""},{summary=>"Contains path",valid=>0,value=>"/"},{summary=>"Contains parent directory part",valid=>0,value=>"foo/bar"},{summary=>"Path element too long",valid=>0,value=>"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},{summary=>"Contains null character",valid=>0,value=>"foo\0"}],match=>"\\A(?:[^/\\0]{1,255})\\z",prefilters=>[],summary=>"Filesystem base directory name on a Unix system","x.completion"=>["dirname_curdir"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::dirname::unix::basename - Filesystem base directory name on a Unix
 
 =head1 VERSION
 
-This document describes version 0.025 of Sah::SchemaR::dirname::unix::basename (from Perl distribution Sah-Schemas-Path), released on 2023-11-23.
+This document describes version 0.030 of Sah::SchemaR::dirname::unix::basename (from Perl distribution Sah-Schemas-Path), released on 2024-01-08.
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2020, 2019, 2018, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2020, 2019, 2018, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

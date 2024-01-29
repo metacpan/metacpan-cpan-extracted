@@ -9,7 +9,7 @@ class Mojo::WebSocketProxy::RequestLogger;
 use Log::Any qw($log);
 use UUID::Tiny;
 
-our $VERSION = '0.15';    ## VERSION
+our $VERSION = '0.16';    ## VERSION
 
 =head1 NAME
 

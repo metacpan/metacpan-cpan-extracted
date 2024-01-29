@@ -1,22 +1,26 @@
 # MANIFEST Thu 27 Jul 2023 17:48:02 MSK
 
 # General
-Changes                                  Changes list
-INSTALL.md                               Installation instructions
-LICENSE                                  License file
-Makefile.PL                              Makefile builder
-MANIFEST                                 This file
-README.md                                !!! README FIRST !!!
-TODO                                     TO DO
+Changes                                 Changes list
+INSTALL.md                              Installation instructions
+LICENSE                                 License file
+Makefile.PL                             Makefile builder
+MANIFEST                                This file
+README.md                               !!! README FIRST !!!
+TODO                                    TO DO
 
 # Libs
-lib/WWW/Suffit/Server.pm                 Main library
+lib/WWW/Suffit/Server.pm                Main library
+lib/WWW/Suffit/Server/API.pm            Common API methods
+lib/WWW/Suffit/Server/API/NoAPI.pm      NoAPI methods
+lib/WWW/Suffit/Server/API/V1.pm         V1 API methods
+lib/WWW/Suffit/Server/Auth.pm           Authorization controller
 
 # Tests
-t/00-fixme.t                             FIXME/TODO/BUG warnings
-t/00-pod-coverage.t                      POD::Coverage testing
-t/00-pod.t                               Checking all POD documents
-t/00-trailingspace.t                     Style test: TrailingSpace
-t/01-use.t                               Test script
+t/00-fixme.t                            FIXME/TODO/BUG warnings
+t/00-pod-coverage.t                     POD::Coverage testing
+t/00-pod.t                              Checking all POD documents
+t/00-trailingspace.t                    Style test: TrailingSpace
+t/01-use.t                              Test script
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -3,7 +3,8 @@ package Ontologies;
 use strict;
 use warnings;
 use Exporter 'import';
-our @EXPORT_OK = qw( $hpo_array $omim_array $rxnorm_array $ethnicity_array);
+our @EXPORT_OK =
+  qw( $hpo_array $omim_array $rxnorm_array $ncit_procedures_array $ncit_exposures_array $ethnicity_array);
 
 # Hard-coded for the sake of speed
 # 100 random entries
@@ -729,6 +730,814 @@ our $rxnorm_array = [
     {
         id    => 'RxNorm:1001751',
         label => 'calcium citrate 250 MG / cholecalciferol 100 UNT Oral Tablet'
+    }
+];
+
+# 100 random entries
+our $ncit_procedures_array = [
+    {
+        id    => 'NCIT:C1447',
+        label => 'Barium Enema Injection'
+    },
+    {
+        id    => 'NCIT:C15189',
+        label => 'Biopsy'
+    },
+    {
+        id    => 'NCIT:C15190',
+        label => 'Needle Biopsy'
+    },
+    {
+        id    => 'NCIT:C15193',
+        label => 'Bone Marrow Biopsy'
+    },
+    {
+        label => 'Diagnosis',
+        id    => 'NCIT:C15220'
+    },
+    {
+        label => 'Second-Look Surgery',
+        id    => 'NCIT:C15317'
+    },
+    {
+        label => 'Lumbar Puncture',
+        id    => 'NCIT:C15327'
+    },
+    {
+        label => 'Fine-Needle Aspiration',
+        id    => 'NCIT:C15361'
+    },
+    {
+        id    => 'NCIT:C15385',
+        label => 'Excisional Biopsy'
+    },
+    {
+        label => 'Incisional Biopsy',
+        id    => 'NCIT:C15386'
+    },
+    {
+        label => 'Shave Biopsy',
+        id    => 'NCIT:C15387'
+    },
+    {
+        label => 'Endoscopic Biopsy',
+        id    => 'NCIT:C15389'
+    },
+    {
+        label => 'Endocervical Curettage',
+        id    => 'NCIT:C15403'
+    },
+    {
+        label => 'Cancer Screening',
+        id    => 'NCIT:C15406'
+    },
+    {
+        label => 'Disease Screening',
+        id    => 'NCIT:C15419'
+    },
+    {
+        label => 'Lymph Node Dissection',
+        id    => 'NCIT:C15427'
+    },
+    {
+        id    => 'NCIT:C15546',
+        label => 'Breast Cancer Screening'
+    },
+    {
+        id    => 'NCIT:C15547',
+        label => 'Screening for Skin Cancer'
+    },
+    {
+        label => 'Screening for Oral Cancer',
+        id    => 'NCIT:C15548'
+    },
+    {
+        id    => 'NCIT:C15549',
+        label => 'Screening for Colorectal Cancer'
+    },
+    {
+        id    => 'NCIT:C15550',
+        label => 'Screening for Prostate Cancer'
+    },
+    {
+        id    => 'NCIT:C15552',
+        label => 'Screening for Testicular Cancer'
+    },
+    {
+        id    => 'NCIT:C15567',
+        label => 'Screening for Gastric Cancer'
+    },
+    {
+        label => 'Screening for Lung Cancer',
+        id    => 'NCIT:C15575'
+    },
+    {
+        id    => 'NCIT:C15576',
+        label => 'Screening for Ovarian Cancer'
+    },
+    {
+        label => 'Clinical Diagnosis',
+        id    => 'NCIT:C15607'
+    },
+    {
+        label => 'Staging',
+        id    => 'NCIT:C15608'
+    },
+    {
+        id    => 'NCIT:C15638',
+        label => 'Genetic Testing for Cancer Risk'
+    },
+    {
+        id    => 'NCIT:C15641',
+        label => 'Screening for Neuroblastoma'
+    },
+    {
+        id    => 'NCIT:C15644',
+        label => 'Bone Marrow Aspiration'
+    },
+    {
+        label => 'Image Guided Biopsy',
+        id    => 'NCIT:C15652'
+    },
+    {
+        label => 'Sentinel Lymph Node Biopsy',
+        id    => 'NCIT:C15667'
+    },
+    {
+        label => 'Screening for Endometrial Cancer',
+        id    => 'NCIT:C15671'
+    },
+    {
+        label => 'Core Biopsy',
+        id    => 'NCIT:C15680'
+    },
+    {
+        label => 'Colposcopic Biopsy',
+        id    => 'NCIT:C15703'
+    },
+    {
+        label => 'Screening for Hepatocellular Cancer',
+        id    => 'NCIT:C15741'
+    },
+    {
+        id    => 'NCIT:C15775',
+        label => 'Breast Cancer Detection Research'
+    },
+    {
+        id    => 'NCIT:C15776',
+        label => 'Cancer Detection'
+    },
+    {
+        label => 'Detection of Measurable Residual Disease',
+        id    => 'NCIT:C15795'
+    },
+    {
+        id    => 'NCIT:C15842',
+        label => 'Prevention, Early Detection of Premalignant Lesions'
+    },
+    {
+        id    => 'NCIT:C15960',
+        label => 'Blood Screening'
+    },
+    {
+        id    => 'NCIT:C16094',
+        label => 'Cardiac Function Study'
+    },
+    {
+        label => 'Non-Invasive Cancer Detection',
+        id    => 'NCIT:C16107'
+    },
+    {
+        id    => 'NCIT:C16209',
+        label => 'Early Detection'
+    },
+    {
+        label => 'Detection',
+        id    => 'NCIT:C16210'
+    },
+    {
+        label => 'Cancer Diagnosis',
+        id    => 'NCIT:C16213'
+    },
+    {
+        label => 'Digital Subtraction Angiography',
+        id    => 'NCIT:C16291'
+    },
+    {
+        id    => 'NCIT:C16308',
+        label => 'Arteriography'
+    },
+    {
+        label => 'Endoscopic Retrograde Cholangiopancreatography',
+        id    => 'NCIT:C16430'
+    },
+    {
+        id    => 'NCIT:C16451',
+        label => 'Colposcopy'
+    },
+    {
+        label => 'Diagnostic Imaging',
+        id    => 'NCIT:C16502'
+    },
+    {
+        id    => 'NCIT:C16525',
+        label => 'Echocardiography'
+    },
+    {
+        id    => 'NCIT:C16546',
+        label => 'Endoscopic Procedure'
+    },
+    {
+        id    => 'NCIT:C16560',
+        label => 'Esophagoscopy'
+    },
+    {
+        id    => 'NCIT:C16587',
+        label => 'Fluorophotometry'
+    },
+    {
+        id    => 'NCIT:C16588',
+        label => 'Fluoroscopy'
+    },
+    {
+        id    => 'NCIT:C16781',
+        label => 'Laryngoscopy'
+    },
+    {
+        id    => 'NCIT:C16806',
+        label => 'Lymphography'
+    },
+    {
+        label => 'Magnetic Resonance Imaging',
+        id    => 'NCIT:C16809'
+    },
+    {
+        label => 'Magnetic Resonance Spectroscopy',
+        id    => 'NCIT:C16810'
+    },
+    {
+        id    => 'NCIT:C16811',
+        label => 'Magnetoencephalography'
+    },
+    {
+        label => 'Mammography',
+        id    => 'NCIT:C16818'
+    },
+    {
+        id    => 'NCIT:C16829',
+        label => 'Mediastinoscopy'
+    },
+    {
+        id    => 'NCIT:C16950',
+        label => 'Palpation'
+    },
+    {
+        id    => 'NCIT:C16969',
+        label => 'Laparoscopy'
+    },
+    {
+        label => 'Positron Emission Tomography',
+        id    => 'NCIT:C17007'
+    },
+    {
+        id    => 'NCIT:C17012',
+        label => 'Proctoscopy'
+    },
+    {
+        id    => 'NCIT:C17131',
+        label => 'Sigmoidoscopy'
+    },
+    {
+        label => 'Skin Test',
+        id    => 'NCIT:C17137'
+    },
+    {
+        label => 'Thermography',
+        id    => 'NCIT:C17194'
+    },
+    {
+        label => 'Thoracoscopy',
+        id    => 'NCIT:C17196'
+    },
+    {
+        label => 'Single Photon Emission Computed Tomography',
+        id    => 'NCIT:C17203'
+    },
+    {
+        id    => 'NCIT:C17204',
+        label => 'Computed Tomography'
+    },
+    {
+        id    => 'NCIT:C17261',
+        label => 'Diagnostic Radiology'
+    },
+    {
+        label => 'Xeroradiography',
+        id    => 'NCIT:C17263'
+    },
+    {
+        id    => 'NCIT:C17348',
+        label => 'Pap Smear'
+    },
+    {
+        label => 'Imaging Technique',
+        id    => 'NCIT:C17369'
+    },
+    {
+        id    => 'NCIT:C17436',
+        label => 'Immunoscintigraphy'
+    },
+    {
+        label => 'Diagnostic Test',
+        id    => 'NCIT:C17454'
+    },
+    {
+        label => 'Echo-Planar Imaging',
+        id    => 'NCIT:C17558'
+    },
+    {
+        id    => 'NCIT:C17631',
+        label => 'Digital Rectal Examination'
+    },
+    {
+        label => 'Upper Gastrointestinal Series',
+        id    => 'NCIT:C17639'
+    },
+    {
+        id    => 'NCIT:C17641',
+        label => 'Percutaneous Transhepatic Cholangiography'
+    },
+    {
+        id    => 'NCIT:C17644',
+        label => 'Transvaginal Ultrasound'
+    },
+    {
+        id    => 'NCIT:C17645',
+        label => 'Radionuclide Scanning'
+    },
+    {
+        id    => 'NCIT:C17646',
+        label => 'Bone Scan'
+    },
+    {
+        label => 'Assessment of Gonadal Function',
+        id    => 'NCIT:C17869'
+    },
+    {
+        id    => 'NCIT:C17958',
+        label => 'Functional Magnetic Resonance Imaging'
+    },
+    {
+        id    => 'NCIT:C18001',
+        label => 'Digital X-Ray'
+    },
+    {
+        id    => 'NCIT:C18020',
+        label => 'Diagnostic Procedure'
+    },
+    {
+        id    => 'NCIT:C18151',
+        label => 'Diaphanography'
+    },
+    {
+        label => 'Histopathologic Examination',
+        id    => 'NCIT:C18190'
+    },
+    {
+        label => 'Lymph Node Mapping',
+        id    => 'NCIT:C18210'
+    },
+    {
+        label => 'Transrectal Ultrasound',
+        id    => 'NCIT:C18315'
+    },
+    {
+        label => 'Digital Mammography',
+        id    => 'NCIT:C18467'
+    },
+    {
+        label => 'Three-Dimensional Imaging',
+        id    => 'NCIT:C18485'
+    },
+    {
+        id    => 'NCIT:C18869',
+        label => 'Medical Imaging, Virtual Reality'
+    },
+    {
+        id    => 'NCIT:C18980',
+        label => 'Radiation Ionizing, Diagnostic Imaging'
+    },
+    {
+        label => 'Radiation Non-Ionizing, Diagnostic Imaging',
+        id    => 'NCIT:C18981'
+    },
+    {
+        label => 'Lower GI Series',
+        id    => 'NCIT:C19174'
+    }
+];
+
+# 100 random entries
+our $ncit_exposures_array = [
+    {
+        'id'    => 'NCIT:C194',
+        'label' => '4-Nitroquinoline-1-Oxide'
+    },
+    {
+        'id'    => 'NCIT:C196',
+        'label' => 'Benzo(a)pyrene-7,8-diol 9,10-Epoxide'
+    },
+    {
+        'label' => 'Dimethylbenzanthracene',
+        'id'    => 'NCIT:C197'
+    },
+    {
+        'label' => 'Aflatoxin',
+        'id'    => 'NCIT:C213'
+    },
+    {
+        'id'    => 'NCIT:C251',
+        'label' => 'Anthracene'
+    },
+    {
+        'id'    => 'NCIT:C284',
+        'label' => 'Asbestos'
+    },
+    {
+        'label' => 'Azoxymethane',
+        'id'    => 'NCIT:C294'
+    },
+    {
+        'label' => 'Bacterial Toxin',
+        'id'    => 'NCIT:C296'
+    },
+    {
+        'label' => 'Batrachotoxin',
+        'id'    => 'NCIT:C297'
+    },
+    {
+        'id'    => 'NCIT:C302',
+        'label' => 'Benzene'
+    },
+    {
+        'id'    => 'NCIT:C349',
+        'label' => 'Carmustine'
+    },
+    {
+        'label' => 'Chewing Tobacco',
+        'id'    => 'NCIT:C361'
+    },
+    {
+        'label' => 'Cholera Toxin',
+        'id'    => 'NCIT:C368'
+    },
+    {
+        'id'    => 'NCIT:C442',
+        'label' => 'Dioxin Compound'
+    },
+    {
+        'id'    => 'NCIT:C470',
+        'label' => 'Enterotoxin'
+    },
+    {
+        'id'    => 'NCIT:C490',
+        'label' => 'Ethylene Dibromide'
+    },
+    {
+        'label' => 'Herbicide',
+        'id'    => 'NCIT:C541'
+    },
+    {
+        'label' => 'Methylnitrosourea',
+        'id'    => 'NCIT:C645'
+    },
+    {
+        'id'    => 'NCIT:C671',
+        'label' => 'Bischloroethylsulfide'
+    },
+    {
+        'label' => 'Mycotoxin',
+        'id'    => 'NCIT:C674'
+    },
+    {
+        'id'    => 'NCIT:C688',
+        'label' => 'Neurotoxin'
+    },
+    {
+        'id'    => 'NCIT:C690',
+        'label' => 'Nickel'
+    },
+    {
+        'id'    => 'NCIT:C736',
+        'label' => 'Pertussis Toxin'
+    },
+    {
+        'id'    => 'NCIT:C737',
+        'label' => 'Pesticide'
+    },
+    {
+        'label' => 'Phorbol Ester',
+        'id'    => 'NCIT:C742'
+    },
+    {
+        'id'    => 'NCIT:C760',
+        'label' => 'Polychlorinated Biphenyl'
+    },
+    {
+        'label' => 'Ricin',
+        'id'    => 'NCIT:C809'
+    },
+    {
+        'label' => 'Ricin A Chain',
+        'id'    => 'NCIT:C810'
+    },
+    {
+        'id'    => 'NCIT:C829',
+        'label' => 'Tobacco Smoke'
+    },
+    {
+        'label' => 'Teratogen',
+        'id'    => 'NCIT:C859'
+    },
+    {
+        'id'    => 'NCIT:C864',
+        'label' => '2,3,7,8-Tetrachlorodibenzo-P-dioxin'
+    },
+    {
+        'id'    => 'NCIT:C892',
+        'label' => 'Smokeless Tobacco'
+    },
+    {
+        'label' => 'Toxin',
+        'id'    => 'NCIT:C894'
+    },
+    {
+        'label' => 'Urethane',
+        'id'    => 'NCIT:C920'
+    },
+    {
+        'id'    => 'NCIT:C936',
+        'label' => 'Vinyl Chloride'
+    },
+    {
+        'id'    => 'NCIT:C951',
+        'label' => 'Dibenzo[a,h]anthracene'
+    },
+    {
+        'label' => 'Anguidine',
+        'id'    => 'NCIT:C1068'
+    },
+    {
+        'label' => 'Dibenzo (a,l) pyrene',
+        'id'    => 'NCIT:C1069'
+    },
+    {
+        'label' => '1,1-Dimethylhydrazine',
+        'id'    => 'NCIT:C1072'
+    },
+    {
+        'label' => 'Fumonisin B1',
+        'id'    => 'NCIT:C1107'
+    },
+    {
+        'label' => 'Phenol',
+        'id'    => 'NCIT:C1191'
+    },
+    {
+        'label' => 'Shiga Toxin',
+        'id'    => 'NCIT:C1225'
+    },
+    {
+        'label' => 'Biohazardous Substance',
+        'id'    => 'NCIT:C1281'
+    },
+    {
+        'label' => 'Aflatoxin B1',
+        'id'    => 'NCIT:C1315'
+    },
+    {
+        'id'    => 'NCIT:C1449',
+        'label' => 'Thorium Dioxide'
+    },
+    {
+        'label' => 'DNA Adduct',
+        'id'    => 'NCIT:C1510'
+    },
+    {
+        'label' => 'Dimethyl Ether',
+        'id'    => 'NCIT:C1645'
+    },
+    {
+        'label' => 'Fungicide',
+        'id'    => 'NCIT:C1697'
+    },
+    {
+        'label' => 'Pollutant',
+        'id'    => 'NCIT:C1751'
+    },
+    {
+        'id'    => 'NCIT:C2128',
+        'label' => 'Sulfur Mustard Compound'
+    },
+    {
+        'id'    => 'NCIT:C2434',
+        'label' => 'Environmental Tobacco Smoke'
+    },
+    {
+        'id'    => 'NCIT:C26451',
+        'label' => 'Anthraquinone'
+    },
+    {
+        'label' => 'Ethylnitrosourea',
+        'id'    => 'NCIT:C26563'
+    },
+    {
+        'id'    => 'NCIT:C28130',
+        'label' => 'Acrylonitrile'
+    },
+    {
+        'id'    => 'NCIT:C28131',
+        'label' => 'Arsenic'
+    },
+    {
+        'label' => 'Chlorine',
+        'id'    => 'NCIT:C28140'
+    },
+    {
+        'label' => 'narcotic',
+        'id'    => 'NCIT:C28171'
+    },
+    {
+        'label' => 'Radioactive Fallout',
+        'id'    => 'NCIT:C28183'
+    },
+    {
+        'label' => 'Nitric Acid',
+        'id'    => 'NCIT:C28202'
+    },
+    {
+        'id'    => 'NCIT:C29354',
+        'label' => 'Permethrin'
+    },
+    {
+        'label' => 'Pediculicide',
+        'id'    => 'NCIT:C29727'
+    },
+    {
+        'id'    => 'NCIT:C29744',
+        'label' => 'Formaldehyde'
+    },
+    {
+        'id'    => 'NCIT:C29768',
+        'label' => '1-Aminobenzo[a]pyrene'
+    },
+    {
+        'label' => '1-Nitrobenzo[a]pyrene',
+        'id'    => 'NCIT:C29779'
+    },
+    {
+        'label' => '1-Nitrobenzo[a]pyrene trans-7,8-Dihydrodiol',
+        'id'    => 'NCIT:C29780'
+    },
+    {
+        'id'    => 'NCIT:C29781',
+        'label' => '1-Nitropyrene'
+    },
+    {
+        'label' => '1,2-Dimethylhydrazine',
+        'id'    => 'NCIT:C29787'
+    },
+    {
+        'label' => '1,2-Dimethylhydrazine Dihydrochloride',
+        'id'    => 'NCIT:C29788'
+    },
+    {
+        'label' => '1,2,5,6-Dibenzanthracene',
+        'id'    => 'NCIT:C29789'
+    },
+    {
+        'id'    => 'NCIT:C29790',
+        'label' => '1,3-Butadiene'
+    },
+    {
+        'label' => '2-Acetylaminofluorene',
+        'id'    => 'NCIT:C29791'
+    },
+    {
+        'label' => '2-Amino-1-Methyl-6-Phenylimidazo[4,5-b]Pyridine',
+        'id'    => 'NCIT:C29792'
+    },
+    {
+        'label' => '2-Amino-3,4-Dimethylimidazole[4,5-f]quinoline',
+        'id'    => 'NCIT:C29793'
+    },
+    {
+        'id'    => 'NCIT:C29794',
+        'label' => '2-Fluoroadenine'
+    },
+    {
+        'id'    => 'NCIT:C29795',
+        'label' => '20-Methylcholanthrene'
+    },
+    {
+        'label' => '3-Aminobenzo[a]pyrene',
+        'id'    => 'NCIT:C29797'
+    },
+    {
+        'label' => '3-Nitrobenzo[a]pyrene',
+        'id'    => 'NCIT:C29798'
+    },
+    {
+        'label' => '3-Nitrobenzo[a]pyrene trans-7,8-Dihydrodiol',
+        'id'    => 'NCIT:C29799'
+    },
+    {
+        'label' => '3,4-Benzpyrene',
+        'id'    => 'NCIT:C29800'
+    },
+    {
+        'id'    => 'NCIT:C29801',
+        'label' => '4-Methylnitrosamino-1,3-pyridyl-1-butanone'
+    },
+    {
+        'label' => '4-Nitroquinoline N-oxide',
+        'id'    => 'NCIT:C29802'
+    },
+    {
+        'id'    => 'NCIT:C29803',
+        'label' => '4-o-Tolylazo-o-Toluidine'
+    },
+    {
+        'label' => '5-Methylchrysene',
+        'id'    => 'NCIT:C29804'
+    },
+    {
+        'label' => '6-Nitrochrysene',
+        'id'    => 'NCIT:C29805'
+    },
+    {
+        'id'    => 'NCIT:C29806',
+        'label' => '9,10-Dimethyl-1,2-Benzanthracene'
+    },
+    {
+        'label' => 'Acetone',
+        'id'    => 'NCIT:C29807'
+    },
+    {
+        'label' => 'Benzo[a]pyrene',
+        'id'    => 'NCIT:C29808'
+    },
+    {
+        'label' => 'Benzo[a]pyrene trans-7,8-Dihydrodiol',
+        'id'    => 'NCIT:C29809'
+    },
+    {
+        'id'    => 'NCIT:C29810',
+        'label' => 'Benzo[b]fluoranthene'
+    },
+    {
+        'label' => 'Benzotrichloride',
+        'id'    => 'NCIT:C29811'
+    },
+    {
+        'label' => 'Carbon Disulfide',
+        'id'    => 'NCIT:C29813'
+    },
+    {
+        'id'    => 'NCIT:C29814',
+        'label' => 'Chlordane'
+    },
+    {
+        'id'    => 'NCIT:C29815',
+        'label' => 'Chloroform'
+    },
+    {
+        'label' => 'Crocidolite Asbestos',
+        'id'    => 'NCIT:C29816'
+    },
+    {
+        'id'    => 'NCIT:C29817',
+        'label' => 'Croton Oil'
+    },
+    {
+        'id'    => 'NCIT:C29818',
+        'label' => 'Cyclopenta[cd]pyrene'
+    },
+    {
+        'label' => 'Ethyl Methanesulfonate',
+        'id'    => 'NCIT:C29820'
+    },
+    {
+        'id'    => 'NCIT:C29821',
+        'label' => 'Ethylene Oxide'
+    },
+    {
+        'label' => 'Ferric-Nitrilotriacetate',
+        'id'    => 'NCIT:C29822'
+    },
+    {
+        'label' => 'Hydroquinone',
+        'id'    => 'NCIT:C29823'
     }
 ];
 

@@ -4,70 +4,83 @@ use 5.006;
 use strict;
 use warnings;
 use Module::List qw(list_modules);
+use base 'Ixchel::Actions::base';
 
 =head1 NAME
 
-Ixchel::Actions::list_actions :: Lists the various actions.
+Ixchel::Actions::list_actions - Lists the various actions with a short description.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.2.0';
 
-=head1 SYNOPSIS
+=head1 CLI SYNOPSIS
 
-    use Data::Dumper;
+ixchel -a list_actions
 
-    $ixchel->action(action=>'list_actions');
+=head1 CODE SYNOPSIS
 
-Prints out a list of available actions and the short
-description for each.
+    my $results $ixchel->action(action=>'list_actions', opts=>{np=>1}
+
+    if ($results->{ok}) {
+        print $results->{status_text};
+    }else{
+        die('Action errored... '.joined("\n", @{$results->{errors}}));
+    }
+
+=head1 FLAGS
+
+=head2 --np
+
+Don't print the the filled in template.
+
+=head1 RESULT HASH REF
+
+    .errors :: A array of errors encountered.
+    .status_text :: A string description of what was done and the results.
+    .ok :: Set to zero if any of the above errored.
 
 =cut
 
-sub new {
-	my ( $empty, %opts ) = @_;
+sub new_extra { }
 
-	my $self = { config => undef, };
-	bless $self;
+sub action_extra {
+	my $self = $_[0];
 
-	if ( defined( $opts{config} ) ) {
-		$self->{config} = $opts{config};
-	}
-
-	return $self;
-} ## end sub new
-
-sub action {
 	my $actions = list_modules( "Ixchel::Actions::", { list_modules => 1 } );
 
 	foreach my $action ( sort( keys( %{$actions} ) ) ) {
-		my $action_name = $action;
-		$action_name =~ s/^Ixchel\:\:Actions\:\://;
+		if ( $action ne 'Ixchel::Actions::base' ) {
+			my $action_name = $action;
+			$action_name =~ s/^Ixchel\:\:Actions\:\://;
 
-		my $short;
-		my $to_eval = 'use ' . $action . '; $short=' . $action . '->short;';
-		eval($to_eval);
-		if ( !defined($short) ) {
-			$short = '';
-		}
-		print $action_name. ' : ' . $short . "\n";
+			my $short;
+			my $to_eval = 'use ' . $action . '; $short=' . $action . '->short;';
+			eval($to_eval);
+			if ( !defined($short) ) {
+				$short = '';
+			}
+			my $new_line = $action_name . ' : ' . $short . "\n";
+			$self->{results}{status_text} = $self->{results}{status_text} . $new_line;
+			if ( !$self->{opts}{np} ) {
+				print $new_line;
+			}
+		} ## end if ( $action ne 'Ixchel::Actions::base' )
 	} ## end foreach my $action ( sort( keys( %{$actions} ) ...))
-} ## end sub action
-
-sub help {
-	return 'Lists the available actions.';
-}
+} ## end sub action_extra
 
 sub short {
 	return 'Lists the available actions.';
 }
 
 sub opts_data {
-	return undef;
+	return 'np
+'
+		;
 }
 
 1;

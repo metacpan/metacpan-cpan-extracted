@@ -2,7 +2,8 @@ NAME
     WWW::Search::KacurCZ - Class for searching http://kacur.cz .
 
 SYNOPSIS
-     use WWW::Search::KacurCZ;
+     use WWW::Search;
+
      my $obj = WWW::Search->new('KacurCZ');
      $obj->native_query($query);
      my $maintainer = $obj->maintainer; 
@@ -10,18 +11,12 @@ SYNOPSIS
      my $version = $obj->version;
 
 METHODS
-    "native_setup_search($query)"
-             Setup.
-
-    "native_retrieve_some()"
-             Get data.
+    For methods look to WWW::Search.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Data::Printer;
      use WWW::Search::KacurCZ;
 
@@ -57,23 +52,29 @@ EXAMPLE
      # }
 
 DEPENDENCIES
-    Encode, LWP::UserAgent, Readonly, Text::Iconv, Web::Scraper,
-    WWW::Search.
+    Encode, LWP::UserAgent, Perl6::Slurp, Readonly, Text::Iconv,
+    Web::Scraper, WWW::Search.
 
 SEE ALSO
-    WWW::Search.
+    WWW::Search
+        Virtual base class for WWW searches
+
+    Task::WWW::Search::Antiquarian::Czech
+        Install the WWW::Search modules for Czech antiquarian bookstores.
 
 REPOSITORY
-    <https://github.com/tupinek/WWW-Search-KacurCZ>
+    <https://github.com/michal-josef-spacek/WWW-Search-KacurCZ>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    BSD license.
+    © Michal Josef Špaček 2014-2023
+
+    BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

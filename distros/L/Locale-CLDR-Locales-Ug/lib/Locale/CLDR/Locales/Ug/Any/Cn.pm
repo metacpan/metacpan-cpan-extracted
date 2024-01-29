@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ug::Any::Cn - Package for language Uyghur
 
 package Locale::CLDR::Locales::Ug::Any::Cn;
 # This file auto generated from Data\common\main\ug_CN.xml
-#	on Tue  5 Dec  1:36:39 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';

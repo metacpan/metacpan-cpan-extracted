@@ -3,7 +3,6 @@ class TestCase::File::Temp {
   use File::Spec;
   use File::Basename;
   use Fn;
-  use Sys::FileTest;
   use List;
   use IO::File;
   
@@ -27,11 +26,11 @@ class TestCase::File::Temp {
           return 0;
         }
         
-        unless (Sys::FileTest->d($dirname)) {
+        unless (Sys->d($dirname)) {
           return 0;
         }
 
-        unless (Sys::FileTest->w($dirname)) {
+        unless (Sys->w($dirname)) {
           return 0;
         }
         
@@ -39,7 +38,7 @@ class TestCase::File::Temp {
         $io_file = undef;
       }
       
-      if (Sys::FileTest->d($dirname)) {
+      if (Sys->d($dirname)) {
         return 0;
       }
     }
@@ -52,7 +51,7 @@ class TestCase::File::Temp {
         $temp_dirs_list->push($temp_dir);
         my $dirname = $temp_dir->dirname;
         
-        unless (Sys::FileTest->d($dirname)) {
+        unless (Sys->d($dirname)) {
           return 0;
         }
       }
@@ -65,7 +64,7 @@ class TestCase::File::Temp {
         $temp_dirs_list->push($temp_dir);
         my $dirname = $temp_dir->dirname;
         
-        unless (Sys::FileTest->d($dirname)) {
+        unless (Sys->d($dirname)) {
           return 0;
         }
       }

@@ -39,6 +39,7 @@ ggplot(df, aes(x, y, label = label, color = label_prefix)) +
         plot.title = element_text(size = 30, face = "bold", hjust = 0.5),
         axis.title = element_text(size = 25),
         axis.text = element_text(size = 15),
-        legend.position = "none") # remove legend
+        legend.position = "right")
+        #legend.position = "none") # remove legend
 
 dev.off()

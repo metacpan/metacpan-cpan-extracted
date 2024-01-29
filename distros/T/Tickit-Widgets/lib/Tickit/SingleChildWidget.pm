@@ -1,15 +1,18 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.70 ':experimental(adjust_params)';
+use warnings;
+use Object::Pad 0.807;
 
-package Tickit::SingleChildWidget 0.58;
-class Tickit::SingleChildWidget
-   :isa(Tickit::ContainerWidget)
-   :does(Tickit::WidgetRole::SingleChildContainer);
+package Tickit::SingleChildWidget 0.59;
+class Tickit::SingleChildWidget;
+
+inherit Tickit::ContainerWidget;
+
+apply Tickit::WidgetRole::SingleChildContainer;
 
 use Carp;
 
@@ -37,7 +40,7 @@ obtain it.
 
 =head2 new
 
-   $widget = Tickit::SingleChildWidget->new( %args )
+   $widget = Tickit::SingleChildWidget->new( %args );
 
 Constructs a new C<Tickit::SingleChildWidget> object.
 

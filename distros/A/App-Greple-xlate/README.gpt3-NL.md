@@ -10,17 +10,17 @@ App::Greple::xlate - vertaalondersteuningsmodule voor greple
 
 # VERSION
 
-Version 0.28
+Version 0.29
 
 # DESCRIPTION
 
-**Greple** **xlate** module vindt tekstblokken en vervangt ze door de vertaalde tekst. Momenteel zijn de DeepL (`deepl.pm`) en ChatGPT (`gpt3.pm`) modules geïmplementeerd als een back-end engine.
+**Greple** **xlate** module vindt gewenste tekstblokken en vervangt ze door de vertaalde tekst. Momenteel zijn de DeepL (`deepl.pm`) en ChatGPT (`gpt3.pm`) modules geïmplementeerd als backend-engine.
 
-Als je normale tekstblokken wilt vertalen die zijn geschreven in de [pod](https://metacpan.org/pod/pod) stijl, gebruik dan het **greple** commando met de `xlate::deepl` en `perl` module als volgt:
+Als je normale tekstblokken wilt vertalen in een document dat is geschreven in de Perl's pod-stijl, gebruik dan het **greple** commando met de `xlate::deepl` en `perl` module als volgt:
 
     greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
 
-Patroon `^(\w.*\n)+` betekent opeenvolgende regels die beginnen met een alfanumeriek teken. Dit commando toont het gebied dat vertaald moet worden. Optie **--all** wordt gebruikt om de volledige tekst te produceren.
+In dit commando betekent het patroon `^(\w.*\n)+` opeenvolgende regels die beginnen met een alfanumeriek teken. Dit commando laat het te vertalen gebied markeren. De optie **--all** wordt gebruikt om de volledige tekst te produceren.
 
 <div>
     <p>
@@ -28,7 +28,7 @@ Patroon `^(\w.*\n)+` betekent opeenvolgende regels die beginnen met een alfanume
     </p>
 </div>
 
-Voeg vervolgens de optie `--xlate` toe om het geselecteerde gebied te vertalen. Het zal ze vinden en vervangen door de uitvoer van het **deepl** commando.
+Voeg vervolgens de optie `--xlate` toe om het geselecteerde gebied te vertalen. Het zal dan de gewenste secties vinden en ze vervangen door de uitvoer van het **deepl** commando.
 
 Standaard worden het oorspronkelijke en vertaalde tekst afgedrukt in het formaat van de "conflict marker" dat compatibel is met [git(1)](http://man.he.net/man1/git). Met behulp van het `ifdef` formaat kun je het gewenste deel krijgen met het [unifdef(1)](http://man.he.net/man1/unifdef) commando. De uitvoerindeling kan worden gespecificeerd met de **--xlate-format** optie.
 
@@ -76,7 +76,7 @@ Als je de hele tekst wilt vertalen, gebruik dan de **--match-all** optie. Dit is
 
     - **conflict**, **cm**
 
-        Druk de oorspronkelijke en vertaalde tekst af in het formaat van het [git(1)](http://man.he.net/man1/git) conflict marker.
+        Originele en geconverteerde tekst worden afgedrukt in [git(1)](http://man.he.net/man1/git) conflict marker formaat.
 
             <<<<<<< ORIGINAL
             original text
@@ -90,7 +90,7 @@ Als je de hele tekst wilt vertalen, gebruik dan de **--match-all** optie. Dit is
 
     - **ifdef**
 
-        Druk de oorspronkelijke en vertaalde tekst af in het [cpp(1)](http://man.he.net/man1/cpp) `#ifdef` formaat.
+        Originele en geconverteerde tekst worden afgedrukt in [cpp(1)](http://man.he.net/man1/cpp) `#ifdef` formaat.
 
             #ifdef ORIGINAL
             original text
@@ -105,7 +105,7 @@ Als je de hele tekst wilt vertalen, gebruik dan de **--match-all** optie. Dit is
 
     - **space**
 
-        Druk de oorspronkelijke en vertaalde tekst af gescheiden door een enkele lege regel.
+        Originele en geconverteerde tekst worden gescheiden door een enkele lege regel.
 
     - **xtxt**
 
@@ -196,6 +196,8 @@ Je moet command line tools installeren voor DeepL en ChatGPT.
 
 [App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
 
+[https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
     DeepL Python-bibliotheek en CLI-commando.
@@ -220,13 +222,27 @@ Je moet command line tools installeren voor DeepL en ChatGPT.
 
     Gebruik **sdif** om het conflictmarkeringsformaat zij aan zij weer te geven met de optie **-V**.
 
+## ARTICLES
+
+- [https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250](https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250)
+
+    Greple-module om alleen de noodzakelijke delen te vertalen en te vervangen met de DeepL API (in het Japans)
+
+- [https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6](https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6)
+
+    Genereren van documenten in 15 talen met de DeepL API-module (in het Japans)
+
+- [https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd](https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd)
+
+    Automatische vertaling Docker-omgeving met DeepL API (in het Japans)
+
 # AUTHOR
 
 Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023 Kazumasa Utashiro.
+Copyright © 2023-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

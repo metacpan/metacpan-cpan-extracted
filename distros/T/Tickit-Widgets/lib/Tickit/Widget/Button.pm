@@ -1,15 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
+use warnings;
+use Object::Pad 0.807;
 
-package Tickit::Widget::Button 0.37;
-class Tickit::Widget::Button
-   :strict(params)
-   :isa(Tickit::Widget);
+package Tickit::Widget::Button 0.41;
+class Tickit::Widget::Button :strict(params);
+
+inherit Tickit::Widget;
 
 use Tickit::Style;
 use Tickit::RenderBuffer qw( LINE_SINGLE LINE_DOUBLE LINE_THICK );
@@ -54,7 +55,7 @@ used:
 
 What kind of border to draw around the button; one of
 
- none single double thick
+   none single double thick
 
 =item marker_left => STRING
 
@@ -115,7 +116,7 @@ use constant KEYPRESSES_FROM_STYLE => 1;
 
 =head2 new
 
-   $button = Tickit::Widget::Button->new( %args )
+   $button = Tickit::Widget::Button->new( %args );
 
 Constructs a new C<Tickit::Widget::Button> object.
 
@@ -167,7 +168,7 @@ method cols
 
 =head2 label
 
-   $label = $button->label
+   $label = $button->label;
 
 =cut
 
@@ -175,7 +176,7 @@ method cols
 
 =head2 set_label
 
-   $button->set_label( $label )
+   $button->set_label( $label );
 
 Return or set the text to display in the button area.
 
@@ -189,7 +190,7 @@ method set_label
 
 =head2 on_click
 
-   $on_click = $button->on_click
+   $on_click = $button->on_click;
 
 =cut
 
@@ -197,11 +198,11 @@ method set_label
 
 =head2 set_on_click
 
-   $button->set_on_click( $on_click )
+   $button->set_on_click( $on_click );
 
 Return or set the CODE reference to be called when the button area is clicked.
 
- $on_click->( $button )
+   $on_click->( $button );
 
 =cut
 
@@ -209,7 +210,7 @@ Return or set the CODE reference to be called when the button area is clicked.
 
 =head2 click
 
-   $button->click
+   $button->click;
 
 Behave as if the button has been clicked; running its C<on_click> handler.
 This is provided for convenience of activating its handler programmatically
@@ -249,13 +250,13 @@ method _activate
 
 =head2 set_valign
 
-   $align = $button->align
+   $align = $button->align;
 
-   $button->set_align( $align )
+   $button->set_align( $align );
 
-   $valign = $button->valign
+   $valign = $button->valign;
 
-   $button->set_valign( $valign )
+   $button->set_valign( $valign );
 
 Accessors for the horizontal and vertical alignment of the label text within
 the button area. See also L<Tickit::WidgetRole::Alignable>.

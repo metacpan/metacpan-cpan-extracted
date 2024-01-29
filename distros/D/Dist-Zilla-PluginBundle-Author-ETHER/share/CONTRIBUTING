@@ -126,6 +126,10 @@ tests pass.'
 }
 }}
 
+Generated files such as README, CONTRIBUTING, Makefile.PL, LICENSE etc should
+*not* be included in your pull request, as they will be updated automatically
+during the next release.
+
 If you have found a bug, but do not have an accompanying patch to fix it, you
 can submit an issue report here:
 {{ $dist->distmeta->{resources}{bugtracker}{web} // 'WARNING: bugtracker data not set!' }}

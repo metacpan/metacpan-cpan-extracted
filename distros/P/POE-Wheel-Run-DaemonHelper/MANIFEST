@@ -1,0 +1,12 @@
+lib/POE/Wheel/Run/DaemonHelper.pm
+Makefile.PL
+README.md
+LICENSE
+Changes
+t/manifest.t
+t/00-load.t
+t/pod.t
+t/early.t
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

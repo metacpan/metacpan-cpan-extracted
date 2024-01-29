@@ -1,5 +1,13 @@
 (Recent) Revision history for Perl extension Data-Dumper-Interp
 
+7.003 - Fix bug where $. was not preserved on first call (termwidth detection)
+7.002 - Use wide chars only with Useqq("unicode") and utf STDOUT or ERR.
+        'l' method modifier omits quotes in vis() string result.
+        Useqq("underscores") separates digits of large numbers.
+        Useqq("hex") shows numbers in hexadecimal
+        Useqq("octets") optimizes string display for binary data, e.g.
+          show octal escapes and not \n \r etc.
+7.001 - dvis (and any with Useqq(...:condense) show replicated chars compactly
 6.011 - Silence 'stty' message if no terminal width is available
 6.010 - trying to find mystery test failure on one Windows smoker host
 6.009 - Fix result-parsing bug with Deparse(1).

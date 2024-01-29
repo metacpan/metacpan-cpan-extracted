@@ -33,7 +33,7 @@ use constant _MAX_SMALL_ORDER => int( sqrt(2)*((1<<(_NATIVE_BITS>>1))-0.5) );
 
 *canonize = \&lex_canonize;
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 our $_MAX_ENUM_COUNT  = 32768;          # limit for stored rotator set size
 our $_MAX_MEMO_COUNT  = 4096;           # limit for memoized values
@@ -639,7 +639,8 @@ sub from_elements_fast {
     # find zeta and theta
     my ($lx, $ux, $c) = (0, 0, 0);
     my ($e0, $e2, $e3) = @{$elements}[$index_start, 0, 0];
-    my $de = $order + 1;
+    my $is_m3 = $order % 3 == 1;
+    my $de    = $is_m3? $modulus/3: $order + 1;
     my $bogus = 0;
     while ($c != $de) {
         if ($c < $de) {
@@ -654,17 +655,14 @@ sub from_elements_fast {
         $c = $e3 < $e2? $modulus + $e3 - $e2: $e3 - $e2;
     }
     croak "delta $de elements missing\n" if $bogus;
-    my $zeta = addmod(mulmod($e3, $order, $modulus), -$e0, $modulus);
-    my $theta = 0;
-    if ($order % 3 != 1) {
-        $theta = $zeta && divmod($zeta, $order - 1, $modulus);
+    my ($zeta, $theta);
+    if ($is_m3) {
+        $theta = addmod($e3, $de, $modulus);
+        $zeta  = mulmod($theta, $order - 1, $modulus);
     }
-    elsif ($zeta || !$elements->[0]) {
-        my $m3 = $modulus / 3;
-        $theta = divmod($zeta, $order - 1, $m3);
-        while (_ol_contains($elements, $theta)) {
-            $theta += $m3;
-        }
+    else {
+        $zeta  = addmod(mulmod($e3, $order, $modulus), -$e0, $modulus);
+        $theta = $zeta && divmod($zeta, $order - 1, $modulus);
     }
 
     my @elems =
@@ -1311,7 +1309,7 @@ Math::DifferenceSet::Planar - object class for planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 1.000 of Math::DifferenceSet::Planar.
+This documentation refers to version 1.001 of Math::DifferenceSet::Planar.
 
 =head1 SYNOPSIS
 

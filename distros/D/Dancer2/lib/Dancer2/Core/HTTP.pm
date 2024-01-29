@@ -1,7 +1,7 @@
 # ABSTRACT: helper for rendering HTTP status codes for Dancer2
 
 package Dancer2::Core::HTTP;
-$Dancer2::Core::HTTP::VERSION = '1.0.0';
+$Dancer2::Core::HTTP::VERSION = '1.1.0';
 use strict;
 use warnings;
 
@@ -144,7 +144,7 @@ Dancer2::Core::HTTP - helper for rendering HTTP status codes for Dancer2
 
 =head1 VERSION
 
-version 1.0.0
+version 1.1.0
 
 =head1 FUNCTIONS
 

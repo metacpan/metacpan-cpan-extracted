@@ -20,8 +20,8 @@ package PDF::Builder::Basic::PDF::File;
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -29,12 +29,12 @@ PDF::Builder::Basic::PDF::File - Holds the trailers and cross-reference tables f
 
 =head1 SYNOPSIS
 
- $p = PDF::Builder::Basic::PDF::File->open("filename.pdf", 1);
- $p->new_obj($obj_ref);
- $p->free_obj($obj_ref);
- $p->append_file();
- $p->close_file();
- $p->release();       # IMPORTANT!
+    $p = PDF::Builder::Basic::PDF::File->open("filename.pdf", 1);
+    $p->new_obj($obj_ref);
+    $p->free_obj($obj_ref);
+    $p->append_file();
+    $p->close_file();
+    $p->release();       # IMPORTANT!
 
 =head1 DESCRIPTION
 
@@ -142,10 +142,6 @@ is in PDF, which contains the location of the previous cross-reference table.
 
 =back
 
-=head1 METHODS
-
-=over
-
 =cut
 
 use Scalar::Util qw(blessed weaken);
@@ -189,11 +185,19 @@ use PDF::Builder::Basic::PDF::Pages;
 use PDF::Builder::Basic::PDF::Null;
 use POSIX qw(ceil floor);
 
-=item PDF::Builder::Basic::PDF::File->new()
+=head1 METHODS
+
+=head2 new
+
+    PDF::Builder::Basic::PDF::File->new()
+
+=over
 
 Creates a new, empty file object which can act as the host to other PDF objects.
 Since there is no file associated with this object, it is assumed that the
 object is created in readiness for creating a new PDF file.
+
+=back
 
 =cut
 
@@ -211,7 +215,11 @@ sub new {
     return $self;
 }
 
-=item $p = PDF::Builder::Basic::PDF::File->open($filename, $update, %options)
+=head2 open
+
+    $p = PDF::Builder::Basic::PDF::File->open($filename, $update, %options)
+
+=over
 
 Opens the file and reads all the trailers and cross reference tables to build
 a complete directory of objects.
@@ -238,6 +246,8 @@ when reading in a PDF file, try running with C<diags> and see what is reported.
 There are many PDF files out "in the wild" which, while failing to conform to
 Adobe's standards, appear to be tolerated by PDF Readers. Thus, Builder will no
 longer fail on them, but merely comment on their existence.
+
+=back
 
 =back
 
@@ -284,6 +294,7 @@ sub open {
        # out inline comment and create a separate comment further along).
     }
 
+    # there should always be 'startxref' within 16*64 bytes of end
     $fh->seek(0, 2);            # go to end of file
     my $end = $fh->tell();
     $self->{' epos'} = $end;
@@ -297,7 +308,8 @@ sub open {
             warn "Malformed PDF file $filename"; #orig 'die'
         }
     }
-    my $xpos = $1;
+    my $xpos = $1; # offset given after 'startxref'
+    # should point to either xref table ('xref'), or object with xref stream
     $self->{' xref_position'} = $xpos;
 
     my $tdict = $self->readxrtr($xpos, %options);
@@ -308,9 +320,13 @@ sub open {
     return $self;
 } # end of open()
 
-=item $new_version = $p->version($version, %opts) # Set 
+=head2 version
 
-=item $ver = $p->version() # Get
+    $new_version = $p->version($version, %opts) # Set 
+
+    $ver = $p->version() # Get
+
+=over
 
 Gets/sets the PDF version (e.g., 1.5). Setting sets both the header and
 trailer versions. Getting returns the higher of header and trailer versions.
@@ -321,6 +337,8 @@ For compatibility with earlier releases, if no decimal point is given, assume
 A warning message is given if you attempt to I<decrease> the PDF version, as you
 might have already read in a higher level file, or used a higher level feature.
 This message is suppressed if the 'silent' option is given with any value.
+
+=back
 
 =cut
 
@@ -368,9 +386,13 @@ sub version {
     return $old_version;
 }
 
-=item $new_version = $p->header_version($version, %opts) # Set
+=head2 header_version
 
-=item $version = $p->header_version() # Get
+    $new_version = $p->header_version($version, %opts) # Set
+
+    $version = $p->header_version() # Get
+
+=over
 
 Gets/sets the PDF version stored in the file header.
 
@@ -380,6 +402,8 @@ For compatibility with earlier releases, if no decimal point is given, assume
 A warning message is given if you attempt to I<decrease> the PDF version, as you
 might have already read in a higher level file, or used a higher level feature.
 This message is suppressed if the 'silent' option is given with any value.
+
+=back
 
 =cut
 
@@ -415,9 +439,13 @@ sub header_version {
     return $old_version;
 }
 
-=item $new_version = $p->trailer_version($version, %opts) # Set
+=head2 trailer_version
 
-=item $version = $p->trailer_version() # Get
+    $new_version = $p->trailer_version($version, %opts) # Set
+
+    $version = $p->trailer_version() # Get
+
+=over
 
 Gets/sets the PDF version stored in the document catalog.
 
@@ -431,6 +459,8 @@ For compatibility with earlier releases, if no decimal point is given, assume
 A warning message is given if you attempt to I<decrease> the PDF version, as you
 might have already read in a higher level file, or used a higher level feature.
 This message is suppressed if the 'silent' option is given with any value.
+
+=back
 
 =cut
 
@@ -470,10 +500,16 @@ sub trailer_version {
     return $old_version;
 }
 
-=item $prev_version = $p->require_version($version)
+=head2 require_version
+
+    $prev_version = $p->require_version($version)
+
+=over
 
 Ensures that the PDF version is at least C<$version>. 
 Silently sets the version to the higher level.
+
+=back
 
 =cut
 
@@ -484,7 +520,11 @@ sub require_version {
     return $current_version;
 }
 
-=item $p->release()
+=head2 release
+
+    $p->release()
+
+=over
 
 Releases ALL of the memory used by the PDF document and all of its
 component objects.  After calling this method, do B<NOT> expect to
@@ -500,6 +540,8 @@ cleanup of the data structures, freeing up all of the memory. Once
 you've called this method, though, don't expect to be able to do
 anything else with the C<PDF::Builder::Basic::PDF::File> object; it'll
 have B<no> internal state whatsoever.
+
+=back
 
 =cut
 
@@ -540,10 +582,16 @@ sub release {
     return;
 } # end of release()
 
-=item $p->append_file()
+=head2 append_file
+
+    $p->append_file()
+
+=over
 
 Appends the objects for output to the read file and then appends the 
 appropriate table.
+
+=back
 
 =cut
 
@@ -585,13 +633,19 @@ sub append_file {
     return;
 } # end of append_file()
 
-=item $p->out_file($fname)
+=head2 out_file
+
+    $p->out_file($fname)
+
+=over
 
 Writes a PDF file to a file of the given filename, based on the current list of
 objects to be output. It creates the trailer dictionary based on information
 in C<$self>.
 
 $fname may be a string or an IO object.
+
+=back
 
 =cut
 
@@ -604,11 +658,17 @@ sub out_file {
     return $self;
 }
 
-=item $p->create_file($fname)
+=head2 create_file
+
+    $p->create_file($fname)
+
+=over
 
 Creates a new output file (no check is made of an existing open file) of
 the given filename or IO object. Note: make sure that C<< $p->{' version'} >>
 is set correctly before calling this function.
+
+=back
 
 =cut
 
@@ -638,9 +698,15 @@ sub create_file {
     return $self;
 }
 
-=item $p->close_file()
+=head2 close_file
+
+    $p->close_file()
+
+=over
 
 Closes up the open file for output, by outputting the trailer, etc.
+
+=back
 
 =cut
 
@@ -674,7 +740,11 @@ sub close_file {
     return $self;
 } # end of close_file()
 
-=item ($value, $str) = $p->readval($str, %opts)
+=head2 readval
+
+    ($value, $str) = $p->readval($str, %opts)
+
+=over
 
 Reads a PDF value from the current position in the file. If C<$str> is too 
 short, read some more from the current location in the file until the whole 
@@ -683,6 +753,8 @@ object is read. This is a recursive call which may slurp in a whole big stream
 
 Returns the recursive data structure read and also the current C<$str> that has 
 been read from the file.
+
+=back
 
 =cut
 
@@ -918,10 +990,16 @@ sub readval {
     return ($result, $str);
 } # end of readval()
 
-=item $ref = $p->read_obj($objind, %opts)
+=head2 read_obj
+
+    $ref = $p->read_obj($objind, %opts)
+
+=over
 
 Given an indirect object reference, locate it and read the object returning
-the read in object.
+the read-in object.
+
+=back
 
 =cut
 
@@ -934,9 +1012,15 @@ sub read_obj {
     return $objind;
 }
 
-=item $ref = $p->read_objnum($num, $gen, %opts)
+=head2 read_objnum
+
+    $ref = $p->read_objnum($num, $gen, %opts)
+
+=over
 
 Returns a fully read object of given number and generation in this file
+
+=back
 
 =cut
 
@@ -1014,11 +1098,17 @@ sub read_objnum {
     return $object;
 } # end of read_objnum()
 
-=item $objind = $p->new_obj($obj)
+=head2 new_obj
+
+    $objind = $p->new_obj($obj)
+
+=over
 
 Creates a new, free object reference based on free space in the cross reference 
 chain. If nothing is free, then think up a new number. If C<$obj>, then turns 
 that object into this new object rather than returning a new object.
+
+=back
 
 =cut
 
@@ -1072,10 +1162,16 @@ sub new_obj {
     }
 }
 
-=item $p->out_obj($obj)
+=head2 out_obj
+
+    $p->out_obj($obj)
+
+=over
 
 Indicates that the given object reference should appear in the output xref
 table whether with data or freed.
+
+=back
 
 =cut
 
@@ -1095,9 +1191,15 @@ sub out_obj {
     return $obj;
 }
 
-=item $p->free_obj($obj)
+=head2 free_obj
+
+    $p->free_obj($obj)
+
+=over
 
 Marks an object reference for output as being freed.
+
+=back
 
 =cut
 
@@ -1111,9 +1213,15 @@ sub free_obj {
     return;
 }
 
-=item $p->remove_obj($objind)
+=head2 remove_obj
+
+    $p->remove_obj($objind)
+
+=over
 
 Removes the object from all places where we might remember it.
+
+=back
 
 =cut
 
@@ -1132,9 +1240,13 @@ sub remove_obj {
     return $self;
 }
 
-=item $p->ship_out(@objects)
+=head2 ship_out
 
-=item $p->ship_out()
+    $p->ship_out(@objects)
+
+    $p->ship_out()
+
+=over
 
 Ships the given objects (or all objects for output if C<@objects> is empty) to
 the currently open output file (assuming there is one). Freed objects are not
@@ -1142,6 +1254,8 @@ shipped, and once an object is shipped it is switched such that this file
 becomes its source and it will not be shipped again unless out_obj is called
 again. Notice that a shipped out object can be re-output or even freed, but
 that it will not cause the data already output to be changed.
+
+=back
 
 =cut
 
@@ -1185,11 +1299,17 @@ sub ship_out {
     return $self;
 } # end of ship_out()
 
-=item $p->copy($outpdf, \&filter)
+=head2 copy
+
+    $p->copy($outpdf, \&filter)
+
+=over
 
 Iterates over every object in the file reading the object, calling C<filter> 
 with the object, and outputting the result. If C<filter> is not defined, 
 just copies input to output.
+
+=back
 
 =cut
 
@@ -1237,20 +1357,22 @@ sub copy {
     return $self;
 } # end of copy()
 
-=back
-
 =head1 PRIVATE METHODS & FUNCTIONS
 
 The following methods and functions are considered B<private> to this class. 
 This does not mean you cannot use them if you have a need, just that they 
 aren't really designed for users of this class.
 
-=over
+=head2 locate_obj
 
-=item $offset = $p->locate_obj($num, $gen)
+    $offset = $p->locate_obj($num, $gen)
+
+=over
 
 Returns a file offset to the object asked for by following the chain of cross
 reference tables until it finds the one you want.
+
+=back
 
 =cut
 
@@ -1274,11 +1396,17 @@ sub locate_obj {
     return;
 }
 
-=item update($fh, $str, $instream)
+=head2 update
+
+    update($fh, $str, $instream)
+
+=over
 
 Keeps reading C<$fh> for more data to ensure that C<$str> has at least a line 
 full for C<readval> to work on. At this point we also take the opportunity to 
 ignore comments.
+
+=back
 
 =cut
 
@@ -1311,10 +1439,16 @@ sub update {
     return $str;
 } # end of update()
 
-=item $objind = $p->test_obj($num, $gen)
+=head2 test_obj
+
+    $objind = $p->test_obj($num, $gen)
+
+=over
 
 Tests the cache to see whether an object reference (which may or may not have
 been getobj()ed) has been cached. Returns it if it has.
+
+=back
 
 =cut
 
@@ -1324,9 +1458,15 @@ sub test_obj {
     return $self->{' objcache'}{$num, $gen};
 }
 
-=item $p->add_obj($objind)
+=head2 add_obj
+
+    $p->add_obj($objind)
+
+=over
 
 Adds the given object to the internal object cache.
+
+=back
 
 =cut
 
@@ -1339,7 +1479,11 @@ sub add_obj {
     return $obj;
 }
 
-=item $tdict = $p->readxrtr($xpos, %options)
+=head2 readxrtr
+
+    $tdict = $p->readxrtr($xpos, %options)
+
+=over
 
 Recursive function which reads each of the cross-reference and trailer tables
 in turn until there are no more.
@@ -1354,6 +1498,8 @@ in [location, generation number, free or used]. See the PDF specification
 for details.
 
 See C<open> for options allowed.
+
+=back
 
 =cut
 
@@ -1403,7 +1549,8 @@ sub _unpack_xref_stream {
 
 sub readxrtr {
     my ($self, $xpos, %options) = @_;
-    # $xpos SHOULD be pointing to "xref" keyword
+    # $xpos SHOULD be pointing to "xref" keyword 
+    #    UNLESS an xref stream is in use (v 1.5+)
     # copy dashed option names to preferred undashed names
     if (defined $options{'-diags'} && !defined $options{'diags'}) { $options{'diags'} = delete($options{'-diags'}); }
 
@@ -1423,7 +1570,7 @@ sub readxrtr {
    #    $buf = update($fh, $buf);
    #}
 
-    if ($buf =~ s/^xref$cr//i) {   # remove xrefEOL from buffer
+    if ($buf =~ s/^xref$cr//i) {   # xref table, remove xrefEOL from buffer
         # Plain XRef tables.
         #
         # look to match startobj# count# EOL of first (or only) subsection
@@ -1610,7 +1757,7 @@ sub readxrtr {
 
         ($tdict, $buf) = $self->readval($buf);
 
-    } elsif ($buf =~ m/^(\d+)\s+(\d+)\s+obj/i) {
+    } elsif ($buf =~ m/^(\d+)\s+(\d+)\s+obj/i) { # object for xref stream
         my ($xref_obj, $xref_gen) = ($1, $2);
 	$PDF::Builder::global_pdf->verCheckOutput(1.5, "importing cross-reference stream");
         # XRef streams
@@ -1687,13 +1834,19 @@ sub readxrtr {
     return $tdict;
 } # end of readxrtr()
 
-=item $p->out_trailer($tdict, $update)
+=head2 out_trailer
 
-=item $p->out_trailer($tdict)
+    $p->out_trailer($tdict, $update)
+
+    $p->out_trailer($tdict)
+
+=over
 
 Outputs the body and trailer for a PDF file by outputting all the objects in
 the ' outlist' and then outputting a xref table for those objects and any
 freed ones. It then outputs the trailing dictionary and the trailer code.
+
+=back
 
 =cut
 
@@ -1838,9 +1991,15 @@ sub out_trailer {
     return;
 } # end of out_trailer()
 
-=item PDF::Builder::Basic::PDF::File->_new()
+=head2 _new
+
+    PDF::Builder::Basic::PDF::File->_new()
+
+=over
 
 Creates a very empty PDF file object (used by new() and open())
+
+=back
 
 =cut
 
@@ -1860,13 +2019,11 @@ sub _new {
 
 1;
 
-=back
-
 =head1 AUTHOR
 
 Martin Hosken Martin_Hosken@sil.org
 
-Copyright Martin Hosken 1999 and onwards
+Copyright Martin Hosken 1999 
 
 No warranty or expression of effectiveness, least of all regarding anyone's
 safety, is implied in this software or documentation.

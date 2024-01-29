@@ -82,7 +82,7 @@
    "provides" : {
       "Connector" : {
          "file" : "lib/Connector.pm",
-         "version" : "1.53"
+         "version" : "1.54"
       },
       "Connector::Builtin" : {
          "file" : "lib/Connector/Builtin.pm"
@@ -207,7 +207,7 @@
          "web" : "https://github.com/whiterabbitsecurity/connector"
       }
    },
-   "version" : "1.53",
+   "version" : "1.54",
    "x_contributors" : [
       "Martin Bartosch <m.bartosch@cynops.de>",
       "Martin Bartosch <mbartosch@whiterabbitsecurity.com>",

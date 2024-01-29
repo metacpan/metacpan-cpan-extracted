@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230903131448;
+our $VERSION = 1.20231210185946;
 
 my $formatters = [
                 {
@@ -86,7 +86,7 @@ my $formatters = [
                   'leading_digits' => '
             9(?:
               [5-79]|
-              8[1-6]
+              8[1-7]
             )
           ',
                   'national_rule' => '0$1',
@@ -202,7 +202,8 @@ my $validators = {
           9(?:
             51|
             6[129]|
-            [78][1-6]|
+            7[1-6]|
+            8[1-7]|
             9[1-5]
           )\\d{6}
         ',
@@ -213,79 +214,79 @@ my $validators = {
                 'voip' => '8700[0-4]\\d{4}'
               };
 my %areanames = ();
-$areanames{en} = {"59538", "Bella\ Vista\ Norte",
-"595767", "Bella\ Vista\ Sur",
-"595673", "Santa\ Rita",
-"595676", "Naranjal",
-"595678", "Santa\ Rosa\ Del\ Monday",
-"59533", "Loreto",
-"595293", "Guarambare",
-"595554", "Itape",
-"59564", "Cargil",
-"59525", "Villeta",
-"595671", "Mayor\ Otano",
-"595550", "Mauricio\ Jose\ Troche",
-"595295", "Jose\ Augusto\ Saldivar",
-"595674", "Juan\ E\.\ O\ Leary",
-"595762", "Carmen\ Del\ Parana",
-"595294", "Itaugua",
-"595675", "Juan\ Leon\ Mallorquin",
-"595553", "Tebicuary",
-"595291", "Aregua",
-"59526", "Villa\ Hayes",
-"59546", "Salto\ Del\ Guaira",
-"595763", "La\ Paz",
+$areanames{en} = {"595768", "Pirapo",
+"595784", "San\ Juan\ Neembucu",
+"59586", "Pilar",
+"59535", "Valle\ Mi",
 "595677", "San\ Alberto",
-"595768", "Pirapo",
-"595552", "Paso\ Yobay",
-"59573", "San\ Cosme",
-"59542", "San\ Pedro\ Del\ Ycua\ Mandyju",
-"59521", "Fernando\ De\ La\ Mora\,\ Lambare\,\ Limpio\,\ Luque\,\ Mariano\ Roque\ Alonso\,\ San\ Antonio\,\ Valle\ Pucu\ and\ Villa\ Elisa",
-"59539", "Yby\ Ja\'U",
+"59528", "Capiata",
+"595741", "Coronel\ Bogado",
+"59546", "Salto\ Del\ Guaira",
+"59575", "Hoenau",
+"59581", "San\ Juan\ Bautista\ \/\ Misiones",
+"59564", "Cargil",
+"595785", "Paso\ De\ Patria",
+"595550", "Mauricio\ Jose\ Troche",
+"59537", "Capitan\ Bado",
+"595783", "San\ Miguel\ \/\ Misiones",
+"595671", "Mayor\ Otano",
 "59541", "Itacurubi\ Del\ Rosario",
-"595761", "Colonia\ Fram",
-"59547", "Puente\ Kyha",
+"595275", "Ypane",
+"59521", "Fernando\ De\ La\ Mora\,\ Lambare\,\ Limpio\,\ Luque\,\ Mariano\ Roque\ Alonso\,\ San\ Antonio\,\ Valle\ Pucu\ and\ Villa\ Elisa",
+"59542", "San\ Pedro\ Del\ Ycua\ Mandyju",
+"595295", "Jose\ Augusto\ Saldivar",
+"595554", "Itape",
+"595763", "La\ Paz",
+"59583", "Villa\ Florida",
+"59543", "San\ Estanislao",
+"59539", "Yby\ Ja\'U",
+"595742", "San\ Pedro\ Del\ Parana",
+"59582", "San\ Ignacio\ \/\ Misiones",
+"595293", "Guarambare",
+"59548", "Curuguaty",
+"595780", "Alberdi",
+"59526", "Villa\ Hayes",
+"595294", "Itaugua",
+"595633", "Cedrales",
+"595453", "Capiibary",
+"595553", "Tebicuary",
 "595672", "Kressburgo",
 "595764", "Maria\ Auxiliadora",
-"595292", "Nueva\ Italia",
-"59583", "Villa\ Florida",
-"59536", "Pedro\ Juan\ Caballero",
-"595451", "Colonia\ Volendam",
-"59585", "Santa\ Rosa\ \/\ Misiones",
-"595345", "Corpus\ Christi",
-"595787", "General\ \ Diaz",
-"59532", "Horqueta",
-"59531", "Concepcion",
-"595631", "Hernandarias",
-"595742", "San\ Pedro\ Del\ Parana",
-"59575", "Hoenau",
-"595782", "Santiago",
-"59537", "Capitan\ Bado",
-"595453", "Capiibary",
-"59561", "Presidente\ Franco",
-"595633", "Cedrales",
-"59548", "Curuguaty",
-"59528", "Capiata",
-"595783", "San\ Miguel\ \/\ Misiones",
-"595271", "Benjamin\ \ Aceval",
 "59572", "Ayolas",
-"595741", "Coronel\ Bogado",
-"59543", "San\ Estanislao",
-"595632", "Colonia\ Yguazu",
-"595275", "Ypane",
-"59571", "Capitan\ Miranda",
-"595780", "Alberdi",
-"59535", "Valle\ Mi",
-"59586", "Pilar",
-"595781", "Santa\ María\ \/\ Misiones",
-"595784", "San\ Juan\ Neembucu",
+"59538", "Bella\ Vista\ Norte",
+"595291", "Aregua",
+"59561", "Presidente\ Franco",
 "595740", "General\ \ Delgado",
-"595785", "Paso\ De\ Patria",
 "59544", "Villa\ Del\ Rosario",
-"59582", "San\ Ignacio\ \/\ Misiones",
-"59524", "Ita",
+"59573", "San\ Cosme",
+"595761", "Colonia\ Fram",
+"59525", "Villeta",
+"595676", "Naranjal",
+"595678", "Santa\ Rosa\ Del\ Monday",
+"595782", "Santiago",
+"59532", "Horqueta",
+"595631", "Hernandarias",
+"595451", "Colonia\ Volendam",
+"595767", "Bella\ Vista\ Sur",
+"59533", "Loreto",
 "595743", "General\ Artigas",
-"59581", "San\ Juan\ Bautista\ \/\ Misiones",};
+"595292", "Nueva\ Italia",
+"59547", "Puente\ Kyha",
+"595787", "General\ \ Diaz",
+"59531", "Concepcion",
+"595762", "Carmen\ Del\ Parana",
+"595674", "Juan\ E\.\ O\ Leary",
+"595632", "Colonia\ Yguazu",
+"59524", "Ita",
+"595781", "Santa\ María\ \/\ Misiones",
+"595552", "Paso\ Yobay",
+"595673", "Santa\ Rita",
+"595675", "Juan\ Leon\ Mallorquin",
+"59536", "Pedro\ Juan\ Caballero",
+"59585", "Santa\ Rosa\ \/\ Misiones",
+"595271", "Benjamin\ \ Aceval",
+"59571", "Capitan\ Miranda",
+"595345", "Corpus\ Christi",};
 
     sub new {
       my $class = shift;

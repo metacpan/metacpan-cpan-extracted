@@ -2,7 +2,8 @@
    "abstract" : "A base class to make your very own Telegram bot",
    "author" : [
       "Justin Hawkins <justin@eatmorecode.com>",
-      "James Green <jkg@earth.li>"
+      "James Green <jkg@earth.li>",
+      "Julien Fiegehenn <simbabque@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
@@ -41,9 +42,9 @@
          "web" : "https://github.com/jkg/Telegram-Bot"
       }
    },
-   "version" : "0.024",
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04",
+   "version" : "0.025",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

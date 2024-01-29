@@ -3,7 +3,7 @@ package CGI::Application::Plugin::OpenTracing;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.104.1';
+our $VERSION = 'v0.104.2';
 
 use syntax 'maybe';
 
@@ -248,7 +248,7 @@ sub start_active_span {
     my $tracer = $plugin->get_tracer();
     my $scope = $tracer->start_active_span( $operation_name, %params );
     
-   $plugin->{SCOPE}{$scope_name} = $scope;
+    $plugin->{SCOPE}{$scope_name} = $scope;
 }
 
 sub add_tags {
@@ -256,14 +256,16 @@ sub add_tags {
     my $scope_name     = shift;
     my %tags           = @_;
     
-   $plugin->get_span($scope_name)->add_tags(%tags);
+    my $span = $plugin->get_span($scope_name);
+    $span && $span->add_tags(%tags);
 }
 
 sub get_tags {
     my $plugin         = shift;
     my $scope_name     = shift;
     
-   $plugin->get_span($scope_name)->get_tags();
+    my $span = $plugin->get_span($scope_name) or return ();
+    $span && $span->get_tags();
 }
 
 sub add_baggage_items {
@@ -271,21 +273,24 @@ sub add_baggage_items {
     my $scope_name     = shift;
     my %baggage_items  = @_;
     
-   $plugin->get_span($scope_name)->add_baggage_items( %baggage_items );
+    my $span = $plugin->get_span($scope_name);
+    $span && $span->add_baggage_items( %baggage_items );
 }
 
 sub close_scope {
     my $plugin         = shift;
     my $scope_name     = shift;
     
-   $plugin->get_scope($scope_name)->close;
+    my $scope = $plugin->get_scope($scope_name);
+    $scope && $scope->close;
 }
 
 sub get_span {
     my $plugin         = shift;
     my $scope_name     = shift;
     
-   $plugin->get_scope($scope_name)->get_span;
+    my $scope = $plugin->get_scope($scope_name);
+    $scope && $scope->get_span;
 }
 
 sub get_scope {

@@ -32,7 +32,7 @@ $inter->call('eval','[set foo] a {b c}');
 __END__
 
 # this is in the Tkx t/ test program
-# but its strange to requre something that requires us first.
+# but its strange to require something that requires us first.
 # so its being skipped in the Tcl t/ series
 
 use Tkx;

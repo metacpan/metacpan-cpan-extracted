@@ -8,7 +8,7 @@ alien_ok 'Alien::OpenJDK';
 
  run_ok([ qw(java -version) ])
    ->success
-   ->err_like(qr/^openjdk version "([0-9\._]+)"/m);
+   ->err_like(qr/^openjdk version "([0-9\._]+(?:-\w+)?)"/m);
 
 # my $xs = <<'END';
 # #include "EXTERN.h"

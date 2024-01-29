@@ -71,11 +71,9 @@
          }
       },
       "test" : {
-         "recommends" : {
-            "DBD::SQLite" : "0"
-         },
          "requires" : {
             "Const::Fast" : "0",
+            "DBD::SQLite" : "0",
             "Database::Temp" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
@@ -105,9 +103,9 @@
          "web" : "https://github.com/mikkoi/database-managedhandle.git"
       }
    },
-   "version" : "0.002",
-   "x_generated_by_perl" : "v5.24.4",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "version" : "0.003",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

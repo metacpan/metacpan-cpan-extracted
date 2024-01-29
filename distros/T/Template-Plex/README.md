@@ -10,10 +10,11 @@ Write a template:
     __DATA__        
     @{[ 
         init {
-            use Time::HiRes qw<time>;
-            $title="Mr.";
+    use Time::HiRes qw<time>;
+    $title="Mr.";
         }
     ]}
+
     Dear $title Connery,
     Ordered a $size pizza with $slices slices to share between @$people and
     myself.  That averages @{[$slices/(@$people+1)]} slices each.
@@ -59,7 +60,7 @@ Change values and render it again:
 
 # DESCRIPTION
 
-`Template::Plex` facilitates the use of perl (not embedded perl) as a template
+`Template::Plex` facilitates the use of Perl (not embedded perl) as a template
 language. It implements bootstrapping and a system to load, cache, inherit and
 render templates with minimal code.
 
@@ -67,17 +68,16 @@ The 'lexical' part of this module refers to the lexical aliasing of input
 variables into the template. This reduces the amount of markup required to
 reference variables and thus improves the style and readability of a template.
 
-Templates can be extended and reused by way of inclusion, sub templates and
-inheritance. The template system itself can be extended by sub classing
-`Template::Plex` and implementing customised load routines and other  helper
-methods.
+Templates can be extended and reused with sub templates and inheritance. The
+template system itself can be extended by sub classing `Template::Plex` and
+implementing customised load routines and other  helper methods.
 
 The short tutorial in this document plus the examples included in the
 distribution cover the basics to get you started. Reading through the `load`
 API options is also recommended to get a better understanding on how templates
 are processed.
 
-# MOTIATION
+# MOTIVATION
 
 Many templating systems are available, yet none use Perl as the template
 language? Perl already has a great text interpolation, so why not use it? 
@@ -115,10 +115,10 @@ interpolated into the string):
 ```perl
     "This is a perl string interpolating 
     @{[ do {
-            my $result="STATEMENTS";
-            ...
-            lc $result;
-        }
+  my $result="STATEMENTS";
+  ...
+  lc $result;
+      }
     ]}
     "
 ```
@@ -154,11 +154,9 @@ variables, define helper subroutines, or import modules:
 
 ```perl
     @{[ init {
-            use Time::HiRes qw<time>;
-
-            sub my_func{ 1+2 };
-
-        }
+  use Time::HiRes qw<time>;
+  sub my_func{ 1+2 };
+      }
     ]}
 
     Calculated @{[my_func]} at @{[time]}
@@ -167,8 +165,8 @@ variables, define helper subroutines, or import modules:
 The `init` block does not inject any content into a template, but manipulates
 the state of a template.
 
-Each template has access to it's self, using the `$self` variable. This comes
-in very handy when loading sub templates and doing more advanced task or even
+Each template has access to it self, using the `$self` variable. This comes in
+very handy when loading sub templates and doing more advanced task or even
 extending the template system.
 
 So far we have seen the `do` and `init` directives. General code can also be
@@ -200,11 +198,6 @@ The returned template is then rendered by calling the `render` method.
 The `immediate` call loads and caches a template with a user defined key and
 then immediately renders it, returning the results.
 
-An important option when loading templates is the **root** option. This is the
-directory (relative to the working directory) which is prepended to all paths.
-This makes it easy for templates to refer to other templates with relative
-paths, regardless of the working directory.
-
 ## Template Reuse
 
 Reusing templates can reduce the repetitive nature of content.
@@ -225,7 +218,7 @@ templates, so a better way is to call the same method on the `$self` object:
     @{[$self->immediate(...)]}
 ```
 
-This will automatically link the variables and relevant option to be the same
+This will automatically link the variables and relevant options to be the same
 as the current template.
 
 Better still, these methods are made available within a template simply as a
@@ -309,6 +302,7 @@ Child template:
 
 ### Inclusion
 
+**Depricated. Please use sub templates to achieve the same result**
 Much like the C language preprocessor, including an other template or other file
 will do a literal copy of its contents into the calling template.  The resulting
 text is processed again and again as long as more include statements are
@@ -403,6 +397,7 @@ Arguments to this function:
 
     If `$path` is a string, it is treated as a file path to a template file. The
     file is opened and slurped with the content being used as the template.
+    If `$root` option is specified, it is prepended to this string
 
     If `$path` is a filehandle, or GLOB ref, it is slurped with the content being
     used as the template. Can be used to read template stored in `__DATA__` for
@@ -410,6 +405,10 @@ Arguments to this function:
 
     If `$path` is an array ref, the items of the array are joined into a string,
     which is used directly as the template.
+
+    **From v0.7.0**
+    If `$path` is an scalar ref, the path is treated relative to the **calling**
+    template or top level file. 
 
 - `$vars`
 
@@ -516,6 +515,15 @@ Arguments to this function:
         key or place an extra empty line at the end of your template.
 
     - **use\_comments**
+
+        **Depricated** and will be removed in later versions. Use this for new code:
+
+        ```
+        @{[
+            # block comment
+            # goes here
+        ]}
+        ```
 
         **From v0.5.0** Enables stripping of lines that start with perl style comments
         from the template before preparation. This is disabled by default
@@ -658,6 +666,10 @@ Returns the loaded or cached template
 Loads and renders a template immediately. Uses the same arguments as `cache`.
 Calls the `cache` API but also calls `render` on the returned template.
 
+**From v0.6.4:** The `vars` argument is also used as the extra fields for a
+render call. This allows for an immediately loaded/rendered template to now use
+field values as well the initial lexical variables.
+
 **From v0.6.0:** Please refere to the `cache` api on details regarding argument
 handling
 
@@ -668,6 +680,10 @@ Returns the result of the rendered loaded/cached template.
 ```
     @{[include("path")}]
 ```
+
+**Depricated** and will be removed in later versions. For new code just use
+`load` and with no vars to get the same result but with better debugging
+ability.
 
 This is a special directive that replaces the directive with the literal
 contents of the file pointed to by path in a similar style to #include in the C
@@ -1206,8 +1222,8 @@ render data being supplied as needed.
 
 Enabling lexically scoped features (i.e. `use feature "say"`) is only in the
 block it used in. Unfortunately that means that features enabled in an init
-block will not be active in subsequent blocks. The inject or use option would
-need to be utilised to achieve this currently.
+block will not be active in subsequent blocks. The `inject` or `use` option
+would need to be utilised to achieve this currently.
 
 Templates are completely processed in memory. A template can execute sub
 templates and run general IO code, so in theory it would be possible to break
@@ -1220,6 +1236,8 @@ in your templates, then maybe this module isn't for you.
 Aliasing means that the template has write access to variables outside of it.
 So again if you don't know what your templates are doing, then maybe this
 module isn't for you
+
+Using normal Perl comments requires spreading the @{\[\]} over multiple lines
 
 # TODO
 
@@ -1235,7 +1253,7 @@ Do a search on CPAN for 'template' and make a cup of coffee.
 # REPOSITORY and BUG REPORTING
 
 Please report any bugs and feature requests on the repo page:
-[GitHub](http://github.com/drclaw1394/perl-template-plex)
+[GitHub](https://github.com/drclaw1394/perl-template-plex)
 
 # AUTHOR
 

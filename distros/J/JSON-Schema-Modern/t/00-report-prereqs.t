@@ -72,6 +72,10 @@ my @include = qw(
   Cpanel::JSON::XS
   JSON::XS
   Mojolicious
+  Sereal::Encoder
+  Sereal::Decoder
+  Math::BigInt
+  Math::BigFloat
 );
 
 my @exclude = qw(

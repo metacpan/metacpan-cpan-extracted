@@ -104,6 +104,17 @@ EOF
 
 }
 
+sub schema_mariadb {
+    <<EOF;
+CREATE TEMPORARY TABLE Address (
+    id integer AUTO_INCREMENT,
+    Name varchar(36) NOT NULL,
+    Counter int(8) NOT NULL,
+    PRIMARY KEY (id))
+EOF
+
+}
+
 sub schema_pg {
     <<EOF;
 CREATE TEMPORARY TABLE Address (

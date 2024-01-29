@@ -12,7 +12,7 @@ if (! libpng_supports ('GET_PALETTE_MAX')) {
     plan skip_all => 'Your libpng does not support get_palette_max';
 }
 
-my $file_name = "$Bin/tantei-san.png";
+my $file_name = "$Bin/gecko-1200-gray8.png";
 my $png = read_png_file ($file_name);
 TODO: {
     local $TODO = 'Work out why this returns zero';

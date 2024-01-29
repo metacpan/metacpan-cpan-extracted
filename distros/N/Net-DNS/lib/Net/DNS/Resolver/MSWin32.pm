@@ -2,7 +2,7 @@ package Net::DNS::Resolver::MSWin32;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: MSWin32.pm 1856 2021-12-02 14:36:25Z willem $)[2];
+our $VERSION = (qw$Id: MSWin32.pm 1961 2024-01-25 11:04:57Z willem $)[2];
 
 
 =head1 NAME
@@ -38,7 +38,7 @@ sub _init {
 
 
 	my @nameservers = map { $_->{IpAddress} } @{$FIXED_INFO->{DnsServersList}};
-	$defaults->nameservers(@nameservers);
+	$defaults->nameservers( grep {$_} @nameservers );
 
 	my $devolution = 0;
 	my $domainname = $FIXED_INFO->{DomainName} || '';

@@ -100,27 +100,20 @@ SKIP: {
         ' Found password policy' );
     ok(
         $res->[2]->[0] =~
-/<span trspan="passwordPolicyMinLower">Minimal lower characters:<\/span> 1/,
+        qr/<span trspan="passwordPolicyMinLower"><\/span> 1/,
         ' Found password policy min lower == 1'
     );
+    ok( $res->[2]->[0] =~ /<span trspan="passwordPolicyMinUpper"><\/span> 1/,
+        ' Found password policy min upper == 1' );
+    ok( $res->[2]->[0] =~ /<span trspan="passwordPolicyMinDigit"><\/span> 2/,
+        ' Found password policy min digit == 2' );
     ok(
-        $res->[2]->[0] =~
-/<span trspan="passwordPolicyMinUpper">Minimal upper characters:<\/span> 1/,
-        ' Found password policy min upper == 1'
-    );
-    ok(
-        $res->[2]->[0] =~
-/<span trspan="passwordPolicyMinDigit">Minimal digit characters:<\/span> 2/,
-        ' Found password policy min digit == 2'
-    );
-    ok(
-        $res->[2]->[0] =~
-/<span trspan="passwordPolicyMinSpeChar">Minimal special characters:<\/span> 1/,
+        $res->[2]->[0] =~ /<span trspan="passwordPolicyMinSpeChar"><\/span> 1/,
         ' Found password policy min speChar == 1'
     );
     ok(
         $res->[2]->[0] =~
-/<span trspan="passwordPolicySpecialChar">Allowed special characters:<\/span> &amp;%#/,
+          /<span trspan="passwordPolicySpecialChar"><\/span> # % &amp;/,
         ' Found password special char list'
     );
     $query .= '&newpassword=zZ11#&confirmpassword=zZ11#';

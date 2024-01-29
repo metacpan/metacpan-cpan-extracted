@@ -1,5 +1,8 @@
 Revision history for Linux-FD
 
+0.015     2024-01-27 21:06:57+01:00 Europe/Brussels
+          - Allow flags to be passed to FD::Timer constructor
+
 0.014     2023-01-02 01:20:05+01:00 Europe/Amsterdam
           - Don't test for boottime timer presence
 

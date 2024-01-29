@@ -88,11 +88,19 @@ Returns formatted date value
 
 Returns formatted duration value
 
+=head2 humanize_duration
+
+    print humanize_duration ( 123 );
+
+Turns duration value into a simplified human readable format
+
 =head2 human2bytes
 
     my $bytes = human2bytes("100 kB");
 
 Converts a human readable byte count into the pure  number of bytes without any suffix
+
+See also L<Mojo::Util/humanize_bytes>
 
 =head2 json_load
 
@@ -144,6 +152,17 @@ If you don't supply one of these forms, we assume you are specifying the date yo
 
 Returns offset of time (in secs)
 
+=head2 randchars
+
+    $rand = randchars( $n ); # default chars collection: 0..9,'a'..'z','A'..'Z'
+    $rand = randchars( $n, \@collection ); # Defined chars collection
+
+Returns random sequence of casual characters by the amount of n
+
+For example:
+
+    $rand = randchars( 8, [qw/a b c d e f/]); # -> cdeccfdf
+
 =head1 HISTORY
 
 See C<Changes> file
@@ -173,7 +192,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.03';
+our $VERSION = '1.05';
 
 use Carp;
 use Term::ANSIColor qw/colored/;
@@ -191,10 +210,11 @@ our @EXPORT = (qw/
         parse_expire parse_time_offset
     /);
 our @EXPORT_OK = (qw/
-        fbytes fdate fdatetime fduration human2bytes
+        fbytes fdate fdatetime fduration human2bytes humanize_duration
         dformat
         md5sum
         json_load json_save
+        randchars
         color
     /, @EXPORT);
 
@@ -233,13 +253,32 @@ sub human2bytes {
     my $exp = HUMAN_SUFFIXES->{($sfx ? uc($sfx) : "B")} || 0;
     return ceil($bts * (2 ** $exp));
 }
+sub humanize_duration {
+    my $msecs = shift || 0;
+    my $secs = int($msecs);
+    my $years = int($secs / (60*60*24*365));
+       $secs -= $years * 60*60*24*365;
+    my $days = int($secs / (60*60*24));
+       $secs -= $days * 60*60*24;
+    my $hours = int($secs / (60*60));
+       $secs -= $hours * 60*60;
+    my $mins = int($secs / 60);
+       $secs %= 60;
+    if ($years) { return sprintf("%d years %d days %s hours", $years, $days, $hours) }
+    elsif ($days) { return sprintf("%d days %s hours %d minutes", $days, $hours, $mins) }
+    elsif ($hours) { return sprintf("%d hours %d minutes %d seconds", $hours, $mins, $secs) }
+    elsif ($mins >= 2) { return sprintf("%d minutes %d seconds", $mins, $secs) }
+    elsif ($secs > 5) { return sprintf("%d seconds", $secs + $mins * 60) }
+    elsif ($msecs - $secs) { return sprintf("%.4f seconds", $msecs) }
+    return sprintf("%d seconds", $secs);
+}
 sub fduration {
     my $msecs = shift || 0;
     my $secs = int($msecs);
     my $hours = int($secs / (60*60));
-    $secs -= $hours * 60*60;
+       $secs -= $hours * 60*60;
     my $mins = int($secs / 60);
-    $secs %= 60;
+       $secs %= 60;
     if ($hours) {
         return sprintf("%d hours %d minutes", $hours, $mins);
     } elsif ($mins >= 2) {
@@ -332,6 +371,15 @@ sub dformat {
     my $d = @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {};
     $f =~ s/\[([A-Z0-9_\-.]+?)\]/(defined($d->{$1}) ? $d->{$1} : "[$1]")/eg;
     return $f;
+}
+sub randchars {
+    my $l = shift || return '';
+    return '' unless $l =~/^\d+$/;
+    my $arr = shift;
+    my $r = '';
+    my @chars = ($arr && ref($arr) eq 'ARRAY') ? (@$arr) : (0..9,'a'..'z','A'..'Z');
+    $r .= $chars[(int(rand($#chars+1)))] for (1..$l);
+    return $r;
 }
 
 # Colored helper function

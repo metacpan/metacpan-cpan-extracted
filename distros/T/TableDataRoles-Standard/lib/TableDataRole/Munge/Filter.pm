@@ -8,9 +8,9 @@ use Log::ger;
 use Role::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-25'; # DATE
+our $DATE = '2024-01-15'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 with 'TableDataRole::Spec::Basic';
 
@@ -131,7 +131,7 @@ TableDataRole::Munge::Filter - Role to filter rows from another tabledata
 
 =head1 VERSION
 
-This document describes version 0.019 of TableDataRole::Munge::Filter (from Perl distribution TableDataRoles-Standard), released on 2023-11-25.
+This document describes version 0.021 of TableDataRole::Munge::Filter (from Perl distribution TableDataRoles-Standard), released on 2024-01-15.
 
 =head1 SYNOPSIS
 
@@ -242,7 +242,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

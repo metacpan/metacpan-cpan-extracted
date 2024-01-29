@@ -1,0 +1,31 @@
+NAME
+
+    TLV::EMV::Tags - A module that holds all EMV tags
+
+SYNOPSIS
+
+    use TLV::EMV::Tags;
+
+DESCRIPTION
+
+    The TLV::EMV::Tags module provides a list of all EMV (Europay,
+    Mastercard, and Visa) tags. This module is used by TLV::EMV::Parser;
+
+CONSTANTS
+
+    EMV_TAGS
+
+      A constant array that contains all EMV tags.
+
+AUTHOR
+
+    Guangsheng He (何光胜) <heguangsheng@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2024 by Guangsheng He (何光胜)
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,20 @@
+Dir::TempChdir
+==============
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENSE
+
+Copyright © 2023 Carsten Gaebler.
+
+This library is free software. You can redistribute and/or modify it under the
+terms of the Do What The Fuck You Want To Public License, Version 2, as
+published by Sam Hocevar. See the COPYING file or http://www.wtfpl.net/ for
+more details.

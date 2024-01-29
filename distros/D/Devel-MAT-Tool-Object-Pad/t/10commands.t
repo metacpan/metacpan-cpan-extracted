@@ -7,6 +7,12 @@ use Test::More;
 BEGIN {
    eval { require Devel::MAT; } or
       plan skip_all => "No Devel::MAT";
+   Devel::MAT->VERSION( '0.48' ); # format_sv shows exemplar element
+
+   eval { require Devel::MAT::Dumper; Devel::MAT::Dumper->VERSION( '0.45' ) } or
+      plan skip_all => "No Devel::MAT::Dumper version 0.45 or above";
+   eval { require Object::Pad; Object::Pad->VERSION( '0.66' ) } or
+      plan skip_all => "No Object::Pad version 0.66 or above";
 
    require Devel::MAT::Dumper;
 }
@@ -20,9 +26,9 @@ use Commandable::Invocation;
    class NativeClass
    {
       # one field of each container type
-      has $sfield;
-      has @afield;
-      has %hfield;
+      field $sfield;
+      field @afield;
+      field %hfield;
 
       ADJUST {
          $sfield = 123;
@@ -33,24 +39,24 @@ use Commandable::Invocation;
 
    class HashClass :repr(HASH)
    {
-      has $x = "HASH";
+      field $x = "HASH";
    }
 
    package ForeignBase { sub new { bless [], shift } }
 
    class MagicClass :isa(ForeignBase) :repr(magic)
    {
-      has $x = "magic";
+      field $x = "magic";
    }
 
    role ARole
    {
-      has $rolefield = 789;
+      field $rolefield = 789;
    }
 
    class SubClass :isa(NativeClass) :does(ARole)
    {
-      has $morefield = 456;
+      field $morefield = 456;
    }
 }
 
@@ -118,8 +124,8 @@ EOF
 The field AV ARRAY(3)=NativeClass at _ADDR_
 Ix Field   Value
 0  $sfield SCALAR(UV) at _ADDR_ = 123
-1  @afield ARRAY(3) at _ADDR_
-2  %hfield HASH(1) at _ADDR_
+1  @afield ARRAY(3) at _ADDR_ = [SCALAR(UV) at _ADDR_, ...]
+2  %hfield HASH(1) at _ADDR_ = {{key} => SCALAR(PV) at _ADDR_}
 EOF
 
    output_matches_ok {
@@ -144,8 +150,8 @@ EOF
 The field AV ARRAY(5)=SubClass at _ADDR_
 Ix Field               Value
 0  NativeClass/$sfield SCALAR(UV) at _ADDR_ = 123
-1  NativeClass/@afield ARRAY(3) at _ADDR_
-2  NativeClass/%hfield HASH(1) at _ADDR_
+1  NativeClass/@afield ARRAY(3) at _ADDR_ = [SCALAR(UV) at _ADDR_, ...]
+2  NativeClass/%hfield HASH(1) at _ADDR_ = {{key} => SCALAR(PV) at _ADDR_}
 3  $morefield          SCALAR(UV) at _ADDR_ = 456
 4  ARole/$rolefield    SCALAR(UV) at _ADDR_ = 789
 EOF
@@ -165,7 +171,7 @@ EOF
 
    output_matches_ok {
       $pmat->run_command( Commandable::Invocation->new( sprintf "outrefs 0x%x --all", 0+$subobj ) );
-   } <<'EOF', 'output from "outrefs" command on Field AV';
+   } <<'EOF', 'output from "outrefs --all" command on Field AV';
 s  the $morefield field                  SCALAR(UV) at _ADDR_
 s  the ARole/$rolefield field            SCALAR(UV) at _ADDR_
 s  the NativeClass/$sfield field         SCALAR(UV) at _ADDR_

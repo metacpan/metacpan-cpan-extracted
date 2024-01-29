@@ -1,5 +1,6 @@
 Changes
-examples/ex1.pl
+examples/fetch_valentinska_capek.pl
+examples/print_valentinska_maintainer.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm
@@ -20,6 +21,8 @@ SIGNATURE
 t/data/valentinska_cz-20151030-Capek.html
 t/WWW-Search-ValentinskaCZ/01-use.t
 t/WWW-Search-ValentinskaCZ/02-version.t
+t/WWW-Search-ValentinskaCZ/03-new.t
+t/WWW-Search-ValentinskaCZ/04-search_from_file.t
 ValentinskaCZ.pm
 xt/WWW-Search-ValentinskaCZ/01-pod_coverage.t
 xt/WWW-Search-ValentinskaCZ/02-pod.t

@@ -1,0 +1,3 @@
+<& /Elements/Calendar,
+  ShowSidebar => 1,
+&>

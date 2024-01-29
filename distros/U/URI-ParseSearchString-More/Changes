@@ -1,8 +1,12 @@
 Revision history for Perl module URI::ParseSearchString::More
 
+0.19      2023-12-23 23:55:32Z
+    - Use URI::host() rather than a regex to get a host name
+    - Remove failing test (GH#5) (Olaf Alders) (Reported by Slaven Rezić GH#4)
+
 0.18      2018-08-03 22:58:54Z
-    - Require LWP::Protocol::https (Reported by Slaven Rezic GH#1)
-    - Fix failing Yahoo test (Reported by Slaven Rezic GH#2)
+    - Require LWP::Protocol::https (Reported by Slaven Rezić GH#1)
+    - Fix failing Yahoo test (Reported by Slaven Rezić GH#2)
 
 0.17      2014-08-15 22:52:09EDT-0400 America/Toronto
     - Fixes failing tests.

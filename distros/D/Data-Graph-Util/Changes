@@ -1,4 +1,11 @@
-0.006   2019-02-15 (PERLANCAR)
+0.007   2023-12-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Add functions: connected_components.
+
+        - [doc] Mention Graph.pm, organize See Also.
+
+
+0.006   2019-02-15  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -6,26 +13,26 @@
 	  Bencher::Scenario::GraphTopologicalSortModules.
 
 
-0.005   2019-02-14 (PERLANCAR)
+0.005   2019-02-14  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] POD formatting so the functions can be linked.
 
 
-0.004   2019-02-14 (PERLANCAR)
+0.004   2019-02-14  Released-By: PERLANCAR
 
 	- Make sort order deterministic [GH#1].
 
 
-0.003   2017-07-04 (PERLANCAR)
+0.003   2017-07-04  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Add note in toposort() about dying when graph cannot be sorted.
 
 
-0.002   2016-06-24 (PERLANCAR)
+0.002   2016-06-24  Released-By: PERLANCAR
 
 	- toposort() now accepts an optional second argument to sort
 	  specified nodes.
@@ -34,6 +41,6 @@
 	  about topological sorting.
 
 
-0.001   2016-06-24 (PERLANCAR)
+0.001   2016-06-24  Released-By: PERLANCAR
 
         - First release.

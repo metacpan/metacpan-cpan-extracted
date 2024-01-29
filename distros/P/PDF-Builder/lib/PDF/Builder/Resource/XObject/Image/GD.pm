@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use PDF::Builder::Util;
 use PDF::Builder::Basic::PDF::Utils;
@@ -18,9 +18,11 @@ PDF::Builder::Resource::XObject::Image::GD - support routines for Graphics Devel
 
 =head1 METHODS
 
-=over 
+=head2 new
 
-=item $res = PDF::Builder::Resource::XObject::Image::GD->new($pdf, $file, %opts)
+    $res = PDF::Builder::Resource::XObject::Image::GD->new($pdf, $file, %opts)
+
+=over
 
 Options:
 
@@ -35,6 +37,9 @@ This is the name you can give for the GD image object. The default is Dxnnnn.
 Use lossless compression.
 
 =back
+
+An image object is created from GD input. Note that this should be invoked
+from Builder.pm's method.
 
 =back
 

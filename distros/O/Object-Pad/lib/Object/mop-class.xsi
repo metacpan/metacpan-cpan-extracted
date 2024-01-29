@@ -193,6 +193,8 @@ add_role(self, role)
     if(!rolemeta || rolemeta->type != METATYPE_ROLE)
       croak("%" SVf " is not a role", SVfARG(role));
 
+    mop_class_begin(meta);
+
     mop_class_add_role(meta, rolemeta);
   }
 
@@ -203,6 +205,7 @@ add_BUILD(self, code)
   CODE:
   {
     ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
+    mop_class_begin(meta);
 
     mop_class_add_BUILD(meta, (CV *)SvREFCNT_inc((SV *)code));
   }
@@ -225,6 +228,7 @@ add_method(self, mname, ...)
     mname = sv_2mortal(newSVsv(mname));
 
     ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
+    mop_class_begin(meta);
 
     if(SvOK(mname) && SvPOK(mname) && strEQ(SvPVX(mname), "BUILD")) {
       croak("Adding a method called BUILD is not supported; use ->add_BUILD directly");
@@ -339,6 +343,7 @@ add_required_method(self, mname)
   CODE:
   {
     ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
+    mop_class_begin(meta);
 
     mop_class_add_required_method(meta, mname);
   }
@@ -352,6 +357,7 @@ add_field(self, fieldname, ...)
     dKWARG(2);
 
     ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
+    mop_class_begin(meta);
 
     FieldMeta *fieldmeta = mop_class_add_field(meta, sv_mortalcopy(fieldname));
 
@@ -413,16 +419,8 @@ get_field(self, fieldname)
   {
     ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
 
-    AV *fields = meta->direct_fields;
-    U32 nfields = av_count(fields);
-
-    FIELDOFFSET i;
-    for(i = 0; i < nfields; i++) {
-      FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
-
-      if(!sv_eq(fieldmeta->name, fieldname))
-        continue;
-
+    FieldMeta *fieldmeta = mop_class_find_field(meta, fieldname, FIND_FIELD_ONLY_DIRECT);
+    if(fieldmeta) {
       ST(0) = sv_newmortal();
       sv_setref_iv(ST(0), "Object::Pad::MOP::Field", PTR2UV(fieldmeta));
       XSRETURN(1);
@@ -438,19 +436,23 @@ fields(self)
   PPCODE:
     ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
 
-    AV *fields = meta->direct_fields;
+    AV *fields = meta->fields;
     U32 nfields = av_count(fields);
 
     EXTEND(SP, nfields);
 
+    U32 retcount = 0;
     FIELDOFFSET i;
     for(i = 0; i < nfields; i++) {
       FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+      if(!fieldmeta->is_direct)
+        continue;
 
       ST(i) = sv_newmortal();
       sv_setref_iv(ST(i), "Object::Pad::MOP::Field", PTR2UV(fieldmeta));
+      retcount++;
     }
-    XSRETURN(nfields);
+    XSRETURN(retcount);
 
 void
 required_method_names(self)

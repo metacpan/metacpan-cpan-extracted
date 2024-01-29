@@ -8,7 +8,7 @@ use Log::ger;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-10-21'; # DATE
 our $DIST = 'App-GnuplotUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our %SPEC;
 
@@ -71,6 +71,26 @@ first find a suitable application, and failing that will use the web browser. If
 you specify `--output-file` (`-o`), the plot is written to the specified image
 file.
 
+To see in a viewer program or browser and set the image format:
+
+    % xyplot --output-format svg ...
+
+If you want to use to force the browser:
+
+    % PERL_DESKTOP_OPEN_USE_BROWSER=1 xyplot ...
+
+If you want to set the program to use to open:
+
+    % PERL_DESKTOP_OPEN_PROGRAM=google-chrome xyplot --output-format svg ...
+
+
+**Tips & Tricks**
+
+**CSV format.** If you have your data in CSV format, you can use
+<prog:csv-unquote> to make sure your numbers are not quoted with double quotes,
+or you can use <prog:csv2tsv> to convert your CSV to TSV first. Both utilities
+are included in <pm:App::CSVUtils>.
+
 
 **Keywords**
 
@@ -80,6 +100,18 @@ _
     args => {
         chart_title => {
             schema => 'str*',
+        },
+        output_format => {
+            description => <<'MARKDOWN',
+
+The output format is normally determined from the output filename's extension,
+e.g. `foo.jpg`. This option is for when you do not specify output filename and
+want to change the format from the default `png`.
+
+MARKDOWN
+            schema => ['str*', in=>[qw/bmp gif jpg png webp
+                                       pdf ps svg/]],
+            default => 'png',
         },
         output_file => {
             schema => 'filename*',
@@ -149,6 +181,8 @@ sub xyplot {
 
     my %args = @_;
 
+    my $output_format = $args{output_format} // 'png';
+
     my $fieldsep_re = qr/\s*,\s*|\s+/s;
     if (defined $args{delimited}) {
         $fieldsep_re = qr/\Q$args{delimited}\E/;
@@ -163,7 +197,7 @@ sub xyplot {
     } else {
         my $tempfh;
         ($tempfh, $outputfilename) = File::Temp::tempfile();
-        $outputfilename .= ".png";
+        $outputfilename .= ".$output_format";
     }
     log_trace "Output filename: %s", $outputfilename;
 
@@ -252,7 +286,7 @@ App::GnuplotUtils - Utilities related to plotting data using gnuplot
 
 =head1 VERSION
 
-This document describes version 0.005 of App::GnuplotUtils (from Perl distribution App-GnuplotUtils), released on 2023-10-21.
+This document describes version 0.006 of App::GnuplotUtils (from Perl distribution App-GnuplotUtils), released on 2023-10-21.
 
 =head1 DESCRIPTION
 
@@ -329,6 +363,25 @@ first find a suitable application, and failing that will use the web browser. If
 you specify C<--output-file> (C<-o>), the plot is written to the specified image
 file.
 
+To see in a viewer program or browser and set the image format:
+
+ % xyplot --output-format svg ...
+
+If you want to use to force the browser:
+
+ % PERL_DESKTOP_OPEN_USE_BROWSER=1 xyplot ...
+
+If you want to set the program to use to open:
+
+ % PERL_DESKTOP_OPEN_PROGRAM=google-chrome xyplot --output-format svg ...
+
+B<Tips & Tricks>
+
+B<CSV format.> If you have your data in CSV format, you can use
+L<csv-unquote> to make sure your numbers are not quoted with double quotes,
+or you can use L<csv2tsv> to convert your CSV to TSV first. Both utilities
+are included in L<App::CSVUtils>.
+
 B<Keywords>
 
 xychart, XY chart, XY plot
@@ -366,6 +419,12 @@ Supply field delimiter character in dataset file instead of the default whitespa
 =item * B<output_file> => I<filename>
 
 (No description)
+
+=item * B<output_format> => I<str> (default: "png")
+
+The output format is normally determined from the output filename's extension,
+e.g. C<foo.jpg>. This option is for when you do not specify output filename and
+want to change the format from the default C<png>.
 
 =item * B<overwrite> => I<bool>
 

@@ -1,9 +1,10 @@
 package Data::Gimei;
 
+use 5.010;
+use strict;
 use warnings;
-use v5.22;
 
-use version; our $VERSION = version->declare("v0.4.0");
+use version; our $VERSION = version->declare("v0.4.2");
 
 use Data::Gimei::Name;
 use Data::Gimei::Address;
@@ -33,8 +34,10 @@ Data::Gimei - a Perl port of Ruby's gimei generates fake data in Japanese.
 
 =head1 SYNOPSIS
 
+  use 5.010;
+  use strict;
   use warnings;
-  use v5.22;
+
   binmode STDOUT, ":utf8";
 
   use Data::Gimei;
@@ -123,7 +126,7 @@ You can also look for information at:
 
 =head1 LICENSE
 
-MIT
+MIT License
 
 Dictionary YAML file is generated from naist-jdic.
 

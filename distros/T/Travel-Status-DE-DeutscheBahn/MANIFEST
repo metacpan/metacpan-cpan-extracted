@@ -20,7 +20,15 @@ scripts/makedeb-docker
 scripts/makedeb-docker-helper
 scripts/update-readme
 t/20-db.t
+t/21-db-journeymatch.t
+t/22-db-journey.t
+t/30-db-journey-platformchange.t
+t/31-db-journey-daychange.t
 't/in/DB.Berlin Jannowitzbrücke.json'
+t/in/DB.EC392.journey.json
+t/in/DB.ICE23.journey.json
+t/in/DB.ICE23.json
+t/in/DB.ICE615.journey.json
 xt/00-compile-pm.t
 xt/01-compile-pl.t
 xt/10-pod-coverage.t

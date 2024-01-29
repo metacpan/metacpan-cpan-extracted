@@ -1,0 +1,337 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/genusername/genusername
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-01-16'; # DATE
+our $DIST = 'App-genusername'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/genusername/genusername",
+    program_name => "genusername",
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Generate random username
+# PODNAME: genusername
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+genusername - Generate random username
+
+=head1 VERSION
+
+This document describes version 0.001 of genusername (from Perl distribution App-genusername), released on 2024-01-16.
+
+=head1 SYNOPSIS
+
+B<genusername> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<genusername> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<genusername> [B<L<--action|/"--list-patterns">>=I<str>|B<L<--list-patterns|/"--list-patterns">>] [B<L<--case|/"--case=s">>=I<str>|B<L<-L|/"--case=s">>|B<L<-U|/"--case=s">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [(B<L<--pattern|/"--patterns-json=s">>=I<str>)+|B<L<--patterns-json|/"--patterns-json=s">>=I<json>|(B<L<-p|/"--patterns-json=s">>=I<str>)+] -- [I<L<num|/"--num=s, -n">>]
+
+=head1 DESCRIPTION
+
+This is a thin wrapper for L<genpw>.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--action>=I<s>
+
+Default value:
+
+ "gen"
+
+Valid values:
+
+ ["gen","list-patterns"]
+
+=item B<--case>=I<s>
+
+Force casing.
+
+Default value:
+
+ "default"
+
+Valid values:
+
+ ["default","random","lower","upper","title"]
+
+C<default> means to not change case. C<random> changes casing some letters
+randomly to lower-/uppercase. C<lower> forces lower case. C<upper> forces
+UPPER CASE. C<title> forces Title case.
+
+
+=item B<--list-patterns>
+
+Shortcut for --action=list-patterns.
+
+See C<--action>.
+
+=item B<--num>=I<s>, B<-n>
+
+Default value:
+
+ 1
+
+Can also be specified as the 1st command-line argument.
+
+=item B<--pattern>=I<s@>, B<-p>
+
+Pattern(s) to use.
+
+CONVERSION (C<%P>). A pattern is string that is roughly similar to a printf
+pattern:
+
+ %P
+
+where C<P> is certain letter signifying a conversion. This will be replaced with
+some other string according to the conversion. An example is the C<%h> conversion
+which will be replaced with hexdigit.
+
+LENGTH (C<%NP>). A non-negative integer (C<N>) can be specified before the
+conversion to signify desired length, for example, C<%4w> will return a random
+word of length 4.
+
+MINIMUM AND MAXIMUM LENGTH (C<%M$NP>). If two non-negative integers separated by
+C<$> is specified before the conversion, this specify desired minimum and maximum
+length. For example, C<%4$10h> will be replaced with between 4 and 10 hexdigits.
+
+ARGUMENT AND FILTERS (C<%(arg)P>, C<%(arg)(filter1)(...)P>). Finally, an argument
+followed by zero or more filters can be specified (before the lengths) and
+before the conversion. For example, C<%(wordlist:ID::KBBI)w> will be replaced by
+a random word from the wordlist L<WordList::ID::KBBI>. Another example,
+C<%()(Str::uc)4$10h> will be replaced by between 4-10 uppercase hexdigits, and
+C<%(arraydata:Sample::DeNiro)(Str::underscore_non_latin_alphanums)(Str::lc)(Str::ucfirst)w>
+will be replaced with a random movie title of Robert De Niro, where symbols are
+replaced with underscore then the string will be converted into lowercase and
+the first character uppercased, e.g. C<Dear_america_letters_home_from_vietnam>.
+
+Anything else will be left as-is.
+
+Available conversions:
+
+ %l   Random Latin letter (A-Z, a-z)
+ %d   Random digit (0-9)
+ %h   Random hexdigit (0-9a-f in lowercase [default] or 0-9A-F in uppercase).
+      Known arguments:
+      - "u" (to use the uppercase instead of the default lowercase digits)
+ %a   Random letter/digit (Alphanum) (A-Z, a-z, 0-9; combination of %l and %d)
+ %s   Random ASCII symbol, e.g. "-" (dash), "_" (underscore), etc.
+ %x   Random letter/digit/ASCII symbol (combination of %a and %s)
+ %m   Base64 character (A-Z, a-z, 0-9, +, /)
+ %b   Base58 character (A-Z, a-z, 0-9 minus IOl0)
+ %B   Base56 character (A-Z, a-z, 0-9 minus IOol01)
+ %%   A literal percent sign
+ %w   Random word. Known arguments:
+      - "stdin:" (for getting the words from stdin, the default)
+      - "wordlist:NAME" (for getting the words from a L<WordList> module)
+      - "arraydata:NAME" (for getting the words from an L<ArrayData> module, the
+        Role::TinyCommons::Collection::PickItems::RandomPos will be applied).
+
+Filters are modules in the C<Data::Sah::Filter::perl::> namespace.
+
+
+Can be specified multiple times.
+
+=item B<--patterns-json>=I<s>
+
+Pattern(s) to use (JSON-encoded).
+
+See C<--pattern>.
+
+=item B<-L>
+
+Shortcut for --case=lower.
+
+See C<--case>.
+
+=item B<-U>
+
+Shortcut for --case=upper.
+
+See C<--case>.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C genusername genusername
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete genusername 'p/*/`genusername`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-genusername>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-genusername>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-genusername>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

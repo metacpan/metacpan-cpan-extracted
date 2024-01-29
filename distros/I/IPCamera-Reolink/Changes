@@ -1,0 +1,8 @@
+Revision history for IPCamera-Reolink
+
+1.00    Thu 04 Jan 2024 04:50:29 PM EST
+        Initial version, created with: module-starter -module=IPCamera::Reolink --author="Stephen Oberski" -email="cpan@cargocult.ca"
+
+1.01    Sat 06 Jan 2024 04:02:05 PM EST
+        - Added module dependencies to PREREQ_PM in Makefile.PL
+        - Additional documentation.

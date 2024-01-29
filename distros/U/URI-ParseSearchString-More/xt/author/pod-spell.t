@@ -12,6 +12,8 @@ all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Alders
 Alders'
+Anwar
+Mohammad
 More
 Olaf
 ParseSearchString
@@ -20,6 +22,7 @@ admin
 emptor
 ie
 lib
+mohammad
 olaf
 params
 root

@@ -4,13 +4,14 @@
       "Eric Brine <ikegami@adaelis.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.120351",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
+      "unknown",
       "unrestricted"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DateTime-Format-Atom",
    "no_index" : {
@@ -25,20 +26,19 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.52"
+            "ExtUtils::MakeMaker" : "6.68"
          }
       },
       "develop" : {
          "requires" : {
-            "FindBin" : "0",
             "Pod::Coverage" : "0.18",
             "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
          "requires" : {
-            "DateTime" : "0",
             "DateTime::Format::RFC3339" : "0",
+            "perl" : "5.01",
             "strict" : "0",
             "version" : "0",
             "warnings" : "0"
@@ -56,10 +56,9 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-DateTime-Format-Atom@rt.cpan.org",
-         "web" : "http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DateTime-Format-Atom"
+         "web" : "https://github.com/ikegami/perl-DateTime-Format-Atom/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/DateTime-Format-Atom/",
+      "homepage" : "https://metacpan.org/dist/DateTime-Format-Atom",
       "license" : [
          "http://creativecommons.org/publicdomain/zero/1.0/"
       ],
@@ -69,5 +68,6 @@
          "web" : "https://github.com/ikegami/perl-DateTime-Format-Atom"
       }
    },
-   "version" : "v1.2.0"
+   "version" : "v1.6.0",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

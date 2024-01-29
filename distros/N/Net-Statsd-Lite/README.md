@@ -4,7 +4,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 # VERSION
 
-version v0.7.0
+version v0.7.1
 
 # SYNOPSIS
 
@@ -21,7 +21,7 @@ my $stats = Net::Statsd::Lite->new(
 
 $stats->increment('this.counter');
 
-$stats->set_add( $username ) if $username;
+$stats->set_add( 'this.users', $username ) if $username;
 
 $stats->timing( $run_time * 1000 );
 

@@ -91,6 +91,8 @@ t/pod.t
 t/printf.t
 t/PV_NV_BUG.t
 t/q_arith.t
+t/random2.t
+t/random3.t
 t/remainder.t
 t/Rmpfr_asinu.t
 t/Rmpfr_fmod_ui.t

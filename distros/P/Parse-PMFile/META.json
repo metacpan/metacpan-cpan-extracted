@@ -4,7 +4,7 @@
       "Kenichi Ishigaki <ishigaki@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,7 @@
       "test" : {
          "requires" : {
             "File::Temp" : "0.19",
-            "Test::More" : "0.88"
+            "Test::More" : "0.94"
          }
       }
    },
@@ -52,6 +52,6 @@
          "url" : "https://github.com/charsbar/Parse-PMFile"
       }
    },
-   "version" : "0.44",
-   "x_serialization_backend" : "JSON::PP version 4.12"
+   "version" : "0.45",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,5 @@
 package Password::Policy::Rule::Whitespace;
-$Password::Policy::Rule::Whitespace::VERSION = '0.04';
+$Password::Policy::Rule::Whitespace::VERSION = '0.06';
 use strict;
 use warnings;
 
@@ -32,7 +32,7 @@ Password::Policy::Rule::Whitespace
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 AUTHOR
 

@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-25'; # DATE
+our $DATE = '2023-11-26'; # DATE
 our $DIST = 'TableDataBundle-Perl-CPAN-Release'; # DIST
-our $VERSION = '20231120.3'; # VERSION
+our $VERSION = '20231126.0'; # VERSION
 
 our $scenario = {
     summary => 'Benchmark loading TableData::Perl::CPAN::Release::Static',
@@ -35,7 +35,7 @@ Bencher::Scenario::TableData::Perl::CPAN::Release::Static - Benchmark loading Ta
 
 =head1 VERSION
 
-This document describes version 20231120.3 of Bencher::Scenario::TableData::Perl::CPAN::Release::Static (from Perl distribution TableDataBundle-Perl-CPAN-Release), released on 2023-11-25.
+This document describes version 20231126.0 of Bencher::Scenario::TableData::Perl::CPAN::Release::Static (from Perl distribution TableDataBundle-Perl-CPAN-Release), released on 2023-11-26.
 
 =head1 SYNOPSIS
 
@@ -89,14 +89,14 @@ Result formatted as table:
  +----------------------------------------+---------+--------+------+--------------+-------------+-----------------------+-----------------------+---------+---------+
  | participant                            | ds_tags | p_tags | perl |    rate (/s) |        time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +----------------------------------------+---------+--------+------+--------------+-------------+-----------------------+-----------------------+---------+---------+
- | TableData::Perl::CPAN::Release::Static |         |        | perl | 0.2367571782 | 4.223736774 |                 0.00% |                 0.00% | 5.5e-11 |       1 |
+ | TableData::Perl::CPAN::Release::Static |         |        | perl | 0.2047387959 | 4.884272156 |                 0.00% |                 0.00% | 6.9e-11 |       1 |
  +----------------------------------------+---------+--------+------+--------------+-------------+-----------------------+-----------------------+---------+---------+
 
 
 The above result formatted in L<Benchmark.pm|Benchmark> style:
 
               Rate     
-    0.2367571782/s  -- 
+    0.2047387959/s  -- 
  
  Legends:
    : ds_tags= p_tags= participant=TableData::Perl::CPAN::Release::Static perl=perl
@@ -110,22 +110,22 @@ Benchmark command (benchmarking module startup overhead):
 Result formatted as table:
 
  #table2#
- +----------------------------------------+-------------+-------------------+-----------------------+-----------------------+---------+---------+
- | participant                            |   time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
- +----------------------------------------+-------------+-------------------+-----------------------+-----------------------+---------+---------+
- | TableData::Perl::CPAN::Release::Static | 213.26324   |  1.20795630000001 |                 0.00% |                 0.57% | 7.6e-11 |       1 |
- | perl -e1 (baseline)                    | 212.0552837 |  0                |                 0.57% |                 0.00% | 2.1e-11 |       1 |
- +----------------------------------------+-------------+-------------------+-----------------------+-----------------------+---------+---------+
+ +----------------------------------------+------------+-------------------+-----------------------+-----------------------+---------+---------+
+ | participant                            |  time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +----------------------------------------+------------+-------------------+-----------------------+-----------------------+---------+---------+
+ | TableData::Perl::CPAN::Release::Static | 217.944692 |           2.29145 |                 0.00% |                 1.06% | 2.4e-11 |       1 |
+ | perl -e1 (baseline)                    | 215.653242 |           0       |                 1.06% |                 0.00% | 7.4e-11 |       1 |
+ +----------------------------------------+------------+-------------------+-----------------------+-----------------------+---------+---------+
 
 
 The above result formatted in L<Benchmark.pm|Benchmark> style:
 
                         Rate  TPCR:S  perl -e1 (baseline) 
-  TPCR:S               4.7/s      --                   0% 
-  perl -e1 (baseline)  4.7/s      0%                   -- 
+  TPCR:S               4.6/s      --                  -1% 
+  perl -e1 (baseline)  4.6/s      1%                   -- 
  
  Legends:
-   TPCR:S: mod_overhead_time=1.20795630000001 participant=TableData::Perl::CPAN::Release::Static
+   TPCR:S: mod_overhead_time=2.29145 participant=TableData::Perl::CPAN::Release::Static
    perl -e1 (baseline): mod_overhead_time=0 participant=perl -e1 (baseline)
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.

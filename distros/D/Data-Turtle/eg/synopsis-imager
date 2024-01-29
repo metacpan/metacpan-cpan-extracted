@@ -33,7 +33,7 @@ $turtle->backward(10);
 $turtle->pen_down;
 for my $i ( 1 .. 4 ) {
     my @line = $turtle->forward(50);
-    if ( @line ) {
+    if ( $turtle->pen_down ) {
         $img->line(
             x1    => $line[0],
             y1    => $line[1],

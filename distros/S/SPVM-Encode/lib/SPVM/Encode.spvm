@@ -1,0 +1,223 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Encode : precompile {
+  version "0.003";
+  
+  use IntList;
+  use Fn;
+  use Unicode::Normalize;
+  
+  static method decode_utf8 : string ($utf8_string : string) {
+    
+    my $string = Unicode::Normalize->NFC($utf8_string);
+    
+    return $string;
+  }
+  
+  static method encode_utf8 : string ($string : string) {
+    
+    my $utf8_string = copy $string;
+    
+    return $utf8_string;
+  }
+  
+  static method decode_utf16 : string ($utf16_string : short[]) {
+    my $code_points = &utf16_string_to_code_points($utf16_string);
+    
+    my $buffer = StringBuffer->new;
+    
+    for (my $i = 0; $i < @$code_points; $i++) {
+      my $code_point = $code_points->[$i];
+      my $utf8_char = Fn->chr($code_point);
+      $buffer->push($utf8_char);
+    }
+    
+    my $string = $buffer->to_string;
+    
+    return $string;
+  }
+  
+  static method encode_utf16 : short[] ($string : string) {
+    my $offset = 0;
+    my $code_points_list = IntList->new_len(0);
+    
+    my $string_length = length $string;
+    
+    while (1) {
+      unless ($offset < $string_length) {
+        last;
+      }
+      
+      my $code_point = Fn->get_code_point($string, \$offset);
+      
+      $code_points_list->push($code_point);
+    }
+    
+    unless ($offset >= length $string) {
+      die "Can't convert part of string to utf16";
+    }
+    
+    my $code_points = $code_points_list->to_array;
+    
+    my $utf16_string = &code_ponts_to_utf16_string($code_points);
+    
+    return $utf16_string;
+  }
+  
+  static method decode_utf32 : string ($utf32_string : int[]) {
+    
+    my $code_points = $utf32_string;
+    
+    my $buffer = StringBuffer->new;
+    
+    for (my $i = 0; $i < @$code_points; $i++) {
+      my $code_point = $code_points->[$i];
+      my $utf8_char = Fn->chr($code_point);
+      $buffer->push($utf8_char);
+    }
+    
+    my $string = $buffer->to_string;
+    
+    return $string;
+  }
+  
+  static method encode_utf32 : int[] ($string : string) {
+    my $offset = 0;
+    my $code_points_list = IntList->new_len(0);
+    
+    my $string_length = length $string;
+    
+    while (1) {
+      unless ($offset < $string_length) {
+        last;
+      }
+      
+      my $code_point = Fn->get_code_point($string, \$offset);
+      
+      $code_points_list->push($code_point);
+    }
+    
+    unless ($offset >= length $string) {
+      die "Can't convert part of string to utf16";
+    }
+    
+    my $code_points = $code_points_list->to_array;
+    
+    my $utf32_string = $code_points;
+    
+    return $utf32_string;
+  }
+  
+  private static method code_ponts_to_utf16_string : short[] ($code_points : int[]) {
+    my $length = 0;
+    
+    # Culcurate length
+    for (my $i = 0; $i < @$code_points; $i++) {
+      my $code_point = $code_points->[$i];
+      
+      if ($code_point < 0 || $code_point > 0x10FFFF) {
+        die "Invalid code point in code point string";
+      }
+      
+      if ($code_point < 0x10000) {
+        $length++;
+      }
+      else {
+        $length += 2;
+      }
+    }
+    
+    # Convert code point to UTF-16
+    my $utf8_string = new short[$length];
+    my $offset = 0;
+    
+    for (my $i = 0; $i < @$code_points; $i++) {
+      my $code_point = $code_points->[$i];
+      
+      if ($code_point < 0x10000) {
+        $utf8_string->[$offset] = (short)$code_point;
+        $offset++;
+      }
+      else {
+        $utf8_string->[$offset] = (short)(($code_point - 0x10000) / 0x400 + 0xD800);
+        $utf8_string->[$offset + 1] = (short)(($code_point - 0x10000) % 0x400 + 0xDC00);
+        $offset += 2;
+      }
+    }
+    
+    return $utf8_string;
+  }
+  
+  private static method utf16_string_to_code_points : int[] ($utf16_string : short[]) {
+    
+    my $length = 0;
+    
+    # Culcurate length
+    for (my $i = 0; $i < @$utf16_string; $i++) {
+      if (&_is_utf16_high_surrogate($utf16_string->[$i] & 0xFFFF)) {
+        if ($i + 1 == @$utf16_string - 1) {
+          die "Invalid UTF-16 string";
+        }
+        else {
+          $i++;
+          unless (&_is_utf16_low_surrogate($utf16_string->[$i] & 0xFFFF)) {
+            die "Invalid UTF-16 string";
+          }
+        }
+      }
+      elsif (&_is_utf16_low_surrogate($utf16_string->[$i] & 0xFFFF)) {
+        die "Invalid UTF-16 string";
+      }
+      $length++;
+    }
+    
+    # Convert UTF-16 string to code points
+    my $code_points = new int[$length];
+    my $offset = 0;
+    for (my $i = 0; $i < @$utf16_string; $i++) {
+      if (&_is_utf16_high_surrogate($utf16_string->[$i] & 0xFFFF)) {
+        $code_points->[$offset] = 0x10000 + (($utf16_string->[$i] & 0xFFFF) - 0xD800) * 0x400 + (($utf16_string->[$i + 1] & 0xFFFF) - 0xDC00);
+        $i++;
+      }
+      else {
+        $code_points->[$offset] = $utf16_string->[$i] & 0xFFFF;
+      }
+      $offset++;
+    }
+    
+    return $code_points;
+  }
+  
+  private static method _is_utf16_high_surrogate : int ($char : int) {
+    if ($char >= 0xD800 && $char < 0xDC00) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  private static method _is_utf16_low_surrogate : int ($char : int) {
+    if ($char >= 0xDC00 && $char < 0xE000) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  private static method is_unicode_scalar_value : int ($code_point: int) {
+    my $is_unicode_scalar_value = 0;
+    # The range of Unicde code points
+    if ($code_point >= 0 && $code_point <= 0x10FFFF) {
+      # Not surrogate code points
+      unless ($code_point >= 0xD800 && $code_point <= 0xDFFF) {
+        $is_unicode_scalar_value = 1;
+      }
+    }
+    
+    return $is_unicode_scalar_value;
+  }
+  
+}

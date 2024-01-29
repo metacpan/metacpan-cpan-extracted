@@ -19,7 +19,9 @@ if($@) {
 
 __END__
 CPAN
+Etienne
 GPL
 GPL2
 licence
 RT
+Tremel

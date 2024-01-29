@@ -1,0 +1,4 @@
+{
+  "build": { "dockerfile": "Dockerfile" },
+  "updateContentCommand": "sh .devcontainer/update_content.sh"
+}

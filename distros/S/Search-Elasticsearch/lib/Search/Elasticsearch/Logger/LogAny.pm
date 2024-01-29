@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Logger::LogAny;
-$Search::Elasticsearch::Logger::LogAny::VERSION = '8.00';
+$Search::Elasticsearch::Logger::LogAny::VERSION = '8.12';
 use Moo;
 with 'Search::Elasticsearch::Role::Logger';
 use Search::Elasticsearch::Util qw(parse_params to_list);
@@ -74,7 +74,7 @@ Search::Elasticsearch::Logger::LogAny - A Log::Any-based Logger implementation
 
 =head1 VERSION
 
-version 8.00
+version 8.12
 
 =head1 DESCRIPTION
 
@@ -155,7 +155,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Elasticsearch BV.
+This software is Copyright (c) 2024 by Elasticsearch BV.
 
 This is free software, licensed under:
 

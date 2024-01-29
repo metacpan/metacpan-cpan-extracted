@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
 
-package Test::Future::IO;
+package Test::Future::IO 0.06;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.05';
 
 use Carp;
 
@@ -55,6 +53,10 @@ make. The arguments to the expectation method should match those given by the
 code under test. Each expectation method returns an object which has
 additional methods to control the behaviour of that invocation.
 
+   $exp = $controller->expect_accept( $fh );
+
+   $exp = $controller->expect_connect( $fh, $name );
+
    $exp = $controller->expect_sleep( $secs );
 
    $exp = $controller->expect_sysread( $fh, $len );
@@ -82,8 +84,8 @@ Expectations can be set to remain pending rather than completing.
 
 As a convenience, a C<syswrite> expectation will default to returning a future
 that will complete yielding its length (as is usual for successful writes),
-and a C<sleep> expectation will return a future that completes yielding
-nothing.
+and a C<sleep> or C<connect> expectation will return a future that completes
+yielding nothing.
 
 Testing event-based code with C<expect_sysread> can be fragile, as it relies
 on exact ordering, buffer sizes, and so on. A more flexible approach that
@@ -114,6 +116,23 @@ my %sysread_buffers;
 
 require Future::IO;
 Future::IO->override_impl( $obj );
+
+sub expect_accept
+{
+   my $self = shift;
+   my ( $fh ) = @_;
+
+   return $controller->expect( accept => $fh );
+}
+
+sub expect_connect
+{
+   my $self = shift;
+   my ( $fh, $name ) = @_;
+
+   return $controller->expect( connect => $fh, $name )
+      ->will_done();
+}
 
 sub expect_sleep
 {

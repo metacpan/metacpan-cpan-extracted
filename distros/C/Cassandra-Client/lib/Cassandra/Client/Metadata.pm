@@ -1,6 +1,6 @@
 package Cassandra::Client::Metadata;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::Metadata::VERSION = '0.20';
+$Cassandra::Client::Metadata::VERSION = '0.21';
 use 5.010;
 use strict;
 use warnings;
@@ -52,7 +52,7 @@ Cassandra::Client::Metadata
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 AUTHOR
 

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
-package Tangence::Stream 0.30;
+package Tangence::Stream 0.32;
 
 use v5.26;
 use warnings;
@@ -68,7 +68,7 @@ mixin.
 
 =head2 tangence_write
 
-   $stream->tangence_write( $data )
+   $stream->tangence_write( $data );
 
 Write bytes of data to the connected peer. C<$data> will be a plain perl
 string.
@@ -77,7 +77,7 @@ string.
 
 =head2 handle_request_$CODE
 
-   $stream->handle_request_$CODE( $token, $message )
+   $stream->handle_request_$CODE( $token, $message );
 
 Invoked on receipt of a given message code. C<$token> will be some opaque perl
 scalar value, and C<$message> will be an instance of L<Tangence::Message>.
@@ -121,7 +121,7 @@ sub identity
 
 =head2 tangence_closed
 
-   $stream->tangence_closed
+   $stream->tangence_closed;
 
 Informs the object that the underlying connection has now been closed, and any
 attachments to C<Tangence::Object> or C<Tangence::ObjectProxy> instances
@@ -141,7 +141,7 @@ sub tangence_closed
 
 =head2 tangence_readfrom
 
-   $stream->tangence_readfrom( $buffer )
+   $stream->tangence_readfrom( $buffer );
 
 Informs the object that more data has been read from the underlying connection
 stream. Whole messages will be removed from the beginning of the C<$buffer>,
@@ -225,7 +225,7 @@ sub object_destroyed ( $self, $obj, $startsub, $donesub )
 
 =head2 request
 
-   $stream->request( %args )
+   $stream->request( %args );
 
 Serialises a message object to pass to the C<tangence_write> method, then
 enqueues a response handler to be invoked when a reply arrives. Takes the
@@ -242,13 +242,13 @@ The message body
 CODE reference to the callback to be invoked when a response to the message is
 received. It will be passed the response message:
 
-   $on_response->( $message )
+   $on_response->( $message );
 
 =back
 
 =head2 request (non-void)
 
-   $response = $stream->request( request => $request )->get
+   $response = await $stream->request( request => $request );
 
 When called in non-void context, this method returns a L<Future> that will
 yield the response instead. In this case it should not be given an
@@ -296,7 +296,7 @@ sub request ( $self, %args )
 
 =head2 respond
 
-   $stream->respond( $token, $message )
+   $stream->respond( $token, $message );
 
 Serialises a message object to be sent to the C<tangence_write> method. The
 C<$token> value that was passed to the C<handle_request_> method ensures that
@@ -326,7 +326,7 @@ sub respondERROR ( $self, $token, $string )
 
 =head2 minor_version
 
-   $ver = $stream->minor_version
+   $ver = $stream->minor_version;
 
 Returns the minor version negotiated by the C<MSG_INIT> / C<MSG_INITED>
 initial message handshake.

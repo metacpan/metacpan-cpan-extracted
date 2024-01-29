@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Hu::Any::Hu - Package for language Hungarian
 
 package Locale::CLDR::Locales::Hu::Any::Hu;
 # This file auto generated from Data\common\main\hu_HU.xml
-#	on Tue  5 Dec  1:14:43 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';

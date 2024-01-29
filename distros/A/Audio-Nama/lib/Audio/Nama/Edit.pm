@@ -8,12 +8,12 @@ use Audio::Nama::Globals qw(:singletons :trackrw);
 #  -  edit name (i.e. sax-v1) used as key in %by_name
 #
 
-use Modern::Perl;
+use Modern::Perl '2020';
 our $VERSION = 1.0;
 use Carp;
 no warnings qw(uninitialized);
 our @ISA;
-use vars qw($n %by_index %by_name );
+our($n, %by_index, %by_name);
 use Audio::Nama::Object qw( 
 				n
 				play_start_mark_name
@@ -246,7 +246,7 @@ sub edit_track 		{ $Audio::Nama::tn{$_[0]->edit_name} }             # in version
 # -------- Edit routines; Main Namespace ------
 {
 package Audio::Nama;
-use Modern::Perl; use Carp;
+use Modern::Perl '2020'; use Carp;
 no warnings 'uninitialized';
 
 our (
@@ -304,7 +304,7 @@ sub get_edit_mark {
 		reset_input_line();
 		if( $p == 3){ complete_edit_points() }
 		else{
-			$text->{term}->stuff_char(10);
+			$term->stuff_char(10);
 			&{$text->{term_attribs}->{'callback_read_char'}}();
 		}
 	}
@@ -368,8 +368,8 @@ sub new_edit {
 
 	# abort for many different reasons
 	
-	Audio::Nama::throw("You must use 'set_edit_points' before creating a new edit. Aborting."),
-		return unless @{$setup->{edit_points}};
+	Audio::Nama::throw("You must use 'set-edit-points' before creating a new edit. Aborting."),
+		return unless defined $setup->{edit_points};
 	my $overlap = grep { 
 		my $fail;
 		my $rst = $_->rec_start_time;
@@ -470,13 +470,13 @@ sub end_edit_mode  	{
 }
 sub destroy_edit {
 	Audio::Nama::throw("no edit selected"), return unless $this_edit;
-	my $reply = $text->{term}->readline('destroy edit "'.$this_edit->edit_name.
+	my $reply = $term->readline('destroy edit "'.$this_edit->edit_name.
 		qq(" and all its WAV files?? [n] ));
 	if ( $reply =~ /y/i ){
 		Audio::Nama::pager("permanently removing edit");
 		$this_edit->destroy;
 	}
-	$text->{term}->remove_history($text->{term}->where_history);
+	$term->remove_history($term->where_history);
 	$this_track = $this_edit->host;
 	end_edit_mode();
 }

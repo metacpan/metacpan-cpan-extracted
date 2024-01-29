@@ -1,4 +1,4 @@
-package EAI::File 1.904;
+package EAI::File 1.908;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import);use Text::CSV();use Data::XLSX::Parser();use Spreadsheet::ParseExcel();use Spreadsheet::WriteExcel();use Excel::Writer::XLSX();use Data::Dumper qw(Dumper);use XML::LibXML();use XML::LibXML::Debugging();
@@ -828,7 +828,7 @@ returns 0 on error, 1 if OK
 
 =head1 COPYRIGHT
 
-Copyright (c) 2023 Roland Kapl
+Copyright (c) 2024 Roland Kapl
 
 All rights reserved.  This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.

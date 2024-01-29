@@ -1,12 +1,13 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Cache/Tables.pm
-## Version v0.100.3
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Version v0.100.4
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/09/04
+## Modified 2023/10/20
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -22,7 +23,7 @@ BEGIN
     use Fcntl qw( :flock );
     use Module::Generic::File qw( sys_tmpdir );
     use Devel::Confess;
-    our $VERSION = 'v0.100.3';
+    our $VERSION = 'v0.100.4';
 };
 
 use strict;
@@ -80,7 +81,7 @@ sub get
 {
     my $self = shift( @_ );
     my $opts = {};
-    $opts = shift( @_ ) if( @_ && $self->_is_hash( $_[0] ) );
+    $opts = shift( @_ ) if( @_ && $self->_is_hash( $_[0] => 'strict' ) );
     foreach my $k ( qw( host port driver ) )
     {
         return( $self->error( "Parameter \"$k\" is missing." ) ) if( !length( $opts->{ $k } ) );
@@ -131,7 +132,7 @@ sub set
 {
     my $self = shift( @_ );
     my $hash = shift( @_ ) || return( $self->error( "No hash reference was provided to add to tables cache." ) );
-    return( $self->error( "Hash reference provided for tables cache ($hash) is not a hash reference." ) ) if( !$self->_is_hash( $hash ) );
+    return( $self->error( "Hash reference provided for tables cache ($hash) is not a hash reference." ) ) if( !$self->_is_hash( $hash => 'strict' ) );
     foreach my $k ( qw( host port driver tables ) )
     {
         return( $self->error( "Tables cache provided is missing the \"$k\" key." ) ) if( !length( $hash->{ $k } ) );
@@ -174,7 +175,7 @@ sub write
         {
             $tables_cache_file->lock( LOCK_SH );
         };
-        $fh->print( $j->encode( $hash ) ) || return( $self->error( "Unable to write data to tables cache file \"$tables_cache_file\": $!" ) );
+        $fh->print( $j->encode( $hash ) ) || return( $self->error( "Unable to write data to tables cache file \"$tables_cache_file\": ", $tables_cache_file->error ) );
         eval
         {
             $tables_cache_file->unlock;
@@ -182,13 +183,13 @@ sub write
         $self->updated( $tables_cache_file->finfo->mtime );
         return( -s( $tables_cache_file ) );
     }
-    elsif( -e( $tables_cache_file ) && !-w( $tables_cache_file ) )
+    elsif( $tables_cache_file->exists && !$tables_cache_file->can_write )
     {
-        return( $self->error( "Table cache file \"$tables_cache_file\" does not have write permission: $!" ) );
+        return( $self->error( "Table cache file \"$tables_cache_file\" does not have write permission: ", $tables_cache_file->error ) );
     }
     else
     {
-        return( $self->error( "Although table cache file \"$tables_cache_file\" is writable, I am unable to write to it: $!" ) );
+        return( $self->error( "Although table cache file \"$tables_cache_file\" is writable, I am unable to write to it: ", $tables_cache_file->error ) );
     }
 }
 
@@ -234,11 +235,11 @@ DB::Object::Cache::Tables - Table Cache
     
 =head1 VERSION
 
-    v0.100.3
+    v0.100.4
 
 =head1 DESCRIPTION
 
-This is a simple given to maintain a cache of database tables in a session. When a connection object is created, it will issue a query to get the list of all tables and views in the database and pass it to L<DB::Object::Cache::Tables>, and save its object. It is then used later several times such as when instantiating table objects.
+This is a simple way to maintain a cache of database tables in a session. When a connection object is created, it will issue a query to get the list of all tables and views in the database and pass it to L<DB::Object::Cache::Tables>, and save its object. It is then used later several times such as when instantiating table objects.
 
 =head1 METHODS
 

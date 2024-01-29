@@ -1,5 +1,5 @@
 package App::SmokeBrew::BuildPerl;
-$App::SmokeBrew::BuildPerl::VERSION = '1.04';
+$App::SmokeBrew::BuildPerl::VERSION = '1.06';
 #ABSTRACT: build and install a particular version of Perl
 
 use strict;
@@ -178,7 +178,7 @@ App::SmokeBrew::BuildPerl - build and install a particular version of Perl
 
 =head1 VERSION
 
-version 1.04
+version 1.06
 
 =head1 SYNOPSIS
 
@@ -298,7 +298,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Chris Williams.
+This software is copyright (c) 2023 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

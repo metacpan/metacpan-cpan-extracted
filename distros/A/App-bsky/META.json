@@ -1,0 +1,104 @@
+{
+   "X_No_Archive" : "Yes",
+   "abstract" : "A Command-line Bluesky Client",
+   "author" : [
+      "Sanko Robinson <sanko@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.23",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-bsky",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Code::TidyAll" : "0",
+            "Code::TidyAll::Plugin::PodTidy" : "0",
+            "Data::Dump" : "0",
+            "Perl::Tidy" : "0",
+            "Pod::Tidy" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0",
+            "Test::PAUSE::Permissions" : "0",
+            "Test::Pod" : "0",
+            "Test::Spellunker" : "0"
+         },
+         "requires" : {
+            "CPAN::Uploader" : "0",
+            "Minilla" : "0",
+            "Pod::Markdown::Github" : "0",
+            "Software::License::Artistic_2_0" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Version::Next" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "At" : "0.15",
+            "File::HomeDir" : "0",
+            "Getopt::Long" : "0",
+            "JSON::Tiny" : "0",
+            "Path::Tiny" : "0",
+            "Pod::Text::Color" : "0",
+            "Term::ANSIColor" : "0",
+            "perl" : "v5.38.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::bsky" : {
+         "file" : "lib/App/bsky.pm",
+         "version" : "0.03"
+      },
+      "App::bsky::CLI" : {
+         "file" : "lib/App/bsky.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sanko/App-bsky/issues"
+      },
+      "homepage" : "https://github.com/sanko/App-bsky",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sanko/App-bsky.git",
+         "web" : "https://github.com/sanko/App-bsky"
+      }
+   },
+   "version" : "0.03",
+   "x_authority" : "cpan:SANKO",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

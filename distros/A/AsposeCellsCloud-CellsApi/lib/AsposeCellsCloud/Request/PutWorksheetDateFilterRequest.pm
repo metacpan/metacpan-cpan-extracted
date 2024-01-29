@@ -59,21 +59,21 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetDateFilterRequest.name : The workbook name.  ,
+# PutWorksheetDateFilterRequest.name : The file name.  ,
 # PutWorksheetDateFilterRequest.sheetName : The worksheet name.  ,
 # PutWorksheetDateFilterRequest.range : Represents the range to which the specified AutoFilter applies.  ,
 # PutWorksheetDateFilterRequest.fieldIndex : The integer offset of the field on which you want to base the filter (from the left of the list; the leftmost field is field 0).  ,
-# PutWorksheetDateFilterRequest.dateTimeGroupingType : Specifies how to group dateTime values(Day,Hour,Minute,Month,Second,Year).  ,
+# PutWorksheetDateFilterRequest.dateTimeGroupingType : Specifies how to group dateTime values (Day, Hour, Minute, Month, Second, Year).  ,
 # PutWorksheetDateFilterRequest.year : The year.  ,
 # PutWorksheetDateFilterRequest.month : The month.  ,
 # PutWorksheetDateFilterRequest.day : The day.  ,
 # PutWorksheetDateFilterRequest.hour : The hour.  ,
 # PutWorksheetDateFilterRequest.minute : The minute.  ,
 # PutWorksheetDateFilterRequest.second : The second.  ,
-# PutWorksheetDateFilterRequest.matchBlanks : Match all blank or not blank cell in the list.(true/false)  ,
-# PutWorksheetDateFilterRequest.refresh : If true, hide the filtered rows.  ,
-# PutWorksheetDateFilterRequest.folder : Original workbook folder.  ,
-# PutWorksheetDateFilterRequest.storageName : Storage name.   
+# PutWorksheetDateFilterRequest.matchBlanks : Match all blank cell in the list.  ,
+# PutWorksheetDateFilterRequest.refresh : Refresh auto filters to hide or unhide the rows.  ,
+# PutWorksheetDateFilterRequest.folder : The folder where the file is situated.  ,
+# PutWorksheetDateFilterRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -84,7 +84,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_date_filter' } = { 
-    	summary => 'Adds date filter in worksheet.',
+    	summary => 'Apply a date filter in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -185,7 +185,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -213,7 +213,7 @@ __PACKAGE__->method_documentation({
      'date_time_grouping_type' => {
      	datatype => 'string',
      	base_name => 'dateTimeGroupingType',
-     	description => 'Specifies how to group dateTime values(Day,Hour,Minute,Month,Second,Year).',
+     	description => 'Specifies how to group dateTime values (Day, Hour, Minute, Month, Second, Year).',
      	format => '',
      	read_only => '',
      		},
@@ -262,28 +262,28 @@ __PACKAGE__->method_documentation({
      'match_blanks' => {
      	datatype => 'string',
      	base_name => 'matchBlanks',
-     	description => 'Match all blank or not blank cell in the list.(true/false)',
+     	description => 'Match all blank cell in the list.',
      	format => '',
      	read_only => '',
      		},
      'refresh' => {
      	datatype => 'string',
      	base_name => 'refresh',
-     	description => 'If true, hide the filtered rows.',
+     	description => 'Refresh auto filters to hide or unhide the rows.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

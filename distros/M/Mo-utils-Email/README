@@ -1,0 +1,91 @@
+NAME
+    Mo::utils::Email - Mo utilities for email.
+
+SYNOPSIS
+     use Mo::utils::Email qw(check_email);
+
+     check_email($self, $key);
+
+DESCRIPTION
+    Mo utilities for email checking of data objects.
+
+SUBROUTINES
+  "check_email"
+     check_email($self, $key);
+
+    Check parameter defined by $key which is valid email.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+ERRORS
+     check_email(): 
+             Parameter '%s' doesn't contain valid email.
+                     Value: %s
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Mo::utils::Email qw(check_email);
+
+     my $self = {
+             'key' => 'michal.josef.spacek@gmail.com',
+     };
+     check_email($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Email qw(check_email);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'michal.josef.špaček@gmail.com',
+     };
+     check_email($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..utils.pm:?] Parameter 'key' doesn't contain valid email.
+
+DEPENDENCIES
+    Email::Valid, Error::Pure, Exporter, Readonly.
+
+SEE ALSO
+    Mo  Micro Objects. Mo is less.
+
+    Mo::utils::Language
+        Mo language utilities.
+
+    Wikibase::Datatype::Utils
+        Wikibase datatype utilities.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Mo-utils-Email>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023-2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230903131448;
+our $VERSION = 1.20231210185946;
 
 my $formatters = [
                 {
@@ -132,32 +132,32 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"42136", "Levice",
-"42138", "Topolcany",
+$areanames{en} = {"42141", "Zilina",
 "42133", "Trnava",
-"42132", "Trencin",
-"42131", "Dunajska\ Streda",
-"42145", "Zvolen",
+"421601", "Roznava",
+"42151", "Presov",
 "42137", "Nitra",
+"42132", "Trencin",
+"42154", "Bardejov",
+"42146", "Prievidza",
+"4212", "Bratislava",
+"42144", "Liptovsky\ Mikulas",
+"42156", "Michalovce",
+"42135", "Nove\ Zamky",
+"42138", "Topolcany",
+"42136", "Levice",
 "42134", "Senica",
 "42155", "Kosice",
-"4212", "Bratislava",
-"42148", "Banska\ Bystrica",
-"42146", "Prievidza",
-"42151", "Presov",
-"42152", "Poprad",
-"42153", "Spisska\ Nova\ Ves",
-"42142", "Povazska\ Bystrica",
-"42143", "Martin",
 "42158", "Roznava",
-"421601", "Roznava",
-"42156", "Michalovce",
-"42141", "Zilina",
-"42135", "Nove\ Zamky",
-"42154", "Bardejov",
+"42148", "Banska\ Bystrica",
+"42145", "Zvolen",
+"42131", "Dunajska\ Streda",
+"42153", "Spisska\ Nova\ Ves",
+"42143", "Martin",
+"42152", "Poprad",
 "42147", "Lucenec",
-"42144", "Liptovsky\ Mikulas",
-"42157", "Humenne",};
+"42157", "Humenne",
+"42142", "Povazska\ Bystrica",};
 
     sub new {
       my $class = shift;

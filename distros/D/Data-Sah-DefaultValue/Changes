@@ -1,3 +1,13 @@
+0.005   2024-01-17  Released-By: PERLANCAR; Urgency: medium
+
+        - Support specifying gen arguments as string.
+
+
+0.004   2023-12-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Add argument to gen_default_value_rules(): extra_args.
+
+
 0.003   2023-03-30  Released-By: PERLANCAR; Urgency: medium
 
         - Move Path::filenames default value rule to

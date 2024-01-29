@@ -1,5 +1,35 @@
 Revision history for Music-ModalFunction
 
+0.0408 2024-01-25 11:28:21
+    - Improve documentation more!
+
+0.0407 2024-01-24 22:52:56
+    - Improve documentation.
+
+0.0406 2024-01-12 17:41:50
+    - Add a companion example and test for common chords.
+
+0.0405 2024-01-12 17:21:56
+    - Add a simple but crucial example and test for common chords.
+
+0.0404 2024-01-12 15:03:45
+    - Use named results in the eg/mode-pivot program.
+
+0.0403 2024-01-12 01:30:38
+    - Fix documentation again...
+
+0.0402 2024-01-12 01:01:39
+    - Fix stupid typo.
+
+0.0401 2024-01-12 00:55:09
+    - Fix documentation.
+
+0.0400 2024-01-12 00:34:18
+    - Return hash results if requested.
+
+0.0316 2024-01-05 11:45:32
+    - Improve documentation.
+
 0.0315 2023-07-16 07:33:22
     - Pin the needed MIDI::Util version.
 

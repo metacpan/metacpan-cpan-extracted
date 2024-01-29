@@ -602,13 +602,25 @@ sub SimpleQuery {
         }
     }
 
-    # Check @bind_values for HASH refs
+    # Check @bind_values for HASH refs. These can be sent as type settings
+    # or hits for the DBD module for dealing with certain data types,
+    # usually BLOBS.
     for ( my $bind_idx = 0 ; $bind_idx < scalar @bind_values ; $bind_idx++ ) {
         if ( ref( $bind_values[$bind_idx] ) eq "HASH" ) {
             my $bhash = $bind_values[$bind_idx];
             $bind_values[$bind_idx] = $bhash->{'value'};
             delete $bhash->{'value'};
-            $sth->bind_param( $bind_idx + 1, undef, $bhash );
+
+            # DBD::MariaDB only works using the string version of setting type,
+            # so convert the hash to the string for this case.
+            if ( $self->isa('DBIx::SearchBuilder::Handle::MariaDB')
+                 && $bhash->{'TYPE'}
+                 && $bhash->{'TYPE'} eq 'SQL_BLOB' ) {
+                $sth->bind_param( $bind_idx + 1, undef, DBI::SQL_BLOB );
+            }
+            else {
+                $sth->bind_param( $bind_idx + 1, undef, $bhash );
+            }
         }
     }
 
@@ -1948,5 +1960,18 @@ sub DESTROY {
     delete $DBIHandle{$self};
 }
 
+=head2 CastAsDecimal FIELD
+
+Cast the given field as decimal.
+
+E.g. on Pg, it's C<CAST(Content AS DECIMAL)>.
+
+=cut
+
+sub CastAsDecimal {
+    my $self  = shift;
+    my $field = shift or return;
+    return "CAST($field AS DECIMAL)";
+}
 
 1;

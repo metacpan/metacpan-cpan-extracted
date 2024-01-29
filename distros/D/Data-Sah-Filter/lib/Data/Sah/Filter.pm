@@ -9,9 +9,9 @@ use Data::Sah::FilterCommon;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-16'; # DATE
+our $DATE = '2024-01-17'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 our @EXPORT_OK = qw(gen_filter);
 
@@ -119,7 +119,7 @@ Data::Sah::Filter - Filtering for Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.022 of Data::Sah::Filter (from Perl distribution Data-Sah-Filter), released on 2023-08-16.
+This document describes version 0.024 of Data::Sah::Filter (from Perl distribution Data-Sah-Filter), released on 2024-01-17.
 
 =head1 SYNOPSIS
 
@@ -133,6 +133,13 @@ This document describes version 0.022 of Data::Sah::Filter (from Perl distributi
  my $val = $c->("foo");        # unchanged, "foo"
  my $val = $c->(" foo ");      # "foo"
 
+Another example:
+
+ my $c = gen_filter(
+     filter_names       => [ ['Str::remove_comment' => {style=>'shell'}] ],
+     #filter_names      => ['Str::remove_comment=style,shell'], # same as above
+ );
+
 =head1 DESCRIPTION
 
 This distribution contains a standard set of filter rules for L<Data::Sah> (to
@@ -143,12 +150,13 @@ A filter rule is put in C<Data::Sah::Filter::$COMPILER::$CATEGORY:$DESCRIPTION>
 module, for example: L<Data::Sah::Filter::perl::Str::trim> for trimming
 whitespace at the beginning and end of string.
 
-Basically, a filter rule will provide a Perl expression (C<expr_filter>) to
-convert one data to another. Multiple filter rules can be combined to form the
-final filtering code. This code can be used by C<Data::Sah> when generating
-validator code from L<Sah> schema, or can be used directly. Some projects which
-use filtering rules directly include: L<App::orgadb> (which lets users specify
-filters from the command-line).
+Basically, a filter rule will provide an expression (in C<expr_filter>) in the
+target language (e.g. Perl, JavaScript, or others) to convert one data to
+another. Multiple filter rules can be combined to form the final filtering code.
+This code can be used by C<Data::Sah> when generating validator code from L<Sah>
+schema, or can be used directly. Some projects which use filtering rules
+directly include: L<App::orgadb> (which lets users specify filters from the
+command-line).
 
 =head2 meta()
 
@@ -309,27 +317,33 @@ code):
 
 =item 35. L<Data::Sah::Filter::perl::Str::remove_comment>
 
-=item 36. L<Data::Sah::Filter::perl::Str::remove_nondigit>
+=item 36. L<Data::Sah::Filter::perl::Str::remove_non_latin_alphanum>
 
-=item 37. L<Data::Sah::Filter::perl::Str::remove_whitespace>
+=item 37. L<Data::Sah::Filter::perl::Str::remove_nondigit>
 
-=item 38. L<Data::Sah::Filter::perl::Str::replace_map>
+=item 38. L<Data::Sah::Filter::perl::Str::remove_whitespace>
 
-=item 39. L<Data::Sah::Filter::perl::Str::rtrim>
+=item 39. L<Data::Sah::Filter::perl::Str::replace_map>
 
-=item 40. L<Data::Sah::Filter::perl::Str::trim>
+=item 40. L<Data::Sah::Filter::perl::Str::rtrim>
 
-=item 41. L<Data::Sah::Filter::perl::Str::try_center>
+=item 41. L<Data::Sah::Filter::perl::Str::trim>
 
-=item 42. L<Data::Sah::Filter::perl::Str::uc>
+=item 42. L<Data::Sah::Filter::perl::Str::try_center>
 
-=item 43. L<Data::Sah::Filter::perl::Str::ucfirst>
+=item 43. L<Data::Sah::Filter::perl::Str::uc>
 
-=item 44. L<Data::Sah::Filter::perl::Str::upcase>
+=item 44. L<Data::Sah::Filter::perl::Str::ucfirst>
 
-=item 45. L<Data::Sah::Filter::perl::Str::uppercase>
+=item 45. L<Data::Sah::Filter::perl::Str::underscore_non_latin_alphanum>
 
-=item 46. L<Data::Sah::Filter::perl::Str::wrap>
+=item 46. L<Data::Sah::Filter::perl::Str::underscore_non_latin_alphanums>
+
+=item 47. L<Data::Sah::Filter::perl::Str::upcase>
+
+=item 48. L<Data::Sah::Filter::perl::Str::uppercase>
+
+=item 49. L<Data::Sah::Filter::perl::Str::wrap>
 
 =back
 
@@ -431,7 +445,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

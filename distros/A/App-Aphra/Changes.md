@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.1.1] - 2024-01-24
+
+### Fixed
+
+- Improved CI and repo metadata
+
 ## [0.1.0] - 2023-10-27
 
 ### Fixed

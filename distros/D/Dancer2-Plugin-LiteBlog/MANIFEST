@@ -4,7 +4,9 @@ ignore.txt
 lib/Dancer2/Plugin/LiteBlog.pm
 lib/Dancer2/Plugin/LiteBlog/Activities.pm
 lib/Dancer2/Plugin/LiteBlog/Article.pm
+lib/Dancer2/Plugin/LiteBlog/Custom.pm
 lib/Dancer2/Plugin/LiteBlog/Splash.pm
+lib/Dancer2/Plugin/LiteBlog/Caroussel.pm
 lib/Dancer2/Plugin/LiteBlog/Blog.pm
 lib/Dancer2/Plugin/LiteBlog/Scaffolder.pm
 lib/Dancer2/Plugin/LiteBlog/Scaffolder/Data.pm

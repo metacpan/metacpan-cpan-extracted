@@ -1,13 +1,24 @@
 Revision history for Perl extension UI-Various
 
-0.44 2023-11-11T13:20:34Z
+1.00 2024-01-20T10:11:50Z
+
+1.00 2024-01-20T10:11:21Z
+
+    - fix for DoD check "uncoverable"
+    - fixed some TODOs, spelling, documentation
+    - added attributes for colours (foreground and background)
+    - boxes without borders are now more compact in Curses
+    - fixed some comment headers in unit tests
+    - added wrapper script (BaSH) to run all examples in sequence
+    - enabled UTF-8 graphics in RichTerm
+    - running out of input in 41-curses tests now produces full stack-trace
 
 0.44 2023-11-11T13:20:10Z
 
     - improved builder/dod-check.pl
-    - added another KNWON ERROR comment (for smokers)
+    - added another KNOWN ERROR comment (for smokers)
     - added missing German translations
-    - descriminate identical error messages in builder/update-language.pl
+    - discriminate identical error messages in builder/update-language.pl
 
 0.43 2023-09-16T12:45:31Z
 
@@ -20,7 +31,7 @@ Revision history for Perl extension UI-Various
 0.41 2023-08-31T11:39:43Z
 
     - added some more tests and diagnostics to handle deep recursion in _cd
-      (which is still happening and not yet completley prevented)
+      (which is still happening and not yet completely prevented)
     - added some comments about sporadic Curses::UI problems to t/41-curses.t
 
 0.40 2023-08-02T07:30:58Z
@@ -31,8 +42,8 @@ Revision history for Perl extension UI-Various
 0.39 2023-07-30T07:43:21Z
 
     - fixed failing test with Term::ReadLine::Gnu >= 1.46 in t/51-rich-term.t
-    - made DoD script useable for other projects
-    - made language support script useable for other projects
+    - made DoD script usable for other projects
+    - made language support script usable for other projects
     - removed hopefully obsolete workaround for coverage
     - fixed typo in message in test 51
     - skipping some broken tests on Windows/Cygwin
@@ -46,15 +57,15 @@ Revision history for Perl extension UI-Various
     - added flag to make symbolic links selectable in FileSelect
     - stderr => 1 is now treated as 0 for PoorTerm
     - fixed bug when selecting protected directories in FileSelect
-    - fixed bug in Curses::Window occuring when dimension is missing
+    - fixed bug in Curses::Window occurring when dimension is missing
     - fixed handling of opendir errors in FileSelect
 
 0.37 2022-12-27T12:58:35Z
 
     - added method to modify element of Listbox
-    - fixed bug in Curses::Dialog occuring when dimension is missing
+    - fixed bug in Curses::Dialog occurring when dimension is missing
     - fixed some POD errors
-    - improved alingment of Check and Radio buttons for Tk
+    - improved alignment of Check and Radio buttons for Tk
 
 0.36 2022-12-25T16:08:48Z
 
@@ -67,7 +78,7 @@ Revision history for Perl extension UI-Various
 
     - minor improvements in dod-check.pl
     - added alignment attribute
-    - refactroed handling of attributes in Tk
+    - refactored handling of attributes in Tk
     - modified code for average character width in Tk
     - minor refactoring for concise code
 
@@ -118,10 +129,10 @@ Revision history for Perl extension UI-Various
     - minor addition to documentation of DoD script
     - added Compound::FileSelect widget
     - fixed missing width in Curses::Button
-    - fixed buggy modification behavior in PoorTerm::Listbox
+    - fixed buggy modification behaviour in PoorTerm::Listbox
     - fixed self-destruction of PoorTerm::toplevel via Button in Boxes
     - fixed bad prompting in RichTerm::Optionmenu
-    - fixed totally broken behavior of Dialog for Tk
+    - fixed totally broken behaviour of Dialog for Tk
     - added tests and fixed handling of undisplayed Listbox in Tk
     - added script for simple syntax checking of all modules
     - added core function 'message'
@@ -190,7 +201,7 @@ Revision history for Perl extension UI-Various
     - added Radio(button) widget
     - improved switches for DoD checks
     - refactored handling of variable references
-    - minor improvments in documentation
+    - minor improvements in documentation
 
 0.15 2022-01-25T10:09:13Z
 
@@ -213,7 +224,7 @@ Revision history for Perl extension UI-Various
 
 0.13 2022-01-10T09:08:37Z
 
-    - replaced bareword filehandle in call_with_stdin unit-test helper
+    - replaced bare-word file-handle in call_with_stdin unit-test helper
     - moved diagnostics introduced in 0.12
 
 0.12 2022-01-09T07:25:51Z

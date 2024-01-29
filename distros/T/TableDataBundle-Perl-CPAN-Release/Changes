@@ -1,3 +1,9 @@
+20231126.0  2023-11-26  Released-By: PERLANCAR; Urgency: medium
+
+            - Make ::GroupedWeekly table data faster (the DateTime
+              calculation is the bottleneck).
+
+
 20231120.3  2023-11-25  Released-By: PERLANCAR; Urgency: medium
 
             - Add tables:

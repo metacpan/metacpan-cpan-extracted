@@ -14,33 +14,37 @@ while (<DATA>) {
 
     my ($x_str, $mant_str, $expo_str) = split /:/;
 
-    note(qq|\n\$x = Math::BigFloat -> new("$x_str");|,
-         qq| (\$m, \$e) = \$x -> sparts();\n\n|);
+    my ($test, $x, $mant, $expo);
 
-    {
-        my $x = Math::BigFloat -> new($x_str);
-        my ($mant_got, $expo_got) = $x -> sparts();
+    # List context.
 
-        is(ref($mant_got), "Math::BigFloat");
-        is(ref($expo_got), "Math::BigFloat");
+    $test = qq|\$x = Math::BigFloat -> new("$x_str"); |
+          . qq|(\$mant, \$expo) = \$x -> sparts();|;
 
-        is($mant_got, $mant_str, "value of mantissa");
-        is($expo_got, $expo_str, "value of exponent");
-        is($x,        $x_str,    "input is unmodified");
-    }
+    note "\n", $test, "\n\n";
+    eval $test;
+    die $@ if $@;
 
-    note(qq|\n\$x = Math::BigFloat -> new("$x_str");|,
-         qq| \$m = \$x -> sparts();\n\n|);
+    is(ref($mant), "Math::BigFloat");
+    is(ref($expo), "Math::BigFloat");
 
-    {
-        my $x = Math::BigFloat -> new($x_str);
-        my $mant_got = $x -> sparts();
+    is($mant, $mant_str, "value of mantissa");
+    is($expo, $expo_str, "value of exponent");
+    is($x,    $x_str,    "input is unmodified");
 
-        is(ref($mant_got), "Math::BigFloat");
+    # Scalar context.
 
-        is($mant_got, $mant_str, "value of mantissa");
-        is($x,        $x_str,    "input is unmodified");
-    }
+    $test = qq|\$x = Math::BigFloat -> new("$x_str"); |
+          . qq|\$mant = \$x -> sparts();|;
+
+    note "\n", $test, "\n\n";
+    eval $test;
+    die $@ if $@;
+
+    is(ref($mant), "Math::BigFloat");
+
+    is($mant, $mant_str, "value of mantissa");
+    is($x,    $x_str,    "input is unmodified");
 
 }
 

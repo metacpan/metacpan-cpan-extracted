@@ -17,6 +17,7 @@ Note:  The Raspberry Pi typically defaults to 16 bit color mode.  Please
 
 Loading very large images can crash if your system does not have enough RAM.
 This is something you need to keep in mind before loading giant pictures.
+Just resize them appropriately before using your script.
 
 ##############################################################################
 

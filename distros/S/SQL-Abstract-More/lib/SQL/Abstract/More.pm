@@ -19,7 +19,7 @@ use namespace::clean;
 # declare error-reporting functions from SQL::Abstract
 sub puke(@); sub belch(@);  # these will be defined later in import()
 
-our $VERSION = '1.40';
+our $VERSION = '1.42';
 our @ISA;
 
 sub import {
@@ -34,7 +34,7 @@ sub import {
   # syntactic sugar : 'Classic' is expanded into SQLA::Classic
   $parent_sqla = 'SQL::Abstract::Classic' if $parent_sqla eq 'Classic';
 
-  # make sure that import() does never get called with different parents
+  # make sure that import() is never called with different parents
   if (my $already_isa = $ISA[0]) {
     $already_isa eq $parent_sqla
       or die "cannot use SQL::Abstract::More -extends => '$parent_sqla', "
@@ -189,6 +189,7 @@ my %params_for_select = (
                                                      depends  => '-limit'},
   -for          => {type => SCALAR|UNDEF,            optional => 1},
   -want_details => {type => BOOLEAN,                 optional => 1},
+  -as           => {type => SCALAR,                  optional => 1},
 );
 my %params_for_insert = (
   -into         => {type => SCALAR},
@@ -345,24 +346,113 @@ sub _prepend_WITH_clause {
 sub select {
   my $self = shift;
 
-  # if got positional args, this is not our job, just delegate to the parent
+  # if this method was called with positional args, just delegate to the parent
   return $self->next::method(@_) if !&_called_with_named_args;
-
-  my %aliased_columns;
 
   # parse arguments
   my %args = validate(@_, \%params_for_select);
 
-  # compute join info if the datasource is a join
-  my $join_info = $self->_compute_join_info($args{-from});
-  $args{-from}  = \($join_info->{sql}) if $join_info;
+  # infrastructure for collecting fragments of sql and bind args
+  my ($sql, @bind) = ("");
+  my $add_sql_bind = sub { $sql .= shift; push @bind, @_}; # closure to add to ($sql, @bind)
 
-  # reorganize columns; initial members starting with "-" are extracted
-  # into a separate list @post_select, later re-injected into the SQL
-  my @cols = ref $args{-columns} ? @{$args{-columns}} : $args{-columns};
+  # parse columns and datasource
+  my ($cols, $post_select, $cols_bind, $aliased_columns) = $self->_parse_columns($args{-columns});
+  my ($from,               $from_bind, $aliased_tables)  = $self->_parse_from($args{-from});
+  $add_sql_bind->("", @$cols_bind, @$from_bind);
+
+  # generate main ($sql, @bind) through the old positional API
+  $add_sql_bind->($self->next::method($from, $cols, $args{-where}));
+
+  # add @post_select clauses if needed (for ex. -distinct)
+  my $all_post_select = join " ", @$post_select;
+  $sql =~ s[^SELECT ][SELECT $all_post_select ]i if $all_post_select;
+
+  # add set operators (UNION, INTERSECT, etc) if needed
+  foreach my $set_op (@set_operators) {
+    if (my $val_set_op = $args{-$set_op}) {
+      my ($sql_set_op, @bind_set_op) = $self->_parse_set_operator($set_op => $val_set_op, $cols, $from);
+      $add_sql_bind->($sql_set_op, @bind_set_op);
+    } 
+  }
+  
+  # add GROUP BY if needed
+  if ($args{-group_by}) {
+    my $sql_grp = $self->where(undef, $args{-group_by});
+    $sql_grp =~ s/\bORDER\b/GROUP/;
+    $add_sql_bind->($sql_grp);
+  }
+
+  # add HAVING if needed (often together with -group_by, but not always)
+  if ($args{-having}) {
+    my ($sql_having, @bind_having) = $self->where($args{-having});
+    $sql_having =~ s/\bWHERE\b/HAVING/;
+    $add_sql_bind->(" $sql_having", @bind_having);
+  }
+
+  # add ORDER BY if needed
+  if (my $order = $args{-order_by}) {
+    $add_sql_bind->($self->_order_by($order));
+  }
+
+  # add pagination if needed (either -page_* args or -limit/-offset)
+  $self->_translate_page_into_limit_offset(\%args) if $args{-page_index} or $args{-page_size};
+  if (defined $args{-limit}) {
+    my ($limit_sql, @limit_bind) = $self->limit_offset(@args{qw/-limit -offset/});
+    if ($limit_sql =~ /%s/) {
+      $sql = sprintf $limit_sql, $sql; # rewrite the whole $sql
+      push @bind, @limit_bind;
+    }
+    else {
+      $add_sql_bind->(" $limit_sql", @limit_bind);
+    }
+  }
+
+  # add FOR clause if needed
+  my $for = exists $args{-for} ? $args{-for} : $self->{select_implicitly_for};
+  $add_sql_bind->(" FOR $for") if $for;
+
+  # add alias if select() is used as a subquery
+  if (my $alias = $args{-as}) {
+    $sql = "($sql)|$alias";
+  }
+
+  # initial WITH clause
+  $self->_prepend_WITH_clause(\$sql, \@bind);
+
+  # return results
+  return $args{-want_details} ? {aliased_tables  => $aliased_tables,
+                                 aliased_columns => $aliased_columns,
+                                 sql             => $sql,
+                                 bind            => \@bind}
+                              : ($sql, @bind);
+}
+
+
+sub _parse_columns {
+  my ($self, $columns) = @_;
+
+  # the -columns arg can be an arrayref or a plain scalar => unify into an array
+  my @cols = ref $columns ? @$columns : ($columns);
+
+  # initial members of the columns list starting with "-" are extracted
+  # into a separate list @post_select, later re-injected into the SQL (for ex. '-distinct')
   my @post_select;
   push @post_select, shift @cols while @cols && $cols[0] =~ s/^-//;
+
+  # loop over columns, handling aliases and subqueries
+  my @cols_bind;
+  my %aliased_columns;
   foreach my $col (@cols) {
+
+    # deal with subquery of shape \ [$sql, @bind]
+    if (_is_subquery($col)) {
+      my ($sql, @col_bind) = @$$col;
+      $sql =~ s{^(select.*)}{($1)}is; # if subquery is a plain SELECT, put it in parenthesis
+      $col = $sql;
+      push @cols_bind, @col_bind;
+    }
+
     # extract alias, if any
     if ($col =~ /^\s*         # ignore insignificant leading spaces
                  (.*[^|\s])   # any non-empty string, not ending with ' ' or '|'
@@ -374,90 +464,74 @@ sub select {
       $col = $self->column_alias($1, $2);
     }
   }
-  $args{-columns} = \@cols;
 
-  # reorganize pagination
-  if ($args{-page_index} || $args{-page_size}) {
-    not exists $args{$_} or puke "-page_size conflicts with $_"
-      for qw/-limit -offset/;
-    $args{-limit} = $args{-page_size};
-    if ($args{-page_index}) {
-      $args{-offset} = ($args{-page_index} - 1) * $args{-page_size};
-    }
-  }
+  return (\@cols, \@post_select, \@cols_bind, \%aliased_columns);
+}
 
-  # generate initial ($sql, @bind), without -order_by (will be handled later)
-  my @old_API_args = @args{qw/-from -columns -where/}; #
-  my ($sql, @bind) = $self->next::method(@old_API_args);
-  unshift @bind, @{$join_info->{bind}} if $join_info;
 
-  # add @post_select clauses if needed (for ex. -distinct)
-  my $post_select = join " ", @post_select;
-  $sql =~ s[^SELECT ][SELECT $post_select ]i if $post_select;
+sub _parse_from {
+  my ($self, $from) = @_;
 
-  # add set operators (UNION, INTERSECT, etc) if needed
-  foreach my $set_op (@set_operators) {
-    if ($args{-$set_op}) {
-      my %sub_args = @{$args{-$set_op}};
-      $sub_args{$_} ||= $args{$_} for qw/-columns -from/;
-      local $self->{WITH}; # temporarily disable the WITH part during the subquery
-      my ($sql1, @bind1) = $self->select(%sub_args);
-      (my $sql_op = uc($set_op)) =~ s/_/ /g;
-      $sql .= " $sql_op $sql1";
-      push @bind, @bind1;
-    }
-  }
+  my @from_bind;
+  my $aliased_tables = {};
 
-  # add GROUP BY if needed
-  if ($args{-group_by}) {
-    my $sql_grp = $self->where(undef, $args{-group_by});
-    $sql_grp =~ s/\bORDER\b/GROUP/;
-    $sql .= $sql_grp;
-  }
-
-  # add HAVING if needed (often together with -group_by, but not always)
-  if ($args{-having}) {
-    my ($sql_having, @bind_having) = $self->where($args{-having});
-    $sql_having =~ s/\bWHERE\b/HAVING/;
-    $sql.= " $sql_having";
-    push @bind, @bind_having;
-  }
-
-  # add ORDER BY if needed
-  if (my $order = $args{-order_by}) {
-
-    my ($sql_order, @orderby_bind) = $self->_order_by($order);
-    $sql .= $sql_order;
-    push @bind, @orderby_bind;
-  }
-
-  # add LIMIT/OFFSET if needed
-  if (defined $args{-limit}) {
-    my ($limit_sql, @limit_bind) 
-      = $self->limit_offset(@args{qw/-limit -offset/});
-    $sql = $limit_sql =~ /%s/ ? sprintf $limit_sql, $sql
-                              : "$sql $limit_sql";
-    push @bind, @limit_bind;
-  }
-
-  # add FOR clause if needed
-  my $for = exists $args{-for} ? $args{-for} : $self->{select_implicitly_for};
-  $sql .= " FOR $for" if $for;
-
-  # initial WITH clause
-  $self->_prepend_WITH_clause(\$sql, \@bind);
-
-  # return results
-  if ($args{-want_details}) {
-    return {sql             => $sql,
-            bind            => \@bind,
-            aliased_tables  => ($join_info && $join_info->{aliased_tables}),
-            aliased_columns => \%aliased_columns          };
+  my $join_info = $self->_compute_join_info($from);
+  if ($join_info) {
+    $from           = \($join_info->{sql});
+    @from_bind      = @{$join_info->{bind}};
+    $aliased_tables = $join_info->{aliased_tables};
   }
   else {
-    return ($sql, @bind);
+
+    # if -from is a subquery, separate the $sql and @bind parts
+    if (_is_subquery($from)) {
+      my ($sql, @bind) = @$$from;
+      $sql =~ s{^(\s*select.*)}{($1)}is; # if subquery is a plain SELECT, put it in parenthesis
+      $from = $sql;
+      push @from_bind, @bind;
+    }
+
+    # conditions below : compatibility with old SQL::Abstract syntax for $source
+    elsif (does($from, 'ARRAY')) {
+      $from = join ", ", @$from;
+    }
+    elsif (does($from, 'SCALAR')) {
+      $from = $$from;
+    }
+
+    my $table_spec  = $self->_parse_table($from);
+    $from           = $table_spec->{sql};
+    $aliased_tables = $table_spec->{aliased_tables};
+  }
+
+  return ($from, \@from_bind, $aliased_tables);
+}
+
+
+sub _parse_set_operator {
+  my ($self, $set_op, $val_set_op, $cols, $from) = @_;
+
+  my %sub_args = @$val_set_op;
+  $sub_args{-columns} ||= $cols;
+  $sub_args{-from}    ||= $from;
+  local $self->{WITH}; # temporarily disable the WITH part during the subquery
+  my ($sql, @bind) = $self->select(%sub_args);
+  (my $sql_op = uc($set_op)) =~ s/_/ /g;
+  return (" $sql_op $sql", @bind);
+}
+
+
+sub _translate_page_into_limit_offset {
+  my ($self, $args) = @_;
+
+  not exists $args->{$_} or puke "-page_size conflicts with $_"  for qw/-limit -offset/;
+  $args->{-limit} = $args->{-page_size};
+  if ($args->{-page_index}) {
+    $args->{-offset} = ($args->{-page_index} - 1) * $args->{-page_size};
   }
 }
+
+
 
 #----------------------------------------------------------------------
 # insert
@@ -1349,7 +1423,7 @@ sub _multicols_IN_through_boolean {
 
 
 #----------------------------------------------------------------------
-# override of parent's methods for decoding arrayrefs
+# override parent's methods for decoding arrayrefs
 #----------------------------------------------------------------------
 
 sub _where_hashpair_ARRAYREF {
@@ -1443,12 +1517,21 @@ sub _choose_LIMIT_OFFSET_dialect {
 
 
 #----------------------------------------------------------------------
-# utility to decide if the method was called with named or with positional args
+# utility functions (not methods)
 #----------------------------------------------------------------------
 
 sub _called_with_named_args {
   return $_[0] && !ref $_[0]  && substr($_[0], 0, 1) eq '-';
 }
+
+
+sub _is_subquery {
+  my $arg = shift;
+  return does($arg, 'REF') && does($$arg, 'ARRAY');
+}
+
+
+
 
 
 1; # End of SQL::Abstract::More
@@ -1458,49 +1541,6 @@ __END__
 =head1 NAME
 
 SQL::Abstract::More - extension of SQL::Abstract with more constructs and more flexible API
-
-=head1 DESCRIPTION
-
-This module generates SQL from Perl data structures.  It is a subclass of
-L<SQL::Abstract::Classic> or L<SQL::Abstract>, fully compatible with the parent
-class, but with some improvements :
-
-=over
-
-=item *
-
-methods take arguments as I<named parameters> instead of positional parameters.
-This is more flexible for identifying and assembling various SQL clauses,
-like C<-where>, C<-order_by>, C<-group_by>, etc.
-
-=item *
-
-additional SQL constructs like C<-union>, C<-group_by>, C<join>, C<with recursive>, etc.
-are supported
-
-=item *
-
-C<WHERE .. IN> clauses can range over multiple columns (tuples)
-
-=item *
-
-values passed to C<select>, C<insert> or C<update> can directly incorporate
-information about datatypes, in the form of arrayrefs of shape
-C<< [{dbd_attrs => \%type}, $value] >>
-
-=item *
-
-several I<SQL dialects> can adapt the generated SQL to various DBMS vendors
-
-=back
-
-This module was designed for the specific needs of
-L<DBIx::DataModel>, but is published as a standalone distribution,
-because it may possibly be useful for other needs.
-
-Unfortunately, this module cannot be used with L<DBIx::Class>, because
-C<DBIx::Class> creates its own instance of C<SQL::Abstract>
-and has no API to let the client instantiate from any other class.
 
 =head1 SYNOPSIS
 
@@ -1538,7 +1578,25 @@ and has no API to let the client instantiate from any other class.
                    ],
   );
 
-  # ex4: passing datatype specifications
+  # ex4 : subqueries
+  my $subq1 = [ $sqla->select(-columns => 'f|x', -from => 'Foo',
+                              -union   => [-columns => 'b|x',
+                                           -from    => 'Bar',
+                                           -where   => {barbar => 123}],
+                              -as      => 'Foo_union_Bar',
+                              ) ];
+  my $subq2 = [ $sqla->select(-columns => 'MAX(amount)',
+                              -from    => 'Expenses',
+                              -where   => {exp_id => {-ident => 'x'}, date => {">" => '01.01.2024'}},
+                              -as      => 'max_amount',
+                              ) ];
+  ($sql, @bind) = $sqla->select(
+     -columns  => ['x', \$subq2],
+     -from     => \$subq1,
+     -order_by => 'x',
+    );
+
+  # ex5: passing datatype specifications
   ($sql, @bind) = $sqla->select(
    -from     => 'Foo',
    -where    => {bar => [{dbd_attrs => {ora_type => ORA_XMLTYPE}}, $xml]},
@@ -1547,7 +1605,7 @@ and has no API to let the client instantiate from any other class.
   $sqla->bind_params($sth, @bind);
   $sth->execute;
 
-  # ex5: multicolumns-in
+  # ex6: multicolumns-in
   $sqla = SQL::Abstract::More->new(
     multicols_sep        => '/',
     has_multicols_in_SQL => 1,
@@ -1557,11 +1615,11 @@ and has no API to let the client instantiate from any other class.
    -where    => {"foo/bar/buz" => {-in => ['1/a/X', '2/b/Y', '3/c/Z']}},
   );
 
-  # ex6: merging several criteria
+  # ex7: merging several criteria
   my $merged = $sqla->merge_conditions($cond_A, $cond_B, ...);
   ($sql, @bind) = $sqla->select(..., -where => $merged, ..);
 
-  # ex7: insert / update / delete
+  # ex8: insert / update / delete
   ($sql, @bind) = $sqla->insert(
     -add_sql => 'OR IGNORE',        # SQLite syntax
     -into    => $table,
@@ -1582,7 +1640,7 @@ and has no API to let the client instantiate from any other class.
     -where => \%conditions,
   );
 
-  # ex8 : initial WITH clause -- example borrowed from https://sqlite.org/lang_with.html
+  # ex9 : initial WITH clause -- example borrowed from https://sqlite.org/lang_with.html
   ($sql, @bind) = $sqla->with_recursive(
     [ -table     => 'parent_of',
       -columns   => [qw/name parent/],
@@ -1607,6 +1665,53 @@ and has no API to let the client instantiate from any other class.
      -order_by => 'born',
     );
 
+
+=head1 DESCRIPTION
+
+This module generates SQL from Perl data structures.  It is a subclass of
+L<SQL::Abstract::Classic> or L<SQL::Abstract>, fully compatible with the parent
+class, but with many improvements :
+
+=over
+
+=item *
+
+methods take arguments as I<named parameters> instead of positional parameters.
+This is more flexible for identifying and assembling various SQL clauses,
+like C<-where>, C<-order_by>, C<-group_by>, etc.
+
+=item *
+
+additional SQL constructs like C<-union>, C<-group_by>, C<join>, C<-with_recursive>, etc.
+are supported
+
+=item *
+
+subqueries can be used in a column list or as a datasource (i.e C<< SELECT ... FROM (SELECT ..) >>)
+
+=item *
+
+C<WHERE .. IN> clauses can range over multiple columns (tuples)
+
+=item *
+
+values passed to C<select>, C<insert> or C<update> can directly incorporate
+information about datatypes, in the form of arrayrefs of shape
+C<< [{dbd_attrs => \%type}, $value] >>
+
+=item *
+
+several I<SQL dialects> can adapt the generated SQL to various DBMS vendors
+
+=back
+
+This module was designed for the specific needs of
+L<DBIx::DataModel>, but is published as a standalone distribution,
+because it may possibly be useful for other needs.
+
+Unfortunately, this module cannot be used with L<DBIx::Class>, because
+C<DBIx::Class> creates its own instance of C<SQL::Abstract>
+and has no API to let the client instantiate from any other class.
 
 =head1 CLASS METHODS
 
@@ -1673,13 +1778,21 @@ class (see L<SQL::Abstract/new>), plus the following :
 
 A C<sprintf> format description for generating table aliasing clauses.
 The default is C<%s AS %s>.
-Can also be supplied as a method coderef (see L</"Overriding methods">).
+
+The argument can also be a method coderef :
+
+  SQL::Abstract::More->new(table_alias => sub {
+    my ($self, $table, $alias) = @_;
+    my $syntax_for_aliased_table = ...;
+    return $syntax_for_aliased_table;
+   })
 
 =item column_alias
 
 A C<sprintf> format description for generating column aliasing clauses.
 The default is C<%s AS %s>.
-Can also be supplied as a method coderef.
+
+Like for C<table_alias>, the argument can also be a method coderef.
 
 =item limit_offset
 
@@ -1693,8 +1806,7 @@ limit and offset values are treated here as regular values,
 with placeholders '?' in the SQL; values are postponed to the
 C<@bind> list.
 
-The argument can also be a coderef (see below
-L</"Overriding methods">). That coderef takes C<$self, $limit, $offset>
+The argument can also be a coderef. That coderef takes C<$self, $limit, $offset>
 as arguments, and should return C<($sql, @bind)>. If C<$sql> contains
 C<%s>, it is treated as a C<sprintf> format string, where the original
 SQL is injected into C<%s>.
@@ -1842,23 +1954,6 @@ C<limit_offset> which uses C<OffsetFetchRows>.
 
 =back
 
-=head3 Overriding methods
-
-Several arguments to C<new()> can be references to method
-implementations instead of plain scalars : this allows you to
-completely redefine a behaviour without the need to subclass.  Just
-supply a regular method body as a code reference : for example, if you
-need another implementation for LIMIT-OFFSET, you could write
-
-  my $sqla = SQL::Abstract::More->new(
-    limit_offset => sub {
-      my ($self, $limit, $offset) = @_;
-      defined $limit or die "NO LIMIT!"; #:-)
-      $offset ||= 0;
-      my $last = $offset + $limit;
-      return ("ROWS ? TO ?", $offset, $last); # ($sql, @bind)
-     });
-
 
 =head1 INSTANCE METHODS
 
@@ -1940,8 +2035,41 @@ vendor-specific SQL variants :
    # Oracle hint
   ->select(..., -columns => ["-/*+ FIRST_ROWS (100) */" => @columns], ...);
 
-The argument to C<-columns> can also be a string instead of 
-an arrayref, like for example
+Within the columns array, it is also possible to insert a 
+subquery expressed as a reference to an arrayref, as explained in
+L<SQL::Abstract/"Literal SQL with placeholders and bind values (subqueries)">.
+The caller is responsible for putting the SQL of the subquery within parenthesis
+and possibly adding a column alias; fortunately this can be done automatically when 
+generating the subquery through a call to C<select()> with an L</-as> parameter :
+
+  # build the subquery -- stored in an arrayref
+  my $subquery = [ $sqla->select(
+      -columns => 'COUNT(*)',
+      -from    => 'Foo',
+      -where   => {bar_id => {-ident => 'Bar.bar_id'},
+                   height => {-between => [100, 200]}},
+      -as      => 'count_foos',
+    ) ];
+  
+  # main query
+  my ($sql, @bind) = $sqla->select(
+         -from    => 'Bar',
+         -columns => ['col1', 'col2', \$subquery, , 'col4'], # reference to an arrayref !
+         -where   => {color => 'green'},
+       );
+
+This will produce SQL :
+
+  SELECT col1, col2,
+         (SELECT COUNT(*) FROM Foo WHERE bar_id=Bar.bar_id and height BETWEEN ? AND ?) AS count_foos,
+         col4
+    FROM Bar WHERE color = ?        
+
+The resulting C<@bind> array combines bind values coming from both the subquery
+and from the main query, i.e. C<< (100, 200, 'green') >>.
+
+
+Instead of an arrayref, the argument to C<-columns> can also be just a string, like for example
 C<< "c1 AS foobar, MAX(c2) AS m_c2, COUNT(c3) AS n_c3" >>;
 however this is mainly for backwards compatibility. The 
 recommended way is to use the arrayref notation as explained above :
@@ -1950,8 +2078,64 @@ recommended way is to use the arrayref notation as explained above :
 
 If omitted, C<< -columns >> takes '*' as default argument.
 
-=item C<< -from => $table || \@joined_tables >> 
+=item C<< -from => $table || \@joined_tables || \$subquery >> 
 
+The argument to C<-from> can be :
+
+=over
+
+=item *
+
+a plain string, interpreted as a table name. Like for column aliases,
+a table alias can be given, using a vertical bar as separator :
+
+  -from => 'Foobar|fb', # SELECT .. FROM Foobar AS fb
+
+=item *
+
+a join specification, given as an arrayref starting with the keyword C<-join>, followed
+by a list of table and join conditions according to the L</join> method :
+
+  -from => [-join => qw/Foo fk=pk Bar/],
+
+
+=item *
+
+a I<reference> to a subquery arrayref, in the form C<< [$sql, @bind] >>.
+The caller is responsible for putting the SQL of the subquery within parenthesis
+and possibly adding a table alias; fortunately this can be done automatically when 
+generating the subquery through a call to C<select()> with an L</-as> parameter :
+
+  my $subq = [ $sqla->select(-columns => 'f|x', -from => 'Foo',
+                             -union   => [-columns => 'b|x',
+                                          -from    => 'Bar',
+                                          -where   => {barbar => 123}],
+                             -as      => 'Foo_union_Bar',
+                             ) ];
+  my ($sql, @bind) = $sqla->select(-from     => \$subq,
+                                   -order_by => 'x');
+
+
+=item *
+
+a simple arrayref that does not start with C<-join>. This is
+for compatibility with the old L<SQL::Abstract> API. Members of the
+array are interpreted as a list of table names, that will be joined
+by C<", ">. Join conditions should then be expressed separately in the
+C<-where> part. This syntax is deprecated : use the C<-join> feature instead.
+
+  $sqla->select(-from => [qw/Foo Bar Buz/], ...) # SELECT FROM Foo, Bar, Buz ..
+
+
+=item *
+
+a simple scalarref. This is
+for compatibility with the old L<SQL::Abstract> API. The result is strictly
+equivalent to passing the scalar directly. This syntax is deprecated.
+
+  $sqla->select(-from => \ "Foo", ...) # SELECT FROM Foo ..
+
+=back
 
 =item C<< -where => $criteria >>
 
@@ -1959,9 +2143,9 @@ Like in L<SQL::Abstract>, C<< $criteria >> can be
 a plain SQL string like C<< "col1 IN (3, 5, 7, 11) OR col2 IS NOT NULL" >>;
 but in most cases, it will rather be a reference to a hash or array of
 conditions that will be translated into SQL clauses, like
-for example C<< {col1 => 'val1', col2 => 'val2'} >>.
+for example C<< {col1 => 'val1', col2 => {'<>' => 'val2'}} >>.
 The structure of that hash or array can be nested to express complex
-boolean combinations of criteria; see
+boolean combinations of criteria, including parenthesized subqueries; see
 L<SQL::Abstract/"WHERE CLAUSES"> for a detailed description.
 
 When using hashrefs or arrayrefs, leaf values can be "bind values with types";
@@ -2047,6 +2231,14 @@ like C<< -for => 'READ ONLY' >> or C<< -for => 'UPDATE' >>.
 
 If true, the return value will be a hashref instead of the usual
 C<< ($sql, @bind) >>. The hashref contains the following keys :
+
+
+=item C<< -as => $alias >>
+
+The C<< $sql >> part is rewritten as C<< ($sql)|$alias >>.
+This is convenient when the result is to be used as a subquery
+within another C<< select() >> call.
+
 
 =over
 
@@ -2644,7 +2836,17 @@ Laurent Dami, C<< <laurent dot dami at cpan dot org> >>
 
 =over
 
-=item L<https://github.com/rouzier> : support for C<-having> without C<-order_by>
+=item *
+
+L<https://github.com/rouzier> : support for C<-having> without C<-order_by>
+
+=item *
+
+L<https://github.com/ktat> : pull request for fixing C<< -from => ['table'] >>
+
+=item *
+
+L<https://metacpan.org/author/DAKKAR> : signaling a regression for C<< -from => \ 'table' >>
 
 =back
 
@@ -2662,7 +2864,7 @@ L<https://metacpan.org/module/SQL::Abstract::More>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2011-2023 Laurent Dami.
+Copyright 2011-2024 Laurent Dami.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

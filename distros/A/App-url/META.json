@@ -1,10 +1,10 @@
 {
    "abstract" : "format a URL according to a sprintf-like template",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -53,10 +53,10 @@
       "homepage" : "https://github.com/briandfoy/app-url",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/app-url.git",
+         "url" : "https://github.com/briandfoy/app-url",
          "web" : "https://github.com/briandfoy/app-url"
       }
    },
-   "version" : "1.007",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.009",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

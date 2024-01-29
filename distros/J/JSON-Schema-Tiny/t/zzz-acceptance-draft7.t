@@ -1,7 +1,9 @@
 # vim: set ft=perl ts=8 sts=2 sw=2 tw=100 et :
 use strictures 2;
 use 5.020;
-use experimental qw(signatures postderef);
+use stable 0.031 'postderef';
+use experimental 'signatures';
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
@@ -48,6 +50,7 @@ acceptance_tests(
           'remote ref, containing refs itself',
           'Recursive references between schemas',
           'Location-independent identifier',
+          'Reference an anchor with a non-relative URI',
           'Location-independent identifier with base URI change in subschema',
           'refs with relative uris and defs',
           'relative refs with absolute uris and defs',

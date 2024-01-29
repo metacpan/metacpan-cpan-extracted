@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.344';
+our $VERSION = '2.403';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -415,6 +415,7 @@ sub run {
                 $sf->{d}{tables_info} = $tables_info;
                 $sf->{d}{user_table_keys} = $user_table_keys;
                 $sf->{d}{sys_table_keys} = $sys_table_keys;
+                $sf->{d}{cte_history} = []; ##
                 my $old_idx_tbl = 1;
 
                 TABLE: while ( 1 ) {
@@ -449,7 +450,7 @@ sub run {
                             $table = $menu_table->[$idx_tbl];
                         }
                         if ( ! defined $table ) {
-                            $sf->{d}{ctes} = [];
+                            $sf->{d}{cte_history} = []; ##
                             next SCHEMA         if @schemas                > 1;
                             $dbh->disconnect();
                             next DATABASE       if @databases              > 1;
@@ -463,9 +464,6 @@ sub run {
                             }
                             $old_idx_tbl = $idx_tbl;
                         }
-                    }
-                    if ( $table ne $cte_table ) {
-                        $sf->{d}{ctes} = [];
                     }
                     if ( $table eq $hidden ) {
                         require App::DBBrowser::CreateDropAttach;
@@ -499,12 +497,14 @@ sub run {
                             next DATABASE;
                         }
                     }
-                    my ( $qt_table, $qt_columns, $qt_aliases );
+                    my ( $qt_table, $qt_columns, $qt_aliases, $ctes );
+                    my $sql = { table => '()' }; ##
+                    $ax->reset_sql( $sql );
                     if ( $table eq $join ) {
                         require App::DBBrowser::Join;
                         my $new_j = App::DBBrowser::Join->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                        $sf->{d}{special_table} = 'join';
-                        if ( ! eval { ( $qt_table, $qt_columns, $qt_aliases ) = $new_j->join_tables(); 1 } ) {
+                        $sf->{d}{table_origin} = 'join';
+                        if ( ! eval { ( $qt_table, $qt_columns, $qt_aliases, $ctes ) = $new_j->join_tables(); 1 } ) {
                             $ax->print_error_message( $@ );
                             next TABLE;
                         }
@@ -513,40 +513,39 @@ sub run {
                     elsif ( $table eq $union ) {
                         require App::DBBrowser::Union;
                         my $new_u = App::DBBrowser::Union->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                        $sf->{d}{special_table} = 'union';
-                        if ( ! eval { ( $qt_table, $qt_columns, $qt_aliases ) = $new_u->union_tables(); 1 } ) {
+                        $sf->{d}{table_origin} = 'union';
+                        if ( ! eval { ( $qt_table, $qt_columns, $qt_aliases, $ctes ) = $new_u->union_tables(); 1 } ) {
                             $ax->print_error_message( $@ );
                             next TABLE;
                         }
                         next TABLE if ! defined $qt_table;
                     }
-
                     elsif ( $table eq $derived_table ) {
-                        $sf->{d}{special_table} = 'drived_table';
-                        if ( ! eval { ( $qt_table, $qt_columns ) = $sf->__derived_table(); 1 } ) {
+                        $sf->{d}{table_origin} = 'drived';
+                        if ( ! eval { ( $qt_table, $qt_columns ) = $sf->__derived_table( $sql ); 1 } ) {
                             $ax->print_error_message( $@ );
                             next TABLE;
                         }
                         next TABLE if ! defined $qt_table;
                     }
                     elsif ( $table eq $cte_table ) {
-                        $sf->{d}{special_table} = 'cte_table';
-                        if ( ! eval { ( $qt_table, $qt_columns ) = $sf->__derived_table(); 1 } ) {
+                        $sf->{d}{table_origin} = 'cte';
+                        if ( ! eval { ( $qt_table, $qt_columns, $ctes ) = $sf->__derived_table( $sql ); 1 } ) {
                             $ax->print_error_message( $@ );
                             next TABLE;
                         }
                         next TABLE if ! defined $qt_table;
                     }
                     else {
-                        $sf->{d}{special_table} = '';
+                        $sf->{d}{table_origin} = 'ordinary';
+                        $sf->{d}{stmt_types} = [ 'Select' ];
                         $table =~ s/^[-\ ]\s//;
                         $sf->{d}{table_key} = $table;
                         if ( ! eval {
                             my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
                             $qt_table = $ax->quote_table( $sf->{d}{tables_info}{$table} );
-                            if ( $sf->{o}{alias}{table} ) {
-                                $qt_table .= " " . $ax->quote_alias( 't1' );
-                            }
+                            my $alias = $ax->alias( $sql, 'table', $qt_table, 't1' );
+                            $qt_table .= " " . $ax->quote_alias( $alias );
                             my $cols = $ax->column_names( $qt_table );
                             $qt_columns = $ax->quote_cols( $cols );
                             1 }
@@ -556,20 +555,21 @@ sub run {
                         }
                     }
                     my $table_footer;
-                    if ( $sf->{d}{special_table} ) {
-                        $table_footer = ucfirst $sf->{d}{special_table};
+                    if ( $sf->{d}{table_origin} eq 'ordinary' ) {
+                         $table_footer = $sf->{d}{table_key};
                     }
                     else {
-                        $table_footer = $sf->{d}{table_key};
+                        $table_footer = ucfirst $sf->{d}{table_origin};
                     }
                     $sf->{d}{table_footer} = "     '$table_footer'     ";
                     require App::DBBrowser::Table;
                     my $tbl = App::DBBrowser::Table->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                    my $sql = {};
-                    $ax->reset_sql( $sql );
+                    #my $sql = {};
+                    #$ax->reset_sql( $sql );
                     $sql->{table} = $qt_table;
                     $sql->{cols} = $qt_columns;
                     $sql->{alias} = $qt_aliases // {};
+                    $sql->{ctes} = $ctes // [];
                     $tbl->browse_the_table( $sql );
                 }
             }
@@ -580,21 +580,22 @@ sub run {
 
 
 sub __derived_table {
-    my ( $sf ) = @_;
+    my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     require App::DBBrowser::Subqueries;
     my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $sf->{d}{stmt_types} = [ 'Select' ];
-    my $sql = { table => '()' };
-    $ax->reset_sql( $sql );
     $ax->print_sql_info( $ax->get_sql_info( $sql ) );
-    my $qt_table;
-    if ( $sf->{d}{special_table} eq 'cte_table' ) {
-        my $table = $sq->prepare_cte( $sql );
+    my ( $qt_table, $ctes );
+    if ( $sf->{d}{table_origin} eq 'cte' ) {
+        $sql->{ctes} = [ @{$sf->{d}{cte_history}} ];
+        my $table = $sq->prepare_and_add_cte( $sql );
         if ( ! defined $table ) {
             return;
         }
+        $sf->{d}{cte_history} = [ @{$sql->{ctes}} ];
         $qt_table = $table;
+        $ctes = $sql->{ctes};
     }
     else {
         my $table = $sq->subquery( $sql );
@@ -603,11 +604,11 @@ sub __derived_table {
         }
         $qt_table = $table;
         # Oracle: key word "AS" not supported in Table aliases (Union, Join, Derived tables)
-        my $alias = $ax->alias( $sql, 'derived_table', $qt_table, 't1' );
+        my $alias = $ax->alias( $sql, 'derived_table', $qt_table, 'd1' );
         $qt_table .= " " . $ax->quote_alias( $alias );
     }
-    my $qt_columns = $ax->quote_cols( $ax->column_names( $qt_table ) );
-    return $qt_table, $qt_columns;
+    my $qt_columns = $ax->quote_cols( $ax->column_names( $qt_table, $ctes ) );
+    return $qt_table, $qt_columns, $ctes;
 }
 
 
@@ -628,7 +629,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.344
+Version 2.403
 
 =head1 DESCRIPTION
 
@@ -640,7 +641,7 @@ Matthäus Kiem <cuer2s@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2023 Matthäus Kiem.
+Copyright (C) 2012-2024 Matthäus Kiem.
 
 THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
 IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

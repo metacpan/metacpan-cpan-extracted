@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Es::Any::Co - Package for language Spanish
 
 package Locale::CLDR::Locales::Es::Any::Co;
 # This file auto generated from Data\common\main\es_CO.xml
-#	on Tue  5 Dec  1:08:38 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ace' => 'acehnés',
@@ -59,14 +59,12 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'BA' => 'Bosnia y Herzegovina',
  			'GB@alt=short' => 'RU',
  			'TA' => 'Tristán de Acuña',
- 			'TL' => 'Timor-Leste',
  			'UM' => 'Islas menores alejadas de EE. UU.',
- 			'VI' => 'Islas Vírgenes de EE. UU.',
 
 		}
 	},
@@ -78,62 +76,146 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'duration-month' => {
+						'per' => q({0}/mes),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'per' => q({0}/mes),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'per' => q({0}/sem.),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'per' => q({0}/sem.),
 					},
 				},
 				'narrow' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(día),
+						'one' => q({0} día),
+						'other' => q({0} días),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(día),
 						'one' => q({0} día),
 						'other' => q({0} días),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'one' => q({0} h),
+						'other' => q({0} h),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'one' => q({0} h),
 						'other' => q({0} h),
 					},
+					# Long Unit Identifier
+					'duration-millisecond' => {
+						'one' => q({0} ms),
+						'other' => q({0} ms),
+					},
+					# Core Unit Identifier
 					'millisecond' => {
 						'one' => q({0} ms),
 						'other' => q({0} ms),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'one' => q({0} min),
+						'other' => q({0} min),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'one' => q({0} min),
 						'other' => q({0} min),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(mes),
+						'one' => q({0} mes),
+						'other' => q({0} meses),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(mes),
 						'one' => q({0} mes),
 						'other' => q({0} meses),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'one' => q({0} s),
+						'other' => q({0} s),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'one' => q({0} s),
 						'other' => q({0} s),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'one' => q({0} sem.),
+						'other' => q({0} sems.),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'one' => q({0} sem.),
 						'other' => q({0} sems.),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'one' => q({0} a.),
+						'other' => q({0} a.),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'one' => q({0} a.),
 						'other' => q({0} a.),
 					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(días),
+						'one' => q({0} día),
+						'other' => q({0} días),
+						'per' => q({0}/día),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(días),
 						'one' => q({0} día),
 						'other' => q({0} días),
 						'per' => q({0}/día),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(mes),
+						'one' => q({0} mes),
+						'other' => q({0} meses),
+						'per' => q({0}/mes),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(mes),
 						'one' => q({0} mes),
 						'other' => q({0} meses),
 						'per' => q({0}/mes),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(a.),
+						'one' => q({0} a.),
+						'other' => q({0} a.),
+						'per' => q({0}/año),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(a.),
 						'one' => q({0} a.),
@@ -314,8 +396,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'day_periods' => (
@@ -326,32 +408,18 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{a. m.},
 					'evening1' => q{de la tarde},
 					'morning2' => q{de la mañana},
 					'night1' => q{de la noche},
 					'noon' => q{m.},
-					'pm' => q{p. m.},
-				},
-				'wide' => {
-					'am' => q{a. m.},
-					'pm' => q{p. m.},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'am' => q{a. m.},
 					'noon' => q{m.},
-					'pm' => q{p. m.},
 				},
 				'narrow' => {
-					'am' => q{a. m.},
 					'noon' => q{m.},
-					'pm' => q{p. m.},
-				},
-				'wide' => {
-					'am' => q{a. m.},
-					'pm' => q{p. m.},
 				},
 			},
 		},

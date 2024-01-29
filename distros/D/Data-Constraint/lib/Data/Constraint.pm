@@ -156,7 +156,7 @@ You wish!  This module can't help you there.
 
 =cut
 
-our $VERSION = '1.203';
+our $VERSION = '1.204';
 
 use base qw(Class::Prototyped);
 
@@ -260,11 +260,11 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2004-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

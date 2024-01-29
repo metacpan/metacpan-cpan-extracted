@@ -23,5 +23,5 @@ requires:
   perl: '5.010'
 resources:
   repository: https://github.com/scottchiefbaker/perl-Date-Parse-Modern.git
-version: 0.5
+version: '0.6'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

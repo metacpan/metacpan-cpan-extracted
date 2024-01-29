@@ -1,3 +1,15 @@
+0.008   2023-09-08  Released-By: PERLANCAR; Urgency: low
+
+        - Add check max_range_len >= min_range_len.
+
+
+0.007   2023-09-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Update Rinci metadata (greedy -> slurpy).
+
+
 0.006   2023-09-08  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

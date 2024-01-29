@@ -94,6 +94,19 @@ EOF
 
 }
 
+sub schema_mariadb {
+<<EOF;
+CREATE TEMPORARY TABLE Users (
+    id integer AUTO_INCREMENT,
+    Created DATETIME NULL,
+    Resolved DATETIME NULL,
+    Result integer NULL,
+    PRIMARY KEY (id)
+)
+EOF
+
+}
+
 sub schema_pg {
 <<EOF;
 CREATE TEMPORARY TABLE Users (

@@ -15,6 +15,8 @@ requires 'perl', '5.024';
 requires 'Mojo::Redis2';
 requires 'Data::UUID';
 requires 'Log::Any';
+requires 'Object::Pad';
+requires 'UUID::Tiny';
 
 on configure => sub {
     requires 'ExtUtils::MakeMaker', '7.1101';

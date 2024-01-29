@@ -38,6 +38,7 @@ sub union_tables {
     }
     my $data = [];
     my $used_tables = [];
+    #my $added_ctes = [];
     my $sql = {};
     $ax->reset_sql( $sql );
     my $old_idx_tbl = 0;
@@ -57,6 +58,7 @@ sub union_tables {
         my $used = ' (used)';
         my @tmp_tables;
         for my $table ( @$tables ) {
+        #for my $table ( @$tables, @$added_ctes ) {
             if ( any { $_ eq $table } @$used_tables ) {
                 push @tmp_tables, '- ' . $table . $used;
             }
@@ -64,6 +66,7 @@ sub union_tables {
                 push @tmp_tables, '- ' . $table;
             }
         }
+
         my $prompt = 'Choose a table:';
         my $menu  = [ @pre, @tmp_tables, @post ];
         $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
@@ -79,8 +82,9 @@ sub union_tables {
                 $old_idx_tbl = 0;
                 my $removed_table = pop @$used_tables;
                 pop @$data;
-                if ( @{$sf->{d}{ctes}//[]} && $removed_table eq $sf->{d}{ctes}[-1]{table} ) {
-                    pop @{$sf->{d}{ctes}};
+                if ( @{$sql->{ctes}} && $removed_table eq $sql->{ctes}[-1]{table} ) {
+                    pop @{$sql->{ctes}};
+                    #pop @$added_ctes;
                 }
                 next TABLE;
             }
@@ -118,38 +122,47 @@ sub union_tables {
                 next TABLE;
             }
             $qt_table = $table;
-            my $default_alias = 'p' . ( @$used_tables + 1 );
+            my $default_alias = 'p' . ( @$used_tables + 1 ); ##
             my $alias = $ax->alias( $sql, 'derived_table', $qt_table, $default_alias );
             $qt_table .= " " . $ax->quote_alias( $alias );
         }
         elsif ( $table eq $cte_table ) {
             my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
-            $table = $sq->prepare_cte( $sql );
+            $table = $sq->prepare_and_add_cte( $sql );
             if ( ! defined $table ) {
                 next TABLE;
             }
             $qt_table = $table;
+            #push @$added_ctes, $table;
         }
         else {
             $table =~ s/^-\s//;
             $table =~ s/\Q$used\E\z//;
             $qt_table = $ax->quote_table( $sf->{d}{tables_info}{$table} );
+            #if ( exists $sf->{d}{tables_info}{$table} ) {
+            #    $qt_table = $ax->quote_table( $sf->{d}{tables_info}{$table} );
+            #}
+            #else {
+            #    $qt_table = $table; #  $added_ctes
+            #}
         }
         my $operator;
         if ( @$data ) {
             $operator = $sf->__set_operator( $sql, $table );
             if ( ! $operator ) {
-                if ( @{$sf->{d}{ctes}//[]} && $table eq $sf->{d}{ctes}[-1]{table} ) {
-                    pop @{$sf->{d}{ctes}};
+                if ( @{$sql->{ctes}} && $table eq $sql->{ctes}[-1]{table} ) {
+                    pop @{$sql->{ctes}};
+                    #pop @$added_ctes;
                 }
                 next TABLE;
             }
         }
-        my $ok = $sf->__choose_table_columns( $sql, $data, $table, $qt_table, $operator );
+        my $ok = $sf->__choose_table_columns( $sql, $data, $table, $qt_table, $operator ); ##
         if ( ! $ok ) {
-            if ( @{$sf->{d}{ctes}//[]} && $table eq $sf->{d}{ctes}[-1]{table} ) {
-                pop @{$sf->{d}{ctes}};
+            if ( @{$sql->{ctes}} && $table eq $sql->{ctes}[-1]{table} ) {
+                pop @{$sql->{ctes}};
+                #pop @$added_ctes;
             }
             next TABLE;
         }
@@ -157,11 +170,12 @@ sub union_tables {
     }
     my $qt_columns = delete $data->[0]{cols};
     my $qt_aliases = delete $data->[0]{alias};
+    my $ctes = $sql->{ctes};
     $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
     my $union_derived_table = $ax->get_stmt( $sql, 'Union', 'prepare' );
-    my $union_alias = $ax->alias( $sql, 'derived_table', '', 't1' );
+    my $union_alias = $ax->alias( $sql, 'derived_table', '', 'u1' );
     $union_derived_table .= " " . $ax->quote_alias( $union_alias );
-    return $union_derived_table, $qt_columns, $qt_aliases;
+    return $union_derived_table, $qt_columns, $qt_aliases, $ctes;
 }
 
 
@@ -203,11 +217,13 @@ sub __choose_table_columns {
     my ( $sf, $sql, $data, $table, $qt_table, $operator ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    #my $privious_cols =  "'^'"; ##
     my $next_idx = @$data;
     my $chosen_cols = [];
     my @bu_cols;
-    $sf->{d}{col_names}{$table} //= $ax->column_names( $qt_table ); ##
+    $sf->{d}{col_names}{$table} //= $ax->column_names( $qt_table, $sql->{ctes} ); ##
+    if ( ! defined $sf->{d}{col_names}{$table} ) {
+        return;
+    }
     $data->[$next_idx] = { qt_table => $qt_table, table => $table };
     if ( $operator ) {
         $data->[$next_idx]{operator} = $operator;
@@ -216,7 +232,6 @@ sub __choose_table_columns {
     COLUMNS: while ( 1 ) {
         my @pre = ( undef, $sf->{i}{ok} );
         push @pre, $sf->{i}{menu_addition} if $sf->{o}{enable}{extended_cols};
-        #push @pre, $privious_cols          if $next_idx; ##
         $sf->__cols_alias_sub_stmt( $data, $next_idx, $chosen_cols );
         $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
         my $info = $ax->get_sql_info( $sql );
@@ -235,11 +250,6 @@ sub __choose_table_columns {
             $#$data = $next_idx - 1;
             return;
         }
-        #if ( $choices[0] eq $privious_cols ) { ##
-        #    $data->[$next_idx]{qt_columns} = $data->[$next_idx-1]{qt_columns};
-        #    return 1;
-        #}
-        #els
         if ( $choices[0] eq $sf->{i}{ok} ) {
             shift @choices;
             push @$chosen_cols, map { { name => $_ } } @choices;
@@ -396,8 +406,8 @@ sub __add_where_stmt {
     my $tmp_sql = {};
     $ax->reset_sql( $tmp_sql );
     $tmp_sql->{table} = $qt_table;
-    $tmp_sql->{cols} = $qt_columns;           # cols for where
-    $tmp_sql->{selected_cols} = $qt_columns;  # selected_cols for select
+    $tmp_sql->{cols} = $qt_columns;           # 'cols' required in WHERE
+    $tmp_sql->{selected_cols} = $qt_columns;  # 'selected_cols' required in SELECT
     my $ret = $sb->where( $tmp_sql );
     $sf->{d}{stmt_types} = $bu_stmt_types;
     if ( ! defined $ret ) {

@@ -5,11 +5,7 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad;
-
-role ARole {
-   method rolem { "ARole" }
-}
+use Object::Pad 0.800;
 
 class AClass {
    method classm { "AClass" }
@@ -17,25 +13,6 @@ class AClass {
 
 my $warnings = "";
 BEGIN { $SIG{__WARN__} = sub { $warnings .= $_[0] }; }
-
-class CClass isa AClass does ARole {}
-
-{
-   my $obj = CClass->new;
-   isa_ok( $obj, [ "CClass" ], '$obj' );
-
-   is( $obj->rolem, "ARole", 'CClass has ->rolem' );
-   is( $obj->classm, "AClass", 'CClass has ->classm' );
-}
-
-BEGIN {
-   like( $warnings, qr/^'isa' modifier keyword is deprecated; use :isa\(\) attribute instead at /m,
-      'extends keyword provokes deprecation warnings' );
-   like( $warnings, qr/^'does' modifier keyword is deprecated; use :does\(\) attribute instead /m,
-      'implements keyword provokes deprecation warnings' );
-
-   undef $warnings;
-}
 
 role DRole { requires mmethod; }
 

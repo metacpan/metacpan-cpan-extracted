@@ -15,6 +15,7 @@ mkdocs.yml
 share/conf/config.yaml
 share/db/hp.json
 share/r/heatmap.R
+share/r/heatmap_scale.R
 share/r/mds.R
 share/r/mds_color.R
 t/cars.json
@@ -22,20 +23,30 @@ t/cars_config.yaml
 t/cars_matrix.txt
 t/cli.t
 t/csv.t
+t/die.t
 t/example.csv
 t/example_config_ref.yaml
 t/example_ref.json
+t/export.glob_hash.json
+t/export.ref_binary_hash.json
 t/individuals.json
 t/individuals_random_100.json
-t/individuals_random_1000.json
 t/individuals_random_100_ontologies.json
+t/inter_cohort_matrix_ref.txt
 t/json.t
 t/matrix_ref.txt
+t/matrix_ref_jaccard.txt
+t/matrix_ref_weights_zero.txt
 t/movies.json
 t/movies_config.yaml
 t/movies_weights.yaml
 t/ontologies.yaml
 t/patient.json
+t/pxf_random_100.json
+t/qr_codes/107_week_0_arm_1.compressed.png
+t/qr_codes/107_week_0_arm_1.pdf
+t/qr_codes/107_week_0_arm_1.png
+t/qr_codes/output.json
 t/rank_ref_sorted.txt
 t/rank_weight_ref_sorted.txt
 t/ref_align.csv
@@ -49,7 +60,7 @@ t/weights.t
 t/weights.yaml
 t/weights_err1.yaml
 t/weights_err2.yaml
-utils/bff_pxf_simulator/back.individuals.json
+t/weights_zero.yaml
 utils/bff_pxf_simulator/bff-pxf-simulator
 utils/bff_pxf_simulator/cpanfile
 utils/bff_pxf_simulator/Ontologies.pm
@@ -58,6 +69,7 @@ utils/bff_pxf_simulator/README.md
 utils/csv2pheno_ranker/cpanfile
 utils/csv2pheno_ranker/csv2pheno-ranker
 utils/csv2pheno_ranker/README.md
+utils/csv2pheno_ranker/vcf/vcf2pheno-ranker.py
 VERSION
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

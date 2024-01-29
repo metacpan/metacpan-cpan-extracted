@@ -1,6 +1,30 @@
 Revision history for Dist-Zilla-Plugin-GitHub-CreateRelease
 
+0.0007 -- Sun Jan 21 22:21:03 AST 2024
+
+    [Detailed Change Log]
+    - c24bf79 Update version for release
+    - 24d5c17 Fix missing dependencies for script
+    - 09dd7a5 Specify minimum JSON::MaybeXS version
+    - ad98a49 v0.0006
+
+0.0006 -- Fri Jan 19 23:07:02 AST 2024
+
+    [Significant Changes from 0.0005]
+    - No changes to the module
+    - Add a createrelease.pl script that can be used to manually create the release
+
+    [Detailed Change Log]
+    - 229513d Update Copyright
+    - 57ba45d Add createrelease.pl script to run if the module fails
+    - dcf151f v0.0005
+
 0.0005 -- Sun Oct 08 11:37:09 ADT 2023
+
+    [Detailed Change Log]
+    - 10a6efe Increment version for new release
+    - cd3713b Add more error handling and pod info
+    - 1e0b2ac v0.0004
 
 0.0004 -- Wed Oct 04 16:29:46 ADT 2023
 

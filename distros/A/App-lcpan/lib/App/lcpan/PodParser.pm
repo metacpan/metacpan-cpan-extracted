@@ -10,9 +10,9 @@ use parent qw(Pod::Simple::Methody);
 use List::Util qw(first);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-09'; # DATE
+our $DATE = '2023-09-26'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.073'; # VERSION
+our $VERSION = '1.074'; # VERSION
 
 sub handle_text {
     my $self = shift;
@@ -93,7 +93,7 @@ App::lcpan::PodParser - Pod parser for use in App::lcpan
 
 =head1 VERSION
 
-This document describes version 1.073 of App::lcpan::PodParser (from Perl distribution App-lcpan), released on 2023-07-09.
+This document describes version 1.074 of App::lcpan::PodParser (from Perl distribution App-lcpan), released on 2023-09-26.
 
 =for Pod::Coverage .+
 

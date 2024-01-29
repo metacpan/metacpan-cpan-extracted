@@ -1,7 +1,7 @@
 package Template::Plugin::Calendar::Simple;
 use strict;
 use warnings FATAL => 'all';
-our $VERSION = '1.00';
+our $VERSION = '1.04';
 
 use Calendar::Simple;
 use Template::Plugin;
@@ -157,7 +157,7 @@ Jeff Anderson, C<< <jeffa at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Jeff Anderson.
+Copyright 2024 Jeff Anderson.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

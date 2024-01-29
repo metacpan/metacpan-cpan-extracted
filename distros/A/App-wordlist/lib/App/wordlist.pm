@@ -10,9 +10,9 @@ use List::Util qw(shuffle);
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-28'; # DATE
+our $DATE = '2024-01-05'; # DATE
 our $DIST = 'App-wordlist'; # DIST
-our $VERSION = '0.291'; # VERSION
+our $VERSION = '0.292'; # VERSION
 
 our %SPEC;
 
@@ -1029,7 +1029,7 @@ App::wordlist - Grep words from (or test them against) WordList::*
 
 =head1 VERSION
 
-This document describes version 0.291 of App::wordlist (from Perl distribution App-wordlist), released on 2022-08-28.
+This document describes version 0.292 of App::wordlist (from Perl distribution App-wordlist), released on 2024-01-05.
 
 =head1 SYNOPSIS
 
@@ -1189,6 +1189,8 @@ wordlist, using C<word_exists()> method on each wordlist.
 
 =item * B<arg> => I<array[str]>
 
+(No description)
+
 =item * B<chars_ordered> => I<str>
 
 Specify possible characters for the word (ordered).
@@ -1212,13 +1214,19 @@ When returning grep result, this means also returning wordlist name.
 
 =item * B<exclude_dynamic_wordlists> => I<bool>
 
+(No description)
+
 =item * B<exclude_wordlist_pattern> => I<re_from_str>
+
+(No description)
 
 =item * B<exclude_wordlists> => I<array[str]>
 
 Exclude wordlist modules.
 
 =item * B<ignore_case> => I<bool> (default: 1)
+
+(No description)
 
 =item * B<langs> => I<array[str]>
 
@@ -1235,9 +1243,15 @@ Use local CPAN mirror first when available (for -L).
 
 =item * B<len> => I<int>
 
+(No description)
+
 =item * B<max_len> => I<int>
 
+(No description)
+
 =item * B<min_len> => I<int>
+
+(No description)
 
 =item * B<num> => I<int> (default: 0)
 
@@ -1323,6 +1337,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<arg> => I<array[str]>
 
+(No description)
+
 =item * B<color> => I<str> (default: "auto")
 
 When to highlight search stringE<sol>matching pattern with color.
@@ -1338,13 +1354,19 @@ When returning grep result, this means also returning wordlist name.
 
 =item * B<exclude_dynamic_wordlists> => I<bool>
 
+(No description)
+
 =item * B<exclude_wordlist_pattern> => I<re_from_str>
+
+(No description)
 
 =item * B<exclude_wordlists> => I<array[str]>
 
 Exclude wordlist modules.
 
 =item * B<ignore_case> => I<bool> (default: 1)
+
+(No description)
 
 =item * B<langs> => I<array[str]>
 
@@ -1357,9 +1379,15 @@ or WordList::PersonName::*) are not included.
 
 =item * B<len> => I<int> (default: 5)
 
+(No description)
+
 =item * B<max_len> => I<int>
 
+(No description)
+
 =item * B<min_len> => I<int>
+
+(No description)
 
 =item * B<num> => I<int> (default: 0)
 
@@ -1457,7 +1485,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2022, 2021, 2020, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,10 +5,8 @@ use warnings;
 
 use Future::AsyncAwait 0.47;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0 0.000149;
 use Test::HexString;
-use Test::Refcount;
 
 use Tangence::Constants;
 
@@ -82,7 +80,7 @@ my $bagproxy;
 
    ok( defined $mdef, 'defined $mdef' );
    is( $mdef->name, "method", '$mdef->name' );
-   is_deeply( [ $mdef->argtypes ], [ TYPE_INT, TYPE_STR ], '$mdef->argtypes' );
+   is( [ $mdef->argtypes ], [ TYPE_INT, TYPE_STR ], '$mdef->argtypes' );
    is( $mdef->ret, TYPE_STR, '$mdef->ret' );
 
    my $f = $objproxy->call_method( method => 10, "hello" );
@@ -100,7 +98,7 @@ my $bagproxy;
 
    $client->send_message( $S2C{CALL_NORETURN} );
 
-   ok( exception { $objproxy->call_method( no_such_method => 123 )->get },
+   ok( dies { $objproxy->call_method( no_such_method => 123 )->get },
       'Calling no_such_method fails in proxy'
    );
 }
@@ -111,7 +109,7 @@ my $bagproxy;
 
    ok( defined $edef, 'defined $edef' );
    is( $edef->name, "event", '$edef->event' );
-   is_deeply( [ $edef->argtypes ], [ TYPE_INT, TYPE_STR ], '$edef->argtypes' );
+   is( [ $edef->argtypes ], [ TYPE_INT, TYPE_STR ], '$edef->argtypes' );
 
    my $event_i;
    my $event_s;
@@ -139,9 +137,9 @@ my $bagproxy;
 
    $client->send_message( $MSG_OK );
 
-   ok( exception { $objproxy->subscribe_event( "no_such_event",
-                      on_fire => sub {},
-                   )->get; },
+   ok( dies { $objproxy->subscribe_event( "no_such_event",
+                 on_fire => sub {},
+              )->get; },
       'Subscribing to no_such_event fails in proxy'
    );
 }
@@ -240,7 +238,7 @@ my $bagproxy;
 
    $client->send_message( $MSG_OK );
 
-   ok( exception { $objproxy->get_property( "no_such_property" )->get },
+   ok( dies { $objproxy->get_property( "no_such_property" )->get },
       'Getting no_such_property fails in proxy'
    );
 }
@@ -274,7 +272,7 @@ my $bagproxy;
    my ( $idx, @more ) = await $f;
 
    is( $idx, 0, 'next_forward starts at element 0' );
-   is_deeply( \@more, [ 1 ], 'next_forward yielded 1 element' );
+   is( \@more, [ 1 ], 'next_forward yielded 1 element' );
 
    undef @more;
    $f = $cursor->next_forward( 5 );
@@ -286,7 +284,7 @@ my $bagproxy;
    ( $idx, @more ) = await $f;
 
    is( $idx, 1, 'next_forward starts at element 1' );
-   is_deeply( \@more, [ 2, 3 ], 'next_forward yielded 2 elements' );
+   is( \@more, [ 2, 3 ], 'next_forward yielded 2 elements' );
 
    undef @more;
    $f = $cursor->next_backward;
@@ -298,7 +296,7 @@ my $bagproxy;
    ( $idx, @more ) = await $f;
 
    is( $idx, 2, 'next_backward starts at element 2' );
-   is_deeply( \@more, [ 3 ], 'next_forward yielded 1 element' );
+   is( \@more, [ 3 ], 'next_forward yielded 1 element' );
 
    undef $f;
    undef $cursor;

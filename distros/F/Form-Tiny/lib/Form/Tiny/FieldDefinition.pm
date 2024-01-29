@@ -1,5 +1,5 @@
 package Form::Tiny::FieldDefinition;
-$Form::Tiny::FieldDefinition::VERSION = '2.22';
+$Form::Tiny::FieldDefinition::VERSION = '2.23';
 use v5.10;
 use strict;
 use warnings;

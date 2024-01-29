@@ -7,6 +7,9 @@
    have the needed values.  Well, the module can emulate another graphics mode
    that may not be the one being displayed.  This means using the two structures
    would break functionality.  Therefore, the data from Perl is passed along.
+
+   8 bit and 1 bit modes are not yet supported and their case values are just
+   placeholders.
 */
 
 #include <stdlib.h>
@@ -172,9 +175,9 @@ void c_plot(
                         {
                             *((unsigned short*)(framebuffer + index)) = (short) color; // 16 bit can send a word at a time, the second most efficient method.
                         }
-				        break;
-				    case 8 :
-				        break;
+                        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -198,8 +201,8 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) ^= (short) color;
                         }
                         break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -223,8 +226,8 @@ void c_plot(
                            *((unsigned short*)(framebuffer + index)) |= (short) color;
                         }
                         break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -248,8 +251,8 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) &= (short) color;
                         }
                         break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -279,8 +282,8 @@ void c_plot(
                             }
                         }
                         break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -310,8 +313,8 @@ void c_plot(
                              }
                          }
                          break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -373,8 +376,8 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) = rgb565;
                         }
                         break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -398,8 +401,8 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) += (short) color;
                         }
                         break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -423,8 +426,8 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) -= (short) color;
                         }
                         break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -448,8 +451,8 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) *= (short) color;
                         }
                         break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -473,8 +476,8 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) /= (short) color;
                         }
                         break;
-				    case 8 :
-				        break;
+                    case 8 :
+                        break;
                     case 1 :
                         break;
                 }
@@ -1646,9 +1649,9 @@ void c_convert_24_32(char* buf24, unsigned int size24, char* buf32, unsigned cha
         *((unsigned int*)(buf32 + loc32++)) = r | (g << 8) | (b << 16);
         loc32 += 3;
         if (r == 0 && g == 0 && b == 0) {
-            *(buf32 + loc32++) = 0;
+            *(buf32 + loc32++) = 0; // The background is transparent
         } else {
-            *(buf32 + loc32++) = 255;
+            *(buf32 + loc32++) = 255; // The foreground is opague
         }
     }
 }

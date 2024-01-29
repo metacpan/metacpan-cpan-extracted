@@ -1,6 +1,7 @@
 # CHECKSUMS file written on Wed Feb 13 03:44:01 2008 GMT by CPAN::Checksums (v1.064)
 $cksum = {
   'Bogus-Fail-0.01_01.tar.gz' => {
+    'cpan_path' => 'J/JH/JHI',
     'md5' => 'd59a04393812e66619686c84f1aab7fa',
     'md5-ungz' => 'eab1658ad451035b75667243987e841a',
     'mtime' => '2008-02-04',

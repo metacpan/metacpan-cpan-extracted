@@ -44,7 +44,7 @@ t/dbmopen.t
 t/eval_error.t
 t/exception_class.t
 t/exception_nonref.t
-t/exceptions.t
+t/exceptions-smartmatch.t
 t/exec.t
 t/filehandles.t
 t/fileno.t
@@ -98,7 +98,6 @@ t/string-eval-basic.t
 t/string-eval-leak.t
 t/sysopen.t
 t/system.t
-t/touch_me
 t/truncate.t
 t/unlink.t
 t/user-context.t

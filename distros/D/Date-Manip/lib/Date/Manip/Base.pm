@@ -1,5 +1,5 @@
 package Date::Manip::Base;
-# Copyright (c) 1995-2023 Sullivan Beck.  All rights reserved.
+# Copyright (c) 1995-2024 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -27,7 +27,7 @@ use Encode qw(encode_utf8 from_to find_encoding decode _utf8_off _utf8_on is_utf
 require Date::Manip::Lang::index;
 
 our $VERSION;
-$VERSION='6.93';
+$VERSION='6.94';
 END { undef $VERSION; }
 
 ###############################################################################
@@ -175,6 +175,10 @@ sub _init_config {
       # How to parse mmm#### strings
 
       'format_mmmyyyy'   => '',
+
+      # Whether to use the default printf formats or the POSIX ones.
+
+      #'use_posix_printf' => 0,
 
       # *** DEPRECATED 7.0 ***
 
@@ -1124,11 +1128,12 @@ sub _config_var_base {
       my $err = $self->_config_var_format_mmmyyyy($val);
       return  if ($err);
 
-   } elsif ($var eq 'dateformat'    ||
-            $var eq 'jan1week1'     ||
-            $var eq 'printable'     ||
-            $var eq 'maxrecurattempts' ||
-            $var eq 'tomorrowfirst') {
+   } elsif ($var eq 'dateformat'       ||
+            $var eq 'jan1week1'        ||
+            $var eq 'printable'        ||
+            $var eq 'tomorrowfirst'    ||
+            #$var eq 'use_posix_printf' ||
+            $var eq 'maxrecurattempts') {
       # do nothing
 
    } else {

@@ -57,7 +57,7 @@ my $meta = {
   "provides"         => {
                           "Types::Namespace" => { file => "lib/Types/Namespace.pm", version => "1.10" },
                           "URI::Namespace" => { file => "lib/URI/Namespace.pm", version => "1.10" },
-                          "URI::NamespaceMap" => { file => "lib/URI/NamespaceMap.pm", version => "1.10" },
+                          "URI::NamespaceMap" => { file => "lib/URI/NamespaceMap.pm", version => 1.12 },
                           "URI::NamespaceMap::ReservedLocalParts" => {
                             file => "lib/URI/NamespaceMap/ReservedLocalParts.pm",
                             version => "1.10",
@@ -74,11 +74,11 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/project",
                         },
-  "version"          => "1.10",
+  "version"          => 1.12,
   "x_contributors"   => [
                           "Dorian Taylor <dorian\@cpan.org>",
                           "Toby Inkster (TOBYINK) <tobyink\@cpan.org>",
-                          "Paul Williams (KWAKWA) <kwakwa\@cpan.org>",
+                          "KWAKWA <kwakwa\@cpan.org>",
                         ],
   "x_static_install" => 1,
 };
@@ -154,28 +154,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

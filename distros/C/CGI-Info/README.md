@@ -1,9 +1,7 @@
--[![Actions Status](https://github.com/nigelhorne/CGI-Info/workflows/.github/workflows/all.yml/badge.svg)](https://github.com/nigelhorne/CGI-Info/actions)
 -[![Travis Status](https://travis-ci.org/nigelhorne/CGI-Info.svg?branch=master)](https://travis-ci.org/nigelhorne/CGI-Info)
 -[![Appveyor Status](https://ci.appveyor.com/api/projects/status/1t1yhvagx00c2qi8?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-info)
 -[![Coveralls Status](https://coveralls.io/repos/github/nigelhorne/CGI-Info/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-Info?branch=master)
 -[![CPAN](https://img.shields.io/cpan/v/CGI-Info.svg)](http://search.cpan.org/~nhorne/CGI-Info/)
--[![Kwalitee](https://cpants.cpanauthors.org/dist/CGI-Info.png)](http://cpants.cpanauthors.org/dist/CGI-Info)
 -[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Information+about+the+CGI+Environment+#perl+#CGI&url=https://github.com/nigelhorne/cgi-info&via=nigelhorne)
 
 # NAME
@@ -12,7 +10,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.78
+Version 0.80
 
 # SYNOPSIS
 
@@ -93,6 +91,9 @@ Returns the file system directory containing the script.
 
         print 'HTML files are normally stored in ', $info->script_dir(), '/', File::Spec->updir(), "\n";
 
+        # or
+        use lib CGI::Info::script_dir() . '../lib';
+
 ## host\_name
 
 Return the host-name of the current web server, according to CGI.
@@ -129,7 +130,8 @@ CGI::Info helps you to test your script prior to deployment on a website:
 if it is not in a CGI environment (e.g. the script is being tested from the
 command line), the program's command line arguments (a list of key=value pairs)
 are used, if there are no command line arguments then they are read from stdin
-as a list of key=value lines. Also you can give one of --tablet, --search-engine,
+as a list of key=value lines.
+Also you can give one of --tablet, --search-engine,
 \--mobile and --robot to mimic those agents. For example:
 
         ./script.cgi --mobile name=Nigel
@@ -188,9 +190,9 @@ constructor.
         # ...
         my $info = CGI::Info->new();
         my $allowed = {
-                'foo' => qr(^\d*$),     # foo must be a number, or empty
-                'bar' => undef,
-                'xyzzy' => qr(^[\w\s-]+$),      # must be alphanumeric
+                foo => qr/^\d*$/,       # foo must be a number, or empty
+                bar => undef,
+                xyzzy => qr/^[\w\s-]+$/,        # must be alphanumeric
                                                 # to prevent XSS, and non-empty
                                                 # as a sanity check
         };
@@ -235,7 +237,7 @@ be thrown:
 
         use CGI::Info;
         my $allowed = {
-                'foo' => qr(\d+),
+                foo => qr/\d+/
         };
         my $xyzzy = $info->params(allow => $allowed);
         my $bar = $info->param('bar');  # Gives an error message
@@ -299,6 +301,14 @@ This can be run as a class or object method.
         use CGI::Info;
 
         print CGI::Info->rootdir();
+
+## root\_dir
+
+Synonym of rootdir(), for compatibility with [CHI](https://metacpan.org/pod/CHI).
+
+## documentroot
+
+Synonym of rootdir(), for compatibility with Apache.
 
 ## logdir
 
@@ -423,7 +433,7 @@ You can also look for information at:
 
 - MetaCPAN
 
-    [https://metacpan.org/release/CGI-Info](https://metacpan.org/release/CGI-Info)
+    [https://metacpan.org/dist/CGI-Info](https://metacpan.org/dist/CGI-Info)
 
 - RT: CPAN's request tracker
 
@@ -439,6 +449,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2010-2023 Nigel Horne.
+Copyright 2010-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2

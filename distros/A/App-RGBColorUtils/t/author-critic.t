@@ -11,11 +11,11 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.006
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/RGBColorUtils.pm','script/rgb-is-dark','script/rgb-is-light'];
+my $filenames = ['lib/App/RGBColorUtils.pm','script/mix-2-rgb-colors','script/mix-rgb-colors','script/rgb-is-dark','script/rgb-is-light'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

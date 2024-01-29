@@ -3,9 +3,9 @@
 package Bencher::Util::CPANModules;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-30'; # DATE
+our $DATE = '2023-10-06'; # DATE
 our $DIST = 'Acme-CPANModulesUtil-Bencher'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 1;
 # ABSTRACT: Alias for Acme::CPANModulesUtil::Bencher
@@ -22,7 +22,7 @@ Bencher::Util::CPANModules - Alias for Acme::CPANModulesUtil::Bencher
 
 =head1 VERSION
 
-This document describes version 0.005 of Bencher::Util::CPANModules (from Perl distribution Acme-CPANModulesUtil-Bencher), released on 2022-11-30.
+This document describes version 0.006 of Bencher::Util::CPANModules (from Perl distribution Acme-CPANModulesUtil-Bencher), released on 2023-10-06.
 
 =head1 DESCRIPTION
 
@@ -65,7 +65,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

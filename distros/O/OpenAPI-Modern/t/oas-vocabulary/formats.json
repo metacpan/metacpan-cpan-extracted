@@ -89,6 +89,11 @@
                 "description": "beyond upper boundary",
                 "data": 2147483648,
                 "valid": false
+            },
+            {
+                "description": "not an integer",
+                "data": 0.1,
+                "valid": false
             }
         ]
     },
@@ -127,6 +132,11 @@
             {
                 "description": "beyond upper boundary",
                 "data": 9223372036854775808,
+                "valid": false
+            },
+            {
+                "description": "not an integer",
+                "data": 0.1,
                 "valid": false
             }
         ]

@@ -8,3 +8,5 @@
 ^dist\.ini$
 ^MYMETA
 ^\.travis\.yml$
+^\.idea$
+^releases/

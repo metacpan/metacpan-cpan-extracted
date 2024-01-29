@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetChartRequest.name : The workbook name.  ,
+# PostWorksheetChartRequest.name : The file name.  ,
 # PostWorksheetChartRequest.sheetName : The worksheet name.  ,
 # PostWorksheetChartRequest.chartIndex : The chart index.  ,
-# PostWorksheetChartRequest.chart : Represents a specified chart.  ,
-# PostWorksheetChartRequest.folder : Original workbook folder.  ,
-# PostWorksheetChartRequest.storageName : Storage name.   
+# PostWorksheetChartRequest.chart : Chart Represents a specified chart.  ,
+# PostWorksheetChartRequest.folder : The folder where the file is situated.  ,
+# PostWorksheetChartRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_chart' } = { 
-    	summary => 'Update chart propreties in worksheet.',
+    	summary => 'Update chart properties in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -144,7 +144,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -165,21 +165,21 @@ __PACKAGE__->method_documentation({
      'chart' => {
      	datatype => 'Chart',
      	base_name => 'chart',
-     	description => 'Represents a specified chart.',
+     	description => 'Chart Represents a specified chart.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

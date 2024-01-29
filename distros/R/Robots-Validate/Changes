@@ -1,5 +1,43 @@
 Revision history for Robots-Validate:
 
+v0.2.9    2024-01-06 13:48:11+00:00 Europe/London
+  [Incompatible Changes]
+  - Bumped minimum Perl version to v5.14.
+
+  [Enhancements]
+  - Improved the regex for Slurp to work with Inktomi slurp, not just Yahoo slurp.
+
+  - Added rule for DataProviderBot.
+
+  - Added rule for MonsidoBot.
+
+  - Added rule for Headline ev-crawler.
+
+  - Removed the starting wordbreak from the regexes, which should improve performance.
+
+  [Other]
+  - Removed Neevabot rule, since the bot seems to have shut down.
+
+  [Documentation]
+  - Fixed a typo.
+
+  - Updated copyright year.
+
+v0.2.8    2023-12-13 09:12:44+00:00 Europe/London
+  [Enhancements]
+  - Updated rules for Amazonbot.
+
+  [Documentation]
+  - Bump copyright year.
+
+  [Tests]
+  - Switched package used for the release manifest.
+
+  [Toolchain]
+  - Sign distribution.
+
+  - Fixed MANIFEST.SKIP rules.
+
 v0.2.7    2022-05-12 11:12:06-04:00 EST5EDT
   [Enhancements]
   - Added rules for Amazonbot.

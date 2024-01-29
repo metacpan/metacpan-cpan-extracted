@@ -7,7 +7,7 @@ use Log::Any;
 use Try::Tiny;
 use IPC::Run;
 use App::XScreenSaver::DBus::SaverProxy;
-our $VERSION = '1.0.4'; # VERSION
+our $VERSION = '1.0.5'; # VERSION
 # ABSTRACT: implements the "idle inhibition" protocol
 
 
@@ -98,7 +98,7 @@ sub Inhibit($self,$name,$reason,$sender) {
     return $cookie;
 }
 
-sub Uninhibit($self,$cookie,$this_sender) {
+sub UnInhibit($self,$cookie,$this_sender) {
     my $inhibit = delete $self->_inhibits->{$cookie}
         or return;
     my ($name, $reason, $sender) = @$inhibit;
@@ -166,7 +166,7 @@ App::XScreenSaver::DBus::Saver - implements the "idle inhibition" protocol
 
 =head1 VERSION
 
-version 1.0.4
+version 1.0.5
 
 =head1 SYNOPSIS
 

@@ -11,7 +11,7 @@ our @ISA = qw{ Exporter };
 use Astro::App::Satpass2::Utils qw{ load_package };
 use Test::More 0.88;
 
-our $VERSION = '0.052';
+our $VERSION = '0.053';
 
 our @EXPORT_OK = qw{ setup geocode };
 our @EXPORT = @EXPORT_OK;
@@ -37,7 +37,7 @@ sub setup {
     my $rslt = LWP::UserAgent->new()->get( $url )
 	or plan skip_all => "No access to $url: " . $@ || 'Unknown error';
     $rslt->is_success
-	or plan skip_all => "No access to $url: ", $rslt->status_line();
+	or plan skip_all => "No access to $url: " . $rslt->status_line();
 
     eval {
 	$wrapper_object = $wrapper_class->new();

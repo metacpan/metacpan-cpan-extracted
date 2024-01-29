@@ -68,16 +68,16 @@ DESCRIPTION
     Another Process" in perlipc.
 
 GnuPG Versions
-    As of this version of GnuPG::Interface, there are two supported versions
-    of GnuPG: 1.4.x and 2.2.x. The GnuPG download page
+    As of this version of GnuPG::Interface, there are three supported
+    versions of GnuPG: 1.4.x, 2.2.x, and 2.4.x. The GnuPG download page
     <https://gnupg.org/download/index.html> has updated information on the
     currently supported versions.
 
     GnuPG released 2.0 and 2.1 versions in the past and some packaging
     systems may still provide these if you install the default "gpg",
-    "gnupg", "gnupg2", etc. packages. This modules supports only version
-    2.2.x, so you may need to find additional package repositories or build
-    from source to get the updated version.
+    "gnupg", "gnupg2", etc. packages. 2.0 and 2.1 versions are not
+    supported, so you may need to find additional package repositories or
+    build from source to get the updated version.
 
 OBJECT METHODS
   Initialization Methods

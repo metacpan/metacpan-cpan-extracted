@@ -1,5 +1,11 @@
 Revision history for Map::Tube::API
 
+0.07  Sun Jan 28 16:50:00 2024
+      - Added Map::Tube::Bielefeld, thanks Michal Josef Špaček.
+
+0.06  Sun Jan 28 14:20:00 2024
+      - Introduced env MAP_BASE_URL and MAP_VERSION.
+
 0.05  Wed Apr 18 21:45:00 2018
       - Fixed mismatch version issue.
 

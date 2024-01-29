@@ -27,7 +27,7 @@ WriteMakefile(
 			repository =>{
 				type => "git",
 				url => "git://github.com/drclaw1394/perl-template-plex.git",
-				web => "http://github.com/drclaw1394/perl-template-plex",
+				web => "https://github.com/drclaw1394/perl-template-plex",
 			}
 		}
 	}

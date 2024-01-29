@@ -1,7 +1,7 @@
 # -------------------- Help ----------------------
 
 package Audio::Nama;
-use Modern::Perl;
+use Modern::Perl '2020';
 
 {
 no warnings 'uninitialized';
@@ -12,7 +12,7 @@ sub helpline {
 			if $text->{commands}->{$cmd}->{short};	
 	$out .=  "Category: $text->{commands}->{$cmd}->{type}\n";
 	my $what = munge_help($text->{commands}->{$cmd}->{what});
-	$out .=  "Description: $what\n";
+	$out .=  "Description: $what";
 	$out .=  "Usage: $cmd "; 
 
 	if ( $text->{commands}->{$cmd}->{parameters} 
@@ -301,8 +301,8 @@ transport => <<TRANSPORT,
    forward, fw        -  Forward some number of seconds, i.e. fw 75
    setpos, sp         -  Set the playback head position, i.e. setpos 49.2
    getpos, gp         -  Get the current head position 
-   to-start, beg      - set playback head to start
-   to-end, end        - set playback head to end
+   jump-to-start, beg   - set playback head to beginning of audio file(s)
+   jump-to-end, end     - set playback head to end
 TRANSPORT
 track_fader => <<'TRACKFADER',
    Track volume/pan fader can be used to change settings for the current track.
@@ -400,10 +400,10 @@ track_io => <<'TRACKIO',
  
      * unconnected JACK port    source manual
      
-       note: the port for mono track 'piano' would be ecasound:piano_in_1 XX
+       note: the port for mono track 'piano' would be ecasound:piano_in_1
 
-     * A list of JACK ports     source drum.ports (ports list from drums.ports)
-                                source ports (ports list from <trackname>.ports)
+     * A list of JACK ports     source drum.ports (ports list from file drums.ports)
+                                source ports (ports list from file <trackname>.ports)
 
      * from another track (after effects processing)
                                 source track Strings
@@ -581,7 +581,7 @@ Nama uses git to save project state as a series of commits, a new commit after
 each command. It is easy to tag a commit as a way of documenting
 developments in a projects. 
 
-   save <tagname>            - label current autosave state as <tagname>
+   save <tagname>            - label current snapshot as <tagname>
    get <tagname>             - checkout project state tagged with <tagname>
    branch <tagname>          - switch to branch and load state
    list-branches, lbr        - list branches and tags

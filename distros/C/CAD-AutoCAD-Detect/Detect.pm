@@ -6,13 +6,13 @@ use warnings;
 
 use CAD::AutoCAD::Version;
 use Error::Pure qw(err);
-use List::MoreUtils qw(any);
+use List::Util 1.33 qw(any);
 use Readonly;
 
 # Constants.
 Readonly::Array our @EXPORT => qw(detect_dwg_file);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Detect DWG file.
 sub detect_dwg_file {
@@ -142,7 +142,7 @@ Returns magic string or undef.
 L<CAD::AutoCAD::Version>,
 L<Error::Pure>,
 L<Exporter>,
-L<List::MoreUtils>,
+L<List::Util>,
 L<Readonly>.
 
 =head1 REPOSITORY
@@ -157,12 +157,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2021 Michal Josef Špaček
+© 2020-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

@@ -60,5 +60,5 @@
    },
    "version" : "5.503",
    "x_module_name" : "MIME::Tools",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -1,5 +1,8 @@
 Revision history for Perl module Distribution::Guess::BuildSystem
 
+1.005 2024-01-25T18:04:01Z
+	* refresh distro, update email address
+
 1.004 2022-01-08T23:56:26Z
 	* No code changes. Fix a link in README.pod.
 

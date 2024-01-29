@@ -9,11 +9,22 @@ Error::Helper - Provides some easy error related methods.
 
 =head1 VERSION
 
-Version 2.0.0
+Version 2.1.0
 
 =cut
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
+
+our $error             = undef;
+our $perror            = undef;
+our $errorLine         = undef;
+our $errorFilename     = undef;
+our $errorString       = '';
+our $errorFlag         = undef;
+our $errorPackage      = undef;
+our $errorPackageShort = undef;
+our $errorSub          = undef;
+our $errorSubShort     = undef;
 
 =head1 SYNOPSIS
 
@@ -41,6 +52,7 @@ Below is a example script showing it's usage.
     					1 => 'UndefArg',
     					2 => 'test',
     					3 => 'derp',
+    					4 => 'test2',
     				},
     				fatal_flags => {
     					derp => 1,
@@ -50,12 +62,23 @@ Below is a example script showing it's usage.
     		};
     		bless $self;
 
-    		#error if $arg is set to "test"
+    		# error if $arg is set to "test"
     		if ( defined($arg)
 			&& $arg eq "test" )
     		{
     			$self->{perror}      = 1;
     			$self->{error}       = 2;
+    			$self->{errorString} = 'A value of "test" has been set';
+    			$self->warn;
+    			return $self;
+    		}
+
+    		# error if $arg is set to "test2", error fatally
+    		if ( defined($arg)
+			&& $arg eq "test" )
+    		{
+    			$self->{perror}      = 1;
+    			$self->{error}       = 4;
     			$self->{errorString} = 'A value of "test" has been set';
     			$self->warn;
     			return $self;
@@ -90,10 +113,27 @@ Below is a example script showing it's usage.
     	} ## end sub foo
     }
 
-    my $foo_obj = Foo->new( $ARGV[0] );
-    if ( $foo_obj->error ) {
-    	warn( 'error:' . $foo_obj->error . ': ' . $foo_obj->errorString );
-    	exit $foo_obj->error;
+    my $foo_obj;
+    eval {
+        $foo_obj = Foo->new( $ARGV[0] );
+        # will never be evaulated as perrors are fatal
+        if ( $foo_obj->error ) {
+        	warn( 'error:' . $foo_obj->error . ': ' . $foo_obj->errorString );
+        	exit $foo_obj->error;
+        }
+    };
+    if ($@) {
+        print 'Error: ' . $Error::Helper::error .
+            "\nError String: " . $Error::Helper::errorString .
+            "\nError Flag: " . $Error::Helper::errorFlag .
+            "\nError File: " . $Error::Helper::errorFilename .
+            "\nError Line: " . $Error::Helper::errorLine .
+            "\nError Sub: " . $Error::Helper::errorSub .
+            "\nError Sub Short: " . $Error::Helper::errorSubShort .
+            "\nError Package: " . $Error::Helper::errorPackage .
+            "\nError PackageShort: " . $Error::Helper::errorPackageShort . "\n";
+
+        exit $Error::Helper::error;
     }
 
     # catches fatal errors
@@ -107,7 +147,7 @@ Below is a example script showing it's usage.
 	    	warn('error flag derp found... calling again with a value of default');
     		$foo_obj->foo( 'default' );
     	}
-    } elsif ($foo->error) {
+    } elsif ($foo_obj->error) {
     	# do something...
        	warn( '$foo_obj->foo( $ARGV[1] ) errored');
     }
@@ -157,6 +197,30 @@ The following are optional.
     - $self->{errorExtra}{perror_not_fatal} :: Controls if $self->{perror} is fatal or not.
         - Type :: Perl boolean
         - Default :: undef
+
+This module also sets several other variables as well for when something like a new method is called
+and dies, before something blessed can be returned. These allow examining the the error that resulted in it dieing.
+
+The following are mapped to the the ones above.
+
+    $Error::Helper::perror
+    $Error::Helper::error
+    $Error::Helper::errorString
+    $Error::Helper::errorFlag
+    $Error::Helper::errorFilename
+    $Error::Helper::errorLine
+
+The following don't have mappings above.
+
+    - $Error::Helper::errorSub :: The sub that warn was called from.
+
+    - $Error::Helper::errorSubShort :: Same as errorSub, but everything prior to the subname is
+            removed. So Foo::bar would become bar.
+
+    - $Error::Helper::errorPackage :: The package from which warn was called from.
+
+    - $Error::Helper::errorPackageShort :: Saome as package, but everthing prior to the last item
+            in the name space is removed. So Foo::Foo::Bar would just become Bar.
 
 =head1 METHODS
 
@@ -235,6 +299,17 @@ sub errorblank {
 	$self->{errorFilename} = undef;
 	$self->{errorLine}     = undef;
 	$self->{errorString}   = "";
+
+	$error             = undef;
+	$perror            = undef;
+	$errorLine         = undef;
+	$errorFilename     = undef;
+	$errorString       = '';
+	$errorFlag         = undef;
+	$errorPackage      = undef;
+	$errorPackageShort = undef;
+	$errorSub          = undef;
+	$errorSubShort     = undef;
 
 	return 1;
 } ## end sub errorblank
@@ -345,22 +420,43 @@ sub warn {
 
 	my ( $package, $filename, $line ) = caller;
 
+	$errorPackage = $package;
+
 	$self->{errorFilename} = $filename;
+	$errorFilename         = $filename;
 	$self->{errorLine}     = $line;
+	$errorLine             = $line;
+
+	if ( !defined( $self->{error} ) ) {
+		$self->{error} = 3060;
+	}
+	$error = $self->{error};
+
+	if ( !defined( $self->{errorString} ) ) {
+		$self->{errorString} = 'unknown... warn called without errorString being set';
+	}
+	$errorString = $self->{errorString};
+
+	$perror = $self->{perror};
+
+	$errorFlag = $self->errorFlag;
 
 	#get the calling sub
 	my @called     = caller(1);
 	my $subroutine = $called[3];
+	$errorSub = $subroutine;
 	$subroutine =~ s/.*\:\://g;
+	$errorSubShort = $subroutine;
 
 	$package =~ s/\:\:/\-/g;
+	$errorPackageShort = $package;
 
 	my $error
 		= $package . ' '
 		. $subroutine . ':'
 		. $self->error . ':'
-		. $self->errorFlag . ': '
-		. $self->errorString
+		. $errorFlag . ': '
+		. $errorString
 		. ' at line '
 		. $line . ' in '
 		. $filename . "\n";
@@ -416,11 +512,11 @@ sub warnString {
 	#get the calling sub
 	my @called     = caller(1);
 	my $subroutine = $called[3];
-	if (defined($subroutine)) {
+	if ( defined($subroutine) ) {
 		$subroutine =~ s/.*\:\://g;
-		$package =~ s/\:\:/\-/g;
+		$package    =~ s/\:\:/\-/g;
 		print STDERR $package . ' ' . $subroutine . ': ' . $string . ' in ' . $filename . ' at line ' . $line . "\n";
-	}else {
+	} else {
 		print STDERR $package . ': ' . $string . ' in ' . $filename . ' at line ' . $line . "\n";
 	}
 } ## end sub warnString

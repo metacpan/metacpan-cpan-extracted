@@ -4142,19 +4142,22 @@ perl_png_init_io_x (perl_libpng_t * Png, SV * fpsv)
 {
     FILE * fp;
     PerlIO *io;
-    
-    io = IoIFP (sv_2io (fpsv));
-    if (io) {
-	Png->io_sv = SvREFCNT_inc (fpsv);
-	Png->memory_gets++;
-	fp = PerlIO_findFILE (io);
-	png_init_io (Png->png, fp);
-	Png->init_io_done = 1;
+    IO * scalar;
+    scalar = sv_2io (fpsv);
+    if (! scalar) {
+	croak ("init_io: sv_2io failed: not an io scalar?");
     }
-    else {
-	croak ("Error doing init_io: unopened file handle?");
+    io = IoIFP (scalar);
+    if (! io) {
+	croak ("init_io: IoIFP failed: scalar's file handle is NULL");
     }
+    Png->io_sv = SvREFCNT_inc (fpsv);
+    Png->memory_gets++;
+    fp = PerlIO_findFILE (io);
+    png_init_io (Png->png, fp);
+    Png->init_io_done = 1;
 }
+ 
 
 static void
 perl_png_set_quantize (perl_libpng_t * png, AV * palette,

@@ -3,7 +3,7 @@ use warnings;
 
 # focus on some troublesome URLs
 
-use Test::More;
+use Test::More import => [qw( cmp_ok done_testing isa_ok ok )];
 use URI::ParseSearchString::More ();
 
 my $more = URI::ParseSearchString::More->new;

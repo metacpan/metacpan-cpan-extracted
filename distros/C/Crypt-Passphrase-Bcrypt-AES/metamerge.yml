@@ -1,0 +1,7 @@
+resources:
+  bugtracker:
+    web: https://github.com/Leont/crypt-passphrase-bcrypt-aes/issues
+  repository:
+    type: git
+    url: git://github.com/Leont/crypt-passphrase-bcrypt-aes.git
+    web: https://github.com/Leont/crypt-passphrase-bcrypt-aes

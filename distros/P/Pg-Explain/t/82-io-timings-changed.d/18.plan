@@ -1,0 +1,126 @@
+                    QUERY PLAN                     
+---------------------------------------------------
+ [                                                +
+   {                                              +
+     "Plan": {                                    +
+       "Node Type": "Aggregate",                  +
+       "Strategy": "Plain",                       +
+       "Partial Mode": "Finalize",                +
+       "Parallel Aware": false,                   +
+       "Startup Cost": 20857.57,                  +
+       "Total Cost": 20857.58,                    +
+       "Plan Rows": 1,                            +
+       "Plan Width": 48,                          +
+       "Actual Startup Time": 74.565,             +
+       "Actual Total Time": 76.863,               +
+       "Actual Rows": 1,                          +
+       "Actual Loops": 1,                         +
+       "Shared Hit Blocks": 2272,                 +
+       "Shared Read Blocks": 9252,                +
+       "Shared Dirtied Blocks": 0,                +
+       "Shared Written Blocks": 0,                +
+       "Local Hit Blocks": 0,                     +
+       "Local Read Blocks": 0,                    +
+       "Local Dirtied Blocks": 0,                 +
+       "Local Written Blocks": 0,                 +
+       "Temp Read Blocks": 0,                     +
+       "Temp Written Blocks": 0,                  +
+       "I/O Read Time": 16.619,                   +
+       "I/O Write Time": 0.000,                   +
+       "Plans": [                                 +
+         {                                        +
+           "Node Type": "Gather",                 +
+           "Parent Relationship": "Outer",        +
+           "Parallel Aware": false,               +
+           "Startup Cost": 20857.34,              +
+           "Total Cost": 20857.55,                +
+           "Plan Rows": 2,                        +
+           "Plan Width": 72,                      +
+           "Actual Startup Time": 74.524,         +
+           "Actual Total Time": 76.848,           +
+           "Actual Rows": 3,                      +
+           "Actual Loops": 1,                     +
+           "Workers Planned": 2,                  +
+           "Workers Launched": 2,                 +
+           "Single Copy": false,                  +
+           "Shared Hit Blocks": 2272,             +
+           "Shared Read Blocks": 9252,            +
+           "Shared Dirtied Blocks": 0,            +
+           "Shared Written Blocks": 0,            +
+           "Local Hit Blocks": 0,                 +
+           "Local Read Blocks": 0,                +
+           "Local Dirtied Blocks": 0,             +
+           "Local Written Blocks": 0,             +
+           "Temp Read Blocks": 0,                 +
+           "Temp Written Blocks": 0,              +
+           "I/O Read Time": 16.619,               +
+           "I/O Write Time": 0.000,               +
+           "Plans": [                             +
+             {                                    +
+               "Node Type": "Aggregate",          +
+               "Strategy": "Plain",               +
+               "Partial Mode": "Partial",         +
+               "Parent Relationship": "Outer",    +
+               "Parallel Aware": false,           +
+               "Startup Cost": 19857.34,          +
+               "Total Cost": 19857.35,            +
+               "Plan Rows": 1,                    +
+               "Plan Width": 72,                  +
+               "Actual Startup Time": 72.748,     +
+               "Actual Total Time": 72.749,       +
+               "Actual Rows": 1,                  +
+               "Actual Loops": 3,                 +
+               "Shared Hit Blocks": 2272,         +
+               "Shared Read Blocks": 9252,        +
+               "Shared Dirtied Blocks": 0,        +
+               "Shared Written Blocks": 0,        +
+               "Local Hit Blocks": 0,             +
+               "Local Read Blocks": 0,            +
+               "Local Dirtied Blocks": 0,         +
+               "Local Written Blocks": 0,         +
+               "Temp Read Blocks": 0,             +
+               "Temp Written Blocks": 0,          +
+               "I/O Read Time": 16.619,           +
+               "I/O Write Time": 0.000,           +
+               "Plans": [                         +
+                 {                                +
+                   "Node Type": "Seq Scan",       +
+                   "Parent Relationship": "Outer",+
+                   "Parallel Aware": true,        +
+                   "Relation Name": "depesz",     +
+                   "Alias": "depesz",             +
+                   "Startup Cost": 0.00,          +
+                   "Total Cost": 15690.67,        +
+                   "Plan Rows": 416667,           +
+                   "Plan Width": 57,              +
+                   "Actual Startup Time": 0.023,  +
+                   "Actual Total Time": 21.904,   +
+                   "Actual Rows": 333333,         +
+                   "Actual Loops": 3,             +
+                   "Shared Hit Blocks": 2272,     +
+                   "Shared Read Blocks": 9252,    +
+                   "Shared Dirtied Blocks": 0,    +
+                   "Shared Written Blocks": 0,    +
+                   "Local Hit Blocks": 0,         +
+                   "Local Read Blocks": 0,        +
+                   "Local Dirtied Blocks": 0,     +
+                   "Local Written Blocks": 0,     +
+                   "Temp Read Blocks": 0,         +
+                   "Temp Written Blocks": 0,      +
+                   "I/O Read Time": 16.619,       +
+                   "I/O Write Time": 0.000        +
+                 }                                +
+               ]                                  +
+             }                                    +
+           ]                                      +
+         }                                        +
+       ]                                          +
+     },                                           +
+     "Planning Time": 0.127,                      +
+     "Triggers": [                                +
+     ],                                           +
+     "Execution Time": 76.918                     +
+   }                                              +
+ ]
+(1 row)
+

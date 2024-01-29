@@ -1,3 +1,9 @@
+0.111   2023-12-27  Released-By: PERLANCAR; Urgency: medium
+
+        - [bug] Forgot to configure Getopt::Long with gnu_getopt,
+          no_ignore_case.
+
+
 0.110   2022-06-02  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.

@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use Compress::Zlib;
 #use Encode qw(:all);
@@ -20,11 +20,15 @@ PDF::Builder::Resource::BaseFont - Base class for font resources
 
 =head1 METHODS
 
+=head2 new
+
+    $font = PDF::Builder::Resource::BaseFont->new($pdf, $name)
+
 =over
 
-=item $font = PDF::Builder::Resource::BaseFont->new($pdf, $name)
-
 Return a font resource object.
+
+=back
 
 =cut
 
@@ -50,9 +54,15 @@ sub data {
     return $_[0]->{' data'}; 
 }
 
-=item $descriptor = $font->descrByData()
+=head2 descrByData
+
+    $descriptor = $font->descrByData()
+
+=over
 
 Return the font's FontDescriptor key structure based on the font's data.
+
+=back
 
 =cut
 
@@ -152,15 +162,17 @@ sub tounicodemap {
     return $self;
 }
 
-=back
-
 =head1 FONT-MANAGEMENT RELATED METHODS
+
+=head2 fontname
+
+    $name = $font->fontname()
 
 =over
 
-=item $name = $font->fontname()
-
 Return the font's name (a.k.a. display name).
+
+=back
 
 =cut
 
@@ -168,9 +180,15 @@ sub fontname {
     return $_[0]->data()->{'fontname'}; 
 }
 
-=item $name = $font->altname()
+=head2 altname
+
+    $name = $font->altname()
+
+=over
 
 Return the font's alternative name (a.k.a. Windows name for a PostScript font).
+
+=back
 
 =cut
 
@@ -178,9 +196,15 @@ sub altname {
     return $_[0]->data()->{'altname'}; 
 }
 
-=item $name = $font->subname()
+=head2 subname
+
+    $name = $font->subname()
+
+=over
 
 Return the font's subname (a.k.a. font variant).
+
+=back
 
 =cut
 
@@ -188,9 +212,15 @@ sub subname {
     return $_[0]->data()->{'subname'}; 
 }
 
-=item $name = $font->apiname()
+=head2 apiname
+
+    $name = $font->apiname()
+
+=over
 
 Return the font's name to be used internally (should be equal to $font->name()).
+
+=back
 
 =cut
 
@@ -198,9 +228,15 @@ sub apiname {
     return $_[0]->data()->{'apiname'}; 
 }
 
-=item $issymbol = $font->issymbol()
+=head2 issymbol
+
+    $issymbol = $font->issymbol()
+
+=over
 
 Return the font's symbol flag (i.e., is this a symbol font).
+
+=back
 
 =cut
 
@@ -208,9 +244,15 @@ sub issymbol {
     return $_[0]->data()->{'issymbol'}; 
 }
 
-=item $iscff = $font->iscff()
+=head2 iscff
+
+    $iscff = $font->iscff()
+
+=over
 
 Return the font's Compact Font Format flag.
+
+=back
 
 =cut
 
@@ -218,15 +260,17 @@ sub iscff {
     return $_[0]->data()->{'iscff'}; 
 }
 
-=back
-
 =head1 TYPOGRAPHY-RELATED METHODS
+
+=head2 fontbbox
+
+    ($llx,$lly, $urx,$ury) = $font->fontbbox()
 
 =over
 
-=item ($llx,$lly, $urx,$ury) = $font->fontbbox()
-
 Return the font's bounding box.
+
+=back
 
 =cut
 
@@ -239,9 +283,15 @@ sub fontbbox {
     return @bbox;
 }
 
-=item $capheight = $font->capheight()
+=head2 capheight
+
+    $capheight = $font->capheight()
+
+=over
 
 Return the font's capheight value.
+
+=back
 
 =cut
 
@@ -249,9 +299,15 @@ sub capheight {
     return $_[0]->data()->{'capheight'}; 
 }
 
-=item $xheight = $font->xheight()
+=head2 xheight
+
+    $xheight = $font->xheight()
+
+=over
 
 Return the font's xheight value.
+
+=back
 
 =cut
 
@@ -259,9 +315,15 @@ sub xheight {
     return $_[0]->data()->{'xheight'}; 
 }
 
-=item $missingwidth = $font->missingwidth()
+=head2 missingwidth
+
+    $missingwidth = $font->missingwidth()
+
+=over
 
 Return the font's missingwidth value.
+
+=back
 
 =cut
 
@@ -269,9 +331,15 @@ sub missingwidth {
     return $_[0]->data()->{'missingwidth'}; 
 }
 
-=item $maxwidth = $font->maxwidth()
+=head2 maxwidth
+
+    $maxwidth = $font->maxwidth()
+
+=over
 
 Return the font's maxwidth value.
+
+=back
 
 =cut
 
@@ -279,9 +347,15 @@ sub maxwidth {
     return $_[0]->data()->{'maxwidth'}; 
 }
 
-=item $avgwidth = $font->avgwidth()
+=head2 avgwidth
+
+    $avgwidth = $font->avgwidth()
+
+=over
 
 Return the font's avgwidth (average width) value.
+
+=back
 
 =cut
 
@@ -351,9 +425,15 @@ sub avgwidth {
     return int($aw);
 }
 
-=item $flags = $font->flags()
+=head2 flags
+
+    $flags = $font->flags()
+
+=over
 
 Return the font's flags value.
+
+=back
 
 =cut
 
@@ -361,9 +441,15 @@ sub flags {
     return $_[0]->data()->{'flags'}; 
 }
 
-=item $stemv = $font->stemv()
+=head2 stemv
+
+    $stemv = $font->stemv()
+
+=over
 
 Return the font's stemv value.
+
+=back
 
 =cut
 
@@ -371,9 +457,15 @@ sub stemv {
     return $_[0]->data()->{'stemv'}; 
 }
 
-=item $stemh = $font->stemh()
+=head2 stemh
+
+    $stemh = $font->stemh()
+
+=over
 
 Return the font's stemh value.
+
+=back
 
 =cut
 
@@ -381,9 +473,15 @@ sub stemh {
     return $_[0]->data()->{'stemh'}; 
 }
 
-=item $italicangle = $font->italicangle()
+=head2 italicangle
 
-Return the font's italicangle value.
+    $italicangle = $font->italicangle()
+
+=over
+
+Return the font's italicangle (slant, obliqueness) value.
+
+=back
 
 =cut
 
@@ -391,9 +489,15 @@ sub italicangle {
     return $_[0]->data()->{'italicangle'}; 
 }
 
-=item $isfixedpitch = $font->isfixedpitch()
+=head2 isfixedpitch
+
+    $isfixedpitch = $font->isfixedpitch()
+
+=over
 
 Return the font's isfixedpitch flag.
+
+=back
 
 =cut
 
@@ -401,9 +505,15 @@ sub isfixedpitch {
     return $_[0]->data()->{'isfixedpitch'}; 
 }
 
-=item $underlineposition = $font->underlineposition()
+=head2 underlineposition
+
+    $underlineposition = $font->underlineposition()
+
+=over
 
 Return the font's underlineposition value.
+
+=back
 
 =cut
 
@@ -411,9 +521,15 @@ sub underlineposition {
     return $_[0]->data()->{'underlineposition'}; 
 }
 
-=item $underlinethickness = $font->underlinethickness()
+=head2 underlinethickness
+
+    $underlinethickness = $font->underlinethickness()
+
+=over
 
 Return the font's underlinethickness value.
+
+=back
 
 =cut
 
@@ -421,9 +537,15 @@ sub underlinethickness {
     return $_[0]->data()->{'underlinethickness'}; 
 }
 
-=item $ascender = $font->ascender()
+=head2 ascender
+
+    $ascender = $font->ascender()
+
+=over
 
 Return the font's ascender value.
+
+=back
 
 =cut
 
@@ -431,9 +553,15 @@ sub ascender {
     return $_[0]->data()->{'ascender'}; 
 }
 
-=item $descender = $font->descender()
+=head2 descender
+
+    $descender = $font->descender()
+
+=over
 
 Return the font's descender value.
+
+=back
 
 =cut
 
@@ -441,15 +569,17 @@ sub descender {
     return $_[0]->data()->{'descender'}; 
 }
 
-=back
-
 =head1 GLYPH-RELATED METHODS
 
-=over 4
+=head2 glyphNames
 
-=item @names = $font->glyphNames()
+    @names = $font->glyphNames()
+
+=over
 
 Return the defined glyph names of the font.
+
+=back
 
 =cut
 
@@ -457,9 +587,15 @@ sub glyphNames {
     return keys %{$_[0]->data()->{'wx'}}; 
 }
 
-=item $glNum = $font->glyphNum()
+=head2 glyphNum
+
+    $glNum = $font->glyphNum()
+
+=over
 
 Return the number of defined glyph names of the font.
+
+=back
 
 =cut
 
@@ -469,9 +605,15 @@ sub glyphNum {
     return scalar keys %{$_[0]->data()->{'wx'}}; 
 }
 
-=item $uni = $font->uniByGlyph($char)
+=head2 uniByGlyph
+
+    $uni = $font->uniByGlyph($char)
+
+=over
 
 Return the unicode by glyph name.
+
+=back
 
 =cut
 
@@ -481,9 +623,15 @@ sub uniByGlyph {
     return $_[0]->data()->{'n2u'}->{$_[1]}; 
 }
 
-=item $uni = $font->uniByEnc($char)
+=head2 uniByEnc
+
+    $uni = $font->uniByEnc($char)
+
+=over
 
 Return the Unicode by the font's encoding map.
+
+=back
 
 =cut
 
@@ -495,9 +643,15 @@ sub uniByEnc {
     return $uni;
 }
 
-=item $uni = $font->uniByMap($char)
+=head2 uniByMap
+
+    $uni = $font->uniByMap($char)
+
+=over
 
 Return the Unicode by the font's default map.
+
+=back
 
 =cut
 
@@ -505,9 +659,15 @@ sub uniByMap {
     return $_[0]->data()->{'uni'}->[$_[1]]; 
 }
 
-=item $char = $font->encByGlyph($glyph)
+=head2 encByGlyph
+
+    $char = $font->encByGlyph($glyph)
+
+=over
 
 Return the character by the given glyph name of the font's encoding map.
+
+=back
 
 =cut
 
@@ -515,9 +675,15 @@ sub encByGlyph {
     return $_[0]->data()->{'n2e'}->{$_[1]} || 0; 
 }
 
-=item $char = $font->encByUni($uni)
+=head2 encByUni
+
+    $char = $font->encByUni($uni)
+
+=over
 
 Return the character by the given Unicode of the font's encoding map.
+
+=back
 
 =cut
 
@@ -527,9 +693,15 @@ sub encByUni {
 	   0; 
 }
 
-=item $char = $font->mapByGlyph($glyph)
+=head2 mapByGlyph
+
+    $char = $font->mapByGlyph($glyph)
+
+=over
 
 Return the character by the given glyph name of the font's default map.
+
+=back
 
 =cut
 
@@ -537,9 +709,15 @@ sub mapByGlyph {
     return $_[0]->data()->{'n2c'}->{$_[1]} || 0; 
 }
 
-=item $char = $font->mapByUni($uni)
+=head2 mapByUni
+
+    $char = $font->mapByUni($uni)
+
+=over
 
 Return the character by the given Unicode of the font's default map.
+
+=back
 
 =cut
 
@@ -547,11 +725,17 @@ sub mapByUni {
     return $_[0]->data()->{'u2c'}->{$_[1]} || 0; 
 }
 
-=item $name = $font->glyphByUni($unicode)
+=head2 glyphByUni
+
+    $name = $font->glyphByUni($unicode)
+
+=over
 
 Return the glyph's name by the font's Unicode map.
 B<CAUTION:> non-standard glyph-names are mapped onto
 the ms-symbol area (0xF000).
+
+=back
 
 =cut
 
@@ -559,9 +743,15 @@ sub glyphByUni {
     return $_[0]->data()->{'u2n'}->{$_[1]} || '.notdef'; 
 }
 
-=item $name = $font->glyphByEnc($char)
+=head2 glyphByEnc
+
+    $name = $font->glyphByEnc($char)
+
+=over
 
 Return the glyph's name by the font's encoding map.
+
+=back
 
 =cut
 
@@ -569,9 +759,15 @@ sub glyphByEnc {
     return $_[0]->data()->{'e2n'}->[$_[1]];
 }
 
-=item $name = $font->glyphByMap($char)
+=head2 glyphByMap
+
+    $name = $font->glyphByMap($char)
+
+=over
 
 Return the glyph's name by the font's default map.
+
+=back
 
 =cut
 
@@ -579,12 +775,18 @@ sub glyphByMap {
     return $_[0]->data()->{'char'}->[$_[1]]; 
 }
 
-=item $width = $font->wxByGlyph($glyph)
+=head2 wxByGlyph
+
+    $width = $font->wxByGlyph($glyph)
+
+=over
 
 Return the glyph's width.
 This is a value, that when divided by 1000 and multiplied by
 the font size (height in points), gives the advance width to the
 next character's start. Typically, the width will be under 1000.
+
+=back
 
 =cut
 
@@ -604,12 +806,18 @@ sub wxByGlyph {
     return $width;
 }
 
-=item $width = $font->wxByUni($uni)
+=head2 wxByUni
+
+    $width = $font->wxByUni($uni)
+
+=over
 
 Return the Unicode character's width.
 This is a value, that when divided by 1000 and multiplied by
 the font size (height in points), gives the advance width to the
 next character's start. Typically, the width will be under 1000.
+
+=back
 
 =cut
 
@@ -625,12 +833,18 @@ sub wxByUni {
     return $width;
 }
 
-=item $width = $font->wxByEnc($char)
+=head2 wxByEnc
+
+    $width = $font->wxByEnc($char)
+
+=over
 
 Return the character's width based on the current encoding.
 This is a value, that when divided by 1000 and multiplied by
 the font size (height in points), gives the advance width to the
 next character's start. Typically, the width will be under 1000.
+
+=back
 
 =cut
 
@@ -648,10 +862,16 @@ sub wxByEnc {
     return $width;
 }
 
-=item $flag = $font->wxMissingByEnc($char)
+=head2 wxMissingByEnc
+
+    $flag = $font->wxMissingByEnc($char)
+
+=over
 
 Return true if the character's width (based on the current encoding) is
 supplied by "missing width" of font.
+
+=back
 
 =cut
 
@@ -664,12 +884,18 @@ sub wxMissingByEnc {
     return !defined($width);
 }
 
-=item $width = $font->wxByMap($char)
+=head2 wxByMap
+
+    $width = $font->wxByMap($char)
+
+=over
 
 Return the character's width based on the font's default encoding.
 This is a value, that when divided by 1000 and multiplied by
 the font size (height in points), gives the advance width to the
 next character's start. Typically, the width will be under 1000.
+
+=back
 
 =cut
 
@@ -686,11 +912,17 @@ sub wxByMap {
     return $width;
 }
 
-=item $wd = $font->width($text)
+=head2 width
 
-Return the width of $text as if it were at size 1.
+    $wd = $font->width($text)
+
+=over
+
+Return the width of $text as if it were at font size 1 (unscaled).
 B<CAUTION:> works correctly only if a proper Perl string
 is used, either in native or UTF-8 format (check utf8-flag).
+
+=back
 
 =cut
 
@@ -716,9 +948,15 @@ sub width {
     return $width;
 }
 
-=item @widths = $font->width_array($text)
+=head2 width_array
+
+    @widths = $font->width_array($text)
+
+=over
 
 Return (as an array) the widths of the words in $text as if they were at size 1.
+
+=back
 
 =cut
 
@@ -730,15 +968,15 @@ sub width_array {
     return @widths;
 }
 
-=back
+=head2 utfByStr
 
-=head1 STRING METHODS
+    $utf8string = $font->utfByStr($string)
 
 =over
 
-=item $utf8string = $font->utfByStr($string)
-
 Return the utf8-string from string based on the font's encoding map.
+
+=back
 
 =cut
 
@@ -750,9 +988,15 @@ sub utfByStr {
     return $string;
 }
 
-=item $string = $font->strByUtf($utf8_string)
+=head2 strByUtf
+
+    $string = $font->strByUtf($utf8_string)
+
+=over
 
 Return the encoded string from utf8-string based on the font's encoding map.
+
+=back
 
 =cut
 
@@ -764,9 +1008,15 @@ sub strByUtf {
     return $utf8_string;
 }
 
-=item $pdf_string = $font->textByStr($string)
+=head2 textByStr
+
+    $pdf_string = $font->textByStr($string)
+
+=over
 
 Return a properly formatted representation of $string for use in the PDF.
+
+=back
 
 =cut
 
@@ -783,10 +1033,16 @@ sub textByStr {
     return $text;
 }
 
-=item $pdf_string = $font->textByStrKern($string)
+=head2 textByStrKern
+
+    $pdf_string = $font->textByStrKern($string)
+
+=over
 
 Return a properly formatted representation of $string, with kerning, 
 for use in the PDF.
+
+=back
 
 =cut
 
@@ -843,9 +1099,5 @@ sub text {
 sub isvirtual { 
     return; 
 }
-
-=back
-
-=cut
 
 1;

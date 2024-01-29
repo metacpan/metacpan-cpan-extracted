@@ -2,7 +2,7 @@
 
 #
 # dbmapreduce.pm
-# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2024 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -599,6 +599,7 @@ sub setup($) {
 	my $sort_column = defined($self->{_key_column}) ? $self->{_key_column} : '0';
 	my(@sort_args) = ('--nolog');
 	push(@sort_args, '--header' => $self->{_header}) if (defined($self->{_header}));
+	push(@sort_args, '--tmpdir' => $self->{_tmpdir}) if (defined($self->{_tmpdir}));
 	push(@sort_args, $sort_column);
         my($new_reader, $new_fred) = dbpipeline_filter(
 		$self->{_input},
@@ -968,7 +969,7 @@ sub finish($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2024 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

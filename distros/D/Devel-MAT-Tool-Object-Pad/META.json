@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -21,14 +21,14 @@
       },
       "runtime" : {
          "requires" : {
-            "Devel::MAT" : "0.47",
+            "Devel::MAT" : "0.48",
             "Syntax::Keyword::Match" : "0"
          }
       },
       "test" : {
          "requires" : {
             "Devel::MAT::Dumper" : "0.45",
-            "Object::Pad" : "0.64",
+            "Object::Pad" : "0.66",
             "Test::More" : "0.88"
          }
       }
@@ -36,7 +36,7 @@
    "provides" : {
       "Devel::MAT::Tool::Object::Pad" : {
          "file" : "lib/Devel/MAT/Tool/Object/Pad.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -45,6 +45,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

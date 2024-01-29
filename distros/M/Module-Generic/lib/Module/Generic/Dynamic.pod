@@ -29,7 +29,7 @@ Module::Generic::Dynamic - Dynamic Object Class
 
 The purpose of this class/package is to provide a framework to create dynamically created class/package.
 
-For more ganular control over the method to be used for each data key-value, use L<Module::Generic/"_set_get_class">
+For more granular control over the method to be used for each data key-value, use L<Module::Generic/"_set_get_class">
 
 =head1 METHODS
 
@@ -41,21 +41,21 @@ It will then associate helper method sbased on the data type for each key of the
 
 =over 4
 
-=item I<hash>
+=item * C<hash>
 
 This would create method after the key name and a new class also based on the key name, and use the helper method L<Module::Generic/"_set_get_object">
 
-=item I<array>
+=item * C<array>
 
 If the array contains hash references, this will create a new class/package dynamically and create an object for each hash reference in the array using L<Module::Generic/"_set_get_object_array">
 
 Otherwise, it will create the method using L<Module::Generic/"_set_get_array">
 
-=item I<string>
+=item * C<string>
 
 This would create a method using the helper method L<Module::Generic/"_set_get_scalar">
 
-=item I<boolean>
+=item * C<boolean>
 
 This would create a method using the helper method L<Module::Generic/"_set_get_boolean">
 

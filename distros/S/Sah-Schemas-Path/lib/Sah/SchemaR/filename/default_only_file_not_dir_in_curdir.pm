@@ -1,10 +1,10 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::filename::default_only_file_not_dir_in_curdir;
 
-our $DATE = '2023-11-23'; # DATE
-our $VERSION = '0.025'; # VERSION
+our $DATE = '2024-01-08'; # DATE
+our $VERSION = '0.030'; # VERSION
 
-our $rschema = do{my$var={base=>"filename",clsets_after_base=>[{description=>"\nThis is like the `filename` schema but with a default value of \"only file in the\ncurrent directory\". That is, if the current directory has a single plain file\nand nothing else (subdirectories are ignored).\n\nDifference with `filename::default_only_file_in_subdir` schema: the other schema\ndoes not ignore subdirectories. Thus, if a directory only contains `file1` and\n`subdir1`, then that other schema will not return `file1` but this schema will.\n\nNote: be careful when using this schema for actions that are destructive,\nbecause a user can perform those actions without giving an argument (e.g. in a\n`delete-file` script). It is safer to use this schema when performing a\nnon=destructive action (e.g. `checksum`) and/or operate in dry-run mode by\ndefault.\n\n",summary=>"File name, defaults to only file in current directory (if there is one) (subdirectories ignored)","x.perl.default_value_rules"=>["Path::only_file_not_dir_in_curdir"]}],clsets_after_type=>[{description=>"\nThis schema is basically string with some checks and prefilters. Why use this\nschema instead of plain ol' str? Mainly to give you the ability to change tilde\nto user's home directory, e.g. `~/foo.txt` into `/home/someuser/foo.txt`.\nNormally this expansion is done by a Unix shell, but sometimes your program\nreceives an unexpanded path, e.g. when you get it from some config file.\n\nSee also more OS-specific schemas like `filename::unix`, which adds some more\nchecks (e.g. filename cannot contain forward slash and each component cannot be\nlonger than 255 characters) and preprocessing (e.g. stripping extraneous slashes\nlike `foo//bar` into `foo/bar`.\n\nWhat's the difference between this schema and `dirname`? The default completion\nrule. `dirname`'s completion only includes directories and not files.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"foo"},{valid=>1,value=>"foo/bar"}],min_len=>1,prefilters=>["Path::expand_tilde_when_on_unix","Path::strip_slashes_when_on_unix"],summary=>"Filesystem file name","x.completion"=>["filename"]},'$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_type}[0]','$var->{clsets_after_base}[0]'],resolve_path=>["str","filename"],type=>"str",v=>2};$var->{clsets_after_type}[1]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_type}[0];$var->{"clsets_after_type.alt.merge.merged"}[1]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"filename",clsets_after_base=>[{description=>"\nThis is like the `filename` schema but with a default value of \"only file in the\ncurrent directory\". That is, if the current directory has a single plain file\nand nothing else (subdirectories are ignored).\n\nDifference with `filename::default_only_file_in_subdir` schema: the other schema\ndoes not ignore subdirectories. Thus, if a directory only contains `file1` and\n`subdir1`, then that other schema will not return `file1` but this schema will.\n\nNote: be careful when using this schema for actions that are destructive,\nbecause a user can perform those actions without giving an argument (e.g. in a\n`delete-file` script). It is safer to use this schema when performing a\nnon-destructive action (e.g. `checksum`) and/or operate in dry-run mode by\ndefault.\n\n",summary=>"File name, defaults to only file in current directory (if there is one) (subdirectories ignored)","x.perl.default_value_rules"=>["Path::only_file_not_dir_in_curdir"]}],clsets_after_type=>[{description=>"\nThis schema is basically string with some checks and prefilters. Why use this\nschema instead of plain ol' str? Mainly to give you the ability to change tilde\nto user's home directory, e.g. `~/foo.txt` into `/home/someuser/foo.txt`.\nNormally this expansion is done by a Unix shell, but sometimes your program\nreceives an unexpanded path, e.g. when you get it from some config file.\n\nSee also more OS-specific schemas like `filename::unix`, which adds some more\nchecks (e.g. filename cannot contain forward slash and each component cannot be\nlonger than 255 characters) and preprocessing (e.g. stripping extraneous slashes\nlike `foo//bar` into `foo/bar`.\n\nWhat's the difference between this schema and `dirname`? The default completion\nrule. `dirname`'s completion only includes directories and not files.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"foo"},{valid=>1,value=>"foo/bar"}],min_len=>1,prefilters=>["Path::expand_tilde_when_on_unix","Path::strip_slashes_when_on_unix"],summary=>"Filesystem file name","x.completion"=>["filename"]},'$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_type}[0]','$var->{clsets_after_base}[0]'],resolve_path=>["str","filename"],type=>"str",v=>2};$var->{clsets_after_type}[1]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_type}[0];$var->{"clsets_after_type.alt.merge.merged"}[1]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: File name, defaults to only file in current directory (if there is one) (subdirectories ignored)
@@ -21,7 +21,7 @@ Sah::SchemaR::filename::default_only_file_not_dir_in_curdir - File name, default
 
 =head1 VERSION
 
-This document describes version 0.025 of Sah::SchemaR::filename::default_only_file_not_dir_in_curdir (from Perl distribution Sah-Schemas-Path), released on 2023-11-23.
+This document describes version 0.030 of Sah::SchemaR::filename::default_only_file_not_dir_in_curdir (from Perl distribution Sah-Schemas-Path), released on 2024-01-08.
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2020, 2019, 2018, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2020, 2019, 2018, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

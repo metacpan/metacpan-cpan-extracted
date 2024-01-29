@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 1.031 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2023-08-06.
+    This document describes version 1.033 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2023-09-06.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -51,24 +51,26 @@ DESCRIPTION
     41. csv-shuf-rows
     42. csv-sort
     43. csv-sort-fields
-    44. csv-sort-rows
-    45. csv-sorted
-    46. csv-sorted-fields
-    47. csv-sorted-rows
-    48. csv-split
-    49. csv-sum
-    50. csv-transpose
-    51. csv-trim
-    52. csv-uniq
-    53. csv-unquote
-    54. csv2ltsv
-    55. csv2paras
-    56. csv2td
-    57. csv2tsv
-    58. csv2vcf
-    59. list-csvutils
-    60. paras2csv
-    61. tsv2csv
+    44. csv-sort-fields-by-example
+    45. csv-sort-fields-by-spec
+    46. csv-sort-rows
+    47. csv-sorted
+    48. csv-sorted-fields
+    49. csv-sorted-rows
+    50. csv-split
+    51. csv-sum
+    52. csv-transpose
+    53. csv-trim
+    54. csv-uniq
+    55. csv-unquote
+    56. csv2ltsv
+    57. csv2paras
+    58. csv2td
+    59. csv2tsv
+    60. csv2vcf
+    61. list-csvutils
+    62. paras2csv
+    63. tsv2csv
 
 FUNCTIONS
   gen_csv_util

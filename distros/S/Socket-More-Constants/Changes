@@ -1,5 +1,10 @@
 Revision history for Perl extension Socket::More::Constants.
 
+v0.1.2 2023-12-18
+  -[fixes]
+    - Reduce min Perl verion to v5.24.0
+    - Makefile.PL using correct version of deps 
+
 v0.1.0 2023-10-12
   - Original version. Extracted from WIP from Socket::More as a refactoring.
 

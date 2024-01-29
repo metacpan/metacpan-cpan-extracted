@@ -46,6 +46,7 @@ BEGIN {
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
     delete $ENV{UI};
+    delete $ENV{LANG};
 }
 
 use UI::Various({use => ['RichTerm']});

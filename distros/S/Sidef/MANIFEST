@@ -193,14 +193,18 @@ scripts/Expensive/thiele_interpolation_formula.sf
 scripts/Expensive/zebra_puzzle.sf
 scripts/Expensive/zhang_suen_thinning_algorithm.sf
 scripts/extend_your_language.sf
+'scripts/Extended tests/almost_and_omega_primes.sf'
 'scripts/Extended tests/binomialmod.sf'
 'scripts/Extended tests/carmichael_with_n_factors.sf'
 'scripts/Extended tests/chebyshev_factorization_method.sf'
+'scripts/Extended tests/combinatorics.sf'
 'scripts/Extended tests/digits2num.pl'
+'scripts/Extended tests/elementary.sf'
 'scripts/Extended tests/fermat_pseudoprimes.sf'
 'scripts/Extended tests/fermat_pseudoprimes_to_base_n.sf'
 'scripts/Extended tests/fermat_with_n_factors.sf'
 'scripts/Extended tests/fermat_with_n_factors_to_base_n.sf'
+'scripts/Extended tests/floor_ceil.sf'
 'scripts/Extended tests/inverse_of_multiplicative_functions.sf'
 'scripts/Extended tests/inverse_sigma.sf'
 'scripts/Extended tests/is_almost_prime.sf'
@@ -857,6 +861,7 @@ scripts/Tests/inherited_blocks.sf
 scripts/Tests/integer_division.sf
 scripts/Tests/integer_limits.sf
 scripts/Tests/integers_binary_encoding.sf
+scripts/Tests/interactive_mode_bug.sf
 scripts/Tests/inverse_of_factorial.sf
 scripts/Tests/inverted_syntax.sf
 scripts/Tests/irootrem.sf

@@ -1,5 +1,4 @@
 use warnings;
-use lib 'inc';
 use Test::More;
 use strict;
 use IO::String;
@@ -355,7 +354,9 @@ sub sp {
                         oidcRPMetaDataOptionsBypassConsent     => 0,
                         oidcRPMetaDataOptionsClientSecret      => "rpsecret",
                         oidcRPMetaDataOptionsUserIDAttr        => "",
-                        oidcRPMetaDataOptionsAccessTokenExpiration => 3600
+                        oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
+                        oidcRPMetaDataOptionsRedirectUris          =>
+                          'http://auth.rp.com?openidconnectcallback=1',
                     }
                 },
                 oidcOPMetaDataOptions           => {},

@@ -36,18 +36,20 @@ SEE ALSO
         class for reading a Graph instance from XML
 
 REPOSITORY
-    <https://github.com/tupinek/Task-Graph-Reader>
+    <https://github.com/michal-josef-spacek/Task-Graph-Reader>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2015 Michal Špaček
-     Artistic License
-     BSD 2-Clause License
+    © 2015-2024 Michal Josef Špaček
+
+    Artistic License
+
+    BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

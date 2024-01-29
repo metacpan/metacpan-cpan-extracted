@@ -377,11 +377,11 @@ This source is in GitHub as part of the Module::Release project:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2023, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may use this software under the same terms as Perl itself.
 
@@ -398,7 +398,7 @@ the automated_testing and required features and parallel testing.
 
 use Getopt::Long qw(:config noignorecase bundling);
 use Module::Release 2.131;
-my $script_version = '2.131';
+my $script_version = '2.132';
 
 my $class = "Module::Release";
 

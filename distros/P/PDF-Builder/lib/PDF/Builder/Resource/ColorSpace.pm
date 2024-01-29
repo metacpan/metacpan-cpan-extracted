@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Array';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Util;
@@ -18,11 +18,15 @@ PDF::Builder::Resource::ColorSpace - Base class for PDF color spaces
 
 =head1 METHODS
 
+=head2 new
+
+    $cs = PDF::Builder::Resource::ColorSpace->new($pdf, $key, %opts)
+
 =over
 
-=item $cs = PDF::Builder::Resource::ColorSpace->new($pdf, $key, %opts)
-
 Returns a new colorspace object, base class for all colorspaces.
+
+=back
 
 =cut
 
@@ -39,11 +43,17 @@ sub new {
     return $self;
 }
 
-=item $name = $res->name($name) # Set
+=head2 name
 
-=item $name = $res->name() # Get
+    $name = $res->name($name) # Set
+
+    $name = $res->name() # Get
+
+=over
 
 Returns or sets the Name of the resource.
+
+=back
 
 =cut
 
@@ -65,9 +75,15 @@ sub type {
     return $self->{' type'};
 }
 
-=item @param = $cs->param(@param)
+=head2 param
+
+    @param = $cs->param(@param)
+
+=over
 
 Returns properly formatted color-parameters based on the colorspace.
+
+=back
 
 =cut
 
@@ -86,9 +102,5 @@ sub param {
 #    }
 #    return $self->SUPER::outobjdeep(@opts);
 #}
-
-=back
-
-=cut
 
 1;

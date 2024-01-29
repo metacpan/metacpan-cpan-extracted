@@ -1,3 +1,6 @@
+0.053		2023-12-12	T. R. Wyant
+    Fix clobbering of $VERSION by casual stringy eval.
+
 0.052		2023-10-14	T. R. Wyant
     Document the first_tle() Template array method.
 

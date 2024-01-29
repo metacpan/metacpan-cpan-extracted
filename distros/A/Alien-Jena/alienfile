@@ -1,0 +1,18 @@
+use alienfile;
+
+plugin 'Probe::CommandLine' => (
+  command => 'jena',
+  args    => [],
+  match   => qr/Jena version/,
+  version => qr/Jena version\s+:\s+([0-9\.]+)/,
+);
+
+share {
+  start_url 'https://archive.apache.org/dist/jena/binaries/';
+  plugin Download => (
+    filter  => qr/^apache-jena-([0-9\.]+)\.tar\.gz$/,
+    version => qr/([0-9\.]+)/,
+  );
+  plugin Extract => 'tar.gz';
+  plugin 'Build::Copy';
+}

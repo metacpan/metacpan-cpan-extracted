@@ -21,6 +21,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "Carp" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
@@ -55,7 +56,7 @@
    "provides" : {
       "App::MusicTools" : {
          "file" : "lib/App/MusicTools.pm",
-         "version" : "1.37"
+         "version" : "1.38"
       }
    },
    "release_status" : "stable",
@@ -67,6 +68,6 @@
          "url" : "https://thrig.me/src/App-MusicTools.git"
       }
    },
-   "version" : "1.37",
+   "version" : "1.38",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

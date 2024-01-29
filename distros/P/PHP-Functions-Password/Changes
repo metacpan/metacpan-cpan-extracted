@@ -55,3 +55,16 @@ v1.13	2022-01-16
 	- Replace the dependency on version.pm >= 0.77 with a ->can() check.
 	- Even though the PASSWORD_BCRYPT salt option is deprecated, if you do pass it (which you shouldn't) then it must be 16 bytes long.
 	- Cleaned up some whitespace.
+
+v1.14	2023-01-03
+	- Use algo name instead of int in password_hash() error message when Argon2 hashing is requested but required Crypt::Argon2 module is not installed.
+	- Make password_needs_rehash() call password_info() as a method instead of function for better subclass support.
+
+v2.00	2024-01-08
+	- Improved documentation.
+	- Moved most of the code into new 'protected' methods (all prefixed with an underscore) for easier overridding in subclasses, should there be a desire to do so.
+	- Static method get_info() now returns either a hashref or undef if the argument format is unrecognized. Previously it was a hash or hashref depending on the context.
+	- Static method verify() now returns undef (previously 0) if the crypted string format is unrecognized.
+
+v2.01	2024-01-11
+	- Make _needs_rehash() call _get_info() instead of password_get_info()

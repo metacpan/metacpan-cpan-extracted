@@ -5,7 +5,7 @@ use warnings;
 
 use Future::AsyncAwait 0.47;
 
-use Test::More;
+use Test2::V0;
 
 use Tangence::Registry;
 
@@ -40,27 +40,27 @@ my $on_more = sub {
 
    $#value = $last_idx;
 
-   is_deeply( \@value, [ undef, undef, undef ], '@value initially' );
+   is( \@value, [ undef, undef, undef ], '@value initially' );
 
    $on_more->( await $cursor->next_forward );
 
-   is_deeply( \@value, [ 1, undef, undef ], '@value after first next_forward' );
+   is( \@value, [ 1, undef, undef ], '@value after first next_forward' );
 
    $obj->push_prop_queue( 4, 5 );
 
-   is_deeply( \@value, [ 1, undef, undef, 4, 5 ], '@value after push' );
+   is( \@value, [ 1, undef, undef, 4, 5 ], '@value after push' );
 
    $on_more->( await $cursor->next_forward );
 
-   is_deeply( \@value, [ 1, 2, undef, 4, 5 ], '@value after second next_forward' );
+   is( \@value, [ 1, 2, undef, 4, 5 ], '@value after second next_forward' );
 
    $obj->shift_prop_queue( 1 );
 
-   is_deeply( \@value, [ 2, undef, 4, 5 ], '@value after shift' );
+   is( \@value, [ 2, undef, 4, 5 ], '@value after shift' );
 
    $on_more->( await $cursor->next_forward );
 
-   is_deeply( \@value, [ 2, 3, 4, 5 ], '@value after third next_forward' );
+   is( \@value, [ 2, 3, 4, 5 ], '@value after third next_forward' );
 
    $proxy->unwatch_property( "queue" );
 }
@@ -80,27 +80,27 @@ $obj->set_prop_queue( [ 1, 2, 3 ] );
 
    $#value = $last_idx;
 
-   is_deeply( \@value, [ undef, undef, undef ], '@value initially' );
+   is( \@value, [ undef, undef, undef ], '@value initially' );
 
    $on_more->( await $cursor->next_backward );
 
-   is_deeply( \@value, [ undef, undef, 3 ], '@value after first next_backward' );
+   is( \@value, [ undef, undef, 3 ], '@value after first next_backward' );
 
    $obj->push_prop_queue( 4, 5 );
 
-   is_deeply( \@value, [ undef, undef, 3, 4, 5 ], '@value after push' );
+   is( \@value, [ undef, undef, 3, 4, 5 ], '@value after push' );
 
    $on_more->( await $cursor->next_backward );
 
-   is_deeply( \@value, [ undef, 2, 3, 4, 5 ], '@value after second next_backward' );
+   is( \@value, [ undef, 2, 3, 4, 5 ], '@value after second next_backward' );
 
    $obj->shift_prop_queue( 1 );
 
-   is_deeply( \@value, [ 2, 3, 4, 5 ], '@value after shift' );
+   is( \@value, [ 2, 3, 4, 5 ], '@value after shift' );
 
    $on_more->( await $cursor->next_backward );
 
-   is_deeply( \@value, [ 2, 3, 4, 5 ], '@value after third next_backward' );
+   is( \@value, [ 2, 3, 4, 5 ], '@value after third next_backward' );
 
    $proxy->unwatch_property( "queue" );
 }

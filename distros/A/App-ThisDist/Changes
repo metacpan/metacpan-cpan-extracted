@@ -1,3 +1,22 @@
+0.022   2024-01-05  Released-By: PERLANCAR; Urgency: medium
+
+        - Add third argument $detail? to instruct to return a hash or more
+          detailed information.
+
+
+0.021   2024-01-05  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention this_mod.
+
+
+0.020   2023-08-27  Released-By: PERLANCAR; Urgency: medium
+
+        - [experimental] Guess this-dist from a single perl release archive in
+          current dir.
+
+
 0.019   2023-05-20  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

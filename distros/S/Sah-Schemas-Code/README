@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Code - Various schemas related to 'code' type and coderefs
 
 VERSION
-    This document describes version 0.001 of Sah::Schemas::Code (from Perl
-    distribution Sah-Schemas-Code), released on 2023-09-03.
+    This document describes version 0.002 of Sah::Schemas::Code (from Perl
+    distribution Sah-Schemas-Code), released on 2023-09-05.
 
 SAH SCHEMAS
     The following schemas are included in this distribution:

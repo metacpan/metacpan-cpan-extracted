@@ -22,7 +22,7 @@ Readonly::Array our @TYPE => qw(a c d e f g i j k m o p r t);
 Readonly::Array our @TYPE_OF_CONTROL => (' ', 'a');
 Readonly::Array our @UNDEFINED => ('0');
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 has bibliographic_level => (
 	is => 'ro',
@@ -186,67 +186,99 @@ Constructor.
 
 =item * C<bibliographic_level>
 
-TODO
+Bibliographic level flag.
+
+Default values is undef.
 
 =item * C<char_coding_scheme>
 
-TODO
+Character coding scheme.
+
+Default values is undef.
 
 =item * C<data_base_addr>
 
-TODO
+Base address of data.
+
+Default values is undef.
 
 =item * C<descriptive_cataloging_form>
 
-TODO
+Descriptive cataloging form.
+
+Default values is undef.
 
 =item * C<encoding_level>
 
-TODO
+Encoding level.
+
+Default values is undef.
 
 =item * C<impl_def_portion_len>
 
-TODO
+Length of the implementation-defined portion.
+
+Default values is undef.
 
 =item * C<indicator_count>
 
-TODO
+Indicator count.
+
+Default values is undef.
 
 =item * C<length>
 
-TODO
+Record length.
+
+Default values is undef.
 
 =item * C<length_of_field_portion_len>
 
-TODO
+Length of the length-of-field portion.
+
+Default values is undef.
 
 =item * C<multipart_resource_record_level>
 
-TODO
+Multipart resource record level.
+
+Default values is undef.
 
 =item * C<starting_char_pos_portion_len>
 
-TODO
+Length of the starting-character-position portion.
+
+Default values is undef.
 
 =item * C<status>
 
-TODO
+Record status.
+
+Default values is undef.
 
 =item * C<subfield_code_count>
 
-TODO
+Subfield code count.
+
+Default values is undef.
 
 =item * C<type>
 
-TODO
+Type of record.
+
+Default values is undef.
 
 =item * C<type_of_control>
 
-TODO
+Type of control.
+
+Default values is undef.
 
 =item * C<undefined>
 
-TODO
+Undefined.
+
+Default values is undef.
 
 =back
 
@@ -264,96 +296,167 @@ Returns character.
 
  my $char_coding_scheme = $obj->char_coding_scheme;
 
-TODO
+Get character coding scheme.
+
+Returns character.
 
 =head2 C<data_base_addr>
 
  my $data_base_addr = $obj->data_base_addr;
 
-TODO
+Get base address of data.
+
+Returns number.
 
 =head2 C<descriptive_cataloging_form>
 
  my $descriptive_cataloging_form = $obj->descriptive_cataloging_form;
 
-TODO
+Get descriptive cataloging form.
+
+Returns character.
 
 =head2 C<encoding_level>
 
  my $encoding_level = $obj->encoding_level;
 
-TODO
+Get encoding level.
+
+Returns character.
 
 =head2 C<impl_def_portion_len>
 
  my $impl_def_portion_len = $obj->impl_def_portion_len;
 
-TODO
+Get length of the implementation-defined portion.
+
+Returns character.
 
 =head2 C<indicator_count>
 
  my $indicator_count = $obj->indicator_count;
 
-TODO
+Get indicator count.
+
+Returns character.
 
 =head2 C<length>
 
  my $length = $obj->length;
 
-TODO
+Get record length.
+
+Returns number.
 
 =head2 C<length_of_field_portion_len>
 
  my $length_of_field_portion_len = $obj->length_of_field_portion_len;
 
-TODO
+Get length of the length-of-field portion
+
+Returns character.
 
 =head2 C<multipart_resource_record_level>
 
  my $multipart_resource_record_level = $obj->multipart_resource_record_level;
 
-TODO
+Get multipart resource record level.
+
+Returns character.
 
 =head2 C<starting_char_pos_portion_len>
 
  my $starting_char_pos_portion_len = $obj->starting_char_pos_portion_len;
 
-TODO
+Get length of the starting-character-position portion.
+
+Returns character.
 
 =head2 C<status>
 
  my $status = $obj->status;
 
-TODO
+Get record status.
+
+Returns character.
 
 =head2 C<subfield_code_count>
 
  my $subfield_code_count = $obj->subfield_code_count;
 
-TODO
+Get subfield code count.
+
+Returns character.
 
 =head2 C<type>
 
  my $type = $obj->type;
 
-TODO
+Get type of record.
+
+Returns character.
 
 =head2 C<type_of_control>
 
  my $type_of_control = $obj->type_of_control;
 
-TODO
+Get type of control.
+
+Returns character.
 
 =head2 C<undefined>
 
  my $undefined = $obj->undefined;
 
-TODO
+Get undefined.
+
+Returns character.
 
 =head1 ERRORS
 
  new():
-         TODO
+         Parameter 'bibliographic_level' must be one of defined strings.
+                 String: %s
+                 Possible strings: a b c d i m s
+         Parameter 'char_coding_scheme' must be one of defined strings.
+                 String: %s
+                 Possible strings: ' ' a
+         Parameter 'descriptive_cataloging_form' must be one of defined strings.
+                 String: %s
+                 Possible strings: ' ' a c i n u
+         Parameter 'encoding_level' must be one of defined strings.
+                 String: %s
+                 Possible strings: ' ' 1 2 3 4 5 7 8 u z
+         Parameter 'impl_def_portion_len' must be one of defined strings.
+                 String: %s
+                 Possible strings: 0
+         Parameter 'indicator_count' must be one of defined strings.
+                 String: %s
+                 Possible strings: 2
+         Parameter 'length_of_field_portion_len' must be one of defined strings.
+                 String: %s
+                 Possible strings: 4
+         Parameter 'multipart_resource_record_level' must be one of defined strings.
+                 String: %s
+                 Possible strings: ' ' a b c
+         Parameter 'starting_char_pos_portion_len' must be one of defined strings.
+                 String: %s
+                 Possible strings: 5
+         Parameter 'status' must be one of defined strings.
+                 String: %s
+                 Possible strings: a c d n p
+         Parameter 'subfield_code_count' must be one of defined strings.
+                 String: %s
+                 Possible strings: 2
+         Parameter 'type' must be one of defined strings.
+                 String: %s
+                 Possible strings: a c d e f g i j k m o p r t
+         Parameter 'type_of_control' must be one of defined strings.
+                 String: %s
+                 Possible strings: ' ' a
+         Parameter 'undefined' must be one of defined strings.
+                 String: %s
+                 Possible strings: 0
 
 =head1 EXAMPLE
 
@@ -435,12 +538,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023 Michal Josef Špaček
+© 2023-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

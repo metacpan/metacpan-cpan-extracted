@@ -79,7 +79,7 @@
       },
       "URI::NamespaceMap" : {
          "file" : "lib/URI/NamespaceMap.pm",
-         "version" : "1.10"
+         "version" : "1.12"
       },
       "URI::NamespaceMap::ReservedLocalParts" : {
          "file" : "lib/URI/NamespaceMap/ReservedLocalParts.pm",
@@ -101,12 +101,12 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/project"
    },
-   "version" : "1.10",
+   "version" : "1.12",
    "x_contributors" : [
       "Dorian Taylor <dorian@cpan.org>",
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>",
-      "Paul Williams (KWAKWA) <kwakwa@cpan.org>"
+      "KWAKWA <kwakwa@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

@@ -22,16 +22,16 @@ name: Locale-CLDR-Locales-Mzn
 provides:
   Locale::CLDR::Locales::Mzn:
     file: lib/Locale/CLDR/Locales/Mzn.pm
-    version: v0.34.4
+    version: v0.40.1
   Locale::CLDR::Locales::Mzn::Any:
     file: lib/Locale/CLDR/Locales/Mzn/Any.pm
-    version: v0.34.4
+    version: v0.40.1
   Locale::CLDR::Locales::Mzn::Any::Ir:
     file: lib/Locale/CLDR/Locales/Mzn/Any/Ir.pm
-    version: v0.34.4
+    version: v0.40.1
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.34.4
+  Locale::CLDR: v0.40.1
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -41,5 +41,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.34.4
+version: v0.40.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

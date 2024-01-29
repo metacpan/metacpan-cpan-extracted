@@ -55,7 +55,7 @@ METHODS
     Process initialization before page run.
 
     Variable $data_ar are data for table. Each item in array could be
-    scalar, array with scalars or Data::HTML::A instance.
+    scalar, array with scalars or Data::HTML::Element::A instance.
 
     Variable $no_data_value contain information for situation when data in
     table not exists.
@@ -247,7 +247,7 @@ EXAMPLE3
      use warnings;
 
      use CSS::Struct::Output::Indent;
-     use Data::HTML::A;
+     use Data::HTML::Element::A;
      use Tags::HTML::Table::View;
      use Tags::Output::Indent;
 
@@ -260,7 +260,7 @@ EXAMPLE3
      );
 
      # Table data.
-     my $prague = Data::HTML::A->new(
+     my $prague = Data::HTML::Element::A->new(
              'data' => ['Prague'],
              'url' => 'https://prague.cz',
      );
@@ -342,10 +342,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2021-2023 Michal Josef Špaček
+    © 2021-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

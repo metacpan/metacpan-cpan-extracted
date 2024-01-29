@@ -1,5 +1,11 @@
 CHANGELOG
 
+v3.07 (2024/01/10)
+------------------
+--Fixed return value of the get method where it comes to prototyped 
+  parameters.  The problem was only seen for array/hash types that 
+  had no contents.
+
 v3.06 (2023/09/23)
 ------------------
 --Typos in documentation (Debian Perl Group)

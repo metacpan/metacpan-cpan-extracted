@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -21,7 +21,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Object::Pad" : "0.74",
+            "Object::Pad" : "0.800",
             "String::Tagged" : "0.10",
             "Tickit" : "0",
             "Tickit::Widget::Entry" : "0",
@@ -33,19 +33,18 @@
       },
       "test" : {
          "requires" : {
-            "Test2::V0" : "0",
-            "Test::Refcount" : "0"
+            "Test2::V0" : "0.000148"
          }
       }
    },
    "provides" : {
       "Tickit::Console" : {
          "file" : "lib/Tickit/Console.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       },
       "Tickit::Console::Tab" : {
          "file" : "lib/Tickit/Console/Tab.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -54,6 +53,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

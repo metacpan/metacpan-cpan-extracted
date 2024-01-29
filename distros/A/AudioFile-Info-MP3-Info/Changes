@@ -1,3 +1,21 @@
+2024-01-04  Dave Cross <dave@perlhacks.com>
+
+  * Version 1.5.1
+
+  * Fix references to ID3Lib (thanks Choroba)
+
+  * Improve CI (remove Travis)
+
+2020-12-06  Dave Cross <dave@perlhacks.com>
+
+  * Version 1.5.0
+
+  * Various code improvements
+
+  * Add GitHub Actions
+
+  * Not released to CPAN for reasons that are lost in the mists of time
+
 2020-11-05  Dave Cross <dave@perlhacks.com>
 
   * Version 1.4.2

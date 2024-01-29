@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Pt::Any::St - Package for language Portuguese
 
 package Locale::CLDR::Locales::Pt::Any::St;
 # This file auto generated from Data\common\main\pt_ST.xml
-#	on Tue  5 Dec  1:28:30 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';

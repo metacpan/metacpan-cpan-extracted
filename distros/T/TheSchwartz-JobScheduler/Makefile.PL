@@ -7,7 +7,7 @@ use 5.014;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Lightweight TheSchwartz job dispatcher",
+  "ABSTRACT" => "Lightweight TheSchwartz job dispatcher with maintained database connections",
   "AUTHOR" => "Mikko Koivunalho <mikkoi\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -18,6 +18,8 @@ my %WriteMakefileArgs = (
   "NAME" => "TheSchwartz::JobScheduler",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Carp::Assert" => 0,
+    "Const::Fast" => 0,
     "English" => 0,
     "Log::Any" => 0,
     "Log::Any::Adapter::Util" => 0,
@@ -29,6 +31,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "DBD::SQLite" => 0,
     "DBI" => 0,
     "Data::Dumper" => 0,
     "Database::ManagedHandle" => 0,
@@ -43,7 +46,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,6 +55,9 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Carp::Assert" => 0,
+  "Const::Fast" => 0,
+  "DBD::SQLite" => 0,
   "DBI" => 0,
   "Data::Dumper" => 0,
   "Database::ManagedHandle" => 0,

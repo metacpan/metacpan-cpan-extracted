@@ -2,7 +2,7 @@
 #
 #  (C) Paul Evans, 2010-2023 -- leonerd@leonerd.org.uk
 
-package Circle::FE::Term::Widget::Box 0.232470;
+package Circle::FE::Term::Widget::Box 0.240250;
 
 use v5.26;
 use warnings;

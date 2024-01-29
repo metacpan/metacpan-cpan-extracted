@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Yav - Package for language Yangben
 
 package Locale::CLDR::Locales::Yav;
 # This file auto generated from Data\common\main\yav.xml
-#	on Tue  5 Dec  1:38:06 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'akánɛ',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Aŋtúla',
  			'AE' => 'imiláat i paaláap',
@@ -217,7 +217,6 @@ has 'display_name_region' => (
  			'MD' => 'moltafí',
  			'MG' => 'matakaskáal',
  			'MH' => 'ílmalasáal',
- 			'MK' => 'masetuán',
  			'ML' => 'malí',
  			'MM' => 'miaŋmáal',
  			'MN' => 'mongolí',
@@ -332,7 +331,7 @@ has 'characters' => (
 			auxiliary => qr{[g j q r x z]},
 			index => ['A', 'B', 'C', 'D', 'E', 'Ɛ', 'F', 'H', 'I', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'S', 'T', 'U', 'V', 'W', 'Y'],
 			main => qr{[a á à â ǎ ā b c d e é è ɛ {ɛ́} {ɛ̀} f h i í ì î ī k l m {mb} n {ny} ŋ {ŋg} o ó ò ô ǒ ō ɔ {ɔ́} {ɔ̀} p s t u ú ù û ǔ ū v w y]},
-			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT

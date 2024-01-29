@@ -1,0 +1,14 @@
+/.aspell.en.prepl
+/Makefile
+/Makefile.old
+/MANIFEST
+/MANIFEST.bak
+/blib/
+/local/
+/pm_to_blib
+/temp/
+/vendor/
+/*.tar.gz
+*.bak
+*.tdy
+/[% dist_name %]-*/

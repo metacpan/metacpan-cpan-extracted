@@ -41,7 +41,7 @@ Standard 404 error page
 
 =cut
 
-sub default :Path :Does('+CatalystX::Action::Negotiate') {
+sub default :Path :Does('+CatalystX::ActionRole::Negotiate') {
     my ( $self, $c ) = @_;
 
     $c->response->body( 'Page not found' );

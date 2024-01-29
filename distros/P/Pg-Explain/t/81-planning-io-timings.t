@@ -21,7 +21,7 @@ for my $plan ( @plans ) {
     $explain->parse_source();
     my $expected_timings = load_timings( $plan );
     is( ref( $explain->planning_buffers ), 'Pg::Explain::Buffers', "$plan has planning buffers info" );
-    cmp_deeply( $explain->planning_buffers->get_struct->{ 'timings' }, load_timings( $plan ), "$plan has expected timings info" );
+    cmp_deeply( $explain->planning_buffers->get_struct->{ 'timings' }, $expected_timings, "$plan has expected timings info" );
 }
 
 exit;

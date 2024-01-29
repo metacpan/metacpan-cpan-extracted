@@ -1,5 +1,5 @@
 package Audio::Nama;
-use Modern::Perl;
+use Modern::Perl '2020';
 
 sub check_level {
 

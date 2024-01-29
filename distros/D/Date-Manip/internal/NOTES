@@ -18,6 +18,7 @@ The tzdata/tzcode archives are obtained from
 In order to create the appropriate Date::Manip modules, run the
 following commands:
 
+   export CC='gcc -std=c99'
    ./internal/tzdata -f           : to download the packages
    ./internal/tzdata -b           : to build the package
 

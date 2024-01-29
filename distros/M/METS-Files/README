@@ -11,22 +11,34 @@ SYNOPSIS
      my @types = $obj->get_use_types;
 
 METHODS
-    "new()"
-             Constructor.
+  "new"
+     my $obj = METS::Files->new(
+             'mets_data' => $mets_data,
+     );
 
-            *       "mets_data"
+    Constructor.
 
-                     METS data.
-                     Parameter is required.
-                     Default value is undef.
+    *       "mets_data"
 
-    "get_use_files($use)"
-             Get "USE" files.
-             Returns array with files.
+            METS data.
 
-    "get_use_types()"
-             Get "USE" types.
-             Returns array with types.
+            Parameter is required.
+
+    Returns instance of object.
+
+  "get_use_files"
+     my @files = $obj->get_use_files($use);
+
+    Get "USE" files defined by $use variable.
+
+    Returns array with files.
+
+  "get_use_types"
+     my @types = $obj->get_use_types;
+
+    Get "USE" types.
+
+    Returns array with types.
 
 ERRORS
      new():
@@ -139,10 +151,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2015-2022 Michal Josef Špaček
+    © 2015-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

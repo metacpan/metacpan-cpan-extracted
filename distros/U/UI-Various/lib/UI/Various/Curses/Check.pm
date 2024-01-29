@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 use UI::Various::core;
 use UI::Various::Check;
@@ -91,11 +91,13 @@ sub _prepare($$$)
 	error('_1_element_must_be_accompanied_by_parent', __PACKAGE__);
 	return 1;
     }
+    my @attributes = $self->_common_attributes();
     $self->_cui($_->_cui
 		->add($self->_cid,
 		      'Checkbox', -x => $column, -y => $row,
 		      -label => $self->text,
 		      -checked => $self->var, # automatic dereference!
+		      @attributes,
 		      -onchange => sub {
 			  # Don't do anything if called via another checkbox:
 			  (caller(4))[3] =~ m/::base::_reference$/  and  return;

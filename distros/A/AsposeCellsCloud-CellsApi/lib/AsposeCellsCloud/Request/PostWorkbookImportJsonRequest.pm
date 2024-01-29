@@ -59,14 +59,15 @@ sub new {
 
 
 # Run Operation Request
-# PostWorkbookImportJsonRequest.name : The workbook(Excel/ODS/...) name.  ,
-# PostWorkbookImportJsonRequest.importJsonRequest :   ,
-# PostWorkbookImportJsonRequest.password : password  ,
-# PostWorkbookImportJsonRequest.folder : Original workbook folder.  ,
-# PostWorkbookImportJsonRequest.storageName : Storage name.  ,
-# PostWorkbookImportJsonRequest.outPath : Output file path.  ,
-# PostWorkbookImportJsonRequest.outStorageName : Storage name for output file.  ,
-# PostWorkbookImportJsonRequest.checkExcelRestriction : check Excel restriction.   
+# PostWorkbookImportJsonRequest.name : The file name.  ,
+# PostWorkbookImportJsonRequest.importJsonRequest : Import Json request.  ,
+# PostWorkbookImportJsonRequest.password : The password needed to open an Excel file.  ,
+# PostWorkbookImportJsonRequest.folder : The folder where the file is situated.  ,
+# PostWorkbookImportJsonRequest.storageName : The storage name where the file is situated.  ,
+# PostWorkbookImportJsonRequest.outPath : Path to save the result. If it`s a single file, the `outPath` should encompass both the filename and extension. In the case of multiple files, the `outPath` should only include the folder.  ,
+# PostWorkbookImportJsonRequest.outStorageName : The storage name where the output file is situated.  ,
+# PostWorkbookImportJsonRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.  ,
+# PostWorkbookImportJsonRequest.region : The regional settings for workbook.   
 
 {
     my $params = {
@@ -77,7 +78,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_workbook_import_json' } = { 
-    	summary => 'Imports/Updates an XML data file into the workbook.The XML data file can be a cloud file or HTTP URI data.',
+    	summary => 'Import a JSON data file into the workbook. The JSON data file can either be a cloud file or data from an HTTP URI.',
         params => $params,
         returns => 'string',
     };
@@ -129,6 +130,10 @@ sub run_http_request {
 
     if(defined $self->check_excel_restriction){
         $query_params->{'checkExcelRestriction'} = $client->to_query_value($self->check_excel_restriction);      
+    }
+
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
     } 
     my $_body_data;
 
@@ -150,56 +155,63 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook(Excel/ODS/...) name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
      'import_json_request' => {
      	datatype => 'ImportJsonRequest',
      	base_name => 'importJsonRequest',
-     	description => '',
+     	description => 'Import Json request.',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => 'password',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'out_path' => {
      	datatype => 'string',
      	base_name => 'outPath',
-     	description => 'Output file path.',
+     	description => 'Path to save the result. If it`s a single file, the `outPath` should encompass both the filename and extension. In the case of multiple files, the `outPath` should only include the folder.',
      	format => '',
      	read_only => '',
      		},
      'out_storage_name' => {
      	datatype => 'string',
      	base_name => 'outStorageName',
-     	description => 'Storage name for output file.',
+     	description => 'The storage name where the output file is situated.',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
-     	description => 'check Excel restriction.',
+     	description => 'Whether check restriction of excel file when user modify cells related objects.',
+     	format => '',
+     	read_only => '',
+     		},
+     'region' => {
+     	datatype => 'string',
+     	base_name => 'region',
+     	description => 'The regional settings for workbook.',
      	format => '',
      	read_only => '',
      		},    
@@ -214,7 +226,8 @@ __PACKAGE__->attribute_map( {
     'storage_name' => 'storageName',
     'out_path' => 'outPath',
     'out_storage_name' => 'outStorageName',
-    'check_excel_restriction' => 'checkExcelRestriction' 
+    'check_excel_restriction' => 'checkExcelRestriction',
+    'region' => 'region' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

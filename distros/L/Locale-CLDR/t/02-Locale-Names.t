@@ -22,7 +22,7 @@ is ($locale->script_name('Cher'), 'Cherokee', 'Script name');
 is ($locale->script_name('wibl'), 'Unknown Script', 'Invalid Script name');
 is ($locale->region_name('GB'), 'United Kingdom', 'Region name');
 is ($locale->region_name('wibble'), 'Unknown Region', 'Invalid Region name');
-is ($locale->variant_name('AREVMDA'), 'Western Armenian', 'Variant name');
+is ($locale->variant_name('PINYIN'), 'Pinyin Romanization', 'Variant name');
 throws_ok { $locale->variant_name('WIBBLE') } qr{ \A Invalid \s variant }xms, 'Invalid Variant name';
 is ($locale->language_name('i_klingon'), 'Klingon', 'Language alias');
 is ($locale->region_name('BQ'), 'Caribbean Netherlands', 'Region alias');

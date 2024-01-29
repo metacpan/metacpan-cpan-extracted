@@ -59,14 +59,14 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetCellSetValueRequest.name : The workbook name.  ,
+# PostWorksheetCellSetValueRequest.name : The file name.  ,
 # PostWorksheetCellSetValueRequest.sheetName : The worksheet name.  ,
 # PostWorksheetCellSetValueRequest.cellName : The cell name.  ,
 # PostWorksheetCellSetValueRequest.value : The cell value.  ,
 # PostWorksheetCellSetValueRequest.type : The value type.  ,
 # PostWorksheetCellSetValueRequest.formula : Formula for cell  ,
-# PostWorksheetCellSetValueRequest.folder : The document folder.  ,
-# PostWorksheetCellSetValueRequest.storageName : Storage name.   
+# PostWorksheetCellSetValueRequest.folder : The folder where the file is situated.  ,
+# PostWorksheetCellSetValueRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_cell_set_value' } = { 
-    	summary => 'Sets cell value by cell name in worksheet.',
+    	summary => 'Set cell value using cell name in the worksheet.',
         params => $params,
         returns => 'CellResponse',
     };
@@ -152,7 +152,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -194,14 +194,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'The document folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

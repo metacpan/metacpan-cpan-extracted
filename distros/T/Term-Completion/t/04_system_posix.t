@@ -5,11 +5,11 @@ use strict;
 my %test_arg;
 BEGIN {
   %test_arg = ( tests => 4 );
-  eval { require POSIX; };
+  eval { require POSIX; require Term::Size; };
   if($@) {
     %test_arg = (skip_all => 'POSIX and Term::Size are required for testing Term::Completion qw(:POSIX)');
   }
-  elsif($^O =~ /win/i && $^O !~ /cygwin/i) {
+  elsif($^O =~ /\bwin/i && $^O !~ /cygwin/i) {
     %test_arg = (skip_all => 'This test does not work on native Windows');
   }
 }

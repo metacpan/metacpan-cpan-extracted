@@ -4,11 +4,12 @@
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
 use v5.36;
-use Object::Pad 0.800;
+use Object::Pad 0.807;
 
-class App::perl::distrolint::Check::DeprecatedFeatures 0.03
-   :does(App::perl::distrolint::CheckRole::EachFile)
-   :does(App::perl::distrolint::CheckRole::TreeSitterPerl);
+class App::perl::distrolint::Check::DeprecatedFeatures 0.06;
+
+apply App::perl::distrolint::CheckRole::EachFile;
+apply App::perl::distrolint::CheckRole::TreeSitterPerl;
 
 use Text::Treesitter 0.07; # child_by_field_name
 
@@ -31,7 +32,7 @@ The following named features are deprecated, and not allowed:
 
 method run ( $app )
 {
-   return $self->run_for_each_perl_file( check_file => $app );
+   return $self->run_for_each_perl_file( check_file => );
 }
 
 my %BANNED_FEATURES = map { $_ => 1 } qw(
@@ -44,16 +45,18 @@ my $QUERY = <<'EOF';
    @statement
 EOF
 
-method check_file ( $file, $app )
+method check_file ( $file )
 {
    my $tree = $self->parse_perl_file( $file );
 
    return 0 unless $self->walk_each_query_match( $QUERY, $tree->root_node, method ( $captures ) {
-      my @imports = $self->extract_use_module_imports( $captures->{statement} );
+      my $node = $captures->{statement};
+      my @imports = $self->extract_use_module_imports( $node );
 
       foreach my $feature ( @imports ) {
          $BANNED_FEATURES{$feature} and
-            $app->diag( "%s uses feature '%s'", $file, $feature ), return 0;
+            App->diag( App->format_file( $file, $node->start_row + 1 ), " uses feature ", App->format_literal( $feature ) ),
+            return 0
       }
 
       return 1;

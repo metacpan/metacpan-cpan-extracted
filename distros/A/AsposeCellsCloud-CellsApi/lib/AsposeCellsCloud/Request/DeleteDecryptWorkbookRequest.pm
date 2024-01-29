@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# DeleteDecryptWorkbookRequest.name : The workbook name.  ,
-# DeleteDecryptWorkbookRequest.encryption : Encryption settings, only password can be specified.  ,
-# DeleteDecryptWorkbookRequest.folder : Original workbook folder.  ,
-# DeleteDecryptWorkbookRequest.storageName : Storage name.   
+# DeleteDecryptWorkbookRequest.name : The file name.  ,
+# DeleteDecryptWorkbookRequest.encryption : WorkbookEncryptionRequestEncryption parameters.  ,
+# DeleteDecryptWorkbookRequest.folder : The folder where the file is situated.  ,
+# DeleteDecryptWorkbookRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_decrypt_workbook' } = { 
-    	summary => 'Decrypts workbook.',
+    	summary => 'Excel files decryption.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
      'encryption' => {
      	datatype => 'WorkbookEncryptionRequest',
      	base_name => 'encryption',
-     	description => 'Encryption settings, only password can be specified.',
+     	description => 'WorkbookEncryptionRequestEncryption parameters.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

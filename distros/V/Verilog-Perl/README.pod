@@ -154,7 +154,7 @@ It understands and implements all preprocessor features of SystemVerilog
 Verilog::Parser is useful when you need to tokenize or write source filters
 (where you need everything including whitespace).  It can take raw files,
 or preprocessed input, and generates callbacks.  It understands all
-SystemVerilog 2017 keywords.
+SystemVerilog 2023 keywords.
 
 =item Abstract Syntax Tree
 
@@ -202,18 +202,45 @@ writing a parser from scratch).
 The Verilator program also contains a very similar front end as
 Verilog-Perl and can create XML output showing the abstract syntax tree.
 Verilator also understands how to elaborate and connect complex pins and
-types, but supports mostly only the synthesis subset of SystemVerilog.
-
-If you're looking to parse only synthesizable code this is the recommended
-route.
+types, but supports a subset of SystemVerilog.
 
 =item Verilog-Mode for Emacs
 
 Although not a parser, a common requested use of Verilog-Perl is to
 automatically make shell modules and interconnect modules.  Verilog-Mode is
-a better solution to this problem, as it results in completely portable
-code; the program (Verilog-Mode) isn't needed for others to update the
-design.  It's also in very common usage, including by many IP providers.
+a project with a better solution to this problem, as it results in
+completely portable code; the program (Verilog-Mode) isn't needed for
+others to update the design.  It's also in very common usage, including by
+many IP providers.
+
+=item slang
+
+The SystemVerilog Language Services (slang) project L<https://sv-lang.com>
+provides various components for lexing, parsing, type checking, and
+elaborating SystemVerilog code.  It's fast and supports UVM.
+
+=item Surelog
+
+The Surelog project L<https://github.com/chipsalliance/Surelog> is a
+SystemVerilog 2017 Pre-processor, Parser, Elaborator, and UHDM Compiler. It
+handles UVM and provides an IEEE Design/TB C/C++ VPI and Python AST API.
+
+=item SV-Parser
+
+The Sv-parser project L<https://github.com/dalance/sv-parser> is a
+SystemVerilog parser library fully compliant with IEEE 1800-2017.  that
+returns a concrete syntax tree.
+
+=item Tree-Sitter-Verilog
+
+The Tree-Sitter-Verilog project
+L<https://github.com/tree-sitter/tree-sitter-verilog> is a verilog grammar
+for the JavaScript tree-sitter parser.
+
+=item Verible
+
+The Verible project L<https://github.com/chipsalliance/verible> parses IEEE
+1800-2017, with the ability to parse un-preprocessed source files.
 
 =back
 
@@ -298,7 +325,7 @@ Verilog-Perl is part of the L<https://www.veripool.org/> free Verilog EDA
 software tool suite.  The latest version is available from CPAN and from
 L<https://www.veripool.org/verilog-perl>.
 
-Copyright 2000-2022 by Wilson Snyder.  This package is free software; you
+Copyright 2000-2024 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 

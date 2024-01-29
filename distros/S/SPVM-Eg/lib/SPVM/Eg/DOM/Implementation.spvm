@@ -1,0 +1,93 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Eg::DOM::Implementation {
+  
+  use Eg::Node::Element;
+  use Eg::Node::Document::HTML;
+  use Eg::Node::Document::XML;
+  use Eg::Node::DocumentType;
+  
+  # Class Methods
+  static method new : Eg::DOM::Implementation () {
+    
+    my $self = new Eg::DOM::Implementation;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method create_document : Eg::Node::Document::XML ($namespace_uri : string, $qualified_name_str : string) {
+    
+    unless ($qualified_name_str) {
+      die "\$qualified_name_str must be defined.";
+    }
+    
+    my $document = Eg::Node::Document::XML->new;
+    
+    $document->{namespace_uri} = $namespace_uri;
+    
+    my $root_element = Eg::Node::Element->new;
+    
+    $root_element->{tag_name} = $qualified_name_str;
+    
+    $document->append_child($root_element);
+    
+    return $document;
+  }
+  
+  method create_html_document : Eg::Node::Document::HTML ($title : string = undef) {
+    
+    my $document = Eg::Node::Document::HTML->new;
+    
+    $document->{namespace_uri} = "http://www.w3.org/1999/xhtml";
+    
+    my $html_element = $document->create_element("html");
+    
+    $document->append_child($html_element);
+    
+    my $head_element = $document->create_element("head");
+    
+    if ($title) {
+      my $text_node = $document->create_text_node($title);
+      
+      my $title_element = $document->create_element("title");
+      
+      $title_element->append_child($text_node);
+    }
+    
+    $html_element->append_child($head_element);
+    
+    my $body_element = $document->create_element("body");
+    
+    $html_element->append_child($body_element);
+    
+    return $document;
+  }
+  
+  method create_document_type : Eg::Node::DocumentType ($qualified_name_str : string, $public_id : string, $system_id : string) {
+    
+    unless ($qualified_name_str) {
+      die "\$qualified_name_str must be defined.";
+    }
+    
+    unless ($public_id) {
+      die "\$public_id must be defined.";
+    }
+    
+    unless ($system_id) {
+      die "\$system_id must be defined.";
+    }
+    
+    my $document_type = Eg::Node::DocumentType->new;
+    
+    $document_type->{name} = $qualified_name_str;
+    
+    $document_type->{public_id} = $public_id;
+    
+    $document_type->{system_id} = $system_id;
+    
+    return $document_type;
+  }
+  
+}

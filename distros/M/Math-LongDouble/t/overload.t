@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Math::LongDouble qw(:all);
 
-print "1..25\n";
+print "1..30\n";
 
 my $uv = ~0;
 my $iv = -21;
@@ -805,6 +805,41 @@ else {
 }
 
 $ok = '';
+
+my $obj0 = Math::LongDouble->new(~0);
+$obj0--;
+if($obj0 - ~0 == -1) {print "ok 26\n"}
+else {
+  warn "$obj0 is not 1 less than ", ~0, "\n";
+  print "not ok 26\n";
+}
+
+$obj0--;
+if($obj0 == ~0 - 2) {print "ok 27\n"}
+else {
+  warn "$obj0 != ~0 - 2\n";
+  print "not ok 27\n";
+}
+
+my $obj1 = $obj0++;
+if($obj1 - $obj0 == -1) {print "ok 28\n"}
+else {
+  warn "$obj1 is not 1 less than $obj0\n";
+  print "not ok 28\n";
+}
+
+my $obj2 = ++$obj0;
+if($obj2 == $obj0) {print "ok 29\n"}
+else {
+  warn "$obj2 != $obj0\n";
+  print "not ok 29\n";
+}
+
+if($obj2 - $obj1 == 2) {print "ok 30\n"}
+else {
+  warn "$obj2 is not 2 greater than $obj1\n";
+  print "not ok 30\n";
+}
 
 #############
 

@@ -320,6 +320,32 @@ This fixes some small design issues:
 
 * runOnce() in L<Net::Clacks::PostgreSQL2Clacks> now returns the lines it would have formerly printed to STDERR. The non-returning run() still prints to STDERR.
 
+=head2 VERSION 28
+
+This version is (in theory) fully backward compatible (i hope).
+
+Version 28 of Net::Clacks::Server now supports multiple users with different permissions. The primary user (same as in previous versions of Net::Clacks) is the only one
+that can run Interclacks connections.
+
+The additional users can have their permissions limited to read/write/manage (or a combination thereof). See "clacks_master.xml" in examples for details.
+
+* read permission allows to read cached variables and listen to events.
+
+* write permission allows to add/alter/delete cached variables and transmit events
+
+* manage permission allows to manage the server (MONITOR, disconnect other clients, etc)
+
+It's important to note that a write permission does NOT imply a read permission. Basically, you can have, for example, sensors that only transmit their state. They don't need the
+ability to read data or listen to other events.
+
+From Version 28 onwards, Makefile.PL and the documentation also clearly state the minimum Perl version required, which currently is v5.36. As a general rule, i only support the two
+most recent stable versions of Perl, similar to the developers of Perl itself. If no new Perl feature is required, Net::Clacks will be able to run on older Perl versions as well,
+but i will only test on supported versions.
+
+L<Net::Clacks::Server> also has an additional way to call the event loop, runOnce(). This allows you to run your own event loop and just call runOnce() every few milliseconds or so.
+
+Special thanks goes to kcott from PerlMonks for the MIN_PERL_VERSION stuff in Makefile.PL
+
 
 =head1 AUTHOR
 

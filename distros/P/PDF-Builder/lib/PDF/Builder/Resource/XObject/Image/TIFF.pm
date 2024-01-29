@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use Compress::Zlib;
 
@@ -21,9 +21,11 @@ PDF::Builder::Resource::XObject::Image::TIFF - TIFF image support
 
 =head1 METHODS
 
-=over
+=head2 new
 
-=item  $res = PDF::Builder::Resource::XObject::Image::TIFF->new($pdf, $file, %opts)
+    $res = PDF::Builder::Resource::XObject::Image::TIFF->new($pdf, $file, %opts)
+
+=over
 
 Returns a TIFF-image object.
 
@@ -38,6 +40,11 @@ Options:
 =item 'name' => 'string'
 
 This is the name you can give for the TIFF image object. The default is Ixnnnn.
+
+=back
+
+Remember that you need to use the Builder.pm method image_tiff in order to
+display a TIFF file.
 
 =back
 
@@ -89,7 +96,11 @@ sub new {
     return $self;
 }
 
-=item  $mode = $tif->usesLib()
+=head2 usesLib
+
+    $mode = $tif->usesLib()
+
+=over
 
 Returns 1 if Graphics::TIFF installed and used, 0 if not installed, or -1 if
 installed but not used (nouseGT option given to C<image_tiff>).
@@ -99,6 +110,8 @@ created. It can't tell you whether Graphics::TIFF is available in
 advance of actually using it, in case you want to use some functionality
 available only in TIFF_GT. See the <PDF::Builder> LA_GT() call if you
 need to know in advance.
+
+=back
 
 =cut
 
@@ -313,7 +326,11 @@ sub read_tiff {
     return $self;
 }
 
-=item $value = $tif->tiffTag($tag)
+=head2 tiffTag
+
+    $value = $tif->tiffTag($tag)
+
+=over
 
 returns the value of the internal tiff-tag.
 
@@ -323,15 +340,13 @@ B<Useful Tags:>
     xRes, yRes (dpi; pixel/cm if resUnit==3)
     resUnit
 
+=back
+
 =cut
 
 sub tiffTag {
     my ($self, $tag) = @_;
     return $self->{' tiff'}->{$tag};
 }
-
-=back
-
-=cut
 
 1;

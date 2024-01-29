@@ -25,10 +25,11 @@ sub expstr2re($) {
   $re
 }
 
-# Check that AUTOLOAD does not change punctuation variables
-{ my @varnames = split / /, '@ ! ^E , / \\ ? ^W';
-  local ($@, $/, $\, $,, $!, $^E, $^W)
-    = ("fakeAt","fakeInRecSep","fakeOutRecSep","fakeCom",13,13,1); # $^W can only be 0 or 1
+# Check that AUTOLOAD or terminal-width detection does not change
+# punctuation variables
+{ my @varnames = split / /, '@ ! ^E . , / \\ ? ^W';
+  local ($@, $/, $\, $., $,, $!, $^E, $^W)
+    = ("fakeAt","fakeInRecSep","fakeOutRecSep", 42, "fakeCom",13,13,1); # $^W can only be 0 or 1
   my %before = map{ do{no strict 'refs'; $_ => ${$_} } } @varnames;
   () = (vis($@), dvis '$@', visnew->rivisq42('$@'));
   my %after  = map{ do{no strict 'refs'; $_ => ${$_} } } @varnames;
@@ -120,7 +121,7 @@ for my $fw (1..5) {
 EOF
 }
 
-t_like( Data::Dumper::Interp->new()->Foldwidth(72) 
+t_like( Data::Dumper::Interp->new()->Foldwidth(72)
      ->vis({ "" => "Emp", A=>111,BBBBB=>222,C=>{d=>888,e=>999},D=>{},EEEEEEEEEEEEEEEEEEEEEEEEEE=>\42,F=>\\\43, G=>qr/foo.*bar/xsi}),
     expstr2re(do{chomp($_=<<'EOF'); $_}) );
 {

@@ -7,12 +7,12 @@ use DBIDM_Test qw/die_ok sqlLike HR_connect $dbh/;
 use Clone qw/clone/;
 use Test::More;
 
-# Note : schema 'HR' with a few tables and associations is defined in DBIDM_Test
-
+note "testing DBIx::DataModel version $DBIx::DataModel::VERSION";
 
 # general-purpose variables
 my ($lst, $emp, $emp2, $act);
 
+# Note : schema 'HR' with a few tables and associations is defined in DBIDM_Test
 
 # additional association to test self-referential assoc.
 HR->Association([qw/Employee   spouse   0..1 emp_id/],
@@ -730,6 +730,17 @@ sqlLike('SELECT lastname, dpt_name ' .
 }
 
 
+# join from instance
+$emp->join(qw/activities department/)->select(
+              -columns         => "dpt_name",
+              -join_with_USING => 1,
+              -where           => {dpt_name => {-like => 'A%'}});
+sqlLike('SELECT dpt_name ' .
+        'FROM T_Activity INNER JOIN T_Department USING (dpt_id) ' .
+        'WHERE (dpt_name LIKE ? AND emp_id = ?)',
+        ['A%', 999],
+        'join from instance');
+
 # wrong paths
 die_ok {$emp->join(qw/activities foo/)};
 die_ok {$emp->join(qw/foo bar/)};
@@ -907,6 +918,7 @@ is $first_colleague->can('department'), HR::Activity->can('department'),
 
 
 # where_on
+# legacy syntax : using database table names in the -where_on hash
 HR->join(qw/Employee activities => department/)->select(
   -where => {firstname => 'Hector',
              dpt_name  => 'Music'},
@@ -923,24 +935,86 @@ my @expected_sql_bind = (<<__EOSQL__, [qw/01.01.2001 999 Music Hector/]);
          ON T_Activity.dpt_id = T_Department.dpt_id AND dpt_head = ?
        WHERE dpt_name = ? AND firstname = ?
 __EOSQL__
-sqlLike(@expected_sql_bind, 'where_on');
+sqlLike(@expected_sql_bind, 'where_on with legacy syntax');
 
 # same test again, to check for possible side-effects in metadata
 HR->join(qw/Employee activities => department/)->select(
   -where => {firstname => 'Hector',
              dpt_name  => 'Music'},
   -where_on => {
-     T_Activity   => {d_end => {"<" => '01.01.2001'}},
+     T_Activity   => {d_end    => {"<" => '01.01.2001'}},
      T_Department => {dpt_head => 999},
    },
  );
 sqlLike(@expected_sql_bind, 'where_on again');
 
-# proper error message if inappropriate usage
+
+# same join again but without -where_on
+HR->join(qw/Employee activities => department/)->select(
+  -where => {firstname => 'Hector',
+             dpt_name  => 'Music'},
+ );
+sqlLike(<<__EOSQL__, [qw/Music Hector/], 'same join after where_on');
+     SELECT * FROM T_Employee 
+       LEFT OUTER JOIN T_Activity
+         ON T_Employee.emp_id = T_Activity.emp_id
+       LEFT OUTER JOIN T_Department 
+         ON T_Activity.dpt_id = T_Department.dpt_id
+       WHERE dpt_name = ? AND firstname = ?
+__EOSQL__
+
+
+# now using the new syntax with association names in the -where_on hash
+HR->join(qw/Employee activities => department/)->select(
+  -where => {firstname => 'Hector',
+             dpt_name  => 'Music'},
+  -where_on => {
+     activities => {d_end    => {"<" => '01.01.2001'}},
+     department => {dpt_head => 999},
+   },
+ );
+sqlLike(@expected_sql_bind, 'where_on with new syntax (association names)');
+
+
+# test with table alias
+HR->join(qw/Employee activities => department|dpt/)->select(
+  -where => {firstname => 'Hector',
+             dpt_name  => 'Music'},
+  -where_on => {
+     activities => {d_end => {"<" => '01.01.2001'}},
+     dpt        => {dpt_head => 999},
+   },
+ );
+$expected_sql_bind[0] = <<__EOSQL__;
+     SELECT * FROM T_Employee 
+       LEFT OUTER JOIN T_Activity
+         ON T_Employee.emp_id = T_Activity.emp_id AND d_end < ?
+       LEFT OUTER JOIN T_Department AS dpt
+         ON T_Activity.dpt_id = dpt.dpt_id AND dpt_head = ?
+       WHERE dpt_name = ? AND firstname = ?
+__EOSQL__
+sqlLike(@expected_sql_bind, 'where_on with table alias');
+
+
+# proper error message if not used on a join
 { eval { HR->table('Employee')->select(-where_on => {Foo => 'bar'}); };
   my $err = $@;
-  like $err, qr/where_on/, 'error message for wrong -where_on' ;
+  like $err, qr/where_on/, 'error message when the source for -where_on is not a join' ;
 }
+
+
+# proper error message if wrong table in -where_on
+{ eval {HR->join(qw/Employee activities => department|dpt/)->select(
+             -where    => {firstname => 'Hector', dpt_name  => 'Music'},
+             -where_on => {BAD_TABLE => {d_end => {"<" => '01.01.2001'}}},
+            ); };
+
+  my $err = $@;
+  like $err, qr/where_on.*?BAD_TABLE/, 'error message for bad table in -where_on' ;
+}
+
+
+
 
 
 

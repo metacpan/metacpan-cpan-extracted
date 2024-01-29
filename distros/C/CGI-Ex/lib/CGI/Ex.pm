@@ -6,7 +6,7 @@ CGI::Ex - CGI utility suite - makes powerful application writing fun and easy
 
 =head1 VERSION
 
-version 2.54
+version 2.55
 
 =for markdown [![master](https://travis-ci.org/ljepson/CGI-Ex.svg?branch=master)](https://travis-ci.org/ljepson/CGI-Ex)
 
@@ -23,7 +23,7 @@ version 2.54
 
 use 5.006;
 use strict;
-our $VERSION = '2.54'; # VERSION
+our $VERSION = '2.55'; # VERSION
 
 our ($PREFERRED_CGI_MODULE,
      $PREFERRED_CGI_REQUIRED,

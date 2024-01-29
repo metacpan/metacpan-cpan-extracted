@@ -3,8 +3,8 @@ package PDF::Builder::Util;
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 # note: $a and $b are "Magic variables" according to perlcritic, and so it
 # has conniptions over using them as variable names (even with "my"). so, I
@@ -686,25 +686,41 @@ sub defineName {
 
 Dimensions are in points.
 
-=over
+=head3 paper_size
 
-=item @box_corners = paper_size($x1,$y1, $x2,$y2);
+    @box_corners = paper_size($x1,$y1, $x2,$y2);
+
+=over
 
 Returns an array ($x1,$y1, $x2,$y2) (full bounding box).
 
-=item @box_corners = paper_size($x1,$y1);
+=back
+
+    @box_corners = paper_size($x1,$y1);
+
+=over
 
 Returns an array (0,0, $x1,$y1) (half bounding box).
 
-=item @box_corners = paper_size($media_name);
+=back
+
+    @box_corners = paper_size($media_name);
+
+=over
 
 Returns an array (0,0, paper_width,paper_height) for the named media.
 
-=item @box_corners = paper_size($x1);
+=back
+
+    @box_corners = paper_size($x1);
+
+=over
 
 Returns an array (0,0, $x1,$x1) (single quadratic).
 
 Otherwise, array (0,0, 612,792) (US Letter dimensions) is returned.
+
+=back
 
 =cut
 
@@ -729,12 +745,18 @@ sub page_size {
     }
 }
 
-=item %sizes = getPaperSizes();
+=head3 getPaperSizes
+
+    %sizes = getPaperSizes();
+
+=over
 
 Returns a hash containing the available paper size aliases as keys and
 their dimensions as a two-element array reference.
 
 See the source of L<PDF::Builder::Resource::PaperSizes> for the complete list.
+
+=back
 
 =cut
 
@@ -746,8 +768,6 @@ sub getPaperSizes {
     return %sizes;
 }
 
-=back
-
 =head2 STRING TO DIMENSION
 
 Convert a string "number [unit]" to the value in desired units. Units are
@@ -758,9 +778,11 @@ point, 72.27/inch), pc (pica, 6/inch), dd (Didot point, 67.5532/inch), and
 cc (Ciceros, 5.62943/inch). More can be added easily. 
 Invalid units are a fatal error.
 
-=over
+=head3 str2dim
 
-=item $value = str2dim($string, $type, $default_units);
+    $value = str2dim($string, $type, $default_units);
+
+=over
 
 C<$string> contains a number and optionally, a unit. Space(s) between the number
 and the unit are optional. E.g., '200', '35.2 mm', and '1.5in' are all allowable

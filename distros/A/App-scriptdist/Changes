@@ -1,5 +1,8 @@
 Revision history for Perl module App::scriptdist
 
+1.003 2024-01-08T15:33:18Z
+	* distro refresh, update email address
+
 1.001 2021-01-29T02:25:15Z
 	* Freshen distro, remove Travis CI, add Github Actions
 

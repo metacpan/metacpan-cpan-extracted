@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# DeleteWorksheetDeleteChartRequest.name : The workbook name.  ,
+# DeleteWorksheetDeleteChartRequest.name : The file name.  ,
 # DeleteWorksheetDeleteChartRequest.sheetName : The worksheet name.  ,
 # DeleteWorksheetDeleteChartRequest.chartIndex : The chart index.  ,
-# DeleteWorksheetDeleteChartRequest.folder : Original workbook folder.  ,
-# DeleteWorksheetDeleteChartRequest.storageName : Storage name.   
+# DeleteWorksheetDeleteChartRequest.folder : The folder where the file is situated.  ,
+# DeleteWorksheetDeleteChartRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_worksheet_delete_chart' } = { 
-    	summary => 'Deletes a chart by index in worksheet.',
+    	summary => 'Delete a chart by index in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,7 +137,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -158,14 +158,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

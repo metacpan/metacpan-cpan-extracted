@@ -314,11 +314,15 @@ sub generate_perl_class_file {
   my $description;
   my $main_doc;
   if ($interface) {
-    $description = "The $basic_type_name interface of L<SPVM> has interface methods to do someting.";
+    $description = "The $basic_type_name interface in L<SPVM> has interface methods to do someting.";
     $main_doc  = <<"EOS";
 =head1 Usage
 
   interface $basic_type_name;
+
+=head1 Details
+
+
 
 =head1 Interface Methods
 
@@ -327,7 +331,7 @@ sub generate_perl_class_file {
 EOS
   }
   elsif ($resource) {
-    $description = "The $basic_type_name resource of L<SPVM> is a L<resouce|SPVM::Document::Resource> to do someting.";
+    $description = "The $basic_type_name resource in L<SPVM> is a L<resouce|SPVM::Document::Resource> to do someting.";
     
     my $native = $self->native;
     my $new_method;
@@ -387,6 +391,10 @@ MyClass.$native_module_ext:
   
   $extern_c_end
   
+=head1 Details
+
+
+
 =head1 Original Product
 
 
@@ -446,11 +454,23 @@ MyClass.$native_module_ext:
 EOS
   }
   else {
-    $description = "The $basic_type_name class of L<SPVM> has methods to do someting.";
+    $description = "The $basic_type_name class in L<SPVM> has methods to do someting.";
     $main_doc  = <<"EOS";
 =head1 Usage
 
   use $basic_type_name;
+
+=head1 Details
+
+
+
+=head1 Interfaces
+
+
+
+=head1 Enumerations
+
+
 
 =head1 Fields
 

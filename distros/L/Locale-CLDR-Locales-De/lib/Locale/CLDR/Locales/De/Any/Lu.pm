@@ -8,13 +8,13 @@ Locale::CLDR::Locales::De::Any::Lu - Package for language German
 
 package Locale::CLDR::Locales::De::Any::Lu;
 # This file auto generated from Data\common\main\de_LU.xml
-#	on Tue  5 Dec  1:06:35 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,24 +24,6 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::De::Any');
-has 'display_name_language' => (
-	is			=> 'ro',
-	isa			=> CodeRef,
-	init_arg	=> undef,
-	default		=> sub { 
-		 sub {
-			 my %languages = (
-				'be' => 'Belarussisch',
-
-			);
-			if (@_) {
-				return $languages{$_[0]};
-			}
-			return \%languages;
-		}
-	},
-);
-
 has 'currencies' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -101,8 +83,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'day_periods' => (

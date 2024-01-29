@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ar::Any::Sd - Package for language Arabic
 
 package Locale::CLDR::Locales::Ar::Any::Sd;
 # This file auto generated from Data\common\main\ar_SD.xml
-#	on Tue  5 Dec  1:00:40 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';

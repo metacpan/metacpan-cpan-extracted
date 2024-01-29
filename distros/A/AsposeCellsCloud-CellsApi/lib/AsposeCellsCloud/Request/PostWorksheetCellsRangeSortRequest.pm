@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_sort' } = { 
-    	summary => 'Sets outline border around a range of cells.',
+    	summary => 'Sets data sort around a range of cells.',
         params => $params,
         returns => 'CellsCloudResponse',
     };

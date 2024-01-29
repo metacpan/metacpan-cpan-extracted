@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Copyright (c) 2008-2023 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2024 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -462,7 +462,7 @@ $def_off{1} = {
                '+13:00:00' => 'Pacific/Auckland',
                '+13:45:00' => 'Pacific/Chatham',
                '+14:00:00' => 'Pacific/Apia',
-               '-01:00:00' => 'America/Nuuk',
+               '-01:00:00' => 'America/Scoresbysund',
                '-01:30:00' => 'America/St_Johns',
                '-02:00:00' => 'America/Miquelon',
                '-02:30:00' => 'America/St_Johns',

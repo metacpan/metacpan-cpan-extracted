@@ -6,8 +6,10 @@ csv2pheno-ranker: A script to convert a CSV to an input suitable for Pheno-Ranke
 
 csv2pheno-ranker -i &lt;input.csv> \[-options\]
 
-     Options:
+     Arguments:
        -i|input                       CSV file
+
+     Options:
        -primary-key                   Name of the field that you want to use as identifier (MUST BE NON-ARRAY)
        -sep|separator                 Delimiter character for CSV files [;] e.g., --sep $'\t'
        -set-primary-key               To force inserting a primary key (in case your CSV does not have one). The name will be set with --primary-key
@@ -69,7 +71,7 @@ The software needs a csv as input file and assumes defaults. If you want to chan
 
 # AUTHOR 
 
-Written by Manuel Rueda, PhD. Info about CNAG can be found at [https://www.cnag.crg.eu](https://www.cnag.crg.eu).
+Written by Manuel Rueda, PhD. Info about CNAG can be found at [https://www.cnag.eu](https://www.cnag.eu).
 
 # COPYRIGHT AND LICENSE
 

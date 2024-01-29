@@ -5,7 +5,7 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad ':experimental(adjust_params)';
+use Object::Pad 0.800 ':experimental(adjust_params)';
 
 {
    my %captured;

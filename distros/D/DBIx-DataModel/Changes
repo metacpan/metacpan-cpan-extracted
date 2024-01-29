@@ -1,6 +1,17 @@
 Revision history for Perl extension DBIx::DataModel.
 
-v3.06
+v3.09 27.01.2024
+  - installing $dbh->{HandleError} so that error messages are reported from the caller's perspective
+  - new feature: select(..., -result_as => [subquery => 'aliased_column'])
+
+v3.08 13.01.2024
+  - new Statement arg : -sql_abstract (can also be written -with) for supporting Common Table Expressions
+  - refactoring of method Statement::refine()
+
+v3.07 26.12.2023
+  - -where_on : support for table aliases and association names
+
+v3.06 22.11.2023
   - support for SQL dialect 'Oracle12c'
   - new arguments 'sql_abstract_class' and 'sql_abstract_args' to define_schema()
 

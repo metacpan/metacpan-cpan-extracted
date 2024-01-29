@@ -14,7 +14,7 @@ INSTALLATION
             make install
 
 AUTHOR
-    This module is Copyright (C) 2017-2023 by
+    This module is Copyright (C) 2017-2024 by
 
     Jim Turner, "<turnerjw784 at yahoo.com>"
 
@@ -127,29 +127,29 @@ DESCRIPTION
 
     The currently-supported websites are: podcasts.apple.com podcasts
     (StreamFinder::Apple), bitchute.com videos (StreamFinder::Bitchute),
-    blogger.com videos (StreamFinder::Blogger), brandnewtube.com and
-    ugetube.com videos (StreamFinder::BrandNewTube), brighteon.com videos
+    blogger.com videos (StreamFinder::Blogger), ugetube.com videos
+    (StreamFinder::BrandNewTube), brighteon.com videos
     (StreamFinder::Brighteon), castbox.fm podcasts (StreamFinder::Castbox),
-    podcasts.google.com podcasts (StreamFinder::Google), iheartradio.com
-    radio stations and podcasts (StreamFinder::IHeartRadio),
-    www.internetradio.com radio stations (StreamFinder::InternetRadio),
-    www.linktv.org videos (StreamFinder::LinkTV), onlineradiobox.com radio
-    stations (StreamFinder::OnlineRadiobox), odysee.com videos
+    podcasts.google.com podcasts (StreamFinder::Google), iheart.com (aka
+    iheartradio.com) radio stations and podcasts
+    (StreamFinder::IHeartRadio), www.internet-radio.com radio stations
+    (StreamFinder::InternetRadio), onlineradiobox.com radio stations
+    (StreamFinder::OnlineRadiobox), odysee.com videos
     (StreamFinder::Odysee), podbean.com podcasts (StreamFinder::Podbean),
     podcastaddict.com podcasts (StreamFinder::PodcastAddict) (DEPRECIATED),
     podchaser.com podcasts (StreamFinder::Podchaser), radio.net radio
     stations (StreamFinder::RadioNet), rcast.net radio stations
     (StreamFinder::Rcast), rumble.com videos (StreamFinder::Rumble),
     sermonaudio.com sermons: audio and video (StreamFinder::SermonAudio),
-    soundcloud.com (non-paywalled) songs (StreamFinder::SoundCloud),
-    spreaker.com podcasts (StreamFinder::Spreaker), subsplash.com podcasts
-    (StreamFinder::Subsplash) (EXPERIMENTAL), tunein.com (non-paywalled)
-    radio stations and podcasts (StreamFinder::Tunein), vimeo.com videos
-    (StreamFinder::Vimeo), youtube.com, et. al and other sites that
-    youtube-dl supports (StreamFinder::Youtube), zeno.fm radio stations and
-    podcasts (StreamFinder::Zeno), and StreamFinder::Anystream - search any
-    (other) webpage URL (not supported by any of the other submodules) for
-    streams.
+    soundcloud.com (non-paywalled) songs (StreamFinder::SoundCloud)
+    (DEPRECIATED), spreaker.com podcasts (StreamFinder::Spreaker),
+    subsplash.com podcasts (StreamFinder::Subsplash) (EXPERIMENTAL),
+    tunein.com (non-paywalled) radio stations and podcasts
+    (StreamFinder::Tunein), vimeo.com videos (StreamFinder::Vimeo),
+    youtube.com, et. al and other sites that youtube-dl supports
+    (StreamFinder::Youtube), zeno.fm radio stations and podcasts
+    (StreamFinder::Zeno), and StreamFinder::Anystream - search any (other)
+    webpage URL (not supported by any of the other submodules) for streams.
 
     NOTE: StreamFinder::Podcastaddict is now considered depreciated and may
     be removed in a later StreamFinder release as it now requires a specific
@@ -158,8 +158,20 @@ DESCRIPTION
     longer possible to obtain a playlist or first episode from them via our
     scripts.
 
+    NOTE: StreamFinder::LinkTV has been removed as that site no longer
+    provides streams anymore but only links to the various (and diverse)
+    streaming sites that provide their own streams. Some may possibly work
+    via StreamFinder::Youtube or StreamFinder::AnyStream.
+
     NOTE: StreamFinder::Goodpods has been removed, as that site has redone
     itself in javascript as to no longer be scrapable for streams.
+
+    NOTE: Users should also consider StreamFinder::SoundCloud to now be
+    depreciated, as they've added cookie and tracker requirements making it
+    impossible to search for songs on their site without enabling, but song
+    URLs (when known) seem to still work for now, but without channel/artist
+    icons. (Privacy-minded individuals should now be cautious while using
+    this site).
 
     NOTE: For many sites, ie. Youtube, Vimeo, Apple, Spreaker, Castbox,
     Google, etc. the "station" object actually refers to a specific video or
@@ -464,7 +476,7 @@ SEE ALSO
         <http://search.cpan.org/dist/StreamFinder/>
 
 LICENSE AND COPYRIGHT
-    Copyright 2017-2023 Jim Turner.
+    Copyright 2017-2024 Jim Turner.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the the Artistic License (2.0). You may obtain a copy

@@ -1,10 +1,10 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::dirname::default_curdir;
 
-our $DATE = '2023-11-23'; # DATE
-our $VERSION = '0.025'; # VERSION
+our $DATE = '2024-01-08'; # DATE
+our $VERSION = '0.030'; # VERSION
 
-our $rschema = do{my$var={base=>"dirname",clsets_after_base=>[{default=>".",description=>"\nNote: be careful when using this schema for actions that are destructive,\nbecause a user can perform those actions without giving an argument (e.g. in a\n`delete-files-in` script). It is safer to use this schema when performing a\nnon=destructive action (e.g. `ls`) and/or operate in dry-run mode by default.\n\n",examples=>[],summary=>"Directory name, default to current directory"}],clsets_after_type=>[{description=>"\nThis schema is basically string with some checks and prefilters. Why use this\nschema instead of plain ol' str? Mainly to give you the ability to change tilde\nto user's home directory, e.g. `~/foo` into `/home/someuser/foo`. Normally this\nexpansion is done by a Unix shell, but sometimes your program receives an\nunexpanded path, e.g. when you get it from some config file.\n\nSee also more OS-specific schemas like `dirname::unix`, which adds some more\nchecks (e.g. filename cannot contain forward slash and each component cannot be\nlonger than 255 characters) and preprocessing (e.g. stripping extraneous slashes\nlike `foo//bar` into `foo/bar`.\n\nWhat's the difference between this schema and `filename`? The default completion\nrule. This schema's completion by default only includes directories.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"foo"},{valid=>1,value=>"foo/bar"}],min_len=>1,prefilters=>["Path::expand_tilde_when_on_unix","Path::strip_slashes_when_on_unix"],summary=>"Filesystem directory name","x.completion"=>["dirname"]},'$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_type}[0]','$var->{clsets_after_base}[0]'],resolve_path=>["str","dirname"],type=>"str",v=>2};$var->{clsets_after_type}[1]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_type}[0];$var->{"clsets_after_type.alt.merge.merged"}[1]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"dirname",clsets_after_base=>[{default=>".",description=>"\nNote: be careful when using this schema for actions that are destructive,\nbecause a user can perform those actions without giving an argument (e.g. in a\n`delete-files-in` script). It is safer to use this schema when performing a\nnon-destructive action (e.g. `ls`) and/or operate in dry-run mode by default.\n\n",examples=>[],summary=>"Directory name, default to current directory"}],clsets_after_type=>[{description=>"\nThis schema is basically string with some checks and prefilters. Why use this\nschema instead of plain ol' str? Mainly to give you the ability to change tilde\nto user's home directory, e.g. `~/foo` into `/home/someuser/foo`. Normally this\nexpansion is done by a Unix shell, but sometimes your program receives an\nunexpanded path, e.g. when you get it from some config file.\n\nSee also more OS-specific schemas like `dirname::unix`, which adds some more\nchecks (e.g. filename cannot contain forward slash and each component cannot be\nlonger than 255 characters) and preprocessing (e.g. stripping extraneous slashes\nlike `foo//bar` into `foo/bar`.\n\nWhat's the difference between this schema and `filename`? The default completion\nrule. This schema's completion by default only includes directories.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"foo"},{valid=>1,value=>"foo/bar"}],min_len=>1,prefilters=>["Path::expand_tilde_when_on_unix","Path::strip_slashes_when_on_unix"],summary=>"Filesystem directory name","x.completion"=>["dirname"]},'$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_type}[0]','$var->{clsets_after_base}[0]'],resolve_path=>["str","dirname"],type=>"str",v=>2};$var->{clsets_after_type}[1]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_type}[0];$var->{"clsets_after_type.alt.merge.merged"}[1]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: Directory name, default to current directory
@@ -21,7 +21,7 @@ Sah::SchemaR::dirname::default_curdir - Directory name, default to current direc
 
 =head1 VERSION
 
-This document describes version 0.025 of Sah::SchemaR::dirname::default_curdir (from Perl distribution Sah-Schemas-Path), released on 2023-11-23.
+This document describes version 0.030 of Sah::SchemaR::dirname::default_curdir (from Perl distribution Sah-Schemas-Path), released on 2024-01-08.
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2020, 2019, 2018, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2020, 2019, 2018, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

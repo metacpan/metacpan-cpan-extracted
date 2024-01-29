@@ -1,0 +1,61 @@
+NAME
+
+    Crypt::Passphrase::Bcrypt::AES - A peppered AES-encrypted Bcrypt
+    encoder for Crypt::Passphrase
+
+SYNOPSIS
+
+     my $passphrase = Crypt::Passphrase->new(
+         encoder => {
+             module  => 'Bcrypt::AES',
+             peppers => {
+                 1 => pack('H*', '0123456789ABCDEF...'),
+                 2 => pack('H*', 'FEDCBA9876543210...'),
+             },
+         },
+     );
+
+DESCRIPTION
+
+    This class implements peppering by encrypting the hash using AES
+    (unlike Crypt::Passphrase::Pepper::Simple which hashes the input
+    instead).
+
+ Configuration
+
+    This module takes all arguments also taken by
+    Crypt::Passphrase::Bcrypt, with the following additions:
+
+      * peppers
+
+      This is a map of identifier to pepper value. The identifiers should
+      be (probably small) numbers, the values should be random binary
+      strings that must be either 16, 24 or 32 bytes long.
+
+      * active
+
+      This is the identifier of the active pepper. By default it will be
+      the identifier with the highest (numerical) value.
+
+      * mode
+
+      This is the mode that will be used with AES. Values values are 'cfb',
+      'ofb' and 'ctr' (the default).
+
+ Supported crypt types
+
+    This supports any sequence of <bcrypt->, (sha256 | sha385 | sha512),
+    -encrypted-aes-, (ctr | cfb | ofb). E.g.
+    bcrypt-sha384-encrypted-aes-ctr
+
+AUTHOR
+
+    Leon Timmermans <fawaka@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2024 by Leon Timmermans.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -35,8 +35,7 @@ Table:
     CHECK (expression) |
     REFERENCES reftable [ ( refcolumn ) ] [ MATCH FULL | MATCH PARTIAL ]
       [ ON DELETE action ] [ ON UPDATE action ] }
-  [ DEFERRABLE | NOT DEFERRABLE ]
-  [ INITIALLY DEFERRED | INITIALLY IMMEDIATE ]
+  [ DEFERRABLE | NOT DEFERRABLE ] [ INITIALLY DEFERRED | INITIALLY IMMEDIATE ]
 
   and table_constraint is:
 
@@ -44,12 +43,11 @@ Table:
   { UNIQUE ( column_name [, ... ] ) |
     PRIMARY KEY ( column_name [, ... ] ) |
     CHECK ( expression ) |
+    EXCLUDE [USING acc_method] (expression) [INCLUDE (column [, ...])] [WHERE (predicate)]
     FOREIGN KEY ( column_name [, ... ] )
      REFERENCES reftable [ ( refcolumn [, ... ] ) ]
-      [ MATCH FULL | MATCH PARTIAL ]
-      [ ON DELETE action ] [ ON UPDATE action ] }
-  [ DEFERRABLE | NOT DEFERRABLE ]
-  [ INITIALLY DEFERRED | INITIALLY IMMEDIATE ]
+      [ MATCH FULL | MATCH PARTIAL ] [ ON DELETE action ] [ ON UPDATE action ] }
+  [ DEFERRABLE | NOT DEFERRABLE ] [ INITIALLY DEFERRED | INITIALLY IMMEDIATE ]
 
 Index :
 (http://www.postgresql.org/docs/current/sql-createindex.html)
@@ -90,10 +88,10 @@ View :
 use strict;
 use warnings;
 
-our $VERSION = '1.63';
+our $VERSION = '1.65';
 
 our $DEBUG;
-$DEBUG   = 0 unless defined $DEBUG;
+$DEBUG = 0 unless defined $DEBUG;
 
 use Data::Dumper;
 use SQL::Translator::Utils qw/ddl_parser_instance/;
@@ -316,6 +314,8 @@ create : CREATE WORD /[^;]+/ ';'
 using_method : /using/i WORD { $item[2] }
 
 where_predicate : /where/i /[^;]+/
+
+where_paren_predicate : /where/i '(' /[^;]+/ ')'
 
 include_covering : /include/i '(' covering_field_name(s /,/) ')'
   { $item{'covering_field_name(s)'} }
@@ -679,37 +679,38 @@ table_constraint : comment(s?) constraint_name(?) table_constraint_type deferrab
         my $fields     = $desc->{'fields'};
         my $expression = $desc->{'expression'};
         my @comments   = ( @{ $item[1] }, @{ $item[-1] } );
+        my $expr_constraint = $type eq 'check' || $type eq 'exclude';
 
         $return              =  {
             name             => $item[2][0] || '',
             supertype        => 'constraint',
             type             => $type,
-            fields           => $type ne 'check' ? $fields : [],
-            expression       => $type eq 'check' ? $expression : '',
+            fields           => $expr_constraint ? [] : $fields,
+            expression       => $expr_constraint ? $expression : '',
             deferrable       => $item{'deferrable'},
             deferred         => $item{'deferred'},
-            reference_table  => $desc->{'reference_table'},
-            reference_fields => $desc->{'reference_fields'},
-            match_type       => $desc->{'match_type'},
             on_delete        => $desc->{'on_delete'} || $desc->{'on_delete_do'},
             on_update        => $desc->{'on_update'} || $desc->{'on_update_do'},
             comments         => [ @comments ],
+            %{$desc}{qw/include using where reference_table reference_fields match_type/}
         }
     }
 
-table_constraint_type : /primary key/i '(' NAME(s /,/) ')'
+table_constraint_type : /primary key/i '(' NAME(s /,/) ')' include_covering(?)
     {
         $return = {
             type   => 'primary_key',
             fields => $item[3],
+            include => $item{'include_convering(?)'}[0],
         }
     }
     |
-    /unique/i '(' NAME(s /,/) ')'
+    /unique/i '(' NAME(s /,/) ')' include_covering(?)
     {
         $return    =  {
             type   => 'unique',
             fields => $item[3],
+            include => $item{'include_convering(?)'}[0],
         }
     }
     |
@@ -718,6 +719,16 @@ table_constraint_type : /primary key/i '(' NAME(s /,/) ')'
         $return        =  {
             type       => 'check',
             expression => $item[3],
+        }
+    }
+    |
+    /exclude/i using_method(?) '(' /[^)]+/ ')' include_covering(?) where_paren_predicate(?) {
+        $return        = {
+            type       => 'exclude',
+            expression => $item{__PATTERN2__},
+            using      => $item{'using_method(?)'}[0],
+            include    => $item{'include_convering(?)'}[0],
+            where      => $item{'where_paren_predicate(?)'}[0],
         }
     }
     |
@@ -1045,113 +1056,124 @@ VALUE : /[-+]?\d*\.?\d+(?:[eE]\d+)?/
 END_OF_GRAMMAR
 
 sub parse {
-    my ( $translator, $data ) = @_;
+  my ($translator, $data) = @_;
 
-    # Enable warnings within the Parse::RecDescent module.
-    local $::RD_ERRORS = 1 unless defined $::RD_ERRORS; # Make sure the parser dies when it encounters an error
-    local $::RD_WARN   = 1 unless defined $::RD_WARN; # Enable warnings. This will warn on unused rules &c.
-    local $::RD_HINT   = 1 unless defined $::RD_HINT; # Give out hints to help fix problems.
+  # Enable warnings within the Parse::RecDescent module.
+  local $::RD_ERRORS = 1
+      unless defined $::RD_ERRORS;    # Make sure the parser dies when it encounters an error
+  local $::RD_WARN = 1
+      unless defined $::RD_WARN;      # Enable warnings. This will warn on unused rules &c.
+  local $::RD_HINT = 1
+      unless defined $::RD_HINT;      # Give out hints to help fix problems.
 
-    local $::RD_TRACE  = $translator->trace ? 1 : undef;
-    local $DEBUG       = $translator->debug;
+  local $::RD_TRACE = $translator->trace ? 1 : undef;
+  local $DEBUG      = $translator->debug;
 
-    my $parser = ddl_parser_instance('PostgreSQL');
+  my $parser = ddl_parser_instance('PostgreSQL');
 
-    my $result = $parser->startrule($data);
-    die "Parse failed.\n" unless defined $result;
-    warn Dumper($result) if $DEBUG;
+  my $result = $parser->startrule($data);
+  die "Parse failed.\n" unless defined $result;
+  warn Dumper($result) if $DEBUG;
 
-    my $schema = $translator->schema;
-    my @tables = sort {
-        ( $result->{tables}{ $a }{'order'} || 0 ) <=> ( $result->{tables}{ $b }{'order'} || 0 )
-    } keys %{ $result->{tables} };
+  my $schema = $translator->schema;
+  my @tables = sort { ($result->{tables}{$a}{'order'} || 0) <=> ($result->{tables}{$b}{'order'} || 0) }
+      keys %{ $result->{tables} };
 
-    for my $table_name ( @tables ) {
-        my $tdata =  $result->{tables}{ $table_name };
-        my $table =  $schema->add_table(
-            #schema => $tdata->{'schema_name'},
-            name   => $tdata->{'table_name'},
-        ) or die "Couldn't create table '$table_name': " . $schema->error;
+  for my $table_name (@tables) {
+    my $tdata = $result->{tables}{$table_name};
+    my $table = $schema->add_table(
 
-        $table->extra(temporary => 1) if $tdata->{'temporary'};
+      #schema => $tdata->{'schema_name'},
+      name => $tdata->{'table_name'},
+    ) or die "Couldn't create table '$table_name': " . $schema->error;
 
-        $table->comments( $tdata->{'comments'} );
+    $table->extra(temporary => 1) if $tdata->{'temporary'};
 
-        my @fields = sort {
-            $tdata->{'fields'}{ $a }{'order'}
-            <=>
-            $tdata->{'fields'}{ $b }{'order'}
-        } keys %{ $tdata->{'fields'} };
+    $table->comments($tdata->{'comments'});
 
-        for my $fname ( @fields ) {
-            my $fdata = $tdata->{'fields'}{ $fname };
-            next if $fdata->{'drop'};
-            my $field = $table->add_field(
-                name              => $fdata->{'name'},
-                data_type         => $fdata->{'data_type'},
-                size              => $fdata->{'size'},
-                default_value     => $fdata->{'default'},
-                is_auto_increment => $fdata->{'is_auto_increment'},
-                is_nullable       => $fdata->{'is_nullable'},
-                comments          => $fdata->{'comments'},
-            ) or die $table->error;
+    my @fields
+        = sort { $tdata->{'fields'}{$a}{'order'} <=> $tdata->{'fields'}{$b}{'order'} } keys %{ $tdata->{'fields'} };
 
-            $table->primary_key( $field->name ) if $fdata->{'is_primary_key'};
+    for my $fname (@fields) {
+      my $fdata = $tdata->{'fields'}{$fname};
+      next if $fdata->{'drop'};
+      my $field = $table->add_field(
+        name              => $fdata->{'name'},
+        data_type         => $fdata->{'data_type'},
+        size              => $fdata->{'size'},
+        default_value     => $fdata->{'default'},
+        is_auto_increment => $fdata->{'is_auto_increment'},
+        is_nullable       => $fdata->{'is_nullable'},
+        comments          => $fdata->{'comments'},
+      ) or die $table->error;
 
-            for my $cdata ( @{ $fdata->{'constraints'} } ) {
-                next unless $cdata->{'type'} eq 'foreign_key';
-                $cdata->{'fields'} ||= [ $field->name ];
-                push @{ $tdata->{'constraints'} }, $cdata;
-            }
-        }
+      $table->primary_key($field->name) if $fdata->{'is_primary_key'};
 
-        for my $idata ( @{ $tdata->{'indices'} || [] } ) {
-            my @options = ();
-            push @options, { using => $idata->{'method'} } if $idata->{method};
-            push @options, { where => $idata->{'where'} }  if $idata->{where};
-            push @options, { include => $idata->{'include'} } if $idata->{include};
-            my $index  =  $table->add_index(
-                name    => $idata->{'name'},
-                type    => uc $idata->{'type'},
-                fields  => $idata->{'fields'},
-                options => \@options
-            ) or die $table->error . ' ' . $table->name;
-        }
-
-        for my $cdata ( @{ $tdata->{'constraints'} || [] } ) {
-            my $constraint       =  $table->add_constraint(
-                name             => $cdata->{'name'},
-                type             => $cdata->{'type'},
-                fields           => $cdata->{'fields'},
-                reference_table  => $cdata->{'reference_table'},
-                reference_fields => $cdata->{'reference_fields'},
-                match_type       => $cdata->{'match_type'} || '',
-                on_delete        => $cdata->{'on_delete'} || $cdata->{'on_delete_do'},
-                on_update        => $cdata->{'on_update'} || $cdata->{'on_update_do'},
-                expression       => $cdata->{'expression'},
-            ) or die "Can't add constraint of type '" .
-                $cdata->{'type'} .  "' to table '" . $table->name .
-                "': " . $table->error;
-        }
+      for my $cdata (@{ $fdata->{'constraints'} }) {
+        next unless $cdata->{'type'} eq 'foreign_key';
+        $cdata->{'fields'} ||= [ $field->name ];
+        push @{ $tdata->{'constraints'} }, $cdata;
+      }
     }
 
-    for my $vinfo (@{$result->{views}}) {
-      my $sql = $vinfo->{sql};
-      $sql =~ s/\A\s+|\s+\z//g;
-      my $view = $schema->add_view (
-        name => $vinfo->{view_name},
-        sql => $sql,
-        fields => $vinfo->{fields},
-      );
-
-      $view->extra ( temporary => 1 ) if $vinfo->{is_temporary};
+    for my $idata (@{ $tdata->{'indices'} || [] }) {
+      my @options = ();
+      push @options, { using   => $idata->{'method'} } if $idata->{method};
+      push @options, { where   => $idata->{'where'} }  if $idata->{where};
+      push @options, { include => $idata->{'include'} }
+          if $idata->{include};
+      my $index = $table->add_index(
+        name    => $idata->{'name'},
+        type    => uc $idata->{'type'},
+        fields  => $idata->{'fields'},
+        options => \@options
+      ) or die $table->error . ' ' . $table->name;
     }
 
-    for my $trigger (@{ $result->{triggers} }) {
-        $schema->add_trigger( %$trigger );
-    }
+    for my $cdata (@{ $tdata->{'constraints'} || [] }) {
+      my $options = [
 
-    return 1;
+        # load this up with the extras
+        map +{ %$cdata{$_} }, grep $cdata->{$_},
+        qw/include using where/
+      ];
+      my $constraint = $table->add_constraint(
+        name             => $cdata->{'name'},
+        type             => $cdata->{'type'},
+        fields           => $cdata->{'fields'},
+        reference_table  => $cdata->{'reference_table'},
+        reference_fields => $cdata->{'reference_fields'},
+        match_type       => $cdata->{'match_type'} || '',
+        on_delete        => $cdata->{'on_delete'}  || $cdata->{'on_delete_do'},
+        on_update        => $cdata->{'on_update'}  || $cdata->{'on_update_do'},
+        expression       => $cdata->{'expression'},
+        options          => $options
+          )
+          or die "Can't add constraint of type '"
+          . $cdata->{'type'}
+          . "' to table '"
+          . $table->name . "': "
+          . $table->error;
+    }
+  }
+
+  for my $vinfo (@{ $result->{views} }) {
+    my $sql = $vinfo->{sql};
+    $sql =~ s/\A\s+|\s+\z//g;
+    my $view = $schema->add_view(
+      name   => $vinfo->{view_name},
+      sql    => $sql,
+      fields => $vinfo->{fields},
+    );
+
+    $view->extra(temporary => 1) if $vinfo->{is_temporary};
+  }
+
+  for my $trigger (@{ $result->{triggers} }) {
+    $schema->add_trigger(%$trigger);
+  }
+
+  return 1;
 }
 
 1;

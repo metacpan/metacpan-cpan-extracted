@@ -3,6 +3,7 @@ lib/App/CPANModuleSite.pm
 Makefile.PL
 README.md
 MANIFEST			This list of files
+MANIFEST.SKIP
 share/site_src/index.html.tt
 share/tt_lib/intro.tt
 share/tt_lib/page.tt

@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Device::Chip::MCP4725 0.15;
+package Device::Chip::MCP4725 0.16;
 class Device::Chip::MCP4725
    :isa(Device::Chip);
 

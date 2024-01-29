@@ -1,3 +1,15 @@
+0.006   2023-10-21  Released-By: PERLANCAR; Urgency: medium
+
+        [cli xyplot]
+
+        - Add option: --output-format.
+
+        - [doc] Show how to change output format, force viewing using a
+          browser or a certain program.
+
+        - [doc] Add tips & tricks section in Description.
+
+
 0.005   2023-10-21  Released-By: PERLANCAR; Urgency: medium
 
         [cli xyplot]

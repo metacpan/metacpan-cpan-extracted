@@ -1,6 +1,10 @@
+ 0.24
+  - Simplify overloading of '++' and '--'.
+  - Replace finite() with _finite() - for Windows only
+
  0.23
- - Fix https://github.com/sisyphus/math-decimal64/pull/1 (also aplies to Math::LongDouble)
-   Thanks to @hiratara
+  - Fix https://github.com/sisyphus/math-decimal64/pull/1 (also aplies to Math::LongDouble)
+    Thanks to @hiratara
 
  0.22
   - Fix t/overload.t to better handle BSD's mentally-retarded, fuck-brained bullshit.

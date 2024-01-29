@@ -9,15 +9,15 @@ use XS::Parse::Infix::FromPerl qw(
    register_xs_parse_infix
    XPI_CLS_ADD_MISC
 );
-use Optree::Generate qw( opcode newBINOP );
+use Optree::Generate qw(
+   newBINOP
+
+   OP_ADD
+);
 
 BEGIN { plan skip_all => "No PL_infix_plugin" unless XS::Parse::Infix::HAVE_PL_INFIX_PLUGIN; }
 
 my %called;
-
-use constant {
-   OP_ADD => opcode("add"),
-};
 
 BEGIN {
    my $arr = [];

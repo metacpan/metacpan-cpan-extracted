@@ -4,7 +4,7 @@ Password::Policy - Make managing multiple password strength profiles easy
 
 # VERSION
 
-version 0.04
+version 0.06
 
 # UNICODE
 
@@ -15,7 +15,7 @@ If you find a case where Unicode characters don't behave correctly, please let m
 # EXCEPTIONS
 
 This module tries to throw a well defined exception object when it encounters an
-error. Wrapping it in something like [Try::Tiny](https://metacpan.org/pod/Try::Tiny) is highly recommended, so that
+error. Wrapping it in something like [Try::Tiny](https://metacpan.org/pod/Try%3A%3ATiny) is highly recommended, so that
 you can handle errors intelligently.
 
 # EXTENDING
@@ -83,7 +83,7 @@ The two most obvious use cases are:
       password should be made of stronger stuff.
 
 The whole thing is driven by a configuration file, passed in on instantiation. It uses
-[Config::Any](https://metacpan.org/pod/Config::Any) internally, so the config file format can be whatever you would like. The
+[Config::Any](https://metacpan.org/pod/Config%3A%3AAny) internally, so the config file format can be whatever you would like. The
 examples all use YAML, but anything Config::Any understands will work.
 
 Assuming a configuration file looks like this:

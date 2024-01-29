@@ -1,7 +1,15 @@
 
+0.406  2023-12-11    lichtkind
+-------
+    * = minor features
+    * + undo expand selection (Ctrl+Shift+A)
+    * + keep columns when moving caret up or down with direction keys
+    * + recent files menu
+    * ! fixed File "save as" function
+
 0.405  2023-10-14    lichtkind
 -------
-    * = more settings
+    * = minor feature: more settings
     * * config under ~/.config/kephra/main-recent.yaml stores most intern vars
     * + document menu with 4 items: soft tabs, tab size, EOL
     * + toggle caret line visibility
@@ -44,5 +52,8 @@
 TODO:
 
 #    * * Syntax modes for RAKU, RUST, C, Ruby, Python, bash, YAML, JSON, Markdown
-#    * + shrink selection (Ctrl+Shift+A)
 #    * multi doc
+#    * git integration
+#    * file browser
+#    * file projects
+#    * UTF crash bug, other encodings

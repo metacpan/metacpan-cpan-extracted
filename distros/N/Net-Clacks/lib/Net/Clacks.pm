@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 27;
+our $VERSION = 28;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -31,6 +31,8 @@ Net::Clacks - Fast client/server interprocess messaging and memcached replacemen
 The Net::Clacks system implements a fast client/server based interprocess messaging. For
 handling a high number of clients, you can run multiple servers in a master/slave configuration.
 A slave can also run itself as master for it's own slaves, so a tree-like setup is possible.
+
+Net::Clacks requires Perl 5.36.0 or higher.
 
 =head1 DESCRIPTION
 

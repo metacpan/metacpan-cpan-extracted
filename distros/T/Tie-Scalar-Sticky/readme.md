@@ -1,6 +1,6 @@
 Tie::Scalar::Sticky
 ===================
-Just another scalar assignment blocker. [![CPAN Version](https://badge.fury.io/pl/Tie-Scalar-Sticky.svg)](https://metacpan.org/pod/Tie::Scalar::Sticky) [![Build Status](https://api.travis-ci.org/jeffa/Tie-Scalar-Sticky.svg?branch=master)](https://travis-ci.org/jeffa/Tie-Scalar-Sticky)
+Just another scalar assignment blocker. [![CPAN Version](https://badge.fury.io/pl/Tie-Scalar-Sticky.svg)](https://metacpan.org/pod/Tie::Scalar::Sticky)
 
 Synopsis
 --------

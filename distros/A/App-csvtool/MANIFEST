@@ -1,0 +1,18 @@
+.editorconfig
+bin/csvtool
+Build.PL
+lib/App/csvtool.pm
+MANIFEST			This list of files
+t/00use.t
+t/10cut.t
+t/10grep.t
+t/10head.t
+t/10sort.t
+t/10tail.t
+t/10uniq.t
+t/99pod.t
+t/lib/TestAppcsvtool.pm
+README
+LICENSE
+META.yml
+META.json

@@ -1,3 +1,9 @@
+1.573   2023-09-23  Released-By: PERLANCAR; Urgency: medium
+
+        - [dux function bool][ux] Add more mainstream notions: n1+en,
+          n1+id, n1+en_id and default to n1+en_id.
+
+
 1.572   2019-10-26  Released-By: PERLANCAR; Urgency: medium
 
 	- subsort: Adjust to Sort::Sub 0.111 (allow passing arguments to

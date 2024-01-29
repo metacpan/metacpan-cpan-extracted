@@ -117,6 +117,7 @@ sub set_build_features {
         },
         qa => {
             bug => 0,
+            'bug-implicit-func' => undef,
             canary => 0,
         },
         reproducible => {
@@ -280,6 +281,10 @@ sub set_build_features {
     # one in the future area.
     $use_feature{future}{lfs} = $use_feature{abi}{lfs};
 
+    ## Area: qa
+
+    $use_feature{qa}{'bug-implicit-func'} //= $use_feature{qa}{bug};
+
     ## Area: reproducible
 
     # Mask features that might have an unsafe usage.
@@ -324,10 +329,10 @@ sub set_build_features {
     ## Area: hardening
 
     # Mask features that are not available on certain architectures.
-    if (none { $os eq $_ } qw(linux kfreebsd knetbsd hurd) or
-        $cpu eq 'hppa') {
-	# Disabled on non-(linux/kfreebsd/knetbsd/hurd).
-        # Disabled on hppa.
+    if (none { $os eq $_ } qw(linux kfreebsd hurd) or
+        any { $cpu eq $_ } qw(alpha hppa ia64)) {
+	# Disabled on non-(linux/kfreebsd/hurd).
+        # Disabled on alpha, hppa, ia64.
 	$use_feature{hardening}{pie} = 0;
     }
     if (any { $cpu eq $_ } qw(ia64 alpha hppa nios2) or $arch eq 'arm') {
@@ -357,6 +362,7 @@ sub set_build_features {
       # glibc 2.16 and later warn when using -O0 and _FORTIFY_SOURCE.
       $use_feature{hardening}{fortify} = 0;
     }
+    $flags->set_option_value('fortify-level', 2);
 
     # Handle logical feature interactions.
     if ($use_feature{hardening}{relro} == 0) {
@@ -431,15 +437,10 @@ sub _add_build_flags {
     ## Area: qa
 
     # Warnings that detect actual bugs.
+    if ($flags->use_feature('qa', 'bug-implicit-func')) {
+        $flags->append('CFLAGS', '-Werror=implicit-function-declaration');
+    }
     if ($flags->use_feature('qa', 'bug')) {
-        # C flags
-        my @cflags = qw(
-            implicit-function-declaration
-        );
-        foreach my $warnflag (@cflags) {
-            $flags->append('CFLAGS', "-Werror=$warnflag");
-        }
-
         # C/C++ flags
         my @cfamilyflags = qw(
             array-bounds
@@ -553,7 +554,8 @@ sub _add_build_flags {
 
     # Fortify Source
     if ($flags->use_feature('hardening', 'fortify')) {
-	$flags->append('CPPFLAGS', '-D_FORTIFY_SOURCE=2');
+        my $fortify_level = $flags->get_option_value('fortify-level');
+        $flags->append('CPPFLAGS', "-D_FORTIFY_SOURCE=$fortify_level");
     }
 
     # Format Security

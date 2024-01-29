@@ -1,5 +1,10 @@
 Revision history for Perl module CPAN::PackageDetails
 
+0.263 2021-02-05T07:21:57Z
+	* Fix a problem with indexing. $VERSION needs to be on it's own line
+	* Freshen the distro in various ways.
+	* Dump Travis CI, add Github Actions
+
 0.262 2018-10-16T22:46:12Z
 	* Fix a problem where $VERSION isn't initialized soon enough.
 	This caused warnings that made other modules fail their "no

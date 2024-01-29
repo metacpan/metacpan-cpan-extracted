@@ -5,8 +5,8 @@ use base qw(PDF::Builder::Content PDF::Builder::Content::Text PDF::Builder::Reso
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Dict;
 use PDF::Builder::Basic::PDF::Utils;
@@ -14,6 +14,18 @@ use PDF::Builder::Resource::XObject::Form;
 =head1 NAME
 
 PDF::Builder::Resource::XObject::Form::Hybrid - support routines for Forms. Inherits from L<PDF::Builder::Content>, L<PDF::Builder::Content::Text>, and L<PDF::Builder::Resource::XObject::Form>
+
+=head1 METHODS
+
+=head2 new
+
+    PDF::Builder::Resource::XObject::Form->new(args)
+
+=over
+
+Create a new object for a form.
+
+=back
 
 =cut
 
@@ -27,7 +39,7 @@ sub new {
     $self->{' charspace'}   = 0;
     $self->{' hscale'}      = 100;
     $self->{' wordspace'}   = 0;
-    $self->{' lead'}        = 0;
+    $self->{' leading'}     = 0;
     $self->{' rise'}        = 0;
     $self->{' render'}      = 0;
     $self->{' matrix'}      = [1, 0, 0, 1, 0, 0];
@@ -57,7 +69,7 @@ sub outobjdeep {
 #   # missing: stream, poststream, apiistext
 #   # added:   api, apipdf, apipage
 #   foreach my $key (qw(api apipdf apipage font fontsize charspace hscale
-#                       wordspace lead rise render matrix fillcolor
+#                       wordspace leading rise render matrix fillcolor
 #                       strokecolor translate scale skew rotate)) {
 #       delete $self->{" $key"};
 #   }

@@ -1,5 +1,5 @@
 package JSON::Path::Constants;
-$JSON::Path::Constants::VERSION = '1.0.3';
+$JSON::Path::Constants::VERSION = '1.0.4';
 use strict;
 use warnings;
 
@@ -90,15 +90,15 @@ JSON::Path::Constants - Constants used in the JSON::Path distribution
 
 =head1 VERSION
 
-version 1.0.3
+version 1.0.4
 
 =head1 AUTHOR
 
-Kit Peters <popefelix@gmail.com>
+Aurelia Peters <popefelix@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Kit Peters.
+This software is copyright (c) 2022 by Aurelia Peters.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -43,5 +43,10 @@ Test::DBIx::OpenTracing::test_database(
         simple  => 'SELECT 1',
         bind => [ 'SELECT id, description FROM things WHERE id IN (?, ?)', 1, 3 ],
     },
+    error_detection => {
+        sqlstate    => '42601',
+        err         => '7',
+    },
 );
+
 done_testing();

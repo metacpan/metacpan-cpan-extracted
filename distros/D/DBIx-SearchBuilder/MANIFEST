@@ -18,6 +18,7 @@ inc/Module/Install/WriteAll.pm
 lib/DBIx/SearchBuilder.pm
 lib/DBIx/SearchBuilder/Handle.pm
 lib/DBIx/SearchBuilder/Handle/Informix.pm
+lib/DBIx/SearchBuilder/Handle/MariaDB.pm
 lib/DBIx/SearchBuilder/Handle/mysql.pm
 lib/DBIx/SearchBuilder/Handle/mysqlPP.pm
 lib/DBIx/SearchBuilder/Handle/ODBC.pm

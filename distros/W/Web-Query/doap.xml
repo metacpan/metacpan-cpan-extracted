@@ -28,6 +28,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Ed Sabol</foaf:name>
+      <foaf:mbox rdf:resource="mailto:esabol@users.noreply.github.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Hiroki Honda</foaf:name>
       <foaf:mbox rdf:resource="mailto:cside.story@gmail.com" />
     </foaf:Person>
@@ -311,6 +317,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.39</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-08-21</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.00</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2023-09-06</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

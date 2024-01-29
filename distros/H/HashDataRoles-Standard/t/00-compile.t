@@ -6,12 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'HashData/Array.pm',
     'HashData/DBI.pm',
     'HashData/Hash.pm',
+    'HashData/Sample/DeNiro.pm',
     'HashData/Test/Source/Array.pm',
     'HashData/Test/Source/DBI.pm',
     'HashData/Test/Source/Hash.pm',

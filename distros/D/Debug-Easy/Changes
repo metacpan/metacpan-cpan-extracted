@@ -339,3 +339,11 @@ Revision history for Debug-Easy
 2.11    Nov 27, 2023
 
         Fixed the eval for loading Data::Dumper::Simple
+
+2.12    Dec 12, 2023
+
+        Relaxed Perl version requirements to 5.08
+
+2.13    Dec 15, 2023
+
+        Relaxed module version requirements in make.

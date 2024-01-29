@@ -1,5 +1,5 @@
-# License: Public Domain or CC0
-# See https://creativecommons.org/publicdomain/zero/1.0/
+# License: Public Domain or CC0 See
+# https://creativecommons.org/publicdomain/zero/1.0/
 # The author, Jim Avera (jim.avera at gmail) has waived all copyright and
 # related or neighboring rights.  Attribution is requested but is not required.
 
@@ -12,6 +12,7 @@ use strict; use warnings FATAL => 'all'; use utf8;
 use 5.018;  # lexical_subs
 use feature qw(say state lexical_subs current_sub);
 use feature 'lexical_subs';
+use feature 'unicode_strings';
 
 no warnings "experimental::lexical_subs";
 
@@ -26,8 +27,8 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '6.012'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-11-22'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '7.003'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-01-18'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Moose;
 
@@ -75,13 +76,15 @@ our %EXPORT_TAGS = (
 
 sub _generate_sub($;$); # forward
 
+our ($COND_LB, $COND_RB, $COND_MULT, $LQ, $RQ);
+
 #---------------------------------------------------------------------------
 my $sane_cW = $^W;
 my $sane_cH = $^H;
 our @save_stack;
 sub _SaveAndResetPunct() {
   # Save things which will later be restored
-  push @save_stack, [ $@, $!+0, $^E+0, $,, $/, $\, $?, $^W ];
+  push @save_stack, [ $@, $!+0, $^E+0, $., $,, $/, $\, $?, $^W ];
   # Reset sane values
   $,  = "";       # output field separator is null string
   $/  = "\n";     # input record separator is newline
@@ -91,7 +94,7 @@ sub _SaveAndResetPunct() {
   #$^H = $sane_cH; # our load-time pragmas (strict etc.)
 }
 sub _RestorePunct_NoPop() {
-  ( $@, $!, $^E, $,, $/, $\, $?, $^W ) = @{ $save_stack[-1] };
+  ( $@, $!, $^E, $., $,, $/, $\, $?, $^W ) = @{ $save_stack[-1] };
 }
 sub _RestorePunct() {
   &_RestorePunct_NoPop;
@@ -215,7 +218,7 @@ sub _dbshow(_) {
               : _dbvis($v)               # something else
 }
 our $_dbmaxlen = 300;
-sub _dbrawstr(_) { "«".(length($_[0])>$_dbmaxlen ? substr($_[0],0,$_dbmaxlen-3)."..." : $_[0])."»" }
+sub _dbrawstr(_) { "${LQ}".(length($_[0])>$_dbmaxlen ? substr($_[0],0,$_dbmaxlen-3)."..." : $_[0])."${RQ}" }
 sub _dbstr($) {
   local $_ = shift;
   return "undef" if !defined;
@@ -252,9 +255,9 @@ $Foldwidth1     = undef        unless defined $Foldwidth1; # override for 1st
 
 # The following override Data::Dumper defaults
 # Initial D::D values are captured once when we are first loaded.
-#
-#$Useqq          = "unicode:controlpic" unless defined $Useqq;
-$Useqq          = "unicode"    unless defined $Useqq;
+
+#$Useqq          = "<unicode:controlpic>" unless defined $Useqq;
+$Useqq          = "<unicode>"    unless defined $Useqq;
 $Quotekeys      = 0            unless defined $Quotekeys;
 $Sortkeys       = \&__sortkeys unless defined $Sortkeys;
 $Maxdepth       = $Data::Dumper::Maxdepth   unless defined $Maxdepth;
@@ -480,13 +483,17 @@ sub __getself_h {
   $obj->Values([{@_}])
 }
 
-sub _EnabSpacedots {
-  # Append :spacedots to Useqq if Useqq matches the global default
-  # (and if the default used extended options).
-  my $self = shift;
+sub _EnabUseqqFeature {
+  # Append <feature> to Useqq ONLY if Useqq has not been changed
+  # (indicated by "<pointy brackets>" in the value -- see $Useqq = ... )
+  # Does nothing unless the default enables extended features.
+  my ($self, $feature) = @_;
   my $curr = $self->Useqq;
-  return $self if length($curr//"") <= 1 or $curr eq $Useqq;
-  $self->Useqq($curr.":spacedots")
+  return $self if length($curr//"") <= 1
+                    || substr($curr,0,1) ne "<"
+                    || substr($curr,-1,1) ne ">";
+#btw '###ENABLE CHANGING Useqq; curr=', _dbvis($curr), "  \$Useqq=$Useqq";
+  $self->Useqq($curr.$feature)
 }
 
 sub _generate_sub($;$) {
@@ -504,21 +511,22 @@ sub _generate_sub($;$) {
   s/alvis/avisl/;  # backwards compat.
   s/hlvis/hvisl/;  # backwards compat.
 
-  s/^[^diha]*\K(?:lvis|visl)/avisl/; # 'visl' same as 'avisl' for bw compat.
+  # NOW visl means something else.
+  #s/^[^diha]*\K(?:lvis|visl)/avisl/; # 'visl' same as 'avisl' for bw compat.
 
   s/([ahid]?vis)// or error "can not infer the basic function";
   my $basename = $1;  # avis, hvis, ivis, dvis, or vis
   my $N = s/(\d+)// ? $1 : undef;
   my %mod = map{$_ => 1} split //, $_;
-  delete $mod{"_"}; # ignore underscores
+  delete $mod{"_"}; # ignore underscores in names
 
   if (($Debug//0) > 1) {
     warn "## (D=$Debug) methname=$methname base=$basename \$_=$_\n";
   }
-  if ($basename =~ /^[id]/) {
-    error "'$1' is inapplicable to $basename" if /([ahl])/;
-  }
-  error "'$1' mis-placed: Only allowed as '${1}vis'" if /([ahi])/;
+##  if ($basename =~ /^[id]/) {
+##    error "'$1' is inapplicable to $basename" if /([ahl])/;
+##  }
+##  error "'$1' mis-placed: Only allowed as '${1}vis'" if /([ahi])/;
 
 
   # All these subs can be called as either or methods or functions.
@@ -538,30 +546,40 @@ sub _generate_sub($;$) {
     $code .= ";";
   } else {
     if ($basename eq "vis") {
-      $code .= " { &__getself_s->_Listform('')";
+      my $listform = delete($mod{l}) ? 'l' : '';
+      $code .= " { &__getself_s->_Listform('${listform}')";
     }
     elsif ($basename eq "avis") {
       my $listform = delete($mod{l}) ? 'l' : 'a';
-      $code .= " { &__getself_a->_Listform('$listform')";
+      $code .= " { &__getself_a->_Listform('${listform}')";
     }
     elsif ($basename eq "hvis") {
       my $listform = delete($mod{l}) ? 'l' : 'h';
-      $code .= " { &__getself_h->_Listform('$listform')";
+      $code .= " { &__getself_h->_Listform('${listform}')";
     }
     elsif ($basename eq "ivis") {
       $code .= " { \@_ = ( &__getself" ;
     }
     elsif ($basename eq "dvis") {
-      $code .= " { \@_ = ( &__getself->_EnabSpacedots" ;
+      $code .= " { \@_ = ( &__getself->_EnabUseqqFeature(':spacedots:condense')" ;
+      #$code .= " { \@_ = ( &__getself->_EnabUseqqFeature(':spacedots')" ;
     }
     else { oops }
 
+    my $useqq = "";
+    $useqq .= ":unicode:controlpics" if delete $mod{c};
+    $useqq .= ":condense"            if delete $mod{C};
+    $code .= '->Debug(2)'            if delete $mod{d};
+    $useqq .= ":hex"                 if delete $mod{h};
+    $code .= '->Objects(0)'          if delete $mod{o};
+    $useqq .= ":octets"              if delete $mod{O};
+    $code .= '->Refaddr(1)'          if delete $mod{r};
+    $useqq .= ":underscores"         if delete $mod{u};
+
+    $code .= "->Useqq(\$Useqq.'${useqq}')" if $useqq ne "";
+    $code .= "->Useqq(0)"     if delete $mod{q};
+
     $code .= "->Maxdepth($N)" if defined($N);
-    $code .= '->Objects(0)'   if delete $mod{o};
-    $code .= '->Useqq(0)'     if delete $mod{q};
-    $code .= '->Useqq("unicode:controlpics")' if delete $mod{c};
-    $code .= '->Refaddr(1)'   if delete $mod{r};
-    $code .= '->Debug(2)'     if delete $mod{d};
 
     if ($basename =~ /^([id])vis/) {
       $code .= ", shift, '$1' ); goto &_Interpolate }";
@@ -649,7 +667,7 @@ my  $my_maxdepth;
 our $my_visit_depth = 0;
 
 my ($maxstringwidth, $truncsuffix, $objects, $opt_refaddr, $listform, $debug);
-my ($sortkeys, $show_overloaded_classname);
+my ($sortkeys, $show_classname);
 
 sub _Do {
   oops unless @_ == 1;
@@ -665,14 +683,14 @@ sub _Do {
   $maxstringwidth = 0 if ($maxstringwidth //= 0) >= INT_MAX;
   $truncsuffix //= "...";
   if (ref($objects) eq "HASH") {
-    for (qw/show_overloaded_classname objects/) {
-      croak "Objects value is a hashref but '${_}' key is missing\n"
+    for (qw/show_classname objects/) {
+      confess "Objects value is a hashref but '${_}' key is missing\n"
         unless exists $objects->{$_};
     }
-    $show_overloaded_classname = $objects->{show_overloaded_classname};
+    $show_classname = $objects->{show_classname};
     $objects = $objects->{objects};
   } else {
-    $show_overloaded_classname = 1;
+    $show_classname = 1;
   }
   $objects = [ $objects ] unless ref($objects //= []) eq 'ARRAY';
 
@@ -790,7 +808,7 @@ btw '@@@repl obj is overloaded' if $debug;
         # overloaded package; should not happen in this case.
         warn("Recursive overloads on $item ?\n"),last
           if $overload_depth++ > 10;
-        my $cn = $show_overloaded_classname ? "($class)" : "";
+        my $cn = $show_classname ? "($class)" : "";
         # Stringify objects which have the stringification operator
         if (overload::Method($class,'""')) {
           my $prefix = _show_as_number($item) ? _MAGIC_NOQUOTES_PFX : "";
@@ -1258,9 +1276,9 @@ sub __unesc_unicode() {  # edits $_
     # so is considered "Graphical", but we want to see it as hex rather
     # than "", and probably any other "Format" category Unicode characters.
 
-    s/
+    s{
        \G (?: [^\\]++ | \\[^x] )*+ \K (?<w> \\x\x{7B} (?<hex>[a-fA-F0-9]+) \x{7D} )
-     /
+     }{
        my $orig = $+{w};
        local $_ = hex( length($+{hex}) > 6 ? '0' : $+{hex} );
        $_ = $_ > 0x10FFFF ? "\0" : chr($_); # 10FFFF is Unicode limit
@@ -1268,7 +1286,30 @@ sub __unesc_unicode() {  # edits $_
        # choice of case when escaping wide characters.
        (m<\P{XPosixGraph}|[\0-\177]>
           || m<\p{General_Category=Format}>) ? lc($orig) : $_
-     /xesg;
+     }xesg;
+  }
+}
+
+my %ctlesc2codepoint = (
+  '\\a' => ord("\a"),
+  '\\b' => ord("\b"),
+  '\\t' => ord("\t"),
+  '\\n' => ord("\n"),
+  '\\f' => ord("\f"),
+  '\\r' => ord("\r"),
+  '\\e' => ord("\e"),
+);
+sub __unesc_nonoctal () {  # edits $_
+  # Change backslash escapes like \n back to octal escapes.
+  # This is to better visualize binary octet streams
+  if (/^"/) {
+    s{
+       \G (?: [^\\]++ | \\[x0-7] )*+ \K (?<w> \\[abtnfre])(?<digitnext>\d?)
+     }{
+      $+{digitnext}
+        ? sprintf("\\%03o", ($ctlesc2codepoint{$+{w}} // oops))
+        : sprintf("\\%01o", ($ctlesc2codepoint{$+{w}} // oops))
+     }xesg;
   }
 }
 
@@ -1283,7 +1324,8 @@ sub __change_quotechars($) {  # edits $_
 }
 
 my %qqesc2controlpic = (
-  '\0' => "\N{SYMBOL FOR NULL}",
+  '\0' => "\N{SYMBOL FOR NULL}",   # occurs if next char is not a digit
+  '\000' => "\N{SYMBOL FOR NULL}", # occurs if next char is a digit
   '\a' => "\N{SYMBOL FOR BELL}",
   '\b' => "\N{SYMBOL FOR BACKSPACE}",
   '\e' => "\N{SYMBOL FOR ESCAPE}",
@@ -1303,7 +1345,8 @@ my %char2controlpic = (
 sub __subst_controlpic_backesc() {  # edits $_
   # Replace '\t' '\n' etc. escapes with "control picture" characters
   return unless/^"/;
-  s{ \G (?: [^\\]++ | \\[^0abefnrt] )*+ \K ( \\[abefnrt] | \\0(?![0-7]) )
+  s{ \G (?: [^\\]++ | \\[^0abefnrt] )*+ \K
+        ( \\[abefnrt] | \\0(?![0-7]) | \\[0-3][0-7][0-7] )
    }{
       $qqesc2controlpic{$1} // $1
     }xesg;
@@ -1312,6 +1355,39 @@ sub __subst_spacedots() {  # edits $_
   if (/^"/) {
     s{\N{MIDDLE DOT}}{\N{BLACK LARGE CIRCLE}}g;
     s{ }{\N{MIDDLE DOT}}g;
+  }
+}
+
+sub __condense_strings($) {  # edits $_
+  if (/^"/) {
+    my $minrep_m1 = $_[0] - 1;
+    my $singlechar_restr = "[^\\\\${COND_LB}${COND_RB}${COND_MULT}]";
+
+    # Special case a string of nul represented as \n\n\n...\00n (n=0..7)
+    # D::D generates this to avoid ambiguity if a digit follows
+    s<( (\\([0-7])){$minrep_m1,}\\00\g{-1} )>
+     < $COND_LB."${2}${COND_MULT}".((length($1)-2)/length($2)).$COND_RB >xge;
+
+    # \0 \1 ... if there is no digit following, which makes it ambiguous
+    s<( (\\\d) \g{-1}{$minrep_m1,} ) (?![0-7]) >
+     < $COND_LB."${2}${COND_MULT}".(length($1)/length($2)).$COND_RB >xge;
+
+    # \x for almost any x besides a digit or \
+    s<( ($singlechar_restr | \\\D | \\[0-3][0-7][0-7] | \\x\{[^\{\}]+\})
+        \g{-1}{$minrep_m1,} )
+     >
+     < $COND_LB."${2}${COND_MULT}".(length($1)/length($2)).$COND_RB >xge;
+  }
+}
+
+sub __nums_in_hex() {
+  if (looks_like_number($_)) {
+    s/^([1-9]\d+)$/ sprintf("%#x", $1) /e; # Leave single-digit numbers as-is
+  }
+}
+sub __nums_with_underscores() {
+  if (looks_like_number($_)) {
+    while( s/^([^\._]*?\d)(\d\d\d)(?=$|\.|_)/$1_$2/ ) { }
   }
 }
 
@@ -1335,8 +1411,12 @@ sub _postprocess_DD_result {
     = @$self{qw/Debug _Listform Foldwidth Foldwidth1/};
   my $useqq = $self->Useqq();
   my $unesc_unicode = $useqq =~ /utf|unic/;
+  my $condense_strings = $useqq =~ /cond/;
+  my $octet_strings = $useqq =~ /octet/;
+  my $nums_in_hex   = $useqq =~ /hex/;
   my $controlpics   = $useqq =~ /pic/;
   my $spacedots     = $useqq =~ /space/;
+  my $underscores   = $useqq =~ /under/;
   my $qq            = $useqq =~ /qq(?:=(..))?/ ? ($1//'{}') : '';
   my $pad = $self->Pad() // "";
 
@@ -1344,6 +1424,22 @@ sub _postprocess_DD_result {
 
   my $maxlinelen = $foldwidth1 || $foldwidth || INT_MAX;
   my $maxlineNlen = ($foldwidth // INT_MAX) - length($pad);
+
+  state $utf_output = grep /utf/i, PerlIO::get_layers(*STDOUT, output=>1);
+  if ($unesc_unicode && $utf_output) {
+    # Probably it's safe to use wide characters
+    $COND_LB = "\N{LEFT DOUBLE PARENTHESIS}";
+    $COND_RB = "\N{RIGHT DOUBLE PARENTHESIS}";
+    $COND_MULT = "\N{MULTIPLICATION SIGN}";
+    $LQ = "«";
+    $RQ = "»";
+  } else {
+    $COND_LB = "(";
+    $COND_RB = ")";
+    $COND_MULT = "x";
+    $LQ = "<<";
+    $RQ = ">>";
+  }
 
   if ($debug) {
     our $_dbmaxlen = INT_MAX;
@@ -1360,9 +1456,13 @@ sub _postprocess_DD_result {
 
     __unmagic_atom ;
     __unesc_unicode          if $unesc_unicode;
+    __unesc_nonoctal         if $octet_strings;
     __subst_controlpic_backesc      if $controlpics;
     __subst_spacedots        if $spacedots;
+    __condense_strings(8)    if $condense_strings;
     __change_quotechars($qq) if $qq;
+    __nums_in_hex            if $nums_in_hex;
+    __nums_with_underscores  if $underscores;
 
     if ($prepending) { $_ = $prepending . $_; $prepending = ""; }
 
@@ -1717,7 +1817,10 @@ sub _postprocess_DD_result {
   }
   elsif (index($listform,'l') >= 0) {
     # show as a bare list without brackets
-    $outstr =~ s/\A(?:${addrvis_re})?[\[\{]// && $outstr =~ s/[\]\}]\z//s or oops;
+    $outstr =~ s/\A(?:${addrvis_re})?\[(.*)\]\z/$1/s;
+    $outstr =~ s/\A(?:${addrvis_re})?\{(.*)\}\z/$1/s;
+    # or a single string without "quote marks"
+    $outstr =~ s/\A"(.*)"\z/$1/s;
   }
 
   # Insert user-specified padding after each embedded newline
@@ -1812,7 +1915,7 @@ sub _Interpolate {
       }
       else {
         if (/^.+?(?<!\\)([\$\@\%])/) {
-          confess __PACKAGE__." bug: Missed '$1' in «$_»"
+          confess __PACKAGE__." bug: Missed '$1' in ${LQ}$_${RQ}"
         }
         # Due to the need to simplify the big regexp above, \x{abcd} is now
         # split into "\x" and "{abcd}".  Combine consecutive pass-thrus
@@ -1833,7 +1936,7 @@ sub _Interpolate {
         $e = "Invalid expression syntax starting at '$leftover' in $funcname arg"
       } else {
         # Otherwise we may have a parser bug
-        $e = "Invalid expression (or ".__PACKAGE__." bug):\n«$leftover»";
+        $e = "Invalid expression (or ".__PACKAGE__." bug):\n${LQ}$leftover${RQ}";
       }
       carp "$e\n";
       push @pieces, ['p',"<INVALID EXPRESSION>".$leftover];
@@ -1953,7 +2056,7 @@ sub DB_Vis_Eval($$) {
     local $Data::Dumper::Interp::string_to_eval =
       "package $pkg; "
        # N.B. eval first clears $@ so we must restore $@ inside the eval
-     .' &Data::Dumper::Interp::_RestorePunct_NoPop;'  # saved in _Interpolate
+     .' &Data::Dumper::Interp::_RestorePunct_NoPop();'  # saved in _Interpolate
        # In case something carps or croaks (e.g. because of ${\(somefunc())}
        # or a tie handler), force a full backtrace so the user's call location
        # is visible.  Unfortunately there is no way to make carp() show only
@@ -2022,7 +2125,7 @@ Data::Dumper::Interp - interpolate Data::Dumper output into strings for human co
   say hvis %hash;    # (abc => [1,2,3,4,5], def => undef)
 
   # Format a reference with abbreviated referent address
-  say visr $href;    # HASH<457:1c9>{abc => [1,2,3,4,5], ...}
+  say visr $ref;     # HASH<457:1c9>{abc => [1,2,3,4,5], ...}
 
   # Just abbreviate a referent address or arbitrary number
   say addrvis refaddr($ref);  # 457:1c9
@@ -2084,14 +2187,13 @@ with pre- and post-processing to "improve" the results:
 
 =over 2
 
-=item * Output is 1 line if possible,
-otherwise folded at your terminal width, WITHOUT a trailing newline.
+=item * One line if possible, else folded to terminal with, WITHOUT newline.
 
 =item * Safely printable Unicode characters appear as themselves.
 
-=item * Object internals are not shown by default; Math:BigInt etc. are stringified.
+=item * Objects like Math:BigInt etc. are stringified (by default).
 
-=item * "virtual" values behind overloaded deref operators are shown.
+=item * "Virtual" values behind overloaded deref operators are shown.
 
 =item * Data::Dumper bugs^H^H^H^Hquirks are circumvented.
 
@@ -2124,13 +2226,11 @@ from interpolating it beforehand.
 
 =head2 dvis I<'string to be interpolated'>
 
-Like C<ivis> but interpolations are prefixed with a "expr=" label
-and spaces are shown visibly as '·'.
+The 'd' is for "B<d>ebugging".  Like C<ivis> but labels expansions
+with "expr=" and shows spaces visibly as '·'.  Other debug-oriented
+formatting may also occur (TBD).
 
-The 'd' in 'dvis' stands for B<d>ebugging messages, a frequent use case where
-brevity of typing is needed.
-
-=head2 vis [I<SCALAREXPR>]
+=head2 vis [I<SCALAREXPR>B<]>
 
 =head2 avis I<LIST>
 
@@ -2159,47 +2259,43 @@ The available modifier characters are:
 
 =over 2
 
-B<l> - omit parenthesis to return a bare list (only with "avis" or "hvis")
+B<l> - omit parenthesis to return a bare list with "avis" or "hvis"; omit quotes from a string formatted by "vis".
 
-B<o> - show object internals
+B<o> - show object internals (see C<Objects>);
 
-=over
 
-Calling B<< Objects(0) >> using the OO api has the same effect.
+B<r> - show abbreviated addresses of refs (see C<Refaddr>).
 
-=back
+B<< <NUMBER> >> - limit structure depth to <NUMBER> levels (see C<Maxdepth>).
+
+See C<Useqq> for more info about these:
+
+B<c> - Show control characters as "Control Picture" characters
+
+B<C> - condense strings of repeated characters
+
+B<h> - show numbers > 9 in hexadecimal
+
+B<O> - Optimize for strings containing binary octets.
 
 B<q> - show strings 'single quoted' if possible
 
 =over
 
-Internally, Data::Dumper is called with C<Useqq(0)>, but depending
+With B<q> Data::Dumper is called with C<Useqq(0)>, but depending
 on the version of Data::Dumper the result may be "double quoted"
 anyway if wide characters are present.
 
 =back
 
-B<r> - show abbreviated addresses of objects and other refs
-
-=over
-
-Calling B<< Reftype(1) >> using the OO api has the same effect.
-
-=back
-
-B<< <NUMBER> >> - limit nested structure depth to <NUMBER> levels
-
-=over
-
-Calling B<< Maxdepth(NUMBER) >> using the OO api has the same effect.
-
-=back
+B<u> - show numbers with underscores between groups of three digits
 
 =back
 
 Functions must be imported explicitly
-unless they are imported by default (list shown below)
-or created via the :all tag.
+unless they are imported by default (see list below).
+
+=for HIDE or created via the :all tag.
 
 To avoid having to import functions in advance, you can
 use them as methods and import only the C<visnew> function:
@@ -2212,44 +2308,44 @@ use them as methods and import only the C<visnew> function:
   say visnew->avis2lrq(@ARGV);
   etc.
 
-(C<visnew> creates a new object.  Non-existent methods are auto-generated when
-first called via the AUTOLOAD mechanism).
+(C<visnew> creates a new object.  Non-existent methods are auto-generated
+via the AUTOLOAD mechanism).
 
 =head2 Functions imported by default
 
  ivis  dvis    vis  avis  hvis
-
  ivisq dvisq   visq avisq hvisq rvis rvisq
 
  visnew
  addrvis addrvisl
  u quotekey qsh qshlist qshpath
 
-=head2 The :all import tag
-Z<> Z<>
-
-  use Data::Dumper::Interp qw/:all/;
-
-This generates and imports all possible variations using suffix
-characters in alphabetical order, without underscores, with NUMBER <= 2.
-There are 119 variations, too many to remember.
-
-You only need to know the basic names
-
-  ivis, dvis, vis, avis, and hvis
-
-and the possible suffixes and their
-order (I<< <NUMBER> >>,C<l>,C<o>,C<q>,C<r>).
-
-For example, one function is C<< B<avis2lq> >>, which
-
- * Formats multiple arguments as an array ('avis')
- * Decends at most 2 levels into structures ('2')
- * Returns a comma-separated list *without* parenthesis ('l')
- * Shows strings in single-quoted form ('q')
-
-You could have used alternate names for the same function such as C<avis2ql>,
-C<q2avisl>, C<q_2_avis_l> etc. if called as methods or explicitly imported.
+=for HIDE =head2 The :all import tag
+=for HIDE Z<> Z<>
+=for HIDE
+=for HIDE   use Data::Dumper::Interp qw/:all/;
+=for HIDE
+=for HIDE This generates and imports methods uing all possible combinations of
+=for HIDE I<< <NUMBER> >>,C<l>,C<o>,C<q>, and C<r>,
+=for HIDE in alphabetical order, with NUMBER <= 2.
+=for HIDE There are 119 variations, too many to remember.
+=for HIDE
+=for HIDE You only need to know the basic names
+=for HIDE
+=for HIDE   ivis, dvis, vis, avis, and hvis
+=for HIDE
+=for HIDE and the possible suffixes and their
+=for HIDE order (I<< <NUMBER> >>,C<l>,C<o>,C<q>,C<r>).
+=for HIDE
+=for HIDE For example, one function is C<< B<avis2lq> >>, which
+=for HIDE
+=for HIDE  * Formats multiple arguments as an array ('avis')
+=for HIDE  * Decends at most 2 levels into structures ('2')
+=for HIDE  * Returns a comma-separated list *without* parenthesis ('l')
+=for HIDE  * Shows strings in single-quoted form ('q')
+=for HIDE
+=for HIDE You could have used alternate names for the same function such as C<avis2ql>,
+=for HIDE C<q2avisl>, C<q_2_avis_l> etc. if called as methods or explicitly imported.
 
 * To save memory, only stub declarations with prototypes are generated
 for imported functions.
@@ -2260,20 +2356,20 @@ The C<:debug> import tag prints messages chronicling these events.
 
 =head2 addrvis I<REF_or_NUMBER>
 
-This function returns a string representing an address in both decimal and
+Returns a string showing an address in both decimal and
 hexadecimal, but abbreviated to only the last few digits.
 
 The number of digits starts at 3 and increases over time if necessary
 to keep new results unambiguous.
 
 For REFs, the result is like I<< "HASHE<lt>457:1c9E<gt>" >>
-or, for blessed objects, I<< "Package::NameE<lt>457:1c9E<gt>" >>.
+or I<< "Package::NameE<lt>457:1c9E<gt>" >>.
 
 If the argument is a plain number, just the abbreviated address
 is returned, e.g. I<< "E<lt>457:1c9E<gt>" >>.
 
 I<"undef"> is returned if the argument is undefined.
-Croaks if the argument is defined but not a ref.
+Croaks if the argument is defined but not a number or reference.
 
 C<addrvis_digits(NUMBER)> forces a minimum width
 and C<addrvis_forget()> discards past values and resets to 3 digits.
@@ -2290,7 +2386,7 @@ Like C<addrvis> but omits the <angle brackets>.
 
 These create an object initialized from the global configuration
 variables listed below.  No arguments are permitted.
-C<visnew> is simply a shorthand wrapper.
+C<visnew> is simply a shorthand.
 
 B<All the functions described above> and any variations
 may be called as I<methods> on an object
@@ -2354,13 +2450,13 @@ the object replaced by the result, and the check repeated.
 By default, "(classname)" is prepended when an overloaded operator is
 evaluated to make clear what happened.
 
-=head2 Objects(I<< {objects => VALUE, show_overloaded_classname => BOOL} >>)
+=head2 Objects(I<< {objects => VALUE, show_classname => BOOL} >>)
 
 This form, passing a hashref,
 allows control of whether "(classname)" is prepended to the result
 from an overloaded operator.
 
-If the I<show_overloaded_classname> value is false, then overload results
+If the I<show_classname> value is false, then overload results
 will appear unadorned, i.e. they will look as if the overload result
 was the original value.
 
@@ -2377,7 +2473,7 @@ value, e.g. "A.20" sorts before "A.100".  See C<Data::Dumper> documentation.
 0 means generate 'single quoted' strings when possible.
 
 1 means generate "double quoted" strings as-is from Data::Dumper.
-Non-ASCII charcters will be shown as hex escapes.
+Non-ASCII charcters will be shown as hex or octal escapes.
 
 Otherwise generate "double quoted" strings enhanced according to option
 keywords given as a :-separated list, e.g. Useqq("unicode:controlpics").
@@ -2402,9 +2498,29 @@ the tiny "control picures" can be hard to read;
 to see traditional \n etc.  while still seeing wide characters as themselves,
 set C<Useqq> to just "unicode";
 
+=item "octets"
+
+Optimize for viewing binary strings (i.e. strings of octets, not "wide"
+characters).  Octal escapes are shown instead of \n, \r, etc.
+
 =item "spacedots"
 
 Space characters are shown as '·' (Middle Dot).
+
+=item "condense"
+
+Repeated sequences in strings are shown as "⸨I<char>xI<repcount>⸩".
+For example
+
+  vec(my $s, 31, 1) = 1;
+  say unpack "b*", ~$s;
+  say visnew->Useqq("unicode:condense")->visl(unpack "b*", ~$s);
+    -->11111111111111111111111111111110
+    -->⸨1×31⸩0
+
+=item "underscores"
+
+Show numbers with '_' seprating groups of 3 digits.
 
 =item "qq"
 

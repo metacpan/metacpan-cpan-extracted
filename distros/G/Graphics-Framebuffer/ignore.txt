@@ -21,3 +21,4 @@ src/Makefile.pl
 subs.pl
 examples/multiprocessing/many*
 examples/multiprocessing/mce*
+t/*.pl

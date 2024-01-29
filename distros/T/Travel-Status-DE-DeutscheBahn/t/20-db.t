@@ -7,7 +7,7 @@ use utf8;
 
 use File::Slurp qw(read_file);
 use JSON;
-use Test::More tests => 52;
+use Test::More tests => 106;
 
 use Travel::Status::DE::HAFAS;
 
@@ -55,9 +55,91 @@ is( $results[0]->number,    '50833',   'result 0: number' );
 is( $results[0]->operator, 'Nahreisezug', 'result 0: operator' );
 is( $results[0]->platform, undef,         'result 0: platform' );
 
+is( $results[0]->direction, 'Tiergarten, Philharmonie', 'result 0: direction' );
+
 for my $res ( $results[0]->route_end, $results[0]->destination ) {
 	is( $res, 'Philharmonie Süd, Berlin', 'result 0: route start/end' );
 }
+
+is( scalar $results[0]->route_interesting,
+	3, 'result 0: route_interesting: 3 elements' );
+is(
+	( $results[0]->route_interesting )[0]->loc->name,
+	'Alexanderstr., Berlin',
+	'result 0: route_interesting 0: name'
+);
+is(
+	( $results[0]->route_interesting )[1]->loc->name,
+	'Alexanderplatz (S+U)/Grunerstr., Berlin',
+	'result 0: route_interesting 1: name'
+);
+is(
+	( $results[0]->route_interesting )[2]->loc->name,
+	'Rotes Rathaus (U), Berlin',
+	'result 0: route_interesting 2: name'
+);
+
+is( scalar $results[0]->route, 12, 'result 0: route: 12 elements' );
+is(
+	( $results[0]->route )[0]->loc->name,
+	'Alexanderstr., Berlin',
+	'result 0: route 0: name'
+);
+is(
+	( $results[0]->route )[1]->loc->name,
+	'Alexanderplatz (S+U)/Grunerstr., Berlin',
+	'result 0: route 1: name'
+);
+is(
+	( $results[0]->route )[2]->loc->name,
+	'Rotes Rathaus (U), Berlin',
+	'result 0: route 2: name'
+);
+is(
+	( $results[0]->route )[3]->loc->name,
+	'Museumsinsel (U), Berlin',
+	'result 0: route 3: name'
+);
+is(
+	( $results[0]->route )[4]->loc->name,
+	'Staatsoper, Berlin',
+	'result 0: route 4: name'
+);
+is(
+	( $results[0]->route )[5]->loc->name,
+	'Unter den Linden (U), Berlin',
+	'result 0: route 5: name'
+);
+is(
+	( $results[0]->route )[6]->loc->name,
+	'Behrenstr./Wilhelmstr., Berlin',
+	'result 0: route 6: name'
+);
+is(
+	( $results[0]->route )[7]->loc->name,
+	'Mohrenstr. (U), Berlin',
+	'result 0: route 7: name'
+);
+is(
+	( $results[0]->route )[8]->loc->name,
+	'Leipziger Str./Wilhelmstr., Berlin',
+	'result 0: route 8: name'
+);
+is(
+	( $results[0]->route )[9]->loc->name,
+	'Potsdamer Platz [Bus Leipziger Str.] (S+U), Berlin',
+	'result 0: route 9: name'
+);
+is(
+	( $results[0]->route )[10]->loc->name,
+	'Varian-Fry-Str./Potsdamer Platz, Berlin',
+	'result 0: route 10: name'
+);
+is(
+	( $results[0]->route )[11]->loc->name,
+	'Philharmonie Süd, Berlin',
+	'result 0: route 11: name'
+);
 
 is(
 	$results[0]->sched_datetime->strftime('%Y%m%d %H%M%S'),
@@ -87,9 +169,72 @@ is( $results[2]->number,    '20024',  'result 2: number' );
 is( $results[2]->operator, 'Nahreisezug', 'result 2: operator' );
 is( $results[2]->platform, undef,         'result 2: no platform' );
 
+is( $results[2]->direction, 'Hermannstr. (S+U), Berlin',
+	'result 2: direction' );
+
 for my $res ( $results[2]->route_end, $results[2]->destination ) {
 	is( $res, 'Hermannstr. (S+U), Berlin', 'result 2: route start/end' );
 }
+
+is( scalar $results[2]->route_interesting,
+	3, 'result 2: route_interesting: 3 elements' );
+is(
+	( $results[2]->route_interesting )[0]->loc->name,
+	'Heinrich-Heine-Str. (U), Berlin',
+	'result 2: route_interesting 0: name'
+);
+is(
+	( $results[2]->route_interesting )[1]->loc->name,
+	'Moritzplatz (U), Berlin',
+	'result 2: route_interesting 1: name'
+);
+is(
+	( $results[2]->route_interesting )[2]->loc->name,
+	'Kottbusser Tor (U), Berlin',
+	'result 2: route_interesting 2: name'
+);
+
+is( scalar $results[2]->route, 8, 'result 2: route: 8 elements' );
+is(
+	( $results[2]->route )[0]->loc->name,
+	'Heinrich-Heine-Str. (U), Berlin',
+	'result 2: route 0: name'
+);
+is(
+	( $results[2]->route )[1]->loc->name,
+	'Moritzplatz (U), Berlin',
+	'result 2: route 1: name'
+);
+is(
+	( $results[2]->route )[2]->loc->name,
+	'Kottbusser Tor (U), Berlin',
+	'result 2: route 2: name'
+);
+is(
+	( $results[2]->route )[3]->loc->name,
+	'Schönleinstr. (U), Berlin',
+	'result 2: route 3: name'
+);
+is(
+	( $results[2]->route )[4]->loc->name,
+	'Hermannplatz (U), Berlin',
+	'result 2: route 4: name'
+);
+is(
+	( $results[2]->route )[5]->loc->name,
+	'Boddinstr. (U), Berlin',
+	'result 2: route 5: name'
+);
+is(
+	( $results[2]->route )[6]->loc->name,
+	'Leinestr. (U), Berlin',
+	'result 2: route 6: name'
+);
+is(
+	( $results[2]->route )[7]->loc->name,
+	'Hermannstr. (S+U), Berlin',
+	'result 2: route 7: name'
+);
 
 is(
 	$results[2]->sched_datetime->strftime('%Y%m%d %H%M%S'),
@@ -119,9 +264,102 @@ is( $results[3]->number,    '3122',   'result 3: number' );
 is( $results[3]->operator, 'S-Bahn Berlin', 'result 3: operator' );
 is( $results[3]->platform, 4,               'result 3: platform' );
 
+is( $results[3]->direction, 'Berlin-Spandau (S)', 'result 3: direction' );
+
 for my $res ( $results[3]->route_end, $results[3]->destination ) {
 	is( $res, 'Berlin-Spandau (S)', 'result 3: route start/end' );
 }
+
+is( scalar $results[3]->route_interesting,
+	3, 'result 3: route_interesting: 3 elements' );
+is(
+	( $results[3]->route_interesting )[0]->loc->name,
+	'Berlin Alexanderplatz (S)',
+	'result 3: route_interesting 0: name'
+);
+is(
+	( $results[3]->route_interesting )[1]->loc->name,
+	'Berlin Hackescher Markt',
+	'result 3: route_interesting 1: name'
+);
+is(
+	( $results[3]->route_interesting )[2]->loc->name,
+	'Berlin Hbf (S-Bahn)',
+	'result 3: route_interesting 2: name'
+);
+
+is( scalar $results[3]->route, 16, 'result 3: route: 16 elements' );
+is(
+	( $results[3]->route )[0]->loc->name,
+	'Berlin Alexanderplatz (S)',
+	'result 3: route 0: name'
+);
+is(
+	( $results[3]->route )[1]->loc->name,
+	'Berlin Hackescher Markt',
+	'result 3: route 1: name'
+);
+is(
+	( $results[3]->route )[2]->loc->name,
+	'Berlin Friedrichstraße (S)',
+	'result 3: route 2: name'
+);
+is(
+	( $results[3]->route )[3]->loc->name,
+	'Berlin Hbf (S-Bahn)',
+	'result 3: route 3: name'
+);
+is(
+	( $results[3]->route )[4]->loc->name,
+	'Berlin Bellevue',
+	'result 3: route 4: name'
+);
+is( ( $results[3]->route )[5]->loc->name,
+	'Berlin-Tiergarten', 'result 3: route 5: name' );
+is(
+	( $results[3]->route )[6]->loc->name,
+	'Berlin Zoologischer Garten (S)',
+	'result 3: route 6: name'
+);
+is(
+	( $results[3]->route )[7]->loc->name,
+	'Berlin Savignyplatz',
+	'result 3: route 7: name'
+);
+is(
+	( $results[3]->route )[8]->loc->name,
+	'Berlin Charlottenburg (S)',
+	'result 3: route 8: name'
+);
+is(
+	( $results[3]->route )[9]->loc->name,
+	'Berlin Westkreuz',
+	'result 3: route 9: name'
+);
+is(
+	( $results[3]->route )[10]->loc->name,
+	'Berlin Messe Süd (Eichkamp)',
+	'result 3: route 10: name'
+);
+is(
+	( $results[3]->route )[11]->loc->name,
+	'Berlin Heerstraße',
+	'result 3: route 11: name'
+);
+is(
+	( $results[3]->route )[12]->loc->name,
+	'Berlin Olympiastadion',
+	'result 3: route 12: name'
+);
+is( ( $results[3]->route )[13]->loc->name,
+	'Berlin-Pichelsberg', 'result 3: route 17: name' );
+is( ( $results[3]->route )[14]->loc->name,
+	'Berlin-Stresow', 'result 3: route 14: name' );
+is(
+	( $results[3]->route )[15]->loc->name,
+	'Berlin-Spandau (S)',
+	'result 3: route 15: name'
+);
 
 is(
 	$results[3]->sched_datetime->strftime('%Y%m%d %H%M%S'),

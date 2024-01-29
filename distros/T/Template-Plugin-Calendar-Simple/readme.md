@@ -1,6 +1,6 @@
 Template::Plugin::Calendar::Simple
 ==================================
-Just another HTML calendar generator. [![CPAN Version](https://badge.fury.io/pl/Template-Plugin-Calendar-Simple.svg)](https://metacpan.org/pod/Template::Plugin::Calendar::Simple) [![Build Status](https://api.travis-ci.org/jeffa/Template-Plugin-Calendar-Simple.svg?branch=master)](https://travis-ci.org/jeffa/Template-Plugin-Calendar-Simple)
+Just another HTML calendar generator. [![CPAN Version](https://badge.fury.io/pl/Template-Plugin-Calendar-Simple.svg)](https://metacpan.org/pod/Template::Plugin::Calendar::Simple)
 
 Description
 -----------

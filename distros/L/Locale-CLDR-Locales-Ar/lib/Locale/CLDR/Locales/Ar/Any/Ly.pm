@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ar::Any::Ly - Package for language Arabic
 
 package Locale::CLDR::Locales::Ar::Any::Ly;
 # This file auto generated from Data\common\main\ar_LY.xml
-#	on Tue  5 Dec  1:00:39 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'arn' => 'المابودونجونية',
@@ -54,7 +54,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'EA' => 'سبتة ومليلية',
  			'MS' => 'مونتيسيرات',
@@ -73,7 +73,7 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			numbers => qr{[‎ \- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			numbers => qr{[‎ \- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -152,8 +152,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'day_periods' => (
@@ -169,7 +169,7 @@ has 'day_periods' => (
 					'evening1' => q{مساءً},
 					'morning1' => q{فجرًا},
 					'morning2' => q{ص},
-					'night1' => q{منتصف الليل},
+					'night1' => q{في المساء},
 					'night2' => q{ل},
 				},
 			},

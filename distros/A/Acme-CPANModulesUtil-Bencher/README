@@ -3,9 +3,9 @@ NAME
     information in an Acme::CPANModules::* list
 
 VERSION
-    This document describes version 0.005 of Acme::CPANModulesUtil::Bencher
+    This document describes version 0.006 of Acme::CPANModulesUtil::Bencher
     (from Perl distribution Acme-CPANModulesUtil-Bencher), released on
-    2022-11-30.
+    2023-10-06.
 
 FUNCTIONS
   gen_bencher_scenario
@@ -114,7 +114,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021 by perlancar
+    This software is copyright (c) 2023, 2022, 2021 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

@@ -1,0 +1,165 @@
+class Cotton {
+  use Eg;
+  use Eg::Runtime;
+  use Eg::OS;
+  use Sys::OS;
+  use Eg::CSS::Box;
+  use Eg::DOM::Implementation;
+  
+  static method tag : Eg::Node::Element ($tag_name : string, $child_nodes_or_text : object of Eg::Node[]|string = undef) {
+    
+    my $dom_impl = Eg::DOM::Implementation->new;
+    
+    my $document = $dom_impl->create_html_document;
+    
+    my $child_nodes = (Eg::Node[])undef;
+    if ($child_nodes_or_text) {
+      if ($child_nodes_or_text is_type string) {
+        $child_nodes = [$document->create_text_node((string)$child_nodes_or_text)];
+      }
+      elsif ($child_nodes_or_text isa Eg::Node[]) {
+        $child_nodes = (Eg::Node[])$child_nodes_or_text;
+      }
+      else {
+        die "The type of \$child_nodes_or_text must inherit Eg::Node::Element or must be string.";
+      }
+    }
+    
+    my $new_element_node = $document->create_element($tag_name);
+    
+    if ($child_nodes) {
+      for my $child_node (@$child_nodes) {
+        $new_element_node->append_child($child_node);
+      }
+    }
+    
+    return $new_element_node;
+  }
+  
+  static method tag_ : Eg::Node::Element ($tag_name : string, $attribute_pairs : object[] = undef, $child_nodes_or_text : object of Eg::Node[]|string = undef) {    
+    my $dom_impl = Eg::DOM::Implementation->new;
+    
+    my $document = $dom_impl->create_html_document;
+    
+    my $child_nodes = (Eg::Node[])undef;
+    if ($child_nodes_or_text) {
+      if ($child_nodes_or_text is_type string) {
+        $child_nodes = [$document->create_text_node((string)$child_nodes_or_text)];
+      }
+      elsif ($child_nodes_or_text isa Eg::Node[]) {
+        $child_nodes = (Eg::Node[])$child_nodes_or_text;
+      }
+      else {
+        die "The type of \$child_nodes_or_text must inherit Eg::Node or must be string.";
+      }
+    }
+    
+    my $new_element_node = $document->create_element($tag_name);
+    
+    if ($child_nodes) {
+      for my $child_node (@$child_nodes) {
+        $new_element_node->append_child($child_node);
+      }
+    }
+    
+    my $attributes_h = Hash->new($attribute_pairs);
+    
+    my $style_pairs = (object[])$attributes_h->delete("style");
+    
+    if ($style_pairs) {
+      my $styles_h = Hash->new($style_pairs);
+      
+      $new_element_node->set_styles_h($styles_h);
+    }
+    
+    for my $attribute_name (@{$attributes_h->keys}) {
+      my $attribute_value = $attributes_h->get($attribute_name);
+      
+      if ($attribute_value) {
+        $new_element_node->set_attribute($attribute_name, (string)$attribute_value);
+      }
+    }
+    
+    return $new_element_node;
+  }
+  
+  # Class Methods
+  static method main : int ($start_file : string, $args : string[]) {
+    my $runtime = Eg::Runtime->new;
+    
+    my $os = (Eg::OS)undef;
+    
+    if (Sys::OS->is_windows) {
+      if (require Eg::OS::Windows) {
+        $os = Eg::OS::Windows->new;
+      }
+    }
+    
+    unless ($os) {
+      die "This system is not supported.";
+    }
+    
+    $os->build_runtime($runtime);
+    
+    Eg->SET_RUNTIME($runtime);
+    
+    my $document = &document;
+    
+    my $window = $runtime->window;
+    
+    $window->set_document($document);
+    
+    my $api = $runtime->api;
+    
+    $api->app->open_main_window;
+    
+    warn $api->window->inner_width;
+    
+    warn Eg->window->inner_width;
+    
+    warn $api->window->inner_height;
+    
+    warn Eg->window->inner_height;
+    
+    warn $api->window->outer_width;
+    
+    warn Eg->window->outer_width;
+    
+    warn $api->window->outer_height;
+    
+    warn Eg->window->outer_height;
+    
+    $api->app->start_event_loop;
+  }
+  
+  static method document : Eg::Node::Document::HTML () {
+    
+    my $div1 = &tag_("div",
+      {style => {"background-color" => "#00FF00", "color" => "#0000FF", "font-size" => "60px", "font-weight" => "bold"}},
+      "あああああ"
+    );
+    
+    my $elements = [
+      $div1,
+      &tag_("div",{style => {left => "300px", top => "400px", width => "100px", height => "100px", "background-color" => "#FF0000"}}),
+      &tag_("div",{style => {left => "400px", top => "500px", width => "100px", height => "100px", "background-color" => "#FF0000"}}),
+      &tag_("div",{style => {left => "100px", top => "100px", width => "100px", height => "100px", "background-color" => "#FFFF00"}}),
+      &tag_("div",{style => {left => "200px", top => "200px", width => "100px", height => "100px", "background-color" => "#FFFF00"}}),
+    ];
+    
+    my $title = "コットン";
+    
+    my $dom_impl = Eg::DOM::Implementation->new;
+    
+    my $document = $dom_impl->create_html_document($title);
+    
+    for my $element (@$elements) {
+      $document->body->append_child($element);
+    }
+    
+    $document->set_title($title);
+    
+    return $document;
+  }
+  
+}

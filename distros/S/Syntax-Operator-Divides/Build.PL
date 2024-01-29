@@ -16,6 +16,8 @@ my $build = Module::Build->new(
    },
    requires => {
       'perl' => '5.016', # pad_alloc()
+      'meta' => '0.003_002',
+      'XS::Parse::Infix' => '0.27',
    },
    license => 'perl',
    create_license => 1,

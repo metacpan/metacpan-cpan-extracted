@@ -8,10 +8,10 @@ div.ticket-list-with-previewinsearch table.ticket-list { table-layout:fixed; }
 var ticket_list = jQuery('table.ticket-list');
 
 % if ( RT->Config->Get('SideBySidePreview') ) {
-ticket_list.wrap( "<div class='row m-0'><div class='ticket-list-with-previewinsearch col-6'></div></div>" );
+ticket_list.wrap( "<div class='row m-3'><div class='ticket-list-with-previewinsearch col-6'></div></div>" );
 jQuery('div.ticket-list-with-previewinsearch').after( "<div id='ticket-preview-container' class='col-6'><p>foobar</p></div>" );
 % } else {
-ticket_list.after( "<div class='row m-0'><div id='ticket-preview-container' class='col-12'><p>foobar</p></div></div>" );
+ticket_list.after( "<div class='row m-3'><div id='ticket-preview-container' class='col-12'><p>foobar</p></div></div>" );
 % }
 
 var get_ticket_row = function (from) {

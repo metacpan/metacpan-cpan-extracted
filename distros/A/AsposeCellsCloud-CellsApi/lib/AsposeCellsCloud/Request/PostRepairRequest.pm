@@ -59,8 +59,8 @@ sub new {
 
 
 # Run Operation Request
-# PostRepairRequest.File : File to upload  ,
-# PostRepairRequest.format :    
+# PostRepairRequest.File : The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
+# PostRepairRequest.outFormat : The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)   
 
 {
     my $params = {
@@ -71,7 +71,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_repair' } = { 
-    	summary => '',
+    	summary => 'Repair abnormal files and generate files in various formats.',
         params => $params,
         returns => 'FilesResult',
     };
@@ -97,8 +97,8 @@ sub run_http_request {
     }
     $header_params->{'Content-Type'} = $client->select_header_content_type('multipart/form-data');
  
-    if(defined $self->format){
-        $query_params->{'format'} = $client->to_query_value($self->format);      
+    if(defined $self->out_format){
+        $query_params->{'outFormat'} = $client->to_query_value($self->out_format);      
     } 
     my $_body_data;
  
@@ -123,14 +123,14 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'File to upload',
+     	description => 'The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)',
      	format => '',
      	read_only => '',
      		},
-     'format' => {
+     'out_format' => {
      	datatype => 'string',
-     	base_name => 'format',
-     	description => '',
+     	base_name => 'outFormat',
+     	description => 'The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)',
      	format => '',
      	read_only => '',
      		},    
@@ -139,7 +139,7 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->attribute_map( {
     'file' => 'File',
-    'format' => 'format' 
+    'out_format' => 'outFormat' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

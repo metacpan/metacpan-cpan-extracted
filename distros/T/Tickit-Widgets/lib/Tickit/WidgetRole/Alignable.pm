@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2023 -- leonerd@leonerd.org.uk
 
-package Tickit::WidgetRole::Alignable 0.51;
+package Tickit::WidgetRole::Alignable 0.52;
 
 use v5.14;
 use warnings;
@@ -105,7 +105,7 @@ sub export_subs_for
 
 =head2 I<NAME>
 
-   $align = $widget->NAME
+   $align = $widget->NAME;
 
 Return the current alignment value
 
@@ -113,7 +113,7 @@ Return the current alignment value
 
 =head2 set_I<NAME>
 
-   $widget->set_NAME( $value )
+   $widget->set_NAME( $value );
 
 Set the new alignment value
 
@@ -129,7 +129,7 @@ respectively.
 
 =head2 _I<NAME>_allocation
 
-   ( $before, $alloc, $after ) = $widget->_NAME_allocation( $value, $total )
+   ( $before, $alloc, $after ) = $widget->_NAME_allocation( $value, $total );
 
 Returns a list of three integers created by aligning the C<$value> to the
 given alignment position within the C<$total>. See also C<align> in

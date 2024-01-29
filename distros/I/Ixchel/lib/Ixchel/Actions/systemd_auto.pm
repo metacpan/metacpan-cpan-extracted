@@ -5,26 +5,34 @@ use strict;
 use warnings;
 use File::Slurp;
 use String::ShellQuote;
+use base 'Ixchel::Actions::base';
 
 =head1 NAME
 
-Ixchel::Actions::systemd_auto :: Generate systemd service files using the systemd_service template.
+Ixchel::Actions::systemd_auto - Generate systemd service files using the systemd_service template.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.2.0';
 
-=head1 SYNOPSIS
+=head1 CLI SYNOPSIS
+
+ixchel -a systemd_auto [B<-s> <service>] [B<--np>] [B<-w>] [B<-s> <service>]
+[B<--reload>] [B<--enable>] [B<--start>] [B<--restart>]
+
+=head1 CODE SYNOPSIS
 
     use Data::Dumper;
 
     my $results=$ixchel->action(action=>'systemd_auto', opts=>{np=>1, w=>1, reload=>1, enable=>1, start=>1, });
 
     print Dumper($results);
+
+=head1 DESCRIPTION
 
 The template used is systemd_service.
 
@@ -36,10 +44,6 @@ in it failing. Printing the results on other systems is meant primarily for test
 
 =head1 FLAGS
 
-=head2 --np
-
-Do not print the status of it.
-
 =head2 -w
 
 Write the generated services to service files.
@@ -47,6 +51,8 @@ Write the generated services to service files.
 =head2 -s <service>
 
 A auto service to operate on.
+
+Otherwise operates on them all.
 
 =head2 --reload
 
@@ -77,54 +83,10 @@ Restart the generated services.
 
 =cut
 
-sub new {
-	my ( $empty, %opts ) = @_;
-
-	my $self = {
-		config => {},
-		vars   => {},
-		arggv  => [],
-		opts   => {},
-	};
-	bless $self;
-
-	if ( defined( $opts{config} ) ) {
-		$self->{config} = $opts{config};
-	}
-
-	if ( defined( $opts{t} ) ) {
-		$self->{t} = $opts{t};
-	} else {
-		die('$opts{t} is undef');
-	}
-
-	if ( defined( $opts{share_dir} ) ) {
-		$self->{share_dir} = $opts{share_dir};
-	}
-
-	if ( defined( $opts{opts} ) ) {
-		$self->{opts} = \%{ $opts{opts} };
-	}
-
-	if ( defined( $opts{argv} ) ) {
-		$self->{argv} = $opts{argv};
-	}
-
-	if ( defined( $opts{vars} ) ) {
-		$self->{vars} = $opts{vars};
-	}
-
-	if ( defined( $opts{ixchel} ) ) {
-		$self->{ixchel} = $opts{ixchel};
-	}
-
-	return $self;
-} ## end sub new
-
-sub action {
+sub new_extra {
 	my $self = $_[0];
 
-	my $results = {
+	$self->{results} = {
 		errors      => [],
 		status_text => '',
 		is_systemd  => 0,
@@ -135,10 +97,14 @@ sub action {
 		reloaded    => 1,
 		ok          => 0,
 	};
+} ## end sub new_extra
+
+sub action_extra {
+	my $self = $_[0];
 
 	# not dying here is intentional for testing purposes
 	if ( $^O eq 'linux' && ( -f '/usr/bin/systemctl' || -f '/bin/systemctl' ) ) {
-		$results->{is_systemd} = 1;
+		$self->{results}{is_systemd} = 1;
 	}
 
 	my @units;
@@ -186,28 +152,26 @@ sub action {
 			}
 		};
 		if ($@) {
-			$results->{written} = 0;
-			my $error = $@;
-			push( @{ $results->{errors} }, $error );
+			$self->{results}{written} = 0;
 			if ( !defined($filled_in) ) {
 				$filled_in = '';
 			}
-			$results->{status_text}
-				= $results->{status_text}
-				. '-----[ ERROR '
-				. $unit
-				. ' ]-------------------------------------' . "\n" . '# '
-				. $error
-				. $filled_in . "\n";
+			$self->status_add(
+				status => '-----[ ERROR '
+					. $unit
+					. ' ]-------------------------------------' . "\n" . '# '
+					. $@
+					. $filled_in . "\n",
+				error => 1,
+			);
 			$self->{ixchel}{errors_count}++;
 		} else {
 			push( @units, $unit );
-			$results->{status_text}
-				= $results->{status_text}
-				. '-----[ '
-				. $unit
-				. ' ]-------------------------------------' . "\n"
-				. $filled_in . "\n";
+			$self->status_add( status => '-----[ '
+					. $unit
+					. ' ]-------------------------------------' . "\n"
+					. $filled_in
+					. "\n" );
 		}
 	} ## end foreach my $service (@services)
 
@@ -218,19 +182,18 @@ sub action {
 			$output = '';
 		}
 		if ( $? != 0 ) {
-			$results->{reloaded} = 0;
-			$results->{status_text}
-				= $results->{status_text}
-				. '-----[ Reload Error ]-------------------------------------' . "\n"
-				. "# systemctl daemon-reload 2>&1 exited non zero...\n"
-				. $output . "\n";
+			$self->status_add(
+				status => '-----[ Reload Error ]-------------------------------------' . "\n"
+					. "# systemctl daemon-reload 2>&1 exited non zero...\n"
+					. $output . "\n",
+				error => 1,
+			);
 			$self->{ixchel}{errors_count}++;
 		} else {
-			$results->{status_text}
-				= $results->{status_text}
-				. '-----[ Reload ]-------------------------------------' . "\n"
-				. "# systemctl daemon-reload 2>&1 exit zero...\n"
-				. $output . "\n";
+			$self->status_add( status => '-----[ Reload ]-------------------------------------' . "\n"
+					. "# systemctl daemon-reload 2>&1 exit zero...\n"
+					. $output
+					. "\n" );
 		}
 	} ## end if ( $self->{opts}{reload} )
 
@@ -244,26 +207,26 @@ sub action {
 				$output = '';
 			}
 			if ( $? != 0 ) {
-				$results->{enabled} = 0;
-				$results->{status_text}
-					= $results->{status_text}
-					. '-----[ Enable '
-					. $unit
-					. ' Error ]-------------------------------------' . "\n" . '# '
-					. $command
-					. " exited non zero...\n"
-					. $output . "\n";
+				$self->{results}{enabled} = 0;
+				$self->status_add(
+					status => '-----[ Enable '
+						. $unit
+						. ' Error ]-------------------------------------' . "\n" . '# '
+						. $command
+						. " exited non zero...\n"
+						. $output . "\n",
+					error => 1
+				);
 				$self->{ixchel}{errors_count}++;
 			} else {
-				$results->{status_text}
-					= $results->{status_text}
-					. '-----[ Enable '
-					. $unit
-					. ' ]-------------------------------------' . "\n" . '# '
-					. $command
-					. " exited zero...\n"
-					. $output . "\n";
-			} ## end else [ if ( $? != 0 ) ]
+				$self->status_add( status => '-----[ Enable '
+						. $unit
+						. ' ]-------------------------------------' . "\n" . '# '
+						. $command
+						. " exited zero...\n"
+						. $output
+						. "\n" );
+			}
 		} ## end foreach my $unit (@units)
 	} ## end if ( $self->{opts}{enable} )
 
@@ -277,26 +240,25 @@ sub action {
 				$output = '';
 			}
 			if ( $? != 0 ) {
-				$results->{started} = 0;
-				$results->{status_text}
-					= $results->{status_text}
-					. '-----[ Start '
-					. $unit
-					. ' Error ]-------------------------------------' . "\n" . '# '
-					. $command
-					. " exited non zero...\n"
-					. $output . "\n";
-				$self->{ixchel}{errors_count}++;
+				$self->{results}{started} = 0;
+				$self->status_add(
+					status => '-----[ Start '
+						. $unit
+						. ' Error ]-------------------------------------' . "\n" . '# '
+						. $command
+						. " exited non zero...\n"
+						. $output . "\n",
+					error => 1,
+				);
 			} else {
-				$results->{status_text}
-					= $results->{status_text}
-					. '-----[ Start '
-					. $unit
-					. ' ]-------------------------------------' . "\n" . '# '
-					. $command
-					. " exited zero...\n"
-					. $output . "\n";
-			} ## end else [ if ( $? != 0 ) ]
+				$self->status_add( status => '-----[ Start '
+						. $unit
+						. ' ]-------------------------------------' . "\n" . '# '
+						. $command
+						. " exited zero...\n"
+						. $output
+						. "\n" );
+			}
 		} ## end foreach my $unit (@units)
 	} ## end if ( $self->{opts}{start} )
 
@@ -310,66 +272,30 @@ sub action {
 				$output = '';
 			}
 			if ( $? != 0 ) {
-				$results->{restarted} = 0;
-				$results->{status_text}
-					= $results->{status_text}
-					. '-----[ Retart '
-					. $unit
-					. ' Error ]-------------------------------------' . "\n" . '# '
-					. $command
-					. " exited non zero...\n"
-					. $output . "\n";
-				$self->{ixchel}{errors_count}++;
+				$self->{results}{restarted} = 0;
+				$self->status_add(
+					'-----[ Retart '
+						. $unit
+						. ' Error ]-------------------------------------' . "\n" . '# '
+						. $command
+						. " exited non zero...\n"
+						. $output . "\n",
+					error => 1
+				);
 			} else {
-				$results->{status_text}
-					= $results->{status_text}
-					. '-----[ Retart '
-					. $unit
-					. ' ]-------------------------------------' . "\n" . '# '
-					. $command
-					. " exited zero...\n"
-					. $output . "\n";
-			} ## end else [ if ( $? != 0 ) ]
+				$self->status_add( status => '-----[ Retart '
+						. $unit
+						. ' ]-------------------------------------' . "\n" . '# '
+						. $command
+						. " exited zero...\n"
+						. $output
+						. "\n" );
+			}
 		} ## end foreach my $unit (@units)
 	} ## end if ( $self->{opts}{restart} )
 
-	if ( !$self->{opts}{np} ) {
-		print $results->{status_text};
-	}
-
-	# only set ok to true if all the all the following are also true
-	# otherwise some error was encountered
-	if (   $results->{is_systemd}
-		&& $results->{written}
-		&& $results->{started}
-		&& $results->{restarted}
-		&& $results->{enabled}
-		&& $results->{reloaded} )
-	{
-		$results->{ok} = 1;
-	}
-
-	return $results;
-} ## end sub action
-
-sub help {
-	return 'Handles generation of service file as specified under .systemd.auto .
-
---np          Do not print the status of it.
-
--w            Write the generated services to service files.
-
--s <service>  A auto service to operate on.
-
---reload      Run systemctl daemon-reload.
-
---enable      Enable the generated services.
-
---start       Start the generated services.
-
---restart     Restart the generated services.
-';
-} ## end sub help
+	return undef;
+} ## end sub action_extra
 
 sub short {
 	return 'Handles generation of service file as specified under .systemd.auto .';
@@ -377,13 +303,12 @@ sub short {
 
 sub opts_data {
 	return 's=s
-np
 w
 reload
 start
 enable
 restart
 ';
-} ## end sub opts_data
+}
 
 1;

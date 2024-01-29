@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Dz - Package for language Dzongkha
 
 package Locale::CLDR::Locales::Dz;
 # This file auto generated from Data\common\main\dz.xml
-#	on Tue  5 Dec  1:06:47 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -44,7 +44,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'aa' => 'ཨ་ཕར་ཁ',
@@ -263,7 +263,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'འཛམ་གླིང༌',
  			'002' => 'ཨཕ་རི་ཀ',
@@ -449,8 +449,6 @@ has 'display_name_region' => (
  			'MF' => 'སེནཊ་ མཱར་ཊིན',
  			'MG' => 'མ་དཱ་གེས་ཀར',
  			'MH' => 'མར་ཤེལ་གླིང་ཚོམ',
- 			'MK' => 'མ་སེ་ཌོ་ནི་ཡ',
- 			'MK@alt=variant' => 'མ་སེ་ཌོ་ནི་ཡ་ (ཡུ་གོ་སླཱ་བི་ཡ)',
  			'ML' => 'མཱ་ལི',
  			'MM' => 'མི་ཡཱན་མར་ (བྷར་མ)',
  			'MN' => 'སོག་པོ་ཡུལ',
@@ -570,7 +568,7 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'calendar' => 'ཟླ་ཐོ',
  			'collation' => 'གནས་སདུད་རིམ་ སགྲིག',
@@ -641,7 +639,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{མེ་ཊྲིཀ་བརྩི་ལུགས},
  			'UK' => q{བྲི་ཊིཤ་ བརྩི་ལུགས},
@@ -655,7 +653,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'ཁ་སྐད་: {0}',
  			'script' => 'ཡིག་གཟུགས་: {0}',
@@ -677,8 +675,8 @@ has 'characters' => (
 			auxiliary => qr{[྄ ཊ ཋ ཌ ཎ ཾ ཥ ྀ ཻ ཽ ྚ ྛ ྜ ྞ ྺ ྻ ྼ]},
 			index => ['ཀ', 'ཁ', 'ག', 'ང', 'ཅ', 'ཆ', 'ཇ', 'ཉ', 'ཏ', 'ཐ', 'ད', 'ན', 'པ', 'ཕ', 'བ', 'མ', 'ཙ', 'ཚ', 'ཛ', 'ཝ', 'ཞ', 'ཟ', 'འ', 'ཡ', 'ར', 'ལ', 'ཤ', 'ས', 'ཧ', 'ཨ'],
 			main => qr{[ཀ ཁ ག ང ཅ ཆ ཇ ཉ ཏ ཐ ད ན པ ཕ བ མ ཙ ཚ ཛ ཝ ཞ ཟ འ ཡ ར ལ ཤ ས ཧ ཨ ི ུ ེ ོ ྐ ྑ ྒ ྔ ྗ ྙ ྟ ྠ ྡ ྣ ྤ ྥ ྦ ྨ ྩ ྪ ྫ ྭ ྱ ྲ ླ ྵ ྶ ྷ]},
-			numbers => qr{[\- , . % ‰ + 0༠ 1༡ 2༢ 3༣ 4༤ 5༥ 6༦ 7༧ 8༨ 9༩]},
-			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] ༼ ༽ § @ * / \& # † ‡ ༄ ༅ ༆ ༈ ༉ ༊ ࿐ ࿑ ༒ ࿒ ࿓ ࿔ ༶ ྾ ྿ ༌ ། ༎ ༏ ༐ ༑ ༔ ༴]},
+			numbers => qr{[\- ‑ , . % ‰ + 0༠ 1༡ 2༢ 3༣ 4༤ 5༥ 6༦ 7༧ 8༨ 9༩]},
+			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] ༼ ༽ § @ * / \& # † ‡ ༄ ༅ ༆ ༈ ༉ ༊ ࿐ ࿑ ༒ ࿒ ࿓ ࿔ ༶ ྾ ྿ ༌ ། ༎ ༏ ༐ ༑ ༔ ༴]},
 		};
 	},
 EOT
@@ -742,54 +740,131 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(ཉིན་ཞག་),
+						'other' => q(ཉིན་ཞག་ {0}),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(ཉིན་ཞག་),
 						'other' => q(ཉིན་ཞག་ {0}),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(ཆུ་ཚོད་),
+						'other' => q(ཆུ་ཚོད་ {0}),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(ཆུ་ཚོད་),
 						'other' => q(ཆུ་ཚོད་ {0}),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(སྐར་མ་),
+						'other' => q(སྐར་མ་ {0}),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(སྐར་མ་),
 						'other' => q(སྐར་མ་ {0}),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(ཟླཝ་),
+						'other' => q(ཟླཝ་ {0}),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(ཟླཝ་),
 						'other' => q(ཟླཝ་ {0}),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(སྐར་ཆ་),
+						'other' => q(སྐར་ཆ་ {0}),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(སྐར་ཆ་),
 						'other' => q(སྐར་ཆ་ {0}),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(བངུན་ཕྲག་),
+						'other' => q(བངུན་ཕྲག་ {0}),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(བངུན་ཕྲག་),
 						'other' => q(བངུན་ཕྲག་ {0}),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(ལོ་འཁོར་),
+						'other' => q(ལོ་འཁོར་ {0}),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(ལོ་འཁོར་),
 						'other' => q(ལོ་འཁོར་ {0}),
 					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(ཉིན་ཞག་),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(ཉིན་ཞག་),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(ཆུ་ཚོད་),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(ཆུ་ཚོད་),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(སྐར་མ་),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(སྐར་མ་),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(ཟླཝ་),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(ཟླཝ་),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(སྐར་ཆ་),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(སྐར་ཆ་),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(བངུན་ཕྲག་),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(བངུན་ཕྲག་),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(ལོ་འཁོར་),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(ལོ་འཁོར་),
 					},

@@ -1,7 +1,8 @@
 # ----------- Ecasound cleanup (post-recording) -----------
 package Audio::Nama::EcasoundCleanup;
 use Role::Tiny;
-use Modern::Perl;
+use Modern::Perl '2020';
+our $VERSION = 1.0;
 sub cleanup {
 	my $self = shift;
 	Audio::Nama::rec_cleanup();
@@ -9,12 +10,13 @@ sub cleanup {
 
 
 package Audio::Nama;
-use Modern::Perl;
+use Modern::Perl '2020';
 use Cwd;
+use File::Spec::Functions qw(splitpath);
 use Audio::Nama::Globals qw(:all);
 
 sub rec_cleanup {  
-	logsub("&rec_cleanup");
+	logsub((caller(0))[3]);
 	logpkg(__FILE__,__LINE__,'debug',"transport still running, can't cleanup"), return if $this_engine->running;
 	if( my (@files) = new_files_were_recorded() )
 	{
@@ -22,8 +24,6 @@ sub rec_cleanup {
 		{
 			$project->{playback_position} = 0;
 			$setup->{_last_rec_tracks} = \@rec_tracks;
-			pager(join " ", "Files recorded for these tracks:",
-				map{ $_->current_wav } @rec_tracks);
 		}
 
 		if( grep /Mixdown/, @files) { 
@@ -34,7 +34,7 @@ sub rec_cleanup {
 	}
 }
 sub mixdown_postprocessing {
-	logsub("&mixdown_postprocessing");
+	logsub((caller(0))[3]);
 	nama_cmd('mixplay');
 	my ($oldfile) = $tn{Mixdown}->full_path =~ m{([^/]+)$};
 	$oldfile = join_path('.wav',$oldfile);
@@ -77,7 +77,7 @@ sub mixdown_postprocessing {
 	chdir $was_in;
 }
 sub tag_mixdown_commit {
-	logsub('&tag_mixdown_commit');
+	logsub((caller(0))[3]);
 	my ($name, $newfile, $mixdownfile) = @_;
 	logpkg(__FILE__,__LINE__,'debug',"tag_mixdown_commit: @_");
 
@@ -90,11 +90,11 @@ sub tag_mixdown_commit {
 	mixoff();
 
 	my $msg = "State for $sym ($mix)";
-	git_snapshot($msg);
+	project_snapshot($msg);
 	git('tag', $name, '-m', $mix);
 }
 sub delete_existing_mixdown_tag_and_convenience_encodings {
-	logsub('&delete_existing_mixdown_tag_and_convenience_encodings');
+	logsub((caller(0))[3]);
 	my $name = shift;
 	logpkg(__FILE__,__LINE__,'debug',"name: $name");
 		git('tag', '-d', $name);
@@ -166,11 +166,16 @@ sub new_files_were_recorded {
 				}
 		} @files;
 	if(@recorded){
-		restart_wav_memoize();
-		pagers("recorded:", @recorded);
+		refresh_wav_cache();
+		pager(join " ", "recorded:", map{ filename($_) } @recorded);
 	}
 	map{ _get_wav_info($_) } @recorded;
 	@recorded 
 } 
+sub filename {
+	my $path = shift;
+	my(undef, undef, $name) = splitpath($path);
+	$name
+}
 1;
 __END__

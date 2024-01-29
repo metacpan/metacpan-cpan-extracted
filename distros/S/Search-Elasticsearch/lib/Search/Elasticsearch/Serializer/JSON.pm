@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Serializer::JSON;
-$Search::Elasticsearch::Serializer::JSON::VERSION = '8.00';
+$Search::Elasticsearch::Serializer::JSON::VERSION = '8.12';
 use Moo;
 use JSON::MaybeXS 1.002002 ();
 
@@ -41,7 +41,7 @@ Search::Elasticsearch::Serializer::JSON - The default JSON Serializer, using JSO
 
 =head1 VERSION
 
-version 8.00
+version 8.12
 
 =head1 SYNOPSIS
 
@@ -88,7 +88,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Elasticsearch BV.
+This software is Copyright (c) 2024 by Elasticsearch BV.
 
 This is free software, licensed under:
 

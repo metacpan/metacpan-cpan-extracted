@@ -1,5 +1,16 @@
 Revision history for Perl module Module::Generic
 
+v0.34.0 2024-01-29T15:50:15+0900
+    - Added method realpath() in Module::Generic::File
+
+v0.33.0 2023-11-24T16:45:01+0900
+    - Add method _set_symbol
+    - Improved method _get_symbol
+    - Improved method _message (aka message) to better handle trailing hash argument
+    - Updated method 'as_hash' in Module::Generic::Hash to accept the option strict and return a simple hash instead.
+    - Updated module Module::Generic::TieHash to set a global $PAUSED
+    - Improved datetime parser with method '_parse_timestamp'
+
 v0.32.8 2023-11-17T21:27:29+0900
     - Updated method as_hash in Module::Generic
     - Improved code for method _set_get_hash_as_object and __instantiate_object in Module::Generic and Module::Generic::Dynamic

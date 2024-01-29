@@ -45,6 +45,19 @@ use constant {
 };
 
 
+# arguments accepted by the refine() method, and their associated handlers
+my %REFINABLE_ARGS = (
+  -where    => \&_merge_into_where_arg,
+  -fetch    => \&_fetch_from_primary_key,
+  -columns  => \&_restrict_columns,
+  map {(-$_ => \&_just_store_arg)} qw/order_by        group_by  having    for
+                                      union union_all intersect except    minus
+                                      result_as       post_SQL  pre_exec  post_exec  post_bless
+                                      limit           offset    page_size page_index as
+                                      column_types    prepare_attrs       dbi_prepare_method
+                                      where_on        join_with_USING     sql_abstract/,
+ );
+
 
 #----------------------------------------------------------------------
 # PUBLIC METHODS
@@ -102,6 +115,13 @@ sub arg {
   return $args->{$arg_name};
 }
 
+
+sub sql_abstract {
+  my ($self, $arg_name) = @_;
+
+  return $self->arg(-sql_abstract) || $self->schema->sql_abstract;
+}
+  
 
 
 #----------------------------------------------------------------------
@@ -167,89 +187,27 @@ sub bind {
 
 
 sub refine {
-  my ($self, %more_args) = @_;
+  my ($self, @more_args) = @_;
 
+  # check statement status
   $self->status <= REFINED
     or croak "can't refine() when in status " . $self->status;
   $self->{status} = REFINED;
 
-  my $args = $self->{args};
+  # process all key-value pairs
+  while (my ($k, $v) = splice @more_args, 0, 2) {
 
-  while (my ($k, $v) = each %more_args) {
+    # special case : -with can be used as synonym for -sql_abstract (for making it more similar to SQL's "WITH RECURSIVE...")
+    $k = '-sql_abstract' if $k eq '-with';
 
-  SWITCH:
-    for ($k) {
-
-      # -where : combine with previous 'where' clauses in same statement
-      /^-where$/ and do {
-        my $sqla = $self->schema->sql_abstract;
-        $args->{-where} = $sqla->merge_conditions($args->{-where}, $v);
-        last SWITCH;
-      };
-
-      # -fetch : special select() on primary key
-      /^-fetch$/ and do {
-        # build a -where clause on primary key
-        my $primary_key = ref($v) ? $v : [$v];
-        my @pk_columns  = $self->meta_source->primary_key;
-        @pk_columns
-          or croak "fetch: no primary key in source " . $self->meta_source;
-        @pk_columns == @$primary_key
-          or croak sprintf "fetch from %s: primary key should have %d values",
-                           $self->meta_source, scalar(@pk_columns);
-        List::MoreUtils::all {defined $_} @$primary_key
-          or croak "fetch from " . $self->meta_source . ": "
-                 . "undefined val in primary key";
-
-        my %where = ();
-        @where{@pk_columns} = @$primary_key;
-        my $sqla = $self->schema->sql_abstract;
-        $args->{-where} = $sqla->merge_conditions($args->{-where}, \%where);
-
-        # want a single record as result
-        $args->{-result_as} = "firstrow";
-
-        last SWITCH;
-      };
-
-      # -columns : store in $self->{args}{-columns}; can restrict previous list
-      /^-columns$/ and do {
-        my @cols = does($v, 'ARRAY') ? @$v : ($v);
-        if (my $old_cols = $args->{-columns}) {
-          unless (@$old_cols == 1 && $old_cols->[0] eq '*' ) {
-            foreach my $col (@cols) {
-              any {$_ eq $col} @$old_cols
-                or croak "can't restrict -columns on '$col' (was not in the) "
-                       . "previous -columns list";
-            }
-          }
-        }
-        $args->{-columns} = \@cols;
-        last SWITCH;
-      };
-
-
-      # other args are just stored, they will be used later
-      /^-( order_by       | group_by  | having    | for
-         | union(?:_all)? | intersect | except    | minus
-         | result_as      | post_SQL  | pre_exec  | post_exec  | post_bless
-         | limit          | offset    | page_size | page_index
-         | column_types   | prepare_attrs         | dbi_prepare_method
-         | _left_cols     | where_on              | join_with_USING
-         )$/x
-         and do {$args->{$k} = $v; last SWITCH};
-
-      # TODO : this hard-coded list of args should be more abstract
-
-      # otherwise
-      croak "invalid arg : $k";
-
-    } # end SWITCH
-  } # end while
+    # find the proper arg handler and invoke it
+    my $refine_handler = $REFINABLE_ARGS{$k}
+      or croak "invalid arg : $k";
+    $self->$refine_handler($k, $v);
+  }
 
   return $self;
 }
-
 
 
 
@@ -266,7 +224,6 @@ sub sqlize {
   my $args         = $self->{args};
   my $meta_source  = $self->meta_source;
   my $source_where = $meta_source->{where};
-  my $sql_abstract = $self->schema->sql_abstract;
   my $result_as    = $args->{-result_as} || "";
 
   # build arguments for SQL::Abstract::More
@@ -274,7 +231,7 @@ sub sqlize {
   my @args_to_copy = qw/-columns -where
                         -union -union_all -intersect -except -minus
                         -order_by -group_by -having
-                        -limit -offset -page_size -page_index/;
+                        -limit -offset -page_size -page_index -as/;
   my %sqla_args = (-from         => clone($self->source->db_from),
                    -want_details => 1);
   defined $args->{$_} and $sqla_args{$_} = $args->{$_} for @args_to_copy;
@@ -294,6 +251,7 @@ sub sqlize {
 
   # "where_on" : conditions to be added in joins
   if (my $where_on = $args->{-where_on}) {
+
     # check proper usage
     does $sqla_args{-from}, 'ARRAY'
       or croak "datasource for '-where_on' was not a join";
@@ -301,24 +259,23 @@ sub sqlize {
     # retrieve components of the join and check again for proper usage
     my ($join_op, $first_table, @other_join_args) = @{$sqla_args{-from}};
     $join_op eq '-join'
-      or croak "datasource for '-where_on' was not a join";
+      or croak "the '-where_on' argument can only be used on a 'join' datasource";
 
-    # reverse index (table_name => $join_hash)
+    # build a hash where keys are the database table names, and values are the join conditions (hashes)
     my %by_dest_table = reverse @other_join_args;
 
-    # insert additional conditions into appropriate places
+    # additional conditions coming from the -where_on hash are inserted as additional join criteria
     while (my ($table, $additional_cond) = each %$where_on) {
-      my $join_cond = $by_dest_table{$table}
-        or croak "-where_on => {'$table' => ..}: this table is not in the join";
+      my $db_table  = $meta_source->{db_table_by_source}{$table};
+      no warnings 'uninitialized';
+      my $join_cond =  $by_dest_table{$db_table} # new preferred syntax : through association or alias names
+                    || $by_dest_table{$table}    # backwards compat : database names are accepted too
+        or croak "-where_on => {'$table' => ..}: there is no such table in the join ", $meta_source->class;
       $join_cond->{condition}
-        = $sql_abstract->merge_conditions($join_cond->{condition},
-                                          $additional_cond);
+        = $self->sql_abstract->merge_conditions($join_cond->{condition},
+                                                $additional_cond);
       delete $join_cond->{using};
     }
-
-    # TODO: should be able to use paths and aliases as keys, instead of
-    # database table names.
-    # TOCHECK: is this stuff still compatible with the bind() method ?
   }
 
   # adjust join conditions for ON clause or for USING clause
@@ -340,7 +297,7 @@ sub sqlize {
   }
 
   # generate SQL
-  my $sqla_result = $sql_abstract->select(%sqla_args);
+  my $sqla_result = $self->sql_abstract->select(%sqla_args);
 
   # maybe post-process the SQL
   if ($args->{-post_SQL}) {
@@ -389,20 +346,22 @@ sub prepare {
   # log the statement and bind values
   $self->schema->_debug("PREPARE $self->{sql} / @{$self->{bound_params}}");
 
-  # call the database
+  # assemble stuff for calling the database
   my $dbh          = $self->schema->dbh or croak "Schema has no dbh";
-  my $method       = $self->{args}{-dbi_prepare_method}
-                  || $self->schema->dbi_prepare_method;
+  my $method       = $self->{args}{-dbi_prepare_method}  || $self->schema->dbi_prepare_method;
   my @prepare_args = ($self->{sql});
   if (my $prepare_attrs = $self->{args}{-prepare_attrs}) {
     push @prepare_args, $prepare_attrs;
   }
+
+  # call the database
   $self->{sth}  = $dbh->$method(@prepare_args);
 
   # new status and return
   $self->{status} = PREPARED;
   return $self;
 }
+
 
 
 sub sth {
@@ -445,8 +404,7 @@ sub execute {
             . CORE::join(", ", @unbound);
 
   # bind parameters and execute
-  my $sqla = $self->schema->sql_abstract;
-  $sqla->bind_params($sth, @{$self->{bound_params}});
+  $self->sql_abstract->bind_params($sth, @{$self->{bound_params}});
   $sth->execute;
 
   # post_exec callback
@@ -496,8 +454,7 @@ sub row_count {
     my ($sql, @bind) = $self->sql;
 
     # get syntax used for LIMIT clauses ...
-    my $sqla = $self->schema->sql_abstract;
-    my ($limit_sql, undef, undef) = $sqla->limit_offset(0, 0);
+    my ($limit_sql, undef, undef) = $self->sql_abstract->limit_offset(0, 0);
     $limit_sql =~ s/([()?*])/\\$1/g;
 
     # ...and use it to remove the LIMIT clause and associated bind vals, if any
@@ -523,7 +480,7 @@ sub row_count {
     # wrap SQL if needed, using  a subquery alias because it's required for 
     # some DBMS (like PostgreSQL)
     $should_wrap and  $sql = "SELECT COUNT(*) FROM "
-                           . $sqla->table_alias("( $sql )", "count_wrapper");
+                           . $self->sql_abstract->table_alias("( $sql )", "count_wrapper");
 
     # log the statement and bind values
     $self->schema->_debug("PREPARE $sql / @bind");
@@ -701,8 +658,67 @@ sub make_fast {
 
 
 #----------------------------------------------------------------------
-# PRIVATE METHODS IN RELATION WITH SELECT()
+# PRIVATE METHODS IN RELATION WITH refine()
 #----------------------------------------------------------------------
+
+
+sub _just_store_arg {
+  my ($self, $k, $v) = @_;
+  $self->{args}{$k} = $v;
+}
+
+sub _merge_into_where_arg {
+  my ($self, $k, $v) = @_;
+  $self->{args}{-where} = $self->sql_abstract->merge_conditions($self->{args}{-where}, $v);
+}
+
+sub _fetch_from_primary_key {
+  my ($self, $k, $v) = @_;
+
+  # gather info for primary key
+  my $primary_key = ref($v) ? $v : [$v];
+  my @pk_columns  = $self->meta_source->primary_key;
+  @pk_columns
+    or croak "fetch: no primary key in source " . $self->meta_source;
+  @pk_columns == @$primary_key
+    or croak sprintf "fetch from %s: primary key should have %d values",
+                     $self->meta_source, scalar(@pk_columns);
+  List::MoreUtils::all {defined $_} @$primary_key
+    or croak "fetch from " . $self->meta_source . ": "
+           . "undefined val in primary key";
+
+  # build a -where clause on primary key
+  my %where = ();
+  @where{@pk_columns} = @$primary_key;
+  $self->{args}{-where} = $self->sql_abstract->merge_conditions($self->{args}{-where}, \%where);
+
+  # want a single record as result
+  $self->{args}{-result_as} = "firstrow";
+}
+
+sub _restrict_columns {
+  my ($self, $k, $v) = @_;
+
+  my @cols = does($v, 'ARRAY') ? @$v : ($v);
+  if (my $old_cols = $self->{args}{-columns}) {
+    unless (@$old_cols == 1 && $old_cols->[0] eq '*' ) {
+      foreach my $col (@cols) {
+        any {$_ eq $col} @$old_cols
+          or croak "can't restrict -columns on '$col' (was not in the) "
+                 . "previous -columns list";
+      }
+    }
+  }
+  $self->{args}{-columns} = \@cols;
+}
+
+
+
+
+#----------------------------------------------------------------------
+# PRIVATE METHODS IN RELATION WITH select()
+#----------------------------------------------------------------------
+
 
 sub _forbid_callbacks {
   my ($self, $subclass) = @_;

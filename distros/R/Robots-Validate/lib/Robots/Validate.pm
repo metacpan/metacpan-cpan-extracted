@@ -2,7 +2,7 @@ package Robots::Validate;
 
 # ABSTRACT: Validate that IP addresses are associated with known robots
 
-use v5.10;
+use v5.14;
 
 use Moo 1;
 
@@ -17,7 +17,7 @@ use Types::Standard -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.7';
+our $VERSION = 'v0.2.9';
 
 
 has resolver => (
@@ -50,13 +50,13 @@ sub _build_robots {
 
         {
             name   => 'Amazonbot',
-            agent  => qr/\bAmazonbot\b/,
-            domain => qr/\.amazonaws\.com$/,
+            agent  => qr/Amazonbot\b/,
+            domain => qr/\.crawl\.amazonbot\.amazon$/,
         },
 
         {
             name   => 'Applebot',
-            agent  => qr/\bApplebot\b/,
+            agent  => qr/Applebot\b/,
             domain => qr/\.applebot\.apple\.com$/,
         },
 
@@ -68,105 +68,117 @@ sub _build_robots {
 
         {
             name   => 'Baidu',
-            agent  => qr/\bBaiduspider\b/,
+            agent  => qr/Baiduspider\b/,
             domain => qr/\.crawl\.baidu\.com$/,
 
         },
 
         {
             name   => 'Bing',
-            agent  => qr/\b(?:Bingbot|MSNBot|AdIdxBot|BingPreview)\b/i,
+            agent  => qr/(?:Bingbot|MSNBot|AdIdxBot|BingPreview)\b/i,
             domain => qr/\.search\.msn\.com$/,
 
         },
 
         {
             name   => 'CocCoc',
-            agent  => qr/\bcoccocbot-web\b/,
+            agent  => qr/coccocbot-web\b/,
             domain => qr/\.coccoc\.com$/,
         },
 
         {
+            name   => 'DataProvider',
+            agent  => qr/Dataprovider\.com/,
+            domain => qr/\.dataproviderbot\.com$/,
+        },
+
+        {
             name   => 'Embedly',
-            agent  => qr/\bEmbedly\b/,
+            agent  => qr/Embedly\b/,
             domain => qr/\.embed\.ly$/,
         },
 
         {
+            name   => 'Headline',
+            agent  => qr/ev-crawler\b/,
+            domain => qr/\.headline\.com$/,
+        },
+
+        {
             name   => 'Exabot',
-            agent  => qr/\bExabot\b/i,
+            agent  => qr/Exabot\b/i,
             domain => qr/\.exabot\.com$/,
         },
 
         {
             name   => 'Google',
-            agent  => qr/\bGoogle(?:bot?)\b/i,
+            agent  => qr/Google(?:bot?)\b/i,
             domain => qr/\.google(?:bot)?\.com$/,
         },
 
         {
             name   => 'InfoTiger',
-            agent  => qr/\bInfoTigerBot\b/,
+            agent  => qr/InfoTigerBot\b/,
             domain => qr/\.infotiger\.com$/,
         },
 
         {
             name   => 'IONOS',
-            agent  => qr/\bIonCrawl\b/,
+            agent  => qr/IonCrawl\b/,
             domain => qr/\.1and1\.org$/,
         },
 
         {
             name   => 'LinkedIn',
-            agent  => qr/\bLinkedInBot\b/,
+            agent  => qr/LinkedInBot\b/,
             domain => qr/\.linkedin\.com$/,
         },
 
         {
             name   => 'Mojeek',
-            agent  => qr/\bMojeekBot\b/,
+            agent  => qr/MojeekBot\b/,
             domain => qr/\.mojeek\.com$/,
         },
 
         {
-            name   => 'Neevabot',
-            agent  => qr/\bNeevabot\b/,
-            domain => qr/\.neevabot\.com$/,
+            name   => 'Monsido',
+            agent  => qr{Monsidobot\b}ao,
+            domain => qr{\.monsido\.com$}ao,
         },
 
         {
             name   => 'PetalBot',
-            agent  => qr/\bPetalBot\b/,
+            agent  => qr/PetalBot\b/,
             domain => qr/\.petalsearch\.com$/,
         },
 
         {
             name   => 'Pinterest',
-            agent  => qr/\bPinterest\b/,
+            agent  => qr/Pinterest\b/,
             domain => qr/\.pinterest\.com$/,
         },
 
         {
             name   => 'Qwant',
-            agent  => qr/\bQwantify\b/,
+            agent  => qr/Qwantify\b/,
             domain => qr/\.qwant\.com$/,
         },
 
         {
             name   => 'SeznamBot',
-            agent  => qr/\bSeznam\b/,
+            agent  => qr/Seznam\b/,
             domain => qr/\.seznam\.cz$/,
         },
 
         {
             name   => 'Sogou',
-            agent  => qr/\bSogou\b/,
+            agent  => qr/Sogou\b/,
             domain => qr/\.sogou\.com$/,
         },
 
         {
             name   => 'Yahoo',
-            agent  => qr/yahoo/i,
+            agent  => qr/Slurp/,
             domain => qr/\.crawl\.yahoo\.net$/,
 
         },
@@ -179,7 +191,7 @@ sub _build_robots {
 
         {
             name   => 'Yeti',
-            agent  => qr/\bnaver\.me\b/,
+            agent  => qr/naver\.me\b/,
             domain => qr/\.naver\.com$/,
         },
 
@@ -266,7 +278,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 =head1 VERSION
 
-version v0.2.7
+version v0.2.9
 
 =head1 SYNOPSIS
 
@@ -334,7 +346,7 @@ You can specify the following C<%opts>:
 
 =item C<agent>
 
-This is the user-agent string. If it does not match, then the DNS lookkups
+This is the user-agent string. If it does not match, then the DNS lookups
 will not be performed.
 
 It is optional.
@@ -359,6 +371,12 @@ support reverse DNS lookups. This means that it cannot be used to
 validate some robots from
 L<Facebook|https://developers.facebook.com/docs/sharing/webmasters/crawler>
 or Twitter.
+
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+This module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
 
 =head1 SEE ALSO
 
@@ -392,7 +410,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2022 by Robert Rothenberg.
+This software is Copyright (c) 2018-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

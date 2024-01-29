@@ -1,0 +1,7 @@
+Revision history for Perl extension CPAN::Test::Dummy::Perl5::Requires.
+
+0.02  2023-12-98
+	- add abstract to Pod (from manwar)
+
+0.01  2018-02-03
+	- initial release

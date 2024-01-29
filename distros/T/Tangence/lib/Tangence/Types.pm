@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
 
-package Tangence::Types 0.30;
+package Tangence::Types 0.32;
 
 use v5.26;
 use warnings;
@@ -36,5 +36,22 @@ use constant TYPE_LIST_STR => Tangence::Type->make( list => TYPE_STR );
 use constant TYPE_LIST_ANY => Tangence::Type->make( list => TYPE_ANY );
 
 use constant TYPE_DICT_ANY => Tangence::Type->make( dict => TYPE_ANY );
+
+=head1 NAME
+
+C<Tangence::Types> - type constants for C<Tangence>
+
+=head1 DESCRIPTION
+
+This module is a component of L<Tangence::Client> or L<Tangence::Server>. It
+is not intended for end-user use directly.
+
+=cut
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
 
 0x55AA;

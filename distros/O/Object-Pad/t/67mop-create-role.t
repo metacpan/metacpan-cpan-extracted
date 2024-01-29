@@ -5,7 +5,7 @@ use warnings;
 
 use Test2::V0;
 
-use Object::Pad ':experimental(mop)';
+use Object::Pad 0.800 ':experimental(mop)';
 
 {
    package ARole {
@@ -25,7 +25,8 @@ use Object::Pad ':experimental(mop)';
 }
 
 {
-   class AClass :does(ARole) {
+   class AClass {
+      apply ARole;
       method some_method {}
    }
 
@@ -34,7 +35,7 @@ use Object::Pad ':experimental(mop)';
 }
 
 {
-   ok( !eval "class BClass :does(ARole) { }", 'BClass does not compile' );
+   ok( !eval "class BClass { apply ARole; }", 'BClass does not compile' );
    like( $@, qr/^Class BClass does not provide a required method named 'some_method' at /,
       'message from failure to compile BClass' );
 }

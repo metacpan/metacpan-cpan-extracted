@@ -82,9 +82,8 @@ sub run {
               . $self->prefix
               . '2fcheck?skin='
               . $self->p->getSkin($req),
-            LEGEND        => 'enterRadius2fCode',
-            CHECKLOGINS   => $checkLogins,
-            STAYCONNECTED => $stayConnected
+            LEGEND => 'enterRadius2fCode',
+            $self->get2fTplParams($req),
         }
     );
     $self->logger->debug( $self->prefix . '2f: prepare verification' );

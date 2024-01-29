@@ -1,0 +1,62 @@
+use alienfile;
+
+use Path::Tiny;
+use File::Which qw(which);
+
+plugin 'Probe::CommandLine' => (
+  command => 'plantuml',
+  args    => [ '-version' ],
+  match   => qr/PlantUML/,
+  version => qr/PlantUML version ([0-9\.]+)/,
+);
+
+sub find_jar_file {
+  my $plantuml = path(scalar which('plantuml'));
+  if(  my ($jar_file) = $plantuml->slurp_utf8 =~ qr/-jar\s+(\S+\.jar)/s ) {
+    return $jar_file;
+  }
+}
+
+meta->around_hook( probe => sub {
+  my $orig = shift;
+  my ($build) = @_;
+  my $install_type = $orig->(@_);
+
+  my $jar_file = find_jar_file();
+  if( defined $jar_file and -f $jar_file ) {
+    return 'system';
+  } else {
+    $build->log('Could not find JAR file');
+    return 'share';
+  }
+});
+
+sys {
+  gather sub {
+    my ($build) = @_;
+    $build->runtime_prop->{jar_file} = find_jar_file();
+  };
+};
+
+
+share {
+  # TODO
+  # - choose license to install
+  # - build from source
+  # - depend on Java
+  plugin 'Download::GitHub' => (
+    github_user => 'plantuml',
+    github_repo => 'plantuml',
+    asset        =>  1,
+    asset_name   => qr/^plantuml-([0-9\.]+)\.jar$/,
+    asset_format => 'none',
+  );
+  plugin 'Extract::File';
+  plugin 'Build::Copy';
+
+  gather sub {
+    my ($build) = @_;
+    my $jar_basename = path( $build->install_prop->{download} )->basename;
+    $build->runtime_prop->{jar_file} = $jar_basename;
+  };
+}

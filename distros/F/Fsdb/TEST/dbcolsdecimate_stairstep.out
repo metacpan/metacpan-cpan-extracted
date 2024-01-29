@@ -1,0 +1,29 @@
+#fsdb x y
+# column x with range 100 and relative precision 0.1 gives threshold 10
+# column y with range 100 and relative precision 0.1 gives threshold 10
+0	0
+2	0
+3	100
+5	100
+6	0
+16	0
+17	0
+19	0
+20	100
+23	100
+24	0
+34	0
+35	0
+45	0
+46	0
+56	0
+57	0
+67	0
+68	0
+78	0
+79	0
+89	0
+90	0
+100	0
+# output 24 of 101 (0.2376)
+#   | dbcolsdecimate -v -p 0.1 x y

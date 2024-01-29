@@ -19,7 +19,7 @@ await $chip->mount(
 # ->read_adc
 {
    $adapter->expect_read(2)
-      ->returns( "\x01\x23" );
+      ->will_done( "\x01\x23" );
 
    is( await $chip->read_adc, 0x0123,
       '$chip->read_adc'
@@ -31,7 +31,7 @@ await $chip->mount(
 # ->read_adc_ratio
 {
    $adapter->expect_read(2)
-      ->returns( "\x02\x80" );
+      ->will_done( "\x02\x80" );
 
    is( await $chip->read_adc_ratio, 0.15625,
       '$chip->read_adc_ratio'

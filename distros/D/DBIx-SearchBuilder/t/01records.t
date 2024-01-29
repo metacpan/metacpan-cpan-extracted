@@ -7,13 +7,14 @@ use Test::More;
 BEGIN { require "./t/utils.pl" }
 our (@AvailableDrivers);
 
-use constant TESTS_PER_DRIVER => 69;
+use constant TESTS_PER_DRIVER => 75;
 
 my $total = scalar(@AvailableDrivers) * TESTS_PER_DRIVER;
 plan tests => $total;
 
 foreach my $d ( @AvailableDrivers ) {
 SKIP: {
+    diag ("Running tests for $d");
 	unless( has_schema( 'TestApp::Address', $d ) ) {
 		skip "No schema for '$d' driver", TESTS_PER_DRIVER;
 	}
@@ -34,7 +35,7 @@ SKIP: {
 # Handle->Fields
         is_deeply(
             [$handle->Fields('Address')],
-            [qw(id name phone employeeid)],
+            [qw(id name phone employeeid content)],
             "listed all columns in the table"
         );
         is_deeply(
@@ -48,22 +49,33 @@ SKIP: {
 	is( $rec->_Accessible('id' => 'write'), undef, 'id is not accessible for write' );
 	is( $rec->_Accessible('id'), undef, "any field is not accessible in undefined mode" );
 	is( $rec->_Accessible('unexpected_field' => 'read'), undef, "field doesn't exist and can't be accessible for read" );
-	is_deeply( [sort($rec->ReadableAttributes)], [qw(EmployeeId Name Phone id)], 'readable attributes' );
-	is_deeply( [sort($rec->WritableAttributes)], [qw(EmployeeId Name Phone)], 'writable attributes' );
+	is_deeply( [sort($rec->ReadableAttributes)], [qw(Content EmployeeId Name Phone id)], 'readable attributes' );
+	is_deeply( [sort($rec->WritableAttributes)], [qw(Content EmployeeId Name Phone)], 'writable attributes' );
 
 	can_ok($rec,'Create');
 
-	my ($id) = $rec->Create( Name => 'Jesse', Phone => '617 124 567');
+	my ($id) = $rec->Create( Name => 'Jesse', Phone => '617 124 567', Content => 'Håvard');
 	ok($id,"Created record ". $id);
 	ok($rec->Load($id), "Loaded the record");
 
 
 	is($rec->id, $id, "The record has its id");
 	is ($rec->Name, 'Jesse', "The record's name is Jesse");
+    is( $rec->Content, 'Håvard', "The record's Content is Håvard");
 
 	my ($val, $msg) = $rec->SetName('Obra');
 	ok($val, $msg) ;
 	is($rec->Name, 'Obra', "We did actually change the name");
+
+    my $rec2 = TestApp::Address->new($handle);
+    isa_ok($rec2, 'DBIx::SearchBuilder::Record');
+
+    my ($id2) = $rec2->Create( Name => 'Håvard', Phone => '617 124 567', Content => 'Foo');
+    ok($id2,"Created record ". $id2);
+    ok($rec2->Load($id2), "Loaded the record");
+
+    is($rec2->id, $id2, "The record has its id");
+    is ($rec2->Name, 'Håvard', "The record's name is Håvard");
 
 # Validate immutability of the field id
 	($val, $msg) = $rec->Setid( $rec->id + 1 );
@@ -253,7 +265,8 @@ sub _ClassAccessible {
         {read => 1, write => 1, type => 'varchar(18)', length => 18, default => ''},
         EmployeeId => 
         {read => 1, write => 1, type => 'int(8)', default => ''},
-
+        Content =>
+        {read => 1, write => 1, sql_type => -4, length => 0,  is_blob => 1,  is_numeric => 0,  type => 'longblob', default => ''},
 }
 
 }
@@ -265,10 +278,26 @@ CREATE TEMPORARY TABLE Address (
         Name varchar(36),
         Phone varchar(18),
         EmployeeId int(8),
+        Content LONGBLOB,
   	PRIMARY KEY (id)) CHARACTER SET utf8mb4
 EOF
 
 }
+
+sub schema_mariadb {
+<<EOF;
+CREATE TEMPORARY TABLE Address (
+    id integer AUTO_INCREMENT,
+    Name varchar(36),
+    Phone varchar(18),
+    EmployeeId int(8),
+    Content LONGBLOB,
+    PRIMARY KEY (id)) CHARACTER SET utf8mb4
+EOF
+
+}
+
+# TODO: Change this test to use bytes for Content
 
 sub schema_pg {
 <<EOF;
@@ -276,7 +305,8 @@ CREATE TEMPORARY TABLE Address (
         id serial PRIMARY KEY,
         Name varchar,
         Phone varchar,
-        EmployeeId integer
+        EmployeeId integer,
+        Content varchar
 )
 EOF
 
@@ -289,7 +319,8 @@ CREATE TABLE Address (
         id  integer primary key,
         Name varchar(36),
         Phone varchar(18),
-        EmployeeId int(8))
+        EmployeeId int(8),
+        Content BLOB )
 EOF
 
 }
@@ -300,7 +331,8 @@ sub schema_oracle { [
         id integer CONSTRAINT Address_Key PRIMARY KEY,
         Name varchar(36),
         Phone varchar(18),
-        EmployeeId integer
+        EmployeeId integer,
+        Content CLOB
     )",
 ] }
 

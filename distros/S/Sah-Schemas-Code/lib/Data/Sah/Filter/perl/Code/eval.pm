@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2023-09-05'; # DATE
 our $DIST = 'Sah-Schemas-Code'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 sub meta {
     +{
@@ -45,7 +45,7 @@ sub filter {
 }
 
 1;
-# ABSTRACT: Convert string to regex if string is delimited by /.../ or qr(...)
+# ABSTRACT: Eval a string inside 'sub { ... }' and return a coderef
 
 __END__
 
@@ -55,11 +55,11 @@ __END__
 
 =head1 NAME
 
-Data::Sah::Filter::perl::Code::eval - Convert string to regex if string is delimited by /.../ or qr(...)
+Data::Sah::Filter::perl::Code::eval - Eval a string inside 'sub { ... }' and return a coderef
 
 =head1 VERSION
 
-This document describes version 0.001 of Data::Sah::Filter::perl::Code::eval (from Perl distribution Sah-Schemas-Code), released on 2023-09-03.
+This document describes version 0.002 of Data::Sah::Filter::perl::Code::eval (from Perl distribution Sah-Schemas-Code), released on 2023-09-05.
 
 =head1 DESCRIPTION
 

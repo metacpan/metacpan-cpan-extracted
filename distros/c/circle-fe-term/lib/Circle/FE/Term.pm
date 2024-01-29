@@ -2,7 +2,7 @@
 #
 #  (C) Paul Evans, 2008-2023 -- leonerd@leonerd.org.uk
 
-package Circle::FE::Term 0.232470;
+package Circle::FE::Term 0.240250;
 
 use v5.26;
 use warnings;

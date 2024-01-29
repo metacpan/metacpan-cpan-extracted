@@ -14,8 +14,8 @@ SKIP: {
   copy "$Bin/test.mp3", "$Bin/test2.mp3";
 
   my $song = AudioFile::Info->new('t/test2.mp3',
-                                  { mp3 => 'AudioFile::Info::MP3::ID3Lib' });
-  is(ref $song, 'AudioFile::Info::MP3::ID3Lib');
+                                  { mp3 => 'AudioFile::Info::MP3::Info' });
+  is(ref $song, 'AudioFile::Info::MP3::Info');
   is($song->title, 'test');
   is($song->artist, 'davorg');
   is($song->album, 'none');
@@ -33,8 +33,8 @@ SKIP: {
   undef $song;
 
   $song = AudioFile::Info->new('t/test2.mp3',
-                               { mp3 => 'AudioFile::Info::MP3::ID3Lib' });
-  is(ref $song, 'AudioFile::Info::MP3::ID3Lib');
+                               { mp3 => 'AudioFile::Info::MP3::Info' });
+  is(ref $song, 'AudioFile::Info::MP3::Info');
   is($song->title, 'xxx');
   is($song->artist, 'xxx');
   is($song->album, 'xxx');

@@ -61,9 +61,10 @@ sub new {
 # Run Operation Request
 # PostRotateRequest.File : 270/90/row/col/row2col  ,
 # PostRotateRequest.rotateType : 270/90/row/col/row2col  ,
-# PostRotateRequest.format : CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers  ,
-# PostRotateRequest.password :   ,
-# PostRotateRequest.checkExcelRestriction :    
+# PostRotateRequest.outFormat : The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
+# PostRotateRequest.password : The password needed to open an Excel file.  ,
+# PostRotateRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.  ,
+# PostRotateRequest.region : The regional settings for workbook.   
 
 {
     my $params = {
@@ -74,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_rotate' } = { 
-    	summary => 'Reverse rows or columns of Excel files, save as kinds of format files.',
+    	summary => 'Rotate rows, columns, or other objects in Excel files and save them in various formats.',
         params => $params,
         returns => 'FilesResult',
     };
@@ -104,8 +105,8 @@ sub run_http_request {
         $query_params->{'rotateType'} = $client->to_query_value($self->rotate_type);      
     }
 
-    if(defined $self->format){
-        $query_params->{'format'} = $client->to_query_value($self->format);      
+    if(defined $self->out_format){
+        $query_params->{'outFormat'} = $client->to_query_value($self->out_format);      
     }
 
     if(defined $self->password){
@@ -114,6 +115,10 @@ sub run_http_request {
 
     if(defined $self->check_excel_restriction){
         $query_params->{'checkExcelRestriction'} = $client->to_query_value($self->check_excel_restriction);      
+    }
+
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
     } 
     my $_body_data;
  
@@ -149,24 +154,31 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'format' => {
+     'out_format' => {
      	datatype => 'string',
-     	base_name => 'format',
-     	description => 'CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers',
+     	base_name => 'outFormat',
+     	description => 'The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
-     	description => '',
+     	description => 'Whether check restriction of excel file when user modify cells related objects.',
+     	format => '',
+     	read_only => '',
+     		},
+     'region' => {
+     	datatype => 'string',
+     	base_name => 'region',
+     	description => 'The regional settings for workbook.',
      	format => '',
      	read_only => '',
      		},    
@@ -176,9 +188,10 @@ __PACKAGE__->method_documentation({
 __PACKAGE__->attribute_map( {
     'file' => 'File',
     'rotate_type' => 'rotateType',
-    'format' => 'format',
+    'out_format' => 'outFormat',
     'password' => 'password',
-    'check_excel_restriction' => 'checkExcelRestriction' 
+    'check_excel_restriction' => 'checkExcelRestriction',
+    'region' => 'region' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

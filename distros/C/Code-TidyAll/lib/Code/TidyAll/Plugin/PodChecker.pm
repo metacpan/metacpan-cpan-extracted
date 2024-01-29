@@ -10,7 +10,7 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 
 has warnings => (
     is  => 'ro',
@@ -47,7 +47,7 @@ Code::TidyAll::Plugin::PodChecker - Use podchecker with tidyall
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 SYNOPSIS
 
@@ -107,7 +107,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2022 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2023 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

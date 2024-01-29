@@ -8,6 +8,8 @@ on test => sub {
     requires 'HealthCheck';
     requires 'Plack::Test';
     requires 'Test::Exception';
+    requires 'Test2::Tools::Mock';
+    requires 'Hash::MultiValue', '>= 0.1';
 };
 
 on develop => sub {

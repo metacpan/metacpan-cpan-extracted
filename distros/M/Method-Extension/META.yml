@@ -1,25 +1,30 @@
 ---
-abstract: 'Method Extension port for perl'
+abstract: 'easily extend existing packages using method extension'
 author:
-  - 'Tiago Peczenyj <tiago.peczenyj@gmail.com>'
+  - 'Tiago Peczenyj <tiago.peczenyj+cpan@gmail.com>'
 build_requires:
-  Module::Build: 0.3601
-  Test::More: 0
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.94'
+  Test::Pod: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
-  Module::Build: 0.3601
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.132661'
+generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.143240'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Method-Extension
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Attribute::Handlers: 0
-  perl: 5.006
+  Attribute::Handlers: '0'
+  perl: '5.006'
 resources:
   bugtracker: https://github.com/peczenyj/Method-Extension/issues
   homepage: https://github.com/peczenyj/Method-Extension
-  repository: git://github.com/peczenyj/Method-Extension.git
-version: 0.1
+  repository: https://github.com/peczenyj/Method-Extension.git
+version: '0.2'
+x_authority: cpan:PACMAN

@@ -15,6 +15,7 @@
 		"backzone",
 		"calendars",
 		"checklinks.awk",
+		"checknow.awk",
 		"checktab.awk",
 		"date.1",
 		"difftime.c",
@@ -48,6 +49,7 @@
 		"zishrink.awk",
 		"zone.tab",
 		"zone1970.tab",
+		"zonenow.tab",
 	],
-	version => "2023c",
+	version => "2023d",
 }

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Lg - Package for language Ganda
 
 package Locale::CLDR::Locales::Lg;
 # This file auto generated from Data\common\main\lg.xml
-#	on Tue  5 Dec  1:19:41 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'Lu-akaani',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Andora',
  			'AE' => 'Emireeti',
@@ -217,7 +217,6 @@ has 'display_name_region' => (
  			'MD' => 'Molodova',
  			'MG' => 'Madagasika',
  			'MH' => 'Bizinga bya Mariso',
- 			'MK' => 'Masedoniya',
  			'ML' => 'Mali',
  			'MM' => 'Myanima',
  			'MN' => 'Mongoliya',

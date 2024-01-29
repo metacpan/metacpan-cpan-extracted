@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# GetCellHtmlStringRequest.name : The workbook name.  ,
+# GetCellHtmlStringRequest.name : The file name.  ,
 # GetCellHtmlStringRequest.sheetName : The worksheet name.  ,
 # GetCellHtmlStringRequest.cellName : The cell name.  ,
-# GetCellHtmlStringRequest.folder : Original workbook folder.  ,
-# GetCellHtmlStringRequest.storageName : Storage name.   
+# GetCellHtmlStringRequest.folder : The folder where the file is situated.  ,
+# GetCellHtmlStringRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_cell_html_string' } = { 
-    	summary => 'Gets the html string which contains data and some formats in this cell.',
+    	summary => 'Retrieve the HTML string containing data and specific formats in this cell.',
         params => $params,
         returns => 'string',
     };
@@ -137,7 +137,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -158,14 +158,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

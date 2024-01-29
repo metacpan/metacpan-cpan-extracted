@@ -191,7 +191,7 @@ sub window_function {
             my $old_idx = 0;
 
             WINDOW_DEFINITION: while( 1 ) {
-                my ( $partition_by, $order_by, $frame_clause ) = ( '- Partition by', '- Order by', '- Frame clause' ); ##
+                my ( $partition_by, $order_by, $frame_clause ) = ( '- Partition by', '- Order by', '- Frame clause' );
                 my @pre = ( undef, $sf->{i}{confirm} );
                 my $menu = [ @pre, $partition_by, $order_by, $frame_clause ];
                 my $tmp_info = $info . "\n" . $sf->__get_win_func_stmt( $win_func_data );

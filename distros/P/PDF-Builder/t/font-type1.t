@@ -21,6 +21,8 @@ if ($OSname eq 'MSWin32') {
     push @pfm_list, 'C:/Program Files/MikTex 2.9/fonts/type1/urw/bookman/ubkd8a.pfm';
     push @pfb_list, 'C:/Program Files (x86)/MikTex 2.9/fonts/type1/urw/bookman/ubkd8a.pfb';
     push @pfm_list, 'C:/Program Files (x86)/MikTex 2.9/fonts/type1/urw/bookman/ubkd8a.pfm';
+    push @pfb_list, 'C:/Users/Phil/fonts/T1fonts/URWGothic-Book.t1';
+    push @pfm_list, 'C:/Users/Phil/fonts/T1fonts/URWGothic-Book.afm';
 
 } else {
     # Unix/Linux systems assumed. is this a standard location everyone has?
@@ -28,6 +30,8 @@ if ($OSname eq 'MSWin32') {
     push @pfm_list, '/usr/share/fonts/type1/gsfonts/a010013l.pfm';
     push @pfb_list, '/usr/share/X11/fonts/urw-fonts/a010013l.pfb';
     push @pfm_list, '/usr/share/X11/fonts/urw-fonts/a010013l.pfm';
+    push @pfb_list, '/usr/share/fonts/urw-base35/URWGothic-Book.t1';
+    push @pfm_list, '/usr/share/fonts/urw-base35/URWGothic-Book.afm';
 }
 
 # This may or may not work on Macs ("darwin" string) and other platforms
@@ -54,8 +58,15 @@ SKIP: {
         unless (defined $pfb_file and defined $pfm_file);
 
     my $pdf = PDF::Builder->new();
-#   my $font = $pdf->font($pfb_file, 'pfmfile' => $pfm_file); # was psfont()
-    my $font = $pdf->psfont($pfb_file, 'pfmfile' => $pfm_file); # was psfont()
+    my $font;
+    # handle both afm and pfm metric files
+    if ($pfm_file =~ m/\.pfm$/i) {
+#       $font = $pdf->font($pfb_file, 'pfmfile' => $pfm_file);
+        $font = $pdf->psfont($pfb_file, 'pfmfile' => $pfm_file);
+    } else {
+#       $font = $pdf->font($pfb_file, 'afmfile' => $pfm_file);
+        $font = $pdf->psfont($pfb_file, 'afmfile' => $pfm_file);
+    }
 
     # Do something with the font to see if it appears to have opened
     # properly.

@@ -7,7 +7,6 @@ use Data::Dumper;
 use LWP::Protocol::https;
 use WWW::Mechanize::Cached;
 use Term::Choose;
-use Term::Choose::Util qw( settings_menu );
 # https://www.unicode.org/Public/UNIDATA/UnicodeData.txt
 # https://unicode.org/reports/tr44/#UnicodeData.txt
 # https://www.unicode.org/Public/UNIDATA/EastAsianWidth.txt
@@ -66,7 +65,7 @@ sub east_asian_width_table {
     my $page = $mech->content( format => 'text' );
     my $east_asian_width_table = [];
     for my $row ( split /\n/, $page ) {
-        if ( $row =~ /^(\S+);(\S\S?)\s/ ) {
+        if ( $row =~ /^(\S+)\s*;\s*(\S\S?)\s/ ) {
             my @range = split /\.\./, $1;
             if ( @range == 1 ) {
                 push @range, $1;
@@ -125,9 +124,7 @@ for my $c ( 0x0 .. 0x10ffff ) {
         # https://www.unicode.org/versions/Unicode14.0.0/ch09.pdf # 9.2 Arabic -> Signs Spanning Numbers -> Unlike ...
         $print_width = [ 0, 0 ];
     }
-    #elsif ( $c >= 0x1160 && $c <= 0x11FF || $c >= 0x0D7B0 && $c <= 0x0D7FF ) {
-    elsif ( $c >= 0x1160 && $c <= 0x11FF ) {
-#        # https://www.unicode.org/versions/Unicode14.0.0/ch18.pdf # 18.6 Hangul -> Hangul Jamo
+    elsif ( $c >= 0x1160 && $c <= 0x11FF || $c >= 0x0D7B0 && $c <= 0x0D7FF ) {
 #        # https://devblogs.microsoft.com/oldnewthing/20201009-00/?p=104351
         $print_width = [ 0, 0 ];
     }

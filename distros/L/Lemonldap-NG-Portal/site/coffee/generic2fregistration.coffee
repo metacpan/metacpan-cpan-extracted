@@ -73,7 +73,7 @@ register = ->
 					e = jQuery.Event( "mfaAdded" )
 					$(document).trigger e, [ { "type": prefix } ]
 					if !e.isDefaultPrevented()
-						setMsg 'genericRegistered', 'success'
+						window.location.href = window.portal + "2fregisters?continue=1"
 
 # Register "click" events
 $(document).ready ->

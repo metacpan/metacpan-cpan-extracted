@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Net::HTTP;
 use URI;
@@ -95,7 +95,7 @@ sub new {
         ) or die "Can't connect: $@";
 
         # create URI object
-        my $uri = URI->new(sprintf ("http://%s:%d/?database=%s", $self->{'_host'}, $self->{'_port'}, $self->{'_database'}));
+        my $uri = URI->new(sprintf ("/?database=%s", $self->{'_database'}));
         $uri->query_param('user' => $self->{'_user'}) if $self->{'_user'};
         $uri->query_param('password' => $self->{'_password'}) if $self->{'_password'};
 
@@ -319,7 +319,7 @@ ClickHouse - Database driver for Clickhouse OLAP Database
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 
 

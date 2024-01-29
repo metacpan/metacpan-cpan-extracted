@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.org/davorg/app-aphra.svg?branch=master)](https://travis-ci.org/davorg/app-aphra)
-[![Coverage Status](https://coveralls.io/repos/github/davorg/app-aphra/badge.svg?branch=master)](https://coveralls.io/github/davorg/app-aphra?branch=master)
+[![Build Status](https://github.com/davorg-cpan/app-aphra/actions/workflows/perltest.yml/badge.svg?branch=master)](https://github.com/davorg-cpan/app-aphra/actions/workflows/perltest.yml) [![Coverage Status](https://coveralls.io/repos/github/davorg-cpan/app-aphra/badge.svg?branch=master)](https://coveralls.io/github/davorg-cpan/app-aphra?branch=master)
 
 > Aphra Behn (/ˈæfrə bɛn/; 14 December 1640? – 16 April 1689) was a British
 > playwright, poet, translator and fiction writer from the Restoration era. As

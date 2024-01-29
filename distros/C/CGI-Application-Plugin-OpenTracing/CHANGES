@@ -2,6 +2,12 @@ CHANGE LOG
 ==========
 
 
+2023-12-20 - v0.104.2
+---------------------
+
+Make the plugin methods more robust when chaining, and having undefined results
+
+
 2023-11-28 - v0.104.1
 ---------------------
 

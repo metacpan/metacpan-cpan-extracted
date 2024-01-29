@@ -31,6 +31,7 @@ do { my $x = {
                                       'Future' => '0.47',
                                       'IO::Async::Notifier' => '0.78',
                                       'IO::Async::SSL' => '0.22',
+                                      'JSON::MaybeUTF8' => '2.000',
                                       'JSON::MaybeXS' => '1.004003',
                                       'Log::Any' => '1.709',
                                       'Net::Async::HTTP' => '0.48',

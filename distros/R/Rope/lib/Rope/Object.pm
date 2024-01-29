@@ -48,13 +48,17 @@ sub set_value {
 		}
 		$spec->{value} = $value;
 	}
+	if ($spec->{required} && ! defined $spec->{value}) {
+		die sprintf "Required property (%s) in object (%s) not set", $key, $self->{name};
+	}
 	return $spec->{value};
 }
  
 sub STORE {
         my ($self, $key, $value) = @_;
-        my $k = $self->{properties}->{$key};
-        if ($k) {
+
+	my $k = $self->{properties}->{$key};
+	if ($k) {
 		if ($k->{writeable}) {
 			$self->set_value($key, $value, $k);
 		} elsif ($k->{configurable}) {
@@ -69,6 +73,7 @@ sub STORE {
         } elsif (! $self->{locked}) {
                 $self->{properties}->{$key} = {
                         value => $value,
+			initable => 1,
 			writable => 1,
 			configurable => 1,
 			enumerable => 1,

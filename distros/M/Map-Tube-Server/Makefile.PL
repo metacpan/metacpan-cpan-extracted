@@ -7,7 +7,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME               => 'Map::Tube::Server',
-    AUTHOR             => q{Mohammad S Anwar <mohammad.anwar@yahoo.com>},
+    AUTHOR             => q{Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>},
     VERSION_FROM       => 'lib/Map/Tube/Server.pm',
     ABSTRACT_FROM      => 'lib/Map/Tube/Server.pm',
     LICENSE            => 'artistic_2',

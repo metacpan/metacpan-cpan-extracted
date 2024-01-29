@@ -368,7 +368,7 @@ sub setup($) {
     #
     if ($self->{_join_method} eq 'merge' && !$self->{_pre_sorted}) {
 	my(@final_sort_argv) = @{$self->{_sort_argv}};
-	unshift(@final_sort_argv, '-T', $self->{_tmpdir})
+	unshift(@final_sort_argv, '--tmpdir', $self->{_tmpdir})
 	    if (defined($self->{_tmpdir}));
 	foreach (0..1) {
 	    my($new_reader, $new_fred) = dbpipeline_filter($self->{_inputs}[$_], [-comment_handler => $self->create_delay_comments_sub], dbsort('--nolog', @final_sort_argv));

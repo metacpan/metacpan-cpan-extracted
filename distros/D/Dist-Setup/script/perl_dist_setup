@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+
+use 5.022;
+use strict;
+use warnings;
+
+use Cwd;
+use Dist::Setup;
+use File::ShareDir qw(dist_dir);
+use File::Spec::Functions qw(abs2rel canonpath catfile updir);
+use FindBin;
+
+my $data_dir = catfile($FindBin::Bin, updir(), 'data');
+if (! -d $data_dir) {
+  # If the directory does not exist next to the binary, we’re assuming that
+  # the tool was `make install`-ed.
+  $data_dir = dist_dir('Dist-Setup');
+}
+# We're using a relative path here because this works better accross OSes
+# (e.g. on Cygwin when talking to some Windows binaries).
+$data_dir =  abs2rel(canonpath($data_dir));
+
+
+my $target_dir = abs2rel(canonpath(getcwd()));
+
+Dist::Setup::setup($data_dir, $target_dir);

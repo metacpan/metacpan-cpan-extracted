@@ -9,9 +9,9 @@ use PMVersions::Util qw(version_from_pmversions);
 use Require::Hook::Source::DzilBuild;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2024-01-09'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-Sah-Schemas'; # DIST
-our $VERSION = '0.031'; # VERSION
+our $VERSION = '0.033'; # VERSION
 
 with (
     'Dist::Zilla::Role::CheckPackageDeclared',
@@ -108,6 +108,9 @@ sub munge_files {
         # actually we don't have to normalize manually, we require the schemas
         # to be normalized anyway. but to be safer.
         my $nsch = Data::Sah::Normalize::normalize_schema($sch);
+
+        # compile schema to perl code and collect the required modules
+        $self->{_modules_required_by_schema} = {};
 
         # collect other Sah::Schema::* modules that are used, this will
         # be added as prereq
@@ -280,31 +283,18 @@ sub register_prereqs {
         $self->zilla->register_prereqs({phase=>'runtime'}, $mod => version_from_pmversions($mod) // 0);
     }
 
-    for my $mod (sort keys %{$self->{_our_schema_modules} // {}}) {
-        my $nsch = ${"$mod\::schema"};
-        my $schr = Data::Sah::Resolve::resolve_schema($nsch);
-        # add prereqs to XCompletion modules
-        {
-            my $xc = $nsch->[1]{'x.completion'};
-            last unless $xc;
-            last if ref $xc eq 'CODE';
-            $xc = $xc->[0] if ref $xc eq 'ARRAY';
-            my $xcmod = "Perinci::Sub::XCompletion::$xc";
-            next if $self->is_package_declared($xcmod);
-            $self->log(["Adding prereq to %s", $xcmod]);
-            $self->zilla->register_prereqs({phase=>'runtime'}, $xcmod => version_from_pmversions($xcmod) // 0);
-        }
-        # add prereqs to coerce modules
-        for my $key ('x.coerce_rules', 'x.perl.coerce_rules') {
-            my $crr = $nsch->[1]{$key};
-            next unless $crr && @$crr;
-            for my $rule (@$crr) {
-                next unless $rule =~ /\A\w+(::\w+)*\z/;
-                my $crmod = "Data::Sah::Coerce::perl::To_$schr->{type}::$rule";
-                next if $self->is_package_declared($crmod);
-                $self->log(["Adding prereq to %s", $crmod]);
-                $self->zilla->register_prereqs({phase=>'runtime'}, $crmod => version_from_pmversions($crmod) // 0);
-            }
+    # add prereqs to modules required by schemas when they are compiled to perl
+    for my $schemamod (sort keys %{$self->{_our_schema_modules} // {}}) {
+        $self->log_debug(["Compiling schema %s", $schemamod]);
+        my $nsch = ${"$schemamod\::schema"};
+
+        require Data::Sah;
+        my $cd = Data::Sah->get_compiler("perl")->compile(schema => $nsch, schema_is_normalized=>1);
+
+        for my $modrec (@{ $cd->{modules} }) {
+            next if $self->is_package_declared($modrec->{name});
+            $self->log(["Adding prereq to %s", $modrec->{name}]);
+            $self->zilla->register_prereqs({phase=>'runtime'}, $modrec->{name} => version_from_pmversions($modrec->{name}) // 0);
         }
     }
 }
@@ -325,7 +315,7 @@ Dist::Zilla::Plugin::Sah::Schemas - Plugin to use when building Sah-Schemas-* di
 
 =head1 VERSION
 
-This document describes version 0.031 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2023-09-03.
+This document describes version 0.033 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2024-01-09.
 
 =head1 SYNOPSIS
 
@@ -438,7 +428,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

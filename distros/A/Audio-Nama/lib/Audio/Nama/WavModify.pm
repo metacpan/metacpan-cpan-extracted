@@ -1,6 +1,6 @@
 package Audio::Nama::WavModify;
 use Role::Tiny;
-use Modern::Perl;
+use Modern::Perl '2020';
 use Audio::Nama::Globals qw(PLAY);
 
 sub normalize {

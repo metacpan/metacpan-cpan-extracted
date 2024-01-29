@@ -41,7 +41,7 @@ use vars qw/@ISA @EXPORT_OK %EXPORT_TAGS $VERSION $REVISION $OUT
 	  /;
 
 BEGIN {
-  $VERSION='2.2.9'; # VERSION TEMPLATE
+  $VERSION='2.2.10'; # VERSION TEMPLATE
   $REVISION=q($Revision: 2.49 $);
   @ISA=qw(Exporter);
   @PARAM_VARS=qw/$ENCODING
@@ -252,7 +252,7 @@ sub xsh_init {
   shift unless ref($_[0]);
   if (ref($_[0])) {
     $OUT=$_[0];
-  } else {
+  } elsif (! $OUT) {
     if (open $OUT, '>&', \*STDOUT) {
       binmode $OUT;
       binmode $OUT, ':bytes';

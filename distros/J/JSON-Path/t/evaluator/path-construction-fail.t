@@ -1,9 +1,9 @@
 use Test2::V0 '-target' => 'JSON::Path';
+use JSON::MaybeXS qw/decode_json/;
 
 # Test demonstrating RT #122109, "paths method succeeds in search but then fails on path construction"
 # https://rt.cpan.org/Ticket/Display.html?id=122109
 #
-use JSON::Parse 'parse_json';
 local $JSON::Path::Safe = 0;
 my $json = '{
    "4" : {
@@ -45,7 +45,7 @@ my $json = '{
       "id" : 5
    }
 }';
-my $json_hash = parse_json($json);
+my $json_hash = decode_json($json);
 my $p3        = $CLASS->new('$.[?($_->{name} eq "Email")]');
 my @paths;
 ok lives { @paths = $p3->paths($json_hash) }, q{paths() did not die} or diag qq{Caught exception: $@};

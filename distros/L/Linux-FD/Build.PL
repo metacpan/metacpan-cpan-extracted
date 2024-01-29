@@ -14,7 +14,6 @@ my $builder = Module::Build->new(
     'IO::Select' => '0',
     'Module::Build' => '0.28',
     'POSIX' => '0',
-    'Test::Exception' => '0',
     'Test::More' => '0.89',
     'Time::HiRes' => '0'
   },
@@ -22,7 +21,7 @@ my $builder = Module::Build->new(
     'Module::Build' => '0.28'
   },
   'requires' => {
-    'Sub::Exporter' => '0',
+    'Exporter' => '5.57',
     'XSLoader' => '0',
     'perl' => '5.006',
     'strict' => '0',

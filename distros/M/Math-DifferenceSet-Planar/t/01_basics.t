@@ -211,7 +211,7 @@ if ($nods) {
 }
 else {
     pass;
-    like($@, qr/^bogus set: prime divisor 7 of order 7 is not a multiplier/);
+    like($@, qr/^delta 19 elements missing/);
 }
 
 my @pe = $ds->peak_elements;
@@ -448,7 +448,7 @@ $ds3 = eval { Math::DifferenceSet::Planar->from_elements(
     0, 1, 5, 7, 17, 28, 31, 49
 )};
 is($ds3, undef);
-like($@, qr/^bogus set: prime divisor 7 of order 7 is not a multiplier/);
+like($@, qr/^delta 19 elements missing/);
 
 $ds3 = eval { Math::DifferenceSet::Planar->from_elements(
     0, 1, 4, 9, 22, 34, 39, 51,

@@ -1,0 +1,5 @@
+class Eg::OS : interface_t {
+  use Eg::Runtime;
+  
+  method build_runtime : void ($runtime : Eg::Runtime);
+}

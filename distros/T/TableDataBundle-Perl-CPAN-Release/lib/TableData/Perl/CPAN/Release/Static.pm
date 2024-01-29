@@ -37,13 +37,13 @@ use warnings;
 use Role::Tiny::With;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-25'; # DATE
+our $DATE = '2023-11-26'; # DATE
 our $DIST = 'TableDataBundle-Perl-CPAN-Release'; # DIST
-our $VERSION = '20231120.3'; # VERSION
+our $VERSION = '20231126.0'; # VERSION
 
 with 'TableDataRole::Perl::CPAN::Release::Static';
 
-our %STATS = ("num_columns",9,"num_rows",370933); # STATS
+our %STATS = ("num_columns",9,"num_rows",371121); # STATS
 
 1;
 # ABSTRACT: CPAN releases (from oldest to newest)
@@ -60,7 +60,7 @@ TableDataRole::Perl::CPAN::Release::Static - CPAN releases (from oldest to newes
 
 =head1 VERSION
 
-This document describes version 20231120.3 of TableDataRole::Perl::CPAN::Release::Static (from Perl distribution TableDataBundle-Perl-CPAN-Release), released on 2023-11-25.
+This document describes version 20231126.0 of TableDataRole::Perl::CPAN::Release::Static (from Perl distribution TableDataBundle-Perl-CPAN-Release), released on 2023-11-26.
 
 =head1 SYNOPSIS
 
@@ -98,7 +98,7 @@ See the L<tabledata> CLI's documentation for other available actions and options
  | key         | value  |
  +-------------+--------+
  | num_columns | 9      |
- | num_rows    | 370933 |
+ | num_rows    | 371121 |
  +-------------+--------+
 
 The statistics is available in the C<%STATS> package variable.

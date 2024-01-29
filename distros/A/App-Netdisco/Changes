@@ -1,3 +1,52 @@
+2.072002 - 2024-01-21
+
+  [ENHANCEMENTS]
+
+  * netdisco-do --force will ignore layers for macsuck/arpnip
+
+  [BUG FIXES]
+
+  * on defer reset job device to canonical IP to avoid missing dupes
+
+2.072001 - 2024-01-15
+
+  [BUG FIXES]
+
+  * revert set is_uplink on ports with multiple vlans
+
+2.072000 - 2024-01-14
+
+  [ENHANCEMENTS]
+
+  * add port_vlans API endpoint to device ports
+  * set device ports with multiple vlans to be uplinks
+  * removed the redundant portctl_vlans setting (handled by portctl_uplinks)
+  * renamed vlanctl to be portctl_native_vlan
+
+  [BUG FIXES]
+
+  * #1150 rewritten port control acls
+
+2.071003 - 2024-01-10
+
+  [ENHANCEMENTS]
+
+  * also display job device IP in expanded jobqueue info
+
+  [BUG FIXES]
+
+  * set Text::CSV requirement to 2.04 to ensure ABI is met
+  * reload admin forms after making row changes
+  * fix order of device port columns so links not between speeds
+  * #1139 force anchor on all MAC address comparisons in search
+  * #1140 special case for queueing a job for delete device from duplicatedevices admin report
+
+2.071002 - 2024-01-06
+
+  [BUG FIXES]
+
+  * fix syntax error - array not hash in JobQueue.pm
+
 2.071001 - 2023-12-07
 
   [BUG FIXES]

@@ -29,6 +29,8 @@ else {
   Rmpc_eta_fund($rop, $op1, MPC_RNDNN);
   cmp_ok("$rop", 'eq', '(7.2829981913846153e-1 -5.6948215660904557e-2)', "Rmpc_eta_fund output is ok");
 
+  cmp_ok($op1, '==', Math::MPC->new(-0.3, 1.2), '\$op1 was not modified by Rmpc_eta_fund()');
+
   my $inex = Rmpc_agm($rop, $op1, $op2, MPC_RNDAA);
   cmp_ok("$rop", 'eq', '(2.7191494731957273 6.4237609338121771e-1)', "Rmpc_agm output is ok");
 

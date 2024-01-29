@@ -11,6 +11,7 @@ my $HBShaperVer  = 0.024;    # minimum version of HarfBuzz::Shaper
 my $LpngVersion  = 0.57;     # minimum version of Image::PNG::Libpng
 my $TextMarkdown = 1.000031; # minimum version of Text::Markdown
 my $HTMLTreeBldr = 5.07;     # minimum version of HTML::TreeBuilder
+my $PodSimpleXHTML = 3.45;   # minimum version of Pod::Simple::XHTML
 
 # Test all of the modules to make sure that a simple "use Module"
 # won't result in a crash.
@@ -22,6 +23,11 @@ find(\&add_to_files, 'lib');
 sub add_to_files {
     return unless -f $_;
     return unless $_ =~ /\.pm$/;
+    ### 3 currently disabled
+    return if ($_ =~ m/CCITTFaxDecode\.pm$/);
+    return if ($_ =~ m/Reader\.pm$/);
+    return if ($_ =~ m/Writer\.pm$/);
+    ###
     push @files, $File::Find::name;
     return;
 }
@@ -82,6 +88,7 @@ foreach my $file (@files) {
     # HarfBuzz::Shaper is built into Content.pm, doesn't have its own module
     # Text::Markdown is built into Content/Text.pm, doesn't have its own module
     # HTML::TreeBuilder is built into Content/Text.pm, doesn't have its own module
+    # Pod::Simple::XHTML is built into buildDoc.pl, doesn't have its own module
     use_ok($file);
 }
 

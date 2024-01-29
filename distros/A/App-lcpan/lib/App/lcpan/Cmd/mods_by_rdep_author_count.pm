@@ -9,9 +9,9 @@ use Function::Fallback::CoreOrPP qw(clone_list);
 require App::lcpan;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-09'; # DATE
+our $DATE = '2023-09-26'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.073'; # VERSION
+our $VERSION = '1.074'; # VERSION
 
 our %SPEC;
 
@@ -90,7 +90,7 @@ App::lcpan::Cmd::mods_by_rdep_author_count - List modules depended "by most numb
 
 =head1 VERSION
 
-This document describes version 1.073 of App::lcpan::Cmd::mods_by_rdep_author_count (from Perl distribution App-lcpan), released on 2023-07-09.
+This document describes version 1.074 of App::lcpan::Cmd::mods_by_rdep_author_count (from Perl distribution App-lcpan), released on 2023-09-26.
 
 =head1 FUNCTIONS
 

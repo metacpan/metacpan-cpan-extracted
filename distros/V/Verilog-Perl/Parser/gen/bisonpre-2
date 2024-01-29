@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.5.1.  */
+/* A Bison parser, made by GNU Bison 3.8.2.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2020 Free Software Foundation,
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -31,8 +31,9 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* Undocumented macros, especially those whose name start with YY_,
-   are private implementation details.  Do not rely on them.  */
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
 
 #ifndef YY_VPARSEBISON_VPARSEBISON_PRETMP_H_INCLUDED
 # define YY_VPARSEBISON_VPARSEBISON_PRETMP_H_INCLUDED
@@ -44,322 +45,329 @@
 extern int VParseBisondebug;
 #endif
 
-/* Token type.  */
+/* Token kinds.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    yaFLOATNUM = 258,
-    yaID__ETC = 259,
-    yaID__LEX = 260,
-    yaID__aPACKAGE = 261,
-    yaID__aTYPE = 262,
-    yaINTNUM = 263,
-    yaTIMENUM = 264,
-    yaSTRING = 265,
-    yaSTRING__IGNORE = 266,
-    yaTIMINGSPEC = 267,
-    ygenGATE = 268,
-    ygenCONFIGKEYWORD = 269,
-    ygenOPERATOR = 270,
-    ygenSTRENGTH = 271,
-    ygenSYSCALL = 272,
-    yACCEPT_ON = 273,
-    yALIAS = 274,
-    yALWAYS = 275,
-    yAND = 276,
-    yASSERT = 277,
-    yASSIGN = 278,
-    yASSUME = 279,
-    yAUTOMATIC = 280,
-    yBEFORE = 281,
-    yBEGIN = 282,
-    yBIND = 283,
-    yBINS = 284,
-    yBINSOF = 285,
-    yBIT = 286,
-    yBREAK = 287,
-    yBUF = 288,
-    yBYTE = 289,
-    yCASE = 290,
-    yCASEX = 291,
-    yCASEZ = 292,
-    yCHANDLE = 293,
-    yCHECKER = 294,
-    yCLASS = 295,
-    yCLOCK = 296,
-    yCLOCKING = 297,
-    yCONSTRAINT = 298,
-    yCONST__ETC = 299,
-    yCONST__LEX = 300,
-    yCONST__LOCAL = 301,
-    yCONST__REF = 302,
-    yCONTEXT = 303,
-    yCONTINUE = 304,
-    yCOVER = 305,
-    yCOVERGROUP = 306,
-    yCOVERPOINT = 307,
-    yCROSS = 308,
-    yDEASSIGN = 309,
-    yDEFAULT = 310,
-    yDEFPARAM = 311,
-    yDISABLE = 312,
-    yDIST = 313,
-    yDO = 314,
-    yEDGE = 315,
-    yELSE = 316,
-    yEND = 317,
-    yENDCASE = 318,
-    yENDCHECKER = 319,
-    yENDCLASS = 320,
-    yENDCLOCKING = 321,
-    yENDFUNCTION = 322,
-    yENDGENERATE = 323,
-    yENDGROUP = 324,
-    yENDINTERFACE = 325,
-    yENDMODULE = 326,
-    yENDPACKAGE = 327,
-    yENDPROGRAM = 328,
-    yENDPROPERTY = 329,
-    yENDSEQUENCE = 330,
-    yENDSPECIFY = 331,
-    yENDTABLE = 332,
-    yENDTASK = 333,
-    yENUM = 334,
-    yEVENT = 335,
-    yEVENTUALLY = 336,
-    yEXPECT = 337,
-    yEXPORT = 338,
-    yEXTENDS = 339,
-    yEXTERN = 340,
-    yFINAL = 341,
-    yFIRST_MATCH = 342,
-    yFOR = 343,
-    yFORCE = 344,
-    yFOREACH = 345,
-    yFOREVER = 346,
-    yFORK = 347,
-    yFORKJOIN = 348,
-    yFUNCTION__ETC = 349,
-    yFUNCTION__LEX = 350,
-    yFUNCTION__aPUREV = 351,
-    yGENERATE = 352,
-    yGENVAR = 353,
-    yGLOBAL__CLOCKING = 354,
-    yGLOBAL__LEX = 355,
-    yIF = 356,
-    yIFF = 357,
-    yIGNORE_BINS = 358,
-    yILLEGAL_BINS = 359,
-    yIMPLEMENTS = 360,
-    yIMPLIES = 361,
-    yIMPORT = 362,
-    yINITIAL = 363,
-    yINOUT = 364,
-    yINPUT = 365,
-    yINSIDE = 366,
-    yINT = 367,
-    yINTEGER = 368,
-    yINTERCONNECT = 369,
-    yINTERFACE = 370,
-    yINTERSECT = 371,
-    yJOIN = 372,
-    yLET = 373,
-    yLOCALPARAM = 374,
-    yLOCAL__COLONCOLON = 375,
-    yLOCAL__ETC = 376,
-    yLOCAL__LEX = 377,
-    yLOGIC = 378,
-    yLONGINT = 379,
-    yMATCHES = 380,
-    yMODPORT = 381,
-    yMODULE = 382,
-    yNAND = 383,
-    yNEGEDGE = 384,
-    yNETTYPE = 385,
-    yNEW__ETC = 386,
-    yNEW__LEX = 387,
-    yNEW__PAREN = 388,
-    yNEXTTIME = 389,
-    yNOR = 390,
-    yNOT = 391,
-    yNULL = 392,
-    yOR = 393,
-    yOUTPUT = 394,
-    yPACKAGE = 395,
-    yPACKED = 396,
-    yPARAMETER = 397,
-    yPOSEDGE = 398,
-    yPRIORITY = 399,
-    yPROGRAM = 400,
-    yPROPERTY = 401,
-    yPROTECTED = 402,
-    yPURE = 403,
-    yRAND = 404,
-    yRANDC = 405,
-    yRANDCASE = 406,
-    yRANDSEQUENCE = 407,
-    yREAL = 408,
-    yREALTIME = 409,
-    yREF = 410,
-    yREG = 411,
-    yREJECT_ON = 412,
-    yRELEASE = 413,
-    yREPEAT = 414,
-    yRESTRICT = 415,
-    yRETURN = 416,
-    ySCALARED = 417,
-    ySEQUENCE = 418,
-    ySHORTINT = 419,
-    ySHORTREAL = 420,
-    ySIGNED = 421,
-    ySOFT = 422,
-    ySOLVE = 423,
-    ySPECIFY = 424,
-    ySPECPARAM = 425,
-    ySTATIC__CONSTRAINT = 426,
-    ySTATIC__ETC = 427,
-    ySTATIC__LEX = 428,
-    ySTRING = 429,
-    ySTRONG = 430,
-    ySTRUCT = 431,
-    ySUPER = 432,
-    ySUPPLY0 = 433,
-    ySUPPLY1 = 434,
-    ySYNC_ACCEPT_ON = 435,
-    ySYNC_REJECT_ON = 436,
-    yS_ALWAYS = 437,
-    yS_EVENTUALLY = 438,
-    yS_NEXTTIME = 439,
-    yS_UNTIL = 440,
-    yS_UNTIL_WITH = 441,
-    yTABLE = 442,
-    yTAGGED = 443,
-    yTASK__ETC = 444,
-    yTASK__LEX = 445,
-    yTASK__aPUREV = 446,
-    yTHIS = 447,
-    yTHROUGHOUT = 448,
-    yTIME = 449,
-    yTIMEPRECISION = 450,
-    yTIMEUNIT = 451,
-    yTRI = 452,
-    yTRI0 = 453,
-    yTRI1 = 454,
-    yTRIAND = 455,
-    yTRIOR = 456,
-    yTRIREG = 457,
-    yTYPE = 458,
-    yTYPEDEF = 459,
-    yUNION = 460,
-    yUNIQUE = 461,
-    yUNIQUE0 = 462,
-    yUNSIGNED = 463,
-    yUNTIL = 464,
-    yUNTIL_WITH = 465,
-    yUNTYPED = 466,
-    yVAR = 467,
-    yVECTORED = 468,
-    yVIRTUAL__CLASS = 469,
-    yVIRTUAL__ETC = 470,
-    yVIRTUAL__INTERFACE = 471,
-    yVIRTUAL__LEX = 472,
-    yVIRTUAL__anyID = 473,
-    yVOID = 474,
-    yWAIT = 475,
-    yWAIT_ORDER = 476,
-    yWAND = 477,
-    yWEAK = 478,
-    yWHILE = 479,
-    yWILDCARD = 480,
-    yWIRE = 481,
-    yWITHIN = 482,
-    yWITH__BRA = 483,
-    yWITH__CUR = 484,
-    yWITH__ETC = 485,
-    yWITH__LEX = 486,
-    yWITH__PAREN = 487,
-    yWOR = 488,
-    yXNOR = 489,
-    yXOR = 490,
-    yD_ERROR = 491,
-    yD_FATAL = 492,
-    yD_INFO = 493,
-    yD_ROOT = 494,
-    yD_UNIT = 495,
-    yD_WARNING = 496,
-    yP_TICK = 497,
-    yP_TICKBRA = 498,
-    yP_OROR = 499,
-    yP_ANDAND = 500,
-    yP_NOR = 501,
-    yP_XNOR = 502,
-    yP_NAND = 503,
-    yP_EQUAL = 504,
-    yP_NOTEQUAL = 505,
-    yP_CASEEQUAL = 506,
-    yP_CASENOTEQUAL = 507,
-    yP_WILDEQUAL = 508,
-    yP_WILDNOTEQUAL = 509,
-    yP_GTE = 510,
-    yP_LTE = 511,
-    yP_LTE__IGNORE = 512,
-    yP_SLEFT = 513,
-    yP_SRIGHT = 514,
-    yP_SSRIGHT = 515,
-    yP_POW = 516,
-    yP_PAR__IGNORE = 517,
-    yP_PAR__STRENGTH = 518,
-    yP_LTMINUSGT = 519,
-    yP_PLUSCOLON = 520,
-    yP_MINUSCOLON = 521,
-    yP_MINUSGT = 522,
-    yP_MINUSGTGT = 523,
-    yP_EQGT = 524,
-    yP_ASTGT = 525,
-    yP_ANDANDAND = 526,
-    yP_POUNDPOUND = 527,
-    yP_POUNDMINUSPD = 528,
-    yP_POUNDEQPD = 529,
-    yP_DOTSTAR = 530,
-    yP_ATAT = 531,
-    yP_COLONCOLON = 532,
-    yP_COLONEQ = 533,
-    yP_COLONDIV = 534,
-    yP_ORMINUSGT = 535,
-    yP_OREQGT = 536,
-    yP_BRASTAR = 537,
-    yP_BRAEQ = 538,
-    yP_BRAMINUSGT = 539,
-    yP_BRAPLUSKET = 540,
-    yP_PLUSPLUS = 541,
-    yP_MINUSMINUS = 542,
-    yP_PLUSEQ = 543,
-    yP_MINUSEQ = 544,
-    yP_TIMESEQ = 545,
-    yP_DIVEQ = 546,
-    yP_MODEQ = 547,
-    yP_ANDEQ = 548,
-    yP_OREQ = 549,
-    yP_XOREQ = 550,
-    yP_SLEFTEQ = 551,
-    yP_SRIGHTEQ = 552,
-    yP_SSRIGHTEQ = 553,
-    prUNARYARITH = 554,
-    prREDUCTION = 555,
-    prNEGATION = 556,
-    prEVENTBEGIN = 557,
-    prTAGGED = 558,
-    prSEQ_CLOCKING = 559,
-    prPOUNDPOUND_MULTI = 560,
-    prLOWER_THAN_ELSE = 561
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    yaFLOATNUM = 258,              /* "FLOATING-POINT NUMBER"  */
+    yaID__ETC = 259,               /* "IDENTIFIER"  */
+    yaID__LEX = 260,               /* "IDENTIFIER-in-lex"  */
+    yaID__aPACKAGE = 261,          /* "PACKAGE-IDENTIFIER"  */
+    yaID__aTYPE = 262,             /* "TYPE-IDENTIFIER"  */
+    yaINTNUM = 263,                /* "INTEGER NUMBER"  */
+    yaTIMENUM = 264,               /* "TIME NUMBER"  */
+    yaSTRING = 265,                /* "STRING"  */
+    yaSTRING__IGNORE = 266,        /* "STRING-ignored"  */
+    yaTIMINGSPEC = 267,            /* "TIMING SPEC ELEMENT"  */
+    ygenGATE = 268,                /* "GATE keyword"  */
+    ygenCONFIGKEYWORD = 269,       /* "CONFIG keyword (cell/use/design/etc)"  */
+    ygenOPERATOR = 270,            /* "OPERATOR"  */
+    ygenSTRENGTH = 271,            /* "STRENGTH keyword (strong1/etc)"  */
+    ygenSYSCALL = 272,             /* "SYSCALL"  */
+    yACCEPT_ON = 273,              /* "accept_on"  */
+    yALIAS = 274,                  /* "alias"  */
+    yALWAYS = 275,                 /* "always"  */
+    yAND = 276,                    /* "and"  */
+    yASSERT = 277,                 /* "assert"  */
+    yASSIGN = 278,                 /* "assign"  */
+    yASSUME = 279,                 /* "assume"  */
+    yAUTOMATIC = 280,              /* "automatic"  */
+    yBEFORE = 281,                 /* "before"  */
+    yBEGIN = 282,                  /* "begin"  */
+    yBIND = 283,                   /* "bind"  */
+    yBINS = 284,                   /* "bins"  */
+    yBINSOF = 285,                 /* "binsof"  */
+    yBIT = 286,                    /* "bit"  */
+    yBREAK = 287,                  /* "break"  */
+    yBUF = 288,                    /* "buf"  */
+    yBYTE = 289,                   /* "byte"  */
+    yCASE = 290,                   /* "case"  */
+    yCASEX = 291,                  /* "casex"  */
+    yCASEZ = 292,                  /* "casez"  */
+    yCHANDLE = 293,                /* "chandle"  */
+    yCHECKER = 294,                /* "checker"  */
+    yCLASS = 295,                  /* "class"  */
+    yCLOCK = 296,                  /* "clock"  */
+    yCLOCKING = 297,               /* "clocking"  */
+    yCONSTRAINT = 298,             /* "constraint"  */
+    yCONST__ETC = 299,             /* "const"  */
+    yCONST__LEX = 300,             /* "const-in-lex"  */
+    yCONST__LOCAL = 301,           /* "const-then-local"  */
+    yCONST__REF = 302,             /* "const-then-ref"  */
+    yCONTEXT = 303,                /* "context"  */
+    yCONTINUE = 304,               /* "continue"  */
+    yCOVER = 305,                  /* "cover"  */
+    yCOVERGROUP = 306,             /* "covergroup"  */
+    yCOVERPOINT = 307,             /* "coverpoint"  */
+    yCROSS = 308,                  /* "cross"  */
+    yDEASSIGN = 309,               /* "deassign"  */
+    yDEFAULT = 310,                /* "default"  */
+    yDEFPARAM = 311,               /* "defparam"  */
+    yDISABLE = 312,                /* "disable"  */
+    yDIST = 313,                   /* "dist"  */
+    yDO = 314,                     /* "do"  */
+    yEDGE = 315,                   /* "edge"  */
+    yELSE = 316,                   /* "else"  */
+    yEND = 317,                    /* "end"  */
+    yENDCASE = 318,                /* "endcase"  */
+    yENDCHECKER = 319,             /* "endchecker"  */
+    yENDCLASS = 320,               /* "endclass"  */
+    yENDCLOCKING = 321,            /* "endclocking"  */
+    yENDFUNCTION = 322,            /* "endfunction"  */
+    yENDGENERATE = 323,            /* "endgenerate"  */
+    yENDGROUP = 324,               /* "endgroup"  */
+    yENDINTERFACE = 325,           /* "endinterface"  */
+    yENDMODULE = 326,              /* "endmodule"  */
+    yENDPACKAGE = 327,             /* "endpackage"  */
+    yENDPROGRAM = 328,             /* "endprogram"  */
+    yENDPROPERTY = 329,            /* "endproperty"  */
+    yENDSEQUENCE = 330,            /* "endsequence"  */
+    yENDSPECIFY = 331,             /* "endspecify"  */
+    yENDTABLE = 332,               /* "endtable"  */
+    yENDTASK = 333,                /* "endtask"  */
+    yENUM = 334,                   /* "enum"  */
+    yEVENT = 335,                  /* "event"  */
+    yEVENTUALLY = 336,             /* "eventually"  */
+    yEXPECT = 337,                 /* "expect"  */
+    yEXPORT = 338,                 /* "export"  */
+    yEXTENDS = 339,                /* "extends"  */
+    yEXTERN = 340,                 /* "extern"  */
+    yFINAL = 341,                  /* "final"  */
+    yFIRST_MATCH = 342,            /* "first_match"  */
+    yFOR = 343,                    /* "for"  */
+    yFORCE = 344,                  /* "force"  */
+    yFOREACH = 345,                /* "foreach"  */
+    yFOREVER = 346,                /* "forever"  */
+    yFORK = 347,                   /* "fork"  */
+    yFORKJOIN = 348,               /* "forkjoin"  */
+    yFUNCTION__ETC = 349,          /* "function"  */
+    yFUNCTION__LEX = 350,          /* "function-in-lex"  */
+    yFUNCTION__aPUREV = 351,       /* "function-is-pure-virtual"  */
+    yGENERATE = 352,               /* "generate"  */
+    yGENVAR = 353,                 /* "genvar"  */
+    yGLOBAL__CLOCKING = 354,       /* "global-then-clocking"  */
+    yGLOBAL__LEX = 355,            /* "global-in-lex"  */
+    yIF = 356,                     /* "if"  */
+    yIFF = 357,                    /* "iff"  */
+    yIGNORE_BINS = 358,            /* "ignore_bins"  */
+    yILLEGAL_BINS = 359,           /* "illegal_bins"  */
+    yIMPLEMENTS = 360,             /* "implements"  */
+    yIMPLIES = 361,                /* "implies"  */
+    yIMPORT = 362,                 /* "import"  */
+    yINITIAL = 363,                /* "initial"  */
+    yINOUT = 364,                  /* "inout"  */
+    yINPUT = 365,                  /* "input"  */
+    yINSIDE = 366,                 /* "inside"  */
+    yINT = 367,                    /* "int"  */
+    yINTEGER = 368,                /* "integer"  */
+    yINTERCONNECT = 369,           /* "interconnect"  */
+    yINTERFACE = 370,              /* "interface"  */
+    yINTERSECT = 371,              /* "intersect"  */
+    yJOIN = 372,                   /* "join"  */
+    yLET = 373,                    /* "let"  */
+    yLOCALPARAM = 374,             /* "localparam"  */
+    yLOCAL__COLONCOLON = 375,      /* "local-then-::"  */
+    yLOCAL__ETC = 376,             /* "local"  */
+    yLOCAL__LEX = 377,             /* "local-in-lex"  */
+    yLOGIC = 378,                  /* "logic"  */
+    yLONGINT = 379,                /* "longint"  */
+    yMATCHES = 380,                /* "matches"  */
+    yMODPORT = 381,                /* "modport"  */
+    yMODULE = 382,                 /* "module"  */
+    yNAND = 383,                   /* "nand"  */
+    yNEGEDGE = 384,                /* "negedge"  */
+    yNETTYPE = 385,                /* "nettype"  */
+    yNEW__ETC = 386,               /* "new"  */
+    yNEW__LEX = 387,               /* "new-in-lex"  */
+    yNEW__PAREN = 388,             /* "new-then-paren"  */
+    yNEXTTIME = 389,               /* "nexttime"  */
+    yNOR = 390,                    /* "nor"  */
+    yNOT = 391,                    /* "not"  */
+    yNULL = 392,                   /* "null"  */
+    yOR = 393,                     /* "or"  */
+    yOUTPUT = 394,                 /* "output"  */
+    yPACKAGE = 395,                /* "package"  */
+    yPACKED = 396,                 /* "packed"  */
+    yPARAMETER = 397,              /* "parameter"  */
+    yPOSEDGE = 398,                /* "posedge"  */
+    yPRIORITY = 399,               /* "priority"  */
+    yPROGRAM = 400,                /* "program"  */
+    yPROPERTY = 401,               /* "property"  */
+    yPROTECTED = 402,              /* "protected"  */
+    yPURE = 403,                   /* "pure"  */
+    yRAND = 404,                   /* "rand"  */
+    yRANDC = 405,                  /* "randc"  */
+    yRANDCASE = 406,               /* "randcase"  */
+    yRANDSEQUENCE = 407,           /* "randsequence"  */
+    yREAL = 408,                   /* "real"  */
+    yREALTIME = 409,               /* "realtime"  */
+    yREF = 410,                    /* "ref"  */
+    yREG = 411,                    /* "reg"  */
+    yREJECT_ON = 412,              /* "reject_on"  */
+    yRELEASE = 413,                /* "release"  */
+    yREPEAT = 414,                 /* "repeat"  */
+    yRESTRICT = 415,               /* "restrict"  */
+    yRETURN = 416,                 /* "return"  */
+    ySCALARED = 417,               /* "scalared"  */
+    ySEQUENCE = 418,               /* "sequence"  */
+    ySHORTINT = 419,               /* "shortint"  */
+    ySHORTREAL = 420,              /* "shortreal"  */
+    ySIGNED = 421,                 /* "signed"  */
+    ySOFT = 422,                   /* "soft"  */
+    ySOLVE = 423,                  /* "solve"  */
+    ySPECIFY = 424,                /* "specify"  */
+    ySPECPARAM = 425,              /* "specparam"  */
+    ySTATIC__CONSTRAINT = 426,     /* "static-then-constraint"  */
+    ySTATIC__ETC = 427,            /* "static"  */
+    ySTATIC__LEX = 428,            /* "static-in-lex"  */
+    ySTRING = 429,                 /* "string"  */
+    ySTRONG = 430,                 /* "strong"  */
+    ySTRUCT = 431,                 /* "struct"  */
+    ySUPER = 432,                  /* "super"  */
+    ySUPPLY0 = 433,                /* "supply0"  */
+    ySUPPLY1 = 434,                /* "supply1"  */
+    ySYNC_ACCEPT_ON = 435,         /* "sync_accept_on"  */
+    ySYNC_REJECT_ON = 436,         /* "sync_reject_on"  */
+    yS_ALWAYS = 437,               /* "s_always"  */
+    yS_EVENTUALLY = 438,           /* "s_eventually"  */
+    yS_NEXTTIME = 439,             /* "s_nexttime"  */
+    yS_UNTIL = 440,                /* "s_until"  */
+    yS_UNTIL_WITH = 441,           /* "s_until_with"  */
+    yTABLE = 442,                  /* "table"  */
+    yTAGGED = 443,                 /* "tagged"  */
+    yTASK__ETC = 444,              /* "task"  */
+    yTASK__LEX = 445,              /* "task-in-lex"  */
+    yTASK__aPUREV = 446,           /* "task-is-pure-virtual"  */
+    yTHIS = 447,                   /* "this"  */
+    yTHROUGHOUT = 448,             /* "throughout"  */
+    yTIME = 449,                   /* "time"  */
+    yTIMEPRECISION = 450,          /* "timeprecision"  */
+    yTIMEUNIT = 451,               /* "timeunit"  */
+    yTRI = 452,                    /* "tri"  */
+    yTRI0 = 453,                   /* "tri0"  */
+    yTRI1 = 454,                   /* "tri1"  */
+    yTRIAND = 455,                 /* "triand"  */
+    yTRIOR = 456,                  /* "trior"  */
+    yTRIREG = 457,                 /* "trireg"  */
+    yTYPE = 458,                   /* "type"  */
+    yTYPEDEF = 459,                /* "typedef"  */
+    yUNION = 460,                  /* "union"  */
+    yUNIQUE = 461,                 /* "unique"  */
+    yUNIQUE0 = 462,                /* "unique0"  */
+    yUNSIGNED = 463,               /* "unsigned"  */
+    yUNTIL = 464,                  /* "until"  */
+    yUNTIL_WITH = 465,             /* "until_with"  */
+    yUNTYPED = 466,                /* "untyped"  */
+    yVAR = 467,                    /* "var"  */
+    yVECTORED = 468,               /* "vectored"  */
+    yVIRTUAL__CLASS = 469,         /* "virtual-then-class"  */
+    yVIRTUAL__ETC = 470,           /* "virtual"  */
+    yVIRTUAL__INTERFACE = 471,     /* "virtual-then-interface"  */
+    yVIRTUAL__LEX = 472,           /* "virtual-in-lex"  */
+    yVIRTUAL__anyID = 473,         /* "virtual-then-identifier"  */
+    yVOID = 474,                   /* "void"  */
+    yWAIT = 475,                   /* "wait"  */
+    yWAIT_ORDER = 476,             /* "wait_order"  */
+    yWAND = 477,                   /* "wand"  */
+    yWEAK = 478,                   /* "weak"  */
+    yWHILE = 479,                  /* "while"  */
+    yWILDCARD = 480,               /* "wildcard"  */
+    yWIRE = 481,                   /* "wire"  */
+    yWITHIN = 482,                 /* "within"  */
+    yWITH__BRA = 483,              /* "with-then-["  */
+    yWITH__CUR = 484,              /* "with-then-{"  */
+    yWITH__ETC = 485,              /* "with"  */
+    yWITH__LEX = 486,              /* "with-in-lex"  */
+    yWITH__PAREN = 487,            /* "with-then-("  */
+    yWOR = 488,                    /* "wor"  */
+    yXNOR = 489,                   /* "xnor"  */
+    yXOR = 490,                    /* "xor"  */
+    yD_ERROR = 491,                /* "$error"  */
+    yD_FATAL = 492,                /* "$fatal"  */
+    yD_INFO = 493,                 /* "$info"  */
+    yD_ROOT = 494,                 /* "$root"  */
+    yD_UNIT = 495,                 /* "$unit"  */
+    yD_WARNING = 496,              /* "$warning"  */
+    yP_TICK = 497,                 /* "'"  */
+    yP_TICKBRA = 498,              /* "'{"  */
+    yP_OROR = 499,                 /* "||"  */
+    yP_ANDAND = 500,               /* "&&"  */
+    yP_NOR = 501,                  /* "~|"  */
+    yP_XNOR = 502,                 /* "^~"  */
+    yP_NAND = 503,                 /* "~&"  */
+    yP_EQUAL = 504,                /* "=="  */
+    yP_NOTEQUAL = 505,             /* "!="  */
+    yP_CASEEQUAL = 506,            /* "==="  */
+    yP_CASENOTEQUAL = 507,         /* "!=="  */
+    yP_WILDEQUAL = 508,            /* "==?"  */
+    yP_WILDNOTEQUAL = 509,         /* "!=?"  */
+    yP_GTE = 510,                  /* ">="  */
+    yP_LTE = 511,                  /* "<="  */
+    yP_LTE__IGNORE = 512,          /* "<=-ignored"  */
+    yP_SLEFT = 513,                /* "<<"  */
+    yP_SRIGHT = 514,               /* ">>"  */
+    yP_SSRIGHT = 515,              /* ">>>"  */
+    yP_POW = 516,                  /* "**"  */
+    yP_PAR__IGNORE = 517,          /* "(-ignored"  */
+    yP_PAR__STRENGTH = 518,        /* "(-for-strength"  */
+    yP_LTMINUSGT = 519,            /* "<->"  */
+    yP_PLUSCOLON = 520,            /* "+:"  */
+    yP_MINUSCOLON = 521,           /* "-:"  */
+    yP_MINUSGT = 522,              /* "->"  */
+    yP_MINUSGTGT = 523,            /* "->>"  */
+    yP_EQGT = 524,                 /* "=>"  */
+    yP_ASTGT = 525,                /* "*>"  */
+    yP_ANDANDAND = 526,            /* "&&&"  */
+    yP_POUNDPOUND = 527,           /* "##"  */
+    yP_POUNDMINUSPD = 528,         /* "#-#"  */
+    yP_POUNDEQPD = 529,            /* "#=#"  */
+    yP_DOTSTAR = 530,              /* ".*"  */
+    yP_ATAT = 531,                 /* "@@"  */
+    yP_COLONCOLON = 532,           /* "::"  */
+    yP_COLONEQ = 533,              /* ":="  */
+    yP_COLONDIV = 534,             /* ":/"  */
+    yP_ORMINUSGT = 535,            /* "|->"  */
+    yP_OREQGT = 536,               /* "|=>"  */
+    yP_BRASTAR = 537,              /* "[*"  */
+    yP_BRAEQ = 538,                /* "[="  */
+    yP_BRAMINUSGT = 539,           /* "[->"  */
+    yP_BRAPLUSKET = 540,           /* "[+]"  */
+    yP_PLUSPLUS = 541,             /* "++"  */
+    yP_MINUSMINUS = 542,           /* "--"  */
+    yP_PLUSEQ = 543,               /* "+="  */
+    yP_MINUSEQ = 544,              /* "-="  */
+    yP_TIMESEQ = 545,              /* "*="  */
+    yP_DIVEQ = 546,                /* "/="  */
+    yP_MODEQ = 547,                /* "%="  */
+    yP_ANDEQ = 548,                /* "&="  */
+    yP_OREQ = 549,                 /* "|="  */
+    yP_XOREQ = 550,                /* "^="  */
+    yP_SLEFTEQ = 551,              /* "<<="  */
+    yP_SRIGHTEQ = 552,             /* ">>="  */
+    yP_SSRIGHTEQ = 553,            /* ">>>="  */
+    prUNARYARITH = 554,            /* prUNARYARITH  */
+    prREDUCTION = 555,             /* prREDUCTION  */
+    prNEGATION = 556,              /* prNEGATION  */
+    prEVENTBEGIN = 557,            /* prEVENTBEGIN  */
+    prTAGGED = 558,                /* prTAGGED  */
+    prSEQ_CLOCKING = 559,          /* prSEQ_CLOCKING  */
+    prPOUNDPOUND_MULTI = 560,      /* prPOUNDPOUND_MULTI  */
+    prLOWER_THAN_ELSE = 561        /* prLOWER_THAN_ELSE  */
   };
+  typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
 
 
 
+
 int VParseBisonparse (void);
+
 
 #endif /* !YY_VPARSEBISON_VPARSEBISON_PRETMP_H_INCLUDED  */

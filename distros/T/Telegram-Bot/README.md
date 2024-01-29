@@ -4,7 +4,7 @@ Telegram::Bot - A base class to make your very own Telegram bot
 
 # VERSION
 
-version 0.024
+version 0.025
 
 # SYNOPSIS
 
@@ -68,6 +68,7 @@ instructive to look at.
 
 - Justin Hawkins <justin@eatmorecode.com>
 - James Green <jkg@earth.li>
+- Julien Fiegehenn <simbabque@cpan.org>
 
 # COPYRIGHT AND LICENSE
 

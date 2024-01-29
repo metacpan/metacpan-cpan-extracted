@@ -6,7 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   JSON::MaybeXS: '1.003003'
   Test::Differences: '0'
-  Test::Exception: '0.31'
+  Test::Exception: '0.42'
   Test::More: '0.88'
   Text::ParseWords: '0'
   XML::Writer: '0.500'
@@ -41,6 +41,7 @@ requires:
   DBI: '1.54'
   Digest::SHA: '0'
   File::ShareDir: '1.0'
+  List::Util: '1.33'
   Moo: '1.000003'
   Package::Variant: '1.001001'
   Parse::RecDescent: '1.967009'
@@ -51,9 +52,9 @@ requires:
 resources:
   IRC: irc://irc.perl.org/#sql-translator
   Ratings: http://cpanratings.perl.org/d/SQL-Translator
-  bugtracker: https://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-Translator
+  bugtracker: https://github.com/dbsrgits/sql-translator/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/dbsrgits/sql-translator/
-version: '1.63'
+version: '1.65'
 x_authority: cpan:JROBINSON
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

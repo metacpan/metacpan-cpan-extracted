@@ -1,6 +1,6 @@
 package Dancer2::Core::Route;
 # ABSTRACT: Dancer2's route handler
-$Dancer2::Core::Route::VERSION = '1.0.0';
+$Dancer2::Core::Route::VERSION = '1.1.0';
 use Moo;
 use Dancer2::Core::Types;
 use Module::Runtime 'use_module';
@@ -11,6 +11,12 @@ use Ref::Util qw< is_regexpref >;
 use Type::Registry;
 
 our ( $REQUEST, $RESPONSE, $RESPONDER, $WRITER, $ERROR_HANDLER );
+
+has name => (
+    is        => 'ro',
+    isa       => Str,
+    predicate => 'has_name',
+);
 
 has method => (
     is       => 'ro',
@@ -318,7 +324,7 @@ Dancer2::Core::Route - Dancer2's route handler
 
 =head1 VERSION
 
-version 1.0.0
+version 1.1.0
 
 =head1 ATTRIBUTES
 

@@ -6,27 +6,27 @@
 use v5.26;
 use warnings;
 
-use Object::Pad 0.800;
+use Object::Pad 0.807;
 
-package App::sdview::Output::Pod 0.13;
-class App::sdview::Output::Pod
-   :does(App::sdview::Output)
-   :strict(params);
+package App::sdview::Output::Pod 0.14;
+class App::sdview::Output::Pod :strict(params);
 
-use constant format => "POD";
+apply App::sdview::Output;
+
+use constant format => "Pod";
 
 =head1 NAME
 
-C<App::sdview::Output::Pod> - generate POD output from L<App::sdview>
+C<App::sdview::Output::Pod> - generate Pod output from L<App::sdview>
 
 =head1 SYNOPSIS
 
-   $ sdview README.md -o POD > README.pod
+   $ sdview README.md -o Pod > README.pod
 
 =head1 DESCRIPTION
 
-This output module adds to L<App::sdview> the ability to output text in POD
-formatting. Given a POD file as input, the output should be relatively
+This output module adds to L<App::sdview> the ability to output text in Pod
+formatting. Given a Pod file as input, the output should be relatively
 similar, up to minor details like whitespacing. Given input in some other
 format, it will do a reasonable job attempting to represent most of the
 structure and formatting.
@@ -109,9 +109,17 @@ method _convert_str ( $s )
 {
    my $ret = "";
 
+   # Paint extra "nobreak" tags on extents separated by NBSP, but leave the
+   # NBSP itself in the string
+   while( $s =~ m/\S+(?:\xA0+\S+)+/g ) {
+      $s->apply_tag( $-[0], $+[0]-$-[0], nobreak => 1 );
+   }
+
    # TODO: This sucks for nested tags
    $s->iter_substr_nooverlap(
       sub ( $substr, %tags ) {
+         $substr =~ s/\xA0/ /g;
+
          # Escape any literal '<'s that would otherwise break
          my $pod = $substr =~ s/[A-Z]\K</E<lt>/gr;
 
@@ -137,6 +145,8 @@ method _convert_str ( $s )
          $pod = "F$open$pod$close" if $tags{file};
          $pod = "U$open$pod$close" if $tags{underline};
 
+         $pod = "S$open$pod$close" if $tags{nobreak};
+
          $ret .= $pod;
       }
    );
@@ -150,7 +160,7 @@ method _convert_str ( $s )
 
 =item *
 
-Some handling of tables. POD does not (currently?) support tables, but at
+Some handling of tables. Pod does not (currently?) support tables, but at
 least we could emit some kind of plain-text rendering of the contents.
 
 =back

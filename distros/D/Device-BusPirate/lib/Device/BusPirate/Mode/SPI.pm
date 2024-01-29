@@ -1,13 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2024 -- leonerd@leonerd.org.uk
 
-use v5.14;
-use Object::Pad 0.45;
+use v5.26;
+use warnings;
+use Object::Pad 0.800;
 
-package Device::BusPirate::Mode::SPI 0.23;
-class Device::BusPirate::Mode::SPI isa Device::BusPirate::Mode;
+package Device::BusPirate::Mode::SPI 0.24;
+class Device::BusPirate::Mode::SPI :isa(Device::BusPirate::Mode);
 
 use Carp;
 
@@ -56,18 +57,17 @@ with an SPI-attached chip.
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented with C<await> expressions L<Future> instances.
 
 =cut
 
-has $_open_drain :mutator;
-has $_cke        :mutator;
-has $_ckp        :mutator;
-has $_sample     :mutator;
-has $_cs_high;
-has $_speed;
-has $_version;
+field $_open_drain :mutator;
+field $_cke        :mutator;
+field $_ckp        :mutator;
+field $_sample     :mutator;
+field $_cs_high;
+field $_speed;
+field $_version;
 
 async method start
 {
@@ -89,7 +89,7 @@ async method start
 
 =head2 configure
 
-   $spi->configure( %args )->get
+   await $spi->configure( %args );
 
 Change configuration options. The following options exist; all of which are
 simple true/false booleans.
@@ -207,7 +207,7 @@ method configure ( %args )
 
 =head2 chip_select
 
-   $spi->chip_select( $cs )->get
+   await $spi->chip_select( $cs );
 
 Set the C<CS> output pin level. A false value will pull it to ground. A true
 value will either pull it up to 3.3V or will leave it in a hi-Z state,
@@ -226,7 +226,7 @@ method chip_select
 
 =head2 writeread
 
-   $miso_bytes = $spi->writeread( $mosi_bytes )->get
+   $miso_bytes = await $spi->writeread( $mosi_bytes );
 
 Performs an actual SPI data transfer. Writes bytes of data from C<$mosi_bytes>
 out of the C<MOSI> pin, while capturing bytes of input from the C<MISO> pin,
@@ -272,7 +272,7 @@ method writeread ( $bytes )
 
 =head2 writeread_cs
 
-   $miso_bytes = $spi->writeread_cs( $mosi_bytes )->get
+   $miso_bytes = await $spi->writeread_cs( $mosi_bytes );
 
 A convenience wrapper around C<writeread> which toggles the C<CS> pin before
 and afterwards. It uses the C<cs_high> configuration setting to determine the

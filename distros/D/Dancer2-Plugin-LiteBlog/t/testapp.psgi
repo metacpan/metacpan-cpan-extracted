@@ -33,18 +33,63 @@ use lib "$FindBin::Bin/../lib";
             { label => 'Perl', link => '/blog/perl'},
             { label => 'Contact', link => '/'},
         ],
-        widgets => [
-            {
-                name => 'splash',
+        route_widgets => {
+            '/page2' => {
+                navigation => [],
+                widgets => [
+            { 
+                name => 'blog',
                 params => {
-                    title => 'Splash Title',
-                    image => '/blog/tech/first-article/featured.jpg',
-                    baseline => 'A great and minimalist blog engine for Dancer2',
-                    cta => {
-                        label => 'Subscribe!',
-                        link => '/subscribe',
+                    title => "Page 2 Stories",
+                    mount => '/page2/blog',
+                    root => 't/articles' }
+            },
+            { 
+                name => 'activities',
+                params => { source => 'activities.yml' }
+            },
+
+            ]}
+        },
+        widgets => [
+        {   name => 'caroussel',
+                params => {
+                    slides => [
+                    {
+                        title => 'Splash Title',
+                        image => '/blog/tech/first-article/featured.jpg',
+                        baseline => 'A great and minimalist blog engine for Dancer2',
+                        cta => {
+                            label => 'Subscribe!',
+                            link => '/subscribe',
+                        }
+                    },
+                    { 
+                        title => "Some Content", 
+                        baseline => "This is a second slide with a content div",
+                        content => "Some content I write in HTML. <p>a paragraph</p>",
+                        cta => {
+                            label => 'Bouton 2',
+                            link => '/subscribe',
+                        }
+                    },
+                    { 
+                        title => "Video",
+                        youtube => "XZvN5W6C6No",
+                        cta => {
+                            label => 'Button3',
+                            link => '/subscribe',
+                        }
                     }
+                    ]
                 }
+            },
+            {
+                name => 'custom',
+                params => {
+                    root => 't/slideshow-poc',
+                    source => 'slidenatural.html',
+                },
             },
             { 
                 name => 'blog',

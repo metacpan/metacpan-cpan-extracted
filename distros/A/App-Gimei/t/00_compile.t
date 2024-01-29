@@ -1,5 +1,4 @@
-use strict;
-use v5.22;
+use v5.36;
 use Test::More;
 
 use_ok $_ for qw(

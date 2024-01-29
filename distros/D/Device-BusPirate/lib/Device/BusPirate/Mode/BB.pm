@@ -1,13 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2024 -- leonerd@leonerd.org.uk
 
-use v5.14;
-use Object::Pad 0.45;
+use v5.26;
+use warnings;
+use Object::Pad 0.800;
 
-package Device::BusPirate::Mode::BB 0.23;
-class Device::BusPirate::Mode::BB isa Device::BusPirate::Mode;
+package Device::BusPirate::Mode::BB 0.24;
+class Device::BusPirate::Mode::BB :isa(Device::BusPirate::Mode);
 
 use Carp;
 
@@ -65,10 +66,12 @@ with the five basic IO lines in bit-banging mode.
 
 =head1 METHODS
 
+The following methods documented with C<await> expressions L<Future> instances.
+
 =cut
 
-has $_dir_mask;
-has $_out_mask;
+field $_dir_mask;
+field $_out_mask;
 
 async method start
 {
@@ -81,7 +84,7 @@ async method start
 
 =head2 configure
 
-   $bb->configure( %args )->get
+   await $bb->configure( %args );
 
 Change configuration options. The following options exist; all of which are
 simple true/false booleans.
@@ -98,7 +101,7 @@ will be driven to GND in either case.
 
 =cut
 
-has $_open_drain;
+field $_open_drain;
 
 async method configure ( %args )
 {
@@ -107,7 +110,7 @@ async method configure ( %args )
 
 =head2 write
 
-   $bb->write( %pins )->get
+   await $bb->write( %pins );
 
 Sets the state of multiple output pins at the same time.
 
@@ -191,7 +194,7 @@ async method _input1 ( $mask )
 
 =head2 read
 
-   $pins = $bbio->read( @pins )->get
+   $pins = await $bbio->read( @pins );
 
 Sets given list of pins (which may be empty) to be inputs, and returns a HASH
 containing the current state of all the pins currently configured as inputs.
@@ -207,7 +210,7 @@ method read ( @pins )
 
 =head2 writeread
 
-   $in_pins = $bbio->writeread( %out_pins )->get
+   $in_pins = await $bbio->writeread( %out_pins );
 
 Combines the effects of C<write> and C<read> in a single operation; sets the
 output state of any pins in C<%out_pins> then returns the input state of the
@@ -222,7 +225,7 @@ method writeread ( %pins )
 
 =head2 power
 
-   $bb->power( $power )->get
+   await $bb->power( $power );
 
 Enable or disable the C<VREG> 5V and 3.3V power outputs.
 
@@ -239,7 +242,7 @@ async method power ( $on )
 
 =head2 pullup
 
-   $bb->pullup( $pullup )->get
+   await $bb->pullup( $pullup );
 
 Enable or disable the IO pin pullup resistors from C<Vpu>. These are connected
 to the C<MISO>, C<CLK>, C<MOSI> and C<CS> pins.
@@ -263,19 +266,20 @@ For each named pin, the following methods are defined. The pin names are
 
 =head2 I<PIN>
 
-   $bbio->PIN( $state )->get
+   await $bbio->PIN( $state );
 
 Sets the output state of the given pin.
 
 =head2 read_I<PIN>
 
-   $state = $bbio->read_PIN->get
+   $state = await $bbio->read_PIN;
 
 Sets the pin to input direction and reads its current state.
 
 =cut
 
 BEGIN {
+   use Object::Pad 0.800 ':experimental(mop)';
    my $metaclass = Object::Pad::MOP::Class->for_caller;
 
    foreach my $pin (qw( cs miso clk mosi aux )) {

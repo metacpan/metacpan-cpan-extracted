@@ -2,6 +2,7 @@ use Test::More tests => 2;
 use Test::Exception;
 
 use File::Basename qw(dirname);
+use Cwd            qw(abs_path);
 
 use strict;
 use warnings;
@@ -9,7 +10,7 @@ use warnings;
 use_ok('Net::AS2');
 
 my ($a1, $a2);
-my $cert_dir = dirname(__FILE__);
+my $cert_dir = abs_path(dirname(__FILE__) . '/certificates');
 
 subtest 'Constructor' => sub {
     lives_ok {

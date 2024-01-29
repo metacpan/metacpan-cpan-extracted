@@ -4,6 +4,7 @@ author:
   - 'Jim Avera'
 build_requires:
   Capture::Tiny: '0'
+  Carp::Always: '0'
   Cwd: '0'
   English: '0'
   Env: '0'
@@ -37,7 +38,7 @@ requires:
   Carp: '0'
   Clone: '0'
   Data::Dumper: '0'
-  Data::Dumper::Interp: '6.009'
+  Data::Dumper::Interp: '7.003'
   Devel::Symdump: '0'
   Digest::MD5: '0'
   Encode: '0'
@@ -51,7 +52,6 @@ requires:
   File::Glob: '0'
   File::Spec: '0'
   File::Spec::Functions: '0'
-  File::Temp: '0.23'
   File::Which: '0'
   Guard: '0'
   Import::Into: '0'
@@ -79,7 +79,7 @@ resources:
   bugtracker: https://github.com/jimav/Spreadsheet-Edit/issues
   homepage: https://github.com/jimav/Spreadsheet-Edit
   repository: https://github.com/jimav/Spreadsheet-Edit.git
-version: '1000.011'
+version: '1000.013'
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: CC0-1.0

@@ -5,26 +5,35 @@ use strict;
 use warnings;
 use File::Slurp;
 use String::ShellQuote;
+use base 'Ixchel::Actions::base';
 
 =head1 NAME
 
-Ixchel::Actions::suricata_ouputs :: Generate a outputs include for suricata.
+Ixchel::Actions::suricata_ouputs - Generate a outputs include for suricata.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.2.0';
 
-=head1 SYNOPSIS
+=head1 CLI SYNOPSIS
+
+ixchel -a suricata_outputs [B<-d> <base_dir>] [B<-i> <instance>]
+
+ixchel -a suricata_outputs B<-w> [B<-d> <base_dir>] [B<-i> <instance>] [B<--np>]
+
+=head1 CODE SYNOPSIS
 
     use Data::Dumper;
 
     my $results=$ixchel->action(action=>'suricata_outputs', opts=>{np=>1, w=>1, });
 
     print Dumper($results);
+
+=head1 DESCRIPTION
 
 The template used is 'suricata_outputs'.
 
@@ -101,10 +110,6 @@ If .suricata.multi_instace is set to 1, then the following is done.
 
 =head1 FLAGS
 
-=head2 --np
-
-Do not print the status of it.
-
 =head2 -w
 
 Write the generated services to service files.
@@ -112,6 +117,10 @@ Write the generated services to service files.
 =head2 -i instance
 
 A instance to operate on.
+
+=head2 -d <base_dir>
+
+Use this as the base dir instead of .suricata.config_base from the config.
 
 =head1 RESULT HASH REF
 
@@ -121,60 +130,21 @@ A instance to operate on.
 
 =cut
 
-sub new {
-	my ( $empty, %opts ) = @_;
+sub new_extra { }
 
-	my $self = {
-		config => {},
-		vars   => {},
-		arggv  => [],
-		opts   => {},
-	};
-	bless $self;
-
-	if ( defined( $opts{config} ) ) {
-		$self->{config} = $opts{config};
-	}
-
-	if ( defined( $opts{t} ) ) {
-		$self->{t} = $opts{t};
-	} else {
-		die('$opts{t} is undef');
-	}
-
-	if ( defined( $opts{share_dir} ) ) {
-		$self->{share_dir} = $opts{share_dir};
-	}
-
-	if ( defined( $opts{opts} ) ) {
-		$self->{opts} = \%{ $opts{opts} };
-	}
-
-	if ( defined( $opts{argv} ) ) {
-		$self->{argv} = $opts{argv};
-	}
-
-	if ( defined( $opts{vars} ) ) {
-		$self->{vars} = $opts{vars};
-	}
-
-	if ( defined( $opts{ixchel} ) ) {
-		$self->{ixchel} = $opts{ixchel};
-	}
-
-	return $self;
-} ## end sub new
-
-sub action {
+sub action_extra {
 	my $self = $_[0];
 
-	my $results = {
-		errors      => [],
-		status_text => '',
-		ok          => 0,
-	};
-
-	my $config_base = $self->{config}{suricata}{config_base};
+	my $config_base;
+	if ( !defined( $self->{opts}{d} ) ) {
+		$config_base = $self->{config}{suricata}{config_base};
+	} else {
+		if ( !-d $self->{opts}{d} ) {
+			$self->status_add( status => '-d, "' . $self->{opts}{d} . '" is not a directory', error => 1 );
+			return undef;
+		}
+		$config_base = $self->{opts}{d};
+	}
 
 	if ( $self->{config}{suricata}{multi_instance} ) {
 		my @instances;
@@ -215,29 +185,32 @@ sub action {
 					},
 				);
 				if ( $self->{opts}{w} ) {
-					write_file( $config_base . '/outputs-' . $instance . '.yaml', $filled_in );
+					write_file( $config_base . '/' . $instance . '-outputs.yaml', $filled_in );
 				}
 			};
 			if ($@) {
-				$results->{status_text}
-					= $results->{status_text}
-					. '-----[ Errored: '
-					. $instance
-					. ' ]-------------------------------------' . "\n" . '# '
-					. $@ . "\n";
-				$self->{ixchel}{errors_count}++;
+				$self->status_add(
+					status => '-----[ Errored: '
+						. $instance
+						. ' ]-------------------------------------' . "\n" . '# '
+						. $@ . "\n",
+					error => 1
+				);
 			} else {
-				$results->{status_text}
-					= $results->{status_text}
-					. '-----[ '
-					. $instance
-					. ' ]-------------------------------------' . "\n"
-					. $filled_in . "\n";
+				$self->status_add( status => '-----[ '
+						. $instance
+						. ' ]-------------------------------------' . "\n"
+						. $filled_in
+						. "\n" );
 			}
 		} ## end foreach my $instance (@instances)
 	} else {
 		if ( defined( $self->{opts}{i} ) ) {
-			die('-i may not be used in single instance mode');
+			$self->status_add(
+				status => '-i may not be used in single instance mode',
+				error  => 1,
+			);
+			return undef;
 		}
 
 		my $vars = {
@@ -268,35 +241,14 @@ sub action {
 			}
 		};
 		if ($@) {
-			$results->{status_text} = '# ' . $@ . "\n";
-			$self->{ixchel}{errors_count}++;
+			$self->status_add( status => $@, error => 1 );
 		} else {
-			$results->{status_text} = $filled_in;
+			$self->status_add( status => "Filled in...\n" . $filled_in );
 		}
 	} ## end else [ if ( $self->{config}{suricata}{multi_instance...})]
 
-	if ( !$self->{opts}{np} ) {
-		print $results->{status_text};
-	}
-
-	if ( !defined( $results->{errors}[0] ) ) {
-		$results->{ok} = 1;
-	}
-
-	return $results;
-} ## end sub action
-
-sub help {
-	return 'Generate a outputs include for suricata.
-
---np          Do not print the status of it.
-
--w            Write the generated services to service files.
-
--i <instance> A instance to operate on.
-
-';
-} ## end sub help
+	return undef;
+} ## end sub action_extra
 
 sub short {
 	return 'Generate a outputs include for suricata.';
@@ -304,8 +256,8 @@ sub short {
 
 sub opts_data {
 	return 'i=s
-np
 w
+d=s
 ';
 }
 

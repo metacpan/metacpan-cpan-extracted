@@ -1,6 +1,7 @@
 package Audio::Nama::EcasoundRun;
 use Role::Tiny;
-use Modern::Perl;
+use Modern::Perl '2020';
+our $VERSION = 1.0;
 use Audio::Nama::Globals qw(:all);
 use Audio::Nama::Log qw(logpkg logsub);
 sub start { 
@@ -78,7 +79,7 @@ sub start_command { $_[0]->ecasound_iam('start') }
 ### routines defined in the root namespace
 
 package Audio::Nama;
-use Modern::Perl; use Carp;
+use Modern::Perl '2020'; use Carp;
 no warnings 'uninitialized';
 use Audio::Nama::Util qw(process_is_running);
 
@@ -210,7 +211,8 @@ sub restart_ecasound {
 	kill_my_ecasound_processes();
 	pager_newline(q(restarting Ecasound engine - your may need to use the "arm" command));	
 	initialize_ecasound_engine();
-	reconfigure_engine('force');
+	request_setup();
+	reconfigure_engine();
 }
 sub kill_my_ecasound_processes {
 	my @signals = (15, 9);

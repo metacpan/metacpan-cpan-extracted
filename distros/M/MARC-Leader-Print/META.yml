@@ -33,4 +33,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/MARC-Leader-Print
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/MARC-Leader-Print
-version: '0.03'
+version: '0.04'

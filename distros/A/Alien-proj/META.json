@@ -4,7 +4,7 @@
       "Shawn Laffan <shawnlaffan@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -26,11 +26,11 @@
             "Alien::Build::MM" : "1.74",
             "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
             "Alien::Build::Plugin::PkgConfig::PPWrapper" : "0",
-            "Alien::MSYS" : "0.07",
             "Alien::cmake3" : "0.02",
             "Alien::libtiff" : "0",
             "Alien::sqlite" : "1.06",
             "Archive::Tar" : "0",
+            "Config" : "0",
             "Env::ShellWords" : "0.01",
             "ExtUtils::MakeMaker" : "6.52",
             "FFI::CheckLib" : "0.28",
@@ -59,12 +59,9 @@
             "Alien::Build" : "2.48",
             "Alien::Build::MM" : "1.74",
             "Alien::Build::Plugin::Build::CMake" : "0.99",
-            "Alien::Build::Plugin::Build::Make" : "0.99",
             "Alien::Build::Plugin::Build::SearchDep" : "0.53",
             "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
             "Alien::Build::Plugin::PkgConfig::PPWrapper" : "0",
-            "Alien::Build::Plugin::Prefer::BadVersion" : "1.05",
-            "Alien::MSYS" : "0",
             "Alien::sqlite" : "1.06",
             "ExtUtils::MakeMaker" : "6.52",
             "File::Find::Rule" : "0",
@@ -103,16 +100,16 @@
          "url" : "https://github.com/shawnlaffan/perl-alien-proj"
       }
    },
-   "version" : "1.26",
+   "version" : "1.27",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 2.80",
+      "generated_by" : "Alien::Build::MM version 2.73",
       "requires" : {
          "share" : {
-            "Alien::MSYS" : "0.07",
             "Alien::cmake3" : "0.02",
             "Alien::libtiff" : "0",
             "Alien::sqlite" : "0",
             "Archive::Tar" : "0",
+            "Config" : "0",
             "Env::ShellWords" : "0.01",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
@@ -127,5 +124,5 @@
          "system" : {}
       }
    },
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -98,6 +98,21 @@ EOMARKDOWN
    ok( $p[4]->text->get_tag_at( 0, "strikethrough" ), 'strikethrough tag' );
 };
 
+subtest "HTML entities get decoded" => sub {
+   my @p = App::sdview::Parser::Markdown->new->parse_string( <<"EOMARKDOWN" );
+Some content with non-breaking&nbsp;spaces in it.
+
+Text &ndash; with HTML entities
+EOMARKDOWN
+
+   is( scalar @p, 2, 'Received 2 paragraphs' );
+
+   is( $p[0]->type, "plain", 'p[0] type' );
+   is( $p[0]->text, "Some content with non-breaking\xA0spaces in it.", 'p[0] text' );
+
+   is( $p[1]->text, "Text \x{2013} with HTML entities", 'p[1] text' );
+};
+
 subtest "Verbatim language" => sub {
    my @p = App::sdview::Parser::Markdown->new->parse_string( <<"EOPOD" );
 # EXAMPLE

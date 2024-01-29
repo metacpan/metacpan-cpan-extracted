@@ -1,3 +1,11 @@
+0.049   2023-10-26  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc][ux] Give some warning when using a schema with default
+          value for destructive actions.
+
+
 0.048   2023-01-19  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] For completion convenience, allow ',' in addition to '=' for

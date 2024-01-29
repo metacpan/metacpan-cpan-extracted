@@ -1,5 +1,5 @@
 package Crypt::HSM::Session;
-$Crypt::HSM::Session::VERSION = '0.015';
+$Crypt::HSM::Session::VERSION = '0.016';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Session - A PKCS11 session
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

@@ -62,7 +62,7 @@ use autouse 'Data::Dumper' => 'Dumper';
 use Carp qw(carp);
 use Text::ParseWords qw( quotewords );
 
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 
 my $Debug = $ENV{DEBUG} || 0;
 
@@ -344,11 +344,11 @@ The source is in GitHub:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>.
+brian d foy, C<< <briandfoy@pobox.com> >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,5 +1,8 @@
 Changes file for Log::Log4perl::Layout::JSON
 
+0.61  2024-01-22
+  - Redo release to update links in README.md
+
 0.60  2023-05-16
   - Fix attempted use of non-hash references as hash references when using
     complex fields [github #10]

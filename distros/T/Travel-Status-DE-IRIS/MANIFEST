@@ -23,7 +23,6 @@ share/json2json
 share/meta.json
 share/old_stations.json
 share/renamed.json
-share/stations.csv
 share/stations.json
 share/xml2json
 share/xml2meta

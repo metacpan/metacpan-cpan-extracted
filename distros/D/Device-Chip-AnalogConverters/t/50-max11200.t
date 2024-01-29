@@ -19,7 +19,7 @@ await $chip->mount(
 # ->read_status
 {
    $adapter->expect_readwrite( "\xC1\x00" )
-      ->returns( "\x00\x00" ); # STAT default value
+      ->will_done( "\x00\x00" ); # STAT default value
 
    is( { await $chip->read_status },
       {
@@ -39,9 +39,9 @@ await $chip->mount(
 # ->read_config
 {
    $adapter->expect_readwrite( "\xC3\x00" )
-      ->returns( "\x00\x02" ); # CTRL1 default value
+      ->will_done( "\x00\x02" ); # CTRL1 default value
    $adapter->expect_readwrite( "\xC7\x00" )
-      ->returns( "\x00\x1e" ); # CTRL3 default value
+      ->will_done( "\x00\x1e" ); # CTRL3 default value
 
    is( await $chip->read_config,
       {
@@ -80,7 +80,7 @@ await $chip->mount(
 {
    $adapter->expect_write( "\x87" ); # trigger
    $adapter->expect_readwrite( "\xC9\x00\x00\x00" )
-      ->returns( "\x00\x12\x34\x56" );
+      ->will_done( "\x00\x12\x34\x56" );
 
    await $chip->trigger;  # defaults to 120s/sec
    is( await $chip->read_adc, 0x123456,
@@ -93,7 +93,7 @@ await $chip->mount(
 {
    $adapter->expect_write( "\x85" ); # trigger at 30s/sec
    $adapter->expect_readwrite( "\xC9\x00\x00\x00" )
-      ->returns( "\x00\x12\x34\x60" );
+      ->will_done( "\x00\x12\x34\x60" );
 
    $chip->default_trigger_rate = 30;
    await $chip->trigger;  # defaults to 120s/sec
@@ -106,7 +106,7 @@ await $chip->mount(
 # ->read_adc_ratio
 {
    $adapter->expect_readwrite( "\xC9\x00\x00\x00" )
-      ->returns( "\x00\x20\x00\x00" );
+      ->will_done( "\x00\x20\x00\x00" );
 
    is( await $chip->read_adc_ratio, 0.25,
       '$chip->read_adc_ratio returns result' );
@@ -118,7 +118,7 @@ await $chip->mount(
 {
    $adapter->expect_write( "\xC4\x31" ); # CTRL2
    $adapter->expect_readwrite( "\xC5\x00" )
-      ->returns( "\x00\x39" );
+      ->will_done( "\x00\x39" );
 
    await $chip->write_gpios( 0x1, 0x3 );
    is( await $chip->read_gpios, 0x9,
@@ -131,7 +131,7 @@ await $chip->mount(
 {
    $adapter->expect_write( "\x90" );
    $adapter->expect_readwrite( "\xCF\x00\x00\x00" )
-      ->returns( "\x00\x00\x01\x23" );
+      ->will_done( "\x00\x00\x01\x23" );
 
    await $chip->selfcal;
    is( await $chip->read_selfcal_offset, 0x123,
@@ -147,9 +147,9 @@ await $chip->mount(
 # concurrent read and GPIO
 {
    $adapter->expect_readwrite( "\xC9\x00\x00\x00" )
-      ->returns( "\x00\x12\x34\x56" );
+      ->will_done( "\x00\x12\x34\x56" );
    $adapter->expect_readwrite( "\xC5\x00" )
-      ->returns( "\x00\x39" );
+      ->will_done( "\x00\x39" );
 
    is(
       [ await Future->needs_all( $chip->read_adc, $chip->read_gpios ) ],
@@ -179,7 +179,7 @@ await $chip->mount(
 
 
    $adapter->expect_readwrite( "\xC5\x00" )
-      ->returns( "\x00\x33" );
+      ->will_done( "\x00\x33" );
 
    is( await $gpioproto->read_gpios( [ 'GPIO3' ] ),
       { GPIO3 => 0 },

@@ -3,7 +3,8 @@
 package Audio::Nama::ChainSetup;
 use Audio::Nama::Globals qw($file $config $jack $setup %tn %bn %en $mode :trackrw $this_engine);
 use Audio::Nama::Log qw(logsub logpkg);
-use Modern::Perl;
+use Modern::Perl '2020';
+our $VERSION = 1.0;
 use Data::Dumper::Concise;
 use Storable qw(dclone);
 use Audio::Nama::Util qw(signal_format input_node output_node);
@@ -45,7 +46,7 @@ our (
 
 
 sub remove_temporary_tracks {
-	logsub("&remove_temporary_tracks");
+	logsub((caller(0))[3]);
 	map { logpkg(__FILE__,__LINE__,'debug',"removing temporary track ",$_->group.'/'.$_->name); $_->remove  } 
 		grep{ $_->group eq 'Temp' } Audio::Nama::audio_tracks();
 }
@@ -63,25 +64,12 @@ sub initialize {
 	Audio::Nama::disable_length_timer();
 	reset_aux_chain_counter();
 	unlink $file->chain_setup;
-	delete $this_engine->{valid_setup};
 	$g;
 }
 sub ecasound_chain_setup { $chain_setup } 
 sub is_ecasound_chain { $is_ecasound_chain{$_[0]} }
 
-sub engine_tracks { # tracks that belong to current chain setup
-     map{$Audio::Nama::ti{$_}} grep{$Audio::Nama::ti{$_}} keys %is_ecasound_chain;
-}
-sub is_engine_track { 
-		# takes Track object, name or index
-		# returns object if corresponding track belongs to current chain setup
-	my $t = shift;
-	my $n;
-	if( (ref $t) =~ /Track/){ $n = $t->n     }
-	if( $t =~ ! /\D/ )      { $n = $t        }
-	if( $t =~ /\D/ and $tn{$_} ){ $n = $Audio::Nama::tn{$t}->n}
-	$Audio::Nama::ti{$n} if $is_ecasound_chain{$n}
-}
+sub engine_tracks { Audio::Nama::audio_tracks() } 
 sub engine_wav_out_tracks {
 	grep{$_->rec} engine_tracks();
 }
@@ -96,10 +84,21 @@ sub show_io {
 	Audio::Nama::pager( $output );
 }
 
+sub warn_missing_jack_clients {
+	for my $track (Audio::Nama::audio_tracks()){
+		$track->send_type =~ /jack_client/ and not $jack->{clients}->{$track->send_id}
+		 	and Audio::Nama::throw("Track ".$track->name. qq(: JACK client ").$track->send_id.qq(" not found. Skipping aux send));
+		$track->source_type eq 'jack_client' and not $jack->{clients}->{$track->source_id}
+			and Audio::Nama::throw("Track ".$track->name. qq(: JACK client ").$track->source_id.qq(" not found. Skipping source connection));
+	}
+}
+
 sub generate_setup_try {
-	logsub("&generate_setup_try");
+	logsub((caller(0))[3]);
 
 	my $extra_setup_code = shift;
+
+	warn_missing_jack_clients();
 
 	# start with bus routing
 	
@@ -118,8 +117,6 @@ sub generate_setup_try {
 	add_paths_for_mixdown_handling();
 	logpkg(__FILE__,__LINE__,'debug',"Graph with mixdown mods:\n$g");
 	
-	# run extra setup
-	
 	$extra_setup_code->($g) if $extra_setup_code;
 
 	prune_graph();
@@ -129,7 +126,6 @@ sub generate_setup_try {
 
 	logpkg(__FILE__,__LINE__,'debug',"Graph after adding loop devices:\n$g");
 
-	# insert handling
 	Audio::Nama::Graph::add_inserts($g);
 
 	logpkg(__FILE__,__LINE__,'debug',"Graph with inserts:\n$g");
@@ -161,18 +157,17 @@ sub add_paths_for_aux_sends { # not including Main
 	# we could add this to the Audio::Nama::Bus base class
 	# then suppress it in Mixdown and Main groups
 
-	logsub("&add_paths_for_aux_sends");
+	logsub((caller(0))[3]);
 
 	map {  Audio::Nama::Graph::add_path_for_aux_send($g, $_ ) } 
-	grep { (ref $_) !~ /Slave/ 
-			and $_->group !~ /Mixdown|Null/
+	grep {  $_->group !~ /Mixdown|Null/
 			and $_->send_type 
 			and $_->rec_status ne OFF } Audio::Nama::audio_tracks();
 }
 
 
 sub add_paths_from_Main {
-	logsub("&add_paths_from_Main");
+	logsub((caller(0))[3]);
 
 	if ($mode->mastering){
 		$g->add_path(qw[Main Eq Low Boost]);
@@ -189,7 +184,7 @@ sub add_paths_from_Main {
 
 }
 sub add_paths_for_mixdown_handling {
-	logsub("&add_paths_for_mixdown_handling");
+	logsub((caller(0))[3]);
 	my $final_leg_origin = $mode->mastering ? 'Boost' : 'Main';
 
 	if ($tn{Mixdown}->rw eq REC ){
@@ -217,7 +212,7 @@ sub add_paths_for_mixdown_handling {
 	}
 }
 sub prune_graph {
-	logsub("&prune_graph");
+	logsub((caller(0))[3]);
 	Audio::Nama::Graph::simplify_send_routing($g);
 	logpkg(__FILE__,__LINE__,'debug',"Graph after simplify_send_routing:\n$g");
 	Audio::Nama::Graph::remove_out_of_bounds_tracks($g) if Audio::Nama::edit_mode();
@@ -230,7 +225,7 @@ sub prune_graph {
 # object based dispatch from routing graph
 	
 sub process_routing_graph {
-	logsub("&process_routing_graph");
+	logsub((caller(0))[3]);
 
 	# generate a set of IO objects from edges
 	@io = map{ dispatch($_) } $g->edges;
@@ -402,7 +397,7 @@ sub override {
 	# data from edges has priority over data from vertexes
 	# we specify $name, because it could be left or right 
 	# vertex
-	logsub("&override");
+	logsub((caller(0))[3]);
 	my ($name, $edge) = @_;
 	(override_from_vertex($name), override_from_edge($edge))
 }
@@ -422,7 +417,7 @@ sub override_from_edge {
 							
 sub write_chains {
 
-	logsub("&write_chains");
+	logsub((caller(0))[3]);
 
 	## write general options
 	
@@ -478,8 +473,11 @@ sub setup_requires_realtime {
 sub has_vertex { $g->has_vertex($_[0]) }
 
 1;
+__END__
 
 =head1 NAME
+
+=encoding UTF-8
 
 Audio::Nama::ChainSetup - routines for generating Ecasound chain setup
 

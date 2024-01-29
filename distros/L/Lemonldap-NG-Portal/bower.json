@@ -7,7 +7,6 @@
   "private": true,
   "dependencies": {
     "bootstrap": "4.x",
-    "crypto-js": "x",
     "fingerprintjs2": "x",
     "font-awesome": "4.x",
     "jquery": "3.x",

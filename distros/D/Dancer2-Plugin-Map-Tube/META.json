@@ -1,16 +1,16 @@
 {
    "abstract" : "Dancer2 add-on for Map::Tube.",
    "author" : [
-      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+      "Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dancer2-Plugin-Map-Tube",
    "no_index" : {
@@ -46,15 +46,15 @@
    "provides" : {
       "Dancer2::Plugin::Map::Tube" : {
          "file" : "lib/Dancer2/Plugin/Map/Tube.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Dancer2::Plugin::Map::Tube::API" : {
          "file" : "lib/Dancer2/Plugin/Map/Tube/API.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Dancer2::Plugin::Map::Tube::Error" : {
          "file" : "lib/Dancer2/Plugin/Map/Tube/Error.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -65,6 +65,6 @@
          "web" : "https://github.com/manwar/Dancer2-Plugin-Map-Tube"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

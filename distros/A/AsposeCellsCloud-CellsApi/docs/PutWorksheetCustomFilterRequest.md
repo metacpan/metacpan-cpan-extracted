@@ -17,10 +17,10 @@ Name | Type | Description | Notes
 **is_and** | **boolean** | true/false |
 **operator_type2** | **string** |  |
 **criteria2** | **string** | The custom criteria. |
-**match_blanks** | **boolean** | Match all blank or  not blank cell in the list.(true/false) |
-**refresh** | **boolean** | If true, hide the filtered rows. |
-**folder** | **string** | Original workbook folder. |
-**storage_name** | **string** | Storage name. |  
+**match_blanks** | **boolean** | Match all blank cell in the list. |
+**refresh** | **boolean** | Refresh auto filters to hide or unhide the rows. |
+**folder** | **string** | The folder where the file is situated. |
+**storage_name** | **string** | The storage name where the file is situated. |  
 
 [[Back to Model list]](../README.md#documentation-for-requests) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -1,6 +1,6 @@
 package Dancer2::CLI::Gen;
 # ABSTRACT: Create new Dancer2 application
-$Dancer2::CLI::Gen::VERSION = '1.0.0';
+$Dancer2::CLI::Gen::VERSION = '1.1.0';
 use Moo;
 use URI;
 use HTTP::Tiny;
@@ -461,7 +461,7 @@ Dancer2::CLI::Gen - Create new Dancer2 application
 
 =head1 VERSION
 
-version 1.0.0
+version 1.1.0
 
 =head1 AUTHOR
 

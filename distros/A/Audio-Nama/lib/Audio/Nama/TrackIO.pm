@@ -1,6 +1,7 @@
 package Audio::Nama::TrackIO;
 use Role::Tiny;
-use Modern::Perl;
+use Modern::Perl '2020';
+our $VERSION = 1.0;
 use Audio::Nama::Globals qw(:all);
 use File::Slurp qw(write_file);
 use File::Copy;
@@ -12,20 +13,24 @@ sub is_used {
 	my $bus = $track->bus;  # 
 	$track->send_type       # It's sending its own signal
 	or $track->{rw} eq REC  # It's recording its own signal
-	or $track->wantme       # Another track needs my signal
+	or $track->used_by_another_track
 	or ($bus and $bus->can('wantme') and $bus->wantme)  # A bus needs my signal
 }
 sub rec_status {
-#	logsub("&rec_status");
+#	logsub((caller(0))[3]);
 	my $track = shift;
 	my $bus = $track->bus;
 
 	return OFF if 0 # 	! ($track->engine_group eq $Audio::Nama::this_engine->name)
+				or  $track->{rw} eq OFF
 				or 	! $track->is_used
 				and ! ($mode->doodle and ! $mode->eager and $setup->{tracks_with_duplicate_inputs}->{$track->name} ); 
-
-	return $track->{rw} if $track->{rw} ne PLAY;
-
+	if ($track->{rw} ne PLAY) # e.g. MON or REC
+	{
+		return OFF if $track->source_type eq 'jack_client' 
+					and not $jack->{clients}->{$track->{source_id}};
+		return $track->{rw}
+	}
 	my $v = $track->playback_version;
 
 	{
@@ -34,7 +39,7 @@ sub rec_status {
 	}
 
 	no warnings 'uninitialized';
-	return maybe_playback($track, $v) if $track->{rw} eq PLAY;
+	return maybe_playback($track, $v);
 
 }
 sub maybe_playback { # ordinary sub, not object method
@@ -227,9 +232,9 @@ sub output_object_text {   # text for user display
 sub source_status {
 	my $track = shift;
 	no warnings 'uninitialized';
-	return $track->current_wav if $track->play;
+	return $track->current_wav if $track->rw eq PLAY and scalar $track->versions->@*; # files to play
 	my $bus = $bn{$track->source_id}; 
-	return join " ", $bus->name, $bus->display_type if $track->source_type eq 'bus';
+	return join " ", $bus->name, $bus->display_type if $track->source_type eq 'bus' and defined $bus; 
 	return "track ".$track->source_id  if $track->source_type eq 'track';
 	return 'jack client '.$track->source_id if $track->source_type eq 'jack_client';
 	if($track->source_type eq 'soundcard')
@@ -279,7 +284,7 @@ sub set_rec {
 }
 sub rw_set {
 	my $track = shift;
-	logsub("&rw_set");
+	logsub((caller(0))[3]);
 	my ($bus, $rw) = @_;
 	$track->set_rec, return if $rw eq REC;
 	$track->set_rw($rw);
@@ -317,7 +322,7 @@ sub import_audio  {
 		return;
 	}
 	my ($depth,$width,$freq) = split ',', Audio::Nama::wav_format($path);
-	Audio::Nama::pager_newline("format: ", Audio::Nama::wav_format($path));
+	Audio::Nama::pager_newline("format: ". Audio::Nama::wav_format($path));
 	$frequency ||= $freq;
 	if ( ! $frequency ){
 		Audio::Nama::throw("Cannot detect sample rate of $path. Skipping.",
@@ -341,7 +346,7 @@ sub import_audio  {
 		Audio::Nama::sleeper(0.2); 
 		sleep 1 while $this_engine->running();
 	} 
-	Audio::Nama::restart_wav_memoize() if $config->{opts}->{R}; # usually handled by reconfigure_engine() 
+	Audio::Nama::refresh_wav_cache() if $config->{opts}->{R}; # usually handled by reconfigure_engine() 
 }
 
 sub port_name { $_[0]->target || $_[0]->name } 
@@ -350,14 +355,14 @@ sub jack_manual_port {
 	$track->port_name . ($direction =~ /source|input/ ? '_in' : '_out');
 }
 
-sub wantme {
+sub used_by_another_track {
 	my $track = shift;
 	no warnings 'uninitialized';
-	my @wantme = grep{ $_->name ne $track->name
+	my @used =    grep{ $_->name ne $track->name
 						and $_->source_type eq 'track'
 						and $_->source_id eq $track->name 
 						and ($_->rec or $_->mon) } Audio::Nama::all_tracks();
-@wantme
+@used
 }
 1;
 	

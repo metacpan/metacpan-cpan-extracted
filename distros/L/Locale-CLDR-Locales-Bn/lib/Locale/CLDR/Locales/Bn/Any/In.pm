@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Bn::Any::In - Package for language Bangla
 
 package Locale::CLDR::Locales::Bn::Any::In;
 # This file auto generated from Data\common\main\bn_IN.xml
-#	on Tue  5 Dec  1:02:38 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ksh' => 'কোলোনিয়ান',
@@ -46,7 +46,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'CD@alt=variant' => 'কঙ্গো (DRC)',
  			'UM' => 'মার্কিন যুক্তরাষ্ট্রের পার্শ্ববর্তী দ্বীপপুঞ্জ',

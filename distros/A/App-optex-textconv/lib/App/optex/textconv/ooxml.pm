@@ -1,6 +1,6 @@
 package App::optex::textconv::ooxml;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use strict;
 use warnings;

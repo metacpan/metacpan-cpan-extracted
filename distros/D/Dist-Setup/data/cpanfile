@@ -1,0 +1,5 @@
+requires 'perl', '5.26.0';
+
+on 'configure' => sub {
+  requires 'ExtUtils::MakeMaker::CPANfile', '0.0.9';
+};

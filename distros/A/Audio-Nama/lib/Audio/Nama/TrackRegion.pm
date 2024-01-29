@@ -1,7 +1,7 @@
 {
 package Audio::Nama::TrackRegion;
 use Role::Tiny;
-use Modern::Perl;
+use Modern::Perl '2020';
 use Audio::Nama::Globals qw(:all);
 use Carp;
 
@@ -13,7 +13,7 @@ sub region_start_time {
 	my $track = shift;
 	return unless $track->is_region;
 	#return if $track->rec_status ne PLAY;
-	carp $track->name, ": expected PLAY status" if $track->rec_status ne PLAY;
+	#carp $track->name, ": expected PLAY status" if $track->rec_status ne PLAY;
 	Audio::Nama::Mark::time_from_tag( $track->region_start )
 }
 sub region_end_time {
@@ -30,7 +30,7 @@ sub region_end_time {
 }
 sub playat_time {
 	my $track = shift;
-	carp $track->name, ": expected PLAY status" if $track->rec_status ne PLAY;
+	#carp $track->name, ": expected PLAY status" if $track->rec_status ne PLAY;
 	#return if $track->rec_status ne PLAY;
 	Audio::Nama::Mark::time_from_tag( $track->playat )
 }

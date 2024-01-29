@@ -1,5 +1,8 @@
 Revision history for Perl module Bundle::BDFOY
 
+20240116 2024-01-16T16:22:44Z
+	* Update for 2024
+
 20210113 2021-01-14T07:22:40Z
 	* Try a bit harder to get PAUSE to index this.
 

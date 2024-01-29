@@ -2,7 +2,7 @@
 #
 #  (C) Paul Evans, 2012-2023 -- leonerd@leonerd.org.uk
 
-package Circle::FE::Term::Tab 0.232470;
+package Circle::FE::Term::Tab 0.240250;
 
 use v5.26;
 use warnings;
@@ -17,8 +17,10 @@ use Circle::FE::Term;
 
 use Module::Pluggable search_path => "Circle::FE::Term::Widget",
                       sub_name => "widgets",
-                      require => 1,
                       inner => 0;
+
+# Load each widget class here to ensure compiletime failures are visible early
+require "$_.pm" =~ s(::)(/)gr for widgets;
 
 use Tickit::Widget::Static;
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 22023;
+use Test::More tests => 27369;
 
 ###############################################################################
 # Read and load configuration file and backend library.
@@ -52,18 +52,32 @@ my @data;
 # Small numbers.
 
 for (my $x = 0; $x <= 1000 ; ++ $x) {
-    for (my $y = 0; $y <= 10 ; ++ $y) {
+    for (my $b = 0; $b <= 10 ; ++ $b) {
 
-        if ($x == 0 || $y <= 1) {
-            push @data, [ $x, $y, undef, undef ];
+        if ($x == 0 || $b <= 1) {
+            push @data, [ $x, $b, undef, undef ];
             next;
         }
 
-        my $z = int(log($x) / log($y));
-        $z++ while $y ** $z < $x;
-        $z-- while $y ** $z > $x;
-        my $status = $y ** $z == $x ? 1 : 0;
-        push @data, [ $x, $y, $z, $status ];
+        my $y = int(log($x) / log($b));
+        $y++ while $b ** $y < $x;
+        $y-- while $b ** $y > $x;
+        my $status = $b ** $y == $x ? 1 : 0;
+        push @data, [ $x, $b, $y, $status ];
+    }
+}
+
+# Larger numbers.
+
+for (my $b = 2 ; $b <= 100 ; $b++) {
+    my $bobj = $LIB -> _new($b);
+    for (my $y = 2 ; $y <= 10 ; $y++) {
+        my $x    = $LIB -> _pow($LIB -> _copy($bobj), $LIB -> _new($y));
+        my $x_up = $LIB -> _inc($LIB -> _copy($x));
+        my $x_dn = $LIB -> _dec($LIB -> _copy($x));
+        push @data, [ $LIB -> _str($x),    $b, $y,     1 ];
+        push @data, [ $LIB -> _str($x_up), $b, $y,     0 ];
+        push @data, [ $LIB -> _str($x_dn), $b, $y - 1, 0 ];
     }
 }
 

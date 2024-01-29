@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright (c) 2008-2023 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2024 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -11,6 +11,10 @@ my $url = 'https://raw.githubusercontent.com/unicode-org/cldr/main/common/supple
 my $new = 'windowsZones.xml';
 require "./data.alias.pl";
 
+use lib "../lib";
+use Date::Manip::Zones;
+
+# %Date::Manip::Zones::Alias
 ############################################################################
 # MAIN PROGRAM
 ############################################################################
@@ -92,6 +96,11 @@ sub _parse {
    foreach my $line (@lines) {
       if ($line =~ /<mapZone\s+other="(.*?)".*type="(.*?)"/) {
          my($alias,$zone) = ($1,$2);
+
+         if (exists $Date::Manip::Zones::Alias{ lc($zone) }) {
+            $zone = $Date::Manip::Zones::Alias{ lc($zone) };
+            $zone = $Date::Manip::Zones::ZoneNames{$zone};
+         }
          next  if (exists $ret{$alias});
          $ret{$alias} = $zone;
       }
@@ -99,52 +108,6 @@ sub _parse {
 
    return %ret;
 }
-
-# # It's a file of TAB separated lines:
-# #
-# #    ALIAS \t DISPLAY_NAME
-# #
-# # where ALIAS is the windows time zone name and DISPLAY_NAME is how
-# # it is displayed on windows.
-# #
-# sub _parse {
-#    my($file) = @_;
-#    my %ret;
-
-#    my @lines = `cat $file`;
-#    chomp(@lines);
-
-#    foreach my $line (@lines) {
-#       $line           =~ /^(.*?)\t(.*)$/;
-#       my($alias,$val) = ($1,$2);
-#       $ret{$alias}    = $val;
-#    }
-
-#    return %ret;
-# }
-
-# For CLDR 2.0
-# sub _parse {
-#    my($file) = @_;
-#    my %ret;
-
-#    my @lines = `cat $file`;
-#    chomp(@lines);
-
-#    my $n = 0;
-#    foreach my $line (@lines) {
-#       $n++;
-
-#       if ($line =~ /^\s*(.*?)\s+any\s+(.*?)\s*$/) {
-#          $ret{$1} = $2;
-#       } else {
-#          warn "ERROR: invalid line: $file[$n]\n" .
-#               "       $line\n";
-#       }
-#    }
-
-#    return %ret;
-# }
 
 # Local Variables:
 # mode: cperl

@@ -6,11 +6,12 @@ use warnings;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-19'; # DATE
+our $DATE = '2024-01-10'; # DATE
 our $DIST = 'String-Util-Match'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our @EXPORT_OK = qw(
+                       match_string
                        match_array_or_regex
                        num_occurs
                );
@@ -23,6 +24,68 @@ $SPEC{':package'} = {
 };
 
 my $_str_or_re = ['any*'=>{of=>['re*','str*']}];
+
+$SPEC{match_string} = {
+    v => 1.1,
+    summary => 'Match a string (with one of several choices)',
+    args => {
+        ignore_case => {
+            schema => 'bool*',
+            description => <<'MARKDOWN',
+
+Only relevant for string vs string matching.
+
+MARKDOWN
+        },
+        str => {
+            summary => 'String to match against',
+            schema => 'str*',
+            req => 1,
+        },
+        matcher => {
+            summary => 'Matcher',
+            #schema => 'matcher::str*',
+            schema => ['any*', of=> [
+                'str*',
+                'aos*',
+                'obj::re*',
+                'code*',
+            ]],
+        },
+    },
+    #args_as => 'array',
+    result_naked => 1,
+};
+sub match_string {
+    my %args = @_;
+
+    my $str = $args{str};
+    return 0 unless defined $str;
+
+    my $matcher = $args{matcher};
+    my $ref = ref $matcher;
+    if (!$ref) {
+        return $args{ignore_case} ? lc($str) eq lc($matcher) : $str eq $matcher;
+    } elsif ($ref eq 'ARRAY') {
+        if ($args{ignore_case}) {
+            my $lc = lc $str;
+            for (@$matcher) {
+                return 1 if $lc eq lc($_);
+            }
+        } else {
+            for (@$matcher) {
+                return 1 if $str eq $_;
+            }
+        }
+        return 0;
+    } elsif ($ref eq 'Regexp') {
+        return $str =~ $matcher;
+    } elsif ($ref eq 'CODE') {
+        return $matcher->($str) ? 1:0;
+    } else {
+        die "Matcher must be string/array/Regexp/code (got $ref)";
+    }
+}
 
 $SPEC{match_array_or_regex} = {
     v => 1.1,
@@ -142,7 +205,7 @@ String::Util::Match - String utilities related to matching
 
 =head1 VERSION
 
-This document describes version 0.003 of String::Util::Match (from Perl distribution String-Util-Match), released on 2023-06-19.
+This document describes version 0.004 of String::Util::Match (from Perl distribution String-Util-Match), released on 2024-01-10.
 
 =head1 SYNOPSIS
 
@@ -224,6 +287,39 @@ Return value:  (any)
 
 
 
+=head2 match_string
+
+Usage:
+
+ match_string(%args) -> any
+
+Match a string (with one of several choices).
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<ignore_case> => I<bool>
+
+Only relevant for string vs string matching.
+
+=item * B<matcher> => I<str|aos|obj::re|code>
+
+Matcher.
+
+=item * B<str>* => I<str>
+
+String to match against.
+
+
+=back
+
+Return value:  (any)
+
+
+
 =head2 num_occurs
 
 Usage:
@@ -283,7 +379,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2017 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

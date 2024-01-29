@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie qw(:file :filesys);
 
-our $VERSION = '1.0'; # VERSION
+our $VERSION = '1.0001'; # VERSION
 
 =head1 NAME
 

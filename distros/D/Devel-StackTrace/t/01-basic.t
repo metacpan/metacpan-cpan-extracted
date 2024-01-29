@@ -399,6 +399,15 @@ SKIP:
     );
 }
 
+{
+    my $trace = Devel::StackTrace->new;
+    my $ok    = 0;
+    if ($trace) {
+        $ok = 1;
+    }
+    ok( $ok, 'trace overloads bool as true' );
+}
+
 done_testing();
 
 # This means I can move these lines down without constantly fiddling

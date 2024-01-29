@@ -9,7 +9,7 @@ use utf8;
 
 use Object::Pad 0.800;
 
-package App::sdview 0.13;
+package App::sdview 0.14;
 class App::sdview :strict(params);
 
 use App::sdview::Style;
@@ -18,7 +18,7 @@ use List::Keywords qw( first );
 
 =head1 NAME
 
-C<App::sdview> - a terminal document viewer for POD and other syntaxes
+C<App::sdview> - a terminal document viewer for Pod and other syntaxes
 
 =head1 SYNOPSIS
 
@@ -29,7 +29,7 @@ C<App::sdview> - a terminal document viewer for POD and other syntaxes
 =head1 DESCRIPTION
 
 This module implements a terminal-based program for viewing structured
-documents. It currently understands POD, some simple Markdown formatting, and
+documents. It currently understands Pod, some simple Markdown formatting, and
 a basic understanding of nroff (for manpages). Future versions may expand on
 these abilities, extending them or adding new formats.
 
@@ -45,7 +45,7 @@ To actually use it, you likely wanted wanted to see the F<bin/sdview> script.
 
 Various output plugins exist. By default it will output a terminal-formatted
 rendering of the document via the F<less> pager, but it can also output
-plaintext, POD, Markdown.
+plaintext, Pod, Markdown.
 
    $ sdview Some::Module -o plain > module.txt
 

@@ -2,13 +2,13 @@ NAME
     Complete::Util - General completion routine
 
 VERSION
-    This document describes version 0.618 of Complete::Util (from Perl
-    distribution Complete-Util), released on 2023-12-01.
+    This document describes version 0.620 of Complete::Util (from Perl
+    distribution Complete-Util), released on 2024-01-23.
 
 DESCRIPTION
     This package provides some generic completion routines that follow the
     Complete convention. (If you are looking for bash/shell tab completion
-    routines, take a look at the See Also section.) The main routine is
+    routines, take a look at "SEE ALSO".) The main routine is
     "complete_array_elem" which tries to complete a word using choices from
     elements of supplied array. For example:
 
@@ -355,7 +355,8 @@ FUNCTIONS
 
     *   uniq => *bool* (default: 1)
 
-        (No description)
+        If set to true, then do not offer key that has been mentioned before
+        in the word.
 
     *   word* => *str* (default: "")
 
@@ -421,6 +422,52 @@ FUNCTIONS
 
     Return value: (array)
 
+  get_answer_summaries
+    Usage:
+
+     get_answer_summaries($answer) -> array
+
+    Extract just the entry summaries from answer structure.
+
+    This routine accepts a hash or an array answer structure. It then
+    returns an arrayref containing just the summaries from each answer
+    entry. If the answer is undef, it returns an empty arrayref.
+
+    See also: get_answer_words().
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $answer* => *array|hash*
+
+        Completion answer structure.
+
+    Return value: (array)
+
+  get_answer_words
+    Usage:
+
+     get_answer_words($answer) -> array
+
+    Extract just the words from answer structure.
+
+    This routine accepts a hash or an array answer structure. It then
+    returns an arrayref containing just the words from each answer entry. If
+    the answer is undef, it returns an empty arrayref.
+
+    See also: get_answer_summaries().
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $answer* => *array|hash*
+
+        Completion answer structure.
+
+    Return value: (array)
+
   hashify_answer
     Usage:
 
@@ -468,6 +515,26 @@ FUNCTIONS
         (No description)
 
     *   suffix => *str*
+
+        (No description)
+
+    Return value: (undef)
+
+  ununiquify_answer
+    Usage:
+
+     ununiquify_answer(%args) -> undef
+
+    If answer contains only one item, make it two.
+
+    For example, if answer is "["a"]", then will make answer become "["a","a
+    "]". This will prevent shell from automatically adding space.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   answer* => *hash|array*
 
         (No description)
 
@@ -558,8 +625,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022, 2020, 2019, 2017, 2016, 2015,
-    2014, 2013 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2024, 2023, 2022, 2020, 2019, 2017, 2016,
+    2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

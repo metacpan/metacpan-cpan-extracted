@@ -1,4 +1,5 @@
 Changes
+Error/Pure/Intent.pod
 examples/die_via_err.pl
 examples/err_get.pl
 examples/err_in_eval_and_print.pl
@@ -22,6 +23,7 @@ examples/err_via_print_with_params.pl
 examples/err_with_all_error.pl
 examples/err_with_die.pl
 examples/err_with_error_list.pl
+images/basic_example.png
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm
@@ -93,6 +95,7 @@ xt/Error-Pure-Error/01-pod_coverage.t
 xt/Error-Pure-Error/02-pod.t
 xt/Error-Pure-ErrorList/01-pod_coverage.t
 xt/Error-Pure-ErrorList/02-pod.t
+xt/Error-Pure-Intent/01-pod.t
 xt/Error-Pure-Print/01-pod_coverage.t
 xt/Error-Pure-Print/02-pod.t
 xt/Error-Pure-PrintVar/01-pod_coverage.t

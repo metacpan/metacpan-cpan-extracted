@@ -1,8 +1,19 @@
 <%INIT>
-use RT::Report::Tickets;
 use Excel::Writer::XLSX;
 
-my $report = RT::Report::Tickets->new( $session{CurrentUser} );
+
+my $report;
+
+if ( ( $Class || 'RT::Tickets' )->can('ReportClass') ) {
+    my $report_class = ( $Class || 'RT::Tickets' )->ReportClass
+        or Abort( loc( "Couldn't find ReportClass for [_1]", $Class || 'RT::Tickets' ) );
+    RT::StaticUtil::RequireModule($report_class) or Abort( loc( "Couldn't load [_1]", $report_class ) );
+    $report = $report_class->new( $session{'CurrentUser'} );
+}
+else {
+    require RT::Report::Tickets;
+    $report = RT::Report::Tickets->new( $session{CurrentUser} );
+}
 
 my %columns = $report->SetupGroupings(
     Query => $Query,
@@ -121,4 +132,5 @@ $m->abort();
 $Query            => undef
 $GroupBy          => undef
 $ChartFunction    => undef
+$Class            => 'RT::Tickets'
 </%ARGS>

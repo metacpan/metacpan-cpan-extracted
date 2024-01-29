@@ -4,7 +4,7 @@ use warnings;
 
 package Neo4j::Driver::StatementResult;
 # ABSTRACT: DEPRECATED (renamed to Neo4j::Driver::Result)
-$Neo4j::Driver::StatementResult::VERSION = '0.41';
+$Neo4j::Driver::StatementResult::VERSION = '0.42';
 
 1;
 
@@ -20,7 +20,7 @@ Neo4j::Driver::StatementResult - DEPRECATED (renamed to Neo4j::Driver::Result)
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 SYNOPSIS
 
@@ -63,10 +63,7 @@ L<neo4j/neo4j-java-driver#651|https://github.com/neo4j/neo4j-java-driver/pull/65
 
 =head1 AUTHOR
 
-Arne Johannessen <ajnn@cpan.org>
-
-If you contact me by email, please make sure you include the word
-"Perl" in your subject header to help beat the spam filters.
+Arne Johannessen (L<AJNN|https://arne.johannessen.de/>)
 
 =head1 COPYRIGHT AND LICENSE
 

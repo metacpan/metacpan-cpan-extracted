@@ -6,7 +6,7 @@ use t_TestCommon # Test2::V0 etc.
   qw/$silent $verbose $debug run_perlscript my_capture/;
 use t_SSUtils qw/create_testdata/;
 
-our ($tdata1_path, $withARGV_path, $opthash_comma);
+our ($tdata1_path, $withINC_path, $opthash_comma);
 BEGIN{
   $tdata1_path = create_testdata(
    name => "tdata1",
@@ -17,10 +17,10 @@ BEGIN{
    ]
   );
 
-  $withARGV_path = create_testdata(
-   name => "withARGV",
+  $withINC_path = create_testdata(
+   name => "withINC",
    rows => [
-     [ "TitleA", "ARGV" ],
+     [ "TitleA", "INC" ],
      [ 100,      200      ],
    ]
   );
@@ -56,10 +56,10 @@ BEGIN{
 { my ($out, $err) = my_capture {
     run_perlscript('-wE', '
        package Foo::Clash1;
-       use Spreadsheet::Edit::Preload '.$opthash_comma.vis($main::withARGV_path->stringify).';
+       use Spreadsheet::Edit::Preload '.$opthash_comma.vis($main::withINC_path->stringify).';
        ');
   };
-  like($err, qr/ARGV.*clash.*Existing.*Array/s, "Detect clash with main::ARGV",
+  like($err, qr/INC.*clash.*Existing.*Array/s, "Detect clash with main::INC",
        dvis 'ERR:$err\nOUT:$out\n')
 }
 

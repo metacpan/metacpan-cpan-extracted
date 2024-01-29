@@ -1,13 +1,19 @@
 package Acme::CPANModules::PortedFrom::NPM;
 
-our $DATE = '2021-08-10'; # DATE
-our $VERSION = '0.004'; # VERSION
+use strict;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-09-25'; # DATE
+our $DIST = 'Acme-CPANModules-PortedFrom-NPM'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 our $LIST = {
-    summary => "Modules/applications that are ported (or inspired from) NPM libraries",
+    summary => "List of modules/applications that are ported (or inspired from) NPM libraries",
     description => <<'_',
 
 If you know of others, please drop me a message.
+
+Keywords: JavaScript, JS, npmjs
 
 _
     entries => [
@@ -36,11 +42,16 @@ _
             npm_module => 'optimist',
             tags => ['html', 'template'],
         },
+        {
+            module => 'Is::Bot',
+            npm_module => 'isbot',
+            tags => ['http', 'browser', 'webbot'],
+        },
     ],
 };
 
 1;
-# ABSTRACT: Modules/applications that are ported (or inspired from) NPM libraries
+# ABSTRACT: List of modules/applications that are ported (or inspired from) NPM libraries
 
 __END__
 
@@ -50,29 +61,43 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::PortedFrom::NPM - Modules/applications that are ported (or inspired from) NPM libraries
+Acme::CPANModules::PortedFrom::NPM - List of modules/applications that are ported (or inspired from) NPM libraries
 
 =head1 VERSION
 
-This document describes version 0.004 of Acme::CPANModules::PortedFrom::NPM (from Perl distribution Acme-CPANModules-PortedFrom-NPM), released on 2021-08-10.
+This document describes version 0.005 of Acme::CPANModules::PortedFrom::NPM (from Perl distribution Acme-CPANModules-PortedFrom-NPM), released on 2023-09-25.
 
 =head1 DESCRIPTION
 
 If you know of others, please drop me a message.
 
-=head1 ACME::MODULES ENTRIES
+Keywords: JavaScript, JS, npmjs
+
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<App::AsciiChart>
+=item L<App::AsciiChart>
 
-=item * L<App::chalk>
+Author: L<VTI|https://metacpan.org/author/VTI>
 
-=item * L<App::envset>
+=item L<App::chalk>
 
-=item * L<Inky>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Smart::Options>
+=item L<App::envset>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<Inky>
+
+Author: L<MFONTANI|https://metacpan.org/author/MFONTANI>
+
+=item L<Smart::Options>
+
+Author: L<MIKIHOSHI|https://metacpan.org/author/MIKIHOSHI>
+
+=item L<Is::Bot>
 
 =back
 
@@ -108,6 +133,8 @@ or directly:
 This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
 result for C<lcpan related-mods> command when it comes to finding related
 modules for the modules listed in this Acme::CPANModules module.
+See L<App::lcpan::Cmd::related_mods> for more details on how "related modules"
+are found.
 
 =head1 HOMEPAGE
 
@@ -117,14 +144,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANM
 
 Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-PortedFrom-NPM>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-PortedFrom-NPM>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 More on the same theme of modules ported from other languages:
@@ -132,6 +151,8 @@ L<Acme::CPANModules::PortedFrom::Java>,
 L<Acme::CPANModules::PortedFrom::PHP>,
 L<Acme::CPANModules::PortedFrom::Python>,
 L<Acme::CPANModules::PortedFrom::Ruby>.
+
+L<https://www.npmjs.com>
 
 L<Acme::CPANModules> - about the Acme::CPANModules namespace
 
@@ -154,15 +175,24 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-PortedFrom-NPM>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

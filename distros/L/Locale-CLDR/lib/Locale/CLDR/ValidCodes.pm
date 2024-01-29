@@ -1,12 +1,12 @@
 package Locale::CLDR::ValidCodes;
 # This file auto generated from Data\common\supplemental\supplementalMetadata.xml
-#	on Tue  5 Dec 12:58:56 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -31,7 +31,6 @@ has 'valid_languages' => (
  aai
  aak
  aal
- aam
  aan
  aao
  aap
@@ -103,7 +102,6 @@ has 'valid_languages' => (
  adl
  adn
  ado
- adp
  adq
  adr
  ads
@@ -161,7 +159,6 @@ has 'valid_languages' => (
  agm
  agn
  ago
- agp
  agq
  agr
  ags
@@ -204,7 +201,6 @@ has 'valid_languages' => (
  aip
  aiq
  air
- ais
  ait
  aiw
  aix
@@ -325,7 +321,6 @@ has 'valid_languages' => (
  aoe
  aof
  aog
- aoh
  aoi
  aoj
  aok
@@ -368,6 +363,7 @@ has 'valid_languages' => (
  aqc
  aqd
  aqg
+ aqk
  aql
  aqm
  aqn
@@ -401,7 +397,6 @@ has 'valid_languages' => (
  asa
  asb
  asc
- asd
  ase
  asf
  asg
@@ -452,7 +447,6 @@ has 'valid_languages' => (
  aub
  auc
  aud
- aue
  auf
  aug
  auh
@@ -531,8 +525,6 @@ has 'valid_languages' => (
  ays
  ayt
  ayu
- ayx
- ayy
  ayz
  az
  aza
@@ -568,7 +560,6 @@ has 'valid_languages' => (
  baw
  bax
  bay
- baz
  bba
  bbb
  bbc
@@ -594,7 +585,6 @@ has 'valid_languages' => (
  bbw
  bbx
  bby
- bbz
  bca
  bcb
  bcd
@@ -706,7 +696,6 @@ has 'valid_languages' => (
  bgj
  bgk
  bgl
- bgm
  bgn
  bgo
  bgp
@@ -730,7 +719,6 @@ has 'valid_languages' => (
  bhh
  bhi
  bhj
- bhk
  bhl
  bhm
  bhn
@@ -749,12 +737,10 @@ has 'valid_languages' => (
  bi
  bia
  bib
- bic
  bid
  bie
  bif
  big
- bij
  bik
  bil
  bim
@@ -773,7 +759,6 @@ has 'valid_languages' => (
  bja
  bjb
  bjc
- bjd
  bje
  bjf
  bjg
@@ -786,7 +771,6 @@ has 'valid_languages' => (
  bjn
  bjo
  bjp
- bjq
  bjr
  bjs
  bjt
@@ -797,7 +781,6 @@ has 'valid_languages' => (
  bjy
  bjz
  bka
- bkb
  bkc
  bkd
  bkf
@@ -827,7 +810,6 @@ has 'valid_languages' => (
  bld
  ble
  blf
- blg
  blh
  bli
  blj
@@ -871,7 +853,6 @@ has 'valid_languages' => (
  bmv
  bmw
  bmx
- bmy
  bmz
  bn
  bna
@@ -924,8 +905,8 @@ has 'valid_languages' => (
  boy
  boz
  bpa
- bpb
  bpd
+ bpe
  bpg
  bph
  bpi
@@ -1023,7 +1004,6 @@ has 'valid_languages' => (
  bsx
  bsy
  bta
- btb
  btc
  btd
  bte
@@ -1033,7 +1013,6 @@ has 'valid_languages' => (
  bti
  btj
  btk
- btl
  btm
  btn
  bto
@@ -1142,7 +1121,6 @@ has 'valid_languages' => (
  bxu
  bxv
  bxw
- bxx
  bxz
  bya
  byb
@@ -1167,7 +1145,6 @@ has 'valid_languages' => (
  byv
  byw
  byx
- byy
  byz
  bza
  bzb
@@ -1225,9 +1202,7 @@ has 'valid_languages' => (
  cbb
  cbc
  cbd
- cbe
  cbg
- cbh
  cbi
  cbj
  cbk
@@ -1242,7 +1217,6 @@ has 'valid_languages' => (
  cbv
  cbw
  cby
- cca
  ccc
  ccd
  cce
@@ -1254,7 +1228,6 @@ has 'valid_languages' => (
  ccn
  cco
  ccp
- ccq
  ccr
  ccs
  cda
@@ -1262,7 +1235,6 @@ has 'valid_languages' => (
  cdd
  cde
  cdf
- cdg
  cdh
  cdi
  cdj
@@ -1281,6 +1253,7 @@ has 'valid_languages' => (
  cel
  cen
  cet
+ cey
  cfa
  cfd
  cfg
@@ -1332,14 +1305,13 @@ has 'valid_languages' => (
  cjn
  cjo
  cjp
- cjr
  cjs
  cjv
  cjy
- cka
  ckb
  ckh
  ckl
+ ckm
  ckn
  cko
  ckq
@@ -1370,7 +1342,6 @@ has 'valid_languages' => (
  cme
  cmg
  cmi
- cmk
  cml
  cmm
  cmo
@@ -1386,6 +1357,7 @@ has 'valid_languages' => (
  cnk
  cnl
  cno
+ cnp
  cns
  cnt
  cnu
@@ -1413,7 +1385,6 @@ has 'valid_languages' => (
  cov
  cow
  cox
- coy
  coz
  cpa
  cpb
@@ -1430,7 +1401,6 @@ has 'valid_languages' => (
  cpx
  cpy
  cqd
- cqu
  cr
  cra
  crb
@@ -1472,6 +1442,7 @@ has 'valid_languages' => (
  csm
  csn
  cso
+ csp
  csq
  csr
  css
@@ -1479,6 +1450,7 @@ has 'valid_languages' => (
  csu
  csv
  csw
+ csx
  csy
  csz
  cta
@@ -1495,6 +1467,7 @@ has 'valid_languages' => (
  cts
  ctt
  ctu
+ cty
  ctz
  cu
  cua
@@ -1506,7 +1479,6 @@ has 'valid_languages' => (
  cuj
  cuk
  cul
- cum
  cuo
  cup
  cuq
@@ -1540,7 +1512,6 @@ has 'valid_languages' => (
  dac
  dad
  dae
- daf
  dag
  dah
  dai
@@ -1549,7 +1520,6 @@ has 'valid_languages' => (
  dal
  dam
  dao
- dap
  daq
  dar
  das
@@ -1624,11 +1594,9 @@ has 'valid_languages' => (
  dgr
  dgs
  dgt
- dgu
  dgw
  dgx
  dgz
- dha
  dhg
  dhi
  dhl
@@ -1657,7 +1625,6 @@ has 'valid_languages' => (
  dip
  dir
  dis
- dit
  diu
  diw
  dix
@@ -1672,7 +1639,6 @@ has 'valid_languages' => (
  dji
  djj
  djk
- djl
  djm
  djn
  djo
@@ -1680,8 +1646,8 @@ has 'valid_languages' => (
  dju
  djw
  dka
+ dkg
  dkk
- dkl
  dkr
  dks
  dkx
@@ -1694,6 +1660,7 @@ has 'valid_languages' => (
  dmc
  dmd
  dme
+ dmf
  dmg
  dmk
  dml
@@ -1715,6 +1682,7 @@ has 'valid_languages' => (
  dnj
  dnk
  dnn
+ dno
  dnr
  dnt
  dnu
@@ -1749,17 +1717,14 @@ has 'valid_languages' => (
  drd
  dre
  drg
- drh
  dri
  drl
  drn
  dro
  drq
- drr
  drs
  drt
  dru
- drw
  dry
  dsb
  dse
@@ -1787,13 +1752,11 @@ has 'valid_languages' => (
  dua
  dub
  duc
- dud
  due
  duf
  dug
  duh
  dui
- duj
  duk
  dul
  dum
@@ -1812,12 +1775,13 @@ has 'valid_languages' => (
  dv
  dva
  dwa
- dwl
+ dwk
  dwr
  dws
  dwu
  dww
  dwy
+ dwz
  dya
  dyb
  dyd
@@ -1830,12 +1794,12 @@ has 'valid_languages' => (
  dyy
  dz
  dza
- dzd
  dze
  dzg
  dzl
  dzn
  eaa
+ ebc
  ebg
  ebk
  ebo
@@ -1854,13 +1818,13 @@ has 'valid_languages' => (
  ego
  egx
  egy
+ ehs
  ehu
  eip
  eit
  eiv
  eja
  eka
- ekc
  eke
  ekg
  eki
@@ -1877,7 +1841,6 @@ has 'valid_languages' => (
  elk
  elm
  elo
- elp
  elu
  elx
  ema
@@ -1887,13 +1850,14 @@ has 'valid_languages' => (
  emi
  emm
  emn
- emo
  emp
+ emq
  ems
  emu
  emw
  emx
  emy
+ emz
  en
  ena
  enb
@@ -1990,6 +1954,7 @@ has 'valid_languages' => (
  fi
  fia
  fie
+ fif
  fil
  fip
  fir
@@ -2076,13 +2041,11 @@ has 'valid_languages' => (
  gas
  gat
  gau
- gav
  gaw
  gax
  gay
  gba
  gbb
- gbc
  gbd
  gbe
  gbf
@@ -2138,6 +2101,7 @@ has 'valid_languages' => (
  geb
  gec
  ged
+ gef
  geg
  geh
  gei
@@ -2154,7 +2118,6 @@ has 'valid_languages' => (
  gez
  gfk
  gft
- gfx
  gga
  ggb
  ggd
@@ -2162,9 +2125,6 @@ has 'valid_languages' => (
  ggg
  ggk
  ggl
- ggn
- ggo
- ggr
  ggt
  ggu
  ggw
@@ -2186,10 +2146,10 @@ has 'valid_languages' => (
  gie
  gig
  gih
+ gii
  gil
  gim
  gin
- gio
  gip
  giq
  gir
@@ -2200,7 +2160,6 @@ has 'valid_languages' => (
  gix
  giy
  giz
- gji
  gjk
  gjm
  gjn
@@ -2214,10 +2173,10 @@ has 'valid_languages' => (
  gkp
  gku
  gl
+ glb
  glc
  gld
  glh
- gli
  glj
  glk
  gll
@@ -2236,6 +2195,7 @@ has 'valid_languages' => (
  gmm
  gmn
  gmq
+ gmr
  gmu
  gmv
  gmw
@@ -2326,7 +2286,6 @@ has 'valid_languages' => (
  gss
  gsw
  gta
- gti
  gtu
  gu
  gua
@@ -2348,7 +2307,6 @@ has 'valid_languages' => (
  gus
  gut
  guu
- guv
  guw
  gux
  guz
@@ -2395,6 +2353,7 @@ has 'valid_languages' => (
  gyo
  gyr
  gyy
+ gyz
  gza
  gzi
  gzn
@@ -2462,6 +2421,7 @@ has 'valid_languages' => (
  hji
  hka
  hke
+ hkh
  hkk
  hkn
  hks
@@ -2499,6 +2459,7 @@ has 'valid_languages' => (
  hna
  hnd
  hne
+ hng
  hnh
  hni
  hnj
@@ -2537,7 +2498,6 @@ has 'valid_languages' => (
  hrm
  hro
  hrp
- hrr
  hrt
  hru
  hrw
@@ -2595,7 +2555,6 @@ has 'valid_languages' => (
  ia
  iai
  ian
- iap
  iar
  iba
  ibb
@@ -2603,7 +2562,6 @@ has 'valid_languages' => (
  ibe
  ibg
  ibh
- ibi
  ibl
  ibm
  ibn
@@ -2675,16 +2633,13 @@ has 'valid_languages' => (
  ilg
  ili
  ilk
- ill
  ilm
  ilo
  ilp
  ils
  ilu
  ilv
- ilw
  ima
- ime
  imi
  iml
  imn
@@ -2772,7 +2727,6 @@ has 'valid_languages' => (
  iyo
  iyx
  izh
- izi
  izr
  izz
  ja
@@ -2790,7 +2744,6 @@ has 'valid_languages' => (
  jan
  jao
  jaq
- jar
  jas
  jat
  jau
@@ -2801,6 +2754,7 @@ has 'valid_languages' => (
  jbi
  jbj
  jbk
+ jbm
  jbn
  jbo
  jbr
@@ -2814,7 +2768,6 @@ has 'valid_languages' => (
  jdt
  jeb
  jee
- jeg
  jeh
  jei
  jek
@@ -2852,6 +2805,7 @@ has 'valid_languages' => (
  jko
  jkp
  jkr
+ jks
  jku
  jle
  jls
@@ -2940,7 +2894,6 @@ has 'valid_languages' => (
  kbc
  kbd
  kbe
- kbf
  kbg
  kbh
  kbi
@@ -3006,7 +2959,6 @@ has 'valid_languages' => (
  kdr
  kdt
  kdu
- kdv
  kdw
  kdx
  kdy
@@ -3066,12 +3018,9 @@ has 'valid_languages' => (
  kg
  kga
  kgb
- kgc
- kgd
  kge
  kgf
  kgg
- kgh
  kgi
  kgj
  kgk
@@ -3143,7 +3092,6 @@ has 'valid_languages' => (
  kjc
  kjd
  kje
- kjf
  kjg
  kjh
  kji
@@ -3275,7 +3223,6 @@ has 'valid_languages' => (
  kog
  koh
  koi
- koj
  kok
  kol
  koo
@@ -3286,7 +3233,6 @@ has 'valid_languages' => (
  kou
  kov
  kow
- kox
  koy
  koz
  kpa
@@ -3304,7 +3250,6 @@ has 'valid_languages' => (
  kpm
  kpn
  kpo
- kpp
  kpq
  kpr
  kps
@@ -3352,7 +3297,6 @@ has 'valid_languages' => (
  krj
  krk
  krl
- krm
  krn
  kro
  krp
@@ -3409,7 +3353,6 @@ has 'valid_languages' => (
  kto
  ktp
  ktq
- ktr
  kts
  ktt
  ktu
@@ -3462,7 +3405,6 @@ has 'valid_languages' => (
  kvp
  kvq
  kvr
- kvs
  kvt
  kvu
  kvv
@@ -3487,7 +3429,6 @@ has 'valid_languages' => (
  kwn
  kwo
  kwp
- kwq
  kwr
  kws
  kwt
@@ -3501,13 +3442,11 @@ has 'valid_languages' => (
  kxb
  kxc
  kxd
- kxe
  kxf
  kxh
  kxi
  kxj
  kxk
- kxl
  kxm
  kxn
  kxo
@@ -3516,7 +3455,6 @@ has 'valid_languages' => (
  kxr
  kxs
  kxt
- kxu
  kxv
  kxw
  kxx
@@ -3556,9 +3494,7 @@ has 'valid_languages' => (
  kze
  kzf
  kzg
- kzh
  kzi
- kzj
  kzk
  kzl
  kzm
@@ -3568,7 +3504,6 @@ has 'valid_languages' => (
  kzq
  kzr
  kzs
- kzt
  kzu
  kzv
  kzw
@@ -3600,7 +3535,6 @@ has 'valid_languages' => (
  lay
  laz
  lb
- lba
  lbb
  lbc
  lbe
@@ -3652,7 +3586,6 @@ has 'valid_languages' => (
  led
  lee
  lef
- leg
  leh
  lei
  lej
@@ -3708,7 +3641,6 @@ has 'valid_languages' => (
  lif
  lig
  lih
- lii
  lij
  lik
  lil
@@ -3761,7 +3693,6 @@ has 'valid_languages' => (
  lll
  llm
  lln
- llo
  llp
  llq
  lls
@@ -3779,7 +3710,6 @@ has 'valid_languages' => (
  lmj
  lmk
  lml
- lmm
  lmn
  lmo
  lmp
@@ -3790,7 +3720,6 @@ has 'valid_languages' => (
  lmw
  lmx
  lmy
- lmz
  ln
  lna
  lnb
@@ -3853,18 +3782,20 @@ has 'valid_languages' => (
  lrv
  lrz
  lsa
+ lsb
  lsd
  lse
- lsg
  lsh
  lsi
  lsl
  lsm
+ lsn
  lso
  lsp
  lsr
  lss
  lst
+ lsv
  lsy
  lt
  ltc
@@ -3900,6 +3831,7 @@ has 'valid_languages' => (
  luz
  lv
  lva
+ lvi
  lvk
  lvu
  lwa
@@ -3913,6 +3845,7 @@ has 'valid_languages' => (
  lwt
  lwu
  lww
+ lxm
  lya
  lyg
  lyn
@@ -4022,7 +3955,6 @@ has 'valid_languages' => (
  med
  mee
  mef
- meg
  meh
  mei
  mej
@@ -4091,7 +4023,6 @@ has 'valid_languages' => (
  mgu
  mgv
  mgw
- mgx
  mgy
  mgz
  mh
@@ -4102,7 +4033,6 @@ has 'valid_languages' => (
  mhe
  mhf
  mhg
- mhh
  mhi
  mhj
  mhk
@@ -4144,7 +4074,6 @@ has 'valid_languages' => (
  mix
  miy
  miz
- mja
  mjb
  mjc
  mjd
@@ -4199,7 +4128,6 @@ has 'valid_languages' => (
  mla
  mlb
  mlc
- mld
  mle
  mlf
  mlh
@@ -4263,7 +4191,6 @@ has 'valid_languages' => (
  mnq
  mnr
  mns
- mnt
  mnu
  mnv
  mnw
@@ -4274,7 +4201,6 @@ has 'valid_languages' => (
  moc
  mod
  moe
- mof
  mog
  moh
  moi
@@ -4388,7 +4314,6 @@ has 'valid_languages' => (
  msq
  msr
  mss
- mst
  msu
  msv
  msw
@@ -4453,7 +4378,6 @@ has 'valid_languages' => (
  mvi
  mvk
  mvl
- mvm
  mvn
  mvo
  mvp
@@ -4470,13 +4394,11 @@ has 'valid_languages' => (
  mwa
  mwb
  mwc
- mwd
  mwe
  mwf
  mwg
  mwh
  mwi
- mwj
  mwk
  mwl
  mwm
@@ -4490,8 +4412,6 @@ has 'valid_languages' => (
  mwu
  mwv
  mww
- mwx
- mwy
  mwz
  mxa
  mxb
@@ -4522,12 +4442,10 @@ has 'valid_languages' => (
  my
  myb
  myc
- myd
  mye
  myf
  myg
  myh
- myi
  myj
  myk
  myl
@@ -4535,10 +4453,8 @@ has 'valid_languages' => (
  myn
  myo
  myp
- myq
  myr
  mys
- myt
  myu
  myv
  myw
@@ -4574,7 +4490,6 @@ has 'valid_languages' => (
  naa
  nab
  nac
- nad
  nae
  naf
  nag
@@ -4601,7 +4516,6 @@ has 'valid_languages' => (
  nbc
  nbd
  nbe
- nbf
  nbg
  nbh
  nbi
@@ -4618,7 +4532,6 @@ has 'valid_languages' => (
  nbu
  nbv
  nbw
- nbx
  nby
  nca
  ncb
@@ -4635,7 +4548,6 @@ has 'valid_languages' => (
  ncm
  ncn
  nco
- ncp
  ncq
  ncr
  ncs
@@ -4713,7 +4625,6 @@ has 'valid_languages' => (
  ngl
  ngm
  ngn
- ngo
  ngp
  ngq
  ngr
@@ -4824,10 +4735,8 @@ has 'valid_languages' => (
  nlk
  nll
  nlm
- nln
  nlo
  nlq
- nlr
  nlu
  nlv
  nlw
@@ -4878,14 +4787,13 @@ has 'valid_languages' => (
  nnp
  nnq
  nnr
- nns
  nnt
  nnu
  nnv
  nnw
- nnx
  nny
  nnz
+ no
  noa
  noc
  nod
@@ -4899,7 +4807,6 @@ has 'valid_languages' => (
  nol
  nom
  non
- noo
  nop
  noq
  nos
@@ -4927,6 +4834,7 @@ has 'valid_languages' => (
  nqn
  nqo
  nqq
+ nqt
  nqy
  nr
  nra
@@ -4947,6 +4855,7 @@ has 'valid_languages' => (
  nrx
  nrz
  nsa
+ nsb
  nsc
  nsd
  nse
@@ -4980,7 +4889,6 @@ has 'valid_languages' => (
  nto
  ntp
  ntr
- nts
  ntu
  ntw
  ntx
@@ -5039,7 +4947,6 @@ has 'valid_languages' => (
  nxo
  nxq
  nxr
- nxu
  nxx
  ny
  nyb
@@ -5091,6 +4998,7 @@ has 'valid_languages' => (
  oc
  oca
  och
+ ocm
  oco
  ocu
  oda
@@ -5119,6 +5027,7 @@ has 'valid_languages' => (
  ojw
  oka
  okb
+ okc
  okd
  oke
  okg
@@ -5135,6 +5044,7 @@ has 'valid_languages' => (
  oku
  okv
  okx
+ okz
  ola
  old
  ole
@@ -5148,7 +5058,6 @@ has 'valid_languages' => (
  oma
  omb
  omc
- ome
  omg
  omi
  omk
@@ -5163,6 +5072,7 @@ has 'valid_languages' => (
  omv
  omw
  omx
+ omy
  ona
  onb
  one
@@ -5210,6 +5120,7 @@ has 'valid_languages' => (
  osa
  osc
  osi
+ osn
  oso
  osp
  ost
@@ -5239,7 +5150,6 @@ has 'valid_languages' => (
  oue
  oui
  oum
- oun
  ovd
  owi
  owl
@@ -5266,7 +5176,6 @@ has 'valid_languages' => (
  paq
  par
  pas
- pat
  pau
  pav
  paw
@@ -5290,7 +5199,6 @@ has 'valid_languages' => (
  pbt
  pbv
  pby
- pbz
  pca
  pcb
  pcc
@@ -5306,7 +5214,6 @@ has 'valid_languages' => (
  pcm
  pcn
  pcp
- pcr
  pcw
  pda
  pdc
@@ -5346,7 +5253,6 @@ has 'valid_languages' => (
  pgn
  pgs
  pgu
- pgy
  pgz
  pha
  phd
@@ -5416,7 +5322,6 @@ has 'valid_languages' => (
  pll
  pln
  plo
- plp
  plq
  plr
  pls
@@ -5427,7 +5332,6 @@ has 'valid_languages' => (
  plz
  pma
  pmb
- pmc
  pmd
  pme
  pmf
@@ -5443,13 +5347,13 @@ has 'valid_languages' => (
  pmr
  pms
  pmt
- pmu
  pmw
  pmx
  pmy
  pmz
  pna
  pnc
+ pnd
  pne
  png
  pnh
@@ -5472,7 +5376,6 @@ has 'valid_languages' => (
  pny
  pnz
  poc
- pod
  poe
  pof
  pog
@@ -5491,7 +5394,6 @@ has 'valid_languages' => (
  pox
  poy
  poz
- ppa
  ppe
  ppi
  ppk
@@ -5501,7 +5403,6 @@ has 'valid_languages' => (
  ppo
  ppp
  ppq
- ppr
  pps
  ppt
  ppu
@@ -5510,7 +5411,6 @@ has 'valid_languages' => (
  pqm
  pqw
  pra
- prb
  prc
  prd
  pre
@@ -5530,7 +5430,6 @@ has 'valid_languages' => (
  pru
  prw
  prx
- pry
  prz
  ps
  psa
@@ -5575,7 +5474,6 @@ has 'valid_languages' => (
  pug
  pui
  puj
- puk
  pum
  puo
  pup
@@ -5586,7 +5484,6 @@ has 'valid_languages' => (
  puw
  pux
  puy
- puz
  pwa
  pwb
  pwg
@@ -5717,7 +5614,6 @@ has 'valid_languages' => (
  rhg
  rhp
  ria
- rie
  rif
  ril
  rim
@@ -5752,7 +5648,6 @@ has 'valid_languages' => (
  rmo
  rmp
  rmq
- rmr
  rms
  rmt
  rmu
@@ -5761,7 +5656,6 @@ has 'valid_languages' => (
  rmx
  rmz
  rn
- rna
  rnd
  rng
  rnl
@@ -5790,7 +5684,6 @@ has 'valid_languages' => (
  rro
  rrt
  rsb
- rsi
  rsl
  rsm
  rtc
@@ -5817,6 +5710,7 @@ has 'valid_languages' => (
  rw
  rwa
  rwk
+ rwl
  rwm
  rwo
  rwr
@@ -5840,7 +5734,6 @@ has 'valid_languages' => (
  sal
  sam
  sao
- sap
  saq
  sar
  sas
@@ -5878,7 +5771,6 @@ has 'valid_languages' => (
  sby
  sbz
  sc
- sca
  scb
  sce
  scf
@@ -5908,10 +5800,10 @@ has 'valid_languages' => (
  sdj
  sdk
  sdl
- sdm
  sdn
  sdo
  sdp
+ sdq
  sdr
  sds
  sdt
@@ -5961,10 +5853,8 @@ has 'valid_languages' => (
  sgi
  sgj
  sgk
- sgl
  sgm
  sgn
- sgo
  sgp
  sgr
  sgs
@@ -6051,7 +5941,6 @@ has 'valid_languages' => (
  skh
  ski
  skj
- skk
  skm
  skn
  sko
@@ -6120,7 +6009,6 @@ has 'valid_languages' => (
  sne
  snf
  sng
- snh
  sni
  snj
  snk
@@ -6194,6 +6082,7 @@ has 'valid_languages' => (
  sqs
  sqt
  squ
+ sqx
  sr
  sra
  srb
@@ -6276,8 +6165,7 @@ has 'valid_languages' => (
  sui
  suj
  suk
- sul
- sum
+ suo
  suq
  sur
  sus
@@ -6294,7 +6182,6 @@ has 'valid_languages' => (
  sve
  svk
  svm
- svr
  svs
  svx
  sw
@@ -6358,6 +6245,7 @@ has 'valid_languages' => (
  szs
  szv
  szw
+ szy
  ta
  taa
  tab
@@ -6383,7 +6271,6 @@ has 'valid_languages' => (
  tay
  taz
  tba
- tbb
  tbc
  tbd
  tbe
@@ -6450,7 +6337,6 @@ has 'valid_languages' => (
  tdr
  tds
  tdt
- tdu
  tdv
  tdx
  tdy
@@ -6491,7 +6377,6 @@ has 'valid_languages' => (
  tgd
  tge
  tgf
- tgg
  tgh
  tgi
  tgj
@@ -6509,7 +6394,6 @@ has 'valid_languages' => (
  tgy
  tgz
  th
- thc
  thd
  the
  thf
@@ -6526,15 +6410,11 @@ has 'valid_languages' => (
  tht
  thu
  thv
- thw
- thx
  thy
  thz
  ti
  tia
  tic
- tid
- tie
  tif
  tig
  tih
@@ -6558,10 +6438,12 @@ has 'valid_languages' => (
  tja
  tjg
  tji
+ tjj
  tjl
  tjm
  tjn
  tjo
+ tjp
  tjs
  tju
  tjw
@@ -6572,7 +6454,6 @@ has 'valid_languages' => (
  tke
  tkf
  tkg
- tkk
  tkl
  tkm
  tkn
@@ -6607,7 +6488,6 @@ has 'valid_languages' => (
  tlt
  tlu
  tlv
- tlw
  tlx
  tly
  tma
@@ -6625,7 +6505,6 @@ has 'valid_languages' => (
  tmm
  tmn
  tmo
- tmp
  tmq
  tmr
  tms
@@ -6640,8 +6519,6 @@ has 'valid_languages' => (
  tnb
  tnc
  tnd
- tne
- tnf
  tng
  tnh
  tni
@@ -6665,7 +6542,6 @@ has 'valid_languages' => (
  tob
  toc
  tod
- toe
  tof
  tog
  toh
@@ -6750,7 +6626,6 @@ has 'valid_languages' => (
  tsc
  tsd
  tse
- tsf
  tsg
  tsh
  tsi
@@ -6830,6 +6705,7 @@ has 'valid_languages' => (
  tvt
  tvu
  tvw
+ tvx
  tvy
  twa
  twb
@@ -6884,6 +6760,7 @@ has 'valid_languages' => (
  tyu
  tyv
  tyx
+ tyy
  tyz
  tza
  tzh
@@ -6928,12 +6805,14 @@ has 'valid_languages' => (
  uka
  ukg
  ukh
+ uki
  ukk
  ukl
  ukp
  ukq
  uks
  uku
+ ukv
  ukw
  uky
  ula
@@ -6963,15 +6842,14 @@ has 'valid_languages' => (
  una
  une
  ung
+ uni
  unk
  unm
  unn
- unp
  unr
  unu
  unx
  unz
- uok
  upi
  upv
  ur
@@ -7003,9 +6881,11 @@ has 'valid_languages' => (
  usi
  usk
  usp
+ uss
  usu
  uta
  ute
+ uth
  utp
  utr
  utu
@@ -7060,15 +6940,16 @@ has 'valid_languages' => (
  vit
  viv
  vka
- vki
  vkj
  vkk
  vkl
  vkm
+ vkn
  vko
  vkp
  vkt
  vku
+ vkz
  vlp
  vls
  vma
@@ -7186,7 +7067,6 @@ has 'valid_languages' => (
  wgi
  wgo
  wgu
- wgw
  wgy
  wha
  whg
@@ -7205,10 +7085,8 @@ has 'valid_languages' => (
  wim
  win
  wir
- wit
  wiu
  wiv
- wiw
  wiy
  wja
  wji
@@ -7216,6 +7094,7 @@ has 'valid_languages' => (
  wkb
  wkd
  wkl
+ wkr
  wku
  wkw
  wky
@@ -7223,6 +7102,7 @@ has 'valid_languages' => (
  wlc
  wle
  wlg
+ wlh
  wli
  wlk
  wll
@@ -7240,6 +7120,7 @@ has 'valid_languages' => (
  wmc
  wmd
  wme
+ wmg
  wmh
  wmi
  wmm
@@ -7281,7 +7162,6 @@ has 'valid_languages' => (
  wow
  woy
  wpc
- wra
  wrb
  wrd
  wrg
@@ -7363,7 +7243,6 @@ has 'valid_languages' => (
  xav
  xaw
  xay
- xba
  xbb
  xbc
  xbd
@@ -7377,7 +7256,6 @@ has 'valid_languages' => (
  xbp
  xbr
  xbw
- xbx
  xby
  xcb
  xcc
@@ -7432,12 +7310,10 @@ has 'valid_languages' => (
  xht
  xhu
  xhv
- xia
  xib
  xii
  xil
  xin
- xip
  xir
  xis
  xiv
@@ -7451,7 +7327,6 @@ has 'valid_languages' => (
  xke
  xkf
  xkg
- xkh
  xki
  xkj
  xkk
@@ -7513,9 +7388,12 @@ has 'valid_languages' => (
  xng
  xnh
  xni
+ xnj
  xnk
+ xnm
  xnn
  xno
+ xnq
  xnr
  xns
  xnt
@@ -7534,11 +7412,16 @@ has 'valid_languages' => (
  xor
  xow
  xpa
+ xpb
  xpc
+ xpd
+ xpf
  xpg
+ xph
  xpi
  xpj
  xpk
+ xpl
  xpm
  xpn
  xpo
@@ -7548,7 +7431,11 @@ has 'valid_languages' => (
  xps
  xpt
  xpu
+ xpv
+ xpw
+ xpx
  xpy
+ xpz
  xqa
  xqt
  xra
@@ -7559,7 +7446,6 @@ has 'valid_languages' => (
  xri
  xrm
  xrn
- xrq
  xrr
  xrt
  xru
@@ -7571,7 +7457,6 @@ has 'valid_languages' => (
  xse
  xsh
  xsi
- xsj
  xsm
  xsn
  xso
@@ -7604,7 +7489,6 @@ has 'valid_languages' => (
  xtv
  xtw
  xty
- xtz
  xua
  xub
  xud
@@ -7678,7 +7562,6 @@ has 'valid_languages' => (
  yaz
  yba
  ybb
- ybd
  ybe
  ybh
  ybi
@@ -7698,14 +7581,12 @@ has 'valid_languages' => (
  yde
  ydg
  ydk
- yds
  yea
  yec
  yee
  yei
  yej
  yel
- yen
  yer
  yes
  yet
@@ -7744,7 +7625,6 @@ has 'valid_languages' => (
  yiu
  yiv
  yix
- yiy
  yiz
  yka
  ykg
@@ -7770,7 +7650,6 @@ has 'valid_languages' => (
  ylr
  ylu
  yly
- yma
  ymb
  ymc
  ymd
@@ -7787,14 +7666,12 @@ has 'valid_languages' => (
  ymq
  ymr
  yms
- ymt
  ymx
  ymz
  yna
  ynd
  yne
  yng
- ynh
  ynk
  ynl
  ynn
@@ -7810,7 +7687,6 @@ has 'valid_languages' => (
  yol
  yom
  yon
- yos
  yot
  yox
  yoy
@@ -7827,7 +7703,6 @@ has 'valid_languages' => (
  yra
  yrb
  yre
- yri
  yrk
  yrl
  yrm
@@ -7840,6 +7715,7 @@ has 'valid_languages' => (
  ysd
  ysg
  ysl
+ ysm
  ysn
  yso
  ysp
@@ -7868,7 +7744,6 @@ has 'valid_languages' => (
  yuq
  yur
  yut
- yuu
  yuw
  yux
  yuy
@@ -7920,10 +7795,12 @@ has 'valid_languages' => (
  zax
  zay
  zaz
+ zba
  zbc
  zbe
  zbl
  zbt
+ zbu
  zbw
  zca
  zch
@@ -7951,7 +7828,6 @@ has 'valid_languages' => (
  zil
  zim
  zin
- zir
  ziw
  ziz
  zka
@@ -7968,6 +7844,7 @@ has 'valid_languages' => (
  zku
  zkv
  zkz
+ zla
  zle
  zlj
  zlm
@@ -8605,10 +8482,10 @@ has 'valid_languages' => (
 );
 
 around valid_languages => sub {
-	my ($orig, $self) = @_;
-	
-	my $languages = $self->$orig;
-	return @{$languages};
+    my ($orig, $self) = @_;
+
+    my $languages = $self->$orig;
+    return @{$languages};
 };
 
 has 'valid_scripts' => (
@@ -8638,15 +8515,19 @@ has 'valid_scripts' => (
  Cari
  Cham
  Cher
+ Chrs
  Copt
+ Cpmn
  Cprt
  Cyrl
  Deva
+ Diak
  Dogr
  Dsrt
  Dupl
  Egyp
  Elba
+ Elym
  Ethi
  Geor
  Glag
@@ -8668,6 +8549,7 @@ has 'valid_scripts' => (
  Hira
  Hluw
  Hmng
+ Hmnp
  Hrkt
  Hung
  Ital
@@ -8679,6 +8561,7 @@ has 'valid_scripts' => (
  Khar
  Khmr
  Khoj
+ Kits
  Knda
  Kore
  Kthi
@@ -8708,6 +8591,7 @@ has 'valid_scripts' => (
  Mtei
  Mult
  Mymr
+ Nand
  Narb
  Nbat
  Newa
@@ -8719,6 +8603,7 @@ has 'valid_scripts' => (
  Orya
  Osge
  Osma
+ Ougr
  Palm
  Pauc
  Perm
@@ -8761,20 +8646,26 @@ has 'valid_scripts' => (
  Thai
  Tibt
  Tirh
+ Tnsa
+ Toto
  Ugar
  Vaii
+ Vith
  Wara
+ Wcho
  Xpeo
  Xsux
+ Yezi
  Yiii
+ Aran
+ Qaag
  Zanb
  Zinh
- Zyyy
- Qaag
  Zmth
  Zsye
  Zsym
  Zxxx
+ Zyyy
  Qaaa
  Qaab
  Qaac
@@ -8828,10 +8719,10 @@ has 'valid_scripts' => (
 );
 
 around valid_scripts => sub {
-	my ($orig, $self) = @_;
-	
-	my $scripts = $self->$orig;
-	return @{$scripts};
+    my ($orig, $self) = @_;
+
+    my $scripts = $self->$orig;
+    return @{$scripts};
 };
 
 has 'valid_regions' => (
@@ -9172,10 +9063,10 @@ has 'valid_regions' => (
 );
 
 around valid_regions => sub {
-	my ($orig, $self) = @_;
-	
-	my $regions = $self->$orig;
-	return @{$regions};
+    my ($orig, $self) = @_;
+
+    my $regions = $self->$orig;
+    return @{$regions};
 };
 
 has 'valid_variants' => (
@@ -9194,8 +9085,7 @@ has 'valid_variants' => (
  aluku
  ao1990
  aranes
- arevela
- arevmda
+ arkaika
  asante
  auvern
  baku1926
@@ -9207,6 +9097,7 @@ has 'valid_variants' => (
  biske
  bohoric
  boont
+ bornholm
  cisaup
  colb1945
  cornu
@@ -9219,12 +9110,12 @@ has 'valid_variants' => (
  fonnapa
  fonupa
  fonxsamp
+ gallo
  gascon
  grclass
  grital
  grmistr
  hepburn
- heploc
  hognorsk
  hsistemo
  ijekavsk
@@ -9254,6 +9145,7 @@ has 'valid_variants' => (
  pahawh3
  pahawh4
  pamaka
+ peano
  petr1708
  pinyin
  polyton
@@ -9271,7 +9163,10 @@ has 'valid_variants' => (
  surmiran
  sursilv
  sutsilv
+ synnejyl
  tarask
+ tongyong
+ tunumiit
  uccor
  ucrcor
  ulster
@@ -9279,17 +9174,21 @@ has 'valid_variants' => (
  vaidika
  valencia
  vallader
+ vecdruka
  vivaraup
  wadegile
  xsistemo
+ arevela
+ arevmda
+ heploc
  	)]},
 );
 
 around valid_variants => sub {
-	my ($orig, $self) = @_;
-	my $variants = $self->$orig;
-	
-	return @{$variants};
+    my ($orig, $self) = @_;
+
+    my $variants = $self->$orig;
+    return @{$variants};
 };
 
 has 'valid_currencies' => (
@@ -9456,10 +9355,10 @@ has 'valid_currencies' => (
 );
 
 around valid_currencies => sub {
-	my ($orig, $self) = @_;
-	my $currencies = $self->$orig;
-	
-	return @{$currencies};
+    my ($orig, $self) = @_;
+
+    my $currencies = $self->$orig;
+    return @{$currencies};
 };
 
 has 'valid_subdivisions' => (
@@ -9966,6 +9865,7 @@ has 'valid_subdivisions' => (
  bsmi
  bsne
  bsno
+ bsnp
  bsns
  bsrc
  bsri
@@ -10144,6 +10044,7 @@ has 'valid_subdivisions' => (
  cllr
  clma
  clml
+ clnb
  clrm
  clta
  clvs
@@ -10278,28 +10179,6 @@ has 'valid_subdivisions' => (
  cy05
  cy06
  cz10
- cz101
- cz102
- cz103
- cz104
- cz105
- cz106
- cz107
- cz108
- cz109
- cz110
- cz111
- cz112
- cz113
- cz114
- cz115
- cz116
- cz117
- cz118
- cz119
- cz120
- cz121
- cz122
  cz20
  cz201
  cz202
@@ -10540,21 +10419,100 @@ has 'valid_subdivisions' => (
  ecx
  ecy
  ecz
+ ee130
+ ee141
+ ee142
+ ee171
+ ee184
+ ee191
+ ee198
+ ee205
+ ee214
+ ee245
+ ee247
+ ee251
+ ee255
+ ee272
+ ee283
+ ee284
+ ee291
+ ee293
+ ee296
+ ee303
+ ee305
+ ee317
+ ee321
+ ee338
+ ee353
  ee37
  ee39
- ee44
- ee49
- ee51
- ee57
- ee59
- ee65
- ee67
- ee70
+ ee424
+ ee430
+ ee431
+ ee432
+ ee441
+ ee442
+ ee446
+ ee45
+ ee478
+ ee480
+ ee486
+ ee50
+ ee503
+ ee511
+ ee514
+ ee52
+ ee528
+ ee557
+ ee56
+ ee567
+ ee586
+ ee60
+ ee615
+ ee618
+ ee622
+ ee624
+ ee638
+ ee64
+ ee651
+ ee653
+ ee661
+ ee663
+ ee668
+ ee68
+ ee689
+ ee698
+ ee708
+ ee71
+ ee712
+ ee714
+ ee719
+ ee726
+ ee732
+ ee735
  ee74
- ee78
- ee82
+ ee784
+ ee79
+ ee792
+ ee793
+ ee796
+ ee803
+ ee809
+ ee81
+ ee824
+ ee834
  ee84
- ee86
+ ee855
+ ee87
+ ee890
+ ee897
+ ee899
+ ee901
+ ee903
+ ee907
+ ee917
+ ee919
+ ee928
  egalx
  egasn
  egast
@@ -10606,6 +10564,7 @@ has 'valid_subdivisions' => (
  esce
  escl
  escm
+ escn
  esco
  escr
  escs
@@ -10727,6 +10686,7 @@ has 'valid_subdivisions' => (
  fr17
  fr18
  fr19
+ fr20r
  fr21
  fr22
  fr23
@@ -10804,17 +10764,18 @@ has 'valid_subdivisions' => (
  fr93
  fr94
  fr95
+ fr971
+ fr972
+ fr973
+ fr974
+ fr976
  frara
  frbfc
  frbre
- frcor
  frcvl
  frges
- frgua
  frhdf
  fridf
- frlre
- frmay
  frnaq
  frnor
  frocc
@@ -10839,6 +10800,7 @@ has 'valid_subdivisions' => (
  gbans
  gbbas
  gbbbd
+ gbbcp
  gbbdf
  gbbdg
  gbben
@@ -10848,7 +10810,6 @@ has 'valid_subdivisions' => (
  gbbgw
  gbbir
  gbbkm
- gbbmh
  gbbne
  gbbnh
  gbbns
@@ -10889,14 +10850,12 @@ has 'valid_subdivisions' => (
  gbdud
  gbdur
  gbeal
- gbeaw
  gbeay
  gbedh
  gbedu
  gbeln
  gbels
  gbenf
- gbeng
  gberw
  gbery
  gbess
@@ -10906,7 +10865,6 @@ has 'valid_subdivisions' => (
  gbfln
  gbfmo
  gbgat
- gbgbn
  gbglg
  gbgls
  gbgre
@@ -10962,7 +10920,6 @@ has 'valid_subdivisions' => (
  gbnet
  gbnfk
  gbngm
- gbnir
  gbnlk
  gbnln
  gbnmd
@@ -10980,7 +10937,6 @@ has 'valid_subdivisions' => (
  gbpem
  gbpkn
  gbply
- gbpol
  gbpor
  gbpow
  gbpte
@@ -10996,7 +10952,6 @@ has 'valid_subdivisions' => (
  gbsaw
  gbsay
  gbscb
- gbsct
  gbsfk
  gbsft
  gbsgc
@@ -11029,7 +10984,6 @@ has 'valid_subdivisions' => (
  gbtof
  gbtrf
  gbtwh
- gbukm
  gbvgl
  gbwar
  gbwbk
@@ -11040,7 +10994,6 @@ has 'valid_subdivisions' => (
  gbwkf
  gbwll
  gbwln
- gbwls
  gbwlv
  gbwnd
  gbwnm
@@ -11073,18 +11026,25 @@ has 'valid_subdivisions' => (
  gesz
  getb
  ghaa
+ ghaf
  ghah
- ghba
+ ghbe
+ ghbo
  ghcp
  ghep
+ ghne
  ghnp
+ ghot
+ ghsv
  ghtv
  ghue
  ghuw
+ ghwn
  ghwp
+ glav
  glku
- glqa
  glqe
+ glqt
  glsm
  gmb
  gml
@@ -11138,6 +11098,7 @@ has 'valid_subdivisions' => (
  gqbs
  gqc
  gqcs
+ gqdj
  gqi
  gqkn
  gqli
@@ -11376,9 +11337,8 @@ has 'valid_subdivisions' => (
  inbr
  inch
  inct
- indd
+ indh
  indl
- indn
  inga
  ingj
  inhp
@@ -11387,6 +11347,7 @@ has 'valid_subdivisions' => (
  injk
  inka
  inkl
+ inla
  inld
  inmh
  inml
@@ -11423,6 +11384,7 @@ has 'valid_subdivisions' => (
  iqsd
  iqsu
  iqwa
+ ir00
  ir01
  ir02
  ir03
@@ -11431,6 +11393,7 @@ has 'valid_subdivisions' => (
  ir06
  ir07
  ir08
+ ir09
  ir10
  ir11
  ir12
@@ -11452,8 +11415,6 @@ has 'valid_subdivisions' => (
  ir28
  ir29
  ir30
- ir31
- ir32
  is1
  is2
  is3
@@ -11462,6 +11423,78 @@ has 'valid_subdivisions' => (
  is6
  is7
  is8
+ isakh
+ isakn
+ isaku
+ isarn
+ isasa
+ isbfj
+ isbla
+ isblo
+ isbog
+ isbol
+ isdab
+ isdav
+ isdju
+ iseom
+ iseyf
+ isfjd
+ isfjl
+ isfla
+ isfld
+ isflr
+ isgar
+ isgog
+ isgrn
+ isgru
+ isgry
+ ishaf
+ ishel
+ ishrg
+ ishru
+ ishut
+ ishuv
+ ishva
+ ishve
+ isisa
+ iskal
+ iskjo
+ iskop
+ islan
+ ismos
+ ismyr
+ isnor
+ isrge
+ isrgy
+ isrhh
+ isrkn
+ isrkv
+ issbh
+ issbt
+ issdn
+ issdv
+ issel
+ issey
+ issfa
+ isshf
+ isskf
+ isskg
+ issko
+ issku
+ issnf
+ issog
+ issol
+ isssf
+ issss
+ isstr
+ issty
+ issvg
+ istal
+ isthg
+ istjo
+ isvem
+ isver
+ isvop
  it21
  it23
  it25
@@ -11485,7 +11518,6 @@ has 'valid_subdivisions' => (
  itag
  ital
  itan
- itao
  itap
  itaq
  itar
@@ -11505,7 +11537,6 @@ has 'valid_subdivisions' => (
  itcb
  itce
  itch
- itci
  itcl
  itcn
  itco
@@ -11543,9 +11574,7 @@ has 'valid_subdivisions' => (
  itna
  itno
  itnu
- itog
  itor
- itot
  itpa
  itpc
  itpd
@@ -11573,6 +11602,7 @@ has 'valid_subdivisions' => (
  itsp
  itsr
  itss
+ itsu
  itsv
  itta
  itte
@@ -11589,7 +11619,6 @@ has 'valid_subdivisions' => (
  itve
  itvi
  itvr
- itvs
  itvt
  itvv
  jm01
@@ -11809,13 +11838,13 @@ has 'valid_subdivisions' => (
  kzalm
  kzast
  kzaty
- kzbay
  kzkar
  kzkus
  kzkzy
  kzman
  kzpav
  kzsev
+ kzshy
  kzvos
  kzyuz
  kzzap
@@ -12313,6 +12342,7 @@ has 'valid_subdivisions' => (
  me21
  me22
  me23
+ me24
  mga
  mgd
  mgf
@@ -12345,77 +12375,86 @@ has 'valid_subdivisions' => (
  mhuti
  mhwth
  mhwtj
- mk02
- mk03
- mk04
- mk05
- mk06
- mk07
- mk08
- mk10
- mk11
- mk12
- mk13
- mk14
- mk16
- mk18
- mk19
- mk20
- mk21
- mk22
- mk23
- mk24
- mk25
- mk26
- mk27
- mk30
- mk32
- mk33
- mk34
- mk35
- mk36
- mk37
- mk40
- mk41
- mk42
- mk43
- mk44
- mk45
- mk46
- mk47
- mk48
- mk49
- mk50
- mk51
- mk52
- mk53
- mk54
- mk55
- mk56
- mk58
- mk59
- mk60
- mk61
- mk62
- mk63
- mk64
- mk65
- mk66
- mk67
- mk69
- mk70
- mk71
- mk72
- mk73
- mk74
- mk75
- mk76
- mk78
- mk80
- mk81
- mk82
- mk83
- mk85
+ mk101
+ mk102
+ mk103
+ mk104
+ mk105
+ mk106
+ mk107
+ mk108
+ mk109
+ mk201
+ mk202
+ mk203
+ mk204
+ mk205
+ mk206
+ mk207
+ mk208
+ mk209
+ mk210
+ mk211
+ mk301
+ mk303
+ mk304
+ mk307
+ mk308
+ mk310
+ mk311
+ mk312
+ mk313
+ mk401
+ mk402
+ mk403
+ mk404
+ mk405
+ mk406
+ mk407
+ mk408
+ mk409
+ mk410
+ mk501
+ mk502
+ mk503
+ mk504
+ mk505
+ mk506
+ mk507
+ mk508
+ mk509
+ mk601
+ mk602
+ mk603
+ mk604
+ mk605
+ mk606
+ mk607
+ mk608
+ mk609
+ mk701
+ mk702
+ mk703
+ mk704
+ mk705
+ mk706
+ mk801
+ mk802
+ mk803
+ mk804
+ mk805
+ mk806
+ mk807
+ mk808
+ mk809
+ mk810
+ mk811
+ mk812
+ mk813
+ mk814
+ mk815
+ mk816
+ mk817
  ml1
  ml10
  ml2
@@ -12549,21 +12588,16 @@ has 'valid_subdivisions' => (
  mt68
  muag
  mubl
- mubr
  mucc
- mucu
  mufl
  mugp
  mumo
  mupa
  mupl
- mupu
  mupw
- muqb
  muro
  murr
  musa
- muvp
  mv00
  mv01
  mv02
@@ -12584,14 +12618,7 @@ has 'valid_subdivisions' => (
  mv27
  mv28
  mv29
- mvce
  mvmle
- mvnc
- mvno
- mvsc
- mvsu
- mvun
- mvus
  mwba
  mwbl
  mwc
@@ -12773,27 +12800,19 @@ has 'valid_subdivisions' => (
  nlut
  nlze
  nlzh
- no01
- no02
  no03
- no04
- no05
- no06
- no07
- no08
- no09
- no10
  no11
- no12
- no14
  no15
- no16
- no17
  no18
- no19
- no20
  no21
  no22
+ no30
+ no34
+ no38
+ no42
+ no46
+ no50
+ no54
  np1
  np2
  np3
@@ -12810,6 +12829,13 @@ has 'valid_subdivisions' => (
  npma
  npme
  npna
+ npp1
+ npp2
+ npp3
+ npp4
+ npp5
+ npp6
+ npp7
  npra
  npsa
  npse
@@ -13021,23 +13047,22 @@ has 'valid_subdivisions' => (
  pkkp
  pkpb
  pksd
- pkta
- plds
- plkp
- pllb
- plld
- pllu
- plma
- plmz
- plop
- plpd
- plpk
- plpm
- plsk
- plsl
- plwn
- plwp
- plzp
+ pl02
+ pl04
+ pl06
+ pl08
+ pl10
+ pl12
+ pl14
+ pl16
+ pl18
+ pl20
+ pl22
+ pl24
+ pl26
+ pl28
+ pl30
+ pl32
  psbth
  psdeb
  psgza
@@ -13326,6 +13351,8 @@ has 'valid_subdivisions' => (
  sc23
  sc24
  sc25
+ sc26
+ sc27
  sddc
  sdde
  sddn
@@ -13594,6 +13621,7 @@ has 'valid_subdivisions' => (
  skzi
  sle
  sln
+ slnw
  sls
  slw
  sm01
@@ -13657,8 +13685,13 @@ has 'valid_subdivisions' => (
  ssnu
  ssuy
  sswr
+ st01
+ st02
+ st03
+ st04
+ st05
+ st06
  stp
- sts
  svah
  svca
  svch
@@ -14006,6 +14039,7 @@ has 'valid_subdivisions' => (
  tz28
  tz29
  tz30
+ tz31
  ua05
  ua07
  ua09
@@ -14058,6 +14092,7 @@ has 'valid_subdivisions' => (
  ug123
  ug124
  ug125
+ ug126
  ug201
  ug202
  ug203
@@ -14092,6 +14127,9 @@ has 'valid_subdivisions' => (
  ug232
  ug233
  ug234
+ ug235
+ ug236
+ ug237
  ug301
  ug302
  ug303
@@ -14124,6 +14162,11 @@ has 'valid_subdivisions' => (
  ug330
  ug331
  ug332
+ ug333
+ ug334
+ ug335
+ ug336
+ ug337
  ug401
  ug402
  ug403
@@ -14155,6 +14198,10 @@ has 'valid_subdivisions' => (
  ug429
  ug430
  ug431
+ ug432
+ ug433
+ ug434
+ ug435
  ugc
  uge
  ugn
@@ -14390,11 +14437,11 @@ has 'valid_subdivisions' => (
  yeta
  zaec
  zafs
- zagt
+ zagp
+ zakzn
  zalp
  zamp
  zanc
- zanl
  zanw
  zawc
  zm01
@@ -14677,10 +14724,10 @@ has 'valid_subdivisions' => (
 );
 
 around valid_subdivisions => sub {
-	my ($orig, $self) = @_;
-	my $subdevisions = $self->$orig;
-	
-	return @{$subdevisions};
+    my ($orig, $self) = @_;
+
+    my $subdivisions = $self->$orig;
+    return @{$subdivisions};
 };
 
 has 'valid_units' => (
@@ -14688,7 +14735,7 @@ has 'valid_units' => (
 	isa			=> ArrayRef,
 	init_arg	=> undef,
 	default	=> sub {[qw( acceleration-g-force
- acceleration-meter-per-second-squared
+ acceleration-meter-per-square-second
  angle-arc-minute
  angle-arc-second
  angle-degree
@@ -14703,11 +14750,19 @@ has 'valid_units' => (
  area-square-meter
  area-square-mile
  area-square-yard
+ area-dunam
  concentr-karat
- concentr-milligram-per-deciliter
+ concentr-milligram-ofglucose-per-deciliter
  concentr-millimole-per-liter
- concentr-part-per-million
- consumption-liter-per-100kilometers
+ concentr-percent
+ concentr-permille
+ concentr-permyriad
+ concentr-permillion
+ concentr-mole
+ concentr-item
+ concentr-portion
+ concentr-ofglucose
+ consumption-liter-per-100-kilometer
  consumption-liter-per-kilometer
  consumption-mile-per-gallon
  consumption-mile-per-gallon-imperial
@@ -14719,9 +14774,11 @@ has 'valid_units' => (
  digital-kilobyte
  digital-megabit
  digital-megabyte
+ digital-petabyte
  digital-terabit
  digital-terabyte
  duration-century
+ duration-decade
  duration-day
  duration-day-person
  duration-hour
@@ -14746,10 +14803,25 @@ has 'valid_units' => (
  energy-kilocalorie
  energy-kilojoule
  energy-kilowatt-hour
+ energy-electronvolt
+ energy-therm-us
+ energy-british-thermal-unit
+ force-pound-force
+ force-newton
+ force-kilowatt-hour-per-100-kilometer
  frequency-gigahertz
  frequency-hertz
  frequency-kilohertz
  frequency-megahertz
+ graphics-dot
+ graphics-dot-per-centimeter
+ graphics-dot-per-inch
+ graphics-em
+ graphics-megapixel
+ graphics-pixel
+ graphics-pixel-per-centimeter
+ graphics-pixel-per-inch
+ length-100-kilometer
  length-astronomical-unit
  length-centimeter
  length-decimeter
@@ -14768,9 +14840,16 @@ has 'valid_units' => (
  length-nautical-mile
  length-parsec
  length-picometer
+ length-point
  length-yard
+ length-earth-radius
+ length-solar-radius
+ light-candela
+ light-lumen
  light-lux
+ light-solar-luminosity
  mass-carat
+ mass-grain
  mass-gram
  mass-kilogram
  mass-metric-ton
@@ -14781,17 +14860,26 @@ has 'valid_units' => (
  mass-pound
  mass-stone
  mass-ton
+ mass-dalton
+ mass-earth-mass
+ mass-solar-mass
  power-gigawatt
  power-horsepower
  power-kilowatt
  power-megawatt
  power-milliwatt
  power-watt
+ pressure-atmosphere
  pressure-hectopascal
- pressure-inch-hg
+ pressure-inch-ofhg
+ pressure-bar
  pressure-millibar
- pressure-millimeter-of-mercury
- pressure-pound-per-square-inch
+ pressure-millimeter-ofhg
+ pressure-pound-force-per-square-inch
+ pressure-pascal
+ pressure-kilopascal
+ pressure-megapascal
+ pressure-ofhg
  speed-kilometer-per-hour
  speed-knot
  speed-meter-per-second
@@ -14800,6 +14888,8 @@ has 'valid_units' => (
  temperature-fahrenheit
  temperature-generic
  temperature-kelvin
+ torque-pound-force-foot
+ torque-newton-meter
  volume-acre-foot
  volume-bushel
  volume-centiliter
@@ -14813,7 +14903,15 @@ has 'valid_units' => (
  volume-cup
  volume-cup-metric
  volume-deciliter
+ volume-dessert-spoon
+ volume-dessert-spoon-imperial
+ volume-drop
+ volume-dram
+ volume-jigger
+ volume-pinch
+ volume-quart-imperial
  volume-fluid-ounce
+ volume-fluid-ounce-imperial
  volume-gallon
  volume-gallon-imperial
  volume-hectoliter
@@ -14825,14 +14923,24 @@ has 'valid_units' => (
  volume-quart
  volume-tablespoon
  volume-teaspoon
+ volume-barrel
+ acceleration-meter-per-second-squared
+ consumption-liter-per-100kilometers
+ concentr-part-per-million
+ pressure-inch-hg
+ pressure-pound-per-square-inch
+ pressure-millimeter-of-mercury
+ proportion-karat
+ torque-pound-foot
+ concentr-milligram-per-deciliter
  	)]},
 );
 
 around valid_units => sub {
-	my ($orig, $self) = @_;
-	my $units = $self->$orig;
-	
-	return @{$units};
+    my ($orig, $self) = @_;
+
+    my $units = $self->$orig;
+    return @{$units};
 };
 
 has 'key_aliases' => (
@@ -14861,10 +14969,10 @@ has 'key_aliases' => (
 );
 
 around key_aliases => sub {
-	my ($orig, $self) = @_;
-	my $aliases = $self->$orig;
-	
-	return %{$aliases};
+    my ($orig, $self) = @_;
+    my $aliases = $self->$orig;
+
+    return %{$aliases};
 };
 
 has 'key_names' => (
@@ -14876,10 +14984,10 @@ has 'key_names' => (
 );
 
 around key_names => sub {
-	my ($orig, $self) = @_;
-	my $names = $self->$orig;
-	
-	return %{$names};
+    my ($orig, $self) = @_;
+    my $names = $self->$orig;
+
+    return %{$names};
 };
 
 has 'valid_keys' => (
@@ -15274,6 +15382,9 @@ has 'valid_keys' => (
 			'remove',
 			'zawgyi',
 		],
+		dx	=> [
+			'SCRIPT_CODE',
+		],
 		em	=> [
 			'emoji',
 			'text',
@@ -15434,6 +15545,8 @@ has 'valid_keys' => (
 			'xml10',
 			'prprname',
 			'names',
+			'iast',
+			'ewts',
 		],
 		ms	=> [
 			'metric',
@@ -15456,6 +15569,7 @@ has 'valid_keys' => (
 			'cham',
 			'cyrl',
 			'deva',
+			'diak',
 			'ethi',
 			'finance',
 			'fullwide',
@@ -15474,9 +15588,11 @@ has 'valid_keys' => (
 			'hantfin',
 			'hebr',
 			'hmng',
+			'hmnp',
 			'java',
 			'jpan',
 			'jpanfin',
+			'jpanyear',
 			'kali',
 			'khmr',
 			'knda',
@@ -15509,6 +15625,7 @@ has 'valid_keys' => (
 			'roman',
 			'romanlow',
 			'saur',
+			'segment',
 			'shrd',
 			'sind',
 			'sinh',
@@ -15518,6 +15635,7 @@ has 'valid_keys' => (
 			'talu',
 			'taml',
 			'tamldec',
+			'tnsa',
 			'telu',
 			'thai',
 			'tirh',
@@ -15526,6 +15644,7 @@ has 'valid_keys' => (
 			'traditional',
 			'vaii',
 			'wara',
+			'wcho',
 		],
 		rg	=> [
 			'RG_KEY_VALUE',
@@ -15880,6 +15999,7 @@ has 'valid_keys' => (
 			'galbv',
 			'Africa/Libreville',
 			'gaza',
+			'gazastrp',
 			'Asia/Gaza',
 			'gblon',
 			'Europe/London Europe/Belfast GB GB-Eire',
@@ -15898,7 +16018,7 @@ has 'valid_keys' => (
 			'gldkshvn',
 			'America/Danmarkshavn',
 			'glgoh',
-			'America/Godthab',
+			'America/Godthab America/Nuuk',
 			'globy',
 			'America/Scoresbysund',
 			'glthu',
@@ -15984,7 +16104,7 @@ has 'valid_keys' => (
 			'kicxi',
 			'Pacific/Kiritimati',
 			'kipho',
-			'Pacific/Enderbury',
+			'Pacific/Enderbury Pacific/Kanton',
 			'kitrw',
 			'Pacific/Tarawa',
 			'kmyva',
@@ -16007,6 +16127,8 @@ has 'valid_keys' => (
 			'Asia/Almaty',
 			'kzguw',
 			'Asia/Atyrau',
+			'kzksn',
+			'Asia/Qostanay',
 			'kzkzo',
 			'Asia/Qyzylorda',
 			'kzura',
@@ -16490,10 +16612,10 @@ has 'valid_keys' => (
 );
 
 around valid_keys => sub {
-	my ($orig, $self) = @_;
-	
-	my $keys = $self->$orig;
-	return %{$keys};
+    my ($orig, $self) = @_;
+
+    my $keys = $self->$orig;
+    return %{$keys};
 };
 
 has 'language_aliases' => (
@@ -16521,51 +16643,182 @@ has 'language_aliases' => (
 	'zh_hakka' => 'hak',
 	'zh_min_nan' => 'nan',
 	'zh_xiang' => 'hsn',
+	'en_GB_oed' => 'en_GB_oxendict',
 	'in' => 'id',
 	'iw' => 'he',
 	'ji' => 'yi',
 	'jw' => 'jv',
-	'mo' => 'ro_MD',
+	'mo' => 'ro',
 	'scc' => 'sr',
 	'scr' => 'hr',
-	'no_BOKMAL' => 'nb',
-	'no_NYNORSK' => 'nn',
-	'aa_SAAHO' => 'ssy',
+	'aam' => 'aas',
+	'adp' => 'dz',
+	'aue' => 'ktz',
+	'ayx' => 'nun',
+	'bgm' => 'bcg',
+	'bjd' => 'drl',
+	'ccq' => 'rki',
+	'cjr' => 'mom',
+	'cka' => 'cmr',
+	'cmk' => 'xch',
+	'coy' => 'pij',
+	'cqu' => 'quh',
+	'drh' => 'mn',
+	'drw' => 'fa_AF',
+	'gav' => 'dev',
+	'gfx' => 'vaj',
+	'ggn' => 'gvr',
+	'gti' => 'nyc',
+	'guv' => 'duz',
+	'hrr' => 'jal',
+	'ibi' => 'opa',
+	'ilw' => 'gal',
+	'jeg' => 'oyb',
+	'kgc' => 'tdf',
+	'kgh' => 'kml',
+	'koj' => 'kwv',
+	'krm' => 'bmf',
+	'ktr' => 'dtp',
+	'kvs' => 'gdj',
+	'kwq' => 'yam',
+	'kxe' => 'tvd',
+	'kzj' => 'dtp',
+	'kzt' => 'dtp',
+	'lii' => 'raq',
+	'lmm' => 'rmx',
+	'meg' => 'cir',
+	'mst' => 'mry',
+	'mwj' => 'vaj',
+	'myt' => 'mry',
+	'nad' => 'xny',
+	'ncp' => 'kdz',
+	'nnx' => 'ngv',
+	'nts' => 'pij',
+	'oun' => 'vaj',
+	'pcr' => 'adx',
+	'pmc' => 'huw',
+	'pmu' => 'phr',
+	'ppa' => 'bfy',
+	'ppr' => 'lcq',
+	'pry' => 'prt',
+	'puz' => 'pub',
+	'sca' => 'hle',
+	'skk' => 'oyb',
+	'tdu' => 'dtp',
+	'thc' => 'tpo',
+	'thx' => 'oyb',
+	'tie' => 'ras',
+	'tkk' => 'twm',
+	'tlw' => 'weo',
+	'tmp' => 'tyj',
+	'tne' => 'kak',
+	'tnf' => 'fa_AF',
+	'tsf' => 'taj',
+	'uok' => 'ema',
+	'xba' => 'cax',
+	'xia' => 'acn',
+	'xkh' => 'waw',
+	'xsj' => 'suj',
+	'ybd' => 'rki',
+	'yma' => 'lrr',
+	'ymt' => 'mtm',
+	'yos' => 'zom',
+	'yuu' => 'yug',
+	'asd' => 'snz',
+	'dit' => 'dif',
+	'llo' => 'ngt',
+	'myd' => 'aog',
+	'nns' => 'nbr',
+	'agp' => 'apf',
+	'ais' => 'ami',
+	'baz' => 'nvo',
+	'bhk' => 'fbl',
+	'bic' => 'bir',
+	'bjq' => 'bzc',
+	'bkb' => 'ebk',
+	'blg' => 'iba',
+	'btb' => 'beb',
+	'daf' => 'dnj',
+	'dap' => 'njz',
+	'djl' => 'dze',
+	'dkl' => 'aqd',
+	'drr' => 'kzk',
+	'dud' => 'uth',
+	'duj' => 'dwu',
+	'dwl' => 'dbt',
+	'elp' => 'amq',
+	'gbc' => 'wny',
+	'ggo' => 'esg',
+	'ggr' => 'gtu',
+	'gio' => 'aou',
+	'gli' => 'kzk',
+	'ill' => 'ilm',
+	'izi' => 'eza',
+	'jar' => 'jgk',
+	'kdv' => 'zkd',
+	'kgd' => 'ncq',
+	'kpp' => 'jkm',
+	'kxl' => 'kru',
+	'kzh' => 'dgl',
+	'leg' => 'enl',
+	'mgx' => 'jbk',
+	'mnt' => 'wnn',
+	'mof' => 'xnt',
+	'mwd' => 'dmw',
+	'nbf' => 'nru',
+	'nbx' => 'ekc',
+	'nln' => 'azd',
+	'nlr' => 'nrk',
+	'noo' => 'dtd',
+	'nxu' => 'bpp',
+	'pat' => 'kxr',
+	'rmr' => 'emx',
+	'sap' => 'aqt',
+	'sgl' => 'isk',
+	'sul' => 'sgd',
+	'sum' => 'ulw',
+	'tgg' => 'bjp',
+	'thw' => 'ola',
+	'tid' => 'itd',
+	'unp' => 'wro',
+	'wgw' => 'wgb',
+	'wit' => 'nol',
+	'wiw' => 'nwo',
+	'xrq' => 'dmw',
+	'yen' => 'ynq',
+	'yiy' => 'yrm',
+	'zir' => 'scv',
+	'sgn_BR' => 'bzs',
+	'sgn_CO' => 'csn',
+	'sgn_DE' => 'gsg',
+	'sgn_DK' => 'dsl',
+	'sgn_FR' => 'fsl',
+	'sgn_GB' => 'bfi',
+	'sgn_GR' => 'gss',
+	'sgn_IE' => 'isg',
+	'sgn_IT' => 'ise',
+	'sgn_JP' => 'jsl',
+	'sgn_MX' => 'mfs',
+	'sgn_NI' => 'ncs',
+	'sgn_NL' => 'dse',
+	'sgn_NO' => 'nsi',
+	'sgn_PT' => 'psr',
+	'sgn_SE' => 'swl',
+	'sgn_US' => 'ase',
+	'sgn_ZA' => 'sfs',
+	'sgn_ES' => 'ssp',
+	'zh_cmn' => 'zh',
+	'zh_cmn_Hans' => 'zh_Hans',
+	'zh_cmn_Hant' => 'zh_Hant',
+	'zh_gan' => 'gan',
+	'zh_wuu' => 'wuu',
+	'zh_yue' => 'yue',
+	'no_bokmal' => 'nb',
+	'no_nynorsk' => 'nn',
+	'aa_saaho' => 'ssy',
 	'sh' => 'sr_Latn',
 	'cnr' => 'sr_ME',
-	'no' => 'nb',
 	'tl' => 'fil',
-	'az_AZ' => 'az_Latn_AZ',
-	'bs_BA' => 'bs_Latn_BA',
-	'ha_Latn_GH' => 'ha_GH',
-	'ha_Latn_NE' => 'ha_NE',
-	'ha_Latn_NG' => 'ha_NG',
-	'kk_Cyrl_KZ' => 'kk_KZ',
-	'ky_Cyrl_KG' => 'ky_KG',
-	'ks_Arab_IN' => 'ks_IN',
-	'mn_Cyrl_MN' => 'mn_MN',
-	'ms_Latn_BN' => 'ms_BN',
-	'ms_Latn_MY' => 'ms_MY',
-	'ms_Latn_SG' => 'ms_SG',
-	'pa_IN' => 'pa_Guru_IN',
-	'pa_PK' => 'pa_Arab_PK',
-	'shi_MA' => 'shi_Tfng_MA',
-	'sr_BA' => 'sr_Cyrl_BA',
-	'sr_ME' => 'sr_Latn_ME',
-	'sr_RS' => 'sr_Cyrl_RS',
-	'sr_XK' => 'sr_Cyrl_XK',
-	'tzm_Latn_MA' => 'tzm_MA',
-	'ug_Arab_CN' => 'ug_CN',
-	'uz_AF' => 'uz_Arab_AF',
-	'uz_UZ' => 'uz_Latn_UZ',
-	'vai_LR' => 'vai_Vaii_LR',
-	'yue_CN' => 'yue_Hans_CN',
-	'yue_HK' => 'yue_Hant_HK',
-	'zh_CN' => 'zh_Hans_CN',
-	'zh_HK' => 'zh_Hant_HK',
-	'zh_MO' => 'zh_Hant_MO',
-	'zh_SG' => 'zh_Hans_SG',
-	'zh_TW' => 'zh_Hant_TW',
 	'aju' => 'jrb',
 	'als' => 'sq',
 	'arb' => 'ar',
@@ -16738,7 +16991,7 @@ has 'language_aliases' => (
 	'mkd' => 'mk',
 	'mal' => 'ml',
 	'mon' => 'mn',
-	'mol' => 'ro_MD',
+	'mol' => 'ro',
 	'mar' => 'mr',
 	'msa' => 'ms',
 	'mlt' => 'mt',
@@ -16750,7 +17003,7 @@ has 'language_aliases' => (
 	'ndo' => 'ng',
 	'nld' => 'nl',
 	'nno' => 'nn',
-	'nor' => 'nb',
+	'nor' => 'no',
 	'nbl' => 'nr',
 	'nav' => 'nv',
 	'nya' => 'ny',
@@ -16838,6 +17091,22 @@ has 'language_aliases' => (
 	'slo' => 'sk',
 	'tib' => 'bo',
 	'wel' => 'cy',
+	'cel_gaulish' => 'xtg',
+	'i_default' => 'en_x_i_default',
+	'i_enochian' => 'und_x_i_enochian',
+	'i_mingo' => 'see_x_i_mingo',
+	'zh_min' => 'nan_x_zh_min',
+	'und_aaland' => 'und_AX',
+	'hy_arevmda' => 'hyw',
+	'und_arevmda' => 'und',
+	'und_arevela' => 'und',
+	'und_lojban' => 'und',
+	'und_saaho' => 'und',
+	'und_bokmal' => 'und',
+	'und_nynorsk' => 'und',
+	'und_hakka' => 'und',
+	'und_xiang' => 'und',
+	'und_hepburn_heploc' => 'und_alalc97',
 	}},
 );
 has 'region_aliases' => (

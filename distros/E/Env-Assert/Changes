@@ -1,5 +1,8 @@
 Revision history for Env-Assert
 
+0.010     2024-01-02 20:32:48+01:00 Europe/Stockholm
+          * Fix errors in SYNOPSIS. (Ron Savage <ron@savage.net.au>)
+
 0.009     2023-11-15 19:35:06+01:00 Europe/Stockholm
           * Add App::FatPacker to deps.
           * Add contributor gregor herrmann <gregoa@debian.org>

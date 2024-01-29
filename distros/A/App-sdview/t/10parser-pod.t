@@ -82,6 +82,31 @@ EOPOD
    ok( $p[5]->text->get_tag_at( 0, "underline" ), 'underline tag' );
 };
 
+subtest "Formatted headings" => sub {
+   my @p = App::sdview::Parser::Pod->new->parse_string( <<"EOPOD" );
+=head1 A B<Bold> Beginning
+EOPOD
+
+   is( scalar @p, 1, 'Received 1 paragraph' );
+
+   is( $p[0]->type, "head1", 'p[0] type' );
+   is( $p[0]->text, "A Bold Beginning", 'p[0] text' );
+   is( [ sort $p[0]->text->tagnames ], [qw( bold )], 'p[0] tags' );
+};
+
+subtest "Non-breaking spaces" => sub {
+   my @p = App::sdview::Parser::Pod->new->parse_string( <<"EOPOD" );
+=pod
+
+Some content with S<non-breaking spaces> in it.
+EOPOD
+
+   is( scalar @p, 1, 'Received 1 paragraph' );
+
+   is( $p[0]->type, "plain", 'p[0] type' );
+   is( $p[0]->text, "Some content with non-breaking\xA0spaces in it.", 'p[0] text' );
+};
+
 subtest "Verbatim trimming" => sub {
    my @p = App::sdview::Parser::Pod->new->parse_string( <<"EOPOD" );
 =head1 EXAMPLE

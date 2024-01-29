@@ -36,7 +36,7 @@
          "requires" : {
             "XXX" : "0.38",
             "YAML::PP" : "0.036",
-            "YAMLScript" : "v0.1.11",
+            "YAMLScript::Lingy" : "v0.2.1",
             "perl" : "v5.16.0"
          }
       },
@@ -58,7 +58,7 @@
          "web" : "https://github.com/ingydotnet/yaml-pp-yamlscript-pm"
       }
    },
-   "version" : "0.0.1",
+   "version" : "0.0.2",
    "x_generated_by_perl" : "v5.28.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

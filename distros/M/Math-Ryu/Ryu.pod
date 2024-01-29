@@ -28,13 +28,17 @@ Math::Ryu - perl interface to Ryu (float-to-string conversion).
 
    $str = d2s(1.4 / 10);
    print $str;           # 1.3999999999999999E-1
+   print fmtpy($str);    # 0.13999999999999999
 
    $str = d2s(sqrt 2);
    print $str;           # 1.4142135623730951E0
+   print fmtpy($str);    # 1.4142135623730951
 
    # Also do the reverse of s2d()
    my $d = s2d('1E-1');
-   printf "%.17g\n", $d; # 0.10000000000000001
+   printf "%.17g\n", $d;   # 0.10000000000000001
+   print  d2s($d);         # 1E-1
+   print  fmtpy(d2s($d));  # 0.1
 
 
 =head1 FUNCTIONS
@@ -108,6 +112,11 @@ Math::Ryu - perl interface to Ryu (float-to-string conversion).
     $str is the same as returned by d2exp($nv, $digits).
     $len is length($str).
 
+  $str = fmtpy($s);
+    The argument $s is a string as returned by d2(s) or n2s().
+    We reformat this string to be the same as the string that
+    python3 produces and return it as $str.
+
 =head1 TODO
 
     Cover larger precision NV types (ie long double and __float128)
@@ -129,7 +138,7 @@ Math::Ryu - perl interface to Ryu (float-to-string conversion).
     The Boost Software License can be found at:
     https://www.boost.org/LICENSE_1_0.txt
 
-    This perl module is Copyright 2021 Sisyphus
+    This perl module is Copyright 2021-24 Sisyphus
 
 =head1 AUTHOR
 

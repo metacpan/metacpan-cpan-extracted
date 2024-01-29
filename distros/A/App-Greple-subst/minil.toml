@@ -7,6 +7,9 @@ static_install = "auto"
 
 [release]
 branch = "master"
+hooks = [
+    "make -C docs",
+]
 
 [FileGatherer]
 exclude_match = [ '^images/', '^docs/' ]

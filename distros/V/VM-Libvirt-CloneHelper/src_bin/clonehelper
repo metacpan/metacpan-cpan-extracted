@@ -133,8 +133,6 @@ The variable/value defaults are shown below.
     wait=360
     # How long to wait if auto-doing all.
 
-temp
-
 =cut
 
 use strict;

@@ -23,7 +23,7 @@ use constant FEMININE_GENDER => 'fem';
 use constant MASCULINE_GENDER => 'man';
 use constant NEUTRAL_GENDER => 'neu';
  
-$VERSION                  = 0.03;
+$VERSION                  = 0.06;
 $DEBUG                    = 0;
 @ISA                      = qw(Exporter);
 @EXPORT_OK                = qw( &number_to_slavic &ordinate_to_slavic LANG_BG);
@@ -346,7 +346,7 @@ sub bulgarian_triplets
    push @inter_options, $inflexion if $inflexion;
    my $inter_options = join ':', @inter_options;
    
-   $inter[-1] =~ s/({.*})/{$1$inter_options}/;
+   $inter[-1] =~ s/(\{.*\})/{$1$inter_options}/;
 
    my $inter = join(' ', @inter);
    deb("bulgarian_triplets calling interpolate_string with [$inter]\n");
@@ -537,14 +537,14 @@ sub interpolate_string
 
  
  while ($data =~ m/\[$RE{num}{real}{-sep=>'[,.]?'}\]+/ || # [number]
-	$data =~ m/{$RE{num}{real}{-sep=>'[,.]?'}}+/)	  # {number}
+	$data =~ m/\{$RE{num}{real}{-sep=>'[,.]?'}\}+/)	  # {number}
  {
-  $data =~ s/{
-	     {
+  $data =~ s/\{
+	     \{
 	     $RE{num}{dec}{-sep=>'[,.]?'}{-keep}
-	     }
+	     \}
 	     ([:\w]+)?
-	     }
+	     \}
 	    /
 	     number_to_slavic($lang,
 			      $1,
@@ -589,6 +589,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::Slavic::Numbers - Converts numeric values into their Slavic
@@ -623,13 +625,13 @@ string equivalents.  Bulgarian is supported so far.
 This module converts a number into a Slavic-language cardinal or
 ordinal.  Bulgarian is supported so far.
 
-The interface tries to conform to the one defined in Lingua::EN::Number,
-though this module does not provide any parse() method. Also, 
-unlike Lingua::En::Numbers, you can use this module in a procedural
-manner by importing the number_to_LL() function (LL=bg so far).
+The interface tries to conform to the one defined in L<Lingua::EN::Numbers>,
+though this module does not provide any C<parse()> method. Also, 
+unlike L<Lingua::EN::Numbers>, you can use this module in a procedural
+manner by importing the C<number_to_I<LL>()> function (I<LL>=C<bg> so far).
 
 If you plan to use this module with greater numbers (>10e20), you can use
-the Math::BigInt module:
+the L<Math::BigInt> module:
 
  use Math::BigInt;
  use Lingua::Slavic::Numbers qw( number_to_slavic );
@@ -661,11 +663,11 @@ This function can be exported by the module.
 
 =head1 CONSTANTS
 
-Bulgarian: Lingua:Slavic::Numbers::LANG_BG ('bg')
+Bulgarian: C<< Lingua:Slavic::Numbers::LANG_BG ('bg') >>
 
 =head1 SOURCE
 
-Lingua::FR::Numbers for the code
+L<Lingua::FR::Numbers> for the code
 
 =head1 BUGS
 
@@ -673,7 +675,7 @@ Though the module should be able to convert big numbers (up to 10**36),
 I do not know how Perl handles them.
 
 Please report any bugs or comments using the Request Tracker interface:
-https://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-Slavic-Numbers
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-Slavic-Numbers>
 
 =head1 COPYRIGHT
 
@@ -687,5 +689,5 @@ Ted Zlatanov <tzz@lifelogs.com>
 
 =head1 SEE ALSO
 
-Lingua::EN::Numbers, Lingua::Word2Num
+L<Lingua::EN::Numbers>, L<Lingua::Word2Num>
 

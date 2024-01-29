@@ -28,7 +28,6 @@ use JSON       qw( to_json from_json );
 
 use Dancer2::Plugin::JobScheduler::Testing::Utils qw( :all );
 use Database::Temp;
-use Data::Dumper;
 
 # Test databases
 # my @drivers = qw( Pg );
@@ -87,10 +86,10 @@ my %plugin_config = (
                 handle_uniqkey => 'acknowledge',
                 databases      => {
                     theschwartz_db1 => {
-                        prefix       => q{},
-                        dbh_callback => 'Database::ManagedHandle->instance',
+                        prefix => q{},
                     },
-                }
+                },
+                dbh_callback => 'Database::ManagedHandle->instance',
             }
         }
     }
@@ -98,8 +97,10 @@ my %plugin_config = (
 
 {
 
-    package TestProgram;
-    use Dancer2;
+    package Dancer2::Plugin::JobScheduler::Testing::TheSchwartz::WebApp::All;
+
+    # request_data command available in Dancer2 0.301000
+    use Dancer2 0.301;
     use HTTP::Status qw( :constants status_message );
 
     BEGIN {
@@ -107,7 +108,6 @@ my %plugin_config = (
         set plugins => { JobScheduler => \%plugin_config, };
     }
     use Dancer2::Plugin::JobScheduler;
-    use Data::Dumper;
 
     set serializer => 'JSON';
 
@@ -138,11 +138,26 @@ my %plugin_config = (
 
 }
 
-my $app = TestProgram->to_app;
+my $app = Dancer2::Plugin::JobScheduler::Testing::TheSchwartz::WebApp::All->to_app;
 is( ref $app, 'CODE', 'Initialized the test app' );
 
 # Activate web app
 my $mech = Test::WWW::Mechanize::PSGI->new( app => $app );
+
+# List jobs, get 0
+$mech->get_ok(q{/list_jobs/task_3});
+
+# diag $mech->content;
+is(
+    from_json( $mech->content ),
+    {
+        error   => undef,
+        status  => 'OK',
+        success => 1,
+        jobs    => []
+    },
+    'Correct return'
+);
 
 # Submit a job with ID 1
 $mech->post(

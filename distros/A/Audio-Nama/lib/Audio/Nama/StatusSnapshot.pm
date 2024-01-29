@@ -1,7 +1,8 @@
 package Audio::Nama::StatusSnapshot;
 
 use Role::Tiny;
-use Modern::Perl;
+use Modern::Perl '2020';
+our $VERSION = 1.0;
 {
 package Audio::Nama;
 
@@ -47,8 +48,6 @@ sub status_snapshot {
 }
 sub status_snapshot_string { 
 	my $json = json_out(status_snapshot());
-	# hack to avoid false diff due to string/numerical
-	# representation 
 	$json =~ s/: "(\d+)"/: $1/g; 
 	$json
 }

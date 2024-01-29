@@ -13,6 +13,7 @@ my $builder = Module::Build->new(
       'experimental'    => 0,
       'match::simple'   => 0,
       'Date::Calc'      => 0,
+      'List::Util'      => 1.45,
       'List::MoreUtils' => 0,
       'Scalar::Does'    => 0.007,
       'Scalar::Util'    => 0,
@@ -24,7 +25,7 @@ my $builder = Module::Build->new(
     },
     build_requires => {
       'Test::More'       => 1.302190,
-      'Test::NoWarnings' => 0,
+      'Test::Warnings'   => 0,
       'Clone'            => 0,
     },
     add_to_cleanup      => [ 'Data-Domain-*' ],

@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.44';
+our $VERSION = '1.00';
 
 use Curses::UI;
 
@@ -84,7 +84,26 @@ sub _init($)
 	fatal('_1_may_only_be_called_from_itself', __PACKAGE__);
 
     # can't use accessors as we're not yet correctly blessed:
-    $self->{_cui} = Curses::UI->new(-clear_on_exit => 1);
+    $self->{_cui} = Curses::UI->new(-clear_on_exit => 1, -color_support => 1);
+
+    # prepare all possible 216 colours:
+    my $col = $self->{_cui}->color;
+    local $_;
+    foreach my $r (0..5)
+    {
+	foreach my $g (0..5)
+	{
+	    foreach my $b (0..5)
+	    {
+		$_ = (($r * 6) + $g) * 6 + $b;
+		$col->define_color('C' . $_,
+				   1 + int($r * 998 / 5),
+				   1 + int($g * 998 / 5),
+				   1 + int($b * 998 / 5));
+	    }
+	}
+    }
+
     $self->{max_height} = $self->{_cui}->height;
     $self->{max_width} = $self->{_cui}->width;
     # internal flag if Curses::UI's mainloop is currently running:

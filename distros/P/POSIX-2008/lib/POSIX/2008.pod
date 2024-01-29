@@ -8,7 +8,8 @@ POSIX::2008 - Perl interface to POSIX.1-2008
 
   use POSIX::2008 qw(:fcntl openat pwrite);
 
-  sysopen my $dh, '/tmp', O_RDONLY|O_DIRECTORY|O_NOFOLLOW or die 'Dafuq?';
+  sysopen my $dh, '/tmp', O_RDONLY|O_DIRECTORY|O_NOFOLLOW
+    or die 'Dafuq?';
   my $fh = openat($dh, 'foobar', O_RDWR|O_CREAT);
   pwrite($fh, 'fuckyounsa', 10, 0);
 
@@ -22,11 +23,15 @@ It also contains a few nonstandard interfaces present in Linux, BSD and Solaris
 that are extensions of the POSIX interfaces.
 
 This module is provided "as is" unless someone volunteers to maintain it.
+Use at your own risk.
 
 =head1 FILE DESCRIPTORS AND HANDLES
 
 Since version 0.05, all I/O functions that take numeric file descriptors also
-accept Perl file or directory handles.
+accept Perl file or directory handles, except for L<C<fdopen()>|"fdopen"> and
+L<C<fdopendir()>|"fdopendir">.
+
+Since version 0.22, returned handles support IO::Handle methods.
 
 =head1 SYSTEM CALL RETURN VALUES
 
@@ -35,12 +40,13 @@ A system call return value of -1 meaning "error" is mapped to undef.
 A system call return value of 0 meaning "success" is mapped to "0 but true".
 
 For system calls where 0 does not just mean "success", 0 is returned
-unchanged. These are L<C<open()>|"open">, L<C<read()>|"read">,
-L<C<write()>|"write">, L<C<readv()>|"readv">, L<C<writev()>|"writev">,
-L<C<pread()>|"pread">, L<C<pwrite()>|"pwrite">, L<C<preadv()>|"preadv">,
-L<C<pwritev()>|"pwritev">, L<C<preadv2()>|"preadv2">,
-L<C<pwritev2()>|"pwritev2">, L<C<getpriority()>|"getpriority">.
-L<C<openat()>|"openat"> gets a special treatment in this regard, see below.
+unchanged. These are L<C<creat()>|"creat">, L<C<open()>|"open">,
+L<C<read()>|"read">, L<C<write()>|"write">, L<C<readv()>|"readv">,
+L<C<writev()>|"writev">, L<C<pread()>|"pread">, L<C<pwrite()>|"pwrite">,
+L<C<preadv()>|"preadv">, L<C<pwritev()>|"pwritev">, L<C<preadv2()>|"preadv2">,
+L<C<pwritev2()>|"pwritev2">, L<C<getpriority()>|"getpriority">,
+L<C<nice()>|"nice">. L<C<openat()>|"openat"> gets a special treatment in this
+regard, see below.
 
 =head1 FUNCTIONS
 
@@ -67,6 +73,8 @@ If you don't want that, use C<CORE::abs()>.
 =item C<access>
 
 ret = access(path, mode);
+
+I<New in version 0.08.>
 
 =item C<acos>
 
@@ -108,8 +116,11 @@ f = atof(s);
 
 i = atoi(s);
 
-Calls C<atoll()>, C<atol()>, or C<atoi()>, whichever is the maximum supported 
+Calls C<atoll()>, C<atol()>, or C<atoi()>, whichever is the maximum supported
 by your system. This is of course silly because you could just use C<int()>.
+
+I<Changed in version 0.19:> Deprecated I<atol> and I<atoll> now covered by
+I<atoi>.
 
 =item C<basename>
 
@@ -130,6 +141,10 @@ r = cabs(re, im);
 =item C<carg>
 
 phi = carg(re, im);
+
+=item C<casin>
+
+y = casin(x);
 
 =item C<casinh>
 
@@ -175,23 +190,33 @@ y = ceil(x);
 
 (re, im) = cexp(re, im);
 
+I<New in version 0.19.>
+
 =item C<chdir>
 
 ret = chdir(dir);
 
-C<dir> can be a path, a Perl file handle or a file descriptor.
+C<dir> can be a path, a Perl file or directory handle, or a file descriptor.
+
+I<Changed in version 0.19:> Deprecated I<fchdir> now covered by I<chdir>.
 
 =item C<chmod>
 
 ret = chmod(what, mode);
 
-C<what> can be a path, a Perl file handle or a file descriptor.
+C<what> can be a path, a Perl file or directory handle (see L</"NOTES">), or a
+file descriptor.
+
+I<Changed in version 0.19:> Deprecated I<fchmod> now covered by I<chmod>.
 
 =item C<chown>
 
 ret = chown(what, uid, gid);
 
-C<what> can be a path, a Perl file handle or a file descriptor.
+C<what> can be a path, a Perl file or directory handle (see L</"NOTES">), or a
+file descriptor.
+
+I<Changed in version 0.19:> Deprecated I<fchown> now covered by I<chown>.
 
 =item C<cimag>
 
@@ -200,6 +225,8 @@ im = cimag(re, im);
 =item C<clock>
 
 t = clock()
+
+I<New in version 0.08.>
 
 =item C<clock_getcpuclockid>
 
@@ -243,6 +270,8 @@ s = confstr(name);
 
 I<name> is one of the C<_CS_*> integer constants.
 
+Returns undef on error.
+
 =item C<conj>
 
 (re, im) = conj(re, im);
@@ -270,6 +299,12 @@ y = cosh(x);
 =item C<creal>
 
 re = creal(re, im);
+
+=item C<creat>
+
+ret = creat(path, mode=0666);
+
+I<New in version 0.22.>
 
 =item C<csin>
 
@@ -304,6 +339,9 @@ by your system.
 
 Note that the library functions use signed integers, so C<div(~0, 1)> is
 C<(-1, 0)>. If you don't want that, use Perls C<int()>, C</> and C<%>.
+
+I<Changed in version 0.19:> Deprecated I<ldiv> and I<lldiv> now covered by
+I<div>.
 
 =item C<dlclose>
 
@@ -341,6 +379,39 @@ y = erf(x);
 
 y = erfc(x);
 
+=item C<execveat>
+
+execveat(dirfd, path, args, env=undef, flags=0);
+
+The execveat() system call is a nonstandard extension present in Linux.
+See also L<C<fexecve()>|"fexecve">.
+
+It executes the program referred to by I<path>, which is interpreted relative
+to I<dirfd> as with the other I<*at> functions, passing I<args> as its
+command-line arguments and optionally I<env> as its environment.
+
+I<args> must be an array reference and, by convention, I<args-E<gt>[0]> should
+be the name of the program being executed.
+
+I<env> must be a hash reference. If omitted or undef, the environment of the
+calling proces is used (which you can manipulate via C<%ENV>).
+
+I<flags> is a bit mask that can include zero or more of the flags
+C<AT_EMPTY_PATH>, C<AT_SYMLINK_NOFOLLOW>.
+
+I<path> is executed "as is", i.e. no C<PATH> search or interpretation of shell
+metacharacters takes place as opposed to Perl's built-in
+L<C<exec>|perlfunc/exec>.
+
+Returns undef on error, otherwise it doesn't return.
+
+Usage example:
+
+  sysopen my $dh, '/usr', O_DIRECTORY|O_PATH;
+  execveat($dh, 'bin/date', [qw(date +%T)], {TZ => 'UTC'}, AT_SYMLINK_NOFOLLOW);
+
+I<New in version 0.22.>
+
 =item C<exp>
 
 y = exp(x);
@@ -364,13 +435,15 @@ C<AT_SYMLINK_NOFOLLOW>.
 
 ret = fchmodat(dirfd, path, mode, flags=0);
 
-I<flags> can be 0 or C<AT_SYMLINK_NOFOLLOW>.
+I<flags> can be 0 or C<AT_SYMLINK_NOFOLLOW>. Your system might support a
+different set of flags.
 
 =item C<fchownat>
 
 ret = fchownat(dirfd, path, uid, gid, flags=0);
 
-I<flags> can be 0 or C<AT_SYMLINK_NOFOLLOW>.
+I<flags> can be 0 or C<AT_SYMLINK_NOFOLLOW>. Your system might support a
+different set of flags.
 
 =item C<fdatasync>
 
@@ -380,9 +453,11 @@ ret = fdatasync(fd);
 
 ret = fdopen(fd, mode);
 
-Returns a file handle associated with the file descriptor I<fd> or undef on
-error. I<mode> is one of the values C<"r">, C<"w">, C<"a"> with an optional
-C<"+"> and/or C<"b">.
+Returns a file handle associated with the I<numeric> file descriptor I<fd>
+or undef on error. I<mode> is one of the values C<"r">, C<"w">, C<"a"> with
+an optional C<"+"> and/or C<"b">.
+
+The file descriptor is not dup'ed and will be closed when the handle is closed.
 
 It's similar to C<IO::Handle::new_from_fd()> with the following improvements:
 
@@ -399,20 +474,40 @@ It fails if I<mode> is not compatible with the flags of I<fd>.
 
 =back
 
+Usage example:
+
+  my $fh = do {
+    opendir my $dh, '.';
+    fdopen(POSIX::dup(fileno $dh), 'r');
+  };
+  chmod 0700, $fh;  # this would fail with $dh from opendir
+
+I<New in version 0.05.>
+
+I<Changed in version 0.22:> I<fd> can no longer be a handle (that was a wrong
+turn).
+
 =item C<fdopendir>
 
 ret = fdopendir(fd);
 
-Returns a directory handle associated with the file descriptor I<fd> or undef
-on error. Usage example:
+Returns a directory handle associated with the numeric file descriptor I<fd>
+or undef on error.
+
+The file descriptor is not dup'ed and will be closed when the handle is closed.
+
+Usage example:
 
   my $dh = do {
     sysopen my $fh, '/tmp', O_RDONLY|O_DIRECTORY|O_NOFOLLOW;
-    fdopendir($fh); # or fdopendir(fileno $fh) but the former also works
-                    # with handles from opendir() for which fileno does
-                    # not work before Perl 5.22
+    fdopendir(POSIX::dup(fileno $fh));
   };
-  my @files = readdir $dh;  # this would fail with $fh from sysopen
+  my @dents = readdir $dh;  # this would fail with $fh from sysopen
+
+I<New in version 0.05.>
+
+I<Changed in version 0.22:> I<fd> can no longer be a handle (that was a wrong
+turn).
 
 =item C<fdim>
 
@@ -424,6 +519,8 @@ ret = feclearexcept(excepts);
 
 Returns C<0 but true> on success, undef on error.
 
+I<New in version 0.20.>
+
 =item C<fegetround>
 
 rounding_mode = fegetround();
@@ -434,6 +531,8 @@ ret = feraiseexcept(excepts);
 
 Returns C<0 but true> on success, undef on error.
 
+I<New in version 0.20.>
+
 =item C<fesetround>
 
 ret = fesetround(round);
@@ -443,6 +542,35 @@ Returns C<0 but true> on success, undef on error.
 =item C<fetestexcept>
 
 excepts_currently_set = fetestexcept(excepts);
+
+I<New in version 0.20.>
+
+=item C<fexecve>
+
+fexecve(fd, args, env=undef);
+
+Executes the program referred to by the file descriptor I<fd>, passing I<args>
+as its command-line arguments and optionally I<env> as its environment.
+
+I<args> must be an array reference and, by convention, I<args-E<gt>[0]> should
+be the name of the program being executed.
+
+I<env> must be a hash reference. If omitted or undef, the environment of the
+calling proces is used (which you can manipulate via C<%ENV>).
+
+See the manpage for issues regarding the close-on-exec flag and the /proc
+filesystem.
+
+Returns undef on error, otherwise it doesn't return.
+
+Usage example:
+
+  sysopen my $fh, '/usr/bin/date', O_PATH;
+  fexecve($fh, [qw(date +%T)], {TZ => 'UTC'});
+
+See also L<C<execveat()>|"execveat">.
+
+I<New in version 0.22.>
 
 =item C<ffs>
 
@@ -496,11 +624,12 @@ blksize, blocks, atim_nsec, mtim_nsec, ctim_nsec) = fstatat(dirfd, path,
 flags = 0);
 
 I<flags> is the bitwise OR of zero or more of C<AT_SYMLINK_NOFOLLOW>,
-C<AT_NO_AUTOMOUNT>.
+C<AT_NO_AUTOMOUNT>. Your system might support a different set of flags.
 
-See L<C<stat()>|"stat"> for notes on the return values and bugs in C<CORE::stat()>.
+See L<C<stat()>|"stat"> for notes on the return values and bugs in
+C<CORE::stat()>.
 
-Returns an empty list on error.
+Returns the empty list on error.
 
 =item C<fsync>
 
@@ -617,6 +746,8 @@ ret = isascii(charstring);
 
 POSIX.1-2008 marks it as obsolete, but I include it anyway.
 
+I<New in version 0.19.>
+
 =item C<isatty>
 
 ret = isatty(fd);
@@ -649,9 +780,33 @@ ret = isgraph(charstring);
 
 Like POSIX::isgraph() but returns 0 for the empty string.
 
+=item C<isgreaterequal>
+
+ret = isgreaterequal(x, y);
+
+I<New in version 0.20.>
+
 =item C<isinf>
 
 ret = isinf(x);
+
+=item C<isless>
+
+ret = isless(x, y);
+
+I<New in version 0.20.>
+
+=item C<islessequal>
+
+ret = islessequal(x, y);
+
+I<New in version 0.20.>
+
+=item C<islessgreater>
+
+ret = islessgreater(x, y);
+
+I<New in version 0.20.>
 
 =item C<islower>
 
@@ -684,6 +839,12 @@ Like POSIX::ispunct() but returns 0 for the empty string.
 ret = isspace(charstring);
 
 Like POSIX::isspace() but returns 0 for the empty string.
+
+=item C<isunordered>
+
+ret = isunordered(x, y);
+
+I<New in version 0.20.>
 
 =item C<isupper>
 
@@ -731,6 +892,8 @@ s = l64a(n);
 
 ret = lchown(path, uid, gid);
 
+I<New in version 0.08.>
+
 =item C<ldexp>
 
 y = ldexp(x, exp);
@@ -747,7 +910,16 @@ ret = link(path1, path2);
 
 ret = linkat(fd1, path1, fd2, path2, flags=0);
 
-I<flags> can be 0 or C<AT_SYMLINK_FOLLOW>.
+I<flags> can be 0 or C<AT_SYMLINK_FOLLOW>. Your system might support a
+different set of flags.
+
+=item C<log>
+
+y = log(x);
+
+=item C<log10>
+
+y = log10(x);
 
 =item C<log1p>
 
@@ -781,9 +953,10 @@ blksize, blocks, atim_nsec, mtim_nsec, ctim_nsec) = lstat(path);
 
 C<path> is assumed to be a string (or will be converted to a string).
 
-See L<C<stat()>|"stat"> for notes on the return values and bugs in C<CORE::stat()>.
+See L<C<stat()>|"stat"> for notes on the return values and bugs in
+C<CORE::stat()>.
 
-Returns an empty list on error.
+Returns the empty list on error.
 
 =item C<mkdir>
 
@@ -868,6 +1041,8 @@ can pass a reference to that value instead, i.e. C<openat(\AT_FDCWD, ...)>.
 
 Returns undef on error.
 
+I<Changed in version 0.18:> Support added for C<\AT_FDCWD> reference.
+
 =item C<openat2>
 
 ret = openat2(dirfd, path, how);
@@ -891,17 +1066,34 @@ is very picky about I<flags> and I<mode>. See the manpage for details.
 
 Returns undef on error.
 
+I<New in version 0.18.>
+
+=item C<pathconf>
+
+ret = pathconf(what, name);
+
+C<what> can be a path or, if your system supports fpathconf(), a Perl file or
+directory handle or a file descriptor.
+
+I<name> is one of the C<_PC_*> integer constants.
+
+Returns undef on error.
+
+I<New in version 0.22.>
+
 =item C<posix_fadvise>
 
 ret = posix_fadvise(fd, offset, len, advice);
 
 I<advice> is one of the C<POSIX_FADV_> constants.
 
-Returns undef on error
+I<New in version 0.14.>
 
 =item C<posix_fallocate>
 
 ret = posix_fallocate(fd, offset, len);
+
+I<New in version 0.14.>
 
 =item C<pread>
 
@@ -922,6 +1114,13 @@ the last byte of I<buf> after the read.
 
 Returns the number of bytes read, 0 at EOF, undef on error.
 
+Croaks if I<buf> is read-only and I<count> is non-zero.
+
+I<Changed in version 0.13:> Argument order is now (count, offset) instead of
+(offset, count).
+
+I<Changed in version 0.22:> Croak with read-only I<buf> and non-zero I<count>.
+
 =item C<preadv>
 
 bytes_read = preadv(fd, buffers, sizes, offset=0);
@@ -935,6 +1134,8 @@ I<fd> must be capable of seeking.
 
 This syscall is present in Linux and BSD.
 
+I<New in version 0.13.>
+
 =item C<preadv2>
 
 bytes_read = preadv2(fd, buffers, sizes, offset=0, flags=0);
@@ -945,9 +1146,15 @@ manpage for details). I<flags> is set to 0 if omitted or undef.
 
 This syscall is Linux-specific.
 
+I<New in version 0.20.>
+
 =item C<ptsname>
 
 name = ptsname(fd);
+
+I<Changed in version 0.19:> Calls C<ptsname_r()> if available.
+
+I<Changed in version 0.22:> I<fd> may also be a file handle.
 
 =item C<pwrite>
 
@@ -972,6 +1179,9 @@ On Linux, if a file is opened with C<O_APPEND>, C<pwrite()> appends data to
 the end of the file, regardless of the value of I<offset> (in violation of
 POSIX).
 
+I<Changed in version 0.13:> Argument order is now (count, offset) instead of
+(offset, count).
+
 =item C<pwritev>
 
 bytes_written = pwritev(fd, buffers, offset=0);
@@ -989,6 +1199,8 @@ POSIX).
 
 This syscall is present in Linux and BSD.
 
+I<New in version 0.08.>
+
 =item C<pwritev2>
 
 bytes_written = pwritev2(fd, buffers, offset=0, flags=0);
@@ -999,32 +1211,34 @@ flags (see the manpage for details). I<flags> is set to 0 if omitted or undef.
 
 This syscall is Linux-specific.
 
+I<New in version 0.20.>
+
 =item C<random>
 
 r = random();
+
+=item C<raise>
+
+ret = raise(sig);
 
 =item C<read>
 
 bytes_read = read(fd, buf, count);
 
-Like C<POSIX::read()> but returns 0 at EOF instead of I<"0 but true">.
+Like C<POSIX::read()> but returns 0 at EOF instead of I<"0 but true">. Croaks
+if I<buf> is read-only and I<count> is non-zero.
+
+I<Changed in version 0.22:> Croak with read-only I<buf> and non-zero I<count>.
 
 =item C<readv>
 
 bytes_read = readv(fd, buffers, sizes);
 
-Example:
-
-  my $fh = openat(\AT_FDCWD, '/tmp/foobar', O_RDWR|O_CREAT|O_TRUNC);
-  pwrite($fh, 'foobar', 6, 0);
-  readv($fh, my @buf, [4, 0, 4, 4]);
-  # -> @buf is ('foob', '', 'ar')
-
 C<readv()> reads from the file descriptor I<fd> into I<buffers> as many
 strings as there are elements in I<sizes>.
 
-I<buffers> must be a I<variable> holding either an array or an array
-reference, i.e. C<@buf> or C<$buf>.
+I<buffers> must be a I<variable> holding an array (C<@buf>), an array reference
+or undef (C<$buf>). If it is undef it will be upgraded to an array reference.
 
 I<sizes> must be an array reference, i.e. C<\@sizes>, C<$sizes>, or C<[...]>.
 
@@ -1036,13 +1250,25 @@ I<buffers> will be extended if necessary, but it will never be shrunk. If
 I<buffers> is not empty, any existing elements are replaced as long as
 sufficient data was read from I<fd>.
 
-If the total byte count of I<sizes> exceeds the number of bytes actually read
-from I<fd>, there may be one partly filled buffer and the rest of I<sizes> is
-skipped, so you may end up with less strings in I<buffers> than there are
-elements in I<sizes>.
+C<readv()> returns the number of bytes read, undef on error.
 
-C<readv()> returns the number of bytes read (which may be less than the total
-bytes in I<sizes>) or undef on error.
+Note that it is not an error for a successful call to transfer fewer bytes
+than requested. In this case there may be one "partially" filled buffer, i.e.
+it contains fewer bytes than the corresponding size. Surplus size entries lead
+to corresponding empty buffers.
+
+Usage example:
+
+  my $fh = openat(\AT_FDCWD, '/tmp/foobar', O_RDWR|O_CREAT|O_TRUNC);
+  pwrite($fh, 'foobar', 6, 0);
+  readv($fh, my $buf1, [3, 0, 8]); # $buf1: ['foo', '', 'bar']
+  sysseek $fh, 0, 0;
+  readv($fh, my @buf2, [1, 3, 2]); # @buf2: ('f', 'oob', 'ar')
+
+I<New in version 0.13.>
+
+I<Changed in version 0.22:> I<buffers> may be an undef variable, buffers
+beyond EOF are created as empty strings instead of being skipped.
 
 =item C<readlink>
 
@@ -1066,6 +1292,8 @@ POSIX-2008).
 
 Returns undef on error.
 
+I<New in version 0.18.>
+
 =item C<remainder>
 
 rem = remainder(x, y);
@@ -1087,11 +1315,26 @@ This could be fixed like this: C<unlink $_[0] or ($!{EISDIR} or $!{EPERM}) and
 rmdir $_[0]> (correct errno check depends on OS), or by using the library call
 right away.
 
+=item C<removeat>
+
+ret = removeat(dirfd, path);
+
+The C<removeat()> function works exactly like L<C<remove()>|"remove"> but
+I<path> is interpreted relative to I<dirfd> as with the other I<*at>
+functions.
+
+This function is a home-grown non-standard extension only available in this
+module (to my knowledge).
+
+I<New in version 0.22.>
+
 =item C<remquo>
 
 (rem, quo) = remquo(x, y);
 
-Returns an empty list on error.
+Returns the empty list on error.
+
+I<New in version 0.20.>
 
 =item C<rename>
 
@@ -1110,6 +1353,14 @@ L<C<renameat()>|"renameat"> and provides a superset of its functionality.
 
 I<flags> is the bitwise OR of zero or more of C<RENAME_EXCHANGE>,
 C<RENAME_NOREPLACE>, C<RENAME_WHITEOUT>.
+
+I<New in version 0.21.>
+
+=item C<rmdir>
+
+ret = rmdir(path);
+
+I<New in version 0.19.>
 
 =item C<round>
 
@@ -1169,6 +1420,8 @@ ret = setreuid(ruid, euid);
 
 sid = setsid();
 
+I<New in version 0.19.>
+
 =item C<setuid>
 
 ret = setuid(uid);
@@ -1200,6 +1453,8 @@ ret = sigrelse(sig);
 =item C<sin>
 
 y = sin(x);
+
+I<New in version 0.19.>
 
 =item C<sinh>
 
@@ -1234,7 +1489,7 @@ is unsigned.
 C<POSIX::2008::stat()> doesn't mimic these bugs and uses the correct data types
 for all values.
 
-Returns an empty list on error.
+Returns the empty list on error.
 
 =item C<strptime>
 
@@ -1247,7 +1502,7 @@ whole or in part and will be returned as initialized if they are not affected
 by the format string. Unprocessed uninitialized or undef fields are returned
 as undef.
 
-Returns an empty list on error.
+Returns the empty list on error.
 
 In scalar context returns the index of the first byte in I<s> that was not
 processed or the byte length of I<s> if the whole string was consumed or undef
@@ -1255,6 +1510,8 @@ on error.
 
 As C<strptime()> acts on null-terminated strings, strings containing NUL bytes
 will only be processed up to the first NUL byte.
+
+I<New in version 0.02.>
 
 =item C<symlink>
 
@@ -1267,6 +1524,18 @@ ret = symlinkat(target, dirfd, linkpath);
 =item C<sync>
 
 sync();
+
+This function doesn't return any value.
+
+=item C<sysconf>
+
+ret = sysconf(name);
+
+I<name> is one of the C<_SC_*> integer constants.
+
+Returns undef on error.
+
+I<New in version 0.22.>
 
 =item C<tan>
 
@@ -1282,9 +1551,22 @@ y = tgamma(x);
 
 =item C<timer_create>
 
-timerid = timer_create(clockid, signal);
+timerid = timer_create(clockid, signal=undef);
+
+Creates a new per-process interval timer using the clock given by I<clock_id>
+as the timing base. I<signal> is the signal number to be delivered when the
+timer expires. If I<signal> is omitted or undef, no signal is delivered and
+the progress of the timer can be monitored using
+L<C<timer_gettime()>|"timer_gettime">.
+
+Calling a notification function on timer expiration is currently not
+supported.
 
 Returns undef on error.
+
+I<New in version 0.16.>
+
+I<Changed in version 0.22:> I<signal> is optional.
 
 =item C<timer_delete>
 
@@ -1292,17 +1574,23 @@ ret = timer_delete(timerid);
 
 Returns C<0 but true> on success, undef on error.
 
+I<New in version 0.16.>
+
 =item C<timer_getoverrun>
 
 count = timer_getoverrun(timerid);
 
 Returns undef on error.
 
+I<New in version 0.16.>
+
 =item C<timer_gettime>
 
 (interval_sec, interval_nsec, initial_sec, initial_nsec) = timer_gettime(timerid);
 
-Returns an empty list on error.
+Returns the empty list on error.
+
+I<New in version 0.16.>
 
 =item C<timer_settime>
 
@@ -1311,9 +1599,18 @@ Returns an empty list on error.
 I<flags> may be 0 or C<TIMER_ABSTIME>. If the I<init> values are omitted, they
 are set to the I<int> values.
 
+I<New in version 0.16.>
+
 =item C<truncate>
 
-ret = truncate(path, length);
+ret = truncate(what, length);
+
+C<what> can be a path, a Perl file handle, or a file descriptor.
+
+Note that it does not flush the file handle before truncating. Perl's built-in
+truncate() does (this is undocumented, probably because it's silly).
+
+I<Changed in version 0.19:> Deprecated I<ftruncate> now covered by I<truncate>.
 
 =item C<trunc>
 
@@ -1322,6 +1619,12 @@ y = trunc(x);
 =item C<ttyname>
 
 name = ttyname(fd);
+
+Calls C<ttyname_r()> if available.
+
+I<New in version 0.19.>
+
+I<Changed in version 0.22:> I<fd> may also be a file handle.
 
 =item C<unlink>
 
@@ -1346,7 +1649,8 @@ I<flags> can be 0 or C<AT_REMOVEDIR>.
 ret = utimensat(dirfd, path, flags, atime_sec, atime_nsec, mtime_sec,
 mtime_nsec);
 
-I<flags> can be 0 or C<AT_SYMLINK_NOFOLLOW>, defaults to 0.
+I<flags> can be 0 or C<AT_SYMLINK_NOFOLLOW>, defaults to 0. Your system might
+support a different set of flags.
 
 I<atime_sec> and I<mtime_sec> default to 0. I<atime_nsec> and I<mtime_nsec>
 default to C<UTIME_NOW>.
@@ -1373,6 +1677,8 @@ buffers are processed in array order. Undefined or empty elements are skipped.
 
 Returns the number of bytes written or undef on error.
 
+I<New in version 0.08.>
+
 =item C<y0>
 
 y = y0(x);
@@ -1398,29 +1704,39 @@ C<yn()> is the Bessel function of the second kind of order n.
 This module does not export anything by default. The following export tags are
 available:
 
- :at     All *at() functions like openat() and all AT_/RENAME_/RESOLVE_ constants
- :id     All get/set*id() functions like getuid() etc.
- :is     All is* functions like isdigit() etc.
- :rw     read(), readv(), write(), writev()
- :prw    pread(), preadv(), preadv2(), pwrite(), pwritev(), pwritev2()
- :clock  All clock* functions and CLOCK_ constants
- :fcntl  All F_, FD_, O_, POSIX_FADV_, SEEK_ and _OK constants (for AT_ use :at)
- :fenv_h All FE_ constants and fe* functions
- :fnm    fnmatch() and all FNM_ constants
- :stat_h All S_I* and UTIME_ constants
- :time_h All CLOCK_ and TIMER_ constants
- :timer  All timer_ functions and TIMER_ constants
+ :at      All *at() functions like openat(), all AT_/RENAME_/RESOLVE_ constants
+ :id      All get/set*id() functions like getuid() etc.
+ :is      All is* functions like isdigit() etc.
+ :rw      read(), readv(), write(), writev()
+ :prw     pread(), preadv(), preadv2(), pwrite(), pwritev(), pwritev2()
+ :clock   All clock* functions and CLOCK_ constants
+ :fcntl   All F_, FD_, O_, POSIX_FADV_, SEEK_, _OK constants (for AT_ use :at)
+ :fenv_h  All FE_ constants and fe* functions
+ :fnm     fnmatch() and all FNM_ constants
+ :stat_h  All S_I* and UTIME_ constants
+ :time_h  All CLOCK_ and TIMER_ constants
+ :timer   All timer_ functions and TIMER_ constants
+ :utmpx_h   All *utx* functions and utmpx.h constants
+ :confstr   confstr() and all _CS_ constants
+ :pathconf  pathconf() and all _PC_ constants
+ :sysconf   sysconf() and all _SC_ constants
+
+I<New in version 0.19:> :stat_h export tag.
+
+I<New in version 0.20:> :fenv_h export tag.
+
+I<New in version 0.22:> :confstr, :pathconf, :sysconf export tags.
 
 =head1 CONSTANTS
 
 C<AT_EACCESS> C<AT_EMPTY_PATH> C<AT_FDCWD> C<AT_NO_AUTOMOUNT> C<AT_REMOVEDIR>
-C<AT_SYMLINK_FOLLOW> C<AT_SYMLINK_NOFOLLOW> C<RENAME_EXCHANGE>
-C<RENAME_NOREPLACE> C<RENAME_WHITEOUT> C<RESOLVE_BENEATH> C<RESOLVE_CACHED>
-C<RESOLVE_IN_ROOT> C<RESOLVE_NO_MAGICLINKS> C<RESOLVE_NO_SYMLINKS>
-C<RESOLVE_NO_XDEV>
+C<AT_RESOLVE_BENEATH> C<AT_SYMLINK_FOLLOW> C<AT_SYMLINK_NOFOLLOW>
+C<RENAME_EXCHANGE> C<RENAME_NOREPLACE> C<RENAME_WHITEOUT> C<RESOLVE_BENEATH>
+C<RESOLVE_CACHED> C<RESOLVE_IN_ROOT> C<RESOLVE_NO_MAGICLINKS>
+C<RESOLVE_NO_SYMLINKS> C<RESOLVE_NO_XDEV>
 
-C<BOOT_TIME> C<NEW_TIME> C<OLD_TIME> C<DEAD_PROCESS> C<INIT_PROCESS>
-C<LOGIN_PROCESS> C<USER_PROCESS> C<RUN_LVL>
+C<ACCOUNTING> C<EMPTY> C<BOOT_TIME> C<NEW_TIME> C<OLD_TIME> C<DEAD_PROCESS>
+C<INIT_PROCESS> C<LOGIN_PROCESS> C<USER_PROCESS> C<RUN_LVL>
 
 C<CLOCK_BOOTTIME> C<CLOCK_HIGHRES> C<CLOCK_MONOTONIC>
 C<CLOCK_MONOTONIC_COARSE> C<CLOCK_MONOTONIC_FAST> C<CLOCK_MONOTONIC_PRECISE>
@@ -1429,15 +1745,14 @@ C<CLOCK_REALTIME_COARSE> C<CLOCK_REALTIME_FAST> C<CLOCK_REALTIME_PRECISE>
 C<CLOCK_SOFTTIME> C<CLOCK_THREAD_CPUTIME_ID> C<CLOCK_UPTIME>
 C<CLOCK_UPTIME_FAST> C<CLOCK_UPTIME_PRECISE>
 
-C<_CS_GNU_LIBC_VERSION> C<_CS_GNU_LIBPTHREAD_VERSION> C<_CS_PATH>
-
 C<F_DUPFD> C<F_DUPFD_CLOEXEC> C<F_GETFD> C<F_SETFD> C<F_GETFL>
 C<F_SETFL> C<F_GETLK> C<F_SETLK> C<F_SETLKW> C<F_GETOWN> C<F_SETOWN>
 C<F_RDLCK> C<F_UNLCK> C<F_WRLCK>
 
-C<FE_TONEAREST> C<FE_TOWARDZERO> C<FE_UPWARD> C<FE_DOWNWARD>
-
 C<FD_CLOEXEC>
+
+C<FE_ALL_EXCEPT> C<FE_DIVBYZERO> C<FE_INEXACT> C<FE_INVALID> C<FE_OVERFLOW>
+C<FE_UNDERFLOW> C<FE_TONEAREST> C<FE_TOWARDZERO> C<FE_UPWARD> C<FE_DOWNWARD>
 
 C<FNM_CASEFOLD> C<FNM_FILE_NAME> C<FNM_LEADING_DIR> C<FNM_NOESCAPE>
 C<FNM_NOMATCH> C<FNM_PATHNAME> C<FNM_PERIOD>
@@ -1447,17 +1762,19 @@ C<FP_INFINITE> C<FP_NAN> C<FP_NORMAL> C<FP_SUBNORMAL> C<FP_ZERO>
 C<TIMER_ABSTIME> C<ITIMER_PROF> C<ITIMER_REAL> C<ITIMER_VIRTUAL>
 
 C<O_ACCMODE> C<O_APPEND> C<O_ASYNC> C<O_CLOEXEC> C<O_CREAT> C<O_DIRECT>
-C<O_DIRECTORY> C<O_DSYNC> C<O_EXCL> C<O_EXEC> C<O_LARGEFILE> C<O_NDELAY>
-C<O_NOATIME> C<O_NOCTTY> C<O_NOFOLLOW> C<O_NONBLOCK> C<O_PATH> C<O_RDONLY>
-C<O_RDWR> C<O_RSYNC> C<O_SEARCH> C<O_SYNC> C<O_TMPFILE> C<O_TRUNC>
-C<O_TTY_INIT> C<O_WRONLY> C<FASYNC>
+C<O_DIRECTORY> C<O_DSYNC> C<O_EMPTY_PATH> C<O_EXCL> C<O_EXEC> C<O_EXLOCK>
+C<O_LARGEFILE> C<O_NDELAY> C<O_NOATIME> C<O_NOCTTY> C<O_NOFOLLOW>
+C<O_NONBLOCK> C<O_NOSIGPIPE> C<O_PATH> C<O_RDONLY> C<O_REGULAR>
+C<O_RESOLVE_BENEATH> C<O_RDWR> C<O_RSYNC> C<O_SEARCH> C<O_SHLOCK> C<O_SYNC>
+C<O_TMPFILE> C<O_TRUNC> C<O_TTY_INIT> C<O_WRONLY> C<FASYNC>
 
 C<POSIX_FADV_NORMAL> C<POSIX_FADV_SEQUENTIAL> C<POSIX_FADV_RANDOM>
 C<POSIX_FADV_NOREUSE> C<POSIX_FADV_WILLNEED> C<POSIX_FADV_DONTNEED>
 
 C<PRIO_PROCESS> C<PRIO_PGRP> C<PRIO_USER>
 
-C<RTLD_GLOBAL> C<RTLD_LAZY> C<RTLD_LOCAL> C<RTLD_NOW>
+C<RTLD_DEEPBIND> C<RTLD_GLOBAL> C<RTLD_LAZY> C<RTLD_LOCAL> C<RTLD_MEMBER>
+C<RTLD_NOAUTODEFER> C<RTLD_NODELETE> C<RTLD_NOLOAD> C<RTLD_NOW>
 
 C<RWF_APPEND> C<RWF_DSYNC> C<RWF_HIPRI> C<RWF_NOWAIT> C<RWF_SYNC>
 
@@ -1467,17 +1784,126 @@ C<W_OK> C<X_OK>
 C<S_IFMT> C<S_IFBLK> C<S_IFCHR> C<S_IFIFO> C<S_IFREG> C<S_IFDIR> C<S_IFLNK>
 C<S_IFSOCK> C<S_ISUID> C<S_ISGID> C<S_IRWXU> C<S_IRUSR> C<S_IWUSR> C<S_IXUSR>
 C<S_IRWXG> C<S_IRGRP> C<S_IWGRP> C<S_IXGRP> C<S_IRWXO> C<S_IROTH> C<S_IWOTH>
-C<S_IXOTH> C<S_ISVTX> 
+C<S_IXOTH> C<S_ISVTX>
 
 C<UTIME_NOW> C<UTIME_OMIT>
 
+C<_CS_GNU_LIBC_VERSION> C<_CS_GNU_LIBPTHREAD_VERSION> C<_CS_LFS64_CFLAGS>
+C<_CS_LFS64_LDFLAGS> C<_CS_LFS64_LIBS> C<_CS_LFS64_LINTFLAGS>
+C<_CS_LFS_CFLAGS> C<_CS_LFS_LDFLAGS> C<_CS_LFS_LIBS> C<_CS_LFS_LINTFLAGS>
+C<_CS_PATH> C<_CS_POSIX_V5_WIDTH_RESTRICTED_ENVS>
+C<_CS_POSIX_V6_ILP32_OFF32_CFLAGS> C<_CS_POSIX_V6_ILP32_OFF32_LDFLAGS>
+C<_CS_POSIX_V6_ILP32_OFF32_LIBS> C<_CS_POSIX_V6_ILP32_OFF32_LINTFLAGS>
+C<_CS_POSIX_V6_ILP32_OFFBIG_CFLAGS> C<_CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS>
+C<_CS_POSIX_V6_ILP32_OFFBIG_LIBS> C<_CS_POSIX_V6_ILP32_OFFBIG_LINTFLAGS>
+C<_CS_POSIX_V6_LP64_OFF64_CFLAGS> C<_CS_POSIX_V6_LP64_OFF64_LDFLAGS>
+C<_CS_POSIX_V6_LP64_OFF64_LIBS> C<_CS_POSIX_V6_LP64_OFF64_LINTFLAGS>
+C<_CS_POSIX_V6_LPBIG_OFFBIG_CFLAGS> C<_CS_POSIX_V6_LPBIG_OFFBIG_LDFLAGS>
+C<_CS_POSIX_V6_LPBIG_OFFBIG_LIBS> C<_CS_POSIX_V6_LPBIG_OFFBIG_LINTFLAGS>
+C<_CS_POSIX_V6_WIDTH_RESTRICTED_ENVS> C<_CS_POSIX_V7_ILP32_OFF32_CFLAGS>
+C<_CS_POSIX_V7_ILP32_OFF32_LDFLAGS> C<_CS_POSIX_V7_ILP32_OFF32_LIBS>
+C<_CS_POSIX_V7_ILP32_OFF32_LINTFLAGS> C<_CS_POSIX_V7_ILP32_OFFBIG_CFLAGS>
+C<_CS_POSIX_V7_ILP32_OFFBIG_LDFLAGS> C<_CS_POSIX_V7_ILP32_OFFBIG_LIBS>
+C<_CS_POSIX_V7_ILP32_OFFBIG_LINTFLAGS> C<_CS_POSIX_V7_LP64_OFF64_CFLAGS>
+C<_CS_POSIX_V7_LP64_OFF64_LDFLAGS> C<_CS_POSIX_V7_LP64_OFF64_LIBS>
+C<_CS_POSIX_V7_LP64_OFF64_LINTFLAGS> C<_CS_POSIX_V7_LPBIG_OFFBIG_CFLAGS>
+C<_CS_POSIX_V7_LPBIG_OFFBIG_LDFLAGS> C<_CS_POSIX_V7_LPBIG_OFFBIG_LIBS>
+C<_CS_POSIX_V7_LPBIG_OFFBIG_LINTFLAGS> C<_CS_POSIX_V7_WIDTH_RESTRICTED_ENVS>
+C<_CS_V5_WIDTH_RESTRICTED_ENVS> C<_CS_V6_ENV> C<_CS_V6_WIDTH_RESTRICTED_ENVS>
+C<_CS_V7_ENV> C<_CS_V7_WIDTH_RESTRICTED_ENVS> C<_CS_XBS5_ILP32_OFF32_CFLAGS>
+C<_CS_XBS5_ILP32_OFF32_LDFLAGS> C<_CS_XBS5_ILP32_OFF32_LIBS>
+C<_CS_XBS5_ILP32_OFF32_LINTFLAGS> C<_CS_XBS5_ILP32_OFFBIG_CFLAGS>
+C<_CS_XBS5_ILP32_OFFBIG_LDFLAGS> C<_CS_XBS5_ILP32_OFFBIG_LIBS>
+C<_CS_XBS5_ILP32_OFFBIG_LINTFLAGS> C<_CS_XBS5_LP64_OFF64_CFLAGS>
+C<_CS_XBS5_LP64_OFF64_LDFLAGS> C<_CS_XBS5_LP64_OFF64_LIBS>
+C<_CS_XBS5_LP64_OFF64_LINTFLAGS> C<_CS_XBS5_LPBIG_OFFBIG_CFLAGS>
+C<_CS_XBS5_LPBIG_OFFBIG_LDFLAGS> C<_CS_XBS5_LPBIG_OFFBIG_LIBS>
+C<_CS_XBS5_LPBIG_OFFBIG_LINTFLAGS>
+
+C<_PC_2_SYMLINKS> C<_PC_ALLOC_SIZE_MIN> C<_PC_ASYNC_IO>
+C<_PC_CHOWN_RESTRICTED> C<_PC_FILESIZEBITS> C<_PC_LINK_MAX> C<_PC_MAX_CANON>
+C<_PC_MAX_INPUT> C<_PC_NAME_MAX> C<_PC_NO_TRUNC> C<_PC_PATH_MAX>
+C<_PC_PIPE_BUF> C<_PC_PRIO_IO> C<_PC_REC_INCR_XFER_SIZE>
+C<_PC_REC_MAX_XFER_SIZE> C<_PC_REC_MIN_XFER_SIZE> C<_PC_REC_XFER_ALIGN>
+C<_PC_SOCK_MAXBUF> C<_PC_SYMLINK_MAX> C<_PC_SYNC_IO> C<_PC_VDISABLE>
+
+C<_SC_2_CHAR_TERM> C<_SC_2_C_BIND> C<_SC_2_C_DEV> C<_SC_2_C_VERSION>
+C<_SC_2_FORT_DEV> C<_SC_2_FORT_RUN> C<_SC_2_LOCALEDEF> C<_SC_2_PBS>
+C<_SC_2_PBS_ACCOUNTING> C<_SC_2_PBS_CHECKPOINT> C<_SC_2_PBS_LOCATE>
+C<_SC_2_PBS_MESSAGE> C<_SC_2_PBS_TRACK> C<_SC_2_SW_DEV> C<_SC_2_UPE>
+C<_SC_2_VERSION> C<_SC_ADVISORY_INFO> C<_SC_AIO_LISTIO_MAX> C<_SC_AIO_MAX>
+C<_SC_AIO_PRIO_DELTA_MAX> C<_SC_ARG_MAX> C<_SC_ASYNCHRONOUS_IO>
+C<_SC_ATEXIT_MAX> C<_SC_AVPHYS_PAGES> C<_SC_BARRIERS> C<_SC_BASE>
+C<_SC_BC_BASE_MAX> C<_SC_BC_DIM_MAX> C<_SC_BC_SCALE_MAX> C<_SC_BC_STRING_MAX>
+C<_SC_CHARCLASS_NAME_MAX> C<_SC_CHAR_BIT> C<_SC_CHAR_MAX> C<_SC_CHAR_MIN>
+C<_SC_CHILD_MAX> C<_SC_CLK_TCK> C<_SC_CLOCK_SELECTION> C<_SC_COLL_WEIGHTS_MAX>
+C<_SC_CPUTIME> C<_SC_C_LANG_SUPPORT> C<_SC_C_LANG_SUPPORT_R>
+C<_SC_DELAYTIMER_MAX> C<_SC_DEVICE_IO> C<_SC_DEVICE_SPECIFIC>
+C<_SC_DEVICE_SPECIFIC_R> C<_SC_EQUIV_CLASS_MAX> C<_SC_EXPR_NEST_MAX>
+C<_SC_FD_MGMT> C<_SC_FIFO> C<_SC_FILE_ATTRIBUTES> C<_SC_FILE_LOCKING>
+C<_SC_FILE_SYSTEM> C<_SC_FSYNC> C<_SC_GETGR_R_SIZE_MAX>
+C<_SC_GETPW_R_SIZE_MAX> C<_SC_HOST_NAME_MAX> C<_SC_INT_MAX> C<_SC_INT_MIN>
+C<_SC_IOV_MAX> C<_SC_IPV6> C<_SC_JOB_CONTROL> C<_SC_LEVEL1_DCACHE_ASSOC>
+C<_SC_LEVEL1_DCACHE_LINESIZE> C<_SC_LEVEL1_DCACHE_SIZE>
+C<_SC_LEVEL1_ICACHE_ASSOC> C<_SC_LEVEL1_ICACHE_LINESIZE>
+C<_SC_LEVEL1_ICACHE_SIZE> C<_SC_LEVEL2_CACHE_ASSOC>
+C<_SC_LEVEL2_CACHE_LINESIZE> C<_SC_LEVEL2_CACHE_SIZE>
+C<_SC_LEVEL3_CACHE_ASSOC> C<_SC_LEVEL3_CACHE_LINESIZE>
+C<_SC_LEVEL3_CACHE_SIZE> C<_SC_LEVEL4_CACHE_ASSOC>
+C<_SC_LEVEL4_CACHE_LINESIZE> C<_SC_LEVEL4_CACHE_SIZE> C<_SC_LINE_MAX>
+C<_SC_LOGIN_NAME_MAX> C<_SC_LONG_BIT> C<_SC_MAPPED_FILES> C<_SC_MB_LEN_MAX>
+C<_SC_MEMLOCK> C<_SC_MEMLOCK_RANGE> C<_SC_MEMORY_PROTECTION>
+C<_SC_MESSAGE_PASSING> C<_SC_MINSIGSTKSZ> C<_SC_MONOTONIC_CLOCK>
+C<_SC_MQ_OPEN_MAX> C<_SC_MQ_PRIO_MAX> C<_SC_MULTI_PROCESS> C<_SC_NETWORKING>
+C<_SC_NGROUPS_MAX> C<_SC_NL_ARGMAX> C<_SC_NL_LANGMAX> C<_SC_NL_MSGMAX>
+C<_SC_NL_NMAX> C<_SC_NL_SETMAX> C<_SC_NL_TEXTMAX> C<_SC_NPROCESSORS_CONF>
+C<_SC_NPROCESSORS_ONLN> C<_SC_NZERO> C<_SC_OPEN_MAX> C<_SC_PAGESIZE>
+C<_SC_PAGE_SIZE> C<_SC_PASS_MAX> C<_SC_PHYS_PAGES> C<_SC_PII>
+C<_SC_PII_INTERNET> C<_SC_PII_INTERNET_DGRAM> C<_SC_PII_INTERNET_STREAM>
+C<_SC_PII_OSI> C<_SC_PII_OSI_CLTS> C<_SC_PII_OSI_COTS> C<_SC_PII_OSI_M>
+C<_SC_PII_SOCKET> C<_SC_PII_XTI> C<_SC_PIPE> C<_SC_POLL> C<_SC_PRIORITIZED_IO>
+C<_SC_PRIORITY_SCHEDULING> C<_SC_RAW_SOCKETS> C<_SC_READER_WRITER_LOCKS>
+C<_SC_REALTIME_SIGNALS> C<_SC_REGEXP> C<_SC_REGEX_VERSION> C<_SC_RE_DUP_MAX>
+C<_SC_RTSIG_MAX> C<_SC_SAVED_IDS> C<_SC_SCHAR_MAX> C<_SC_SCHAR_MIN>
+C<_SC_SELECT> C<_SC_SEMAPHORES> C<_SC_SEM_NSEMS_MAX> C<_SC_SEM_VALUE_MAX>
+C<_SC_SHARED_MEMORY_OBJECTS> C<_SC_SHELL> C<_SC_SHRT_MAX> C<_SC_SHRT_MIN>
+C<_SC_SIGNALS> C<_SC_SIGQUEUE_MAX> C<_SC_SIGSTKSZ> C<_SC_SINGLE_PROCESS>
+C<_SC_SPAWN> C<_SC_SPIN_LOCKS> C<_SC_SPORADIC_SERVER> C<_SC_SSIZE_MAX>
+C<_SC_SS_REPL_MAX> C<_SC_STREAMS> C<_SC_STREAM_MAX> C<_SC_SYMLOOP_MAX>
+C<_SC_SYNCHRONIZED_IO> C<_SC_SYSTEM_DATABASE> C<_SC_SYSTEM_DATABASE_R>
+C<_SC_THREADS> C<_SC_THREAD_ATTR_STACKADDR> C<_SC_THREAD_ATTR_STACKSIZE>
+C<_SC_THREAD_CPUTIME> C<_SC_THREAD_DESTRUCTOR_ITERATIONS>
+C<_SC_THREAD_KEYS_MAX> C<_SC_THREAD_PRIORITY_SCHEDULING>
+C<_SC_THREAD_PRIO_INHERIT> C<_SC_THREAD_PRIO_PROTECT>
+C<_SC_THREAD_PROCESS_SHARED> C<_SC_THREAD_ROBUST_PRIO_INHERIT>
+C<_SC_THREAD_ROBUST_PRIO_PROTECT> C<_SC_THREAD_SAFE_FUNCTIONS>
+C<_SC_THREAD_SPORADIC_SERVER> C<_SC_THREAD_STACK_MIN>
+C<_SC_THREAD_THREADS_MAX> C<_SC_TIMEOUTS> C<_SC_TIMERS> C<_SC_TIMER_MAX>
+C<_SC_TRACE> C<_SC_TRACE_EVENT_FILTER> C<_SC_TRACE_EVENT_NAME_MAX>
+C<_SC_TRACE_INHERIT> C<_SC_TRACE_LOG> C<_SC_TRACE_NAME_MAX>
+C<_SC_TRACE_SYS_MAX> C<_SC_TRACE_USER_EVENT_MAX> C<_SC_TTY_NAME_MAX>
+C<_SC_TYPED_MEMORY_OBJECTS> C<_SC_TZNAME_MAX> C<_SC_T_IOV_MAX>
+C<_SC_UCHAR_MAX> C<_SC_UINT_MAX> C<_SC_UIO_MAXIOV> C<_SC_ULONG_MAX>
+C<_SC_USER_GROUPS> C<_SC_USER_GROUPS_R> C<_SC_USHRT_MAX> C<_SC_V6_ILP32_OFF32>
+C<_SC_V6_ILP32_OFFBIG> C<_SC_V6_LP64_OFF64> C<_SC_V6_LPBIG_OFFBIG>
+C<_SC_V7_ILP32_OFF32> C<_SC_V7_ILP32_OFFBIG> C<_SC_V7_LP64_OFF64>
+C<_SC_V7_LPBIG_OFFBIG> C<_SC_VERSION> C<_SC_WORD_BIT> C<_SC_XBS5_ILP32_OFF32>
+C<_SC_XBS5_ILP32_OFFBIG> C<_SC_XBS5_LP64_OFF64> C<_SC_XBS5_LPBIG_OFFBIG>
+C<_SC_XOPEN_CRYPT> C<_SC_XOPEN_ENH_I18N> C<_SC_XOPEN_LEGACY>
+C<_SC_XOPEN_REALTIME> C<_SC_XOPEN_REALTIME_THREADS> C<_SC_XOPEN_SHM>
+C<_SC_XOPEN_STREAMS> C<_SC_XOPEN_UNIX> C<_SC_XOPEN_VERSION>
+C<_SC_XOPEN_XCU_VERSION> C<_SC_XOPEN_XPG2> C<_SC_XOPEN_XPG3> C<_SC_XOPEN_XPG4>
+
 =head1 NOTES
+
+C<removeat()> is a home-grown nonstandard extension present only in this
+module.
 
 C<preadv()> and C<pwritev()> are nonstandard extensions present in Linux and
 BSD.
 
-C<openat2()>, C<preadv2()>, C<pwritev2()> and C<renameat2()> are nonstandard
-extensions present in Linux.
+C<execveat()>, C<openat2()>, C<preadv2()>, C<pwritev2()> and C<renameat2()>
+are nonstandard extensions present in Linux.
 
 C<fstatat()>, C<lstat()> and C<stat()> do not set the special underscore
 filehandle C<_> (mostly because I have no clue how that works).
@@ -1491,6 +1917,13 @@ C<isalnum()> and friends were cowardly removed from the POSIX module with Perl
 C<SEEK_DATA> and C<SEEK_HOLE> are nonstandard extensions present in Linux,
 Solaris, FreeBSD, and DragonFly BSD; they are proposed for inclusion in the
 next POSIX revision (Issue 8).
+
+For some inexplicable reason, Perl forbids you to use the built-in C<chmod()>
+and C<chown()> on an C<opendir()> handle and to use C<readdir()> and
+C<rewinddir()> on a C<sysopen()> handle (provided it refers to a directory).
+Needless to say that C<chmod()> and C<chown()> from POSIX::2008 happily work
+with C<opendir()> handles, and of course you can use C<readdir()> and
+C<rewinddir()> on an C<openat()> handle that refers to a directory.
 
 =head1 AUTHOR
 

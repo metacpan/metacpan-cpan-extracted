@@ -1,3 +1,8 @@
+0.013   2023-12-13  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix Rinci metadata.
+
+
 0.012   2022-09-22  Released-By: PERLANCAR; Urgency: medium
 
         - Add utility: cut-video-by-duration (alias: vcut)

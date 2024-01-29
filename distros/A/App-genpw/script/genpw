@@ -1,18 +1,18 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/genpw/genpw
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-22'; # DATE
-our $DIST = 'App-genpw'; # DIST
-our $VERSION = '0.011'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-01-16'; # DATE
+our $DIST = 'App-genpw'; # DIST
+our $VERSION = '0.013'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/genpw/genpw",
@@ -22,7 +22,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: Generate random password, with patterns and wordlists
+# ABSTRACT: (Gen)erate random password/strings, with (p)atterns and (w)ordlists
 # PODNAME: genpw
 
 __END__
@@ -33,21 +33,19 @@ __END__
 
 =head1 NAME
 
-genpw - Generate random password, with patterns and wordlists
+genpw - (Gen)erate random password/strings, with (p)atterns and (w)ordlists
 
 =head1 VERSION
 
-This document describes version 0.011 of genpw (from Perl distribution App-genpw), released on 2020-05-22.
+This document describes version 0.013 of genpw (from Perl distribution App-genpw), released on 2024-01-16.
 
 =head1 SYNOPSIS
 
-Usage:
+B<genpw> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
- % genpw [-L] [-U] [--action=s] [--case=s] [--config-path=path | -c]
-     [--config-profile=profile | -P] [--format=name] [--json] [-l=s]
-     [--len=s] [--list-patterns] [--max-len=s] [--min-len=s]
-     [--(no)naked-res] [--no-config | -C] [--no-env] [-p=s+]
-     [--page-result[=program]] [--pattern=s+] [--patterns-json=s] [num]
+B<genpw> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<genpw> [B<L<--action|/"--list-patterns">>=I<str>|B<L<--list-patterns|/"--list-patterns">>] [B<L<--case|/"--case=s">>=I<str>|B<L<-L|/"--case=s">>|B<L<-U|/"--case=s">>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--len|/"--len=s, -l">>=I<L<posint|Sah::Schema::posint>>|B<L<-l|/"--len=s, -l">>=I<L<posint|Sah::Schema::posint>>] [B<L<--max-len|/"--max-len=s">>=I<L<posint|Sah::Schema::posint>>] [B<L<--min-len|/"--min-len=s">>=I<L<posint|Sah::Schema::posint>>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [(B<L<--pattern|/"--patterns-json=s">>=I<str>)+|B<L<--patterns-json|/"--patterns-json=s">>=I<json>|(B<L<-p|/"--patterns-json=s">>=I<str>)+] -- [I<L<num|/"--num=s, -n">>]
 
 =head1 DESCRIPTION
 
@@ -96,6 +94,8 @@ Like the above, but words will be fetched from C<WordList::*> modules. You need
 to install the L<genpw-wordlist> CLI. By default, will use wordlist from
 L<WordList::EN::Enable>:
 
+ % genpw -p '%(wordlist:EN::Enable)w%4d'
+ 
  % genpw-wordlist -p '%w%4d'
  sedimentologists8542
 
@@ -106,6 +106,12 @@ Generate a random GUID:
 
 Like the above, but in uppercase:
 
+ % genpw -p '%(u)8h-%(u)4h-%(u)4h-%(u)4h-%(u)12h'
+ CA333840-6132-33A1-9C31-F2FF20EDB3EA
+ 
+ % genpw -p '%()(Str::uc)8h-%()(Str::uc)4h-%()(Str::uc)4h-%()(Str::uc)4h-%()(Str::uc)12h'
+ CA333840-6132-33A1-9C31-F2FF20EDB3EA
+ 
  % genpw -p '%8h-%4h-%4h-%4h-%12h' -U
  22E13D9E-1187-CD95-1D05-2B92A09E740D
 
@@ -119,6 +125,8 @@ then:
 
  % genpw -P guid
  008869fa-177e-3a46-24d6-0900a00e56d5
+
+Keywords: generate, pattern, wordlist
 
 =head1 OPTIONS
 
@@ -150,9 +158,9 @@ Valid values:
 
  ["default","random","lower","upper","title"]
 
-`default` means to not change case. `random` changes casing some letters
-randomly to lower-/uppercase. `lower` forces lower case. `upper` forces
-UPPER CASE. `title` forces Title case.
+C<default> means to not change case. C<random> changes casing some letters
+randomly to lower-/uppercase. C<lower> forces lower case. C<upper> forces
+UPPER CASE. C<title> forces Title case.
 
 
 =item B<--len>=I<s>, B<-l>
@@ -179,27 +187,62 @@ Default value:
 
  1
 
+Can also be specified as the 1st command-line argument.
+
 =item B<--pattern>=I<s@>, B<-p>
 
 Pattern(s) to use.
 
-A pattern is string that is similar to a printf pattern. %P (where P is certain
-letter signifying a format) will be replaced with some other string. %Nw (where
-N is a number) will be replaced by a word of length N, %N$MP (where N and M is a
-number) will be replaced by a word of length between N and M. Anything else will
-be used as-is. Available conversions:
+CONVERSION (C<%P>). A pattern is string that is roughly similar to a printf
+pattern:
 
-    %l   Random Latin letter (A-Z, a-z)
-    %d   Random digit (0-9)
-    %h   Random hexdigit (0-9a-f)
-    %a   Random letter/digit (Alphanum) (A-Z, a-z, 0-9; combination of %l and %d)
-    %s   Random ASCII symbol, e.g. "-" (dash), "_" (underscore), etc.
-    %x   Random letter/digit/ASCII symbol (combination of %a and %s)
-    %m   Base64 character (A-Z, a-z, 0-9, +, /)
-    %b   Base58 character (A-Z, a-z, 0-9 minus IOl0)
-    %B   Base56 character (A-Z, a-z, 0-9 minus IOol01)
-    %%   A literal percent sign
-    %w   Random word
+ %P
+
+where C<P> is certain letter signifying a conversion. This will be replaced with
+some other string according to the conversion. An example is the C<%h> conversion
+which will be replaced with hexdigit.
+
+LENGTH (C<%NP>). A non-negative integer (C<N>) can be specified before the
+conversion to signify desired length, for example, C<%4w> will return a random
+word of length 4.
+
+MINIMUM AND MAXIMUM LENGTH (C<%M$NP>). If two non-negative integers separated by
+C<$> is specified before the conversion, this specify desired minimum and maximum
+length. For example, C<%4$10h> will be replaced with between 4 and 10 hexdigits.
+
+ARGUMENT AND FILTERS (C<%(arg)P>, C<%(arg)(filter1)(...)P>). Finally, an argument
+followed by zero or more filters can be specified (before the lengths) and
+before the conversion. For example, C<%(wordlist:ID::KBBI)w> will be replaced by
+a random word from the wordlist L<WordList::ID::KBBI>. Another example,
+C<%()(Str::uc)4$10h> will be replaced by between 4-10 uppercase hexdigits, and
+C<%(arraydata:Sample::DeNiro)(Str::underscore_non_latin_alphanums)(Str::lc)(Str::ucfirst)w>
+will be replaced with a random movie title of Robert De Niro, where symbols are
+replaced with underscore then the string will be converted into lowercase and
+the first character uppercased, e.g. C<Dear_america_letters_home_from_vietnam>.
+
+Anything else will be left as-is.
+
+Available conversions:
+
+ %l   Random Latin letter (A-Z, a-z)
+ %d   Random digit (0-9)
+ %h   Random hexdigit (0-9a-f in lowercase [default] or 0-9A-F in uppercase).
+      Known arguments:
+      - "u" (to use the uppercase instead of the default lowercase digits)
+ %a   Random letter/digit (Alphanum) (A-Z, a-z, 0-9; combination of %l and %d)
+ %s   Random ASCII symbol, e.g. "-" (dash), "_" (underscore), etc.
+ %x   Random letter/digit/ASCII symbol (combination of %a and %s)
+ %m   Base64 character (A-Z, a-z, 0-9, +, /)
+ %b   Base58 character (A-Z, a-z, 0-9 minus IOl0)
+ %B   Base56 character (A-Z, a-z, 0-9 minus IOol01)
+ %%   A literal percent sign
+ %w   Random word. Known arguments:
+      - "stdin:" (for getting the words from stdin, the default)
+      - "wordlist:NAME" (for getting the words from a L<WordList> module)
+      - "arraydata:NAME" (for getting the words from an L<ArrayData> module, the
+        Role::TinyCommons::Collection::PickItems::RandomPos will be applied).
+
+Filters are modules in the C<Data::Sah::Filter::perl::> namespace.
 
 
 Can be specified multiple times.
@@ -232,13 +275,37 @@ See C<--case>.
 
 Set path to configuration file.
 
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
 =item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
+
 =item B<--no-config>, B<-C>
 
 Do not use any configuration file.
+
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
 
 =back
 
@@ -249,6 +316,10 @@ Do not use any configuration file.
 =item B<--no-env>
 
 Do not read environment for default options.
+
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
 
 =back
 
@@ -264,6 +335,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -278,20 +355,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -347,7 +437,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/genpw.conf>, F<~/genpw.conf>, or F</etc/genpw.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/genpw.conf>, F</home/u1/genpw.conf>, or F</etc/genpw.conf>.
 
 All found files will be read and merged.
 
@@ -357,7 +447,22 @@ You can put multiple profiles in a single file by using section names like C<[pr
 
 You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
 
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
 
 List of available configuration parameters:
 
@@ -373,17 +478,17 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 GENPW_OPT => str
+=head2 GENPW_OPT
 
-Specify additional command-line options.
+String. Specify additional command-line options.
 
 =head1 FILES
 
-F<~/.config/genpw.conf>
+=head2 /home/u1/.config/genpw.conf
 
-F<~/genpw.conf>
+=head2 /home/u1/genpw.conf
 
-F</etc/genpw.conf>
+=head2 /etc/genpw.conf
 
 =head1 HOMEPAGE
 
@@ -393,21 +498,13 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-genpw>
 
 Source repository is at L<https://github.com/perlancar/perl-App-genpw>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-genpw>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<genpw-base56>.
 
 L<genpw-base64>.
 
-L<genpw-id>.
+L<genpw-ind>.
 
 L<genpw-wordlist>.
 
@@ -415,11 +512,37 @@ L<genpw-wordlist>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2024, 2020, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-genpw>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

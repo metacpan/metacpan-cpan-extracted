@@ -22,7 +22,7 @@ no_index:
 provides:
   Util::H2O:
     file: lib/Util/H2O.pm
-    version: '0.22'
+    version: '0.24'
 requires:
   Carp: '0'
   Exporter: '5.58'
@@ -33,5 +33,5 @@ resources:
   bugtracker: https://github.com/haukex/Util-H2O/issues
   homepage: https://github.com/haukex/Util-H2O
   repository: https://github.com/haukex/Util-H2O.git
-version: '0.22'
+version: '0.24'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

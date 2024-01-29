@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Ky::Ky_fonipa;
 # This file auto generated from Data\common\transforms\ky-ky_FONIPA.xml
-#	on Tue  5 Dec 12:59:06 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';

@@ -4,10 +4,11 @@
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
 use v5.36;
-use Object::Pad 0.800;
+use Object::Pad 0.807;
 
-class App::perl::distrolint::Check::HardTabs 0.03
-   :does(App::perl::distrolint::CheckRole::EachFile);
+class App::perl::distrolint::Check::HardTabs 0.06;
+
+apply App::perl::distrolint::CheckRole::EachFile;
 
 use constant DESC => "check that no source code file contains HT characters";
 use constant SORT => 8;
@@ -31,20 +32,20 @@ leads to many false positives.
 
 method run ( $app )
 {
-   return $self->run_for_each_source_file( check_file => $app );
+   return $self->run_for_each_source_file( check_file => );
 }
 
-method check_file ( $file, $app )
+method check_file ( $file )
 {
    # Skip any .c file that appears to be generated from a .xs file
-   return 1 if -f $file =~ s/\.c$/.xs/r;
+   return 1 if $file =~ m/\.c$/ and -f $file =~ s/\.c$/.xs/r;
 
    my @lines = read_lines $file;
 
    foreach my $i ( 0 .. $#lines ) {
       next unless $lines[$i] =~ m/\t/;
 
-      $app->diag( "%s contains a \\t character on line %d", $file, $i+1 );
+      App->diag( App->format_file( $file, $i+1 ), " contains a \\t character" );
       return 0;
    }
 

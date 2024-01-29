@@ -23,15 +23,14 @@ my $script = catfile( qw [ t bin capture.pl ] );
 {
     my $app1 = App::Env->new( 'App1', { Cache => 0 } );
 
-    my ( $stdout, $stderr ) = $app1->capture( $^X, $script, 'exit' );
+    $app1->capture( $^X, $script, 'exit' );
     isnt( $?, 0, 'unsuccessful system call' );
 }
 
 {
     my $app1 = App::Env->new( 'App1', { Cache => 0, SysFatal => 1 } );
 
-    eval { my ( $stdout, $stderr ) = $app1->capture( $^X, $script, 'exit' ); };
-    isnt( $@, '', 'unsuccessful system call: SysFatal' );
+    ok( dies { $app1->capture( $^X, $script, 'exit' ); }, 'unsuccessful system call: SysFatal', );
 }
 
 {
@@ -39,11 +38,11 @@ my $script = catfile( qw [ t bin capture.pl ] );
 
     my $stdout = $app1->qexec( $^X, $script, 'a', 'b' );
 
-    is( $stdout, "a\nb\n", "qexec scalar" );
+    is( $stdout, "a\nb\n", 'qexec scalar' );
 
     my @stdout = $app1->qexec( $^X, $script, 'a', 'b' );
 
-    is( \@stdout, [ "a\n", "b\n" ], "qexec list" );
+    is( \@stdout, [ "a\n", "b\n" ], 'qexec list' );
 
 }
 

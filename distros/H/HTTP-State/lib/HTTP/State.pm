@@ -2,7 +2,7 @@ use v5.36;
 package HTTP::State;
 
 
-our $VERSION="v0.1.1";
+our $VERSION="v0.1.2";
 
 # Logging
 #

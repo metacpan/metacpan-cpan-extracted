@@ -15,7 +15,8 @@ push @tests, ["","",'Empty String'];
 push @tests, ["\x{5317}\x{4EB0}\n",  # those are the Chinese characters for Beijing, according to Sean M. Burke
               "\x{5317}\x{4EB0}", '(Some) Chinese characters also work'];
 push @tests, ["Do p\x{00FC}t <this> into URL's?","Do_p\x{00FC}t_this_into_URLs",'Synopsis'];
-push @tests, ["Do\x{A0}nonbreaking\x{A0}spaces\x{A0}work?","Do\x{A0}nonbreaking\x{A0}spaces\x{A0}work",'nbsp'];
+push @tests, ["Do\x{A0}nonbreaking\x{A0}spaces\x{A0}work?","Do\x{A0}nonbreaking\x{A0}spaces\x{A0}work",'nbsp']
+    if $] > 5.032000; # earlier versions match \x{A0} in \s
 
 plan tests => 1+@tests*4;
 

@@ -154,6 +154,7 @@ my @files = (
     'lib/DateTime/TimeZone/Antarctica/Palmer.pm',
     'lib/DateTime/TimeZone/Antarctica/Rothera.pm',
     'lib/DateTime/TimeZone/Antarctica/Troll.pm',
+    'lib/DateTime/TimeZone/Antarctica/Vostok.pm',
     'lib/DateTime/TimeZone/Asia/Almaty.pm',
     'lib/DateTime/TimeZone/Asia/Amman.pm',
     'lib/DateTime/TimeZone/Asia/Anadyr.pm',

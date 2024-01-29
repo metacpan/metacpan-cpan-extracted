@@ -15,6 +15,7 @@ use Config::INI::RefVars;
 
 subtest "separator => '::'" => sub {
   my $obj = Config::INI::RefVars->new(separator => '::');
+  is($obj->separator, '::', 'separator()');
   my $src = [
              '[A]',
              'x=$(=)',

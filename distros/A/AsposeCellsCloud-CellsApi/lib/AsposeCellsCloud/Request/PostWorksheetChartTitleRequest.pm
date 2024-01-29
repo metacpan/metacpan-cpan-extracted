@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetChartTitleRequest.name : The workbook name.  ,
+# PostWorksheetChartTitleRequest.name : The file name.  ,
 # PostWorksheetChartTitleRequest.sheetName : The worksheet name.  ,
 # PostWorksheetChartTitleRequest.chartIndex : The chart index.  ,
 # PostWorksheetChartTitleRequest.title : Chart title  ,
-# PostWorksheetChartTitleRequest.folder : Original workbook folder.  ,
-# PostWorksheetChartTitleRequest.storageName : Storage name.   
+# PostWorksheetChartTitleRequest.folder : The folder where the file is situated.  ,
+# PostWorksheetChartTitleRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -144,7 +144,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -172,14 +172,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

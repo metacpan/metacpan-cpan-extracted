@@ -6,7 +6,7 @@
 #
 
 package Audio::Nama;
-use Modern::Perl; use Carp;
+use Modern::Perl '2020'; use Carp;
 use Socket qw(getnameinfo NI_NUMERICHOST) ;
 
 sub is_test_script { $config->{opts}->{J} }
@@ -38,7 +38,7 @@ sub apply_ecasound_test_args {
 	@ARGV = grep { $_ ne q(-E) } @ARGV
 }
 
-sub definitions {
+sub initializations {
 
 	$| = 1;     # flush STDOUT buffer on every write
 
@@ -59,6 +59,7 @@ sub definitions {
 	@inserts_data
 	@effects_data
 	$project->{nama_version}
+	$project->{save_file_version_number}
 	$project->{sample_rate}
 	$fx->{applied}
 	$fx->{params}
@@ -66,6 +67,8 @@ sub definitions {
 );
 @persistent_vars = qw(
 	$project->{nama_version}
+	$project->{save_file_version_number}
+	$project->{mark_sequence_counter}
 	$project->{timebase}
 	$project->{command_buffer}
 	$project->{track_version_comments}
@@ -73,7 +76,7 @@ sub definitions {
 	$project->{bunch}
 	$project->{current_op}
 	$project->{current_param}
-	$project->{current_stepsize}
+	$project->{param_stepsize}
 	$project->{playback_position}
 	$project->{sample_rate}
 	$project->{waveform}
@@ -86,17 +89,18 @@ sub definitions {
 	$mode->{midi_transport_sync}
 	$gui->{_seek_unit}
 	$text->{command_history}
+	$text->{hotkey_mode}
 	$this_track_name
 	$this_op
 );
 
 
-	$text->{wrap} = new Text::Format {
+	$text->{wrap} = Text::Format->new( {
 		columns 		=> 75,
 		firstIndent 	=> 0,
 		bodyIndent		=> 0,
 		tabstop			=> 4,
-	};
+	});
 
 	####### Initialize singletons #######
 
@@ -141,18 +145,18 @@ sub definitions {
 	{
 		effects_cache 			=> ['.effects_cache.json',	\&project_root],
 		gui_palette 			=> ['palette',        		\&project_root],
-		state_store 			=> ['State',      			\&project_dir ],
-		git_state_store 		=> ['State.json',      		\&project_dir ],
-		untracked_state_store => ['Aux',					\&project_dir ],
-		effect_profile 			=> ['effect_profiles',		\&project_root],
+		state_store 			=> ['State.json',  			\&project_dir ],
+		untracked_state_store 	=> ['Aux.json',				\&project_dir ],
+		effect_profile 			=> ['effect_profiles.json',	\&project_root],
 		chain_setup 			=> ['Setup.ecs',      		\&project_dir ],
 		user_customization 		=> ['customize.pl',    		\&project_root],
-		project_effect_chains 	=> ['project_effect_chains',\&project_dir ],
-		global_effect_chains  	=> ['global_effect_chains', \&project_root],
-		old_effect_chains  		=> ['effect_chains', 		\&project_root],
+		project_effect_chains 	=> ['project_effect_chains.json',\&project_dir ],
+		global_effect_chains  	=> ['global_effect_chains.json', \&project_root],
+		old_effect_chains  		=> ['effect_chains.json', 		\&project_root],
 		_logfile				=> ['nama.log',				\&project_root],
 		midi_store				=> ['midi.msh',				\&project_dir ],
 		aux_midi_commands		=> ['aux_midi_commands', 	\&project_root],
+		tempo_map				=> ['tempo', 				\&project_dir ],
 
 
 	}, 'Audio::Nama::File';
@@ -186,7 +190,8 @@ sub definitions {
 		use_pager 						=> 1,
 		use_placeholders 				=> 1,
 		use_git							=> 1,
-		autosave						=> 'undo',
+		use_midi						=> 0,
+		use_group_numbering				=> 1,
 		volume_control_operator 		=> 'ea', # default to linear scale
 		sync_mixdown_and_playback_version_numbers => 1, # not implemented yet
 		engine_tcp_port					=> 2868, # 'default' engine
@@ -222,9 +227,9 @@ sub definitions {
 				my $delay = shift();
 				modify_effect($id,2,undef,$delay)
 			},
-		hotkey_beep					=> 'beep -f 250 -l 200',
-	#	this causes beeping during make test
-	#	beep_command					=> 'beep -f 350 -l 700',
+		playback_jump_seconds => 1,
+		mark_bump_seconds => 0.1,
+		seek_end_margin	=>10,
 		midi_record_buffer => 'midi_record',
 		midi_default_input_channel => 'keyboard',
 		ecasound_channel_ops 		=> {map{$_,1} qw(chcopy chmove chorder chmix chmute)},
@@ -234,12 +239,15 @@ sub definitions {
 		waveform_pixels_per_second  => 10,
 		loop_chain_channel_width     => 16,
 
+		ticks_per_quarter_note		=> 24,
+		
+
 	}, 'Audio::Nama::Config';
 
 	{ package Audio::Nama::Config;
 	use Carp;
 	use Audio::Nama::Globals qw(:singletons);
-	use Modern::Perl;
+	use Modern::Perl '2020';
 	our @ISA = 'Audio::Nama::Object'; #  for ->dump and ->as_hash methods
 
 	sub serialize_formats { split " ", $_[0]->{serialize_formats} }
@@ -276,12 +284,14 @@ sub definitions {
 
 sub initialize_interfaces {
 	
-	logsub("&intialize_interfaces");
+	logsub((caller(0))[3]);
 	
-	if ( ! $config->{opts}->{t} and Audio::Nama::Graphical::initialize_tk() ){ 
+	if ( $config->{opts}->{g} and Audio::Nama::Graphical::initialize_tk() ){ 
+ 		say("Starting in graphical mode, terminal is also available.");
 		$ui = Audio::Nama::Graphical->new();
 	} else {
-		pager_newline( "Unable to load perl Tk module. Starting in console mode.") if $config->{opts}->{g};
+		say( "Unable to load perl Tk module.") if $config->{opts}->{g};
+ 		say("Starting in console mode.");
 		$ui = Audio::Nama::Text->new();
 		can_load( modules =>{ Event => undef})
 			or die "Perl Module 'Event' not found. Please install it and try again. Stopping.";
@@ -296,11 +306,6 @@ sub initialize_interfaces {
 		and $jack->{use_jacks}++;
 	choose_sleep_routine();
 	$config->{want_logging} = initialize_logger($config->{opts}->{L});
-
-	$project->{name} = shift @ARGV;
-	{no warnings 'uninitialized';
-	logpkg(__FILE__,__LINE__,'debug',"project name: $project->{name}");
-	}
 
 	logpkg(__FILE__,__LINE__,'debug', sub{"Command line options\n".  json_out($config->{opts})});
 
@@ -454,7 +459,7 @@ sub reset_remote_control_socket {
 
 sub start_osc_listener {
 	my $port = shift;
-	say("Starting OSC listener on port $port");
+	pager_newline("Starting OSC listener on port $port");
 	my $osc_in = $project->{osc_socket} = IO::Socket::INET->new(
 		LocalAddr => 'localhost',
 		LocalPort => $port,

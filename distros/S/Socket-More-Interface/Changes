@@ -1,0 +1,5 @@
+Revision history for Perl extension Socket::More::Interface.
+
+v0.1.0  2023-10-07
+  - Original version.
+  - Split out of Socket::More distribution

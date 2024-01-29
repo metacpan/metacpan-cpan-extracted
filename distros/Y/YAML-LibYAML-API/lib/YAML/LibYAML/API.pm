@@ -3,7 +3,7 @@ package YAML::LibYAML::API;
 use strict;
 use warnings;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = 'v0.14.0'; # VERSION
 
 use YAML::PP::Common qw/
     YAML_ANY_SCALAR_STYLE YAML_PLAIN_SCALAR_STYLE
@@ -159,10 +159,18 @@ YAML::LibYAML::API - Wrapper around the C libyaml library
     YAML::LibYAML::API::XS::parse_filehandle_events($fh, $events);
 
     # emit
-    my $yaml = YAML::LibYAML::API::XS::emit_string_events($events);
+    my $yaml = YAML::LibYAML::API::XS::emit_string_events($events, {
+        indent => 2,
+        width => 80,
+        unicode => 1, # emit unicode
+    });
     # or:
-    YAML::LibYAML::API::XS::emit_file_events($filename, $events);
-    YAML::LibYAML::API::XS::emit_filehandle_events($fh, $events);
+    my $options = {
+        indent => 2,
+        width => 80,
+    };
+    YAML::LibYAML::API::XS::emit_file_events($filename, $events, $options);
+    YAML::LibYAML::API::XS::emit_filehandle_events($fh, $events, $options);
 
 =head1 DESCRIPTION
 

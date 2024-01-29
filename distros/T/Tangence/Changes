@@ -1,5 +1,17 @@
 Revision history for Tangence
 
+0.32    2024-01-06
+        [CHANGES]
+         * Quiet the meta::experimental warnings of meta 0.003_002
+
+0.31    2024-01-03
+        [CHANGES]
+         * Various module style updates for newer Object::Pad v0.800
+         * Swapped unit tests from `Test::More` to `Test2::V0`
+         * Dropped many test-time dependencies now they are built-in to
+           `Test2::Suite`
+         * Use `meta` rather than `no strict 'refs'` hackery
+
 0.30    2022-10-29
         [CHANGES]
          * Updates for Object::Pad v0.70:

@@ -10,17 +10,17 @@ App::Greple::xlate - greple için çeviri desteği modülü
 
 # VERSION
 
-Version 0.28
+Version 0.29
 
 # DESCRIPTION
 
-**Greple** **xlate** modülü metin bloklarını bulur ve bunları çevrilmiş metinle değiştirir. Şu anda DeepL (`deepl.pm`) ve ChatGPT (`gpt3.pm`) modülleri arka uç motoru olarak uygulanmıştır.
+**Greple** **xlate** modülü istenen metin bloklarını bulur ve bunları çevrilmiş metinle değiştirir. Şu anda DeepL (`deepl.pm`) ve ChatGPT (`gpt3.pm`) modülleri arka uç motoru olarak uygulanmıştır.
 
-[pod](https://metacpan.org/pod/pod) stiliyle yazılmış normal metin bloklarını çevirmek isterseniz, şu şekilde **greple** komutunu `xlate::deepl` ve `perl` modülü ile kullanın:
+Eğer Perl'in pod stiliyle yazılmış bir belgedeki normal metin bloklarını çevirmek istiyorsanız, şu şekilde **greple** komutunu `xlate::deepl` ve `perl` modülü ile kullanın:
 
     greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
 
-Desen `^(\w.*\n)+`, alfanümerik harfle başlayan ardışık satırları ifade eder. Bu komut çevrilecek alanı gösterir. Tüm metni üretmek için **--all** seçeneği kullanılır.
+Bu komutta, desen dizesi `^(\w.*\n)+`, alfanümerik harfle başlayan ardışık satırları ifade eder. Bu komut, çevrilecek alanı vurgular. Bütün metni üretmek için **--all** seçeneği kullanılır.
 
 <div>
     <p>
@@ -28,7 +28,7 @@ Desen `^(\w.*\n)+`, alfanümerik harfle başlayan ardışık satırları ifade e
     </p>
 </div>
 
-Ardından seçilen alanı çevirmek için `--xlate` seçeneğini ekleyin. Bu, **deepl** komutunun çıktısıyla bulup değiştirir.
+Ardından seçilen alanı çevirmek için `--xlate` seçeneğini ekleyin. Ardından, istenen bölümleri bulacak ve bunları **deepl** komutunun çıktısıyla değiştirecektir.
 
 Varsayılan olarak, orijinal ve çevrilmiş metin [git(1)](http://man.he.net/man1/git) ile uyumlu "çatışma işaretçisi" formatında yazdırılır. `ifdef` formatını kullanarak, istediğiniz bölümü [unifdef(1)](http://man.he.net/man1/unifdef) komutuyla kolayca alabilirsiniz. Çıktı formatı **--xlate-format** seçeneğiyle belirtilebilir.
 
@@ -76,7 +76,7 @@ Tüm metni çevirmek isterseniz, **--match-all** seçeneğini kullanın. Bu, tü
 
     - **conflict**, **cm**
 
-        Orijinal ve çevrilmiş metni [git(1)](http://man.he.net/man1/git) çakışma işaretçisi formatında yazdırın.
+        Orjinal ve çevrilmiş metin [git(1)](http://man.he.net/man1/git) çakışma işaretçisi formatında yazdırılır.
 
             <<<<<<< ORIGINAL
             original text
@@ -90,7 +90,7 @@ Tüm metni çevirmek isterseniz, **--match-all** seçeneğini kullanın. Bu, tü
 
     - **ifdef**
 
-        Orijinal ve çevrilmiş metni [cpp(1)](http://man.he.net/man1/cpp) `#ifdef` formatında yazdırın.
+        Orjinal ve çevrilmiş metin [cpp(1)](http://man.he.net/man1/cpp) `#ifdef` formatında yazdırılır.
 
             #ifdef ORIGINAL
             original text
@@ -105,7 +105,7 @@ Tüm metni çevirmek isterseniz, **--match-all** seçeneğini kullanın. Bu, tü
 
     - **space**
 
-        Orijinal ve çevrilmiş metni tek boş satırla ayrı ayrı yazdırın.
+        Orjinal ve çevrilmiş metin tek boş satır ile ayrılmış olarak yazdırılır.
 
     - **xtxt**
 
@@ -196,6 +196,8 @@ DeepL ve ChatGPT için komut satırı araçlarını yüklemeniz gerekmektedir.
 
 [App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
 
+[https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
+
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
     DeepL Python kütüphanesi ve CLI komutu.
@@ -220,13 +222,27 @@ DeepL ve ChatGPT için komut satırı araçlarını yüklemeniz gerekmektedir.
 
     **-V** seçeneğiyle çakışma işaretçi formatını yan yana göstermek için **sdif** kullanın.
 
+## ARTICLES
+
+- [https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250](https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250)
+
+    DeepL API ile sadece gerekli kısımları çevirmek ve değiştirmek için Greple modülü (Japonca olarak)
+
+- [https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6](https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6)
+
+    DeepL API modülü ile 15 dilde belge oluşturma (Japonca olarak)
+
+- [https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd](https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd)
+
+    DeepL API ile otomatik çeviri Docker ortamı (Japonca olarak)
+
 # AUTHOR
 
 Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023 Kazumasa Utashiro.
+Copyright © 2023-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

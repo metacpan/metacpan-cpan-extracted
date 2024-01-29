@@ -9,6 +9,7 @@ requires 'Ryu', '>= 2.007';
 requires 'Ryu::Async', '>= 0.019';
 requires 'Log::Any', '>= 1.709';
 requires 'JSON::MaybeXS', '>= 1.004003';
+requires 'JSON::MaybeUTF8', '>= 2.000';
 requires 'Path::Tiny', '>= 0.118';
 requires 'Syntax::Keyword::Try', '>= 0.21';
 requires 'Time::Moment', '>= 0.44';

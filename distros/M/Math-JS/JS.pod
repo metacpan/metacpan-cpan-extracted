@@ -1,0 +1,79 @@
+
+=pod
+
+=head1 NAME
+
+  Math::JS - Emulate JavaScript arithmetic in perl
+
+=head1 DESCRIPTION
+
+  Assign numeric values to Math::JS objects, and perform arithmetic
+  operations on those values according to the rules that JavaScript
+  uses.
+  This module was prompted by https://www.perlmonks.org/?node=11155911
+  and the unexpected arithmetical behaviour revealed therein.
+  JavaScript uses the C 'double' as its floating point data type, and
+  therefore the building of Math::JS is restricted to perls that have
+  that same configuration - ie where $Config{nvtype} is 'double' and
+  $Config{nvsize} is 8.
+  Prior to perl-5.30, perl's assignment of floating-point values to
+  double-precision NVs was buggy - hence we also limit this module to
+  perl-5.30.0 and later.
+
+=head1 SYNOPSIS
+
+  use warnings; use strict;
+  use Math::JS;
+
+  my $js0 = Math::JS->new(2147483648);
+  $js0 >>= 1;
+  print $js0, "\n";
+  # Outputs -1073741824 (same as JavaScript)
+  my $js1 = ($js0 + 10000) & 123456789;
+  print $js1, "\n";
+  # Outputs 1296  (same as javascript)
+
+=head1 FUNCTIONS
+
+  Exports no functions by default, and only one function upon request:
+
+  $rop = urs($op, $shift);
+    Emulate JavaScript's '>>>' operator.
+    An usnsigned 32-bit rightshift of $shift places is performed on the
+    value held by the Math::JS object $op. $rop is a created Math::JS
+    object that holds, as its value, the result of that right shift.
+
+  Overloading of the '+', '-', '*', '/', '%', '**', '++', '--', '>=',
+  '<=', '==', '!=', '>', '<', '<=>', '""', '+=', '-=', '*=', '/=', '%=',
+  '**=', '&', '|', '^', '~', '&=',  '|=', '^=' operators is provided.
+
+=head1 DISPLAYING FLOATING POINT VALUES
+
+  This warrants some specific documentation because it's not trivial to
+  get Perl to print out the values in the same form as JavaScript does.
+  (That's in addition to the fact that perl's print() function likes to
+  present inaccurate values, whereas JavaScript does not.)
+
+  As of Math-JS-0.04, Math-Ryu-0.06 or later will be automatically used by
+  the overloading of '""' if such a Math::Ryu installation is found.
+  This should provide good agreement between the outputs of JavaScript
+  and Math::JS. (Please report any discrepancies encountered.)
+  Where the formats differ, they should both assign to exactly the same
+  double-precision value.
+
+  If a suitable installation of Math::Ryu is not available then
+  overloading of '""' uses perl's sprintf() function, which might present
+  more decimal mantissa digits than JavaScript does - though both forms
+  should assign to exactly the same double-precision value.
+
+=head1 LICENSE
+
+  This program is free software; you may redistribute it and/or
+  modify it under the same terms as Perl itself.
+  Copyright 2024, Sisyphus
+
+=head1 AUTHOR
+
+  Sisyphus <sisyphus at(@) cpan dot (.) org>
+
+=cut

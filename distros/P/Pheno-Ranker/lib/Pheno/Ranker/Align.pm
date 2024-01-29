@@ -5,8 +5,6 @@ use warnings;
 use autodie;
 use feature qw(say);
 use List::Util qw(any shuffle first);
-
-#use List::MoreUtils qw(duplicates);
 use Data::Dumper;
 use Sort::Naturally qw(nsort);
 use Hash::Fold fold => { array_delimiter => ':' };
@@ -29,11 +27,28 @@ sub check_format {
 sub cohort_comparison {
 
     my ( $ref_binary_hash, $self ) = @_;
-    my $out_file = $self->{out_file};
+    my $out_file          = $self->{out_file};
+    my $similarity_metric = $self->{similarity_metric_cohort};
 
     # Inform about the start of the comparison process
     say "Performing COHORT comparison"
       if ( $self->{debug} || $self->{verbose} );
+
+    # Define the subroutine to be used
+    my %similarity_function = (
+        'hamming' => \&hd_fast,
+        'jaccard' => \&jaccard_similarity
+    );
+
+    # Define values for diagonal elements depending on metric
+    my %similarity_diagonal = (
+        'hamming' => 0,
+        'jaccard' => 1
+    );
+
+    # Use previous hashes to define stuff
+    my $metric              = $similarity_function{$similarity_metric};
+    my $similarity_diagonal = $similarity_diagonal{$similarity_metric};
 
     # Sorting keys of the hash
     my @sorted_keys_ref_binary_hash = nsort( keys %{$ref_binary_hash} );
@@ -47,7 +62,7 @@ sub cohort_comparison {
     open( my $fh, ">", $out_file );
     say $fh "\t", join "\t", @sorted_keys_ref_binary_hash;
 
-    # Initialize matrix for storing distances
+    # Initialize matrix for storing similarity
     my @matrix;
 
     # Iterate over items (I elements)
@@ -58,43 +73,45 @@ sub cohort_comparison {
           if $self->{verbose};
         my $str1 = $ref_binary_hash->{ $sorted_keys_ref_binary_hash[$i] }
           {binary_digit_string_weighted};
-        print $fh $sorted_keys_ref_binary_hash[$i] . "\t";
+
+        # Print first column (w/o \t)
+        print $fh $sorted_keys_ref_binary_hash[$i];
 
         # Iterate for pairwise comparisons (J elements)
         for my $j ( 0 .. $#sorted_keys_ref_binary_hash ) {
             my $str2 = $ref_binary_hash->{ $sorted_keys_ref_binary_hash[$j] }
               {binary_digit_string_weighted};
-            my $distance;
+            my $similarity;
 
             if ($switch) {
 
-                # Compute every distance for large datasets
+                # Compute every similarity for large datasets
                 my $str2 =
                   $ref_binary_hash->{ $sorted_keys_ref_binary_hash[$j] }
                   {binary_digit_string_weighted};
-                $distance = $i == $j ? 0 : hd_fast( $str1, $str2 );
+                $similarity =
+                  $i == $j ? $similarity_diagonal : $metric->( $str1, $str2 );
             }
             else {
                 if ( $i == $j ) {
 
-                    # Distance is zero for diagonal elements
-                    $distance = 0;
+                    # Similarity for diagonal elements
+                    $similarity = $similarity_diagonal;
                 }
                 elsif ( $j > $i ) {
 
-                    # Compute distance for large cohorts or upper triangle
-                    $distance = hd_fast( $str1, $str2 );
-                    $matrix[$i][$j] = $distance;
+                    # Compute similarity for large cohorts or upper triangle
+                    $similarity = $metric->( $str1, $str2 );
+                    $matrix[$i][$j] = $similarity;
                 }
                 else {
-                    # Use precomputed distance from lower triangle
-                    $distance = $matrix[$j][$i];
+                    # Use precomputed similarity from lower triangle
+                    $similarity = $matrix[$j][$i];
                 }
             }
 
-            # Print a tab before each distance except the first one
-            print $fh "\t" if $j > 0;
-            print $fh $distance;
+            # Print a tab before each similarity
+            print $fh "\t", $similarity;
         }
 
         print $fh "\n";
@@ -123,7 +140,7 @@ sub compare_and_rank {
     say "Performing COHORT(REF)-PATIENT(TAR) comparison"
       if ( $self->{debug} || $self->{verbose} );
 
-    # Hash for compiling distances
+    # Hash for compiling metrics
     my $score;
 
     # Hash for stats
@@ -233,6 +250,8 @@ sub compare_and_rank {
         # Compute estimated av and dev for binary_string of L = length_align - n_00
         # Corrected length_align L = length_align - n_00
         my $length_align_corrected = $length_align - $n_00;
+
+        #$estimated_average, $estimated_std_dev
         ( $stat->{hamming_stats}{mean_rnd}, $stat->{hamming_stats}{sd_rnd} ) =
           estimate_hamming_stats($length_align_corrected);
 
@@ -449,6 +468,12 @@ sub create_glob_and_ref_hashes {
                 self   => $self
             }
         );
+
+        # *** IMPORTANT ***
+        # We eliminate keys with weight = 0 if defined $weight;
+        prune_keys_with_weight_zero($ref_hash) if defined $weight;
+
+        # Load big hash ref_hash_flattened
         $ref_hash_flattened->{$id} = $ref_hash;
 
         # The idea is to create a $glob_hash with unique key-values
@@ -598,24 +623,23 @@ sub remap_hash {
         my $id_key = add_id2key( $key, $hash, $self );
 
         # Finally add value to id_key
-        my $tmp_key = $id_key . '.' . $val;
+        my $tmp_key_at_variable_level = $id_key . '.' . $val;
 
         # Add HPO ascendants
         if ( defined $edges && $val =~ /^HP:/ ) {
-            my $ascendants = add_hpo_ascendants( $tmp_key, $nodes, $edges );
+            my $ascendants =
+              add_hpo_ascendants( $tmp_key_at_variable_level, $nodes, $edges );
             $out_hash->{$_} = 1 for @$ascendants;    # weight 1 for now
         }
 
         ##################
         # Assign weights #
         ##################
-        # NB: mrueda (04-12-23) - it's ok if $weight == undef => NO AUTOVIVIFICATION!
-        # NB: We don't warn if it does not exist, just assign 1
-        # *** IMPORTANT *** 07-26-2023
-        # We allow for assigning weights by TERM (e.g., 1D)
-        # but VARIABLE level takes precedence to TERM
 
-        my $tmp_key_at_term_level = $tmp_key;
+        # NB: mrueda (04-12-23) - it's ok if $weight == undef => NO AUTOVIVIFICATION!
+        # NB: We don't warn if user selection does not exist, just assign 1
+
+        my $tmp_key_at_term_level = $tmp_key_at_variable_level;
 
         # If variable has . then capture $1
         if ( $tmp_key_at_term_level =~ m/\./ ) {
@@ -625,24 +649,44 @@ sub remap_hash {
             $tmp_key_at_term_level = $1;
         }
 
-        # ORDER MATTERS !!!!
-        $out_hash->{$tmp_key} =
+        if ( defined $weight ) {
 
-          # VARIABLE LEVEL
-          exists $weight->{$tmp_key}
-          ? $weight->{$tmp_key}
+            # *** IMPORTANT ***
+            # ORDER MATTERS !!!!
+            # We allow for assigning weights by TERM (e.g., 1D)
+            # but VARIABLE level takes precedence to TERM
 
-          # TERM LEVEL
-          : exists $weight->{$tmp_key_at_term_level}
-          ? $weight->{$tmp_key_at_term_level}
+            $out_hash->{$tmp_key_at_variable_level} =
 
-          # NO WEIGHT
-          : 1;
+              # VARIABLE LEVEL
+              # NB: exists stringifies the weights
+              exists $weight->{$tmp_key_at_variable_level}
+              ? $weight->{$tmp_key_at_variable_level} + 0    # coercing to number
+
+              # TERM LEVEL
+              : exists $weight->{$tmp_key_at_term_level}
+              ? $weight->{$tmp_key_at_term_level} + 0        # coercing to number
+
+              # NO WEIGHT
+              : 1;
+
+        }
+        else {
+
+            # Assign a weight of 1 if no users weights
+            $out_hash->{$tmp_key_at_variable_level} = 1;
+
+        }
+
+        ##############
+        # label Hash #
+        ##############
 
         # Finally we load the Nomenclature hash
         my $label = $key;
         $label =~ s/id/label/;
-        $nomenclature{$tmp_key} = $hash->{$label} if defined $hash->{$label};
+        $nomenclature{$tmp_key_at_variable_level} = $hash->{$label}
+          if defined $hash->{$label};
     }
 
     # *** IMPORTANT ***
@@ -853,4 +897,17 @@ sub parse_hpo_json {
     }
     return \%nodes, \%edges;
 }
+
+sub prune_keys_with_weight_zero {
+
+    my $hash_ref = shift;
+
+    # Iterate over the keys of the hash
+    foreach my $key ( keys %{$hash_ref} ) {
+
+        # Delete the key if its value is 0
+        delete $hash_ref->{$key} if $hash_ref->{$key} == 0;
+    }
+}
+
 1;

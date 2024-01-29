@@ -1,5 +1,5 @@
 ---
-abstract: 'Locate directory of original perl script'
+abstract: 'Locate directory of original Perl script'
 author:
   - unknown
 build_requires:
@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/perl/perl5/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl/perl5.git
-version: '1.53'
+version: '1.54'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

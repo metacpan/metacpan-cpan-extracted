@@ -30,6 +30,9 @@ if ( $cmd =~ /init/i ) {
 elsif ( $cmd =~ /gtd/i ) {
     $sudoc->send_gtd_email($sudoc->c->{loading}->{jobid}, 'waiting');
 }
+elsif ( $cmd =~ /get/i ) {
+    $sudoc->get();
+}
 elsif ( $cmd =~ /trans/i ) {
     my $daemon = Koha::Contrib::Sudoc::TransferDaemon->new();
     $daemon->start;
@@ -37,8 +40,13 @@ elsif ( $cmd =~ /trans/i ) {
 elsif ( $cmd =~ /chargeauto/i ) {
     my $loading = $sudoc->c->{loading};
     $sudoc->send_gtd_email($loading->{jobid});
+
     # Attente raisonnable que l'ABES envoie les fichiers
     sleep($loading->{timeout}->{transfer} * 60);
+
+    # Si mode GET, on va chercher les fichiers
+    $sudoc->get();
+
     $sudoc->spool->staged_to_waiting();
     $sudoc->load_waiting();
 }
@@ -76,7 +84,7 @@ sudoc - Commande de chargement des notices SUDOC
 
 =head1 VERSION
 
-version 2.40
+version 2.43
 
 =head1 AUTHOR
 
@@ -84,7 +92,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Fréderic Demians.
+This software is Copyright (c) 2024 by Fréderic Demians.
 
 This is free software, licensed under:
 

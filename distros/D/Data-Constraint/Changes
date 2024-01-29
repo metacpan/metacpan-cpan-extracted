@@ -1,5 +1,8 @@
 Revision history for Perl module Data::Constraint
 
+1.204 2024-01-24T20:25:02Z
+	* refresh distro, update email addresses
+
 1.203 2022-01-09T02:53:41Z
 	* no code changes. Fix a link in README.pod.
 

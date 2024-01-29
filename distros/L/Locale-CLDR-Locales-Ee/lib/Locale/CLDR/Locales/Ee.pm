@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ee - Package for language Ewe
 
 package Locale::CLDR::Locales::Ee;
 # This file auto generated from Data\common\main\ee.xml
-#	on Tue  5 Dec  1:06:52 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -25,19 +25,19 @@ use Moo;
 
 extends('Locale::CLDR::Locales::Root');
 has 'valid_algorithmic_formats' => (
-	is => 'ro',
-	isa => ArrayRef,
-	init_arg => undef,
-	default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal','spellout-ordinal','digits-ordinal' ]},
+    is => 'ro',
+    isa => ArrayRef,
+    init_arg => undef,
+    default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal','spellout-ordinal','digits-ordinal' ]},
 );
 
 has 'algorithmic_number_format_data' => (
-	is => 'ro',
-	isa => HashRef,
-	init_arg => undef,
-	default => sub { 
-		use bigfloat;
-		return {
+    is => 'ro',
+    isa => HashRef,
+    init_arg => undef,
+    default => sub {
+        use bigfloat;
+        return {
 		'after-billions' => {
 			'private' => {
 				'0' => {
@@ -454,7 +454,7 @@ has 'algorithmic_number_format_data' => (
 				},
 			},
 		},
-	} },
+    } },
 );
 
 # Need to add code for Key type pattern
@@ -477,7 +477,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ab' => 'abkhaziagbe',
@@ -906,7 +906,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'xexeme',
  			'002' => 'Afrika nutome',
@@ -1092,8 +1092,6 @@ has 'display_name_region' => (
  			'MF' => 'Saint Martin nutome',
  			'MG' => 'Madagaska nutome',
  			'MH' => 'Marshal ƒudomekpowo nutome',
- 			'MK' => 'Makedonia nutome',
- 			'MK@alt=variant' => 'Makedonia (FYROM) nutome',
  			'ML' => 'Mali nutome',
  			'MM' => 'Myanmar (Burma) nutome',
  			'MN' => 'Mongolia nutome',
@@ -1213,7 +1211,7 @@ has 'display_name_variant' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'ALALC97' => 'ALALC9',
  			'BISCAYAN' => 'BISCAYA',
@@ -1226,7 +1224,7 @@ has 'display_name_key' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'calendar' => 'kalenda',
  			'collation' => 'tutuɖo',
@@ -1336,7 +1334,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{metric},
  			'UK' => q{uk},
@@ -1350,7 +1348,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'gbegbɔgblɔ {0}',
  			'script' => 'gbeŋɔŋlɔ {0}',
@@ -1372,8 +1370,8 @@ has 'characters' => (
 			auxiliary => qr{[ă â å ä ā æ c ç ĕ ê ë ĭ î ï j ñ ŏ ô ö ø œ q ŭ û ü ÿ]},
 			index => ['A', 'B', 'D', 'Ɖ', 'E', 'Ɛ', 'F', 'Ƒ', 'G', 'Ɣ', 'H', 'X', 'I', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'R', 'S', 'T', 'U', 'V', 'Ʋ', 'W', 'Y', 'Z'],
 			main => qr{[a á à ã b d ɖ e é è ẽ ɛ {ɛ́} {ɛ̀} {ɛ̃} f ƒ g ɣ h x i í ì ĩ k l m n ŋ o ó ò õ ɔ {ɔ́} {ɔ̀} {ɔ̃} p r s t u ú ù ũ v ʋ w y z]},
-			numbers => qr{[\- , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] \{ \} § @ * / \& # † ‡ ′ ″]},
+			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] \{ \} § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -1448,82 +1446,193 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(ŋkekewo),
+						'one' => q(ŋkeke {0}),
+						'other' => q(ŋkeke {0}),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(ŋkekewo),
 						'one' => q(ŋkeke {0}),
 						'other' => q(ŋkeke {0}),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(gaƒoƒowo),
+						'one' => q(gaƒoƒo {0}),
+						'other' => q(gaƒoƒo {0}),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(gaƒoƒowo),
 						'one' => q(gaƒoƒo {0}),
 						'other' => q(gaƒoƒo {0}),
 					},
-					'kilometer' => {
-						'name' => q(agbadroƒe),
-						'one' => q(agbadroƒe {0}),
-						'other' => q(agbadroƒe {0}),
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(aɖabaƒoƒowo),
+						'one' => q(aɖabaƒoƒo {0}),
+						'other' => q(aɖabaƒoƒo {0}),
 					},
-					'meter' => {
-						'name' => q(abɔ),
-						'one' => q(abɔ {0}),
-						'other' => q(abɔ {0}),
-					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(aɖabaƒoƒowo),
 						'one' => q(aɖabaƒoƒo {0}),
 						'other' => q(aɖabaƒoƒo {0}),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(ɣletiwo),
+						'one' => q(ɣleti {0}),
+						'other' => q(ɣleti {0}),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(ɣletiwo),
 						'one' => q(ɣleti {0}),
 						'other' => q(ɣleti {0}),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(sekend),
+						'one' => q(sekend {0} wo),
+						'other' => q(sekend {0} wo),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'name' => q(sekend),
 						'one' => q(sekend {0} wo),
 						'other' => q(sekend {0} wo),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(kɔsiɖawo),
+						'one' => q(kɔsiɖa {0}),
+						'other' => q(kɔsiɖa {0}),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(kɔsiɖawo),
 						'one' => q(kɔsiɖa {0}),
 						'other' => q(kɔsiɖa {0}),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(ƒewo),
+						'one' => q(ƒe {0}),
+						'other' => q(ƒe {0}),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(ƒewo),
 						'one' => q(ƒe {0}),
 						'other' => q(ƒe {0}),
 					},
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'name' => q(agbadroƒe),
+						'one' => q(agbadroƒe {0}),
+						'other' => q(agbadroƒe {0}),
+					},
+					# Core Unit Identifier
+					'kilometer' => {
+						'name' => q(agbadroƒe),
+						'one' => q(agbadroƒe {0}),
+						'other' => q(agbadroƒe {0}),
+					},
+					# Long Unit Identifier
+					'length-meter' => {
+						'name' => q(abɔ),
+						'one' => q(abɔ {0}),
+						'other' => q(abɔ {0}),
+					},
+					# Core Unit Identifier
+					'meter' => {
+						'name' => q(abɔ),
+						'one' => q(abɔ {0}),
+						'other' => q(abɔ {0}),
+					},
 				},
 				'narrow' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(ŋkeke),
+						'one' => q(ŋkeke {0}),
+						'other' => q(ŋkeke {0}),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(ŋkeke),
 						'one' => q(ŋkeke {0}),
 						'other' => q(ŋkeke {0}),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(gaƒoƒo),
+						'one' => q(gaƒoƒo {0}),
+						'other' => q(gaƒoƒo {0}),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(gaƒoƒo),
 						'one' => q(gaƒoƒo {0}),
 						'other' => q(gaƒoƒo {0}),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(aɖabaƒoƒo),
+						'one' => q(a {0}),
+						'other' => q(a {0}),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(aɖabaƒoƒo),
 						'one' => q(a {0}),
 						'other' => q(a {0}),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(ɣletiwo),
+						'one' => q(ɣleti {0}),
+						'other' => q(ɣleti {0}),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(ɣletiwo),
 						'one' => q(ɣleti {0}),
 						'other' => q(ɣleti {0}),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'one' => q(s {0}),
+						'other' => q(s {0}),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'one' => q(s {0}),
 						'other' => q(s {0}),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(kɔsiɖa),
+						'one' => q(kɔsiɖa {0}),
+						'other' => q(kɔsiɖa {0}),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(kɔsiɖa),
 						'one' => q(kɔsiɖa {0}),
 						'other' => q(kɔsiɖa {0}),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(ƒe),
+						'one' => q(ƒe {0}),
+						'other' => q(ƒe {0}),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(ƒe),
 						'one' => q(ƒe {0}),
@@ -1531,35 +1640,83 @@ has 'units' => (
 					},
 				},
 				'short' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(ŋkekewo),
+						'one' => q(ŋkeke {0}),
+						'other' => q(ŋkeke {0}),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(ŋkekewo),
 						'one' => q(ŋkeke {0}),
 						'other' => q(ŋkeke {0}),
 					},
+					# Long Unit Identifier
+					'duration-hour' => {
+						'name' => q(gaƒoƒowo),
+						'one' => q(gaƒoƒo {0}),
+						'other' => q(gaƒoƒo {0}),
+					},
+					# Core Unit Identifier
 					'hour' => {
 						'name' => q(gaƒoƒowo),
 						'one' => q(gaƒoƒo {0}),
 						'other' => q(gaƒoƒo {0}),
 					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(aɖabaƒoƒowo),
+						'one' => q(a {0}),
+						'other' => q(a {0}),
+					},
+					# Core Unit Identifier
 					'minute' => {
 						'name' => q(aɖabaƒoƒowo),
-						'one' => q(aɖabaƒoƒo {0}),
-						'other' => q(aɖabaƒoƒo {0}),
+						'one' => q(a {0}),
+						'other' => q(a {0}),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(ɣletiwo),
+						'one' => q(ɣleti {0}),
+						'other' => q(ɣleti {0}),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(ɣletiwo),
 						'one' => q(ɣleti {0}),
 						'other' => q(ɣleti {0}),
 					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'one' => q(sekend {0}),
+						'other' => q(sekend {0}),
+					},
+					# Core Unit Identifier
 					'second' => {
 						'one' => q(sekend {0}),
 						'other' => q(sekend {0}),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(kɔsiɖawo),
+						'one' => q(kɔsiɖa {0}),
+						'other' => q(kɔsiɖa {0}),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(kɔsiɖawo),
 						'one' => q(kɔsiɖa {0}),
 						'other' => q(kɔsiɖa {0}),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(ƒewo),
+						'one' => q(ƒe {0}),
+						'other' => q(ƒe {0}),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(ƒewo),
 						'one' => q(ƒe {0}),
@@ -2497,7 +2654,6 @@ has 'currencies' => (
 		'EUR' => {
 			symbol => '€',
 			display_name => {
-				'currency' => q(EUR),
 				'one' => q(euro),
 				'other' => q(euro),
 			},
@@ -4355,13 +4511,13 @@ has 'calendar_months' => (
 							'ƒoave'
 						],
 						leap => [
-							'',
-							'',
-							'',
-							'',
-							'',
-							'',
-							'siamlɔm'
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							
 						],
 					},
 					wide => {
@@ -4381,13 +4537,13 @@ has 'calendar_months' => (
 							'ƒoave'
 						],
 						leap => [
-							'',
-							'',
-							'',
-							'',
-							'',
-							'',
-							'siamlɔm'
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							
 						],
 					},
 				},
@@ -4409,13 +4565,13 @@ has 'calendar_months' => (
 							'foa'
 						],
 						leap => [
-							'',
-							'',
-							'',
-							'',
-							'',
-							'',
-							'sia'
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							
 						],
 					},
 					wide => {
@@ -4435,13 +4591,13 @@ has 'calendar_months' => (
 							'ƒoave'
 						],
 						leap => [
-							'',
-							'',
-							'',
-							'',
-							'',
-							'',
-							'siamlɔm'
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							undef(),
+							
 						],
 					},
 				},
@@ -5207,8 +5363,8 @@ has 'day_period_data' => (
 );
 
 around day_period_data => sub {
-	my ($orig, $self) = @_;
-	return $self->$orig;
+    my ($orig, $self) = @_;
+    return $self->$orig;
 };
 
 has 'day_periods' => (
@@ -7644,7 +7800,9 @@ has 'time_zone_names' => (
 		},
 		'Norfolk' => {
 			long => {
-				'standard' => q#Norfolk Island gaƒoƒo me#,
+				'daylight' => q#Norfolk Island dzomeŋɔli gaƒoƒo me#,
+				'generic' => q#Norfolk Island gaƒoƒo me#,
+				'standard' => q#Norfolk Island nutome gaƒoƒo me#,
 			},
 		},
 		'Noronha' => {

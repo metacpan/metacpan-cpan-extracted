@@ -12,14 +12,10 @@ use XS::Parse::Keyword::FromPerl qw(
    register_xs_parse_keyword
 );
 use Optree::Generate qw(
-   opcode
    newSVOP
-);
 
-use constant {
-   # Pull out some OP_* constants
-   OP_CONST => opcode("const"),
-};
+   OP_CONST
+);
 
 # ident
 BEGIN {

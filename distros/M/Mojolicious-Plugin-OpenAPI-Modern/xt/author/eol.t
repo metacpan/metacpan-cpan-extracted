@@ -10,7 +10,7 @@ my @files = (
     'lib/Mojolicious/Plugin/OpenAPI/Modern.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
-    't/01-basic.t',
+    't/initialization.t',
     't/lib/BasicApp.pm',
     't/validate_request_response.t',
     'xt/author/00-compile.t',

@@ -1,0 +1,51 @@
+class TestCase::Unicode::Normalize {
+  use Unicode::Normalize;
+
+  static method NFC : int () {
+    my $string = "あいうパ";
+    
+    my $string_ret = Unicode::Normalize->NFC($string);
+    
+    unless ($string_ret eq "あいうパ") {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method NFKC : int () {
+    my $string = "あいうパ";
+    
+    my $string_ret = Unicode::Normalize->NFKC($string);
+    
+    unless ($string_ret eq "あいうパ") {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method NFD : int () {
+    my $string = "あいうパ";
+    
+    my $string_ret = Unicode::Normalize->NFD($string);
+    
+    unless ($string_ret eq "あいうパ") {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method NFKD : int () {
+    my $string = "あいうパ";
+    
+    my $string_ret = Unicode::Normalize->NFKD($string);
+    
+    unless ($string_ret eq "あいうパ") {
+      return 0;
+    }
+    
+    return 1;
+  }
+}

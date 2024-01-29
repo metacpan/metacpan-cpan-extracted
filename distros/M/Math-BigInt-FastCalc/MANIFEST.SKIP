@@ -84,7 +84,7 @@
 # Avoid more git stuff.
 \B\.gitattributes\b
 
-# Avoid patch-related files.
+# Avoid patch files.
 \.patch$
 \.diff$
 
@@ -111,7 +111,7 @@
 \.lzh$
 
 # Avoid development stuff.
-^dev(el)?$
+^dev(el)?/
 
 # Avoid distribution-specific stuff.
 ^Math-BigInt-FastCalc-[0-9]

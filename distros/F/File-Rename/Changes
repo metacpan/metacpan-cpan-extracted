@@ -1,6 +1,13 @@
 Revision history for Perl extension File::Rename.
 
-2.01    Robin Barker 2023-01-17
+2.02    2023-12-30 Author:Robin Barker
+    added example of using options in code
+
+    add C<use 5.032;> to source files
+
+    replace C<use 5.032;> on older perl versions
+
+2.01    2023-01-17 Author:Robin Barker
     min perl version 5.8.0
 
     use warnings
@@ -9,7 +16,7 @@ Revision history for Perl extension File::Rename.
 
     source/rename source of rename script   
 
-2.00_4  Robin Barker 2023-01-16
+2.00_4  2023-01-16 Author:Robin Barker
     Min perl version 5.8.0
 
     Move rename source file to source/ - to avoid
@@ -19,37 +26,37 @@ Revision history for Perl extension File::Rename.
 
     Initialize C<our $print> for v5.10
 
-2.00_3  Robin Barker 2023-01-15
+2.00_3  2023-01-15 Author:Robin Barker
     Restore indirect print in t/testlib.pl
 
     Change regex for $INC values
 
     2.00_2 deleted
 
-2.00_1  Robin Barker 2023-01-14
+2.00_1  2023-01-14 Author:Robin Barker
     min perl version 5.6.1 
 
     use warnings
 
     use Getopt::Long 2.24
 
-2.00    Robin Barker 2022-12-31
+2.00    2022-12-31 Author:Robin Barker
     rename script requires options before code/files
 
     New script unsafe-rename with no_require_order
 
     Removed Build.PL from distribution
     
-1.99_9  Robin Barker 2022-12-28
+1.99_9  2022-12-28 Author:Robin Barker
     Remove Build.PL from distribution
 
     Set MIN_PERL_VERSION in Makefile.PL
 
-1.992   Robin Barker 2022-12-27
+1.992   2022-12-27 Author:Robin Barker
     Reinstate shebang line
     https://rt.cpan.org/Ticket/Display.html?id=145711
 
-1.991   Robin Barker 2022-12-27
+1.991   2022-12-27 Author:Robin Barker
     Add required ExtUtils::MakeMaker version to 
         BUILD_REQUIRES and CONFIGURE_REQUIRES
 
@@ -57,180 +64,181 @@ Revision history for Perl extension File::Rename.
 
     Fix typos in 1.99 POD and Changes file 
 
-1.99    Robin Barker 2022-12-24
+1.99    2022-12-24 Author:Robin Barker
     rename script requires options before code/files
 
     New script unsafe-rename with no_require_order:
         to recover the old behavior of the rename script
 
-1.90_5  Robin Barker 2022-12-24
+1.90_5  2022-12-24 Author:Robin Barker
     Add back Build.PL for 1.99 - to be removed for 2.00
     README and POD for 1.99
 
-1.90_4  Robin Barker 2022-12-23
+1.90_4  2022-12-23 Author:Robin Barker
     Remove Build.PL - so testers build and test unsafe-rename
     More globbing in rename-examples.t
     Test for warnings in rename-examples.t
 
-1.90_3  Robin Barker 2022-12-22
+1.90_3  2022-12-22 Author:Robin Barker
     Increase required version of ExtUtils::MakeMaker
     Add test for unsafe script
 
-1.90_2  Robin Barker 2022-12-20
+1.90_2  2022-12-20 Author:Robin Barker
     Add :config to use File:Rename, to mimic GetOpt::Long
     Fix cygwin tests - cygwin is not Windows
         See http://www.cpantesters.org/cpan/report/41cc76dd-84fd-1014-94ee-444106f7812f
 
-1.90_1  Robin Barker 2022-12-19
+1.90_1  2022-12-19 Author:Robin Barker
     require_order in script
     New script unsafe-rename with no_require_order
     Rewrite examples to mark start of non-options
 
-1.31    Robin Barker 2022-05-07
+1.31    2022-05-07 Author:Robin Barker
     Add explicit LICENCE field
     Fix tests for perl 5.8.* and cygwin
 
-1.30_03 Robin Barker 2022-04-23
+1.30_03 2022-04-23 Author:Robin Barker
     Add explicit 'cygwin' in test lib and script
 
-1.30_02 Neil Bowers 2021-09-05
+1.30_02 2021-09-05 Author:Neil Bowers
     Add LICENCE=>perl to Makefile.PL
 
-1.30_01 Robin Barker 2021-08-16
+1.30_01 2021-08-16 Author:Robin Barker
     Fix tests for perl < 5.8.9 (on cygwin)
 
-1.30    Robin Barker 2021-08-16
+1.30    2021-08-16 Author:Robin Barker
     Unicode support: --unicode and File::Rename::Unicode
 
-1.29_06 Robin Barker 2021-08-04 - not released
+1.29_06 2021-08-04 Status:not released
     Documented approach to unicode strings in README
 
-1.29_05 Robin Narker 2021-08-03
+1.29_05 2021-08-03 Author:Robin Barker 
     Add encoding to --unicode
     Reworked C<create()> in testlib.pl:
         removed unnessary C<die>
         simplified File-Rename-unicode.t
 
-1.29_04 Robin Narker 2021-08-02
+1.29_04 2021-08-02 Author:Robin Barker 
     Tests which should skip_all: BEGIN { plan skip_all => 
 
-1.29_03 Robin Narker 2021-08-01
+1.29_03 2021-08-01 Author:Robin Barker
     Fix tests which should skip
 
-1.29_02 Robin Narker 2021-08-01
+1.29_02 2021-08-01 Author:Robin Barker
     Add File::Rename::Unicode to hide C<use feature>
 
-1.29_01 Robin Narker 2021-07-31
+1.29_01 2021-07-31 Author:Robin Barker
     Add -u to do utf8::upgrade and unicode_strings
 
-1.20	Robin Barker 2021-03-22
-	On darwin, when built with ExtUtils::MakeMaker, 
-	builds the correct script and passes tests; see
-	http://matrix.cpantesters.org/?dist=File-Rename%201.19_04;os=darwin;reports=1
+1.20    2021-03-22 Author:Robin Barker
+    On darwin, when built with ExtUtils::MakeMaker, 
+    builds the correct script and passes tests; see
+    http://matrix.cpantesters.org/?dist=File-Rename%201.19_04;os=darwin;reports=1
 
-	1.19_04 Robin Barker 2021-03-20
-	Fix distribution file format
+1.19_04 2021-03-20 Author:Robin Barker
+    Fix distribution file format
 
-	1.19_03 Robin Barker 2021-03-19
-	Fix META.* for Makefile.PL
+1.19_03 2021-03-19 Author:Robin Barker
+    Fix META.* for Makefile.PL
 
-	1.19_02 Robin Barker 2021-03-18
-	More robust OSType handling
+1.19_02 2021-03-18 Author:Robin Barker
+    More robust OSType handling
 
-	1.19_01	Robin Barker 2021-03-17
-	Fix Makefile and tests to find script on darwin
+1.19_01 2021-03-17 Author:Robin Barker
+    Fix Makefile and tests to find script on darwin
 
-1.13	Robin Barker 2020-06-17
-        Fix 'examples' test script to do file globbing
+1.13    2020-06-17 Author:Robin Barker
+    Fix 'examples' test script to do file globbing
 
-1.12	Robin Barker 2020-06-17
-	Added new test script to MANIFEST
+1.12    2020-06-17 Author:Robin Barker
+    Added new test script to MANIFEST
 
-1.11	Robin Barker 2020-06-16
-	Added more examples in the script POD, suggested by 'xavier'
-	Added a test script to test that examples in POD are valid
+1.11    2020-06-16 Author:Robin Barker
+    Added more examples in the script POD, suggested by 'xavier'
+    Added a test script to test that examples in POD are valid
 
-1.10	Robin Barker 2018-09-25
-	Added option --filename [-d] to rename filename component only
-	Added option --fullpath [--path] to rename any part of path 
+1.10    2018-09-25 Author:Robin Barker
+    Added option --filename [-d] to rename filename component only
+    Added option --fullpath [--path] to rename any part of path 
 
-1.09_04 Robin Barker 2018-09-19
-	Added CONTRIBUTING
-	Fixed file 'log' which was supposed to be deleted
+1.09_04 2018-09-19 Author:Robin Barker
+    Added CONTRIBUTING
+    Fixed file 'log' which was supposed to be deleted
 
-1.09_03	Robin Barker 2018-09-17
-	Change options to closer align to original feature request
+1.09_03 2018-09-17 Author:Robin Barker
+    Change options to closer align to original feature request
 
-1.09_02	Robin Barker 2018-09-16
-	Fix test failure for perl 5.14
+1.09_02 2018-09-16 Author:Robin Barker
+    Fix test failure for perl 5.14
 
-1.09_01	Robin Barker 2018-09-16
-	Option for renaming file component only: filename-only/-d
+1.09_01 2018-09-16 Author:Robin Barker
+    Option for renaming file component only: filename-only/-d
 
-1.00	Robin Barker 2018-07-03
-	File::Rename::Options module 
+1.00    2018-07-03 Author:Robin Barker
+    File::Rename::Options module 
 
-0.99_02	Robin Barker 2018-06-26
-	Remove spurious C<opendir> in t/File-Rename-script.t
+0.99_02 2018-06-26 Author:Robin Barker
+    Remove spurious C<opendir> in t/File-Rename-script.t
 
-0.99_01	Robin Barker 2018-06-12
-	File::Rename::Options in separate file
+0.99_01 2018-06-12 Author:Robin Barker
+    File::Rename::Options in separate file
 
-0.35	Robin Barker 2018-06-14
-	Add $File::Rename::Options::VERSION
+0.35    2018-06-14 Author:Robin Barker
+    Add $File::Rename::Options::VERSION
 
-0.33	Robin Barker 2018-06-13
-	Added return code for File::Rename::rename
-	More tests: in preparation for v1.00
-	Add $File::Rename::Options::VERSION
+0.33    2018-06-13 Author:Robin Barker
+    Added return code for File::Rename::rename
+    More tests: in preparation for v1.00
+    Add $File::Rename::Options::VERSION
 
-0.32	Robin Barker 2018-06-08 - as 0.32-fix
-	Fixed syntax of rmtree() for perl5.16
+0.32-fix 2018-06-08 Author:Robin Barker
+    Fixed syntax of rmtree() for perl5.16
 
-0.31	Robin Barker 2018-06-05
-	Removed use of s///r in tests
-	Rewrote tests - more robust - use of testlib.pl
+0.31    2018-06-05 Author:Robin Barker
+    Removed use of s///r in tests
+    Rewrote tests - more robust - use of testlib.pl
 
-0.30	Robin Barker 2018-06-02
-	(tidied configure_requires)
-	removed typo from rename POD
-	options do not need to before code / files
-	allow null separated file names reading from STDIN
+0.30    2018-06-02 Author:Robin Barker
+    (tidied configure_requires)
+    removed typo from rename POD
+    options do not need to before code / files
+    allow null separated file names reading from STDIN
 
-0.20	Robin Barker 2013-04-30
-	Added option -E (statement): alternative to -e
+0.20    2013-04-30 Author:Robin Barker
+    Added option -E (statement): alternative to -e
 
-0.10	Robin Barker 2013-04-29
-	Merged "0.09 (beta for 0.10)" from 2006-06-26
-	Added option -V (version). 
+0.10    2013-04-29 Author:Robin Barker
+    Merged "0.09 (beta for 0.10)" from 2006-06-26
+    Added option -V (version). 
 
-0.09	(beta for 0.10) Robin Barker 2006-06-26 - not released
-	Added options -e, -f, -n and -V (version). 
+0.09 2006-06-26 Status:not released (beta for 0.10) 
+    Added options -e, -f, -n and -V (version). 
 
-	Options -e, -f, -n suggested by code
-	written by Aristotle Pagaltzis.
+    Options -e, -f, -n suggested by code
+    written by Aristotle Pagaltzis.
 
-0.06	Robin Barker 2011-09-23
-	Added example/rename.pl, dealt with other Kwalitee metrics.
-	Updated META files
+0.06    2011-09-23 Author:Robin Barker
+    Added example/rename.pl, dealt with other Kwalitee metrics.
+    Updated META files
 
-0.05	Robin Barker 2007-10-03
-	Removed perl 5.6.0 dependencies and successfully
-	tested on perl 5.005_05 (with patched Temp::File).
+0.05    2007-10-03 Author:Robin Barker
+    Removed perl 5.6.0 dependencies and successfully
+    tested on perl 5.005_05 (with patched Temp::File).
 
-0.04	Robin Barker 2007-09-27
-	Replaced depencies on perl versions by explicit
-	requirements on modules in Build.PL/Makefile.PL
+0.04    2007-09-27 Author:Robin Barker
+    Replaced depencies on perl versions by explicit
+    requirements on modules in Build.PL/Makefile.PL
 
-0.03	Robin Barker 2007-09-26
-	Added --force and --nono options (over_write, no_action)
+0.03    2007-09-26 Author:Robin Barker
+    Added --force and --nono options (over_write, no_action)
 
-0.02	Robin Barker 2006-01-13
-	Added t/pod*.t, and extended POD to pass tests
+0.02    2006-01-13 Author:Robin Barker
+    Added t/pod*.t, and extended POD to pass tests
 
-0.01  Mon Dec 13 17:54:05 2004
-	- original version; created by h2xs 1.23 with options
-		-XAn File::Rename
+0.01    2004-12-13T17:54:05Z  
+    Mon Dec 13 17:54:05 2004
+    - original version; created by h2xs 1.23 with options
+        -XAn File::Rename
 
 # $Revision$$Date$
 # Robin's RCS header:

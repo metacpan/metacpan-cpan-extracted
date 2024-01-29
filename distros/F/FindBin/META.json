@@ -1,5 +1,5 @@
 {
-   "abstract" : "Locate directory of original perl script",
+   "abstract" : "Locate directory of original Perl script",
    "author" : [
       "unknown"
    ],
@@ -55,6 +55,6 @@
          "web" : "https://github.com/perl/perl5"
       }
    },
-   "version" : "1.53",
+   "version" : "1.54",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

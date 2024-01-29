@@ -1,0 +1,33 @@
+Revision history for RT-Extension-SwitchUsers
+
+0.07 2023-12-15
+  - Skip ACL on Creator/LastUpdatedBy check in SwitchUsers. Allows additional
+    transaction recording to succeed without error when SwitchUsers is utilized.
+  - Fix id schema of SwitchUsers for mysql
+  - Add Pg schema for SwitchUsers
+  - Add SQLite schema for SwitchUsers
+
+All versions below were internal releases and thus not published to CPAN.
+
+0.06 2021-04-05
+ - Return Class::ReturnValue object in scalar mode just like original _Set
+
+0.05 2020-08-20
+ - Write a log message when switching to/from another user
+ - Create a new table to record the actual user making changes when
+   operating as a switched user
+
+0.04 2019-02-08
+ - Move Switch Users menu item to preferences menu
+
+0.03 2018-04-20
+ - Show the switch menu using rights for the base user, not the switched user.
+   This means the menu will be there for switching back, even if the switched
+   user doesn't normally see it.
+ - Work around REMOTE_USER and $WebRemoteUserContinuous when switched
+
+0.02 2018-04-09
+ - Fix bug trying to call loc before user object is available.
+
+0.01 2018-03-19
+ - Initial version

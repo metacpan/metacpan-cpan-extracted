@@ -27,17 +27,17 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.980"
+            "SPVM" : "0.989065"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.980",
+            "SPVM" : "0.989065",
             "SPVM::Errno" : "0.07",
-            "SPVM::File::Path" : "0.01",
-            "SPVM::File::Spec" : "0.03",
-            "SPVM::IO" : "0.16",
-            "SPVM::Sys" : "0.481001"
+            "SPVM::File::Path" : "0.011001",
+            "SPVM::File::Spec" : "0.081003",
+            "SPVM::IO" : "0.211002",
+            "SPVM::Sys" : "0.513"
          }
       },
       "test" : {
@@ -50,6 +50,6 @@
          "type" : "git"
       }
    },
-   "version" : "0.021",
+   "version" : "0.022",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

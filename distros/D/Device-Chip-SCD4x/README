@@ -1,0 +1,90 @@
+NAME
+
+    Device::Chip::SCD4x - chip driver for SCD40 and SCD41
+
+SYNOPSIS
+
+       use Device::Chip::SCD4x;
+       use Future::AsyncAwait;
+    
+       my $chip = Device::Chip::SCD4x->new;
+       await $chip->mount( Device::Chip::Adapter::...->new );
+    
+       await $chip->start_periodic_measurement;
+    
+       while(1) {
+          await Future::IO->sleep(1);
+    
+          my ( $co2, $temp, $humid ) = await $chip->maybe_read_measurement
+             or next;
+    
+          printf "CO2 concentration=%dppm  ", $co2;
+          printf "Temperature=%.2fC  ", $temp;
+          printf "Humidity=%.2f%%\n", $hum;
+       }
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communication to a
+    Sensirion SCD40 or SCD41 attached to a computer via an I²C adapter.
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+MOUNT PARAMETERS
+
+ addr
+
+    The I²C address of the device. Can be specified in decimal, octal or
+    hex with leading 0 or 0x prefixes.
+
+METHODS
+
+    The following methods documented in an await expression return Future
+    instances.
+
+ read_config
+
+       $config = await $chip->read_config;
+
+    Returns a HASH reference containing the compensation values from chip
+    config.
+
+       temperature_offset # in degrees C
+       sensor_altitude    # in metres
+       ambient_pressure   # in hPa
+
+ start_periodic_measurement
+
+       await $chip->start_periodic_measurement;
+
+    Starts periodic measurement mode.
+
+ read_measurement
+
+       ( $co2concentration, $temperature, $humidity ) = await $chip->read_measurement();
+
+    Returns the latest sensor reading values. Returns a 3-element list,
+    containing the COâ‚‚ concentration in PPM, temperature in degrees C, and
+    humidity in %RH.
+
+ maybe_read_measurement
+
+       ( $co2concentration, $temperature, $humidity ) = await $chip->maybe_read_measurement();
+
+    If the sensor has a new measurement ready, returns it. Otherwise,
+    returns the last successful measurement reading. After initial startup,
+    this will return an empty list before the first reading is available.
+
+ get_serial_number
+
+       $bytes = await $chip->get_serial_number;
+
+    Returns a 6-byte encoding of the chip's internal serial number.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

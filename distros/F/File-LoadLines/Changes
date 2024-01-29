@@ -1,5 +1,26 @@
 Revision history for File-LoadLines
 
+1.045	2024-01-26
+
+	Add support for file:// URLs.
+	Update dependencies.
+
+1.044	2023-01-04
+
+	Add support for data URLs.
+
+1.043	2023-12-14
+
+	Fix typo.
+
+1.042	2023-12-13
+
+	More encoding testing.
+
+1.041	2023-12-10
+
+	Fix nochomp (MS Windows only).
+
 1.040	2023-11-20
 
 	Add loadblob(), exported on demand.

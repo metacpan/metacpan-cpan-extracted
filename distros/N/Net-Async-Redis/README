@@ -170,6 +170,18 @@ CONSTANTS
     When enabled, this will create a span for every Redis request. See
     OpenTracing::Any for details.
 
+ OPENTELEMETRY_ENABLED
+
+    Defaults to false, this can be controlled by the USE_OPENTELEMETRY
+    environment variable. This provides a way to set the default
+    opentelemetry mode for all Net::Async::Redis instances - you can
+    enable/disable for a specific instance via "configure":
+
+     $redis->configure(opentelemetry => 1);
+
+    When enabled, this will create a span for every Redis request. See
+    OpenTelemetry or https://opentelemetry.io for details.
+
 METHODS
 
     NOTE: For a full list of the Redis methods supported by this module,
@@ -198,6 +210,8 @@ METHODS
       * client_name
 
       * opentracing
+
+      * opentelemetry
 
       * protocol - either 'resp2' or 'resp3', default is autodetect
 
@@ -461,6 +475,10 @@ METHODS - Generic
 
     Indicates whether OpenTracing::Any support is enabled.
 
+ opentelemetry
+
+    Indicates whether OpenTelemetry support is enabled.
+
 METHODS - Deprecated
 
     This are still supported, but no longer recommended.
@@ -498,6 +516,11 @@ METHODS - Internal
  command_label
 
     Generate a label for the given command list.
+
+ span_for_future
+
+    See https://opentelemetry.io/docs/specs/semconv/database/redis/ for
+    current semantic conventions around Redis.
 
  execute_command
 
@@ -610,6 +633,6 @@ CONTRIBUTORS
 
 LICENSE
 
-    Copyright Tom Molesworth and others 2015-2023. Licensed under the same
+    Copyright Tom Molesworth and others 2015-2024. Licensed under the same
     terms as Perl itself.
 

@@ -190,8 +190,25 @@ share {
       $enable_tiff = 'ON';
       Alien::Build->log ('Enabling TIFF support');
       #  might need this but it depends on a few things
+      my $libtiff_include;
+      my $libtiff_rpath = ();
       if (Alien::libtiff->install_type ('share')) {
-        my $libtiff_include = path ('Alien::libtiff'->dist_dir . '/include')->stringify;
+        $libtiff_include = path ('Alien::libtiff'->dist_dir . '/include')->stringify;
+        $libtiff_rpath = Alien::libtiff->dist_dir . '/lib';
+      }
+      else {
+        if ($on_windows) {
+          my $p = path ($^X)->parent->parent->parent . '/c/include';
+          if (path($p)->exists) {
+            $libtiff_include = $p;
+          }
+        }
+        else {
+          my $libfile = find_lib (lib => 'tiff');
+          push @tiff_extra_args, "-DTIFF_LIBRARY=$libfile";
+        }
+      }
+      if ($libtiff_include) {
         my $libfile = find_lib_file (
           lib   => 'tiff',
           alien => 'Alien::libtiff',
@@ -200,7 +217,11 @@ share {
           "-DTIFF_LIBRARY=$libfile",
           "-DTIFF_INCLUDE_DIR=$libtiff_include",
         );
-        push @alien_rpaths, Alien::libtiff->dist_dir . '/lib';
+        push @alien_rpaths, $libtiff_rpath;
+      }
+      if (!@tiff_extra_args) {
+        Alien::Build->log ('Disabling TIFF support');
+        $enable_tiff = 'OFF';
       }
     }
     if (!$have{'Alien::curl'} or $config_args =~ /--(without-curl|with-curl=no)/ ) {

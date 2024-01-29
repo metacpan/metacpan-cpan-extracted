@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mojo::Util::Collection Documentation</title>
+
+    <!-- Include Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Include Prism.js -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/PrismJS/prism@1.29.0/themes/prism.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/PrismJS/prism@1.29.0/plugins/toolbar/prism-toolbar.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/PrismJS/prism@1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/PrismJS/prism@1.29.0/themes/prism-okaidia.min.css" />
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/gh/PrismJS/prism@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/gh/PrismJS/prism@1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/gh/PrismJS/prism@1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/gh/PrismJS/prism@1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/gh/PrismJS/prism@1.29.0/plugins/normalize-whitespace/prism-normalize-whitespace.min.js"></script>
+
+    <style type="text/css">
+        .token.operator {
+            background: none;
+        }
+    </style>
+</head>
+<body class="line-numbers">
+<main class="d-flex flex-nowrap">
+    <div class="d-flex flex-column flex-shrink-0 p-3" style="width: 280px;">
+        <a href="/docs/collection.html" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
+            <span class="fs-4">Mojo::Util::Collection</span>
+        </a>
+        <hr />
+        <ul class="sticky-top nav nav-pills flex-column mb-auto">
+            <li>
+                <a href="#" class="nav-link link-dark" data-bs-toggle="collapse" data-bs-target="#methods-collapse">
+                    Methods
+                </a>
+                <div class="collapse" id="methods-collapse">
+                    <ul class="btn-toggle-nav list-unstyled fw-normal ps-4 pb-1 small">
+                        <li><a href="#method-collect">collect</a></li>
+                        <li><a href="#method-add">add</a></li>
+                        <li><a href="#method-avg">avg</a></li>
+                        <li><a href="#method-asOptions">asOptions</a></li>
+                        <li><a href="#method-count">count</a></li>
+                        <li><a href="#method-each">each</a></li>
+                        <li><a href="#method-exclude">exclude</a></li>
+                        <li><a href="#method-filter">filter</a></li>
+                        <li><a href="#method-find">find</a></li>
+                        <li><a href="#method-findOrNew">findOrNew</a></li>
+                        <li><a href="#method-first">first</a></li>
+                        <li><a href="#method-firstOrNew">firstOrNew</a></li>
+                        <li><a href="#method-get">get</a></li>
+                        <li><a href="#method-indexOf">indexOf</a></li>
+                        <li><a href="#method-last">last</a></li>
+                        <li><a href="#method-lists">lists</a></li>
+                        <li><a href="#method-max">max</a></li>
+                        <li><a href="#method-min">min</a></li>
+                        <li><a href="#method-next">next</a></li>
+                        <li><a href="#method-only">only</a></li>
+                        <li><a href="#method-orderBy">orderBy</a></li>
+                        <li><a href="#method-page">page</a></li>
+                        <li><a href="#method-remove">remove</a></li>
+                        <li><a href="#method-search">search</a></li>
+                        <li><a href="#method-slice">slice</a></li>
+                        <li><a href="#method-sum">sum</a></li>
+                        <li><a href="#method-toArray">toArray</a></li>
+                        <li><a href="#method-toCsv">toCsv</a></li>
+                        <li><a href="#method-toJson">toJson</a></li>
+                        <li><a href="#method-touch">touch</a></li>
+                        <li><a href="#method-unique">unique</a></li>
+                        <li><a href="#method-where">where</a></li>
+                        <li><a href="#method-whereIn">whereIn</a></li>
+                        <li><a href="#method-whereNotIn">whereNotIn</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li class="border-top my-3"></li>
+            <li>
+                <a href="#package-model-user" class="nav-link link-dark">
+                    MyApp::Model::User
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="d-flex flex-column border-start ps-3">
+        <h2 id="method-construct">
+            <a href="#method-construct" class="text-decoration-none">#</a>Construct
+        </h2>
+        <div class="ms-4">
+            <p><strong>Construct a new collection</strong></p>
+            <pre>
+                <code class="language-perl">
+                    my $collection = Mojo::Util::Collection->new(
+                        items => [
+                            { id => 1, first_name => 'John', last_name => 'Doe', age => 20 },
+                            { id => 2, first_name => 'Jane', last_name => 'Doe', age => 30 },
+                            { id => 3, first_name => 'Jack', last_name => 'Doe', age => 35 },
+                            { id => 4, first_name => 'Jill', last_name => 'Doe', age => 40 },
+                            { id => 5, first_name => 'James', last_name => 'Doe', age => 45 },
+                        ],
+                        model => MyApp::Model::User->new,
+                    );
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-collect">
+            <a href="#method-collect" class="text-decoration-none">#</a>collect
+        </h2>
+        <div class="ms-4">
+            <p><strong>Instantiate a new collection</strong></p>
+
+            <pre>
+                <code class="language-perl">
+                    my $collection = collect({
+                        id => 1,
+                        first_name => 'John',
+                        last_name => 'Doe',
+                        age => 20,
+                    }, {
+                        id => 2,
+                        first_name => 'Jane',
+                        last_name => 'Doe',
+                        age => 30,
+                    })->as(sub { MyApp::Model::User->new(@_) });
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-add">
+            <a href="#method-add" class="text-decoration-none">#</a>add
+        </h2>
+        <div class="ms-4">
+            <p><strong>Add an item using a hash</strong></p>
+
+            <pre>
+                <code class="language-perl">
+                    $collection->add({
+                        id => 6,
+                        first_name => 'Kate',
+                        last_name => 'Doe',
+                        age => 30,
+                    });
+                </code>
+            </pre>
+
+            <p><strong>Add an item using a model</strong></p>
+
+            <pre>
+                <code class="language-perl">
+                    my $user = MyApp::Model::User->new({
+                        id => 6,
+                        first_name => 'Kate',
+                        last_name => 'Doe',
+                        age => 30,
+                    });
+
+                    $collection->add($user);
+                </code>
+            </pre>
+
+            <p><strong>Add an array of items</strong></p>
+
+            <pre>
+                <code class="language-perl">
+                    $collection->add([
+                        {
+                            id => 6,
+                            first_name => 'Kate',
+                            last_name => 'Doe',
+                            age => 30,
+                        },
+                        {
+                            id => 7,
+                            first_name => 'Kathy',
+                            last_name => 'Doe',
+                            age => 35,
+                        },
+                    ]);
+                </code>
+            </pre>
+
+            <p><strong>Add an array of models</strong></p>
+
+            <pre>
+                <code class="language-perl">
+                    my $user1 = MyApp::Model::User->new({
+                        id => 6,
+                        first_name => 'Kate',
+                        last_name => 'Doe',
+                        age => 30,
+                    });
+
+                    my $user2 = MyApp::Model::User->new({
+                        id => 7,
+                        first_name => 'Kathy',
+                        last_name => 'Doe',
+                        age => 35,
+                    });
+
+                    $collection->add([$user1, $user2]);
+                </code>
+            </pre>
+
+            <p><strong>Add another collection</strong></p>
+
+            <pre>
+                <code class="language-perl">
+                    my $collection2 = Mojo::Util::Collection->new(
+                        items => [
+                            {
+                                id => 6,
+                                first_name => 'Kate',
+                                last_name => 'Doe',
+                                age => 30,
+                            },
+                            {
+                                id => 7,
+                                first_name => 'Kathy',
+                                last_name => 'Doe',
+                                age => 35,
+                            },
+                        ],
+                        model => MyApp::Model::User->new,
+                    );
+
+                    $collection->add($collection2);
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-avg">
+            <a href="#method-avg" class="text-decoration-none">#</a>avg
+        </h2>
+        <div class="ms-4">
+            <p><strong>Return the average of the given $field</strong></p>
+
+            <pre>
+                <code class="language-perl">
+                    my $avg = $collection->avg('age'); # 34
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-asOptions">
+            <a href="#method-asOptions" class="text-decoration-none">#</a>asOptions
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Return an array ref with the following format [{ value => $value, key => $label }]</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $options = $collection->asOptions('id', 'full_name');
+                </code>
+            </pre>
+
+            <pre>
+                <code class="language-perl">
+                    [
+                        { value => 1, key => 'John Doe' },
+                        { value => 2, key => 'Jane Doe' },
+                        { value => 3, key => 'Jack Doe' },
+                        { value => 4, key => 'Jill Doe' },
+                        { value => 5, key => 'James Doe' },
+                    ]
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-count">
+            <a href="#method-count" class="text-decoration-none">#</a>count
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Return the size of the collection</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $count = $collection->count; # 5
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-each">
+            <a href="#method-each" class="text-decoration-none">#</a>each
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Map through each item and call the callback</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    $collection->each(sub {
+                        my $item = shift;
+
+                        # Upper case the first name
+                        $item->first_name(uc $item->first_name);
+                    });
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-exclude">
+            <a href="#method-exclude" class="text-decoration-none">#</a>exclude
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Exclude objects that doesn't match criteria</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $filtered = $collection->exclude(sub {
+                        my $item = shift;
+
+                        # Exclude users that are 30 years old
+                        return $item->age == 30;
+                    });
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-filter">
+            <a href="#method-filter" class="text-decoration-none">#</a>filter
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Filter objects by callback</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $filtered = $collection->filter(sub {
+                        my $item = shift;
+
+                        # Filter users that are 30 years old
+                        return $item->age == 30;
+                    });
+                </code>
+            </pre>
+
+            <pre>
+                <code class="language-perl">
+                    bless({
+                        'model' => bless({ }, 'MyApp::Model::User'),
+                        'objects' => [
+                            bless({
+                                'id' => 2,
+                                'first_name' => 'Jane',
+                                'last_name' => 'Doe',
+                                'age' => 30
+                            }, 'MyApp::Model::User')
+                        ]
+                    }, 'Mojo::Util::Collection');
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-find">
+            <a href="#method-find" class="text-decoration-none">#</a>find
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Find object by primary key, of if args is a hash ref then find first object matching given args</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $user = $collection->find(1);
+                </code>
+            </pre>
+
+            <pre>
+                <code class="language-perl">
+                    bless({ 'id' => 1, 'first_name' => 'John', 'last_name' => 'Doe', 'age' => 20 }, 'MyApp::Model::User');
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-findOrNew">
+            <a href="#method-findOrNew" class="text-decoration-none">#</a>findOrNew
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Find object by primary key, or if args is a hash ref then find first object matching given args, or create a new object</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $user = $collection->findOrNew({ first_name => 'John', age => 20 });
+                </code>
+            </pre>
+
+            <pre>
+                <code class="language-perl">
+                    bless({ 'id' => 1, 'first_name' => 'John', 'last_name' => 'Doe', 'age' => 20 }, 'MyApp::Model::User');
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-first">
+            <a href="#method-first" class="text-decoration-none">#</a>first
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Get first object in collection</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $user = $collection->first;
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-firstOrNew">
+            <a href="#method-firstOrNew" class="text-decoration-none">#</a>firstOrNew
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Get first object in collection, or create a new object if collection is empty</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $user = $collection->firstOrNew({ first_name => 'Jack', age => 35 }, { id => 3 });
+                </code>
+            </pre>
+
+            <pre>
+                <code class="language-perl">
+                    bless({ 'id' => 3, 'first_name' => 'Jack', 'last_name' => 'Doe', 'age' => 35 }, 'MyApp::Model::User');
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-get">
+            <a href="#method-get" class="text-decoration-none">#</a>get
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Get object by index</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $item = $collection->get(0);
+                </code>
+            </pre>
+
+            <pre>
+                <code class="language-perl">
+                    bless({ 'id' => 1, 'first_name' => 'John', 'last_name' => 'Doe', 'age' => 20 }, 'MyApp::Model::User');
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-indexOf">
+            <a href="#method-indexOf" class="text-decoration-none">#</a>indexOf
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Get the index of the first object that matches the given criteria</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $fields = {
+                        id => 3,
+                        first_name => 'Jack',
+                        last_name => 'Doe',
+                        age => 35
+                    };
+
+                    my $index = $collection->indexOf($fields); # 2
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-last">
+            <a href="#method-last" class="text-decoration-none">#</a>last
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Get last object in collection</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $user = $collection->last;
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-lists">
+            <a href="#method-lists" class="text-decoration-none">#</a>lists
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Return an array ref containing all the fields from all objects for the given $field.</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $options = $collection->lists('full_name');
+                </code>
+            </pre>
+
+            <pre>
+                <code class="language-perl">
+                    [ 'John Doe', 'Jane Doe', 'Jack Doe', 'Jill Doe', 'James Doe' ]
+                </code>
+            </pre>
+
+            <p>
+                <strong>Return a hash ref containing $key_field => $value_field if both are given.</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $options = $collection->lists('id', 'full_name');
+                </code>
+            </pre>
+
+            <pre>
+                <code class="language-perl">
+                    {
+                        '1' => 'John Doe',
+                        '2' => 'Jane Doe',
+                        '3' => 'Jack Doe',
+                        '4' => 'Jill Doe',
+                        '5' => 'James Doe'
+                    }
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-max">
+            <a href="#method-max" class="text-decoration-none">#</a>max
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Return the max value for the given $field</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $max = $collection->max('age'); # 45
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-min">
+            <a href="#method-min" class="text-decoration-none">#</a>min
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Return the min value for the given $field</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $min = $collection->min('age'); # 20
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-next">
+            <a href="#method-next" class="text-decoration-none">#</a>next
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Get the next object in the collection</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    while (my $user = $collection->next) {
+                        print $user->full_name . "\n";
+                    }
+                </code>
+            </pre>
+
+            <pre>
+                <code class="language-perl">
+                    John Doe
+                    Jane Doe
+                    Jack Doe
+                    Jill Doe
+                    James Doe
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-only">
+            <a href="#method-only" class="text-decoration-none">#</a>only
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Return an array ref containing only given @fields</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $options = $collection->only('full_name', 'age');
+                </code>
+            </pre>
+
+            <pre>
+                <code class="language-perl">
+                    [
+                        { full_name => 'John Doe', age => 20 },
+                        { full_name => 'Jane Doe', age => 30 },
+                        { full_name => 'Jack Doe', age => 35 },
+                        { full_name => 'Jill Doe', age => 40 },
+                        { full_name => 'James Doe', age => 45 },
+                    ]
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-orderBy">
+            <a href="#method-orderBy" class="text-decoration-none">#</a>orderBy
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Sort the collection by given $field and $direction</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $sorted = $collection->orderBy('full_name', 'desc');
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-page">
+            <a href="#method-page" class="text-decoration-none">#</a>page
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Return a new collection with the given page number and page size</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    $collection->limit(2);
+
+                    my $page = $collection->page(2);
+                </code>
+            </pre>
+
+            <pre>
+                <code class="language-perl">
+                    bless({
+                        'model' => bless({ }, 'MyApp::Model::User'),
+                        'objects' => [
+                            bless({
+                                'id' => 3,
+                                'first_name' => 'Jack',
+                                'last_name' => 'Doe',
+                                'age' => 35
+                            }, 'MyApp::Model::User'),
+                            bless({
+                                'id' => 4,
+                                'first_name' => 'Jill',
+                                'last_name' => 'Doe',
+                                'age' => 40
+                            }, 'MyApp::Model::User')
+                        ]
+                    }, 'Mojo::Util::Collection');
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-remove">
+            <a href="#method-remove" class="text-decoration-none">#</a>remove
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Remove an item from the collection by index or by object</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $user = MyApp::Model::User->new({
+                        id => 3,
+                        first_name => 'Jane',
+                        last_name => 'Doe',
+                        age => 30,
+                    });
+
+                    $collection->remove($user);
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-search">
+            <a href="#method-search" class="text-decoration-none">#</a>search
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Search for objects that match the given criteria</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $users = $collection->search({ first_name => 'Jane' });
+                </code>
+            </pre>
+
+            <pre>
+                <code class="language-perl">
+                    bless({
+                        'model' => bless({ }, 'MyApp::Model::User'),
+                        'objects' => [
+                            bless({
+                                'id' => 3,
+                                'first_name' => 'Jane',
+                                'last_name' => 'Doe'
+                            }, 'MyApp::Model::User')
+                        ]
+                    }, 'Mojo::Util::Collection');
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-slice">
+            <a href="#method-slice" class="text-decoration-none">#</a>slice
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Return a new collection with elements starting at $start and ending at $end</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $users = $collection->slice(1, 3);
+                </code>
+            </pre>
+
+            <pre>
+
+            </pre>
+        </div>
+
+        <h2 id="method-sum">
+            <a href="#method-sum" class="text-decoration-none">#</a>sum
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Return the sum of the given $field</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $sum = $collection->sum('age'); # 170
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-toArray">
+            <a href="#method-toArray" class="text-decoration-none">#</a>toArray
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Serialize all the objects</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $array = $collection->toArray;
+                </code>
+            </pre>
+
+            <pre>
+                <code class="language-perl">
+                    [
+                        { id => 1, first_name => 'John', last_name => 'Doe', age => 20 },
+                        { id => 2, first_name => 'Jane', last_name => 'Doe', age => 30 },
+                        { id => 3, first_name => 'Jack', last_name => 'Doe', age => 35 },
+                        { id => 4, first_name => 'Jill', last_name => 'Doe', age => 40 },
+                        { id => 5, first_name => 'James', last_name => 'Doe', age => 45 },
+                    ]
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-toCsv">
+            <a href="#method-toCsv" class="text-decoration-none">#</a>toCsv
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Serialize all the objects to CSV</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $csv = $collection->toCsv('Id,Full Name,Age', qw/id,full_name,age/);
+                </code>
+            </pre>
+
+            <pre>
+                <code class="language-perl">
+                    Id,Full Name,Age
+                    1,John Doe,20
+                    2,Jane Doe,30
+                    3,Jack Doe,35
+                    4,Jill Doe,40
+                    5,James Doe,45
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-toJson">
+            <a href="#method-toJson" class="text-decoration-none">#</a>toJson
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Serialize all the objects to JSON</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $json = $collection->toJson;
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-touch">
+            <a href="#method-touch" class="text-decoration-none">#</a>touch
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Update the age field for all objects in the collection</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    $collection->touch(sub {
+                        my $item = shift;
+
+                        $item->age($item->age + 1);
+                    });
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-unique">
+            <a href="#method-unique" class="text-decoration-none">#</a>unique
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Return an array ref containing only unique values for given $field</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $unique = $collection->unique('first_name');
+                </code>
+            </pre>
+
+            <pre>
+                <code class="language-perl">
+                    ['John', 'Jane', 'Jack', 'Jill', 'James']
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-whereIn">
+            <a href="#method-whereIn" class="text-decoration-none">#</a>whereIn
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Return a new collection with objects that match the given criteria</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $filtered = $collection->whereIn('first_name', ['John', 'Jane']);
+                </code>
+            </pre>
+        </div>
+
+        <h2 id="method-whereNotIn">
+            <a href="#method-whereNotIn" class="text-decoration-none">#</a>whereNotIn
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>Return a new collection with objects that don't match the given criteria</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    my $filtered = $collection->whereNotIn('first_name', ['John', 'Jane']);
+                </code>
+            </pre>
+        </div>
+
+        <hr />
+
+        <h2 id="package-model-user">
+            <a href="#package-model-user" class="text-decoration-none">#</a>MyApp::Model::User
+        </h2>
+        <div class="ms-4">
+            <p>
+                <strong>MyApp::Model::User</strong>
+            </p>
+
+            <pre>
+                <code class="language-perl">
+                    package MyApp::Model::User;
+                    use Mojo::Base 'Mojo::Util::Model';
+
+                    # Attributes
+                    has 'full_name' => sub {
+                        my $self = shift;
+
+                        return $self->first_name . ' ' . $self->last_name;
+                    };
+
+                    1;
+                </code>
+            </pre>
+        </div>
+    </div>
+</main>
+</body>
+</html>

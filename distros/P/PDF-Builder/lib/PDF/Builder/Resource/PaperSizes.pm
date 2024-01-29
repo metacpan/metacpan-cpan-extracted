@@ -3,8 +3,8 @@ package PDF::Builder::Resource::PaperSizes;
 use strict;
 use warnings;
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -44,8 +44,6 @@ limitation and support much larger sizes, but you should check before doing a
 lot of work!
 
 =head3 Metric sizes
-
-=over
 
       4a0 --  4760 x 6716 (1679 mm x 2639 mm)
 
@@ -157,23 +155,16 @@ lot of work!
 
       p6 --  303 x 397 (107 mm x 140 mm)
 
-=back
-
 =head3 Mixed sizes
-
-=over
 
       universal --  595 x 792 (210 mm x 11 in)
 
 This is not a standard or official size, but a PDF::Builder size, which should 
 print OK on either A4 or US Letter paper size. It is narrow (like A4) and short 
-(like letter).
-
-=back
+(like letter). Your content will be in the lower left of the paper, when
+printed, with extra top margin on A4 or extra right margin on Letter.
 
 =head3 US/British (non-metric) sizes
-
-=over
 
       broadsheet --  1296 x 1584 (18 in x 22 in) sometimes 1224 x 1584!
 
@@ -260,8 +251,6 @@ print OK on either A4 or US Letter paper size. It is narrow (like A4) and short
       super-royal --  486 x 738 (6.75 in x 10.25 in)
 
       imperial --  540 x 792 (7.5 in x 11 in)
-
-=back
 
 =cut
 

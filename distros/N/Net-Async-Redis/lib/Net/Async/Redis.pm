@@ -9,7 +9,7 @@ use experimental qw(signatures);
 
 use parent qw(Net::Async::Redis::Commands);
 
-our $VERSION = '5.001';
+our $VERSION = '6.000';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -164,7 +164,6 @@ Note that this module uses L<Future::AsyncAwait> internally.
 =cut
 
 use mro;
-use Class::Method::Modifiers;
 use Syntax::Keyword::Try;
 use Syntax::Keyword::Dynamically;
 use Syntax::Keyword::Match;
@@ -183,7 +182,6 @@ use File::ShareDir ();
 
 use Log::Any qw($log);
 use Metrics::Any qw($metrics), strict => 0;
-use OpenTracing::Any qw($tracer);
 
 use List::Util qw(pairmap);
 use Scalar::Util qw(reftype blessed refaddr);
@@ -208,7 +206,45 @@ L<OpenTracing::Any> for details.
 
 =cut
 
-use constant OPENTRACING_ENABLED => $ENV{USE_OPENTRACING} // 0;
+use constant OPENTRACING_ENABLED   => $ENV{USE_OPENTRACING} // 0;
+
+=head2 OPENTELEMETRY_ENABLED
+
+Defaults to false, this can be controlled by the C<USE_OPENTELEMETRY>
+environment variable. This provides a way to set the default C<opentelemetry>
+mode for all L<Net::Async::Redis> instances - you can enable/disable
+for a specific instance via L</configure>:
+
+ $redis->configure(opentelemetry => 1);
+
+When enabled, this will create a span for every Redis request. See
+L<OpenTelemetry> or L<https://opentelemetry.io> for details.
+
+=cut
+
+use constant OPENTELEMETRY_ENABLED => $ENV{USE_OPENTELEMETRY} // 0;
+
+our $provider;
+our $tracer;
+BEGIN {
+    if(OPENTRACING_ENABLED) {
+        require OpenTracing::Any;
+        OpenTracing::Any->import(qw($tracer));
+    }
+
+    if(OPENTELEMETRY_ENABLED) {
+        require OpenTelemetry;
+        require OpenTelemetry::Context;
+        require OpenTelemetry::Trace;
+        require OpenTelemetry::Constants;
+        OpenTelemetry::Constants->import(qw( SPAN_STATUS_ERROR SPAN_STATUS_OK ));
+        $provider = OpenTelemetry->tracer_provider;
+        $tracer = $provider->tracer(
+            name => __PACKAGE__,
+            version => __PACKAGE__->VERSION
+        );
+    }
+}
 
 # These only apply to the legacy RESP2 protocol. Since RESP3, connections
 # are no longer restricted once pubsub activity has started.
@@ -282,6 +318,8 @@ Applies configuration parameters - currently supports:
 
 =item * C<opentracing>
 
+=item * C<opentelemetry>
+
 =item * C<protocol> - either 'resp2' or 'resp3', default is autodetect
 
 =item * C<hashrefs> - RESP3 (Redis 6.0+) supports more data types, currently the only difference this
@@ -307,6 +345,7 @@ method configure (%args) {
         on_disconnect
         client_name
         opentracing
+        opentelemetry
         protocol
         hashrefs
         tls_cert_file
@@ -331,7 +370,7 @@ method configure (%args) {
         delete $self->{client_side_cache};
         if($self->loop) {
             my $conn = delete $self->{client_side_connection};
-            $self->remove_child($conn) if $conn and $conn->parent;
+            $conn->remove_from_parent if $conn;
         }
     }
     my $uri = $self->{uri} = URI->new($self->{uri}) unless ref $self->uri;
@@ -341,6 +380,8 @@ method configure (%args) {
     }
 
     die 'hashref support requires RESP3 (Redis version 6+)' if defined $self->{protocol} and $self->{protocol} eq 'resp2' and $self->{hashrefs};
+
+    die 'opentelemetry requested but not available, set USE_OPENTELEMETRY=1 in the environment to enable' if $self->opentelemetry and not OPENTELEMETRY_ENABLED;
     $self->next::method(%args)
 }
 
@@ -424,9 +465,11 @@ will be preserved for subsequent L</connect> calls.
 
 method connect (%args) {
     return $self->{connection} if $self->{connection};
-    my $f = $self->connect_to_server(%args)->on_ready(sub {
-        $log->tracef('connection call complete - %s', $_[0]->state);
-        delete $self->{connection} unless shift->is_done
+    $self->{connection_in_progress} = 1;
+    my $f = $self->connect_to_server(%args)->on_ready(sub ($f) {
+        $log->tracef('connection call complete - %s', $f->state);
+        $self->{connection_in_progress} = 0;
+        delete $self->{connection} unless $f->is_done
     });
     return $self->{connection} = $f;
 }
@@ -494,7 +537,6 @@ async method connect_to_server (%args) {
         die 'ERR unknown command' if $self->{protocol} and $self->{protocol} eq 'resp2';
 
         # Try issuing a HELLO to detect RESP3 or above
-        dynamically $self->{connection_in_progress} = 1;
         await $self->hello(
             3, defined($auth) ? (
                 qw(AUTH), $username, $auth
@@ -507,10 +549,10 @@ async method connect_to_server (%args) {
 
         $proto->{hashrefs} = $self->{hashrefs};
         $proto->{protocol} = $self->{protocol_level};
-    } catch {
+    } catch ($e) {
         # If we had an auth failure or invalid client name, all bets are off:
         # immediately raise those back to the caller
-        die $@ unless $@ =~ /ERR unknown command/;
+        die $e unless $e =~ /ERR unknown command/;
 
         $log->tracef('Older Redis version detected, dropping back to RESP2 protocol');
         $self->{protocol_level} = 'resp2';
@@ -520,13 +562,10 @@ async method connect_to_server (%args) {
         $proto->{hashrefs} = $self->{hashrefs};
         $proto->{protocol} = $self->{protocol_level};
 
-        dynamically $self->{connection_in_progress} = 1;
         await $self->auth($auth) if defined $auth;
-        dynamically $self->{connection_in_progress} = 1;
         await $self->client_setname($self->client_name) if defined $self->client_name;
     }
 
-    dynamically $self->{connection_in_progress} = 1;
     if($uri->database) {
         try {
             $log->tracef('Select database %s', $uri->database);
@@ -759,23 +798,24 @@ See L<https://redis.io/topics/client-side-caching> for more details on this feat
 
 =cut
 
-async sub client_side_connection {
-    my ($self) = @_;
+async method client_side_connection {
     return if $self->{client_side_connection};
 
     if($self->{protocol_level} eq 'resp3') {
-        $self->{client_side_cache_ready} = Future->done;
+        $log->tracef('Client side cache uses same connection due to RESP3');
         Scalar::Util::weaken($self->{client_side_connection} = $self);
         await $self->enable_clientside_cache($self);
         return;
     }
 
+    $log->tracef('Client side cache needs a new connection due to RESP2');
     $self->{client_side_connection} = my $redis = ref($self)->new(
         host => $self->host,
         port => $self->port,
         auth => $self->{auth},
     );
     $self->add_child($redis);
+    await $redis->connect;
     await $self->enable_clientside_cache($redis);
     return;
 }
@@ -836,9 +876,8 @@ method client_side_cache_size { $self->{client_side_cache_size} }
 # For now, we're only caching the GET/SET requests. Client-side caching
 # support in the Redis server covers other commands, though: eventually
 # we'll be extending this for all read commands.
-around get => async sub {
-    my ($code, $self, $k) = @_;
-    return await $self->$code($k) unless $self->is_client_side_cache_enabled;
+async method get ($k) {
+    return await $self->next::method($k) unless $self->is_client_side_cache_enabled;
 
     my $cache = $self->client_side_cache;
     $log->tracef('Check cache for [%s]', $k);
@@ -852,7 +891,7 @@ around get => async sub {
     }
 
     $log->tracef('Key [%s] was not cached', $k);
-    my $f = $self->$code($k);
+    my $f = $self->next::method($k);
     # Set our cache entry regardless of whether it completes
     # immediately or not...
     $cache->set(
@@ -920,7 +959,7 @@ async sub watch_keyspace {
         my $k = $message->channel;
         $k =~ s/^[^:]+://;
         my $f = $code->($message->payload, $k);
-        $f->retain if blessed($f) and $f->isa('Future');
+        $self->adopt_future($f) if blessed($f) and $f->isa('Future');
     }) if $code;
     return $ev;
 }
@@ -945,6 +984,14 @@ Indicates whether L<OpenTracing::Any> support is enabled.
 =cut
 
 method opentracing { $self->{opentracing} }
+
+=head2 opentelemetry
+
+Indicates whether L<OpenTelemetry> support is enabled.
+
+=cut
+
+method opentelemetry { $self->{opentelemetry} }
 
 =head1 METHODS - Deprecated
 
@@ -1164,6 +1211,45 @@ method command_label (@cmd) {
     return $cmd[0];
 }
 
+=head2 span_for_future
+
+See L<https://opentelemetry.io/docs/specs/semconv/database/redis/> for current semantic conventions around Redis.
+
+=cut
+
+method span_for_future ($f, %args) {
+    return $f unless OPENTELEMETRY_ENABLED;
+
+    $args{name} //= $f->label // 'Future';
+    my $span = $tracer->create_span(
+        %args,
+        parent => OpenTelemetry::Context->current
+    );
+
+    my $context = OpenTelemetry::Trace->context_with_span($span);
+
+    return $f->on_ready(sub {
+        dynamically OpenTelemetry::Context->current = $context;
+        if($f->is_done) {
+            $span->set_status(
+                OpenTelemetry::Constants->SPAN_STATUS_OK
+            );
+        } elsif($f->is_cancelled) {
+            $span->set_status(
+                OpenTelemetry::Constants->SPAN_STATUS_OK
+            );
+        } else {
+            my $e = $f->failure;
+            $span->record_exception($e);
+            $span->set_status(
+                OpenTelemetry::Constants->SPAN_STATUS_ERROR,
+                $e
+            );
+        }
+        $span->end;
+    });
+}
+
 =head2 execute_command
 
 Queues the given command for execution.
@@ -1178,6 +1264,14 @@ sub execute_command {
         $self->command_label(@cmd)
     );
     $tracer->span_for_future($f) if $self->opentracing;
+    $self->span_for_future(
+        $f,
+        attributes => {
+            'db.system'               => 'redis',
+            'db.redis.database_index' => $self->database,
+            'db.statement'            => join(' ', map { /\s/ ? qq{"$_"} : $_ } @cmd),
+        }
+    ) if OPENTELEMETRY_ENABLED && $self->opentelemetry;
 
     my $item = [ \@cmd, $f];
     if($self->{connection_in_progress}) {
@@ -1358,8 +1452,7 @@ invalidation events.
 
 =cut
 
-async sub enable_clientside_cache {
-    my ($self, $redis) = @_;
+async method enable_clientside_cache ($redis) {
     my $f = $self->{client_side_cache_ready} = $self->loop->new_future;
     try {
         $log->tracef('At this point we want an ID');
@@ -1677,5 +1770,5 @@ tests and feedback:
 
 =head1 LICENSE
 
-Copyright Tom Molesworth and others 2015-2023.
+Copyright Tom Molesworth and others 2015-2024.
 Licensed under the same terms as Perl itself.

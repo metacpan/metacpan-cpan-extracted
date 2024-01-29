@@ -1,4 +1,13 @@
 Revision history for Perl extension List::Insertion.
+v0.1.4 2024-01-10
+  [maintenance]
+    - Updated to work with latest Template::Plex (v0.7.0)
+
+v0.1.3 2023-08-23
+  [improvements]
+  - remove Exporter, as it isn't used to export symbols in this case
+
+
 v0.1.2  2023-06-23
   [improvements]
   - removed uneeded localisation of $_

@@ -1,14 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.66;
+use warnings;
+use Object::Pad 0.807;
 
-package Tickit::ContainerWidget 0.58;
-class Tickit::ContainerWidget
-   :isa(Tickit::Widget);
+package Tickit::ContainerWidget 0.59;
+class Tickit::ContainerWidget;
+
+inherit Tickit::Widget;
 
 use Carp;
 
@@ -49,7 +51,7 @@ Set whenever a child widget within the container has the input focus.
 
 =head2 new
 
-   $widget = Tickit::ContainerWidget->new( %args )
+   $widget = Tickit::ContainerWidget->new( %args );
 
 Constructs a new C<Tickit::ContainerWidget> object. Must be called on a
 subclass that implements the required methods; see the B<SUBCLASS METHODS>
@@ -76,7 +78,7 @@ ADJUST
 
 =head2 add
 
-   $widget->add( $child, %opts )
+   $widget->add( $child, %opts );
 
 Sets the child widget's parent, stores the options for the child, and calls
 the C<children_changed> method. The concrete implementation will have to
@@ -104,7 +106,7 @@ method add
 
 =head2 remove
 
-   $widget->remove( $child_or_index )
+   $widget->remove( $child_or_index );
 
 Removes the child widget's parent, and calls the C<children_changed> method.
 The concrete implementation will have to remove this child from its storage.
@@ -130,9 +132,9 @@ method remove
 
 =head2 child_opts
 
-   %opts = $widget->child_opts( $child )
+   %opts = $widget->child_opts( $child );
 
-   $opts = $widget->child_opts( $child )
+   $opts = $widget->child_opts( $child );
 
 Returns the options currently set for the given child as a key/value list in
 list context, or as a HASH reference in scalar context. The HASH reference in
@@ -152,7 +154,7 @@ method child_opts
 
 =head2 set_child_opts
 
-   $widget->set_child_opts( $child, %newopts )
+   $widget->set_child_opts( $child, %newopts );
 
 Sets new options on the given child. Any options whose value is given as
 C<undef> are deleted.
@@ -213,7 +215,7 @@ method _on_win_focus
 
 =head2 find_child
 
-   $child = $widget->find_child( $how, $other, %args )
+   $child = $widget->find_child( $how, $other, %args );
 
 Returns a child widget. The C<$how> argument determines how this is done,
 relative to the child widget given by C<$other>:
@@ -289,7 +291,7 @@ use constant CONTAINER_OR_FOCUSABLE => sub {
 
 =head2 focus_next
 
-   $widget->focus_next( $how, $other )
+   $widget->focus_next( $how, $other );
 
 Moves the input focus to the next widget in the widget tree, by searching in
 the direction given by C<$how> relative to the widget given by C<$other>
@@ -326,7 +328,7 @@ search within the next child, and so on.
 
 Usually this would be used via the widget itself:
 
- $self->parent->focus_next( $how => $self );
+   $self->parent->focus_next( $how => $self );
 
 =cut
 
@@ -396,7 +398,7 @@ method focus_next
 
 =head2 children
 
-   @children = $widget->children
+   @children = $widget->children;
 
 Required. Should return a list of all the contained child widgets. The order
 is not specified, but should be in some stable order that makes sense given
@@ -408,7 +410,7 @@ another given one.
 
 =head2 children_for_focus
 
-   @children = $widget->children_for_focus
+   @children = $widget->children_for_focus;
 
 Optional. If implemented, this method is called to obtain a list of child
 widgets to perform a child search on when changing focus using the
@@ -421,7 +423,7 @@ part of the main focus set. This method can then exclude them.
 
 =head2 children_changed
 
-   $widget->children_changed
+   $widget->children_changed;
 
 Optional. If implemented, this method will be called after any change of the
 contained child widgets or their options. Typically this will be used to set
@@ -431,7 +433,7 @@ If not overridden, the base implementation will call C<reshape>.
 
 =head2 child_resized
 
-   $widget->child_resized( $child )
+   $widget->child_resized( $child );
 
 Optional. If implemented, this method will be called after a child widget
 changes or may have changed its size requirements. Typically this will be used

@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Map::Tube::Moscow;
+
      my $obj = Map::Tube::Moscow->new;
      my $routes_ar = $obj->get_all_routes($from, $to);
      my $line = $obj->get_line_by_id($line_id);
@@ -23,55 +24,88 @@ DESCRIPTION
     <https://ru.wikipedia.org/wiki/Московский_метрополитен>.
 
 METHODS
-    "new()"
-             Constructor.
+  "new"
+     my $obj = Map::Tube::Moscow->new;
 
-    "get_all_routes($from, $to)" [EXPERIMENTAL]
-             Get all routes from station to station.
-             Returns reference to array with Map::Tube::Route objects.
+    Constructor.
 
-    "get_line_by_id($line_id)"
-             Get line object defined by id.
-             Returns Map::Tube::Line object.
+    Returns instance of object.
 
-    "get_line_by_name($line_name)"
-             Get line object defined by name.
-             Returns Map::Tube::Line object.
+  "get_all_routes" [EXPERIMENTAL]
+     my $routes_ar = $obj->get_all_routes($from, $to);
 
-    "get_lines()"
-             Get lines in metro map.
-             Returns reference to unsorted array with Map::Tube::Line objects.
+    Get all routes from station to station.
 
-    "get_node_by_id($station_id)"
-             Get station node by id.
-             Returns Map::Tube::Node object.
+    Returns reference to array with Map::Tube::Route objects.
 
-    "get_node_by_name($station_name)"
-             Get station node by name.
-             Returns Map::Tube::Node object.
+  "get_line_by_id"
+     my $line = $obj->get_line_by_id($line_id);
 
-    "get_shortest_route($from, $to)"
-             Get shortest route between $from and $to node names. Node names in $from and $to are case insensitive.
-             Returns Map::Tube::Route object.
+    Get line object defined by id.
 
-    "get_stations($line)"
-             Get list of stations for concrete metro line.
-             Returns reference to array with Map::Tube::Node objects.
+    Returns Map::Tube::Line object.
 
-    "name()"
-             Get metro name.
-             Returns string with metro name.
+  "get_line_by_name"
+     my $line = $obj->get_line_by_name($line_name);
 
-    "xml()"
-             Get XML specification of Moscow metro.
-             Returns string with XML.
+    Get line object defined by name.
+
+    Returns Map::Tube::Line object.
+
+  "get_lines"
+     my $lines_ar = $obj->get_lines;
+
+    Get lines in metro map.
+
+    Returns reference to unsorted array with Map::Tube::Line objects.
+
+  "get_node_by_id"
+     my $station = $obj->get_node_by_id($station_id);
+
+    Get station node by id.
+
+    Returns Map::Tube::Node object.
+
+  "get_node_by_name"
+     my $station = $obj->get_node_by_name($station_name);
+
+    Get station node by name.
+
+    Returns Map::Tube::Node object.
+
+  "get_shortest_route"
+     my $route = $obj->get_shortest_route($from, $to);
+
+    Get shortest route between $from and $to node names. Node names in $from
+    and $to are case insensitive.
+
+    Returns Map::Tube::Route object.
+
+  "get_stations"
+     my $stations_ar = $obj->get_stations($line);
+
+    Get list of stations for concrete metro line.
+
+    Returns reference to array with Map::Tube::Node objects.
+
+  "name"
+     my $metro_name = $obj->name;
+
+    Get metro name.
+
+    Returns string with metro name.
+
+  "xml"
+     my $xml_file = $obj->xml;
+
+    Get XML specification of Moscow metro.
+
+    Returns string with XML.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(decode_utf8 encode_utf8);
      use Map::Tube::Moscow;
 
@@ -88,11 +122,9 @@ EXAMPLE1
      # Route: Планерная (7 Таганско-Краснопресненская линия), Сходненская (7 Таганско-Краснопресненская линия), Тушинская (7 Таганско-Краснопресненская линия), Спартак (7 Таганско-Краснопресненская линия), Щукинская (7 Таганско-Краснопресненская линия), Октябрьское поле (7 Таганско-Краснопресненская линия), Полежаевская (7 Таганско-Краснопресненская линия), Беговая (7 Таганско-Краснопресненская линия), Улица 1905 года (7 Таганско-Краснопресненская линия), Баррикадная (7 Таганско-Краснопресненская линия), Пушкинская (7 Таганско-Краснопресненская линия), Кузнецкий мост (7 Таганско-Краснопресненская линия), Китай-город (6 Калужско-Рижская линия,7 Таганско-Краснопресненская линия), Тургеневская (6 Калужско-Рижская линия), Сухаревская (6 Калужско-Рижская линия), Проспект Мира (5 Кольцевая линия,6 Калужско-Рижская линия), Новослободская (5 Кольцевая линия), Белорусская (2 Замоскворецкая линия,5 Кольцевая линия)
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Map::Tube::Moscow;
 
      # Object.
@@ -108,11 +140,9 @@ EXAMPLE2
      # XML file: .*/moscow-map.xml
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Map::Tube::GraphViz;
      use Map::Tube::GraphViz::Utils qw(node_color_without_label);
      use Map::Tube::Moscow;
@@ -136,11 +166,9 @@ EXAMPLE3
      # -rw-r--r-- 1 skim skim 549576 Mar  9 21:39 Moscow.png
 
 EXAMPLE4
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Map::Tube::Moscow;
 
@@ -168,11 +196,9 @@ EXAMPLE4
      # Филёвская линия
 
 EXAMPLE5
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(decode_utf8 encode_utf8);
      use Map::Tube::Moscow;
 
@@ -221,7 +247,7 @@ SEE ALSO
         Install the Map::Tube concrete metro modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Map-Tube-Moscow>
+    <https://github.com/michal-josef-spacek/Map-Tube-Moscow>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -229,10 +255,12 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2017 Michal Josef Špaček
-     Artistic License
-     BSD 2-Clause License
+    © 2014-2023 Michal Josef Špaček
+
+    Artistic License
+
+    BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

@@ -4,7 +4,11 @@ use warnings;
 use strict;
 use feature 'say';
 use Term::ANSIColor qw(:constants);
+use Progress::Awesome;
 use Carp qw(croak);
+
+
+
 
 sub new {
   my( $class, $filename ) = @_;
@@ -14,17 +18,18 @@ sub new {
             bless $obj, $class;
 }
 
+
 =head1 NAME
 
-App::FileComposer - Dumps pre defined scripts!
+App::FileComposer - Filehandle made simple.
 
 =head1 VERSION
 
-Version 0.02
+Version 1.00
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '1.00';
 
 
 =head1 SYNOPSIS
@@ -32,7 +37,7 @@ Inside your module:
 
     use App::FileComposer;
 
-    my $foo = App::FileComposer->new(filename => foo.c);
+    my $foo = App::FileComposer->new("reset.css");
     $foo->load();
 
     $foo->write();
@@ -41,35 +46,33 @@ Inside your module:
 
 =head1 DESCRIPTION
 
-This module is an internal implemantation of a CLI Tool called mkscript
-but, if you wish you can use its internal functions as a module in your script..
+This module is an internal implemantation of a CLI Tool that come with this
+package called mkscript, but if you wish you can use its internal functions 
+as a module in your script..
 
-App::FileComposer looks for Code samples inside some defined directory and use their data
-to write new ones. It saves a lot of time from having to write the same initial lines of 
-code every time ...
-instead you can define your own samples and load whatever is inside them into a new file 
+This module is very basic. Get an overview of this project by reading the mkscript command documentation..
+Exemple: man mkscript or perldoc mkscript
 
-
-=head1 SUBROUTINES/METHODS
+=head1 API METHODS
 
 
 =head1 
 
 =head1 set_filename()
 
-Change the filename defined in the new method, very Useful in case of Bad filename
+Change the filename defined in the constructor, very Useful in case of Bad filename
 errors..
 
 
 =head1 get_filename()
 
-Get the Current filename passed to new...
+Get the Current filename passed to the constructor...
 
 
 =head1 set_sourcePath()
 
 If you wish to change the local of the sample files, define here
-the default directory is: /home/user/.samples
+the default directory is: /home/user/.app-filecomposer
 
 
 =head1 get_sourcePath()
@@ -79,12 +82,13 @@ Get the Current samples dir
 
 =head1 load()
 
-load the default samples directory, it dies if does not exists
+Check the template  directory to see if the file declared by new constructor exists ...
+the program will die with a warning if the file doesn't exist. 
 
 =head1 write() 
 
-Once the file is loaded through load(), you can write..
-write() will dump the file in ./  (The current working directory)
+Once the file is loaded through load(), 
+write() will dump the file in "./"  (The current working directory).
 
 
 =cut
@@ -231,8 +235,9 @@ sub write {
 	my ($self, $where) = @_; 
 	my $origin = $self->{'origin'};	
 	my $filename = $self->{'filename'};
-  #// flag
 
+
+  #// flag
 	our $i_found;
 	
   #// dies if we have not the file in $i_found
@@ -254,22 +259,31 @@ sub write {
         open INPUT , '<', "$origin/$i_found" 
             or die "error: $! \n";
 
-                  my @load_file_in_mem = <INPUT>;
-                  close(INPUT);
-
+                  # my @filesize = <INPUT>;
+                  
         open OUTPUT, '>>', "./$temp" 
             or die "cannot write to $temp, error: $!\n";
-          
-                  print OUTPUT $_ for @load_file_in_mem;
-                  rename $temp, $filename;
+        my $bar = Progress::Awesome->new(1000, style => 'rainbow', title => 'loading...');
 
-          close(OUTPUT);
-    
+         while (<INPUT>) {
+                  print OUTPUT $_;
+                  $bar->inc();
+                  select(undef, undef, undef, 0.010);
+                  
+
+               }
+
+                close(INPUT);
+                close(OUTPUT);
+                  rename $temp, $filename;
+                  $bar->finish;
+ 
+
+   
      		}
 
-  
 }
 
 
-
 1; # End of App::FileComposer
+

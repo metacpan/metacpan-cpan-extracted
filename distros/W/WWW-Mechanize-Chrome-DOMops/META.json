@@ -56,6 +56,6 @@
          "web" : "https://github.com/hadjiprocopis/www-mechanize-chrome-domops"
       }
    },
-   "version" : "0.06",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

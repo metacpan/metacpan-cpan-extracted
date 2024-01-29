@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Yo::Any::Bj - Package for language Yoruba
 
 package Locale::CLDR::Locales::Yo::Any::Bj;
 # This file auto generated from Data\common\main\yo_BJ.xml
-#	on Tue  5 Dec  1:38:09 pm GMT
+#	on Sun  7 Jan  2:30:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.40.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,16 +28,78 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
-				'da' => 'Èdè Ilɛ̀ Denmark',
- 				'de' => 'Èdè Ilɛ̀ Gemani',
+				'agq' => 'Èdè Ágɛ̀ɛ̀mù',
+ 				'bez' => 'Èdè Bɛ́nà',
+ 				'chr' => 'Èdè Shɛ́rókiì',
+ 				'cu' => 'Èdè Síláfííkì Ilé Ìjɔ́sìn',
+ 				'da' => 'Èdè Ilɛ̀ Denmark',
+ 				'de_AT' => 'Èdè Jámánì (Ɔ́síríà )',
+ 				'de_CH' => 'Èdè Ilɛ̀ Jámánì (Orílɛ́ède swítsàlandì)',
+ 				'dje' => 'Shárúmà',
+ 				'dsb' => 'Shóbíánù Apá Ìshàlɛ̀',
+ 				'ebu' => 'Èdè Ɛmbù',
  				'en' => 'Èdè Gɛ̀ɛ́sì',
- 				'pl' => 'Èdè Ilɛ̀ Polandi',
- 				'pt' => 'Èdè Pɔtugi',
- 				'ru' => 'Èdè ̣Rɔɔsia',
+ 				'en_AU' => 'Èdè Gɛ̀ɛ́sì (órílɛ̀-èdè Ɔsirélíà)',
+ 				'en_CA' => 'Èdè Gɛ̀ɛ́sì (Orílɛ̀-èdè Kánádà)',
+ 				'en_GB' => 'Èdè òyìnbó Gɛ̀ɛ́sì',
+ 				'en_GB@alt=short' => 'Èdè Gɛ̀ɛ́sì (GB)',
+ 				'en_US@alt=short' => 'Èdè Gɛ̀ɛ́sì (US)',
+ 				'es' => 'Èdè Sípáníìshì',
+ 				'es_419' => 'Èdè Sípáníìshì (orílɛ̀-èdè Látìn-Amɛ́ríkà)',
+ 				'es_ES' => 'Èdè Sípáníìshì (orílɛ̀-èdè Yúróòpù)',
+ 				'es_MX' => 'Èdè Sípáníìshì (orílɛ̀-èdè Mɛ́síkò)',
+ 				'fr_CA' => 'Èdè Faransé (orílɛ̀-èdè Kánádà)',
+ 				'fr_CH' => 'Èdè Faranshé (Súwísàlaǹdì)',
+ 				'id' => 'Èdè Indonéshíà',
+ 				'ii' => 'Shíkuán Yì',
+ 				'jmc' => 'Máshámè',
+ 				'khq' => 'Koira Shíínì',
+ 				'kk' => 'Kashakì',
+ 				'kln' => 'Kálɛnjín',
+ 				'ks' => 'Kashímirì',
+ 				'ksb' => 'Sháńbálà',
+ 				'ku' => 'Kɔdishì',
+ 				'kw' => 'Èdè Kɔ́nììshì',
+ 				'lb' => 'Lùshɛ́mbɔ́ɔ̀gì',
+ 				'mul' => 'Ɔlɔ́pɔ̀ èdè',
+ 				'nb' => 'Nɔ́ɔ́wè Bokímàl',
+ 				'nds' => 'Jámánì ìpìlɛ̀',
+ 				'nl' => 'Èdè Dɔ́ɔ̀shì',
+ 				'nmg' => 'Kíwáshíò',
+ 				'nn' => 'Nɔ́ɔ́wè Nínɔ̀sìkì',
+ 				'nus' => 'Núɛ̀',
+ 				'nyn' => 'Ńyákɔ́lè',
+ 				'om' => 'Òròmɔ́',
+ 				'os' => 'Ɔshɛ́tíìkì',
+ 				'prg' => 'Púrúshíànù',
+ 				'pt' => 'Èdè Pɔtogí',
+ 				'pt_BR' => 'Èdè Pɔtogí (Orilɛ̀-èdè Bràsíl)',
+ 				'pt_PT' => 'Èdè Pɔtogí (orílɛ̀-èdè Yúróòpù)',
+ 				'qu' => 'Kúɛ́ńjùà',
+ 				'rm' => 'Rómáǹshì',
+ 				'ru' => 'Èdè Rɔ́shíà',
+ 				'seh' => 'Shɛnà',
+ 				'shi' => 'Tashelíìtì',
+ 				'sn' => 'Shɔnà',
+ 				'teo' => 'Tɛ́sò',
  				'tr' => 'Èdè Tɔɔkisi',
+ 				'ug' => 'Yúgɔ̀',
+ 				'und' => 'Èdè àìmɔ̀',
+ 				'vo' => 'Fɔ́lápùùkù',
+ 				'wae' => 'Wɔsà',
+ 				'wo' => 'Wɔ́lɔ́ɔ̀fù',
+ 				'xog' => 'Shógà',
+ 				'yav' => 'Yangbɛn',
+ 				'zgh' => 'Àfɛnùkò Támásáìtì ti Mòrókò',
+ 				'zh' => 'Edè Sháínà',
+ 				'zh@alt=menu' => 'Edè Sháínà, Mandárínì',
+ 				'zh_Hans' => 'Ɛdè Sháínà Onírɔ̀rùn',
+ 				'zh_Hans@alt=long' => 'Èdè Mandárínì Sháínà Onírɔ̀rùn',
+ 				'zh_Hant' => 'Èdè Sháínà Ìbílɛ̀',
+ 				'zh_Hant@alt=long' => 'Èdè Mandárínì Sháínà Ìbílɛ̀',
  				'zu' => 'Èdè Shulu',
 
 			);
@@ -49,235 +111,270 @@ has 'display_name_language' => (
 	},
 );
 
+has 'display_name_script' => (
+	is			=> 'ro',
+	isa			=> CodeRef,
+	init_arg	=> undef,
+	default		=> sub {
+		sub {
+			my %scripts = (
+			'Armn' => 'Àmɛ́níà',
+ 			'Cyrl' => 'èdè ilɛ̀ Rɔ́shíà',
+ 			'Deva' => 'Dɛfanagárì',
+ 			'Ethi' => 'Ɛtiópíìkì',
+ 			'Geor' => 'Jɔ́jíànù',
+ 			'Grek' => 'Jɔ́jíà',
+ 			'Hanb' => 'Han pɛ̀lú Bopomófò',
+ 			'Hans' => 'tí wɔ́n mú rɔrùn.',
+ 			'Hans@alt=stand-alone' => 'Hans tí wɔ́n mú rɔrùn.',
+ 			'Hant' => 'Hans àtɔwɔ́dɔ́wɔ́',
+ 			'Hant@alt=stand-alone' => 'Hans àtɔwɔ́dɔ́wɔ́',
+ 			'Hrkt' => 'ìlànà àfɔwɔ́kɔ ará Jàpánù',
+ 			'Khmr' => 'Kɛmɛ̀',
+ 			'Zmth' => 'Àmì Ìshèsìrò',
+ 			'Zsym' => 'Àwɔn àmì',
+ 			'Zxxx' => 'Aikɔsilɛ',
+ 			'Zyyy' => 'Wɔ́pɔ̀',
+ 			'Zzzz' => 'Ìshɔwɔ́kɔ̀wé àìmɔ̀',
+
+			);
+			if ( @_ ) {
+				return $scripts{$_[0]};
+			}
+			return \%scripts;
+		}
+	}
+);
+
 has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
-			'AD' => 'Orílɛ́ède Ààndórà',
- 			'AE' => 'Orílɛ́ède Ɛmirate ti Awɔn Arabu',
- 			'AF' => 'Orílɛ́ède Àfùgànístánì',
- 			'AG' => 'Orílɛ́ède Ààntígúà àti Báríbúdà',
- 			'AI' => 'Orílɛ́ède Ààngúlílà',
- 			'AL' => 'Orílɛ́ède Àlùbàníánì',
- 			'AM' => 'Orílɛ́ède Améníà',
- 			'AO' => 'Orílɛ́ède Ààngólà',
- 			'AR' => 'Orílɛ́ède Agentínà',
+			'003' => 'Àríwá Amɛ́ríkà',
+ 			'005' => 'Gúúshù Amɛ́ríkà',
+ 			'009' => 'Òsɔ́ɔ́níà',
+ 			'011' => 'Ìwɔ̀ oorùn Afíríkà',
+ 			'013' => 'Ààrin Gbùgbùn Àmɛ́ríkà',
+ 			'019' => 'Amɛ́ríkà',
+ 			'021' => 'Apáàríwá Amɛ́ríkà',
+ 			'030' => 'Ìlà Òòrùn Eshíà',
+ 			'034' => 'Gúúshù Eshíà',
+ 			'035' => 'Gúúshù ìlà òòrùn Éshíà',
+ 			'039' => 'Gúúshù Yúróòpù',
+ 			'053' => 'Ɔshirélashíà',
+ 			'054' => 'Mɛlanéshíà',
+ 			'057' => 'Agbègbè Maikironéshíà',
+ 			'061' => 'Polineshíà',
+ 			'142' => 'Áshíà',
+ 			'143' => 'Ààrin Gbùngbùn Éshíà',
+ 			'145' => 'Ìwɔ̀ Òòrùn Eshíà',
+ 			'155' => 'Ìwɔ̀ Òòrùn Yúrópù',
+ 			'419' => 'Látín Amɛ́ríkà',
+ 			'AE' => 'Ɛmirate ti Awɔn Arabu',
  			'AS' => 'Sámóánì ti Orílɛ́ède Àméríkà',
- 			'AT' => 'Orílɛ́ède Asítíríà',
- 			'AU' => 'Orílɛ́ède Ástràlìá',
- 			'AW' => 'Orílɛ́ède Árúbà',
- 			'AZ' => 'Orílɛ́ède Asɛ́bájánì',
- 			'BA' => 'Orílɛ́ède Bɔ̀síníà àti Ɛtisɛgófínà',
- 			'BB' => 'Orílɛ́ède Bábádósì',
- 			'BD' => 'Orílɛ́ède Bángáládésì',
- 			'BE' => 'Orílɛ́ède Bégíɔ́mù',
- 			'BF' => 'Orílɛ́ède Bùùkíná Fasò',
- 			'BG' => 'Orílɛ́ède Bùùgáríà',
- 			'BH' => 'Orílɛ́ède Báránì',
- 			'BI' => 'Orílɛ́ède Bùùrúndì',
- 			'BJ' => 'Orílɛ́ède Bɛ̀nɛ̀',
- 			'BM' => 'Orílɛ́ède Bémúdà',
- 			'BN' => 'Orílɛ́ède Búrúnɛ́lì',
- 			'BO' => 'Orílɛ́ède Bɔ̀lífíyà',
- 			'BR' => 'Orílɛ́ède Bàràsílì',
- 			'BS' => 'Orílɛ́ède Bàhámásì',
- 			'BT' => 'Orílɛ́ède Bútánì',
- 			'BW' => 'Orílɛ́ède Bɔ̀tìsúwánà',
- 			'BY' => 'Orílɛ́ède Bélárúsì',
- 			'BZ' => 'Orílɛ́ède Bèlísɛ̀',
- 			'CA' => 'Orílɛ́ède Kánádà',
- 			'CD' => 'Orilɛ́ède Kóngò',
- 			'CF' => 'Orílɛ́ède Àrin gùngun Áfíríkà',
- 			'CG' => 'Orílɛ́ède Kóngò',
- 			'CH' => 'Orílɛ́ède switishilandi',
- 			'CI' => 'Orílɛ́ède Kóútè forà',
- 			'CK' => 'Orílɛ́ède Etíokun Kùúkù',
- 			'CL' => 'Orílɛ́ède shílè',
- 			'CM' => 'Orílɛ́ède Kamerúúnì',
- 			'CN' => 'Orílɛ́ède sháínà',
- 			'CO' => 'Orílɛ́ède Kòlómíbìa',
- 			'CR' => 'Orílɛ́ède Kuusita Ríkà',
- 			'CU' => 'Orílɛ́ède Kúbà',
- 			'CV' => 'Orílɛ́ède Etíokun Kápé féndè',
- 			'CY' => 'Orílɛ́ède Kúrúsì',
- 			'CZ' => 'Orílɛ́ède shɛ́ɛ́kì',
- 			'DE' => 'Orílɛ́ède Gemani',
- 			'DJ' => 'Orílɛ́ède Díbɔ́ótì',
- 			'DK' => 'Orílɛ́ède Dɛ́mákì',
- 			'DM' => 'Orílɛ́ède Dòmíníkà',
- 			'DO' => 'Orilɛ́ède Dòmíníkánì',
- 			'DZ' => 'Orílɛ́ède Àlùgèríánì',
- 			'EC' => 'Orílɛ́ède Ekuádò',
- 			'EE' => 'Orílɛ́ède Esitonia',
- 			'EG' => 'Orílɛ́ède Égípítì',
- 			'ER' => 'Orílɛ́ède Eritira',
- 			'ES' => 'Orílɛ́ède Sipani',
- 			'ET' => 'Orílɛ́ède Etopia',
- 			'FI' => 'Orílɛ́ède Filandi',
- 			'FJ' => 'Orílɛ́ède Fiji',
- 			'FK' => 'Orílɛ́ède Etikun Fakalandi',
- 			'FM' => 'Orílɛ́ède Makoronesia',
- 			'FR' => 'Orílɛ́ède Faranse',
- 			'GA' => 'Orílɛ́ède Gabon',
- 			'GB' => 'Orílɛ́ède Omobabirin',
- 			'GD' => 'Orílɛ́ède Genada',
- 			'GE' => 'Orílɛ́ède Gɔgia',
- 			'GF' => 'Orílɛ́ède Firenshi Guana',
- 			'GH' => 'Orílɛ́ède Gana',
- 			'GI' => 'Orílɛ́ède Gibaratara',
- 			'GL' => 'Orílɛ́ède Gerelandi',
- 			'GM' => 'Orílɛ́ède Gambia',
- 			'GN' => 'Orílɛ́ède Gene',
- 			'GP' => 'Orílɛ́ède Gadelope',
- 			'GQ' => 'Orílɛ́ède Ekutoria Gini',
- 			'GR' => 'Orílɛ́ède Geriisi',
- 			'GT' => 'Orílɛ́ède Guatemala',
- 			'GU' => 'Orílɛ́ède Guamu',
- 			'GW' => 'Orílɛ́ède Gene-Busau',
- 			'GY' => 'Orílɛ́ède Guyana',
- 			'HN' => 'Orílɛ́ède Hondurasi',
- 			'HR' => 'Orílɛ́ède Kòróátíà',
- 			'HT' => 'Orílɛ́ède Haati',
- 			'HU' => 'Orílɛ́ède Hungari',
- 			'ID' => 'Orílɛ́ède Indonesia',
- 			'IE' => 'Orílɛ́ède Ailandi',
- 			'IL' => 'Orílɛ́ède Iserɛli',
- 			'IN' => 'Orílɛ́ède India',
- 			'IO' => 'Orílɛ́ède Etíkun Índíánì ti Ìlú Bírítísì',
- 			'IQ' => 'Orílɛ́ède Iraki',
- 			'IR' => 'Orílɛ́ède Irani',
- 			'IS' => 'Orílɛ́ède Ashilandi',
- 			'IT' => 'Orílɛ́ède Italiyi',
- 			'JM' => 'Orílɛ́ède Jamaika',
- 			'JO' => 'Orílɛ́ède Jɔdani',
- 			'JP' => 'Orílɛ́ède Japani',
- 			'KE' => 'Orílɛ́ède Kenya',
- 			'KG' => 'Orílɛ́ède Kurishisitani',
- 			'KH' => 'Orílɛ́ède Kàmùbódíà',
- 			'KI' => 'Orílɛ́ède Kiribati',
- 			'KM' => 'Orílɛ́ède Kòmòrósì',
- 			'KN' => 'Orílɛ́ède Kiiti ati Neefi',
- 			'KP' => 'Orílɛ́ède Guusu Kɔria',
- 			'KR' => 'Orílɛ́ède Ariwa Kɔria',
- 			'KW' => 'Orílɛ́ède Kuweti',
- 			'KY' => 'Orílɛ́ède Etíokun Kámánì',
- 			'KZ' => 'Orílɛ́ède Kashashatani',
- 			'LA' => 'Orílɛ́ède Laosi',
- 			'LB' => 'Orílɛ́ède Lebanoni',
- 			'LC' => 'Orílɛ́ède Lushia',
- 			'LI' => 'Orílɛ́ède Lɛshitɛnisiteni',
- 			'LK' => 'Orílɛ́ède Siri Lanka',
- 			'LR' => 'Orílɛ́ède Laberia',
- 			'LS' => 'Orílɛ́ède Lesoto',
- 			'LT' => 'Orílɛ́ède Lituania',
- 			'LU' => 'Orílɛ́ède Lusemogi',
- 			'LV' => 'Orílɛ́ède Latifia',
- 			'LY' => 'Orílɛ́ède Libiya',
- 			'MA' => 'Orílɛ́ède Moroko',
- 			'MC' => 'Orílɛ́ède Monako',
- 			'MD' => 'Orílɛ́ède Modofia',
- 			'MG' => 'Orílɛ́ède Madasika',
- 			'MH' => 'Orílɛ́ède Etikun Máshali',
- 			'MK' => 'Orílɛ́ède Masidonia',
- 			'ML' => 'Orílɛ́ède Mali',
- 			'MM' => 'Orílɛ́ède Manamari',
- 			'MN' => 'Orílɛ́ède Mogolia',
- 			'MP' => 'Orílɛ́ède Etikun Guusu Mariana',
- 			'MQ' => 'Orílɛ́ède Matinikuwi',
- 			'MR' => 'Orílɛ́ède Maritania',
- 			'MS' => 'Orílɛ́ède Motserati',
- 			'MT' => 'Orílɛ́ède Malata',
- 			'MU' => 'Orílɛ́ède Maritiusi',
- 			'MV' => 'Orílɛ́ède Maladifi',
- 			'MW' => 'Orílɛ́ède Malawi',
- 			'MX' => 'Orílɛ́ède Mesiko',
- 			'MY' => 'Orílɛ́ède Malasia',
- 			'MZ' => 'Orílɛ́ède Moshamibiku',
- 			'NA' => 'Orílɛ́ède Namibia',
- 			'NC' => 'Orílɛ́ède Kaledonia Titun',
- 			'NE' => 'Orílɛ́ède Nàìjá',
- 			'NF' => 'Orílɛ́ède Etikun Nɔ́úfókì',
- 			'NG' => 'Orílɛ́ède Nàìjíríà',
- 			'NI' => 'Orílɛ́ède NIkaragua',
- 			'NL' => 'Orílɛ́ède Nedalandi',
- 			'NO' => 'Orílɛ́ède Nɔɔwii',
- 			'NP' => 'Orílɛ́ède Nepa',
- 			'NR' => 'Orílɛ́ède Nauru',
- 			'NU' => 'Orílɛ́ède Niue',
- 			'NZ' => 'Orílɛ́ède shilandi Titun',
- 			'OM' => 'Orílɛ́ède Ɔɔma',
- 			'PA' => 'Orílɛ́ède Panama',
- 			'PE' => 'Orílɛ́ède Peru',
- 			'PF' => 'Orílɛ́ède Firenshi Polinesia',
- 			'PG' => 'Orílɛ́ède Paapu ti Giini',
- 			'PH' => 'Orílɛ́ède filipini',
- 			'PK' => 'Orílɛ́ède Pakisitan',
- 			'PL' => 'Orílɛ́ède Polandi',
- 			'PM' => 'Orílɛ́ède Pɛɛri ati mikuloni',
- 			'PN' => 'Orílɛ́ède Pikarini',
- 			'PR' => 'Orílɛ́ède Pɔto Riko',
- 			'PS' => 'Orílɛ́ède Iwɔorun Pakisitian ati Gasha',
- 			'PT' => 'Orílɛ́ède Pɔtugi',
- 			'PW' => 'Orílɛ́ède Paalu',
- 			'PY' => 'Orílɛ́ède Paraguye',
- 			'QA' => 'Orílɛ́ède Kota',
- 			'RE' => 'Orílɛ́ède Riuniyan',
- 			'RO' => 'Orílɛ́ède Romaniya',
- 			'RU' => 'Orílɛ́ède Rɔshia',
- 			'RW' => 'Orílɛ́ède Ruwanda',
- 			'SA' => 'Orílɛ́ède Saudi Arabia',
- 			'SB' => 'Orílɛ́ède Etikun Solomoni',
- 			'SC' => 'Orílɛ́ède seshɛlɛsi',
- 			'SD' => 'Orílɛ́ède Sudani',
- 			'SE' => 'Orílɛ́ède Swidini',
- 			'SG' => 'Orílɛ́ède Singapo',
- 			'SH' => 'Orílɛ́ède Hɛlena',
- 			'SI' => 'Orílɛ́ède Silofania',
- 			'SK' => 'Orílɛ́ède Silofakia',
- 			'SL' => 'Orílɛ́ède Siria looni',
- 			'SM' => 'Orílɛ́ède Sani Marino',
- 			'SN' => 'Orílɛ́ède Sɛnɛga',
- 			'SO' => 'Orílɛ́ède Somalia',
- 			'SR' => 'Orílɛ́ède Surinami',
- 			'ST' => 'Orílɛ́ède Sao tomi ati piriishipi',
- 			'SV' => 'Orílɛ́ède Ɛɛsáfádò',
- 			'SY' => 'Orílɛ́ède Siria',
- 			'SZ' => 'Orílɛ́ède Sashiland',
- 			'TC' => 'Orílɛ́ède Tɔɔki ati Etikun Kakɔsi',
- 			'TD' => 'Orílɛ́ède shààdì',
- 			'TG' => 'Orílɛ́ède Togo',
- 			'TH' => 'Orílɛ́ède Tailandi',
- 			'TJ' => 'Orílɛ́ède Takisitani',
- 			'TK' => 'Orílɛ́ède Tokelau',
- 			'TL' => 'Orílɛ́ède ÌlàOòrùn Tímɔ̀',
- 			'TM' => 'Orílɛ́ède Tɔɔkimenisita',
- 			'TN' => 'Orílɛ́ède Tunishia',
- 			'TO' => 'Orílɛ́ède Tonga',
- 			'TR' => 'Orílɛ́ède Tɔɔki',
- 			'TT' => 'Orílɛ́ède Tirinida ati Tobaga',
- 			'TV' => 'Orílɛ́ède Tufalu',
- 			'TW' => 'Orílɛ́ède Taiwani',
- 			'TZ' => 'Orílɛ́ède Tanshania',
- 			'UA' => 'Orílɛ́ède Ukarini',
- 			'UG' => 'Orílɛ́ède Uganda',
- 			'US' => 'Orílɛ́ède Orilɛede Amerika',
- 			'UY' => 'Orílɛ́ède Nruguayi',
- 			'UZ' => 'Orílɛ́ède Nshibɛkisitani',
- 			'VC' => 'Orílɛ́ède Fisɛnnti ati Genadina',
- 			'VE' => 'Orílɛ́ède Fɛnɛshuɛla',
- 			'VG' => 'Orílɛ́ède Etíkun Fágínì ti ìlú Bírítísì',
- 			'VI' => 'Orílɛ́ède Etikun Fagini ti Amɛrika',
- 			'VN' => 'Orílɛ́ède Fɛtinami',
- 			'VU' => 'Orílɛ́ède Faniatu',
- 			'WF' => 'Orílɛ́ède Wali ati futuna',
- 			'WS' => 'Orílɛ́ède Samɔ',
- 			'YE' => 'Orílɛ́ède yemeni',
- 			'YT' => 'Orílɛ́ède Mayote',
- 			'ZA' => 'Orílɛ́ède Ariwa Afirika',
- 			'ZM' => 'Orílɛ́ède shamibia',
- 			'ZW' => 'Orílɛ́ède shimibabe',
+ 			'AX' => 'Àwɔn Erékùsù ti Åland',
+ 			'AZ' => 'Asɛ́bájánì',
+ 			'BA' => 'Bɔ̀síníà àti Ɛtisɛgófínà',
+ 			'BE' => 'Bégíɔ́mù',
+ 			'BJ' => 'Bɛ̀nɛ̀',
+ 			'BL' => 'Ìlú Bátílɛ́mì',
+ 			'BN' => 'Búrúnɛ́lì',
+ 			'BO' => 'Bɔ̀lífíyà',
+ 			'BQ' => 'Káríbíánì ti Nɛ́dálándì',
+ 			'BW' => 'Bɔ̀tìsúwánà',
+ 			'BZ' => 'Bèlísɛ̀',
+ 			'CH' => 'switishilandi',
+ 			'CL' => 'Shílè',
+ 			'CN' => 'Sháínà',
+ 			'CZ' => 'Shɛ́ɛ́kì',
+ 			'CZ@alt=variant' => 'Shɛ́ɛ́kì',
+ 			'DG' => 'Diego Gashia',
+ 			'DJ' => 'Díbɔ́ótì',
+ 			'DK' => 'Dɛ́mákì',
+ 			'EH' => 'Ìwɔ̀òòrùn Sàhárà',
+ 			'EU' => 'Àpapɔ̀ Yúróòpù',
+ 			'FO' => 'Àwɔn Erékùsù ti Faroe',
+ 			'GB' => 'Gɛ̀ɛ́sì',
+ 			'GE' => 'Gɔgia',
+ 			'GF' => 'Firenshi Guana',
+ 			'GS' => 'Gúúsù Georgia àti Gúúsù Àwɔn Erékùsù Sandwich',
+ 			'HK' => 'Agbègbè Ìshàkóso Ìshúná Hong Kong Tí Shánà Ń Darí',
+ 			'IC' => 'Ɛrékùsù Kánárì',
+ 			'IL' => 'Iserɛli',
+ 			'IS' => 'Ashilandi',
+ 			'JO' => 'Jɔdani',
+ 			'KG' => 'Kurishisitani',
+ 			'KP' => 'Guusu Kɔria',
+ 			'KR' => 'Ariwa Kɔria',
+ 			'KZ' => 'Kashashatani',
+ 			'LC' => 'Lushia',
+ 			'LI' => 'Lɛshitɛnisiteni',
+ 			'MH' => 'Etikun Máshali',
+ 			'MO' => 'Agbègbè Ìshàkóso Pàtàkì Macao',
+ 			'MZ' => 'Moshamibiku',
+ 			'NF' => 'Etikun Nɔ́úfókì',
+ 			'NO' => 'Nɔɔwii',
+ 			'NZ' => 'Shilandi Titun',
+ 			'OM' => 'Ɔɔma',
+ 			'PF' => 'Firenshi Polinesia',
+ 			'PM' => 'Pɛɛri ati mikuloni',
+ 			'PR' => 'Pɔto Riko',
+ 			'PS' => 'Agbègbè ara Palɛsítínì',
+ 			'PS@alt=short' => 'Palɛsítínì',
+ 			'PT' => 'Pɔ́túgà',
+ 			'QO' => 'Agbègbè Òshɔ́ɔ́níà',
+ 			'RS' => 'Sɛ́bíà',
+ 			'RU' => 'Rɔshia',
+ 			'SC' => 'Sheshɛlɛsi',
+ 			'SH' => 'Hɛlena',
+ 			'SJ' => 'Sífábáàdì àti Jánì Máyɛ̀nì',
+ 			'SN' => 'Sɛnɛga',
+ 			'ST' => 'Sao tomi ati piriishipi',
+ 			'SV' => 'Ɛɛsáfádò',
+ 			'SX' => 'Síntì Mátɛ́ɛ̀nì',
+ 			'SZ' => 'Sashiland',
+ 			'TC' => 'Tɔɔki ati Etikun Kakɔsi',
+ 			'TD' => 'Shààdì',
+ 			'TF' => 'Agbègbè Gúúsù Faranshé',
+ 			'TL' => 'ÌlàOòrùn Tímɔ̀',
+ 			'TL@alt=variant' => 'Ìlà Òòrùn Tímɔ̀',
+ 			'TM' => 'Tɔɔkimenisita',
+ 			'TN' => 'Tunishia',
+ 			'TR' => 'Tɔɔki',
+ 			'UM' => 'Àwɔn Erékùsù Kékèké Agbègbè US',
+ 			'UN' => 'Ìshɔ̀kan àgbáyé',
+ 			'US' => 'Amɛrikà',
+ 			'UZ' => 'Nshibɛkisitani',
+ 			'VC' => 'Fisɛnnti ati Genadina',
+ 			'VE' => 'Fɛnɛshuɛla',
+ 			'VI' => 'Etikun Fagini ti Amɛrika',
+ 			'VN' => 'Fɛtinami',
+ 			'WS' => 'Samɔ',
+ 			'XA' => 'ìsɔ̀rɔ̀sí irɔ́',
+ 			'XB' => 'ibi irɔ́',
+ 			'ZA' => 'Gúúshù Áfíríkà',
+ 			'ZM' => 'Shamibia',
+ 			'ZW' => 'Shimibabe',
+ 			'ZZ' => 'Àgbègbè àìmɔ̀',
+
+		}
+	},
+);
+
+has 'display_name_key' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub {
+		{
+			'calendar' => 'Kàlɛ́ńdà',
+ 			'cf' => 'Ìgúnrégé Kɔ́rɛ́ńsì',
+ 			'collation' => 'Ètò Ɛlɛ́sɛɛsɛ',
+ 			'currency' => 'Kɔ́rɛ́ńsì',
+ 			'ms' => 'Èto Ìdiwɔ̀n',
+ 			'numbers' => 'Àwɔn nɔ́ńbà',
+
+		}
+	},
+);
+
+has 'display_name_type' => (
+	is			=> 'ro',
+	isa			=> HashRef[HashRef[Str]],
+	init_arg	=> undef,
+	default		=> sub {
+		{
+			'calendar' => {
+ 				'buddhist' => q{Kàlɛ́ńdà Buddhist},
+ 				'chinese' => q{Kàlɛ́ńdà ti Sháìnà},
+ 				'dangi' => q{Kàlɛ́ńdà dangi},
+ 				'ethiopic' => q{Kàlɛ́ńdà Ɛtíópíìkì},
+ 				'gregorian' => q{Kàlɛ́ńdà Gregory},
+ 				'hebrew' => q{Kàlɛ́ńdà Hébérù},
+ 				'islamic' => q{Kàlɛ́ńdà Lárúbáwá},
+ 				'iso8601' => q{Kàlɛ́ńdà ISO-8601},
+ 				'japanese' => q{Kàlɛ́ńdà ti Jàpánù},
+ 				'persian' => q{Kàlɛ́ńdà Pásíànù},
+ 				'roc' => q{Kàlɛ́ńdà Minguo},
+ 			},
+ 			'cf' => {
+ 				'account' => q{Ìgúnrégé Ìshirò Owó Kɔ́rɛ́ńsì},
+ 				'standard' => q{Ìgúnrégé Gbèdéke Kɔ́rɛ́ńsì},
+ 			},
+ 			'collation' => {
+ 				'ducet' => q{Ètò Ɛlɛ́sɛɛsɛ Àkùàyàn Unicode},
+ 				'search' => q{Ìshàwárí Ète-Gbogbogbò},
+ 			},
+ 			'ms' => {
+ 				'metric' => q{Èto Mɛ́tíríìkì},
+ 				'uksystem' => q{Èto Ìdiwɔ̀n Ɔba},
+ 				'ussystem' => q{Èto Ìdiwɔ̀n US},
+ 			},
+ 			'numbers' => {
+ 				'arab' => q{àwɔn díjítì Làrubáwá-Índíà},
+ 				'arabext' => q{Àwɔn Díjíìtì Lárúbáwá-Índíà fífɛ̀},
+ 				'armn' => q{Àwɔn nɔ́ńbà Àmɛ́níà},
+ 				'armnlow' => q{Àwɔn Nɔ́ńbà Kékèké ti Amɛ́ríkà},
+ 				'beng' => q{Àwɔn díjíìtì Báńgílà},
+ 				'deva' => q{Àwɔn díjììtì Defanagárì},
+ 				'ethi' => q{Àwɔn nɔ́ńbà Ɛtiópíìkì},
+ 				'fullwide' => q{Àwɔn Díjíìtì Fífɛ̀-Ɛ̀kún},
+ 				'geor' => q{Àwɔn nɔ́ńbà Jɔ́jíà},
+ 				'grek' => q{Àwɔn nɔ́ńbà Gíríìkì},
+ 				'greklow' => q{Àwɔn Nɔ́ńbà Gíríìkì Kékèké},
+ 				'gujr' => q{Àwɔn díjíìtì Gùjárátì},
+ 				'guru' => q{Àwɔn Díjíìtì Gurumukì},
+ 				'hanidec' => q{Àwɔn nɔ́ńbà Dɛ́símà Sháìnà},
+ 				'hans' => q{Àwɔn nɔ́ńbà Ìrɔ̀rùn ti Sháìnà},
+ 				'hansfin' => q{Àwɔn nɔ́ńbà Ìshúná Ìrɔ̀rùn Sháìnà},
+ 				'hant' => q{Àwɔn nɔ́ńbà Ìbílɛ̀ Sháìnà},
+ 				'hantfin' => q{Àwɔn nɔ́ńbà Ìshúná Ìbílɛ̀ Sháìnà},
+ 				'hebr' => q{Àwɔn nɔ́ńbà Hébérù},
+ 				'jpan' => q{Àwɔn nɔ́ńbà Jápànù},
+ 				'jpanfin' => q{Àwɔn nɔ́ńbà Ìshúná Jàpáànù},
+ 				'khmr' => q{Àwɔn díjíìtì Kɛ́mɛ̀},
+ 				'knda' => q{Àwɔn díjíìtì kanada},
+ 				'laoo' => q{Àwɔn díjíìtì Láó},
+ 				'latn' => q{Díjíítì Ìwɔ̀ Oòrùn},
+ 				'mlym' => q{Àwɔn díjíìtì Málàyálámù},
+ 				'mymr' => q{Àwɔn díjíìtì Myánmarí},
+ 				'orya' => q{Àwɔn díjíìtì Òdíà},
+ 				'roman' => q{Àwɔn díjíìtì Rómánù},
+ 				'romanlow' => q{Àwɔn díjíìtì Rómánù Kékeré},
+ 				'taml' => q{Àwɔn díjíìtì Ìbílɛ̀ Támílù},
+ 				'tamldec' => q{Àwɔn díjíìtì Tàmílù},
+ 				'telu' => q{Àwɔn díjíìtì Télúgù},
+ 				'thai' => q{Àwɔn díjíìtì Thai},
+ 				'tibt' => q{Àwɔn díjíìtì Tibetán},
+ 			},
+
+		}
+	},
+);
+
+has 'display_name_measurement_system' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub {
+		{
+			'metric' => q{Mɛ́tíríìkì},
+ 			'UK' => q{Ilɛ̀ Gɛ̀ɛ́sì},
+ 			'US' => q{Orílɛ̀-Èdè Amɛ́ríkà},
+
+		}
+	},
+);
+
+has 'display_name_code_patterns' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub {
+		{
+			'script' => 'Ìshɔwɔ́kɔ̀wé: {0}',
 
 		}
 	},
@@ -302,6 +399,596 @@ EOT
 );
 
 
+has 'units' => (
+	is			=> 'ro',
+	isa			=> HashRef[HashRef[HashRef[Str]]],
+	init_arg	=> undef,
+	default		=> sub { {
+				'long' => {
+					# Long Unit Identifier
+					'1024p2' => {
+						'1' => q(mɛ́bì {0}),
+					},
+					# Core Unit Identifier
+					'1024p2' => {
+						'1' => q(mɛ́bì {0}),
+					},
+					# Long Unit Identifier
+					'1024p4' => {
+						'1' => q(tɛbi {0}),
+					},
+					# Core Unit Identifier
+					'1024p4' => {
+						'1' => q(tɛbi {0}),
+					},
+					# Long Unit Identifier
+					'1024p5' => {
+						'1' => q(pɛbi {0}),
+					},
+					# Core Unit Identifier
+					'1024p5' => {
+						'1' => q(pɛbi {0}),
+					},
+					# Long Unit Identifier
+					'1024p6' => {
+						'1' => q(ɛ́síbì {0}),
+					},
+					# Core Unit Identifier
+					'1024p6' => {
+						'1' => q(ɛ́síbì {0}),
+					},
+					# Long Unit Identifier
+					'1024p7' => {
+						'1' => q(sɛ́bì {0}),
+					},
+					# Core Unit Identifier
+					'1024p7' => {
+						'1' => q(sɛ́bì {0}),
+					},
+					# Long Unit Identifier
+					'concentr-permille' => {
+						'other' => q({0} ìdákan nínú ɛgbɛ̀rún),
+					},
+					# Core Unit Identifier
+					'permille' => {
+						'other' => q({0} ìdákan nínú ɛgbɛ̀rún),
+					},
+					# Long Unit Identifier
+					'digital-bit' => {
+						'name' => q(àwɔ́n bíìtì),
+						'other' => q({0} àwɔ́n bíìtì),
+					},
+					# Core Unit Identifier
+					'bit' => {
+						'name' => q(àwɔ́n bíìtì),
+						'other' => q({0} àwɔ́n bíìtì),
+					},
+					# Long Unit Identifier
+					'digital-byte' => {
+						'name' => q(àwɔ́n báìtì),
+						'other' => q({0} àwɔ́n báìtì),
+					},
+					# Core Unit Identifier
+					'byte' => {
+						'name' => q(àwɔ́n báìtì),
+						'other' => q({0} àwɔ́n báìtì),
+					},
+					# Long Unit Identifier
+					'digital-gigabit' => {
+						'name' => q(àwɔn gígábíìtì),
+						'other' => q({0} àwɔn gígábíìtì),
+					},
+					# Core Unit Identifier
+					'gigabit' => {
+						'name' => q(àwɔn gígábíìtì),
+						'other' => q({0} àwɔn gígábíìtì),
+					},
+					# Long Unit Identifier
+					'digital-gigabyte' => {
+						'name' => q(àwɔn gígábáìtì),
+						'other' => q({0} àwɔn gígábáìtì),
+					},
+					# Core Unit Identifier
+					'gigabyte' => {
+						'name' => q(àwɔn gígábáìtì),
+						'other' => q({0} àwɔn gígábáìtì),
+					},
+					# Long Unit Identifier
+					'digital-kilobit' => {
+						'name' => q(àwɔn kílóbíìtì),
+						'other' => q({0} àwɔ́n kílóbíìtì),
+					},
+					# Core Unit Identifier
+					'kilobit' => {
+						'name' => q(àwɔn kílóbíìtì),
+						'other' => q({0} àwɔ́n kílóbíìtì),
+					},
+					# Long Unit Identifier
+					'digital-kilobyte' => {
+						'name' => q(àwɔn kílóbáìtì),
+						'other' => q({0} àwɔn kílóbáìtì),
+					},
+					# Core Unit Identifier
+					'kilobyte' => {
+						'name' => q(àwɔn kílóbáìtì),
+						'other' => q({0} àwɔn kílóbáìtì),
+					},
+					# Long Unit Identifier
+					'digital-megabit' => {
+						'name' => q(àwɔn mégábíìtì),
+						'other' => q({0} àwɔn mégábíìtì),
+					},
+					# Core Unit Identifier
+					'megabit' => {
+						'name' => q(àwɔn mégábíìtì),
+						'other' => q({0} àwɔn mégábíìtì),
+					},
+					# Long Unit Identifier
+					'digital-megabyte' => {
+						'name' => q(àwɔn mégábáìtì),
+						'other' => q({0} àwɔn mégábáìtì),
+					},
+					# Core Unit Identifier
+					'megabyte' => {
+						'name' => q(àwɔn mégábáìtì),
+						'other' => q({0} àwɔn mégábáìtì),
+					},
+					# Long Unit Identifier
+					'digital-petabyte' => {
+						'name' => q(àwɔn pɛ́tábáìtì),
+						'other' => q({0} àwɔn pɛ́tábáìtì),
+					},
+					# Core Unit Identifier
+					'petabyte' => {
+						'name' => q(àwɔn pɛ́tábáìtì),
+						'other' => q({0} àwɔn pɛ́tábáìtì),
+					},
+					# Long Unit Identifier
+					'digital-terabit' => {
+						'name' => q(àwɔn tɛ́rábíìtì),
+						'other' => q({0} àwɔn tɛ́rábíìtì),
+					},
+					# Core Unit Identifier
+					'terabit' => {
+						'name' => q(àwɔn tɛ́rábíìtì),
+						'other' => q({0} àwɔn tɛ́rábíìtì),
+					},
+					# Long Unit Identifier
+					'digital-terabyte' => {
+						'name' => q(àwɔn tɛ́rábáìtì),
+						'other' => q({0} àwɔn tɛ́rábáìtì),
+					},
+					# Core Unit Identifier
+					'terabyte' => {
+						'name' => q(àwɔn tɛ́rábáìtì),
+						'other' => q({0} àwɔn tɛ́rábáìtì),
+					},
+					# Long Unit Identifier
+					'duration-century' => {
+						'name' => q(ɔ̀rúndún),
+						'other' => q(ɔ̀rúndún {0}),
+					},
+					# Core Unit Identifier
+					'century' => {
+						'name' => q(ɔ̀rúndún),
+						'other' => q(ɔ̀rúndún {0}),
+					},
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(ɔjɔ́),
+						'other' => q(ɔj {0}),
+						'per' => q({0}/ɔj),
+					},
+					# Core Unit Identifier
+					'day' => {
+						'name' => q(ɔjɔ́),
+						'other' => q(ɔj {0}),
+						'per' => q({0}/ɔj),
+					},
+					# Long Unit Identifier
+					'duration-decade' => {
+						'name' => q(ɛ̀wádùn),
+						'other' => q(ɛ̀wádùn {0}),
+					},
+					# Core Unit Identifier
+					'decade' => {
+						'name' => q(ɛ̀wádùn),
+						'other' => q(ɛ̀wádùn {0}),
+					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(ìsh),
+						'other' => q({0} ìsh),
+						'per' => q({0}/ìsh),
+					},
+					# Core Unit Identifier
+					'minute' => {
+						'name' => q(ìsh),
+						'other' => q({0} ìsh),
+						'per' => q({0}/ìsh),
+					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(oshù),
+						'other' => q({0} oshù),
+						'per' => q({0}/oshù),
+					},
+					# Core Unit Identifier
+					'month' => {
+						'name' => q(oshù),
+						'other' => q({0} oshù),
+						'per' => q({0}/oshù),
+					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(ìsh àáy),
+						'other' => q({0}ìsh àáy),
+						'per' => q({0}/ìsh àáy),
+					},
+					# Core Unit Identifier
+					'second' => {
+						'name' => q(ìsh àáy),
+						'other' => q({0}ìsh àáy),
+						'per' => q({0}/ìsh àáy),
+					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(ɔsh),
+						'other' => q({0} ɔsh),
+						'per' => q({0}/ɔsh),
+					},
+					# Core Unit Identifier
+					'week' => {
+						'name' => q(ɔsh),
+						'other' => q({0} ɔsh),
+						'per' => q({0}/ɔsh),
+					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(ɔ̀dún),
+						'other' => q({0} ɔd),
+						'per' => q({0} ɔd),
+					},
+					# Core Unit Identifier
+					'year' => {
+						'name' => q(ɔ̀dún),
+						'other' => q({0} ɔd),
+						'per' => q({0} ɔd),
+					},
+					# Long Unit Identifier
+					'graphics-dot' => {
+						'name' => q(dɔ́ɔ̀tì),
+						'other' => q({0} dɔ́ɔ̀tì),
+					},
+					# Core Unit Identifier
+					'dot' => {
+						'name' => q(dɔ́ɔ̀tì),
+						'other' => q({0} dɔ́ɔ̀tì),
+					},
+					# Long Unit Identifier
+					'length-earth-radius' => {
+						'name' => q(ìdinwɔ̀n ayé),
+						'other' => q({0} ìdinwɔ̀n ayé),
+					},
+					# Core Unit Identifier
+					'earth-radius' => {
+						'name' => q(ìdinwɔ̀n ayé),
+						'other' => q({0} ìdinwɔ̀n ayé),
+					},
+					# Long Unit Identifier
+					'light-candela' => {
+						'name' => q(kandɛ́là),
+						'other' => q({0} kandɛ́là),
+					},
+					# Core Unit Identifier
+					'candela' => {
+						'name' => q(kandɛ́là),
+						'other' => q({0} kandɛ́là),
+					},
+					# Long Unit Identifier
+					'light-lumen' => {
+						'name' => q(lumɛ́ɛ̀nì),
+						'other' => q({0} lumɛ́ɛ̀nì),
+					},
+					# Core Unit Identifier
+					'lumen' => {
+						'name' => q(lumɛ́ɛ̀nì),
+						'other' => q({0} lumɛ́ɛ̀nì),
+					},
+					# Long Unit Identifier
+					'volume-dessert-spoon' => {
+						'name' => q(àmì shíbí oúnjɛ́ kékeré),
+						'other' => q({0} àmì shíbí oúnjɛ́ kékeré),
+					},
+					# Core Unit Identifier
+					'dessert-spoon' => {
+						'name' => q(àmì shíbí oúnjɛ́ kékeré),
+						'other' => q({0} àmì shíbí oúnjɛ́ kékeré),
+					},
+					# Long Unit Identifier
+					'volume-dessert-spoon-imperial' => {
+						'name' => q(shíbí oúnjɛ kékeré),
+						'other' => q({0} àmì oúnjɛ kékeré),
+					},
+					# Core Unit Identifier
+					'dessert-spoon-imperial' => {
+						'name' => q(shíbí oúnjɛ kékeré),
+						'other' => q({0} àmì oúnjɛ kékeré),
+					},
+					# Long Unit Identifier
+					'volume-drop' => {
+						'name' => q(dírɔ́pù),
+						'other' => q({0} dírɔ́pù),
+					},
+					# Core Unit Identifier
+					'drop' => {
+						'name' => q(dírɔ́pù),
+						'other' => q({0} dírɔ́pù),
+					},
+					# Long Unit Identifier
+					'volume-pinch' => {
+						'name' => q(píńshì),
+						'other' => q({0} píńshì),
+					},
+					# Core Unit Identifier
+					'pinch' => {
+						'name' => q(píńshì),
+						'other' => q({0} píńshì),
+					},
+				},
+				'narrow' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(ɔjɔ́),
+						'other' => q(ɔj {0}),
+					},
+					# Core Unit Identifier
+					'day' => {
+						'name' => q(ɔjɔ́),
+						'other' => q(ɔj {0}),
+					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(ìsh),
+						'other' => q({0}/ìsh),
+					},
+					# Core Unit Identifier
+					'minute' => {
+						'name' => q(ìsh),
+						'other' => q({0}/ìsh),
+					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(oshù),
+						'other' => q({0} oshù),
+					},
+					# Core Unit Identifier
+					'month' => {
+						'name' => q(oshù),
+						'other' => q({0} oshù),
+					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(ìsh àáy),
+						'other' => q({0} ìsh àáy),
+					},
+					# Core Unit Identifier
+					'second' => {
+						'name' => q(ìsh àáy),
+						'other' => q({0} ìsh àáy),
+					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(ɔshɛ́),
+						'other' => q({0} ɔsh),
+					},
+					# Core Unit Identifier
+					'week' => {
+						'name' => q(ɔshɛ́),
+						'other' => q({0} ɔsh),
+					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(ɔd),
+						'other' => q({0} ɔd),
+					},
+					# Core Unit Identifier
+					'year' => {
+						'name' => q(ɔd),
+						'other' => q({0} ɔd),
+					},
+					# Long Unit Identifier
+					'light-lumen' => {
+						'other' => q({0} Lúmɛ́nì),
+					},
+					# Core Unit Identifier
+					'lumen' => {
+						'other' => q({0} Lúmɛ́nì),
+					},
+				},
+				'short' => {
+					# Long Unit Identifier
+					'concentr-permille' => {
+						'name' => q(ìdákan nínú ɛgbɛ̀rún),
+					},
+					# Core Unit Identifier
+					'permille' => {
+						'name' => q(ìdákan nínú ɛgbɛ̀rún),
+					},
+					# Long Unit Identifier
+					'digital-megabit' => {
+						'name' => q(ɛ́mbíìtì),
+						'other' => q({0} ɛ́mbiì),
+					},
+					# Core Unit Identifier
+					'megabit' => {
+						'name' => q(ɛ́mbíìtì),
+						'other' => q({0} ɛ́mbiì),
+					},
+					# Long Unit Identifier
+					'digital-megabyte' => {
+						'name' => q(ɛ́mbáìtì),
+					},
+					# Core Unit Identifier
+					'megabyte' => {
+						'name' => q(ɛ́mbáìtì),
+					},
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(ɔjɔ́),
+						'other' => q({0} ɔj),
+						'per' => q({0}/ɔj),
+					},
+					# Core Unit Identifier
+					'day' => {
+						'name' => q(ɔjɔ́),
+						'other' => q({0} ɔj),
+						'per' => q({0}/ɔj),
+					},
+					# Long Unit Identifier
+					'duration-decade' => {
+						'name' => q(ɛ̀wádùn),
+						'other' => q(ɛ̀wádún {0}),
+					},
+					# Core Unit Identifier
+					'decade' => {
+						'name' => q(ɛ̀wádùn),
+						'other' => q(ɛ̀wádún {0}),
+					},
+					# Long Unit Identifier
+					'duration-minute' => {
+						'name' => q(ìsh),
+						'other' => q({0} ìsh),
+						'per' => q({0}/ìsh),
+					},
+					# Core Unit Identifier
+					'minute' => {
+						'name' => q(ìsh),
+						'other' => q({0} ìsh),
+						'per' => q({0}/ìsh),
+					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(oshù),
+						'other' => q({0} oshù),
+						'per' => q({0}/oshù),
+					},
+					# Core Unit Identifier
+					'month' => {
+						'name' => q(oshù),
+						'other' => q({0} oshù),
+						'per' => q({0}/oshù),
+					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'name' => q(ìsh àáy),
+						'other' => q({0} ìsh àáy),
+						'per' => q({0} ìsh àáy),
+					},
+					# Core Unit Identifier
+					'second' => {
+						'name' => q(ìsh àáy),
+						'other' => q({0} ìsh àáy),
+						'per' => q({0} ìsh àáy),
+					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(ɔsh),
+						'other' => q({0} ɔsh),
+						'per' => q({0}/ɔshɛ̀),
+					},
+					# Core Unit Identifier
+					'week' => {
+						'name' => q(ɔsh),
+						'other' => q({0} ɔsh),
+						'per' => q({0}/ɔshɛ̀),
+					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(ɔd),
+						'other' => q({0} ɔd),
+						'per' => q({0}/ɔd),
+					},
+					# Core Unit Identifier
+					'year' => {
+						'name' => q(ɔd),
+						'other' => q({0} ɔd),
+						'per' => q({0}/ɔd),
+					},
+					# Long Unit Identifier
+					'graphics-dot' => {
+						'name' => q(dɔ́ɔ̀tì),
+						'other' => q({0} dɔ́ɔ̀tì),
+					},
+					# Core Unit Identifier
+					'dot' => {
+						'name' => q(dɔ́ɔ̀tì),
+						'other' => q({0} dɔ́ɔ̀tì),
+					},
+					# Long Unit Identifier
+					'length-earth-radius' => {
+						'name' => q(àmì ìdínwɔ̀n ayé),
+						'other' => q({0} àmì ìdínwɔ̀n ayé),
+					},
+					# Core Unit Identifier
+					'earth-radius' => {
+						'name' => q(àmì ìdínwɔ̀n ayé),
+						'other' => q({0} àmì ìdínwɔ̀n ayé),
+					},
+					# Long Unit Identifier
+					'light-lumen' => {
+						'name' => q(àmì lumɛ́ɛ̀nì),
+						'other' => q({0} Lúmɛ́nì),
+					},
+					# Core Unit Identifier
+					'lumen' => {
+						'name' => q(àmì lumɛ́ɛ̀nì),
+						'other' => q({0} Lúmɛ́nì),
+					},
+					# Long Unit Identifier
+					'volume-dessert-spoon' => {
+						'name' => q(shíbí oúnjɛ́ kékeré),
+						'other' => q({0} shíbí oúnjɛ́ kékeré),
+					},
+					# Core Unit Identifier
+					'dessert-spoon' => {
+						'name' => q(shíbí oúnjɛ́ kékeré),
+						'other' => q({0} shíbí oúnjɛ́ kékeré),
+					},
+					# Long Unit Identifier
+					'volume-dessert-spoon-imperial' => {
+						'name' => q(àmì oúnjɛ kékeré),
+						'other' => q({0} àmì oúnjɛ kékeré),
+					},
+					# Core Unit Identifier
+					'dessert-spoon-imperial' => {
+						'name' => q(àmì oúnjɛ kékeré),
+						'other' => q({0} àmì oúnjɛ kékeré),
+					},
+					# Long Unit Identifier
+					'volume-drop' => {
+						'name' => q(dírɔ́pù),
+						'other' => q({0} dírɔ́pù),
+					},
+					# Core Unit Identifier
+					'drop' => {
+						'name' => q(dírɔ́pù),
+						'other' => q({0} dírɔ́pù),
+					},
+					# Long Unit Identifier
+					'volume-pinch' => {
+						'name' => q(píńshì),
+						'other' => q({0} píńshì),
+					},
+					# Core Unit Identifier
+					'pinch' => {
+						'name' => q(píńshì),
+						'other' => q({0} píńshì),
+					},
+				},
+			} }
+);
+
 has 'yesstr' => (
 	is			=> 'ro',
 	isa			=> RegexpRef,
@@ -316,6 +1003,54 @@ has 'nostr' => (
 	default		=> sub { qr'^(?i:Bɛ́ɛ̀kɔ́|K)$' }
 );
 
+has 'number_formats' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		decimalFormat => {
+			'long' => {
+				'1000' => {
+					'other' => '0 ɛgbɛ̀rún',
+				},
+				'10000' => {
+					'other' => '00 ɛgbɛ̀rún',
+				},
+				'100000' => {
+					'other' => '000 ɛgbɛ̀rún',
+				},
+				'1000000' => {
+					'other' => '0 mílíɔ̀nù',
+				},
+				'10000000' => {
+					'other' => '00 mílíɔ̀nù',
+				},
+				'100000000' => {
+					'other' => '000 mílíɔ̀nù',
+				},
+				'1000000000' => {
+					'other' => '0 bilíɔ̀nù',
+				},
+				'10000000000' => {
+					'other' => '00 bilíɔ̀nù',
+				},
+				'100000000000' => {
+					'other' => '000 bilíɔ̀nù',
+				},
+				'1000000000000' => {
+					'other' => '0 tiriliɔ̀nù',
+				},
+				'10000000000000' => {
+					'other' => '00 tiriliɔ̀nù',
+				},
+				'100000000000000' => {
+					'other' => '000 tiriliɔ̀nù',
+				},
+			},
+		},
+} },
+);
+
 has 'currencies' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -326,14 +1061,63 @@ has 'currencies' => (
 				'currency' => q(Diami ti Awon Orílɛ́ède Arabu),
 			},
 		},
+		'ALL' => {
+			display_name => {
+				'currency' => q(Lɛ́ɛ̀kì Àlìbáníà),
+				'other' => q(lɛ́kè Àlìbéníà),
+			},
+		},
+		'AMD' => {
+			display_name => {
+				'currency' => q(Dírààmù Àmɛ́níà),
+			},
+		},
+		'ANG' => {
+			display_name => {
+				'other' => q(àwɔn gílídà Netherlands Antillean),
+			},
+		},
 		'AOA' => {
 			display_name => {
-				'currency' => q(Wansa ti Orílɛ́ède Àngólà),
+				'other' => q(àwɔn kíwánsà Angola),
+			},
+		},
+		'ARS' => {
+			display_name => {
+				'currency' => q(Pɛ́sò Agɛntínà),
+				'other' => q(àwɔn pɛ́sò Agɛntínà),
 			},
 		},
 		'AUD' => {
 			display_name => {
 				'currency' => q(Dɔla ti Orílɛ́ède Ástràlìá),
+			},
+		},
+		'AWG' => {
+			display_name => {
+				'other' => q(àwɔn fuloríìnì Àrúbà),
+			},
+		},
+		'BAM' => {
+			display_name => {
+				'other' => q(àwɔn àmi Yíyípadà Bosnia-Herzegovina),
+			},
+		},
+		'BBD' => {
+			display_name => {
+				'currency' => q(Dɔ́là Bábádɔ̀ɔ̀sì),
+				'other' => q(àwɔn dɔ́là Bábádɔ̀ɔ̀sì),
+			},
+		},
+		'BDT' => {
+			display_name => {
+				'currency' => q(Tákà Báńgíládɛ̀ɛ̀shì),
+			},
+		},
+		'BGN' => {
+			display_name => {
+				'currency' => q(Owó Lɛ́fì Bɔ̀lìgéríà),
+				'other' => q(Lɛ́fà Bɔ̀lìgéríà),
 			},
 		},
 		'BHD' => {
@@ -343,27 +1127,76 @@ has 'currencies' => (
 		},
 		'BIF' => {
 			display_name => {
-				'currency' => q(Faransi ti Orílɛ́ède Bùùrúndì),
+				'other' => q(àwɔn faransi Bùùrúndì),
+			},
+		},
+		'BMD' => {
+			display_name => {
+				'currency' => q(Dɔ́là Bɛ̀múdà),
+				'other' => q(àwɔ́n dɔ́là Bɛ̀múdà),
+			},
+		},
+		'BND' => {
+			display_name => {
+				'currency' => q(Dɔ́là Bùrùnéì),
+			},
+		},
+		'BOB' => {
+			display_name => {
+				'currency' => q(Bɔlifiánò Bɔ̀lífíà),
+				'other' => q(àwɔn bɔlifiánò Bɔ̀lífíà),
+			},
+		},
+		'BRL' => {
+			display_name => {
+				'currency' => q(Owó ti Orílɛ̀-èdè Brazil),
+				'other' => q(Awon owó ti Orílɛ̀-èdè Brazil),
+			},
+		},
+		'BSD' => {
+			display_name => {
+				'currency' => q(Dɔ́là Bàhámà),
+				'other' => q(àwɔn dɔ́là Bàhámà),
+			},
+		},
+		'BTN' => {
+			display_name => {
+				'currency' => q(Ìngɔ́tírɔ̀mù Bútàànì),
 			},
 		},
 		'BWP' => {
 			display_name => {
-				'currency' => q(Pula ti Orílɛ́ède Bɔ̀tìsúwánà),
+				'currency' => q(Pula Bɔ̀tìsúwánà),
+				'other' => q(àwɔn pula Bɔ̀tìsúwánà),
+			},
+		},
+		'BYN' => {
+			display_name => {
+				'currency' => q(Rɔ́bù Bɛ̀lárùùsì),
+				'other' => q(àwɔn rɔ́bù Bɛ̀lárùùsì),
+			},
+		},
+		'BZD' => {
+			display_name => {
+				'currency' => q(Dɔ́là Bɛ̀lísè),
+				'other' => q(àwɔn Dɔ́là Bɛ́lìsè),
 			},
 		},
 		'CAD' => {
 			display_name => {
-				'currency' => q(Dɔla ti Orílɛ́ède Kánádà),
+				'currency' => q(Dɔ́là Kánádà),
+				'other' => q(àwɔn dɔ́là Kánádà),
 			},
 		},
 		'CDF' => {
 			display_name => {
-				'currency' => q(Faransi ti Orílɛ́ède Kóngò),
+				'other' => q(àwɔn firanki Kongo),
 			},
 		},
-		'CHF' => {
+		'CLP' => {
 			display_name => {
-				'currency' => q(Faransi ti Orílɛ́ède Siwisi),
+				'currency' => q(Pɛ́sò Shílè),
+				'other' => q(àwɔn pɛ́sò Shílè),
 			},
 		},
 		'CNY' => {
@@ -371,39 +1204,98 @@ has 'currencies' => (
 				'currency' => q(Reminibi ti Orílɛ́ède sháínà),
 			},
 		},
+		'COP' => {
+			display_name => {
+				'currency' => q(Pɛ́sò Kòlóḿbíà),
+				'other' => q(àwɔn pɛ́sò Kòlóḿbíà),
+			},
+		},
+		'CRC' => {
+			display_name => {
+				'currency' => q(Kólɔ́ɔ̀nì Kosita Ríkà),
+				'other' => q(àwɔ́n kólɔ́ɔ̀nì Kosita Ríkà),
+			},
+		},
+		'CUC' => {
+			display_name => {
+				'currency' => q(Pɛ́sò Yíyípadà Kúbà),
+				'other' => q(àwɔn pɛ́sò yíyípadà Kúbà),
+			},
+		},
+		'CUP' => {
+			display_name => {
+				'currency' => q(Pɛ́sò Kúbà),
+			},
+		},
 		'CVE' => {
 			display_name => {
-				'currency' => q(Kabofediano ti Orílɛ́ède Esuodo),
+				'other' => q(àwɔn èsìkúdò Kapú Faadì),
+			},
+		},
+		'CZK' => {
+			display_name => {
+				'currency' => q(Koruna Shɛ́ɛ̀kì),
+				'other' => q(àwɔn koruna Shɛ́ɛ̀kì),
 			},
 		},
 		'DJF' => {
 			display_name => {
-				'currency' => q(Faransi ti Orílɛ́ède Dibouti),
+				'other' => q(àwɔn faransi Dibouti),
+			},
+		},
+		'DKK' => {
+			display_name => {
+				'currency' => q(Kírónì Dáníshì),
+				'other' => q(Kírònà Dáníìshì),
+			},
+		},
+		'DOP' => {
+			display_name => {
+				'currency' => q(Pɛ́sò Dòníníkà),
+				'other' => q(àwɔn pɛ́sò Dòníníkà),
 			},
 		},
 		'DZD' => {
 			display_name => {
 				'currency' => q(Dina ti Orílɛ́ède Àlùgèríánì),
+				'other' => q(àwɔn dínà Àlùgèríánì),
 			},
 		},
 		'EGP' => {
 			display_name => {
 				'currency' => q(pɔɔn ti Orílɛ́ède Egipiti),
+				'other' => q(àwɔn pɔ́n-ún Ejipítì),
 			},
 		},
 		'ERN' => {
 			display_name => {
-				'currency' => q(Nakifa ti Orílɛ́ède Eriteriani),
+				'other' => q(àwɔn nakifasì Eritira),
 			},
 		},
 		'ETB' => {
 			display_name => {
-				'currency' => q(Biri ti Orílɛ́ède Eutopia),
+				'other' => q(àwɔn báà Etópíà),
+			},
+		},
+		'FJD' => {
+			display_name => {
+				'currency' => q(Dɔ́là Fíjì),
+			},
+		},
+		'FKP' => {
+			display_name => {
+				'currency' => q(Pɔ́n-ùn Erékùsù Falkland),
+				'other' => q(àwɔn Pɔ́n-ùn Erékùsù Falkland [ Pɔ́n-ùn Erékùsù Falkland ] 1.23 Pɔ́n-ùn Erékùsù Falkland 0.00 pɔ́n-ùn Erékùsù Falkland),
 			},
 		},
 		'GBP' => {
 			display_name => {
-				'currency' => q(Pɔɔn ti Orílɛ́ède Bírítísì),
+				'currency' => q(Pɔ́n-ùn ti Orilɛ̀-èdè Gɛ̀ɛ́sì),
+			},
+		},
+		'GEL' => {
+			display_name => {
+				'currency' => q(Lárì Jɔ́jíà),
 			},
 		},
 		'GHC' => {
@@ -411,9 +1303,25 @@ has 'currencies' => (
 				'currency' => q(shidi ti Orílɛ́ède Gana),
 			},
 		},
+		'GHS' => {
+			display_name => {
+				'other' => q(àwɔn sídì Gana),
+			},
+		},
+		'GIP' => {
+			display_name => {
+				'currency' => q(Pɔ́n-ùn Gibúrátà),
+				'other' => q(àwɔn pɔ́n-ùn Gibúrátà),
+			},
+		},
 		'GMD' => {
 			display_name => {
-				'currency' => q(Dalasi ti Orílɛ́ède Gamibia),
+				'other' => q(àwɔn dalasi Gamibia),
+			},
+		},
+		'GNF' => {
+			display_name => {
+				'other' => q(àwɔn fírànkì Gínì),
 			},
 		},
 		'GNS' => {
@@ -421,9 +1329,71 @@ has 'currencies' => (
 				'currency' => q(Faransi ti Orílɛ́ède Gini),
 			},
 		},
+		'GTQ' => {
+			display_name => {
+				'currency' => q(Kúɛ́tísààlì Guatimílà),
+				'other' => q(àwɔn kúɛ́tísààlì Guatimílà),
+			},
+		},
+		'GYD' => {
+			display_name => {
+				'currency' => q(Dɔ́là Gùyánà),
+				'other' => q(àwɔn dɔ́là Gùyánà),
+			},
+		},
+		'HKD' => {
+			display_name => {
+				'currency' => q(Dɔ́là Hong Kong),
+			},
+		},
+		'HNL' => {
+			display_name => {
+				'currency' => q(Lɛmipírà Ɔ́ńdúrà),
+				'other' => q(àwɔn Lɛmipírà Ɔ́ńdúrà),
+			},
+		},
+		'HRK' => {
+			display_name => {
+				'currency' => q(Kúnà Kúróshíà),
+				'other' => q(àwɔn kúnà Kúróshíà),
+			},
+		},
+		'HTG' => {
+			display_name => {
+				'currency' => q(Gɔ́dì Àítì),
+				'other' => q(àwɔn gɔ́dì Àítì),
+			},
+		},
+		'HUF' => {
+			display_name => {
+				'currency' => q(Fɔ́ríǹtì Hɔ̀ngérí),
+				'other' => q(àwɔn fɔ́ríǹtì Hɔ̀ngérí),
+			},
+		},
+		'ILS' => {
+			display_name => {
+				'currency' => q(Shékélì Tuntun Ísírɛ̀ɛ̀lì),
+			},
+		},
 		'INR' => {
 			display_name => {
 				'currency' => q(Rupi ti Orílɛ́ède Indina),
+			},
+		},
+		'ISK' => {
+			display_name => {
+				'other' => q(kórónɔ̀ Áílándíìkì),
+			},
+		},
+		'JMD' => {
+			display_name => {
+				'currency' => q(Dɔ́là Jàmáíkà),
+				'other' => q(àwɔn dɔ́là Jàmáíkà),
+			},
+		},
+		'JOD' => {
+			display_name => {
+				'currency' => q(Dínárì Jɔ́dàànì),
 			},
 		},
 		'JPY' => {
@@ -433,37 +1403,77 @@ has 'currencies' => (
 		},
 		'KES' => {
 			display_name => {
-				'currency' => q(shiili ti Orílɛ́ède Kenya),
+				'currency' => q(Shiili Kenya),
+				'other' => q(àwɔ́n shiili Kenya),
+			},
+		},
+		'KHR' => {
+			display_name => {
+				'currency' => q(Ráyò Kàm̀bɔ́díà),
 			},
 		},
 		'KMF' => {
 			display_name => {
-				'currency' => q(Faransi ti Orílɛ́ède shomoriani),
+				'other' => q(àwɔn faransi Komori),
+			},
+		},
+		'KPW' => {
+			display_name => {
+				'currency' => q(Wɔ́ɔ̀nù Àríwá Kòríà),
+			},
+		},
+		'KRW' => {
+			display_name => {
+				'currency' => q(Wɔ́ɔ̀nù Gúúsù Kòríà),
+			},
+		},
+		'KYD' => {
+			display_name => {
+				'currency' => q(Dɔ́là Erékùsù Cayman),
+				'other' => q(àwɔn dɔ́là Erékùsù Cayman),
+			},
+		},
+		'KZT' => {
+			display_name => {
+				'currency' => q(Tɛngé Kasakísítàànì),
+			},
+		},
+		'LBP' => {
+			display_name => {
+				'currency' => q(Pɔ́n-ùn Lebanese),
 			},
 		},
 		'LRD' => {
 			display_name => {
-				'currency' => q(Dɔla ti Orílɛ́ède Liberia),
+				'currency' => q(Dɔla Liberia),
+				'other' => q(àwɔn dɔla Liberia),
 			},
 		},
 		'LSL' => {
 			display_name => {
 				'currency' => q(Loti ti Orílɛ́ède Lesoto),
+				'other' => q(Lótì ti Lɛ̀sótò),
 			},
 		},
 		'LYD' => {
 			display_name => {
-				'currency' => q(Dina ti Orílɛ́ède Libiya),
+				'other' => q(àwɔn dínà Líbíyà),
 			},
 		},
 		'MAD' => {
 			display_name => {
-				'currency' => q(Dirami ti Orílɛ́ède Moroko),
+				'other' => q(àwɔn dírámì Morokò),
 			},
 		},
 		'MGA' => {
 			display_name => {
-				'currency' => q(Faransi ti Orílɛ́ède Malagasi),
+				'other' => q(àwɔn faransi Malagasi),
+			},
+		},
+		'MKD' => {
+			display_name => {
+				'currency' => q(Dɛ́nà Masidóníà),
+				'other' => q(dɛ́nàrì Masidóníà),
 			},
 		},
 		'MRO' => {
@@ -478,12 +1488,28 @@ has 'currencies' => (
 		},
 		'MUR' => {
 			display_name => {
-				'currency' => q(Rupi ti Orílɛ́ède Maritiusi),
+				'other' => q(àwɔn rupi Maritusi),
+			},
+		},
+		'MVR' => {
+			display_name => {
+				'currency' => q(Rúfìyá Mɔ̀lìdífà),
 			},
 		},
 		'MWK' => {
 			display_name => {
-				'currency' => q(Kasha ti Orílɛ́ède Malawi),
+				'other' => q(àwɔn kásà Màláwì),
+			},
+		},
+		'MXN' => {
+			display_name => {
+				'currency' => q(Pɛ́sò Mɛ́síkò),
+				'other' => q(àwɔn pɛ́sò Mɛ́síkò),
+			},
+		},
+		'MYR' => {
+			display_name => {
+				'currency' => q(Ríngìtì Màléshíà),
 			},
 		},
 		'MZM' => {
@@ -491,19 +1517,75 @@ has 'currencies' => (
 				'currency' => q(Metika ti Orílɛ́ède Mosamibiki),
 			},
 		},
-		'NAD' => {
+		'MZN' => {
 			display_name => {
-				'currency' => q(Dɔla ti Orílɛ́ède Namibia),
+				'currency' => q(Mɛ́tíkààlì Mòsáḿbíìkì),
+				'other' => q(àwɔn mɛ́tíkààlì Mòsáḿbíìkì),
 			},
 		},
-		'NGN' => {
+		'NAD' => {
 			display_name => {
-				'currency' => q(Naira ti Orílɛ́ède Nàìjíríà),
+				'currency' => q(Dɔla Namibíà),
+				'other' => q(àwɔn dɔla Namibíà),
+			},
+		},
+		'NIO' => {
+			display_name => {
+				'currency' => q(Kɔ̀dóbà Naikarágúà),
+				'other' => q(àwɔn kɔ̀dóbà Naikarágúà),
+			},
+		},
+		'NOK' => {
+			display_name => {
+				'currency' => q(kórónì Nɔ́wè),
+				'other' => q(kórónà Nɔ́wè),
+			},
+		},
+		'NPR' => {
+			display_name => {
+				'currency' => q(Rúpìì Nɛ̵́pààlì),
+			},
+		},
+		'NZD' => {
+			display_name => {
+				'currency' => q(Dɔ́là New Zealand),
+			},
+		},
+		'PAB' => {
+			display_name => {
+				'other' => q(àwɔn bálíbóà Pànámà),
+			},
+		},
+		'PEN' => {
+			display_name => {
+				'other' => q(àwɔn sólì Pèrúù),
+			},
+		},
+		'PLN' => {
+			display_name => {
+				'currency' => q(Sílɔ̀tì Pɔ́líshì),
+				'other' => q(àwɔn sílɔ̀tì Pɔ́líshì),
+			},
+		},
+		'PYG' => {
+			display_name => {
+				'other' => q(àwɔn gúáránì Párágúwè),
+			},
+		},
+		'RSD' => {
+			display_name => {
+				'other' => q(àwɔn dínárì Sàbíà),
+			},
+		},
+		'RUB' => {
+			display_name => {
+				'currency' => q(Owó ruble ti ilɛ̀ Rɔ́shíà),
+				'other' => q(Owó ruble ti ilɛ̀ Rɔ́shíà),
 			},
 		},
 		'RWF' => {
 			display_name => {
-				'currency' => q(Faransi ti Orílɛ́ède Ruwanda),
+				'other' => q(àwɔn faransi Ruwanda),
 			},
 		},
 		'SAR' => {
@@ -511,14 +1593,20 @@ has 'currencies' => (
 				'currency' => q(Riya ti Orílɛ́ède Saudi),
 			},
 		},
+		'SBD' => {
+			display_name => {
+				'currency' => q(Dɔ́là Erékùsù Sɔ́lómɔ́nì),
+			},
+		},
 		'SCR' => {
 			display_name => {
-				'currency' => q(Rupi ti Orílɛ́ède Sayiselesi),
+				'other' => q(àwɔ́n rúpì Sayiselesi),
 			},
 		},
 		'SDG' => {
 			display_name => {
-				'currency' => q(Dina ti Orílɛ́ède Sudani),
+				'currency' => q(Pɔ́n-ùn Sùdáànì),
+				'other' => q(àwɔn pɔ́n-ùn Sùdáànì),
 			},
 		},
 		'SDP' => {
@@ -526,14 +1614,43 @@ has 'currencies' => (
 				'currency' => q(Pɔɔun ti Orílɛ́ède Sudani),
 			},
 		},
+		'SEK' => {
+			display_name => {
+				'other' => q(Kòrónɔ̀ Súwídìn),
+			},
+		},
+		'SGD' => {
+			display_name => {
+				'currency' => q(Dɔ́là Síngápɔ̀),
+			},
+		},
 		'SHP' => {
 			display_name => {
-				'currency' => q(Pɔɔun ti Orílɛ́ède ̣Elena),
+				'currency' => q(Pɔ́n-un Elena),
+				'other' => q(àwɔn pɔ́n-un Elena),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'other' => q(àwɔn líónì Sira Líonì),
 			},
 		},
 		'SOS' => {
 			display_name => {
-				'currency' => q(Sile ti Orílɛ́ède Somali),
+				'currency' => q(Shílè Somali),
+				'other' => q(àwɔ́n shílè Somali),
+			},
+		},
+		'SRD' => {
+			display_name => {
+				'currency' => q(Dɔ́là Súrínámì),
+				'other' => q(àwɔn Dɔ́là Súrínámì),
+			},
+		},
+		'SSP' => {
+			display_name => {
+				'currency' => q(Pɔ́n-un Gúúsù Sùdáànì),
+				'other' => q(àwɔn pɔ́n-un Gúúsù Sùdáànì),
 			},
 		},
 		'STD' => {
@@ -543,42 +1660,106 @@ has 'currencies' => (
 		},
 		'STN' => {
 			display_name => {
-				'currency' => q(Dobira ti Orílɛ́ède Sao tome Ati Pirisipe),
+				'currency' => q(Dɔbíra Sao tome àti Pirisipi),
+			},
+		},
+		'SYP' => {
+			display_name => {
+				'currency' => q(Pɔ́n-ùn Sírìà),
+			},
+		},
+		'TMT' => {
+			display_name => {
+				'currency' => q(Mánààtì Tɔkimɛnístàànì),
 			},
 		},
 		'TND' => {
 			display_name => {
-				'currency' => q(Dina ti Orílɛ́ède Tunisia),
+				'currency' => q(Dínà Tunishíà),
+				'other' => q(àwɔn dínà Tunishíà),
+			},
+		},
+		'TRY' => {
+			display_name => {
+				'currency' => q(Lírà Tɔ́kì),
+			},
+		},
+		'TTD' => {
+			display_name => {
+				'currency' => q(Dɔ́là Trinidad & Tobago),
+				'other' => q(àwɔn dɔ́là Trinidad àti Tobago),
+			},
+		},
+		'TWD' => {
+			display_name => {
+				'currency' => q(Dɔ́là Tàìwánì Tuntun),
 			},
 		},
 		'TZS' => {
 			display_name => {
-				'currency' => q(Sile ti Orílɛ́ède Tansania),
+				'other' => q(àwɔn shile Tansania),
+			},
+		},
+		'UAH' => {
+			display_name => {
+				'currency' => q(Ɔrifiníyà Yukiréníà),
 			},
 		},
 		'UGX' => {
 			display_name => {
-				'currency' => q(Siile ti Orílɛ́ède Uganda),
+				'currency' => q(Shile Uganda),
+				'other' => q(àwɔn shile Uganda),
 			},
 		},
 		'USD' => {
 			display_name => {
-				'currency' => q(Dɔla ti Orílɛ́ède Amerika),
+				'currency' => q(Dɔ́là),
+				'other' => q(Dɔ́là ti Orílɛ̀-Èdè Amɛ́ríkà),
+			},
+		},
+		'UYU' => {
+			display_name => {
+				'currency' => q(Pɛ́sò Úrúgúwè),
+				'other' => q(àwɔn pɛ́sò Úrúgúwè),
+			},
+		},
+		'UZS' => {
+			display_name => {
+				'currency' => q(Sómú Usibɛkísítàànì),
+			},
+		},
+		'VES' => {
+			display_name => {
+				'currency' => q(Bɔ̀lífà Fɛnɛsuɛ́là),
+				'other' => q(àwɔn bɔ̀lífà Fɛnɛsuɛ́là),
 			},
 		},
 		'XAF' => {
 			display_name => {
-				'currency' => q(Faransi ti Orílɛ́ède BEKA),
+				'other' => q(àwɔn firanki àárín Afíríkà),
+			},
+		},
+		'XCD' => {
+			display_name => {
+				'currency' => q(Dɔ́là Ilà Oòrùn Karíbíà),
+				'other' => q(àwɔn dɔ́là Ilà Oòrùn Karíbíà),
 			},
 		},
 		'XOF' => {
 			display_name => {
-				'currency' => q(Faransi ti Orílɛ́ède BIKEAO),
+				'currency' => q(Faransì ìwɔ̀-oorùn Afíríkà),
+				'other' => q(àwɔn faransì ìwɔ̀-oorùn Afíríkà),
 			},
 		},
-		'ZAR' => {
+		'XXX' => {
 			display_name => {
-				'currency' => q(Randi ti Orílɛ́ède Ariwa Afirika),
+				'currency' => q(owóníná àìmɔ̀),
+				'other' => q(owóníná àìmɔ̀),
+			},
+		},
+		'YER' => {
+			display_name => {
+				'currency' => q(Ráyò Yɛ́mɛ̀nì),
 			},
 		},
 		'ZMK' => {
@@ -588,7 +1769,7 @@ has 'currencies' => (
 		},
 		'ZMW' => {
 			display_name => {
-				'currency' => q(Kawasha ti Orílɛ́ède Saabia),
+				'other' => q(àwɔn kàwasà Sámbíà),
 			},
 		},
 		'ZWD' => {
@@ -609,18 +1790,37 @@ has 'calendar_months' => (
 				'format' => {
 					abbreviated => {
 						nonleap => [
-							'Shɛ́rɛ́',
-							'Èrèlè',
-							'Ɛrɛ̀nà',
-							'Ìgbé',
-							'Ɛ̀bibi',
-							'Òkúdu',
-							'Agɛmɔ',
-							'Ògún',
-							'Owewe',
-							'Ɔ̀wàrà',
-							'Bélú',
-							'Ɔ̀pɛ̀'
+							'Shɛ́r',
+							'Èrèl',
+							'Ɛrɛ̀n',
+							'Ìgb',
+							'Ɛ̀bi',
+							'Òkú',
+							'Agɛ',
+							'Ògú',
+							'Owe',
+							'Ɔ̀wà',
+							'Bél',
+							'Ɔ̀pɛ'
+						],
+						leap => [
+							
+						],
+					},
+					narrow => {
+						nonleap => [
+							'S',
+							'È',
+							'Ɛ',
+							'Ì',
+							'Ɛ̀',
+							'Ò',
+							'A',
+							'Ò',
+							'O',
+							'Ɔ̀',
+							'B',
+							'Ɔ̀'
 						],
 						leap => [
 							
@@ -649,6 +1849,44 @@ has 'calendar_months' => (
 				'stand-alone' => {
 					abbreviated => {
 						nonleap => [
+							'Shɛ́',
+							'Èr',
+							'Ɛr',
+							'Ìg',
+							'Ɛ̀b',
+							'Òk',
+							'Ag',
+							'Òg',
+							'Ow',
+							'Ɔ̀w',
+							'Bé',
+							'Ɔ̀p'
+						],
+						leap => [
+							
+						],
+					},
+					narrow => {
+						nonleap => [
+							'S',
+							'È',
+							'Ɛ',
+							'Ì',
+							'Ɛ̀',
+							'Ò',
+							'A',
+							'Ò',
+							'O',
+							'Ɔ̀',
+							'B',
+							'Ɔ̀'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
 							'Shɛ́rɛ́',
 							'Èrèlè',
 							'Ɛrɛ̀nà',
@@ -661,25 +1899,6 @@ has 'calendar_months' => (
 							'Ɔ̀wàrà',
 							'Bélú',
 							'Ɔ̀pɛ̀'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'Oshù Shɛ́rɛ́',
-							'Oshù Èrèlè',
-							'Oshù Ɛrɛ̀nà',
-							'Oshù Ìgbé',
-							'Oshù Ɛ̀bibi',
-							'Oshù Òkúdu',
-							'Oshù Agɛmɔ',
-							'Oshù Ògún',
-							'Oshù Owewe',
-							'Oshù Ɔ̀wàrà',
-							'Oshù Bélú',
-							'Oshù Ɔ̀pɛ̀'
 						],
 						leap => [
 							
@@ -698,22 +1917,22 @@ has 'calendar_days' => (
 			'gregorian' => {
 				'format' => {
 					abbreviated => {
-						mon => 'Ajé',
-						tue => 'Ìsɛ́gun',
-						wed => 'Ɔjɔ́rú',
-						thu => 'Ɔjɔ́bɔ',
-						fri => 'Ɛtì',
-						sat => 'Àbámɛ́ta',
-						sun => 'Àìkú'
+						mon => 'Aj',
+						tue => 'Ìsɛ́g',
+						wed => 'Ɔjɔ́r',
+						thu => 'Ɔjɔ́b',
+						fri => 'Ɛt',
+						sat => 'Àbám',
+						sun => 'Àìk'
 					},
-					short => {
-						mon => 'Ajé',
-						tue => 'Ìsɛ́gun',
-						wed => 'Ɔjɔ́rú',
-						thu => 'Ɔjɔ́bɔ',
-						fri => 'Ɛtì',
-						sat => 'Àbámɛ́ta',
-						sun => 'Àìkú'
+					narrow => {
+						mon => 'A',
+						tue => 'Ì',
+						wed => 'Ɔ',
+						thu => 'Ɔ',
+						fri => 'Ɛ',
+						sat => 'À',
+						sun => 'À'
 					},
 					wide => {
 						mon => 'Ɔjɔ́ Ajé',
@@ -726,32 +1945,23 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'Ajé',
-						tue => 'Ìsɛ́gun',
-						wed => 'Ɔjɔ́rú',
-						thu => 'Ɔjɔ́bɔ',
-						fri => 'Ɛtì',
-						sat => 'Àbámɛ́ta',
-						sun => 'Àìkú'
-					},
-					short => {
-						mon => 'Ajé',
-						tue => 'Ìsɛ́gun',
-						wed => 'Ɔjɔ́rú',
-						thu => 'Ɔjɔ́bɔ',
-						fri => 'Ɛtì',
-						sat => 'Àbámɛ́ta',
-						sun => 'Àìkú'
+					narrow => {
+						mon => 'A',
+						tue => 'Ì',
+						wed => 'Ɔ',
+						thu => 'Ɔ',
+						fri => 'Ɛ',
+						sat => 'À',
+						sun => 'À'
 					},
 					wide => {
-						mon => 'Ɔjɔ́ Ajé',
-						tue => 'Ɔjɔ́ Ìsɛ́gun',
+						mon => 'Ajé',
+						tue => 'Ìsɛ́gun',
 						wed => 'Ɔjɔ́rú',
 						thu => 'Ɔjɔ́bɔ',
-						fri => 'Ɔjɔ́ Ɛtì',
-						sat => 'Ɔjɔ́ Àbámɛ́ta',
-						sun => 'Ɔjɔ́ Àìkú'
+						fri => 'Ɛtì',
+						sat => 'Àbámɛ́ta',
+						sun => 'Àìkú'
 					},
 				},
 			},
@@ -765,17 +1975,24 @@ has 'calendar_quarters' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					wide => {0 => 'Kɔ́tà Kínní',
-						1 => 'Kɔ́tà Kejì',
-						2 => 'Kɔ́à Keta',
-						3 => 'Kɔ́tà Kɛrin'
+					narrow => {0 => 'kíní',
+						1 => 'Kejì',
+						2 => 'Kɛta',
+						3 => 'Kɛin'
+					},
+					wide => {0 => 'Ìdámɛ́rin kíní',
+						1 => 'Ìdámɛ́rin Kejì',
+						2 => 'Ìdámɛ́rin Kɛta',
+						3 => 'Ìdámɛ́rin Kɛrin'
 					},
 				},
 				'stand-alone' => {
-					wide => {0 => 'Kɔ́tà Kínní',
-						1 => 'Kɔ́tà Kejì',
-						2 => 'Kɔ́à Keta',
-						3 => 'Kɔ́tà Kɛrin'
+					narrow => {0 => 'kí',
+						1 => 'Ke',
+						2 => 'Kɛt',
+						3 => 'Kɛr'
+					},
+					wide => {2 => 'Ìdámɛ́rin Kɛta'
 					},
 				},
 			},
@@ -884,6 +2101,327 @@ has 'datetime_formats_interval' => (
 	} },
 );
 
+has 'time_zone_names' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default	=> sub { {
+		regionFormat => q({0} Àkókò ojúmɔmɔ),
+		'Africa_Western' => {
+			long => {
+				'daylight' => q#Àkókò Ìwɔ̀-Oòrùn Ooru Afírikà#,
+				'generic' => q#Àkókò Ìwɔ̀-Oòrùn Afírikà#,
+				'standard' => q#Àkókò Ìwɔ̀-Oòrùn Àfɛnukò Afírikà#,
+			},
+		},
+		'Alaska' => {
+			long => {
+				'daylight' => q#Àkókò Ìyálɛ̀ta Alásíkà#,
+				'generic' => q#Àkókò Alásíkà#,
+				'standard' => q#Àkókò Àfɛnukò Alásíkà#,
+			},
+		},
+		'Amazon' => {
+			long => {
+				'daylight' => q#Àkókò Oru Amásɔ́nì#,
+				'generic' => q#Àkókò Amásɔ́nì#,
+				'standard' => q#Àkókò Afɛnukò Amásɔ́nì#,
+			},
+		},
+		'America/Anchorage' => {
+			exemplarCity => q#ìlú Ankɔ́réèjì#,
+		},
+		'America/Bahia_Banderas' => {
+			exemplarCity => q#ìlú Báhì Bándɛ́rásì#,
+		},
+		'America/Barbados' => {
+			exemplarCity => q#ìlú Bábádɔ́ɔ̀sì#,
+		},
+		'America/Belize' => {
+			exemplarCity => q#ìlú Bɛ̀líìsì#,
+		},
+		'America/Blanc-Sablon' => {
+			exemplarCity => q#ìlú Blank Sabulɔ́ɔ̀nì#,
+		},
+		'America/Boise' => {
+			exemplarCity => q#ìlú Bɔ́isè#,
+		},
+		'America/Chihuahua' => {
+			exemplarCity => q#ìlú Shihuahua#,
+		},
+		'America/Coral_Harbour' => {
+			exemplarCity => q#ìlú àtikɔkàn#,
+		},
+		'America/Creston' => {
+			exemplarCity => q#ìlú Kírɛstɔ́ɔ̀nù#,
+		},
+		'America/Curacao' => {
+			exemplarCity => q#ìlú Kurashao#,
+		},
+		'America/Indiana/Knox' => {
+			exemplarCity => q#ìlú nɔ́sì#,
+		},
+		'America/Indiana/Marengo' => {
+			exemplarCity => q#ìlú Marɛ́ngo#,
+		},
+		'America/Kentucky/Monticello' => {
+			exemplarCity => q#ìlú Montisɛ́lò#,
+		},
+		'America/Kralendijk' => {
+			exemplarCity => q#ìlú Kíralɛ́ndáikì#,
+		},
+		'America/Marigot' => {
+			exemplarCity => q#ìlú Marigɔ́ɔ̀tì#,
+		},
+		'America/Mexico_City' => {
+			exemplarCity => q#ìlú Mɛ́síkò#,
+		},
+		'America/Miquelon' => {
+			exemplarCity => q#ìlú Mikulɔ́nì#,
+		},
+		'America/St_Johns' => {
+			exemplarCity => q#ìlú St Jɔ́ɔ̀nù#,
+		},
+		'America/St_Thomas' => {
+			exemplarCity => q#ìlú St Tɔ́màsì#,
+		},
+		'America/Swift_Current' => {
+			exemplarCity => q#ìlú Súfítù Kɔ̀rentì#,
+		},
+		'America_Central' => {
+			long => {
+				'daylight' => q#Akókò àárín gbùngbùn ojúmɔmɔ#,
+				'generic' => q#àkókò àárín gbùngbùn#,
+				'standard' => q#àkókò asiko àárín gbùngbùn#,
+			},
+		},
+		'America_Eastern' => {
+			long => {
+				'daylight' => q#Àkókò ojúmɔmɔ Ìhà Ìlà Oòrun#,
+				'generic' => q#Àkókò ìhà ìlà oòrùn#,
+				'standard' => q#Akókò Àsikò Ìha Ìla Oòrùn#,
+			},
+		},
+		'America_Mountain' => {
+			long => {
+				'daylight' => q#Àkókò ojúmɔmɔ Ori-òkè#,
+				'generic' => q#Àkókò òkè#,
+				'standard' => q#Àkókò asiko òkè#,
+			},
+		},
+		'America_Pacific' => {
+			long => {
+				'daylight' => q#Àkókò Ìyálɛta Pàsífíìkì#,
+				'generic' => q#Àkókò Pàsífíìkì#,
+				'standard' => q#Àkókò àsikò Pàsífíìkì#,
+			},
+		},
+		'Argentina' => {
+			long => {
+				'daylight' => q#Aago Soma Argentina#,
+				'generic' => q#Aago Ajɛntìnà#,
+				'standard' => q#Aago àsìkò Argentina#,
+			},
+		},
+		'Argentina_Western' => {
+			long => {
+				'daylight' => q#Àkókò Oru Iwɔ́-oòrùn Ajɛ́ntínà#,
+				'generic' => q#Àkókò Iwɔ́-oòrùn Ajɛ́ntínà#,
+				'standard' => q#Àkókò Iwɔ́-oòrùn Àfɛnukò Ajɛ́ntínà#,
+			},
+		},
+		'Atlantic' => {
+			long => {
+				'daylight' => q#Àkókò Ìyálɛta Àtìláńtíìkì#,
+				'generic' => q#Àkókò Àtìláńtíìkì#,
+				'standard' => q#Àkókò àsikò Àtìláńtíìkì#,
+			},
+		},
+		'Atlantic/Bermuda' => {
+			exemplarCity => q#ìlú Bɛ̀múdà#,
+		},
+		'Azores' => {
+			long => {
+				'daylight' => q#Àkókò Ooru Ásɔ́sì#,
+				'generic' => q#Àkókò Ásɔ́sì#,
+				'standard' => q#Àkókò Àfɛnukò Ásɔ́sì#,
+			},
+		},
+		'Cape_Verde' => {
+			long => {
+				'daylight' => q#Àkókò Sɔ́mà Képú Fáàdì#,
+				'generic' => q#Àkókò Képú Fáàdì#,
+				'standard' => q#Àkókò Àfɛnukò Képú Fáàdì#,
+			},
+		},
+		'Chile' => {
+			long => {
+				'daylight' => q#Àkókò Oru Shílè#,
+				'generic' => q#Àkókò Shílè#,
+				'standard' => q#Àkókò Àfɛnukò Shílè#,
+			},
+		},
+		'China' => {
+			long => {
+				'daylight' => q#Àkókò Ojúmɔmɔ Sháínà#,
+				'generic' => q#Àkókò Sháínà#,
+				'standard' => q#Àkókò Ìfɛnukòsí Sháínà#,
+			},
+		},
+		'Cuba' => {
+			long => {
+				'daylight' => q#Àkókò Ojúmɔmɔ Kúbà#,
+				'generic' => q#Àkókò Kúbà#,
+				'standard' => q#Àkókò Àfɛnukò Kúbà#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#Àpapɔ̀ Àkókò Àgbáyé#,
+			},
+		},
+		'Etc/Unknown' => {
+			exemplarCity => q#Ìlú Àìmɔ̀#,
+		},
+		'Europe_Central' => {
+			long => {
+				'daylight' => q#Àkókò Àárin Sɔmà Europe#,
+				'generic' => q#Àkókò Àárin Europe#,
+				'standard' => q#Àkókò Àárin àsikò Europe#,
+			},
+		},
+		'Europe_Eastern' => {
+			long => {
+				'daylight' => q#Àkókò Sɔmà Ìha Ìlà Oòrùn Europe#,
+				'generic' => q#Àkókò Ìhà Ìlà Oòrùn Europe#,
+				'standard' => q#Àkókò àsikò Ìhà Ìlà Oòrùn Europe#,
+			},
+		},
+		'Europe_Western' => {
+			long => {
+				'daylight' => q#Àkókò Sɔmà Ìhà Ìwɔ Oòrùn Europe#,
+				'generic' => q#Àkókò Ìwɔ Oòrùn Europe#,
+				'standard' => q#Àkókò àsikò Ìwɔ Oòrùn Europe#,
+			},
+		},
+		'Falkland' => {
+			long => {
+				'daylight' => q#Àkókò Ooru Etíkun Fókílándì#,
+				'generic' => q#Àkókò Fókílándì#,
+				'standard' => q#Àkókò Àfɛnukò Etíkun Fókílándì#,
+			},
+		},
+		'Greenland_Eastern' => {
+			long => {
+				'daylight' => q#Àkókò ìgbà Ooru Greenland#,
+				'generic' => q#Àkókò Ìlà oorùn Greenland#,
+				'standard' => q#Àkókò Ìwɔ̀ Ìfɛnukò oorùn Greenland#,
+			},
+		},
+		'Greenland_Western' => {
+			long => {
+				'daylight' => q#Àkókò Àfɛnukò Ìgba Oòru Greenland#,
+				'generic' => q#Àkókò Ìwɔ̀ oorùn Greenland#,
+				'standard' => q#Àkókò Àfɛnukò Ìwɔ̀ Oòrùn Greenland#,
+			},
+		},
+		'Hawaii_Aleutian' => {
+			long => {
+				'daylight' => q#Àkókò Ojúmɔmɔ Hawaii-Aleutian#,
+				'generic' => q#Àkókò Hawaii-Aleutian#,
+				'standard' => q#Àkókò Àfɛnukò Hawaii-Aleutian#,
+			},
+		},
+		'Indonesia_Western' => {
+			long => {
+				'standard' => q#Àkókò Ìwɔ̀ oorùn Indonesia#,
+			},
+		},
+		'Irkutsk' => {
+			long => {
+				'daylight' => q#Àkókò Sɔmà Íkúsíkì#,
+				'generic' => q#Àkókò Íkósíkì#,
+				'standard' => q#Àkókò Àfɛnukò Íkósíkì#,
+			},
+		},
+		'Mauritius' => {
+			long => {
+				'daylight' => q#Àkókò Ooru Máríshúshì#,
+				'generic' => q#Àkókò Máríshúshì#,
+				'standard' => q#Àkókò Àfɛnukò Máríshúshì#,
+			},
+		},
+		'Mexico_Northwest' => {
+			long => {
+				'daylight' => q#Àkókò Ojúmɔmɔ Apá Ìwɔ̀ Oorùn Mɛ́shíkò#,
+				'generic' => q#Àkókò Apá Ìwɔ̀ Oorùn Mɛ́shíkò#,
+				'standard' => q#Àkókò Àfɛnukò Apá Ìwɔ̀ Oorùn Mɛ́shíkò#,
+			},
+		},
+		'Mexico_Pacific' => {
+			long => {
+				'daylight' => q#Àkókò Ojúmɔmɔ Pásífíìkì Mɛ́síkò#,
+				'generic' => q#Àkókò Pásífíìkì Mɛ́shíkò#,
+				'standard' => q#Àkókò Àfɛnukò Pásífíìkì Mɛ́síkò#,
+			},
+		},
+		'Newfoundland' => {
+			long => {
+				'daylight' => q#Àkókò Ojúmɔmɔ Newfoundland#,
+				'generic' => q#Àkókò Newfoundland#,
+				'standard' => q#Àkókò Àfɛnukò Newfoundland#,
+			},
+		},
+		'Paraguay' => {
+			long => {
+				'daylight' => q#Àkókò Ooru Párágúwè#,
+				'generic' => q#Àkókò Párágúwè#,
+				'standard' => q#Àkókò Àfɛnukò Párágúwè#,
+			},
+		},
+		'Peru' => {
+			long => {
+				'daylight' => q#Àkókò Ooru Pérù#,
+				'generic' => q#Àkókò Pérù#,
+				'standard' => q#Àkókò Àfɛnukò Pérù#,
+			},
+		},
+		'Pierre_Miquelon' => {
+			long => {
+				'daylight' => q#Àkókò Ojúmɔmɔ Pierre & Miquelon#,
+				'generic' => q#Àkókò Pierre & Miquelon#,
+				'standard' => q#Àkókò Àfɛnukò Pierre & Miquelon#,
+			},
+		},
+		'Reunion' => {
+			long => {
+				'standard' => q#Àkókò Rɛ́yúníɔ́nì#,
+			},
+		},
+		'Seychelles' => {
+			long => {
+				'standard' => q#Àkókò Sèshɛ́ɛ̀lì#,
+			},
+		},
+		'South_Georgia' => {
+			long => {
+				'standard' => q#Àkókò Gúsù Jɔ́jíà#,
+			},
+		},
+		'Uruguay' => {
+			long => {
+				'daylight' => q#Aago Soma Uruguay#,
+				'generic' => q#Aago Uruguay#,
+				'standard' => q#Àkókò Àfɛnukò Úrúgúwè#,
+			},
+		},
+		'Yukon' => {
+			long => {
+				'standard' => q#Àkókò Yúkɔ́nì#,
+			},
+		},
+	 } }
+);
 no Moo;
 
 1;

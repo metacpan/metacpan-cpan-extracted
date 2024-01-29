@@ -1,0 +1,13 @@
+Revision history for IO-Async-Loop-Epoll-FD
+
+0.003     2024-01-27 21:13:38+01:00 Europe/Brussels
+          - Handle fake-events in post_fork
+          - Add version dependencies on Linux::FD and Linux::FD::Pid
+
+0.002     2024-01-27 20:42:22+01:00 Europe/Brussels
+          - Correctly unwatch handlers
+          - Don't change sigmask during epoll_pwait
+          - Correctly repopulate epoll after fork
+
+0.001     2024-01-27 17:44:34+01:00 Europe/Brussels
+          Initial release to an unsuspecting world

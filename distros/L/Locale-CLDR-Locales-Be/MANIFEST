@@ -1,6 +1,8 @@
 Build.PL
 lib/Locale/CLDR/Locales/Be.pm
 lib/Locale/CLDR/Locales/Be/Any.pm
+lib/Locale/CLDR/Locales/Be/Any/Any.pm
+lib/Locale/CLDR/Locales/Be/Any/Any/Tarask.pm
 lib/Locale/CLDR/Locales/Be/Any/By.pm
 MANIFEST			This list of files
 README

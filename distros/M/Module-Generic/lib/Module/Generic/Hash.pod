@@ -26,8 +26,6 @@ Module::Generic::Hash - Hash Manipulation Object Class
     $h->keys->length # e.g. 10
     $keys->pop # See Module::Generic::Array
     print( $h->as_string, "\n" );
-    # or
-    print( "$h\n" );
     # Produces:
     {
     "age" => 30,
@@ -127,7 +125,7 @@ Module::Generic::Hash - Hash Manipulation Object Class
 
 =head1 VERSION
 
-    v1.3.1
+    v1.4.0
 
 =head1 DESCRIPTION
 
@@ -194,7 +192,7 @@ Possible optional parameters are:
 
 =over 4
 
-=item I<debug>
+=item * C<debug>
 
 Provided with an integer and this actives or deactivates debugging messages. Nothing meaningful happens below 3
 
@@ -203,6 +201,8 @@ Provided with an integer and this actives or deactivates debugging messages. Not
 =head2 as_hash
 
 Returns the hash object as a regular hash reference. It copies all the keys and their values into a new anonymous hash and returns it.
+
+Optionally, it takes an hash or hash reference of options. If the option C<strict> is provided with a true value, then instead of returning the current object, it returns a simple hash reference containing a copy of the current object data.
 
 =head2 as_json
 

@@ -20,8 +20,8 @@ use warnings;
 
 use base 'PDF::Builder::Basic::PDF::Dict';
 
-our $VERSION = '3.025'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.026'; # VERSION
+our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Array;
 use PDF::Builder::Basic::PDF::Dict;
@@ -43,9 +43,11 @@ themselves.
 
 =head1 METHODS
 
-=over
+=head2 new
 
-=item PDF::Builder::Basic::PDF::Pages->new($pdf, $parent)
+    PDF::Builder::Basic::PDF::Pages->new($pdf, $parent)
+
+=over
 
 This creates a new Pages object in a PDF. Notice that the C<$parent> here is 
 not the file context for the object, but the parent pages object for these 
@@ -54,6 +56,8 @@ point to the file context, which is identified by I<not> having a Type of
 I<Pages>. C<$pdf> is the file object (or a reference to an array of I<one> 
 file object [3.016 and later, or multiple file objects earlier]) in which to 
 create the new Pages object.
+
+=back
 
 =cut
 
@@ -96,13 +100,19 @@ sub new {
 #    return $self;
 #}
 
-#=item $p->out_obj($is_new)
+#=head2 out_obj
+#
+#    $p->out_obj($is_new)
+#
+#=over
 #
 #Tells all the files that this thing is destined for that they should output this
 #object, come time to output. If this object has no parent, then it must be the
 #root. So set as the root for the files in question and tell it to be output too.
 #If C<$is_new> is set, then call C<new_obj> rather than C<out_obj> to create as 
 #a new object in the file.
+#
+#=back
 #
 #=cut
 #
@@ -130,10 +140,16 @@ sub _pdf {
     return $self->get_top()->{' parent'};
 }
 
-=item $p->find_page($page_number)
+=head2 find_page
+
+    $p->find_page($page_number)
+
+=over
 
 Returns the given page, using the page count values in the pages tree. Pages
 start at 0.
+
+=back
 
 =cut
 
@@ -165,7 +181,11 @@ sub find_page_recursively {
     return;
 }
 
-=item $p->add_page($page, $page_number)
+=head2 add_page
+
+    $p->add_page($page, $page_number)
+
+=over
 
 Inserts the page before the given C<$page_number>. C<$page_number> can be 
 negative to count backwards from the END of the document. -1 is after the last 
@@ -177,6 +197,8 @@ appended or prepended to the document. Pages inserted in the middle of the
 document may simply be inserted in the appropriate leaf in the pages tree 
 without adding any new branches or leaves, leaving it unbalanced (slower
 performance, but still usable). 
+
+=back
 
 =cut
 
@@ -237,10 +259,10 @@ sub add_page_recursively {
     my ($self, $page, $page_index) = @_;
 
     my $parent = $self;
-    my $max_kids_per_parent = 8; # Why 8?
+    my $max_kids_per_parent = 8; # Why 8? effort to somewhat balance tree?
     if (scalar $parent->{'Kids'}->elements() >= $max_kids_per_parent and 
         $parent->{'Parent'} and 
-        $page_index < 1) {
+        $page_index < 0) {
         my $grandparent = $parent->{'Parent'}->realise();
         $parent = $parent->new($parent->_pdf(), $grandparent);
 
@@ -275,7 +297,11 @@ sub set_modified {
     return;
 }
 
-#=item $root_pages = $p->rebuild_tree([@pglist])
+#=head2 rebuild_tree
+#
+#    $root_pages = $p->rebuild_tree([@pglist])
+#
+#=over
 #
 #B<WARNING: Not yet implemented. Do not attempt to use!>
 #
@@ -285,6 +311,8 @@ sub set_modified {
 #
 #Returns the top of the tree for insertion in the root object.
 #
+#=back
+#
 #=cut
 
 # TBD where's the code?
@@ -293,9 +321,15 @@ sub set_modified {
 #    return;
 #}
 
-=item @objects = $p->get_pages()
+=head2 get_pages
+
+    @objects = $p->get_pages()
+
+=over
 
 Returns a list of page objects in the document, in page order.
+
+=back
 
 =cut
 
@@ -325,9 +359,15 @@ sub get_pages_recursively {
     return @pages;
 }
 
-=item $p->find_prop($key)
+=head2 find_prop
+
+    $p->find_prop($key)
+
+=over
 
 Searches up through the inheritance tree to find a property (key).
+
+=back
 
 =cut
 
@@ -354,7 +394,11 @@ sub find_prop {
     return;
 }
 
-=item $p->add_font($pdf, $font)
+=head2 add_font
+
+    $p->add_font($pdf, $font)
+
+=over
 
 Creates or edits the resource dictionary at this level in the hierarchy. If
 the font is already supported, even through the hierarchy, then it is not added.
@@ -363,6 +407,8 @@ B<CAUTION:> if this method was used in older releases, the code may have
 swapped the order of C<$pdf> and C<$font>, requiring ad hoc swapping of 
 parameters in user code, contrary to the POD definition above. Now the code
 matches the documentation.
+
+=back
 
 =cut
 
@@ -395,13 +441,19 @@ sub add_font {
     return $self;
 } # end of add_font()
 
-=item $p->bbox($xmin,$ymin, $xmax,$ymax, $param)
+=head2 bbox
 
-=item $p->bbox($xmin,$ymin, $xmax,$ymax)
+    $p->bbox($xmin,$ymin, $xmax,$ymax, $param)
+
+    $p->bbox($xmin,$ymin, $xmax,$ymax)
+
+=over
 
 Specifies the bounding box for this and all child pages. If the values are
 identical to those inherited, no change is made. C<$param> specifies the 
 attribute name so that other 'bounding box'es can be set with this method.
+
+=back
 
 =cut
 
@@ -428,10 +480,16 @@ sub bbox {
     return $self;
 }
 
-=item $p->proc_set(@entries)
+=head2 proc_set
+
+    $p->proc_set(@entries)
+
+=over
 
 Ensures that the current resource contains all the entries in the proc_sets
 listed. If necessary, it creates a local resource dictionary to achieve this.
+
+=back
 
 =cut
 
@@ -474,9 +532,15 @@ sub empty {
     return $self;
 }
 
-=item $p->get_top()
+=head2 get_top
+
+    $p->get_top()
+
+=over
 
 Returns the top of the pages tree.
+
+=back
 
 =cut
 
@@ -488,9 +552,5 @@ sub get_top {
 
     return $top->realise();
 }
-
-=back
-
-=cut
 
 1;

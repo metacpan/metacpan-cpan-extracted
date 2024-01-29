@@ -3,7 +3,7 @@ package Net::AS2;
 use strict;
 use warnings;
 use autodie qw(:file :filesys);
-our $VERSION = '1.0110'; # VERSION
+our $VERSION = '1.0111'; # VERSION
 
 =head1 NAME
 

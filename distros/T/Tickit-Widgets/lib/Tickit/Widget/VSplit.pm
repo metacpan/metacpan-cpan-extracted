@@ -1,15 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2023 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.57;
+use warnings;
+use Object::Pad 0.807 ':experimental(inherit_field)';
 
-package Tickit::Widget::VSplit 0.38;
-class Tickit::Widget::VSplit
-   :strict(params)
-   :isa(Tickit::Widget::LinearSplit);
+package Tickit::Widget::VSplit 0.41;
+class Tickit::Widget::VSplit :strict(params);
+
+inherit Tickit::Widget::LinearSplit qw( $_split_at $_split_len );
 
 use Tickit::Style;
 use Tickit::RenderBuffer qw( LINE_SINGLE CAP_BOTH );
@@ -95,7 +96,7 @@ use constant VALUE_METHOD => "cols";
 
 =head2 new
 
-   $vsplit = Tickit::Widget::VSplit->new( %args )
+   $vsplit = Tickit::Widget::VSplit->new( %args );
 
 Constructs a new C<Tickit::Widget::VSplit> object.
 
@@ -127,9 +128,9 @@ method cols
 
 =head2 set_left_child
 
-   $child = $hsplit->left_child
+   $child = $hsplit->left_child;
 
-   $vsplit->set_left_child( $child )
+   $vsplit->set_left_child( $child );
 
 Accessor for the child widget used in the left half of the display.
 
@@ -142,9 +143,9 @@ Accessor for the child widget used in the left half of the display.
 
 =head2 set_right_child
 
-   $child = $hsplit->right_child
+   $child = $hsplit->right_child;
 
-   $vsplit->set_right_child( $child )
+   $vsplit->set_right_child( $child );
 
 Accessor for the child widget used in the right half of the display.
 
@@ -170,22 +171,19 @@ method render_to_rb
 {
    my ( $rb, $rect ) = @_;
 
-   my $split_len = $self->_split_len;
-   my $split_at  = $self->_split_at;
-
    my $lines = $self->window->lines;
 
    $rb->setpen( $self->get_style_pen( "split" ) );
 
-   $rb->vline_at( 0, $lines-1, $split_at, LINE_SINGLE, undef, CAP_BOTH );
+   $rb->vline_at( 0, $lines-1, $_split_at, LINE_SINGLE, undef, CAP_BOTH );
 
-   if( $split_len > 2 ) {
+   if( $_split_len > 2 ) {
       foreach my $line ( $rect->linerange ) {
-         $rb->erase_at( $line, $split_at + 1, $split_len - 2 );
+         $rb->erase_at( $line, $_split_at + 1, $_split_len - 2 );
       }
    }
-   if( $split_len > 1 ) {
-      $rb->vline_at( 0, $lines-1, $split_at + $split_len - 1, LINE_SINGLE, undef, CAP_BOTH );
+   if( $_split_len > 1 ) {
+      $rb->vline_at( 0, $lines-1, $_split_at + $_split_len - 1, LINE_SINGLE, undef, CAP_BOTH );
    }
 }
 

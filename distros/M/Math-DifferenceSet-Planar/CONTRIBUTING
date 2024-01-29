@@ -131,6 +131,7 @@ distribution builder like Dist::Zilla may be performed in the future.
 The git repository contains these files the CPAN release does not:
 
 .gitignore
+compute/even_order_sample.c
 compute/extra_large_sample.gp
 compute/prime_order_samples.gp
 maint/create_cpan_db

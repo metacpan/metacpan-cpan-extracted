@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.575';
+our $VERSION = '0.582';
 
 use 5.020;
 use strictures 2;
@@ -16,9 +16,8 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use B;
 use Carp 'croak';
-use JSON::MaybeXS 1.004004 'is_bool';
 use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref);
-use Scalar::Util 'blessed';
+use Scalar::Util qw(blessed looks_like_number);
 use Storable 'dclone';
 use Feature::Compat::Try;
 use JSON::Schema::Modern::Error;
@@ -30,6 +29,7 @@ use Exporter 'import';
 our @EXPORT_OK = qw(
   is_type
   get_type
+  is_bignum
   is_equal
   is_elements_unique
   jsonp
@@ -53,6 +53,7 @@ our @EXPORT_OK = qw(
 use JSON::PP ();
 use constant { true => JSON::PP::true, false => JSON::PP::false };
 
+# supports the six core types, plus integer (which is also a number)
 sub is_type ($type, $value) {
   if ($type eq 'null') {
     return !(defined $value);
@@ -76,12 +77,12 @@ sub is_type ($type, $value) {
     }
 
     if ($type eq 'number') {
-      return ref($value) =~ /^Math::Big(?:Int|Float)$/
+      return is_bignum($value)
         || !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK));
     }
 
     if ($type eq 'integer') {
-      return ref($value) =~ /^Math::Big(?:Int|Float)$/ && $value->is_int
+      return is_bignum($value) && $value->is_int
         || !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK)) && int($value) == $value;
     }
   }
@@ -93,13 +94,14 @@ sub is_type ($type, $value) {
   return ref($value) eq $type;
 }
 
+# returns one of the six core types, plus integer
 sub get_type ($value) {
   return 'object' if is_plain_hashref($value);
   return 'boolean' if is_bool($value);
   return 'null' if not defined $value;
   return 'array' if is_plain_arrayref($value);
 
-  return ref($value) =~ /^Math::Big(?:Int|Float)$/ ? ($value->is_int ? 'integer' : 'number')
+  return is_bignum($value) ? ($value->is_int ? 'integer' : 'number')
       : (blessed($value) ? '' : 'reference to ').ref($value)
     if is_ref($value);
 
@@ -109,6 +111,18 @@ sub get_type ($value) {
     if !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK));
 
   return 'ambiguous type';
+}
+
+# lifted from JSON::MaybeXS
+sub is_bool ($value) {
+  Scalar::Util::blessed($value)
+    and ($value->isa('JSON::PP::Boolean')
+      or $value->isa('Cpanel::JSON::XS::Boolean')
+      or $value->isa('JSON::XS::Boolean'));
+}
+
+sub is_bignum ($value) {
+  ref($value) =~ /^Math::Big(?:Int|Float)$/;
 }
 
 # compares two arbitrary data payloads for equality, as per
@@ -122,6 +136,13 @@ sub is_equal ($x, $y, $state = undef) {
   if ($state->{scalarref_booleans}) {
     ($x, $types[0]) = (0+!!$$x, 'boolean') if $types[0] eq 'reference to SCALAR';
     ($y, $types[1]) = (0+!!$$y, 'boolean') if $types[1] eq 'reference to SCALAR';
+  }
+
+  if ($state->{stringy_numbers}) {
+    ($x, $types[0]) = (0+$x, int(0+$x) == $x ? 'integer' : 'number')
+      if $types[0] eq 'string' and looks_like_number($x);
+    ($y, $types[1]) = (0+$y, int(0+$y) == $y ? 'integer' : 'number')
+      if $types[1] eq 'string' and looks_like_number($y);
   }
 
   return 0 if $types[0] ne $types[1];
@@ -154,10 +175,11 @@ sub is_equal ($x, $y, $state = undef) {
 
 # checks array elements for uniqueness. short-circuits on first pair of matching elements
 # if second arrayref is provided, it is populated with the indices of identical items
-sub is_elements_unique ($array, $equal_indices = undef) {
+sub is_elements_unique ($array, $equal_indices = undef, $state = {}) {
+  my %s = $state->%{qw(scalarref_booleans stringy_numbers)};
   foreach my $idx0 (0 .. $array->$#*-1) {
     foreach my $idx1 ($idx0+1 .. $array->$#*) {
-      if (is_equal($array->[$idx0], $array->[$idx1], { scalarref_booleans => 1 })) {
+      if (is_equal($array->[$idx0], $array->[$idx1], \%s)) {
         push @$equal_indices, $idx0, $idx1 if defined $equal_indices;
         return 0;
       }
@@ -167,7 +189,7 @@ sub is_elements_unique ($array, $equal_indices = undef) {
 }
 
 # shorthand for creating and appending json pointers
-# the first argument is a a json pointer; remaining arguments are path segments to be encoded and
+# the first argument is a json pointer; remaining arguments are path segments to be encoded and
 # appended
 sub jsonp {
   return join('/', shift, map s/~/~0/gr =~ s!/!~1!gr, map +(is_plain_arrayref($_) ? @$_ : $_), grep defined, @_);
@@ -205,7 +227,9 @@ sub canonical_uri ($state, @extra_path) {
 # - schema_path
 # - _schema_path_suffix
 # - errors
-# - exception
+# - exception (set by abort())
+# - recommended_response
+# - depth
 sub E ($state, $error_string, @args) {
   croak 'E called in void context' if not defined wantarray;
 
@@ -220,12 +244,14 @@ sub E ($state, $error_string, @args) {
     or ($uri->fragment // '') eq $keyword_location and $uri->clone->fragment(undef) eq '';
 
   push $state->{errors}->@*, JSON::Schema::Modern::Error->new(
+    depth => $state->{depth} // 0,
     keyword => $state->{keyword},
     instance_location => $state->{data_path},
     keyword_location => $keyword_location,
     defined $uri ? ( absolute_keyword_location => $uri ) : (),
     error => @args ? sprintf($error_string, @args) : $error_string,
     $state->{exception} ? ( exception => $state->{exception} ) : (),
+    $state->{recommended_response} ? ( recommended_response => $state->{recommended_response} ) : (),
   );
 
   return 0;
@@ -243,6 +269,7 @@ sub E ($state, $error_string, @args) {
 # - collect_annotations
 # - spec_version
 # - _unknown
+# - depth
 sub A ($state, $annotation) {
   return 1 if not $state->{collect_annotations} or $state->{spec_version} eq 'draft7';
 
@@ -256,6 +283,7 @@ sub A ($state, $annotation) {
     .jsonp($state->{schema_path}, $state->{keyword}, delete $state->{_schema_path_suffix});
 
   push $state->{annotations}->@*, {
+    depth => $state->{depth} // 0,
     keyword => $state->{keyword},
     instance_location => $state->{data_path},
     keyword_location => $keyword_location,
@@ -317,7 +345,8 @@ sub assert_uri_reference ($state, $schema) {
   return 1;
 }
 
-# this is only suitable for checking URIs within schemas themselves
+# this is only suitable for checking URIs within schemas themselves,
+# which have fragments consisting of plain names (anchors) or json pointers
 sub assert_uri ($state, $schema, $override = undef) {
   croak 'assert_uri called in void context' if not defined wantarray;
 
@@ -338,6 +367,7 @@ sub assert_uri ($state, $schema, $override = undef) {
 }
 
 # produces an annotation whose value is the same as that of the current keyword
+# makes a copy as this is passed back to the user, who cannot be trusted to not mutate it
 sub annotate_self ($state, $schema) {
   A($state, is_ref($schema->{$state->{keyword}}) ? dclone($schema->{$state->{keyword}})
     : $schema->{$state->{keyword}});
@@ -345,7 +375,7 @@ sub annotate_self ($state, $schema) {
 
 sub sprintf_num ($value) {
   # use original value as stored in the NV, without losing precision
-  ref($value) =~ /^Math::Big(?:Int|Float)$/ ? $value->bstr : sprintf('%s', $value);
+  is_bignum($value) ? $value->bstr : sprintf('%s', $value);
 }
 
 1;
@@ -362,7 +392,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.575
+version 0.582
 
 =head1 SYNOPSIS
 
@@ -372,7 +402,7 @@ version 0.575
 
 This class contains internal utilities to be used by L<JSON::Schema::Modern>.
 
-=for Pod::Coverage is_type get_type is_equal is_elements_unique jsonp unjsonp local_annotations
+=for Pod::Coverage is_type get_type is_bignum is_bool is_equal is_elements_unique jsonp unjsonp local_annotations
 canonical_uri E A abort assert_keyword_exists assert_keyword_type assert_pattern assert_uri_reference assert_uri
 annotate_self sprintf_num
 

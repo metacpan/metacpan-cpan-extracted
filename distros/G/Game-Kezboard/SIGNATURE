@@ -1,0 +1,68 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 a9770292085b13f2013c52617f0fc3cb32ae471951f5eb0f3ab0782b8982d88c Changes
+SHA256 db739608563af2d9f1763883315451cc38032cb67bdd42a443bfcc7eef1a49b2 LICENSE
+SHA256 c24a0141eccc4d4aea9a810ab1be1c507b9723e88cce78aadcebf927a4a16ce6 MANIFEST
+SHA256 440206d73d3039fdafc16a77a12f23a6b5fcb44714e5ef498400373af76cabbf META.json
+SHA256 69afe124f9763a4c362e674fb2cfebd972a83f524ea0b48ec7b789754724177e META.yml
+SHA256 c14bc93d2917edc7de1f92add88a85171d2a5fed5086067048cd4bc04e55f2d8 Makefile.PL
+SHA256 47cc8b487d691427408c6673e0530e4bccf936b5559730de805ee175366149c0 README
+SHA256 d4fc9613c0b0f7b158bc3e4ed7dff49a9777189927b0e8058c958ccaac9c0a5c data/font/Ac437_EverexME_5x8.ttf
+SHA256 9348ddfd44da5a127c59141981954746a860ec8e03e0412cf3af7134af0f97e2 data/font/LICENSE
+SHA256 c640d66027c404e537fa96f2d96dc3996d55ca1b1539da67f83e13cafb8a60a8 data/image/blank.png
+SHA256 ff805084fa0a1d281127e8b022c7a1ba85813382478a9b0b927cc7d351f031e6 data/image/bomba.png
+SHA256 990562ef94234ab67c31a65de201993381810f3182254ec324db805fb79eb4f5 data/image/card-backwards.png
+SHA256 a6a6d953beaf1a6689c073af6e72b8b4a00ac83fc801f0266449684f4e2ac868 data/image/card-forward.png
+SHA256 c592667c3cb5894de1b8a675e4b1bece43b6e1e2d0d9fc8ce76ab24630e2e36e data/image/card-left.png
+SHA256 9a7ae6ce68a0b4224673f35e38b715d0576c7b8d310f87300a515210f487fbc5 data/image/card-nop.png
+SHA256 e6ac9c6ea8d34a781558da8eb45fdfb846afb796290ee06e5da1649571dc0108 data/image/card-reverse.png
+SHA256 7165b9240babf27fc07a03308d02b62cabaea41ecfa868a5b936c5c781446e64 data/image/card-right.png
+SHA256 57491de2f481e098f9a2b34adf0572e3aeb80b0a4077f76ebbe1d072b93e5ca8 data/image/castle.png
+SHA256 b286f052cb9124b64b7230151c6ccd8c15b8be98a793534cb54085681966a662 data/image/descbg.png
+SHA256 e692b443dff337a707215738f86c3943748de0ae5a8e08a1b7f950e62a8edd40 data/image/grid.png
+SHA256 6bcbe2de3ccad37a4d4bea287ef2d95107468090d4d1c7218ac654ef7d6df6f5 data/image/hero-e.png
+SHA256 8c6c96c4b474f8613125f5d15e96ea83c4ad51e70fd8b87afcff346e7ca02e25 data/image/hero-n.png
+SHA256 a7213a520206990f3d970a9b7eec11401ab8398824aa0078626eeee60aec9c77 data/image/hero-s.png
+SHA256 a4efb87f6a1d78c758c0b720a855b4d815a9b5e4eaefdab513eb01555ff94b4e data/image/hero-w.png
+SHA256 9ebbb8c7f196d2387ada15a1ce97534fc0d24e32bfd0750a890047eb097fcb76 data/image/mulligan.png
+SHA256 0592748ee52eb7da6892dcd391c7947673c8b704b7dddb1e4a75e13cfaff8d8b data/image/nope.png
+SHA256 6decb224ef63106f117412faace5e2c81456051f350d84256ba1eea7f699b059 data/image/okay.png
+SHA256 3e8602f0d288e8fd944ba261043867823643565043832693d5f549fcccf4cb5e data/image/pretitle.png
+SHA256 ed493850c83274c23a308e46f8d0dd3ba2da747e13ae2e4c8217679bec76da7b data/image/score.png
+SHA256 fcc21839fa765ec045e54f37e0afc6639ff5dfcb7ee88690e7afee46f6a5d2dc data/image/scrambler.png
+SHA256 5cb5e5dda9dd869db061d985ae31ee22834e9a4e682f09beae2001cd7ef0dc11 data/image/starfield.png
+SHA256 d1f8f465e310b1aa8ca2dbf7017918f710bc12e1c429fb9e125fe3bd5676eb03 data/image/title.png
+SHA256 c92d70401f3a930a507fbe984a15a0bdd19d25ed422e35054f7e516e37a89ef8 data/image/victory.png
+SHA256 a4a05dd26b3d3e40db63a6dfd4d78358fd0ff61cea8bcefc7e82f6e69d9a58c1 kezboard
+SHA256 c4055fab5f7def861500d974a8f85ce928103ec972a2dff7cd8b85526b51e121 lib/Game/Kezboard.pm
+SHA256 409ed8b2c3a2fa0d44a130fc9541b418a9e19c973b32454da95bb542cd30a2f0 t/00-load.t
+SHA256 b1a901c77e050cb7baedd312775ad12804c3c44d820d24bc4992770c77cf7588 t/pod-coverage.t
+SHA256 5b20e757a8c88ffddf8a2486df1dae80c9ea550819a3fb8c36a5f1b0b51396e3 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEElPO2YAAs9b/plKLEs1lvXE/ryKcFAmW2zh0ACgkQs1lvXE/r
+yKdMRQwAjI82moxb7AQz1tzSd7YX0XzS6juHCDbVkEBRKB/lEniwBXr8l1eOu0bV
+oTy4cr5HjcZqVSF4wVgHREdZVVAuptxf9gO7KZzNLl/ewmBUyA0ohzzij+6AKQ8E
+mE+31YAxy9S5gldV+91by1ZNjOUuNi/rvTLAt2U0V6BWr3CjMmLyFbPTk1dVEOvz
+uK6S2m+RD+DAtm5m8OLRMSIT+s3bd6Tx1RwJKPwZu1N6QIAQfyGtoYVdbkNklFPu
+CQ30ZctTpudhNAqvT2b+1aU6ueR+oILDHHCrx4RizRMGJBexgehKY5ZcyXeYK6HS
++BtXYX7mqIWJfPIEk9v80IeaY3DYX62/Mnk+2SJiDMSBxO6UJFs/VNhPuUrMqZp3
+XfGZGUakyski9vl+foliCEs38VpfyBOQBb6fBOyuhZal9TO954Y1gvWJWnKauAoY
+jO0JlCQtXk21y4paf+BtHTMO6Dw30PItKbB2N/MFou6n3+E1WV7wH1IJR11uWAYI
+htK8Dlp8
+=rk70
+-----END PGP SIGNATURE-----

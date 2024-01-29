@@ -1,3 +1,31 @@
+5.513	  2024-01-25  Dianne Skoll <dianne@skoll.ca>
+
+	* VERSION 5.513 RELEASED
+
+	* Add MIME::Parser->ambiguous_content to indicate one of several
+   	  types of ambiguous MIME content that could be security risks.
+
+	* Add the '@duplicate_parameters' pseudo-parameter to let caller
+  	  detect duplicate MIME parameters on a MIME header.
+
+5.512	  2024-01-08  Dianne Skoll <dianne@skoll.ca>
+
+	* VERSION 5.512 RELEASED
+
+	* Use much larger chunk sizes for Base-64 encoding which reduces
+	  both encoding time and space overhead.
+	  https://rt.cpan.org/Ticket/Display.html?id=128400
+	  https://rt.cpan.org/Ticket/Display.html?id=130110
+
+5.511	  2024-01-02  Dianne Skoll <dianne@skoll.ca>
+
+	* VERSION 5.511 RELEASED
+
+	* Silence a warning if used with a development version of
+	  MIME::QuotedPrint
+	  https://rt.cpan.org/Ticket/Display.html?id=150118
+	  https://rt.cpan.org/Ticket/Display.html?id=149225
+
 5.510	  2022-07-06  Dianne Skoll <dianne@skoll.ca>
 
 	* VERSION 5.510 RELEASED

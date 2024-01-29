@@ -4,38 +4,46 @@
   <lines>
     <line id="1" name="Маскоўская лінія" color="blue"/>
     <line id="2" name="Аўтазаводская лінія" color="red"/>
+    <line id="3" name="Зеленалужская лінія" color="green"/>
   </lines>
   <stations>
-    <station id="КАСТРЫЧНІЦКАЯ" name="Кастрычніцкая" line="Маскоўская лінія" link="A08,A10,B07,B09"/>
 
     <!-- https://be.wikipedia.org/wiki/Маскоўская лінія,_Мінск -->
-    <station id="A01" name="Уручча" line="Маскоўская лінія" link="A02"/>
-    <station id="A02" name="Барысаўскі тракт" line="Маскоўская лінія" link="A01,A03"/>
-    <station id="A03" name="Усход" line="Маскоўская лінія" link="A02,A04"/>
-    <station id="A04" name="Маскоўская" line="Маскоўская лінія" link="A03,A05"/>
-    <station id="A05" name="Парк Чалюскінцаў" line="Маскоўская лінія" link="A04,A06"/>
-    <station id="A06" name="Акадэмія навук" line="Маскоўская лінія" link="A05,A07"/>
-    <station id="A07" name="Плошча Якуба Коласа" line="Маскоўская лінія" link="A06,A08"/>
-    <station id="A08" name="Плошча Перамогі" line="Маскоўская лінія" link="A07,КАСТРЫЧНІЦКАЯ"/>
-    <station id="A10" name="Плошча Леніна" line="Маскоўская лінія" link="КАСТРЫЧНІЦКАЯ,A11"/>
-    <station id="A11" name="Інстытут культуры" line="Маскоўская лінія" link="A10,A12"/>
-    <station id="A12" name="Грушаўка" line="Маскоўская лінія" link="A11,A13"/>
-    <station id="A13" name="Міхалова" line="Маскоўская лінія" link="A12,A14"/>
-    <station id="A14" name="Пятроўшчына" line="Маскоўская лінія" link="A13,A15"/>
-    <station id="A15" name="Малінаўка" line="Маскоўская лінія" link="A14"/>
+    <station id="A01" name="Уручча" line="1:1" link="A02"/>
+    <station id="A02" name="Барысаўскі тракт" line="1:2" link="A01,A03"/>
+    <station id="A03" name="Усход" line="1:3" link="A02,A04"/>
+    <station id="A04" name="Маскоўская" line="1:4" link="A03,A05"/>
+    <station id="A05" name="Парк Чалюскінцаў" line="1:5" link="A04,A06"/>
+    <station id="A06" name="Акадэмія навук" line="1:6" link="A05,A07"/>
+    <station id="A07" name="Плошча Якуба Коласа" line="1:7" link="A06,A08"/>
+    <station id="A08" name="Плошча Перамогі" line="1:8" link="A07,A09"/>
+    <station id="A09" name="Кастрычніцкая" line="1:9" link="A08,A10" other_links="Tunnel:B08"/>
+    <station id="A10" name="Плошча Леніна" line="1:10" link="A09,A11" other_links="Tunnel:C03"/>
+    <station id="A11" name="Інстытут культуры" line="1:11" link="A10,A12"/>
+    <station id="A12" name="Грушаўка" line="1:12" link="A11,A13"/>
+    <station id="A13" name="Міхалова" line="1:13" link="A12,A14"/>
+    <station id="A14" name="Пятроўшчына" line="1:14" link="A13,A15"/>
+    <station id="A15" name="Малінаўка" line="1:15" link="A14"/>
 
     <!-- https://be.wikipedia.org/wiki/Аўтазаводская лінія,_Мінск -->
-    <station id="B01" name="Каменная горка" line="Аўтазаводская лінія" link="B02"/>
-    <station id="B02" name="Кунцаўшчына" line="Аўтазаводская лінія" link="B01,B03"/>
-    <station id="B03" name="Спартыўная" line="Аўтазаводская лінія" link="B02,B04"/>
-    <station id="B04" name="Пушкінская" line="Аўтазаводская лінія" link="B03,B05"/>
-    <station id="B05" name="Маладзёжная" line="Аўтазаводская лінія" link="B04,B06"/>
-    <station id="B06" name="Фрунзенская" line="Аўтазаводская лінія" link="B05,B07"/>
-    <station id="B07" name="Няміга" line="Аўтазаводская лінія" link="B06,КАСТРЫЧНІЦКАЯ"/>
-    <station id="B09" name="Першамайская" line="Аўтазаводская лінія" link="КАСТРЫЧНІЦКАЯ,B10"/>
-    <station id="B10" name="Трактарны завод" line="Аўтазаводская лінія" link="B09,B11"/>
-    <station id="B11" name="Партызанская" line="Аўтазаводская лінія" link="B10,B12"/>
-    <station id="B12" name="Аўтазаводская" line="Аўтазаводская лінія" link="B11,B13"/>
-    <station id="B13" name="Магілёўская" line="Аўтазаводская лінія" link="B12"/>
+    <station id="B01" name="Каменная горка" line="2:1" link="B02"/>
+    <station id="B02" name="Кунцаўшчына" line="2:2" link="B01,B03"/>
+    <station id="B03" name="Спартыўная" line="2:3" link="B02,B04"/>
+    <station id="B04" name="Пушкінская" line="2:4" link="B03,B05"/>
+    <station id="B05" name="Маладзёжная" line="2:5" link="B04,B06"/>
+    <station id="B06" name="Фрунзенская" line="2:6" link="B05,B07" other_links="Tunnel:C01"/>
+    <station id="B07" name="Няміга" line="2:7" link="B06,B08"/>
+    <station id="B08" name="Кастрычніцкая" line="2:8" link="B07,B09" other_links="Tunnel:A09"/>
+    <station id="B09" name="Першамайская" line="2:9" link="B08,B10"/>
+    <station id="B10" name="Трактарны завод" line="2:10" link="B09,B11"/>
+    <station id="B11" name="Партызанская" line="2:11" link="B10,B12"/>
+    <station id="B12" name="Аўтазаводская" line="2:12" link="B11,B13"/>
+    <station id="B13" name="Магілёўская" line="2:13" link="B12"/>
+
+    <!-- https://be.wikipedia.org/wiki/Зеленалужская_лінія -->
+    <station id="C01" name="Юбілейная плошча" line="3:1" link="C02" other_links="Tunnel:B06"/>
+    <station id="C02" name="Плошча Францішка Багушэвіча" line="3:2" link="C01,C03"/>
+    <station id="C03" name="Вакзальная" line="3:3" link="C02,C04" other_links="Tunnel:A10"/>
+    <station id="C04" name="Кавальская Слабада" line="3:4" link="C03"/>
   </stations>
 </tube>

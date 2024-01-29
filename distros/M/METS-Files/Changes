@@ -1,3 +1,10 @@
+0.03 2024-01-01T18:00:24+01:00
+ - Add tests.
+ - Move bugtracker to github.
+ - Rewrite doc to use of =head2.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.02 2022-08-27T00:29:10+02:00
  - Add tests for constructor.
  - Improve SYNOPSIS section in doc.

@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-15'; # DATE
+our $DATE = '2023-11-20'; # DATE
 our $DIST = 'App-FileRenameUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/File/Util/DirList/mv_files_to_dirs",
@@ -40,7 +40,7 @@ mv-files-to-dirs - Move files to directories, one file to each directory
 
 =head1 VERSION
 
-This document describes version 0.012 of mv-files-to-dirs (from Perl distribution App-FileRenameUtils), released on 2023-11-15.
+This document describes version 0.014 of mv-files-to-dirs (from Perl distribution App-FileRenameUtils), released on 2023-11-20.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ B<mv-files-to-dirs> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">
 
 B<mv-files-to-dirs> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<mv-files-to-dirs> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--dry-run|/"--dry-run, -n">>|B<L<-n|/"--dry-run, -n">>] [(B<L<--file-or-dir|/"--files-then-dirs-json=s">>=I<L<pathname::exists|Sah::Schema::pathname::exists>>)+|B<L<--files-then-dirs-json|/"--files-then-dirs-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<file_or_dir|/"--files-then-dirs-json=s">>E<gt> ...
+B<mv-files-to-dirs> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--dry-run|/"--dry-run, -n">>|B<L<-n|/"--dry-run, -n">>] [(B<L<--file-or-dir|/"--files-then-dirs-json=s">>=I<L<pathname::exists|Sah::Schema::pathname::exists>>)+|B<L<--files-then-dirs-json|/"--files-then-dirs-json=s">>=I<json>] [B<L<--files-per-dir|/"--files-per-dir=s">>=I<L<posint|Sah::Schema::posint>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--reverse|/"--reverse, -r">>|B<L<-r|/"--reverse, -r">>] -- E<lt>I<L<file_or_dir|/"--files-then-dirs-json=s">>E<gt> ...
 
 
 
@@ -70,6 +70,14 @@ Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
 
+=item B<--files-per-dir>=I<s>
+
+Number of files to move to each diectory.
+
+Default value:
+
+ 1
+
 =item B<--files-then-dirs-json>=I<s>
 
 One or more existing file (or directory) names then the same number of existing directories (JSON-encoded).
@@ -77,6 +85,14 @@ One or more existing file (or directory) names then the same number of existing 
 See C<--file-or-dir>.
 
 Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--reverse>, B<-r>
+
+Reverse processing (so first file will go to the last dir, second file to second-last dir, and so on).
+
+Default value:
+
+ 1
 
 =back
 

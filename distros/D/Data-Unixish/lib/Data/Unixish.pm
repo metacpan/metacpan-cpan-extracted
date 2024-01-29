@@ -1,17 +1,18 @@
 package Data::Unixish;
 
-our $DATE = '2019-10-26'; # DATE
-our $VERSION = '1.572'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
+use Exporter qw(import);
 use Module::Load;
 use Package::Util::Lite qw(package_exists);
 
-require Exporter;
-our @ISA       = qw(Exporter);
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-09-23'; # DATE
+our $DIST = 'Data-Unixish'; # DIST
+our $VERSION = '1.573'; # VERSION
+
 our @EXPORT_OK =
     qw(
           aduxa cduxa fduxa lduxa
@@ -126,7 +127,7 @@ sub _dux {
     }
 
     unless ($pid) {
-        no strict 'refs';
+        no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
         my $res = $funcname->(%args);
         die "Dux function $funcname failed: $res->[0] - $res->[1]"
             unless $res->[0] == 200;
@@ -207,7 +208,7 @@ sub _idux {
 
     my @res;
     {
-        no strict 'refs';
+        no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
         my @bres; @bres = $funcname_b->(\%args) if defined &$funcname_b;
         for (@items) {
             push @res, $funcname_i->($_, \%args);
@@ -253,7 +254,7 @@ Data::Unixish - Implementation for Unixish, a data transformation framework
 
 =head1 VERSION
 
-This document describes version 1.572 of Data::Unixish (from Perl distribution Data-Unixish), released on 2019-10-26.
+This document describes version 1.573 of Data::Unixish (from Perl distribution Data-Unixish), released on 2023-09-23.
 
 =head1 SYNOPSIS
 
@@ -411,14 +412,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Unixi
 
 Source repository is at L<https://github.com/perlancar/perl-Data-Unixish>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Unixish>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Unixish>
@@ -429,11 +422,57 @@ L<dux> script in L<App::dux>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTORS
+
+=for stopwords Mohammad S Anwar Steven Haryanto Toby Inkster
+
+=over 4
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=item *
+
+Toby Inkster <mail@tobyinkster.co.uk>
+
+=back
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Unixish>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

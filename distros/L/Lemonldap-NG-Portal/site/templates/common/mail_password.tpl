@@ -5,7 +5,6 @@
 <br />
 <TMPL_IF NAME="RESET">
 <span trspan="newPwdIs">Your new password is</span> 
-<span><img src="cid:key:../common/key.png" alt="key"/></span>
 <b><TMPL_VAR NAME="password" ESCAPE=HTML></b>
 <TMPL_ELSE>
 <span trspan="pwdChanged">Your password has been successfully changed!</span> 

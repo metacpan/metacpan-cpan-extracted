@@ -7,12 +7,12 @@ use v5.26;
 use warnings;
 use utf8;
 
-use Object::Pad 0.800;
+use Object::Pad 0.807;
 
-package App::sdview::Output::Terminal 0.13;
-class App::sdview::Output::Terminal
-   :isa(App::sdview::Output::Formatted)
-   :strict(params);
+package App::sdview::Output::Terminal 0.14;
+class App::sdview::Output::Terminal :strict(params);
+
+inherit App::sdview::Output::Formatted;
 
 use constant format => "terminal";
 

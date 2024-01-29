@@ -37,9 +37,13 @@ my %WriteMakefileArgs = (
 	'Test2::Plugin::UTF8' => '0', # rids of the Wide Character in TAP message!
 	'File::Spec' => '0',
 	'File::Temp' => '0',
-	'YAML' => '0',
+	# this has problems with YAML_PARSE_ERR_INCONSISTENT_INDENTATION
+	# see https://github.com/ingydotnet/yaml-pm/issues/224
+	#'YAML' => '0',
+	# this works but needs compilation on M$
+	#'YAML::XS' => '0',
+	# this looks like the best choice right now
 	'YAML::PP' => '0',
-	'YAML::XS' => '0',
 
         'Benchmark' => '0',
 	# WARNING (30.06.2023): CPAN tests fail when
@@ -53,7 +57,7 @@ my %WriteMakefileArgs = (
 	'Encode' => '3.0',
 	'JSON' => '4.0',
 	'Unicode::Escape' => '0.0.2',
-	'YAML::PP' => '0.0.36',
+	'YAML::PP' => '0',
 	'Data::Dumper' => '0',
 	'Data::Dump' => '0',
 	'Data::Dump::Filtered' => '0',

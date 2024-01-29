@@ -1,3 +1,15 @@
+0.059000 -- 2022-01-14
+
+    - Handle negatable options in completion and help text (closes #27)
+
+    - Term::CLI::Intro
+        - Restructure & expand class summary.
+        - Restructure the headings a bit, add the Tree and TypeTiny
+          argument types.
+
+    - examples/state_demo.pl
+        - Fix doc string for "borrow".
+
 0.058002 -- 2022-08-22
 
     [Bug fixes]

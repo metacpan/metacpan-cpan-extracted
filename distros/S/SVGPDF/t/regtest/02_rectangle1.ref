@@ -1,0 +1,22 @@
+==== start svg ====
+XObject #1
+vb 0 0 200 250 (inferred) => bb 0.00 -250.00 200.00 0.00
+matrix( 1 0 0 -1 0 0)
+vb rect( 0.00 0.00 200.00 250.00)
+xo fill_color black (initial)
+  start handling rect (SVGPDF::Rect)
+  rect x=10 y=10 w=30 h=30
+    xo save
+    rect stroke=none fill=(current) fill=black
+    xo fill (none)
+    xo restore
+  end handling rect
+  start handling rect (SVGPDF::Rect)
+  rect x=60 y=10 w=30 h=30
+    xo save
+    rect stroke=none fill=(current) fill=black
+    rect(rounded) rx=10 ry=10
+    xo fill (none)
+    xo restore
+  end handling rect
+==== end svg ====

@@ -9,9 +9,9 @@ use Perinci::Exporter;
 use Perinci::Object;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-22'; # DATE
+our $DATE = '2023-12-13'; # DATE
 our $DIST = 'App-FfmpegUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our %SPEC;
 
@@ -451,7 +451,7 @@ _
         %argspecopt_copy,
     },
     args_rels => {
-        req_one => [qw/start end duration/],
+        req_one => [qw/start duration/],
     },
     examples => [
         {
@@ -609,7 +609,7 @@ App::FfmpegUtils - Utilities related to ffmpeg
 
 =head1 VERSION
 
-This document describes version 0.012 of App::FfmpegUtils (from Perl distribution App-FfmpegUtils), released on 2022-09-22.
+This document describes version 0.013 of App::FfmpegUtils (from Perl distribution App-FfmpegUtils), released on 2023-12-13.
 
 =head1 FUNCTIONS
 
@@ -675,11 +675,19 @@ Whether to use the "copy" codec (fast but produces inaccurate timings).
 
 =item * B<duration> => I<duration|percent_str>
 
+(No description)
+
 =item * B<end> => I<duration|percent_str>
+
+(No description)
 
 =item * B<files>* => I<array[filename]>
 
+(No description)
+
 =item * B<start> => I<duration|percent_str>
+
+(No description)
 
 
 =back
@@ -764,15 +772,23 @@ Set audio sample rate, in Hz.
 
 =item * B<crf> => I<int>
 
+(No description)
+
 =item * B<ffmpeg_path> => I<filename>
 
+(No description)
+
 =item * B<files>* => I<array[filename]>
+
+(No description)
 
 =item * B<frame_rate> => I<ufloat>
 
 Set frame rate, in fps.
 
 =item * B<preset> => I<str> (default: "veryslow")
+
+(No description)
 
 =item * B<scale> => I<str> (default: "1080^>")
 
@@ -846,9 +862,15 @@ Whether to use the "copy" codec (fast but produces inaccurate timings).
 
 =item * B<every> => I<duration|percent_str>
 
+(No description)
+
 =item * B<files>* => I<array[filename]>
 
+(No description)
+
 =item * B<parts> => I<posint>
+
+(No description)
 
 
 =back
@@ -906,7 +928,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

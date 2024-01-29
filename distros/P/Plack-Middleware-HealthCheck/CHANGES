@@ -1,6 +1,15 @@
 Changelog for Plack-Middleware-HealthCheck
 
-v0.0.5 2020-09-14T17:57:29
+v0.1.0 2024-01-24T23:32:01
+ - Pull request #5: SM-4578 (Alan Lee)
+ - Update cpanfile and test file to comply with verify-cpanfile (Alan Lee)
+ - Update cpanfile to use compatible version of Hash::MultiValue (Alan Lee)
+ - Commit Makefile changes to enable 'make disttest' command (Alan Lee)
+ - Revert HashMultiValue change (Alan Lee)
+ - Added test cases for blessed object encoding (Alan Lee)
+ - Add 'allow_blessed' and 'convert_blessed' to JSON object (Alan Lee)
+
+v0.0.5 2020-09-14T17:57:17
  - Update README (Andrew Hewus Fresh)
  - Fix content_type header spelling (Andrew Hewus Fresh)
 

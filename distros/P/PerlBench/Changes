@@ -1,5 +1,18 @@
 Revision history for Perl module perlbench
 
+1.003 2024-01-05T14:50:56Z
+	* re-release for slight snafu in 1.002
+
+1.002 2024-01-05T14:36:55Z
+	* refresh distro
+
+1.002 2024-01-05T14:33:05Z
+	* Refresh module
+
+1.002 2020-02-16T04:08:02Z
+	* Note that you need to look at the perlbench* programs to see
+	what you need to do.
+
 1.001 2017-04-23T13:53:06Z
 	* Freshening the distro
 

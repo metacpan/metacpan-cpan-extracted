@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 08-recurse.t 1925 2023-05-31 11:58:59Z willem $ -*-perl-*-
+# $Id: 08-recurse.t 1959 2024-01-17 08:55:01Z willem $ -*-perl-*-
 #
 
 use strict;
@@ -46,7 +46,7 @@ eval {
 } || exit( plan skip_all => "Cannot access global root nameservers: $@" );
 
 
-plan tests => 10;
+plan tests => 12;
 
 NonFatalBegin();
 
@@ -60,7 +60,7 @@ for my $res ( Net::DNS::Resolver::Recurse->new( debug => 0 ) ) {
 }
 
 
-for my $res ( Net::DNS::Resolver::Recurse->new( debug => 0 ) ) {	# test the callback
+for my $res ( Net::DNS::Resolver::Recurse->new( debug => 0 ) ) {    # test the callback
 
 	my $count = 0;
 
@@ -98,10 +98,32 @@ SKIP: {
 	ok( $reply->header->aa, "authoritative response from $from" );
 
 	my @ns = grep { $_->type eq 'NS' } $reply->answer;
-	ok( scalar(@ns), "NS RRs in response from $from" );
+	my $ns = scalar(@ns);
+	ok( scalar(@ns), "$ns NS RRs in response from $from" );
 
 	my @ar = grep { $_->can('address') } $reply->additional;
-	ok( scalar(@ar), "address RRs in response from $from" );
+	my $ar = scalar(@ar);
+	ok( scalar(@ar), "$ar address RRs in response from $from" );
+}
+
+
+for my $res ( Net::DNS::Resolver::Recurse->new() ) {
+	$res->callback(
+		sub {
+			my $reply = shift;
+			my ($q)	  = $reply->question;
+			my ($a)	  = ( $reply->answer, $reply->authority );
+			$a->{owner} = Net::DNS::DomainName->new('bogus.example')
+					if lc( $a->owner ) eq lc( $q->qname );
+		} );
+	my $reply = $res->send( 'net-dns.org', 'NS' );
+	is( $reply, undef, 'reject bogus referral' );
+}
+
+
+for my $res ( Net::DNS::Resolver::Recurse->new() ) {
+	local $res->{recurse_depth} = 200;
+	exception( 'deep recursion', sub { $res->send('www.net-dns.org') } );
 }
 
 

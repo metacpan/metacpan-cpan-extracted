@@ -1,0 +1,6 @@
+# Adding numeric suffixes to reused aliases
+
+Demo:
+
+    yamltidy -c etc/serialize-aliases/config.yaml etc/serialize-aliases/example1.yaml --debug
+    yamltidy -c etc/serialize-aliases/config.yaml etc/serialize-aliases/example2.yaml --debug

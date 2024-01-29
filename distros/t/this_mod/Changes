@@ -1,0 +1,129 @@
+0.020   2023-08-27  Released-By: PERLANCAR; Urgency: medium
+
+        - [experimental] Guess this-dist from a single perl release archive in
+          current dir.
+
+
+0.019   2023-05-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention dir2mod, dir2dist.
+
+
+0.018   2022-08-21  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention Dist::Util::Current.
+
+
+0.017   2022-08-21  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Add notes about debugging statement.
+
+
+0.016   2022-06-05  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention scripts that already default to 'current distribution'
+          and 'current module' like 'pmman', 'dist-has-deb'.
+
+
+0.015   2022-05-03  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Tweak description for the scripts.
+
+
+0.014   2022-05-03  Released-By: PERLANCAR; Urgency: medium
+
+	- [cli this-mod] Observe PERL_THIS_MOD_NAMESPACE_PREFIX environment
+	  variable.
+
+
+0.013   2021-12-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Do not determine using URLs in .git/config or
+	  CPAN::Dist::FromRepoName against directory name, as these are too
+	  eager.
+
+
+0.012   2021-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- [cli this-mod] Add option --namespace-prefix (-n).
+
+	- Also export this_mod().
+
+
+0.011   2021-06-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Add function this_mod().
+
+
+0.010   2021-05-27  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Tweak examples in Synopsis of scripts.
+
+
+0.009   2021-04-02  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Add more recipes in Synopsis; add recipes for this-mod.
+
+	- [doc] Mention this-{dist,mod}-on-metacpan.
+
+
+0.008   2021-02-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: this-mod.
+
+
+0.007   2020-10-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option --extract-version (-V) to extract version.
+
+
+0.006   2020-10-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Extract distribution name from {META,MYMETA}.{json,yml},
+	  Makefile{,.PL}, Build.PL.
+
+
+0.005   2020-10-03  Released-By: PERLANCAR; Urgency: medium
+
+	- [internal] Move logic to this_dist() function in App::ThisDist
+	  for reusability.
+
+
+0.004   2020-10-03  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Tweak/expand docs.
+
+
+0.003   2020-10-02  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Tweak Abstract.
+
+
+0.002   2020-10-02  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add FAQ item.
+
+
+0.001   2020-10-02  Released-By: PERLANCAR
+
+        - First release.

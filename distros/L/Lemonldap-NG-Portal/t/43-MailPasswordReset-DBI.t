@@ -36,8 +36,7 @@ SKIP: {
 "INSERT INTO users VALUES ('dwho','dwho','Doctor who','dwho\@badwolf.org')"
     );
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                    => 'error',
                 useSafeJail                 => 1,
@@ -58,7 +57,7 @@ SKIP: {
                 dbiMailCol                  => 'mail',
                 portalEnablePasswordDisplay => 1,
                 portalDisplayPasswordPolicy => 1,
-                passwordPolicyActivation    => 0,
+                passwordPolicyActivation    => 1,
                 passwordResetAllowedRetries => 4,
                 passwordPolicyMinDigit      => 2,
                 passwordPolicyMinSpeChar    => 1,
@@ -170,11 +169,8 @@ m%<input id="newpassword" name="newpassword" type="password" class="form-control
         $res->[2]->[0] !~ /passwordPolicySpecialChar/,
         ' Password special char list not found'
     );
-    ok(
-        $res->[2]->[0] =~
-/<span trspan="passwordPolicyMinDigit">Minimal digit characters:<\/span> 2/,
-        ' Found password policy min digit == 2'
-    );
+    ok( $res->[2]->[0] =~ /<span trspan="passwordPolicyMinDigit"><\/span> 2/,
+        ' Found password policy min digit == 2' );
     $query .= '&newpassword=zz11#&confirmpassword=zz11#';
     ok(
         $res = $client->_post(

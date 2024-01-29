@@ -2,6 +2,8 @@ package Liveman::Project;
 use common::sense;
 
 use File::Slurper qw/read_text write_text/;
+use File::Spec qw/catfile updir/;
+use File::Path qw/mkpath rmtree/;
 use Liveman::Append;
 
 # Конструктор
@@ -29,7 +31,7 @@ sub make {
     die "Not license $self->{license}!\n" if $self->{license} !~ /^(perl_5|gpl_3)$/;
 
     $self->{name} = my $name = $pkg =~ s/::/-/gr;
-    $self->{path} = my $path = "lib/" . ($pkg =~ s/::/\//gr);
+    $self->{path} = my $path = catfile("lib", split /::/, $pkg);
     my $dir = "perl-" . lc $name;
 
     system "minil new $name" and return $self;
@@ -43,14 +45,14 @@ sub make {
 
     Liveman::Append->new->mkmd("$path.md");
 
-    _replace { s!("5.22"),[^\]]*?(\s*\])!$1$2! } ".github/workflows/test.yml";
+    _replace { s!("5.22"),[^\]]*?(\s*\])!$1$2! } catfile(qw/ .github workflows test.yml /);
 
-    system "rm -fr t" and return $self;
+    eval { rmtree("t") } or do { print STDERR $@; return $self };
     system "git init" and return $self;
     system "git remote add origin git\@github.com:darviarush/$dir.git" and return $self;
     system "opera \"https://github.com/new?name=$dir&description=$pkg%20is%20\" &> /dev/null";
 
-    chdir "..";
+    chdir updir();
     $self
 }
 
@@ -59,8 +61,8 @@ sub minil_toml {
     my ($self) = @_;
 
     my $authority = "???";
-    my $pause = "$ENV{HOME}/.pause";
-    if(-e $pause) {
+    my $pause = catfile($ENV{HOME}, ".pause");
+    if(length $ENV{HOME} and -f $pause) {
         $authority = $1 if read_text($pause) =~ /\buser[\t ]+(\S+)/;
     }
 
@@ -812,7 +814,7 @@ __END__
 
 =head1 NAME
 
-Liveman::Project - maker new perl-repository
+Liveman::Project - maker of the new perl-repository
 
 =head1 SYNOPSIS
 

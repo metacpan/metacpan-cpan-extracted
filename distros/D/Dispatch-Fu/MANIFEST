@@ -12,4 +12,6 @@ lib/Dispatch/Fu.pm
 t/00-example.t
 t/01-example.t
 t/02-xdefault.t
+t/03-on-warn.t
+t/04-return-values.t
 t/release-kwalitee.t

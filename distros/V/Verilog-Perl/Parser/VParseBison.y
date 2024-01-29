@@ -10,7 +10,7 @@
 //
 //*************************************************************************
 //
-// Copyright 2001-2022 by Wilson Snyder.  This program is free software;
+// Copyright 2001-2024 by Wilson Snyder.  This program is free software;
 // you can redistribute it and/or modify it under the terms of either the GNU
 // Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 //
@@ -324,6 +324,11 @@ static void NEED_S09(VFileLine*, const string&) {
     //Let lint tools worry about it
     //fileline->error((string)"Advanced feature: \""+tokname+"\" is a 1800-2009 construct, but used under --language 1800-2005 or earlier.");
 }
+
+// gcc-11 https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98753
+#if defined(__GNUC__) && __GNUC__ == 11
+#pragma GCC diagnostic ignored "-Wfree-nonheap-object"
+#endif
 
 %}
 

@@ -1,5 +1,9 @@
 Revision history for Pg-Explain
 
+2.7     2023/12/29
+        Properly handle various I/O Timings formats
+        per information from Michael Paquier
+
 2.6     2023/01/26
         - Fix handling of Planning I/O timings
           per report from Christoph Berg

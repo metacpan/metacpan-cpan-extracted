@@ -3,12 +3,15 @@
 #
 #  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::Equ 0.06;
+package Syntax::Operator::Equ 0.09;
 
 use v5.14;
 use warnings;
 
 use Carp;
+
+use meta 0.003_002;
+no warnings 'meta::experimental';
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, our $VERSION );
@@ -71,25 +74,45 @@ given above.
 
 sub import
 {
-   my $class = shift;
+   my $pkg = shift;
    my $caller = caller;
 
-   $class->import_into( $caller, @_ );
+   $pkg->import_into( $caller, @_ );
 }
 
-sub import_into
+sub unimport
 {
-   my $class = shift;
-   my ( $caller, @syms ) = @_;
+   my $pkg = shift;
+   my $caller = caller;
+
+   $pkg->unimport_into( $caller, @_ );
+}
+
+sub import_into   { shift->apply( 1, @_ ) }
+sub unimport_into { shift->apply( 0, @_ ) }
+
+sub apply
+{
+   my $pkg = shift;
+   my ( $on, $caller, @syms ) = @_;
 
    @syms or @syms = qw( equ );
 
    my %syms = map { $_ => 1 } @syms;
-   $^H{"Syntax::Operator::Equ/equ"}++ if delete $syms{equ};
+   if( delete $syms{equ} ) {
+      $on ? $^H{"Syntax::Operator::Equ/equ"}++
+          : delete $^H{"Syntax::Operator::Equ/equ"};
+   }
+
+   my $callerpkg;
 
    foreach (qw( is_strequ is_numequ )) {
-      no strict 'refs';
-      *{"${caller}::$_"} = \&{$_} if delete $syms{$_};
+      next unless delete $syms{$_};
+
+      $callerpkg //= meta::package->get( $caller );
+
+      $on ? $callerpkg->add_symbol( '&'.$_ => \&{$_} )
+          : $callerpkg->remove_symbol( '&'.$_ );
    }
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;

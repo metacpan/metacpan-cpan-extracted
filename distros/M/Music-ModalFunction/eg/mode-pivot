@@ -48,26 +48,27 @@ for my $i (1 .. $phrases) {
 
     # make a modal query object with the current chord and mode
     my $m = Music::ModalFunction->new(
-        chord_note => lc($modal_pitch),
-        chord      => $chord,
-        mode_note  => $last_pitch,
-        mode       => $last_scale,
+        chord_note   => lc($modal_pitch),
+        chord        => $chord,
+        mode_note    => $last_pitch,
+        mode         => $last_scale,
+        hash_results => 1,
     );
     my $results = $m->pivot_chord_keys;
     last unless @$results;
     # select a random member of the query results
     my $result = $results->[ int rand @$results ];
     # get the result pitch
-    $pitch = substr $result->[7], 0, 1;
+    $pitch = substr $result->{key_note}, 0, 1;
     # get the result accidental
-    (my $accidental = $result->[7]) =~ s/^[a-g]([fs]?)/$1/;
+    (my $accidental = $result->{key_note}) =~ s/^[a-g]([fs]?)/$1/;
     # convert from midi format back to #/b format
     $accidental = '#' if $accidental eq 's';
     $accidental = 'b' if $accidental eq 'f';
     # redefine the pitch with the accidental appended
     $pitch = uc($pitch) . $accidental;
     # get the scale from the result
-    $scale = $result->[8];
+    $scale = $result->{key};
 }
 
 $score->write_score("$0.mid");

@@ -1,0 +1,51 @@
+{
+   "abstract" : "Converts numeric values into their Slavic",
+   "author" : [
+      "Ted Zlatanov <tzz@lifelogs.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Lingua-Slavic-Numbers",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "0",
+            "Regexp::Common" : "0",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "Lingua::BG::Numbers" : {
+         "file" : "lib/Lingua/BG/Numbers.pm",
+         "version" : "0.03"
+      },
+      "Lingua::Slavic::Numbers" : {
+         "file" : "lib/Lingua/Slavic/Numbers.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/eserte/Lingua-Slavic-Numbers"
+      }
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

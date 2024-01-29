@@ -11,7 +11,7 @@ WriteMakefile(
    VERSION_FROM  => 'lib/DateTime/Format/RFC3339.pm',
    ABSTRACT_FROM => 'lib/DateTime/Format/RFC3339.pm',
    dist           => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
-   clean          => { FILES => 'DateTime-Format-Atom-*' },
+   clean          => { FILES => 'DateTime-Format-RFC3339-*' },
    BUILD_REQUIRES => {},
 
    META_MERGE  => {
@@ -22,11 +22,12 @@ WriteMakefile(
       prereqs => {
          configure => {
             requires => {
-               'ExtUtils::MakeMaker' => 6.52,
+               'ExtUtils::MakeMaker' => 6.68,
             },
          },
          runtime => {
             requires => {
+               'perl'                => 5.010,
                'strict'              => 0,
                'version'             => 0,
                'warnings'            => 0,
@@ -43,7 +44,6 @@ WriteMakefile(
          },
          develop => {
             requires => {
-               'FindBin'             => 0,
                'Pod::Coverage'       => 0.18,
                'Test::Pod::Coverage' => 1.08,
             },
@@ -51,11 +51,10 @@ WriteMakefile(
       },
 
       resources => {
-         homepage => 'http://search.cpan.org/dist/DateTime-Format-RFC3339/',
+         homepage => 'https://metacpan.org/dist/DateTime-Format-RFC3339',
          license => [ 'http://creativecommons.org/publicdomain/zero/1.0/' ],
          bugtracker => {
-            web    => 'http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DateTime-Format-RFC3339',
-            mailto => 'bug-DateTime-Format-RFC3339@rt.cpan.org',
+            web => 'https://github.com/ikegami/perl-DateTime-Format-RFC3339/issues',
          },
          repository => {
             type => 'git',

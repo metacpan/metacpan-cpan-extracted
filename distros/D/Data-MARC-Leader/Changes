@@ -1,3 +1,8 @@
+0.04 2024-01-12T09:38:37+01:00
+ - Add test with real data.
+ - Improve doc of Data::MARC::Leader.
+ - Update copyright years.
+
 0.03 2023-11-20T14:39:39+01:00
  - Change API: Rename char_encoding_scheme() to char_coding_scheme().
 

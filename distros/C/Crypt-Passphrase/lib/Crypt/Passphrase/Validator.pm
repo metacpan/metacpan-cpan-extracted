@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Validator;
-$Crypt::Passphrase::Validator::VERSION = '0.016';
+$Crypt::Passphrase::Validator::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -27,31 +27,43 @@ Crypt::Passphrase::Validator - Base class for Crypt::Passphrase validators
 
 =head1 VERSION
 
-version 0.016
+version 0.019
 
 =head1 DESCRIPTION
 
-This is a base class for validators. It requires any subclass to implement the following two methods:
+This is a base class for validators.
 
-=head1 METHODS
+=head1 SUBCLASSING
 
-=head2 accepts_hash($hash)
+=head2 Mandatory methods
+
+It expects the subclass to implement the following methods:
+
+=head3 accepts_hash
+
+ $validator->accepts_hash($hash)
 
 This method returns true if this validator is able to process a hash. Typically this means that it's crypt identifier matches that of the validator.
 
-=head2 verify_password($password, $hash)
+=head3 verify_password
+
+ $validator->verify_password($password, $hash)
 
 This checks if a C<$password> satisfies C<$hash>.
 
+=head2 Provided methods
+
 It provides the following helper method:
 
-=head2 secure_compare($left, $right)
+=head3 secure_compare
+
+ $validator->secure_compare($left, $right)
 
 This compares two strings in a way that resists timing attacks.
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

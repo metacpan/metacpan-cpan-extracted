@@ -36,7 +36,7 @@ package WWW::Splunk;
 use strict;
 use warnings;
 
-our $VERSION = '2.08';
+our $VERSION = '2.09';
 
 use WWW::Splunk::API;
 use Carp;
@@ -59,9 +59,13 @@ sub start_search {
 	($since, $until) = map { defined $_ ? scalar UnixDate (ParseDate ($_) || $_, '%O') || $_ : undef }
 		($since, $until);
 
+	if ($self->{search}) {
+		$string = 'search '.$string;
+	}
+
 	$self->{results_consumed} = 0;
 	my $response = $self->post ('/search/jobs', {
-		search => "search $string",
+		search => "$string",
 		(defined $since ? (earliest_time => $since) : ()),
 		(defined $until ? (latest_time => $until) : ()),
 	});
@@ -172,12 +176,31 @@ sub results_read {
 Lubomir Rintel, L<< <lkundrak@v3.sk> >>,
 Michal Josef Špaček L<< <skim@cpan.org> >>
 
-The code is hosted on GitHub L<http://github.com/tupinek/perl-WWW-Splunk>.
+The code is hosted on GitHub L<http://github.com/michal-josef-spacek/perl-WWW-Splunk>.
 Bug fixes and feature enhancements are always welcome.
 
 =head1 LICENSE
 
  This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+
+=head1 DONATIONS
+
+If you use this library and find it useful, donations are greatly appreciated!
+
+=begin text
+
+ Use https://liberapay.com/skim/donate
+
+=end text
+
+=begin html
+
+<a href="https://liberapay.com/skim/donate">
+  <img alt="Donate using Liberapay"
+    src="https://liberapay.com/assets/widgets/donate.svg">
+</a>
+
+=end html
 
 =cut
 

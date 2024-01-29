@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -21,24 +21,26 @@
       },
       "runtime" : {
          "requires" : {
-            "Future" : "0.05",
-            "POE" : "0"
+            "Future" : "0.49",
+            "POE" : "0",
+            "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88",
+            "Test2::V0" : "0",
             "Test::Timer" : "0"
          }
       }
    },
    "provides" : {
       "Future::IO::Impl::POE" : {
-         "file" : "lib/Future/IO/Impl/POE.pm"
+         "file" : "lib/Future/IO/Impl/POE.pm",
+         "version" : "0.05"
       },
       "POE::Future" : {
          "file" : "lib/POE/Future.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -47,6 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

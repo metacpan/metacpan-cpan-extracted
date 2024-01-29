@@ -4,7 +4,7 @@
       "perlancar <perlancar@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -56,323 +56,347 @@
    "provides" : {
       "Data::Sah::Coerce::perl::To_array::From_str::expand_glob" : {
          "file" : "lib/Data/Sah/Coerce/perl/To_array/From_str/expand_glob.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Data::Sah::Filter::perl::Path::check_dir_exists" : {
          "file" : "lib/Data/Sah/Filter/perl/Path/check_dir_exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Data::Sah::Filter::perl::Path::check_file_exists" : {
          "file" : "lib/Data/Sah/Filter/perl/Path/check_file_exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Data::Sah::Filter::perl::Path::check_path_exists" : {
          "file" : "lib/Data/Sah/Filter/perl/Path/check_path_exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Data::Sah::Filter::perl::Path::check_path_not_exists" : {
          "file" : "lib/Data/Sah/Filter/perl/Path/check_path_not_exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Data::Sah::Filter::perl::Path::expand_tilde" : {
          "file" : "lib/Data/Sah/Filter/perl/Path/expand_tilde.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" : {
          "file" : "lib/Data/Sah/Filter/perl/Path/expand_tilde_when_on_unix.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Data::Sah::Filter::perl::Path::strip_slashes" : {
          "file" : "lib/Data/Sah/Filter/perl/Path/strip_slashes.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" : {
          "file" : "lib/Data/Sah/Filter/perl/Path/strip_slashes_when_on_unix.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Data::Sah::Value::perl::Path::curdir_abs" : {
          "file" : "lib/Data/Sah/Value/perl/Path/curdir_abs.pm",
-         "version" : "0.025"
+         "version" : "0.030"
+      },
+      "Data::Sah::Value::perl::Path::newest_file_in_curdir" : {
+         "file" : "lib/Data/Sah/Value/perl/Path/newest_file_in_curdir.pm",
+         "version" : "0.030"
       },
       "Data::Sah::Value::perl::Path::only_file_in_curdir" : {
          "file" : "lib/Data/Sah/Value/perl/Path/only_file_in_curdir.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Data::Sah::Value::perl::Path::only_file_not_dir_in_curdir" : {
          "file" : "lib/Data/Sah/Value/perl/Path/only_file_not_dir_in_curdir.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Data::Sah::Value::perl::Path::only_subdir_in_curdir" : {
          "file" : "lib/Data/Sah/Value/perl/Path/only_subdir_in_curdir.pm",
-         "version" : "0.025"
+         "version" : "0.030"
+      },
+      "Data::Sah::Value::perl::Path::only_subdir_not_file_in_curdir" : {
+         "file" : "lib/Data/Sah/Value/perl/Path/only_subdir_not_file_in_curdir.pm",
+         "version" : "0.030"
       },
       "Sah::Schema::dirname" : {
          "file" : "lib/Sah/Schema/dirname.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::dirname::default_curdir" : {
          "file" : "lib/Sah/Schema/dirname/default_curdir.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::dirname::default_curdir_abs" : {
          "file" : "lib/Sah/Schema/dirname/default_curdir_abs.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::dirname::default_only_subdir_in_curdir" : {
          "file" : "lib/Sah/Schema/dirname/default_only_subdir_in_curdir.pm",
-         "version" : "0.025"
+         "version" : "0.030"
+      },
+      "Sah::Schema::dirname::default_only_subdir_not_file_in_curdir" : {
+         "file" : "lib/Sah/Schema/dirname/default_only_subdir_not_file_in_curdir.pm",
+         "version" : "0.030"
       },
       "Sah::Schema::dirname::exists" : {
          "file" : "lib/Sah/Schema/dirname/exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::dirname::exists::default_only_subdir_in_curdir" : {
          "file" : "lib/Sah/Schema/dirname/exists/default_only_subdir_in_curdir.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::dirname::not_exists" : {
          "file" : "lib/Sah/Schema/dirname/not_exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::dirname::unix" : {
          "file" : "lib/Sah/Schema/dirname/unix.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::dirname::unix::basename" : {
          "file" : "lib/Sah/Schema/dirname/unix/basename.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::dirname::unix::exists" : {
          "file" : "lib/Sah/Schema/dirname/unix/exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::dirname::unix::not_exists" : {
          "file" : "lib/Sah/Schema/dirname/unix/not_exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::dirnames::exist" : {
          "file" : "lib/Sah/Schema/dirnames/exist.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::filename" : {
          "file" : "lib/Sah/Schema/filename.pm",
-         "version" : "0.025"
+         "version" : "0.030"
+      },
+      "Sah::Schema::filename::default_newest_file_in_curdir" : {
+         "file" : "lib/Sah/Schema/filename/default_newest_file_in_curdir.pm",
+         "version" : "0.030"
       },
       "Sah::Schema::filename::default_only_file_in_curdir" : {
          "file" : "lib/Sah/Schema/filename/default_only_file_in_curdir.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::filename::default_only_file_not_dir_in_curdir" : {
          "file" : "lib/Sah/Schema/filename/default_only_file_not_dir_in_curdir.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::filename::exists" : {
          "file" : "lib/Sah/Schema/filename/exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::filename::exists::default_only_file_in_curdir" : {
          "file" : "lib/Sah/Schema/filename/exists/default_only_file_in_curdir.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::filename::not_exists" : {
          "file" : "lib/Sah/Schema/filename/not_exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::filename::unix" : {
          "file" : "lib/Sah/Schema/filename/unix.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::filename::unix::basename" : {
          "file" : "lib/Sah/Schema/filename/unix/basename.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::filename::unix::exists" : {
          "file" : "lib/Sah/Schema/filename/unix/exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::filename::unix::not_exists" : {
          "file" : "lib/Sah/Schema/filename/unix/not_exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::filenames" : {
          "file" : "lib/Sah/Schema/filenames.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::filenames::exist" : {
          "file" : "lib/Sah/Schema/filenames/exist.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::pathname" : {
          "file" : "lib/Sah/Schema/pathname.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::pathname::exists" : {
          "file" : "lib/Sah/Schema/pathname/exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::pathname::not_exists" : {
          "file" : "lib/Sah/Schema/pathname/not_exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::pathname::unix" : {
          "file" : "lib/Sah/Schema/pathname/unix.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::pathname::unix::basename" : {
          "file" : "lib/Sah/Schema/pathname/unix/basename.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::pathname::unix::exists" : {
          "file" : "lib/Sah/Schema/pathname/unix/exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::pathname::unix::not_exists" : {
          "file" : "lib/Sah/Schema/pathname/unix/not_exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::pathnames" : {
          "file" : "lib/Sah/Schema/pathnames.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schema::pathnames::exist" : {
          "file" : "lib/Sah/Schema/pathnames/exist.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::dirname" : {
          "file" : "lib/Sah/SchemaR/dirname.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::dirname::default_curdir" : {
          "file" : "lib/Sah/SchemaR/dirname/default_curdir.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::dirname::default_curdir_abs" : {
          "file" : "lib/Sah/SchemaR/dirname/default_curdir_abs.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::dirname::default_only_subdir_in_curdir" : {
          "file" : "lib/Sah/SchemaR/dirname/default_only_subdir_in_curdir.pm",
-         "version" : "0.025"
+         "version" : "0.030"
+      },
+      "Sah::SchemaR::dirname::default_only_subdir_not_file_in_curdir" : {
+         "file" : "lib/Sah/SchemaR/dirname/default_only_subdir_not_file_in_curdir.pm",
+         "version" : "0.030"
       },
       "Sah::SchemaR::dirname::exists" : {
          "file" : "lib/Sah/SchemaR/dirname/exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::dirname::exists::default_only_subdir_in_curdir" : {
          "file" : "lib/Sah/SchemaR/dirname/exists/default_only_subdir_in_curdir.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::dirname::not_exists" : {
          "file" : "lib/Sah/SchemaR/dirname/not_exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::dirname::unix" : {
          "file" : "lib/Sah/SchemaR/dirname/unix.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::dirname::unix::basename" : {
          "file" : "lib/Sah/SchemaR/dirname/unix/basename.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::dirname::unix::exists" : {
          "file" : "lib/Sah/SchemaR/dirname/unix/exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::dirname::unix::not_exists" : {
          "file" : "lib/Sah/SchemaR/dirname/unix/not_exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::dirnames::exist" : {
          "file" : "lib/Sah/SchemaR/dirnames/exist.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::filename" : {
          "file" : "lib/Sah/SchemaR/filename.pm",
-         "version" : "0.025"
+         "version" : "0.030"
+      },
+      "Sah::SchemaR::filename::default_newest_file_in_curdir" : {
+         "file" : "lib/Sah/SchemaR/filename/default_newest_file_in_curdir.pm",
+         "version" : "0.030"
       },
       "Sah::SchemaR::filename::default_only_file_in_curdir" : {
          "file" : "lib/Sah/SchemaR/filename/default_only_file_in_curdir.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::filename::default_only_file_not_dir_in_curdir" : {
          "file" : "lib/Sah/SchemaR/filename/default_only_file_not_dir_in_curdir.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::filename::exists" : {
          "file" : "lib/Sah/SchemaR/filename/exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::filename::exists::default_only_file_in_curdir" : {
          "file" : "lib/Sah/SchemaR/filename/exists/default_only_file_in_curdir.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::filename::not_exists" : {
          "file" : "lib/Sah/SchemaR/filename/not_exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::filename::unix" : {
          "file" : "lib/Sah/SchemaR/filename/unix.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::filename::unix::basename" : {
          "file" : "lib/Sah/SchemaR/filename/unix/basename.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::filename::unix::exists" : {
          "file" : "lib/Sah/SchemaR/filename/unix/exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::filename::unix::not_exists" : {
          "file" : "lib/Sah/SchemaR/filename/unix/not_exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::filenames" : {
          "file" : "lib/Sah/SchemaR/filenames.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::filenames::exist" : {
          "file" : "lib/Sah/SchemaR/filenames/exist.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::pathname" : {
          "file" : "lib/Sah/SchemaR/pathname.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::pathname::exists" : {
          "file" : "lib/Sah/SchemaR/pathname/exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::pathname::not_exists" : {
          "file" : "lib/Sah/SchemaR/pathname/not_exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::pathname::unix" : {
          "file" : "lib/Sah/SchemaR/pathname/unix.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::pathname::unix::basename" : {
          "file" : "lib/Sah/SchemaR/pathname/unix/basename.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::pathname::unix::exists" : {
          "file" : "lib/Sah/SchemaR/pathname/unix/exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::pathname::unix::not_exists" : {
          "file" : "lib/Sah/SchemaR/pathname/unix/not_exists.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::pathnames" : {
          "file" : "lib/Sah/SchemaR/pathnames.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::SchemaR::pathnames::exist" : {
          "file" : "lib/Sah/SchemaR/pathnames/exist.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       },
       "Sah::Schemas::Path" : {
          "file" : "lib/Sah/Schemas/Path.pm",
-         "version" : "0.025"
+         "version" : "0.030"
       }
    },
    "release_status" : "stable",
@@ -387,10 +411,10 @@
          "web" : "https://github.com/perlancar/perl-Sah-Schemas-Path"
       }
    },
-   "version" : "0.025",
+   "version" : "0.030",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.038000"
+         "version" : "5.038002"
       },
       "plugins" : [
          {
@@ -428,52 +452,52 @@
                }
             },
             "name" : "@Author::PERLANCAR/@Filter/GatherDir",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "@Author::PERLANCAR/@Filter/PruneCruft",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Author::PERLANCAR/@Filter/ManifestSkip",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Author::PERLANCAR/@Filter/MetaYAML",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@Author::PERLANCAR/@Filter/License",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodCoverageTests",
             "name" : "@Author::PERLANCAR/@Filter/PodCoverageTests",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Author::PERLANCAR/@Filter/PodSyntaxTests",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
             "name" : "@Author::PERLANCAR/@Filter/ExtraTests",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/@Filter/ExecDir",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@Author::PERLANCAR/@Filter/ShareDir",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -483,22 +507,22 @@
                }
             },
             "name" : "@Author::PERLANCAR/@Filter/MakeMaker",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Author::PERLANCAR/@Filter/Manifest",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Author::PERLANCAR/@Filter/ConfirmRelease",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/ExecDir script",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
@@ -579,17 +603,17 @@
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
             "name" : "@Author::PERLANCAR/IfBuilt",
-            "version" : "0.03"
+            "version" : "0.02"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Author::PERLANCAR/MetaJSON",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Author::PERLANCAR/MetaConfig",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
@@ -599,7 +623,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.030"
+                        "version" : "6.031"
                      }
                   ],
                   "include_underscores" : 0
@@ -795,7 +819,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Sah::Schemas",
                         "name" : "-Sah::Schemas",
-                        "version" : "0.074"
+                        "version" : "0.077"
                      }
                   ]
                }
@@ -806,7 +830,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PruneFiles",
             "name" : "@Author::PERLANCAR/PruneFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Pod2Readme",
@@ -920,7 +944,7 @@
                }
             },
             "name" : "Prereqs",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -931,62 +955,62 @@
                }
             },
             "name" : "DevelopX_spec",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.030"
+            "version" : "6.031"
          }
       ],
       "zilla" : {
@@ -994,15 +1018,15 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.030"
+         "version" : "6.031"
       }
    },
    "x_authority" : "cpan:PERLANCAR",
    "x_contributors" : [
       "Gabor Szabo <gabor@szabgab.com>"
    ],
-   "x_generated_by_perl" : "v5.38.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

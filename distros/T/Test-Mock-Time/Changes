@@ -1,5 +1,8 @@
 Revision history for Test-Mock-Time
 
+v0.2.1  2024-01-09 13:25:43 EET
+        - Fix warning about bigint/bignum conflict.
+
 v0.2.0  2023-06-07 01:30:38 EEST
         - Fix compatibility with modern EV.
 

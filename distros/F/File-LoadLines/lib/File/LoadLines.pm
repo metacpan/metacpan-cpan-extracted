@@ -17,7 +17,7 @@ File::LoadLines - Load lines from files and network
 
 =cut
 
-our $VERSION = '1.040';
+our $VERSION = '1.045';
 
 =head1 SYNOPSIS
 
@@ -63,9 +63,12 @@ that are returned in the result array. Line terminators are removed.
 In scalar context, returns an array reference.
 
 The first argument may be the name of a file, an opened file handle,
-or a reference to a string that contains the data. If the file name
-starts with C<"http:"> or C<"https:"> the data will be retrieved using
-LWP.
+or a reference to a string that contains the data.
+The name of a file on disk may start with C<"file://">, this is ignored.
+If the name starts with C<"http:"> or C<"https:"> the data will be
+retrieved using LWP.
+L<Data URLs|https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs> like C<"data:text/plain;base64,SGVsbG8sIFdvcmxkIQ=="> are
+also supported.
 
 The second argument can be used to influence the behaviour.
 It is a hash reference of option settings.
@@ -149,6 +152,7 @@ sub loadlines {
     }
     elsif ( $filename eq '-' ) {
 	$filename = "__STDIN__";
+	binmode( STDIN, ':raw' );
 	$data = do { local $/; <STDIN> };
     }
     elsif ( $filename =~ /^https?:/ ) {
@@ -166,8 +170,48 @@ sub loadlines {
 	    croak("$filename: ", $res->status_line);
 	}
     }
+    elsif ( $filename =~ /^data:/ ) {
+	unless ( $filename =~ m! ^ data:
+				 (?<mediatype> .*? )
+				 ,
+				 (?<data>      .*  ) $
+			  !sx ) {
+	    if ( $options->{fail} eq "soft" ) {
+		$options->{error} = "Malformed inline data";
+		return;
+	    }
+	    else {
+		croak("Malformed inline data");
+	    }
+	}
+	$data = $+{data};
+	$filename = "__DATA__";
+	my $mediatype = $+{mediatype};
+	my $enc = "";
+	if ( $mediatype && $mediatype =~ /^(.*);base64$/ ) {
+	    $mediatype = $1;
+	    $enc = "base64";
+	}
+	$options->{mediatype} = $mediatype if $mediatype;
+	if ( ! $enc ) {
+	    # URL encoded.
+	    $data = $+{data};
+	    $data =~ s/\%([0-9a-f][0-9a-f])/chr(hex($1))/ige;
+	}
+	else {
+	    # Base64.
+	    require MIME::Base64;
+	    $data = MIME::Base64::decode($data);
+	}
+	if ( $mediatype && $mediatype =~ /;charset=([^;]*)/ ) {
+	    $data = decode( $1, $data );
+	    $options->{encoding} = $1;
+	    $encoded++;
+	}
+    }
     else {
 	my $name = $filename;
+	$name =~ s;^file://;;;
 	$filename = decode_utf8($name);
 	# On MS Windows, non-latin (wide) filenames need special treatment.
 	if ( $filename ne $name && $^O =~ /mswin/i ) {
@@ -181,13 +225,14 @@ sub loadlines {
 		$options->{error} = "$!", return if $options->{fail} eq "soft";
 		croak("$filename: $!\n");
 	    }
+	    binmode FILE => ':raw';
 	    $data = do { local $/; readline(\*FILE) };
 	    # warn("$filename³: len=", length($data), "\n");
 	    close(FILE);
 	}
 	else {
 	    my $f;
-	    unless ( open( $f, '<', $filename ) ) {
+	    unless ( open( $f, '<:raw', $filename ) ) {
 		$options->{error} = "$!", return if $options->{fail} eq "soft";
 		croak("$filename: $!\n");
 	    }
@@ -203,7 +248,7 @@ sub loadlines {
     }
     elsif ( $encoded ) {
 	# Nothing to do, already dealt with.
-	$options->{encoding} = 'Perl';
+	$options->{encoding} //= 'Perl';
     }
 
     # Detect Byte Order Mark.
@@ -300,7 +345,8 @@ sub loadblob {
     croak("Invalid options.\n")
       if defined($options) && ref($options) ne "HASH";
     $options //= {};
-    loadlines( $filename, { blob => 1, %$options } );
+    $options->{blob} = 1;
+    loadlines( $filename, $options );
 }
 
 =head1 SEE ALSO
@@ -341,7 +387,7 @@ GitHub.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2018,2020,2023 Johan Vromans, all rights reserved.
+Copyright 2018,2020,2024 Johan Vromans, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

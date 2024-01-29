@@ -59,13 +59,12 @@ use subs qw(
             M_1_PIl M_2_PIl  M_2_SQRTPIl M_SQRT2l M_SQRT1_2l
             );
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 #$VERSION = eval $VERSION;
 
 Math::LongDouble->DynaLoader::bootstrap($Math::LongDouble::VERSION);
 
-@Math::LongDouble::EXPORT = ();
-@Math::LongDouble::EXPORT_OK = qw(
+my @tagged = qw(
     InfLD NaNLD ZeroLD UnityLD is_NaNLD is_InfLD is_ZeroLD STRtoLD LDtoSTR NVtoLD UVtoLD IVtoLD
     LDtoNV LDtoLD cmp_NV
     ld_set_prec ld_get_prec LDtoSTRP
@@ -91,33 +90,9 @@ Math::LongDouble->DynaLoader::bootstrap($Math::LongDouble::VERSION);
     pow_LD remainder_LD  rint_LD round_LD scalbln_LD scalbn_LD signbit_LD
     sincos_LD sinh_LD sin_LD sqrt_LD tan_LD tanh_LD tgamma_LD trunc_LD
     );
-
-%Math::LongDouble::EXPORT_TAGS = (all => [qw(
-    InfLD NaNLD ZeroLD UnityLD is_NaNLD is_InfLD is_ZeroLD STRtoLD LDtoSTR NVtoLD UVtoLD IVtoLD
-    LDtoNV LDtoLD cmp_NV
-    ld_set_prec ld_get_prec LDtoSTRP
-    LD_DBL_DIG LD_LDBL_DIG LD_DBL_MANT_DIG LD_LDBL_MANT_DIG
-
-    LD_DBL_MIN_EXP LD_DBL_MAX_EXP LD_DBL_MIN_10_EXP LD_DBL_MAX_10_EXP
-    LD_DBL_MAX LD_DBL_MIN LD_DBL_EPSILON LD_DBL_DENORM_MIN
-
-    LD_LDBL_MIN_EXP LD_LDBL_MAX_EXP LD_LDBL_MIN_10_EXP LD_LDBL_MAX_10_EXP
-    LD_LDBL_MAX LD_LDBL_MIN LD_LDBL_EPSILON LD_LDBL_DENORM_MIN
-
-    M_El M_LOG2El M_LOG10El M_LN2l M_LN10l M_PIl M_PI_2l M_PI_4l
-    M_1_PIl M_2_PIl  M_2_SQRTPIl M_SQRT2l M_SQRT1_2l
-
-    ld_max_orig_len ld_min_inter_prec ld_bytes
-
-    llrint_LD llround_LD lrint_LD lround_LD frexp_LD nan_LD remquo_LD
-    acos_LD acosh_LD asin_LD asinh_LD atan_LD atanh_LD atan2_LD cbrt_LD ceil_LD
-    copysign_LD cosh_LD cos_LD erf_LD erfc_LD exp_LD expm1_LD finite_LD fabs_LD
-    fdim_LD floor_LD fma_LD fmax_LD fmin_LD fmod_LD hypot_LD isinf_LD
-    ilogb_LD isnan_LD ldexp_LD lgamma_LD  log_LD log10_LD
-    log2_LD log1p_LD modf_LD nearbyint_LD nextafter_LD
-    pow_LD remainder_LD  rint_LD round_LD scalbln_LD scalbn_LD signbit_LD
-    sincos_LD sinh_LD sin_LD sqrt_LD tan_LD tanh_LD tgamma_LD trunc_LD
-    )]);
+@Math::LongDouble::EXPORT = ();
+@Math::LongDouble::EXPORT_OK = @tagged;
+%Math::LongDouble::EXPORT_TAGS = (all => \@tagged);
 
 my $fmt = "a" . Math::LongDouble::_get_actual_ldblsize();
 

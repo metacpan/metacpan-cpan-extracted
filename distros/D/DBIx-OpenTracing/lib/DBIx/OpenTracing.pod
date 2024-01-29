@@ -59,6 +59,10 @@ L<OpenTracing conventions|https://opentracing.io/specification/conventions/>:
 
 =item * error - will be set to true if the query failed
 
+=item * error.kind - A string containing the C<I<SQLSTATE>>, for ex. "SQLSTATE_0700F"
+
+=item * message - A readable message indicating the kind of error (not the SQL-Statement)
+
 =back
 
 =head1 IMPORT ARGUMENTS

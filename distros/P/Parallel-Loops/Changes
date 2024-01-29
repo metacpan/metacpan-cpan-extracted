@@ -1,3 +1,9 @@
+Version 0.12 on Jan 9 2024:
+    - Fix a couple of spelling mistakes
+Version 0.11 on Mar 26 2019:
+    - Allow callers to setup Parallel::ForkManager's
+      set_waitpid_blocking_sleep($sleep)
+    - Document perl versions where dependencies were introduced to core
 Version 0.10 on Oct 17 2018:
     - Version 0.09 actually requires Parallel::ForkManager 1.15. Declare that
       explicity

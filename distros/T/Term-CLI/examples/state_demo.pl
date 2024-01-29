@@ -77,7 +77,7 @@ sub buy_command {
 sub borrow_command {
     return Term::CLI::Command->new(
         name     => 'borrow',
-        summary  => 'borrow money (decrease credit)',
+        summary  => 'borrow money (increase credit)',
         arguments => [ Term::CLI::Argument::Number::Float->new(
             name => 'amount',
             min => 0,

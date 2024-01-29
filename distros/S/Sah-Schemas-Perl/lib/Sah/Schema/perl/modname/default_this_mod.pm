@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2023-10-26'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.048'; # VERSION
+our $VERSION = '0.049'; # VERSION
 
 our $schema = ['perl::modname' => {
     summary => 'Perl module, defaults to "this module"',
@@ -15,6 +15,12 @@ our $schema = ['perl::modname' => {
 See <pm:App::ThisDist>'s `this_mod()` for more details on how "this module" is
 determined. Note that `App::ThisDist` is not added as dependency automatically;
 you will have to add it manually.
+
+Note: be careful when using this schema for actions that are destructive to a
+Perl module or that change some things, because a user can perform those actions
+without giving an argument (e.g. a `delete-module` script). It is safer to use
+this schema to perform a non=destructive action (e.g. `man-module`) and/or
+operate in dry-run mode by default.
 
 _
 
@@ -42,7 +48,7 @@ Sah::Schema::perl::modname::default_this_mod - Perl module, defaults to "this mo
 
 =head1 VERSION
 
-This document describes version 0.048 of Sah::Schema::perl::modname::default_this_mod (from Perl distribution Sah-Schemas-Perl), released on 2023-01-19.
+This document describes version 0.049 of Sah::Schema::perl::modname::default_this_mod (from Perl distribution Sah-Schemas-Perl), released on 2023-10-26.
 
 =head1 SYNOPSIS
 
@@ -54,16 +60,16 @@ To check data against this schema (requires L<Data::Sah>):
  my $validator = gen_validator("perl::modname::default_this_mod*");
  say $validator->($data) ? "valid" : "INVALID!";
 
-The above schema returns a boolean result (true if data is valid, false if
+The above validator returns a boolean result (true if data is valid, false if
 otherwise). To return an error message string instead (empty string if data is
 valid, a non-empty error message otherwise):
 
  my $validator = gen_validator("perl::modname::default_this_mod", {return_type=>'str_errmsg'});
  my $errmsg = $validator->($data);
 
-Often a schema has coercion rule or default value, so after validation the
-validated value is different. To return the validated (set-as-default, coerced,
-prefiltered) value:
+Often a schema has coercion rule or default value rules, so after validation the
+validated value will be different from the original. To return the validated
+(set-as-default, coerced, prefiltered) value:
 
  my $validator = gen_validator("perl::modname::default_this_mod", {return_type=>'str_errmsg+val'});
  my $res = $validator->($data); # [$errmsg, $validated_val]
@@ -129,17 +135,30 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  % ./myapp.pl --arg1 ...
 
+=head2 Using on the CLI with validate-with-sah
+
+To validate some data on the CLI, you can use L<validate-with-sah> utility.
+Specify the schema as the first argument (encoded in Perl syntax) and the data
+to validate as the second argument (encoded in Perl syntax):
+
+ % validate-with-sah '"perl::modname::default_this_mod*"' '"data..."'
+
+C<validate-with-sah> has several options for, e.g. validating multiple data,
+showing the generated validator code (Perl/JavaScript/etc), or loading
+schema/data from file. See its manpage for more details.
+
 
 =head2 Using with Type::Tiny
 
-To create a type constraint and type library from a schema:
+To create a type constraint and type library from a schema (requires
+L<Type::Tiny> as well as L<Type::FromSah>):
 
  package My::Types {
      use Type::Library -base;
      use Type::FromSah qw( sah2type );
 
      __PACKAGE__->add_type(
-         sah2type('$sch_name*', name=>'PerlModnameDefaultThisMod')
+         sah2type('perl::modname::default_this_mod*', name=>'PerlModnameDefaultThisMod')
      );
  }
 
@@ -151,6 +170,12 @@ To create a type constraint and type library from a schema:
 See L<App::ThisDist>'s C<this_mod()> for more details on how "this module" is
 determined. Note that C<App::ThisDist> is not added as dependency automatically;
 you will have to add it manually.
+
+Note: be careful when using this schema for actions that are destructive to a
+Perl module or that change some things, because a user can perform those actions
+without giving an argument (e.g. a C<delete-module> script). It is safer to use
+this schema to perform a non=destructive action (e.g. C<man-module>) and/or
+operate in dry-run mode by default.
 
 =head1 HOMEPAGE
 

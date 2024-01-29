@@ -57,7 +57,7 @@ get '/expire_quick' => sub {
 
 my $headers;
 hook before => sub {
-    header 'X-Foo' => ++$headers;
+    response_header 'X-Foo' => ++$headers;
 };
 
 get '/clear_headers' => sub { $headers = 0 };

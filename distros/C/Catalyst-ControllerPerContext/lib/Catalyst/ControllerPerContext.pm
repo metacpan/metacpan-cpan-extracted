@@ -1,6 +1,6 @@
 package Catalyst::ControllerPerContext;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use Moose;
 extends 'Catalyst::Controller';

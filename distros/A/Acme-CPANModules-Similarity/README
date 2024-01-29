@@ -1,0 +1,265 @@
+NAME
+    Acme::CPANModules::Similarity - List of modules to finding similarity
+    between stuffs
+
+VERSION
+    This document describes version 0.001 of Acme::CPANModules::Similarity
+    (from Perl distribution Acme-CPANModules-Similarity), released on
+    2024-01-17.
+
+DESCRIPTION
+    ** Between arrays/bags/sets
+
+    Algorithm::HowSimilar uses Algorithm::Diff to calculate similarity
+    between two arrays. It can also calculate similarity between two
+    strings.
+
+    Bag::Similarity
+
+    Set::Jaccard::SimilarityCoefficient
+
+    Set::Partitions::Similarity
+
+    Set::Similarity provides several algorithms.
+
+    ** Between codes
+
+    School::Code::Compare
+
+    ** Between colors
+
+    Color::Similarity
+
+    Color::RGB::Util provides rgb_diff() and rgb_distance() to calculate
+    difference between two RGB colors using one of several algorithms.
+
+    ** Between files
+
+    File::FindSimilars uses file size and a modified soundex algorithm on
+    the filename to determine similarity.
+
+    ** Between graphs
+
+    Graph::Similarity
+
+    ** Between HTML/XML documents
+
+    HTML::Similarity calculates the structural similarity between two HTML
+    documents.
+
+    XML::Similarity
+
+    ** Between images
+
+    Image::Similar
+
+    ** Between strings/texts
+
+    Similarity between two text can be calculated using Levenshtein edit
+    distance. There are several levenshtein modules on CPAN, among others:
+    Text::Levenshtein, Text::Levenshtein::XS, Text::Levenshtein::Flexible,
+    Text::LevenshteinXS, Text::Fuzzy. For more details, see
+    Bencher::Scenario::LevenshteinModules.
+
+    Soundex can also be used. Some example soundex moduless: Text::Soundex,
+    Text::Phonetic::Soundex.
+
+    Algorithm::HowSimilar uses Algorithm::Diff to calculate similarity
+    between two strings. It's roughly similar in speed to pure-perl
+    Levenshtein modules, and tend to be faster for longer strings. It can
+    also calculate similarity between two arrays.
+
+    String::Similarity
+
+    String::Similarity::Group
+
+    Text::Similarity
+
+    String::Simrank
+
+    String::Similex
+
+    ** Between vectors
+
+    Data::CosineSimilarity
+
+    ** Between words (semantic similarity)
+
+    WordNet::Similarity
+
+    WordNet::SenseRelate::AllWords
+
+    ** Others
+
+    Cluster::Similarity
+
+ACME::CPANMODULES ENTRIES
+    Algorithm::HowSimilar
+        Author: JFREEMAN <https://metacpan.org/author/JFREEMAN>
+
+    Bag::Similarity
+        Author: WOLLMERS <https://metacpan.org/author/WOLLMERS>
+
+    Set::Jaccard::SimilarityCoefficient
+        Author: MLFISHER <https://metacpan.org/author/MLFISHER>
+
+    Set::Partitions::Similarity
+        Author: KUBINA <https://metacpan.org/author/KUBINA>
+
+    Set::Similarity
+        Author: WOLLMERS <https://metacpan.org/author/WOLLMERS>
+
+    School::Code::Compare
+        Author: BORISD <https://metacpan.org/author/BORISD>
+
+    Color::Similarity
+        Author: MBARBON <https://metacpan.org/author/MBARBON>
+
+    Color::RGB::Util
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    File::FindSimilars
+        Author: SUNTONG <https://metacpan.org/author/SUNTONG>
+
+    Graph::Similarity
+        Author: SHOHEIK <https://metacpan.org/author/SHOHEIK>
+
+    HTML::Similarity
+        Author: XERN <https://metacpan.org/author/XERN>
+
+    XML::Similarity
+        Author: XERN <https://metacpan.org/author/XERN>
+
+    Image::Similar
+        Author: BKB <https://metacpan.org/author/BKB>
+
+    Text::Levenshtein
+        Author: NEILB <https://metacpan.org/author/NEILB>
+
+    Text::Levenshtein::XS
+        Author: UGEXE <https://metacpan.org/author/UGEXE>
+
+    Text::Levenshtein::Flexible
+        Author: MBETHKE <https://metacpan.org/author/MBETHKE>
+
+    Text::LevenshteinXS
+        Author: JGOLDBERG <https://metacpan.org/author/JGOLDBERG>
+
+    Text::Fuzzy
+        Author: BKB <https://metacpan.org/author/BKB>
+
+    Bencher::Scenario::LevenshteinModules
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Text::Soundex
+        Author: RJBS <https://metacpan.org/author/RJBS>
+
+    Text::Phonetic::Soundex
+        Author: MAROS <https://metacpan.org/author/MAROS>
+
+    String::Similarity
+        Author: MLEHMANN <https://metacpan.org/author/MLEHMANN>
+
+    String::Similarity::Group
+        Author: LEOCHARRE <https://metacpan.org/author/LEOCHARRE>
+
+    Text::Similarity
+        Author: TPEDERSE <https://metacpan.org/author/TPEDERSE>
+
+    String::Simrank
+        Author: SHURIKO <https://metacpan.org/author/SHURIKO>
+
+    String::Similex
+        Author: BIAFRA <https://metacpan.org/author/BIAFRA>
+
+    Data::CosineSimilarity
+        Author: AIMBERT <https://metacpan.org/author/AIMBERT>
+
+    WordNet::Similarity
+        Author: TPEDERSE <https://metacpan.org/author/TPEDERSE>
+
+    WordNet::SenseRelate::AllWords
+        Author: TPEDERSE <https://metacpan.org/author/TPEDERSE>
+
+    Cluster::Similarity
+        Author: INGRIF <https://metacpan.org/author/INGRIF>
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n Similarity
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries Similarity | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=Similarity -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::Similarity -E'say $_->{module} for @{ $Acme::CPANModules::Similarity::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-Similarity>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-Similarity>.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Simi
+    larity>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

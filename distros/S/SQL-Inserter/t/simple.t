@@ -8,8 +8,9 @@ my @execute = ();
 
 my $dbh = mock {} => (
     add => [
-        prepare => sub { my $self = shift; push @prepare, @_ ; return $self},
-        execute => sub { shift; @execute = @_ ; return 1},
+        prepare        => sub {my $self = shift; push @prepare, @_ ; return $self},
+        execute        => sub {shift; @execute = @_ ; return 1},
+        last_insert_id => sub {1},
     ]
 );
 
@@ -195,6 +196,20 @@ subtest 'new' => sub {
     ok($sql->{oracle}, "Oracle detected");
     $sql = SQL::Inserter->new(dbh=>{Driver => {Name => 'MySQL'}},table=>'table');
     ok(!$sql->{oracle}, "Oracle not detected");
+};
+
+subtest 'last_insert_id' => sub {
+    @execute = ();
+    @prepare = ();
+    my $sql = SQL::Inserter->new(dbh=>$dbh,table=>'table',cols=>[qw/col1 col2/],buffer=>3);
+    $sql->last_insert_id;
+    is([@prepare],[], "No prepared statement");
+    is($sql->insert(1,2),0, "No execute");
+    is($sql->{row_total}, undef, "No row_total");
+
+    is($sql->last_insert_id, 1, "Last insert id");
+    is([@execute],[1,2], "Last execute bind vars");
+    is($sql->{row_total}, 1, "1 execute");
 };
 
 done_testing;

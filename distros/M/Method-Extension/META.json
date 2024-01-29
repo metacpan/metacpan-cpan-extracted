@@ -1,0 +1,60 @@
+{
+   "abstract" : "easily extend existing packages using method extension",
+   "author" : [
+      "Tiago Peczenyj <tiago.peczenyj+cpan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Method-Extension",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Attribute::Handlers" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/peczenyj/Method-Extension/issues"
+      },
+      "homepage" : "https://github.com/peczenyj/Method-Extension",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/peczenyj/Method-Extension.git",
+         "web" : "https://github.com/peczenyj/Method-Extension"
+      }
+   },
+   "version" : "0.2",
+   "x_authority" : "cpan:PACMAN"
+}

@@ -21,9 +21,11 @@ Branislav
 Brendan
 Byrd
 Ceccarelli
+Chae
 Chase
 Costa
 David
+Deguest
 Dick
 Dorian
 Dubois
@@ -45,6 +47,7 @@ IDNA
 IRI
 ISBNs
 Ishigaki
+Jacques
 James
 Jan
 Joenio
@@ -67,6 +70,7 @@ Martijn
 Masahiro
 Masinter
 Matt
+Matthew
 Michael
 Miller
 Miyagawa
@@ -151,6 +155,7 @@ icap
 icaps
 isbn
 ishigaki
+jack
 jand
 joenio
 john
@@ -167,6 +172,7 @@ mark
 matthewlawrence
 miyagawa
 mms
+mschae
 news
 nntp
 nntps

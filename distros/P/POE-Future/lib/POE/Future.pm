@@ -1,19 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2024 -- leonerd@leonerd.org.uk
 
-package POE::Future;
+package POE::Future 0.05;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.04';
 
 use Carp;
 
 use base qw( Future );
-Future->VERSION( '0.05' ); # to respect subclassing
+Future->VERSION( '0.49' ); # udata
 
 use POE;
 
@@ -48,7 +46,7 @@ For a full description on how to use Futures, see the L<Future> documentation.
 
 =head2 new
 
-   $f = POE::Future->new
+   $f = POE::Future->new;
 
 Returns a new leaf future instance, which will allow waiting for its result to
 be made available, using the C<await> method.
@@ -57,7 +55,7 @@ be made available, using the C<await> method.
 
 =head2 new_delay
 
-   $f = POE::Future->new_delay( $after )
+   $f = POE::Future->new_delay( $after );
 
 Returns a new leaf future instance which will become ready (with an empty
 result) after the specified delay time.
@@ -69,17 +67,17 @@ sub new_delay
    my $self = shift->new;
    my ( $after ) = @_;
 
-   $self->{session} = POE::Session->create(
+   $self->set_udata( session => my $session = POE::Session->create(
       inline_states => {
          _start => sub { $_[KERNEL]->delay( done => $after ) },
          cancel => sub { $_[KERNEL]->delay( done => ) },
          done   => sub { $self->done },
       },
-   );
+   ) );
 
    $self->on_cancel( sub {
       my ( $self ) = @_;
-      POE::Kernel->post( $self->{session}, cancel => );
+      POE::Kernel->post( $session, cancel => );
    });
 
    return $self;
@@ -87,7 +85,7 @@ sub new_delay
 
 =head2 new_alarm
 
-   $f = POE::Future->new_alarm( $at )
+   $f = POE::Future->new_alarm( $at );
 
 Returns a new leaf future instance which will become ready (with an empty
 result) at the specified alarm time.
@@ -99,17 +97,17 @@ sub new_alarm
    my $self = shift->new;
    my ( $at ) = @_;
 
-   $self->{session} = POE::Session->create(
+   $self->set_udata( session => my $session = POE::Session->create(
       inline_states => {
          _start => sub { $_[KERNEL]->alarm( done => $at ) },
          cancel => sub { $_[KERNEL]->alarm( done => ) },
          done   => sub { $self->done },
       },
-   );
+   ) );
 
    $self->on_cancel( sub {
       my ( $self ) = @_;
-      POE::Kernel->post( $self->{session}, cancel => );
+      POE::Kernel->post( $session, cancel => );
    });
 
    return $self;

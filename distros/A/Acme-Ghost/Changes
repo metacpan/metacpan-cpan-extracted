@@ -1,0 +1,8 @@
+# Version/Revision history
+
+1.01 Sat 20 Jan 2024 21:50:45 MSK
+    * Added Prefork module
+    * Added OS requirements in Makefile.PL
+
+1.00 Sun 03 Dec 2023 13:48:46 MSK
+    * Initial release

@@ -1,6 +1,7 @@
+ oEdtk is Copyright (C) 2005-2024, D Aunay, G Chaillou Domingo, M Henrion, G Ballin
 	***************************************************************************
 	***************************************************************************
-						oEdtk v 0.6123			17/12/2011  
+					oEdtk v 1.8122			17/12/2023  
 	***************************************************************************
 	***************************************************************************
 		
@@ -49,9 +50,9 @@
 	
 	CONTENT OF THIS ARCHIVE
 	***************************************************************************
-	/lib/oEdtk.pm					main module dedicated for documentation
+	/lib/oEdtk.pm				main module dedicated for documentation
 	/lib/oEdtk/libEdtkC7.pm			methods for DSC Compuset integration
-	/lib/oEdtk/libEdtkDev.pm			general methods for developpements only
+	/lib/oEdtk/libEdtkDev.pm		general methods for developpements only
 	/lib/oEdtk/prodEdtk.pm			main methods used for production
 	/lib/oEdtk/prodEdtkXls.pm		methods used for excel docs production
 	/lib/oEdtk/trackEdtk.pm			module planned for production statistics
@@ -62,7 +63,7 @@
 	/lib/oEdtk/README				this file
 	/lib/oEdtk/COPYING				GNU GENERAL PUBLIC LICENSE
 
-	/t/test.t						test plan for installation
+	/t/test.t				test plan for installation
 	/t/test_fixe_oEdtk.pl			simple test application for installation
 	/t/cp_fr_fixe.dat				test file for simple Excel test
 	/t/cp_fr.dat					test file for simple Excel test 2 (planned)
@@ -77,14 +78,14 @@
 	***************************************************************************
 
 	Config::IniFiles		(for develoments and tracking)
-	DBI					(for database : settings, Outputmanagement, tracking...)
+	DBI				(for database : settings, Outputmanagement, tracking...)
 	List::MoreUtils
 	List::Util
 	Sys::Hostname
 
 	Term::ReadKey			(for developments only - used for tuiEdtk)
 
-	Spreadsheet::WriteExcel	(for excel document only)
+	Spreadsheet::WriteExcel		(for excel document only)
 	OLE::Storage_Lite		(for Spreadsheet::WriteExcel only)
 	Parse::RecDescent		(for Spreadsheet::WriteExcel only)
 
@@ -112,49 +113,6 @@
 	XML::Writer
 
 	
-	TODO
-	***************************************************************************
-		- documentation
-		- integrer les polices dans les flux PDF plutot que les vectoriser.
-		- Optimiser les flux continues (omgr).
-		- Aplatir les PDF pour que ce ne soit pas un assemblage de cadre (omgr).
-		- move_table : s'assurer que la table n'est pas vide avant de la bouger
-		- gestion épurement glissant des bases
-		- chargement de la configuration, revenir au chargement multi-sections (attention passage appname)
-		- configuration en contexte ciblé (livraisons, chargement paramètres, tests) sans modification edtk.ini
-		- omgr_stats / index_Statistics impact passage idlot sur 7 ok, mais màj id sur \d{6}
-		- contrôler utilisation des alias plutôt que les noms de tables (index/tracking)
-		- normalisation des principales clefs tracking/paramétrage (automat)
-		- reprise prévisu en fin de runEdtk.pl => bug gestion compteur de fichiers xls non pris en compte
-		- AC016 : éditions avec duplicata, utiliser ED_POSTCOMP pour sélectionner le tex de postcomposition
-		- acqCheck lier l'envoi du mail à index_Run_lot
-		- clean up process assemblage des pages in ged (exit pdfmaker)
-		- dans tracking ajouter une colonne message
-		- dans tracking ajouter une k5 sur tous les enviro de façon à suivre le type d'index
-		- DIE : bien remonter toutes les erreurs dans le plan d'éxécution (les échecs d'insertion dans lotissement doivent tout bloquer !!!)
-		- ED_IDMANUFACT : vérifier bonne prise en compte de ED_IDMANUFACT
-		- EDTK_MAIL_TO : ajouter gestion mail façonnier
-		- EDTK_MAIL_TO : devrait être défini au niveau des filières, ou du façonnier (manufacturer)
-		- EDTK_MAIL_TO : scinder mail prod façonnier par mail façonnier
-		- envoi des statistiques mensuelles lors index_Purge
-		- externaliser table des caractères à cleaner (char_dico.ini) => clean addr
-		- gestion des entêtes d'enregistrement (Descriptors) mettre en place une valeur par défaut dans edtk.ini sinon définir dans le Descriptor pos_key, length_key, offset_record
-		- gestion des paragraphes
-		- index_Block : RESET doit réinitialiser la filière à la filière de base du lot
-		- interfaçage graphique Descriptors / Maquettage
-		- liste des pré imprimés incomplètes sur PG de garde
-		- normalisation des noms de colonnes tracking / index
-		- normaliser colonnes SGBD (tracking)
-		- opération de remove / ANO de lot ou de seqlot (ràf trace dans tracking)
-		- pagination / foliotage à remettre dans le lotissement
-		- params_export ko à debugger
-		- perl packaging des dist => 0.6 11 n
-		- quand un lot n'est pas encore loti, il faut pouvoir identifier les lots en attente de lotissement (purges éventuelles, cf script de stats/Purge)
-		- reprise procédure livraison sur dév
-		- revoir le mode Excel sur exemple mode Tex
-		- sysdate : prévoir la version psg 
-
-
 	HISTORY
 	***************************************************************************
 	version 0.612x
@@ -216,7 +174,4 @@
 	reference site is cpan.org
 
 
-	AUTHORS
-	***************************************************************************
-	D Aunay, G Chaillou Domingo, M Henrion, G Ballin 2005-2013
 	  		

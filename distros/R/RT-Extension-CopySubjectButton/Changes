@@ -1,11 +1,7 @@
 Revision history for RT-Extension-CopySubjectButton
 
-0.01 2022-07-08
- - Initial version
+0.06 2024-1-18
+ - Apparently the previous version only works on my machine, this version should fix that.
 
-0.02 2022-07-11
- - The copy button, is now only visible on the ticket display page. (Did not work in other pages)
- - Properly formatted the "Changes" file
-
-0.03 2022-07-11
- - Fixed the button's css class so that it also works with the dark theme
+0.05 2023-12-29
+ - Complete rewrite. The extension now uses the SubjectTag instead of the Queue name to generate the subject. This allows to have different Queue tags than the Queue name.

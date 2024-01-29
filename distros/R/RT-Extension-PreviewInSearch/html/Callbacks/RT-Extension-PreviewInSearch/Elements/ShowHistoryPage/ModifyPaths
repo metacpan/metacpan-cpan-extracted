@@ -17,5 +17,8 @@ if ($ShowHistory eq "scroll") {
     if ( $ARGSRef->{UpdatePath} ne ( RT->Config->Get('WebPath') . '/Ticket/Update.html' ) ) {
         $ARGSRef->{UpdatePath} = RT->Config->Get('WebPath') . '/Ticket/Update.html';
     }
+    if ( $ARGSRef->{EmailRecordPath} ne ( RT->Config->Get('WebPath') . '/Ticket/ShowEmailRecord.html' ) ) {
+        $ARGSRef->{EmailRecordPath} = RT->Config->Get('WebPath') . '/Ticket/ShowEmailRecord.html';
+    }
 }
 </%INIT>

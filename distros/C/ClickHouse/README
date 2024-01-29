@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.04
+    Version 0.05
 
 SYNOPSIS
 
@@ -27,6 +27,7 @@ EXAMPLE
             port     => 8123,
             user     => 'Frodo'
             password => 'finger',
+            timeout  => 5,
         );
     
         my $rows = $ch->select("SELECT id, field_one, field_two FROM some_table");

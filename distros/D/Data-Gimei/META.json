@@ -4,7 +4,7 @@
       "NAKAJIMA Yusaku < youpong@cpan.org >"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.19",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "mit"
    ],
@@ -46,7 +46,7 @@
             "Class::Tiny" : "0",
             "File::Share" : "0",
             "YAML::XS" : "0",
-            "perl" : "v5.22.0",
+            "perl" : "5.010",
             "version" : "0"
          }
       },
@@ -59,7 +59,7 @@
    "provides" : {
       "Data::Gimei" : {
          "file" : "lib/Data/Gimei.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.4.2"
       },
       "Data::Gimei::Address" : {
          "file" : "lib/Data/Gimei/Address.pm"
@@ -77,21 +77,21 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/youpong/pl-gimei/issues"
+         "web" : "https://github.com/youpong/Data-Gimei/issues"
       },
-      "homepage" : "https://github.com/youpong/pl-gimei",
+      "homepage" : "https://github.com/youpong/Data-Gimei",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/youpong/pl-gimei.git",
-         "web" : "https://github.com/youpong/pl-gimei"
+         "url" : "https://github.com/youpong/Data-Gimei.git",
+         "web" : "https://github.com/youpong/Data-Gimei"
       }
    },
-   "version" : "v0.4.0",
+   "version" : "v0.4.2",
    "x_authority" : "cpan:YOUPONG",
    "x_contributors" : [
       "NAKAJIMA Yusaku <yupong7@gmail.com>",
       "youpong <43817652+youpong@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.06",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

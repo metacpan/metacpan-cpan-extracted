@@ -59,10 +59,9 @@ sub run {
         $req,
         'webauthn2fcheck',
         params => {
-            DATA          => to_json( { request => $request } ),
-            TOKEN         => $token,
-            CHECKLOGINS   => $checkLogins,
-            STAYCONNECTED => $stayConnected
+            DATA  => to_json( { request => $request } ),
+            TOKEN => $token,
+            $self->get2fTplParams($req),
         }
     );
 
