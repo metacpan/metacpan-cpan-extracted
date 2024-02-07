@@ -64,7 +64,7 @@ the provided config. The config is a hashref with the following properties:
 If a cache entry is older (in seconds) than C<cache_expiration_time>, it will be deleted from cache and the actual resolving will be made,
 adding a fresh entry into cache.
 
-Default value: 1200 seconds.
+Default value: 600 seconds.
 
 =item cache_limit
 

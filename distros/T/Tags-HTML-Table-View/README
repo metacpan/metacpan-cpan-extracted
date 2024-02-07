@@ -54,8 +54,23 @@ METHODS
 
     Process initialization before page run.
 
-    Variable $data_ar are data for table. Each item in array could be
-    scalar, array with scalars or Data::HTML::Element::A instance.
+    Variable $data_ar are data for table. Each item in array could be:
+
+    *   Scalar
+
+        Add scalar variable to field.
+
+    *   Array with scalars
+
+        Add scalar variables to field.
+
+    *   Code
+
+        Run this code with argument $self of this module.
+
+    *   Data::HTML::Element::A instance
+
+        Serialize link to field.
 
     Variable $no_data_value contain information for situation when data in
     table not exists.
@@ -347,5 +362,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

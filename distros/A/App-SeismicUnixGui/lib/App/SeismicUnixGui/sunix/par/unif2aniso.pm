@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::par::unif2aniso;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 

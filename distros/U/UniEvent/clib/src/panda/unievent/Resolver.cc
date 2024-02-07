@@ -412,7 +412,9 @@ AddrInfo Resolver::find (const string& node, const string& service, const AddrIn
         panda_log_info(logmod, this << " found in cache " << node);
 
         time_t now = time(0);
-        if (!it->second.expired(now, cfg.cache_expiration_time)) return it->second.address;
+        auto& ai = it->second.address;
+        auto expiration_time = std::min<time_t>(ai.ttl(), cfg.cache_expiration_time);
+        if (!it->second.expired(now, expiration_time)) return ai;
 
         panda_log_info(logmod, this << " expired " << node);
         _cache.erase(it);

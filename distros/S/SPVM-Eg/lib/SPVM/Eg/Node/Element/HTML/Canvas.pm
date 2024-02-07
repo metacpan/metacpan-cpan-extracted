@@ -6,48 +6,11 @@ package SPVM::Eg::Node::Element::HTML::Canvas;
 
 =head1 Name
 
-SPVM::Eg::Node::Element::HTML::Canvas - Short Description
+SPVM::Eg::Node::Element::HTML::Canvas - HTMLCanvasElement in JavaScript
 
 =head1 Description
 
-The Eg::Node::Element::HTML::Canvas class in L<SPVM> has methods to do someting.
-
-=head1 Usage
-
-  use Eg::Node::Element::HTML::Canvas;
-
-=head1 Details
-
-
-
-=head1 Interfaces
-
-
-
-=head1 Enumerations
-
-
-
-=head1 Fields
-
-
-
-=head1 Class Methods
-
-
-
-=head1 Instance Methods
-
-
-
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+The Eg::Node::Element::HTML::Canvas class in L<SPVM> represents L<HTMLCanvasElement|https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement> in JavaScript
 
 =head1 Copyright & License
 

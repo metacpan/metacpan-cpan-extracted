@@ -6,7 +6,7 @@
 =head2 SYNOPSIS
 
 PERL PROGRAM NAME:  XCONTOUR - X CONTOUR plot of f(x1,x2) via vector plot call		
-AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
 DATE:   
 DESCRIPTION:
 Version: 
@@ -93,7 +93,7 @@ Version:
  of labeled contours. 							
 
 
- AUTHOR: Morten Wendell Pedersen, Aarhus University 
+ Author: Morten Wendell Pedersen, Aarhus University 
 
  All the coding is based on snippets taken from xwigb, ximage and pscontour
  All I have done is put the parts together and put in some bugs ;-)

@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::par::makevel;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  MAKEVEL - MAKE a VELocity function v(x,y,z)				
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 

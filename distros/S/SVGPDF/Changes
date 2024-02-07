@@ -1,8 +1,15 @@
 Revision history for SVGPDF
 
-0.084
+0.085	2024-01-29
+
+	- Fix some tests for longdouble perls.
+	- Update copyright years.
+
+0.084	2024-01-28
+
 	- Change license info.
 	- Add gif, tif(f) and p[bgnp]m to recognized image extensions.
+	- Limited support for URLs in font-face sources.
 	- Support CSS for element#id.
 	- Support CSS for element.class.
 	- Remove xt tests from MANIFEST.

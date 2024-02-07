@@ -1,0 +1,6 @@
+t/foo.t:
+  - alias: "Foo once"
+    args:  [foo, bar]
+  - alias: "Foo twice"
+  - alias: "Foo thrice"
+    args:  [baz]

@@ -1,14 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Loop::Poll;
+package IO::Async::Loop::Poll 0.803;
 
-use strict;
+use v5.14;
 use warnings;
 
-our $VERSION = '0.802';
 use constant API_VERSION => '0.49';
 
 use base qw( IO::Async::Loop );
@@ -99,7 +98,7 @@ the notifiers.
 
 =head2 new
 
-   $loop = IO::Async::Loop::Poll->new( %args )
+   $loop = IO::Async::Loop::Poll->new( %args );
 
 This function returns a new instance of a C<IO::Async::Loop::Poll> object. It
 takes the following named arguments:
@@ -137,7 +136,7 @@ sub new
 
 =head2 post_poll
 
-   $count = $loop->post_poll
+   $count = $loop->post_poll;
 
 This method checks the returned event list from a C<IO::Poll::poll> call,
 and calls any of the notification methods or callbacks that are appropriate.
@@ -199,7 +198,7 @@ sub is_running
 
 =head2 loop_once
 
-   $count = $loop->loop_once( $timeout )
+   $count = $loop->loop_once( $timeout );
 
 This method calls the C<poll> method on the stored C<IO::Poll> object,
 passing in the value of C<$timeout>, and then runs the C<post_poll> method

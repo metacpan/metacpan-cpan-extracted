@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::plot::ximage;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  XIMAGE - X IMAGE plot of a uniformly-sampled function f(x1,x2)     	
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 
@@ -119,7 +119,7 @@ package App::SeismicUnixGui::sunix::plot::ximage;
  in each file as npair=npair1,npair2,... .                             
 
 
- AUTHOR:  Dave Hale, Colorado School of Mines, 08/09/90
+ Author:  Dave Hale, Colorado School of Mines, 08/09/90
 
  Stewart A. Levin, Mobil - Added ps print option
 

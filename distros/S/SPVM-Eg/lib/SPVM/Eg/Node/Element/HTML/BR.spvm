@@ -3,14 +3,14 @@
 
 class Eg::Node::Element::HTML::BR extends Eg::Node::Element::HTML {
   
-  allow Eg::Node::Document::HTML;
+  allow Eg::Node::Document;
   
   # Class Methods
-  private static method new : Eg::Node::Element::HTML::BR () {
+  private static method new : Eg::Node::Element::HTML::BR ($options : object[] = undef) {
     
     my $self = new Eg::Node::Element::HTML::BR;
     
-    $self->SUPER::init;
+    $self->SUPER::init(Eg->merge_options_v2($options, {is_void_element => 1}));
     
     return $self;
   }

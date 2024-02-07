@@ -2,6 +2,8 @@ package PGXN::Site::Templates;
 
 use 5.10.0;
 use utf8;
+use strict;
+use warnings;
 use parent 'Template::Declare';
 use PGXN::Site;
 use PGXN::Site::Locale;
@@ -14,7 +16,7 @@ use File::Basename qw(basename);
 use SemVer;
 use Gravatar::URL;
 #use namespace::autoclean; # Do not use; breaks sort {}
-our $VERSION = v0.22.2;
+our $VERSION = v0.23.4;
 
 my $l = PGXN::Site::Locale->get_handle('en');
 sub T { $l->maketext(@_) }
@@ -209,9 +211,9 @@ BEGIN { create_wrapper wrapper => sub {
                         };
                         span { class is 'grey'; '|' };
                         a {
-                            href is 'https://manager.pgxn.org/';
-                            title is T 'Release it on PGXN';
-                            T 'Release It';
+                            href is 'https://manager.pgxn.org/howto';
+                            title is T 'How to release extensions on PGXN';
+                            T 'Release on PGXN';
                         };
                     };
                     span {
@@ -281,7 +283,7 @@ template home => sub {
                                 join ' ', @vals
                             } };
                             dd { $dist->{abstract} };
-                            last if ++$i == 5;
+                            last if ++$count == 5;
                         };
                     };
                     h6 {
@@ -375,7 +377,7 @@ template distribution => sub {
                                     my $datetime = $dist->date_for(lc $status);
                                     (my $date = $datetime) =~ s{T.+}{};
                                     a {
-                                        href is '/dist/' . $dist->name . lc "/$stat_version/";
+                                        href is '/dist/' . lc $dist->name . "/$stat_version/";
                                         outs $dist->name . " $stat_version — ";
                                         outs_raw qq{<time datetime="$datetime">$date</time>};
                                     }
@@ -391,7 +393,7 @@ template distribution => sub {
                                 for my $rel (@rels) {
                                     # Include release status in the option name?
                                     option {
-                                        value is '/dist/' . lc $dist->name . lc "/$rel->{version}/";
+                                        value is '/dist/' . lc $dist->name . "/$rel->{version}/";
                                         selected is 'selected' if $rel->{version} eq $version;
                                         (my $date = $rel->{date}) =~ s{T.+}{};
                                         "$rel->{version} — $date";
@@ -987,7 +989,7 @@ sub _detailed_results {
             h2 {
                 if ($hit->{docpath}) {
                     a {
-                        href is '/dist/' . lc $hit->{dist} . "/$hit->{docpath}.html";
+                        href is "/dist/\L$hit->{dist}\E/$hit->{docpath}.html";
                         $hit->{$label}
                     };
                 } else {
@@ -1161,16 +1163,10 @@ template donors => sub {
                         h2 { T 'Sponsors' };
                         ul {
                             li { 'Richard Broersma' };
-                            li {a{
-                                href is 'https://tigerlead.com/';
-                                'TigerLead';
-                            }};
+                            li { 'TigerLead' };
                             li { 'Thom Brown' };
                             li { 'Hitoshi Harada' };
-                            li {a{
-                                href is 'https://www.25th-floor.com/';
-                                '25th-floor - de Pretis & Helmberger KG';
-                            }};
+                            li { '25th-floor - de Pretis & Helmberger KG' };
                         };
                     };
 
@@ -1178,13 +1174,10 @@ template donors => sub {
                         class is 'width50 floatRight';
                         h2 { T 'Advocates' };
                         ul {
-                            li {a{
-                                href is 'https://www.hubbellgrp.com/';
-                                'Hubbell Group Inc.';
-                            }};
+                            li { 'Hubbell Group Inc.' };
                             li { 'John S. Gage' };
                             li {a{
-                                href is 'https://www.2ndquadrant.us/';
+                                href is 'https://www.crunchydata.com/blog/author/greg-smith';
                                 'Greg Smith';
                             }};
                             li {a{
@@ -1196,7 +1189,7 @@ template donors => sub {
                                 'depesz';
                             }};
                             li {a{
-                                href is 'https://jim.nasby.net/';
+                                href is 'https://www.linkedin.com/in/decibel';
                                 'Jim Nasby';
                             }};
                             li {a{
@@ -1219,17 +1212,14 @@ template donors => sub {
                                 'David Golden';
                             }};
                             li {a{
-                                href is 'https://thoughts.j-davis.com/';
+                                href is 'http://thoughts.davisjeff.com/';
                                 'Jeff Davis';
                             }};
                             li {a{
                                 href is 'https://www.estately.com/';
                                 'Estately';
                             }};
-                            li {a{
-                                href is 'https://www.full-table-scan.com/';
-                                'Chris Spotts';
-                            }};
+                            li { 'Chris Spotts' };
                         };
                     };
 
@@ -1238,30 +1228,18 @@ template donors => sub {
 
                         h2 { T 'Boosters' };
                         ul {
+                            li {'Kineticode, Inc.' };
+                            li {'CxNet (Chile)' };
                             li {a{
-                                href is 'https://www.kineticode.com/';
-                                'Kineticode, Inc.';
-                            }};
-                            li {a{
-                                href is 'https://www.cxnet.cl/';
-                                'CxNet (Chile)';
-                            }};
-                            li {a{
-                                href is 'https://www.schemaverse.com/';
+                                href is 'https://github.com/Abstrct/Schemaverse';
                                 'Schemaverse';
                             }};
                             li {a{
                                 href is 'https://github.com/fabiotr/';
                                 'Fábio Telles Rodriguez';
                             }};
-                            li {a{
-                                href is 'https://www.nextbio.com/b/search/author/Wenjian%20Yang';
-                                'Wenjian Yang';
-                            }};
-                            li {a{
-                                href is 'https://pgdba.net/blog/';
-                                'Michael Nacos';
-                            }};
+                            li { 'Wenjian Yang' };
+                            li { 'Michael Nacos' };
                             li { 'August Zajonc' };
                         };
                     };
@@ -1407,9 +1385,9 @@ template search_form => sub {
                 name is 'in';
                 my $in = $args->{in};
                 for my $spec (
+                    [ dists      => 'Distributions' ],
                     [ docs       => 'Documentation' ],
                     [ extensions => 'Extensions'    ],
-                    [ dists      => 'Distributions' ],
                     [ users      => 'Users'         ],
                     [ tags       => 'Tags'          ]
                 ) {
@@ -1519,7 +1497,7 @@ template founders => sub {
             };
         };
         a {
-            href is 'https://www.dalibo.org/en/';
+            href is 'https://www.dalibo.org/';
             title is 'Dalibo';
             img {
                 src is '/ui/img/dalibo.png';
@@ -1533,15 +1511,12 @@ template patrons => sub {
     div {
         id is 'patrons';
         h3 {
-            a {
-                href is 'https://www.enovafinancial.com/';
+            img {
+                src is '/ui/img/enova.png';
+                alt is 'e';
                 title is 'Enova Financial';
-                img {
-                    src is '/ui/img/enova.png';
-                    alt is 'e';
-                };
-                outs ' Enova Financial';
             };
+            outs ' Enova Financial';
         };
     };
 };
@@ -1714,7 +1689,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2010-2021 David E. Wheeler.
+Copyright (c) 2010-2024 David E. Wheeler.
 
 This module is free software; you can redistribute it and/or modify it under
 the L<PostgreSQL License|https://www.opensource.org/licenses/postgresql>.

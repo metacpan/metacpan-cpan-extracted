@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Map::Tube::API;
 
-$Dancer2::Plugin::Map::Tube::API::VERSION   = '0.03';
+$Dancer2::Plugin::Map::Tube::API::VERSION   = '0.04';
 $Dancer2::Plugin::Map::Tube::API::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,23 +9,25 @@ Dancer2::Plugin::Map::Tube::API - API for Map::Tube.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
 use 5.006;
 use JSON;
 use Data::Dumper;
+use IO::Socket::INET;
 use Cache::Memcached::Fast;
+use Time::HiRes qw(gettimeofday);
 use Dancer2::Plugin::Map::Tube::Error;
 
 use Moo;
 use namespace::autoclean;
 
-our $REQUEST_PERIOD    = 60; # seconds.
-our $REQUEST_THRESHOLD = 6;  # API calls limit per minute.
-our $MEMCACHE_HOST     = 'localhost';
-our $MEMCACHE_PORT     = 11211;
+our $REQUEST_PERIOD    = $ENV{'REQUEST_PERIOD'}    || 60; # seconds.
+our $REQUEST_THRESHOLD = $ENV{'REQUEST_THRESHOLD'} || 6;  # API calls limit per REQUEST_PERIOD.
+our $MEMCACHE_HOST     = $ENV{'MEMCACHE_HOST'} || 'localhost';
+our $MEMCACHE_PORT     = $ENV{'MEMCACHE_PORT'} || 11211;
 
 has 'map_name'          => (is => 'ro');
 has 'user_maps'         => (is => 'rw');
@@ -53,8 +55,20 @@ makes most of work for L<Map::Tube::Server>.
 sub BUILD {
     my ($self, $arg) = @_;
 
+    return { error_code    => $MEMCACHE_SERVER_ERROR,
+             error_message => $MEMCACHE_SERVER_UNREACHABLE,
+    } unless $self->_is_server_running();
+
     my $address = sprintf("%s:%d", $self->memcache_host, $self->memcache_port);
-    $self->{memcached} = Cache::Memcached::Fast->new({ servers => [{ address => $address }] });
+    $self->{memcached} = Cache::Memcached::Fast->new(
+        { servers         => [{ address => $address }],
+          close_on_error  => 1,
+          max_failures    => 3,
+          failure_timeout => 2,
+          utf8            => 1,
+          connect_timeout => 0.2,
+          max_size        => 513 * 1024,
+        });
 
     my $map_name = $self->map_name;
     if (defined $map_name) {
@@ -76,6 +90,12 @@ sub BUILD {
 
         $self->{map_object} = $self->{installed_maps}->{$self->{map_names}->{lc($map_name)}};
     }
+    else {
+        $self->{user_error} = {
+            error_code    => $BAD_REQUEST,
+            error_message => $MISSING_MAP_NAME,
+        };
+    }
 }
 
 =head1 METHODS
@@ -88,6 +108,10 @@ Returns ordered list of stations for the shortest route from C<$start> to C<$end
 
 sub shortest_route {
     my ($self, $client_ip, $start, $end) = @_;
+
+    return { error_code    => $MEMCACHE_SERVER_ERROR,
+             error_message => $MEMCACHE_SERVER_UNREACHABLE,
+    } unless $self->_is_server_running();
 
     return { error_code    => $TOO_MANY_REQUEST,
              error_message => $REACHED_REQUEST_LIMIT,
@@ -136,6 +160,10 @@ Returns the list of stations, indexed if it is available, in the given C<$line>.
 sub line_stations {
     my ($self, $client_ip, $line_name) = @_;
 
+    return { error_code    => $MEMCACHE_SERVER_ERROR,
+             error_message => $MEMCACHE_SERVER_UNREACHABLE,
+    } unless $self->_is_server_running();
+
     return { error_code    => $TOO_MANY_REQUEST,
              error_message => $REACHED_REQUEST_LIMIT,
     } unless $self->_is_authorized($client_ip);
@@ -175,6 +203,10 @@ Returns ordered list of stations in the map.
 sub map_stations {
     my ($self, $client_ip) = @_;
 
+    return { error_code    => $MEMCACHE_SERVER_ERROR,
+             error_message => $MEMCACHE_SERVER_UNREACHABLE,
+    } unless $self->_is_server_running();
+
     return { error_code    => $TOO_MANY_REQUEST,
              error_message => $REACHED_REQUEST_LIMIT,
     } unless $self->_is_authorized($client_ip);
@@ -208,6 +240,10 @@ Returns ordered list of available maps.
 sub available_maps {
     my ($self, $client_ip) = @_;
 
+    return { error_code    => $MEMCACHE_SERVER_ERROR,
+             error_message => $MEMCACHE_SERVER_UNREACHABLE,
+    } unless $self->_is_server_running();
+
     return { error_code    => $TOO_MANY_REQUEST,
              error_message => $REACHED_REQUEST_LIMIT,
     } unless $self->_is_authorized($client_ip);
@@ -227,42 +263,51 @@ sub _jsonified_content {
     return { content => JSON->new->allow_nonref->utf8(1)->encode($data) };
 }
 
+sub _is_server_running {
+    my ($self) = @_;
+
+    my $socket = IO::Socket::INET->new(
+        PeerAddr => $self->memcache_host,
+        PeerPort => $self->memcache_port,
+        Proto    => 'tcp',
+        Timeout  => 2,
+    );
+
+    return 0 unless $socket;
+
+    close($socket);
+    return 1;
+}
+
 sub _is_authorized {
     my ($self, $client_ip) = @_;
 
-    my $userdata = $self->memcached->get('userdata');
-    my $now = time;
+    return 0 unless defined $client_ip;
 
-    if (defined $userdata) {
-        if (exists $userdata->{$client_ip}) {
-            my $old = $userdata->{$client_ip}->{last_access_time};
-            my $cnt = $userdata->{$client_ip}->{count};
-            if (($now - $old) < $self->request_period) {
-                if (($cnt + 1) > $self->request_threshold) {
-                    return 0;
-                }
-                else {
-                    $userdata->{$client_ip}->{last_access_time} = $now;
-                    $userdata->{$client_ip}->{count} = $cnt + 1;
-                }
-            }
-            else {
-                $userdata->{$client_ip}->{last_access_time} = $now;
-                $userdata->{$client_ip}->{count} = 1;
-            }
+    my $now = int(gettimeofday());
+    my $call_info = $self->memcached->get($client_ip);
+
+    if (defined $call_info) {
+        my ($start_time, $count) = split /\:/, $call_info, 2;
+        my $elapsed_time = $now - $start_time;
+
+        if ($elapsed_time >= $self->request_period) {
+            $start_time = $now;
+            $count = 1;
         }
         else {
-            $userdata->{$client_ip}->{last_access_time} = $now;
-            $userdata->{$client_ip}->{count} = 1;
+            if ($count >= $self->request_threshold) {
+                return 0;
+            }
+            else {
+                $count++;
+            }
         }
 
-        $self->memcached->replace('userdata', $userdata);
+        $self->memcached->replace($client_ip, sprintf("%d:%d", $start_time, $count));
     }
     else {
-        $userdata->{$client_ip}->{last_access_time} = $now;
-        $userdata->{$client_ip}->{count} = 1;
-
-        $self->memcached->add('userdata', $userdata);
+        $self->memcached->add($client_ip, sprintf("%d:1", $now));
     }
 
     return 1;

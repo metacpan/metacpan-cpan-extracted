@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::header::suaddhead;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUADDHEAD - put headers on bare traces and set the tracl and ns fields
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE: June 7 2013 
  REQUIRES:  Seismic Unix modules (CSM)
  DESCRIPTION suaddhead 

@@ -1,3 +1,6 @@
+20230906.0   31.01.2024
+    - libdwarf version bump
+    - improved cmake support
 20201123.0   24.11.2020
     - version bump
     - improved cmake support (accepted by upstream)

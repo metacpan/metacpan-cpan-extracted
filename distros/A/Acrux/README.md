@@ -3,4 +3,3 @@
 # Acrux & Acme::Crux
 
 Acrux - Southern crucis constellation for your applications
-

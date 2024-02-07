@@ -1,5 +1,5 @@
 package Selenium::Driver::Gecko;
-$Selenium::Driver::Gecko::VERSION = '1.06';
+$Selenium::Driver::Gecko::VERSION = '2.00';
 use strict;
 use warnings;
 
@@ -14,14 +14,14 @@ use File::Which;
 #ABSTRACT: Tell Selenium::Client how to spawn geckodriver
 
 
-sub build_spawn_opts($class,$object) {
-    $object->{driver_class}       = $class;
-    $object->{driver_version}     //= '';
-    $object->{log_file}           //= "$object->{client_dir}/perl-client/selenium-$object->{port}.log";
+sub build_spawn_opts ( $class, $object ) {
+    $object->{driver_class} = $class;
+    $object->{driver_version} //= '';
+    $object->{log_file}       //= "$object->{client_dir}/perl-client/selenium-$object->{port}.log";
     $object->{driver_file} = File::Which::which('geckodriver');
     die "Could not find driver!" unless $object->{driver_file};
 
-    my @config = ('--port', $object->{port});
+    my @config = ( '--port', $object->{port} );
 
     # Build command string
     $object->{command} //= [
@@ -45,7 +45,7 @@ Selenium::Driver::Gecko - Tell Selenium::Client how to spawn geckodriver
 
 =head1 VERSION
 
-version 1.06
+version 2.00
 
 =head1 Mode of Operation
 

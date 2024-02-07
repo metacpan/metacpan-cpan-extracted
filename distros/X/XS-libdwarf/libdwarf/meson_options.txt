@@ -1,0 +1,18 @@
+
+option('dwarfgen',
+  type : 'boolean',
+  value : false,
+  description : 'enable dwarfgen compilation'
+)
+
+option('dwarfexample',
+  type : 'boolean',
+  value : false,
+  description : 'enable dwarf examples compilation'
+)
+
+option('doc',
+  type : 'boolean',
+  value : false,
+  description : 'build and install Doxygen documentation'
+)

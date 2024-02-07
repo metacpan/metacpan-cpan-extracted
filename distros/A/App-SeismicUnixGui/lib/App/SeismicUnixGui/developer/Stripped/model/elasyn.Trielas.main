@@ -39,12 +39,12 @@ of the specified (xg,zg) coordinates.
 
 
 
- AUTHORS:  Andreas Rueger, Colorado School of Mines, 02/02/94
+ Authors:  Andreas Rueger, Colorado School of Mines, 02/02/94
             Tariq Alkalifah, Colorado School of Mines, 02/02/94
 	     (interpolation routines)
 	     
  The program is based on :
-	        gbbeam.c, AUTHOR: Andreas Rueger, 08/12/93
-	       	sdbeam.c, AUTHOR Dave Hale, CSM, 02/26/91
+	        gbbeam.c, Author: Andreas Rueger, 08/12/93
+	       	sdbeam.c, Author Dave Hale, CSM, 02/26/91
 
 

@@ -1,22 +1,20 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2024 -- leonerd@leonerd.org.uk
 
 package # hide from CPAN
-   IO::Async::Internals::Connector;
+   IO::Async::Internals::Connector 0.802;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.802';
 
 use Scalar::Util qw( weaken blessed );
 
 use POSIX qw( EINPROGRESS );
 use Socket qw( SOL_SOCKET SO_ERROR );
 
-use Future 0.21;
+use Future 0.44; # ->result
 use Future::Utils 0.18 qw( try_repeat_until_success );
 
 use IO::Async::OS;
@@ -245,8 +243,8 @@ sub connect
 
    return Future->needs_all( $peeraddrfuture, $localaddrfuture )
       ->then( sub {
-         my @peeraddrs  = $peeraddrfuture->get;
-         my @localaddrs = $localaddrfuture->get;
+         my @peeraddrs  = $peeraddrfuture->result;
+         my @localaddrs = $localaddrfuture->result;
 
          my @addrs;
 

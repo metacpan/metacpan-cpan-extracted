@@ -1,27 +1,26 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use IO::Async::Internals::TimeQueue;
 
 my $queue = IO::Async::Internals::TimeQueue->new;
 
 ok( defined $queue, '$queue defined' );
-isa_ok( $queue, "IO::Async::Internals::TimeQueue", '$queue isa IO::Async::Internals::TimeQueue' );
+isa_ok( $queue, [ "IO::Async::Internals::TimeQueue" ], '$queue isa IO::Async::Internals::TimeQueue' );
 
 is( $queue->next_time, undef, '->next_time when empty is undef' );
 
-ok( exception { $queue->enqueue( code => sub { "DUMMY" } ) },
+ok( dies { $queue->enqueue( code => sub { "DUMMY" } ) },
     'enqueue no time fails' );
 
-ok( exception { $queue->enqueue( time => 123 ) },
+ok( dies { $queue->enqueue( time => 123 ) },
     'enqueue no code fails' );
 
-ok( exception { $queue->enqueue( time => 123, code => 'HELLO' ) },
+ok( dies { $queue->enqueue( time => 123, code => 'HELLO' ) },
     'enqueue code not CODE ref fails' );
 
 $queue->enqueue( time => 1000, code => sub { "DUMMY" } );

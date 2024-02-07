@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::plot::pslabel;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 
@@ -151,7 +151,7 @@ Optional Parameters:
 
 
 
- AUTHOR:  John E. Anderson, Visiting Scientist from Mobil, 1994
+ Author:  John E. Anderson, Visiting Scientist from Mobil, 1994
 
 
 

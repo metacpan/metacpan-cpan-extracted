@@ -2,8 +2,8 @@ package Project2::Gantt::Skin::Medium;
 
 use Mojo::Base 'Project2::Gantt::Skin';
 
-our $DATE = '2023-02-16'; # DATE
-our $VERSION = '0.009';
+our $DATE = '2024-02-05'; # DATE
+our $VERSION = '0.011';
 
 has spanInfoWidth   => 205 + 100;
 has titleSize       => 200 + 100;

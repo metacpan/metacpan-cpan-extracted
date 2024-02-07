@@ -157,9 +157,11 @@ c *******************
         tr(1)  =  datax1 - datadx
         tr(2)  =  datadx
         tr(3)  =  0.0
-        tr(4)  =  datat1 - datadt - tr(1)*rvinvd
+        tr(4)  =  0.0
+        tr(4) = datat1 - datadt - tr(1)*rvinvd
+!        tr(5)  = 0.0
         tr(5)  = -datadx*rvinvd
-        tr(6)  =  datadt
+!        tr(6)  =  datadt
 c
 c *****    READ VELOCITY DEPTH MODEL  ******
 c

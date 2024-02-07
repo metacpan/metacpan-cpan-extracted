@@ -1,5 +1,5 @@
 ---
-abstract: HTML
+abstract: 'Components of SPVM Engine'
 author:
   - 'Yuki Kimoto<kimoto.yuki@gmail.com>'
 build_requires:
@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   SPVM: '0.989063'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,5 +21,5 @@ requires:
   SPVM: '0.989063'
   SPVM::Regex: '0.244'
 resources: {}
-version: '0.014'
+version: '0.017'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

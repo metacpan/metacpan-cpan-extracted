@@ -1,3 +1,25 @@
+0.10 2024-02-04T17:11:53+01:00
+ - API change: Add 'data' and 'data_type' parameters to Form.
+ - API change: Add 'data' and 'data_type' parameters to Select.
+ - API change: Remove 'options' parameter from Select.
+ - Add DESCRIPTION section to Element doc.
+ - Add Utils with data and data_type checks.
+ - Add check for CSS class in Input, Option and Select.
+ - Add check for data in Option.
+ - Add default value for boolean values in Input.
+ - Add doc for Input.
+ - Add id and target to A element.
+ - Add name to input element.
+ - Add possibility of callback to 'data'.
+ - Add tests for Button.
+ - Add tests for Input.
+ - Add tests for Options.
+ - Add tests for Select.
+ - Add tests for Select constructor errors.
+ - Add tests for Utils.
+ - Fix boolean value in Option for disabled and selected params.
+ - Fix ERRORS sections in doc.
+
 0.09 2024-01-06T19:35:12+01:00
  - Add check for CSS class.
  - Update to bigger version because issues in $VERSION.

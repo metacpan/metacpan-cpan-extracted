@@ -17,6 +17,8 @@ Acrux - Southern crucis constellation for your applications
 
 Southern crucis constellation for your applications
 
+See L<Acme::Crux> for more!
+
 =head1 TO DO
 
 See C<TODO> file
@@ -42,7 +44,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 1;
 

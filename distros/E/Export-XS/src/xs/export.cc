@@ -89,7 +89,12 @@ void export_constants (const Stash& from, Stash to) {
 void autoexport (Stash stash) {
     auto gv = tls.self_stash["import"];
     auto dsub = stash.sub("import");
-    if (dsub && dsub != gv.sub() && (!dsub.stash() || dsub.stash().name() != "UNIVERSAL")) {
+    if (
+        dsub &&
+        dsub != gv.sub() &&
+        (!dsub.stash() || dsub.stash().name() != "UNIVERSAL") &&
+        (!dsub.glob() || !dsub.glob().stash() || dsub.glob().stash().name() != "UNIVERSAL")
+    ) {
         throw std::logic_error(string("Export::XS: can't make autoexport for stash '") + stash.name() + "' - you already have import() sub");
     }
     stash["import"] = gv;

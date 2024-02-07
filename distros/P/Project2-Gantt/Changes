@@ -1,5 +1,13 @@
 Revision history for Project2-Gantt
 
+0.011     2024-02-05 18:50:42 CET
+    - Update test to not use postderef
+
+0.010     2024-02-04 18:51:14 CET
+    - Force requires on specific version of Time::Piece to fix an issue
+      where copy constructor was using timezones and changing the dates
+      causing tests to break. (Thanks E. Choroba)
+
 0.009     2023-02-16 10:41:11 CET
     - Depend on Alien::Font::Vera and update doc to reflect that
 

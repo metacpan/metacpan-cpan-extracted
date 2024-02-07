@@ -68,13 +68,22 @@ formTools = {
             modal_copy.find('form.formtools-element-form').on('submit', formTools.elementSubmit);
             modal_copy.modal('show');
             modal_copy.attr('ondragenter', 'formTools.dragenter(event);');
-            modal_copy.find('select').selectpicker(); // initialize selectpicker after cloneNode to make it work
-            modal_copy.find('.custom-checkbox').each(function() {
+
+            modal_copy.find(':input[name^="template-"]').each(function() {
+                const input = jQuery(this);
+                input.attr('name', input.attr('name').replace(/^template-/, ''));
+            });
+            modal_copy.find('select:not(.combobox)').selectpicker();
+
+            modal_copy.find('.custom-checkbox, .custom-radio').each(function() {
                 const input = jQuery(this).find('input');
                 const label = jQuery(this).find('label');
-                label.attr('for', source_copy.id + input.attr('name'));
-                input.attr('id', source_copy.id + input.attr('name'));
+                label.attr('for', source_copy.id + label.attr('for').replace(/^template-/, ''));
+                input.attr('id', source_copy.id + input.attr('id').replace(/^template-/, ''));
             });
+
+            // combobox dropdown icon doesn't work after drag&drop, hide it for now
+            modal_copy.find('.combobox-container .input-group-append').hide();
         }
         formTools.submit();
     },
@@ -120,9 +129,35 @@ formTools = {
                 delete value.arguments.label;
             }
 
-            const default_value = form.find(':input[name=default]').val();
+            let default_value;
+            form.find(':input[name^="Object-"][name*="-CustomField-"]:not([name$="-Magic"])').each(function() {
+                const input = jQuery(this);
+                if ( input.is('[type=radio], [type=checkbox]') ) {
+                    if ( input.is(':checked') ) {
+                        if ( default_value ) {
+                            if ( !Array.isArray(default_value) ) {
+                                default_value = [default_value];
+                            }
+                            default_value.push(input.val());
+                        }
+                        else {
+                            default_value = input.val();
+                        }
+                    }
+                }
+                else {
+                    default_value = input.val();
+                }
+            });
 
-            if ( default_value.length ) {
+            if ( !default_value ) {
+                const default_input = form.find(':input[name=default]');
+                if ( default_input ) {
+                    default_value = default_input.val();
+                }
+            }
+
+            if ( default_value && default_value.length ) {
                 value.arguments.default = default_value;
             }
             else {
@@ -177,6 +212,16 @@ formTools = {
                     value.arguments.render_as = 'hidden';
                 }
                 else if ( value.arguments.render_as === 'hidden' ) {
+                    delete value.arguments.render_as;
+                }
+            }
+
+            const readonly = form.find(':input[name=readonly]');
+            if ( readonly.length ) {
+                if ( readonly.is(':checked') ) {
+                    value.arguments.render_as = 'readonly_plus_values';
+                }
+                else if ( value.arguments.render_as === 'readonly_plus_values' ) {
                     delete value.arguments.render_as;
                 }
             }

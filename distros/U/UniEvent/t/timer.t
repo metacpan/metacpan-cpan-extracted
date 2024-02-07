@@ -6,25 +6,27 @@ test_catch '[timer]';
 
 my $l = UniEvent::Loop->default;
 
+my $slow_ratio = $ENV{ASAN_OPTIONS} ? 2 : 1;
+
 subtest 'once timer' => sub {
     $l->update_time;
     my $t = new UniEvent::Timer;
-    
+
     is $t->type, UniEvent::Timer::TYPE, 'type correct';
-    
+
     $t->event->add(\&count);
     time_mark();
     $t->start(0, 0.02);
     $l->run;
     check_mark(0.02, "first call time is correct");
     check_count(1, "timer run once");
-    
+
     time_mark();
     $t->once(0.01);
     $l->run;
     check_mark(0.01, "first call time is correct");
     check_count(1, "timer run once");
-    
+
     ok !$l->alive, "loop is not alive after firing";
     $l->run;
     pass "loop doesnt get blocked after firing";
@@ -83,14 +85,14 @@ subtest 'change repeat' => sub {
         my $initial_meth = shift;
         my $t = new UniEvent::Timer;
         $t->callback(sub { $l->stop });
-        $t->$initial_meth(0.02);
-        $t->repeat(0.04);
+        $t->$initial_meth(0.02 * $slow_ratio);
+        $t->repeat(0.04 * $slow_ratio);
         time_mark();
         $l->run;
-        check_mark(0.02, "changing repeat doesn't apply for the next call ($initial_meth)");
+        check_mark(0.02 * $slow_ratio, "changing repeat doesn't apply for the next call ($initial_meth)");
         time_mark();
         $l->run;
-        check_mark(0.04, "changing repeat applies for further calls ($initial_meth)");
+        check_mark(0.04 * $slow_ratio, "changing repeat applies for further calls ($initial_meth)");
     };
     subtest 'once'  => $sub, 'once';
     subtest 'start' => $sub, 'start';
@@ -147,21 +149,21 @@ subtest 'static ctors' => sub {
         $l->run;
         is $cnt, 2;
     };
-    
+
     subtest 'create_once' => sub {
         my $cnt = 0;
         my $t = UE::Timer->create_once(0.001, sub {++$cnt});
         $l->run for 1..3;
         is $cnt, 1;
     };
-    
+
     subtest 'UE::timer_once' => sub {
         my $cnt = 0;
         my $t = UE::timer_once 0.001, sub {++$cnt};
         $l->run for 1..3;
         is $cnt, 1;
     };
-    
+
     subtest 'deprecated start' => sub {
         my $cnt = 0;
         my $t = UE::Timer->start(0.001, sub {
@@ -171,7 +173,7 @@ subtest 'static ctors' => sub {
         $l->run;
         is $cnt, 2;
     };
-    
+
     subtest 'deprecated once' => sub {
         my $cnt = 0;
         my $t = UE::Timer->once(0.001, sub {++$cnt});
@@ -188,23 +190,23 @@ subtest 'event listener' => sub {
     my $h = new UE::Timer;
     $h->event_listener(bless {}, 'MyLst');
     $h->callback(sub { $cnt++ });
-    
+
     $h->call_now;
     is $cnt, 11, "listener&event called";
 };
 
 subtest "pause/resume" => sub {
-    my $t = UE::timer 0.01, sub { die };
-    select undef, undef, undef, 0.005;
+    my $t = UE::timer 0.02 * $slow_ratio, sub { die };
+    select undef, undef, undef, 0.01 * $slow_ratio;
     $l->run_nowait;
     $t->pause;
-    select undef, undef, undef, 0.006;
+    select undef, undef, undef, 0.012 * $slow_ratio;
     $l->run_nowait;
     $t->resume;
-    cmp_ok $t->due_in, '<=', 0.0051;
+    cmp_ok $t->due_in, '<=', 0.011 * $slow_ratio;
     my $called;
     $t->callback(sub { $called = 1 });
-    select undef, undef, undef, 0.006;
+    select undef, undef, undef, 0.012 * $slow_ratio;
     $l->run_nowait;
     ok $called;
 };

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+./build && cpanm -n "`ls -t *.tar.gz | head -n1`"

@@ -1,5 +1,5 @@
 package Selenium::Driver::Chrome;
-$Selenium::Driver::Chrome::VERSION = '1.06';
+$Selenium::Driver::Chrome::VERSION = '2.00';
 use strict;
 use warnings;
 
@@ -18,14 +18,14 @@ sub _driver {
     return 'chromedriver';
 }
 
-sub build_spawn_opts($class,$object) {
-    $object->{driver_class}       = $class;
-    $object->{driver_version}     //= '';
-    $object->{log_file}           //= "$object->{client_dir}/perl-client/selenium-$object->{port}.log";
-    $object->{driver_file} = File::Which::which($class->_driver());
+sub build_spawn_opts ( $class, $object ) {
+    $object->{driver_class} = $class;
+    $object->{driver_version} //= '';
+    $object->{log_file}       //= "$object->{client_dir}/perl-client/selenium-$object->{port}.log";
+    $object->{driver_file} = File::Which::which( $class->_driver() );
     die "Could not find driver!" unless $object->{driver_file};
 
-    my @config = ('--port='.$object->{port});
+    my @config = ( '--port=' . $object->{port} );
 
     # Build command string
     $object->{command} //= [
@@ -49,7 +49,7 @@ Selenium::Driver::Chrome - Tell Selenium::Client how to spawn chromedriver
 
 =head1 VERSION
 
-version 1.06
+version 2.00
 
 =head1 Mode of Operation
 

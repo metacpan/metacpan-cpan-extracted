@@ -3,25 +3,51 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = libdwarf dwarfdump
+AUTOMAKE_OPTIONS=subdir-objects
+SUBDIRS = src/lib/libdwarf src/bin/dwarfdump
 
 if HAVE_DWARFGEN
-SUBDIRS += dwarfgen
+  SUBDIRS += src/lib/libdwarfp
+  SUBDIRS += src/bin/dwarfgen
 endif
-
-###if HAVE_LIBELF
-###SUBDIRS += dwarfgen
-###endif
-###if HAVE_LIBELF_LIBELF
-###SUBDIRS += dwarfgen
-###endif
 
 if HAVE_DWARFEXAMPLE
-SUBDIRS += dwarfexample
+SUBDIRS += src/bin/dwarfexample
 endif
 
-DISTCLEANFILES = \
-libdwarf/libdwarf.h
+SUBDIRS += test
+SUBDIRS += doc
+SUBDIRS += fuzz
+SUBDIRS += src/bin/gennames
+SUBDIRS += src/bin/tag_tree
+SUBDIRS += src/bin/tag_attr
+SUBDIRS += src/bin/attr_form
+SUBDIRS += src/bin/buildopstab
+SUBDIRS += src/bin/builduritable
+
+### rebuild is for maintainers to update C source
+### that depends on certain (C and/or text) Files.
+### Very rarely necessary.
+### Harmless if nothing needed update.
+### Rebuild all source after doing 'make rebuild'
+### Also do 'make check' as it checks correctness
+### of certain libdwarf source files.
+rebuild:
+	make -C src/bin/gennames    rebuild
+	make -C src/bin/tag_tree    rebuild
+	make -C src/bin/tag_attr    rebuild
+	make -C src/bin/attr_form   rebuild
+	make -C src/bin/buildopstab rebuild
+doc:
+	make -C doc doc
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libdwarf.pc
+if HAVE_DWARFGEN 
+pkgconfig_DATA +=  libdwarfp.pc
+endif
+
+DISTCLEANFILES =
 
 MAINTAINERCLEANFILES = \
 Makefile.in \
@@ -41,72 +67,40 @@ m4/ltoptions.m4 \
 m4/ltsugar.m4 \
 m4/ltversion.m4 \
 m4/lt~obsolete.m4 \
-missing \
-$(distdir).tar.gz \
-$(distdir).tar.xz
+missing  \
+test-driver \
+$(distdir).tar.gz  \
+$(distdir).tar.xz 
 
 EXTRA_DIST = \
 appveyor.yml \
+autogen.sh \
 bugxml \
 ChangeLog \
 ChangeLog2018 \
+ChangeLog2019 \
+ChangeLog2020 \
+ChangeLog2021 \
+ChangeLog2022 \
 cmake \
 CMakeLists.txt \
-codingstyle.txt \
-config.h.in.cmake \
-dwarfdump/runtests.sh \
-libdwarf/runtests.sh \
+CODINGSTYLE.md \
+CONTRIBUTING.md \
+cmake/config.h.cmake \
+README \
 README.md \
-scripts/baseconfig.h  \
-scripts/BLDLIBDWARF \
-scripts/BLDLIBDWARFTAR \
-scripts/BLDTESTDIR \
+README.cmake \
+libdwarf.pc.in \
+libdwarfp.pc.in \
+meson.build \
+meson_options.txt \
 scripts/buildandreleasetest.sh \
-scripts/buildstandardsource.sh \
+scripts/run-all-tests.sh \
 scripts/ChangeLog \
 scripts/ChangeLog2018 \
+scripts/ChangeLog2019 \
+scripts/ChangeLog2020 \
 scripts/CLEANUP \
-scripts/conddef.py  \
-scripts/CPTARTOWEBDIR \
-scripts/CPTOPUBLIC \
-scripts/CREATINGARELEASE \
-scripts/dateorder   \
-scripts/ddbuild.sh  \
-scripts/FIX-CONFIGURE-TIMES \
-scripts/fixlibdwarfelf.sh \
-scripts/funcfinderhdr.py \
-scripts/funcfindermm.py \
-scripts/funcfindersrcs.py \
-scripts/GETTOTOP \
-scripts/libbuild.sh \
-scripts/REBLDLIBDWARF \
-scripts/RUNPY \
-scripts/SETUP_GZ_TREE \
-scripts/UPDATEDWARFDUMPVERSION.sh \
-scripts/UPD.awk \
-tsearch/ChangeLog \
-tsearch/ChangeLog2014 \
-tsearch/ChangeLog2015 \
-tsearch/ChangeLog2016 \
-tsearch/ChangeLog2017 \
-tsearch/ChangeLog2018 \
-tsearch/config.h \
-tsearch/dwarf_incl.h \
-tsearch/dwarf_tsearchbal.c \
-tsearch/dwarf_tsearchbin.c \
-tsearch/dwarf_tsearch.c \
-tsearch/dwarf_tsearchepp.c \
-tsearch/dwarf_tsearch.h \
-tsearch/dwarf_tsearchhash.c \
-tsearch/dwarf_tsearchred.c \
-tsearch/ESSAY.txt \
-tsearch/Makefile \
-tsearch/README \
-tsearch/RUNTEST \
-tsearch/scripts \
-tsearch/tsearch.c \
-tsearch/tsearchlibtimes.csv \
-tsearch/tsearchlibtimes.ods \
-tsearch/tsearch_tester.c
+.travis.yml
 
 # AUTHORS, ChangeLog and COPYING must be present

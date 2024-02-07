@@ -7,7 +7,7 @@ our $VERSION = '0.0.1';
 =head2 SYNOPSIS
 
   PROGRAM NAME: suspecfk
-  AUTHOR: Juan Lorenzo 
+AUTHOR: Juan Lorenzo (Perl module only)
   DATE:   July 1 2016 
   DESCRIPTION:  A package that makes using and understanding suspecfk easier
   VERSION: 0.1

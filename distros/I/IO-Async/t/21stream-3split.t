@@ -1,13 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Fatal;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use IO::File;
 use Errno qw( EAGAIN EWOULDBLOCK );
@@ -75,7 +73,7 @@ $S1->syswrite( "reverse\n" );
 
 $loop->loop_once( 0.1 );
 
-is_deeply( \@lines, [ "reverse\n" ], '@lines on response to split stream' );
+is( \@lines, [ "reverse\n" ], '@lines on response to split stream' );
 
 is_refcount( $stream, 2, 'split read/write $stream has refcount 2 before removing from Loop' );
 
@@ -108,7 +106,7 @@ $loop->add( $stream );
 
 is_refcount( $stream, 2, 'latehandle $stream has refcount 2 after adding to Loop' );
 
-ok( exception { $stream->write( "some text" ) },
+ok( dies { $stream->write( "some text" ) },
     '->write on stream with no IO handle fails' );
 
 $stream->set_handle( $S1 );
@@ -176,7 +174,7 @@ undef $stream; # Only ref is now in the Loop
 $S2->close;
 
 # $S1 should now be both read- and write-ready.
-ok( !exception { $loop->loop_once }, 'read+write-ready closed Stream doesn\'t die' );
+ok( !dies { $loop->loop_once }, 'read+write-ready closed Stream doesn\'t die' );
 
 undef $stream;
 

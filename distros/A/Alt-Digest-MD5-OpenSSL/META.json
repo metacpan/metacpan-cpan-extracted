@@ -24,7 +24,7 @@
       "build" : {
          "requires" : {
             "Alien::Base::Wrapper" : "0.32",
-            "ExtUtils::MakeMaker" : "6.52"
+            "ExtUtils::MakeMaker" : "6.76"
          }
       },
       "configure" : {
@@ -39,9 +39,19 @@
             "Digest::base" : "1.00",
             "XSLoader" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Alien::OpenSSL" : "0",
+            "Encode" : "0",
+            "MIME::Base64" : "0",
+            "Test::Alien::Diag" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : 0.02,
+   "version" : 0.03,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

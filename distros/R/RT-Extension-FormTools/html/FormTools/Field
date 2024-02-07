@@ -63,7 +63,29 @@ if ( RT::Extension::FormTools::is_core_field($name) ) {
 
     if ($ticket) {
         @values = map { $_->Content } @{ $cf->ValuesForObject($ticket)->ItemsArrayRef };
-        $default ||= $values[0];
+        $default ||= @values > 1 ? \@values : $values[0];
+    }
+
+    if ( $default && !ref $default && $cf->MaxValues != 1 ) {
+        $default = [ split /\r?\n/, $default ];
+    }
+
+    if ( !( defined $default && length $default ) && $cf->SupportDefaultValues ) {
+        if ( defined( my $default_values = $cf->DefaultValues( Object => $queue ) ) ) {
+            $default = $default_values;
+        }
+    }
+
+    # for readonly, @values is used to render multiple value inputs.
+    if ( $render_as =~ /readonly/ ) {
+        if ( ref $default eq 'ARRAY' ) {
+            if ( @$default > 1 ) {
+                @values = @$default;
+            }
+            else {
+                $default = $default->[0];
+            }
+        }
     }
 
     $input_name = GetCustomFieldInputName(
@@ -73,12 +95,16 @@ if ( RT::Extension::FormTools::is_core_field($name) ) {
 }
 
 my $request_args = $m->request_args();
-if ( $field_type eq 'core' && exists $request_args->{$name} ) {
-    $default = $request_args->{$name};
-} elsif ( $field_type eq 'custom' && $cf->Id &&
-        ( exists $request_args->{ $input_name } ) ) {
-    $default = ($request_args->{ $input_name } ||
-                $request_args->{ $input_name .'s' } );
+
+if ( $render_as !~ /readonly/ ) {
+    my $request_args = $m->request_args();
+
+    if ( $field_type eq 'core' && exists $request_args->{$name} ) {
+        $default = $request_args->{$name};
+    }
+    elsif ( $field_type eq 'custom' && $cf->Id && ( exists $request_args->{$input_name} ) ) {
+        $default = ( $request_args->{$input_name} || $request_args->{ $input_name . 's' } );
+    }
 }
 
 $default = '' unless defined $default;
@@ -119,6 +145,15 @@ $default = '' unless defined $default;
     data-validation="<% $ARGS{validation} %>"
 % }
 >
+
+% if ( $default && RT->Config->Get('MessageBoxRichText',  $session{'CurrentUser'}) && $default !~ /<.{1,5}>/ ) {
+%   $default =~ s/&/&amp;/g;
+%   $default =~ s/</&lt;/g;
+%   $default =~ s/>/&gt;/g;
+%   $default =~ s/"/&quot;/g;
+%   $default =~ s/'/&#39;/g;
+%   $default =~ s{\n}{<br />}g;
+% }
 <& /Elements/MessageBox,
     Name => $name,
     ($rows ? (Height => $rows) : ()),

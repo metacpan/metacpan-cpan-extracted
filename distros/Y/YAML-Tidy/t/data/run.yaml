@@ -1,2 +1,2 @@
 "some":  input file	
-that: {"should be":tidied}
+that: {"should be":tidied, "keep { quotes": "#here"}

@@ -23,6 +23,27 @@ clib/backend-uv/src/UVUdp.h
 clib/backend-uv/src/UVWork.h
 clib/cmake/modules/Findlibuv.cmake
 clib/CMakeLists.txt
+clib/doc/build.md
+clib/doc/check.md
+clib/doc/fs.md
+clib/doc/fsevent.md
+clib/doc/fspoll.md
+clib/doc/functions.md
+clib/doc/handle.md
+clib/doc/idle.md
+clib/doc/loop.md
+clib/doc/pipe.md
+clib/doc/poll.md
+clib/doc/prepare.md
+clib/doc/resolver.md
+clib/doc/signal.md
+clib/doc/stream.md
+clib/doc/tcp.md
+clib/doc/timer.md
+clib/doc/tty.md
+clib/doc/udp.md
+clib/FetchDeps.cmake
+clib/README.md
 clib/src/panda/unievent.h
 clib/src/panda/unievent/AddrInfo.cc
 clib/src/panda/unievent/AddrInfo.h
@@ -243,6 +264,7 @@ lib/UniEvent/Udp.pm
 lib/UniEvent/Udp.pod
 lib/UniEvent/Work.pm
 Makefile.PL
+Makefile.test
 MANIFEST			This list of files
 MANIFEST.SKIP
 misc/bench_delay.plx
@@ -364,7 +386,6 @@ t/tty.t
 t/udp/simple.t
 t/udp/udp.t
 t/util.t
-t/var/streamer/fout.txt
 t/work.t
 xs/Backend.xsi
 xs/Check.xs

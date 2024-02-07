@@ -41,6 +41,6 @@ README
 t/01-use.t
 xt/author/pod-coverage.t
 xt/author/pod.t
+LICENSE                                  LICENSE file (added by Distar)
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
-LICENSE                                  LICENSE file (added by Distar)

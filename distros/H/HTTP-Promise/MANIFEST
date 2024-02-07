@@ -49,7 +49,6 @@ lib/HTTP/Promise/Stream/UU.pm
 LICENSE
 Makefile.PL
 MANIFEST
-META.yml			Module meta-data (added by MakeMaker)
 README
 README.md
 SIGNATURE			Public-key signature (added by MakeMaker)
@@ -91,4 +90,5 @@ t/testin/post-multipart-form-data-07.txt
 t/testin/science-sans-conscience-rabelais.txt
 t/testin/short.txt
 t/testin/tengu.png
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

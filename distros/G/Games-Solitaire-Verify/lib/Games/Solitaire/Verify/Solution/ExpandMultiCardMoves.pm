@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Solution::ExpandMultiCardMoves;
-$Games::Solitaire::Verify::Solution::ExpandMultiCardMoves::VERSION = '0.2403';
+$Games::Solitaire::Verify::Solution::ExpandMultiCardMoves::VERSION = '0.2500';
 use warnings;
 use strict;
 use 5.014;
@@ -24,7 +24,7 @@ __PACKAGE__->mk_acc_ref(
         qw(
             _move_line
             _output_fh
-            )
+        )
     ]
 );
 
@@ -351,7 +351,7 @@ sub _apply_move
         };
 
         $recursive_move->(
-            $ultimate_source, $ultimate_dest,
+            $ultimate_source,    $ultimate_dest,
             $ultimate_num_cards, [@empty_stack_indexes],
         );
     }
@@ -432,7 +432,7 @@ moves.
 
 =head1 VERSION
 
-version 0.2403
+version 0.2500
 
 =head1 SYNOPSIS
 

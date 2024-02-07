@@ -1,5 +1,8 @@
 Release history for LWP-Protocol-https
 
+6.13      2024-02-06 01:00:50Z
+    - Fix ssl upgrade for regular host names (GH#77) (Axel Burri)
+
 6.12      2024-01-22 17:51:31Z
     - Enable MultiHomed for IO::Socket::SSL (GH#61) (ℕicolas ℝ.)
     - Making it possible to use IPv6 in https call through https proxy

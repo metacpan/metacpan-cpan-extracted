@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Move;
-$Games::Solitaire::Verify::Move::VERSION = '0.2403';
+$Games::Solitaire::Verify::Move::VERSION = '0.2500';
 use warnings;
 use strict;
 
@@ -17,7 +17,7 @@ __PACKAGE__->mk_acc_ref(
             dest
             num_cards
             _game
-            )
+        )
     ]
 );
 
@@ -26,7 +26,7 @@ sub _from_fcs_string
 {
     my ( $self, $str ) = @_;
 
-    if ( $str =~ m{\AMove a card from stack (\d+) to the foundations\z} )
+    if ( $str =~ m{\AMove a card from stack ([0-9]+) to the foundations\z} )
     {
         my $source = $1;
 
@@ -35,7 +35,8 @@ sub _from_fcs_string
 
         $self->source($source);
     }
-    elsif ( $str =~ m{\AMove a card from freecell (\d+) to the foundations\z} )
+    elsif (
+        $str =~ m{\AMove a card from freecell ([0-9]+) to the foundations\z} )
     {
         my $source = $1;
 
@@ -44,7 +45,8 @@ sub _from_fcs_string
 
         $self->source($source);
     }
-    elsif ( $str =~ m{\AMove a card from freecell (\d+) to stack (\d+)\z} )
+    elsif (
+        $str =~ m{\AMove a card from freecell ([0-9]+) to stack ([0-9]+)\z} )
     {
         my ( $source, $dest ) = ( $1, $2 );
 
@@ -54,7 +56,8 @@ sub _from_fcs_string
         $self->source($source);
         $self->dest($dest);
     }
-    elsif ( $str =~ m{\AMove a card from stack (\d+) to freecell (\d+)\z} )
+    elsif (
+        $str =~ m{\AMove a card from stack ([0-9]+) to freecell ([0-9]+)\z} )
     {
         my ( $source, $dest ) = ( $1, $2 );
 
@@ -64,7 +67,8 @@ sub _from_fcs_string
         $self->source($source);
         $self->dest($dest);
     }
-    elsif ( $str =~ m{\AMove (\d+) cards from stack (\d+) to stack (\d+)\z} )
+    elsif ( $str =~
+        m{\AMove ([0-9]+) cards from stack ([0-9]+) to stack ([0-9]+)\z} )
     {
         my ( $num_cards, $source, $dest ) = ( $1, $2, $3 );
 
@@ -76,7 +80,7 @@ sub _from_fcs_string
         $self->num_cards($num_cards);
     }
     elsif ( $str =~
-        m{\AMove the sequence on top of Stack (\d+) to the foundations\z} )
+        m{\AMove the sequence on top of Stack ([0-9]+) to the foundations\z} )
     {
         my $source = $1;
 
@@ -121,7 +125,7 @@ Solitaire move.
 
 =head1 VERSION
 
-version 0.2403
+version 0.2500
 
 =head1 SYNOPSIS
 

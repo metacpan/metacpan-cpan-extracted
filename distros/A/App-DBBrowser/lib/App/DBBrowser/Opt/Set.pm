@@ -76,7 +76,7 @@ sub _options {
             { name => '_e_write_access', text => "- Write access",       section => 'enable' },
         ],
         group_sql_settings => [
-            { name => '_meta',                   text => "- System DB/Tables", section => 'G'      },
+            { name => '_meta',                   text => "- System data",      section => 'G'      },
             { name => 'operators',               text => "- Operators",        section => 'G'      },
             { name => '_alias',                  text => "- Alias",            section => 'alias'  },
             { name => '_sql_identifiers',        text => "- Identifiers",      section => 'G'      },

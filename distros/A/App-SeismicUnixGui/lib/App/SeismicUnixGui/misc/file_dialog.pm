@@ -2585,6 +2585,7 @@ sub set_hash_ref {
 }
 
 =head2 sub FileDialog_director
+
 Associates the type of file-opening process
 with the correct module
 

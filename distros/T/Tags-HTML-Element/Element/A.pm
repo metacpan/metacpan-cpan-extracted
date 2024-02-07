@@ -7,8 +7,9 @@ use warnings;
 use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
+use Tags::HTML::Element::Utils qw(tags_data tags_value);
 
-our $VERSION = 0.02;
+our $VERSION = 0.06;
 
 sub _cleanup {
 	my $self = shift;
@@ -44,16 +45,12 @@ sub _process {
 
 	$self->{'tags'}->put(
 		['b', 'a'],
-		$self->_tags_value($self->{'_a'}, 'css_class', 'class'),
-		$self->_tags_value($self->{'_a'}, 'url', 'href'),
+		tags_value($self, $self->{'_a'}, 'css_class', 'class'),
+		tags_value($self, $self->{'_a'}, 'id'),
+		tags_value($self, $self->{'_a'}, 'target'),
+		tags_value($self, $self->{'_a'}, 'url', 'href'),
 	);
-	if ($self->{'_a'}->data_type eq 'plain') {
-		$self->{'tags'}->put(
-			['d', @{$self->{'_a'}->data}],
-		);
-	} elsif ($self->{'_a'}->data_type eq 'tags') {
-		$self->{'tags'}->put(@{$self->{'_a'}->data});
-	}
+	tags_data($self, $self->{'_a'});
 	$self->{'tags'}->put(
 		['e', 'a'],
 	);
@@ -65,20 +62,6 @@ sub _process_css {
 	my $self = shift;
 
 	return;
-}
-
-sub _tags_value {
-	my ($self, $object, $method, $method_rewrite) = @_;
-
-	if (defined $object->$method) {
-		return ([
-			'a',
-			defined $method_rewrite ? $method_rewrite : $method,
-			$object->$method,
-		]);
-	}
-
-	return ();
 }
 
 1;
@@ -265,12 +248,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023-2024 Michal Josef Špaček
+© 2022-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.06
 
 =cut

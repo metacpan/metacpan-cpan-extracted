@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::Merge;
 
-our $VERSION = 'v0.37.0'; # VERSION
+our $VERSION = 'v0.38.0'; # VERSION
 
 use YAML::PP::Type::MergeKey;
 

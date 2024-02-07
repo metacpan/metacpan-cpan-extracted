@@ -1,4 +1,4 @@
-December 2022.
+February 2024.
 
 Sendmail::PMilter
 =================
@@ -24,14 +24,14 @@ For installation instructions see the file named INSTALL.  If during
 installation the standard procedures are followed, then the tests in
 t/ will be run automatically before the final installation step.
 
-As of 2022 this author has been using Sendmail::PMilter routinely to
-handle modest volumes of mail for about six years.  In 2022 several
-users have also admitted to using it with Postfix.  So far it seems
-to be working for them.
+As of 2024 this author has been using Sendmail::PMilter routinely to
+handle modest volumes of mail for about eight years.  Several people
+have also admitted to using it with Postfix, including one with around
+500 mail accounts.  It seems to be working well for them.
 
 Enjoy!
 
-Ged Haywood, December 2022.
+Ged Haywood, February 2024.
 
 ----------------------------------------------------------------------
 For copyright/license terms see the file named LICENCE.

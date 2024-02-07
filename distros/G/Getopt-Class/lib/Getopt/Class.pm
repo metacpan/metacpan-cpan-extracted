@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Getopt::Long with Class - ~/lib/Getopt/Class.pm
-## Version v0.104.2
+## Version v0.104.3
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/04/25
-## Modified 2023/10/11
+## Modified 2024/02/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -27,7 +27,7 @@ BEGIN
     use Module::Generic::Scalar;
     use Nice::Try;
     use Scalar::Util;
-    our $VERSION = 'v0.104.2';
+    our $VERSION = 'v0.104.3';
 };
 
 use strict;
@@ -220,7 +220,7 @@ sub init
             $opts->{ $k2_under } = '';
         }
         my $suff = '';
-        if( $def->{type} eq 'string' )
+        if( $def->{type} eq 'string' || $def->{type} eq 'scalar' )
         {
             $suff = '=s';
         }
@@ -595,7 +595,7 @@ sub postprocess
             }
             $opts->{ $k } = ( $opts->{ $k } ? $self->true : $self->false );
         }
-        elsif( $def->{type} eq 'string' )
+        elsif( $def->{type} eq 'string' || $def->{type} eq 'scalar' )
         {
             $opts->{ $k } = Module::Generic::Scalar->new( $opts->{ $k } );
         }
@@ -1137,7 +1137,7 @@ Getopt::Class - Extended dictionary version of Getopt::Long
 
 =head1 VERSION
 
-    v0.104.2
+    v0.104.3
 
 =head1 DESCRIPTION
 

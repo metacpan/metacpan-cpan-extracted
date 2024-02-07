@@ -1,3 +1,8 @@
+0.025   2024-01-30  Released-By: PERLANCAR; Urgency: medium
+
+        - Return raw numbers in result metadata.
+
+
 0.024   2023-02-05  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

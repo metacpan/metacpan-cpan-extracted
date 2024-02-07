@@ -15,6 +15,8 @@ foreach ( sort keys %{ $manifest } ) {
 	and next;
     m{ \A tools / }smx
 	and next;
+    m{ \A t/data/script }smx
+	and next;
 
     ok ! is_executable(), "$_ should not be executable";
 }

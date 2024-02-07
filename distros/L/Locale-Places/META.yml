@@ -9,6 +9,8 @@ build_requires:
   IO::AIO: '0'
   Test::Carp: '0'
   Test::Most: '0'
+  Test::Needs: '0'
+  autodie: '0'
 configure_requires:
   Config: '0'
   File::Which: '0'
@@ -31,6 +33,7 @@ requires:
   DBD::SQLite: '0'
   DBD::SQLite::Constants: '0'
   DBI: '0'
+  Database::Abstraction: '0.04'
   Error::Simple: '0'
   File::Spec: '0'
   File::pfopen: '0'
@@ -41,5 +44,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Locale-Places/issues
   repository: git://github.com/nigelhorne/Locale-Places.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

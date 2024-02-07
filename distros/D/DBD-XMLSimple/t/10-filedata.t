@@ -2,9 +2,9 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 5;
+use Test::Most tests => 6;
 use Test::DatabaseRow;
-# use Test::NoWarnings;	# FIXME: remove once registration completed
+use Test::NoWarnings;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 use FindBin qw($Bin);

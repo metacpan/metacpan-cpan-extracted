@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::header::sucwt;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUCWT - generates Continous Wavelet Transform amplitude, regularity	
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 

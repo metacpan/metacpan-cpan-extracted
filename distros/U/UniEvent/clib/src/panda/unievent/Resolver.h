@@ -18,7 +18,7 @@ namespace panda { namespace unievent {
 
 struct Resolver : Refcnt, private backend::ITimerImplListener {
     static constexpr uint64_t DEFAULT_RESOLVE_TIMEOUT       = 5000;  // [ms]
-    static constexpr uint32_t DEFAULT_CACHE_EXPIRATION_TIME = 20*60; // [s]
+    static constexpr uint32_t DEFAULT_CACHE_EXPIRATION_TIME = 10*60; // [s]
     static constexpr size_t   DEFAULT_CACHE_LIMIT           = 10000; // [records]
     static constexpr uint32_t DEFAULT_QUERY_TIMEOUT         = 500;   // [ms]
     static constexpr uint32_t DEFAULT_WORKERS               = 5;

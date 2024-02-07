@@ -1,13 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Fatal;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use Errno qw( EAGAIN EWOULDBLOCK ECONNRESET );
 
@@ -37,7 +35,7 @@ sub recv_data
    die "Cannot recv - $!";
 }
 
-ok( !exception { IO::Async::Socket->new( write_handle => \*STDOUT ) }, 'Send-only Socket works' );
+ok( !dies { IO::Async::Socket->new( write_handle => \*STDOUT ) }, 'Send-only Socket works' );
 
 # Receiving
 {
@@ -61,7 +59,7 @@ ok( !exception { IO::Async::Socket->new( write_handle => \*STDOUT ) }, 'Send-onl
    );
 
    ok( defined $socket, 'recving $socket defined' );
-   isa_ok( $socket, "IO::Async::Socket", 'recving $socket isa IO::Async::Socket' );
+   isa_ok( $socket, [ "IO::Async::Socket" ], 'recving $socket isa IO::Async::Socket' );
 
    is_oneref( $socket, 'recving $socket has refcount 1 initially' );
 
@@ -71,11 +69,11 @@ ok( !exception { IO::Async::Socket->new( write_handle => \*STDOUT ) }, 'Send-onl
 
    $S2->send( "message\n" );
 
-   is_deeply( \@received, [], '@received before wait' );
+   is( \@received, [], '@received before wait' );
 
    wait_for { scalar @received };
 
-   is_deeply( \@received,
+   is( \@received,
               [ [ "message\n", @S2addr ] ],
               '@received after wait' );
 
@@ -94,7 +92,7 @@ ok( !exception { IO::Async::Socket->new( write_handle => \*STDOUT ) }, 'Send-onl
    wait_for { scalar @new_received };
 
    is( scalar @received, 0, '@received still empty after on_recv replace' );
-   is_deeply( \@new_received,
+   is( \@new_received,
               [ [ "another message\n", @S2addr ] ],
               '@new_received after on_recv replace' );
 
@@ -133,11 +131,11 @@ SKIP: {
 
    wait_for { scalar @frags };
 
-   is_deeply( \@frags, [ "A ni" ], '@frags with recv_len=4 without recv_all' );
+   is( \@frags, [ "A ni" ], '@frags with recv_len=4 without recv_all' );
 
    wait_for { @frags == 3 };
 
-   is_deeply( \@frags, [ "A ni", "anot", "and " ], '@frags finally with recv_len=4 without recv_all' );
+   is( \@frags, [ "A ni", "anot", "and " ], '@frags finally with recv_len=4 without recv_all' );
 
    undef @frags;
    $socket->configure( recv_all => 1 );
@@ -148,7 +146,7 @@ SKIP: {
 
    wait_for { scalar @frags };
 
-   is_deeply( \@frags, [ "Long", "Repe", "Once" ], '@frags with recv_len=4 with recv_all' );
+   is( \@frags, [ "Long", "Repe", "Once" ], '@frags with recv_len=4 with recv_all' );
 
    $loop->remove( $socket );
 }
@@ -157,9 +155,9 @@ SKIP: {
    my ( $S1, $S2 ) = IO::Async::OS->socketpair( "inet", "dgram" ) or die "Cannot socketpair - $!";
 
    my $no_on_recv_socket;
-   ok( !exception { $no_on_recv_socket = IO::Async::Socket->new( handle => $S1 ) },
+   ok( !dies { $no_on_recv_socket = IO::Async::Socket->new( handle => $S1 ) },
        'Allowed to construct a Socket without an on_recv handler' );
-   ok( exception { $loop->add( $no_on_recv_socket ) },
+   ok( dies { $loop->add( $no_on_recv_socket ) },
        'Not allowed to add an on_recv-less Socket to a Loop' );
 }
 
@@ -180,7 +178,7 @@ my @sub_received;
    );
 
    ok( defined $socket, 'receiving subclass $socket defined' );
-   isa_ok( $socket, "IO::Async::Socket", 'receiving $socket isa IO::Async::Socket' );
+   isa_ok( $socket, [ "IO::Async::Socket" ], 'receiving $socket isa IO::Async::Socket' );
 
    is_oneref( $socket, 'subclass $socket has refcount 1 initially' );
 
@@ -190,11 +188,11 @@ my @sub_received;
 
    $S2->send( "message\n" );
 
-   is_deeply( \@sub_received, [], '@sub_received before wait' );
+   is( \@sub_received, [], '@sub_received before wait' );
 
    wait_for { scalar @sub_received };
 
-   is_deeply( \@sub_received,
+   is( \@sub_received,
              [ [ "message\n", @S2addr ] ],
              '@sub_received after wait' );
 
@@ -217,7 +215,7 @@ my @sub_received;
    );
 
    ok( defined $socket, 'sending $socket defined' );
-   isa_ok( $socket, "IO::Async::Socket", 'sending $socket isa IO::Async::Socket' );
+   isa_ok( $socket, [ "IO::Async::Socket" ], 'sending $socket isa IO::Async::Socket' );
 
    is_oneref( $socket, 'sending $socket has refcount 1 intially' );
 

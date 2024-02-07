@@ -6,7 +6,7 @@ use strict;
 use warnings;
 no warnings;
 
-our $VERSION = '0.123';
+our $VERSION = '0.124';
 
 =encoding utf8
 
@@ -90,11 +90,11 @@ This source is in a Git repository:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2013-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2013-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms as Artistic License 2.0.
 

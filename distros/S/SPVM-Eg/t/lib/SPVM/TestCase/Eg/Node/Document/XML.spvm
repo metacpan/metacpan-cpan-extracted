@@ -1,0 +1,36 @@
+class TestCase::Eg::Node::Document::XML {
+  
+  use Eg;
+  
+  use Eg::DOM::Implementation;
+  
+  use Eg::Node::Document::XML;
+  
+  static method create_element : int () {
+    
+    my $document = Eg->document->implementation->create_document(undef, "root");
+    
+    {
+      my $element = $document->create_element("div");
+      
+      unless ($element is_type Eg::Node::Element) {
+        return 0;
+      }
+      
+      unless ($element->node_type == Eg::Node->TYPE_ELEMENT_NODE) {
+        return 0;
+      }
+      
+      if ($element->node_value) {
+        return 0;
+      }
+      
+      unless ($element->tag_name eq "div") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+}

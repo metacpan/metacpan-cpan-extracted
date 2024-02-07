@@ -3,13 +3,11 @@
 #
 #  (C) Paul Evans, 2009-2012 -- leonerd@leonerd.org.uk
 
-package IO::Async::Timer::Countdown;
+package IO::Async::Timer::Countdown 0.803;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( IO::Async::Timer );
-
-our $VERSION = '0.802';
 
 use Carp;
 
@@ -127,7 +125,7 @@ sub configure
 
 =head2 is_expired
 
-   $expired = $timer->is_expired
+   $expired = $timer->is_expired;
 
 Returns true if the Timer has already expired.
 
@@ -165,7 +163,7 @@ sub _make_enqueueargs
 
 =head2 reset
 
-   $timer->reset
+   $timer->reset;
 
 If the timer is running, restart the countdown period from now. If the timer
 is not running, this method has no effect.

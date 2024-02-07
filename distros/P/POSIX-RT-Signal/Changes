@@ -1,5 +1,11 @@
           Revision history for POSIX-RT-Signal
 
+0.017     2024-01-31 22:02:46+01:00 Europe/Brussels
+          - Use updated typemap
+
+0.016     2024-01-30 19:13:53+01:00 Europe/Brussels
+          - Use Signal typemap
+
 0.015     2014-09-03 14:26:17+02:00 Europe/Amsterdam
           Correctly detect realtime signal numbers
           Only add fd entry on operating systems supporting it

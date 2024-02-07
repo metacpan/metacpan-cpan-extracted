@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Routine;
+package IO::Async::Routine 0.803;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.802';
 
 use base qw( IO::Async::Notifier );
 
@@ -198,7 +196,7 @@ the basename of a function within that module (i.e. without the module name
 prefixed). It will be invoked as the main code body of the object, and passed
 in a list of all the channels; first the input ones then the output ones.
 
-   module::func( @channels_in, @channels_out )
+   module::func( @channels_in, @channels_out );
 
 =head2 setup => ARRAY
 
@@ -528,7 +526,7 @@ sub _setup_spawn
 
 =head2 id
 
-   $id = $routine->id
+   $id = $routine->id;
 
 Returns an ID string that uniquely identifies the Routine out of all the
 currently-running ones. (The ID of already-exited Routines may be reused,
@@ -544,7 +542,7 @@ sub id
 
 =head2 model
 
-   $model = $routine->model
+   $model = $routine->model;
 
 Returns the detachment model in use by the Routine.
 
@@ -558,7 +556,7 @@ sub model
 
 =head2 kill
 
-   $routine->kill( $signal )
+   $routine->kill( $signal );
 
 Sends the specified signal to the routine code. This is either implemented by
 C<CORE::kill()> or C<threads::kill> as required. Note that in the thread case
@@ -579,7 +577,7 @@ sub kill
 
 =head2 result_future
 
-   $f = $routine->result_future
+   $f = $routine->result_future;
 
 I<Since version 0.75.>
 

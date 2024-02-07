@@ -3,7 +3,7 @@ package App::SeismicUnixGui::sunix::plot::lprop;
 =head2 SYNOPSIS
 true
 PERL PROGRAM NAME:
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 

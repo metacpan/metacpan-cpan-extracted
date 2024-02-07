@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
+use Test2::V0;
 
 use IO::Async::Process;
 
@@ -27,7 +27,7 @@ testing_loop( $loop );
       on_finish => sub { },
    );
 
-   isa_ok( $process->stdout, "IO::Async::Stream", '$process->stdout' );
+   isa_ok( $process->stdout, [ "IO::Async::Stream" ], '$process->stdout isa IO::Async::Stream' );
 
    is( $process->stdout->notifier_name, "stdout", '$process->stdout->notifier_name' );
    
@@ -50,7 +50,7 @@ testing_loop( $loop );
    ok( $process->is_exited,     '$process->is_exited after sub { print }' );
    is( $process->exitstatus, 0, '$process->exitstatus after sub { print }' );
 
-   is_deeply( \@stdout_lines, [ "hello\n" ], '@stdout_lines after sub { print }' );
+   is( \@stdout_lines, [ "hello\n" ], '@stdout_lines after sub { print }' );
 }
 
 {
@@ -68,7 +68,7 @@ testing_loop( $loop );
       on_finish => sub { },
    );
 
-   isa_ok( $process->stdout, "IO::Async::Stream", '$process->stdout' );
+   isa_ok( $process->stdout, [ "IO::Async::Stream" ], '$process->stdout isa IO::Async::Stream' );
 
    $loop->add( $process );
 
@@ -79,7 +79,7 @@ testing_loop( $loop );
    ok( $process->is_exited,     '$process->is_exited after sub { print } inline' );
    is( $process->exitstatus, 0, '$process->exitstatus after sub { print } inline' );
 
-   is_deeply( \@stdout_lines, [ "hello\n" ], '@stdout_lines after sub { print } inline' );
+   is( \@stdout_lines, [ "hello\n" ], '@stdout_lines after sub { print } inline' );
 }
 
 {
@@ -91,7 +91,7 @@ testing_loop( $loop );
       on_finish => sub { },
    );
 
-   isa_ok( $process->stdout, "IO::Async::Stream", '$process->stdout' );
+   isa_ok( $process->stdout, [ "IO::Async::Stream" ], '$process->stdout isa IO::Async::Stream' );
 
    $loop->add( $process );
 
@@ -135,7 +135,7 @@ testing_loop( $loop );
       on_finish => sub { },
    );
 
-   isa_ok( $process->stderr, "IO::Async::Stream", '$process->stderr' );
+   isa_ok( $process->stderr, [ "IO::Async::Stream" ], '$process->stderr isa IO::Async::Stream' );
 
    is( $process->stderr->notifier_name, "stderr", '$process->stderr->notifier_name' );
 
@@ -162,7 +162,7 @@ testing_loop( $loop );
       on_finish => sub { },
    );
 
-   isa_ok( $process->stdin, "IO::Async::Stream", '$process->stdin' );
+   isa_ok( $process->stdin, [ "IO::Async::Stream" ], '$process->stdin isa IO::Async::Stream' );
 
    is( $process->stdin->notifier_name, "stdin", '$process->stdin->notifier_name' );
 
@@ -187,7 +187,7 @@ testing_loop( $loop );
       on_finish => sub { },
    );
 
-   isa_ok( $process->stdin, "IO::Async::Stream", '$process->stdin' );
+   isa_ok( $process->stdin, [ "IO::Async::Stream" ], '$process->stdin isa IO::Async::Stream' );
 
    $loop->add( $process );
 
@@ -209,7 +209,7 @@ testing_loop( $loop );
       on_finish => sub { },
    );
 
-   isa_ok( $process->stdin, "IO::Async::Stream", '$process->stdin' );
+   isa_ok( $process->stdin, [ "IO::Async::Stream" ], '$process->stdin isa IO::Async::Stream' );
 
    $loop->add( $process );
 
@@ -233,7 +233,7 @@ testing_loop( $loop );
       on_finish => sub { },
    );
 
-   isa_ok( $process->stdin, "IO::Async::Stream", '$process->stdin' );
+   isa_ok( $process->stdin, [ "IO::Async::Stream" ], '$process->stdin isa IO::Async::Stream' );
 
    $loop->add( $process );
 
@@ -276,7 +276,7 @@ testing_loop( $loop );
       on_finish => sub { },
    );
 
-   isa_ok( $process->stdio, "IO::Async::Stream", '$process->stdio' );
+   isa_ok( $process->stdio, [ "IO::Async::Stream" ], '$process->stdio isa IO::Async::Stream' );
 
    is( $process->stdio->notifier_name, "stdio", '$process->stdio->notifier_name' );
 
@@ -301,7 +301,7 @@ testing_loop( $loop );
    ok( $process->is_exited,     '$process->is_exited after perl STDIO' );
    is( $process->exitstatus, 0, '$process->exitstatus after perl STDIO' );
 
-   is_deeply( \@output_lines, [ "SOME DATA\n" ], '@output_lines after perl STDIO' );
+   is( \@output_lines, [ "SOME DATA\n" ], '@output_lines after perl STDIO' );
 }
 
 {
@@ -337,7 +337,7 @@ testing_loop( $loop );
       on_finish => sub { },
    );
 
-   isa_ok( $process->stdio, "IO::Async::Stream", '$process->stdio isa Stream' );
+   isa_ok( $process->stdio, [ "IO::Async::Stream" ], '$process->stdio isa IO::Async::Stream' );
 
    $process->stdio->write( "A packet to be echoed" );
 
@@ -353,14 +353,14 @@ testing_loop( $loop );
 
    $loop->add( $process );
 
-   isa_ok( $process->stdio->read_handle, "IO::Socket", '$process->stdio handle isa IO::Socket' );
+   isa_ok( $process->stdio->read_handle, [ "IO::Socket" ], '$process->stdio handle isa IO::Socket' );
 
    wait_for { defined $output_packet and !$process->is_running };
 
    ok( $process->is_exited,     '$process->is_exited after perl STDIO via socketpair' );
    is( $process->exitstatus, 0, '$process->exitstatus after perl STDIO via socketpair' );
 
-   is_deeply( $output_packet, "A packet to be echoed", '$output_packet after perl STDIO via socketpair' );
+   is( $output_packet, "A packet to be echoed", '$output_packet after perl STDIO via socketpair' );
 }
 
 {
@@ -381,7 +381,7 @@ testing_loop( $loop );
       on_finish => sub { },
    );
 
-   isa_ok( $process->stdio, "IO::Async::Stream", '$process->stdio isa Stream' );
+   isa_ok( $process->stdio, [ "IO::Async::Stream" ], '$process->stdio isa IO::Async::Stream' );
 
    my $output_packet = "";
    $process->stdio->configure(
@@ -395,14 +395,14 @@ testing_loop( $loop );
 
    $loop->add( $process );
 
-   isa_ok( $process->stdio->read_handle, "IO::Socket", '$process->stdio handle isa IO::Socket' );
+   isa_ok( $process->stdio->read_handle, [ "IO::Socket" ], '$process->stdio handle isa IO::Socket' );
 
    wait_for { defined $output_packet and !$process->is_running };
 
    ok( $process->is_exited,     '$process->is_exited after perl STDIO via socketpair' );
    is( $process->exitstatus, 0, '$process->exitstatus after perl STDIO via socketpair' );
 
-   is_deeply( $output_packet, "Data from the prefork", '$output_packet from prefork via socketpair' );
+   is( $output_packet, "Data from the prefork", '$output_packet from prefork via socketpair' );
 }
 
 {
@@ -412,13 +412,13 @@ testing_loop( $loop );
       on_finish => sub { },
    );
 
-   isa_ok( $process->stdio, "IO::Async::Stream", '$process->stdio isa Stream' );
+   isa_ok( $process->stdio, [ "IO::Async::Stream" ], '$process->stdio isa IO::Async::Stream' );
 
    $process->stdio->configure( on_read => sub { } );
 
    $loop->add( $process );
 
-   isa_ok( $process->stdio->read_handle, "IO::Socket", '$process->stdio handle isa IO::Socket' );
+   isa_ok( $process->stdio->read_handle, [ "IO::Socket" ], '$process->stdio handle isa IO::Socket' );
    is( sockaddr_family( $process->stdio->read_handle->sockname ), PF_INET, '$process->stdio handle sockdomain is PF_INET' );
 
    wait_for { !$process->is_running };
@@ -437,7 +437,7 @@ testing_loop( $loop );
       on_finish => sub { },
    );
 
-   isa_ok( $process->stdio, "IO::Async::Socket", '$process->stdio isa Socket' );
+   isa_ok( $process->stdio, [ "IO::Async::Socket" ], '$process->stdio isa IO::Async::Socket' );
 
    my @output_packets;
    $process->stdio->configure(
@@ -453,7 +453,7 @@ testing_loop( $loop );
 
    $loop->add( $process );
 
-   isa_ok( $process->stdio->read_handle, "IO::Socket", '$process->stdio handle isa IO::Socket' );
+   isa_ok( $process->stdio->read_handle, [ "IO::Socket" ], '$process->stdio handle isa IO::Socket' );
    ok( defined sockaddr_family( $process->stdio->read_handle->sockname ), '$process->stdio handle sockdomain is defined' );
 
    $process->stdio->send( $_ ) for "First packet", "Second packet";
@@ -463,7 +463,7 @@ testing_loop( $loop );
    ok( $process->is_exited,     '$process->is_exited after perl STDIO via dgram socketpair' );
    is( $process->exitstatus, 0, '$process->exitstatus after perl STDIO via dgram socketpair' );
 
-   is_deeply( \@output_packets,
+   is( \@output_packets,
               [ "First packet", "Second packet" ],
               '@output_packets after perl STDIO via dgram socketpair' );
 }

@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2006-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2006-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Stream;
+package IO::Async::Stream 0.803;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.802';
 
 use base qw( IO::Async::Handle );
 
@@ -18,6 +16,8 @@ use Carp;
 
 use Encode 2.11 qw( find_encoding STOP_AT_PARTIAL );
 use Scalar::Util qw( blessed );
+
+use Future 0.44; # ->result
 
 use IO::Async::Debug;
 use IO::Async::Metrics '$METRICS';
@@ -180,7 +180,7 @@ and re-enable notifications again once something has read enough to cause it to
 drop. If these events are overridden, the overriding code will have to perform
 this behaviour if required, by using
 
-   $self->want_readready_for_read(...)
+   $self->want_readready_for_read(...);
 
 =head2 on_outgoing_empty
 
@@ -325,8 +325,8 @@ Optional. If defined, gives the name of a method or a CODE reference to use
 to implement the actual reading from or writing to the filehandle. These will
 be invoked as
 
-   $stream->reader( $read_handle, $buffer, $len )
-   $stream->writer( $write_handle, $buffer, $len )
+   $stream->reader( $read_handle, $buffer, $len );
+   $stream->writer( $write_handle, $buffer, $len );
 
 Each is expected to modify the passed buffer; C<reader> by appending to it,
 C<writer> by removing a prefix from it. Each is expected to return a true
@@ -392,11 +392,8 @@ sub configure
    }
 
    if( exists $params{read_high_watermark} or exists $params{read_low_watermark} ) {
-      my $high = delete $params{read_high_watermark};
-      defined $high or $high = $self->{read_high_watermark};
-
-      my $low  = delete $params{read_low_watermark};
-      defined $low  or $low  = $self->{read_low_watermark};
+      my $high = delete $params{read_high_watermark} // $self->{read_high_watermark};
+      my $low  = delete $params{read_low_watermark}  // $self->{read_low_watermark};
 
       croak "Cannot set read_low_watermark without read_high_watermark" if defined $low and !defined $high;
       croak "Cannot set read_high_watermark without read_low_watermark" if defined $high and !defined $low;
@@ -447,8 +444,8 @@ sub _add_to_loop
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in C<await> expressions return L<Future>
+instances.
 
 =cut
 
@@ -456,9 +453,9 @@ L<Future> instances.
 
 =head2 want_readready_for_write
 
-   $stream->want_readready_for_read( $set )
+   $stream->want_readready_for_read( $set );
 
-   $stream->want_readready_for_write( $set )
+   $stream->want_readready_for_write( $set );
 
 Mutators for the C<want_readready> property on L<IO::Async::Handle>, which
 control whether the C<read> or C<write> behaviour should be continued once the
@@ -495,9 +492,9 @@ sub want_readready_for_write
 
 =head2 want_writeready_for_write
 
-   $stream->want_writeready_for_write( $set )
+   $stream->want_writeready_for_write( $set );
 
-   $stream->want_writeready_for_read( $set )
+   $stream->want_writeready_for_read( $set );
 
 Mutators for the C<want_writeready> property on L<IO::Async::Handle>, which
 control whether the C<write> or C<read> behaviour should be continued once the
@@ -548,7 +545,7 @@ sub _is_empty
 
 =head2 close
 
-   $stream->close
+   $stream->close;
 
 A synonym for C<close_when_empty>. This should not be used when the deferred
 wait behaviour is required, as the behaviour of C<close> may change in a
@@ -564,7 +561,7 @@ sub close
 
 =head2 close_when_empty
 
-   $stream->close_when_empty
+   $stream->close_when_empty;
 
 If the write buffer is empty, this method calls C<close> on the underlying IO
 handles, and removes the stream from its containing loop. If the write buffer
@@ -590,7 +587,7 @@ sub close_when_empty
 
 =head2 close_now
 
-   $stream->close_now
+   $stream->close_now;
 
 This method immediately closes the underlying IO handles and removes the
 stream from the containing loop. It will not wait to flush the remaining data
@@ -616,9 +613,9 @@ sub close_now
 
 =head2 is_write_eof
 
-   $eof = $stream->is_read_eof
+   $eof = $stream->is_read_eof;
 
-   $eof = $stream->is_write_eof
+   $eof = $stream->is_write_eof;
 
 Returns true after an EOF condition is reported on either the read or the
 write handle, respectively.
@@ -639,7 +636,7 @@ sub is_write_eof
 
 =head2 write
 
-   $stream->write( $data, %params )
+   $stream->write( $data, %params );
 
 This method adds data to the outgoing data queue, or writes it immediately,
 according to the C<autoflush> parameter.
@@ -693,7 +690,7 @@ that were written by this call, which may not be the entire length of the
 buffer - if it takes more than one C<syscall> operation to empty the buffer
 then this callback will be invoked multiple times.
 
-   $on_write->( $stream, $len )
+   $on_write->( $stream, $len );
 
 =item on_flush => CODE
 
@@ -701,14 +698,14 @@ A CODE reference which will be invoked once the data queued by this C<write>
 call has been flushed. This will be invoked even if the buffer itself is not
 yet empty; if more data has been queued since the call.
 
-   $on_flush->( $stream )
+   $on_flush->( $stream );
 
 =item on_error => CODE
 
 A CODE reference which will be invoked if a C<syswrite> error happens while
 performing this write. Invoked as for the C<Stream>'s C<on_write_error> event.
 
-   $on_error->( $stream, $errno )
+   $on_error->( $stream, $errno );
 
 =back
 
@@ -723,7 +720,7 @@ to this point.
 
 =head2 write (scalar)
 
-   $stream->write( ... )->get
+   await $stream->write( ... );
 
 If called in non-void context, this method returns a L<Future> which will
 complete (with no value) when the write operation has been flushed. This may
@@ -774,7 +771,7 @@ sub _flush_one_write
             $head->watching++;
             return 0;
          }
-         my $data = $f->get;
+         my $data = $f->result;
          if( !ref $data and my $encoding = $self->{encoding} ) {
             $data = $encoding->encode( $data );
          }
@@ -891,8 +888,7 @@ sub write
       };
    }
 
-   my $write_len = $params{write_len};
-   defined $write_len or $write_len = $self->{write_len};
+   my $write_len = $params{write_len} // $self->{write_len};
 
    push @{ $self->{writequeue} }, Writer(
       $data, $write_len, $on_write, $on_flush, $on_error, 0
@@ -1080,7 +1076,7 @@ sub on_read_low_watermark
 
 =head2 push_on_read
 
-   $stream->push_on_read( $on_read )
+   $stream->push_on_read( $on_read );
 
 Pushes a new temporary C<on_read> handler to the end of the queue. This queue,
 if non-empty, is used to provide C<on_read> event handling code in preference
@@ -1117,9 +1113,7 @@ enough data has been read by the Stream into its buffer. At this point, the
 data is removed from the buffer and given to the C<Future> object to complete
 it.
 
-   my $f = $stream->read_...
-
-   my ( $string ) = $f->get;
+   my $string = await $stream->read_...
 
 Unlike the C<on_read> event handlers, these methods don't allow for access to
 "partial" results; they only provide the final result once it is ready.
@@ -1152,7 +1146,7 @@ short in C<read_exactly>'s case, or lacking the ending pattern in
 C<read_until>'s case). Additionally, each C<Future> will yield the C<$eof>
 value in its results.
 
-   my ( $string, $eof ) = $f->get;
+   my ( $string, $eof ) = await ...;
 
 =cut
 
@@ -1171,9 +1165,9 @@ sub _read_future
 
 =head2 read_exactly
 
-   ( $string, $eof ) = $stream->read_atmost( $len )->get
+   ( $string, $eof ) = await $stream->read_atmost( $len );
 
-   ( $string, $eof ) = $stream->read_exactly( $len )->get
+   ( $string, $eof ) = await $stream->read_exactly( $len );
 
 Completes the C<Future> when the read buffer contains C<$len> or more
 characters of input. C<read_atmost> will also complete after the first
@@ -1215,7 +1209,7 @@ sub read_exactly
 
 =head2 read_until
 
-   ( $string, $eof ) = $stream->read_until( $end )->get
+   ( $string, $eof ) = await $stream->read_until( $end );
 
 Completes the C<Future> when the read buffer contains a match for C<$end>,
 which may either be a plain string or a compiled C<Regexp> reference. Yields
@@ -1251,7 +1245,7 @@ sub read_until
 
 =head2 read_until_eof
 
-   ( $string, $eof ) = $stream->read_until_eof->get
+   ( $string, $eof ) = await $stream->read_until_eof;
 
 Completes the C<Future> when the stream is eventually closed at EOF, and
 yields all of the data that was available.
@@ -1283,11 +1277,11 @@ sub read_until_eof
 
 =head2 new_for_stdio
 
-   $stream = IO::Async::Stream->new_for_stdin
+   $stream = IO::Async::Stream->new_for_stdin;
 
-   $stream = IO::Async::Stream->new_for_stdout
+   $stream = IO::Async::Stream->new_for_stdout;
 
-   $stream = IO::Async::Stream->new_for_stdio
+   $stream = IO::Async::Stream->new_for_stdio;
 
 Return a C<IO::Async::Stream> object preconfigured with the correct
 C<read_handle>, C<write_handle> or both.
@@ -1301,7 +1295,7 @@ sub new_for_stdio { shift->new( read_handle => \*STDIN, write_handle => \*STDOUT
 
 =head2 connect
 
-   $future = $stream->connect( %args )
+   $future = $stream->connect( %args );
 
 A convenient wrapper for calling the C<connect> method on the underlying
 L<IO::Async::Loop> object, passing the C<socktype> hint as C<stream> if not

@@ -341,7 +341,7 @@ developed by Andrew Main (Zefram) <zefram@fysh.org>.
 The Olson timezone database is is the public domain.
 
 The C<Time::OlsonTZ::Data> Perl module wrapper for the database is
-Copyright (C) 2010, 2011, 2012, 2013, 2014, 2017, 2018, 2019, 2020, 2021, 2022, 2023
+Copyright (C) 2010, 2011, 2012, 2013, 2014, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024
 Andrew Main (Zefram) <zefram@fysh.org>.
 
 =head1 LICENSE

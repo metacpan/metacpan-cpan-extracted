@@ -54,6 +54,8 @@ ok( !$Event->is_mandate,'! is_mandate' );
 ok( !$Event->is_refund,'! is_refund' );
 ok( !$Event->is_pre_authorization,'! is_authorization' );
 
+ok( $Event->resources->payout_id,'payout_id' );
+
 done_testing();
 
 # vim: ts=4:sw=4:et

@@ -3,6 +3,7 @@ package Data::HTML::Element::Form;
 use strict;
 use warnings;
 
+use Data::HTML::Element::Utils qw(check_data check_data_type);
 use Error::Pure qw(err);
 use List::Util 1.33 qw(none);
 use Mo qw(build is);
@@ -16,7 +17,7 @@ Readonly::Array our @ENCTYPES => (
 	'text/plain',
 );
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 has action => (
 	is => 'ro',
@@ -24,6 +25,15 @@ has action => (
 
 has css_class => (
 	is => 'ro',
+);
+
+has data => (
+	default => [],
+	ro => 1,
+);
+
+has data_type => (
+	ro => 1,
 );
 
 has enctype => (
@@ -47,6 +57,12 @@ sub BUILD {
 
 	# Check CSS class.
 	check_css_class($self, 'css_class');
+
+	# Check data type.
+	check_data_type($self);
+
+	# Check data based on type.
+	check_data($self);
 
 	# Check enctype.
 	if (defined $self->{'enctype'}) {
@@ -88,6 +104,8 @@ Data::HTML::Element::Form - Data object for HTML form element.
  my $obj = Data::HTML::Element::Form->new(%params);
  my $action = $obj->action;
  my $css_class = $obj->css_class;
+ my $data = $obj->data;
+ my $data_type = $obj->data_type;
  my $enctype = $obj->enctype;
  my $id = $obj->id;
  my $label = $obj->label;
@@ -114,6 +132,25 @@ Default value is undef.
 Form CSS class.
 
 Default value is undef.
+
+=item * C<data>
+
+Data content. It's reference to array.
+
+Data type of data is described in 'data_type' parameter.
+
+Default value is [].
+
+=item * C<data_type>
+
+Data type for content.
+
+Possible value are: plain tags
+
+The 'plain' content are string(s).
+The 'tags' content is structure described in L<Tags>.
+
+Default value is 'plain'.
 
 =item * C<enctype>
 
@@ -176,6 +213,22 @@ Get CSS class for form.
 
 Returns string.
 
+=head2 C<data>
+
+ my $data = $obj->data;
+
+Get data inside button element.
+
+Returns reference to array.
+
+=head2 C<data_type>
+
+ my $data_type = $obj->data_type;
+
+Get button data type.
+
+Returns string.
+
 =head2 C<enctype>
 
  my $enctype = $obj->enctype;
@@ -212,6 +265,16 @@ Returns string.
 =head1 ERRORS
 
  new():
+         Parameter 'css_class' has bad CSS class name.
+                 Value: %s
+         Parameter 'css_class' has bad CSS class name (number on begin).
+                 Value: %s
+         Parameter 'data' must be a array.
+                Value: %s
+                Reference: %s
+         Parameter 'data' in 'plain' mode must contain reference to array with scalars.
+         Parameter 'data' in 'tags' mode must contain reference to array with references to array with Tags structure.
+         Parameter 'data_type' has bad value.
          Parameter 'enctype' has bad value.
                  Value: %s
          Parameter 'method' has bad value.
@@ -294,6 +357,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

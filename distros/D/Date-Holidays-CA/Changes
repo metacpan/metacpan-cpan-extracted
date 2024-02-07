@@ -1,5 +1,13 @@
 Revision history for Perl extension Date::Holidays::CA.
 
+0.06 -- Tue Feb 06 20:18:31 AST 2024
+
+    - 0704459 Increment version for a release
+    - 908158f Fix a pod documentation issue
+    - 4407e7c Fixes rt106793 - inconsistent holidays based on calling method
+    - 16f62c3 St Patrick's Day is in March
+    - 2f21b80 v0.05
+
 0.05 -- Wed May 18 18:57:16 ADT 2022
 
     - b794c1a Add .gitignore file

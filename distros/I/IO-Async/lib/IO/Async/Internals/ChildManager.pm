@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Internals::ChildManager;
+package IO::Async::Internals::ChildManager 0.803;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.802';
 
 # Not a notifier
 

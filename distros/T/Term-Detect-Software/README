@@ -3,8 +3,8 @@ NAME
     capabilities
 
 VERSION
-    This document describes version 0.224 of Term::Detect::Software (from
-    Perl distribution Term-Detect-Software), released on 2023-07-09.
+    This document describes version 0.225 of Term::Detect::Software (from
+    Perl distribution Term-Detect-Software), released on 2024-01-30.
 
 SYNOPSIS
      use Term::Detect::Software qw(detect_terminal detect_terminal_cached);
@@ -99,6 +99,29 @@ FAQ
     doesn't recognize Konsole's 24bit color support and only gives
     "max_colors" 256.
 
+ENVIRONMENT
+  PERL_TERM_DETECT_SOFTWARE_ENGINE
+    String. Explicitly instruct Term::Detect::Software to use a specific
+    engine, instead of heuristically trying to detect. This is useful for
+    testing or for avoiding sometimes costly detection.
+
+    List of supported engines:
+
+     konsole
+     xterm
+     cygwin
+     linux            # linux virtual console
+     gnome-terminal
+     windows          # windows command prompt
+     dumb             # dumb/generic, e.g. run under CGI or something like that
+     rxvt
+     st
+     putty
+     xvt
+
+    For more details on the capabilities of each engine, currently please
+    peruse the source code.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Term-Detect-Software>.
@@ -135,8 +158,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2020, 2019, 2015, 2014, 2013 by
-    perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2024, 2023, 2020, 2019, 2015, 2014, 2013
+    by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

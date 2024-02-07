@@ -1,3 +1,29 @@
+0.017 2024-02-01
+  [Document Improvement]
+    * Add and improve many documents.
+  [New Features]
+    * Implement the methods in Eg::Node::Attr.
+    * Add some methods in Eg::Node::Document.
+  [Incompatible Changes]
+    * The implementation location of the methods is now fully aligned with JavaScript.
+      For example, tag_name is moved from Eg::Node::Element::HTML to Eg::Node::Element.
+0.016 2024-02-01
+  [Document Improvement]
+    * Add the doc of Eg::DOM::Implementation.
+    * Add the doc of Eg::Node::Document::XML.
+    * Add the doc of Eg::Node::Document::HTML.
+  [Internal Changes]
+    * An Eg::Node object have owner document.
+  [Incompatible Changes]
+    * Many things are changed.
+0.015 2024-01-30
+  [New Features]
+    * Add many CSS child classes.
+    * Support font-weight:bold;
+    * Support font-style:italic.
+    * The create_element method in the Eg::Node::Document can parse all HTML tags.
+  [Bug Fix]
+    * Fix Wide character encoding.
 0.014 2024-01-25
   [New Features]
     * Add many Node child classes.

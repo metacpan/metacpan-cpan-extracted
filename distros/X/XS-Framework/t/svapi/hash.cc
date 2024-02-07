@@ -268,13 +268,25 @@ TEST_CASE("Hash", "[Hash]") {
 
         Hash check = Hash::create();
         int cnt = 0;
-        for (auto it = o.begin(); it != o.end(); ++it) {
-            cnt++;
-            REQUIRE(it->key().length());
-            REQUIRE(it->value());
-            REQUIRE(it->hash());
-            check[it->key()] = it->value();
+        SECTION("iterator") {
+            for (auto it = o.begin(); it != o.end(); ++it) {
+                cnt++;
+                REQUIRE(it->key().length());
+                REQUIRE(it->value());
+                REQUIRE(it->hash());
+                check[it->key()] = it->value();
+            }
         }
+#if (__cplusplus >= 201703L)
+        SECTION("range based") {
+            for (auto [key, value] : o) {
+                cnt++;
+                REQUIRE(key.length());
+                REQUIRE(value);
+                check[key] = value;
+            }
+        }
+#endif
         REQUIRE(cnt == 3);
         REQUIRE(check.size() == 3);
         REQUIRE(check["key"].get() == vars.iv);

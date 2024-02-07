@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-01'; # DATE
+our $DATE = '2024-02-01'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240101.0'; # VERSION
+our $VERSION = '20240201.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
@@ -45,18 +45,18 @@ Acme::CPANAuthors::CPAN::Streaks::DailyReleases::AllTime - Authors with all-time
 
 =head1 VERSION
 
-This document describes version 20240101.0 of Acme::CPANAuthors::CPAN::Streaks::DailyReleases::AllTime (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-01-01.
+This document describes version 20240201.0 of Acme::CPANAuthors::CPAN::Streaks::DailyReleases::AllTime (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-01.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-01-01, produced by L<cpan-streaks>, only streaks with length of at least 20 are included):
+Current standings (as of 2024-02-01, produced by L<cpan-streaks>, only streaks with length of at least 20 are included):
 
   +-----------+------+------------+------------+---------+
   | author    |  len | start_date | end_date   | status  |
   +-----------+------+------------+------------+---------+
-  | PERLANCAR | 1691 | 2019-05-17 |            | ongoing |
+  | PERLANCAR | 1722 | 2019-05-17 |            | ongoing |
   | MANWAR    | 1027 | 2014-10-28 | 2017-08-19 | broken  |
   | MANWAR    |  621 | 2017-08-21 | 2019-05-03 | broken  |
   | BARBIE    |  370 | 2014-03-19 | 2015-03-23 | broken  |

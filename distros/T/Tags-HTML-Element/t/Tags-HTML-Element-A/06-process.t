@@ -32,15 +32,17 @@ $obj = Tags::HTML::Element::A->new(
 $anchor = Data::HTML::Element::A->new(
 	'css_class' => 'foo',
 	'data' => ['Link'],
+	'id' => 'one',
+	'target' => '_blank',
 );
 $obj->init($anchor);
 $obj->process;
 $ret = $tags->flush(1);
 $right_ret = <<'END';
-<a class="foo">Link</a>
+<a class="foo" id="one" target="_blank">Link</a>
 END
 chomp $right_ret;
-is($ret, $right_ret, "A with CSS class.");
+is($ret, $right_ret, "A with CSS class, id and target.");
 
 # Test.
 $tags = Tags::Output::Raw->new;

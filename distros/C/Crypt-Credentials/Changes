@@ -1,0 +1,11 @@
+Revision history for Crypt-Credentials
+
+0.003     2024-02-02 22:12:28+01:00 Europe/Brussels
+          - Croak when no key is valid
+          - Allow for nested directories of credential files
+
+0.002     2024-01-31 02:56:49+01:00 Europe/Brussels
+          - Allow for multiple keys
+
+0.001     2024-01-31 02:30:02+01:00 Europe/Brussels
+          Initial release to an unsuspecting world

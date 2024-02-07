@@ -1,14 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Loop::Select;
+package IO::Async::Loop::Select 0.803;
 
-use strict;
+use v5.14;
 use warnings;
 
-our $VERSION = '0.802';
 use constant API_VERSION => '0.49';
 
 use base qw( IO::Async::Loop );
@@ -73,7 +72,7 @@ by the C<post_select> method to pick which event callbacks to invoke.
 
 =head2 new
 
-   $loop = IO::Async::Loop::Select->new
+   $loop = IO::Async::Loop::Select->new;
 
 This function returns a new instance of a C<IO::Async::Loop::Select> object.
 It takes no special arguments.
@@ -101,7 +100,7 @@ sub new
 
 =head2 pre_select
 
-   $loop->pre_select( \$readvec, \$writevec, \$exceptvec, \$timeout )
+   $loop->pre_select( \$readvec, \$writevec, \$exceptvec, \$timeout );
 
 This method prepares the bitvectors for a C<select> call, setting the bits
 that the Loop is interested in. It will also adjust the C<$timeout> value if
@@ -152,7 +151,7 @@ sub pre_select
 
 =head2 post_select
 
-   $loop->post_select( $readvec, $writevec, $exceptvec )
+   $loop->post_select( $readvec, $writevec, $exceptvec );
 
 This method checks the returned bitvectors from a C<select> call, and calls
 any of the callbacks that are appropriate.
@@ -215,7 +214,7 @@ sub is_running
 
 =head2 loop_once
 
-   $count = $loop->loop_once( $timeout )
+   $count = $loop->loop_once( $timeout );
 
 This method calls the C<pre_select> method to prepare the bitvectors for a
 C<select> syscall, performs it, then calls C<post_select> to process the

@@ -1,0 +1,61 @@
+#!/usr/bin/env perl
+
+use 5.008;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.012';
+
+my %opt;
+
+my $name = @ARGV ? $ARGV[0] : 'world';
+
+print "Hello, $name!\n"
+
+__END__
+
+=head1 TITLE
+
+hello - "Hello world" program
+
+=head1 SYNOPSIS
+
+ hello
+ hello sailor
+
+=head1 OPTIONS
+
+=head2 --help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 --version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script prints "Hello world!" If you want to say hello to
+someone else, give the name as the first and only command line argument.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

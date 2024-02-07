@@ -16,9 +16,16 @@ use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 use Neo4j_Test;
 use Neo4j_Test::MockHTTP;
 
+use Try::Tiny;
+
 my ($d, $r, $w);
 
-plan tests => 16 + $no_warnings;
+plan tests => 17 + $no_warnings;
+
+
+my $default_scheme = 'neo4j';
+my $default_host = '127.0.0.1';
+my $default_port = '';
 
 
 subtest 'config read/write' => sub {
@@ -50,11 +57,11 @@ subtest 'constructor config' => sub {
 	lives_and { is $d->config('timeout'), undef; } 'new driver default';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new({timeout => 1}); } 'new driver hashref lives';
 	lives_and { is $d->config('timeout'), 1; } 'new driver hashref';
-	lives_and { like $d->config('uri'), qr/\blocalhost\b/; } 'new driver default uri';
+	lives_and { like $d->config('uri'), qr/\b\Q$default_host\E$default_port\b/; } 'new driver default uri';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://test:10047'); } 'new driver uri lives';
 	lives_and { is $d->config('uri'), 'http://test:10047'; } 'new driver uri';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new({}); } 'new driver empty hashref lives';
-	lives_and { like $d->config('uri'), qr/\blocalhost\b/; } 'new driver empty hashref default uri';
+	lives_and { like $d->config('uri'), qr/\b\Q$default_host\E$default_port\b/; } 'new driver empty hashref default uri';
 	throws_ok { Neo4j::Driver->new({}, 0) } qr/\bmultiple arguments unsupported\b/i, 'extra arg';
 };
 
@@ -113,7 +120,7 @@ subtest 'uri config' => sub {
 	lives_ok { $d = $d->config(uri => 'http://test:10057'); } 'uri set lives';
 	lives_and { is $d->config('uri'), 'http://test:10057'; } 'uri get';
 	lives_ok { $d = $d->config(uri => undef); } 'uri undef lives';
-	lives_and { is $d->config('uri'), 'http://localhost:7474'; } 'uri undef default';
+	lives_and { like $d->config('uri'), qr<^$default_scheme://\Q$default_host\E$default_port$>; } 'uri undef default';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new({uri => 'http://test:10059'}); } 'uri hashref lives';
 	lives_and { is $d->config('uri'), 'http://test:10059'; } 'uri hashref get';
 };
@@ -129,20 +136,20 @@ subtest 'uri variants' => sub {
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://test2'); } 'http default port lives';
 	lives_and { is $d->config('uri'), 'http://test2:7474'; } 'http default port';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('http:'); } 'http scheme only lives';
-	lives_and { is $d->config('uri'), 'http://localhost:7474'; } 'http scheme only';
+	lives_and { like $d->config('uri'), qr<^http://\Q$default_host\E:7474$>; } 'http scheme only';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://'); } 'http scheme only long lives';
-	lives_and { is $d->config('uri'), 'http://localhost:7474'; } 'http scheme only long';
+	lives_and { like $d->config('uri'), qr<^http://\Q$default_host\E:7474$>; } 'http scheme only long';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('test4'); } 'host only lives';
-	lives_and { is $d->config('uri'), 'http://test4:7474'; } 'host only';
+	lives_and { like $d->config('uri'), qr<^$default_scheme://test4$default_port$>; } 'host only';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('//localhost'); } 'network-path ref lives';
-	lives_and { is $d->config('uri'), 'http://localhost:7474'; } 'network-path ref only';
+	lives_and { like $d->config('uri'), qr<^$default_scheme://localhost$default_port$>; } 'network-path ref only';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new(''); } 'empty lives';
-	lives_and { is $d->config('uri'), 'http://localhost:7474'; } 'empty';
+	lives_and { like $d->config('uri'), qr<^$default_scheme://\Q$default_host\E$default_port$>; } 'empty';
 	# long host names
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://foo.bar.test:10023'); } 'new driver fqdn lives';
 	lives_and { is $d->config('uri'), 'http://foo.bar.test:10023'; } 'new driver fqdn';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('foo.bar.test'); } 'host only fqdn lives';
-	lives_and { is $d->config('uri'), 'http://foo.bar.test:7474'; } 'host only fqdn';
+	lives_and { like $d->config('uri'), qr<^$default_scheme://\Qfoo.bar.test\E$default_port$>; } 'host only fqdn';
 };
 
 
@@ -152,7 +159,7 @@ subtest 'uri literal ips' => sub {
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://198.51.100.2:4000'); } 'IPv4 full uri lives';
 	lives_and { is $d->config('uri'), 'http://198.51.100.2:4000'; } 'IPv4 full uri';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('198.51.100.2'); } 'IPv4 only lives';
-	lives_and { is $d->config('uri'), 'http://198.51.100.2:7474'; } 'IPv4 only';
+	lives_and { like $d->config('uri'), qr<^$default_scheme://\Q198.51.100.2\E$default_port$>; } 'IPv4 only';
 	throws_ok {
 		Neo4j::Driver->new('198.51.100.2:7474');
 	} qr/\bFailed to parse URI\b/i, 'IPv4 only with port dies';
@@ -161,25 +168,25 @@ subtest 'uri literal ips' => sub {
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://[::1]:6000'); } 'IPv6 full uri lives';
 	lives_and { is $d->config('uri'), 'http://[::1]:6000'; } 'IPv6 full uri';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('::1'); } 'IPv6 only lives';
-	lives_and { is $d->config('uri'), 'http://[::1]:7474'; } 'IPv6 only';
+	lives_and { like $d->config('uri'), qr<^$default_scheme://\[::1\]$default_port$>; } 'IPv6 only undef default';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('::'); } 'IPv6 default only lives';
-	lives_and { is $d->config('uri'), 'http://[::]:7474'; } 'IPv6 default only';
+	lives_and { like $d->config('uri'), qr<^$default_scheme://\[::\]$default_port$>; } 'IPv6 default only';
 	$ip = '2001:db8:85a3:8d3:1319:fabe:360c:7348';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new("$ip"); } 'IPv6 long only lives';
-	lives_and { is $d->config('uri'), "http://[$ip]:7474"; } 'IPv6 long only';
+	lives_and { like $d->config('uri'), qr<^$default_scheme://\[$ip\]$default_port$>; } 'IPv6 default only';
 	$ip = '64:ff9b:1:fffe::192.0.2.34';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new("[$ip]"); } 'IPv4/IPv6 translation lives';
-	lives_and { is $d->config('uri'), "http://[$ip]:7474"; } 'IPv4/IPv6 translation';
+	lives_and { like $d->config('uri'), qr<^$default_scheme://\[$ip\]$default_port$>; } 'IPv4/IPv6 translation';
 	$ip = '2001:DB8:0:0:01::AA';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new("//[$ip]"); } 'IPv6 non-canoncial lives';
-	lives_and { like $d->config('uri'), qr{^http://\[2001:db8:[01:]+:aa\]:7474$}i; } 'IPv6 non-canoncial';
+	lives_and { like $d->config('uri'), qr{^$default_scheme://\[2001:db8:[01:]+:aa\]$default_port$}i; } 'IPv6 non-canoncial';
 	throws_ok {
 		Neo4j::Driver->new("[$ip]:7474");
 	} qr/\bFailed to parse URI\b/i, 'IPv6 literal only with port dies';
 };
 
 
-subtest 'non-http uris' => sub {
+subtest 'https/bolt uri schemes' => sub {
 	plan tests => 12;
 	# https scheme
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('https://test6:9993'); } 'https full uri lives';
@@ -187,19 +194,67 @@ subtest 'non-http uris' => sub {
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('https://test7'); } 'https default port lives';
 	lives_and { is $d->config('uri'), 'https://test7:7473'; } 'https default port';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('https:'); } 'https scheme only lives';
-	lives_and { is $d->config('uri'), 'https://localhost:7473'; } 'https scheme only';
+	lives_and { like $d->config('uri'), qr<^https://\Q$default_host\E:7473$>; } 'https scheme only';
 	# bolt scheme
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('bolt://test:9997'); } 'bolt full uri lives';
 	is $d->config('uri'), 'bolt://test:9997', 'bolt full uri';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('bolt://test9'); } 'bolt default port lives';
 	is $d->config('uri'), 'bolt://test9:7687', 'bolt default port';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('bolt:'); } 'bolt scheme only lives';
-	is $d->config('uri'), 'bolt://localhost:7687', 'bolt scheme only';
+	lives_and { like $d->config('uri'), qr<^bolt://\Q$default_host\E:7687$>; } 'bolt scheme only';
+};
+
+
+subtest 'neo4j uri scheme' => sub {
+	plan skip_all => "(requires Neo4j::Bolt not to be loaded)" if $INC{'Neo4j/Bolt.pm'};
+	plan tests => 6;
+	my $mock_plugin = Neo4j_Test::MockHTTP->new;
+	
+	lives_and {
+		$d = Neo4j::Driver->new('neo4j://hu');
+		my $s = $d->plugin($mock_plugin)->session;
+		ok $s->isa('Neo4j::Driver::Session::HTTP') && $s->{net}{http_agent}{base} eq 'http://hu:7474';
+	} 'neo4j http uri default port';
+	lives_and {
+		$d = Neo4j::Driver->new('neo4j://hup:7687');
+		my $s = $d->plugin($mock_plugin)->session;
+		ok $s->isa('Neo4j::Driver::Session::HTTP') && $s->{net}{http_agent}{base} eq 'http://hup:7687';
+	} 'neo4j http uri explicit port';
+	
+	lives_and {
+		$d = Neo4j::Driver->new({ uri => 'neo4j://hs', encrypted => 1 });
+		my $s = $d->plugin($mock_plugin)->session;
+		ok $s->isa('Neo4j::Driver::Session::HTTP') && $s->{net}{http_agent}{base} eq 'https://hs:7473';
+	} 'neo4j https uri default port';
+	lives_and {
+		$d = Neo4j::Driver->new({ uri => 'neo4j://hsp:7687', encrypted => 1 });
+		my $s = $d->plugin($mock_plugin)->session;
+		ok $s->isa('Neo4j::Driver::Session::HTTP') && $s->{net}{http_agent}{base} eq 'https://hsp:7687';
+	} 'neo4j https uri explicit port';
+	
+	lives_and {
+		local %INC = %INC;
+		$INC{'Neo4j/Bolt.pm'} = '';
+		$d = Neo4j::Driver->new('neo4j://bb');
+		my $is_bolt;
+		try { $d->session }
+		catch { $is_bolt = m/\bconnect\b.*\bpackage\b.*\bNeo4j::Bolt\b/ };
+		ok $is_bolt && $d->{config}{uri} eq 'bolt://bb:7687';
+	} 'neo4j bolt uri default port';
+	lives_and {
+		local %INC = %INC;
+		$INC{'Neo4j/Bolt.pm'} = '';
+		$d = Neo4j::Driver->new('neo4j://bbp:80');
+		my $is_bolt;
+		try { $d->session }
+		catch { $is_bolt = m/\bconnect\b.*\bpackage\b.*\bNeo4j::Bolt\b/ };
+		ok $is_bolt && $d->{config}{uri} eq 'bolt://bbp:80';
+	} 'neo4j bolt uri explicit port';
 };
 
 
 subtest 'unsupported uris' => sub {
-	plan tests => 9;
+	plan tests => 7;
 	# unimplemented scheme (Casual Clusters)
 	throws_ok {
 		Neo4j::Driver->new('bolt+routing://test12');
@@ -207,12 +262,6 @@ subtest 'unsupported uris' => sub {
 	throws_ok {
 		Neo4j::Driver->new('bolt+routing:');
 	} qr/\bscheme\b.*\bunsupported\b/i, 'bolt+routing scheme only';
-	throws_ok {
-		Neo4j::Driver->new('neo4j://test12');
-	} qr/\bscheme\b.*\bunsupported\b/i, 'neo4j full uri';
-	throws_ok {
-		Neo4j::Driver->new('neo4j:');
-	} qr/\bscheme\b.*\bunsupported\b/i, 'neo4j scheme only';
 	# unknown scheme
 	throws_ok {
 		Neo4j::Driver->new('unkown://test12');

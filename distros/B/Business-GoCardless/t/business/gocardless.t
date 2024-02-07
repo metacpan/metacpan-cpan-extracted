@@ -230,7 +230,7 @@ sub test_payout {
 
     note( "Payout" );
 
-    $mock->mock( 'content',sub { _payout_json() } );
+    $mock->mock( 'content',sub { '{"payouts":'._payout_json() .'}' } );
     my $Payout = $GoCardless->payout( '0BKR1AZNJF' );
 
     cmp_deeply(

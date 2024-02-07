@@ -239,7 +239,7 @@ foreach my $browser (@browsers) {
             $session->DeleteAllCookies();
             isnt( exception { $session->GetNamedCookie( name => 'tickle' ) }, undef, "DeleteAllCookies works");
 
-#        is( exception { $session->DeleteSession() }, undef, "Can delete session");
+        is( exception { $session->DeleteSession( session_id => $session->{sessionId} ) }, undef, "Can delete session");
 
         };
     }

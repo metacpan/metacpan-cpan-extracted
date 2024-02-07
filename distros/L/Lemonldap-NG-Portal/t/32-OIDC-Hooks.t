@@ -123,6 +123,10 @@ ok( $refresh_token, 'Refresh token present' );
 my $id_token_payload = id_token_payload($id_token);
 is( $id_token_payload->{id_token_hook}, 1, "Found hooked claim in ID token" );
 
+# 3084
+my $id_token_header = id_token_header($id_token);
+ok( !exists $id_token_header->{kid}, "HS** ID token has no kid header" );
+
 # Reset conf to make sure to make sure lazy loading works
 $op->p->HANDLER->checkConf(1);
 

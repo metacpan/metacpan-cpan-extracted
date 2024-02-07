@@ -34,10 +34,10 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::YAMLScript" : "v0.1.22",
+            "Alien::YAMLScript" : "v0.1.36",
+            "Cpanel::JSON::XS" : "4.37",
             "FFI::CheckLib" : "0.31",
             "FFI::Platypus" : "2.08",
-            "JSON" : "4.1",
             "perl" : "v5.16.0"
          }
       },
@@ -59,9 +59,9 @@
          "web" : "https://github.com/ingydotnet/yamlscript"
       }
    },
-   "version" : "0.1.22",
+   "version" : "0.1.36",
    "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

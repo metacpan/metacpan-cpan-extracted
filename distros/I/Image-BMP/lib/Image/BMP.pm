@@ -18,6 +18,26 @@ package Image::BMP;
 # CHANGELOG
 # ---------
 #
+# Version 1.26 2024/02/06
+# -----------------------
+# * Add 'diff' code to testing so we aren't relying on system('diff')
+#
+# Version 1.25 2024/02/05
+# -----------------------
+# * Close 'bug' requesting update from indirect object creation to new method
+#
+# Version 1.23 2024/02/05
+# -----------------------
+# * Add tests and a CHANGELOG to be super professional and fancy
+#
+# Version 1.22 2024/02/05
+# -----------------------
+# * Try to fix packaging issues
+#
+# Version 1.20 2024/02/03
+# -----------------------
+# * Try to fix packaging issues
+#
 # Version 1.19 2016/05/22
 # -----------------------
 # * Stupid filehandle bug fix for view_ascii
@@ -62,7 +82,7 @@ use Exporter ();
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(open_file open_pipe close load colormap xy xy_rgb xy_index set save view_ascii debug remember_image ignore_imagemagick_bug add_pixel file);
 
-$VERSION = '1.19';
+$VERSION = '1.26';
 $LIBRARY = __PACKAGE__;
 
 ##################################################
@@ -145,7 +165,7 @@ sub open_file($$) {
 	my ($bmp,$file) = @_;
 	$file = $file || $bmp->{file};
 	$bmp->_debug(1,"BMP: $file\n");
-	$bmp->{fh} = new IO::File;
+	$bmp->{fh} = IO::File->new();
 	$bmp->{file} = $file;
 
 	# Avoid using open unless we need it.  Bit kludgy.  Unnecessary??
@@ -243,7 +263,7 @@ sub write_file($$) {
 	$wfile = $wfile || $bmp->{wfile};
 	return unless $wfile;
 	$bmp->{wfile} = $wfile;
-	$bmp->{wfh} = new IO::File;
+	$bmp->{wfh} = IO::File->new();
 	sysopen($bmp->{wfh},$bmp->{wfile},O_WRONLY|O_CREAT)
 		|| fatal("Couldn't write file: $wfile");
 }
@@ -801,14 +821,14 @@ Image::BMP - Bitmap parser/viewer
  use Image::BMP;
 
  # Example one:
- my $img = new Image::BMP(
+ my $img = Image::BMP->new(
 				file            => 'some.bmp',
 				debug           => 1,
 				);
  $img->view_ascii;
 
  # Example two:
- my $img2 = new Image::BMP;
+ my $img2 = Image::BMP->new();
  $img2->open_file('another.bmp');
  my $color = $img2->xy(100,100);	# Get pixel at 100,100
  my ($r,$g,$b) = $img2->xy_rgb(100,200);
@@ -824,7 +844,7 @@ It can be used to:
 
 =item Just get image info, don't read the whole image:
 
- my $img = new Image::BMP(file => 'some.bmp');
+ my $img = Image::BMP->new(file => 'some.bmp');
  print "Resolution: $img->{Width} x $img->{Height}\n";
 
 =item View images
@@ -857,7 +877,7 @@ The following data/keys are read when opening an image:
 
 =over
 
-=item $img = new Image::BMP(%options);
+=item $img = Image::BMP->new(%options);
 
 Constructs a new C<Image::BMP> object:
 
@@ -944,7 +964,7 @@ you can process all the image data yourself by supplying a callback function:
 	 my ($img,$x,$y,$r,$g,$b) = @_;
 	 print "add pixel $x,$y = $r,$g,$b\n";
  }
- my $img = new Image::BMP(file => 'some.bmp', add_pixel = \&my_add);
+ my $img = Image::BMP->new(file => 'some.bmp', add_pixel = \&my_add);
  $img->load;
 
 It may be useful to note that most bitmaps are read from left to right

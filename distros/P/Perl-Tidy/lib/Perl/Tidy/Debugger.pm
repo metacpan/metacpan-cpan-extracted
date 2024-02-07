@@ -8,7 +8,7 @@ package Perl::Tidy::Debugger;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
-our $VERSION = '20230912';
+our $VERSION = '20240202';
 
 use constant EMPTY_STRING => q{};
 use constant SPACE        => q{ };
@@ -30,10 +30,9 @@ sub really_open_debug_file {
     my $self            = shift;
     my $debug_file      = $self->{_debug_file};
     my $is_encoded_data = $self->{_is_encoded_data};
-    my ( $fh, $filename ) =
-      Perl::Tidy::streamhandle( $debug_file, 'w', $is_encoded_data );
+    my $fh = Perl::Tidy::streamhandle( $debug_file, 'w', $is_encoded_data );
     if ( !$fh ) {
-        Perl::Tidy::Warn("can't open $debug_file: $OS_ERROR\n");
+        Perl::Tidy::Warn("can't open debug file '$debug_file'\n");
     }
     $self->{_debug_file_opened} = 1;
     $self->{_fh}                = $fh;
@@ -77,8 +76,6 @@ sub write_debug_entry {
     my $input_line_number = $line_of_tokens->{_line_number};
     my $line_type         = $line_of_tokens->{_line_type};
 
-    my ( $j, $num );
-
     my $token_str              = "$input_line_number: ";
     my $reconstructed_original = "$input_line_number: ";
 
@@ -100,7 +97,7 @@ sub write_debug_entry {
             $pattern .= $rtoken_type->[$j];
         }
         $reconstructed_original .= $rtokens->[$j];
-        $num = length( $rtokens->[$j] );
+        my $num      = length( $rtokens->[$j] );
         my $type_str = $rtoken_type->[$j];
 
         # be sure there are no blank tokens (shouldn't happen)

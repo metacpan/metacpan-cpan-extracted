@@ -2,18 +2,19 @@ use 5.008005; use strict; use warnings;
 
 package Catalyst::Plugin::CachedUriForAction;
 
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 
-use Moose::Role;
-use Class::MOP::Class ();
+use mro;
 use Carp ();
 use URI::Encode::XS 'uri_encode_utf8';
 
-after setup_finalize => sub {
+sub CACHE_KEY () { __PACKAGE__ . '::action_uri_info' }
+
+sub setup_finalize {
 	my $c = shift;
+	$c->maybe::next::method( @_ );
 
-	my %cache;
-
+	my $cache = \%{ $c->dispatcher->{(CACHE_KEY)} };
 	for my $action ( values %{ $c->dispatcher->_action_hash } ) {
 		my $xa = $c->dispatcher->expand_action( $action );
 		my $n_caps = $xa->number_of_captures;
@@ -23,27 +24,42 @@ after setup_finalize => sub {
 
 		my $n_args = $xa->number_of_args; # might be undef to mean "any number"
 		my $tmpl = $c->uri_for( $action, [ ("\0\0\0\0") x $n_caps ], ("\0\0\0\0") x ( $n_args || 0 ) );
-		my @part = split /%00%00%00%00/, $tmpl, -1;
-		$cache{ '/' . $action->reverse } = [ $n_caps, $n_args, ( shift @part ), \@part ];
+		my ( $prefix, @part ) = split /%00%00%00%00/, $tmpl, -1;
+		$prefix =~ s!\A/!!;
+		$cache->{ '/' . $action->reverse } = [ $n_caps, $n_args, \@part, $prefix ];
 	}
+}
 
-	Class::MOP::Class->initialize( $c )->add_around_method_modifier( uri_for_action => sub {
-	########################################################################
-	shift;
-	my $c        = shift;
+sub uri_for_action {
+	my $c = shift;
+
+	my $dispatcher = $c->dispatcher;
+	my $cache = $dispatcher && $dispatcher->{(CACHE_KEY)}
+		or return $c->next::method( @_ ); # fall back if called too early
+
 	my $action   = shift;
 	my $captures = @_ && 'ARRAY'  eq ref $_[0]  ? shift : [];
 	my $fragment = @_ && 'SCALAR' eq ref $_[-1] ? pop   : undef;
 	my $params   = @_ && 'HASH'   eq ref $_[-1] ? pop   : undef;
 
-	$action = '/' . $c->dispatcher->get_action_by_path( $action )->reverse
+	$action = '/' . $dispatcher->get_action_by_path( $action )->reverse
 		if ref $action
 		and do { local $@; eval { $action->isa( 'Catalyst::Action' ) } };
 
-	my $info = $cache{ $action }
+	my $info = $cache->{ $action }
 		or Carp::croak "Can't find action for path '$action' in uri_for_action";
 
-	my ( $n_caps, $n_args, $path, $extra_parts ) = @$info;
+	my ( $uri, $base ) = '';
+	if ( ref $c ) {
+		$base = $c->request->base;
+		$uri = '/' if $$base !~ m!/\z!;
+	} else { # fallback if called as class method
+		$base = bless \( my $tmp = '' ), 'URI::_generic';
+		$uri = '/';
+	}
+
+	my ( $n_caps, $n_args, $extra_parts ) = @$info;
+	$uri .= $info->[-1];
 
 	# this is not very sensical but it has to be like this because it is what Catalyst does:
 	# the :Args() case (i.e. any number of args) is grouped with the :Args(0) case (i.e. no args)
@@ -66,28 +82,21 @@ after setup_finalize => sub {
 			if ( @$captures + @_ ) != @$extra_parts;
 		# and now since @$extra_parts is exactly the same length as @$captures and @_ combined
 		# iterate over those arrays and use a cursor into @$extra_parts to interleave its elements
-		for ( @$captures ) { ( $path .= uri_encode_utf8 $_ ) .= $extra_parts->[ ++$i ] }
-		for ( @_ )         { ( $path .= uri_encode_utf8 $_ ) .= $extra_parts->[ ++$i ] }
+		for ( @$captures ) { ( $uri .= uri_encode_utf8 $_ ) .= $extra_parts->[ ++$i ] }
+		for ( @_ )         { ( $uri .= uri_encode_utf8 $_ ) .= $extra_parts->[ ++$i ] }
 	} else {
 		# in the slurpy case, the size of @$extra_parts is determined by $n_caps alone since $n_args was undef
 		# and as we checked above @$captures alone has at least length $n_caps
 		# so we will need all of @$captures to cover @$extra_parts, and may then still have some of it left over
 		# so iterate over @$extra_parts and use a cursor into @$captures to interleave its elements
-		for ( @$extra_parts )       { ( $path .= uri_encode_utf8 $captures->[ ++$i ] ) .= $_ }
+		for ( @$extra_parts )       { ( $uri .= uri_encode_utf8 $captures->[ ++$i ] ) .= $_ }
 		# and then append the rest of @$captures, and then everything from @_ after that
-		for ( ++$i .. $#$captures ) { ( $path .= '/' ) .= uri_encode_utf8 $captures->[ $_ ] }
-		for ( @_ )                  { ( $path .= '/' ) .= uri_encode_utf8 $_ }
+		for ( ++$i .. $#$captures ) { ( $uri .= '/' ) .= uri_encode_utf8 $captures->[ $_ ] }
+		for ( @_ )                  { ( $uri .= '/' ) .= uri_encode_utf8 $_ }
 	}
 
-	$path =~ s/%2B/+/g;
-
-	my $uri_obj = ref $c ? do {
-		my $base = $c->request->base;
-		( my $uri = $$base ) =~ s!/?\z!$path!;
-		bless \$uri, ref $base;
-	} : do { # fallback if called as class method
-		bless \$path, 'URI::_generic';
-	};
+	$uri =~ s/%2B/+/g;
+	substr $uri, 0, 0, $$base;
 
 	if ( defined $params ) {
 		my $query = '';
@@ -108,23 +117,18 @@ after setup_finalize => sub {
 		}
 		if ( '' ne $query ) {
 			$query =~ s/%20/+/g;
-			( $$uri_obj .= '?' ) .= substr $query, length $delim;
+			( $uri .= '?' ) .= substr $query, length $delim;
 		}
 	}
 
 	if ( defined $fragment ) {
-		( $$uri_obj .= '#' ) .= uri_encode_utf8 $$fragment;
+		( $uri .= '#' ) .= uri_encode_utf8 $$fragment;
 	}
 
-	$uri_obj;
-	########################################################################
-	} );
-
-};
+	bless \$uri, ref $base;
+}
 
 BEGIN { delete $Catalyst::Plugin::CachedUriForAction::{'uri_encode_utf8'} }
-
-no Moose::Role;
 
 1;
 

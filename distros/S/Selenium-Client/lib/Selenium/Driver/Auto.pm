@@ -1,5 +1,5 @@
 package Selenium::Driver::Auto;
-$Selenium::Driver::Auto::VERSION = '1.06';
+$Selenium::Driver::Auto::VERSION = '2.00';
 #ABSTRACT: Automatically choose the best driver available for your browser choice
 
 use strict;
@@ -12,19 +12,23 @@ use File::Which;
 
 
 sub build_spawn_opts {
-    # Uses object call syntax
-    my (undef,$object) = @_;
 
-    if ($object->{browser} eq 'firefox') {
+    # Uses object call syntax
+    my ( undef, $object ) = @_;
+
+    if ( $object->{browser} eq 'firefox' ) {
         require Selenium::Driver::Gecko;
         return Selenium::Driver::Gecko->build_spawn_opts($object);
-    } elsif ($object->{browser} eq 'chrome') {
+    }
+    elsif ( $object->{browser} eq 'chrome' ) {
         require Selenium::Driver::Chrome;
         return Selenium::Driver::Chrome->build_spawn_opts($object);
-    } elsif ($object->{browser} eq 'MicrosoftEdge') {
+    }
+    elsif ( $object->{browser} eq 'MicrosoftEdge' ) {
         require Selenium::Driver::Edge;
         return Selenium::Driver::Edge->build_spawn_opts($object);
-    } elsif ($object->{browser} eq 'safari') {
+    }
+    elsif ( $object->{browser} eq 'safari' ) {
         require Selenium::Driver::Safari;
         return Selenium::Driver::Safari->build_spawn_opts($object);
     }
@@ -46,7 +50,7 @@ Selenium::Driver::Auto - Automatically choose the best driver available for your
 
 =head1 VERSION
 
-version 1.06
+version 2.00
 
 =head1 SUBROUTINES
 

@@ -1,8 +1,9 @@
 package DBIx::Class::CryptColumn;
-$DBIx::Class::CryptColumn::VERSION = '0.008';
+$DBIx::Class::CryptColumn::VERSION = '0.009';
 use strict;
 use warnings;
 
+use Crypt::Passphrase 0.019;
 use Sub::Util 1.40 'set_subname';
 use namespace::clean;
 
@@ -64,6 +65,21 @@ sub register_column {
 			});
 		}
 
+		if (defined(my $name = $args->{recode_hash_method})) {
+			$self->_export_sub($name, sub {
+				my $row = shift;
+				my $old_hash = $row->get_column($column);
+				my $new_hash = $crypt_passphrase->recode_hash($old_hash);
+
+				if ($new_hash ne $old_hash) {
+					local $self->column_info($column)->{inflate_passphrase};
+					$row->update({ $column => $new_hash })->discard_changes;
+				}
+
+				return $new_hash;
+			});
+		}
+
 		$info->{inflate_passphrase} = $crypt_passphrase;
 	}
 
@@ -101,7 +117,7 @@ DBIx::Class::CryptColumn - Automatically hash password/passphrase columns
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -185,6 +201,12 @@ a password matches the known hash. If it does and the hash needs a rehash it
 will rehash the password and store the result to the database. In either case it
 returns the result of the verification. This method takes a password as its
 only argument. This option is recommended over the others for most deployments.
+
+=item * recode_hash_method
+
+If this option is set it will add a method with the given name that checks if
+the hash recodes to a new value, and if so updates it in the database, otherwise
+this is a no-op.
 
 =back
 

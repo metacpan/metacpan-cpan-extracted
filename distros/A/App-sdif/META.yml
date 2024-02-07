@@ -40,7 +40,7 @@ provides:
     file: lib/App/cdif/default.pm
   App::sdif:
     file: lib/App/sdif.pm
-    version: '4.30'
+    version: '4.31'
   App::sdif::Divert:
     file: lib/App/sdif/Divert.pm
   App::sdif::LabelStack:
@@ -69,7 +69,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/sdif-tools/issues
   homepage: https://github.com/kaz-utashiro/sdif-tools
   repository: https://github.com/kaz-utashiro/sdif-tools.git
-version: '4.30'
+version: '4.31'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

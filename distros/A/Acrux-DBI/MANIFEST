@@ -1,0 +1,27 @@
+# MANIFEST Sun 04 Feb 2024 14:25:07 MSK
+
+# General
+Changes                                 Changes list
+INSTALL.md                              Installation instructions
+LICENSE                                 License file
+Makefile.PL                             Makefile builder
+MANIFEST                                This file
+README.md                               !!! README FIRST !!!
+TODO                                    TO DO
+
+# Acrux libs
+lib/Acrux/DBI.pm                        Main library
+lib/Acrux/DBI/Res.pm                    Results
+lib/Acrux/DBI/Tx.pm                     Transactions
+
+# Tests
+t/00-fixme.t                            FIXME/TODO/BUG warnings
+t/00-pod-coverage.t                     POD::Coverage testing
+t/00-pod.t                              Checking all POD documents
+t/00-trailingspace.t                    Style test: TrailingSpace
+t/01-use.t                              Test script
+t/02-url.t                              Database connecting URL testing
+t/03-connect.t                          Database connecting testing
+t/04-transaction.t                      Database transaction testing
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

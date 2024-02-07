@@ -12,8 +12,8 @@ use Project2::Gantt::Skin;
 
 use Mojo::Log;
 
-our $DATE = '2023-02-16'; # DATE
-our $VERSION = '0.009';
+our $DATE = '2024-02-05'; # DATE
+our $VERSION = '0.011';
 
 has root        => undef;
 has skin        => sub { Project2::Gantt::Skin->new };
@@ -214,8 +214,8 @@ Project2::Gant - Create Gantt charts
   use Project2::Gantt;
 
   my $gantt = Project2::Gantt->new(
-    file        =>      'gantt.png',
-    description =>      'My Project'
+    file        => 'gantt.png',
+    description => 'My Project'
   );
 
   my $john = $gantt->addResource(name => 'John Doe');

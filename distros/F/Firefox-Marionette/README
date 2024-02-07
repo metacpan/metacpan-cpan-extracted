@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 1.51
+    Version 1.52
 
 SYNOPSIS
 
@@ -2157,6 +2157,11 @@ SUBROUTINES/METHODS
       provided to the await or bye methods. This defaults to "1"
       millisecond.
 
+      * stealth - stops navigator.webdriver
+      <https://developer.mozilla.org/en-US/docs/Web/API/Navigator/webdriver>
+      from being accessible by the current web page. This is highly
+      experimental. See WEBSITES THAT BLOCK AUTOMATION for a discussion.
+
       * survive - if this is set to a true value, firefox will not
       automatically exit when the object goes out of scope. See the
       reconnect parameter for an experimental technique for reconnecting.
@@ -3167,7 +3172,7 @@ GEO LOCATION
     <https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API> can
     be used by supplying the geo parameter to the new method and then
     calling the geo method (from a secure context
-    <https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts>.
+    <https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts>).
 
     The geo method can accept various specific latitude and longitude
     parameters as a list, such as;
@@ -3194,13 +3199,15 @@ GEO LOCATION
     parameters in as a reference means it can be deal with various geo
     location websites, such as;
 
-        $firefox->geo($firefox->json('https://freeipapi.com/api/json/')); # get geo location from IP address
+        $firefox->geo($firefox->json('https://freeipapi.com/api/json/')); # get geo location from current IP address
     
         $firefox->geo($firefox->json('https://geocode.maps.co/search?street=101+Collins+St&city=Melbourne&state=VIC&postalcode=3000&country=AU&format=json')->[0]); # get geo location of street address
     
         $firefox->geo($firefox->json('http://api.positionstack.com/v1/forward?access_key=' . $access_key . '&query=101+Collins+St,Melbourne,VIC+3000')->{data}->[0]); # get geo location of street address using api key
     
-        $firefox->geo($firefox->json('https://api.ipgeolocation.io/ipgeo?apiKey=' . $api_key)); # get geo location from IP address
+        $firefox->geo($firefox->json('https://api.ipgeolocation.io/ipgeo?apiKey=' . $api_key)); # get geo location from current IP address
+    
+        $firefox->geo($firefox->json('http://api.ipstack.com/142.250.70.206?access_key=' . $api_key)); # get geo location from specific IP address (http access only for free)
 
     These sites were active at the time this documentation was written, but
     mainly function as an illustration of the flexibility of geo and json
@@ -3378,9 +3385,12 @@ WEBSITES THAT BLOCK AUTOMATION
     allows web sites to detect that the browser is being automated. Firefox
     no longer (since version 88)
     <https://bugzilla.mozilla.org/show_bug.cgi?id=1632821> allows you to
-    disable this functionality while you are automating the browser. If the
-    web site you are trying to automate mysteriously fails when you are
-    automating a workflow, but it works when you perform the workflow
+    disable this functionality while you are automating the browser. This
+    can be overridden with the stealth parameter for the new method. This
+    is very experimental and feedback is welcome.
+
+    If the web site you are trying to automate mysteriously fails when you
+    are automating a workflow, but it works when you perform the workflow
     manually, you may be dealing with a web site that is hostile to
     automation.
 
@@ -3714,7 +3724,7 @@ ACKNOWLEDGEMENTS
 
 LICENSE AND COPYRIGHT
 
-    Copyright (c) 2023, David Dick <ddick@cpan.org>. All rights reserved.
+    Copyright (c) 2024, David Dick <ddick@cpan.org>. All rights reserved.
 
     This module is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself. See "perlartistic" in

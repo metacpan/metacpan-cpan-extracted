@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Protocol::Stream;
+package IO::Async::Protocol::Stream 0.803;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.802';
 
 use base qw( IO::Async::Protocol );
 
@@ -189,7 +187,7 @@ sub teardown_transport
 
 =head2 write
 
-   $protocol->write( $data )
+   $protocol->write( $data );
 
 Writes the given data by calling the C<write> method on the contained
 transport stream.
@@ -215,7 +213,7 @@ sub write
 
 =head2 connect
 
-   $protocol->connect( %args )
+   $protocol->connect( %args );
 
 Sets up a connection to a peer, and configures the underlying C<transport> for
 the Protocol. Calls L<IO::Async::Protocol> C<connect> with C<socktype> set to

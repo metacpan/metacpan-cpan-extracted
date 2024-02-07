@@ -228,3 +228,58 @@ TEST("write stack overflow") {
     }
     test.await(server->connection_event, "connection");
 }
+
+TEST("request holds") {
+    variation = GENERATE(values(ssl_buf_vars));
+
+    AsyncTest test(2000, {"write"});
+    TcpSP server = make_server(test.loop);
+    net::SockAddr sa = server->sockaddr().value();
+
+    {
+        TcpSP client = make_client(test.loop);
+        client->connect(sa);
+        client->write("q", [&](auto, auto& err, auto) {
+            CHECK_FALSE(err);
+            test.happens("write");
+        });
+        client->disconnect();
+    }
+    StreamSP sconn;
+    server->connection_event.add([&](const StreamSP&, const StreamSP& conn, const ErrorCode& err) {
+        CHECK_FALSE(err);
+        sconn = conn;
+        sconn->eof_event.add([&](auto...){
+            test.loop->stop();
+        });
+    });
+    test.loop->run();
+}
+
+TEST("bad example") {
+    variation = GENERATE(values(ssl_buf_vars));
+
+    AsyncTest test(2000, {"write"});
+    TcpSP server = make_server(test.loop);
+    net::SockAddr sa = server->sockaddr().value();
+
+    {
+        TcpSP client = make_client(test.loop);
+        client->connect(sa);
+        client->connect_event.add([&, client](auto, auto, auto) {
+            client->write("q", [&](auto, auto, auto) {
+                test.happens("write");
+                client->disconnect();
+            });
+        });
+    }
+    StreamSP sconn;
+    server->connection_event.add([&](const StreamSP&, const StreamSP& conn, const ErrorCode& err) {
+        CHECK_FALSE(err);
+        sconn = conn;
+        sconn->eof_event.add([&](auto...){
+            test.loop->stop();
+        });
+    });
+    test.loop->run();
+}

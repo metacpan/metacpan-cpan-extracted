@@ -63,19 +63,14 @@ arguments as needed.
 
 The API-based service appears not to provide OID lists. Accordingly, as
 of version 0.150 the C<direct> attribute defaults to true, and is
-deprecated. Six months from the release of 0.150 this attribute will
-warn on the first use; six months after that it will warn on all uses,
-and six months after that any use will be fatal.
+deprecated. As of version 0.164 the first use of this attribute will
+produce a warning. Six months after that every use will warn, and six
+months after that use if it will be fatal.
 
 The absence of OID lists also means that the Space Track options on
-Celestrak queries are deprecated. Six months after the release of 0.158
-these will warn on the first use, and so on as for the C<direct>
-attribute.
-
-The absence of OID lists also means that the Space Track options on
-Celestrak queries are deprecated. Six months after the release of 0.158
-these will warn on the first use, and so on as for the C<direct>
-attribute.
+Celestrak queries are deprecated. As of version 0.163 released
+2023-10-24 these warn on every use. In the first release after
+2024-04-24 use of these options will be fatal.
 
 =head2 DEPRECATION NOTICE: IRIDIUM STATUS
 
@@ -85,9 +80,17 @@ deprecated, and will result in an exception.
 As of version 0.143, any access of attribute
 C<url_iridium_status_mccants> is fatal.
 
-Of course, since there are no longer any Iridium Classic satellites in
-service, all the Iridium status machinery is a candidate for deprecation
-and removal. Stay tuned.
+As of version 0.164 support for Iridium Classic satellites is being
+deprecated and removed. All testing of the iridium_status() method is
+halted as of version 0.164. Six months after that release, the first use
+of the iridium_status() method will produce a warning. After a further
+six months all uses will warn, and after a further six months use of
+this method will be fatal. Related attributes and manifest constants
+will be deprecated on the same schedule.
+
+The Celestrak Iridium catalog is B<not> being deprecated because it
+still exists, and there are still non-functioning Iridium Classic
+satellites in orbit.
 
 =head1 DESCRIPTION
 
@@ -128,7 +131,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.163';
+our $VERSION = '0.164';
 our @EXPORT_OK = qw{
     shell
 
@@ -326,12 +329,13 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	    rms		=> 1,
 	    match	=> 1,
 	},
-	meteosat	=> {
-	    name	=> 'METEOSAT',
-	    # source	=> 'METEOSAT-SV',
-	    rms		=> 1,
-	    match	=> 1,
-	},
+	# Removed 2024-01-12
+	#meteosat	=> {
+	#    name	=> 'METEOSAT',
+	#    # source	=> 'METEOSAT-SV',
+	#    rms		=> 1,
+	#    match	=> 1,
+	#},
 	intelsat	=> {
 	    name	=> 'Intelsat',
 	    # source	=> 'Intelsat-11P',
@@ -2075,10 +2079,7 @@ The following commands are defined:
   box_score
     Retrieve the SATCAT box score. A Space Track login is needed.
   celestrak name
-    Retrieves the named catalog of IDs from Celestrak. If the
-    direct attribute is false (the default), the corresponding
-    orbital elements come from Space Track. If true, they come
-    from Celestrak, and no login is needed.
+    Retrieves the named catalog of IDs from Celestrak.
   exit (or bye)
     Terminate the shell. End-of-file also works.
   file filename
@@ -2272,14 +2273,25 @@ In terms of the Kelso statuses, the mapping is:
 
 The BODY_STATUS constants are exportable using the :status tag.
 
+This method and the associated manifest constants are B<deprecated>.
+
 =cut
 
 {	# Begin local symbol block.
 
-    use constant BODY_STATUS_IS_OPERATIONAL	=> 0;
-    use constant BODY_STATUS_IS_SPARE		=> 1;
-    use constant BODY_STATUS_IS_TUMBLING	=> 2;
-    use constant BODY_STATUS_IS_DECAYED		=> 3;
+    # NOTE the indirection here is so that, at the next deprecation
+    # step, the exported stuff can become a normal subroutine that
+    # triggers a deprecation warning, but the internal stuff can still
+    # be in-lined and trigger no warning.
+    use constant _BODY_STATUS_IS_OPERATIONAL	=> 0;
+    use constant _BODY_STATUS_IS_SPARE		=> 1;
+    use constant _BODY_STATUS_IS_TUMBLING	=> 2;
+    use constant _BODY_STATUS_IS_DECAYED	=> 3;
+
+    use constant BODY_STATUS_IS_OPERATIONAL	=> _BODY_STATUS_IS_OPERATIONAL;
+    use constant BODY_STATUS_IS_SPARE		=> _BODY_STATUS_IS_SPARE;
+    use constant BODY_STATUS_IS_TUMBLING	=> _BODY_STATUS_IS_TUMBLING;
+    use constant BODY_STATUS_IS_DECAYED		=> _BODY_STATUS_IS_DECAYED;
 
     my %kelso_comment = (	# Expand Kelso status.
 	'[S]' => 'Spare',
@@ -2288,15 +2300,15 @@ The BODY_STATUS constants are exportable using the :status tag.
 	);
     my %status_portable = (	# Map statuses to portable.
 	kelso => {
-	    ''	=> BODY_STATUS_IS_OPERATIONAL,
-	    '[+]' => BODY_STATUS_IS_OPERATIONAL,	# Operational
-	    '[-]' => BODY_STATUS_IS_TUMBLING,		# Nonoperational
-	    '[P]' => BODY_STATUS_IS_SPARE,		# Partially Operational
-	    '[B]' => BODY_STATUS_IS_SPARE,		# Backup/Standby
-	    '[S]' => BODY_STATUS_IS_SPARE,		# Spare
-	    '[X]' => BODY_STATUS_IS_SPARE,		# Extended Mission
-	    '[D]' => BODY_STATUS_IS_DECAYED,		# Decayed
-	    '[?]' => BODY_STATUS_IS_TUMBLING,		# Unknown
+	    ''	=> _BODY_STATUS_IS_OPERATIONAL,
+	    '[+]' => _BODY_STATUS_IS_OPERATIONAL,	# Operational
+	    '[-]' => _BODY_STATUS_IS_TUMBLING,		# Nonoperational
+	    '[P]' => _BODY_STATUS_IS_SPARE,		# Partially Operational
+	    '[B]' => _BODY_STATUS_IS_SPARE,		# Backup/Standby
+	    '[S]' => _BODY_STATUS_IS_SPARE,		# Spare
+	    '[X]' => _BODY_STATUS_IS_SPARE,		# Extended Mission
+	    '[D]' => _BODY_STATUS_IS_DECAYED,		# Decayed
+	    '[?]' => _BODY_STATUS_IS_TUMBLING,		# Unknown
 	},
 #	sladen => undef,	# Not needed; done programmatically.
     );
@@ -2443,7 +2455,7 @@ The BODY_STATUS constants are exportable using the :status tag.
 	unless ( $opt->{raw} ) {
 	    foreach my $body ( @all_iridium_classic ) {
 		$rslt{$body->[0]}
-		    and $body->[4] != BODY_STATUS_IS_DECAYED
+		    and $body->[4] != _BODY_STATUS_IS_DECAYED
 		    and next;
 		$rslt{$body->[0]} = [ @{ $body } ];	# shallow clone
 	    }
@@ -2497,7 +2509,7 @@ The BODY_STATUS constants are exportable using the :status tag.
 	    $val->[1] =~ m/ \A iridium \b /smxi
 		or next;
 	    $val->[2] = '';
-	    $val->[4] = BODY_STATUS_IS_OPERATIONAL;
+	    $val->[4] = _BODY_STATUS_IS_OPERATIONAL;
 	}
 
 	return;
@@ -2508,7 +2520,7 @@ The BODY_STATUS constants are exportable using the :status tag.
 	    my ( $rslt, $id, $name, $plane ) = @_;
 	    $rslt->{$id} = [ $id, $name, '[-]',
 		"$plane - Failed on station?",
-		BODY_STATUS_IS_TUMBLING ];
+		_BODY_STATUS_IS_TUMBLING ];
 	    return;
 	},
 	d => sub {
@@ -2517,7 +2529,7 @@ The BODY_STATUS constants are exportable using the :status tag.
 	t => sub {
 	    my ( $rslt, $id, $name, $plane ) = @_;
 	    $rslt->{$id} = [ $id, $name, '[-]', $plane,
-		BODY_STATUS_IS_TUMBLING ];
+		_BODY_STATUS_IS_TUMBLING ];
 	},
     );
 
@@ -2554,7 +2566,7 @@ The BODY_STATUS constants are exportable using the :status tag.
 	{
 	    # 23-Nov-2017 update double-parenthesized 6.
 	    s< [(]+ (\d+) [)]+ >
-		< $exception{$1} = BODY_STATUS_IS_TUMBLING; $1>smxge;
+		< $exception{$1} = _BODY_STATUS_IS_TUMBLING; $1>smxge;
 	}
 	s/ [(] .*? [)\n] //smxg;	# Strip parenthetical comments
 	foreach ( split qr{ \n }smx ) {
@@ -2585,8 +2597,8 @@ The BODY_STATUS constants are exportable using the :status tag.
 			    $interp->( $rslt, $id, $name, $plane );
 			} else {
 			    my $status = $inx > 10 ?
-				BODY_STATUS_IS_SPARE :
-				BODY_STATUS_IS_OPERATIONAL;
+				_BODY_STATUS_IS_SPARE :
+				_BODY_STATUS_IS_OPERATIONAL;
 			    exists $exception{$num}
 				and $status = $exception{$num};
 			    $rslt->{$id} = [ $id, $name,
@@ -2641,8 +2653,8 @@ The BODY_STATUS constants are exportable using the :status tag.
 		$oid,
 		ucfirst lc $body->{OBJECT_NAME},
 		defined $body->{DECAY} ?
-		( '[D]', "Decayed $body->{DECAY}", BODY_STATUS_IS_DECAYED ) :
-		( '[?]', 'SpaceTrack', BODY_STATUS_IS_TUMBLING )
+		( '[D]', "Decayed $body->{DECAY}", _BODY_STATUS_IS_DECAYED ) :
+		( '[?]', 'SpaceTrack', _BODY_STATUS_IS_TUMBLING )
 	    ];
 	}
 	$resp->content( join '',
@@ -5102,13 +5114,16 @@ sub _check_cookie_generic {
 	    '--start_epoch'	=> 2,
 	},
 	attribute	=> {
+	    direct		=> 1,
+	    url_iridium_status_kelso	=> 0,
 	    url_iridium_status_mccants	=> 3,
+	    url_iridium_status_sladen	=> 0,
 	},
-	iridium_status	=> {
-	    mccants	=> 3,
-	},
+	iridium_status	=> 0,
 	iridium_status_format	=> {
+	    kelso	=> 0,
 	    mccants	=> 3,
+	    sladen	=> 0,
 	},
     );
 
@@ -5116,6 +5131,8 @@ sub _check_cookie_generic {
 	my ( undef, $method, $argument ) = @_;	# Invocant unused
 	my $level = $deprecate{$method}
 	    or return;
+	defined $method
+	    or ( $method = ( caller 1 )[3] ) =~ s/ .* :: //smx;
 	my $desc = $method;
 	if ( ref $level ) {
 	    defined $argument or Carp::confess( 'Bug - $argument undefined' );
@@ -6762,6 +6779,8 @@ As of version 0.100_02, the default is C<'kelso'>. It used to be
 C<'mccants'>, but Mike McCants no longer maintains his Iridium status
 web page, and format C<'mccants'> was removed as of version 0.137.
 
+This attribute is B<deprecated>.
+
 =item max_range (number)
 
 This attribute specifies the maximum size of a range of NORAD IDs to be
@@ -6825,6 +6844,8 @@ his web site.
 
 The default is 'https://celestrak.org/SpaceTrack/query/iridium.txt'
 
+This attribute is B<deprecated>.
+
 =item url_iridium_status_mccants (text)
 
 This attribute is B<deprecated>, and any access of it will be fatal.
@@ -6837,6 +6858,8 @@ but it is provided so you will not be dead in the water if Mr. Sladen
 needs to change his ISP or re-arrange his web site.
 
 The default is 'http://www.rod.sladen.org.uk/iridium.htm'.
+
+This attribute is B<deprecated>.
 
 =item username (text)
 
@@ -7118,7 +7141,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2005-2023 by Thomas R. Wyant, III (F<wyant at cpan dot org>).
+Copyright 2005-2024 by Thomas R. Wyant, III (F<wyant at cpan dot org>).
 
 =head1 LICENSE
 

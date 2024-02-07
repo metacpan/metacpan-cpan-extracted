@@ -1,5 +1,17 @@
 Revision history for IO-Async
 
+0.803   2024-01-29
+        [CHANGES]
+         * Module style updates:
+            + Use perl v5.14 for `//` operator and `package NAME VER` syntax
+            + Updated Pod style
+            + Swapped unit tests from `Test::More` to `Test2::V0`
+            + Removed several now-unnecessary test-time dependencies
+
+        [BUGFIXES]
+         * Take the first name for each aliased signal in case of aliased
+           names (RT145759)
+
 0.802   2022-08-15
         [CHANGES]
          * Preëmptively use Future ->udata API from upcoming release, to

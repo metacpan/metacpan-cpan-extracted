@@ -8,7 +8,7 @@ our $VERSION = '0.0.1';
 =head2 SYNOPSIS 
 
  PROGRAM NAME: cp
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE: Sept. 24 2015 
  DESCRIPTION copy files
  Version 1

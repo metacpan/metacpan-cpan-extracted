@@ -4,7 +4,6 @@ use warnings;
 use Test::More (
     $] <= 5.010 ? (skip_all => 'only on perl 5.10 and higher') : ()
 );
-END { done_testing(); }
 
 use Data::Domain::Dependencies qw(Dependencies);
 use Params::Validate::Dependencies::all_or_none_of;
@@ -23,9 +22,4 @@ foreach my $one (qw(alpha beta gamma)) {
 ok(!$domain->inspect({}), "none, validation succeeded");
 ok(!$domain->inspect({map { $_ => 1 } qw(alpha beta gamma)}), "all three, validation succeeded");
 
-is(
-  $domain->generate_documentation(),
-  "all or none of ('alpha', 'beta' and 'gamma')",
-  "doco works"
-);
-
+done_testing();

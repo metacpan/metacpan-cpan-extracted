@@ -10,6 +10,7 @@ use Encode();
 use Firefox::Marionette();
 use Waterfox::Marionette();
 use Compress::Zlib();
+use IO::Socket::IP();
 use Config;
 use HTTP::Daemon();
 use HTTP::Status();
@@ -27,6 +28,7 @@ my $at_least_one_success;
 my $terminated;
 my $class;
 my $quoted_home_directory = quotemeta File::HomeDir->my_home();
+my $is_covering = !!(eval 'Devel::Cover::get_coverage()');
 
 my $oldfh = select STDOUT; $| = 1; select $oldfh;
 $oldfh = select STDERR; $| = 1; select $oldfh;
@@ -75,6 +77,7 @@ my $most_common_useragent = q[Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb
 my $useragents_me_uri = qq[data:application/json,{"about": "Use this API to get a list of current popular useragents. Please post a link back to the site if you find it useful!", "terms": "As the data here don't change sooner than once per week, you shouldn't need to make lots of requests all at once. Currently, we impose a rate-limit of 15 requests per IP address per hour (even this is probably too many)", "data": [{"ua": "$most_common_useragent", "pct": 37.8271882916}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.63", "pct": 14.2696312975}, {"ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36", "pct": 10.8077680833}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/110.0", "pct": 6.5859836758}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57", "pct": 4.9535603715}, {"ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36", "pct": 4.5032367014}, {"ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15", "pct": 4.5032367014}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36", "pct": 1.9138755981}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 OPR/95.0.0.0", "pct": 1.2383900929}, {"ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36", "pct": 0.7880664227}, {"ua": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/110.0", "pct": 0.7880664227}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.41", "pct": 0.7880664227}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.56", "pct": 0.6754855052}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37", "pct": 0.6754855052}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0", "pct": 0.6754855052}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36 Edg/90.0.818.46", "pct": 0.5629045877}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.50", "pct": 0.5629045877}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Whale/3.19.166.16 Safari/537.36", "pct": 0.5629045877}, {"ua": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/110.0", "pct": 0.4503236701}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36 Edg/108.0.1462.76", "pct": 0.4503236701}, {"ua": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36", "pct": 0.4503236701}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.46", "pct": 0.3377427526}, {"ua": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:109.0) Gecko/20100101 Firefox/110.0", "pct": 0.3377427526}, {"ua": "Mozilla/5.0 (Windows NT 6.1; Trident/7.0; rv:11.0) like Gecko", "pct": 0.3377427526}, {"ua": "Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:109.0) Gecko/20100101 Firefox/110.0", "pct": 0.3377427526}, {"ua": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36 Core/1.94.192.400 QQBrowser/11.5.5250.400", "pct": 0.3377427526}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.78", "pct": 0.2251618351}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36", "pct": 0.2251618351}, {"ua": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 OPR/95.0.0.0", "pct": 0.2251618351}, {"ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.63", "pct": 0.2251618351}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36 Edg/92.0.902.67", "pct": 0.2251618351}, {"ua": "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko", "pct": 0.2251618351}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:108.0) Gecko/20100101 Firefox/108.0", "pct": 0.2251618351}, {"ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36", "pct": 0.2251618351}, {"ua": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36", "pct": 0.2251618351}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36", "pct": 0.2251618351}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/18.17763", "pct": 0.2251618351}, {"ua": "Mozilla/5.0 (X11; Linux x86_64; rv:108.0) Gecko/20100101 Firefox/108.0", "pct": 0.2251618351}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36", "pct": 0.2251618351}, {"ua": "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.63", "pct": 0.2251618351}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/111.0", "pct": 0.2251618351}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36 Edg/108.0.1462.54", "pct": 0.2251618351}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.61", "pct": 0.2251618351}, {"ua": "Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/110.0", "pct": 0.2251618351}, {"ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.70", "pct": 0.2251618351}], "updated": 1678066547, "thanks": "https://www.useragents.me/"}];
 
 my $min_geo_version = 60;
+my $min_stealth_version = 60;
 
 if (($^O eq 'MSWin32') || ($^O eq 'cygwin')) {
 } elsif ($> == 0) { # see RT#131304
@@ -108,6 +111,24 @@ foreach my $sig_name (@sig_names) {
 
 $SIG{INT} = sub { $terminated = 1; die "Caught an INT signal"; };
 $SIG{TERM} = sub { $terminated = 1; die "Caught a TERM signal"; };
+
+sub wait_for_server_on {
+	my ($daemon, $pid) = @_;
+	my $host = URI->new($daemon->url())->host();
+	my $port = URI->new($daemon->url())->port();
+	undef $daemon;
+	CONNECT: while (!IO::Socket::IP->new(Type => Socket::SOCK_STREAM(), PeerPort => $port, PeerHost => $host)) {
+		diag("Waiting for server ($pid) to listen on $host:$port:$!");
+		waitpid $pid, POSIX::WNOHANG();
+		if (kill 0, $pid) {
+			sleep 1;
+		} else {
+			diag("Server ($pid) has exited");
+			last CONNECT;
+		}
+	}
+	return 
+}
 
 sub empty_port {
 	socket my $socket, Socket::PF_INET(), Socket::SOCK_STREAM(), 0 or die "Failed to create a socket:$!";
@@ -179,6 +200,16 @@ sub start_firefox {
 			diag("Setting trust to scalar");
 			$parameters{trust} = $ca_cert_handle->filename();
 		}
+	}
+	if ($major_version >= $min_stealth_version) { # https://developer.mozilla.org/en-US/docs/Web/API/Navigator/webdriver#browser_compatibility
+	} elsif ($parameters{stealth}) {
+		diag("stealth support is not available for Firefox versions less than $min_stealth_version");
+		delete $parameters{stealth};
+	}
+	if ($major_version >= $min_geo_version) {
+	} elsif ($parameters{geo}) {
+		diag("geo support is not available for Firefox versions less than $min_geo_version");
+		delete $parameters{geo};
 	}
 	if ((defined $major_version) && ($major_version >= 61)) {
 	} elsif ($parameters{har}) {
@@ -902,6 +933,10 @@ SKIP: {
 	ok($timeouts->page_load() == $page_timeout, "\$timeouts->page_load() is $page_timeout");
 	ok($timeouts->script() == $script_timeout, "\$timeouts->script() is $script_timeout");
 	ok($timeouts->implicit() == $implicit_timeout, "\$timeouts->implicit() is $implicit_timeout");
+	if ($major_version >= $min_stealth_version) {
+		my $webdriver = $firefox->script('return navigator.webdriver');
+		ok($webdriver, "navigator.webdriver returns true:$webdriver");
+	}
 	ok(!defined $firefox->child_error(), "Firefox does not have a value for child_error");
 	ok($firefox->alive(), "Firefox is still alive");
 	ok(not($firefox->script('window.open("about:blank", "_blank");')), "Opening new window to about:blank via 'window.open' script");
@@ -1109,12 +1144,12 @@ _CONFIG_
 SKIP: {
 	diag("Starting new firefox for testing capabilities and accessing proxies");
 	my $daemon = HTTP::Daemon->new(LocalAddr => 'localhost') || die "Failed to create HTTP::Daemon";
-	my $localPort = URI->new($daemon->url())->port();
-	my $proxyPort = empty_port();
+	my $proxyPort = URI->new($daemon->url())->port();
+	my $securePort = empty_port();
 	diag("Using proxy port TCP/$proxyPort");
 	my $socksPort = empty_port();
 	diag("Using SOCKS port TCP/$socksPort");
-	my %proxy_parameters = (http => 'localhost:' . $localPort, https => 'localhost:' . $proxyPort, none => [ 'local.example.org' ], socks => 'localhost:' . $socksPort);
+	my %proxy_parameters = (http => 'localhost:' . $proxyPort, https => 'localhost:' . $securePort, none => [ 'local.example.org' ], socks => 'localhost:' . $socksPort);
 	my $ftpPort = empty_port();
 	if ($binary =~ /waterfox/i) {
 	} elsif ((defined $major_version) && ($major_version < 90)) {
@@ -1241,8 +1276,8 @@ SKIP: {
 			skip("\$capabilities->proxy is not supported for " . $capabilities->browser_version(), 10);
 		}
 		ok($capabilities->proxy()->type() eq 'manual', "\$capabilities->proxy()->type() is 'manual'");
-		ok($capabilities->proxy()->http() eq 'localhost:' . $localPort, "\$capabilities->proxy()->http() is 'localhost:" . $localPort . "':" . $capabilities->proxy()->http());
-		ok($capabilities->proxy()->https() eq 'localhost:' . $proxyPort, "\$capabilities->proxy()->https() is 'localhost:" . $proxyPort . "'");
+		ok($capabilities->proxy()->http() eq 'localhost:' . $proxyPort, "\$capabilities->proxy()->http() is 'localhost:" . $proxyPort . "':" . $capabilities->proxy()->http());
+		ok($capabilities->proxy()->https() eq 'localhost:' . $securePort, "\$capabilities->proxy()->https() is 'localhost:" . $securePort . "'");
 		if ($major_version < 90) {
 			ok($capabilities->proxy()->ftp() eq 'localhost:' . $ftpPort, "\$capabilities->proxy()->ftp() is 'localhost:$ftpPort'");
 		}
@@ -1281,13 +1316,24 @@ SKIP: {
 				if (my $pid = fork) {
 					my $url = 'http://wtf.example.org';
 					my $favicon_url = 'http://wtf.example.org/favicon.ico';
-					$firefox->go($url);
+					wait_for_server_on($daemon, $pid);
+					$daemon = undef;
+					my $try_count = 0;
+					GO: {
+						eval {
+							$firefox->go($url);
+						} or do {
+							if ($try_count < 2) {
+								diag("Failed to get $url via proxy on attempt $try_count for $version_string");
+								$try_count += 1;
+								redo GO;
+							} else {
+								diag("Failed to get $url via proxy too many times $version_string");
+							}
+						};
+					}
 					ok($firefox->html() =~ /success/smx, "Correctly accessed the Proxy");
 					diag($firefox->html());
-					while(kill $signals_by_name{TERM}, $pid) {
-						waitpid $pid, POSIX::WNOHANG();
-						sleep 1;
-					}
 					$handle->seek(0,0) or die "Failed to seek to start of temporary file for proxy check:$!";
 					my $quoted_url = quotemeta $url;
 					my $quoted_favicon_url = quotemeta $favicon_url;
@@ -1298,18 +1344,26 @@ SKIP: {
 							die "Firefox is requesting this $line without any reason";
 						}
 					}
+					while(kill 0, $pid) {
+						kill $signals_by_name{TERM}, $pid;
+						sleep 1;
+						waitpid $pid, POSIX::WNOHANG();
+					}
+					ok($! == POSIX::ESRCH(), "Process $pid no longer exists:$!");
 				} elsif (defined $pid) {
+					eval 'Devel::Cover::set_coverage("none")' if $is_covering;
 					eval {
 						local $SIG{ALRM} = sub { die "alarm during proxy server\n" };
-						alarm 5;
+						alarm 40;
 						$0 = "[Test HTTP Proxy for " . getppid . "]";
+						diag("Accepting connections for $0");
 						while (my $connection = $daemon->accept()) {
 							diag("Accepted connection");
 							if (my $child = fork) {
 							} elsif (defined $child) {
 								eval {
 									local $SIG{ALRM} = sub { die "alarm during proxy server accept\n" };
-									alarm 5;
+									alarm 40;
 									while (my $request = $connection->get_request()) {
 										diag("Got request for " . $request->uri());
 										$handle->print($request->uri() . "\n");
@@ -1471,7 +1525,7 @@ my $uname;
 SKIP: {
 	diag("Starting new firefox for testing PDFs and script elements");
 	my $bookmarks_path = File::Spec->catfile(Cwd::cwd(), qw(t data bookmarks_chrome.html));
-	($skip_message, $firefox) = start_firefox(0, capabilities => Firefox::Marionette::Capabilities->new(accept_insecure_certs => 1, moz_headless => 1), bookmarks => $bookmarks_path, geo => 1);
+	($skip_message, $firefox) = start_firefox(0, capabilities => Firefox::Marionette::Capabilities->new(accept_insecure_certs => 1, moz_headless => 1), bookmarks => $bookmarks_path, geo => 1, stealth => 1);
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
@@ -1523,29 +1577,37 @@ SKIP: {
 		ok($firefox->aria_role($element) =~ /^(?:toggle[ ])?button$/smx, "Retrieved the ARIA role correctly:" . $firefox->aria_role($element));
 		ok($firefox->find_id('save')->aria_role() =~ /^(?:toggle[ ])?button$/smx, "Retrieved the ARIA label correctly:" . $firefox->find_id('save')->aria_role());
 	}
-	my $browser_language = join q[, ], @{$firefox->script('return navigator.languages')};
-	my $original_language = join q[, ], $firefox->languages();
-	ok($original_language eq $browser_language, "\$firefox->languages() equals navigator.languages:'$original_language' vs '$browser_language'");
-	my $new_language = 'en-AU, en-GB, en';
-	ok((join q[, ], $firefox->languages(split q[, ], $new_language)) eq $original_language, "\$firefox->languages(split q[, ], \"$new_language\") returns correctly");
-	$browser_language = join q[, ], @{$firefox->script('return navigator.languages')};
-	ok($new_language eq $browser_language, "\$firefox->languages() equals navigator.languages:'$new_language' vs '$browser_language'");
-	my $lone_language = 'en-GB';
-	ok((join q[, ], $firefox->languages($lone_language)) eq $new_language, "\$firefox->languages(\"$lone_language\") returns correctly");
-	$browser_language = join q[, ], @{$firefox->script('return navigator.languages')};
-	ok($lone_language eq $browser_language, "\$firefox->languages() matches navigator.language b/c there is only one entry:'$lone_language' vs '$browser_language'");
+	if ($major_version > 32) { # https://bugzilla.mozilla.org/show_bug.cgi?id=889335
+		my $browser_language = join q[, ], @{$firefox->script('return navigator.languages')};
+		my $original_language = join q[, ], $firefox->languages();
+		ok($original_language eq $browser_language, "\$firefox->languages() equals navigator.languages:'$original_language' vs '$browser_language'");
+		my $new_language = 'en-AU, en-GB, en';
+		ok((join q[, ], $firefox->languages(split q[, ], $new_language)) eq $original_language, "\$firefox->languages(split q[, ], \"$new_language\") returns correctly");
+		$browser_language = join q[, ], @{$firefox->script('return navigator.languages')};
+		ok($new_language eq $browser_language, "\$firefox->languages() equals navigator.languages:'$new_language' vs '$browser_language'");
+		my $lone_language = 'en-GB';
+		ok((join q[, ], $firefox->languages($lone_language)) eq $new_language, "\$firefox->languages(\"$lone_language\") returns correctly");
+		$browser_language = join q[, ], @{$firefox->script('return navigator.languages')};
+		ok($lone_language eq $browser_language, "\$firefox->languages() matches navigator.language b/c there is only one entry:'$lone_language' vs '$browser_language'");
+	} else {
+		my $browser_language = $firefox->chrome()->script('return Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch("").getComplexValue("intl.accept_languages", Components.interfaces.nsIPrefLocalizedString).data;');
+		$firefox->content();
+		my $original_language = join q[, ], $firefox->languages();
+		ok($original_language eq $browser_language, "\$firefox->languages() equals navigator.languages:'$original_language' vs '$browser_language'");
+	}
 	my $test_agent_string = "Firefox::Marionette v$Firefox::Marionette::VERSION test suite";
 	my $original_agent = $firefox->agent($test_agent_string);
 	ok($original_agent, "\$firefox->agent() returns a user agent string:$original_agent");
 	my $shadow_root;
-	my $path = File::Spec->catfile(Cwd::cwd(), qw(t data elements.html));
-	if ($^O eq 'cygwin') {
-		$path = $firefox->execute( 'cygpath', '-s', '-m', $path );
-	}
+	my $path;
 	if ($ENV{FIREFOX_HOST}) {
 	} elsif (($^O eq 'openbsd') && (Cwd::cwd() !~ /^($quoted_home_directory\/Downloads|\/tmp)/)) {
 		diag("Skipping checks that use a file:// url b/c of OpenBSD's unveil functionality - see https://bugzilla.mozilla.org/show_bug.cgi?id=1580271");
 	} else {
+		$path = File::Spec->catfile(Cwd::cwd(), qw(t data elements.html));
+		if ($^O eq 'cygwin') {
+			$path = $firefox->execute( 'cygpath', '-s', '-m', $path );
+		}
 		ok($firefox->go("file://$path"), "\$firefox->go(\"file://$path\") loaded successfully");
 		my $new_agent = $firefox->agent(undef);
 		ok($new_agent eq $test_agent_string, "\$firefox->agent(undef) returns '$test_agent_string':$new_agent");
@@ -1647,6 +1709,67 @@ SKIP: {
 			ok($hash->{value} == 2, "Value returned from script is the numeric 2 in a hash");
 		}
 	}
+	my $webdriver = $firefox->script('return navigator.webdriver');
+	ok(!defined $webdriver, "navigator.webdriver returns undef when stealth is on");
+	$webdriver = $firefox->script(q[if ('webdriver' in Object.getPrototypeOf(window.navigator)) { return true } else { return false }]);
+	ok(!$webdriver, "navigator.webdriver in prototype does not exist when stealth is on");
+	$webdriver = $firefox->script(q[if ('webdriver' in navigator) { return true } else { return false }]);
+	ok(!$webdriver, "navigator.webdriver does not exist when stealth is on");
+	my %user_agents_to_js = (
+		'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36' =>
+						{
+							platform => 'Win32',
+							appVersion => '5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+							vendor => 'Google Inc.',
+							vendorSub => '',
+						},
+		'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0' =>
+						{
+							platform => 'Win32',
+							appVersion => '5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0',
+							vendor => 'Google Inc.',
+							vendorSub => '',
+						},
+		'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0' =>
+						{
+							platform => 'Win32',
+							appVersion => '5.0 (Windows)',
+							vendor => '',
+							vendorSub => '',
+						},
+		'Mozilla/5.0 (X11; DragonFly x86_64; rv:108.0) Gecko/20100101 Firefox/108.0' =>
+						{
+							platform => 'DragonFly x86_64',
+							appVersion => '5.0 (X11)',
+							vendor => '',
+							vendorSub => '',
+						},
+		'Mozilla/5.0 (X11; FreeBSD amd64; rv:109.0) Gecko/20100101 Firefox/118.0' =>
+						{
+							platform => 'FreeBSD amd64',
+							appVersion => '5.0 (X11)',
+							vendor => '',
+							vendorSub => '',
+						},
+		'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0' =>
+						{
+							platform => 'Win32',
+							appVersion => '5.0 (Windows)',
+							vendor => '',
+							vendorSub => '',
+						},
+			);
+	foreach my $user_agent (sort { $a cmp $b } keys %user_agents_to_js) {
+		ok($firefox->go("about:blank"), "\$firefox->go(\"about:blank\") loaded successfully for user agent test of values");
+		$firefox->agent($user_agent);
+		foreach my $key (qw(
+					platform
+					appVersion
+				)) {
+			my $value = $firefox->script('return navigator.' . $key);
+			ok($value eq $user_agents_to_js{$user_agent}{$key}, "navigator.$key is now '$user_agents_to_js{$user_agent}{$key}':$value");
+		}
+	}
 	if (($tls_tests_ok) && ($ENV{RELEASE_TESTING})) {
 		my $json;
 		if ($major_version < 50) {
@@ -1658,12 +1781,19 @@ SKIP: {
 			ok($json->{latitude} == -37.5, "\$firefox->json(\$url)->{latitude} returned -31.5:$json->{latitude}");
 			ok($json->{longitude} == 144.5, "\$firefox->json(\$url)->{longitude} returned 144.5:$json->{longitude}");
 			ok($json->{timeZone} eq "+11:00", "\$firefox->json(\$url)->{timeZone} returned +11:00:$json->{timeZone}");
+			$useragents_me_uri =~ s/[ ]/%20/smxg; # firefoxen older that 108 strips spaces from data uris: https://bugzilla.mozilla.org/show_bug.cgi?id=1104311
 			my %user_agent_strings = map { $_->{ua} => $_->{pct} } @{$firefox->json($useragents_me_uri)->{data}};
 			my ($user_agent) = reverse sort { $user_agent_strings{$a} <=> $user_agent_strings{$b} } keys %user_agent_strings;
-			ok($firefox->agent($user_agent), "\$firefox->agent(\"\$most_common_useragent\") worked");
-			ok($firefox->go("file://$path"), "\$firefox->go(\"file://$path\") loaded successfully for user agent test");
-			my $agent = $firefox->agent();
-			ok($agent eq $most_common_useragent, "\$firefox->agent() now produces the most common user agent");
+			ok($user_agent eq $most_common_useragent, "Correctly sorted the most common user agent:'$user_agent' vs '$most_common_useragent'");
+			ok($firefox->agent($most_common_useragent), "\$firefox->agent(\"\$most_common_useragent\") worked");
+			if ($ENV{FIREFOX_HOST}) {
+			} elsif (($^O eq 'openbsd') && (Cwd::cwd() !~ /^($quoted_home_directory\/Downloads|\/tmp)/)) {
+				diag("Skipping checks that use a file:// url b/c of OpenBSD's unveil functionality - see https://bugzilla.mozilla.org/show_bug.cgi?id=1580271");
+			} else {
+				ok($firefox->go("file://$path"), "\$firefox->go(\"file://$path\") loaded successfully for user agent test");
+				my $agent = $firefox->agent();
+				ok($agent eq $most_common_useragent, "\$firefox->agent() now produces the most common user agent");
+			}
 		}
 		if ($ENV{FIREFOX_HOST}) {
 		} elsif (($^O eq 'openbsd') && (Cwd::cwd() !~ /^($quoted_home_directory\/Downloads|\/tmp)/)) {
@@ -1811,7 +1941,7 @@ SKIP: {
 			TODO: {
 				local $TODO = ($major_version < 113 && $name !~ /^(CLEAR_COOKIES|CLEAR_NETWORK_CACHE|CLEAR_IMAGE_CACHE)$/smx) ? "Older firefox (less than 113) can have different values for Firefox::Marionette::Cache constants" : q[];
 				my $result = $firefox->check_cache_key($name);
-				if (($name eq 'CLEAR_FORGET_ABOUT_SITE') && ($major_version < 121)) {
+				if (($name eq 'CLEAR_FORGET_ABOUT_SITE') && ($major_version < 124)) {
 					ok($result <= &$name(), "\$firefox->check_cache_key($name) eq Firefox::Marionette::Cache::${name} which should less than or equal to $result and is " . &$name());
 				} else {
 					ok($result == &$name(), "\$firefox->check_cache_key($name) eq Firefox::Marionette::Cache::${name} which should be $result and is " . &$name());
@@ -3806,7 +3936,7 @@ SKIP: {
 			if ($path =~ /Test\-Simple/) { # dodging possible Devel::Cover messages
 				$download_path = $path;
 				$count += 1;
-			} elsif ($INC{'Devel/Cover.pm'}) {
+			} elsif ($is_covering) {
 			} else {
 				$count += 1;
 			}
@@ -4145,10 +4275,6 @@ SKIP: {
 		ok($capabilities->moz_headless() || $ENV{FIREFOX_VISIBLE} || 0, "\$capabilities->moz_headless() is set to " . ($ENV{FIREFOX_VISIBLE} ? 'false' : 'true'));
 	}
         ok($capabilities->timeouts()->implicit() == 987654, "\$firefox->capabilities()->timeouts()->implicit() correctly reflects the implicit shortcut timeout");
-	my $go_path = File::Spec->catfile(Cwd::cwd(), qw(t data iframe.html));
-	if ($^O eq 'cygwin') {
-		$go_path = $firefox->execute( 'cygpath', '-s', '-m', $go_path );
-	}
 	my $path = 't/addons/borderify/manifest.json';
 	if (($^O eq 'openbsd') && (Cwd::cwd() !~ /^($quoted_home_directory\/Downloads|\/tmp)/)) {
 		diag("Skipping checks that use a file:// url b/c of OpenBSD's unveil functionality - see https://bugzilla.mozilla.org/show_bug.cgi?id=1580271");
@@ -4171,18 +4297,27 @@ SKIP: {
 				skip("addon:install may not be supported in firefox versions less than 52:$exception", 2);
 			}
 			ok($install_id, "Successfully installed an extension:$install_id");
-			$firefox->go("file://$go_path");
-			my $actual_border;
-			CHECK_BORDER: for my $count ( 1 .. 10 ) {
-				$actual_border = $firefox->script(q{return document.body.style.border});
-				if ($actual_border =~ /red/smx) {
-					last CHECK_BORDER;
-				} else {
-					sleep 1;
+			if ($ENV{FIREFOX_HOST}) {
+			} elsif (($^O eq 'openbsd') && (Cwd::cwd() !~ /^($quoted_home_directory\/Downloads|\/tmp)/)) {
+				diag("Skipping checks that use a file:// url b/c of OpenBSD's unveil functionality - see https://bugzilla.mozilla.org/show_bug.cgi?id=1580271");
+			} else {
+				my $go_path = File::Spec->catfile(Cwd::cwd(), qw(t data iframe.html));
+				if ($^O eq 'cygwin') {
+					$go_path = $firefox->execute( 'cygpath', '-s', '-m', $go_path );
 				}
+				$firefox->go("file://$go_path");
+				my $actual_border;
+				CHECK_BORDER: for my $count ( 1 .. 10 ) {
+					$actual_border = $firefox->script(q{return document.body.style.border});
+					if ($actual_border =~ /red/smx) {
+						last CHECK_BORDER;
+					} else {
+						sleep 1;
+					}
+				}
+				my $expected_border =  "5px solid red";
+				ok($actual_border eq $expected_border, "Extension is proved to be running correctly: '$actual_border' vs '$expected_border'");
 			}
-			my $expected_border =  "5px solid red";
-			ok($actual_border eq $expected_border, "Extension is proved to be running correctly: '$actual_border' vs '$expected_border'");
 			ok($firefox->uninstall($install_id), "Successfully uninstalled an extension");
 		}
 	}
@@ -4219,19 +4354,22 @@ SKIP: {
 			my $json_document = Encode::decode('UTF-8', '{ "id": "5", "value": "sömething"}');
 			my $txt_document = 'This is ordinary text';
 			if (my $pid = fork) {
-				$firefox->go($daemon->url() . '?format=JSON');
+				wait_for_server_on($daemon, $pid);
+				my $base_url = $daemon->url();
+				undef $daemon;
+				$firefox->go($base_url . '?format=JSON');
 				ok($firefox->strip() eq $json_document, "Correctly retrieved JSON document");
 				diag(Encode::encode('UTF-8', $firefox->strip(), 1));
 				ok($firefox->json()->{id} == 5, "Correctly parsed JSON document");
 				ok(Encode::encode('UTF-8', $firefox->json()->{value}, 1) eq "sömething", "Correctly parsed UTF-8 JSON field");
-				$firefox->go($daemon->url() . '?format=txt');
+				$firefox->go($base_url . '?format=txt');
 				ok($firefox->strip() eq $txt_document, "Correctly retrieved TXT document");
 				diag($firefox->strip());
 				if ($major_version >= 61) {
-					my $handle = $firefox->download($daemon->url() . '?format=txt');
+					my $handle = $firefox->download($base_url . '?format=txt');
 					my $output = <$handle>;
 					ok($output eq $txt_document, "Correctly downloaded TXT document without timeout");
-					$handle = $firefox->download($daemon->url() . '?format=txt', 50);
+					$handle = $firefox->download($base_url . '?format=txt', 50);
 					$output = <$handle>;
 					ok($output eq $txt_document, "Correctly downloaded TXT document with explicit timeout");
 				}
@@ -4240,11 +4378,14 @@ SKIP: {
 					sleep 1;
 					waitpid $pid, POSIX::WNOHANG();
 				}
+				ok($! == POSIX::ESRCH(), "Process $pid no longer exists:$!");
 			} elsif (defined $pid) {
+				eval 'Devel::Cover::set_coverage("none")' if $is_covering;
 				eval {
 					local $SIG{ALRM} = sub { die "alarm during content server\n" };
 					alarm 40;
 					$0 = "[Test HTTP Content Server for " . getppid . "]";
+					diag("Accepting connections for $0");
 					while (my $connection = $daemon->accept()) {
 						diag("Accepted connection");
 						if (my $child = fork) {
@@ -4363,7 +4504,10 @@ SKIP: {
 				skip("\$capabilities->proxy is not supported for " . $^O, 3);
 			} elsif ((exists $Config::Config{'d_fork'}) && (defined $Config::Config{'d_fork'}) && ($Config::Config{'d_fork'} eq 'define')) {
 				if (my $pid = fork) {
-					$firefox->go($daemon->url() . '?links_and_images');
+					wait_for_server_on($daemon, $pid);
+					my $base_url = $daemon->url();
+					undef $daemon;
+					$firefox->go($base_url . '?links_and_images');
 					foreach my $image ($firefox->images()) {
 						ok($image->tag(), "Image tag is defined as " . $image->tag());
 					}
@@ -4379,11 +4523,14 @@ SKIP: {
 						sleep 1;
 						waitpid $pid, POSIX::WNOHANG();
 					}
+					ok($! == POSIX::ESRCH(), "Process $pid no longer exists:$!");
 				} elsif (defined $pid) {
+					eval 'Devel::Cover::set_coverage("none")' if $is_covering;
 					eval {
 						local $SIG{ALRM} = sub { die "alarm during links and images server\n" };
 						alarm 40;
 						$0 = "[Test HTTP Links and Images Server for " . getppid . "]";
+						diag("Accepting connections for $0");
 						while (my $connection = $daemon->accept()) {
 							diag("Accepted connection");
 							if (my $child = fork) {

@@ -3,16 +3,17 @@ package Data::HTML::Element::A;
 use strict;
 use warnings;
 
+use Data::HTML::Element::Utils qw(check_data check_data_type);
 use Error::Pure qw(err);
 use List::Util 1.33 qw(none);
 use Mo qw(build is);
-use Mo::utils qw(check_array);
+use Mo::utils qw(check_array check_strings);
 use Mo::utils::CSS qw(check_css_class);
 use Readonly;
 
-Readonly::Array our @DATA_TYPES => qw(plain tags);
+Readonly::Array our @TARGETS => qw(_blank _parent _self _top);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 has css_class => (
 	is => 'ro',
@@ -27,6 +28,14 @@ has data_type => (
 	ro => 1,
 );
 
+has id => (
+	ro => 1,
+);
+
+has target => (
+	ro => 1,
+);
+
 has url => (
 	is => 'ro',
 );
@@ -38,31 +47,13 @@ sub BUILD {
 	check_css_class($self, 'css_class');
 
 	# Check data type.
-	if (! defined $self->{'data_type'}) {
-		$self->{'data_type'} = 'plain';
-	}
-	if (none { $self->{'data_type'} eq $_ } @DATA_TYPES) {
-		err "Parameter 'data_type' has bad value.";
-	}
+	check_data_type($self);
 
 	# Check data based on type.
-	check_array($self, 'data');
-	foreach my $data_item (@{$self->{'data'}}) {
-		# Plain mode
-		if ($self->{'data_type'} eq 'plain') {
-			if (ref $data_item ne '') {
-				err "Parameter 'data' in 'plain' mode must contain ".
-					'reference to array with scalars.';
-			}
-		# Tags mode.
-		} else {
-			if (ref $data_item ne 'ARRAY') {
-				err "Parameter 'data' in 'tags' mode must contain ".
-					"reference to array with references ".
-					'to array with Tags structure.';
-			}
-		}
-	}
+	check_data($self);
+
+	# Check target.
+	check_strings($self, 'target', \@TARGETS);
 
 	return;
 }
@@ -87,6 +78,8 @@ Data::HTML::Element::A - Data object for HTML a element.
  my $css_class = $obj->css_class;
  my $data = $obj->data;
  my $data_type = $obj->data_type;
+ my $id = $obj->id;
+ my $target = $obj->target;
  my $url = $obj->url;
 
 =head1 METHODS
@@ -126,6 +119,32 @@ The 'tags' content is structure described in L<Tags>.
 
 Default value is 'plain'.
 
+=item * C<id>
+
+Id.
+
+Default value is undef.
+
+=item * C<target>
+
+Target.
+
+Possible values are:
+
+=over
+
+=item * C<_blank>
+
+=item * C<_parent>
+
+=item * C<_self>
+
+=item * C<_top>
+
+=back
+
+Default value is undef.
+
 =item * C<url>
 
 URL of link.
@@ -158,6 +177,14 @@ Get button data type.
 
 Returns string.
 
+=head2 C<id>
+
+ my $id = $obj->id;
+
+Get element id.
+
+Returns string.
+
 =head2 C<url>
 
  my $url = $obj->url;
@@ -169,12 +196,21 @@ Returns string.
 =head1 ERRORS
 
  new():
+         Parameter 'css_class' has bad CSS class name.
+                 Value: %s
+         Parameter 'css_class' has bad CSS class name (number on begin).
+                 Value: %s
          Parameter 'data' must be a array.
                 Value: %s
                 Reference: %s
          Parameter 'data' in 'plain' mode must contain reference to array with scalars.
          Parameter 'data' in 'tags' mode must contain reference to array with references to array with Tags structure.
          Parameter 'data_type' has bad value.
+         Parameter 'target' must have strings definition.
+         Parameter 'target' must have right string definition.
+         Parameter 'target' must be one of defined strings.
+                 String: %s
+                 Possible strings: %s
 
 =head1 EXAMPLE1
 
@@ -246,12 +282,12 @@ Returns string.
 
 =head1 DEPENDENCIES
 
+L<Data::HTML::Element::Utils>,
 L<Error::Pure>,
 L<List::Util>,
 L<Mo>,
 L<Mo::utils>,
-L<Mo::utils::CSS>,
-L<Readonly>.
+L<Mo::utils::CSS>.
 
 =head1 REPOSITORY
 
@@ -271,6 +307,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

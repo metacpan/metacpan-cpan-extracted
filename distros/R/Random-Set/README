@@ -17,16 +17,21 @@ METHODS
 
     *       "precision"
 
-             Precision.
-             Default value is 100.
+            Precision.
+
+            Default value is 100.
 
     *       "set"
 
-             Set definition.
-             Set is array of arrays with pairs of probability and value.
-             Default value is [].
-             It is required.
-             Sumary of probabilities must be 1.
+            Set definition.
+
+            Set is array of arrays with pairs of probability and value.
+
+            Default value is [].
+
+            It is required.
+
+            Sumary of probabilities must be 1.
 
   "get"
      my $random = $obj->get;
@@ -103,10 +108,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2013-2023
+    © Michal Josef Špaček 2013-2024
 
     BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

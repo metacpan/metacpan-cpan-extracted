@@ -1,5 +1,9 @@
 Revision history for Linux-FD
 
+0.016     2024-01-30 19:27:36+01:00 Europe/Brussels
+          - Adapt to C89 style XS arguments
+          - Use Signal typemap
+
 0.015     2024-01-27 21:06:57+01:00 Europe/Brussels
           - Allow flags to be passed to FD::Timer constructor
 

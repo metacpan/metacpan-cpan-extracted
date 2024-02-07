@@ -1,14 +1,14 @@
 package RPi::MultiPCA9685;
 use 5.006;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our @ISA = qw();
 use strict;
 use warnings;
 use POSIX qw/ceil floor/;
 use RPi::I2C;
-use vars qw/@dev/;
+use vars qw/@dev $num_PWMPCBs/;
 use Exporter 'import';
-our @EXPORT_OK = qw(init_PWM setChannelPWM);
+our @EXPORT_OK = qw(init_PWM setChannelPWM disablePWM);
 
 #----------------------------------------------------------
 # init all PWM PCBs - the number of boards is determined by the number of Servos (Servos /16)
@@ -19,7 +19,7 @@ sub init_PWM {
   my $i2c_freq=shift;
   my $num_servos=shift;
   my $presc=int(25000000/(4096*$i2c_freq));# calc the prescaler value for register FEh(254)
-  my $num_PWMPCBs=ceil($num_servos/16);
+  $num_PWMPCBs=ceil($num_servos/16);
   my $j;
   @dev=();
   for ($j=0;$j<=$num_PWMPCBs;$j++){	   # init all PWM PCBs - every 16 ports switch to the next i2c address
@@ -30,6 +30,16 @@ sub init_PWM {
   }  
   return 1;
 }
+#----------------------------------------------------------
+# Disable PWM - powers off all devices
+#----------------------------------------------------------
+sub disablePWM {
+  my $j;
+  for ($j=0;$j<=$num_PWMPCBs;$j++){        # disable all PWM PCBs - every 16 ports switch to the next i2c address
+    $dev[$j]->write_block([0,0,0,0],250);  # disable PWM for all channels via chip Register FAh(250)
+  }
+  return 1;
+}	
 #----------------------------------------------------------
 # send the pwm values to the PCA9685 chip
 # use the auto address increment of the chip
@@ -240,6 +250,16 @@ least 2 array elements in size (one servo or LED). If the array is smaller than
 $num_servos x2, simply the channel PWM setting stops at the last array element.
 This means, using the combination $currentservo and $mref, you can set only a 
 fraction of all consecutive channels. 
+
+=head2 disablePWM
+
+Disables the PWM output for all channels.
+
+Parameters: none
+
+Disables the PWM output for all channels. This function may help
+to prevent of damages to servos if they run against a mechanical block. Servos
+usually stop moving if they get no PWM at all.
 
 =head1 AUTHOR
 

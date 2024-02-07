@@ -75,7 +75,7 @@ use Cwd 'abs_path';
 use File::Path qw(make_path remove_tree);
 use File::stat;
 
-our $VERSION = "0.40";
+our $VERSION = "0.41";
 
 use App::LXC::Container::Data;
 use App::LXC::Container::Texts;
@@ -454,12 +454,11 @@ sub _run($)
     my $self = shift;
     debug(2, __PACKAGE__, '::_run($self)');
 
-    # FIXME: exec instead of system when Devel::Cover supports it
     if ($self->{running})
     {
+	# system instead of exec as Devel::Cover has problems with exec
 	debug(3, 'attaching LXC application container ', $self->{name});
 	0 == system(
-#	exec(
 	     'lxc-attach', '--rcfile', $self->{rc},
 	     '--name', $self->{name}, '--', '/lxc-run.sh')
 	    or  fatal('call_failed__1__2', 'lxc-attach', $!);
@@ -467,11 +466,18 @@ sub _run($)
     else
     {
 	debug(3, 'starting LXC application container ', $self->{name});
-	0 == system(
-#	exec(
-	     'lxc-execute', '--rcfile', $self->{rc},
-	     '--name', $self->{name}, '--', '/lxc-run.sh')
-	    or  fatal('call_failed__1__2', 'lxc-execute', $!);
+	my $rc = system(
+			'lxc-execute', '--rcfile', $self->{rc},
+			'--name', $self->{name}, '--', '/lxc-run.sh');
+	my $err = $!;
+	# remove all .Xauthority files in container (the credentials may
+	# change before the next run):
+	local $_;
+	foreach (glob($self->{root} . '/.xauth-*/.Xauthority'))
+	{
+	    unlink $_  or  error 'can_t_remove__1__2', $_, $!;
+	}
+	0 == $rc  or  fatal('call_failed__1__2', 'lxc-execute', $err);
     }
 }
 
@@ -506,9 +512,13 @@ sub _write_init_sh($)
 	    if $self->{audio} eq 'A';
 	if ($self->{x11} eq 'X'  and  defined $ENV{DISPLAY})
 	{
-	    push @todo, '', '# X11:', 'export DISPLAY=' . $ENV{DISPLAY};
-	    push @todo, 'export XAUTHORITY=/.xauth/.Xauthority'
-		if defined $ENV{XAUTHORITY};
+	    my $display = $ENV{DISPLAY};
+	    push @todo, '', '# X11:', 'export DISPLAY=' . $display;
+	    if (defined $ENV{XAUTHORITY})
+	    {
+		my $container_path = $self->_write_xauthority($display);
+		push @todo, 'export XAUTHORITY=' . $container_path;
+	    }
 	}
     }
     else
@@ -545,37 +555,8 @@ sub _write_init_sh($)
 	    # We must pass the X11-authority for the correct display here:
 	    if (defined $ENV{XAUTHORITY})
 	    {
-		# A writable directory is needed for the lock-file!
-		my $xauth_dir = $self->{root} . '/.xauth';
-		-d $xauth_dir
-		    or  mkdir $xauth_dir, 0700
-		    or  fatal('can_t_create__1__2', $xauth_dir, $!);
-		my $xauth = $xauth_dir . '/.Xauthority';
-		my @entries = `xauth list`;
-		my $name = $self->{name};
-		my $entry = undef;
-		foreach (@entries)
-		{
-		    if (s|^[^/]+(?=/[^:]+$display)|$name|)
-		    {	$entry = $_;   }
-		}
-		defined $entry
-		    or  fatal('call_failed__1__2',
-			      'xauth list', 'no ' . $display);
-		debug(4, 'Xauthority entry is: ', $entry);
-		my $xauth_add = 'xauth -b -f ' . $xauth . ' add ' . $entry;
-		system($xauth_add) == 0
-		    or  fatal('call_failed__1__2', $xauth_add, $?);
-		# This is a branch we can't really mock as non-root:
-		# uncoverable branch true
-		if ($self->{user} ne 'root')
-		{
-		    # uncoverable statement
-		    my ($uid, $gid) = (getpwnam($self->{user}))[2..3];
-		    # uncoverable statement
-		    chown $uid, $gid, $xauth_dir, $xauth;
-		}
-		push @todo, 'export XAUTHORITY=/.xauth/.Xauthority';
+		my $container_path = $self->_write_xauthority($display);
+		push @todo, 'export XAUTHORITY=' . $container_path;
 	    }
 	}
     }
@@ -631,6 +612,62 @@ sub _write_init_sh($)
     }
     # TODO: We could optimise everything if we only have /bin/sh as single
     # command (no script needed)!
+}
+
+#########################################################################
+
+=head2 B<_write_xauthority> - write X11 authority file for container/user
+
+    $container_path = $self->_write_xauthority($display);
+
+=head3 description:
+
+This method writes an X11 authority file for the container and the user it
+is run (including attached) for.  It is used when the container is started
+or attached and an X11 display using the environment variable C<XAUTHORITY>
+exists (within C<_write_init_sh> above).  The method returns the path to the
+created X11 authority file as it is used inside of the container.
+
+Note that each user needs its own writable directory for the lock-file.
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+sub _write_xauthority($$)
+{
+    my ($self, $display) = @_;
+    debug(4, __PACKAGE__, '::_write_xauthority($self)');
+    local $_ = '/.xauth-' . $self->{user};
+    my $container_path = $_ . '/.Xauthority';
+    my $xauth_dir = $self->{root} . $_;
+    -d $xauth_dir
+	or  mkdir $xauth_dir, 0700
+	or  fatal('can_t_create__1__2', $xauth_dir, $!);
+    my $xauth = $xauth_dir . '/.Xauthority';
+    unless (-f $xauth)
+    {
+	my @entries = `xauth list`;
+	my $name = $self->{name};
+	my $entry = undef;
+	foreach (@entries)
+	{
+	    if (s|^[^/]+(?=/[^:]+$display)|$name|)
+	    {	$entry = $_;   }
+	}
+	defined $entry
+	    or  fatal('call_failed__1__2',
+		      'xauth list', 'no ' . $display);
+	debug(4, 'Xauthority entry is: ', $entry);
+	my $xauth_add = 'xauth -b -f ' . $xauth . ' add ' . $entry;
+	system($xauth_add) == 0
+	    or  fatal('call_failed__1__2', $xauth_add, $?);
+	if ($self->{user} ne 'root')
+	{
+	    my ($uid, $gid) = (getpwnam($self->{user}))[2..3];
+	    chown $uid, $gid, $xauth_dir, $xauth;
+	}
+    }
+    return $container_path;
 }
 
 #########################################################################

@@ -1,12 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use IO::Async::Channel;
 
@@ -32,15 +31,15 @@ note( "Default IO::Async::Channel codec is " . IO::Async::Channel::_default_code
 
    $channel_wr->send( [ structure => "here" ] );
 
-   is_deeply( $channel_rd->recv, [ structure => "here" ], 'Sync mode channels can send/recv structures' );
+   is( $channel_rd->recv, [ structure => "here" ], 'Sync mode channels can send/recv structures' );
 
    $channel_wr->send_encoded( $channel_wr->encode( [ prefrozen => "data" ] ) );
 
-   is_deeply( $channel_rd->recv, [ prefrozen => "data" ], 'Sync mode channels can send_encoded' );
+   is( $channel_rd->recv, [ prefrozen => "data" ], 'Sync mode channels can send_encoded' );
 
    $channel_wr->send_encoded( IO::Async::Channel->encode( [ prefrozen => "again" ] ) );
 
-   is_deeply( $channel_rd->recv, [ prefrozen => "again" ], 'Channel->encode works as a class method' );
+   is( $channel_rd->recv, [ prefrozen => "again" ], 'Channel->encode works as a class method' );
 
    $channel_wr->close;
 
@@ -66,7 +65,7 @@ note( "Default IO::Async::Channel codec is " . IO::Async::Channel::_default_code
    $channel_wr->{stream}->write( "", on_flush => sub { $flushed++ } );
    wait_for { $flushed };
 
-   is_deeply( $channel_rd->recv, [ data => "by async" ], 'Async mode channel can send' );
+   is( $channel_rd->recv, [ data => "by async" ], 'Async mode channel can send' );
 
    $channel_wr->close;
 
@@ -87,7 +86,7 @@ note( "Default IO::Async::Channel codec is " . IO::Async::Channel::_default_code
 
    $channel_rd->configure(
       on_recv => sub {
-         identical( $_[0], $channel_rd, 'Channel passed to on_recv' );
+         ref_is( $_[0], $channel_rd, 'Channel passed to on_recv' );
          push @recv_queue, $_[1];
       },
       on_eof => sub {
@@ -102,7 +101,7 @@ note( "Default IO::Async::Channel codec is " . IO::Async::Channel::_default_code
 
    wait_for { @recv_queue };
 
-   is_deeply( shift @recv_queue, [ data => "by sync" ], 'Async mode channel can on_recv' );
+   is( shift @recv_queue, [ data => "by sync" ], 'Async mode channel can on_recv' );
 
    $channel_wr->close;
 
@@ -126,7 +125,7 @@ note( "Default IO::Async::Channel codec is " . IO::Async::Channel::_default_code
 
    my $recv_f = wait_for_future $channel_rd->recv;
 
-   is_deeply( scalar $recv_f->get, [ data => "by sync" ], 'Async mode future can receive data' );
+   is( scalar $recv_f->get, [ data => "by sync" ], 'Async mode future can receive data' );
 
    $channel_wr->close;
 
@@ -152,7 +151,7 @@ note( "Default IO::Async::Channel codec is " . IO::Async::Channel::_default_code
    my $recved;
    $channel_rd->recv(
       on_recv => sub {
-         identical( $_[0], $channel_rd, 'Channel passed to ->recv on_recv' );
+         ref_is( $_[0], $channel_rd, 'Channel passed to ->recv on_recv' );
          $recved = $_[1];
       },
       on_eof => sub { die "Test failed early" },
@@ -160,7 +159,7 @@ note( "Default IO::Async::Channel codec is " . IO::Async::Channel::_default_code
 
    wait_for { $recved };
 
-   is_deeply( $recved, [ data => "by sync" ], 'Async mode channel can ->recv on_recv' );
+   is( $recved, [ data => "by sync" ], 'Async mode channel can ->recv on_recv' );
 
    $channel_wr->close;
 
@@ -227,7 +226,7 @@ note( "Default IO::Async::Channel codec is " . IO::Async::Channel::_default_code
 
    wait_for { $r2_f->is_ready };
 
-   is_deeply( scalar $r2_f->get, [ "second" ], 'Async recv result after cancellation' );
+   is( scalar $r2_f->get, [ "second" ], 'Async recv result after cancellation' );
 
    $loop->remove( $channel_rd );
 }
@@ -255,7 +254,7 @@ SKIP: {
 
    my $recv_f = wait_for_future $channel_rd->recv;
 
-   is_deeply( scalar $recv_f->get, [ data => "by sync" ], 'Channel can use Sereal as codec' );
+   is( scalar $recv_f->get, [ data => "by sync" ], 'Channel can use Sereal as codec' );
 
    $loop->remove( $channel_rd );
 }

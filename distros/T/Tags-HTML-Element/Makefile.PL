@@ -5,7 +5,7 @@ use warnings;
 use inc::Module::Install;
 
 # Definition.
-abstract 'Tags helper for HTML elements.';
+abstract 'Tags helpers for HTML elements.';
 author 'Michal Josef Spacek <skim@cpan.org>';
 author_requires 'English' => 0;
 author_requires 'File::Object' => 0;
@@ -26,12 +26,12 @@ resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Tags-HTML-Elem
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Tags-HTML-Element';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Tags-HTML-Element';
 test_requires 'CSS::Struct::Output::Indent' => 0;
-test_requires 'CSS::Struct::Output::Structure' => 0;
-test_requires 'Data::HTML::Element::Button' => 0;
-test_requires 'Data::HTML::Element::Form' => 0;
-test_requires 'Data::HTML::Element::Input' => 0;
-test_requires 'Data::HTML::Element::Select' => 0;
-test_requires 'Data::HTML::Element::Textarea' => 0;
+test_requires 'CSS::Struct::Output::Structure' => 0.03;
+test_requires 'Data::HTML::Element::Button' => 0.10;
+test_requires 'Data::HTML::Element::Form' => 0.10;
+test_requires 'Data::HTML::Element::Input' => 0.10;
+test_requires 'Data::HTML::Element::Select' => 0.10;
+test_requires 'Data::HTML::Element::Textarea' => 0.10;
 test_requires 'English' => 0;
 test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Tags::Output::Raw' => 0;
@@ -40,7 +40,7 @@ test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.02';
+version '0.06';
 
 # Run.
 WriteAll();

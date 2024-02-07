@@ -1,10 +1,10 @@
 {
    "abstract" : "Colorize messages according to level amd my colors",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -49,10 +49,10 @@
       "homepage" : "https://github.com/briandfoy/Log-Log4perl-Appender-ScreenColoredLevels-UsingMyColors",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/Log-Log4perl-Appender-ScreenColoredLevels-UsingMyColors.git",
+         "url" : "https://github.com/briandfoy/Log-Log4perl-Appender-ScreenColoredLevels-UsingMyColors",
          "web" : "https://github.com/briandfoy/Log-Log4perl-Appender-ScreenColoredLevels-UsingMyColors"
       }
    },
-   "version" : "0.114",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.115",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,2 +1,2 @@
-/usr/bin/ar qc libpanda-backtrace.a CMakeFiles/panda-backtrace.dir/src/panda/backtrace.cc.o CMakeFiles/panda-backtrace.dir/src/panda/dwarf.cc.o CMakeFiles/panda-backtrace.dir/src/panda/glibc-dl.cc.o CMakeFiles/panda-backtrace.dir/src/panda/macos-dl.cc.o CMakeFiles/panda-backtrace.dir/src/panda/win-dl.cc.o
+/usr/bin/ar qc libpanda-backtrace.a "CMakeFiles/panda-backtrace.dir/src/panda/backtrace.cc.o" "CMakeFiles/panda-backtrace.dir/src/panda/dwarf.cc.o" "CMakeFiles/panda-backtrace.dir/src/panda/glibc-dl.cc.o" "CMakeFiles/panda-backtrace.dir/src/panda/macos-dl.cc.o" "CMakeFiles/panda-backtrace.dir/src/panda/win-dl.cc.o"
 /usr/bin/ranlib libpanda-backtrace.a

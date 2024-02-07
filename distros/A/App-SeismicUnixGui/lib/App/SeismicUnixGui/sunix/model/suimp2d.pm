@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::model::suimp2d;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 

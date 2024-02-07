@@ -16,6 +16,8 @@ SUBROUTINES
   "check_array_css_color"
      check_array_css_color($self, $key);
 
+    *Since version 0.03.*
+
     Check parameter defined by $key which is reference to array. Check if
     all values are CSS colors.
 
@@ -25,6 +27,8 @@ SUBROUTINES
 
   "check_css_class"
      check_css_class($self, $key);
+
+    *Since version 0.02.*
 
     Check parameter defined by $key if it's CSS class name. Value could be
     undefined.
@@ -36,6 +40,8 @@ SUBROUTINES
   "check_css_color"
      check_css_color($self, $key);
 
+    *Since version 0.03.*
+
     Check parameter defined by $key if it's CSS color. Value could be
     undefined.
 
@@ -45,6 +51,8 @@ SUBROUTINES
 
   "check_css_unit"
      check_css_unit($self, $key);
+
+    *Since version 0.01. Described functionality since version 0.04.*
 
     Check parameter defined by $key if it's CSS unit. Value could be
     undefined.
@@ -81,8 +89,11 @@ ERRORS
 
      check_css_unit():
              Parameter '%s' doesn't contain number.
+                     Value: %s
              Parameter '%s' doesn't contain unit.
+                     Value: %s
              Parameter '%s' contain bad unit.
+                     Unit: %s
                      Value: %s
 
 EXAMPLE1
@@ -268,5 +279,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

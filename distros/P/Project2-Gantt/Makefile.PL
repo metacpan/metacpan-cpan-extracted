@@ -19,7 +19,8 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Alien::Font::Vera" => "0.013",
     "Imager" => "1.019",
-    "Mojolicious" => "9.31"
+    "Mojolicious" => "9.31",
+    "Time::Piece" => "1.33"
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test::Directory" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +44,8 @@ my %FallbackPrereqs = (
   "Imager" => "1.019",
   "Mojolicious" => "9.31",
   "Test::Directory" => 0,
-  "Test::More" => 0
+  "Test::More" => 0,
+  "Time::Piece" => "1.33"
 );
 
 

@@ -4,6 +4,12 @@ Revision history for Perl extension Sendmail::PMilter V1.1x and later.
 
 https://rt.cpan.org/Public/Dist/Display.html?Name=Sendmail-PMilter
 
+1.27
+    Sat 03 Feb 2024 16:25:32 GMT released
+    - [150737] Proper handling of die
+    - [150611] child_exit and milter_exit
+    - [150270] Setconn with unix socket permissions
+
 1.24
     Thu 15 Dec 2022 12:28:00 GMT released
     - [145263] Make no reply to MTA from the abort callback.

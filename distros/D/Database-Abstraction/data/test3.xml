@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<table>
+	<entry id="1">
+		<entry>1</entry>
+		<en>One</en>
+		<fr>Un</fr>
+		<de>Eins</de>
+	</entry>
+	<entry id="2">
+		<entry>2</entry>
+		<en>Two</en>
+		<fr>Deux</fr>
+		<de>Zwei</de>
+	</entry>
+</table>

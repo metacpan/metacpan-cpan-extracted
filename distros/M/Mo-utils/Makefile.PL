@@ -32,7 +32,7 @@ test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.20';
+version '0.21';
 
 # Run.
 WriteAll();

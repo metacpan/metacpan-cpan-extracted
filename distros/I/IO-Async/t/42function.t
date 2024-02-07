@@ -1,13 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Fatal;
-use Test::Refcount;
+use Test2::V0 0.000149;
 use constant HAVE_TEST_MEMORYGROWTH => eval { require Test::MemoryGrowth; };
 
 use File::Temp qw( tempdir );
@@ -34,7 +32,7 @@ testing_loop( $loop );
    );
 
    ok( defined $function, '$function defined' );
-   isa_ok( $function, "IO::Async::Function", '$function isa IO::Async::Function' );
+   isa_ok( $function, [ "IO::Async::Function" ], '$function isa IO::Async::Function' );
 
    is_oneref( $function, '$function has refcount 1' );
 
@@ -50,7 +48,7 @@ testing_loop( $loop );
       args => [ 10, 20 ],
    );
 
-   isa_ok( $future, "Future", '$future' );
+   isa_ok( $future, [ "Future" ], '$future isa Future' );
 
    is_refcount( $function, 2, '$function has refcount 2 after ->call' );
 
@@ -123,12 +121,12 @@ testing_loop( $loop );
 
    is( $function->workers, 1, '$function->workers is still 1 after 2 calls' );
 
-   isa_ok( $f1, "Future", '$f1' );
-   isa_ok( $f2, "Future", '$f2' );
+   isa_ok( $f1, [ "Future" ], '$f1 isa Future' );
+   isa_ok( $f2, [ "Future" ], '$f2 isa Future' );
 
    wait_for { @result == 2 };
 
-   is_deeply( \@result, [ 3, 7 ], '@result after both calls return' );
+   is( \@result, [ 3, 7 ], '@result after both calls return' );
 
    is( $function->workers, 1, '$function->workers is still 1 after 2 calls return' );
 
@@ -157,7 +155,7 @@ testing_loop( $loop );
       $function->call( args => [], priority => 2 ),
    );
 
-   is_deeply( [ ( wait_for_future $f )->get ],
+   is( [ ( wait_for_future $f )->get ],
       [ 4, 2, 3, 1 ], '$function->call with priority enqueues correctly' );
 
    $loop->remove( $function );
@@ -181,7 +179,7 @@ testing_loop( $loop );
 
    wait_for { scalar @result };
 
-   is_deeply( \@result, [ 'SCALAR', \'b' ], 'Call and result preserves references' );
+   is( \@result, [ 'SCALAR', \'b' ], 'Call and result preserves references' );
 
    $loop->remove( $function );
 }
@@ -207,7 +205,7 @@ testing_loop( $loop );
 
    like( $err, qr/^exception name at \Q$0\E line \d+\.$/, '$err after exception' );
 
-   is_deeply( [ $f->failure ],
+   is( [ $f->failure ],
               [ "exception name at $0 line $line.", error => ],
               '$f->failure after exception' );
 
@@ -226,7 +224,7 @@ testing_loop( $loop );
       args => [],
    );
 
-   is_deeply( [ $f->failure ],
+   is( [ $f->failure ],
               [ "A message\n", category => 123, 456 ],
               '$f->failure after exception with detail' );
 
@@ -260,7 +258,7 @@ testing_loop( $loop );
    undef @errs;
    wait_for { scalar @errs == 2 };
 
-   is_deeply( \@errs, [ "1", "2" ], 'Closed variables preserved when exit_on_die => 0' );
+   is( \@errs, [ "1", "2" ], 'Closed variables preserved when exit_on_die => 0' );
 
    $loop->remove( $function );
 }
@@ -292,7 +290,7 @@ testing_loop( $loop );
    undef @errs;
    wait_for { scalar @errs == 2 };
 
-   is_deeply( \@errs, [ "1", "1" ], 'Closed variables preserved when exit_on_die => 1' );
+   is( \@errs, [ "1", "1" ], 'Closed variables preserved when exit_on_die => 1' );
 
    $loop->remove( $function );
 }
@@ -441,7 +439,7 @@ foreach my $model (qw( fork thread spawn )) {
 
    unlink( "$dir/done" );
 
-   is_deeply( \%ret, { 1 => 1, 2 => 2, 3 => 3 }, 'ret keys after parallel run' );
+   is( \%ret, { 1 => 1, 2 => 2, 3 => 3 }, 'ret keys after parallel run' );
 
    is( scalar $function->workers, 3, '$function->workers is still 3' );
 

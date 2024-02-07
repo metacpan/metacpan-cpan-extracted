@@ -1,12 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use Fcntl qw( SEEK_SET SEEK_END );
 use File::Temp qw( tempfile );
@@ -52,7 +51,7 @@ sub mkhandles
    );
 
    ok( defined $file, '$file defined' );
-   isa_ok( $file, "IO::Async::File", '$file isa IO::Async::File' );
+   isa_ok( $file, [ "IO::Async::File" ], '$file isa IO::Async::File' );
 
    is_oneref( $file, '$file has refcount 1 initially' );
 
@@ -69,8 +68,8 @@ sub mkhandles
    is( $old_size, 0, '$old_size' );
    is( $new_size, 8, '$new_size' );
 
-   isa_ok( $old_stat, "File::stat", '$old_stat isa File::stat' );
-   isa_ok( $new_stat, "File::stat", '$new_stat isa File::stat' );
+   isa_ok( $old_stat, [ "File::stat" ], '$old_stat isa File::stat' );
+   isa_ok( $new_stat, [ "File::stat" ], '$new_stat isa File::stat' );
 
    $loop->remove( $file );
 }

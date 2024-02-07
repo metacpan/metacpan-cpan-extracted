@@ -1,5 +1,5 @@
 This archive contains the distribution Dist-Zilla-Plugin-Typemap,
-version 0.005:
+version 0.006:
 
   Manipulate the typemap file for XS distributions using dzil
 

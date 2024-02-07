@@ -1,6 +1,9 @@
 package t::TimeAbout;
 
-use Test::More;
+use v5.14;
+use warnings;
+
+use Test2::V0;
 use Time::HiRes qw( time );
 
 use constant AUT => $ENV{TEST_QUICK_TIMERS} ? 0.1 : 1;

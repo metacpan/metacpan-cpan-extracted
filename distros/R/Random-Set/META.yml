@@ -4,6 +4,7 @@ author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   English: 0
+  Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
   Test::More: 0
   Test::NoWarnings: 0
@@ -25,10 +26,11 @@ no_index:
     - xt
 requires:
   Class::Utils: 0.03
+  Error::Pure: 0
   perl: 5.8.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Random-Set/issues
   homepage: https://github.com/michal-josef-spacek/Random-Set
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Random-Set
-version: '0.08'
+version: '0.09'

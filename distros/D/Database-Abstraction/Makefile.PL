@@ -16,9 +16,13 @@ WriteMakefile(
 	'INC' => '',	# e.g., '-I/usr/include/other'
 	PL_FILES	=> {},
 	TEST_REQUIRES => {
+		'DBD::CSV' => 0,
+		'DBD::XMLSimple' => 0,
 		'File::Spec' => 0,
+		'FindBin' => 0,
 		'Test::Compile' => 0,
-		'Test::Most' => 0
+		'Test::Most' => 0,
+		'Text::xSV::Slurp' => 0
 	}, PREREQ_PM => {
 		'autodie' => 0,
 		'strict' => 0,
@@ -28,7 +32,7 @@ WriteMakefile(
 		'File::Spec' => 0,
 		'File::pfopen' => 0.02,
 		'File::Temp' => 0,
-		'Error::Simple' => 0,
+		# 'Error' => 0,
 		'Carp' => 0
 	},
 	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

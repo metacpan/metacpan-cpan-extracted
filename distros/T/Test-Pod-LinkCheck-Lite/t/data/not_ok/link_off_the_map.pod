@@ -1,0 +1,10 @@
+=pod
+
+This document links to the L<hello|hello> script, which is stored in a
+non-standard place. And here is a link to its
+L<SYNOPSIS|hello/SYNOPSIS>.
+
+The idea is that this should generate two failures unless the location
+of the F<hello> script is searched.
+
+=cut

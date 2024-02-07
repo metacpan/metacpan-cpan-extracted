@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/FirefoxUtils/start_firefox
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-09'; # DATE
+our $DATE = '2023-10-28'; # DATE
 our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FirefoxUtils/start_firefox",
@@ -39,11 +39,15 @@ start-firefox - Start firefox if not already started
 
 =head1 VERSION
 
-This document describes version 0.021 of start-firefox (from Perl distribution App-FirefoxUtils), released on 2022-10-09.
+This document describes version 0.022 of start-firefox (from Perl distribution App-FirefoxUtils), released on 2023-10-28.
 
 =head1 SYNOPSIS
 
-B<start-firefox> [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--dry-run>|B<-n>] [B<--firefox-cmd>=I<any>|B<--firefox-cmd-json>=I<json>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--quiet-arg>|B<-q>]
+B<start-firefox> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<start-firefox> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<start-firefox> [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--dry-run|/"--dry-run, -n">>|B<L<-n|/"--dry-run, -n">>] [B<L<--firefox-cmd|/"--firefox-cmd=s">>=I<any>|B<L<--firefox-cmd-json|/"--firefox-cmd=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--quiet-arg|/"--quiet-arg, -q">>|B<L<-q|/"--quiet-arg, -q">>]
 
 =head1 OPTIONS
 
@@ -64,6 +68,9 @@ Default value:
  "firefox"
 
 =item B<--quiet-arg>, B<-q>
+
+(No description)
+
 
 =back
 
@@ -359,7 +366,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

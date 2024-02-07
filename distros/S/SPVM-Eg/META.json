@@ -1,10 +1,10 @@
 {
-   "abstract" : "HTML",
+   "abstract" : "Components of SPVM Engine",
    "author" : [
       "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -46,6 +46,6 @@
          "type" : "git"
       }
    },
-   "version" : "0.014",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.017",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

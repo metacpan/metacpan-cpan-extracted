@@ -1,6 +1,6 @@
 package Mail::BIMI::Indicator;
 # ABSTRACT: Class to model a BIMI indicator
-our $VERSION = '3.20231123'; # VERSION
+our $VERSION = '3.20240205'; # VERSION
 use 5.20.0;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -113,7 +113,7 @@ sub _build_data($self) {
     return scalar read_file $self->bimi_object->options->svg_from_file;
   }
   $self->log_verbose('HTTP Fetch: '.$self->uri);
-  my $response = $self->http_client->get( $self->uri );
+  my $response = $self->http_client_get( $self->uri );
   if ( !$response->{success} ) {
     if ( $response->{status} == 599 ) {
       $self->add_error('SVG_FETCH_ERROR',$response->{content});
@@ -218,7 +218,7 @@ Mail::BIMI::Indicator - Class to model a BIMI indicator
 
 =head1 VERSION
 
-version 3.20231123
+version 3.20240205
 
 =head1 DESCRIPTION
 

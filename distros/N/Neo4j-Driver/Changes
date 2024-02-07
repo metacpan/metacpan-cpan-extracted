@@ -1,5 +1,19 @@
 Revision history for Neo4j::Driver
 
+0.44  2024-02-06
+
+ - Result->peek() is no longer experimental.
+ - Result->consume() is no longer experimental.
+ - Result->summary() is discouraged in favour of consume().
+ - Internal change: Result->fetch() now detects an exhausted result stream
+   immediately when the last record is retrieved.
+ - Minor testing improvements.
+
+0.43  2024-01-31
+
+ - Accept neo4j: URIs, converting them to bolt / http / https.
+ - Change default URI from http://localhost to neo4j://127.0.0.1.
+
 0.42  2023-12-14
 
  - Add support for spatial and temporal Cypher values (Neo4j::Types v2).

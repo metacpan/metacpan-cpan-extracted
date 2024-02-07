@@ -57,7 +57,7 @@ use MIME::Tools qw(debug);
 @ISA = qw(MIME::Decoder);
 
 ### The package version, both in 1.23 style *and* usable by MakeMaker:
-$VERSION = "5.513";
+$VERSION = "5.514";
 
 ### How many bytes to encode at a time (must be a multiple of 3)
 my $EncodeChunkLength = 120 * 57;

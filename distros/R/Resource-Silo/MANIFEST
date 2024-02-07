@@ -23,6 +23,8 @@ t/214-dependencies.t
 t/215-show.t
 t/216-meta.t
 t/217-literal.t
+t/218-inspect.t
+t/219-shortcut.t
 t/301-class-init.t
 t/302-require.t
 t/401-circular.t

@@ -1,3 +1,11 @@
+0.012		2024-02-01	T. R. Wyant
+    Add new() argument add_dir to cover links to odd places.
+    The default is blib/script to cover links into script files.
+
+    Fix test failures when https: is not available. I hope.
+
+    Fix noise in xt/author/perlpod.t.
+
 0.011		2023-02-14	T. R. Wyant
     Add user_agent argument to new().  This allows the user to specify a
     subclass of HTTP::Tiny, to implement extra client functionality such

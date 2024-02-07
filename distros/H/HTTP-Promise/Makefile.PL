@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
         'IO::File'              => 0,
         'JSON'                  => '4.10',
         'JSON::XS'              => '4.03',
-        'Module::Generic'       => 'v0.32.4',
+        'Module::Generic'       => 'v0.34.0',
         # 'Nice::Try'             => 'v1.3.4',
         'Promise::Me'           => 'v0.4.7',
         'Regexp::Common'        => '2017060201',
@@ -73,7 +73,6 @@ my %WriteMakefileArgs = (
     LICENSE             => 'perl_5',
     MIN_PERL_VERSION    => 'v5.26.1',
     (MM->can('signature_target') ? (SIGN => 1) : ()),
-    # dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp', PREOP => './dev/cleanup.pl' },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp' },
     clean               => { FILES => 'HTTP-Promise-*' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {

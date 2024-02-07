@@ -1,11 +1,12 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
+use Test2::V0;
+use Test2::IPC; # initialise Test2 before starting threads
 
 use IO::Async::Loop;
 use IO::Async::OS;
@@ -26,7 +27,7 @@ testing_loop( $loop );
 
    wait_for { @result };
 
-   is_deeply( \@result, [ return => "A result" ], 'result to on_joined for returning thread' );
+   is( \@result, [ return => "A result" ], 'result to on_joined for returning thread' );
 }
 
 # thread in list context
@@ -40,7 +41,7 @@ testing_loop( $loop );
 
    wait_for { @result };
 
-   is_deeply( \@result, [ return => "A result", "of many", "values" ], 'result to on_joined for returning thread in list context' );
+   is( \@result, [ return => "A result", "of many", "values" ], 'result to on_joined for returning thread in list context' );
 }
 
 # thread that dies
@@ -53,7 +54,7 @@ testing_loop( $loop );
 
    wait_for { @result };
 
-   is_deeply( \@result, [ died => "Ooops I fail\n" ], 'result to on_joined for a died thread' );
+   is( \@result, [ died => "Ooops I fail\n" ], 'result to on_joined for a died thread' );
 }
 
 done_testing;

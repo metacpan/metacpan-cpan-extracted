@@ -19,11 +19,12 @@ no_index:
     - t
     - inc
 requires:
+  Config::General: '2'
   Sys::Syslog: '0'
   perl: '5.020'
 resources:
   homepage: https://sourceforge.net/projects/acrux/
   license: https://dev.perl.org/licenses
   repository: https://abalama@git.code.sf.net/p/acrux/code
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

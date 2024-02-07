@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Typemap
 
+0.006     2024-01-29 21:57:00+01:00 Europe/Brussels
+          - Make plugin a FileGatherer instead of a FileMunger
+
 0.005     2023-10-08 13:59:04+02:00 Europe/Brussels
           - Allow a + prefex in module names
 

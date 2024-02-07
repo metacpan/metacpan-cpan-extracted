@@ -783,8 +783,8 @@ Nikon.jpg       -       100
 OlympusE1.jpg   Auto    400
 </pre>
 
-One limitation of the <code>-T</code> option is that a list of tags to extract
-must be specified.  Otherwise, all information is extracted from each input
+One limitation of the <code>-T</code> option is that you must specify a list
+of tags to extract.  Otherwise, all information is extracted from each input
 file, and the columns would contain values from random tags.</blockquote>
 
 <blockquote> The <code>-csv</code> (comma separated values) option solves this
@@ -792,7 +792,8 @@ dilemma by pre-extracting information from all input files, then producing a
 sorted list of available tag names as the first row of the output, and
 organizing the information into columns for each tag.  As well, a first column
 labelled "SourceFile" is generated.  These features make it practical to use the
-<code>-csv</code> option for extracting all information from multiple images.
+<code>-csv</code> option for extracting all information from multiple images
+(but impractical for a large number of images due to memory restrictions).
 For example, this command:
 
 <pre>exiftool -csv -r t/images > out.csv</pre>
@@ -960,10 +961,12 @@ exiftool -exif:gpslatitude=42.5 -exif:gpslatituderef=S a.jpg
 exiftool -xmp:gpslatitude="42 30 0.00 S" a.jpg
 exiftool -xmp:gpslatitude=42.50S a.jpg
 exiftool -xmp:gpslatitude=-42.5 a.jpg
+exiftool -xmp:gpslatitude="-42 -30" a.jpg
 </pre>
 
-Similar styles may be used for longitude.  ExifTool will convert any of these
-coordinate styles to the proper format for the specific tag used.
+Note the last example: The negative sign must be applied to all components of
+the coordinate.  Similar styles may be used for longitude.  ExifTool will convert
+any of these coordinate styles to the proper format for the specific tag used.
 </blockquote>
 
 <blockquote>ExifTool 12.22 and later allow combined lat/lon GPSCoordinates
@@ -1285,6 +1288,12 @@ around this limitation, arguments may be read from an ExifTool argument file
 using the <code>-@</code> option.  UTF&#8209;8 encoding is recommended for the
 argument file, and with this you would also set <code>-charset filename=utf8</code>
 if using special characters in filename arguments within the file.</blockquote>
+
+<blockquote>Also see
+<a href="https://stackoverflow.com/questions/57131654/using-utf-8-encoding-chcp-65001-in-command-prompt-windows-powershell-window/57134096#57134096">this StackOverflow answer</a>
+for another possible solution, but note that this option has the side effect of
+changing the fonts of some older programs and causing problems with their GUIs,
+so you'll have to decide whether this is acceptable for you.</blockquote>
 
 <blockquote>Another way to bypass the console/command-line encoding problems for
 individual tag values is to extract/write to/from a separate text file and use a
@@ -1819,7 +1828,7 @@ default values if necessary).
 </blockquote>
 
 <hr>
-<i>Last revised Jun 12, 2023</i>
+<i>Last revised Jan 23, 2024</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

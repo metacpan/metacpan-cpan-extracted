@@ -21,6 +21,7 @@ do { my $x = {
                                       'Alien::Font::Vera' => '0.013',
                                       'Imager' => '1.019',
                                       'Mojolicious' => '9.31',
+                                      'Time::Piece' => '1.33',
                                       'perl' => '5.020'
                                     }
                     },

@@ -1,20 +1,18 @@
+
+# Consider dependencies only in project.
+set(CMAKE_DEPENDS_IN_PROJECT_ONLY OFF)
+
 # The set of languages for which implicit dependencies are needed:
 set(CMAKE_DEPENDS_LANGUAGES
-  "CXX"
   )
-# The set of files for implicit dependencies of each language:
-set(CMAKE_DEPENDS_CHECK_CXX
-  "/tmp/mkcpandist/dist_21747/libpanda-backtrace/src/panda/backtrace.cc" "/tmp/mkcpandist/dist_21747/libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/src/panda/backtrace.cc.o"
-  "/tmp/mkcpandist/dist_21747/libpanda-backtrace/src/panda/dwarf.cc" "/tmp/mkcpandist/dist_21747/libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/src/panda/dwarf.cc.o"
-  "/tmp/mkcpandist/dist_21747/libpanda-backtrace/src/panda/glibc-dl.cc" "/tmp/mkcpandist/dist_21747/libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/src/panda/glibc-dl.cc.o"
-  "/tmp/mkcpandist/dist_21747/libpanda-backtrace/src/panda/macos-dl.cc" "/tmp/mkcpandist/dist_21747/libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/src/panda/macos-dl.cc.o"
-  "/tmp/mkcpandist/dist_21747/libpanda-backtrace/src/panda/win-dl.cc" "/tmp/mkcpandist/dist_21747/libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/src/panda/win-dl.cc.o"
-  )
-set(CMAKE_CXX_COMPILER_ID "GNU")
 
-# The include file search paths:
-set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "../include"
+# The set of dependency files which are needed:
+set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/src/panda/backtrace.cc" "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/src/panda/backtrace.cc.o" "gcc" "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/src/panda/backtrace.cc.o.d"
+  "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/src/panda/dwarf.cc" "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/src/panda/dwarf.cc.o" "gcc" "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/src/panda/dwarf.cc.o.d"
+  "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/src/panda/glibc-dl.cc" "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/src/panda/glibc-dl.cc.o" "gcc" "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/src/panda/glibc-dl.cc.o.d"
+  "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/src/panda/macos-dl.cc" "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/src/panda/macos-dl.cc.o" "gcc" "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/src/panda/macos-dl.cc.o.d"
+  "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/src/panda/win-dl.cc" "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/src/panda/win-dl.cc.o" "gcc" "/home/s.aleinikov/village/meia/plus/XS-libpanda-backtrace/libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/src/panda/win-dl.cc.o.d"
   )
 
 # Targets to which this target links.

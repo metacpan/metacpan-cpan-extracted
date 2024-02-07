@@ -10,7 +10,7 @@ package Perl::Tidy::IOScalar;
 use strict;
 use warnings;
 use Carp;
-our $VERSION = '20230912';
+our $VERSION = '20240202';
 
 use constant DEVEL_MODE   => 0;
 use constant EMPTY_STRING => q{};
@@ -32,13 +32,13 @@ sub AUTOLOAD {
 ======================================================================
 Error detected in package '$my_package', version $VERSION
 Received unexpected AUTOLOAD call for sub '$AUTOLOAD'
-Called from package: '$pkg'  
+Called from package: '$pkg'
 Called from File '$fname'  at line '$lno'
 This error is probably due to a recent programming change
 ======================================================================
 EOM
     exit 1;
-}
+} ## end sub AUTOLOAD
 
 sub DESTROY {
 
@@ -64,17 +64,9 @@ EOM
 
         # Convert a scalar to an array.
         # This avoids looking for "\n" on each call to getline
-        #
-        # NOTES: The -1 count is needed to avoid loss of trailing blank lines
-        # (which might be important in a DATA section).
         my @array;
         if ( $rscalar && ${$rscalar} ) {
-
-            #@array = map { $_ .= "\n" } split /\n/, ${$rscalar}, -1;
-            @array = map { $_ . "\n" } split /\n/, ${$rscalar}, -1;
-
-            # remove possible extra blank line introduced with split
-            if ( @array && $array[-1] eq "\n" ) { pop @array }
+            @array = split /^/, ${$rscalar};
         }
         my $i_next = 0;
         return bless [ \@array, $mode, $i_next ], $package;
@@ -86,7 +78,7 @@ expecting mode = 'r' or 'w' but got mode ($mode); trace follows:
 ------------------------------------------------------------------------
 EOM
     }
-}
+} ## end sub new
 
 sub getline {
     my $self = shift;
@@ -100,7 +92,7 @@ EOM
     }
     my $i = $self->[2]++;
     return $self->[0]->[$i];
-}
+} ## end sub getline
 
 sub print    ## no critic (Subroutines::ProhibitBuiltinHomonyms)
 {
@@ -115,5 +107,5 @@ EOM
     }
     ${ $self->[0] } .= $msg;
     return;
-}
+} ## end sub print
 1;

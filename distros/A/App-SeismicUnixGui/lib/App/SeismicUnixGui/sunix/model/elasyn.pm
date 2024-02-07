@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::model::elasyn;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 
@@ -113,7 +113,7 @@ of the specified (xg,zg) coordinates.
 
  The program is based on :
 
-	        gbbeam.c, AUTHOR: Andreas Rueger, 08/12/93
+	        gbbeam.c, Author: Andreas Rueger, 08/12/93
 
 	       	sdbeam.c, AUTHOR Dave Hale, CSM, 02/26/91
 

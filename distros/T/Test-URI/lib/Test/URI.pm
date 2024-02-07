@@ -12,7 +12,7 @@ my $Test = Test::Builder->new();
 @EXPORT = qw(uri_scheme_ok uri_host_ok uri_port_ok uri_fragment_ok
 	uri_path_ok);
 
-$VERSION = '1.084';
+$VERSION = '1.085';
 
 =encoding utf8
 
@@ -202,11 +202,11 @@ This source is in GitHub
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2004-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

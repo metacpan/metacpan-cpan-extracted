@@ -15,7 +15,9 @@ examples/create_and_print_input.pl
 examples/create_and_print_option.pl
 examples/create_and_print_select.pl
 examples/create_and_print_textarea.pl
-examples/default_form.pl
+examples/form_items.pl
+examples/form_with_submit.pl
+examples/tags_boolean.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm
@@ -62,6 +64,11 @@ t/Tags-HTML-Element-Input/05-process.t
 t/Tags-HTML-Element-Input/06-process_css.t
 t/Tags-HTML-Element-Option/01-use.t
 t/Tags-HTML-Element-Option/02-version.t
+t/Tags-HTML-Element-Option/03-new.t
+t/Tags-HTML-Element-Option/04-cleanup.t
+t/Tags-HTML-Element-Option/05-init.t
+t/Tags-HTML-Element-Option/06-process.t
+t/Tags-HTML-Element-Option/07-process_css.t
 t/Tags-HTML-Element-Select/01-use.t
 t/Tags-HTML-Element-Select/02-version.t
 t/Tags-HTML-Element-Select/03-new.t
@@ -78,6 +85,10 @@ t/Tags-HTML-Element-Textarea/06-process.t
 t/Tags-HTML-Element-Textarea/07-process_css.t
 t/Tags-HTML-Element-Utils/01-use.t
 t/Tags-HTML-Element-Utils/02-version.t
+t/Tags-HTML-Element-Utils/03-tags_boolean.t
+t/Tags-HTML-Element-Utils/04-tags_data.t
+t/Tags-HTML-Element-Utils/05-tags_label.t
+t/Tags-HTML-Element-Utils/06-tags_value.t
 t/Tags-HTML-Element/01-use.t
 t/Tags-HTML-Element/02-version.t
 xt/Tags-HTML-Element-A/01-pod_coverage.t
@@ -98,7 +109,3 @@ xt/Tags-HTML-Element-Utils/01-pod_coverage.t
 xt/Tags-HTML-Element-Utils/02-pod.t
 xt/Tags-HTML-Element/01-pod_coverage.t
 xt/Tags-HTML-Element/02-pod.t
-xt/Tags-HTML-Form-Select/01-pod_coverage.t
-xt/Tags-HTML-Form-Select/02-pod.t
-xt/Tags-HTML-Form/01-pod_coverage.t
-xt/Tags-HTML-Form/02-pod.t

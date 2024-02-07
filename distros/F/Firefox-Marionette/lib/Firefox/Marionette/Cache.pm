@@ -30,6 +30,9 @@ our @EXPORT_OK = qw(
   CLEAR_PREFLIGHT_CACHE
   CLEAR_CLIENT_AUTH_REMEMBER_SERVICE
   CLEAR_CREDENTIAL_MANAGER_STATE
+  CLEAR_COOKIE_BANNER_EXCEPTION
+  CLEAR_COOKIE_BANNER_EXECUTED_RECORD
+  CLEAR_FINGERPRINTING_PROTECTION_STATE
   CLEAR_ALL
   CLEAR_ALL_CACHES
   CLEAR_DOM_STORAGES
@@ -38,36 +41,37 @@ our @EXPORT_OK = qw(
 
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK, );
 
-our $VERSION = '1.51';
+our $VERSION = '1.52';
 
-sub CLEAR_COOKIES                       { return 1 }
-sub CLEAR_NETWORK_CACHE                 { return 2 }
-sub CLEAR_IMAGE_CACHE                   { return 4 }
-sub CLEAR_DOWNLOADS                     { return 16 }
-sub CLEAR_PASSWORDS                     { return 32 }
-sub CLEAR_MEDIA_DEVICES                 { return 64 }
-sub CLEAR_DOM_QUOTA                     { return 128 }
-sub CLEAR_PREDICTOR_NETWORK_DATA        { return 256 }
-sub CLEAR_DOM_PUSH_NOTIFICATIONS        { return 512 }
-sub CLEAR_HISTORY                       { return 1024 }
-sub CLEAR_SESSION_HISTORY               { return 2048 }
-sub CLEAR_AUTH_TOKENS                   { return 4096 }
-sub CLEAR_AUTH_CACHE                    { return 8192 }
-sub CLEAR_PERMISSIONS                   { return 16_384 }
-sub CLEAR_CONTENT_PREFERENCES           { return 32_768 }
-sub CLEAR_HSTS                          { return 65_536 }
-sub CLEAR_EME                           { return 131_072 }
-sub CLEAR_REPORTS                       { return 262_144 }
-sub CLEAR_STORAGE_ACCESS                { return 524_288 }
-sub CLEAR_CERT_EXCEPTIONS               { return 1_048_576 }
-sub CLEAR_CONTENT_BLOCKING_RECORDS      { return 2_097_152 }
-sub CLEAR_CSS_CACHE                     { return 4_194_304 }
-sub CLEAR_PREFLIGHT_CACHE               { return 8_388_608 }
-sub CLEAR_CLIENT_AUTH_REMEMBER_SERVICE  { return 16_777_216 }
-sub CLEAR_CREDENTIAL_MANAGER_STATE      { return 16_777_216 }
-sub CLEAR_COOKIE_BANNER_EXCEPTION       { return 33_554_432 }
-sub CLEAR_COOKIE_BANNER_EXECUTED_RECORD { return 67_108_864 }
-sub CLEAR_ALL                           { return 0xFFFFFFFF }
+sub CLEAR_COOKIES                         { return 1 }
+sub CLEAR_NETWORK_CACHE                   { return 2 }
+sub CLEAR_IMAGE_CACHE                     { return 4 }
+sub CLEAR_DOWNLOADS                       { return 16 }
+sub CLEAR_PASSWORDS                       { return 32 }
+sub CLEAR_MEDIA_DEVICES                   { return 64 }
+sub CLEAR_DOM_QUOTA                       { return 128 }
+sub CLEAR_PREDICTOR_NETWORK_DATA          { return 256 }
+sub CLEAR_DOM_PUSH_NOTIFICATIONS          { return 512 }
+sub CLEAR_HISTORY                         { return 1024 }
+sub CLEAR_SESSION_HISTORY                 { return 2048 }
+sub CLEAR_AUTH_TOKENS                     { return 4096 }
+sub CLEAR_AUTH_CACHE                      { return 8192 }
+sub CLEAR_PERMISSIONS                     { return 16_384 }
+sub CLEAR_CONTENT_PREFERENCES             { return 32_768 }
+sub CLEAR_HSTS                            { return 65_536 }
+sub CLEAR_EME                             { return 131_072 }
+sub CLEAR_REPORTS                         { return 262_144 }
+sub CLEAR_STORAGE_ACCESS                  { return 524_288 }
+sub CLEAR_CERT_EXCEPTIONS                 { return 1_048_576 }
+sub CLEAR_CONTENT_BLOCKING_RECORDS        { return 2_097_152 }
+sub CLEAR_CSS_CACHE                       { return 4_194_304 }
+sub CLEAR_PREFLIGHT_CACHE                 { return 8_388_608 }
+sub CLEAR_CLIENT_AUTH_REMEMBER_SERVICE    { return 16_777_216 }
+sub CLEAR_CREDENTIAL_MANAGER_STATE        { return 16_777_216 }
+sub CLEAR_COOKIE_BANNER_EXCEPTION         { return 33_554_432 }
+sub CLEAR_COOKIE_BANNER_EXECUTED_RECORD   { return 67_108_864 }
+sub CLEAR_FINGERPRINTING_PROTECTION_STATE { return 134_217_728 }
+sub CLEAR_ALL                             { return 0xFFFFFFFF }
 
 sub CLEAR_ALL_CACHES {
     return CLEAR_NETWORK_CACHE() | CLEAR_IMAGE_CACHE() | CLEAR_CSS_CACHE() |
@@ -85,7 +89,8 @@ sub CLEAR_FORGET_ABOUT_SITE {
       CLEAR_PREDICTOR_NETWORK_DATA() | CLEAR_DOM_PUSH_NOTIFICATIONS() |
       CLEAR_CLIENT_AUTH_REMEMBER_SERVICE() | CLEAR_REPORTS() |
       CLEAR_CERT_EXCEPTIONS() | CLEAR_CREDENTIAL_MANAGER_STATE() |
-      CLEAR_COOKIE_BANNER_EXCEPTION() | CLEAR_COOKIE_BANNER_EXECUTED_RECORD();
+      CLEAR_COOKIE_BANNER_EXCEPTION() | CLEAR_COOKIE_BANNER_EXECUTED_RECORD() |
+      CLEAR_FINGERPRINTING_PROTECTION_STATE();
 }
 
 1;    # Magic true value required at end of module
@@ -96,7 +101,7 @@ Firefox::Marionette::Cache - Constants to describe actions on the cache
 
 =head1 VERSION
 
-Version 1.51
+Version 1.52
 
 =head1 SYNOPSIS
 
@@ -225,6 +230,10 @@ returns the value of CLEAR_COOKIE_BANNER_EXCEPTION, which is 1 << 25 = 33554432
 
 returns the value of CLEAR_COOKIE_BANNER_EXECUTED_RECORD, which is 1 << 26 = 67108864
 
+=head2 CLEAR_FINGERPRINTING_PROTECTION_STATE
+
+returns the value of CLEAR_FINGERPRINTING_PROTECTION_STATE, which is 1 << 26 = 134217728
+
 =head2 CLEAR_ALL
 
 returns the value of CLEAR_ALL, which is 4294967295 (0xFFFFFFFF)
@@ -239,7 +248,7 @@ returns the value of CLEAR_DOM_STORAGES, which is 262784 (L<CLEAR_DOM_QUOTA|/CLE
 
 =head2 CLEAR_FORGET_ABOUT_SITE
 
-returns the value of CLEAR_FORGET_ABOUT_SITE, which is 30920599 (L<CLEAR_HISTORY|/CLEAR_HISTORY> | L<CLEAR_SESSION_HISTORY|/CLEAR_SESSION_HISTORY> | L<CLEAR_ALL_CACHES|/CLEAR_ALL_CACHES> | L<CLEAR_COOKIES|/CLEAR_COOKIES> | L<CLEAR_EME|/CLEAR_EME> | L<CLEAR_DOWNLOADS|/CLEAR_DOWNLOADS> | L<CLEAR_PERMISSIONS|/CLEAR_PERMISSIONS> | L<CLEAR_DOM_STORAGES|/CLEAR_DOM_STORAGES> | L<CLEAR_CONTENT_PREFERENCES|/CLEAR_CONTENT_PREFERENCES> | L<CLEAR_PREDICTOR_NETWORK_DATA|/CLEAR_PREDICTOR_NETWORK_DATA> | L<CLEAR_DOM_PUSH_NOTIFICATIONS|/CLEAR_DOM_PUSH_NOTIFICATIONS> | L<CLEAR_CLIENT_AUTH_REMEMBER_SERVICE|/CLEAR_CLIENT_AUTH_REMEMBER_SERVICE> | L<CLEAR_REPORTS|/CLEAR_REPORTS> | L<CLEAR_CERT_EXCEPTIONS|/CLEAR_CERT_EXCEPTIONS> | L<CLEAR_CREDENTIAL_MANAGER_STATE|/CLEAR_CREDENTIAL_MANAGER_STATE>)
+returns the value of CLEAR_FORGET_ABOUT_SITE, which is 30920599 (L<CLEAR_HISTORY|/CLEAR_HISTORY> | L<CLEAR_SESSION_HISTORY|/CLEAR_SESSION_HISTORY> | L<CLEAR_ALL_CACHES|/CLEAR_ALL_CACHES> | L<CLEAR_COOKIES|/CLEAR_COOKIES> | L<CLEAR_EME|/CLEAR_EME> | L<CLEAR_DOWNLOADS|/CLEAR_DOWNLOADS> | L<CLEAR_PERMISSIONS|/CLEAR_PERMISSIONS> | L<CLEAR_DOM_STORAGES|/CLEAR_DOM_STORAGES> | L<CLEAR_CONTENT_PREFERENCES|/CLEAR_CONTENT_PREFERENCES> | L<CLEAR_PREDICTOR_NETWORK_DATA|/CLEAR_PREDICTOR_NETWORK_DATA> | L<CLEAR_DOM_PUSH_NOTIFICATIONS|/CLEAR_DOM_PUSH_NOTIFICATIONS> | L<CLEAR_CLIENT_AUTH_REMEMBER_SERVICE|/CLEAR_CLIENT_AUTH_REMEMBER_SERVICE> | L<CLEAR_REPORTS|/CLEAR_REPORTS> | L<CLEAR_CERT_EXCEPTIONS|/CLEAR_CERT_EXCEPTIONS> | L<CLEAR_CREDENTIAL_MANAGER_STATE|/CLEAR_CREDENTIAL_MANAGER_STATE> | L<CLEAR_COOKIE_BANNER_EXECUTED_RECORD|/CLEAR_COOKIE_BANNER_EXECUTED_RECORD> | L<CLEAR_FINGERPRINTING_PROTECTION_STATE|/CLEAR_FINGERPRINTING_PROTECTION_STATE>)
 
 =head1 SUBROUTINES/METHODS
 
@@ -271,7 +280,7 @@ David Dick  C<< <ddick@cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2023, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
+Copyright (c) 2024, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic/perlartistic>.

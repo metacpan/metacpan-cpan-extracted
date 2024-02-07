@@ -1,5 +1,10 @@
 Revision history for Dancer2::Plugin::Map::Tube
 
+0.04  2024-02-01
+      - Introduced environment keys: REQUEST_PERIOD, REQUEST_THRESHOLD, MEMCACHE_HOST, MEMCACHE_PORT.
+      - Added checks for memcache server.
+      - Improved call restriction logic.
+
 0.03  2024-01-28
       - Added Map::Tube::Bielefeld, thanks Michal Josef Špaček.
       - Added Map::Tube::Hongkong, thanks FUNG Cheok Yin.

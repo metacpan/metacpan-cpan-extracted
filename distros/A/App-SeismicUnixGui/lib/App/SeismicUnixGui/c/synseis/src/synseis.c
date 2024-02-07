@@ -21,6 +21,7 @@
 #define Z_INCREMENT 0.25 /* default resampling increment in m*/
 #define ZSTART 0.0 /* o/p for first z value in resampling */
 #define Vp_water_mps 1500. /* velocity of sound in salt water at 0 deg C */
+#define rho_water_gcc 1.035  /* density of salt water at 0 deg C */
 
 /* internal functions at the end of this source file */
 double ricker();
@@ -42,11 +43,12 @@ int main (int argc, char **argv)
     /* RC [SIZE], regularized reflection coefficient */
     depth[SIZE], depth_reg [SIZE], /* depth measurements*/
     rho [SIZE], rho_reg [SIZE], /*density in g/cc*/
-    time[SIZE], time_reg,
+    time[SIZE], time_reg,/* first step in converting depth to time*/
     tmin, /*min time value for stout synthetic seismogram*/
     Vp [SIZE],  Vp_reg [SIZE], /*velocity in m/s*/
     Convolve_Amplitude[SIZE], Convolve_time, /*convolved output trace*/
-    top_imp, bottom_imp,water_imp, /*impedances*/
+    top_imp, bottom_imp,water_imp, upper_half_space_imp, /*impedances*/
+    min_time, max_time, expected_num_of_t_samples,time_non_reg[SIZE], 
     water_depth, /*water depth in meters*/
     t_increment, /*xincrement for regularization*/
     xstart, /* first x value at which to start regularizing*/
@@ -74,7 +76,7 @@ int main (int argc, char **argv)
     *Reg_Vp_filnam;
 
   int
-    i,t,error = FALSE,
+    i,j,t,error = FALSE,
     /*num_pts, number of points in array*/
     num_pts_conv, /*number of points in convolved array=num_src+num_refl_coef*/
     num_pts_src, /* counters*/
@@ -457,15 +459,22 @@ if(reg_Vp_out == TRUE) {
     }
     fclose(fpout);
     num_pts_log_reg = num_pts_Vp_reg;
+    
 } /* end of writing out regularized velocity values to a file */
 /*  overall end of REGULARIZING LOG FILE contents (density, velocities)*/
 
+
 /* CALCULATE TWO-WAY TRAVELTIME TO THE TOP OF LAYER */
+/* For use later when converting reflection coefficients that are regularized in depth 
+ into their time equivalency
+ Use velocity in the layer above the point to calculate increment 
+ The output is then regularized at the sample increment in time -s */
+ 
 if(verbose == TRUE) {
     printf("Calculating traveltime to the top of each assumed layer\n");
 }
 
-time[0] = 2. * water_depth /Vp_water_mps;/*in secs*/
+time[0] = 2. * water_depth / Vp_water_mps;/*in secs*/
 tstart  = time[0];
 
 if(verbose == TRUE) printf("\ndepth[0]=%f, time[0]=%f",depth[0],time[0]);
@@ -475,14 +484,24 @@ for(i=1; i< num_pts_Vp_reg; i++) {
 /*	 if(verbose == TRUE) { */
 /*		 printf("\n%d,depth[%d]=%f, time[%d]=%f",i,depth_reg[i],i,time[i]); */
 /*	 } */
-} /*End CALCULATion of TWO-WAY TRAVELTIME TO THE TOP OF each LAYER*/
+} /*End CALCULATION of TWO-WAY TRAVELTIME TO THE TOP OF each LAYER*/
 
-/*  CALCULATE REFLECTION COEFFICIENTS */
+/*min_time                  = time[0];
+max_time                  = time[num_pts_Vp_reg-1];
+expected_num_of_t_samples = (max_time - min_time) /t_increment;*/
+/*printf("min_time=%f, max_time=%f, num-samples=%f\n",min_time,max_time, expected_num_of_t_samples);*/
+
+/*  CALCULATE REFLECTION COEFFICIENTS IN DEPTH */
 if(verbose == TRUE) printf("\n Calculating reflection coefficients in depth!\n");
 
-bottom_imp = Vp_reg[0] * rho_reg[0];
-water_imp = Vp_water_mps; /*TODO water_imp = Vwater(m/s) * rho water(g/cc) */
-Refl_coef_reg_depth[0]   = (bottom_imp - water_imp) / (bottom_imp + water_imp);
+bottom_imp        = Vp_reg[0] * rho_reg[0];
+water_imp         = Vp_water_mps * rho_water_gcc;
+upper_half_space_imp = water_imp;
+
+if (water_depth == 0.0) upper_half_space_imp = 0;  /* case for air */
+
+Refl_coef_reg_depth[0]   = (bottom_imp - upper_half_space_imp) / (bottom_imp + upper_half_space_imp);
+
 for( i=1; i < num_pts_Vp_reg; i++){
 
 	top_imp = Vp_reg[i-1] * rho_reg[i-1];
@@ -511,6 +530,7 @@ for( i=1; i < num_pts_Vp_reg; i++){
  }
 
   /*REGULARIZE REFLECTION COEFFICIENTS in time*/
+  
  if(verbose == TRUE) {
 	 printf("Regularizing reflection coefficients in time\n");
 	 printf("num_pts_log_reg = %d\n", num_pts_log_reg);
@@ -522,34 +542,32 @@ for( i=1; i < num_pts_Vp_reg; i++){
 			printf("%f\t%f\n",depth_reg[i], Refl_coef_reg_depth[i]);
 		} */
  }
+ 
 
 regular(tstart, t_increment, num_pts_log_reg,
 		&num_pts_rc_reg_time, Refl_coef_reg_depth, time, Refl_coef_reg_time);
 
  if(verbose == TRUE) {
-	 printf("L517 time,      Amplitude\n");
-		printf("num_pts_log_reg = %d\n", num_pts_log_reg);
-
-/*		for (i=0;  i< num_pts_log_reg;  i++) {
-			  time_reg =  xstart + t_increment * (float)i;
-			  printf("time_reg=%f,     RC(t)= %f\n", time_reg, Refl_coef_reg_time[i]);
-		} */
+	printf("L530 time,      Amplitude\n");
+	printf("num_pts_log_reg = %d\n", num_pts_log_reg);
+	printf("num_pts_rc_reg_time = %d\n", num_pts_rc_reg_time);
  }
-
+	
  if(reflec_coef_reg_time_out == TRUE) {
 	if(verbose == TRUE) {
 		printf("Putting resampled reflection coefficients into a file\n");
     }
+    
     fpout= fopen(Refl_coef_reg_time_filnam,"w");
 
-    for (i=0;  i< num_pts_log_reg;  i++) {
+    for (i=0;  i< num_pts_rc_reg_time;  i++) {
     	time_reg =  tstart + t_increment * (float)i;
     	fprintf(fpout,"%f\t%f\n", time_reg, Refl_coef_reg_time[i]);
     }
 
     fclose(fpout);
   }
-/* END of REGULARIZE REFLECTION COEFFICIENTS */
+/* END of REGULARIZE REFLECTION COEFFICIENTS IN TIME */
 
 /* CONVOLVE SOURCE AND DATA */
  if(verbose == TRUE) printf(" Convolving data \n");
@@ -672,11 +690,11 @@ double ricker(td, freq, rick_long)
          /* xstart: x min for resampling
     	t_increment: resampling interval
     	num_pts_src: num_pts in input data set
-    	num_pts_reg: in output sampled data set
+    	num_pts_reg: output sampled data set
     	winA: input data amplitudes
     	wint: input data times
     	winA_reg: output sampled data amplitudes
-    	xint: new interpolation
+    	xint: output interpolation times
     		  first xint has to be >= 0
     		  last xint has to less than the last x value of
     		  the series being resampled*/
@@ -689,9 +707,10 @@ double ricker(td, freq, rick_long)
 /*  printf("regular, xint=%f\n",xint); */
   for  (i=0; i < num_pts_src; i++) {
     while(wint[i+1] >= xint) {
+    
     	winA_reg[*num_pts_reg] = (winA[i+1]  -  winA[i])/
     		  (wint[i+1] - wint[i]) * ( xint  -  wint[i]) +  winA[i];
-/*        	printf("regular, A_reg=%f\n",winA_reg[*num_pts_reg]); */
+ /*       	printf("regular, xint=%f A_reg=%f\n",xint, winA_reg[*num_pts_reg]); */
 			*num_pts_reg=*num_pts_reg +1, xint=xint+t_increment;
 		}
   }

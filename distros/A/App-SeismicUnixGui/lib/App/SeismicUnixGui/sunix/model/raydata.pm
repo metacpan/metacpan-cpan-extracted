@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::model::raydata;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 
@@ -65,7 +65,7 @@ Output is written into files <*.data>
 
 
 
-AUTHOR:  Andreas Rueger, Colorado School of Mines, 02/15/94
+Author:  Andreas Rueger, Colorado School of Mines, 02/15/94
 
 
 
@@ -243,7 +243,7 @@ int main (int argc, char **argv)
 
         for(ir = 0; ir < nre;ir +=1 ){
 
-	  /*fprintf(stderr,"ir=%i \t kend=0\n",ir,re[ir].kend);*/
+	  /*fprintf(stderr,"ir=0 \t kend=0\n",ir,re[ir].kend);*/
 
 		if(re[ir].kend == kend || kend == INT_MAX) {
 
@@ -305,7 +305,7 @@ int main (int argc, char **argv)
 
 		}
 
-		/*fprintf(stderr,"pol=%g\n",poldata[ir]);*/
+		/*fprintf(stderr,"pol=0\n",poldata[ir]);*/
 
 	}
 
@@ -319,7 +319,7 @@ int main (int argc, char **argv)
 
         for(ir=0;ir<nri;ir+=1)
 
-	    fprintf(txfp,"%f	%f\n",xdata[ir],tdata[ir]);
+	    fprintf(txfp,"0.000000	0.000000\n",xdata[ir],tdata[ir]);
 
      /* Binary output for x_t
 
@@ -345,7 +345,7 @@ int main (int argc, char **argv)
 
         for(ir=0;ir<nri;ir+=1)
 
-	    fprintf(pxfp,"%f	%f\n",xdata[ir],pxdata[ir]);
+	    fprintf(pxfp,"0.000000	0.000000\n",xdata[ir],pxdata[ir]);
 
      /* Binary output for x_px
 
@@ -371,7 +371,7 @@ int main (int argc, char **argv)
 
         for(ir=0;ir<nri;ir+=1)
 
-	    fprintf(pzfp,"%f	%f\n",xdata[ir],pzdata[ir]);
+	    fprintf(pzfp,"0.000000	0.000000\n",xdata[ir],pzdata[ir]);
 
      /* Binary output for x_pz
 
@@ -397,7 +397,7 @@ int main (int argc, char **argv)
 
         for(ir=0;ir<nri;ir+=1)
 
-	    fprintf(vgxfp,"%f	%f\n",xdata[ir],vgxdata[ir]);
+	    fprintf(vgxfp,"0.000000	0.000000\n",xdata[ir],vgxdata[ir]);
 
      /* Binary output for x_vgx
 
@@ -423,7 +423,7 @@ int main (int argc, char **argv)
 
         for(ir=0;ir<nri;ir+=1)
 
-	    fprintf(vgzfp,"%f	%f\n",xdata[ir],vgzdata[ir]);
+	    fprintf(vgzfp,"0.000000	0.000000\n",xdata[ir],vgzdata[ir]);
 
      /* Binary output for x_vgz
 
@@ -445,7 +445,7 @@ int main (int argc, char **argv)
 
         for(ir=0;ir<nri;ir+=1)
 
-	    fprintf(pxvxfp,"%f	%f\n",pxdata[ir],vgxdata[ir]);
+	    fprintf(pxvxfp,"0.000000	0.000000\n",pxdata[ir],vgxdata[ir]);
 
      /* Binary output for px_vgx
 
@@ -469,7 +469,7 @@ int main (int argc, char **argv)
 
         for(ir=0;ir<nri;ir+=1)
 
-	    fprintf(polfp,"%f	%f\n",xdata[ir],poldata[ir]);
+	    fprintf(polfp,"0.000000	0.000000\n",xdata[ir],poldata[ir]);
 
      /* Binary output for px_vgx
 
@@ -489,7 +489,7 @@ int main (int argc, char **argv)
 
 
 
-     if(!ascci) fprintf(outparfp,"%i\n",nri);
+     if(!ascci) fprintf(outparfp,"0\n",nri);
 
 	return EXIT_FAILURE;
 

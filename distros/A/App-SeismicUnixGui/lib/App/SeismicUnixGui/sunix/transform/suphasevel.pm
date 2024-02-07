@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::transform::suphasevel;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUPHASEVEL - Multi-mode PHASE VELocity dispersion map computed
- AUTHOR:Derek Goff
+AUTHOR: Juan Lorenzo, Derek Goff (Perl module only)
  DATE:   OCT 24 2013
  DESCRIPTION: A package that makes using and understanding suphasevel easier
  Version: 

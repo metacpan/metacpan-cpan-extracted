@@ -24,6 +24,7 @@ t/data/not_ok/external_installed_bad_section.pod
 t/data/not_ok/external_installed_section.pod
 t/data/not_ok/github_error.pod
 t/data/not_ok/internal_error.pod
+t/data/not_ok/link_off_the_map.pod
 t/data/not_ok/man_bad.pod
 t/data/not_ok/redirect.pod
 t/data/not_ok/redirect_no_path.pod
@@ -40,6 +41,7 @@ t/data/pod_ok/internal.pod
 t/data/pod_ok/man.pod
 t/data/pod_ok/no_links.pod
 t/data/pod_ok/url_links.pod
+t/data/script/hello
 t/pod_file_ok.t
 xt/author/basic.t
 xt/author/changes.t

@@ -1,10 +1,10 @@
 {
    "abstract" : "False and true, alternately, ad infinitum.",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -43,16 +43,13 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/briandfoy/tie-toggle/issues"
-      },
       "homepage" : "https://github.com/briandfoy/tie-toggle",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/tie-toggle.git",
+         "url" : "https://github.com/briandfoy/tie-toggle",
          "web" : "https://github.com/briandfoy/tie-toggle"
       }
    },
-   "version" : "1.084",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "1.085",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

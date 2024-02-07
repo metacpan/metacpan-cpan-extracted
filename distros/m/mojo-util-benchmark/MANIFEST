@@ -1,0 +1,11 @@
+Changes
+lib/Mojo/Util/Benchmark.pm
+Makefile.PL
+MANIFEST            This list of files
+README.md
+t/benchmark/*.t
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/git.t

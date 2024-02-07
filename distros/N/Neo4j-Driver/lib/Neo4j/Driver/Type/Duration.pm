@@ -5,7 +5,10 @@ use utf8;
 
 package Neo4j::Driver::Type::Duration;
 # ABSTRACT: Represents a Neo4j temporal duration value
-$Neo4j::Driver::Type::Duration::VERSION = '0.42';
+$Neo4j::Driver::Type::Duration::VERSION = '0.44';
+
+# For documentation, see Neo4j::Driver::Types.
+
 
 use parent 'Neo4j::Types::Duration';
 use parent 'Neo4j::Driver::Type::Temporal';

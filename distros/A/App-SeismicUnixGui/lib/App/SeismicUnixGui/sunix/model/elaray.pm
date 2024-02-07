@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::model::elaray;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 
@@ -133,7 +133,7 @@ Version:
 
   The program is based on :
 
- 	        gbray.c, AUTHOR: Andreas Rueger, 08/12/93
+ 	        gbray.c, Author: Andreas Rueger, 08/12/93
 
  	       	sdray.c, AUTHOR Dave Hale, CSM, 02/26/91
 

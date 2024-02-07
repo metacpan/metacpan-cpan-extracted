@@ -1,6 +1,6 @@
 package Mail::BIMI::VMC::Chain;
 # ABSTRACT: Class to model a VMC Chain
-our $VERSION = '3.20231123'; # VERSION
+our $VERSION = '3.20240205'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -124,7 +124,7 @@ sub vmc($self) {
     next if !$x509_object;
     my $exts = eval{ $x509_object->extensions_by_oid() };
     next if !$exts;
-    if ( $cert->has_valid_usage && exists $exts->{&LOGOTYPE_OID}) {
+    if ( $cert->has_valid_usage && exists $exts->{&LOGOTYPE_OID()}) {
       # Has both extended usage and embedded Indicator
       $self->add_error('VMC_VALIDATION_ERROR','Multiple VMCs found in chain') if $vmc;
       $vmc = $cert;
@@ -169,7 +169,7 @@ sub app_validate($self) {
       if ( $exts ) {
         my $alt_name = exists $exts->{'2.5.29.17'} ? $exts->{'2.5.29.17'}->to_string : '-none-';
         say YELLOW.'  Alt Name         '.WHITE.': '.CYAN.($alt_name//'-none-').RESET;
-        say YELLOW.'  Has LogotypeExtn '.WHITE.': '.CYAN.(exists($exts->{&LOGOTYPE_OID})?GREEN.'Yes':BRIGHT_RED.'No').RESET;
+        say YELLOW.'  Has LogotypeExtn '.WHITE.': '.CYAN.(exists($exts->{&LOGOTYPE_OID()})?GREEN.'Yes':BRIGHT_RED.'No').RESET;
       }
       else {
         say YELLOW.'  Extensions       '.WHITE.': '.BRIGHT_RED.'NOT FOUND'.RESET;
@@ -195,7 +195,7 @@ Mail::BIMI::VMC::Chain - Class to model a VMC Chain
 
 =head1 VERSION
 
-version 3.20231123
+version 3.20240205
 
 =head1 DESCRIPTION
 

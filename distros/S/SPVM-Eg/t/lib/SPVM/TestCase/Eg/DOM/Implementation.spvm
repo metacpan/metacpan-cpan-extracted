@@ -1,0 +1,83 @@
+class TestCase::Eg::DOM::Implementation {
+  use Eg;
+  use Eg::DOM::Implementation;
+  
+  static method create_html_document : int () {
+    
+    {
+      my $document = Eg->document->implementation->create_html_document;
+      
+      my $html_element = $document->first_child;
+      
+      unless ($html_element && $html_element == $document->last_child) {
+        return 0;
+      }
+      
+      unless ($html_element is_type Eg::Node::Element::HTML::Html) {
+        return 0;
+      }
+      
+      my $head_element = $html_element->first_child;
+      
+      my $body_element = $html_element->last_child;
+      
+      unless ($head_element && $head_element == $html_element->first_child) {
+        return 0;
+      }
+      
+      unless ($body_element && $body_element == $html_element->last_child) {
+        return 0;
+      }
+      
+      unless ($head_element->next_sibling == $body_element) {
+        return 0;
+      }
+      
+    }
+    
+    {
+      # tag_name - HTML
+      {
+        my $document = Eg->document->implementation->create_html_document;
+        
+        {
+          my $div = $document->create_element("div");
+          
+          unless ($div->tag_name eq "DIV") {
+            return 0;
+          }
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method create_document : int () {
+    
+    {
+      # tag_name - XML
+      {
+        my $document = Eg->document->implementation->create_document(undef, "root");
+        
+        {
+          my $div = $document->create_element("div");
+          
+          unless ($div->tag_name eq "div") {
+            return 0;
+          }
+        }
+        
+        {
+          my $div = $document->create_element("DIV");
+          
+          unless ($div->tag_name eq "DIV") {
+            return 0;
+          }
+        }
+      }
+    }
+    
+    return 1;
+  }
+}

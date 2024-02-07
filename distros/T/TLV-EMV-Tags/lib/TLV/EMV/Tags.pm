@@ -4,7 +4,7 @@ our @EXPORT_OK = ('EMV_TAGS');
 
 our ( $VERSION );
 BEGIN {
-    $VERSION = '1.00';
+    $VERSION = '1.01';
 }
 
 use constant EMV_TAGS => [
@@ -184,11 +184,11 @@ A constant array that contains all EMV tags.
 
 =head1 AUTHOR
 
-Guangsheng He (何光胜) <heguangsheng@gmail.com>
+Guangsheng He <heguangsheng@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2024 by Guangsheng He (何光胜)
+Copyright (C) 2024 by Guangsheng He
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

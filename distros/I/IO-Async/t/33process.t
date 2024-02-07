@@ -1,12 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use POSIX qw( ENOENT SIGTERM SIGUSR1 );
 use constant ENOENT_MESSAGE => do { local $! = ENOENT; "$!" };
@@ -50,7 +49,7 @@ testing_loop( $loop );
 
    wait_for { defined $exitcode };
 
-   is( $invocant, $process, '$_[0] in on_finish is $process' );
+   ref_is( $invocant, $process, '$_[0] in on_finish is $process' );
    undef $invocant; # refcount
 
    ok( ($exitcode & 0x7f) == 0, 'WIFEXITED($exitcode) after sub { 0 }' );
@@ -119,7 +118,7 @@ testing_loop( $loop );
 
    wait_for { defined $exitcode };
 
-   is( $invocant, $process, '$_[0] in on_exception is $process' );
+   ref_is( $invocant, $process, '$_[0] in on_exception is $process' );
    undef $invocant; # refcount
 
    ok( ($exitcode & 0x7f) == 0,      'WIFEXITED($exitcode) after sub { die }' );

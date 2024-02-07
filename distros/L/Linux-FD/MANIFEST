@@ -18,5 +18,6 @@ lib/Linux/ppport.h
 t/10-events.t
 t/10-signals.t
 t/10-timers.t
+typemap
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t

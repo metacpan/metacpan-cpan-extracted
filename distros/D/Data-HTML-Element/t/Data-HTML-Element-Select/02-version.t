@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Data::HTML::Element::Select::VERSION, 0.09, 'Version.');
+is($Data::HTML::Element::Select::VERSION, 0.1, 'Version.');

@@ -7,8 +7,9 @@ use warnings;
 use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
+use Tags::HTML::Element::Utils qw(tags_boolean tags_data tags_value);
 
-our $VERSION = 0.02;
+our $VERSION = 0.06;
 
 sub _cleanup {
 	my $self = shift;
@@ -44,31 +45,14 @@ sub _process {
 
 	$self->{'tags'}->put(
 		['b', 'option'],
-		defined $self->{'_option'}->css_class ? (
-			['a', 'class', $self->{'_option'}->css_class],
-		) : (),
-		defined $self->{'_option'}->id ? (
-			['a', 'name', $self->{'_option'}->id],
-			['a', 'id', $self->{'_option'}->id],
-		) : (),
-		$self->{'_option'}->disabled ? (
-			['a', 'disabled', 'disabled'],
-		) : (),
-		$self->{'_option'}->selected ? (
-			['a', 'selected', 'selected'],
-		) : (),
-		defined $self->{'_option'}->value ? (
-			['a', 'value', $self->{'_option'}->value],
-		) : (),
+		tags_value($self, $self->{'_option'}, 'css_class', 'class'),
+		tags_value($self, $self->{'_option'}, 'id'),
+		tags_boolean($self, $self->{'_option'}, 'disabled'),
+		tags_boolean($self, $self->{'_option'}, 'selected'),
+		tags_value($self, $self->{'_option'}, 'value'),
 		# TODO Other. https://www.w3schools.com/tags/tag_option.asp
 	);
-	if ($self->{'_option'}->data_type eq 'plain') {
-		$self->{'tags'}->put(
-			['d', $self->{'_option'}->data],
-		);
-	} elsif ($self->{'_option'}->data_type eq 'tags') {
-		$self->{'tags'}->put($self->{'_option'}->data);
-	}
+	tags_data($self, $self->{'_option'});
 	$self->{'tags'}->put(
 		['e', 'option'],
 	);
@@ -112,7 +96,10 @@ Tags::HTML::Element::Option - Tags helper for HTML option element.
  use Tags::HTML::Element::Option;
 
  my $obj = Tags::HTML::Element::Option->new(%params);
- $obj->process($input);
+ $obj->cleanup;
+ $obj->init($option);
+ $obj->prepare;
+ $obj->process;
  $obj->process_css;
 
 =head1 METHODS
@@ -139,23 +126,53 @@ Default value is undef.
 
 =back
 
-=head2 C<process>
+=head2 C<cleanup>
 
- $obj->process($option);
+ $obj->cleanup;
 
-Process Tags structure for C<$option> to output.
+Process cleanup after page run.
+
+In this case cleanup internal representation of button set by L<init>.
+
+Returns undef.
+
+=head2 C<init>
+
+ $obj->init($option);
+
+Process initialization in page run.
 
 Accepted C<$option> is L<Data::HTML::Element::Option>.
 
 Returns undef.
 
+=head2 C<prepare>
+
+ $obj->prepare;
+
+Process initialization before page run.
+
+Do nothing in this object.
+
+Returns undef.
+
+=head2 C<process>
+
+ $obj->process;
+
+Process L<Tags> structure for HTML option element to output.
+
+Do nothing in case without inicialization by L<init>.
+
+Returns undef.
+
 =head2 C<process_css>
 
- $obj->process_css($option);
+ $obj->process_css;
 
-Process CSS::Struct structure for C<$option> to output.
+Process L<CSS::Struct> structure for HTML option element to output.
 
-Accepted C<$option> is L<Data::HTML::Element::Option>.
+Do nothing in case without inicialization by L<init>.
 
 Returns undef.
 
@@ -201,12 +218,15 @@ Returns undef.
  # Data object for option.
  my $option = Data::HTML::Element::Option->new(
          'css_class' => 'form-option',
-         'data' => 'Option',
+         'data' => ['Option'],
  );
 
+ # Initialize.
+ $obj->init($option);
+
  # Process option.
- $obj->process($option);
- $obj->process_css($option);
+ $obj->process;
+ $obj->process_css;
 
  # Print out.
  print "HTML:\n";
@@ -243,12 +263,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022-2023 Michal Josef Špaček
+© 2022-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.06
 
 =cut

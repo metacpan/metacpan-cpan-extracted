@@ -1,3 +1,8 @@
+0.225   2024-01-30  Released-By: PERLANCAR; Urgency: medium
+
+        - Observe PERL_TERM_DETECT_SOFTWARE_ENGINE.
+
+
 0.224   2023-07-09  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.

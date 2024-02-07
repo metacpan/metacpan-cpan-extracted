@@ -23,7 +23,7 @@ target_compile_features(panda-backtrace PUBLIC cxx_std_14)
 find_package(panda-lib REQUIRED)
 find_package(libdwarf REQUIRED)
 
-target_link_libraries(panda-backtrace PUBLIC panda::panda-lib unwind libdwarf::dwarf-static)
+target_link_libraries(panda-backtrace PUBLIC panda-lib libdwarf::dwarf-static)
 
 ########################tests#######################################
 file(GLOB_RECURSE testSource RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "tests/*.cc")
@@ -35,11 +35,11 @@ set_property(SOURCE ${testSource} PROPERTY COMPILE_OPTIONS ${compile_opts})
 add_library(panda-backtrace-tests EXCLUDE_FROM_ALL STATIC ${testSource})
 
 find_package(Catch2)
-target_link_libraries(panda-backtrace-tests PUBLIC panda-backtrace Catch2::Catch2)
+target_link_libraries(panda-backtrace-tests PUBLIC panda-backtrace Catch2::Catch2WithMain)
 
-add_executable(MyTest ${EXCLUDE_TEST} ${testSource} "tests/main.cc")
+add_executable(MyTest ${EXCLUDE_TEST} ${testSource})
 target_link_libraries(MyTest panda-backtrace-tests panda-backtrace)
-add_test(test-all MyTest)
+add_test(${PROJECT_NAME} MyTest)
 
 #install
 install(DIRECTORY include/ DESTINATION include FILES_MATCHING PATTERN "*.h")

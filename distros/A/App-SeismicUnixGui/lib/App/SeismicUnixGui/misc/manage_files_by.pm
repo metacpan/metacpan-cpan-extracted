@@ -27,29 +27,29 @@ sub copy_file {
 
 }
 
-=head2 sub count_lines
-
- this function counts the numbers of lines in a text file
- 
-=cut
-
-sub count_lines {
-	my ($self, $ref_origin) = @_;
-
-# print ("\nmanage_files_by,count_lines The input file is called $$ref_origin\n");
-
-	# open the file of interest
-	open( my $IN, '<', $$ref_origin ) or die "Can't open $$ref_origin, $!\n";
-	my $cnt;
-	$cnt++ while <$IN>;
-	close($IN);
-
-	my $num_lines = $cnt;
-
-	# print ("line number = $num_lines\n");
-
-	return ($num_lines);
-}
+#=head2 sub count_lines
+#
+# this function counts the numbers of lines in a text file
+# 
+#=cut
+#
+#sub count_lines {
+#	my ($self, $ref_origin) = @_;
+#
+## print ("\nmanage_files_by,count_lines The input file is called $$ref_origin\n");
+#
+#	# open the file of interest
+#	open( my $IN, '<', $$ref_origin ) or die "Can't open $$ref_origin, $!\n";
+#	my $cnt;
+#	$cnt++ while <$IN>;
+#	close($IN);
+#
+#	my $num_lines = $cnt;
+#
+#	# print ("line number = $num_lines\n");
+#
+#	return ($num_lines);
+#}
 
 sub delete_file {
 

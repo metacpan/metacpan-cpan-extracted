@@ -50,6 +50,7 @@ lib/XS/STL/ErrorCategory.pod
 lib/XS/STL/ErrorCode.pm
 lib/XS/STL/ErrorCode.pod
 Makefile.PL
+Makefile.test
 MANIFEST			This list of files
 misc/leak1.plx
 misc/mytest.plx

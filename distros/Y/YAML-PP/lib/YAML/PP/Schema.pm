@@ -4,7 +4,7 @@ package YAML::PP::Schema;
 use B;
 use Module::Load qw//;
 
-our $VERSION = 'v0.37.0'; # VERSION
+our $VERSION = 'v0.38.0'; # VERSION
 
 use YAML::PP::Common qw/ YAML_PLAIN_SCALAR_STYLE /;
 
@@ -40,19 +40,16 @@ sub new {
             $false ||= \&_bool_booleanpm_false;
             push @bool_class, 'boolean';
         }
-        elsif ($b eq 'perl') {
-            $true ||= \&_bool_perl_true;
-            $false ||= \&_bool_perl_false;
-        }
-        elsif ($b eq 'perl_experimental') {
-            $true ||= \&_bool_perl_true;
-            $false ||= \&_bool_perl_false;
-            push @bool_class, 'perl_experimental';
+        elsif ($b eq 'perl' or $b eq 'perl_experimental') {
+            push @bool_class, 'perl';
         }
         else {
             die "Invalid value for 'boolean': '$b'. Allowed: ('perl', 'boolean', 'JSON::PP')";
         }
     }
+    # Ensure booleans are resolved
+    $true ||= \&_bool_perl_true;
+    $false ||= \&_bool_perl_false;
 
     my %representers = (
         'undef' => undef,
@@ -67,6 +64,7 @@ sub new {
         coderef => undef,
         glob => undef,
         tied_equals => {},
+        bool => undef,
     );
     my $self = bless {
         yaml_version => $yaml_version,
@@ -238,13 +236,13 @@ sub add_representer {
         push @$rep, [ $args{class_matches}, $args{code} ];
         return;
     }
+    if (my $bool = $args{bool} and $] >= 5.036000) {
+        $representers->{bool} = {
+            code => $args{code},
+        };
+        return;
+    }
     if (my $class_equals = $args{class_equals}) {
-        if ($] >= 5.036000 and $class_equals eq 'perl_experimental') {
-            $representers->{bool} = {
-                code => $args{code},
-            };
-            return;
-        }
         my $rep = $representers->{class_equals};
         $rep->{ $class_equals } = {
             code => $args{code},

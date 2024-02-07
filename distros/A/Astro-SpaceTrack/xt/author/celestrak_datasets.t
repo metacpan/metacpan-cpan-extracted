@@ -22,9 +22,9 @@ $rslt->is_success()
 
 my %got = parse_string( $rslt->content(), source => 'celestrak' );
 
-my $st = Astro::SpaceTrack->new (direct => 1);
+my $st = Astro::SpaceTrack->new();
 
-(undef, my $names) = $st->names ('celestrak');
+(undef, my $names) = $st->names( 'celestrak' );
 my %expect;
 foreach (@$names) {
     $expect{$_->[1]} = {
@@ -160,6 +160,14 @@ sub parse_string {
     foreach my $anchor ( $tree->look_down( _tag => 'a' ) ) {
 	my $href = $anchor->attr( 'href' )
 	    or next;
+
+	# Exclude pre-launch data sets, which are ephemeral.
+	my $parent = $anchor->parent();
+	my @sibs = $parent->content_list();
+	not ref $sibs[0]
+	    and $sibs[0] =~ m/ \b pre-launch \b /smxi
+	    and next;
+
 	if ( $href =~ m/ \b (?: sup- )? gp\.php \b /smx ) {
 	    my $uri = URI->new( $href );
 	    # NOTE convenient in this case but technically incorrect as

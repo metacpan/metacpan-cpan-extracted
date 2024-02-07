@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use Locale::Places;
 
-die 'Arg count' unless(scalar(@ARGV) == 2);
+die "$0: Usage place language-code" unless(scalar(@ARGV) == 2);
 
 my $place = ucfirst(lc($ARGV[0]));
 my $language = lc($ARGV[1]);

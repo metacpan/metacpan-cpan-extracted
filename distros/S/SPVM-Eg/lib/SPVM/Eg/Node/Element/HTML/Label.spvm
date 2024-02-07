@@ -3,14 +3,14 @@
 
 class Eg::Node::Element::HTML::Label extends Eg::Node::Element::HTML {
   
-  allow Eg::Node::Document::HTML;
+  allow Eg::Node::Document;
   
   # Class Methods
-  private static method new : Eg::Node::Element::HTML::Label () {
+  private static method new : Eg::Node::Element::HTML::Label ($options : object[] = undef) {
     
     my $self = new Eg::Node::Element::HTML::Label;
     
-    $self->SUPER::init;
+    $self->SUPER::init($options);
     
     return $self;
   }

@@ -1285,8 +1285,6 @@ clib/zoneinfo/WET
 clib/zoneinfo/zone.tab
 clib/zoneinfo/zone1970.tab
 clib/zoneinfo/Zulu
-Date-5.2.12/META.json
-Date-5.2.12/META.yml
 INSTALL.SKIP
 lib/Date.pm
 lib/Date.pod

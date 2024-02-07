@@ -1,0 +1,7 @@
+bin/zen
+Build.PL
+lib/App/zen.pm
+MANIFEST			This list of files
+Makefile.PL
+META.yml
+META.json

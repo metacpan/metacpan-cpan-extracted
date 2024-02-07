@@ -1,4 +1,7 @@
+Changes
 cpanfile
+data/Changes.raw
+data/Changes.raw.cond
 data/cpanfile
 data/dist_setup.conf
 data/dot_devcontainer/.cond
@@ -6,20 +9,27 @@ data/dot_devcontainer/devcontainer.json.raw
 data/dot_devcontainer/Dockerfile
 data/dot_devcontainer/update_content.sh
 data/dot_github/.cond
-data/dot_github/ci.yml
+data/dot_github/workflows/ci.yml
 data/dot_gitignore
+data/dot_perlcriticrc
+data/dot_perltidyrc
 data/LICENSE.raw
 data/Makefile.PL
 data/MANIFEST.SKIP
-data/MANIFEST.skip
+data/t/000-load.t
+data/t/001-cpanfile.t
+data/t/001-perlcritic.t
+data/t/001-podsyntax.t
+data/t/001-spelling.t
 data/tt_footer
 data/tt_header
-Dist-Setup-0.01.tar.gz
 lib/Dist/Setup.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-MANIFEST.SKIP
 script/perl_dist_setup
+t/000-load.t
+t/001-cpanfile.t
+t/001-podsyntax.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

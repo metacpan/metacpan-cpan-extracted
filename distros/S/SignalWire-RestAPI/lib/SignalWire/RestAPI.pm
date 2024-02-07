@@ -4,7 +4,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.5';
+our $VERSION = '1.6';
 our $Debug   = 0;
 
 use LWP::UserAgent ();
@@ -90,7 +90,7 @@ sub _do_request {
     my $content = '';
     
     if( keys %args ) {
-	if ($content_type eq 'application/json' && $method eq 'POST') {
+	if ($content_type eq 'application/json' && ( $method eq 'POST' || $method eq 'PUT') ) {
 	    $content = $self->_build_json_content( %args );
 	} else {
 	    $content = $self->_build_content( %args );
@@ -331,7 +331,7 @@ document like this, telling us that everything went great:
       <DateUpdated>Wed, 10 Aug 2011 04:38:16 +0000</DateUpdated>
       <ParentCallSid/>
       <AccountSid>ACxxxxxxxx</AccountSid>
-      <To>+15558675309</To>
+      <To>+1.658675309</To>
       <ToFormatted>(555) 867-5309</ToFormatted>
       <From>+14158675309</From>
       <FromFormatted>(415) 867-5309</FromFormatted>
@@ -509,7 +509,7 @@ which now prints:
       <DateUpdated>Wed, 10 Aug 2011 04:38:16 +0000</DateUpdated>
       <ParentCallSid/>
       <AccountSid>ACxxxxxxxx</AccountSid>
-      <To>+15558675309</To>
+      <To>+1.658675309</To>
       <ToFormatted>(555) 867-5309</ToFormatted>
       <From>+13126540987</From>
       <FromFormatted>(312) 654-0987</FromFormatted>
@@ -847,7 +847,7 @@ Same as B<GET>.
 
 Example:
 
-  $response = $signalwire->DELETE('Recordings/RE41331862605f3d662488fdafda2e175f');
+  $response = $signalwire->DELETE('Recordings/RE41331862605f3d662488fdafda2e1.6f');
 
 =head1 API CHANGES
 

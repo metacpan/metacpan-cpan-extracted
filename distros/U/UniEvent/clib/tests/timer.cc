@@ -117,8 +117,8 @@ TEST("pause/resume") {
     SECTION("resume") {
         test.set_expected(1);
         t->event.add([](auto){ FAIL(); });
-        t->start(10);
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        t->start(40);
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
         test.run_nowait();
         SECTION("normal") {
             t->pause();
@@ -127,13 +127,13 @@ TEST("pause/resume") {
             t->pause();
             t->pause();
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(6));
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));
         test.run_nowait();
         t->resume();
-        CHECK(t->due_in() <= 5);
+        CHECK(t->due_in() <= 20);
         t->event.remove_all();
         t->event.add([&](auto){ test.happens(); });
-        std::this_thread::sleep_for(std::chrono::milliseconds(6));
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));
         test.run_nowait();
     }
     SECTION("resume non-paused timer") {

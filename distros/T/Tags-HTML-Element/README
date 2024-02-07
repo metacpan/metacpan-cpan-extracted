@@ -1,5 +1,5 @@
 NAME
-    Data::HTML::Element - Data objects for HTML elements.
+    Data::HTML::Element - Tags helpers for HTML elements.
 
 SEE ALSO
     Tags::HTML::Element::A
@@ -37,5 +37,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.06
 

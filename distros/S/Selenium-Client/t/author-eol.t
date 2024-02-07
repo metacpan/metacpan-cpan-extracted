@@ -17,6 +17,10 @@ use Test::EOL;
 my @files = (
     'bin/build_selenium_spec.pl',
     'lib/Selenium/Client.pm',
+    'lib/Selenium/Client/Commands.pm',
+    'lib/Selenium/Client/Driver.pm',
+    'lib/Selenium/Client/WDKeys.pm',
+    'lib/Selenium/Client/WebElement.pm',
     'lib/Selenium/Driver/Auto.pm',
     'lib/Selenium/Driver/Chrome.pm',
     'lib/Selenium/Driver/Edge.pm',

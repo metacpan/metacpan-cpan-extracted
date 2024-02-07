@@ -222,7 +222,7 @@ sub loadRPs {
             $self->logger->warn("RP $rp has no Client ID");
         }
     }
-    return 1
+    return 1;
 }
 
 # RUNNING METHODS
@@ -1153,12 +1153,12 @@ sub run {
                             'deleteSession'
                         ]
                     );
+                    $req->data->{nofail} = 1;
                     $err = $req->error( $self->p->process($req) );
                     if ( $err and $err != PE_LOGOUT_OK ) {
                         if ( $err > 0 ) {
                             $self->logger->error(
                                 "Logout process returns error code $err");
-                            return PE_ERROR;
                         }
                         return $err;
                     }
@@ -1645,17 +1645,15 @@ sub _handleAuthorizationCodeGrant {
     $codeSession->remove();
 
     # Check PKCE
-    if ( $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsRequirePKCE} ) {
-        unless (
-            $self->validatePKCEChallenge(
-                $req->param('code_verifier'),
-                $codeSession->data->{'code_challenge'},
-                $codeSession->data->{'code_challenge_method'}
-            )
-          )
-        {
-            return $self->sendOIDCError( $req, 'invalid_grant', 400 );
-        }
+    unless (
+        $self->validatePKCEChallenge(
+            $req->param('code_verifier'),
+            $codeSession->data->{'code_challenge'},
+            $codeSession->data->{'code_challenge_method'}
+        )
+    )
+    {
+        return $self->sendOIDCError( $req, 'invalid_grant', 400 );
     }
 
     # Check we have the same client_id value
@@ -2190,9 +2188,22 @@ sub registration {
     my $registration_response = {};
 
     # Check redirect_uris
-    unless ( $client_metadata->{redirect_uris} ) {
-        $self->logger->error("Field redirect_uris is mandatory");
+    my $redirect_uris = $client_metadata->{redirect_uris};
+    unless ( $redirect_uris and ref($redirect_uris) eq 'ARRAY' ) {
+        $self->logger->error("Field redirect_uris (array) is mandatory");
         return $self->p->sendError( $req, 'invalid_client_metadata', 400 );
+    }
+    else {
+        foreach (@$redirect_uris) {
+            if ( /^\s*((?:java|vb)script|data):/i
+                or $self->p->checkXSSAttack( 'redirect_uri', $_ ) )
+            {
+                $self->userLogger->error(
+                    "Registration tried with a forbidden redirect_uri: $_");
+                return $self->p->sendError( $req, 'invalid_client_metadata',
+                    400 );
+            }
+        }
     }
 
     # RP identifier
@@ -2212,7 +2223,6 @@ sub registration {
       || ( $self->conf->{oidcServiceKeyTypeSig} eq 'EC' ? 'ES256' : 'RS256' );
     my $userinfo_signed_response_alg =
       $client_metadata->{userinfo_signed_response_alg};
-    my $redirect_uris          = $client_metadata->{redirect_uris};
     my $request_uris           = $client_metadata->{request_uris};
     my $backchannel_logout_uri = $client_metadata->{backchannel_logout_uri};
     my $backchannel_logout_session_required =

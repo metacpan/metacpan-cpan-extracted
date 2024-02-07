@@ -19,6 +19,8 @@ WriteMakefile(
 	'Test::Most' => 0,
 	'Test::Script' => 1.12,
 	'Test::DatabaseRow' => 0,
+	'Test::Differences' => 0,
+	'Test::NoWarnings' => 0,
 	'autodie' => 0,
 	'IPC::System::Simple' => 0,
     },
@@ -31,15 +33,21 @@ WriteMakefile(
     },
     dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean		=> { FILES => 'DBD::XMLSimple-*' },
-    META_MERGE		=> {
-    	'meta-spec' => { version => 2 },
-    	resources => {
-    		repository => {
-			type => 'git',
-			url => 'git://github.com/nigelhorne/DBD-XMLSimple.git',
-			web => 'https://github.com/nigelhorne/DBD-XMLSimple',
-    		},
+	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
+		'meta-spec' => { version => 2 },
+		resources => {
+			repository => {
+				type => 'git',
+				url => 'git://github.com/nigelhorne/DBD-XMLSimple.git',
+				web => 'https://github.com/nigelhorne/DBD-XMLSimple',
+				repository => 'https://github.com/nigelhorne/DBD-XMLSimple',
+			}, bugtracker => {
+				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=DBD-XMLSimple',
+				web => 'https://github.com/nigelhorne/DBD-XMLSimple/issues',
+				url => 'https://github.com/nigelhorne/DBD-XMLSimple/issues',
+				mailto => 'bug-DBD-XMLSimple@rt.cpan.org'
+			}
+		},
 	},
-    },
     MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
 );

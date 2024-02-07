@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use IO::Poll;
 
@@ -22,7 +22,7 @@ $S2->blocking( 0 );
 
 # Empty
 
-is_deeply( [ $poll->handles ], [], '$poll->handles empty initially' );
+is( [ $poll->handles ], [], '$poll->handles empty initially' );
 
 # watch_io
 
@@ -32,7 +32,7 @@ $loop->watch_io(
    on_read_ready  => sub { $readready = 1 },
 );
 
-is_deeply( [ $poll->handles ], [ $S1 ], '$poll->handles after watch_io read_ready' );
+is( [ $poll->handles ], [ $S1 ], '$poll->handles after watch_io read_ready' );
 
 $S2->syswrite( "data\n" );
 
@@ -54,7 +54,7 @@ $loop->unwatch_io(
    on_read_ready => 1,
 );
 
-is_deeply( [ $poll->handles ], [], '$poll->handles empty after unwatch_io read_ready' );
+is( [ $poll->handles ], [], '$poll->handles empty after unwatch_io read_ready' );
 
 my $writeready = 0;
 $loop->watch_io(
@@ -62,7 +62,7 @@ $loop->watch_io(
    on_write_ready => sub { $writeready = 1 },
 );
 
-is_deeply( [ $poll->handles ], [ $S1 ], '$poll->handles after watch_io write_ready' );
+is( [ $poll->handles ], [ $S1 ], '$poll->handles after watch_io write_ready' );
 
 $poll->poll( 0.1 );
 
@@ -75,7 +75,7 @@ $loop->unwatch_io(
    on_write_ready => 1,
 );
 
-is_deeply( [ $poll->handles ], [], '$poll->handles empty after unwatch_io write_ready' );
+is( [ $poll->handles ], [], '$poll->handles empty after unwatch_io write_ready' );
 
 # Removal is clean (tests for workaround to bug in IO::Poll version 0.05)
 

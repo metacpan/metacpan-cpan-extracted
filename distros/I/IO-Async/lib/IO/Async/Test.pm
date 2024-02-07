@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Test;
+package IO::Async::Test 0.803;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.802';
 
 use Exporter 'import';
 our @EXPORT = qw(
@@ -24,7 +22,8 @@ C<IO::Async::Test> - utility functions for use in test scripts
 
 =head1 SYNOPSIS
 
-   use Test::More tests => 1;
+   use Test2::V0;
+   use Future::AsyncAwait;
    use IO::Async::Test;
 
    use IO::Async::Loop;
@@ -54,7 +53,9 @@ C<IO::Async::Test> - utility functions for use in test scripts
 
    is( substr( $buffer, 0, 10, "" ), "0123456789", 'Buffer was correct' );
 
-   my $result = wait_for_future( $stream->read_until( "\n" ) )->get;
+   my $result = await wait_for_future( $stream->read_until( "\n" ) );
+
+   done_testing;
 
 =head1 DESCRIPTION
 
@@ -88,7 +89,7 @@ END { undef $loop }
 
 =head2 testing_loop
 
-   testing_loop( $loop )
+   testing_loop( $loop );
 
 Set the L<IO::Async::Loop> object which the C<wait_for> function will loop
 on.
@@ -102,7 +103,7 @@ sub testing_loop
 
 =head2 wait_for
 
-   wait_for { COND } OPTS
+   wait_for { COND } OPTS;
 
 Repeatedly call the C<loop_once> method on the underlying loop (given to the
 C<testing_loop> function), until the given condition function callback
@@ -150,7 +151,7 @@ sub wait_for(&@)
 
 =head2 wait_for_stream
 
-   wait_for_stream { COND } $handle, $buffer
+   wait_for_stream { COND } $handle, $buffer;
 
 As C<wait_for>, but will also watch the given IO handle for readability, and
 whenever it is readable will read bytes in from it into the given buffer. The
@@ -201,7 +202,7 @@ sub wait_for_stream(&$$)
 
 =head2 wait_for_future
 
-   $future = wait_for_future $future
+   $future = wait_for_future $future;
 
 I<Since version 0.68.>
 

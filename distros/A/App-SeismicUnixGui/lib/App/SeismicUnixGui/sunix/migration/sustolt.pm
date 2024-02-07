@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::migration::sustolt;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUSTOLT - Stolt migration for stacked data or common-offset gathers	
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 

@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-01'; # DATE
+our $DATE = '2024-02-01'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240101.0'; # VERSION
+our $VERSION = '20240201.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
@@ -75,18 +75,18 @@ Acme::CPANAuthors::CPAN::Streaks::WeeklyDistributions::AllTime - Authors with al
 
 =head1 VERSION
 
-This document describes version 20240101.0 of Acme::CPANAuthors::CPAN::Streaks::WeeklyDistributions::AllTime (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-01-01.
+This document describes version 20240201.0 of Acme::CPANAuthors::CPAN::Streaks::WeeklyDistributions::AllTime (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-01.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-01-01, produced by L<cpan-streaks>, only streaks with length of at least 6 are included):
+Current standings (as of 2024-02-01, produced by L<cpan-streaks>, only streaks with length of at least 6 are included):
 
   +-----------+-----+------------+------------+---------+
   | author    | len | start_date | end_date   | status  |
   +-----------+-----+------------+------------+---------+
-  | PERLANCAR | 489 | 2014-08-24 |            | ongoing |
+  | PERLANCAR | 493 | 2014-08-24 |            | ongoing |
   | SKIM      |  29 | 2014-09-14 | 2015-03-29 | broken  |
   | KENTNL    |  26 | 2014-05-18 | 2014-11-09 | broken  |
   | SHARYANTO |  25 | 2014-03-02 | 2014-08-17 | broken  |

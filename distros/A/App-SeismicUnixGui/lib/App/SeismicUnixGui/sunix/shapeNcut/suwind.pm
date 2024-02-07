@@ -5,32 +5,12 @@ package App::SeismicUnixGui::sunix::shapeNcut::suwind;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUWIND - window traces by key word					
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:  Nov 1 2012  
  DESCRIPTION: suwind a lists of header words
  or an single value
  
  Version:  0.0.3
-
-=head2 USE
-
-=head3 NOTES
-
-Example:
-If skip is used, s is ignored e.g. s=2 skip=1 key=tracl j=2
-
-Example:
-
-accept=4,9,11 max=0    (max=0 is needed)
-
-Example: where in data, tracl=1,2,3, etc.
-
-j=3 key=tracl,s=0, tracl's are 3, 6, 9 etc.,
-j=2 key=tracl s=0, tracl's are 2, 4, 6 etc.
-j=2 key=tracl s=1, tracl's are 1, 3, 5,7
-j=2 key=tracl s=2, tracl's are 2, 4, 6,8 etc.,
-
-=head4 Examples
 
 =head3 SEISMIC UNIX NOTES
 
@@ -126,11 +106,35 @@ j=2 key=tracl s=2, tracl's are 2, 4, 6,8 etc.,
 
  Trace header fields accessed: ns, dt, delrt, keyword
  Trace header fields modified: ns, delrt, ntr
+ 
+ =head2 USE
+
+=head3 NOTES
+
+Example:
+If skip is used, s is ignored e.g. s=2 skip=1 key=tracl j=2
+
+Example:
+
+accept=4,9,11 max=0    (max=0 is needed)
+
+Example: where in data, tracl=1,2,3, etc.
+
+j=3 key=tracl,s=0, tracl's are 3, 6, 9 etc.,
+j=2 key=tracl s=0, tracl's are 2, 4, 6 etc.
+j=2 key=tracl s=1, tracl's are 1, 3, 5,7
+j=2 key=tracl s=2, tracl's are 2, 4, 6,8 etc.,
+
+New list option:
+
+Include a file name conatining a single-column list of numbers which
+represent trace header values. Make sure to set the header as well.
+
 
 =head2 CHANGES and their DATES
 
 V 0.0.3 May 2023
-Include a file name conatining a singel-column list of numbers which
+Include a file name conatining a single-column list of numbers which
 represent trace header values. Make sure to set the header as well.
 
 =cut
@@ -323,7 +327,7 @@ sub accept {
 #
 #}
 
-=pod sub accept_only_list 
+=pod sub accept_only_list_name
 
  sub accept_only_list: when selecting multiple traces
      all at once.
@@ -342,7 +346,6 @@ sub accept_only_list_name {
     	
     	my ($list_ref, $num_rows) = $manage_files_by2->read_1col($list_name);	
     	my @list = @$list_ref;
-
 
         my $start       = 0;
 

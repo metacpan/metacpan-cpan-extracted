@@ -3,14 +3,14 @@
 
 class Eg::Node::Element::HTML::Span extends Eg::Node::Element::HTML {
   
-  allow Eg::Node::Document::HTML;
+  allow Eg::Node::Document;
   
   # Class Methods
-  private static method new : Eg::Node::Element::HTML::Span () {
+  private static method new : Eg::Node::Element::HTML::Span ($options : object[] = undef) {
     
     my $self = new Eg::Node::Element::HTML::Span;
     
-    $self->SUPER::init;
+    $self->SUPER::init($options);
     
     return $self;
   }

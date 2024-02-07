@@ -19,7 +19,7 @@ BEGIN {
 
 use Cwd;
 
-$VERSION = '1.008';
+$VERSION = '1.009';
 
 =encoding utf8
 
@@ -127,11 +127,11 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2010-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2010-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

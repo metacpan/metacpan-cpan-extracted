@@ -3,6 +3,6 @@ use warnings;
 use v5.20;
 use YAML::Tidy::Run;
 
-our $VERSION = 'v0.9.0'; # VERSION
+our $VERSION = 'v0.10.0'; # VERSION
 
 YAML::Tidy::Run->new->run;

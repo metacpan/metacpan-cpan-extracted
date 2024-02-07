@@ -144,14 +144,6 @@ my (
 	$add2flow_button_green, $add2flow_button_blue
 );
 
-#my ($check_code_button);
-#my ($file_menubutton);
-#my ( $flow_item_down_arrow_button, $flow_item_up_arrow_button );
-#my $wipe_plots_button;
-#my $Data_menubutton;
-#my $Flow_menubutton;
-#my $SaveAs_menubutton;
-
 my $var                           = $get->var();
 my $alias_superflow_names_h       = $get->alias_superflow_names_h();
 my $alias_help_menubutton_label_h = $get->alias_help_menubutton_label_h();
@@ -197,19 +189,20 @@ my $L_SU_gui = {
 	Only superflow bindings use this private (' _') subroutine.
 	Superflows that are opening Data files from GUI are directed here
 	
-	FileDialog_button is mainly used for user-built flows but 
-	also directs superflows
+	FileDialog_button is mainly used for user-built flows 
+	and directs superflows
 	to _FileDialog_button
 	
 	For safety, place set_hash_ref first
 	$$dialog_type_sref can be Data, Save or SaveAs
+	
+	print(" 43 L_SU,_FileDialog_button, dialog type: $L_SU_href->{_dialog_type}\n");
+   print(" L_SU,_FileDialog_button, values_aref: @{$L_SU_href->{_values_aref}}\n");
 
 =cut 
 
 sub _FileDialog_button {
 	my ( $self, $dialog_type_sref ) = @_;
-
-	#	print("42 L_SU,_FileDialog_button= $self, $$dialog_type_sref\n");
 
 	if ( length $dialog_type_sref ) {
 
@@ -217,9 +210,6 @@ sub _FileDialog_button {
 		$file_dialog->set_hash_ref($L_SU_href);
 		$file_dialog->FileDialog_director();
 		$L_SU_href = $file_dialog->get_hash_ref();
-
-# print(" 43 L_SU,_FileDialog_button, dialog type: $L_SU_href->{_dialog_type}\n");
-# print(" L_SU,_FileDialog_button, values_aref: @{$L_SU_href->{_values_aref}}\n");
 
 	}
 	else {

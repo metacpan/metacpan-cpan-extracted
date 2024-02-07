@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent qw(Firefox::Marionette::LocalObject);
 
-our $VERSION = '1.51';
+our $VERSION = '1.52';
 
 sub IDENTIFIER { return 'window-fcc6-11e5-b4f8-330a88ab9d7f' }
 
@@ -17,7 +17,7 @@ Firefox::Marionette::WebWindow - Represents a Firefox window retrieved using the
 
 =head1 VERSION
 
-Version 1.51
+Version 1.52
 
 =head1 SYNOPSIS
 
@@ -76,7 +76,7 @@ David Dick  C<< <ddick@cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2023, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
+Copyright (c) 2024, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic/perlartistic>.

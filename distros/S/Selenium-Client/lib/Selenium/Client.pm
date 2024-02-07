@@ -1,5 +1,5 @@
 package Selenium::Client;
-$Selenium::Client::VERSION = '1.06';
+$Selenium::Client::VERSION = '2.00';
 # ABSTRACT: Module for communicating with WC3 standard selenium servers
 
 use strict;
@@ -13,49 +13,52 @@ use feature qw/signatures/;
 
 use JSON::MaybeXS();
 use HTTP::Tiny();
-use Carp qw{confess cluck};
+use Carp       qw{confess cluck};
 use File::Path qw{make_path};
 use File::HomeDir();
 use File::Slurper();
 use File::Spec();
 use Sub::Install();
 use Net::EmptyPort();
-use Capture::Tiny qw{capture_merged};
+use Capture::Tiny      qw{capture_merged};
 use Unicode::Normalize qw{NFC};
 
 use Selenium::Specification;
 
 
-sub new($class,%options) {
-    $options{version}    //= 'stable';
-    $options{port}       //= 4444;
+sub new ( $class, %options ) {
+    $options{version} //= 'stable';
+    $options{port}    //= 4444;
 
     #XXX geckodriver doesn't bind to localhost lol
-    $options{host}       //= '127.0.0.1';
+    $options{host} //= '127.0.0.1';
     $options{host} = '127.0.0.1' if $options{host} eq 'localhost';
 
-    $options{nofetch}    //= 1;
-    $options{scheme}     //= 'http';
-    $options{prefix}     //= '';
-    $options{ua}         //= HTTP::Tiny->new();
-    $options{client_dir} //= File::HomeDir::my_home()."/.selenium";
-    $options{driver}     //= "SeleniumHQ::Jar";
+    $options{nofetch}        //= 1;
+    $options{scheme}         //= 'http';
+    $options{prefix}         //= '';
+    $options{ua}             //= HTTP::Tiny->new();
+    $options{client_dir}     //= File::HomeDir::my_home() . "/.selenium";
+    $options{driver}         //= "SeleniumHQ::Jar";
     $options{post_callbacks} //= [];
-    $options{auto_close} //= 1;
-    $options{browser}    //= '';
-    $options{headless}   //= 1;
-    $options{normalize}  //= 1;
-    $options{fatal}      //= 1;
+    $options{auto_close}     //= 1;
+    $options{browser}        //= '';
+    $options{headless}       //= 1;
+    $options{normalize}      //= 1;
+    $options{fatal}          //= 1;
+
     # Use the hardcoded JSON version of the stable spec in Selenium::Specification's DATA section.
-    $options{hardcode}   //= 1;
+    $options{hardcode}     //= 1;
+    $options{capabilities} //= {};
 
     #create client_dir and log-dir
-    my $dir = File::Spec->catdir( $options{client_dir},"perl-client" );
+    my $dir = File::Spec->catdir( $options{client_dir}, "perl-client" );
     make_path($dir);
-    #Grab the spec
-    $options{spec}= Selenium::Specification::read($options{client_dir},$options{version},$options{nofetch}, $options{hardcode});
 
-    my $self = bless(\%options, $class);
+    #Grab the spec
+    $options{spec} = Selenium::Specification::read( $options{client_dir}, $options{version}, $options{nofetch}, $options{hardcode} );
+
+    my $self = bless( \%options, $class );
     $self->{sessions} = [];
 
     $self->_build_subs();
@@ -64,54 +67,55 @@ sub new($class,%options) {
 }
 
 
-sub catalog($self,$printed=0) {
+sub catalog ( $self, $printed = 0 ) {
     return $self->{spec} unless $printed;
-    foreach my $method (keys(%{$self->{spec}})) {
+    foreach my $method ( keys( %{ $self->{spec} } ) ) {
         print "$method: $self->{spec}{$method}{href}\n";
     }
     return $self->{spec};
 }
 
 my %browser_opts = (
-    firefox       => {
-        name => 'moz:firefoxOptions',
+    firefox => {
+        name     => 'moz:firefoxOptions',
         headless => sub ($c) {
             $c->{args} //= [];
-            push(@{$c->{args}}, '-headless');
+            push( @{ $c->{args} }, '-headless' );
         },
     },
-    chrome        => {
-        name => 'goog:chromeOptions',
+    chrome => {
+        name     => 'goog:chromeOptions',
         headless => sub ($c) {
             $c->{args} //= [];
-            push(@{$c->{args}}, 'headless');
+            push( @{ $c->{args} }, 'headless' );
         },
     },
     MicrosoftEdge => {
-        name =>'ms:EdgeOptions',
+        name     => 'ms:EdgeOptions',
         headless => sub ($c) {
             $c->{args} //= [];
-            push(@{$c->{args}}, 'headless');
+            push( @{ $c->{args} }, 'headless' );
         },
     },
 );
 
-sub _build_caps($self,%options) {
+sub _build_caps ( $self, %options ) {
     $options{browser}  = $self->{browser}  if $self->{browser};
     $options{headless} = $self->{headless} if $self->{headless};
 
     my $c = {
-        browserName  => $options{browser},
+        browserName => $options{browser},
+        %{ $self->{capabilities} },
     };
-    my $browser = $browser_opts{$options{browser}};
+    my $browser = $browser_opts{ $options{browser} };
 
     if ($browser) {
         my $browseropts = {};
-        foreach my $k (keys %$browser) {
-            next if $k eq 'name';
+        foreach my $k ( keys %$browser ) {
+            next                           if $k eq 'name';
             $browser->{$k}->($browseropts) if $options{$k};
         }
-        $c->{$browser->{name}} = $browseropts;
+        $c->{ $browser->{name} } = $browseropts;
     }
 
     return (
@@ -121,13 +125,14 @@ sub _build_caps($self,%options) {
     );
 }
 
-sub _build_subs($self) {
-    foreach my $sub (keys(%{$self->{spec}})) {
+sub _build_subs ($self) {
+    foreach my $sub ( keys( %{ $self->{spec} } ) ) {
+        print "Installing $self->{spec}{$sub}{uri} as $self->{spec}{$sub}{name}\n" if $self->{debug};
         Sub::Install::install_sub(
             {
                 code => sub {
                     my $self = shift;
-                    return $self->_request($sub,@_);
+                    return $self->_request( $sub, @_ );
                 },
                 as   => $sub,
                 into => "Selenium::Client",
@@ -137,7 +142,7 @@ sub _build_subs($self) {
 }
 
 #Check if server already up and spawn if no
-sub _spawn($self) {
+sub _spawn ($self) {
     return $self->Status() if Net::EmptyPort::wait_port( $self->{port}, 1 );
 
     # Pick a random port for the new server
@@ -152,19 +157,19 @@ sub _spawn($self) {
     return $self->_do_spawn();
 }
 
-sub _do_spawn($self) {
+sub _do_spawn ($self) {
 
     #XXX on windows we will *never* terminate if we are listening for *anything*
     #XXX so we have to just bg & ignore, unfortunately (also have to system())
-    if (_is_windows()) {
+    if ( _is_windows() ) {
         $self->{pid} = qq/$self->{driver}:$self->{port}/;
-        my @cmdprefix = ("start /MIN", qq{"$self->{pid}"});
+        my @cmdprefix = ( "start /MIN", qq{"$self->{pid}"} );
 
         # Selenium JAR controls it's own logging because Java
         my @cmdsuffix;
-        @cmdsuffix = ('>', $self->{log_file}, '2>&1') unless $self->{driver_class} eq 'Selenium::Driver::SeleniumHQ::Jar';
+        @cmdsuffix = ( '>', $self->{log_file}, '2>&1' ) unless $self->{driver_class} eq 'Selenium::Driver::SeleniumHQ::Jar';
 
-        my $cmdstring = join(' ', @cmdprefix, @{$self->{command}}, @cmdsuffix );
+        my $cmdstring = join( ' ', @cmdprefix, @{ $self->{command} }, @cmdsuffix );
         print "$cmdstring\n" if $self->{debug};
         system($cmdstring);
         return $self->_wait();
@@ -176,8 +181,8 @@ sub _do_spawn($self) {
         $self->{pid} = $pid;
         return $self->_wait();
     }
-    open(my $fh, '>>', $self->{log_file});
-    capture_merged { exec(@{$self->{command}}) } stdout => $fh;
+    open( my $fh, '>>', $self->{log_file} );
+    capture_merged { exec( @{ $self->{command} } ) } stdout => $fh;
 }
 
 sub _wait ($self) {
@@ -188,27 +193,19 @@ sub _wait ($self) {
     return $self->Status();
 }
 
-sub DESTROY($self) {
+sub DESTROY ($self) {
     return unless $self->{auto_close};
 
-    local $?; # Avoid affecting the exit status
-
-    print "Shutting down active sessions...\n" if $self->{debug};
-    #murder all sessions we spawned so that die() cleans up properly
-    if ($self->{ua} && @{$self->{sessions}}) {
-        foreach my $session (@{$self->{sessions}}) {
-            # An attempt was made.  The session *might* already be dead.
-            eval { $self->DeleteSession( sessionid => $session ) };
-        }
-    }
+    local $?;    # Avoid affecting the exit status
 
     #Kill the server if we spawned one
     return unless $self->{pid};
     print "Attempting to kill server process...\n" if $self->{debug};
 
-    if (_is_windows()) {
+    if ( _is_windows() ) {
         my $killer = qq[taskkill /FI "WINDOWTITLE eq $self->{pid}"];
         print "$killer\n" if $self->{debug};
+
         #$killer .= ' > nul 2&>1' unless $self->{debug};
         system($killer);
         return 1;
@@ -221,17 +218,17 @@ sub DESTROY($self) {
 
     # 0 is always WCONTINUED, 1 is always WNOHANG, and POSIX is an expensive import
     # When 0 is returned, the process is still active, so it needs more persuasion
-    foreach (0..3) {
-        return unless waitpid( $self->{pid}, 1) == 0;
+    foreach ( 0 .. 3 ) {
+        return unless waitpid( $self->{pid}, 1 ) == 0;
         sleep 1;
     }
 
     # Advanced persuasion
     print "Forcibly terminating selenium server process...\n" if $self->{debug};
-    kill('TERM', $self->{pid});
+    kill( 'TERM', $self->{pid} );
 
     #XXX unfortunately I can't just do a SIGALRM, because blocking system calls can't be intercepted on win32
-    foreach (0..$self->{timeout}) {
+    foreach ( 0 .. $self->{timeout} ) {
         return unless waitpid( $self->{pid}, 1 ) == 0;
         sleep 1;
     }
@@ -247,9 +244,9 @@ sub _is_windows {
 our @bad_methods = qw{AcceptAlert DismissAlert Back Forward Refresh ElementClick MaximizeWindow MinimizeWindow FullscreenWindow SwitchToParentFrame ElementClear};
 
 #Exempt some calls from return processing
-our @no_process = qw{Status GetWindowRect GetElementRect GetAllCookies};
+our @no_process = qw{Status GetAlertText GetTimeouts GetWindowRect GetElementRect GetAllCookies};
 
-sub _request($self, $method, %params) {
+sub _request ( $self, $method, %params ) {
     my $subject = $self->{spec}->{$method};
 
     #TODO handle compressed output from server
@@ -266,7 +263,7 @@ sub _request($self, $method, %params) {
 
     # Remove parameters to inject into child objects
     my $inject_key   = exists $params{inject} ? delete $params{inject} : undef;
-    my $inject_value = $inject_key ? $params{$inject_key} : '';
+    my $inject_value = $inject_key            ? $params{$inject_key}   : '';
     my $inject;
     $inject = { to_inject => { $inject_key => $inject_value } } if $inject_key && $inject_value;
 
@@ -276,117 +273,146 @@ sub _request($self, $method, %params) {
     #If we have no extra params, and this is getSession, simplify
     %params = $self->_build_caps() if $method eq 'NewSession' && !%params;
 
-    foreach my $param (keys(%params)) {
+    my @needed_params = $subject->{uri} =~ m/\{(\w+)\}/g;
+    foreach my $param (@needed_params) {
         confess "$param is required for $method" unless exists $params{$param};
         delete $params{$param} if $url =~ s/{\Q$param\E}/$params{$param}/g;
     }
 
     if (%params) {
-        $options{content} = JSON::MaybeXS::encode_json(\%params);
-        $options{headers}{'Content-Length'} = length($options{content});
+        $options{content} = JSON::MaybeXS::encode_json( \%params );
+        $options{headers}{'Content-Length'} = length( $options{content} );
     }
 
     print "$subject->{method} $url\n" if $self->{debug};
     print "Body: $options{content}\n" if $self->{debug} && exists $options{content};
 
-    my $res = $self->{ua}->request($subject->{method}, $url, \%options);
+    my $res = $self->{ua}->request( $subject->{method}, $url, \%options );
 
     my @cbret;
-    foreach my $cb (@{$self->{post_callbacks}}) {
-        if ($cb && ref $cb eq 'CODE') {
-            @options{qw{url method}} = ($url,$subject->{method});
+    foreach my $cb ( @{ $self->{post_callbacks} } ) {
+        if ( $cb && ref $cb eq 'CODE' ) {
+            @options{qw{url method}} = ( $url, $subject->{method} );
             $options{content} = \%params if %params;
-            my $ret = $cb->($self, $res, \%options);
-            push(@cbret,$ret) if $ret;
+            my $ret = $cb->( $self, $res, \%options );
+            push( @cbret, $ret ) if $ret;
         }
         return $cbret[0] if @cbret == 1;
-        return @cbret if @cbret;
+        return @cbret    if @cbret;
     }
 
     print "$res->{status} : $res->{content}\n" if $self->{debug} && ref $res eq 'HASH';
 
     # all the selenium servers are UTF-8
     my $normal = $res->{content};
-    $normal = NFC( $normal ) if $self->{normalize};
-    my $decoded_content = eval { JSON::MaybeXS->new()->utf8()->decode( $normal ) };
+    $normal = NFC($normal) if $self->{normalize};
+    my $decoded_content = eval { JSON::MaybeXS->new()->utf8()->decode($normal) };
 
-    if ($self->{fatal}) {
+    if ( $self->{fatal} ) {
         confess "$res->{reason} :\n Consult $subject->{href}\nRaw Error:\n$res->{content}\n" unless $res->{success};
-    } else {
+    }
+    else {
         cluck "$res->{reason} :\n Consult $subject->{href}\nRaw Error:\n$res->{content}\n" unless $res->{success};
     }
 
-    if (grep { $method eq $_ } @no_process) {
-        return @{$decoded_content->{value}} if ref $decoded_content->{value} eq 'ARRAY';
+    #XXX should be caught below by objectify
+    if ( grep { $method eq $_ } @no_process ) {
+        if ( ref $decoded_content->{value} eq 'ARRAY' ) {
+            return wantarray ? @{ $decoded_content->{value} } : $decoded_content->{value};
+        }
         return $decoded_content->{value};
     }
-    return $self->_objectify($decoded_content,$inject);
+
+    #XXX sigh
+    if ( $decoded_content->{sessionId} ) {
+        $decoded_content->{value} = [ { capabilities => $decoded_content->{value} }, { sessionId => $decoded_content->{sessionId} } ];
+    }
+
+    return $self->_objectify( $decoded_content, $inject );
 }
 
 our %classes = (
     capabilities => { class => 'Selenium::Capabilities' },
     sessionId    => {
-        class => 'Selenium::Session',
+        class            => 'Selenium::Session',
         destroy_callback => sub {
-                my $self = shift;
-                $self->DeleteSession() unless $self->{deleted};
+            my $self = shift;
+            $self->DeleteSession( sessionid => $self->{sessionid} ) unless $self->{deleted};
         },
         callback => sub {
-            my ($self,$call) = @_;
+            my ( $self, $call ) = @_;
             $self->{deleted} = 1 if $call eq 'DeleteSession';
         },
     },
+
     # Whoever thought this parameter name was a good idea...
     'element-6066-11e4-a52e-4f735466cecf' => {
         class => 'Selenium::Element',
     },
 );
 
-sub _objectify($self,$result,$inject) {
+sub _objectify ( $self, $result, $inject ) {
     my $subject = $result->{value};
-    return $subject unless grep { ref $subject eq $_ } qw{ARRAY HASH};
+    return $subject       unless grep { ref $subject eq $_ } qw{ARRAY HASH};
     $subject = [$subject] unless ref $subject eq 'ARRAY';
 
     my @objs;
     foreach my $to_objectify (@$subject) {
+
         # If we have just data return it
-        return @$subject if ref $to_objectify ne 'HASH';
+        return wantarray ? @$subject : $subject if ref $to_objectify ne 'HASH';
 
         my @objects = keys(%$to_objectify);
         foreach my $object (@objects) {
+
             my $has_class = exists $classes{$object};
 
             my $base_object = $inject // {};
-            $base_object->{lc($object)} = $to_objectify->{$object};
+            $base_object->{ lc($object) } = $to_objectify->{$object};
             $base_object->{sortField} = lc($object);
 
-            my $to_push = $has_class ?
-                $classes{$object}{class}->new($self, $base_object ) :
-                $to_objectify;
+            my $to_push =
+                $has_class
+              ? $classes{$object}{class}->new( $self, $base_object )
+              : $to_objectify;
             $to_push->{sortField} = lc($object);
+
             # Save sessions for destructor
-            push(@{$self->{sessions}}, $to_push->{sessionid}) if ref $to_push eq 'Selenium::Session';
-            push(@objs,$to_push);
+            push( @{ $self->{sessions} }, $to_push->session_id ) if ref $to_push eq 'Selenium::Session';
+            push( @objs,                  $to_push );
         }
     }
     @objs = sort { $a->{sortField} cmp $b->{sortField} } @objs;
     return $objs[0] if @objs == 1;
-    return @objs;
+    return wantarray ? @objs : \@objs;
 }
 
 1;
 
 
 package Selenium::Capabilities;
-$Selenium::Capabilities::VERSION = '1.06';
+$Selenium::Capabilities::VERSION = '2.00';
 use parent qw{Selenium::Subclass};
 1;
+
 package Selenium::Session;
-$Selenium::Session::VERSION = '1.06';
+$Selenium::Session::VERSION = '2.00';
+sub session_id {
+    my $self = shift;
+    return $self->{sessionId} // $self->{sessionid};
+}
+
+sub DESTROY {
+    my $self = shift;
+    return if $self->{deleted};
+    $self->DeleteSession( sessionid => $self->session_id );
+}
+
 use parent qw{Selenium::Subclass};
 1;
+
 package Selenium::Element;
-$Selenium::Element::VERSION = '1.06';
+$Selenium::Element::VERSION = '2.00';
 use parent qw{Selenium::Subclass};
 1;
 
@@ -402,7 +428,7 @@ Selenium::Client - Module for communicating with WC3 standard selenium servers
 
 =head1 VERSION
 
-version 1.06
+version 2.00
 
 =head1 CONSTRUCTOR
 

@@ -1,0 +1,7 @@
+Revision history for Dist-Zilla-Plugin-GitHub-Offline
+
+0.002     2024-02-06 22:19:38+01:00 Europe/Brussels
+          - Use http based repo url by default
+
+0.001     2024-02-06 20:15:35+01:00 Europe/Brussels
+          Initial release to an unsuspecting world

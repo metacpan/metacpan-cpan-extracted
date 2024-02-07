@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::plot::xwigb;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  XWIGB - X WIGgle-trace plot of f(x1,x2) via Bitmap			
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 
@@ -124,7 +124,7 @@ package App::SeismicUnixGui::sunix::plot::xwigb;
  in each file as npair=npair1,npair2,... .                             
 
 
- AUTHOR:  Dave Hale, Colorado School of Mines, 08/09/90
+ Author:  Dave Hale, Colorado School of Mines, 08/09/90
 
  Endian stuff by: 
     Morten Wendell Pedersen, Aarhus University (visiting CSM, June 1995)

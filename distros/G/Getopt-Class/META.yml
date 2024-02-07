@@ -25,7 +25,7 @@ requires:
   DateTime::Format::Strptime: '1.76'
   Devel::Confess: '0.009004'
   Getopt::Long: '0.44'
-  Module::Generic: v0.30.4
+  Module::Generic: v0.34.0
   Nice::Try: v1.3.4
   Scalar::Util: '1.54'
   Tie::Hash: '1.05'
@@ -37,5 +37,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Getopt-Class/issues
   repository: https://gitlab.com/jackdeguest/Getopt-Class
-version: v0.104.2
+version: v0.104.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -58,7 +58,7 @@ print OUT <<'EOF';
         } \
         sv2 = get_sv("PDL::undefval",1); \
         if(SvIV(get_sv("PDL::debug",1))) \
-            fprintf(stderr,"Warning: SvPDLV converted undef to $PDL::undefval (%g).\n",SvNV(sv2)); \
+            fprintf(stderr,"Warning: SvPDLV converted undef to $PDL::undefval (%"NVgf").\n",SvNV(sv2)); \
         if (PDL_SV_IS_UNDEF(sv2)) { \
             outany.type = forced_type >=0 ? forced_type : PDL_B; \
             outany.value.B = 0; \
@@ -85,7 +85,7 @@ EOF
 for (PDL::Types::types()) {
   print OUT "case @{[$_->sym]}: ";
   if ($_->real) {
-    my $upper = uc(my $letter = $_->integer ? 'i' : 'n');
+    my $upper = uc(my $letter = $_->unsigned ? 'u' : $_->integer ? 'i' : 'n');
     print OUT "sv_set${letter}v(outsv, (${upper}V)(inany.value.".$_->ppsym."))";
   } else {
     my ($fs, $ppsym) = ($_->floatsuffix, $_->ppsym);

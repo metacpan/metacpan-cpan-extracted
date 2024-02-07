@@ -120,7 +120,7 @@ subtest 'direct Neo4j::Driver hash access' => sub {
 	# Direct hash access is known to have been used in the wild,
 	# even though it was not officially supported at the time.
 	plan tests => 3;
-	$d = Neo4j::Driver->new()->plugin($mock_plugin);
+	$d = Neo4j::Driver->new('http:')->plugin($mock_plugin);
 	$d->{http_timeout} = 0.5;
 	lives_ok { $w = ''; $w = warning { $d->session(database => 'dummy') }; } 'session';
 	is $d->config('timeout'), 0.5, 'http_timeout set';

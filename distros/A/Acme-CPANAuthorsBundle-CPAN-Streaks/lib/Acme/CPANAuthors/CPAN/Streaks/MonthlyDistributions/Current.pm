@@ -4,54 +4,43 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-01'; # DATE
+our $DATE = '2024-02-01'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240101.0'; # VERSION
+our $VERSION = '20240201.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
     'SKIM' => '',
-    'JJATRIA' => '',
     'GENE' => '',
-    'JGOMEZ' => '',
-    'KIMOTO' => '',
-    'MIKKOI' => '',
     'VVELOX' => '',
-    'ZMUGHAL' => '',
-    'JGNI' => '',
-    'AAHAZRED' => '',
     'ABALAMA' => '',
-    'ABH' => '',
-    'AJNN' => '',
-    'AZOMER' => '',
-    'BLIAKO' => '',
-    'BOOK' => '',
     'BPS' => '',
-    'CGPAN' => '',
-    'CRLCU' => '',
-    'CROMEDOME' => '',
     'DERIV' => '',
     'DJERIUS' => '',
-    'EMUNDALL' => '',
     'ETHER' => '',
-    'GBROWN' => '',
-    'GSG' => '',
-    'INGY' => '',
-    'JKSTILL' => '',
+    'JGNI' => '',
     'JMATES' => '',
-    'JV' => '',
-    'KARUPA' => '',
-    'KRAIH' => '',
-    'MATHIAS' => '',
-    'MAUKE' => '',
-    'MERKYS' => '',
-    'MRDVT' => '',
-    'PACMAN' => '',
     'PEVANS' => '',
-    'TEEJAY' => '',
-    'TEODESIAN' => '',
-    'VANHOESEL' => '',
     'VKON' => '',
+    'ARISTOTLE' => '',
+    'ATRODO' => '',
+    'DRCLAW' => '',
+    'GARU' => '',
+    'GHE' => '',
+    'JROBINSON' => '',
+    'LEONT' => '',
+    'MMCCLENN' => '',
+    'MSIMERSON' => '',
+    'MSLM' => '',
+    'NHORNE' => '',
+    'NUDDLEGG' => '',
+    'OLEG' => '',
+    'SANKO' => '',
+    'SFOBERSKI' => '',
+    'SHE' => '',
+    'SISYPHUS' => '',
+    'SREZIC' => '',
+    'XMOLEX' => '',
 );
 
 
@@ -70,60 +59,49 @@ Acme::CPANAuthors::CPAN::Streaks::MonthlyDistributions::Current - Authors with o
 
 =head1 VERSION
 
-This document describes version 20240101.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-01-01.
+This document describes version 20240201.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-01.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-01-01, produced by L<cpan-streaks>):
+Current standings (as of 2024-02-01, produced by L<cpan-streaks>):
 
   +-----------+-----+------------+-------------+
   | author    | len | start_date | status      |
   +-----------+-----+------------+-------------+
-  | PERLANCAR | 113 | 2014-08    | might-break |
-  | SKIM      |  10 | 2023-03    | might-break |
-  | JJATRIA   |   3 | 2023-10    | might-break |
-  | GENE      |   2 | 2023-11    | might-break |
-  | JGOMEZ    |   2 | 2023-11    | might-break |
-  | KIMOTO    |   2 | 2023-11    | might-break |
-  | MIKKOI    |   2 | 2023-11    | might-break |
-  | VVELOX    |   2 | 2023-11    | might-break |
-  | ZMUGHAL   |   2 | 2023-11    | might-break |
-  | JGNI      |   2 | 2023-12    | ongoing     |
-  | AAHAZRED  |   1 | 2023-12    | might-break |
-  | ABALAMA   |   1 | 2023-12    | might-break |
-  | ABH       |   1 | 2023-12    | might-break |
-  | AJNN      |   1 | 2023-12    | might-break |
-  | AZOMER    |   1 | 2023-12    | might-break |
-  | BLIAKO    |   1 | 2023-12    | might-break |
-  | BOOK      |   1 | 2023-12    | might-break |
-  | BPS       |   1 | 2023-12    | might-break |
-  | CGPAN     |   1 | 2023-12    | might-break |
-  | CRLCU     |   1 | 2023-12    | might-break |
-  | CROMEDOME |   1 | 2023-12    | might-break |
-  | DERIV     |   1 | 2023-12    | might-break |
-  | DJERIUS   |   1 | 2023-12    | might-break |
-  | EMUNDALL  |   1 | 2023-12    | might-break |
-  | ETHER     |   1 | 2023-12    | might-break |
-  | GBROWN    |   1 | 2023-12    | might-break |
-  | GSG       |   1 | 2023-12    | might-break |
-  | INGY      |   1 | 2023-12    | might-break |
-  | JKSTILL   |   1 | 2023-12    | might-break |
-  | JMATES    |   1 | 2023-12    | might-break |
-  | JV        |   1 | 2023-12    | might-break |
-  | KARUPA    |   1 | 2023-12    | might-break |
-  | KRAIH     |   1 | 2023-12    | might-break |
-  | MATHIAS   |   1 | 2023-12    | might-break |
-  | MAUKE     |   1 | 2023-12    | might-break |
-  | MERKYS    |   1 | 2023-12    | might-break |
-  | MRDVT     |   1 | 2023-12    | might-break |
-  | PACMAN    |   1 | 2023-12    | might-break |
-  | PEVANS    |   1 | 2023-12    | might-break |
-  | TEEJAY    |   1 | 2023-12    | might-break |
-  | TEODESIAN |   1 | 2023-12    | might-break |
-  | VANHOESEL |   1 | 2023-12    | might-break |
-  | VKON      |   1 | 2023-12    | might-break |
+  | PERLANCAR | 115 | 2014-08    | ongoing     |
+  | SKIM      |  11 | 2023-03    | might-break |
+  | GENE      |   3 | 2023-11    | might-break |
+  | VVELOX    |   3 | 2023-11    | might-break |
+  | ABALAMA   |   2 | 2023-12    | might-break |
+  | BPS       |   2 | 2023-12    | might-break |
+  | DERIV     |   2 | 2023-12    | might-break |
+  | DJERIUS   |   2 | 2023-12    | might-break |
+  | ETHER     |   2 | 2023-12    | might-break |
+  | JGNI      |   2 | 2023-12    | might-break |
+  | JMATES    |   2 | 2023-12    | might-break |
+  | PEVANS    |   2 | 2023-12    | might-break |
+  | VKON      |   2 | 2023-12    | might-break |
+  | ARISTOTLE |   1 | 2024-01    | might-break |
+  | ATRODO    |   1 | 2024-01    | might-break |
+  | DRCLAW    |   1 | 2024-01    | might-break |
+  | GARU      |   1 | 2024-01    | might-break |
+  | GHE       |   1 | 2024-01    | might-break |
+  | JROBINSON |   1 | 2024-01    | might-break |
+  | LEONT     |   1 | 2024-01    | might-break |
+  | MMCCLENN  |   1 | 2024-01    | might-break |
+  | MSIMERSON |   1 | 2024-01    | might-break |
+  | MSLM      |   1 | 2024-01    | might-break |
+  | NHORNE    |   1 | 2024-01    | might-break |
+  | NUDDLEGG  |   1 | 2024-01    | might-break |
+  | OLEG      |   1 | 2024-01    | might-break |
+  | SANKO     |   1 | 2024-01    | might-break |
+  | SFOBERSKI |   1 | 2024-01    | might-break |
+  | SHE       |   1 | 2024-01    | might-break |
+  | SISYPHUS  |   1 | 2024-01    | might-break |
+  | SREZIC    |   1 | 2024-01    | might-break |
+  | XMOLEX    |   1 | 2024-01    | might-break |
   +-----------+-----+------------+-------------+
 
 =head1 HOMEPAGE

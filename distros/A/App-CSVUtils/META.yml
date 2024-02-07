@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,177 +24,177 @@ name: App-CSVUtils
 provides:
   App::CSVUtils:
     file: lib/App/CSVUtils.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv2paras:
     file: lib/App/CSVUtils/csv2paras.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv2td:
     file: lib/App/CSVUtils/csv2td.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv2vcf:
     file: lib/App/CSVUtils/csv2vcf.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_add_fields:
     file: lib/App/CSVUtils/csv_add_fields.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_avg:
     file: lib/App/CSVUtils/csv_avg.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_check_cell_values:
     file: lib/App/CSVUtils/csv_check_cell_values.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_check_field_names:
     file: lib/App/CSVUtils/csv_check_field_names.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_check_field_values:
     file: lib/App/CSVUtils/csv_check_field_values.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_check_rows:
     file: lib/App/CSVUtils/csv_check_rows.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_cmp:
     file: lib/App/CSVUtils/csv_cmp.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_concat:
     file: lib/App/CSVUtils/csv_concat.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_convert_to_hash:
     file: lib/App/CSVUtils/csv_convert_to_hash.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_csv:
     file: lib/App/CSVUtils/csv_csv.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_delete_fields:
     file: lib/App/CSVUtils/csv_delete_fields.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_dump:
     file: lib/App/CSVUtils/csv_dump.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_each_row:
     file: lib/App/CSVUtils/csv_each_row.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_fill_cells:
     file: lib/App/CSVUtils/csv_fill_cells.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_fill_template:
     file: lib/App/CSVUtils/csv_fill_template.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_find_values:
     file: lib/App/CSVUtils/csv_find_values.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_freqtable:
     file: lib/App/CSVUtils/csv_freqtable.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_gen:
     file: lib/App/CSVUtils/csv_gen.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_get_cells:
     file: lib/App/CSVUtils/csv_get_cells.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_grep:
     file: lib/App/CSVUtils/csv_grep.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_info:
     file: lib/App/CSVUtils/csv_info.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_intrange:
     file: lib/App/CSVUtils/csv_intrange.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_list_field_names:
     file: lib/App/CSVUtils/csv_list_field_names.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_lookup_fields:
     file: lib/App/CSVUtils/csv_lookup_fields.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_ltrim:
     file: lib/App/CSVUtils/csv_ltrim.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_map:
     file: lib/App/CSVUtils/csv_map.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_munge_field:
     file: lib/App/CSVUtils/csv_munge_field.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_munge_rows:
     file: lib/App/CSVUtils/csv_munge_rows.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_pick_cells:
     file: lib/App/CSVUtils/csv_pick_cells.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_pick_fields:
     file: lib/App/CSVUtils/csv_pick_fields.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_pick_rows:
     file: lib/App/CSVUtils/csv_pick_rows.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_quote:
     file: lib/App/CSVUtils/csv_quote.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_replace_newline:
     file: lib/App/CSVUtils/csv_replace_newline.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_rtrim:
     file: lib/App/CSVUtils/csv_rtrim.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_select_fields:
     file: lib/App/CSVUtils/csv_select_fields.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_select_rows:
     file: lib/App/CSVUtils/csv_select_rows.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_setop:
     file: lib/App/CSVUtils/csv_setop.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_shuf_fields:
     file: lib/App/CSVUtils/csv_shuf_fields.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_shuf_rows:
     file: lib/App/CSVUtils/csv_shuf_rows.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_sort_fields:
     file: lib/App/CSVUtils/csv_sort_fields.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_sort_fields_by_example:
     file: lib/App/CSVUtils/csv_sort_fields_by_example.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_sort_fields_by_spec:
     file: lib/App/CSVUtils/csv_sort_fields_by_spec.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_sort_rows:
     file: lib/App/CSVUtils/csv_sort_rows.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_sorted_fields:
     file: lib/App/CSVUtils/csv_sorted_fields.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_sorted_rows:
     file: lib/App/CSVUtils/csv_sorted_rows.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_split:
     file: lib/App/CSVUtils/csv_split.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_sum:
     file: lib/App/CSVUtils/csv_sum.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_transpose:
     file: lib/App/CSVUtils/csv_transpose.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_trim:
     file: lib/App/CSVUtils/csv_trim.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_uniq:
     file: lib/App/CSVUtils/csv_uniq.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::csv_unquote:
     file: lib/App/CSVUtils/csv_unquote.pm
-    version: '1.033'
+    version: '1.034'
   App::CSVUtils::paras2csv:
     file: lib/App/CSVUtils/paras2csv.pm
-    version: '1.033'
+    version: '1.034'
 recommends:
   Sort::Sub: '0.120'
 requires:
   Complete::Module: '0.263'
-  Complete::Util: '0.616'
+  Complete::Util: '0.620'
   Cwd: '0'
   Data::Cmp: '0.002'
   Data::Dmp: '0.242'
@@ -218,11 +218,11 @@ requires:
   List::Util: '1.54'
   Log::ger: '0.038'
   Module::List::Tiny: '0'
-  Number::Util::Range: '0.003'
+  Number::Util::Range: '0.005'
   Perinci::CmdLine::Any: '0.154'
   Perinci::CmdLine::Lite: '1.924'
   Perinci::Sub::Gen::AccessTable: '0.592'
-  Perinci::Sub::Util: '0.471'
+  Perinci::Sub::Util: '0.472'
   Perinci::Sub::XCompletion::filename: '0'
   Perinci::Sub::XCompletion::sortsub_spec: '0'
   Sah::Schema::filename: '0'
@@ -246,10 +246,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils
   homepage: https://metacpan.org/release/App-CSVUtils
   repository: git://github.com/perlancar/perl-App-CSVUtils.git
-version: '1.033'
+version: '1.034'
 x_Dist_Zilla:
   perl:
-    version: '5.038000'
+    version: '5.038002'
   plugins:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
@@ -473,6 +473,10 @@ x_Dist_Zilla:
       version: '0.425'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript csv2csv'
+      version: '0.425'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv2paras'
       version: '0.425'
     -
@@ -507,66 +511,66 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Author::PERLANCAR/@Filter/GatherDir'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::PERLANCAR/@Filter/PruneCruft'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::PERLANCAR/@Filter/ManifestSkip'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::PERLANCAR/@Filter/MetaYAML'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::PERLANCAR/@Filter/License'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::PERLANCAR/@Filter/PodCoverageTests'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::PERLANCAR/@Filter/PodSyntaxTests'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::PERLANCAR/@Filter/ExtraTests'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/@Filter/ExecDir'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::PERLANCAR/@Filter/ShareDir'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::PERLANCAR/@Filter/MakeMaker'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::PERLANCAR/@Filter/Manifest'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/ExecDir script'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.608'
+      version: '0.610'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -624,15 +628,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.03'
+      version: '0.02'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::PERLANCAR/MetaConfig'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -641,7 +645,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.030'
+              version: '6.031'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -794,7 +798,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: '@Author::PERLANCAR/PruneFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Pod2Readme
       name: '@Author::PERLANCAR/Pod2Readme'
@@ -882,7 +886,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -890,7 +894,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -898,7 +902,7 @@ x_Dist_Zilla:
           phase: runtime
           type: recommends
       name: RuntimeRecommends
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -906,60 +910,60 @@ x_Dist_Zilla:
           phase: develop
           type: x_spec
       name: DevelopX_spec
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.030'
+      version: '6.031'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: 0
-    version: '6.030'
+    version: '6.031'
 x_authority: cpan:PERLANCAR
 x_contributors:
   - 'Adam Hopkins <violapiratejunky@gmail.com>'
-x_generated_by_perl: v5.38.0
+x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

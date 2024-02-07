@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use IPC::Cmd qw{ run };
-use Module::Load::Conditional qw{ check_install };
 use Test::More 0.88;	# Because of done_testing();
 
 # The following is a random 64-character command name generated from
@@ -19,29 +18,6 @@ use Test::More 0.88;	# Because of done_testing();
 use constant RANDOM_CMD =>
     '2d8S4rU0svlIoqpA01ntUV1w_NWiKZ8TvSbbhnmYkvLPCHhv8ccYxCLIXNlQcnVv';
 use constant CAN_MAN_MAN => run( COMMAND => [ qw{ man -w 1 man } ] ) || 0;
-
-# Check for https: support, since the modules are not prerequisites of
-# this one.
-my $have_https = do {
-    local $@ = undef;
-    eval {
-	check_install(
-	    module	=> 'IO::Socket::SSL',
-	    version	=> 1.42,
-	) && check_install(
-	    module	=> 'Net::SSLeay',
-	    version	=> 1.49,
-	);
-    };
-};
-
-$have_https
-    or diag <<'EOD';
-
-
-https: not available. You need IO::Socket::SSL 1.42 and Net::SSLeay
-1.49. Under this circumstance, diagnostics are normal.
-EOD
 
 
 # This mess is because if Devel::Hide or Test::Without::Module is
@@ -77,16 +53,28 @@ BEGIN {
     Test::Pod::LinkCheck::Lite->import( qw{ :const } );
 }
 
+my $have_https;
 {
     my $t = Test::Pod::LinkCheck::Lite->new();
+
+    $have_https = $t->can_ssl();
 
     diag '';
     diag $t->configuration( 'Default' );
     diag 'CAN_MAN_MAN is ', CAN_MAN_MAN ? 'true' : 'false';
+    diag 'have_https is ', $have_https ? 'true' : 'false';
     CAN_MAN_MAN
 	or diag <<'EOD';
+
 The man (1) program appears to be available, but man -w man appears not
 to work. Tests of man links will be skipped.
+EOD
+
+    $have_https
+	or diag <<'EOD';
+
+https: is not available. You need IO::Socket::SSL 1.42 and Net::SSLeay
+1.49. Under this circumstance, diagnostics are normal.
 EOD
 
     # Encapsulation violation for testing purposes. DO NOT try this at
@@ -215,23 +203,9 @@ EOD
 
     $t->pod_file_ok( 't/data/pod_ok/external_installed.pod' );
 
-    SKIP: {
-
-	my $version = 1.40;
-	my $rv;
-	$rv = check_install(
-	    module	=> 'Scalar::Util',
-	    version	=> $version,
-	) and defined $rv->{version}
-	    and $rv->{version} ge $version
-	    or skip
-	    "External section check needs Scalar::Util version $version", 1;
-
-	# This file is in not_ok/ only to prevent all_pod_files_ok()
-	# from finding it.
-	$t->pod_file_ok( 't/data/not_ok/external_installed_section.pod' );
-
-    }
+    # This file is in not_ok/ only to prevent all_pod_files_ok()
+    # from finding it.
+    $t->pod_file_ok( 't/data/not_ok/external_installed_section.pod' );
 
     {
 	my ( $fail, $pass, $skip );
@@ -491,6 +465,29 @@ foreach my $mi ( Test::Pod::LinkCheck::Lite->new()->module_index() ) {
     note "Test with module_index => $mi";
 
     $t->pod_file_ok( 't/data/pod_ok/external_uninstalled.pod' );
+}
+
+{
+    my $t = Test::Pod::LinkCheck::Lite->new(
+	add_dir	=> 't/data/script',
+    );
+
+    note 'Link to unusual place works if we are told where it is';
+    $t->pod_file_ok( 't/data/not_ok/link_off_the_map.pod' );
+}
+
+{
+    my $t = Test::Pod::LinkCheck::Lite->new();
+
+    note 'Link to unusual place fails unless we are told where it is';
+
+    my $errors;
+    TODO: {
+	local $TODO = 'Deliberate failure';
+	$errors = $t->pod_file_ok( 't/data/not_ok/link_off_the_map.pod' );
+    }
+    cmp_ok $errors, '==', 2,
+	'Got two errors if unusual location not identified';
 }
 
 done_testing;

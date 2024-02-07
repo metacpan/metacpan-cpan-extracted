@@ -34,10 +34,10 @@ no_index:
 provides:
   LWP::Protocol::https:
     file: lib/LWP/Protocol/https.pm
-    version: '6.12'
+    version: '6.13'
   LWP::Protocol::https::Socket:
     file: lib/LWP/Protocol/https.pm
-    version: '6.12'
+    version: '6.13'
 requires:
   IO::Socket::SSL: '1.970'
   LWP::Protocol::http: '0'
@@ -52,7 +52,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/LWP-Protocol-https/issues
   homepage: https://github.com/libwww-perl/LWP-Protocol-https
   repository: https://github.com/libwww-perl/LWP-Protocol-https.git
-version: '6.12'
+version: '6.13'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -230,7 +230,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v6.12
+          tag: v6.13
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -372,10 +372,6 @@ x_Dist_Zilla:
       name: MetaTests
       version: '6.031'
     -
-      class: Dist::Zilla::Plugin::Test::ChangesHasContent
-      name: Test::ChangesHasContent
-      version: '0.011'
-    -
       class: Dist::Zilla::Plugin::Test::MinimumVersion
       config:
         Dist::Zilla::Plugin::Test::MinimumVersion:
@@ -498,6 +494,7 @@ x_contributors:
   - 'Alex Kapranoff <ka@nadoby.ru>'
   - 'amire80 <amir.aharoni@gmail.com>'
   - 'Andreas J. Koenig <andreas.koenig@anima.de>'
+  - 'Axel Burri <axel@tty0.ch>'
   - 'Bill Mann <wfmann@alum.mit.edu>'
   - 'Bron Gondwana <brong@fastmail.fm>'
   - 'Chase Whitener <capoeirab@cpan.org>'

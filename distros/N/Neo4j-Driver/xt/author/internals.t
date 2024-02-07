@@ -45,6 +45,8 @@ subtest 'result: list() repeated' => sub {
 
 
 subtest 'summary: plan/notification internals' => sub {
+	plan skip_all => "(EXPLAIN not supported by Neo4j::Bolt)"
+		if $Neo4j_Test::bolt && $s->server->agent !~ m<Neo4j/[34]\.>;
 	plan tests => 5;
 	$q = <<END;
 EXPLAIN MATCH (n), (m) RETURN n, m

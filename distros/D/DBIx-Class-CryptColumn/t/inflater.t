@@ -21,7 +21,7 @@ my $id = $rs->create({ passphrase => $object })->id;
 
 my $row = $rs->find({ id => $id });
 
-is $row->get_column('passphrase'), '$reversed$oom', 'Column stored as reversed';
+is $row->get_column('passphrase'), '$reversed$1$oom', 'Column stored as reversed';
 
 my $ppr = $row->passphrase;
 isa_ok $ppr, 'Crypt::Passphrase::PassphraseHash';

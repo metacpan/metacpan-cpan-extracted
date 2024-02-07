@@ -29,7 +29,7 @@ t/Mo-utils-CSS/01-use.t
 t/Mo-utils-CSS/02-version.t
 t/Mo-utils-CSS/03-check_array_css_color.t
 t/Mo-utils-CSS/04-check_css_class.t
-t/Mo-utils-CSS/05-check_css_unit.t
-t/Mo-utils-CSS/06-check_css_color.t
+t/Mo-utils-CSS/05-check_css_color.t
+t/Mo-utils-CSS/06-check_css_unit.t
 xt/Mo-utils-CSS/01-pod_coverage.t
 xt/Mo-utils-CSS/02-pod.t

@@ -2,7 +2,7 @@
 
 =head1 LICENSE
 
-Copyright (c) 2016-2022 G.W. Haywood.  All rights reserved.
+Copyright (c) 2016-2024 G.W. Haywood.  All rights reserved.
   With thanks to all those who have trodden these paths before,
   including
 Copyright (c) 2002-2004 Todd Vierling.  All rights reserved.
@@ -53,7 +53,7 @@ use Socket;
 use Symbol;
 use UNIVERSAL;
 
-our $VERSION = '1.24';
+our $VERSION = '1.27';
 $VERSION = eval $VERSION;
 
 our $DEBUG = 0;
@@ -242,10 +242,10 @@ my $smflags =
     SMFI_V2_ACTS SMFI_V6_ACTS SMFI_CURR_ACTS SMFI_V2_PROT SMFI_V6_PROT SMFI_CURR_PROT
     MAXREPLYLEN MAXREPLIES
 ';
-my @smflags = eval "qw/ $smflags /;";
-my @dispatchers =  qw/ ithread_dispatcher postfork_dispatcher prefork_dispatcher sequential_dispatcher /;
+our @smflags = eval "qw/ $smflags /;";
+our @dispatchers =  qw/ ithread_dispatcher postfork_dispatcher prefork_dispatcher sequential_dispatcher /;
 my @callback_names = qw/ negotiate connect helo envfrom envrcpt data header eoh body eom close abort unknown /;
-my %DEFAULT_CALLBACKS = map { $_ => $_.'_callback' } @callback_names;
+our %DEFAULT_CALLBACKS = map { $_ => $_.'_callback' } @callback_names;
 # Don't export anything by default.
 our @EXPORT = ();
 # Everything else is OK.  I have tried.
@@ -445,7 +445,7 @@ sub register ($$$;$) {
 
 =pod
 
-=item setconn(DESC)
+=item setconn(DESC[, PERMS])
 
 Sets up the server socket with connection descriptor DESC.  This is
 identical to the descriptor syntax used by the "X" milter configuration
@@ -473,7 +473,11 @@ should be specified.
 An IPv6 socket, bound to address HOST (default INADDR_ANY), on port PORT.  
 This requires IPv6 support and the Perl IO::Socket::IP package to be installed.
 It is not recommended to open milter engines to the world, so the @HOST part
-should be specified.
+SHOULD be specified.
+
+=item PERMS
+
+Optional permissions mask.
 
 =back
 
@@ -484,6 +488,7 @@ Returns a true value on success, undef on failure.
 sub setconn ($$) {
 	my $this = shift;
 	my $conn = shift;
+	my $perms = shift;
 	my $backlog = $this->{backlog} || 5;
 	my $socket;
 
@@ -495,9 +500,15 @@ sub setconn ($$) {
 
 		my $path = $2;
 		my $addr = sockaddr_un($path);
+		my $oldumask = umask;
 
 		croak "setconn: $conn: path not absolute"
 			unless ($path =~ m,^/,,);
+
+		if ($perms)
+		{
+		    umask 0777 - $perms;
+		} 
 
 		if (-e $path && ! -S $path) { # exists, not a socket
 			$! = Errno::EEXIST;
@@ -521,6 +532,8 @@ sub setconn ($$) {
 			}
 		}
 
+		umask $oldumask;
+		
 		if (defined($socket)) {
 			$socket->listen($backlog) || croak "setconn: listen $conn: $!";
 		}
@@ -947,6 +960,12 @@ It will be passed the C<MILTER> object.
 =item child_exit
 
 subroutine reference that will be called just before each child process
+terminates.  It will be passed the C<MILTER> object plus current requests
+handled and maximum requests per child.
+
+=item milter_exit
+
+subroutine reference that will be called just before the milter
 terminates.  It will be passed the C<MILTER> object.
 
 =item max_children
@@ -968,19 +987,21 @@ main() call, this value will be used.
 sub prefork_dispatcher (@) {
 	my %params = @_;
 	my %children;
+	my $curr_requests;
+	my $max_requests;
 
 	my $child_dispatcher = sub {
 		my $this = shift;
 		my $lsocket = shift;
 		my $handler = shift;
-		my $max_requests = $this->get_max_requests() || $params{max_requests_per_child} || 100;
-		my $i = 0;
+		$max_requests = $this->get_max_requests() || $params{max_requests_per_child} || 100;
+		$curr_requests = 0;
 
 		local $SIG{PIPE} = 'IGNORE'; # so close_callback will be reached
 
 		my $siginfo = exists($SIG{INFO}) ? 'INFO' : 'USR1';
 		local $SIG{$siginfo} = sub {
-			warn "$$: requests handled: $i\n";
+			warn "$$: requests handled: $curr_requests\n";
 		};
 
 		# call child_init handler if present
@@ -988,35 +1009,34 @@ sub prefork_dispatcher (@) {
 			my $method = $params{child_init};
 			$this->$method();
 		}
-
-		while ($i < $max_requests) {
-			my $socket = $lsocket->accept();
-			next if $!{EINTR};
-
-			warn "$$: incoming connection\n" if ($DEBUG > 0);
-
-			$i++;
-			&$handler($socket);
-			$socket->close();
-		}
-
-		# call child_exit handler if present
-		if (defined $params{child_exit}) {
-			my $method = $params{child_exit};
-			$this->$method();
+		eval {
+			while ($curr_requests < $max_requests) {
+				my $socket = $lsocket->accept();
+				next if $!{EINTR};
+				warn "$$: incoming connection\n" if ($DEBUG > 0);
+				$curr_requests++;
+				&$handler($socket);
+				$socket->close();
+			}
+		};
+		if ($@) {
+			warn "Exiting cause die";
 		}
 	};
 
 	# Propagate some signals down to the entire process group.
 	my $killall = sub {
 		my $sig = shift;
+		my $this = $_[0];
 
+		# call milter_exit handler if present
+		if (defined $params{milter_exit}) {
+			my $method = $params{milter_exit};
+			$this->$method();
+		}
 		kill 'TERM', keys %children;
 		exit 0;
 	};
-	local $SIG{INT} = $killall;
-	local $SIG{QUIT} = $killall;
-	local $SIG{TERM} = $killall;
 
 	setpgrp();
 
@@ -1024,24 +1044,55 @@ sub prefork_dispatcher (@) {
 		my $this = $_[0];
 		my $maxchildren = $this->get_max_interpreters() || $params{max_children} || 10;
 
+		$SIG{INT} = $killall;
+		$SIG{QUIT} = $killall;
+		$SIG{TERM} = $killall;
+
 		while (1) {
 			while (scalar keys %children < $maxchildren) {
 				my $pid = fork();
 				die "fork: $!" unless defined($pid);
 
 				if ($pid) {
-					# Perl reset these to IGNORE.  Restore them.
-					$SIG{INT} = $killall;
-					$SIG{QUIT} = $killall;
-					$SIG{TERM} = $killall;
 					$children{$pid} = 1;
 				} else {
-					# Perl reset these to IGNORE.  Set to defaults.
-					$SIG{INT} = 'DEFAULT';
-					$SIG{QUIT} = 'DEFAULT';
-					$SIG{TERM} = 'DEFAULT';
+					# setup child_exit handler if present
+					if (defined $params{child_exit}) {
+						# INTR signal usually invoked by CTRL + C
+						# Don't do anything in child and let's parent to
+						# signal children with TERM
+						$SIG{INT} = 'IGNORE';
+
+						# QUIT and TERM should terminate the children but
+						# parent also sends TERM to all children (dups are
+						# possible. If using systemd, consier using:
+						# KillMode=mixed
+						# As workaround we will restore these signals to its
+						# default, avoiding dup execution.
+						$SIG{QUIT} = $SIG{TERM} = sub {
+							my $sig_name = shift;
+
+							$SIG{QUIT} = $SIG{TERM} = 'DEFAULT';
+							my $method = $params{child_exit};
+							$this->$method($curr_requests, $max_requests);
+
+							# If signal is QUIT, core dump must be issued.
+							# As we now have set it to default, simply call it.
+							if ($sig_name eq 'QUIT') {
+								kill 'QUIT', $$;
+							}
+							exit;
+						};
+					} else {
+						# Perl reset these to IGNORE.  Set to defaults.
+						$SIG{INT} = 'DEFAULT';
+						$SIG{QUIT} = 'DEFAULT';
+						$SIG{TERM} = 'DEFAULT';
+					}
 					&$child_dispatcher(@_);
-					exit 0;
+
+					# curr_requests = max_requests
+					kill 'TERM', $$;
 				}
 			}
 
@@ -1263,6 +1314,7 @@ of Sendmail version 8.15.2 and later.
 =head1 THANKS
 
 rob.casey@bluebottle.com - for the prefork mechanism idea
+Carlos Velasco - for milter_exit and other improvements
 
 =cut
 

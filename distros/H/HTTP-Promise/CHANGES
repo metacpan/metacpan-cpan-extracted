@@ -1,5 +1,11 @@
 Revision history for Perl module HTTP::Promise
 
+v0.4.1 2024-02-06T06:30:56+0900
+    - Correcting small bug in HTTP::Promise::Body::Form
+
+v0.4.0 2024-02-01T23:17:20+0900
+    - Added the method decode_json() in HTTP::Promise::Message
+
 v0.3.3 2023-10-10T08:15:14+0900
     - Corrected malformed signature for distribution release
 

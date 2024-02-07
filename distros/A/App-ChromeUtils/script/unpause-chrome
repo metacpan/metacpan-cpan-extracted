@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ChromeUtils/unpause_chrome
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-07'; # DATE
+our $DATE = '2023-10-28'; # DATE
 our $DIST = 'App-ChromeUtils'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ChromeUtils/unpause_chrome",
@@ -40,11 +40,15 @@ unpause-chrome - Unpause (resume, continue, kill -CONT) Chrome
 
 =head1 VERSION
 
-This document describes version 0.011 of unpause-chrome (from Perl distribution App-ChromeUtils), released on 2022-10-07.
+This document describes version 0.012 of unpause-chrome (from Perl distribution App-ChromeUtils), released on 2023-10-28.
 
 =head1 SYNOPSIS
 
-B<unpause-chrome> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [(B<--user>=I<unix::uid::exists>)+|B<--users-json>=I<json>]
+B<unpause-chrome> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<unpause-chrome> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<unpause-chrome> [B<L<--cmndline-pat|/"--cmndline-pat=s">>=I<L<re_from_str|Sah::Schema::re_from_str>>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--exec-pat|/"--exec-pat=s">>=I<L<re_from_str|Sah::Schema::re_from_str>>] [B<L<--fname-pat|/"--fname-pat=s">>=I<L<re_from_str|Sah::Schema::re_from_str>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--pid-pat|/"--pid-pat=s">>=I<L<re_from_str|Sah::Schema::re_from_str>>] [(B<L<--user|/"--users-json=s">>=I<L<unix::uid::exists|Sah::Schema::unix::uid::exists>>)+|B<L<--users-json|/"--users-json=s">>=I<json>]
 
 =head1 OPTIONS
 
@@ -65,6 +69,48 @@ Can be specified multiple times.
 Kill browser processes that belong to certain user(s) only (JSON-encoded).
 
 See C<--user>.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--cmndline-pat>=I<s>
+
+Filter processes using regex against their cmndline.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+
+=item B<--exec-pat>=I<s>
+
+Filter processes using regex against their exec.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+
+=item B<--fname-pat>=I<s>
+
+Filter processes using regex against their fname.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
+
+=item B<--pid-pat>=I<s>
+
+Filter processes using regex against their pid.
+
+If one of the C<*-pat> options are specified, then instead of the default
+heuristic rules to find the browser processes, these C<*-pat> options are solely
+used to determine which processes are the browser processes.
+
 
 =back
 
@@ -247,7 +293,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

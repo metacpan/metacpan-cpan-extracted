@@ -1,5 +1,8 @@
 Revision history for Catalyst-Manual
 
+5.9012 - 2024-02-03
+    - fixed some broken links (Graham Knop, Daniel Böhmer)
+
 5.9011 - 2020-07-22
     - added NGINX Unit deployment documentation
 

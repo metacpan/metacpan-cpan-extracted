@@ -12,7 +12,7 @@ diff2vba - generate VBA patch script from diff output
 
 # VERSION
 
-Version 0.99
+Version 1.00
 
 # DESCRIPTION
 
@@ -54,10 +54,6 @@ Install from CPAN
 
     cpanm App::diff2vba
 
-or
-
-    cpanm https://github.com/kaz-utashiro/App-diff2vba.git
-
 # SEE ALSO
 
 [App::diff2vba](https://metacpan.org/pod/App%3A%3Adiff2vba), [https://github.com/kaz-utashiro/App-diff2vba](https://github.com/kaz-utashiro/App-diff2vba)
@@ -79,7 +75,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2021-2022 Kazumasa Utashiro.
+Copyright 2021-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

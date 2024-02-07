@@ -6,7 +6,7 @@ use strict;
 use warnings;
 no warnings;
 
-our $VERSION = '0.114';
+our $VERSION = '0.115';
 
 use Term::ANSIColor qw(:constants color colored);
 use Log::Log4perl::Level;
@@ -130,11 +130,11 @@ This source is on GitHub:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2008-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2008-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

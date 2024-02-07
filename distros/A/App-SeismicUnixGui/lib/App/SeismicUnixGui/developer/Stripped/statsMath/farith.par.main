@@ -66,7 +66,7 @@
 
 
 
-   AUTHOR:  Dave Hale, Colorado School of Mines, 07/07/89
+   Author:  Dave Hale, Colorado School of Mines, 07/07/89
 	Zhaobo Meng added scale and cartprod, 10/01/96
 	Zhaobo Meng added signum, 9 May 1997
 	Tony Kocurko added scalar operations, August 1997

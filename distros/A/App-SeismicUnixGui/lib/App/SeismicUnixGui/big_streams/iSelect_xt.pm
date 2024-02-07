@@ -172,14 +172,14 @@ sub calcNdisplay {
 
 =cut
 
-	$sugain->clear();
-	$sugain->pbal($on);
-	$sugain[1] = $sugain->Step();
-
-	$sugain->clear();
-	$sugain->agc($on);
-	$sugain->width(0.1);
-	$sugain[2] = $sugain->Step();
+#	$sugain->clear();
+#	$sugain->pbal($on);
+#	$sugain[1] = $sugain->Step();
+#
+#	$sugain->clear();
+#	$sugain->agc($on);
+#	$sugain->width(0.1);
+#	$sugain[2] = $sugain->Step();
 
 	$sugain->clear();
 	$sugain->tpower(3);
@@ -484,10 +484,10 @@ The pick file can be saved
 
 =cut
 
-#	print "$flow[1]\n";
+	print "$flow[1]\n";
 	# $log->file($flow[1]);
 
-#	print  "$flow[2]\n";
+	print  "$flow[2]\n";
 	# $log->file($flow[2]);
 
 }    # end calcNdisplay subroutine

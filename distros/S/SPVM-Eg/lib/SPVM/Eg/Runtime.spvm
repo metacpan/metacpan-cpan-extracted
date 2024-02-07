@@ -27,8 +27,6 @@ class Eg::Runtime {
     
     $self->{data_h} = Hash->new;
     
-    warn dump $self;
-    
     return $self;
   }
   

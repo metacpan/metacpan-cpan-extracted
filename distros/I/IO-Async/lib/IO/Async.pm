@@ -1,18 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async;
+package IO::Async 0.803;
 
-use strict;
+use v5.14;
 use warnings;
 
 # This package contains no code other than a declaration of the version.
 # It is provided simply to keep CPAN happy:
 #   cpan -i IO::Async
-
-our $VERSION = '0.802';
 
 =head1 NAME
 

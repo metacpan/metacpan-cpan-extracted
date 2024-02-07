@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Protocol::LineStream;
+package IO::Async::Protocol::LineStream 0.803;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.802';
 
 use base qw( IO::Async::Protocol::Stream );
 
@@ -116,7 +114,7 @@ sub on_read
 
 =head2 write_line
 
-   $lineprotocol->write_line( $text )
+   $lineprotocol->write_line( $text );
 
 Writes a line of text to the transport stream. The text will have the
 end-of-line marker appended to it; C<$text> should not end with it.

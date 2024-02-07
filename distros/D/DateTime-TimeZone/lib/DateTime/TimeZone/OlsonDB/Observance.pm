@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.61';
+our $VERSION = '2.62';
 
 use DateTime::Duration;
 use DateTime::TimeZone::OlsonDB;
@@ -181,19 +181,19 @@ sub _sorted_rules_for_year {
 
     ## no critic (BuiltinFunctions::ProhibitComplexMappings)
     my @rules = (
-        map      { $_->[0] }
-            sort { $a->[1] <=> $b->[1] }
-            map {
+        map  { $_->[0] }
+        sort { $a->[1] <=> $b->[1] }
+        map {
             my $dt = $_->utc_start_datetime_for_year(
                 $year,
                 $self->offset_from_utc, 0
             );
             [ $_, $dt ]
-            }
-            grep {
+        }
+        grep {
             $_->min_year <= $year
                 && ( ( !$_->max_year ) || $_->max_year >= $year )
-            } $self->rules
+        } $self->rules
     );
 
     my %rules_by_month;

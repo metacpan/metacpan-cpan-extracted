@@ -23,5 +23,5 @@ no_index:
     - inc
 resources:
   repository: http://github.com/manwar/CGI--Simple.git
-version: '1.280'
+version: '1.281'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

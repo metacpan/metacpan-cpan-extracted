@@ -1,6 +1,6 @@
 package Mail::BIMI::VMC;
 # ABSTRACT: Class to model a VMC
-our $VERSION = '3.20231123'; # VERSION
+our $VERSION = '3.20240205'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -56,7 +56,7 @@ sub _build_data($self) {
   }
 
   $self->log_verbose('HTTP Fetch: '.$self->uri);
-  my $response = $self->http_client->get( $self->uri );
+  my $response = $self->http_client_get( $self->uri );
   if ( !$response->{success} ) {
     if ( $response->{status} == 599 ) {
       $self->add_error('VMC_FETCH_ERROR',$response->{content});
@@ -216,7 +216,7 @@ sub is_experimental($self) {
 
 
 sub is_allowed_mark_type($self) {
-  my $mark_type = lc $self->mark_type // '';
+  my $mark_type = lc ($self->mark_type // '');
   my $allowed_mark_types = lc $self->bimi_object->options->allowed_mark_types;
   for my $allowed_mark_type (split /, ?/, $allowed_mark_types) {
     return 1 if $allowed_mark_type eq '*';
@@ -338,7 +338,7 @@ Mail::BIMI::VMC - Class to model a VMC
 
 =head1 VERSION
 
-version 3.20231123
+version 3.20240205
 
 =head1 DESCRIPTION
 

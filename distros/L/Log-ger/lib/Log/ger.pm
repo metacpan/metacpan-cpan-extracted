@@ -2,9 +2,9 @@
 package Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-10'; # DATE
+our $DATE = '2023-10-29'; # DATE
 our $DIST = 'Log-ger'; # DIST
-our $VERSION = '0.040'; # VERSION
+our $VERSION = '0.041'; # VERSION
 
 #IFUNBUILT
 # use strict 'subs', 'vars';
@@ -185,7 +185,7 @@ Log::ger - A lightweight, flexible logging framework
 
 =head1 VERSION
 
-version 0.040
+version 0.041
 
 =head1 SYNOPSIS
 
@@ -207,7 +207,7 @@ In your module (producer):
      log_error "an error occured: %03d - %s", $errcode, $errmsg;
      ...
 
-     # the logging routines (log_*) can automatically dump of data structure
+     # the logging routines (log_*) can automatically dump data structures
      log_debug "http response: %s", $http;
 
      # log_fatal does not die by default, if you want to then die() explicitly.
@@ -308,7 +308,7 @@ B<Fast>. Low null-/stealth-logging overhead, about 1.5x faster than Log::Any, 3x
 faster than Log4perl, 5x faster than L<Log::Fast>, ~40x faster than
 L<Log::Contextual>, and ~100x faster than L<Log::Dispatch>.
 
-For more benchmarks, see L<Bencher::Scenarios::LogGer>.
+For more benchmarks, see L<Bencher::Scenarios::Log::ger>.
 
 B<Conditional compilation.> There is a plugin to optimize away unneeded logging
 statements, like assertion/conditional compilation, so they have zero runtime
@@ -364,7 +364,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2018, 2017 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

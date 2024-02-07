@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Body/Form.pm
-## Version v0.2.0
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/05/18
-## Modified 2023/09/08
+## Modified 2024/02/06
 ## All rights reserved.
 ## 
 ## 
@@ -21,7 +21,7 @@ BEGIN
     use vars qw( $VERSION );
     # use Nice::Try;
     use URL::Encode::XS ();
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -120,7 +120,7 @@ sub as_string
 {
     my $self = shift( @_ );
     my $keys = [];
-    if( @_ && $self->_tie_object->_is_array( $_[0] ) )
+    if( @_ && $self->_is_array( $_[0] ) )
     {
         $keys = shift( @_ );
     }
@@ -310,7 +310,7 @@ sub open
     my $self = shift( @_ );
     my $encoded = $self->as_string;
     return( $self->pass_error ) if( !defined( $encoded ) );
-    my $s = $self->_tie_object->new_scalar( \$encoded ) || 
+    my $s = $self->new_scalar( \$encoded ) || 
         return( $self->pass_error );
     my $io = $s->open( @_ ) ||
         return( $self->pass_error( $s->error ) );
@@ -330,7 +330,7 @@ sub print
     my $nread;
     # Get output filehandle, and ensure that it's a printable object:
     $fh ||= select;
-    return( $self->error( "Filehandle provided ($fh) is not a proper filehandle and its not a HTTP::Promise::IO object." ) ) if( !$self->_tie_object->_is_glob( $fh ) && !$self->_tie_object->_is_a( $fh => 'HTTP::Promise::IO' ) );
+    return( $self->error( "Filehandle provided ($fh) is not a proper filehandle and its not a HTTP::Promise::IO object." ) ) if( !$self->_is_glob( $fh ) && !$self->_is_a( $fh => 'HTTP::Promise::IO' ) );
     my $encoded = $self->as_string;
     return( $self->pass_error ) if( !defined( $encoded ) );
     $fh->print( $encoded ) || return( $self->error( "Unable to print on given filehandle '$fh': $!" ) );
@@ -367,7 +367,7 @@ HTTP::Promise::Body::Form - x-www-form-urlencoded Data Class
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Server
 
+0.06  2024-02-01
+      - Updated dependency on Dancer2::Plugin::Map::Tube v0.04.
+
 0.05  2024-01-28
       - Ooops another pod typo fixed.
 

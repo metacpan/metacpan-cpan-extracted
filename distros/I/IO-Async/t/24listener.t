@@ -1,13 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Identity;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use IO::Async::Loop;
 
@@ -48,13 +46,13 @@ $listensock = IO::Socket::INET->new(
    );
 
    ok( defined $listener, 'defined $listener' );
-   isa_ok( $listener, "IO::Async::Listener", '$listener isa IO::Async::Listener' );
-   isa_ok( $listener, "IO::Async::Notifier", '$listener isa IO::Async::Notifier' );
+   isa_ok( $listener, [ "IO::Async::Listener" ], '$listener isa IO::Async::Listener' );
+   isa_ok( $listener, [ "IO::Async::Notifier" ], '$listener isa IO::Async::Notifier' );
 
    is_oneref( $listener, '$listener has refcount 1 initially' );
 
    ok( $listener->is_listening, '$listener is_listening' );
-   is_deeply( [ unpack_sockaddr_in $listener->sockname ],
+   is( [ unpack_sockaddr_in $listener->sockname ],
               [ unpack_sockaddr_in $listensock->sockname ], '$listener->sockname' );
 
    is( $listener->family,   AF_INET,     '$listener->family' );
@@ -73,7 +71,7 @@ $listensock = IO::Socket::INET->new(
 
    wait_for { defined $newclient };
 
-   is_deeply( [ unpack_sockaddr_in $newclient->peername ],
+   is( [ unpack_sockaddr_in $newclient->peername ],
               [ unpack_sockaddr_in $clientsock->sockname ], '$newclient peer is correct' );
 
    is_refcount( $listener, 2, '$listener has refcount 2 before removing from Loop' );
@@ -108,7 +106,7 @@ $listensock = IO::Socket::INET->new(
 
       wait_for { defined $accepted };
 
-      isa_ok( $accepted, "IO::Async::Stream", '$accepted with handle_constructor' );
+      isa_ok( $accepted, [ "IO::Async::Stream" ], '$accepted with handle_constructor' );
       undef $accepted;
    }
 
@@ -123,7 +121,7 @@ $listensock = IO::Socket::INET->new(
 
       wait_for { defined $accepted };
 
-      isa_ok( $accepted, "IO::Async::Stream", '$accepted with handle_constructor' );
+      isa_ok( $accepted, [ "IO::Async::Stream" ], '$accepted with handle_constructor' );
       undef $accepted;
    }
 
@@ -147,8 +145,8 @@ $listensock = IO::Socket::INET->new(
 
    wait_for { defined $newstream };
 
-   isa_ok( $newstream, "IO::Async::Stream", 'on_stream $newstream isa IO::Async::Stream' );
-   is_deeply( [ unpack_sockaddr_in $newstream->read_handle->peername ],
+   isa_ok( $newstream, [ "IO::Async::Stream" ], 'on_stream $newstream isa IO::Async::Stream' );
+   is( [ unpack_sockaddr_in $newstream->read_handle->peername ],
               [ unpack_sockaddr_in $clientsock->sockname ], '$newstream sock peer is correct' );
 
    $loop->remove( $listener );
@@ -171,8 +169,8 @@ $listensock = IO::Socket::INET->new(
 
    wait_for { defined $newsocket };
 
-   isa_ok( $newsocket, "IO::Async::Socket", 'on_socket $newsocket isa IO::Async::Socket' );
-   is_deeply( [ unpack_sockaddr_in $newsocket->read_handle->peername ],
+   isa_ok( $newsocket, [ "IO::Async::Socket" ], 'on_socket $newsocket isa IO::Async::Socket' );
+   is( [ unpack_sockaddr_in $newsocket->read_handle->peername ],
               [ unpack_sockaddr_in $clientsock->sockname ], '$newsocket sock peer is correct' );
 
    $loop->remove( $listener );
@@ -209,7 +207,7 @@ $listensock = IO::Socket::INET->new(
    );
 
    ok( defined $listener, 'subclass defined $listener' );
-   isa_ok( $listener, "IO::Async::Listener", 'subclass $listener isa IO::Async::Listener' );
+   isa_ok( $listener, [ "IO::Async::Listener" ], 'subclass $listener isa IO::Async::Listener' );
 
    is_oneref( $listener, 'subclass $listener has refcount 1 initially' );
 
@@ -226,7 +224,7 @@ $listensock = IO::Socket::INET->new(
 
    wait_for { defined $sub_newclient };
 
-   is_deeply( [ unpack_sockaddr_in $sub_newclient->peername ],
+   is( [ unpack_sockaddr_in $sub_newclient->peername ],
               [ unpack_sockaddr_in $clientsock->sockname ], '$sub_newclient peer is correct' );
 
    is_refcount( $listener, 2, 'subclass $listener has refcount 2 before removing from Loop' );
@@ -261,7 +259,7 @@ $listensock = IO::Socket::INET->new(
 
    wait_for { defined $accepted };
 
-   isa_ok( $accepted, "IO::Async::Stream", '$accepted with handle_constructor method' );
+   isa_ok( $accepted, [ "IO::Async::Stream" ], '$accepted with handle_constructor method' );
 
    $loop->remove( $listener );
 }
@@ -297,7 +295,7 @@ $listensock = IO::Socket::INET->new(
    is( $listener->family,   AF_INET,     '$listener->family' );
    is( $listener->socktype, SOCK_STREAM, '$listener->sockname' );
 
-   is( $listen_self, $listener, '$listen_self is $listener' );
+   ref_is( $listen_self, $listener, '$listen_self is $listener' );
    undef $listen_self; # for refcount
 
    my $clientsock = IO::Socket::INET->new( Type => SOCK_STREAM )
@@ -309,7 +307,7 @@ $listensock = IO::Socket::INET->new(
 
    wait_for { defined $newclient };
 
-   is_deeply( [ unpack_sockaddr_in $newclient->peername ],
+   is( [ unpack_sockaddr_in $newclient->peername ],
               [ unpack_sockaddr_in $clientsock->sockname ], '$newclient peer is correct' );
 
    $loop->remove( $listener );

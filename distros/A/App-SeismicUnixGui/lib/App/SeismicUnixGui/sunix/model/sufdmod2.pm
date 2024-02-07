@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::model::sufdmod2;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUFDMOD2 - Finite-Difference MODeling (2nd order) for acoustic wave equation
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 

@@ -1,5 +1,10 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.31 2024-01-30T11:04:34Z
+
+    - introduce --lxl option to cdif to compare input line-by-line
+    - use /proc/self/fd if /dev/fd is not available
+
 4.30 2024-01-23T02:51:53Z
 
     - introduce --cc,fc,lc,mc,tc,uc color option to sdif

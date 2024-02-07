@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::datum::sudatumk2ds;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 

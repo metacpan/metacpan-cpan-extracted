@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Metrics;
+package IO::Async::Metrics 0.803;
 
-use strict;
+use v5.14;
 use warnings;
 
 # Metrics support is entirely optional

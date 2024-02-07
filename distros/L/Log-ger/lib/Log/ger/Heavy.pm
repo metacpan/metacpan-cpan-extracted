@@ -2,9 +2,9 @@
 package Log::ger::Heavy;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-10'; # DATE
+our $DATE = '2023-10-29'; # DATE
 our $DIST = 'Log-ger'; # DIST
-our $VERSION = '0.040'; # VERSION
+our $VERSION = '0.041'; # VERSION
 
 #IFUNBUILT
 # use strict;
@@ -381,7 +381,7 @@ Log::ger::Heavy - The bulk of the implementation of Log::ger
 
 =head1 VERSION
 
-version 0.040
+version 0.041
 
 =head1 DESCRIPTION
 
@@ -394,7 +394,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2018, 2017 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

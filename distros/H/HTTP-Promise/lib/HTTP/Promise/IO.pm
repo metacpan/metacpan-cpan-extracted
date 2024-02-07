@@ -916,8 +916,16 @@ sub _ssl_opts
     my $ssl_opts = $self->ssl_opts;
     unless( exists( $ssl_opts->{SSL_verify_mode} ) )
     {
-        # set SSL_VERIFY_PEER as default.
-        $ssl_opts->{SSL_verify_mode} = IO::Socket::SSL::SSL_VERIFY_PEER();
+        if( exists( $ssl_opts->{verify_hostname} ) &&
+            !$ssl_opts->{verify_hostname} )
+        {
+            $ssl_opts->{SSL_verify_mode} = IO::Socket::SSL::SSL_VERIFY_NONE();
+        }
+        else
+        {
+            # set SSL_VERIFY_PEER as default.
+            $ssl_opts->{SSL_verify_mode} = IO::Socket::SSL::SSL_VERIFY_PEER();
+        }
         unless( exists( $ssl_opts->{SSL_verifycn_scheme} ) )
         {
             $ssl_opts->{SSL_verifycn_scheme} = 'www'

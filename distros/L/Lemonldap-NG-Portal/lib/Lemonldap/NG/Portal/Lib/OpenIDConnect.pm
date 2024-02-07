@@ -2267,9 +2267,6 @@ sub _createJWT {
         encode_jwt(
             payload       => to_json($payload),
             alg           => $alg,
-            extra_headers => {
-                kid => $self->conf->{oidcServiceKeyIdSig},
-            },
             @keyArg,
         );
     };
@@ -2541,6 +2538,11 @@ sub addRouteFromConf {
 # @return boolean 1 if challenge succeed, 0 else
 sub validatePKCEChallenge {
     my ( $self, $code_verifier, $code_challenge, $code_challenge_method ) = @_;
+
+    unless ($code_challenge) {
+        $self->logger->debug("PKCE was not requested by the RP");
+        return 1;
+    }
 
     unless ($code_verifier) {
         $self->logger->error("PKCE required but no code verifier provided");

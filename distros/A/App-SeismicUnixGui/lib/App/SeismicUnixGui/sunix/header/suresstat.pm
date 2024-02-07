@@ -7,7 +7,7 @@ our $VERSION = '0.0.1';
 =head2 SYNOPSIS 
 
  PERL PROGRAM NAME: suresstat 
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE: June 2 2016 
  DESCRIPTION: surface consistent receiver-source static
  Version 1

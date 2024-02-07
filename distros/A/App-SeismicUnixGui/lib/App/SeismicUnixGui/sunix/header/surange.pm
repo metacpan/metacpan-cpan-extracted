@@ -5,9 +5,13 @@ package App::SeismicUnixGui::sunix::header::surange;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SURANGE - get max and min values for non-zero header entries	
- AUTHOR: Juan Lorenzo
+ 
+AUTHOR: Juan Lorenzo (Perl module only)
+ 
  DATE:   
+ 
  DESCRIPTION:
+ 
  Version: 
 
 =head2 USE

@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::model::elamodel;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 
@@ -123,7 +123,7 @@ Version:
 
 
 
- AUTHOR:  Dave Hale, Colorado School of Mines, 02/12/91
+Author: Dave Hale, Colorado School of Mines, 02/12/91
 
  modified : Andreas Rueger, Colorado School of Mines, 01/18/94
 

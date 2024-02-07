@@ -13,7 +13,7 @@ is($obj->autofocus, 0, 'Get autofocus (0 - default).');
 $obj = Data::HTML::Element::Button->new(
 	'autofocus' => undef,
 );
-is($obj->autofocus, 0, 'Get autofocus (undef).');
+is($obj->autofocus, 0, 'Get autofocus (0 - undef).');
 
 # Test.
 $obj = Data::HTML::Element::Button->new(

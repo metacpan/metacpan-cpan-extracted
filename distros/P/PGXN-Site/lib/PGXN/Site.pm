@@ -2,7 +2,9 @@ package PGXN::Site;
 
 use 5.10.0;
 use utf8;
-our $VERSION = v0.22.2;
+use strict;
+use warnings;
+our $VERSION = v0.23.4;
 
 sub version_string {
     sprintf 'v%vd', $VERSION;
@@ -84,13 +86,22 @@ The PGXN::Site class itself consists of a single class method.
 
 Returns a string representation of the PGXN::Site version.
 
+=head1 Support
+
+This module is stored in an open
+L<GitHub repository|https://github.com/pgxn/pgxn-site/>. Feel free to
+fork and contribute!
+
+Please file bug reports via
+L<GitHub Issues|https://github.com/pgxn/pgxn-site/issues/>.
+
 =head1 Author
 
 David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2010-2021 David E. Wheeler.
+Copyright (c) 2010-2024 David E. Wheeler.
 
 This module is free software; you can redistribute it and/or modify it under
 the L<PostgreSQL License|https://www.opensource.org/licenses/postgresql>.

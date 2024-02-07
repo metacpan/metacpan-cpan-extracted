@@ -19,9 +19,9 @@ my $rs = $schema->resultset('Foo');
 	my $row = $rs->find({ id => $new->id });
 
 	for my $current ($new, $row) {
-		is $current->get_column('passphrase'), '$reversed$oom', 'Column stored as reversed after create';
+		is $current->get_column('passphrase'), '$reversed$1$oom', 'Column stored as reversed after create';
 		isa_ok $current->get_inflated_column('passphrase'), 'Crypt::Passphrase::PassphraseHash';
-		is $current->get_inflated_column('passphrase')->raw_hash, '$reversed$oom', 'Column stored as reversed after create';
+		is $current->get_inflated_column('passphrase')->raw_hash, '$reversed$1$oom', 'Column stored as reversed after create';
 
 		ok !$current->verify_passphrase('mookooh'), 'Rejects incorrect passphrase using check method';
 		ok $current->verify_passphrase('moo'), 'Accepts correct passphrase using check method';
@@ -43,10 +43,12 @@ my $rs = $schema->resultset('Foo');
 	ok !$row->passphrase_needs_rehash, 'No second rehash is needed after verify and rehash';
 	ok $row->verify_passphrase('moo'), 'Verifies after verify and rehash';
 
+	$row->recode_password;
+	is $row->get_inflated_column('passphrase')->raw_hash, '$reversed$2$oom', 'Column stored as reversed after create';
+
 	$row->update({ passphrase => 'mookooh' })->discard_changes;
 	ok $row->verify_passphrase('mookooh'), 'Accepts new correct passphrase using check method';
 	ok !$row->verify_passphrase('moo'), 'Rejects old passphrase using check method';
-
 }
 
 done_testing;

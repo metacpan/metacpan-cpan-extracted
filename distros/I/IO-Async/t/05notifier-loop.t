@@ -1,12 +1,10 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0 0.000149;
 use Test::Metrics::Any;
-use Test::Refcount;
 
 use IO::Async::Notifier;
 
@@ -43,7 +41,7 @@ is_refcount( $loop, 2, '$loop has refcount 2 initially' );
 {
    my $notifier = TestNotifier->new( \my $in_loop );
 
-   is_deeply( [ $loop->notifiers ],
+   is( [ $loop->notifiers ],
               [],
               '$loop->notifiers empty' );
    is( $notifier->loop, undef, 'loop undef' );
@@ -53,21 +51,21 @@ is_refcount( $loop, 2, '$loop has refcount 2 initially' );
    is_refcount( $loop, 2, '$loop has refcount 2 adding Notifier' );
    is_refcount( $notifier, 2, '$notifier has refcount 2 after adding to Loop' );
 
-   is( $notifier->loop, $loop, 'loop $loop' );
+   ref_is( $notifier->loop, $loop, 'loop $loop' );
 
-   is_deeply( [ $loop->notifiers ],
-              [ $notifier ],
+   is( [ $loop->notifiers ],
+              [ exact_ref($notifier) ],
               '$loop->notifiers contains new Notifier' );
 
    ok( $in_loop, '_add_to_loop called' );
 
-   ok( exception { $loop->add( $notifier ) }, 'adding again produces error' );
+   ok( dies { $loop->add( $notifier ) }, 'adding again produces error' );
 
    $loop->remove( $notifier );
 
    is( $notifier->loop, undef, '$notifier->loop is undef' );
 
-   is_deeply( [ $loop->notifiers ],
+   is( [ $loop->notifiers ],
               [],
               '$loop->notifiers empty once more' );
 
@@ -87,17 +85,17 @@ is_refcount( $loop, 2, '$loop has refcount 2 initially' );
 
    is_refcount( $child, 3, '$child has refcount 3 after add_child within loop' );
 
-   is( $parent->loop, $loop, '$parent->loop is $loop' );
-   is( $child->loop,  $loop, '$child->loop is $loop' );
+   ref_is( $parent->loop, $loop, '$parent->loop is $loop' );
+   ref_is( $child->loop,  $loop, '$child->loop is $loop' );
 
    ok( $parent_in_loop, '$parent now in loop' );
    ok( $child_in_loop,  '$child now in loop' );
 
-   ok( exception { $loop->remove( $child ) }, 'Directly removing a child from the loop fails' );
+   ok( dies { $loop->remove( $child ) }, 'Directly removing a child from the loop fails' );
 
    $loop->remove( $parent );
 
-   is_deeply( [ $parent->children ], [ $child ], '$parent->children after $loop->remove' );
+   is( [ $parent->children ], [ exact_ref($child) ], '$parent->children after $loop->remove' );
 
    is_oneref( $parent, '$parent has refcount 1 after removal from loop' );
    is_refcount( $child, 2, '$child has refcount 2 after removal of parent from loop' );
@@ -108,11 +106,11 @@ is_refcount( $loop, 2, '$loop has refcount 2 initially' );
    ok( !$parent_in_loop, '$parent no longer in loop' );
    ok( !$child_in_loop,  '$child no longer in loop' );
 
-   ok( exception { $loop->add( $child ) }, 'Directly adding a child to the loop fails' );
+   ok( dies { $loop->add( $child ) }, 'Directly adding a child to the loop fails' );
 
    $loop->add( $parent );
 
-   is( $child->loop, $loop, '$child->loop is $loop after remove/add parent' );
+   ref_is( $child->loop, $loop, '$child->loop is $loop after remove/add parent' );
 
    ok( $parent_in_loop, '$parent now in loop' );
    ok( $child_in_loop,  '$child now in loop' );

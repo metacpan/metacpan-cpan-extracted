@@ -9,6 +9,7 @@ my $build_requires = {
 
 my $prereq_pm = {
         'Sys::Syslog'           => 0,
+        'Config::General'       => 2.00,    # Ubuntu = libconfig-general-perl       RGEL = perl-Config-General
     };
 
 WriteMakefile(
@@ -34,7 +35,7 @@ WriteMakefile(
         },
     },
     clean => {
-        FILES => '*.tmp *.log',
+        FILES => '*.tmp *.log *.pid',
     },
 );
 

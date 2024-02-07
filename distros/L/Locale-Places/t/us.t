@@ -4,43 +4,54 @@
 
 use strict;
 use warnings;
+
+# use autodie qw(:all);
 use Test::Most tests => 6;
 use lib 't/lib';
 use MyLogger;
 
 BEGIN {
-	use_ok('Locale::Places::DB::US');
+	use_ok('Locale::Places::Database::US');
 }
 
 US: {
-	Locale::Places::DB::init(directory => 'lib/Locale/Places/databases');
-	my $places = new_ok('Locale::Places::DB::US' => [logger => new_ok('MyLogger'), no_entry => 1]);
+	SKIP: {
+		if(!defined($ENV{'AUTOMATED_TESTING'})) {
+			Database::Abstraction::init(directory => 'lib/Locale/Places/databases');
+			my $places = new_ok('Locale::Places::Database::US' => [logger => new_ok('MyLogger'), no_entry => 1]);
 
-	my $dc = $places->fetchrow_hashref({ data => 'Washington DC', type => 'en' });
-	if($ENV{'TEST_VERBOSE'}) {
-		require Data::Dumper;
-		Data::Dumper->import();
-		diag(Data::Dumper->new([$dc])->Dump());
-	}
+			eval { require 'autodie' };
 
-	$dc = $places->selectall_hashref({ code2 => $dc->{'code2'} });
+			my $dc = $places->fetchrow_hashref({ data => 'Washington DC', type => 'en' });
+			if($ENV{'TEST_VERBOSE'}) {
+				require Data::Dumper;
+				Data::Dumper->import();
+				diag(Data::Dumper->new([$dc])->Dump());
+			}
 
-	my $found;
+			$dc = $places->selectall_hashref({ code2 => $dc->{'code2'} });
 
-	foreach my $entry(@{$dc}) {
-		next if(!defined($entry->{'type'}));
-		if($ENV{'TEST_VERBOSE'}) {
-			diag(Data::Dumper->new([\$entry])->Dump());
+			my $found;
+
+			foreach my $entry(@{$dc}) {
+				next if(!defined($entry->{'type'}));
+				if($ENV{'TEST_VERBOSE'}) {
+					diag(Data::Dumper->new([\$entry])->Dump());
+				}
+
+				if($entry->{'type'} eq 'la') {
+					is($entry->{'data'}, 'Vasingtonia', 'Latvian');
+					$found++;
+				} elsif($entry->{'type'} eq 'fr') {
+					is($entry->{'data'}, 'Washington', 'French');
+					$found++;
+				}
+			}
+
+			cmp_ok($found, '==', 2, 'Should have been 2 matches');
+		} else {
+			diag('AUTOMATED_TESTING: Not testing live data');
+			skip('AUTOMATED_TESTING: Not testing live data', 5);
 		}
-
-		if($entry->{'type'} eq 'la') {
-			is($entry->{'data'}, 'Vasingtonia', 'Latvian');
-			$found++;
-		} elsif($entry->{'type'} eq 'fr') {
-			is($entry->{'data'}, 'Washington', 'French');
-			$found++;
-		}
 	}
-
-	cmp_ok($found, '==', 2, 'Should have been 2 matches');
 }

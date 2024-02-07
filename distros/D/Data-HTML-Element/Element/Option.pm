@@ -3,15 +3,14 @@ package Data::HTML::Element::Option;
 use strict;
 use warnings;
 
+use Data::HTML::Element::Utils qw(check_data check_data_type);
 use Error::Pure qw(err);
 use List::Util 1.33 qw(none);
 use Mo qw(build is);
-use Mo::utils qw(check_bool check_number);
-use Readonly;
+use Mo::utils qw(check_array check_bool check_number);
+use Mo::utils::CSS qw(check_css_class);
 
-Readonly::Array our @DATA_TYPES => qw(plain tags);
-
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 has css_class => (
 	is => 'ro',
@@ -49,18 +48,25 @@ has value => (
 sub BUILD {
 	my $self = shift;
 
+	# Check CSS class.
+	check_css_class($self, 'css_class');
+
 	# Check data type.
-	if (! defined $self->{'data_type'}) {
-		$self->{'data_type'} = 'plain';
-	}
-	if (none { $self->{'data_type'} eq $_ } @DATA_TYPES) {
-		err "Parameter 'data_type' has bad value.";
-	}
+	check_data_type($self);
+
+	# Check data based on type.
+	check_data($self);
 
 	# Check disabled.
+	if (! defined $self->{'disabled'}) {
+		$self->{'disabled'} = 0;
+	}
 	check_bool($self, 'disabled');
 
 	# Check selected.
+	if (! defined $self->{'selected'}) {
+		$self->{'selected'} = 0;
+	}
 	check_bool($self, 'selected');
 
 	return;

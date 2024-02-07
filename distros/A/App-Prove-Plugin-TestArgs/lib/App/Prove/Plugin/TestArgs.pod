@@ -1,0 +1,49 @@
+=pod
+
+=head1 NAME
+
+App::Prove::Plugin::TestArgs - A prove plugin to configure test aliases and
+arguments
+
+=head1 SYNOPSIS
+
+  # command-line 
+  prove -PTestArgs=t/config.yml t/foo.t
+
+  # t/config.yml
+  ---
+  t/foo.t:
+    - alias: "Foo once"
+      args:  [foo, bar]
+    - alias: "Foo twice"
+    - alias: "Foo thrice"
+      args:  [baz]
+
+=head1 DESCRIPTION
+
+L<TAP::Harness> is the default test harness of the C<prove> command-line test
+driver program. The harness has a C<test_args> object attribute that allows us
+to pass different arguments to test scripts. Furthermore the harness
+C<runtests()> object method implementation allows us to run a test script
+multiple times giving each run a unique name (an alias).  Unfortunately it
+seems to be impossible to control this functionality directly via the C<prove>
+command-line interface.
+
+This plugin allows you to assign multiple alias-argument pairs to a test
+script.  Each pair triggers a separate run of the test script. The argument
+part of an alias-argument pair is optional. For the time being the
+configuration has to be stored in a YAML file that is the only argument passed
+to this plugin.
+
+=head1 AUTHORS
+
+Sven Willenbuecher, E<lt>sven.willenbuecher@gmx.deE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by Sven Willenbuecher.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.
+
+=cut

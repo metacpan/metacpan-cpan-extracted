@@ -1,3 +1,11 @@
+0.04 2024-02-03T10:39:58+01:00
+ - Add information about module version for checks in doc.
+ - Add tests for error parameters.
+ - Improve error variables in check_css_unit().
+ - Rewrite the tests so that the functional tests are first and then the
+   errors.
+ - Sort test files.
+
 0.03 2024-01-07T23:09:07+01:00
  - Add check_array_css_color().
  - Fix SYNOPSIS section in doc.

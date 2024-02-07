@@ -5,10 +5,16 @@
 
 #define XSRETURN_EXPECTED(val) do { xs::expected_to_stack(val, MARK, ax); return; } while (0)
 
+#ifndef PERL_STACK_OFFSET_DEFINED
+    typedef I32 Stack_off_t;
+#  define Stack_off_t_MAX I32_MAX
+#  define PERL_STACK_OFFSET_DEFINED
+#endif
+
 namespace xs {
 
     template <class T>
-    void _expected_to_stack (const T& ret, SV**& sp, I32& ax, std::false_type) {
+    void _expected_to_stack (const T& ret, SV**& sp, Stack_off_t& ax, std::false_type) {
         auto wcnt = Sub::want_count();
         if (ret) {
             mXPUSHs(xs::out(ret.value()).detach());
@@ -25,7 +31,7 @@ namespace xs {
     }
 
     template <class T>
-    void _expected_to_stack (const T& ret, SV**& sp, I32& ax, std::true_type) {
+    void _expected_to_stack (const T& ret, SV**& sp, Stack_off_t& ax, std::true_type) {
         auto wcnt = Sub::want_count();
         if (wcnt == 0) {
             if (!ret) throw ret.error();
@@ -41,12 +47,12 @@ namespace xs {
     }
 
     template <class TYPE, class ERROR>
-    void expected_to_stack (const panda::excepted<TYPE,ERROR>& ret, SV**& sp, I32& ax) {
+    void expected_to_stack (const panda::excepted<TYPE,ERROR>& ret, SV**& sp, Stack_off_t& ax) {
         return _expected_to_stack(ret, sp, ax, std::is_same<void,TYPE>());
     }
 
     template <class TYPE, class ERROR>
-    void expected_to_stack (const panda::expected<TYPE,ERROR>& ret, SV**& sp, I32& ax) {
+    void expected_to_stack (const panda::expected<TYPE,ERROR>& ret, SV**& sp, Stack_off_t& ax) {
         return _expected_to_stack(ret, sp, ax, std::is_same<void,TYPE>());
     }
 

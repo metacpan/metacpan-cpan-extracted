@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Protocol::LogoutResponse;
-our $VERSION = '0.76'; # VERSION
+our $VERSION = '0.77'; # VERSION
 
 use Moose;
 use MooseX::Types::URI qw/ Uri /;
@@ -92,7 +92,7 @@ Net::SAML2::Protocol::LogoutResponse - SAML2 LogoutResponse Protocol object
 
 =head1 VERSION
 
-version 0.76
+version 0.77
 
 =head1 SYNOPSIS
 

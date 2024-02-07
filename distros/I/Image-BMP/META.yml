@@ -1,0 +1,21 @@
+---
+abstract: 'A simple Bitmap/BMP parser/viewer'
+author:
+  - 'David Madison Stellar <cpan.org@daveola.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Image-BMP
+no_index:
+  directory:
+    - t
+    - inc
+version: '1.26'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,47 @@
+{
+  "name" : "Mojo-Util-Benchmark",
+  "version" : "0.0.1",
+  "abstract" : "A set of utilities for working with collections of data.",
+  "description" : "This is package that is going to provide a set of utilities for measuring execution time.",
+  "author" : [
+    "Adrian Crisan <adrian.crisan88@gmail.com>"
+  ],
+  "license" : "MIT",
+  "meta-spec" : {
+    "version" : 2,
+    "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+  },
+  "resources" : {
+    "homepage" : "https://aurorasoftware.gitlab.io/mojo-util-benchmark",
+    "license": "https://opensource.org/license/mit",
+    "repository" : {
+      "type" : "git",
+      "url" : "https://gitlab.com/AuroraSoftware/mojo-util-benchmark.git",
+      "web" : "https://gitlab.com/AuroraSoftware/mojo-util-benchmark"
+    },
+    "bugtracker" : {
+      "web" : "https://gitlab.com/AuroraSoftware/mojo-util-benchmark/-/issues"
+    }
+  },
+  "no_index" : {
+    "directory" : [
+      "t",
+      "docs"
+    ]
+  },
+  "prereqs" : {
+    "runtime" : {
+      "requires" : {
+        "perl" : "5.006"
+      }
+    }
+  },
+  "provides" : {
+    "Mojo::Util::Benchmark" : {
+      "file" : "lib/Mojo/Util/Benchmark.pm",
+      "version" : "0.0.1"
+    }
+  },
+  "keywords" : ["mojo util benchmark"],
+  "release_status" : "stable"
+}

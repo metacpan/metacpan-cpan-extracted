@@ -227,13 +227,9 @@ sub select {
     my $here = $whereami->get4superflow_select_button();
     
     # widgets were initialized in a super class
-    #$param_widgets		->set_labels_w_aref($pre_built_big_stream_href->{_labels_w_aref} );
-    #$param_widgets		->set_values_w_aref($pre_built_big_stream_href->{_values_w_aref} );
-    #$param_widgets		->set_check_buttons_w_aref($pre_built_big_stream_href->{_check_buttons_w_aref} );
     # print("5. pre_built_big_stream,_is_superflow_select,$pre_built_big_stream_href->{_is_superflow_select_button}\n");
-    $param_widgets->gui_full_clear();
 
-    # print("6. pre_built_big_stream,_is_superflow_select_button,$pre_built_big_stream_href->{_is_superflow_select_button}\n");
+    $param_widgets->gui_full_clear();
     $param_widgets->range($pre_built_big_stream_href);
     $param_widgets->set_labels( $pre_built_big_stream_href->{_names_aref} );
     $param_widgets->set_values( $pre_built_big_stream_href->{_values_aref} );
@@ -242,6 +238,7 @@ sub select {
 
     $param_widgets->redisplay_labels();
     $param_widgets->redisplay_values();
+#    print("6. pre_built_big_stream,_is_superflow_select_button,$pre_built_big_stream_href->{_is_superflow_select_button}\n");
     $param_widgets->redisplay_check_buttons();
 
     # print("2 pre_built_big_stream,superflow_select,chkb=@{$pre_built_big_stream_href->{_check_buttons_settings_aref}}\n");
@@ -256,7 +253,7 @@ sub select {
     # program name that is selected (i.e. through *_spec.pm)
     # send superflow names through an alias filter
     # that links their GUI name to their program name
-    # e.g. iVelAnalysis (GUI) is actually IVA.pm (shortened)
+    # e.g., iVelAnalysis (GUI) is actually IVA.pm (shortened)
 
     my $run_name = $name->get_alias_superflow_names($prog_name_sref);
 

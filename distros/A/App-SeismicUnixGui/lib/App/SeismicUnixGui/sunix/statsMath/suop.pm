@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::statsMath::suop;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 
@@ -186,7 +186,10 @@ Version:
  An additional parameter called "list"  allows the operation
  to be repeated among multiple files.
 
- The names of the su files are in the list.
+ The base file names of the su files are in the list, which
+ means that they are missing their suffix or extension,
+ 
+ e.g., file1_neg
 
  The list is found in $DATA_SEISMIC_TXT.
  Output file names carry a suffix equal to the operation
@@ -281,6 +284,7 @@ sub Step {
 		# for first file
 		$outbound = $DATA_SEISMIC_SU.'/'.$file_name[0] . '_' . $suop->{_op} . $suffix_su;
 		$step     = " suop $suop->{_Step} < $inbound[0] > $outbound ";
+#		print ("outbound=$outbound\n");
 
 		if ( $last_idx >= 2 ) {
 

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+PERL5OPT=-MText::CSV_XS dzil build "$@"

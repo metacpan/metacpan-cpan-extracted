@@ -1,5 +1,13 @@
 Revision history for Locale::Places
 
+0.10	Mon Feb  5 09:01:00 EST 2024
+	Fix https://github.com/nigelhorne/Locale-Places/issues/6
+		https://github.com/nigelhorne/Locale-Places/actions/runs/7452695411/job/20304898625
+	It looks like GZip::Faster doesn't error check
+	Updated DB.pm with some of the latest code from NJH-Snippets
+	Use Database::Abstraction
+	Added AUTOLOAD support, where the routine name is the target language
+
 0.09	Mon Jan  8 15:11:04 EST 2024
 	Added US places
 	Latest DB.pm from NJH-Snippets

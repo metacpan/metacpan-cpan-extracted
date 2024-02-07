@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::App::CmdLine::From_Patsolve;
-$Games::Solitaire::Verify::App::CmdLine::From_Patsolve::VERSION = '0.2403';
+$Games::Solitaire::Verify::App::CmdLine::From_Patsolve::VERSION = '0.2500';
 use strict;
 use warnings;
 use autodie;
@@ -16,7 +16,7 @@ __PACKAGE__->mk_acc_ref(
             _sol_filename
             _variant_params
             _buffer_ref
-            )
+        )
     ]
 );
 
@@ -32,11 +32,8 @@ sub _perform_move
             die "Cannot find card.";
         }
 
-        my $dest_fc_idx = first
-        {
-            !defined( $self->_st->get_freecell($_) )
-        }
-        ( 0 .. $self->_st->num_freecells - 1 );
+        my $dest_fc_idx = first { !defined( $self->_st->get_freecell($_) ) }
+            ( 0 .. $self->_st->num_freecells - 1 );
 
         if ( not defined($dest_fc_idx) )
         {
@@ -55,8 +52,7 @@ sub _perform_move
     {
         my @src_s = $self->_find_card_src_string($src_card_s);
         $self->_perform_and_output_move(
-            sprintf( "Move a card from %s to the foundations", $src_s[1] ),
-        );
+            sprintf( "Move a card from %s to the foundations", $src_s[1] ), );
     }
     elsif ( ($src_card_s) = $move_line =~ /\A(.[HCDS]) to empty pile\z/ )
     {
@@ -68,8 +64,7 @@ sub _perform_move
         my @src_s = $self->_find_card_src_string($src_card_s);
 
         $self->_perform_and_output_move(
-            sprintf( "Move %s from %s to stack %d", @src_s, $dest_col_idx ),
-        );
+            sprintf( "Move %s from %s to stack %d", @src_s, $dest_col_idx ), );
     }
     elsif ( ( $src_card_s, ( my $dest_card_s ) ) =
         $move_line =~ /\A(.[HCDS]) to (.[HCDS])\z/ )
@@ -126,7 +121,7 @@ converting from patsolve solutions to fc-solve ones.
 
 =head1 VERSION
 
-version 0.2403
+version 0.2500
 
 =head1 SYNOPSIS
 

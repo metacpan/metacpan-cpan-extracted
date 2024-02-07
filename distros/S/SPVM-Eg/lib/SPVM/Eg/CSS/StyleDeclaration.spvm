@@ -1,0 +1,160 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Eg::CSS::StyleDeclaration {
+  
+  allow Eg::Node::Element::HTML;
+  
+  use Eg::CSS::Rule;
+  
+  # Fields
+  has parent_rule : ro Eg::CSS::Rule;
+  
+  has styles_h : Hash of string;
+  
+  # Class Method
+  private static method new : Eg::CSS::StyleDeclaration () {
+    
+    my $self = new Eg::CSS::StyleDeclaration;
+    
+    $self->{styles_h} = Hash->new;
+    
+    return $self;
+  }
+  
+  # Instance Method
+  method get_property_value : string ($name : string) {
+    
+    unless ($name) {
+      die "\$name must be defined.";
+    }
+    
+    my $styles_h = $self->{styles_h};
+    
+    my $value = $styles_h->get_string($name);
+    
+    return $value;
+  }
+  
+  method remove_property : string ($name : string) {
+    
+    unless ($name) {
+      die "\$name must be defined.";
+    }
+    
+    my $styles_h = $self->{styles_h};
+    
+    my $value = (string)$styles_h->delete($name);
+    
+    return $value;
+  }
+  
+  method set_property : void ($name : string, $value : string) {
+    
+    unless ($name) {
+      die "\$name must be defined.";
+    }
+    
+    unless ($value) {
+      die "\$value must be defined.";
+    }
+    
+    my $styles_h = $self->{styles_h};
+    
+    $styles_h->set_string($name, $value);
+  }
+  
+  method css_text : string () {
+    
+    my $styles_h = $self->{styles_h};
+    
+    my $names = $styles_h->keys;
+    
+    Sort->sort_string_asc($names);
+    
+    my $css_text_buffer = StringBuffer->new;
+    
+    for my $name (@$names) {
+      my $value = $styles_h->get_string($name);
+      
+      my $css_text_each = "$name:$value;";
+      
+      $css_text_buffer->push($css_text_each);
+    }
+    
+    my $css_text = $css_text_buffer->to_string;
+    
+    return $css_text;
+  }
+  
+  method set_css_text : void ($css_text : string) {
+    
+    unless ($css_text) {
+      die "\$css_text must be defined.";
+    }
+    
+    my $style_pairs_text = Fn->split(";", $css_text);
+    
+    my $new_styles_h = Hash->new;
+    
+    for my $style_pair_text (@$style_pairs_text) {
+      
+      my $style_name_value = Fn->split(":", $style_pair_text);
+      
+      unless (@$style_name_value == 2) {
+        die "\$text_value contains an invalid style value:\"$style_pair_text\". It do not contains \":\".";
+      }
+      
+      my $style_name = $style_name_value->[0];
+      
+      unless (Regex->new("^[\w-:]+$")->match($style_name)) {
+        die "\$text_value contains an invalid style name:\"$style_name\".";
+      }
+      
+      my $style_value = $style_name_value->[1];
+      
+      unless (Regex->new("^[\w-:]+$")->match($style_name)) {
+        die "\$text_value contains an invalid style value:\"$style_value\".";
+      }
+      
+      $new_styles_h->set_string($style_name, $style_value);
+    }
+    
+    $self->{styles_h} = $new_styles_h;
+  }
+  
+  method to_pairs : string[] () {
+    
+    my $styles_h = $self->{styles_h};
+    
+    my $style_pairs = (string[])undef;
+    
+    if ($styles_h) {
+      my $names = $styles_h->keys;
+      
+      Sort->sort_string_asc($names);
+      
+      my $style_pairs_list = StringList->new;
+      for my $name (@$names) {
+        my $value = $styles_h->get_string($name);
+        
+        $style_pairs_list->push($name);
+        $style_pairs_list->push($value);
+      }
+      
+      $style_pairs = $style_pairs_list->to_array;
+    }
+    else {
+      $style_pairs = new string[0];
+    }
+    
+    return $style_pairs;
+  }
+  
+  method to_hash : Hash of string () {
+    
+    my $hash = $self->{styles_h}->clone;
+    
+    return $hash;
+  }
+}

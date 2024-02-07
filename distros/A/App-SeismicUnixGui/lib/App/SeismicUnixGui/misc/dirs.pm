@@ -54,8 +54,8 @@ my @PARENT_DIR_SPECS   = ("specs");
 my @PARENT_DIR_SU      = ("sunix");
 
 my @PARENT_DIR_GEN = (
-	"misc", "geopsy", "gmt", "messages",
-	"developer/code/sunix", "developer/code/gmt", "script", "sqlite", "t",
+	"misc", "geopsy", "messages",
+	"developer/code/sunix", "script"
 );
 
 my @CHILD_DIR_CONVERT = (
@@ -106,12 +106,14 @@ my $dirs = {
 	_PARENT_DIR_SPECS   => \@PARENT_DIR_SPECS,
 	_PARENT_DIR_SU      => \@PARENT_DIR_SU,
 	_PARENT_DIR_GEN     => \@PARENT_DIR_GEN,
+	_PARENT_DIR_type    => '',	
 	_CHILD_DIR_CONVERT  => \@CHILD_DIR_CONVERT,
 	_CHILD_DIR_GEN      => \@CHILD_DIR_GEN,
 	_CHILD_DIR_GUI      => \@CHILD_DIR_GUI,
 	_CHILD_DIR_TOOLS    => \@CHILD_DIR_TOOLS,
 	_CHILD_DIR_SPECS    => \@CHILD_DIR_SPECS,
 	_CHILD_DIR_SU       => \@CHILD_DIR_SU,
+	_CHILD_DIR_type     => '',
 };
 
 =head2 sub clear
@@ -128,14 +130,15 @@ sub clear {
 	$dirs->{_CHILD_DIR_TOOLS}    = '';
 	$dirs->{_CHILD_DIR_SPECS}    = '';
 	$dirs->{_CHILD_DIR_SU}       = '';
+	$dirs->{_CHILD_DIR_type}     = '';	
 	$dirs->{_GRANDPARENT_DIR}    = '';
-	$dirs->{_PARENT_DIR}         = '';
 	$dirs->{_PARENT_DIR_CONVERT} = '';
 	$dirs->{_PARENT_DIR_GEN}     = '';
 	$dirs->{_PARENT_DIR_GUI}     = '';
 	$dirs->{_PARENT_DIR_TOOLS}   = '';
 	$dirs->{_PARENT_DIR_SPECS}   = '';
 	$dirs->{_PARENT_DIR_SU}      = '';
+	$dirs->{_PARENT_DIR_type}    = '';
 	$dirs->{_file_name}          = '', 
 	$dirs->{_program_name}       = '';
 	return ();
@@ -805,14 +808,15 @@ sub get_pathNfile2search {
 
 	my ($self) = @_;
 
-	if (    length $dirs->{_CHILD_DIR}
+	if (    length $dirs->{_CHILD_DIR_type}
 		and length $dirs->{_GRANDPARENT_DIR}
-		and length $dirs->{_PARENT_DIR} )
+		and length $dirs->{_PARENT_DIR_type} )
 	{
 
-		my $CHILD_DIR       = $dirs->{_CHILD_DIR};
+		my $CHILD_DIR_type  = $dirs->{_CHILD_DIR_type};
 		my $GRANDPARENT_DIR = $dirs->{_GRANDPARENT_DIR};
-		my $PARENT_DIR      = $dirs->{_PARENT_DIR};
+		my $PARENT_DIR_type = $dirs->{_PARENT_DIR_type};
+		
 
 =head2 Define
 
@@ -829,8 +833,14 @@ sub get_pathNfile2search {
  
 =cut
 
-		my @PARENT_DIR = @{ $dirs->{_PARENT_DIR} };
-		my @CHILD_DIR  = @{ $dirs->{_CHILD_DIR} };
+#		print("dirs,get_pathNfile2search CHILD_DIR = @{$dirs->{$dirs->{_CHILD_DIR_type}}}\n");
+#		print("dirs,get_pathNfile2search PARENT_DIR= @{$dirs->{$dirs->{_PARENT_DIR_type}}}\n");	
+			
+		my @PARENT_DIR = @{ $dirs->{$dirs->{_PARENT_DIR_type}} };
+		my @CHILD_DIR  = @{ $dirs->{$dirs->{_CHILD_DIR_type}} };
+		
+#		print("dirs,get_pathNfile2search PARENT_DIR= @PARENT_DIR\n");
+#		print("dirs,get_pathNfile2search CHILD_DIR= @CHILD_DIR\n");
 
 		my $parent_directory_number_of = scalar @PARENT_DIR;
 		my $child_directory_number_of  = scalar @CHILD_DIR;
@@ -888,7 +898,7 @@ sub get_pathNfile2search {
 		return ( $result_aref2, \@dimensions );
 	}
 	else {
-		print("get_pathNfile2search, missing variable(s)\n");
+		print("dirs, get_pathNfile2search, missing variable(s)\n");
 		print("CHILD_DIR=$dirs->{_CHILD_DIR}\n");
 		print("GRANDPARENT_DIR=$dirs->{_GRANDPARENT_DIR}\n");
 		print("PARENT_DIR=$dirs->{_PARENT_DIR}\n");
@@ -1609,11 +1619,8 @@ sub set_CHILD_DIR_type {
 
 	if ( length $type ) {
 
-		my $CHILD_DIR = '_CHILD_DIR_' . $type;
-		$L_SU_global_constants->{_CHILD_DIR} =
-		  $L_SU_global_constants->{$CHILD_DIR};
-
-#		print("dirs,set_CHILD_DIR,set_CHILD_DIR_type = $L_SU_global_constants->{_CHILD_DIR}\n");
+        $dirs->{_CHILD_DIR_type} = '_CHILD_DIR_' . $type;
+#		print("dirs,set_CHILD_DIR_type = $dirs->{_CHILD_DIR_type}\n");
 
 	}
 	else {
@@ -1634,9 +1641,9 @@ sub set_GRANDPARENT_DIR {
 
 	if ( length $GRANDPARENT_DIR ) {
 
-		$L_SU_global_constants->{_GRANDPARENT_DIR} = $GRANDPARENT_DIR;
+		$dirs->{_GRANDPARENT_DIR} = $GRANDPARENT_DIR;
 
-#		print("dirs,set_GRANDPARENT_DIR,set_GRANDPARENT_DIR = $L_SU_global_constants->{_GRANDPARENT_DIR}\n");
+#		print("dirs,set_GRANDPARENT_DIR = $dirs->{_GRANDPARENT_DIR}\n");
 
 	}
 	else {
@@ -1655,11 +1662,9 @@ sub set_PARENT_DIR_type {
 
 	if ( length $type ) {
 
-		my $PARENT_DIR = '_PARENT_DIR_' . $type;
-		$L_SU_global_constants->{_PARENT_DIR} =
-		  $L_SU_global_constants->{$PARENT_DIR};
+		$dirs->{_PARENT_DIR_type} ='_PARENT_DIR_' . $type;
 
-#		print("dirs,set_PARENT_DIR,set_PARENT_DIR_type = $L_SU_global_constants->{_PARENT_DIR}\n");
+#		print("dirs,set_PARENT_DIR_type = $dirs->{_PARENT_DIR_type}\n");
 
 	}
 	else {

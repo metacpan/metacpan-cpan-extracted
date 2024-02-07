@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Dancer2" : "0.159002",
-            "Dancer2::Plugin::Map::Tube" : "0.01",
+            "Dancer2::Plugin::Map::Tube" : "0.04",
             "Dancer2::Plugin::Res" : "0.07",
             "perl" : "5.006"
          }
@@ -47,6 +47,6 @@
          "web" : "https://github.com/manwar/Map-Tube-Server"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

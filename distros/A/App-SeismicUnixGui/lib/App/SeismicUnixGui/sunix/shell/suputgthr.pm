@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::shell::suputgthr;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 

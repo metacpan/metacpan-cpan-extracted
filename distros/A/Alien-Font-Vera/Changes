@@ -1,19 +1,19 @@
+Revision history for Alien-Font-Vera
+
+0.014     2024-02-04 19:28:35 CET
+    - Small update to documentation (Thanks to Håkon Hægland and the perl pull request club).
+
 0.013   2023-01-29 Bruno Ramos
---------
     - Stable release
 
 0.012   2023-01-29 Bruno Ramos
---------
     - Update POD
 
 0.011   2023-01-29 Bruno Ramos
---------
     - Fix POD & other small changes for release
 
 0.010   2023-01-29 Bruno Ramos
---------
     - Prepare for stable release
 
 0.001   2023-01-29 Bruno Ramos
---------
     - Initial release

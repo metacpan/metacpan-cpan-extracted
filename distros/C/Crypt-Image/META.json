@@ -1,7 +1,7 @@
 {
    "abstract" : "Interface to hide text into an image.",
    "author" : [
-      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+      "Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
@@ -46,19 +46,19 @@
    "provides" : {
       "Crypt::Image" : {
          "file" : "lib/Crypt/Image.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       },
       "Crypt::Image::Axis" : {
          "file" : "lib/Crypt/Image/Axis.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       },
       "Crypt::Image::Params" : {
          "file" : "lib/Crypt/Image/Params.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       },
       "Crypt::Image::Util" : {
          "file" : "lib/Crypt/Image/Util.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
@@ -69,6 +69,6 @@
          "web" : "https://github.com/manwar/Crypt-Image"
       }
    },
-   "version" : "0.14",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "0.15",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

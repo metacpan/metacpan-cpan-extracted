@@ -1,13 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Fatal;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use Errno qw( EAGAIN EWOULDBLOCK );
 

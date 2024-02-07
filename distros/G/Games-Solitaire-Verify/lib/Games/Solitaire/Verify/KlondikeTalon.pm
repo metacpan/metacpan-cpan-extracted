@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::KlondikeTalon;
-$Games::Solitaire::Verify::KlondikeTalon::VERSION = '0.2403';
+$Games::Solitaire::Verify::KlondikeTalon::VERSION = '0.2500';
 use warnings;
 use strict;
 
@@ -16,7 +16,7 @@ __PACKAGE__->mk_acc_ref(
             _num_redeals_so_far
             _undealt_cards
             _waste
-            )
+        )
     ]
 );
 
@@ -138,7 +138,7 @@ talon of Klondike-like games.
 
 =head1 VERSION
 
-version 0.2403
+version 0.2500
 
 =head1 SYNOPSIS
 

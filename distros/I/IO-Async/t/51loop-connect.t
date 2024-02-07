@@ -1,12 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use IO::Socket::INET;
 use POSIX qw( ENOENT ENETDOWN );
@@ -47,14 +46,14 @@ my $addr = $listensock->sockname;
       addr => { family => "inet", socktype => "stream", addr => $addr },
    );
 
-   isa_ok( $future, "Future", '$future' );
+   isa_ok( $future, [ "Future" ], '$future isa Future' );
 
    wait_for { $future->is_ready };
 
    my ( $sock ) = $future->get;
 
    can_ok( $sock, qw( peerhost peerport ) );
-   is_deeply( [ unpack_sockaddr_in $sock->peername ],
+   is( [ unpack_sockaddr_in $sock->peername ],
               [ unpack_sockaddr_in $addr ], 'by addr: $sock->getpeername is $addr from future' );
 
    $listensock->accept; # Throw it away
@@ -67,14 +66,14 @@ my $addr = $listensock->sockname;
       addr   => { family => "inet", socktype => "stream", addr => $addr },
    );
 
-   isa_ok( $future, "Future", '$future for ->connect( handle )' );
+   isa_ok( $future, [ "Future" ], '$future for ->connect( handle ) isa Future' );
 
    wait_for { $future->is_ready };
 
    my $stream = $future->get;
-   identical( $stream, $given_stream, '$future->get returns given Stream' );
+   ref_is( $stream, $given_stream, '$future->get returns given Stream' );
    ok( my $sock = $stream->read_handle, '$stream has a read handle' );
-   is_deeply( [ unpack_sockaddr_in $sock->peername ],
+   is( [ unpack_sockaddr_in $sock->peername ],
               [ unpack_sockaddr_in $addr ], 'Returned $stream->read_handle->getpeername is $addr' );
 
    $listensock->accept; # Throw it away
@@ -94,7 +93,7 @@ my $addr = $listensock->sockname;
 
    # Not sure if it'll be an IO::Socket::INET or ::IP, but either way it should support these
    can_ok( $sock, qw( peerhost peerport ) );
-   is_deeply( [ unpack_sockaddr_in $sock->peername ],
+   is( [ unpack_sockaddr_in $sock->peername ],
               [ unpack_sockaddr_in $addr ], 'by addr: $sock->getpeername is $addr' );
 
    $listensock->accept; # Throw it away
@@ -108,14 +107,14 @@ my $addr = $listensock->sockname;
       socktype => $listensock->socktype,
    );
 
-   isa_ok( $future, "Future", '$future' );
+   isa_ok( $future, [ "Future" ], '$future isa Future' );
 
    wait_for { $future->is_ready };
 
    my ( $sock ) = $future->get;
 
    can_ok( $sock, qw( peerhost peerport ) );
-   is_deeply( [ unpack_sockaddr_in $sock->peername ],
+   is( [ unpack_sockaddr_in $sock->peername ],
               [ unpack_sockaddr_in $addr ], 'by host/service: $sock->getpeername is $addr from future' );
 
    is( $sock->sockhost, $INADDR_LOOPBACK_HOST, '$sock->sockhost is INADDR_LOOPBACK_HOST from future' );
@@ -139,7 +138,7 @@ my $addr = $listensock->sockname;
    wait_for { $sock };
 
    can_ok( $sock, qw( peerhost peerport ) );
-   is_deeply( [ unpack_sockaddr_in $sock->peername ],
+   is( [ unpack_sockaddr_in $sock->peername ],
               [ unpack_sockaddr_in $addr ], 'by host/service: $sock->getpeername is $addr' );
 
    is( $sock->sockhost, $INADDR_LOOPBACK_HOST, '$sock->sockhost is INADDR_LOOPBACK_HOST' );
@@ -197,9 +196,9 @@ SKIP: {
 
    wait_for { $stream };
 
-   isa_ok( $stream, "IO::Async::Stream", 'on_stream $stream isa IO::Async::Stream' );
+   isa_ok( $stream, [ "IO::Async::Stream" ], 'on_stream $stream isa IO::Async::Stream' );
    my $sock = $stream->read_handle;
-   is_deeply( [ unpack_sockaddr_in $sock->peername ],
+   is( [ unpack_sockaddr_in $sock->peername ],
               [ unpack_sockaddr_in $addr ], 'on_stream $sock->getpeername is $addr' );
 
    $listensock->accept; # Throw it away
@@ -214,13 +213,13 @@ my $udpsock = IO::Socket::INET->new( LocalAddr => 'localhost', Protocol => 'udp'
       addr   => { family => "inet", socktype => "dgram", addr => $udpsock->sockname },
    );
 
-   isa_ok( $future, "Future", '$future for ->connect( handle socket )' );
+   isa_ok( $future, [ "Future" ], '$future for ->connect( handle socket ) isa Future' );
 
    wait_for { $future->is_ready };
 
    my $socket = $future->get;
-   identical( $socket, $given_socket, '$future->get returns given Socket' );
-   is_deeply( [ unpack_sockaddr_in $socket->read_handle->peername ],
+   ref_is( $socket, $given_socket, '$future->get returns given Socket' );
+   is( [ unpack_sockaddr_in $socket->read_handle->peername ],
               [ unpack_sockaddr_in $udpsock->sockname ], 'Returned $socket->read_handle->getpeername is $addr' );
 }
 
@@ -236,8 +235,8 @@ my $udpsock = IO::Socket::INET->new( LocalAddr => 'localhost', Protocol => 'udp'
 
    wait_for { $sock };
 
-   isa_ok( $sock, "IO::Async::Socket", 'on_socket $sock isa IO::Async::Socket' );
-   is_deeply( [ unpack_sockaddr_in $sock->read_handle->peername ],
+   isa_ok( $sock, [ "IO::Async::Socket" ], 'on_socket $sock isa IO::Async::Socket' );
+   is( [ unpack_sockaddr_in $sock->read_handle->peername ],
               [ unpack_sockaddr_in $udpsock->sockname ], 'on_socket $sock->read_handle->getpeername is $addr' );
 }
 

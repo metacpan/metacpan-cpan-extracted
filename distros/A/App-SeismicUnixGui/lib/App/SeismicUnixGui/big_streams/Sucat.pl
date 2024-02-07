@@ -6,7 +6,8 @@
   PROGRAM NAME: Sucat.pl
   Purpose: Concatenate a series files 
   AUTHOR:  Juan M. Lorenzo DEPENDS: on cat from bash 
-  DATE:    May 25 
+  DATE:    May 25 2018
+  
            Includes access to a simple configuration file
            Simple file is called Sucat.config
            Access to simple file is via Sucat2_config.pl
@@ -30,6 +31,9 @@
 
 =head2 Example Cases
 
+Square brackets show abbreviations of default directories.
+[$DATA_SEISMIC_TXT]:  is at: ~/txt/"subUser"/
+
  CASE 1A
 
  Use a list (use complete file names but exclude the directory paths) 
@@ -37,7 +41,7 @@
  into the correct format.
 
  A "list", which is found in the $DATA_SEISMIC_TXT directory contains, 
- e.g.:
+ e.g.,:
  ivpicks_sorted_par_L28Hz_Ibeam_geom4_cdp1
  ivpicks_sorted_par_L28Hz_Ibeam_geom4_cdp11
 
@@ -66,11 +70,10 @@ CASE 1B
  for concatenating iVelan "pick files" (x-coordinate,time pairs)
  into the correct format.
 
- A "list" which is found in the $DATA_SEISMIC_TXT directory contains, e.g.:
+ For example, a "list" [$DATA_SEISMIC_TXT] contains:
 
  itop_mute_par_L28Hz_Ibeam_cmp_ep3
  itop_mute_par_L28Hz_Ibeam_cmp_ep5
-
 
  The starting input format in each  in "par" format:
  tnmo=0.0189974,0.113193,0.153562,0.231926
@@ -80,13 +83,10 @@ CASE 1B
  xmute=5.4778,16.806,19.68,100.761
 
  The final output format is:
-
- The list is expected to be found in $DATA_SEISMIC_TXT, i.e., ~/txt/"subuser"/
-    
  Data_type is determined by parsing the file names and normally contains:
  "itop_mute", "ibot_mute" etc." '
     
- (See ~sunix/shell/sucat.pm
+ (See ~sunix/shell/sucat.pm)
  If "data_type" = "velan" then the concatenated output file
  will automatically be reformatted for input into sunmo.       
 
@@ -97,11 +97,15 @@ CASE 1B
 GUI EXAMPLE:    
     
  Note that a list can only be used when the values of the prior
- 6 parameters are blank.
+ 6 parameters are BLANK, i.e., be sure to
+ exclude values for first 6 parameters in GUI. 
 
- An output name is also required.
- --Exclude values for first 7 parameters in GUI. 
- --alternative directories are optional.
+ The input name should have an suffix= ".txt"
+ SUG will recognize the extension but will not show the suffix
+ in the GUI.
+ An output name is also required. The suffix ".su"
+ will be added automatically to whatever name you choose.
+ Alternative directories are optional.
 
     first_file_number_in               =               
     last_file_number_in                =                
@@ -109,13 +113,13 @@ GUI EXAMPLE:
     input_suffix                       =               
     input_name_prefix                  =                  
     input_name_extension               =              
-    list                               =  file name [$DATA_SEISMIC_TXT]
-    output_file_name                   =    
-    alternative_inbound_directory      =  [$PL_SEISMIC]             
-    alternative_outbound_directory     =  [$PL_SEISMIC]  
+    list                               =  list [$DATA_SEISMIC_TXT]
+    output_file_name                   =  file_name
+    alternative_inbound_directory      =               
+    alternative_outbound_directory     =   
   
   
-  an example list:
+  An example of what can be inside the file: "list.txt":
   
   25.su
   26.su
@@ -129,7 +133,7 @@ CASE 2
  DO NOT use a list. 
  Instead, include values for at least the first 3 
  parameters in the GUI, 
- and up to and including values for all the remaining parameters,
+ and up to and including values for all the remaining parametfile nameers,
  except the list name. A
 
  An output name is possible but not required. Note that it is assumed
@@ -180,27 +184,27 @@ CASE 3
  input_suffix                          = 
  input_name_prefix                     = 
  input_name_extension                  = 
- list                                  = cat_list_good_sp;
- output_file_name                      = 'All_good_sp';
+ list                                  = cat_list_good_sp [$DATA_SEISMIC_TXT]
+ output_file_name                      = All_good_sp [$DATA_SEISMIC_SU]
  alternative_inbound_directory         = 
  alternative_outbound_directory        =
 
 
  CASE 4:
  
-  first_file_number_in            = 1000
-  last_file_number_in             = 1010
-  number_of_files_in              = 11
-  input_suffix                    = _clean.su
+  first_file_number_in            = 1000 [$DATA_SEISMIC_SU]
+  last_file_number_in             = 1010 [$DATA_SEISMIC_SU]
+  number_of_files_in              = 11   [$DATA_SEISMIC_SU]
+  input_suffix                    = _clean.su [$DATA_SEISMIC_SU]
   input_name_prefix               = 
   input_name_extension            = 
-  output_file_name                = 1000_10 
+  output_file_name                = 1000_10 [$DATA_SEISMIC_SU]
   alternative_inbound_directory   = 
   alternative_outbound_directory  =
 
 =head2 NOTES 
 
-  The input and output default directories are $PL_SEISMIC
+  The input and output default directories are 
   but these can be overridden by the values of the 
   alternative directories
     
@@ -212,11 +216,14 @@ CASE 3
   (1) sorted ivpicks
   V 0.1.4 update NOTES 9.9.21
   V 0.1.5 improved USAGE 11.8.22
+  V 0.1.6 requires lists to have a ".txt" suffix
+      The Input directories for a generic
+      "list.txt" is [$DATA_SEISMIC_TXT] May, 2023, NM
 
 =cut
 
 use Moose;
-our $VERSION = '0.1.5';
+our $VERSION = '0.1.6';
 use App::SeismicUnixGui::misc::control '0.0.3';
 use aliased 'App::SeismicUnixGui::misc::control';
 use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';

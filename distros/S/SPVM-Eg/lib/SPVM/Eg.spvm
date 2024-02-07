@@ -2,27 +2,43 @@
 # MIT License
 
 class Eg {
-  version "0.014";
+  version "0.017";
   
   use Eg::Node;
-  use Eg::Node::Document::HTML;
-  use Eg::Node::Element;
-  use Eg::Node::Text;
+  use Eg::Node::Document;
   use Eg::Runtime;
-  
-  use Hash;
-  use List;
-  use StringBuffer;
   
   our $RUNTIME : rw Eg::Runtime;
   
+  INIT {
+    
+    $RUNTIME = Eg::Runtime->new;
+  }
+  
   # Class Methods
   static method window : Eg::Window () {
+    
     return $RUNTIME->window;
   }
   
-  static method document : Eg::Node::Document::HTML () {
+  static method document : Eg::Node::Document () {
     return &window->document;
+  }
+  
+  # Temporary
+  static method merge_options_v2 : object[] ($options1 : object[], $options2 : object[]) {
+    
+    unless ($options1) {
+      $options1 = {};
+    }
+    
+    unless ($options2) {
+      $options2 = {};;
+    }
+    
+    my $merged_options = Fn->merge_options($options1, $options2);
+    
+    return $merged_options;
   }
   
 }

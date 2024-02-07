@@ -3,14 +3,14 @@
 
 class Eg::Node::Element::HTML::Video extends Eg::Node::Element::HTML::Media {
   
-  allow Eg::Node::Document::HTML;
+  allow Eg::Node::Document;
   
   # Class Methods
-  private static method new : Eg::Node::Element::HTML::Video () {
+  private static method new : Eg::Node::Element::HTML::Video ($options : object[] = undef) {
     
     my $self = new Eg::Node::Element::HTML::Video;
     
-    $self->SUPER::init;
+    $self->SUPER::init($options);
     
     return $self;
   }

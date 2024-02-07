@@ -6,7 +6,7 @@ use strict;
 use warnings;
 no warnings;
 
-our $VERSION = '1.051';
+our $VERSION = '1.052';
 
 =encoding utf8
 
@@ -344,11 +344,11 @@ The source code is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2008-2022, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
+Copyright © 2008-2024, brian d foy C<< <briandfoy@pobox.com> >>. All rights reserved.
 
 This project is under the Artistic License 2.0.
 

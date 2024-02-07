@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::NMO_Vel_Stk::surecip;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 

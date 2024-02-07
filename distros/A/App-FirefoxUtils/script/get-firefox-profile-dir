@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Firefox/Util/Profile/get_firefox_profile_dir
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-09'; # DATE
+our $DATE = '2023-10-28'; # DATE
 our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Firefox/Util/Profile/get_firefox_profile_dir",
@@ -40,11 +40,15 @@ get-firefox-profile-dir - Given a Firefox profile name, return its directory
 
 =head1 VERSION
 
-This document describes version 0.021 of get-firefox-profile-dir (from Perl distribution App-FirefoxUtils), released on 2022-10-09.
+This document describes version 0.022 of get-firefox-profile-dir (from Perl distribution App-FirefoxUtils), released on 2023-10-28.
 
 =head1 SYNOPSIS
 
-B<get-firefox-profile-dir> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<profile>E<gt>
+B<get-firefox-profile-dir> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<get-firefox-profile-dir> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<get-firefox-profile-dir> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<profile|/"--profile=s*, -l">>E<gt>
 
 =head1 DESCRIPTION
 
@@ -59,6 +63,9 @@ C<*> marks required options.
 =over
 
 =item B<--profile>=I<s>*, B<-l>
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -243,7 +250,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

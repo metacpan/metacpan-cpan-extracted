@@ -1,5 +1,6 @@
 #pragma once
 #include <system_error>
+#include <inttypes.h>
 
 namespace panda { namespace date {
 

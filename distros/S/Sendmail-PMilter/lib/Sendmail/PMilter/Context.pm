@@ -2,7 +2,7 @@
 
 =head1 LICENSE
 
-Copyright (c) 2016-2022 G.W. Haywood.  All rights reserved.
+Copyright (c) 2016-2024 G.W. Haywood.  All rights reserved.
   With thanks to all those who have trodden these paths before,
   including
 Copyright (c) 2002-2004 Todd Vierling.  All rights reserved.
@@ -50,11 +50,11 @@ use Carp;
 use Socket;
 use UNIVERSAL;
 
-use Sendmail::PMilter 1.24 qw(:all);
+use Sendmail::PMilter 1.27 qw(:all);
 
 # use Data::Dumper;
 
-our $VERSION = '1.24';
+our $VERSION = '1.27';
 $VERSION = eval $VERSION;
 
 =pod
@@ -443,6 +443,7 @@ sub main ($) {
 #$time_now = localtime;
 #printf( "%s PID=%d Context.pm(%3d): main:       error found at loop exit: [%s]\n", $time_now, $$, __LINE__, $err );
 		warn $err;
+		die $err;
 	} else {
 		$this->write_packet(SMFIR_CONTINUE) if defined($socket);
 	}
@@ -490,11 +491,12 @@ sub call_hooks ($$;@) {
 #my $time_now = localtime;
 #printf( "%s PID=%d Context.pm(%3d): call_hooks: callback=[%s]\n", $time_now, $$, __LINE__, $what );
 
-	my $rc = SMFIS_CONTINUE;
+	my $rc = SMFIS_CONTINUE;	# SMFIS_CONTINUE is the default behaviour if no callback is defined.
 	my $sub = $this->{callbacks}{$what};
 #$time_now = localtime;
 	if( defined($sub) )
 	{
+	    $rc = SMFIS_TEMPFAIL;	# 2023.03.11: Without this assignment we would accept messages if the milter bombs out with some dumb Perl error.  Under these circumstances I'd rather TEMPFAIL.  Configuration?
 #printf( "%s PID=%d Context.pm(%3d): call_hooks: about to call callback=[%s], rc=[%s]\n", $time_now, $$, __LINE__, $what, $rc );
 	    $rc = &$sub($this, @_);
 #$time_now = localtime;

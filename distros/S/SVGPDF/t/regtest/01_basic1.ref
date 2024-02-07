@@ -1,6 +1,6 @@
 ==== start svg ====
 XObject #1
-vb 0 0 200 250 (inferred) => bb 0.00 -250.00 200.00 0.00
+vb 0.00 0.00 200.00 250.00 (inferred) => bb 0.00 -250.00 200.00 0.00
 matrix( 1 0 0 -1 0 0)
 vb rect( 0.00 0.00 200.00 250.00)
 xo fill_color black (initial)
@@ -10,21 +10,21 @@ xo fill_color black (initial)
   start handling rect (SVGPDF::Rect)
   rect x=0.5 y=0.5 w=199 h=249
     xo save
-    rect stroke-width=1 stroke=black fill=none
+    rect stroke-width=1.00 stroke=black fill=none
     xo stroke (black)
     xo restore
   end handling rect
   start handling rect (SVGPDF::Rect)
   rect x=10 y=10 w=30 h=30
     xo save
-    rect stroke-width=5 stroke=black fill=none
+    rect stroke-width=5.00 stroke=black fill=none
     xo stroke (black)
     xo restore
   end handling rect
   start handling rect (SVGPDF::Rect)
   rect x=60 y=10 w=30 h=30
     xo save
-    rect stroke-width=5 stroke=black fill=none
+    rect stroke-width=5.00 stroke=black fill=none
     rect(rounded) rx=10 ry=10
     xo stroke (black)
     xo restore
@@ -32,42 +32,42 @@ xo fill_color black (initial)
   start handling circle (SVGPDF::Circle)
   circle cx=25 cy=75 r=20
     xo save
-    circle stroke-width=5 stroke=red fill=none
+    circle stroke-width=5.00 stroke=red fill=none
     xo stroke (red)
     xo restore
   end handling circle
   start handling ellipse (SVGPDF::Ellipse)
   ellipse cx=75 cy=75 rx=20 ry=5
     xo save
-    ellipse stroke-width=5 stroke=red fill=none
+    ellipse stroke-width=5.00 stroke=red fill=none
     xo stroke (red)
     xo restore
   end handling ellipse
   start handling line (SVGPDF::Line)
   line x1=10 y1=110 x2=50 y2=150
     xo save
-    line stroke-width=5 stroke=orange fill=(current) fill=black
+    line stroke-width=5.00 stroke=orange fill=(current) fill=black
     xo paint (orange currentColor)
     xo restore
   end handling line
   start handling polyline (SVGPDF::Polyline)
   polyline points="60 110 65 120 70 115..."
     xo save
-    polyline stroke-width=5 stroke=orange fill=none
+    polyline stroke-width=5.00 stroke=orange fill=none
     xo stroke (orange)
     xo restore
   end handling polyline
   start handling polygon (SVGPDF::Polygon)
   polygon points="50 160 55 180 70 180..."
     xo save
-    polygon stroke-width=5 stroke=green fill=none
+    polygon stroke-width=5.00 stroke=green fill=none
     xo stroke (green)
     xo restore
   end handling polygon
   start handling path (SVGPDF::Path)
   path d="M20,230 Q40,205 50,2..."
     xo save
-    path stroke-width=5 stroke=blue fill=none
+    path stroke-width=5.00 stroke=blue fill=none
     xo move(20.00,230.00)
     xo spline(40.00,205.00 50.00,230.00)
     xo spline(60.00,255.00 90.00,230.00)

@@ -22,12 +22,37 @@ use Test::Warnings 0.010 qw(:no_end_test);
 my $no_warnings;
 use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
-plan tests => 5 + 1 + $no_warnings;
+plan tests => 7 + 1 + $no_warnings;
 
 my $transaction = $driver->session->begin_transaction;
 
 
 my ($q, $r, $c);
+
+
+subtest 'result stream interface: consume' => sub {
+	plan tests => 7;
+	$r = $s->run('RETURN 7 AS n UNION RETURN 11 AS n');
+	lives_ok { $c = $r->consume } 'consume()';
+	isa_ok $c, 'Neo4j::Driver::ResultSummary', 'summary from consume()';
+	ok ! $r->{stream}, 'stream dereferenced';
+	ok ! $r->{attached}, 'stream detached';
+	ok $r->{exhausted}, 'stream exhausted';
+	lives_and { ok ! $r->has_next } 'no has next';
+	lives_and { ok ! $r->size } 'no size';
+};
+
+
+subtest 'result stream interface: summary' => sub {
+	plan tests => 6;
+	$r = $s->run('RETURN 7 AS n UNION RETURN 11 AS n');
+	lives_ok { $r->summary } 'summary()';
+	ok ! $r->{stream}, 'stream dereferenced';
+	ok ! $r->{attached}, 'stream detached';
+	ok ! $r->{exhausted}, 'stream not exhausted';
+	lives_and { ok $r->has_next } 'has next';
+	lives_and { ok $r->size } 'has size';
+};
 
 
 subtest 'ResultSummary' => sub {
@@ -36,7 +61,7 @@ subtest 'ResultSummary' => sub {
 RETURN {fortytwo}
 END
 	my @params = (fortytwo => 42);
-	lives_ok { $r = $s->run($q, @params)->summary; } 'get summary';
+	lives_ok { $r = $s->run($q, @params)->consume; } 'get summary';
 	isa_ok $r, 'Neo4j::Driver::ResultSummary', 'ResultSummary';
 	isa_ok $r->server, 'Neo4j::Driver::ServerInfo', 'ServerInfo';
 	my $param_start = $s->{cypher_params_v2} ? '\$' : '\{';
@@ -49,7 +74,7 @@ END
 	$q = <<END;
 EXPLAIN MATCH (n), (m) RETURN n, m
 END
-	lives_ok { $r = $s->run($q)->summary; } 'get summary with plan';
+	lives_ok { $r = $s->run($q)->consume; } 'get summary with plan';
 	lives_and { is_deeply $r->statement->{parameters}, {} } 'no params';
 	my ($plan, @notifications);
 	lives_and { ok $plan = $r->plan; } 'get plan';

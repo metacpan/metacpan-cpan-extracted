@@ -1,3 +1,8 @@
+1.034   2024-02-02  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] (Re)add csv2csv as alias for csv-csv.
+
+
 1.033   2023-09-06  Released-By: PERLANCAR; Urgency: medium
 
         - Add utility: csv-sort-fields-by-spec.

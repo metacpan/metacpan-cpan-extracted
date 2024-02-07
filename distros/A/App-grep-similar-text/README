@@ -1,0 +1,117 @@
+NAME
+    App::grep::similar::text - Print lines similar to the specified text
+
+VERSION
+    This document describes version 0.001 of App::grep::similar::text (from
+    Perl distribution App-grep-similar-text), released on 2024-01-18.
+
+FUNCTIONS
+  grep_similar_text
+    Usage:
+
+     grep_similar_text(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Print lines similar to the specified text.
+
+    This is a grep-like utility that greps for text in input similar to the
+    specified text. Measure of similarity can be adjusted using these
+    options: "--max-edit-distance" ("-M").
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   color => *str* (default: "auto")
+
+        Specify when to show color (never, always, or auto/when
+        interactive).
+
+    *   count => *true*
+
+        Supress normal output, return a count of matching lines.
+
+    *   files => *array[filename]*
+
+        (No description)
+
+    *   ignore_case => *bool*
+
+        If set to true, will search case-insensitively.
+
+    *   invert_match => *bool*
+
+        Invert the sense of matching.
+
+    *   line_number => *true*
+
+        Show line number along with matches.
+
+    *   max_edit_distance => *uint*
+
+        If not specified, a sensible default will be calculated as follow:
+
+         int( min(len(text), len(input_text)) / 1.3)
+
+    *   quiet => *true*
+
+        Do not print matches, only return appropriate exit code.
+
+    *   string* => *str*
+
+        String to compare similarity of each line of input to.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-grep-similar-text>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-grep-similar-text>.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-grep-similar-text
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

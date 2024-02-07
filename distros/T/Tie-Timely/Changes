@@ -1,5 +1,8 @@
 Revision history for Perl module Time::Timely
 
+1.025 2024-02-06T05:18:49Z
+	* refresh distro, update email addresses
+
 1.024 2022-01-21T02:01:23Z
 	* The LICENSE file had been truncated. 
 

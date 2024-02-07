@@ -2,38 +2,26 @@ NAME
     App::FirefoxUtils - Utilities related to Firefox
 
 VERSION
-    This document describes version 0.021 of App::FirefoxUtils (from Perl
-    distribution App-FirefoxUtils), released on 2022-10-09.
+    This document describes version 0.022 of App::FirefoxUtils (from Perl
+    distribution App-FirefoxUtils), released on 2023-10-28.
 
 SYNOPSIS
 DESCRIPTION
     This distribution includes several utilities related to Firefox:
 
-    *   firefox-has-processes
-
-    *   firefox-is-paused
-
-    *   firefox-is-running
-
-    *   get-firefox-profile-dir
-
-    *   kill-firefox
-
-    *   list-firefox-profiles
-
-    *   pause-and-unpause-firefox
-
-    *   pause-firefox
-
-    *   ps-firefox
-
-    *   restart-firefox
-
-    *   start-firefox
-
-    *   terminate-firefox
-
-    *   unpause-firefox
+    1. firefox-has-processes
+    2. firefox-is-paused
+    3. firefox-is-running
+    4. get-firefox-profile-dir
+    5. kill-firefox
+    6. list-firefox-profiles
+    7. pause-and-unpause-firefox
+    8. pause-firefox
+    9. ps-firefox
+    10. restart-firefox
+    11. start-firefox
+    12. terminate-firefox
+    13. unpause-firefox
 
 FUNCTIONS
   firefox_has_processes
@@ -47,7 +35,45 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   cmndline_pat => *re_from_str*
+
+        Filter processes using regex against their cmndline.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   exec_pat => *re_from_str*
+
+        Filter processes using regex against their exec.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   fname_pat => *re_from_str*
+
+        Filter processes using regex against their fname.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   pid_pat => *re_from_str*
+
+        Filter processes using regex against their pid.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
     *   quiet => *true*
+
+        (No description)
 
     *   users => *array[unix::uid::exists]*
 
@@ -81,7 +107,45 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   cmndline_pat => *re_from_str*
+
+        Filter processes using regex against their cmndline.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   exec_pat => *re_from_str*
+
+        Filter processes using regex against their exec.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   fname_pat => *re_from_str*
+
+        Filter processes using regex against their fname.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   pid_pat => *re_from_str*
+
+        Filter processes using regex against their pid.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
     *   quiet => *true*
+
+        (No description)
 
     *   users => *array[unix::uid::exists]*
 
@@ -117,7 +181,45 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   cmndline_pat => *re_from_str*
+
+        Filter processes using regex against their cmndline.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   exec_pat => *re_from_str*
+
+        Filter processes using regex against their exec.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   fname_pat => *re_from_str*
+
+        Filter processes using regex against their fname.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   pid_pat => *re_from_str*
+
+        Filter processes using regex against their pid.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
     *   quiet => *true*
+
+        (No description)
 
     *   users => *array[unix::uid::exists]*
 
@@ -172,6 +274,33 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   cmndline_pat => *re_from_str*
+
+        Filter processes using regex against their cmndline.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   exec_pat => *re_from_str*
+
+        Filter processes using regex against their exec.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   fname_pat => *re_from_str*
+
+        Filter processes using regex against their fname.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
     *   periods => *array[duration]*
 
         Pause and unpause times, in seconds.
@@ -181,6 +310,15 @@ FUNCTIONS
         pattern), you can use:
 
          300,10,120,30
+
+    *   pid_pat => *re_from_str*
+
+        Filter processes using regex against their pid.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
 
     *   users => *array[unix::uid::exists]*
 
@@ -220,6 +358,42 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   cmndline_pat => *re_from_str*
+
+        Filter processes using regex against their cmndline.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   exec_pat => *re_from_str*
+
+        Filter processes using regex against their exec.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   fname_pat => *re_from_str*
+
+        Filter processes using regex against their fname.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   pid_pat => *re_from_str*
+
+        Filter processes using regex against their pid.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
     *   users => *array[unix::uid::exists]*
 
         Kill browser processes that belong to certain user(s) only.
@@ -248,6 +422,42 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   cmndline_pat => *re_from_str*
+
+        Filter processes using regex against their cmndline.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   exec_pat => *re_from_str*
+
+        Filter processes using regex against their exec.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   fname_pat => *re_from_str*
+
+        Filter processes using regex against their fname.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   pid_pat => *re_from_str*
+
+        Filter processes using regex against their pid.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
 
     *   users => *array[unix::uid::exists]*
 
@@ -282,7 +492,11 @@ FUNCTIONS
 
     *   firefox_cmd => *array[str]|str* (default: "firefox")
 
+        (No description)
+
     *   quiet => *true*
+
+        (No description)
 
     Special arguments:
 
@@ -319,7 +533,11 @@ FUNCTIONS
 
     *   firefox_cmd => *array[str]|str* (default: "firefox")
 
+        (No description)
+
     *   quiet => *true*
+
+        (No description)
 
     Special arguments:
 
@@ -352,7 +570,45 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   cmndline_pat => *re_from_str*
+
+        Filter processes using regex against their cmndline.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   exec_pat => *re_from_str*
+
+        Filter processes using regex against their exec.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   fname_pat => *re_from_str*
+
+        Filter processes using regex against their fname.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   pid_pat => *re_from_str*
+
+        Filter processes using regex against their pid.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
     *   signal => *unix::signal*
+
+        (No description)
 
     *   users => *array[unix::uid::exists]*
 
@@ -382,6 +638,42 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   cmndline_pat => *re_from_str*
+
+        Filter processes using regex against their cmndline.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   exec_pat => *re_from_str*
+
+        Filter processes using regex against their exec.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   fname_pat => *re_from_str*
+
+        Filter processes using regex against their fname.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
+
+    *   pid_pat => *re_from_str*
+
+        Filter processes using regex against their pid.
+
+        If one of the "*-pat" options are specified, then instead of the
+        default heuristic rules to find the browser processes, these "*-pat"
+        options are solely used to determine which processes are the browser
+        processes.
 
     *   users => *array[unix::uid::exists]*
 
@@ -443,7 +735,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2020, 2019 by perlancar
+    This software is copyright (c) 2023, 2022, 2021, 2020, 2019 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

@@ -6,7 +6,7 @@ package Catalyst::Manual;
 use strict;
 use warnings;
 
-our $VERSION = '5.9011';
+our $VERSION = '5.9012';
 
 1;
 __END__
@@ -82,7 +82,7 @@ By: Kieren Diment, Matt Trout
 Available July 12, 2009
 ISBN 10: 1-4302-2365-0
 ISBN 13: 978-1-4302-2365-8
-http://www.apress.com/book/view/9781430223658
+https://link.springer.com/book/10.1007/978-1-4302-2366-5
 
 =item *
 
@@ -92,7 +92,6 @@ By: Jonathan Rockway
 Published December, 2007
 ISBN 10: 1847190952
 ISBN 13: 978-1-847190-95-6
-http://www.packtpub.com/catalyst-perl-web-application/book
 
 =back
 

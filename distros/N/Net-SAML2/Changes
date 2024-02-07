@@ -1,5 +1,20 @@
 Revision history for Perl extension Net::SAML2.
 
+0.77 -- Fri Feb 02 23:45:43 AST 2024
+
+    [Compatibility Deprecation Warning]
+    - The Redirect now uses SHA256 dy default instead of SHA1
+    - nameid_format in Protocol::AuthnRequest is Deprecated.  Please update your
+    code to use nameidpolicy_format instead.  The current code simply warns but a
+    future version will use nameid_format for other purposes see:
+    https://github.com/perl-net-saml2/perl-Net-SAML2/issues/195.
+
+    [Detailed Change Log]
+    - 70890a1 Add deprecation warning for nameid_format in Protocol::AuthnRequest
+    - 4920a03 add and BumpVersionAfterRelease
+    - 5ba4c33 Set Default Redirect Signature Algorithm to sha256
+    - 12afa9a v0.76
+
 0.76 -- Mon Jan 08 18:31:06 AST 2024
 
     - 688dc32 Forgot to increment the version for last release

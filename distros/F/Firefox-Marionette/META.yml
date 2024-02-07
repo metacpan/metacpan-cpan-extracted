@@ -11,6 +11,7 @@ build_requires:
   HTTP::Daemon: '0'
   HTTP::Response: '0'
   HTTP::Status: '0'
+  IO::Socket::IP: '0'
   IO::Socket::SSL: '0'
   PDF::API2: '2.036'
   Test::CheckManifest: '0.9'
@@ -67,5 +68,5 @@ requires:
 resources:
   bugtracker: https://github.com/david-dick/firefox-marionette/issues
   repository: https://github.com/david-dick/firefox-marionette
-version: '1.51'
+version: '1.52'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

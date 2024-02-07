@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::plot::pscontour;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 
@@ -209,7 +209,7 @@ Notes:
 
 
 
- AUTHOR:  Dave Hale, Colorado School of Mines, 05/29/90
+ Author:  Dave Hale, Colorado School of Mines, 05/29/90
 
  MODIFIED:  Craig Artley, Colorado School of Mines, 08/30/91
 

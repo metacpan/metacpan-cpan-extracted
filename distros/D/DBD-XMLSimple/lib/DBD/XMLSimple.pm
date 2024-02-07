@@ -9,7 +9,7 @@ DBD::XMLSimple - Access XML data via the DBI interface
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
@@ -76,7 +76,7 @@ use base qw(DBI::DBD::SqlEngine);
 
 use vars qw($VERSION $drh $methods_already_installed);
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 our $drh = undef;
 our $methods_already_installed = 0;
 
@@ -113,6 +113,8 @@ sub CLONE
 package DBD::XMLSimple::dr;
 
 use vars qw($imp_data_size);
+
+$imp_data_size = 0;
 
 sub disconnect_all
 {
@@ -323,7 +325,7 @@ L<http://search.cpan.org/dist/DBD-XMLSimple/>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright 2016-2017 Nigel Horne.
+Copyright 2016-2024 Nigel Horne.
 
 This program is released under the following licence: GPL
 

@@ -52,6 +52,7 @@ t/02-kwalitee.t
 t/02-pod-coverage.t
 t/02-pod.t
 t/99-prepare.t
+t/ambiguous-parse.t
 t/attachment-filename-encoding.t
 t/Body.t
 t/BodyPrint.t
@@ -70,6 +71,7 @@ t/ParserEncoded.t
 t/ParserPreamble.t
 t/Ref.t
 t/Smtpsend.t
+t/test-utf8-bom.t
 t/ticket-11901.t
 t/ticket-119568.t
 t/ticket-22684.t
@@ -148,6 +150,12 @@ testmsgs/bluedot-postcard.msg
 testmsgs/bluedot-postcard.ref
 testmsgs/bluedot-simple.msg
 testmsgs/bluedot-simple.ref
+testmsgs/double-boundary.msg
+testmsgs/double-content-disposition-param.msg
+testmsgs/double-content-disposition.msg
+testmsgs/double-content-id.msg
+testmsgs/double-content-transfer-encoding.msg
+testmsgs/double-content-type.msg
 testmsgs/double-semicolon.msg
 testmsgs/double-semicolon2.msg
 testmsgs/dup-names.msg
@@ -191,6 +199,7 @@ testmsgs/russian.ref
 testmsgs/simple.msg
 testmsgs/simple.ref
 testmsgs/ticket-60931.msg
+testmsgs/utf8-bom-at-start.msg
 testmsgs/uu-junk-extracted.ref
 testmsgs/uu-junk-target.msg
 testmsgs/uu-junk.msg

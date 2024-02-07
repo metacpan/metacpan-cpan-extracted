@@ -16,6 +16,10 @@ class Eg::Node {
   use Eg::Node::Document;
   use Eg::Node::DocumentFragment;
   
+  use Eg::Node::Element::HTML::Unknown;
+  
+  use Native::MethodCall;
+  
   enum {
     TYPE_ELEMENT_NODE = 1,
     TYPE_ATTRIBUTE_NODE = 2,
@@ -31,6 +35,8 @@ class Eg::Node {
   # Fields
   has node_type : ro int;
   
+  has node_name : protected string;
+  
   has parent_node : ro Eg::Node;
   
   has next_sibling : ro Eg::Node;
@@ -45,6 +51,8 @@ class Eg::Node {
   
   has box : Eg::CSS::Box;
   
+  has owner_document : ro Eg::Node::Document;
+  
   # Class Methods
   
   # Instance Methods
@@ -52,11 +60,24 @@ class Eg::Node {
     
     my $options_h = Hash->new($options);
     
+    if ($options_h->exists("owner_document")) {
+      
+      my $owner_document = (Eg::Node::Document)$options_h->get("owner_document");
+      $self->{owner_document} = $owner_document;
+      weaken $self->{owner_document};
+    }
+    else {
+      unless ($self isa Eg::Node::Document) {
+        die "If the node does not inherit the Eg::Node::Document class, the \"owner_document\" option must be defined.";
+      }
+    }
+    
     if ($options_h->exists("node_type")) {
-      
       my $node_type = $options_h->get_int("node_type");
-      
       $self->{node_type} = $node_type;
+    }
+    else {
+      die "The \"node_type\" option must be defined.";
     }
     
     my $node_value = $options_h->get_or_default_string("node_value", undef);
@@ -66,6 +87,10 @@ class Eg::Node {
       
       $self->{node_value_buffer} = $node_value_buffer;
     }
+    
+    my $node_name = $options_h->get_or_default_string("node_name", undef);
+    
+    $self->{node_name} = $node_name;
     
   }
   
@@ -148,57 +173,44 @@ class Eg::Node {
   
   method node_name : string () {
     
-    my $node_name = (string)undef;
-    
     my $node_type = $self->{node_type};
     
+    my $node_name = (string)undef;
+    
     switch ($node_type) {
-      case &TYPE_DOCUMENT_NODE : {
-        $node_name = "#document";
+      case &TYPE_ATTRIBUTE_NODE: {
+        $node_name = $self->(Eg::Node::Attr)->name;
       }
-      case &TYPE_ELEMENT_NODE : {
-        $node_name = $self->(Eg::Node::Element)->tag_name;
+      case &TYPE_CDATA_SECTION_NODE: {
+        $node_name = "#cdata-section";
       }
-      case &TYPE_TEXT_NODE : {
-        $node_name = "#text";
-      }
-      case &TYPE_COMMENT_NODE : {
+      case &TYPE_COMMENT_NODE: {
         $node_name = "#comment";
       }
-      default : {
-        die "The node type $node_type is not supported.";
+      case &TYPE_DOCUMENT_NODE: {
+        $node_name = "#document";
+      }
+      case &TYPE_DOCUMENT_FRAGMENT_NODE: {
+        $node_name = "#document-fragment";
+      }
+      case &TYPE_DOCUMENT_TYPE_NODE: {
+        $node_name = $self->(Eg::Node::DocumentType)->name;
+      }
+      case &TYPE_ELEMENT_NODE: {
+        $node_name = $self->(Eg::Node::Element)->tag_name;
+      }
+      case &TYPE_PROCESSING_INSTRUCTION_NODE: {
+        $node_name = $self->(Eg::Node::ProcessingInstruction)->target;
+      }
+      case &TYPE_TEXT_NODE: {
+        $node_name = "#text";
+      }
+      default: {
+        die "[Unexpected Error]Unknown node type.";
       }
     }
     
     return $node_name;
-  }
-  
-  method owner_document : Eg::Node::Document () {
-    
-    my $current_node = $self;
-    
-    my $document_node = (Eg::Node::Document)undef;
-    
-    unless ($current_node isa Eg::Node::Document) {
-      
-      while (1) {
-        my $parent_node = $current_node->{parent_node};
-        
-        unless ($parent_node) {
-          last;
-        }
-        
-        if ($parent_node isa Eg::Node::Document) {
-          $document_node = (Eg::Node::Document)$current_node;
-          last;
-        }
-        else {
-          $current_node = $parent_node;
-        }
-      }
-    }
-    
-    return $document_node;
   }
   
   method remove_child : Eg::Node ($child_node : Eg::Node) {
@@ -491,4 +503,119 @@ class Eg::Node {
     return $new_node;
   }
   
+  method clone_node : Eg::Node ($deep : int = 0) {
+    
+    my $new_parent_node_stack = List->new(new Eg::Node[0]);
+    
+    my $new_previous_sibling_cur = (Eg::Node)undef;
+    
+    my $node_root = (Eg::Node)$self;
+    my $node_cur = $node_root;
+    my $finish = 0;
+    
+    my $new_node_tree = (Eg::Node)undef;
+    while ($node_cur) {
+      
+      # [START]Preorder traversal position
+      my $new_node = Eg::Node::Element::HTML::Unknown->new;
+      
+      if ($node_cur == $node_root) {
+        $new_node_tree = $new_node;
+      }
+      
+      unless ($deep) {
+        last;
+      }
+      
+      if ($node_cur->{parent_node}) {
+        if ($new_parent_node_stack->length > 0) {
+          my $new_parent_node = (Eg::Node)$new_parent_node_stack->get($new_parent_node_stack->length - 1);
+          $new_node->{parent_node} = $new_parent_node;
+          weaken $new_node->{parent_node};
+          unless ($new_parent_node->{first_child}) {
+            $new_parent_node->{first_child} = $new_node;
+          }
+        }
+      }
+      
+      if ($new_previous_sibling_cur) {
+        $new_node->{previous_sibling} = $new_previous_sibling_cur;
+        weaken $new_node->{previous_sibling};
+        
+        $new_previous_sibling_cur->{next_sibling} = $new_node;
+      }
+      
+      if ($node_cur->first_child) {
+        
+        $new_parent_node_stack->push($new_node);
+        
+        $node_cur = (Eg::Node)$node_cur->first_child;
+      }
+      else {
+        while (1) {
+          # [START]Postorder traversal position
+          
+          if ($node_cur == $node_root) {
+            
+            $finish = 1;
+            
+            last;
+          }
+          
+          # Next sibling
+          if ($node_cur->next_sibling) {
+            $new_previous_sibling_cur = $new_node;
+            
+            $node_cur = $node_cur->next_sibling;
+            last;
+          }
+          # Next is parent
+          else {
+            if ($new_parent_node_stack->length > 0) {
+              my $new_parent_node = (Eg::Node)$new_parent_node_stack->get($new_parent_node_stack->length - 1);
+              
+              $new_parent_node->{last_child} = $new_node;
+              
+              $new_parent_node_stack->pop;
+            }
+            
+            $node_cur = $node_cur->parent_node;
+          }
+        }
+        if ($finish) {
+          last;
+        }
+      }
+    }
+    
+    return $new_node_tree;
+  }
+  
+  protected method clone : Eg::Node () {
+    
+    my $class_name = type_name $self;
+    
+    my $error_id = 0;
+    my $cloned = (Eg::Node)Native::MethodCall->new_class_method($class_name, "new")->call(new object[0]);
+    
+    if ($self->{node_value_buffer}) {
+      $self->{node_value_buffer} = StringBuffer->new($self->{node_value_buffer}->to_string);
+    }
+    
+    if ($cloned isa Eg::Node::Element) {
+      
+      if ($self->(Eg::Node::Element)->{attributes_h}) {
+        $cloned->(Eg::Node::Element)->{attributes_h} = $self->(Eg::Node::Element)->{attributes_h}->clone;
+      }
+      
+      $cloned->(Eg::Node::Element)->{node_name} = copy $self->(Eg::Node::Element)->{node_name};
+      
+      if ($cloned isa Eg::Node::Element::HTML) {
+        
+      }
+      
+    }
+    
+    return $cloned;
+  }
 }

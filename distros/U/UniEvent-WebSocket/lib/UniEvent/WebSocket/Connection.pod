@@ -23,7 +23,7 @@ UniEvent::WebSocket::Connection - Websocket connection base class
     
     $conn->send(
         payload => $data,
-        opcode  => OPCODE_TEXT,
+        opcode  => Protocol::WebSocket::Fast::OPCODE_TEXT,
         deflate => 1,
         cb      => sub { log("message sent") },
     );

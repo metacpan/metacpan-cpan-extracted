@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::OS::linux;
+package IO::Async::OS::linux 0.803;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.802';
 
 our @ISA = qw( IO::Async::OS::_Base );
 

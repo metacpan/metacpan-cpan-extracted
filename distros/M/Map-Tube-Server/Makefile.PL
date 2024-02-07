@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use 5.006;
 use strict;
@@ -21,7 +21,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Dancer2'                    => '0.159002',
         'Dancer2::Plugin::Res'       => '0.07',
-        'Dancer2::Plugin::Map::Tube' => '0.01',
+        'Dancer2::Plugin::Map::Tube' => '0.04',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Map-Tube-Server*' },

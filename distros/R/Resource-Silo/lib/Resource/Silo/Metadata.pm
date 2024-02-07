@@ -2,7 +2,7 @@ package Resource::Silo::Metadata;
 
 use strict;
 use warnings;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 NAME
 
@@ -180,7 +180,7 @@ sub add {
     };
 
     $spec{origin} = Carp::shortmess("declared");
-    $spec{origin} =~ s/\s+$//s;
+    $spec{origin} =~ s/\D+$//s;
     $self->{resource}{$name} = \%spec;
 
     # Move code generation into Resource::Silo::Container

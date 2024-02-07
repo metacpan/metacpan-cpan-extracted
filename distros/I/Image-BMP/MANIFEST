@@ -1,0 +1,33 @@
+INSTALL
+lib/Image/BMP.pm
+CHANGELOG
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-test-images.t
+t/images/broken.big.bmp
+t/images/text2.bmp
+t/images/bitfield-compressed.expect
+t/images/bw.bitcount=1.bmp
+t/images/curses2_960x300.expect
+t/images/bw.bmp
+t/images/bug.expect
+t/images/text2.expect
+t/images/pad-bug.bmp
+t/images/bw.expect
+t/images/bitfield-compressed.bmp
+t/images/bug.bmp
+t/images/broken.expect
+t/images/mini-compressed.expect
+t/images/broken.bmp
+t/images/mini-compressed.bmp
+t/images/mini-compressed.2.bmp
+t/images/text1.compressed.expect
+t/images/broken.big.expect
+t/images/pad-bug.expect
+t/images/bw.bitcount=1.expect
+t/images/text1.compressed.bmp
+t/images/curses2_960x300.bmp
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

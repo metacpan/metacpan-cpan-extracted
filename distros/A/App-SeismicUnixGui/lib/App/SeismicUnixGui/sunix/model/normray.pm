@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::model::normray;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 
@@ -127,7 +127,7 @@ Version:
 
 
 
- AUTHOR:  Dave Hale, Colorado School of Mines, 02/16/91
+Author: Dave Hale, Colorado School of Mines, 02/16/91
 
  MODIFIED:  Andreas Rueger, Colorado School of Mines, 08/12/93
 

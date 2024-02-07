@@ -28,10 +28,18 @@ community’s distributed collection of Perl software and documentation. But
 PostgreSQL’s extensibility is not well-known, and it’s difficult to find the
 extensions that do exist. I’d like to solve that problem. Care to help?
 
+Support
+-------
+
+This module is stored in an open [GitHub repository]. Feel free to fork and
+contribute!
+
+Please file bug reports via [GitHub Issues].
+
 Copyright and License
 ---------------------
 
-Copyright (c) 2010-2021 David E. Wheeler.
+Copyright (c) 2010-2024 David E. Wheeler.
 
 This module is free software; you can redistribute it and/or modify it under the
 [PostgreSQL License].
@@ -60,3 +68,5 @@ enhancements, or modifications.
   [extensibility]: https://www.postgresql.org/docs/current/static/extend.html
   [CPAN]: https://www.cpan.org/
   [PostgreSQL License]: https://www.opensource.org/licenses/postgresql
+  [GitHub repository]: https://github.com/pgxn/pgxn-site/
+  [GitHub Issues]: https://github.com/pgxn/pgxn-site/issues/

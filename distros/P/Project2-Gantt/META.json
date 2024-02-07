@@ -46,6 +46,7 @@
             "Alien::Font::Vera" : "0.013",
             "Imager" : "1.019",
             "Mojolicious" : "9.31",
+            "Time::Piece" : "1.33",
             "perl" : "5.020"
          }
       },
@@ -65,59 +66,59 @@
    "provides" : {
       "Project2::Gantt" : {
          "file" : "lib/Project2/Gantt.pm",
-         "version" : "0.009"
+         "version" : "0.011"
       },
       "Project2::Gantt::DateUtils" : {
          "file" : "lib/Project2/Gantt/DateUtils.pm",
-         "version" : "0.009"
+         "version" : "0.011"
       },
       "Project2::Gantt::GanttHeader" : {
          "file" : "lib/Project2/Gantt/GanttHeader.pm",
-         "version" : "0.009"
+         "version" : "0.011"
       },
       "Project2::Gantt::Globals" : {
          "file" : "lib/Project2/Gantt/Globals.pm",
-         "version" : "0.009"
+         "version" : "0.011"
       },
       "Project2::Gantt::ImageWriter" : {
          "file" : "lib/Project2/Gantt/ImageWriter.pm",
-         "version" : "0.009"
+         "version" : "0.011"
       },
       "Project2::Gantt::Resource" : {
          "file" : "lib/Project2/Gantt/Resource.pm",
-         "version" : "0.009"
+         "version" : "0.011"
       },
       "Project2::Gantt::Skin" : {
          "file" : "lib/Project2/Gantt/Skin.pm",
-         "version" : "0.009"
+         "version" : "0.011"
       },
       "Project2::Gantt::Skin::Large" : {
          "file" : "lib/Project2/Gantt/Skin/Large.pm",
-         "version" : "0.009"
+         "version" : "0.011"
       },
       "Project2::Gantt::Skin::Medium" : {
          "file" : "lib/Project2/Gantt/Skin/Medium.pm",
-         "version" : "0.009"
+         "version" : "0.011"
       },
       "Project2::Gantt::Skin::Small" : {
          "file" : "lib/Project2/Gantt/Skin/Small.pm",
-         "version" : "0.009"
+         "version" : "0.011"
       },
       "Project2::Gantt::SpanInfo" : {
          "file" : "lib/Project2/Gantt/SpanInfo.pm",
-         "version" : "0.009"
+         "version" : "0.011"
       },
       "Project2::Gantt::Task" : {
          "file" : "lib/Project2/Gantt/Task.pm",
-         "version" : "0.009"
+         "version" : "0.011"
       },
       "Project2::Gantt::TextUtils" : {
          "file" : "lib/Project2/Gantt/TextUtils.pm",
-         "version" : "0.009"
+         "version" : "0.011"
       },
       "Project2::Gantt::TimeSpan" : {
          "file" : "lib/Project2/Gantt/TimeSpan.pm",
-         "version" : "0.009"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -128,7 +129,7 @@
          "web" : "https://github.com/brunoramoslu/Project2-Gantt"
       }
    },
-   "version" : "0.009",
+   "version" : "0.011",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

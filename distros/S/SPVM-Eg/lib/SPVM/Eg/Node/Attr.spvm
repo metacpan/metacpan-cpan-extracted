@@ -6,22 +6,14 @@ class Eg::Node::Attr extends Eg::Node {
   
   allow Eg::Node::Document;
   
+  use Fn;
+  use Eg::Node::Element;
+  
   # Fields
   has name : ro string;
   
   has value : ro string;
   
-  # Class Methods
-  private static method new : Eg::Node::Attr () {
-    
-    my $self = new Eg::Node::Attr;
-    
-    $self->SUPER::init({node_type => Eg::Node->TYPE_ATTRIBUTE_NODE});
-    
-    return $self;
-  }
-  
-  # Instance Methods
   method set_value : void ($value : string) {
     
     unless ($value) {
@@ -29,6 +21,110 @@ class Eg::Node::Attr extends Eg::Node {
     }
     
     $self->{value} = $value;
+  }
+  
+  has namespace_uri : ro string;
+  
+  has owner_element : ro Eg::Node::Element;
+  
+  # Class Methods
+  private static method new : Eg::Node::Attr ($name : string, $options : object[] = undef) {
+    
+    unless ($name) {
+      die "\$name must be defined.";
+    }
+    
+    unless (Regex->new("^[a-zA-Z_][\w+\-\.]*$")->match($name)) {
+      die "\$name must be a valid name.";
+    }
+    
+    $name = Fn->lc($name);
+    
+    my $self = new Eg::Node::Attr;
+    
+    $self->SUPER::init(Eg->merge_options_v2($options, {node_type => Eg::Node->TYPE_ATTRIBUTE_NODE}));
+    
+    $self->{name} = $name;
+    
+    $self->{value} = "";
+    
+    return $self;
+  }
+  
+  private static method new_ns : Eg::Node::Attr ($namespace_uri : string, $qualified_name : string, $options : object[] = undef) {
+    
+    unless ($namespace_uri) {
+      die "\$namespace_uri must be defined.";
+    }
+    
+    unless ($qualified_name) {
+      die "\$qualified_name must be defined.";
+    }
+    
+    unless (length $qualified_name) {
+      die "\$qualified_name must have its length.";
+    }
+    
+    unless (Regex->new("^([a-zA-Z_][\w+\-\.]*:)?[a-zA-Z_][\w+\-\.]*$")->match($qualified_name)) {
+      die "\$qualified_name must be a valid name.";
+    }
+    
+    my $self = new Eg::Node::Attr;
+    
+    $self->SUPER::init(Eg->merge_options_v2($options, {node_type => Eg::Node->TYPE_ATTRIBUTE_NODE}));
+    
+    $self->{name} = $qualified_name;
+    
+    $self->{value} = "";
+    
+    $self->{namespace_uri} = $namespace_uri;
+    
+    return $self;
+  }
+  
+  # Instance Method
+  method local_name : string () {
+    
+    my $namespace_uri = $self->{namespace_uri};
+    
+    my $name = $self->{name};
+    
+    my $local_name = (string)undef;
+    
+    if ($namespace_uri) {
+      if (Fn->contains($name, ":")) {
+        my $prefix_and_local_name = Fn->split(":", $name);
+        
+        $local_name = $prefix_and_local_name->[1];
+      }
+      else {
+        $local_name = $name;
+      }
+    }
+    else {
+      $local_name = $name;
+    }
+    
+    return $name;
+  }
+  
+  method prefix : string () {
+    
+    my $namespace_uri = $self->{namespace_uri};
+    
+    my $name = $self->{name};
+    
+    my $prefix = (string)undef;
+    
+    if ($namespace_uri) {
+      if (Fn->contains($name, ":")) {
+        my $prefix_and_local_name = Fn->split(":", $name);
+        
+        $prefix = $prefix_and_local_name->[0];
+      }
+    }
+    
+    return $name;
   }
   
 }

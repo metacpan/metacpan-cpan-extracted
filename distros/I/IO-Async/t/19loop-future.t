@@ -1,10 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use lib ".";
 use t::TimeAbout;
@@ -24,9 +23,9 @@ my $loop = IO::Async::Loop->new_builtin;
    $loop->later( sub { $future->done( "result" ) } );
 
    my $ret = $loop->await( $future );
-   identical( $ret, $future, '$loop->await( $future ) returns $future' );
+   ref_is( $ret, $future, '$loop->await( $future ) returns $future' );
 
-   is_deeply( [ $future->get ], [ "result" ], '$future->get' );
+   is( [ $future->get ], [ "result" ], '$future->get' );
 }
 
 {
@@ -57,11 +56,11 @@ my $loop = IO::Async::Loop->new_builtin;
 {
    my $future = IO::Async::Future->new( $loop );
 
-   identical( $future->loop, $loop, '$future->loop yields $loop' );
+   ref_is( $future->loop, $loop, '$future->loop yields $loop' );
 
    $loop->later( sub { $future->done( "result" ) } );
 
-   is_deeply( [ $future->get ], [ "result" ], '$future->get on IO::Async::Future' );
+   is( [ $future->get ], [ "result" ], '$future->get on IO::Async::Future' );
 }
 
 {
@@ -69,29 +68,29 @@ my $loop = IO::Async::Loop->new_builtin;
 
    $loop->later( sub { $future->done( "result" ) } );
 
-   is_deeply( [ $future->get ], [ "result" ], '$future->get on IO::Async::Future from $loop->new_future' );
+   is( [ $future->get ], [ "result" ], '$future->get on IO::Async::Future from $loop->new_future' );
 }
 
 # done_later
 {
    my $future = $loop->new_future;
 
-   identical( $future->done_later( "deferred result" ), $future, '->done_later returns $future' );
+   ref_is( $future->done_later( "deferred result" ), $future, '->done_later returns $future' );
    ok( !$future->is_ready, '$future not yet ready after ->done_later' );
 
-   is_deeply( [ $future->get ], [ "deferred result" ], '$future now ready after ->get' );
+   is( [ $future->get ], [ "deferred result" ], '$future now ready after ->get' );
 }
 
 # fail_later
 {
    my $future = $loop->new_future;
 
-   identical( $future->fail_later( "deferred exception\n" ), $future, '->fail_later returns $future' );
+   ref_is( $future->fail_later( "deferred exception\n" ), $future, '->fail_later returns $future' );
    ok( !$future->is_ready, '$future not yet ready after ->fail_later' );
 
    $loop->await( $future );
 
-   is_deeply( [ $future->failure ], [ "deferred exception\n" ], '$future now ready after $loop->await' );
+   is( [ $future->failure ], [ "deferred exception\n" ], '$future now ready after $loop->await' );
 }
 
 # delay_future
@@ -101,7 +100,7 @@ my $loop = IO::Async::Loop->new_builtin;
    time_about( sub { $loop->await( $future ) }, 1, '->delay_future is ready' );
 
    ok( $future->is_ready, '$future is ready from delay_future' );
-   is_deeply( [ $future->get ], [], '$future->get returns empty list on delay_future' );
+   is( [ $future->get ], [], '$future->get returns empty list on delay_future' );
 
    # Check that ->cancel does not crash
    $loop->delay_future( after => 1 * AUT )->cancel;

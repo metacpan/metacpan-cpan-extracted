@@ -5,12 +5,12 @@ use utf8;
 use Test::More;
 use HTML::TagCloud;
 use PGXN::Site;
+use HTTP::Request::Common;
 
 BEGIN {
     for my $mod (qw(
         Test::XML
         Test::XPath
-        HTTP::Request::Common
      )) {
         eval "use $mod;";
         plan skip_all => "$mod required for template testing" if $@;
@@ -399,9 +399,9 @@ sub test_wrapper {
                 });
                 $tx->is('./span[2][@class="grey"]', '|', 'Should have spacer span');
                 $tx->ok('./a[3]', 'Test third anchor', sub {
-                    $tx->is('./@href', 'https://manager.pgxn.org/', 'Should link to manage.pgxn.org');
-                    $tx->is('./@title', $mt->maketext('Release it on PGXN'), 'Should have link title');
-                    $tx->is('./text()', $mt->maketext('Release It'), 'Should have text "Blog"');
+                    $tx->is('./@href', 'https://manager.pgxn.org/howto', 'Should link to the manager How To');
+                    $tx->is('./@title', $mt->maketext('How to release extensions on PGXN'), 'Should have link title');
+                    $tx->is('./text()', $mt->maketext('Release on PGXN'), 'Should have text "Release on PGXN"');
                 });
             }); # /span.floatLeft
 
@@ -479,9 +479,9 @@ sub test_search_form {
 
                 my $i = 0;
                 for my $spec (
+                    [ dists      => 'Distributions' ],
                     [ docs       => 'Documentation' ],
                     [ extensions => 'Extensions'    ],
-                    [ dists      => 'Distributions' ],
                     [ users      => 'Users'         ],
                     [ tags       => 'Tags'          ],
                 ) {

@@ -3,27 +3,29 @@
 
 # Element in JavaScript
 class Eg::Node::Element extends Eg::Node {
-  allow Eg;
+  allow Eg::Node;
   allow Eg::Node::Document;
-  allow Eg::Node::Document::HTML;
   allow Eg::Node::Document::XML;
-  allow Eg::DOM::Implementation;
+  allow Eg::Node::Document;
   
-  use Eg::DOM::Implementation;
   use Fn;
   
   use Eg::Node::Element::HTML;
   
-  has attributes_h : ro Hash of string;
+  use Eg::CSS::StyleDeclaration;
   
-  has tag_name : protected string;
+  has namespace_uri : ro protected string;
+  
+  has is_void_element : protected byte;
+  
+  has attributes_h : protected Hash of string;
   
   # Class Methods
-  private static method new : Eg::Node::Element () {
+  private static method new : Eg::Node::Element ($options : object[] = undef) {
     
     my $self = new Eg::Node::Element;
     
-    $self->init;
+    $self->init($options);
     
     return $self;
   }
@@ -31,7 +33,13 @@ class Eg::Node::Element extends Eg::Node {
   # Instance Methods
   protected method init : void ($options : object[] = undef) {
     
-    $self->SUPER::init({node_type => Eg::Node->TYPE_ELEMENT_NODE});
+    unless ($options) {
+      $options = new object[0];
+    }
+    
+    $options = Array->merge_object($options, {node_type => Eg::Node->TYPE_ELEMENT_NODE});
+    
+    $self->SUPER::init($options);
   }
   
   method get_attribute : string ($name : string) {
@@ -40,20 +48,18 @@ class Eg::Node::Element extends Eg::Node {
       die "\$name must be defined.";
     }
     
+    if ($self isa Eg::Node::Element::HTML) {
+      $name = Fn->lc($name);
+      
+      if ($name eq "style" && $self->has_attribute($name)) {
+        return $self->style->css_text;
+      }
+    }
+    
     my $attributes_h = $self->{attributes_h};
     
     unless ($self->{attributes_h}) {
       return undef;
-    }
-    
-    my $owner_document = $self->owner_document;
-    
-    if ($owner_document && $owner_document is_type Eg::Node::Document && $self isa Eg::Node::Element::HTML) {
-      $name = Fn->lc($name);
-    }
-    
-    if ($name eq "nonce") {
-      return "";
     }
     
     my $attribute = $attributes_h->get_string($name);
@@ -67,17 +73,24 @@ class Eg::Node::Element extends Eg::Node {
       die "\$name must be defined.";
     }
     
+    if ($self isa Eg::Node::Element::HTML) {
+      $name = Fn->lc($name);
+      
+      if ($name eq "style") {
+        
+        unless ($value) {
+          die "\$value must be defined.";
+        }
+        
+        $self->style->set_css_text($value);
+      }
+    }
+    
     unless ($value) {
       die "\$value must be defined.";
     }
     
     my $attributes_h = $self->{attributes_h};
-    
-    my $owner_document = $self->owner_document;
-    
-    if ($owner_document && $owner_document is_type Eg::Node::Document && $self isa Eg::Node::Element::HTML) {
-      $name = Fn->lc($name);
-    }
     
     unless ($attributes_h) {
       $attributes_h = $self->{attributes_h} = Hash->new;
@@ -113,32 +126,21 @@ class Eg::Node::Element extends Eg::Node {
     return $exists;
   }
   
-  method attribute_pairs : string[] () {
+  method get_attribute_names : string[] () {
     
     my $attributes_h = $self->{attributes_h};
     
-    my $attribute_pairs = (string[])undef;
-    
+    my $names = (string[])undef;
     if ($attributes_h) {
-      my $names = $attributes_h->keys;
+      $names = $attributes_h->keys;
       
       Sort->sort_string_asc($names);
-      
-      my $attribute_pairs_list = StringList->new;
-      for my $name (@$names) {
-        my $value = $attributes_h->get_string($name);
-        
-        $attribute_pairs_list->push($name);
-        $attribute_pairs_list->push($value);
-      }
-      
-      $attribute_pairs = $attribute_pairs_list->to_array;
     }
     else {
-      $attribute_pairs = new string[0];
+      $names = new string[0];
     }
     
-    return $attribute_pairs;
+    return $names;
   }
   
   method text : string () {
@@ -181,7 +183,7 @@ class Eg::Node::Element extends Eg::Node {
       }
     }
     else {
-      my $text_node = Eg::DOM::Implementation->new->create_html_document->create_text_node($text);
+      my $text_node = Eg->document->implementation->create_html_document->create_text_node($text);
       
       $self->{first_child} = $text_node;
       
@@ -190,29 +192,10 @@ class Eg::Node::Element extends Eg::Node {
     
   }
   
-  # jQuery Instance Methods
-  method attr : string ($name : string) {
-    
-    my $attr = $self->get_attribute($name);
-    
-    return $attr;
-  }
-  
-  method set_attr : void ($name : string, $value : string) {
-    
-    $self->set_attribute($name, $value);
-  }
-  
-  method remove_attr : void ($name : string) {
-    
-    $self->remove_attribute($name);
-  }
-  
   method tag_name : string () {
     
-    my $tag_name = $self->{tag_name};
+    my $tag_name = $self->{node_name};
     
-    # HTML
     if ($self isa Eg::Node::Element::HTML) {
       $tag_name = Fn->uc($tag_name);
     }
@@ -220,4 +203,7 @@ class Eg::Node::Element extends Eg::Node {
     return $tag_name;
   }
   
+  method style : Eg::CSS::StyleDeclaration () { die "Not implemented."; }
+  
+
 }

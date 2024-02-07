@@ -9,8 +9,8 @@ use warnings;
 use Carp;
 use CHI;
 use File::Spec;
-use Locale::Places::DB::GB;
-use Locale::Places::DB::US;
+use Locale::Places::Database::GB;
+use Locale::Places::Database::US;
 use Module::Info;
 
 =encoding utf8
@@ -21,11 +21,11 @@ Locale::Places - Translate places between different languages using http://downl
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -64,7 +64,7 @@ sub new {
 	my $directory = delete $args{'directory'} || Module::Info->new_from_loaded(__PACKAGE__)->file();
 	$directory =~ s/\.pm$//;
 
-	Locale::Places::DB::init({
+	Database::Abstraction::init({
 		directory => File::Spec->catfile($directory, 'databases'),
 		no_entry => 1,
 		cache => $args{cache} || CHI->new(driver => 'Memory', datastore => {}),
@@ -146,10 +146,10 @@ sub translate {
 	my $db;
 
 	if(defined($country) && ($country eq 'US')) {
-		$self->{'US'} ||= Locale::Places::DB::US->new(no_entry => 1);
+		$self->{'US'} ||= Locale::Places::Database::US->new();
 		$db = $self->{'US'};
 	} else {
-		$self->{'GB'} ||= Locale::Places::DB::GB->new(no_entry => 1);
+		$self->{'GB'} ||= Locale::Places::Database::GB->new();
 		$db = $self->{'GB'};
 	}
 
@@ -251,6 +251,38 @@ sub _get_language {
 		return 'en';
 	}
 	return;	# undef
+}
+
+=head2 AUTOLOAD
+
+Translate to the given language, where the routine's name will be the target language.
+
+    # Prints 'Virginie', since that's Virginia in French
+    print $places->fr({ place => 'Virginia', from => 'en', country => 'US' });
+
+=cut
+
+sub AUTOLOAD
+{
+	our $AUTOLOAD;
+	my $to = $AUTOLOAD;
+
+	$to =~ s/.*:://;
+
+	return if($to eq 'DESTROY');
+
+	my $self = shift or return;
+
+	my %params;
+        if(ref($_[0]) eq 'HASH') {
+                %params = %{$_[0]};
+        } elsif((scalar(@_) % 2) == 0) {
+                %params = @_;
+        } elsif(scalar(@_) == 1) {
+                $params{'entry'} = shift;
+        }
+
+	return $self->translate(to => $to, %params);
 }
 
 =head1 AUTHOR

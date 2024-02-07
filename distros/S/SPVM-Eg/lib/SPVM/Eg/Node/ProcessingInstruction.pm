@@ -6,48 +6,36 @@ package SPVM::Eg::Node::ProcessingInstruction;
 
 =head1 Name
 
-SPVM::Eg::Node::ProcessingInstruction - Short Description
+SPVM::Eg::Node::ProcessingInstruction - ProcessingInstruction in JavaScript
 
 =head1 Description
 
-The Eg::Node::ProcessingInstruction class in L<SPVM> has methods to do someting.
+The Eg::Node::ProcessingInstruction class in L<SPVM> represents a node containing a doctype.
+
+This class is a port of L<ProcessingInstruction|https://developer.mozilla.org/en-US/docs/Web/API/ProcessingInstruction> in JavaScript.
 
 =head1 Usage
 
-  use Eg::Node::ProcessingInstruction;
+  my $pi = Eg->document->implementation->create_processing_instruction(
+    "xml-stylesheet",
+    'href="mycss.css"',
+  );
+  
+  my $target = $pi->target;
 
-=head1 Details
+=head1 Inheritance
 
-
-
-=head1 Interfaces
-
-
-
-=head1 Enumerations
-
-
+L<Eg::Node|SPVM::Eg::Node>
 
 =head1 Fields
 
+=head2 target
 
+C<has target : ro string;>
 
-=head1 Class Methods
+Returns the application to which the ProcessingInstruction is targeted.
 
-
-
-=head1 Instance Methods
-
-
-
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+For details, see L<ProcessingInstruction.target|https://developer.mozilla.org/en-US/docs/Web/API/ProcessingInstruction/target> in JavaScript.
 
 =head1 Copyright & License
 

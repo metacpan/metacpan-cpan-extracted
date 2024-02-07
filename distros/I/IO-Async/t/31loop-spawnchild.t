@@ -1,12 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use POSIX qw( ENOENT EBADF );
 
@@ -24,12 +23,12 @@ my $loop = IO::Async::Loop->new_builtin;
 
 testing_loop( $loop );
 
-ok( exception { $loop->spawn_child( badoption => 1 ); }, 'Bad option to spawn fails' );
+ok( dies { $loop->spawn_child( badoption => 1 ); }, 'Bad option to spawn fails' );
 
-ok( exception { $loop->spawn_child( code => sub { 1 }, command => "hello" ); },
+ok( dies { $loop->spawn_child( code => sub { 1 }, command => "hello" ); },
     'Both code and command options to spawn fails' );
 
-ok( exception { $loop->spawn_child( on_exit => sub { 1 } ); }, 'Bad option to spawn fails' );
+ok( dies { $loop->spawn_child( on_exit => sub { 1 } ); }, 'Bad option to spawn fails' );
 
 {
    my ( $exited_pid, $exitcode, $dollarbang, $dollarat );

@@ -1,0 +1,17 @@
+Revision history for ExtUtils-Typemaps-Signal
+
+0.005     2024-01-31 22:01:24+01:00 Europe/Brussels
+          - Use digraphs to allow for preprocessor conditionals in typemap
+
+0.004     2024-01-30 19:12:23+01:00 Europe/Brussels
+          - Fix sigset undef handling further
+
+0.003     2024-01-30 19:09:19+01:00 Europe/Brussels
+          - Correctly handle undefined sigsets
+
+0.002     2024-01-29 22:00:35+01:00 Europe/Brussels
+          - Fix abstract
+          - Fix repository and bugtracker metadata
+
+0.001     2024-01-29 21:57:26+01:00 Europe/Brussels
+          Initial release to an unsuspecting world

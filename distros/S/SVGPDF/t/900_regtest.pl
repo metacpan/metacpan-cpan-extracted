@@ -8,7 +8,7 @@ use warnings;
 # We intercept the debugging output and compare these.
 
 use Test::More;
-
+use Config;
 our $api;
 
 BEGIN {
@@ -16,6 +16,9 @@ BEGIN {
     use_ok("SVGPDF");
 }
 
+# For some specific build variants.
+my $var = $Config{uselongdouble} ? "-ld" : "";
+diag("Using variant $var") if $var;
 my $test = 2;
 
 BAIL_OUT("Missing test data") unless -d "regtest";
@@ -45,6 +48,7 @@ foreach my $file ( sort @files ) {
     #diag("Testing: $file");
     ( my $out = $file ) =~ s/\.svg/.out/;
     ( my $ref = $file ) =~ s/\.svg/.ref/;
+    ( my $vref = $file ) =~ s/\.svg/$var.ref/;
 
     my $o;
 
@@ -60,6 +64,10 @@ foreach my $file ( sort @files ) {
     my $ok = $o && @$o;
     ok( $ok, "Have XO results" );
     $test++;
+    if ( $var && -s $vref ) {
+	$ref = $vref;
+	diag("Using ref = $ref");
+    }
     $ok = -s $ref && !differ( $out, $ref );
     ok( $ok, $file );
     $test++;

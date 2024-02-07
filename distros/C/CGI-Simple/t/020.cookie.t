@@ -11,7 +11,7 @@ BEGIN {
 
 use strict;
 use warnings;
-use Test::More tests => 115;
+use Test::More tests => 122;
 use Test::NoWarnings;
 
 use CGI::Simple::Util qw(escape unescape);
@@ -162,14 +162,16 @@ my @test_cookie = (
 
   # Try new with full information provided
   my $c = CGI::Simple::Cookie->new(
-    -name     => 'foo',
-    -value    => 'bar',
-    -expires  => '+3M',
-    -domain   => '.capricorn.com',
-    -path     => '/cgi-bin/database',
-    -secure   => 1,
-    -httponly => 1,
-    -samesite => 'Lax'
+    -name       => 'foo',
+    -value      => 'bar',
+    -expires    => '+3M',
+    -domain     => '.capricorn.com',
+    -path       => '/cgi-bin/database',
+    -secure     => 1,
+    -httponly   => 1,
+    -samesite   => 'Lax',
+    -priority   => 'High',
+    -partitioned => 1
   );
   is( ref( $c ), 'CGI::Simple::Cookie',
     'new returns objects of correct type' );
@@ -185,6 +187,8 @@ my @test_cookie = (
   ok( $c->secure,   'secure attribute is set' );
   ok( $c->httponly, 'httponly attribute is set' );
   is( $c->samesite, 'Lax', 'samesite attribute is correct' );
+  is( $c->priority, 'High', 'priority attribute is correct' );
+  is( $c->partitioned, 1, 'partitioned attribute is correct' );
 
 # now try it with the only two manditory values (should also set the default path)
   $c = CGI::Simple::Cookie->new(
@@ -202,6 +206,7 @@ my @test_cookie = (
   ok( !defined $c->secure,   'secure attribute is not set' );
   ok( !defined $c->httponly, 'httponly attribute is not set' );
   ok( !defined $c->samesite, 'samesite attribute is not set' );
+  ok( !$c->partitioned, 'partitioned attribute is not set' );
 
   # I'm really not happy about the restults of this section.  You pass
   # the new method invalid arguments and it just merilly creates a
@@ -228,15 +233,17 @@ my @test_cookie = (
 
 {
   my $c = CGI::Simple::Cookie->new(
-    -name      => 'Jam',
-    -value     => 'Hamster',
-    -expires   => '+3M',
-    '-max-age' => '+3M',
-    -domain    => '.pie-shop.com',
-    -path      => '/',
-    -secure    => 1,
-    -httponly  => 1,
-    -samesite  => 'strict'
+    -name        => 'Jam',
+    -value       => 'Hamster',
+    -expires     => '+3M',
+    '-max-age'   => '+3M',
+    -domain      => '.pie-shop.com',
+    -path        => '/',
+    -secure      => 1,
+    -httponly    => 1,
+    -samesite    => 'strict',
+    -priority    => 'high',
+    -partitioned => 1,
   );
 
   my $name = $c->name;
@@ -270,6 +277,12 @@ my @test_cookie = (
   like( $c->as_string, '/SameSite=Strict/',
     "Stringified cookie contains normalized SameSite" );
 
+  like( $c->as_string, '/Priority=High/',
+    "Stringified cookie contains normalized Priority" );
+
+  like( $c->as_string, '/Partitioned/',
+    "Stringified cookie contains Partitioned" );
+
   $c = CGI::Simple::Cookie->new(
     -name  => 'Hamster-Jam',
     -value => 'Tulip',
@@ -302,6 +315,12 @@ my @test_cookie = (
 
   ok( $c->as_string !~ /SameSite/,
     "Stringified cookie does not contain SameSite" );
+
+  ok( $c->as_string !~ /Priority/,
+    "Stringified cookie does not contain Priority" );
+
+  ok( $c->as_string !~ /Partitioned/,
+    "Stringified cookie does not contain Partitioned" );
 }
 
 #-----------------------------------------------------------------------------

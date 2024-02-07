@@ -2,9 +2,9 @@ use strict;
 use warnings;
 
 use English;
-use Error::Pure::Utils qw(clean);
+use Error::Pure::Utils qw(clean err_msg_hr);
 use Mo::utils qw(check_angle);
-use Test::More 'tests' => 10;
+use Test::More 'tests' => 13;
 use Test::NoWarnings;
 
 # Test.
@@ -16,6 +16,8 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'key' must be a number.\n",
 	"Parameter 'key' must be a number (foo).");
+my $err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'Value'}, 'foo', 'Test error parameter (Value: foo).');
 clean();
 
 # Test.
@@ -27,6 +29,8 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'key' must be a number between 0 and 360.\n",
 	"Parameter 'key' must be a number between 0 and 360 (-1).");
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'Value'}, -1, 'Test error parameter (Value: -1).');
 clean();
 
 # Test.
@@ -38,6 +42,8 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'key' must be a number between 0 and 360.\n",
 	"Parameter 'key' must be a number between 0 and 360 (360.1).");
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'Value'}, 360.1, 'Test error parameter (Value: 360.1).');
 clean();
 
 # Test.

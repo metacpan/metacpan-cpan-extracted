@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::transform::sutaup;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUTAUP - forward and inverse T-X and F-K global slant stacks		
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 

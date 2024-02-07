@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::SP;
-our $VERSION = '0.76'; # VERSION
+our $VERSION = '0.77'; # VERSION
 
 use Moose;
 
@@ -168,10 +168,10 @@ sub authn_request {
     my (%params)        = @_;
 
     return Net::SAML2::Protocol::AuthnRequest->new(
-        issueinstant  => DateTime->now,
-        issuer        => $self->id,
-        destination   => $destination,
-        nameid_format => $nameid_format || '',
+        issueinstant        => DateTime->now,
+        issuer              => $self->id,
+        destination         => $destination,
+        nameidpolicy_format => $nameid_format || '',
         %params,
     );
 
@@ -478,7 +478,7 @@ Net::SAML2::SP - SAML Service Provider object
 
 =head1 VERSION
 
-version 0.76
+version 0.77
 
 =head1 SYNOPSIS
 

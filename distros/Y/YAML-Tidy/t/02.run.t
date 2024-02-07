@@ -36,21 +36,22 @@ my $ytr;
 my $tidied = <<'EOM';
 ---
 some: input file
-that: {should be: tidied}
+that: {should be: tidied, "keep { quotes": "#here"}
 EOM
 my $filelist = <<'EOM';
 a/b/1.yaml
 c/d/2.yaml
 EOM
 
+my @config_args = ("-c", "$Bin/yamltidy");
 subtest stdin => sub {
-    local @ARGV = qw/ - /;
+    local @ARGV = (@config_args, qw/ - /);
     $ytr = YAML::Tidy::Run->new(stdin => \*DATA);
     $ytr->run;
     is $out[0], $tidied, 'Tidied stdin';
     clean();
 
-    local @ARGV = qw/ - --debug /;
+    local @ARGV = (@config_args, qw/ - --debug /);
     $ytr = YAML::Tidy::Run->new(stdin => \*DATA);
     $ytr->run;
     is $before[0], $data, 'debug before';
@@ -73,27 +74,27 @@ subtest information => sub {
 };
 
 subtest file => sub {
-    local @ARGV = $infile;
+    local @ARGV = (@config_args, $infile);
     $ytr = YAML::Tidy::Run->new(stdin => \*DATA);
     $ytr->run;
     is $out[0], $tidied, 'Tidied file';
     clean();
 
-    local @ARGV = (qw/ --debug /, $infile);
+    local @ARGV = (@config_args, qw/ --debug /, $infile);
     $ytr = YAML::Tidy::Run->new(stdin => \*DATA);
     $ytr->run;
     is $before[0], $input, 'debug before';
     is $after[0], $tidied, 'debug after';
     clean();
 
-    local @ARGV = (qw/ --inplace /, $infile);
+    local @ARGV = (@config_args, qw/ --inplace /, $infile);
     $ytr = YAML::Tidy::Run->new(stdin => \*DATA);
     $ytr->run;
     ok exists $write{ $infile }, 'inplace - file written';
     is $write{ $infile }, $tidied, 'inplace - file content correct';
     clean();
 
-    local @ARGV = (qw/ --inplace --verbose /, $infile);
+    local @ARGV = (@config_args, qw/ --inplace --verbose /, $infile);
     $ytr = YAML::Tidy::Run->new(stdin => \*DATA);
     $ytr->run;
     like $out[0], qr{info.*Processed.*run.yaml.*\bchanged}, 'Verbose output';
@@ -104,14 +105,14 @@ subtest 'batch stdin' => sub {
     my @f;
     local *{"YAML::Tidy::Run::_process_file"} = sub($, $file) { push @f, $file };
     open my $in, '<', \$filelist;
-    local @ARGV = (qw/ -b - --inplace /);
+    local @ARGV = (@config_args, qw/ -b - --inplace /);
     $ytr = YAML::Tidy::Run->new(stdin => $in);
     $ytr->run;
     is $f[0], 'a/b/1.yaml', 'file 1';
     is $f[1], 'c/d/2.yaml', 'file 2';
     clean();
 
-    local @ARGV = (qw/ --batch - /);
+    local @ARGV = (@config_args, qw/ --batch - /);
     $ytr = YAML::Tidy::Run->new(stdin => $in);
     eval {
         $ytr->run;
@@ -125,4 +126,4 @@ done_testing;
 
 __DATA__
 "some":  input file	
-that: {"should be":tidied}
+that: {"should be":tidied, "keep { quotes": "#here"}

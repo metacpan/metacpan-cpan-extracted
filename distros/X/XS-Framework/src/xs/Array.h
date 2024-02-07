@@ -163,7 +163,13 @@ struct Array : Sv {
     void undef () { if (sv) av_undef((AV*)sv); }
     void clear () { if (sv) av_clear((AV*)sv); }
 
-    struct const_iterator : private std::iterator<std::random_access_iterator_tag, const Scalar> {
+    struct const_iterator {
+        using difference_type = std::ptrdiff_t;
+        using value_type = const Scalar;
+        using pointer = value_type*;
+        using reference = value_type&;
+        using iterator_category = std::forward_iterator_tag;
+
         const_iterator ()                          : cur(nullptr) {}
         const_iterator (SV** avfirst)              : cur(avfirst) {}
 
@@ -195,7 +201,11 @@ struct Array : Sv {
         SV** cur;
     };
 
-    struct iterator : private std::iterator<std::random_access_iterator_tag, Scalar>, const_iterator {
+    struct iterator : const_iterator {
+        using value_type = const Scalar;
+        using pointer = value_type*;
+        using reference = value_type&;
+
         using const_iterator::const_iterator;
 
         iterator& operator++ () { const_iterator::operator++(); return *this; }

@@ -1,6 +1,6 @@
 ==== start svg ====
 XObject #1
-vb 0 0 200 250 (inferred) => bb 0.00 -250.00 200.00 0.00
+vb 0.00 0.00 200.00 250.00 (inferred) => bb 0.00 -250.00 200.00 0.00
 matrix( 1 0 0 -1 0 0)
 vb rect( 0.00 0.00 200.00 250.00)
 xo fill_color black (initial)

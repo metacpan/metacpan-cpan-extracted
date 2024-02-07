@@ -111,7 +111,13 @@ struct Hash : Sv {
     void undef () { if (sv) hv_undef((HV*)sv); }
     void clear () { if (sv) hv_clear((HV*)sv); }
 
-    struct const_iterator : private std::iterator<std::forward_iterator_tag, const HashEntry> {
+    struct const_iterator {
+        using difference_type = std::ptrdiff_t;
+        using value_type = const HashEntry;
+        using pointer = value_type*;
+        using reference = value_type&;
+        using iterator_category = std::forward_iterator_tag;
+
         const_iterator () : arr(NULL), end(NULL), cur(HashEntry()) {}
 
         const_iterator (HV* hv) : arr(HvARRAY(hv)), end(arr + HvMAX(hv) + 1), cur(HashEntry()) {
@@ -154,8 +160,13 @@ struct Hash : Sv {
         HashEntry cur;
     };
 
-    struct iterator : private std::iterator<std::forward_iterator_tag, HashEntry>, const_iterator {
+    struct iterator : const_iterator {
         using const_iterator::const_iterator;
+
+        using value_type = HashEntry;
+        using pointer = value_type*;
+        using reference = value_type&;
+
         HashEntry* operator-> () { return &cur; }
         HashEntry& operator*  () { return cur; }
     };

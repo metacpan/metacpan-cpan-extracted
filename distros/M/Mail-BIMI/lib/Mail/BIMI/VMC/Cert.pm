@@ -1,6 +1,6 @@
 package Mail::BIMI::VMC::Cert;
 # ABSTRACT: Class to model a VMC Cert
-our $VERSION = '3.20231123'; # VERSION
+our $VERSION = '3.20240205'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -58,8 +58,8 @@ sub _build_indicator_asn($self) {
   return if !$self->x509_object;
   my $exts = eval{ $self->x509_object->extensions_by_oid() };
   return if !$exts;
-  return if !exists $exts->{&LOGOTYPE_OID};
-  my $indhex = $exts->{&LOGOTYPE_OID}->value;
+  return if !exists $exts->{&LOGOTYPE_OID()};
+  my $indhex = $exts->{&LOGOTYPE_OID()}->value;
   $indhex =~ s/^#//;
   my $indicator = pack("H*",$indhex);
   my $asn = Convert::ASN1->new;
@@ -157,7 +157,7 @@ Mail::BIMI::VMC::Cert - Class to model a VMC Cert
 
 =head1 VERSION
 
-version 3.20231123
+version 3.20240205
 
 =head1 DESCRIPTION
 

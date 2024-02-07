@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::header::suchw;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUCHW - Change Header Word using one or two header word fields	
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION: Nov 3 2013,
  Version: 0.1

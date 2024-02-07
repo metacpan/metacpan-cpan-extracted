@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Freecells;
-$Games::Solitaire::Verify::Freecells::VERSION = '0.2403';
+$Games::Solitaire::Verify::Freecells::VERSION = '0.2500';
 use warnings;
 use strict;
 
@@ -16,7 +16,7 @@ __PACKAGE__->mk_acc_ref(
             _count
             _cells
             _s
-            )
+        )
     ]
 );
 
@@ -198,7 +198,7 @@ Freecells in games such as Freecell, Baker's Game, or Seahaven Towers
 
 =head1 VERSION
 
-version 0.2403
+version 0.2500
 
 =head1 SYNOPSIS
 

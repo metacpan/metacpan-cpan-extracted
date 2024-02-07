@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Map::Tube;
 
-$Dancer2::Plugin::Map::Tube::VERSION   = '0.03';
+$Dancer2::Plugin::Map::Tube::VERSION   = '0.04';
 $Dancer2::Plugin::Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Dancer2::Plugin::Map::Tube - Dancer2 add-on for Map::Tube.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -23,14 +23,17 @@ use Dancer2::Plugin;
 
 =head1 DESCRIPTION
 
-It provides the REST API features for L<Map::Tube::Server>.It holds the supported
+It provides the REST API features for L<Map::Tube::Server>. It holds the supported
 map informations.
 
-Currently users are allowed to make 6 api calls per minute. Other than that there
-are no restrictions for now. In future, we would allow access by API KEY.
+Currently users are  allowed  to  make 6 api calls per 60 secs by default. However
+this can be overridden by setting environment keys: C<REQUEST_PERIOD> and C<REQUEST_THRESHOLD>.
 
-Please be gentle as it's running on tiny RaspberryPI box sitting in the corner of
-my bedroom.
+The current implementation relies on client ip address but in future it would use
+C<API KEY>.
+
+It also expects C<memcached> server running on C<127.0.0.1> and listening port C<11211>
+by default. This can be overridden by setting environment keys: C<MEMCACHE_HOST> and C<MEMCACHE_PORT>.
 
 =head1 SYNOPSIS
 

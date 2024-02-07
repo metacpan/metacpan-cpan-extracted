@@ -1,3 +1,6 @@
+1.1.0     31.01.2024
+    - libdwarf 2023-09-06
+    - fix pure cmake build
 1.0.2     26.11.2021
     - version bump
 1.0.1     26.11.2021

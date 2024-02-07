@@ -1,10 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use IO::Async::Loop;
 
@@ -15,15 +14,15 @@ is_refcount( $loop, 2, '$loop has refcount 2 initially' );
 my $notifier = SomeEventSource::Async->new;
 my $in_loop;
 
-isa_ok( $notifier, "SomeEventSource",     '$notifier isa SomeEventSource' );
-isa_ok( $notifier, "IO::Async::Notifier", '$notifier isa IO::Async::Notifier' );
+isa_ok( $notifier, [ "SomeEventSource" ],     '$notifier isa SomeEventSource' );
+isa_ok( $notifier, [ "IO::Async::Notifier" ], '$notifier isa IO::Async::Notifier' );
 
 $loop->add( $notifier );
 
 is_refcount( $loop, 2, '$loop has refcount 2 adding Notifier' );
 is_refcount( $notifier, 2, '$notifier has refcount 2 after adding to Loop' );
 
-is( $notifier->loop, $loop, 'loop $loop' );
+ref_is( $notifier->loop, $loop, 'loop $loop' );
 
 ok( $in_loop, 'SomeEventSource::Async added to Loop' );
 

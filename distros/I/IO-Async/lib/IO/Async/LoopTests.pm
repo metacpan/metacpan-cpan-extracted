@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::LoopTests;
+package IO::Async::LoopTests 0.803;
 
-use strict;
+use v5.14;
 use warnings;
 
 use Exporter 'import';
@@ -13,10 +13,8 @@ our @EXPORT = qw(
    run_tests
 );
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0 0.000149;
 use Test::Metrics::Any;
-use Test::Refcount;
 
 use IO::Async::Test qw();
 
@@ -27,8 +25,6 @@ use Fcntl qw( SEEK_SET );
 use POSIX qw( SIGTERM );
 use Socket qw( sockaddr_family AF_UNIX );
 use Time::HiRes qw( time );
-
-our $VERSION = '0.802';
 
 # Abstract Units of Time
 use constant AUT => $ENV{TEST_QUICK_TIMERS} ? 0.1 : 1;
@@ -75,14 +71,14 @@ system load while testing.
 
 =head2 run_tests
 
-   run_tests( $class, @tests )
+   run_tests( $class, @tests );
 
 Runs a test or collection of tests against the loop subclass given. The class
 being tested is loaded by this function; the containing script does not need
 to C<require> or C<use> it first.
 
-This function runs C<Test::More::plan> to output its expected test count; the
-containing script should not do this.
+This function runs C<plan> to output its expected test count; the containing
+script should not do this.
 
 =cut
 
@@ -100,7 +96,7 @@ sub run_tests
    foreach my $test ( @tests ) {
       $loop = $testclass->new;
 
-      isa_ok( $loop, $testclass, '$loop' );
+      isa_ok( $loop, [ $testclass ], '$loop' );
 
       is( IO::Async::Loop->new, $loop, 'magic constructor yields $loop' );
 
@@ -607,7 +603,7 @@ sub run_tests_signal
 
    $loop->detach_signal( 'TERM', $idB );
 
-   ok( exception { $loop->attach_signal( 'this signal name does not exist', sub {} ) },
+   ok( dies { $loop->attach_signal( 'this signal name does not exist', sub {} ) },
        'Bad signal name fails' );
 
    undef $caught;
@@ -793,7 +789,7 @@ sub run_tests_control
 
    alarm( 0 );
 
-   is_deeply( \@result, [ result => "here" ], '->stop arguments returned by ->run' );
+   is( \@result, [ result => "here" ], '->stop arguments returned by ->run' );
 
    $loop->watch_time( after => 0.1, code => sub { $loop->stop( result => "here" ) } );
 
@@ -818,7 +814,7 @@ sub run_tests_control
 
    @result = $loop->run;
 
-   is_deeply( \@result, [ "inner", "outer" ], '->run can be nested properly' );
+   is( \@result, [ "inner", "outer" ], '->run can be nested properly' );
 
    $loop->watch_time( after => 0.1, code => sub { $loop->loop_stop } );
 

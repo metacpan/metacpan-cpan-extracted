@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::header::header_values;
 =head2 SYNOPSIS 
 
  PROGRAM NAME: header_values 
- AUTHOR: Daniel Lopez
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   Jan 14 2020
  DESCRIPTION: Extract segy header values
  Version: 0.0.1

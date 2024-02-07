@@ -1,8 +1,10 @@
 package Dist::Zilla::Plugin::Typemap;
-$Dist::Zilla::Plugin::Typemap::VERSION = '0.005';
+$Dist::Zilla::Plugin::Typemap::VERSION = '0.006';
 use Moose;
 
-with 'Dist::Zilla::Role::FileMunger', 'Dist::Zilla::Role::PrereqSource';
+with 'Dist::Zilla::Role::FileGatherer', 'Dist::Zilla::Role::PrereqSource';
+
+use experimental 'signatures', 'postderef';
 
 use Dist::Zilla::File::InMemory;
 use List::Util qw/first max/;
@@ -53,18 +55,21 @@ has filename => (
 	default => 'typemap',
 );
 
-sub munge_files {
-	my ($self) = @_;
-
-	for my $file (@{$self->zilla->files}) {
-		next unless $file->name eq $self->filename;
-		$self->munge_file($file);
+sub gather_files($self) {
+	my ($file) = grep { $_->name eq $self->filename } $self->zilla->files->@*;
+	if (!$file) {
+		$file = Dist::Zilla::File::InMemory->new(
+            name => $self->filename,
+            content => '',
+		);
+		$self->add_file($file);
 	}
+	$self->munge_file($file);
+
+	return
 }
 
-sub munge_file {
-	my ($self, $file) = @_;
-
+sub munge_file($self, $file) {
 	my $typemap = ExtUtils::Typemaps->new(string => $file->content);
 
 	for my $name ($self->modules) {
@@ -74,7 +79,7 @@ sub munge_file {
 	}
 
 	for my $filename ($self->files) {
-		my $file = first { $_->name eq $filename } @{$self->zilla->files} or croak "No such typemap file $filename";
+		my $file = first { $_->name eq $filename } $self->zilla->files->@* or croak "No such typemap file $filename";
 		$typemap->add_string(string => $file->content);
 	}
 
@@ -83,9 +88,7 @@ sub munge_file {
 	return;
 }
 
-sub register_prereqs {
-	my ($self) = @_;
-
+sub register_prereqs($self) {
 	my $version = $self->minimum_pxs;
 	my @modules = map { s/^\+/ExtUtils::Typemaps::/gr } $self->modules;
 	if ($version eq 'auto') {
@@ -128,7 +131,7 @@ Dist::Zilla::Plugin::Typemap - Manipulate the typemap file for XS distributions 
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

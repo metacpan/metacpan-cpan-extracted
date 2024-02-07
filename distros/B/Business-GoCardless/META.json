@@ -47,7 +47,7 @@
             "Moo" : "1.006",
             "POSIX" : "0",
             "Throwable" : "0.200011",
-            "perl" : "5.010001"
+            "perl" : "5.020000"
          }
       }
    },
@@ -64,6 +64,6 @@
          "url" : "https://github.com/Humanstate/business-gocardless"
       }
    },
-   "version" : "0.40",
+   "version" : "0.43",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

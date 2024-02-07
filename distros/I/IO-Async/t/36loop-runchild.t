@@ -1,12 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use IO::Async::Loop;
 use IO::Async::OS;
@@ -126,20 +125,20 @@ is( ($exitcode >> 8), 0,       'WEXITSTATUS($exitcode) after perl STDIN->STDOUT'
 is( $child_out, "some data\n", '$child_out after perl STDIN->STDOUT' );
 is( $child_err, "",            '$child_err after perl STDIN->STDOUT' );
 
-ok( exception { $loop->run_child(
+ok( dies { $loop->run_child(
          command => [ $^X, "-e", 1 ]
       ) },
    'Missing on_finish fails'
 );
 
-ok( exception { $loop->run_child( 
+ok( dies { $loop->run_child( 
          command => [ $^X, "-e", 1 ],
          on_finish => "hello"
       ) },
    'on_finish not CODE ref fails'
 );
 
-ok( exception { $loop->run_child(
+ok( dies { $loop->run_child(
          command => [ $^X, "-e", 1 ],
          on_finish => sub {},
          on_exit => sub {},
@@ -147,7 +146,7 @@ ok( exception { $loop->run_child(
    'on_exit parameter fails'
 );
 
-ok( exception { $loop->run_child(
+ok( dies { $loop->run_child(
          command => [ $^X, "-e", 1 ],
          on_finish => sub {},
          some_key_you_fail => 1

@@ -1,27 +1,27 @@
 ==== start svg ====
 XObject #1
-vb 0 0 160 140 (inferred) => bb 0.00 -140.00 160.00 0.00
+vb 0.00 0.00 160.00 140.00 (inferred) => bb 0.00 -140.00 160.00 0.00
 matrix( 1 0 0 -1 0 0)
 vb rect( 0.00 0.00 160.00 140.00)
 xo fill_color black (initial)
   start handling line (SVGPDF::Line)
   line x1=40 y1=20 x2=120 y2=20
     xo save
-    line stroke-width=20 linecap=0 stroke=black fill=(current) fill=black
+    line stroke-width=20.00 linecap=0 stroke=black fill=(current) fill=black
     xo paint (black currentColor)
     xo restore
   end handling line
   start handling line (SVGPDF::Line)
   line x1=40 y1=60 x2=120 y2=60
     xo save
-    line stroke-width=20 linecap=2 stroke=black fill=(current) fill=black
+    line stroke-width=20.00 linecap=2 stroke=black fill=(current) fill=black
     xo paint (black currentColor)
     xo restore
   end handling line
   start handling line (SVGPDF::Line)
   line x1=40 y1=100 x2=120 y2=100
     xo save
-    line stroke-width=20 linecap=1 stroke=black fill=(current) fill=black
+    line stroke-width=20.00 linecap=1 stroke=black fill=(current) fill=black
     xo paint (black currentColor)
     xo restore
   end handling line

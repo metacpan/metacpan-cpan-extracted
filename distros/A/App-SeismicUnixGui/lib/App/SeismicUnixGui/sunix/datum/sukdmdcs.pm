@@ -1,16 +1,18 @@
-package App::SeismicUnixGui::sunix::datum::sukdmdcs;
+package App::SeismicUnixGui::sunix::datum::sudatumk2dr;
+
+=head1 DOCUMENTATION
 
 =head2 SYNOPSIS
 
-PERL PROGRAM NAME: 
+PERL PROGRAM NAME: SUDATUMK2DR - Kirchhoff datuming of receivers for 2D prestack data	
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
-DATE:
+DATE:   
 
 DESCRIPTION:
 
-Version:
+Version: 
 
 =head2 USE
 
@@ -18,233 +20,108 @@ Version:
 
 =head4 Examples
 
-=head2 SYNOPSIS
-
 =head3 SEISMIC UNIX NOTES
-  SUKDMDCS - 2.5D datuming of sources for prestack common receiver 	
 
- 	     data, using constant-background data-mapping formula.      
+SUDATUMK2DR - Kirchhoff datuming of receivers for 2D prestack data	
+		(shot gathers are the input)				
 
-            (See selfdoc for specific survey geometry requirements.)   
-
-
-
-    sukdmdcs  infile=  outfile=  [parameters] 		         	
-
-
+    sudatumk2dr  infile=  outfile=  [parameters] 			
 
  Required parameters:							
-
  infile=stdin		file for input seismic traces			
-
- outfile=stdout	file for output  	                        
-
- ttfile=file for input traveltime tables		
-
-
-
- Required parameters describing the traveltime tables:	         	
-
+ outfile=stdout	file for common offset migration output  	
+ ttfile=		file for input traveltime tables		
+   The following 9 parameters describe traveltime tables:		
  fzt= 			first depth sample in traveltime table		
-
  nzt= 			number of depth samples in traveltime table	
-
- dzt			depth interval in traveltime table		
-
+ dzt=			depth interval in traveltime table		
  fxt=			first lateral sample in traveltime table	
-
  nxt=			number of lateral samples in traveltime table	
-
  dxt=			lateral interval in traveltime table		
+ fs= 			x-coordinate of first source			
+ ns= 			number of sources				
+ ds= 			x-coordinate increment of sources		
 
- fs= 			x-coordinate of first source in table		
+ fxi=                  x-coordinate of the first surface location      
+ dxi=                  horizontal spacing on surface                   
+ nxi=                  number of input surface locations               
+ sgn=			Sign of the datuming process (up=-1 or down=1)  
 
- ns =			number of sources in table			
-
- ds= 			x-coordinate increment of sources in table	
-
-
-
- Parameters describing the input data:                                 
-
- nxso=                  number of shots                                 
-
- dxso=                  shot interval                                   
-
- fxso=0                x-coordinate of first shot                      
-
- nxgo=                  number of receiver offsets per shot             
-
- dxgo=                  receiver offset interval                        
-
- fxgo=0                first receiver offset                           
-
- dt= or from header (dt)       time sampling interval of input data    
-
- ft= or from header (ft)       first time sample of input data         
-
- dc=0                  flag for previously datumed receivers:          
-
-                          dc=0 receivers on recording surface          
-
-                          dc=1 receivers on datum                      ", 
-
-
-
- Parameters descrbing the domain of the problem:	                
-
- dzo=0.2*dzt		vertical spacing in surface determination	
-
- offmax=99999		maximum absolute offset allowed             	
-
-
-
- Parameters describing the recording and datuming surfaces:            
-
- recsurf=0             recording surface (horizontal=0, topographic=1) 
-
- zrec=                  defines recording surface when recsurf=0        
-
- recfile=              defines recording surface when recsurf=1        
-
- datsurf=0             datuming surface (horizontal=0, irregular=1)    
-
- zdat=                  defines datuming surface when datsurf=0         
-
- datfile=              defines datuming surface when datsurf=1         
-
-
-
- Parameters describing the extrapolation:                              
-
- aperx=nxt*dxt/2  	lateral aperture         			
-
- v0=1500(m/s)		reference wavespeed             		
-
- freq=50               dominant frequency in data, used to determine   
-
-                       the minimum distance below the datum that       
-
-                       the stationary phase calculation is valid.      
-
- scale=1.0             user defined scale factor for output            
-
+ Optional Parameters:							
+ dt= or from header (dt) 	time sampling interval of input data	
+ ft= or from header (ft) 	first time sample of input data		
+ surf="0,0;99999,0"  The first surface defined the recording surface 
+ surf="0,0;99999,0"  and the second one, the new datum.              
+                       "x1,z1;x2,z2;x3,z3;...
+ fzo=fzt		z-coordinate of first point in output trace 	
+ dzo=0.2*dzt		vertical spacing of output trace 		
+ nzo=5*(nzt-1)+1 	number of points in output trace		",	
+ fxso=fxt		x-coordinate of first shot	 		
+ dxso=0.5*dxt		shot horizontal spacing		 		
+ nxso=2*(nxt-1)+1  	number of shots 				
+ fxgo=fxt		x-coordinate of first receiver			
+ dxgo=0.5*dxt		receiver horizontal spacing			
+ nxgo=nxso		number of receivers per shot			
+ fmax=0.25/dt		frequency-highcut for input traces		
+ offmax=99999		maximum absolute offset allowed in migration 	
+ aperx=nxt*dxt/2  	migration lateral aperature 			
+ angmax=60		migration angle aperature from vertical 	
+ v0=1500(m/s)		reference velocity value at surface		
+ dvz=0.0  		reference velocity vertical gradient		
+ antiali=1             Antialiase filter (no-filter = 0)               
  jpfile=stderr		job print file name 				
-
  mtr=100  		print verbal information at every mtr traces	
-
- ntr=100000		maximum number of input traces to be datumed	
-
-
-
-
-
-
-
- Computational Notes:                                                
-
-   
-
- 1. Input traces must be SU format and organized in common receiver gathers.
-
-    
-
- 2. Traveltime tables were generated by program rayt2d (or equivalent)     
-
-    on any grid, with dimension ns*nxt*nzt. In the extrapolation process,       
-
-    traveltimes are interpolated into shot/geophone locations and     
-
-    output grids.                                          
-
-
-
- 3. If the offset value of an input trace is not in the offset array     
-
-    of output, the nearest one in the array is chosen.                   
-
-
-
- 4. Amplitudes are computed using the constant reference wavespeed v0.  
-
-                                
-
- 5. Input traces must specify source and receiver positions via the header  
-
-    fields tr.sx and tr.gx.             
-
-
-
- 6. Recording and datuming surfaces are defined as follows:  If recording
-
-    surface is horizontal, set recsurf=0 (default).  Then, zrec will be a
-
-    required parameter, set to the depth of surface.  If the recording  
-
-    surface is topographic, then set recsurf=1.  Then, recfile is a required
-
-    input file.  The input file recfile should be a single column ascii file
-
-    with the depth of the recording surface at every surface location (first 
-
-    source to last offset), with spacing equal to dxgo. 
-
- 
-
-    The same holds for the datuming surface, using datsurf, zdat, and datfile.
-
-
-
-
-
- Assumptions and limitations:
-
-
-
- 1. This code implements a 2.5D extraplolation operator that allows to
-
-    transfer data from one reference surface to another.  The formula used in
-
-    this application is an adaptation of Bleistein & Jaramillo's 2.5D data
-
-    mapping formula for receiver extrapolation.  This is the result of a
-
-    stationary phase analysis of the data mapping equation in the case of
-
-    a constant input receiver location (receiver gather). 
-
- 
-
-
-
- Credits:
-
- 
-
- Authors:  Steven D. Sheaffer (CWP), 11/97 
-
-
-
-
-
- References:  Sheaffer, S., 1999, "2.5D Downward Continuation of the Seismic
-
-              Wavefield Using Kirchhoff Data Mapping."  M.Sc. Thesis, 
-
-              Dept. of Mathematical & Computer Sciences, 
-
-              Colorado School of Mines.
-
-
-
-
-
-
-
-=head2 User's notes (Juan Lorenzo)
-untested
-
-=cut
+ ntr=100000		maximum number of input traces to be migrated	
+
+ verbose=0		silent, =1 chatty				
+
+ Notes:								
+ 1. Traveltime tables were generated by program rayt2d (or other ones)	
+    on relatively coarse grids, with dimension ns*nxt*nzt. In the	
+    datuming process, traveltimes are interpolated into shot/gephone 	
+    positions and output grids.					
+ 2. Input traces must be SU format and organized in common rec. gathers
+ 3. If the offset value of an input trace is not in the offset array 	
+    of output, the nearest one in the array is chosen. 		
+ 4. Amplitudes are computed using the reference velocity profile, v(z),
+    specified by the parameters v0= and dvz=.				
+ 5. Input traces must specify source and receiver positions via the header
+    fields tr.sx and tr.gx. Offset is computed automatically.		
+
+
+ Author:  Trino Salinas, 05/01/96,  Colorado School of Mines
+
+ This code is based on sukzmig2d.c written by Zhenyue Liu, 03/01/95.
+ Subroutines from Dave Hale's modeling library were adapted in
+ this code to define topography using cubic splines.
+
+ This code implements a Kirchhoff extraplolation operator that allows to
+ transfer data from one reference surface to another.  The formula used in
+ this application is a far field approximation of the Berryhill's original
+ formula (Berryhill, 1979).  This equation is the result of a stationary
+ phase analysis to get an analog asymptotic expansion for the two-and-one
+ half dimensional extrapolation formula (Bleistein, 1984).
+
+ The extrapolation formula permits the downward continuation of upgoing
+ waves  and  upward  continuation  of  downgoing waves.  For upward conti-
+ nuation of upgoing waves and downward continuation of downgoing waves,
+ the conjugate transpose of the equation is used (Bevc, 1993).
+
+ References :
+
+ Berryhill, J.R., 1979, Wave equation datuming: Geophysics,
+   44, 1329--1344.
+
+ _______________, 1984, Wave equation datuming before stack
+   (short note) : Geophysics, 49, 2064--2067.
+
+ Bevc, D., 1993, Data parallel wave equation datuming with
+   irregular acquisition topography :  63rd Ann. Internat.
+   Mtg., SEG, Expanded Abstracts, 197--200.
+
+ Bleistein, N., 1984, Mathematical methods for wave phenomena,
+   Academic Press Inc. (Harcourt Brace Jovanovich Publishers),
+   New York.
 
 =head2 CHANGES and their DATES
 
@@ -252,78 +129,54 @@ untested
 
 use Moose;
 our $VERSION = '0.0.1';
-
-=head2 Import packages
-
-=cut
-
 use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
 
-use App::SeismicUnixGui::misc::SeismicUnix
-  qw($in $out $on $go $to $suffix_ascii $off $suffix_su $suffix_bin);
-use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
-
-=head2 instantiation of packages
-
-=cut
-
-my $get              = L_SU_global_constants->new();
-my $Project          = Project_config->new();
-my $DATA_SEISMIC_SU  = $Project->DATA_SEISMIC_SU();
-my $DATA_SEISMIC_BIN = $Project->DATA_SEISMIC_BIN();
-my $DATA_SEISMIC_TXT = $Project->DATA_SEISMIC_TXT();
+my $get = L_SU_global_constants->new();
 
 my $var          = $get->var();
-my $on           = $var->{_on};
-my $off          = $var->{_off};
-my $true         = $var->{_true};
-my $false        = $var->{_false};
 my $empty_string = $var->{_empty_string};
 
-=head2 Encapsulated
-hash of private variables
-
-=cut
-
-my $sukdmdcs = {
-	_aperx   => '',
-	_datfile => '',
-	_datsurf => '',
-	_dc      => '',
-	_ds      => '',
-	_dt      => '',
-	_dxgo    => '',
-	_dxso    => '',
-	_dxt     => '',
-	_dzo     => '',
-	_freq    => '',
-	_fs      => '',
-	_ft      => '',
-	_fxgo    => '',
-	_fxso    => '',
-	_fxt     => '',
-	_fzt     => '',
-	_infile  => '',
-	_jpfile  => '',
-	_mtr     => '',
-	_ns      => '',
-	_ntr     => '',
-	_nxgo    => '',
-	_nxso    => '',
-	_nxt     => '',
-	_nzt     => '',
-	_offmax  => '',
-	_outfile => '',
-	_recfile => '',
-	_recsurf => '',
-	_scale   => '',
-	_ttfile  => '',
-	_v0      => '',
-	_zdat    => '',
-	_zrec    => '',
-	_Step    => '',
-	_note    => '',
-
+my $sudatumk2dr = {
+    _angmax   => '',
+    _antiali  => '',
+    _aperx    => '',
+    _ds       => '',
+    _dt       => '',
+    _dvz      => '',
+    _dxgo     => '',
+    _dxi      => '',
+    _dxso     => '',
+    _dxt      => '',
+    _dzo      => '',
+    _dzt      => '',
+    _fmax     => '',
+    _fs       => '',
+    _ft       => '',
+    _fxgo     => '',
+    _fxi      => '',
+    _fxso     => '',
+    _fxt      => '',
+    _fzo      => '',
+    _fzt      => '',
+    _jpfile   => '',
+    _mtr      => '',
+    _ns       => '',
+    _ntr      => '',
+    _nxgo     => '',
+    _nxi      => '',
+    _nxso     => '',
+    _nxt      => '',
+    _nzo      => '',
+    _nzt      => '',
+    _offmax   => '',
+    _par_file => '',
+    _sgn      => '',
+    _surf     => '',
+    _ttfile   => '',
+    _v0       => '',
+    _verbose  => '',
+    _Step     => '',
+    _note     => '',
 };
 
 =head2 sub Step
@@ -335,8 +188,8 @@ by adding the program name
 
 sub Step {
 
-	$sukdmdcs->{_Step} = 'sukdmdcs' . $sukdmdcs->{_Step};
-	return ( $sukdmdcs->{_Step} );
+    $sudatumk2dr->{_Step} = 'sudatumk2dr' . $sudatumk2dr->{_Step};
+    return ( $sudatumk2dr->{_Step} );
 
 }
 
@@ -349,8 +202,8 @@ by adding the program name
 
 sub note {
 
-	$sukdmdcs->{_note} = 'sukdmdcs' . $sukdmdcs->{_note};
-	return ( $sukdmdcs->{_note} );
+    $sudatumk2dr->{_note} = 'sudatumk2dr' . $sudatumk2dr->{_note};
+    return ( $sudatumk2dr->{_note} );
 
 }
 
@@ -360,43 +213,90 @@ sub note {
 
 sub clear {
 
-	$sukdmdcs->{_aperx}   = '';
-	$sukdmdcs->{_datfile} = '';
-	$sukdmdcs->{_datsurf} = '';
-	$sukdmdcs->{_dc}      = '';
-	$sukdmdcs->{_ds}      = '';
-	$sukdmdcs->{_dt}      = '';
-	$sukdmdcs->{_dxgo}    = '';
-	$sukdmdcs->{_dxso}    = '';
-	$sukdmdcs->{_dxt}     = '';
-	$sukdmdcs->{_dzo}     = '';
-	$sukdmdcs->{_freq}    = '';
-	$sukdmdcs->{_fs}      = '';
-	$sukdmdcs->{_ft}      = '';
-	$sukdmdcs->{_fxgo}    = '';
-	$sukdmdcs->{_fxso}    = '';
-	$sukdmdcs->{_fxt}     = '';
-	$sukdmdcs->{_fzt}     = '';
-	$sukdmdcs->{_infile}  = '';
-	$sukdmdcs->{_jpfile}  = '';
-	$sukdmdcs->{_mtr}     = '';
-	$sukdmdcs->{_ns}      = '';
-	$sukdmdcs->{_ntr}     = '';
-	$sukdmdcs->{_nxgo}    = '';
-	$sukdmdcs->{_nxso}    = '';
-	$sukdmdcs->{_nxt}     = '';
-	$sukdmdcs->{_nzt}     = '';
-	$sukdmdcs->{_offmax}  = '';
-	$sukdmdcs->{_outfile} = '';
-	$sukdmdcs->{_recfile} = '';
-	$sukdmdcs->{_recsurf} = '';
-	$sukdmdcs->{_scale}   = '';
-	$sukdmdcs->{_ttfile}  = '';
-	$sukdmdcs->{_v0}      = '';
-	$sukdmdcs->{_zdat}    = '';
-	$sukdmdcs->{_zrec}    = '';
-	$sukdmdcs->{_Step}    = '';
-	$sukdmdcs->{_note}    = '';
+    $sudatumk2dr->{_angmax}   = '';
+    $sudatumk2dr->{_antiali}  = '';
+    $sudatumk2dr->{_aperx}    = '';
+    $sudatumk2dr->{_ds}       = '';
+    $sudatumk2dr->{_dt}       = '';
+    $sudatumk2dr->{_dvz}      = '';
+    $sudatumk2dr->{_dxgo}     = '';
+    $sudatumk2dr->{_dxi}      = '';
+    $sudatumk2dr->{_dxso}     = '';
+    $sudatumk2dr->{_dxt}      = '';
+    $sudatumk2dr->{_dzo}      = '';
+    $sudatumk2dr->{_dzt}      = '';
+    $sudatumk2dr->{_fmax}     = '';
+    $sudatumk2dr->{_fs}       = '';
+    $sudatumk2dr->{_ft}       = '';
+    $sudatumk2dr->{_fxgo}     = '';
+    $sudatumk2dr->{_fxi}      = '';
+    $sudatumk2dr->{_fxso}     = '';
+    $sudatumk2dr->{_fxt}      = '';
+    $sudatumk2dr->{_fzo}      = '';
+    $sudatumk2dr->{_fzt}      = '';
+    $sudatumk2dr->{_jpfile}   = '';
+    $sudatumk2dr->{_mtr}      = '';
+    $sudatumk2dr->{_ns}       = '';
+    $sudatumk2dr->{_ntr}      = '';
+    $sudatumk2dr->{_nxgo}     = '';
+    $sudatumk2dr->{_nxi}      = '';
+    $sudatumk2dr->{_nxso}     = '';
+    $sudatumk2dr->{_nxt}      = '';
+    $sudatumk2dr->{_nzo}      = '';
+    $sudatumk2dr->{_nzt}      = '';
+    $sudatumk2dr->{_offmax}   = '';
+    $sudatumk2dr->{_par_file} = '';
+    $sudatumk2dr->{_sgn}      = '';
+    $sudatumk2dr->{_surf}     = '';
+    $sudatumk2dr->{_ttfile}   = '';
+    $sudatumk2dr->{_v0}       = '';
+    $sudatumk2dr->{_verbose}  = '';
+    $sudatumk2dr->{_Step}     = '';
+    $sudatumk2dr->{_note}     = '';
+}
+
+=head2 sub angmax 
+
+
+=cut
+
+sub angmax {
+
+    my ( $self, $angmax ) = @_;
+    if ( $angmax ne $empty_string ) {
+
+        $sudatumk2dr->{_angmax} = $angmax;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' angmax=' . $sudatumk2dr->{_angmax};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' angmax=' . $sudatumk2dr->{_angmax};
+
+    }
+    else {
+        print("sudatumk2dr, angmax, missing angmax,\n");
+    }
+}
+
+=head2 sub antiali 
+
+
+=cut
+
+sub antiali {
+
+    my ( $self, $antiali ) = @_;
+    if ( $antiali ne $empty_string ) {
+
+        $sudatumk2dr->{_antiali} = $antiali;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' antiali=' . $sudatumk2dr->{_antiali};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' antiali=' . $sudatumk2dr->{_antiali};
+
+    }
+    else {
+        print("sudatumk2dr, antiali, missing antiali,\n");
+    }
 }
 
 =head2 sub aperx 
@@ -406,83 +306,19 @@ sub clear {
 
 sub aperx {
 
-	my ( $self, $aperx ) = @_;
-	if ( $aperx ne $empty_string ) {
+    my ( $self, $aperx ) = @_;
+    if ( $aperx ne $empty_string ) {
 
-		$sukdmdcs->{_aperx} = $aperx;
-		$sukdmdcs->{_note} =
-		  $sukdmdcs->{_note} . ' aperx=' . $sukdmdcs->{_aperx};
-		$sukdmdcs->{_Step} =
-		  $sukdmdcs->{_Step} . ' aperx=' . $sukdmdcs->{_aperx};
+        $sudatumk2dr->{_aperx} = $aperx;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' aperx=' . $sudatumk2dr->{_aperx};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' aperx=' . $sudatumk2dr->{_aperx};
 
-	}
-	else {
-		print("sukdmdcs, aperx, missing aperx,\n");
-	}
-}
-
-=head2 sub datfile 
-
-
-=cut
-
-sub datfile {
-
-	my ( $self, $datfile ) = @_;
-	if ( $datfile ne $empty_string ) {
-
-		$sukdmdcs->{_datfile} = $datfile;
-		$sukdmdcs->{_note} =
-		  $sukdmdcs->{_note} . ' datfile=' . $sukdmdcs->{_datfile};
-		$sukdmdcs->{_Step} =
-		  $sukdmdcs->{_Step} . ' datfile=' . $sukdmdcs->{_datfile};
-
-	}
-	else {
-		print("sukdmdcs, datfile, missing datfile,\n");
-	}
-}
-
-=head2 sub datsurf 
-
-
-=cut
-
-sub datsurf {
-
-	my ( $self, $datsurf ) = @_;
-	if ( $datsurf ne $empty_string ) {
-
-		$sukdmdcs->{_datsurf} = $datsurf;
-		$sukdmdcs->{_note} =
-		  $sukdmdcs->{_note} . ' datsurf=' . $sukdmdcs->{_datsurf};
-		$sukdmdcs->{_Step} =
-		  $sukdmdcs->{_Step} . ' datsurf=' . $sukdmdcs->{_datsurf};
-
-	}
-	else {
-		print("sukdmdcs, datsurf, missing datsurf,\n");
-	}
-}
-
-=head2 sub dc 
-
-
-=cut
-
-sub dc {
-
-	my ( $self, $dc ) = @_;
-	if ( $dc ne $empty_string ) {
-
-		$sukdmdcs->{_dc}   = $dc;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' dc=' . $sukdmdcs->{_dc};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' dc=' . $sukdmdcs->{_dc};
-
-	}
-	else {
-		print("sukdmdcs, dc, missing dc,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, aperx, missing aperx,\n");
+    }
 }
 
 =head2 sub ds 
@@ -492,17 +328,19 @@ sub dc {
 
 sub ds {
 
-	my ( $self, $ds ) = @_;
-	if ( $ds ne $empty_string ) {
+    my ( $self, $ds ) = @_;
+    if ( $ds ne $empty_string ) {
 
-		$sukdmdcs->{_ds}   = $ds;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' ds=' . $sukdmdcs->{_ds};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' ds=' . $sukdmdcs->{_ds};
+        $sudatumk2dr->{_ds} = $ds;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' ds=' . $sudatumk2dr->{_ds};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' ds=' . $sudatumk2dr->{_ds};
 
-	}
-	else {
-		print("sukdmdcs, ds, missing ds,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, ds, missing ds,\n");
+    }
 }
 
 =head2 sub dt 
@@ -512,17 +350,41 @@ sub ds {
 
 sub dt {
 
-	my ( $self, $dt ) = @_;
-	if ( $dt ne $empty_string ) {
+    my ( $self, $dt ) = @_;
+    if ( $dt ne $empty_string ) {
 
-		$sukdmdcs->{_dt}   = $dt;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' dt=' . $sukdmdcs->{_dt};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' dt=' . $sukdmdcs->{_dt};
+        $sudatumk2dr->{_dt} = $dt;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' dt=' . $sudatumk2dr->{_dt};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' dt=' . $sudatumk2dr->{_dt};
 
-	}
-	else {
-		print("sukdmdcs, dt, missing dt,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, dt, missing dt,\n");
+    }
+}
+
+=head2 sub dvz 
+
+
+=cut
+
+sub dvz {
+
+    my ( $self, $dvz ) = @_;
+    if ( $dvz ne $empty_string ) {
+
+        $sudatumk2dr->{_dvz} = $dvz;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' dvz=' . $sudatumk2dr->{_dvz};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' dvz=' . $sudatumk2dr->{_dvz};
+
+    }
+    else {
+        print("sudatumk2dr, dvz, missing dvz,\n");
+    }
 }
 
 =head2 sub dxgo 
@@ -532,17 +394,41 @@ sub dt {
 
 sub dxgo {
 
-	my ( $self, $dxgo ) = @_;
-	if ( $dxgo ne $empty_string ) {
+    my ( $self, $dxgo ) = @_;
+    if ( $dxgo ne $empty_string ) {
 
-		$sukdmdcs->{_dxgo} = $dxgo;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' dxgo=' . $sukdmdcs->{_dxgo};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' dxgo=' . $sukdmdcs->{_dxgo};
+        $sudatumk2dr->{_dxgo} = $dxgo;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' dxgo=' . $sudatumk2dr->{_dxgo};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' dxgo=' . $sudatumk2dr->{_dxgo};
 
-	}
-	else {
-		print("sukdmdcs, dxgo, missing dxgo,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, dxgo, missing dxgo,\n");
+    }
+}
+
+=head2 sub dxi 
+
+
+=cut
+
+sub dxi {
+
+    my ( $self, $dxi ) = @_;
+    if ( $dxi ne $empty_string ) {
+
+        $sudatumk2dr->{_dxi} = $dxi;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' dxi=' . $sudatumk2dr->{_dxi};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' dxi=' . $sudatumk2dr->{_dxi};
+
+    }
+    else {
+        print("sudatumk2dr, dxi, missing dxi,\n");
+    }
 }
 
 =head2 sub dxso 
@@ -552,17 +438,19 @@ sub dxgo {
 
 sub dxso {
 
-	my ( $self, $dxso ) = @_;
-	if ( $dxso ne $empty_string ) {
+    my ( $self, $dxso ) = @_;
+    if ( $dxso ne $empty_string ) {
 
-		$sukdmdcs->{_dxso} = $dxso;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' dxso=' . $sukdmdcs->{_dxso};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' dxso=' . $sukdmdcs->{_dxso};
+        $sudatumk2dr->{_dxso} = $dxso;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' dxso=' . $sudatumk2dr->{_dxso};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' dxso=' . $sudatumk2dr->{_dxso};
 
-	}
-	else {
-		print("sukdmdcs, dxso, missing dxso,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, dxso, missing dxso,\n");
+    }
 }
 
 =head2 sub dxt 
@@ -572,17 +460,19 @@ sub dxso {
 
 sub dxt {
 
-	my ( $self, $dxt ) = @_;
-	if ( $dxt ne $empty_string ) {
+    my ( $self, $dxt ) = @_;
+    if ( $dxt ne $empty_string ) {
 
-		$sukdmdcs->{_dxt}  = $dxt;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' dxt=' . $sukdmdcs->{_dxt};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' dxt=' . $sukdmdcs->{_dxt};
+        $sudatumk2dr->{_dxt} = $dxt;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' dxt=' . $sudatumk2dr->{_dxt};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' dxt=' . $sudatumk2dr->{_dxt};
 
-	}
-	else {
-		print("sukdmdcs, dxt, missing dxt,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, dxt, missing dxt,\n");
+    }
 }
 
 =head2 sub dzo 
@@ -592,37 +482,63 @@ sub dxt {
 
 sub dzo {
 
-	my ( $self, $dzo ) = @_;
-	if ( $dzo ne $empty_string ) {
+    my ( $self, $dzo ) = @_;
+    if ( $dzo ne $empty_string ) {
 
-		$sukdmdcs->{_dzo}  = $dzo;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' dzo=' . $sukdmdcs->{_dzo};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' dzo=' . $sukdmdcs->{_dzo};
+        $sudatumk2dr->{_dzo} = $dzo;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' dzo=' . $sudatumk2dr->{_dzo};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' dzo=' . $sudatumk2dr->{_dzo};
 
-	}
-	else {
-		print("sukdmdcs, dzo, missing dzo,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, dzo, missing dzo,\n");
+    }
 }
 
-=head2 sub freq 
+=head2 sub dzt 
 
 
 =cut
 
-sub freq {
+sub dzt {
 
-	my ( $self, $freq ) = @_;
-	if ( $freq ne $empty_string ) {
+    my ( $self, $dzt ) = @_;
+    if ( $dzt ne $empty_string ) {
 
-		$sukdmdcs->{_freq} = $freq;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' freq=' . $sukdmdcs->{_freq};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' freq=' . $sukdmdcs->{_freq};
+        $sudatumk2dr->{_dzt} = $dzt;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' dzt=' . $sudatumk2dr->{_dzt};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' dzt=' . $sudatumk2dr->{_dzt};
 
-	}
-	else {
-		print("sukdmdcs, freq, missing freq,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, dzt, missing dzt,\n");
+    }
+}
+
+=head2 sub fmax 
+
+
+=cut
+
+sub fmax {
+
+    my ( $self, $fmax ) = @_;
+    if ( $fmax ne $empty_string ) {
+
+        $sudatumk2dr->{_fmax} = $fmax;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' fmax=' . $sudatumk2dr->{_fmax};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' fmax=' . $sudatumk2dr->{_fmax};
+
+    }
+    else {
+        print("sudatumk2dr, fmax, missing fmax,\n");
+    }
 }
 
 =head2 sub fs 
@@ -632,17 +548,19 @@ sub freq {
 
 sub fs {
 
-	my ( $self, $fs ) = @_;
-	if ( $fs ne $empty_string ) {
+    my ( $self, $fs ) = @_;
+    if ( $fs ne $empty_string ) {
 
-		$sukdmdcs->{_fs}   = $fs;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' fs=' . $sukdmdcs->{_fs};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' fs=' . $sukdmdcs->{_fs};
+        $sudatumk2dr->{_fs} = $fs;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' fs=' . $sudatumk2dr->{_fs};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' fs=' . $sudatumk2dr->{_fs};
 
-	}
-	else {
-		print("sukdmdcs, fs, missing fs,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, fs, missing fs,\n");
+    }
 }
 
 =head2 sub ft 
@@ -652,17 +570,19 @@ sub fs {
 
 sub ft {
 
-	my ( $self, $ft ) = @_;
-	if ( $ft ne $empty_string ) {
+    my ( $self, $ft ) = @_;
+    if ( $ft ne $empty_string ) {
 
-		$sukdmdcs->{_ft}   = $ft;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' ft=' . $sukdmdcs->{_ft};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' ft=' . $sukdmdcs->{_ft};
+        $sudatumk2dr->{_ft} = $ft;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' ft=' . $sudatumk2dr->{_ft};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' ft=' . $sudatumk2dr->{_ft};
 
-	}
-	else {
-		print("sukdmdcs, ft, missing ft,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, ft, missing ft,\n");
+    }
 }
 
 =head2 sub fxgo 
@@ -672,17 +592,41 @@ sub ft {
 
 sub fxgo {
 
-	my ( $self, $fxgo ) = @_;
-	if ( $fxgo ne $empty_string ) {
+    my ( $self, $fxgo ) = @_;
+    if ( $fxgo ne $empty_string ) {
 
-		$sukdmdcs->{_fxgo} = $fxgo;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' fxgo=' . $sukdmdcs->{_fxgo};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' fxgo=' . $sukdmdcs->{_fxgo};
+        $sudatumk2dr->{_fxgo} = $fxgo;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' fxgo=' . $sudatumk2dr->{_fxgo};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' fxgo=' . $sudatumk2dr->{_fxgo};
 
-	}
-	else {
-		print("sukdmdcs, fxgo, missing fxgo,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, fxgo, missing fxgo,\n");
+    }
+}
+
+=head2 sub fxi 
+
+
+=cut
+
+sub fxi {
+
+    my ( $self, $fxi ) = @_;
+    if ( $fxi ne $empty_string ) {
+
+        $sudatumk2dr->{_fxi} = $fxi;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' fxi=' . $sudatumk2dr->{_fxi};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' fxi=' . $sudatumk2dr->{_fxi};
+
+    }
+    else {
+        print("sudatumk2dr, fxi, missing fxi,\n");
+    }
 }
 
 =head2 sub fxso 
@@ -692,17 +636,19 @@ sub fxgo {
 
 sub fxso {
 
-	my ( $self, $fxso ) = @_;
-	if ( $fxso ne $empty_string ) {
+    my ( $self, $fxso ) = @_;
+    if ( $fxso ne $empty_string ) {
 
-		$sukdmdcs->{_fxso} = $fxso;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' fxso=' . $sukdmdcs->{_fxso};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' fxso=' . $sukdmdcs->{_fxso};
+        $sudatumk2dr->{_fxso} = $fxso;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' fxso=' . $sudatumk2dr->{_fxso};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' fxso=' . $sudatumk2dr->{_fxso};
 
-	}
-	else {
-		print("sukdmdcs, fxso, missing fxso,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, fxso, missing fxso,\n");
+    }
 }
 
 =head2 sub fxt 
@@ -712,17 +658,41 @@ sub fxso {
 
 sub fxt {
 
-	my ( $self, $fxt ) = @_;
-	if ( $fxt ne $empty_string ) {
+    my ( $self, $fxt ) = @_;
+    if ( $fxt ne $empty_string ) {
 
-		$sukdmdcs->{_fxt}  = $fxt;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' fxt=' . $sukdmdcs->{_fxt};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' fxt=' . $sukdmdcs->{_fxt};
+        $sudatumk2dr->{_fxt} = $fxt;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' fxt=' . $sudatumk2dr->{_fxt};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' fxt=' . $sudatumk2dr->{_fxt};
 
-	}
-	else {
-		print("sukdmdcs, fxt, missing fxt,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, fxt, missing fxt,\n");
+    }
+}
+
+=head2 sub fzo 
+
+
+=cut
+
+sub fzo {
+
+    my ( $self, $fzo ) = @_;
+    if ( $fzo ne $empty_string ) {
+
+        $sudatumk2dr->{_fzo} = $fzo;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' fzo=' . $sudatumk2dr->{_fzo};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' fzo=' . $sudatumk2dr->{_fzo};
+
+    }
+    else {
+        print("sudatumk2dr, fzo, missing fzo,\n");
+    }
 }
 
 =head2 sub fzt 
@@ -732,39 +702,19 @@ sub fxt {
 
 sub fzt {
 
-	my ( $self, $fzt ) = @_;
-	if ( $fzt ne $empty_string ) {
+    my ( $self, $fzt ) = @_;
+    if ( $fzt ne $empty_string ) {
 
-		$sukdmdcs->{_fzt}  = $fzt;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' fzt=' . $sukdmdcs->{_fzt};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' fzt=' . $sukdmdcs->{_fzt};
+        $sudatumk2dr->{_fzt} = $fzt;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' fzt=' . $sudatumk2dr->{_fzt};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' fzt=' . $sudatumk2dr->{_fzt};
 
-	}
-	else {
-		print("sukdmdcs, fzt, missing fzt,\n");
-	}
-}
-
-=head2 sub infile 
-
-
-=cut
-
-sub infile {
-
-	my ( $self, $infile ) = @_;
-	if ( $infile ne $empty_string ) {
-
-		$sukdmdcs->{_infile} = $infile;
-		$sukdmdcs->{_note} =
-		  $sukdmdcs->{_note} . ' infile=' . $sukdmdcs->{_infile};
-		$sukdmdcs->{_Step} =
-		  $sukdmdcs->{_Step} . ' infile=' . $sukdmdcs->{_infile};
-
-	}
-	else {
-		print("sukdmdcs, infile, missing infile,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, fzt, missing fzt,\n");
+    }
 }
 
 =head2 sub jpfile 
@@ -774,19 +724,19 @@ sub infile {
 
 sub jpfile {
 
-	my ( $self, $jpfile ) = @_;
-	if ( $jpfile ne $empty_string ) {
+    my ( $self, $jpfile ) = @_;
+    if ( $jpfile ne $empty_string ) {
 
-		$sukdmdcs->{_jpfile} = $jpfile;
-		$sukdmdcs->{_note} =
-		  $sukdmdcs->{_note} . ' jpfile=' . $sukdmdcs->{_jpfile};
-		$sukdmdcs->{_Step} =
-		  $sukdmdcs->{_Step} . ' jpfile=' . $sukdmdcs->{_jpfile};
+        $sudatumk2dr->{_jpfile} = $jpfile;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' jpfile=' . $sudatumk2dr->{_jpfile};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' jpfile=' . $sudatumk2dr->{_jpfile};
 
-	}
-	else {
-		print("sukdmdcs, jpfile, missing jpfile,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, jpfile, missing jpfile,\n");
+    }
 }
 
 =head2 sub mtr 
@@ -796,17 +746,19 @@ sub jpfile {
 
 sub mtr {
 
-	my ( $self, $mtr ) = @_;
-	if ( $mtr ne $empty_string ) {
+    my ( $self, $mtr ) = @_;
+    if ( $mtr ne $empty_string ) {
 
-		$sukdmdcs->{_mtr}  = $mtr;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' mtr=' . $sukdmdcs->{_mtr};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' mtr=' . $sukdmdcs->{_mtr};
+        $sudatumk2dr->{_mtr} = $mtr;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' mtr=' . $sudatumk2dr->{_mtr};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' mtr=' . $sudatumk2dr->{_mtr};
 
-	}
-	else {
-		print("sukdmdcs, mtr, missing mtr,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, mtr, missing mtr,\n");
+    }
 }
 
 =head2 sub ns 
@@ -816,17 +768,19 @@ sub mtr {
 
 sub ns {
 
-	my ( $self, $ns ) = @_;
-	if ( $ns ne $empty_string ) {
+    my ( $self, $ns ) = @_;
+    if ( $ns ne $empty_string ) {
 
-		$sukdmdcs->{_ns}   = $ns;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' ns=' . $sukdmdcs->{_ns};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' ns=' . $sukdmdcs->{_ns};
+        $sudatumk2dr->{_ns} = $ns;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' ns=' . $sudatumk2dr->{_ns};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' ns=' . $sudatumk2dr->{_ns};
 
-	}
-	else {
-		print("sukdmdcs, ns, missing ns,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, ns, missing ns,\n");
+    }
 }
 
 =head2 sub ntr 
@@ -836,17 +790,19 @@ sub ns {
 
 sub ntr {
 
-	my ( $self, $ntr ) = @_;
-	if ( $ntr ne $empty_string ) {
+    my ( $self, $ntr ) = @_;
+    if ( $ntr ne $empty_string ) {
 
-		$sukdmdcs->{_ntr}  = $ntr;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' ntr=' . $sukdmdcs->{_ntr};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' ntr=' . $sukdmdcs->{_ntr};
+        $sudatumk2dr->{_ntr} = $ntr;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' ntr=' . $sudatumk2dr->{_ntr};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' ntr=' . $sudatumk2dr->{_ntr};
 
-	}
-	else {
-		print("sukdmdcs, ntr, missing ntr,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, ntr, missing ntr,\n");
+    }
 }
 
 =head2 sub nxgo 
@@ -856,17 +812,41 @@ sub ntr {
 
 sub nxgo {
 
-	my ( $self, $nxgo ) = @_;
-	if ( $nxgo ne $empty_string ) {
+    my ( $self, $nxgo ) = @_;
+    if ( $nxgo ne $empty_string ) {
 
-		$sukdmdcs->{_nxgo} = $nxgo;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' nxgo=' . $sukdmdcs->{_nxgo};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' nxgo=' . $sukdmdcs->{_nxgo};
+        $sudatumk2dr->{_nxgo} = $nxgo;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' nxgo=' . $sudatumk2dr->{_nxgo};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' nxgo=' . $sudatumk2dr->{_nxgo};
 
-	}
-	else {
-		print("sukdmdcs, nxgo, missing nxgo,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, nxgo, missing nxgo,\n");
+    }
+}
+
+=head2 sub nxi 
+
+
+=cut
+
+sub nxi {
+
+    my ( $self, $nxi ) = @_;
+    if ( $nxi ne $empty_string ) {
+
+        $sudatumk2dr->{_nxi} = $nxi;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' nxi=' . $sudatumk2dr->{_nxi};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' nxi=' . $sudatumk2dr->{_nxi};
+
+    }
+    else {
+        print("sudatumk2dr, nxi, missing nxi,\n");
+    }
 }
 
 =head2 sub nxso 
@@ -876,17 +856,19 @@ sub nxgo {
 
 sub nxso {
 
-	my ( $self, $nxso ) = @_;
-	if ( $nxso ne $empty_string ) {
+    my ( $self, $nxso ) = @_;
+    if ( $nxso ne $empty_string ) {
 
-		$sukdmdcs->{_nxso} = $nxso;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' nxso=' . $sukdmdcs->{_nxso};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' nxso=' . $sukdmdcs->{_nxso};
+        $sudatumk2dr->{_nxso} = $nxso;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' nxso=' . $sudatumk2dr->{_nxso};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' nxso=' . $sudatumk2dr->{_nxso};
 
-	}
-	else {
-		print("sukdmdcs, nxso, missing nxso,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, nxso, missing nxso,\n");
+    }
 }
 
 =head2 sub nxt 
@@ -896,17 +878,41 @@ sub nxso {
 
 sub nxt {
 
-	my ( $self, $nxt ) = @_;
-	if ( $nxt ne $empty_string ) {
+    my ( $self, $nxt ) = @_;
+    if ( $nxt ne $empty_string ) {
 
-		$sukdmdcs->{_nxt}  = $nxt;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' nxt=' . $sukdmdcs->{_nxt};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' nxt=' . $sukdmdcs->{_nxt};
+        $sudatumk2dr->{_nxt} = $nxt;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' nxt=' . $sudatumk2dr->{_nxt};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' nxt=' . $sudatumk2dr->{_nxt};
 
-	}
-	else {
-		print("sukdmdcs, nxt, missing nxt,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, nxt, missing nxt,\n");
+    }
+}
+
+=head2 sub nzo 
+
+
+=cut
+
+sub nzo {
+
+    my ( $self, $nzo ) = @_;
+    if ( $nzo ne $empty_string ) {
+
+        $sudatumk2dr->{_nzo} = $nzo;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' nzo=' . $sudatumk2dr->{_nzo};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' nzo=' . $sudatumk2dr->{_nzo};
+
+    }
+    else {
+        print("sudatumk2dr, nzo, missing nzo,\n");
+    }
 }
 
 =head2 sub nzt 
@@ -916,17 +922,19 @@ sub nxt {
 
 sub nzt {
 
-	my ( $self, $nzt ) = @_;
-	if ( $nzt ne $empty_string ) {
+    my ( $self, $nzt ) = @_;
+    if ( $nzt ne $empty_string ) {
 
-		$sukdmdcs->{_nzt}  = $nzt;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' nzt=' . $sukdmdcs->{_nzt};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' nzt=' . $sukdmdcs->{_nzt};
+        $sudatumk2dr->{_nzt} = $nzt;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' nzt=' . $sudatumk2dr->{_nzt};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' nzt=' . $sudatumk2dr->{_nzt};
 
-	}
-	else {
-		print("sukdmdcs, nzt, missing nzt,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, nzt, missing nzt,\n");
+    }
 }
 
 =head2 sub offmax 
@@ -936,107 +944,85 @@ sub nzt {
 
 sub offmax {
 
-	my ( $self, $offmax ) = @_;
-	if ( $offmax ne $empty_string ) {
+    my ( $self, $offmax ) = @_;
+    if ( $offmax ne $empty_string ) {
 
-		$sukdmdcs->{_offmax} = $offmax;
-		$sukdmdcs->{_note} =
-		  $sukdmdcs->{_note} . ' offmax=' . $sukdmdcs->{_offmax};
-		$sukdmdcs->{_Step} =
-		  $sukdmdcs->{_Step} . ' offmax=' . $sukdmdcs->{_offmax};
+        $sudatumk2dr->{_offmax} = $offmax;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' offmax=' . $sudatumk2dr->{_offmax};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' offmax=' . $sudatumk2dr->{_offmax};
 
-	}
-	else {
-		print("sukdmdcs, offmax, missing offmax,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, offmax, missing offmax,\n");
+    }
 }
 
-=head2 sub outfile 
+=head2 sub par_file 
 
 
 =cut
 
-sub outfile {
+sub par_file {
 
-	my ( $self, $outfile ) = @_;
-	if ( $outfile ne $empty_string ) {
+    my ( $self, $par_file ) = @_;
+    if ( $par_file ne $empty_string ) {
 
-		$sukdmdcs->{_outfile} = $outfile;
-		$sukdmdcs->{_note} =
-		  $sukdmdcs->{_note} . ' outfile=' . $sukdmdcs->{_outfile};
-		$sukdmdcs->{_Step} =
-		  $sukdmdcs->{_Step} . ' outfile=' . $sukdmdcs->{_outfile};
+        $sudatumk2dr->{_par_file} = $par_file;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' par=' . $sudatumk2dr->{_par_file};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' par=' . $sudatumk2dr->{_par_file};
 
-	}
-	else {
-		print("sukdmdcs, outfile, missing outfile,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, par_file, missing offmax,\n");
+    }
 }
 
-=head2 sub recfile 
+=head2 sub sgn 
 
 
 =cut
 
-sub recfile {
+sub sgn {
 
-	my ( $self, $recfile ) = @_;
-	if ( $recfile ne $empty_string ) {
+    my ( $self, $sgn ) = @_;
+    if ( $sgn ne $empty_string ) {
 
-		$sukdmdcs->{_recfile} = $recfile;
-		$sukdmdcs->{_note} =
-		  $sukdmdcs->{_note} . ' recfile=' . $sukdmdcs->{_recfile};
-		$sukdmdcs->{_Step} =
-		  $sukdmdcs->{_Step} . ' recfile=' . $sukdmdcs->{_recfile};
+        $sudatumk2dr->{_sgn} = $sgn;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' sgn=' . $sudatumk2dr->{_sgn};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' sgn=' . $sudatumk2dr->{_sgn};
 
-	}
-	else {
-		print("sukdmdcs, recfile, missing recfile,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, sgn, missing sgn,\n");
+    }
 }
 
-=head2 sub recsurf 
+=head2 sub surf 
 
 
 =cut
 
-sub recsurf {
+sub surf {
 
-	my ( $self, $recsurf ) = @_;
-	if ( $recsurf ne $empty_string ) {
+    my ( $self, $surf ) = @_;
+    if ( $surf ne $empty_string ) {
 
-		$sukdmdcs->{_recsurf} = $recsurf;
-		$sukdmdcs->{_note} =
-		  $sukdmdcs->{_note} . ' recsurf=' . $sukdmdcs->{_recsurf};
-		$sukdmdcs->{_Step} =
-		  $sukdmdcs->{_Step} . ' recsurf=' . $sukdmdcs->{_recsurf};
+        $sudatumk2dr->{_surf} = $surf;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' surf=' . $sudatumk2dr->{_surf};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' surf=' . $sudatumk2dr->{_surf};
 
-	}
-	else {
-		print("sukdmdcs, recsurf, missing recsurf,\n");
-	}
-}
-
-=head2 sub scale 
-
-
-=cut
-
-sub scale {
-
-	my ( $self, $scale ) = @_;
-	if ( $scale ne $empty_string ) {
-
-		$sukdmdcs->{_scale} = $scale;
-		$sukdmdcs->{_note} =
-		  $sukdmdcs->{_note} . ' scale=' . $sukdmdcs->{_scale};
-		$sukdmdcs->{_Step} =
-		  $sukdmdcs->{_Step} . ' scale=' . $sukdmdcs->{_scale};
-
-	}
-	else {
-		print("sukdmdcs, scale, missing scale,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, surf, missing surf,\n");
+    }
 }
 
 =head2 sub ttfile 
@@ -1046,19 +1032,19 @@ sub scale {
 
 sub ttfile {
 
-	my ( $self, $ttfile ) = @_;
-	if ( $ttfile ne $empty_string ) {
+    my ( $self, $ttfile ) = @_;
+    if ( $ttfile ne $empty_string ) {
 
-		$sukdmdcs->{_ttfile} = $ttfile;
-		$sukdmdcs->{_note} =
-		  $sukdmdcs->{_note} . ' ttfile=' . $sukdmdcs->{_ttfile};
-		$sukdmdcs->{_Step} =
-		  $sukdmdcs->{_Step} . ' ttfile=' . $sukdmdcs->{_ttfile};
+        $sudatumk2dr->{_ttfile} = $ttfile;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' ttfile=' . $sudatumk2dr->{_ttfile};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' ttfile=' . $sudatumk2dr->{_ttfile};
 
-	}
-	else {
-		print("sukdmdcs, ttfile, missing ttfile,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, ttfile, missing ttfile,\n");
+    }
 }
 
 =head2 sub v0 
@@ -1068,70 +1054,54 @@ sub ttfile {
 
 sub v0 {
 
-	my ( $self, $v0 ) = @_;
-	if ( $v0 ne $empty_string ) {
+    my ( $self, $v0 ) = @_;
+    if ( $v0 ne $empty_string ) {
 
-		$sukdmdcs->{_v0}   = $v0;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' v0=' . $sukdmdcs->{_v0};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' v0=' . $sukdmdcs->{_v0};
+        $sudatumk2dr->{_v0} = $v0;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' v0=' . $sudatumk2dr->{_v0};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' v0=' . $sudatumk2dr->{_v0};
 
-	}
-	else {
-		print("sukdmdcs, v0, missing v0,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, v0, missing v0,\n");
+    }
 }
 
-=head2 sub zdat 
+=head2 sub verbose 
 
 
 =cut
 
-sub zdat {
+sub verbose {
 
-	my ( $self, $zdat ) = @_;
-	if ( $zdat ne $empty_string ) {
+    my ( $self, $verbose ) = @_;
+    if ( $verbose ne $empty_string ) {
 
-		$sukdmdcs->{_zdat} = $zdat;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' zdat=' . $sukdmdcs->{_zdat};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' zdat=' . $sukdmdcs->{_zdat};
+        $sudatumk2dr->{_verbose} = $verbose;
+        $sudatumk2dr->{_note} =
+          $sudatumk2dr->{_note} . ' verbose=' . $sudatumk2dr->{_verbose};
+        $sudatumk2dr->{_Step} =
+          $sudatumk2dr->{_Step} . ' verbose=' . $sudatumk2dr->{_verbose};
 
-	}
-	else {
-		print("sukdmdcs, zdat, missing zdat,\n");
-	}
-}
-
-=head2 sub zrec 
-
-
-=cut
-
-sub zrec {
-
-	my ( $self, $zrec ) = @_;
-	if ( $zrec ne $empty_string ) {
-
-		$sukdmdcs->{_zrec} = $zrec;
-		$sukdmdcs->{_note} = $sukdmdcs->{_note} . ' zrec=' . $sukdmdcs->{_zrec};
-		$sukdmdcs->{_Step} = $sukdmdcs->{_Step} . ' zrec=' . $sukdmdcs->{_zrec};
-
-	}
-	else {
-		print("sukdmdcs, zrec, missing zrec,\n");
-	}
+    }
+    else {
+        print("sudatumk2dr, verbose, missing verbose,\n");
+    }
 }
 
 =head2 sub get_max_index
-
+ 
 max index = number of input variables -1
  
 =cut
 
 sub get_max_index {
-	my ($self) = @_;
-	my $max_index = 34;
+    my ($self) = @_;
+    my $max_index = 37;
 
-	return ($max_index);
+    return ($max_index);
 }
 
 1;

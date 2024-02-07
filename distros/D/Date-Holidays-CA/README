@@ -3,7 +3,7 @@ NAME
     Canadian jurisdictions
 
 VERSION
-    version 0.05
+    version 0.06
 
 SYNOPSIS
         # procedural approach
@@ -17,7 +17,8 @@ SYNOPSIS
         print 'Woot!' if is_holiday($year, $month, $day, {province => 'BC'});
 
         my $calendar = holidays($year, {province => 'BC'});
-        print $calendar->('0701');              # "Canada Day/Fête du Canada"
+        #returns a hash reference
+        print $calendar->{'0701'};              # "Canada Day/FÃªte du Canada"
 
 
         # object-oriented approach
@@ -177,16 +178,18 @@ FUNCTIONS / METHODS
     '1225' for December 25); the values are the holiday names.
 
         my $calendar = holidays($year, {province => 'MB', language => 'EN'});
-        print $calendar->('0701');               # "Canada Day"
+        #returns a hash reference
+        print $calendar->{'0701'};               # "Canada Day"
 
         my $calendar = $dhc->holidays($year);
-        print $calendar->('1111');               # "Remembrance Day"
+        #returns a hash reference
+        print $calendar->{'1111'};               # "Remembrance Day"
 
    ca_holidays()
-    Same as "holidays()".
+    Same as holidays().
 
    holidays_dt()
-    Similar to "holidays()", after a fashion: returns a hashref with the
+    Similar to holidays(), after a fashion: returns a hashref with the
     holiday names as the keys and DateTime objects as the values.
 
         my $calendar = $dhc->holidays_dt($year);

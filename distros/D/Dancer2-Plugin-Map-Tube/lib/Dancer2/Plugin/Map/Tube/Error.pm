@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Map::Tube::Error;
 
-$Dancer2::Plugin::Map::Tube::Error::VERSION   = '0.03';
+$Dancer2::Plugin::Map::Tube::Error::VERSION   = '0.04';
 $Dancer2::Plugin::Map::Tube::Error::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Dancer2::Plugin::Map::Tube::Error - Error codes for Map::Tube API.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -20,6 +20,9 @@ use parent 'Exporter';
 our @EXPORT = qw(
     $BAD_REQUEST
     $TOO_MANY_REQUEST
+
+    $MEMCACHE_SERVER_ERROR
+    $MEMCACHE_SERVER_UNREACHABLE
 
     $REACHED_REQUEST_LIMIT
 
@@ -44,6 +47,8 @@ our @EXPORT = qw(
 =head1 ERROR MESSAGES
 
 =over 2
+
+=item MEMCACHE SERVER UNREACHABLE
 
 =item REACHED REQUEST LIMIT
 
@@ -73,7 +78,9 @@ our @EXPORT = qw(
 
 our $BAD_REQUEST      = 400;
 our $TOO_MANY_REQUEST = 429;
+our $MEMCACHE_SERVER_ERROR = 430;
 
+our $MEMCACHE_SERVER_UNREACHABLE         = 'Memcache server is unreachable.';
 our $REACHED_REQUEST_LIMIT               = 'Reached request limit.';
 our $MISSING_MAP_NAME                    = 'Missing map name.';
 our $RECEIVED_INVALID_MAP_NAME           = 'Received invalid map name.';

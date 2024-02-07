@@ -4,7 +4,7 @@ package App::SeismicUnixGui::misc::param_widgets4pre_built_streams;
 
 =head2 SYNOPSIS 
 
- PERL PROGRAM NAME: param_widgets
+ PERL PROGRAM NAME: param_widgets4pre_built_streams
  AUTHOR:  Juan Lorenzo
 
 =head2 CHANGES and their DATES
@@ -42,7 +42,6 @@ use aliased 'App::SeismicUnixGui::misc::wipe';
 use aliased 'App::SeismicUnixGui::misc::label_boxes';
 use aliased 'App::SeismicUnixGui::misc::value_boxes';
 
-
 extends 'App::SeismicUnixGui::misc::gui_history' => { -version => 0.0.2 };
 use aliased 'App::SeismicUnixGui::misc::gui_history';
 
@@ -51,7 +50,11 @@ my $check_buttons = check_buttons->new();
 my $L_SU_global_constants = L_SU_global_constants->new();
 
 =head2 Declare 
+
 local variables
+
+# print("param_widgets, default_param_specs,first entry num=$default_param_specs->{_first_entry_num}\n");
+# print("param_widgets_grey, default_param_specs,first entry num=$default_param_specs->{_first_entry_num}\n");
 
 =cut
 
@@ -66,8 +69,9 @@ my $false               = $var->{_false};
 my $empty_string        = $var->{_empty_string};
 my $param_widgets       = $gui_history->get_defaults();
 
-# print("param_widgets, default_param_specs,first entry num=$default_param_specs->{_first_entry_num}\n");
-# print("param_widgets_grey, default_param_specs,first entry num=$default_param_specs->{_first_entry_num}\n");
+# default is good
+# my $first                  = $param_widgets->{_first_idx};
+
 
 
 =head2 _changes
@@ -88,14 +92,12 @@ my $param_widgets       = $gui_history->get_defaults();
  
  currently changes in param_widgets package only works with regular flows 
  and not with pre-built superflows
- 
 
 =cut
 
 sub _changes {
 	my ($index) = @_;
 	my $idx = $index;    # individual parameter line
-
 
 	my $control = control->new();
 
@@ -112,7 +114,7 @@ sub _changes {
 		if ( $idx >= 0 && $idx <= $control->get_max_index($prog_name) ) {    # cautious, index must be reasonable
 
 			local_set_entry_change_status($true);
-			my $changed_entry = $param_widgets->{_changed_entry};            #always
+			my $changed_entry = $param_widgets->{_changed_entry};            # always
 
 			# print("param_widgets,changes,changed 1-yes 0 -no? $changed_entry\n");
 			local_update_check_button_setting($idx);
@@ -120,7 +122,7 @@ sub _changes {
 			# local_set_last_changed_entry_index($idx);
 		}
 
-		return ($true);                                                      # for Entry widget to say there is no error
+		return ($true);    # for Entry widget to say there is no error
 
 		# second case is when we are using project_selector
 		# project_selector does not yet have a max_index defined in a separate module
@@ -323,32 +325,34 @@ sub _set_length_in_gui {
 clear the gui completely of 61 parameter values
 61 = current defaulted maximum number of variables in a list box
 
-=cut
-
-sub gui_full_clear {
-	my ($self) = @_;
-
-	my $wipe = wipe->new();
-
-	my $safe = $param_widgets->{_length};
-
+#	my $safe = $param_widgets->{_length};
 	# print("param_widgets_neutral, gui_full_clear, temp save length $param_widgets_color_href->{_length} \n");
 	# _max_length_in_gui();
 	# print("param_widgets_neutral, gui_full_clear, length used for cleaning $param_widgets_color_href->{_length} \n");
 
 	# print("param_widgets_neutral, gui_full_clear, _values_w_aref, $param_widgets_color_href->{_values_w_aref} \n");
 	# print("param_widgets_neutral, gui_full_clear, _labels_w_aref, $param_widgets_color_href->{_labels_w_aref} \n");
-	$wipe->range($param_widgets);
-	$wipe->values();
-	$wipe->labels();
-	$wipe->check_buttons();
 
-	# return to original length value
+# return to original length value
 	# _set_length_in_gui($safe);
 	# print("param_widgets_grey, gui_full_clear, restored length $param_widgets_color_href->{_length} \n");
 
-	return ();
+
+=cut
+
+sub gui_full_clear {
+	my ($self) = @_;
+	
+	my $wipe = wipe->new();
+	
+	$wipe->range($param_widgets);
+	$wipe->values();
+	$wipe->labels();
+	$wipe->all_check_buttons();
+#    print("param_widgets4pre_built_streams,gui_full_clear\n");
+;	return ();
 }
+
 
 =head2 sub  local_set_entry_change_status
 
@@ -960,14 +964,14 @@ sub redisplay_check_buttons {
 	my ($self)        = @_;
 	my $button_w_aref = $param_widgets->{_check_buttons_w_aref};
 	my $first         = $param_widgets->{_first_idx};
-	my $length        = scalar @{ $param_widgets->{_check_buttons_settings_aref} };
+#	my $length        = scalar @{ $param_widgets->{_check_buttons_settings_aref} };
+	my $length        = scalar @{ $param_widgets->{_labels_aref} };
 
-	# my $length 			= $param_widgets->{_length};
 	my $settings_aref = $param_widgets->{_check_buttons_settings_aref};
 
 	# print("1. param_widgets,redisplay_check_buttons,settings @{$settings_aref}[0]\n");
 	# print("2. param_widgets,redisplay_check_buttons,settings @{$param_widgets->{_check_buttons_settings_aref}}[0]\n");
-	# print("2. param_widgets,redisplay_check_buttons,length: $length\n");
+#	print("2. param_widgets,redisplay_check_buttons,length: $length\n");
 
 	if ( $button_w_aref && $settings_aref ) {
 
@@ -1035,7 +1039,8 @@ sub redisplay_labels {
   textvariables must be a reference in order
   for -validatecommand to work. BEWARE!
 
-  DB
+  9.27.23
+  Clear the GUI first and then redisplay values
 
 =cut 
 
@@ -1047,14 +1052,18 @@ sub redisplay_values {
 	my $first         = $param_widgets->{_first_idx};
 	my $length        = scalar @{ $param_widgets->{_values_aref} };
 
-	# my $length 				= $param_widgets->{_length};
+	# my $length 			= $param_widgets->{_length};
 	# print("param_widgets, redisplay_values, length is $length\n");
 	# print("param_widgets, redisplay_values, first is $first\n");
-	if ( $values_w_aref && $values_aref ) {
+	
+	if ( length $values_w_aref && 
+		 length $values_aref ) {
 
 		for ( my $i = $first; $i < $length; $i++ ) {
 
 			my $control = control->new();
+			
+			#TODO: fully clear the gui first
 
 			# print("1. param_widgets,redisplay_values,chkbtn @{$param_widgets->{_check_buttons_settings_aref}}[$i]\n");
 
@@ -1117,6 +1126,8 @@ sub set_current_program {
 =head2 sub set_first_idx
 
 =0
+
+TODO... for retirement
 
 =cut
 

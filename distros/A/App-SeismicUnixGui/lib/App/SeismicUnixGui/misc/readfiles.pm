@@ -225,6 +225,7 @@ sub cols_1p {
 sub cols_2p {
 
 	my ( $files, $ref_file ) = @_;
+	
 	$readfiles->{_ref_file} = $$ref_file if defined($ref_file);
 
 	#print '$$ref_file= '.$$ref_file."\n\n";

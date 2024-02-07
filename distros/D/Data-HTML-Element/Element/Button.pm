@@ -3,6 +3,7 @@ package Data::HTML::Element::Button;
 use strict;
 use warnings;
 
+use Data::HTML::Element::Utils qw(check_data check_data_type);
 use Error::Pure qw(err);
 use List::Util 1.33 qw(none);
 use Mo qw(build default is);
@@ -19,7 +20,7 @@ Readonly::Array our @ENCTYPES => (
 Readonly::Array our @FORM_METHODS => qw(get post);
 Readonly::Array our @TYPES => qw(button reset submit);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 has autofocus => (
 	ro => 1,
@@ -95,31 +96,10 @@ sub BUILD {
 	check_css_class($self, 'css_class');
 
 	# Check data type.
-	if (! defined $self->{'data_type'}) {
-		$self->{'data_type'} = 'plain';
-	}
-	if (none { $self->{'data_type'} eq $_ } @DATA_TYPES) {
-		err "Parameter 'data_type' has bad value.";
-	}
+	check_data_type($self);
 
 	# Check data based on type.
-	check_array($self, 'data');
-	foreach my $data_item (@{$self->{'data'}}) {
-		# Plain mode
-		if ($self->{'data_type'} eq 'plain') {
-			if (ref $data_item ne '') {
-				err "Parameter 'data' in 'plain' mode must contain ".
-					'reference to array with scalars.';
-			}
-		# Tags mode.
-		} else {
-			if (ref $data_item ne 'ARRAY') {
-				err "Parameter 'data' in 'tags' mode must contain ".
-					"reference to array with references ".
-					'to array with Tags structure.';
-			}
-		}
-	}
+	check_data($self);
 
 	# Check disabled.
 	if (! defined $self->{'disabled'}) {
@@ -437,6 +417,10 @@ Returns string.
  new():
          Parameter 'autofocus' must be a bool (0/1).
                 Value: %s
+         Parameter 'css_class' has bad CSS class name.
+                 Value: %s
+         Parameter 'css_class' has bad CSS class name (number on begin).
+                 Value: %s
          Parameter 'data' must be a array.
                 Value: %s
                 Reference: %s
@@ -545,6 +529,7 @@ Returns string.
 
 =head1 DEPENDENCIES
 
+L<Data::HTML::Element::Utils>,
 L<Error::Pure>,
 L<List::Util>,
 L<Mo>,
@@ -570,6 +555,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

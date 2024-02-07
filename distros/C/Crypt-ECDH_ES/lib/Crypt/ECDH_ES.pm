@@ -1,19 +1,19 @@
 package Crypt::ECDH_ES;
-$Crypt::ECDH_ES::VERSION = '0.004';
+$Crypt::ECDH_ES::VERSION = '0.005';
 use strict;
 use warnings;
 
 use Carp;
 use Crypt::Curve25519;
 use Crypt::URandom qw/urandom/;
-use Crypt::Rijndael;
+use Crypt::Rijndael 1.16;
 use Digest::SHA qw/sha256 hmac_sha256/;
 
 use Exporter 5.57 'import';
-our @EXPORT_OK = qw/ecdhes_encrypt ecdhes_decrypt ecdhes_generate_key/;
+our @EXPORT_OK = qw/ecdhes_encrypt ecdhes_decrypt ecdhes_encrypt_authenticated ecdhes_decrypt_authenticated ecdhes_generate_key/;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-my $format = 'C/a C/a n/a N/a';
+my $format_unauthenticated = 'C/a C/a n/a N/a';
 
 sub ecdhes_encrypt {
 	my ($public_key, $data) = @_;
@@ -25,20 +25,19 @@ sub ecdhes_encrypt {
 	my ($encrypt_key, $sign_key) = unpack 'a16 a16', sha256($shared);
 	my $iv     = substr sha256($public), 0, 16;
 	my $cipher = Crypt::Rijndael->new($encrypt_key, Crypt::Rijndael::MODE_CBC);
-	$cipher->set_iv($iv);
 
 	my $pad_length = 16 - length($data) % 16;
 	my $padding = chr($pad_length) x $pad_length;
 
-	my $ciphertext = $cipher->encrypt($data . $padding);
+	my $ciphertext = $cipher->encrypt($data . $padding, $iv);
 	my $mac = hmac_sha256($iv . $ciphertext, $sign_key);
-	return pack $format, '', $public, $mac, $ciphertext;
+	return pack $format_unauthenticated, '', $public, $mac, $ciphertext;
 }
 
 sub ecdhes_decrypt {
 	my ($private_key, $packed_data) = @_;
 
-	my ($options, $public, $mac, $ciphertext) = unpack $format, $packed_data;
+	my ($options, $public, $mac, $ciphertext) = unpack $format_unauthenticated, $packed_data;
 	croak 'Unknown options' if $options ne '';
 
 	my $shared = curve25519_shared_secret($private_key, $public);
@@ -46,12 +45,62 @@ sub ecdhes_decrypt {
 	my $iv     = substr sha256($public), 0, 16;
 	croak 'MAC is incorrect' if hmac_sha256($iv . $ciphertext, $sign_key) ne $mac;
 	my $cipher = Crypt::Rijndael->new($encrypt_key, Crypt::Rijndael::MODE_CBC);
-	$cipher->set_iv($iv);
 
-	my $plaintext = $cipher->decrypt($ciphertext);
+	my $plaintext = $cipher->decrypt($ciphertext, $iv);
 	my $pad_length = ord substr $plaintext, -1;
 	substr($plaintext, -$pad_length, $pad_length, '') eq chr($pad_length) x $pad_length or croak 'Incorrectly padded';
 	return $plaintext;
+}
+
+my $format_authenticated = 'C/a C/a C/a C/a N/a';
+
+sub ecdhes_encrypt_authenticated {
+	my ($public_key_other, $private_key_self, $data) = @_;
+
+	my $public_key_self = curve25519_public_key($private_key_self);
+	my $private_ephemeral = curve25519_secret_key(urandom(32));
+	my $ephemeral_public  = curve25519_public_key($private_ephemeral);
+	my $primary_shared  = curve25519_shared_secret($private_ephemeral, $public_key_other);
+
+	my ($primary_encrypt_key, $primary_iv) = unpack 'a16 a16', sha256($primary_shared);
+	my $primary_cipher = Crypt::Rijndael->new($primary_encrypt_key, Crypt::Rijndael::MODE_CBC);
+	my $encrypted_public_key = $primary_cipher->encrypt($public_key_self, $primary_iv);
+
+	my $secondary_shared = $primary_shared . curve25519_shared_secret($private_key_self, $public_key_other);
+	my ($secondary_encrypt_key, $sign_key) = unpack 'a16 a16', sha256($secondary_shared);
+	my $cipher = Crypt::Rijndael->new($secondary_encrypt_key, Crypt::Rijndael::MODE_CBC);
+	my $iv     = substr sha256($ephemeral_public), 0, 16;
+
+	my $pad_length = 16 - length($data) % 16;
+	my $padding = chr($pad_length) x $pad_length;
+
+	my $ciphertext = $cipher->encrypt($data . $padding, $iv);
+	my $mac = hmac_sha256($iv . $ciphertext, $sign_key);
+	return pack $format_authenticated, "\x{1}", $ephemeral_public, $encrypted_public_key, $mac, $ciphertext;
+}
+
+sub ecdhes_decrypt_authenticated {
+	my ($private_key, $packed_data) = @_;
+
+	my ($options, $ephemeral_public, $encrypted_public_key, $mac, $ciphertext) = unpack $format_authenticated, $packed_data;
+	croak 'Unknown options' if $options ne "\x{1}";
+
+	my $primary_shared = curve25519_shared_secret($private_key, $ephemeral_public);
+	my ($primary_encrypt_key, $primary_iv) = unpack 'a16 a16', sha256($primary_shared);
+	my $primary_cipher = Crypt::Rijndael->new($primary_encrypt_key, Crypt::Rijndael::MODE_CBC);
+	my $public_key = $primary_cipher->decrypt($encrypted_public_key, $primary_iv);
+
+	my $secondary_shared = $primary_shared . curve25519_shared_secret($private_key, $public_key);
+	my ($secondary_encrypt_key, $sign_key) = unpack 'a16 a16', sha256($secondary_shared);
+	my $cipher = Crypt::Rijndael->new($secondary_encrypt_key, Crypt::Rijndael::MODE_CBC);
+	my $iv     = substr sha256($ephemeral_public), 0, 16;
+
+	croak 'MAC is incorrect' if hmac_sha256($iv . $ciphertext, $sign_key) ne $mac;
+
+	my $plaintext = $cipher->decrypt($ciphertext, $iv);
+	my $pad_length = ord substr $plaintext, -1;
+	substr($plaintext, -$pad_length, $pad_length, '') eq chr($pad_length) x $pad_length or croak 'Incorrectly padded';
+	return ($plaintext, $public_key);
 }
 
 sub ecdhes_generate_key {
@@ -77,7 +126,7 @@ Crypt::ECDH_ES - A fast and small hybrid crypto system
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -106,11 +155,19 @@ All cryptographic components are believed to provide at least 128-bits of securi
 
 =head2 ecdhes_encrypt($public_key, $plaintext)
 
-This will encrypt C<$plaintext> using C<$public_key>. This is a probabilistic encryption: the result will be different for every invocation.
+This will encrypt C<$plaintext> using C<$public_key>. This is a non-deterministic encryption: the result will be different for every invocation.
 
 =head2 ecdhes_decrypt($private_key, $ciphertext)
 
-This will decrypt C<$ciphertext> using C<$public_key> and return the plaintext.
+This will decrypt C<$ciphertext> (as encrypted using C<ecdhes_encrypt>) using C<$private_key> and return the plaintext.
+
+=head2 ecdhes_encrypt_authenticated($public_key, $private_key, $plaintext)
+
+This will encrypt C<$plaintext> using C<$public_key> (of the receiver) and C<$private_key> (of the sender). This is a non-deterministic encryption: the result will be different for every invocation.
+
+=head2 ecdhes_decrypt_authenticated($private_key, $ciphertext)
+
+This will decrypt C<$ciphertext> (as encrypted using C<ecdhes_encrypt_authenticated>) using C<$private_key> and return the plaintext and the public of the sender
 
 =head2 ecdhes_generate_key()
 
@@ -134,7 +191,7 @@ This is a public key signing/verification system based on an equivalent curve.
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::plot::supsmax;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 

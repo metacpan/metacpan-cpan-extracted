@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-01'; # DATE
+our $DATE = '2024-02-01'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240101.0'; # VERSION
+our $VERSION = '20240201.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'BINGOS' => '',
@@ -26,7 +26,6 @@ use Acme::CPANAuthors::Register (
     'JIMAVERA' => '',
     'ASPOSE' => '',
     'DJERIUS' => '',
-    'JAVONET' => '',
     'DDUMONT' => '',
     'DRCLAW' => '',
     'JV' => '',
@@ -34,139 +33,153 @@ use Acme::CPANAuthors::Register (
     'AJNN' => '',
     'DCANTRELL' => '',
     'ABALAMA' => '',
-    'CADE' => '',
-    'LICHTKIND' => '',
-    'NERDVANA' => '',
     'SHLOMIF' => '',
     'BLIAKO' => '',
-    'BURAK' => '',
     'CUKEBOT' => '',
     'DROLSKY' => '',
-    'EXODIST' => '',
-    'GRYPHON' => '',
     'NLNETLABS' => '',
     'TEAM' => '',
     'WYANT' => '',
     'YANICK' => '',
     'BPS' => '',
     'DART' => '',
-    'MRUEDA' => '',
     'PJACKLAM' => '',
     'RKAPL' => '',
-    'ZHMYLOVE' => '',
-    'JGNI' => '',
-    'JMATES' => '',
-    'BRTASTIC' => '',
-    'CCELSO' => '',
     'GENE' => '',
     'GSG' => '',
-    'JJATRIA' => '',
+    'JGNI' => '',
+    'JMATES' => '',
     'JRM' => '',
     'OETIKER' => '',
     'RKELSCH' => '',
     'RRWO' => '',
     'SREZIC' => '',
-    'TANIGUCHI' => '',
-    'TODDR' => '',
-    'YANGAK' => '',
-    'ZMUGHAL' => '',
     'CGPAN' => '',
     'DAMI' => '',
-    'DCHURCH' => '',
     'DERIV' => '',
     'DORNER' => '',
-    'FELIPE' => '',
-    'GDT' => '',
-    'GRICHTER' => '',
     'ISHIGAKI' => '',
-    'JGOMEZ' => '',
     'MIKKOI' => '',
-    'OODLER' => '',
     'RJBS' => '',
-    'RSCHUPP' => '',
     'SHOGO' => '',
-    'SIDNEY' => '',
     'TONYC' => '',
     'VOEGELAS' => '',
     'AAHAZRED' => '',
     'ABH' => '',
-    'ABRAXXA' => '',
     'AJM' => '',
-    'AJOLMA' => '',
-    'AKIYM' => '',
     'AVERKIOS' => '',
-    'AZOMER' => '',
-    'BARTL' => '',
-    'BESINT' => '',
     'BLAINEM' => '',
-    'BOD' => '',
-    'BODOLFO' => '',
-    'BOOK' => '',
-    'BPSCHUCK' => '',
     'BWEST' => '',
-    'CAVAC' => '',
-    'CHOROBA' => '',
-    'CJFIELDS' => '',
-    'COUDOT' => '',
     'CRLCU' => '',
-    'CROMEDOME' => '',
-    'DAKKAR' => '',
     'DAVECROSS' => '',
-    'DEPESZ' => '',
-    'DKECHAG' => '',
-    'DVEEDEN' => '',
-    'EMUNDALL' => '',
-    'FREED' => '',
-    'GANGLION' => '',
     'GARU' => '',
-    'GBROWN' => '',
     'GUILLEM' => '',
-    'GUIMARD' => '',
-    'HAKONH' => '',
-    'HAUKEX' => '',
-    'HKOBA' => '',
     'INGY' => '',
-    'JKSTILL' => '',
-    'JMCNAMARA' => '',
-    'JSF' => '',
-    'KARUPA' => '',
-    'KRAIH' => '',
     'KUERBIS' => '',
-    'LIS' => '',
-    'LWP' => '',
-    'MARKOV' => '',
     'MATHIAS' => '',
-    'MAUKE' => '',
-    'MBESSON' => '',
-    'MERKYS' => '',
-    'MHASCH' => '',
-    'MICHIELB' => '',
-    'MJONDET' => '',
-    'MRDVT' => '',
-    'OVID' => '',
     'PACMAN' => '',
-    'PLICEASE' => '',
-    'PMPERRY' => '',
-    'POPEFELIX' => '',
-    'RHESA' => '',
     'RJET' => '',
-    'RMBARKER' => '',
     'SBECK' => '',
     'SKAJI' => '',
-    'SLAFFAN' => '',
-    'SZABGAB' => '',
-    'TEEJAY' => '',
-    'TEODESIAN' => '',
-    'TOBYINK' => '',
-    'TURNSTEP' => '',
-    'TVDW' => '',
-    'VANHOESEL' => '',
     'VEESH' => '',
     'VKON' => '',
-    'WOLDRICH' => '',
     'YOUPONG' => '',
-    'YTURTLE' => '',
-    'ZEFRAM' => '',
+    'ABELTJE' => '',
+    'ANELSON' => '',
+    'APPEL' => '',
+    'ARIDEV' => '',
+    'ARISTOTLE' => '',
+    'ASLEWIS' => '',
+    'ATRODO' => '',
+    'BAKERSCOT' => '',
+    'BIGFOOT' => '',
+    'BIGPRESH' => '',
+    'BKB' => '',
+    'CHEVALIER' => '',
+    'CHRISN' => '',
+    'CHROMATIC' => '',
+    'CMANLEY' => '',
+    'CORION' => '',
+    'CORLISS' => '',
+    'DANBERR' => '',
+    'DDICK' => '',
+    'DEXTER' => '',
+    'DMANTO' => '',
+    'DOMM' => '',
+    'DORIAN' => '',
+    'DSKOLL' => '',
+    'ELCAMLOST' => '',
+    'ETJ' => '',
+    'EXIFTOOL' => '',
+    'EZIMUEL' => '',
+    'FDULAU' => '',
+    'FKENTO' => '',
+    'FREDERICD' => '',
+    'FSEITZ' => '',
+    'GHE' => '',
+    'GLLORE' => '',
+    'GNUSTAVO' => '',
+    'GRAY' => '',
+    'GRECHARY' => '',
+    'HOCHSTEN' => '',
+    'IKEGAMI' => '',
+    'IPENBURG' => '',
+    'JEFFA' => '',
+    'JETM' => '',
+    'JJNAPIORK' => '',
+    'JKG' => '',
+    'JOHNH' => '',
+    'JROBINSON' => '',
+    'JUERD' => '',
+    'KARASIK' => '',
+    'KAZEBURO' => '',
+    'KJETILK' => '',
+    'LEONT' => '',
+    'LION' => '',
+    'LNATION' => '',
+    'LOCATION' => '',
+    'LSKATZ' => '',
+    'MANWAR' => '',
+    'MAREKR' => '',
+    'MBRADSHAW' => '',
+    'MIKEVNTNR' => '',
+    'MIYAGAWA' => '',
+    'MMCCLENN' => '',
+    'MRSCOTTY' => '',
+    'MSCHOUT' => '',
+    'MSIMERSON' => '',
+    'MSLM' => '',
+    'NHORNE' => '',
+    'NJFRANCK' => '',
+    'NUDDLEGG' => '',
+    'OLEG' => '',
+    'PMORCH' => '',
+    'POWERMAN' => '',
+    'RADIATOR' => '',
+    'RHANDOM' => '',
+    'RWSTAUNER' => '',
+    'SALVA' => '',
+    'SANKO' => '',
+    'SBAKKER' => '',
+    'SCHROEDER' => '',
+    'SFOBERSKI' => '',
+    'SHE' => '',
+    'SISYPHUS' => '',
+    'SORTIZ' => '',
+    'SUKRIA' => '',
+    'SULLR' => '',
+    'SYBER' => '',
+    'TIMLEGGE' => '',
+    'TINITA' => '',
+    'TOKUHIROM' => '',
+    'TORBIAK' => '',
+    'TRIZEN' => '',
+    'TURNERJW' => '',
+    'VOLKENING' => '',
+    'WESM' => '',
+    'WSNYDER' => '',
+    'XMOLEX' => '',
+    'TANIGUCHI' => '',
 );
 
 
@@ -185,175 +198,188 @@ Acme::CPANAuthors::CPAN::Streaks::MonthlyReleases::Current - Authors with ongoin
 
 =head1 VERSION
 
-This document describes version 20240101.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyReleases::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-01-01.
+This document describes version 20240201.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyReleases::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-01.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-01-01, produced by L<cpan-streaks>):
+Current standings (as of 2024-02-01, produced by L<cpan-streaks>):
 
   +-----------+-----+------------+-------------+
   | author    | len | start_date | status      |
   +-----------+-----+------------+-------------+
-  | BINGOS    | 214 | 2006-03    | might-break |
-  | ETHER     | 142 | 2012-03    | might-break |
-  | LEEJO     | 117 | 2014-04    | might-break |
-  | PERLANCAR | 114 | 2014-08    | ongoing     |
-  | PEVANS    |  67 | 2018-06    | might-break |
-  | UTASHIRO  |  67 | 2018-06    | might-break |
-  | OALDERS   |  53 | 2019-08    | might-break |
-  | KIMOTO    |  25 | 2021-12    | might-break |
-  | OLIVER    |  23 | 2022-02    | might-break |
-  | SKIM      |  21 | 2022-04    | might-break |
-  | DERF      |  19 | 2022-06    | might-break |
-  | JDEGUEST  |  19 | 2022-06    | might-break |
-  | BDFOY     |  12 | 2023-01    | might-break |
-  | HMBRAND   |  12 | 2023-01    | might-break |
-  | JIMAVERA  |  12 | 2023-01    | might-break |
-  | ASPOSE    |  11 | 2023-02    | might-break |
-  | DJERIUS   |  10 | 2023-03    | might-break |
-  | JAVONET   |   9 | 2023-04    | might-break |
-  | DDUMONT   |   8 | 2023-05    | might-break |
-  | DRCLAW    |   8 | 2023-05    | might-break |
-  | JV        |   8 | 2023-05    | might-break |
-  | VVELOX    |   8 | 2023-05    | might-break |
-  | AJNN      |   7 | 2023-06    | might-break |
-  | DCANTRELL |   7 | 2023-06    | might-break |
-  | ABALAMA   |   6 | 2023-07    | might-break |
-  | CADE      |   6 | 2023-07    | might-break |
-  | LICHTKIND |   6 | 2023-07    | might-break |
-  | NERDVANA  |   6 | 2023-07    | might-break |
-  | SHLOMIF   |   6 | 2023-07    | might-break |
-  | BLIAKO    |   5 | 2023-08    | might-break |
-  | BURAK     |   5 | 2023-08    | might-break |
-  | CUKEBOT   |   5 | 2023-08    | might-break |
-  | DROLSKY   |   5 | 2023-08    | might-break |
-  | EXODIST   |   5 | 2023-08    | might-break |
-  | GRYPHON   |   5 | 2023-08    | might-break |
-  | NLNETLABS |   5 | 2023-08    | might-break |
-  | TEAM      |   5 | 2023-08    | might-break |
-  | WYANT     |   5 | 2023-08    | might-break |
-  | YANICK    |   5 | 2023-08    | might-break |
-  | BPS       |   4 | 2023-09    | might-break |
-  | DART      |   4 | 2023-09    | might-break |
-  | MRUEDA    |   4 | 2023-09    | might-break |
-  | PJACKLAM  |   4 | 2023-09    | might-break |
-  | RKAPL     |   4 | 2023-09    | might-break |
-  | ZHMYLOVE  |   4 | 2023-09    | might-break |
-  | JGNI      |   4 | 2023-10    | ongoing     |
-  | JMATES    |   4 | 2023-10    | ongoing     |
-  | BRTASTIC  |   3 | 2023-10    | might-break |
-  | CCELSO    |   3 | 2023-10    | might-break |
-  | GENE      |   3 | 2023-10    | might-break |
-  | GSG       |   3 | 2023-10    | might-break |
-  | JJATRIA   |   3 | 2023-10    | might-break |
-  | JRM       |   3 | 2023-10    | might-break |
-  | OETIKER   |   3 | 2023-10    | might-break |
-  | RKELSCH   |   3 | 2023-10    | might-break |
-  | RRWO      |   3 | 2023-10    | might-break |
-  | SREZIC    |   3 | 2023-10    | might-break |
-  | TANIGUCHI |   3 | 2023-10    | might-break |
-  | TODDR     |   3 | 2023-10    | might-break |
-  | YANGAK    |   3 | 2023-10    | might-break |
-  | ZMUGHAL   |   3 | 2023-10    | might-break |
-  | CGPAN     |   2 | 2023-11    | might-break |
-  | DAMI      |   2 | 2023-11    | might-break |
-  | DCHURCH   |   2 | 2023-11    | might-break |
-  | DERIV     |   2 | 2023-11    | might-break |
-  | DORNER    |   2 | 2023-11    | might-break |
-  | FELIPE    |   2 | 2023-11    | might-break |
-  | GDT       |   2 | 2023-11    | might-break |
-  | GRICHTER  |   2 | 2023-11    | might-break |
-  | ISHIGAKI  |   2 | 2023-11    | might-break |
-  | JGOMEZ    |   2 | 2023-11    | might-break |
-  | MIKKOI    |   2 | 2023-11    | might-break |
-  | OODLER    |   2 | 2023-11    | might-break |
-  | RJBS      |   2 | 2023-11    | might-break |
-  | RSCHUPP   |   2 | 2023-11    | might-break |
-  | SHOGO     |   2 | 2023-11    | might-break |
-  | SIDNEY    |   2 | 2023-11    | might-break |
-  | TONYC     |   2 | 2023-11    | might-break |
-  | VOEGELAS  |   2 | 2023-11    | might-break |
-  | AAHAZRED  |   1 | 2023-12    | might-break |
-  | ABH       |   1 | 2023-12    | might-break |
-  | ABRAXXA   |   1 | 2023-12    | might-break |
-  | AJM       |   1 | 2023-12    | might-break |
-  | AJOLMA    |   1 | 2023-12    | might-break |
-  | AKIYM     |   1 | 2023-12    | might-break |
-  | AVERKIOS  |   1 | 2023-12    | might-break |
-  | AZOMER    |   1 | 2023-12    | might-break |
-  | BARTL     |   1 | 2023-12    | might-break |
-  | BESINT    |   1 | 2023-12    | might-break |
-  | BLAINEM   |   1 | 2023-12    | might-break |
-  | BOD       |   1 | 2023-12    | might-break |
-  | BODOLFO   |   1 | 2023-12    | might-break |
-  | BOOK      |   1 | 2023-12    | might-break |
-  | BPSCHUCK  |   1 | 2023-12    | might-break |
-  | BWEST     |   1 | 2023-12    | might-break |
-  | CAVAC     |   1 | 2023-12    | might-break |
-  | CHOROBA   |   1 | 2023-12    | might-break |
-  | CJFIELDS  |   1 | 2023-12    | might-break |
-  | COUDOT    |   1 | 2023-12    | might-break |
-  | CRLCU     |   1 | 2023-12    | might-break |
-  | CROMEDOME |   1 | 2023-12    | might-break |
-  | DAKKAR    |   1 | 2023-12    | might-break |
-  | DAVECROSS |   1 | 2023-12    | might-break |
-  | DEPESZ    |   1 | 2023-12    | might-break |
-  | DKECHAG   |   1 | 2023-12    | might-break |
-  | DVEEDEN   |   1 | 2023-12    | might-break |
-  | EMUNDALL  |   1 | 2023-12    | might-break |
-  | FREED     |   1 | 2023-12    | might-break |
-  | GANGLION  |   1 | 2023-12    | might-break |
-  | GARU      |   1 | 2023-12    | might-break |
-  | GBROWN    |   1 | 2023-12    | might-break |
-  | GUILLEM   |   1 | 2023-12    | might-break |
-  | GUIMARD   |   1 | 2023-12    | might-break |
-  | HAKONH    |   1 | 2023-12    | might-break |
-  | HAUKEX    |   1 | 2023-12    | might-break |
-  | HKOBA     |   1 | 2023-12    | might-break |
-  | INGY      |   1 | 2023-12    | might-break |
-  | JKSTILL   |   1 | 2023-12    | might-break |
-  | JMCNAMARA |   1 | 2023-12    | might-break |
-  | JSF       |   1 | 2023-12    | might-break |
-  | KARUPA    |   1 | 2023-12    | might-break |
-  | KRAIH     |   1 | 2023-12    | might-break |
-  | KUERBIS   |   1 | 2023-12    | might-break |
-  | LIS       |   1 | 2023-12    | might-break |
-  | LWP       |   1 | 2023-12    | might-break |
-  | MARKOV    |   1 | 2023-12    | might-break |
-  | MATHIAS   |   1 | 2023-12    | might-break |
-  | MAUKE     |   1 | 2023-12    | might-break |
-  | MBESSON   |   1 | 2023-12    | might-break |
-  | MERKYS    |   1 | 2023-12    | might-break |
-  | MHASCH    |   1 | 2023-12    | might-break |
-  | MICHIELB  |   1 | 2023-12    | might-break |
-  | MJONDET   |   1 | 2023-12    | might-break |
-  | MRDVT     |   1 | 2023-12    | might-break |
-  | OVID      |   1 | 2023-12    | might-break |
-  | PACMAN    |   1 | 2023-12    | might-break |
-  | PLICEASE  |   1 | 2023-12    | might-break |
-  | PMPERRY   |   1 | 2023-12    | might-break |
-  | POPEFELIX |   1 | 2023-12    | might-break |
-  | RHESA     |   1 | 2023-12    | might-break |
-  | RJET      |   1 | 2023-12    | might-break |
-  | RMBARKER  |   1 | 2023-12    | might-break |
-  | SBECK     |   1 | 2023-12    | might-break |
-  | SKAJI     |   1 | 2023-12    | might-break |
-  | SLAFFAN   |   1 | 2023-12    | might-break |
-  | SZABGAB   |   1 | 2023-12    | might-break |
-  | TEEJAY    |   1 | 2023-12    | might-break |
-  | TEODESIAN |   1 | 2023-12    | might-break |
-  | TOBYINK   |   1 | 2023-12    | might-break |
-  | TURNSTEP  |   1 | 2023-12    | might-break |
-  | TVDW      |   1 | 2023-12    | might-break |
-  | VANHOESEL |   1 | 2023-12    | might-break |
-  | VEESH     |   1 | 2023-12    | might-break |
-  | VKON      |   1 | 2023-12    | might-break |
-  | WOLDRICH  |   1 | 2023-12    | might-break |
-  | YOUPONG   |   1 | 2023-12    | might-break |
-  | YTURTLE   |   1 | 2023-12    | might-break |
-  | ZEFRAM    |   1 | 2023-12    | might-break |
+  | BINGOS    | 215 | 2006-03    | might-break |
+  | ETHER     | 143 | 2012-03    | might-break |
+  | LEEJO     | 118 | 2014-04    | might-break |
+  | PERLANCAR | 115 | 2014-08    | ongoing     |
+  | PEVANS    |  68 | 2018-06    | might-break |
+  | UTASHIRO  |  68 | 2018-06    | might-break |
+  | OALDERS   |  54 | 2019-08    | might-break |
+  | KIMOTO    |  26 | 2021-12    | might-break |
+  | OLIVER    |  24 | 2022-02    | might-break |
+  | SKIM      |  22 | 2022-04    | might-break |
+  | DERF      |  20 | 2022-06    | might-break |
+  | JDEGUEST  |  20 | 2022-06    | might-break |
+  | BDFOY     |  13 | 2023-01    | might-break |
+  | HMBRAND   |  13 | 2023-01    | might-break |
+  | JIMAVERA  |  13 | 2023-01    | might-break |
+  | ASPOSE    |  12 | 2023-02    | might-break |
+  | DJERIUS   |  11 | 2023-03    | might-break |
+  | DDUMONT   |   9 | 2023-05    | might-break |
+  | DRCLAW    |   9 | 2023-05    | might-break |
+  | JV        |   9 | 2023-05    | might-break |
+  | VVELOX    |   9 | 2023-05    | might-break |
+  | AJNN      |   8 | 2023-06    | might-break |
+  | DCANTRELL |   8 | 2023-06    | might-break |
+  | ABALAMA   |   7 | 2023-07    | might-break |
+  | SHLOMIF   |   7 | 2023-07    | might-break |
+  | BLIAKO    |   6 | 2023-08    | might-break |
+  | CUKEBOT   |   6 | 2023-08    | might-break |
+  | DROLSKY   |   6 | 2023-08    | might-break |
+  | NLNETLABS |   6 | 2023-08    | might-break |
+  | TEAM      |   6 | 2023-08    | might-break |
+  | WYANT     |   6 | 2023-08    | might-break |
+  | YANICK    |   6 | 2023-08    | might-break |
+  | BPS       |   5 | 2023-09    | might-break |
+  | DART      |   5 | 2023-09    | might-break |
+  | PJACKLAM  |   5 | 2023-09    | might-break |
+  | RKAPL     |   5 | 2023-09    | might-break |
+  | GENE      |   4 | 2023-10    | might-break |
+  | GSG       |   4 | 2023-10    | might-break |
+  | JGNI      |   4 | 2023-10    | might-break |
+  | JMATES    |   4 | 2023-10    | might-break |
+  | JRM       |   4 | 2023-10    | might-break |
+  | OETIKER   |   4 | 2023-10    | might-break |
+  | RKELSCH   |   4 | 2023-10    | might-break |
+  | RRWO      |   4 | 2023-10    | might-break |
+  | SREZIC    |   4 | 2023-10    | might-break |
+  | CGPAN     |   3 | 2023-11    | might-break |
+  | DAMI      |   3 | 2023-11    | might-break |
+  | DERIV     |   3 | 2023-11    | might-break |
+  | DORNER    |   3 | 2023-11    | might-break |
+  | ISHIGAKI  |   3 | 2023-11    | might-break |
+  | MIKKOI    |   3 | 2023-11    | might-break |
+  | RJBS      |   3 | 2023-11    | might-break |
+  | SHOGO     |   3 | 2023-11    | might-break |
+  | TONYC     |   3 | 2023-11    | might-break |
+  | VOEGELAS  |   3 | 2023-11    | might-break |
+  | AAHAZRED  |   2 | 2023-12    | might-break |
+  | ABH       |   2 | 2023-12    | might-break |
+  | AJM       |   2 | 2023-12    | might-break |
+  | AVERKIOS  |   2 | 2023-12    | might-break |
+  | BLAINEM   |   2 | 2023-12    | might-break |
+  | BWEST     |   2 | 2023-12    | might-break |
+  | CRLCU     |   2 | 2023-12    | might-break |
+  | DAVECROSS |   2 | 2023-12    | might-break |
+  | GARU      |   2 | 2023-12    | might-break |
+  | GUILLEM   |   2 | 2023-12    | might-break |
+  | INGY      |   2 | 2023-12    | might-break |
+  | KUERBIS   |   2 | 2023-12    | might-break |
+  | MATHIAS   |   2 | 2023-12    | might-break |
+  | PACMAN    |   2 | 2023-12    | might-break |
+  | RJET      |   2 | 2023-12    | might-break |
+  | SBECK     |   2 | 2023-12    | might-break |
+  | SKAJI     |   2 | 2023-12    | might-break |
+  | VEESH     |   2 | 2023-12    | might-break |
+  | VKON      |   2 | 2023-12    | might-break |
+  | YOUPONG   |   2 | 2023-12    | might-break |
+  | ABELTJE   |   1 | 2024-01    | might-break |
+  | ANELSON   |   1 | 2024-01    | might-break |
+  | APPEL     |   1 | 2024-01    | might-break |
+  | ARIDEV    |   1 | 2024-01    | might-break |
+  | ARISTOTLE |   1 | 2024-01    | might-break |
+  | ASLEWIS   |   1 | 2024-01    | might-break |
+  | ATRODO    |   1 | 2024-01    | might-break |
+  | BAKERSCOT |   1 | 2024-01    | might-break |
+  | BIGFOOT   |   1 | 2024-01    | might-break |
+  | BIGPRESH  |   1 | 2024-01    | might-break |
+  | BKB       |   1 | 2024-01    | might-break |
+  | CHEVALIER |   1 | 2024-01    | might-break |
+  | CHRISN    |   1 | 2024-01    | might-break |
+  | CHROMATIC |   1 | 2024-01    | might-break |
+  | CMANLEY   |   1 | 2024-01    | might-break |
+  | CORION    |   1 | 2024-01    | might-break |
+  | CORLISS   |   1 | 2024-01    | might-break |
+  | DANBERR   |   1 | 2024-01    | might-break |
+  | DDICK     |   1 | 2024-01    | might-break |
+  | DEXTER    |   1 | 2024-01    | might-break |
+  | DMANTO    |   1 | 2024-01    | might-break |
+  | DOMM      |   1 | 2024-01    | might-break |
+  | DORIAN    |   1 | 2024-01    | might-break |
+  | DSKOLL    |   1 | 2024-01    | might-break |
+  | ELCAMLOST |   1 | 2024-01    | might-break |
+  | ETJ       |   1 | 2024-01    | might-break |
+  | EXIFTOOL  |   1 | 2024-01    | might-break |
+  | EZIMUEL   |   1 | 2024-01    | might-break |
+  | FDULAU    |   1 | 2024-01    | might-break |
+  | FKENTO    |   1 | 2024-01    | might-break |
+  | FREDERICD |   1 | 2024-01    | might-break |
+  | FSEITZ    |   1 | 2024-01    | might-break |
+  | GHE       |   1 | 2024-01    | might-break |
+  | GLLORE    |   1 | 2024-01    | might-break |
+  | GNUSTAVO  |   1 | 2024-01    | might-break |
+  | GRAY      |   1 | 2024-01    | might-break |
+  | GRECHARY  |   1 | 2024-01    | might-break |
+  | HOCHSTEN  |   1 | 2024-01    | might-break |
+  | IKEGAMI   |   1 | 2024-01    | might-break |
+  | IPENBURG  |   1 | 2024-01    | might-break |
+  | JEFFA     |   1 | 2024-01    | might-break |
+  | JETM      |   1 | 2024-01    | might-break |
+  | JJNAPIORK |   1 | 2024-01    | might-break |
+  | JKG       |   1 | 2024-01    | might-break |
+  | JOHNH     |   1 | 2024-01    | might-break |
+  | JROBINSON |   1 | 2024-01    | might-break |
+  | JUERD     |   1 | 2024-01    | might-break |
+  | KARASIK   |   1 | 2024-01    | might-break |
+  | KAZEBURO  |   1 | 2024-01    | might-break |
+  | KJETILK   |   1 | 2024-01    | might-break |
+  | LEONT     |   1 | 2024-01    | might-break |
+  | LION      |   1 | 2024-01    | might-break |
+  | LNATION   |   1 | 2024-01    | might-break |
+  | LOCATION  |   1 | 2024-01    | might-break |
+  | LSKATZ    |   1 | 2024-01    | might-break |
+  | MANWAR    |   1 | 2024-01    | might-break |
+  | MAREKR    |   1 | 2024-01    | might-break |
+  | MBRADSHAW |   1 | 2024-01    | might-break |
+  | MIKEVNTNR |   1 | 2024-01    | might-break |
+  | MIYAGAWA  |   1 | 2024-01    | might-break |
+  | MMCCLENN  |   1 | 2024-01    | might-break |
+  | MRSCOTTY  |   1 | 2024-01    | might-break |
+  | MSCHOUT   |   1 | 2024-01    | might-break |
+  | MSIMERSON |   1 | 2024-01    | might-break |
+  | MSLM      |   1 | 2024-01    | might-break |
+  | NHORNE    |   1 | 2024-01    | might-break |
+  | NJFRANCK  |   1 | 2024-01    | might-break |
+  | NUDDLEGG  |   1 | 2024-01    | might-break |
+  | OLEG      |   1 | 2024-01    | might-break |
+  | PMORCH    |   1 | 2024-01    | might-break |
+  | POWERMAN  |   1 | 2024-01    | might-break |
+  | RADIATOR  |   1 | 2024-01    | might-break |
+  | RHANDOM   |   1 | 2024-01    | might-break |
+  | RWSTAUNER |   1 | 2024-01    | might-break |
+  | SALVA     |   1 | 2024-01    | might-break |
+  | SANKO     |   1 | 2024-01    | might-break |
+  | SBAKKER   |   1 | 2024-01    | might-break |
+  | SCHROEDER |   1 | 2024-01    | might-break |
+  | SFOBERSKI |   1 | 2024-01    | might-break |
+  | SHE       |   1 | 2024-01    | might-break |
+  | SISYPHUS  |   1 | 2024-01    | might-break |
+  | SORTIZ    |   1 | 2024-01    | might-break |
+  | SUKRIA    |   1 | 2024-01    | might-break |
+  | SULLR     |   1 | 2024-01    | might-break |
+  | SYBER     |   1 | 2024-01    | might-break |
+  | TIMLEGGE  |   1 | 2024-01    | might-break |
+  | TINITA    |   1 | 2024-01    | might-break |
+  | TOKUHIROM |   1 | 2024-01    | might-break |
+  | TORBIAK   |   1 | 2024-01    | might-break |
+  | TRIZEN    |   1 | 2024-01    | might-break |
+  | TURNERJW  |   1 | 2024-01    | might-break |
+  | VOLKENING |   1 | 2024-01    | might-break |
+  | WESM      |   1 | 2024-01    | might-break |
+  | WSNYDER   |   1 | 2024-01    | might-break |
+  | XMOLEX    |   1 | 2024-01    | might-break |
+  | TANIGUCHI |   1 | 2024-02    | ongoing     |
   +-----------+-----+------------+-------------+
 
 =head1 HOMEPAGE

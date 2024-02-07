@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
-package Future::IO::Impl::IOAsync;
+package Future::IO::Impl::IOAsync 0.803;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Future::IO::ImplBase );
 

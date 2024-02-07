@@ -59,16 +59,10 @@ my $build = $class->new(
     module_name        => 'PGXN::Site',
     license            => 'postgresql',
     script_files       => 'bin',
-    configure_requires => { 'Module::Build' => '0.30', },
+    configure_requires => { 'Module::Build' => '0.4209' },
     build_requires     => {
-        'HTTP::Message::PSGI'  => 0,
-        'Module::Build'        => '0.30',
-        'Plack::Test'          => 0,
-        'Software::License'    => '0.102340',
-        'Test::File::Contents' => '0.20',
-        'Test::More'           => '0.70',
-        'Test::MockModule'     => '0.05',
-        'Text::MultiMarkdown'  => '1.000033',
+        'Module::Build'       => '0.4209',
+        'Text::MultiMarkdown' => 0,
     },
     requires => {
         'Carp'                         => 0,
@@ -85,7 +79,7 @@ my $build = $class->new(
         'List::Util'                   => '1.20',
         'List::MoreUtils'              => '0.28',
         'namespace::autoclean'         => '0.11',
-        'perl'                         => 5.010,
+        'perl'                         => '5.14.0',
         'Plack'                        => '0.9956',
         'Plack::App::File'             => 0,
         'Plack::Builder'               => 0,
@@ -98,18 +92,31 @@ my $build = $class->new(
         'Template::Declare::Tags'      => '0.43',
         'WWW::PGXN'                    => '0.12.0',
     },
-    test_recommends => {
+    test_requires => {
+        'HTTP::Message::PSGI'   => 0,
         'HTTP::Request::Common' => '5.824',
-        'Test::Pod'             => '1.41',
-        'Test::Pod::Coverage'   => '1.06',
-        'Test::XML'             => '0.08',
-        'Test::XPath'           => '0.13',
+        'Plack::Test'          => 0,
+        'Test::File::Contents' => '0.20',
+        'Test::More'           => '0.70',
+        'Test::MockModule'     => '0.05',
     },
     meta_merge => {
+        'meta-spec' => { version => 2 },
         resources => {
             homepage   => 'https://www.pgxn.org/',
             bugtracker => 'https://github.com/pgxn/pgxn-site/issues/',
             repository => 'https://github.com/pgxn/pgxn-site/',
+        },
+        prereqs => {
+            test => {
+                recommends => {
+                    'Test::Pod'             => '1.41',
+                    'Test::Pod::Coverage'   => '1.06',
+                    'Test::XML'             => '0.08',
+                    'Test::XPath'           => '0.13',
+                    'PGXN::API::Searcher'   => '0.10.1',
+                },
+            },
         },
     },
 );

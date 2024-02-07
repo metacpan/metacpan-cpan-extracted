@@ -1,4 +1,19 @@
 Revision history for Database-Abstraction
 
-0.01    
+0.04	Fri Feb  2 13:14:18 EST 2024
+	init() can now be called more than once and will retain the old values
+	Added XML test
+	Restrict the size of the CSV file that are slurped to 16K
+
+0.03	Thu Feb  1 13:48:01 EST 2024
+	Complain if the directory argument isn't a directory
+	Put the values from init() into a hash
+	Remove Database::Abstraction::Error - it's an artifact
+		It was a good idea, but Error doesn't play well with 'use lib'
+
+0.02	Tue 30 Jan 11:07:12 EST 2024
+	Simpler package name used for testing
+	Fix the Error objection being thrown
+
+0.01    Mon Jan 29 14:02:37 EST 2024
         First draft

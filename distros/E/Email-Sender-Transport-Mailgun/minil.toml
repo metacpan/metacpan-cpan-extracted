@@ -1,4 +1,4 @@
 name = "Email-Sender-Transport-Mailgun"
-badges = ["travis"]
+badges = ["github-actions"]
 module_maker="ModuleBuildTiny"
 

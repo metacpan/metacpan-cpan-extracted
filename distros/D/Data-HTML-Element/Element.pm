@@ -3,7 +3,7 @@ package Data::HTML::Element;
 use strict;
 use warnings;
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 1;
 
@@ -16,6 +16,16 @@ __END__
 =head1 NAME
 
 Data::HTML::Element - Data objects for HTML elements.
+
+=head1 DESCRIPTION
+
+Collection of immutable data objects for HTML elements. All methods should be related to
+main element with exception with inner content defined via 'data' method.
+
+Intent behind data objects is control of information inside it.
+
+This data objects are used in L<Tags::HTML::Element> helpers and in other high
+level objects in L<Tags::HTML> namespace.
 
 =head1 SEE ALSO
 
@@ -69,6 +79,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

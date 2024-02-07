@@ -1,13 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Fatal;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use lib ".";
 use t::TimeAbout;
@@ -33,7 +31,7 @@ testing_loop( $loop );
    );
 
    ok( defined $timer, '$timer defined' );
-   isa_ok( $timer, "IO::Async::Timer", '$timer isa IO::Async::Timer' );
+   isa_ok( $timer, [ "IO::Async::Timer" ], '$timer isa IO::Async::Timer' );
 
    is_oneref( $timer, '$timer has refcount 1 initially' );
 
@@ -41,14 +39,14 @@ testing_loop( $loop );
 
    is_refcount( $timer, 2, '$timer has refcount 2 after adding to Loop' );
 
-   is( $timer->start, $timer, '$timer->start returns $timer' );
+   ref_is( $timer->start, $timer, '$timer->start returns $timer' );
 
    is_refcount( $timer, 2, '$timer has refcount 2 after starting' );
 
    ok( $timer->is_running, 'Started Timer is running' );
 
    time_about( sub { wait_for { $tick == 1 } }, 2, 'Timer works' );
-   is_deeply( \@targs, [ $timer ], 'on_tick args' );
+   is( \@targs, [ exact_ref($timer) ], 'on_tick args' );
 
    ok( $timer->is_running, 'Timer is still running' );
 
@@ -94,7 +92,7 @@ testing_loop( $loop );
 
    time_about( sub { wait_for { $tick == 5 } }, 2, 'Normal interval used after first invocation' );
 
-   ok( exception { $timer->configure( interval => 5 ); },
+   ok( dies { $timer->configure( interval => 5 ); },
        'Configure a running timer fails' );
 
    $loop->remove( $timer );
@@ -185,10 +183,10 @@ testing_loop( $loop );
    $loop->add( $timer );
    $timer->start;
 
-   like( exception { wait_for { $count > 0 } },
+   like( dies { wait_for { $count > 0 } },
       qr/FAIL 1/, 'on_tick death throws exception' );
 
-   like( exception { wait_for { $count > 1 } },
+   like( dies { wait_for { $count > 1 } },
       qr/FAIL 2/, 'on_tick death rescheduled and runs a second time' );
 
    $loop->remove( $timer );
@@ -204,7 +202,7 @@ my $sub_tick = 0;
    );
 
    ok( defined $timer, 'subclass $timer defined' );
-   isa_ok( $timer, "IO::Async::Timer", 'subclass $timer isa IO::Async::Timer' );
+   isa_ok( $timer, [ "IO::Async::Timer" ], 'subclass $timer isa IO::Async::Timer' );
 
    is_oneref( $timer, 'subclass $timer has refcount 1 initially' );
 

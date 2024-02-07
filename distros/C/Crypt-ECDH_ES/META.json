@@ -1,10 +1,10 @@
 {
    "abstract" : "A fast and small hybrid crypto system",
    "author" : [
-      "Leon Timmermans <leont@cpan.org>"
+      "Leon Timmermans <fawaka@gmail.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -16,32 +16,26 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
+            "Module::Build::Tiny" : "0.034",
             "perl" : "5.006"
          }
       },
       "develop" : {
          "requires" : {
-            "File::Spec" : "0",
-            "IO::Handle" : "0",
-            "IPC::Open3" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Test::More" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08",
-            "perl" : "5.006"
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
             "Crypt::Curve25519" : "0",
-            "Crypt::Rijndael" : "0",
+            "Crypt::Rijndael" : "1.16",
             "Crypt::URandom" : "0",
             "Digest::SHA" : "0",
             "Exporter" : "5.57",
-            "Getopt::Long" : "0",
-            "MIME::Base64" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -49,6 +43,9 @@
       },
       "test" : {
          "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Test::More" : "0",
             "perl" : "5.006"
          }
@@ -57,14 +54,13 @@
    "provides" : {
       "Crypt::ECDH_ES" : {
          "file" : "lib/Crypt/ECDH_ES.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-crypt-ecdh_es at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-ECDH_ES"
+         "web" : "https://github.com/Leont/crypt-ecdh_es/issues"
       },
       "repository" : {
          "type" : "git",
@@ -72,12 +68,9 @@
          "web" : "https://github.com/Leont/crypt-ecdh_es"
       }
    },
-   "version" : "0.004",
-   "x_contributors" : [
-      "Leon Timmermans <fawaka@gmail.com>"
-   ],
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
+   "version" : "0.005",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -1,13 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Fatal;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use Fcntl qw( SEEK_SET SEEK_END );
 use File::Temp qw( tempfile );
@@ -54,7 +52,7 @@ sub mkhandles
    );
 
    ok( defined $filestream, '$filestream defined' );
-   isa_ok( $filestream, "IO::Async::FileStream", '$filestream isa IO::Async::FileStream' );
+   isa_ok( $filestream, [ "IO::Async::FileStream" ], '$filestream isa IO::Async::FileStream' );
 
    is_oneref( $filestream, 'reading $filestream has refcount 1 initially' );
 
@@ -66,11 +64,11 @@ sub mkhandles
 
    $wr->syswrite( "message\n" );
 
-   is_deeply( \@lines, [], '@lines before wait' );
+   is( \@lines, [], '@lines before wait' );
 
    wait_for { scalar @lines };
 
-   is_deeply( \@lines, [ "message\n" ], '@lines after wait' );
+   is( \@lines, [ "message\n" ], '@lines after wait' );
 
    $loop->remove( $filestream );
 }
@@ -105,7 +103,7 @@ sub mkhandles
 
    wait_for { scalar @lines };
 
-   is_deeply( \@lines, [ "Some initial content\n", "More content\n" ], 'All content is visible' );
+   is( \@lines, [ "Some initial content\n", "More content\n" ], 'All content is visible' );
 
    $loop->remove( $filestream );
 }
@@ -143,7 +141,7 @@ sub mkhandles
 
    wait_for { scalar @lines };
 
-   is_deeply( \@lines, [ "With a partial line finished here\n" ], 'Partial line completely returned' );
+   is( \@lines, [ "With a partial line finished here\n" ], 'Partial line completely returned' );
 
    $loop->remove( $filestream );
 }
@@ -177,7 +175,7 @@ sub mkhandles
 
    wait_for { scalar @lines };
 
-   is_deeply( \@lines, [ "Additional content\n" ], 'Initial content is skipped' );
+   is( \@lines, [ "Additional content\n" ], 'Initial content is skipped' );
 
    $loop->remove( $filestream );
 }
@@ -217,7 +215,7 @@ sub mkhandles
    wait_for { @lines == 3 };
 
    is( $truncated, 1, 'File content truncation detected' );
-   is_deeply( \@lines,
+   is( \@lines,
       [ "Some original lines\n", "in the file\n", "And another\n" ],
       'All three lines read' );
 
@@ -245,7 +243,7 @@ SKIP: {
    );
 
    ok( defined $filestream, '$filestream defined for filenaem' );
-   isa_ok( $filestream, "IO::Async::FileStream", '$filestream isa IO::Async::FileStream' );
+   isa_ok( $filestream, [ "IO::Async::FileStream" ], '$filestream isa IO::Async::FileStream' );
 
    is_oneref( $filestream, 'reading $filestream has refcount 1 initially' );
 
@@ -256,7 +254,7 @@ SKIP: {
    $wr->syswrite( "message\n" );
    wait_for { scalar @lines };
 
-   is_deeply( \@lines, [ "message\n" ], '@lines after wait' );
+   is( \@lines, [ "message\n" ], '@lines after wait' );
    shift @lines;
 
    $wr->syswrite( "last line of old file\n" );
@@ -268,9 +266,9 @@ SKIP: {
    $wr->syswrite( "first line of new file\n" );
 
    wait_for { scalar @lines };
-   is_deeply( $lines[0], "last line of old file\n", '@lines sees last line of old file' );
+   is( $lines[0], "last line of old file\n", '@lines sees last line of old file' );
    wait_for { scalar @lines >= 2 };
-   is_deeply( $lines[1], "first line of new file\n", '@lines sees first line of new file' );
+   is( $lines[1], "first line of new file\n", '@lines sees first line of new file' );
 
    $loop->remove( $filestream );
 }
@@ -287,7 +285,7 @@ my @sub_lines;
    );
 
    ok( defined $filestream, 'subclass $filestream defined' );
-   isa_ok( $filestream, "IO::Async::FileStream", '$filestream isa IO::Async::FileStream' );
+   isa_ok( $filestream, [ "IO::Async::FileStream" ], '$filestream isa IO::Async::FileStream' );
 
    is_oneref( $filestream, 'subclass $filestream has refcount 1 initially' );
 
@@ -297,11 +295,11 @@ my @sub_lines;
 
    $wr->syswrite( "message\n" );
 
-   is_deeply( \@sub_lines, [], '@sub_lines before wait' );
+   is( \@sub_lines, [], '@sub_lines before wait' );
 
    wait_for { scalar @sub_lines };
 
-   is_deeply( \@sub_lines, [ "message\n" ], '@sub_lines after wait' );
+   is( \@sub_lines, [ "message\n" ], '@sub_lines after wait' );
 
    $loop->remove( $filestream );
 }

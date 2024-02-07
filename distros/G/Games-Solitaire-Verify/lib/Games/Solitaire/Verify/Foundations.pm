@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Foundations;
-$Games::Solitaire::Verify::Foundations::VERSION = '0.2403';
+$Games::Solitaire::Verify::Foundations::VERSION = '0.2500';
 use warnings;
 use strict;
 
@@ -16,7 +16,7 @@ __PACKAGE__->mk_acc_ref(
             _num_decks
             _founds
             _s
-            )
+        )
     ]
 );
 
@@ -176,7 +176,7 @@ foundations (or home-cells) in a Solitaire game.
 
 =head1 VERSION
 
-version 0.2403
+version 0.2500
 
 =head1 SYNOPSIS
 

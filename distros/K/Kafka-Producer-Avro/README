@@ -118,8 +118,8 @@ USAGE
    "new"
     Creates new producer client object.
 
-    "new()" takes arguments in key-value pairs as described in
-    Kafka::Producer from which it inherits.
+    new() takes arguments in key-value pairs as described in Kafka::Producer
+    from which it inherits.
 
     In addition, takes in the following arguments:
 
@@ -137,15 +137,15 @@ USAGE
     Returns a string containing last error message.
 
    "send( $topic, $partition, $messages, $keys, $compression_codec, $timestamps, $key_schema, $value_schema )"
-   "send( %named_params )"
+   send( %named_params )
     Sends Avro-formatted messages on a Kafka::Connection object.
 
     Returns a non-blank value (a reference to a hash with server response
     description) if the message is successfully sent.
 
-    In order to handle Avro format, "Kafka::Producer|Kafka::Producer"
-    "send()" method is extended with two more positional arguments,
-    $key_schema and $value_schema:
+    In order to handle Avro format, "Kafka::Producer|Kafka::Producer" send()
+    method is extended with two more positional arguments, $key_schema and
+    $value_schema:
 
       $producer->send(
             $topic,             # scalar 
@@ -169,7 +169,7 @@ USAGE
     If an expected schema isn't provided, latest version from Schema
     Registry is used accordingly to the (topic + key/value) subject.
 
-    Alternatively, for ease of use, the "send()" method may be also used by
+    Alternatively, for ease of use, the send() method may be also used by
     suggesting named parameters:
 
       $producer->send(
@@ -183,7 +183,7 @@ USAGE
             value_schema      => $value_schema       # (optional) undef | JSON-string
       );
 
-   "bulk_send( %params )"
+   bulk_send( %params )
     Similar to "send" but uses bulks to avoid memory leaking.
 
     Extra named parameters are expected:

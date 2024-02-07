@@ -1,0 +1,4 @@
+Revision history for Perl distribution [% dist_name %]
+
+0.01 - [% PERL %] use POSIX  'strftime'; print strftime('%F', localtime) [% END %]
+ - Initial release

@@ -55,7 +55,7 @@ be able to store and retrieve ndarrays via Storable.
 use strict;
 use warnings;
 
-#line 73 "storable.pd"
+#line 65 "storable.pd"
 { package # hide from PAUSE
     PDL;
 use Carp;

@@ -1,10 +1,10 @@
-# DBD::XMLSimple
+# NAME
 
-Access XML data via the DBI interface
+DBD::XMLSimple - Access XML data via the DBI interface
 
 # VERSION
 
-Version 0.06
+Version 0.07
 
 # SYNOPSIS
 
@@ -70,7 +70,7 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 
 # SEE ALSO
 
-[DBD::AnyData](https://metacpan.org/pod/DBD::AnyData), which was also used as a template for this module.
+[DBD::AnyData](https://metacpan.org/pod/DBD%3A%3AAnyData), which was also used as a template for this module.
 
 # SUPPORT
 
@@ -98,6 +98,6 @@ You can also look for information at:
 
 # LICENCE AND COPYRIGHT
 
-Copyright 2016-2017 Nigel Horne.
+Copyright 2016-2024 Nigel Horne.
 
 This program is released under the following licence: GPL

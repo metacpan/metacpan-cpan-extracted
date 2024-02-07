@@ -1,23 +1,54 @@
 # MANIFEST Sun 28 Jan 2024 16:57:59 MSK
 
 # General
-Changes                                  Changes list
-INSTALL.md                               Installation instructions
-LICENSE                                  License file
-Makefile.PL                              Makefile builder
-MANIFEST                                 This file
-README.md                                !!! README FIRST !!!
-TODO                                     TO DO
+Changes                                 Changes list
+INSTALL.md                              Installation instructions
+LICENSE                                 License file
+Makefile.PL                             Makefile builder
+MANIFEST                                This file
+README.md                               !!! README FIRST !!!
+TODO                                    TO DO
 
-# Libs
-lib/Acme/Crux.pm                         Main App library
-lib/Acrux.pm                             Main library
+# Acrux libs
+lib/Acrux.pm                            Main library
+lib/Acrux/Config.pm                     Config class
+lib/Acrux/Const.pm                      Constants
+lib/Acrux/Digest.pm                     Digest base class
+lib/Acrux/Digest/M11R.pm                Modulus 11 (recursive) check digit
+lib/Acrux/Digest/FNV32a.pm              FNV32a Digest calculation
+lib/Acrux/FilePid.pm                    FilePid interface
+lib/Acrux/Log.pm                        Logger class
+lib/Acrux/Pointer.pm                    Pointer class
+lib/Acrux/RefUtil.pm                    Reference Utilities
+lib/Acrux/Util.pm                       Utilities
+
+# Acme::Crux libs
+lib/Acme/Crux.pm                        Main App library
+lib/Acme/Crux/Plugin.pm                 Plugin base class
+lib/Acme/Crux/Plugin/Config.pm          Config plugin
+lib/Acme/Crux/Plugin/Log.pm             Log plugin
 
 # Tests
-t/00-fixme.t                             FIXME/TODO/BUG warnings
-t/00-pod-coverage.t                      POD::Coverage testing
-t/00-pod.t                               Checking all POD documents
-t/00-trailingspace.t                     Style test: TrailingSpace
-t/01-use.t                               Test script
+t/00-fixme.t                            FIXME/TODO/BUG warnings
+t/00-pod-coverage.t                     POD::Coverage testing
+t/00-pod.t                              Checking all POD documents
+t/00-trailingspace.t                    Style test: TrailingSpace
+t/01-use.t                              Test script
+t/02-util.t                             Utilities
+t/03-refutil.t                          RefUtil test
+t/04-pointer.t                          Pointer test
+t/05-filepid.t                          FilePid interface
+t/06-digest-m11r.t                      M11R Digest test
+t/07-digest-fnv32a.t                    FNV32a Digest test
+t/08-config.t                           Config test
+t/09-log.t                              Logger test
+t/10-app-min.t                          App with a minimum number of args
+t/test.conf                             Test file of config
+
+# Examples
+eg/acrux_lite.pl
+eg/acrux_log.pl
+eg/acrux_std.pl
+eg/acrux_test.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

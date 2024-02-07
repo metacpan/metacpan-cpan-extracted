@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::plot::pscubecontour;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 
@@ -247,7 +247,7 @@ Version:
 
 
 
- AUTHOR:  Craig Artley, Colorado School of Mines, 03/12/93
+ Author:  Craig Artley, Colorado School of Mines, 03/12/93
 
  NOTE:  Original written by Zhiming Li & Dave Hale, CSM, 07/01/90
 

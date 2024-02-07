@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::transform::sucepstrum;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUCEPSTRUM - transform to the CEPSTRal domain				
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 

@@ -60,6 +60,12 @@
 ^MYMETA\.
 #!end included /usr/local/perls/perl-5.18.1/lib/5.18.1/ExtUtils/MANIFEST.SKIP
 
+# Downloaded databases
+
+lib/Locale/Places/databases/GB.txt
+lib/Locale/Places/databases/US.txt
+lib/Locale/Places/databases/readme.txt
+
 \.travis\.yml
 \.appveyor\.yml
 \.releaserc

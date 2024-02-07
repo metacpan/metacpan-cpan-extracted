@@ -111,7 +111,7 @@
 
  (Original codes pscontour and pscube)
 
- AUTHOR:  Craig Artley, Colorado School of Mines, 03/12/93
+ Author:  Craig Artley, Colorado School of Mines, 03/12/93
  NOTE:  Original written by Zhiming Li & Dave Hale, CSM, 07/01/90
 	  Completely rewritten, the code now bears more similarity to
 	  psimage than the previous pscube.  Faces of cube now rendered

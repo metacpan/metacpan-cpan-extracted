@@ -26,7 +26,7 @@ setlocale(LC_ALL, 'C');
 	my $sigset = POSIX::SigSet->new(SIGALRM);
 	sigprocmask(SIG_BLOCK, $sigset);
 	alarm .2;
-	ok(!defined sigwaitinfo($sigset, 0.1), 'Nothing yet');
+	ok(!defined sigtimedwait($sigset, 0.1), 'Nothing yet');
 
 	my $ret = sigwaitinfo('ALRM');
 	is(ref $ret, 'HASH', 'Return value is a hash');
@@ -57,8 +57,8 @@ throws_ok { sigqueue($$, 65536) } qr/Couldn't sigqueue: Invalid argument/, 'sigq
 SKIP: { 
 	skip 'Invalid arguments to sigwaitinfo are ignored on FreeBSD', 2 if $^O =~ /freebsd/i;
 	my $sigset = POSIX::SigSet->new(SIGUSR1);
-	throws_ok { sigwaitinfo($sigset, -1) } qr/Couldn't sigwaitinfo: Invalid argument at/, 'sigwaitinfo throws on error in void context';
-	lives_ok { sigwaitinfo($sigset, -1) or 1 } 'sigwaitinfo doesn\'t throw on error in scalar context';
+	throws_ok { sigtimedwait($sigset, -1) } qr/Couldn't sigwaitinfo: Invalid argument at/, 'sigwaitinfo throws on error in void context';
+	lives_ok { sigtimedwait($sigset, -1) or 1 } 'sigwaitinfo doesn\'t throw on error in scalar context';
 }
 
 my $first = allocate_signal();

@@ -1,5 +1,10 @@
 Revision history for Perl module YAML::Tidy
 
+v0.10.0 2024-02-01 15:19:24+01:00
+
+    - Ensure quotes are not removed from a scalar in a flow collection
+      if it contains things like '{'
+
 v0.9.0 2024-01-18 21:45:25+01:00
 
     - Add option --batch

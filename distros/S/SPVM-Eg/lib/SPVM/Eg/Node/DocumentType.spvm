@@ -14,12 +14,31 @@ class Eg::Node::DocumentType extends Eg::Node {
   has system_id : ro string;
   
   # Class Methods
-  private static method new : Eg::Node::DocumentType () {
+  private static method new : Eg::Node::DocumentType ($qualified_name_str : string, $public_id : string, $system_id : string, $options : object[] = undef) {
+    
+    unless ($qualified_name_str) {
+      die "\$qualified_name_str must be defined.";
+    }
+    
+    unless ($public_id) {
+      die "\$public_id must be defined.";
+    }
+    
+    unless ($system_id) {
+      die "\$system_id must be defined.";
+    }
     
     my $self = new Eg::Node::DocumentType;
     
-    $self->SUPER::init({node_type => Eg::Node->TYPE_DOCUMENT_TYPE_NODE});
+    $self->SUPER::init(Array->merge_object($options, {node_type => Eg::Node->TYPE_DOCUMENT_TYPE_NODE}));
+    
+    $self->{name} = $qualified_name_str;
+    
+    $self->{public_id} = $public_id;
+    
+    $self->{system_id} = $system_id;
     
     return $self;
   }
+  
 }

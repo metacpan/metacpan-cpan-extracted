@@ -1,15 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Timer;
+package IO::Async::Timer 0.803;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( IO::Async::Notifier );
-
-our $VERSION = '0.802';
 
 use Carp;
 
@@ -47,7 +45,7 @@ L<IO::Async::Timer::Periodic> - event callback at regular intervals
 
 =head2 new
 
-   $timer = IO::Async::Timer->new( %args )
+   $timer = IO::Async::Timer->new( %args );
 
 Constructs a particular subclass of C<IO::Async::Timer> object, and returns
 it. This constructor is provided for backward compatibility to older code
@@ -102,7 +100,7 @@ sub _remove_from_loop
 
 =head2 is_running
 
-   $running = $timer->is_running
+   $running = $timer->is_running;
 
 Returns true if the Timer has been started, and has not yet expired, or been
 stopped.
@@ -118,7 +116,7 @@ sub is_running
 
 =head2 start
 
-   $timer->start
+   $timer->start;
 
 Starts the Timer. Throws an error if it was already running.
 
@@ -159,7 +157,7 @@ sub start
 
 =head2 stop
 
-   $timer->stop
+   $timer->stop;
 
 Stops the Timer if it is running. If it has not yet been added to the C<Loop>
 but there is a start pending, this will cancel it.

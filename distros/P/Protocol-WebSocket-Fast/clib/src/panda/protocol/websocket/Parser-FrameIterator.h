@@ -1,7 +1,13 @@
 // this file is included into struct MessageIterator
 // ! no namespaces here or #includes here !
 
-struct FrameIterator : std::iterator<std::input_iterator_tag, FrameSP> {
+struct FrameIterator {
+    using difference_type = std::ptrdiff_t;
+    using value_type = FrameSP;
+    using pointer = value_type*;
+    using reference = value_type&;
+    using iterator_category = std::input_iterator_tag;
+
     FrameIterator (Parser* parser, const FrameSP& start_frame) : parser(parser), cur(start_frame) {}
     FrameIterator (const FrameIterator& oth)                   : parser(oth.parser), cur(oth.cur) {}
 

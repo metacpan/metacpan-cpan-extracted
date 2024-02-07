@@ -41,6 +41,14 @@ my $o2 = $a->mimeTypeOf('im_not_really_a.tar');
 ok(defined $o2);
 is($o2->type, 'application/x-tar');
 
+my $o3 = $a->mimeTypeOf('double-ext.gpkg.tar');
+ok(defined $o3);
+is($o3->type, 'application/vnd.gentoo.gpkg');
+
+my $o4 = $a->mimeTypeOf('double-ext.unknown.tar');
+ok(defined $o4);
+is($o4->type, 'application/x-tar');
+
 my $p = $a->mimeTypeOf('my_image.gif');
 ok(defined $p);
 is($p->type, 'image/gif');
@@ -59,7 +67,7 @@ is($a->mimeTypeOf('my.lzh')->type, 'application/x-lzh');
 is($a->mimeTypeOf('webm')->type,   'video/x-webm');
 is($a->mimeTypeOf('b.webm')->type, 'video/x-webm');
 is($a->mimeTypeOf('b.weba')->type, 'audio/x-webm');
-is($a->mimeTypeOf('b.webp')->type, 'image/x-webp');
+is($a->mimeTypeOf('b.webp')->type, 'image/webp');
 
 my $warn;
 my $r2 = MIME::Type->new(type => 'text/x-fake2');

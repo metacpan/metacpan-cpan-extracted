@@ -1,0 +1,57 @@
+ CHANGELOG
+ ---------
+
+ Version 1.26 2024/02/06
+ -----------------------
+ * Add 'diff' code to testing so we aren't relying on system('diff')
+
+ Version 1.25 2024/02/05
+ -----------------------
+ * Close 'bug' requesting update from indirect object creation to new method
+
+ Version 1.23 2024/02/05
+ -----------------------
+ * Add tests and a CHANGELOG to be super professional and fancy
+
+ Version 1.22 2024/02/05
+ -----------------------
+ * Try to fix packaging issues
+
+ Version 1.20 2024/02/03
+ -----------------------
+ * Try to fix packaging issues
+
+ Version 1.19 2016/05/22
+ -----------------------
+ * Stupid filehandle bug fix for view_ascii
+
+ Version 1.18 2016/05/21
+ -----------------------
+ * Fix for non-byte indexes, reads and writes (Thanks for the inspiration, Mike Paolucci)
+
+ Version 1.17 2012/06/02
+ -----------------------
+ * Fix for B/W images with sizes indivisible by 8 (Thanks Jiri Holec, jr.holec volny cz)
+
+ Version 1.16 2008/06/19
+ -----------------------
+ * Handle bitfield compression (Thanks Anatoly Savchenkov, asavchenkov alarity com)
+
+ Version 1.15 2007/11/29
+ -----------------------
+ + Fix to avoid seeing 24b images as B&W (Thanks Christian Walde, mithaldu yahoo de)
+
+ Version 1.14 2006/09/07
+ -----------------------
+ + Fix for border case on last byte in image (Thanks Peter Dons Tychsen, pdt gnmobile com)
+ + Fix for ColorsUsed==0 (Thanks Marton Nemeth, Marton.Nemeth knorr-bremse com)
+   See MSDN / Administration and Management Graphics and Multimedia / Bitmaps /
+       About Bitmaps / Bitmap storage
+       http://windowssdk.msdn.microsoft.com/en-us/library/ms532311.aspx
+   and MSDN / Administration and Management Graphics and Multimedia / Bitmaps /
+       About Bitmaps / Bitmap reference / Bitmap structures / BITMAPINFOHEADER
+       http://windowssdk.msdn.microsoft.com/en-us/library/ms532290.aspx
+
+ Version 1.13 2006/06/11
+ -----------------------
+ + Initial public release

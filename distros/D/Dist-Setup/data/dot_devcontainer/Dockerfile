@@ -9,7 +9,7 @@
 FROM mcr.microsoft.com/vscode/devcontainers/cpp:debian
 
 RUN apt-get update
-RUN apt-get install -y libaspell-dev cpanminus perlbrew libcpan-uploader-perl
+RUN apt-get install -y aspell aspell-en cpanminus perlbrew libcpan-uploader-perl
 
 ENV PERL_MM_USE_DEFAULT=1
 RUN perlbrew init

@@ -32,22 +32,19 @@ use File::Basename;
 use File::Spec;
 use File::pfopen 0.02;
 use File::Temp;
-use Error::Simple;
-use Database::Abstraction::Error;
+# use Error::Simple;	# A nice idea to use this but it doesn't play well with "use lib"
 use Carp;
 
-our $directory;
-our $logger;
-our $cache;
-our $cache_duration;
+our %defaults;
+use constant	MAX_SLURP_SIZE => 16 * 1024;	# CSV files <= than this size are read into memory
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -75,7 +72,8 @@ You can then access the data using:
     my $row = $foo->fetchrow_hashref(customer_id => 'xyzzy');
     print Data::Dumper->new([$row])->Dump();
 
-CSV files can have empty lines of comment lines starting with '#', to make them more readable
+CSV files can have empty lines or comment lines starting with '#',
+to make them more readable.
 
 If the table has a column called "entry", sorts are based on that
 To turn that off, pass 'no_entry' to the constructor, for legacy
@@ -89,17 +87,22 @@ Set some class level defaults.
 
     MyPackageName::Database::init(directory => '../databases');
 
-See the documentation for new() to see what variables can be set
+See the documentation for new() to see what variables can be set.
+
+Returns a refernce to a hash of the current values.
 
 =cut
 
 sub init {
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	$directory ||= $args{'directory'};
-	$logger ||= $args{'logger'};
-	$cache ||= $args{'cache'};
-	$cache_duration ||= $args{'cache_duration'};
+	# $defaults->{'directory'} ||= $args{'directory'};
+	# $defaults->{'logger'} ||= $args{'logger'};
+	# $defaults->{'cache'} ||= $args{'cache'};
+	# $defaults->{'cache_duration'} ||= $args{'cache_duration'};
+	%defaults = (%args, %defaults);
+
+	return \%defaults;
 }
 
 =head2 new
@@ -141,17 +144,21 @@ sub new {
 		return bless { %{$class}, %args }, ref($class);
 	}
 
-	croak("$class: where are the files?") unless($directory || $args{'directory'});
+	croak("$class: where are the files?") unless($args{'directory'} || $defaults{'directory'});
+
+	croak("$class: ", $args{'directory'} || $defaults{'directory'}, ' is not a directory') unless(-d ($args{'directory'} || $defaults{'directory'}));
 	# init(\%args);
 
-	return bless {
-		logger => $args{'logger'} || $logger,
-		directory => $args{'directory'} || $directory,	# The directory containing the tables in XML, SQLite or CSV format
-		cache => $args{'cache'} || $cache,
-		cache_duration => $args{'cache_duration'} || $cache_duration || '1 hour',
-		table => $args{'table'},	# The name of the file containing the table, defaults to the class name
-		no_entry => $args{'no_entry'} || 0,
-	}, $class;
+	# return bless {
+		# logger => $args{'logger'} || $logger,
+		# directory => $args{'directory'} || $directory,	# The directory containing the tables in XML, SQLite or CSV format
+		# cache => $args{'cache'} || $cache,
+		# cache_duration => $args{'cache_duration'} || $cache_duration || '1 hour',
+		# table => $args{'table'},	# The name of the file containing the table, defaults to the class name
+		# no_entry => $args{'no_entry'} || 0,
+	# }, $class;
+	# Reseen keys take precendence, so defaults come first
+	return bless { no_entry => 0, %defaults, %args }, $class;
 }
 
 =head2	set_logger
@@ -203,7 +210,7 @@ sub _open {
 	# Read in the database
 	my $dbh;
 
-	my $dir = $self->{'directory'} || $directory;
+	my $dir = $self->{'directory'} || $defaults{'directory'};
 	my $slurp_file = File::Spec->catfile($dir, "$table.sql");
 	if($self->{'logger'}) {
 		$self->{'logger'}->debug("_open: try to open $slurp_file");
@@ -316,32 +323,34 @@ sub _open {
 			# $self->{'data'} = Text::CSV::Slurp->load(file => $slurp_file, %options);
 
 			# FIXME: Text::xSV::Slurp can't cope well with quotes in field contents
-			require Text::xSV::Slurp;
-			Text::xSV::Slurp->import();
+			if((-s $slurp_file) <= MAX_SLURP_SIZE) {
+				require Text::xSV::Slurp;
+				Text::xSV::Slurp->import();
 
-			my @data = @{xsv_slurp(
-				shape => 'aoh',
-				text_csv => {
-					sep_char => $sep_char,
-					allow_loose_quotes => 1,
-					blank_is_undef => 1,
-					empty_is_undef => 1,
-					binary => 1,
-					escape_char => '\\',
-				},
-				# string => \join('', grep(!/^\s*(#|$)/, <DATA>))
-				file => $slurp_file
-			)};
+				my @data = @{xsv_slurp(
+					shape => 'aoh',
+					text_csv => {
+						sep_char => $sep_char,
+						allow_loose_quotes => 1,
+						blank_is_undef => 1,
+						empty_is_undef => 1,
+						binary => 1,
+						escape_char => '\\',
+					},
+					# string => \join('', grep(!/^\s*(#|$)/, <DATA>))
+					file => $slurp_file
+				)};
 
-			# Ignore blank lines or lines starting with # in the CSV file
-			unless($self->{no_entry}) {
-				@data = grep { $_->{'entry'} !~ /^\s*#/ } grep { defined($_->{'entry'}) } @data;
-			}
-			# $self->{'data'} = @data;
-			my $i = 0;
-			$self->{'data'} = ();
-			foreach my $d(@data) {
-				$self->{'data'}[$i++] = $d;
+				# Ignore blank lines or lines starting with # in the CSV file
+				unless($self->{no_entry}) {
+					@data = grep { $_->{'entry'} !~ /^\s*#/ } grep { defined($_->{'entry'}) } @data;
+				}
+				# $self->{'data'} = @data;
+				my $i = 0;
+				$self->{'data'} = ();
+				foreach my $d(@data) {
+					$self->{'data'}[$i++] = $d;
+				}
 			}
 			$self->{'type'} = 'CSV';
 		} else {
@@ -354,7 +363,8 @@ sub _open {
 				}
 				$dbh->func($table, 'XML', $slurp_file, 'xmlsimple_import');
 			} else {
-				throw Error::Database(-file => "$dir/$table");
+				# throw Error(-file => "$dir/$table");
+				croak("Can't file a $table database in $dir");
 			}
 			$self->{'type'} = 'XML';
 		}
@@ -424,12 +434,15 @@ sub selectall_hash {
 			if($self->{'logger'}) {
 				$self->{'logger'}->fatal("selectall_hash $query: argument is not a string");
 			}
-			throw Error::Simple("$query: argument is not a string: " . ref($arg));
+			# throw Error::Simple("$query: argument is not a string: " . ref($arg));
+			croak("$query: argument is not a string: ", ref($arg));
 		}
 		if(!defined($arg)) {
 			my @call_details = caller(0);
-			throw Error::Simple("$query: value for $c1 is not defined in call from " .
-				$call_details[2] . ' of ' . $call_details[1]);
+			# throw Error::Simple("$query: value for $c1 is not defined in call from " .
+				# $call_details[2] . ' of ' . $call_details[1]);
+			croak("$query: value for $c1 is not defined in call from ",
+				$call_details[2], ' of ', $call_details[1]);
 		}
 		if($done_where) {
 			if($arg =~ /\@/) {
@@ -486,7 +499,8 @@ sub selectall_hash {
 
 	if(my $sth = $self->{$table}->prepare($query)) {
 		$sth->execute(@query_args) ||
-			throw Error::Simple("$query: @query_args");
+			# throw Error::Simple("$query: @query_args");
+			croak("$query: @query_args");
 
 		my @rc;
 		while(my $href = $sth->fetchrow_hashref()) {
@@ -503,7 +517,8 @@ sub selectall_hash {
 	if($self->{'logger'}) {
 		$self->{'logger'}->warn("selectall_hash failure on $query: @query_args");
 	}
-	throw Error::Simple("$query: @query_args");
+	# throw Error::Simple("$query: @query_args");
+	croak("$query: @query_args");
 }
 
 =head2	fetchrow_hashref
@@ -578,7 +593,8 @@ sub fetchrow_hashref {
 		}
 	}
 	my $sth = $self->{$table}->prepare($query) or die $self->{$table}->errstr();
-	$sth->execute(@query_args) || throw Error::Simple("$query: @query_args");
+	# $sth->execute(@query_args) || throw Error::Simple("$query: @query_args");
+	$sth->execute(@query_args) || croak("$query: @query_args");
 	if($c) {
 		my $rc = $sth->fetchrow_hashref();
 		$c->set($key, $rc, $self->{'cache_duration'});
@@ -619,7 +635,8 @@ sub execute {
 		$self->{'logger'}->debug("execute $query");
 	}
 	my $sth = $self->{$table}->prepare($query);
-	$sth->execute() || throw Error::Simple($query);
+	# $sth->execute() || throw Error::Simple($query);
+	$sth->execute() || croak($query);
 	my @rc;
 	while(my $href = $sth->fetchrow_hashref()) {
 		return $href if(!wantarray);
@@ -748,8 +765,10 @@ sub AUTOLOAD {
 			$self->{'logger'}->debug("AUTOLOAD $query");
 		}
 	}
-	my $sth = $self->{$table}->prepare($query) || throw Error::Simple($query);
-	$sth->execute(@args) || throw Error::Simple($query);
+	# my $sth = $self->{$table}->prepare($query) || throw Error::Simple($query);
+	my $sth = $self->{$table}->prepare($query) || croak($query);
+	# $sth->execute(@args) || throw Error::Simple($query);
+	$sth->execute(@args) || croak($query);
 
 	if(wantarray) {
 		return map { $_->[0] } @{$sth->fetchall_arrayref()};
@@ -774,6 +793,11 @@ sub DESTROY {
 =head1 AUTHOR
 
 Nigel Horne, C<< <njh at bandsman.co.uk> >>
+
+=head1 BUGS
+
+The default delimiter for CSV files is set to '!', not ',' for historical reasons.
+I really ought to fix that.
 
 =head1 LICENSE AND COPYRIGHT
 

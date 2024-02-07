@@ -1,4 +1,4 @@
-RPi-MultiPCA9685 version 0.05
+RPi-MultiPCA9685 version 0.06
 =============================
 Control the PWM channels of several PCA9685 ICs in one go
 
@@ -19,7 +19,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2023 by Rolf Jethon
+Copyright (C) 2024 by Rolf Jethon
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.00.6 or,

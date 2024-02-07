@@ -1,5 +1,8 @@
 # DO NOT EDIT! This file is written by perl_setup_dist.
 # If needed, you can add content at the end of the file.
+
+## no critic (Policy)
+
 use 5.026;
 use strict;
 use warnings;
@@ -14,7 +17,7 @@ WriteMakefile(
     DISTNAME         => 'Dist-Setup',
     AUTHOR           => q{Mathias Kende <mathias@cpan.org>},
     VERSION_FROM     => 'lib/Dist/Setup.pm',
-    ABSTRACT         => q{Simple opinionated tool to setup a Perl distribution directory.},
+    ABSTRACT         => q{Simple opinionated tool to set up a Perl distribution directory.},
     LICENSE          => 'mit',
     EXE_FILES        => ['script/perl_dist_setup',],
     MIN_PERL_VERSION => '5.026',
@@ -34,11 +37,11 @@ WriteMakefile(
       resources => {
         repository => {
           type => 'git',
-          url => 'git@github.com:mkende/dist_setup.git',
-          web => 'https://github.com/mkende/dist_setup',
+          url => 'git@github.com:mkende/perl_dist_setup.git',
+          web => 'https://github.com/mkende/perl_dist_setup',
         },
         bugtracker => {
-          web => 'https://github.com/mkende/dist_setup/issues',
+          web => 'https://github.com/mkende/perl_dist_setup/issues',
         },
       },
     },
@@ -51,16 +54,47 @@ sub MY::postamble {
 
   my @postamble;
   push @postamble, ::postamble() if *::postamble{CODE};
-  
+
   push @postamble, <<"MAKE_FRAGMENT";
-distupload: tardist
+distupload: distcheck disttest
+\t\$(MAKE) tardist
 \tcpan-upload --directory Dist-Setup \$(DISTVNAME).tar\$(SUFFIX)
+
+cover:
+\tcover -test
+
+critic: export EXTENDED_TESTING = 1
+critic: all
+\tperl -Ilib t/001-perlcritic.t 2>&1 | less
+
+rawcritic:
+\tperlcritic lib script
+
+tidy:
+\tperltidy -b -bext='/' \$(shell find lib -name "*.pm") script/perl_dist_setup
+
+spelling: export EXTENDED_TESTING = 1
+spelling:
+\t\$(PERLRUN) t/001-spelling.t --interactive
+
+alltest: export EXTENDED_TESTING = 1
+alltest: test
 MAKE_FRAGMENT
 
   push @postamble, File::ShareDir::Install::postamble($self);
+
   return join "\n", @postamble;
 }
 
 # You can add below this template a `postamble` sub that returns more content to
 # add to the generated Makefile.
+
 # End of the template. You can add custom content below this line.
+
+sub postamble {
+  return <<"MAKE_FRAGMENT";
+tidy: tidytest
+tidytest:
+\tperltidy -b -bext='/' \$(shell find data/t -name "*.t")
+MAKE_FRAGMENT
+}

@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::File;
+package IO::Async::File 0.803;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.802';
 
 use base qw( IO::Async::Timer::Periodic );
 
@@ -198,7 +196,7 @@ sub on_tick
 
 =head2 handle
 
-   $handle = $file->handle
+   $handle = $file->handle;
 
 Returns the filehandle currently associated with the instance; either the one
 passed to the C<handle> parameter, or opened from the C<filename> parameter.

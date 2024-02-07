@@ -1,0 +1,281 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li>
+    <ul>
+      <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+      <li><a href="#USE">USE</a>
+        <ul>
+          <li><a href="#NOTES">NOTES</a>
+            <ul>
+              <li><a href="#Examples">Examples</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#SYNOPSIS1">SYNOPSIS</a>
+        <ul>
+          <li><a href="#SEISMIC-UNIX-NOTES-SUOP---do-unary-arithmetic-operation-on-segys">SEISMIC UNIX NOTES SUOP - do unary arithmetic operation on segys</a></li>
+        </ul>
+      </li>
+      <li><a href="#Users-notes-Juan-Lorenzo">User&#39;s notes (Juan Lorenzo)</a></li>
+      <li><a href="#CHANGES-and-their-DATES">CHANGES and their DATES</a></li>
+      <li><a href="#Import-packages">Import packages</a></li>
+      <li><a href="#instantiation-of-packages">instantiation of packages</a></li>
+      <li><a href="#Encapsulated-hash-of-private-variables">Encapsulated hash of private variables</a></li>
+      <li><a href="#sub-Step">sub Step</a></li>
+      <li><a href="#sub-note">sub note</a></li>
+      <li><a href="#sub-clear">sub clear</a></li>
+      <li><a href="#sub-_get_inbound">sub _get_inbound</a></li>
+      <li><a href="#sub-_set_inbound_list">sub _set_inbound_list</a></li>
+      <li><a href="#sub-_get_file_names">sub _get_file_names</a></li>
+      <li><a href="#sub-list">sub list</a></li>
+      <li><a href="#sub-nw">sub nw</a></li>
+      <li><a href="#sub-op">sub op</a></li>
+      <li><a href="#sub-get_max_index">sub get_max_index</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="SYNOPSIS">SYNOPSIS</h2>
+
+<p>PERL PROGRAM NAME:</p>
+
+<p>AUTHOR:</p>
+
+<p>DATE:</p>
+
+<p>DESCRIPTION:</p>
+
+<p>Version:</p>
+
+<h2 id="USE">USE</h2>
+
+<h3 id="NOTES">NOTES</h3>
+
+<h4 id="Examples">Examples</h4>
+
+<h2 id="SYNOPSIS1">SYNOPSIS</h2>
+
+<h3 id="SEISMIC-UNIX-NOTES-SUOP---do-unary-arithmetic-operation-on-segys">SEISMIC UNIX NOTES SUOP - do unary arithmetic operation on segys</h3>
+
+<pre><code>suop &lt;stdin &gt;stdout op=abs                                     
+
+
+
+Required parameters:                                           
+
+       none                                                    
+
+
+
+Optional parameter:                                            
+
+       op=abs          operation flag                          
+
+                       abs   : absolute value                  
+
+                       avg   : remove average value            
+
+                       ssqrt : signed square root              
+
+                       sqr   : square                          
+
+                       ssqr  : signed square                   
+
+                       sgn   : signum function                 
+
+                       exp   : exponentiate                    
+
+                       sexp  : signed exponentiate             
+
+                       slog  : signed natural log              
+
+                       slog2 : signed log base 2               
+
+                       slog10: signed common log               
+
+                       cos   : cosine                          
+
+                       sin   : sine                            
+
+                       tan   : tangent                         
+
+                       cosh  : hyperbolic cosine               
+
+                       sinh  : hyperbolic sine                 
+
+                       tanh  : hyperbolic tangent              
+
+                       cnorm : norm complex samples by modulus &quot;, 
+
+                       norm  : divide trace by Max. Value      
+
+                       db    : 20 * slog10 (data)              
+
+                       neg   : negate value                    
+
+                       posonly : pass only positive values     
+
+                       negonly : pass only negative values     
+
+                      sum   : running sum trace integration   
+
+                      diff  : running diff trace differentiation
+
+                      refl  : (v[i+1] - v[i])/(v[i+1] + v[i]) 
+
+                       mod2pi : modulo 2 pi                    
+
+                       inv   : inverse                         
+
+                       rmsamp : rms amplitude                  
+
+                      s2v   : sonic to velocity (ft/s) conversion     
+
+                      s2vm  : sonic to velocity (m/s) conversion     
+
+                      d2m   : density (g/cc) to metric (kg/m^3) conversion 
+
+                      drv2  : 2nd order vertical derivative 
+
+                      drv4  : 4th order vertical derivative 
+
+                      integ : top-down integration            
+
+                      spike : local extrema to spikes         
+
+                      saf   : spike and fill to next spike    
+
+                      freq  : local dominant freqeuncy        
+
+                      lnza  : preserve least non-zero amps    
+
+                      --------- window operations ----------- 
+
+                      mean  : arithmetic mean                 
+
+                      despike  : despiking based on median filter
+
+                      std   : standard deviation              
+
+                      var   : variance                        
+
+      nw=21           number of time samples in window        
+
+                      --------------------------------------- 
+
+                       nop   : no operation                    
+
+
+
+Note:  Binary ops are provided by suop2.                       
+
+Operations inv, slog, slog2, and slog10 are &quot;punctuated&quot;,      &quot;, 
+
+meaning that if, the input contains 0 values,                  
+
+0 values are returned.                                 &quot;,      
+
+
+
+For file operations on non-SU format binary files use:  farith
+
+
+
+Credits:
+
+
+
+CWP: Shuki Ronen, Jack K Cohen (c. 1987)
+
+ Toralf Foerster: norm and db operations, 10/95.
+
+ Additions by Reg Beardsley, Chris Liner, and others.
+
+
+
+Notes:
+
+       If efficiency becomes important consider inverting main loop
+
+     and repeating operation code within the branches of the switch.
+
+
+
+       Note on db option.  The following are equivalent:
+
+       ... | sufft | suamp | suop op=norm | suop op=slog10 |\
+
+               sugain scale equals 20| suxgraph style=normal
+
+
+
+       ... | sufft | suamp | suop op=db | suxgraph style=normal</code></pre>
+
+<h2 id="Users-notes-Juan-Lorenzo">User&#39;s notes (Juan Lorenzo)</h2>
+
+<pre><code>An additional parameter called &quot;list&quot;  allows the operation
+to be repeated among multiple files.
+
+The names of the su files are in the list.
+
+The list is found in $DATA_SEISMIC_TXT.
+Output file names carry a suffix equal to the operation
+variable. For example,
+
+   file1_neg.su</code></pre>
+
+<h2 id="CHANGES-and-their-DATES">CHANGES and their DATES</h2>
+
+<h2 id="Import-packages">Import packages</h2>
+
+<h2 id="instantiation-of-packages">instantiation of packages</h2>
+
+<h2 id="Encapsulated-hash-of-private-variables">Encapsulated hash of private variables</h2>
+
+<h2 id="sub-Step">sub Step</h2>
+
+<p>collects switches and assembles bash instructions by adding the program name</p>
+
+<h2 id="sub-note">sub note</h2>
+
+<p>collects switches and assembles bash instructions by adding the program name</p>
+
+<h2 id="sub-clear">sub clear</h2>
+
+<h2 id="sub-_get_inbound">sub _get_inbound</h2>
+
+<h2 id="sub-_set_inbound_list">sub _set_inbound_list</h2>
+
+<h2 id="sub-_get_file_names">sub _get_file_names</h2>
+
+<h2 id="sub-list">sub list</h2>
+
+<pre><code>list array</code></pre>
+
+<h2 id="sub-nw">sub nw</h2>
+
+<h2 id="sub-op">sub op</h2>
+
+<h2 id="sub-get_max_index">sub get_max_index</h2>
+
+<p>max index = number of input variables -1</p>
+
+
+</body>
+
+</html>
+
+

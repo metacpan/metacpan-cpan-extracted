@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::NMO_Vel_Stk::suztot;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 

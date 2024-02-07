@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-06'; # DATE
+our $DATE = '2024-02-02'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.033'; # VERSION
+our $VERSION = '1.034'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -279,7 +279,7 @@ App::CSVUtils::csv_sort_rows - Sort CSV rows
 
 =head1 VERSION
 
-This document describes version 1.033 of App::CSVUtils::csv_sort_rows (from Perl distribution App-CSVUtils), released on 2023-09-06.
+This document describes version 1.034 of App::CSVUtils::csv_sort_rows (from Perl distribution App-CSVUtils), released on 2024-02-02.
 
 =for Pod::Coverage ^(on|after|before)_.+$
 
@@ -641,7 +641,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

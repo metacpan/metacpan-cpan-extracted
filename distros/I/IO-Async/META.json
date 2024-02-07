@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -26,7 +26,7 @@
          "requires" : {
             "Exporter" : "5.57",
             "File::stat" : "0",
-            "Future" : "0.33",
+            "Future" : "0.44",
             "Future::Utils" : "0.18",
             "IO::Poll" : "0",
             "List::Util" : "0",
@@ -34,167 +34,166 @@
             "Storable" : "0",
             "Struct::Dumb" : "0",
             "Time::HiRes" : "0",
-            "perl" : "5.008004"
+            "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
             "File::Temp" : "0",
-            "Test::Fatal" : "0",
+            "Test2::V0" : "0.000149",
             "Test::Future::IO::Impl" : "0",
-            "Test::Identity" : "0",
-            "Test::Metrics::Any" : "0",
-            "Test::More" : "0.88",
-            "Test::Refcount" : "0"
+            "Test::Metrics::Any" : "0"
          }
       }
    },
    "provides" : {
       "Future::IO::Impl::IOAsync" : {
-         "file" : "lib/Future/IO/Impl/IOAsync.pm"
+         "file" : "lib/Future/IO/Impl/IOAsync.pm",
+         "version" : "0.803"
       },
       "IO::Async" : {
          "file" : "lib/IO/Async.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Channel" : {
          "file" : "lib/IO/Async/Channel.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Debug" : {
          "file" : "lib/IO/Async/Debug.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::File" : {
          "file" : "lib/IO/Async/File.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::FileStream" : {
          "file" : "lib/IO/Async/FileStream.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Function" : {
          "file" : "lib/IO/Async/Function.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Future" : {
          "file" : "lib/IO/Async/Future.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Handle" : {
          "file" : "lib/IO/Async/Handle.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Internals::ChildManager" : {
          "file" : "lib/IO/Async/Internals/ChildManager.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Internals::FunctionWorker" : {
          "file" : "lib/IO/Async/Internals/FunctionWorker.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Listener" : {
          "file" : "lib/IO/Async/Listener.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Loop" : {
          "file" : "lib/IO/Async/Loop.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Loop::Poll" : {
          "file" : "lib/IO/Async/Loop/Poll.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Loop::Select" : {
          "file" : "lib/IO/Async/Loop/Select.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::LoopTests" : {
          "file" : "lib/IO/Async/LoopTests.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Metrics" : {
-         "file" : "lib/IO/Async/Metrics.pm"
+         "file" : "lib/IO/Async/Metrics.pm",
+         "version" : "0.803"
       },
       "IO::Async::Notifier" : {
          "file" : "lib/IO/Async/Notifier.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::OS" : {
          "file" : "lib/IO/Async/OS.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::OS::MSWin32" : {
          "file" : "lib/IO/Async/OS/MSWin32.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::OS::cygwin" : {
          "file" : "lib/IO/Async/OS/cygwin.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::OS::linux" : {
          "file" : "lib/IO/Async/OS/linux.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::PID" : {
          "file" : "lib/IO/Async/PID.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Process" : {
          "file" : "lib/IO/Async/Process.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Protocol" : {
          "file" : "lib/IO/Async/Protocol.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Protocol::LineStream" : {
          "file" : "lib/IO/Async/Protocol/LineStream.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Protocol::Stream" : {
          "file" : "lib/IO/Async/Protocol/Stream.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Resolver" : {
          "file" : "lib/IO/Async/Resolver.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Routine" : {
          "file" : "lib/IO/Async/Routine.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Signal" : {
          "file" : "lib/IO/Async/Signal.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Socket" : {
          "file" : "lib/IO/Async/Socket.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Stream" : {
          "file" : "lib/IO/Async/Stream.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Test" : {
          "file" : "lib/IO/Async/Test.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Timer" : {
          "file" : "lib/IO/Async/Timer.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Timer::Absolute" : {
          "file" : "lib/IO/Async/Timer/Absolute.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Timer::Countdown" : {
          "file" : "lib/IO/Async/Timer/Countdown.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       },
       "IO::Async::Timer::Periodic" : {
          "file" : "lib/IO/Async/Timer/Periodic.pm",
-         "version" : "0.802"
+         "version" : "0.803"
       }
    },
    "release_status" : "stable",
@@ -204,6 +203,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.802",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.803",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

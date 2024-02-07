@@ -62,6 +62,8 @@ my @files = (
     't/data/sample-solutions/from-shirl-hart-1024--want.txt',
     't/data/sample-solutions/patsolve-338741497-win-solution.txt',
     't/data/texts/list.txt',
+    't/data/texts/texts/1.binary_star.board',
+    't/data/texts/texts/1.binary_star.sol',
     't/data/texts/texts/3.all_in_a_row.board',
     't/data/texts/texts/3.all_in_a_row.sol',
     't/data/texts/texts/4.golf-wrap-ranks.sol',

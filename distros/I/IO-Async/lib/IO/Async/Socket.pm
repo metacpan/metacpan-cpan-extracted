@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Socket;
+package IO::Async::Socket 0.803;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.802';
 
 use base qw( IO::Async::Handle );
 
@@ -23,6 +21,7 @@ filehandle
 
 =head1 SYNOPSIS
 
+   use Future::AsyncAwait;
    use IO::Async::Socket;
 
    use IO::Async::Loop;
@@ -42,11 +41,11 @@ filehandle
    );
    $loop->add( $socket );
 
-   $socket->connect(
+   await $socket->connect(
       host     => "some.host.here",
       service  => "echo",
       socktype => 'dgram',
-   )->get;
+   );
 
    $socket->send( "A TEST DATAGRAM" );
 
@@ -206,7 +205,7 @@ sub _add_to_loop
 
 =head2 send
 
-   $socket->send( $data, $flags, $addr )
+   $socket->send( $data, $flags, $addr );
 
 This method adds a segment of data to be sent, or sends it immediately,
 according to the C<autoflush> parameter. C<$flags> and C<$addr> are optional.
@@ -324,22 +323,22 @@ sub on_write_ready
 C<UDP> is carried by the C<SOCK_DGRAM> socket type, for which the string
 C<'dgram'> is a convenient shortcut:
 
-   $socket->connect(
+   await $socket->connect(
       host     => $hostname,
       service  => $service,
       socktype => 'dgram',
       ...
-   )
+   );
 
 =head2 Receive-first on a UDP Socket
 
 A typical server pattern with C<UDP> involves binding a well-known port
 number instead of connecting to one, and waiting on incoming packets.
 
-   $socket->bind(
+   await $socket->bind(
       service  => 12345,
       socktype => 'dgram',
-   )->get;
+   );
 
 =head1 SEE ALSO
 

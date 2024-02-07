@@ -56,7 +56,8 @@ static PERL_ITHREADS_LOCAL CV* proto = (CV*)Sub::create(&XS_function_call).detac
 
 Sub create_sub (IFunctionCaller* fc) {
     auto ret = Sub::clone_anon_xsub(proto);
-    ret.payload_attach(fc, &out_marker);
+    auto mg = ret.payload_attach(fc, &out_marker);
+    mg->mg_flags |= MGf_DUP;
     return ret;
 }
 
@@ -67,6 +68,7 @@ Sub create_sub (IFunctionCaller* fc) {
         ptr = new SubPad(sub);
         ptr->retain();
         auto mg = sub.payload_attach(ptr, &in_marker);
+        mg->mg_flags |= MGf_DUP;
         mg->mg_obj = sub.get();
         return ptr;
     }

@@ -25,7 +25,7 @@ WriteMakefile(
 			'Devel::REPL' => '0',
 			'Regexp::Common' => '0',
 			#'Parallel::ForkManager' => '0',
-			#'Scalar::Util' => '0',
+			'Scalar::Util' => '0',
 			}, # e.g., Module::Name => 1.1
     ($] >= 5.014 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT       => 'Sim::OPT is a optimization and parametric exploration program that can mix sequential and parallel block search methods.', # retrieve abstract from module

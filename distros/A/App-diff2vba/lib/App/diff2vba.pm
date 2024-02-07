@@ -2,7 +2,7 @@ package App::diff2vba;
 use 5.014;
 use warnings;
 
-our $VERSION = "0.99";
+our $VERSION = "1.00";
 
 use utf8;
 use Encode;
@@ -17,7 +17,7 @@ use Pod::Usage;
 use Data::Section::Simple qw(get_data_section);
 use List::Util qw(max);
 use List::MoreUtils qw(pairwise);
-use App::diff2vba::Util;
+use App::diff2vba::Util qw(split_string);
 use App::sdif::Util qw(read_unified_2);
 
 use Getopt::EX::Hashed 1.03; {
@@ -145,7 +145,7 @@ sub substitute {
 	    @{$app->TABLE};
 	}
     };
-    for my $i (0 .. $#fromto) {
+    while (my($i, $fromto) = each @fromto) {
 	my $fromto = $fromto[$i];
 	use integer;
 	chomp @$fromto;
@@ -155,7 +155,7 @@ sub substitute {
 	my @from = split_string($from, $count);
 	my @to   = split_string($to,   $count);
 	adjust_border(\@from, \@to, $app->adjust) if $app->adjust;
-	for my $j (0 .. $#from) {
+	for my $j (keys @from) {
 	    next if !$app->identical and $from[$j] eq $to[$j];
 	    $app->append(text => sprintf "' # %d-%d\n", $i + 1, $j + 1);
 	    $app->append(section => $template,
@@ -264,7 +264,7 @@ App::diff2vba - generate VBA patch script from diff output
 
 =head1 VERSION
 
-Version 0.99
+Version 1.00
 
 =head1 SYNOPSIS
 

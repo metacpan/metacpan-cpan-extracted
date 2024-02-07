@@ -16,9 +16,9 @@
 #     C => [q[t/lib/MyTest_xsgen.cc]]
 #     CC => q[c++]
 #     CCFLAGS => q[-Wall -Wextra -std=c++14 -g -ggdb3 -DPERL_POISON -fPIC -fstack-protector-all -D_FORTIFY_SOURCE=2 -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -DDEBUGGING -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -o $@]
-#     CONFIGURE_REQUIRES => { Date=>q[v5.2.12], Encode::Base2N=>q[v1.0.5], Export::XS=>q[v3.0.6], Net::SockAddr=>q[v1.1.3], Protocol::HTTP=>q[v1.1.5], Protocol::WebSocket::Fast=>q[v1.2.6], Test::Catch=>q[v2.0.1], URI::XS=>q[v2.1.6], UniEvent=>q[v1.2.12], UniEvent::HTTP=>q[v1.2.2], UniEvent::Socks=>q[v1.0.1], XLog=>q[v1.1.3], XS::Framework=>q[v1.5.5], XS::Install=>q[v1.3.5], XS::libboost::mini=>q[v1.76.0.0], XS::libcares=>q[v1.17.1.2], XS::libcatch=>q[v3.0.1], XS::libpanda=>q[v1.5.9], XS::librangeV3=>q[v1.11.0], XS::libuv=>q[v1.41.0.1], next::XS=>q[v1.0.7] }
+#     CONFIGURE_REQUIRES => { Date=>q[v5.2.13], Encode::Base2N=>q[v1.0.5], Export::XS=>q[v3.0.7], Net::SockAddr=>q[v1.1.3], Protocol::HTTP=>q[v1.1.5], Protocol::WebSocket::Fast=>q[v1.2.8], Test::Catch=>q[v2.0.1], URI::XS=>q[v2.1.6], UniEvent=>q[v1.2.13], UniEvent::HTTP=>q[v1.2.2], UniEvent::Socks=>q[v1.0.1], XLog=>q[v1.1.3], XS::Framework=>q[v1.5.6], XS::Install=>q[v1.3.5], XS::libboost::mini=>q[v1.76.0.0], XS::libcares=>q[v1.17.1.2], XS::libcatch=>q[v3.0.1], XS::libpanda=>q[v1.5.10], XS::librangeV3=>q[v1.11.0], XS::libuv=>q[v1.41.0.1], next::XS=>q[v1.0.7] }
 #     DEFINE => q[-DCARES_STATICLIB -DCARES_STATICLIB]
-#     INC => q[-Isrc -I/home/s.aleinikov/village/meia/plus/UniEvent-WebSocket/clib/src -I/home/s.aleinikov/village/meia/plus/UniEvent-WebSocket/clib/src -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Protocol/WebSocket/Fast.x/i -I/usr/include -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Export/XS.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libpanda.x/i -I/home/s.aleinikov/village/meia/var/lib/XS/Install.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/next/XS.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/URI/XS.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Encode/Base2N.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Protocol/HTTP.x/i -I/usr/include -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Date.x/i -I/home/s.aleinikov/village/meia/var/lib/XS/libboost/mini.x/i -I/home/s.aleinikov/village/meia/var/lib/XS/librangeV3.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XLog.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Net/SockAddr.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/UniEvent.x/i -I/usr/include -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libuv.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libcares.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/UniEvent/Socks.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/UniEvent/HTTP.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libcatch.x/i -Iinclude]
+#     INC => q[-Isrc -I/home/s.aleinikov/village/meia/plus/UniEvent-WebSocket/clib/src -I/home/s.aleinikov/village/meia/plus/UniEvent-WebSocket/clib/src -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libpanda.x/i -I/home/s.aleinikov/village/meia/var/lib/XS/Install.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XLog.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/next/XS.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Export/XS.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/URI/XS.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Encode/Base2N.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libuv.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/UniEvent.x/i -I/usr/include -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Net/SockAddr.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libcares.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Date.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/UniEvent/HTTP.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Protocol/HTTP.x/i -I/usr/include -I/home/s.aleinikov/village/meia/var/lib/XS/libboost/mini.x/i -I/home/s.aleinikov/village/meia/var/lib/XS/librangeV3.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/UniEvent/Socks.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Protocol/WebSocket/Fast.x/i -I/usr/include -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libcatch.x/i -Iinclude]
 #     LD => q[$(CC)]
 #     LDDLFLAGS => q[-shared -O2 -g -L/usr/local/lib -fstack-protector-strong]
 #     LDFROM => q[$(OBJECT) $(INST_ARCHLIB)/auto/UniEvent/WebSocket/WebSocket.so -Wl,--whole-archive clib/build/libunievent-websocket-tests.a  -Wl,--no-whole-archive]
@@ -30,15 +30,15 @@
 #     OPTIMIZE => q[-g -O0]
 #     PM => { lib/UniEvent/WebSocket.pm=>q[$(INST_ARCHLIB)/UniEvent/WebSocket.pm], lib/UniEvent/WebSocket.pod=>q[$(INST_ARCHLIB)/UniEvent/WebSocket.pod], lib/UniEvent/WebSocket/Client.pm=>q[$(INST_ARCHLIB)/UniEvent/WebSocket/Client.pm], lib/UniEvent/WebSocket/Client.pod=>q[$(INST_ARCHLIB)/UniEvent/WebSocket/Client.pod], lib/UniEvent/WebSocket/ConnectRequest.pm=>q[$(INST_ARCHLIB)/UniEvent/WebSocket/ConnectRequest.pm], lib/UniEvent/WebSocket/ConnectRequest.pod=>q[$(INST_ARCHLIB)/UniEvent/WebSocket/ConnectRequest.pod], lib/UniEvent/WebSocket/Connection.pm=>q[$(INST_ARCHLIB)/UniEvent/WebSocket/Connection.pm], lib/UniEvent/WebSocket/Connection.pod=>q[$(INST_ARCHLIB)/UniEvent/WebSocket/Connection.pod], lib/UniEvent/WebSocket/Server.pm=>q[$(INST_ARCHLIB)/UniEvent/WebSocket/Server.pm], lib/UniEvent/WebSocket/Server.pod=>q[$(INST_ARCHLIB)/UniEvent/WebSocket/Server.pod], lib/UniEvent/WebSocket/ServerConnection.pm=>q[$(INST_ARCHLIB)/UniEvent/WebSocket/ServerConnection.pm], lib/UniEvent/WebSocket/ServerConnection.pod=>q[$(INST_ARCHLIB)/UniEvent/WebSocket/ServerConnection.pod] }
 #     PMLIBDIRS => [q[lib]]
-#     PREREQ_PM => { Date=>q[v5.2.12], Encode::Base2N=>q[v1.0.5], Export::XS=>q[v3.0.6], Net::SockAddr=>q[v1.1.3], Protocol::HTTP=>q[v1.1.5], Protocol::WebSocket::Fast=>q[v1.2.6], Test::Catch=>q[v2.0.1], Test::Deep=>q[0], Test::More=>q[0], Test::Simple=>q[0.96], URI::XS=>q[v2.1.6], UniEvent=>q[v1.2.12], UniEvent::HTTP=>q[v1.2.2], UniEvent::Socks=>q[v1.0.1], XLog=>q[v1.1.3], XS::Framework=>q[v1.5.5], XS::Install=>q[v1.3.5], XS::libboost::mini=>q[v1.76.0.0], XS::libcares=>q[v1.17.1.2], XS::libcatch=>q[v3.0.1], XS::libpanda=>q[v1.5.9], XS::librangeV3=>q[v1.11.0], XS::libuv=>q[v1.41.0.1], next::XS=>q[v1.0.7] }
+#     PREREQ_PM => { Date=>q[v5.2.13], Encode::Base2N=>q[v1.0.5], Export::XS=>q[v3.0.7], Net::SockAddr=>q[v1.1.3], Protocol::HTTP=>q[v1.1.5], Protocol::WebSocket::Fast=>q[v1.2.8], Test::Catch=>q[v2.0.1], Test::Deep=>q[0], Test::More=>q[0], Test::Simple=>q[0.96], URI::XS=>q[v2.1.6], UniEvent=>q[v1.2.13], UniEvent::HTTP=>q[v1.2.2], UniEvent::Socks=>q[v1.0.1], XLog=>q[v1.1.3], XS::Framework=>q[v1.5.6], XS::Install=>q[v1.3.5], XS::libboost::mini=>q[v1.76.0.0], XS::libcares=>q[v1.17.1.2], XS::libcatch=>q[v3.0.1], XS::libpanda=>q[v1.5.10], XS::librangeV3=>q[v1.11.0], XS::libuv=>q[v1.41.0.1], next::XS=>q[v1.0.7] }
 #     TEST_REQUIRES => { Test::Deep=>q[0], Test::More=>q[0], Test::Simple=>q[0.96] }
-#     TYPEMAPS => [q[/home/s.aleinikov/village/meia/var/lib/XS/Install.x/tm/typemap], q[/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap], q[/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap64], q[/home/s.aleinikov/village/meia/var/lib/XS/Install.x/tm/typemap], q[/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap], q[/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap64]]
+#     TYPEMAPS => [q[/home/s.aleinikov/village/meia/var/lib/XS/Install.x/tm/typemap], q[/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap64], q[/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap], q[/home/s.aleinikov/village/meia/var/lib/XS/Install.x/tm/typemap], q[/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap64], q[/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap]]
 #     VERSION => q[0.0.0]
 #     XS => { t/lib/MyTest.xs=>q[t/lib/MyTest_xsgen.cc] }
 #     XSOPT => q[-hiertype -C++ -hiertype -C++]
 #     clean => { FILES=>q[ clib/build clib/cmake_props $(O_FILES)] }
-#     dynamic_lib => { OTHERLDFLAGS=>q[-lz -lcrypto /usr/lib/x86_64-linux-gnu/libssl.so -lpthread] }
-#     postamble => { 1=>q[XSUBPPRUN = $(PERLRUN) -Ilib -MXS::Install::ParseXS -MXS::Framework::ParseXS $(XSUBPP)], 10=>q[sync_bin_deps: 	$(PERL) -MXS::Install::Util -e 'XS::Install::Util::cmd_sync_bin_deps()' MyTest Protocol::HTTP XS::libpanda Date UniEvent::HTTP XS::librangeV3 UniEvent::Socks XS::Install Encode::Base2N next::XS URI::XS UniEvent XS::libcatch XS::libuv XS::libcares XS::libboost::mini XS::Framework Protocol::WebSocket::Fast XLog Export::XS Test::Catch Net::SockAddr], 11=>q[install :: sync_bin_deps], 2=>q[cmake_install : dynamic 	cd clib/build && $(MAKE) install $(DEV_NULL)], 3=>q[cmake_inc_copy :: cmake_install ], 4=>q[pm_to_blib : cmake_inc_copy], 5=>q[clib/build/libunievent-websocket-tests.a  : FORCE; cd clib/build && cd ../cmake_props && $(MAKE)  unievent-websocket-tests ], 6=>q[$(INST_DYNAMIC) : clib/build/libunievent-websocket-tests.a ], 7=>q[t/lib/MyTest_xsgen.cc : t/lib/MyTest.xs  $(FIRST_MAKEFILE) 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) -csuffix _xsgen.cc $(XSUBPP_EXTRA_ARGS) t/lib/MyTest.xs > t/lib/MyTest.xsc 	$(MV) t/lib/MyTest.xsc t/lib/MyTest_xsgen.cc], 8=>q[t/lib/MyTest_xsgen$(OBJ_EXT) : clib/src/panda/unievent/websocket.h clib/src/panda/unievent/websocket/Connection.h clib/src/panda/unievent/websocket/Server.h clib/src/panda/unievent/websocket/ServerConnection.h clib/src/panda/unievent/websocket/Client.h clib/src/panda/unievent/websocket/Error.h], 9=>q[object : $(OBJECT)] }
+#     dynamic_lib => { OTHERLDFLAGS=>q[-lpthread /usr/lib/x86_64-linux-gnu/libssl.so -lz -lcrypto] }
+#     postamble => { 1=>q[XSUBPPRUN = $(PERLRUN) -Ilib -MXS::Install::ParseXS -MXS::Framework::ParseXS $(XSUBPP)], 10=>q[sync_bin_deps: 	$(PERL) -MXS::Install::Util -e 'XS::Install::Util::cmd_sync_bin_deps()' MyTest UniEvent Net::SockAddr XS::libuv XLog XS::libpanda XS::Framework Encode::Base2N URI::XS XS::libcatch next::XS Export::XS XS::libcares UniEvent::Socks XS::Install Date Test::Catch XS::libboost::mini Protocol::HTTP Protocol::WebSocket::Fast XS::librangeV3 UniEvent::HTTP], 11=>q[install :: sync_bin_deps], 2=>q[cmake_install : dynamic 	cd clib/build && $(MAKE) install $(DEV_NULL)], 3=>q[cmake_inc_copy :: cmake_install ], 4=>q[pm_to_blib : cmake_inc_copy], 5=>q[clib/build/libunievent-websocket-tests.a  : FORCE; cd clib/build && cd ../cmake_props && $(MAKE)  unievent-websocket-tests ], 6=>q[$(INST_DYNAMIC) : clib/build/libunievent-websocket-tests.a ], 7=>q[t/lib/MyTest_xsgen.cc : t/lib/MyTest.xs  $(FIRST_MAKEFILE) 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) -csuffix _xsgen.cc $(XSUBPP_EXTRA_ARGS) t/lib/MyTest.xs > t/lib/MyTest.xsc 	$(MV) t/lib/MyTest.xsc t/lib/MyTest_xsgen.cc], 8=>q[t/lib/MyTest_xsgen$(OBJ_EXT) : clib/src/panda/unievent/websocket/Error.h clib/src/panda/unievent/websocket.h clib/src/panda/unievent/websocket/Server.h clib/src/panda/unievent/websocket/Client.h clib/src/panda/unievent/websocket/ServerConnection.h clib/src/panda/unievent/websocket/Connection.h], 9=>q[object : $(OBJECT)] }
 
 # --- MakeMaker post_initialize section:
 
@@ -59,11 +59,11 @@ FULL_AR = /usr/bin/ar
 LD = $(CC)
 LDDLFLAGS = -shared -O2 -g -L/usr/local/lib -fstack-protector-strong
 LDFLAGS =  -Wl,-z,now -Wl,-zrelro -Wl,-z,noexecstack -fstack-protector-strong -L/usr/local/lib
-LIBC = libc-2.31.so
+LIBC = /lib/x86_64-linux-gnu/libc.so.6
 LIB_EXT = .a
 OBJ_EXT = .o
 OSNAME = linux
-OSVERS = 5.10.0-23-amd64
+OSVERS = 6.1.0-13-amd64
 RANLIB = :
 SITELIBEXP = /home/s.aleinikov/perlbrew/perls/perl-5.38.0-poison/lib/site_perl/5.38.0
 SITEARCHEXP = /home/s.aleinikov/perlbrew/perls/perl-5.38.0-poison/lib/site_perl/5.38.0/x86_64-linux
@@ -175,7 +175,7 @@ BASEEXT = MyTest
 PARENT_NAME = 
 DLBASE = $(BASEEXT)
 VERSION_FROM = 
-INC = -Isrc -I/home/s.aleinikov/village/meia/plus/UniEvent-WebSocket/clib/src -I/home/s.aleinikov/village/meia/plus/UniEvent-WebSocket/clib/src -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Protocol/WebSocket/Fast.x/i -I/usr/include -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Export/XS.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libpanda.x/i -I/home/s.aleinikov/village/meia/var/lib/XS/Install.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/next/XS.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/URI/XS.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Encode/Base2N.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Protocol/HTTP.x/i -I/usr/include -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Date.x/i -I/home/s.aleinikov/village/meia/var/lib/XS/libboost/mini.x/i -I/home/s.aleinikov/village/meia/var/lib/XS/librangeV3.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XLog.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Net/SockAddr.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/UniEvent.x/i -I/usr/include -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libuv.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libcares.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/UniEvent/Socks.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/UniEvent/HTTP.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libcatch.x/i -Iinclude
+INC = -Isrc -I/home/s.aleinikov/village/meia/plus/UniEvent-WebSocket/clib/src -I/home/s.aleinikov/village/meia/plus/UniEvent-WebSocket/clib/src -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libpanda.x/i -I/home/s.aleinikov/village/meia/var/lib/XS/Install.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XLog.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/next/XS.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Export/XS.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/URI/XS.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Encode/Base2N.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libuv.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/UniEvent.x/i -I/usr/include -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Net/SockAddr.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libcares.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Date.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/UniEvent/HTTP.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Protocol/HTTP.x/i -I/usr/include -I/home/s.aleinikov/village/meia/var/lib/XS/libboost/mini.x/i -I/home/s.aleinikov/village/meia/var/lib/XS/librangeV3.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/UniEvent/Socks.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Protocol/WebSocket/Fast.x/i -I/usr/include -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libcatch.x/i -Iinclude
 DEFINE = -DCARES_STATICLIB -DCARES_STATICLIB
 OBJECT = t/lib/MyTest_xsgen$(OBJ_EXT)
 LDFROM = $(OBJECT) $(INST_ARCHLIB)/auto/UniEvent/WebSocket/WebSocket.so -Wl,--whole-archive clib/build/libunievent-websocket-tests.a  -Wl,--no-whole-archive
@@ -242,8 +242,8 @@ XSUBPPDIR = /home/s.aleinikov/perlbrew/perls/perl-5.38.0-poison/lib/5.38.0/ExtUt
 XSUBPP = "$(XSUBPPDIR)$(DFSEP)xsubpp"
 XSUBPPRUN = $(PERLRUN) $(XSUBPP)
 XSPROTOARG = 
-XSUBPPDEPS = /home/s.aleinikov/perlbrew/perls/perl-5.38.0-poison/lib/5.38.0/ExtUtils/typemap /home/s.aleinikov/village/meia/var/lib/XS/Install.x/tm/typemap /home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap /home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap64 /home/s.aleinikov/village/meia/var/lib/XS/Install.x/tm/typemap /home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap /home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap64 /home/s.aleinikov/perlbrew/perls/perl-5.38.0-poison/lib/5.38.0/ExtUtils$(DFSEP)xsubpp
-XSUBPPARGS = -hiertype -C++ -hiertype -C++ -typemap '/home/s.aleinikov/perlbrew/perls/perl-5.38.0-poison/lib/5.38.0/ExtUtils/typemap' -typemap '/home/s.aleinikov/village/meia/var/lib/XS/Install.x/tm/typemap' -typemap '/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap' -typemap '/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap64' -typemap '/home/s.aleinikov/village/meia/var/lib/XS/Install.x/tm/typemap' -typemap '/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap' -typemap '/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap64'
+XSUBPPDEPS = /home/s.aleinikov/perlbrew/perls/perl-5.38.0-poison/lib/5.38.0/ExtUtils/typemap /home/s.aleinikov/village/meia/var/lib/XS/Install.x/tm/typemap /home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap64 /home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap /home/s.aleinikov/village/meia/var/lib/XS/Install.x/tm/typemap /home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap64 /home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap /home/s.aleinikov/perlbrew/perls/perl-5.38.0-poison/lib/5.38.0/ExtUtils$(DFSEP)xsubpp
+XSUBPPARGS = -hiertype -C++ -hiertype -C++ -typemap '/home/s.aleinikov/perlbrew/perls/perl-5.38.0-poison/lib/5.38.0/ExtUtils/typemap' -typemap '/home/s.aleinikov/village/meia/var/lib/XS/Install.x/tm/typemap' -typemap '/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap64' -typemap '/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap' -typemap '/home/s.aleinikov/village/meia/var/lib/XS/Install.x/tm/typemap' -typemap '/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap64' -typemap '/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/tm/typemap'
 XSUBPP_EXTRA_ARGS =
 
 
@@ -340,7 +340,7 @@ PASTHRU = LIBPERL_A="$(LIBPERL_A)"\
 	OPTIMIZE="$(OPTIMIZE)"\
 	PREFIX="$(PREFIX)"\
 	PASTHRU_DEFINE='-DCARES_STATICLIB -DCARES_STATICLIB $(PASTHRU_DEFINE)'\
-	PASTHRU_INC='-Isrc -I/home/s.aleinikov/village/meia/plus/UniEvent-WebSocket/clib/src -I/home/s.aleinikov/village/meia/plus/UniEvent-WebSocket/clib/src -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Protocol/WebSocket/Fast.x/i -I/usr/include -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Export/XS.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libpanda.x/i -I/home/s.aleinikov/village/meia/var/lib/XS/Install.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/next/XS.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/URI/XS.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Encode/Base2N.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Protocol/HTTP.x/i -I/usr/include -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Date.x/i -I/home/s.aleinikov/village/meia/var/lib/XS/libboost/mini.x/i -I/home/s.aleinikov/village/meia/var/lib/XS/librangeV3.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XLog.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Net/SockAddr.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/UniEvent.x/i -I/usr/include -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libuv.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libcares.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/UniEvent/Socks.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/UniEvent/HTTP.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libcatch.x/i -Iinclude $(PASTHRU_INC)'
+	PASTHRU_INC='-Isrc -I/home/s.aleinikov/village/meia/plus/UniEvent-WebSocket/clib/src -I/home/s.aleinikov/village/meia/plus/UniEvent-WebSocket/clib/src -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libpanda.x/i -I/home/s.aleinikov/village/meia/var/lib/XS/Install.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XLog.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/Framework.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/next/XS.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Export/XS.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/URI/XS.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Encode/Base2N.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libuv.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/UniEvent.x/i -I/usr/include -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Net/SockAddr.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libcares.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Date.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/UniEvent/HTTP.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Protocol/HTTP.x/i -I/usr/include -I/home/s.aleinikov/village/meia/var/lib/XS/libboost/mini.x/i -I/home/s.aleinikov/village/meia/var/lib/XS/librangeV3.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/UniEvent/Socks.x/i -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/Protocol/WebSocket/Fast.x/i -I/usr/include -I/home/s.aleinikov/village/meia/var/lib/x86_64-linux/XS/libcatch.x/i -Iinclude $(PASTHRU_INC)'
 
 
 # --- MakeMaker special_targets section:
@@ -496,7 +496,7 @@ dynamic :: $(FIRST_MAKEFILE) config $(INST_BOOT) $(INST_DYNAMIC)
 # This section creates the dynamically loadable objects from relevant
 # objects and possibly $(MYEXTLIB).
 ARMAYBE = :
-OTHERLDFLAGS = -lz -lcrypto /usr/lib/x86_64-linux-gnu/libssl.so -lpthread
+OTHERLDFLAGS = -lpthread /usr/lib/x86_64-linux-gnu/libssl.so -lz -lcrypto
 INST_DYNAMIC_DEP = 
 INST_DYNAMIC_FIX = 
 
@@ -615,24 +615,24 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  Test::More: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Test::Simple: '\''0.96'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'configure_requires:' >> META_new.yml
-	$(NOECHO) $(ECHO) '  Date: v5.2.12' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Date: v5.2.13' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Encode::Base2N: v1.0.5' >> META_new.yml
-	$(NOECHO) $(ECHO) '  Export::XS: v3.0.6' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Export::XS: v3.0.7' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Net::SockAddr: v1.1.3' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Protocol::HTTP: v1.1.5' >> META_new.yml
-	$(NOECHO) $(ECHO) '  Protocol::WebSocket::Fast: v1.2.6' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Protocol::WebSocket::Fast: v1.2.8' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Test::Catch: v2.0.1' >> META_new.yml
 	$(NOECHO) $(ECHO) '  URI::XS: v2.1.6' >> META_new.yml
-	$(NOECHO) $(ECHO) '  UniEvent: v1.2.12' >> META_new.yml
+	$(NOECHO) $(ECHO) '  UniEvent: v1.2.13' >> META_new.yml
 	$(NOECHO) $(ECHO) '  UniEvent::HTTP: v1.2.2' >> META_new.yml
 	$(NOECHO) $(ECHO) '  UniEvent::Socks: v1.0.1' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XLog: v1.1.3' >> META_new.yml
-	$(NOECHO) $(ECHO) '  XS::Framework: v1.5.5' >> META_new.yml
+	$(NOECHO) $(ECHO) '  XS::Framework: v1.5.6' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XS::Install: v1.3.5' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XS::libboost::mini: v1.76.0.0' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XS::libcares: v1.17.1.2' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XS::libcatch: v3.0.1' >> META_new.yml
-	$(NOECHO) $(ECHO) '  XS::libpanda: v1.5.9' >> META_new.yml
+	$(NOECHO) $(ECHO) '  XS::libpanda: v1.5.10' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XS::librangeV3: v1.11.0' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XS::libuv: v1.41.0.1' >> META_new.yml
 	$(NOECHO) $(ECHO) '  next::XS: v1.0.7' >> META_new.yml
@@ -648,24 +648,24 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '    - t' >> META_new.yml
 	$(NOECHO) $(ECHO) '    - inc' >> META_new.yml
 	$(NOECHO) $(ECHO) 'requires:' >> META_new.yml
-	$(NOECHO) $(ECHO) '  Date: v5.2.12' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Date: v5.2.13' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Encode::Base2N: v1.0.5' >> META_new.yml
-	$(NOECHO) $(ECHO) '  Export::XS: v3.0.6' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Export::XS: v3.0.7' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Net::SockAddr: v1.1.3' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Protocol::HTTP: v1.1.5' >> META_new.yml
-	$(NOECHO) $(ECHO) '  Protocol::WebSocket::Fast: v1.2.6' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Protocol::WebSocket::Fast: v1.2.8' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Test::Catch: v2.0.1' >> META_new.yml
 	$(NOECHO) $(ECHO) '  URI::XS: v2.1.6' >> META_new.yml
-	$(NOECHO) $(ECHO) '  UniEvent: v1.2.12' >> META_new.yml
+	$(NOECHO) $(ECHO) '  UniEvent: v1.2.13' >> META_new.yml
 	$(NOECHO) $(ECHO) '  UniEvent::HTTP: v1.2.2' >> META_new.yml
 	$(NOECHO) $(ECHO) '  UniEvent::Socks: v1.0.1' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XLog: v1.1.3' >> META_new.yml
-	$(NOECHO) $(ECHO) '  XS::Framework: v1.5.5' >> META_new.yml
+	$(NOECHO) $(ECHO) '  XS::Framework: v1.5.6' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XS::Install: v1.3.5' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XS::libboost::mini: v1.76.0.0' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XS::libcares: v1.17.1.2' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XS::libcatch: v3.0.1' >> META_new.yml
-	$(NOECHO) $(ECHO) '  XS::libpanda: v1.5.9' >> META_new.yml
+	$(NOECHO) $(ECHO) '  XS::libpanda: v1.5.10' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XS::librangeV3: v1.11.0' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XS::libuv: v1.41.0.1' >> META_new.yml
 	$(NOECHO) $(ECHO) '  next::XS: v1.0.7' >> META_new.yml
@@ -700,24 +700,24 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
 	$(NOECHO) $(ECHO) '      "configure" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Date" : "v5.2.12",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Date" : "v5.2.13",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Encode::Base2N" : "v1.0.5",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Export::XS" : "v3.0.6",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Export::XS" : "v3.0.7",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Net::SockAddr" : "v1.1.3",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Protocol::HTTP" : "v1.1.5",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Protocol::WebSocket::Fast" : "v1.2.6",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Protocol::WebSocket::Fast" : "v1.2.8",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Test::Catch" : "v2.0.1",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "URI::XS" : "v2.1.6",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "UniEvent" : "v1.2.12",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "UniEvent" : "v1.2.13",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "UniEvent::HTTP" : "v1.2.2",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "UniEvent::Socks" : "v1.0.1",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "XLog" : "v1.1.3",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "XS::Framework" : "v1.5.5",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "XS::Framework" : "v1.5.6",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "XS::Install" : "v1.3.5",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "XS::libboost::mini" : "v1.76.0.0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "XS::libcares" : "v1.17.1.2",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "XS::libcatch" : "v3.0.1",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "XS::libpanda" : "v1.5.9",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "XS::libpanda" : "v1.5.10",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "XS::librangeV3" : "v1.11.0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "XS::libuv" : "v1.41.0.1",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "next::XS" : "v1.0.7"' >> META_new.json
@@ -725,24 +725,24 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
 	$(NOECHO) $(ECHO) '      "runtime" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Date" : "v5.2.12",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Date" : "v5.2.13",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Encode::Base2N" : "v1.0.5",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Export::XS" : "v3.0.6",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Export::XS" : "v3.0.7",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Net::SockAddr" : "v1.1.3",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Protocol::HTTP" : "v1.1.5",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Protocol::WebSocket::Fast" : "v1.2.6",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Protocol::WebSocket::Fast" : "v1.2.8",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Test::Catch" : "v2.0.1",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "URI::XS" : "v2.1.6",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "UniEvent" : "v1.2.12",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "UniEvent" : "v1.2.13",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "UniEvent::HTTP" : "v1.2.2",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "UniEvent::Socks" : "v1.0.1",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "XLog" : "v1.1.3",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "XS::Framework" : "v1.5.5",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "XS::Framework" : "v1.5.6",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "XS::Install" : "v1.3.5",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "XS::libboost::mini" : "v1.76.0.0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "XS::libcares" : "v1.17.1.2",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "XS::libcatch" : "v3.0.1",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "XS::libpanda" : "v1.5.9",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "XS::libpanda" : "v1.5.10",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "XS::librangeV3" : "v1.11.0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "XS::libuv" : "v1.41.0.1",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "next::XS" : "v1.0.7"' >> META_new.json
@@ -1163,24 +1163,24 @@ ppd :
 	$(NOECHO) $(ECHO) '    <ABSTRACT>test module</ABSTRACT>' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR></AUTHOR>' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> MyTest.ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Date::" VERSION="v5.2.12" />' >> MyTest.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Date::" VERSION="v5.2.13" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Encode::Base2N" VERSION="v1.0.5" />' >> MyTest.ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Export::XS" VERSION="v3.0.6" />' >> MyTest.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Export::XS" VERSION="v3.0.7" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Net::SockAddr" VERSION="v1.1.3" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Protocol::HTTP" VERSION="v1.1.5" />' >> MyTest.ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Protocol::WebSocket::Fast" VERSION="v1.2.6" />' >> MyTest.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Protocol::WebSocket::Fast" VERSION="v1.2.8" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Test::Catch" VERSION="v2.0.1" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="URI::XS" VERSION="v2.1.6" />' >> MyTest.ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="UniEvent::" VERSION="v1.2.12" />' >> MyTest.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="UniEvent::" VERSION="v1.2.13" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="UniEvent::HTTP" VERSION="v1.2.2" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="UniEvent::Socks" VERSION="v1.0.1" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XLog::" VERSION="v1.1.3" />' >> MyTest.ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XS::Framework" VERSION="v1.5.5" />' >> MyTest.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XS::Framework" VERSION="v1.5.6" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XS::Install" VERSION="v1.3.5" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XS::libboost::mini" VERSION="v1.76.0.0" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XS::libcares" VERSION="v1.17.1.2" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XS::libcatch" VERSION="v3.0.1" />' >> MyTest.ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XS::libpanda" VERSION="v1.5.9" />' >> MyTest.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XS::libpanda" VERSION="v1.5.10" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XS::librangeV3" VERSION="v1.11.0" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XS::libuv" VERSION="v1.41.0.1" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="next::XS" VERSION="v1.0.7" />' >> MyTest.ppd
@@ -1244,12 +1244,12 @@ t/lib/MyTest_xsgen.cc : t/lib/MyTest.xs  $(FIRST_MAKEFILE)
 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) -csuffix _xsgen.cc $(XSUBPP_EXTRA_ARGS) t/lib/MyTest.xs > t/lib/MyTest.xsc
 	$(MV) t/lib/MyTest.xsc t/lib/MyTest_xsgen.cc
 
-t/lib/MyTest_xsgen$(OBJ_EXT) : clib/src/panda/unievent/websocket.h clib/src/panda/unievent/websocket/Connection.h clib/src/panda/unievent/websocket/Server.h clib/src/panda/unievent/websocket/ServerConnection.h clib/src/panda/unievent/websocket/Client.h clib/src/panda/unievent/websocket/Error.h
+t/lib/MyTest_xsgen$(OBJ_EXT) : clib/src/panda/unievent/websocket/Error.h clib/src/panda/unievent/websocket.h clib/src/panda/unievent/websocket/Server.h clib/src/panda/unievent/websocket/Client.h clib/src/panda/unievent/websocket/ServerConnection.h clib/src/panda/unievent/websocket/Connection.h
 
 object : $(OBJECT)
 
 sync_bin_deps:
-	$(PERL) -MXS::Install::Util -e 'XS::Install::Util::cmd_sync_bin_deps()' MyTest Protocol::HTTP XS::libpanda Date UniEvent::HTTP XS::librangeV3 UniEvent::Socks XS::Install Encode::Base2N next::XS URI::XS UniEvent XS::libcatch XS::libuv XS::libcares XS::libboost::mini XS::Framework Protocol::WebSocket::Fast XLog Export::XS Test::Catch Net::SockAddr
+	$(PERL) -MXS::Install::Util -e 'XS::Install::Util::cmd_sync_bin_deps()' MyTest UniEvent Net::SockAddr XS::libuv XLog XS::libpanda XS::Framework Encode::Base2N URI::XS XS::libcatch next::XS Export::XS XS::libcares UniEvent::Socks XS::Install Date Test::Catch XS::libboost::mini Protocol::HTTP Protocol::WebSocket::Fast XS::librangeV3 UniEvent::HTTP
 
 install :: sync_bin_deps
 

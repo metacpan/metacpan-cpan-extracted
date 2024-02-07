@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>b7365a83-1ae6-4a22-9ae6-db1f04f42336</MessageSerialNumber>
-  <MessageDate>Fri, 26 Jan 2024 03:41:17 GMT</MessageDate>
+  <MessageSerialNumber>158f1a76-f9ba-441a-98e5-3f8c9258f9a7</MessageSerialNumber>
+  <MessageDate>Tue, 6 Feb 2024 03:41:14 GMT</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -1323,11 +1323,11 @@
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>1100000-4999999</Range>
+          <Range>1100000-5199999</Range>
           <Length>3</Length>
         </Rule>
         <Rule>
-          <Range>5000000-5249999</Range>
+          <Range>5200000-5249999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
@@ -1617,6 +1617,28 @@
         <Rule>
           <Range>9000000-9999999</Range>
           <Length>5</Length>
+        </Rule>
+      </Rules>
+    </Group>
+    <Group>
+      <Prefix>978-632</Prefix>
+      <Agency>Vietnam</Agency>
+      <Rules>
+        <Rule>
+          <Range>0000000-1199999</Range>
+          <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>1200000-5999999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>6000000-6799999</Range>
+          <Length>3</Length>
+        </Rule>
+        <Rule>
+          <Range>6800000-9999999</Range>
+          <Length>0</Length>
         </Rule>
       </Rules>
     </Group>

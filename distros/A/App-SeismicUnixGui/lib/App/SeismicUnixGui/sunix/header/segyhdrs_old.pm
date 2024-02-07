@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::header::segyhdrs;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SEGYHDRS - make SEG-Y ascii and binary headers for segywrite		
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 

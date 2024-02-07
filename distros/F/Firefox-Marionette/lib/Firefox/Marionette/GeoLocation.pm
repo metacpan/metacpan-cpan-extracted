@@ -6,7 +6,7 @@ use Encode();
 use overload q[""] => '_lat_long';
 use charnames qw(:full);
 
-our $VERSION = '1.51';
+our $VERSION = '1.52';
 
 sub _MINUTES_IN_ONE_HOUR             { return 60 }
 sub _MINUTES_IN_ONE_DEGREE           { return 60 }
@@ -203,7 +203,7 @@ Firefox::Marionette::GeoLocation - Represents a GeoLocation for Firefox
 
 =head1 VERSION
 
-Version 1.51
+Version 1.52
 
 =head1 SYNOPSIS
 
@@ -232,7 +232,7 @@ returns the accuracy of the altitude expressed in meters.  This value may not be
 
 =head2 country_code
 
-returns the country_code (ISO 3166-1 alpha-2) of the location.  This value may not be defined.
+returns the country_code (L<ISO 3166-1 alpha-2|https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2>) of the location.  This value may not be defined.
 
 =head2 heading
 
@@ -324,7 +324,7 @@ David Dick  C<< <ddick@cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2023, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
+Copyright (c) 2024, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic/perlartistic>.

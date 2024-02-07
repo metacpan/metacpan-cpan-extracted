@@ -1,0 +1,54 @@
+---
+abstract: 'A credentials store in mojo'
+author:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+build_requires:
+  Encode: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Mojolicious::Lite: '0'
+  Test::Mojo: '0'
+  Test::More: '0'
+  lib: '0'
+  perl: '5.020'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.020'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Credentials
+provides:
+  Mojolicious::Command::credentials:
+    file: lib/Mojolicious/Command/credentials.pm
+    version: '0.006'
+  Mojolicious::Plugin::Credentials:
+    file: lib/Mojolicious/Plugin/Credentials.pm
+    version: '0.006'
+requires:
+  Carp: '0'
+  Crypt::Credentials: '0.002'
+  Env: '0'
+  File::Slurper: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  Mojo::Base: '0'
+  Mojolicious: '7.51'
+  Text::ParseWords: '0'
+  YAML::PP: '0'
+  perl: '5.020'
+resources:
+  bugtracker: https://github.com/Leont/mojolicious-plugin-credentials/issues
+  repository: git://github.com/Leont/mojolicious-plugin-credentials.git
+version: '0.006'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

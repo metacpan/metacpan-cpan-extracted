@@ -93,8 +93,7 @@
 !     + source_depth_m
 !      print*,'8. read_immodpg_config.f,receiver_depth_m:',
 !     + receiver_depth_m
-!       print*,'9?. read_immodpg_config.f, reducing_vel_mps:',
-!     + reducing_vel_mps
+!        print*,'9. read_immodpg_config.f, reducing_vel_mps:',+ reducing_vel_mps
 !       print*, '10. read_immodpg_config.f, plot_min_x_m:',plot_min_x_m
 !       print*, '11. read_immodpg_config.f, plot_max_x_m:',plot_max_x_m
 !       print*, '12.read_immodpg_config.f, plot_min_t_s:',plot_min_t_s

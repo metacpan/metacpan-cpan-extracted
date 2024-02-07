@@ -3,7 +3,7 @@
 #
 #    perltidy - a perl script indenter and formatter
 #
-#    Copyright (c) 2000-2023 by Steve Hancock
+#    Copyright (c) 2000-2024 by Steve Hancock
 #    Distributed under the GPL license agreement; see file COPYING
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -82,6 +82,7 @@ use constant DEVEL_MODE   => 0;
 use constant DIAGNOSTICS  => 0;
 use constant EMPTY_STRING => q{};
 use constant SPACE        => q{ };
+use constant CONST_1024   => 1024;    # bytes per kb; 2**10
 
 use vars qw{
   $VERSION
@@ -98,7 +99,26 @@ use Encode::Guess;
 use IO::File;
 use File::Basename;
 use File::Copy;
-use File::Temp qw(tempfile);
+
+# perl stat function index names, based on
+#    https://perldoc.perl.org/functions/stat
+use constant {
+    _dev_     => 0,     # device number of filesystem
+    _ino_     => 1,     # inode number
+    _mode_    => 2,     # file mode  (type and permissions)
+    _nlink_   => 3,     # number of (hard) links to the file
+    _uid_     => 4,     # numeric user ID of file's owner
+    _gid_     => 5,     # numeric group ID of file's owner
+    _rdev_    => 6,     # the device identifier (special files only)
+    _size_    => 7,     # total size of file, in bytes
+    _atime_   => 8,     # last access time in seconds since the epoch
+    _mtime_   => 9,     # last modify time in seconds since the epoch
+    _ctime_   => 10,    # inode change time in seconds since the epoch (*)
+    _blksize_ => 11,    # preferred I/O size in bytes for interacting with
+                        # the file (may vary from file to file)
+    _blocks_  => 12,    # actual number of system-specific blocks allocated
+                        # on disk (often, but not always, 512 bytes each)
+};
 
 BEGIN {
 
@@ -111,7 +131,7 @@ BEGIN {
     # then the Release version must be bumped, and it is probably past time for
     # a release anyway.
 
-    $VERSION = '20230912';
+    $VERSION = '20240202';
 } ## end BEGIN
 
 sub DESTROY {
@@ -130,7 +150,7 @@ sub AUTOLOAD {
     print {*STDERR} <<EOM;
 ======================================================================
 Unexpected call to Autoload looking for sub $AUTOLOAD
-Called from package: '$pkg'  
+Called from package: '$pkg'
 Called from File '$fname'  at line '$lno'
 This error is probably due to a recent programming change
 ======================================================================
@@ -157,23 +177,29 @@ sub streamhandle {
     #                      (check for 'print' method for 'w' mode)
     #                      (check for 'getline' method for 'r' mode)
 
-    # An optional flag $is_encoded_data may be given, as follows:
-
-    # Case 1. Any non-empty string: encoded data is being transferred, set
-    # encoding to be utf8 for files and for stdin.
-
-    # Case 2. Not given, or an empty string: unencoded binary data is being
-    # transferred, set binary mode for files and for stdin.
-
-    # NOTE: sub slurp_stream is now preferred for reading.
+    # An optional flag '$is_encoded_data' may be given, as follows:
+    # - true: encoded data is being transferred,
+    #    set encoding to be utf8 for files and for stdin.
+    # - false: unencoded binary data is being transferred,
+    #    set binary mode for files and for stdin.
 
     my ( $filename, $mode, $is_encoded_data ) = @_;
+
+    # Note: mode 'r' works but is no longer used.
+    # Use sub stream_slurp instead for mode 'r' (for efficiency).
+    if ( $mode ne 'w' && $mode ne 'W' ) {
+        if ( DEVEL_MODE || ( $mode ne 'r' && $mode ne 'R' ) ) {
+            Fault("streamhandle called in unexpected mode '$mode'\n");
+        }
+    }
 
     my $ref = ref($filename);
     my $New;
     my $fh;
 
+    #-------------------
     # handle a reference
+    #-------------------
     if ($ref) {
         if ( $ref eq 'ARRAY' ) {
             $New = sub { Perl::Tidy::IOScalarArray->new( $filename, $mode ) };
@@ -228,7 +254,9 @@ EOM
         }
     }
 
+    #----------------
     # handle a string
+    #----------------
     else {
         if ( $filename eq '-' ) {
             $New = sub { $mode eq 'w' ? *STDOUT : *STDIN }
@@ -237,41 +265,46 @@ EOM
             $New = sub { IO::File->new( $filename, $mode ) };
         }
     }
+
+    #--------------
+    # Open the file
+    #--------------
     $fh = $New->( $filename, $mode );
+
     if ( !$fh ) {
-
-        Warn("Couldn't open file:$filename in mode:$mode : $OS_ERROR\n");
-
+        Warn("Couldn't open file:'$filename' in mode:$mode : $OS_ERROR\n");
     }
+
+    #------------
+    # Set binmode
+    #------------
     else {
-
-        # Case 1: handle encoded data
-        if ($is_encoded_data) {
-            if ( ref($fh) eq 'IO::File' ) {
-                ## binmode object call not available in older perl versions
-                ## $fh->binmode(":raw:encoding(UTF-8)");
-                binmode $fh, ":raw:encoding(UTF-8)";
-            }
-            elsif ( $filename eq '-' ) {
-                binmode STDOUT, ":raw:encoding(UTF-8)";
-            }
-            else {
-                # shouldn't happen
-            }
+        if ( ref($fh) eq 'IO::File' ) {
+            ## binmode object call not available in older perl versions
+            ## $fh->binmode(":raw:encoding(UTF-8)");
+            if ($is_encoded_data) { binmode $fh, ":raw:encoding(UTF-8)"; }
+            else                  { binmode $fh }
         }
-
-        # Case 2: handle unencoded data
+        elsif ( $filename eq '-' ) {
+            if ($is_encoded_data) { binmode STDOUT, ":raw:encoding(UTF-8)"; }
+            else                  { binmode STDOUT }
+        }
         else {
-            if    ( ref($fh) eq 'IO::File' ) { binmode $fh }
-            elsif ( $filename eq '-' )       { binmode STDOUT }
-            else                             { }    # shouldn't happen
+
+            # shouldn't get here
+            if (DEVEL_MODE) {
+                my $ref_fh = ref($fh);
+                Fault(<<EOM);
+unexpected streamhandle state for file='$filename' mode='$mode' ref(fh)=$ref_fh
+EOM
+            }
         }
     }
 
-    return $fh, ( $ref or $filename );
+    return $fh;
 } ## end sub streamhandle
 
-sub slurp_stream {
+sub stream_slurp {
 
     my ($filename) = @_;
 
@@ -343,7 +376,7 @@ EOM
     }
 
     return $rinput_string;
-} ## end sub slurp_stream
+} ## end sub stream_slurp
 
 {    ## begin closure for sub catfile
 
@@ -508,6 +541,8 @@ sub perltidy {
 
     my %input_hash = @_;
 
+    # This is the main perltidy routine
+
     my %defaults = (
         argv                  => undef,
         destination           => undef,
@@ -634,10 +669,6 @@ EOM
     %input_hash = ( %defaults, %input_hash );
     my $argv               = $input_hash{'argv'};
     my $destination_stream = $input_hash{'destination'};
-    my $errorfile_stream   = $input_hash{'errorfile'};
-    my $logfile_stream     = $input_hash{'logfile'};
-    my $teefile_stream     = $input_hash{'teefile'};
-    my $debugfile_stream   = $input_hash{'debugfile'};
     my $perltidyrc_stream  = $input_hash{'perltidyrc'};
     my $source_stream      = $input_hash{'source'};
     my $stderr_stream      = $input_hash{'stderr'};
@@ -646,8 +677,7 @@ EOM
     my $postfilter         = $input_hash{'postfilter'};
 
     if ($stderr_stream) {
-        ( $fh_stderr, my $stderr_file ) =
-          Perl::Tidy::streamhandle( $stderr_stream, 'w' );
+        $fh_stderr = Perl::Tidy::streamhandle( $stderr_stream, 'w' );
         if ( !$fh_stderr ) {
             croak <<EOM;
 ------------------------------------------------------------------------
@@ -668,7 +698,7 @@ EOM
         my $flag = shift;
         if   ($flag) { goto ERROR_EXIT }
         else         { goto NORMAL_EXIT }
-        croak "unexpectd return to Exit";
+        croak "unexpected return to Exit";
     } ## end sub Exit
 
     sub Die {
@@ -727,7 +757,7 @@ EOM
             croak <<EOM;
 ------------------------------------------------------------------------
 Please check value of -dump_options_type in call to perltidy;
-saw: '$dump_options_type' 
+saw: '$dump_options_type'
 expecting: 'perltidyrc' or 'full'
 ------------------------------------------------------------------------
 EOM
@@ -771,7 +801,7 @@ EOM
             my ( $rargv_str, $msg ) = parse_args($argv);
             if ($msg) {
                 Die(<<EOM);
-Error parsing this string passed to to perltidy with 'argv': 
+Error parsing this string passed to to perltidy with 'argv':
 $msg
 EOM
             }
@@ -803,11 +833,17 @@ EOM
     }
     $self->[_file_extension_separator_] = $dot;
 
+    # save a copy of the last two input args for error checking later
+    my @ARGV_saved;
+    if ( @ARGV > 1 ) {
+        @ARGV_saved = ( $ARGV[-2], $ARGV[-1] );
+    }
+
     #-------------------------
     # get command line options
     #-------------------------
     my ( $rOpts, $config_file, $rraw_options, $roption_string,
-        $rexpansion, $roption_category, $roption_range )
+        $rexpansion, $roption_category, $roption_range, $rinteger_option_range )
       = process_command_line(
         $perltidyrc_stream,  $is_Windows, $Windows_type,
         $rpending_complaint, $dump_options_type,
@@ -880,22 +916,30 @@ EOM
         Exit(0);
     }
 
-    # --dump-block-summary requires one filename in the arg list.
-    # This is a safety precaution in case a user accidentally adds -dbs to the
-    # command line parameters and is expecting formatted output to stdout.
-    # Another precaution, added elsewhere, is to  ignore -dbs in a .perltidyrc
+    # some dump options require one filename in the arg list.  This is a safety
+    # precaution in case a user accidentally adds such an option to the command
+    # line parameters and is expecting formatted output to stdout.  Another
+    # precaution, added elsewhere, is to ignore these in a .perltidyrc
     my $num_files = @Arg_files;
-    if ( $rOpts->{'dump-block-summary'} && $num_files != 1 ) {
-        Die(<<EOM);
---dump-block-summary expects 1 filename in the arg list but saw $num_files filenames
+    foreach my $opt_name (
+        qw(
+        dump-block-summary
+        dump-unusual-variables
+        dump-mixed-call-parens
+        )
+      )
+    {
+        if ( $rOpts->{$opt_name} && $num_files != 1 ) {
+            Die(<<EOM);
+--$opt_name expects 1 filename in the arg list but saw $num_files filenames
 EOM
+        }
     }
 
     #----------------------------------------
     # check parameters and their interactions
     #----------------------------------------
-    $self->check_options( $is_Windows, $Windows_type, $rpending_complaint,
-        $num_files );
+    $self->check_options( $num_files, $rinteger_option_range );
 
     if ($user_formatter) {
         $rOpts->{'format'} = 'user';
@@ -934,6 +978,53 @@ EOM
     Perl::Tidy::VerticalAligner::check_options($rOpts);
     if ( $rOpts->{'format'} eq 'html' ) {
         Perl::Tidy::HtmlWriter->check_options($rOpts);
+    }
+
+    # Try to catch an unusual missing string parameter error, like this:
+    #    perltidy -wvt perltidy.pl
+    # The problem is that -wvt wants a string, so it grabs 'perltidy.pl'.
+    # Then there is no output filename, so input is assumed to be stdin.
+    # This make perltidy unexpectedly wait for input. To the user, it
+    # appears that perltidy has gone into an infinite loop. Issue c312.
+    # To avoid getting this far, it is best for parameters which take a
+    # string to check the strings in one of the 'check_options' subs, and
+    # exit if there is an obvious error. This has been done for -wvt,
+    # but are undoubtedly other parameters where this problem might occur.
+    if ( !$num_files && @ARGV_saved > 1 ) {
+        my $opt_test  = $ARGV_saved[-2];
+        my $file_test = $ARGV_saved[-1];
+        if (   $opt_test =~ s/^[-]+//
+            && $file_test !~ /^[-]/
+            && $file_test !~ /^\d+$/
+            && -e $file_test )
+        {
+
+            # These options can take filenames, so we will ignore them here
+            my %is_option_with_file_parameter;
+            my @qf = qw(outfile profile);
+            @is_option_with_file_parameter{@qf} = (1) x scalar(@qf);
+
+            # Expand an abbreviation into a long name
+            my $long_name;
+            my $exp = $rexpansion->{$opt_test};
+            if    ( !$exp )        { $long_name = $opt_test }
+            elsif ( @{$exp} == 1 ) { $long_name = $exp->[0] }
+            else                   { }
+
+            # If this arg grabbed the file, then it must take a string arg
+            if (   $long_name
+                && defined( $rOpts->{$long_name} )
+                && $rOpts->{$long_name} eq $file_test
+                && !$is_option_with_file_parameter{$long_name} )
+            {
+                Die(<<EOM);
+Stopping on possible missing string parameter for '-$opt_test':
+This parameter takes a string and has been set equal to file '$file_test',
+and formatted output will go to standard output. If this is actually correct,
+you can skip this message by entering this as '-$opt_test=$file_test'.
+EOM
+            }
+        }
     }
 
     # make the pattern of file extensions that we shouldn't touch
@@ -1015,23 +1106,23 @@ EOM
     # loop to process all files
     #--------------------------
     $self->process_all_files(
+        {
+            rinput_hash => \%input_hash,
+            rfiles      => \@Arg_files,
 
-        \%input_hash,
-        \@Arg_files,
+            # filename stuff...
+            source_stream             => $source_stream,
+            output_extension          => $output_extension,
+            forbidden_file_extensions => $forbidden_file_extensions,
+            in_place_modify           => $in_place_modify,
+            backup_extension          => $backup_extension,
+            delete_backup             => $delete_backup,
 
-        # filename stuff...
-        $source_stream,
-        $output_extension,
-        $forbidden_file_extensions,
-        $in_place_modify,
-        $backup_extension,
-        $delete_backup,
-
-        # logfile stuff...
-        $logfile_header,
-        $rpending_complaint,
-        $rpending_logfile_message,
-
+            # logfile stuff...
+            logfile_header           => $logfile_header,
+            rpending_complaint       => $rpending_complaint,
+            rpending_logfile_message => $rpending_logfile_message,
+        }
     );
 
     #-----
@@ -1210,7 +1301,7 @@ sub backup_method_copy {
         $in_place_modify );
 
     # set the modification time of the copy to the original value (rt#145999)
-    my ( $read_time, $write_time ) = @input_file_stat[ 8, 9 ];
+    my ( $read_time, $write_time ) = @input_file_stat[ _atime_, _mtime_ ];
     if ( defined($write_time) ) {
         utime( $read_time, $write_time, $backup_file )
           || Warn("error setting times for backup file '$backup_file'\n");
@@ -1219,7 +1310,7 @@ sub backup_method_copy {
     # Open the original input file for writing ... opening with ">" will
     # truncate the existing data.
     open( my $fout, ">", $input_file )
-      || Die(
+      or Die(
 "problem re-opening $input_file for write for -b option; check file and directory permissions: $OS_ERROR\n"
       );
 
@@ -1357,13 +1448,13 @@ sub backup_method_move {
     }
 
     # Open a file with the original input file name for writing ...
-    my $is_encoded_data = $self->[_is_encoded_data_];
-    my ( $fout, $iname ) =
-      Perl::Tidy::streamhandle( $input_file, 'w', $is_encoded_data );
-    if ( !$fout ) {
-        Die(
+    open( my $fout, ">", $input_file )
+      or Die(
 "problem re-opening $input_file for write for -b option; check file and directory permissions: $OS_ERROR\n"
-        );
+      );
+
+    if ( $self->[_is_encoded_data_] ) {
+        binmode $fout, ":raw:encoding(UTF-8)";
     }
 
     # Now copy the formatted output to it..
@@ -1391,7 +1482,7 @@ EOM
         $in_place_modify );
 
     # Keep original modification time if no change (rt#145999)
-    my ( $read_time, $write_time ) = @input_file_stat[ 8, 9 ];
+    my ( $read_time, $write_time ) = @input_file_stat[ _atime_, _mtime_ ];
     if ( !$self->[_input_output_difference_] && defined($write_time) ) {
         utime( $read_time, $write_time, $input_file )
           || Warn("error setting times for '$input_file'\n");
@@ -1436,6 +1527,11 @@ EOM
 
 } ## end sub backup_method_move
 
+# masks for file permissions
+use constant OCT_777  => oct(777);     # All users (O+G+W) + r/w/x bits
+use constant OCT_7777 => oct(7777);    # Same + suid/sgid/sbit
+use constant OCT_600  => oct(600);     # Owner RW permission
+
 sub set_output_file_permissions {
 
     my ( $self, $output_file, $rinput_file_stat, $in_place_modify ) = @_;
@@ -1445,9 +1541,10 @@ sub set_output_file_permissions {
     #  $rinput_file_stat = the result of stat($input_file)
     #  $in_place_modify  = true if --backup-and-modify-in-place is set
 
-    my ( $mode_i, $uid_i, $gid_i ) = @{$rinput_file_stat}[ 2, 4, 5 ];
-    my ( $uid_o, $gid_o ) = ( stat($output_file) )[ 4, 5 ];
-    my $input_file_permissions  = $mode_i & oct(7777);
+    my ( $mode_i, $uid_i, $gid_i ) =
+      @{$rinput_file_stat}[ _mode_, _uid_, _gid_ ];
+    my ( $uid_o, $gid_o ) = ( stat($output_file) )[ _uid_, _gid_ ];
+    my $input_file_permissions  = $mode_i & OCT_7777;
     my $output_file_permissions = $input_file_permissions;
 
     #rt128477: avoid inconsistent owner/group and suid/sgid
@@ -1464,7 +1561,7 @@ sub set_output_file_permissions {
         else {
 
             # owner or group differ: do not copy suid and sgid
-            $output_file_permissions = $mode_i & oct(777);
+            $output_file_permissions = $mode_i & OCT_777;
             if ( $input_file_permissions != $output_file_permissions ) {
                 Warn(
 "Unable to copy setuid and/or setgid bits for output file '$output_file'\n"
@@ -1488,7 +1585,7 @@ sub set_output_file_permissions {
     # assumption that a previous backup can be unlinked even if
     # not writable.
     if ( !$in_place_modify ) {
-        $output_file_permissions |= oct(600);
+        $output_file_permissions |= OCT_600;
     }
 
     if ( !chmod( $output_file_permissions, $output_file ) ) {
@@ -1503,7 +1600,7 @@ sub set_output_file_permissions {
 } ## end sub set_output_file_permissions
 
 sub get_decoded_string_buffer {
-    my ( $self, $input_file, $display_name, $rpending_logfile_message ) = @_;
+    my ( $self, $input_file, $display_name ) = @_;
 
     # Decode the input buffer if necessary or requested
 
@@ -1524,8 +1621,34 @@ sub get_decoded_string_buffer {
 
     my $rOpts = $self->[_rOpts_];
 
-    my $rinput_string = slurp_stream($input_file);
+    my $rinput_string = stream_slurp($input_file);
     return unless ( defined($rinput_string) );
+
+    # Note that we could have a zero size input string here if it
+    # arrived from standard input or from a string ref. For example
+    # 'perltidy <null.pl'.  If we issue a warning and stop, as we would
+    # for a zero length file ('perltidy null.pl'), then we could cause
+    # a call to the perltidy module to misbehave as a filter. So we will
+    # process this as any other file in this case without any warning (c286).
+    if ( !length( ${$rinput_string} ) ) {
+
+        # zero length, but keep going
+    }
+
+    # Check size of strings arriving from the standard input. These
+    # could not be checked until now.
+    if ( $input_file eq '-' ) {
+        my $size_in_mb =
+          length( ${$rinput_string} ) / ( CONST_1024 * CONST_1024 );
+        my $maximum_file_size_mb = $rOpts->{'maximum-file-size-mb'};
+        if ( $size_in_mb > $maximum_file_size_mb ) {
+            $size_in_mb = sprintf( "%0.1f", $size_in_mb );
+            Warn(
+"skipping file: <stdin>: size $size_in_mb MB exceeds limit $maximum_file_size_mb; use -maxfs=i to change\n"
+            );
+            return;
+        }
+    }
 
     $rinput_string = $self->set_line_separator($rinput_string);
 
@@ -1722,7 +1845,7 @@ BEGIN {
 
 sub get_line_separator_default {
 
-    my ( $rOpts, $input_file ) = @_;
+    my ($rOpts) = @_;
 
     # Get the line separator that will apply unless overridden by a
     # --preserve-line-endings flag for a specific file
@@ -1774,7 +1897,7 @@ sub set_line_separator {
 
     # Limit the search to a reasonable number of characters, in case we
     # have a weird file
-    my $str = substr( ${$rinput_string}, 0, 1024 );
+    my $str = substr( ${$rinput_string}, 0, CONST_1024 );
     if ($str) {
 
         if ( $str =~ m/(($CR|$LF)+)/ ) {
@@ -1804,28 +1927,44 @@ sub set_line_separator {
         else { }
     }
 
-    # Now change the line separator if requested
     if ( defined($input_line_separator) ) {
 
+        # Remember the input line separator if needed
         if ( $rOpts->{'preserve-line-endings'} ) {
             $line_separator = $input_line_separator;
         }
 
-        # patch to read raw mac files under unix, dos
-        if ( $input_line_separator ne "\n" && $input_line_separator eq $CR ) {
-
-            # if this file is currently a single line ..
+        # Convert line endings to "\n" for processing if necessary.
+        if ( $input_line_separator ne "\n" ) {
             my @lines = split /^/, ${$rinput_string};
-            if ( @lines == 1 ) {
 
-                # and becomes multiple lines with the change ..
-                @lines = map { $_ . "\n" } split /$CR/, ${$rinput_string};
-                if ( @lines > 1 ) {
+            # try to convert CR to \n
+            if ( $input_line_separator eq $CR ) {
 
-                    # then make the change
-                    my $buf = join EMPTY_STRING, @lines;
-                    $rinput_string = \$buf;
+                # if this file is currently a single line ..
+                if ( @lines == 1 ) {
+
+                    # and becomes multiple lines with the change ..
+                    @lines = map { $_ . "\n" } split /$CR/, ${$rinput_string};
+                    if ( @lines > 1 ) {
+
+                        # then make the change
+                        my $buf = join EMPTY_STRING, @lines;
+                        $rinput_string = \$buf;
+                    }
                 }
+            }
+
+            # convert CR-LF to LF
+            elsif ( ( $input_line_separator eq $CRLF ) && ( "\n" eq $LF ) ) {
+                foreach my $line (@lines) { $line =~ s/$CRLF$/\n/ }
+                my $buf = join EMPTY_STRING, @lines;
+                $rinput_string = \$buf;
+            }
+
+            # unknown line ending scheme - leave it alone and let the tokenizer
+            # deal with it
+            else {
             }
         }
     }
@@ -1837,24 +1976,19 @@ sub set_line_separator {
 
 sub process_all_files {
 
-    my (
+    my ( $self, $rcall_hash ) = @_;
 
-        $self,
-        $rinput_hash,
-        $rfiles,
-
-        $source_stream,
-        $output_extension,
-        $forbidden_file_extensions,
-        $in_place_modify,
-        $backup_extension,
-        $delete_backup,
-
-        $logfile_header,
-        $rpending_complaint,
-        $rpending_logfile_message,
-
-    ) = @_;
+    my $rinput_hash               = $rcall_hash->{rinput_hash};
+    my $rfiles                    = $rcall_hash->{rfiles};
+    my $source_stream             = $rcall_hash->{source_stream};
+    my $output_extension          = $rcall_hash->{output_extension};
+    my $forbidden_file_extensions = $rcall_hash->{forbidden_file_extensions};
+    my $in_place_modify           = $rcall_hash->{in_place_modify};
+    my $backup_extension          = $rcall_hash->{backup_extension};
+    my $delete_backup             = $rcall_hash->{delete_backup};
+    my $logfile_header            = $rcall_hash->{logfile_header};
+    my $rpending_complaint        = $rcall_hash->{rpending_complaint};
+    my $rpending_logfile_message  = $rcall_hash->{rpending_logfile_message};
 
     # This routine is the main loop to process all files.
     # Total formatting is done with these layers of subroutines:
@@ -1873,7 +2007,6 @@ sub process_all_files {
     my $logfile_stream     = $rinput_hash->{'logfile'};
     my $teefile_stream     = $rinput_hash->{'teefile'};
     my $debugfile_stream   = $rinput_hash->{'debugfile'};
-    my $stderr_stream      = $rinput_hash->{'stderr'};
 
     my $number_of_files = @{$rfiles};
     while ( my $input_file = shift @{$rfiles} ) {
@@ -1955,11 +2088,12 @@ sub process_all_files {
             # And avoid formatting extremely large files. Since perltidy reads
             # files into memory, trying to process an extremely large file
             # could cause system problems.
-            my $size_in_mb = ( -s $input_file ) / ( 1024 * 1024 );
-            if ( $size_in_mb > $rOpts->{'maximum-file-size-mb'} ) {
+            my $size_in_mb = ( -s $input_file ) / ( CONST_1024 * CONST_1024 );
+            my $maximum_file_size_mb = $rOpts->{'maximum-file-size-mb'};
+            if ( $size_in_mb > $maximum_file_size_mb ) {
                 $size_in_mb = sprintf( "%0.1f", $size_in_mb );
                 Warn(
-"skipping file: $input_file: size $size_in_mb MB exceeds limit $rOpts->{'maximum-file-size-mb'}; use -mfs=i to change\n"
+"skipping file: $input_file: size $size_in_mb MB exceeds limit $maximum_file_size_mb; use -maxfs=i to change\n"
                 );
                 next;
             }
@@ -1976,8 +2110,9 @@ sub process_all_files {
             if ( $in_place_modify && !-w $input_file ) {
                 my $backup_method = $rOpts->{'backup-method'};
                 if ( defined($backup_method) && $backup_method eq 'copy' ) {
-                    Warn
-"skipping file '$input_file' for -b option: file reported as non-writable\n";
+                    Warn(
+"skipping file '$input_file' for -b option: file reported as non-writable\n"
+                    );
                     next;
                 }
             }
@@ -1997,7 +2132,7 @@ sub process_all_files {
                 my ( $base, $old_path ) = fileparse($fileroot);
                 my $new_path = $rOpts->{'output-path'};
                 if ( !-d $new_path ) {
-                    mkdir( $new_path, 0777 )
+                    mkdir($new_path)    # Default MODE is 0777
                       or
                       Die("unable to create directory $new_path: $OS_ERROR\n");
                 }
@@ -2035,8 +2170,7 @@ EOM
             $encoding_log_message,
             $length_function,
 
-        ) = $self->get_decoded_string_buffer( $input_file, $display_name,
-            $rpending_logfile_message );
+        ) = $self->get_decoded_string_buffer( $input_file, $display_name );
 
         # Skip this file on any error
         next if ( !defined($rinput_string) );
@@ -2199,14 +2333,14 @@ EOM
         if ( $rOpts->{'format'} eq 'tidy' && defined($routput_string) ) {
 
             $self->write_tidy_output(
-
-                $routput_string,
-
-                \@input_file_stat,
-                $in_place_modify,
-                $input_file,
-                $backup_extension,
-                $delete_backup,
+                {
+                    routput_string   => $routput_string,
+                    rinput_file_stat => \@input_file_stat,
+                    in_place_modify  => $in_place_modify,
+                    input_file       => $input_file,
+                    backup_extension => $backup_extension,
+                    delete_backup    => $delete_backup,
+                }
             );
         }
 
@@ -2221,17 +2355,14 @@ sub write_tidy_output {
 
     # Write tidied output in '$routput_string' to its final destination
 
-    my (
-        $self,
+    my ( $self, $rcall_hash ) = @_;
 
-        $routput_string,
-
-        $rinput_file_stat,
-        $in_place_modify,
-        $input_file,
-        $backup_extension,
-        $delete_backup,
-    ) = @_;
+    my $routput_string   = $rcall_hash->{routput_string};
+    my $rinput_file_stat = $rcall_hash->{rinput_file_stat};
+    my $in_place_modify  = $rcall_hash->{in_place_modify};
+    my $input_file       = $rcall_hash->{input_file};
+    my $backup_extension = $rcall_hash->{backup_extension};
+    my $delete_backup    = $rcall_hash->{delete_backup};
 
     my $rOpts           = $self->[_rOpts_];
     my $is_encoded_data = $self->[_is_encoded_data_];
@@ -2329,7 +2460,7 @@ sub write_tidy_output {
 
     return;
 
-} ## end sub write_tidied_output
+} ## end sub write_tidy_output
 
 sub process_filter_layer {
 
@@ -2374,9 +2505,8 @@ sub process_filter_layer {
         Fault("bad call: the source string ref is not SCALAR\n");
     }
 
-    my $rOpts           = $self->[_rOpts_];
-    my $is_encoded_data = $self->[_is_encoded_data_];
-    my $logger_object   = $self->[_logger_object_];
+    my $rOpts         = $self->[_rOpts_];
+    my $logger_object = $self->[_logger_object_];
 
     # vars for --line-range-tidy filter, if needed
     my @input_lines_pre;
@@ -2510,6 +2640,13 @@ EOM
         $routput_string = \$output_string;
     }
 
+    #-----------------------------------------
+    # handle a '--noadd-terminal-newline' flag
+    #-----------------------------------------
+    if ($chomp_terminal_newline) {
+        chomp ${$routput_string};
+    }
+
     #-------------------------------------------------------------
     # handle --preserve-line-endings or -output-line-endings flags
     #-------------------------------------------------------------
@@ -2520,29 +2657,30 @@ EOM
         my $line_separator = $self->[_line_separator_];
         my @output_lines   = split /^/, ${$routput_string};
         foreach my $line (@output_lines) {
-            chomp $line;
-            $line .= $line_separator;
+
+            # must check chomp because last line might not have a newline
+            # if --noadd-terminal-newline is also set (c283)
+            if ( chomp $line ) {
+                $line .= $line_separator;
+            }
         }
         my $output_string = join EMPTY_STRING, @output_lines;
         $routput_string = \$output_string;
     }
 
-    #-----------------------------------------
-    # handle a '--noadd-terminal-newline' flag
-    #-----------------------------------------
-    if ($chomp_terminal_newline) {
-        chomp ${$routput_string};
-    }
-
     return $routput_string;
-}
+} ## end sub process_filter_layer
+
+# For safety, set an upper bound on number of iterations before stopping.
+# The average number of iterations is 2. No known cases exceed 5.
+use constant ITERATION_LIMIT => 6;
 
 sub process_iteration_layer {
 
     my ( $self, $rinput_string ) = @_;
 
     # This is the iteration layer of processing.
-    # Do all formatting, iterating if requested, on the source string $buf.
+    # Do all formatting, iterating if requested, on the source $rinput_string
     # Output depends on format type:
     #   For 'tidy' formatting, output goes to sink object
     #   For 'html' formatting, output goes to the ultimate destination
@@ -2585,8 +2723,7 @@ sub process_iteration_layer {
     {
         $tee_file = $self->[_teefile_stream_]
           || $fileroot . $self->make_file_extension('TEE');
-        ( $fh_tee, my $tee_filename ) =
-          Perl::Tidy::streamhandle( $tee_file, 'w', $is_encoded_data );
+        $fh_tee = Perl::Tidy::streamhandle( $tee_file, 'w', $is_encoded_data );
         if ( !$fh_tee ) {
             Warn("couldn't open TEE file $tee_file: $OS_ERROR\n");
         }
@@ -2603,7 +2740,7 @@ sub process_iteration_layer {
         # check iteration count and quietly fix if necessary:
         # - iterations option only applies to code beautification mode
         # - the convergence check should stop most runs on iteration 2, and
-        #   virtually all on iteration 3.  But we'll allow up to 6.
+        #   virtually all on iteration 3.  We allow up to ITERATION_LIMIT.
         $max_iterations = $rOpts->{'iterations'};
         if ( !defined($max_iterations)
             || $max_iterations <= 0 )
@@ -2611,8 +2748,8 @@ sub process_iteration_layer {
             $max_iterations = 1;
         }
 
-        if ( $max_iterations > 6 ) {
-            $max_iterations = 6;
+        if ( $max_iterations > ITERATION_LIMIT ) {
+            $max_iterations = ITERATION_LIMIT;
         }
 
         # get starting MD5 sum for convergence test
@@ -2753,7 +2890,7 @@ sub process_iteration_layer {
             my $stopping_on_error = $stop_now;
             if ($stop_now) {
                 $convergence_log_message = <<EOM;
-Stopping iterations because of severe errors.                       
+Stopping iterations because of severe errors.
 EOM
             }
 
@@ -2782,7 +2919,7 @@ EOM
                         # them when they happen.
                         $rstatus->{'blinking'} = 1;
                         $convergence_log_message = <<EOM;
-BLINKER. Output for iteration $iter same as for $saw_md5{$digest}. 
+BLINKER. Output for iteration $iter same as for $saw_md5{$digest}.
 EOM
                         $stopping_on_error ||= $convergence_log_message;
                         DEVEL_MODE
@@ -2987,6 +3124,8 @@ EOM
 
 sub line_diff {
 
+    my ( $s1, $s2 ) = @_;
+
     # Given two strings, return
     # $diff_marker = a string with carat (^) symbols indicating differences
     # $pos1 = character position of first difference; pos1=-1 if no difference
@@ -2994,7 +3133,6 @@ sub line_diff {
     # Form exclusive or of the strings, which has null characters where strings
     # have same common characters so non-null characters indicate character
     # differences.
-    my ( $s1, $s2 ) = @_;
     my $diff_marker = EMPTY_STRING;
     my $pos         = -1;
     my $pos1        = $pos;
@@ -3018,15 +3156,16 @@ sub line_diff {
 
 sub compare_string_buffers {
 
+    my ( $rbufi, $rbufo ) = @_;
+
     # Compare input and output string buffers and return a brief text
     # description of the first difference.
-    my ( $rbufi, $rbufo ) = @_;
 
     my $leni = defined($rbufi) ? length( ${$rbufi} ) : 0;
     my $leno = defined($rbufo) ? length( ${$rbufo} ) : 0;
     my $msg =
       "Input  file length is $leni chars\nOutput file length is $leno chars\n";
-    return $msg unless $leni && $leno;
+    return $msg unless ( $leni && $leno );
     my @aryi = split /^/, ${$rbufi};
     my @aryo = split /^/, ${$rbufo};
     my ( $linei,  $lineo );
@@ -3100,7 +3239,7 @@ EOM
         $msg .= <<EOM;
 <$counti:$linei
 >$counto:$lineo
-$line_diff 
+$line_diff
 EOM
         return $msg;
     } ## end while
@@ -3153,7 +3292,7 @@ sub make_logfile_header {
     $msg .= "Configuration and command line parameters for this run:\n";
     $msg .= "$options_string\n";
 
-    if ( $rOpts->{'DEBUG'} || $rOpts->{'show-options'} ) {
+    if ( $rOpts->{'show-options'} ) {
         $rOpts->{'logfile'} = 1;    # force logfile to be saved
         $msg .= "Final parameter set for this run\n";
         $msg .= "------------------------------------\n";
@@ -3177,7 +3316,7 @@ sub generate_options {
     #  %option_range - a hash giving the valid ranges of certain options
 
     # Note: a few options are not documented in the man page and usage
-    # message. This is because these are depricated, experimental or debug
+    # message. This is because these are deprecated, experimental or debug
     # options and may or may not be retained in future versions:
 
     # These undocumented flags are accepted but not used:
@@ -3209,6 +3348,7 @@ sub generate_options {
     my %option_category = ();
     my %option_range    = ();
     my $rexpansion      = \%expansion;
+    my %integer_option_range;
 
     # names of categories in manual
     # leading integers will allow sorting
@@ -3398,12 +3538,15 @@ sub generate_options {
     $add_option->( 'want-right-space',                          'wrs',   '=s' );
     $add_option->( 'want-trailing-commas',                      'wtc',   '=s' );
     $add_option->( 'space-prototype-paren',                     'spp',   '=i' );
+    $add_option->( 'space-signature-paren',                     'ssp',   '=i' );
     $add_option->( 'valign-code',                               'vc',    '!' );
     $add_option->( 'valign-block-comments',                     'vbc',   '!' );
     $add_option->( 'valign-side-comments',                      'vsc',   '!' );
     $add_option->( 'valign-exclusion-list',                     'vxl',   '=s' );
     $add_option->( 'valign-inclusion-list',                     'vil',   '=s' );
     $add_option->( 'valign-if-unless',                          'viu',   '!' );
+    $add_option->( 'valign-signed-numbers',                     'vsn',   '!' );
+    $add_option->( 'valign-signed-numbers-limit',               'vsnl',  '=i' );
     $add_option->( 'extended-block-tightness',                  'xbt',   '!' );
     $add_option->( 'extended-block-tightness-list',             'xbtl',  '=s' );
 
@@ -3475,25 +3618,29 @@ sub generate_options {
     $add_option->( 'stack-opening-hash-brace',                'sohb',  '!' );
     $add_option->( 'stack-opening-paren',                     'sop',   '!' );
     $add_option->( 'stack-opening-square-bracket',            'sosb',  '!' );
-    $add_option->( 'vertical-tightness',                      'vt',    '=i' );
-    $add_option->( 'vertical-tightness-closing',              'vtc',   '=i' );
-    $add_option->( 'want-break-after',                        'wba',   '=s' );
-    $add_option->( 'want-break-before',                       'wbb',   '=s' );
-    $add_option->( 'break-after-all-operators',               'baao',  '!' );
-    $add_option->( 'break-before-all-operators',              'bbao',  '!' );
-    $add_option->( 'keep-interior-semicolons',                'kis',   '!' );
-    $add_option->( 'one-line-block-semicolons',               'olbs',  '=i' );
-    $add_option->( 'one-line-block-nesting',                  'olbn',  '=i' );
-    $add_option->( 'one-line-block-exclusion-list',           'olbxl', '=s' );
-    $add_option->( 'break-before-hash-brace',                 'bbhb',  '=i' );
-    $add_option->( 'break-before-hash-brace-and-indent',      'bbhbi', '=i' );
-    $add_option->( 'break-before-square-bracket',             'bbsb',  '=i' );
-    $add_option->( 'break-before-square-bracket-and-indent',  'bbsbi', '=i' );
-    $add_option->( 'break-before-paren',                      'bbp',   '=i' );
-    $add_option->( 'break-before-paren-and-indent',           'bbpi',  '=i' );
-    $add_option->( 'brace-left-list',                         'bll',   '=s' );
-    $add_option->( 'brace-left-exclusion-list',               'blxl',  '=s' );
-    $add_option->( 'break-after-labels',                      'bal',   '=i' );
+
+    # FIXME: --vt and --vtc are actually expansions now, so these two lines
+    # should eventually be removed.
+    $add_option->( 'vertical-tightness',         'vt',  '=i' );
+    $add_option->( 'vertical-tightness-closing', 'vtc', '=i' );
+
+    $add_option->( 'want-break-after',                       'wba',   '=s' );
+    $add_option->( 'want-break-before',                      'wbb',   '=s' );
+    $add_option->( 'break-after-all-operators',              'baao',  '!' );
+    $add_option->( 'break-before-all-operators',             'bbao',  '!' );
+    $add_option->( 'keep-interior-semicolons',               'kis',   '!' );
+    $add_option->( 'one-line-block-semicolons',              'olbs',  '=i' );
+    $add_option->( 'one-line-block-nesting',                 'olbn',  '=i' );
+    $add_option->( 'one-line-block-exclusion-list',          'olbxl', '=s' );
+    $add_option->( 'break-before-hash-brace',                'bbhb',  '=i' );
+    $add_option->( 'break-before-hash-brace-and-indent',     'bbhbi', '=i' );
+    $add_option->( 'break-before-square-bracket',            'bbsb',  '=i' );
+    $add_option->( 'break-before-square-bracket-and-indent', 'bbsbi', '=i' );
+    $add_option->( 'break-before-paren',                     'bbp',   '=i' );
+    $add_option->( 'break-before-paren-and-indent',          'bbpi',  '=i' );
+    $add_option->( 'brace-left-list',                        'bll',   '=s' );
+    $add_option->( 'brace-left-exclusion-list',              'blxl',  '=s' );
+    $add_option->( 'break-after-labels',                     'bal',   '=i' );
 
     # This was an experiment mentioned in git #78, originally named -bopl. I
     # expanded it to also open logical blocks, based on git discussion #100,
@@ -3562,6 +3709,10 @@ sub generate_options {
     $add_option->( 'look-for-hash-bang',           'x',    '!' );
     $add_option->( 'look-for-selfloader',          'lsl',  '!' );
     $add_option->( 'pass-version-line',            'pvl',  '!' );
+    $add_option->( 'warn-variable-types',          'wvt',  '=s' );
+    $add_option->( 'warn-variable-exclusion-list', 'wvxl', '=s' );
+    $add_option->( 'want-call-parens',             'wcp',  '=s' );
+    $add_option->( 'nowant-call-parens',           'nwcp', '=s' );
 
     ########################################
     $category = 13;    # Debugging
@@ -3572,11 +3723,14 @@ sub generate_options {
     $add_option->( 'dump-block-types',                'dbt',   '=s' );
     $add_option->( 'dump-cuddled-block-list',         'dcbl',  '!' );
     $add_option->( 'dump-defaults',                   'ddf',   '!' );
+    $add_option->( 'dump-integer-option-range',       'dior',  '!' );
     $add_option->( 'dump-long-names',                 'dln',   '!' );
+    $add_option->( 'dump-mixed-call-parens',          'dmcp',  '!' );
     $add_option->( 'dump-options',                    'dop',   '!' );
     $add_option->( 'dump-profile',                    'dpro',  '!' );
     $add_option->( 'dump-short-names',                'dsn',   '!' );
     $add_option->( 'dump-token-types',                'dtt',   '!' );
+    $add_option->( 'dump-unusual-variables',          'duv',   '!' );
     $add_option->( 'dump-want-left-space',            'dwls',  '!' );
     $add_option->( 'dump-want-right-space',           'dwrs',  '!' );
     $add_option->( 'experimental',                    'exp',   '=s' );
@@ -3591,6 +3745,7 @@ sub generate_options {
     $add_option->( 'maximum-file-size-mb',            'maxfs', '=i' );
     $add_option->( 'maximum-level-errors',            'maxle', '=i' );
     $add_option->( 'maximum-unexpected-errors',       'maxue', '=i' );
+    $add_option->( 'integer-range-check',             'irc',   '=i' );
 
     #---------------------------------------------------------------------
 
@@ -3618,59 +3773,6 @@ sub generate_options {
             $option_category{$long_name} = $category_name[$category];
         }
     }
-
-    #---------------------------------------
-    # Assign valid ranges to certain options
-    #---------------------------------------
-    # In the future, these may be used to make preliminary checks
-    # hash keys are long names
-    # If key or value is undefined:
-    #   strings may have any value
-    #   integer ranges are >=0
-    # If value is defined:
-    #   value is [qw(any valid words)] for strings
-    #   value is [min, max] for integers
-    #   if min is undefined, there is no lower limit
-    #   if max is undefined, there is no upper limit
-    # Parameters not listed here have defaults
-    %option_range = (
-        'format'                        => [ 'tidy', 'html', 'user' ],
-        'output-line-ending'            => [ 'dos',  'win',  'mac', 'unix' ],
-        'space-backslash-quote'         => [ 0,      2 ],
-        'block-brace-tightness'         => [ 0,      2 ],
-        'keyword-paren-inner-tightness' => [ 0,      2 ],
-        'brace-tightness'               => [ 0,      2 ],
-        'paren-tightness'               => [ 0,      2 ],
-        'square-bracket-tightness'      => [ 0,      2 ],
-
-        'block-brace-vertical-tightness'            => [ 0, 2 ],
-        'brace-follower-vertical-tightness'         => [ 0, 2 ],
-        'brace-vertical-tightness'                  => [ 0, 2 ],
-        'brace-vertical-tightness-closing'          => [ 0, 2 ],
-        'paren-vertical-tightness'                  => [ 0, 2 ],
-        'paren-vertical-tightness-closing'          => [ 0, 2 ],
-        'square-bracket-vertical-tightness'         => [ 0, 2 ],
-        'square-bracket-vertical-tightness-closing' => [ 0, 2 ],
-        'vertical-tightness'                        => [ 0, 2 ],
-        'vertical-tightness-closing'                => [ 0, 2 ],
-
-        'closing-brace-indentation'          => [ 0, 3 ],
-        'closing-paren-indentation'          => [ 0, 3 ],
-        'closing-square-bracket-indentation' => [ 0, 3 ],
-        'closing-token-indentation'          => [ 0, 3 ],
-
-        'closing-side-comment-else-flag' => [ 0, 2 ],
-        'comma-arrow-breakpoints'        => [ 0, 5 ],
-
-        'keyword-group-blanks-before' => [ 0, 2 ],
-        'keyword-group-blanks-after'  => [ 0, 2 ],
-
-        'space-prototype-paren' => [ 0, 2 ],
-        'break-after-labels'    => [ 0, 2 ],
-    );
-
-    # Note: we could actually allow negative ci if someone really wants it:
-    # $option_range{'continuation-indentation'} = [ undef, undef ];
 
     #------------------------------------------------------------------
     # DEFAULTS: Assign default values to the above options here, except
@@ -3735,6 +3837,7 @@ sub generate_options {
       hanging-side-comments
       indent-block-comments
       indent-columns=4
+      integer-range-check=2
       iterations=1
       keep-old-blank-lines=1
       keyword-paren-inner-tightness=1
@@ -3776,10 +3879,12 @@ sub generate_options {
       valign-code
       valign-block-comments
       valign-side-comments
+      valign-signed-numbers-limit=20
       short-concatenation-item-length=8
       space-for-semicolon
       space-backslash-quote=1
       space-prototype-paren=1
+      space-signature-paren=1
       square-bracket-tightness=1
       square-bracket-vertical-tightness-closing=0
       square-bracket-vertical-tightness=0
@@ -3793,10 +3898,217 @@ sub generate_options {
       format-skipping
       default-tabsize=8
 
+      whitespace-cycle=0
+      entab-leading-whitespace=0
+      blank-lines-before-closing-block=0
+      blank-lines-after-opening-block=0
+
       pod2html
       html-table-of-contents
       html-entities
     );
+
+    #---------------------------------------
+    # Assign valid ranges to certain options
+    #---------------------------------------
+    # In the future, these may be used to make preliminary checks
+    # hash keys are long names
+    # If key or value is undefined:
+    #   strings may have any value
+    #   integer ranges are >=0
+    # If value is defined:
+    #   value is [qw(any valid words)] for strings
+    #   value is [min, max] for integers
+    #   if min is undefined, there is no lower limit
+    #   if max is undefined, there is no upper limit
+    # Parameters not listed here have defaults
+    %option_range = (
+        'format'                        => [ 'tidy', 'html', 'user' ],
+        'output-line-ending'            => [ 'dos',  'win',  'mac', 'unix' ],
+        'space-backslash-quote'         => [ 0,      2 ],
+        'block-brace-tightness'         => [ 0,      2 ],
+        'keyword-paren-inner-tightness' => [ 0,      2 ],
+        'brace-tightness'               => [ 0,      2 ],
+        'paren-tightness'               => [ 0,      2 ],
+        'square-bracket-tightness'      => [ 0,      2 ],
+
+        'block-brace-vertical-tightness'            => [ 0, 2 ],
+        'brace-follower-vertical-tightness'         => [ 0, 2 ],
+        'brace-vertical-tightness'                  => [ 0, 2 ],
+        'brace-vertical-tightness-closing'          => [ 0, 3 ],
+        'paren-vertical-tightness'                  => [ 0, 2 ],
+        'paren-vertical-tightness-closing'          => [ 0, 3 ],
+        'square-bracket-vertical-tightness'         => [ 0, 2 ],
+        'square-bracket-vertical-tightness-closing' => [ 0, 3 ],
+        'vertical-tightness'                        => [ 0, 2 ],
+        'vertical-tightness-closing'                => [ 0, 3 ],
+
+        'closing-brace-indentation'          => [ 0, 3 ],
+        'closing-paren-indentation'          => [ 0, 3 ],
+        'closing-square-bracket-indentation' => [ 0, 3 ],
+        'closing-token-indentation'          => [ 0, 3 ],
+
+        'closing-side-comment-else-flag' => [ 0, 2 ],
+        'comma-arrow-breakpoints'        => [ 0, 5 ],
+
+        'keyword-group-blanks-before' => [ 0, 2 ],
+        'keyword-group-blanks-after'  => [ 0, 2 ],
+
+        'space-prototype-paren' => [ 0, 2 ],
+        'space-signature-paren' => [ 0, 2 ],
+        'break-after-labels'    => [ 0, 2 ],
+    );
+
+    # Valid [min,max] ranges of all integer options (type '=i').  This hash is
+    # replacing %option_range, above, for use by sub 'check_options'
+    %integer_option_range = (
+        'blank-lines-after-opening-block'           => [ 0, undef ],
+        'blank-lines-before-closing-block'          => [ 0, undef ],
+        'blank-lines-before-packages'               => [ 0, undef ],
+        'blank-lines-before-subs'                   => [ 0, undef ],
+        'block-brace-tightness'                     => [ 0, 2 ],
+        'block-brace-vertical-tightness'            => [ 0, 2 ],
+        'brace-follower-vertical-tightness'         => [ 0, 2 ],
+        'brace-tightness'                           => [ 0, 2 ],
+        'brace-vertical-tightness'                  => [ 0, 2 ],
+        'brace-vertical-tightness-closing'          => [ 0, 3 ],
+        'break-after-labels'                        => [ 0, 2 ],
+        'break-before-hash-brace'                   => [ 0, 3 ],
+        'break-before-hash-brace-and-indent'        => [ 0, 2 ],
+        'break-before-paren'                        => [ 0, 3 ],
+        'break-before-paren-and-indent'             => [ 0, 2 ],
+        'break-before-square-bracket'               => [ 0, 3 ],
+        'break-before-square-bracket-and-indent'    => [ 0, 2 ],
+        'closing-brace-indentation'                 => [ 0, 3 ],
+        'closing-paren-indentation'                 => [ 0, 3 ],
+        'closing-side-comment-else-flag'            => [ 0, 2 ],
+        'closing-side-comment-interval'             => [ 0, undef ],
+        'closing-side-comment-maximum-text'         => [ 0, undef ],
+        'closing-square-bracket-indentation'        => [ 0, 3 ],
+        'closing-token-indentation'                 => [ 0, 3 ],
+        'comma-arrow-breakpoints'                   => [ 0, 5 ],
+        'continuation-indentation'                  => [ 0, undef ],
+        'cuddled-break-option'                      => [ 0, 2 ],
+        'default-tabsize'                           => [ 0, undef ],
+        'dump-block-minimum-lines'                  => [ 0, undef ],
+        'entab-leading-whitespace'                  => [ 0, undef ],
+        'fixed-position-side-comment'               => [ 0, undef ],
+        'indent-columns'                            => [ 0, undef ],
+        'integer-range-check'                       => [ 0, 3 ],
+        'iterations'                                => [ 0, undef ],
+        'keep-old-blank-lines'                      => [ 0, 2 ],
+        'keyword-group-blanks-after'                => [ 0, 2 ],
+        'keyword-group-blanks-before'               => [ 0, 2 ],
+        'keyword-group-blanks-repeat-count'         => [ 0, undef ],
+        'keyword-paren-inner-tightness'             => [ 0, 2 ],
+        'long-block-line-count'                     => [ 0, undef ],
+        'maximum-consecutive-blank-lines'           => [ 0, undef ],
+        'maximum-fields-per-table'                  => [ 0, undef ],
+        'maximum-file-size-mb'                      => [ 0, undef ],
+        'maximum-level-errors'                      => [ 0, undef ],
+        'maximum-line-length'                       => [ 0, undef ],
+        'maximum-unexpected-errors'                 => [ 0, undef ],
+        'minimum-space-to-comment'                  => [ 0, undef ],
+        'one-line-block-nesting'                    => [ 0, 1 ],
+        'one-line-block-semicolons'                 => [ 0, 2 ],
+        'paren-tightness'                           => [ 0, 2 ],
+        'paren-vertical-tightness'                  => [ 0, 2 ],
+        'paren-vertical-tightness-closing'          => [ 0, 3 ],
+        'short-concatenation-item-length'           => [ 0, undef ],
+        'space-backslash-quote'                     => [ 0, 2 ],
+        'space-prototype-paren'                     => [ 0, 2 ],
+        'space-signature-paren'                     => [ 0, 2 ],
+        'square-bracket-tightness'                  => [ 0, 2 ],
+        'square-bracket-vertical-tightness'         => [ 0, 2 ],
+        'square-bracket-vertical-tightness-closing' => [ 0, 3 ],
+        'starting-indentation-level'                => [ 0, undef ],
+        'vertical-tightness'                        => [ 0, 2 ],
+        'vertical-tightness-closing'                => [ 0, 3 ],
+        'valign-signed-numbers-limit'               => [ 0, undef ],
+        'whitespace-cycle'                          => [ 0, undef ],
+    );
+
+    # Enter default values into the integer option range table
+    foreach my $opt (@defaults) {
+        if ( $opt =~ /^(.*)=(\d+)$/ ) {
+            my $key = $1;
+            my $def = $2;
+            if ( defined( $integer_option_range{$key} ) ) {
+                $integer_option_range{$key}[2] = $def;
+            }
+        }
+    }
+
+    # Enter special values which have undef as the default.
+    # Note that cti, vt, and vtc are aliases which are included to work
+    # around an old problem with msdos (see note in check_options).
+    foreach my $key (
+        qw(
+        closing-token-indentation
+        vertical-tightness
+        vertical-tightness-closing
+        fixed-position-side-comment
+        starting-indentation-level
+        )
+      )
+    {
+        if ( defined( $integer_option_range{$key} )
+            && @{ $integer_option_range{$key} } < 3 )
+        {
+            $integer_option_range{$key}[2] = undef;
+        }
+    }
+
+    # Verify that only integers of type =i are in the above list during
+    # development. This will guard against spelling errors.
+    if (DEVEL_MODE) {
+        my %option_flag;
+        my $msg = EMPTY_STRING;
+        foreach my $opt (@option_string) {
+            my $key  = $opt;
+            my $flag = EMPTY_STRING;
+            if ( $key =~ /(.*)(!|=.*|:.*)$/ ) {
+                $key  = $1;
+                $flag = $2;
+            }
+            $option_flag{$key} = $flag;
+        }
+
+        # Be sure all keys of %integer_option_range have option type '=i'
+        foreach my $opt ( keys %integer_option_range ) {
+            my $flag = $option_flag{$opt};
+            if ( !defined($flag) ) { $flag = EMPTY_STRING }
+            if ( $flag ne '=i' ) {
+
+                # If this fault occurs, one of the items in the previous hash
+                # is not type =i, possibly due to incorrect spelling.
+                $msg .=
+"Option '$opt' has an entry in '%integer_option_range' but is not an integer\n";
+            }
+        }
+
+        # Be sure all '=i' options are in %integer_option_range. This is not
+        # strictly necessary but helps insure that nothing was missed.
+        foreach my $opt ( keys %option_flag ) {
+            my $flag = $option_flag{$opt};
+            next if ( $flag ne '=i' );
+            if ( !defined( $integer_option_range{$opt} ) ) {
+                $msg .=
+"Integer option '$opt' is needs an entry in '%integer_option_range'\n";
+            }
+        }
+
+        # look for integer options without default values
+        foreach my $opt ( keys %integer_option_range ) {
+            if ( @{ $integer_option_range{$opt} } < 3 ) {
+                $msg .= "Integer option '$opt' does not have a default value\n";
+            }
+        }
+
+        if ($msg) {
+            Fault($msg);
+        }
+    }
 
     #-----------------------------------------------------------------------
     # Define abbreviations which will be expanded into the above primitives.
@@ -4019,12 +4331,12 @@ q(wbb=% + - * / x != == >= <= =~ !~ < > | & = **= += *= &= <<= &&= -= /= |= >>= 
 
     # Uncomment next line to dump all expansions for debugging:
     # dump_short_names(\%expansion);
-    return (
-        \@option_string,   \@defaults, \%expansion,
-        \%option_category, \%option_range
-    );
+    return ( \@option_string, \@defaults, \%expansion, \%option_category,
+        \%option_range, \%integer_option_range, );
 
 } ## end sub generate_options
+
+{ #<<< closure process_command_line
 
 # Memoize process_command_line. Given same @ARGV passed in, return same
 # values and same @ARGV back.
@@ -4060,6 +4372,7 @@ sub process_command_line {
         return _process_command_line(@q);
     }
 } ## end sub process_command_line
+} ## end closure process_command_line
 
 # (note the underscore here)
 sub _process_command_line {
@@ -4084,10 +4397,9 @@ sub _process_command_line {
     }
     else { $glc = undef }
 
-    my (
-        $roption_string,   $rdefaults, $rexpansion,
-        $roption_category, $roption_range
-    ) = generate_options();
+    my ( $roption_string, $rdefaults, $rexpansion,
+        $roption_category, $roption_range, $rinteger_option_range, )
+      = generate_options();
 
     #--------------------------------------------------------------
     # set the defaults by passing the above list through GetOptions
@@ -4172,6 +4484,10 @@ sub _process_command_line {
             dump_defaults( @{$rdefaults} );
             Exit(0);
         }
+        elsif ( $i =~ /^-(dump-integer-option-range|dior)$/ ) {
+            dump_integer_option_range($rinteger_option_range);
+            Exit(0);
+        }
         elsif ( $i =~ /^-(dump-long-names|dln)$/ ) {
             dump_long_names( @{$roption_string} );
             Exit(0);
@@ -4206,7 +4522,7 @@ sub _process_command_line {
             if ($config_file) {
                 Warn(<<EOM);
  Conflict: a perltidyrc configuration file was specified both as this
- perltidy call parameter: $perltidyrc_stream 
+ perltidy call parameter: $perltidyrc_stream
  and with this -profile=$config_file.
  Using -profile=$config_file.
 EOM
@@ -4227,7 +4543,7 @@ EOM
         # open any config file
         my $rconfig_string;
         if ($config_file) {
-            $rconfig_string = slurp_stream($config_file);
+            $rconfig_string = stream_slurp($config_file);
             if ( !defined($rconfig_string) ) {
                 ${$rconfig_file_chatter} .=
                   "# $config_file exists but cannot be opened\n";
@@ -4291,6 +4607,7 @@ EOM
                     qw{
                     dump-cuddled-block-list
                     dump-defaults
+                    dump-integer-option_range
                     dump-long-names
                     dump-options
                     dump-profile
@@ -4299,6 +4616,8 @@ EOM
                     dump-want-left-space
                     dump-want-right-space
                     dump-block-summary
+                    dump-unusual-variables
+                    dump-mixed-call-parens
                     help
                     stylesheet
                     version
@@ -4334,7 +4653,8 @@ EOM
     }
 
     return ( \%Opts, $config_file, \@raw_options, $roption_string,
-        $rexpansion, $roption_category, $roption_range );
+        $rexpansion, $roption_category, $roption_range,
+        $rinteger_option_range );
 } ## end sub _process_command_line
 
 sub make_grep_alias_string {
@@ -4447,10 +4767,16 @@ sub cleanup_word_list {
 
 sub check_options {
 
-    my ( $self, $is_Windows, $Windows_type, $rpending_complaint, $num_files ) =
-      @_;
+    my ( $self, $num_files, $rinteger_option_range ) = @_;
 
-    # $num_files = number of files to be processed, for error checks
+    # Check options at a high level. Note that other modules have their
+    # own sub 'check_options' for lower level checking.
+
+    # Input parameters:
+    #  $num_files = the number of files to be processed in this call to
+    #     perltidy, needed for error checks.
+    #  $rinteger_option-range = hash with valid ranges of parameters which
+    #     take an integer
 
     my $rOpts = $self->[_rOpts_];
 
@@ -4467,12 +4793,65 @@ sub check_options {
 EOM
     }
 
-    # Since -vt, -vtc, and -cti are abbreviations, but under
+    my $integer_range_check = $rOpts->{'integer-range-check'};
+    if (   !defined($integer_range_check)
+        || $integer_range_check < 0
+        || $integer_range_check > 3 )
+    {
+        $integer_range_check = 2;
+    }
+
+    # Check for integer values out of bounds as follows:
+    #  $integer_range_check=
+    #    0 => skip check completely (for stress-testing perltidy only)
+    #    1 => quietly reset bad values to defaults
+    #    2 => issue warning and reset bad values defaults [DEFAULT]
+    #    3 => stop if any values are out of bounds
+    if ($integer_range_check) {
+        my $Error_message;
+        foreach my $opt ( keys %{$rinteger_option_range} ) {
+            my $range = $rinteger_option_range->{$opt};
+            next unless defined($range);
+            my ( $min, $max, $default ) = @{$range};
+
+            my $val = $rOpts->{$opt};
+            if ( defined($min) && defined($val) && $val < $min ) {
+                $Error_message .= "--$opt=$val but should be >= $min";
+                if ( $integer_range_check < 3 ) {
+                    $rOpts->{$opt} = $default;
+                    my $def = defined($default) ? $default : 'undef';
+                    $Error_message .= "; using default $def";
+                }
+                $Error_message .= "\n";
+            }
+            if ( defined($max) && defined($val) && $val > $max ) {
+                $Error_message .= "--$opt=$val but should be <= $max";
+                if ( $integer_range_check < 3 ) {
+                    $rOpts->{$opt} = $default;
+                    my $def = defined($default) ? $default : 'undef';
+                    $Error_message .= "; using default $def";
+                }
+                $Error_message .= "\n";
+            }
+        }
+        if ($Error_message) {
+            if ( $integer_range_check == 1 ) {
+                ## no warning
+            }
+            elsif ( $integer_range_check == 2 ) {
+                Warn($Error_message);
+            }
+            else {
+                Die($Error_message);
+            }
+        }
+    }
+
+    # Note that -vt, -vtc, and -cti are abbreviations. But under
     # msdos, an unquoted input parameter like vtc=1 will be
     # seen as 2 parameters, vtc and 1, so the abbreviations
     # won't be seen.  Therefore, we will catch them here if
     # they get through.
-
     if ( defined $rOpts->{'vertical-tightness'} ) {
         my $vt = $rOpts->{'vertical-tightness'};
         $rOpts->{'paren-vertical-tightness'}          = $vt;
@@ -4546,15 +4925,15 @@ EOM
 
         if ( $rOpts->{'opening-brace-on-new-line'} ) {
             Warn(<<EOM);
- Conflict: you specified both 'opening-brace-always-on-right' (-bar) and 
+ Conflict: you specified both 'opening-brace-always-on-right' (-bar) and
   'opening-brace-on-new-line' (-bl).  Ignoring -bl.
 EOM
             $rOpts->{'opening-brace-on-new-line'} = 0;
         }
         if ( $rOpts->{'brace-left-and-indent'} ) {
             Warn(<<EOM);
- Conflict: you specified both 'opening-brace-always-on-right' (-bar) and 
-  '--brace-left-and-indent' (-bli).  Ignoring -bli. 
+ Conflict: you specified both 'opening-brace-always-on-right' (-bar) and
+  '--brace-left-and-indent' (-bli).  Ignoring -bli.
 EOM
             $rOpts->{'brace-left-and-indent'} = 0;
         }
@@ -4798,7 +5177,7 @@ EOM
 
             if ($config_file) {
                 Die(<<"DIE");
-Please check your configuration file $config_file for circular-references. 
+Please check your configuration file $config_file for circular-references.
 To deactivate it, use -npro.
 DIE
             }
@@ -4819,7 +5198,7 @@ sub dump_short_names {
     print {*STDOUT} <<EOM;
 List of short names.  This list shows how all abbreviations are
 translated into other abbreviations and, eventually, into long names.
-New abbreviations may be defined in a .perltidyrc file.  
+New abbreviations may be defined in a .perltidyrc file.
 For a list of all long names, use perltidy --dump-long-names (-dln).
 --------------------------------------------------------------------------
 EOM
@@ -4856,7 +5235,7 @@ sub check_vms_filename {
               }{$1}x;
 
     # normalize filename, if there are no unescaped dots then append one
-    $base .= '.' unless $base =~ /(?:^|[^^])\./;
+    $base .= '.' unless ( $base =~ /(?:^|[^^])\./ );
 
     # if we don't already have an extension then we just append the extension
     my $separator = ( $base =~ /\.$/ ) ? EMPTY_STRING : "_";
@@ -4876,7 +5255,7 @@ sub Win_OS_Type {
 
     my $rpending_complaint = shift;
     my $os                 = EMPTY_STRING;
-    return $os unless $OSNAME =~ /win32|dos/i;    # is it a MS box?
+    return $os unless ( $OSNAME =~ /win32|dos/i );    # is it a MS box?
 
     # Systems built from Perl source may not have Win32.pm
     # But probably have Win32::GetOSVersion() anyway so the
@@ -4913,7 +5292,7 @@ sub Win_OS_Type {
             1  => "XP/.Net",
             2  => "Win2003",
             51 => "NT3.51",
-        }
+        },
     }->{$id}->{$minor};
 
     # If $os is undefined, the above code is out of date.  Suggested updates
@@ -5161,7 +5540,7 @@ sub read_config_file {
           strip_comment( $line, $config_file, $line_no );
         last if ($death_message);
         next unless $line;
-        $line =~ s/^\s*(.*?)\s*$/$1/;    # trim both ends
+        $line =~ s/^ \s+ | \s+ $//gx;    # trim both ends
         next unless $line;
 
         my $body = $line;
@@ -5170,8 +5549,8 @@ sub read_config_file {
         #     name { body }   or  name {   or    name { body
         # See rules in perltidy's perldoc page
         # Section: Other Controls - Creating a new abbreviation
-        if ( $line =~ /^((\w+)\s*\{)(.*)?$/ ) {
-            ( $name, $body ) = ( $2, $3 );
+        if ( $line =~ /^(?: (\w+) \s* \{ ) (.*)? $/x ) {
+            ( $name, $body ) = ( $1, $2 );
 
             # Cannot start new abbreviation unless old abbreviation is complete
             last if ($opening_brace_line);
@@ -5211,7 +5590,7 @@ sub read_config_file {
             }
         }
         else {
-            ## done
+            # no abbreviations to untangle
         }
 
         # Now store any parameters
@@ -5410,6 +5789,19 @@ EOM
     return;
 } ## end sub dump_long_names
 
+sub dump_integer_option_range {
+    my ($rinteger_option_range) = @_;
+    print {*STDOUT} "Option, min, max, default\n";
+    foreach my $key ( sort keys %{$rinteger_option_range} ) {
+        my ( $min, $max, $default ) = @{ $rinteger_option_range->{$key} };
+        foreach ( $min, $max, $default ) {
+            $_ = 'undef' unless defined($_);
+        }
+        print {*STDOUT} "$key, $min, $max, $default\n";
+    }
+    return;
+} ## end sub dump_integer_option_range
+
 sub dump_defaults {
     my @defaults = @_;
     print {*STDOUT} "Default command line options:\n";
@@ -5464,9 +5856,9 @@ sub readable_options {
 
 sub show_version {
     print {*STDOUT} <<"EOM";
-This is perltidy, v$VERSION 
+This is perltidy, v$VERSION
 
-Copyright 2000-2023, Steve Hancock
+Copyright 2000-2024, Steve Hancock
 
 Perltidy is free software and may be copied under the terms of the GNU
 General Public License, which is included in the distribution files.
@@ -5505,8 +5897,8 @@ I/O control
  -f      force perltidy to read a binary file
  -g      like -log but writes more detailed .LOG file, for debugging scripts
  -opt    write the set of options actually used to a .LOG file
- -npro   ignore .perltidyrc configuration command file 
- -pro=file   read configuration commands from file instead of .perltidyrc 
+ -npro   ignore .perltidyrc configuration command file
+ -pro=file   read configuration commands from file instead of .perltidyrc
  -st     send output to standard output, STDOUT
  -se     send all error output to standard error output, STDERR
  -v      display version number to standard output and quit
@@ -5530,11 +5922,11 @@ Whitespace Control
  -bbvtl=s  make -bbvt to apply to selected list of block types
  -pt=n   paren tightness (n=0, 1 or 2)
  -sbt=n  square bracket tightness (n=0, 1, or 2)
- -bvt=n  brace vertical tightness, 
+ -bvt=n  brace vertical tightness,
          n=(0=open, 1=close unless multiple steps on a line, 2=always close)
  -pvt=n  paren vertical tightness (see -bvt for n)
  -sbvt=n square bracket vertical tightness (see -bvt for n)
- -bvtc=n closing brace vertical tightness: 
+ -bvtc=n closing brace vertical tightness:
          n=(0=open, 1=sometimes close, 2=always close)
  -pvtc=n closing paren vertical tightness, see -bvtc for n.
  -sbvtc=n closing square bracket vertical tightness, see -bvtc for n.
@@ -5542,9 +5934,9 @@ Whitespace Control
  -lp     line up parentheses, brackets, and non-BLOCK braces
  -sfs    add space before semicolon in for( ; ; )
  -aws    allow perltidy to add whitespace (default)
- -dws    delete all old non-essential whitespace 
+ -dws    delete all old non-essential whitespace
  -icb    indent closing brace of a code block
- -cti=n  closing indentation of paren, square bracket, or non-block brace: 
+ -cti=n  closing indentation of paren, square bracket, or non-block brace:
          n=0 none, =1 align with opening, =2 one full indentation level
  -icp    equivalent to -cti=2
  -wls=s  want space left of tokens in string; i.e. -nwls='+ - * /'
@@ -5567,7 +5959,7 @@ Line Break Control
  -cbl=s  list of blocks to cuddled, default 'try-catch-finally'
  -dnl    delete old newlines (default)
  -l=n    maximum line length;  default n=80
- -bl     opening brace on new line 
+ -bl     opening brace on new line
  -sbl    opening sub brace on new line.  value of -bl is used if not given.
  -bli    opening brace on new line and indented
  -bar    opening brace always on right, even for long clauses
@@ -5588,7 +5980,7 @@ Following Old Breakpoints
  -bom    break at old method call breakpoints: ->
  -bok    break at old list keyword breakpoints such as map, sort (default)
  -bot    break at old conditional (ternary ?:) operator breakpoints (default)
- -boa    break at old attribute breakpoints 
+ -boa    break at old attribute breakpoints
  -cab=n  break at commas after a comma-arrow (=>):
          n=0 break at all commas after =>
          n=1 stable: break unless this breaks an existing one-line container
@@ -5605,7 +5997,7 @@ Comment controls
  -cscp=s change closing side comment prefix to be other than '## end'
  -cscl=s change closing side comment to apply to selected list of blocks
  -csci=n minimum number of lines needed to apply a -csc tag, default n=6
- -csct=n maximum number of columns of appended text, default n=20 
+ -csct=n maximum number of columns of appended text, default n=20
  -cscw   causes warning if old side comment is overwritten with -csc
 
  -sbc    use 'static block comments' identified by leading '##' (default)
@@ -5617,18 +6009,18 @@ Comment controls
 
 Delete selected text
  -dac    delete all comments AND pod
- -dbc    delete block comments     
- -dsc    delete side comments  
+ -dbc    delete block comments
+ -dsc    delete side comments
  -dp     delete pod
 
 Send selected text to a '.TEE' file
  -tac    tee all comments AND pod
- -tbc    tee block comments       
- -tsc    tee side comments       
- -tp     tee pod           
+ -tbc    tee block comments
+ -tsc    tee side comments
+ -tp     tee pod
 
 Outdenting
- -olq    outdent long quoted strings (default) 
+ -olq    outdent long quoted strings (default)
  -olc    outdent a long block comment line
  -ola    outdent statement labels
  -okw    outdent control keywords (redo, next, last, goto, return)
@@ -5668,7 +6060,7 @@ HTML
 
 A prefix of "n" negates short form toggle switches, and a prefix of "no"
 negates the long forms.  For example, -nasc means don't add missing
-semicolons.  
+semicolons.
 
 If you are unable to see this entire text, try "perltidy -h | more"
 For more detailed information, and additional options, try "man perltidy",

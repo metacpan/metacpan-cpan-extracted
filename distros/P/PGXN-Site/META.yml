@@ -4,17 +4,17 @@ author:
   - 'David E. Wheeler <david@justatheory.com>'
 build_requires:
   HTTP::Message::PSGI: '0'
-  Module::Build: '0.30'
+  HTTP::Request::Common: '5.824'
+  Module::Build: '0.4209'
   Plack::Test: '0'
-  Software::License: '0.102340'
   Test::File::Contents: '0.20'
   Test::MockModule: '0.05'
   Test::More: '0.70'
-  Text::MultiMarkdown: '1.000033'
+  Text::MultiMarkdown: '0'
 configure_requires:
-  Module::Build: '0.30'
+  Module::Build: '0.4209'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,25 +23,25 @@ name: PGXN-Site
 provides:
   PGXN::Site:
     file: lib/PGXN/Site.pm
-    version: v0.22.2
+    version: v0.23.4
   PGXN::Site::Controller:
     file: lib/PGXN/Site/Controller.pm
-    version: v0.22.2
+    version: v0.23.4
   PGXN::Site::Locale:
     file: lib/PGXN/Site/Locale.pm
-    version: v0.22.2
+    version: v0.23.4
   PGXN::Site::Locale::en:
     file: lib/PGXN/Site/Locale/en.pm
-    version: v0.22.2
+    version: v0.23.4
   PGXN::Site::Locale::fr:
     file: lib/PGXN/Site/Locale/fr.pm
-    version: v0.22.2
+    version: v0.23.4
   PGXN::Site::Router:
     file: lib/PGXN/Site/Router.pm
-    version: v0.22.2
+    version: v0.23.4
   PGXN::Site::Templates:
     file: lib/PGXN/Site/Templates.pm
-    version: v0.22.2
+    version: v0.23.4
 requires:
   Carp: '0'
   Data::Dump: '1.17'
@@ -68,10 +68,8 @@ requires:
   Template::Declare::Tags: '0.43'
   WWW::PGXN: v0.12.0
   namespace::autoclean: '0.11'
-  perl: '5.01'
+  perl: v5.14.0
 resources:
-  bugtracker: https://github.com/pgxn/pgxn-site/issues/
   homepage: https://www.pgxn.org/
-  repository: https://github.com/pgxn/pgxn-site/
-version: v0.22.2
+version: v0.23.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

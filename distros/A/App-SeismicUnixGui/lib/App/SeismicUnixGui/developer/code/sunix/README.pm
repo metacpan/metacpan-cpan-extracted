@@ -123,7 +123,7 @@ e.g.,
 =item
 
 Before running code in the GUI
-Add the followign lines in L_SU_path.pm:
+Add the following lines in L_SU_path.pm:
 
 	_sukdmig3d => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[6],

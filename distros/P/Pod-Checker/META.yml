@@ -22,5 +22,5 @@ requires:
   File::Basename: '0'
   Pod::Simple: '3.4'
   Test::More: '0.6'
-version: '1.76'
+version: '1.77'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

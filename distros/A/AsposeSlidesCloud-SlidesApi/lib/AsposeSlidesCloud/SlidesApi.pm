@@ -16811,6 +16811,75 @@ sub get_api_info {
 }
 
 #
+# get_available_fonts
+#
+# Returns presentation fonts info.
+# 
+# @param string $fonts_folder Storage folder for custom fonts. (optional)
+# @param string $storage Storage for custom fonts. (optional)
+{
+    my $params = {
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Storage folder for custom fonts.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Storage for custom fonts.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_available_fonts' } = { 
+    	summary => 'Returns presentation fonts info.',
+        params => $params,
+        returns => 'FontsData',
+        };
+}
+# @return FontsData
+#
+sub get_available_fonts {
+    my ($self, %args) = @_;
+
+    # parse inputs
+    my $_resource_path = '/slides/fonts/available';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
+        $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FontsData', $response);
+    return $_response_object;
+}
+
+#
 # get_background
 #
 # Read slide background info.

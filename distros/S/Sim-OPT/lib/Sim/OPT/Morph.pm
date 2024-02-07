@@ -1,5 +1,5 @@
 package Sim::OPT::Morph;
-# Copyright (C) 2008-2023 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2024 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Morph of Sim::OPT.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -47,7 +47,7 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes @weighttransforms
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.137'; # our $VERSION = '';
+$VERSION = '0.143'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model for simulation programs.';
 
 ################################################# MORPH
@@ -875,7 +875,7 @@ sub morph
 				my $translate_surface = $vals{$countmorphing}{$countvar}{translate_surface};
 				my $keep_obstructions = $vals{$countmorphing}{$countvar}{keep_obstructions};
 				my $shift_vertices = $vals{$countmorphing}{$countvar}{shift_vertices};
-				my $construction_reassign = $vals{$countmorphing}{$countvar}{construction_reassign};
+				my $reassign_construction = $vals{$countmorphing}{$countvar}{reassign_construction};
 				my $change_thickness = $vals{$countmorphing}{$countvar}{change_thickness};
 				my $recalculateish = $vals{$countmorphing}{$countvar}{recalculateish};
 				my @recalculatenet = @{ $vals{$countmorphing}{$countvar}{recalculatenet} };
@@ -1165,121 +1165,83 @@ sub morph
 										} #
 										elsif ( $modtype eq "generic_change" )#
 										{
-											make_generic_change
-											( $to, $stepsvar, $countop, $countstep,
-												\@applytype, $generic_change, $countvar, $fileconfig, $countmorphing, $launchline, \@menus, $countinstance );
+											make_generic_change( $to, $stepsvar, $countop, $countstep, \@applytype, $generic_change, $countvar, $fileconfig, $countmorphing, $launchline, \@menus, $countinstance );
 										} #
 										elsif ( $modtype eq "translate_surface" )
 										{
-											translate_surfaces
-											($to, $stepsvar, $countop, $countstep,
-												\@applytype, $translate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+											translate_surfaces($to, $stepsvar, $countop, $countstep, \@applytype, $translate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 										}
 										elsif ( $modtype eq "rotate_surface" )              #
 										{
-											rotate_surface
-											($to, $stepsvar, $countop, $countstep,
-												\@applytype, $rotate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+											rotate_surface($to, $stepsvar, $countop, $countstep, \@applytype, $rotate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 										}
 										elsif ( $modtype eq "shift_vertices" )
 										{
-											shift_vertices
-											( $to, $stepsvar, $countop, $countstep,
-												\@applytype, $shift_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+											shift_vertices( $to, $stepsvar, $countop, $countstep, \@applytype, $shift_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 										}
 										elsif ( $modtype eq "translate_vertices" )
 										{
-											translate_vertices
-											( $to, $stepsvar, $countop, $countstep,
-												\@applytype, \@translate_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+											translate_vertices( $to, $stepsvar, $countop, $countstep, \@applytype, \@translate_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 										}
-										elsif ( $modtype eq "construction_reassign" )
+										elsif ( $modtype eq "reassign_construction" )
 										{
-											reassign_construction
-											( $to, $stepsvar, $countop, $countstep,
-												\@applytype, $construction_reassign, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+											reassign_construction( $to, $stepsvar, $countop, $countstep, \@applytype, $reassign_construction, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 										}
 										elsif ( $modtype eq "rotate" )
 										{
-											rotate
-											( $to, $stepsvar, $countop, $countstep,
-												\@applytype, $rotate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+											rotate( $to, $stepsvar, $countop, $countstep, \@applytype, $rotate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 										}
 										elsif ( $modtype eq "translate" )
 										{
 
-											translate
-											( $to, $stepsvar, $countop, $countstep,
-												\@applytype, $translate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+											translate( $to, $stepsvar, $countop, $countstep, \@applytype, $translate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 										}
 										elsif ( $modtype eq "pin_obstructions" )
 										{
 
-											pin_obstructions
-											( $to, $stepsvar, $countop, $countstep,
-												\@applytype, $pin_obstructions, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+											pin_obstructions( $to, $stepsvar, $countop, $countstep, \@applytype, $pin_obstructions, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 										}
 										elsif ( $modtype eq "apply_constraints" )
 										{
 
-											apply_constraints
-											( $to, $stepsvar, $countop, $countstep,
-												\@applytype, \@apply_constraints, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+											apply_constraints( $to, $stepsvar, $countop, $countstep, \@applytype, \@apply_constraints, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 										}
 										elsif ( $modtype eq "change_thickness" )
 										{
-											change_thickness
-											( $to, $stepsvar, $countop, $countstep,
-												\@applytype, $change_thickness, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+											change_thickness( $to, $stepsvar, $countop, $countstep, \@applytype, $change_thickness, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 										}
 										elsif ( $modtype eq "rotatez" )
 										{
-											rotatez
-											($to, $stepsvar, $countop, $countstep,
-												\@applytype, $rotatez, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+											rotatez($to, $stepsvar, $countop, $countstep, \@applytype, $rotatez, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 										}
 										elsif ( $modtype eq "change_config" )
 										{
-											change_config
-											( $to, $stepsvar, $countop, $countstep,
-												\@applytype, \@change_config, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+											change_config( $to, $stepsvar, $countop, $countstep, \@applytype, \@change_config, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 										}
 										elsif ( $modtype eq "reshape_windows" )
 										{
-											reshape_windows
-											($to, $stepsvar, $countop, $countstep,
-												\@applytype, \@reshape_windows, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+											reshape_windows($to, $stepsvar, $countop, $countstep, \@applytype, \@reshape_windows, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 										}
 										elsif ( $modtype eq "obs_modify" )
 										{
-											obs_modify
-											( $to, $stepsvar, $countop, $countstep,
-												\@applytype, $obs_modify, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+											obs_modify( $to, $stepsvar, $countop, $countstep, \@applytype, $obs_modify, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 
 										}
 										elsif ( $modtype eq "warping" )
 										{
-											warp
-											( $to, $stepsvar, $countop, $countstep,
-												\@applytype, $warp, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+											warp( $to, $stepsvar, $countop, $countstep, \@applytype, $warp, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 										}
 										elsif ( $modtype eq "vary_controls" )
 										{
-											vary_controls
-											( $to, $stepsvar, $countop, $countstep,
-												\@applytype, \@vary_controls, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+											vary_controls( $to, $stepsvar, $countop, $countstep, \@applytype, \@vary_controls, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 										}
 										elsif ( $modtype eq "vary_net" )
 										{
-											vary_net
-											( $to, $stepsvar, $countop, $countstep,
-												\@applytype, \@vary_net, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+											vary_net( $to, $stepsvar, $countop, $countstep, \@applytype, \@vary_net, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 										}
 										elsif ( $modtype eq "change_climate" )
 										{
-											change_climate
-											( $to, $stepsvar, $countop, $countstep,
-												\@applytype, \@change_climate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $countmorphing, $launchline, \@menus, $countinstance );
+											change_climate( $to, $stepsvar, $countop, $countstep, \@applytype, \@change_climate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $countmorphing, $launchline, \@menus, $countinstance );
 										}
 										else
 										{
@@ -2930,30 +2892,28 @@ sub rotatez # PUT THE ROTATION POINT AT POINT 0, 0, 0. I HAVE NOT YET MADE THE F
 
 sub reassign_construction
 {
-	my ( $to, $stepsvar, $countop, $countstep, $swap, $construction_reassign, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
-
-	my @applytype = @$swap;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $reassign_construction, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
+	
+        say $tee "AAA \$to $to"  ;
+        say $tee "AAA \$stepsvar $stepsvar" ;
+        say $tee "AAA \$countop $countop"  ;
+        say $tee "AAA \$countstep $countstep" ;
+	my @applytype = @{ $applytype_ref };
 	my $zone_letter = $applytype[$countop][3];
 
-	my @menus = @$menus_ref;
+	my @menus = @{ $menus_ref }; 
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
 	say $tee "Reassign construction solutions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
-	my @surfaces_to_reassign = @{ $construction_reassign->[$countop][0] };
-	my @groups_to_choose = @{ $construction_reassign->[$countop][1] };
-	my $configfile = $$construction_reassign[$countop][2];
-	my $surface_letter;
+	my @surfaces_to_reassign = @{ $reassign_construction->[$countop][0] }; 
+	my @groups_to_choose = @{ $reassign_construction->[$countop][1] }; 
+	
 	my $count = 0;
-	my @reassign_constructions;
-
-	foreach $surface_to_reassign (@surfaces_to_reassign)
+	foreach $surface_to_reassign ( @surfaces_to_reassign )
 	{
-		my $group_to_choose =  $groups_to_choose[$count][$countstep];
-		my $group = $group_to_choose->[0];
-		my $construction = $group_to_choose->[1];
-
+		my $construction =  $groups_to_choose[$count]->[$countstep-1]; 
 		my $printthis =
 "cd $to/cfg/
 prj -file $fileconfig -mode script<<YYY
@@ -2966,7 +2926,6 @@ $surface_to_reassign
 e
 n
 y
-$group
 $construction
 -
 -
@@ -2974,6 +2933,8 @@ $construction
 -
 y
 y
+a
+a
 -
 -
 -

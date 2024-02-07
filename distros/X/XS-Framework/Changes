@@ -1,5 +1,9 @@
-1.5.5  xx.xx.2022
+1.5.6  31.01.2024
+           - fix svt_(copy|dup|local) access, must be guarded by flags
+           - fix PERL_STACK_OFFSET_SSIZET builds
+1.5.5  03.10.2022
            - fix test for perl 5.37.4 (possibly bug in perl)
+           - structured binding for HashEntry if C++17 is supported
 1.5.4  28.06.2022
            - fix for blead perl 5.37
 1.5.3  22.06.2022
@@ -32,7 +36,7 @@
            - fix compilation with new test catch FW
            - ErrorCode::operator& removed, use == instead
            - add is_perl_thread()
-           - min perl version is now 5.20 (COP hints are buggy on 5.18) 
+           - min perl version is now 5.20 (COP hints are buggy on 5.18)
 1.3.1  17.04.2020
            - fix compilation on threaded perls
 1.3.0  15.04.2020

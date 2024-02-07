@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Future;
+package IO::Async::Future 0.803;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.802';
 
 use base qw( Future );
 Future->VERSION( '0.05' ); # to respect subclassing
@@ -25,6 +23,7 @@ C<IO::Async::Future> - use L<Future> with L<IO::Async>
 
 =head1 SYNOPSIS
 
+   use Future::AsyncAwait;
    use IO::Async::Loop;
 
    my $loop = IO::Async::Loop->new;
@@ -33,7 +32,7 @@ C<IO::Async::Future> - use L<Future> with L<IO::Async>
 
    $loop->watch_time( after => 3, code => sub { $future->done( "Done" ) } );
 
-   print $future->get, "\n";
+   print await( $future ), "\n";
 
 =head1 DESCRIPTION
 
@@ -52,15 +51,15 @@ New C<IO::Async::Future> objects should be constructed by using the following
 methods on the C<Loop>. For more detail see the L<IO::Async::Loop>
 documentation.
 
-   $future = $loop->new_future
+   $future = $loop->new_future;
 
 Returns a new pending Future.
 
-   $future = $loop->delay_future( %args )
+   $future = $loop->delay_future( %args );
 
 Returns a new Future that will become done at a given time.
 
-   $future = $loop->timeout_future( %args )
+   $future = $loop->timeout_future( %args );
 
 Returns a new Future that will become failed at a given time.
 
@@ -95,7 +94,7 @@ sub new
 
 =head2 loop
 
-   $loop = $future->loop
+   $loop = $future->loop;
 
 Returns the underlying L<IO::Async::Loop> object.
 
@@ -115,7 +114,7 @@ sub await
 
 =head2 done_later
 
-   $future->done_later( @result )
+   $future->done_later( @result );
 
 A shortcut to calling the C<done> method in a C<later> idle watch on the
 underlying Loop object. Ensures that a returned Future object is not ready
@@ -137,7 +136,7 @@ sub done_later
 
 =head2 fail_later
 
-   $future->fail_later( $exception, @details )
+   $future->fail_later( $exception, @details );
 
 A shortcut to calling the C<fail> method in a C<later> idle watch on the
 underlying Loop object. Ensures that a returned Future object is not ready

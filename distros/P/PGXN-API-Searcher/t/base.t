@@ -171,7 +171,7 @@ for my $doc (
         key      => 'theory',
         name     => 'David E. Wheeler',
         user     => 'theory',
-        uri      => 'http://justatheory.com/',
+        uri      => 'https://justatheory.com/',
     },
     {
         type => 'tags',
@@ -241,7 +241,7 @@ for my $doc (
         email    => 'roger@example.com',
         key      => 'roger',
         name     => 'Roger Davidson',
-        uri      => 'http://roger.example.com/',
+        uri      => 'https://roger.example.com/',
         user     => 'roger',
     },
     {
@@ -460,7 +460,7 @@ is_deeply $res, {
         {
             excerpt => "roger Roger is a <strong>Davidson</strong>. Har har.",
             name    => "Roger Davidson",
-            uri     => 'http://roger.example.com/',
+            uri     => 'https://roger.example.com/',
             user    => "roger",
         },
     ],

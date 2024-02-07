@@ -30,6 +30,7 @@
             "HTTP::Daemon" : "0",
             "HTTP::Response" : "0",
             "HTTP::Status" : "0",
+            "IO::Socket::IP" : "0",
             "IO::Socket::SSL" : "0",
             "PDF::API2" : "2.036",
             "Test::CheckManifest" : "0.9",
@@ -92,6 +93,6 @@
          "web" : "https://github.com/david-dick/firefox-marionette"
       }
    },
-   "version" : "1.51",
+   "version" : "1.52",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

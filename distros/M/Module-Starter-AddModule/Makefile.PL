@@ -44,13 +44,13 @@ my $github    = 'https://github.com/briandfoy/module-starter-addmodule';
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (
-	'MIN_PERL_VERSION' => '5.010',
+	'MIN_PERL_VERSION' => '5.012',
 
 	'NAME'	        => $module,
 	'ABSTRACT_FROM' => $main_file,
 	'VERSION_FROM'  => $main_file,
 	'LICENSE'       => 'artistic_2',
-	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
+	'AUTHOR'        => 'brian d foy <briandfoy@pobox.com>',
 
 	'CONFIGURE_REQUIRES' => {
 		'ExtUtils::MakeMaker'   => '6.64',
@@ -77,7 +77,7 @@ my %WriteMakefile = (
 		resources => {
 			repository => {
 				type => 'git',
-				url  => "$github.git",
+				url  => $github,
 				web  => $github,
 				},
 			bugtracker => {

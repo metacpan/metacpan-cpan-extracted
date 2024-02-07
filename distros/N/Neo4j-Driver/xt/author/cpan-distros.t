@@ -33,6 +33,13 @@ plan tests => 1 + $no_warnings;
 
 
 subtest 'REST::Neo4p' => sub {
+	# no deprecated::smartmatch warnings
+	local $SIG{'__WARN__'} = sub {
+		warn $_[0] unless caller(1) =~ m/^REST::Neo4p\b/
+			&& $_[0] =~ m/\b(?:given|when) is deprecated\b/;
+	};
+	
+	$Neo4j::Driver::VERSION //= 0.19;  # satisfy minimum req of REST::Neo4p for dev version
 	plan skip_all => "REST::Neo4p unavailable" unless eval "require REST::Neo4p; 1";
 	plan skip_all => "REST::Neo4p version too old" unless eval "REST::Neo4p->VERSION('0.4003')";
 	plan tests => 11;

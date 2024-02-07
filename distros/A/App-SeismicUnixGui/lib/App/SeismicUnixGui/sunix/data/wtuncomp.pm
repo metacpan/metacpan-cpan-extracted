@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::data::wtuncomp;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 

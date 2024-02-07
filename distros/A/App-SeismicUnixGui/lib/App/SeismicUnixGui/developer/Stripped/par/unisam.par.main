@@ -39,7 +39,7 @@
  r=10		  ... damping coefficient, only active when smooth=1	
 
 
- AUTHOR:  Dave Hale, Colorado School of Mines, 07/07/89
+ Author:  Dave Hale, Colorado School of Mines, 07/07/89
           Zhaobo Meng, Colorado School of Mines, 
  	    added sine interpolation and window smoothing, 09/16/96 
           CWP: John Stockwell,  added file input options, 24 Nov 1997

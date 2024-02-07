@@ -104,16 +104,25 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'is_custom' => {
+    	datatype => 'boolean',
+    	base_name => 'IsCustom',
+    	description => 'Returns true for a custom font (contained in fontsFolder directory).',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
     'font_name' => 'string',
-    'is_embedded' => 'boolean'
+    'is_embedded' => 'boolean',
+    'is_custom' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
     'font_name' => 'FontName',
-    'is_embedded' => 'IsEmbedded'
+    'is_embedded' => 'IsEmbedded',
+    'is_custom' => 'IsCustom'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

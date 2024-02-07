@@ -6,7 +6,7 @@ use warnings;
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -83,16 +83,21 @@ Returns instance of object.
 
 =item * C<precision>
 
- Precision.
- Default value is 100.
+Precision.
+
+Default value is 100.
 
 =item * C<set>
 
- Set definition.
- Set is array of arrays with pairs of probability and value.
- Default value is [].
- It is required.
- Sumary of probabilities must be 1.
+Set definition.
+
+Set is array of arrays with pairs of probability and value.
+
+Default value is [].
+
+It is required.
+
+Sumary of probabilities must be 1.
 
 =back
 
@@ -190,12 +195,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2013-2023
+© Michal Josef Špaček 2013-2024
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

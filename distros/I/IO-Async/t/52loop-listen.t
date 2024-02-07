@@ -1,12 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use IO::Socket::INET;
 
@@ -47,9 +46,9 @@ testing_loop( $loop );
    ok( $f->is_ready, '$loop->listen on handle ready synchronously' );
 
    my $notifier = $f->get;
-   isa_ok( $notifier, "IO::Async::Notifier", 'synchronous on_notifier given a Notifier' );
+   isa_ok( $notifier, [ "IO::Async::Notifier" ], 'synchronous on_notifier given a Notifier' );
 
-   identical( $notifier->loop, $loop, 'synchronous $notifier->loop is $loop' );
+   ref_is( $notifier->loop, $loop, 'synchronous $notifier->loop is $loop' );
 
    my $clientsock = IO::Socket::INET->new( Type => SOCK_STREAM )
       or die "Cannot socket() - $!";
@@ -60,7 +59,7 @@ testing_loop( $loop );
 
    wait_for { defined $newclient };
 
-   is_deeply( [ unpack_sockaddr_in $newclient->peername ],
+   is( [ unpack_sockaddr_in $newclient->peername ],
               [ unpack_sockaddr_in $clientsock->sockname ], '$newclient peer is correct' );
 }
 
@@ -85,9 +84,9 @@ testing_loop( $loop );
    # Not sure if it'll be an IO::Socket::INET or ::IP, but either way it should support these
    can_ok( $listensock, qw( peerhost peerport ) );
 
-   isa_ok( $notifier, "IO::Async::Notifier", 'asynchronous on_notifier given a Notifier' );
+   isa_ok( $notifier, [ "IO::Async::Notifier" ], 'asynchronous on_notifier given a Notifier' );
 
-   identical( $notifier->loop, $loop, 'asynchronous $notifier->loop is $loop' );
+   ref_is( $notifier->loop, $loop, 'asynchronous $notifier->loop is $loop' );
 
    my $listenaddr = $listensock->sockname;
 
@@ -108,7 +107,7 @@ testing_loop( $loop );
 
    can_ok( $newclient, qw( peerhost peerport ) );
 
-   is_deeply( [ unpack_sockaddr_in $newclient->peername ],
+   is( [ unpack_sockaddr_in $newclient->peername ],
               [ unpack_sockaddr_in $clientsock->sockname ], '$newclient peer is correct' );
 }
 

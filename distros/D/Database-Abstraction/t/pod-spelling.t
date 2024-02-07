@@ -18,26 +18,3 @@ if($ENV{AUTHOR_TESTING}) {
 }
 
 __END__
-AnnoCPAN
-CGI
-CPAN
-CPANTS
-FCGI
-GPL
-Init
-ISPs
-logdir
-MetaCPAN
-POSTing
-RT
-cgi
-http
-https
-params
-param
-stdin
-tmpdir
-Tmpdir
-www
-xml
-iPad

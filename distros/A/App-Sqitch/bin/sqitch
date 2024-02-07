@@ -1,15 +1,6 @@
 #!perl -w -CAS
 
-our $VERSION = 'v1.4.0'; # VERSION
-use POSIX qw(setlocale);
-BEGIN {
-    if ($^O eq 'MSWin32') {
-        require Win32::Locale;
-        setlocale POSIX::LC_ALL, Win32::Locale::get_locale();
-    } else {
-        setlocale POSIX::LC_ALL, '';
-    }
-}
+our $VERSION = 'v1.4.1'; # VERSION
+use locale;
 use App::Sqitch;
-
 exit App::Sqitch->go;

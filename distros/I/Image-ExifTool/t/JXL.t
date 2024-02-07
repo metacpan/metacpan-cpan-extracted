@@ -51,12 +51,17 @@ my $testnum = 1;
 {
     ++$testnum;
     my $skip = '';
-    if (eval { require IO::Uncompress::Brotli }) {
+    # (this test fails for IO::Uncompress::Brotli 0.002001, and
+    #  I don't know about 0.003, so require 0.004 or higher to be safe)
+    if (eval { require IO::Uncompress::Brotli and $IO::Uncompress::Brotli::VERSION >= 0.004 }) {
         my $exifTool = Image::ExifTool->new;
         my $info = $exifTool->ImageInfo('t/images/JXL2.jxl', 'imagesize', 'exif:all', 'xmp:all');
-        notOK() unless check($exifTool, $info, $testname, $testnum);
+        unless (check($exifTool, $info, $testname, $testnum)) {
+            notOK();
+            warn "\n  (IO::Uncompress::Brotli is version $IO::Uncompress::Brotli::VERSION)\n";
+        }
     } else {
-        $skip = ' # skip Requires IO::Unompress::Brotli';
+        $skip = ' # skip Requires IO::Uncompress::Brotli version 0.004 or later';
     }
     print "ok $testnum$skip\n";
 }

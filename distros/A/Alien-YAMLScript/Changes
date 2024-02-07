@@ -1,3 +1,9 @@
+0.1.36 Fri Feb  2 02:23:50 PM PST 2024
+ - libyamlscript 0.1.36
+
+0.1.35 Sat Jan 20 01:03:51 PM EST 2024
+ - libyamlscript 0.1.35
+
 0.1.22 Thu Jan 11 03:32:50 PM EST 2024
  - Only use Alien when local libyamlscript not installed
  - Fix bug loading null

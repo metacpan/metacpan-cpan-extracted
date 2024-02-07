@@ -37,7 +37,7 @@ TEST("normal input") {
     s->start();
     s->finish_event.add([&](const ErrorCode& err) {
         if (err) WARN(err);
-        CHECK(!err);
+        CHECK_FALSE(err);
         test.happens();
     });
     test.run();
@@ -47,12 +47,12 @@ TEST("normal input") {
 TEST("pause input") {
     AsyncTest test(3000, 1);
     auto i = new TestFileInput("tests/streamer/file.txt", 30000);
-    auto o = new TestOutput(10000);
+    auto o = new TestOutput(2000);
     StreamerSP s = new Streamer(i, o, 50000, test.loop);
     s->start();
     s->finish_event.add([&](const ErrorCode& err) {
         if (err) WARN(err);
-        CHECK(!err);
+        CHECK_FALSE(err);
         test.happens();
     });
     test.run();
@@ -70,7 +70,7 @@ TEST("normal output") {
     s->start();
     s->finish_event.add([&](const ErrorCode& err) {
         if (err) WARN(err);
-        CHECK(!err);
+        CHECK_FALSE(err);
         test.happens();
     });
     test.run();

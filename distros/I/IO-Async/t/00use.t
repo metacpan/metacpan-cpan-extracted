@@ -1,35 +1,36 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "IO::Async::Notifier" );
-use_ok( "IO::Async::Handle" );
-use_ok( "IO::Async::Stream" );
-use_ok( "IO::Async::Timer" );
-use_ok( "IO::Async::Timer::Absolute" );
-use_ok( "IO::Async::Timer::Countdown" );
-use_ok( "IO::Async::Timer::Periodic" );
-use_ok( "IO::Async::Signal" );
-use_ok( "IO::Async::Listener" );
-use_ok( "IO::Async::Socket" );
-use_ok( "IO::Async::File" );
-use_ok( "IO::Async::FileStream" );
+require IO::Async::Notifier;
+require IO::Async::Handle;
+require IO::Async::Stream;
+require IO::Async::Timer;
+require IO::Async::Timer::Absolute;
+require IO::Async::Timer::Countdown;
+require IO::Async::Timer::Periodic;
+require IO::Async::Signal;
+require IO::Async::Listener;
+require IO::Async::Socket;
+require IO::Async::File;
+require IO::Async::FileStream;
 
-use_ok( "IO::Async::OS" );
+require IO::Async::OS;
 
-use_ok( "IO::Async::Loop::Select" );
-use_ok( "IO::Async::Loop::Poll" );
+require IO::Async::Loop::Select;
+require IO::Async::Loop::Poll;
 
-use_ok( "IO::Async::Test" );
+require IO::Async::Test;
 
-use_ok( "IO::Async::Function" );
-use_ok( "IO::Async::Resolver" );
+require IO::Async::Function;
+require IO::Async::Resolver;
 
-use_ok( "IO::Async::Protocol" );
-use_ok( "IO::Async::Protocol::Stream" );
-use_ok( "IO::Async::Protocol::LineStream" );
+require IO::Async::Protocol;
+require IO::Async::Protocol::Stream;
+require IO::Async::Protocol::LineStream;
 
+pass( 'Modules loaded' );
 done_testing;

@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::filter::sudipfilt;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUDIPFILT - DIP--or better--SLOPE Filter in f-k domain	
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 

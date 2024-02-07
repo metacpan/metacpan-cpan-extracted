@@ -95,187 +95,191 @@
    "provides" : {
       "URI" : {
          "file" : "lib/URI.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::Escape" : {
          "file" : "lib/URI/Escape.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::Heuristic" : {
          "file" : "lib/URI/Heuristic.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::IRI" : {
          "file" : "lib/URI/IRI.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::QueryParam" : {
          "file" : "lib/URI/QueryParam.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::Split" : {
          "file" : "lib/URI/Split.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::URL" : {
          "file" : "lib/URI/URL.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::WithBase" : {
          "file" : "lib/URI/WithBase.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::data" : {
          "file" : "lib/URI/data.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::file" : {
          "file" : "lib/URI/file.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::file::Base" : {
          "file" : "lib/URI/file/Base.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::file::FAT" : {
          "file" : "lib/URI/file/FAT.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::file::Mac" : {
          "file" : "lib/URI/file/Mac.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::file::OS2" : {
          "file" : "lib/URI/file/OS2.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::file::QNX" : {
          "file" : "lib/URI/file/QNX.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::file::Unix" : {
          "file" : "lib/URI/file/Unix.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::file::Win32" : {
          "file" : "lib/URI/file/Win32.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::ftp" : {
          "file" : "lib/URI/ftp.pm",
-         "version" : "5.25"
+         "version" : "5.26"
+      },
+      "URI::geo" : {
+         "file" : "lib/URI/geo.pm",
+         "version" : "5.26"
       },
       "URI::gopher" : {
          "file" : "lib/URI/gopher.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::http" : {
          "file" : "lib/URI/http.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::https" : {
          "file" : "lib/URI/https.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::icap" : {
          "file" : "lib/URI/icap.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::icaps" : {
          "file" : "lib/URI/icaps.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::ldap" : {
          "file" : "lib/URI/ldap.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::ldapi" : {
          "file" : "lib/URI/ldapi.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::ldaps" : {
          "file" : "lib/URI/ldaps.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::mailto" : {
          "file" : "lib/URI/mailto.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::mms" : {
          "file" : "lib/URI/mms.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::news" : {
          "file" : "lib/URI/news.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::nntp" : {
          "file" : "lib/URI/nntp.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::nntps" : {
          "file" : "lib/URI/nntps.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::pop" : {
          "file" : "lib/URI/pop.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::rlogin" : {
          "file" : "lib/URI/rlogin.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::rsync" : {
          "file" : "lib/URI/rsync.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::rtsp" : {
          "file" : "lib/URI/rtsp.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::rtspu" : {
          "file" : "lib/URI/rtspu.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::sftp" : {
          "file" : "lib/URI/sftp.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::sip" : {
          "file" : "lib/URI/sip.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::sips" : {
          "file" : "lib/URI/sips.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::snews" : {
          "file" : "lib/URI/snews.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::ssh" : {
          "file" : "lib/URI/ssh.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::telnet" : {
          "file" : "lib/URI/telnet.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::tn3270" : {
          "file" : "lib/URI/tn3270.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::urn" : {
          "file" : "lib/URI/urn.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::urn::isbn" : {
          "file" : "lib/URI/urn/isbn.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       },
       "URI::urn::oid" : {
          "file" : "lib/URI/urn/oid.pm",
-         "version" : "5.25"
+         "version" : "5.26"
       }
    },
    "release_status" : "stable",
@@ -292,7 +296,7 @@
       "x_IRC" : "irc://irc.perl.org/#lwp",
       "x_MailingList" : "mailto:libwww@perl.org"
    },
-   "version" : "5.25",
+   "version" : "5.26",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -493,16 +497,6 @@
             "version" : "6.031"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Test::ChangesHasContent",
-            "name" : "Test::ChangesHasContent",
-            "version" : "0.011"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Substitute",
-            "name" : "Substitute",
-            "version" : "0.007"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::Test::MinimumVersion",
             "config" : {
                "Dist::Zilla::Plugin::Test::MinimumVersion" : {
@@ -533,6 +527,7 @@
                   "spell_cmd" : "aspell list",
                   "stopwords" : [
                      "Berners",
+                     "CRS",
                      "IDNA",
                      "ISBNs",
                      "Koster",
@@ -549,6 +544,7 @@
                      "UNC",
                      "etype",
                      "evalue",
+                     "lon",
                      "lowercasing",
                      "relativize",
                      "unicode",
@@ -717,7 +713,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v5.25",
+                  "tag" : "v5.26",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -876,10 +872,12 @@
       "Julien Fiegehenn <simbabque@cpan.org>",
       "Ville Skytt\u00e4 <ville.skytta@iki.fi>",
       "Mark Stosberg <mark@stosberg.com>",
+      "David Dick <ddick@cpan.org>",
       "Graham Knop <haarg@haarg.org>",
       "Michael G. Schwern <schwern@pobox.com>",
       "Shoichi Kaji <skaji@cpan.org>",
       "Branislav Zahradn\u00edk <happy.barney@gmail.com>",
+      "dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
       "Perlbotics <perlbotix@cpan.org>",
       "James Raspass <jraspass@gmail.com>",
       "Matthew Chae <mschae@cpan.org>",
@@ -888,7 +886,6 @@
       "Alex Kapranoff <kapranoff@gmail.com>",
       "Brendan Byrd <Perl@ResonatorSoft.org>",
       "brian d foy <brian.d.foy@gmail.com>",
-      "David Dick <ddick@cpan.org>",
       "David Schmidt <davewood@gmx.at>",
       "Dorian Taylor <dorian.taylor.lists@gmail.com>",
       "gerard <gerard@tty.nl>",

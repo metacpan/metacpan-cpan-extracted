@@ -1,6 +1,11 @@
 Revision history for Perl extension App-LXC-Container
 
-0.40 2023-12-05T08:52:47Z
+0.41 2024-02-01T09:52:25Z
+
+0.41 2024-02-01T09:51:03Z
+
+    - removing all X11 authorisations after end of main (1st) job of container
+    - fix authorising bug for 2nd user attaching container with X11
 
 0.40 2023-12-05T08:51:59Z
 

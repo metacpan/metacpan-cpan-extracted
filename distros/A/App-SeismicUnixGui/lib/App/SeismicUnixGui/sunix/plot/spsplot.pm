@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::plot::spsplot;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 
@@ -111,7 +111,7 @@ Version:
 
 
 
- AUTHOR:  Dave Hale, Colorado School of Mines, 10/18/90
+ Author:  Dave Hale, Colorado School of Mines, 10/18/90
 
  MODIFIED: Craig Artley, Colorado School of Mines, 03/27/94
 

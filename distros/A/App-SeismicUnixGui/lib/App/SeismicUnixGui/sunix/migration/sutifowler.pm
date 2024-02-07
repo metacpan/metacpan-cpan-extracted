@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::migration::sutifowler;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 

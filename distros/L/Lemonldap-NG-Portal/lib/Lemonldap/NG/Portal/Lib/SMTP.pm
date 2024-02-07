@@ -9,6 +9,7 @@ use strict;
 use Mouse;
 use JSON qw(from_json);
 use MIME::Entity;
+use Lemonldap::NG::Common::EmailAddress qw(format_email);
 use Email::Sender::Simple qw(sendmail);
 use Email::Date::Format   qw(email_date);
 use HTML::FormatText::WithLinks;
@@ -117,7 +118,7 @@ sub send_mail {
     my ( $self, $mail, $subject, $body, $html ) = @_;
 
     if ( $mail =~ /^\S+\@\S+$/ ) {
-        $mail = "$mail <$mail>";
+        $mail = format_email($mail, $mail);
     }
 
     $self->logger->info("send_mail called to send \"$subject\" to $mail");

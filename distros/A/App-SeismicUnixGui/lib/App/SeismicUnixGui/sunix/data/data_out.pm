@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::data::data_out;
 =head2 SYNOPSIS 
 
  PERL PROGRAM NAME: data_out.pm 
- AUTHOR: 	Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE: 		June 22 2017
   
 

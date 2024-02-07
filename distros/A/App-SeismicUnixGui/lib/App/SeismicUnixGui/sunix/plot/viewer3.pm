@@ -6,7 +6,7 @@
 =head2 SYNOPSIS
 
 PERL PROGRAM NAME:  VIEWER3 - VIEWER for 3-dimensional model				", 
-AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
 DATE:   
 DESCRIPTION:
 Version: 

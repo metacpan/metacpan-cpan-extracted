@@ -1,5 +1,8 @@
 Revision history for Perl module Surveyor::Benchmark::SchwartzianTransform::SortFilesBySize
 
+0.124 2024-02-02T20:09:56Z
+	* refresh distro, update email addresses
+
 0.123 2022-01-09T02:16:46Z
 	* No code changes. Fix a link in the README.pod.
 

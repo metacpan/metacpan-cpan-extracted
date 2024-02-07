@@ -1,0 +1,54 @@
+# We report any policy of level 2 or higher (there is far too much noise if we
+# go down to severity 1).
+severity =  2
+verbose = %f:%l: %m (%p, Severity: %s).\n
+
+# We still include some policies whose default severity is 1
+include = ValuesAndExpressions::ProhibitInterpolationOfLiterals CodeLayout::ProhibitTrailingWhitespace CodeLayout::RequireTidyCode
+
+# Signatures are nice, let’s use them.
+[TestingAndDebugging::ProhibitNoWarnings]
+allow = experimental::signatures
+
+# Methods of at most 2 lines can directly use @_ without unpacking it first
+# (used here for performance reasons).
+[Subroutines::RequireArgUnpacking]
+short_subroutine_statements = 2
+
+[ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+allow_if_string_contains_single_quote = 1
+
+# Let’s allow moderately complex regex using the default syntax.
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 30
+
+# And we disable some policies that don’t work well:
+
+# This policy confuses sub prototype with signatures.
+[-Subroutines::ProhibitSubroutinePrototypes]
+
+# This policy appears to also be confused by signatures.
+[-Subroutines::ProhibitManyArgs]
+
+# In theory we want that but, when using Locale::MakeText, this policy 
+# complains about the %Lexicon variables declared for the localization and there
+# is no easy way to exclude them except by listing them all.
+# TODO: remove once https://github.com/Perl-Critic/Perl-Critic/issues/1034 is fixed.
+[-Variables::ProhibitPackageVars]
+
+# That performance issue has been fixed in Perl 5.18 and newer.
+[-Modules::RequireNoMatchVarsWithUseEnglish]
+
+# I like postfix control :-)
+[-ControlStructures::ProhibitPostfixControls]
+
+# All the sections that I want to include are there already.
+[-Documentation::RequirePodSections]
+
+# This policy has many bugs, also I think that using the topic variable can make
+# the code clearer, even in place where it would not be required to use it.
+[-BuiltinFunctions::ProhibitUselessTopic]
+
+# Let’s assume the reader knows how to write regex.
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireLineBoundaryMatching]

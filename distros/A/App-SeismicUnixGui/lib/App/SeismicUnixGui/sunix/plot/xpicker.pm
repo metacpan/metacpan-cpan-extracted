@@ -6,7 +6,7 @@
 =head2 SYNOPSIS
 
 PERL PROGRAM NAME:  XPICKER - X wiggle-trace plot of f(x1,x2) via Bitmap with PICKing	
-AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
 DATE:   
 DESCRIPTION:
 Version: 
@@ -143,7 +143,7 @@ Version:
 
 
 
- AUTHOR:  Dave Hale, Colorado School of Mines, 08/09/90
+ Author:  Dave Hale, Colorado School of Mines, 08/09/90
  with picking by Wenying Cai of University of Utah.
  Endian stuff by Morten Pedersen and John Stockwell of CWP.
  Interp stuff by Tony Kocurko of Memorial University of Newfoundland

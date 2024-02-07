@@ -1,2 +1,2 @@
-/usr/bin/ar qc libpanda-backtrace-tests.a CMakeFiles/panda-backtrace-tests.dir/tests/bt.cc.o CMakeFiles/panda-backtrace-tests.dir/tests/fn01.cc.o CMakeFiles/panda-backtrace-tests.dir/tests/fn02.cc.o CMakeFiles/panda-backtrace-tests.dir/tests/fn03.cc.o
+/usr/bin/ar qc libpanda-backtrace-tests.a "CMakeFiles/panda-backtrace-tests.dir/tests/bt.cc.o" "CMakeFiles/panda-backtrace-tests.dir/tests/fn01.cc.o" "CMakeFiles/panda-backtrace-tests.dir/tests/fn02.cc.o" "CMakeFiles/panda-backtrace-tests.dir/tests/fn03.cc.o"
 /usr/bin/ranlib libpanda-backtrace-tests.a

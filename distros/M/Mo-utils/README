@@ -815,6 +815,9 @@ SEE ALSO
     Mo::utils::Language
         Mo language utilities.
 
+    Mo::utils::CSS
+        Mo CSS utilities.
+
     Wikibase::Datatype::Utils
         Wikibase datatype utilities.
 
@@ -827,10 +830,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2020-2023 Michal Josef Špaček
+    © 2020-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.20
+    0.21
 

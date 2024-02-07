@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::transform::sufft;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUFFT - fft real time traces to complex frequency traces		
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 
@@ -63,6 +63,9 @@ package App::SeismicUnixGui::sunix::transform::sufft;
 
 =head2 CHANGES and their DATES
 
+10.18.23
+sub dt removed as unused by sufft and unnecessary
+
 =cut
 
 use Moose;
@@ -110,7 +113,7 @@ sub note {
 
 sub clear {
 
-    $sufft->{_dt}      = '';
+#    $sufft->{_dt}      = '';
     $sufft->{_mode}    = '';
     $sufft->{_sign}    = '';
     $sufft->{_verbose} = '';
@@ -118,25 +121,25 @@ sub clear {
     $sufft->{_note}    = '';
 }
 
-=head2 sub dt 
-
-
-=cut
-
-sub dt {
-
-    my ( $self, $dt ) = @_;
-    if ($dt) {
-
-        $sufft->{_dt}   = $dt;
-        $sufft->{_note} = $sufft->{_note} . ' dt=' . $sufft->{_dt};
-        $sufft->{_Step} = $sufft->{_Step} . ' dt=' . $sufft->{_dt};
-
-    }
-    else {
-        print("sufft, dt, missing dt,\n");
-    }
-}
+#=head2 sub dt 
+#
+#
+#=cut
+#
+#sub dt {
+#
+#    my ( $self, $dt ) = @_;
+#    if ($dt) {
+#
+#        $sufft->{_dt}   = $dt;
+#        $sufft->{_note} = $sufft->{_note} . ' dt=' . $sufft->{_dt};
+#        $sufft->{_Step} = $sufft->{_Step} . ' dt=' . $sufft->{_dt};
+#
+#    }
+#    else {
+#        print("sufft, dt, missing dt,\n");
+#    }
+#}
 
 =head2 sub sign 
 
@@ -188,7 +191,7 @@ sub get_max_index {
     my ($self) = @_;
 
     # : index=2
-    my $max_index = 2;
+    my $max_index = 1;
 
     return ($max_index);
 }

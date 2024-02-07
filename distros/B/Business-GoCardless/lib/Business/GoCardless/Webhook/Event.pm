@@ -95,6 +95,7 @@ sub resources {
 	return $class->new(
 		client => $self->client,
 		id     => $self->links->{ $resource },
+        links  => $self->links,
 	);
 }
 

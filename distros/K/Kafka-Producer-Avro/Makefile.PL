@@ -26,7 +26,8 @@ my %config = (
 		'Kafka::Producer'			=> 'v1.8.0',
 		'Avro::BinaryEncoder'		=> 'v1.10.1',
 		'Avro::Schema'				=> 'v1.10.1',
-		'Confluent::SchemaRegistry'	=> 'v1.0.0'
+		'Confluent::SchemaRegistry'	=> 'v1.0.0',
+        'Memoize'                   => '0'
     },
     TEST_REQUIRES       => {            # more to the list $Module::CoreList::version{5.010}
 		'Math::BigInt'				=> '1.89',

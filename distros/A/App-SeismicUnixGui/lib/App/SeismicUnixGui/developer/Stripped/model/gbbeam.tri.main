@@ -32,7 +32,7 @@
 
 
 
- AUTHOR:  Dave Hale, Colorado School of Mines, 02/09/91
+ Author:  Dave Hale, Colorado School of Mines, 02/09/91
  MODIFIED:  Andreas Rueger, Colorado School of Mines, 08/18/93
 	Modifications include: 2.5-D amplitudes, computation of reflection/
 			transmission losses, attenuation,

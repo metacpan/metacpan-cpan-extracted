@@ -1,4 +1,7 @@
-1.2.12    xx.xx.2022
+1.2.13    31.01.2024
+           - decrease default resolver cache time 20 min -> 10 min
+           - improve tests
+1.2.12    03.10.2022
            - fix timer test
            - fix fs test name clash with unistd.h
 1.2.11    22.06.2022

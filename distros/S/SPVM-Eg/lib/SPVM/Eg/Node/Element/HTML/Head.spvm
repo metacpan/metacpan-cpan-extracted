@@ -3,14 +3,14 @@
 
 class Eg::Node::Element::HTML::Head extends Eg::Node::Element::HTML {
   
-  allow Eg::Node::Document::HTML;
+  allow Eg::Node::Document;
   
   # Class Methods
-  private static method new : Eg::Node::Element::HTML::Head () {
+  private static method new : Eg::Node::Element::HTML::Head ($options : object[] = undef) {
     
     my $self = new Eg::Node::Element::HTML::Head;
     
-    $self->SUPER::init;
+    $self->SUPER::init($options);
     
     return $self;
   }

@@ -1,15 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Listener;
+package IO::Async::Listener 0.803;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( IO::Async::Handle );
-
-our $VERSION = '0.802';
 
 use IO::Async::Handle;
 use IO::Async::OS;
@@ -28,6 +26,7 @@ C<IO::Async::Listener> - listen on network sockets for incoming connections
 
 =head1 SYNOPSIS
 
+   use Future::AsyncAwait;
    use IO::Async::Listener;
 
    use IO::Async::Loop;
@@ -52,10 +51,10 @@ C<IO::Async::Listener> - listen on network sockets for incoming connections
 
    $loop->add( $listener );
 
-   $listener->listen(
+   await $listener->listen(
       service  => "echo",
       socktype => 'stream',
-   )->get;
+   );
 
    $loop->run;
 
@@ -66,14 +65,14 @@ This object can also be used indirectly via an L<IO::Async::Loop>:
    use IO::Async::Loop;
    my $loop = IO::Async::Loop->new;
 
-   $loop->listen(
+   await $loop->listen(
       service  => "echo",
       socktype => 'stream',
 
       on_stream => sub {
          ...
       },
-   )->get;
+   );
 
    $loop->run;
 
@@ -154,11 +153,11 @@ client socket is accepted from the listening socket. It is passed the listener
 object itself, and is expected to return a new instance of
 L<IO::Async::Handle> or a subclass, used to wrap the new client socket.
 
-   $handle = $handle_constructor->( $listener )
+   $handle = $handle_constructor->( $listener );
 
 This can also be given as a subclass method
 
-   $handle = $listener->handle_constructor()
+   $handle = $listener->handle_constructor();
 
 =head2 handle_class => STRING
 
@@ -166,20 +165,20 @@ Optional. If defined and C<handle_constructor> isn't, then new wrapper handles
 are constructed by invoking the C<new> method on the given class name, passing
 in no additional parameters.
 
-   $handle = $handle_class->new()
+   $handle = $handle_class->new();
 
 This can also be given as a subclass method
 
-   $handle = $listener->handle_class->new
+   $handle = $listener->handle_class->new;
 
 =head2 acceptor => STRING|CODE
 
 Optional. If defined, gives the name of a method or a CODE reference to use to
 implement the actual accept behaviour. This will be invoked as:
 
-   ( $accepted ) = $listener->acceptor( $socket )->get
+   ( $accepted ) = await $listener->acceptor( $socket );
 
-   ( $handle ) = $listener->acceptor( $socket, handle => $handle )->get
+   ( $handle ) = await $listener->acceptor( $socket, handle => $handle );
 
 It is invoked with the listening socket as its its argument, and optionally
 an L<IO::Async::Handle> instance as a named parameter, and is expected to
@@ -334,14 +333,14 @@ sub _accept
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in C<await> expressions return L<Future>
+instances.
 
 =cut
 
 =head2 acceptor
 
-   $acceptor = $listener->acceptor
+   $acceptor = $listener->acceptor;
 
 Returns the currently-set C<acceptor> method name or code reference. This may
 be of interest to Loop C<listen> extension methods that wish to extend or wrap
@@ -364,7 +363,7 @@ sub is_listening
 
 =head2 sockname
 
-   $name = $listener->sockname
+   $name = $listener->sockname;
 
 Returns the C<sockname> of the underlying listening socket
 
@@ -380,7 +379,7 @@ sub sockname
 
 =head2 family
 
-   $family = $listener->family
+   $family = $listener->family;
 
 Returns the socket address family of the underlying listening socket
 
@@ -396,7 +395,7 @@ sub family
 
 =head2 socktype
 
-   $socktype = $listener->socktype
+   $socktype = $listener->socktype;
 
 Returns the socket type of the underlying listening socket
 
@@ -412,7 +411,7 @@ sub socktype
 
 =head2 listen
 
-   $listener->listen( %params )->get
+   await $listener->listen( %params );
 
 This method sets up a listening socket and arranges for the acceptor callback
 to be invoked each time a new connection is accepted on the socket.
@@ -429,7 +428,7 @@ Optional. A callback that is invoked when the listening socket is ready.
 Similar to that on the underlying loop method, except it is passed the
 listener object itself.
 
-   $on_listen->( $listener )
+   $on_listen->( $listener );
 
 =back
 

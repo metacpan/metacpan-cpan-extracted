@@ -2,6 +2,8 @@ package PGXN::Site::Controller;
 
 use 5.10.0;
 use utf8;
+use strict;
+use warnings;
 #use aliased 'PGXN::Site::Request';
 use Plack::Request;
 use Plack::Response;
@@ -11,7 +13,7 @@ use Encode;
 use WWW::PGXN;
 use List::MoreUtils qw(any);
 use namespace::autoclean;
-our $VERSION = v0.22.2;
+our $VERSION = v0.23.4;
 
 Template::Declare->init( dispatch_to => ['PGXN::Site::Templates'] );
 
@@ -586,7 +588,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2010-2021 David E. Wheeler.
+Copyright (c) 2010-2024 David E. Wheeler.
 
 This module is free software; you can redistribute it and/or modify it under
 the L<PostgreSQL License|https://www.opensource.org/licenses/postgresql>.

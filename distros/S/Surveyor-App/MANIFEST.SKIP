@@ -68,3 +68,4 @@ t/\d
 \A\.github\b
 
 .github_token
+\.gitattributes\b

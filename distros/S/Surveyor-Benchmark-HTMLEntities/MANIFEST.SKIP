@@ -69,3 +69,4 @@ Surveryor-.*
 
 .gitignore
 .github_token
+\.gitattributes\b

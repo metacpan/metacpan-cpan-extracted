@@ -2,9 +2,10 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 10;
+use Test::Most tests => 14;
+use Test::Differences;
 use Test::DatabaseRow;
-# use Test::NoWarnings;	# FIXME: remove once registration completed
+use Test::NoWarnings;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
@@ -19,7 +20,12 @@ STRINGDATA: {
 
 	my $sth = $dbh->prepare("Select email FROM people WHERE name = 'Nigel Horne'");
 	$sth->execute();
+
 	my @rc = @{$sth->fetchall_arrayref()};
+
+	my @expected = ('njh@bandsman.co.uk');
+	eq_or_diff(@rc, \@expected, 'Get of valid data succeeds');
+
 	ok(scalar(@rc) == 1);
 	my @row1 = @{$rc[0]};
 	ok(scalar(@row1) == 1);
@@ -28,6 +34,10 @@ STRINGDATA: {
 	$sth = $dbh->prepare("Select email FROM people WHERE name = 'Bugs Bunny'");
 	$sth->execute();
 	@rc = @{$sth->fetchall_arrayref()};
+
+	my @empty = (undef);
+	eq_or_diff(@rc, \@empty, 'Check we can get empty values');
+
 	ok(scalar(@rc) == 1);
 	@row1 = @{$rc[0]};
 	ok(scalar(@row1) == 1);
@@ -36,6 +46,10 @@ STRINGDATA: {
 	$sth = $dbh->prepare('Select name FROM people');
 	$sth->execute();
 	@rc = @{$sth->fetchall_arrayref()};
+
+	my @names = (['Bugs Bunny'], ['Nigel Horne'], ['A N Other']);
+	eq_or_diff(\@rc, \@names, 'Check we can get all of the values');
+
 	ok(scalar(@rc) == 3);
 
 	all_row_ok(

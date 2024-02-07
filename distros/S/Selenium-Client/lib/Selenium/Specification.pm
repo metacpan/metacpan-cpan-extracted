@@ -1,5 +1,5 @@
 package Selenium::Specification;
-$Selenium::Specification::VERSION = '1.06';
+$Selenium::Specification::VERSION = '2.00';
 # ABSTRACT: Module for building a machine readable specification for Selenium
 
 use strict;
@@ -19,7 +19,7 @@ use DateTime::Format::HTTP();
 use HTTP::Tiny();
 use File::Path qw{make_path};
 use File::Spec();
-use Encode qw{decode};
+use Encode             qw{decode};
 use Unicode::Normalize qw{NFC};
 
 #TODO make a JSONWire JSON spec since it's not changing
@@ -27,8 +27,8 @@ use Unicode::Normalize qw{NFC};
 # URLs and the container ID
 our %spec_urls = (
     unstable => {
-       url         => 'https://w3c.github.io/webdriver/',
-       section_id  => 'endpoints',
+        url        => 'https://w3c.github.io/webdriver/',
+        section_id => 'endpoints',
     },
     draft => {
         url        => "https://www.w3.org/TR/webdriver2/",
@@ -46,22 +46,23 @@ my $parse = [];
 our $method = {};
 
 
-sub read($client_dir, $type='stable', $nofetch=1, $hardcode=1) {
+sub read ( $client_dir, $type = 'stable', $nofetch = 1, $hardcode = 1 ) {
     my $buf;
     state $static;
-    if (!$hardcode) {
-        my $dir = File::Spec->catdir( $client_dir,"specs" );
-        my $file =  File::Spec->catfile( "$dir","$type.json");
+    if ( !$hardcode ) {
+        my $dir  = File::Spec->catdir( $client_dir, "specs" );
+        my $file = File::Spec->catfile( "$dir", "$type.json" );
         fetch( once => $nofetch, dir => $dir );
         die "could not write $file: $@" unless -f $file;
         $buf = File::Slurper::read_binary($file);
-    } else {
+    }
+    else {
         $static = readline(DATA) unless $static;
-        $buf = $static;
+        $buf    = $static;
     }
     my $array = JSON::MaybeXS->new()->utf8()->decode($buf);
     my %hash;
-    @hash{map { $_->{name} } @$array} = @$array;
+    @hash{ map { $_->{name} } @$array } = @$array;
     return \%hash;
 }
 
@@ -72,61 +73,59 @@ sub fetch (%options) {
 
     my $rc = 0;
     foreach my $spec ( sort keys(%spec_urls) ) {
-        make_path( $dir ) unless -d $dir;
-        my $file =  File::Spec->catfile( "$dir","$spec.json");
-        my $last_modified = -f $file ? (stat($file))[9] : undef;
+        make_path($dir) unless -d $dir;
+        my $file          = File::Spec->catfile( "$dir", "$spec.json" );
+        my $last_modified = -f $file ? ( stat($file) )[9] : undef;
 
-        if ($options{once} && $last_modified) {
+        if ( $options{once} && $last_modified ) {
             print STDERR "Skipping fetch, using cached result" if $options{verbose};
             next;
         }
 
         $last_modified = 0 if $options{force};
 
-        my $spc = _build_spec($last_modified, %{$spec_urls{$spec}});
-        if (!$spc) {
+        my $spc = _build_spec( $last_modified, %{ $spec_urls{$spec} } );
+        if ( !$spc ) {
             print STDERR "Could not retrieve $spec_urls{$spec}{url}, skipping" if $options{verbose};
             $rc = 1;
             next;
         }
 
         # Second clause is for an edge case -- if the header is not set for some bizarre reason we should obey force still
-        if (ref $spc ne 'ARRAY' && $last_modified) {
+        if ( ref $spc ne 'ARRAY' && $last_modified ) {
             print STDERR "Keeping cached result '$file', as page has not changed since last fetch.\n" if $options{verbose};
             next;
         }
 
-        _write_spec($spc, $file);
+        _write_spec( $spc, $file );
         print "Wrote $file\n" if $options{verbose};
     }
     return $rc;
 }
 
-
-
-sub _write_spec ($spec, $file) {
+sub _write_spec ( $spec, $file ) {
     my $spec_json = JSON::MaybeXS->new()->utf8()->encode($spec);
-    return File::Slurper::write_binary($file, $spec_json);
+    return File::Slurper::write_binary( $file, $spec_json );
 }
 
-sub _build_spec($last_modified, %spec) {
-    my $page = $browser->get($spec{url});
+sub _build_spec ( $last_modified, %spec ) {
+    my $page = $browser->get( $spec{url} );
     return unless $page->{success};
 
-    if ($page->{headers}{'last-modified'} && $last_modified ) {
-        my $modified = DateTime::Format::HTTP->parse_datetime($page->{headers}{'last-modified'})->epoch();
+    if ( $page->{headers}{'last-modified'} && $last_modified ) {
+        my $modified = DateTime::Format::HTTP->parse_datetime( $page->{headers}{'last-modified'} )->epoch();
         return 'cache' if $modified < $last_modified;
     }
 
-    my $html = NFC( decode('UTF-8', $page->{content}) );
+    my $html = NFC( decode( 'UTF-8', $page->{content} ) );
 
     $parse = [];
     %state = ( id => $spec{section_id} );
     my $parser = HTML::Parser->new(
         handlers => {
-            start => [\&_handle_open,  "tagname,attr"],
-            end   => [\&_handle_close, "tagname"],
-            text  => [\&_handle_text,  "text"],
+            start => [ \&_handle_open,  "tagname,attr" ],
+            end   => [ \&_handle_close, "tagname" ],
+            text  => [ \&_handle_text,  "text" ],
         }
     );
     $parser->parse($html);
@@ -134,120 +133,121 @@ sub _build_spec($last_modified, %spec) {
     # Now that we have parsed the methods, let us go ahead and build the argspec based on the anchors for each endpoint.
     foreach my $m (@$parse) {
         $method = $m;
-        %state = ();
+        %state  = ();
         my $mparser = HTML::Parser->new(
             handlers => {
-                start => [\&_endpoint_open,  "tagname,attr"],
-                end   => [\&_endpoint_close, "tagname"],
-                text  => [\&_endpoint_text,  "text"],
+                start => [ \&_endpoint_open,  "tagname,attr" ],
+                end   => [ \&_endpoint_close, "tagname" ],
+                text  => [ \&_endpoint_text,  "text" ],
             },
         );
         $mparser->parse($html);
     }
 
-    return _fixup(\%spec,$parse);
+    return _fixup( \%spec, $parse );
 }
 
-sub _fixup($spec,$parse) {
+sub _fixup ( $spec, $parse ) {
     @$parse = map {
-        $_->{href}    = "$spec->{url}$_->{href}";
+        $_->{href} = "$spec->{url}$_->{href}";
+
         #XXX correct TYPO in the spec
         $_->{uri} =~ s/{sessionid\)/{sessionid}/g;
-        @{$_->{output_params}} = grep { $_ ne 'null' } uniq @{$_->{output_params}};
+        @{ $_->{output_params} } = grep { $_ ne 'null' } uniq @{ $_->{output_params} };
         $_
     } @$parse;
 
     return $parse;
 }
 
-sub _handle_open($tag,$attr) {
+sub _handle_open ( $tag, $attr ) {
 
-    if ( $tag eq 'section' && ($attr->{id} || '') eq $state{id} ) {
+    if ( $tag eq 'section' && ( $attr->{id} || '' ) eq $state{id} ) {
         $state{active} = 1;
         return;
     }
-    if ($tag eq 'tr') {
+    if ( $tag eq 'tr' ) {
         $state{method}  = 1;
         $state{headers} = [qw{method uri name}];
         $state{data}    = {};
         return;
     }
-    if ($tag eq 'td') {
-        $state{heading} = shift @{$state{headers}};
+    if ( $tag eq 'td' ) {
+        $state{heading} = shift @{ $state{headers} };
         return;
     }
-    if ($tag eq 'a' && $state{heading} && $attr->{href}) {
+    if ( $tag eq 'a' && $state{heading} && $attr->{href} ) {
         $state{data}{href} = $attr->{href};
     }
 }
 
-sub _handle_close($tag) {
-    if ($tag eq 'section') {
+sub _handle_close ($tag) {
+    if ( $tag eq 'section' ) {
         $state{active} = 0;
         return;
     }
-    if ($tag eq 'tr' && $state{active}) {
-        if ($state{past_first}) {
-            push(@$parse, $state{data});
+    if ( $tag eq 'tr' && $state{active} ) {
+        if ( $state{past_first} ) {
+            push( @$parse, $state{data} );
         }
 
         $state{past_first} = 1;
-        $state{method} = 0;
+        $state{method}     = 0;
         return;
     }
 }
 
-sub _handle_text($text) {
+sub _handle_text ($text) {
     return unless $state{active} && $state{method} && $state{past_first} && $state{heading};
     $text =~ s/\s//gm;
     return unless $text;
-    $state{data}{$state{heading}} .= $text;
+    $state{data}{ $state{heading} } .= $text;
 }
 
 # Endpoint parsers
 
-sub _endpoint_open($tag,$attr) {
+sub _endpoint_open ( $tag, $attr ) {
     my $id = $method->{href};
     $id =~ s/^#//;
 
-    if ($attr->{id} && $attr->{id} eq $id) {
+    if ( $attr->{id} && $attr->{id} eq $id ) {
         $state{active} = 1;
     }
-    if ($tag eq 'ol') {
+    if ( $tag eq 'ol' ) {
         $state{in_tag} = 1;
     }
-    if ($tag eq 'dt' && $state{in_tag} && $state{last_tag} eq 'dl') {
+    if ( $tag eq 'dt' && $state{in_tag} && $state{last_tag} eq 'dl' ) {
         $state{in_dt} = 1;
     }
-    if ($tag eq 'code' && $state{in_dt} && $state{in_tag} && $state{last_tag} eq 'dt') {
+    if ( $tag eq 'code' && $state{in_dt} && $state{in_tag} && $state{last_tag} eq 'dt' ) {
         $state{in_code} = 1;
     }
 
     $state{last_tag} = $tag;
 }
 
-sub _endpoint_close($tag) {
+sub _endpoint_close ($tag) {
     return unless $state{active};
-    if ($tag eq 'section') {
+    if ( $tag eq 'section' ) {
         $state{active} = 0;
         $state{in_tag} = 0;
     }
-    if ($tag eq 'ol') {
+    if ( $tag eq 'ol' ) {
         $state{in_tag} = 0;
     }
-    if ($tag eq 'dt') {
+    if ( $tag eq 'dt' ) {
         $state{in_dt} = 0;
     }
-    if ($tag eq 'code') {
+    if ( $tag eq 'code' ) {
         $state{in_code} = 0;
     }
 }
 
-sub _endpoint_text($text) {
-    if ($state{active} && $state{in_tag} && $state{in_code} && $state{in_dt} && $state{last_tag} eq 'code') {
+sub _endpoint_text ($text) {
+    if ( $state{active} && $state{in_tag} && $state{in_code} && $state{in_dt} && $state{last_tag} eq 'code' ) {
         $method->{output_params} //= [];
         $text =~ s/\s//gm;
-        push(@{$method->{output_params}},$text) if $text;
+        push( @{ $method->{output_params} }, $text ) if $text;
     }
 }
 
@@ -263,7 +263,7 @@ Selenium::Specification - Module for building a machine readable specification f
 
 =head1 VERSION
 
-version 1.06
+version 2.00
 
 =head1 SUBROUTINES
 

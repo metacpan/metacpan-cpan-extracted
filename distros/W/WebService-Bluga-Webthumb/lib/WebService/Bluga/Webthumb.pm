@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Carp;
 use Digest::MD5;
-use LWP::Simple;
+use LWP::UserAgent;
 use URI;
 use Path::Class;
 use POSIX qw(strftime);
@@ -15,7 +15,7 @@ WebService::Bluga::Webthumb - fetch website thumbnails via webthumb.bluga.net
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -89,10 +89,38 @@ If not specified, defaults to 14 days.
 If set, generated thumbnails will be saved into this directory, and the URL
 returned will be constructed using C<cache_url_stub> (so the C<cache_url_stub>
 setting should be set to the URL at which the contents of C<cache_dir> are
-available).
+available) - thus we're serving cached thumbnails ourselves, which costs no
+credits at all and eases the load on the bluga.net servers.
 
 The age of the cached thumbnail will be compared against the C<cache> setting, 
 and if it's too old, the cached thumbnail will be replaced with a fresh one.
+
+If you set C<cache_dir> you B<must> also set C<cache_url_stub> to the URL
+at which the contents of that directory can be served from - it's up to you
+to make that happen via your preferred method.
+
+Note that if fetching and caching the thumbnail fails, we will return the
+direct URL to the webthumb API such that the client's browser gets a chance
+to fetch it from there instead.  I'm not sure this is the best behaviour,
+it was what happened before 0.06 without much thought put in to it.  It makes
+some sense as it may lead to the client being able to fetch the thumbnail
+if the problem was between our server and the webthumb service, but it may
+also be an unexpected surprise - so a future release may add an option to
+change this behaviour and cause a hard failure if fetching & caching the
+thumbnail fails (poke me if that would be useful to you!)
+
+=item cache_url_stub
+
+As above, if you use C<cache_dir> to arrange for generated thumbnails to be
+fetched and cached locally, you must set C<cache_url_stub> to the URL at
+which the contents of that directory are served; the returned thumbnail URL
+will then be the value of C<cache_url_stub> with the filename (which is the
+hash of the URL and desired size) appended).
+
+=item timeout
+
+When fetching thumbnails from the webthumb server to cache locally, this
+timeout value decides how long we wait - it defaults to 3 seconds.
 
 =back
 
@@ -123,8 +151,17 @@ sub new {
         $params{cache} = 14;
     }
 
+    if (exists $params{cache_dir} && ! exists $params{cache_url_stub}) {
+        croak "Must supply cache_url_stub if you supply cache_dir";
+    }
+
     my $self = \%params;
     bless $self => $class;
+
+    $self->{ua} = LWP::UserAgent->new(
+        agent => __PACKAGE__ . '/' . $VERSION,
+        timeout => $params{timeout} || 3,
+    );
     return $self;
 }
 
@@ -172,10 +209,19 @@ sub thumb_url {
     # If we're caching, we want to fetch the resulting thumbnail and store it
     # locally, then return the URL to that instead
     if ($params->{cache_dir}) {
-        my $img_content = LWP::Simple::get($uri);
-        if ($img_content) {
-            my $url = $self->_cache_image($url, $params, $img_content);
+        my $req = $self->{ua}->get($uri);
+        if ($req->is_success) {
+            my $url = $self->_cache_image($url, $params, $req->content);
             return $url if defined $url;
+        } else {
+            # We couldn't cache it, just return the calculated URL; maybe
+            # the user will have more luck fetching it directly as they
+            # would have without caching enabled (and this is the implied
+            # behaviour before 0.06 switched to using a real UA object with
+            # the timeout set, and checking for success here)
+            # Maybe we should have an option which allows us to throw
+            # an error here so calling code can differentiate easily?
+            return $uri->as_string;
         }
     }
 

@@ -1,26 +1,12 @@
-##########################################################################
-#
-#	File:	Project/Gantt/DateUtils.pm
-#
-#	Author:	Alexander Westholm
-#
-#	Purpose: Collection of utility functions for manipulating
-#		Class::Date objects. Contains functions for getting the
-#		number of hours/days/months between two dates, getting
-#		the end and beginning of hours/days/months, and looking
-#		up the string name of a day of the week or month.
-#
-#	Client: CPAN
-#
-#	CVS: $Id: DateUtils.pm,v 1.4 2004/08/03 17:56:52 awestholm Exp $
-#
-##########################################################################
 package Project2::Gantt::DateUtils;
 
 use Mojo::Base -strict,-signatures;
 
 use Exporter ();
 use vars qw[@EXPORT_OK %EXPORT_TAGS @ISA];
+
+our $DATE = '2024-02-05'; # DATE
+our $VERSION = '0.011';
 
 @ISA = qw[Exporter];
 

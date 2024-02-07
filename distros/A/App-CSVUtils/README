@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 1.033 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2023-09-06.
+    This document describes version 1.034 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2024-02-02.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -63,14 +63,15 @@ DESCRIPTION
     53. csv-trim
     54. csv-uniq
     55. csv-unquote
-    56. csv2ltsv
-    57. csv2paras
-    58. csv2td
-    59. csv2tsv
-    60. csv2vcf
-    61. list-csvutils
-    62. paras2csv
-    63. tsv2csv
+    56. csv2csv
+    57. csv2ltsv
+    58. csv2paras
+    59. csv2td
+    60. csv2tsv
+    61. csv2vcf
+    62. list-csvutils
+    63. paras2csv
+    64. tsv2csv
 
 FUNCTIONS
   gen_csv_util
@@ -537,8 +538,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017,
-    2016 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2019, 2018,
+    2017, 2016 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

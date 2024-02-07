@@ -4,13 +4,14 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "unknown",
+      "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Params-Validate-Dependencies-all_or_none_of",
    "no_index" : {
@@ -32,7 +33,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Params::Validate::Dependencies" : "1.22"
+            "Params::Validate::Dependencies" : "1.22",
+            "Test::More" : "0.88"
          }
       }
    },
@@ -45,5 +47,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies-all_or_none_of"
       }
    },
-   "version" : "1.01"
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

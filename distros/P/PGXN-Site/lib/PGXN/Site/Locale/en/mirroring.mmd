@@ -22,8 +22,13 @@ On Windows, use AT like so:
 Please do not sync more than once every hour. And realistically you only need to
 sync once or twice a day. Next, set up a web server to serve the mirror. If your
 rsync is already in the subdirectory of a web server root, you should be golden.
-Otherwise, if you’re using [Apache], you can set up a virtual host like so
-(assuming that you’re `rsync`ing to `/usr/local/pgxn`):
+Otherwise you need a static file web server; perhaps the simplest is this [Python
+one-liner] serving on port 8080:
+
+    python -m http.server 8080
+
+If you’re using [Apache], you can set up a virtual host like so (assuming that
+you’re `rsync`ing to `/usr/local/pgxn`):
 
     <VirtualHost *:80>
       DocumentRoot /usr/local/pgxn
@@ -51,7 +56,8 @@ For [Nginx], you set set up a virtual host like this:
 If you’d like to register your mirror, [send us email] with all the details and
 we’ll get you registered.
 
-  [rsync]: https://rsync.samba.org/
-  [Apache]: https://httpd.apache.org/
-  [Nginx]: https://www.nginx.org/
+  [rsync]: https://rsync.samba.org
+  [Python one-liner]: https://docs.python.org/3/library/http.server.html
+  [Apache]: https://httpd.apache.org
+  [Nginx]: https://nginx.org
   [send us email]: mailto:[_1]

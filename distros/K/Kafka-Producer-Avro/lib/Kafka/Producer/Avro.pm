@@ -103,9 +103,11 @@ use Avro::BinaryEncoder;
 use Avro::Schema;
 use Confluent::SchemaRegistry;
 
+use Memoize;
+
 use constant MAGIC_BYTE => 0; 
 
-use version; our $VERSION = version->declare('v1.0.0');
+use version; our $VERSION = version->declare('v1.0.1');
 
 =head1 INSTALL
 
@@ -213,6 +215,7 @@ sub _set_error   { $_[0]->{__ERROR} = $_[1] }
 sub _get_error   { $_[0]->{__ERROR} }
 
 # Interact with Schema Registry
+memoize('_get_avro_schema');
 sub _get_avro_schema {
 	my $self = shift;
 	my $topic = shift;
@@ -222,8 +225,6 @@ sub _get_avro_schema {
 	my $subject = $topic . '-' . $type;
 	my $sr = $self->schema_registry();
 	my ($schema_id, $avro_schema);
-	
-	# FIXME need to use caching w/ TTL to avoid these checks for every call
 	
 	# If a schema is supplied...	
 	if ($supplied_schema) {

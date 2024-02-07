@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::par::unisam2;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  UNISAM2 - UNIformly SAMple a 2-D function f(x1,x2)			
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 
@@ -66,7 +66,7 @@ package App::SeismicUnixGui::sunix::par::unisam2;
 
 
 
- AUTHOR:  Dave Hale, Colorado School of Mines, 01/12/91\n"
+ Author:  Dave Hale, Colorado School of Mines, 01/12/91\n"
 
 =head2 CHANGES and their DATES
 

@@ -463,7 +463,7 @@ sub gui_full_clear {
 	
 	# print("1. param_widgets_neutral,gui_full_clear, check button settings:--@{$param_widgets_color_href->{_check_buttons_settings_aref}}--\n");
 	
-	$wipe->full_range($param_widgets_color_href);
+	$wipe->neutral_range($param_widgets_color_href);
 	# print("2. param_widgets_neutral,gui_full_clear, check button settings:--@{$param_widgets_color_href->{_check_buttons_settings_aref}}--\n");
 	$wipe->values();
 	# print("3. param_widgets_neutral,gui_full_clear, check button settings:--@{$param_widgets_color_href->{_check_buttons_settings_aref}}--\n");

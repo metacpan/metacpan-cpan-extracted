@@ -13,7 +13,7 @@ Neo4j::Driver::Config - Driver configuration options
 
 =head1 VERSION
 
-version 0.42
+version 0.44
 
 =head1 SYNOPSIS
 
@@ -188,25 +188,34 @@ former name is now discouraged.
 
 Specifies the Neo4j server connection URI. The URI scheme determines
 the type of driver created. Supported schemes are C<bolt>, C<http>,
-and C<https>.
+C<https>, and C<neo4j>.
 Use of C<bolt> URIs requires L<Neo4j::Bolt> to be installed; use
 of C<https> URIs requires L<LWP::Protocol::https> to be installed.
 
+All URIs using the C<neo4j> scheme are interpreted either as C<bolt>
+or as C<http>/C<https> URIs. The conditions that influence this
+behaviour are unspecified for this driver and are subject to change.
+Instead of relying on the C<neo4j> URI scheme, you should explicitly
+select C<bolt> or C<http>/C<https>, as appropriate for your database
+setup. No first-party implementation of client-side routing is
+planned (but plug-ins might get a hook for it in a future version).
+
 If a part of the URI or even the entire URI is missing, suitable
 default values will be substituted. In particular, the host name
-C<localhost> and the protocol C<http> will be used as defaults;
+C<127.0.0.1> and the protocol C<neo4j> will be used as defaults;
 if no port is specified, the protocol's default port will be used.
 
  # all of these are semantically equal
  $driver->config(uri =>  undef );
- $driver->config(uri => 'http:');
- $driver->config(uri => 'localhost');
- $driver->config(uri => 'http://localhost');
- $driver->config(uri => 'http://localhost:7474/');
-
-The C<neo4j> URI scheme is not yet implemented. Once it is added
-to a future version of this driver, the default URI scheme will
-likely change to C<neo4j>.
+ $driver->config(uri => '127.0.0.1');
+ $driver->config(uri => 'neo4j:');
+ $driver->config(uri => 'neo4j://127.0.0.1');
+ 
+ # default ports for each protocol are optional
+ $driver->config(uri => 'bolt://localhost');   # port 7687
+ $driver->config(uri => 'http://localhost');   # port 7474
+ $driver->config(uri => 'https://localhost');  # port 7473
+ $driver->config(uri => 'neo4j://localhost');  # varies
 
 Note that there sometimes are issues with IPv4/IPv6 dual-stack
 hostnames such as C<localhost> when using HTTP. The connection may
@@ -220,11 +229,11 @@ L<Neo4j::Driver>
 
 =head1 AUTHOR
 
-Arne Johannessen (L<AJNN|https://arne.johannessen.de/>)
+Arne Johannessen (L<AJNN|https://metacpan.org/author/AJNN>)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2023 by Arne Johannessen.
+This software is Copyright (c) 2016-2024 by Arne Johannessen.
 
 This is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0 or (at your option) the same terms

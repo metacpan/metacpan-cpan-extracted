@@ -10,11 +10,27 @@ class Eg::Node::ProcessingInstruction extends Eg::Node::CharacterData {
   has target : ro string;
   
   # Class Methods
-  private static method new : Eg::Node::ProcessingInstruction ($node_value : string) {
+  private static method new : Eg::Node::ProcessingInstruction ($target : string, $data : string, $options : object[] = undef) {
+    
+    unless ($target) {
+      die "\$target must be defined.";
+    }
+    
+    unless (Regex->new("^[a-zA-Z_][\w+\-\.]*$")->match($target)) {
+      die "\$target must be a valid XML name.";
+    }
+    
+    if ($data) {
+      if (Fn->contains($data, "?>")) {
+        die "\$data cannot contain  \"?>\".";
+      }
+    }
     
     my $self = new Eg::Node::ProcessingInstruction;
     
-    $self->SUPER::init({node_type => Eg::Node->TYPE_PROCESSING_INSTRUCTION_NODE, node_value => $node_value});
+    $self->SUPER::init(Eg->merge_options_v2($options, {node_type => Eg::Node->TYPE_PROCESSING_INSTRUCTION_NODE, node_value => $data}));
+    
+    $self->{target} = $target;
     
     return $self;
   }

@@ -1,15 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Resolver;
+package IO::Async::Resolver 0.803;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( IO::Async::Function );
-
-our $VERSION = '0.802';
 
 # Socket 2.006 fails to getaddrinfo() AI_NUMERICHOST properly on MSWin32
 use Socket 2.007 qw(
@@ -41,13 +39,15 @@ C<IO::Async::Resolver> - performing name resolutions asynchronously
 
 This object is used indirectly via an L<IO::Async::Loop>:
 
+   use Future::AsyncAwait;
    use IO::Async::Loop;
+
    my $loop = IO::Async::Loop->new;
 
-   my @results = $loop->resolver->getaddrinfo(
+   my @results = await $loop->resolver->getaddrinfo(
       host    => "www.example.com",
       service => "http",
-   )->get;
+   );
 
    foreach my $addr ( @results ) {
       printf "http://www.example.com can be reached at " .
@@ -55,7 +55,7 @@ This object is used indirectly via an L<IO::Async::Loop>:
          @{$addr}{qw( family socktype protocol addr )};
    }
 
-   my @pwent = $loop->resolve( type => 'getpwuid', data => [ $< ] )->get;
+   my @pwent = await $loop->resolve( type => 'getpwuid', data => [ $< ] );
 
    print "My passwd ent: " . join( "|", @pwent ) . "\n";
 
@@ -145,14 +145,14 @@ sub debug_printf_result
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in C<await> expressions return L<Future>
+instances.
 
 =cut
 
 =head2 resolve
 
-   @result = $loop->resolve( %params )->get
+   @result = await $loop->resolve( %params );
 
 Performs a single name resolution operation, as given by the keys in the hash.
 
@@ -185,7 +185,7 @@ error details specific to the resolver in question.
 
 =head2 resolve (void)
 
-   $resolver->resolve( %params )
+   $resolver->resolve( %params );
 
 When not returning a future, additional parameters can be given containing the
 continuations to invoke on success or failure:
@@ -262,7 +262,7 @@ sub resolve
 
 =head2 getaddrinfo
 
-   @addrs = $resolver->getaddrinfo( %args )->get
+   @addrs = await $resolver->getaddrinfo( %args );
 
 A shortcut wrapper around the C<getaddrinfo> resolver, taking its arguments in
 a more convenient form.
@@ -321,7 +321,7 @@ the lookup is performed asynchronously instead.
 
 =head2 getaddrinfo (void)
 
-   $resolver->getaddrinfo( %args )
+   $resolver->getaddrinfo( %args );
 
 When not returning a future, additional parameters can be given containing the
 continuations to invoke on success or failure:
@@ -332,13 +332,13 @@ continuations to invoke on success or failure:
 
 Callback which is invoked after a successful lookup.
 
-   $on_resolved->( @addrs )
+   $on_resolved->( @addrs );
 
 =item on_error => CODE
 
 Callback which is invoked after a failed lookup, including for a timeout.
 
-   $on_error->( $exception )
+   $on_error->( $exception );
 
 =back
 
@@ -356,7 +356,7 @@ sub getaddrinfo
       croak "Expected 'on_error' or to return a Future";
 
    my $host    = $args{host}    || "";
-   my $service = $args{service}; defined $service or $service = "";
+   my $service = $args{service} // "";
    my $flags   = $args{flags}   || 0;
 
    $flags |= AI_PASSIVE if $args{passive};
@@ -419,7 +419,7 @@ sub getaddrinfo
 
 =head2 getnameinfo
 
-   ( $host, $service ) = $resolver->getnameinfo( %args )->get
+   ( $host, $service ) = await $resolver->getnameinfo( %args );
 
 A shortcut wrapper around the C<getnameinfo> resolver, taking its arguments in
 a more convenient form.
@@ -464,7 +464,7 @@ C<NI_NUMERICHOST> and C<NI_NUMERICSERV> flags are given.
 
 =head2 getnameinfo (void)
 
-   $resolver->getnameinfo( %args )
+   $resolver->getnameinfo( %args );
 
 When not returning a future, additional parameters can be given containing the
 continuations to invoke on success or failure:
@@ -475,13 +475,13 @@ continuations to invoke on success or failure:
 
 Callback which is invoked after a successful lookup.
 
-   $on_resolved->( $host, $service )
+   $on_resolved->( $host, $service );
 
 =item on_error => CODE
 
 Callback which is invoked after a failed lookup, including for a timeout.
 
-   $on_error->( $exception )
+   $on_error->( $exception );
 
 =back
 
@@ -544,7 +544,9 @@ sub getnameinfo
 
 =cut
 
-=head2 register_resolver( $name, $code )
+=head2 register_resolver
+
+   register_resolver( $name, $code );
 
 Registers a new named resolver function that can be called by the C<resolve>
 method. All named resolvers must be registered before the object is

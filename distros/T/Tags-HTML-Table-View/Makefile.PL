@@ -28,12 +28,13 @@ resources 'homepage' => 'https://github.com/michal-josef-spacek/Tags-HTML-Table-
 resources 'repository' => 'git://github.com/michal-josef-spacek/Tags-HTML-Table-View';
 test_requires 'CSS::Struct::Output::Raw' => 0;
 test_requires 'CSS::Struct::Output::Structure' => 0;
+test_requires 'Data::HTML::Element::A' => 0.10;
 test_requires 'Tags::Output::Raw' => 0;
 test_requires 'Tags::Output::Structure' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

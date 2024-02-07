@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::statsMath::suop2;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUOP2 - do a binary operation on two data sets			
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   Feb. 19 2015,
  DESCRIPTION:
  Version:  0.0.1

@@ -6,48 +6,26 @@ package SPVM::Eg::Node::Document::XML;
 
 =head1 Name
 
-SPVM::Eg::Node::Document::XML - Short Description
+SPVM::Eg::Node::Document::XML - XMLDocument in JavaScript
 
 =head1 Description
 
-The Eg::Node::Document::XML class in L<SPVM> has methods to do someting.
+The Eg::Node::Document::XML class in L<SPVM> represents an XML document.
+
+This class is a port of L<XMLDocument|https://developer.mozilla.org/en-US/docs/Web/API/XMLDocument> in JavaScript.
 
 =head1 Usage
 
-  use Eg::Node::Document::XML;
+  my $xml_document = Eg->document->implementation->create_document(
+    "http://www.w3.org/1999/xhtml",
+    "html",
+  );
+  
+  my $element = $xml_document->create_element("div");
 
-=head1 Details
+=head1 Inheritance
 
-
-
-=head1 Interfaces
-
-
-
-=head1 Enumerations
-
-
-
-=head1 Fields
-
-
-
-=head1 Class Methods
-
-
-
-=head1 Instance Methods
-
-
-
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+L<Eg::Node::Document|SPVM::Eg::Node::Document>
 
 =head1 Copyright & License
 

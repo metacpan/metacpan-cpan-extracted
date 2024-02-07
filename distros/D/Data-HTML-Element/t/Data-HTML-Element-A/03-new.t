@@ -4,7 +4,7 @@ use warnings;
 use English;
 use Error::Pure::Utils qw(clean);
 use Data::HTML::Element::A;
-use Test::More 'tests' => 8;
+use Test::More 'tests' => 9;
 use Test::NoWarnings;
 
 # Test.
@@ -70,4 +70,14 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'data' in 'tags' mode must contain reference to array with references to array with Tags structure.\n",
 	"Parameter 'data' in 'tags' mode must contain reference to array with references to array with Tags structure.");
+clean();
+
+# Test.
+eval {
+	Data::HTML::Element::A->new(
+		'target' => 'bad',
+	);
+};
+is($EVAL_ERROR, "Parameter 'target' must be one of defined strings.\n",
+	"Parameter 'target' must be one of defined strings.");
 clean();

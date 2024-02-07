@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::model::suea2df;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUEA2DF - SU version of (an)elastic anisotropic 2D finite difference 	
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 

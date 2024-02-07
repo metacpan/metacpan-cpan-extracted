@@ -9,11 +9,10 @@
 # Sun Oct 25 14:32:20 EDT 2009
 
 
-
 use strict;
 use warnings;
 package Date::Holidays::CA;
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 # ABSTRACT: Date::Holidays::CA determines public holidays for Canadian jurisdictions
 
@@ -105,6 +104,9 @@ sub is_ca_holiday {
     my $day     = shift;
     my $options = shift;
 
+    if (defined $options and defined $options->{province} ) {
+        $self->{province} = $options->{province}
+    }
     _assert_valid_date($year, $month, $day);
 
     unless (defined $self) {
@@ -526,7 +528,7 @@ sub _st_patricks_day {
 
     return DateTime->new(
         year  => $year,
-        month => 2,
+        month => 3,
         day   => _nearest_monday($year, 3, 17),
     );
 }
@@ -736,7 +738,7 @@ Date::Holidays::CA - Date::Holidays::CA determines public holidays for Canadian 
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -751,7 +753,8 @@ version 0.05
     print 'Woot!' if is_holiday($year, $month, $day, {province => 'BC'});
 
     my $calendar = holidays($year, {province => 'BC'});
-    print $calendar->('0701');              # "Canada Day/Fête du Canada"
+    #returns a hash reference
+    print $calendar->{'0701'};              # "Canada Day/Fête du Canada"
 
 
     # object-oriented approach
@@ -933,10 +936,12 @@ that year.  The keys are the date of the holiday in C<mmdd> format
 (eg '1225' for December 25); the values are the holiday names.
 
     my $calendar = holidays($year, {province => 'MB', language => 'EN'});
-    print $calendar->('0701');               # "Canada Day"
+    #returns a hash reference
+    print $calendar->{'0701'};               # "Canada Day"
 
     my $calendar = $dhc->holidays($year);
-    print $calendar->('1111');               # "Remembrance Day"
+    #returns a hash reference
+    print $calendar->{'1111'};               # "Remembrance Day"
 
 =head3 ca_holidays()
 

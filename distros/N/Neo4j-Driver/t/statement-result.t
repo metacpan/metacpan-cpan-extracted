@@ -24,7 +24,7 @@ use Test::Warnings 0.010 qw(:no_end_test);
 my $no_warnings;
 use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
-plan tests => 13 + 1 + $no_warnings;
+plan tests => 14 + 1 + $no_warnings;
 
 my $transaction = $driver->session->begin_transaction;
 $transaction->{return_stats} = 0;  # optimise sim
@@ -63,11 +63,12 @@ subtest 'stream interface: zero rows' => sub {
 
 
 subtest 'stream interface: one row' => sub {
-	plan tests => 5;
+	plan tests => 6;
 	$r = $s->run('RETURN 42');
 	lives_and { ok $r->has_next } 'has next before';
 	lives_ok { $v = 0;  $v = $r->fetch } 'fetch single row';
 	isa_ok $v, 'Neo4j::Driver::Record', 'fetch: confirmed record';
+	ok ! $r->{attached}, 'detached after';
 	lives_and { ok ! $r->has_next } 'no has next after';
 	lives_and { is $r->fetch(), undef } 'fetch no second row';
 };
@@ -84,19 +85,36 @@ subtest 'stream interface: more rows' => sub {
 };
 
 
-$Neo4j::Driver::Result::fake_attached = 1;
-$Neo4j::Driver::Result::Bolt::gather_results = 1;
 subtest 'stream interface: fake attached' => sub {
-	plan tests => 5;
+	local $Neo4j::Driver::Result::fake_attached = 1;
+	local $Neo4j::Driver::Result::Bolt::gather_results = 1;
+	plan tests => 7;
 	$r = $s->run('RETURN 7 AS n UNION RETURN 11 AS n');
 	lives_and { ok $r->fetch } 'fetch first row';
+	lives_and { ok $r->{attached} } 'attached before second';
 	lives_and { ok $r->has_next } 'has next before second';
 	lives_and { ok $r->fetch } 'fetch second row';
+	lives_and { ok ! $r->{attached} } 'detached after second';
 	lives_and { ok ! $r->has_next } 'no has next after second';
 	lives_and { is $r->fetch(), undef } 'fetch no third row';
 };
-$Neo4j::Driver::Result::fake_attached = 0;
-$Neo4j::Driver::Result::Bolt::gather_results = 0;
+
+
+subtest 'stream interface: look ahead' => sub {
+	plan tests => 10;
+	$r = $s->run('RETURN 7 AS n UNION RETURN 11 AS n');
+	my ($peek, $v);
+	lives_ok { $peek = 0;  $peek = $r->peek } 'peek 1st';
+	lives_ok { $v = 0;  $v = $r->fetch } 'fetch 1st';
+	isa_ok $peek, 'Neo4j::Driver::Record', 'peek record 1st';
+	is $peek, $v, 'peek matches fetch 1st';
+	lives_ok { $peek = 0;  $peek = $r->peek } 'peek 2nd';
+	lives_ok { $v = 0;  $v = $r->fetch } 'fetch 2nd';
+	isa_ok $peek, 'Neo4j::Driver::Record', 'peek record 2nd';
+	is $peek, $v, 'peek matches fetch 2nd';
+	lives_and { ok ! $r->fetch } 'no fetch 3rd';
+	lives_and { is_deeply [$r->peek], [undef] } 'peek undef 3rd';
+};
 
 
 subtest 'list interface: zero rows' => sub {
@@ -137,9 +155,9 @@ subtest 'list interface: more rows' => sub {
 };
 
 
-$Neo4j::Driver::Result::fake_attached = 1;
-$Neo4j::Driver::Result::Bolt::gather_results = 1;
 subtest 'list interface: fake attached' => sub {
+	local $Neo4j::Driver::Result::fake_attached = 1;
+	local $Neo4j::Driver::Result::Bolt::gather_results = 1;
 	plan tests => 7;
 	$r = $s->run('RETURN 7 AS n UNION RETURN 11 AS n');
 	lives_and { is $r->size, 2 } 'size two rows';
@@ -151,8 +169,6 @@ subtest 'list interface: fake attached' => sub {
 	lives_ok { @a = ();  @a = $r->list } 'list again';
 	is_deeply [@a], [@list], 'lists match';
 };
-$Neo4j::Driver::Result::fake_attached = 0;
-$Neo4j::Driver::Result::Bolt::gather_results = 0;
 
 
 subtest 'list interface: arrayref in scalar context' => sub {

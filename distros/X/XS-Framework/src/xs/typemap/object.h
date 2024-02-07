@@ -80,9 +80,9 @@ struct ObjectStorageMG_Impl {
 
         #ifdef USE_ITHREADS
             marker->svt_dup = _on_svdup;
-            mg->mg_flags = MGf_DUP;
+            mg->mg_flags = MGf_DUP | MGf_COPY | MGf_LOCAL;
         #else
-            mg->mg_flags = 0;
+            mg->mg_flags = MGf_COPY | MGf_LOCAL;
         #endif
     }
 

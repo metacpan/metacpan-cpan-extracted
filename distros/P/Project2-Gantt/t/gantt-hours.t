@@ -92,7 +92,7 @@ $gantt->addTask(
 );
 
 my $got = [
-    map { $_->description } $gantt->tasks->@*
+    map { $_->description } @{$gantt->tasks}
 ];
 
 my $expected = [

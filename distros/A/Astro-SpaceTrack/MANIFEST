@@ -62,8 +62,6 @@ t/data/Mock-LWP-UserAgent/ecef6b565d11dadf7b8457118813d872.json
 t/file.dat
 t/query_amsat.t
 t/query_celestrak.t
-t/query_iridium_status_kelso.t
-t/query_iridium_status_sladen.t
 t/query_mccants.t
 t/query_misc.t
 t/query_spacetrack.t

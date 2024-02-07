@@ -2,7 +2,7 @@ package Net::SAML2::RequestedAttribute;
 use Moose;
 use XML::Generator;
 use URN::OASIS::SAML2 qw(URN_METADATA NS_METADATA);
-our $VERSION = '0.76'; # VERSION
+our $VERSION = '0.77'; # VERSION
 
 # ABSTRACT: RequestedAttribute class
 
@@ -80,7 +80,7 @@ Net::SAML2::RequestedAttribute - RequestedAttribute class
 
 =head1 VERSION
 
-version 0.76
+version 0.77
 
 =head1 SYNOPSIS
 

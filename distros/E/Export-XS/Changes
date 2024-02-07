@@ -1,4 +1,6 @@
-3.0.6  xx.xx.2022
+3.0.7  31.01.2024
+        - perl 5.40 related
+3.0.6  22.06.2022
         - perl 5.36 related
 3.0.5  19.06.2020
         - add 'export_constants' to XS API

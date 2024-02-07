@@ -160,7 +160,7 @@ my @cleanup = ("pdl$Config{exe_ext}", qw(
 # use similar mods to affect CCFLAGS on other systems as needed...
 
 my $ccflags =  $Config{ccflags};
-if($Config{archname}=~m/x86_64/) {
+if($Config{archname}=~m/amd64|i686|x86_64/) {
     $ccflags .= " -fPIC";
 }
 
@@ -309,13 +309,20 @@ $text .= "\n" . ::coretarget($self);
 my $coretest = join ' ', map File::Spec->catfile('t', $_.'.t'), qw(
   01-pptest autoload bad basic bool clump config constructor core croak lvalue
   math matrix matrixops nat_complex ops-bitwise ops pdl_from_string
-  pdlchar pp_croaking pp_line_numbers primitive pthread reduce
+  pdlchar pp_croaking pp_line_numbers primitive-* pthread reduce
   slice subclass thread thread_def ufunc
 );
 $text .= <<EOF;
 
 coretest : core
 	prove -b $coretest
+EOF
+
+$text .= <<EOF;
+
+update-ppport:
+	cd Basic/Core && \$(PERLRUN) -MDevel::PPPort -e'Devel::PPPort::WriteFile' && \$(PERLRUN) ppport.h --strip
+
 EOF
 
 return $text

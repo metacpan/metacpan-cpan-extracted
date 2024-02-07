@@ -1,5 +1,5 @@
 package Selenium::Driver::SeleniumHQ::Jar;
-$Selenium::Driver::SeleniumHQ::Jar::VERSION = '1.06';
+$Selenium::Driver::SeleniumHQ::Jar::VERSION = '2.00';
 use strict;
 use warnings;
 
@@ -8,9 +8,9 @@ use v5.28;
 no warnings 'experimental';
 use feature qw/signatures/;
 
-use Carp qw{confess};
+use Carp           qw{confess};
 use File::Basename qw{basename};
-use File::Path qw{make_path};
+use File::Path     qw{make_path};
 use File::Spec();
 use XML::LibXML();
 use HTTP::Tiny();
@@ -20,23 +20,23 @@ use HTTP::Tiny();
 
 our $index = 'http://selenium-release.storage.googleapis.com';
 
-sub build_spawn_opts($class,$object) {
-    $object->{driver_class}       = $class;
+sub build_spawn_opts ( $class, $object ) {
+    $object->{driver_class} = $class;
     $object->{driver_interpreter} //= 'java';
     $object->{driver_version}     //= '';
-    $object->{log_file}           //= File::Spec->catfile($object->{client_dir},"perl-client","selenium-$object->{port}.log");
-    ($object->{driver_file}, $object->{driver_major_version}) = find_and_fetch( File::Spec->catdir($object->{client_dir},"jars"), $object->{driver_version},$object->{ua});
+    $object->{log_file}           //= File::Spec->catfile( $object->{client_dir}, "perl-client", "selenium-$object->{port}.log" );
+    ( $object->{driver_file}, $object->{driver_major_version} ) = find_and_fetch( File::Spec->catdir( $object->{client_dir}, "jars" ), $object->{driver_version}, $object->{ua} );
     $object->{driver_config} //= _build_config($object);
 
     #XXX port in config is currently IGNORED
     my @java_opts;
-    my @config = ((qw{standalone --config}), $object->{driver_config}, '--port', $object->{port});
+    my @config = ( (qw{standalone --config}), $object->{driver_config}, '--port', $object->{port} );
 
     # Handle older seleniums that are WC3 compliant
     if ( $object->{driver_major_version} < 4 ) {
         $object->{prefix} = '/wd/hub';
-        @java_opts = qw{-Dwebedriver.gecko.driver=geckodriver -Dwebdriver.chrome.driver=chromedriver};
-        @config = ();
+        @java_opts        = qw{-Dwebedriver.gecko.driver=geckodriver -Dwebdriver.chrome.driver=chromedriver};
+        @config           = ();
     }
 
     # Build command string
@@ -51,12 +51,11 @@ sub build_spawn_opts($class,$object) {
     return $object;
 }
 
-sub _build_config($self) {
-    my $dir = File::Spec->catdir($self->{client_dir},"perl-client");
-    make_path( $dir ) unless -d $dir;
+sub _build_config ($self) {
+    my $dir = File::Spec->catdir( $self->{client_dir}, "perl-client" );
+    make_path($dir) unless -d $dir;
 
-
-    my $file = File::Spec->catfile($dir,"config-$self->{port}.toml");
+    my $file = File::Spec->catfile( $dir, "config-$self->{port}.toml" );
     return $file if -f $file;
 
     # TODO add some self-signed SSL to this
@@ -85,40 +84,38 @@ EOF
     $config =~ s/--REPLACE--/\"$log_corrected\"/gm;
     $config =~ s/--PORT--/$self->{port}/gm;
 
-    File::Slurper::write_text($file, $config);
+    File::Slurper::write_text( $file, $config );
     return $file;
 }
 
 
-sub find_and_fetch($dir, $version='', $ua='') {
+sub find_and_fetch ( $dir, $version = '', $ua = '' ) {
     $ua ||= HTTP::Tiny->new();
     my $res = $ua->get($index);
     confess "$res->{reason} :\n$res->{content}\n" unless $res->{success};
-    my $parsed = XML::LibXML->load_xml(string => $res->{content});
+    my $parsed = XML::LibXML->load_xml( string => $res->{content} );
 
     #XXX - XPATH NO WORKY, HURR DURR
     my @files;
-    foreach my $element ($parsed->findnodes('//*')) {
-        my $contents = $element->getChildrenByTagName("Contents");
-        my @candidates = sort { $b cmp $a } grep { m/selenium-server/ && m/\.jar$/ } map {
-            $_->getChildrenByTagName('Key')->to_literal().'';
-        } @$contents;
-        push(@files,@candidates);
+    foreach my $element ( $parsed->findnodes('//*') ) {
+        my $contents   = $element->getChildrenByTagName("Contents");
+        my @candidates = sort { $b cmp $a } grep { m/selenium-server/ && m/\.jar$/ } map { $_->getChildrenByTagName('Key')->to_literal() . ''; } @$contents;
+        push( @files, @candidates );
     }
 
     @files = grep { m/\Q$version\E/ } @files if $version;
     my $jar = shift @files;
     my $url = "$index/$jar";
 
-    make_path( $dir ) unless -d $dir;
-    my $fname = File::Spec->catfile($dir, basename($jar));
+    make_path($dir) unless -d $dir;
+    my $fname = File::Spec->catfile( $dir, basename($jar) );
     my ($v) = $fname =~ m/-(\d)\.\d\.\d.*\.jar$/;
-    return ($fname,$v) if -f $fname;
+    return ( $fname, $v ) if -f $fname;
 
-    $res = $ua->mirror($url, $fname);
+    $res = $ua->mirror( $url, $fname );
 
     confess "$res->{reason} :\n$res->{content}\n" unless $res->{success};
-    return ($fname,$v);
+    return ( $fname, $v );
 }
 
 1;
@@ -135,7 +132,7 @@ Selenium::Driver::SeleniumHQ::Jar - Download the latest version of seleniumHQ's 
 
 =head1 VERSION
 
-version 1.06
+version 2.00
 
 =head1 Mode of Operation
 

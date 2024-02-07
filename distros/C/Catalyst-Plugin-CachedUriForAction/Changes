@@ -1,5 +1,9 @@
 Release history for Catalyst-Plugin-CachedUriForAction
 
+1.005 Thu 01 Feb 2024
+	- Plugin style return to inheritance for easier wrapping
+	- Performance improvements
+
 1.004 Sat 12 Aug 2023
 	- Plugin style switch from inheritance-based to a role
 

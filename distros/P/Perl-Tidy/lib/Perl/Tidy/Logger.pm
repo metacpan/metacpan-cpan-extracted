@@ -8,7 +8,8 @@
 package Perl::Tidy::Logger;
 use strict;
 use warnings;
-our $VERSION = '20230912';
+our $VERSION = '20240202';
+use Carp;
 use English qw( -no_match_vars );
 
 use constant DEVEL_MODE   => 0;
@@ -28,7 +29,7 @@ sub AUTOLOAD {
 ======================================================================
 Error detected in package '$my_package', version $VERSION
 Received unexpected AUTOLOAD call for sub '$AUTOLOAD'
-Called from package: '$pkg'  
+Called from package: '$pkg'
 Called from File '$fname'  at line '$lno'
 This error is probably due to a recent programming change
 ======================================================================
@@ -45,7 +46,8 @@ use constant DEFAULT_LOGFILE_GAP => 50;
 
 sub new {
 
-    my ( $class, @args ) = @_;
+    my ( $class, @arglist ) = @_;
+    if ( @arglist % 2 ) { croak "Odd number of items in arg hash list\n" }
 
     my %defaults = (
         rOpts           => undef,
@@ -56,7 +58,7 @@ sub new {
         is_encoded_data => undef,
     );
 
-    my %args = ( %defaults, @args );
+    my %args = ( %defaults, @arglist );
 
     my $rOpts           = $args{rOpts};
     my $log_file        = $args{log_file};
@@ -173,10 +175,14 @@ use constant MAX_PRINTED_CHARS => 35;
 
 sub black_box {
     my ( $self, $line_of_tokens, $output_line_number ) = @_;
+
+    # This routine saves information comparing the indentation of input
+    # and output lines when a detailed logfile is requested.
+    # This was very useful during the initial development of perltidy.
+
     my $input_line        = $line_of_tokens->{_line_text};
     my $input_line_number = $line_of_tokens->{_line_number};
 
-    # save line information in case we have to write a logfile message
     $self->{_line_of_tokens}                = $line_of_tokens;
     $self->{_output_line_number}            = $output_line_number;
     $self->{_wrote_line_information_string} = 0;
@@ -194,7 +200,7 @@ sub black_box {
         $structural_indentation_level = 0
           if ( $structural_indentation_level < 0 );
         $self->{_last_input_line_written} = $input_line_number;
-        ( my $out_str = $input_line ) =~ s/^\s*//;
+        ( my $out_str = $input_line ) =~ s/^\s+//;
         chomp $out_str;
 
         $out_str = ( '.' x $structural_indentation_level ) . $out_str;
@@ -382,11 +388,12 @@ sub warning {
         my $is_encoded_data = $self->{_is_encoded_data};
         if ( !$fh_warnings ) {
             my $warning_file = $self->{_warning_file};
-            ( $fh_warnings, my $filename ) =
+            $fh_warnings =
               Perl::Tidy::streamhandle( $warning_file, 'w', $is_encoded_data );
-            $fh_warnings
-              or Perl::Tidy::Die("couldn't open $filename: $OS_ERROR\n");
-            Perl::Tidy::Warn_msg("## Please see file $filename\n")
+            if ( !$fh_warnings ) {
+                Perl::Tidy::Die("couldn't open warning file '$warning_file'\n");
+            }
+            Perl::Tidy::Warn_msg("## Please see file $warning_file\n")
               unless ref($warning_file);
             $self->{_fh_warnings} = $fh_warnings;
             $fh_warnings->print("Perltidy version is $Perl::Tidy::VERSION\n");
@@ -458,12 +465,9 @@ sub report_definite_bug {
 }
 
 sub get_save_logfile {
-
-    # Returns a true/false flag indicating whether or not
-    # the logfile will be saved.
     my $self = shift;
     return $self->{_save_logfile};
-} ## end sub get_save_logfile
+}
 
 sub finish {
 
@@ -501,9 +505,11 @@ sub finish {
 
     if ($save_logfile) {
         my $is_encoded_data = $self->{_is_encoded_data};
-        my ( $fh, $filename ) =
-          Perl::Tidy::streamhandle( $log_file, 'w', $is_encoded_data );
-        if ($fh) {
+        my $fh = Perl::Tidy::streamhandle( $log_file, 'w', $is_encoded_data );
+        if ( !$fh ) {
+            Perl::Tidy::Warn("unable to open log file '$log_file'\n");
+        }
+        else {
             my $routput_array = $self->{_output_array};
             foreach my $line ( @{$routput_array} ) { $fh->print($line) }
             if (   $fh->can('close')

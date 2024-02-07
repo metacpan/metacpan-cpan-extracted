@@ -68,7 +68,7 @@ print(" Please be patient.\n");
 print(" Examining the system ... for $paths2find\n");
 print(" Hint: Choose a path with either $default_hintA (global) or
        $default_hintB (local installation) in its name.
-       Ignore paths with \"blib\" intheir name.\n");
+       Ignore paths with \"blib\" in their name.\n");
 
 # remove pre-existing files
 unlink($fifo);
@@ -160,14 +160,17 @@ if ( length $SCRIPT_PATH ) {
 	print(
 "\nThe system path to \"SeismicUnixGui_script\" appears to be:\n $SCRIPT_PATH\n");
 	print("Before running SeismicUnixGui, be sure to add the\n");
-	print("following 4 lines to the end of your \".bashrc\" file\n\n");
+	print("following 5 lines to the end of your \".bashrc\" file\n\n");
 	print("export SeismicUnixGui=$SeismicUnixGui\n");	
-	print("export SeismicUnixGui_script=$SCRIPT_PATH\n");
-	print("export PATH=\$PATH::\$SeismicUnixGui_script\n");
-	print("export PERL5LIB=\$PERL5LIB::\$SeismicUnixGui\n");
+	print("export PERL5LIB=\$PERL5LIB:\$SeismicUnixGui\n");
+	print("export SeismicUnixGui_script=\$SeismicUnixGui/script\n");	
+	print("export PATH=\$PATH::\$SeismicUnixGui_script\n");	
+    print("export PATH=\$PATH:\$SeismicUnixGui/fortran/bin\n");
+    print("export PATH=\$PATH:\$SeismicUnixGui/App/SeismicUnixGui/c/bin\n");
+
 	print(
 		"\nHowever, for a quick BUT temporary fix, you have another option:\n");
-	print("    Cut-and-paste the 4 instructions above, one at a time \n");
+	print("    Cut-and-paste the 5 instructions above, one at a time \n");
 	print("into your command line and execute them one at a time.\n"
 	);
 	print("\nIn case you are unsure, this last instruction also means: \n");

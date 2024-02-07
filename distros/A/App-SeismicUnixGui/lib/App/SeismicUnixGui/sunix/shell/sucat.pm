@@ -8,7 +8,7 @@ our $VERSION = '0.0.1';
 =head2 SYNOPSIS
 
  PROGRAM NAME: sucat
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE: May 25 2016
  DESCRIPTION concatenate a list of files
  Version 1
@@ -334,7 +334,7 @@ sub _get_gather_type {
 
 =head2 sub _set_data_type
 
- set_data_type can be velan,su,txt or empty
+ set_data_type can be velan,su,txt, cat
 
 =cut
 
@@ -415,7 +415,7 @@ sub data_type {
 		_set_data_type($data_type);
 		my $gather_type = _get_gather_type();
 
-#		print("sucat, data_type, data_type=---$data_type---\n\n");
+		print("sucat, data_type, data_type=---$data_type---\n\n");
 
 		if (
 			$data_type ne $empty_string

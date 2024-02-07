@@ -656,6 +656,14 @@ below for usage).
  $y = topdl $ndarray;       # fall through
  $x = topdl (1,2,3,4);      # Convert 1D array
 
+=head2 set_datatype
+
+=for ref
+
+Sets the ndarray's data type to the given value (the integer identifier
+for the type, see L<PDL::Types/enum>). See L</get_datatype>. Internal
+function.
+
 =head2 get_datatype
 
 =for ref
@@ -841,6 +849,18 @@ sub PDL::flows {
  	my $this = shift;
          return ($this->fflows || $this->bflows);
 }
+
+=head2 fflows
+
+=for ref
+
+Returns whether the ndarray's C<PDL_DATAFLOW_F> flag is set.
+
+=head2 bflows
+
+=for ref
+
+Returns whether the ndarray's C<PDL_DATAFLOW_B> flag is set.
 
 =head2 new
 
@@ -1373,6 +1393,15 @@ that all broadcastids have been removed.
 
  $y = $x->unwind;
 
+=cut
+
+sub PDL::unwind {
+	my $value = shift;
+	my $foo = $value->null();
+	$foo .= $value->unbroadcast();
+	return $foo;
+}
+
 =head2 make_physical
 
 =for ref
@@ -1400,14 +1429,145 @@ might want to consider using the PDL preprocessor
 which can be used to transparently access virtual ndarrays without the
 need to physicalise them (though there are exceptions).
 
-=cut
+=head2 make_physvaffine
 
-sub PDL::unwind {
-	my $value = shift;
-	my $foo = $value->null();
-	$foo .= $value->unbroadcast();
-	return $foo;
-}
+=for ref
+
+A more "careful" function than C<make_physical>. For ndarrays
+without a vaffine transformations as parent, it will just call
+C<make_physical>. Otherwise, it will update the vaffine transformation
+bookkeeping.
+
+=head2 make_physdims
+
+=for ref
+
+Ensures the ndarray's dimensions are up to date including changes in
+parent's dimensions, and calling C<redodims>.
+
+=head2 trans_parent
+
+=for ref
+
+Returns a PDL::Trans object representing the transformation (PDL
+operation) that is the "parent" of this ndarray, or C<undef> if none.
+
+Such objects have these methods:
+
+=over
+
+=item parents
+
+Returns a list of ndarrays that are inputs to this trans.
+
+=item children
+
+Returns a list of ndarrays that are outputs to this trans (specified as
+C<[o]>, C<[oca]>, C<[io]>, or C<[t]> in C<Pars>).
+
+=item address
+
+The memory address of the struct.
+
+=item name
+
+The function name from the vtable.
+
+=item flags
+
+List of strings of flags set for this trans.
+
+=item flags_vtable
+
+List of strings of flags set for this trans's vtable.
+
+=item vaffine
+
+Whether the trans is affine.
+
+=item offs
+
+Affine-only: the offset into the parent's data.
+
+=item incs
+
+Affine-only: the dimincs for each of the child's dims.
+
+=item ind_sizes
+
+The size of each named dim.
+
+=item inc_sizes
+
+The size of the inc for each use of a named dim.
+
+=back
+
+=head2 trans_children
+
+=for ref
+
+Returns a list of PDL::Trans objects (see L</trans_parent>) representing
+each transformation that has this ndarray as an input.
+
+=head2 address
+
+=for ref
+
+Returns the memory address of the ndarray's C<struct>.
+
+=head2 address_data
+
+=for ref
+
+Returns the value of the ndarray C<struct>'s C<data> member.
+
+=head2 freedata
+
+=for ref
+
+Frees the C<datasv> if possible. Useful in memory-mapping functionality.
+
+=head2 set_donttouchdata
+
+=for ref
+
+Sets the C<PDL_DONTTOUCHDATA> flag and the C<nbytes> to the given
+value. Useful in memory-mapping functionality.
+
+=head2 set_data_by_offset
+
+=for ref
+
+Sets the ndarray's C<data> and C<datasv> to those of the given ndarray,
+but the C<data> points to the other ndarray's C<data> plus the given
+offset.
+Sets the C<PDL_DONTTOUCHDATA> flag. Useful in memory-mapping functionality.
+
+=head2 nbytes
+
+=for ref
+
+Returns the ndarray's C<nbytes>.
+
+=head2 seed
+
+=for ref
+
+Returns the random seed being used by PDL's RNG.
+
+=head2 set_debugging
+
+=for ref
+
+Sets whether PDL operations print lots of debugging info to standard
+output. Returns the old value.
+
+=for example
+
+  PDL::Core::set_debugging(1);
+  # ... these operations will have debugging info printed to stdout
+  PDL::Core::set_debugging(0); # turn it off again
 
 =head2 dummy
 
@@ -1508,6 +1668,8 @@ Duplicates an ndarray along several dimensions
  $x = sequence(3,2);
  $y = $x->dupN(2, 3); # doubles along first dimension, triples along second
  # [
+ #  [0 1 2 0 1 2]
+ #  [3 4 5 3 4 5]
  #  [0 1 2 0 1 2]
  #  [3 4 5 3 4 5]
  #  [0 1 2 0 1 2]
@@ -1997,6 +2159,244 @@ sub PDL::info {
     return sprintf $nstr, @args;
 }
 
+=head2 pdump
+
+=for ref
+
+Returns a close analogue of the output of C<< $pdl->dump >> as a
+string. Like that C function, it will not cause any physicalisation of
+the ndarray.
+
+Not exported, and not inserted into the C<PDL> namespace.
+
+=for example
+
+  print PDL::Core::pdump($pdl);
+
+=cut
+
+sub pdump {
+  my ($pdl) = @_;
+  my @dims = $pdl->dims_nophys;
+  my @lines = (
+    "State: ${\join '|', $pdl->flags}",
+    "Dims: (@dims)",
+    "BroadcastIds: (@{[$pdl->broadcastids_nophys]})",
+  );
+  push @lines, sprintf "Vaffine: 0x%x (parent)", $pdl->vaffine_from if $pdl->vaffine;
+  push @lines, !$pdl->allocated ? '(not allocated)' : join "\n  ",
+    sprintf("data: 0x%x, nbytes: %d, nvals: %d", $pdl->address_data, $pdl->nbytes, $pdl->nelem_nophys),
+    "First values: (@{[$pdl->firstvals_nophys]})",
+    ;
+  if (my $trans = $pdl->trans_parent) {
+    push @lines, grep length, split "\n", pdump_trans($trans);
+  }
+  if (my @trans_children = $pdl->trans_children) {
+    push @lines, "CHILDREN:";
+    push @lines, map "  $_", grep length, split "\n", pdump_trans($_) for @trans_children;
+  }
+  join '', "PDUMPING 0x${\sprintf '%x', $pdl->address}, datatype: ${\$pdl->get_datatype}\n", map "  $_\n", @lines;
+}
+
+=head2 pdump_trans
+
+=for ref
+
+Returns a string representation of a C<PDL::Trans> object, a close
+analogue of part of the output of C<< $pdl->dump >>.
+
+Not exported, and not inserted into the C<PDL> namespace.
+
+=for example
+
+  print PDL::Core::pdump_trans($pdl_trans);
+
+=cut
+
+sub pdump_trans {
+  my ($trans) = @_;
+  my @lines = (
+    "State: ${\join '|', $trans->flags}",
+    "vtable flags: ${\join '|', $trans->flags_vtable}",
+  );
+  my @ins = $trans->parents;
+  my @outs = $trans->children;
+  push @lines,
+    "AFFINE, " . ($outs[0]->dimschgd
+      ? "BUT DIMSCHANGED"
+      : "o:".$trans->offs."  i:(@{[$trans->incs]}) d:(@{[$outs[0]->dims_nophys]})")
+    if $trans->vaffine;
+  push @lines,
+    "ind_sizes: (@{[$trans->ind_sizes]})",
+    "inc_sizes: (@{[$trans->inc_sizes]})",
+    "INPUTS: (@{[map sprintf('0x%x', $_->address), @ins]})  OUTPUTS: (@{[map sprintf('0x%x', $_->address), @outs]})",
+    ;
+  join '', "PDUMPTRANS 0x${\sprintf '%x', $trans->address} (${\$trans->name})\n", map "  $_\n", @lines;
+}
+
+=head2 pdumphash
+
+=for ref
+
+Returns a hash-ref representing the information about a given object
+(C<PDL::Trans> or ndarray) and all the objects of either type it is
+connected to. Includes similar information to that shown by L</pdump>
+and L</pdump_trans>.
+
+Not exported, and not inserted into the C<PDL> namespace.
+
+=for example
+
+  $hashref = PDL::Core::pdumphash($pdl_trans); # or
+  $hashref = PDL::Core::pdumphash($pdl);
+
+=cut
+
+# only look at each obj once, mutates the hash
+sub pdumphash {
+  my ($obj, $sofar) = @_;
+  confess "expected object but got '$obj'" if !ref $obj;
+  $sofar ||= {};
+  my $addr = sprintf '0x%x', $obj->address; # both ndarray and trans
+  return $sofar if $sofar->{$addr};
+  if ($obj->isa('PDL::Trans')) {
+    my @ins = $obj->parents;
+    my @outs = $obj->children;
+    $sofar->{$addr} = {
+      kind => 'trans',
+      name => $obj->name,
+      flags => [$obj->flags],
+      vtable_flags => [$obj->flags_vtable],
+      !($obj->vaffine && !$outs[0]->dimschgd) ? () : (
+        affine => "o:".$obj->offs." i:(@{[$obj->incs]}) d:(@{[$outs[0]->dims_nophys]})"
+      ),
+      ins => [map sprintf('0x%x', $_->address), @ins],
+      outs => [map sprintf('0x%x', $_->address), @outs],
+    };
+    pdumphash($_, $sofar) for @ins, @outs;
+  } else {
+    my @ins = grep defined, $obj->trans_parent;
+    my @outs = $obj->trans_children;
+    $sofar->{$addr} = {
+      kind => 'ndarray',
+      datatype => $obj->get_datatype,
+      flags => [$obj->flags],
+      !$obj->vaffine ? () : (
+        vaffine_from => sprintf("0x%x", $obj->vaffine_from),
+      ),
+      !$obj->allocated ? () : (
+        data => sprintf("0x%x", $obj->address_data),
+        nbytes => $obj->nbytes,
+        nelem_nophys => $obj->nelem_nophys,
+        firstvals => [$obj->firstvals_nophys],
+      ),
+      ins => [map sprintf('0x%x', $_->address), @ins],
+      outs => [map sprintf('0x%x', $_->address), @outs],
+    };
+    pdumphash($_, $sofar) for @ins, @outs;
+  }
+  $sofar;
+}
+
+=head2 pdumpgraph
+
+=for ref
+
+Given a hash-ref returned by L</pdumphash>, returns a L<Graph> object
+representing the same information.
+
+Not exported, and not inserted into the C<PDL> namespace.
+
+=for example
+
+  $g = PDL::Core::pdumphash($hashref);
+
+=cut
+
+sub pdumpgraph {
+  my ($hash) = @_;
+  require Graph;
+  my $g = Graph->new(multiedged=>1);
+  for my $addr (keys %$hash) {
+    $g->set_vertex_attributes($addr, my $props = $hash->{$addr});
+    $g->add_edge_by_id($_, $addr, 'normal') for @{ $props->{ins} };
+    $g->add_edge_by_id($addr, $_, 'normal') for @{ $props->{outs} };
+    if (my $from = $props->{vaffine_from}) {
+      $g->add_edge_by_id($addr, $from, 'vaffine_from');
+    }
+  }
+  $g;
+}
+
+=head2 pdumpgraphvizify
+
+=for ref
+
+Given a L<Graph> object returned by L</pdumpgraph>, modifies it suitable
+for input to L<GraphViz2/from_graph>, then returns it. See example for
+how to use.
+
+Not exported, and not inserted into the C<PDL> namespace.
+
+=for example
+
+  $g = PDL::Core::pdumpgraphvizify($g);
+
+  # full example:
+  $count = 1; $format = 'png'; sub output {
+    $g = PDL::Core::pdumpgraph(PDL::Core::pdumphash($_[0]));
+    require GraphViz2;
+    $gv = GraphViz2->from_graph(PDL::Core::pdumpgraphvizify($g));
+    $gv->run(format => $format, output_file => 'output'.$count++.".$format");
+  }
+  # keep changing ndarray, then calling this to show each state:
+  output($pdl);
+
+  # run the above script, then show the ndarray evolve over time, in a
+  # left-to-right montage using ImageMagick tools:
+  perl myscript.pl
+  montage output* -tile "$(echo output*|wc -w)"x1 -geometry '1x1<' final.png
+  display final.png
+
+=cut
+
+sub pdumpgraphvizify {
+  my ($g) = @_;
+  for my $v ($g->vertices) {
+    my $kind = $g->get_vertex_attribute($v, 'kind');
+    if (my $from = $g->get_vertex_attribute($v, 'vaffine_from')) {
+      $g->set_edge_attribute_by_id(
+        $v, $from, 'vaffine_from',
+        graphviz => { style => 'dashed', constraint => 'false' },
+      );
+    }
+    my @blocks;
+    push @blocks, $g->get_vertex_attribute($v, 'name') if $kind eq 'trans';
+    push @blocks, join '', map "$_\\l", @{$g->get_vertex_attribute($v, 'flags')};
+    if ($kind eq 'trans') {
+      my @vflags = @{$g->get_vertex_attribute($v, 'vtable_flags')};
+      push @blocks, join '', map "$_\\l", @vflags ? @vflags : '(no vtable flags)';
+      my $affine = $g->get_vertex_attribute($v, 'affine');
+      push @blocks, $affine if $affine;
+    } else {
+      my $firstvals = $g->get_vertex_attribute($v, 'firstvals');
+      $firstvals = ", (".($firstvals ? "@$firstvals" : 'not allocated').")";
+      push @blocks, 'datatype: '.$g->get_vertex_attribute($v, 'datatype'). $firstvals;
+    }
+    $g->set_vertex_attribute($v, graphviz => {
+      shape => 'record',
+      color => $kind eq 'ndarray' ? 'blue' : 'red',
+      label => [\@blocks],
+    });
+  }
+  $g->set_graph_attribute(graphviz => {
+    global => {directed => 1, combine_node_and_port => 0},
+    graph => {concentrate => 'true', rankdir => 'TB'},
+  });
+
+  $g;
+}
+
 =head2 approx
 
 =for ref
@@ -2102,12 +2502,49 @@ sub alltopdl {
     return $_[0]->new($_[1]);
 0;}
 
+=head2 tracedebug
+
+=for ref
+
+Sets whether an ndarray will have debugging info printed during use if a
+(Boolean) value is given. Returns the new value.
+
+=head2 donttouch
+
+=for ref
+
+Returns whether the ndarray's C<PDL_DONTTOUCHDATA> flag is set.
+
+=head2 allocated
+
+=for ref
+
+Returns whether the ndarray's C<PDL_ALLOCATED> flag is set.
+
+=head2 vaffine
+
+=for ref
+
+Returns whether the ndarray's C<PDL_OPT_VAFFTRANSOK> flag is set.
+
+=head2 anychgd
+
+=for ref
+
+Returns whether the ndarray's C<PDL_ANYCHANGED> flag is set.
+
+=head2 dimschgd
+
+=for ref
+
+Returns whether the ndarray's C<PDL_PARENTDIMSCHANGED> flag is set.
 
 =head2 inplace
 
 =for ref
 
-Flag an ndarray so that the next operation is done 'in place'
+Flag an ndarray so that the next operation is done 'in place', returning
+the ndarray.
 
 =for usage
 
@@ -2144,12 +2581,12 @@ sub PDL::inplace {
 
 # Copy if not inplace
 
-
 =head2 is_inplace
 
 =for ref
 
-Test the in-place flag on an ndarray
+Sets whether an ndarray will operate "in-place" for the next operation
+if a (Boolean) value is given. Returns the old value.
 
 =for usage
 
@@ -2788,6 +3225,10 @@ Convert to float datatype
 
 Convert to double datatype
 
+=head2 ldouble
+
+Convert to long double datatype
+
 =head2 cfloat
 
 Convert to complex float datatype
@@ -2795,6 +3236,10 @@ Convert to complex float datatype
 =head2 cdouble
 
 Convert to complex double datatype
+
+=head2 cldouble
+
+Convert to complex long double datatype
 
 =head2 type
 
@@ -2964,7 +3409,7 @@ Convert ndarray indices to perl list
 
  @tmp = listindices $x;
 
-C<@tmp> now contains the values C<0..nelem($x)>.
+C<@tmp> now contains the values C<0..nelem($x)-1>.
 
 Obviously this is grossly inefficient for the large datasets PDL is designed to
 handle. This was provided as a get out while PDL matured. It  should now be mostly
@@ -3293,67 +3738,6 @@ sub PDL::dog {
 
 ###################### Misc internal routines ####################
 
-# Recursively pack an N-D array ref in format [[1,1,2],[2,2,3],[2,2,2]] etc
-# package vars $level and @dims must be initialised first.
-
-sub rpack {
-    my ($ptype,$x) = @_;  my ($ret,$type);
-
-    $ret = "";
-    if (ref($x) eq "ARRAY") {
-
-       if (defined($dims[$level])) {
-           barf 'Array is not rectangular' unless $dims[$level] == scalar(@$x);
-       }else{
-          $dims[$level] = scalar(@$x);
-       }
-
-       $type = ref($$x[0]);
-        if ($type) {
-        $level++;
-        for(@$x) {
-            barf 'Array is not rectangular' unless $type eq ref($_); # Equal types
-            $ret .= rpack($ptype,$_);
-        }
-        $level--;
-        } else {
-        # These are leaf nodes
-        $ret = pack $ptype, map {defined($_) ? $_ : $PDL::undefval} @$x;
-      }
-    } elsif (ref($x) eq "PDL") {
-	barf 'Cannot make a new ndarray from two or more ndarrays, try "cat"';
-    } else {
-        barf "Don't know how to make a PDL object from passed argument";
-    }
-    return $ret;
-}
-
-sub rcopyitem {        # Return a deep copy of an item - recursively
-    my $x = shift;
-    my ($y, $key, $value);
-    if (ref(\$x) eq "SCALAR") {
-       return $x;
-    }elsif (ref($x) eq "SCALAR") {
-       $y = $$x; return \$y;
-    }elsif (ref($x) eq "ARRAY") {
-       $y = [];
-       for (@$x) {
-           push @$y, rcopyitem($_);
-       }
-       return $y;
-    }elsif (ref($x) eq "HASH") {
-       $y={};
-       while (($key,$value) = each %$x) {
-          $$y{$key} = rcopyitem($value);
-       }
-       return $y;
-    }elsif (blessed($x)) {
-       return $x->copy;
-    }else{
-       barf ('Deep copy of object failed - unknown component with type '.ref($x));
-    }
-0;}
-
 # N-D array stringifier
 
 sub strND {
@@ -3507,14 +3891,6 @@ sub str2D{
     }
     $ret .= " "x$level."]\n";
     return $ret;
-}
-
-#
-# Sleazy hcpy saves me time typing
-#
-sub PDL::hcpy {
-  $_[0]->hdrcpy($_[1]);
-  $_[0];
 }
 
 ########## Docs for functions in Core.xs ##################
@@ -3734,6 +4110,16 @@ Switch on/off automatic header copying, with PDL pass-through
 
 C<hcpy> sets or clears the hdrcpy flag of a PDL, and returns the PDL
 itself.  That makes it convenient for inline use in expressions.
+
+=cut
+
+#
+# Sleazy hcpy saves me time typing
+#
+sub PDL::hcpy {
+  $_[0]->hdrcpy($_[1]);
+  $_[0];
+}
 
 =head2 online_cpus
 

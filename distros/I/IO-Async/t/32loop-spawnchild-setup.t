@@ -1,12 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use File::Temp qw( tmpnam );
 use POSIX qw( ENOENT EBADF getcwd );
@@ -20,10 +19,10 @@ my $loop = IO::Async::Loop->new_builtin;
 
 testing_loop( $loop );
 
-ok( exception { $loop->spawn_child( code => sub { 1 }, setup => "hello" ); },
+ok( dies { $loop->spawn_child( code => sub { 1 }, setup => "hello" ); },
     'Bad setup type fails' );
 
-ok( exception { $loop->spawn_child( code => sub { 1 }, setup => [ 'somerandomthing' => 1 ] ); },
+ok( dies { $loop->spawn_child( code => sub { 1 }, setup => [ 'somerandomthing' => 1 ] ); },
     'Setup with bad key fails' );
 
 # These tests are all very similar looking, with slightly different start and

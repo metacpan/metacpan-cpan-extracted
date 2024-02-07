@@ -37,6 +37,7 @@ lib/URI/file/QNX.pm
 lib/URI/file/Unix.pm
 lib/URI/file/Win32.pm
 lib/URI/ftp.pm
+lib/URI/geo.pm
 lib/URI/gopher.pm
 lib/URI/http.pm
 lib/URI/https.pm
@@ -77,6 +78,9 @@ t/escape.t
 t/file.t
 t/ftp.t
 t/generic.t
+t/geo_basic.t
+t/geo_construct.t
+t/geo_point.t
 t/gopher.t
 t/heuristic.t
 t/http.t
@@ -133,4 +137,3 @@ xt/author/pod-syntax.t
 xt/author/portability.t
 xt/author/test-version.t
 xt/dependent-modules.t
-xt/release/changes_has_content.t

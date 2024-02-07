@@ -1,5 +1,8 @@
 Revision history for Perl module Cookie
 
+v0.3.4 2024-02-02T18:59:00+0900
+    - Minor correction in Cookie::Domain to find root for .test domains
+
 v0.3.3 2023-10-11T00:01:31+0900
     - Corrected malformed signature for distribution release
 

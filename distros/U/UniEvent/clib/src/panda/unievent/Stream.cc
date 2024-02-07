@@ -97,13 +97,13 @@ void Stream::finalize_handle_connection (const StreamSP& client, const ErrorCode
 
     if (req && client) client->queue.done(req, []{});
     StreamSP self = this;
-    
+
     // call on client stream as well (may be useful)
     if (client) {
         client->connection_event(self, client, err);
         if (client->_listener) client->_listener->on_connection(self, client, err);
     }
-        
+
     connection_event(self, client, err);
     if (_listener) _listener->on_connection(self, client, err);
 }
@@ -146,7 +146,7 @@ void Stream::finalize_handle_connect (const ErrorCode& connect_err, const Connec
         req->_timer->pause();
         req->_timer->event.remove_all();
     }
-    
+
     // if we are already canceling queue now, do not start recursive cancel
     if (!err || queue.canceling()) {
         queue.done(req, [=]{ notify_on_connect(err, req); });
@@ -206,7 +206,13 @@ void Stream::write (const WriteRequestSP& req) {
 }
 
 void WriteRequest::exec () {
-    panda_log_debug("WriteRequest::exec " << this);
+    panda_log_debug([&]{
+        size_t sum = 0;
+        for (const auto b : bufs) {
+            sum += b.size();
+        }
+        log << "WriteRequest::exec " << this << " " << sum << " bytes";
+    });
     REQUEST_REQUIRE_WRITE_STATE;
     last_filter = handle->_filters.front();
     for (const auto& buf : bufs) handle->_wq_size -= buf.length();

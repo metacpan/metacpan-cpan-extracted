@@ -4,11 +4,15 @@ package App::SeismicUnixGui::sunix::datum::sudatumk2dr;
 
 =head2 SYNOPSIS
 
- PERL PROGRAM NAME: SUDATUMK2DR - Kirchhoff datuming of receivers for 2D prestack data	
- AUTHOR: Juan Lorenzo
- DATE:   
- DESCRIPTION:
- Version: 
+PERL PROGRAM NAME: SUDATUMK2DR - Kirchhoff datuming of receivers for 2D prestack data	
+
+AUTHOR: Juan Lorenzo (Perl module only)
+
+DATE:   
+
+DESCRIPTION:
+
+Version: 
 
 =head2 USE
 

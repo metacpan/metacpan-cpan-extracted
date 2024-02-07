@@ -1,3 +1,18 @@
+2.085 2024-01-30
+- switch FFT code to use heap, not VLA (#436) - thanks @HaraldJoerg for report
+- add methods PDL::Trans::{address,name,flags,flags_vtable,vaffine,offs,incs,ind_sizes,inc_sizes}
+- add PDL::Core::pdump{,_trans,graph}
+- xvals etc now return at least a double BY DEFAULT, but respect given type (#330) - thank @djerius for report
+- fix segv if vsearch $x arg is empty (#454) - thanks @djerius
+- IO::HDF fix for HDF4 4.2.16 (#439) - thanks @sebastic
+- fix GIS::Proj to work better on Windows (#456) - thanks @shawnlaffan
+- fix conversion of ulonglong to Perl scalar and therefore stringification (#458) - thanks @vadim-160102 for report
+- fix modulo for ulonglong and on Windows
+- update Opt::Simplex docs (#452) - thanks @KJ7LNW
+- fix Graphics::OpenGLQ on MacOS Ventura (#452) - thanks @deriamis
+- fix IO::Storable warning on empty (#448) - thanks @djerius for report
+- fix non-broadcast, non-matching size-1 dims on output being silently accepted (#445) - thanks @djerius for report
+
 2.084 2023-05-21
 - reduce size of PDL_KLUDGE_COPY_X macro to <4096 in line with C standard, to fix for older clang on many BSD
 

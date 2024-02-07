@@ -1,5 +1,8 @@
 Revision history for URI
 
+5.26      2024-02-02 19:04:40Z
+    - Add URI::geo (GH#141) (david-dick)
+
 5.25      2024-01-27 16:11:41Z
     - cache scheme so it never attempt to load it again (GH#55) (mschae94)
 

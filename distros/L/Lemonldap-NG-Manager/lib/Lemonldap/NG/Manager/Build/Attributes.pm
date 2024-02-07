@@ -6,7 +6,7 @@
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.18.2';
 use strict;
 use Regexp::Common qw/URI/;
 
@@ -23,7 +23,7 @@ sub perlExpr {
     );
     $cpt->share_from( 'Lemonldap::NG::Common::Safelib',
         $Lemonldap::NG::Common::Safelib::functions );
-    $cpt->reval("BEGIN { 'warnings'->unimport; } $val");
+    $cpt->reval($val);
     my $err = join( '',
         grep { $_ =~ /(?:Undefined subroutine|Devel::StackTrace)/ ? () : $_ }
           split( /\n/, $@ ) );

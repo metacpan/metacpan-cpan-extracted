@@ -7,9 +7,9 @@ use warnings;
 use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
-use Tags::HTML::Element::Utils qw(tags_boolean);
+use Tags::HTML::Element::Utils qw(tags_boolean tags_label tags_value);
 
-our $VERSION = 0.02;
+our $VERSION = 0.06;
 
 sub _cleanup {
 	my $self = shift;
@@ -44,34 +44,21 @@ sub _process {
 	}
 
 	$self->{'tags'}->put(
+		tags_label($self, $self->{'_input'}),
 		['b', 'input'],
 		tags_boolean($self, $self->{'_input'}, 'autofocus'),
-		defined $self->{'_input'}->css_class ? (
-			['a', 'class', $self->{'_input'}->css_class],
-		) : (),
-		['a', 'type', $self->{'_input'}->type],
-		defined $self->{'_input'}->id ? (
-			['a', 'name', $self->{'_input'}->id],
-			['a', 'id', $self->{'_input'}->id],
-		) : (),
-		defined $self->{'_input'}->value ? (
-			['a', 'value', $self->{'_input'}->value],
-		) : (),
+		tags_value($self, $self->{'_input'}, 'css_class', 'class'),
+		tags_value($self, $self->{'_input'}, 'type'),
+		tags_value($self, $self->{'_input'}, 'id'),
+		tags_value($self, $self->{'_input'}, 'name'),
+		tags_value($self, $self->{'_input'}, 'value'),
 		tags_boolean($self, $self->{'_input'}, 'checked'),
-		defined $self->{'_input'}->placeholder ? (
-			['a', 'placeholder', $self->{'_input'}->placeholder],
-		) : (),
-		defined $self->{'_input'}->size ? (
-			['a', 'size', $self->{'_input'}->size],
-		) : (),
+		tags_value($self, $self->{'_input'}, 'placeholder'),
+		tags_value($self, $self->{'_input'}, 'size'),
 		tags_boolean($self, $self->{'_input'}, 'readonly'),
 		tags_boolean($self, $self->{'_input'}, 'disabled'),
-		defined $self->{'_input'}->min ? (
-			['a', 'min', $self->{'_input'}->min],
-		) : (),
-		defined $self->{'_input'}->max ? (
-			['a', 'max', $self->{'_input'}->max],
-		) : (),
+		tags_value($self, $self->{'_input'}, 'min'),
+		tags_value($self, $self->{'_input'}, 'max'),
 		['e', 'input'],
 	);
 
@@ -86,9 +73,12 @@ sub _process_css {
 	}
 
 	my $css_class = '';
+	my $css_required = '.';
 	if (defined $self->{'_input'}->css_class) {
 		$css_class = '.'.$self->{'_input'}->css_class;
+		$css_required .= $self->{'_input'}->css_class.'-';
 	}
+	$css_required .= 'required';
 
 	$self->{'css'}->put(
 		['s', 'input'.$css_class.'[type=submit]:hover'],
@@ -113,6 +103,7 @@ sub _process_css {
 		['s', 'input'.$css_class.'[type=text]'],
 		['s', 'input'.$css_class.'[type=date]'],
 		['s', 'input'.$css_class.'[type=number]'],
+		['s', 'input'.$css_class.'[type=email]'],
 		['d', 'width', '100%'],
 		['d', 'padding', '12px 20px'],
 		['d', 'margin', '8px 0'],
@@ -120,6 +111,10 @@ sub _process_css {
 		['d', 'border', '1px solid #ccc'],
 		['d', 'border-radius', '4px'],
 		['d', 'box-sizing', 'border-box'],
+		['e'],
+
+		['s', $css_required],
+		['d', 'color', 'red'],
 		['e'],
 	);
 
@@ -145,6 +140,7 @@ Tags::HTML::Element::Input - Tags helper for HTML input element.
  my $obj = Tags::HTML::Element::Input->new(%params);
  $obj->cleanup;
  $obj->init($input);
+ $obj->prepare;
  $obj->process;
  $obj->process_css;
 
@@ -187,6 +183,16 @@ Returns undef.
 Initialize object.
 
 Accepted C<$input> is L<Data::HTML::Element::Input>.
+
+Returns undef.
+
+=head2 C<prepare>
+
+ $obj->prepare;
+
+Process initialization before page run.
+
+Do nothing in this object.
 
 Returns undef.
 
@@ -318,6 +324,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.06
 
 =cut

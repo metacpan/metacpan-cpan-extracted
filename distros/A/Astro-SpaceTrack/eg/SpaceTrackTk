@@ -10,7 +10,7 @@ use IO::File;
 use Tk;
 use Tk::Pane;
 
-our $VERSION = '0.163';
+our $VERSION = '0.164';
 
 my @pad = qw{ -padx 5 -pady 5 };	# Standard cell padding
 
@@ -19,9 +19,6 @@ my $st = Astro::SpaceTrack->new( @ARGV );
 
 # Display the banner text if desired.
 banner();
-
-# Log in.
-login();
 
 # Display the main window.
 main_window();
@@ -76,81 +73,6 @@ sub grid_next_row {
     }
     $hash->{column} = 0;
     return;
-}
-
-# Return true if a login is needed.
-sub login_needed {
-    $st->getv( 'direct' ) and return;
-    my $rslt = $st->login() or return 1;
-    $rslt->is_success() and return;
-    return 1;
-}
-
-# Log in
-sub login {
-
-    login_needed() or return;
-
-    my ( $user, $passwd ) = ( '', '' );
-
-    my $mw = MainWindow->new( -title => 'Log in to Space Track' );
-
-    my $grid = grid_new();
-
-    $mw->Label( -text => 'Username:' )
-	->grid( grid_args( $grid, sticky => 'e' ) );
-    $mw->Entry( -relief => 'sunken', -textvariable => \$user )
-	->grid( grid_args( $grid, sticky => 'w' ) );
-
-    grid_next_row( $grid );
-
-    $mw->Label( -text => 'Password:' )
-	->grid( grid_args( $grid, sticky => 'e' ) );
-    $mw->Entry( -relief => 'sunken', -textvariable => \$passwd,
-	-show => '*' )
-	->grid( grid_args( $grid, sticky => 'w' ) );
-
-    grid_next_row( $grid );
-
-    my $bf = $mw->Frame->grid(
-	grid_args( $grid, columnspan => 2, sticky => 'ew' ) );
-
-    my $bg = grid_new();
-
-    $bf->Button( -text => 'Log in', -command => sub {
-	    my $rslt = $st->login( direct => 0, username => $user,
-		password => $passwd );
-	    $rslt and $rslt->is_success and do {
-		$mw->destroy();
-		return;
-	    };
-	    $mw->messageBox(
-		-icon => 'error', -type => 'RetryCancel',
-		-title => 'Login failure',
-		-message => ( $rslt ? $rslt->status_line() :
-		    'Unknown error' )
-	    ) eq 'Cancel' and do {
-		$mw->destroy();
-		exit;
-	    };
-	    $passwd = '';
-	} )->grid( grid_args( $bg ) );
-
-    $bf->Button( -text => 'Skip login', -command => sub {
-	    $st->set( direct => 1 );
-	    $mw->destroy();
-	    return;
-	} )->grid( grid_args( $bg ) );
-
-    my %data;
-    $bf->Button( -text => 'Settings ...',
-	-command => sub{ settings( { main_window => $mw }, \%data ); },
-    )->grid( grid_args( $bg ) );
-
-    MainLoop();
-
-    return;
-
 }
 
 # Main window
@@ -256,7 +178,7 @@ sub main_window {
 
     BEGIN {
 
-	%authen = map { $_ => 1 } qw{ direct password username };
+	%authen = map { $_ => 1 } qw{ password username };
 
 	%info = (
 	    Checkbutton => {
@@ -283,8 +205,10 @@ sub main_window {
 	    return;
 	};
 
-	my %current = map { $_ => $st->getv( $_ ) } qw{ direct
-	    max_range password username verbose verify_hostname webcmd };
+	my %current = map { $_ => $st->getv( $_ ) } qw{ 
+	    max_range password username identity verbose verify_hostname
+	    webcmd
+	};
 	my %old = %current;
 
 	$settings = $widget->{main_window}->Toplevel(
@@ -294,9 +218,9 @@ sub main_window {
 
 	foreach (
 	    'Access',
-	    [ direct => 'Direct-fetch (no login):', 'Checkbutton' ],
 	    [ username => 'User Name:' ],
 	    [ password => 'Password:', Entry => -show => '*' ],
+	    [ identity => 'Identity from file:', 'Checkbutton' ],
 	    'General',
 	    [ max_range => 'Maximum range:' ],
 	    [ verbose => 'Verbose Errors:', 'Checkbutton' ],
@@ -335,21 +259,28 @@ sub main_window {
 		foreach my $key ( keys %current ) {
 		    no warnings qw{ uninitialized };
 		    $current{$key} eq $old{$key} and next;
-		    $re_login ||= $authen{$key};
+		    if ( $key eq 'identity' ) {
+			if ( $current{$key} ) {
+			    $re_login = 1;
+			} else {
+			    $st->set( username => '', password => '' );
+			    $st->logout();
+			}
+		    } else {
+			$re_login ||= $authen{$key};
+		    }
 		    $st->set( $key => $current{$key} );
 		}
 		if ( $re_login ) {
-		    if ( ! $current{direct} ) {
-			my $rslt = $st->login();
-			$rslt->is_success() or do {
-			    $widget->{main_window}->messageBox(
-				-icon => 'error', -type => 'OK',
-				-title => 'Login failure',
-				-message => $rslt->status_line
-			    );
-			    return;
-			};
-		    }
+		    my $rslt = $st->login();
+		    $rslt->is_success() or do {
+			$widget->{main_window}->messageBox(
+			    -icon => 'error', -type => 'OK',
+			    -title => 'Login failure',
+			    -message => $rslt->status_line
+			);
+			return;
+		    };
 		    load_data_source_widget( $widget );
 		    load_data_frame( $widget, $data );
 		}
@@ -478,30 +409,6 @@ sub file_panel {
     include_common_names( $widget, $data, $dg );
 
     return;
-}
-
-# Adjust the data panel to retrieve Iridium status.
-sub iridium_status_panel {
-    my ( $widget, $data ) = @_;
-
-    if ( ! $widget->{iridium_status} ) {
-	$widget->{iridium_status} = {
-	    label => $widget->{data_frame}->Label(
-		-text => 'Data format:' ),
-	    value => $widget->{data_frame}->Optionmenu(
-		-options => ( $st->names( 'iridium_status' ) )[1],
-		-variable => \$data->{iridium_status},
-	    ),
-	};
-    }
-
-    my $dg = grid_new( 1 );
-    $widget->{iridium_status}{label}->grid( grid_args( $dg, sticky => 'e' ) );
-    $widget->{iridium_status}{value}->grid( grid_args( $dg, sticky => 'w' )
-	)->raise();
-
-    return;
-
 }
 
 # Adjust the data panel to retrieve data from Space Track by OID.
@@ -1013,32 +920,11 @@ sub spacetrack_panel {
 	defined $data->{with_name}
 	    or $data->{with_name} = $st->getv( 'with_name' );
 
-	if ( $st->getv( 'direct' ) ) {
-	    if ( $widget->{common_names} ) {
-		$widget->{common_names}{label}->gridForget();
-		$widget->{common_names}{value}->gridForget();
-	    }
-	} else {
-	    grid_next_row( $grid );
-
-	    $widget->{common_names} ||= {
-		label => $widget->{data_frame}->Label(
-		    -text => 'Include common names:' ),
-		value => $widget->{data_frame}->Checkbutton(
-		    -variable => \$data->{with_name},
-		    -relief => 'flat',
-		    -command => sub {
-			$st->set( with_name => $data->{with_name} );
-			return;
-		    },
-		),
-	    };
-
-	    $widget->{common_names}{label}
-		->grid( grid_args( $grid, sticky => 'e' ) );
-	    $widget->{common_names}{value}
-		->grid( grid_args( $grid, sticky => 'w' ) )->raise();
+	if ( $widget->{common_names} ) {
+	    $widget->{common_names}{label}->gridForget();
+	    $widget->{common_names}{value}->gridForget();
 	}
+
 	return;
     }
 }
@@ -1078,7 +964,6 @@ sub load_data_frame {
 	    [
 		[ 'Celestrak catalog'		=> 'celestrak' ],
 		[ 'Celestrak supplemental'	=> 'celestrak_supplemental' ],
-		[ 'Iridium Status'		=> 'iridium_status' ],
 		[ 'Local file catalog'		=> 'file' ],
 		[ 'Radio Amateur Satellite Corporation data' => 'amsat' ],
 		[ 'Space Track catalog'		=> 'spacetrack' ],
@@ -1094,7 +979,6 @@ sub load_data_frame {
 	    [
 		[ 'Celestrak catalog'		=> 'celestrak' ],
 		[ 'Celestrak supplemental'	=> 'celestrak_supplemental' ],
-		[ 'Iridium Status'		=> 'iridium_status' ],
 		[ 'Radio Amateur Satellite Corporation data' => 'amsat' ],
 	    ],
 	);
@@ -1102,8 +986,12 @@ sub load_data_frame {
 
     sub load_data_source_widget {
 	my ( $widget ) = @_;
+	# FIXME encapsulation violation. The intent is to find out
+	# whether we think we have a valid Space Track login cookie.
 	$widget->{data_source_widget}->options( $options[
-	    $st->getv( 'direct' ) ? 1 : 0 ] );
+		$st->_check_cookie_generic( 2 ) ? 0 : 1
+	    ]
+	);
 	return;
     }
 
@@ -1235,7 +1123,6 @@ SpaceTrackTk - Tk-based interface to Astro::SpaceTrack
 
  SpaceTrackTk
  SpaceTrackTk username menuhin password yehudi with_name 1
- SpaceTrackTk direct 1
 
 =head1 OPTIONS
 
@@ -1253,7 +1140,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2023 by Thomas R. Wyant, III
+Copyright (C) 2010-2024 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

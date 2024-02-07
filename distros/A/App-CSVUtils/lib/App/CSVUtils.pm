@@ -9,9 +9,9 @@ use Cwd;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-06'; # DATE
+our $DATE = '2024-02-02'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.033'; # VERSION
+our $VERSION = '1.034'; # VERSION
 
 our @EXPORT_OK = qw(
                        gen_csv_util
@@ -1985,7 +1985,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 1.033 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2023-09-06.
+This document describes version 1.034 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2024-02-02.
 
 =head1 DESCRIPTION
 
@@ -2103,21 +2103,23 @@ This distribution contains the following CLI utilities:
 
 =item 55. L<csv-unquote>
 
-=item 56. L<csv2ltsv>
+=item 56. L<csv2csv>
 
-=item 57. L<csv2paras>
+=item 57. L<csv2ltsv>
 
-=item 58. L<csv2td>
+=item 58. L<csv2paras>
 
-=item 59. L<csv2tsv>
+=item 59. L<csv2td>
 
-=item 60. L<csv2vcf>
+=item 60. L<csv2tsv>
 
-=item 61. L<list-csvutils>
+=item 61. L<csv2vcf>
 
-=item 62. L<paras2csv>
+=item 62. L<list-csvutils>
 
-=item 63. L<tsv2csv>
+=item 63. L<paras2csv>
+
+=item 64. L<tsv2csv>
 
 =back
 
@@ -2611,7 +2613,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

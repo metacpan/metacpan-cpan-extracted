@@ -1,0 +1,45 @@
+Revision history for perl distribution Dist-Setup
+
+0.09 - 2023-02-05
+
+ - Improve spell checking for Perl files by manually calling the `context`
+   aspell filter (instead of using the `perl` mode that does not work well).
+
+0.08 - 2023-02-04
+
+ - Update the Git repository name to match the name of the binary.
+
+0.07 - 2023-02-04
+
+ - Add POD documentation to the perl_dist_setup script and Dist::Setup module.
+ - Improve the support for the `make cover` target.
+
+0.06 - 2023-02-03
+
+ - Be more permissive with regex in PerlCritic
+ - Add a Test::CPANfile test to check that all dependencies are listed.
+ - Support for uploading the distribution right from the Makefile.
+
+0.05 - 2025-02-02
+
+ - Add the missing Test2::V0 dependency in the cpanfile.
+
+0.04 - 2024-02-01
+ - Various fixes related to GitHub CI.
+
+0.03 - 2024-01-30
+ - Cleaner new lines in generated files.
+ - Generate a barebone Changes file if not already present.
+ - Use the Lancaster consensus environment variable in GitHub CI and tests.
+ - Add a test for the syntax of the POD file.
+ - Add support for spell-checking the files (and testing it).
+ - Add perlcritic and perltidy supports.
+
+0.02 - 2024-01-26
+ - Added support for GitHub CI and dev container.
+ - Fix spurious new lines being added at the end of the templates.
+ - Add support for a cpan-upload command in the Makefile.
+ - Fix a bug with a badly name MANIFEST.skip file.
+
+0.01 - 2023-12-27
+ - Initial release

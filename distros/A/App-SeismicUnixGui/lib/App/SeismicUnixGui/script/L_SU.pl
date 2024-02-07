@@ -4,7 +4,7 @@
 
 =head2 SYNOPSIS 
 
- PERL PROGRAM NAME: L_SUV0.85.5.pl 
+ PERL PROGRAM NAME: L_SUV0.87.1.pl 
  AUTHOR: 	Juan Lorenzo
  DATE: 		June 22 2017 
 
@@ -191,7 +191,7 @@ widgets from the main program
 ( $main_href->{_mw} )->title( $var->{_program_title} );
 ( $main_href->{_mw} )->geometry( $var->{_main_window_geometry} );
 ( $main_href->{_mw} )->resizable( 1, 1 )
-  ;    # not resizable in either width or height
+  ;    # resizable in either width or height
 ( $main_href->{_mw} )->focusFollowsMouse;
 
 =head2 Define 
@@ -292,7 +292,8 @@ $top_menu_frame = ( $main_href->{_mw} )->Frame(
 );
 
 =head2 message box
-is withdrawn temporarily while filling
+
+Is withdrawn temporarily while filling
 with widgets. Dialog box is iconified in
 subclasses.
 A Toplevel widget is required to define geometry.
@@ -635,7 +636,7 @@ print join("\n", $top_menu_bar->bind($class) ), "\n";
 
 =cut
 
-=head2  side menu frame
+=head2 side menu frame
 
  contains side menus
  1. for files
@@ -703,6 +704,7 @@ $main_href->{_parameter_menu_frame} = ( $main_href->{_mw} )->Frame(
 	-background  => $var->{_light_gray},
 	-relief      => 'groove'
 );
+
 $parameter_titles_frame = ( $main_href->{_mw} )->Frame(
 	-borderwidth => $var->{_one_pixel_borderwidth},
 	-background  => $var->{_light_gray},
@@ -1208,6 +1210,7 @@ $sunix_par_programs_listbox->insert( "end", sort @sunix_par_programs, );
 
 $sunix_picks_programs_listbox->insert( "end", sort @sunix_picks_programs, );
 
+
 =head2 Notebooks within
 
 sunix_frame_II (top row)
@@ -1534,7 +1537,8 @@ $main_href->{_message_w} = $work_frame->Text(
 $flow_control_frame = $work_frame->Frame(
 	-borderwidth => $var->{_no_borderwidth},
 	-relief      => 'groove',
-	-width       => '250',
+#	-width       => '250',
+		-width       => '400',
 	-background  => 'pink',
 );
 

@@ -6,10 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 15 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Selenium/Client.pm',
+    'Selenium/Client/Commands.pm',
+    'Selenium/Client/Driver.pm',
+    'Selenium/Client/WDKeys.pm',
+    'Selenium/Client/WebElement.pm',
     'Selenium/Driver/Auto.pm',
     'Selenium/Driver/Chrome.pm',
     'Selenium/Driver/Edge.pm',

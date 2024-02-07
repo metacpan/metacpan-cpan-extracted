@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::shapeNcut::sugprfb;
 =head2 SYNOPSIS
 
 PERL PROGRAM NAME: SUGPRFB - SU program to remove First Breaks from GPR data		
-AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
 DATE:   
 DESCRIPTION:
 Version: 

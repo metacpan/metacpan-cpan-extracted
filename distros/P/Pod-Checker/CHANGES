@@ -1,3 +1,10 @@
+ 04-Feb-2024           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.77
+ + CPAN#151316: Fix INSTALLDIRS option on newer perls
+ + use sane tar options to create distro
+
+
  03-Jan-2024           Marek Rouchal                        <marekr@cpan.org>
  -----------------------------------------------------------------------------
  Version 1.76

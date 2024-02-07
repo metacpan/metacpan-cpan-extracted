@@ -1,12 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use IO::Async::Loop;
 
@@ -36,7 +35,7 @@ my $linestreamproto = IO::Async::Protocol::LineStream->new(
 );
 
 ok( defined $linestreamproto, '$linestreamproto defined' );
-isa_ok( $linestreamproto, "IO::Async::Protocol::LineStream", '$linestreamproto isa IO::Async::Protocol::LineStream' );
+isa_ok( $linestreamproto, [ "IO::Async::Protocol::LineStream" ], '$linestreamproto isa IO::Async::Protocol::LineStream' );
 
 is_oneref( $linestreamproto, '$linestreamproto has refcount 1 initially' );
 
@@ -46,11 +45,11 @@ is_refcount( $linestreamproto, 2, '$linestreamproto has refcount 2 after adding 
 
 $S2->syswrite( "message\r\n" );
 
-is_deeply( \@lines, [], '@lines before wait' );
+is( \@lines, [], '@lines before wait' );
 
 wait_for { scalar @lines };
 
-is_deeply( \@lines, [ "message" ], '@lines after wait' );
+is( \@lines, [ "message" ], '@lines after wait' );
 
 undef @lines;
 my @new_lines;
@@ -67,7 +66,7 @@ $S2->syswrite( "new\r\nlines\r\n" );
 wait_for { scalar @new_lines };
 
 is( scalar @lines, 0, '@lines still empty after on_read replace' );
-is_deeply( \@new_lines, [ "new", "lines" ], '@new_lines after on_read replace' );
+is( \@new_lines, [ "new", "lines" ], '@new_lines after on_read replace' );
 
 $linestreamproto->write_line( "response" );
 
@@ -83,7 +82,7 @@ $linestreamproto = TestProtocol::Stream->new(
 );
 
 ok( defined $linestreamproto, 'subclass $linestreamproto defined' );
-isa_ok( $linestreamproto, "IO::Async::Protocol::LineStream", '$linestreamproto isa IO::Async::Protocol::LineStream' );
+isa_ok( $linestreamproto, [ "IO::Async::Protocol::LineStream" ], '$linestreamproto isa IO::Async::Protocol::LineStream' );
 
 is_oneref( $linestreamproto, 'subclass $linestreamproto has refcount 1 initially' );
 
@@ -93,11 +92,11 @@ is_refcount( $linestreamproto, 2, 'subclass $linestreamproto has refcount 2 afte
 
 $S2->syswrite( "message\r\n" );
 
-is_deeply( \@sub_lines, [], '@sub_lines before wait' );
+is( \@sub_lines, [], '@sub_lines before wait' );
 
 wait_for { scalar @sub_lines };
 
-is_deeply( \@sub_lines, [ "message" ], '@sub_lines after wait' );
+is( \@sub_lines, [ "message" ], '@sub_lines after wait' );
 
 undef @lines;
 

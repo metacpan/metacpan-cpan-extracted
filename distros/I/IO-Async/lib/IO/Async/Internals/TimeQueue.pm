@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2006-2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2006-2024 -- leonerd@leonerd.org.uk
 
 package # hide from CPAN
-  IO::Async::Internals::TimeQueue;
+  IO::Async::Internals::TimeQueue 0.802;
 
-use strict;
+use v5.14;
 use warnings;
 
 use Carp;
@@ -163,7 +163,7 @@ sub HEAP__fire
 package # hide from CPAN
   IO::Async::Internals::TimeQueue::Elem;
 
-use strict;
+use v5.14;
 our @ISA = qw( Heap::Elem );
 
 sub new

@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
+use Test2::V0;
 use Test::Metrics::Any;
 
 use Socket 1.93 qw( 
@@ -21,7 +21,7 @@ my $loop = IO::Async::Loop->new_builtin;
 testing_loop( $loop );
 
 my $resolver = $loop->resolver;
-isa_ok( $resolver, "IO::Async::Resolver", '$loop->resolver' );
+isa_ok( $resolver, [ "IO::Async::Resolver" ], '$loop->resolver isa IO::Async::Resolver' );
 
 SKIP: {
    my @pwuid;
@@ -34,13 +34,13 @@ SKIP: {
          data => [ $< ], 
       );
 
-      isa_ok( $future, "Future", '$future' );
+      isa_ok( $future, [ "Future" ], '$future isa Future' );
 
       wait_for { $future->is_ready };
 
       my @result = $future->get;
 
-      is_deeply( \@result, \@pwuid, 'getpwuid from future' );
+      is( \@result, \@pwuid, 'getpwuid from future' );
    }
 
    {
@@ -55,7 +55,7 @@ SKIP: {
 
       wait_for { $result };
 
-      is_deeply( $result, \@pwuid, 'getpwuid' );
+      is( $result, \@pwuid, 'getpwuid' );
    }
 
    {
@@ -70,7 +70,7 @@ SKIP: {
 
       wait_for { $result };
 
-      is_deeply( $result, \@pwuid, 'getpwuid via $loop->resolve' );
+      is( $result, \@pwuid, 'getpwuid via $loop->resolve' );
    }
 
    SKIP: {
@@ -90,7 +90,7 @@ SKIP: {
 
       wait_for { $result };
 
-      is_deeply( $result, \@pwnam, 'getpwnam' );
+      is( $result, \@pwnam, 'getpwnam' );
    }
 }
 
@@ -109,7 +109,7 @@ SKIP: {
 
    wait_for { $result };
 
-   is_deeply( $result, \@proto, 'getprotobyname' );
+   is( $result, \@proto, 'getprotobyname' );
 }
 
 SKIP: {
@@ -129,7 +129,7 @@ SKIP: {
 
    wait_for { $result };
 
-   is_deeply( $result, \@proto, 'getprotobynumber' );
+   is( $result, \@proto, 'getprotobynumber' );
 }
 
 BEGIN {
@@ -233,7 +233,7 @@ my @expect_passive_3000 = (
    my @got = @{$result}[1..$#$result];
    my @expect = map { [ @{$_}{qw( family socktype protocol addr canonname )} ] } @expect_one_www;
 
-   is_deeply( \@got, \@expect, 'getaddrinfo_array - resolved addresses' );
+   is( \@got, \@expect, 'getaddrinfo_array - resolved addresses' );
 }
 
 {
@@ -252,7 +252,7 @@ my @expect_passive_3000 = (
 
    my @got = @{$result}[1..$#$result];
 
-   is_deeply( \@got, \@expect_one_www, 'getaddrinfo_hash - resolved addresses' );
+   is( \@got, \@expect_one_www, 'getaddrinfo_hash - resolved addresses' );
 }
 
 {
@@ -273,7 +273,7 @@ my @expect_passive_3000 = (
 
    my @got = @{$result}[1..$#$result];
 
-   is_deeply( \@got, \@expect_one_www, '$resolver->getaddrinfo - resolved addresses' );
+   is( \@got, \@expect_one_www, '$resolver->getaddrinfo - resolved addresses' );
 }
 
 {
@@ -284,13 +284,13 @@ my @expect_passive_3000 = (
       socktype => "stream",
    );
 
-   isa_ok( $future, "Future", '$future for $resolver->getaddrinfo' );
+   isa_ok( $future, [ "Future" ], '$future for $resolver->getaddrinfo isa Future' );
 
    wait_for { $future->is_ready };
 
    my @got = $future->get;
 
-   is_deeply( \@got, \@expect_one_www, '$resolver->getaddrinfo - resolved addresses' );
+   is( \@got, \@expect_one_www, '$resolver->getaddrinfo - resolved addresses' );
 }
 
 {
@@ -308,7 +308,7 @@ my @expect_passive_3000 = (
 
    my @got = @{$result}[1..$#$result];
 
-   is_deeply( \@got, \@expect_lo_80, '$resolver->getaddrinfo resolved addresses synchronously' );
+   is( \@got, \@expect_lo_80, '$resolver->getaddrinfo resolved addresses synchronously' );
 
    undef $result;
    $resolver->getaddrinfo(
@@ -322,7 +322,7 @@ my @expect_passive_3000 = (
 
    my @got_sinaddrs = map { $_->{addr} } @{$result}[1..$#$result];
 
-   is_deeply( \@got_sinaddrs, [ map { pack_sockaddr_in( 0, inet_aton "127.0.0.1" ) } @got_sinaddrs ],
+   is( \@got_sinaddrs, [ map { pack_sockaddr_in( 0, inet_aton "127.0.0.1" ) } @got_sinaddrs ],
       '$resolver->getaddrinfo resolved addresses synchronously with no service' );
 }
 
@@ -342,7 +342,7 @@ my @expect_passive_3000 = (
 
    my @got = @{$result}[1..$#$result];
 
-   is_deeply( \@got, \@expect_passive_3000, '$resolver->getaddrinfo passive - resolved addresses' );
+   is( \@got, \@expect_passive_3000, '$resolver->getaddrinfo passive - resolved addresses' );
 }
 
 {
@@ -352,13 +352,13 @@ my @expect_passive_3000 = (
       socktype => SOCK_STREAM,
    );
 
-   isa_ok( $future, "Future", '$future for $resolver->getaddrinfo numerical' );
+   isa_ok( $future, [ "Future" ], '$future for $resolver->getaddrinfo numerical isa Future' );
 
    wait_for { $future->is_ready };
 
    my @got = $future->get;
 
-   is_deeply( \@got, \@expect_lo_80, '$resolver->getaddrinfo resolved addresses synchronously' );
+   is( \@got, \@expect_lo_80, '$resolver->getaddrinfo resolved addresses synchronously' );
 }
 
 {
@@ -390,7 +390,7 @@ my $sinaddr_lo_www = pack_sockaddr_in( 80, INADDR_LOOPBACK );
    wait_for { $result };
 
    is( $result->[0], "resolved", '$resolver->getnameinfo - resolved' );
-   is_deeply( [ @{$result}[1..2] ], [ "localhost", "www" ], '$resolver->getnameinfo - resolved names' );
+   is( [ @{$result}[1..2] ], [ "localhost", "www" ], '$resolver->getnameinfo - resolved names' );
 }
 
 {
@@ -400,7 +400,7 @@ my $sinaddr_lo_www = pack_sockaddr_in( 80, INADDR_LOOPBACK );
 
    my @got = $future->get;
 
-   is_deeply( \@got, [ "localhost", "www" ], '$resolver->getnameinfo - resolved names from future' );
+   is( \@got, [ "localhost", "www" ], '$resolver->getnameinfo - resolved names from future' );
 }
 
 {
@@ -413,7 +413,7 @@ my $sinaddr_lo_www = pack_sockaddr_in( 80, INADDR_LOOPBACK );
       on_error    => sub { $result = [ 'error',    @_ ] },
    );
 
-   is_deeply( $result, [ resolved => "127.0.0.1", 80 ], '$resolver->getnameinfo with numeric is synchronous' );
+   is( $result, [ resolved => "127.0.0.1", 80 ], '$resolver->getnameinfo with numeric is synchronous' );
 }
 
 {
@@ -422,7 +422,7 @@ my $sinaddr_lo_www = pack_sockaddr_in( 80, INADDR_LOOPBACK );
       numeric => 1,
    );
 
-   is_deeply( [ $future->get ], [ "127.0.0.1", 80 ], '$resolver->getnameinfo with numeric is synchronous for future' );
+   is( [ $future->get ], [ "127.0.0.1", 80 ], '$resolver->getnameinfo with numeric is synchronous for future' );
 }
 
 # Metrics

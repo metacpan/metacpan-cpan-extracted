@@ -1,3 +1,5 @@
+1.2.8    31.01.2024
+           - fix compilation warnings
 1.2.7    20.07.2023
            - deflate config default_compress_binary
 1.2.6    22.06.2022

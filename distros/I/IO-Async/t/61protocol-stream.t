@@ -1,12 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use IO::Async::Loop;
 
@@ -43,7 +42,7 @@ testing_loop( $loop );
    );
 
    ok( defined $streamproto, '$streamproto defined' );
-   isa_ok( $streamproto, "IO::Async::Protocol::Stream", '$streamproto isa IO::Async::Protocol::Stream' );
+   isa_ok( $streamproto, [ "IO::Async::Protocol::Stream" ], '$streamproto isa IO::Async::Protocol::Stream' );
 
    is_oneref( $streamproto, '$streamproto has refcount 1 initially' );
 
@@ -53,11 +52,11 @@ testing_loop( $loop );
 
    $S2->syswrite( "message\n" );
 
-   is_deeply( \@lines, [], '@lines before wait' );
+   is( \@lines, [], '@lines before wait' );
 
    wait_for { scalar @lines };
 
-   is_deeply( \@lines, [ "message\n" ], '@lines after wait' );
+   is( \@lines, [ "message\n" ], '@lines after wait' );
 
    undef @lines;
    my @new_lines;
@@ -76,7 +75,7 @@ testing_loop( $loop );
    wait_for { scalar @new_lines };
 
    is( scalar @lines, 0, '@lines still empty after on_read replace' );
-   is_deeply( \@new_lines, [ "new\n", "lines\n" ], '@new_lines after on_read replace' );
+   is( \@new_lines, [ "new\n", "lines\n" ], '@new_lines after on_read replace' );
 
    $streamproto->write( "response\n" );
 
@@ -90,11 +89,11 @@ testing_loop( $loop );
 
    $streamproto->write(
       sub {
-         is( $_[0], $streamproto, 'writersub $_[0] is $streamproto' );
+         ref_is( $_[0], $streamproto, 'writersub $_[0] is $streamproto' );
          return $done++ ? undef : "a lazy message\n";
       },
       on_flush => sub {
-         is( $_[0], $streamproto, 'on_flush $_[0] is $streamproto' );
+         ref_is( $_[0], $streamproto, 'on_flush $_[0] is $streamproto' );
          $flushed = 1;
       },
    );
@@ -138,7 +137,7 @@ my @sub_lines;
    );
 
    ok( defined $streamproto, 'subclass $streamproto defined' );
-   isa_ok( $streamproto, "IO::Async::Protocol::Stream", '$streamproto isa IO::Async::Protocol::Stream' );
+   isa_ok( $streamproto, [ "IO::Async::Protocol::Stream" ], '$streamproto isa IO::Async::Protocol::Stream' );
 
    is_oneref( $streamproto, 'subclass $streamproto has refcount 1 initially' );
 
@@ -148,11 +147,11 @@ my @sub_lines;
 
    $S2->syswrite( "message\n" );
 
-   is_deeply( \@sub_lines, [], '@sub_lines before wait' );
+   is( \@sub_lines, [], '@sub_lines before wait' );
 
    wait_for { scalar @sub_lines };
 
-   is_deeply( \@sub_lines, [ "message\n" ], '@sub_lines after wait' );
+   is( \@sub_lines, [ "message\n" ], '@sub_lines after wait' );
 
    $loop->remove( $streamproto );
 }

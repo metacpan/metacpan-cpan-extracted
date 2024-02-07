@@ -138,14 +138,18 @@ method set_graphics () {
 	my $w = $self->u( $lw,
 			  fontsize => $style->{'font-size'},
 			  width => $self->root->xoforms->[-1]->{diag});
-	$msg .= " stroke-width=$w";
+	$msg .= sprintf(" stroke-width=%.2f", $w);
 	if ( $lw =~ /e[mx]/ ) {
-	    $msg .= "($lw@" .
-	      ( $style->{'font-size'}|| $self->root->fontsize) . ")";
+	    $msg .= sprintf("(%s\@%.2f)", $lw,
+			    $self->u( $style->{'font-size'}|| $self->root->fontsize,
+				      fontsize => $style->{'font-size'},
+				      width => $self->root->xoforms->[-1]->{diag}));
 	}
 	if ( $lw =~ /\%/ ) {
-	    $msg .= "($lw@" .
-	      ( $self->root->xoforms->[-1]->{diag}) . ")";
+	    $msg .= sprintf("(%s\@%.2f)", $lw,
+			    $self->u( $self->root->xoforms->[-1]->{diag},
+				      fontsize => $style->{'font-size'},
+				      width => $self->root->xoforms->[-1]->{diag}));
 	}
 	$xo->line_width($w);
     }

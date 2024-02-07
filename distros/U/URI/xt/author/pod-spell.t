@@ -10,6 +10,7 @@ set_spell_cmd('aspell list');
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+49699333
 Aas
 Adam
 Alders
@@ -20,6 +21,7 @@ Bonaccorso
 Branislav
 Brendan
 Byrd
+CRS
 Ceccarelli
 Chae
 Chase
@@ -134,6 +136,7 @@ carnil
 data
 davewood
 ddick
+dependabot
 dorian
 ether
 etype
@@ -141,6 +144,7 @@ evalue
 file
 foy
 ftp
+geo
 gerard
 gianni
 gisle
@@ -166,6 +170,7 @@ ldap
 ldapi
 ldaps
 lib
+lon
 lowercasing
 mailto
 mark

@@ -6,6 +6,16 @@ Mark Overmeer.
 TODO:
 	. Add source http://www.ltsw.se/knbase/internet/mime.htp ?
 
+version 2.26: Tue  6 Feb 10:08:33 CET 2024
+
+	Changes:
+	- iana updates
+
+version 2.25: Thu 29 Dec 10:27:24 CET 2022
+
+	Improvements:
+	- support multi-level extensions.  Flagged by [Michał Górny]
+
 version 2.24: Wed 28 Dec 13:06:23 CET 2022
 
 	Fixes:

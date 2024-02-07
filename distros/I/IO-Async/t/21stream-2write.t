@@ -1,13 +1,12 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
+use Test2::V0 0.000149;
 use Test::Metrics::Any;
-use Test::Refcount;
 
 use Errno qw( EAGAIN EWOULDBLOCK ECONNRESET );
 
@@ -56,7 +55,7 @@ sub read_data
    );
 
    ok( defined $stream, 'writing $stream defined' );
-   isa_ok( $stream, "IO::Async::Stream", 'writing $stream isa IO::Async::Stream' );
+   isa_ok( $stream, [ "IO::Async::Stream" ], 'writing $stream isa IO::Async::Stream' );
 
    is_oneref( $stream, 'writing $stream has refcount 1 initially' );
 
@@ -81,11 +80,11 @@ sub read_data
 
    my $f = $stream->write( "hello again\n",
       on_write => sub {
-         is( $_[0], $stream, 'on_write $_[0] is $stream' );
+         ref_is( $_[0], $stream, 'on_write $_[0] is $stream' );
          $written += $_[1];
       },
       on_flush => sub {
-         is( $_[0], $stream, 'on_flush $_[0] is $stream' );
+         ref_is( $_[0], $stream, 'on_flush $_[0] is $stream' );
          $flushed++
       },
    );
@@ -361,7 +360,7 @@ SKIP: {
 
    $stream->write(
       sub {
-         is( $_[0], $stream, 'Writersub $_[0] is $stream' );
+         ref_is( $_[0], $stream, 'Writersub $_[0] is $stream' );
          return $done++ ? undef : "a lazy message\n";
       },
       on_write => sub { $written += $_[1] },

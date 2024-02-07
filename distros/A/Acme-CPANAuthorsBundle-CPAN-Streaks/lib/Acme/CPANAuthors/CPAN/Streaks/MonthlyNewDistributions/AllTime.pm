@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-01'; # DATE
+our $DATE = '2024-02-01'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240101.0'; # VERSION
+our $VERSION = '20240201.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
@@ -156,18 +156,18 @@ Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::AllTime - Authors wit
 
 =head1 VERSION
 
-This document describes version 20240101.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::AllTime (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-01-01.
+This document describes version 20240201.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::AllTime (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-01.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-01-01, produced by L<cpan-streaks>, only streaks with length of at least 6 are included):
+Current standings (as of 2024-02-01, produced by L<cpan-streaks>, only streaks with length of at least 6 are included):
 
   +-----------+-----+------------+----------+-------------+
   | author    | len | start_date | end_date | status      |
   +-----------+-----+------------+----------+-------------+
-  | PERLANCAR | 113 | 2014-08    |          | might-break |
+  | PERLANCAR | 115 | 2014-08    |          | ongoing     |
   | MGV       |  53 | 2014-01    | 2018-05  | broken      |
   | KENTNL    |  46 | 2013-01    | 2016-10  | broken      |
   | ETHER     |  36 | 2013-01    | 2015-12  | broken      |
@@ -209,6 +209,7 @@ Current standings (as of 2024-01-01, produced by L<cpan-streaks>, only streaks w
   | PEVANS    |  11 | 2010-08    | 2011-06  | broken      |
   | DOY       |  11 | 2010-09    | 2011-07  | broken      |
   | DBOOK     |  11 | 2015-01    | 2015-11  | broken      |
+  | SKIM      |  11 | 2023-03    |          | might-break |
   | CWEST     |  10 | 2004-05    | 2005-02  | broken      |
   | MRAMBERG  |  10 | 2005-07    | 2006-04  | broken      |
   | LEOCHARRE |  10 | 2008-06    | 2009-03  | broken      |
@@ -218,7 +219,6 @@ Current standings (as of 2024-01-01, produced by L<cpan-streaks>, only streaks w
   | MANWAR    |  10 | 2015-08    | 2016-05  | broken      |
   | ETJ       |  10 | 2020-05    | 2021-02  | broken      |
   | PEVANS    |  10 | 2021-03    | 2021-12  | broken      |
-  | SKIM      |  10 | 2023-03    |          | might-break |
   | MIYAGAWA  |   9 | 2001-05    | 2002-01  | broken      |
   | AUTRIJUS  |   9 | 2003-07    | 2004-03  | broken      |
   | STEVAN    |   9 | 2004-03    | 2004-11  | broken      |

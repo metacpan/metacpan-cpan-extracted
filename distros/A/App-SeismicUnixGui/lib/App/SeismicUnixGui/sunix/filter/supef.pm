@@ -4,10 +4,14 @@ package App::SeismicUnixGui::sunix::filter::supef;
 
 =head2 SYNOPSIS
 
- PERL PROGRAM NAME:  SUPEF - Wiener predictive error filtering				
- AUTHOR: Juan Lorenzo
- DATE:   
+ PERL PROGRAM NAME:  SUPEF - Wiener predictive error filtering		
+ 		
+ AUTHOR: Juan Lorenzo (Perl module only)
+ 
+ DATE: 
+   
  DESCRIPTION:
+ 
  Version: 
 
 =head2 USE

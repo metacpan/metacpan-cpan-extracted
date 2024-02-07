@@ -7,7 +7,7 @@ use v5.20;
 use experimental qw/ signatures /;
 package YAML::Tidy;
 
-our $VERSION = 'v0.9.0'; # VERSION
+our $VERSION = 'v0.10.0'; # VERSION
 
 use YAML::Tidy::Node;
 use YAML::Tidy::Config;
@@ -353,7 +353,7 @@ sub _change_style($self, $node, $style) {
         }
     }
 
-    my $emit = $self->_emit_value($value, $style);
+    my $emit = $self->_emit_value($value, $style, $node->{flow});
     chomp $emit;
     return (0) if $emit =~ tr/\n//;
     my $first = substr($emit, 0, 1);
@@ -368,16 +368,31 @@ sub _change_style($self, $node, $style) {
     return (0);
 }
 
-sub _emit_value($self, $value, $style) {
+sub _emit_value($self, $value, $style, $inflow) {
     my $options = { unicode => 0 };
-    my $events = [
+    my @events = (
         { name => 'stream_start_event' },
         { name => 'document_start_event', implicit => 1 },
-        { name => 'scalar_event', style => $style, value => $value },
+    );
+    if ($inflow) {
+        push @events, { name => 'sequence_start_event', style => YAML_FLOW_SEQUENCE_STYLE };
+    }
+    push @events, (
+        { name => 'scalar_event', style => $style, value => $value }
+    );
+    if ($inflow) {
+        push @events, { name => 'sequence_end_event' }
+    }
+    push @events, (
         { name => 'document_end_event', implicit => 1 },
         { name => 'stream_end_event' },
-    ];
-    return YAML::LibYAML::API::XS::emit_string_events($events, $options);
+    );
+    my $emit =  YAML::LibYAML::API::XS::emit_string_events(\@events, $options);
+    if ($inflow) {
+        $emit =~ s/^ *\[ *//;
+        $emit =~ s/ *\] *$//;
+    }
+    return $emit;
 }
 
 sub _collect_aliases($self, $node) {

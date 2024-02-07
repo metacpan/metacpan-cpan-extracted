@@ -89,7 +89,7 @@ Version:
 
 
 
- AUTHOR:  Dave Hale, Colorado School of Mines, 02/09/91
+AUTHOR: Juan Lorenzo (Perl module only)
 
  MODIFIED:  Andreas Rueger, Colorado School of Mines, 08/18/93
 

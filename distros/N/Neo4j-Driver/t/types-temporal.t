@@ -43,8 +43,10 @@ sub mock_jolt {
 # Trigger Jolt.pm to load DateTime.pm (with require instead of use to allow for 1.00)
 $s->run(mock_jolt { 'T' => '00:00:00' });
 
+diag "BEFORE neo4j_datetime_ok" if $^O =~ /Win32/;  # debug crash on Win32
 neo4j_datetime_ok 'Neo4j::Driver::Type::DateTime', sub {
 	my ($class, $params) = @_;
+diag "INSIDE neo4j_datetime_ok ".($params->{seconds}//"") if $^O =~ /Win32/;  # debug crash on Win32
 	my $iso = '';
 	if (defined $params->{days}) {
 		$iso = gmtime( $params->{days} * 86400 )->strftime('%Y-%m-%d');
@@ -68,6 +70,7 @@ neo4j_datetime_ok 'Neo4j::Driver::Type::DateTime', sub {
 	}
 	return bless { 'T' => $iso }, $class;
 };
+diag "AFTER neo4j_datetime_ok" if $^O =~ /Win32/;  # debug crash on Win32
 
 
 subtest 'LocalDateTime' => sub {

@@ -28,7 +28,7 @@ The interface to the running MTA follows the 'milter protocol'.  This
 protocol is driven by the MTA.  It is effected by messages of a simple
 structure which are passed between the MTA and the milter via a socket
 connection.  Over the years the Milter Protocol has progressed through
-several versions, and seems (December 2022) to be extremely stable at
+several versions, and seems (February 2024) to be extremely stable at
 Milter Protocol Version 6.
 
 Choose "yes" below to install Sendmail::PMilter from this package.
@@ -44,9 +44,9 @@ my %PM = (
 
 WriteMakefile(
   NAME             => 'Sendmail::PMilter',
-  VERSION          => '1.24',
+  VERSION          => '1.27',
   ABSTRACT         => 'Perl bindings for Sendmail/Postfix milter interface.',
-  AUTHOR           => 'G.W. Haywood <pause.2022.12@milter.uk>',
+  AUTHOR           => 'G.W. Haywood <pause.2024.02@milter.uk>',
   LICENSE          => 'unknown',
   MIN_PERL_VERSION => 5.14.0,
 );

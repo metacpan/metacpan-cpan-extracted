@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::plot::xmovie;
 =head2 SYNOPSIS
 
 PERL PROGRAM NAME:  XMOVIE - image one or more frames of a uniformly sampled function f(x1,x2)
-AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
 DATE:   
 DESCRIPTION:
 Version: 

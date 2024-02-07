@@ -4,27 +4,24 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-01'; # DATE
+our $DATE = '2024-02-01'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240101.0'; # VERSION
+our $VERSION = '20240201.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
-    'INGY' => '',
-    'KIMOTO' => '',
-    'AJNN' => '',
-    'BOOK' => '',
+    'LEONT' => '',
+    'ARISTOTLE' => '',
     'GENE' => '',
-    'JKSTILL' => '',
-    'JMATES' => '',
-    'JV' => '',
-    'MATHIAS' => '',
-    'MRDVT' => '',
+    'MSIMERSON' => '',
+    'OLEG' => '',
+    'SANKO' => '',
     'SKIM' => '',
-    'VKON' => '',
-    'VVELOX' => '',
-    'JGNI' => '',
-    'MIKKOI' => '',
+    'XMOLEX' => '',
+    'ABALAMA' => '',
+    'ATRODO' => '',
+    'DERIV' => '',
+    'NHORNE' => '',
 );
 
 
@@ -43,33 +40,30 @@ Acme::CPANAuthors::CPAN::Streaks::WeeklyDistributions::Current - Authors with on
 
 =head1 VERSION
 
-This document describes version 20240101.0 of Acme::CPANAuthors::CPAN::Streaks::WeeklyDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-01-01.
+This document describes version 20240201.0 of Acme::CPANAuthors::CPAN::Streaks::WeeklyDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-01.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-01-01, produced by L<cpan-streaks>):
+Current standings (as of 2024-02-01, produced by L<cpan-streaks>):
 
   +-----------+-----+------------+-------------+
   | author    | len | start_date | status      |
   +-----------+-----+------------+-------------+
-  | PERLANCAR | 489 | 2014-08-24 | ongoing     |
-  | INGY      |   2 | 2023-12-17 | might-break |
-  | KIMOTO    |   2 | 2023-12-17 | might-break |
-  | AJNN      |   1 | 2023-12-24 | might-break |
-  | BOOK      |   1 | 2023-12-24 | might-break |
-  | GENE      |   1 | 2023-12-24 | might-break |
-  | JKSTILL   |   1 | 2023-12-24 | might-break |
-  | JMATES    |   1 | 2023-12-24 | might-break |
-  | JV        |   1 | 2023-12-24 | might-break |
-  | MATHIAS   |   1 | 2023-12-24 | might-break |
-  | MRDVT     |   1 | 2023-12-24 | might-break |
-  | SKIM      |   1 | 2023-12-24 | might-break |
-  | VKON      |   1 | 2023-12-24 | might-break |
-  | VVELOX    |   1 | 2023-12-24 | might-break |
-  | JGNI      |   1 | 2023-12-31 | ongoing     |
-  | MIKKOI    |   1 | 2023-12-31 | ongoing     |
+  | PERLANCAR | 493 | 2014-08-24 | ongoing     |
+  | LEONT     |   2 | 2024-01-21 | ongoing     |
+  | ARISTOTLE |   1 | 2024-01-21 | might-break |
+  | GENE      |   1 | 2024-01-21 | might-break |
+  | MSIMERSON |   1 | 2024-01-21 | might-break |
+  | OLEG      |   1 | 2024-01-21 | might-break |
+  | SANKO     |   1 | 2024-01-21 | might-break |
+  | SKIM      |   1 | 2024-01-21 | might-break |
+  | XMOLEX    |   1 | 2024-01-21 | might-break |
+  | ABALAMA   |   1 | 2024-01-28 | ongoing     |
+  | ATRODO    |   1 | 2024-01-28 | ongoing     |
+  | DERIV     |   1 | 2024-01-28 | ongoing     |
+  | NHORNE    |   1 | 2024-01-28 | ongoing     |
   +-----------+-----+------------+-------------+
 
 =head1 HOMEPAGE

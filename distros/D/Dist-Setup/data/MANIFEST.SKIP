@@ -1,19 +1,26 @@
-^.aspelldict$
-^.git/
-^.gitmodules$
-^.gitignore$
-^.perlcriticrc$
-^.perltidyrc$
+^\.aspell\..*$
+^\.aspelldict$
+[% IF github.use_devcontainer %]^\.devcontainer/
+[% END %]^\.git/
+[% IF github.use_ci %]^\.github/
+[% END %]^\.gitignore$
+^\.gitmodules$
+^\.perlcriticrc$
+^\.perltidyrc$
 ^Makefile$
+^Makefile.old$
 ^MANIFEST\.bak$
-^MANIFEST\.skip$
+^MANIFEST\.SKIP$
 ^blib/
-^cpanfile.snapshot$
-^dist_setup.conf$
+^cover_db/
+^cpanfile\.snapshot$
+^dist_setup\.conf$
 ^local/
+^t/001-perlcritic.t
+^t/001-perltidy.t
+^t/001-spelling.t
 ^third_party/
 ^pm_to_blib$
-^[% dist_name %]\.tar\.gz
-^[% dist_name %]/
-[% IF github.use_devcontainer %]^\.devcontainer/[% END %]
-[% IF github.use_ci %]^\.github/[% END %]
+^[% dist_name %]-[\d.]+/
+^[% dist_name %]-[\d.]+\.tar\.gz
+.*\.bak

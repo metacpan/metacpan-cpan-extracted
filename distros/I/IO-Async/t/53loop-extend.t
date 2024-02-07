@@ -1,12 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use IO::Async::Loop;
 
@@ -23,7 +22,7 @@ testing_loop( $loop );
       my $self = shift;
       %connectargs = @_;
 
-      identical( $self, $loop, 'FOO_connect invocant is $loop' );
+      ref_is( $self, $loop, 'FOO_connect invocant is $loop' );
 
       return $connect_future = $loop->new_future;
    }
@@ -36,11 +35,11 @@ testing_loop( $loop );
    );
 
    is( ref delete $connectargs{on_connected}, "CODE", 'FOO_connect received on_connected continuation' );
-   is_deeply( \%connectargs,
+   is( \%connectargs,
               { some_param => "here" },
               'FOO_connect received some_param and no others' );
 
-   identical( $f, $connect_future, 'FOO_connect returns Future object' );
+   ref_is( $f, $connect_future, 'FOO_connect returns Future object' );
 
    $loop->connect(
       extensions => [qw( FOO BAR )],
@@ -50,7 +49,7 @@ testing_loop( $loop );
    );
 
    delete $connectargs{on_connected};
-   is_deeply( \%connectargs,
+   is( \%connectargs,
               { extensions => [qw( BAR )],
                 param1 => "one",
                 param2 => "two" },
@@ -66,7 +65,7 @@ testing_loop( $loop );
       my $self = shift;
       %listenargs = @_;
 
-      identical( $self, $loop, 'FOO_listen invocant is $loop' );
+      ref_is( $self, $loop, 'FOO_listen invocant is $loop' );
 
       return $listen_future = $loop->new_future;
    }
@@ -78,12 +77,12 @@ testing_loop( $loop );
       on_accept => sub { $sock = shift },
    );
 
-   isa_ok( delete $listenargs{listener}, "IO::Async::Listener", '$listenargs{listener}' );
-   is_deeply( \%listenargs,
+   isa_ok( delete $listenargs{listener}, [ "IO::Async::Listener" ], '$listenargs{listener} isa IO::Async::Listener' );
+   is( \%listenargs,
               { some_param => "here" },
               'FOO_listen received some_param and no others' );
 
-   identical( $f, $listen_future, 'FOO_listen returns Future object' );
+   ref_is( $f, $listen_future, 'FOO_listen returns Future object' );
 
    $loop->listen(
       extensions => [qw( FOO BAR )],
@@ -93,7 +92,7 @@ testing_loop( $loop );
    );
 
    delete $listenargs{listener};
-   is_deeply( \%listenargs,
+   is( \%listenargs,
               { extensions => [qw( BAR )],
                 param1 => "one",
                 param2 => "two" },

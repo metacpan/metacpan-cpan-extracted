@@ -3,8 +3,8 @@ NAME
     multilevel) buckets
 
 VERSION
-    This document describes version 0.003 of List::Util::groupby (from Perl
-    distribution List-Util-groupby), released on 2023-09-30.
+    This document describes version 0.004 of List::Util::groupby (from Perl
+    distribution List-Util-groupby), released on 2023-11-20.
 
 SYNOPSIS
      use List::Util::groupby qw(groupby hgroupby);
@@ -30,7 +30,7 @@ SYNOPSIS
      #}
 
 DESCRIPTION
-    This module provides "groupby".
+    This module provides "groupby" and "hgroupby".
 
 FUNCTIONS
     Not exported by default but exportable.

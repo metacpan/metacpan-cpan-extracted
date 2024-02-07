@@ -7,7 +7,7 @@ use Mo qw(build is);
 use Mo::utils qw(check_bool check_number);
 use Mo::utils::CSS qw(check_css_class);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 has autofocus => (
 	is => 'ro',
@@ -334,6 +334,10 @@ Returns string.
                  Value: %s
          Parameter 'cols' must be a number.
                  Value: %s
+         Parameter 'css_class' has bad CSS class name.
+                 Value: %s
+         Parameter 'css_class' has bad CSS class name (number on begin).
+                 Value: %s
          Parameter 'disabled' must be a bool (0/1).
                  Value: %s
          Parameter 'readonly' must be a bool (0/1).
@@ -404,6 +408,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

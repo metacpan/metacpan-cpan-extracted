@@ -49,6 +49,7 @@ can_ok(
         active
         cancelled
         expired
+        metadata
     /,
 );
 

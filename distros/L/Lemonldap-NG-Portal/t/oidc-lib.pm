@@ -213,12 +213,12 @@ sub tokenExchange {
 }
 
 sub codeGrant {
-    my ( $op, $clientid, $code, $redirect_uri ) = @_;
-    my $query = buildForm(
-        {
+    my ( $op, $clientid, $code, $redirect_uri, %other_params ) = @_;
+    my $query = buildForm( {
             grant_type   => "authorization_code",
             code         => $code,
             redirect_uri => $redirect_uri,
+            %other_params,
         }
     );
 

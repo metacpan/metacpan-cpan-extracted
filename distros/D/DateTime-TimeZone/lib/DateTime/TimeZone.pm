@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.61';
+our $VERSION = '2.62';
 
 # Note that while we make use of DateTime::Duration in this module if we
 # actually try to load it here all hell breaks loose with circular
@@ -620,7 +620,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 =head1 VERSION
 
-version 2.61
+version 2.62
 
 =head1 SYNOPSIS
 
@@ -1003,7 +1003,7 @@ Tom Wyant <wyant@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Dave Rolsky.
+This software is copyright (c) 2024 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

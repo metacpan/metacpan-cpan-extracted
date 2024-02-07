@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::par::mkparfile;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  MKPARFILE - convert ascii to par file format 				
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 

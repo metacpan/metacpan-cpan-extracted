@@ -25,6 +25,9 @@ Version: 0.1
     
 =head2 CHANGES and their DATES
 
+Sep 25 2023
+Also change name of the InstallationGuide
+
 =cut
 
 use aliased 'App::SeismicUnixGui::misc::manage_files_by2';
@@ -39,7 +42,7 @@ my @inbound;
 my @outbound_bck;
 my @outbound;
 my ( @line2find, @replacement );
-my $max_num_files = 5;
+my $max_num_files = 5;   # +1!
 
 my $up3dirs = '/../../..';
 my $up4dirs = '/../../../..';
@@ -50,8 +53,8 @@ and file
 =cut
 
 my $local       = getcwd();
-my $old_version = '0.85.0';
-my $new_version = '0.85.5';
+my $old_version = '0.87.0';
+my $new_version = '0.87.1';
 
 my $i = 0;
 $line2find[$i]   = ("L_SUV$old_version.pl");
@@ -154,3 +157,5 @@ for ( my $count = 0 ; $count < $max_num_files; $count++ ) {
 
 }
 
+print("Do not forget to update the name of the SeismicUnixGuiInstallationGuide too\n
+	   As well, update the contents of the file if necessary");

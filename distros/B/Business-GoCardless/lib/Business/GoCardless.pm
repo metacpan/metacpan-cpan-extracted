@@ -11,7 +11,7 @@ set of modules
 
 =head1 VERSION
 
-0.40
+0.43
 
 =head1 DESCRIPTION
 
@@ -39,7 +39,7 @@ use Carp qw/ confess /;
 use Business::GoCardless::Client;
 use Business::GoCardless::Webhook;
 
-$Business::GoCardless::VERSION = '0.40';
+$Business::GoCardless::VERSION = '0.43';
 
 has api_version => (
     is       => 'ro',
@@ -132,13 +132,18 @@ sub merchant {
 
 sub payouts {
     my ( $self,%filters ) = @_;
-    return $self->merchant( $self->client->merchant_id )
-        ->payouts( \%filters );
+
+    if ( $self->client->api_version > 1 ) {
+        return $self->_list( 'payouts',%filters );
+    } else {
+        return $self->merchant( $self->client->merchant_id )
+            ->payouts( \%filters );
+    }
 }
 
 sub payout {
     my ( $self,$id ) = @_;
-    return $self->_generic_find_obj( $id,'Payout' );
+    return $self->_generic_find_obj( $id,'Payout','payouts' );
 }
 
 sub new_pre_authorization_url {

@@ -9,12 +9,12 @@
 
  DESCRIPTION:
 
- Version: 1.0
+ Version: 2.0
 
 =head2 USE
 
 
-=head3 NOTES
+=head3 NOTES for old V 1.0
  This script creates the synthetic seismogram in an ascii file
  usage Synseis.sh Site number
 
@@ -115,6 +115,8 @@ Synseis \
 -Z$zrhov_filename \
 -W$water_depth
  -V
+ 
+=head2 NOTEs V 2.0
 
 =head4 Examples
 
@@ -123,21 +125,27 @@ Synseis \
 
 
 =head2 CHANGES and their DATES
-   
+
+   upgrade ss plot to use suxwigb
 
 =cut 
 
 use Moose;
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
+
 use aliased 'App::SeismicUnixGui::sunix::par::a2b';
+use aliased 'App::SeismicUnixGui::misc::a2su';
+use aliased 'App::SeismicUnixGui::sunix::data::data_in';
 use aliased 'App::SeismicUnixGui::misc::flow';
-use aliased 'App::SeismicUnixGui::misc::manage_files_by';
+use aliased 'App::SeismicUnixGui::misc::manage_files_by2';
 use aliased 'App::SeismicUnixGui::misc::message';
 use aliased 'App::SeismicUnixGui::big_streams::Synseis';
 use aliased 'App::SeismicUnixGui::configs::big_streams::Synseis_config';
 use App::SeismicUnixGui::misc::SeismicUnix
      qw($in $out $on $go $to $suffix_ascii $suffix_bin $off $suffix_su);
 use aliased 'App::SeismicUnixGui::sunix::plot::xgraph';
+use aliased 'App::SeismicUnixGui::sunix::header::suaddhead';
+use aliased 'App::SeismicUnixGui::sunix::plot::suxwigb';
 use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
 
 
@@ -149,16 +157,23 @@ use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
 =cut
 
 my $Project         = Project_config->new();
-my $manage_files_by = manage_files_by->new();
+my $manage_files_by2 = manage_files_by2->new();
 my $log            = message->new();
 my $a2b            = a2b->new();
+my $a2su           = a2su->new();
 my $run            = flow->new();
+my $suxwigb        = suxwigb->new();
 my $Synseis        = Synseis->new();
 my $Synseis_config = Synseis_config->new();
 my $xgraph         = xgraph->new();
+my $data_in	       = data_in->new();
 
 
-my ($DATA_SEISMIC_SU)           = $Project->DATA_SEISMIC_SU();
+my $DATA_SEISMIC_BIN            = $Project->DATA_SEISMIC_BIN();
+my $DATA_SEISMIC_SEGD           = $Project->DATA_SEISMIC_SEGD();
+my $DATA_SEISMIC_SEGY           = $Project->DATA_SEISMIC_SEGY();
+my $DATA_SEISMIC_SU             = $Project->DATA_SEISMIC_SU();
+my $DATA_SEISMIC_TXT            = $Project->DATA_SEISMIC_TXT();
 my ($PL_SEISMIC)                = $Project->PL_SEISMIC();
 my ($DATA_SEISMIC_WELL_SYNSEIS) = $Project->DATA_SEISMIC_WELL_SYNSEIS();
 my ($DATA_RESISTIVITY_WELL_TXT) =
@@ -177,7 +192,8 @@ my @xgraph_inbound;
 my $xgraph_file_name;
 my ( @geometry, @a2b_file_name );
 my ( $wbox, $hbox, $xbox, $ybox );
-
+my (@data_in);
+my (@suxwigb);
 
 =head2 default values for
 geomtery of boxes
@@ -231,7 +247,7 @@ my $reflection_coef_time  = $DATA_SEISMIC_WELL_SYNSEIS . '/' . 'rc_t';
 my $reflection_coef_depth = $DATA_SEISMIC_WELL_SYNSEIS . '/' . 'rc_z';
 my $zrho_reg              = $DATA_SEISMIC_WELL_SYNSEIS . '/' . 'zrho_reg';
 my $zv_reg                = $DATA_SEISMIC_WELL_SYNSEIS . '/' . 'zv_reg';
-my $zrhov = $DATA_SEISMIC_WELL_SYNSEIS . '/' . $base_file_name;
+my $zrhov                 = $DATA_SEISMIC_WELL_SYNSEIS . '/' . $base_file_name;
 
 # my $zrhov							= $DATA_RESISTIVITY_WELL_TXT.'/'.'zrhov_W8';
 
@@ -246,8 +262,9 @@ my $water_depth_s = $water_depth_m / $water_velocity_mps/ 2;
 # print(" 1. Synseis.pl, plot_density_min:$plot_density_min\n\n");
 # print(" 1. Synseis.pl, plot_depth_min_m:$plot_time_min_s\n\n");
 # print(" 1. Synseis.pl, plot_velocity_min:$plot_velocity_min\n\n");
-# print(" 1. Synseis.pl, plot_ss_amplitude_min:$plot_ss_amplitude_min\n\n");
-# print(" 1. Synseis.pl, plot_reflection_coefficient_min:$plot_reflection_coefficient_min\n\n");
+#print(" 1. Synseis.pl, plot_ss_amplitude_min:$plot_ss_amplitude_min\n\n");
+#print(" 1. Synseis.pl, plot_reflection_coefficient_min:$plot_reflection_coefficient_min\n\n");
+
 
 =head2 Set a2b 
 
@@ -262,6 +279,19 @@ $a2b->floats_per_line( quotemeta(2) );
 $a2b->outpar(
     quotemeta( $DATA_SEISMIC_WELL_SYNSEIS . '/' . '.temp_zrho_reg' ) );
 $a2b[1] = $a2b->Step();
+
+
+=head2 Set up
+
+	data_in parameter values
+
+=cut
+
+$data_in->clear();
+$data_in->base_file_name( quotemeta('ss_amp_only') );
+$data_in->suffix_type( quotemeta('su') );
+$data_in[1] = $data_in->Step();
+
 
 =head2 Set  a2b 
 
@@ -339,6 +369,7 @@ $a2b[5] = $a2b->Step();
 
 my $sed_num_points;
 
+
 =head2 Set Synseis
 
 =cut
@@ -371,6 +402,7 @@ $Synseis[1]     = $Synseis->Step();
 $SynseisNote[1] = $Synseis->note();
 
 =head2 DEFINE FLOW(S)
+
 Reading and plotting data 
 and synthetic seismogram
  
@@ -406,10 +438,15 @@ $flow[4] = $run->modules( \@items );
 @items = ( $a2b[5], $in, $a2b_inbound[5], $out, $a2b_outbound[5] );
 # print  "synthetic seismograms: @items\n";
  $flow[6] = $run->modules( \@items );
+ 
+# create a second ss.su with only the amplitude column in preparation
+ 
 
 =head2 RUN FLOW(S)
+
 flow 1 to create ss and accompanying files
 flow 2 create zrhoreg.bin
+
 =cut
 
 # run main
@@ -421,35 +458,48 @@ $run->flow( \$flow[2] );
 #print  "Synseis.pl,flow2: $flow[2]\n";
 
 #get meta-data from zrhoreg
-my $num_points_zrho_reg = $manage_files_by->count_lines( \$zrho_reg );
+my $num_points_zrho_reg = $manage_files_by2->count_lines( \$zrho_reg );
 # print("num_points_zrho_reg  $num_points_zrho_reg \n");
 
 #create zv_reg.bin
 $run->flow( \$flow[3] );
 #get meta-data from zvreg
-my $num_points_zv_reg = $manage_files_by->count_lines( \$zv_reg );
+my $num_points_zv_reg = $manage_files_by2->count_lines( \$zv_reg );
 #print("num_points_zv_reg  $num_points_zv_reg \n");
 
 #create reflection_coef_depth.bin
 $run->flow( \$flow[4] );
 # get meta-data from reflection_coef_depth
-my $num_points_depth = $manage_files_by->count_lines( \$reflection_coef_depth );
+my $num_points_depth = $manage_files_by2->count_lines( \$reflection_coef_depth );
 #print("num_points_depth  $num_points_depth \n");
 
 # create reflection_coef_time.bin
 $run->flow( \$flow[5] );
 #print  "Synseis.pl,flow5: $flow[5]\n";
 # get meta-data from reflection_coef_time
-my $num_points_time = $manage_files_by->count_lines( \$reflection_coef_time );
+my $num_points_time = $manage_files_by2->count_lines( \$reflection_coef_time );
 #print("num_points_time $num_points_time \n");
 
 # create ss.bin
 $run->flow( \$flow[6] );
 
+#=head2 Set up 
+#
+#	a2su parameter values
+#	and run them
+#
+#=cut
+#
+#$a2su->clear();
+#$a2su->set_base_file_name_in('ss');
+#$a2su->set_path_in($DATA_SEISMIC_TXT);
+#$a2su->set_si_us($time_sampling_interval_us);
+#$a2su->go();
+
 ## get meta-data from ss
 my $num_points_synthetic_seismogram =
-     $manage_files_by->count_lines( \$output_synthetic_seismogram );
-# print("num_points_synthetic_seismogram $num_points_synthetic_seismogram \n");
+     $manage_files_by2->count_lines( \$output_synthetic_seismogram );
+print("num_points_synthetic_seismogram $num_points_synthetic_seismogram \n");
 
 =head2 plot zrho_reg.bin
 
@@ -569,10 +619,32 @@ $xgraph_inbound[4] = $xgraph_file_name . $suffix_bin;
 @items = ( $xgraph[4], $in, $xgraph_inbound[4], $go );
 $flow[10] = $run->modules( \@items );
 
-=head2 Set
- xgraph plot ss.bin
+#=head2 Set up
+#
+#	suxwigb parameter values
+#
+#=cut
+#
+#$suxwigb->clear();
+#$suxwigb->x2beg( quotemeta($plot_ss_amplitude_min) );
+#$suxwigb->x2end( quotemeta($plot_ss_amplitude_max) );
+#$suxwigb->box_width( quotemeta(400) );
+#$suxwigb->box_height( quotemeta($hbox) );
+#$suxwigb->box_X0( quotemeta($xbox) );
+#$suxwigb->box_Y0( quotemeta(920) );
+#$suxwigb->orientation( quotemeta('seismic') );
+#$suxwigb->windowtitle(quotemeta('Synthetic seismogram'));
+#$suxwigb->title(quotemeta('synthetic seismogram in time (s)'));
+#$suxwigb[1] = $suxwigb->Step();
+
+=head2 Plot
+
+synthetic seismogram 
 
 =cut
+
+@items = ( $suxwigb[1], $in, $data_in[1], $go );
+$flow[11] = $run->modules( \@items );
 
 $xbox = 920;
 $geometry[5] = $wbox . 'x' . $hbox . '+' . $xbox . '+' . $ybox;
@@ -580,8 +652,8 @@ $geometry[5] = $wbox . 'x' . $hbox . '+' . $xbox . '+' . $ybox;
 $xgraph->clear();
 $xgraph->axes_style( quotemeta('seismic') );
 $xgraph->title( quotemeta('synthetic seismogram') );
-$xgraph->x2beg( quotemeta($plot_ss_amplitude_min) );
 $xgraph->x2end( quotemeta($plot_ss_amplitude_max) );
+$xgraph->x2beg( quotemeta($plot_ss_amplitude_min) );
 $xgraph->x1beg( quotemeta($plot_time_min_s) );
 $xgraph->x1end( quotemeta($plot_time_max_s) );
 $xgraph->nTic2( quotemeta(2) );
@@ -647,7 +719,7 @@ $run->flow( \$flow[11] );
 ##    print  "$flow[10]\n";
 ##$log->file($flow[10]);
 #
-##     print  "$flow[11]\n";
+     print  "$flow[11]\n";
 ##$log->file($flow[11]);
 #
 #system("sh /usr/local/pl/L_SU/c/synseis/run_me_only.sh");

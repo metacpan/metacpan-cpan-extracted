@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::statsMath::farith;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 
@@ -157,7 +157,7 @@ Version:
 
 
 
-   AUTHOR:  Dave Hale, Colorado School of Mines, 07/07/89
+   Author:  Dave Hale, Colorado School of Mines, 07/07/89
 
 	Zhaobo Meng added scale and cartprod, 10/01/96
 

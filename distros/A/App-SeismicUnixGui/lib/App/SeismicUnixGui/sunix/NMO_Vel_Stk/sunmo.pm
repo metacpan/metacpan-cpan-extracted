@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::NMO_Vel_Stk::sunmo;
 =head2 SYNOPSIS 
 
  PROGRAM NAME: sunmo 
- AUTHOR: Chang Liu
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   Dec 1 2013
  DESCRIPTION: 
  Version: 0.0.1

@@ -4,6 +4,7 @@
 /MANIFEST
 /MANIFEST.bak
 /blib/
+/cover_db/
 /local/
 /pm_to_blib
 /temp/

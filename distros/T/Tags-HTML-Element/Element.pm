@@ -3,7 +3,7 @@ package Tags::HTML::Element;
 use strict;
 use warnings;
 
-our $VERSION = 0.02;
+our $VERSION = 0.06;
 
 1;
 
@@ -15,7 +15,7 @@ __END__
 
 =head1 NAME
 
-Data::HTML::Element - Data objects for HTML elements.
+Data::HTML::Element - Tags helpers for HTML elements.
 
 =head1 SEE ALSO
 
@@ -69,6 +69,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.06
 
 =cut

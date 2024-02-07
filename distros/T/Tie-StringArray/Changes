@@ -1,5 +1,8 @@
 Revision history for Perl module Tie::StringArray
 
+1.104 2024-02-05T08:28:20Z
+	* refresh distro, update email addresses
+
 1.103 2022-01-09T00:22:26Z
 	* No code changes. Fix link in README.pod.
 

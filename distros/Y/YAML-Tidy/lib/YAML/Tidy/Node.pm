@@ -6,7 +6,7 @@ use experimental qw/ signatures /;
 
 package YAML::Tidy::Node;
 
-our $VERSION = 'v0.9.0'; # VERSION
+our $VERSION = 'v0.10.0'; # VERSION
 use overload '""' => \&_stringify;
 
 sub new($class, %args) {

@@ -1,5 +1,5 @@
 package Email::Sender::Transport::Mailgun;
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 use Moo;
 with 'Email::Sender::Transport';
@@ -62,6 +62,16 @@ has region => (
     isa => Enum[qw( us eu )],
 );
 
+has retry_count => (
+    is => 'lazy',
+    builder => sub { 3 }, # set to 0 to disable retries
+);
+
+has retry_delay_seconds => (
+    is => 'lazy',
+    builder => sub { 1 },
+);
+
 has base_uri => (
     is => 'lazy',
     builder => sub { 'https://api.mailgun.net/v3' },
@@ -107,7 +117,18 @@ sub send_email {
     }
 
     my $uri = $self->uri . '/messages.mime';
-    my $response = $self->ua->post_multipart($uri, $content);
+
+    # If we get a 5xx error, retry a few times.
+    # Been seeing "Socket closed by remote server: Broken pipe" errors (EPIPE).
+    my $retries = 0;
+
+    my $response;
+    while (1) {
+        $response = $self->ua->post_multipart($uri, $content);
+        last if $response->{status} !~ /^5/;
+        last if $retries++ >= $self->retry_count;
+        sleep $self->retry_delay_seconds;
+    }
 
     $self->failure($response, $env->{to})
         unless $response->{success};
@@ -232,6 +253,14 @@ Defines used Mailgun region. C<'us'> (default) or C<'eu'>.
 
 See L<https://documentation.mailgun.com/en/latest/api-intro.html#mailgun-regions-1>
 
+=head2 retry_count
+
+=head2 retry_delay_seconds
+
+If the Mailgun API request fails with a 5xx response, the request will be retried C<retry_count> times, with a delay of C<retry_delay_seconds> between each attempt.
+
+Defaults to three retries with a one second delay.
+
 =head2 tag
 
 Tag string. Comma-separated string list or arrayref of strings.
@@ -285,6 +314,10 @@ C<EMAIL_SENDER_TRANSPORT_>.
 =item EMAIL_SENDER_TRANSPORT_dkim
 
 =item EMAIL_SENDER_TRANSPORT_region
+
+=item EMAIL_SENDER_TRANSPORT_retry_count
+
+=item EMAIL_SENDER_TRANSPORT_retry_delay_seconds
 
 =item EMAIL_SENDER_TRANSPORT_tag
 

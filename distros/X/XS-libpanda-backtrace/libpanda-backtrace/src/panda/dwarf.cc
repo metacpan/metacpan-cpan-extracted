@@ -1,7 +1,6 @@
 #include "dwarf.h"
 #include "dl.h"
 #include <limits.h>     // PATH_MAX
-#include <libdwarf/dwarf.h>
 #include <functional>
 #include <memory>
 #include <iostream> // for debug
@@ -33,7 +32,7 @@ static DwarfInfoMap load_dwarf_info(const SharedObjectMap& so_map) {
         DwarfInfo::file_guard_t file_guard (file, [](auto* f){ if (f) {fclose(f); }});
         int fd = file ? fileno(file) : 0;
         if (fd > 0) {
-            auto err = dwarf_init_b(fd, DW_DLC_READ, DW_GROUPNUMBER_ANY, nullptr, &info->err_arg, &info->debug, &error);
+            auto err = dwarf_init_b(fd, DW_GROUPNUMBER_ANY, nullptr, &info->err_arg, &info->debug, &error);
             //std::cout << "loading '" << so.name << "', code = " << err << "\n";
             if (err == DW_DLV_OK) {
                 if (info->load(std::move(file_guard))) {
@@ -70,7 +69,7 @@ DwarfInfo::~DwarfInfo() {
     if (debug) {
         CUs.clear(); // DIEs must be released before debug
         Dwarf_Error error;
-        auto res = dwarf_finish(debug, &error);
+        auto res = dwarf_finish(debug);
         if (res != DW_DLV_OK) {
              fprintf(stderr, "dwarf_finish: %s\n", dwarf_errmsg(error));
         }
@@ -371,9 +370,10 @@ void DieRC::refine_fn_line(DieSP it, std::uint64_t offset, FunctionDetails& deta
         Dwarf_Unsigned modtime;
         Dwarf_Unsigned flength;
         Dwarf_Unsigned dirindex;
+        Dwarf_Form_Data16 *md5data = 0;
         const char *source_name;
 
-        res = dwarf_srclines_files_data(line_context, i, &source_name ,&dirindex, &modtime, &flength, &error);
+        res = dwarf_srclines_files_data_b(line_context, i, &source_name ,&dirindex, &modtime, &flength, &md5data, &error);
         if (res != DW_DLV_OK) { return; }
         if (cu_name.find(source_name) != string::npos) {
             if (dirindex) {
@@ -567,7 +567,9 @@ Scan DieRC::contains(std::uint64_t offset) noexcept {
                 Dwarf_Ranges *ranges;
                 Dwarf_Signed  ranges_count;
                 Dwarf_Unsigned  byte_count;
-                res = dwarf_get_ranges_a(debug, ranges_offset, die, &ranges, &ranges_count, &byte_count, &error);
+                Dwarf_Off  actual_offset = 0;
+
+                res = dwarf_get_ranges_b(debug, ranges_offset, die, &actual_offset,&ranges, &ranges_count, &byte_count, &error);
                 if (res == DW_DLV_OK) {
                     Dwarf_Addr baseaddr = 0;
                     for(int i = 0; i < ranges_count; ++i) {

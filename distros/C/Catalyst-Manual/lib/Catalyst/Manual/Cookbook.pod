@@ -1295,7 +1295,7 @@ please put your actions into your Root controller.
 =head3 Flowchart
 
 A graphical flowchart of how the dispatcher works can be found on the wiki at
-L<http://dev.catalystframework.org/attachment/wiki/WikiStart/catalyst-flow.png>.
+L<https://web.archive.org/web/20190919010727/http://dev.catalystframework.org/attachment/wiki/WikiStart/catalyst-flow.png>.
 
 =head2 DRY Controllers with Chained actions
 

@@ -20,16 +20,16 @@ name: Linux-FD
 provides:
   Linux::FD:
     file: lib/Linux/FD.pm
-    version: '0.015'
+    version: '0.016'
   Linux::FD::Event:
     file: lib/Linux/FD/Event.pm
-    version: '0.015'
+    version: '0.016'
   Linux::FD::Signal:
     file: lib/Linux/FD/Signal.pm
-    version: '0.015'
+    version: '0.016'
   Linux::FD::Timer:
     file: lib/Linux/FD/Timer.pm
-    version: '0.015'
+    version: '0.016'
 requires:
   Exporter: '5.57'
   XSLoader: '0'
@@ -39,7 +39,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/linux-fd/issues
   repository: git://github.com/Leont/linux-fd.git
-version: '0.015'
+version: '0.016'
 x_generated_by_perl: v5.38.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

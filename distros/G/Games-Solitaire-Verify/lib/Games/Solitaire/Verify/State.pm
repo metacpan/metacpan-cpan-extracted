@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::State;
-$Games::Solitaire::Verify::State::VERSION = '0.2403';
+$Games::Solitaire::Verify::State::VERSION = '0.2500';
 use warnings;
 use strict;
 
@@ -16,7 +16,7 @@ use Games::Solitaire::Verify::VariantParams ();
 use Games::Solitaire::Verify::VariantsMap   ();
 
 use List::Util qw(first);
-use POSIX qw();
+use POSIX      qw();
 
 __PACKAGE__->mk_acc_ref(
     [
@@ -27,7 +27,7 @@ __PACKAGE__->mk_acc_ref(
             _variant
             _variant_params
             _temp_move
-            )
+        )
     ]
 );
 
@@ -403,7 +403,7 @@ sub _calc_freecell_max_seq_move
     my $to_empty = ( defined( $args->{to_empty} ) ? $args->{to_empty} : 0 );
 
     return ( ( $self->num_empty_freecells() + 1 )
-        << ( $self->num_empty_columns() - $to_empty ) );
+            << ( $self->num_empty_columns() - $to_empty ) );
 }
 
 sub _calc_empty_stacks_filled_by_any_card_max_seq_move
@@ -501,7 +501,7 @@ sub _mv_stack_to_foundation
     my $suit = $card->suit();
 
     my $f_idx = first { $self->get_foundation_value( $suit, $_ ) == $rank - 1 }
-    ( 0 .. ( $self->num_decks() - 1 ) );
+        ( 0 .. ( $self->num_decks() - 1 ) );
 
     if ( defined($f_idx) )
     {
@@ -527,7 +527,8 @@ sub _mv_stack_seq_to_foundation
 
     if ( $rules ne "simple_simon" )
     {
-        return Games::Solitaire::Verify::Exception::Move::Variant::Unsupported
+        return
+            Games::Solitaire::Verify::Exception::Move::Variant::Unsupported
             ->new( move => $move );
     }
 
@@ -544,7 +545,8 @@ sub _mv_stack_seq_to_foundation
 
     if ( $num_seq_components != 1 )
     {
-        return Games::Solitaire::Verify::Exception::Move::Src::Col::NotTrueSeq
+        return
+            Games::Solitaire::Verify::Exception::Move::Src::Col::NotTrueSeq
             ->new( move => $move );
     }
 
@@ -553,7 +555,7 @@ sub _mv_stack_seq_to_foundation
     my $suit = $card->suit();
 
     my $f_idx = first { $self->get_foundation_value( $suit, $_ ) == 0 }
-    ( 0 .. ( $self->num_decks() - 1 ) );
+        ( 0 .. ( $self->num_decks() - 1 ) );
 
     if ( defined($f_idx) )
     {
@@ -680,7 +682,7 @@ sub _mv_freecell_to_foundation
     my $suit = $card->suit();
 
     my $f_idx = first { $self->get_foundation_value( $suit, $_ ) == $rank - 1 }
-    ( 0 .. ( $self->num_decks() - 1 ) );
+        ( 0 .. ( $self->num_decks() - 1 ) );
 
     if ( defined($f_idx) )
     {
@@ -708,7 +710,8 @@ sub _mv_freecell_to_stack
 
     if ( !defined($card) )
     {
-        return Games::Solitaire::Verify::Exception::Move::Src::Freecell::Empty
+        return
+            Games::Solitaire::Verify::Exception::Move::Src::Freecell::Empty
             ->new( move => $move, );
     }
 
@@ -822,7 +825,7 @@ states (or positions) of the entire board.
 
 =head1 VERSION
 
-version 0.2403
+version 0.2500
 
 =head1 SYNOPSIS
 

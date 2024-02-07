@@ -1,0 +1,17 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Eg::Node::Element::HTML::Output extends Eg::Node::Element::HTML {
+  
+  allow Eg::Node::Document;
+  
+  # Class Methods
+  private static method new : Eg::Node::Element::HTML::Output ($options : object[] = undef) {
+    
+    my $self = new Eg::Node::Element::HTML::Output;
+    
+    $self->SUPER::init($options);
+    
+    return $self;
+  }
+}

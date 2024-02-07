@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::plot::xgraph;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  XGRAPH - X GRAPHer							
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 

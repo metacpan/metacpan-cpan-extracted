@@ -18,6 +18,18 @@ static const char* FILE_NAME = "Eg/OS/Windows/API/App.cpp";
 
 extern "C" {
 
+static wchar_t* to_wide_char(const char* str, size_t* len) {
+  size_t size = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
+
+  wchar_t* wideStr = new wchar_t[size];
+
+  MultiByteToWideChar(CP_UTF8, 0, str, -1, wideStr, size);
+
+  *len = size;
+
+  return wideStr;
+}
+
 static LRESULT CALLBACK window_procedure(HWND window_handle , UINT message , WPARAM wparam , LPARAM lparam);
 
 static int32_t paint_event_handler(SPVM_ENV* env, SPVM_VALUE* stack, void* obj_self);
@@ -242,28 +254,14 @@ static LRESULT CALLBACK window_procedure(HWND window_handle , UINT message , WPA
   return DefWindowProc(window_handle , message , wparam , lparam);
 }
 
-static int16_t* encode_utf16(SPVM_ENV* env, SPVM_VALUE* stack, const char* string) {
-  int32_t error_id = 0;
-  
-  void* obj_string =  env->new_string_nolen(env, stack, string);
-  
-  void* obj_string_utf8_to_utf16 = NULL;
-  {
-    stack[0].oval = obj_string;
-    env->call_class_method_by_name(env, stack, "Encode", "encode_utf16", 1, &error_id, __func__, FILE_NAME, __LINE__);
-    if (error_id) { return NULL; }
-    obj_string_utf8_to_utf16 = stack[0].oval;
-  }
-  
-  int16_t* string_utf8_to_utf16 = env->get_elems_short(env, stack, obj_string_utf8_to_utf16);
-  
-  return string_utf8_to_utf16;
-}
-
 static void alert(SPVM_ENV* env, SPVM_VALUE* stack, const char* message) {
-  int16_t* message_utf8_to_utf16 = encode_utf16(env, stack, message);
   
-  MessageBoxW(NULL, (LPCWSTR)message_utf8_to_utf16, TEXT("Alert"), MB_OK);
+  size_t message_wc_length = -1;
+  const WCHAR* message_wc = to_wide_char(message, &message_wc_length);
+  
+  MessageBoxW(NULL, (LPCWSTR)message_wc, TEXT("Alert"), MB_OK);
+  
+  delete message_wc;
 }
 
 static int32_t paint_event_handler(SPVM_ENV* env, SPVM_VALUE* stack, void* obj_self) {
@@ -284,16 +282,14 @@ static int32_t paint_event_handler(SPVM_ENV* env, SPVM_VALUE* stack, void* obj_s
     if (error_id) { return error_id; }
     void* obj_document_title = stack[0].oval;
     
-    void* obj_document_title_utf8_to_utf16 = NULL;
-    {
-      stack[0].oval = obj_document_title;
-      env->call_class_method_by_name(env, stack, "Encode", "encode_utf16", 1, &error_id, __func__, FILE_NAME, __LINE__);
-      if (error_id) { return error_id; }
-      obj_document_title_utf8_to_utf16 = stack[0].oval;
-    }
-    int16_t* document_title_utf8_to_utf16 = env->get_elems_short(env, stack, obj_document_title_utf8_to_utf16);
+    const char* document_title = env->get_chars(env, stack, obj_document_title);
     
-    SetWindowTextW(window_handle, (LPCWSTR)document_title_utf8_to_utf16);
+    size_t document_title_wc_length = -1;
+    const WCHAR* document_title_wc = to_wide_char(document_title, &document_title_wc_length);
+    
+    SetWindowTextW(window_handle, (LPCWSTR)document_title_wc);
+    
+    delete document_title_wc;
   }
   
   // Paint nodes
@@ -406,13 +402,8 @@ int32_t SPVM__Eg__OS__Windows__API__App__text_metrics_height(SPVM_ENV* env, SPVM
   int32_t width = box->width;
   int32_t font_size = box->font_size;
   
-  spvm_warn("LINE %d %d", __LINE__, font_size);
-  
   DWRITE_FONT_WEIGHT font_weight_native = DWRITE_FONT_WEIGHT_NORMAL;
   DWRITE_FONT_STYLE font_style_native = DWRITE_FONT_STYLE_NORMAL;
-  
-  const int16_t* text_utf16 = encode_utf16(env, stack, text);
-  int32_t text_utf16_length = strlen((char*)text_utf16) / 2;
   
   HRESULT hresult = E_FAIL;
   
@@ -435,15 +426,20 @@ int32_t SPVM__Eg__OS__Windows__API__App__text_metrics_height(SPVM_ENV* env, SPVM
     &text_format
   );
   
+  size_t text_wc_length = -1;
+  const WCHAR* text_wc = to_wide_char(text, &text_wc_length);
+  
   IDWriteTextLayout* text_layout = NULL;
   hresult = direct_write_factory->CreateTextLayout(
-    (const WCHAR*)text_utf16,
-    text_utf16_length,
+    (const WCHAR*)text_wc,
+    text_wc_length,
     text_format,
     width,
     0,
     &text_layout
   );
+  
+  delete text_wc;
   
   if (FAILED(hresult)) {
     return env->die(env, stack, "IDWriteFactory#CreateTextLayout() failed.", __func__, FILE_NAME, __LINE__);
@@ -481,7 +477,7 @@ int32_t SPVM__Eg__OS__Windows__API__App__paint_node(SPVM_ENV* env, SPVM_VALUE* s
   
   struct eg_css_box* box = (struct eg_css_box*)env->get_pointer(env, stack, obj_box);
   
-  D2D1_RECT_F box_rect = D2D1::RectF(box->left, box->top, box->left + box->width + 1, box->top + box->height + 1);
+  D2D1_RECT_F box_rect = D2D1::RectF(box->computed_left, box->computed_top, box->computed_left + box->computed_width + 1, box->computed_top + box->computed_height + 1);
   
   // Renderer
   stack[0].oval = obj_self;
@@ -517,11 +513,20 @@ int32_t SPVM__Eg__OS__Windows__API__App__paint_node(SPVM_ENV* env, SPVM_VALUE* s
   if (text) {
     
     int32_t font_size = box->font_size;
+    
     DWRITE_FONT_WEIGHT font_weight_native = DWRITE_FONT_WEIGHT_NORMAL;
+    
+    int32_t font_weight = box->font_weight_value_type;
+    
+    if (box->font_weight_value_type == EG_CSS_BOX_C_VALUE_TYPE_FONT_WEIGHT_BOLD) {
+      font_weight_native = DWRITE_FONT_WEIGHT_BOLD;
+    }
+    
     DWRITE_FONT_STYLE font_style_native = DWRITE_FONT_STYLE_NORMAL;
     
-    const int16_t* text_utf16 = encode_utf16(env, stack, text);
-    int32_t text_utf16_length = strlen((char*)text_utf16) / 2;
+    if (box->font_style_value_type == EG_CSS_BOX_C_VALUE_TYPE_FONT_STYLE_ITALIC) {
+      font_style_native = DWRITE_FONT_STYLE_ITALIC;
+    }
     
     D2D1::ColorF color_f = {0};
     color_f = D2D1::ColorF(box->color_red, box->color_green, box->color_blue, box->color_alpha);
@@ -547,15 +552,20 @@ int32_t SPVM__Eg__OS__Windows__API__App__paint_node(SPVM_ENV* env, SPVM_VALUE* s
       &text_format
     );
     
+    size_t text_wc_length = -1;
+    const WCHAR* text_wc = to_wide_char(text, &text_wc_length);
+    
     IDWriteTextLayout* text_layout = NULL;
     hresult = direct_write_factory->CreateTextLayout(
-          (const WCHAR*)text_utf16
-        , text_utf16_length
+          (const WCHAR*)text_wc
+        , text_wc_length
         ,text_format
         , box->width
         , 0
         , &text_layout
     );
+    
+    delete text_wc;
     
     if (FAILED(hresult)) {
       return env->die(env, stack, "IDWriteFactory#CreateTextLayout() failed.", __func__, FILE_NAME, __LINE__);
@@ -573,5 +583,6 @@ int32_t SPVM__Eg__OS__Windows__API__App__paint_node(SPVM_ENV* env, SPVM_VALUE* s
   
   return 0;
 }
+
 
 }

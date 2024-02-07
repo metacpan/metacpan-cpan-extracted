@@ -1,14 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Fatal;
-use Test::Identity;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use IO::Async::Loop;
 
@@ -33,7 +30,7 @@ sub mkhandles
    return ( $S1, $S2 );
 }
 
-ok( exception { IO::Async::Handle->new( handle => "Hello" ) }, 'Not a filehandle' );
+ok( dies { IO::Async::Handle->new( handle => "Hello" ) }, 'Not a filehandle' );
 
 # Read readiness
 {
@@ -49,7 +46,7 @@ ok( exception { IO::Async::Handle->new( handle => "Hello" ) }, 'Not a filehandle
    );
 
    ok( defined $handle, '$handle defined' );
-   isa_ok( $handle, "IO::Async::Handle", '$handle isa IO::Async::Handle' );
+   isa_ok( $handle, [ "IO::Async::Handle" ], '$handle isa IO::Async::Handle' );
 
    is( $handle->notifier_name, "r=$fd1", '$handle->notifier_name for read_handle' );
 
@@ -75,7 +72,7 @@ ok( exception { IO::Async::Handle->new( handle => "Hello" ) }, 'Not a filehandle
    wait_for { $readready };
 
    is( $readready,  1, '$readready while readable' );
-   is_deeply( \@rrargs, [ $handle ], 'on_read_ready args while readable' );
+   is( \@rrargs, [ exact_ref($handle) ], 'on_read_ready args while readable' );
 
    $S1->getline; # ignore return
 
@@ -98,7 +95,7 @@ ok( exception { IO::Async::Handle->new( handle => "Hello" ) }, 'Not a filehandle
 
    $S1->getline; # ignore return
 
-   ok( exception { $handle->want_writeready( 1 ); },
+   ok( dies { $handle->want_writeready( 1 ); },
        'setting want_writeready with write_handle == undef dies' );
    ok( !$handle->want_writeready, 'wantwriteready write_handle == undef false' );
 
@@ -125,7 +122,7 @@ ok( exception { IO::Async::Handle->new( handle => "Hello" ) }, 'Not a filehandle
    );
 
    ok( defined $handle, '$handle defined' );
-   isa_ok( $handle, "IO::Async::Handle", '$handle isa IO::Async::Handle' );
+   isa_ok( $handle, [ "IO::Async::Handle" ], '$handle isa IO::Async::Handle' );
 
    is( $handle->notifier_name, "w=$fd1", '$handle->notifier_name for write_handle' );
 
@@ -151,7 +148,7 @@ ok( exception { IO::Async::Handle->new( handle => "Hello" ) }, 'Not a filehandle
    wait_for { $writeready };
 
    is( $writeready, 1, '$writeready while writeable' );
-   is_deeply( \@wrargs, [ $handle ], 'on_write_ready args while writeable' );
+   is( \@wrargs, [ exact_ref($handle) ], 'on_write_ready args while writeable' );
 
    $writeready = 0;
    my $new_writeready = 0;
@@ -201,7 +198,7 @@ my $sub_writeready = 0;
    );
 
    ok( defined $handle, 'subclass $handle defined' );
-   isa_ok( $handle, "IO::Async::Handle", 'subclass $handle isa IO::Async::Handle' );
+   isa_ok( $handle, [ "IO::Async::Handle" ], 'subclass $handle isa IO::Async::Handle' );
 
    is_oneref( $handle, 'subclass $handle has refcount 1 initially' );
 
@@ -295,7 +292,7 @@ my $sub_writeready = 0;
 
    is( $closed, 0, 'not $closed after ->close_read' );
 
-   is( $handle->loop, $loop, 'Handle still member of Loop after ->close_read' );
+   ref_is( $handle->loop, $loop, 'Handle still member of Loop after ->close_read' );
 
    ( $Srd1, $Srd2 ) = mkhandles;
 
@@ -311,7 +308,7 @@ my $sub_writeready = 0;
    is( $handle->read_handle->getline, "Also works\n", 'read handle still works' );
    is( $Swr2->getline, undef, 'sysread from EOF write handle' );
 
-   is( $handle->loop, $loop, 'Handle still member of Loop after ->close_write' );
+   ref_is( $handle->loop, $loop, 'Handle still member of Loop after ->close_write' );
 
    is( $closed, 0, 'not $closed after ->close_read' );
 
@@ -409,7 +406,7 @@ my $sub_writeready = 0;
       on_write_ready => sub { },
    );
 
-   identical( $handle->read_handle, $handle->write_handle,
+   ref_is( $handle->read_handle, $handle->write_handle,
       '->new with equal read and write fileno only creates one handle' );
 }
 

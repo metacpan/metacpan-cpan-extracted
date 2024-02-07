@@ -1,5 +1,8 @@
 Revision history for Perl module Test::ISBN
 
+2.044 2024-02-02T19:44:07Z
+	* refresh distro, update email addresses
+
 2.043 2022-01-09T03:48:53Z
 	* no code changes. Fix a link in README.pod.
 

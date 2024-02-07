@@ -4,7 +4,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 # VERSION
 
-Version 1.51
+Version 1.52
 
 # SYNOPSIS
 
@@ -1578,6 +1578,7 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 - script - a shortcut to allow directly providing the [script](https://metacpan.org/pod/Firefox::Marionette::Timeout#script) timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
 - seer - this option is switched off "0" by default.  When it is switched on "1", it will activate the various speculative and pre-fetch options for firefox.  NOTE: that this option only works when profile\_name/profile is not specified.
 - sleep\_time\_in\_ms - the amount of time (in milliseconds) that this module should sleep when unsuccessfully calling the subroutine provided to the [await](#await) or [bye](#bye) methods.  This defaults to "1" millisecond.
+- stealth - stops [navigator.webdriver](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/webdriver) from being accessible by the current web page. This is highly experimental.  See [WEBSITES THAT BLOCK AUTOMATION](#websites-that-block-automation) for a discussion.
 - survive - if this is set to a true value, firefox will not automatically exit when the object goes out of scope.  See the reconnect parameter for an experimental technique for reconnecting.
 - trust - give a path to a [root certificate](https://en.wikipedia.org/wiki/Root_certificate) encoded as a [PEM encoded X.509 certificate](https://datatracker.ietf.org/doc/html/rfc7468#section-5) that will be trusted for this session.
 - timeouts - a shortcut to allow directly providing a [timeout](https://metacpan.org/pod/Firefox::Marionette::Timeout) object, instead of needing to use timeouts from the capabilities parameter.  Overrides the timeouts provided (if any) in the capabilities parameter.
@@ -2293,7 +2294,7 @@ And used to fill in login prompts without explicitly knowing the account details
 
 # GEO LOCATION
 
-The firefox [Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API) can be used by supplying the `geo` parameter to the [new](#new) method and then calling the [geo](#geo) method (from a [secure context](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts).
+The firefox [Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API) can be used by supplying the `geo` parameter to the [new](#new) method and then calling the [geo](#geo) method (from a [secure context](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts)).
 
 The [geo](#geo) method can accept various specific latitude and longitude parameters as a list, such as;
 
@@ -2317,13 +2318,15 @@ or it can be passed in as a reference, such as;
 
 the combination of a variety of parameter names and the ability to pass parameters in as a reference means it can be deal with various geo location websites, such as;
 
-    $firefox->geo($firefox->json('https://freeipapi.com/api/json/')); # get geo location from IP address
+    $firefox->geo($firefox->json('https://freeipapi.com/api/json/')); # get geo location from current IP address
 
     $firefox->geo($firefox->json('https://geocode.maps.co/search?street=101+Collins+St&city=Melbourne&state=VIC&postalcode=3000&country=AU&format=json')->[0]); # get geo location of street address
 
     $firefox->geo($firefox->json('http://api.positionstack.com/v1/forward?access_key=' . $access_key . '&query=101+Collins+St,Melbourne,VIC+3000')->{data}->[0]); # get geo location of street address using api key
 
-    $firefox->geo($firefox->json('https://api.ipgeolocation.io/ipgeo?apiKey=' . $api_key)); # get geo location from IP address
+    $firefox->geo($firefox->json('https://api.ipgeolocation.io/ipgeo?apiKey=' . $api_key)); # get geo location from current IP address
+
+    $firefox->geo($firefox->json('http://api.ipstack.com/142.250.70.206?access_key=' . $api_key)); # get geo location from specific IP address (http access only for free)
 
 These sites were active at the time this documentation was written, but mainly function as an illustration of the flexibility of [geo](#geo) and [json](#json) methods in providing the desired location to the [Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API).
 
@@ -2428,7 +2431,9 @@ So, this module is designed to allow you to navigate the shadow DOM using normal
 
 # WEBSITES THAT BLOCK AUTOMATION
 
-Marionette [by design](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/webdriver) allows web sites to detect that the browser is being automated.  Firefox [no longer (since version 88)](https://bugzilla.mozilla.org/show_bug.cgi?id=1632821) allows you to disable this functionality while you are automating the browser.  If the web site you are trying to automate mysteriously fails when you are automating a workflow, but it works when you perform the workflow manually, you may be dealing with a web site that is hostile to automation.
+Marionette [by design](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/webdriver) allows web sites to detect that the browser is being automated.  Firefox [no longer (since version 88)](https://bugzilla.mozilla.org/show_bug.cgi?id=1632821) allows you to disable this functionality while you are automating the browser.  This can be overridden with the `stealth` parameter for the [new](#new) method.  This is very experimental and feedback is welcome.
+
+If the web site you are trying to automate mysteriously fails when you are automating a workflow, but it works when you perform the workflow manually, you may be dealing with a web site that is hostile to automation.
 
 At the very least, under these circumstances, it would be a good idea to be aware that there's an [ongoing arms race](https://en.wikipedia.org/wiki/Web_scraping#Methods_to_prevent_web_scraping), and potential [legal issues](https://en.wikipedia.org/wiki/Web_scraping#Legal_issues) in this area.
 
@@ -2664,7 +2669,7 @@ Thanks also to the authors of the documentation in the following sources;
 
 # LICENSE AND COPYRIGHT
 
-Copyright (c) 2023, David Dick `<ddick@cpan.org>`. All rights reserved.
+Copyright (c) 2024, David Dick `<ddick@cpan.org>`. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See ["perlartistic" in perlartistic](https://metacpan.org/pod/perlartistic#perlartistic).

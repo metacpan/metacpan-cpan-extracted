@@ -4,11 +4,11 @@
 # ShadowRoot in JavaScript
 class Eg::Node::ShadowRoot extends Eg::Node::DocumentFragment {
   
-  private static method new : Eg::Node::ShadowRoot () {
+  private static method new : Eg::Node::ShadowRoot ($options : object[] = undef) {
     
     my $self = new Eg::Node::ShadowRoot;
     
-    $self->SUPER::init({node_type => Eg::Node->TYPE_DOCUMENT_FRAGMENT_NODE});
+    $self->SUPER::init(Eg->merge_options_v2($options, {node_type => Eg::Node->TYPE_DOCUMENT_FRAGMENT_NODE}));
     
     return $self;
   }

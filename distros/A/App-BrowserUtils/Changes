@@ -1,3 +1,11 @@
+0.019   2023-10-28  Released-By: PERLANCAR; Urgency: medium
+
+        - Add *-pat options to allow custom recognizing of browser
+          processes.
+
+        - Recognize firefox-esr as firefox.
+
+
 0.018   2022-10-07  Released-By: PERLANCAR; Urgency: medium
 
         - Recognize brave-browser.

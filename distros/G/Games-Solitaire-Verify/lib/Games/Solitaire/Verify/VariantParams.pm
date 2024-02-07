@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::VariantParams;
-$Games::Solitaire::Verify::VariantParams::VERSION = '0.2403';
+$Games::Solitaire::Verify::VariantParams::VERSION = '0.2500';
 use warnings;
 use strict;
 
@@ -18,7 +18,7 @@ __PACKAGE__->mk_acc_ref(
             rules
             seq_build_by
             sequence_move
-            )
+        )
     ]
 );
 
@@ -173,7 +173,7 @@ the parameters of the variant.
 
 =head1 VERSION
 
-version 0.2403
+version 0.2500
 
 =head1 SYNOPSIS
 

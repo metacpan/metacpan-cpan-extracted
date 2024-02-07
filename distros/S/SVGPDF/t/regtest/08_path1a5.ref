@@ -20,7 +20,7 @@ xo fill_color black (initial)
       start handling rect (SVGPDF::Rect)
       rect x=1 y=1 w=1198 h=523
         xo save
-        rect stroke-width=1 stroke=blue fill=none
+        rect stroke-width=1.00 stroke=blue fill=none
         xo stroke (blue)
         xo restore
       end handling rect
@@ -40,14 +40,14 @@ xo fill_color black (initial)
                     start handling ellipse (SVGPDF::Ellipse)
                     ellipse cx=125 cy=125 rx=100 ry=50
                       xo save
-                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      ellipse stroke-width=2.00 stroke=#888888 fill=none
                       xo stroke (#888888)
                       xo restore
                     end handling ellipse
                     start handling ellipse (SVGPDF::Ellipse)
                     ellipse cx=225 cy=75 rx=100 ry=50
                       xo save
-                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      ellipse stroke-width=2.00 stroke=#888888 fill=none
                       xo stroke (#888888)
                       xo restore
                     end handling ellipse
@@ -101,14 +101,14 @@ xo fill_color black (initial)
                     start handling ellipse (SVGPDF::Ellipse)
                     ellipse cx=125 cy=125 rx=100 ry=50
                       xo save
-                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      ellipse stroke-width=2.00 stroke=#888888 fill=none
                       xo stroke (#888888)
                       xo restore
                     end handling ellipse
                     start handling ellipse (SVGPDF::Ellipse)
                     ellipse cx=225 cy=75 rx=100 ry=50
                       xo save
-                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      ellipse stroke-width=2.00 stroke=#888888 fill=none
                       xo stroke (#888888)
                       xo restore
                     end handling ellipse
@@ -134,7 +134,7 @@ xo fill_color black (initial)
               start handling path (SVGPDF::Path)
               path d="M 125,75 a100,50 0 0..."
                 xo save
-                path stroke-width=6 stroke=red fill=none
+                path stroke-width=6.00 stroke=red fill=none
                 xo move(125.00,75.00)
                 xo arc(100.00,50.00 0.00 0,0 225.00,125.00)
                 elliptic_arc(125.00,75.00 225.00,125.00 100.00,50.00 move=0 large=0 dir=0 rot=0.00)
@@ -176,14 +176,14 @@ xo fill_color black (initial)
                     start handling ellipse (SVGPDF::Ellipse)
                     ellipse cx=125 cy=125 rx=100 ry=50
                       xo save
-                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      ellipse stroke-width=2.00 stroke=#888888 fill=none
                       xo stroke (#888888)
                       xo restore
                     end handling ellipse
                     start handling ellipse (SVGPDF::Ellipse)
                     ellipse cx=225 cy=75 rx=100 ry=50
                       xo save
-                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      ellipse stroke-width=2.00 stroke=#888888 fill=none
                       xo stroke (#888888)
                       xo restore
                     end handling ellipse
@@ -209,7 +209,7 @@ xo fill_color black (initial)
               start handling path (SVGPDF::Path)
               path d="M 125,75 a100,50 0 0..."
                 xo save
-                path stroke-width=6 stroke=red fill=none
+                path stroke-width=6.00 stroke=red fill=none
                 xo move(125.00,75.00)
                 xo arc(100.00,50.00 0.00 0,1 225.00,125.00)
                 elliptic_arc(125.00,75.00 225.00,125.00 100.00,50.00 move=0 large=0 dir=1 rot=0.00)
@@ -251,14 +251,14 @@ xo fill_color black (initial)
                     start handling ellipse (SVGPDF::Ellipse)
                     ellipse cx=125 cy=125 rx=100 ry=50
                       xo save
-                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      ellipse stroke-width=2.00 stroke=#888888 fill=none
                       xo stroke (#888888)
                       xo restore
                     end handling ellipse
                     start handling ellipse (SVGPDF::Ellipse)
                     ellipse cx=225 cy=75 rx=100 ry=50
                       xo save
-                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      ellipse stroke-width=2.00 stroke=#888888 fill=none
                       xo stroke (#888888)
                       xo restore
                     end handling ellipse
@@ -284,7 +284,7 @@ xo fill_color black (initial)
               start handling path (SVGPDF::Path)
               path d="M 125,75 a100,50 0 1..."
                 xo save
-                path stroke-width=6 stroke=red fill=none
+                path stroke-width=6.00 stroke=red fill=none
                 xo move(125.00,75.00)
                 xo arc(100.00,50.00 0.00 1,0 225.00,125.00)
                 elliptic_arc(125.00,75.00 225.00,125.00 100.00,50.00 move=0 large=1 dir=0 rot=0.00)
@@ -338,14 +338,14 @@ xo fill_color black (initial)
                     start handling ellipse (SVGPDF::Ellipse)
                     ellipse cx=125 cy=125 rx=100 ry=50
                       xo save
-                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      ellipse stroke-width=2.00 stroke=#888888 fill=none
                       xo stroke (#888888)
                       xo restore
                     end handling ellipse
                     start handling ellipse (SVGPDF::Ellipse)
                     ellipse cx=225 cy=75 rx=100 ry=50
                       xo save
-                      ellipse stroke-width=2 stroke=#888888 fill=none
+                      ellipse stroke-width=2.00 stroke=#888888 fill=none
                       xo stroke (#888888)
                       xo restore
                     end handling ellipse
@@ -371,7 +371,7 @@ xo fill_color black (initial)
               start handling path (SVGPDF::Path)
               path d="M 125,75 a100,50 0 1..."
                 xo save
-                path stroke-width=6 stroke=red fill=none
+                path stroke-width=6.00 stroke=red fill=none
                 xo move(125.00,75.00)
                 xo arc(100.00,50.00 0.00 1,1 225.00,125.00)
                 elliptic_arc(125.00,75.00 225.00,125.00 100.00,50.00 move=0 large=1 dir=1 rot=0.00)

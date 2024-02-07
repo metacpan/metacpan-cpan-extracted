@@ -10,7 +10,7 @@ WriteMakefile(
     VERSION_FROM     => 'lib/Business/GoCardless.pm',
     AUTHOR           => 'Lee Johnson <leejo@cpan.org>',
     LICENSE          => 'perl',
-    MIN_PERL_VERSION => '5.10.1',
+    MIN_PERL_VERSION => '5.20.0',
     PREREQ_PM => {
         'Moo'                  => 1.006,
         'Carp'                 => 0, # Carp was first released with perl 5

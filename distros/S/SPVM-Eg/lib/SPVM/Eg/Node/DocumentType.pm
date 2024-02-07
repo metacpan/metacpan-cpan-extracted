@@ -6,48 +6,53 @@ package SPVM::Eg::Node::DocumentType;
 
 =head1 Name
 
-SPVM::Eg::Node::DocumentType - Short Description
+SPVM::Eg::Node::DocumentType - DocumentType in JavaScript
 
 =head1 Description
 
-The Eg::Node::DocumentType class in L<SPVM> has methods to do someting.
+The Eg::Node::DocumentType class in L<SPVM> represents a node containing a doctype.
+
+This class is a port of L<DocumentType|https://developer.mozilla.org/en-US/docs/Web/API/DocumentType> in JavaScript.
 
 =head1 Usage
 
-  use Eg::Node::DocumentType;
+  my $dt = Eg->document->implementation->create_document_type(
+    "svg:svg",
+    "-//W3C//DTD SVG 1.1//EN",
+    "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd",
+  );
+  
+  my $name = $dt->name;
 
-=head1 Details
+=head1 Inheritance
 
-
-
-=head1 Interfaces
-
-
-
-=head1 Enumerations
-
-
+L<Eg::Node|SPVM::Eg::Node>
 
 =head1 Fields
 
+=head2 name
 
+C<has name : ro string;>
 
-=head1 Class Methods
+Retunrs the type of the document.
 
+For details, see L<DocumentType.name|https://developer.mozilla.org/en-US/docs/Web/API/DocumentType/name> in JavaScript.
 
+=head2 public_id
 
-=head1 Instance Methods
+C<has public_id : ro string;>
 
+Retunrs a formal identifier of the document.
 
+For details, see L<DocumentType.publicId|https://developer.mozilla.org/en-US/docs/Web/API/DocumentType/publicId> in JavaScript.
 
+=head2 system_id
 
-=head1 Repository
+C<has system_id : ro string;>
 
+Retunrs the URL of the associated DTD.
 
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+For details, see L<DocumentType.systemId|https://developer.mozilla.org/en-US/docs/Web/API/DocumentType/systemId> in JavaScript.
 
 =head1 Copyright & License
 

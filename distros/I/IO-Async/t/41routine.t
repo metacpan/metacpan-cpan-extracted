@@ -1,13 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Identity;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use IO::Async::Routine;
 
@@ -44,7 +42,7 @@ sub test_with_model
          on_finish => sub {},
       );
 
-      isa_ok( $routine, "IO::Async::Routine", "\$routine for $model model" );
+      isa_ok( $routine, [ "IO::Async::Routine" ], "\$routine for $model model isa IO::Async::Routine" );
       is_oneref( $routine, "\$routine has refcount 1 initially for $model model" );
 
       $loop->add( $routine );
@@ -217,7 +215,7 @@ foreach my $model (qw( fork thread spawn )) {
       on_finish => sub { },
    );
 
-   isa_ok( $routine, "IO::Async::Routine", '$routine' );
+   isa_ok( $routine, [ "IO::Async::Routine" ], '$routine isa IO::Async::Routine' );
 
    $loop->add( $routine );
 

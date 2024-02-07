@@ -5,124 +5,29 @@
 class Eg::Node::Element::HTML extends Eg::Node::Element {
   allow Eg::Node::Document;
   allow Eg::Node::Element;
-  allow Eg::Node::Document::HTML;
+  allow Eg::Node::Document;
+  
+  use Eg::CSS::StyleDeclaration;
   
   # Fields
-  has styles_h : rw Hash of string;
-  
-  has computed_styles_h : rw Hash of string;
+  has style : ro Eg::CSS::StyleDeclaration;
   
   # Class Methods
-  private static method new : Eg::Node::Element::HTML () {
+  private static method new : Eg::Node::Element::HTML ($options : object[] = undef) {
     
     my $self = new Eg::Node::Element::HTML;
     
-    $self->SUPER::init;
+    $self->init($options);
     
     return $self;
   }
   
-  method css : string ($name : string) {
+  # Instance Methods
+  protected method init : void ($options : object[] = undef) {
     
-    my $styles_h = $self->{styles_h};
+    $self->SUPER::init($options);
     
-    unless ($self->{styles_h}) {
-      return undef;
-    }
-    
-    my $css = (string)$styles_h->get($name);
-    
-    return $css;
-  }
-  
-  method set_css : void ($name : string, $value : string) {
-    
-    my $styles_h = $self->{styles_h};
-    
-    unless ($styles_h) {
-      $styles_h = $self->{styles_h} = Hash->new;
-    }
-    
-    $styles_h->set_string($name, $value);
-  }
-  
-  method exists_css : int ($name : string) {
-    
-    my $styles_h = $self->{styles_h};
-    
-    my $exists = 0;
-    if ($styles_h) {
-      $exists = $styles_h->exists($name);
-    }
-    
-    return $exists;
-  }
-  
-  method remove_css : void ($name : string) {
-    
-    my $styles_h = $self->{styles_h};
-    
-    my $deleted_css = (string)undef;
-    
-    if ($self->{styles_h}) {
-      $styles_h->delete($name);
-    }
-  }
-  
-  method style_pairs : string[] () {
-    
-    my $styles_h = $self->{styles_h};
-    
-    my $style_pairs = (string[])undef;
-    
-    if ($styles_h) {
-      my $names = $styles_h->keys;
-      
-      Sort->sort_string_asc($names);
-      
-      my $style_pairs_list = StringList->new;
-      for my $name (@$names) {
-        my $value = $styles_h->get_string($name);
-        
-        $style_pairs_list->push($name);
-        $style_pairs_list->push($value);
-      }
-      
-      $style_pairs = $style_pairs_list->to_array;
-    }
-    else {
-      $style_pairs = new string[0];
-    }
-    
-    return $style_pairs;
-  }
-  
-  method computed_style_pairs : string[] () {
-    
-    my $computed_styles_h = $self->{computed_styles_h};
-    
-    my $computed_style_pairs = (string[])undef;
-    
-    if ($computed_styles_h) {
-      my $names = $computed_styles_h->keys;
-      
-      Sort->sort_string_asc($names);
-      
-      my $computed_style_pairs_list = StringList->new;
-      for my $name (@$names) {
-        my $value = $computed_styles_h->get_string($name);
-        
-        $computed_style_pairs_list->push($name);
-        $computed_style_pairs_list->push($value);
-      }
-      
-      $computed_style_pairs = $computed_style_pairs_list->to_array;
-    }
-    else {
-      $computed_style_pairs = new string[0];
-    }
-    
-    return $computed_style_pairs;
+    $self->{style} = Eg::CSS::StyleDeclaration->new;
   }
   
 }

@@ -40,7 +40,7 @@ c
 !      print*, '1. readmmod.for,previous_model=',previous_model,'--'
 !      print*, '1. readmmod.for,new_model=',new_model,'--'
       if (previous_model == 0.0 .and. new_model == 1.0) then
-       ID=1
+       ID=0
        write(*,*) '1- CREATE A GRADIENT VEL. MODEL (Binary FORMAT)'
        CALL READ_PAR_I4('0- READ/MODIFY OLD MODEL ',ID)
 

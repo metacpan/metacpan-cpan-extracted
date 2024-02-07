@@ -41,7 +41,7 @@
 
 
 
- AUTHOR:  Dave Hale, Colorado School of Mines, 02/12/91
+ Author:  Dave Hale, Colorado School of Mines, 02/12/91
  MODIFIED: Andreas Rueger, Colorado School of Mines, 01/18/93
     Fill regions with attenuation Q-factors and density values.
  MODIFIED: Craig Artley, Colorado School of Mines, 03/27/94

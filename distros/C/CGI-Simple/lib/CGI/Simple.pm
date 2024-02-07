@@ -13,7 +13,7 @@ our ($VERSION, $USE_CGI_PM_DEFAULTS, $DISABLE_UPLOADS, $POST_MAX,
      $NO_UNDEF_PARAMS, $USE_PARAM_SEMICOLONS, $PARAM_UTF8, $HEADERS_ONCE,
      $NPH, $DEBUG, $NO_NULL, $FATAL);
 
-$VERSION = "1.280";
+$VERSION = "1.281";
 
 # you can hard code the global variable settings here if you want.
 # warning - do not delete the unless defined $VAR part unless you
@@ -1491,7 +1491,7 @@ CGI::Simple - A Simple totally OO CGI interface that is CGI.pm compliant
 
 =head1 VERSION
 
-This document describes CGI::Simple version 1.280.
+This document describes CGI::Simple version 1.281.
 
 =head1 SYNOPSIS
 

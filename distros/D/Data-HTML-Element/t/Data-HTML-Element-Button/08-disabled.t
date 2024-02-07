@@ -13,7 +13,7 @@ is($obj->disabled, 0, 'Get disabled (0 - default).');
 $obj = Data::HTML::Element::Button->new(
 	'disabled' => undef,
 );
-is($obj->disabled, 0, 'Get disabled (undef).');
+is($obj->disabled, 0, 'Get disabled (0 - undef).');
 
 # Test.
 $obj = Data::HTML::Element::Button->new(

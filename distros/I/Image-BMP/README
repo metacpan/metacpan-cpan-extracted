@@ -1,4 +1,4 @@
-                        Image::BMP version 1.13
+                        Image::BMP version 1.21
                     (A simple Bitmap parser/viewer)
 
 
@@ -26,6 +26,6 @@ This module has no external dependencies.
 
 COPYRIGHT
 ---------
-Copyright 2005, 2006
-David Madison <http://MarginalHacks.com/>
+Copyright 2005, 2006, 2024
+David Madison Stellar <http://MarginalHacks.com/>
 

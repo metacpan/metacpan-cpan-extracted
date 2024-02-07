@@ -3,14 +3,14 @@
 
 class Eg::Node::Element::HTML::TableSection extends Eg::Node::Element::HTML {
   
-  allow Eg::Node::Document::HTML;
+  allow Eg::Node::Document;
   
   # Class Methods
-  private static method new : Eg::Node::Element::HTML::TableSection () {
+  private static method new : Eg::Node::Element::HTML::TableSection ($options : object[] = undef) {
     
     my $self = new Eg::Node::Element::HTML::TableSection;
     
-    $self->SUPER::init;
+    $self->SUPER::init($options);
     
     return $self;
   }

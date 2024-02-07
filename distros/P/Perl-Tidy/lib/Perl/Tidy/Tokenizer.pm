@@ -1,17 +1,28 @@
 #####################################################################
 #
-# The Perl::Tidy::Tokenizer package is essentially a filter which
-# reads lines of perl source code from a source object and provides
-# corresponding tokenized lines through its get_line() method.  Lines
-# flow from the source_object to the caller like this:
+# Perl::Tidy::Tokenizer reads a source and breaks it into a stream of tokens
 #
-# source_object --> Tokenizer -->  calling routine
-#   get_line()      get_line()     line_of_tokens
+# Usage Outline:
+#
+#   STEP 1: initialize or re-initialze Tokenizer with user options
+#     Perl::Tidy::Tokenizer::check_options($rOpts);
+#
+#   STEP 2: create a tokenizer for a specific input source object
+#     my $tokenizer = Perl::Tidy::Tokenizer->new(
+#         source_object      => $source,
+#         ...
+#     );
+#
+#   STEP 3: get and process each tokenized 'line' (a hash ref of token info)
+#    while ( my $line = $tokenizer->get_line() ) {
+#        $formatter->write_line($line);
+#    }
+#
+#   STEP 4: report errors
+#    my $severe_error = $tokenizer->report_tokenization_errors();
 #
 # The source object can be a STRING ref, an ARRAY ref, or an object with a
 # get_line() method which supplies one line (a character string) perl call.
-# The Tokenizer returns a reference to a data structure 'line_of_tokens'
-# containing one tokenized line for each call to its get_line() method.
 #
 # NOTE: This is not a real class.  Only one tokenizer my be used.
 #
@@ -22,7 +33,7 @@ use strict;
 use warnings;
 use English qw( -no_match_vars );
 
-our $VERSION = '20230912';
+our $VERSION = '20240202';
 
 use Carp;
 
@@ -30,11 +41,23 @@ use constant DEVEL_MODE   => 0;
 use constant EMPTY_STRING => q{};
 use constant SPACE        => q{ };
 
+{ #<<< A non-indenting brace to contain all lexical variables
+
+# Parent sequence number of tree of containers; must be 1
+use constant SEQ_ROOT => 1;
+
+# Defaults for guessing old indentation
+use constant INDENT_COLUMNS_DEFAULT => 4;
+use constant TAB_SIZE_DEFAULT       => 8;
+
 # Decimal values of some ascii characters for quick checks
 use constant ORD_TAB           => 9;
 use constant ORD_SPACE         => 32;
 use constant ORD_PRINTABLE_MIN => 33;
 use constant ORD_PRINTABLE_MAX => 126;
+
+# A limit on message length when problems are detected
+use constant LONG_MESSAGE => 256;
 
 # GLOBAL VARIABLES which change during tokenization:
 # These could also be stored in $self but it is more convenient and
@@ -99,6 +122,7 @@ my (
     %is_keyword_taking_optional_arg,
     %is_q_qq_qw_qx_qr_s_y_tr_m,
     %is_q_qq_qx_qr_s_y_tr_m,
+    %quote_modifiers,
     %is_semicolon_or_t,
     %is_sort_map_grep,
     %is_sort_map_grep_eval_do,
@@ -120,13 +144,19 @@ my (
     %is_keyword,
     %is_my_our_state,
     %is_package,
+    %matching_end_token,
 
     # INITIALIZER: sub check_options
     $code_skipping_pattern_begin,
     $code_skipping_pattern_end,
+    $format_skipping_pattern_begin,
+    $format_skipping_pattern_end,
 
     $rOpts_code_skipping,
     $rOpts_code_skipping_begin,
+    $rOpts_format_skipping,
+    $rOpts_format_skipping_begin,
+    $rOpts_format_skipping_end,
     $rOpts_starting_indentation_level,
     $rOpts_indent_columns,
     $rOpts_look_for_hash_bang,
@@ -138,6 +168,10 @@ my (
     $rOpts_outdent_labels,
     $rOpts_maximum_level_errors,
     $rOpts_maximum_unexpected_errors,
+    $rOpts_indent_closing_brace,
+    $rOpts_non_indenting_braces,
+    $rOpts_non_indenting_brace_prefix,
+    $rOpts_whitespace_cycle,
 
     $tabsize,
     %is_END_DATA_format_sub,
@@ -177,7 +211,8 @@ BEGIN {
         _warning_count_                      => $i++,
         _html_tag_count_                     => $i++,
         _in_pod_                             => $i++,
-        _in_skipped_                         => $i++,
+        _in_code_skipping_                   => $i++,
+        _in_format_skipping_                 => $i++,
         _in_attribute_list_                  => $i++,
         _in_quote_                           => $i++,
         _quote_target_                       => $i++,
@@ -188,7 +223,6 @@ BEGIN {
         _saw_perl_dash_P_                    => $i++,
         _saw_perl_dash_w_                    => $i++,
         _saw_use_strict_                     => $i++,
-        _saw_v_string_                       => $i++,
         _saw_brace_error_                    => $i++,
         _hit_bug_                            => $i++,
         _look_for_autoloader_                => $i++,
@@ -203,6 +237,7 @@ BEGIN {
         _debugger_object_                    => $i++,
         _diagnostics_object_                 => $i++,
         _logger_object_                      => $i++,
+        _save_logfile_                       => $i++,
         _unexpected_error_count_             => $i++,
         _started_looking_for_here_target_at_ => $i++,
         _nearly_matched_here_target_at_      => $i++,
@@ -213,6 +248,10 @@ BEGIN {
         _rOpts_                              => $i++,
         _rinput_lines_                       => $i++,
         _input_line_index_next_              => $i++,
+        _rtrimmed_input_lines_               => $i++,
+        _rclosing_brace_indentation_hash_    => $i++,
+        _show_indentation_table_             => $i++,
+        _rnon_indenting_brace_stack_         => $i++,
     };
 } ## end BEGIN
 
@@ -244,7 +283,7 @@ sub AUTOLOAD {
 ======================================================================
 Error detected in package '$my_package', version $VERSION
 Received unexpected AUTOLOAD call for sub '$AUTOLOAD'
-Called from package: '$pkg'  
+Called from package: '$pkg'
 Called from File '$fname'  at line '$lno'
 This error is probably due to a recent programming change
 ======================================================================
@@ -274,7 +313,7 @@ sub Fault {
     my $input_stream_name;
     if ( !ref($self) ) {
         $msg = "Fault not called as a method - please fix\n";
-        if ( $self && length($self) < 200 ) { $msg .= $self }
+        if ( $self && length($self) < LONG_MESSAGE ) { $msg .= $self }
         $self              = undef;
         $input_stream_name = "(UNKNOWN)";
     }
@@ -299,22 +338,24 @@ EOM
     return;
 } ## end sub Fault
 
-sub make_code_skipping_pattern {
+sub make_skipping_pattern {
     my ( $rOpts, $opt_name, $default ) = @_;
     my $param = $rOpts->{$opt_name};
     if ( !$param ) { $param = $default }
-    $param =~ s/^\s*//;    # allow leading spaces to be like format-skipping
+    $param =~ s/^\s+//;    # allow leading spaces to be like format-skipping
     if ( $param !~ /^#/ ) {
         Die("ERROR: the $opt_name parameter '$param' must begin with '#'\n");
     }
-    my $pattern = '^\s*' . $param . '\b';
+
+    # Note that the ending \s will match a newline
+    my $pattern = '^\s*' . $param . '\s';
     if ( Perl::Tidy::Formatter::bad_pattern($pattern) ) {
         Die(
 "ERROR: the $opt_name parameter '$param' causes the invalid regex '$pattern'\n"
         );
     }
     return $pattern;
-} ## end sub make_code_skipping_pattern
+} ## end sub make_skipping_pattern
 
 sub check_options {
 
@@ -411,7 +452,7 @@ sub check_options {
         # Note that 'grep-alias-list' has been preprocessed to be a trimmed,
         # space-separated list
         my @q = split /\s+/, $rOpts->{'grep-alias-list'};
-        @{is_grep_alias}{@q} = (1) x scalar(@q);
+        @is_grep_alias{@q} = (1) x scalar(@q);
     }
 
     $rOpts_starting_indentation_level = $rOpts->{'starting-indentation-level'};
@@ -427,11 +468,20 @@ sub check_options {
     $rOpts_maximum_unexpected_errors  = $rOpts->{'maximum-unexpected-errors'};
     $rOpts_code_skipping              = $rOpts->{'code-skipping'};
     $rOpts_code_skipping_begin        = $rOpts->{'code-skipping-begin'};
+    $rOpts_format_skipping            = $rOpts->{'format-skipping'};
+    $rOpts_format_skipping_begin      = $rOpts->{'format-skipping-begin'};
+    $rOpts_format_skipping_end        = $rOpts->{'format-skipping-end'};
+    $rOpts_indent_closing_brace       = $rOpts->{'indent-closing-brace'};
+    $rOpts_non_indenting_braces       = $rOpts->{'non-indenting-braces'};
+    $rOpts_non_indenting_brace_prefix = $rOpts->{'non-indenting-brace-prefix'};
+    $rOpts_whitespace_cycle           = $rOpts->{'whitespace-cycle'};
 
     # In the Tokenizer, --indent-columns is just used for guessing old
     # indentation, and must be positive.  If -i=0 is used for this run (which
     # is possible) we'll just guess that the old run used 4 spaces per level.
-    if ( !$rOpts_indent_columns ) { $rOpts_indent_columns = 4 }
+    if ( !$rOpts_indent_columns ) {
+        $rOpts_indent_columns = INDENT_COLUMNS_DEFAULT;
+    }
 
     # Define $tabsize, the number of spaces per tab for use in
     # guessing the indentation of source lines with leading tabs.
@@ -442,19 +492,25 @@ sub check_options {
       ? $rOpts->{'entab-leading-whitespace'}
       : $rOpts->{'tabs'} ? $rOpts->{'indent-columns'}
       :                    $rOpts->{'default-tabsize'};
-    if ( !$tabsize ) { $tabsize = 8 }
+    if ( !$tabsize ) { $tabsize = TAB_SIZE_DEFAULT }
 
     $code_skipping_pattern_begin =
-      make_code_skipping_pattern( $rOpts, 'code-skipping-begin', '#<<V' );
+      make_skipping_pattern( $rOpts, 'code-skipping-begin', '#<<V' );
     $code_skipping_pattern_end =
-      make_code_skipping_pattern( $rOpts, 'code-skipping-end', '#>>V' );
+      make_skipping_pattern( $rOpts, 'code-skipping-end', '#>>V' );
+
+    $format_skipping_pattern_begin =
+      make_skipping_pattern( $rOpts, 'format-skipping-begin', '#<<<' );
+    $format_skipping_pattern_end =
+      make_skipping_pattern( $rOpts, 'format-skipping-end', '#>>>' );
 
     return;
 } ## end sub check_options
 
 sub new {
 
-    my ( $class, @args ) = @_;
+    my ( $class, @arglist ) = @_;
+    if ( @arglist % 2 ) { croak "Odd number of items in arg hash list\n" }
 
     my %defaults = (
         source_object        => undef,
@@ -465,7 +521,7 @@ sub new {
         starting_line_number => 1,
         rOpts                => {},
     );
-    my %args = ( %defaults, @args );
+    my %args = ( %defaults, @arglist );
 
     # we are given an object with a get_line() method to supply source lines
     my $source_object = $args{source_object};
@@ -484,6 +540,8 @@ sub Perl::Tidy::Tokenizer::new received a 'source_object' parameter which is not
 EOM
     }
 
+    my $logger_object = $args{logger_object};
+
     # Tokenizer state data is as follows:
     # _rhere_target_list_    reference to list of here-doc targets
     # _here_doc_target_      the target string for a here document
@@ -493,7 +551,8 @@ EOM
     # _line_start_quote_     line where we started looking for a long quote
     # _in_here_doc_          flag indicating if we are in a here-doc
     # _in_pod_               flag set if we are in pod documentation
-    # _in_skipped_           flag set if we are in a skipped section
+    # _in_code_skipping_     flag set if we are in a code skipping section
+    # _in_format_skipping_   flag set if we are in a format skipping section
     # _in_error_             flag set if we saw severe error (binary in script)
     # _in_trouble_           set if we saw a troublesome lexical like 'my sub s'
     # _warning_count_        number of calls to logger sub warning
@@ -522,7 +581,8 @@ EOM
     $self->[_warning_count_]            = 0;
     $self->[_html_tag_count_]           = 0;
     $self->[_in_pod_]                   = 0;
-    $self->[_in_skipped_]               = 0;
+    $self->[_in_code_skipping_]         = 0;
+    $self->[_in_format_skipping_]       = 0;
     $self->[_in_attribute_list_]        = 0;
     $self->[_in_quote_]                 = 0;
     $self->[_quote_target_]             = EMPTY_STRING;
@@ -533,7 +593,6 @@ EOM
     $self->[_saw_perl_dash_P_]          = 0;
     $self->[_saw_perl_dash_w_]          = 0;
     $self->[_saw_use_strict_]           = 0;
-    $self->[_saw_v_string_]             = 0;
     $self->[_saw_brace_error_]          = 0;
     $self->[_hit_bug_]                  = 0;
     $self->[_look_for_autoloader_]      = $rOpts_look_for_autoloader;
@@ -547,7 +606,7 @@ EOM
     $self->[_started_tokenizing_]       = 0;
     $self->[_debugger_object_]          = $args{debugger_object};
     $self->[_diagnostics_object_]       = $args{diagnostics_object};
-    $self->[_logger_object_]            = $args{logger_object};
+    $self->[_logger_object_]            = $logger_object;
     $self->[_unexpected_error_count_]   = 0;
     $self->[_started_looking_for_here_target_at_] = 0;
     $self->[_nearly_matched_here_target_at_]      = undef;
@@ -555,7 +614,19 @@ EOM
     $self->[_rlower_case_labels_at_]              = undef;
     $self->[_maximum_level_]                      = 0;
     $self->[_true_brace_error_count_]             = 0;
-    $self->[_rOpts_]                              = $rOpts;
+    $self->[_rnon_indenting_brace_stack_]         = [];
+    $self->[_show_indentation_table_]             = 0;
+
+    $self->[_rclosing_brace_indentation_hash_] = {
+        valid                 => undef,
+        rhistory_line_number  => [0],
+        rhistory_level_diff   => [0],
+        rhistory_anchor_point => [1],
+    };
+
+    $self->[_rOpts_] = $rOpts;
+    $self->[_save_logfile_] =
+      defined($logger_object) && $logger_object->get_save_logfile();
 
     bless $self, $class;
 
@@ -597,6 +668,7 @@ sub make_source_array {
     my $rinput_lines = [];
 
     my $rsource = ref($line_source_object);
+    my $source_string;
 
     if ( !$rsource ) {
 
@@ -609,23 +681,60 @@ EOM
 
     # handle an ARRAY ref
     elsif ( $rsource eq 'ARRAY' ) {
-        $rinput_lines = $line_source_object;
+        $rinput_lines  = $line_source_object;
+        $source_string = join( EMPTY_STRING, @{$line_source_object} );
     }
 
     # handle a SCALAR ref
     elsif ( $rsource eq 'SCALAR' ) {
-        my @lines = split /^/, ${$line_source_object};
+        $source_string = ${$line_source_object};
+        my @lines = split /^/, $source_string;
         $rinput_lines = \@lines;
     }
 
     # handle an object - must have a get_line method
     else {
+
+        # This will die if user's object does have a 'get_line' method
         while ( my $line = $line_source_object->get_line() ) {
             push( @{$rinput_lines}, $line );
         }
+        $source_string = join( EMPTY_STRING, @{$rinput_lines} );
+    }
+
+    # Get trimmed lines. It is much faster to strip leading whitespace from
+    # the whole input file at once than line-by-line.
+
+    # Add a terminal newline if needed to keep line count unchanged:
+    # - avoids problem of losing a last line which is just \r and no \n  (c283)
+    # - but check input line count to avoid adding line to an empty file (c286)
+    if ( @{$rinput_lines} && $source_string !~ /\n$/ ) {
+        $source_string .= "\n";
+    }
+
+    # Remove leading whitespace except newlines
+    $source_string =~ s/^ [^\S\n]+ //gxm;
+
+    # Then break the string into lines
+    my @trimmed_lines = split /^/, $source_string;
+
+    # Safety check - a change in number of lines would be a disaster
+    if ( @trimmed_lines != @{$rinput_lines} ) {
+
+        # Shouldn't happen - die in DEVEL_MODE and fix
+        my $ntr = @trimmed_lines;
+        my $utr = @{$rinput_lines};
+        DEVEL_MODE
+          && $self->Fault(
+            "trimmed / untrimmed line counts differ: $ntr / $utr\n");
+
+        # Otherwise we can safely continue with undefined trimmed lines.  They
+        # will be detected and fixed later.
+        @trimmed_lines = ();
     }
 
     $self->[_rinput_lines_]          = $rinput_lines;
+    $self->[_rtrimmed_input_lines_]  = \@trimmed_lines;
     $self->[_input_line_index_next_] = 0;
     return;
 } ## end sub make_source_array
@@ -745,7 +854,7 @@ sub increment_brace_error {
 sub get_saw_brace_error {
     my $self = shift;
     return $self->[_saw_brace_error_];
-} ## end sub get_saw_brace_error
+}
 
 sub report_definite_bug {
     my $self = shift;
@@ -806,6 +915,9 @@ sub report_tokenization_errors {
     my $level = get_indentation_level();
     if ( $level != $self->[_starting_level_] ) {
         $self->warning("final indentation level: $level\n");
+
+        $self->[_show_indentation_table_] = 1;
+
         my $level_diff = $self->[_starting_level_] - $level;
         if ( $level_diff < 0 ) { $level_diff = -$level_diff }
 
@@ -821,6 +933,10 @@ EOM
     }
 
     $self->check_final_nesting_depths();
+
+    if ( $self->[_show_indentation_table_] ) {
+        $self->show_indentation_table();
+    }
 
     # Likewise, large numbers of brace errors usually indicate non-perl
     # scripts, so set the severe error flag at a low number.  This is similar
@@ -841,7 +957,7 @@ EOM
         $self->warning("hit EOF while in format description\n");
     }
 
-    if ( $self->[_in_skipped_] ) {
+    if ( $self->[_in_code_skipping_] ) {
         $self->write_logfile_entry(
             "hit EOF while in lines skipped with --code-skipping\n");
     }
@@ -923,12 +1039,7 @@ EOM
     }
 
     if ( !$self->[_saw_perl_dash_w_] ) {
-        if ( $] < 5.006 ) {
-            $self->write_logfile_entry("Suggest including '-w parameter'\n");
-        }
-        else {
-            $self->write_logfile_entry("Suggest including 'use warnings;'\n");
-        }
+        $self->write_logfile_entry("Suggest including 'use warnings;'\n");
     }
 
     if ( $self->[_saw_perl_dash_P_] ) {
@@ -953,13 +1064,100 @@ EOM
     return $severe_error;
 } ## end sub report_tokenization_errors
 
+sub show_indentation_table {
+    my ($self) = @_;
+
+    # Output indentation table made at closing braces.  This can be helpful for
+    # the case of a missing brace in a previously formatted file.
+
+    # skip if -wc is used (rare); it is too complex to use
+    return if ($rOpts_whitespace_cycle);
+
+    # skip if non-indenting-brace-prefix (very rare, but could be fixed)
+    return if ($rOpts_non_indenting_brace_prefix);
+
+    # skip if starting level is not zero (probably in editor)
+    return if ($rOpts_starting_indentation_level);
+
+    # skip if indentation analysis is not valid
+    my $rhash = $self->[_rclosing_brace_indentation_hash_];
+    return if ( !$rhash->{valid} );
+
+    my $rhistory_line_number  = $rhash->{rhistory_line_number};
+    my $rhistory_level_diff   = $rhash->{rhistory_level_diff};
+    my $rhistory_anchor_point = $rhash->{rhistory_anchor_point};
+
+    # Remove the first artificial point from the table
+    shift @{$rhistory_line_number};
+    shift @{$rhistory_level_diff};
+    shift @{$rhistory_anchor_point};
+
+    # Ignore an ending non-anchor point
+    my $num_his = @{$rhistory_level_diff};
+    if ( !$rhistory_anchor_point->[-1] ) {
+        $num_his -= 1;
+    }
+
+    # skip if the table does not have at least 2 points to pinpoint an error
+    return if ( $num_his <= 1 );
+
+    # skip if first point shows a level error - the analysis may not be valid
+    return if ( $rhistory_level_diff->[0] );
+
+    # Since the table could be arbitrarily large, we will limit the table to N
+    # lines.  If there are more lines than that, we will show N-3 lines, then
+    # ..., then the last 2 lines. Allow about 3 lines per error, so a table
+    # limit of 10 can localize up to about 3 errors in a file.
+    my $nlines_max   = 10;
+    my @pre_indexes  = ( 0 .. $num_his - 1 );
+    my @post_indexes = ();
+    if ( @pre_indexes > $nlines_max ) {
+        if ( $nlines_max >= 5 ) {
+            @pre_indexes  = ( 0 .. $nlines_max - 4 );
+            @post_indexes = ( $num_his - 2, $num_his - 1 );
+        }
+        else {
+            @pre_indexes = ( 0 .. $nlines_max - 1 );
+        }
+    }
+
+    my @output_lines;
+    push @output_lines, <<EOM;
+Table of nesting level differences at closing braces.
+This might help localize brace errors if the file was previously formatted.
+line:  (brace level) - (level expected from old indentation)
+EOM
+    foreach my $i (@pre_indexes) {
+        my $lno  = $rhistory_line_number->[$i];
+        my $diff = $rhistory_level_diff->[$i];
+        push @output_lines, <<EOM;
+$lno: $diff
+EOM
+    }
+    if (@post_indexes) {
+        push @output_lines, "...\n";
+        foreach my $i (@post_indexes) {
+            my $lno  = $rhistory_line_number->[$i];
+            my $diff = $rhistory_level_diff->[$i];
+            push @output_lines, <<EOM;
+$lno: $diff
+EOM
+        }
+    }
+    push @output_lines, "\n";
+    my $output_str = join EMPTY_STRING, @output_lines;
+
+    $self->interrupt_logfile();
+    $self->warning($output_str);
+    $self->resume_logfile();
+
+    return;
+} ## end sub show_indentation_table
+
 sub report_v_string {
 
     # warn if this version can't handle v-strings
     my ( $self, $tok ) = @_;
-    if ( !$self->[_saw_v_string_] ) {
-        $self->[_saw_v_string_] = $self->[_last_line_number_];
-    }
     if ( $] < 5.006 ) {
         $self->warning(
 "Found v-string '$tok' but v-strings are not implemented in your version of perl; see Camel 3 book ch 2\n"
@@ -995,10 +1193,12 @@ sub get_line {
 
     # get the next line from the input array
     my $input_line;
-    my $rinput_lines = $self->[_rinput_lines_];
+    my $trimmed_input_line;
     my $line_index   = $self->[_input_line_index_next_];
+    my $rinput_lines = $self->[_rinput_lines_];
     if ( $line_index < @{$rinput_lines} ) {
-        $input_line = $rinput_lines->[ $line_index++ ];
+        $trimmed_input_line = $self->[_rtrimmed_input_lines_]->[$line_index];
+        $input_line         = $rinput_lines->[ $line_index++ ];
         $self->[_input_line_index_next_] = $line_index;
     }
 
@@ -1020,10 +1220,15 @@ sub get_line {
     if ( $other_line_endings{ substr( $input_line, -1 ) } ) {
         if ( $input_line =~ s/([\r\035\032])+$// ) {
             $input_line_separator = $1 . $input_line_separator;
+
+            # This could make the trimmed input line incorrect, so the
+            # safe thing to do is to make it undef to force it to be
+            # recomputed later.
+            $trimmed_input_line = undef;
         }
     }
 
-    # for backwards compatibility we keep the line text terminated with
+    # For backwards compatibility we keep the line text terminated with
     # a newline character
     $input_line .= "\n";
     $self->[_line_of_text_] = $input_line;
@@ -1065,14 +1270,12 @@ sub get_line {
         _curly_brace_depth         => $brace_depth,
         _square_bracket_depth      => $square_bracket_depth,
         _paren_depth               => $paren_depth,
-        _quote_character           => EMPTY_STRING,
 ## Skip these needless initializations for efficiency:
 ##      _rtoken_type               => undef,
 ##      _rtokens                   => undef,
 ##      _rlevels                   => undef,
 ##      _rblock_type               => undef,
 ##      _rtype_sequence            => undef,
-##      _rci_levels                => undef,
 ##      _starting_in_quote         => 0,
 ##      _ending_in_quote           => 0,
     };
@@ -1089,7 +1292,7 @@ sub get_line {
         # Handle <<~ targets, which are indicated here by a leading space on
         # the here quote character
         if ( $here_quote_character =~ /^\s/ ) {
-            $candidate_target =~ s/^\s*//;
+            $candidate_target =~ s/^\s+//;
         }
         if ( $candidate_target eq $here_doc_target ) {
             $self->[_nearly_matched_here_target_at_] = undef;
@@ -1118,8 +1321,7 @@ sub get_line {
         # check for error of extra whitespace
         # note for PERL6: leading whitespace is allowed
         else {
-            $candidate_target =~ s/\s*$//;
-            $candidate_target =~ s/^\s*//;
+            $candidate_target =~ s/^ \s+ | \s+ $//gx;    # trim both ends
             if ( $candidate_target eq $here_doc_target ) {
                 $self->[_nearly_matched_here_target_at_] = $input_line_number;
             }
@@ -1177,24 +1379,24 @@ sub get_line {
     }
 
     # print line unchanged if in skipped section
-    elsif ( $self->[_in_skipped_] ) {
+    elsif ( $self->[_in_code_skipping_] ) {
 
         $line_of_tokens->{_line_type} = 'SKIP';
         if ( $input_line =~ /$code_skipping_pattern_end/ ) {
             $line_of_tokens->{_line_type} = 'SKIP_END';
             $self->log_numbered_msg("Exiting code-skipping section\n");
-            $self->[_in_skipped_] = 0;
+            $self->[_in_code_skipping_] = 0;
         }
         elsif ( $input_line =~ /$code_skipping_pattern_begin/ ) {
 
             # warn of duplicate starting comment lines, git #118
-            my $lno = $self->[_in_skipped_];
+            my $lno = $self->[_in_code_skipping_];
             $self->warning(
                 "Already in code-skipping section which started at line $lno\n"
             );
         }
         else {
-            ## ok - not a code-skipping control line
+            # not a code-skipping control line
         }
         return $line_of_tokens;
     }
@@ -1246,7 +1448,7 @@ sub get_line {
         }
     }
     else {
-        ## ok
+        # not a special control line
     }
 
     # check for a hash-bang line if we haven't seen one
@@ -1335,10 +1537,12 @@ sub get_line {
     #        _in_end_
     #        _in_format_
     #        _in_error_
-    #        _in_skipped_
+    #        _in_code_skipping_
+    #        _in_format_skipping_
     #        _in_pod_
     #        _in_quote_
-    $self->tokenize_this_line($line_of_tokens);
+
+    $self->tokenize_this_line( $line_of_tokens, $trimmed_input_line );
 
     # Now finish defining the return structure and return it
     $line_of_tokens->{_ending_in_quote} = $self->[_in_quote_];
@@ -1385,7 +1589,7 @@ sub get_line {
     }
 
     # handle start of skipped section
-    if ( $self->[_in_skipped_] ) {
+    if ( $self->[_in_code_skipping_] ) {
 
         $line_of_tokens->{_line_type} = 'SKIP';
         $self->log_numbered_msg("Entering code-skipping section\n");
@@ -1437,7 +1641,7 @@ sub get_line {
         return $line_of_tokens;
     }
     else {
-        ## ok: not in __END__ or __DATA__
+        # not in __END__ or __DATA__
     }
 
     # now, finally, we know that this line is type 'CODE'
@@ -1464,8 +1668,6 @@ sub get_line {
     if ( $self->[_in_quote_]
         and ( $self->[_line_start_quote_] < 0 ) )
     {
-
-        #if ( ( my $quote_target = get_quote_target() ) !~ /^\s*$/ ) {
         if ( ( my $quote_target = $self->[_quote_target_] ) !~ /^\s*$/ ) {
             $self->[_line_start_quote_] = $input_line_number;
             $self->log_numbered_msg(
@@ -1479,7 +1681,7 @@ sub get_line {
         $self->log_numbered_msg("End of multi-line quote or pattern\n");
     }
     else {
-        ## ok
+        # not at the edge of a quote
     }
 
     # we are returning a line of CODE
@@ -1531,13 +1733,20 @@ sub find_starting_indentation_level {
                         && $line =~ /$code_skipping_pattern_begin/ )
                     {
                         $in_code_skipping = 1;
+                        next;
                     }
                 }
                 else {
                     if ( $line =~ /$code_skipping_pattern_end/ ) {
                         $in_code_skipping = 0;
                     }
+                    next;
                 }
+
+                # Note that we could also ignore format-skipping lines here
+                # but it isn't clear if that would be best.
+                # See c326 for example code.
+
                 next;
             }
             next if ($in_code_skipping);
@@ -1586,7 +1795,10 @@ sub guess_old_indentation_level {
         if ($2) { $spaces += length($2) }
 
         # correct for outdented labels
-        if ( $3 && $rOpts_outdent_labels ) {
+        if (   $3
+            && $rOpts_outdent_labels
+            && $rOpts_continuation_indentation > 0 )
+        {
             $spaces += $rOpts_continuation_indentation;
         }
     }
@@ -1662,7 +1874,7 @@ sub prepare_for_a_new_file {
     $total_depth              = 0;
     $rtotal_depth             = [];
     $rcurrent_sequence_number = [];
-    $next_sequence_number     = 2;    # The value 1 is reserved for SEQ_ROOT
+    $next_sequence_number     = SEQ_ROOT + 1;
 
     $rparen_type                     = [];
     $rparen_semicolon_count          = [];
@@ -2016,14 +2228,12 @@ sub prepare_for_a_new_file {
             $rtokens->[$i] = $tok_0;
             return 1;
         }
-        else {
 
-            # Shouldn't get here
-            if (DEVEL_MODE) {
-                $self->Fault(<<EOM);
+        # Shouldn't get here - bad call parameters
+        if (DEVEL_MODE) {
+            $self->Fault(<<EOM);
 While working near line number $input_line_number, bad arg '$tok' passed to sub split_pretoken()
 EOM
-            }
         }
         return;
     } ## end sub split_pretoken
@@ -2056,7 +2266,6 @@ EOM
     # These block types terminate statements and do not need a trailing
     # semicolon
     # patched for SWITCH/CASE/
-    # NOTE: not currently used but may be used in the future
     my %is_zero_continuation_block_type;
     my @q;
     @q = qw( } { BEGIN END CHECK INIT AUTOLOAD DESTROY UNITCHECK continue ;
@@ -2112,28 +2321,6 @@ EOM
     @q = qw( ; { } );
     push @q, ',';
     @is_list_end_type{@q} = (1) x scalar(@q);
-
-    # original ref: camel 3 p 147,
-    # but perl may accept undocumented flags
-    # perl 5.10 adds 'p' (preserve)
-    # Perl version 5.22 added 'n'
-    # From http://perldoc.perl.org/perlop.html we have
-    # /PATTERN/msixpodualngc or m?PATTERN?msixpodualngc
-    # s/PATTERN/REPLACEMENT/msixpodualngcer
-    # y/SEARCHLIST/REPLACEMENTLIST/cdsr
-    # tr/SEARCHLIST/REPLACEMENTLIST/cdsr
-    # qr/STRING/msixpodualn
-    my %quote_modifiers = (
-        's'  => '[msixpodualngcer]',
-        'y'  => '[cdsr]',
-        'tr' => '[cdsr]',
-        'm'  => '[msixpodualngc]',
-        'qr' => '[msixpodualn]',
-        'q'  => EMPTY_STRING,
-        'qq' => EMPTY_STRING,
-        'qw' => EMPTY_STRING,
-        'qx' => EMPTY_STRING,
-    );
 
     # table showing how many quoted things to look for after quote operator..
     # s, y, tr have 2 (pattern and replacement)
@@ -2241,9 +2428,16 @@ EOM
 
     sub scan_bare_identifier {
         my $self = shift;
-        ( $i, $tok, $type, $prototype ) =
-          $self->scan_bare_identifier_do( $input_line, $i, $tok, $type,
-            $prototype, $rtoken_map, $max_token_index );
+        ( $i, $tok, $type, $prototype ) = $self->scan_bare_identifier_do(
+
+            $input_line,
+            $i,
+            $tok,
+            $type,
+            $prototype,
+            $rtoken_map,
+            $max_token_index
+        );
         return;
     } ## end sub scan_bare_identifier
 
@@ -2252,12 +2446,24 @@ EOM
         my $self = shift;
 
         (
-            $i, $tok, $type, $id_scan_state, $identifier,
+
+            $i,
+            $tok,
+            $type,
+            $id_scan_state,
+            $identifier,
             my $split_pretoken_flag
-          )
-          = $self->scan_complex_identifier( $i, $id_scan_state, $identifier,
-            $rtokens, $max_token_index, $expecting,
-            $rparen_type->[$paren_depth] );
+
+        ) = $self->scan_complex_identifier(
+
+            $i,
+            $id_scan_state,
+            $identifier,
+            $rtokens,
+            $max_token_index,
+            $expecting,
+            $rparen_type->[$paren_depth]
+        );
 
         # Check for signal to fix a special variable adjacent to a keyword,
         # such as '$^One$0'.
@@ -2279,7 +2485,7 @@ EOM
                 $self->interrupt_logfile();
                 $self->warning(<<EOM);
 $input_line_number: Trouble parsing at characters '$excess' after special variable '$var'.
-A space may be needed after '$var'. 
+A space may be needed after '$var'.
 EOM
                 $self->resume_logfile();
             }
@@ -2596,9 +2802,15 @@ EOM
 
     sub scan_id {
         my $self = shift;
-        ( $i, $tok, $type, $id_scan_state ) =
-          $self->scan_id_do( $input_line, $i, $tok, $rtokens, $rtoken_map,
-            $id_scan_state, $max_token_index );
+        ( $i, $tok, $type, $id_scan_state ) = $self->scan_id_do(
+
+            $input_line,
+            $i, $tok,
+            $rtokens,
+            $rtoken_map,
+            $id_scan_state,
+            $max_token_index
+        );
         return;
     } ## end sub scan_id
 
@@ -2707,8 +2919,17 @@ EOM
         my $self = shift;
         if ( $expecting == TERM ) {
             if ( $really_want_term{$last_nonblank_type} ) {
-                $self->report_unexpected( $tok, "term", $i_tok,
-                    $last_nonblank_i, $rtoken_map, $rtoken_type, $input_line );
+                $self->report_unexpected(
+                    {
+                        found           => $tok,
+                        expecting       => "term",
+                        i_tok           => $i_tok,
+                        last_nonblank_i => $last_nonblank_i,
+                        rpretoken_map   => $rtoken_map,
+                        rpretoken_type  => $rtoken_type,
+                        input_line      => $input_line,
+                    }
+                );
                 return 1;
             }
         }
@@ -2720,8 +2941,17 @@ EOM
         my ( $self, $thing ) = @_;
         if ( $expecting == OPERATOR ) {
             if ( !defined($thing) ) { $thing = $tok }
-            $self->report_unexpected( $thing, "operator", $i_tok,
-                $last_nonblank_i, $rtoken_map, $rtoken_type, $input_line );
+            $self->report_unexpected(
+                {
+                    found           => $thing,
+                    expecting       => "operator",
+                    i_tok           => $i_tok,
+                    last_nonblank_i => $last_nonblank_i,
+                    rpretoken_map   => $rtoken_map,
+                    rpretoken_type  => $rtoken_type,
+                    input_line      => $input_line,
+                }
+            );
             if ( $i_tok == 0 ) {
                 $self->interrupt_logfile();
                 $self->warning("Missing ';' or ',' above?\n");
@@ -2770,7 +3000,7 @@ EOM
           ^= &&= ||= //= <=>
           #;
         push @qZ, ',';
-        @{Z_test_hash}{@qZ} = (1) x scalar(@qZ);
+        @Z_test_hash{@qZ} = (1) x scalar(@qZ);
     }
 
     sub do_DOLLAR_SIGN {
@@ -2826,7 +3056,9 @@ EOM
             $want_brace     = $want_paren;
             $want_paren     = EMPTY_STRING;
         }
-        elsif ( $statement_type =~ /^sub\b/ ) {
+        elsif ( substr( $statement_type, 0, 3 ) eq 'sub'
+            && $statement_type =~ /^sub\b/ )
+        {
             $container_type = $statement_type;
         }
         else {
@@ -2982,7 +3214,9 @@ EOM
 
         # restore statement type as 'sub' at closing paren of a signature
         # so that a subsequent ':' is identified as an attribute
-        if ( $container_type =~ /^sub\b/ ) {
+        if ( substr( $container_type, 0, 3 ) eq 'sub'
+            && $container_type =~ /^sub\b/ )
+        {
             $statement_type = $container_type;
         }
 
@@ -3013,7 +3247,7 @@ EOM
             $self->warning("Unexpected leading ',' after a '('\n");
         }
         else {
-            ## ok: no complaints needed
+            # no complaints about the comma
         }
 
         # patch for operator_expected: note if we are in the list (use.t)
@@ -3124,7 +3358,7 @@ EOM
         if ($is_pattern) {
             $in_quote                = 1;
             $type                    = 'Q';
-            $allowed_quote_modifiers = '[msixpodualngc]';
+            $allowed_quote_modifiers = $quote_modifiers{'m'};
         }
         else {    # not a pattern; check for a /= token
 
@@ -3245,7 +3479,7 @@ EOM
             $want_paren = EMPTY_STRING;
         }
         else {
-            ## ok: not special
+            # not special
         }
 
         # now identify which of the three possible types of
@@ -3314,6 +3548,7 @@ EOM
         $rbrace_context->[$brace_depth]         = $context;
         ( $type_sequence, $indent_flag ) =
           $self->increase_nesting_depth( BRACE, $rtoken_map->[$i_tok] );
+
         return;
     } ## end sub do_LEFT_CURLY_BRACKET
 
@@ -3343,6 +3578,13 @@ EOM
         # if an operator or term is expected next.
         if ( $is_block_operator{$block_type} ) {
             $tok = $block_type;
+        }
+
+        # pop non-indenting brace stack if sequence number matches
+        if ( @{ $self->[_rnon_indenting_brace_stack_] }
+            && $self->[_rnon_indenting_brace_stack_]->[-1] eq $type_sequence )
+        {
+            pop @{ $self->[_rnon_indenting_brace_stack_] };
         }
 
         $context = $rbrace_context->[$brace_depth];
@@ -3447,7 +3689,7 @@ EOM
         if ($is_pattern) {
             $in_quote                = 1;
             $type                    = 'Q';
-            $allowed_quote_modifiers = '[msixpodualngc]';
+            $allowed_quote_modifiers = $quote_modifiers{'m'};
         }
         else {
             ( $type_sequence, $indent_flag ) =
@@ -3807,7 +4049,7 @@ EOM
                         "Unconventional here-target: '$here_doc_target'\n");
                 }
                 else {
-                    ## ok: nothing to complain about
+                    # nothing to complain about
                 }
             }
             elsif ( $expecting == TERM ) {
@@ -3866,7 +4108,7 @@ EOM
                         "Unconventional here-target: '$here_doc_target'\n");
                 }
                 else {
-                    ## ok: nothing to complain about
+                    # nothing to complain about
                 }
 
                 # Note that we put a leading space on the here quote
@@ -4105,65 +4347,6 @@ EOM
         return;
     } ## end sub do_ATTRIBUTE_LIST
 
-    sub do_QUOTED_BAREWORD {
-
-        my $self = shift;
-
-        # find type of a bareword followed by a '=>'
-        if ( $ris_constant->{$current_package}{$tok} ) {
-            $type = 'C';
-        }
-        elsif ( $ris_user_function->{$current_package}{$tok} ) {
-            $type      = 'U';
-            $prototype = $ruser_function_prototype->{$current_package}{$tok};
-        }
-        elsif ( $tok =~ /^v\d+$/ ) {
-            $type = 'v';
-            $self->report_v_string($tok);
-        }
-        else {
-
-            # Bareword followed by a fat comma - see 'git18.in'
-            # If tok is something like 'x17' then it could
-            # actually be operator x followed by number 17.
-            # For example, here:
-            #     123x17 => [ 792, 1224 ],
-            # (a key of 123 repeated 17 times, perhaps not
-            # what was intended). We will mark x17 as type
-            # 'n' and it will be split. If the previous token
-            # was also a bareword then it is not very clear is
-            # going on.  In this case we will not be sure that
-            # an operator is expected, so we just mark it as a
-            # bareword.  Perl is a little murky in what it does
-            # with stuff like this, and its behavior can change
-            # over time.  Something like
-            #    a x18 => [792, 1224], will compile as
-            # a key with 18 a's.  But something like
-            #    push @array, a x18;
-            # is a syntax error.
-            if (
-                   $expecting == OPERATOR
-                && substr( $tok, 0, 1 ) eq 'x'
-                && ( length($tok) == 1
-                    || substr( $tok, 1, 1 ) =~ /^\d/ )
-              )
-            {
-                $type = 'n';
-                if ( $self->split_pretoken(1) ) {
-                    $type = 'x';
-                    $tok  = 'x';
-                }
-            }
-            else {
-
-                # git #18
-                $type = 'w';
-                $self->error_if_expecting_OPERATOR();
-            }
-        }
-        return;
-    } ## end sub do_QUOTED_BAREWORD
-
     sub do_X_OPERATOR {
 
         my $self = shift;
@@ -4256,35 +4439,50 @@ EOM
             $statement_type = $tok;
         }
 
-        # Check for misplaced 'elsif' and 'else', but allow isolated
-        # else or elsif blocks to be formatted.  This is indicated
-        # by a last noblank token of ';'
+        # Check for unexpected 'elsif'
         elsif ( $tok eq 'elsif' ) {
             if (
-                $last_nonblank_token ne ';'
 
                 ## !~ /^(if|elsif|unless)$/
-                && !$is_if_elsif_unless{$last_nonblank_block_type}
+                !$is_if_elsif_unless{$last_nonblank_block_type}
+
+                # Allow isolated blocks of any kind during editing
+                # by checking for a last noblank token of ';' and no
+                # sequence numbers having been issued (c272). The check
+                # on sequence number is not perfect but good enough.
+                && !(
+                       $last_nonblank_token eq ';'
+                    && $next_sequence_number == SEQ_ROOT + 1
+                )
+
               )
             {
                 $self->warning(
                     "expecting '$tok' to follow one of 'if|elsif|unless'\n");
             }
         }
+
+        # Check for unexpected 'else'
         elsif ( $tok eq 'else' ) {
 
             # patched for SWITCH/CASE
             if (
-                $last_nonblank_token ne ';'
 
                 ## !~ /^(if|elsif|unless|case|when)$/
-                && !$is_if_elsif_unless_case_when{$last_nonblank_block_type}
+                !$is_if_elsif_unless_case_when{$last_nonblank_block_type}
 
                 # patch to avoid an unwanted error message for
                 # the case of a parenless 'case' (RT 105484):
                 # switch ( 1 ) { case x { 2 } else { } }
                 ## !~ /^(if|elsif|unless|case|when)$/
                 && !$is_if_elsif_unless_case_when{$statement_type}
+
+                # Allow isolated blocks of any kind during editing (c272)
+                && !(
+                       $last_nonblank_token eq ';'
+                    && $next_sequence_number == SEQ_ROOT + 1
+                )
+
               )
             {
                 $self->warning(
@@ -4569,7 +4767,54 @@ EOM
                 || $input_line !~ /^\s*__(?:END|DATA)__\s*$/ )
           )
         {
-            $self->do_QUOTED_BAREWORD();
+            # Bareword followed by a fat comma - see 'git18.in'
+            # This code was previously sub do_QUOTED_BAREWORD: see c316, c317
+
+            #   'v25=>1'   is a v-string key!
+            #   '-v25=>1'  is also a v-string key!
+            if ( $tok =~ /^v\d+$/ ) {
+                $type = 'v';
+                $self->complain("v-string used as hash key\n");
+                $self->report_v_string($tok);
+            }
+
+            # If tok is something like 'x17' then it could
+            # actually be operator x followed by number 17.
+            # For example, here:
+            #     123x17 => [ 792, 1224 ],
+            # (a key of 123 repeated 17 times, perhaps not
+            # what was intended). We will mark x17 as type
+            # 'n' and it will be split. If the previous token
+            # was also a bareword then it is not very clear is
+            # going on.  In this case we will not be sure that
+            # an operator is expected, so we just mark it as a
+            # bareword.  Perl is a little murky in what it does
+            # with stuff like this, and its behavior can change
+            # over time.  Something like
+            #    a x18 => [792, 1224], will compile as
+            # a key with 18 a's.  But something like
+            #    push @array, a x18;
+            # is a syntax error.
+            elsif (
+                   $expecting == OPERATOR
+                && substr( $tok, 0, 1 ) eq 'x'
+                && ( length($tok) == 1
+                    || substr( $tok, 1, 1 ) =~ /^\d/ )
+              )
+            {
+                $type = 'n';
+                if ( $self->split_pretoken(1) ) {
+                    $type = 'x';
+                    $tok  = 'x';
+                }
+                $self->complain("x operator in hash key\n");
+            }
+            else {
+
+                # git #18
+                $type = 'w';
+                $self->error_if_expecting_OPERATOR();
+            }
         }
 
         # quote a bare word within braces..like xxx->{s}; note that we
@@ -4998,108 +5243,35 @@ EOM
 
     use constant DEBUG_TOKENIZE => 0;
 
+    my %is_arrow_or_Z;
+
+    BEGIN {
+        my @qZ = qw( -> Z );
+        @is_arrow_or_Z{@qZ} = (1) x scalar(@qZ);
+    }
+
     sub tokenize_this_line {
 
-  # This routine breaks a line of perl code into tokens which are of use in
-  # indentation and reformatting.  One of my goals has been to define tokens
-  # such that a newline may be inserted between any pair of tokens without
-  # changing or invalidating the program. This version comes close to this,
-  # although there are necessarily a few exceptions which must be caught by
-  # the formatter.  Many of these involve the treatment of bare words.
-  #
-  # The tokens and their types are returned in arrays.  See previous
-  # routine for their names.
-  #
-  # See also the array "valid_token_types" in the BEGIN section for an
-  # up-to-date list.
-  #
-  # To simplify things, token types are either a single character, or they
-  # are identical to the tokens themselves.
-  #
-  # As a debugging aid, the -D flag creates a file containing a side-by-side
-  # comparison of the input string and its tokenization for each line of a file.
-  # This is an invaluable debugging aid.
-  #
-  # In addition to tokens, and some associated quantities, the tokenizer
-  # also returns flags indication any special line types.  These include
-  # quotes, here_docs, formats.
-  #
-  # -----------------------------------------------------------------------
-  #
-  # How to add NEW_TOKENS:
-  #
-  # New token types will undoubtedly be needed in the future both to keep up
-  # with changes in perl and to help adapt the tokenizer to other applications.
-  #
-  # Here are some notes on the minimal steps.  I wrote these notes while
-  # adding the 'v' token type for v-strings, which are things like version
-  # numbers 5.6.0, and ip addresses, and will use that as an example.  ( You
-  # can use your editor to search for the string "NEW_TOKENS" to find the
-  # appropriate sections to change):
-  #
-  # *. Try to talk somebody else into doing it!  If not, ..
-  #
-  # *. Make a backup of your current version in case things don't work out!
-  #
-  # *. Think of a new, unused character for the token type, and add to
-  # the array @valid_token_types in the BEGIN section of this package.
-  # For example, I used 'v' for v-strings.
-  #
-  # *. Implement coding to recognize the $type of the token in this routine.
-  # This is the hardest part, and is best done by imitating or modifying
-  # some of the existing coding.  For example, to recognize v-strings, I
-  # patched 'sub scan_bare_identifier' to recognize v-strings beginning with
-  # 'v' and 'sub scan_number' to recognize v-strings without the leading 'v'.
-  #
-  # *. Update sub operator_expected.  This update is critically important but
-  # the coding is trivial.  Look at the comments in that routine for help.
-  # For v-strings, which should behave like numbers, I just added 'v' to the
-  # regex used to handle numbers and strings (types 'n' and 'Q').
-  #
-  # *. Implement a 'bond strength' rule in sub set_bond_strengths in
-  # Perl::Tidy::Formatter for breaking lines around this token type.  You can
-  # skip this step and take the default at first, then adjust later to get
-  # desired results.  For adding type 'v', I looked at sub bond_strength and
-  # saw that number type 'n' was using default strengths, so I didn't do
-  # anything.  I may tune it up someday if I don't like the way line
-  # breaks with v-strings look.
-  #
-  # *. Implement a 'whitespace' rule in sub set_whitespace_flags in
-  # Perl::Tidy::Formatter.  For adding type 'v', I looked at this routine
-  # and saw that type 'n' used spaces on both sides, so I just added 'v'
-  # to the array @spaces_both_sides.
-  #
-  # *. Update HtmlWriter package so that users can colorize the token as
-  # desired.  This is quite easy; see comments identified by 'NEW_TOKENS' in
-  # that package.  For v-strings, I initially chose to use a default color
-  # equal to the default for numbers, but it might be nice to change that
-  # eventually.
-  #
-  # *. Update comments in Perl::Tidy::Tokenizer::dump_token_types.
-  #
-  # *. Run lots and lots of debug tests.  Start with special files designed
-  # to test the new token type.  Run with the -D flag to create a .DEBUG
-  # file which shows the tokenization.  When these work ok, test as many old
-  # scripts as possible.  Start with all of the '.t' files in the 'test'
-  # directory of the distribution file.  Compare .tdy output with previous
-  # version and updated version to see the differences.  Then include as
-  # many more files as possible. My own technique has been to collect a huge
-  # number of perl scripts (thousands!) into one directory and run perltidy
-  # *, then run diff between the output of the previous version and the
-  # current version.
-  #
-  # *. For another example, search for the smartmatch operator '~~'
-  # with your editor to see where updates were made for it.
-  #
-  # -----------------------------------------------------------------------
+        # This routine tokenizes one line. The results are stored in
+        # the hash ref '$line_of_tokens'.
 
-        my ( $self, $line_of_tokens ) = @_;
-        my ($untrimmed_input_line) = $line_of_tokens->{_line_text};
+        # Given:
+        #   $line_of_tokens = ref to hash of values being filled for this line
+        #   $trimmed_input_line
+        #        = the input line without leading whitespace, OR
+        #        = undef if not available
+        # Returns:
+        #   nothing
+
+        my ( $self, $line_of_tokens, $trimmed_input_line ) = @_;
+        my $untrimmed_input_line = $line_of_tokens->{_line_text};
 
         # Extract line number for use in error messages
         $input_line_number = $line_of_tokens->{_line_number};
 
-        # Check for pod documentation
+        #-------------------------------------
+        # Check for start of pod documentation
+        #-------------------------------------
         if ( substr( $untrimmed_input_line, 0, 1 ) eq '='
             && $untrimmed_input_line =~ /^=[A-Za-z_]/ )
         {
@@ -5118,99 +5290,122 @@ EOM
             }
         }
 
-        $input_line = $untrimmed_input_line;
-
-        chomp $input_line;
-
-        # Reinitialize the multi-line quote flag
+        #--------------------------
+        # Trim leading whitespace ?
+        #--------------------------
+        # Use untrimmed line if we are continuing in a type 'Q' quote
         if ( $in_quote && $quote_type eq 'Q' ) {
             $line_of_tokens->{_starting_in_quote} = 1;
+            $input_line = $untrimmed_input_line;
+            chomp $input_line;
         }
+
+        # Trim start of this line if we are not continuing a quoted line.
+        # Do not trim end because we might end in a quote (test: deken4.pl)
+        # Perl::Tidy::Formatter will delete needless trailing blanks
         else {
             $line_of_tokens->{_starting_in_quote} = 0;
 
-            # Trim start of this line unless we are continuing a quoted line.
-            # Do not trim end because we might end in a quote (test: deken4.pl)
-            # Perl::Tidy::Formatter will delete needless trailing blanks
-            if ( !length($input_line) ) {
+            # Use the pre-computed trimmed line if defined (most efficient)
+            $input_line = $trimmed_input_line;
 
-                # line is empty
+            # otherwise trim the raw input line (much less efficient)
+            if ( !defined($input_line) ) {
+                $input_line = $untrimmed_input_line;
+                $input_line =~ s/^\s+//;
             }
-            elsif ( $input_line =~ m/\S/g ) {
 
-                # There are $spaces blank characters before a nonblank character
-                my $spaces = pos($input_line) - 1;
-                if ( $spaces > 0 ) {
+            chomp $input_line;
 
-                    # Trim the leading spaces
-                    $input_line = substr( $input_line, $spaces );
+            # define 'guessed_indentation_level' if logfile will be saved
+            if ( $self->[_save_logfile_] && length($input_line) ) {
+                my $guess =
+                  $self->guess_old_indentation_level($untrimmed_input_line);
+                $line_of_tokens->{_guessed_indentation_level} = $guess;
+            }
+        }
 
-                    # Find actual space count if there are leading tabs
-                    if (
-                        ord( substr( $untrimmed_input_line, 0, 1 ) ) == ORD_TAB
-                        && $untrimmed_input_line =~ /^(\t+)/ )
-                    {
-                        $spaces += length($1) * ( $tabsize - 1 );
-                    }
+        #------------
+        # Blank lines
+        #------------
+        if ( !length($input_line) ) {
+            $line_of_tokens->{_line_type}        = 'CODE';
+            $line_of_tokens->{_rtokens}          = [];
+            $line_of_tokens->{_rtoken_type}      = [];
+            $line_of_tokens->{_rlevels}          = [];
+            $line_of_tokens->{_rblock_type}      = [];
+            $line_of_tokens->{_nesting_tokens_0} = $nesting_token_string;
+            $line_of_tokens->{_nesting_blocks_0} = $nesting_block_string;
+            return;
+        }
 
-                    # Calculate a guessed level for nonblank lines to avoid
-                    $line_of_tokens->{_guessed_indentation_level} =
-                      int( $spaces / $rOpts_indent_columns );
+        #---------
+        # Comments
+        #---------
+        if ( !$in_quote && substr( $input_line, 0, 1 ) eq '#' ) {
+
+            # and check for skipped section
+            if (
+                (
+                    substr( $input_line, 0, 4 ) eq '#<<V'
+                    || $rOpts_code_skipping_begin
+                )
+                && $rOpts_code_skipping
+
+                # note that the code_skipping_patterns require a newline
+                && $input_line . "\n" =~ /$code_skipping_pattern_begin/
+              )
+            {
+                $self->[_in_code_skipping_] = $self->[_last_line_number_];
+                return;
+            }
+
+            if ( !$self->[_in_format_skipping_] ) {
+                if (
+                    (
+                        substr( $input_line, 0, 4 ) eq '#<<<'
+                        || $rOpts_format_skipping_begin
+                    )
+                    && $rOpts_format_skipping
+
+                    # note that the code_skipping_patterns require a newline
+                    && $input_line . "\n" =~ /$format_skipping_pattern_begin/
+                  )
+                {
+                    $self->[_in_format_skipping_] = $self->[_last_line_number_];
                 }
             }
             else {
-
-                # line has all blank characters
-                $input_line = EMPTY_STRING;
-            }
-        }
-
-        if ( !$in_quote ) {
-
-            # Optimize handling of a blank line
-            if ( !length($input_line) ) {
-                $line_of_tokens->{_line_type}        = 'CODE';
-                $line_of_tokens->{_rtokens}          = [];
-                $line_of_tokens->{_rtoken_type}      = [];
-                $line_of_tokens->{_rlevels}          = [];
-                $line_of_tokens->{_rci_levels}       = [];
-                $line_of_tokens->{_rblock_type}      = [];
-                $line_of_tokens->{_nesting_tokens_0} = $nesting_token_string;
-                $line_of_tokens->{_nesting_blocks_0} = $nesting_block_string;
-                return;
-            }
-
-            # Check comments
-            if ( substr( $input_line, 0, 1 ) eq '#' ) {
-
-                # and check for skipped section
                 if (
                     (
-                        substr( $input_line, 0, 4 ) eq '#<<V'
-                        || $rOpts_code_skipping_begin
+                        substr( $input_line, 0, 4 ) eq '#>>>'
+                        || $rOpts_format_skipping_end
                     )
-                    && $rOpts_code_skipping
-                    && $input_line =~ /$code_skipping_pattern_begin/
+
+                    # note that the code_skipping_patterns require a newline
+                    && $input_line . "\n" =~ /$format_skipping_pattern_end/
                   )
                 {
-                    $self->[_in_skipped_] = $self->[_last_line_number_];
-                    return;
+                    $self->[_in_format_skipping_] = 0;
                 }
-
-                # Optional fast processing of a block comment
-                $line_of_tokens->{_line_type}        = 'CODE';
-                $line_of_tokens->{_rtokens}          = [$input_line];
-                $line_of_tokens->{_rtoken_type}      = ['#'];
-                $line_of_tokens->{_rlevels}          = [$level_in_tokenizer];
-                $line_of_tokens->{_rci_levels}       = [0];
-                $line_of_tokens->{_rblock_type}      = [EMPTY_STRING];
-                $line_of_tokens->{_nesting_tokens_0} = $nesting_token_string;
-                $line_of_tokens->{_nesting_blocks_0} = $nesting_block_string;
-                return;
             }
+
+            # Optional fast processing of a block comment
+            $line_of_tokens->{_line_type}        = 'CODE';
+            $line_of_tokens->{_rtokens}          = [$input_line];
+            $line_of_tokens->{_rtoken_type}      = ['#'];
+            $line_of_tokens->{_rlevels}          = [$level_in_tokenizer];
+            $line_of_tokens->{_rblock_type}      = [EMPTY_STRING];
+            $line_of_tokens->{_nesting_tokens_0} = $nesting_token_string;
+            $line_of_tokens->{_nesting_blocks_0} = $nesting_block_string;
+            return;
         }
 
-        # update the copy of the line for use in error messages
+        #-------------------------------------
+        # Loop to find all tokens on this line
+        #-------------------------------------
+
+        # Update the copy of the line for use in error messages
         # This must be exactly what we give the pre_tokenizer
         $self->[_line_of_text_] = $input_line;
 
@@ -5233,12 +5428,13 @@ EOM
         $indent_flag     = 0;
         $peeked_ahead    = 0;
 
+        my $starting_level_in_tokenizer = $level_in_tokenizer;
+
         $self->tokenizer_main_loop();
 
-        #-----------------------------------------------
-        # all done tokenizing this line ...
-        # now prepare the final list of tokens and types
-        #-----------------------------------------------
+        #-------------------------------------------------
+        # Done tokenizing this line ... package the result
+        #-------------------------------------------------
         $self->tokenizer_wrapup_line($line_of_tokens);
 
         return;
@@ -5248,12 +5444,34 @@ EOM
 
         my ($self) = @_;
 
-        #---------------------------------
         # Break one input line into tokens
-        #---------------------------------
+        # We are working on closure variables.
 
-        # start by breaking the line into pre-tokens
+        # Start by breaking the line into pre-tokens
         ( $rtokens, $rtoken_map, $rtoken_type ) = pre_tokenize($input_line);
+
+        # Verify that all leading whitespace has been trimmed
+        # except for quotes of type 'Q' (c273).
+        if (   @{$rtokens}
+            && $rtoken_type->[0] eq 'b'
+            && !( $in_quote && $quote_type eq 'Q' ) )
+        {
+
+            # Shouldn't happen if calling sub did trim operation correctly.
+            DEVEL_MODE && $self->Fault(<<EOM);
+leading blank at line
+$input_line
+EOM
+
+            # Fix by removing the leading blank token.  This fix has been
+            # tested and works correctly even if no whitespaces was trimmed.
+            # But it is an inefficient way to do things because, for example,
+            # it forces all comments to be processed by sub pre_tokenize.
+            # And it may cause indented code-skipping comments to be missed.
+            shift @{$rtokens};
+            shift @{$rtoken_map};
+            shift @{$rtoken_type};
+        }
 
         $max_token_index = scalar( @{$rtokens} ) - 1;
         push( @{$rtokens}, SPACE, SPACE, SPACE )
@@ -5316,25 +5534,36 @@ EOM
                     $last_nonblank_container_type = $container_type;
                     $last_nonblank_type_sequence  = $type_sequence;
                     $last_nonblank_i              = $i_tok;
-
-                    # Fix part #3 for git82: propagate type 'Z' though L-R pair
-                    if ( !( $type eq 'R' && $last_nonblank_type eq 'Z' ) ) {
-                        $last_nonblank_token = $tok;
-                        $last_nonblank_type  = $type;
-                    }
+                    $last_nonblank_token          = $tok;
+                    $last_nonblank_type           = $type;
                 }
 
-                # Patch for c030: Fix things in case a '->' got separated from
-                # the subsequent identifier by a side comment.  We need the
-                # last_nonblank_token to have a leading -> to avoid triggering
-                # an operator expected error message at the next '('. See also
-                # fix for git #63.
-                if ( $last_last_nonblank_token eq '->' ) {
-                    if (   $last_nonblank_type eq 'w'
-                        || $last_nonblank_type eq 'i' )
-                    {
-                        $last_nonblank_token = '->' . $last_nonblank_token;
-                        $last_nonblank_type  = 'i';
+                # Check for patches
+                if ( $is_arrow_or_Z{$last_last_nonblank_type} ) {
+
+                    # Patch for c030: Fix things in case a '->' got separated
+                    # from the subsequent identifier by a side comment.  We
+                    # need the last_nonblank_token to have a leading -> to
+                    # avoid triggering an operator expected error message at
+                    # the next '('. See also fix for git #63.
+                    if ( $last_last_nonblank_type eq '->' ) {
+                        if (   $last_nonblank_type eq 'w'
+                            || $last_nonblank_type eq 'i' )
+                        {
+                            $last_nonblank_token = '->' . $last_nonblank_token;
+                            $last_nonblank_type  = 'i';
+                        }
+                    }
+
+                    # Fix part #3 for git82: propagate type 'Z' though L-R pair
+                    elsif ( $last_last_nonblank_type eq 'Z' ) {
+                        if ( $last_nonblank_type eq 'R' ) {
+                            $last_nonblank_type  = $last_last_nonblank_type;
+                            $last_nonblank_token = $last_last_nonblank_token;
+                        }
+                    }
+                    else {
+                        # No other patches
                     }
                 }
             }
@@ -5353,12 +5582,11 @@ EOM
             my $pre_tok  = $tok  = $rtokens->[$i];      # get the next pre-token
             my $pre_type = $type = $rtoken_type->[$i];  # and type
 
-            # remember the starting index of this token; we will be updating $i
-            $i_tok = $i;
-
             # re-initialize various flags for the next output token
             (
 
+                # remember the starting index of this token; we will update $i
+                $i_tok,
                 $block_type,
                 $container_type,
                 $type_sequence,
@@ -5367,6 +5595,7 @@ EOM
               )
               = (
 
+                $i,
                 EMPTY_STRING,
                 EMPTY_STRING,
                 EMPTY_STRING,
@@ -5377,7 +5606,9 @@ EOM
             # this pre-token will start an output token
             push( @{$routput_token_list}, $i_tok );
 
-            # The search for the full token ends in one of 5 main END NODES:
+            #---------------------------------------------------
+            # The token search leads to one of 5 main END NODES:
+            #---------------------------------------------------
 
             #-----------------------
             # END NODE 1: whitespace
@@ -5387,7 +5618,31 @@ EOM
             #----------------------
             # END NODE 2: a comment
             #----------------------
-            last if ( $pre_type eq '#' );
+            if ( $pre_type eq '#' ) {
+
+                # push non-indenting brace stack Look for a possible
+                # non-indenting brace.  This is only used to give a hint in
+                # case the file is unbalanced.
+                # Hardwired to '#<<<' for efficiency.  We will not use the
+                # result later if the pattern has been changed (very unusual).
+                if (   $last_nonblank_token eq '{'
+                    && $last_nonblank_block_type
+                    && $last_nonblank_type_sequence
+                    && !$self->[_in_format_skipping_]
+                    && $rOpts_non_indenting_braces )
+                {
+                    my $offset = $rtoken_map->[$i_tok];
+                    my $text   = substr( $input_line, $offset, 5 );
+                    my $len    = length($text);
+                    if (   $len == 4 && $text eq '#<<<'
+                        || $len > 4 && $text eq '#<<< ' )
+                    {
+                        push @{ $self->[_rnon_indenting_brace_stack_] },
+                          $last_nonblank_type_sequence;
+                    }
+                }
+                last;
+            }
 
             # continue gathering identifier if necessary
             if ($id_scan_state) {
@@ -5541,9 +5796,8 @@ EOM
                 print {*STDOUT} "TOKENIZE:(@debug_list)\n";
             };
 
-            # We have the next token, $tok.
-            # Now we have to examine this token and decide what it is
-            # and define its $type
+            # The next token is '$tok'.
+            # Now we have to define its '$type'
 
             #------------------------
             # END NODE 3: a bare word
@@ -5554,9 +5808,9 @@ EOM
                 next;
             }
 
-            # Turn off attribute list on first non-blank, non-bareword.
-            # Added '#' to fix c038 (later moved above).
-            $self->[_in_attribute_list_] &&= 0;
+            # Turn off attribute list on first non-blank, non-bareword,
+            # and non-comment (added to fix c038)
+            $self->[_in_attribute_list_] = 0;
 
             #-------------------------------
             # END NODE 4: a string of digits
@@ -5595,9 +5849,8 @@ EOM
             $last_nonblank_block_type     = $block_type;
             $last_nonblank_container_type = $container_type;
             $last_nonblank_type_sequence  = $type_sequence;
-
-            $last_nonblank_token = $tok;
-            $last_nonblank_type  = $type;
+            $last_nonblank_token          = $tok;
+            $last_nonblank_type           = $type;
         }
 
         # reset indentation level if necessary at a sub or package
@@ -5611,7 +5864,11 @@ EOM
 
         $self->[_in_quote_] = $in_quote;
         $self->[_quote_target_] =
-          $in_quote ? matching_end_token($quote_character) : EMPTY_STRING;
+            $in_quote
+          ? $matching_end_token{$quote_character}
+              ? $matching_end_token{$quote_character}
+              : $quote_character
+          : EMPTY_STRING;
         $self->[_rhere_target_list_] = $rhere_target_list;
 
         return;
@@ -5625,7 +5882,10 @@ EOM
         #---------------------------------------------------------
 
         # Arrays to hold token values for this line:
-        my ( @levels, @block_type, @type_sequence, @token_type, @tokens );
+        my (
+            @output_levels,     @output_block_type, @output_type_sequence,
+            @output_token_type, @output_tokens
+        );
 
         $line_of_tokens->{_nesting_tokens_0} = $nesting_token_string;
 
@@ -5636,14 +5896,14 @@ EOM
         # Loop over tokens
         #-----------------
         # $i is the index of the pretoken which starts this full token
-        foreach my $i ( @{$routput_token_list} ) {
+        foreach my $ii ( @{$routput_token_list} ) {
 
-            my $type_i = $routput_token_type->[$i];
+            my $type_i = $routput_token_type->[$ii];
 
             #----------------------------------------
             # Section 1. Handle a non-sequenced token
             #----------------------------------------
-            if ( !$routput_type_sequence->[$i] ) {
+            if ( !$routput_type_sequence->[$ii] ) {
 
                 #-------------------------------
                 # Section 1.1. types ';' and 't'
@@ -5652,7 +5912,7 @@ EOM
                 # - output __END__, __DATA__, and format as type 'k' instead
                 #   of ';' to make html colors correct, etc.
                 if ( $is_semicolon_or_t{$type_i} ) {
-                    my $tok_i = $rtokens->[$i];
+                    my $tok_i = $rtokens->[$ii];
                     if ( $is_END_DATA_format_sub{$tok_i} ) {
                         $type_i = 'k';
                     }
@@ -5672,16 +5932,16 @@ EOM
                     $self->[_in_error_] = 1;
                 }
                 else {
-                    ## ok - valid token type other than ; and t
+                    # valid token type other than ; and t
                 }
 
                 #----------------------------------------------------
                 # Section 1.3. Store values for a non-sequenced token
                 #----------------------------------------------------
-                push( @levels,        $level_in_tokenizer );
-                push( @block_type,    EMPTY_STRING );
-                push( @type_sequence, EMPTY_STRING );
-                push( @token_type,    $type_i );
+                push( @output_levels,        $level_in_tokenizer );
+                push( @output_block_type,    EMPTY_STRING );
+                push( @output_type_sequence, EMPTY_STRING );
+                push( @output_token_type,    $type_i );
 
             }
 
@@ -5697,9 +5957,9 @@ EOM
                 my $level_i = $level_in_tokenizer;
 
                 # $tok_i is the PRE-token.  It only equals the token for symbols
-                my $tok_i = $rtokens->[$i];
+                my $tok_i = $rtokens->[$ii];
 
-                # $routput_indent_flag->[$i] indicates that we need a change
+                # $routput_indent_flag->[$ii] indicates that we need a change
                 # in level at a nested ternary, as follows
                 #     1 => at a nested ternary ?
                 #    -1 => at a nested ternary :
@@ -5712,7 +5972,7 @@ EOM
 
                     if ( $type_i eq '?' ) {
 
-                        if ( $routput_indent_flag->[$i] > 0 ) {
+                        if ( $routput_indent_flag->[$ii] > 0 ) {
                             $level_in_tokenizer++;
 
                             # break BEFORE '?' in a nested ternary
@@ -5729,7 +5989,7 @@ EOM
 
                             $level_in_tokenizer++;
 
-                            if ( $routput_block_type->[$i] ) {
+                            if ( $routput_block_type->[$ii] ) {
                                 $nesting_block_flag = 1;
                                 $nesting_block_string .= '1';
                             }
@@ -5758,7 +6018,7 @@ EOM
                         || $type_i eq 'R'
 
                         # only the second and higher ? : have levels
-                        || $type_i eq ':' && $routput_indent_flag->[$i] < 0
+                        || $type_i eq ':' && $routput_indent_flag->[$ii] < 0
                       )
                     {
 
@@ -5801,15 +6061,15 @@ EOM
 
                 # The starting nesting block string, which is used in any .LOG
                 # output, should include the first token of the line
-                if ( !@levels ) {
+                if ( !@output_levels ) {
                     $nesting_block_string_0 = $nesting_block_string;
                 }
 
                 # Store values for a sequenced token
-                push( @levels,        $level_i );
-                push( @block_type,    $routput_block_type->[$i] );
-                push( @type_sequence, $routput_type_sequence->[$i] );
-                push( @token_type,    $type_i );
+                push( @output_levels,        $level_i );
+                push( @output_block_type,    $routput_block_type->[$ii] );
+                push( @output_type_sequence, $routput_type_sequence->[$ii] );
+                push( @output_token_type,    $type_i );
 
             }
         }    ## End loop to over tokens
@@ -5821,44 +6081,150 @@ EOM
         $line_of_tokens->{_nesting_blocks_0} = $nesting_block_string_0;
 
         # Form and store the tokens
-        if (@levels) {
+        if (@output_levels) {
 
             my $im     = shift @{$routput_token_list};
             my $offset = $rtoken_map->[$im];
-            foreach my $i ( @{$routput_token_list} ) {
-                my $numc = $rtoken_map->[$i] - $offset;
-                push( @tokens, substr( $input_line, $offset, $numc ) );
+            foreach my $ii ( @{$routput_token_list} ) {
+                my $numc = $rtoken_map->[$ii] - $offset;
+                push( @output_tokens, substr( $input_line, $offset, $numc ) );
                 $offset += $numc;
 
-                if ( DEVEL_MODE && $numc <= 0 ) {
+                # programming note: it seems most efficient to 'next' out of
+                # a critical loop like this as early as possible. So instead
+                # of 'if ( DEVEL_MODE && $numc < 0 )' we write:
+                next unless DEVEL_MODE;
+                next if ( $numc > 0 );
 
-                    # Should not happen unless @{$rtoken_map} is corrupted
-                    $self->Fault(
-                        "number of characters is '$numc' but should be >0\n");
-                }
+                # Should not happen unless @{$rtoken_map} is corrupted
+                $self->Fault(
+                    "number of characters is '$numc' but should be >0\n");
             }
 
             # Form and store the final token of this line
             my $numc = length($input_line) - $offset;
-            push( @tokens, substr( $input_line, $offset, $numc ) );
+            push( @output_tokens, substr( $input_line, $offset, $numc ) );
 
-            if ( DEVEL_MODE && $numc <= 0 ) {
-                $self->Fault(
-                    "Number of Characters is '$numc' but should be >0\n");
+            if (DEVEL_MODE) {
+                if ( $numc <= 0 ) {
+
+                    # check '$rtoken_map' and '$routput_token_list'
+                    $self->Fault(
+                        "Number of Characters is '$numc' but should be >0\n");
+                }
+
+                # Make sure we didn't gain or lose any characters
+                my $test_line = join EMPTY_STRING, @output_tokens;
+                if ( $test_line ne $input_line ) {
+                    my $len_input = length($input_line);
+                    my $len_test  = length($test_line);
+
+                    # check '$rtoken_map' and '$routput_token_list'
+                    Fault(<<EOM);
+Reconstruted line difers from input; input_length=$len_input test_length=$len_test
+input:'$input_line'
+test :'$test_line'
+EOM
+                }
             }
         }
 
-        # NOTE: This routine returns ci=0. Eventually '_rci_levels' can be
-        # removed. The ci values are computed later by sub Formatter::set_ci.
-        my @ci_levels = (0) x scalar(@levels);
-
         # Wrap up this line of tokens for shipping to the Formatter
-        $line_of_tokens->{_rtoken_type}    = \@token_type;
-        $line_of_tokens->{_rtokens}        = \@tokens;
-        $line_of_tokens->{_rblock_type}    = \@block_type;
-        $line_of_tokens->{_rtype_sequence} = \@type_sequence;
-        $line_of_tokens->{_rlevels}        = \@levels;
-        $line_of_tokens->{_rci_levels}     = \@ci_levels;
+        $line_of_tokens->{_rtoken_type}    = \@output_token_type;
+        $line_of_tokens->{_rtokens}        = \@output_tokens;
+        $line_of_tokens->{_rblock_type}    = \@output_block_type;
+        $line_of_tokens->{_rtype_sequence} = \@output_type_sequence;
+        $line_of_tokens->{_rlevels}        = \@output_levels;
+
+        #-----------------------------------------------------------------
+        # Compare input indentation with computed levels at closing braces
+        #-----------------------------------------------------------------
+        # This may provide a useful hint for error location if the file
+        # is not balanced in braces.  Closing braces are used because they
+        # have a well-defined indentation and can be processed efficiently.
+        if ( $output_tokens[0] eq '}' ) {
+
+            my $blk = $output_block_type[0];
+            if (
+                (
+                    # builtin block types without continuation indentation
+                    $is_zero_continuation_block_type{$blk}
+
+                    # or a named sub, but skip sub aliases for efficiency,
+                    # since this is just for diagnostic info
+                    || substr( $blk, 0, 4 ) eq 'sub '
+                )
+
+                # and we are not in format skipping
+                && !$self->[_in_format_skipping_]
+              )
+            {
+
+                # subtract 1 space for newline in untrimmed line
+                my $untrimmed_input_line = $line_of_tokens->{_line_text};
+                my $space_count =
+                  length($untrimmed_input_line) - length($input_line) - 1;
+
+                # check for tabs
+                if ( $space_count
+                    && ord( substr( $untrimmed_input_line, 0, 1 ) ) == ORD_TAB )
+                {
+                    if ( $untrimmed_input_line =~ /^(\t+)?(\s+)?/ ) {
+                        if ($1) { $space_count += length($1) * $tabsize }
+                        if ($2) { $space_count += length($2) }
+                    }
+                }
+
+                # '$guess' = the level according to indentation
+                my $guess = int( $space_count / $rOpts_indent_columns );
+
+                # subtract 1 level from guess for --indent-closing-brace
+                $guess -= 1 if ($rOpts_indent_closing_brace);
+
+                # subtract 1 from $level for each non-indenting brace level
+                my $adjust = @{ $self->[_rnon_indenting_brace_stack_] };
+
+                my $level = $output_levels[0];
+
+                # find the difference between expected and indentation guess
+                my $level_diff = $level - $adjust - $guess;
+
+                my $rhash = $self->[_rclosing_brace_indentation_hash_];
+
+                # results are only valid if we guess correctly at the
+                # first spaced brace
+                if ( $space_count && !defined( $rhash->{valid} ) ) {
+                    $rhash->{valid} = !$level_diff;
+                }
+
+                # save the result
+                my $rhistory_line_number  = $rhash->{rhistory_line_number};
+                my $rhistory_level_diff   = $rhash->{rhistory_level_diff};
+                my $rhistory_anchor_point = $rhash->{rhistory_anchor_point};
+
+                if ( $rhistory_level_diff->[-1] != $level_diff ) {
+
+                    # add an anchor point
+                    push @{$rhistory_level_diff},   $level_diff;
+                    push @{$rhistory_line_number},  $input_line_number;
+                    push @{$rhistory_anchor_point}, 1;
+                }
+                else {
+
+                    # add a movable point following an anchor point
+                    if ( $rhistory_anchor_point->[-1] ) {
+                        push @{$rhistory_level_diff},   $level_diff;
+                        push @{$rhistory_line_number},  $input_line_number;
+                        push @{$rhistory_anchor_point}, 0;
+                    }
+
+                    # extend a movable point
+                    else {
+                        $rhistory_line_number->[-1] = $input_line_number;
+                    }
+                }
+            }
+        }
 
         return;
     } ## end sub tokenizer_wrapup_line
@@ -5895,12 +6261,12 @@ BEGIN {
     push @q, ',';
     push @q, '(';     # for completeness, not currently a token type
     push @q, '->';    # was previously in UNKNOWN
-    @{op_expected_table}{@q} = (TERM) x scalar(@q);
+    @op_expected_table{@q} = (TERM) x scalar(@q);
 
     # Always UNKNOWN following these types;
     # previously had '->' in this list for c030
     @q = qw( w );
-    @{op_expected_table}{@q} = (UNKNOWN) x scalar(@q);
+    @op_expected_table{@q} = (UNKNOWN) x scalar(@q);
 
     # Always expecting OPERATOR ...
     # 'n' and 'v' are currently excluded because they might be VERSION numbers
@@ -5910,17 +6276,17 @@ BEGIN {
     # Fix for c250: added 'i' because new type 'P' was added
     @q = qw( -- C h R ++ ] Q <> i );    ## n v q );
     push @q, ')';
-    @{op_expected_table}{@q} = (OPERATOR) x scalar(@q);
+    @op_expected_table{@q} = (OPERATOR) x scalar(@q);
 
     # Fix for git #62: added '*' and '%'
     @q = qw( < ? * % );
-    @{is_weird_parsing_rule_exception}{@q} = (1) x scalar(@q);
+    @is_weird_parsing_rule_exception{@q} = (1) x scalar(@q);
 
     @q = qw<) $>;
-    @{is_paren_dollar}{@q} = (1) x scalar(@q);
+    @is_paren_dollar{@q} = (1) x scalar(@q);
 
     @q = qw( n v );
-    @{is_n_v}{@q} = (1) x scalar(@q);
+    @is_n_v{@q} = (1) x scalar(@q);
 
 } ## end BEGIN
 
@@ -5996,6 +6362,10 @@ sub operator_expected {
         return $op_expected;
     }
 
+    DEBUG_OPERATOR_EXPECTED
+      && print {*STDOUT}
+"OPERATOR_EXPECTED: in hardwired table for last type $last_nonblank_type token $last_nonblank_token\n";
+
     #---------------------------------------------
     # Section 2: Handle special cases if necessary
     #---------------------------------------------
@@ -6007,16 +6377,13 @@ sub operator_expected {
     # Fix for c250: removed coding for type 'i' because 'i' and new type 'P'
     # are now done by hash table lookup
 
-    # keyword...
+    #--------------------
+    # Section 2A: keyword
+    #--------------------
     if ( $last_nonblank_type eq 'k' ) {
 
-        # keywords expecting OPERATOR:
-        if ( $expecting_operator_token{$last_nonblank_token} ) {
-            $op_expected = OPERATOR;
-        }
-
         # keywords expecting TERM:
-        elsif ( $expecting_term_token{$last_nonblank_token} ) {
+        if ( $expecting_term_token{$last_nonblank_token} ) {
 
             # Exceptions from TERM:
 
@@ -6029,7 +6396,7 @@ sub operator_expected {
                     $last_nonblank_token}
               )
             {
-                $op_expected = OPERATOR;
+                return OPERATOR;
             }
 
             # Patch to allow a ? following 'split' to be a deprecated pattern
@@ -6037,21 +6404,27 @@ sub operator_expected {
             # from the list
             # %is_keyword_rejecting_question_as_pattern_delimiter. This patch
             # will force perltidy to guess.
-            elsif ($tok eq '?'
+            if (   $tok eq '?'
                 && $last_nonblank_token eq 'split' )
             {
-                $op_expected = UNKNOWN;
+                return UNKNOWN;
             }
-            else {
-                $op_expected = TERM;
-            }
+
+            return TERM;
         }
-        else {
-            $op_expected = TERM;
+
+        # keywords expecting OPERATOR:
+        if ( $expecting_operator_token{$last_nonblank_token} ) {
+            return OPERATOR;
         }
+
+        return TERM;
+
     } ## end type 'k'
 
-    # closing container token...
+    #------------------------------------
+    # Section 2B: Closing container token
+    #------------------------------------
 
     # Note that the actual token for type '}' may also be a ')'.
 
@@ -6062,22 +6435,21 @@ sub operator_expected {
     #       $a = do { BLOCK } / 2;
     # the $last_nonblank_token is 'do' when $last_nonblank_type eq '}'.
 
-    elsif ( $last_nonblank_type eq '}' ) {
-        $op_expected = UNKNOWN;
+    if ( $last_nonblank_type eq '}' ) {
 
         # handle something after 'do' and 'eval'
         if ( $is_block_operator{$last_nonblank_token} ) {
 
             # something like $a = do { BLOCK } / 2;
-            $op_expected = OPERATOR;    # block mode following }
+            return OPERATOR;    # block mode following }
         }
 
         #       $last_nonblank_token =~ /^(\)|\$|\-\>)/
-        elsif ( $is_paren_dollar{ substr( $last_nonblank_token, 0, 1 ) }
+        if ( $is_paren_dollar{ substr( $last_nonblank_token, 0, 1 ) }
             || substr( $last_nonblank_token, 0, 2 ) eq '->' )
         {
-            $op_expected = OPERATOR;
-            if ( $last_nonblank_token eq '$' ) { $op_expected = UNKNOWN }
+            if ( $last_nonblank_token eq '$' ) { return UNKNOWN }
+            return OPERATOR;
         }
 
         # Check for smartmatch operator before preceding brace or square
@@ -6086,8 +6458,8 @@ sub operator_expected {
         #
         # qr/3/ ~~ ['1234'] ? 1 : 0;
         # map { $_ ~~ [ '0', '1' ] ? 'x' : 'o' } @a;
-        elsif ( $last_nonblank_token eq '~~' ) {
-            $op_expected = OPERATOR;
+        if ( $last_nonblank_token eq '~~' ) {
+            return OPERATOR;
         }
 
         # A right brace here indicates the end of a simple block.  All
@@ -6095,87 +6467,88 @@ sub operator_expected {
         # block operator keywords have been given those keywords as
         # "last_nonblank_token" and caught above.  (This statement is order
         # dependent, and must come after checking $last_nonblank_token).
-        else {
 
-            # patch for dor.t (defined or).
-            if (   $tok eq '/'
-                && $next_type eq '/'
-                && $last_nonblank_token eq ']' )
-            {
-                $op_expected = OPERATOR;
-            }
-
-            # Patch for RT #116344: misparse a ternary operator after an
-            # anonymous hash, like this:
-            #   return ref {} ? 1 : 0;
-            # The right brace should really be marked type 'R' in this case,
-            # and it is safest to return an UNKNOWN here. Expecting a TERM will
-            # cause the '?' to always be interpreted as a pattern delimiter
-            # rather than introducing a ternary operator.
-            elsif ( $tok eq '?' ) {
-                $op_expected = UNKNOWN;
-            }
-            else {
-                $op_expected = TERM;
-            }
+        # patch for dor.t (defined or).
+        if (   $tok eq '/'
+            && $next_type eq '/'
+            && $last_nonblank_token eq ']' )
+        {
+            return OPERATOR;
         }
+
+        # Patch for RT #116344: misparse a ternary operator after an
+        # anonymous hash, like this:
+        #   return ref {} ? 1 : 0;
+        # The right brace should really be marked type 'R' in this case,
+        # and it is safest to return an UNKNOWN here. Expecting a TERM will
+        # cause the '?' to always be interpreted as a pattern delimiter
+        # rather than introducing a ternary operator.
+        if ( $tok eq '?' ) {
+            return UNKNOWN;
+        }
+        return TERM;
+
     } ## end type '}'
 
-    # number or v-string...
+    #-------------------------------
+    # Section 2C: number or v-string
+    #-------------------------------
     # An exception is for VERSION numbers a 'use' statement. It has the format
     #     use Module VERSION LIST
     # We could avoid this exception by writing a special sub to parse 'use'
     # statements and perhaps mark these numbers with a new type V (for VERSION)
     ##elsif ( $last_nonblank_type =~ /^[nv]$/ ) {
-    elsif ( $is_n_v{$last_nonblank_type} ) {
-        $op_expected = OPERATOR;
+    if ( $is_n_v{$last_nonblank_type} ) {
         if ( $statement_type eq 'use' ) {
-            $op_expected = UNKNOWN;
+            return UNKNOWN;
         }
+        return OPERATOR;
     }
 
-    # quote...
+    #---------------------
+    # Section 2D: qw quote
+    #---------------------
     # TODO: labeled prototype words would better be given type 'A' or maybe
     # 'J'; not 'q'; or maybe mark as type 'Y'?
-    elsif ( $last_nonblank_type eq 'q' ) {
+    if ( $last_nonblank_type eq 'q' ) {
         if ( $last_nonblank_token eq 'prototype' ) {
-            $op_expected = TERM;
+            return TERM;
         }
 
         # update for --use-feature=class (rt145706):
         # Look for class VERSION after possible attribute, as in
         #    class Example::Subclass : isa(Example::Base) 1.345 { ... }
-        elsif ( $statement_type =~ /^package\b/ ) {
-            $op_expected = TERM;
+        if ( $statement_type =~ /^package\b/ ) {
+            return TERM;
         }
 
         # everything else
-        else {
-            $op_expected = OPERATOR;
-        }
+        return OPERATOR;
     }
 
-    # file handle or similar
-    elsif ( $last_nonblank_type eq 'Z' ) {
+    #-----------------------------------
+    # Section 2E: file handle or similar
+    #-----------------------------------
+    if ( $last_nonblank_type eq 'Z' ) {
 
         # angle.t
         if ( $last_nonblank_token =~ /^\w/ ) {
-            $op_expected = UNKNOWN;
+            return UNKNOWN;
         }
 
         # Exception to weird parsing rules for 'x(' ... see case b1205:
         # In something like 'print $vv x(...' the x is an operator;
         # Likewise in 'print $vv x$ww' the x is an operator (case b1207)
         # otherwise x follows the weird parsing rules.
-        elsif ( $tok eq 'x' && $next_type =~ /^[\(\$\@\%]$/ ) {
-            $op_expected = OPERATOR;
+        if ( $tok eq 'x' && $next_type =~ /^[\(\$\@\%]$/ ) {
+            return OPERATOR;
         }
 
         # The 'weird parsing rules' of next section do not work for '<' and '?'
         # It is best to mark them as unknown.  Test case:
         #  print $fh <DATA>;
-        elsif ( $is_weird_parsing_rule_exception{$tok} ) {
-            $op_expected = UNKNOWN;
+        if ( $is_weird_parsing_rule_exception{$tok} ) {
+            return UNKNOWN;
         }
 
         # For possible file handle like "$a", Perl uses weird parsing rules.
@@ -6188,15 +6561,15 @@ sub operator_expected {
         #    print $fh &xsi_protos(@mods);
         #    my $x = new $CompressClass *FH;
         #    print $OUT +( $count % 15 ? ", " : "\n\t" );
-        elsif ($blank_after_Z
+        if (   $blank_after_Z
             && $next_type ne 'b' )
         {
-            $op_expected = TERM;
+            return TERM;
         }
 
         # Note that '?' and '<' have been moved above
         # ( $tok =~ /^([x\/\+\-\*\%\&\.\?\<]|\>\>)$/ ) {
-        elsif ( $tok =~ /^([x\/\+\-\*\%\&\.]|\>\>)$/ ) {
+        if ( $tok =~ /^([x\/\+\-\*\%\&\.]|\>\>)$/ ) {
 
             # Do not complain in 'use' statements, which have special syntax.
             # For example, from RT#130344:
@@ -6206,25 +6579,18 @@ sub operator_expected {
 "operator in possible indirect object location not recommended\n"
                 );
             }
-            $op_expected = OPERATOR;
+            return OPERATOR;
         }
 
         # all other cases
-        else {
-            $op_expected = UNKNOWN;
-        }
+
+        return UNKNOWN;
     }
 
-    # anything else...
-    else {
-        $op_expected = UNKNOWN;
-    }
-
-    DEBUG_OPERATOR_EXPECTED
-      && print {*STDOUT}
-"OPERATOR_EXPECTED: returns $op_expected for last type $last_nonblank_type token $last_nonblank_token\n";
-
-    return $op_expected;
+    #--------------------------
+    # Section 2F: anything else
+    #--------------------------
+    return UNKNOWN;
 
 } ## end sub operator_expected
 
@@ -6525,7 +6891,6 @@ sub decide_if_code_block {
             foreach my $k ( $j + 1 .. @pre_types - 2 ) {
                 if ( $pre_types[$k] eq $quote_mark ) {
                     $j = $k + 1;
-                    ##my $next = $pre_types[$j];
                     last;
                 }
             }
@@ -6581,9 +6946,15 @@ sub report_unexpected {
 
     # report unexpected token type and show where it is
     # USES GLOBAL VARIABLES: (none)
-    my ( $self, $found, $expecting, $i_tok, $last_nonblank_i, $rpretoken_map,
-        $rpretoken_type, $input_line )
-      = @_;
+    my ( $self, $rcall_hash ) = @_;
+
+    my $found           = $rcall_hash->{found};
+    my $expecting       = $rcall_hash->{expecting};
+    my $i_tok           = $rcall_hash->{i_tok};
+    my $last_nonblank_i = $rcall_hash->{last_nonblank_i};
+    my $rpretoken_map   = $rcall_hash->{rpretoken_map};
+    my $rpretoken_type  = $rcall_hash->{rpretoken_type};
+    my $input_line      = $rcall_hash->{input_line};
 
     if ( ++$self->[_unexpected_error_count_] <= MAX_NAG_MESSAGES ) {
         my $msg = "found $found where $expecting expected";
@@ -6625,10 +6996,10 @@ my %is_R_closing_sb;
 BEGIN {
 
     my @q = qw< $ & % * @ ) >;
-    @{is_sigil_or_paren}{@q} = (1) x scalar(@q);
+    @is_sigil_or_paren{@q} = (1) x scalar(@q);
 
     @q = qw(R ]);
-    @{is_R_closing_sb}{@q} = (1) x scalar(@q);
+    @is_R_closing_sb{@q} = (1) x scalar(@q);
 } ## end BEGIN
 
 sub is_non_structural_brace {
@@ -6877,6 +7248,7 @@ EOM
                     $self->resume_logfile();
                 }
                 $self->increment_brace_error();
+                if ( $bb eq BRACE ) { $self->[_show_indentation_table_] = 1 }
             }
         }
         $rcurrent_depth->[$aa]--;
@@ -6892,6 +7264,7 @@ EOM
                 '^' );
         }
         $self->increment_brace_error();
+        if ( $aa eq BRACE ) { $self->[_show_indentation_table_] = 1 }
 
         # keep track of errors in braces alone (ignoring ternary nesting errors)
         $self->[_true_brace_error_count_]++
@@ -6917,6 +7290,7 @@ The most recent un-matched $opening_brace_names[$aa] is on line $sl
 EOM
             $self->indicate_error( $msg, @{$rsl}, '^' );
             $self->increment_brace_error();
+            if ( $aa eq BRACE ) { $self->[_show_indentation_table_] = 1 }
         }
     }
     return;
@@ -6937,7 +7311,7 @@ sub peek_ahead_for_n_nonblank_pre_tokens {
     my ( $rpre_tokens, $rmap, $rpre_types );
 
     while ( $line = $self->peek_ahead( $i++ ) ) {
-        $line =~ s/^\s*//;                 # trim leading blanks
+        $line =~ s/^\s+//;                 # trim leading blanks
         next if ( length($line) <= 0 );    # skip blank
         next if ( $line =~ /^#/ );         # skip comment
         ( $rpre_tokens, $rmap, $rpre_types ) =
@@ -6956,7 +7330,7 @@ sub peek_ahead_for_nonblank_token {
     my $i = 0;
 
     while ( $line = $self->peek_ahead( $i++ ) ) {
-        $line =~ s/^\s*//;                 # trim leading blanks
+        $line =~ s/^\s+//;                 # trim leading blanks
         next if ( length($line) <= 0 );    # skip blank
         next if ( $line =~ /^#/ );         # skip comment
 
@@ -7074,11 +7448,11 @@ BEGIN {
 
     # Constants like 'pi' in Trig.pm are common
     my @q = qw(pi pi2 pi4 pip2 pip4);
-    @{is_known_constant}{@q} = (1) x scalar(@q);
+    @is_known_constant{@q} = (1) x scalar(@q);
 
     # parenless calls of 'ok' are common
     @q = qw( ok );
-    @{is_known_function}{@q} = (1) x scalar(@q);
+    @is_known_function{@q} = (1) x scalar(@q);
 } ## end BEGIN
 
 sub guess_if_pattern_or_division {
@@ -7095,12 +7469,12 @@ sub guess_if_pattern_or_division {
     my ( $self, $i, $rtokens, $rtoken_map, $max_token_index ) = @_;
     my $is_pattern = 0;
     my $msg        = "guessing that / after $last_nonblank_token starts a ";
+    my $ibeg       = $i;
 
     if ( $i >= $max_token_index ) {
         $msg .= "division (no end to pattern found on the line)\n";
     }
     else {
-        my $ibeg = $i;
         my $divide_possible =
           $self->is_possible_numerator( $i, $rtokens, $max_token_index );
 
@@ -7123,9 +7497,10 @@ sub guess_if_pattern_or_division {
         #
         # Spacing rule: a space before the slash but not after the slash
         # usually indicates a pattern.  We can use this to break ties.
-
-        my $is_pattern_by_spacing =
-          ( $i > 1 && $next_token !~ m/^\s/ && $rtokens->[ $i - 2 ] =~ m/^\s/ );
+        # Note: perl seems to take a newline as a space in this rule (c243)
+        my $space_before          = $i < 2 || $rtokens->[ $i - 2 ] =~ m/^\s/;
+        my $space_after           = $next_token                    =~ m/^\s/;
+        my $is_pattern_by_spacing = $space_before && !$space_after;
 
         # look for a possible ending / on this line..
         my $in_quote        = 1;
@@ -7134,11 +7509,24 @@ sub guess_if_pattern_or_division {
         my $quote_pos       = 0;
         my $quoted_string;
         (
-            $i, $in_quote, $quote_character, $quote_pos, $quote_depth,
+
+            $i,
+            $in_quote,
+            $quote_character,
+            $quote_pos,
+            $quote_depth,
             $quoted_string
           )
-          = $self->follow_quoted_string( $ibeg, $in_quote, $rtokens,
-            $quote_character, $quote_pos, $quote_depth, $max_token_index );
+          = $self->follow_quoted_string(
+
+            $ibeg,
+            $in_quote,
+            $rtokens,
+            $quote_character,
+            $quote_pos,
+            $quote_depth,
+            $max_token_index
+          );
 
         if ($in_quote) {
 
@@ -7305,9 +7693,19 @@ sub scan_bare_identifier_do {
     # USES GLOBAL VARIABLES: $current_package, $last_nonblank_token,
     # $last_nonblank_type, $rparen_type, $paren_depth
 
-    my ( $self, $input_line, $i, $tok, $type, $prototype, $rtoken_map,
-        $max_token_index )
-      = @_;
+    my (
+
+        $self,
+
+        $input_line,
+        $i,
+        $tok,
+        $type,
+        $prototype,
+        $rtoken_map,
+        $max_token_index
+
+    ) = @_;
     my $i_begin = $i;
     my $package = undef;
 
@@ -7324,8 +7722,15 @@ sub scan_bare_identifier_do {
     #   A::
     #   ::A
     #   A'B
-    if ( $input_line =~ m/\G\s*((?:\w*(?:'|::)))*(?:(?:->)?(\w+))?/gc ) {
-
+    if (
+        $input_line =~ m{
+         \G\s*                # start at pos
+         ( (?:\w*(?:'|::)) )* # $1 = maybe package name like A:: A::B:: or A'
+         (?:(?:->)?           #      maybe followed by '->'
+         (\w+))?              # $2 = maybe followed by sub name
+        }gcx
+      )
+    {
         my $pos  = pos($input_line);
         my $numc = $pos - $pos_beg;
         $tok = substr( $input_line, $pos_beg, $numc );
@@ -7364,7 +7769,7 @@ sub scan_bare_identifier_do {
 
             # check for v-string with leading 'v' type character
             # (This seems to have precedence over filehandle, type 'Y')
-            if ( $tok =~ /^v\d[_\d]*$/ ) {
+            if ( substr( $tok, 0, 1 ) eq 'v' && $tok =~ /^v\d[_\d]*$/ ) {
 
                 # we only have the first part - something like 'v101' -
                 # look for more
@@ -7374,8 +7779,6 @@ sub scan_bare_identifier_do {
                     $tok  = substr( $input_line, $pos_beg, $numc );
                 }
                 $type = 'v';
-
-                # warn if this version can't handle v-strings
                 $self->report_v_string($tok);
             }
 
@@ -7525,9 +7928,19 @@ sub scan_id_do {
     # not the last nonblank token on the line, the identifier is
     # scanned and handled and a value of '' is returned.
 
-    my ( $self, $input_line, $i, $tok, $rtokens, $rtoken_map, $id_scan_state,
-        $max_token_index )
-      = @_;
+    my (
+
+        $self,
+
+        $input_line,
+        $i,
+        $tok,
+        $rtokens,
+        $rtoken_map,
+        $id_scan_state,
+        $max_token_index
+
+    ) = @_;
     use constant DEBUG_NSCAN => 0;
     my $type = EMPTY_STRING;
     my ( $i_beg, $pos_beg );
@@ -7595,9 +8008,18 @@ sub scan_id_do {
         }
 
         elsif ( $is_package{$id_scan_state} ) {
-            ( $i, $tok, $type ) =
-              $self->do_scan_package( $input_line, $i, $i_beg, $tok, $type,
-                $rtokens, $rtoken_map, $max_token_index );
+            ( $i, $tok, $type ) = $self->do_scan_package(
+                {
+                    input_line      => $input_line,
+                    i               => $i,
+                    i_beg           => $i_beg,
+                    tok             => $tok,
+                    type            => $type,
+                    rtokens         => $rtokens,
+                    rtoken_map      => $rtoken_map,
+                    max_token_index => $max_token_index,
+                }
+            );
             $id_scan_state = EMPTY_STRING;
         }
 
@@ -7685,11 +8107,17 @@ sub do_scan_package {
     # character and at least three components.
     # reference http://perldoc.perl.org/functions/package.html
 
-    my (
-        $self,    $input_line, $i,
-        $i_beg,   $tok,        $type,
-        $rtokens, $rtoken_map, $max_token_index
-    ) = @_;
+    my ( $self, $rcall_hash ) = @_;
+
+    my $input_line      = $rcall_hash->{input_line};
+    my $i               = $rcall_hash->{i};
+    my $i_beg           = $rcall_hash->{i_beg};
+    my $tok             = $rcall_hash->{tok};
+    my $type            = $rcall_hash->{type};
+    my $rtokens         = $rcall_hash->{rtokens};
+    my $rtoken_map      = $rcall_hash->{rtoken_map};
+    my $max_token_index = $rcall_hash->{max_token_index};
+
     my $package = undef;
     my $pos_beg = $rtoken_map->[$i_beg];
     pos($input_line) = $pos_beg;
@@ -7764,7 +8192,7 @@ sub do_scan_package {
         # variables, like $^W: (issue c066).
         my @q =
           qw{ ? A B C D E F G H I J K L M N O P Q R S T U V W X Y Z [ \ ] ^ _ };
-        @{is_special_variable_char}{@q} = (1) x scalar(@q);
+        @is_special_variable_char{@q} = (1) x scalar(@q);
     } ## end BEGIN
 
     # These are the possible states for this scanner:
@@ -7993,7 +8421,7 @@ sub do_scan_package {
                           "Space in identifier, following $identifier\n";
                     }
                     else {
-                        ## ok: silently accept space after '$' and '@' sigils
+                        # silently accept space after '$' and '@' sigils
                     }
                 }
             }
@@ -8260,7 +8688,6 @@ sub do_scan_package {
         my $self = shift;
 
         # Starting sub call after seeing an '&'
-
         if ( $tok =~ /^[\$\w]/ ) {    # alphanumeric ..
             $id_scan_state = $scan_state_COLON;    # now need ::
             $saw_alpha     = 1;
@@ -8296,9 +8723,10 @@ sub do_scan_package {
 
                 # Special variable (c066)
                 $identifier .= $tok;
-                $type = '&';
+                $type = 'i';
 
-                # There may be one more character, not a space, after the ^
+                # To be a special $^ variable, there may be one more character,
+                # not a space, after the ^
                 my $next1 = $rtokens->[ $i + 1 ];
                 my $chr   = substr( $next1, 0, 1 );
                 if ( $is_special_variable_char{$chr} ) {
@@ -8314,7 +8742,9 @@ sub do_scan_package {
                 }
                 else {
 
-                    # it is &^
+                    # It is &^.  This is parsed by perl as a call to sub '^',
+                    # even though it would be difficult to create a sub '^'.
+                    # So we mark it as an identifier (c068).
                     $id_scan_state = EMPTY_STRING;
                 }
             }
@@ -8382,8 +8812,15 @@ sub do_scan_package {
         # files are processed, causing an error.
 
         (
-            my $self, $i, $id_scan_state, $identifier, $rtokens,
-            $max_token_index, $expecting, $container_type
+            my $self,
+
+            $i,
+            $id_scan_state,
+            $identifier,
+            $rtokens,
+            $max_token_index,
+            $expecting,
+            $container_type
         ) = @_;
 
         # return flag telling caller to split the pretoken
@@ -8630,8 +9067,16 @@ EOM
             print {*STDOUT}
 "SCANID: returned with tok, i, state, identifier =$tok, $i, $id_scan_state, $identifier\n";
         };
-        return ( $i, $tok, $type, $id_scan_state, $identifier,
-            $split_pretoken_flag );
+
+        return (
+
+            $i,
+            $tok,
+            $type,
+            $id_scan_state,
+            $identifier,
+            $split_pretoken_flag
+        );
     } ## end sub scan_complex_identifier
 } ## end closure for sub scan_complex_identifier
 
@@ -8643,7 +9088,7 @@ EOM
 
         # lexical subs with these names can cause parsing errors in this version
         my @q = qw( m q qq qr qw qx s tr y );
-        @{warn_if_lexical}{@q} = (1) x scalar(@q);
+        @warn_if_lexical{@q} = (1) x scalar(@q);
     } ## end BEGIN
 
     # saved package and subnames in case prototype is on separate line
@@ -8704,17 +9149,17 @@ EOM
         # $rsaw_function_definition,
         # $statement_type
 
-        my ( $self, $rinput_hash ) = @_;
+        my ( $self, $rcall_hash ) = @_;
 
-        my $input_line      = $rinput_hash->{input_line};
-        my $i               = $rinput_hash->{i};
-        my $i_beg           = $rinput_hash->{i_beg};
-        my $tok             = $rinput_hash->{tok};
-        my $type            = $rinput_hash->{type};
-        my $rtokens         = $rinput_hash->{rtokens};
-        my $rtoken_map      = $rinput_hash->{rtoken_map};
-        my $id_scan_state   = $rinput_hash->{id_scan_state};
-        my $max_token_index = $rinput_hash->{max_token_index};
+        my $input_line      = $rcall_hash->{input_line};
+        my $i               = $rcall_hash->{i};
+        my $i_beg           = $rcall_hash->{i_beg};
+        my $tok             = $rcall_hash->{tok};
+        my $type            = $rcall_hash->{type};
+        my $rtokens         = $rcall_hash->{rtokens};
+        my $rtoken_map      = $rcall_hash->{rtoken_map};
+        my $id_scan_state   = $rcall_hash->{id_scan_state};
+        my $max_token_index = $rcall_hash->{max_token_index};
 
         my $i_entry = $i;
 
@@ -8970,7 +9415,7 @@ EOM
             # something else..
             elsif ($next_nonblank_token) {
 
-                if ( $rinput_hash->{tok} eq 'method' && $call_type == SUB_CALL )
+                if ( $rcall_hash->{tok} eq 'method' && $call_type == SUB_CALL )
                 {
                     # For a method call, silently ignore this error (rt145706)
                     # to avoid needless warnings. Example which can produce it:
@@ -9034,35 +9479,33 @@ sub find_next_nonblank_token {
     }
 
     my $next_nonblank_token = $rtokens->[ ++$i ];
+
+    # Any more tokens?
     return ( SPACE, $i )
       if ( !defined($next_nonblank_token) || !length($next_nonblank_token) );
 
-    # Quick test for nonblank ascii char. Note that we just have to
-    # examine the first character here.
+    # Skip over whitespace
     my $ord = ord( substr( $next_nonblank_token, 0, 1 ) );
-    if (   $ord >= ORD_PRINTABLE_MIN
-        && $ord <= ORD_PRINTABLE_MAX )
+    if (
+
+        ( $ord <= ORD_PRINTABLE_MIN || $ord >= ORD_PRINTABLE_MAX )
+
+        # Quick test for ascii space or tab
+        && (
+            ( $ord == ORD_SPACE || $ord == ORD_TAB )
+
+            # Slow test to for something else identified as whitespace
+            || $next_nonblank_token =~ /^\s+$/
+        )
+      )
     {
-        return ( $next_nonblank_token, $i );
-    }
-
-    # Quick test to skip over an ascii space or tab
-    elsif ( $ord == ORD_SPACE || $ord == ORD_TAB ) {
         $next_nonblank_token = $rtokens->[ ++$i ];
         return ( SPACE, $i ) unless defined($next_nonblank_token);
-    }
-
-    # Slow test to skip over something else identified as whitespace
-    elsif ( $next_nonblank_token =~ /^\s*$/ ) {
-        $next_nonblank_token = $rtokens->[ ++$i ];
-        return ( SPACE, $i ) unless defined($next_nonblank_token);
-    }
-    else {
-        ## at nonblank
     }
 
     # We should be at a nonblank now
     return ( $next_nonblank_token, $i );
+
 } ## end sub find_next_nonblank_token
 
 sub find_next_noncomment_token {
@@ -9153,7 +9596,7 @@ sub is_possible_numerator {
         # /(\)|\}|\;|\&\&|\|\||and|or|while|if|unless)/
         my @q = qw( & && | || ? : + - * and or while if unless);
         push @q, ')', '}', ']', '>', ',', ';';
-        @{pattern_test}{@q} = (1) x scalar(@q);
+        @pattern_test{@q} = (1) x scalar(@q);
     } ## end BEGIN
 
     sub pattern_expected {
@@ -9169,9 +9612,13 @@ sub is_possible_numerator {
         my $is_pattern = 0;
 
         my $next_token = $rtokens->[ $i + 1 ];
-        if ( $next_token =~ /^[msixpodualgc]/ ) {
+
+        # skip a possible quote modifier
+        my $possible_modifiers = $quote_modifiers{'m'};
+        if ( $next_token =~ /^$possible_modifiers/ ) {
             $i++;
-        }    # skip possible modifier
+        }
+
         my ( $next_nonblank_token, $i_next ) =
           $self->find_next_nonblank_token( $i, $rtokens, $max_token_index );
 
@@ -9479,7 +9926,6 @@ EOM
         my $numc = $pos - $pos_beg;
         $number = substr( $input_line, $pos_beg, $numc );
         $type   = 'v';
-        $self->report_v_string($number);
     }
 
     # handle octal, hex, binary
@@ -9502,7 +9948,7 @@ EOM
            [0-9a-fA-F_]*)                # optional Additional exponent digits
 
            # or hex integer
-           |([xX][0-9a-fA-F_]+)        
+           |([xX][0-9a-fA-F_]+)
 
            # or octal fraction
            |([oO]?[0-7_]+          # string of octal digits
@@ -9514,13 +9960,13 @@ EOM
            |([oO]?[0-7_]+)         # string of octal digits
 
            # or a binary float
-           |([bB][01_]*            # 'b' with string of binary digits 
+           |([bB][01_]*            # 'b' with string of binary digits
            (\.([01][01_]*)?)?      # optional decimal and fraction
            [Pp][+-]?[01]           # Required exponent indicator, no underscore
            [01_]*)                 # additional exponent bits
 
            # or binary integer
-           |([bB][01_]+)           # 'b' with string of binary digits 
+           |([bB][01_]+)           # 'b' with string of binary digits
 
            )}gx
           )
@@ -9637,11 +10083,24 @@ sub find_here_doc {
         my $quoted_string;
 
         (
-            $i, $in_quote, $here_quote_character, $quote_pos, $quote_depth,
+
+            $i,
+            $in_quote,
+            $here_quote_character,
+            $quote_pos,
+            $quote_depth,
             $quoted_string
           )
-          = $self->follow_quoted_string( $i_next_nonblank, $in_quote, $rtokens,
-            $here_quote_character, $quote_pos, $quote_depth, $max_token_index );
+          = $self->follow_quoted_string(
+
+            $i_next_nonblank,
+            $in_quote,
+            $rtokens,
+            $here_quote_character,
+            $quote_pos,
+            $quote_depth,
+            $max_token_index
+          );
 
         if ($in_quote) {    # didn't find end of quote, so no target found
             $i = $ibeg;
@@ -9742,11 +10201,24 @@ sub do_quote {
     if ( $in_quote == 2 ) {    # two quotes/quoted_string_1s to follow
         my $ibeg = $i;
         (
-            $i, $in_quote, $quote_character, $quote_pos, $quote_depth,
+
+            $i,
+            $in_quote,
+            $quote_character,
+            $quote_pos,
+            $quote_depth,
             $quoted_string
           )
-          = $self->follow_quoted_string( $ibeg, $in_quote, $rtokens,
-            $quote_character, $quote_pos, $quote_depth, $max_token_index );
+          = $self->follow_quoted_string(
+
+            $ibeg,
+            $in_quote,
+            $rtokens,
+            $quote_character,
+            $quote_pos,
+            $quote_depth,
+            $max_token_index
+          );
         $quoted_string_2 .= $quoted_string;
         if ( $in_quote == 1 ) {
             if ( $quote_character =~ /[\{\[\<\(]/ ) { $i++; }
@@ -9760,11 +10232,24 @@ sub do_quote {
     if ( $in_quote == 1 ) {    # one (more) quote to follow
         my $ibeg = $i;
         (
-            $i, $in_quote, $quote_character, $quote_pos, $quote_depth,
+
+            $i,
+            $in_quote,
+            $quote_character,
+            $quote_pos,
+            $quote_depth,
             $quoted_string
           )
-          = $self->follow_quoted_string( $ibeg, $in_quote, $rtokens,
-            $quote_character, $quote_pos, $quote_depth, $max_token_index );
+          = $self->follow_quoted_string(
+
+            $ibeg,
+            $in_quote,
+            $rtokens,
+            $quote_character,
+            $quote_pos,
+            $quote_depth,
+            $max_token_index
+          );
         $quoted_string_1 .= $quoted_string;
         if ( $in_quote == 1 ) {
             $quoted_string_1 .= "\n";
@@ -9782,6 +10267,17 @@ sub do_quote {
 
     );
 } ## end sub do_quote
+
+# Some possible non-word quote delimiters, for preliminary checking
+my %is_punct_char;
+
+BEGIN {
+
+    my @q = qw# / " ' { } ( ) [ ] < > ; + - * | % ! x ~ = ? : . ^ & #;
+    push @q, '#';
+    push @q, ',';
+    @is_punct_char{@q} = (1) x scalar(@q);
+}
 
 sub follow_quoted_string {
 
@@ -9822,12 +10318,20 @@ sub follow_quoted_string {
 "QUOTE entering with quote_pos = $quote_pos i=$i beginning_tok =$beginning_tok\n";
     };
 
-    # get the corresponding end token
-    if ( $beginning_tok !~ /^\s*$/ ) {
-        $end_tok = matching_end_token($beginning_tok);
+    # for a non-blank token, get the corresponding end token
+    if (
+        $is_punct_char{$beginning_tok}
+        || ( length($beginning_tok)
+            && $beginning_tok !~ /^\s+$/ )
+      )
+    {
+        $end_tok =
+            $matching_end_token{$beginning_tok}
+          ? $matching_end_token{$beginning_tok}
+          : $beginning_tok;
     }
 
-    # a blank token means we must find and use the first non-blank one
+    # for a blank token, find and use the first non-blank one
     else {
         my $allow_quote_comments = ( $i < 0 ) ? 1 : 0; # i<0 means we saw a <cr>
 
@@ -9849,7 +10353,10 @@ sub follow_quoted_string {
                         $beginning_tok = $tok;
                         $quote_pos     = 0;
                     }
-                    $end_tok     = matching_end_token($beginning_tok);
+                    $end_tok =
+                        $matching_end_token{$beginning_tok}
+                      ? $matching_end_token{$beginning_tok}
+                      : $beginning_tok;
                     $quote_depth = 1;
                     last;
                 }
@@ -9871,7 +10378,7 @@ sub follow_quoted_string {
     # Case 1 (rare): loop for case of alphanumeric quote delimiter..
     # "quote_pos" is the position the current word to begin searching
     #----------------------------------------------------------------
-    if ( $beginning_tok =~ /\w/ ) {
+    if ( !$is_punct_char{$beginning_tok} && $beginning_tok =~ /\w/ ) {
 
         # Note this because it is not recommended practice except
         # for obfuscated perl contests
@@ -9890,7 +10397,7 @@ sub follow_quoted_string {
 
                     # retain backslash unless it hides the end token
                     $quoted_string .= $tok
-                      unless $rtokens->[ $i + 1 ] eq $end_tok;
+                      unless ( $rtokens->[ $i + 1 ] eq $end_tok );
                     $quote_pos++;
                     last if ( $i >= $max_token_index );
                     $tok = $rtokens->[ ++$i ];
@@ -9986,7 +10493,7 @@ sub write_error_indicator_pair {
       make_numbered_line( $line_number, $input_line, $pos );
     $underline = write_on_underline( $underline, $pos - $offset, $carrat );
     $self->warning( $numbered_line . "\n" );
-    $underline =~ s/\s*$//;
+    $underline =~ s/\s+$//;
     $self->warning( $underline . "\n" );
     return;
 } ## end sub write_error_indicator_pair
@@ -10158,29 +10665,6 @@ sub show_tokens {
     return;
 } ## end sub show_tokens
 
-{    ## closure for sub matching end token
-    my %matching_end_token;
-
-    BEGIN {
-        %matching_end_token = (
-            '{' => '}',
-            '(' => ')',
-            '[' => ']',
-            '<' => '>',
-        );
-    } ## end BEGIN
-
-    sub matching_end_token {
-
-        # return closing character for a pattern
-        my $beginning_token = shift;
-        if ( $matching_end_token{$beginning_token} ) {
-            return $matching_end_token{$beginning_token};
-        }
-        return ($beginning_token);
-    } ## end sub matching_end_token
-}
-
 sub dump_token_types {
     my ( $class, $fh ) = @_;
 
@@ -10188,18 +10672,18 @@ sub dump_token_types {
     # adding NEW_TOKENS: add a comment here
     $fh->print(<<'END_OF_LIST');
 
-Here is a list of the token types currently used for lines of type 'CODE'.  
-For the following tokens, the "type" of a token is just the token itself.  
+Here is a list of the token types currently used for lines of type 'CODE'.
+For the following tokens, the "type" of a token is just the token itself.
 
 .. :: << >> ** && .. || // -> => += -= .= %= &= |= ^= *= <>
 ( ) <= >= == =~ !~ != ++ -- /= x=
-... **= <<= >>= &&= ||= //= <=> 
+... **= <<= >>= &&= ||= //= <=>
 , + - / * | % ! x ~ = \ ? : . < > ^ &
 
 The following additional token types are defined:
 
  type    meaning
-    b    blank (white space) 
+    b    blank (white space)
     {    indent: opening structural curly brace or square bracket or paren
          (code block, anonymous hash reference, or anonymous array reference)
     }    outdent: right structural curly brace or square bracket or paren
@@ -10208,7 +10692,7 @@ The following additional token types are defined:
     (    left non-structural paren (all but a list right of an =)
     )    right non-structural paren
     L    left non-structural curly brace (enclosing a key)
-    R    right non-structural curly brace 
+    R    right non-structural curly brace
     ;    terminal semicolon
     f    indicates a semicolon in a "for" statement
     h    here_doc operator <<
@@ -10234,9 +10718,9 @@ The following additional token types are defined:
     p    unary +
     m    unary -
     pp   pre-increment operator ++
-    mm   pre-decrement operator -- 
+    mm   pre-decrement operator --
     A    : used as attribute separator
-    
+
     Here are the '_line_type' codes used internally:
     SYSTEM         - system-specific code before hash-bang line
     CODE           - line of perl code (including comments)
@@ -10258,6 +10742,94 @@ END_OF_LIST
 
     return;
 } ## end sub dump_token_types
+
+#------------------
+# About Token Types
+#------------------
+
+# The array "valid_token_types" in the BEGIN section has an up-to-date list
+# of token types.  Sub 'dump_token_types' should be kept up to date with
+# token types.
+
+# Ideally, tokens are the smallest pieces of text
+# such that a newline may be inserted between any pair of tokens without
+# changing or invalidating the program. This version comes close to this,
+# although there are necessarily a few exceptions which must be caught by
+# the formatter.  Many of these involve the treatment of bare words.
+#
+# To simplify things, token types are either a single character, or they
+# are identical to the tokens themselves.
+#
+# As a debugging aid, the -D flag creates a file containing a side-by-side
+# comparison of the input string and its tokenization for each line of a file.
+# This is an invaluable debugging aid.
+#
+# In addition to tokens, and some associated quantities, the tokenizer
+# also returns flags indication any special line types.  These include
+# quotes, here_docs, formats.
+#
+#------------------
+# Adding NEW_TOKENS
+#------------------
+#
+# Here are some notes on the minimal steps.  I wrote these notes while
+# adding the 'v' token type for v-strings, which are things like version
+# numbers 5.6.0, and ip addresses, and will use that as an example.  ( You
+# can use your editor to search for the string "NEW_TOKENS" to find the
+# appropriate sections to change):
+
+# *. For another example, search for the smartmatch operator '~~'
+# with your editor to see where updates were made for it.
+
+# *. For another example, search for the string 'c250', which shows
+# locations where changes for new types 'P' and 'S' were made.
+
+# *. Think of a new, unused character for the token type, and add to
+# the array @valid_token_types in the BEGIN section of this package.
+# For example, I used 'v' for v-strings.
+#
+# *. Implement coding to recognize the $type of the token in this routine.
+# This is the hardest part, and is best done by imitating or modifying
+# some of the existing coding.  For example, to recognize v-strings, I
+# patched 'sub scan_bare_identifier' to recognize v-strings beginning with
+# 'v' and 'sub scan_number' to recognize v-strings without the leading 'v'.
+#
+# *. Update sub operator_expected.  This update is critically important but
+# the coding is trivial.  Look at the comments in that routine for help.
+# For v-strings, which should behave like numbers, I just added 'v' to the
+# regex used to handle numbers and strings (types 'n' and 'Q').
+#
+# *. Implement a 'bond strength' rule in sub set_bond_strengths in
+# Perl::Tidy::Formatter for breaking lines around this token type.  You can
+# skip this step and take the default at first, then adjust later to get
+# desired results.  For adding type 'v', I looked at sub bond_strength and
+# saw that number type 'n' was using default strengths, so I didn't do
+# anything.  I may tune it up someday if I don't like the way line
+# breaks with v-strings look.
+#
+# *. Implement a 'whitespace' rule in sub set_whitespace_flags in
+# Perl::Tidy::Formatter.  For adding type 'v', I looked at this routine
+# and saw that type 'n' used spaces on both sides, so I just added 'v'
+# to the array @spaces_both_sides.
+#
+# *. Update HtmlWriter package so that users can colorize the token as
+# desired.  This is quite easy; see comments identified by 'NEW_TOKENS' in
+# that package.  For v-strings, I initially chose to use a default color
+# equal to the default for numbers, but it might be nice to change that
+# eventually.
+#
+# *. Update comments in Perl::Tidy::Tokenizer::dump_token_types.
+#
+# *. Run lots and lots of debug tests.  Start with special files designed
+# to test the new token type.  Run with the -D flag to create a .DEBUG
+# file which shows the tokenization.  When these work ok, test as many old
+# scripts as possible.  Start with all of the '.t' files in the 'test'
+# directory of the distribution file.  Compare .tdy output with previous
+# version and updated version to see the differences.  Then include as
+# many more files as possible. My own technique has been to collect a huge
+# number of perl scripts (thousands!) into one directory and run perltidy
+# *, then run diff between the output of the previous version and the
+# current version.
 
 BEGIN {
 
@@ -10681,6 +11253,29 @@ BEGIN {
     @q = qw(q qq qw qx qr s y tr m);
     @is_q_qq_qw_qx_qr_s_y_tr_m{@q} = (1) x scalar(@q);
 
+    # Quote modifiers:
+    # original ref: camel 3 p 147,
+    # but perl may accept undocumented flags
+    # perl 5.10 adds 'p' (preserve)
+    # Perl version 5.22 added 'n'
+    # From http://perldoc.perl.org/perlop.html we have
+    # /PATTERN/msixpodualngc or m?PATTERN?msixpodualngc
+    # s/PATTERN/REPLACEMENT/msixpodualngcer
+    # y/SEARCHLIST/REPLACEMENTLIST/cdsr
+    # tr/SEARCHLIST/REPLACEMENTLIST/cdsr
+    # qr/STRING/msixpodualn
+    %quote_modifiers = (
+        's'  => '[msixpodualngcer]',
+        'y'  => '[cdsr]',
+        'tr' => '[cdsr]',
+        'm'  => '[msixpodualngc]',
+        'qr' => '[msixpodualn]',
+        'q'  => EMPTY_STRING,
+        'qq' => EMPTY_STRING,
+        'qw' => EMPTY_STRING,
+        'qx' => EMPTY_STRING,
+    );
+
     # Note: 'class' will be added by sub check_options if -use-feature=class
     @q = qw(package);
     @is_package{@q} = (1) x scalar(@q);
@@ -10919,5 +11514,14 @@ BEGIN {
     #  __DATA__ __END__
 
     @is_keyword{@Keywords} = (1) x scalar(@Keywords);
+
+    %matching_end_token = (
+        '{' => '}',
+        '(' => ')',
+        '[' => ']',
+        '<' => '>',
+    );
 } ## end BEGIN
+
+} ## end package Perl::Tidy::Tokenizer
 1;

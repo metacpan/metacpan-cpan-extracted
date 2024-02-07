@@ -6,7 +6,7 @@
 
 Alien::YAMLScript - Find or install libyamlscript
 
-=head1 SYNOPSIS
+=head2 SYNOPSIS
 
     use Alien::YAMLScript;
 
@@ -14,15 +14,15 @@ Alien::YAMLScript - Find or install libyamlscript
     say $alien->libs;
     say $alien->cflags;
 
-=head1 STATUS
+=head2 STATUS
 
 This is ALPHA software. Expect things to change.
 
-=head1 DESCRIPTION
+=head2 DESCRIPTION
 
 This L<Alien|https://metacpan.org/pod/Alien> module provides access to the libyamlscript shared library. You are unlikely to need to use this module directly. See L<YAMLScript|https://metacpan.org/pod/YAMLScript> for a more likely entrypoint.
 
-=head1 SEE ALSO
+=head2 SEE ALSO
 
 =over
 
@@ -34,17 +34,17 @@ This L<Alien|https://metacpan.org/pod/Alien> module provides access to the libya
 
 =back
 
-=head1 AUTHORS
+=head2 AUTHORS
 
 =over
 
-=item * Ingy döt Net L<ingy@ingy.net|mailto:ingy@ingy.net>
+=item * L<Ingy döt Net|https://github.com/ingydotnet>
 
-=item * José Joaquín Atria L<jjatria@cpan.org|mailto:jjatria@cpan.org>
+=item * L<José Joaquín Atria|https://github.com/jjatria>
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head2 COPYRIGHT AND LICENSE
 
 Copyright 2022-2024 by Ingy döt Net
 

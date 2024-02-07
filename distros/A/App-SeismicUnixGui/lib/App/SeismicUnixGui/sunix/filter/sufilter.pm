@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::filter::sufilter;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUFILTER - applies a zero-phase, sine-squared tapered filter		
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   Nov 1 2012,July 27 2015
  DESCRIPTION: sufilter a lists of header words
  or an single value

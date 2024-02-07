@@ -27,6 +27,22 @@
       PUSHs(sv); \
     }
 
+#define PDL_FLAG_COMMA(f) f,
+#define PDL_FLAG_STRCOMMA(f) #f,
+#define PDL_FLAG_DUMP(macro, flagvar) \
+    int flagval[] = { \
+      macro(PDL_FLAG_COMMA) \
+      0 \
+    }; \
+    char *flagchar[] = { \
+      macro(PDL_FLAG_STRCOMMA) \
+      NULL \
+    }; \
+    int i, f = flagvar; \
+    for (i=0; flagval[i]!=0; i++) \
+      if (f & flagval[i]) \
+        XPUSHs(sv_2mortal(newSVpv(flagchar[i], 0)));
+
 #define setflag(reg,flagval,val) (val?(reg |= flagval):(reg &= ~flagval))
 
 Core PDL; /* Struct holding pointers to shared C routines */
@@ -78,13 +94,6 @@ trans_children(self)
 
 INCLUDE_COMMAND: $^X -e "require q{./Dev.pm}; PDL::Core::Dev::generate_core_flags()"
 
-void
-set_inplace(self,val)
-  pdl *self;
-  int val;
-  CODE:
-    setflag(self->state,PDL_INPLACE,val);
-
 IV
 address(self)
   pdl *self;
@@ -92,6 +101,70 @@ address(self)
     RETVAL = PTR2IV(self);
   OUTPUT:
     RETVAL
+
+IV
+address_data(self)
+  pdl *self;
+  CODE:
+    RETVAL = PTR2IV(self->data);
+  OUTPUT:
+    RETVAL
+
+PDL_Indx
+nelem_nophys(x)
+  pdl *x
+  CODE:
+    RETVAL = x->nvals;
+  OUTPUT:
+    RETVAL
+
+# only returns list, not context-aware
+void
+dims_nophys(x)
+  pdl *x
+  PPCODE:
+    EXTEND(sp, x->ndims);
+    PDL_Indx i;
+    for(i=0; i<x->ndims; i++) mPUSHi(x->dims[i]);
+
+# only returns list, not context-aware
+void
+broadcastids_nophys(x)
+  pdl *x
+  PPCODE:
+    EXTEND(sp, x->nbroadcastids);
+    PDL_Indx i;
+    for(i=0; i<x->nbroadcastids; i++) mPUSHi(x->broadcastids[i]);
+
+void
+firstvals_nophys(x)
+  pdl *x
+  PPCODE:
+    if (!(x->state & PDL_ALLOCATED)) barf("firstvals_nophys called on non-ALLOCATED", x);
+    PDL_Indx i, maxvals = PDLMIN(10, x->nvals);
+    EXTEND(sp, maxvals);
+    for(i=0; i<maxvals; i++) {
+      PDL_Anyval anyval = pdl_get_offs(x, i);
+      if (anyval.type < 0) barf("Error getting value, type=%d", anyval.type);
+      SV *sv = sv_newmortal();
+      ANYVAL_TO_SV(sv, anyval);
+      PUSHs(sv);
+    }
+
+IV
+vaffine_from(self)
+  pdl *self;
+  CODE:
+    if (!self->vafftrans) barf("vaffine_from called on %p with NULL vafftrans", self);
+    RETVAL = PTR2IV(self->vafftrans->from);
+  OUTPUT:
+    RETVAL
+
+void
+flags(x)
+  pdl *x
+  PPCODE:
+    PDL_FLAG_DUMP(PDL_LIST_FLAGS_PDLSTATE, x->state)
 
 int
 set_donttouchdata(it,size)
@@ -236,6 +309,77 @@ children(trans)
   pdl_trans *trans
   PPCODE:
     TRANS_PDLS(vtable->nparents, vtable->npdls)
+
+IV
+address(self)
+  pdl_trans *self;
+  CODE:
+    RETVAL = PTR2IV(self);
+  OUTPUT:
+    RETVAL
+
+char *
+name(self)
+  pdl_trans *self;
+  CODE:
+    if (!self->vtable) barf("%p has NULL vtable", self);
+    RETVAL = self->vtable->name;
+  OUTPUT:
+    RETVAL
+
+void
+flags(x)
+  pdl_trans *x
+  PPCODE:
+    PDL_FLAG_DUMP(PDL_LIST_FLAGS_PDLTRANS, x->flags)
+
+void
+flags_vtable(x)
+  pdl_trans *x
+  PPCODE:
+    if (!x->vtable) barf("%p has NULL vtable", x);
+    PDL_FLAG_DUMP(PDL_LIST_FLAGS_PDLVTABLE, x->vtable->flags)
+
+int
+vaffine(x)
+  pdl_trans *x
+  CODE:
+    RETVAL= !!(x->flags & PDL_ITRANS_ISAFFINE);
+  OUTPUT:
+    RETVAL
+
+IV
+offs(self)
+  pdl_trans *self;
+  CODE:
+    RETVAL = PTR2IV(self->offs);
+  OUTPUT:
+    RETVAL
+
+void
+incs(x)
+  pdl_trans *x;
+  PPCODE:
+    if (!(x->flags & PDL_ITRANS_ISAFFINE)) barf("incs called on non-vaffine trans %p", x);
+    PDL_Indx i, max = x->incs ? x->pdls[1]->ndims : 0;
+    EXTEND(sp, max);
+    for(i=0; i<max; i++) mPUSHi(x->incs[i]);
+
+void
+ind_sizes(x)
+  pdl_trans *x;
+  PPCODE:
+    PDL_Indx i, max = x->vtable->ninds;
+    EXTEND(sp, max);
+    for(i=0; i<max; i++) mPUSHi(x->ind_sizes[i]);
+
+void
+inc_sizes(x)
+  pdl_trans *x;
+  PPCODE:
+    PDL_Indx i, max = x->vtable->nind_ids;
+    EXTEND(sp, max);
+    for(i=0; i<max; i++) mPUSHi(x->inc_sizes[i]);
 
 MODULE = PDL::Core     PACKAGE = PDL::Core
 
@@ -660,16 +804,6 @@ upd_data(self, keep_datasv=0)
 	  PDLDEBUG_f(printf("upd_data datasv gone, maybe reshaped\n"));
 	}
 	PDLDEBUG_f(printf("upd_data end: "); pdl_dump(self));
-
-void
-set_dataflow_f(self,value)
-	pdl *self;
-	int value;
-	CODE:
-	if(value)
-		self->state |= PDL_DATAFLOW_F;
-	else
-		self->state &= ~PDL_DATAFLOW_F;
 
 int
 badflag(x,newval=0)

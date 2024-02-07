@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Card;
-$Games::Solitaire::Verify::Card::VERSION = '0.2403';
+$Games::Solitaire::Verify::Card::VERSION = '0.2500';
 use warnings;
 use strict;
 
@@ -18,7 +18,7 @@ __PACKAGE__->mk_acc_ref(
             rank
             suit
             _game
-            )
+        )
     ]
 );
 
@@ -272,7 +272,7 @@ Solitaire card.
 
 =head1 VERSION
 
-version 0.2403
+version 0.2500
 
 =head1 SYNOPSIS
 

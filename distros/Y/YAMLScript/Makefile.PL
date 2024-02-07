@@ -17,15 +17,15 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "YAMLScript",
   "PREREQ_PM" => {
-    "Alien::YAMLScript" => "0.1.22",
+    "Alien::YAMLScript" => "0.1.36",
+    "Cpanel::JSON::XS" => "4.37",
     "FFI::CheckLib" => "0.31",
-    "FFI::Platypus" => "2.08",
-    "JSON" => "4.1"
+    "FFI::Platypus" => "2.08"
   },
   "TEST_REQUIRES" => {
     "Test2::V0" => "0.000159"
   },
-  "VERSION" => "0.1.22",
+  "VERSION" => "0.1.36",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,10 +33,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Alien::YAMLScript" => "0.1.22",
+  "Alien::YAMLScript" => "0.1.36",
+  "Cpanel::JSON::XS" => "4.37",
   "FFI::CheckLib" => "0.31",
   "FFI::Platypus" => "2.08",
-  "JSON" => "4.1",
   "Test2::V0" => "0.000159"
 );
 

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Record;
 # ABSTRACT: Container for Cypher result values
-$Neo4j::Driver::Record::VERSION = '0.42';
+$Neo4j::Driver::Record::VERSION = '0.44';
 
 use Carp qw(croak);
 use JSON::MaybeXS 1.003003 qw(is_bool);
@@ -114,7 +114,7 @@ Neo4j::Driver::Record - Container for Cypher result values
 
 =head1 VERSION
 
-version 0.42
+version 0.44
 
 =head1 SYNOPSIS
 
@@ -159,52 +159,9 @@ category C<ambiguous> will be issued.
  $value = $session->run('RETURN "It works!"')->single->get;
  $value = $session->run('RETURN "warning", "ambiguous"')->single->get;
 
-When retrieving values from records, Neo4j types are converted to Perl
-types as shown in the following table.
-
- Neo4j type      resulting Perl type
- ----------      -------------------
- Number          scalar
- String          scalar
- Boolean         JSON::PP::true or JSON::PP::false
- null            undef
- 
- Node            Neo4j::Types::Node
- Relationship    Neo4j::Types::Relationship
- Path            Neo4j::Types::Path
- 
- List            array reference
- Map             hash reference
-
-Boolean values are returned in a type that is trackable such
-that their being boolean is preserved in case they are sent back
-to Neo4j as a query parameter. They are currently provided as
-L<JSON::PP::Boolean>, but you can use C<!!> to force-convert to
-a plain scalar L<Perl distinguished boolean|builtin/"is_bool">
-value if necessary. Future versions of this driver may switch
-to always provide distinguished booleans.
-
-Neo4j types are currently implemented by the following packages:
-
-=over
-
-=item * L<Neo4j::Types::Node> is implemented by
-L<Neo4j::Driver::Type::Node>.
-
-=item * L<Neo4j::Types::Relationship> is implemented by
-L<Neo4j::Driver::Type::Relationship>.
-
-=item * L<Neo4j::Types::Path> is implemented by
-L<Neo4j::Driver::Type::Path>.
-
-=back
-
-In a future version of this driver, these types will
-be implemented by other packages, but they will
-continue to inherit from L<Neo4j::Types> and have that interface.
-
-I<B<Note:> The type mapping documentation above will soon be replaced
-by L<Neo4j::Driver::Types>.>
+Values are returned from Neo4j as L<Neo4j::Types> objects and
+as simple Perl references / scalars. For details and for known
+issues with type mapping see L<Neo4j::Driver::Types>.
 
 =head2 data
 
@@ -221,10 +178,6 @@ Return the keys and values of this record as a hash reference.
 
 =item * L<Neo4j::Driver::Types>
 
-=item * L<Neo4j::Driver::Type::B<Node>>,
-L<Neo4j::Driver::Type::B<Relationship>>,
-L<Neo4j::Driver::Type::B<Path>>
-
 =item * Equivalent documentation for the official Neo4j drivers:
 L<Record (Java)|https://neo4j.com/docs/api/java-driver/5.2/org.neo4j.driver/org/neo4j/driver/Record.html>,
 L<Record (JavaScript)|https://neo4j.com/docs/api/javascript-driver/5.2/class/lib6/record.js~Record.html>,
@@ -234,11 +187,11 @@ L<IRecord (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.2/html/ca4ccbd1-2925
 
 =head1 AUTHOR
 
-Arne Johannessen (L<AJNN|https://arne.johannessen.de/>)
+Arne Johannessen (L<AJNN|https://metacpan.org/author/AJNN>)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2023 by Arne Johannessen.
+This software is Copyright (c) 2016-2024 by Arne Johannessen.
 
 This is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0 or (at your option) the same terms

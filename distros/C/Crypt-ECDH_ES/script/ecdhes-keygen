@@ -33,20 +33,6 @@ print $formatter->(@keys);
 #PODNAME: ecdhes-keygen
 #ABSTRACT: A tool for generating ecdhes keys
 
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-ecdhes-keygen - A tool for generating ecdhes keys
-
-=head1 VERSION
-
-version 0.004
-
 =head1 SYNOPSIS
 
  $ ecdhes-keygen --base64
@@ -72,16 +58,3 @@ The new keys will be encoded to base64.
 The new keys will be encoded with uuencode.
 
 =back
-
-=head1 AUTHOR
-
-Leon Timmermans <leont@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015 by Leon Timmermans.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

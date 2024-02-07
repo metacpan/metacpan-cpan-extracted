@@ -1,11 +1,40 @@
 Revision history for Perl extension PGXN::Site
 
+0.23.4  2024-02-06T23:47:18Z
+      - Fixed the dependency configuration in `Build.PL` so it actually knows
+        to install modules required for testing. Thanks to Slaven Rezic for the
+        report!
+      - Added a link to the GitHub repo and issues to the docs and README.
+      - Updated some wayward http URLs to https.
+
+0.23.3  2024-02-06T20:20:13Z
+      - Fixed 404 "Not Found" errors for documentation with uppercase characters
+        in the file name, such as `/dist/vectorize/vector-serve/README.html`,
+        and fixes another letter casing issue for links to between stable,
+        testing, and unstable states on the distribution page.
+
+0.23.2  2024-02-05T21:28:11Z
+      - Restored the limit on the list of recent release on the home page to five.
+        Was inadvertently removed in v0.22.1.
+
+0.23.0  2024-02-05T20:26:43Z
+      - Updated links in the static pages, removing or replacing dead URLs.
+      - Changed the default search index from "Documentation" to "Distributions".
+        Few releases include documentation other than a README, which pgxn-api
+        indexes in the distributions index and not the documentation index. So
+        make distribution search the default to improve the default search
+        experience.
+      - Updated the build metadata to comply with CPAN Meta spec v2.
+      - Changed the "Release It!" link in the footer to "Release on PGXN" to
+        make its intent clearer.
+      - Added a Python one-liner to serve a mirror to `mirroring.mmd`.
+
 0.22.2  2023-02-18T23:25:58Z
       - Replaced Twitter link with Mastodon and added a rel link to Mastodon
         to the header.
 
 0.22.1  2022-01-17T18:52:06Z
-      - Updated the "Recent Releases" box on the home page to filter out=
+      - Updated the "Recent Releases" box on the home page to filter out
         duplicate distributions, so as to avoid redundancy.
 
 0.22.0  2021-05-29T21:32:54Z

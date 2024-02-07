@@ -1,3 +1,4 @@
+=encoding UTF-8
 =head1 NAME
 
 Date - extremely fast Date framework with timezones, microseconds, relative dates and intervals support.

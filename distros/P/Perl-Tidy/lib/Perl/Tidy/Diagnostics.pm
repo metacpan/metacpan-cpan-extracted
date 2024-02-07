@@ -18,7 +18,7 @@ package Perl::Tidy::Diagnostics;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
-our $VERSION = '20230912';
+our $VERSION = '20240202';
 
 use constant EMPTY_STRING => q{};
 
@@ -35,13 +35,13 @@ sub AUTOLOAD {
 ======================================================================
 Error detected in package '$my_package', version $VERSION
 Received unexpected AUTOLOAD call for sub '$AUTOLOAD'
-Called from package: '$pkg'  
+Called from package: '$pkg'
 Called from File '$fname'  at line '$lno'
 This error is probably due to a recent programming change
 ======================================================================
 EOM
     exit 1;
-}
+} ## end sub AUTOLOAD
 
 sub DESTROY {
 
@@ -57,7 +57,7 @@ sub new {
         _input_file              => EMPTY_STRING,
         _fh                      => undef,
     }, $class;
-}
+} ## end sub new
 
 sub set_input_file {
     my ( $self, $input_file ) = @_;
@@ -92,6 +92,6 @@ sub write_diagnostics {
     $fh->print($msg);
     $self->{_write_diagnostics_count}++;
     return;
-}
+} ## end sub write_diagnostics
 
 1;

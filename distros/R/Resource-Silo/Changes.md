@@ -1,5 +1,10 @@
 # Revision history for Resource::Silo
 
+- 0.12    Sun Feb 04 2024
+    - [api] Added 'use Resource::Silo -shortcut => 'custom_function_name'
+    - [doc] Rework documentation
+    - [api] Add silo->ctl->list_cached method to inspect cache
+
 - 0.11    Wed Oct 04 2023
     - Use namespace::clean to remove unneeded imports from the container class
     - Use Moo internally, enforce Moo/Moose compatibility

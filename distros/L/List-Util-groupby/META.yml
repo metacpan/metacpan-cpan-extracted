@@ -19,7 +19,7 @@ name: List-Util-groupby
 provides:
   List::Util::groupby:
     file: lib/List/Util/groupby.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Exporter: '5.57'
   perl: '5.010001'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=List-Util-groupby
   homepage: https://metacpan.org/release/List-Util-groupby
   repository: git://github.com/perlancar/perl-List-Util-groupby.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -109,7 +109,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.608'
+      version: '0.610'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'

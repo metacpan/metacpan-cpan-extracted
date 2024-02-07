@@ -13,7 +13,7 @@ Neo4j::Driver::Deprecations - Explains features that have been deprecated, but n
 
 =head1 VERSION
 
-version 0.42
+version 0.44
 
 =head1 OVERVIEW
 
@@ -293,15 +293,15 @@ with L<parent>):
 
 =over
 
-=item * L<Neo4j::Driver::Type::Node>
+=item * Neo4j::Driver::Type::Node
 
-=item * L<Neo4j::Driver::Type::Relationship>
+=item * Neo4j::Driver::Type::Relationship
 
-=item * L<Neo4j::Driver::Type::Path>
+=item * Neo4j::Driver::Type::Path
 
-=item * L<Neo4j::Driver::Type::Point>
+=item * Neo4j::Driver::Type::Point
 
-=item * L<Neo4j::Driver::Type::Temporal>
+=item * Neo4j::Driver::Type::Temporal
 
 =back
 
@@ -402,9 +402,9 @@ distinguish between structural types and simple maps / lists.
 It also made it difficult to access metadata. See GitHub issues
 L<#2|https://github.com/johannessen/neo4j-driver-perl/issues/2> and L<#8|https://github.com/johannessen/neo4j-driver-perl/issues/8>.
 
-Proper blessed types for L<nodes|Neo4j::Driver::Type::Node>,
-L<relationships|Neo4j::Driver::Type::Relationship> and
-L<paths|Neo4j::Driver::Type::Path> were added in S<version 0.13,>
+Proper blessed types for nodes,
+relationships and
+paths were added in S<version 0.13,>
 and directly accessing their elements and properties using
 C<< ->[] >> or C<< ->{} >> was deprecated at the same time.
 A deprecation warning was added in version 0.18.
@@ -781,11 +781,11 @@ Use L<C<elements()>|Neo4j::Types::Path/"elements"> instead.
 
 =head1 AUTHOR
 
-Arne Johannessen (L<AJNN|https://arne.johannessen.de/>)
+Arne Johannessen (L<AJNN|https://metacpan.org/author/AJNN>)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2023 by Arne Johannessen.
+This software is Copyright (c) 2016-2024 by Arne Johannessen.
 
 This is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0 or (at your option) the same terms

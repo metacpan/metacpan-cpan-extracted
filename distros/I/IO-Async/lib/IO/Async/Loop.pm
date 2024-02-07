@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Loop;
+package IO::Async::Loop 0.803;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.802';
 
 # When editing this value don't forget to update the docs below
 use constant NEED_API_VERSION => '0.33';
@@ -154,6 +152,7 @@ undisturbed.
 sub __new
 {
    my $class = shift;
+   our $VERSION;
 
    # Detect if the API version provided by the subclass is sufficient
    $class->can( "API_VERSION" ) or
@@ -210,7 +209,7 @@ sub DESTROY
 
 =head2 new
 
-   $loop = IO::Async::Loop->new
+   $loop = IO::Async::Loop->new;
 
 This function attempts to find a good subclass to use, then calls its
 constructor. It works by making a list of likely candidate classes, then
@@ -380,7 +379,7 @@ The following methods manage the collection of L<IO::Async::Notifier> objects.
 
 =head2 add
 
-   $loop->add( $notifier )
+   $loop->add( $notifier );
 
 This method adds another notifier object to the stored collection. The object
 may be a L<IO::Async::Notifier>, or any subclass of it.
@@ -426,7 +425,7 @@ sub _add_noparentcheck
 
 =head2 remove
 
-   $loop->remove( $notifier )
+   $loop->remove( $notifier );
 
 This method removes a notifier object from the stored collection, and
 recursively and children notifiers it contains.
@@ -466,7 +465,7 @@ sub _remove_noparentcheck
 
 =head2 notifiers
 
-   @notifiers = $loop->notifiers
+   @notifiers = $loop->notifiers;
 
 Returns a list of all the notifier objects currently stored in the Loop.
 
@@ -492,7 +491,7 @@ program.
 
 =head2 loop_once
 
-   $count = $loop->loop_once( $timeout )
+   $count = $loop->loop_once( $timeout );
 
 This method performs a single wait loop using the specific subclass's
 underlying mechanism. If C<$timeout> is undef, then no timeout is applied, and
@@ -513,9 +512,9 @@ sub loop_once
 
 =head2 run
 
-   @result = $loop->run
+   @result = $loop->run;
 
-   $result = $loop->run
+   $result = $loop->run;
 
 Runs the actual IO event loop. This method blocks until the C<stop> method is
 called, and returns the result that was passed to C<stop>. In scalar context
@@ -543,7 +542,7 @@ sub run
 
 =head2 stop
 
-   $loop->stop( @result )
+   $loop->stop( @result );
 
 Stops the inner-most C<run> method currently in progress, causing it to return
 the given C<@result>.
@@ -563,7 +562,7 @@ sub stop
 
 =head2 loop_forever
 
-   $loop->loop_forever
+   $loop->loop_forever;
 
 A synonym for C<run>, though this method does not return a result.
 
@@ -578,7 +577,7 @@ sub loop_forever
 
 =head2 loop_stop
 
-   $loop->loop_stop
+   $loop->loop_stop;
 
 A synonym for C<stop>, though this method does not pass any results.
 
@@ -592,7 +591,7 @@ sub loop_stop
 
 =head2 post_fork
 
-   $loop->post_fork
+   $loop->post_fork;
 
 The base implementation of this method does nothing. It is provided in case
 some Loop subclasses should take special measures after a C<fork()> system
@@ -625,7 +624,7 @@ The following methods relate to L<IO::Async::Future> objects.
 
 =head2 new_future
 
-   $future = $loop->new_future
+   $future = $loop->new_future;
 
 Returns a new L<IO::Async::Future> instance with a reference to the Loop.
 
@@ -640,12 +639,12 @@ sub new_future
 
 =head2 await
 
-   $loop->await( $future )
+   await $loop->await( $future );
 
 Blocks until the given future is ready, as indicated by its C<is_ready> method.
 As a convenience it returns the future, to simplify code:
 
-   my @result = $loop->await( $future )->get;
+   my @result = await $loop->await( $future );
 
 =cut
 
@@ -661,7 +660,7 @@ sub await
 
 =head2 await_all
 
-   $loop->await_all( @futures )
+   $loop->await_all( @futures );
 
 Blocks until all the given futures are ready, as indicated by the C<is_ready>
 method. Equivalent to calling C<await> on a C<< Future->wait_all >> except
@@ -681,7 +680,7 @@ sub await_all
 
 =head2 delay_future
 
-   $loop->delay_future( %args )->get
+   await $loop->delay_future( %args );
 
 Returns a new L<IO::Async::Future> instance which will become done at a given
 point in time. The C<%args> should contain an C<at> or C<after> key as per the
@@ -707,7 +706,7 @@ sub delay_future
 
 =head2 timeout_future
 
-   $loop->timeout_future( %args )->get
+   await $loop->timeout_future( %args );
 
 Returns a new L<IO::Async::Future> instance which will fail at a given point
 in time. The C<%args> should contain an C<at> or C<after> key as per the
@@ -741,8 +740,8 @@ Most of the following methods are higher-level wrappers around base
 functionality provided by the low-level API documented below. They may be
 used by L<IO::Async::Notifier> subclasses or called directly by the program.
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in C<await> expressions return L<Future>
+instances.
 
 =cut
 
@@ -765,7 +764,7 @@ sub __new_feature
 
 =head2 attach_signal
 
-   $id = $loop->attach_signal( $signal, $code )
+   $id = $loop->attach_signal( $signal, $code );
 
 This method adds a new signal handler to watch the given signal. The same
 signal can be attached to multiple times; its callback functions will all be
@@ -831,7 +830,7 @@ sub attach_signal
 
 =head2 detach_signal
 
-   $loop->detach_signal( $signal, $id )
+   $loop->detach_signal( $signal, $id );
 
 Removes a previously-attached signal handler.
 
@@ -874,9 +873,9 @@ sub detach_signal
 
 =head2 later
 
-   $loop->later( $code )
+   $loop->later( $code );
 
-   $f = $loop->later
+   $f = $loop->later;
 
 Schedules a code reference to be invoked as soon as the current round of IO
 operations is complete.
@@ -918,7 +917,7 @@ sub later
 
 =head2 spawn_child
 
-   $loop->spawn_child( %params )
+   $loop->spawn_child( %params );
 
 This method creates a new child process to run a given code block or command.
 The C<%params> hash takes the following keys:
@@ -1133,7 +1132,7 @@ sub spawn_child
 
 =head2 open_process
 
-   $process = $loop->open_process( %params )
+   $process = $loop->open_process( %params );
 
 I<Since version 0.72.>
 
@@ -1164,19 +1163,19 @@ sub open_process
 
 =head2 open_child
 
-   $pid = $loop->open_child( %params )
+   $pid = $loop->open_child( %params );
 
 A back-compatibility wrapper to calling L</open_process> and returning the PID
 of the newly-constructed L<IO::Async::Process> instance. The C<on_finish>
 continuation likewise will be invoked with the PID rather than the process
 instance.
 
-   $on_finish->( $pid, $exitcode )
+   $on_finish->( $pid, $exitcode );
 
 Similarly, a C<on_error> continuation is accepted, though note its arguments
 come in a different order to those of the Process's C<on_exception>:
 
-   $on_error->( $pid, $exitcode, $errno, $exception )
+   $on_error->( $pid, $exitcode, $errno, $exception );
 
 This method should not be used in new code; instead use L</open_process>
 directly.
@@ -1210,9 +1209,9 @@ sub open_child
 
 =head2 run_process
 
-   @results = $loop->run_process( %params )->get
+   @results = await $loop->run_process( %params );
 
-   ( $exitcode, $stdout ) = $loop->run_process( ... )->get  # by default
+   ( $exitcode, $stdout ) = await $loop->run_process( ... );  # by default
 
 I<Since version 0.73.>
 
@@ -1256,7 +1255,7 @@ Optional. If true, the returned future will fail if the process exits with a
 nonzero status. The failure will contain a message, the C<process> category
 name, and the capture values that were requested.
 
-   Future->fail( $message, process => @captures )
+   Future->fail( $message, process => @captures );
 
 =back
 
@@ -1267,15 +1266,15 @@ perl C<readpipe> function (`backticks`), allowing it to replace
 
 with
 
-   my ( $exitcode, $output ) = $loop->run_process(
+   my ( $exitcode, $output ) = await $loop->run_process(
       command => "command here", 
-   )->get;
+   );
 
 Z<>
 
-   my ( $exitcode, $stdout ) = $loop->run_process(
+   my ( $exitcode, $stdout ) = await $loop->run_process(
       command => "/bin/ps",
-   )->get;
+   );
 
    my $status = ( $exitcode >> 8 );
    print "ps exited with status $status\n";
@@ -1353,7 +1352,7 @@ sub run_process
 
 =head2 run_child
 
-   $pid = $loop->run_child( %params )
+   $pid = $loop->run_child( %params );
 
 A back-compatibility wrapper for L</run_process>, returning the PID and taking
 an C<on_finish> continuation instead of returning a Future.
@@ -1372,7 +1371,7 @@ C<run_process>:
 A continuation to be called when the child process exits and closed its STDOUT
 and STDERR streams. It will be invoked in the following way:
 
-   $on_finish->( $pid, $exitcode, $stdout, $stderr )
+   $on_finish->( $pid, $exitcode, $stdout, $stderr );
 
 The second argument is passed the plain perl C<$?> value.
 
@@ -1407,7 +1406,7 @@ sub run_child
 
 =head2 resolver
 
-   $loop->resolver
+   $resolver = $loop->resolver;
 
 Returns the internally-stored L<IO::Async::Resolver> object, used for name
 resolution operations by the C<resolve>, C<connect> and C<listen> methods.
@@ -1428,7 +1427,7 @@ sub resolver
 
 =head2 set_resolver
 
-   $loop->set_resolver( $resolver )
+   $loop->set_resolver( $resolver );
 
 Sets the internally-stored L<IO::Async::Resolver> object. In most cases this
 method should not be required, but it may be used to provide an alternative
@@ -1451,7 +1450,7 @@ sub set_resolver
 
 =head2 resolve
 
-   @result = $loop->resolve( %params )->get
+   @result = await $loop->resolve( %params );
 
 This method performs a single name resolution operation. It uses an
 internally-stored L<IO::Async::Resolver> object. For more detail, see the
@@ -1469,7 +1468,7 @@ sub resolve
 
 =head2 connect
 
-   $handle|$socket = $loop->connect( %params )->get
+   $handle|$socket = await $loop->connect( %params );
 
 This method performs a non-blocking connection to a given address or set of
 addresses, returning a L<IO::Async::Future> which represents the operation. On
@@ -1635,7 +1634,7 @@ below.
 
 =head2 connect (void)
 
-   $loop->connect( %params )
+   $loop->connect( %params );
 
 When not returning a future, additional parameters can be given containing the
 continuations to invoke on success or failure.
@@ -1648,7 +1647,7 @@ A continuation that is invoked on a successful C<connect(2)> call to a valid
 socket. It will be passed the connected socket handle, as an C<IO::Socket>
 object.
 
-   $on_connected->( $handle )
+   $on_connected->( $handle );
 
 =item on_stream => CODE
 
@@ -1664,7 +1663,7 @@ transport for a Protocol object.
 Similar to C<on_stream>, but constructs an instance of L<IO::Async::Socket>.
 This is most useful for C<SOCK_DGRAM> or C<SOCK_RAW> sockets.
 
-   $on_socket->( $socket )
+   $on_socket->( $socket );
 
 =item on_connect_error => CODE
 
@@ -1674,7 +1673,7 @@ occurred, and the name of the operation it occurred in. Errors from the
 C<connect(2)> syscall are considered most significant, then C<bind(2)>, then
 finally C<socket(2)>.
 
-   $on_connect_error->( $syscall, $! )
+   $on_connect_error->( $syscall, $! );
 
 =item on_resolve_error => CODE
 
@@ -1773,7 +1772,7 @@ sub connect
 
 =head2 listen
 
-   $listener = $loop->listen( %params )->get
+   $listener = await $loop->listen( %params );
 
 This method sets up a listening socket and arranges for an acceptor callback
 to be invoked each time a new connection is accepted on the socket. Internally
@@ -1900,7 +1899,7 @@ below.
 
 =head2 listen (void)
 
-   $loop->listen( %params )
+   $loop->listen( %params );
 
 When not returning a future, additional parameters can be given containing the
 continuations to invoke on success or failure.
@@ -1912,7 +1911,7 @@ continuations to invoke on success or failure.
 Optional. A callback that is invoked when the Listener object is ready to
 receive connections. The callback is passed the Listener object itself.
 
-   $on_notifier->( $listener )
+   $on_notifier->( $listener );
 
 If this callback is required, it may instead be better to construct the
 Listener object directly.
@@ -2126,8 +2125,8 @@ sub _listen_hostservice
    my $self = shift;
    my ( $listener, $host, $service, %params ) = @_;
 
-   $host ||= "";
-   defined $service or $service = ""; # might be 0
+   $host    ||= "";
+   $service //= "";
 
    my %gai_hints;
    exists $params{$_} and $gai_hints{$_} = $params{$_} for qw( family socktype protocol flags );
@@ -2156,7 +2155,7 @@ to give different implementations on that OS.
 
 =head2 signame2num
 
-   $signum = $loop->signame2num( $signame )
+   $signum = $loop->signame2num( $signame );
 
 Legacy wrappers around L<IO::Async::OS> functions.
 
@@ -2166,7 +2165,7 @@ sub signame2num { shift; IO::Async::OS->signame2num( @_ ) }
 
 =head2 time
 
-   $time = $loop->time
+   $time = $loop->time;
 
 Returns the current UNIX time in fractional seconds. This is currently
 equivalent to C<Time::HiRes::time> but provided here as a utility for
@@ -2183,7 +2182,7 @@ sub time
 
 =head2 fork
 
-   $pid = $loop->fork( %params )
+   $pid = $loop->fork( %params );
 
 This method creates a new child process to run a given code block, returning
 its process ID.
@@ -2202,7 +2201,7 @@ thows an exception).
 A optional continuation to be called when the child processes exits. It will
 be invoked in the following way:
 
-   $on_exit->( $pid, $exitcode )
+   $on_exit->( $pid, $exitcode );
 
 The second argument is passed the plain perl C<$?> value.
 
@@ -2261,7 +2260,7 @@ sub fork
 
 =head2 create_thread
 
-   $tid = $loop->create_thread( %params )
+   $tid = $loop->create_thread( %params );
 
 This method creates a new (non-detached) thread to run the given code block,
 returning its thread ID.
@@ -2285,11 +2284,11 @@ C<scalar> if not supplied.
 Callback to invoke when the thread function returns or throws an exception.
 If it returned, this callback will be invoked with its result
 
-   $on_joined->( return => @result )
+   $on_joined->( return => @result );
 
 If it threw an exception the callback is invoked with the value of C<$@>
 
-   $on_joined->( died => $! )
+   $on_joined->( died => $! );
 
 =back
 
@@ -2385,7 +2384,7 @@ to implement a C<IO::Async::Loop> subclass.
 
 =head2 API_VERSION
 
-   IO::Async::Loop->API_VERSION
+   IO::Async::Loop->API_VERSION;
 
 This method will be called by the magic constructor on the class before it is
 constructed, to ensure that the specific implementation will support the
@@ -2416,7 +2415,7 @@ sub post_wait
 
 =head2 watch_io
 
-   $loop->watch_io( %params )
+   $loop->watch_io( %params );
 
 This method installs callback functions which will be invoked when the given
 IO handle becomes read- or write-ready.
@@ -2488,7 +2487,7 @@ sub __watch_io
 
 =head2 unwatch_io
 
-   $loop->unwatch_io( %params )
+   $loop->unwatch_io( %params );
 
 This method removes a watch on an IO handle which was previously installed by
 C<watch_io>.
@@ -2549,7 +2548,7 @@ sub __unwatch_io
 
 =head2 watch_signal
 
-   $loop->watch_signal( $signal, $code )
+   $loop->watch_signal( $signal, $code );
 
 This method adds a new signal handler to watch the given signal.
 
@@ -2589,7 +2588,7 @@ sub watch_signal
 
 =head2 unwatch_signal
 
-   $loop->unwatch_signal( $signal )
+   $loop->unwatch_signal( $signal );
 
 This method removes the signal callback for the given signal.
 
@@ -2615,7 +2614,7 @@ sub unwatch_signal
 
 =head2 watch_time
 
-   $id = $loop->watch_time( %args )
+   $id = $loop->watch_time( %args );
 
 This method installs a callback which will be called at the specified time.
 The time may either be specified as an absolute value (the C<at> key), or
@@ -2748,7 +2747,7 @@ sub _build_time
 
 =head2 enqueue_timer
 
-   $id = $loop->enqueue_timer( %params )
+   $id = $loop->enqueue_timer( %params );
 
 An older version of C<watch_time>. This method should not be used in new code
 but is retained for legacy purposes. For simple watch/unwatch behaviour use
@@ -2773,7 +2772,7 @@ sub enqueue_timer
 
 =head2 cancel_timer
 
-   $loop->cancel_timer( $id )
+   $loop->cancel_timer( $id );
 
 An older version of C<unwatch_time>. This method should not be used in new
 code but is retained for legacy purposes.
@@ -2789,7 +2788,7 @@ sub cancel_timer
 
 =head2 requeue_timer
 
-   $newid = $loop->requeue_timer( $id, %params )
+   $newid = $loop->requeue_timer( $id, %params );
 
 Reschedule an existing timer, moving it to a new time. The old timer is
 removed and will not be invoked.
@@ -2818,7 +2817,7 @@ sub requeue_timer
 
 =head2 watch_idle
 
-   $id = $loop->watch_idle( %params )
+   $id = $loop->watch_idle( %params );
 
 This method installs a callback which will be called at some point in the near
 future.
@@ -2889,7 +2888,7 @@ sub watch_idle
 
 =head2 unwatch_idle
 
-   $loop->unwatch_idle( $id )
+   $loop->unwatch_idle( $id );
 
 Cancels a previously-installed idle handler.
 
@@ -2933,7 +2932,7 @@ sub _reap_children
 
 =head2 watch_process
 
-   $loop->watch_process( $pid, $code )
+   $loop->watch_process( $pid, $code );
 
 This method adds a new handler for the termination of the given child process
 PID, or all child processes.
@@ -3012,7 +3011,7 @@ sub watch_child { shift->watch_process( @_ ) }
 
 =head2 unwatch_process
 
-   $loop->unwatch_process( $pid )
+   $loop->unwatch_process( $pid );
 
 This method removes a watch on an existing child process PID.
 
@@ -3051,7 +3050,7 @@ cases of each will be documented in the above section.
 
 =head2 _adjust_timeout
 
-   $loop->_adjust_timeout( \$timeout )
+   $loop->_adjust_timeout( \$timeout );
 
 Shortens the timeout value passed in the scalar reference if it is longer in
 seconds than the time until the next queued event on the timer queue. If there
@@ -3092,7 +3091,7 @@ sub _adjust_timeout
 
 =head2 _manage_queues
 
-   $loop->_manage_queues
+   $loop->_manage_queues;
 
 Checks the timer queue for callbacks that should have been invoked by now, and
 runs them all, removing them from the queue. It also invokes all of the
@@ -3144,14 +3143,14 @@ For example,
    $loop->connect(
       extensions => [qw( FOO BAR )],
       %args
-   )
+   );
 
 will become
 
    $loop->FOO_connect(
       extensions => [qw( BAR )],
       %args
-   )
+   );
 
 This is provided so that extension modules, such as L<IO::Async::SSL> can
 easily be invoked indirectly, by passing extra arguments to C<connect> methods

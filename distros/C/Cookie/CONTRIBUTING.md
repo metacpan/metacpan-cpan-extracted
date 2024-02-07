@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackde
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Cookie-v0.3.2/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Cookie-v0.3.3/README.md)
 
 ## Author
 

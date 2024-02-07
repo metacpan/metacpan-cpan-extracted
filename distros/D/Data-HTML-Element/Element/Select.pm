@@ -3,10 +3,12 @@ package Data::HTML::Element::Select;
 use strict;
 use warnings;
 
+use Data::HTML::Element::Utils qw(check_data check_data_type);
 use Mo qw(build default is);
-use Mo::utils qw(check_array_object check_bool check_number);
+use Mo::utils qw(check_bool check_number);
+use Mo::utils::CSS qw(check_css_class);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 has autofocus => (
 	is => 'ro',
@@ -14,6 +16,15 @@ has autofocus => (
 
 has css_class => (
 	is => 'ro',
+);
+
+has data => (
+	default => [],
+	ro => 1,
+);
+
+has data_type => (
+	ro => 1,
 );
 
 has disabled => (
@@ -40,11 +51,6 @@ has name => (
 	is => 'ro',
 );
 
-has options => (
-	default => [],
-	is => 'ro',
-);
-
 has required => (
 	is => 'ro',
 );
@@ -62,6 +68,15 @@ sub BUILD {
 	}
 	check_bool($self, 'autofocus');
 
+	# Check CSS class.
+	check_css_class($self, 'css_class');
+
+	# Check data type.
+	check_data_type($self);
+
+	# Check data based on type.
+	check_data($self);
+
 	# Check disabled.
 	if (! defined $self->{'disabled'}) {
 		$self->{'disabled'} = 0;
@@ -73,9 +88,6 @@ sub BUILD {
 		$self->{'multiple'} = 0;
 	}
 	check_bool($self, 'multiple');
-
-	# Check options.
-	check_array_object($self, 'options', 'Data::HTML::Element::Option', 'Option');
 
 	# Check required.
 	if (! defined $self->{'required'}) {

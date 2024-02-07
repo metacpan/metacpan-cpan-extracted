@@ -1,3 +1,6 @@
+1.01 Thu Feb 01 16:04:00 CET 2024
+    - Introduced caching (memoization) in Schema Registry calling
+
 0.04 Thu Dec 17 21:35:03 CEST 2020
     - Fixed dependencies versions
 

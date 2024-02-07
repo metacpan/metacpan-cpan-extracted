@@ -1,5 +1,8 @@
 Revision history for Perl module Test::URI
 
+1.085 2024-02-04T06:36:26Z
+	* refresh distro, update email address
+
 1.084 2022-01-09T02:38:09Z
 	* no code changes. Fix link in README.pod.
 

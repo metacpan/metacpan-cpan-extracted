@@ -2364,7 +2364,8 @@ Search for values in a sorted array, return index appropriate for sampling from 
   $idx = vsearch_sample($vals, $x);
 
 C<$x> must be sorted, but may be in decreasing or increasing
-order.
+order.  if C<$x> is empty, then all values in C<$idx> will be
+set to the bad value.
 
 B<vsearch_sample> returns an index I<I> for each value I<V> of C<$vals> appropriate
 for sampling C<$vals>
@@ -2412,7 +2413,7 @@ function to obtain cumulative probabilities from absolute probabilities.
 
 =for bad
 
-needs major (?) work to handles bad values
+bad values in vals() result in bad values in idx()
 
 =cut
 
@@ -2441,7 +2442,8 @@ Determine the insertion point for values in a sorted array, inserting before dup
   $idx = vsearch_insert_leftmost($vals, $x);
 
 C<$x> must be sorted, but may be in decreasing or increasing
-order.
+order.  if C<$x> is empty, then all values in C<$idx> will be
+set to the bad value.
 
 B<vsearch_insert_leftmost> returns an index I<I> for each value I<V> of
 C<$vals> equal to the leftmost position (by index in array) within
@@ -2485,7 +2487,7 @@ leftmost (by index in array) duplicate if I<V> matches.
 
 =for bad
 
-needs major (?) work to handles bad values
+bad values in vals() result in bad values in idx()
 
 =cut
 
@@ -2514,7 +2516,8 @@ Determine the insertion point for values in a sorted array, inserting after dupl
   $idx = vsearch_insert_rightmost($vals, $x);
 
 C<$x> must be sorted, but may be in decreasing or increasing
-order.
+order.  if C<$x> is empty, then all values in C<$idx> will be
+set to the bad value.
 
 B<vsearch_insert_rightmost> returns an index I<I> for each value I<V> of
 C<$vals> equal to the rightmost position (by index in array) within
@@ -2558,7 +2561,7 @@ leftmost (by index in array) duplicate if I<V> matches.
 
 =for bad
 
-needs major (?) work to handles bad values
+bad values in vals() result in bad values in idx()
 
 =cut
 
@@ -2587,7 +2590,8 @@ Match values against a sorted array.
   $idx = vsearch_match($vals, $x);
 
 C<$x> must be sorted, but may be in decreasing or increasing
-order.
+order.  if C<$x> is empty, then all values in C<$idx> will be
+set to the bad value.
 
 B<vsearch_match> returns an index I<I> for each value I<V> of
 C<$vals>.  If I<V> matches an element in C<$x>, I<I> is the
@@ -2600,7 +2604,7 @@ duplicated values, I<I> may refer to any of them.
 
 =for bad
 
-needs major (?) work to handles bad values
+bad values in vals() result in bad values in idx()
 
 =cut
 
@@ -2629,7 +2633,8 @@ Determine the index for values in a sorted array of bins, lower bound inclusive.
   $idx = vsearch_bin_inclusive($vals, $x);
 
 C<$x> must be sorted, but may be in decreasing or increasing
-order.
+order.  if C<$x> is empty, then all values in C<$idx> will be
+set to the bad value.
 
 C<$x> represents the edges of contiguous bins, with the first and
 last elements representing the outer edges of the outer bins, and the
@@ -2671,7 +2676,7 @@ righmost (by index in array) duplicate if I<V> matches.
 
 =for bad
 
-needs major (?) work to handles bad values
+bad values in vals() result in bad values in idx()
 
 =cut
 
@@ -2700,7 +2705,8 @@ Determine the index for values in a sorted array of bins, lower bound exclusive.
   $idx = vsearch_bin_exclusive($vals, $x);
 
 C<$x> must be sorted, but may be in decreasing or increasing
-order.
+order.  if C<$x> is empty, then all values in C<$idx> will be
+set to the bad value.
 
 C<$x> represents the edges of contiguous bins, with the first and
 last elements representing the outer edges of the outer bins, and the
@@ -2742,7 +2748,7 @@ righmost (by index in array) duplicate if I<V> matches.
 
 =for bad
 
-needs major (?) work to handles bad values
+bad values in vals() result in bad values in idx()
 
 =cut
 
@@ -2801,7 +2807,7 @@ needs major (?) work to handles bad values
 
 
 
-#line 2974 "primitive.pd"
+#line 2997 "primitive.pd"
 		sub PDL::interpolate {
 			my ($xi, $x, $y, $yi, $err) = @_;
 			croak "x must be real" if (ref($x) && ! $x->type->real);
@@ -2811,7 +2817,7 @@ needs major (?) work to handles bad values
 			PDL::_interpolate_int($xi, $x, $y, $yi, $err);
 			($yi, $err);
 		}
-#line 2815 "Primitive.pm"
+#line 2821 "Primitive.pm"
 
 *interpolate = \&PDL::interpolate;
 
@@ -2819,7 +2825,7 @@ needs major (?) work to handles bad values
 
 
 
-#line 3054 "primitive.pd"
+#line 3077 "primitive.pd"
 
 =head2 interpol
 
@@ -2855,7 +2861,7 @@ sub interpol ($$$;$) {
 } # sub: interpol()
 *PDL::interpol = \&interpol;
 
-#line 3092 "primitive.pd"
+#line 3115 "primitive.pd"
 =head2 interpND
 
 =for ref
@@ -3097,7 +3103,7 @@ sub PDL::interpND {
  }
 }
 
-#line 3341 "primitive.pd"
+#line 3364 "primitive.pd"
 =head2 one2nd
 
 =for ref
@@ -3144,7 +3150,7 @@ sub PDL::one2nd {
   }
   return @index;
 }
-#line 3148 "Primitive.pm"
+#line 3154 "Primitive.pm"
 
 =head2 which
 
@@ -3205,7 +3211,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 3472 "primitive.pd"
+#line 3495 "primitive.pd"
    sub which { my ($this,$out) = @_;
 		$this = $this->flat;
 		$out //= $this->nullcreate;
@@ -3214,7 +3220,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 		$lastoutmax ? $out->slice('0:'.($lastoutmax-1))->sever : empty(indx);
    }
    *PDL::which = \&which;
-#line 3218 "Primitive.pm"
+#line 3224 "Primitive.pm"
 
 *which = \&PDL::which;
 
@@ -3259,7 +3265,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 3489 "primitive.pd"
+#line 3512 "primitive.pd"
    sub which_both { my ($this,$outi,$outni) = @_;
 		$this = $this->flat;
 		$outi //= $this->nullcreate;
@@ -3272,7 +3278,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 		($outi, $lastoutnmax ? $outni->slice('0:'.($lastoutnmax-1))->sever : empty(indx));
    }
    *PDL::which_both = \&which_both;
-#line 3276 "Primitive.pm"
+#line 3282 "Primitive.pm"
 
 *which_both = \&PDL::which_both;
 
@@ -3280,7 +3286,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 3522 "primitive.pd"
+#line 3545 "primitive.pd"
 
 =head2 where
 
@@ -3346,7 +3352,7 @@ sub PDL::where {
 }
 *where = \&PDL::where;
 
-#line 3590 "primitive.pd"
+#line 3613 "primitive.pd"
 =head2 where_both
 
 =for ref
@@ -3382,7 +3388,7 @@ sub PDL::where_both {
 }
 *where_both = \&PDL::where_both;
 
-#line 3628 "primitive.pd"
+#line 3651 "primitive.pd"
 =head2 whereND
 
 =for ref
@@ -3464,7 +3470,7 @@ sub PDL::whereND :lvalue {
 }
 *whereND = \&PDL::whereND;
 
-#line 3713 "primitive.pd"
+#line 3736 "primitive.pd"
 =head2 whichND
 
 =for ref
@@ -3567,7 +3573,7 @@ sub PDL::whichND {
   return $ind;
 }
 
-#line 3822 "primitive.pd"
+#line 3845 "primitive.pd"
 =head2 setops
 
 =for ref
@@ -3747,7 +3753,7 @@ sub PDL::setops {
 
 }
 
-#line 4005 "primitive.pd"
+#line 4028 "primitive.pd"
 =head2 intersect
 
 =for ref
@@ -3782,7 +3788,7 @@ sub PDL::intersect {
 
 }
 
-#line 4041 "primitive.pd"
+#line 4064 "primitive.pd"
 =head1 AUTHOR
 
 Copyright (C) Tuomas J. Lukka 1997 (lukka@husc.harvard.edu). Contributions
@@ -3798,7 +3804,7 @@ the copyright notice should be included in the file.
 Updated for CPAN viewing compatibility by David Mertens.
 
 =cut
-#line 3802 "Primitive.pm"
+#line 3808 "Primitive.pm"
 
 # Exit with OK status
 

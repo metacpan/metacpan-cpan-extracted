@@ -19,7 +19,7 @@ no multidimensional;
 
 use Cwd;
 
-use Test::More tests => 198;
+use Test::More tests => 212;
 use Test::Output;
 
 #####################################
@@ -231,7 +231,6 @@ _setup_file('/lxc/run-test-broken.conf',
 	    '#MASTER:L42,-,-',
 	    'lxc.rootfs.path=' . CONF_ROOT . '/run-test-broken',
 	    'lxc.net.0.ipv4.address = 10.0.3.42/24');
-my $re_output =
 $ENV{ALC_DEBUG} = 0;		# cover branch in App::LXC::Container::run
 
 _setup_file('/lxc-ls', '#!/bin/sh', 'exit 0');	# lxc-ls runs before nft!
@@ -515,7 +514,7 @@ check_config_file(TMP_PATH . '/lxc/run-test-1/lxc-run.sh',
 # otherwise Devel::Cover gets confused):
 $ENV{PATH} = '';		# lxc-execute and lxc-attach will fail
 
-$re_output =
+my $re_output =
     "using 'PoorTerm' as UI\n" .
     '.+"lxc-execute": [^:]+App/LXC/Container/Run\.pm line \d+\.' . "\n" .
     "call to 'lxc-execute' failed: No such file or directory at -e line \\d\\.";
@@ -552,6 +551,23 @@ $_ = _sub_perl('use App::LXC::Container;
 		$_->_run();');
 like($_, qr{^using 'PoorTerm' as UI$},
      '_run in 2nd mockup test (lxc-attach) seems correct');
+
+_setup_dir('/lxc/run-test-1/.xauth-dir');
+_setup_file('/lxc/run-test-1/.xauth-dir/.Xauthority', 42);
+_chmod(0555, '/lxc/run-test-1/.xauth-dir');
+$_ = _sub_perl('use App::LXC::Container;
+		$_ = App::LXC::Container::Run->new
+		("run-test-1", "root", "/", "command");
+		$_->_run();');
+$re_output =
+    "using 'PoorTerm' as UI\n" .
+    "can't remove .+tmp/lxc/run-test-1/.xauth-dir/.Xauthority': " .
+    'Permission denied at -e line \d\.';
+like($_, qr{^$re_output$},
+     '_run in 3rd mockup test (lxc-execute protected .Xauthority) fails correct');
+_chmod(0755, '/lxc/run-test-1/.xauth-dir');
+_remove_file('/lxc/run-test-1/.xauth-dir/.Xauthority');
+_remove_dir('/lxc/run-test-1/.xauth-dir');
 
 #########################################################################
 # tests with 2nd valid configuration:
@@ -603,12 +619,12 @@ system('cp', '-a',
 $ENV{DISPLAY} = ':0';
 $ENV{XAUTHORITY} = HOME_PATH . '/.Xauthority';
 
-_remove_file('/lxc/run-test-2/.xauth/.Xauthority');
-_remove_dir(TMP_PATH . '/lxc/run-test-2/.xauth');
+_remove_file('/lxc/run-test-2/.xauth-root/.Xauthority');
+_remove_dir(TMP_PATH . '/lxc/run-test-2/.xauth-root');
 _chmod(0555, '/lxc/run-test-2');
 eval '$_->_write_init_sh();';	# 1 - creating .xauth directory fails
 like($@,
-    qr{^can't create .+tmp/lxc/run-test-2/.xauth': Permission denied$re_eval},
+    qr{^can't create .+/lxc/run-test-2/.xauth-root': Permission denied$re_eval},
     'failing write-access for .xauth directory has correct output');
 _chmod(0755, '/lxc/run-test-2');
 
@@ -627,13 +643,15 @@ is($@, '', 'creating startup script with full X11 access run without problems');
 check_config_file(TMP_PATH . '/lxc/run-test-2/lxc-run.sh',
 		  {DISPLAY => 'export DISPLAY=:0',
 		   PULSE => 'export PULSE_SERVER=10\.0\.3\.1',
-		   XAUTHORITY => 'export XAUTHORITY=/\.xauth/\.Xauthority',
+		   XAUTHORITY => 'export XAUTHORITY=/\.xauth-root/\.Xauthority',
 		   cd => 'cd "/"',
 		   dns => 'echo "nameserver \$gateway" >/etc/resolv\.conf',
 		   exec => "exec 'do' 'it'",
 		   gateway => 'gateway=10\.0\.3\.1',
 		   route => 'ip route add default via "\$gateway"',
 		   shebang => '#!/bin/sh'});
+ok(-f TMP_PATH . '/lxc/run-test-2/.xauth-root/.Xauthority',
+   '1st .Xauthority file has been created in correct location');
 
 $_->{running} = 1;
 eval '$_->_write_init_sh();';	# 5 - run without error (D+XA, 2nd)
@@ -641,18 +659,38 @@ is($@, '', 'creating startup script for 2nd X11 access run without problems');
 check_config_file(TMP_PATH . '/lxc/run-test-2/lxc-run.sh',
 		  {DISPLAY => 'export DISPLAY=:0',
 		   PULSE => 'export PULSE_SERVER=10\.0\.3\.1',
-		   XAUTHORITY => 'export XAUTHORITY=/\.xauth/\.Xauthority',
+		   XAUTHORITY => 'export XAUTHORITY=/\.xauth-root/\.Xauthority',
 		   cd => 'cd "/"',
 		   dns => '!gateway',
 		   exec => "exec 'do' 'it'",
 		   gateway => '!gateway',
 		   route => '!route',
 		   shebang => '#!/bin/sh'});
+
+my $user = defined $ENV{USER} ? $ENV{USER} : 'root' ;
+$_->{user} = $user;
+eval '$_->_write_init_sh();';	# 6 - run without error (D+XA, 2nd user)
+is($@, '',
+   "creating startup script for 2nd user's X11 access run without problems");
+check_config_file(TMP_PATH . '/lxc/run-test-2/lxc-run.sh',
+		  {DISPLAY => 'export DISPLAY=:0',
+		   PULSE => 'export PULSE_SERVER=10\.0\.3\.1',
+		   XAUTHORITY => "export XAUTHORITY=/\.xauth-$user/\.Xauthority",
+		   cd => 'cd "/"',
+		   dns => '!gateway',
+		   exec =>
+		   "exec su $user -s /bin/sh -c 'do \"..\"' -- dummy_argv0 'it'",
+		   gateway => '!gateway',
+		   route => '!route',
+		   shebang => '#!/bin/sh'});
+ok(-f TMP_PATH . '/lxc/run-test-2/.xauth-' . $user . '/.Xauthority',
+   '2nd .Xauthority file has been created in correct location');
+$_->{user} = 'root' ;
 $_->{running} = 0;
 
 delete $ENV{XAUTHORITY};
 $_->{command} = [];		# trying default command aka shell
-eval '$_->_write_init_sh();';	# 6 - run without error (D-XA)
+eval '$_->_write_init_sh();';	# 7 - run without error (D-XA)
 is($@, '',
    'creating startup script with simple X11 access run without problems');
 check_config_file(TMP_PATH . '/lxc/run-test-2/lxc-run.sh',
@@ -667,7 +705,7 @@ check_config_file(TMP_PATH . '/lxc/run-test-2/lxc-run.sh',
 		   shebang => '#!/bin/sh'});
 
 $_->{running} = 1;
-eval '$_->_write_init_sh();';	# 7 - run without error (D-XA, 2nd)
+eval '$_->_write_init_sh();';	# 8 - run without error (D-XA, 2nd)
 is($@, '',
    'creating startup script for 2nd simple X11 access run without problems');
 check_config_file(TMP_PATH . '/lxc/run-test-2/lxc-run.sh',
@@ -682,7 +720,7 @@ check_config_file(TMP_PATH . '/lxc/run-test-2/lxc-run.sh',
 		   shebang => '#!/bin/sh'});
 
 delete $ENV{DISPLAY};
-eval '$_->_write_init_sh();';	# 8 - run without error (-D-XA, 2nd)
+eval '$_->_write_init_sh();';	# 9 - run without error (-D-XA, 2nd)
 is($@, '',
    'creating startup script for 2nd no-X11 variant run without problems');
 check_config_file(TMP_PATH . '/lxc/run-test-2/lxc-run.sh',

@@ -116,8 +116,8 @@ sub get_values {
     my $plot_velocity_max               = @{ $Synseis->{_values_aref} }[13];
     my $plot_reflection_coefficient_min = @{ $Synseis->{_values_aref} }[14];
     my $plot_reflection_coefficient_max = @{ $Synseis->{_values_aref} }[15];
-    my $plot_ss_amplitude_max           = @{ $Synseis->{_values_aref} }[16];
-    my $plot_ss_amplitude_min           = @{ $Synseis->{_values_aref} }[17];
+    my $plot_ss_amplitude_min           = @{ $Synseis->{_values_aref} }[16];
+    my $plot_ss_amplitude_max           = @{ $Synseis->{_values_aref} }[17];
 
 # print(" 1. Synseis_config, get_values, base_file_name is $base_file_name\n\n");
     $base_file_name = $control->su_data_name( \$base_file_name );

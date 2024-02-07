@@ -17,7 +17,7 @@ $override->override('Net::SAML2::Protocol::AuthnRequest::_build_id' =>
 {
     my ($ar, $xp) = net_saml2_authnreq(
         nameid        => 'mynameid',
-        nameid_format =>
+        nameidpolicy_format =>
             'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
         nameid_allow_create  => 1,
         issuer_namequalifier => 'bar',

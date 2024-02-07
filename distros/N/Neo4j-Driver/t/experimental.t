@@ -35,7 +35,7 @@ sub response_for { $mock_plugin->response_for(undef, @_) }
 
 my ($q, $r, @a, $a);
 
-plan tests => 9 + $no_warnings;
+plan tests => 7 + $no_warnings;
 
 
 {
@@ -209,37 +209,6 @@ subtest 'multiple statements' => sub {
 };
 
 
-subtest 'result stream interface: discard result stream' => sub {
-	plan tests => 4;
-	$r = $s->run('RETURN 7 AS n UNION RETURN 11 AS n');
-	my $c;
-	lives_ok { $c = $r->consume } 'consume()';
-	isa_ok $c, 'Neo4j::Driver::ResultSummary', 'summary from consume()';
-	lives_and { ok ! $r->has_next } 'no has next';
-	TODO: {
-		local $TODO = 'records are not yet cheaply discarded';
-		lives_and { ok ! $r->size } 'no size';
-	};
-};
-
-
-subtest 'result stream interface: look ahead' => sub {
-	plan tests => 10;
-	$r = $s->run('RETURN 7 AS n UNION RETURN 11 AS n');
-	my ($peek, $v);
-	lives_ok { $peek = 0;  $peek = $r->peek } 'peek 1st';
-	lives_ok { $v = 0;  $v = $r->fetch } 'fetch 1st';
-	isa_ok $peek, 'Neo4j::Driver::Record', 'peek record 1st';
-	is $peek, $v, 'peek matches fetch 1st';
-	lives_ok { $peek = 0;  $peek = $r->peek } 'peek 2nd';
-	lives_ok { $v = 0;  $v = $r->fetch } 'fetch 2nd';
-	isa_ok $peek, 'Neo4j::Driver::Record', 'peek record 2nd';
-	is $peek, $v, 'peek matches fetch 2nd';
-	lives_and { ok ! $r->fetch } 'no fetch 3rd';
-	throws_ok { $r->peek } qr/\bexhausted\b/i, 'peek dies 3rd';
-};
-
-
 subtest 'disable HTTP summary counters' => sub {
 	plan skip_all => '(Bolt always provides stats)' if $Neo4j_Test::bolt;
 	plan tests => 4 unless $Neo4j_Test::bolt;
@@ -273,7 +242,7 @@ END
 
 subtest 'stack trace' => sub {
 	plan tests => 1;
-	my $d = Neo4j::Driver->new->plugin( Neo4j_Test::MockHTTP->new );
+	my $d = Neo4j::Driver->new('http:')->plugin( Neo4j_Test::MockHTTP->new );
 	throws_ok {
 		$Neo4j::Driver::Events::STACK_TRACE = 1;
 		$d->session->run('trace not implemented');

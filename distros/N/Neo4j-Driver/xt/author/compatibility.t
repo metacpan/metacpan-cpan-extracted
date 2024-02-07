@@ -31,6 +31,13 @@ my ($q);
 
 
 subtest 'query acceptance REST::Neo4p' => sub {
+	# no deprecated::smartmatch warnings
+	local $SIG{'__WARN__'} = sub {
+		warn $_[0] unless caller(1) =~ m/^REST::Neo4p\b/
+			&& $_[0] =~ m/\b(?:given|when) is deprecated\b/;
+	};
+	
+	$Neo4j::Driver::VERSION //= 0.19;  # satisfy minimum req of REST::Neo4p for dev version
 	plan skip_all => "(REST::Neo4p unavailable)" unless eval "require REST::Neo4p; 1";
 	plan tests => 1;
 	$q = REST::Neo4p::Query->new('RETURN 42');

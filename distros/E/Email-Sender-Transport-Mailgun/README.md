@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/sdt/Email-Sender-Transport-Mailgun.svg?branch=master)](https://travis-ci.org/sdt/Email-Sender-Transport-Mailgun)
+[![Actions Status](https://github.com/sdt/Email-Sender-Transport-Mailgun/workflows/test/badge.svg)](https://github.com/sdt/Email-Sender-Transport-Mailgun/actions)
 # NAME
 
 Email::Sender::Transport::Mailgun - Mailgun transport for Email::Sender
@@ -68,6 +68,14 @@ Defines used Mailgun region. `'us'` (default) or `'eu'`.
 
 See [https://documentation.mailgun.com/en/latest/api-intro.html#mailgun-regions-1](https://documentation.mailgun.com/en/latest/api-intro.html#mailgun-regions-1)
 
+## retry\_count
+
+## retry\_delay\_seconds
+
+If the Mailgun API request fails with a 5xx response, the request will be retried `retry_count` times, with a delay of `retry_delay_seconds` between each attempt.
+
+Defaults to three retries with a one second delay.
+
 ## tag
 
 Tag string. Comma-separated string list or arrayref of strings.
@@ -115,6 +123,8 @@ To specify any of the attributes above, prepend the attribute name with
 - EMAIL\_SENDER\_TRANSPORT\_deliverytime
 - EMAIL\_SENDER\_TRANSPORT\_dkim
 - EMAIL\_SENDER\_TRANSPORT\_region
+- EMAIL\_SENDER\_TRANSPORT\_retry\_count
+- EMAIL\_SENDER\_TRANSPORT\_retry\_delay\_seconds
 - EMAIL\_SENDER\_TRANSPORT\_tag
 - EMAIL\_SENDER\_TRANSPORT\_testmode
 - EMAIL\_SENDER\_TRANSPORT\_tracking

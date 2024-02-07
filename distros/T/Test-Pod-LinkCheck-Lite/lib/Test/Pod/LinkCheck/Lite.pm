@@ -18,11 +18,10 @@ use Module::Load::Conditional ();	# Core since 5.9.5
 use Pod::Perldoc ();		# Core since 5.8.1
 use Pod::Simple ();		# Core since 5.9.3
 use Pod::Simple::LinkSection;	# Core since 5.9.3 (part of Pod::Simple)
-use Scalar::Util ();		# Core since 5.7.3
 use Storable ();		# Core since 5.7.3
 use Test::Builder ();		# Core since 5.6.2
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 our @ISA = qw{ Exporter };
 
@@ -179,6 +178,12 @@ sub _default_ignore_url {
     }
 }
 
+sub _default_add_dir {
+    -d 'blib/script'
+	and return [ 'blib/script' ];
+    return [];
+}
+
 sub _default_module_index {
     my @handlers;
     foreach ( keys %Test::Pod::LinkCheck::Lite:: ) {
@@ -205,6 +210,12 @@ sub _default_skip_server_errors {
 
 sub _default_user_agent {
     return USER_AGENT_CLASS;
+}
+
+sub _init_add_dir {
+    my ( $self, $name, $value ) = @_;
+    $self->{$name} = [ grep { -d } ref $value ? @{ $value } : $value ];
+    return;
 }
 
 sub _init_allow_man_spaces {
@@ -337,8 +348,8 @@ sub _init_skip_server_errors {
 
 sub _init_user_agent {
     my ( $self, $name, $value ) = @_;
-    defined $name
-	or $name = USER_AGENT_CLASS;
+    defined $value
+	or $value = USER_AGENT_CLASS;
     eval {
 	$value->isa( USER_AGENT_CLASS )
     } or Carp::confess(
@@ -402,6 +413,11 @@ sub allow_man_spaces {
 sub cache_url_response {
     my ( $self ) = @_;
     return $self->{cache_url_response}
+}
+
+sub can_ssl {
+    my ( $self ) = @_;
+    return $self->{user_agent}->can_ssl();
 }
 
 sub check_external_sections {
@@ -632,8 +648,10 @@ sub __build_test_msg {
 # for module documentation (whether in the .pm or a separate .pod), or
 # regular .pod documentation (e.g. perldelta.pod).
 sub _get_installed_doc_info {
-    my ( undef, $module ) = @_;
+    my ( $self, $module ) = @_;
     my $pd = Pod::Perldoc->new();
+
+    local @INC = ( @{ $self->{add_dir} }, @INC );
 
     # Pod::Perldoc writes to STDERR if the module (or whatever) is not
     # installed, so we localize STDERR and reopen it to the null device.
@@ -914,7 +932,8 @@ sub _handle_url {
 	or return $self->_fail( $link, 'contains no url' );
 
     if ( $url =~ m/ \A https : /smxi ) {
-	my ( $ok, $why ) = USER_AGENT_CLASS->can_ssl();
+	$DB::single = 1;
+	my ( $ok, $why ) = $self->can_ssl();
 	unless ( $ok ) {
 	    $self->{_ssl_warning}
 		or $TEST->diag( "Can not check https: links: $why" );
@@ -1089,7 +1108,9 @@ sub __token_start {
 	foreach my $name ( qw{ section to } ) {
 	    my $sect = $token->attr( $name )
 		or next;
-	    @{ $sect }[ 2 .. $#$sect ] = ( _normalize_text( "$sect" ) );
+	    my $norm = _normalize_text( "$sect" );
+	    splice @{ $sect }, 2;
+	    push @{ $sect }, $norm;
 	}
 	push @{ $attr->{links} }, [ @{ $token }[ 1 .. $#$token ] ];
     } elsif ( 'X' eq $tag ) {
@@ -1297,6 +1318,15 @@ as name/value pairs.
 The following arguments are supported:
 
 =over
+
+=item add_dir
+
+This argument is the name of a directory to search for extra POD, or a
+reference to an array of such directories. Directories that do not
+actually exist will be eliminated.
+
+The default is F<blib/script> if it exists, because otherwise links from
+modules to scripts will not be resolved.
 
 =item agent
 
@@ -1532,6 +1562,14 @@ This method returns the value of the C<'allow_man_spaces'> attribute.
 
 This method returns the value of the C<'cache_url_response'> attribute.
 
+=head2 can_ssl
+
+Added in version 0.012.
+
+This convenience method wraps the user agent's method of the same name.
+See C<can_ssl()> in the user agent's documentation for what is returned.
+This will be L<HTTP::Tiny|HTTP::Tiny> by default.
+
 =head2 check_external_sections
 
  $t->check_external_sections()
@@ -1693,7 +1731,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2019-2023 by Thomas R. Wyant, III
+Copyright (C) 2019-2024 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

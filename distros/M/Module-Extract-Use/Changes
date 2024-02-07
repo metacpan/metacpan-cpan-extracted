@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Extract::Use
 
+1.052 2024-02-05T21:29:59Z
+	* refresh distro, update email addresses
+
 1.051 2022-01-09T18:16:19Z
 	* Fix up t/rt/79273.t regression, GitHub #7
 

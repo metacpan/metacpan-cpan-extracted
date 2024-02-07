@@ -1,7 +1,6 @@
 class Eg::OS::Windows::API::App extends Eg::OS::API {
   
   use List;
-  use Encode;
   use Eg::Window;
   use Eg::Node;
   use Hash;

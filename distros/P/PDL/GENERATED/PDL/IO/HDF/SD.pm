@@ -124,7 +124,7 @@ interchangeably.
 use strict;
 use warnings;
 
-#line 361 "SD.pd"
+#line 362 "SD.pd"
 use PDL::Primitive;
 use PDL::Basic;
 
@@ -427,7 +427,7 @@ sub SDgetvariablenames
 {
     my($self) = @_;
     return sort keys %{$self->{DATASET}};
-#line 668 "SD.pd"
+#line 669 "SD.pd"
 } # End of SDgetvariablenames()...
 sub SDgetvariablename
 {
@@ -468,12 +468,12 @@ sub SDgetattributenames
         return( undef )
             unless defined( $self->{DATASET}->{$name} );
         return sort keys %{ $self->{DATASET}->{$name}->{ATTRS} };
-#line 710 "SD.pd"
+#line 711 "SD.pd"
     }
     else 
     {
         return sort keys %{ $self->{GLOBATTR} };
-#line 714 "SD.pd"
+#line 715 "SD.pd"
     }
 } # End of SDgetattributenames()...
 # Wrapper (this is now defunct):
@@ -639,7 +639,7 @@ sub SDgetdimsize
         unless defined( $self->{DATASET}->{$name} );
     my @dims;
     foreach( sort keys %{ $self->{DATASET}->{$name}->{DIMS} } )
-#line 884 "SD.pd"
+#line 885 "SD.pd"
     { 
         push @dims, $self->{DATASET}->{$name}->{DIMS}->{$_}->{SIZE};
     }
@@ -675,7 +675,7 @@ sub SDgetunlimiteddimsize
     
     my @dim;
     foreach( sort keys %{$self->{DATASET}{$name}{DIMS}} )
-#line 920 "SD.pd"
+#line 921 "SD.pd"
     {
         if( $self->{DATASET}->{$name}->{DIMS}->{$_}->{SIZE} == 0 )
         {
@@ -725,7 +725,7 @@ sub SDgetdimnames
         
     my @dims=();
     foreach( sort keys %{ $self->{DATASET}->{$name}->{DIMS} } )
-#line 970 "SD.pd"
+#line 971 "SD.pd"
     {
 	push @dims,$self->{DATASET}->{$name}->{DIMS}->{$_}->{NAME};
     }
@@ -1157,7 +1157,7 @@ sub SDsetdimname
     
     my $res = 0;
     foreach( sort keys %{$self->{DATASET}->{$name}->{DIMS}} )
-#line 1410 "SD.pd"
+#line 1411 "SD.pd"
     {
         return( undef )
             unless defined( $$dimname[ $_ ] );
@@ -1343,7 +1343,7 @@ sub DESTROY
     $self->close;
 } # End of DESTROY()...
 
-#line 1602 "SD.pd"
+#line 1603 "SD.pd"
 =head1 CURRENT AUTHOR & MAINTAINER
 
 Judd Taylor, Orbital Systems, Ltd.

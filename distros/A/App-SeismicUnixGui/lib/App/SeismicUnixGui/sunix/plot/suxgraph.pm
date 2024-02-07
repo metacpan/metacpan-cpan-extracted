@@ -6,7 +6,7 @@ package App::SeismicUnixGui::sunix::plot::suxgraph;
 
  PERL PROGRAM NAME: suxgraph.pm 							
 
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:  Jan 25, 2018 
  DESCRIPTION: package for sunix module suxgraph
  Version: 1.0.0 

@@ -1,5 +1,8 @@
 Revision history for Perl extension CGI::Simple.
 
+1.281 2024-01-31 MANWAR
+      - RT-151161 Add CGI::Cookie partitioned support, PR #14, thanks @ldevantier-doseme.
+
 1.280 2022-01-11 MANWAR
       - Changed the version format from N.nn to N.nnn as requested.
 

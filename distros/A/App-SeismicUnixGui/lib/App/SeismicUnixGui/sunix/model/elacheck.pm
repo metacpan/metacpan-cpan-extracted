@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::model::elacheck;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 
@@ -39,7 +39,7 @@ Version:
 
 
 
- AUTHOR:: Andreas Rueger, Colorado School of Mines, 01/20/94
+ Author:: Andreas Rueger, Colorado School of Mines, 01/20/94
 
  get stiffness information for anisotropic model (interactive)
 

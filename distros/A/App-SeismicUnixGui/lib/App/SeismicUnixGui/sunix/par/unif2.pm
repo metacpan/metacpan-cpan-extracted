@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::par::unif2;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  UNIF2 - generate a 2-D UNIFormly sampled velocity profile from a layered
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 

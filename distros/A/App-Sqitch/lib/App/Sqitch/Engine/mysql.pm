@@ -16,7 +16,7 @@ use List::MoreUtils qw(firstidx);
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = 'v1.4.0'; # VERSION
+our $VERSION = 'v1.4.1'; # VERSION
 
 has uri => (
     is       => 'ro',
@@ -179,7 +179,7 @@ has _mysql => (
         # Get Maria to abort properly on error.
         my $vinfo = try { $self->sqitch->probe($self->client, '--version') } || '';
         if ($vinfo =~ /mariadb/i) {
-            my ($version) = $vinfo =~ /Ver\s(\S+)/;
+            my ($version) = $vinfo =~ /(?:Ver|client)\s+(\S+)/;
             my ($maj, undef, $pat) = split /[.]/ => $version;
             push @ret => '--abort-source-on-error'
                 if $maj > 5 || ($maj == 5 && $pat >= 66);
@@ -566,7 +566,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2023 iovation Inc., David E. Wheeler
+Copyright (c) 2012-2024 iovation Inc., David E. Wheeler
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -4,7 +4,13 @@ author:
   - 'Michal Josef Spacek <michal.josef.spacek@gmail.com>'
 build_requires:
   Alien::Base::Wrapper: '0.32'
-  ExtUtils::MakeMaker: '6.52'
+  Alien::OpenSSL: '0'
+  Encode: '0'
+  ExtUtils::MakeMaker: '6.76'
+  MIME::Base64: '0'
+  Test::Alien::Diag: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
 configure_requires:
   Alien::Base::Wrapper: '1.97'
   Alien::OpenSSL: '0'
@@ -24,5 +30,5 @@ no_index:
 requires:
   Digest::base: '1.00'
   XSLoader: '0'
-version: 0.02
+version: 0.03
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

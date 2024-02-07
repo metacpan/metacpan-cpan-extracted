@@ -1,3 +1,31 @@
+0.06 2024-02-06T07:25:46+01:00
+ - Fix minimal version of CSS::Struct::Output::Structure (GH#1).
+
+0.05 2024-02-05T19:09:13+01:00
+ - Add missing label to Select.
+ - Rewrite Option to use of tags_value() and tags_boolean() helpers.
+ - Rewrite Select to use of tags_value() and tags_boolean() helpers.
+
+0.04 2024-02-05T11:50:12+01:00
+ - Add tests for form.
+ - Fix default CSS for input type email.
+
+0.03 2024-02-04T18:00:04+01:00
+ - Add Option tests.
+ - Add doc for Utils.
+ - Add label for Textarea.
+ - Another fix of Form processing.
+ - Fix CSS processing in Form.
+ - Fix doc in Form.
+ - Fix doc in Option.
+ - Fix module abstract.
+ - Implement Utils::tags_label().
+ - Improve A element output.
+ - Rename variable in Utils.
+ - Rewrite Input to use helpers.
+ - Simplify Form in same way as other objects.
+ - Update copyright years.
+
 0.02 2024-01-07T00:39:59+01:00
  - Add Utils module with helpers.
  - Add tests for A.

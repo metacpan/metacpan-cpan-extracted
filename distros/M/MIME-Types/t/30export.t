@@ -18,21 +18,21 @@ use MIME::Types;
 #
 
 my ($mt, $cte) = MIME::Types::by_suffix("Pdf");
-is($mt, "application/pdf");
-is($cte, "base64");
+is $mt, "application/pdf", 'plain extension';
+is $cte, "base64";
 
 ($mt, $cte) = MIME::Types::by_suffix("foo.Pdf");
-is($mt, "application/pdf");
-is($cte, "base64");
+is $mt, "application/pdf", 'filename with extension';
+is $cte, "base64";
 
 ($mt, $cte) = MIME::Types::by_suffix("flurfl");
-is($mt, "");
-is($cte, "");
+is $mt, "", 'unknown extension';
+is $cte, "";
 
 #pkcs7-mime          p7m,p7c
 
 my @c = MIME::Types::by_mediatype("pkcs7-mime");
-cmp_ok(scalar @c, '==', 2);
+cmp_ok(scalar @c, '==', 2, 'my_mediatype short, multiple types');
 cmp_ok(scalar @{$c[0]}, '>', 2);
 is($c[0]->[0], "p7m");
 is($c[0]->[1], "application/pkcs7-mime");
@@ -43,7 +43,7 @@ is($c[1]->[1], "application/pkcs7-mime");
 is($c[1]->[2], "base64");
 
 @c = MIME::Types::by_mediatype("Application/pDF");
-cmp_ok(scalar @c, '<', 2);
+cmp_ok(scalar @c, '<', 2, 'by_mediatype long');
 cmp_ok(scalar @{$c[0]}, '==', 3);
 is($c[0]->[0], "pdf");
 is($c[0]->[1], "application/pdf");

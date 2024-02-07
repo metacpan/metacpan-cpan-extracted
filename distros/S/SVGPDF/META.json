@@ -44,7 +44,7 @@
    "provides" : {
       "SVGPDF" : {
          "file" : "lib/SVGPDF.pm",
-         "version" : "0.084"
+         "version" : "0.085"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "https://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.084",
+   "version" : "0.085",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

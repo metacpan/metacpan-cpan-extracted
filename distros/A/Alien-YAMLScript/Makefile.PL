@@ -25,13 +25,13 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Alien::YAMLScript",
   "PREREQ_PM" => {
-    "JSON" => "4.1"
+    "Cpanel::JSON::XS" => "4.37"
   },
   "TEST_REQUIRES" => {
     "Test2::V0" => "0.000159",
     "Test::Alien" => "2.8"
   },
-  "VERSION" => "0.1.22",
+  "VERSION" => "0.1.36",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,8 +41,8 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Alien::Build" => "0.32",
   "Alien::Build::MM" => "0.32",
+  "Cpanel::JSON::XS" => "4.37",
   "ExtUtils::MakeMaker" => "6.52",
-  "JSON" => "4.1",
   "Test2::V0" => "0.000159",
   "Test::Alien" => "2.8"
 );

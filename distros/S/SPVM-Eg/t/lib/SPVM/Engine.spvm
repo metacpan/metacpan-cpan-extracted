@@ -1,0 +1,141 @@
+class Engine {
+  use Eg;
+  use Eg::Runtime;
+  use Eg::OS;
+  use Sys::OS;
+  use Eg::CSS::Box;
+  use Eg::DOM::Implementation;
+  
+  static method document : Eg::Node::Document () {
+    
+    my $div1 = &tag_("div",
+      {style => "background-color:#00FF00;color:#0000FF;font-size:60px;font-weight:bold;font-style:italic;"},
+      "あいうああああabcあいう"
+    );
+    
+    my $div2 = &tag_("div",
+      {style => "background-color:#00FF00;color:#0000FF;font-size:20px;font-weight:bold;font-style:italic;"},
+      "二行目"
+    );
+    
+    my $elements = [
+      $div1,
+      $div2,
+      &tag_("div",{style => "left:300px;top:400px;width:100px;height:100px;background-color:#FF0000;position:fixed;"}),
+      &tag_("div",{style => "left:400px;top:500px;width:100px;height:100px;background-color:#FF0000;position:fixed;"}),
+      &tag_("div",{style => "left:100px;top:100px;width:100px;height:100px;background-color:#FFFF00;position:fixed;"}),
+      &tag_("div",{style => "left:200px;top:200px;width:100px;height:100px;background-color:#FFFF00;position:fixed;"}),
+    ];
+    
+    my $title = "コットン";
+    
+    my $document = Eg->document->implementation->create_html_document($title);
+    
+    for my $element (@$elements) {
+      $document->body->append_child($element);
+    }
+    
+    $document->set_title($title);
+    
+    return $document;
+  }
+  
+  static method tag : Eg::Node::Element ($tag_name : string, $child_nodes_or_text : object of Eg::Node[]|string = undef) {
+    
+    my $document = Eg->document->implementation->create_html_document;
+    
+    my $child_nodes = (Eg::Node[])undef;
+    if ($child_nodes_or_text) {
+      if ($child_nodes_or_text is_type string) {
+        $child_nodes = [$document->create_text_node((string)$child_nodes_or_text)];
+      }
+      elsif ($child_nodes_or_text isa Eg::Node[]) {
+        $child_nodes = (Eg::Node[])$child_nodes_or_text;
+      }
+      else {
+        die "The type of \$child_nodes_or_text must inherit Eg::Node::Element or must be string.";
+      }
+    }
+    
+    my $new_element_node = $document->create_element($tag_name);
+    
+    if ($child_nodes) {
+      for my $child_node (@$child_nodes) {
+        $new_element_node->append_child($child_node);
+      }
+    }
+    
+    return (Eg::Node::Element::HTML)$new_element_node;
+  }
+  
+  static method tag_ : Eg::Node::Element::HTML ($tag_name : string, $attribute_pairs : object[] = undef, $child_nodes_or_text : object of Eg::Node[]|string = undef) {
+    
+    my $document = Eg->document->implementation->create_html_document;
+    
+    my $child_nodes = (Eg::Node[])undef;
+    if ($child_nodes_or_text) {
+      if ($child_nodes_or_text is_type string) {
+        $child_nodes = [$document->create_text_node((string)$child_nodes_or_text)];
+      }
+      elsif ($child_nodes_or_text isa Eg::Node[]) {
+        $child_nodes = (Eg::Node[])$child_nodes_or_text;
+      }
+      else {
+        die "The type of \$child_nodes_or_text must inherit Eg::Node or must be string.";
+      }
+    }
+    
+    my $new_element_node = $document->create_element($tag_name);
+    
+    if ($child_nodes) {
+      for my $child_node (@$child_nodes) {
+        $new_element_node->append_child($child_node);
+      }
+    }
+    
+    my $attributes_h = Hash->new($attribute_pairs);
+    
+    for my $attribute_name (@{$attributes_h->keys}) {
+      my $attribute_value = $attributes_h->get($attribute_name);
+      
+      if ($attribute_value) {
+        $new_element_node->set_attribute($attribute_name, (string)$attribute_value);
+      }
+    }
+    
+    return (Eg::Node::Element::HTML)$new_element_node;
+  }
+  
+  # Class Methods
+  static method main : int () {
+    
+    my $runtime = Eg->RUNTIME;
+    
+    my $os = (Eg::OS)undef;
+    
+    if (Sys::OS->is_windows) {
+      if (require Eg::OS::Windows) {
+        $os = Eg::OS::Windows->new;
+      }
+    }
+    
+    unless ($os) {
+      die "This system is not supported.";
+    }
+    
+    $os->build_runtime($runtime);
+    
+    my $document = &document;
+    
+    my $window = $runtime->window;
+    
+    $window->set_document($document);
+    
+    my $api = $runtime->api;
+    
+    $api->app->open_main_window;
+    
+    $api->app->start_event_loop;
+  }
+  
+}

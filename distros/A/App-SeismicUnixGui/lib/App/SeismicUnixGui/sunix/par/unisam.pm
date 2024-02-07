@@ -6,7 +6,7 @@ package App::SeismicUnixGui::sunix::par::unisam;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  UNISAM - UNIformly SAMple a function y(x) specified as x,y pairs	
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 
@@ -60,7 +60,7 @@ package App::SeismicUnixGui::sunix::par::unisam;
  r=10		  ... damping coefficient, only active when smooth=1	
 
 
- AUTHOR:  Dave Hale, Colorado School of Mines, 07/07/89
+ Author:  Dave Hale, Colorado School of Mines, 07/07/89
           Zhaobo Meng, Colorado School of Mines, 
  	    added sine interpolation and window smoothing, 09/16/96 
           CWP: John Stockwell,  added file input options, 24 Nov 1997

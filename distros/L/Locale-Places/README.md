@@ -45,6 +45,13 @@ which is the country of that 'place' is in.
     # Prints "Douvres" if we're working on a French system
     print Locale::Places->new()->translate('Dover');
 
+## AUTOLOAD
+
+Translate to the given language.
+
+    # Prints 'Virginie', since that's Virginia in French
+    print $places->fr({ place => 'Virginia', from => 'en', country => 'US' });
+
 # AUTHOR
 
 Nigel Horne, `<njh at bandsman.co.uk>`

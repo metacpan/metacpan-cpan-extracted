@@ -1,10 +1,10 @@
 {
    "abstract" : "Compare the low-tech and Schwartzian Transform sorts",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -48,10 +48,10 @@
       "homepage" : "https://github.com/briandfoy/surveyor-benchmark-schwartziantransform-sortfilesbysize",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/surveyor-benchmark-schwartziantransform-sortfilesbysize.git",
+         "url" : "https://github.com/briandfoy/surveyor-benchmark-schwartziantransform-sortfilesbysize",
          "web" : "https://github.com/briandfoy/surveyor-benchmark-schwartziantransform-sortfilesbysize"
       }
    },
-   "version" : "0.123",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.124",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,15 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2006-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2006-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Handle;
+package IO::Async::Handle 0.803;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( IO::Async::Notifier );
-
-our $VERSION = '0.802';
 
 use Carp;
 
@@ -354,14 +352,14 @@ sub notifier_name
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in C<await> expressions return L<Future>
+instances.
 
 =cut
 
 =head2 set_handle
 
-   $handle->set_handles( %params )
+   $handle->set_handles( %params );
 
 Sets new reading or writing filehandles. Equivalent to calling the
 C<configure> method with the same parameters.
@@ -381,11 +379,11 @@ sub set_handles
 
 =head2 set_handle
 
-   $handle->set_handle( $fh )
+   $handle->set_handle( $fh );
 
 Shortcut for
 
-   $handle->configure( handle => $fh )
+   $handle->configure( handle => $fh );
 
 =cut
 
@@ -399,7 +397,7 @@ sub set_handle
 
 =head2 close
 
-   $handle->close
+   $handle->close;
 
 This method calls C<close> on the underlying IO handles. This method will then
 remove the handle from its containing loop.
@@ -441,9 +439,9 @@ sub _closed
 
 =head2 close_write
 
-   $handle->close_read
+   $handle->close_read;
 
-   $handle->close_write
+   $handle->close_write;
 
 Closes the underlying read or write handle, and deconfigures it from the
 object. Neither of these methods will invoke the C<on_closed> event, nor
@@ -479,7 +477,7 @@ sub close_write
 
 =head2 new_close_future
 
-   $handle->new_close_future->get
+   await $handle->new_close_future;
 
 Returns a new L<IO::Async::Future> object which will become done when the
 handle is closed. Cancelling the C<$future> will remove this notification
@@ -508,9 +506,9 @@ sub new_close_future
 
 =head2 write_handle
 
-   $handle = $handle->read_handle
+   $handle = $handle->read_handle;
 
-   $handle = $handle->write_handle
+   $handle = $handle->write_handle;
 
 These accessors return the underlying IO handles.
 
@@ -532,9 +530,9 @@ sub write_handle
 
 =head2 write_fileno
 
-   $fileno = $handle->read_fileno
+   $fileno = $handle->read_fileno;
 
-   $fileno = $handle->write_fileno
+   $fileno = $handle->write_fileno;
 
 These accessors return the file descriptor numbers of the underlying IO
 handles.
@@ -559,13 +557,13 @@ sub write_fileno
 
 =head2 want_writeready
 
-   $value = $handle->want_readready
+   $value = $handle->want_readready;
 
-   $oldvalue = $handle->want_readready( $newvalue )
+   $oldvalue = $handle->want_readready( $newvalue );
 
-   $value = $handle->want_writeready
+   $value = $handle->want_writeready;
 
-   $oldvalue = $handle->want_writeready( $newvalue )
+   $oldvalue = $handle->want_writeready( $newvalue );
 
 These are the accessor for the C<want_readready> and C<want_writeready>
 properties, which define whether the object is interested in knowing about 
@@ -627,7 +625,7 @@ sub want_writeready
 
 =head2 socket
 
-   $handle->socket( $ai )
+   $handle->socket( $ai );
 
 Convenient shortcut to creating a socket handle, as given by an addrinfo
 structure, and setting it as the read and write handle for the object.
@@ -657,14 +655,14 @@ sub socket
 
 =head2 bind
 
-   $handle = $handle->bind( %args )->get
+   $handle = await $handle->bind( %args );
 
 Performs a C<getaddrinfo> resolver operation with the C<passive> flag set,
 and then attempts to bind a socket handle of any of the return values.
 
 =head2 bind (1 argument)
 
-   $handle = $handle->bind( $ai )->get
+   $handle = await $handle->bind( $ai );
 
 When invoked with a single argument, this method is a convenient shortcut to
 creating a socket handle and C<bind()>ing it to the address as given by an
@@ -708,7 +706,7 @@ sub bind
 
 =head2 connect
 
-   $handle = $handle->connect( %args )->get
+   $handle = await $handle->connect( %args );
 
 A convenient wrapper for calling the C<connect> method on the underlying
 L<IO::Async::Loop> object.

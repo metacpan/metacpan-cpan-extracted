@@ -1,8 +1,8 @@
 #pragma once
 
 #include "SharedObjectInfo.h"
-#include <libdwarf/libdwarf.h>
-#include <libdwarf/dwarf.h>
+#include <libdwarf.h>
+#include <dwarf.h>
 #include <memory>
 #include <unordered_map>
 #include <list>

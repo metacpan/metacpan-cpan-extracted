@@ -1,11 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use IO::Async::Notifier;
 use Future;
@@ -21,21 +19,21 @@ my $notifier = IO::Async::Notifier->new(
 {
    my $f = Future->new;
 
-   is_deeply( [ $notifier->adopted_futures ], [],
+   is( [ $notifier->adopted_futures ], [],
       '->adopted_futures initially' );
 
    $notifier->adopt_future( $f );
 
    is_refcount( $f, 2, '$f has refcount 2 after ->adopt_future' );
    is_oneref( $notifier, '$notifier still has refcount 1 after ->adopt_future' );
-   is_deeply( [ $notifier->adopted_futures ], [ $f ],
+   is( [ $notifier->adopted_futures ], [ $f ],
       '->adopted_futures after adoption' );
 
    $f->done( "result" );
 
    is_refcount( $f, 1, '$f has refcount 1 after $f->done' );
 
-   is_deeply( [ $notifier->adopted_futures ], [],
+   is( [ $notifier->adopted_futures ], [],
       '->adopted_futures finally' );
 }
 
@@ -49,7 +47,7 @@ my $notifier = IO::Async::Notifier->new(
 
    is( $err, "It failed", '$err after $f->fail' );
    is( $name, "name",     '$name after $f->fail' );
-   is_deeply( \@detail, [ 1, 2, 3 ], '@detail after $f->fail' );
+   is( \@detail, [ 1, 2, 3 ], '@detail after $f->fail' );
 
    is_refcount( $f, 1, '$f has refcount 1 after $f->fail' );
 

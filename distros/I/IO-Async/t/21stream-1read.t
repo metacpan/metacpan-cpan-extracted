@@ -1,14 +1,12 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0 0.000149;
 use Test::Metrics::Any;
-use Test::Refcount;
 
 use IO::File;
 use POSIX qw( ECONNRESET );
@@ -50,7 +48,7 @@ sub mkhandles
    );
 
    ok( defined $stream, 'reading $stream defined' );
-   isa_ok( $stream, "IO::Async::Stream", 'reading $stream isa IO::Async::Stream' );
+   isa_ok( $stream, [ "IO::Async::Stream" ], 'reading $stream isa IO::Async::Stream' );
 
    is_oneref( $stream, 'reading $stream has refcount 1 initially' );
 
@@ -60,11 +58,11 @@ sub mkhandles
 
    $wr->syswrite( "message\n" );
 
-   is_deeply( \@lines, [], '@lines before wait' );
+   is( \@lines, [], '@lines before wait' );
 
    wait_for { scalar @lines };
 
-   is_deeply( \@lines, [ "message\n" ], '@lines after wait' );
+   is( \@lines, [ "message\n" ], '@lines after wait' );
 
    undef @lines;
 
@@ -72,20 +70,20 @@ sub mkhandles
 
    $loop->loop_once( 0.1 ); # nothing happens
 
-   is_deeply( \@lines, [], '@lines partial still empty' );
+   is( \@lines, [], '@lines partial still empty' );
 
    $wr->syswrite( "\n" );
 
    wait_for { scalar @lines };
 
-   is_deeply( \@lines, [ "return\n" ], '@lines partial completed now received' );
+   is( \@lines, [ "return\n" ], '@lines partial completed now received' );
 
    undef @lines;
 
    $wr->syswrite( "hello\nworld\n" );
    wait_for { scalar @lines };
 
-   is_deeply( \@lines, [ "hello\n", "world\n" ], '@lines two at once' );
+   is( \@lines, [ "hello\n", "world\n" ], '@lines two at once' );
 
    undef @lines;
    my @new_lines;
@@ -104,7 +102,7 @@ sub mkhandles
    wait_for { scalar @new_lines };
 
    is( scalar @lines, 0, '@lines still empty after on_read replace' );
-   is_deeply( \@new_lines, [ "new\n", "lines\n" ], '@new_lines after on_read replace' );
+   is( \@new_lines, [ "new\n", "lines\n" ], '@new_lines after on_read replace' );
 
    is_refcount( $stream, 2, 'reading $stream has refcount 2 before removing from Loop' );
 
@@ -143,7 +141,7 @@ sub mkhandles
 
    wait_for { scalar @lines };
 
-   is_deeply( \@lines, [ "Here is the contents\n" ], '@lines from stream with abstract reader' );
+   is( \@lines, [ "Here is the contents\n" ], '@lines from stream with abstract reader' );
 
    $loop->remove( $stream );
 }
@@ -207,11 +205,11 @@ sub mkhandles
 
    wait_for { scalar @chunks };
 
-   is_deeply( \@chunks, [ "pa" ], '@lines with read_len=2 without read_all' );
+   is( \@chunks, [ "pa" ], '@lines with read_len=2 without read_all' );
 
    wait_for { @chunks == 4 };
 
-   is_deeply( \@chunks, [ "pa", "rt", "ia", "l" ], '@lines finally with read_len=2 without read_all' );
+   is( \@chunks, [ "pa", "rt", "ia", "l" ], '@lines finally with read_len=2 without read_all' );
 
    undef @chunks;
    $stream->configure( read_all => 1 );
@@ -220,7 +218,7 @@ sub mkhandles
 
    wait_for { scalar @chunks };
 
-   is_deeply( \@chunks, [ "pa", "rt", "ia", "l" ], '@lines with read_len=2 with read_all' );
+   is( \@chunks, [ "pa", "rt", "ia", "l" ], '@lines with read_len=2 with read_all' );
 
    $loop->remove( $stream );
 }
@@ -229,9 +227,9 @@ sub mkhandles
    my ( $rd, $wr ) = mkhandles;
 
    my $no_on_read_stream;
-   ok( !exception { $no_on_read_stream = IO::Async::Stream->new( read_handle => $rd ) },
+   ok( !dies { $no_on_read_stream = IO::Async::Stream->new( read_handle => $rd ) },
        'Allowed to construct a Stream without an on_read handler' );
-   ok( exception { $loop->add( $no_on_read_stream ) },
+   ok( dies { $loop->add( $no_on_read_stream ) },
        'Not allowed to add an on_read-less Stream to a Loop' );
 }
 
@@ -246,7 +244,7 @@ my @sub_lines;
    );
 
    ok( defined $stream, 'reading subclass $stream defined' );
-   isa_ok( $stream, "IO::Async::Stream", 'reading $stream isa IO::Async::Stream' );
+   isa_ok( $stream, [ "IO::Async::Stream" ], 'reading $stream isa IO::Async::Stream' );
 
    is_oneref( $stream, 'subclass $stream has refcount 1 initially' );
 
@@ -256,11 +254,11 @@ my @sub_lines;
 
    $wr->syswrite( "message\n" );
 
-   is_deeply( \@sub_lines, [], '@sub_lines before wait' );
+   is( \@sub_lines, [], '@sub_lines before wait' );
 
    wait_for { scalar @sub_lines };
 
-   is_deeply( \@sub_lines, [ "message\n" ], '@sub_lines after wait' );
+   is( \@sub_lines, [ "message\n" ], '@sub_lines after wait' );
 
    $loop->remove( $stream );
 }
@@ -469,7 +467,7 @@ my @sub_lines;
    $stream->close;
 
    is( $closed, 1, 'closed after close' );
-   is( $loop_during_closed, $loop, 'loop during closed' );
+   ref_is( $loop_during_closed, $loop, 'loop during closed' );
 
    ok( !defined $stream->loop, 'Stream no longer member of Loop' );
 

@@ -1935,7 +1935,7 @@ sub _save_most_recent_param_flow {
 
 #    print("color_flow _save_most_recent_param_flow ,last changed entry index was $last_parameter_index_touched_color \n");
 #	print("2. color_flow, _save_most_recent_param_flow , print gui_history.txt\n");
-	$gui_history->view();
+#	$gui_history->view();
 
 #	my $prior_flow_color       = ( $color_flow_href->{_flow_select_color_href} )->{_prior};
 #	my $most_recent_flow_color = ( $color_flow_href->{_flow_select_color_href} )->{_most_recent};

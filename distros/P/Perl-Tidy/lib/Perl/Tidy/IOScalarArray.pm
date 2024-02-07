@@ -14,7 +14,7 @@ package Perl::Tidy::IOScalarArray;
 use strict;
 use warnings;
 use Carp;
-our $VERSION = '20230912';
+our $VERSION = '20240202';
 
 use constant DEVEL_MODE => 0;
 
@@ -35,13 +35,13 @@ sub AUTOLOAD {
 ======================================================================
 Error detected in package '$my_package', version $VERSION
 Received unexpected AUTOLOAD call for sub '$AUTOLOAD'
-Called from package: '$pkg'  
+Called from package: '$pkg'
 Called from File '$fname'  at line '$lno'
 This error is probably due to a recent programming change
 ======================================================================
 EOM
     exit 1;
-}
+} ## end sub AUTOLOAD
 
 sub DESTROY {
 
@@ -74,7 +74,7 @@ expecting mode = 'r' or 'w' but got mode ($mode); trace follows:
 ------------------------------------------------------------------------
 EOM
     }
-}
+} ## end sub new
 
 sub getline {
     my $self = shift;
@@ -88,7 +88,7 @@ EOM
     }
     my $i = $self->[2]++;
     return $self->[0]->[$i];
-}
+} ## end sub getline
 
 sub print    ## no critic (Subroutines::ProhibitBuiltinHomonyms)
 {
@@ -103,5 +103,5 @@ EOM
     }
     push @{ $self->[0] }, $msg;
     return;
-}
+} ## end sub print
 1;

@@ -43,6 +43,7 @@
             "DBD::SQLite" : "0",
             "DBD::SQLite::Constants" : "0",
             "DBI" : "0",
+            "Database::Abstraction" : "0.04",
             "Error::Simple" : "0",
             "File::Spec" : "0",
             "File::pfopen" : "0",
@@ -55,7 +56,9 @@
       "test" : {
          "requires" : {
             "Test::Carp" : "0",
-            "Test::Most" : "0"
+            "Test::Most" : "0",
+            "Test::Needs" : "0",
+            "autodie" : "0"
          }
       }
    },
@@ -71,6 +74,6 @@
          "web" : "https://github.com/nigelhorne/Locale-Places"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

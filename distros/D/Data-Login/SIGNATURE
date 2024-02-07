@@ -1,0 +1,70 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 678bcf0d1d5dd71c97bdcefa3cfa9b5a9cc5c68c859c186eba1e2784d650879b CONCEPT
+SHA256 cd93f05ee7e99015e80a99d93400e1705d7789e55b92ba7351afde7288562597 Changes
+SHA256 d53de1de5e97aadb5bffa1eb84038b24a8c916622c44a16e0239d4cdafbe2df2 LICENSE
+SHA256 6e0b04d8b1a7c157d26b22a21104817ceacc8ba06e0fe9af19b1bdfadcfe1cc6 Login.pm
+SHA256 0b55ff84310496e41d1cb6d2cb4a698ea9a83dda6312589e38fc9c9b0976a8ba Login/Role.pm
+SHA256 accbb475af5704302088b634bcf464b3919282fdea94ad036b563f8010f46de3 MANIFEST
+SHA256 f14d16c0fbaead96ff6e163a124c42b9578aef34ba85f088e50a91595df38cf0 META.yml
+SHA256 b4247a4750ef5e2faeb3fe4281fb03b9d96703d251e4187f8742915cc3175ad4 Makefile.PL
+SHA256 577932278b5c80901b423c4264c118011e8b0c8da2c371385eed031524825df2 README
+SHA256 b3714c6293f35de1dee446ed2c2bdccf8eb914d8da3ebb968ed289beeadcee85 examples/create_and_print_login.pl
+SHA256 afc9e9ef7b67615f183e5370b5cf065af8e05dabb5bd6f964f95002a64d30118 examples/create_and_print_login_role.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 f484a7dd4d778436ad2b510efe4707a80159cfb2e9823c91b1b8d2eef81fa76f t/Data-Login-Role/01-use.t
+SHA256 c8c08e310ae1ba6a7a2d8d9681253c03af2b962c28d730dbeeb594ddca9889c9 t/Data-Login-Role/02-version.t
+SHA256 ce2296a46e1ca4c859d4a35235020b28b73e01f275392055b74f26ec0fcef8d0 t/Data-Login-Role/03-new.t
+SHA256 1cf471cd63e6741a1d30971b384e4df861c3b39a94b08098ad68f4797b30cace t/Data-Login-Role/04-active.t
+SHA256 faadcce80c24d4522f31bf8e4a8264ec4bc7dcd50597facaaed703943195f362 t/Data-Login-Role/05-id.t
+SHA256 abf071f3b4b5a66b4fcf26c2812f9debd2110fc91b40272c08cef0e10e16c34d t/Data-Login-Role/06-role.t
+SHA256 dbe5fa3baed1f8313dc0d16f73819cd65c2ae504d978aa773b2c9912789022b9 t/Data-Login/01-use.t
+SHA256 5a5b95103d01df4228d30b3d0e7298336cf1783665d0c81826f9854fa7662565 t/Data-Login/02-version.t
+SHA256 5d1e8fce7c9c660122dd18821515caf9c841ddfcd0206c413d4df10149b5fcda t/Data-Login/03-new.t
+SHA256 2c14d519a3d9f33da8c5335fc974d1abccbd4b64a3ec25cc789b2ccf18ddea63 t/Data-Login/04-hash_type.t
+SHA256 0e18af4c819751ab0cb33e3dce41ddb5fbf668810eb8ff40a54f4b86a5cf8068 t/Data-Login/05-id.t
+SHA256 35abf268d617ae01ece77f79229f28a2e13552c75a9fd00c45d2efb7b2b41e82 t/Data-Login/06-login_name.t
+SHA256 a3dbe5c373020a200cebad991d5e0392c5659dbdd2d1fabf8202eda0d1af0d68 t/Data-Login/07-password_hash.t
+SHA256 36fbbb71f1c5b338a095b30bcf3b90e4d2a14405a134121fad537212fcc1a53b t/Data-Login/08-roles.t
+SHA256 cd13c9e7224264c9aeb69dcdbef270251b9203a8ffe5e2d954154c57802524e5 xt/Data-Login-Role/01-pod_coverage.t
+SHA256 248a31cbfe59a2546e416ca3ac6e31fd27e8745fe6414db412c7eabcea7ff54a xt/Data-Login-Role/02-pod.t
+SHA256 fa8dfcfc0e068d5e1e8cb5870dc1b6a60ffa67ef095b75b575df421fcf42d62f xt/Data-Login/01-pod_coverage.t
+SHA256 63d25230847c4a2293ce8c7060370f50689bbd8f2c41a23f5cf845702306f99f xt/Data-Login/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEEbhzVZugfHqSVNvE7YSp92FNcjtAFAmXBXTUACgkQYSp92FNc
+jtBIxgwAmQ0Tqn5JYTCOW/8owTsw9OyTpwX8VvRwnlbHuZ2IFox+H+/pSgAVrPiQ
+NTNXsKY5McEezQ+MWyORKv6nLhFeb/cLhPobRsXVFervHx/C7WJ0vGDD6zmI/e7e
+20U6hihJT/G88bNJCVl4jaPQryB4XwZ6DjwSl8Jmt0XUUKGh7rPjImI9fEUYGusS
+mHtRu2UxWKe3Z/VvDAN5rPlMvFTOHwBvS1QjehJeTZjjwVk3gIibFrjLms+fkxTi
+NJVHhFs7JE4vy59Nf+H6SQ3K+JwzuXpmHVgfSEMS/vilhgxRRQnkSDu1Hdv0fqiQ
+C7LQcrdJB62fe7v5Q/1Hm50AV21ZtD0IYunQxmIaryg7vXICmakTSqAtoD4hm/Tu
+DEpsusQ7tUG11RqAXXgWdy1UmogFfZTqFxfT806kBaiKdZmlCWH3XSFiKJoX7DWP
+5S+YIteNTJmt3zIdRnaYIWglKpC6ANcdS7p4SaxPr0hkueCwZOtUTBBsm4u0kAl7
+j3T1Bdee
+=2I+H
+-----END PGP SIGNATURE-----

@@ -1,13 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Fatal;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use POSIX qw( SIGTERM );
 
@@ -32,7 +30,7 @@ my $signal = IO::Async::Signal->new(
 );
 
 ok( defined $signal, '$signal defined' );
-isa_ok( $signal, "IO::Async::Signal", '$signal isa IO::Async::Signal' );
+isa_ok( $signal, [ "IO::Async::Signal" ], '$signal isa IO::Async::Signal' );
 
 is_oneref( $signal, '$signal has refcount 1 initially' );
 
@@ -51,7 +49,7 @@ kill SIGTERM, $$;
 wait_for { $caught };
 
 is( $caught, 1, '$caught after raise' );
-is_deeply( \@rargs, [ $signal ], 'on_receipt args after raise' );
+is( \@rargs, [ exact_ref($signal) ], 'on_receipt args after raise' );
 
 my $caught2 = 0;
 
@@ -112,7 +110,7 @@ $signal = TestSignal->new(
 );
 
 ok( defined $signal, 'subclass $signal defined' );
-isa_ok( $signal, "IO::Async::Signal", 'subclass $signal isa IO::Async::Signal' );
+isa_ok( $signal, [ "IO::Async::Signal" ], 'subclass $signal isa IO::Async::Signal' );
 
 is_oneref( $signal, 'subclass $signal has refcount 1 initially' );
 
@@ -130,7 +128,7 @@ wait_for { $sub_caught };
 
 is( $sub_caught, 1, '$sub_caught after raise' );
 
-ok( exception {
+ok( dies {
       my $signal = IO::Async::Signal->new(
          name => 'this signal name does not exist',
          on_receipt => sub {},

@@ -56,7 +56,7 @@ pdl* pdl_SvPDLV ( SV* sv ) {
 
    if(sv_derived_from(sv, "Math::Complex")) {
       dSP;
-      int count, i;
+      int i;
       NV retval;
       double vals[2];
       char *meths[] = { "Re", "Im" };
@@ -64,7 +64,7 @@ pdl* pdl_SvPDLV ( SV* sv ) {
       ENTER; SAVETMPS;
       for (i = 0; i < 2; i++) {
         PUSHMARK(sp); XPUSHs(sv); PUTBACK;
-        count = perl_call_method(meths[i], G_SCALAR);
+        int count = perl_call_method(meths[i], G_SCALAR);
         SPAGAIN;
         if (count != 1) croak("Failed Math::Complex method '%s'", meths[i]);
         retval = POPn;
@@ -101,12 +101,11 @@ pdl* pdl_SvPDLV ( SV* sv ) {
 
         if (SvROK(*svp) && SvTYPE(SvRV(*svp)) == SVt_PVCV) {
            dSP;
-           int count;
            ENTER ;
            SAVETMPS ;
            PUSHMARK(sp) ;
 
-           count = perl_call_sv(*svp, G_SCALAR|G_NOARGS);
+           int count = perl_call_sv(*svp, G_SCALAR|G_NOARGS);
 
            SPAGAIN ;
 
@@ -134,11 +133,9 @@ pdl* pdl_SvPDLV ( SV* sv ) {
       
     if(SvTYPE(SvRV(sv)) == SVt_PVAV) {
         /* This is similar to pdl_avref in Core.xs.PL -- we do the same steps here. */
-        AV *dims, *av;
         int datalevel = -1;
-
-        av = (AV *)SvRV(sv);
-        dims = (AV *)sv_2mortal((SV *)newAV());
+        AV *av = (AV *)SvRV(sv);
+        AV *dims = (AV *)sv_2mortal((SV *)newAV());
         av_store(dims,0,newSViv( (IV) av_len(av)+1 ) );
         
         /* Pull sizes using av_ndcheck */
@@ -157,6 +154,7 @@ pdl* pdl_SvPDLV ( SV* sv ) {
 
     /* Return the pdl * pointer */
     ret = INT2PTR(pdl *, SvIV(sv2));
+    if (!ret) croak("Fatal error: ndarray address is NULL");
 
     /* Final check -- make sure it has the right magic number */
     if(ret->magicno != PDL_MAGICNO) {
@@ -657,24 +655,24 @@ PDL_Indx pdl_kludge_copy_ ## ppsym_out(PDL_Indx dest_off, /* Offset into the des
   ctype_out* dest_data,  /* Data pointer in the dest data array */ \
   PDL_Indx* dest_dims,/* Pointer to the dimlist for the dest pdl */ \
   PDL_Indx ndims,    /* Number of dimensions in the dest pdl */ \
-  int level,         /* Recursion level */ \
+  PDL_Indx level,    /* Recursion level */ \
   PDL_Indx stride,   /* Stride through memory for the current dim */ \
   pdl* source_pdl,   /* pointer to the source pdl */ \
-  int plevel,        /* level within the source pdl */ \
+  PDL_Indx plevel,   /* level within the source pdl */ \
   void* source_data, /* Data pointer in the source pdl */ \
-  ctype_out undefval,   /* undefval for the dest pdl */ \
+  ctype_out undefval,/* undefval for the dest pdl */ \
   pdl* dest_pdl      /* pointer to the dest pdl */ \
 ) { \
   PDL_Indx i; \
   PDL_Indx undef_count = 0; \
   /* Can't copy into a level deeper than the number of dims in the output PDL */ \
   if(level > ndims ) { \
-    fprintf(stderr,"pdl_kludge_copy: level=%d; ndims=%"IND_FLAG"\n",level,ndims); \
+    fprintf(stderr,"pdl_kludge_copy: level=%"IND_FLAG"; ndims=%"IND_FLAG"\n",level,ndims); \
     croak("Internal error - please submit a bug report at https://github.com/PDLPorters/pdl/issues:\n  pdl_kludge_copy: Assertion failed; ndims-1-level (%"IND_FLAG") < 0!.",ndims-1-level); \
   } \
   if(level >= ndims - 1) { \
     /* We are in as far as we can go in the destination PDL, so direct copying is in order. */ \
-    int pdldim = source_pdl->ndims - 1 - plevel;  /* which dim are we working in the source PDL? */ \
+    PDL_Indx pdldim = source_pdl->ndims - 1 - plevel;  /* which dim are we working in the source PDL? */ \
     PDL_Indx pdlsiz; \
     int oob = (ndims-1-level < 0);         /* out-of-bounds flag */ \
     /* Do bounds checking on the source dimension -- if we wander off the end of the \
@@ -723,7 +721,7 @@ PDL_Indx pdl_kludge_copy_ ## ppsym_out(PDL_Indx dest_off, /* Offset into the des
     ); \
   if(i >= dest_dims[ndims - 1 - level]) return undef_count; \
   /* pad the rest of this dim to zero if there are not enough elements in the source PDL... */ \
-  int cursor, target; \
+  PDL_Indx cursor, target; \
   cursor = i * stride; \
   target = dest_dims[ndims-1-level]*stride; \
   undef_count += target - cursor; \
@@ -751,23 +749,20 @@ PDL_TYPELIST2_ALL(PDL_KLUDGE_COPY_X, INNERLOOP_X)
  */
 #define PDL_SETAV_X(X, datatype_out, ctype_out, ppsym_out, ...) \
 PDL_Indx pdl_setav_ ## ppsym_out(ctype_out* dest_data, AV* av, \
-                     PDL_Indx* dest_dims, int ndims, int level, ctype_out undefval, pdl *dest_pdl) \
+                     PDL_Indx* dest_dims, PDL_Indx ndims, PDL_Indx level, ctype_out undefval, pdl *dest_pdl) \
 { \
   PDL_Indx cursz = dest_dims[ndims-1-level]; /* we go from the highest dim inward */ \
   PDL_Indx len = av_len(av); \
   PDL_Indx i,stride=1; \
-  SV *el, **elp; \
   PDL_Indx undef_count = 0; \
   for (i=0;i<ndims-1-level;i++) { \
     stride *= dest_dims[i]; \
   } \
   for (i=0;i<=len;i++,dest_data += stride) { /* note len is actually highest index, not element count */ \
-    int foo; \
     /* Fetch the next value from the AV */ \
-    elp = av_fetch(av,i,0); \
-    el = (elp ? *elp : 0); \
-    foo = el ? SVavref(el) : 0; \
-    if (foo) { \
+    SV **elp = av_fetch(av,i,0); \
+    SV *el = (elp ? *elp : 0); \
+    if ( el && SVavref(el) ) { \
       /* If the element was an AV ref, recurse to walk through that AV, one dim lower */ \
       undef_count += pdl_setav_ ## ppsym_out(dest_data, (AV *) SvRV(el), dest_dims, ndims, level+1, undefval, dest_pdl); \
  \
@@ -779,11 +774,9 @@ PDL_Indx pdl_setav_ ## ppsym_out(ctype_out* dest_data, AV* av, \
         croak("Non-array, non-PDL element in list"); \
       } \
       /* The element was a PDL - use pdl_kludge_copy to copy it into the destination */ \
-      PDL_Indx pd; \
-      int pddex; \
       pdl_barf_if_error(pdl_make_physical(pdl)); \
-      pddex = ndims - 2 - level; \
-      pd = (pddex >= 0 && pddex < ndims ? dest_dims[ pddex ] : 0); \
+      PDL_Indx pddex = ndims - 2 - level; \
+      PDL_Indx pd = (pddex >= 0 && pddex < ndims ? dest_dims[ pddex ] : 0); \
       if(!pd) \
           pd = 1; \
       undef_count += pdl_kludge_copy_ ## ppsym_out(0, dest_data,dest_dims,ndims, level+1, stride / pd , pdl, 0, pdl->data, undefval, dest_pdl); \
@@ -828,20 +821,18 @@ PDL_TYPELIST2_ALL(PDL_SETAV_X, INNERLOOP_X)
 
 SV *pdl_hdr_copy(SV *hdrp) {
   /* call the perl routine _hdr_copy */
-  int count;
-  SV *retval;
   dSP;
   ENTER;
   SAVETMPS;
   PUSHMARK(SP);
   XPUSHs( hdrp );
   PUTBACK;
-  count = call_pv("PDL::_hdr_copy",G_SCALAR);
+  int count = call_pv("PDL::_hdr_copy",G_SCALAR);
   SPAGAIN;
   if (count != 1)
       croak("PDL::_hdr_copy didn\'t return a single value - please report this bug (B).");
-  retval = (SV *) POPs ;
-  if(retval != &PL_sv_undef )
+  SV *retval = (SV *) POPs ;
+  if (SvROK(retval))
       (void)SvREFCNT_inc(retval);
   FREETMPS;
   LEAVE;
@@ -875,7 +866,6 @@ Here's the flow:
 void pdl_hdr_childcopy(pdl_trans *trans) {
   void *hdrp = NULL;
   char propagate_hdrcpy = 0;
-  SV *hdr_copy = NULL;
   pdl_transvtable *vtable = trans->vtable;
   pdl **pdls = trans->pdls;
   PDL_Indx i;
@@ -891,24 +881,23 @@ void pdl_hdr_childcopy(pdl_trans *trans) {
       break;
     }
   }
-  if (hdrp) {
-    hdr_copy = ((hdrp == &PL_sv_undef) ? &PL_sv_undef : pdl_hdr_copy(hdrp));
-    /* Found the header -- now copy it into all the right places */
-    for (i=0; i<vtable->npdls; i++) {
-      pdl *pdl = pdls[i];
-      short flags = vtable->par_flags[i];
-      if (!(flags & PDL_PARAM_ISCREAT)) continue;
-      if (pdl->hdrsv != hdrp) {
-        if (pdl->hdrsv && pdl->hdrsv != &PL_sv_undef)
-          (void)SvREFCNT_dec( pdl->hdrsv );
-        if (hdr_copy != &PL_sv_undef) (void)SvREFCNT_inc(hdr_copy);
-        pdl->hdrsv = hdr_copy;
-      }
-      if (propagate_hdrcpy) pdl->state |= PDL_HDRCPY;
+  if (!hdrp) return;
+  SV *hdr_copy = ((hdrp == &PL_sv_undef) ? &PL_sv_undef : pdl_hdr_copy(hdrp));
+  /* Found the header -- now copy it into all the right places */
+  for (i=0; i<vtable->npdls; i++) {
+    pdl *pdl = pdls[i];
+    short flags = vtable->par_flags[i];
+    if (!(flags & PDL_PARAM_ISCREAT)) continue;
+    if (pdl->hdrsv != hdrp) {
+      if (pdl->hdrsv && pdl->hdrsv != &PL_sv_undef)
+        (void)SvREFCNT_dec( pdl->hdrsv );
+      if (hdr_copy != &PL_sv_undef) (void)SvREFCNT_inc(hdr_copy);
+      pdl->hdrsv = hdr_copy;
     }
-    if(hdr_copy != &PL_sv_undef)
-      SvREFCNT_dec(hdr_copy); /* make hdr_copy mortal again */
+    if (propagate_hdrcpy) pdl->state |= PDL_HDRCPY;
   }
+  if (hdr_copy != &PL_sv_undef)
+    SvREFCNT_dec(hdr_copy); /* make hdr_copy mortal again */
 }
 
 void pdl_dump_slice_args(pdl_slice_args* args) {
@@ -1058,33 +1047,28 @@ pdl_slice_args* pdl_slice_args_parse_sv(SV* sv) {
   /**** in the start/inc/end array                                   ****/
   PDL_Indx i;
   for(i=0; i<nargs; i++) {
-    SV *this;
-    SV **thisp;
-    SV **svp;
     char all_flag = 0;
     pdl_slice_args this_arg = {0,-1,0}; /* start,end,inc 0=do in RedoDims */
-    thisp = av_fetch( arglist, i, 0 );
-    this = (thisp  ?  *thisp  : 0 );
+    SV **thisp = av_fetch( arglist, i, 0 );
+    SV *this = (thisp  ?  *thisp  : 0 );
     /** Keep the whole dimension if the element is undefined or missing **/
     all_flag = (  (!this)   ||   (this==&PL_sv_undef)  );
     if(!all_flag) {
       /* Main branch -- this element is not an empty string */
       if(SvROK(this)) {
         /*** It's a reference - it better be an array ref. ***/
-        int nelem;
-        AV *sublist;
         if( SvTYPE(SvRV(this)) != SVt_PVAV )
           barf("slice: non-ARRAY ref in the argument list!");
         /*** It *is* an array ref!  Expand it into an AV so we can read it. ***/
-        sublist = (AV *)(SvRV(this));
-        nelem = !sublist ? 0 : av_len(sublist) + 1;
+        AV *sublist = (AV *)(SvRV(this));
+        int nelem = !sublist ? 0 : av_len(sublist) + 1;
         if(nelem > 3) barf("slice: array refs can have at most 3 elements!");
         if(nelem==0) {      /* No elements - keep it all */
           all_flag = 1;
         } else /* Got at least one element */{
           /* Load the first into start and check for dummy or all-clear */
           /* (if element is missing use the default value already in start) */
-          svp = av_fetch(sublist, 0, 0);
+          SV **svp = av_fetch(sublist, 0, 0);
           if(svp && *svp && *svp != &PL_sv_undef) {
             /* There is a first element.  Check if it's a string, then an IV */
             if( SvPOKp(*svp)) {

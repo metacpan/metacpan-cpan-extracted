@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Function;
+package IO::Async::Function 0.803;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.802';
 
 use base qw( IO::Async::Notifier );
 use IO::Async::Timer::Countdown;
@@ -27,6 +25,7 @@ C<IO::Async::Function> - call a function asynchronously
 
 =head1 SYNOPSIS
 
+   use Future::AsyncAwait;
    use IO::Async::Function;
 
    use IO::Async::Loop;
@@ -41,14 +40,11 @@ C<IO::Async::Function> - call a function asynchronously
 
    $loop->add( $function );
 
-   $function->call(
+   my $isprime = await $function->call(
       args => [ 123454321 ],
-   )->on_done( sub {
-      my $isprime = shift;
-      print "123454321 " . ( $isprime ? "is" : "is not" ) . " a prime number\n";
-   })->on_fail( sub {
-      print STDERR "Cannot determine if it's prime - $_[0]\n";
-   })->get;
+   );
+
+   print "123454321 " . ( $isprime ? "is" : "is not" ) . " a prime number\n";
 
 =head1 DESCRIPTION
 
@@ -111,7 +107,7 @@ The following named parameters may be passed to C<new> or C<configure>:
 
 The body of the function to execute.
 
-   @result = $code->( @args )
+   @result = $code->( @args );
 
 =head2 init_code => CODE
 
@@ -119,7 +115,7 @@ Optional. If defined, this is invoked exactly once in every child process or
 thread, after it is created, but before the first invocation of the function
 body itself.
 
-   $init_code->()
+   $init_code->();
 
 =head2 module => STRING
 
@@ -291,14 +287,14 @@ sub _remove_from_loop
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in C<await> expressions return L<Future>
+instances.
 
 =cut
 
 =head2 start
 
-   $function->start
+   $function->start;
 
 Start the worker processes
 
@@ -313,11 +309,11 @@ sub start
 
 =head2 stop
 
-   $function->stop
+   $function->stop;
 
 Stop the worker processes
 
-   $f = $function->stop
+   $f = $function->stop;
 
 I<Since version 0.75.>
 
@@ -345,7 +341,7 @@ sub stop
 
 =head2 restart
 
-   $function->restart
+   $function->restart;
 
 Gracefully stop and restart all the worker processes. 
 
@@ -361,7 +357,7 @@ sub restart
 
 =head2 call
 
-   @result = $function->call( %params )->get
+   @result = await $function->call( %params );
 
 Schedules an invocation of the contained function to be executed on one of the
 worker processes. If a non-busy worker is available now, it will be called
@@ -398,14 +394,14 @@ fact an unblessed C<ARRAY> reference, this array is unpacked and used as-is
 for the C<fail> result. If the exception is not such a reference, it is used
 as the first argument to C<fail>, in the category of C<error>.
 
-   $f->done( @result )
+   $f->done( @result );
 
-   $f->fail( @{ $exception } )
-   $f->fail( $exception, error => )
+   $f->fail( @{ $exception } );
+   $f->fail( $exception, error => );
 
 =head2 call (void)
 
-   $function->call( %params )
+   $function->call( %params );
 
 When not returning a future, the C<on_result>, C<on_return> and C<on_error>
 arguments give continuations to handle successful results or failure.
@@ -548,7 +544,7 @@ sub _worker_objects
 
 =head2 workers
 
-   $count = $function->workers
+   $count = $function->workers;
 
 Returns the total number of worker processes available
 
@@ -562,7 +558,7 @@ sub workers
 
 =head2 workers_busy
 
-   $count = $function->workers_busy
+   $count = $function->workers_busy;
 
 Returns the number of worker processes that are currently busy
 
@@ -576,7 +572,7 @@ sub workers_busy
 
 =head2 workers_idle
 
-   $count = $function->workers_idle
+   $count = $function->workers_idle;
 
 Returns the number of worker processes that are currently idle
 

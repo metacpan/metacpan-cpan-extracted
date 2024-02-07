@@ -65,5 +65,5 @@ sub add_response {
     if (ref $content) {
         $content = encode_json($content);
     }
-    push(@responses, { success => 0, content => $content });
+    push(@responses, { success => 0, status => 400, content => $content });
 }

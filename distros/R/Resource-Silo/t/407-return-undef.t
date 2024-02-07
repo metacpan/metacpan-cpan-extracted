@@ -18,20 +18,23 @@ resource param  =>
     argument        => qr(.*),
     init            => sub {};
 
+my $no_reason = "declared at ".quotemeta(__FILE__)." line \\d+ "
+    ."failed for no apparent reason";
+
 throws_ok {
     silo->bare;
-} qr('bare' failed for no .* reason), "undef return = no go";
+} qr('bare' $no_reason), "undef return";
 
 throws_ok {
     silo->param("foo_42");
-} qr('param.foo_42' failed for no .* reason), "undef return = no go";
+} qr('param.foo_42' $no_reason), "undef return with param";
 
 throws_ok {
     silo->ctl->fresh("bare");
-} qr('bare' failed for no .* reason), "undef return = no go";
+} qr('bare' $no_reason), "undef return via fresh";
 
 throws_ok {
     silo->ctl->fresh(param => "foo_42");
-} qr('param.foo_42' failed for no .* reason), "undef return = no go";
+} qr('param.foo_42' $no_reason), "undef return with param via fresh";
 
 done_testing;

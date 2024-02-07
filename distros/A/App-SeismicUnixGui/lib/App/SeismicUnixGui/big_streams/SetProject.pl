@@ -6,7 +6,7 @@
 	NAME:     SetProject 
 	Author:   Juan M. Lorenzo 
 	Date:     December 15, 2011 
-	Purpose:  Create Project Directores  
+	Purpose:  Create Project Directories  
  		      makes system-wide and local directories
         Details:  "sub-packages" use~/Servilleta_demos/seismics/
                   Project_Variables package 
@@ -49,6 +49,7 @@ my ($DATA_RESISTIVITY_SURFACE_TXT) = $Project->DATA_RESISTIVITY_SURFACE_TXT();
 my ($DATA_RESISTIVITY_WELL)        = $Project->DATA_RESISTIVITY_WELL();
 my ($DATA_RESISTIVITY_WELL_TXT)    = $Project->DATA_RESISTIVITY_WELL_TXT();
 my ($DATA_SEISMIC_BIN)             = $Project->DATA_SEISMIC_BIN();
+my ($DATA_SEISMIC_XL)              = $Project->DATA_SEISMIC_XL();
 my ($DATA_SEISMIC_ININT)           = $Project->DATA_SEISMIC_ININT();
 my ($DATA_SEISMIC_MATLAB)          = $Project->DATA_SEISMIC_MATLAB();
 my ($DATA_SEISMIC_R)               = $Project->DATA_SEISMIC_R();
@@ -83,7 +84,7 @@ my ($PL_RESISTIVITY_SURFACE) = $Project->PL_RESISTIVITY_SURFACE();
 my ($PL_SEISMIC)                   = $Project->PL_SEISMIC();
 my ($PL_GEOMAPS)                   = $Project->PL_GEOMAPS();
 my ($PNG_SEISMIC)                 = $Project->PNG();
-my ($R_WELL)                       = $Project->R_WELL();
+#my ($R_WELL)                       = $Project->R_WELL();
 my ($PL_WELL)                      = $Project->PL_WELL();
 my ($PS_SEISMIC)                   = $Project->PS_SEISMIC();
 my ($PS_WELL)                      = $Project->PS_WELL();
@@ -96,7 +97,7 @@ my ($TEMP_DATA_SEISMIC)            = $Project->TEMP_DATA_SEISMIC();
 my ($TEMP_DATA_SEISMIC_SU)         = $Project->TEMP_DATA_SEISMIC_SU();
 my ($TEMP_FAST_TOMO)               = $Project->TEMP_FAST_TOMO();
 my ($WELL)                         = $Project->WELL();
-my ($DATA_WELL)                    = $Project->DATA_WELL();
+#my ($DATA_WELL)                    = $Project->DATA_WELL();
 
 
 =head2 Creates necessary directories
@@ -133,6 +134,7 @@ manage_dirs_by->make_dir($DATA_RESISTIVITY_SURFACE_TXT);
 #  manage_dirs_by->make_dir($DATA_RESISTIVITY_WELL);
 # manage_dirs_by->make_dir($DATA_RESISTIVITY_WELL_TXT);
 # manage_dirs_by->make_dir($DATA_SEISMIC_BIN);
+manage_dirs_by->make_dir($DATA_SEISMIC_XL);
 # manage_dirs_by->make_dir($DATA_SEISMIC_ININT);
 manage_dirs_by->make_dir($DATA_SEISMIC_MATLAB);
 manage_dirs_by->make_dir($DATA_SEISMIC_R);
@@ -149,7 +151,7 @@ manage_dirs_by->make_dir($DATA_SEISMIC_R);
 # manage_dirs_by->make_dir($DATA_SEISMIC_SEGY_RAW);
 # manage_dirs_by->make_dir($DATA_SEISMIC_SU_RAW);
 # manage_dirs_by->make_dir($DATA_SEISMIC_TXT);
-manage_dirs_by->make_dir($DATA_WELL);
+#manage_dirs_by->make_dir($DATA_WELL);
 
 # manage_dirs_by->make_dir($DATABASE_SEISMIC_SQLITE);
 # manage_dirs_by->make_dir($GEOPSY);

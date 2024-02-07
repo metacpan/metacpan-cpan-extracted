@@ -37,10 +37,9 @@ complete( 'box_score -', [ qw{ --format --json --no-json } ] );
 
 complete( 'box_score -n', [ qw{ --no-json } ] );
 
-$app->set( direct => 1 );
 complete( 'celestrak -',
     [ celestrak_direct_retrieve_options() ],
-    q/Complete 'celestrak -', direct => 1/,
+    q/Complete 'celestrak -'/,
 );
 
 =begin comment

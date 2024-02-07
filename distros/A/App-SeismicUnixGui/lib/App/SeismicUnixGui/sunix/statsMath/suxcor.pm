@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::statsMath::suxcor;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUXCOR - correlation with user-supplied filter			
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 

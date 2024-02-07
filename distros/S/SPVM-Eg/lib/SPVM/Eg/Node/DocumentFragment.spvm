@@ -7,11 +7,11 @@ class Eg::Node::DocumentFragment extends Eg::Node {
   allow Eg::Node::Document;
   
   # Class Methods
-  private static method new : Eg::Node::DocumentFragment () {
+  private static method new : Eg::Node::DocumentFragment ($options : object[] = undef) {
     
     my $self = new Eg::Node::DocumentFragment;
     
-    $self->SUPER::init({node_type => Eg::Node->TYPE_DOCUMENT_FRAGMENT_NODE});
+    $self->SUPER::init(Eg->merge_options_v2($options, {node_type => Eg::Node->TYPE_DOCUMENT_FRAGMENT_NODE}));
     
     return $self;
   }

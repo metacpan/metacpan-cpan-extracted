@@ -1,15 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2011 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Signal;
+package IO::Async::Signal 0.803;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( IO::Async::Notifier );
-
-our $VERSION = '0.802';
 
 use Carp;
 

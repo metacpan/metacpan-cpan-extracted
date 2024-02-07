@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Column;
-$Games::Solitaire::Verify::Column::VERSION = '0.2403';
+$Games::Solitaire::Verify::Column::VERSION = '0.2500';
 use warnings;
 use strict;
 
@@ -14,7 +14,7 @@ __PACKAGE__->mk_acc_ref(
         qw(
             _cards
             _s
-            )
+        )
     ]
 );
 
@@ -190,7 +190,7 @@ columns that are composed of a sequence of cards.
 
 =head1 VERSION
 
-version 0.2403
+version 0.2500
 
 =head1 SYNOPSIS
 

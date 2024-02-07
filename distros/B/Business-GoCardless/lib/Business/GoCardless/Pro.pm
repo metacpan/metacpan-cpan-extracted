@@ -277,6 +277,19 @@ sub customers {
 
 See L<Business::GoCardless::Webhook::V2> for more information on Webhook operations.
 
+=head2 webhooks (B<pager>)
+
+Get a list of L<Business::GoCardless::Webhook::V2> objects.
+
+    my @webhooks = $GoCardless->webhooks
+
+=cut
+
+sub webhooks {
+    my ( $self,%filters ) = @_;
+    return $self->_list( 'webhooks',\%filters );
+}
+
 =head2 webhook
 
 Get a L<Business::GoCardless::Webhook::V2> object from the data sent to you via a
@@ -315,6 +328,25 @@ sub webhook {
         : $webhook;
 }
 
+# payout methods are in the SUPER class
+=head1 Payout Methods
+
+See L<Business::GoCardless::Payout> for more information on Payout operations.
+
+=head2 payouts (B<pager>)
+
+Get a list of L<Business::GoCardless::Payout> objects.
+
+    my @payouts = $GoCardless->payouts
+
+=head2 payout
+
+Get an individual payout, returns a L<Business::GoCardless::Payout> object:
+
+    my $Payout = $GoCardless->payout( $id );
+
+=cut
+
 sub _list {
     my ( $self,$endpoint,$filters ) = @_;
 
@@ -323,6 +355,8 @@ sub _list {
         redirect_flows => 'RedirectFlow',
         customers      => 'Customer',
         subscriptions  => 'Subscription',
+        webhooks       => 'Webhook::V2',
+        payouts        => 'Payout',
     }->{ $endpoint };
 
     $filters //= {};
@@ -336,8 +370,20 @@ sub _list {
     my ( $data,$links,$info ) = $self->client->api_get( $uri );
 
     $class = "Business::GoCardless::$class";
-    my @objects = map { $class->new( client => $self->client,%{ $_ } ) }
-        @{ $data->{$endpoint} };
+    my @objects = map { $class->new(
+        client => $self->client,
+
+        # webhooks come back with stringified JSON
+        # so we need to further decode that
+        $endpoint eq 'webhooks'
+            ? (
+                json => $_->{request_body},
+                # load ordering handled by setting _signature rather than signature
+                # signature will be set in the json trigger
+                _signature => $_->{request_headers}{'Webhook-Signature'}
+            )
+            : ( %{ $_ } )
+    ); } @{ $data->{$endpoint} };
 
     return wantarray ? ( @objects ) : Business::GoCardless::Paginator->new(
         class   => $class,
@@ -505,9 +551,7 @@ sub confirm_resource {
                 payments => {
                     amount   => $amount,
                     currency => $currency,
-                    links    => {
-                        mandate => $RedirectFlow->links->{mandate},
-                    },
+                    links    => $RedirectFlow->links // {},
                 },
             };
 
@@ -532,9 +576,7 @@ sub confirm_resource {
                     interval_unit => $int_unit,
                     interval      => $interval,
                     start_date    => $start_at,
-                    links => {
-                        mandate => $RedirectFlow->links->{mandate},
-                    },
+                    links         => $RedirectFlow->links // {},
                 },
             };
 
@@ -566,6 +608,8 @@ L<Business::GoCardless>
 L<Business::GoCardless::Resource>
 
 L<Business::GoCardless::Payment>
+
+L<Business::GoCardless::Payout>
 
 L<Business::GoCardless::Client>
 

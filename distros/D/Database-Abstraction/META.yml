@@ -3,10 +3,14 @@ abstract: 'database abstraction layer'
 author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
+  DBD::CSV: '0'
+  DBD::XMLSimple: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  FindBin: '0'
   Test::Compile: '0'
   Test::Most: '0'
+  Text::xSV::Slurp: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -23,7 +27,6 @@ no_index:
 requires:
   Carp: '0'
   DBD::SQLite::Constants: '0'
-  Error::Simple: '0'
   File::Basename: '0'
   File::Spec: '0'
   File::Temp: '0'
@@ -35,5 +38,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Database-Abstraction/issues
   repository: git://github.com/nigelhorne/Database-Abstraction.git
-version: '0.01'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

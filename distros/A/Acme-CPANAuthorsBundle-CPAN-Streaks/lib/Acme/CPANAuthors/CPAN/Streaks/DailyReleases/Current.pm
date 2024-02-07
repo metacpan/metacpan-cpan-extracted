@@ -4,26 +4,26 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-01'; # DATE
+our $DATE = '2024-02-01'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240101.0'; # VERSION
+our $VERSION = '20240201.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
-    'BINGOS' => '',
-    'BODOLFO' => '',
-    'MRDVT' => '',
-    'JGNI' => '',
-    'BPSCHUCK' => '',
-    'ETHER' => '',
-    'GBROWN' => '',
-    'JV' => '',
-    'MIKKOI' => '',
-    'PEVANS' => '',
-    'SKAJI' => '',
-    'UTASHIRO' => '',
-    'VKON' => '',
-    'JMATES' => '',
+    'LEONT' => '',
+    'AJNN' => '',
+    'BDFOY' => '',
+    'BPS' => '',
+    'DERIV' => '',
+    'EXIFTOOL' => '',
+    'GHE' => '',
+    'HOCHSTEN' => '',
+    'KARASIK' => '',
+    'MANWAR' => '',
+    'SHLOMIF' => '',
+    'SYBER' => '',
+    'WYANT' => '',
+    'TANIGUCHI' => '',
 );
 
 
@@ -42,32 +42,32 @@ Acme::CPANAuthors::CPAN::Streaks::DailyReleases::Current - Authors with ongoing 
 
 =head1 VERSION
 
-This document describes version 20240101.0 of Acme::CPANAuthors::CPAN::Streaks::DailyReleases::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-01-01.
+This document describes version 20240201.0 of Acme::CPANAuthors::CPAN::Streaks::DailyReleases::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-01.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-01-01, produced by L<cpan-streaks>):
+Current standings (as of 2024-02-01, produced by L<cpan-streaks>):
 
   +-----------+------+------------+-------------+
   | author    |  len | start_date | status      |
   +-----------+------+------------+-------------+
-  | PERLANCAR | 1691 | 2019-05-17 | ongoing     |
-  | BINGOS    |    2 | 2023-12-30 | might-break |
-  | BODOLFO   |    2 | 2023-12-30 | might-break |
-  | MRDVT     |    2 | 2023-12-30 | might-break |
-  | JGNI      |    2 | 2023-12-31 | ongoing     |
-  | BPSCHUCK  |    1 | 2023-12-31 | might-break |
-  | ETHER     |    1 | 2023-12-31 | might-break |
-  | GBROWN    |    1 | 2023-12-31 | might-break |
-  | JV        |    1 | 2023-12-31 | might-break |
-  | MIKKOI    |    1 | 2023-12-31 | might-break |
-  | PEVANS    |    1 | 2023-12-31 | might-break |
-  | SKAJI     |    1 | 2023-12-31 | might-break |
-  | UTASHIRO  |    1 | 2023-12-31 | might-break |
-  | VKON      |    1 | 2023-12-31 | might-break |
-  | JMATES    |    1 | 2024-01-01 | ongoing     |
+  | PERLANCAR | 1722 | 2019-05-17 | ongoing     |
+  | LEONT     |    5 | 2024-01-27 | might-break |
+  | AJNN      |    2 | 2024-01-30 | might-break |
+  | BDFOY     |    1 | 2024-01-31 | might-break |
+  | BPS       |    1 | 2024-01-31 | might-break |
+  | DERIV     |    1 | 2024-01-31 | might-break |
+  | EXIFTOOL  |    1 | 2024-01-31 | might-break |
+  | GHE       |    1 | 2024-01-31 | might-break |
+  | HOCHSTEN  |    1 | 2024-01-31 | might-break |
+  | KARASIK   |    1 | 2024-01-31 | might-break |
+  | MANWAR    |    1 | 2024-01-31 | might-break |
+  | SHLOMIF   |    1 | 2024-01-31 | might-break |
+  | SYBER     |    1 | 2024-01-31 | might-break |
+  | WYANT     |    1 | 2024-01-31 | might-break |
+  | TANIGUCHI |    1 | 2024-02-01 | ongoing     |
   +-----------+------+------------+-------------+
 
 =head1 HOMEPAGE

@@ -10,8 +10,8 @@
 
 !      trim end and adjustl start of empty spaces
        inbound=trim(adjustl(inbound_bin))
-!      print *, 'read_bin_data, inbound_bin is:',trim(inbound)bin),'--'
-!      print *, 'read_bin_data, next line:'
+!       print *, 'read_bin_data, inbound_bin is:',inbound,'--'
+!       print *, 'read_bin_data, next line:'
        inbound_locked=trim(inbound_bin)//"_locked"
 !      print *, 'read_bin_data, inbound_locked is:',trim(inbound_locked),&
 
@@ -21,36 +21,33 @@
        if (ready.eq.0) then
        
  20      open(UNIT=21,FILE=inbound_bin,STATUS='OLD',IOSTAT=err_msg, &
-         FORM='UNFORMATTED',access='stream')
+         FORM='UNFORMATTED')
          counter = counter +1
-!        print *, 'L27.read_bin_data.f, err_msg=',err_msg
+!        =0 normal completion, not an error
+!        print *, 'L26.read_bin_data.f, err_msg=',err_msg
          
 !        check whether file opens data file
          if (err_msg.eq.0) then
-!         print *, 'L34.read_bin_data.f,unlocked, err_msg=',err_msg
+!          print *, 'L30.read_bin_data.f,unlocked, err_msg=',err_msg
+! read by columns: k          
+          k=1     
+120        read (unit=21) (Amp(k,i), i=1,ns)
+
+!           i=1
+!           do 
+!             print*,'k,i,ntr,ns,Amp(k,i)',k,i,ntr,ns,Amp(k,i)
+!             i = i+1
+!             if(i.GE.ns) go to 50
+!           enddo
            
-          k=1
-          do      
-! 120      read (unit=21) (Amp(k,i), i=1,ns)
-
-           i=1
-           do 
-120         read (unit=21) Amp(k,i)
-
- !            print*,'k, i,ntr, ns,Amp(k-1,i-1)',k,i,ntr,ns,Amp(k-1,i-1)
- !            i = i+1
-             if(i.GE.ns) goto 50
-           enddo
-          
-50         k=k+1	  
-           if(k.GE.ntr) go to 125
-          enddo
-          
- 125      close (unit=21)
+50         if(k.GE.ntr) go to 125
+           k=k+1
+           go to 120 
+125       close (unit=21)
 
          else
-!        print *, 'read_bin_data.f, err_msg=',err_msg
-!        print *, 'L49 read_bin_data.f, can not open bin file=',counter
+          print *, 'read_bin_data.f, err_msg=',err_msg
+          print *,'L53 read_bin_data.f, can not open bin file=',counter
 
 !         rest a little before trying again
 !         call sleep(1)
@@ -58,8 +55,8 @@
          end if
         
        else
-         print *, 'L57. read_bin_data.f,locked, try again,ready=',ready
- !        print *, '3.read_bin_data.f, err_messg=',err_msg
+!        print *, 'L61. read_bin_data.f,locked, try again,ready=',ready
+!        print *, '3.read_bin_data.f, err_messg=',err_msg
          go to 10
        end if
        

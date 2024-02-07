@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-05'; # DATE
+our $DATE = '2024-01-30'; # DATE
 our $DIST = 'App-BPOMUtils-NutritionFacts'; # DIST
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/NutritionFacts/bpom_show_nutrition_facts",
@@ -39,7 +39,7 @@ bpom-tampilkan-ing - Render BPOM-compliant nutrition fact table (ING - informasi
 
 =head1 VERSION
 
-This document describes version 0.024 of bpom-tampilkan-ing (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2023-02-05.
+This document describes version 0.025 of bpom-tampilkan-ing (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2024-01-30.
 
 =head1 SYNOPSIS
 
@@ -425,8 +425,8 @@ String. Specify additional command-line options.
    table.vertical_html_table tr.has_bottom_border { border-bottom: solid 1pt black; }
  </style>
  <table class="vertical_html_table"><colgroup><col style="width:16pt;"><col style="width:200pt;"><col style="width:48pt;"><col style="width:48pt;"><col style="width:36pt;"></colgroup>
- <tr><td colspan=5 align="middle"><b>INFORMASI NILAI GIZI</b></td></tr>
  <tbody>
+ <tr><td colspan=5 align="middle"><b>INFORMASI NILAI GIZI</b></td></tr>
  <tr><td colspan=5></td></tr>
  <tr><td colspan=5 align="left"><b>JUMLAH PER KEMASAN (20 g)</b></td></tr>
  <tr class=has_bottom_border><td colspan=5><b>Energi total 10 kkal</b></td></tr>
@@ -560,7 +560,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

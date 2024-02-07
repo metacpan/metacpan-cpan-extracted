@@ -1,13 +1,19 @@
 Revision history for Perl extension RPi::MultiPCA9685.
+0.06  Sun Feb 02 08:45:49 2024
+        - added a new function: disablePWM. This allows to switch off  the PWM
+          output for all channels. After disabling, the required channels need
+          to be set again.
 0.05  Mon Jan 23 16:21:17 2024
-        - resolved bug in MultiPCA9685.pm, where the setting of the PWM frequency did not work
+        - resolved bug in MultiPCA9685.pm, where the setting of the PWM 
+          frequency did not work
 0.04  Sat Dec 30 16:26:42 2023
         - By mistake I assumed a bug in version 0.02 but the problem was caused
           by an application. Switched back to Version 0.02 functions.
 0.03  Sat Dec 30 09:14:07 2023
         - Bug fixed where always one more servo was set than necessary
 0.02  Mon Oct 23 19:02:03 2023
-	- Perl requirement changed to Perl 5.006 to demand only the minimum 	requirements
+	- Perl requirement changed to Perl 5.006 to demand only the minimum
+          requirements
 0.01  Sun Sep 24 19:03:26 2023
 	- original version; created by h2xs 1.23 with options
 		-AX --skip-exporter --use-new-tests -n RPi::MultiPCA9685

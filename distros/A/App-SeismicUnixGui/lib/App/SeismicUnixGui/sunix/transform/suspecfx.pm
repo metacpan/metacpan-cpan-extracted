@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::transform::suspecfx;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUSPECFX - Fourier SPECtrum (T -> F) of traces 		
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 

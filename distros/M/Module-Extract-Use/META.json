@@ -1,10 +1,10 @@
 {
    "abstract" : "Discover the modules a module explicitly uses",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "ppi",
       "parsing",
@@ -58,10 +58,10 @@
       "homepage" : "https://github.com/briandfoy/module-extract-use",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/module-extract-use.git",
+         "url" : "https://github.com/briandfoy/module-extract-use",
          "web" : "https://github.com/briandfoy/module-extract-use"
       }
    },
-   "version" : "1.051",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "1.052",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

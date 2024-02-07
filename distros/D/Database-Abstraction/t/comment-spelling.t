@@ -19,21 +19,3 @@ if($ENV{AUTHOR_TESTING} ) {
 }
 
 __DATA__
-BrowserDetect
-cgi
-dir
-env
-ENV
-EscapeCage
-escapecstring
-getpairs
-INET
-NetBSD
-paramref
-realpath
-Solaris
-splitpath
-TODO
-UA
-usr
-XSS

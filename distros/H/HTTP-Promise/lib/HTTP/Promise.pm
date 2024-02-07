@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.3.3
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.4.1
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2023/10/10
+## Modified 2024/02/06
 ## All rights reserved.
 ## 
 ## 
@@ -59,7 +59,7 @@ BEGIN
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
     our $SERIALISER = $Promise::Me::SERIALISER;
-    our $VERSION = 'v0.3.3';
+    our $VERSION = 'v0.4.1';
 };
 
 use strict;
@@ -96,6 +96,7 @@ sub init
     $self->{send_te}                = 1;
     $self->{serialiser}             = $SERIALISER;
     $self->{shared_mem_size}        = $Promise::Me::RESULT_MEMORY_SIZE;
+    $self->{ssl_opts}               = undef;
     $self->{stop_if}                = sub{};
     $self->{threshold}              = $CONTENT_SIZE_THRESHOLD;
     # 3 minutes
@@ -1023,6 +1024,7 @@ sub send
             }
             else
             {
+                my $ssl_opts = $self->ssl_opts;
                 $io = HTTP::Promise::IO->connect_ssl(
                     host => $uri->host,
                     port => $uri->port,
@@ -1031,6 +1033,7 @@ sub send
                     debug   => $self->debug,
                     ( defined( $p->{local_host} ) ? ( local_host => $p->{local_host} ) : () ),
                     ( defined( $p->{local_port} ) ? ( local_port => $p->{local_port} ) : () ),
+                    ( ( defined( $ssl_opts ) && scalar( keys( %$ssl_opts ) ) ) ? ( ssl_opts => $ssl_opts ) : () ),
                 ) || return( HTTP::Promise::IO->pass_error );
             }
         }
@@ -1348,6 +1351,7 @@ sub send
     unless( $req->method eq 'HEAD'
             || ( $def->{code} >= 100 && $def->{code} < 200 )
             || $def->{code} == 204
+            || $def->{code} == 302
             || $def->{code} == 304 )
     {
         if( $chunked )
@@ -1495,6 +1499,8 @@ sub simple_request
         return( $resp );
     }
 }
+
+sub ssl_opts { return( shift->_set_get_hash_as_mix_object( 'ssl_opts', @_ ) ); }
 
 sub stop_if { return( shift->_set_get_code( 'stop_if', @_ ) ); }
 
@@ -1783,7 +1789,7 @@ sub _make_request_query
     my $u = $req->uri || 
         return( $self->error( "No URL was provided for this HTTP query." ) );
     my( $k, $v );
-    while( ( $k, $v ) = splice( @_, 0, 2 ) )
+    while( ( $k, $v ) = ( @_ == 1 && ref( $_[0] ) eq 'HASH' ) ? each( %{$_[0]} ) : splice( @_, 0, 2 ) )
     {
         if( lc( $k ) eq 'content' || lc( $k ) eq 'query' )
         {
@@ -2246,7 +2252,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.3.3
+    v0.4.1
 
 =head1 DESCRIPTION
 

@@ -2,9 +2,8 @@ bin/create_db.PL
 bin/translate.PL
 Changes
 lib/Locale/Places.pm
-lib/Locale/Places/DB.pm
-lib/Locale/Places/DB/GB.pm
-lib/Locale/Places/DB/US.pm
+lib/Locale/Places/Database/GB.pm
+lib/Locale/Places/Database/US.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

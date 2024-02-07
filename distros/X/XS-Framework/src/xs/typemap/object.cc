@@ -16,8 +16,8 @@ static int _backref_marker (pTHX_ SV*, MAGIC*, SV*, const char*, I32) { assert(0
 static bool destroy_hook (pTHX_ SV* sv) {
     MAGIC* mg = SvMAGIC(sv);
     for (; mg; mg = mg->mg_moremagic) {
-        if (mg->mg_virtual && mg->mg_virtual->svt_copy == backref_marker) {
-            if (mg->mg_virtual->svt_local(aTHX_ sv, mg)) return TRUE;
+        if (mg->mg_virtual && (mg->mg_flags & MGf_COPY) && (mg->mg_virtual->svt_copy == backref_marker)) {
+            if ((mg->mg_flags & MGf_LOCAL) && mg->mg_virtual->svt_local(aTHX_ sv, mg)) return TRUE;
         }
     }
     if (orig_destroy_hook) return orig_destroy_hook(aTHX_ sv);

@@ -4,7 +4,64 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
+
+use Carp;
+use Exporter;
+use Scalar::Util qw( set_prototype );
+
+use Resource::Silo::Metadata;
+use Resource::Silo::Container;
+
+# Store definitions here
+our %metadata;
+
+sub import {
+    my ($self, @param) = @_;
+    my $caller = caller;
+    my $target;
+    my $shortcut = "silo";
+
+    while (@param) {
+        my $flag = shift @param;
+        if ($flag eq '-class') {
+            $target = $caller;
+        } elsif ($flag eq '-shortcut') {
+            $shortcut = shift @param;
+            croak "-shortcut must be an identifier"
+                unless $shortcut and !ref $shortcut and $shortcut =~ /^[a-z_][a-z_0-9]*$/i;
+        } else {
+            # TODO if there's more than 3 elsifs, use jump table instead
+            croak "Unexpected parameter to 'use $self': '$flag'";
+        };
+    };
+
+    $target ||= __PACKAGE__."::container::".$caller;
+
+    my $spec = Resource::Silo::Metadata->new($target);
+    $metadata{$target} = $spec;
+
+    my $instance;
+    my $silo = set_prototype {
+        # cannot instantiate target until the package is fully defined,
+        # thus go lazy
+        $instance //= $target->new;
+    } '';
+
+    no strict 'refs'; ## no critic
+    no warnings 'redefine', 'once'; ## no critic
+
+    push @{"${target}::ISA"}, 'Resource::Silo::Container';
+
+    push @{"${caller}::ISA"}, 'Exporter';
+    push @{"${caller}::EXPORT"}, $shortcut;
+    *{"${caller}::resource"} = $spec->_make_dsl;
+    *{"${caller}::$shortcut"}     = $silo;
+};
+
+1; # End of Resource::Silo
+
+__END__
 
 =head1 NAME
 
@@ -12,114 +69,150 @@ Resource::Silo - lazy declarative resource container for Perl.
 
 =head1 DESCRIPTION
 
-We assume the following setup:
+This module provides a container that manages initialization, caching, and
+cleanup of resources that the application needs to talk to the outside world,
+such as configuration files, database connections, queues,
+external service endpoints, and so on.
 
-=over
+Upon use, a one-off container class based on L<Resource::Silo::Container>
+with a one-and-true (but not only) instance is created.
 
-=item * The application needs to access multiple resources, such as
-configuration files, databases, queues, service endpoints, credentials, etc.
+The resources are then defined using a L<Moose>-like DSL,
+and their identifiers become method names in said class.
+Apart from a name, each resource defined an initialization routine,
+and optionally dependencies, cleanup routine, and various flags.
 
-=item * The application has helper scripts that don't need to initialize
-all the resources at once, as well as a test suite where accessing resources
-is undesirable unless a fixture or mock is provided.
-
-=item * The resource management has to be decoupled from the application
-logic where possible.
-
-=back
-
-And we propose the following solution:
-
-=over
-
-=item * All available resources are declared in one place
-and encapsulated within a single container.
-
-=item * Such container is equipped with methods to access resources,
-as well as an exportable prototyped function for obtaining the one and true
-instance of it (a.k.a. optional singleton).
-
-=item * Every class or script in the project accesses resources
-through this container and only through it.
-
-=back
+Resources are instantiated on demand and cached.
+The container is fork-aware and will reset its cache
+whenever the process ID changes.
 
 =head1 SYNOPSIS
 
-The default mode is to create a one-off container for all resources
-and export if into the calling class via C<silo> function.
+Declaring the resources:
 
     package My::App;
+
+    # This creates 'resource' and 'silo' functions
+    # and *also* makes 'silo' re-exportable via Exporter
     use Resource::Silo;
 
-    use DBI;
-    use YAML::LoadFile;
-    ...
+    # A literal resource, that is, initialized with a constant value
+    resource config_file =>
+        literal => '/etc/myapp/myapp.yaml';
 
-    resource config => sub { LoadFile( ... ) };
-    resource dbh    => sub {
-        my $self = shift;
-        my $conf = $self->config->{dbh};
-        DBI->connect( $conf->{dsn}, $conf->{user}, $conf->{pass}, { RaiseError => 1 } );
-    };
-    resource queue  => sub { My::Queue->new( ... ) };
-    ...
+    # A typical resource with a lazy-loaded module
+    resource config =>
+        require => 'YAML::XS',
+        init    => sub {
+            my $self = shift;
+            YAML::XS::LoadFile( $self->config_file );
+        };
 
-    my $statement = silo->dbh->prepare( $sql );
-    my $queue = silo->queue;
+    # Derived resource is a front end to other resources
+    # without side effects of its own.
+    resource app_name =>
+        derived => 1,
+        init    => sub { $_[0]->config->{name} };
 
-For more complicated projects, it may make more sense
-to create a dedicated class for resource management:
+    # An RDBMS connection is one of the most expected things here
+    resource dbh =>
+        require      => [ 'DBI' ],      # loading multiple modules is fine
+        dependencies => [ 'config' ],
+        init         => sub {
+            my $self = shift;
+            my $config = $self->config->{database};
+            DBI->connect(
+                $config->{dsn},
+                $config->{username},
+                $config->{password},
+                { RaiseError => 1 }
+            );
+        };
 
-    # in the container class
-    package My::Project::Res;
-    use Resource::Silo -class;      # resource definitions will now create
-                                    # eponymous methods in My::Project::Res
+    # A full-blown Spring style dependency injection
+    resource myclass =>
+        derived => 1,
+        class   => 'My::App::Class',  # call My::App::Class->new
+        dependencies => {
+            dbh => 1,                 # pass 'dbh' resource to new()
+            name => 'app_name',       # set 'name' parameter to 'app_name' resource
+            version => \3.14,         # pass a literal value
+        };
 
-    resource foo => sub { ... };    # declare resources as in the above example
-    resource bar => sub { ... };
+Accessing the resources in the app itself:
 
-    1;
+    use My::App qw(silo);
 
-    # in all other modules/packages/scripts:
+    my $app = silo->myclass; # this will initialize all the dependencies
+    $app->frobnicate;
 
-    package My::Project;
-    use My::Project::Res qw(silo);
+Partial resource usage and fine-grained control,
+e.g. in a maintenance script:
 
-    silo->foo;                      # obtain resources
-    silo->bar;
+    use 5.010;
+    use My::App qw(silo);
 
-    My::Project::Res->new;          # separate empty resource container
+    # Override a resource with something else
+    silo->ctl->override( config => shift );
 
-=head1 EXPORT
+    # This will derive a database connection from the given configuration file
+    my $dbh = silo->dbh;
+
+    say $dbh->selectall_arrayref('SELECT * FROM users')->[0][0];
+
+Writing tests:
+
+    use Test::More;
+    use My::All qw(silo);
+
+    # replace side effect with mocks
+    silo->ctl->override( config => $config_hash, dbh => $local_sqlite );
+
+    # make sure no other side effects will ever be triggered
+    # (unless 'derived' flag is set or resource is a literal)
+    silo->ctl->lock;
+
+    my $app = silo->myclass;
+    # run actual tests below
+
+=head1 IMPORT/EXPORT
 
 The following functions will be exported into the calling module,
 unconditionally:
 
 =over
 
-=item * silo - a singleton function returning the resource container.
-Note that this function will be created separately for every calling module,
-and needs to be re-exported to be shared.
+=item * resource - resource declaration DSL;
 
-=item * resource - a DSL for defining resources, their initialization
-and properties. See below.
+=item * silo - a re-exportable prototyped function
+returning the one and true container instance.
 
 =back
 
-Additionally, if the C<-class> argument was added to the use line,
-the following things happen:
+Additionally, L<Exporter> is added to the calling package's C<@ISA>
+and C<silo> is appended to C<our @EXPORT>.
 
-=over
+B<NOTE> If the module has other exported functions, they should be added
+via
 
-=item * L<Resource::Silo::Container> and L<Exporter> are added to C<@ISA>;
+    push our @EXPORT, qw( foo bar quux );
 
-=item * C<silo> function is added to C<@EXPORT> and thus becomes re-exported
-by default;
+or else the C<silo> function in that array will be overwritten.
 
-=item * calling C<resource> creates a corresponding method in this package.
+=head2 USE OPTIONS
 
-=back
+=head3 -class
+
+If a C<-class> argument is given on the use line,
+the calling package will itself become the container class.
+
+Such a class may have normal fields and methods in addition to resources
+and will also be L<Moose>- and L<Moo>-compatible.
+
+=head3 -shortcut <function name>
+
+If specified, use that name for singleton instance instead of C<silo>.
+Name must be a valid identifier, i.e. C</[a-z_][a-z_0-9]*/i>.
 
 =head2 resource
 
@@ -128,13 +221,21 @@ by default;
 
 %options may include:
 
-=head3 init => sub { $self, $name, [$argument] }
+=head3 init => sub { $container, $name, [$argument] }
 
 A coderef to obtain the resource.
 Required, unless C<literal> or C<class> are specified.
 
 If the number of arguments is odd,
 the last one is popped and considered to be the init function.
+
+The arguments to the initializer are the container itself,
+resource name, and an optional argument or an empty string if none given.
+
+Returning an C<undef> value is considered an error.
+
+Using C<Carp::croak> in the initializer will blame the code
+that has requested the resource, skipping Resource::Silo's internals.
 
 =head3 literal => $value
 
@@ -145,21 +246,35 @@ and an empty C<dependencies> list is implied.
 
 =head3 argument => C<sub { ... }> || C<qr( ... )>
 
-If specified, assume that the resource in question may have several instances,
-distinguished by a string argument. Such argument will be passed as the 3rd
-parameter to the C<init> function.
+Declare a (possibly infinite) set of sibling resources under the same name,
+distinguished by a string parameter.
+Said parameter will be passed as the 3rd parameter to the C<init> function.
 
-Only one resource instance will be cached per argument value.
-
-This may be useful e.g. for L<DBIx::Class> result sets,
-or for L<Redis::Namespace>.
+Exactly one resource instance will be cached per argument value.
 
 A regular expression will always be anchored to match I<the whole string>.
 A function must return true for the parameter to be valid.
 
 If the argument is omitted, it is assumed to be an empty string.
 
-See L<MORE EXAMPLES> below.
+E.g. when using L<Redis::Namespace>:
+
+    package My::App;
+    use Resource::Silo;
+
+    resource redis_server => sub { Redis->new() };
+
+    resource redis =>
+        require         => 'Redis::Namespace',
+        derived         => 1,
+        argument        => qr([\w:]*),
+        init            => sub {
+            my ($c, undef, $ns) = @_;
+            Redis::Namespace->new(
+                redis     => $c->redis_server,
+                namespace => $ns,
+            );
+        };
 
 =head3 derived => 1 | 0
 
@@ -189,6 +304,8 @@ If set, try loading the resource when C<silo-E<gt>ctl-E<gt>preload> is called.
 Useful if you want to throw errors when a service is starting,
 not during request processing.
 
+See L<Resource::Silo::Container/preload>.
+
 =head3 cleanup => sub { $resource_instance }
 
 Undo the init procedure.
@@ -210,12 +327,22 @@ The default is 0, negative numbers are also valid, if that makes sense for
 you application
 (e.g. destroy C<$my_service_main_object> before the resources it consumes).
 
+    resource logger =>
+        cleanup_order   => 9e9,     # destroy as late as possible
+        require         => [ 'Log::Any', 'Log::Any::Adapter' ],
+        init            => sub {
+            Log::Any::Adapter->set( 'Stderr' );
+            # your rsyslog config could be here
+            Log::Any->get_logger;
+        };
+
 =head3 fork_cleanup => sub { $resource_instance }
 
-Like C<cleanup>, but only in case a change in process ID was detected.
-See L</FORKING>
-
+If present, use this function in place of C<cleanup>
+if the process ID has changed.
 This may be useful if cleanup is destructive and shouldn't be performed twice.
+
+See L</FORKING>.
 
 =head3 dependencies => \@list
 
@@ -318,97 +445,67 @@ within the same interpreter without interference.>
 
 C<silo-E<gt>new> will create a new instance of the I<same> container class.
 
-=cut
-
-use Carp;
-use Exporter;
-use Scalar::Util qw( set_prototype );
-
-use Resource::Silo::Metadata;
-use Resource::Silo::Container;
-
-# Store definitions here
-our %metadata;
-
-sub import {
-    my ($self, @param) = @_;
-    my $caller = caller;
-    my $target;
-
-    while (@param) {
-        my $flag = shift @param;
-        if ($flag eq '-class') {
-            $target = $caller;
-        } else {
-            # TODO if there's more than 3 elsifs, use jump table instead
-            croak "Unexpected parameter to 'use $self': '$flag'";
-        };
-    };
-
-    $target ||= __PACKAGE__."::container::".$caller;
-
-    my $spec = Resource::Silo::Metadata->new($target);
-    $metadata{$target} = $spec;
-
-    my $instance;
-    my $silo = set_prototype {
-        # cannot instantiate target until the package is fully defined,
-        # thus go lazy
-        $instance //= $target->new;
-    } '';
-
-    no strict 'refs'; ## no critic
-    no warnings 'redefine', 'once'; ## no critic
-
-    push @{"${target}::ISA"}, 'Resource::Silo::Container';
-
-    push @{"${caller}::ISA"}, 'Exporter';
-    push @{"${caller}::EXPORT"}, qw(silo);
-    *{"${caller}::resource"} = $spec->_make_dsl;
-    *{"${caller}::silo"}     = $silo;
-};
-
-=head1 TESTING: LOCK AND OVERRIDES
-
-It's usually a bad idea to access real-world resources in one's test suite,
-especially if it's e.g. a partner's endpoint.
-
-Now the #1 rule when it comes to mocks is to avoid mocks and instead design
-the modules in such a way that they can be tested in isolation.
-This however may not always be easily achievable.
-
-Thus, L<Resource::Silo> provides a mechanism to substitute a subset of resources
-with mocks and forbid the instantiation of the rest, thereby guarding against
-unwanted side-effects.
-
-The C<lock>/C<unlock> methods in L<Resource::Silo::Container>,
-available via C<silo-E<gt>ctl> frontend,
-temporarily forbid instantiating new resources.
-The resources already in cache will still be OK though.
-
-The C<override> method allows to supply substitutes for resources or
-their initializers.
-
-The C<derived> flag in the resource definition may be used to indicate
-that a resource is safe to instantiate as long as its dependencies are
-either instantiated or mocked, e.g. a L<DBIx::Class> schema is probably fine
-as long as the underlying database connection is taken care of.
-
-Here is an example:
-
-    use Test::More;
-    use My::Project qw(silo);
-    silo->ctl->lock->override(
-        dbh => DBI->connect( 'dbi:SQLite:database=:memory:', '', '', { RaiseError => 1 ),
-    );
-
-    silo->dbh;                   # a mocked database
-    silo->schema;                # a DBIx::Class schema reliant on the dbh
-    silo->endpoint( 'partner' ); # an exception as endpoint wasn't mocked
-
 =head1 CAVEATS AND CONSIDERATIONS
 
-See L<Resource::Silo::Container> for resource container implementation.
+See L<Resource::Silo::Container> for the container implementation.
+
+See L<Resource::Silo::Metadata> for the metadata storage.
+
+=head2 FINE-GRAINED CONTROL INTERFACE
+
+Calling C<$container-E<gt>ctl> will return a frontend object
+which allows to control the container itself.
+This is done so in order to avoid polluting the container namespace:
+
+    use My::App qw(silo);
+
+    # instantiate a separate instance of a resource, ignoring the cache
+    # e.g. for a long and invasive database update
+    my $dbh = silo->ctl->fresh("dbh");
+
+See L<Resource::Silo::Container/ctl> for more.
+
+=head2 OVERRIDES AND LOCKING
+
+In addition to declaring resources, L<Resource::Silo> provides a mechanism
+to C<override> an existing initializer with a user-supplied routine.
+(If a non-coderef value is given, it's wrapped into a function.)
+
+It also allows to prevent instantiation of new resources via C<lock> method.
+After C<$container-E<gt>ctl-E<gt>lock>,
+trying to obtain a resource will cause an exception,
+unless the resource is overridden, already in the cache,
+or marked as C<derived> and thus considered safe,
+as long as its dependencies are safe.
+
+The primary use for these is of course providing test fixtures / mocks:
+
+    use Test::More;
+    use My::App qw(silo);
+
+    silo->ctl->override(
+        config  => $config_hash,     # short hand for sub { $config_hash }
+        dbh     => $local_sqlite,
+    );
+    silo->ctl->lock;
+
+    silo->dbh->do( $sql );                  # works on the mock
+    silo->user_agent->get( $partner_url );  # dies unless the UA was also mocked
+
+Passing parameters to the container class constructor
+will use C<override> internally, too:
+
+    package My::App;
+    use Resource::Silo -class;
+
+    resource foo => sub { ... };
+
+    # later...
+    my $app = My::App->new( foo => $foo_value );
+    $app->frobnicate();      # will use $foo_value instead of instantiating foo
+
+See L<Resource::Silo::Container/override>, L<Resource::Silo::Container/lock>,
+and L<Resource::Silo::Container/unlock> for details.
 
 =head2 CACHING
 
@@ -451,137 +548,77 @@ both L<Moo> and L<Moose> when in C<-class> mode:
     };
 
 Extending such mixed classes will also work.
-However, the resource definitions will be taken
-from the nearest ancestor that has them, using breadth first search.
+However, as of current, the resource definitions will be taken
+from the nearest ancestor that has any, using breadth first search.
+
+=head2 TROUBLESHOOTING
+
+Resource instantiation order may become tricky in real-life usage.
+
+C<$container-E<gt>ctl-E<gt>list_cached> will output a list of all
+resources that have been initialized so far. The ones with arguments
+will be in form of "name/argument".
+See L<Resource::Silo::Container/list_cached>.
+
+C<$container-E<gt>ctl-E<gt>meta> will return a metaclass object
+containing the resource definitions.
+See L<Resource::Silo::Container/meta>.
 
 =head1 MORE EXAMPLES
 
-=head2 Resources with just the init
+Setting up outgoing HTTP.
+Aside from having all the tricky options in one place,
+this prevents accidentally talking to production endpoints while running tests.
 
-    package My::App;
-    use Resource::Silo;
-
-    resource config => sub {
-        require YAML::XS;
-        YAML::XS::LoadFile( "/etc/myapp.yaml" );
-    };
-
-    resource dbh    => sub {
-        require DBI;
-        my $self = shift;
-        my $conf = $self->config->{database};
-        DBI->connect(
-            $conf->{dbi}, $conf->{username}, $conf->{password}, { RaiseError => 1 }
-        );
-    };
-
-    resource user_agent => sub {
-        require LWP::UserAgent;
-        LWP::UserAgent->new();
-        # set your custom UserAgent header or SSL certificate(s) here
-    };
-
-Note that though lazy-loading the modules is not necessary,
-it may speed up loading support scripts.
-
-=head2 Resources with extra options
-
-    resource logger =>
-        cleanup_order   => 9e9,     # destroy as late as possible
-        require         => [ 'Log::Any', 'Log::Any::Adapter' ],
-        init            => sub {
-            Log::Any::Adapter->set( 'Stderr' );
-            # your rsyslog config could be here
-            Log::Any->get_logger;
+    resource user_agent =>
+        require => 'LWP::UserAgent',
+        init => sub {
+            my $ua = LWP::UserAgent->new;
+            $ua->agent( 'Tired human with red eyes' );
+            $ua->protocols_allowed( ['http', 'https'] );
+            # insert your custom SSL certificates here
+            $ua;
         };
 
+Using L<DBIx::Class> together with a regular L<DBI> connection:
+
+    resource dbh => sub { ... };
+
     resource schema =>
-        derived         => 1,        # merely a frontend to dbi
+        derived         => 1,                   # merely a frontend to DBI
         require         => 'My::App::Schema',
+        dependencies    => [ 'dbh' ],
         init            => sub {
             my $self = shift;
             return My::App::Schema->connect( sub { $self->dbh } );
         };
 
-=head2 Resource with parameter
-
-An useless but short example:
-
-    #!/usr/bin/env perl
-
-    use strict;
-    use warnings;
-    use Resource::Silo;
-
-    resource fibonacci =>
-        argument            => qr(\d+),
-        init                => sub {
-            my ($self, $name, $arg) = @_;
-            $arg <= 1 ? $arg
-                : $self->fibonacci($arg-1) + $self->fibonacci($arg-2);
-        };
-
-    print silo->fibonacci(shift);
-
-A more pragmatic one:
-
-    package My::App;
-    use Resource::Silo;
-
-    resource redis_conn => sub {
-        my $self = shift;
-        require Redis;
-        Redis->new( server => $self->config->{redis} );
-    };
-
-    my %known_namespaces = (
-        lock    => 1,
-        session => 1,
-        user    => 1,
-    );
-
-    resource redis  =>
-        argument        => sub { $known_namespaces{ $_ } },
-        require         => 'Redis::Namespace',
+    resource resultset =>
+        derived         => 1,
+        dependencies    => 'schema',
+        argument        => qr(\w+),
         init            => sub {
-            my ($self, $name, $ns) = @_;
-            Redis::Namespace->new(
-                redis     => $self->redis,
-                namespace => $ns,
-            );
+            my ($c, undef, $name) = @_;
+            return $c->schema->resultset($name);
         };
-
-    # later in the code
-    silo->redis;            # nope!
-    silo->redis('session'); # get a prefixed namespace
-
-=head3 Overriding in test files
-
-    use Test::More;
-    use My::App qw(silo);
-
-    silo->ctl->override( dbh => $temp_sqlite_connection );
-    silo->ctl->lock;
-
-    my $stuff = My::App::Stuff->new();
-    $stuff->frobnicate( ... );        # will only affect the sqlite instance
-
-    $stuff->ping_partner_api();       # oops! the user_agent resource wasn't
-                                      # overridden, so there'll be an exception
-
-=head3 Fetching a dedicated resource instance
-
-    use My::App qw(silo);
-    my $dbh = silo->ctl->fresh('dbh');
-
-    $dbh->begin_work;
-    # Perform a Big Scary Update here
-    # Any operations on $dbh won't interfere with normal usage
-    #     of silo->dbh by other application classes.
 
 =head1 SEE ALSO
 
 L<Bread::Board> - a more mature IoC / DI framework.
+
+=head1 BUGS
+
+This software is still in beta stage. Its interface is still evolving.
+
+Version 0.09 brings a breaking change that forbids forward dependencies.
+
+Forced re-exporting of C<silo> was probably a bad idea
+and should have been left as an exercise to the user.
+
+Please report bug reports and feature requests to
+L<https://github.com/dallaylaen/resource-silo-p5/issues>
+or via RT:
+L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Resource-Silo>.
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -592,20 +629,9 @@ B<I<Heroes of Might and Magic III.>>
 
 =item * This module was inspired in part by my work for
 L<Cloudbeds|https://www.cloudbeds.com/>.
-That was a great time and I had great coworkers!
+That was a great time!
 
 =back
-
-=head1 BUGS
-
-This software is still in beta stage. Its interface is still evolving.
-
-Version 0.09 brings a breaking change that forbids forward dependencies.
-
-Please report bug reports and feature requests to
-L<https://github.com/dallaylaen/resource-silo-p5/issues>
-or via RT:
-L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Resource-Silo>.
 
 =head1 SUPPORT
 
@@ -615,25 +641,27 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over
+
+=item * Github: L<https://github.com/dallaylaen/resource-silo-p5>;
 
 =item * RT: CPAN's request tracker (report bugs here)
 
-L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Resource-Silo>
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Resource-Silo>;
 
 =item * CPAN Ratings
 
-L<https://cpanratings.perl.org/d/Resource-Silo>
+L<https://cpanratings.perl.org/d/Resource-Silo>;
 
 =item * Search CPAN
 
-L<https://metacpan.org/release/Resource-Silo>
+L<https://metacpan.org/release/Resource-Silo>;
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2023, Konstantin Uvarin, C<< <khedin@gmail.com> >>
+Copyright (c) 2023-2024, Konstantin Uvarin, C<< <khedin@gmail.com> >>
 
 This program is free software.
 You can redistribute it and/or modify it under the terms of either:
@@ -643,5 +671,3 @@ or the Artistic License.
 See L<http://dev.perl.org/licenses/> for more information.
 
 =cut
-
-1; # End of Resource::Silo

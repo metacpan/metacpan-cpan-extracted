@@ -99,7 +99,7 @@ sub mock_request {
         form   => parse_form($data->{content}),
     });
 
-    return { success => 1, content => qq({"id":"$id"}) };
+    return { success => 1, status => 200, content => qq({"id":"$id"}) };
 }
 
 sub parse_form {

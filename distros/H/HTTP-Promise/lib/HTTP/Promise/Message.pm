@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Message.pm
-## Version v0.2.0
+## Version v0.3.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/21
-## Modified 2023/09/08
+## Modified 2024/02/01
 ## All rights reserved.
 ## 
 ## 
@@ -26,7 +26,7 @@ BEGIN
     our $CRLF = "\015\012";
     # HTTP/1.0, HTTP/1.1, HTTP/2
     our $HTTP_VERSION  = qr/(?<http_protocol>HTTP\/(?<http_version>(?<http_vers_major>[0-9])(?:\.(?<http_vers_minor>[0-9]))?))/;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -615,6 +615,26 @@ sub decoded_content_utf8
     return( $data );
 }
 
+sub decoded_json
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{binmode} = 'utf-8';
+    my $data = $self->decoded_content_utf8( $opts );
+    if( $self->headers->content_is_json )
+    {
+        local $@;
+        # try-catch
+        my $ref = eval
+        {
+            return( $self->new_json->relaxed->decode( $$data ) );
+        };
+        return( $self->error( "Error decoding JSON payload: $@\nPayload was: $data" ) ) if( $@ );
+        return( $ref );
+    }
+    return( $data );
+}
+
 sub dump
 {
     my $self = shift( @_ );
@@ -1134,7 +1154,7 @@ HTTP::Promise::Message - HTTP Message Class
 
 =head1 VERSION
 
-    v0.2.0
+    v0.3.0
 
 =head1 DESCRIPTION
 
@@ -1482,6 +1502,10 @@ When set to true, this will cause this method to die upon error. Default is fals
 This calls L</decoded_content>, but this sets the C<binmode> option to C<utf-8>.
 
 It returns whatever L</decode_content> returns.
+
+=head2 decoded_json
+
+If the content type of the response is C<application/json>, this will call L</decoded_content_utf8> and decode the JSON payload and return the hash reference. If an error occurred, it will set L<an error|Module::Generic/error> and return C<undef> in scalar context, or an empty list in list context.
 
 =head2 dump
 

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::Jolt;
 # ABSTRACT: Jolt result handler
-$Neo4j::Driver::Result::Jolt::VERSION = '0.42';
+$Neo4j::Driver::Result::Jolt::VERSION = '0.44';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -102,7 +102,6 @@ sub _gather_results {
 			# If a rollback caused by a failure fails as well,
 			# two failure events may appear on the Jolt stream.
 			# Otherwise, there is always one at most.
-			carp "Jolt error: unexpected error event $prev" unless $state == 0 || $state == 3 || $state == 4;
 			croak "Jolt error: expected reference to HASH, received " . (ref $event ? "reference to " . ref $event : "scalar") . " in $type event $prev" unless ref $event eq 'HASH';
 			$state = 4;
 			$error = $error->append_new(Internal => "Jolt error: Jolt $type event with 0 errors $prev") unless @{$event->{errors}};

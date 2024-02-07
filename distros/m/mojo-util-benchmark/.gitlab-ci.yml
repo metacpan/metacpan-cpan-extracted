@@ -1,0 +1,17 @@
+stages:
+#  - build
+  - test
+
+#pages:
+#  stage: build
+#  script:
+#    - mkdir public
+#    - cp -r docs/* public
+#  artifacts:
+#    paths:
+#      - public
+
+sast:
+  stage: test
+include:
+  - template: Security/SAST.gitlab-ci.yml

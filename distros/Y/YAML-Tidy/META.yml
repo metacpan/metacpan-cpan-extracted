@@ -23,28 +23,28 @@ name: YAML-Tidy
 provides:
   YAML::Tidy:
     file: lib/YAML/Tidy.pm
-    version: v0.9.0
+    version: v0.10.0
   YAML::Tidy::Config:
     file: lib/YAML/Tidy/Config.pm
-    version: v0.9.0
+    version: v0.10.0
   YAML::Tidy::Node:
     file: lib/YAML/Tidy/Node.pm
-    version: v0.9.0
+    version: v0.10.0
   YAML::Tidy::Node::Alias:
     file: lib/YAML/Tidy/Node.pm
-    version: v0.9.0
+    version: v0.10.0
   YAML::Tidy::Node::Collection:
     file: lib/YAML/Tidy/Node.pm
-    version: v0.9.0
+    version: v0.10.0
   YAML::Tidy::Node::Leaf:
     file: lib/YAML/Tidy/Node.pm
-    version: v0.9.0
+    version: v0.10.0
   YAML::Tidy::Node::Scalar:
     file: lib/YAML/Tidy/Node.pm
-    version: v0.9.0
+    version: v0.10.0
   YAML::Tidy::Run:
     file: lib/YAML/Tidy/Run.pm
-    version: v0.9.0
+    version: v0.10.0
 requires:
   Cwd: '0'
   Data::Dumper: '0'
@@ -65,7 +65,7 @@ requires:
 resources:
   bugtracker: https://github.com/perlpunk/yamltidy/issues
   repository: https://github.com/perlpunk/yamltidy
-version: v0.9.0
+version: v0.10.0
 x_generated_by_perl: v5.30.3
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

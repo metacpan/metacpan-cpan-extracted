@@ -25,7 +25,7 @@ if ($ENV{LOGGER}) {
 if (@vars) {
     variate_catch($tname, @vars) for (1..$cnt);
 } else {
-    catch_run($tname) for (1..$cnt);
+    test_catch($tname) for (1..$cnt);
 }
 
 done_testing();

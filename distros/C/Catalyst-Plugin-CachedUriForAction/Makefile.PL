@@ -19,8 +19,7 @@ our %META = (
 		runtime => {
 			requires => {qw(
 				perl 5.008005
-				Moose::Role 0
-				Class::MOP::Class 0
+				mro 0
 				Catalyst 5.90090
 				URI::Encode::XS 0.11
 			)},

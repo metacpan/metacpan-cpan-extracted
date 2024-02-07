@@ -1,3 +1,7 @@
+# local pass for V0.87.1
+#L_SU_path.pm
+#L_SU_global_constants.pm
+#dirs.pm
 algebra_by.pm
 array.pm
 big_streams_param.pm

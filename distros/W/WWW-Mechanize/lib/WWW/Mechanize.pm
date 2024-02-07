@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '2.17';
+our $VERSION = '2.18';
 
 use Tie::RefHash       ();
 use HTTP::Request 1.30 ();
@@ -1180,7 +1180,8 @@ sub click_button {
         value  => 1,
     );
 
-    my @present_exclusive_options = @exclusive_options{ keys %args };
+    my @present_exclusive_options
+        = map { $_ || () } @exclusive_options{ keys %args };
 
     if ( scalar @present_exclusive_options > 1 ) {
         $self->die(
@@ -2018,7 +2019,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 2.17
+version 2.18
 
 =head1 SYNOPSIS
 

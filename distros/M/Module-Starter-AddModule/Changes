@@ -1,5 +1,9 @@
 Revision history for Perl module Module::Starter::AddModule
 
+1.009 2024-01-31T03:02:33Z
+	* update minimum version to v5.12, since Software::LicenseUtil requires that
+	* refresh distro, update email addresses
+
 1.008 2022-01-09T03:58:41Z
 	* no code changes. Fix a link in README.pod.
 

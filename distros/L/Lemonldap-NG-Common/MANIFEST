@@ -35,7 +35,7 @@ lib/Lemonldap/NG/Common/Conf/SAML/Metadata.pm
 lib/Lemonldap/NG/Common/Conf/Serializer.pm
 lib/Lemonldap/NG/Common/Conf/Wrapper.pm
 lib/Lemonldap/NG/Common/Crypto.pm
-lib/Lemonldap/NG/Common/EmailTransport.pm
+lib/Lemonldap/NG/Common/EmailAddress.pm
 lib/Lemonldap/NG/Common/FormEncode.pm
 lib/Lemonldap/NG/Common/IPv6.pm
 lib/Lemonldap/NG/Common/JWT.pm
@@ -95,6 +95,7 @@ t/35-Common-Crypto.t
 t/36-Common-Regexp.t
 t/37-Common-TOTP.pm
 t/40-Common-Session.t
+t/41-Common-EmailAddress.t
 t/45-importMetadata-config.t
 t/45-importMetadata.t
 t/50-Combination-Parser.t

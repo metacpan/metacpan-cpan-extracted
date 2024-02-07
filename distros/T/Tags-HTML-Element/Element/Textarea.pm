@@ -7,9 +7,9 @@ use warnings;
 use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
-use Tags::HTML::Element::Utils qw(tags_boolean tags_value);
+use Tags::HTML::Element::Utils qw(tags_boolean tags_label tags_value);
 
-our $VERSION = 0.02;
+our $VERSION = 0.06;
 
 sub _cleanup {
 	my $self = shift;
@@ -44,6 +44,7 @@ sub _process {
 	}
 
 	$self->{'tags'}->put(
+		tags_label($self, $self->{'_textarea'}),
 		['b', 'textarea'],
 		tags_boolean($self, $self->{'_textarea'}, 'autofocus'),
 		tags_value($self, $self->{'_textarea'}, 'css_class', 'class'),
@@ -282,12 +283,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023-2024 Michal Josef Špaček
+© 2022-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.06
 
 =cut

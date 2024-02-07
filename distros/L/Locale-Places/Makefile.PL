@@ -8,162 +8,197 @@ use IO::Socket::INET;
 
 my $site = 'download.geonames.org';
 
-if($ENV{'NO_NETWORK_TESTING'}) {
-	print STDERR "NA: NO_NETWORK_TESTING is defined\n";
-	exit(0);
-}
-
 if(!IO::Socket::INET->new(PeerAddr => "$site:80", Timeout => 5)) {
 	print STDERR "NA: Can't connect to $site\n";
 	exit(0);
 }
 
-my @dirs = (
-	'lib/Locale/Places/databases',
-);
-
-foreach my $dir(@dirs) {
-	if(! -d $dir) {
-		print "Creating the download directory $dir\n";
-		mkdir $dir || die "$dir: $@";
-	}
+if(defined($ENV{'GITHUB_ACTION'}) || defined($ENV{'TRAVIS_PERL_VERSION'}) || defined($ENV{'APPVEYOR'})) {
+	# Prevent downloading and installing stuff
+	$ENV{'AUTOMATED_TESTING'} = 1;
 }
 
-# unlink('lib/Geo/Coder/Free/MaxMind/databases/cities.sql');
-if(eval { require HTTP::Cache::Transparent; }) {
-	HTTP::Cache::Transparent->import();
-	my $cachedir;
-	if(my $e = $ENV{'CACHEDIR'}) {
-		$cachedir = File::Spec->catfile($e, 'http-cache-transparent');
-	} else {
-		require File::HomeDir;
-		File::HomeDir->import();
-
-		# $cachedir = File::Spec->catfile(File::Spec->tmpdir(), 'cache', 'http-cache-transparent');
-		$cachedir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', 'http-cache-transparent');
-	}
-
-	if(!-d $cachedir) {
-		print "Creating the cache directory $cachedir\n";
-		mkdir $cachedir, 02755 || die "$cachedir: $@";
-	}
-	HTTP::Cache::Transparent::init({
-		BasePath => $cachedir,
-		# Verbose => $opts{'v'} ? 1 : 0,
-		Verbose => 1,
-		NoUpdate => 60 * 60 * 24,
-		MaxAge => 30 * 24
-	}) || die "$0: $cachedir: $!";
-} elsif(!$ENV{'AUTOMATED_TESTING'}) {
-	print "Consider installing HTTP::Cache::Transparent to reduce downloads\n";
-}
-
-my $use_withcache;
-if(eval { require LWP::Simple::WithCache; }) {
-	LWP::Simple::WithCache->import();
-	$use_withcache = 1;
-} else {
-	require LWP::Simple;
-	LWP::Simple->import();
-
-	if(!$ENV{'AUTOMATED_TESTING'}) {
-		print "Consider installing LWP::Simple::WithCache to reduce downloads\n";
-	}
-}
-
-foreach my $country('GB', 'US') {
-	my $url = "https://$site/export/dump/alternatenames/$country.zip";
-	my $file = "lib/Locale/Places/databases/$country.zip";
-
-	my $use_mirror = 0;
-
-	if(-r $file) {
-		# Don't bother checking for a download if the file is less than a week old
-		next if(-M $file < 7);
-		# I get errors with mirror with L:S:WithCache
-		#	that the temporary file is unavailable
-		if(!$use_withcache) {
-			# Only download if a newer version is available
-			$use_mirror = 1;
-		}
-		unlink $file;	# Don't leave anything stale around
-	}
-
-	if($use_mirror) {
-		print "Downloading $url to $file if a newer version is available\n";
-		if($use_withcache &&
-		   LWP::Simple::WithCache::is_error(my $rc = LWP::Simple::WithCache::mirror($url, $file))) {
-			die "$url: LWP error $rc";
-		} elsif(LWP::Simple::is_error($rc = LWP::Simple::mirror($url, $file))) {
-			die "$url: LWP error $rc";
-		}
-	} else {
-		print "Downloading $url to $file\n";
-		if($use_withcache &&
-		   LWP::Simple::WithCache::is_error(my $rc = LWP::Simple::WithCache::getstore($url, $file))) {
-			die "$url: LWP error $rc";
-		} elsif(LWP::Simple::is_error($rc = LWP::Simple::getstore($url, $file))) {
-			die "$url: LWP error $rc";
-		}
-	}
-	die $file if(!-r $file);
-
-	if(!(-r "lib/Locale/Places/databases/$country.csv")) {
-		my $zip = "lib/Locale/Places/databases/$country.zip";
-
-		print "Exploding $zip\n";
-
-		# Try inline as the external program fails on Windows
-		# http://www.cpantesters.org/cpan/report/a03259ca-6c02-1014-bd5e-9b11492b42cd
-		eval 'require IO::Uncompress::Unzip';
-		if($@) {
-			system("unzip $zip") or die "unzip $zip failed";
-
-			rename "$country.txt", "lib/Locale/Places/databases/$country.csv" or die "rename: $!";
-			unlink 'readme.txt';
-		} elsif(open(my $fout, '>', "lib/Locale/Places/databases/$country.csv")) {
-			IO::Uncompress::Unzip->import();
-			my $fin = IO::Uncompress::Unzip->new($zip);
-			do {
-				if($fin->getHeaderInfo->{'Name'} eq "$country.txt") {
-					while(my $line = $fin->getline()) {
-						print $fout $line;
-					}
-					# last; # Gives syntax error that it's not in a loop :-(
-				}
-			} while($fin->nextStream());
-		}
-		# Save disc space, but prevent more than one download
-		# if(open(my $fout, '>', $zip)) {
-			# close($fout);
-		# }
-		truncate $zip, 0;
-	}
-
-	die if(!(-r "lib/Locale/Places/databases/$country.csv"));
-}
-
-# my $pm = {
-	# 'lib/Locale/Places.pm' => 'blib/lib/Locale/Places.pm',
-	# 'lib/Locale/Places/DB.pm' => 'blib/lib/Locale/Places/DB.pm',
-	# 'lib/Locale/Places/DB/GB.pm' => 'blib/lib/Locale/Places/DB/GB.pm',
-# };
-
-# if($ENV{'AUTOMATED_TESTING'}) {
-	# $pm->{'lib/Locale/Places/databases/GB.csv'} = 'blib/lib/Locale/Places/databases/GB.csv';
-# } else {
-	# $pm->{'lib/Locale/Places/databases/GB.sql'} = 'blib/lib/Locale/Places/databases/GB.sql';
-# }
-
-# For bin/create_sqlite
-my $build_requires = {
-	'DBI' => 0,
-	'File::Copy' => 0,
+my @countries = ($ENV{'AUTOMATED_TESTING'} || $ENV{'NO NETWORK TESTING'}) ? () : ('GB', 'US');
+my $build_requires = {};
+my $test_requires = {
+	'Test::Carp' => 0,
+	'Test::Most' => 0,
+	'Test::Needs' => 0
 };
 
-if($Config{'osname'} ne 'MSWin32') {
-	$build_requires->{'File::Open::NoCache::ReadOnly'} = 0;
-	$build_requires->{'IO::AIO'} = 0;
+if(scalar(@countries)) {
+	$build_requires = {	# For bin/create_sqlite
+		'DBI' => 0,
+		'File::Copy' => 0,
+	};
+	$test_requires->{'autodie'} = 0;
+
+	my @dirs = (
+		'lib/Locale/Places/databases',
+	);
+
+	foreach my $dir(@dirs) {
+		if(! -d $dir) {
+			print "Creating the download directory $dir\n";
+			mkdir $dir || die "$dir: $@";
+		}
+	}
+
+	eval { require 'autodie' };
+
+	# unlink('lib/Locale/Places/databases/GB.sql');
+	if(eval { require HTTP::Cache::Transparent }) {
+		HTTP::Cache::Transparent->import();
+		my $cachedir;
+		if(my $e = $ENV{'CACHEDIR'}) {
+			$cachedir = File::Spec->catfile($e, 'http-cache-transparent');
+		} else {
+			require File::HomeDir;
+			File::HomeDir->import();
+
+			# $cachedir = File::Spec->catfile(File::Spec->tmpdir(), 'cache', 'http-cache-transparent');
+			$cachedir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', 'http-cache-transparent');
+		}
+
+		if(!-d $cachedir) {
+			print "Creating the cache directory $cachedir\n";
+			mkdir $cachedir, 02755 || die "$cachedir: $@";
+		}
+		HTTP::Cache::Transparent::init({
+			BasePath => $cachedir,
+			# Verbose => $opts{'v'} ? 1 : 0,
+			Verbose => 1,
+			NoUpdate => 60 * 60 * 24,
+			MaxAge => 30 * 24
+		}) || die "$0: $cachedir: $!";
+	} elsif(!$ENV{'AUTOMATED_TESTING'}) {
+		print "Consider installing HTTP::Cache::Transparent to reduce downloads\n";
+	}
+
+	my $use_withcache;
+	if(eval { require LWP::Simple::WithCache; }) {
+		LWP::Simple::WithCache->import();
+		$use_withcache = 1;
+	} else {
+		require LWP::Simple;
+		LWP::Simple->import();
+
+		if(!$ENV{'AUTOMATED_TESTING'}) {
+			print "Consider installing LWP::Simple::WithCache to reduce downloads\n";
+		}
+	}
+
+	foreach my $country(@countries) {
+		my $url = "https://$site/export/dump/alternatenames/$country.zip";
+		my $file = "lib/Locale/Places/databases/$country.zip";
+
+		my $use_mirror = 0;
+
+		if(-r $file) {
+			# Don't bother checking for a download if the file is less than a week old
+			next if(-M $file < 7);
+			# I get errors with mirror with L:S:WithCache
+			#	that the temporary file is unavailable
+			if(!$use_withcache) {
+				# Only download if a newer version is available
+				$use_mirror = 1;
+			}
+			unlink $file;	# Don't leave anything stale around
+		}
+
+		if($use_mirror) {
+			print "Downloading $url to $file if a newer version is available\n";
+			if($use_withcache &&
+			   LWP::Simple::WithCache::is_error(my $rc = LWP::Simple::WithCache::mirror($url, $file))) {
+				if($ENV{'AUTOMATED_TESTING'}) {
+					print STDERR "Can't download $url";
+					exit(0);
+				}
+				die "$url: LWP error $rc";
+			} elsif(LWP::Simple::is_error($rc = LWP::Simple::mirror($url, $file))) {
+				if($ENV{'AUTOMATED_TESTING'}) {
+					print STDERR "Can't download $url";
+					exit(0);
+				}
+				die "$url: LWP error $rc";
+			}
+		} else {
+			print "Downloading $url to $file\n";
+			if($use_withcache &&
+			   LWP::Simple::WithCache::is_error(my $rc = LWP::Simple::WithCache::getstore($url, $file))) {
+				if($ENV{'AUTOMATED_TESTING'}) {
+					print STDERR "Can't download $url";
+					exit(0);
+				}
+				die "$url: LWP error $rc";
+			} elsif(LWP::Simple::is_error($rc = LWP::Simple::getstore($url, $file))) {
+				if($ENV{'AUTOMATED_TESTING'}) {
+					print STDERR "Can't download $url";
+					exit(0);
+				}
+				die "$url: LWP error $rc";
+			}
+		}
+		die $file if(!-r $file);
+
+		if(!(-r "lib/Locale/Places/databases/$country.csv")) {
+			my $zip = "lib/Locale/Places/databases/$country.zip";
+
+			print "Exploding $zip\n";
+
+			# Try inline as the external program fails on Windows
+			# http://www.cpantesters.org/cpan/report/a03259ca-6c02-1014-bd5e-9b11492b42cd
+			eval 'require IO::Uncompress::Unzip';
+			if($@) {
+				system("unzip $zip") or die "unzip $zip failed";
+
+				rename "$country.txt", "lib/Locale/Places/databases/$country.csv" or die "rename: $!";
+				unlink 'readme.txt';
+			} elsif(open(my $fout, '>', "lib/Locale/Places/databases/$country.csv")) {
+				IO::Uncompress::Unzip->import();
+				if(my $fin = IO::Uncompress::Unzip->new($zip)) {
+					do {
+						if($fin->getHeaderInfo->{'Name'} eq "$country.txt") {
+							while(my $line = $fin->getline()) {
+								print $fout $line;
+							}
+							# last; # Gives syntax error that it's not in a loop :-(
+						}
+					} while($fin->nextStream());
+				} elsif($ENV{'AUTOMATED_TESTING'}) {
+					print STDERR "$zip: $IO::Uncompress::Unzip::UnzipError\n";
+					exit(0);
+				} else {
+					die "$zip: $IO::Uncompress::Unzip::UnzipError";
+				}
+				close $fout || die "$zip: $!";
+			}
+			# Save disc space, but prevent more than one download
+			# if(open(my $fout, '>', $zip)) {
+				# close($fout);
+			# }
+			truncate $zip, 0;
+		}
+
+		die if(!(-r "lib/Locale/Places/databases/$country.csv"));
+	}
+
+	# my $pm = {
+		# 'lib/Locale/Places.pm' => 'blib/lib/Locale/Places.pm',
+		# 'lib/Locale/Places/DB.pm' => 'blib/lib/Locale/Places/DB.pm',
+		# 'lib/Locale/Places/DB/GB.pm' => 'blib/lib/Locale/Places/DB/GB.pm',
+	# };
+
+	# if($ENV{'AUTOMATED_TESTING'}) {
+		# $pm->{'lib/Locale/Places/databases/GB.csv'} = 'blib/lib/Locale/Places/databases/GB.csv';
+	# } else {
+		# $pm->{'lib/Locale/Places/databases/GB.sql'} = 'blib/lib/Locale/Places/databases/GB.sql';
+	# }
+
+	if($Config{'osname'} ne 'MSWin32') {
+		$build_requires->{'File::Open::NoCache::ReadOnly'} = 0;
+		$build_requires->{'IO::AIO'} = 0;
+	}
 }
 
 WriteMakefile(
@@ -181,11 +216,10 @@ WriteMakefile(
 		'File::Which' => 0,
 		'LWP::Simple' => 0,
 		'Try::Tiny' => 0,
-	}, TEST_REQUIRES => {
-		'Test::Carp' => 0,
-		'Test::Most' => 0,
-	}, PREREQ_PM => {
+	}, TEST_REQUIRES => $test_requires,
+	PREREQ_PM => {
 		'CHI' => 0,
+		'Database::Abstraction' => 0.04,
 		'DBI' => 0,
 		'DBD::CSV' => 0,
 		'DBD::SQLite' => 0,

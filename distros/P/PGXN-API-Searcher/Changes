@@ -1,8 +1,20 @@
 Revision history for Perl extension PGXN-API-Searcher.
 
+0.11.0  2024-02-06T23:37:09Z
+      - Converted the version from a v-string to a string to make
+        ExtUtils::MakeMaker happy.
+      - Removed all Pod tests from the distribution.
+      - Modernized the build configuration to separate test prerequisites
+        from build prerequisites.
+      - Fixed old links, email address, typos.
+
+0.10.2  2013-06-05T06:53:22Z
+      - Updated GitHub URLs to point to `/pgxn/` rather than `/theory/`.
+      - Removed the Pod tests from the distribution.
+
 0.10.1  2011-11-08T17:48:20Z
       - Fixed test to be neutral about scores, since Lucy is prone to changing
-        how they're calculatd (as is the case on 0.2.2).
+        how they're calculated (as is the case on 0.2.2).
       - Worked around bug in Lucy 0.2.2's highlighting in the tests.
 
 0.10.0  2011-08-26T17:11:54Z
@@ -53,7 +65,7 @@ Revision history for Perl extension PGXN-API-Searcher.
 0.6.1   2011-03-28T03:07:13Z
       - The index to query is no longer specified as the first argument to
         `search()`, but via the new `index` parameter.
-      - The `index` paraemter defaults to "doc" if it's not specified.
+      - The `index` parameter defaults to "doc" if it's not specified.
       - Pass parameters to `search()` as a list rather than a hash reference.
       - Add `index` key to the returned hash.
 

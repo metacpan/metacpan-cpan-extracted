@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::transform::succepstrum;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUCCEPSTRUM - Compute the complex CEPSTRUM of a seismic trace 	"
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 

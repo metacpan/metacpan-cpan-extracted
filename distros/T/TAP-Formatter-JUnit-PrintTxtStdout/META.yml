@@ -1,0 +1,52 @@
+---
+abstract: ...
+author:
+  - 'DERIV <DERIV@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::More: '0.98'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '7.64'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: TAP-Formatter-JUnit-PrintTxtStdout
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  TAP::Formatter::JUnit::PrintTxtStdout:
+    file: lib/TAP/Formatter/JUnit/PrintTxtStdout.pm
+    version: '0.001'
+requires:
+  Moose: '0'
+  Path::Tiny: '0'
+  TAP::Formatter::JUnit: '0'
+  indirect: '0.37'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/deriv-com/perl-TAP-Formatter-JUnit-PrintTxtStdout/issues
+  homepage: https://github.com/deriv-com/perl-TAP-Formatter-JUnit-PrintTxtStdout
+  repository: https://github.com/deriv-com/perl-TAP-Formatter-JUnit-PrintTxtStdout.git
+version: '0.001'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'chylli-deriv <chylli@deriv.com>'
+  - 'Raunak Kathuria <raunak@deriv.com>'
+  - 'chylli-deriv <52912308+chylli-deriv@users.noreply.github.com>'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

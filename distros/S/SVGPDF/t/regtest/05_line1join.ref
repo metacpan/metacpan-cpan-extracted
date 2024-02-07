@@ -1,27 +1,27 @@
 ==== start svg ====
 XObject #1
-vb 0 0 160 280 (inferred) => bb 0.00 -280.00 160.00 0.00
+vb 0.00 0.00 160.00 280.00 (inferred) => bb 0.00 -280.00 160.00 0.00
 matrix( 1 0 0 -1 0 0)
 vb rect( 0.00 0.00 160.00 280.00)
 xo fill_color black (initial)
   start handling polyline (SVGPDF::Polyline)
   polyline points="40 60 80 20 120 60"
     xo save
-    polyline stroke-width=20 linecap=0 linejoin=0 stroke=black fill=none
+    polyline stroke-width=20.00 linecap=0 linejoin=0 stroke=black fill=none
     xo stroke (black)
     xo restore
   end handling polyline
   start handling polyline (SVGPDF::Polyline)
   polyline points="40 140 80 100 120 14..."
     xo save
-    polyline stroke-width=20 linecap=1 linejoin=1 stroke=black fill=none
+    polyline stroke-width=20.00 linecap=1 linejoin=1 stroke=black fill=none
     xo stroke (black)
     xo restore
   end handling polyline
   start handling polyline (SVGPDF::Polyline)
   polyline points="40 220 80 180 120 22..."
     xo save
-    polyline stroke-width=20 linecap=2 linejoin=2 stroke=black fill=none
+    polyline stroke-width=20.00 linecap=2 linejoin=2 stroke=black fill=none
     xo stroke (black)
     xo restore
   end handling polyline

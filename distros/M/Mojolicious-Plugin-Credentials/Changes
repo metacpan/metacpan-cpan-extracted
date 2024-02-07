@@ -1,0 +1,19 @@
+Revision history for Mojolicious-Plugin-Credentials
+
+0.006     2024-02-06 00:27:06+01:00 Europe/Brussels
+          - Signal signature support dependency more actively
+
+0.005     2024-02-02 22:15:27+01:00 Europe/Brussels
+          - Fix typo in MOJO_CREDENTIALS_KEYS handling
+
+0.004     2024-01-31 23:26:37+01:00 Europe/Brussels
+          - Add support for MOJO_CREDENTIALS_DIR environmental variable
+
+0.003     2024-01-31 22:22:02+01:00 Europe/Brussels
+          - Add --editor flag to credentials edit
+
+0.002     2024-01-31 03:01:03+01:00 Europe/Brussels
+          - Adapt to supporting multiple keys
+
+0.001     2024-01-31 02:33:30+01:00 Europe/Brussels
+          Initial release to an unsuspecting world

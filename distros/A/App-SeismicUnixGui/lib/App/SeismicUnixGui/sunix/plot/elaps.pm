@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::plot::elaps;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 
@@ -115,7 +115,7 @@ Version:
 
 
 
- AUTHOR:  Dave Hale, Colorado School of Mines, 10/18/90
+ Author:  Dave Hale, Colorado School of Mines, 10/18/90
 
  modified: Andreas Rueger, Colorado School of Mines, 01/25/94
 

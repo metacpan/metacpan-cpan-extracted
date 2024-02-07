@@ -3,7 +3,7 @@ package URI;
 use strict;
 use warnings;
 
-our $VERSION = '5.25';
+our $VERSION = '5.26';
 
 # 1=version 5.10 and earlier; 0=version 5.11 and later
 use constant HAS_RESERVED_SQUARE_BRACKETS => $ENV{URI_HAS_RESERVED_SQUARE_BRACKETS} ? 1 : 0;
@@ -995,6 +995,15 @@ The I<https> URI scheme is a Netscape invention which is commonly
 implemented.  The scheme is used to reference HTTP servers through SSL
 connections.  Its syntax is the same as http, but the default
 port is different.
+
+=item B<geo>:
+
+The I<geo> URI scheme is specified in L<RFC 5870|http://tools.ietf.org/html/rfc5870>.
+The scheme is used to reference physical location in a two- or
+three-dimensional coordinate reference system in a compact, simple,
+human-readable, and protocol-independent way.
+
+C<URI> objects belonging to the geo scheme support the common methods.
 
 =item B<icap>:
 

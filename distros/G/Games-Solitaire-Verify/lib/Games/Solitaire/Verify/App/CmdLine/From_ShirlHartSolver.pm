@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::App::CmdLine::From_ShirlHartSolver;
-$Games::Solitaire::Verify::App::CmdLine::From_ShirlHartSolver::VERSION = '0.2403';
+$Games::Solitaire::Verify::App::CmdLine::From_ShirlHartSolver::VERSION = '0.2500';
 use strict;
 use warnings;
 use autodie;
@@ -18,7 +18,7 @@ __PACKAGE__->mk_acc_ref(
             _sol_filename
             _variant_params
             _buffer_ref
-            )
+        )
     ]
 );
 
@@ -95,7 +95,7 @@ sub _analyze_shirl_hart_move
             $src_card = substr( $src_card, 0, 2 );
             my $col = $self->_st->get_column($src_col_idx);
             my $idx = first { $col->pos($_)->to_string eq $src_card }
-            ( 0 .. $col->len - 1 );
+                ( 0 .. $col->len - 1 );
             if ( !defined $idx )
             {
                 die "wrong move stack to stack - $move_line";
@@ -238,8 +238,7 @@ FOUNDATION:
             my @src_s;
             my $rec   = $suits{$suit};
             my $start = $rec->{start};
-            eval { @src_s = $self->_find_card_src_string(
-                    $start->to_string ); };
+            eval { @src_s = $self->_find_card_src_string( $start->to_string ); };
             if ( !$@ )
             {
                 ++$count;
@@ -311,7 +310,7 @@ converting from Shirl Hart's solver's solutions to fc-solve ones.
 
 =head1 VERSION
 
-version 0.2403
+version 0.2500
 
 =head1 SYNOPSIS
 

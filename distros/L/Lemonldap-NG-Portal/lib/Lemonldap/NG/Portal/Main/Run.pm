@@ -953,7 +953,7 @@ sub sendHtml {
       'Pragma'        => 'no-cache',                               # HTTP 1.0
       'Expires'       => '0';                                      # Proxies
 
-    $self->setCorsHeaderFromConfig($res) unless $req->data->{dropCsp};
+    $self->setCorsHeaderFromConfig($res);
 
     if (    $self->conf->{strictTransportSecurityMax_Age}
         and $self->conf->{portal} =~ /^https:/ )
@@ -1253,7 +1253,7 @@ sub corsPreflight {
     my @headers;
     my $res = [ 204, \@headers, [] ];
 
-    $self->setCorsHeaderFromConfig($res) unless $req->data->{dropCsp};
+    $self->setCorsHeaderFromConfig($res);
 
     return $res;
 }
@@ -1288,7 +1288,7 @@ sub sendJSONresponse {
 
     }
     else {
-        $self->setCorsHeaderFromConfig($res) unless $req->data->{dropCsp};
+        $self->setCorsHeaderFromConfig($res);
     }
     return $res;
 }
@@ -1297,7 +1297,7 @@ sub sendRawHtml {
     my ($self) = $_[0];
     my $res = Lemonldap::NG::Common::PSGI::sendRawHtml(@_);
 
-    $self->setCorsHeaderFromConfig($res) unless $_[1]->data->{dropCsp};
+    $self->setCorsHeaderFromConfig($res);
 
     return $res;
 }

@@ -30,7 +30,7 @@ GitHub.
 
 # COPYRIGHT AND LICENCE
 
-Copyright (C) 2022,2023 Johan Vromans
+Copyright (C) 2022,2024 Johan Vromans
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided under the terms of the Simplified

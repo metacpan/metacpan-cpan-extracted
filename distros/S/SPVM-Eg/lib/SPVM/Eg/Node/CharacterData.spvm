@@ -36,4 +36,5 @@ class Eg::Node::CharacterData extends Eg::Node {
     
     return $node_value_length;
   }
+  
 }

@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::par::a2b;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  A2B - convert ascii floats to binary 				
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  
  DESCRIPTION: 
  Version: 0.0.4

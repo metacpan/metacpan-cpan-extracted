@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::statsMath::suinterp;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUINTERP - interpolate traces using automatic event picking		
- AUTHOR: Masoud Safari-Zanjani
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   Dec 10 2013,
  DESCRIPTION:
  Version: 

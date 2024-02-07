@@ -1,5 +1,8 @@
 Revision history for Perl module Surveyor::Benchmark::HTMLEntities
 
+1.025 2024-02-02T20:17:49Z
+	* refresh distro, update email addresses
+
 1.023 2022-01-09T01:53:51Z
 	* no code changes. Fix a link in README.pod.
 

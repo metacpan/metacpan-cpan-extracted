@@ -1,3 +1,11 @@
+0.21 2024-02-03T11:53:31+01:00
+ - Add Mo::utils::CSS to SEE ALSO section in doc.
+ - Add tests for error parameters.
+ - Fix test for check_array_object().
+ - Improve error check for check_array_object().
+ - Move code for check of object to helper.
+ - Update copyright years.
+
 0.20 2023-11-12T12:29:40+01:00
  - Add check_angle().
  - Fix error sentence for check_number() in doc.

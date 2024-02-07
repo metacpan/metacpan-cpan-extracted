@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::OS;
+package IO::Async::OS 0.803;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.802';
 
 our @ISA = qw( IO::Async::OS::_Base );
 
@@ -136,7 +134,7 @@ sub getfamilybyname
 
 =head2 getsocktypebyname
 
-   $socktype = IO::Async::OS->getsocktypebyname( $name )
+   $socktype = IO::Async::OS->getsocktypebyname( $name );
 
 Return a socket type value based on the given name. If C<$name> looks like a
 number it will be returned as-is. The string values C<stream>, C<dgram> and
@@ -180,7 +178,7 @@ sub socket
    # SOCK_STREAM is the most likely
    $socktype = $self->getsocktypebyname( $socktype ) || SOCK_STREAM;
 
-   defined $proto or $proto = 0;
+   $proto //= 0;
 
    if( $HAVE_IO_SOCKET_IP and ( $family == AF_INET || $family == AF_INET6() ) ) {
       return IO::Socket::IP->new->socket( $family, $socktype, $proto );
@@ -205,7 +203,7 @@ sub socket
 
 =head2 socketpair
 
-   ( $S1, $S2 ) = IO::Async::OS->socketpair( $family, $socktype, $proto )
+   ( $S1, $S2 ) = IO::Async::OS->socketpair( $family, $socktype, $proto );
 
 An abstraction of the C<socketpair(2)> syscall, where any argument may be
 missing (or given as C<undef>).
@@ -272,7 +270,7 @@ sub socketpair
 
 =head2 pipepair
 
-   ( $rd, $wr ) = IO::Async::OS->pipepair
+   ( $rd, $wr ) = IO::Async::OS->pipepair;
 
 An abstraction of the C<pipe(2)> syscall, which returns the two new handles.
 
@@ -288,7 +286,7 @@ sub pipepair
 
 =head2 pipequad
 
-   ( $rdA, $wrA, $rdB, $wrB ) = IO::Async::OS->pipequad
+   ( $rdA, $wrA, $rdB, $wrB ) = IO::Async::OS->pipequad;
 
 This method is intended for creating two pairs of filehandles that are linked
 together, suitable for passing as the STDIN/STDOUT pair to a child process.
@@ -338,7 +336,7 @@ sub pipequad
 
 =head2 signame2num
 
-   $signum = IO::Async::OS->signame2num( $signame )
+   $signum = IO::Async::OS->signame2num( $signame );
 
 This utility method converts a signal name (such as "TERM") into its system-
 specific signal number. This may be useful to pass to C<POSIX::SigSet> or use
@@ -346,7 +344,7 @@ in other places which use numbers instead of symbolic names.
 
 =head2 signum2name
 
-   $signame = IO::Async::OS->signum2name( $signum )
+   $signame = IO::Async::OS->signum2name( $signum );
 
 The inverse of L<signame2num>; this method convers signal numbers into
 readable names.
@@ -369,7 +367,9 @@ sub _init_signum
    my @nums  = split ' ', $Config::Config{sig_num};
 
    @sig_name2num{ @names } = @nums;
-   @sig_num2name{ @nums  } = @names;
+
+   # Only take the first of each name, in case of aliased names
+   @sig_num2name{ $sig_name2num{$_} } //= $_ for @names;
 }
 
 sub signame2num
@@ -394,7 +394,7 @@ sub signum2name
 
 =head2 extract_addrinfo
 
-   ( $family, $socktype, $protocol, $addr ) = IO::Async::OS->extract_addrinfo( $ai )
+   ( $family, $socktype, $protocol, $addr ) = IO::Async::OS->extract_addrinfo( $ai );
 
 Given an ARRAY or HASH reference value containing an addrinfo, returns a
 family, socktype and protocol argument suitable for a C<socket> call and an
@@ -546,7 +546,7 @@ sub _extract_addrinfo_unix
 
 =head2 make_addr_for_peer
 
-   $connectaddr = IO::Async::OS->make_addr_for_peer( $family, $listenaddr )
+   $connectaddr = IO::Async::OS->make_addr_for_peer( $family, $listenaddr );
 
 Given the C<sockdomain> and C<sockname> of a listening socket. creates an
 address suitable to C<connect()> to it.
@@ -594,9 +594,9 @@ to store other data it requires.
 
 =head2 loop_unwatch_signal
 
-   IO::Async::OS->loop_watch_signal( $loop, $signal, $code )
+   IO::Async::OS->loop_watch_signal( $loop, $signal, $code );
 
-   IO::Async::OS->loop_unwatch_signal( $loop, $signal )
+   IO::Async::OS->loop_unwatch_signal( $loop, $signal );
 
 Used to implement the C<watch_signal> / C<unwatch_signal> Loop pair.
 
@@ -663,7 +663,7 @@ sub loop_unwatch_signal
 
 =head2 potentially_open_fds
 
-   @fds = IO::Async::OS->potentially_open_fds
+   @fds = IO::Async::OS->potentially_open_fds;
 
 Returns a list of filedescriptors which might need closing. By default this
 will return C<0 .. _SC_OPEN_MAX>. OS-specific subclasses may have a better

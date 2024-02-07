@@ -1,8 +1,95 @@
 # Copyright (c) 2024 Yuki Kimoto
 # MIT License
 
-# None in JavaScript
+# Document in JavaScript
 class Eg::Node::Document extends Eg::Node {
+  
+  allow Eg::DOM::Implementation;
+  allow Eg::Window;
+  
+  use Hash;
+  use Regex;
+  use StringBuffer;
+  
+  use Eg::Node::Element;
+  use Eg::Node::Text;
+  use Eg::Node::Comment;
+  use Eg::Node::DocumentFragment;
+  use Eg::Node::Attr;
+  use Eg::Node::CDATASection;
+  use Eg::Node::ProcessingInstruction;
+  use Eg::Node::DocumentType;
+  use Eg::Node::ShadowRoot;
+  
+  use Eg::Node::Element::HTML;
+  use Eg::Node::Element::HTML::Unknown;
+  use Eg::Node::Element::HTML::Anchor;
+  use Eg::Node::Element::HTML::Area;
+  use Eg::Node::Element::HTML::Audio;
+  use Eg::Node::Element::HTML::Base;
+  use Eg::Node::Element::HTML::Body;
+  use Eg::Node::Element::HTML::BR;
+  use Eg::Node::Element::HTML::Button;
+  use Eg::Node::Element::HTML::Canvas;
+  use Eg::Node::Element::HTML::Data;
+  use Eg::Node::Element::HTML::DataList;
+  use Eg::Node::Element::HTML::Details;
+  use Eg::Node::Element::HTML::Dialog;
+  use Eg::Node::Element::HTML::Div;
+  use Eg::Node::Element::HTML::DList;
+  use Eg::Node::Element::HTML::Embed;
+  use Eg::Node::Element::HTML::FieldSet;
+  use Eg::Node::Element::HTML::Font;
+  use Eg::Node::Element::HTML::Form;
+  use Eg::Node::Element::HTML::Frame;
+  use Eg::Node::Element::HTML::Head;
+  use Eg::Node::Element::HTML::Heading;
+  use Eg::Node::Element::HTML::HR;
+  use Eg::Node::Element::HTML::Html;
+  use Eg::Node::Element::HTML::IFrame;
+  use Eg::Node::Element::HTML::Image;
+  use Eg::Node::Element::HTML::Input;
+  use Eg::Node::Element::HTML::Label;
+  use Eg::Node::Element::HTML::Legend;
+  use Eg::Node::Element::HTML::LI;
+  use Eg::Node::Element::HTML::Link;
+  use Eg::Node::Element::HTML::Map;
+  use Eg::Node::Element::HTML::Marquee;
+  use Eg::Node::Element::HTML::Media;
+  use Eg::Node::Element::HTML::Menu;
+  use Eg::Node::Element::HTML::Meta;
+  use Eg::Node::Element::HTML::Meter;
+  use Eg::Node::Element::HTML::Mod;
+  use Eg::Node::Element::HTML::OList;
+  use Eg::Node::Element::HTML::Object;
+  use Eg::Node::Element::HTML::OptGroup;
+  use Eg::Node::Element::HTML::Option;
+  use Eg::Node::Element::HTML::Output;
+  use Eg::Node::Element::HTML::Paragraph;
+  use Eg::Node::Element::HTML::Param;
+  use Eg::Node::Element::HTML::Picture;
+  use Eg::Node::Element::HTML::Pre;
+  use Eg::Node::Element::HTML::Progress;
+  use Eg::Node::Element::HTML::Quote;
+  use Eg::Node::Element::HTML::Script;
+  use Eg::Node::Element::HTML::Select;
+  use Eg::Node::Element::HTML::Source;
+  use Eg::Node::Element::HTML::Span;
+  use Eg::Node::Element::HTML::Style;
+  use Eg::Node::Element::HTML::Slot;
+  use Eg::Node::Element::HTML::TableCaption;
+  use Eg::Node::Element::HTML::TableCell;
+  use Eg::Node::Element::HTML::TableCol;
+  use Eg::Node::Element::HTML::Table;
+  use Eg::Node::Element::HTML::TableRow;
+  use Eg::Node::Element::HTML::TableSection;
+  use Eg::Node::Element::HTML::Template;
+  use Eg::Node::Element::HTML::TextArea;
+  use Eg::Node::Element::HTML::Time;
+  use Eg::Node::Element::HTML::Title;
+  use Eg::Node::Element::HTML::Track;
+  use Eg::Node::Element::HTML::UList;
+  use Eg::Node::Element::HTML::Video;
   
   use Eg::Node::Element;
   use Eg::Node::Text;
@@ -14,79 +101,104 @@ class Eg::Node::Document extends Eg::Node {
   use Eg::Node::DocumentType;
   use Eg::Node::ShadowRoot;
   use Regex;
-  
   use Fn;
   
   # Fields
-  has namespace_uri : protected string;
+  has doctype : ro protected Eg::Node::DocumentType;
   
-  method parent_node : Eg::Node () {
-    return undef;
+  has implementation : ro Eg::DOM::Implementation;
+  
+  has title : protected string;
+  
+  # Class Methods
+  private static method new : Eg::Node::Document ($title : string = undef, $options : object[] = undef) {
+    
+    my $self = new Eg::Node::Document;
+    
+    $self->init($options);
+    
+    my $html_element = $self->create_element("html");
+    
+    $html_element->{namespace_uri} = "http://www.w3.org/1999/xhtml";
+    
+    $self->append_child($html_element);
+    
+    my $head_element = $self->create_element("head");
+    
+    if ($title) {
+      my $text_node = $self->create_text_node($title);
+      
+      my $title_element = $self->create_element("title");
+      
+      $title_element->append_child($text_node);
+    }
+    
+    $html_element->append_child($head_element);
+    
+    my $body_element = $self->create_element("body");
+    
+    $html_element->append_child($body_element);
+    
+    return $self;
   }
   
-  method document_element : Eg::Node::Element () {
-    my $root_node = (Eg::Node::Element)$self->first_child;
+  # Instance Methods
+  protected method init : void ($options : object[] = undef) {
     
-    return $root_node;
+    unless ($options) {
+      $options = new object[0];
+    }
+    
+    $options = Array->merge_object($options, {node_type => Eg::Node->TYPE_DOCUMENT_NODE});
+    
+    $self->SUPER::init($options);
+    
+    my $implementation = Eg::DOM::Implementation->new($self);
+    
+    $self->{implementation} = $implementation;
   }
   
-  method create_text_node : Eg::Node::Text ($node_value : string) {
-    
-    unless ($node_value) {
-      die "\$node_value must be defined.";
-    }
-    
-    my $text_node = Eg::Node::Text->new($node_value);
-    
-    return $text_node;
+  method title : string () {
+    return $self->{title};
   }
   
-  method create_comment : Eg::Node::Comment ($node_value : string) {
+  method set_title : string ($title : string) {
     
-    unless ($node_value) {
-      die "\$node_value must be defined.";
+    unless ($title) {
+      die "\$title must be defined.";
     }
     
-    my $comment_node = Eg::Node::Comment->new($node_value);
-    
-    return $comment_node;
-  }
-  
-  method create_cdata_section : Eg::Node::CDATASection ($node_value : string) {
-    
-    unless ($node_value) {
-      die "\$node_value must be defined.";
-    }
-    
-    my $cdata_section_node = Eg::Node::CDATASection->new($node_value);
-    
-    return $cdata_section_node;
-  }
-  
-  method create_processing_instruction : Eg::Node::ProcessingInstruction ($target : string, $data : string) {
-    
-    unless ($target) {
-      die "\$target must be defined.";
-    }
-    
-    unless (Regex->new("^[a-zA-Z_][\w+\-\.]*$")->match($target)) {
-      die "\$target must be a valid XML name.";
-    }
-    
-    if ($data) {
-      if (Fn->contains($data, "?>")) {
-        die "\$data cannot contain  \"?>\".";
-      }
-    }
-    
-    my $processing_instruction_node = Eg::Node::ProcessingInstruction->new($data);
-    
-    $processing_instruction_node->{target} = $target;
-    
-    return $processing_instruction_node;
+    $self->{title} = $title;
   }
   
   method create_element : Eg::Node::Element ($tag_name : string) {
+    
+    if ($self isa Eg::Node::Document::XML) {
+      return $self->create_element_xml($tag_name);
+    }
+    else {
+      return $self->create_element_html($tag_name);
+    }
+  }
+  
+  private method create_element_xml : Eg::Node::Element ($tag_name : string) {
+    
+    unless ($tag_name) {
+      die "\$tag_name must be defined.";
+    }
+    
+    unless (length $tag_name) {
+      die "\$tag_name must have its length.";
+    }
+    
+    my $element = Eg::Node::Element->new({owner_document => $self});
+    
+    $element->{node_name} = $tag_name;
+    
+    return $element;
+  }
+  
+  private method create_element_html : Eg::Node::Element::HTML ($tag_name : string) {
     
     unless ($tag_name) {
       die "\$tag_name must be defined.";
@@ -100,37 +212,525 @@ class Eg::Node::Document extends Eg::Node {
       die "\$tag_name cannot contains \":\"";
     }
     
-    my $element = Eg::Node::Element->new;
+    my $element = (Eg::Node::Element::HTML)undef;
     
-    $element->{tag_name} = $tag_name;
+    unless (Regex->new("^[a-zA-Z_]\w+$")->match($tag_name)) {
+      die "\$tag_name must consist of word characters.";
+    }
+    
+    $tag_name = Fn->lc($tag_name);;
+    
+    if ($tag_name eq "a") {
+      $element = Eg::Node::Element::HTML::Anchor->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "abbr") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "acronym") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "address") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "area") {
+      $element = Eg::Node::Element::HTML::Area->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "article") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "aside") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "audio") {
+      $element = Eg::Node::Element::HTML::Audio->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "b") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "base") {
+      $element = Eg::Node::Element::HTML::Base->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "bdi") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "bdo") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "big") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "blockquote") {
+      $element = Eg::Node::Element::HTML::Quote->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "body") {
+      $element = Eg::Node::Element::HTML::Body->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "br") {
+      $element = Eg::Node::Element::HTML::BR->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "button") {
+      $element = Eg::Node::Element::HTML::Button->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "canvas") {
+      $element = Eg::Node::Element::HTML::Canvas->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "caption") {
+      $element = Eg::Node::Element::HTML::TableCaption->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "center") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "cite") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "code") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "col") {
+      $element = Eg::Node::Element::HTML::TableCol->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "colgroup") {
+      $element = Eg::Node::Element::HTML::TableCol->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "data") {
+      $element = Eg::Node::Element::HTML::Data->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "datalist") {
+      $element = Eg::Node::Element::HTML::DataList->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "dd") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "del") {
+      $element = Eg::Node::Element::HTML::Mod->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "details") {
+      $element = Eg::Node::Element::HTML::Details->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "dfn") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "dialog") {
+      $element = Eg::Node::Element::HTML::Dialog->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "dir") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "div") {
+      $element = Eg::Node::Element::HTML::Div->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "dl") {
+      $element = Eg::Node::Element::HTML::DList->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "dt") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "em") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "embed") {
+      $element = Eg::Node::Element::HTML::Embed->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "fieldset") {
+      $element = Eg::Node::Element::HTML::FieldSet->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "figcaption") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "figure") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "font") {
+      $element = Eg::Node::Element::HTML::Font->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "footer") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "form") {
+      $element = Eg::Node::Element::HTML::Form->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "frame") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "frameset") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "h1") {
+      $element = Eg::Node::Element::HTML::Heading->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "h2") {
+      $element = Eg::Node::Element::HTML::Heading->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "h3") {
+      $element = Eg::Node::Element::HTML::Heading->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "h4") {
+      $element = Eg::Node::Element::HTML::Heading->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "h5") {
+      $element = Eg::Node::Element::HTML::Heading->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "h6") {
+      $element = Eg::Node::Element::HTML::Heading->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "head") {
+      $element = Eg::Node::Element::HTML::Head->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "header") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "hgroup") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "hr") {
+      $element = Eg::Node::Element::HTML::HR->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "html") {
+      $element = Eg::Node::Element::HTML::Html->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "i") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "iframe") {
+      $element = Eg::Node::Element::HTML::IFrame->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "image") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "img") {
+      $element = Eg::Node::Element::HTML::Image->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "input") {
+      $element = Eg::Node::Element::HTML::Input->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "ins") {
+      $element = Eg::Node::Element::HTML::Mod->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "kbd") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "label") {
+      $element = Eg::Node::Element::HTML::Label->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "legend") {
+      $element = Eg::Node::Element::HTML::Legend->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "li") {
+      $element = Eg::Node::Element::HTML::LI->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "link") {
+      $element = Eg::Node::Element::HTML::Link->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "main") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "map") {
+      $element = Eg::Node::Element::HTML::Map->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "mark") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "marquee") {
+      $element = Eg::Node::Element::HTML::Marquee->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "menu") {
+      $element = Eg::Node::Element::HTML::Menu->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "menuitem") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "meta") {
+      $element = Eg::Node::Element::HTML::Meta->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "meter") {
+      $element = Eg::Node::Element::HTML::Meter->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "nav") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "nobr") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "noembed") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "noframes") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "noscript") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "object") {
+      $element = Eg::Node::Element::HTML::Object->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "ol") {
+      $element = Eg::Node::Element::HTML::OList->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "optgroup") {
+      $element = Eg::Node::Element::HTML::OptGroup->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "option") {
+      $element = Eg::Node::Element::HTML::Option->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "output") {
+      $element = Eg::Node::Element::HTML::Output->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "p") {
+      $element = Eg::Node::Element::HTML::Paragraph->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "param") {
+      $element = Eg::Node::Element::HTML::Param->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "picture") {
+      $element = Eg::Node::Element::HTML::Picture->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "plaintext") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "portal") {
+      $element = Eg::Node::Element::HTML::Picture->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "pre") {
+      $element = Eg::Node::Element::HTML::Pre->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "progress") {
+      $element = Eg::Node::Element::HTML::Progress->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "q") {
+      $element = Eg::Node::Element::HTML::Quote->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "rb") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "rp") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "rt") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "rtc") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "ruby") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "s") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "samp") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "script") {
+      $element = Eg::Node::Element::HTML::Script->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "search") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "section") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "select") {
+      $element = Eg::Node::Element::HTML::Select->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "slot") {
+      $element = Eg::Node::Element::HTML::Slot->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "small") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "source") {
+      $element = Eg::Node::Element::HTML::Source->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "span") {
+      $element = Eg::Node::Element::HTML::Span->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "strike") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "strong") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "style") {
+      $element = Eg::Node::Element::HTML::Style->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "sub") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "summary") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "sup") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "table") {
+      $element = Eg::Node::Element::HTML::Table->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "tbody") {
+      $element = Eg::Node::Element::HTML::TableSection->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "td") {
+      $element = Eg::Node::Element::HTML::TableCell->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "template") {
+      $element = Eg::Node::Element::HTML::Template->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "textarea") {
+      $element = Eg::Node::Element::HTML::TextArea->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "tfoot") {
+      $element = Eg::Node::Element::HTML::TableSection->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "th") {
+      $element = Eg::Node::Element::HTML::TableCell->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "thead") {
+      $element = Eg::Node::Element::HTML::TableSection->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "time") {
+      $element = Eg::Node::Element::HTML::Time->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "title") {
+      $element = Eg::Node::Element::HTML::Title->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "tr") {
+      $element = Eg::Node::Element::HTML::TableRow->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "track") {
+      $element = Eg::Node::Element::HTML::Track->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "tt") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "u") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "ul") {
+      $element = Eg::Node::Element::HTML::UList->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "var") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "video") {
+      $element = Eg::Node::Element::HTML::Video->new({owner_document => $self, node_name => $tag_name});
+    }
+    elsif ($tag_name eq "wbr") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name, is_void_element => 1});
+    }
+    elsif ($tag_name eq "xmp") {
+      $element = Eg::Node::Element::HTML->new({owner_document => $self, node_name => $tag_name});
+    }
+    else {
+      $element = Eg::Node::Element::HTML::Unknown->new({owner_document => $self, node_name => $tag_name});
+    }
     
     return $element;
   }
   
+  method create_element_ns : Eg::Node::Element ($namespace_uri : string, $qualified_name : string) {
+    
+    unless ($namespace_uri) {
+      die "\$namespace_uri must be defined.";
+    }
+    
+    unless ($qualified_name) {
+      die "\$qualified_name must be defined.";
+    }
+    
+    unless (length $qualified_name) {
+      die "\$qualified_name must have its length.";
+    }
+    
+    unless (Regex->new("^([a-zA-Z_][\w+\-\.]*:)?[a-zA-Z_][\w+\-\.]*$")->match($qualified_name)) {
+      die "\$qualified_name must be a valid XML name.";
+    }
+    
+    my $element = Eg::Node::Element->new({owner_document => $self});
+    
+    $element->{namespace_uri} = $namespace_uri;
+    
+    $element->{node_name} = $qualified_name;
+    
+    return $element;
+  }
+  
+  method create_text_node : Eg::Node::Text ($node_value : string) {
+    
+    unless ($node_value) {
+      die "\$node_value must be defined.";
+    }
+    
+    my $text_node = Eg::Node::Text->new({owner_document => $self, node_value => $node_value});
+    
+    return $text_node;
+  }
+  
+  method create_comment : Eg::Node::Comment ($node_value : string) {
+    
+    unless ($node_value) {
+      die "\$node_value must be defined.";
+    }
+    
+    my $comment_node = Eg::Node::Comment->new({owner_document => $self, node_value => $node_value});
+    
+    return $comment_node;
+  }
+  
+  method create_cdata_section : Eg::Node::CDATASection ($node_value : string) {
+    
+    unless ($node_value) {
+      die "\$node_value must be defined.";
+    }
+    
+    my $cdata_section_node = Eg::Node::CDATASection->new({owner_document => $self, node_value => $node_value});
+    
+    return $cdata_section_node;
+  }
+  
   method create_document_fragment : Eg::Node::DocumentFragment () {
     
-    my $document_fragment_node = Eg::Node::DocumentFragment->new;
+    my $document_fragment_node = Eg::Node::DocumentFragment->new({owner_document => $self});
     
     return $document_fragment_node;
   }
   
   method create_attribute : Eg::Node::Attr ($name : string) {
     
-    unless ($name) {
-      die "\$name must be defined.";
-    }
-    
-    unless (Regex->new("^[a-zA-Z_][\w+\-\.]*$")->match($name)) {
-      die "\$name must be a valid XML name.";
-    }
-    
-    $name = Fn->lc($name);
-    
-    my $attribute_node = Eg::Node::Attr->new;
-    
-    $attribute_node->{name} = $name;
+    my $attribute_node = Eg::Node::Attr->new($name, {owner_document => $self});
     
     return $attribute_node;
+  }
+  
+  method create_attribute_ns : Eg::Node::Attr ($namespace_uri : string, $qualified_name : string) {
+    
+    my $attribute_node = Eg::Node::Attr->new_ns($namespace_uri, $qualified_name, {owner_document => $self});
+    
+    return $attribute_node;
+  }
+  
+  method create_processing_instruction : Eg::Node::ProcessingInstruction ($target : string, $data : string) {
+    
+    my $processing_instruction_node = Eg::Node::ProcessingInstruction->new($target, $data, {owner_document => $self});
+    
+    return $processing_instruction_node;
+  }
+  
+  method document_element : Eg::Node::Element () {
+    
+    my $root_node = (Eg::Node::Element)$self->first_child;
+    
+    return $root_node;
+  }
+  
+  method head : Eg::Node::Element () {
+    my $root_node = $self->document_element;
+    
+    return (Eg::Node::Element)$root_node->first_child;
+  }
+  
+  method body : Eg::Node::Element () {
+    my $root_node = $self->document_element;
+    
+    return (Eg::Node::Element)$root_node->first_child->next_sibling;
   }
   
 }

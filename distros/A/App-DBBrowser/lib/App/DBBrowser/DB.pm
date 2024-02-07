@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.403';
+our $VERSION = '2.404';
 
 #use bytes; # required
 use Scalar::Util qw( looks_like_number );
@@ -324,17 +324,17 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.403
+Version 2.404
 
 =head1 DESCRIPTION
 
 A database plugin provides the database specific methods. C<App::DBBrowser> considers a module whose name matches
-C</^App::DBBrowser::DB::[^:']+\z/> and which is located in one of the C<@INC> directories as a database plugin.
+C</^App::DBBrowser::DB::[^:']+\z/> and which is located in one of the C<@INC> directories, as a database plugin.
 
 The user can add an installed database plugin to the available plugins in the options menu (C<db-browser -h>) by
-selecting I<DB Options> and then I<DB Plugins>.
+selecting I<Plugins>.
 
-A suitable database plugin provides the methods named in this documentation.
+A suitable database plugin provides the methods mentioned in this documentation.
 
 =head1 METHODS
 
@@ -344,7 +344,7 @@ A suitable database plugin provides the methods named in this documentation.
 
 The constructor method.
 
-When C<db-browser> calls the plugin constructor it passes tow arguments:
+When C<db-browser> calls the plugin constructor it passes two arguments:
 
     sub new {
         my ( $class, $info, $opt ) = @_;
@@ -367,17 +367,17 @@ Returns the name of the C<DBI> database driver used by the plugin.
 
 =head3 get_databases();
 
-Returns two array references: the first reference refers to the array of user-databases the second refers to the array
-of system-databases. The second array reference is optional.
+Returns two array references: the first reference refers to the array of user databases, the second to the array of the
+system databases. The second array reference is optional.
 
-If the option I<System data> is true, user-databases and system-databases are used else only the user-databases are
-used.
+If the option I<System data> is true, user databases and system databases are used, otherwise only the user databases
+are used.
 
 =head3 get_db_handle( $database )
 
 Returns the database handle.
 
-C<db-browser> expects a C<DBI> database handle with the attribute I<RaiseError> enabled.
+C<db-browser> expects a C<DBI> database handle with the attribute I<RaiseError> activated.
 
 =head2 Optional methods
 
@@ -386,11 +386,11 @@ C<db-browser> expects a C<DBI> database handle with the attribute I<RaiseError> 
 C<$dbh> is the database handle returned by the method C<db_hanlde>.
 
 If the driver is C<SQLite>, a third argument is passed to C<get_schemas>; if the database has attached databases, the
-third argument is true otherwise it is false.
+third argument is true, otherwise it is false.
 
-Returns the user-schemas as an array-reference and the system-schemas as an array-reference (if any).
+Returns the user schemas as an array reference and the system schemas as an array reference (if any).
 
-If the option I<metadata> is true, user-schemas and system-schemas are used else only the user-schemas are used.
+If the option I<System data> is true, user schemas and system schemas are used, otherwise only the user schemas are used.
 
 =begin comment
 

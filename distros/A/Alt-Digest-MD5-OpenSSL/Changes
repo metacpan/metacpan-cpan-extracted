@@ -1,3 +1,9 @@
+0.03 2024-01-29T23:55:48+01:00
+ - Add author basic tests.
+ - Add test for OpenSSL diagnostics.
+ - Add test requires to Makefile.PL.
+ - Move original Digest::MD5 tests to t/original.
+
 0.02 2024-01-25T13:26:59+01:00
  - No index Digest::MD5.
 

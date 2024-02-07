@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result;
 # ABSTRACT: Result of running a Cypher statement (a stream of records)
-$Neo4j::Driver::Result::VERSION = '0.42';
+$Neo4j::Driver::Result::VERSION = '0.44';
 
 use parent 'Neo4j::Driver::StatementResult';
 
@@ -128,7 +128,7 @@ sub fetch {
 	my ($self) = @_;
 	
 	return if $self->{exhausted};  # fetch() mustn't destroy a list() buffer
-	$self->_fill_buffer(1);
+	$self->_fill_buffer(2);
 	my $next = shift @{$self->{buffer}};
 	$self->{exhausted} = ! $next;
 	return $next;
@@ -136,12 +136,10 @@ sub fetch {
 
 
 sub peek {
-	# uncoverable pod (experimental feature)
 	my ($self) = @_;
 	
-	croak "iterator is exhausted" if $self->{exhausted};
 	$self->_fill_buffer(1);
-	return $self->{buffer}->[0];
+	return scalar $self->{buffer}->[0];
 }
 
 
@@ -173,11 +171,9 @@ sub detach {
 
 
 sub consume {
-	# uncoverable pod (experimental feature)
 	my ($self) = @_;
 	
-	# Neo4j::Bolt doesn't offer direct access to neo4j_close_results()
-	$self->{exhausted} = 1;
+	1 while $self->fetch;  # Exhaust the result stream
 	return $self->summary;
 }
 
@@ -217,7 +213,7 @@ Neo4j::Driver::Result - Result of running a Cypher statement (a stream of record
 
 =head1 VERSION
 
-version 0.42
+version 0.44
 
 =head1 SYNOPSIS
 
@@ -270,6 +266,17 @@ Until version 0.18, this module was named C<StatementResult>.
 
 L<Neo4j::Driver::Result> implements the following methods.
 
+=head2 consume
+
+ $summary = $result->consume;
+
+Return the L<Neo4j::Driver::ResultSummary>.
+
+Calling this method fully exhausts the result and invalidates the
+result stream, discarding any remaining records. If you want to
+access records I<after> retrieving the summary, you should use
+C<list()> before C<consume()> to buffer all records into memory.
+
 =head2 fetch
 
  while ($record = $result->fetch) {
@@ -315,6 +322,15 @@ multiple times returns the buffered list.
 
 This method returns an array reference if called in scalar context.
 
+=head2 peek
+
+ $record = $result->peek;
+
+Obtain the next L<Record|Neo4j::Driver::Record> from this result
+without actually navigating to it and consuming it. The record
+is left in the internal stream buffer for further processing.
+If there is no next record, return C<undef>.
+
 =head2 single
 
  $name = $session->run('... LIMIT 1')->single->get('name');
@@ -342,6 +358,9 @@ for use by C<list()>.
 Return a L<Neo4j::Driver::ResultSummary> object. Calling this method
 detaches the result stream, but does I<not> exhaust it.
 
+This method is discouraged. It may be deprecated and removed in
+a future version. Please use C<consume()> instead.
+
 As a special case, L<Record|Neo4j::Driver::Record>s returned by the
 C<single> method also have a C<summary> method that works the same
 way.
@@ -365,37 +384,6 @@ context.
 
 Until version 0.25, it returned an array reference instead.
 
-=head2 Discarding the result stream
-
- $result->consume;
-
-Discarding the entire result may be useful as a cheap way to signal
-to the Bolt networking layer that any resources held by the result
-may be released. The actual result records are silently discarded
-without any effort to buffer the results. Calling this method
-exhausts the result stream.
-
-As a side effect, discarding the result yields a summary of it.
-
- $result_summary = $result->consume;
-
-Using a result after this method has been called is discouraged.
-This may become a fatal error in future versions.
-
-All of the official drivers offer this method, but it doesn't appear
-to be necessary here, since L<Neo4j::Bolt::ResultStream> reliably
-calls C<neo4j_close_results()> in its C<DESTROY()> method. It may
-be removed in future versions.
-
-=head2 Look ahead in the result stream
-
- say "Next record: ", $result->peek->get(...) if $result->has_next;
-
-Using C<peek()>, it is possible to retrieve the
-same record the next call to C<fetch()> would retrieve without
-actually navigating to it. This may change the internal stream
-buffer and detach the result, but will never exhaust it.
-
 =head1 SEE ALSO
 
 =over
@@ -415,11 +403,11 @@ L<IResult (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.2/html/f1ac31ec-c6dd
 
 =head1 AUTHOR
 
-Arne Johannessen (L<AJNN|https://arne.johannessen.de/>)
+Arne Johannessen (L<AJNN|https://metacpan.org/author/AJNN>)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2023 by Arne Johannessen.
+This software is Copyright (c) 2016-2024 by Arne Johannessen.
 
 This is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0 or (at your option) the same terms

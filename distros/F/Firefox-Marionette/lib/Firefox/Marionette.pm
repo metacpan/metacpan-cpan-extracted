@@ -72,7 +72,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.51';
+our $VERSION = '1.52';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -204,8 +204,7 @@ sub languages {
     my ( $self, @new_languages ) = @_;
     my $pref_name = 'intl.accept_languages';
     my $script =
-      'return navigator.languages'
-      ; # branch.getComplexValue(arguments[0], Components.interfaces.nsIPrefLocalizedString).data';
+'return navigator.languages || branch.getComplexValue(arguments[0], Components.interfaces.nsIPrefLocalizedString).data.split(/,\s*/)';
     my $old           = $self->_context('chrome');
     my @old_languages = @{
         $self->script(
@@ -466,11 +465,43 @@ sub agent {
     if ( ( scalar @new ) > 0 ) {
         if ( defined $new[0] ) {
             $self->set_pref( $pref_name, $new[0] );
+            my ( $webkit_app, $app_version, $platform ) =
+              ( q[], '5.0 (Windows)', 'Win32' );
+            my ( $vendor, $vendor_sub ) = ( q[], q[] );
+            my $webkit;
+            if ( $new[0] =~ /AppleWebKit/smx ) {
+                $webkit = 1;
+            }
+
+    # https://developer.mozilla.org/en-US/docs/Web/API/Navigator/userAgent#value
+            if (
+                $new[0] =~ m{^
+                                        [^\/]+\/ # appCodeName
+                                        (([^ ]+[ ][(][^ ]+)[^;]*;[ ] # appVersion
+                                        ([^;]+); # platform
+					.*)
+				$}smx
+              )
+            {
+                ( $webkit_app, $app_version, $platform ) = ( $1, $2, $3 );
+                $app_version .= q[)];
+                if ($webkit) {
+                    $app_version = $webkit_app;
+                    $vendor      = 'Google Inc.';
+                    $vendor_sub  = q[];
+                }
+            }
+            if ( $new[0] =~ /Win(?:32|64)/smx ) {
+                $platform = 'Win32';
+            }
+            $self->set_pref( 'general.platform.override',   $platform );
+            $self->set_pref( 'general.appversion.override', $app_version );
         }
         else {
             $self->clear_pref($pref_name);
         }
     }
+
     return $old_agent;
 }
 
@@ -991,6 +1022,10 @@ sub _init {
     if ( defined $parameters{har} ) {
         $self->{_har} = $parameters{har};
         require Firefox::Marionette::Extension::HarExportTrigger;
+    }
+    if ( $parameters{stealth} ) {
+        $self->{stealth} = 1;
+        require Firefox::Marionette::Extension::Stealth;
     }
     $self->{mime_types} = [
         qw(
@@ -3840,35 +3875,43 @@ sub _check_protocol_version_and_pid {
     return;
 }
 
+sub _install_extension {
+    my ( $self, $module, $name ) = @_;
+    $self->_build_local_extension_directory();
+    my $path =
+      File::Spec->catfile( $self->{_local_extension_directory}, $name );
+    my $handle = FileHandle->new(
+        $path,
+        Fcntl::O_WRONLY() | Fcntl::O_CREAT() | Fcntl::O_EXCL(),
+        Fcntl::S_IRUSR() | Fcntl::S_IWUSR()
+      )
+      or Firefox::Marionette::Exception->throw(
+        "Failed to open '$path' for writing:$EXTENDED_OS_ERROR");
+    binmode $handle;
+    print {$handle} MIME::Base64::decode_base64( $module->as_string() )
+      or Firefox::Marionette::Exception->throw(
+        "Failed to write to '$path':$EXTENDED_OS_ERROR");
+    close $handle
+      or Firefox::Marionette::Exception->throw(
+        "Failed to close '$path':$EXTENDED_OS_ERROR");
+    $self->install( $path, 1 );
+    return;
+}
+
 sub _post_launch_checks_and_setup {
     my ( $self, $timeouts ) = @_;
     $self->_write_local_proxy( $self->_ssh() );
     if ( defined $timeouts ) {
         $self->timeouts($timeouts);
     }
+    if ( $self->{stealth} ) {
+        $self->_install_extension( 'Firefox::Marionette::Extension::Stealth',
+            'stealth-0.0.1.xpi' );
+    }
     if ( $self->{_har} ) {
-        $self->_build_local_extension_directory();
-        my $path = File::Spec->catfile(
-            $self->{_local_extension_directory},
-            'har_export_trigger-0.6.1-an+fx.xpi'
-        );
-        my $handle = FileHandle->new(
-            $path,
-            Fcntl::O_WRONLY() | Fcntl::O_CREAT() | Fcntl::O_EXCL(),
-            Fcntl::S_IRUSR() | Fcntl::S_IWUSR()
-          )
-          or Firefox::Marionette::Exception->throw(
-            "Failed to open '$path' for writing:$EXTENDED_OS_ERROR");
-        binmode $handle;
-        print {$handle}
-          MIME::Base64::decode_base64(
-            Firefox::Marionette::Extension::HarExportTrigger->as_string() )
-          or Firefox::Marionette::Exception->throw(
-            "Failed to write to '$path':$EXTENDED_OS_ERROR");
-        close $handle
-          or Firefox::Marionette::Exception->throw(
-            "Failed to close '$path':$EXTENDED_OS_ERROR");
-        $self->install( $path, 0 );
+        $self->_install_extension(
+            'Firefox::Marionette::Extension::HarExportTrigger',
+            'har_export_trigger-0.6.1-an+fx.xpi' );
     }
     if ( $self->{force_webauthn} ) {
         $self->{$webauthn_default_authenticator_key_name} =
@@ -3991,7 +4034,7 @@ sub _check_addons {
     my ( $self, %parameters ) = @_;
     $self->{addons} = 1;
     my @arguments = ();
-    if ( $self->{_har} ) {
+    if ( ( $self->{_har} ) || ( $self->{stealth} ) ) {
     }
     elsif ( $parameters{nightly} )
     {    # safe-mode will disable loading extensions in nightly
@@ -11726,7 +11769,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.51
+Version 1.52
 
 =head1 SYNOPSIS
 
@@ -13415,6 +13458,8 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * sleep_time_in_ms - the amount of time (in milliseconds) that this module should sleep when unsuccessfully calling the subroutine provided to the L<await|/await> or L<bye|/bye> methods.  This defaults to "1" millisecond.
 
+=item * stealth - stops L<navigator.webdriver|https://developer.mozilla.org/en-US/docs/Web/API/Navigator/webdriver> from being accessible by the current web page. This is highly experimental.  See L<WEBSITES THAT BLOCK AUTOMATION|/WEBSITES-THAT-BLOCK-AUTOMATION> for a discussion.
+
 =item * survive - if this is set to a true value, firefox will not automatically exit when the object goes out of scope.  See the reconnect parameter for an experimental technique for reconnecting.
 
 =item * trust - give a path to a L<root certificate|https://en.wikipedia.org/wiki/Root_certificate> encoded as a L<PEM encoded X.509 certificate|https://datatracker.ietf.org/doc/html/rfc7468#section-5> that will be trusted for this session.
@@ -14194,7 +14239,7 @@ And used to fill in login prompts without explicitly knowing the account details
 
 =head1 GEO LOCATION
 
-The firefox L<Geolocation API|https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API> can be used by supplying the C<geo> parameter to the L<new|/new> method and then calling the L<geo|/geo> method (from a L<secure context|https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts>.
+The firefox L<Geolocation API|https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API> can be used by supplying the C<geo> parameter to the L<new|/new> method and then calling the L<geo|/geo> method (from a L<secure context|https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts>).
 
 The L<geo|/geo> method can accept various specific latitude and longitude parameters as a list, such as;
 
@@ -14218,13 +14263,15 @@ or it can be passed in as a reference, such as;
 
 the combination of a variety of parameter names and the ability to pass parameters in as a reference means it can be deal with various geo location websites, such as;
 
-    $firefox->geo($firefox->json('https://freeipapi.com/api/json/')); # get geo location from IP address
+    $firefox->geo($firefox->json('https://freeipapi.com/api/json/')); # get geo location from current IP address
 
     $firefox->geo($firefox->json('https://geocode.maps.co/search?street=101+Collins+St&city=Melbourne&state=VIC&postalcode=3000&country=AU&format=json')->[0]); # get geo location of street address
 
     $firefox->geo($firefox->json('http://api.positionstack.com/v1/forward?access_key=' . $access_key . '&query=101+Collins+St,Melbourne,VIC+3000')->{data}->[0]); # get geo location of street address using api key
 
-    $firefox->geo($firefox->json('https://api.ipgeolocation.io/ipgeo?apiKey=' . $api_key)); # get geo location from IP address
+    $firefox->geo($firefox->json('https://api.ipgeolocation.io/ipgeo?apiKey=' . $api_key)); # get geo location from current IP address
+
+    $firefox->geo($firefox->json('http://api.ipstack.com/142.250.70.206?access_key=' . $api_key)); # get geo location from specific IP address (http access only for free)
 
 These sites were active at the time this documentation was written, but mainly function as an illustration of the flexibility of L<geo|/geo> and L<json|/json> methods in providing the desired location to the L<Geolocation API|https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API>.
 
@@ -14335,7 +14382,9 @@ So, this module is designed to allow you to navigate the shadow DOM using normal
 
 =head1 WEBSITES THAT BLOCK AUTOMATION
 
-Marionette L<by design|https://developer.mozilla.org/en-US/docs/Web/API/Navigator/webdriver> allows web sites to detect that the browser is being automated.  Firefox L<no longer (since version 88)|https://bugzilla.mozilla.org/show_bug.cgi?id=1632821> allows you to disable this functionality while you are automating the browser.  If the web site you are trying to automate mysteriously fails when you are automating a workflow, but it works when you perform the workflow manually, you may be dealing with a web site that is hostile to automation.
+Marionette L<by design|https://developer.mozilla.org/en-US/docs/Web/API/Navigator/webdriver> allows web sites to detect that the browser is being automated.  Firefox L<no longer (since version 88)|https://bugzilla.mozilla.org/show_bug.cgi?id=1632821> allows you to disable this functionality while you are automating the browser.  This can be overridden with the C<stealth> parameter for the L<new|/new> method.  This is very experimental and feedback is welcome.
+
+If the web site you are trying to automate mysteriously fails when you are automating a workflow, but it works when you perform the workflow manually, you may be dealing with a web site that is hostile to automation.
 
 At the very least, under these circumstances, it would be a good idea to be aware that there's an L<ongoing arms race|https://en.wikipedia.org/wiki/Web_scraping#Methods_to_prevent_web_scraping>, and potential L<legal issues|https://en.wikipedia.org/wiki/Web_scraping#Legal_issues> in this area.
 
@@ -14620,7 +14669,7 @@ Thanks also to the authors of the documentation in the following sources;
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2023, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
+Copyright (c) 2024, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic/perlartistic>.

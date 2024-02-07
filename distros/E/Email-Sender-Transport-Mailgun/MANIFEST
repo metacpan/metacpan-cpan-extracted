@@ -11,6 +11,7 @@ t/apikey.t
 t/failure.t
 t/live.t
 t/region.t
+t/retry.t
 t/success.t
 META.yml
 MANIFEST

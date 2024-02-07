@@ -6,6 +6,8 @@ META.json
 META.yml
 Makefile.PL
 README
+build
+build-and-install
 devscript/update-data
 dist.ini
 lib/TableData/Perl/CPAN/Release/Static/2024.pm

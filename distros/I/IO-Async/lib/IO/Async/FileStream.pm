@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::FileStream;
+package IO::Async::FileStream 0.803;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.802';
 
 use base qw( IO::Async::Stream );
 
@@ -164,8 +162,7 @@ sub configure
       $params{read_handle} = $self->{file}->handle;
    }
    elsif( exists $params{handle} or exists $params{read_handle} ) {
-      my $handle = delete $params{handle};
-      defined $handle or $handle = delete $params{read_handle};
+      my $handle = delete $params{handle} // delete $params{read_handle};
 
       $self->{file}->configure( handle => $handle );
       $params{read_handle} = $self->{file}->handle;
@@ -272,7 +269,7 @@ sub write
 
 =head2 seek
 
-   $filestream->seek( $offset, $whence )
+   $filestream->seek( $offset, $whence );
 
 Callable only during the C<on_initial> event. Moves the read position in the
 filehandle to the given offset. C<$whence> is interpreted as for C<sysseek>,
@@ -295,14 +292,14 @@ sub seek
 
    $self->{running_initial} or croak "Cannot ->seek except during on_initial";
 
-   defined $whence or $whence = SEEK_SET;
+   $whence //= SEEK_SET;
 
    sysseek( $self->read_handle, $offset, $whence );
 }
 
 =head2 seek_to_last
 
-   $success = $filestream->seek_to_last( $str_pattern, %opts )
+   $success = $filestream->seek_to_last( $str_pattern, %opts );
 
 Callable only during the C<on_initial> event. Attempts to move the read
 position in the filehandle to just after the last occurrence of a given match.
@@ -360,7 +357,7 @@ sub seek_to_last
 
    my $blocksize = $opts{blocksize} || 8192;
 
-   defined $opts{horizon} or $opts{horizon} = $blocksize * 4;
+   $opts{horizon} //= $blocksize * 4;
    my $horizon = $opts{horizon} ? $offset - $opts{horizon} : 0;
    $horizon = 0 if $horizon < 0;
 

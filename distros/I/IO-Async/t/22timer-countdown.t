@@ -1,13 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Fatal;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use lib ".";
 use t::TimeAbout;
@@ -35,7 +33,7 @@ testing_loop( $loop );
    );
 
    ok( defined $timer, '$timer defined' );
-   isa_ok( $timer, "IO::Async::Timer", '$timer isa IO::Async::Timer' );
+   isa_ok( $timer, [ "IO::Async::Timer" ], '$timer isa IO::Async::Timer' );
 
    is_oneref( $timer, '$timer has refcount 1 initially' );
 
@@ -46,7 +44,7 @@ testing_loop( $loop );
    ok( !$timer->is_running, 'New Timer is no yet running' );
    ok( !$timer->is_expired, 'New Timer is no yet expired' );
 
-   is( $timer->start, $timer, '$timer->start returns $timer' );
+   ref_is( $timer->start, $timer, '$timer->start returns $timer' );
 
    is_refcount( $timer, 2, '$timer has refcount 2 after starting' );
 
@@ -54,7 +52,7 @@ testing_loop( $loop );
    ok( !$timer->is_expired, 'Started Timer not yet expired' );
 
    time_about( sub { wait_for { $expired } }, 2, 'Timer works' );
-   is_deeply( \@eargs, [ $timer ], 'on_expire args' );
+   is( \@eargs, [ exact_ref($timer) ], 'on_expire args' );
 
    ok( !$timer->is_running, 'Expired Timer is no longer running' );
    ok(  $timer->is_expired, 'Expired Timer now expired' );
@@ -195,7 +193,7 @@ testing_loop( $loop );
    time_about( sub { wait_for { $expired } }, 1, 'Reconfigured timer on_expire works' );
 
    $timer->start;
-   ok( exception { $timer->configure( delay => 5 ); },
+   ok( dies { $timer->configure( delay => 5 ); },
        'Configure a running timer fails' );
 
    $loop->remove( $timer );
@@ -226,7 +224,7 @@ my $sub_expired;
    );
 
    ok( defined $timer, 'subclass $timer defined' );
-   isa_ok( $timer, "IO::Async::Timer", 'subclass $timer isa IO::Async::Timer' );
+   isa_ok( $timer, [ "IO::Async::Timer" ], 'subclass $timer isa IO::Async::Timer' );
 
    is_oneref( $timer, 'subclass $timer has refcount 1 initially' );
 

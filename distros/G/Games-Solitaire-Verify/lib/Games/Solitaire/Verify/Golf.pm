@@ -1,11 +1,13 @@
 package Games::Solitaire::Verify::Golf;
-$Games::Solitaire::Verify::Golf::VERSION = '0.2403';
+$Games::Solitaire::Verify::Golf::VERSION = '0.2500';
 use strict;
 use warnings;
+use 5.014;
 use autodie;
+use utf8;
 
 
-use Carp ();
+use Carp       ();
 use List::Util qw/ sum /;
 
 use Games::Solitaire::Verify::Card      ();
@@ -19,16 +21,25 @@ __PACKAGE__->mk_acc_ref(
         qw(
             _columns
             _foundation
+            _num_foundations
             _place_queens_on_kings
             _talon
             _variant
             _wrap_ranks
-            )
+        )
     ]
 );
 
 my $MAX_RANK  = 13;
 my $NUM_SUITS = 4;
+my $CARD_RE   = qr/[A23456789TJQK][HCDS]/;
+
+sub _is_binary_star
+{
+    my $self = shift;
+
+    return $self->_variant eq 'binary_star';
+}
 
 sub _is_golf
 {
@@ -43,25 +54,47 @@ sub _init
 
     my $variant = $self->_variant( $args->{variant} );
     if (
-        not
-        exists { golf => 1, all_in_a_row => 1, black_hole => 1, }->{$variant} )
+        not exists {
+            all_in_a_row => 1,
+            binary_star  => 1,
+            black_hole   => 1,
+            golf         => 1,
+        }->{$variant}
+        )
     {
         Carp::confess("Unknown variant '$variant'!");
     }
+    my $IS_BINARY_STAR = $self->_is_binary_star;
     $self->_place_queens_on_kings( $args->{queens_on_kings} // '' );
     $self->_wrap_ranks( $args->{wrap_ranks}                 // '' );
+    my $num_foundations = ( $IS_BINARY_STAR ? 2 : 1 );
+    $self->_num_foundations($num_foundations);
     $self->_foundation(
-        Games::Solitaire::Verify::Freecells->new( { count => 1 } ) );
+        Games::Solitaire::Verify::Freecells->new(
+            { count => $num_foundations, }
+        )
+    );
     my $board_string = $args->{board_string};
 
     my @lines = split( /\n/, $board_string );
 
     my $_set_found_line = sub {
         my $foundation_str = shift;
-        if ( my ($card_s) = $foundation_str =~ m#\AFoundations: (\S{2})\z# )
+        if ( my ($card_s) = $foundation_str =~
+            m#\AFoundations:((?: $CARD_RE){$num_foundations})\z# )
         {
-            $self->_set_found(
-                Games::Solitaire::Verify::Card->new( { string => $card_s } ) );
+            $card_s =~ s/\A //ms or die;
+            my @c = split( / /, $card_s );
+            if ( @c != $num_foundations )
+            {
+                die;
+            }
+            for my $i ( keys @c )
+            {
+                my $s = $c[$i];
+                $self->_set_found( $i,
+                    Games::Solitaire::Verify::Card->new( { string => $s } ) );
+            }
         }
         else
         {
@@ -72,7 +105,7 @@ sub _init
     my $foundation_str = shift(@lines);
     if ( $self->_variant eq 'golf' )
     {
-        if ( $foundation_str !~ s#\ATalon: ((?:\S{2} ){15}\S{2})#$1# )
+        if ( $foundation_str !~ s#\ATalon: ((?:$CARD_RE ){15}$CARD_RE)#$1# )
         {
             die "improper talon line <$foundation_str>!";
         }
@@ -125,8 +158,8 @@ sub _init
 
 sub _set_found
 {
-    my ( $self, $card ) = @_;
-    $self->_foundation->assign( 0, $card );
+    my ( $self, $i, $card ) = @_;
+    $self->_foundation->assign( $i, $card, );
     return;
 }
 
@@ -148,7 +181,7 @@ sub process_solution
 
         if ( $s ne '' )
         {
-            die "Line '$line_idx' is not empty, but '$s'";
+            Carp::confess("Line '$line_idx' is not empty, but '$s'");
         }
 
         return;
@@ -160,16 +193,30 @@ sub process_solution
     {
         die "First line is '$l' instead of 'Solved!'";
     }
-    my $IS_GOLF     = $self->_is_golf;
-    my $CHECK_EMPTY = ( $IS_GOLF or $self->_variant eq "black_hole" );
+    my $IS_BINARY_STAR     = $self->_is_binary_star;
+    my $IS_GOLF            = $self->_is_golf;
+    my $CHECK_EMPTY        = ( $IS_GOLF or $self->_variant eq "black_hole" );
+    my $IS_DETAILED_MOVE   = $IS_BINARY_STAR;
+    my $IS_DISPLAYED_BOARD = $IS_BINARY_STAR;
+    my $num_decks          = $self->_num_foundations();
+    my $num_foundations    = $self->_num_foundations();
 
     # As many moves as the number of cards.
 MOVES:
-    for my $move_idx ( 0 .. ( $MAX_RANK * $NUM_SUITS - 1 ) )
+    for my $move_idx (
+        0 .. (
+            $num_decks * $MAX_RANK * $NUM_SUITS -
+                $num_foundations -
+                ( $num_foundations > 1 )
+        )
+        )
     {
         my ( $move_line, $move_line_idx ) = $get_line->();
 
         my $card;
+        my $col_idx;
+        my $foundation_idx;
+        my $moved_card_str;
         if (    $IS_GOLF
             and $move_line =~ m/\ADeal talon\z/ )
         {
@@ -177,16 +224,34 @@ MOVES:
             {
                 die "Talon is empty on line no. $move_line_idx";
             }
-            $card = shift @{ $self->_talon };
+            $card           = shift @{ $self->_talon };
+            $foundation_idx = 0;
         }
-        elsif ( $move_line !~
-            m/\AMove a card from stack ([0-9]+) to the foundations\z/ )
+        else
         {
-            die
+            if (
+                $IS_DETAILED_MOVE
+                ? ( ( $moved_card_str, $col_idx, $foundation_idx ) =
+                        $move_line =~
+m/\AMove ($CARD_RE) from stack ([0-9]+) to foundations ([0-9]+)\z/
+                )
+                : ( ($col_idx) =
+                        $move_line =~
+m/\AMove a card from stack ([0-9]+) to the foundations\z/
+                )
+                )
+            {
+                if ( not $IS_DETAILED_MOVE )
+                {
+                    $foundation_idx = 0;
+                }
+            }
+            else
+            {
+                die
 "Incorrect format for move line no. $move_line_idx - '$move_line'";
+            }
         }
-
-        my $col_idx = $1;
 
         if ( !defined $card )
         {
@@ -197,29 +262,31 @@ MOVES:
         }
 
         $assert_empty_line->();
-
-        my ( $info_line, $info_line_idx ) = $get_line->();
-
-        if ( $info_line !~ m/\AInfo: Card moved is ([A23456789TJQK][HCDS])\z/ )
+        my ( $info_line, $info_line_idx );
+        if ( not $IS_DETAILED_MOVE )
         {
-            die
+            ( $info_line, $info_line_idx ) = $get_line->();
+            if ( $info_line !~ m/\AInfo: Card moved is ($CARD_RE)\z/ )
+            {
+                die
 "Invalid format for info line no. $info_line_idx - '$info_line'";
-        }
+            }
 
-        my $moved_card_str = $1;
+            $moved_card_str = $1;
 
-        $assert_empty_line->();
-        $assert_empty_line->();
+            $assert_empty_line->();
+            $assert_empty_line->();
 
-        my ( $sep_line, $sep_line_idx ) = $get_line->();
+            my ( $sep_line, $sep_line_idx ) = $get_line->();
 
-        if ( $sep_line !~ m/\A=+\z/ )
-        {
-            die
+            if ( $sep_line !~ m/\A=+\z/ )
+            {
+                die
 "Invalid format for separator line no. $sep_line_idx - '$sep_line'";
-        }
+            }
 
-        $assert_empty_line->();
+            $assert_empty_line->();
+        }
 
         if ( defined $card )
         {
@@ -242,7 +309,7 @@ MOVES:
 "Card moved should be '$top_card_moved_str', but the info says it is '$moved_card_str' at line $info_line_idx";
             }
 
-            my $found_card = $self->_foundation->cell(0);
+            my $found_card = $self->_foundation->cell($foundation_idx);
             if ( defined($found_card) )
             {
                 my $found_rank = $found_card->rank();
@@ -269,12 +336,55 @@ MOVES:
 "Cannot put $top_card_moved_str in the foundations that contain "
                         . $found_card->to_string();
                 }
+                if ($IS_DISPLAYED_BOARD)
+                {
+                    my ( $line, $line_idx ) = $get_line->();
+                    my $wanted_line = $self->_foundation->to_string();
+                    $wanted_line =~ s#\AFreecells:#Foundations:#
+                        or Carp::confess("Unimpl!");
+                    $wanted_line =~ s#  # #g;
+                    my $fstr = $found_card->to_string();
+                    my $tstr = $top_card->to_string();
+                    $wanted_line =~
+s#\AFoundations:(?: $CARD_RE){$foundation_idx} \K(\Q$fstr\E)#my$c=$1;"[ $c → $tstr ]"#e
+                        or Carp::confess(
+"Failed substitute! foundation_idx=$foundation_idx wanted_line=$wanted_line fstr='$fstr'"
+                        );
+                    if ( $line ne $wanted_line )
+                    {
+                        Carp::confess(
+                            "Foundations str is '$line' vs. '$wanted_line'");
+                    }
+                    for my $i ( keys @$columns )
+                    {
+                        my $col         = $columns->[$i];
+                        my $wanted_line = $col->to_string();
+                        if ( $i == $col_idx )
+                        {
+                            $wanted_line =~
+                                s# \K(\Q$tstr\E)\z#my$c=$1;"[ $c → ]"#e
+                                or Carp::confess(
+"Failed column substitute! foundation_idx=$foundation_idx wanted_line=$wanted_line tstr='$tstr'"
+                                );
+                        }
+                        my ( $line, $line_idx ) = $get_line->();
+                        if ( $line ne $wanted_line )
+                        {
+                            Carp::confess(
+                                "Column $i str is '$line' vs. '$wanted_line'");
+                        }
+                    }
+                    $assert_empty_line->();
+                }
             }
             $card = $col->pop;
             --$remaining_cards;
         }
-
-        $self->_set_found($card);
+        if ( not defined $foundation_idx )
+        {
+            die "\$foundation_idx not set";
+        }
+        $self->_set_found( $foundation_idx, $card, );
         if ($CHECK_EMPTY)
         {
             if ( $remaining_cards == 0 )
@@ -301,7 +411,7 @@ of black-hole-solve (or a similar solver)
 
 =head1 VERSION
 
-version 0.2403
+version 0.2500
 
 =head1 SYNOPSIS
 
@@ -313,7 +423,7 @@ version 0.2403
         }
     );
 
-    open my $fh, '<', $solution_fn;
+    open my $fh, '<:encoding(utf-8)', $solution_fn;
     $verifier->process_solution( sub { my $l = <$fh>; chomp $l; return $l; } );
     print "Solution is OK.\n";
     exit(0);

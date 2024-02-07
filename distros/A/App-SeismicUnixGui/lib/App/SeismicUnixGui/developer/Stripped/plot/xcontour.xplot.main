@@ -72,7 +72,7 @@
  of labeled contours. 							
 
 
- AUTHOR: Morten Wendell Pedersen, Aarhus University 
+ Author: Morten Wendell Pedersen, Aarhus University 
 
  All the coding is based on snippets taken from xwigb, ximage and pscontour
  All I have done is put the parts together and put in some bugs ;-)

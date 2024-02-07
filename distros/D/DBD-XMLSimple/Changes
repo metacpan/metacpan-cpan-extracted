@@ -1,5 +1,8 @@
 Revision history for DBD-XMLSimple
 
+0.07	Fri Feb  2 09:05:41 EST 2024
+	Fix uninit variable in DBI.pm
+
 0.06	Sun Sep  3 03:28:35 EDT 2017
 	Concatenate leafs of the same entry
 	DBI now supports this module

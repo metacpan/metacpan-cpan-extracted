@@ -1,6 +1,16 @@
 NAME
     Data::HTML::Element - Data objects for HTML elements.
 
+DESCRIPTION
+    Collection of immutable data objects for HTML elements. All methods
+    should be related to main element with exception with inner content
+    defined via 'data' method.
+
+    Intent behind data objects is control of information inside it.
+
+    This data objects are used in Tags::HTML::Element helpers and in other
+    high level objects in Tags::HTML namespace.
+
 SEE ALSO
     Data::HTML::Element::A
         Data object for HTML a element.
@@ -37,5 +47,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.09
+    0.10
 

@@ -1,5 +1,5 @@
 package Sim::OPT::Report;
-# Copyright (C) 2008-2023 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2024 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Retrieve of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -38,7 +38,7 @@ no warnings;
 
 our @EXPORT = qw( newretrieve newreport get_files );
 
-$VERSION = '0.111';
+$VERSION = '0.115';
 $ABSTRACT = 'Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results.';
 
 #########################################################################################
@@ -345,7 +345,7 @@ ZZZ
 
     sub retrieve_stats_results
     {
-      my ( $result, $resfile, $shortresfile, $thisto, $retrdata_ref, $reporttitle, $themereport, $counttheme, $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines ) = @_;
+      my ( $result, $resfile, $shortresfile, $thisto, $retrdata_ref, $reporttitle, $themereport, $counttheme, $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines, $howmuch, $where, $what ) = @_;
 
       my @retrdata = @$retrdata_ref;
       my $printthis;
@@ -408,6 +408,41 @@ TTT
           say $tee "THERE ALREADY IS A RETFILE!";
         }
       }
+      elsif ( $themereport eq "dhs" ) # dhs = degree hours
+      {
+        unless (-e "$retfile")
+        {
+          $printthis =
+"cd $thisto/cfg
+res -file $resfile -mode script<<TTT
+
+3
+$retrdata[0]
+$retrdata[1]
+$retrdata[2]
+d
+$where
+b
+$what
+-
+$howmuch
+>
+$retfile
+$retfile
+m
+-
+-
+-
+-
+TTT
+";
+        }
+        else
+        {
+          say $tee "THERE ALREADY IS A RETFILE!";
+        }
+      }
+      
       if ( ($exeonfiles eq "y") or ( $dowhat{newretrieve} eq "y" ) )
       {
 
@@ -639,6 +674,9 @@ TTT
           my $afterlines = $datarep{afterlines};
           my $column = $datarep{column};
           my $reportstrategy = $datarep{reportstrategy};
+          my $howmuch = $datarep{howmuch};
+          my $where = $datarep{where};
+          my $what = $datarep{what};
 
           my $counttheme = 0;
           foreach my $retrievedatum ( @{ $retrievedata{$counttool} } )
@@ -685,6 +723,9 @@ TTT
                   my $reportstrategy = $datarep{reportstrategy};
                   my $retfile = "$resfile-$reporttitle-$themereport.grt";
                   my $column = $datarep{column};
+                  my $howmuch = $datarep{howmuch};
+                  my $where = $datarep{where};
+                  my $what = $datarep{what};
 
                   $retstruct[$countcase][$countblock][ $countinstance ][$counttheme][$countreport][$countitem][$counttool] = $retfile;
                   print RETBLOCK "$retfile\n";
@@ -712,6 +753,9 @@ TTT
                         afterlines => $afterlines,
                         column => $column,
                         reportstrategy => $reportstrategy,
+                        howmuch => $howmuch,
+                        where => $where,
+                        what => $what
                         #adhoclines => $adhoclines,
                       } );
                   }
@@ -730,11 +774,11 @@ TTT
            					{
                       retrieve_comfort_results( $result, $resfile, $shortresfile, $thisto, \@retrdata, $reporttitle, $themereport, $counttheme, $countreport, $retfile );
                     }
-                    elsif ( ( ( $themereport eq "loads" ) or ( $themereport eq "tempsstats"  ) ) )
+                    elsif ( ( ( $themereport eq "loads" ) or ( $themereport eq "tempsstats"  ) or  ( $themereport eq "dhs"  ) ) )
                     {
-                      say $tee "IN NEWRETRIEVE \$result $result, \$resfile $resfile, $shortresfile. \@retrdata @retrdata, \$reporttitle $reporttitle, \$themereport $themereport, \$counttheme $counttheme, \$countrep$shortresfile, ort $countreport, \$retfile $retfile, \$semaphorego1 $semaphorego1, \$semaphorego2 $semaphorego2, \$semaphorestop1 $semaphorestop1, \$semaphorestop2 $semaphorestop2, \$textpattern $textpattern, \$afterlines $afterlines";
+                      say $tee "IN NEWRETRIEVE \$result $result, \$resfile $resfile, $shortresfile. \@retrdata @retrdata, \$reporttitle $reporttitle, \$themereport $themereport, \$counttheme $counttheme, \$countrep$shortresfile, ort $countreport, \$retfile $retfile, \$semaphorego1 $semaphorego1, \$semaphorego2 $semaphorego2, \$semaphorestop1 $semaphorestop1, \$semaphorestop2 $semaphorestop2, \$textpattern $textpattern, \$afterlines $afterlines, \$howmuch $howmuch, \$where $where, \$what $what";
                       retrieve_stats_results( $result, $resfile, $shortresfile, $thisto, \@retrdata, $reporttitle, $themereport, $counttheme,
-                            $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines );
+                            $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines, $howmuch, $where, $what );
                     }
                     elsif ( ( $themereport eq "radent" ) or ( $themereport eq "radabs" ) or ( $themereport eq "airtemp" ) or ( $themereport eq "radtemp" ) or ( $themereport eq "restemp" ) )
                     {

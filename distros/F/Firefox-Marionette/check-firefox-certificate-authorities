@@ -7,7 +7,7 @@ use English qw( -no_match_vars );
 use Encode();
 use Firefox::Marionette();
 
-our $VERSION = '1.51';
+our $VERSION = '1.52';
 
 sub _NUMBER_OF_SPACES_FOR_CODE_QUOTING_IN_MARKDOWN { return 4 }
 
@@ -101,7 +101,7 @@ check-firefox-certificate-authorities - check the CA certificates in firefox for
 
 =head1 VERSION
 
-Version 1.51
+Version 1.52
 
 =head1 USAGE
 
@@ -174,7 +174,7 @@ David Dick  C<< <ddick@cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2023, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
+Copyright (c) 2024, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic/perlartistic>.

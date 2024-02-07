@@ -18,11 +18,18 @@ use DynaLoader;
 
 
 
+BEGIN {
+  use Alien::proj;
+  if ($^O =~ /MSWin32/ and $Alien::proj::VERSION le '1.25') {
+    $ENV{PATH} = join ';', (Alien::proj->bin_dirs, $ENV{PATH});
+  }
+
+
+}
 
 
 
-
-#line 19 "Proj.pd"
+#line 26 "Proj.pd"
 
 use strict;
 use warnings;
@@ -34,7 +41,7 @@ PDL::GIS::Proj - PDL interface to the PROJ projection library.
 =head1 DESCRIPTION
 
 For more information on the PROJ library, see: L<http://www.proj.org/>
-#line 38 "Proj.pm"
+#line 45 "Proj.pm"
 
 =head1 FUNCTIONS
 
@@ -44,7 +51,7 @@ For more information on the PROJ library, see: L<http://www.proj.org/>
 
 
 
-#line 64 "Proj.pd"
+#line 71 "Proj.pd"
 
 =head2 get_proj_info($params_string)
 
@@ -62,7 +69,7 @@ sub get_proj_info
     pop(@a);
     return join("\n", @a);
 } # End of get_proj_info()...
-#line 66 "Proj.pm"
+#line 73 "Proj.pm"
 
 =head2 fwd_transform
 
@@ -136,7 +143,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 213 "Proj.pd"
+#line 220 "Proj.pd"
 
 =head2 proj_version
 
@@ -194,7 +201,7 @@ sub load_projection_information
     return $info;
 } # End of load_projection_information()...
 
-#line 32 "Proj.pd"
+#line 39 "Proj.pd"
 =head1 AUTHOR
 
 Judd Taylor, Orbital Systems, Ltd.
@@ -211,7 +218,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =cut
-#line 215 "Proj.pm"
+#line 222 "Proj.pm"
 
 # Exit with OK status
 

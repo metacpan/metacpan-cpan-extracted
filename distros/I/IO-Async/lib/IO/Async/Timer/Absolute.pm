@@ -1,15 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Timer::Absolute;
+package IO::Async::Timer::Absolute 0.803;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( IO::Async::Timer );
-
-our $VERSION = '0.802';
 
 use Carp;
 

@@ -3,7 +3,7 @@ package App::SeismicUnixGui::sunix::plot::lcmap;
 =head2 SYNOPSIS
 
 PERL PROGRAM NAME:
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 

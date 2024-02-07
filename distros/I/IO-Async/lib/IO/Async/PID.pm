@@ -1,15 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2011 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::PID;
+package IO::Async::PID 0.803;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( IO::Async::Notifier );
-
-our $VERSION = '0.802';
 
 use Carp;
 
@@ -163,7 +161,7 @@ sub notifier_name
 
 =head2 pid
 
-   $process_id = $pid->pid
+   $process_id = $pid->pid;
 
 Returns the underlying process ID
 
@@ -177,7 +175,7 @@ sub pid
 
 =head2 kill
 
-   $pid->kill( $signal )
+   $pid->kill( $signal );
 
 Sends a signal to the process
 

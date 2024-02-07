@@ -106,6 +106,7 @@ use Getopt::EX::Hashed; {
     has prefix_pattern => '    =s  ' , default => $prefix_default ;
     has visible        => '    =s@ ' , default => [] ;
     has lenience       => '    !   ' , default => 1 ;
+    has linebyline     => '    :2  ' , alias => 'lxl';
 
     has ignore_case         => 'i' ;
     has ignore_space_change => 'b' ;
@@ -338,7 +339,17 @@ while (<DIFF>) {
     #
     # normal diff
     #
-    if (($left, $cmd, $right) = /^([\d,]+)([adc])([\d,]+)\r?$/) {
+    if ($app->linebyline) {
+	my $old = $_;
+	my $new = <DIFF> // do {
+	    print $old;
+	    next;
+	};
+	compare(\$old, \$new) if $app->unit;
+	print color("OTEXT", $old);
+	print color("NTEXT", $new);
+    }
+    elsif (($left, $cmd, $right) = /^([\d,]+)([adc])([\d,]+)\r?$/) {
 	my $command_line = $_;
 	my($old, $del, $new);
 	eval {
@@ -896,7 +907,7 @@ cdif - word context diff
 
 =head1 VERSION
 
-Version 4.30
+Version 4.31
 
 =head1 SYNOPSIS
 
@@ -936,6 +947,7 @@ Options:
 	--prefix-pattern    prefix pattern
 	--visible char=?    set visible attributes
 	--[no]lenience      suppress unexpected input warning (default true)
+	--lxl               compare input data line-by-line
 
 
 =head1 DESCRIPTION
@@ -1303,6 +1315,29 @@ number which ignores insert/delete newlines.
 Suppress warning message for unexpected input from diff command.  True
 by default.
 
+=item B<--linebyline>, B<--lxl>
+
+Compare input data line-by-line.  Consider the inputs as pairs of two
+lines each, and output the result of comparing each two lines.
+
+Suppose you have a document with old and new text on lines beginning
+with L<OLD:> and L<NEW:> labels.
+
+    OLD: this is old text
+    NEW: and this is updated document
+
+Only this old/new part can be compared using B<greple>'s B<-Mtee>
+module as follows.
+
+    greple -Mtee cdif --lxl -- --cm=N -GE '^OLD: (.*\n)^NEW: (.*\n)'
+
+B<-Mtee> module sends matched parts to the filter command and replace
+them by its result.  Consult L<App::Greple::tee> for detail.
+
+You can use L<teip(1)> command as well.
+
+    teip -g '^(OLD|NEW): -- cdif --lxl
+
 =back
 
 =head1 GIT
@@ -1349,6 +1384,8 @@ L<App::sdif>, L<https://github.com/kaz-utashiro/sdif-tools>
 L<sdif(1)>, L<watchdiff(1)>
 
 L<Getopt::EX::Colormap>
+
+L<App::Greple::tee>
 
 L<https://taku910.github.io/mecab/>
 

@@ -27,6 +27,7 @@ use Business::GoCardless::Mandate;
     session_token
     success_redirect_url
     links
+    metadata
 
 =cut
 
@@ -37,6 +38,7 @@ has [ qw/
     session_token
     success_redirect_url
     links
+    metadata
 / ] => (
     is => 'rw',
 );
@@ -69,7 +71,7 @@ sub mandate {
 
     my $Mandate = Business::GoCardless::Mandate->new(
         client => $self->client,
-        id => $self->links->{mandate}
+        id => $self->links ? $self->links->{mandate} : undef,
     );
 
     return $Mandate->find_with_client( 'mandates' );

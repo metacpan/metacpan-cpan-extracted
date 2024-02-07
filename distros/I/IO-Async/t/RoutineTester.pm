@@ -1,6 +1,6 @@
 package t::RoutineTester;
 
-use strict;
+use v5.14;
 use warnings;
 
 sub test_routine

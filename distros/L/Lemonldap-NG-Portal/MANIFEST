@@ -705,6 +705,7 @@ t/32-OIDC-Password-Grant-with-Bruteforce-and-Choice.t
 t/32-OIDC-Password-Grant.t
 t/32-OIDC-redirect_uri-filter.t
 t/32-OIDC-Refresh-Token.t
+t/32-OIDC-Register-with-bad-redirect-uri.t
 t/32-OIDC-Register.t
 t/32-OIDC-Request-Uri.t
 t/32-OIDC-Response-Modes.t

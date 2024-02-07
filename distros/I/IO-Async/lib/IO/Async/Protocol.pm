@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Protocol;
+package IO::Async::Protocol 0.803;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.802';
 
 use base qw( IO::Async::Notifier );
 
@@ -104,7 +102,7 @@ sub configure
 
 =head2 transport
 
-   $transport = $protocol->transport
+   $transport = $protocol->transport;
 
 Returns the stored transport object
 
@@ -118,7 +116,7 @@ sub transport
 
 =head2 connect
 
-   $protocol->connect( %args )
+   $protocol->connect( %args );
 
 Sets up a connection to a peer, and configures the underlying C<transport> for
 the Protocol.
@@ -138,7 +136,7 @@ continuation will be used; otherwise C<on_socket> will be used.
 Optional. If supplied, will be invoked once the connection has been
 established.
 
-   $on_connected->( $protocol )
+   $on_connected->( $protocol );
 
 =item transport => IO::Async::Handle
 
@@ -214,7 +212,7 @@ at some point within the code.
 
 =head2 setup_transport
 
-   $protocol->setup_transport( $transport )
+   $protocol->setup_transport( $transport );
 
 Called by C<configure> when a new C<transport> object is given, this method
 should perform whatever setup is required to wire the new transport object
@@ -241,7 +239,7 @@ sub setup_transport
 
 =head2 teardown_transport
 
-   $protocol->teardown_transport( $transport )
+   $protocol->teardown_transport( $transport );
 
 The reverse of C<setup_transport>; called by C<configure> when a previously
 set-up transport object is about to be replaced.

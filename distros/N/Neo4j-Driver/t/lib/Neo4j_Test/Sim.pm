@@ -6,7 +6,6 @@ use Carp qw(croak);
 use JSON::PP qw(decode_json);
 use Digest::MD5;
 use File::Basename qw(dirname);
-use File::Slurp;
 use URI;
 use Neo4j_Test;
 
@@ -48,7 +47,10 @@ sub request {
 	if (! -f $file || ! -r $file) {
 		return $self->not_implemented($method, $url, $file);
 	}
-	$self->{json} = File::Slurp::read_file $file;
+	open my $fh, '<:raw', $file or croak "open $file failed: $!";
+	read $fh, $self->{json}, -s $fh or croak "read $file failed: $!";
+	close $fh;
+	
 	$self->{status} = 201;  # HTTP: Created
 	# always use 201 so that the Location header is picked up by the Transaction
 }
@@ -126,8 +128,9 @@ sub store {
 	my $hash = request_hash("$url", $request);
 	$response //= '';
 	$response =~ s/{"expires":"[A-Za-z0-9 :,+-]+"}/{"expires":"Tue, 01 Jan 2999 00:00:00 +0000"}/;
-	File::Slurp::write_file "$path/$hash.txt", "$url\n\n\n$request" if $write_txt;  # useful for debugging
-	File::Slurp::write_file "$path/$hash.json", $response;
+	eval 'require Path::Tiny; 1' or die $@;
+	Path::Tiny->new("$path/$hash.txt")->spew_raw("$url\n\n\n$request") if $write_txt;  # useful for debugging
+	Path::Tiny->new("$path/$hash.json")->spew_raw($response);
 }
 
 

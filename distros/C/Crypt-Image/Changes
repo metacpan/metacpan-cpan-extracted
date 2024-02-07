@@ -1,5 +1,8 @@
 Revision history for Crypt::Image
 
+0.15  2024-02-04T11:50:00+01:00
+      - Recovered from backpan.
+
 0.14  2019-05-10T05:05:00+01:00
       - Tidied up pod for Crypt::Image::Util.
 

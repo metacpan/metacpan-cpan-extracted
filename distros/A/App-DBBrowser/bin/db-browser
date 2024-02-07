@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.014;
-our $VERSION = '2.403';
+our $VERSION = '2.404';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.403
+Version 2.404
 
 =head1 SYNOPSIS
 
@@ -333,7 +333,7 @@ the SELECT substatement instead of the selected columns.
 
 =head3 Export
 
-Export the result of the chosen SQL statement to a C<CSV>-file. See options L<Export data>.
+Export the result of the chosen SQL statement to a C<CSV>-file. See options L</Export Data>.
 
 =head1 WRITE ACCESS
 
@@ -343,17 +343,13 @@ I<Create/Drop Table/View> can be accessed by selecting the prompt-line in the L<
 is activated.
 
 Selecting the prompt line of the I<Create/Drop Table/View> submenu allows you to set the parse settings described in
-L</Import data>.
+L</Import Data>.
 
 =head3 Create Table
 
-If the option I<Source type> is set to I<menu>, selecting I<Create Table> opens a submenu where you can choose the type
-of the data source. If I<Source type> is set to I<plain> or I<file>, the set data source type is automatically used
-without displaying a menu.
-
-For the meaning of the different data source types, see L<Data source>.
-
-If the data has been read from a file, you can apply different input filters (See L<Input filters>).
+If the option I<Source Type> is set to I<menu>, selecting I<Create Table> opens a submenu where you can choose the type
+of the data source. If I<Source Type> is set to I<plain> or I<file>, the set data source type is automatically used
+without displaying a menu. For more information, see L</Data Input>.
 
 You will be prompted:
 
@@ -369,7 +365,7 @@ if the first data row should be used as a header
 
 =item
 
-if an auto increment column should be added (if the option L<Auto increment> is enabled)
+if an auto increment column should be added (if the option L</Auto Increment> is enabled)
 
 =item
 
@@ -406,11 +402,9 @@ I<Delete>, I<Update>, or I<Insert> may not be available with C<Join> and C<Union
 
 =head3 Insert
 
-If the option I<Source type> is set to I<menu>, selecting I<Insert> opens a submenu where one can choose the type of
-the data source. If I<Source type> is set to I<plain> or I<file>, the set data source type is used without showing a
-menu.
-
-For the meaning of the different data source types, see L<Source type>.
+If the option I<Source Type> is set to I<menu>, selecting I<Insert> opens a submenu where one can choose the type of
+the data source. If I<Source Type> is set to I<plain> or I<file>, the set data source type is used without showing a
+menu. For more information, see L</Data Input>.
 
 If the first column of a table is an auto-increment column, the C<INSERT INTO> statement is built without this first
 column. This feature is available if supported by the database plugin.
@@ -425,15 +419,15 @@ Delete records. The affected records are shown before the user confirms the dele
 
 =head2 Data Input
 
-=head3 Data source
+=head3 Data Source
 
 =over
 
-=item Plain
+=item plain
 
 Insert the data cell by cell.
 
-=item From File
+=item file
 
 The data is read from a chosen file.
 
@@ -441,10 +435,10 @@ Supported file formats: text files and file formats supported by L<Spreadsheet::
 different parser modules for the different file formats - see L<Spreadsheet::Read/DESCRIPTION>. The parser modules are not
 installed automatically. It is up to the user to install the required parser modules.
 
-Selecting I<From File> opens the I<Source directory> submenu where one can choose the directory which should be
+Selecting I<file> opens the I<Source directory> submenu where one can choose the directory which should be
 searched for files.
 
-If the L<Directory history> is set to C<1>, the I<Source directory> submenu is skipped and the directory is chosen
+If the L</Directory History> is set to C<1>, the I<Source directory> submenu is skipped and the directory is chosen
 automatically.
 
 After a directory has been chosen, a submenu is opened where one can choose the source file.
@@ -453,13 +447,13 @@ If the previous submenu I<Source directory> is not shown due to the settings des
 the source directory in this submenu by selecting I<Change dir>.
 
 Selecting the prompt line of the I<Files> submenu (I<Choose a File:>) allows one to set the parse settings described in
-L</Import data>.
+L</Import Data>.
 
-After the data has been read, the user can apply different input filters (See L<Input filters>).
+After the data has been read, the user can apply different input filters (See L</Input Filters>).
 
 =back
 
-=head3 Input filters
+=head3 Input Filters
 
 =over
 
@@ -505,7 +499,6 @@ Append an empty column. Appends a header element to the header row and adjusts t
 header row. If the input has rows with different numbers of cells, use the I<Row Group> filter first to select the right
 row-group.
 
-
 =item Split Column
 
      Item | length/width/height             Item | length | width | height
@@ -518,17 +511,21 @@ row-group.
 
 =item Search & Replace
 
-     y  | factor                            y  | factor
-    ----|---------                          ---|-------
-     62 | 8,975.1                           62 | 8975.1
-    ----|---------                          ---|-------
-     63 | 9,745.8                           63 | 9745.8
-    ----|---------                          ---|-------
-     64 | 9,818.2                           64 | 9818.2
+I<s/Pattern/Replacement/Modifiers> (L<1|https://perldoc.perl.org/perlrequick#Search-and-replace>, L<2|https://perldoc.perl.org/perlop#s/PATTERN/REPLACEMENT/msixpodualngcer>)
+
+E.g. remove all commas: C<s/,//g>
+
+    id | num                       id | num
+    ---|-------------              ---|-----------
+     1 |    78,975.17               1 |   78975.17
+    ---|-------------              ---|-----------
+     2 | 1,040,745.87               2 | 1040745.87
+    ---|-------------              ---|-----------
+     3 | 3,129,818.21               3 | 3129818.21
+
+Supported L<modifiers|https://perldoc.perl.org/perlre#Modifiers>: C<imnsxage>.
 
 In the replacement, the variable C<$c> can be used as a counter. C<$c> is set to C<0> before each C<s///>.
-
-Supported modifiers: C<imnsxage>.
 
 By selecting the prompt line (I<Your choice:>), one can save I<search & replace> instructions for later use.
 
@@ -537,17 +534,17 @@ offered.
 
 =item Split Table
 
-     y  | factor  | y  | factor             y  | factor
-    ----|---------|----|---------           ---|--------
-     62 | 8,975.1 | 64 | 9,986.5            62 | 8,975.1
-    ----|---------|----|---------           ---|--------
-     63 | 9,745.8 | 65 | 9,782.7            63 | 9,745.8
-                                            ---|--------
+     y  | factor | y  | factor              y  | factor
+    ----|--------|----|--------             ---|-------
+     62 | 8975.1 | 64 | 9986.5              62 | 8975.1
+    ----|--------|----|--------             ---|-------
+     63 | 9745.8 | 65 | 9782.7              63 | 9745.8
+                                            ---|-------
                                             y  | factor
-                                            ---|--------
-                                            64 | 9,818.2
-                                            ---|--------
-                                            65 | 9,986.5
+                                            ---|-------
+                                            64 | 9818.2
+                                            ---|-------
+                                            65 | 9986.5
 
 =item Merge Rows
 
@@ -597,7 +594,7 @@ Transpose columns to rows.
 
 Convert fields containing an empty string to NULL (undefined).
 
-The default values for this filter can be set using the option L<Empty to Null>.
+The default values for this filter can be set using the option L</Empty to Null>.
 
 =item Reset
 
@@ -658,11 +655,11 @@ Reset database-specific parameters to the global I<DB Settings>.
 
 Add menu entries to menus:
 
-=head3 Tables menu
+=head3 Tables Menu
 
 =over
 
-=item Derived (table)
+=item Derived Table
 
 Enter a subquery and use it as a table.
 
@@ -694,7 +691,7 @@ Statements can be saved permanently in the submenu, which opens by selecting the
 
 Certain uses of CTEs are not supported.
 
-=item Join menu
+=item Join
 
 =item Union
 
@@ -702,21 +699,21 @@ Certain uses of CTEs are not supported.
 
 =back
 
-=head3 Join menu
+=head3 Join Menu
 
 =over
 
-=item Derived (table)
+=item Derived Table
 
 =item Cte
 
 =back
 
-=head3 Union menu
+=head3 Union Menu
 
 =over
 
-=item Derived (table)
+=item Derived Table
 
 =item Cte
 
@@ -746,8 +743,8 @@ available extensions.
 Extended Values
 
 If enabled, then - in addition to constants - subqueries, functions and more (see the following list) are available for
-the right side of operators. Places where extended values are available: C<SET> in update, C<WHEN>, C<THEN> and C<ELSE>
-in case expressions, and C<WHERE> and C<HAVING>.
+the right side of operators. Places where extended values are available: C<WHERE>, C<HAVING>, C<SET> in update, and
+C<WHEN>, C<THEN> and C<ELSE> in case expressions.
 
 =item
 
@@ -760,7 +757,9 @@ This option can also be enabled later in the functions menu by selecting the pro
 
 =back
 
-=head3 Column and Value extensions
+=head4 Column/Value/Argument Extensions
+
+Not all of these extensions are available everywhere.
 
 =over
 
@@ -781,7 +780,7 @@ A subquery can be saved permanently in the submenu, which opens by selecting the
 
 Entries matching C</^\s*(?:SELECT|WITH)\s/i> are automatically enclosed in parentheses.
 
-=item Scalar functions
+=item Scalar Functions
 
 Selecting C<func()> opens the menu, where the user can choose from a list of scalar functions.
 
@@ -795,11 +794,11 @@ To subtract from a date, use C<DATEADD> with a negative amount.
 
 Non-ANSI SQL scalar functions may not work with the C<ODBC> plugin.
 
-=item Window functions
+=item Window Functions
 
 Selecting C<win()> opens the menu, where the user can choose from a list of window functions.
 
-=item Case expression
+=item Case Expression
 
 Selecting C<case> opens the menu, where the user can build a C<CASE> expression.
 
@@ -819,13 +818,13 @@ Available after the C<SET> in an C<UPDATE> statement.
 
 C<WHERE>, C<WHEN> and C<HAVING>: in the C<%%> menu are also available parentheses.
 
-=item Column aliases
+=item Column Aliases
 
 Selecting C<as> allows one to set aliases for the selected columns.
 
 =back
 
-=head3 Write access
+=head3 Write Access
 
 Enable write access - use with care.
 
@@ -911,13 +910,29 @@ Possible settings:
 
 =over
 
-=item C<NO>: no alias
+=item
 
-=item C<AUTO>: a default alias is used
+NO
 
-=item C<ASK>: the user is asked for the alias; if nothing is entered, no alias is added
+no alias
 
-=item C<ASK/AUTO>: the user is asked for the alias; if nothing is entered, a default alias is added
+=item
+
+AUTO
+
+a default alias is used
+
+=item
+
+ASK
+
+the user is asked for the alias; if nothing is entered, no alias is added
+
+=item
+
+ASK/AUTO
+
+the user is asked for the alias; if nothing is entered, a default alias is added
 
 =back
 
@@ -927,21 +942,29 @@ Not all of these settings are available for any alias type.
 
 =over
 
-=item Qualified Table Names
+=item
 
-C<SQLite>: if the current database has attached databases, the use of qualified table names is enabled automatically.
+Qualified Table Names
 
-=item Quote Table Names
+=item
 
-=item Quote Column Names
+Quote Table Names
 
-=item Quote Aliases
+=item
+
+Quote Column Names
+
+=item
+
+Quote Aliases
 
 =back
 
-C<Informix>: set the C<DELIMIDENT> environment variable to allow quoted identifiers.
+C<SQLite>: if the current database has attached databases, the use of qualified table names is enabled automatically.
 
 C<SQLite>: database names in SQL statements (C<ATTACH DATABASE>) are always quoted.
+
+C<Informix>: set the C<DELIMIDENT> environment variable to allow quoted identifiers.
 
 =head3 View Prefix
 
@@ -949,7 +972,7 @@ Enter a string that should be automatically placed in front of all view names.
 
 =head3 Auto Increment
 
-Setting I<Auto increment> to a value other than an empty string enables the option to set an auto-increment column when
+Setting I<Auto Increment> to a value other than an empty string enables the option to set an auto-increment column when
 creating a table. The value set here is then used as the default name for the auto-increment column.
 
 =head3 Column Data Types
@@ -1069,7 +1092,7 @@ split
 Reads the entire input at once and splits it using the input record separator (IRS) to obtain the records (rows). It
 then splits the records using the input field separator (IFS) to acquire the fields (columns) of each record.
 
-To decode the files, the L</File encoding> is used.
+To decode the files, the L</File Encoding> is used.
 
 Advantages:
 
@@ -1142,7 +1165,7 @@ If C<Spreadsheet::Read> is chosen, the default settings from L<Spreadsheet::Read
 C<Spreadsheet::Read> will use the first line of the file to auto-detect the separation character if the file is a CSV
 file.
 
-C<Spreadsheet::Read::rows> automatically fills up uneven rows, so the filters L<Fill up Rows> and L<Row Groups> have no
+C<Spreadsheet::Read::rows> automatically fills up uneven rows, so the filters L</Fill up Rows> and L</Row Groups> have no
 significance when C<Spreadsheet::Read> is used.
 
 Advantages:
@@ -1157,12 +1180,12 @@ Automatically detects the separation character for CSV files.
 
 =back
 
-=head3 CSV Options in a
+=head3 CSV Options In a
 
 Set C<sep_char>, C<quote_char>, C<escape_char>, C<eol> and C<comment_str>. If left empty, default values are used. For
 details on these options, refer to L<Text::CSV_XS>.
 
-=head3 CSV Options in b
+=head3 CSV Options In b
 
 Set C<allow_loose_escapes>, C<allow_loose_quotes>, C<allow_whitespace>, C<blank_is_undef>, C<binary>, C<decode_utf8>,
 C<empty_is_undef> and C<skip_empty_rows>. For meanings of these options, refer to L<Text::CSV_XS>.
@@ -1229,7 +1252,7 @@ Set how many searched directories should be saved in the directory history.
 
 A value of C<0> disables the history.
 
-If I<Directory history> is set to C<1> and a directory has been saved, the directory is chosen automatically without
+If I<Directory History> is set to C<1> and a directory has been saved, the directory is chosen automatically without
 showing the history menu.
 
 =head3 File Filter

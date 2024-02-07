@@ -103,7 +103,6 @@ my @files = (
     't/taint.t',
     't/tick.html',
     't/tick.t',
-    't/untaint.t',
     't/upload.html',
     't/upload.t',
     't/uri.t',

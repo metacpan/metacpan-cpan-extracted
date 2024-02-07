@@ -1,13 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Identity;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use IO::Async::Loop;
 
@@ -40,16 +38,16 @@ my $writeready;
 my $proto = TestProtocol->new;
 
 ok( defined $proto, '$proto defined' );
-isa_ok( $proto, "IO::Async::Protocol", '$proto isa IO::Async::Protocol' );
+isa_ok( $proto, [ "IO::Async::Protocol" ], '$proto isa IO::Async::Protocol' );
 
 is_oneref( $proto, '$proto has refcount 1 initially' );
 
 $proto->configure( transport => $handle );
 
-identical( $proto->transport, $handle, '$proto->transport' );
+ref_is( $proto->transport, $handle, '$proto->transport' );
 
 is( scalar @setup_args, 1, '@setup_args after configure transport' );
-identical( $setup_args[0], $handle, '$setup_args[0] after configure transport');
+ref_is( $setup_args[0], $handle, '$setup_args[0] after configure transport');
 
 undef @setup_args;
 
@@ -79,13 +77,13 @@ my $newhandle = IO::Async::Handle->new(
 
 $proto->configure( transport => $newhandle );
 
-identical( $proto->transport, $newhandle, '$proto->transport after reconfigure' );
+ref_is( $proto->transport, $newhandle, '$proto->transport after reconfigure' );
 
 is( scalar @teardown_args, 1, '@teardown_args after reconfigure transport' );
-identical( $teardown_args[0], $handle, '$teardown_args[0] after reconfigure transport');
+ref_is( $teardown_args[0], $handle, '$teardown_args[0] after reconfigure transport');
 
 is( scalar @setup_args, 1, '@setup_args after reconfigure transport' );
-identical( $setup_args[0], $newhandle, '$setup_args[0] after reconfigure transport');
+ref_is( $setup_args[0], $newhandle, '$setup_args[0] after reconfigure transport');
 
 undef @teardown_args;
 undef @setup_args;

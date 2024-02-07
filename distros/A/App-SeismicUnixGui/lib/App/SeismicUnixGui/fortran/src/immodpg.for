@@ -10,7 +10,8 @@
        integer*4  nchanges
        integer*2  how_many
        parameter (nlmax=25,npmax=960000,npamax=4000000)
-       parameter (ntrmax=5000,nsmax=65536)
+!      parameter (ntrmax=5000,nsmax=65536)
+       parameter (ntrmax=5000,nsmax=4000)
        parameter (nxymax=2000)
        parameter (nchanges=100000)
        real*4    Amp(ntrmax,nsmax)
@@ -223,14 +224,15 @@
 !       last_change     array of times at which GUI is clicked
 !       change_step     array of time delays between GUI clicks
 
-!       Amp_min            minimum amplitude
-!       Amp_max            maximum amplitude
+!       Amp_min         minimum amplitude
+!       Amp_max         maximum amplitude
 !       multin
-!       rv 		reducing velocity km/s
+!       rv_kmps 		reducing velocity km/s
+!       rvinv_kmps      reduction velocity km/s
 !
 !       how often user calls immodpg via a click in the  gui
-       thickness increment_m = 10.
-       Vincrement_mps       = 10.
+        thickness increment_m = 10.
+        Vincrement_mps        = 10.
 !       tout             time output, 
 !       Aug 2013 by Juan
 !       va and va_prior, za and za_prior are velocity  and depth
@@ -241,19 +243,19 @@
 !       xa3
 !       xa4
 !       xout
-!      output distance of distance,time calculated pairs
+!       output distance of distance,time calculated pairs
 !       va
 !       za
-!      xmax            maximum plotting distance
+!       xmax    maximum plotting distance
 !               Should be greater than maximum offset in
 !               order to allow V-Z plot to show on black
 !               background ; in km
-!       tmax            maximum time of data
-!       tmin            minimum time of data
+!       tmax    maximum time of data
+!       tmin    minimum time of data
 !       xinc    increment for km/s in modeling or thickness in modelign
 
 ! DEFAULT PARAMETERS
-! OLD for big-scale marine work
+! OLD values for big-scale marine work
 ! 	pmin   = 0.0
 ! 	pmax   = 3.0
 ! 	pmax   = .6
@@ -267,15 +269,16 @@
 ! pmax = 40 s/km   V= 25 m/s
 ! pmin = 5   s/km  V= 200 m/s
 !
-	pmin   = 0
-        pmax   = 40
+       pmin   = 0
+       pmax   = 40
 ! 	dp     = 0.0005
 ! 	dp     = 0.001
 	dp     = 0.0001
         vmf    = 1./sqrt(3.)
-! 	rv     = 1.0
-	rv     = .0
-!       km
+! reduction velocity
+	rv_kmps     = 0.0
+	    
+!   In km
 	xmin   = 0.0
 	xmax   = 0.120
 ! 	xmax   = 20.
@@ -295,9 +298,9 @@
 ! 	datadt = 0.005
         datat1 = 0.0
         flag   = .false.
-	 idred  = 0
-        idrdtr = 0
-        idrxy  = 0
+       idred  = 0
+       idrdtr = 0
+       idrxy  = 0
 !
 	  do i=1,nlmax
 		multin(i) = 1
@@ -365,33 +368,33 @@
 ! Read digitized X-T pairs, 0- No',idrxy
        idrxy=int(result(1))
        
-!  Read data traces, 0- No',idrdtr
+! Read data traces, 0- No',idrdtr
       idrdtr=int(result(2))
       datat1    =result(4)
       datax1    =result(5)
       datadx    =result(6)
       
-!SOURCE AND RECEIVER DEPTH DEFINITION (KM)
+! SOURCE AND RECEIVER DEPTH DEFINITION (KM)
       SDEPTH  = result(7)
       RDEPTH  = result(8)
       
 ! DEFINE PLOTTING AREA ENTER
 ! linear reduction velocity in mps
-      rv = result(9)
+      rv_kmps = result(9)
       xmin = result(10)
       xmax = result(11)
       tmin = result(12)
       tmax = result(13)
       
 ! result16 is the starting layer from the settings file
-      starting_layer       = result(16)
-      current_layer_number = int(starting_layer)
-      VbotNtop_factor      = result(17)
-      Vincrement_kmps       = result(18)
-      thickness_increment_km =result(19)
+      starting_layer         = result(16)
+      current_layer_number   = int(starting_layer)
+      VbotNtop_factor        = result(17)
+      Vincrement_kmps        = result(18)
+      thickness_increment_km = result(19)
 
 !      print*, 'immodpg.for,read pre_digitized_XT_pairs (y/n)=',idrxy
-!       print*, 'immodpg.for,reading data_traces(y/n)=',idrdtr
+!      print*, 'immodpg.for,reading data_traces(y/n)=',idrdtr
 !      print*, 'immodpg.for,datat1 (S)=',datat1
 !      print*, 'immodpg.for,datax1 (KM)=',datax1
 !      print*, 'immodpg.for,datadx (X)=',datadx
@@ -419,7 +422,7 @@
 
 ! datadt is returned
 ! Read data parameters
-! retufns ntr, ns and idtusec
+! returns ntr, ns and idtusec
 ! define the different needed directories
        set_DIR = "IMMODPG"
        call Project_config(set_DIR,get_DIR)
@@ -428,23 +431,25 @@
        call read_parmmod_file(inbound_par,ntr,ns,idtusec)
 !        write(*,*) 'immodpg.for,inbound_par:idtusec',idtusec     
        datadt = float(idtusec) * 1e-6
-!      write(*,*) 'immodpg.for,inbound_par:datadt',datadt
+!      write(*,*)'immodpg.for,inbound_par:datadt,ntr,ns',datadt,ntr,ns
 
 !      error checking
 !       if (ntr.GT.ntrmax) print*,'error:traces>20000'
 !       if (ns.GT.nsmax) print*,'error: samples>= 65536'
 
        call rdata(Amp,ntrmax,nsmax,ntr,ns,Amp_min,Amp_max)
+!       iii = size(Amp,2)
+!       print*,'array size in dim=2',iii
              
-       print*,'immodpg.for,rdata:ns,ntr',ns,'--',ntr
+!      print*,'immodpg.for,rdata:ns,ntr',ns,'--',ntr
        
 ! Clips for gray scale (pggray)
          current_clip   = Amp_max/100
 
 ! User override of clips for gray scale (pggray)
-         current_clip   = result(3)
-         clip_min    = -current_clip
-         clip_max    =  current_clip
+          current_clip   = result(3)
+          clip_min    = -current_clip
+          clip_max    =  current_clip
 !         print*, '330 immodpg.for,clip_min=',clip_min
 !         print*, '331 immodpg.for,current_clip=',current_clip
 
@@ -454,55 +459,62 @@
 
 ! **** PARAMETERS FOR THE X-T PLOT  ****
 !      DEFINE  PLOTTING AREA
-! reduction velocity
-	rvinv=0.
+       rvinv_kmps = 0.0
+       if (rv_kmps.eq.0.) go to 40
+	    rvinv_kmps = 1./rv_kmps  ! used to be 1./rv
+!	    print*,'rvinv_kmps',rvinv_kmps
+!	    print*,'rv_kmps',rv_kmps	    
+	    idred=1 ! 1-yes 0-No JML 3-30-2020
+40     continue
 
-	if (rv.eq.0.) go to 40
-	  rvinv=1./rv/m2km  ! used to be 1./rv
-	  idred=1 ! 1-yes 0-No JML 3-30-2020
-40	continue
-
-!       if(idrdtr.eq.1) then
+       if(idrdtr.eq.1) then
+       idred=1  ! data will be linearly reduced
+!       print*, 'immodpg.for,data idred=',idred
 !	 call read_par_i4('1-Traces are red. by this vel., 0-No',idred)
-!       endif
+       endif
 
 ! Transformation Matrix between data array and world coordinates
-        rvinvd = 0.0
+        rvinvd_kmps = 0.0
 ! if no velocity reduction (idred=0)
-        if(idred.eq.0) rvinvd = rvinv
-        print*, '473 immodpg.for,rvinvd=',rvinvd
+        if(idred.eq.0) rvinvd_kmps = rvinv_kmps
+        if(idred.eq.1) rvinvd_kmps = rvinv_kmps
+!       print*, '476 immodpg.for,rvinvd=',rvinvd
         
 ! *******************
-	tr(1)  =  datax1 - datadx
-	tr(2)  =  datadx
-	tr(3)  =  0.0
-	tr(4)  =  datat1 - datadt - tr(1)*rvinvd
-	tr(5)  = -datadx*rvinvd
-	tr(6)  =  datadt
+	   tr(1)  =  datax1 - datadx
+	   tr(2)  =  datadx
+	   tr(3)  =  0.0
+	   tr(4)  =  datat1 - datadt - tr(1)*rvinvd_kmps
+!	   tr(4)  =  0.0
+!	   tr(5)  =  0.0
+	   tr(5)  = -datadx*rvinvd_kmps
+	   tr(6)  =  datadt
 
 ! READ VELOCITY DEPTH MODEL
 !       call execute_command_line ("fg",exitstat=i, cmdmsg=message)
 !       print *, "Exit status of fg was ", i
 !       print *, "Message from fg was ", message
 !       show model to user for the first time
-	call READMMOD(VT,VB,DZ,VST,VSB,RHOT,RHOB,nl)
+	    call READMMOD(VT,VB,DZ,VST,VSB,RHOT,RHOB,nl)
 !       print*, 'L 470  immodpg.for,readmod'
 
 ! error check the working layer number
-	if(current_layer_number.lt.1)   current_layer_number = 1
-	if(current_layer_number.gt.nl)  current_layer_number = nl
+	    if(current_layer_number.lt.1)   current_layer_number = 1
+	    if(current_layer_number.gt.nl)  current_layer_number = nl
 
 ! Open X-T Window ****************
 !       print *,' 1. start '
 !       call pgbegin(0,'?',1,1)  !ask what device to use
 
-	call pgbegin(0,' ',1,1)  ! use default device
+	   call pgbegin(0,' ',1,1)  ! use default device
 
-!      width_in,aspect 11 " wide and 8/11 high
-	call pgpaper(10.75,0.75)
-! (XLEFT, XRIGHT, YBOT, YTOP)
-!	call pgvport(-5.,1.,0.,1.)
-!       call pgsvp(0.0,0.5,0.5,1.0)
+!  Overall terminal size 
+!  in inches width_in,aspect 11 " wide and 8/11 high
+	   call pgpaper(10.75,0.75)
+!	   call pgpaper(16.0,0.55) 
+!  XLEFT_bot, XRIGHT_TOP, YBOT, YTOP)
+!	   call pgvport(-5.,1.,0.,1.)
+!      call pgsvp(0.0,0.5,0.1,1.0)
        call pgask(flag)
        
        a2_prior = -1.0
@@ -516,89 +528,93 @@
               if(vb(i).gt.a2) a2=vb(i)
               a1_prior = a1_prior + dz(i)
               za_prior(k+1) = a1_prior
-8     continue
+8      continue
 ! End of setup
-! user sees an EMPTY BLACkKSCREEN
+! user sees an EMPTY BLACK SCREEN
 !       print *,' 1. start of principal input loop'
-10	continue
+10	   continue
 
 ************************************
 ! START OF ALL INTERACTIONS WITH THE USER
 !       print *,' L511 start of interaction with the user'
 
 ! Check for Vtop-Vbottom too small.-km/s
-!	A3 = 0.001
-	A3 = 0.00001
+	    A3 = 0.00001
 !       print*, '1D. immodpg.for,made it, current_layer_number=',
 !     +  current_layer_number
 
        do i = 1, current_layer_number
 
-	if(ABS(VT(i)-VB(i)).le.A3) vb(i) = vt(i)
+	   if(ABS(VT(i)-VB(i)).le.A3) vb(i) = vt(i)
 
        end do
 
-!      Reflections at the bottom of layers decided automatically
-!      based on velocity discontinuities
-	do i=1,nl-1
+! Reflections at the bottom of layers decided automatically
+! based on velocity discontinuities
+	   do i=1,nl-1
          IR(i)=0 
     	 if(ABS(VT(i+1)-VB(i)).GT.A3) IR(i)=1     
         end do 
         
- !** No reflection at the bottom of model
-	IR(nl) = 0  
+! No reflection at the bottom of model
+	   IR(nl) = 0  
 	
-	print*,'reflection at layer i,=',i,IR(i)
+!	print*,'reflection at layer i,=',i,IR(i)
 
 !      COMPUTATIONS ***
-	DZ1TEM=DZ(1)
+	   DZ1TEM=DZ(1)
 
 !      Correct only if 1st layer is a constant vel. layer.
-	DZ(1)=DZ(1)-(SDEPTH+RDEPTH)/2.
+	   DZ(1)=DZ(1)-(SDEPTH+RDEPTH)/2.
 
-	call txpr(nl,VT,VB,DZ,PMIN,PMAX,DP,IR,multin,ntp,ILA,P,X,T)
-	DZ(1)=DZ1TEM
+	   call txpr(nl,VT,VB,DZ,PMIN,PMAX,DP,IR,multin,ntp,ILA,P,X,T)
+	   DZ(1)=DZ1TEM
 
-55	continue
+55	   continue
 
-!      PLOTTING and REPLOTTING when correct option turns
+! PLOTTING and REPLOTTING when correct option turns
        call pgpage ! clear screen
-!       left_bottom_X, right_top_X,left_bottom_Y,right_top_Y
-!      0.7= Xfraction of black screen occupied by seismic data
+! for pgvport
+! left_bottom_X, right_top_X,left_bottom_Y,right_top_Y
+! 0.7= Xfraction of black screen occupied by seismic data
        call pgvport(0.15,0.75,0.15,0.9)
-!      real character size in proportion to 1
-       call pgsch(1.25)
+! increase vertical exaggeration by decreasing the 
+! second number -- original at 0.75-- to a smaller value
+       call pgvport(0.15,0.6,0.15,0.9)
+!      call pgvport(0.1,0.9,0.1,0.9)
+!      character size, in proportion to 1.0
+       call pgsch(1.)
        call pgwindow(xmin,xmax,tmax,tmin)
        call pgbox('BCTN',0.0,0,'BCTN',0.0,0)
        call pglabel('X(km)','Tred (sec)',
-     + 'Primary P-wave T-X Curves, 1-D Model')
+     + 'Body wave, T-X Curves, 1-D Model')
 !
-!      plot seismic image in a window
+! plot seismic image in a window
        if(idrdtr.eq.1) then
 !        print *, 'L561, clip_min,clip_max=',clip_min,clip_max
 !        print *, 'L562, ns,ntr=',ns,ntr
 !        print *, 'L563, ntrmax,nsmax=',ntrmax,nsmax  
 !        clip_min = -1.00000
 !        clip_max = 1.00000
-	 call pggray(Amp,ntrmax,nsmax,1,ntr,1,ns,clip_max,clip_min,tr)
-!         print *, 'L543, plot seismic image in window' 
+	   call pggray(Amp,ntrmax,nsmax,1,ntr,1,ns,clip_max,clip_min,tr)
+!         print *, 'L543, plot seismic image in window;ns=',ns 
 
        endif
 !
-!      plot modelled arrivals by layer
+! plot modelled arrivals by layer
        do 140 j=1,current_layer_number
          nplj = 0
          array_ntp(j) = ntp
 
-!        plot first breaks in a layer
-	  do 120 i=1,ntp
+! plot first breaks in a layer
+	   do 120 i=1,ntp
 
-! ** SELECT LAYER J **
-!            nplj - number of points in layer j
+! SELECT LAYER J **
+! nplj - number of points in layer j
 	    if(ABS(ILA(i)).NE.J) go to 120
 	       nplj = nplj+1
 	       xa1(nplj)  =   X(i)
-	       xa2(nplj)  =   T(i) - X(i) * rvinv !** RED. TIME
+	       xa2(nplj)  =   T(i) - X(i) * rvinv_kmps !** RED. TIME
 	       xa3(nplj)  =   P(i)
               xa4(nplj)  =   T(i) - X(i) *  P(i) !** TAU
 !             get ready to output all the data
@@ -608,37 +624,37 @@
 !        write(*,*)'*** test output *****************************'
 !        write(*,*)'nplj=',nplj,' layer is ',j
 !        write(*,*) xout(nplj,j),tout(nplj,j)
-!	  write(*,*) 'L 374 total # of computed points ',ntp
+!	   write(*,*) 'L 374 total # of computed points ',ntp
 
-120	continue ! points in each layer
+120	   continue ! points in each layer
 
-	if(nplj.eq.0) go to 140 ! new layer
+	   if(nplj.eq.0) go to 140 ! new layer
 !
-!      PLOT LAYER J **
-	icolor = icolor + 1
+! PLOT LAYER J **
+	   icolor = icolor + 1
 
-!      pick a different color for arrivals that travel
-!      through a new deeper layer
+! pick a different color for arrivals that travel
+! through a new deeper layer
        if(icolor.gt.15) icolor = 1
 
-	call pgsci(icolor)
+	   call pgsci(icolor)
 !      print*, 'immodpg.for,read pre_digitized_XT_pairs (y/n)=',idrxy
 !      print*, 'immodpg.for,reading data_traces(y/n)=',idrdtr
 !      print*, 'immodpg.for,datat1 (S)=',datat1
 !      print*, 'immodpg.for,datax1 (KM)=',datax1
-!      print*, 'immodpg.for,datadx (X)=',datadx
+!      print*, 'immodpg.for,datadx (KM)=',datadx
 !      print*, 'immodpg.for,SDEPTH (KM)=',SDEPTH
-!       print*, 'L614 immodpg.for,RDEPTH (KM)=',RDEPTH
+!      print*, 'L614 immodpg.for,RDEPTH (KM)=',RDEPTH
 !
 !      print*, 'immodpg.for,PLOTTING LAYOUT'
-!      print*, 'immodpg.for,rv (KM/S)=',rv
+!      print*, 'immodpg.for,rv_kmps (km/s)=',rv_kmps
 !      print*, 'immodpg.for,MINIMUN DISTANCE (KM)xmin=',xmin
-!      print*, 'L619 immodpg.for,MAXIMUN DISTANCE (KM)=',xmax
+!      print*, 'L619 immodpg.for,MAXIMUM DISTANCE (KM)=',xmax
 !      print*, 'immodpg.for,tmin (s)=',tmin
 !      print*, 'immodpg.for,tmax (s)=',tmax
 !      print *, "immodpg.for,starting layer:", current_layer_number
 
-!	call pgsci(3)
+!	   call pgsci(3)
 !
 ! X - T Plot of first arrival points for a fixed layer
 !
@@ -649,29 +665,31 @@
 !
 !       call gks$polyline(nplj, xa3, xa4)
 !
-140   continue ! go to a new layer
+140     continue ! go to a new layer
 !
 ! Draw digitized X-T data if it exists
 !
-      if(idrxy.eq.1) then
+       if(idrxy.eq.1) then
 
          do ixy = 1,ndxy
-             xa2(ixy) = tdig(ixy) - xdig(ixy) * rvinv
+             xa2(ixy) = tdig(ixy) - xdig(ixy) * rvinv_kmps
          enddo
 
-	 call pgsci(3)
+	   call pgsci(3)
          call pgpoint(ndxy,xdig,xa2,9)  ! TODO perhaps
          print *, 'L647 Draw digitized X-T data if it exists'
 
-      endif
+       endif
 !
-!      Draw velocity vs. depth plot at far right
-!      STEP 1: Erase previous model
-!       0 = black (erase)
+! Draw velocity vs. depth plot at far right
+! for pgvport:
+!  left_bottom_X, right_top_X,left_bottom_Y,right_top_Y
+! STEP 1: Erase previous model
+! 0 = black (erase)
        VPlotMax_prior=a2_prior*VPlotScale
        ZPlotMax_prior=a1_prior*1.0
        call pgsci(0)
-       call pgvport(0.88,0.98,0.2,0.8)
+       call pgvport(0.8,0.98,0.15,0.9)
        call pgwindow(0.0,VPlotMax_prior,ZPlotMax_prior,0.0)
        call pgbox('BCTN',0.0,0,'BCNST',0.0,0)
        call pglabel('V(km/s)','Z(km)','')
@@ -679,13 +697,13 @@
 !       print *, 'L 555 current layer number is ', current_layer_number
 !       print *, 'L 556 end of draw velocity model'
 
-!      STEP 2: Calculate the current model
+! STEP 2: Calculate the current model
 ! ****** descomentar para trabajo con OBS  ***
 !       dz(1) = 2.0 * dz(1)
 ! ***********************
-      a1=0.
-      a2=-1.0
-      do 145 i = 1,current_layer_number
+       a1=0.
+       a2=-1.0
+       do 145 i = 1,current_layer_number
               k = 2*i - 1
               va(k) = vt(i)
               if(vt(i).gt.a2) a2=vt(i)
@@ -694,43 +712,43 @@
               if(vb(i).gt.a2) a2=vb(i)
               a1 = a1 + dz(i)
               za(k+1) = a1
-145   continue
+145    continue
 
-!      STEP 3: Save the current model as the "prior"
+! STEP 3: Save the current model as the "prior"
        a1_prior = a1
        a2_prior = a2
        va_prior = va
        za_prior = za
 
-!            STEP 4: Draw the current model
+! STEP 4: Draw the current model
 ! ****** descomentar para trabajo con OBS  ***
 !       dz(1) = dz(1)/2.0
 ! ***********************
-!      set color index: 3 = green
-!       white on black background =1
+! set color index: 3 = green
+! white on black background =1
        call pgsci(3)
        VPlotMax=a2*VPlotScale
        ZPlotMax=a1*1.0
- !      print*,'L711,a1,a2',a1,a2
-       call pgvport(0.88,0.98,0.2,0.8)
-	call pgwindow(0.0,VPlotMax,ZPlotMax,0.0)
-	call pgbox('BCTN',0.0,0,'BCNST',0.0,0)
-	call pglabel('V(km/s)','Z(km)','')
-!	call pgslw(5)
-	call pgline(2*current_layer_number,va,za)
-!       print *, 'L 594 current layer number is ', current_layer_number
-!	call pgslw(1)
-!       print *, 'L 596 end of draw velocity model'
+ !     print*,'L711,a1,a2',a1,a2
+       call pgvport(0.8,0.98,0.15,0.9)
+	   call pgwindow(0.0,VPlotMax,ZPlotMax,0.0)
+	   call pgbox('BCTN',0.0,0,'BCNST',0.0,0)
+	   call pglabel('V(km/s)','Z(km)','')
+!	   call pgslw(5)
+	   call pgline(2*current_layer_number,va,za)
+!      print *, 'L 594 current layer number is ', current_layer_number
+!	   call pgslw(1)
+!      print *, 'L 596 end of draw velocity model'
 
 150    continue
 
-!     define the different needed directories
-      set_DIR = "IMMODPG_INVISIBLE"
-      call Project_config(set_DIR,get_DIR)
+!      define the different needed directories
+       set_DIR = "IMMODPG_INVISIBLE"
+       call Project_config(set_DIR,get_DIR)
 !      print*, '1. immodpg.for, get_DIR:',trim(get_DIR),'--'
 !      print*, '1. immodpg.for, change_file:',change_file,'--'
-      inbound_change = trim(get_DIR)//"/"//change_file
-      inbound_clip   = trim(get_DIR)//"/"//clip_file
+       inbound_change = trim(get_DIR)//"/"//change_file
+       inbound_clip   = trim(get_DIR)//"/"//clip_file
 !      print*, '1.immodpg.for,inbound_change:',inbound_change,'--'
 
        ans = .TRUE.
@@ -738,7 +756,7 @@
 
        do while (ans)
 
-!       slow fortran for Perl i/o to .001 s
+! Slow down fortran for Perl i/o to .001 s
 !        call cpu_time(start)
 !        print '("Time = ",f6.3," seconds.")',start
 ! 151    call cpu_time(finish)
@@ -757,14 +775,14 @@
 
            icount=icount+1
 !          print *, 'L 722 do loop: immodpg,icount=',icount
-!          Detect for change:  "yes"
+! Detect for change:  "yes"
 !          print*, '2. immodpg.for,inbound_change:',inbound_change,'--'
 
            call read_yes_no_file(is_change,inbound_change)
            
 !          print*, '737.immodpg.for,is_change:',is_change,'--'
            if (is_change ) then
-!	      keep track of change frequency
+! keep track of change frequency
               i_past_change   = i_change    
               i_change        = i_change+1
               
@@ -776,7 +794,7 @@
 !              print*,'change step=',change_step(i_change)
               time_delay = change_step(i_change) * governor
 
-!             Restore change to "no"
+! Restore change to "no"
               call write_yes_no_file(no,inbound_change)
 !             read option number
               call read_option_file(option,inbound_option)
@@ -786,16 +804,16 @@
 !     +        change_layer_number_opt
 
               if(option.eq.change_layer_number_opt) then
-!                CASE change layer option YES
+! CASE change layer option YES
                  call read_layer_file(new_layer_number,inbound_layer)
                  prior_layer_number   = current_layer_number
                  current_layer_number = new_layer_number
 !                 print *,'L 517 current layer #:',current_layer_number
 
-!                is layer number new or old?
-!                if old, do nothing
+! is layer number new or old?
+! if old, do nothing
                  if (current_layer_number .ne. prior_layer_number)then
-!                  CASE 1: new layer detected
+!CASE 1: new layer detected
                    if(new_layer_number.lt.1) then
                       current_layer_number = 1
 !                      print *, 'L516 new current layer_number'
@@ -808,13 +826,11 @@
 
 ! write modified model to terminal before
 !                   changing layer
-!
                    write(*,*) ' '
                    write(*,*) 'modified model prior to layer change:'
                    call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
 !
 ! write modified model to file immodpg.out
-!
 !                   write(*,*) ' '
 !                    write(*,*) 'Binary file: immodpg.out'
 
@@ -846,7 +862,7 @@
 
               endif ! end check for change in layer
 
-!              write out an elicited working text model
+!  write out an elicited working text model
               if(option.eq.write_simple_model_text_opt) then
 
                call write_model_file_text(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB,
@@ -854,7 +870,7 @@
 
               endif
 
-!              write out an elicited  working binary model
+!  write out an elicited  working binary model
               if(option.eq.write_model_bin_opt) then
 
         OPEN(UNIT=IOUT,FILE=outbound_model_bin,
@@ -899,11 +915,10 @@
 
              endif
 
-
-!            set thickness increment
+! set thickness increment
              if(option.eq.change_thickness_increment_opt) then
              
-!              read new thickness increment value
+! read new thickness increment value
 !              call read_thickness_increment
 !              print*,'L 644 new thickness_increment_m is',
 !     +         new_thickness_increment_m
@@ -916,7 +931,7 @@
               
              endif
 
-!            set velocity increment
+! set velocity increment
              if(option.eq.changeVincrement_opt) then
 !             read new velocity increment value
                call readVincrement_file(newVincrement_mps,
@@ -932,7 +947,7 @@
              endif
 
              if(option.eq.changeVbotNtop_factor_opt) then
-!             read new velocity factor value
+! read new velocity factor value
               call readVbotNtop_factor_file(
      +               newVbotNtop_factor,inboundVbotNtop_factor)
 !               print*,'L 655 new VbotNtop_factor:',newVbotNtop_factor
@@ -946,10 +961,10 @@
 
 !
 ! *** Options that require
-!     recomputation and replot of  X-T curves
+! recomputation and replot of  X-T curves
 
              if(option.eq.changeVbot_upper_layer_opt) then
-!             read new bottom velocity  value
+! read new bottom velocity  value
                call readVbot_upper_file(newVbot_upper,inboundVbot_upper)
 
                priorVbot_upper         = currentVbot_upper
@@ -960,15 +975,15 @@
 !               print*,'L786 new Vbot_upper', VB(current_layer_number-1)
 !               go to 150 ! start of this do loop
 
-!              write modified model to terminal after
-!              changing bottom velocity of upper layer
+! write modified model to terminal after
+! changing bottom velocity of upper layer
                call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
                option = option_default
 
              endif
 
              if(option.eq.changeVtop_lower_layer_opt) then
-!             read new bottom velocity  value
+! read new bottom velocity  value
 !               print*,'L794,changing Vtop_lower_layer'
                call readVtop_lower_file(newVtop_lower,inboundVtop_lower)
 !               print*,'L 797 new Vtop_lower is',newVtop_lower
@@ -980,8 +995,8 @@
 !                print*,'L803 new Vtop_lower',VT(current_layer_number+1)
 !               go to 150 ! start of this do loop
 
-!              write modified model to terminal after
-!              changing top velocity of lower layer
+! write modified model to terminal after
+! changing top velocity of lower layer
                call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
                option = option_default
 
@@ -989,7 +1004,7 @@
 
              if(option.eq.changeVbot_opt) then
              
-             ! read new bottom velocity  value
+! read new bottom velocity  value
                call readVbot_file(newVbot,inboundVbot)
                print*,'L 964 new Vbot is',newVbot
                priorVbot         = currentVbot
@@ -999,8 +1014,8 @@
                VB(current_layer_number) = Vbot_kmps
 !               go to 150 ! start of this do loop
 
-!              write modified model to terminal after
-!              changing bottom velocity
+! write modified model to terminal after
+! changing bottom velocity
                call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
                option = option_default
 
@@ -1009,7 +1024,7 @@
              if(option.eq.changeVtop_opt) then
              
 !             print*,'L 979 changeVtop_opt=',changeVtop_opt
-!             read new bottom velocity  value
+! read new bottom velocity  value
                call readVtop_file(newVtop,inboundVtop)
                print*,'L 982  new Vtop is',newVtop
                priorVtop         = currentVtop
@@ -1019,8 +1034,8 @@
                VT(current_layer_number) = Vtop_kmps
 !               go to 150 ! start of this do loop
 
-!              write modified model to terminal after
-!              changing top velocity in layer
+! write modified model to terminal after
+! changing top velocity in layer
                call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
                option = option_default
 
@@ -1032,8 +1047,8 @@
 !                print*,'immodpg.for,Vbot_minus_option=',Vbot_minus_opt
 !                print*,'immodpg.for,Vbot_minus=',VB(current_layer_number)
 
-!              write modified model to terminal after
-!              changing bottom velocity
+! write modified model to terminal after
+! changing bottom velocity
                call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
                option = option_default
                
@@ -1045,8 +1060,8 @@
 !                print*,'immodpg.for,Vbot_plus_option=',Vbot_plus_opt
 !                print*,'immodpg.for,Vbot_plus=',VB(current_layer_number)
 
-!              write modified model to terminal after
-!              changing bottom velocity
+! write modified model to terminal after
+! hanging bottom velocity
                call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
                option = option_default
                
@@ -1058,8 +1073,8 @@
 !                 print*,'immodpg.for,option=',Vtop_minus_opt
 !                print*,'immodpg.for,Vtop_minus=',VT(current_layer_number)
 
-!              write modified model to terminal after
-!              changing top velocity
+! write modified model to terminal after
+! changing top velocity
                call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
                option = option_default
                
@@ -1071,8 +1086,8 @@
 !                 print*,'immodpg.for,option=',Vtop_plus_opt
 !                 print*,'immodpg.for,Vtop_plus=',VT(current_layer_number)
 
-!              write modified model to terminal after
-!              changing bottom velocity -- had no option_default before
+! write modified model to terminal after
+! changing bottom velocity -- had no option_default before
                call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
                option = option_default
                
@@ -1090,8 +1105,8 @@
 !               print*,'immodpg.for,option=VT',VT(current_layer_number)
 !               print*,'immodpg.for,option=VB',VB(current_layer_number)
                
-!              write modified model to terminal after
-!              changing both bottom and top velocities in a layer
+!  write modified model to terminal after
+!  changing both bottom and top velocities in a layer
 !              had no option_default before
                call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
                option = option_default
@@ -1107,8 +1122,8 @@
 !               print*,'immodpg.for,option=VT',VT(current_layer_number)
 !               print*,'immodpg.for,option=VB',VB(current_layer_number)
 
-!              write modified model to terminal after
-!              changing both bottom and top velocities in a layer
+!  write modified model to terminal after
+!  changing both bottom and top velocities in a layer
 !              had no option_default before
                call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
                option = option_default
@@ -1131,8 +1146,8 @@
 !              print*,'immodpg.for,VB_upper=',VB(upper_layer_number)
 !              print*,'immodpg.for,Vincrement_kmps=',Vincrement_kmps
 
-!              write modified model to terminal after
-!              changing both top velocity in the current layer
+!  write modified model to terminal after
+!  changing both top velocity in the current layer
 !              and bottom velocity in the layer above
 !              had no option_default before
                call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
@@ -1153,8 +1168,8 @@
 !              print*,'immodpg.for,VB_upper=',VB(current_layer_number-1)
 !              print*,'immodpg.for,Vincrement_kmps=',Vincrement_kmps
 
-!              write modified model to terminal after
-!              changing both top velocity in the current layer
+!  write modified model to terminal after
+!  changing both top velocity in the current layer
 !              and bottom velocity in the layer above
 !              had no option_default before
                call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
@@ -1172,8 +1187,8 @@
      +        VB(current_layer_number+1) - Vincrement_kmps
 !             print*,'immodpg.for,option=',VbotNVtop_lower_layer_minus_opt
 
-!              write modified model to terminal after
-!              changing both top velocity in the current layer
+!  write modified model to terminal after
+!  changing both top velocity in the current layer
 !              and bottom velocity in the layer above
 !              had no option_default before
                call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
@@ -1191,8 +1206,8 @@
      +        VB(current_layer_number+1) + Vincrement_kmps
 !              print*,'immodpg.for,option=',VbotNVtop_lower_layer_plus_opt
 
-!              write modified model to terminal after
-!              changing both bottom velocity in the current layer
+!  write modified model to terminal after
+!  changing both bottom velocity in the current layer
 !              and top velocity in the layer below
 !              had no option_default before
                call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
@@ -1207,7 +1222,7 @@
      +             VbotNtop_factor * VB(current_layer_number)
 !                print*,'immodpg.for,option=',VbotNtop_multiply_opt
 
-!              write modified model to terminal after
+!  write modified model to terminal after
 !              scaling both bottom and top velocities 
 !              in the current layer
 !              by multiplication
@@ -1228,8 +1243,8 @@
                 DZ(current_layer_number) = current_thickness_km
 !                go to 150 ! start of this do loop
                 
-!              write modified model to terminal after
-!              changing the current layer thickness
+!  write modified model to terminal after
+!  changing the current layer thickness
 !              had no option_default before
                call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
                option = option_default               
@@ -1246,8 +1261,8 @@
 !               print*,'immodpg.for L1208,new_thickness='
 !               print*,DZ(current_layer_number)
      
-!              write modified model to terminal after
-!              changing the current layer thickness
+!  write modified model to terminal after
+!  changing the current layer thickness
 !              had no option_default before
                call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
                option = option_default
@@ -1262,8 +1277,8 @@
                DZ(current_layer_number) =
      +         DZ(current_layer_number) - thickness_increment_km
        
-!              write modified model to terminal after
-!              changing the current layer thickness
+!  write modified model to terminal after
+!  changing the current layer thickness
 !              had no option_default before
                call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
                option = option_default      
@@ -1281,7 +1296,7 @@
               go to 255
            endif
            
-      go to 10 ! start of all interactions with user
+       go to 10 ! start of all interactions with user
 !          stay in do loop
            else
 !              print *, 'L 1249 read_yes_no_file.f,is_change=',is_change
@@ -1290,7 +1305,7 @@
        end do ! end of loop that detects changes in GUI
 
 !
-!	if(option.eq.10) then
+!	   if(option.eq.10) then
 !		call read_par_r4('New dp (s/km) ??',dp)
 !       endif
 !
@@ -1311,14 +1326,14 @@
 !      end the loop
 
 
-      icolor = 0
-      call pgpage   ! clear screen
-      call pgsci(1) ! set color index
+       icolor = 0
+       call pgpage   ! clear screen
+       call pgsci(1) ! set color index
 !      print *, 'L 576 clear screen'
 
-      go to 10 ! START of ALL interactions with USER
+       go to 10 ! START of ALL interactions with USER
 
-255   continue  ! leave if option_exit
+255    continue  ! leave if option_exit
 !          print*,'L1047 Vtop_lower',VT(current_layer_number+1)
 !          print*,'L1048 VB_upper=',VB(current_layer_number-1)
 !       write modified file to a text file
@@ -1327,9 +1342,9 @@
 !
 ! write modified model to terminal
 !
-	write(*,*) ' '
-	write(*,*) 'MODIFIED MODEL:'
-	call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
+       write(*,*) ' '
+	   write(*,*) 'MODIFIED MODEL:'
+	   call WRIMOD2(nl,VT,VB,DZ,VST,VSB,RHOT,RHOB)
 !
 ! write modified model to file immodpg.out
 !
@@ -1392,5 +1407,4 @@
         end function c_usleep
        end interface
       end module posix
-        
-
+       

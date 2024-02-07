@@ -8,8 +8,9 @@ use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 use Tags::HTML::Element::Option;
+use Tags::HTML::Element::Utils qw(tags_boolean tags_data tags_label tags_value);
 
-our $VERSION = 0.02;
+our $VERSION = 0.06;
 
 sub _cleanup {
 	my $self = shift;
@@ -49,26 +50,16 @@ sub _process {
 	}
 
 	$self->{'tags'}->put(
+		tags_label($self, $self->{'_select'}),
 		['b', 'select'],
-		defined $self->{'_select'}->css_class ? (
-			['a', 'class', $self->{'_select'}->css_class],
-		) : (),
-		defined $self->{'_select'}->id ? (
-			['a', 'name', $self->{'_select'}->id],
-			['a', 'id', $self->{'_select'}->id],
-		) : (),
-		defined $self->{'_select'}->size ? (
-			['a', 'size', $self->{'_select'}->size],
-		) : (),
-		$self->{'_select'}->disabled ? (
-			['a', 'disabled', 'disabled'],
-		) : (),
+		tags_value($self, $self->{'_select'}, 'css_class', 'class'),
+		tags_value($self, $self->{'_select'}, 'id'),
+		tags_value($self, $self->{'_select'}, 'name'),
+		tags_value($self, $self->{'_select'}, 'size'),
+		tags_boolean($self, $self->{'_select'}, 'disabled'),
 		# TODO Other. https://www.w3schools.com/tags/tag_select.asp
 	);
-	foreach my $option (@{$self->{'_select'}->options}) {
-		$self->{'_option'}->init($option);
-		$self->{'_option'}->process;
-	}
+	tags_data($self, $self->{'_select'});
 	$self->{'tags'}->put(
 		['e', 'select'],
 	);
@@ -99,9 +90,6 @@ sub _process_css {
 		['d', 'box-sizing', 'border-box'],
 		['e'],
 	);
-	if (@{$self->{'_select'}->options}) {
-		$self->{'_option'}->process_css;
-	}
 
 	return;
 }
@@ -123,8 +111,11 @@ Tags::HTML::Element::Select - Tags helper for HTML select element.
  use Tags::HTML::Element::Select;
 
  my $obj = Tags::HTML::Element::Select->new(%params);
- $obj->process($select);
- $obj->process_css($select);
+ $obj->cleanup;
+ $obj->init($select);
+ $obj->prepare;
+ $obj->process;
+ $obj->process_css;
 
 =head1 METHODS
 
@@ -150,23 +141,53 @@ Default value is undef.
 
 =back
 
-=head2 C<process>
+=head2 C<cleanup>
 
- $obj->process($select);
+ $obj->cleanup;
 
-Process Tags structure for C<$select> data object to output.
+Process cleanup after page run.
+
+In this case cleanup internal representation of a set by L<init>.
+
+Returns undef.
+
+=head2 C<init>
+
+ $obj->init($select);
+
+Process initialization in page run.
 
 Accepted C<$select> is L<Data::HTML::Element::Select>.
 
 Returns undef.
 
+=head2 C<prepare>
+
+ $obj->prepare;
+
+Process initialization before page run.
+
+Do nothing in this object.
+
+Returns undef.
+
+=head2 C<process>
+
+ $obj->process;
+
+Process L<Tags> structure for HTML select element to output.
+
+Do nothing in case without inicialization by L<init>.
+
+Returns undef.
+
 =head2 C<process_css>
 
- $obj->process_css($select);
+ $obj->process_css;
 
-Process CSS::Struct structure for C<$select> data object to output.
+Process L<CSS::Struct> structure for HTML select element to output.
 
-Accepted C<$select> is L<Data::HTML::Element::Select>.
+Do nothing in case without inicialization by L<init>.
 
 Returns undef.
 
@@ -214,9 +235,12 @@ Returns undef.
          'css_class' => 'form-select',
  );
 
+ # Initialize.
+ $obj->init($select);
+
  # Process select.
- $obj->process($select);
- $obj->process_css($select);
+ $obj->process;
+ $obj->process_css;
 
  # Print out.
  print "HTML:\n";
@@ -227,7 +251,7 @@ Returns undef.
 
  # Output:
  # HTML:
- # <select class="form-select" type="text" />
+ # <select class="form-select" />
  #
  # CSS:
  # select.form-select {
@@ -260,12 +284,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022-2023 Michal Josef Špaček
+© 2022-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.06
 
 =cut

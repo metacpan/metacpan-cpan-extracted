@@ -30,57 +30,115 @@ class Eg::CSS::BoxBuilder {
     
     my $body = $document->body;
     
-    my $node_root = (Eg::Node)$document;
-    my $node_cur = $node_root;
-    my $finish = 0;
-    while ($node_cur) {
-      
-      if ($node_cur == $head) {
-        $node_cur = $body;
-      }
-      
-      # [START]Preorder traversal position
-      
-      unless ($node_cur->{box}) {
-        $node_cur->{box} = Eg::CSS::Box->new;
-      }
-      
-      if ($node_cur isa Eg::Node::Element) {
-        $node_cur->(Eg::Node::Element::HTML)->set_computed_styles_h($node_cur->(Eg::Node::Element::HTML)->styles_h);
-        $self->build_box_styles($node_cur);
-      }
-      
-      $self->build_box_set_default_values($node_cur);
-      
-      $self->build_box_descendant($node_cur);
-      
-      if ($node_cur->first_child) {
-        $node_cur = (Eg::Node)$node_cur->first_child;
-      }
-      else {
-        while (1) {
-          # [START]Postorder traversal position
-          $self->build_box_ascendant($node_cur);
-          
-          if ($node_cur == $node_root) {
+    {
+      my $node_root = (Eg::Node)$document;
+      my $node_cur = $node_root;
+      my $finish = 0;
+      while ($node_cur) {
+        
+        if ($node_cur == $head) {
+          $node_cur = $body;
+        }
+        
+        # [START]Preorder traversal position
+        
+        unless ($node_cur->{box}) {
+          $node_cur->{box} = Eg::CSS::Box->new;
+        }
+        
+        if ($node_cur isa Eg::Node::Element) {
+          # $document->get_computed_style($node_cur);
+          $self->build_box_styles($node_cur);
+        }
+        
+        $self->build_box_set_default_values($node_cur);
+        
+        $self->build_box_descendant($node_cur);
+        
+        if ($node_cur->first_child) {
+          $node_cur = (Eg::Node)$node_cur->first_child;
+        }
+        else {
+          while (1) {
+            # [START]Postorder traversal position
+            $self->build_box_ascendant($node_cur);
             
-            $finish = 1;
+            if ($node_cur == $node_root) {
+              
+              $finish = 1;
+              
+              last;
+            }
             
-            last;
+            # Next sibling
+            if ($node_cur->next_sibling) {
+              $node_cur = $node_cur->next_sibling;
+              last;
+            }
+            # Next is parent
+            else {
+              $node_cur = $node_cur->parent_node;
+            }
           }
-          
-          # Next sibling
-          if ($node_cur->next_sibling) {
-            $node_cur = $node_cur->next_sibling;
+          if ($finish) {
             last;
-          }
-          # Next is parent
-          else {
-            $node_cur = $node_cur->parent_node;
           }
         }
-        if ($finish) {
-          last;
+      }
+    }
+    
+    {
+      my $node_root = (Eg::Node)$document;
+      my $node_cur = $node_root;
+      my $finish = 0;
+      while ($node_cur) {
+        
+        if ($node_cur == $head) {
+          $node_cur = $body;
+        }
+        
+        # [START]Preorder traversal position
+        
+        unless ($node_cur->{box}) {
+          $node_cur->{box} = Eg::CSS::Box->new;
+        }
+        
+        if ($node_cur isa Eg::Node::Element) {
+          # $document->get_computed_style($node_cur);
+          $self->build_box_styles($node_cur);
+        }
+        
+        $self->build_box_set_default_values($node_cur);
+        
+        $self->build_box_descendant_compute_position($node_cur);
+        
+        if ($node_cur->first_child) {
+          $node_cur = (Eg::Node)$node_cur->first_child;
+        }
+        else {
+          while (1) {
+            # [START]Postorder traversal position
+            
+            if ($node_cur == $node_root) {
+              
+              $finish = 1;
+              
+              last;
+            }
+            
+            # Next sibling
+            if ($node_cur->next_sibling) {
+              $node_cur = $node_cur->next_sibling;
+              last;
+            }
+            # Next is parent
+            else {
+              $node_cur = $node_cur->parent_node;
+            }
+          }
+          if ($finish) {
+            last;
+          }
         }
       }
     }
@@ -93,6 +151,8 @@ class Eg::CSS::BoxBuilder {
   private native method build_box_descendant : void ($node : Eg::Node);
   
   private native method build_box_ascendant : void ($node : Eg::Node);
+  
+  private native method build_box_descendant_compute_position : void ($node : Eg::Node);
   
   private method text_metrics_height : int ($text_node : Eg::Node::Text) {
     return $self->{runtime}->api->app->text_metrics_height($text_node);

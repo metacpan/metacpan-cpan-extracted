@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::statsMath::sumix;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUMIX - compute weighted moving average (trace MIX) on a panel	
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 

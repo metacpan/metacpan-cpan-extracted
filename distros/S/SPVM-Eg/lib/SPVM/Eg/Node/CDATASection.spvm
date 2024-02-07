@@ -7,12 +7,13 @@ class Eg::Node::CDATASection extends Eg::Node::Text {
   allow Eg::Node::Document;
   
   # Class Methods
-  private static method new : Eg::Node::CDATASection ($node_value : string) {
+  private static method new : Eg::Node::CDATASection ($options : object[] = undef) {
     
     my $self = new Eg::Node::CDATASection;
     
-    $self->SUPER::init({node_value => $node_value});
+    $self->SUPER::init(Eg->merge_options_v2($options, {node_type => Eg::Node->TYPE_CDATA_SECTION_NODE}));
     
     return $self;
   }
+  
 }

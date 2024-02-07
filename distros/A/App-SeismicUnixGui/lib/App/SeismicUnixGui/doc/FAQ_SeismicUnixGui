@@ -161,7 +161,7 @@ Example 1: parameter "geopsy" in "Project"
  						sub get_max_index {
  							my ($self) = @_;
  
- 							my $max_index = 12;
+ 							my $max_index = 14;
  	
  							return($max_index);
  						}	
@@ -919,20 +919,20 @@ Q. How does LSU_project_selector create new Project directories?
 	 Q how are values written/updated to the viewing area in the main GUI?
 	 
 	 All forms of writing to the GUI involve param_widgets->redisplay_values
-	 param_widgets->redisplay_values is the key subroutine
+	 i.e., param_widgets->redisplay_values is the key subroutine
 	 
 	 (Note that param_widgets4pre_built_streams.pm is for superflows
 	            param_widgets_'color'.pm is for user-built flows
 	            param_widgets_neutral is for first time a seismic unix program is called
 	            param_widgets is for L_SU_project_selector, file_dialog, L_SU, project_selector
 	 
-	 In pre-built Superflows:	 			
+	 For pre-built superflows:	 			
 	 			redisplay the values that exist stored in param_flow:
 	            
 	            e.g., file_dialog,_pre_built_superflow_close_data_file
 	            
 	 			# update the gui with the new file name
-                		$param_widgets->set_values( $file_dialog->{_values_aref} );
+                $param_widgets->set_values( $file_dialog->{_values_aref} );
                 		
 		 		$param_widgets4pre_built_streams->redisplay_values();
 		 		
@@ -3015,4 +3015,13 @@ A.  Following on from the previous questions, if MB3 selected,
   But if we reselect an open color flow the param_widgets
   are reoccupied by what was stored in color_href. In this manner we
   can minimize memory usage for param_widgets
+  
+  Q. When I select a superflow or big stream, what are some of the subs are used?
+  
+    L_SU.pm	 
+	 pre_built_superflows
+   		# for binding to file dialog options
+		my $sub_ref = \&_FileDialog_button;
+		   $pre_built_big_stream->set_sub_ref($sub_ref);
+		   $pre_built_big_stream->select();
            

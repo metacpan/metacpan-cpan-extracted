@@ -8,6 +8,16 @@ use Fcntl;
 use IO::File;
 use IO::Handle;
 
+my $fdpath;
+BEGIN {
+    $fdpath = sub {
+	for my $path (qw(/dev/fd /proc/self/fd)) {
+	    -r "$path/0" and return $path;
+	}
+	die "No file descriptor access.\n";
+    }->();
+}
+
 sub new {
     my $class = shift;
     my $fh = new_tmpfile IO::File or die "new_tmpfile: $!\n";
@@ -57,7 +67,7 @@ sub fd {
 
 sub path {
     my $obj = shift;
-    sprintf "/dev/fd/%d", $obj->fd;
+    sprintf "$fdpath/%d", $obj->fd;
 }
 
 1;

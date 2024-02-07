@@ -21,6 +21,7 @@ __PACKAGE__->add_columns(
 			verify_method             => 'verify_passphrase',
 			rehash_method             => 'passphrase_needs_rehash',
 			verify_and_rehash_method  => 'verify_and_rehash_password',
+			recode_hash_method        => 'recode_password',
 		},
     },
 );

@@ -381,8 +381,8 @@ sub _api_request {
     my $res = $ua->request( $req );
 
     if ( $res->is_success ) {
-        say STDERR "GOCARDLESS <- " . $res->content if $ENV{GOCARDLESS_DEBUG};
-        my $data  = JSON->new->canonical->decode( $res->content );
+        my $data  = JSON->new->canonical->decode( my $json = $res->content );
+        say STDERR "GOCARDLESS <- $json" if $ENV{GOCARDLESS_DEBUG};
         my $links = $res->header( 'link' );
         my $info  = $res->header( 'x-pagination' );
         return wantarray ? ( $data,$links,$info ) : $data;

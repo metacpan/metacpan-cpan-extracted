@@ -7,9 +7,9 @@ use warnings;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-30'; # DATE
+our $DATE = '2023-11-20'; # DATE
 our $DIST = 'List-Util-groupby'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our @EXPORT_OK = qw(
                        groupby
@@ -79,7 +79,7 @@ List::Util::groupby - Group items of a list into several (possibly multilevel) b
 
 =head1 VERSION
 
-This document describes version 0.003 of List::Util::groupby (from Perl distribution List-Util-groupby), released on 2023-09-30.
+This document describes version 0.004 of List::Util::groupby (from Perl distribution List-Util-groupby), released on 2023-11-20.
 
 =head1 SYNOPSIS
 
@@ -107,7 +107,7 @@ This document describes version 0.003 of List::Util::groupby (from Perl distribu
 
 =head1 DESCRIPTION
 
-This module provides L</groupby>.
+This module provides L</groupby> and L</hgroupby>.
 
 =head1 FUNCTIONS
 

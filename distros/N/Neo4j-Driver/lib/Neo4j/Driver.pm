@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.42';
+$Neo4j::Driver::VERSION = '0.44';
 
 use Carp qw(croak);
 
@@ -75,15 +75,15 @@ sub _check_uri {
 	
 	if ($uri) {
 		$uri = "[$uri]" if $uri =~ m{^[0-9a-f:]*::|^(?:[0-9a-f]+:){6}}i;
-		$uri =~ s|^|http://| if $uri !~ m{:|/} || $uri =~ m{^\[.+\]$};
-		$uri =~ s|^|http:| if $uri =~ m{^//};
+		$uri =~ s|^|neo4j://| if $uri !~ m{:|/} || $uri =~ m{^\[.+\]$};
+		$uri =~ s|^|neo4j:| if $uri =~ m{^//};
 		$uri = URI->new($uri);
 		
 		if ( ! $uri->scheme ) {
 			croak sprintf "Failed to parse URI '%s'", $uri;
 		}
-		if ( $uri->scheme !~ m/^https?$|^bolt$/ ) {
-			croak sprintf "URI scheme '%s' unsupported; use 'http' or 'bolt'", $uri->scheme // "";
+		if ( $uri->scheme !~ m/^https?$|^bolt$|^neo4j$/ ) {
+			croak sprintf "URI scheme '%s' unsupported; use 'bolt', 'http', or 'neo4j'", $uri->scheme // "";
 		}
 		
 		if (my $userinfo = $uri->userinfo(undef)) {
@@ -92,16 +92,25 @@ sub _check_uri {
 			utf8::decode $_ for @userinfo;
 			$self->basic_auth(@userinfo);
 		}
-		$uri->host('localhost') unless $uri->host;
+		$uri->host('127.0.0.1') unless $uri->host;
 		$uri->path('') if $uri->path_query eq '/';
 		$uri->fragment(undef);
 	}
 	else {
-		$uri = URI->new("http://localhost");
+		$uri = URI->new("neo4j://127.0.0.1");
 	}
 	$uri->port( $NEO4J_DEFAULT_PORT{ $uri->scheme } ) if ! $uri->_port;
 	
 	$self->{config}->{uri} = $uri;
+}
+
+
+sub _fix_neo4j_uri {
+	my ($self) = @_;
+	
+	my $uri = $self->{config}->{uri};
+	$uri->scheme( exists $INC{'Neo4j/Bolt.pm'} ? 'bolt' : $self->{config}->{tls} ? 'https' : 'http' );
+	$uri->port( $NEO4J_DEFAULT_PORT{ $uri->scheme } ) if ! $uri->_port;
 }
 
 
@@ -160,6 +169,8 @@ sub session {
 	
 	@options = %{$options[0]} if @options == 1 && ref $options[0] eq 'HASH';
 	my %options = $self->_parse_options('session', ['database'], @options);
+	
+	$self->_fix_neo4j_uri if $self->{config}->{uri}->scheme eq 'neo4j';
 	
 	my $session = Neo4j::Driver::Session->new($self);
 	return $session->_connect($options{database});
@@ -236,7 +247,7 @@ Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.42
+version 0.44
 
 =head1 SYNOPSIS
 
@@ -312,25 +323,9 @@ install L<LWP::Protocol::https> separately to enable HTTPS.
 The protocol is automatically chosen based on the URI scheme.
 See L<Neo4j::Driver::Config/"uri"> for details.
 
-B<This driver's development is not yet considered finalised.>
-
-As of version 0.36, the one major open item is:
-
-=over
-
-=item *
-
-Support for the C<neo4j:> URI scheme in some fashion.
-(No first-party implementation of client-side routing is
-currently planned, but plug-ins might get a hook for it.)
-
-=back
-
-Once the above item is implemented, this driver will
+This driver will soon
 move to S<version 1.00,> removing L<deprecated
 functionality|Neo4j::Driver::Deprecations>.
-There is an ongoing effort to work on this and other
-items, but there is no schedule for their completion.
 
 =head1 METHODS
 
@@ -486,11 +481,11 @@ driver I<certainly> would be in much worse shape than it is today.
 
 =head1 AUTHOR
 
-Arne Johannessen (L<AJNN|https://arne.johannessen.de/>)
+Arne Johannessen (L<AJNN|https://metacpan.org/author/AJNN>)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2023 by Arne Johannessen.
+This software is Copyright (c) 2016-2024 by Arne Johannessen.
 
 This is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0 or (at your option) the same terms

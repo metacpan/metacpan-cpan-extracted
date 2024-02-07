@@ -31,9 +31,9 @@
       set_DIR        = "DATA_SEISMIC_BIN"
       call Project_config(set_DIR,get_DIR)
       inbound_bin = trim(get_DIR)//"/"//trim(base_file)//'.bin'
-!      print*,'1179immodpg.for,rdata,base_file:',inbound_bin
+!      print*,'34 rdata.for,base_file:',inbound_bin
 !      print*,'next line'
-!      print*,'1218-immodpg.for,rdata,inbound_bin:',trim(inbound_bin)
+!      print*,'36,rdata.for,inbound_bin:',trim(inbound_bin)
 
 ! Read data File
       call read_bin_data (inbound_bin,ntrmax,nsmax,ntr,ns,Amp)

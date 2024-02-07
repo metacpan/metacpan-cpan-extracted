@@ -40,7 +40,7 @@
 
 
 
- AUTHOR:: Andreas Rueger, Colorado School of Mines, 01/20/95
+ Author:: Andreas Rueger, Colorado School of Mines, 01/20/95
        original name of algorithm: graebner1.c
 
   Technical reference: Graebner, M.; Geophysics, Vol 57, No 11:

@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::NMO_Vel_Stk::sustack;
 =head2 SYNOPSIS
 
  PROGRAM NAME: sustack 
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:  July 31, 2013
  DESCRIPTION  horizontal summation across
               a file based on a header word

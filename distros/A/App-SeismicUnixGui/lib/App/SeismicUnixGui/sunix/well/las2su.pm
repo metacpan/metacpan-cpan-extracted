@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::well::las2su;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  LAS2SU - convert las2 format well log curves to su traces	
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 

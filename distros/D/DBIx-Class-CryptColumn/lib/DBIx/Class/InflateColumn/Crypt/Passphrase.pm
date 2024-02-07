@@ -1,5 +1,5 @@
 package DBIx::Class::InflateColumn::Crypt::Passphrase;
-$DBIx::Class::InflateColumn::Crypt::Passphrase::VERSION = '0.008';
+$DBIx::Class::InflateColumn::Crypt::Passphrase::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -42,7 +42,7 @@ DBIx::Class::InflateColumn::Crypt::Passphrase - Inflate/deflate columns to passp
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

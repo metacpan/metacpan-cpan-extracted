@@ -7,17 +7,12 @@ use base qw(Exporter Params::Validate::Dependencies::Documenter);
 
 use vars qw($VERSION @EXPORT @EXPORT_OK);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 @EXPORT_OK = @EXPORT = ('all_or_none_of');
 
 =head1 NAME
 
-Params::Validate::Dependencies::all_or_none_of
-
-=head1 DESCRIPTION
-
-An extension for Params::Validate::Dependencies to validate that either
-all of or none of a list of params are present.
+Params::Validate::Dependencies::all_or_none_of - validate that either all or none of a list of params are present
 
 =head1 SYNOPSIS
 
@@ -76,7 +71,7 @@ going on, look at L<Params::Validate::Dependencies::Extending>.
 I like to know who's using my code.  All comments, including constructive
 criticism, are welcome.
 
-Please report any bugs either by email or using L<http://rt.cpan.org/>
+Please report any bugs either by email
 or at L<https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies/issues>.
 
 Bug reports should contain enough detail that I can replicate the
@@ -98,7 +93,7 @@ L<https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies-all_or_non
 
 =head1 COPYRIGHT and LICENCE
 
-Copyright 2011 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2024 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used, distributed, and modified under the terms of either the GNU General Public Licence version 2 or the Artistic Licence. It's up to you which one you use. The full text of the licences can be found in the files GPL2.txt and ARTISTIC.txt, respectively.
 

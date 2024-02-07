@@ -1,5 +1,5 @@
 package Selenium::Driver::WinApp;
-$Selenium::Driver::WinApp::VERSION = '1.06';
+$Selenium::Driver::WinApp::VERSION = '2.00';
 use strict;
 use warnings;
 
@@ -16,16 +16,17 @@ sub _driver {
     return 'WinAppDriver.exe';
 }
 
-sub build_spawn_opts($class,$object) {
-    $object->{driver_class}       = $class;
-    $object->{driver_version}     //= '';
-    $object->{log_file}           //= "$object->{client_dir}/perl-client/selenium-$object->{port}.log";
-    $object->{driver_file} = File::Which::which($class->_driver());
+sub build_spawn_opts ( $class, $object ) {
+    $object->{driver_class} = $class;
+    $object->{driver_version} //= '';
+    $object->{log_file}       //= "$object->{client_dir}/perl-client/selenium-$object->{port}.log";
+    $object->{driver_file} = File::Which::which( $class->_driver() );
     die "Could not find driver!" unless $object->{driver_file};
+
     #XXX appears that escaping from system() does not work correctly on win32 thanks to the join() I have? to do later, sigh
     $object->{driver_file} = qq/"$object->{driver_file}"/;
 
-    my @config = ($object->{port});
+    my @config = ( $object->{port} );
 
     # Build command string
     $object->{command} //= [
@@ -49,7 +50,7 @@ Selenium::Driver::WinApp - Tell Selenium::Client how to spawn the Windows Applic
 
 =head1 VERSION
 
-version 1.06
+version 2.00
 
 =head1 Mode of Operation
 

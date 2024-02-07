@@ -1,12 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use IO::Async::Loop;
 use IO::Async::OS;
@@ -24,14 +23,14 @@ testing_loop( $loop );
       code    => sub { 3 },
       capture => [qw( exitcode )],
    );
-   is_deeply( [ $f->get ], [ 3 << 8 ],
+   is( [ $f->get ], [ 3 << 8 ],
       '$f->get from code gives exitcode' );
 
    $f = $loop->run_process(
       command => [ $^X, "-e", 'exit 5' ],
       capture => [qw( exitcode )],
    );
-   is_deeply( [ $f->get ], [ 5 << 8 ],
+   is( [ $f->get ], [ 5 << 8 ],
       '$f->get from command gives exitcode' );
 }
 
@@ -43,14 +42,14 @@ testing_loop( $loop );
       code    => sub { print "hello\n"; 0 },
       capture => [qw( stdout )],
    );
-   is_deeply( [ $f->get ], [ "hello\n" ],
+   is( [ $f->get ], [ "hello\n" ],
       '$f->get from code gives stdout' );
 
    $f = $loop->run_process(
       command => [ $^X, "-e", 'print "goodbye\n"' ],
       capture => [qw( stdout )],
    );
-   is_deeply( [ $f->get ], [ "goodbye\n" ],
+   is( [ $f->get ], [ "goodbye\n" ],
       '$f->get from command gives stdout' );
 }
 
@@ -62,7 +61,7 @@ testing_loop( $loop );
       command => [ $^X, "-e", 'print STDOUT "output\n"; print STDERR "error\n";' ],
       capture => [qw( stdout stderr )],
    );
-   is_deeply( [ $f->get ], [ "output\n", "error\n" ],
+   is( [ $f->get ], [ "output\n", "error\n" ],
       '$f->get from command gives stdout and stderr' );
 }
 
@@ -76,7 +75,7 @@ testing_loop( $loop );
       stdin   => "some data\n",
       capture => [qw( stdout )],
    );
-   is_deeply( [ $f->get ], [ "some data\n" ],
+   is( [ $f->get ], [ "some data\n" ],
       '$f->get from command given stdin gives stdout' );
 }
 
@@ -85,7 +84,7 @@ testing_loop( $loop );
    my $f = $loop->run_process(
       command => [ $^X, "-e", 'print STDOUT "output";' ],
    );
-   is_deeply( [ $f->get ], [ 0, "output" ],
+   is( [ $f->get ], [ 0, "output" ],
       '$f->get from command with default capture' );
 }
 
@@ -95,7 +94,7 @@ testing_loop( $loop );
       command => [ $^X, "-e", 'print STDOUT "output"; print STDERR "error";' ],
       capture => [qw(stderr exitcode stdout)],
    );
-   is_deeply( [ $f->get ], [ "error", 0, "output" ],
+   is( [ $f->get ], [ "error", 0, "output" ],
       '$f->get from command with all captures' );
 }
 
@@ -144,33 +143,33 @@ testing_loop( $loop );
       # ignore message
       my ( undef, $category, @captures ) = $f->failure;
       is( $category, "process", '$f->failure category' );
-      is_deeply( \@captures, [ 3<<8 ], '$f->failure details' );
+      is( \@captures, [ 3<<8 ], '$f->failure details' );
    };
 }
 
 # Testing error handling
-ok( exception { $loop->run_process(
+ok( dies { $loop->run_process(
          command => [ $^X, "-e", 1 ],
          some_key_you_fail => 1
       ) },
    'unrecognised key fails'
 );
 
-ok( exception { $loop->run_process(
+ok( dies { $loop->run_process(
          command => [ $^X, "-e", 1 ],
          capture => 'pid'
       ) },
    'Capture in capture format'
 );
 
-ok( exception { $loop->run_process(
+ok( dies { $loop->run_process(
          command => [ $^X, "-e", 1 ],
          capture => ['invalid_capture']
       ) },
    'Invalid capture type'
 );
 
-ok( exception { $loop->run_process(
+ok( dies { $loop->run_process(
          command => [ $^X, "-e", 1 ],
          on_finish => sub{ 0 }
       ) },

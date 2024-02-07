@@ -4,10 +4,14 @@ package App::SeismicUnixGui::sunix::par::b2a;
 
 =head2 SYNOPSIS
 
- PERL PROGRAM NAME:  B2A - convert binary floats to ascii				
- AUTHOR: Juan Lorenzo
+ PERL PROGRAM NAME:  B2A - convert binary floats to ascii		
+ 		
+AUTHOR: Juan Lorenzo (Perl module only)
+
  DATE:   
+ 
  DESCRIPTION:
+ 
  Version: 
 
 =head2 USE
@@ -38,7 +42,7 @@ package App::SeismicUnixGui::sunix::par::b2a;
  Note: 							
  Parameter:							", 
   format=0 uses printf("%15.10e ", x[i1])			
-  format=1 uses printf("%15.15f ", x[i1])			
+  format=1 uses printf("%15.15f ", x[i1])		
 
  Credits:
 	CWP: Jack K. Cohen

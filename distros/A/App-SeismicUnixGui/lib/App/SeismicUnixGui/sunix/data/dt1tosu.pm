@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::data::dt1tosu;
 
 PERL PROGRAM NAME: 
 
-AUTHOR:  
+AUTHOR: Juan Lorenzo (Perl module only)
 
 DATE:
 

@@ -2,7 +2,7 @@
 
 use Test2::V0 -target => 'Alien::YAMLScript';
 use Test::Alien;
-use JSON::PP;
+use Cpanel::JSON::XS;
 
 alien_ok $CLASS;
 
@@ -25,7 +25,7 @@ ffi_ok { symbols => [ 'graal_create_isolate', 'load_ys_to_json' ] },
 
         is $load->(<<'...'),
 !yamlscript/v0/data
-foo:: 1..10
+foo:: 1 .. 10
 ...
             { data => { foo => [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ] } },
             'Can load YS to JSON';

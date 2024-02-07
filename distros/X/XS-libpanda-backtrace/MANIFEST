@@ -4,10 +4,12 @@ lib/XS/libpanda/backtrace.pm
 lib/XS/libpanda/backtrace.pod
 libpanda-backtrace/build/cmake_install.cmake
 libpanda-backtrace/build/CMakeFiles/CMakeDirectoryInformation.cmake
-libpanda-backtrace/build/CMakeFiles/Export/lib/cmake/panda-backtrace/panda-backtrace-config-noconfig.cmake
-libpanda-backtrace/build/CMakeFiles/Export/lib/cmake/panda-backtrace/panda-backtrace-config.cmake
+libpanda-backtrace/build/CMakeFiles/Export/9101e5a2389e2ffef2fb7fe91ce714ec/panda-backtrace-config-noconfig.cmake
+libpanda-backtrace/build/CMakeFiles/Export/9101e5a2389e2ffef2fb7fe91ce714ec/panda-backtrace-config.cmake
 libpanda-backtrace/build/CMakeFiles/MyTest.dir/build.make
 libpanda-backtrace/build/CMakeFiles/MyTest.dir/cmake_clean.cmake
+libpanda-backtrace/build/CMakeFiles/MyTest.dir/compiler_depend.make
+libpanda-backtrace/build/CMakeFiles/MyTest.dir/compiler_depend.ts
 libpanda-backtrace/build/CMakeFiles/MyTest.dir/depend.make
 libpanda-backtrace/build/CMakeFiles/MyTest.dir/DependInfo.cmake
 libpanda-backtrace/build/CMakeFiles/MyTest.dir/flags.make
@@ -16,6 +18,8 @@ libpanda-backtrace/build/CMakeFiles/MyTest.dir/progress.make
 libpanda-backtrace/build/CMakeFiles/panda-backtrace-tests.dir/build.make
 libpanda-backtrace/build/CMakeFiles/panda-backtrace-tests.dir/cmake_clean.cmake
 libpanda-backtrace/build/CMakeFiles/panda-backtrace-tests.dir/cmake_clean_target.cmake
+libpanda-backtrace/build/CMakeFiles/panda-backtrace-tests.dir/compiler_depend.make
+libpanda-backtrace/build/CMakeFiles/panda-backtrace-tests.dir/compiler_depend.ts
 libpanda-backtrace/build/CMakeFiles/panda-backtrace-tests.dir/depend.make
 libpanda-backtrace/build/CMakeFiles/panda-backtrace-tests.dir/DependInfo.cmake
 libpanda-backtrace/build/CMakeFiles/panda-backtrace-tests.dir/flags.make
@@ -24,6 +28,8 @@ libpanda-backtrace/build/CMakeFiles/panda-backtrace-tests.dir/progress.make
 libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/build.make
 libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/cmake_clean.cmake
 libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/cmake_clean_target.cmake
+libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/compiler_depend.make
+libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/compiler_depend.ts
 libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/depend.make
 libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/DependInfo.cmake
 libpanda-backtrace/build/CMakeFiles/panda-backtrace.dir/flags.make
@@ -33,15 +39,15 @@ libpanda-backtrace/build/CMakeFiles/progress.marks
 libpanda-backtrace/build/CTestTestfile.cmake
 libpanda-backtrace/cmake_props/cmake_install.cmake
 libpanda-backtrace/cmake_props/CMakeCache.txt
-libpanda-backtrace/cmake_props/CMakeFiles/3.18.4/CMakeCCompiler.cmake
-libpanda-backtrace/cmake_props/CMakeFiles/3.18.4/CMakeCXXCompiler.cmake
-libpanda-backtrace/cmake_props/CMakeFiles/3.18.4/CMakeDetermineCompilerABI_C.bin
-libpanda-backtrace/cmake_props/CMakeFiles/3.18.4/CMakeDetermineCompilerABI_CXX.bin
-libpanda-backtrace/cmake_props/CMakeFiles/3.18.4/CMakeSystem.cmake
-libpanda-backtrace/cmake_props/CMakeFiles/3.18.4/CompilerIdC/a.out
-libpanda-backtrace/cmake_props/CMakeFiles/3.18.4/CompilerIdC/CMakeCCompilerId.c
-libpanda-backtrace/cmake_props/CMakeFiles/3.18.4/CompilerIdCXX/a.out
-libpanda-backtrace/cmake_props/CMakeFiles/3.18.4/CompilerIdCXX/CMakeCXXCompilerId.cpp
+libpanda-backtrace/cmake_props/CMakeFiles/3.25.1/CMakeCCompiler.cmake
+libpanda-backtrace/cmake_props/CMakeFiles/3.25.1/CMakeCXXCompiler.cmake
+libpanda-backtrace/cmake_props/CMakeFiles/3.25.1/CMakeDetermineCompilerABI_C.bin
+libpanda-backtrace/cmake_props/CMakeFiles/3.25.1/CMakeDetermineCompilerABI_CXX.bin
+libpanda-backtrace/cmake_props/CMakeFiles/3.25.1/CMakeSystem.cmake
+libpanda-backtrace/cmake_props/CMakeFiles/3.25.1/CompilerIdC/a.out
+libpanda-backtrace/cmake_props/CMakeFiles/3.25.1/CompilerIdC/CMakeCCompilerId.c
+libpanda-backtrace/cmake_props/CMakeFiles/3.25.1/CompilerIdCXX/a.out
+libpanda-backtrace/cmake_props/CMakeFiles/3.25.1/CompilerIdCXX/CMakeCXXCompilerId.cpp
 libpanda-backtrace/cmake_props/CMakeFiles/cmake.check_cache
 libpanda-backtrace/cmake_props/CMakeFiles/CMakeDirectoryInformation.cmake
 libpanda-backtrace/cmake_props/CMakeFiles/CMakeOutput.log
@@ -65,8 +71,8 @@ libpanda-backtrace/tests/fn.h
 libpanda-backtrace/tests/fn01.cc
 libpanda-backtrace/tests/fn02.cc
 libpanda-backtrace/tests/fn03.cc
-libpanda-backtrace/tests/main.cc
 Makefile.PL
+Makefile.test
 MANIFEST			This list of files
 t/bt.t
 t/lib/MyTest.pm

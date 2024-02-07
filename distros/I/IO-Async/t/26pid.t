@@ -1,12 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use IO::Async::Test;
 
-use Test::More;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use POSIX qw( SIGTERM );
 
@@ -35,7 +34,7 @@ testing_loop( $loop );
    );
 
    ok( defined $pid, '$pid defined' );
-   isa_ok( $pid, "IO::Async::PID", '$pid isa IO::Async::PID' );
+   isa_ok( $pid, [ "IO::Async::PID" ], '$pid isa IO::Async::PID' );
 
    is_oneref( $pid, '$pid has refcount 1 initially' );
 

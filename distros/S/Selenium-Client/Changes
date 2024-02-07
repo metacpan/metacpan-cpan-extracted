@@ -1,5 +1,9 @@
 Revision history for Selenium-Client
 
+2.00 2024-02-05 TEODESIAN
+    [NEW FEATURES]
+    - Add a drop-in replacement for Selenium::Remote::Driver called Selenium::Client::Driver.
+
 1.06 2023-09-19 TEODESIAN
     [NEW FEATURES]
     - Hardcode the spec inside of Selenium::Specification's __DATA__ to idiot-proof this in preparation for use by S::R::D

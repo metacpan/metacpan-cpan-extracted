@@ -7,14 +7,19 @@ MD5.xs
 README
 rfc1321.txt
 SIGNATURE
-t/align.t
-t/badfile.t
-t/bits.t
-t/clone.t
-t/files.t
-t/md5-aaa.t
-t/utf8.t
-t/warns.t
+t/Alt-Digest-MD5-OpenSSL/01-use.t
+t/Alt-Digest-MD5-OpenSSL/02-version.t
+t/Alt-Digest-MD5-OpenSSL/03-openssl_diag.t
+t/Digest-MD5/01-use.t
+t/Digest-MD5/02-version.t
+t/original/align.t
+t/original/badfile.t
+t/original/bits.t
+t/original/clone.t
+t/original/files.t
+t/original/md5-aaa.t
+t/original/utf8.t
+t/original/warns.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

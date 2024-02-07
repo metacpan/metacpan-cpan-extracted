@@ -4,7 +4,7 @@ Database::Abstraction - database abstraction layer
 
 # VERSION
 
-Version 0.01
+Version 0.04
 
 # SYNOPSIS
 
@@ -17,7 +17,7 @@ Look for databases in $directory in this order:
 
 For example, you can access the files in /var/db/foo.csv via this class:
 
-    package MyPackageName::Database::Foo;;
+    package MyPackageName::Database::Foo;
 
     use Database::Abstraction;
 
@@ -27,11 +27,13 @@ For example, you can access the files in /var/db/foo.csv via this class:
 
 You can then access the data using:
 
-    my $foo = MyPackageName::Database->new(directory => '/var/db');
-    my $row = $foo->fetchrow_hashref(customer_id => '12345);
+    my $foo = MyPackageName::Database::Foo->new(directory => '/var/db');
+    print 'Customer name ', $foo->name(customer_id => 'plugh');
+    my $row = $foo->fetchrow_hashref(customer_id => 'xyzzy');
     print Data::Dumper->new([$row])->Dump();
 
-CSV files can have empty lines of comment lines starting with '#', to make them more readable
+CSV files can have empty lines or comment lines starting with '#',
+to make them more readable.
 
 If the table has a column called "entry", sorts are based on that
 To turn that off, pass 'no\_entry' to the constructor, for legacy
@@ -43,9 +45,11 @@ reasons it's enabled by default
 
 Set some class level defaults.
 
-    __PACKAGE__::Database(directory => '../databases')
+    MyPackageName::Database::init(directory => '../databases');
 
-See the documentation for new() to see what variables can be set
+See the documentation for new() to see what variables can be set.
+
+Returns a refernce to a hash of the current values.
 
 ## new
 
@@ -57,7 +61,7 @@ cache => place to store results;
 cache\_duration => how long to store results in the cache (default is 1 hour);
 directory => where the database file is held
 
-If the arguments are not set, tries to take from class level defaults
+If the arguments are not set, tries to take from class level defaults.
 
 ## set\_logger
 
@@ -103,6 +107,11 @@ Set distinct to 1 if you're after a unique list
 # AUTHOR
 
 Nigel Horne, `<njh at bandsman.co.uk>`
+
+# BUGS
+
+The default delimiter for CSV files is set to '!', not ',' for historical reasons.
+I really ought to fix that.
 
 # LICENSE AND COPYRIGHT
 

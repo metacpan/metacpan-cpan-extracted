@@ -1,7 +1,7 @@
 package Net::SAML2::Binding::Redirect;
 use Moose;
 
-our $VERSION = '0.76'; # VERSION
+our $VERSION = '0.77'; # VERSION
 
 use Carp qw(croak);
 use Crypt::OpenSSL::RSA;
@@ -38,7 +38,7 @@ has 'sig_hash' => (
     isa      => signingAlgorithm,
     is       => 'ro',
     required => 0,
-    default  => 'sha1' #FIXME: Change default to sha256
+    default  => 'sha256'
 );
 
 has debug => (
@@ -212,7 +212,7 @@ Net::SAML2::Binding::Redirect - HTTP Redirect binding for SAML
 
 =head1 VERSION
 
-version 0.76
+version 0.77
 
 =head1 SYNOPSIS
 
@@ -275,7 +275,7 @@ Supported:
 
 sha256, sha224, sha384, sha512 and sha1
 
-Defaults to C<sha1>.  This will change to C<sha256> in a future release.
+Defaults to C<sha256>.
 
 =item B<debug>
 

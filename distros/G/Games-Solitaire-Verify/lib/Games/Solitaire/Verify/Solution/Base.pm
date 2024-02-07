@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Solution::Base;
-$Games::Solitaire::Verify::Solution::Base::VERSION = '0.2403';
+$Games::Solitaire::Verify::Solution::Base::VERSION = '0.2500';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ __PACKAGE__->mk_acc_ref(
             _max_rank
             _move
             _reached_end
-            )
+        )
     ]
 );
 
@@ -100,7 +100,7 @@ all Games::Solitaire::Verify::Solution::* classes.
 
 =head1 VERSION
 
-version 0.2403
+version 0.2500
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

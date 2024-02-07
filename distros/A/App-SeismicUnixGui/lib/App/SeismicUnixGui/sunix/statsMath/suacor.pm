@@ -5,7 +5,7 @@ package App::SeismicUnixGui::sunix::statsMath::suacor;
 =head2 SYNOPSIS
 
  PERL PROGRAM NAME:  SUACOR - auto-correlation						
- AUTHOR: Juan Lorenzo
+AUTHOR: Juan Lorenzo (Perl module only)
  DATE:   
  DESCRIPTION:
  Version: 
