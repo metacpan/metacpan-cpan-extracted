@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::BrowserServer;
-$Playwright::BrowserServer::VERSION = '1.324';
+$Playwright::BrowserServer::VERSION = '1.401';
 use parent 'Playwright::Base';
 
 sub new {
@@ -32,16 +32,6 @@ sub kill {
     );
 }
 
-sub process {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'process',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub wsEndpoint {
     my $self = shift;
     return $self->_api_request(
@@ -57,6 +47,16 @@ sub close {
     return $self->_api_request(
         args    => [@_],
         command => 'close',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub process {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'process',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::BrowserServer - Automatically generated class for Playwright::Browse
 
 =head1 VERSION
 
-version 1.324
+version 1.401
 
 =head1 CONSTRUCTOR
 
@@ -121,43 +121,43 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 Execute the BrowserServer::kill playwright routine.
 
-See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-kill> for more information.
-
-=head2 process(@args)
-
-Execute the BrowserServer::process playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-process> for more information.
+See L<https://playwright.dev/docs/api/class-BrowserServer#BrowserServer-kill> for more information.
 
 =head2 wsEndpoint(@args)
 
 Execute the BrowserServer::wsEndpoint playwright routine.
 
-See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-wsEndpoint> for more information.
+See L<https://playwright.dev/docs/api/class-BrowserServer#BrowserServer-wsEndpoint> for more information.
 
 =head2 close(@args)
 
 Execute the BrowserServer::close playwright routine.
 
-See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-close> for more information.
+See L<https://playwright.dev/docs/api/class-BrowserServer#BrowserServer-close> for more information.
+
+=head2 process(@args)
+
+Execute the BrowserServer::process playwright routine.
+
+See L<https://playwright.dev/docs/api/class-BrowserServer#BrowserServer-process> for more information.
 
 =head2 on(@args)
 
 Execute the BrowserServer::on playwright routine.
 
-See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-on> for more information.
+See L<https://playwright.dev/docs/api/class-BrowserServer#BrowserServer-on> for more information.
 
 =head2 evaluate(@args)
 
 Execute the BrowserServer::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-evaluate> for more information.
+See L<https://playwright.dev/docs/api/class-BrowserServer#BrowserServer-evaluate> for more information.
 
 =head2 evaluateHandle(@args)
 
 Execute the BrowserServer::evaluateHandle playwright routine.
 
-See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-evaluateHandle> for more information.
+See L<https://playwright.dev/docs/api/class-BrowserServer#BrowserServer-evaluateHandle> for more information.
 
 =head1 SEE ALSO
 

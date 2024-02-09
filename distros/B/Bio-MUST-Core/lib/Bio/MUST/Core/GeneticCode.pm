@@ -1,6 +1,6 @@
 package Bio::MUST::Core::GeneticCode;
 # ABSTRACT: Genetic code for conceptual translation
-$Bio::MUST::Core::GeneticCode::VERSION = '0.212670';
+$Bio::MUST::Core::GeneticCode::VERSION = '0.240390';
 use Moose;
 use namespace::autoclean;
 
@@ -56,7 +56,7 @@ Bio::MUST::Core::GeneticCode - Genetic code for conceptual translation
 
 =head1 VERSION
 
-version 0.212670
+version 0.240390
 
 =head1 SYNOPSIS
 

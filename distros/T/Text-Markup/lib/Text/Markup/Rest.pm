@@ -3,10 +3,16 @@ package Text::Markup::Rest;
 use 5.8.1;
 use strict;
 use warnings;
+use Text::Markup;
 use Text::Markup::Cmd;
 use File::Basename;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
+
+sub import {
+    # Replace the regex if passed one.
+    Text::Markup->register( rest => $_[1] ) if $_[1];
+}
 
 # Find Python or die.
 my $PYTHON = find_cmd(
@@ -112,6 +118,11 @@ extensions as reST:
 =item F<.rst>
 
 =back
+
+To change it the files it recognizes, load this module directly and pass a
+regular expression matching the desired extension(s), like so:
+
+  use Text::Markup::Rest qr{re?st(?:aurant)};
 
 =head1 Author
 

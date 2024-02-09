@@ -52,157 +52,82 @@ sub new {
   return $self;
 }
 
+# Instance Methods
+sub build_dynamic_lib_dist_precompile {
+  my ($self, $class_name) = @_;
+  
+  $self->build_dynamic_lib_dist($class_name, 'precompile');
+}
+
+sub build_dynamic_lib_dist_native {
+  my ($self, $class_name) = @_;
+  
+  $self->build_dynamic_lib_dist($class_name, 'native');
+}
+
 sub build_dynamic_lib_dist {
-  my ($self, $basic_type_name, $category) = @_;
+  my ($self, $class_name, $category) = @_;
   
   # Create the compiler
   my $compiler = SPVM::Builder::Compiler->new(
     include_dirs => $self->include_dirs
   );
   
-  my $success = $compiler->compile($basic_type_name, __FILE__, __LINE__);
+  my $success = $compiler->compile($class_name, __FILE__, __LINE__);
   unless ($success) {
     $compiler->print_error_messages(*STDERR);
     exit(255);
   }
   my $runtime = $compiler->get_runtime;
-  my $class_file = $runtime->get_class_file($basic_type_name);
-  my $method_names = $runtime->get_method_names($basic_type_name, $category);
-  my $precompile_source = $runtime->build_precompile_class_source($basic_type_name);
-  my $dl_func_list = SPVM::Builder::Util::create_dl_func_list($basic_type_name, $method_names, {category => $category});
   
-  $self->build_dist($basic_type_name, {category => $category, class_file => $class_file, dl_func_list => $dl_func_list, precompile_source => $precompile_source});
+  $self->build_dist($class_name, {runtime => $runtime, category => $category});
 }
 
 sub build_dist {
-  my ($self, $basic_type_name, $options) = @_;
+  my ($self, $class_name, $options) = @_;
   
   $options ||= {};
   
-  my $build_dir = $self->build_dir;
-  
-  my $dl_func_list = $options->{dl_func_list};
-  my $class_file = $options->{class_file};
-  my $precompile_source = $options->{precompile_source};
+  my $is_jit = 0;
   
   my $category = $options->{category};
   
-  my $build_src_dir;
-  if ($category eq 'precompile') {
-    $build_src_dir = SPVM::Builder::Util::create_build_src_path($build_dir);
-    mkpath $build_src_dir;
-    
-    my $cc = SPVM::Builder::CC->new(
-      build_dir => $build_dir,
-    );
-    
-    $cc->build_precompile_class_source_file(
-      $basic_type_name,
-      {
-        output_dir => $build_src_dir,
-        precompile_source => $precompile_source,
-        class_file => $class_file,
-      }
-    );
-  }
-  elsif ($category eq 'native') {
-    $build_src_dir = 'lib';
-  }
-
-  my $build_object_dir = SPVM::Builder::Util::create_build_object_path($build_dir);
-  mkpath $build_object_dir;
+  my $build_dir = $self->build_dir;
   
-  my $build_lib_dir = 'blib/lib';
+  my $runtime = $options->{runtime};
+  
+  my $output_dir = 'blib/lib';
   
   $self->build(
-    $basic_type_name,
+    $class_name,
     {
-      compile_input_dir => $build_src_dir,
-      compile_output_dir => $build_object_dir,
-      link_output_dir => $build_lib_dir,
+      runtime => $runtime,
       category => $category,
-      class_file => $class_file,
-      dl_func_list => $dl_func_list,
+      is_jit => $is_jit,
+      output_dir => $output_dir,
     }
   );
 }
 
-sub build_dynamic_lib_dist_precompile {
-  my ($self, $basic_type_name) = @_;
-  
-  $self->build_dynamic_lib_dist($basic_type_name, 'precompile');
-}
-
-sub build_dynamic_lib_dist_native {
-  my ($self, $basic_type_name) = @_;
-  
-  $self->build_dynamic_lib_dist($basic_type_name, 'native');
-}
-
-sub build_at_runtime {
-  my ($self, $basic_type_name, $options) = @_;
+sub build_jit {
+  my ($self, $class_name, $options) = @_;
   
   $options ||= {};
   
-  my $build_dir = $self->build_dir;
+  my $is_jit = 1;
   
-  my $dl_func_list = $options->{dl_func_list};
-  my $class_file = $options->{class_file};
-  my $precompile_source = $options->{precompile_source};
-
   my $category = $options->{category};
   
-  # Build directory
-  if (defined $build_dir) {
-    mkpath $build_dir;
-  }
-  else {
-    confess "The \"build_dir\" field must be defined to build a $category method at runtime. Perhaps the setting of the SPVM_BUILD_DIR environment variable is forgotten";
-  }
+  my $build_dir = $self->build_dir;
   
-  # Source directory
-  my $build_src_dir;
-  if ($category eq 'precompile') {
-    $build_src_dir = SPVM::Builder::Util::create_build_src_path($build_dir);
-    mkpath $build_src_dir;
-    
-    my $cc = SPVM::Builder::CC->new(
-      build_dir => $build_dir,
-      at_runtime => 1,
-    );
-    
-    $cc->build_precompile_class_source_file(
-      $basic_type_name,
-      {
-        output_dir => $build_src_dir,
-        precompile_source => $precompile_source,
-        class_file => $class_file,
-      }
-    );
-  }
-  elsif ($category eq 'native') {
-    my $class_file = $options->{class_file};
-    $build_src_dir = SPVM::Builder::Util::remove_basic_type_name_part_from_file($class_file, $basic_type_name);
-  }
-  
-  # Object directory
-  my $build_object_dir = SPVM::Builder::Util::create_build_object_path($build_dir);
-  mkpath $build_object_dir;
-  
-  # Lib directory
-  my $build_lib_dir = SPVM::Builder::Util::create_build_lib_path($build_dir);
-  mkpath $build_lib_dir;
+  my $runtime = $options->{runtime};
   
   my $build_file = $self->build(
-    $basic_type_name,
+    $class_name,
     {
-      compile_input_dir => $build_src_dir,
-      compile_output_dir => $build_object_dir,
-      link_output_dir => $build_lib_dir,
+      runtime => $runtime,
       category => $category,
-      class_file => $class_file,
-      dl_func_list => $dl_func_list,
-      at_runtime => 1,
+      is_jit => $is_jit,
     }
   );
   
@@ -210,108 +135,79 @@ sub build_at_runtime {
 }
 
 sub build {
-  my ($self, $basic_type_name, $options) = @_;
+  my ($self, $class_name, $options) = @_;
   
   $options ||= {};
   
   my $build_dir = $self->build_dir;
   
-  my $at_runtime = $options->{at_runtime};
+  my $is_jit = $options->{is_jit};
+  
   my $cc = SPVM::Builder::CC->new(
     build_dir => $build_dir,
-    at_runtime => $at_runtime,
+    is_jit => $is_jit,
   );
-  
-  my $dl_func_list = $options->{dl_func_list};
   
   my $category = $options->{category};
   
-  # Class file
-  my $class_file = $options->{class_file};
-  unless (defined $class_file) {
-    my $config_file = SPVM::Builder::Util::get_config_file_from_basic_type_name($basic_type_name);
-    if ($config_file) {
-      $class_file = $config_file;
-      $class_file =~ s/\.config$/\.spvm/;
-    }
-    else {
-      confess "The class file \"$class_file\" is not found";
+  my $runtime = $options->{runtime};
+  
+  my $output_dir = $options->{output_dir};
+  
+  unless (defined $output_dir) {
+    if ($is_jit) {
+      $output_dir = SPVM::Builder::Util::create_build_lib_path($build_dir);
+      mkpath $output_dir;
     }
   }
   
+  # Config
   my $config;
   if ($category eq 'native') {
-    $config = $self->create_native_config_from_class_file($class_file);
+    my $config_file = SPVM::Builder::Util::search_config_file($class_name);
+    
+    unless (defined $config_file) {
+      my $config_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, 'config');
+      
+      confess "A config file \"$config_rel_file\" is not found in (@INC)";
+    }
+    
+    $config = SPVM::Builder::Config->load_config($config_file);
   }
   elsif ($category eq 'precompile') {
     $config = SPVM::Builder::Util::API::create_default_config();
   }
   
-  $config->class_name($basic_type_name);
+  $config->class_name($class_name);
   
-  # Compile source file and create object files
+  $config->category($category);
+  
+  $config->is_jit($is_jit);
+  
+  $config->output_dir($output_dir);
+  
+  # Output directory
+  # Compile source files to object files
   my $compile_options = {
-    input_dir => $options->{compile_input_dir},
-    output_dir => $options->{compile_output_dir},
+    runtime => $runtime,
     config => $config,
-    category => $category,
   };
-
-  my $object_files = $cc->compile_source_files($basic_type_name, $compile_options);
   
-  # Link object files and create dynamic library
+  my $object_files = $cc->compile_class($class_name, $compile_options);
+  
+  # Link object files and generate a dynamic library
   my $link_options = {
-    output_dir => $options->{link_output_dir},
+    runtime => $runtime,
     config => $config,
-    category => $category,
-    dl_func_list => $dl_func_list,
   };
+  
   my $output_file = $cc->link(
-    $basic_type_name,
+    $class_name,
     $object_files,
     $link_options
   );
   
   return $output_file;
-}
-
-sub create_native_config_from_class_file {
-  my ($self, $class_file) = @_;
-  
-  my $config;
-  my $config_file = $class_file;
-  $config_file =~ s/\.spvm$/.config/;
-
-  # Config file
-  if (-f $config_file) {
-    $config = SPVM::Builder::Config->load_config($config_file);
-  }
-  else {
-    my $error = $self->_error_message_find_config($config_file);
-    confess $error;
-  }
-  
-  return $config;
-}
-
-sub _error_message_find_config {
-  my ($self, $config_file) = @_;
-  
-  my $error = <<"EOS";
-Can't find the native config file \"$config_file\".
-
-The config file must contain at least the following code.
-----------------------------------------------
-use strict;
-use warnings;
-
-use SPVM::Builder::Config;
-my \$config = SPVM::Builder::Config->new_gnu99(file => __FILE__);
-
-\$config;
-----------------------------------------------
-EOS
-  
 }
 
 1;

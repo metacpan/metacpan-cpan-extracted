@@ -4,9 +4,26 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 
+my @dirs = (
+	'lib/Genealogy/ObituaryDailyTimes/data'
+);
+
+# FIXME: AUTOMATED_TESTING - create the empty directory in blib
+foreach my $dir(@dirs) {
+	if(! -d $dir) {
+		print "Creating the download directory $dir\n";
+		mkdir $dir, 0755 || die "$dir: $@";
+		if($ENV{'AUTOMATED_TESTING'}) {
+			# So that the directory is copied to blib for testing
+			open(my $dummy, '>', "$dir/dummy");
+		}
+	}
+}
+
 my $prereqs = {
 	'autodie' => 0,
 	'Carp' => 0,
+	'Database::Abstraction' => 0.04,
 	'DBD::SQLite' => 0,
 	'DBD::SQLite::Constants' => 0,
 	'Error::Simple' => 0,
@@ -47,11 +64,14 @@ WriteMakefile(
 		'Test::Carp' => 0,
 		'Test::Most' => 0,
 		'Test::NoWarnings' => 0,
+		'Test::Needs' => 0,
 		# 'Test::Kwalitee' => 0,
 		'IPC::System::Simple' => 0,
 	}, PREREQ_PM => $prereqs,
 	dist => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-	clean => { FILES => 'Genealogy-ObituaryDailyTimes-*' },
+	realclean => {
+		FILES => 'Genealogy-ObituaryDailyTimes-* lib/Genealogy/ObituaryDailyTimes/data'
+	},
 	# META_ADD => {
 		# provides => {}
 	# },

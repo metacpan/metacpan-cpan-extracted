@@ -22,6 +22,7 @@ my @files = (
     't/04correctness.t',
     't/05internals.t',
     't/06-issue-rt106793.t',
+    't/07-issue-rt77533.t',
     't/10pod.t',
     't/11pod-coverage.t',
     't/author-critic.t',

@@ -21,6 +21,7 @@ BEGIN {
   @variables = qw( $CLASS $METHOD $METHOD_REF $TEMP_DIR $TEMP_FILE $TEST_FILE );
 }
 
+use Term::ANSIColor           qw( colored );
 use Scalar::Readonly          qw( readonly_off );
 use Test::Builder::Tester     tests => @functions + @variables + 17;
 
@@ -28,7 +29,7 @@ use Test::Expander            -target   => 'Test::Expander',
                               -tempdir  => { CLEANUP => 1 },
                               -tempfile => { UNLINK  => 1 };
 use Test::Expander::Constants qw(
-  $FMT_INVALID_DIRECTORY $FMT_INVALID_VALUE $FMT_SET_TO $FMT_REQUIRE_DESCRIPTION $FMT_UNKNOWN_OPTION
+  $FMT_INVALID_DIRECTORY $FMT_INVALID_VALUE $FMT_SET_TO $FMT_REQUIRE_DESCRIPTION $FMT_UNKNOWN_OPTION $NOTE
 );
 
 foreach my $function ( sort @functions ) {
@@ -201,10 +202,10 @@ readonly_off( $TEST_FILE );
 test_out(
   join(
     "\n",
-    sprintf( "# $FMT_SET_TO", '$CLASS',     $CLASS ),
-    sprintf( "# $FMT_SET_TO", '$TEMP_DIR',  $TEMP_DIR ),
-    sprintf( "# $FMT_SET_TO", '$TEMP_FILE', $TEMP_FILE ),
-    sprintf( "# $FMT_SET_TO", '$TEST_FILE', path( __FILE__ )->absolute ),
+    sprintf( "# $FMT_SET_TO", exists( $ENV{ HARNESS_PERL_SWITCHES } ) ? '$CLASS'     : colored( '$CLASS',     'cyan' ), $CLASS ),
+    sprintf( "# $FMT_SET_TO", exists( $ENV{ HARNESS_PERL_SWITCHES } ) ? '$TEMP_DIR'  : colored( '$TEMP_DIR',  'cyan' ), $TEMP_DIR ),
+    sprintf( "# $FMT_SET_TO", exists( $ENV{ HARNESS_PERL_SWITCHES } ) ? '$TEMP_FILE' : colored( '$TEMP_FILE', 'cyan' ), $TEMP_FILE ),
+    sprintf( "# $FMT_SET_TO", exists( $ENV{ HARNESS_PERL_SWITCHES } ) ? '$TEST_FILE' : colored( '$TEST_FILE', 'cyan' ), path( __FILE__ )->absolute ),
     "ok 1 - $title",
   )
 );
@@ -232,10 +233,10 @@ readonly_off( $TEST_FILE );
 test_out(
   join(
     "\n",
-    sprintf( "# $FMT_SET_TO", '$CLASS',     $CLASS ),
-    sprintf( "# $FMT_SET_TO", '$TEMP_DIR',  $TEMP_DIR ),
-    sprintf( "# $FMT_SET_TO", '$TEMP_FILE', $TEMP_FILE ),
-    sprintf( "# $FMT_SET_TO", '$TEST_FILE', path( __FILE__ )->absolute ),
+    sprintf( "# $FMT_SET_TO", exists( $ENV{ HARNESS_PERL_SWITCHES } ) ? '$CLASS'     : colored( '$CLASS',     'cyan' ), $CLASS ),
+    sprintf( "# $FMT_SET_TO", exists( $ENV{ HARNESS_PERL_SWITCHES } ) ? '$TEMP_DIR'  : colored( '$TEMP_DIR',  'cyan' ), $TEMP_DIR ),
+    sprintf( "# $FMT_SET_TO", exists( $ENV{ HARNESS_PERL_SWITCHES } ) ? '$TEMP_FILE' : colored( '$TEMP_FILE', 'cyan' ), $TEMP_FILE ),
+    sprintf( "# $FMT_SET_TO", exists( $ENV{ HARNESS_PERL_SWITCHES } ) ? '$TEST_FILE' : colored( '$TEST_FILE', 'cyan' ), path( __FILE__ )->absolute ),
     "ok 1 - $title",
   )
 );
@@ -252,6 +253,10 @@ test_out( "ok 1 - $title" );
 is( $METHOD, $expected, $title );
 test_test( $title );
 
+use Data::Dumper qw( Dumper );
+open( my $fh, '>', '/tmp/Test::Expander.env' );
+print $fh Dumper( { map { /HAR|COV/ ? ( $_ => $ENV{ $_ } ) : () } keys( %ENV ) } );
+
 $title = "test file absent (command line option '-e' simulated)";
 readonly_off( $CLASS );
 readonly_off( $METHOD );
@@ -260,7 +265,13 @@ readonly_off( $TEMP_DIR );
 readonly_off( $TEMP_FILE );
 readonly_off( $TEST_FILE );
 $CLASS = $METHOD = $METHOD_REF = $TEMP_DIR = $TEMP_FILE = $TEST_FILE = undef;
-test_out( "ok 1 - $title" );
+no warnings qw( once );
+test_out(
+  exists( $ENV{ HARNESS_PERL_SWITCHES } )
+    ? ()
+    : sprintf( '# ' . $Test::Expander::FMT_UNSET_VAR, colored( '$CLASS', 'magenta' ) ),
+  "ok 1 - $title",
+);
 {
   my $mock_PathTiny = mock 'Path::Tiny'     => ( override => [ exists      => sub {} ] );
   my $mock_importer = mock 'Importer'       => ( override => [ import_into => sub {} ] );

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Error;
-$Playwright::Error::VERSION = '1.324';
+$Playwright::Error::VERSION = '1.401';
 use parent 'Playwright::Base';
 
 sub new {
@@ -32,21 +32,21 @@ sub stack {
     );
 }
 
-sub message {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'message',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub name {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'name',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub message {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'message',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -96,7 +96,7 @@ Playwright::Error - Automatically generated class for Playwright::Error
 
 =head1 VERSION
 
-version 1.324
+version 1.401
 
 =head1 CONSTRUCTOR
 
@@ -111,37 +111,37 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 Execute the Error::stack playwright routine.
 
-See L<https://playwright.dev/api/class-Error#Error-stack> for more information.
-
-=head2 message(@args)
-
-Execute the Error::message playwright routine.
-
-See L<https://playwright.dev/api/class-Error#Error-message> for more information.
+See L<https://playwright.dev/docs/api/class-Error#Error-stack> for more information.
 
 =head2 name(@args)
 
 Execute the Error::name playwright routine.
 
-See L<https://playwright.dev/api/class-Error#Error-name> for more information.
+See L<https://playwright.dev/docs/api/class-Error#Error-name> for more information.
+
+=head2 message(@args)
+
+Execute the Error::message playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Error#Error-message> for more information.
 
 =head2 on(@args)
 
 Execute the Error::on playwright routine.
 
-See L<https://playwright.dev/api/class-Error#Error-on> for more information.
+See L<https://playwright.dev/docs/api/class-Error#Error-on> for more information.
 
 =head2 evaluate(@args)
 
 Execute the Error::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-Error#Error-evaluate> for more information.
+See L<https://playwright.dev/docs/api/class-Error#Error-evaluate> for more information.
 
 =head2 evaluateHandle(@args)
 
 Execute the Error::evaluateHandle playwright routine.
 
-See L<https://playwright.dev/api/class-Error#Error-evaluateHandle> for more information.
+See L<https://playwright.dev/docs/api/class-Error#Error-evaluateHandle> for more information.
 
 =head1 SEE ALSO
 

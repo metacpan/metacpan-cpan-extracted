@@ -8,7 +8,7 @@ use Lucy::Search::IndexSearcher;
 use Lucy::Highlight::Highlighter;
 use Carp;
 
-our $VERSION = 'v0.11.0';
+our $VERSION = 'v0.11.1';
 
 sub new {
     my ($class, $path) = @_;

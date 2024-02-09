@@ -149,9 +149,12 @@ gerard
 gianni
 gisle
 gopher
+gregoa
+gregor
 haarg
 hakon
 happy
+herrmann
 hiratara
 http
 https

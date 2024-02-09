@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST.pm
-## Version v1.2.0
+## Version v1.2.1
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2023/12/04
+## Modified 2024/02/09
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -40,7 +40,7 @@ BEGIN
     use Net::API::REST::Request;
     use Net::API::REST::Response;
     use Apache2::API::Status;
-    $VERSION = 'v1.2.0';
+    $VERSION = 'v1.2.1';
 };
 
 use strict;
@@ -306,8 +306,9 @@ Ok methods ....: %s
 Path ..........: %s
 Path info .....: %s
 Variables .....: %s
+Params ........: %s
 EOT
-        $self->noexec->messagef( 3, $tmpl, $handler, $ep->access, join( ', ', @{$ep->methods} ), $ep->path, join( ', ', @{$ep->path_info} ), $self->dumper( $ep->variables->as_hash ) );
+        $self->noexec->messagef( 3, $tmpl, $handler, $ep->access, join( ', ', @{$ep->methods} ), $ep->path, join( ', ', @{$ep->path_info} ), $self->dumper( $ep->variables->as_hash( strict => 1 ) ), $self->dumper( $ep->params->as_hash( strict => 1 ) ) );
         # Check access with handler
         my $ok_access = $self->is_allowed( 'access' );
         if( $ok_access && ref( $ok_access ) eq 'CODE' )
@@ -539,7 +540,7 @@ sub jwt_decode
     {
         $opts = shift( @_ );
     }
-    ## A simple decode, most likely for public jwt like google, linkedin, etc.
+    # A simple decode, most likely for public jwt like google, linkedin, etc.
     elsif( scalar( @_ ) == 1 )
     {
         my $token = shift( @_ );
@@ -548,7 +549,7 @@ sub jwt_decode
         local $@;
         eval
         {
-            ## $data = Crypt::JWT::decode_jwt( token => $token );
+            # $data = Crypt::JWT::decode_jwt( token => $token );
             $data = Net::API::REST::JWT::decode_jwt( token => $token );
         };
         if( $@ )
@@ -569,11 +570,11 @@ sub jwt_decode
     key => $opts->{key},
     decode_payload => 1,
     decode_header => 1,
-    ## verify_iss => sub{ 1; }
+    # verify_iss => sub{ 1; }
     verify_aud => qr{^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$},
     };
     # PBES2-HS256+A128KW
-    ## accepted_alg => qr{^(?:PBES2\-HS256\+A128KW|HS256)$},
+    # accepted_alg => qr{^(?:PBES2\-HS256\+A128KW|HS256)$},
     if( $opts->{accepted_algo} )
     {
         return( $self->error( "Accepted alorithm option must be an array reference." ) ) if( !$self->_is_array( $opts->{accepted_algo} ) );
@@ -584,7 +585,7 @@ sub jwt_decode
         }
     }
     
-    ## accepted_enc => qr{^(?:A128GCM)$},
+    # accepted_enc => qr{^(?:A128GCM)$},
     if( $opts->{accepted_enc} )
     {
         return( $self->error( "Accepted encoding option must be an array reference." ) ) if( !$self->_is_array( $opts->{accepted_enc} ) );
@@ -898,6 +899,8 @@ sub route
                     variables => $vars,
                     access => $access,
                     path => $uri,
+                    ( defined( $params ) ? ( params => $params ) : () ),
+                    debug => $self->debug,
                 );
                 $ep->path_info( [ splice( @$parts, $pos + 1 ) ] ) if( $#$parts > $pos );
                 return( $ep );
@@ -953,6 +956,7 @@ sub route
                             access => $access,
                             path => $uri,
                             ( defined( $params ) ? ( params => $params ) : () ),
+                            debug => $self->debug,
                         );
                         return( $ep );
                     }
@@ -995,6 +999,7 @@ sub route
                                 access => $access,
                                 path => $uri,
                                 ( defined( $params ) ? ( params => $params ) : () ),
+                                debug => $self->debug,
                             );
                         };
                         if( $@ )
@@ -1054,6 +1059,8 @@ sub route
                         variables => $vars,
                         access => $access,
                         path => $uri,
+                        ( defined( $params ) ? ( params => $params ) : () ),
+                        debug => $self->debug,
                     );
                 };
                 if( $@ )
@@ -1098,6 +1105,7 @@ sub route
                 : exists( $methods->{ uc( $http_meth ) } ) ? $methods->{ uc( $http_meth ) } : $ref->{_handler};
             
             my $var_name = $ref->{_name};
+            $params = $ref->{_params} if( CORE::exists( $ref->{_params} ) && ref( $ref->{_params} ) eq 'HASH' );
             # For variable type to be array
             if( exists( $ref->{_type} ) )
             {
@@ -1125,7 +1133,6 @@ sub route
             {
                 $vars->{ $var_name } = $part;
             }
-            $params = $ref->{_params} if( CORE::exists( $ref->{_params} ) && ref( $ref->{_params} ) eq 'HASH' );
             
             # We reached the end, return the handler
             if( $pos == $#$parts )
@@ -1141,6 +1148,7 @@ sub route
                         access => $access,
                         path => $uri,
                         ( defined( $params ) ? ( params => $params ) : () ),
+                        debug => $self->debug,
                     );
                     $ep->access( $ref->{_access_control} ) if( $ref->{_access_control} );
                     return( $ep );
@@ -1187,6 +1195,7 @@ sub route
                             access => $access,
                             path => $uri,
                             ( defined( $params ) ? ( params => $params ) : () ),
+                            debug => $self->debug,
                         );
                     };
                     if( $@ )
@@ -1244,7 +1253,11 @@ sub routes
             foreach my $k ( sort( keys( %$this ) ) )
             {
                 my $v = $this->{ $k };
-                if( ref( $v ) eq 'HASH' )
+                if( $k eq '_params' )
+                {
+                    return( "Value provided for _params is not an hash reference." ) if( ref( $v ) ne 'HASH' );
+                }
+                elsif( ref( $v ) eq 'HASH' )
                 {
                     if( !CORE::exists( $v->{_handler} ) &&
                         !CORE::exists( $v->{_delete} ) && 
@@ -1265,10 +1278,6 @@ sub routes
                 {
                     return( "Value provided for _name is empty." ) if( !length( $v ) );
                     return( "Value provided for _name is a reference, but I was expecting a scalar." ) if( ref( $v ) );
-                }
-                elsif( $k eq '_params' )
-                {
-                    return( "Value provided for _params is not an hash reference." ) if( ref( $v ) ne 'HASH' );
                 }
                 elsif( ref( $v ) eq 'CODE' )
                 {
@@ -1411,6 +1420,7 @@ sub init
     $self->{access} = 'public';
     $self->{handler} = '';
     $self->{methods} = [];
+    $self->{params} = {};
     $self->{path} = '';
     $self->{path_info} = [];
     $self->{variables} = {};
@@ -1600,7 +1610,7 @@ Net::API::REST - Framework for RESTful APIs
 
 =head1 VERSION
 
-    v1.2.0
+    v1.2.1
 
 =head1 DESCRIPTION
 

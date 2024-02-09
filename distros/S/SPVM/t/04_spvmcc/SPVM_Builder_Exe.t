@@ -27,14 +27,12 @@ my $build_dir = $ENV{SPVM_BUILD_DIR};
   my $basic_type_name = 'MyExe';
   my $include_dirs = [map { "$_/SPVM" } "$test_dir/lib", @INC];
   my $output_file = "$build_dir/work/myexe";
-  my $config_file = "$test_dir/myexe.config";
 
   my $builder_exe = SPVM::Builder::Exe->new(
     class_name => $basic_type_name,
     output_file => $output_file,
     build_dir => $build_dir,
     include_dirs => $include_dirs,
-    config_file => $config_file,
   );
   
   $builder_exe->build_exe_file;
@@ -48,7 +46,7 @@ my $build_dir = $ENV{SPVM_BUILD_DIR};
     ok($link_info->config->class_name, 'TestCase::NativeAPI2');
     ok($link_info->config->ld, $config->ld);
     ok($link_info->config->ldflags, $config->ldflags);
-    like($link_info->output_file, qr|$build_dir/work/myexe$Config{exe_ext}|);
+    like($link_info->config->output_file, qr|$build_dir/work/myexe$Config{exe_ext}|);
     my $is_object_files = 1;
     for my $object_file (@{$link_info->object_files}) {
       unless ($object_file->isa('SPVM::Builder::ObjectFileInfo')) {
@@ -79,12 +77,13 @@ my $build_dir = $ENV{SPVM_BUILD_DIR};
   my $basic_type_name = 'MyExe::Foo::Bar';
   my $include_dirs = [map { "$_/SPVM" } "$test_dir/lib", @INC];
   my $output_file = "$build_dir/work/myexe";
-
+  
   my $builder_exe = SPVM::Builder::Exe->new(
     class_name => $basic_type_name,
     output_file => $output_file,
     build_dir => $build_dir,
     include_dirs => $include_dirs,
+    allow_no_config_file => 1,
   );
   
   $builder_exe->build_exe_file;

@@ -1,7 +1,7 @@
 package Bio::MUST::Core::SeqId;
 # ABSTRACT: Modern and legacy MUST-compliant sequence id
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::SeqId::VERSION = '0.212670';
+$Bio::MUST::Core::SeqId::VERSION = '0.240390';
 use Moose;
 use namespace::autoclean;
 
@@ -204,10 +204,16 @@ const my @GENERA  => qw(
     A-2
     acetamiprid-degrading
     Activation-tagging
-    Adeno-associated
     Adeno-Associated
+    Adeno-associated
+    adeno-associated
+    Agave-associated
     Aids-associated
+    Aksy-Durug
+    alfalfa-associated
+    Alfalfa-associated
     alk-system
+    allo-octoploid
     Altai-like
     Amalga-like
     ammonia-oxidizing
@@ -218,9 +224,10 @@ const my @GENERA  => qw(
     Anopheline-associated
     antibiotic-resistant
     antimony-reducing
-    Apple-associated
     Araraquara-like
+    Ardenna-associated
     Argemone-Cactus
+    Aristolochia-associated
     Arrabida-like
     arsenate-reducing
     arsenic-metabolizing
@@ -238,8 +245,9 @@ const my @GENERA  => qw(
     Bacteroides-like
     Banna-like
     Barkedji-like
-    Bas-Congo
     Bastrovirus-like_virus/VietNam/Bat/17819_21
+    Bat-associated
+    Bayan-Khairhan-Ula
     BD1-11
     BD1-7
     BD2-11
@@ -252,11 +260,14 @@ const my @GENERA  => qw(
     benzene-degrading
     benzoapyrene-degrading
     Benzoyl-CoA
+    Bercke-Baary
+    beta-cyfluthrin-degrading
     beta-symbiont
     Bi-allelically
     Bi-directional
     Bi-molecular
     Bidnavirus-like
+    Bifidobacterium-E.
     biocide-degrading
     biphenthrin-degrading
     biphenyl-degrading
@@ -264,11 +275,13 @@ const my @GENERA  => qw(
     Black-and-white
     Black-eyed
     Black-headed
+    black-headed
     Blackcurrant-associated
     Bo-Circo-like
     Bombus-associated
     Bos-associated
     Bovine-like
+    Broad-billed
     Broad-leafed
     bromate-reducing
     bromoform-metabolizing
@@ -312,7 +325,6 @@ const my @GENERA  => qw(
     Buxtonella-like
     C-terminal
     C.glutamicum-E.coli
-    Cachavirus-1A
     Cachavirus-1B
     Cafeteriavirus-dependent
     Calf-giraffe
@@ -320,11 +332,16 @@ const my @GENERA  => qw(
     Calhevirus-2b
     Camellia-associated
     Campylobacter-like
+    Candida/CUG-Ser1
+    Caraparu-like
     carbazole-degrading
     Carpediemonas-like
+    Carpotroche-associated
     carrageenase-producing
+    Carrot-associated
     Cas-Br-E
     Cas-NS-1
+    Cassava-Congo
     CASV-2
     CAT-levansucrase
     Catch-me-cave
@@ -334,15 +351,17 @@ const my @GENERA  => qw(
     CFB-group
     chain-forming
     Chaq-like
+    Cherry-associated
     Chiba-040502
+    chieh-qua
     chlamydia-associated
     Chlorante-Aster
-    Chlorella-like
     chloromethane-metabolizing
     chlortetracycline-resistant
     Choricystis-like
     Chryso-hypnum
     Chrysovirus-like
+    chu-like
     cilia-associated
     Circo-like
     Circovirus-like
@@ -359,13 +378,15 @@ const my @GENERA  => qw(
     Counter-selectable
     Cowpox-Vaccinia
     Coxiella-like
+    CP52-degrading
     Cr(VI)-reducing
+    Crab-eating
     Crane-associated
-    crAss-like
     CrAss-like
     Cre-expression
     Cre-lox
     Crimean-Congo
+    CRISPR-Cas
     CRISPR-cas9
     CRISPR-mediated
     Crow-dipper
@@ -502,6 +523,10 @@ const my @GENERA  => qw(
     Cryphonectria-Endothia
     Cryptaulaxoides-like
     Ctenophore-associated
+    CTFE4-defluorinating
+    CUG-Ala
+    CUG-Ser1
+    CUG-Ser2
     Culex-associated
     Culicine-associated
     cyanobacteria-associated
@@ -519,11 +544,9 @@ const my @GENERA  => qw(
     dibenzofuran-degrading
     dichloromethane-degrading
     Dietzia-Escherichia
-    Dimorpha-like
     Diporeia-associated
     DMSP-degrading
     DNA-binding
-    Dobrava-Belgrade
     Dragonfly-associated
     Drosophila-associated
     DSMP-degrading
@@ -531,9 +554,11 @@ const my @GENERA  => qw(
     Duck-associated
     Duck-dominant
     dye-degrading
+    Echarate-like
     EDTA-degrading
     Ehrlichia-like
     EIAV-based
+    Endornaviridae-like
     Endornavirus-like
     Entamoeba-associated
     Epomophorini-Myonycterini
@@ -550,13 +575,16 @@ const my @GENERA  => qw(
     Fe-oxidizing
     fenpropathrin-degrading
     fenthion-degrading
+    Fer-de-lance
     Fermo-like
     Fesa-like
     Fibropapilloma-associated
     Finkel-Biskis-Jinkins
     Fisa-like
+    Fish-associated
     FLAG-tagging
     Flavi-like
+    Flaviridae-like
     Flavobacterium-like
     Flexibacter-like
     Flexistipes-like
@@ -564,9 +592,13 @@ const my @GENERA  => qw(
     Fonticula-like
     Food-grade
     Foot-and-mouth
+    Four-toed
     Francisella-like
     FRT-Tp-FRT
     furfural-degrading
+    GABA-v2-NaVbeta1-myc
+    GABA-v3-NaVbeta1-myc
+    GABA-v4-NaVbeta1-myc
     gamma-symbiont
     Ganwon-do
     Gardner-Arnstein
@@ -601,9 +633,11 @@ const my @GENERA  => qw(
     Hardy-Zuckerman
     Haruka-associated
     HCV/GBV-B
+    Heart-leaved
     Hedyotis-Oldenlandia
     Helper-independent
     Hemibarbus-Squalidus
+    Henipa-like
     HERV-H/env59
     HERV-H/env60
     HERV-H/env62
@@ -618,9 +652,12 @@ const my @GENERA  => qw(
     Hom-1
     HPIV-1
     HSV-tk-containing
+    hSyn-NaVbeta1-myc
     HTLV-1
     HTLV-3
     Humaita-Tubiacanga
+    Human-associated
+    Human-Simian
     Hump-back
     Husa-like
     HVAC-associated
@@ -628,6 +665,7 @@ const my @GENERA  => qw(
     hydrogen-producing
     Hyphomicrobium-like
     Ichthyobodo-related
+    Iflaviridae-like
     IncP-1
     IncP-1beta
     IncQ-like
@@ -638,9 +676,7 @@ const my @GENERA  => qw(
     IRE/CTVM19-associated
     iron-reducing
     Isosphaera-like
-    Issyk-kul
     Issyk-Kul
-    J-virus
     Janibacter-like
     jellyfish-degrading
     Jiangxi12-B14
@@ -654,10 +690,12 @@ const my @GENERA  => qw(
     LANV-2
     Large-insert
     Leafhopper-borne
+    Leafy-liverwort
     Legionella-like
     Leguminosae-associated
     Leptotrichia-like
     lignocellulose-degrading
+    Lily-associated
     LMWdDNA-degrading
     Long-fingered
     long-tailed
@@ -675,6 +713,7 @@ const my @GENERA  => qw(
     male-killing
     manganese-oxidation
     manganese-oxidizing
+    Marcus-kochia
     Marinobacter-like
     Mason-Pfizer
     Massilia-like
@@ -682,8 +721,23 @@ const my @GENERA  => qw(
     Maus-Elberfeld
     Maverick-related
     MCG-1
+    MCG-10
+    MCG-11
+    MCG-12
+    MCG-13
+    MCG-14
     MCG-15
-    MCG-6
+    MCG-16
+    MCG-17
+    MCG-2
+    MCG-3
+    MCG-4
+    MCG-5a
+    MCG-5b
+    MCG-7
+    MCG-8
+    MCG-9
+    mDlx-NaVbeta1-myc
     Meaban-like
     Melon-headed
     mercury-resistant
@@ -703,6 +757,8 @@ const my @GENERA  => qw(
     MLV-like
     MLV-related
     MMTV-luciferase
+    Mongoose-associated
+    mongoose-associated
     monochloroacetic-acid-degrading
     Mononegavirus-like
     mosquito-borne
@@ -721,22 +777,26 @@ const my @GENERA  => qw(
     naphthalene-degrading
     naphthalene-utilizing
     narna-like
+    Narnaviridae-like
     Nebraska-like
+    nege-like
     Negelike-virus
     Negev-like
+    Negeviridae-like
     Neo-uvaria
     NFAT-DsRed
     nitrite-oxidizing
     nitrogen-fixing
     Nivun-Haamir
     NL63-related
+    Nodaviridae-like
     Non-A,
     non-culturable
     Non-geniculate
     Non-human
     non-mammal
-    Non-primate
     non-primate
+    Non-primate
     Norovirus/GII.4/1993-6/UK
     Norovirus/Hu/GII.2/V1/09/18-Jan-2009/Slovenia
     Norovirus/Hu/GII.4/1732/07/07-Jun-2007/Slovenia
@@ -764,6 +824,7 @@ const my @GENERA  => qw(
     Odonata-associated
     oil-degrading
     oil-susceptible
+    OM05-12
     Onyong-nyong
     oomycete-like
     oral-nasopharyngeal
@@ -779,24 +840,31 @@ const my @GENERA  => qw(
     Parecho-like
     Paromomycin-resistant
     Partiti-like
+    Partitiviridae-like
     Partitivirus-like
     Parvo-like
     Passionfruit-associated
     PCB-dechlorinating
+    peach-associated
     Peach-associated
     Pechuel-loeschea
+    Peixe-Boi
     Peptococcus-like
     Percalates-clade
-    perchlorate-reducing
     Perchlorate-reducing
+    perchlorate-reducing
     Perkinsela-like
     Perkinsiella-like
     pesticide-degrading
+    Petroica-associated
     Pfiesteria-like
+    PHA-producing
     pharmaceutical-degrading
+    Pheasant-associated
     phenanthrene-degrading
     phenanthrene-metabolizing
     phenol-degrading
+    Phenuiviridae-like
     Phlebotomus-associated
     Phoma-like
     phosphorous-removal
@@ -807,13 +875,13 @@ const my @GENERA  => qw(
     piggyBac-helper
     Pike-perch
     Pink-eared
+    PinkBerry-associated
     Piscirickettsia-like
     Pistacia-associated
     pkBIG-alpha
     pLEV-TeLS
     pnpB-pnpA
     Po-Circo-like
-    Poaceae-associated
     Point-Douro
     Polycystine-like
     porcine-murine
@@ -825,6 +893,7 @@ const my @GENERA  => qw(
     PreXMRV-2
     Promoter-probe
     Promoter-trap
+    propionate-degrading
     Pseudo-nitzschia
     Pseudoalteromonas-like
     PTE-S5
@@ -834,7 +903,9 @@ const my @GENERA  => qw(
     Quinoa-associated
     R6K-based
     Raccoon-associated
+    ray-finned
     RDHV-like
+    Reagent-associated
     Red-bellied
     Red-billed
     Red-capped
@@ -845,9 +916,15 @@ const my @GENERA  => qw(
     Red-handed
     Red-necked
     Red-recombineering
+    red-rumped
     Regulator-reporter
+    Reoviridae-like
     Reptile-associated
     Retro-megavirus
+    Retropinna-associated
+    Rhabdoviridae-like
+    Rhinopithecus-associated
+    rice-associated
     Rigidomastix-like
     RIOMV-3
     RIOMV-4
@@ -893,13 +970,19 @@ const my @GENERA  => qw(
     S2-like
     S5-like
     S7-like
+    SAfia-400D
+    SAfia-838D_Ambidensovirus
+    Saint-Floris
     Santee-Cooper
     Sapelovirus-like
     Sapporo-HK299
+    SARS-CoV-2
     SARS-like
     SARS-related
+    Saw-shelled
     Saxo-fridericia
     Sciuro-hypnum
+    Sea-firefly
     Sebastiano-Schaueria
     selenate-reducing
     Selenomonas-like
@@ -912,6 +995,7 @@ const my @GENERA  => qw(
     Shuttle/allelic-replacement
     Sikhote-Alin
     simazine-degrading
+    Simian-Chimpanzee
     Simian-Human
     Sindbis-like
     Single-copy
@@ -927,6 +1011,7 @@ const my @GENERA  => qw(
     Soft-shell
     Soft-shelled
     Soil-borne
+    Solemoviridae-like
     Solms-laubachia
     Soybean-associated
     Spawner-isolated
@@ -944,13 +1029,17 @@ const my @GENERA  => qw(
     Sticholonche-like
     Stolbur-It
     Stolbur-Rus
+    stool-associated
     Striga-associated
+    String-of-pearls
     Stripa-derived
     Stx1-converting
     Stx1a-converting
     Stx2-converting
     Stx2a-converting
+    Stx2c-converting
     Stx2d-converting
+    StxXX-converting
     sulfate-reducing
     sulfide-oxidizing
     sulfite-reducing
@@ -968,6 +1057,7 @@ const my @GENERA  => qw(
     Tea-oil
     Temperature-sensitive
     Tent-making
+    Teosinte-associated
     Tetracycline-inducible
     Theileria-related
     Theilers-like
@@ -979,6 +1069,7 @@ const my @GENERA  => qw(
     Tick-associated
     tick-borne
     Tick-borne
+    TIM5-like
     toluene-degrading
     Tombus-like
     Totivirus-like
@@ -986,6 +1077,7 @@ const my @GENERA  => qw(
     trichloroacetic-acid-degrading
     triclosan-degrading
     Trifolium-associated
+    tris(2-butoxyethyl)
     TSE-associated
     TTV-like
     Twisted-stalk
@@ -1004,11 +1096,15 @@ const my @GENERA  => qw(
     UAS-Red
     UAS-Stinger
     Ui-te-Rangiora
+    Uzun-Agach
+    Vaccinium-associated
     Van-royena
     VDV-1/DWV
+    Vera-duthiea
     VESV-like
     Violaceae-associated
     Virga-like
+    Virgaviridae-like
     Viroid-like
     Virus-associated
     Virus-induced
@@ -1028,11 +1124,11 @@ const my @GENERA  => qw(
     Whitefly-associated
     Whitefly-transmitted
     WPS-2
-    X-cell
     X-symbiont
     Xanthomonas-like
     XMRV-like
     XMRV-related
+    Xuzhou-associated
     xylene-degrading
     Y-symbiont
     Yaba-7
@@ -1042,12 +1138,18 @@ const my @GENERA  => qw(
     Yaounde-like
     Yellow-bellied
     Yellow-breasted
+    Yellow-eyed
+    yellow-necked
     Yellow-wax
+    Zostera-associated
     );
 
 const my @SPECIES => qw(
+    023Pt_psg01
     04_1_1
     070605-23_N11_16
+    0a_pSin-ctrl
+    0b_pSin-L7Ae
     100_oclvp78
     101_oclvp44
     102_oclvp93
@@ -1216,7 +1318,11 @@ const my @SPECIES => qw(
     199_oclvp489
     19_xplvp109
     1_xplvp296
+    1a_pSin-SEAP-PP7
     1AZ_DGR
+    1b_pSin-SEAP-MS2
+    1c_pSin-secNluc-PP7
+    1d_pSin-secNluc-MS2
     200_oclvp497
     2010_Msc_17636_VA3/HMO
     2010_Msc_18001_MLB
@@ -1248,7 +1354,23 @@ const my @SPECIES => qw(
     29_xplvp147
     2_xplvp435
     2A3B_DGR
+    2a_pSin-PCP-cNOT7
     2ANA_DGR
+    2b_pSin-PCP-ppvS-cNOT7
+    2c_pSin-PCP-tevS-cNOT7
+    2d_pSin-PCP-cNOT7-ppvS-degron
+    2e_pSin-degron-tevS-PCP-cNOT7
+    2f_pSin-PPVp-AND-TEVp
+    2g_pSin-PPVp-OR-TEVp
+    2h_pSin-PPVp-NAND-TEVp
+    2i_pSin-PPVp-NOR-TEVp
+    2j_pSin-PPVp-XOR-TEVp
+    2k_pSin-PPVp-XNOR-TEVp
+    2l_pSin-PPVp-IMPLY-TEVp
+    2m_pSin-PPVp-NIMPLY-TEVp
+    2n_pSin-TEVp-IMPLY-PPVp
+    2o_pSin-TEVp-NIMPLY-PPVp
+    2p_pSin-PCP-tevS-cNOT7-MS2
     3-5_YC-ZSS-LKJ-3024
     3-7_YC-ZSS-LKJ-1723
     30_xplvp384
@@ -1265,6 +1387,17 @@ const my @SPECIES => qw(
     397_MR-2014
     39_xplvp47
     3_xplvp302
+    3a_pSin-MCP-cNOT7
+    3b_pSin-MCP-smvS-cNOT7
+    3c_pSin-MCP-tvmvS-cNOT7
+    3d_pSin-MCP-cNOT7-smvS-degron
+    3e_pSin-degron-tvmvS-MCP-cNOT7
+    3f_pSin-SMVp-AND-TVMVp
+    3g_pSin-SMVp-OR-TVMVp
+    3h_pSin-SMVp-NAND-TVMVp
+    3i_pSin-SMVp-NOR-TVMVp
+    3j_pSin-SMVp-XOR-TVMVp
+    3k_pSin-MCP-smvS-cNOT7-PP7
     4-1_YC-ZSS-LKJ-010-0902
     40_xplvp46
     41_xplvp469
@@ -1283,6 +1416,20 @@ const my @SPECIES => qw(
     49_oclvp161
     4_57p
     4_xplvp418
+    4a_pSin-PPVp
+    4b_pSin-Kt-PPVp
+    4c_pSin-TEVp
+    4d_pSin-nTEVp-PLY1-2A-ABI-cTEVp
+    4e_pSin-nTEVp-smvS-PLY1-2A-ABI-smvS-cTEVp
+    4f_pSin-nTEVp-smvS-tvmvS-PLY1-2A-ABI-smvS-tvmvS-cTEVp
+    4g_pSin-SMVp
+    4h_pSin-SMVp-PP7
+    4i_pSin-nSMVp-tevs-tevs-cSMVp-MS2
+    4j_pSin-nSMVp-FRB-2A-FKBP-cSMVp
+    4k_pSin-nSMVp-tevS-FRB-2A-FKBP-tevS-cSMVp
+    4l_pSin-TVMVp
+    4m_pSin-nTVMVp-CIBN-2A-CRY2-cTVMVp
+    4n_pSin-nTVMVp-tevS-CIBN-2A-CRY2-tevS-cTVMVp
     507_MR-2014
     50_oclvp203
     51_oclvp114
@@ -1624,6 +1771,27 @@ const my @SPECIES => qw(
     ADB_BD111
     Ae_JM910
     AF_NAK1-3
+    AGG1095_KMOsgRNAs
+    AGG1207_AeBGCN-Cas9
+    AGG1208_sds3-Cas9
+    AGG1245_Pub_AaHyPiggyBac_SV40
+    AGG1448_zpg2kb-Cas9
+    AGG1547_nos-Cas9
+    AGG1551_shu-Cas9
+    AGG1552_Ewald-Cas9
+    AGG1687_zpg4kb-Cas9
+    AGG1747_pGL3_PUb(-565)-FF
+    AGG1748_pGL3_PUb(-465)-FF
+    AGG1749_pGL3_PUb(-365)-FF
+    AGG1750_pGL3_PUb(-265)-FF
+    AGG1751_pGL3_PUb(-143)-FF
+    AGG1752_pGL3_PUb(-133_77bp-intron)-FF
+    AGG2143_PUb(-133_77bp-intron)-AmC-SV40
+    AGG2144_PUb(-265)-AmC-SV40
+    AGG2145_PUb(-565)-AmC-SV40
+    AGG2146_PUb(-2565)-AmC-SV40
+    AGG2196_pGL3_PUb(-2565)-FF
+    AH_HY1
     Al31_1
     AO2_32
     apr34_000142F
@@ -1683,6 +1851,9 @@ const my @SPECIES => qw(
     B_D75_82
     B_EHO
     B_UC1
+    BAC_Igh_FGFR3-EGFP
+    backbone_CONEXER_BAC_Universal1
+    backbone_CONEXER_BAC_Universal2
     Bact_1
     Bact_10
     Bact_11
@@ -1732,6 +1903,7 @@ const my @SPECIES => qw(
     BgL12_3S_Black
     BgL12_3S_Purple
     BgL12_3S_Red
+    bII_SDSRA_K68
     BJCX4_extB9.1
     BM0354_1
     BM0354_2
@@ -1801,9 +1973,9 @@ const my @SPECIES => qw(
     BtCoV/MSTM6/Min_nat/RSA/2010
     BtCoV/NCL_MCO1/Mop_con/RSA/2012
     BtCoV/OCR11/Pte_par/CRC/2011
-    BtCoV/Rhi_bla/BB98-22/BGR/2008
-    BtCoV/Rhi_eur/BB98-92/BGR/2008
-    BtCoV/Rhi_eur/BB98-98/BGR/2008
+    BtCoV/Rhi_bla/BB89-22/BGR/2008
+    BtCoV/Rhi_eur/BB89-92/BGR/2008
+    BtCoV/Rhi_eur/BB89-98/BGR/2008
     BtCoV/Rhi_eur/BB99-04/BGR/2009
     BtCoV/Rhi_fer/FR0711-B11/FRA/2011
     BtCoV/Rhi_fer/FR0711-B3/FRA/2011
@@ -1825,6 +1997,7 @@ const my @SPECIES => qw(
     BtCoV/Rhi_hip/Slo57/SLO/2009
     BtCoV/Rhi_hip/Slo69/SLO/2009
     BtCoV/VH_NC2/Neo_cap/RSA/2012
+    bunya-arena-like_virus
     C01_2wb_b10_2005-12-15
     C02_1ub_b10_2005-12-15
     C100_CLW
@@ -1859,6 +2032,9 @@ const my @SPECIES => qw(
     CCSD_DF2030_TE37_isolate_1
     CCSD_DF2030_TE37_isolate_2
     Ced_B08
+    CFTR_BAC01
+    CFTR_BAC02
+    CFTR_BAC03
     CG06_land_8_20_14_3_00_33_50
     CG06_land_8_20_14_3_00_37_11
     CG07_land_8_20_14_0_80_38_8
@@ -1890,48 +2066,12 @@ const my @SPECIES => qw(
     CH64b_2B
     CN30_LM100
     Col_A
-    cr106_1
-    cr107_1
-    cr108_1
-    cr109_1
-    cr10_1
-    cr110_1
-    cr111_1
-    cr112_1
-    cr113_1
-    cr114_1
-    cr115_1
-    cr116_1
-    cr118_1
-    cr11_1
-    cr124_1
-    cr125_1
-    cr126_1
-    cr127_1
-    cr128_1
-    cr130_1
-    cr131_1
-    cr1_1
+    coronavirus/KP817/Phy_dis/PAN/2011
     CR1_10_MR-20148
     CR1_11_MR-2014
-    cr271_1
-    cr272_1
-    cr273_1
-    cr3_1
-    cr4_1
-    cr50_1
-    cr52_1
-    cr53_1
-    cr55_1
-    cr56_1
     CR5_1_MR-2014
     CR5_2_MR-2014
-    cr60_1
-    cr6_1
-    cr7_1
     CR7_6_MR-2014
-    cr85_1
-    cr8_1
     CRF01_AE
     CRF02_AG:08GQ032
     CRF02_AG:08GQ057
@@ -2004,6 +2144,70 @@ const my @SPECIES => qw(
     D2_1_3F-16sF
     D3_1_1F-16sF
     D3_1_3_2F-16sF
+    D_HF1_1
+    D_HF1_11
+    D_HF1_3
+    D_HF2_144
+    D_HF2_219
+    D_HF2_273
+    D_HF2_7
+    D_HF2_82
+    D_HF32_302
+    D_HF32_91
+    D_HF33_10
+    D_HF33_14
+    D_HF34_23
+    D_HF34_8
+    D_HF35_23
+    D_HF36_426
+    D_HF36_482
+    D_HF38_14
+    D_HF38_28
+    D_HF38_35
+    D_HF3_10
+    D_HF3_12
+    D_HF3_19
+    D_HF3_26
+    D_HF3_8
+    D_HF4_111
+    D_HF4_124
+    D_HF4_1353
+    D_HF4_1386
+    D_HF4_144
+    D_HF4_149
+    D_HF4_150
+    D_HF4_162
+    D_HF4_1794
+    D_HF4_2
+    D_HF4_2562
+    D_HF4_274
+    D_HF4_298
+    D_HF4_320
+    D_HF4_329
+    D_HF4_340
+    D_HF4_371
+    D_HF4_79
+    D_HF4_80
+    D_HF5_1
+    D_HF5_107
+    D_HF5_131
+    D_HF5_137
+    D_HF5_2C
+    D_HF5_2R
+    D_HF5_3
+    D_HF5_49
+    D_HF5_61
+    D_HF5_75
+    D_HF5_96
+    D_HF6_100
+    D_HF6_206
+    D_HF6_322
+    D_HF6_34
+    D_HF6_591
+    D_HF7_11
+    D_HF7_3
+    D_HF7_66
+    D_HF7_9
     DAB_16s_R32(2)
     Davis_19N
     DB_16s_F5
@@ -2068,6 +2272,7 @@ const my @SPECIES => qw(
     E56_UTI
     E60_UTI
     E81_UTI
+    EMG_100139454
     Ep06i_A10B
     Ep06i_A1B
     Ep06i_A4C
@@ -2075,6 +2280,7 @@ const my @SPECIES => qw(
     EqCoPV_11
     EqCoPV_8
     EqCoPV_9
+    EqCoPV_A4
     ES5_1357
     ES6_1418
     ES6_478
@@ -2484,6 +2690,7 @@ const my @SPECIES => qw(
     HMP_JCVI_SC0278
     HMP_JCVI_SC0281
     hmp_mda_pilot_jcvi_0005
+    Hoplo_CB025_CB025_18_01
     Horo_12
     Horo_15
     Hu/Caterer_Company_1_pat_1/10-04-2003/NL
@@ -3240,6 +3447,8 @@ const my @SPECIES => qw(
     idli_44
     idli_45
     IFC_YC12
+    IHP_575_RK_Exo70_Native
+    IHP_576_RK_native
     IIIL_D
     IK_MB1-800R
     IK_MB10-800R
@@ -3325,6 +3534,9 @@ const my @SPECIES => qw(
     ISW_2
     JCVI_control_MDA_Ecoli_02
     JCVI_control_MDA_Saureus_10
+    JGI_KR11_SmLR_4_I6
+    JGI_KR11_SmLR_5_K8
+    JGI_KR13_SmLR_4_D7
     JL4_S
     JN18_A7_F*
     Jomon_CT89
@@ -3360,6 +3572,8 @@ const my @SPECIES => qw(
     Liv16S_LC_L1
     LUC13011_P14
     M12R1_907R_F06
+    M13K07_deltapIII_deltaf1ori
+    M32_bin.2
     M:02_AG
     M:A1_BA106
     M:A1_BA110
@@ -5237,9 +5451,18 @@ const my @SPECIES => qw(
     MPB_LPxJP_h
     MPB_OSA52A
     MPB_OSA52B
+    MSD3_H10
+    MSK17_88
+    MSK18_59
+    MSK20_81
     MSX_63619
     Myotis/13rs384_31/Italy/2012
+    N118_L5885_C67.5
     N11_011-8
+    N127_L5035_C77.3
+    N159_L15121_C59.1
+    N55_L8635_C17.5
+    N88_L5317_C7.5
     N_OV_001
     N_OV_003
     N_OV_008
@@ -5299,6 +5522,18 @@ const my @SPECIES => qw(
     NSA_23
     O_ANT70
     O_MVP5180
+    ophiovirus_agro
+    ophiovirus_brac
+    ophiovirus_den
+    ophiovirus_indi
+    ophiovirus_macra
+    ophiovirus_mori
+    ophiovirus_odo
+    ophiovirus_pli
+    ophiovirus_poa
+    ophiovirus_sela
+    ophiovirus_tri
+    ophiovirus_visco
     OSW_10
     OU_20
     OX_B
@@ -5323,6 +5558,55 @@ const my @SPECIES => qw(
     P_270_FSTHT
     P_278_FSTHT
     P_321_FSTCO
+    pAAVsc_gLDLR
+    pAAVsc_gPCSK9
+    pAAVsc_gSerpina1a
+    pAAVsc_gSerpina1b
+    pAAVsc_gSerpina1c
+    pAAVsc_gSerpina1d
+    pAAVsc_gSerpina1e
+    pAAVsc_LP1-Cre
+    pAH05_PsodB-100-GFPova_RhyB2-10-BFP_mCh
+    PAS_122122
+    pasteuri_A
+    pBbB1c-CBGA_PlacUV5
+    pBbB1c-CBGA_Ptrc
+    pBbB2c-CBGA_J23100
+    pBbB2c-CBGA_J23105
+    pBbB2c-CBGA_J23116
+    pBbB2c-CBGA_J23119
+    pBbB2c-CBGA_J23150
+    pBbB2c-CBGA_pBAD
+    pBbB5c-CBGA_PlacUV5
+    pBbB5c-CBGA_Ptrc
+    pcDNA3.1_AU1_Shble10_FLAG_STOP_eGFP
+    pcDNA3.1_AU1_Shble10mut_FLAG_STOP_eGFP
+    pcDNA3.1_AU1_Shble11_FLAG_STOP_eGFP
+    pcDNA3.1_AU1_Shble12_FLAG_STOP_eGFP
+    pcDNA3.1_AU1_Shble13_FLAG_STOP_eGFP
+    pcDNA3.1_AU1_Shble13mut_FLAG_STOP_eGFP
+    pcDNA3.1_AU1_Shble1_FLAG_STOP_eGFP
+    pcDNA3.1_AU1_Shble2_FLAG_STOP_eGFP
+    pcDNA3.1_AU1_Shble3_FLAG_STOP_eGFP
+    pcDNA3.1_AU1_Shble4_FLAG_STOP_eGFP
+    pcDNA3.1_AU1_Shble4mut_FLAG_STOP_eGFP
+    pcDNA3.1_AU1_Shble5_FLAG_STOP_eGFP
+    pcDNA3.1_AU1_Shble6_FLAG_STOP_eGFP
+    pcDNA3.1_AU1_Shble6mut_FLAG_STOP_eGFP
+    pcDNA3.1_AU1_Shble7_FLAG_STOP_eGFP
+    pcDNA3.1_AU1_Shble7mut_FLAG_STOP_eGFP
+    pcDNA3.1_AU1_Shble8_FLAG_STOP_eGFP
+    pcDNA3.1_AU1_Shble9_FLAG_STOP_eGFP
+    pCH13_HG8_pta_KO
+    pCH16_HG8_ldh_KO
+    pCH19_HG8_lctD_KO
+    pCH22_HG8_rnf_KO
+    pCH24_HG8_hfsB_KO
+    pCH50_HG8_MG_reductase_KO
+    pCH51_HG8_MG_synthase_KO
+    pCH53_HG8_GlycerolDH_KO
+    pCOMB3xss_dsbA_Li005_LPS
+    pComb3XXT_dSBA_Nb_C20
     PE_BacIPD31B
     PE_IP16
     PE_IP5a
@@ -5345,12 +5629,151 @@ const my @SPECIES => qw(
     pEAQ-HT_OsD27-myc
     pEAQ-HT_OsD27deltaDIS-myc
     pEBO_BDBV-GP
+    pEG01_128_pLux-TruD
+    pEG02_192_RSTN-PapoA
+    pEG02_194_RSTN-BamA
+    pEG02_195_RSTN-EpiA
+    pEG02_199_RSTN-HalA1
+    pEG02_200_RSTN-HalA2
+    pEG02_312_RSTN-papa-tev
+    pEG02_575_RSTN-PsnA2-tev
+    pEG03_017_T7A1-MBP-TruE
+    pEG03_045_PP37_His-MdnA
+    pEG03_046_His-BmbC
+    pEG03_047_His-StrA
+    pEG03_048_His-pqqA
+    pEG03_049_His-sboA
+    pEG03_051_His-TfxA
+    pEG03_052_His-ProcA
+    pEG03_053_His-TbtA
+    pEG03_055_His-Pgm2
+    pEG03_057_RSTN-TruE
+    pEG03_058_RSTN-MdnA
+    pEG03_059_RSTN-SboA
+    pEG03_060_RSTN-PqqA
+    pEG03_061_RSTN-StrA
+    pEG03_062_RSTN-BmbC
+    pEG03_063_RSTN-TfxA
+    pEG03_064_RSTN-ProcA
+    pEG03_065_RSTN-TbtA
+    pEG03_067_RSTN-Pgm2
+    pEG03_121_RSTN-mdnA
+    pEG03_128_RSTN-proc
+    pEG03_132_RSTN-paaP
+    pEG03_157_RSTN-MibA
+    pEG03_161_RSTN-PlpA1
+    pEG03_162_RSTN-PlpA2
+    pEG03_165_RSTN-PbtA
+    pEG03_172_RSTN-LtnA1
+    pEG03_173_RSTN-LtnA2
+    pEG03_174_RSTN-CrnA1
+    pEG03_175_RSTN-CrnA2
+    pEG03_176_RSTN-BsjA2
+    pEG03_177_RSTN-BsjA3
+    pEG03_178_RSTN-CinA
+    pEG03_180_RSTN-LasA
+    pEG03_181_RSTN-AlbsA
+    pEG03_182_RSTN-McbA
+    pEG03_194_RSTN-PsnA2
+    pEG03_197_RSTN-AMdnA
+    pEG03_212_RSTC-CapA
+    pEG03_213_RSTC-LasA
+    pEG03_214_RSTC-AlbsA
+    pEG03_215_RSTC-AtxA1
+    pEG03_248_RSTN-sboA
+    pEG03_283_RSTN-PapA
+    pEG03_286_RSTN-PcpA
+    pEG03_553_RSTC-Cln1A1
+    pEG03_554_RSTC-Cln1A2
+    pEG03_555_RSTC-Cln2A1
+    pEG03_556_RSTC-Cln2A2
+    pEG03_557_RSTC-Cln3A1
+    pEG03_558_RSTC-Cln3A2
+    pEG03_559_RSTC-Cln3A3
+    pEG03_560_RSTC-CsegA1
+    pEG03_561_RSTC-CsegA2
+    pEG03_562_RSTC-CsegA3
+    pEG03_563_RSTN-PadeA
+    pEG03_564_RSTN-ThcoA
+    pEG03_565_RSTN-StspA
+    pEG03_567_RSTN-LcnA
+    pEG03_568_RSTN-PalA
+    pEG03_570_RSTN-RaxX
+    pEG03_571_RSTN-ComX
+    pEG03_572_RSTN-KgpE
+    pEG03_574_RSTN-TgnA*
+    pEG03_871_RSTN-SgbA
+    pEG03_905_RSTN-truE*
+    pEG07_034_pCym-TruD
+    pEG07_035_pCym-AlbA
+    pEG07_037_pCym-MdnC
+    pEG07_043_pCym-ProcM
+    pEG07_047_pCym-MibHS
+    pEG07_048_pCym-MibD
+    pEG07_056_pCym-PlpXY
+    pEG07_058_pCym-PbtO
+    pEG07_059_pCym-PbtM1
+    pEG07_060_pCym-PaaA
+    pEG07_066_pCym-CinX
+    pEG07_067_pCym-CapBC
+    pEG07_068_pCym-LasBCD
+    pEG07_069_pCym-LasF
+    pEG07_070_pCym-AlbsBC
+    pEG07_071_pCym-AlbsT
+    pEG07_073_pCym-McbCD
+    pEG07_074_pCym-MibO
+    pEG07_076_pCym-LtnM1
+    pEG07_077_pCym-LtnM2
+    pEG07_078_pCym-CrnM
+    pEG07_079_pCym-BsjM
+    pEG07_127_pCym-PsnB
+    pEG07_130_pCym-AMdnC
+    pEG07_132_pCym-AtxBC
+    pEG07_133_pCym-Cln1BC
+    pEG07_134_pCym-Cln2BC
+    pEG07_135_pCym-Cln3BC
+    pEG07_136_pCym-CsegBC
+    pEG07_137_pCym-PadeK
+    pEG07_138_pCym-ThcoK
+    pEG07_139_pCym-StspM
+    pEG07_141_pCym-LcnG
+    pEG07_142_pCym-PalS
+    pEG07_143_pCym-SgbL
+    pEG07_144_pCym-RaxST
+    pEG07_145_pCym-ComQ
+    pEG07_146_pCym-KgpF
+    pEG07_147_pCym-TgnB
+    pEG07_149_pCym-PapB
+    pEG07_152_pCym-PcpXY
+    pEG07_160_pCym-LynD
+    pEG07_166_pCym-PapoK
+    pEG07_169_pCym-EpiD
+    pEG07_171_pCym-BamB
+    pEG07_172_pCym-HalM1
+    pEG07_173_pCym-HalM2
+    pEGY_EC_13655
     PEPV_San92
     pET19b_DAD2cpGFP(G166)
     pET19b_DAD2cpGFP(G166)LSSmOrange
     pET19b_HisDAD2
     pET19b_HisDAD2cpGFP(G166)
     pET19b_ShHTL7cpGFP(L166)LSSmOrange
+    pFR015_pBAD_retron-RT_araC_bsaI
+    pFR156_pBAD_CspRecT_MutL-E32K_tracRNA
+    Pgap_Dual_Kana
+    pGE_curli_3R-A
+    pGE_curli_3R-I
+    pGE_curli_3R-L
+    pGE_curli_3R-X
+    pGE_curli_3R-X2
+    pGE_curli_3R-X3
+    pGE_curli_3R-Xlon
+    pGEC_delta-flhDC
+    pGEC_TetR_Ptet-flhDC
+    pGECfimEcN_gfpTCD
+    pGECfimEcN_mKATE2
+    pGECfluEcN_gfpTCD
+    pGECmatEcN_lux
     PGPV10K_LD1
     PGPV10K_RP1
     PGPV10K_SP1
@@ -5366,6 +5789,8 @@ const my @SPECIES => qw(
     Ph2_Loihi
     phage_Deep-GF0-KM16-C193
     phage_Deep1-GF2-KM23-C739
+    phage_EC_HWW_001
+    phage_EF62phi
     phage_MedDCM-OCT-S28-C10
     phage_MedDCM-OCT-S28-C3
     phage_MedDCM-OCT-S30-C28
@@ -5378,6 +5803,11 @@ const my @SPECIES => qw(
     phage_MedDCM-OCT-S45-C18
     phage_MedDCM-OCT-S45-C4
     phage_MedDCM-OCT-S46-C10
+    phage_vB_CfrD_Devorator
+    phage_vB_EcoD_Punny
+    pHBA008_BASIS-components_rK_3-prime
+    pHBA010_BASIS-components_pH_3-prime
+    pHBA031_BASIS-LS-rK-BAC266-PH-3
     pHC_pUC_ori
     PI_GH1.1.B5
     PI_GH2.1.C2
@@ -5386,12 +5816,43 @@ const my @SPECIES => qw(
     pig/sw-92_2/SWE/2010
     pig/Swebo_1/SWE
     PII_GH2.2.C11
+    Pili_CB159_MCB012_18_01
     Pip1_Cr_FR_2014
     Pip2_Cr_FR_2014
     Pip3_M_FR_2014
+    pIVTRA_hADAR1
+    pJM_CO_001
+    pJM_CO_002
+    pJM_CO_003
+    pJM_CO_004
+    pJM_CO_005
+    pJM_CO_006
+    pJM_CO_007
+    pJM_CO_008
+    pJM_CO_009
+    pJM_CO_010
+    pJM_CO_011
+    pJM_CO_012
+    pJM_CO_013
+    pJM_CO_014
+    pJM_CO_015
+    pJM_CO_016
+    pJM_CO_017
+    pJM_CO_018
+    pJM_CO_019
+    pJM_CO_020
     pKW20_CDFtet_pAraRedCas9_TracrRNA
+    pKW3_MB1amp_tracr_Universal1
+    pKW3_MB1amp_tracr_Universal2
     pLC_pBBR1_ori
+    pLF118_Gm_pAraRed(rec)_TracrRNA
     PM58B_RA
+    pMis1_1B
+    pMU2105_M0795_tdk_KO
+    pMVA_NR2
+    pNL4-3_gag-pol(Delta1443-4553)_EGFP
+    pPGG_tRNAarI_sgRNA_Cas9
+    PREDICT_AdV-12
     PREDICT_AdV-13
     PREDICT_AdV-14
     PREDICT_AdV-15
@@ -5410,6 +5871,7 @@ const my @SPECIES => qw(
     PREDICT_AdV-27
     PREDICT_AdV-28
     PREDICT_AdV-29
+    PREDICT_AdV-3
     PREDICT_AdV-30
     PREDICT_AdV-31
     PREDICT_AdV-32
@@ -5430,6 +5892,7 @@ const my @SPECIES => qw(
     PREDICT_AdV-47
     PREDICT_AdV-48
     PREDICT_AdV-49
+    PREDICT_AdV-5
     PREDICT_AdV-50
     PREDICT_AdV-51
     PREDICT_AdV-52
@@ -5450,6 +5913,7 @@ const my @SPECIES => qw(
     PREDICT_AdV-67
     PREDICT_AdV-68
     PREDICT_AdV-69
+    PREDICT_AdV-7
     PREDICT_AdV-70
     PREDICT_AdV-71
     PREDICT_AdV-72
@@ -5459,21 +5923,68 @@ const my @SPECIES => qw(
     PREDICT_AdV-77
     PREDICT_AdV-78
     PREDICT_AdV-79
+    PREDICT_AdV-8
     PREDICT_AdV-80
     PREDICT_AdV-81
     PREDICT_AdV-87
     PREDICT_AdV-90
     PREDICT_AdV-91
+    PREDICT_CoV-100
+    PREDICT_CoV-101
+    PREDICT_CoV-103
+    PREDICT_CoV-105
+    PREDICT_CoV-106
+    PREDICT_CoV-109
+    PREDICT_CoV-110
+    PREDICT_CoV-112
+    PREDICT_CoV-113
+    PREDICT_CoV-114
+    PREDICT_CoV-115
+    PREDICT_CoV-116
+    PREDICT_CoV-117
+    PREDICT_CoV-118
+    PREDICT_CoV-119
+    PREDICT_CoV-16
     PREDICT_CoV-17
+    PREDICT_CoV-27
     PREDICT_CoV-35
+    PREDICT_CoV-44
     PREDICT_CoV-47
     PREDICT_CoV-49
     PREDICT_CoV-50
+    PREDICT_CoV-52
+    PREDICT_CoV-54
+    PREDICT_CoV-56
+    PREDICT_CoV-63
+    PREDICT_CoV-64
+    PREDICT_CoV-65
+    PREDICT_CoV-70
+    PREDICT_CoV-72
+    PREDICT_CoV-73
+    PREDICT_CoV-74
+    PREDICT_CoV-75
+    PREDICT_CoV-76
+    PREDICT_CoV-77
+    PREDICT_CoV-78
+    PREDICT_CoV-81
     PREDICT_CoV-82
+    PREDICT_CoV-85
+    PREDICT_CoV-86
+    PREDICT_CoV-88
+    PREDICT_CoV-89
     PREDICT_CoV-90
+    PREDICT_CoV-91
     PREDICT_CoV-92
     PREDICT_CoV-93
+    PREDICT_CoV-94
     PREDICT_CoV-96
+    PREDICT_CoV-97
+    PREDICT_CoV-98
+    PREDICT_CoV-99
+    PREDICT_Flavi-4
+    PREDICT_Flavi-5
+    PREDICT_Flavi-6
+    PREDICT_MAstV-135
     PREDICT_Orbi-6
     PREDICT_PapV-1
     PREDICT_PbV-1
@@ -5613,6 +6124,8 @@ const my @SPECIES => qw(
     PREDICT_PMV-109
     PREDICT_PMV-11
     PREDICT_PMV-110
+    PREDICT_PMV-111
+    PREDICT_PMV-112
     PREDICT_PMV-113
     PREDICT_PMV-114
     PREDICT_PMV-115
@@ -5652,6 +6165,7 @@ const my @SPECIES => qw(
     PREDICT_PMV-151
     PREDICT_PMV-152
     PREDICT_PMV-153
+    PREDICT_PMV-154
     PREDICT_PMV-155
     PREDICT_PMV-156
     PREDICT_PMV-159
@@ -5670,8 +6184,26 @@ const my @SPECIES => qw(
     PREDICT_PMV-174
     PREDICT_PMV-175
     PREDICT_PMV-176
+    PREDICT_PMV-177
+    PREDICT_PMV-178
+    PREDICT_PMV-179
     PREDICT_PMV-18
+    PREDICT_PMV-180
+    PREDICT_PMV-181
+    PREDICT_PMV-182
+    PREDICT_PMV-183
+    PREDICT_PMV-184
+    PREDICT_PMV-185
+    PREDICT_PMV-186
+    PREDICT_PMV-187
+    PREDICT_PMV-188
+    PREDICT_PMV-189
     PREDICT_PMV-19
+    PREDICT_PMV-190
+    PREDICT_PMV-191
+    PREDICT_PMV-192
+    PREDICT_PMV-193
+    PREDICT_PMV-194
     PREDICT_PMV-2
     PREDICT_PMV-20
     PREDICT_PMV-21
@@ -5747,6 +6279,7 @@ const my @SPECIES => qw(
     PREDICT_PMV-93
     PREDICT_PMV-94
     PREDICT_PMV-95
+    PREDICT_PMV-96
     PREDICT_PMV-97
     PREDICT_PMV-98
     PREDICT_PMV-99
@@ -5767,6 +6300,15 @@ const my @SPECIES => qw(
     PREDICT_PyV-9
     PREDICT_RbdV-14
     PREDICT_RbdV-15
+    PREDICT_RbdV-21
+    PREDICT_RbdV-27
+    PREDICT_RbdV-28
+    PREDICT_RbdV-30
+    PREDICT_RbdV-31
+    PREDICT_RbdV-32
+    PREDICT_RbdV-33
+    PREDICT_RbdV-34
+    PREDICT_RbdV-35
     pRS315_AnSuc1:pep1
     pRS315_Ppdc_xyr1V821F:ace1
     pRS315_Pxyn1_ReCel3a:slp1
@@ -5779,6 +6321,9 @@ const my @SPECIES => qw(
     pRS425_YPRCtau3-CrtE-CrtI-CrtYB
     pSC101_rK-sacB_selection-construct
     pSC101_sC-rpsL_selection-construct
+    pSGK_ChoD
+    pSGK_P45_F3213
+    pSP43_pKW3spec(rec)_SapI_insert_gRNA
     pStA0.BBa_J23100
     pStA0.BBa_J23102
     pStA0.BBa_J23107
@@ -5786,7 +6331,42 @@ const my @SPECIES => qw(
     pStA0.BBa_J23116
     pStA0.BBa_J23118
     pT7SA11NSP1_3xFL_UnaG
+    Ptet_Dual_Spe
+    pTLAB21_Bs314EBE_avrGf2
+    pTTC_FusionRed_eGFP_3UTR
     pTU2-b_TrxD27-TrxCCD7-MBPCCD8
+    pVMG0266_nanos-Cas9_Ice2
+    pVMG0278_ebony_gRNA1
+    pVMG0288_LbCpf1_D156R
+    pVMG0295_Cquin_white-sgRNA-6_recoded
+    pVMG0313_ebony_gRNA4
+    pVMG090_White_gRNA2
+    pYTNB01K_1G7
+    pYTRW07K_0G5
+    pYTRW08K_0C5
+    pYTRW09K_0T5
+    pYTRW10K_0x5
+    pYTRW11K_0S5
+    pYTRW13K_3G5
+    pYTRW14K_7G5
+    pYTRW15K_2G5
+    pYTRW16K_1G5
+    pYTRW17K_6G5
+    pYTRW18K_3T5
+    pYTRW20K_0Ti1
+    pYTRW21K_1Ti1
+    pYTRW22K_7Ti1
+    pYTRW26K_1Ti1
+    pYTRW27K_7Ti1
+    pYTRW28K_0Ti1
+    pYTSK00K_0x7
+    pYTSK02A_0G7
+    pYTSK31K_1G7
+    pYTSK54K_7G7
+    pYTSK55K_2G7
+    pYTSK56K_3G7
+    pYTSK58K_6G7
+    pYTSK65K_8G7
     Q_sR_OV_011
     Q_sR_OV_019
     Q_sR_OV_020
@@ -5796,8 +6376,18 @@ const my @SPECIES => qw(
     Q_sR_OV_036
     Q_sR_OV_041
     Q_sR_OV_042
+    R1_CDLR_pACNR-FL-POWV-DTV
+    R1_CpG-H-M1_pACNR-FL-POWV-DTV
+    R1_CpG-H-M2_pACNR-FL-POWV-DTV
+    R1_UpA-H-M1_pACNR-FL-POWV-DTV
+    R1_UpA-H-M2_pACNR-FL-POWV-DTV
     R2_11
     R2_8
+    R2_CDLR_pACNR-FL-POWV-DTV
+    R2_CpG-H-M1_pACNR-FL-POWV-DTV
+    R2_CpG-H-M2_pACNR-FL-POWV-DTV
+    R2_UpA-H-M1_pACNR-FL-POWV-DTV
+    R2_UpA-H-M2_pACNR-FL-POWV-DTV
     Rabbit_CoV/La06_256/Ory_cun/ESP/2006
     Rabbit_CoV/La09_24/Ory_cun/ESP/2009
     Rabbit_CoV/La09_31/Ory_cun/ESP/2009
@@ -5926,6 +6516,23 @@ const my @SPECIES => qw(
     RO_isolate_32
     RO_isolate_6
     RO_isolate_7
+    S-RIM12_Np_14_0310
+    S-RIM12_Np_15_0310
+    S-RIM12_Np_22_1112
+    S-RIM12_RW_04_0310
+    S-RIM12_RW_04_0709
+    S-RIM12_RW_07_1112
+    S-RIM12_RW_14_0101
+    S-RIM12_RW_22_0110
+    S-RIM12_RW_25_0210
+    S-RIM12_RW_28_1109
+    S-RIM12_RW_29_1109
+    S-RIM12_Sn_07_0910
+    S-RIM12_Sn_31_0910
+    S-RIM12_W1_12_0610
+    S-RIM12_W1_24_0910
+    S-RIM12_WH_05_0310
+    S-RIM12_WH_07_0310
     S1_MeH
     S2_MeH
     S8A-217_16S
@@ -6033,6 +6640,7 @@ const my @SPECIES => qw(
     Se3Ps_2679
     Se3Ps_2758
     Se3Pw_3619
+    SH_25-50_Exo70_native
     SM23_31
     SM23_57
     SM_12
@@ -6068,7 +6676,6 @@ const my @SPECIES => qw(
     sp_2_GP
     sp_AL
     Spd2B_4
-    Sq1_host
     SRC_DS3
     SRC_DS3a
     SRC_DSE1
@@ -6097,12 +6704,12 @@ const my @SPECIES => qw(
     TF4_17
     TF4_17_MR-2014
     TF5_22_MR-2014
+    tombus-like_virus
     TPMV_P-EGFP
     TPMV_P-EGFP_H-His6
     TPMV_P-EGFP_HaCD20
     TPMV_P-EGFP_HaEGFR
     TsCyV-1_JP-NUBS-2014
-    UAB_Phi87
     UBP10_UBA1149
     UBP10_UBA1160
     UBP11_UBA4055
@@ -6152,8 +6759,16 @@ const my @SPECIES => qw(
     UBP9_UBA6438
     Udayana_MDPVA
     Udayana_MDPVB
+    UK_ancient_CT89
+    vB_EcoM-p111
+    vB_KsaM-C1
+    vB_LmoS_P7
+    vB_PaeM_Sem1
+    vB_RanS_PJN03
     vB_SabS_Sds2
     vB_SauM_SDQ
+    Vk*MYCDLoxP_MYC_FULL_LENGTH_ONLY
+    Vk*MYCDLoxP_MYCS
     VPXV_CA85
     W13C10_B
     W13C11_B
@@ -6401,6 +7016,10 @@ sub _set_gca_and_or_taxon_id {
 sub BUILD {
     my $self = shift;
 
+    # warn of trailing spaces as they harm taxonomic analysis
+    carp '[BMC] Warning: "' . $self->full_id . '" has trailing spaces;'
+        . ' cannot parse sequence id!' if $self->full_id =~ m/\s+\z/xms;
+
     # parse potential taxonomy-aware abbreviated id
     # Note: such ids are still considered as foreign_ids
     {
@@ -6593,7 +7212,7 @@ sub nexus_id {
     # ... but cannot contain single quotes
 
     my $full_id = $self->full_id =~ tr/'//dr;       # remove quotes...
-	return qq{'$full_id'};                          # ... and requote
+    return qq{'$full_id'};                          # ... and requote
 }
 
 
@@ -6749,7 +7368,7 @@ Bio::MUST::Core::SeqId - Modern and legacy MUST-compliant sequence id
 
 =head1 VERSION
 
-version 0.212670
+version 0.240390
 
 =head1 SYNOPSIS
 

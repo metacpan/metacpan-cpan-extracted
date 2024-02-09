@@ -1,5 +1,5 @@
 package WebService::KvKAPI::Formatters;
-our $VERSION = '0.105';
+our $VERSION = '0.106';
 use warnings;
 use strict;
 
@@ -39,7 +39,7 @@ WebService::KvKAPI::Formatters - Utility package for formatting common numbers
 
 =head1 VERSION
 
-version 0.105
+version 0.106
 
 =head1 DESCRIPTION
 

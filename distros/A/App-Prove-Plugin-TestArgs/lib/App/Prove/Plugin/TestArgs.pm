@@ -7,7 +7,7 @@ package App::Prove::Plugin::TestArgs;
 use Class::Method::Modifiers qw( install_modifier );
 use Config::Any              qw();
 
-our $VERSION = '1.000000';
+our $VERSION = '1.000001';
 
 my $command_line_test_args;
 my %test_script_has_alias;

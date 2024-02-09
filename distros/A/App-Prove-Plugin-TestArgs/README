@@ -27,7 +27,7 @@ To maintain this module, run the following commands:
   perl Makefile.PL
   make
   make RELEASE_TESTING=1 test  # use Test::Harness
-  make RELEASE_TESTING=1 testp # use TAP::harness
+  make RELEASE_TESTING=1 testp # use TAP::Harness
   make cover
 
 The second command installs the module dependencies in a "local" directory

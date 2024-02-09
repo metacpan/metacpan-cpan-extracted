@@ -18,51 +18,51 @@ name: Text-Markup
 provides:
   Text::Markup:
     file: lib/Text/Markup.pm
-    version: '0.31'
+    version: '0.32'
   Text::Markup::Asciidoc:
     file: lib/Text/Markup/Asciidoc.pm
-    version: '0.31'
+    version: '0.32'
   Text::Markup::Asciidoctor:
     file: lib/Text/Markup/Asciidoctor.pm
-    version: '0.31'
+    version: '0.32'
   Text::Markup::Bbcode:
     file: lib/Text/Markup/Bbcode.pm
-    version: '0.31'
+    version: '0.32'
   Text::Markup::Cmd:
     file: lib/Text/Markup/Cmd.pm
   Text::Markup::CommonMark:
     file: lib/Text/Markup/CommonMark.pm
-    version: '0.31'
+    version: '0.32'
   Text::Markup::Creole:
     file: lib/Text/Markup/Creole.pm
-    version: '0.31'
+    version: '0.32'
   Text::Markup::HTML:
     file: lib/Text/Markup/HTML.pm
-    version: '0.31'
+    version: '0.32'
   Text::Markup::Markdown:
     file: lib/Text/Markup/Markdown.pm
-    version: '0.31'
+    version: '0.32'
   Text::Markup::Mediawiki:
     file: lib/Text/Markup/Mediawiki.pm
-    version: '0.31'
+    version: '0.32'
   Text::Markup::Multimarkdown:
     file: lib/Text/Markup/Multimarkdown.pm
-    version: '0.31'
+    version: '0.32'
   Text::Markup::None:
     file: lib/Text/Markup/None.pm
-    version: '0.31'
+    version: '0.32'
   Text::Markup::Pod:
     file: lib/Text/Markup/Pod.pm
-    version: '0.31'
+    version: '0.32'
   Text::Markup::Rest:
     file: lib/Text/Markup/Rest.pm
-    version: '0.31'
+    version: '0.32'
   Text::Markup::Textile:
     file: lib/Text/Markup/Textile.pm
-    version: '0.31'
+    version: '0.32'
   Text::Markup::Trac:
     file: lib/Text/Markup/Trac.pm
-    version: '0.31'
+    version: '0.32'
 requires:
   File::BOM: '0.14'
   HTML::Entities: '0'
@@ -81,5 +81,5 @@ requires:
 resources:
   homepage: https://metacpan.org/pod/Text::Markup
   license: http://dev.perl.org/licenses/
-version: '0.31'
+version: '0.32'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

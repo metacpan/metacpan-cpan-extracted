@@ -1,0 +1,53 @@
+<svg viewBox="0 0 470 470" xmlns="http://www.w3.org/2000/svg">
+<style>
+  @font-face { font-family: Inkpen2Script;
+               src: url('file:///home/jv/.fonts/Inkpen2Script.ttf')
+	       format('truetype');
+  }
+  path, polygon, rect {
+      stroke-width: 15;
+      stroke: #092a48;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+  }
+  text {
+      font-family: Inkpen2Script;
+      font-size: 100px;
+      fill: blue;
+  }
+</style>
+
+<!-- Define the note shape. -->
+<defs>
+  <g id="note">
+    <path fill="none"
+	  d="M0,0 a 20 17.5 0 1 0 0 1 v-105 3 a 18 18 0 0 0 18 18
+	     l 7 1 a 16 16 0 0 1 15 19" />
+    <ellipse cx="-20" cy="0.5" rx="13" ry="10" />
+  </g>
+</defs>
+
+<!-- The page, with flipped corner. -->
+<polygon transform="translate(62.5,7.5)" fill="#f1ecda"
+	 points="0,0 345,0 345,359 245,455 0,455" />
+<polygon transform="translate(407,369)" fill="yellow"
+	 points="0,0 -95,0 -95,95" />
+
+<!-- The chord text. -->
+<g transform="translate(120,100)">
+  <text transform="scale(1.5,1)">Am</text>
+</g>
+
+<!-- Draw the notes. -->
+<use href="#note" x="307.5" y="190" fill="#ff0000"/>
+<use href="#note" x="162"   y="330" fill="#00ff00"/>
+
+<!-- The lyrics lines. -->
+<path d="M122.5,117.5 h155z
+	 m0,30 h155z        m215,0 h10z
+	 m-215,30 h122.5z   m215,0 h10z
+	 M122.5,257.5 h10z  m102.5,0 h122.5z
+	 m-102.5,30 h10z    m70,0 h155z
+	 m0,30 h155z	 " />
+
+</svg>

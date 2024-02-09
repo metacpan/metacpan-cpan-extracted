@@ -1,0 +1,39 @@
+---
+abstract: 'Parse the common log format lines used by Apache'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  Module::Metadata: '0'
+  Test2::Tools::Compare: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+  strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - log
+  - apache
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Common-Log-Parser
+provides:
+  Common::Log::Parser:
+    file: lib/Common/Log/Parser.pm
+    version: v0.1.0
+requires:
+  Exporter: '5.57'
+  perl: v5.14.0
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/robrwo/perl5-Common-Log-Parser/issues
+  repository: git://github.com/robrwo/perl5-Common-Log-Parser.git
+version: v0.1.0
+x_authority: cpan:RRWO
+x_generated_by_perl: v5.34.3
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: Artistic-2.0

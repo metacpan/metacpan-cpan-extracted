@@ -318,6 +318,94 @@ sub output_type {
   }
 }
 
+sub resource_loader_config {
+  my $self = shift;
+  if (@_) {
+    $self->{resource_loader_config} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{resource_loader_config};
+  }
+}
+
+sub category {
+  my $self = shift;
+  if (@_) {
+    $self->{category} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{category};
+  }
+}
+
+sub config_exe {
+  my $self = shift;
+  if (@_) {
+    $self->{config_exe} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{config_exe};
+  }
+}
+
+sub is_jit {
+  my $self = shift;
+  if (@_) {
+    $self->{is_jit} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{is_jit};
+  }
+}
+
+sub cc_output_dir {
+  my $self = shift;
+  if (@_) {
+    $self->{cc_output_dir} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{cc_output_dir};
+  }
+}
+
+sub output_dir {
+  my $self = shift;
+  if (@_) {
+    $self->{output_dir} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{output_dir};
+  }
+}
+
+sub output_file {
+  my $self = shift;
+  if (@_) {
+    $self->{output_file} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{output_file};
+  }
+}
+
+sub used_as_resource {
+  my $self = shift;
+  if (@_) {
+    $self->{used_as_resource} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{used_as_resource};
+  }
+}
+
 # Class Methods
 sub new {
   my $class = shift;
@@ -375,7 +463,7 @@ sub new {
   
   # spvm_core_include_dir
   unless (defined $self->spvm_core_include_dir) {
-    my $builder_dir = SPVM::Builder::Util::get_builder_dir_from_config_class();
+    my $builder_dir = SPVM::Builder::Util::get_builder_dir();
     my $spvm_core_include_dir = "$builder_dir/include";
     
     $self->spvm_core_include_dir($spvm_core_include_dir);
@@ -482,6 +570,11 @@ sub new {
   
   unless (defined $self->{_loaded_config_files}) {
     $self->{_loaded_config_files} = [];
+  }
+  
+  # category
+  unless (defined $self->{category}) {
+    $self->category('native');
   }
   
   return $self;
@@ -734,22 +827,28 @@ sub use_resource {
     $resource = $first_arg;
   }
   else {
-    my $basic_type_name = $first_arg;
+    my $class_name = $first_arg;
     my %args = @args;
     if (exists $args{class_name}) {
-      $basic_type_name = delete $args{class_name};
+      $class_name = delete $args{class_name};
     }
-    $resource = SPVM::Builder::Resource->new(class_name => $basic_type_name, %args);
+    $resource = SPVM::Builder::Resource->new(class_name => $class_name, %args);
   }
   
-  my $resource_basic_type_name = $resource->class_name;
+  my $resource_class_name = $resource->class_name;
   my $resource_mode = $resource->mode;
   my $resource_argv = $resource->argv;
   
   my $ext = defined $resource_mode ? "$resource_mode.config" : 'config';
-  my $config_file_base = SPVM::Builder::Util::convert_basic_type_name_to_rel_file($resource_basic_type_name, $ext);
+  my $config_file_base = SPVM::Builder::Util::convert_class_name_to_rel_file($resource_class_name, $ext);
   
-  my $config_file = SPVM::Builder::Util::get_config_file_from_basic_type_name($resource_basic_type_name, $resource_mode);
+  my $config_file = SPVM::Builder::Util::search_config_file($resource_class_name, $resource_mode);
+  
+  unless (defined $config_file) {
+    my $config_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($resource_class_name, 'config');
+    
+    confess "A config file \"$config_rel_file\" is not found in (@INC)";
+  }
   
   my $config = $self->load_config($config_file, @$resource_argv);
   $config->file($config_file);
@@ -758,30 +857,30 @@ sub use_resource {
   
   my $index = keys %{$self->{resources}};
   
-  $self->{resources}->{$resource_basic_type_name} = {resource => $resource, index => $index};
+  $self->{resources}->{$resource_class_name} = {resource => $resource, index => $index};
   
   return $resource;
 }
 
-sub disable_resource {
+sub no_compile_resource {
   my $self = shift;
   if (@_) {
-    $self->{disable_resource} = $_[0];
+    $self->{no_compile_resource} = $_[0];
     return $self;
   }
   else {
-    return $self->{disable_resource};
+    return $self->{no_compile_resource};
   }
 }
 
 sub get_resource {
-  my ($self, $resource_basic_type_name) = @_;
+  my ($self, $resource_class_name) = @_;
   
-  unless (defined $self->{resources}{$resource_basic_type_name}) {
+  unless (defined $self->{resources}{$resource_class_name}) {
     return;
   }
   
-  my $resource = $self->{resources}{$resource_basic_type_name}{resource};
+  my $resource = $self->{resources}{$resource_class_name}{resource};
   
   return $resource;
 }
@@ -1151,8 +1250,8 @@ If this field is undef, whether compiler and linker messages are output is not s
 
 =head2 class_name
 
-  my $basic_type_name = $config->class_name;
-  $config->class_name($basic_type_name);
+  my $class_name = $config->class_name;
+  $config->class_name($class_name);
 
 Gets and sets the C<class_name> field, the class name configured by this config.
 
@@ -1185,14 +1284,91 @@ If thie field is C<static_lib>, the output file is a static link library.
 
 If thie field is C<exe>, the output file is an executable file.
 
-=head2 disable_resource
+=head2 no_compile_resource
 
-  my $disable_resource = $config->disable_resource;
-  $config->disable_resource($disable_resource);
+  my $no_compile_resource = $config->no_compile_resource;
+  $config->no_compile_resource($no_compile_resource);
 
-Gets and sets the C<disable_resource> field.
+Gets and sets the C<no_compile_resource> field.
 
 If this value is a true value, all resources loaded by the L</"use_resource"> method are disabled.
+
+This field is mainly internal use and automatically set.
+
+=head2 resource_loader_config
+
+  my $resource_loader_config = $config->resource_loader_config;
+  $config->resource_loader_config($resource_loader_config);
+
+Gets and sets the C<resource_loader_config> field, the config file that uses this config as a resource by the L</"use_resource"> method.
+
+This field is mainly internal use and automatically set.
+
+=head2 category
+
+  my $category = $config->category;
+  $config->category($category);
+
+Gets and sets the C<category> field.
+
+If a source file is compiled by the C<precompile> option, the value is C<precompile>, otherwise C<native>.
+
+This field is mainly internal use and automatically set.
+
+=head2 config_exe
+
+  my $config_exe = $config->config_exe;
+  $config->config_exe($config_exe);
+
+Gets and sets the C<config_exe> field.
+
+If an excutable file is generated by the L<spvmcc> command, this field of each config is set to a L<SPVM::Builder::Config::Exe> object.
+
+This field is mainly internal use and automatically set.
+
+=head2 cc_output_dir
+
+  my $cc_output_dir = $config->cc_output_dir;
+  $config->cc_output_dir($cc_output_dir);
+
+Gets and sets the C<cc_output_dir> field.
+
+This field is mainly internal use and automatically set.
+
+This field is automatically set.
+
+=head2 output_dir
+
+  my $output_dir = $config->output_dir;
+  $config->output_dir($output_dir);
+
+Gets and sets the C<output_dir> field.
+
+This field is mainly internal use and automatically set.
+
+This field is automatically set.
+
+=head2 output_file
+
+  my $output_file = $config->output_file;
+  $config->output_file($output_file);
+
+Gets and sets the C<output_file> field.
+
+The path that a dinamic link library or an executable file is output to.
+
+This field is mainly internal use and automatically set.
+
+=head2 used_as_resource
+
+  my $used_as_resource = $config->used_as_resource;
+  $config->used_as_resource($used_as_resource);
+
+Gets and sets the C<used_as_resource> field.
+
+If this field is true, this config is used as a resource.
+
+This field is mainly internal use and automatically set.
 
 =head1 Class Methods
 

@@ -99,8 +99,11 @@ EOT
         'got expected std abbr_ids';
 
     my $prefix = 'lcl|seq';
-    my @lcl_abbr_ids = map { $prefix . $_ } (1..10);
-    my $lcl_mapper = $ali->std_mapper($prefix);
+    my $offset = 100;
+    my @lcl_abbr_ids = map { $prefix . ($_+$offset) } (1..10);
+    my $lcl_mapper = $ali->std_mapper(
+        { offset => $offset, id_prefix => $prefix }
+    );
     is_deeply $lcl_mapper->abbr_ids, \@lcl_abbr_ids,
         'got expected prefixed abbr_ids';
 

@@ -2,7 +2,7 @@
 package Test::Expander;
 
 # The versioning is conform with https://semver.org
-our $VERSION = '2.3.2';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '2.4.0';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use strict;
 use warnings
@@ -16,6 +16,7 @@ use Getopt::Long        qw( GetOptions :config posix_default );
 use Importer;
 use Path::Tiny          qw( cwd path );
 use Scalar::Readonly    qw( readonly_on );
+use Term::ANSIColor     qw( colored );
 use Test::Builder;
 use Test2::API          qw( context );
 use Test2::API::Context qw();
@@ -27,8 +28,8 @@ use Test::Expander::Constants qw(
   $DIE $FALSE
   $FMT_INVALID_DIRECTORY $FMT_INVALID_ENV_ENTRY $FMT_INVALID_VALUE $FMT_INVALID_SUBTEST_NUMBER $FMT_KEEP_ENV_VAR
   $FMT_NEW_FAILED $FMT_NEW_SUCCEEDED $FMT_REPLACEMENT $FMT_REQUIRE_DESCRIPTION $FMT_REQUIRE_IMPLEMENTATION
-  $FMT_SEARCH_PATTERN $FMT_SET_ENV_VAR $FMT_SET_TO $FMT_SKIP_ENV_VAR $FMT_UNKNOWN_OPTION $FMT_USE_DESCRIPTION
-  $FMT_USE_IMPLEMENTATION $MSG_BAIL_OUT $MSG_ERROR_WAS $MSG_UNEXPECTED_EXCEPTION
+  $FMT_SEARCH_PATTERN $FMT_SET_ENV_VAR $FMT_SET_TO $FMT_SKIP_ENV_VAR $FMT_UNSET_VAR $FMT_UNKNOWN_OPTION
+  $FMT_USE_DESCRIPTION $FMT_USE_IMPLEMENTATION $MSG_BAIL_OUT $MSG_ERROR_WAS $MSG_UNEXPECTED_EXCEPTION
   $NOTE
   $REGEX_ANY_EXTENSION $REGEX_CLASS_HIERARCHY_LEVEL $REGEX_TOP_DIR_IN_PATH $REGEX_VERSION_NUMBER
   $TRUE
@@ -259,10 +260,15 @@ sub _export_symbols {
 
   foreach my $name ( sort keys( %constants ) ) {            # Export defined constants
     no strict qw( refs );                                   ## no critic (ProhibitProlongedStrictureOverride)
-    my $value = eval( "${ \$name }" ) or next;
-    readonly_on( ${ __PACKAGE__ . '::' . $name =~ s/^.//r } );
-    push( @EXPORT, $name );
-    $NOTE->( $FMT_SET_TO, $name, $constants{ $name }->( $value, $CLASS ) );
+    my $value = eval( "${ \$name }" );
+    if ( defined( $value ) ) {
+      readonly_on( ${ __PACKAGE__ . '::' . $name =~ s/^.//r } );
+      push( @EXPORT, $name );
+      $NOTE->( $FMT_SET_TO, colored( $name, 'cyan' ), $constants{ $name }->( $value, $CLASS ) );
+    }
+    elsif ( $name =~ /^ \$ (?: CLASS | METHOD | METHOD_REF )$/x ) {
+      $NOTE->( $FMT_UNSET_VAR, colored( $name, 'magenta' ) ) unless defined( $value );
+    }
   }
 
   return;
@@ -363,16 +369,16 @@ sub _read_env_file {
       };
       $DIE->( $FMT_INVALID_ENV_ENTRY, $index, $env_file, $line, $@ =~ s/\n//gr =~ s/ at \(eval .+//ir ) if $@;
       if ( defined( $value ) ) {
-        $NOTE->( $FMT_SET_ENV_VAR, $name, $value, $env_file );
+        $NOTE->( $FMT_SET_ENV_VAR, colored( $name, 'cyan' ), $value, $env_file );
         $ENV{ $name } = $env{ $name } = $value;
       }
       else {
-        $NOTE->( $FMT_SKIP_ENV_VAR, $name, $env_file );
+        $NOTE->( $FMT_SKIP_ENV_VAR, colored( $name, 'magenta' ), $env_file );
       }
     }
     elsif ( exists( $ENV{ $+{ name } } ) ) {
       $env{ $name } = $ENV{ $name };
-      $NOTE->( $FMT_KEEP_ENV_VAR, $name, $ENV{ $name }, $env_file );
+      $NOTE->( $FMT_KEEP_ENV_VAR, colored( $name, 'cyan' ), $ENV{ $name }, $env_file );
     }
   }
 

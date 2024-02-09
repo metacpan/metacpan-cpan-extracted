@@ -33,7 +33,8 @@ my $build = $class->new(
     license            => 'perl',
     create_makefile_pl => 'traditional',
     configure_requires => { 'Module::Build' => '0.4209' },
-    build_requires     => {
+    recommmends        => { 'CommonMark' => '0.290000' },
+    test_requires      => {
         'File::Spec::Functions' => 0,
         'Module::Build'         => '0.4209',
         'Test::More'            => '0.96',
@@ -53,9 +54,6 @@ my $build = $class->new(
         'Text::Trac'            => '0.10',
         'Parse::BBCode'         => '0.15',
         'Text::WikiCreole'      => '0.07',
-    },
-    recommmends => {
-        'CommonMark'            => '0.290000',
     },
     meta_merge => {
          "meta-spec" => { version => 2 },

@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-Markup.
 
+0.32  2024-02-08T03:25:18Z
+    - Added the ability to change the regular expression for a format by
+      passing it in the `use` statement.
+
 0.31  2023-09-10T23:24:43Z
     - Fixed the passing of parameters to `parse()`.
     - Documented the parameters passable to `parse()` for each parser.
@@ -13,7 +17,7 @@ Revision history for Perl extension Text-Markup.
       legacy `asciidoc` command. Text::Markdown will not use this formatter by
       default, but when explicitly loaded will be used instead of
       Text::Markup::Asciidoc.
-    - Added Text::Markdown::CommonMark, which uses the cmark library, via the
+    - Added Text::Markup::CommonMark, which uses the cmark library, via the
       CommonMark module. Text::Markdown will not use this formatter by
       default, but when explicitly loaded will be used instead of
       Text::Markup::Markdown.

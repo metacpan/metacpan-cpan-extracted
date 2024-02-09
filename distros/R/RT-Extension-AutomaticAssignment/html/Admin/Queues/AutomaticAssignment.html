@@ -16,9 +16,17 @@
 
 % for my $filter (@filters) {
 % my $class = "RT::Extension::AutomaticAssignment::Filter::$filter";
-% unless ($class->require) {
-%     RT->Logger->error("Couldn't load class '$class': $@");
-%     $m->abort;
+% if ( RT::Handle::cmp_version($RT::VERSION, '5.0.4') >= 0 ) {
+%     my ($ok, $msg) = RT::StaticUtil::RequireModule( $class );
+%     unless ( $ok ) {
+%         RT->Logger->error("Couldn't load class '$class': $msg");
+%         $m->abort;
+%     }
+% } else {
+%     unless ($class->require) {
+%         RT->Logger->error("Couldn't load class '$class': $@");
+%         $m->abort;
+%     }
 % }
 <option value="<% $filter %>"><% $class->Description %></option>
 % }
@@ -65,9 +73,17 @@
 
 % for my $chooser (@choosers) {
 % my $class = "RT::Extension::AutomaticAssignment::Chooser::$chooser";
-% unless ($class->require) {
-%     RT->Logger->error("Couldn't load class '$class': $@");
-%     $m->abort;
+% if ( RT::Handle::cmp_version($RT::VERSION, '5.0.4') >= 0 ) {
+%     my ($ok, $msg) = RT::StaticUtil::RequireModule( $class );
+%     unless ( $ok ) {
+%         RT->Logger->error("Couldn't load class '$class': $msg");
+%         $m->abort;
+%     }
+% } else {
+%     unless ($class->require) {
+%         RT->Logger->error("Couldn't load class '$class': $@");
+%         $m->abort;
+%     }
 % }
 <option <% $name eq $chooser ? "selected" : "" %> value="<% $chooser %>"><% $class->Description %></option>
 % }

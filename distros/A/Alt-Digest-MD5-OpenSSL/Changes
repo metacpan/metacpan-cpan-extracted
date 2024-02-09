@@ -1,3 +1,9 @@
+0.04 2024-02-08T14:53:57+01:00
+ - Fix LICENSE to same as original Digest::MD5.
+ - Improve doc.
+ - Indent XS code.
+ - Rename ctx variable to context.
+
 0.03 2024-01-29T23:55:48+01:00
  - Add author basic tests.
  - Add test for OpenSSL diagnostics.

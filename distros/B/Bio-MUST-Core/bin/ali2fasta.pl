@@ -21,7 +21,7 @@ for my $infile (@ARGV_infiles) {
     $ali->degap_seqs if $ARGV_degap;
     my $outfile = change_suffix($infile, '.fasta');
 
-	my $chunk = $ARGV_nowrap ? -1 : undef;
+    my $chunk = $ARGV_nowrap ? -1 : undef;
     $ali->store_fasta($outfile, $chunk);
 }
 
@@ -35,7 +35,7 @@ ali2fasta.pl - Convert ALI files to FASTA files
 
 =head1 VERSION
 
-version 0.212670
+version 0.240390
 
 =head1 USAGE
 

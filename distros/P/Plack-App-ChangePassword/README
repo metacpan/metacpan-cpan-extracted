@@ -1,0 +1,329 @@
+NAME
+    Plack::App::ChangePassword - Plack change password application.
+
+SYNOPSIS
+     use Plack::App::ChangePassword;
+
+     my $obj = Plack::App::ChangePassword->new(%parameters);
+     my $psgi_ar = $obj->call($env);
+     my $app = $obj->to_app;
+
+METHODS
+  "new"
+     my $obj = Plack::App::ChangePassword->new(%parameters);
+
+    Constructor.
+
+    *       "author"
+
+            Author string to HTML head.
+
+            Default value is undef.
+
+    *       "content_type"
+
+            Content type for output.
+
+            Default value is 'text/html; charset=__ENCODING__'.
+
+    *       "css"
+
+            Instance of CSS::Struct::Output object.
+
+            Default value is CSS::Struct::Output::Raw instance.
+
+    *       "css_init"
+
+            Reference to array with CSS::Struct structure.
+
+            Default value is CSS initialization from Tags::HTML::Page::Begin
+            like
+
+             * {
+                    box-sizing: border-box;
+                    margin: 0;
+                    padding: 0;
+             }
+
+    *       "encoding"
+
+            Set encoding for output.
+
+            Default value is 'utf-8'.
+
+    *       "favicon"
+
+            Link to favicon.
+
+            Default value is undef.
+
+    *       "flag_begin"
+
+            Flag that means begin of html writing via
+            Tags::HTML::Page::Begin.
+
+            Default value is 1.
+
+    *       "flag_end"
+
+            Flag that means end of html writing via Tags::HTML::Page::End.
+
+            Default value is 1.
+
+    *       "generator"
+
+            HTML generator string.
+
+            Default value is 'Plack::App::ChangePassword; Version:
+            __VERSION__'.
+
+    *       "message_cb"
+
+            Callback to process message from application. Arguments for
+            callback are: $env, $message_type and $message. Returns undef.
+
+            Default value is undef.
+
+    *       "psgi_app"
+
+            PSGI application to run instead of normal process. Intent of
+            this is change application in "_process_actions" method.
+
+            Default value is undef.
+
+    *       "redirect_change_password"
+
+            Redirect URL after successful password changed.
+
+            Default value is undef.
+
+    *       "redirect_error"
+
+            Redirect URL after error in changing of password.
+
+            Default value is undef.
+
+    *       "change_password_cb"
+
+            Callback for main changing of password. Arguments for callback
+            are: $env, $old_password and $password. Returns 0/1 for
+            (un)successful changing of password.
+
+            Default value is undef.
+
+    *       "script_js"
+
+            Reference to array with Javascript code strings.
+
+            Default value is [].
+
+    *       "script_js_src"
+
+            Reference to array with Javascript URLs.
+
+            Default value is [].
+
+    *       "status_code"
+
+            HTTP status code.
+
+            Default value is 200.
+
+    *       "tags"
+
+            Instance of Tags::Output object.
+
+            Default value is
+
+             Tags::Output::Raw->new(
+                     'xml' => 1,
+                     'no_simple' => ['script', 'textarea'],
+                     'preserved' => ['pre', 'style'],
+             );
+
+    *       "title"
+
+            Page title.
+
+            Default value is 'Change password page'.
+
+    Returns instance of object.
+
+  "call"
+     my $psgi_ar = $obj->call($env);
+
+    Implementation of login page.
+
+    Returns reference to array (PSGI structure).
+
+  "to_app"
+     my $app = $obj->to_app;
+
+    Creates Plack application.
+
+    Returns Plack::Component object.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent;
+     use Plack::App::ChangePassword;
+     use Plack::Runner;
+     use Tags::Output::Indent;
+
+     # Run application.
+     my $app = Plack::App::ChangePassword->new(
+             'css' => CSS::Struct::Output::Indent->new,
+             'generator' => 'Plack::App::ChangePassword',
+             'tags' => Tags::Output::Indent->new(
+                     'preserved' => ['style'],
+                     'xml' => 1,
+             ),
+     )->to_app;
+     Plack::Runner->new->run($app);
+
+     # Output:
+     # HTTP::Server::PSGI: Accepting connections at http://0:5000/
+
+     # > curl http://localhost:5000/
+     # <!DOCTYPE html>
+     # <html lang="en">
+     #   <head>
+     #     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+     #     <meta name="generator" content="Plack::App::ChangePassword" />
+     #     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     #     <title>
+     #       Change password page
+     #     </title>
+     #     <style type="text/css">
+     # * {
+     #      box-sizing: border-box;
+     #      margin: 0;
+     #      padding: 0;
+     # }
+     # .form-change-password {
+     #      width: 300px;
+     #      background-color: #f2f2f2;
+     #      padding: 20px;
+     #      border-radius: 5px;
+     #      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+     # }
+     # .form-change-password fieldset {
+     #      border: none;
+     #      padding: 0;
+     #      margin-bottom: 20px;
+     # }
+     # .form-change-password legend {
+     #      font-weight: bold;
+     #      margin-bottom: 10px;
+     # }
+     # .form-change-password p {
+     #      margin: 0;
+     #      padding: 10px 0;
+     # }
+     # .form-change-password label {
+     #      display: block;
+     #      font-weight: bold;
+     #      margin-bottom: 5px;
+     # }
+     # .form-change-password input[type="text"], .form-change-password input[type="password"] {
+     #      width: 100%;
+     #      padding: 8px;
+     #      border: 1px solid #ccc;
+     #      border-radius: 3px;
+     # }
+     # .form-change-password button[type="submit"] {
+     #      width: 100%;
+     #      padding: 10px;
+     #      background-color: #4CAF50;
+     #      color: #fff;
+     #      border: none;
+     #      border-radius: 3px;
+     #      cursor: pointer;
+     # }
+     # .form-change-password button[type="submit"]:hover {
+     #      background-color: #45a049;
+     # }
+     # .form-change-password .messages {
+     #      text-align: center;
+     # }
+     # .container {
+     #      display: flex;
+     #      align-items: center;
+     #      justify-content: center;
+     #      height: 100vh;
+     # }
+     # </style>
+     #   </head>
+     #   <body>
+     #     <div class="container">
+     #       <div class="inner">
+     #         <form class="form-change-password" method="post">
+     #           <fieldset>
+     #             <legend>
+     #               Change password
+     #             </legend>
+     #             <p>
+     #               <label for="old_password">
+     #                 Old password
+     #               </label>
+     #               <input type="password" name="old_password" id="old_password"
+     #                 autofocus="autofocus" />
+     #             </p>
+     #             <p>
+     #               <label for="password1">
+     #                 New password
+     #               </label>
+     #               <input type="password" name="password1" id="password1" />
+     #             </p>
+     #             <p>
+     #               <label for="password2">
+     #                 Confirm new password
+     #               </label>
+     #               <input type="password" name="password2" id="password2" />
+     #             </p>
+     #             <p>
+     #               <button type="submit" name="change_password" value=
+     #                 "change_password">
+     #                 Save Changes
+     #               </button>
+     #             </p>
+     #           </fieldset>
+     #         </form>
+     #       </div>
+     #     </div>
+     #   </body>
+     # </html>
+
+DEPENDENCIES
+    Plack::Component::Tags::HTML, Plack::Request, Plack::Response,
+    Plack::Session, Plack::Util::Accessor, Tags::HTML::ChangePassword,
+    Tags::HTML::Container.
+
+SEE ALSO
+    Plack::App::Login
+        Plack login application.
+
+    Plack::App::Login::Password
+        Plack login/password application.
+
+    Plack::App::Register
+        Plack register application.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Plack-App-ChangePassword>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

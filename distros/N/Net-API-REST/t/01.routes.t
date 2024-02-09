@@ -2,14 +2,20 @@
 BEGIN
 {
 	use strict;
+	use warnings;
 	use lib './lib';
+    use vars qw( $DEBUG );
 	use URI;
 	use IO::File;
-	use Test::More tests => 4;
+    use Test::More qw( no_plan );
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
+use strict;
+use warnings;
+
 my $url = shift( @ARGV ) || 'http://localhost/jp/org/stock/1234/board/member/5678';
-my $api = MyAPI->new( debug => 0 );
+my $api = MyAPI->new( debug => $DEBUG );
 my $uri = URI->new( $url );
 my $sub = $api->route( $uri );
 ok( $sub, "Getting the handler" );
@@ -24,8 +30,13 @@ elsif( !length( $sub ) )
 is( ref( $sub ), 'Net::API::REST::Endpoint', "Handler is a Net::API::REST::Endpoint object" );
 my $rv = $sub->handler->( 'argv1' );
 is( $rv, 'John Doe', "Checking handler returned value." );
-is( $sub->params->{auth_method} => 'path_info', 'endpoint -> params' );
-exit( 0 );
+is( $sub->params->{csrf_method} => 'path_info', 'endpoint -> params' );
+my $params = $sub->params;
+is( $params->{csrf_method}, 'path_info', 'endpoint -> params{auth_method}' );
+
+done_testing();
+
+exit(0);
 
 package MyAPI;
 BEGIN
@@ -42,6 +53,9 @@ BEGIN
 	use Net::API::REST::Response;
 	our $VERSION = '0.1';
 };
+
+use strict;
+use warnings;
 
 {
 	our( @objects ) = &fake_some_more();
@@ -107,7 +121,7 @@ sub init
 							_handler => $self->curry::jp_stock,
 							_name => 'org_id',
 							# arbitrary hash of key-value pairs
-							_params => { auth_method => 'path_info' },
+							_params => { csrf_method => 'path_info' },
 							board =>
 							{
 								_handler => $self->curry::board,

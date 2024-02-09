@@ -1,3 +1,38 @@
+/*
+ * This library is free software; you can redistribute it and/or
+ * modify it under the same terms as Perl itself.
+ *
+ *  Copyright 2023-2024 Michal Josef Špaček.
+ *  Copyright 1998-2000 Gisle Aas.
+ *  Copyright 1995-1996 Neil Winton.
+ *  Copyright 1991-1992 RSA Data Security, Inc.
+ *
+ * This code is derived from Neil Winton's MD5-1.7 Perl module, which in
+ * turn is derived from the reference implementation in RFC 1321 which
+ * comes with this message:
+ *
+ * Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All
+ * rights reserved.
+ *
+ * License to copy and use this software is granted provided that it
+ * is identified as the "RSA Data Security, Inc. MD5 Message-Digest
+ * Algorithm" in all material mentioning or referencing this software
+ * or this function.
+ *
+ * License is also granted to make and use derivative works provided
+ * that such works are identified as "derived from the RSA Data
+ * Security, Inc. MD5 Message-Digest Algorithm" in all material
+ * mentioning or referencing the derived work.
+ *
+ * RSA Data Security, Inc. makes no representations concerning either
+ * the merchantability of this software or the suitability of this
+ * software for any particular purpose. It is provided "as is"
+ * without express or implied warranty of any kind.
+ *
+ * These notices must be retained in any copies of any part of this
+ * documentation and/or software.
+ */
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -6,13 +41,13 @@
 #include <string.h>
 
 STATIC const struct {
-        int (*svt_get)(SV* sv, MAGIC* mg);
-        int (*svt_set)(SV* sv, MAGIC* mg);
-        U32 (*svt_len)(SV* sv, MAGIC* mg);
-        int (*svt_clear)(SV* sv, MAGIC* mg);
-        int (*svt_free)(SV* sv, MAGIC* mg);
+    int (*svt_get)(SV* sv, MAGIC* mg);
+    int (*svt_set)(SV* sv, MAGIC* mg);
+    U32 (*svt_len)(SV* sv, MAGIC* mg);
+    int (*svt_clear)(SV* sv, MAGIC* mg);
+    int (*svt_free)(SV* sv, MAGIC* mg);
 } vtbl_md5 = {
-        NULL, NULL, NULL, NULL, NULL
+    NULL, NULL, NULL, NULL, NULL
 };
 
 /* TODO defined(USE_ITHREADS) && defined(MGf_DUP) */
@@ -148,47 +183,46 @@ addfile(self, fh)
     SV* self
     InputStream fh
     PREINIT:
-    MD5_CTX* context = get_md5_ctx(aTHX_ self);
-    STRLEN fill = context->Nl & 0x3F;
+        MD5_CTX* context = get_md5_ctx(aTHX_ self);
+        STRLEN fill = context->Nl & 0x3F;
 #ifdef USE_HEAP_INSTEAD_OF_STACK
-    unsigned char* buffer;
+        unsigned char* buffer;
 #else
-    unsigned char buffer[4096];
+        unsigned char buffer[4096];
 #endif
-    int  n;
+        int  n;
     CODE:
-    if (fh) {
+        if (fh) {
 #ifdef USE_HEAP_INSTEAD_OF_STACK
-        New(0, buffer, 4096, unsigned char);
-        assert(buffer);
+            New(0, buffer, 4096, unsigned char);
+            assert(buffer);
 #endif
             if (fill) {
-            /* The MD5Update() function is faster if it can work with
-             * complete blocks.  This will fill up any buffered block
-             * first.
-             */
-            STRLEN missing = 64 - fill;
-            if ( (n = PerlIO_read(fh, buffer, missing)) > 0)
-             MD5_Update(context, buffer, n);
-            else
-            XSRETURN(1);  /* self */
-        }
+                /* The MD5Update() function is faster if it can work with
+                 * complete blocks.  This will fill up any buffered block
+                 * first.
+                 */
+                STRLEN missing = 64 - fill;
+                if ( (n = PerlIO_read(fh, buffer, missing)) > 0)
+                    MD5_Update(context, buffer, n);
+                else
+                    XSRETURN(1);  /* self */
+            }
 
-        /* Process blocks until EOF or error */
+            /* Process blocks until EOF or error */
             while ( (n = PerlIO_read(fh, buffer, sizeof(buffer))) > 0) {
-            MD5_Update(context, buffer, n);
-        }
+                MD5_Update(context, buffer, n);
+            }
 #ifdef USE_HEAP_INSTEAD_OF_STACK
-        Safefree(buffer);
+            Safefree(buffer);
 #endif
-        if (PerlIO_error(fh)) {
-        croak("Reading from filehandle failed");
+            if (PerlIO_error(fh)) {
+                croak("Reading from filehandle failed");
+            }
+        } else {
+            croak("No filehandle passed");
         }
-    }
-    else {
-        croak("No filehandle passed");
-    }
-    XSRETURN(1);  /* self */
+        XSRETURN(1);  /* self */
 
 void
 clone(self)
@@ -222,7 +256,8 @@ add(self, ...)
             U32 had_utf8 = SvUTF8(ST(i));
             data = (unsigned char *)(SvPVbyte(ST(i), len));
             MD5_Update(context, data, len);
-            if (had_utf8) sv_utf8_upgrade(ST(i));
+            if (had_utf8)
+                sv_utf8_upgrade(ST(i));
         }
         XSRETURN(1);  /* self */
 
@@ -248,13 +283,13 @@ md5(...)
         Digest::MD5::md5_hex    = F_HEX
         Digest::MD5::md5_base64 = F_B64
     PREINIT:
-        MD5_CTX ctx;
+        MD5_CTX context;
         int i;
         unsigned char *data;
         STRLEN len;
         unsigned char digeststr[16];
     PPCODE:
-        MD5_Init(&ctx);
+        MD5_Init(&context);
 
         if ((PL_dowarn & G_WARN_ON) || ckWARN(WARN_SYNTAX)) {
             const char *msg = 0;
@@ -268,13 +303,11 @@ md5(...)
                     else
                         msg = "called with reference argument";
                 }
-            }
-            else if (items > 1) {
+            } else if (items > 1) {
                 data = (unsigned char *)SvPV(ST(0), len);
                 if (len == 11 && memEQ("Digest::MD5", data, 11)) {
                     msg = "probably called as class method";
-                }
-                else if (SvROK(ST(0))) {
+                } else if (SvROK(ST(0))) {
                     SV* sv = SvRV(ST(0));
                     char *name;
                     if (SvOBJECT(sv) && (name = HvNAME(SvSTASH(sv)))
@@ -292,9 +325,10 @@ md5(...)
         for (i = 0; i < items; i++) {
             U32 had_utf8 = SvUTF8(ST(i));
             data = (unsigned char *)(SvPVbyte(ST(i), len));
-            MD5_Update(&ctx, data, len);
-            if (had_utf8) sv_utf8_upgrade(ST(i));
+            MD5_Update(&context, data, len);
+            if (had_utf8)
+                sv_utf8_upgrade(ST(i));
         }
-        MD5_Final(digeststr, &ctx);
+        MD5_Final(digeststr, &context);
         ST(0) = make_mortal_sv(aTHX_ digeststr, ix);
         XSRETURN(1);

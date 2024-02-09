@@ -4,12 +4,13 @@ author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
   DBD::CSV: '0'
-  DBD::XMLSimple: '0'
+  DBD::XMLSimple: '0.07'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   FindBin: '0'
   Test::Compile: '0'
   Test::Most: '0'
+  Test::Needs: '0'
   Text::xSV::Slurp: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -38,5 +39,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Database-Abstraction/issues
   repository: git://github.com/nigelhorne/Database-Abstraction.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,4 +1,7 @@
 Revision history for Web-ACL
 
+0.0.2	2024-02.07/12:30
+		 - Set min version of Error::Helper to 2.1.0
+
 0.0.1	2024-01-02/14:15
 		 - Initial release.

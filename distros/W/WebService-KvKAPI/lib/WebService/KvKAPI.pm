@@ -1,7 +1,7 @@
 use utf8;
 package WebService::KvKAPI;
 
-our $VERSION = '0.105';
+our $VERSION = '0.106';
 
 # ABSTRACT: Query the Dutch Chamber of Commerence (KvK) API
 #
@@ -18,6 +18,7 @@ use WebService::KvKAPI::LocationProfile;
 
 field $api_key   :param = undef;
 field $api_host  :param :accessor = undef;
+field $api_path  :param :accessor = undef;
 field $spoof     :param = 0;
 
 # We need https://rt.cpan.org/Public/Bug/Display.html?id=140712 for delegation
@@ -25,52 +26,48 @@ field $basic_profile;
 field $location_profile;
 field $search;
 
+use Sub::HandlesVia::Declare '$search', Blessed => (
+    search => 'search',
+);
+
+use Sub::HandlesVia::Declare '$location_profile', Blessed => (
+    get_location_profile => 'get_location_profile',
+);
+
+use Sub::HandlesVia::Declare '$basic_profile', Blessed => (
+    get_basic_profile => 'get_basic_profile',
+    get_owner         => 'get_owner',
+    get_main_location => 'get_main_location',
+    get_locations     => 'get_locations',
+);
+
 ADJUST {
     $search = WebService::KvKAPI::Search->new(
         api_key => $api_key,
         spoof   => $spoof,
         $self->has_api_host ? (api_host => $api_host) : (),
+        $self->has_api_path ? (api_path => $api_path) : (),
     );
     $location_profile = WebService::KvKAPI::LocationProfile->new(
         api_key => $api_key,
         spoof   => $spoof,
         $self->has_api_host ? (api_host => $api_host) : (),
+        $self->has_api_path ? (api_path => $api_path) : (),
     );
     $basic_profile = WebService::KvKAPI::BasicProfile->new(
         api_key => $api_key,
         spoof   => $spoof,
         $self->has_api_host ? (api_host => $api_host) : (),
+        $self->has_api_path ? (api_path => $api_path) : (),
     );
-
 }
 
 method has_api_host {
     return $api_host ? 1 : 0;
 }
 
-method search {
-    return $search->search(@_);
-}
-
-method get_location_profile {
-    return $location_profile->get_location_profile(@_);
-}
-
-method get_basic_profile {
-    return $basic_profile->get_basic_profile(@_);
-
-}
-
-method get_owner {
-    return $basic_profile->get_owner(@_);
-}
-
-method get_main_location {
-    return $basic_profile->get_main_location(@_);
-}
-
-method get_locations {
-    return $basic_profile->get_locations(@_);
+method has_api_path {
+    return $api_path ? 1 : 0;
 }
 
 1;
@@ -87,7 +84,7 @@ WebService::KvKAPI - Query the Dutch Chamber of Commerence (KvK) API
 
 =head1 VERSION
 
-version 0.105
+version 0.106
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,13 @@
+0.240390  2024-02-08 21:59:31+01:00 Europe/Brussels
+    - Additions
+      - Ali: temp_fasta can now be passed an existing IdMapper
+      - Listable: std_mapper can now accept an offset for numbering seqs
+      - SeqId: added warning for unparsable ids due to trailing spaces
+    - Changes
+      - Listable: changed interface of std_mapper
+    - Fixes
+      - binaries: improved robustness of import-itol.pl
+
 0.212670  2021-09-24 16:25:23+02:00 Europe/Brussels
     - Changes
       - Ali: refactored store_phylip method for speed (visible in ali2phylip.pl)

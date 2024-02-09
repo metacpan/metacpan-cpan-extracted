@@ -1,5 +1,10 @@
 Revision history for Database-Abstraction
 
+0.05	Fri Feb  9 11:01:00 EST 2024
+	Fix https://www.cpantesters.org/cpan/report/f07e90f2-c264-11ee-bb2d-64236e8775ea
+	init() will now return the current defaults
+	Ensure that the default cache_duration is 1 hour
+
 0.04	Fri Feb  2 13:14:18 EST 2024
 	init() can now be called more than once and will retain the old values
 	Added XML test

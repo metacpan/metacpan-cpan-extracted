@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Taxonomy::Classifier;
 # ABSTRACT: Helper class for multiple-criterion classifier based on taxonomy
-$Bio::MUST::Core::Taxonomy::Classifier::VERSION = '0.212670';
+$Bio::MUST::Core::Taxonomy::Classifier::VERSION = '0.240390';
 use Moose;
 use namespace::autoclean;
 
@@ -125,7 +125,7 @@ Bio::MUST::Core::Taxonomy::Classifier - Helper class for multiple-criterion clas
 
 =head1 VERSION
 
-version 0.212670
+version 0.240390
 
 =head1 SYNOPSIS
 

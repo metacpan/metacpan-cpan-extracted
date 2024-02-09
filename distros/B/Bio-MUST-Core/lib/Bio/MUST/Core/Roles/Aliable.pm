@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Roles::Aliable;
 # ABSTRACT: Aliable Moose role (pure interface) for Ali-like objects
-$Bio::MUST::Core::Roles::Aliable::VERSION = '0.212670';
+$Bio::MUST::Core::Roles::Aliable::VERSION = '0.240390';
 use Moose::Role;
 
 use autodie;
@@ -29,7 +29,7 @@ Bio::MUST::Core::Roles::Aliable - Aliable Moose role (pure interface) for Ali-li
 
 =head1 VERSION
 
-version 0.212670
+version 0.240390
 
 =head1 SYNOPSIS
 

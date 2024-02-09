@@ -14,13 +14,17 @@ METHODS
 
     Constructor.
 
-    Returns instance of object.
-
     *       "css"
 
             'CSS::Struct::Output' object for process_css processing.
 
             Default value is undef.
+
+    *       "css_register"
+
+            CSS class for form.
+
+            Default value is 'form-register'.
 
     *       "form_method"
 
@@ -30,7 +34,7 @@ METHODS
 
             Default value is 'post'.
 
-    *       "language"
+    *       "lang"
 
             Language in ISO 639-3 code.
 
@@ -61,6 +65,8 @@ METHODS
                             'submit' => 'Register',
                     },
              }
+
+    Returns instance of object.
 
   "process"
      $obj->process($messages_ar);
@@ -235,7 +241,6 @@ EXAMPLE2
              }],
              'css' => $css,
              'tags' => $tags,
-             'title' => 'Register',
      )->to_app;
      Plack::Runner->new->run($app);
 
@@ -261,10 +266,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2021-2023 Michal Josef Špaček
+    © 2021-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.08
 

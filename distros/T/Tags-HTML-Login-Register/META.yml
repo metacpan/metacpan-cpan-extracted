@@ -33,7 +33,6 @@ requires:
   Error::Pure: 0
   List::Util: 1.33
   Readonly: 0
-  Scalar::Util: 0
   Tags::HTML: 0
   Tags::HTML::Messages: 0.09
   perl: 5.8.0
@@ -42,4 +41,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-Login-Register
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-Login-Register
-version: '0.06'
+version: '0.08'

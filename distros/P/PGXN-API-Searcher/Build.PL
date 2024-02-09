@@ -33,9 +33,6 @@ $class->new(
     license            => 'perl',
     create_makefile_pl => 'traditional',
     configure_requires => { 'Module::Build' => '0.4209' },
-    build_requires     => {
-        'Module::Build' => '0.4209',
-    },
     test_requires => {
         'File::Path'            => '2.08',
         'File::Spec::Functions' => 0,
@@ -44,14 +41,23 @@ $class->new(
     requires => {
         'Carp'       => 0,
         'File::Spec' => 0,
-        'Lucy'       => '0.2.1',
-        'perl'       => '5.10.0',
+        'Lucy'       => '0.6.2',
+        'perl'       => '5.12.0',
     },
     meta_merge => {
         resources => {
             homepage   => 'https://metacpan.org/dist/PGXN-API-Searcher',
             bugtracker => 'https://github.com/pgxn/pgxn-api-searcher/issues/',
             repository => 'https://github.com/pgxn/pgxn-api-searcher/',
-        }
+        },
+        prereqs => {
+            develop => {
+                requires => {
+                    'Test::Pod'             => '1.41',
+                    'Test::Pod::Coverage'   => '1.06',
+                    'Test::Spelling'        => '0.25',
+                },
+            },
+        },
     },
 )->create_build_script;

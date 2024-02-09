@@ -23,8 +23,6 @@ For example, you can access the files in /var/db/foo.csv via this class:
 
     our @ISA = ('Database::Abstraction');
 
-    1;
-
 You can then access the data using:
 
     my $foo = MyPackageName::Database::Foo->new(directory => '/var/db');
@@ -35,9 +33,10 @@ You can then access the data using:
 CSV files can have empty lines or comment lines starting with '#',
 to make them more readable.
 
-If the table has a column called "entry", sorts are based on that
+If the table has a column called "entry",
+entries are keyed on that and sorts are based on it.
 To turn that off, pass 'no\_entry' to the constructor, for legacy
-reasons it's enabled by default
+reasons it's enabled by default.
 
 # SUBROUTINES/METHODS
 
@@ -47,9 +46,13 @@ Set some class level defaults.
 
     MyPackageName::Database::init(directory => '../databases');
 
-See the documentation for new() to see what variables can be set.
+See the documentation for new to see what variables can be set.
 
-Returns a refernce to a hash of the current values.
+Returns a reference to a hash of the current values.
+Therefore when given with no arguments you can get the current default values:
+
+    my $defaults = Database::Abstraction::init();
+    print $defaults->{'directory'}, "\n";
 
 ## new
 
@@ -65,7 +68,7 @@ If the arguments are not set, tries to take from class level defaults.
 
 ## set\_logger
 
-Pass a class that will be used for logging
+Pass a class that will be used for logging.
 
 ## selectall\_hashref
 
@@ -96,13 +99,14 @@ Time that the database was last updated
 
 Return the contents of an arbitrary column in the database which match the
 given criteria
-Returns an array of the matches, or just the first entry when called in
-scalar context
+Returns an array of the matches,
+or only the first when called in scalar context
 
-If the first column if the database is "entry" you can do a quick lookup with
-    my $value = $table->column($entry);	# where column is the value you're after
+If the database has a column called "entry" you can do a quick lookup with
 
-Set distinct to 1 if you're after a unique list
+    my $value = $foo->column('123');    # where "column" is the value you're after
+
+Set distinct to 1 if you're after a unique list.
 
 # AUTHOR
 
@@ -112,6 +116,9 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 
 The default delimiter for CSV files is set to '!', not ',' for historical reasons.
 I really ought to fix that.
+
+It would be nice for the key column to be called key, not entry,
+however key's a reserved word in SQL.
 
 # LICENSE AND COPYRIGHT
 

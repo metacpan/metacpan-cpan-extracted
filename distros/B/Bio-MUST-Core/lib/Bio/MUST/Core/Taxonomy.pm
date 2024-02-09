@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.212670';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.240390';
 use Moose;
 use namespace::autoclean;
 
@@ -545,7 +545,7 @@ around qw( get_taxonomy get_taxonomy_with_levels get_term_at_level ) => sub {
     # update taxon_id if merged in current version of NCBI Taxonomy
     # in contrast, we don't do anything if taxon_id has been deleted
     if ( defined $taxon_id && $self->is_merged($taxon_id) ) {
-        my $msg = "[BMC] Warning: merged taxid for $taxon_id;";
+        my $msg = "[BMC] Note: merged taxid for $taxon_id;";
         $taxon_id = $self->merged_for($taxon_id);
         carp "$msg using $taxon_id instead!";
     }
@@ -1938,7 +1938,7 @@ sub _read_gtdb_metadata {
         if ($line =~ m/^accession/xms) {
             (undef, @keys) = split /\t/xms, $line;
             next LINE;
-	    }
+        }
 
         my ($gca, @values) = split /\t/xms, $line;
         $gca =~ s/GB_|RS_//xms;
@@ -2015,7 +2015,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.212670
+version 0.240390
 
 =head1 SYNOPSIS
 

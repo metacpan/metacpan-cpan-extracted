@@ -1,18 +1,13 @@
-.travis.yml
 bin/pgxn_api_server
 bin/pgxn_api_sync
 Build.PL
 Changes
-eg/debian_init
-eg/sync_pgxn
 lib/PGXN/API.pm
 lib/PGXN/API/index.html
 lib/PGXN/API/Indexer.pm
 lib/PGXN/API/Router.pm
 lib/PGXN/API/Sync.pm
 MANIFEST			This list of files
-META.json
-META.yml
 README.md
 t/base.t
 t/bin/testrsync
@@ -69,3 +64,5 @@ t/root/user/fred.json
 t/root/user/theory.json
 t/router.t
 t/sync.t
+META.yml
+META.json

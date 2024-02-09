@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Touchscreen;
-$Playwright::Touchscreen::VERSION = '1.324';
+$Playwright::Touchscreen::VERSION = '1.401';
 use parent 'Playwright::Base';
 
 sub new {
@@ -76,7 +76,7 @@ Playwright::Touchscreen - Automatically generated class for Playwright::Touchscr
 
 =head1 VERSION
 
-version 1.324
+version 1.401
 
 =head1 CONSTRUCTOR
 
@@ -91,25 +91,25 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 Execute the Touchscreen::tap playwright routine.
 
-See L<https://playwright.dev/api/class-Touchscreen#Touchscreen-tap> for more information.
+See L<https://playwright.dev/docs/api/class-Touchscreen#Touchscreen-tap> for more information.
 
 =head2 on(@args)
 
 Execute the Touchscreen::on playwright routine.
 
-See L<https://playwright.dev/api/class-Touchscreen#Touchscreen-on> for more information.
+See L<https://playwright.dev/docs/api/class-Touchscreen#Touchscreen-on> for more information.
 
 =head2 evaluate(@args)
 
 Execute the Touchscreen::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-Touchscreen#Touchscreen-evaluate> for more information.
+See L<https://playwright.dev/docs/api/class-Touchscreen#Touchscreen-evaluate> for more information.
 
 =head2 evaluateHandle(@args)
 
 Execute the Touchscreen::evaluateHandle playwright routine.
 
-See L<https://playwright.dev/api/class-Touchscreen#Touchscreen-evaluateHandle> for more information.
+See L<https://playwright.dev/docs/api/class-Touchscreen#Touchscreen-evaluateHandle> for more information.
 
 =head1 SEE ALSO
 

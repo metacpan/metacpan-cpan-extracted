@@ -187,8 +187,8 @@ sub get_spvm_core_source_file_names {
   return \@spvm_core_source_file_names;
 }
 
-sub get_spvm_compiler_and_runtime_class_file_names {
-  my @spvm_compiler_and_runtime_class_file_names = qw(
+sub get_spvm_compiler_required_file_names {
+  my @get_spvm_compiler_required_file_names = qw(
     SPVM/Native/Arg.c
     SPVM/Native/Arg.spvm
     SPVM/Native/BasicType.c
@@ -215,7 +215,7 @@ sub get_spvm_compiler_and_runtime_class_file_names {
     SPVM/Native/Stack.spvm
   );
   
-  return \@spvm_compiler_and_runtime_class_file_names;
+  return \@get_spvm_compiler_required_file_names;
 }
 
 sub need_generate {
@@ -319,25 +319,6 @@ sub spurt_binary {
   print $fh $content;
 }
 
-sub create_cfunc_name {
-  my ($basic_type_name, $method_name, $category) = @_;
-  
-  my $prefix;
-  if ($category eq 'native') {
-    $prefix = 'SPVM__';
-  }
-  elsif ($category eq 'precompile') {
-    $prefix = 'SPVMPRECOMPILE__'
-  }
-  
-  # Precompile Method names
-  my $method_abs_name_under_score = "${basic_type_name}::$method_name";
-  $method_abs_name_under_score =~ s/:/_/g;
-  my $cfunc_name = "$prefix$method_abs_name_under_score";
-  
-  return $cfunc_name;
-}
-
 sub unindent {
   my $str = shift;
   my $min = min map { m/^([ \t]*)/; length $1 || () } split "\n", $str;
@@ -376,22 +357,22 @@ sub convert_class_file_to_dynamic_lib_file {
   return $dynamic_lib_category_file;
 }
 
-sub convert_basic_type_name_to_dynamic_lib_rel_file {
-  my ($basic_type_name, $category) = @_;
+sub convert_class_name_to_dynamic_lib_rel_file {
+  my ($class_name, $category) = @_;
   
   my $dlext = $Config{dlext};
-  my $dynamic_lib_category_rel_file = &convert_basic_type_name_to_rel_file($basic_type_name);
+  my $dynamic_lib_category_rel_file = &convert_class_name_to_rel_file($class_name);
   $dynamic_lib_category_rel_file .= $category eq 'native' ? ".$dlext" : ".$category.$dlext";
   
   return $dynamic_lib_category_rel_file;
 }
 
-sub convert_basic_type_name_to_category_rel_file {
-  my ($basic_type_name, $category, $ext) = @_;
+sub convert_class_name_to_category_rel_file {
+  my ($class_name, $category, $ext) = @_;
   
-  $basic_type_name =~ s/^SPVM:://;
+  $class_name =~ s/^SPVM:://;
   
-  my $rel_file_with_ext = "SPVM::$basic_type_name";
+  my $rel_file_with_ext = "SPVM::$class_name";
   $rel_file_with_ext =~ s/::/\//g;
   $rel_file_with_ext .= $category eq 'native' ? "" : ".$category";
   if (defined $ext) {
@@ -401,25 +382,25 @@ sub convert_basic_type_name_to_category_rel_file {
   return $rel_file_with_ext;
 }
 
-sub convert_basic_type_name_to_rel_dir {
-  my ($basic_type_name) = @_;
-
-  $basic_type_name =~ s/^SPVM:://;
-
+sub convert_class_name_to_rel_dir {
+  my ($class_name) = @_;
+  
+  $class_name =~ s/^SPVM:://;
+  
   my $rel_dir;
-  my $rel_file = "SPVM::$basic_type_name";
+  my $rel_file = "SPVM::$class_name";
   $rel_file =~ s/::/\//g;
   $rel_dir = dirname $rel_file;
   
   return $rel_dir;
 }
 
-sub convert_basic_type_name_to_rel_file {
-  my ($basic_type_name, $ext) = @_;
+sub convert_class_name_to_rel_file {
+  my ($class_name, $ext) = @_;
 
-  $basic_type_name =~ s/^SPVM:://;
+  $class_name =~ s/^SPVM:://;
   
-  my $rel_file_with_ext = "SPVM::$basic_type_name";
+  my $rel_file_with_ext = "SPVM::$class_name";
   $rel_file_with_ext =~ s/::/\//g;
   
   if (defined $ext) {
@@ -429,13 +410,11 @@ sub convert_basic_type_name_to_rel_file {
   return $rel_file_with_ext;
 }
 
-sub remove_basic_type_name_part_from_file {
-  my ($file, $basic_type_name) = @_;
-
-  $basic_type_name =~ s/^SPVM:://;
+sub get_class_base_dir {
+  my ($file, $class_name) = @_;
   
   $file =~ s/\.spvm$//;
-  my $class_file = "SPVM::$basic_type_name";
+  my $class_file = "SPVM::$class_name";
   $class_file =~ s/::/\//g;
   $file =~ s/$class_file$//;
   $file =~ s/[\\\/]$//;
@@ -444,80 +423,108 @@ sub remove_basic_type_name_part_from_file {
 }
 
 sub create_make_rule_native {
-  my $basic_type_name = shift;
+  my $class_name = shift;
   
-  create_make_rule($basic_type_name, 'native', @_);
+  create_make_rule($class_name, 'native', @_);
 }
 
 sub create_make_rule_precompile {
-  my $basic_type_name = shift;
+  my $class_name = shift;
   
-  create_make_rule($basic_type_name, 'precompile', @_);
+  create_make_rule($class_name, 'precompile', @_);
 }
 
 sub create_make_rule {
-  my ($basic_type_name, $category, $options) = @_;
+  my ($class_name, $category, $options) = @_;
   
   $options ||= {};
-  $basic_type_name =~ s/^SPVM:://;
   
-  my $module_base_name = $basic_type_name;
-  $module_base_name =~ s/^.+:://;
+  # Deprecated
+  if ($class_name =~ s/^SPVM:://) {
+    warn "The SPVM:: prefix is no more required in the class name given to the create_make_rule function.";
+  }
   
   my $lib_dir = defined $options->{lib_dir} ? $options->{lib_dir} : 'lib';
   
-  my $class_rel_file = &convert_basic_type_name_to_rel_file($basic_type_name, 'spvm');
+  my $config_file = "$lib_dir/" . &convert_class_name_to_rel_file($class_name, 'config');
   
-  my $noext_file = $class_rel_file;
-  $noext_file =~ s/\.[^\.]+$//;
-  
-  my $spvm_file = $noext_file;
-  $spvm_file .= '.spvm';
-  $spvm_file = "$lib_dir/$spvm_file";
+  my $config_file_without_ext = $config_file;
+  $config_file_without_ext =~ s/\.[^\.]+$//;
   
   # Dependency files
-  my @deps;
+  my @dependent_files;
   
-  # Dependency c source files
-  push @deps, grep { $_ ne '.' && $_ ne '..' } glob "$lib_dir/$class_rel_file/*";
-
-  push @deps, $spvm_file;
+  my $spvm_class_file = "$config_file_without_ext.spvm";
+  push @dependent_files, $spvm_class_file;
   
   # Dependency native class file
   if ($category eq 'native') {
     # Config
-    my $config_file = $noext_file;
-    $config_file .= '.config';
-    $config_file = "$lib_dir/$config_file";
     my $config = SPVM::Builder::Config->load_config($config_file);
-    push @deps, $config_file;
+    push @dependent_files, $config_file;
     
     # Native class
-    my $native_class_file = $noext_file;
     my $native_class_file_ext = $config->ext;
-    $native_class_file .= ".$native_class_file_ext";
-    $native_class_file = "$lib_dir/$native_class_file";
-    push @deps, $native_class_file;
+    my $native_class_file = "$config_file_without_ext.$native_class_file_ext";
+    push @dependent_files, $native_class_file;
     
     # Native include
-    my $native_include_dir = "$lib_dir/$noext_file.native/include";
+    my $native_include_dir = "$config_file_without_ext.native/include";
     my @native_include_files;
     if (-d $native_include_dir) {
       find({wanted => sub { if (-f $_) { push @native_include_files, $_ } }, no_chdir => 1}, $native_include_dir);
     }
-    push @deps, @native_include_files;
+    push @dependent_files, @native_include_files;
     
     # Native source
-    my $native_src_dir = "$lib_dir/$noext_file.native/src";
+    my $native_src_dir = "$config_file_without_ext.native/src";
     my @native_src_files;
     if (-d $native_src_dir) {
       find({wanted => sub { if (-f $_) { push @native_src_files, $_ } }, no_chdir => 1}, $native_src_dir);
     }
-    push @deps, @native_src_files;
+    push @dependent_files, @native_src_files;
+    
+    # Dependency resources
+    {
+      my $resource_class_names = $config->get_resource_names;
+      for my $resource_class_name (@$resource_class_names) {
+        my $resource = $config->get_resource($resource_class_name);
+        
+        my $resource_config = $resource->config;
+        
+        my $resource_config_file = $resource_config->file;
+        
+        my $resource_config_file_without_ext = $resource_config_file;
+        $resource_config_file_without_ext =~ s/\.[^\.]+$//;
+        
+        # Resource class file
+        my $resource_spvm_class_file = "$resource_config_file_without_ext.spvm";
+        push @dependent_files, $resource_spvm_class_file;
+        
+        # Config
+        push @dependent_files, $resource_config_file;
+        
+        # Native include
+        my $resource_native_include_dir = "$resource_config_file_without_ext.native/include";
+        my @resource_native_include_files;
+        if (-d $resource_native_include_dir) {
+          find({wanted => sub { if (-f $_) { push @resource_native_include_files, $_ } }, no_chdir => 1}, $resource_native_include_dir);
+        }
+        push @dependent_files, @resource_native_include_files;
+        
+        # Native source
+        my $resource_native_src_dir = "$resource_config_file_without_ext.native/src";
+        my @resource_native_src_files;
+        if (-d $resource_native_src_dir) {
+          find({wanted => sub { if (-f $_) { push @resource_native_src_files, $_ } }, no_chdir => 1}, $resource_native_src_dir);
+        }
+        push @dependent_files, @resource_native_src_files;
+      }
+    }
   }
   
   # Shared library file
-  my $dynamic_lib_rel_file = &convert_basic_type_name_to_dynamic_lib_rel_file($basic_type_name, $category);
+  my $dynamic_lib_rel_file = &convert_class_name_to_dynamic_lib_rel_file($class_name, $category);
   my $dynamic_lib_file = "blib/lib/$dynamic_lib_rel_file";
   
   my $make_rule = '';
@@ -527,8 +534,8 @@ sub create_make_rule {
   $make_rule .= "\t\$(NOECHO) \$(NOOP)\n\n";
   
   # Get source files
-  $make_rule .= "$dynamic_lib_file :: @deps\n";
-  $make_rule .= "\t$^X -Mblib -MSPVM::Builder::API -e \"SPVM::Builder::API->new(build_dir => '.spvm_build')->build_dynamic_lib_dist_$category('$basic_type_name')\"\n\n";
+  $make_rule .= "$dynamic_lib_file :: @dependent_files\n";
+  $make_rule .= "\t$^X -Mblib -MSPVM::Builder::API -e \"SPVM::Builder::API->new(build_dir => '.spvm_build')->build_dynamic_lib_dist_$category('$class_name')\"\n\n";
   
   return $make_rule;
 }
@@ -570,14 +577,14 @@ sub get_spvm_dependent_files {
       push @spvm_dependent_files, $spvm_core_source_file;
     }
     
-    # SPVM Compiler and Runtime class file names
-    my $spvm_compiler_and_runtime_class_file_names = &get_spvm_compiler_and_runtime_class_file_names();
-    for my $spvm_compiler_and_runtime_class_file_name (@$spvm_compiler_and_runtime_class_file_names) {
-      my $spvm_compiler_and_runtime_class_file = "$builder_loaded_dir/$spvm_compiler_and_runtime_class_file_name";
-      unless (-f $spvm_compiler_and_runtime_class_file) {
-        confess "Can't find $spvm_compiler_and_runtime_class_file";
+    # SPVM Compiler required file names
+    my $get_spvm_compiler_required_file_names = &get_spvm_compiler_required_file_names();
+    for my $get_spvm_compiler_required_file_name (@$get_spvm_compiler_required_file_names) {
+      my $get_spvm_compiler_required_class_file = "$builder_loaded_dir/$get_spvm_compiler_required_file_name";
+      unless (-f $get_spvm_compiler_required_class_file) {
+        confess "Can't find $get_spvm_compiler_required_class_file";
       }
-      push @spvm_dependent_files, $spvm_compiler_and_runtime_class_file;
+      push @spvm_dependent_files, $get_spvm_compiler_required_class_file;
     }
   }
   
@@ -588,15 +595,15 @@ sub get_spvm_dependent_files {
   return \@spvm_dependent_files;
 }
 
-sub get_config_file_from_basic_type_name {
-  my ($basic_type_name, $mode) = @_;
+sub search_config_file {
+  my ($class_name, $mode) = @_;
   
   my $ext = 'config';
   if (defined $mode) {
     $ext = "$mode.$ext";
   }
   
-  my $config_file_base = SPVM::Builder::Util::convert_basic_type_name_to_rel_file($basic_type_name, $ext);
+  my $config_file_base = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, $ext);
   my $config_file;
   for my $inc (@INC) {
     my $config_file_tmp = "$inc/$config_file_base";
@@ -605,14 +612,11 @@ sub get_config_file_from_basic_type_name {
       last;
     }
   }
-  unless (defined $config_file) {
-    confess "Can't find the config file \"$config_file_base\" in (@INC)";
-  }
   
   return $config_file;
 }
 
-sub get_builder_dir_from_config_class {
+sub get_builder_dir {
   my $builder_config_dir = $INC{"SPVM/Builder/Config.pm"};
   my $builder_dir = $builder_config_dir;
   $builder_dir =~ s/\/Config\.pm$//;
@@ -663,96 +667,12 @@ sub create_build_lib_path {
   return $build_lib_path;
 }
 
-sub create_dl_func_list {
-  my ($basic_type_name, $method_names, $options) = @_;
-  
-  $options ||= {};
-  
-  my $category = $options->{category} || '';
-  
-  # dl_func_list
-  # This option is needed Windows DLL file
-  my $dl_func_list = [];
-  for my $method_name (@$method_names) {
-    my $cfunc_name = SPVM::Builder::Util::create_cfunc_name($basic_type_name, $method_name, $category);
-    push @$dl_func_list, $cfunc_name;
-  }
-  
-  # This is bad hack to suppress boot strap function error.
-  unless (@$dl_func_list) {
-    push @$dl_func_list, '';
-  }
-  
-  return $dl_func_list;
-}
-
 sub get_dynamic_lib_file_dist {
   my ($class_file, $category) = @_;
 
   my $dynamic_lib_file = SPVM::Builder::Util::convert_class_file_to_dynamic_lib_file($class_file, $category);
   
   return $dynamic_lib_file;
-}
-
-sub get_method_addresses {
-  my ($dynamic_lib_file, $basic_type_name, $method_names, $category) = @_;
-  
-  my $method_addresses = {};
-  if (@$method_names) {
-    my $method_infos = [];
-    for my $method_name (@$method_names) {
-      my $method_info = {};
-      $method_info->{basic_type_name} = $basic_type_name;
-      $method_info->{method_name} = $method_name;
-      push @$method_infos, $method_info;
-    }
-    
-    for my $method_info (@$method_infos) {
-      my $basic_type_name = $method_info->{basic_type_name};
-      my $method_name = $method_info->{method_name};
-
-      my $cfunc_address;
-      if ($dynamic_lib_file) {
-        my $dynamic_lib_libref = DynaLoader::dl_load_file($dynamic_lib_file);
-        
-        if ($dynamic_lib_libref) {
-
-          my $cfunc_name = SPVM::Builder::Util::create_cfunc_name($basic_type_name, $method_name, $category);
-          $cfunc_address = DynaLoader::dl_find_symbol($dynamic_lib_libref, $cfunc_name);
-          unless ($cfunc_address) {
-            my $dl_error = DynaLoader::dl_error();
-            my $error = <<"EOS";
-Can't find native function \"$cfunc_name\" corresponding to ${basic_type_name}->$method_name in \"$dynamic_lib_file\"
-
-You must write the following definition.
---------------------------------------------------
-#include <spvm_native.h>
-
-int32_t $cfunc_name(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  return 0;
-}
---------------------------------------------------
-
-$dl_error
-EOS
-            confess $error;
-          }
-        }
-        else {
-          my $dl_error = DynaLoader::dl_error();
-          confess "The DynaLoader::dl_load_file function failed:Can't load the \"$dynamic_lib_file\" file for $category methods in $basic_type_name class: $dl_error";
-        }
-      }
-      else {
-        confess "DLL file is not specified";
-      }
-      
-      $method_addresses->{$method_name} = $cfunc_address;
-    }
-  }
-  
-  return $method_addresses;
 }
 
 sub create_default_config {
@@ -794,7 +714,7 @@ sub get_version_string {
 
 sub get_spvm_version_string {
   
-  my $builder_dir = &get_builder_dir_from_config_class;
+  my $builder_dir = &get_builder_dir;
   my $spvm_api_header_file = "$builder_dir/include/spvm_native.h";
   
   open my $spvm_module_fh, '<', $spvm_api_header_file or die "Can't open the file \"$spvm_api_header_file\": $!";
@@ -810,6 +730,109 @@ sub get_spvm_version_string {
   }
   
   return $version_string;
+}
+
+sub create_dl_func_list {
+  my ($class_name, $method_names, $options) = @_;
+  
+  $options ||= {};
+  
+  my $category = $options->{category} || '';
+  
+  # dl_func_list
+  # This option is needed Windows DLL file
+  my $dl_func_list = [];
+  for my $method_name (@$method_names) {
+    my $cfunc_name = SPVM::Builder::Util::create_cfunc_name($class_name, $method_name, $category);
+    push @$dl_func_list, $cfunc_name;
+  }
+  
+  # This is bad hack to suppress boot strap function error.
+  unless (@$dl_func_list) {
+    push @$dl_func_list, '';
+  }
+  
+  return $dl_func_list;
+}
+
+sub create_cfunc_name {
+  my ($class_name, $method_name, $category) = @_;
+  
+  my $prefix;
+  if ($category eq 'native') {
+    $prefix = 'SPVM__';
+  }
+  elsif ($category eq 'precompile') {
+    $prefix = 'SPVMPRECOMPILE__'
+  }
+  
+  # Precompile Method names
+  my $method_abs_name_under_score = "${class_name}::$method_name";
+  $method_abs_name_under_score =~ s/:/_/g;
+  my $cfunc_name = "$prefix$method_abs_name_under_score";
+  
+  return $cfunc_name;
+}
+
+sub get_method_addresses {
+  my ($dynamic_lib_file, $class_name, $method_names, $category) = @_;
+  
+  my $method_addresses = {};
+  if (@$method_names) {
+    my $method_infos = [];
+    for my $method_name (@$method_names) {
+      my $method_info = {};
+      $method_info->{class_name} = $class_name;
+      $method_info->{method_name} = $method_name;
+      push @$method_infos, $method_info;
+    }
+    
+    for my $method_info (@$method_infos) {
+      my $class_name = $method_info->{class_name};
+      my $method_name = $method_info->{method_name};
+
+      my $cfunc_address;
+      if ($dynamic_lib_file) {
+        my $dynamic_lib_libref = DynaLoader::dl_load_file($dynamic_lib_file);
+        
+        if ($dynamic_lib_libref) {
+
+          my $cfunc_name = SPVM::Builder::Util::create_cfunc_name($class_name, $method_name, $category);
+          $cfunc_address = DynaLoader::dl_find_symbol($dynamic_lib_libref, $cfunc_name);
+          unless ($cfunc_address) {
+            my $dl_error = DynaLoader::dl_error();
+            my $error = <<"EOS";
+Can't find native function \"$cfunc_name\" corresponding to ${class_name}->$method_name in \"$dynamic_lib_file\"
+
+You must write the following definition.
+--------------------------------------------------
+#include <spvm_native.h>
+
+int32_t $cfunc_name(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  return 0;
+}
+--------------------------------------------------
+
+$dl_error
+EOS
+            confess $error;
+          }
+        }
+        else {
+          my $dl_error = DynaLoader::dl_error();
+          confess "The DynaLoader::dl_load_file function failed:Can't load the \"$dynamic_lib_file\" file for $category methods in $class_name class: $dl_error";
+        }
+      }
+      else {
+        confess "DLL file is not specified";
+      }
+      
+      $method_addresses->{$method_name} = $cfunc_address;
+    }
+  }
+  
+  return $method_addresses;
 }
 
 1;

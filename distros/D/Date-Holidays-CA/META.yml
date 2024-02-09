@@ -17,7 +17,7 @@ name: Date-Holidays-CA
 provides:
   Date::Holidays::CA:
     file: lib/Date/Holidays/CA.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   Carp: '0'
   DateTime: '0'
@@ -29,7 +29,7 @@ requires:
 resources:
   bugtracker: https://github.com/timlegge/perl-Date-Holidays-CA/issues
   repository: git://github.com/timlegge/perl-Date-Holidays-CA.git
-version: '0.06'
+version: '0.07'
 x_contributors:
   - 'Timothy Legge <timlegge@gmail.com>'
 x_generated_by_perl: v5.38.0

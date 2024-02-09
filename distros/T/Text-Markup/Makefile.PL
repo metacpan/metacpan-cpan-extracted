@@ -4,27 +4,24 @@ use ExtUtils::MakeMaker;
 WriteMakefile
 (
   'PREREQ_PM' => {
-                   'Parse::BBCode' => '0.15',
-                   'HTML::Entities' => 0,
-                   'File::BOM' => '0.14',
-                   'Text::MediawikiFormat' => '1.0',
-                   'Text::Trac' => '0.10',
-                   'Module::Build' => '0.4209',
-                   'Text::WikiCreole' => '0.07',
+                   'Text::Markdown' => '1.000004',
+                   'Text::Textile' => '2.10',
                    'HTML::Tagset' => 0,
+                   'File::BOM' => '0.14',
+                   'Text::WikiCreole' => '0.07',
+                   'Text::MediawikiFormat' => '1.0',
+                   'Pod::Simple::XHTML' => '3.15',
                    'Text::MultiMarkdown' => '1.000028',
                    'Symbol' => 0,
-                   'Test::More' => '0.96',
+                   'Text::Trac' => '0.10',
+                   'Parse::BBCode' => '0.15',
                    'IPC::Open3' => 0,
-                   'File::Spec::Functions' => 0,
-                   'Text::Markdown' => '1.000004',
-                   'Pod::Simple::XHTML' => '3.15',
-                   'Text::Textile' => '2.10'
+                   'HTML::Entities' => 0
                  },
-  'VERSION_FROM' => 'lib/Text/Markup.pm',
-  'EXE_FILES' => [],
   'PL_FILES' => {},
-  'NAME' => 'Text::Markup',
-  'INSTALLDIRS' => 'site'
+  'VERSION_FROM' => 'lib/Text/Markup.pm',
+  'INSTALLDIRS' => 'site',
+  'EXE_FILES' => [],
+  'NAME' => 'Text::Markup'
 )
 ;

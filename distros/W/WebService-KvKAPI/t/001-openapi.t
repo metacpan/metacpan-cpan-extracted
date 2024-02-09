@@ -36,6 +36,15 @@ is($client->base_url->host, $base_host, ".. and the base host is '$base_host'");
     is($client->base_url->host, $base_host, ".. and the base host is '$base_host'");
 
 }
+{
+    my $client = get_openapi_client(api_host => 'foo.bar', api_path => '/foo/api');
+    my $base_uri  = 'https://foo.bar/foo/api';
+    my $base_host = 'foo.bar';
+
+    is($client->base_url, $base_uri, "Base URI is: $base_uri");
+    is($client->base_url->host, $base_host, ".. and the base host is '$base_host'");
+    is($client->base_url->path, '/foo/api', ".. and the base path is '/foo/api'");
+}
 
 { # Spoof mode
     my $client = get_openapi_client(spoof => 1);

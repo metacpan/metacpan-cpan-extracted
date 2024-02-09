@@ -1,0 +1,65 @@
+<svg viewBox="0 0 650 650" xmlns="http://www.w3.org/2000/svg">
+
+<style>
+  @font-face {
+      font-family: Inkpen2Script;
+      src: url('file://Inkpen2Script.ttf')
+      format('truetype');
+  }
+  path, polygon, rect {
+      stroke-width: 15;
+      stroke: #092a48;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+  }
+  text {
+      font-family: Inkpen2Script;
+      font-size: 100px;
+      fill: blue;
+  }
+</style>
+
+<defs>
+
+  <!-- Define the note shape. -->
+  <g id="note">
+    <path fill="none"
+	  d="M0,0 a 20 17.5 0 1 0 0 1 v-105 3 a 18 18 0 0 0 18 18
+	     l 7 1 a 16 16 0 0 1 15 19" />
+    <ellipse cx="-20" cy="0.5" rx="13" ry="10" />
+  </g><!-- note -->
+
+  <!-- Define the page. -->
+  <g id="page" transform="translate(-55,0)">
+    <rect transform="translate(62.5,7.5)" fill="#f1ecda"
+	  x="0" y="0" width="345" height="455" />
+
+    <!-- The chord text. -->
+    <g transform="translate(120,120)">
+      <text transform="scale(1.5,1)">Am</text>
+    </g>
+
+    <!-- Draw the first notes (red) -->
+    <use href="#note" x="307.5" y="210" fill="#ff0000"/>
+    <!-- This fill is controlled from the 'use'. -->
+    <use href="#note" x="162"   y="375"/>
+
+    <!-- The lyrics lines. -->
+    <path d="M122.5,137.5 h155z
+	     m0,30 h155z        m215,0 h10z
+	     m-215,30 h122.5z   m215,0 h10z
+	     M122.5,300.5 h10z  m102.5,0 h122.5z
+	     m-102.5,30 h10z    m70,0 h155z
+	     m0,30 h155z	 " />
+  </g><!-- page -->
+
+</defs>
+
+<!-- Draw the pages, rotated, at different positions. -->
+<use href="#page" transform="translate(185,60)   rotate(10)"/>
+<!-- Lower note yellow. -->
+<use href="#page" fill="#ffff00" transform="translate(95,127.5) rotate(10)"/>
+<!-- Lower note green. -->
+<use href="#page" fill="#00ff00" transform="translate(282.5,0)  rotate(10)"/>
+
+</svg>

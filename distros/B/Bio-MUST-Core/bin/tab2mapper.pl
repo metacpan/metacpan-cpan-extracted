@@ -33,8 +33,8 @@ for my $infile (@ARGV_infiles) {
         gi2taxid => $ARGV_gi2taxid,
     } );
 
-	my $outfile = change_suffix($infile, '.idm');
-	$mapper->store($outfile);
+    my $outfile = change_suffix($infile, '.idm');
+    $mapper->store($outfile);
 }
 
 __END__
@@ -47,7 +47,7 @@ tab2mapper.pl - Build an id mapper from a tabular file giving annotation strings
 
 =head1 VERSION
 
-version 0.212670
+version 0.240390
 
 =head1 USAGE
 

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::FileChooser;
-$Playwright::FileChooser::VERSION = '1.324';
+$Playwright::FileChooser::VERSION = '1.401';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,6 +20,16 @@ sub new {
 
 sub spec {
     return $Playwright::spec->{'FileChooser'}{members};
+}
+
+sub element {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'element',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
 }
 
 sub setFiles {
@@ -37,16 +47,6 @@ sub isMultiple {
     return $self->_api_request(
         args    => [@_],
         command => 'isMultiple',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub element {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'element',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::FileChooser - Automatically generated class for Playwright::FileChoo
 
 =head1 VERSION
 
-version 1.324
+version 1.401
 
 =head1 CONSTRUCTOR
 
@@ -117,47 +117,47 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
+=head2 element(@args)
+
+Execute the FileChooser::element playwright routine.
+
+See L<https://playwright.dev/docs/api/class-FileChooser#FileChooser-element> for more information.
+
 =head2 setFiles(@args)
 
 Execute the FileChooser::setFiles playwright routine.
 
-See L<https://playwright.dev/api/class-FileChooser#FileChooser-setFiles> for more information.
+See L<https://playwright.dev/docs/api/class-FileChooser#FileChooser-setFiles> for more information.
 
 =head2 isMultiple(@args)
 
 Execute the FileChooser::isMultiple playwright routine.
 
-See L<https://playwright.dev/api/class-FileChooser#FileChooser-isMultiple> for more information.
-
-=head2 element(@args)
-
-Execute the FileChooser::element playwright routine.
-
-See L<https://playwright.dev/api/class-FileChooser#FileChooser-element> for more information.
+See L<https://playwright.dev/docs/api/class-FileChooser#FileChooser-isMultiple> for more information.
 
 =head2 page(@args)
 
 Execute the FileChooser::page playwright routine.
 
-See L<https://playwright.dev/api/class-FileChooser#FileChooser-page> for more information.
+See L<https://playwright.dev/docs/api/class-FileChooser#FileChooser-page> for more information.
 
 =head2 on(@args)
 
 Execute the FileChooser::on playwright routine.
 
-See L<https://playwright.dev/api/class-FileChooser#FileChooser-on> for more information.
+See L<https://playwright.dev/docs/api/class-FileChooser#FileChooser-on> for more information.
 
 =head2 evaluate(@args)
 
 Execute the FileChooser::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-FileChooser#FileChooser-evaluate> for more information.
+See L<https://playwright.dev/docs/api/class-FileChooser#FileChooser-evaluate> for more information.
 
 =head2 evaluateHandle(@args)
 
 Execute the FileChooser::evaluateHandle playwright routine.
 
-See L<https://playwright.dev/api/class-FileChooser#FileChooser-evaluateHandle> for more information.
+See L<https://playwright.dev/docs/api/class-FileChooser#FileChooser-evaluateHandle> for more information.
 
 =head1 SEE ALSO
 

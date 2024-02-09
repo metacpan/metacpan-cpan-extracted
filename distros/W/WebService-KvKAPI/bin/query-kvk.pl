@@ -20,6 +20,7 @@ GetOptions(
         help|h
         man|m
         hostname=s
+        path=s
 
         spoof
         profile|profiel|basic-profile=i
@@ -34,12 +35,12 @@ GetOptions(
         kvkNummer|kvkNumber|kvk-nummer=s
         rsin=s
         vestigingsnummer|branchNumber=s
-        handelsnaam|tradeName=s
+        naam|handelsnaam|tradeName=s
         straatnaam|street=s
         postcode|postalCode=s
         huisnummer|houseNumber=s
         plaats|woonplaats|stad|city=s
-        type=s
+        type=s@
         InclusiefInactieveRegistraties|inactief|inactive
         pagina|page=i
         aantal|amount=i
@@ -65,6 +66,7 @@ if (!$api_key && !$options{spoof}) {
 
 my $api = WebService::KvKAPI->new(
     $options{hostname} ? (api_host => $options{hostname}) : (),
+    $options{path} ? (api_path => $options{path}) : (),
     $options{spoof} ? (spoof => 1) : ( api_key => $api_key ),
 );
 delete $options{spoof};
@@ -117,7 +119,7 @@ query-kvk.pl - Query the Dutch Chamber of Commerce via the CLI
 
 =head1 VERSION
 
-version 0.105
+version 0.106
 
 =head1 SYNOPSIS
 

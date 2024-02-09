@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::Most;
 
-if($ENV{AUTHOR_TESTING}) {
+if($ENV{'AUTHOR_TESTING'}) {
 	# Ensure a recent version of Test::Pod::Coverage
 	my $min_tpc = 1.08;
 	eval "use Test::Pod::Coverage $min_tpc";

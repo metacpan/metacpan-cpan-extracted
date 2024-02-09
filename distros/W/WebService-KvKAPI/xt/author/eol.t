@@ -18,7 +18,8 @@ my @files = (
     't/001-openapi.t',
     't/100-search.t',
     't/200-basic-profile.t',
-    't/300-location-profile.t'
+    't/300-location-profile.t',
+    't/900-factory.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

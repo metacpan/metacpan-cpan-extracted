@@ -1,6 +1,6 @@
 package PGXN::API::Indexer;
 
-use 5.10.0;
+use v5.14;
 use utf8;
 use Moose;
 use PGXN::API;
@@ -9,6 +9,7 @@ use File::Path qw(make_path);
 use File::Copy::Recursive qw(fcopy dircopy);
 use File::Basename;
 use Text::Markup;
+use Text::Markup::CommonMark;
 use XML::LibXML;
 use List::Util qw(first);
 use List::MoreUtils qw(uniq);
@@ -19,10 +20,11 @@ use Lucy::Index::Indexer;
 use Try::Tiny;
 use Archive::Zip qw(AZ_OK);
 use namespace::autoclean;
-our $VERSION = v0.16.5;
+our $VERSION = v0.20.0;
 
-has verbose  => (is => 'rw', isa => 'Int', default => 0);
-has to_index => (is => 'ro', isa => 'HashRef', default => sub { +{
+has verbose   => (is => 'rw', isa => 'Int', default => 0);
+has _index_it => (is => 'rw', isa => 'Bool', default => 1);
+has to_index  => (is => 'ro', isa => 'HashRef', default => sub { +{
     map { $_ => [] } qw(docs dists extensions users tags)
 } });
 
@@ -210,6 +212,9 @@ sub parse_from_mirror {
 sub add_distribution {
     my ($self, $params) = @_;
 
+    # merge_distmeta will set _index_it, but we don't want it changed after this
+    # method finishes.
+    local $self->{_index_it} = 1;
     $self->copy_files($params)        or return $self->_rollback;
     $self->merge_distmeta($params)    or return $self->_rollback;
     $self->update_user($params)       or return $self->_rollback;
@@ -221,14 +226,14 @@ sub add_distribution {
 sub copy_files {
     my ($self, $p) = @_;
     my $meta = $p->{meta};
-    say "  Copying \L$meta->{name}-$meta->{version} files" if $self->verbose;
+    say "  Copying \L$meta->{name}-$meta->{version}\E files" if $self->verbose;
 
     # Need to copy the README, zip file, and dist meta file.
     for my $file (qw(download readme)) {
         my $src = $self->mirror_file_for($file => $meta);
         my $dst = $self->doc_root_file_for($file => $meta);
         next if $file eq 'readme' && !-e $src;
-        say "    \L$meta->{name}-$meta->{version}.$file" if $self->verbose > 1;
+        say "    \L$meta->{name}-$meta->{version}\E.$file" if $self->verbose > 1;
         fcopy $src, $dst or die "Cannot copy $src to $dst: $!\n";
     }
     return $self;
@@ -237,7 +242,7 @@ sub copy_files {
 sub merge_distmeta {
     my ($self, $p) = @_;
     my $meta = $p->{meta};
-    say "  Merging \L$meta->{name}-$meta->{version} META.json" if $self->verbose;
+    say "  Merging \L$meta->{name}-$meta->{version}\E META.json" if $self->verbose;
 
     # Merge the list of versions into the meta file.
     my $api = PGXN::API->instance;
@@ -245,16 +250,36 @@ sub merge_distmeta {
     my $dist_meta = $api->read_json_from($dist_file);
     $meta->{releases} = $dist_meta->{releases};
 
+    # Determine whether to full-text index this distribution.
+    $self->_index_it(
+        # Always index a stable release.
+        $meta->{release_status} eq 'stable'
+        # Index if testing and no stable.
+        || ($meta->{release_status} eq 'testing' && !$meta->{releases}{stable})
+        # Index if there are only unstable releases.
+        || !$meta->{releases}{testing}
+    );
+
     # Add a list of special files and docs.
     $meta->{special_files} = $self->_source_files($p);
     $meta->{docs}          = $self->parse_docs($p);
 
-    # Add doc paths to provided extensions where possible.
-    while (my ($ext, $data) = each %{ $meta->{provides} }) {
-        $data->{docpath} = first {
-            my ($basename) = m{([^/]+)$};
-            $basename eq $ext;
-        } keys %{ $meta->{docs} };
+    # Add doc paths to provided extensions where appropriate.
+    while (my ($noext_path, $data) = each %{ $meta->{docs} }) {
+        if (my $ext = delete $data->{extension}) {
+            # The extension referenced a docfile. Use it.
+            my $d = $meta->{provides}{$ext}
+                || die "Extension $ext missing from meta spec";
+            $d->{docpath} = $noext_path;
+            next;
+        }
+
+        # No doc specified or it wasn't found. Try to find a likely candidate
+        # where the extension name is the file base name.
+        my ($basename) = $noext_path =~ m{([^/]+)$};
+        if (my $d = $meta->{provides}{$basename}) {
+            $d->{docpath} ||= $noext_path;
+        }
     }
 
     # Write the merge metadata to the file.
@@ -262,7 +287,7 @@ sub merge_distmeta {
     make_path dirname $fn;
     $api->write_json_to($fn, $meta);
 
-    $dist_file = $self->doc_root_file_for(dist => $meta );
+    $dist_file = $self->doc_root_file_for(dist => $meta);
     if ($meta->{release_status} eq 'stable') {
         # Copy it to its dist home.
         fcopy $fn, $dist_file or die "Cannot copy $fn to $dist_file: $!\n";
@@ -290,7 +315,7 @@ sub merge_distmeta {
         date        => $meta->{date},
         user_name   => $self->_get_user_name($meta),
         user        => $meta->{user},
-    }) if $meta->{release_status} eq 'stable';
+    });
 
     # Now update all older versions with the complete list of releases.
     for my $releases ( values %{ $meta->{releases} }) {
@@ -341,17 +366,14 @@ sub update_user {
 sub update_tags {
     my ($self, $p) = @_;
     my $meta = $p->{meta};
-    say "  Updating \L$meta->{name}-$meta->{version} tags" if $self->verbose;
+    say "  Updating \L$meta->{name}-$meta->{version}\E tags" if $self->verbose;
 
     my $tags = $meta->{tags} or return $self;
 
     for my $tag (@{ $tags }) {
         say "    $tag" if $self->verbose > 1;
         my $data = $self->_update_releases(tag => $meta, tag => lc $tag);
-        $self->_index(tags => {
-            key => lc $tag,
-            tag => $tag,
-        }) if $p->{meta}->{release_status} eq 'stable';
+        $self->_index(tags => { key => lc $tag, tag => $tag });
     }
     return $self;
 }
@@ -360,7 +382,7 @@ sub update_extensions {
     my ($self, $p) = @_;
     my $meta = $p->{meta};
     my $api = PGXN::API->instance;
-    say "  Updating \L$meta->{name}-$meta->{version} extensions"
+    say "  Updating \L$meta->{name}-$meta->{version}\E extensions"
         if $self->verbose;
 
     while (my ($ext, $data) = each %{ $meta->{provides} }) {
@@ -437,7 +459,7 @@ sub update_extensions {
             date        => $meta->{date},
             user_name   => $self->_get_user_name($meta),
             user        => $meta->{user},
-        }) if $meta->{release_status} eq 'stable';
+        });
     }
 
     return $self;
@@ -450,35 +472,42 @@ sub find_docs {
     my $prefix = quotemeta lc "$meta->{name}-$meta->{version}";
     my $skip   = { directory => [], file => [], %{ $meta->{no_index} || {} } };
     my $markup = Text::Markup->new;
-    my @files  = grep {
-        $_ && $markup->guess_format($_) && -e catfile $dir, $_
-    } map { $_->{docfile} } values %{ $meta->{provides} };
+    my (%seen, @docs);
+    while (my ($ext, $info) = each %{ $meta->{provides} }) {
+        my $fn = $info->{docfile};
+        next unless $fn && $markup->guess_format($fn) && -e catfile $dir, $fn;
+        push @docs => { extension => $ext, filename => $fn };
+        $seen{$fn}++;
+    }
 
     for my $member ($p->{zip}->members) {
         next if $member->isDirectory;
 
         # Skip files that should not be indexed.
         (my $fn = $member->fileName) =~ s{^$prefix/}{};
+        next if $seen{$fn}++;
         next if first { $fn eq $_ } @{ $skip->{file} };
         next if first { $fn =~ /^\Q$_/ } @{ $skip->{directory} };
-        push @files => $fn if $markup->guess_format($fn)
-            || $fn =~ /^README(?:[.][^.]+)?$/i;
+        next unless $markup->guess_format($fn) || $fn =~ /^README(?:[.][^.]+)?$/i;
+        push @docs => { filename => $fn };
     }
-    return uniq @files;
+
+    return @docs;
 }
 
 sub parse_docs {
     my ($self, $p) = @_;
     my $meta = $p->{meta};
-    say "  Parsing \L$meta->{name}-$meta->{version} docs" if $self->verbose;
+    say "  Parsing \L$meta->{name}-$meta->{version}\E docs" if $self->verbose;
 
     my $markup = Text::Markup->new(default_encoding => 'UTF-8');
     my $dir    = $self->doc_root_file_for(source => $meta);
 
     # Find all doc files and write them out.
-    my (%docs, %seen);
-    for my $fn ($self->find_docs($p)) {
-        next if $seen{$fn}++;
+    my (%docs, $readme);
+    my @files = $self->find_docs($p);
+    for my $spec (@files) {
+        my $fn = $spec->{filename};
         my $src = catfile $dir, $fn;
         next unless -e $src;
         say "    Parsing markup in $src" if $self->verbose > 1;
@@ -509,12 +538,13 @@ sub parse_docs {
         close $fh or die "Cannot close $dst: $!\n";
 
         $docs{$noext} = {
+            ($spec->{extension} ? (extension => $spec->{extension}) : ()),
             title => $title,
             ($abstract) ? (abstract => $abstract) : ()
         };
 
-        # Add it to the search index.
-        $self->_index(docs => {
+        # Prepare the index entry.
+        my $to_index = {
             key       => lc "$meta->{name}/$noext",
             docpath   => $noext,
             title     => $title,
@@ -525,9 +555,21 @@ sub parse_docs {
             date      => $meta->{date},
             user_name => $self->_get_user_name($meta),
             user      => $meta->{user},
-        }) if $meta->{release_status} eq 'stable'
-            && $fn !~ qr{^(?i:README(?:[.][^.]+)?)$};
+        };
+
+        # If $fn is a README and isn't referenced by a docfile field...
+        if (!$spec->{extension} && $fn =~ qr{^(?i:README(?:[.][^.]+)?)$}) {
+            # Hang on to it to use in case there are no other docs.
+            $readme = $to_index;
+        } else {
+            # Add it to the search index.
+            $self->_index(docs => $to_index);
+        }
     }
+
+    # No docs found, just the README. So index it as documentation.
+    $self->_index(docs => $readme) if @files == 1 && $readme;
+
     return \%docs;
 }
 
@@ -676,7 +718,7 @@ sub _index_user {
 
 sub _index {
     my ($self, $index, $data) = @_;
-    push @{ $self->to_index->{ $index } } => $data;
+    push @{ $self->to_index->{ $index } } => $data if $self->_index_it;
 }
 
 sub _rollback {
@@ -1285,7 +1327,7 @@ Used internally by C<parse_docs()> to determine what files to parse.
 
   $indexer->parse_docs($params);
 
-Searches the distribution download file fora C<README> and for documentation
+Searches the distribution download file for a C<README> and for documentation
 files in a F<doc> or F<docs> directory, parses them into HTML (using
 L<Text::Markup>), and the runs them through L<XML::LibXML> to remove all
 unsafe HTML, to generate a table of contents, and to save them as partial HTML
@@ -1473,7 +1515,7 @@ David E. Wheeler <david.wheeler@pgexperts.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011-2013 David E. Wheeler.
+Copyright (c) 2011-2024 David E. Wheeler.
 
 This module is free software; you can redistribute it and/or modify it under
 the L<PostgreSQL License|http://www.opensource.org/licenses/postgresql>.

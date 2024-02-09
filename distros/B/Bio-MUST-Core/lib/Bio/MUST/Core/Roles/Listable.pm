@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Roles::Listable;
 # ABSTRACT: Listable Moose role for objects with implied id lists
-$Bio::MUST::Core::Roles::Listable::VERSION = '0.212670';
+$Bio::MUST::Core::Roles::Listable::VERSION = '0.240390';
 use Moose::Role;
 
 use autodie;
@@ -84,15 +84,17 @@ sub complete_seq_list {
 
 sub std_mapper {
     my $self   = shift;
-    my $prefix = shift // 'seq';
+    my $args   = shift // {};           # HashRef (should not be empty...)
+
+    my $prefix = $args->{id_prefix} // 'seq';
+    my $offset = $args->{offset}    // 0;
 
     my @seq_ids = $self->all_seq_ids;
     return Bio::MUST::Core::IdMapper->new(
-        long_ids => [ map { $_->full_id  }    @seq_ids ],   #   list context
-        abbr_ids => [ map { $prefix . $_ } 1..@seq_ids ],   # scalar context
+        long_ids => [ map { $_->full_id  }              @seq_ids ],  # list
+        abbr_ids => [ map { $prefix . ($_+$offset) } 1..@seq_ids ],  # scalar
     );
 }
-
 
 sub acc_mapper {
     my $self   = shift;
@@ -229,7 +231,7 @@ Bio::MUST::Core::Roles::Listable - Listable Moose role for objects with implied 
 
 =head1 VERSION
 
-version 0.212670
+version 0.240390
 
 =head1 SYNOPSIS
 

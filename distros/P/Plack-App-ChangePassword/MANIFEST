@@ -1,0 +1,27 @@
+ChangePassword.pm
+Changes
+CONCEPT
+examples/change_password_psgi.pl
+images/change_password_psgi_screenshot.png
+inc/Module/Install.pm
+inc/Module/Install/AuthorRequires.pm
+inc/Module/Install/AuthorTests.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeFromPod.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+SIGNATURE
+t/Plack-App-ChangePassword/01-use.t
+t/Plack-App-ChangePassword/02-version.t
+t/Plack-App-ChangePassword/03-general.t
+xt/Plack-App-ChangePassword/01-pod_coverage.t
+xt/Plack-App-ChangePassword/02-pod.t

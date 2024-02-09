@@ -3,12 +3,18 @@ package Text::Markup::Pod;
 use 5.8.1;
 use strict;
 use warnings;
+use Text::Markup;
 use Pod::Simple::XHTML 3.15;
+
+sub import {
+    # Replace the regex if passed one.
+    Text::Markup->register( pod => $_[1] ) if $_[1];
+}
 
 # Disable the use of HTML::Entities.
 $Pod::Simple::XHTML::HAS_HTML_ENTITIES = 0;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 sub parser {
     my ($file, $encoding, $opts) = @_;
@@ -60,6 +66,11 @@ extensions as Pod:
 
 =back
 
+To change it the files it recognizes, load this module directly and pass a
+regular expression matching the desired extension(s), like so:
+
+  use Text::Markup::Pod qr{cgi};
+
 =head1 Options
 
 You may pass an arrayref of settings to this parser which changes the output returned.  For example,
@@ -85,7 +96,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011-2023 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2011-2024 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

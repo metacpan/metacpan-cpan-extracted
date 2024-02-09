@@ -3,7 +3,7 @@ NAME
     Canadian jurisdictions
 
 VERSION
-    version 0.06
+    version 0.07
 
 SYNOPSIS
         # procedural approach
@@ -362,6 +362,11 @@ CAVEATS
     For reasons outlined in the two sections above, please be forewarned
     that what days are considered holidays may change with versions of the
     module.
+
+    Note that the holiday is intended to reflect the actual observed holiday
+    not the date of the actual day. Christmas Day, for example, is December
+    25th but the actual day of the holiday may be two days later, the
+    Monday, if Christmas Day is on a Saturday.
 
 SEE ALSO
     Date::Holidays

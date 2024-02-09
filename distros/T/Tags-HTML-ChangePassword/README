@@ -1,0 +1,298 @@
+NAME
+    Tags::HTML::ChangePassword - Tags helper for change password.
+
+SYNOPSIS
+     use Tags::HTML::ChangePassword;
+
+     my $obj = Tags::HTML::ChangePassword->new(%params);
+     $obj->prepare($message_types_hr);
+     $obj->init($messages_ar);
+     $obj->process;
+     $obj->process_css;
+
+METHODS
+  "new"
+     my $obj = Tags::HTML::ChangePassword->new(%params);
+
+    Constructor.
+
+    *       "css"
+
+            'CSS::Struct::Output' object for process_css processing.
+
+            Default value is undef.
+
+    *       "css_change_password"
+
+            CSS class for form.
+
+            Default value is 'form-change-password'.
+
+    *       "form_method"
+
+            Form method.
+
+            Possible values are 'post' and 'get'.
+
+            Default value is 'post'.
+
+    *       "lang"
+
+            Language in ISO 639-3 code.
+
+            Default value is 'eng'.
+
+    *       "tags"
+
+            'Tags::Output' object.
+
+            Default value is undef.
+
+    *       "text"
+
+            Hash reference with keys defined language in ISO 639-3 code and
+            value with hash reference with texts.
+
+            Required keys are 'login', 'password_label', 'username_label'
+            and 'submit'.
+
+            Default value is:
+
+             {
+                    'eng' => {
+                            'change_password' => 'Change password',
+                            'old_password_label' => 'Old password',
+                            'password1_label' => 'New password',
+                            'password2_label' => 'Confirm new password',
+                            'submit' => 'Save Changes',
+                    },
+             }
+
+    Returns instance of object.
+
+  "init"
+     $obj->init($messages_ar);
+
+    Initialize object. Variable $message_ar is reference to array with
+    Data::Message::Simple instances.
+
+    Returns undef.
+
+  "prepare"
+     $obj->prepare($message_types_hr);
+
+    Prepare object. Variable $message_types_hr is reference to hash with
+    message type keys and CSS color as value. Message types are defined in
+    Data::Message::Simple.
+
+    Returns undef.
+
+  "process"
+     $obj->process;
+
+    Process Tags structure for register form.
+
+    Returns undef.
+
+  "process_css"
+     $obj->process_css;
+
+    Process CSS::Struct structure for register form.
+
+    Returns undef.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+             From Tags::HTML::new():
+                     Parameter 'css' must be a 'CSS::Struct::Output::*' class.
+                     Parameter 'tags' must be a 'Tags::Output::*' class.
+
+     process():
+             From Tags::HTML::process():
+                     Parameter 'tags' isn't defined.
+             Bad message data object.
+             Text for lang '%s' and key '%s' doesn't exist.
+
+     process_css():
+             From Tags::HTML::process_css():
+                     Parameter 'css' isn't defined.
+             Message types must be a hash reference.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent;
+     use Tags::HTML::ChangePassword;
+     use Tags::Output::Indent;
+
+     # Object.
+     my $css = CSS::Struct::Output::Indent->new;
+     my $tags = Tags::Output::Indent->new;
+     my $obj = Tags::HTML::ChangePassword->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+
+     # Process login button.
+     $obj->process_css;
+     $obj->process;
+
+     # Print out.
+     print "CSS\n";
+     print $css->flush."\n\n";
+     print "HTML\n";
+     print $tags->flush."\n";
+
+     # Output:
+     # CSS
+     # .form-change-password {
+     #      width: 300px;
+     #      background-color: #f2f2f2;
+     #      padding: 20px;
+     #      border-radius: 5px;
+     #      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+     # }
+     # .form-change-password fieldset {
+     #      border: none;
+     #      padding: 0;
+     #      margin-bottom: 20px;
+     # }
+     # .form-change-password legend {
+     #      font-weight: bold;
+     #      margin-bottom: 10px;
+     # }
+     # .form-change-password p {
+     #      margin: 0;
+     #      padding: 10px 0;
+     # }
+     # .form-change-password label {
+     #      display: block;
+     #      font-weight: bold;
+     #      margin-bottom: 5px;
+     # }
+     # .form-change-password input[type="text"], .form-change-password input[type="password"] {
+     #      width: 100%;
+     #      padding: 8px;
+     #      border: 1px solid #ccc;
+     #      border-radius: 3px;
+     # }
+     # .form-change-password button[type="submit"] {
+     #      width: 100%;
+     #      padding: 10px;
+     #      background-color: #4CAF50;
+     #      color: #fff;
+     #      border: none;
+     #      border-radius: 3px;
+     #      cursor: pointer;
+     # }
+     # .form-change-password button[type="submit"]:hover {
+     #      background-color: #45a049;
+     # }
+     # .form-change-password .messages {
+     #      text-align: center;
+     # }
+     # 
+     # HTML
+     # <form class="form-change-password" method="post">
+     #   <fieldset>
+     #     <legend>
+     #       Change password
+     #     </legend>
+     #     <p>
+     #       <label for="old_password">
+     #       </label>
+     #       Old password
+     #       <input type="password" name="old_password" id="old_password" autofocus=
+     #         "autofocus">
+     #       </input>
+     #     </p>
+     #     <p>
+     #       <label for="password1">
+     #         New password
+     #       </label>
+     #       <input type="password" name="password1" id="password1">
+     #       </input>
+     #     </p>
+     #     <p>
+     #       <label for="password2">
+     #         Confirm new password
+     #       </label>
+     #       <input type="password" name="password2" id="password2">
+     #       </input>
+     #     </p>
+     #     <p>
+     #       <button type="submit" name="change_password" value="change_password">
+     #         Save Changes
+     #       </button>
+     #     </p>
+     #   </fieldset>
+     # </form>
+
+EXAMPLE2
+     use strict;
+     use warnings;
+ 
+     use CSS::Struct::Output::Indent;
+     use Plack::App::Tags::HTML;
+     use Plack::Runner;
+     use Tags::HTML::ChangePassword;
+     use Tags::Output::Indent;
+     use Unicode::UTF8 qw(decode_utf8);
+ 
+     my $css = CSS::Struct::Output::Indent->new;
+     my $tags = Tags::Output::Indent->new(
+             'xml' => 1,
+             'preserved' => ['style'],
+     );
+     my $register = Tags::HTML::ChangePassword->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+     $register->process_css;
+     my $app = Plack::App::Tags::HTML->new(
+             'component' => 'Tags::HTML::Container',
+             'data' => [sub {
+                     my $self = shift;
+                     $register->process;
+                     return;
+             }],
+             'css' => $css,
+             'tags' => $tags,
+     )->to_app;
+     Plack::Runner->new->run($app);
+
+     # Output screenshot is in images/ directory.
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, List::Util, Readonly, Tags::HTML,
+    Tags::HTML::Messages.
+
+SEE ALSO
+    Tags::HTML::Login::Access
+        Tags helper for login access.
+
+    Tags::HTML::Login::Button
+        Tags helper for login button.
+
+    Tags::HTML::Login::Register
+        Tags helper for login register.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tags-HTML-ChangePassword>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

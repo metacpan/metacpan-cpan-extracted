@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Selectors;
-$Playwright::Selectors::VERSION = '1.324';
+$Playwright::Selectors::VERSION = '1.401';
 use parent 'Playwright::Base';
 
 sub new {
@@ -86,7 +86,7 @@ Playwright::Selectors - Automatically generated class for Playwright::Selectors
 
 =head1 VERSION
 
-version 1.324
+version 1.401
 
 =head1 CONSTRUCTOR
 
@@ -101,31 +101,31 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 Execute the Selectors::setTestIdAttribute playwright routine.
 
-See L<https://playwright.dev/api/class-Selectors#Selectors-setTestIdAttribute> for more information.
+See L<https://playwright.dev/docs/api/class-Selectors#Selectors-setTestIdAttribute> for more information.
 
 =head2 register(@args)
 
 Execute the Selectors::register playwright routine.
 
-See L<https://playwright.dev/api/class-Selectors#Selectors-register> for more information.
+See L<https://playwright.dev/docs/api/class-Selectors#Selectors-register> for more information.
 
 =head2 on(@args)
 
 Execute the Selectors::on playwright routine.
 
-See L<https://playwright.dev/api/class-Selectors#Selectors-on> for more information.
+See L<https://playwright.dev/docs/api/class-Selectors#Selectors-on> for more information.
 
 =head2 evaluate(@args)
 
 Execute the Selectors::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-Selectors#Selectors-evaluate> for more information.
+See L<https://playwright.dev/docs/api/class-Selectors#Selectors-evaluate> for more information.
 
 =head2 evaluateHandle(@args)
 
 Execute the Selectors::evaluateHandle playwright routine.
 
-See L<https://playwright.dev/api/class-Selectors#Selectors-evaluateHandle> for more information.
+See L<https://playwright.dev/docs/api/class-Selectors#Selectors-evaluateHandle> for more information.
 
 =head1 SEE ALSO
 

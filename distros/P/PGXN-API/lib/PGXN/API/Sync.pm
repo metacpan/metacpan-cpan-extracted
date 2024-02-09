@@ -1,6 +1,6 @@
 package PGXN::API::Sync;
 
-use 5.10.0;
+use v5.14;
 use utf8;
 use Moose;
 use PGXN::API;
@@ -14,7 +14,7 @@ use Archive::Zip qw(:ERROR_CODES);
 use constant WIN32 => $^O eq 'MSWin32';
 use Moose::Util::TypeConstraints;
 use namespace::autoclean;
-our $VERSION = v0.16.5;
+our $VERSION = v0.20.0;
 
 subtype Executable => as 'Str', where {
     my $exe = $_;
@@ -112,7 +112,8 @@ sub regex_for_uri_template {
 
     my %regex_for = (
         '{dist}'      => qr{[^/]+?},
-        '{version}'   => qr{(?:0|[1-9][0-9]*)(?:[.][0-9]+){2,}(?:-[a-z][-0-9a-z]*)?},
+        # https://regex101.com/r/vkijKf/
+        '{version}'   => qr{(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?},
         '{user}'      => qr{([a-z]([-a-z0-9]{0,61}[a-z0-9])?)}i,
         '{extension}' => qr{[^/]+?},
         '{tag}'       => qr{[^/]+?},
@@ -194,7 +195,7 @@ sub unzip {
 
     foreach my $member ($zip->members) {
         # Make sure the file is readable by everyone
-        $member->unixFileAttributes($member->unixFileAttributes | 0444);
+        $member->unixFileAttributes( $member->isDirectory ? 0755 : 0444 );
         my $fn = catfile $dist_dir, split m{/} => $member->fileName;
         say "    $fn\n" if $self->verbose > 2;
         if ($member->extractToFileNamed($fn) != AZ_OK) {
@@ -388,7 +389,7 @@ David E. Wheeler <david.wheeler@pgexperts.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011-2013 David E. Wheeler.
+Copyright (c) 2011-2024 David E. Wheeler.
 
 This module is free software; you can redistribute it and/or modify it under
 the L<PostgreSQL License|http://www.opensource.org/licenses/postgresql>.

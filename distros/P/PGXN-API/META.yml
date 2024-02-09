@@ -3,8 +3,6 @@ abstract: 'Maintain and serve a REST API to search PGXN mirrors'
 author:
   - 'David E. Wheeler <david.wheeler@pgexperts.com>'
 build_requires:
-  Module::Build: '0.30'
-  Software::License: '0.102340'
   Test::Exception: '0.31'
   Test::File: '1.29'
   Test::File::Contents: '0.20'
@@ -12,10 +10,10 @@ build_requires:
   Test::More: '0.70'
   Test::Output: '0.16'
 configure_requires:
-  Module::Build: '0.30'
+  Module::Build: '0.4209'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150001'
-license: open_source
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -23,21 +21,19 @@ name: PGXN-API
 provides:
   PGXN::API:
     file: lib/PGXN/API.pm
-    version: v0.16.5
+    version: v0.20.0
   PGXN::API::Indexer:
     file: lib/PGXN/API/Indexer.pm
-    version: v0.16.5
+    version: v0.20.0
   PGXN::API::Router:
     file: lib/PGXN/API/Router.pm
-    version: v0.16.5
+    version: v0.20.0
   PGXN::API::Sync:
     file: lib/PGXN/API/Sync.pm
-    version: v0.16.5
-recommends:
-  Test::Pod: '1.41'
-  Test::Pod::Coverage: '1.06'
+    version: v0.20.0
 requires:
   Archive::Zip: '1.30'
+  CommonMark: '0.290000'
   Cwd: '3.33'
   Data::Dump: '1.17'
   Digest::SHA1: '2.13'
@@ -54,7 +50,7 @@ requires:
   Moose: '1.15'
   Moose::Util::TypeConstraints: '1.15'
   MooseX::Singleton: '0.25'
-  PGXN::API::Searcher: v0.9.4
+  PGXN::API::Searcher: v0.11.1
   Plack: '0.9977'
   Plack::App::Directory: '0'
   Plack::App::File: '0'
@@ -64,10 +60,8 @@ requires:
   URI::Template: '0.16'
   XML::LibXML: '1.70'
   namespace::autoclean: '0.11'
-  perl: '5.01'
+  perl: '5.014'
 resources:
-  bugtracker: http://github.com/pgxn/pgxn-api/issues/
   homepage: http://api.pgxn.org/
-  license: http://www.opensource.org/licenses/postgresql
-  repository: http://github.com/pgxn/pgxn-api/
-version: v0.16.5
+version: v0.20.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

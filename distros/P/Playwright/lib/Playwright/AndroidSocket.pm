@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::AndroidSocket;
-$Playwright::AndroidSocket::VERSION = '1.324';
+$Playwright::AndroidSocket::VERSION = '1.401';
 use parent 'Playwright::Base';
 
 sub new {
@@ -96,7 +96,7 @@ Playwright::AndroidSocket - Automatically generated class for Playwright::Androi
 
 =head1 VERSION
 
-version 1.324
+version 1.401
 
 =head1 CONSTRUCTOR
 
@@ -111,37 +111,37 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 Execute the AndroidSocket::write playwright routine.
 
-See L<https://playwright.dev/api/class-AndroidSocket#AndroidSocket-write> for more information.
+See L<https://playwright.dev/docs/api/class-AndroidSocket#AndroidSocket-write> for more information.
 
 =head2 data(@args)
 
 Execute the AndroidSocket::data playwright routine.
 
-See L<https://playwright.dev/api/class-AndroidSocket#AndroidSocket-data> for more information.
+See L<https://playwright.dev/docs/api/class-AndroidSocket#AndroidSocket-data> for more information.
 
 =head2 close(@args)
 
 Execute the AndroidSocket::close playwright routine.
 
-See L<https://playwright.dev/api/class-AndroidSocket#AndroidSocket-close> for more information.
+See L<https://playwright.dev/docs/api/class-AndroidSocket#AndroidSocket-close> for more information.
 
 =head2 on(@args)
 
 Execute the AndroidSocket::on playwright routine.
 
-See L<https://playwright.dev/api/class-AndroidSocket#AndroidSocket-on> for more information.
+See L<https://playwright.dev/docs/api/class-AndroidSocket#AndroidSocket-on> for more information.
 
 =head2 evaluate(@args)
 
 Execute the AndroidSocket::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-AndroidSocket#AndroidSocket-evaluate> for more information.
+See L<https://playwright.dev/docs/api/class-AndroidSocket#AndroidSocket-evaluate> for more information.
 
 =head2 evaluateHandle(@args)
 
 Execute the AndroidSocket::evaluateHandle playwright routine.
 
-See L<https://playwright.dev/api/class-AndroidSocket#AndroidSocket-evaluateHandle> for more information.
+See L<https://playwright.dev/docs/api/class-AndroidSocket#AndroidSocket-evaluateHandle> for more information.
 
 =head1 SEE ALSO
 

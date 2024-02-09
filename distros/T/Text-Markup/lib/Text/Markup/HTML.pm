@@ -3,8 +3,14 @@ package Text::Markup::HTML;
 use 5.8.1;
 use strict;
 use warnings;
+use Text::Markup;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
+
+sub import {
+    # Replace the regex if passed one.
+    Text::Markup->register( html => $_[1] ) if $_[1];
+}
 
 sub parser {
     my ($file, $encoding, $opts) = @_;
@@ -47,13 +53,18 @@ with no decoding. It recognizes files with the following extensions as HTML:
 
 =back
 
+To change it the files it recognizes, load this module directly and pass a
+regular expression matching the desired extension(s), like so:
+
+  use Text::Markup::HTML qr{hachetml};
+
 =head1 Author
 
 David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011-2023 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2011-2024 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

@@ -59,13 +59,13 @@ for my $infile (@ARGV_infiles) {
 
     # discard partial sequences and report their ids
     if ($ARGV_min_res_seq) {
-    	my @ali_list = map { $_->full_id } $ali->all_seq_ids;
-		$ali->apply_list( $ali->complete_seq_list($ARGV_min_res_seq) );
-		my @phy_list = map { $_->full_id } $ali->all_seq_ids;
-		my $lc = List::Compare->new( { lists => [\@ali_list, \@phy_list] } );
-		for my $full_id ($lc->get_unique) {
-			### Discarding seq: $full_id
-		}
+        my @ali_list = map { $_->full_id } $ali->all_seq_ids;
+        $ali->apply_list( $ali->complete_seq_list($ARGV_min_res_seq) );
+        my @phy_list = map { $_->full_id } $ali->all_seq_ids;
+        my $lc = List::Compare->new( { lists => [\@ali_list, \@phy_list] } );
+        for my $full_id ($lc->get_unique) {
+            ### Discarding seq: $full_id
+        }
     }
 
     # generate mapping file and map ids
@@ -142,7 +142,7 @@ ali2phylip.pl - Convert (and filter) ALI files to PHYLIP files for tree building
 
 =head1 VERSION
 
-version 0.212670
+version 0.240390
 
 =head1 USAGE
 

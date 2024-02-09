@@ -7,9 +7,6 @@ arguments
 
 =head1 SYNOPSIS
 
-  # command-line 
-  prove -PTestArgs=t/config.yml t/foo.t
-
   # t/config.yml
   ---
   t/foo.t:
@@ -19,21 +16,45 @@ arguments
     - alias: "Foo thrice"
       args:  [baz]
 
+  # command-line 
+  prove -PTestArgs=t/config.yml --verbose t/foo.t :: quux corge
+  Foo once ....
+  1..1
+  # ['foo','bar']
+  ok 1 - t/foo.t
+  ok
+  Foo twice ...
+  1..1
+  # ['quux','corge']
+  ok 1 - t/foo.t
+  ok
+  Foo thrice ..
+  1..1
+  # ['baz']
+  ok 1 - t/foo.t
+  ok
+  All tests successful.
+  Files=3, Tests=3,  0 wallclock secs ( 0.02 usr  0.01 sys +  0.07 cusr  0.02 csys =  0.12 CPU)
+  Result: PASS
+
 =head1 DESCRIPTION
 
 L<TAP::Harness> is the default test harness of the C<prove> command-line test
 driver program. The harness has a C<test_args> object attribute that allows us
 to pass different arguments to test scripts. Furthermore the harness
 C<runtests()> object method implementation allows us to run a test script
-multiple times giving each run a unique name (an alias).  Unfortunately it
+multiple times giving each run a unique name (an C<alias>).  Unfortunately it
 seems to be impossible to control this functionality directly via the C<prove>
 command-line interface.
 
-This plugin allows you to assign multiple alias-argument pairs to a test
-script.  Each pair triggers a separate run of the test script. The argument
-part of an alias-argument pair is optional. For the time being the
-configuration has to be stored in a YAML file that is the only argument passed
-to this plugin.
+This plugin allows you to assign multiple C<alias>-C<args> pairs to a test
+script.  Each pair triggers a separate run of the test script. The C<args> part
+of a pair is optional. If it is missing, C<prove>'s own optional test script
+arguments passed at the command-line after an arisdottle (C<::>) are used as a
+default.
+
+For the time being the configuration has to be stored in a YAML file that is
+the only argument passed to this plugin.
 
 =head1 AUTHORS
 

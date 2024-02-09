@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Android;
-$Playwright::Android::VERSION = '1.324';
+$Playwright::Android::VERSION = '1.401';
 use parent 'Playwright::Base';
 
 sub new {
@@ -106,7 +106,7 @@ Playwright::Android - Automatically generated class for Playwright::Android
 
 =head1 VERSION
 
-version 1.324
+version 1.401
 
 =head1 CONSTRUCTOR
 
@@ -121,43 +121,43 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 Execute the Android::devices playwright routine.
 
-See L<https://playwright.dev/api/class-Android#Android-devices> for more information.
+See L<https://playwright.dev/docs/api/class-Android#Android-devices> for more information.
 
 =head2 connect(@args)
 
 Execute the Android::connect playwright routine.
 
-See L<https://playwright.dev/api/class-Android#Android-connect> for more information.
+See L<https://playwright.dev/docs/api/class-Android#Android-connect> for more information.
 
 =head2 launchServer(@args)
 
 Execute the Android::launchServer playwright routine.
 
-See L<https://playwright.dev/api/class-Android#Android-launchServer> for more information.
+See L<https://playwright.dev/docs/api/class-Android#Android-launchServer> for more information.
 
 =head2 setDefaultTimeout(@args)
 
 Execute the Android::setDefaultTimeout playwright routine.
 
-See L<https://playwright.dev/api/class-Android#Android-setDefaultTimeout> for more information.
+See L<https://playwright.dev/docs/api/class-Android#Android-setDefaultTimeout> for more information.
 
 =head2 on(@args)
 
 Execute the Android::on playwright routine.
 
-See L<https://playwright.dev/api/class-Android#Android-on> for more information.
+See L<https://playwright.dev/docs/api/class-Android#Android-on> for more information.
 
 =head2 evaluate(@args)
 
 Execute the Android::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-Android#Android-evaluate> for more information.
+See L<https://playwright.dev/docs/api/class-Android#Android-evaluate> for more information.
 
 =head2 evaluateHandle(@args)
 
 Execute the Android::evaluateHandle playwright routine.
 
-See L<https://playwright.dev/api/class-Android#Android-evaluateHandle> for more information.
+See L<https://playwright.dev/docs/api/class-Android#Android-evaluateHandle> for more information.
 
 =head1 SEE ALSO
 

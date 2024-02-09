@@ -8,7 +8,7 @@ use URI::Split qw( uri_split uri_join );
 
 use base qw( URI );
 
-our $VERSION = '5.26';
+our $VERSION = '5.27';
 
 sub _MINIMUM_LATITUDE      { return -90 }
 sub _MAXIMUM_LATITUDE      { return 90 }
@@ -231,6 +231,10 @@ sub _path {
 1;
 
 __END__
+
+=head1 NAME
+
+URI::geo - URI scheme for geo Identifiers
 
 =head1 SYNOPSIS
 

@@ -29,7 +29,6 @@ my $app = Plack::App::Tags::HTML->new(
         }],
         'css' => $css,
         'tags' => $tags,
-        'title' => 'Register',
 )->to_app;
 Plack::Runner->new->run($app);
 

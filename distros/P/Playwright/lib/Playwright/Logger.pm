@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Logger;
-$Playwright::Logger::VERSION = '1.324';
+$Playwright::Logger::VERSION = '1.401';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,21 +22,21 @@ sub spec {
     return $Playwright::spec->{'Logger'}{members};
 }
 
-sub log {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'log',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub isEnabled {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'isEnabled',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub log {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'log',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -86,7 +86,7 @@ Playwright::Logger - Automatically generated class for Playwright::Logger
 
 =head1 VERSION
 
-version 1.324
+version 1.401
 
 =head1 CONSTRUCTOR
 
@@ -97,35 +97,35 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 log(@args)
-
-Execute the Logger::log playwright routine.
-
-See L<https://playwright.dev/api/class-Logger#Logger-log> for more information.
-
 =head2 isEnabled(@args)
 
 Execute the Logger::isEnabled playwright routine.
 
-See L<https://playwright.dev/api/class-Logger#Logger-isEnabled> for more information.
+See L<https://playwright.dev/docs/api/class-Logger#Logger-isEnabled> for more information.
+
+=head2 log(@args)
+
+Execute the Logger::log playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Logger#Logger-log> for more information.
 
 =head2 on(@args)
 
 Execute the Logger::on playwright routine.
 
-See L<https://playwright.dev/api/class-Logger#Logger-on> for more information.
+See L<https://playwright.dev/docs/api/class-Logger#Logger-on> for more information.
 
 =head2 evaluate(@args)
 
 Execute the Logger::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-Logger#Logger-evaluate> for more information.
+See L<https://playwright.dev/docs/api/class-Logger#Logger-evaluate> for more information.
 
 =head2 evaluateHandle(@args)
 
 Execute the Logger::evaluateHandle playwright routine.
 
-See L<https://playwright.dev/api/class-Logger#Logger-evaluateHandle> for more information.
+See L<https://playwright.dev/docs/api/class-Logger#Logger-evaluateHandle> for more information.
 
 =head1 SEE ALSO
 

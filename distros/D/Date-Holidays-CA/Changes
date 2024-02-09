@@ -1,5 +1,18 @@
 Revision history for Perl extension Date::Holidays::CA.
 
+0.07 -- Thu Feb 08 21:53:40 AST 2024
+
+    [Significant Changes]
+    This release adjusted the actual day that Christmas, Boxing and Canada Day
+    holidays are observed.  This may change the holiday from the actual date
+    to the Monday or Tuesday if the holiday falls on weekends.
+
+    [Change Log]
+    - bfdfbaa Update version for a release
+    - 0abebd7 Add test for BC Family Day for RT:77533
+    - 2408a55 Fixes RT:101334 Christmas, Boxing Day and Canada Day shift due to weekends
+    - 8e0d860 v0.06
+
 0.06 -- Tue Feb 06 20:18:31 AST 2024
 
     - 0704459 Increment version for a release

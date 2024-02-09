@@ -53,7 +53,7 @@
    "provides" : {
       "Date::Holidays::CA" : {
          "file" : "lib/Date/Holidays/CA.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -67,7 +67,7 @@
          "web" : "https://github.com/timlegge/perl-Date-Holidays-CA"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_contributors" : [
       "Timothy Legge <timlegge@gmail.com>"
    ],

@@ -2,7 +2,9 @@ package Bio::MUST::Core::SeqMask;
 # ABSTRACT: Sequence mask for selecting specific sites
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Raphael LEONARD <rleonard@doct.uliege.be>
-$Bio::MUST::Core::SeqMask::VERSION = '0.212670';
+$Bio::MUST::Core::SeqMask::VERSION = '0.240390';
+# TODO: handle codons with gblocks/bmge (and idealize?)
+
 use Moose;
 use namespace::autoclean;
 
@@ -745,7 +747,7 @@ Bio::MUST::Core::SeqMask - Sequence mask for selecting specific sites
 
 =head1 VERSION
 
-version 0.212670
+version 0.240390
 
 =head1 SYNOPSIS
 

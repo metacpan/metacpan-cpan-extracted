@@ -40,20 +40,21 @@ BEGIN {
 	}
 }
 
+my %normalised;
 my $force_flag;
+my $dir = 'lib/Genealogy/ObituaryDailyTimes/data';
+
 if(defined($ARGV[0]) && ($ARGV[0] eq '-f')) {
 	$force_flag++;
 } elsif($ENV{'AUTOMATED_TESTING'}) {
 	exit;
 }
 
-my $dir = 'lib/Genealogy/ObituaryDailyTimes/database';
-my $filename = File::Spec->catdir($dir, 'obituaries.sql');
-my %normalised;
-
 if(!-d $dir) {
 	mkdir $dir, 0755;
 }
+
+my $filename = File::Spec->catdir($dir, 'obituaries.sql');
 
 if(-r $filename) {
 	# Don't bother building if the current file is less than a day old
@@ -80,7 +81,7 @@ HTTP::Cache::Transparent::init({
 
 print "This will take some time. It'd be best to go and make yourself a cup of tea.\n";
 
-my $ua = LWP::UserAgent::WithCache->new(timeout => 10, keep_alive => 1);
+my $ua = LWP::UserAgent::WithCache->new(timeout => 60, keep_alive => 1);
 $ua->env_proxy(1);
 $ua->agent('Mozilla/5.0');
 $ua->conn_cache()->total_capacity(undef);
@@ -135,19 +136,31 @@ while(freelists($ua, 'v28no' . sprintf('%03d', $issue))) {
 	$issue++;
 }
 
+flush($dbh);
+
+$issue = 1;
+# 2024
+while(freelists($ua, 'v29no' . sprintf('%03d', $issue))) {
+	$issue++;
+}
+
 print "\n";
 
 flush($dbh);
 
 $dbh->commit();
 $dbh->prepare('CREATE INDEX name_index ON obituaries(first, last)')->execute();
+$dbh->prepare('CREATE INDEX name_age_index ON obituaries(first, last, age)')->execute();
 $dbh->do('pragma optimize');
 $dbh->disconnect();
 
 sub mlarchives($$) {
 	my @lines;
 
-	my $url = "https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=$page";
+	# my $url = "https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=$page";
+	# Ancestry has removed the archives.
+	# The first 17 pages are on Wayback machine, but the rest is lost
+	my $url = "https://wayback.archive-it.org/20669/20231102044925/https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=$page";
 
 	$| = 1;
 	printf "%-70s\r", $url;
@@ -184,6 +197,7 @@ sub mlarchives($$) {
 
 	my $last_line;
 	my $rc;
+	# my $entries = 0;
 
 	while(my $line = shift(@lines)) {
 		# LAST NAME, First Name (MAIDEN); Age; Place of Death; Newspaper Name; Newspaper date; tagname
@@ -197,7 +211,12 @@ sub mlarchives($$) {
 			if($stage == -1) {
 				if($line =~ /No Results/) {
 					# Last page
-					return 0;
+					return 0
+				}
+				if($line =~ /This page has not been archived here/) {
+				die;
+					# End of Wayback's archive
+					return 0
 				}
 				# Introduction to a post about to start
 				$stage = 0;
@@ -213,15 +232,21 @@ sub mlarchives($$) {
 			if($line =~ /^LAST NAME/) {
 				# The ----- probably didn't start a line
 				# e.g. https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=41
-				$stage = 0;
+				$stage = 0
 			} elsif($line =~ /Re: \[GEN-OBIT\]/) {
 				# It's a reply to a post, not an actual post
 				# e.g. https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=46
-				return 1;
+				return 1
 			} elsif($line =~ /No Results/) {
 				# Last page
-				return 0;
+				return 0
+			} elsif($line =~ /This page has not been archived here/) {
+				# End of Wayback's archive
+				return 0
 			}
+			# if($line =~ /Obituary Daily Times (v\d.+)$/) {
+				# print "$1\n" unless($1 =~ /strong>/);
+			# }
 		}
 		next unless($stage == 1);
 
@@ -261,11 +286,15 @@ sub mlarchives($$) {
 		# $age //= '';
 
 		# print "$line->>>>>>>>>>\n";
-		queue($first, normalise_name($last), $maiden, $age, $place, $date, $newspaper, 'M', $page) if($last =~ /^[A-Z]/);
+		if($last =~ /^[A-Z]/) {
+			queue($first, normalise_name($last), $maiden, $age, $place, $date, $newspaper, 'M', $page);
+			# $entries++;
+		}
 		# print "\"$last\",\"$first\",\"$maiden\",\"$age\",\"$place\",\"$date\",\"$newspaper\"\n" if($last =~ /^[A-Z]/);
 		$rc = 1;
 	}
 	die "Couldn't parse $url" if(!defined($rc));
+	# print "\n\t$entries\n";
 	return 1;
 }
 

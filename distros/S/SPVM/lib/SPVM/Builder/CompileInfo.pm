@@ -40,6 +40,17 @@ sub output_file {
   }
 }
 
+sub category {
+  my $self = shift;
+  if (@_) {
+    $self->{category} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{category};
+  }
+}
+
 # Class methods
 sub new {
   my $class = shift;
@@ -116,16 +127,13 @@ sub create_ccflags {
     }
     
     # Resource include directories
-    my $disable_resource = $config->disable_resource;
-    unless ($disable_resource) {
-      my $resource_names = $config->get_resource_names;
-      for my $resource_name (@$resource_names) {
-        my $resource = $config->get_resource($resource_name);
-        my $config = $resource->config;
-        my $resource_include_dir = $config->native_include_dir;
-        if (defined $resource_include_dir) {
-          push @all_include_dirs, $resource_include_dir;
-        }
+    my $resource_names = $config->get_resource_names;
+    for my $resource_name (@$resource_names) {
+      my $resource = $config->get_resource($resource_name);
+      my $config = $resource->config;
+      my $resource_include_dir = $config->native_include_dir;
+      if (defined $resource_include_dir) {
+        push @all_include_dirs, $resource_include_dir;
       }
     }
     
@@ -182,6 +190,15 @@ Gets and sets the C<source_file> field, a source file.
   $compile_info->output_file($output_file);
 
 Gets and sets the C<output_file> field, an output file.
+
+=head2 category
+
+  my $category = $config->category;
+  $config->category($category);
+
+Gets and sets the C<category> field.
+
+These are C<precompile_class>, C<native_class>, C<native_source>, C<spvm_core>, C<bootstrap>.
 
 =head1 Class Methods
 

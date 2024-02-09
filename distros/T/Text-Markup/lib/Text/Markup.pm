@@ -3,10 +3,11 @@ package Text::Markup;
 use 5.8.1;
 use strict;
 use warnings;
+use Text::Markup;
 use Text::Markup::None;
 use Carp;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 my %_PARSER_FOR;
 my %REGEX_FOR = (
@@ -146,6 +147,15 @@ This distribution includes support for a number of markup formats:
 =item * L<Trac|https://trac.edgewall.org/wiki/WikiFormatting>
 
 =back
+
+Modules under the Text::Markup namespace provide these parsers, and Text::Markup
+automatically loads them on recognizing file name suffixes documented for each
+module. To change the file extensions recognized for a particular parser (except
+for L<Text::Markup::None>), load it directly and pass a regular expression. For
+example, to have the Mediawiki parser recognized files with the suffixes
+C<truck>, C<truc>, C<track>, or C<trac>, load it like so:
+
+  use Text::Markup::Mediawiki qr{tr[au]ck?};
 
 Adding support for more markup languages is straight-forward, and patches
 adding them to this distribution are also welcome. See L</Add a Parser> for
@@ -304,6 +314,11 @@ C<Text::FooBar> module, it might look something like this:
   use Text::FooBar ();
   use File::BOM qw(open_bom)
 
+  sub import {
+      # Replace the regex if passed one.
+      Text::Markup->register( foobar => $_[1] ) if $_[1];
+  }
+
   sub parser {
       my ($file, $encoding, $opts) = @_;
       my $md = Text::FooBar->new(@{ $opts || [] });
@@ -332,9 +347,8 @@ In such a case, read in the file as raw bytes:
       open my $fh, '<:raw', $file or die "Cannot open $file: $!\n";
 
 The returned HTML, however, B<must be encoded in UTF-8>. Please include an
-L<encoding
-declaration|https://en.wikipedia.org/wiki/Character_encodings_in_HTML>, such
-as a content-type C<< <meta> >> element:
+L<encoding declaration|https://en.wikipedia.org/wiki/Character_encodings_in_HTML>,
+such as a content-type C<< <meta> >> element:
 
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
@@ -430,13 +444,15 @@ UI.
 =back
 
 If you don't want to submit your parser, you can still create and use one
-independently. Rather than add its information to the C<%REGEX_FOR> hash in
-this module, you can just load your parser manually, and have it call the
-C<register> method, like so:
+independently. Just omit editing the C<%REGEX_FOR> hash in this module and make
+sure you C<register> the parser manually with a default regular expression
+in the C<import> method, like so:
 
   package My::Markup::FooBar;
   use Text::Markup;
-  Text::Markup->register(foobar => qr{fb|foob(?:ar)?});
+  sub import {
+      Text::Markup->register( foobar => $_[1] || qr{fb|foob(?:ar)?} );
+  }
 
 This will be useful for creating private parsers you might not want to
 contribute, or that you'd want to distribute independently.
@@ -472,7 +488,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011-2023 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2011-2024 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

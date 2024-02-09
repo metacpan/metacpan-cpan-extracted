@@ -3,62 +3,63 @@
 # You should not use this directly; use Playwright instead.
 
 package Playwright::ModuleList;
-$Playwright::ModuleList::VERSION = '1.324';
+$Playwright::ModuleList::VERSION = '1.401';
 use strict;
 use warnings;
 
-use Playwright::APIRequest;
-use Playwright::RequestOptions;
-use Playwright::Dialog;
-use Playwright::Touchscreen;
-use Playwright::Tracing;
-use Playwright::PageAssertions;
-use Playwright::BrowserServer;
-use Playwright::AndroidWebView;
-use Playwright::WebSocketFrame;
-use Playwright::Error;
-use Playwright::APIRequestContext;
-use Playwright::FileChooser;
-use Playwright::ConsoleMessage;
-use Playwright::Download;
-use Playwright::Selectors;
-use Playwright::TimeoutError;
-use Playwright::PlaywrightException;
-use Playwright::BrowserType;
-use Playwright::SnapshotAssertions;
-use Playwright::FrameLocator;
 use Playwright::Android;
-use Playwright::AndroidDevice;
-use Playwright::AndroidInput;
-use Playwright::Mouse;
-use Playwright::PlaywrightAssertions;
-use Playwright::JSHandle;
-use Playwright::AndroidSocket;
-use Playwright::Coverage;
-use Playwright::APIResponse;
-use Playwright::Worker;
-use Playwright::Frame;
-use Playwright::Accessibility;
-use Playwright::WebSocket;
-use Playwright::LocatorAssertions;
-use Playwright::Logger;
-use Playwright::BrowserContext;
-use Playwright::Page;
-use Playwright::Video;
 use Playwright::CDPSessionEvent;
-use Playwright::CDPSession;
-use Playwright::Electron;
-use Playwright::Response;
-use Playwright::ElementHandle;
-use Playwright::Route;
-use Playwright::APIResponseAssertions;
-use Playwright::Request;
-use Playwright::Browser;
-use Playwright::GenericAssertions;
-use Playwright::Locator;
-use Playwright::Keyboard;
-use Playwright::FormData;
+use Playwright::BrowserServer;
+use Playwright::PageAssertions;
+use Playwright::LocatorAssertions;
+use Playwright::Coverage;
+use Playwright::Page;
 use Playwright::ElectronApplication;
+use Playwright::SnapshotAssertions;
+use Playwright::Request;
+use Playwright::AndroidDevice;
+use Playwright::Logger;
+use Playwright::Video;
+use Playwright::Accessibility;
+use Playwright::Selectors;
+use Playwright::ElementHandle;
+use Playwright::Mouse;
+use Playwright::WebSocketFrame;
+use Playwright::Frame;
+use Playwright::Electron;
+use Playwright::FormData;
+use Playwright::BrowserType;
+use Playwright::APIRequestContext;
+use Playwright::AndroidInput;
+use Playwright::PlaywrightAssertions;
+use Playwright::Error;
+use Playwright::BrowserContext;
+use Playwright::Download;
+use Playwright::CDPSession;
+use Playwright::Worker;
+use Playwright::Route;
+use Playwright::FileChooser;
+use Playwright::AndroidWebView;
+use Playwright::Locator;
+use Playwright::GenericAssertions;
+use Playwright::WebError;
+use Playwright::Tracing;
+use Playwright::Dialog;
+use Playwright::APIResponse;
+use Playwright::ConsoleMessage;
+use Playwright::PlaywrightException;
+use Playwright::APIResponseAssertions;
+use Playwright::AndroidSocket;
+use Playwright::WebSocket;
+use Playwright::Touchscreen;
+use Playwright::Response;
+use Playwright::TimeoutError;
+use Playwright::RequestOptions;
+use Playwright::Keyboard;
+use Playwright::JSHandle;
+use Playwright::Browser;
+use Playwright::APIRequest;
+use Playwright::FrameLocator;
 use Playwright::Mouse;
 use Playwright::Keyboard;
 
@@ -76,7 +77,7 @@ Playwright::ModuleList - Playwright sub classes.
 
 =head1 VERSION
 
-version 1.324
+version 1.401
 
 =head1 SEE ALSO
 

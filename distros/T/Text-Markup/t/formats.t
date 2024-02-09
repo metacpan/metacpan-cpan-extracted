@@ -43,6 +43,8 @@ my %parsed_filter_for = (
 );
 
 my @loaded = Text::Markup->formats;
+my %regex_for = Text::Markup->format_matchers;
+
 while (my $data = <DATA>) {
     next if $data =~ /^#/;
     chomp $data;
@@ -58,7 +60,7 @@ while (my $data = <DATA>) {
             }
         } if $req;
 
-        plan tests => @exts + 5;
+        plan tests => @exts + 7;
         use_ok $module or next;
 
         push @loaded => $format unless grep { $_ eq $format } @loaded;
@@ -93,6 +95,14 @@ while (my $data = <DATA>) {
             file   => catfile('t', 'empty.txt'),
             format => $format,
         ), undef, "Parse empty $name file";
+
+        # Try recognizing in plain text.
+        is $parser->guess_format('hello.txt'), undef,
+            'guess_format should not match .txt';
+        $module->import(qr/txt/);
+        is $parser->guess_format('hello.txt'), $format,
+            'Now guess_format should match .txt';
+        $module->import($regex_for{$format});
     }
 }
 

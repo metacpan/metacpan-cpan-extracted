@@ -353,26 +353,26 @@ All remaining elements of the **%ENV** hash gets emptied (without localization) 
     - the cascading definition of environment variables can be used, which means that
         - during the evaluation of current line environment variables defined in the same file above can be applied.
         For example if such **.env** file contains
-            ```perl
+
                 VAR1 = 'ABC'
                 VAR2 = lc( $ENV{ VAR1 } )
-            ```
+
             and neither **VAR1** nor **VAR2** will be overwritten during the evaluation of subsequent lines in the same or other
             **.env** files, the **%ENV** hash will contain at least the following entries:
-            ```perl
+
                 VAR1 => 'ABC'
                 VAR2 => 'abc'
-            ```
+
         - during the evaluation of current line also environment variables defined in a higher-level **.env** file can be used.
         For example if **t/Foo/Bar/Baz.env** contains
-            ```perl
+
                 VAR0 = 'XYZ '
-            ```
+
             and **t/Foo/Bar/Baz/myMethod.env** contains
-            ```perl
+
                 VAR1 = 'ABC'
                 VAR2 = lc( $ENV{ VAR0 } . $ENV{ VAR1 } )
-            ```
+
             and neither **VAR0**, nor **VAR1**, nor **VAR2** will be overwritten during the evaluation of subsequent lines in the same
             or other **.env** files, the **%ENV** hash will contain at least the following entries:
 
@@ -383,11 +383,11 @@ All remaining elements of the **%ENV** hash gets emptied (without localization) 
     [string eval](https://perldoc.perl.org/functions/eval) so that
         - constant values must be quoted;
         - variables and subroutines must not be quoted:
-            ```perl
+
                 NAME_CONST = 'VALUE'
                 NAME_VAR   = $KNIB::App::MyApp::Constants::ABC
                 NAME_FUNC  = join(' ', $KNIB::App::MyApp::Constants::DEF)
-            ```
+
 All environment variables set up in this manner are logged to STDOUT
 using [note](https://metacpan.org/pod/Test2::Tools::Basic#DIAGNOSTICS).
 
@@ -454,6 +454,9 @@ If, however, you need the test file name in a test submodule or in a **.env** fi
 All variables mentioned above are read-only after their export.
 In this case they are logged to STDOUT using [note](https://metacpan.org/pod/Test2::Tools::Basic#DIAGNOSTICS).
 
+If any of the variables **$CLASS**, **$METHOD**, and **$METHOD\_REF** is undefined and hence not exported,
+this is reported at the very begin of test execution.
+
 # CAVEATS
 
 - **Test::Expander** is recommended to be the very first module in your test file.
@@ -495,7 +498,7 @@ Please report any bugs or feature requests through the web interface at
 
 # COPYRIGHT AND LICENSE
 
-Copyright (c) 2021-2023 Jurij Fajnberg
+Copyright (c) 2021-2024 Jurij Fajnberg
 
 This program is free software; you can redistribute it and/or modify it under the same terms
 as the Perl 5 programming language system itself.

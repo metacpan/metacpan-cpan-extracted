@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::PlaywrightAssertions;
-$Playwright::PlaywrightAssertions::VERSION = '1.324';
+$Playwright::PlaywrightAssertions::VERSION = '1.401';
 use parent 'Playwright::Base';
 
 sub new {
@@ -32,11 +32,11 @@ sub expectLocator {
     );
 }
 
-sub expectPage {
+sub expectAPIResponse {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'expectPage',
+        command => 'expectAPIResponse',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -52,21 +52,21 @@ sub setDefaultAssertionTimeout {
     );
 }
 
-sub expectGeneric {
+sub expectPage {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'expectGeneric',
+        command => 'expectPage',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub expectAPIResponse {
+sub expectGeneric {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'expectAPIResponse',
+        command => 'expectGeneric',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -116,7 +116,7 @@ Playwright::PlaywrightAssertions - Automatically generated class for Playwright:
 
 =head1 VERSION
 
-version 1.324
+version 1.401
 
 =head1 CONSTRUCTOR
 
@@ -131,49 +131,49 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 Execute the PlaywrightAssertions::expectLocator playwright routine.
 
-See L<https://playwright.dev/api/class-PlaywrightAssertions#PlaywrightAssertions-expectLocator> for more information.
-
-=head2 expectPage(@args)
-
-Execute the PlaywrightAssertions::expectPage playwright routine.
-
-See L<https://playwright.dev/api/class-PlaywrightAssertions#PlaywrightAssertions-expectPage> for more information.
-
-=head2 setDefaultAssertionTimeout(@args)
-
-Execute the PlaywrightAssertions::setDefaultAssertionTimeout playwright routine.
-
-See L<https://playwright.dev/api/class-PlaywrightAssertions#PlaywrightAssertions-setDefaultAssertionTimeout> for more information.
-
-=head2 expectGeneric(@args)
-
-Execute the PlaywrightAssertions::expectGeneric playwright routine.
-
-See L<https://playwright.dev/api/class-PlaywrightAssertions#PlaywrightAssertions-expectGeneric> for more information.
+See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectLocator> for more information.
 
 =head2 expectAPIResponse(@args)
 
 Execute the PlaywrightAssertions::expectAPIResponse playwright routine.
 
-See L<https://playwright.dev/api/class-PlaywrightAssertions#PlaywrightAssertions-expectAPIResponse> for more information.
+See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectAPIResponse> for more information.
+
+=head2 setDefaultAssertionTimeout(@args)
+
+Execute the PlaywrightAssertions::setDefaultAssertionTimeout playwright routine.
+
+See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-setDefaultAssertionTimeout> for more information.
+
+=head2 expectPage(@args)
+
+Execute the PlaywrightAssertions::expectPage playwright routine.
+
+See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectPage> for more information.
+
+=head2 expectGeneric(@args)
+
+Execute the PlaywrightAssertions::expectGeneric playwright routine.
+
+See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectGeneric> for more information.
 
 =head2 on(@args)
 
 Execute the PlaywrightAssertions::on playwright routine.
 
-See L<https://playwright.dev/api/class-PlaywrightAssertions#PlaywrightAssertions-on> for more information.
+See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-on> for more information.
 
 =head2 evaluate(@args)
 
 Execute the PlaywrightAssertions::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-PlaywrightAssertions#PlaywrightAssertions-evaluate> for more information.
+See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-evaluate> for more information.
 
 =head2 evaluateHandle(@args)
 
 Execute the PlaywrightAssertions::evaluateHandle playwright routine.
 
-See L<https://playwright.dev/api/class-PlaywrightAssertions#PlaywrightAssertions-evaluateHandle> for more information.
+See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-evaluateHandle> for more information.
 
 =head1 SEE ALSO
 

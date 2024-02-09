@@ -8,12 +8,11 @@ use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use List::Util qw(none);
 use Readonly;
-use Scalar::Util qw(blessed);
 use Tags::HTML::Messages;
 
 Readonly::Array our @FORM_METHODS => qw(post get);
 
-our $VERSION = 0.06;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -21,7 +20,7 @@ sub new {
 
 	# Create object.
 	my ($object_params_ar, $other_params_ar) = split_params(
-		['css_register', 'form_method', 'lang', 'link', 'title', 'text', 'width'], @params);
+		['css_register', 'form_method', 'lang', 'text', 'width'], @params);
 	my $self = $class->SUPER::new(@{$other_params_ar});
 
 	# CSS style for register box.
@@ -100,8 +99,8 @@ sub _process {
 		['b', 'p'],
 		['b', 'label'],
 		['a', 'for', $username_id],
-		['e', 'label'],
 		['d', $self->_text('username_label')],
+		['e', 'label'],
 		['b', 'input'],
 		['a', 'type', 'text'],
 		['a', 'name', $username_id],
@@ -261,8 +260,6 @@ Tags::HTML::Login::Register - Tags helper for login register.
 
 Constructor.
 
-Returns instance of object.
-
 =over 8
 
 =item * C<css>
@@ -270,6 +267,12 @@ Returns instance of object.
 'CSS::Struct::Output' object for L<process_css> processing.
 
 Default value is undef.
+
+=item * C<css_register>
+
+CSS class for form.
+
+Default value is 'form-register'.
 
 =item * C<form_method>
 
@@ -279,7 +282,7 @@ Possible values are 'post' and 'get'.
 
 Default value is 'post'.
 
-=item * C<language>
+=item * C<lang>
 
 Language in ISO 639-3 code.
 
@@ -311,6 +314,8 @@ Default value is:
  }
 
 =back
+
+Returns instance of object.
 
 =head2 C<process>
 
@@ -495,7 +500,6 @@ Returns undef.
          }],
          'css' => $css,
          'tags' => $tags,
-         'title' => 'Register',
  )->to_app;
  Plack::Runner->new->run($app);
 
@@ -544,12 +548,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2023 Michal Josef Špaček
+© 2021-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.08
 
 =cut

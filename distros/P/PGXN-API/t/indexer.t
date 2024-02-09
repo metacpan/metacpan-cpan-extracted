@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
-use Test::More tests => 249;
-#use Test::More 'no_plan';
+use Test::More tests => 266;
+# use Test::More 'no_plan';
 use File::Copy::Recursive qw(dircopy fcopy);
 use File::Path qw(remove_tree);
 use File::Spec::Functions qw(catfile catdir rel2abs);
@@ -180,7 +180,7 @@ my $docs = { 'docs/pair' => {
     title => 'pair',
     abstract => 'Key value pair',
 }};
-$mock->mock(parse_docs => $docs);
+$mock->mock(parse_docs => sub { $docs });
 
 # Set up zip archive.
 my $zip       = Archive::Zip->new;
@@ -226,7 +226,7 @@ is_deeply $meta->{special_files}, [qw(README.md META.json Makefile)],
     'And it should have special files';
 is_deeply $meta->{docs}, $docs, 'Should have docs from parse_docs';
 is $meta->{provides}{pair}{docpath}, 'docs/pair',
-    'Should have extension doc path in provides';
+    'Should have drived extension doc path into provides';
 
 # So have a look at the contents.
 ok my $dist_meta = $api->read_json_from($dist_file),
@@ -245,15 +245,32 @@ my $zip_011 = Archive::Zip->new;
 $zip_011->read(rel2abs catfile qw(t root dist pair 0.1.1 pair-0.1.1.zip));
 $zip_011->addString('# control file', 'pair-0.1.1/pair.control.in');
 
+# Set up multiple docs to be returned by parse_docs.
+$docs = {
+    'docs/howto' => {
+        extension => 'pair',
+        title     => 'pair Howto',
+        abstract => 'How to use key value pair',
+    },
+    'docs/pair' => {
+        title     => 'pair 0.0.1',
+        abstract => 'Key value pair',
+    },
+};
+
 my $dist_011_file = catfile $api->doc_root, qw(dist pair 0.1.1 META.json);
 file_not_exists_ok $dist_011_file, 'pair/0.1.1/META.json should not yet exist';
 $params->{meta} = $meta_011;
 $params->{zip} = $zip_011;
-ok $indexer->merge_distmeta($params), 'Merge the distmeta';
+do {
+    # Don't persist the setting of _index_it by merge_distmeta.
+    local $indexer->{_index_it} = 1;
+    ok $indexer->merge_distmeta($params), 'Merge the distmeta';
+};
 file_exists_ok $dist_011_file, 'pair/0.1.1/META.json should now exist';
 
 is_deeply $indexer->to_index->{dists}, [],
-    'Testing distribution should not be queued for indexing';
+    'Nothing should not be queued for indexing';
 
 files_eq_or_diff $dist_011_file, $dist,
     'pair/0.1.1/META.json and pair.json should be the same';
@@ -267,6 +284,11 @@ is_deeply $meta_011->{releases}, { stable => [
 is_deeply $meta_011->{special_files},
     [qw(Changes README.md META.json Makefile pair.control.in)],
     'And it should have special files';
+
+delete $docs->{'docs/howto'}{extension};
+is_deeply $meta_011->{docs}, $docs, 'Should have docs without extension key';
+is $meta_011->{provides}{pair}{docpath}, 'docs/howto',
+    'Should have explicit extension doc in provides';
 
 ok $dist_meta = $api->read_json_from($dist_011_file),
     'Read the 0.1.1 merged distmeta';
@@ -398,6 +420,7 @@ file_exists_ok $pairkw_file, "$pairkw_file should now exist";
 file_exists_ok $orderedkw_file, "$orderedkw_file should now exist";
 file_not_exists_ok $keyvalkw_file, "$keyvalkw_file should still not exist";
 
+is @{ $indexer->to_index->{tags} }, 2, 'Should have two tags';
 is_deeply shift @{ $indexer->to_index->{tags} }, {
     key => 'ordered pair',
     tag => 'ordered pair',
@@ -432,16 +455,22 @@ delete $exp->{releases}{pgTAP};
 ok my $ord_data = $api->read_json_from($orderedkw_file),
     "Read JSON from $orderedkw_file";
 is_deeply $ord_data, $exp, "$orderedkw_file should have the release data";
+is @{ $indexer->to_index->{tags} }, 0, 'Should have no tags';
 
 # Now update with 0.1.1.
 $params->{meta} = $meta_011;
 fcopy catfile(qw(t data pair-tag-updated.json)),
       catfile($api->mirror_root, qw(tag pair.json));
-ok $indexer->update_tags($params), 'Update the tags to 0.1.1';
+do {
+    # Tell it not to index.
+    local $indexer->{_index_it} = 0;
+    ok $indexer->update_tags($params), 'Update the tags to 0.1.1';
+};
 file_exists_ok $keyvalkw_file, "$keyvalkw_file should now exist";
 is_deeply $indexer->to_index, {
     map { $_ => [] } qw(docs dists extensions users tags)
-}, 'Should have no index updates for test dist';
+}, 'Should have no index updates for with _index_it false';
+$indexer->to_index->{tags} = [];
 
 # Check the JSON data.
 $exp->{tag} = 'pair';
@@ -575,16 +604,20 @@ is_deeply $doc_data, $exp,
 fcopy catfile(qw(t data pair-ext-updated.json)),
       catfile($api->mirror_root, qw(extension pair.json));
 $params->{meta} = $meta_011;
-ok $indexer->update_extensions($params),
-    'Update the extension metadata to 0.1.1';
+do {
+    # Tell it not to index.
+    local $indexer->{_index_it} = 0;
+    ok $indexer->update_extensions($params),
+        'Update the extension metadata to 0.1.1';
+};
 is_deeply $indexer->to_index, {
     map { $_ => [] } qw(docs dists extensions users tags)
-}, 'Should have no indexed extensions for testing dist';
+}, 'Should have no indexed extensions with _index_it false';
 
 $exp->{latest} = 'testing';
 $exp->{testing} = {
     abstract => 'A key/value pair dåtå type',
-    docpath  => 'docs/pair',
+    docpath  => 'docs/howto',
     dist     => 'pair',
     version  => '0.1.1',
     sha1     => 'c552c961400253e852250c5d2f3def183c81adb3',
@@ -614,7 +647,7 @@ is_deeply shift @{ $indexer->to_index->{extensions} }, {
     abstract    => 'A key/value pair dåtå type',
     date        => '2010-10-29T22:46:45Z',
     dist        => 'otherdist',
-    docpath     => 'docs/pair',
+    docpath     => 'docs/howto',
     extension   => 'pair',
     key         => 'pair',
     user        => 'theory',
@@ -631,7 +664,7 @@ unshift @{ $exp->{versions}{'0.1.1'} } => {
 };
 $exp->{stable} = {
     abstract => 'A key/value pair dåtå type',
-    docpath  => 'docs/pair',
+    docpath  => 'docs/howto',
     dist     => 'pair',
     sha1     => 'cebefd23151b4b797239646f7ae045b03d028fcf',
     version  => '0.1.2',
@@ -750,9 +783,11 @@ is_deeply $indexer->to_index->{docs}, [], 'Should be no other documents to index
 
 file_exists_ok $doc_dir, 'Directory dist/pair/pair-0.1.0 should now exist';
 file_exists_ok $readme, 'dist/pair/pair/0.1.0/README.html should now exist';
+file_contents_like $readme, qr/<pre><code>make/, 'Fenced code should be a <pre> block';
 file_exists_ok $doc, 'dist/pair/pair-0.1.0/doc/pair.html should now exist';
 file_contents_like $readme, qr{\Q<h1 id="pair.0.1.0">pair 0.1.0</h1>},
     'README.html should have HTML';
+
 file_contents_unlike $readme, qr{<html}i, 'README.html should have no html element';
 file_contents_unlike $readme, qr{<body}i, 'README.html should have no body element';
 file_contents_like $doc, qr{\Q<h1 id="pair.0.1.0">pair 0.1.0},
@@ -761,12 +796,14 @@ file_contents_unlike $doc, qr{<html}i, 'Doc should have no html element';
 file_contents_unlike $doc, qr{<body}i, 'Doc should have no body element';
 
 # Make sure we skip files that should not be indexed.
+$indexer->to_index->{docs} = [];
 $meta->{no_index} = { file => ['doc/pair.md'] };
 $docs = $indexer->parse_docs($params);
 is_deeply $docs, {
     'README'   => { title => 'pair 0.1.0' },
 }, 'Doc parser should ignore no_index-specified doc file';
 
+$indexer->to_index->{docs} = [];
 $meta->{no_index} = { directory => ['doc']};
 $docs = $indexer->parse_docs($params);
 is_deeply $docs, {
@@ -775,7 +812,48 @@ is_deeply $docs, {
 
 delete $meta->{no_index};
 
+# Index the README as docs if it's listed in docfile.
+$indexer->to_index->{docs} = [];
+delete $meta->{provides}{pair}{docpath};
+$meta->{provides}{pair}{docfile} = 'README.md';
+$docs = $indexer->parse_docs($params);
+is_deeply $docs, {
+    'README'   => { title => 'pair 0.1.0', extension => 'pair' },
+    'doc/pair' => { title => 'pair 0.1.0', abstract => 'A key/value pair data type' },
+}, 'Doc parser should parse the README as the pair extension and also the doc/pair docs';
+is @{ $indexer->to_index->{docs} }, 2, 'Should have two docs to index';
+is $indexer->to_index->{docs}[0]{docpath}, 'README',
+    'The first should be the the README listed in docfile';
+is $indexer->to_index->{docs}[1]{docpath}, 'doc/pair',
+    'The second should be the the doc/pair file';
+
+# Try it with a package containing only a README, but keep the named docfile.
+$indexer->to_index->{docs} = [];
+delete $meta->{provides}{pair}{docpath};
+ok $params->{zip}->removeMember('pair-0.1.0/doc/pair.md'),
+    'Remove doc directory';
+$docs = $indexer->parse_docs($params);
+is_deeply $docs, {
+    'README'   => { title => 'pair 0.1.0', extension => 'pair' },
+}, 'Doc parser should parse the README as the pair extension doc';
+is @{ $indexer->to_index->{docs} }, 1, 'Should have one doc to index';
+is $indexer->to_index->{docs}[0]{docpath}, 'README',
+    'And it should be the README';
+
+# Now remove the docfile spec.
+$indexer->to_index->{docs} = [];
+delete $meta->{provides}{pair}{docpath};
+delete $meta->{provides}{pair}{docfile};
+$docs = $indexer->parse_docs($params);
+is_deeply $docs, {
+    'README'   => { title => 'pair 0.1.0' },
+}, 'Doc parser should parse the README with its title as the sole doc';
+is @{ $indexer->to_index->{docs} }, 1, 'Should have one doc to index';
+is $indexer->to_index->{docs}[0]{docpath}, 'README',
+    'And it should be the README';
+
 # Try it with an emptyish file.
+$indexer->to_index->{docs} = [];
 $params->{zip}->addString('', 'pair-0.1.0/foo.pl');
 touch(catfile $indexer->doc_root_file_for(source => $params->{meta}), 'foo.pl');
 my $plhtml = catfile $doc_dir, 'foo.html';
@@ -786,6 +864,7 @@ is_deeply $meta->{docs}, {
     'README'   => { title => 'pair 0.1.0' },
     'doc/pair' => { title => 'pair 0.1.0', abstract => 'A key/value pair data type' },
 }, 'Should array of docs excluding file with no docs';
+
 
 ##############################################################################
 # Make sure that add_document() calls all the necessary methods.
@@ -877,7 +956,6 @@ like $res->{hits}[0]{excerpt}, qr{\Qtwo-value <strong>composite</strong> type},
 is $res->{hits}[0]{dist}, 'pair', 'It should be in dist "pair"';
 is $res->{hits}[0]{version}, '0.1.0', 'It should be in 0.1.0';
 
-
 ##############################################################################
 # Now index 0.1.1 (testing).
 $meta_011 = $api->read_json_from(
@@ -887,8 +965,11 @@ $pgz = catfile qw(dist pair 0.1.1 pair-0.1.1.zip);
 $params->{meta}   = $meta_011;
 ok $params->{zip} = $sync->unzip($pgz, {name => 'pair'}), "Unzip $pgz";
 ok $indexer->add_distribution($params), 'Index pair 0.1.1';
+is_deeply $indexer->to_index, {
+    map { $_ => [] } qw(docs dists extensions users tags)
+}, 'Should have no index updates for test dist';
 
-# The previous stable release should still be indxed.
+# The previous stable release should still be indexed.
 ok $searcher = PGXN::API::Searcher->new($doc_root), 'Instantiate another searcher';
 ok $res = $searcher->search(query => 'data', in => 'dists'),
     'Search dists for "data" again';
@@ -1064,62 +1145,60 @@ is_deeply \@called, [qw(update_user_lists _commit)],
 
 ##############################################################################
 # Test find_docs().
-$ENV{FOO} = 1;
 touch(catfile $indexer->doc_root_file_for(source => $params->{meta}), qw(sql hi.mkdn));
 $params->{meta}{provides}{pair}{docfile} = 'sql/hi.mkdn';
-is_deeply [ $indexer->find_docs($params)], [qw(
-    sql/hi.mkdn
-    doc/pair.md
-    README.md
-)], 'find_docs() should find specified and random doc files';
-delete $ENV{FOO};
+is_deeply [ sort { $a->{filename} cmp $b->{filename} } $indexer->find_docs($params)], [
+    { filename => 'README.md' },
+    { filename => 'doc/pair.md' },
+    { filename => 'sql/hi.mkdn', extension => 'pair' },
+], 'find_docs() should find specified and random doc files';
 
 $params->{meta}{no_index} = { file => ['sql/hi.mkdn'] };
-is_deeply [ $indexer->find_docs($params)], [qw(
-    sql/hi.mkdn
-    doc/pair.md
-    README.md
-)], 'find_docs() no_index should be ignored for specified doc file';
+is_deeply [ sort { $a->{filename} cmp $b->{filename} } $indexer->find_docs($params)], [
+    { filename => 'README.md' },
+    { filename => 'doc/pair.md' },
+    { filename => 'sql/hi.mkdn', extension => 'pair' },
+], 'find_docs() no_index should be ignored for specified doc file';
 
 $params->{meta}{no_index} = { file => ['doc/pair.md'] };
-is_deeply [ $indexer->find_docs($params)], [qw(
-    sql/hi.mkdn
-    README.md
-)], 'find_docs() should respect no_index for found docs';
+is_deeply [ sort { $a->{filename} cmp $b->{filename} } $indexer->find_docs($params)], [
+    { filename => 'README.md' },
+    { filename => 'sql/hi.mkdn', extension => 'pair' },
+], 'find_docs() should respect no_index for found docs';
 
 $params->{meta}{no_index} = { directory => ['sql'] };
-is_deeply [ $indexer->find_docs($params)], [qw(
-    sql/hi.mkdn
-    doc/pair.md
-    README.md
-)], 'find_docs() should ignore no_index directory for specified doc';
+is_deeply [ sort { $a->{filename} cmp $b->{filename} } $indexer->find_docs($params)], [
+    { filename => 'README.md' },
+    { filename => 'doc/pair.md' },
+    { filename => 'sql/hi.mkdn', extension => 'pair' },
+], 'find_docs() should ignore no_index directory for specified doc';
 
 $params->{meta}{no_index} = { directory => ['doc'] };
-is_deeply [ $indexer->find_docs($params)], [qw(
-    sql/hi.mkdn
-    README.md
-)], 'find_docs() should respect no_index directory for found docs';
+is_deeply [ sort { $a->{filename} cmp $b->{filename} } $indexer->find_docs($params)], [
+    { filename => 'README.md' },
+    { filename => 'sql/hi.mkdn', extension => 'pair' },
+], 'find_docs() should respect no_index directory for found docs';
 
 delete $params->{meta}{no_index};
 $params->{meta}{provides}{pair}{docfile} = 'foo/bar.txt';
-is_deeply [ $indexer->find_docs($params)], [qw(
-    doc/pair.md
-    README.md
-)], 'find_docs() should ignore non-existent specified file';
+is_deeply [ sort { $a->{filename} cmp $b->{filename} } $indexer->find_docs($params)], [
+    { filename => 'README.md' },
+    { filename => 'doc/pair.md' },
+], 'find_docs() should ignore non-existent specified file';
 
 $params->{meta}{provides}{pair}{docfile} = 'doc/pair.md';
-is_deeply [ $indexer->find_docs($params)], [qw(
-    doc/pair.md
-    README.md
-)], 'find_docs() should not return dupes';
+is_deeply [ sort { $a->{filename} cmp $b->{filename} } $indexer->find_docs($params)], [
+    { filename => 'README.md' },
+    { filename => 'doc/pair.md', extension => 'pair' },
+], 'find_docs() should not return dupes';
 
 $params->{meta}{provides}{pair}{docfile} = 'doc/pair.pdf';
 touch(catfile $indexer->doc_root_file_for(source => $params->{meta}), qw(doc pair.pdf));
 
-is_deeply [ $indexer->find_docs($params)], [qw(
-    doc/pair.md
-    README.md
-)], 'find_docs() should ignore doc files it does not know how to parse';
+is_deeply [ sort { $a->{filename} cmp $b->{filename} } $indexer->find_docs($params)], [
+    { filename => 'README.md' },
+    { filename => 'doc/pair.md' },
+], 'find_docs() should ignore doc files it does not know how to parse';
 
 sub touch {
     my $fn = shift;

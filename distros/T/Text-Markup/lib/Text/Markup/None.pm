@@ -3,10 +3,11 @@ package Text::Markup::None;
 use 5.8.1;
 use strict;
 use warnings;
+use Text::Markup;
 use HTML::Entities;
 use File::BOM qw(open_bom);
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 sub parser {
     my ($file, $encoding, $opts) = @_;
@@ -61,7 +62,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011-2023 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2011-2024 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

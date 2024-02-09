@@ -56,8 +56,8 @@ sub canonical_holidays {
         'National Day for Truth and Reconciliation' =>      '1583-09-30',
         'Thanksgiving Day' =>              '1583-10-10',
         'Remembrance Day' =>               '1583-11-11',
-        'Christmas Day' =>                 '1583-12-25',
-        'Boxing Day' =>                    '1583-12-26',
+        'Christmas Day' =>                 '1583-12-26',
+        'Boxing Day' =>                    '1583-12-27',
     },
 
     1584 => {
@@ -66,7 +66,7 @@ sub canonical_holidays {
         'Easter Monday' =>                 '1584-04-02',
         'Victoria Day' =>                  '1584-05-21',
         'Civic Holiday' =>                 '1584-08-06',
-        'Canada Day' =>                    '1584-07-01',
+        'Canada Day' =>                    '1584-07-02',
         'Labour Day' =>                    '1584-09-03',
         'National Day for Truth and Reconciliation' =>      '1584-09-30',
         'Thanksgiving Day' =>              '1584-10-08',
@@ -102,7 +102,7 @@ sub canonical_holidays {
         'Thanksgiving Day' =>              '1970-10-12',
         'Remembrance Day' =>               '1970-11-11',
         'Christmas Day' =>                 '1970-12-25',
-        'Boxing Day' =>                    '1970-12-26',
+        'Boxing Day' =>                    '1970-12-28',
     },
 
     1971 => {
@@ -116,8 +116,8 @@ sub canonical_holidays {
         'National Day for Truth and Reconciliation' =>      '1971-09-30',
         'Thanksgiving Day' =>              '1971-10-11',
         'Remembrance Day' =>               '1971-11-11',
-        'Christmas Day' =>                 '1971-12-25',
-        'Boxing Day' =>                    '1971-12-26',
+        'Christmas Day' =>                 '1971-12-27',
+        'Boxing Day' =>                    '1971-12-28',
     },
 
     1999 => {
@@ -131,8 +131,8 @@ sub canonical_holidays {
         'National Day for Truth and Reconciliation' =>      '1999-09-30',
         'Thanksgiving Day' =>              '1999-10-11',
         'Remembrance Day' =>               '1999-11-11',
-        'Christmas Day' =>                 '1999-12-25',
-        'Boxing Day' =>                    '1999-12-26',
+        'Christmas Day' =>                 '1999-12-27',
+        'Boxing Day' =>                    '1999-12-28',
     },
 
     2000 => {
@@ -141,7 +141,7 @@ sub canonical_holidays {
         'Easter Monday' =>                 '2000-04-24',
         'Victoria Day' =>                  '2000-05-22',
         'Civic Holiday' =>                 '2000-08-07',
-        'Canada Day' =>                    '2000-07-01',
+        'Canada Day' =>                    '2000-07-03',
         'Labour Day' =>                    '2000-09-04',
         'National Day for Truth and Reconciliation' =>      '2000-09-30',
         'Thanksgiving Day' =>              '2000-10-09',
@@ -156,7 +156,7 @@ sub canonical_holidays {
         'Easter Monday' =>                 '2001-04-16',
         'Victoria Day' =>                  '2001-05-21',
         'Civic Holiday' =>                 '2000-08-06',
-        'Canada Day' =>                    '2001-07-01',
+        'Canada Day' =>                    '2001-07-02',
         'Labour Day' =>                    '2001-09-03',
         'National Day for Truth and Reconciliation' =>      '2001-09-30',
         'Thanksgiving Day' =>              '2001-10-08',
@@ -206,8 +206,8 @@ sub canonical_holidays {
         'National Day for Truth and Reconciliation' =>      '2004-09-30',
         'Thanksgiving Day' =>              '2004-10-11',
         'Remembrance Day' =>               '2004-11-11',
-        'Christmas Day' =>                 '2004-12-25',
-        'Boxing Day' =>                    '2004-12-26',
+        'Christmas Day' =>                 '2004-12-27',
+        'Boxing Day' =>                    '2004-12-28',
     },
 
     2005 => {
@@ -221,8 +221,8 @@ sub canonical_holidays {
         'National Day for Truth and Reconciliation' =>      '2005-09-30',
         'Thanksgiving Day' =>              '2005-10-10',
         'Remembrance Day' =>               '2005-11-11',
-        'Christmas Day' =>                 '2005-12-25',
-        'Boxing Day' =>                    '2005-12-26',
+        'Christmas Day' =>                 '2005-12-26',
+        'Boxing Day' =>                    '2005-12-27',
     },
 
     2006 => {
@@ -231,7 +231,7 @@ sub canonical_holidays {
         'Easter Monday' =>                 '2006-04-17',
         'Victoria Day' =>                  '2006-05-22',
         'Civic Holiday' =>                 '2006-08-07',
-        'Canada Day' =>                    '2006-07-01',
+        'Canada Day' =>                    '2006-07-03',
         'Labour Day' =>                    '2006-09-04',
         'National Day for Truth and Reconciliation' =>      '2006-09-30',
         'Thanksgiving Day' =>              '2006-10-09',
@@ -246,7 +246,7 @@ sub canonical_holidays {
         'Easter Monday' =>                 '2007-04-09',
         'Victoria Day' =>                  '2007-05-21',
         'Civic Holiday' =>                 '2007-08-06',
-        'Canada Day' =>                    '2007-07-01',
+        'Canada Day' =>                    '2007-07-02',
         'Labour Day' =>                    '2007-09-03',
         'National Day for Truth and Reconciliation' =>      '2007-09-30',
         'Thanksgiving Day' =>              '2007-10-08',
@@ -267,7 +267,7 @@ sub canonical_holidays {
         'Thanksgiving Day' =>              '2037-10-12',
         'Remembrance Day' =>               '2037-11-11',
         'Christmas Day' =>                 '2037-12-25',
-        'Boxing Day' =>                    '2037-12-26',
+        'Boxing Day' =>                    '2037-12-28',
     },
 
     2038 => {
@@ -281,8 +281,8 @@ sub canonical_holidays {
         'National Day for Truth and Reconciliation' =>      '2038-09-30',
         'Thanksgiving Day' =>              '2038-10-11',
         'Remembrance Day' =>               '2038-11-11',
-        'Christmas Day' =>                 '2038-12-25',
-        'Boxing Day' =>                    '2038-12-26',
+        'Christmas Day' =>                 '2038-12-27',
+        'Boxing Day' =>                    '2038-12-28',
     },
 
     2039 => {
@@ -296,8 +296,8 @@ sub canonical_holidays {
         'National Day for Truth and Reconciliation' =>      '2039-09-30',
         'Thanksgiving Day' =>              '2039-10-10',
         'Remembrance Day' =>               '2039-11-11',
-        'Christmas Day' =>                 '2039-12-25',
-        'Boxing Day' =>                    '2039-12-26',
+        'Christmas Day' =>                 '2039-12-26',
+        'Boxing Day' =>                    '2039-12-27',
     },
 
     2298 => {
@@ -311,8 +311,8 @@ sub canonical_holidays {
         'National Day for Truth and Reconciliation' =>      '2298-09-30',
         'Thanksgiving Day' =>              '2298-10-10',
         'Remembrance Day' =>               '2298-11-11',
-        'Christmas Day' =>                 '2298-12-25',
-        'Boxing Day' =>                    '2298-12-26',
+        'Christmas Day' =>                 '2298-12-26',
+        'Boxing Day' =>                    '2298-12-27',
     },
 
     2299 => {
@@ -321,7 +321,7 @@ sub canonical_holidays {
         'Easter Monday' =>                 '2299-04-17',
         'Victoria Day' =>                  '2299-05-22',
         'Civic Holiday' =>                 '2299-08-07',
-        'Canada Day' =>                    '2299-07-01',
+        'Canada Day' =>                    '2299-07-03',
         'Labour Day' =>                    '2299-09-04',
         'National Day for Truth and Reconciliation' =>      '2299-09-30',
         'Thanksgiving Day' =>              '2299-10-09',

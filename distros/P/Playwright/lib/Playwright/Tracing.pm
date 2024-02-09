@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Tracing;
-$Playwright::Tracing::VERSION = '1.324';
+$Playwright::Tracing::VERSION = '1.401';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,6 +20,16 @@ sub new {
 
 sub spec {
     return $Playwright::spec->{'Tracing'}{members};
+}
+
+sub stopChunk {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'stopChunk',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
 }
 
 sub startChunk {
@@ -37,16 +47,6 @@ sub stop {
     return $self->_api_request(
         args    => [@_],
         command => 'stop',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub stopChunk {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'stopChunk',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::Tracing - Automatically generated class for Playwright::Tracing
 
 =head1 VERSION
 
-version 1.324
+version 1.401
 
 =head1 CONSTRUCTOR
 
@@ -117,47 +117,47 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
+=head2 stopChunk(@args)
+
+Execute the Tracing::stopChunk playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Tracing#Tracing-stopChunk> for more information.
+
 =head2 startChunk(@args)
 
 Execute the Tracing::startChunk playwright routine.
 
-See L<https://playwright.dev/api/class-Tracing#Tracing-startChunk> for more information.
+See L<https://playwright.dev/docs/api/class-Tracing#Tracing-startChunk> for more information.
 
 =head2 stop(@args)
 
 Execute the Tracing::stop playwright routine.
 
-See L<https://playwright.dev/api/class-Tracing#Tracing-stop> for more information.
-
-=head2 stopChunk(@args)
-
-Execute the Tracing::stopChunk playwright routine.
-
-See L<https://playwright.dev/api/class-Tracing#Tracing-stopChunk> for more information.
+See L<https://playwright.dev/docs/api/class-Tracing#Tracing-stop> for more information.
 
 =head2 start(@args)
 
 Execute the Tracing::start playwright routine.
 
-See L<https://playwright.dev/api/class-Tracing#Tracing-start> for more information.
+See L<https://playwright.dev/docs/api/class-Tracing#Tracing-start> for more information.
 
 =head2 on(@args)
 
 Execute the Tracing::on playwright routine.
 
-See L<https://playwright.dev/api/class-Tracing#Tracing-on> for more information.
+See L<https://playwright.dev/docs/api/class-Tracing#Tracing-on> for more information.
 
 =head2 evaluate(@args)
 
 Execute the Tracing::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-Tracing#Tracing-evaluate> for more information.
+See L<https://playwright.dev/docs/api/class-Tracing#Tracing-evaluate> for more information.
 
 =head2 evaluateHandle(@args)
 
 Execute the Tracing::evaluateHandle playwright routine.
 
-See L<https://playwright.dev/api/class-Tracing#Tracing-evaluateHandle> for more information.
+See L<https://playwright.dev/docs/api/class-Tracing#Tracing-evaluateHandle> for more information.
 
 =head1 SEE ALSO
 

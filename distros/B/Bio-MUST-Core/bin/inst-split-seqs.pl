@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # PODNAME: inst-split-seqs.pl
-# ABSTRACT: Split sequences of FASTA files into shorter sequences
+# ABSTRACT: Split sequences of FASTA files into shorter sequences (optimized)
 # CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
 
 use Modern::Perl '2011';
@@ -48,11 +48,11 @@ __END__
 
 =head1 NAME
 
-inst-split-seqs.pl - Split sequences of FASTA files into shorter sequences
+inst-split-seqs.pl - Split sequences of FASTA files into shorter sequences (optimized)
 
 =head1 VERSION
 
-version 0.212670
+version 0.240390
 
 =head1 USAGE
 

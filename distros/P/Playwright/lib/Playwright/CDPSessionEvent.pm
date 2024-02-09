@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::CDPSessionEvent;
-$Playwright::CDPSessionEvent::VERSION = '1.324';
+$Playwright::CDPSessionEvent::VERSION = '1.401';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,21 +22,21 @@ sub spec {
     return $Playwright::spec->{'CDPSessionEvent'}{members};
 }
 
-sub eventName {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'eventName',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub onEvent {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'onEvent',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub eventName {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'eventName',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -86,7 +86,7 @@ Playwright::CDPSessionEvent - Automatically generated class for Playwright::CDPS
 
 =head1 VERSION
 
-version 1.324
+version 1.401
 
 =head1 CONSTRUCTOR
 
@@ -97,35 +97,35 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 eventName(@args)
-
-Execute the CDPSessionEvent::eventName playwright routine.
-
-See L<https://playwright.dev/api/class-CDPSessionEvent#CDPSessionEvent-eventName> for more information.
-
 =head2 onEvent(@args)
 
 Execute the CDPSessionEvent::onEvent playwright routine.
 
-See L<https://playwright.dev/api/class-CDPSessionEvent#CDPSessionEvent-onEvent> for more information.
+See L<https://playwright.dev/docs/api/class-CDPSessionEvent#CDPSessionEvent-onEvent> for more information.
+
+=head2 eventName(@args)
+
+Execute the CDPSessionEvent::eventName playwright routine.
+
+See L<https://playwright.dev/docs/api/class-CDPSessionEvent#CDPSessionEvent-eventName> for more information.
 
 =head2 on(@args)
 
 Execute the CDPSessionEvent::on playwright routine.
 
-See L<https://playwright.dev/api/class-CDPSessionEvent#CDPSessionEvent-on> for more information.
+See L<https://playwright.dev/docs/api/class-CDPSessionEvent#CDPSessionEvent-on> for more information.
 
 =head2 evaluate(@args)
 
 Execute the CDPSessionEvent::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-CDPSessionEvent#CDPSessionEvent-evaluate> for more information.
+See L<https://playwright.dev/docs/api/class-CDPSessionEvent#CDPSessionEvent-evaluate> for more information.
 
 =head2 evaluateHandle(@args)
 
 Execute the CDPSessionEvent::evaluateHandle playwright routine.
 
-See L<https://playwright.dev/api/class-CDPSessionEvent#CDPSessionEvent-evaluateHandle> for more information.
+See L<https://playwright.dev/docs/api/class-CDPSessionEvent#CDPSessionEvent-evaluateHandle> for more information.
 
 =head1 SEE ALSO
 

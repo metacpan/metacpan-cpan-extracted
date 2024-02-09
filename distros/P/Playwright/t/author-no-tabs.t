@@ -70,6 +70,7 @@ my @files = (
     'lib/Playwright/Tracing.pm',
     'lib/Playwright/Util.pm',
     'lib/Playwright/Video.pm',
+    'lib/Playwright/WebError.pm',
     'lib/Playwright/WebSocket.pm',
     'lib/Playwright/WebSocketFrame.pm',
     'lib/Playwright/Worker.pm',
@@ -77,6 +78,7 @@ my @files = (
     't/Playwright-Util.t',
     't/Playwright.t',
     't/author-critic.t',
+    't/author-distmeta.t',
     't/author-eol.t',
     't/author-minimum-version.t',
     't/author-mojibake.t',
@@ -87,7 +89,6 @@ my @files = (
     't/author-test-version.t',
     't/release-cpan-changes.t',
     't/release-dist-manifest.t',
-    't/release-distmeta.t',
     't/release-kwalitee.t',
     't/release-meta-json.t',
     't/release-unused-vars.t'

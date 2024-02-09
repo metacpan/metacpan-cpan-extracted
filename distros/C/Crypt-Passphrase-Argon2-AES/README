@@ -44,9 +44,12 @@ METHODS
       This is the mode that will be used with AES. Values values are 'ecb',
       'cbc' (the default), 'cfb', 'ofb' and 'ctr'.
 
+    The salt_size is hard-coded to 16 bytes, and if mode equals cbc or ecb,
+    the output_size must be a multiple of 16 bytes.
+
 AUTHOR
 
-    Leon Timmermans <leont@cpan.org>
+    Leon Timmermans <fawaka@gmail.com>
 
 COPYRIGHT AND LICENSE
 

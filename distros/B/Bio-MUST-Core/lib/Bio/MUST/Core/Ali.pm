@@ -2,7 +2,7 @@ package Bio::MUST::Core::Ali;
 # ABSTRACT: Multiple sequence alignment
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Core::Ali::VERSION = '0.212670';
+$Bio::MUST::Core::Ali::VERSION = '0.240390';
 use Moose;
 use namespace::autoclean;
 
@@ -503,10 +503,8 @@ sub temp_fasta {
     my $self = shift;
     my $args = shift // {};             # HashRef (should not be empty...)
 
-    # abbreviate ids (possibly using a custom prefix)
-    my $prefix = $args->{id_prefix};
-    delete $args->{id_prefix};          # not necessarily required
-    my $mapper = $self->std_mapper($prefix);
+    # abbreviate ids (possibly using a custom prefix, offset, or IdMapper)
+    my $mapper = $args->{mapper} // $self->std_mapper($args);
     $self->shorten_ids($mapper);
 
     # write temporary .fasta file using standard abbr_ids
@@ -825,7 +823,7 @@ Bio::MUST::Core::Ali - Multiple sequence alignment
 
 =head1 VERSION
 
-version 0.212670
+version 0.240390
 
 =head1 SYNOPSIS
 
@@ -1301,7 +1299,7 @@ Long ids without abbreviated forms in the IdMapper are left untouched.
     use aliased 'Bio::MUST::Core::Ali';
     use aliased 'Bio::MUST::Core::IdMapper';
     my $ali = Ali->load('input.ali');
-    my $mapper = IdMapper->std_mapper($ali, 'lcl|seq');
+    my $mapper = IdMapper->std_mapper( $ali, { id_prefix => 'lcl|seq' } );
     $ali->shorten_ids($mapper);
     $ali->store_fasta('input.4blast.fasta');
     # makeblastdb
@@ -1480,6 +1478,9 @@ L<Bio::MUST::Core::Listable>).
 
     my $infile1 = $ali1->temp_fasta( { id_prefix => 'file1-' } );
     my $infile2 = $ali2->temp_fasta( { id_prefix => 'file2-' } );
+
+Finally, it is possible to pass an existing L<Bio::MUST::Core::IdMapper> object
+by providing the C<mapper> option.
 
 =head2 load_phylip
 

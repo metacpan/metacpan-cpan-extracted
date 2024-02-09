@@ -12,7 +12,7 @@
 use strict;
 use warnings;
 package Date::Holidays::CA;
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 # ABSTRACT: Date::Holidays::CA determines public holidays for Canadian jurisdictions
 
@@ -498,6 +498,24 @@ sub _nearest_monday {
     return $day + $delta_days;
 }
 
+# _round_to_monday
+#
+# accepts: year, month, day for a given date
+# returns: day unless day is a Sat/Sun, then the next Mon
+sub _round_to_monday {
+    my $year  = shift;
+    my $month = shift;
+    my $day   = shift;
+
+    my $dt = DateTime->new(year => $year, month => $month, day => $day);
+
+    my $delta_days = (8 - $dt->dow());
+    $delta_days = 0 if($delta_days > 2);
+
+    return $day + $delta_days;
+}
+
+
 ### holiday date calculating functions
 #
 # these all take one parameter ($year) and return a DateTime object
@@ -616,10 +634,15 @@ sub _nl_discovery_day {
 sub _canada_day {
     my $year = shift;
 
+    # Canada Day is July 1st unless it is a Sunday.  If it is a
+    # Sunday then Monday is the Holiday.  Further complicated by
+    # the fact that July 1st on a Saturday is usually a holiday
+    # for people who work week days.  So we round to Monday if
+    # July 1st is a Saturday or Sunday.
     return DateTime->new(
         year  => $year,
         month => 7,
-        day   => 1,
+        day   => _round_to_monday($year, 7, 1)
     );
 }
 
@@ -706,20 +729,25 @@ sub _remembrance_day {
 sub _christmas_day {
     my $year = shift;
 
+    # Christmas Day is December 25th but the Holiday is normally
+    # observed on the Monday if it occurs on a week end day
     return DateTime->new(
         year  => $year,
         month => 12,
-        day   => 25,
+        day   => _round_to_monday($year, 12, 25)
     );
 }
 
 sub _boxing_day {
     my $year = shift;
 
+    # Normally the day after the Christmas Holiday, except if
+    # Christmas is on Friday, then our holiday is on Monday
+    my $result = _christmas_day($year)->add(days=>1);
     return DateTime->new(
         year  => $year,
         month => 12,
-        day   => 26,
+        day   => _round_to_monday($year, 12, $result->day())
     );
 }
 
@@ -738,7 +766,7 @@ Date::Holidays::CA - Date::Holidays::CA determines public holidays for Canadian 
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -1155,6 +1183,11 @@ have will shape its future development.
 For reasons outlined in the two sections above, please be forewarned
 that what days are considered holidays may change with versions of
 the module.
+
+Note that the holiday is intended to reflect the actual observed
+holiday not the date of the actual day.  Christmas Day, for example,
+is December 25th but the actual day of the holiday may be two days
+later, the Monday, if Christmas Day is on a Saturday.
 
 =head1 SEE ALSO
 

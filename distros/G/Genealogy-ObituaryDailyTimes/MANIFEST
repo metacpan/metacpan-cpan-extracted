@@ -2,8 +2,7 @@ bin/create_db.PL
 bin/ml_from_cache
 Changes
 lib/Genealogy/ObituaryDailyTimes.pm
-lib/Genealogy/ObituaryDailyTimes/DB.pm
-lib/Genealogy/ObituaryDailyTimes/DB/obituaries.pm
+lib/Genealogy/ObituaryDailyTimes/obituaries.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

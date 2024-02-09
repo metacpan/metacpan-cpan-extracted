@@ -1,17 +1,17 @@
 GCA_000014265.1	Trichodesmium erythraeum IMS101
 GCF_000270265.1	Synechocystis sp. PCC 6803
 GCF_000317085.1	Synechococcus sp. PCC 7502
-GCF_000019485.1	Synechococcus sp. PCC 7002
+GCF_000019485.1	Picosynechococcus sp. PCC 7002
 GCA_000013225.1	Synechococcus sp. JA-2-3B'a(2-13)
 GCF_000317065.1	Pseudanabaena sp. PCC 7367
 GCA_000317025.1	Pleurocapsa sp. PCC 7327
 GCF_000020025.1	Nostoc punctiforme PCC 73102
 GCA_000214075.2	Microcoleus vaginatus FGP-2
-GCF_000317515.1	Microcoleus sp. PCC 7113
+GCF_000317515.1	Allocoleopsis franciscana PCC 7113
 GCA_000317555.1	Gloeocapsa sp. PCC 7428
 GCA_000317045.1	Geitlerinema sp. PCC 7407
 GCF_000317145.1	Chamaesiphon minutus PCC 6605
-GCF_000011345.1	Thermosynechococcus elongatus BP-1
+GCF_000011345.1	Thermosynechococcus vestitus BP-1
 GCA_000013205.1	Synechococcus sp. JA-3-3Ab
 GCA_000014585.1	Synechococcus sp. CC9311
 GCA_000179235.1	Synechococcus sp. CB0101
@@ -39,7 +39,7 @@ GCF_000317615.1	Dactylococcopsis salina PCC 8305
 GCF_000022045.1	Cyanothece sp. PCC 7425
 GCF_000018105.1	Acaryochloris marina MBIC11017
 GCA_000332075.2	Synechocystis sp. PCC 7509
-GCA_000195975.1	Synechococcus sp. WH 8102
+GCA_000195975.1	Parasynechococcus marenigrum WH 8102
 GCF_000063525.1	Synechococcus sp. RCC307
 GCF_000332275.1	Synechococcus sp. PCC 7336
 GCA_000332335.1	Oscillatoria sp. PCC 10802
@@ -61,7 +61,7 @@ GCF_000316575.1	Calothrix sp. PCC 7507
 GCF_000007925.1	Prochlorococcus marinus subsp. marinus str. CCMP1375
 GCF_000316625.1	Nostoc sp. PCC 7107
 GCF_000340565.1	Nodularia spumigena CCY9414
-GCF_000316605.1	Leptolyngbya sp. PCC 7376
+GCF_000316605.1	[Leptolyngbya] sp. PCC 7376
 GCA_000733415.1	[Leptolyngbya] sp. JSC-1
 GCA_000316515.1	Cyanobium gracile PCC 6307
 GCF_000734895.2	Calothrix sp. 336/3
@@ -91,7 +91,7 @@ GCF_000763385.1	Leptolyngbya sp. KIOST-1
 GCA_000017845.1	Crocosphaera subtropica ATCC 51142
 GCF_001548095.1	Geminocystis sp. NIES-3708
 GCF_000828085.2	Scytonema tolypothrichoides VB-61278
-GCA_000485815.1	Synechococcus sp. NKBG15041c
+GCA_000485815.1	Picosynechococcus sp. NKBG15041c
 GCF_000760175.1	Prochlorococcus sp. MIT 0601
 GCA_000710505.1	Planktothrix agardhii NIVA-CYA 126/8
 GCF_000517105.1	Fischerella sp. PCC 9605
@@ -111,7 +111,7 @@ GCF_000737575.1	Synechococcus sp. KORDI-49
 GCF_000010065.1	Synechococcus elongatus PCC 6301
 GCA_000332355.1	Baaleninema simplex PCC 7105
 GCA_000015665.1	Prochlorococcus marinus str. MIT 9515
-GCA_000817785.1	Hassallia byssoidea VB512170
+GCA_000817785.1	Hassalia byssoidea VB512170
 GCF_000091205.1	Cyanidioschyzon merolae strain 10D
 GCA_001007665.1	Candidatus Synechococcus spongiarum SP3
 GCA_000515235.1	Synechococcus sp. CC9616
@@ -173,7 +173,7 @@ GCA_000315625.1	Guillardia theta CCMP2712
 GCF_001182765.1	Synechococcus sp. WH 8103
 GCA_000634415.1	Prochlorococcus sp. scB245a_519A13
 GCF_001264245.1	Microcystis panniformis FACHB-1757
-GCF_000715475.1	Synechococcus sp. NKBG042902
+GCF_000715475.1	Picosynechococcus sp. NKBG042902
 GCF_000291945.1	Prochlorococcus sp. W11
 GCF_000973065.1	Limnospira indica PCC 8005
 GCA_000312165.1	Microcystis aeruginosa PCC 9717

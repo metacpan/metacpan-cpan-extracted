@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::FormData;
-$Playwright::FormData::VERSION = '1.324';
+$Playwright::FormData::VERSION = '1.401';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,21 +22,21 @@ sub spec {
     return $Playwright::spec->{'FormData'}{members};
 }
 
-sub create {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'create',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub set {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'set',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub create {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'create',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -86,7 +86,7 @@ Playwright::FormData - Automatically generated class for Playwright::FormData
 
 =head1 VERSION
 
-version 1.324
+version 1.401
 
 =head1 CONSTRUCTOR
 
@@ -97,35 +97,35 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 create(@args)
-
-Execute the FormData::create playwright routine.
-
-See L<https://playwright.dev/api/class-FormData#FormData-create> for more information.
-
 =head2 set(@args)
 
 Execute the FormData::set playwright routine.
 
-See L<https://playwright.dev/api/class-FormData#FormData-set> for more information.
+See L<https://playwright.dev/docs/api/class-FormData#FormData-set> for more information.
+
+=head2 create(@args)
+
+Execute the FormData::create playwright routine.
+
+See L<https://playwright.dev/docs/api/class-FormData#FormData-create> for more information.
 
 =head2 on(@args)
 
 Execute the FormData::on playwright routine.
 
-See L<https://playwright.dev/api/class-FormData#FormData-on> for more information.
+See L<https://playwright.dev/docs/api/class-FormData#FormData-on> for more information.
 
 =head2 evaluate(@args)
 
 Execute the FormData::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-FormData#FormData-evaluate> for more information.
+See L<https://playwright.dev/docs/api/class-FormData#FormData-evaluate> for more information.
 
 =head2 evaluateHandle(@args)
 
 Execute the FormData::evaluateHandle playwright routine.
 
-See L<https://playwright.dev/api/class-FormData#FormData-evaluateHandle> for more information.
+See L<https://playwright.dev/docs/api/class-FormData#FormData-evaluateHandle> for more information.
 
 =head1 SEE ALSO
 

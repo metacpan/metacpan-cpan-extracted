@@ -16,7 +16,7 @@ use aliased 'Bio::MUST::Core::Tree';
 for my $infile (@ARGV_infiles) {
 
     ### Processing: $infile
-	my $tree = Tree->load($infile);
+    my $tree = Tree->load($infile);
     my $list = $ARGV_sort ? $tree->alphabetical_list : $tree->std_list;
     my $outfile = change_suffix($infile, '.idl');
     $list->store($outfile);
@@ -32,7 +32,7 @@ tree2list.pl - Generate id lists from tree tips
 
 =head1 VERSION
 
-version 0.212670
+version 0.240390
 
 =head1 USAGE
 

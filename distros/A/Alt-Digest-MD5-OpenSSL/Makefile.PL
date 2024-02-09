@@ -16,6 +16,7 @@ WriteMakefile(
 		'Alien::Base::Wrapper' => 0.32,
 		'ExtUtils::MakeMaker' => '6.76',
 	},
+	LICENSE => 'perl_5',
 	META_MERGE => {
 		no_index => {
 			directory => [qw(lib/Digest)],

@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 use IPC::Cmd qw/can_run/;
 use DBIx::QuickDB::Util qw/strip_hash_defaults/;
@@ -135,6 +135,8 @@ sub _default_config {
             'innodb_io_capacity'             => '2000',
             'innodb_max_dirty_pages_pct'     => '0',
             'innodb_max_dirty_pages_pct_lwm' => '0',
+
+            defined($ENV{QDB_MYSQL_SSL_FIPS}) ? ('ssl_fips_mode' => "$ENV{QDB_MYSQL_SSL_FIPS}") : (),
 
             $provider eq 'percona'
             ? (
@@ -447,6 +449,18 @@ DBD::MariaDB is preferred with a fallback to DBD::MySQL.
 =item mysqld_provider => $PROVIDER
 
 Should be either 'mariadb' or 'percona'. Will auto-detect when possible.
+
+=head1 ENVIRONMENT VARIABLES
+
+=head2 QDB_MYSQL_SSL_FIPS
+
+Set to 1 to enable, 0 to disable or enter any string accepted by the
+C<ssl_fips_mode> mysqld config option. If this environment variable is not
+defined then the C<ssl_fips_mode> option will not be included in the generated
+config file at all by default.
+
+This is mainly used to allow this dists test suite to pass on systems where
+FIPS is required and enforced.
 
 =head1 SOURCE
 

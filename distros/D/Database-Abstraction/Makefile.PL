@@ -7,21 +7,21 @@ WriteMakefile(
 	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
 	VERSION_FROM	=> 'lib/Database/Abstraction.pm',
 	ABSTRACT_FROM	=> 'lib/Database/Abstraction.pm',
-	((defined($ExtUtils::MakeMaker::VERSION) &&
-	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-	  ? ('LICENSE'=> 'GPL')
-	  : ()),
+	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
+		? ('LICENSE'=> 'GPL')
+		: ()),
 	'LIBS' => [''],	# e.g., '-lm'
 	'DEFINE' => '',	# e.g., '-DHAVE_SOMETHING'
 	'INC' => '',	# e.g., '-I/usr/include/other'
 	PL_FILES	=> {},
 	TEST_REQUIRES => {
 		'DBD::CSV' => 0,
-		'DBD::XMLSimple' => 0,
+		'DBD::XMLSimple' => 0.07,
 		'File::Spec' => 0,
 		'FindBin' => 0,
 		'Test::Compile' => 0,
 		'Test::Most' => 0,
+		'Test::Needs' => 0,
 		'Text::xSV::Slurp' => 0
 	}, PREREQ_PM => {
 		'autodie' => 0,

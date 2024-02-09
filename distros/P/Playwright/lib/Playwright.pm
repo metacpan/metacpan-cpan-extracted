@@ -1,5 +1,5 @@
 package Playwright;
-$Playwright::VERSION = '1.324';
+$Playwright::VERSION = '1.401';
 use strict;
 use warnings;
 
@@ -16,7 +16,7 @@ use Net::EmptyPort();
 use JSON::MaybeXS();
 use File::Which();
 use Capture::Tiny qw{capture_merged capture_stderr};
-use Carp qw{confess};
+use Carp          qw{confess};
 
 use Playwright::Base();
 use Playwright::Util();
@@ -100,17 +100,21 @@ sub new ( $class, %options ) {
 
     #XXX yes, this is a race, so we need retries in _start_server
     my $port    = $options{port}    // Net::EmptyPort::empty_port();
+    my $cdp_uri = $options{cdp_uri} // '';
     my $timeout = $options{timeout} // 30;
     my $self    = bless(
         {
             ua      => $options{ua}   // LWP::UserAgent->new(),
             host    => $options{host} // 'localhost',
             port    => $port,
+            cdp_uri => $cdp_uri,
             debug   => $options{debug},
             cleanup =>
               ( $options{cleanup} || !$options{port} || !$options{host} ) // 1,
             pid => $options{host} ? "REUSE" : _start_server(
-                $port, $timeout, $options{debug}, $options{cleanup} // 1
+                $port,    $cdp_uri,
+                $timeout, $options{debug},
+                $options{cleanup} // 1
             ),
             parent  => $$ // 'bogus',    # Oh lawds, this can be undef sometimes
             timeout => $timeout,
@@ -255,7 +259,7 @@ sub DESTROY ($self) {
     $self->quit();
 }
 
-sub _start_server ( $port, $timeout, $debug, $cleanup ) {
+sub _start_server ( $port, $cdp_uri, $timeout, $debug, $cleanup ) {
     $debug = $debug ? '--debug' : '';
 
     # Check if the port is already live, and short-circuit if this is the case.
@@ -272,11 +276,15 @@ sub _start_server ( $port, $timeout, $debug, $cleanup ) {
         print "Waiting for playwright server on port $port to come up...\n"
           if $debug;
         Net::EmptyPort::wait_port( $port, $timeout )
-          or confess("Server never came up after 30s!");
+          or confess( "Server never came up after " . $timeout . "s!" );
         print "done\n" if $debug;
 
         return $pid;
     }
+
+    my @args = ( $node_bin, $server_bin, "--port", $port );
+    push( @args, "--cdp", $cdp_uri ) if $cdp_uri;
+    push( @args, $debug ) if $debug;
 
     # Orphan the process in the event that cleanup => 0
     if ( !$cleanup ) {
@@ -286,12 +294,10 @@ sub _start_server ( $port, $timeout, $debug, $cleanup ) {
         die "Cannot detach playwright_server process for persistence"
           if POSIX::setsid() < 0;
         require Capture::Tiny;
-        capture_merged {
-            exec( $node_bin, $server_bin, "--port", $port, $debug )
-        };
+        capture_merged { exec(@args) };
         die("Could not exec!");
     }
-    exec( $node_bin, $server_bin, "--port", $port, $debug );
+    exec(@args);
 }
 
 1;
@@ -308,7 +314,7 @@ Playwright - Perl client for Playwright
 
 =head1 VERSION
 
-version 1.324
+version 1.401
 
 =head1 SYNOPSIS
 
@@ -478,6 +484,25 @@ Don't worry though, you can access the parent attribute on most Playwright::* ob
 
     # Assuming $element is a Playwright::ElementHandle
     my $page = $element->{parent};
+
+=head2 Chrome Specific features
+
+You can pass the parameter 'cdp_uri' to the constructor to connect to a running browser with a ChromeDevTools server running.
+Example:
+
+    ws://wegotussomebrowsers.test:666?user=fred&token=Y4BBAD4B3AD00
+
+This appears to be what the large scale playwright-as-a-service shops are using to expose browsers to their customers.
+
+For the curious as to how this actually works:
+
+Similar to the playwright_server binary this module ships, they use some kind of web service to wrap browser.newBrowserCDPSession().
+Alternatively, they wrap running `chromium-browser --remote-debugging-port=7779311` instead of touching pw, because complexity demon BAD.
+See the CDP: block in example.pl with this distribution (read: in the TLD of its repo) for how to do precisely that.
+
+It's nothing all that complicated, other than the hulking swarm of services which integrate that into a userland that can charge your credit card!
+Oh, and monitoring/balancing/scaling it all so that it doesn't fall over because you crammed 10 billion clients onto one box.
+Gotta stay right on the edge of utilization madness, that's the sweet spot as far as margin is concerned.
 
 =head2 Firefox Specific concerns
 
@@ -741,11 +766,21 @@ George S. Baugh <teodesian@gmail.com>
 
 =back
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Yanick Champoux
+=for stopwords reneeb Yanick Champoux
+
+=over 4
+
+=item *
+
+reneeb <info@perl-services.de>
+
+=item *
 
 Yanick Champoux <yanick.champoux@iinteractive.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -5,8 +5,7 @@ use strict;
 use Carp;
 use File::Spec;
 use Module::Info;
-use Genealogy::ObituaryDailyTimes::DB;
-use Genealogy::ObituaryDailyTimes::DB::obituaries;
+use Genealogy::ObituaryDailyTimes::obituaries;
 
 =head1 NAME
 
@@ -14,11 +13,11 @@ Genealogy::ObituaryDailyTimes - Lookup an entry in the Obituary Daily Times
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 
@@ -55,14 +54,22 @@ sub new {
 		return bless { %{$class}, %args }, ref($class);
 	}
 
-	my $directory = $args{'directory'} || Module::Info->new_from_loaded(__PACKAGE__)->file();
-	$directory =~ s/\.pm$//;
+	if(!(my $directory = $args{'directory'})) {
+		# If the directory argument isn't given, see if we can find the data
+		$directory ||= Module::Info->new_from_loaded(__PACKAGE__)->file();
+		$directory =~ s/\.pm$//;
+		$args{'directory'} = File::Spec->catfile($directory, 'data');
+	}
+	if(!-d $args{'directory'}) {
+		Carp::carp(__PACKAGE__, ': ', $args{'directory'}, ' is not a directory');
+		return;
+	}
 
-	# The database is updated daily
-	$args{'cache_duration'} ||= '1 day';
-
-	Genealogy::ObituaryDailyTimes::DB::init(directory => File::Spec->catfile($directory, 'database'), %args);
-	return bless { }, $class;
+	# cache_duration can be overriden by the args
+	return bless {
+		cache_duration => '1 day',	# The database is updated daily
+		%args,
+	}, $class;
 }
 
 =head2 search
@@ -86,7 +93,7 @@ sub search {
 		return;
 	}
 
-	$self->{'obituaries'} ||= Genealogy::ObituaryDailyTimes::DB::obituaries->new(no_entry => 1);
+	$self->{'obituaries'} ||= Genealogy::ObituaryDailyTimes::obituaries->new(no_entry => 1, %{$self});
 
 	if(!defined($self->{'obituaries'})) {
 		Carp::croak("Can't open the obituaries database");
@@ -135,9 +142,15 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
 
+Ancestry has removed the archives.
+The first 17 pages are on Wayback machine, but the rest is lost.
+
 =head1 SEE ALSO
 
-The Obituary Daily Times, L<https://sites.rootsweb.com/~obituary/>
+The Obituary Daily Times, L<https://sites.rootsweb.com/~obituary/>,
+Archived Rootsweb data, L<https://wayback.archive-it.org/20669/20231102044925/https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit>,
+Recent data L<https://www.freelists.org/list/obitdailytimes>,
+Older data L<https://obituaries.rootsweb.com/obits/searchObits>.
 
 =head1 SUPPORT
 
@@ -169,7 +182,7 @@ L<http://deps.cpantesters.org/?module=Genealogy::ObituaryDailyTimes>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020-2023 Nigel Horne.
+Copyright 2020-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

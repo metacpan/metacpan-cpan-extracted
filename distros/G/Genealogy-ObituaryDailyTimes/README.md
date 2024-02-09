@@ -12,7 +12,7 @@ Genealogy::ObituaryDailyTimes - Lookup an entry in the Obituary Daily Times
 
 # VERSION
 
-Version 0.10
+Version 0.11
 
 # SYNOPSIS
 
@@ -45,9 +45,15 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 
 # BUGS
 
+Ancestry has removed the archives.
+The first 17 pages are on Wayback machine, but the rest is lost.
+
 # SEE ALSO
 
-The Obituary Daily Times, [https://sites.rootsweb.com/~obituary/](https://sites.rootsweb.com/~obituary/)
+The Obituary Daily Times, [https://sites.rootsweb.com/~obituary/](https://sites.rootsweb.com/~obituary/),
+Archived Rootsweb data, [https://wayback.archive-it.org/20669/20231102044925/https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit](https://wayback.archive-it.org/20669/20231102044925/https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit),
+Recent data [https://www.freelists.org/list/obitdailytimes](https://www.freelists.org/list/obitdailytimes),
+Older data [https://obituaries.rootsweb.com/obits/searchObits](https://obituaries.rootsweb.com/obits/searchObits).
 
 # SUPPORT
 
@@ -75,6 +81,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2020-2023 Nigel Horne.
+Copyright 2020-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2

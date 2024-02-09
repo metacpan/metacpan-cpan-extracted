@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/JWT.pm
-## Version v0.100.2
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Version v0.100.3
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2022/06/29
+## Modified 2024/02/09
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -38,7 +38,7 @@ BEGIN
     use Compress::Raw::Zlib;
     use Scalar::Util qw(looks_like_number);
     # Crypt::JWT version 0.024
-    our $VERSION = 'v0.100.2';
+    our $VERSION = 'v0.100.3';
 };
 
 use strict;
@@ -126,7 +126,9 @@ sub encode_jwt
             signature => $b64u_signature
             };
             $token->{header} = \%{$args{unprotected_headers}} if( ref( $args{unprotected_headers} ) eq 'HASH' );
-            return encode_json($token);
+            my $j = JSON->new->allow_nonref->allow_blessed->convert_blessed;
+            # return encode_json($token);
+            return( $j->encode( $token ) );
         }
         else 
         {
@@ -161,7 +163,9 @@ sub encode_jwt
             $token->{unprotected} = \%{$args{shared_unprotected_headers}} if( ref( $args{shared_unprotected_headers} ) eq 'HASH' );
             # aad: Additional Authenticated Data (AAD)
             $token->{aad} = $b64u_aad if( defined( $b64u_aad ) );
-            return( encode_json( $token ) );
+            # return( encode_json( $token ) );
+            my $j = JSON->new->allow_nonref->allow_blessed->convert_blessed;
+            return( $j->encode( $token ) );
         }
         else 
         {
@@ -493,7 +497,15 @@ sub _payload_enc
     my( $payload ) = @_;
     if( ref( $payload ) =~ /^(HASH|ARRAY)$/ ) 
     {
-        $payload = encode_json( $payload );
+        # $payload = encode_json( $payload );
+        my $j = JSON->new->allow_nonref->allow_blessed->convert_blessed;
+        # try-catch
+        local $@;
+        $payload = eval
+        {
+            $j->encode( $payload );
+        };
+        die( "Error JSON encoding payload: $@" ) if( $@ );
     }
     else 
     {
@@ -719,7 +731,9 @@ sub _encode_jwe
     # adds some header items
     my( $cek, $ecek ) = _encrypt_jwe_cek( $key, $header );
     # encode header
-    my $json_header = encode_json( $header );
+    my $j = JSON->new->allow_nonref->allow_blessed->convert_blessed;
+    # my $json_header = encode_json( $header );
+    my $json_header = $j->encode( $header );
     my $b64u_header = encode_b64u( $json_header );
     my $b64u_aad    = defined( $args{aad} ) ? encode_b64u( $args{aad} ) : undef;
     # encrypt payload
@@ -894,7 +908,9 @@ sub _encode_jws
     # prepare header
     $header->{alg} = $alg;
     # encode header
-    my $json_header = encode_json( $header );
+    my $j = JSON->new->allow_nonref->allow_blessed->convert_blessed;
+    # my $json_header = encode_json( $header );
+    my $json_header = $j->encode( $header );
     my $b64u_header = encode_b64u( $json_header );
     # key
     die( "JWS: missing 'key'" ) if( !$args{key} && $alg ne 'none' );

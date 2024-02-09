@@ -1,5 +1,14 @@
 Revision history for Genealogy::ObituaryDailyTimes
 
+0.11	Thu Feb  8 09:03:49 EST 2024
+	Added first, last, age as an index
+	Renamed database to data
+	Use Database::Abstraction
+	Improved argument checking for 'directory'
+	Try using the Wayback machine archive
+	Get the 2024 data from Freelists
+	"make realclean" now removes the database
+
 0.10	Sun Oct 15 16:04:03 EDT 2023
 	Latest DB.pm from NJH-Snippets
 	Allow new() to take a ref to a hash of arguments

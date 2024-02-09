@@ -1,5 +1,14 @@
 Revision history for Webservice-KvKAPI
 
+TODO:
+* Add naamgevings API support, see
+  https://developers.kvk.nl/nl/documentation/naamgeving-api
+
+0.106     2024-02-07 17:06:55Z
+
+    * Support zoeken api/v2
+    * Add api_path to support zoeken v2 logic
+
 0.105     2023-08-16 11:24:36Z
 
      * Query a different host when using the CLI script

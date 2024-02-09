@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+# use Devel::Leak::Object qw{ GLOBAL_bless };
+
 use Test::Most;
 
 use autodie;
@@ -89,21 +91,21 @@ my @valid_ids = (
 
     # Bacteria
     [ 'Acholeplasma laidlawii_441768@162448101',
-        'cellular organisms; Bacteria; Terrabacteria group; Tenericutes; Mollicutes; Acholeplasmatales; Acholeplasmataceae; Acholeplasma; Acholeplasma laidlawii; Acholeplasma laidlawii PG-8A',
-        'cellular organisms; Bacteria; Terrabacteria group; Tenericutes; Mollicutes; Acholeplasmatales; Acholeplasmataceae; Acholeplasma; Acholeplasma laidlawii',
-       ('cellular organisms; Bacteria; Terrabacteria group; Tenericutes; Mollicutes; Acholeplasmatales; Acholeplasmataceae; Acholeplasma; Acholeplasma laidlawii; Acholeplasma laidlawii PG-8A') x 3,
+        'cellular organisms; Bacteria; Terrabacteria group; Mycoplasmatota; Mollicutes; Acholeplasmatales; Acholeplasmataceae; Acholeplasma; Acholeplasma laidlawii; Acholeplasma laidlawii PG-8A',
+        'cellular organisms; Bacteria; Terrabacteria group; Mycoplasmatota; Mollicutes; Acholeplasmatales; Acholeplasmataceae; Acholeplasma; Acholeplasma laidlawii',
+       ('cellular organisms; Bacteria; Terrabacteria group; Mycoplasmatota; Mollicutes; Acholeplasmatales; Acholeplasmataceae; Acholeplasma; Acholeplasma laidlawii; Acholeplasma laidlawii PG-8A') x 3,
         q{'Acholeplasma laidlawii PG-8A'},
         q{'Acholeplasma laidlawii PG-8A [162448101]'} ],
     [ 'Curvibacter putative_667019@260221396',
-        'cellular organisms; Bacteria; Proteobacteria; Betaproteobacteria; Burkholderiales; Comamonadaceae; Curvibacter; Curvibacter putative symbiont of Hydra magnipapillata',
+        'cellular organisms; Bacteria; Pseudomonadota; Betaproteobacteria; Burkholderiales; Comamonadaceae; Curvibacter; Curvibacter putative symbiont of Hydra magnipapillata',
         '',         # Note the unusual 'organism' name
-       ('cellular organisms; Bacteria; Proteobacteria; Betaproteobacteria; Burkholderiales; Comamonadaceae; Curvibacter; Curvibacter putative symbiont of Hydra magnipapillata') x 3,
+       ('cellular organisms; Bacteria; Pseudomonadota; Betaproteobacteria; Burkholderiales; Comamonadaceae; Curvibacter; Curvibacter putative symbiont of Hydra magnipapillata') x 3,
         q{'Curvibacter putative symbiont of Hydra magnipapillata'},
         q{'Curvibacter putative symbiont of Hydra magnipapillata [260221396]'} ],
     [ 'Desulfotomaculum gibsoniae_767817@357041591',
-        'cellular organisms; Bacteria; Terrabacteria group; Firmicutes; Clostridia; Eubacteriales; Desulfallaceae; Desulfoscipio; Desulfoscipio gibsoniae; Desulfoscipio gibsoniae DSM 7213',
-        'cellular organisms; Bacteria; Terrabacteria group; Firmicutes; Clostridia; Eubacteriales; Desulfallaceae; Desulfoscipio; Desulfoscipio gibsoniae',
-       ('cellular organisms; Bacteria; Terrabacteria group; Firmicutes; Clostridia; Eubacteriales; Desulfallaceae; Desulfoscipio; Desulfoscipio gibsoniae; Desulfoscipio gibsoniae DSM 7213') x 3,
+        'cellular organisms; Bacteria; Terrabacteria group; Bacillota; Clostridia; Eubacteriales; Desulfallaceae; Desulfoscipio; Desulfoscipio gibsoniae; Desulfoscipio gibsoniae DSM 7213',
+        'cellular organisms; Bacteria; Terrabacteria group; Bacillota; Clostridia; Eubacteriales; Desulfallaceae; Desulfoscipio; Desulfoscipio gibsoniae',
+       ('cellular organisms; Bacteria; Terrabacteria group; Bacillota; Clostridia; Eubacteriales; Desulfallaceae; Desulfoscipio; Desulfoscipio gibsoniae; Desulfoscipio gibsoniae DSM 7213') x 3,
         q{'Desulfoscipio gibsoniae DSM 7213'},
         q{'Desulfoscipio gibsoniae DSM 7213 [357041591]'} ],
 
@@ -165,9 +167,9 @@ my @valid_ids = (
         q{'Ulnaria acus'},
         q{'Ulnaria acus [123456]'} ],
     [ 'Oscillatoriales cyanobacterium_627090@ABCDEF',
-        'cellular organisms; Bacteria; Terrabacteria group; Cyanobacteria/Melainabacteria group; Cyanobacteria; unclassified Cyanobacteria; [Leptolyngbya] sp. JSC-1',
-        'cellular organisms; Bacteria; Terrabacteria group; Cyanobacteria/Melainabacteria group; Cyanobacteria; Oscillatoriophycideae; Oscillatoriales; unclassified Oscillatoriales; Oscillatoriales cyanobacterium',
-       ('cellular organisms; Bacteria; Terrabacteria group; Cyanobacteria/Melainabacteria group; Cyanobacteria; unclassified Cyanobacteria; [Leptolyngbya] sp. JSC-1') x 3,
+        'cellular organisms; Bacteria; Terrabacteria group; Cyanobacteriota/Melainabacteria group; Cyanobacteriota; unclassified Cyanobacteriota; [Leptolyngbya] sp. JSC-1',
+        'cellular organisms; Bacteria; Terrabacteria group; Cyanobacteriota/Melainabacteria group; Cyanobacteriota; Cyanophyceae; Oscillatoriophycideae; Oscillatoriales; unclassified Oscillatoriales; Oscillatoriales cyanobacterium',
+       ('cellular organisms; Bacteria; Terrabacteria group; Cyanobacteriota/Melainabacteria group; Cyanobacteriota; unclassified Cyanobacteriota; [Leptolyngbya] sp. JSC-1') x 3,
         q{'[Leptolyngbya] sp. JSC-1'},
         q{'[Leptolyngbya] sp. JSC-1 [ABCDEF]'} ],
 #     [ 'Fistulifera sp._880758@xyz789',
@@ -369,16 +371,16 @@ my @dupe_tests = (
         [ qw(Eukaryota Metazoa Arthropoda Insecta Diptera Culicidae Aedes undef) ]  ],
     [ 'Aedes', 'cellular organisms; Eukaryota; Opisthokonta; Metazoa; Eumetazoa; Bilateria; Protostomia; Ecdysozoa; Panarthropoda; Arthropoda; Mandibulata; Pancrustacea; Hexapoda; Insecta; Dicondylia; Pterygota; Neoptera; Holometabola; Diptera; Nematocera; Culicomorpha; Culicoidea; Culicidae; Culicinae; Aedini; Aedes', 7158,
         [ qw(Eukaryota Metazoa Arthropoda Insecta Diptera Culicidae Aedes undef) ]  ],
-    [ 'Aquificae', 'cellular organisms; Bacteria; Aquificae; Aquificae', 187857,
-        [ qw(Bacteria undef Aquificae Aquificae undef undef undef undef) ]  ],
-    [ 'Aquificae', 'cellular organisms; Bacteria; Aquificae', 200783,
-        [ qw(Bacteria undef Aquificae undef undef undef undef undef) ]  ],
+    [ 'Aquificae', 'cellular organisms; Bacteria; Aquificota; Aquificae', 187857,
+        [ qw(Bacteria undef Aquificota Aquificae undef undef undef undef) ]  ],
+    [ 'Aquificae', 'cellular organisms; Bacteria; Aquificota', 200783,
+        [ qw(Bacteria undef Aquificota undef undef undef undef undef) ]  ],
     # formerly problematic taxa
     # Actinomycetia were once known as Actinobacteria too
-    [ 'Actinomycetia', 'cellular organisms; Bacteria; Terrabacteria group; Actinobacteria; Actinomycetia', 1760,
-        [ qw(Bacteria undef Actinobacteria Actinomycetia undef undef undef undef) ]  ],
-    [ 'Actinobacteria', 'cellular organisms; Bacteria; Terrabacteria group; Actinobacteria', 201174,
-        [ qw(Bacteria undef Actinobacteria undef undef undef undef undef) ]  ],
+    [ 'Actinomycetes', 'cellular organisms; Bacteria; Terrabacteria group; Actinomycetota; Actinomycetes', 1760,
+        [ qw(Bacteria undef Actinomycetota Actinomycetes undef undef undef undef) ]  ],
+    [ 'Actinomycetota', 'cellular organisms; Bacteria; Terrabacteria group; Actinomycetota', 201174,
+        [ qw(Bacteria undef Actinomycetota undef undef undef undef undef) ]  ],
 
     # duplicate genera
     [ 'Uronema', 'cellular organisms; Eukaryota; Sar; Alveolata; Ciliophora; Intramacronucleata; Oligohymenophorea; Scuticociliatia; Philasterida; Uronematidae; Uronema', 35106,
@@ -399,8 +401,8 @@ my @dupe_tests = (
         [ qw(Viruses undef undef undef undef undef undef undef) ] ],
 
     # names impossible to disambiguate due to completely identical lineage
-    [ 'Frankia', 'cellular organisms; Bacteria; Terrabacteria group; Actinobacteria; Actinomycetia; Frankiales; Frankiaceae; Frankia; unclassified Frankia; Frankia sp. NRRL B-16315', 683320,
-        [ qw(Bacteria undef Actinobacteria Actinomycetia Frankiales Frankiaceae Frankia), 'Frankia sp. NRRL B-16315' ]  ],
+    [ 'Frankia', 'cellular organisms; Bacteria; Terrabacteria group; Actinomycetota; Actinomycetes; Frankiales; Frankiaceae; Frankia; unclassified Frankia; Frankia sp. NRRL B-16315', 683320,
+        [ qw(Bacteria undef Actinomycetota Actinomycetes Frankiales Frankiaceae Frankia), 'Frankia sp. NRRL B-16315' ]  ],
 );
 
 {
@@ -705,7 +707,7 @@ SKIP: {
     my $list = Bio::MUST::Core::IdList->load($infile);
 
     my @exp_taxa = (
-        qw(Tenericutes Proteobacteria Firmicutes Firmicutes Firmicutes) x 2
+        qw(Mycoplasmatota Pseudomonadota Bacillota Bacillota Bacillota) x 2
     );
 
     # check classification using both plain full_ids and true seq_ids
@@ -757,16 +759,16 @@ my @lcas = (
 my @eq_tests = (
 
     [ 'GCF_000005825.2',
-    'cellular organisms; Bacteria; Firmicutes; Bacilli; Bacillales; Bacillaceae; Bacillus',
-    'cellular organisms; Bacteria; Terrabacteria group; Firmicutes; Bacilli; Bacillales; Bacillaceae; Bacillus; Bacillus pseudofirmus; Bacillus pseudofirmus OF4',
+    'cellular organisms; Bacteria; Bacillota; Bacilli; Bacillales; Bacillaceae; Bacillus',
+    'cellular organisms; Bacteria; Terrabacteria group; Bacillota; Bacilli; Bacillales; Bacillaceae; Bacillus; Bacillus pseudofirmus; Bacillus pseudofirmus OF4',
     ],
     [ 'GCF_000006625.1',
     'cellular organisms; Bacteria; Tenericutes; Mollicutes; Mycoplasmatales; Mycoplasmataceae; Ureaplasma',
     'cellular organisms; Bacteria; Terrabacteria group; Tenericutes; Mollicutes; Mycoplasmatales; Mycoplasmataceae; Ureaplasma; Ureaplasma parvum; Ureaplasma parvum serovar 3 str. ATCC 700970',
     ],
     [ 'GCF_000007405.1',
-    'cellular organisms; Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacteriales; Enterobacteriaceae; Escherichia-Shigella',
-    'cellular organisms; Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacterales; Enterobacteriaceae; Shigella; Shigella flexneri; Shigella flexneri 2a str. 2457T',
+    'cellular organisms; Bacteria; Pseudomonadota; Gammaproteobacteria; Enterobacteriales; Enterobacteriaceae; Escherichia-Shigella',
+    'cellular organisms; Bacteria; Pseudomonadota; Gammaproteobacteria; Enterobacterales; Enterobacteriaceae; Shigella; Shigella flexneri; Shigella flexneri 2a str. 2457T',
     ],
     [ 'GCF_000007325.1',
     'cellular organisms; Bacteria; Fusobacteria; Fusobacteriia; Fusobacteriales; Fusobacteriaceae; Fusobacterium',
@@ -779,20 +781,20 @@ my @eq_tests = (
 
     # note the lack of space after the semicolons and the trailing semicolons
     [ 'GCF_000006665.1',
-    'cellular organisms;Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacteriales;Enterobacteriaceae;Escherichia-Shigella;',
-    'cellular organisms;Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacterales;Enterobacteriaceae;Escherichia;Escherichia coli;Escherichia coli O157:H7 str. EDL933;',
+    'cellular organisms;Bacteria;Pseudomonadota;Gammaproteobacteria;Enterobacteriales;Enterobacteriaceae;Escherichia-Shigella;',
+    'cellular organisms;Bacteria;Pseudomonadota;Gammaproteobacteria;Enterobacterales;Enterobacteriaceae;Escherichia;Escherichia coli;Escherichia coli O157:H7 str. EDL933;',
     ],
     [ 'GCF_000006725.1',
-    'cellular organisms;Bacteria;Proteobacteria;Gammaproteobacteria;Xanthomonadales;Xanthomonadaceae;Xylella;',
-    'cellular organisms;Bacteria;Proteobacteria;Gammaproteobacteria;Xanthomonadales;Xanthomonadaceae;Xylella;Xylella fastidiosa;Xylella fastidiosa 9a5c;',
+    'cellular organisms;Bacteria;Pseudomonadota;Gammaproteobacteria;Xanthomonadales;Xanthomonadaceae;Xylella;',
+    'cellular organisms;Bacteria;Pseudomonadota;Gammaproteobacteria;Xanthomonadales;Xanthomonadaceae;Xylella;Xylella fastidiosa;Xylella fastidiosa 9a5c;',
     ],
     [ 'GCF_000006865.1',
-    'cellular organisms;Bacteria;Firmicutes;Bacilli;Lactobacillales;Streptococcaceae;Lactococcus;',
-    'cellular organisms;Bacteria;Terrabacteria group;Firmicutes;Bacilli;Lactobacillales;Streptococcaceae;Lactococcus;Lactococcus lactis;Lactococcus lactis subsp. lactis Il1403;',
+    'cellular organisms;Bacteria;Bacillota;Bacilli;Lactobacillales;Streptococcaceae;Lactococcus;',
+    'cellular organisms;Bacteria;Terrabacteria group;Bacillota;Bacilli;Lactobacillales;Streptococcaceae;Lactococcus;Lactococcus lactis;Lactococcus lactis subsp. lactis Il1403;',
     ],
     [ 'GCF_000007725.1',
-    'cellular organisms;Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacteriales;Enterobacteriaceae;Buchnera;',
-    'cellular organisms;Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacterales;Erwiniaceae;Buchnera;Buchnera aphidicola;Buchnera aphidicola str. Bp (Baizongia pistaciae);',
+    'cellular organisms;Bacteria;Pseudomonadota;Gammaproteobacteria;Enterobacteriales;Enterobacteriaceae;Buchnera;',
+    'cellular organisms;Bacteria;Pseudomonadota;Gammaproteobacteria;Enterobacterales;Erwiniaceae;Buchnera;Buchnera aphidicola;Buchnera aphidicola str. Bp (Baizongia pistaciae);',
     ],
 
     # must fail!
@@ -802,12 +804,12 @@ my @eq_tests = (
 #   ],
 
     [ 'GCF_000008885.1',
-    'cellular organisms;Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacteriales;Enterobacteriaceae;Wigglesworthia;',
-    'cellular organisms;Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacterales;Erwiniaceae;Wigglesworthia;Wigglesworthia glossinidia;Wigglesworthia glossinidia endosymbiont of Glossina brevipalpis;',
+    'cellular organisms;Bacteria;Pseudomonadota;Gammaproteobacteria;Enterobacteriales;Enterobacteriaceae;Wigglesworthia;',
+    'cellular organisms;Bacteria;Pseudomonadota;Gammaproteobacteria;Enterobacterales;Erwiniaceae;Wigglesworthia;Wigglesworthia glossinidia;Wigglesworthia glossinidia endosymbiont of Glossina brevipalpis;',
     ],
     [ 'GCF_000009625.1',
-    'cellular organisms;Bacteria;Proteobacteria;Alphaproteobacteria;Rhizobiales;Rhizobiaceae;Mesorhizobium;',
-    'cellular organisms;Bacteria;Proteobacteria;Alphaproteobacteria;Rhizobiales;Phyllobacteriaceae;Mesorhizobium;Mesorhizobium loti;Mesorhizobium loti MAFF303099;',
+    'cellular organisms;Bacteria;Pseudomonadota;Alphaproteobacteria;Rhizobiales;Rhizobiaceae;Mesorhizobium;',
+    'cellular organisms;Bacteria;Pseudomonadota;Alphaproteobacteria;Rhizobiales;Phyllobacteriaceae;Mesorhizobium;Mesorhizobium loti;Mesorhizobium loti MAFF303099;',
     ],
 );
 
@@ -827,22 +829,22 @@ my @eq_tests = (
 
 my @exp_names = (
     'Acidobacteria',
-    'Actinobacteria',
+    'Actinomycetota',
     'Aquificae',
+    'Bacillota',
     'Bacteroidetes',
     'Chlamydiae',
     'Chlorobi',
     'Chloroflexi',
-    'Cyanobacteria',
+    'Cyanobacteriota',
     'Deferribacteres',
     'Deinococcus-Thermus',
     'Dictyoglomi',
-    'Firmicutes',
     'Fusobacteria',
     'Ignavibacteria',
     'Nitrospirae',
     'Planctomycetes',
-    'Proteobacteria',
+    'Pseudomonadota',
     'Spirochaetes',
     'Synergistetes',
     'Thermodesulfobacteria',
@@ -854,6 +856,7 @@ my @exp_colors = (
     '#E5585D',
     '#B64348',
     '#DDA35D',
+    '#02AE94',
     '#AF8147',
     '#C6D95E',
     '#9DAC48',
@@ -862,7 +865,6 @@ my @exp_colors = (
     '#00DD7C',
     '#00AF61',
     '#0BDBBC',
-    '#02AE94',
     '#46BCD8',
     '#3494AC',
     '#6876D8',

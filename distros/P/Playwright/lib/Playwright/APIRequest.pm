@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::APIRequest;
-$Playwright::APIRequest::VERSION = '1.324';
+$Playwright::APIRequest::VERSION = '1.401';
 use parent 'Playwright::Base';
 
 sub new {
@@ -76,7 +76,7 @@ Playwright::APIRequest - Automatically generated class for Playwright::APIReques
 
 =head1 VERSION
 
-version 1.324
+version 1.401
 
 =head1 CONSTRUCTOR
 
@@ -91,25 +91,25 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 Execute the APIRequest::newContext playwright routine.
 
-See L<https://playwright.dev/api/class-APIRequest#APIRequest-newContext> for more information.
+See L<https://playwright.dev/docs/api/class-APIRequest#APIRequest-newContext> for more information.
 
 =head2 on(@args)
 
 Execute the APIRequest::on playwright routine.
 
-See L<https://playwright.dev/api/class-APIRequest#APIRequest-on> for more information.
+See L<https://playwright.dev/docs/api/class-APIRequest#APIRequest-on> for more information.
 
 =head2 evaluate(@args)
 
 Execute the APIRequest::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-APIRequest#APIRequest-evaluate> for more information.
+See L<https://playwright.dev/docs/api/class-APIRequest#APIRequest-evaluate> for more information.
 
 =head2 evaluateHandle(@args)
 
 Execute the APIRequest::evaluateHandle playwright routine.
 
-See L<https://playwright.dev/api/class-APIRequest#APIRequest-evaluateHandle> for more information.
+See L<https://playwright.dev/docs/api/class-APIRequest#APIRequest-evaluateHandle> for more information.
 
 =head1 SEE ALSO
 

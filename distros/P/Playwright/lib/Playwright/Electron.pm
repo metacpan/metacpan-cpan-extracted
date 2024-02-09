@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Electron;
-$Playwright::Electron::VERSION = '1.324';
+$Playwright::Electron::VERSION = '1.401';
 use parent 'Playwright::Base';
 
 sub new {
@@ -76,7 +76,7 @@ Playwright::Electron - Automatically generated class for Playwright::Electron
 
 =head1 VERSION
 
-version 1.324
+version 1.401
 
 =head1 CONSTRUCTOR
 
@@ -91,25 +91,25 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 Execute the Electron::launch playwright routine.
 
-See L<https://playwright.dev/api/class-Electron#Electron-launch> for more information.
+See L<https://playwright.dev/docs/api/class-Electron#Electron-launch> for more information.
 
 =head2 on(@args)
 
 Execute the Electron::on playwright routine.
 
-See L<https://playwright.dev/api/class-Electron#Electron-on> for more information.
+See L<https://playwright.dev/docs/api/class-Electron#Electron-on> for more information.
 
 =head2 evaluate(@args)
 
 Execute the Electron::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-Electron#Electron-evaluate> for more information.
+See L<https://playwright.dev/docs/api/class-Electron#Electron-evaluate> for more information.
 
 =head2 evaluateHandle(@args)
 
 Execute the Electron::evaluateHandle playwright routine.
 
-See L<https://playwright.dev/api/class-Electron#Electron-evaluateHandle> for more information.
+See L<https://playwright.dev/docs/api/class-Electron#Electron-evaluateHandle> for more information.
 
 =head1 SEE ALSO
 

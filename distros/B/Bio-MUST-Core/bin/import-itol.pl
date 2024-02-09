@@ -38,8 +38,8 @@ for my $infile (@ARGV_infiles) {
     symlink($infile, $newname);         # TODO: improve this
     $zip->addFile($newname);
 
-    $zip->addFile($_)
-        for File::Find::Rule->file()->name("$basename\-*.txt")->in($dir);
+    $zip->addFile($_) for File::Find::Rule->file()
+        ->maxdepth(1)->name("$basename\-*.txt")->in($dir);
 
     ### Storing ZIP file: $zipfile
     unless ( $zip->writeToFileNamed($zipfile) == AZ_OK ) {
@@ -118,7 +118,7 @@ import-itol.pl - Upload trees and associate metadata files to iTOL
 
 =head1 VERSION
 
-version 0.212670
+version 0.240390
 
 =head1 USAGE
 

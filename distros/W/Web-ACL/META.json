@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Data::Dumper" : "0",
-            "Error::Helper" : "0",
+            "Error::Helper" : "v2.1.0",
             "Net::Subnet" : "0",
             "perl" : "5.006"
          }
@@ -51,6 +51,6 @@
          "web" : "https://github.com/LilithSec/Web-ACL"
       }
    },
-   "version" : "v0.0.1",
+   "version" : "v0.0.2",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

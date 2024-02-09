@@ -17,7 +17,6 @@ my $passphrase = Crypt::Passphrase->new(
 		memory_cost => '16M',
 		time_cost   => 2,
 	},
-	validators => [ 'Argon2' ],
 );
 
 my $password = 'password';
@@ -33,9 +32,12 @@ my $hash2 = '$argon2id$v=19$m=16384,t=2,p=1$AAAAAAAAAAAAAAAAAAAAAA$AcpOEUs9E88hQ
 ok($passphrase->verify_password($password, $hash2), 'Unencrypted hash validates');
 ok($passphrase->needs_rehash($hash2), 'Unencrypted hash needs rehash');
 
-my $hash3 = '$argon2id-encrypted-aes-cbc$v=19$m=16384,t=2,p=1,keyid=1$tOZt95qn9CHuFQzrx8346Q$VnInu6mq2fz8hqkMluox0Q';
+my $hash3 = '$argon2id-encrypted-aes-cbc$v=19$m=16384,t=2,p=1,keyid=1$JhkFTZgrHPE6F173oNYTGQ$iODwNT6xOu+LEB0bAw/hlXV9eHG6q/uHqOg1NXzibnQ';
 ok($passphrase->verify_password($password, $hash3), 'Hash encrypted with old pepper still validates');
 ok($passphrase->needs_rehash($hash3), 'Hash encrypted with old pepper needs rehash');
+my $hash3b = $passphrase->recode_hash($hash3);
+isnt($hash3b, $hash3, 'Recoded hash has changed');
+ok(!$passphrase->needs_rehash($hash3b), 'Recoded hash doesn\'t need rehash');
 
 my $hash4 = '$argon2id-encrypted-aes-cbc$v=1,id=1$v=19$m=16384,t=2,p=1$tOZt95qn9CHuFQzrx8346Q$VnInu6mq2';
 ok(!$passphrase->verify_password($password, $hash4), 'Incomplete hash doesn\'t validate');

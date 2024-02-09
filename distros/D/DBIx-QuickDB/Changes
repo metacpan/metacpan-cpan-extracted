@@ -1,3 +1,7 @@
+0.000024  2024-02-07 17:19:03-08:00 America/Los_Angeles
+
+    - Add QDB_MYSQL_SSL_FIPS env var
+
 0.000023  2022-08-23 14:02:40-07:00 America/Los_Angeles
 
     - Allow an instance dir for pools

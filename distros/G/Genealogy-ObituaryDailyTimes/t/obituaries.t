@@ -1,7 +1,7 @@
 #!perl -wT
 
 use strict;
-use Test::Most tests => 12;
+use Test::Most tests => 13;
 
 use lib 'lib';
 use lib 't/lib';
@@ -12,12 +12,14 @@ BEGIN {
 }
 
 SKIP: {
-	skip 'Database not installed', 11 if(!-r 'lib/Genealogy/ObituaryDailyTimes/database/obituaries.sql');
+	skip 'Database not installed', 12 if(!-r 'lib/Genealogy/ObituaryDailyTimes/data/obituaries.sql');
 
+	my $search;
 	if($ENV{'TEST_VERBOSE'}) {
-		Genealogy::ObituaryDailyTimes::DB::init(logger => MyLogger->new());
+		$search = new_ok('Genealogy::ObituaryDailyTimes' => [ logger => MyLogger->new() ]);
+	} else {
+		$search = new_ok('Genealogy::ObituaryDailyTimes');
 	}
-	my $search = new_ok('Genealogy::ObituaryDailyTimes');
 
 	my @smiths = $search->search(last => 'Smith');
 
@@ -30,8 +32,16 @@ SKIP: {
 	# FIXME, test either last == Smith or maiden == Smith
 	is($smiths[0]->{'last'}, 'Smith', 'Returned Smiths');
 
+	unless($ENV{'MLARCHIVEDIR'} || ($ENV{'MLARCHIVE_DIR'})) {
+		diag('The next test may fail since Rootsweb was partially archived on Wayback Machine');
+	}
 	my $baal = $search->search({ first => 'Eric', last => 'Baal' });
-	is($baal->{'url'}, 'https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=96', 'Check Baal URL');
+	ok(defined($baal));
+
+	if($ENV{'TEST_VERBOSE'}) {
+		diag(Data::Dumper->new([$baal])->Dump());
+	}
+	cmp_ok($baal->{'url'}, 'eq', 'https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=96', 'Check Baal URL');
 
 	my @coppage = $search->search({ first => 'John', middle => 'W', last => 'Coppage' });
 

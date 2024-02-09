@@ -23,11 +23,11 @@ for my $infile (@ARGV_infiles) {
 
     ### Processing: $infile
     my $list = IdList->$method($infile);
-	my $mapper = $tax->tax_mapper(
-		$list, { append_acc => $ARGV_append_acc }
-	);
-	my $outfile = change_suffix($infile, '.final-idm');
-	$mapper->store($outfile);
+    my $mapper = $tax->tax_mapper(
+        $list, { append_acc => $ARGV_append_acc }
+    );
+    my $outfile = change_suffix($infile, '.final-idm');
+    $mapper->store($outfile);
 }
 
 __END__
@@ -40,7 +40,7 @@ list2mapper.pl - Build final id mapper from id list using the NCBI Taxonomy data
 
 =head1 VERSION
 
-version 0.212670
+version 0.240390
 
 =head1 USAGE
 

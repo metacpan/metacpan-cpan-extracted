@@ -524,6 +524,17 @@ my @valid_ids = (
         'Emiliania huxleyi PLYM219',
         'u#Emiliania_huxleyi_PLYM219@CAMNT_0030889445',
         q{'u#Emiliania huxleyi_PLYM219@CAMNT_0030889445'} ],
+
+    [ ('Arabidopsis halleri_81970@78182999 ') x 2, '1', undef, undef, undef, undef, undef,
+        undef, undef, undef, undef, undef,
+        undef, undef, undef, undef, undef, undef,
+        undef, undef, undef, undef,
+        undef, undef, undef,
+        undef,
+        undef,
+        'Arabidopsis halleri_81970@78182999 ',
+        q{'Arabidopsis halleri_81970@78182999 '} ],
+
 );
 
 for my $exp_row (@valid_ids) {
@@ -569,87 +580,87 @@ for my $exp_row (@valid_ids) {
 }
 
 my @ids2build = (
-	[ 'Arabidopsis halleri', '81970', '78182999',
-		'Arabidopsis halleri_81970@78182999' ],
-	[ 'Micromonas sp. RCC299', '296587', '255079694',
-		'Micromonas sp._296587@255079694' ],
-	[ 'Capsella bursa-pastoris', '3719', '158513961',
-		'Capsella bursa-pastoris_3719@158513961' ],
-	[ 'Pseudo-nitzschia multiseries', '37319', '194836',
-		'Pseudo-nitzschia multiseries_37319@194836' ],
-	[ 'Capsella bursa-pastoris', '3719', q{},
-		'Capsella bursa-pastoris_3719' ],
-	[ 'Ostreococcus \'lucimarinus\'', '242159', q{},
-		'Ostreococcus lucimarinus_242159' ],
-	[ 'Micromonas sp. RCC299', '296587', q{},
-	   	'Micromonas sp._296587' ],
-	[ 'Candidatus Phytoplasma mali', '37692', q{},
-		'Phytoplasma mali_37692' ],
-	[ 'Candidatus Arthromitus sp. SFB-rat-Yit', '1041504', q{},
-		'Arthromitus sp._1041504' ],
-	[ 'Candidatus Cloacamonas acidaminovorans str. Evry', '459349', q{},
-		'Cloacamonas acidaminovorans_459349' ],
-	[ 'Clostridium sticklandii', '1511', q{},
-		'Clostridium sticklandii_1511' ],
-	[ 'Clostridium sticklandii', q{}, q{},
-		'Clostridium sticklandii' ],
+    [ 'Arabidopsis halleri', '81970', '78182999',
+        'Arabidopsis halleri_81970@78182999' ],
+    [ 'Micromonas sp. RCC299', '296587', '255079694',
+        'Micromonas sp._296587@255079694' ],
+    [ 'Capsella bursa-pastoris', '3719', '158513961',
+        'Capsella bursa-pastoris_3719@158513961' ],
+    [ 'Pseudo-nitzschia multiseries', '37319', '194836',
+        'Pseudo-nitzschia multiseries_37319@194836' ],
+    [ 'Capsella bursa-pastoris', '3719', q{},
+        'Capsella bursa-pastoris_3719' ],
+    [ 'Ostreococcus \'lucimarinus\'', '242159', q{},
+        'Ostreococcus lucimarinus_242159' ],
+    [ 'Micromonas sp. RCC299', '296587', q{},
+        'Micromonas sp._296587' ],
+    [ 'Candidatus Phytoplasma mali', '37692', q{},
+        'Phytoplasma mali_37692' ],
+    [ 'Candidatus Arthromitus sp. SFB-rat-Yit', '1041504', q{},
+        'Arthromitus sp._1041504' ],
+    [ 'Candidatus Cloacamonas acidaminovorans str. Evry', '459349', q{},
+        'Cloacamonas acidaminovorans_459349' ],
+    [ 'Clostridium sticklandii', '1511', q{},
+        'Clostridium sticklandii_1511' ],
+    [ 'Clostridium sticklandii', q{}, q{},
+        'Clostridium sticklandii' ],
 
-	# TODO: add more ids! (test no species at all genus-like, viruses etc)
+    # TODO: add more ids! (test no species at all genus-like, viruses etc)
 );
 
 my @strains2build = (
-	[ 'Arabidopsis halleri', '81970', '78182999', 1,
-		'Arabidopsis halleri_81970@78182999' ],
-	[ 'Micromonas sp. RCC299', '296587', '255079694', 1,
-		'Micromonas sp._RCC299_296587@255079694' ],
-	[ 'Capsella bursa-pastoris', '3719', '158513961', 1,
-		'Capsella bursa-pastoris_3719@158513961' ],
-	[ 'Pseudo-nitzschia multiseries', '37319', '194836', 1,
-		'Pseudo-nitzschia multiseries_37319@194836' ],
-	[ 'Capsella bursa-pastoris', '3719', q{}, 1,
-		'Capsella bursa-pastoris_3719' ],
-	[ 'Ostreococcus \'lucimarinus\'', '242159', q{}, 1,
-		'Ostreococcus lucimarinus_242159' ],
-	[ 'Micromonas sp. RCC299', '296587', q{}, 1,
-	   	'Micromonas sp._RCC299_296587' ],
-	[ 'Candidatus Phytoplasma mali', '37692', q{}, 1,
-		'Phytoplasma mali_37692' ],
-	[ 'Candidatus Arthromitus sp. SFB-rat-Yit', '1041504', q{}, 1,
-		'Arthromitus sp._SFBratYit_1041504' ],
-	[ 'Candidatus Cloacamonas acidaminovorans str. Evry', '459349', q{}, 1,
-		'Cloacamonas acidaminovorans_Evry_459349' ],
-	[ 'Clostridium sticklandii', '1511', q{}, 1,
-		'Clostridium sticklandii_1511' ],
-	[ 'Clostridium sticklandii', q{}, q{}, 1,
-		'Clostridium sticklandii' ],
+    [ 'Arabidopsis halleri', '81970', '78182999', 1,
+        'Arabidopsis halleri_81970@78182999' ],
+    [ 'Micromonas sp. RCC299', '296587', '255079694', 1,
+        'Micromonas sp._RCC299_296587@255079694' ],
+    [ 'Capsella bursa-pastoris', '3719', '158513961', 1,
+        'Capsella bursa-pastoris_3719@158513961' ],
+    [ 'Pseudo-nitzschia multiseries', '37319', '194836', 1,
+        'Pseudo-nitzschia multiseries_37319@194836' ],
+    [ 'Capsella bursa-pastoris', '3719', q{}, 1,
+        'Capsella bursa-pastoris_3719' ],
+    [ 'Ostreococcus \'lucimarinus\'', '242159', q{}, 1,
+        'Ostreococcus lucimarinus_242159' ],
+    [ 'Micromonas sp. RCC299', '296587', q{}, 1,
+        'Micromonas sp._RCC299_296587' ],
+    [ 'Candidatus Phytoplasma mali', '37692', q{}, 1,
+        'Phytoplasma mali_37692' ],
+    [ 'Candidatus Arthromitus sp. SFB-rat-Yit', '1041504', q{}, 1,
+        'Arthromitus sp._SFBratYit_1041504' ],
+    [ 'Candidatus Cloacamonas acidaminovorans str. Evry', '459349', q{}, 1,
+        'Cloacamonas acidaminovorans_Evry_459349' ],
+    [ 'Clostridium sticklandii', '1511', q{}, 1,
+        'Clostridium sticklandii_1511' ],
+    [ 'Clostridium sticklandii', q{}, q{}, 1,
+        'Clostridium sticklandii' ],
 
-	# TODO: add more ids! (test no species at all genus-like, viruses etc)
+    # TODO: add more ids! (test no species at all genus-like, viruses etc)
 );
 
 for my $exp_row (@ids2build) {
     my $seq_id = $class->new_with(
-    	org       => $exp_row->[0],
-    	taxon_id  => $exp_row->[1],
-    	accession => $exp_row->[2]
+        org       => $exp_row->[0],
+        taxon_id  => $exp_row->[1],
+        accession => $exp_row->[2]
     );
-	cmp_ok $seq_id->full_id, 'eq', $exp_row->[3],
-		"got expected SeqId: $exp_row->[3]";
+    cmp_ok $seq_id->full_id, 'eq', $exp_row->[3],
+        "got expected SeqId: $exp_row->[3]";
 }
 
 for my $exp_row (@strains2build) {
     my $seq_id = $class->new_with(
-    	org         => $exp_row->[0],
-    	taxon_id    => $exp_row->[1],
-    	accession   => $exp_row->[2],
+        org         => $exp_row->[0],
+        taxon_id    => $exp_row->[1],
+        accession   => $exp_row->[2],
         keep_strain => $exp_row->[3]
     );
-	cmp_ok $seq_id->full_id, 'eq', $exp_row->[4],
-		"got expected SeqId: $exp_row->[4]";
+    cmp_ok $seq_id->full_id, 'eq', $exp_row->[4],
+        "got expected SeqId: $exp_row->[4]";
 }
 
 my @ids2clean = (
-	[ 'Candidatus Phytoplasma mali', 'Phytoplasma mali' ],
-	[ 'Candidatus Arthromitus sp. SFB-rat-Yit', 'Arthromitus sp. SFB-rat-Yit' ],
+    [ 'Candidatus Phytoplasma mali', 'Phytoplasma mali' ],
+    [ 'Candidatus Arthromitus sp. SFB-rat-Yit', 'Arthromitus sp. SFB-rat-Yit' ],
 # TODO: check these
 #     [ 'uncultured cyanobacterium', 'cyanobacterium' ],
 #     [ 'uncultured actinobacterium WB039', 'actinobacterium WB039' ],
@@ -662,8 +673,8 @@ explain \@ids2clean;
 for my $exp_row (@ids2clean) {
     my $org = $class->clean_ncbi_name( $exp_row->[0] );
 
-	cmp_ok $org, 'eq', $exp_row->[1],
-		"got expected SeqId: $exp_row->[1]";
+    cmp_ok $org, 'eq', $exp_row->[1],
+        "got expected SeqId: $exp_row->[1]";
 }
 
 done_testing;

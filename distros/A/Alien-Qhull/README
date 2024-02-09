@@ -1,0 +1,43 @@
+Alien::Qhull
+
+This module finds or builds the *Qhull* library and executables.
+
+It requires Qhull version '8.0.2'. If that is available on the system,
+that is used, otherwise it will build a "share" version using that
+version, which is distributed with this package.
+
+  Bundled executables
+
+Qhull provides the following executables:
+
+ qconvex  qdelaunay  qhalf  qhull  qvoronoi  rbox
+
+The Alien::Qhull-bin_dir> will return a valid path if these are
+available in a "system" install; they are always available in a "share"
+install.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2024 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

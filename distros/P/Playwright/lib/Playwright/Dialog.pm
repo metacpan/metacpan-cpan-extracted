@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Dialog;
-$Playwright::Dialog::VERSION = '1.324';
+$Playwright::Dialog::VERSION = '1.401';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,31 +22,31 @@ sub spec {
     return $Playwright::spec->{'Dialog'}{members};
 }
 
-sub dismiss {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'dismiss',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub defaultValue {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'defaultValue',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub accept {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'accept',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub page {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'page',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub dismiss {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'dismiss',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -67,6 +67,16 @@ sub type {
     return $self->_api_request(
         args    => [@_],
         command => 'type',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub defaultValue {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'defaultValue',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -116,7 +126,7 @@ Playwright::Dialog - Automatically generated class for Playwright::Dialog
 
 =head1 VERSION
 
-version 1.324
+version 1.401
 
 =head1 CONSTRUCTOR
 
@@ -127,53 +137,59 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 dismiss(@args)
-
-Execute the Dialog::dismiss playwright routine.
-
-See L<https://playwright.dev/api/class-Dialog#Dialog-dismiss> for more information.
-
-=head2 defaultValue(@args)
-
-Execute the Dialog::defaultValue playwright routine.
-
-See L<https://playwright.dev/api/class-Dialog#Dialog-defaultValue> for more information.
-
 =head2 accept(@args)
 
 Execute the Dialog::accept playwright routine.
 
-See L<https://playwright.dev/api/class-Dialog#Dialog-accept> for more information.
+See L<https://playwright.dev/docs/api/class-Dialog#Dialog-accept> for more information.
+
+=head2 page(@args)
+
+Execute the Dialog::page playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Dialog#Dialog-page> for more information.
+
+=head2 dismiss(@args)
+
+Execute the Dialog::dismiss playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Dialog#Dialog-dismiss> for more information.
 
 =head2 message(@args)
 
 Execute the Dialog::message playwright routine.
 
-See L<https://playwright.dev/api/class-Dialog#Dialog-message> for more information.
+See L<https://playwright.dev/docs/api/class-Dialog#Dialog-message> for more information.
 
 =head2 type(@args)
 
 Execute the Dialog::type playwright routine.
 
-See L<https://playwright.dev/api/class-Dialog#Dialog-type> for more information.
+See L<https://playwright.dev/docs/api/class-Dialog#Dialog-type> for more information.
+
+=head2 defaultValue(@args)
+
+Execute the Dialog::defaultValue playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Dialog#Dialog-defaultValue> for more information.
 
 =head2 on(@args)
 
 Execute the Dialog::on playwright routine.
 
-See L<https://playwright.dev/api/class-Dialog#Dialog-on> for more information.
+See L<https://playwright.dev/docs/api/class-Dialog#Dialog-on> for more information.
 
 =head2 evaluate(@args)
 
 Execute the Dialog::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-Dialog#Dialog-evaluate> for more information.
+See L<https://playwright.dev/docs/api/class-Dialog#Dialog-evaluate> for more information.
 
 =head2 evaluateHandle(@args)
 
 Execute the Dialog::evaluateHandle playwright routine.
 
-See L<https://playwright.dev/api/class-Dialog#Dialog-evaluateHandle> for more information.
+See L<https://playwright.dev/docs/api/class-Dialog#Dialog-evaluateHandle> for more information.
 
 =head1 SEE ALSO
 

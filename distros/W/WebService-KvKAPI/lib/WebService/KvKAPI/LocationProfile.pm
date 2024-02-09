@@ -1,6 +1,6 @@
 use utf8;
 package WebService::KvKAPI::LocationProfile;
-our $VERSION = '0.105';
+our $VERSION = '0.106';
 # ABSTRACT: Instance of OpenAPI client for locatieprofiel API of the KvK.
 
 use v5.26;
@@ -31,7 +31,7 @@ WebService::KvKAPI::LocationProfile - Instance of OpenAPI client for locatieprof
 
 =head1 VERSION
 
-version 0.105
+version 0.106
 
 =head1 AUTHOR
 

@@ -1,3 +1,14 @@
+0.08 2024-02-08T13:54:59+01:00
+ - Fix data element in label of username field.
+
+0.07 2024-02-07T21:00:52+01:00
+ - Add missing 'css_register' parameter to doc.
+ - Fix typo in doc (language -> lang).
+ - Improve doc.
+ - Remove obsolete code.
+ - Remove obsolete dependency.
+ - Update copyright years.
+
 0.06 2023-06-29T19:49:02+02:00
  - Add second example to doc with image.
 

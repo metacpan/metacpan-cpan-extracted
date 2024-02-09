@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 use utf8;
-use Test::More tests => 37;
-#use Test::More 'no_plan';
+use Test::More tests => 41;
+# use Test::More 'no_plan';
 use Lucy::Plan::Schema;
 use Lucy::Plan::FullTextType;
 use Lucy::Analysis::PolyAnalyzer;
@@ -276,37 +276,32 @@ like delete $res->{hits}[0]{score}, qr/^\d+[.]\d+$/,
 like delete $res->{hits}[1]{score}, qr/^\d+[.]\d+$/,
     'Second hit score should look like a score';
 
-TODO: {
-    # Hack to work around bug in Lucy 0.2.2.
-    local $TODO = 'Lucy 0.2.2 is broken' if Lucy->VERSION == 0.002002;
-
-    is_deeply $res, {
-        query  => "ordered pair",
-        limit  => 50,
-        offset => 0,
-        count  => 2,
-        hits   => [
-            {
-                abstract  => "A key/value pair data type",
-                date      => "2010-10-18T15:24:21Z",
-                dist      => "pair",
-                excerpt   => "This is the <strong>pair</strong> README file. Here you will find all thingds related to <strong>pair</strong>, including installation information",
-                user      => "theory",
-                user_name => "David E. Wheeler",
-                version   => "0.1.0",
-            },
-            {
-                abstract  => "A semantic version data type",
-                date      => "2010-10-18T15:24:21Z",
-                dist      => "semver",
-                excerpt   => "README for the semver distribion. Installation instructions",
-                user      => "roger",
-                user_name => "Roger Davidson",
-                version   => "2.1.3",
-            },
-        ],
-    }, 'Should have results for simple search';
-}
+is_deeply $res, {
+    query  => "ordered pair",
+    limit  => 50,
+    offset => 0,
+    count  => 2,
+    hits   => [
+        {
+            abstract  => "A key/value pair data type",
+            date      => "2010-10-18T15:24:21Z",
+            dist      => "pair",
+            excerpt   => "This is the <strong>pair</strong> README file. Here you will find all thingds related to <strong>pair</strong>, including installation information",
+            user      => "theory",
+            user_name => "David E. Wheeler",
+            version   => "0.1.0",
+        },
+        {
+            abstract  => "A semantic version data type",
+            date      => "2010-10-18T15:24:21Z",
+            dist      => "semver",
+            excerpt   => "README for the semver distribion. Installation instructions",
+            user      => "roger",
+            user_name => "Roger Davidson",
+            version   => "2.1.3",
+        },
+    ],
+}, 'Should have results for simple search';
 
 # Test offset.
 ok $res = $search->search(
@@ -447,7 +442,6 @@ is_deeply $res, {
     ],
 }, 'Should have expected structure for extensions';
 
-
 ok $res = $search->search( query => 'Davidson', in => 'users' ), 'Seach users';
 like delete $res->{hits}[0]{score}, qr/^\d+[.]\d+$/,
     'The score should look like a score';
@@ -466,3 +460,23 @@ is_deeply $res, {
     ],
 }, 'Should have expected structure for users';
 
+# Regressions.
+for my $spec (
+    # https://github.com/pgxn/pgxn-api/issues/23
+    {
+        name  => 'issue 23',
+        query => "json%00'%7C%7CSLeeP(3)%26%26'1", # "json\0'||SLeeP(3)&&'1"
+        in    => 'docs',
+    },
+    # https://github.com/pgxn/pgxn-api/issues/26
+    {
+        name  => 'issue 26',
+        query => "..%00", # "..\0"
+        in    => 'docs',
+    }
+) {
+    ok $res = $search->search( query => $spec->{query}, in => $spec->{in} ),
+        "Search $spec->{name}";
+    is_deeply $res, { count => 0, hits => [], limit => 50, offset => 0, query => $spec->{query} },
+        "Should have empty structure for $spec->{name}";
+}

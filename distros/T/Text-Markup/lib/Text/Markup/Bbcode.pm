@@ -3,10 +3,16 @@ package Text::Markup::Bbcode;
 use 5.8.1;
 use strict;
 use warnings;
+use Text::Markup;
 use File::BOM qw(open_bom);
 use Parse::BBCode;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
+
+sub import {
+    # Replace the regex if passed one.
+    Text::Markup->register( bbcode => $_[1] ) if $_[1];
+}
 
 sub parser {
     my ($file, $encoding, $opts) = @_;
@@ -63,6 +69,11 @@ It recognizes files with the following extensions as Markdown:
 =item F<.bbcode>
 
 =back
+
+To change it the files it recognizes, load this module directly and pass a
+regular expression matching the desired extension(s), like so:
+
+  use Text::Markup::Bbcode qr{beebee};
 
 Normally this module returns the output wrapped in a minimal HTML document
 skeleton. If you would like the raw output with the raw skeleton, you can pass

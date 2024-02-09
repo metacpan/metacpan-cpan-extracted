@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::SnapshotAssertions;
-$Playwright::SnapshotAssertions::VERSION = '1.324';
+$Playwright::SnapshotAssertions::VERSION = '1.401';
 use parent 'Playwright::Base';
 
 sub new {
@@ -76,7 +76,7 @@ Playwright::SnapshotAssertions - Automatically generated class for Playwright::S
 
 =head1 VERSION
 
-version 1.324
+version 1.401
 
 =head1 CONSTRUCTOR
 
@@ -91,25 +91,25 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 Execute the SnapshotAssertions::toMatchSnapshot playwright routine.
 
-See L<https://playwright.dev/api/class-SnapshotAssertions#SnapshotAssertions-toMatchSnapshot> for more information.
+See L<https://playwright.dev/docs/api/class-SnapshotAssertions#SnapshotAssertions-toMatchSnapshot> for more information.
 
 =head2 on(@args)
 
 Execute the SnapshotAssertions::on playwright routine.
 
-See L<https://playwright.dev/api/class-SnapshotAssertions#SnapshotAssertions-on> for more information.
+See L<https://playwright.dev/docs/api/class-SnapshotAssertions#SnapshotAssertions-on> for more information.
 
 =head2 evaluate(@args)
 
 Execute the SnapshotAssertions::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-SnapshotAssertions#SnapshotAssertions-evaluate> for more information.
+See L<https://playwright.dev/docs/api/class-SnapshotAssertions#SnapshotAssertions-evaluate> for more information.
 
 =head2 evaluateHandle(@args)
 
 Execute the SnapshotAssertions::evaluateHandle playwright routine.
 
-See L<https://playwright.dev/api/class-SnapshotAssertions#SnapshotAssertions-evaluateHandle> for more information.
+See L<https://playwright.dev/docs/api/class-SnapshotAssertions#SnapshotAssertions-evaluateHandle> for more information.
 
 =head1 SEE ALSO
 

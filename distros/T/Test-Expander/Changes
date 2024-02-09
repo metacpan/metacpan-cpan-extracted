@@ -1,5 +1,8 @@
 Changelog for Test-Expander
 
+2.4.0 2024-02-07
+    - Report unset and unexported read-only variables $CLASS, $METHOD, and $METHOD_REF.
+
 2.3.2 2023-12-21
     - Improve documentation by adding of synopsis case regarding '-bail' option and explicit code blocks.
 

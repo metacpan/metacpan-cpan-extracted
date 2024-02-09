@@ -7,10 +7,12 @@ use CommonMark;
 use Text::Markup;
 use File::BOM qw(open_bom);
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
-# Replace Text::Markup::Markdown.
-Text::Markup->register( markdown => qr{m(?:d(?:own)?|kdn?|arkdown)} );
+sub import {
+    # Replace Text::Markup::Markdown.
+    Text::Markup->register( markdown => $_[1] || qr{m(?:d(?:own)?|kdn?|arkdown)} );
+}
 
 sub parser {
     my ($file, $encoding, $opts) = @_;
@@ -83,6 +85,11 @@ It recognizes files with the following extensions as CommonMark Markdown:
 
 =back
 
+To change it the files it recognizes, load this module directly and pass a
+regular expression matching the desired extension(s), like so:
+
+  use Text::Markup::CommonMark qr{markd?};
+
 Normally this module returns the output wrapped in a minimal HTML document
 skeleton. If you would like the raw output without the skeleton, you can pass
 the C<raw> option to C<parse>.
@@ -131,7 +138,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011-2023 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2011-2024 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

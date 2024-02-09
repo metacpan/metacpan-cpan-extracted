@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::APIResponseAssertions;
-$Playwright::APIResponseAssertions::VERSION = '1.324';
+$Playwright::APIResponseAssertions::VERSION = '1.401';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,21 +22,21 @@ sub spec {
     return $Playwright::spec->{'APIResponseAssertions'}{members};
 }
 
-sub toBeOK {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'toBeOK',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub not {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'not',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub toBeOK {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'toBeOK',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -96,7 +96,7 @@ Playwright::APIResponseAssertions - Automatically generated class for Playwright
 
 =head1 VERSION
 
-version 1.324
+version 1.401
 
 =head1 CONSTRUCTOR
 
@@ -107,41 +107,41 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 toBeOK(@args)
-
-Execute the APIResponseAssertions::toBeOK playwright routine.
-
-See L<https://playwright.dev/api/class-APIResponseAssertions#APIResponseAssertions-toBeOK> for more information.
-
 =head2 not(@args)
 
 Execute the APIResponseAssertions::not playwright routine.
 
-See L<https://playwright.dev/api/class-APIResponseAssertions#APIResponseAssertions-not> for more information.
+See L<https://playwright.dev/docs/api/class-APIResponseAssertions#APIResponseAssertions-not> for more information.
+
+=head2 toBeOK(@args)
+
+Execute the APIResponseAssertions::toBeOK playwright routine.
+
+See L<https://playwright.dev/docs/api/class-APIResponseAssertions#APIResponseAssertions-toBeOK> for more information.
 
 =head2 NotToBeOK(@args)
 
 Execute the APIResponseAssertions::NotToBeOK playwright routine.
 
-See L<https://playwright.dev/api/class-APIResponseAssertions#APIResponseAssertions-NotToBeOK> for more information.
+See L<https://playwright.dev/docs/api/class-APIResponseAssertions#APIResponseAssertions-NotToBeOK> for more information.
 
 =head2 on(@args)
 
 Execute the APIResponseAssertions::on playwright routine.
 
-See L<https://playwright.dev/api/class-APIResponseAssertions#APIResponseAssertions-on> for more information.
+See L<https://playwright.dev/docs/api/class-APIResponseAssertions#APIResponseAssertions-on> for more information.
 
 =head2 evaluate(@args)
 
 Execute the APIResponseAssertions::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-APIResponseAssertions#APIResponseAssertions-evaluate> for more information.
+See L<https://playwright.dev/docs/api/class-APIResponseAssertions#APIResponseAssertions-evaluate> for more information.
 
 =head2 evaluateHandle(@args)
 
 Execute the APIResponseAssertions::evaluateHandle playwright routine.
 
-See L<https://playwright.dev/api/class-APIResponseAssertions#APIResponseAssertions-evaluateHandle> for more information.
+See L<https://playwright.dev/docs/api/class-APIResponseAssertions#APIResponseAssertions-evaluateHandle> for more information.
 
 =head1 SEE ALSO
 

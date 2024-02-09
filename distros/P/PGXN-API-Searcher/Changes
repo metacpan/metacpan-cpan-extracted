@@ -1,5 +1,13 @@
 Revision history for Perl extension PGXN-API-Searcher.
 
+0.11.1  2024-02-08T21:21:37Z
+      - Require Lucy v0.6.2.
+      - Added regression tests to ensure Lucy no longer chokes on null bytes
+        in the query (pgxn/pgxn-api#23).
+      - Restored test that skipped running to avoid a bug in Lucy 0.002002.
+      - Added developer dependencies.
+      - Dropped support for Perl 5.10.
+
 0.11.0  2024-02-06T23:37:09Z
       - Converted the version from a v-string to a string to make
         ExtUtils::MakeMaker happy.

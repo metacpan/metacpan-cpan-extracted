@@ -1,6 +1,6 @@
 package Test::Expander::Constants;
 
-our $VERSION = '2.3.1';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '2.4.0';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use strict;
 use warnings
@@ -37,6 +37,7 @@ const our $FMT_SET_ENV_VAR             => "Set environment variable '%s' to '%s'
 const our $FMT_SET_TO                  => "Set %s to '%s'";
 const our $FMT_SKIP_ENV_VAR            => "Skip environment variable '%s' because its value from file '%s' is undefined";
 const our $FMT_UNKNOWN_OPTION          => "Unknown option '%s' => '%s' supplied.\n";
+const our $FMT_UNSET_VAR               => "Read-only variable '%s' is not set and not imported";
 const our $FMT_USE_DESCRIPTION         => 'use %s;%s';
 const our $FMT_USE_IMPLEMENTATION      => 'package %s; use %s%s; 1';
 

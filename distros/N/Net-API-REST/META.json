@@ -45,7 +45,7 @@
             "Devel::Confess" : "0",
             "JSON" : "0",
             "MIME::Base64" : "3.15",
-            "Module::Generic" : "v0.32.8",
+            "Module::Generic" : "v0.34.0",
             "Regexp::Common" : "0",
             "Scalar::Util" : "0",
             "URI" : "0",
@@ -79,6 +79,6 @@
          "web" : "https://gitlab.com/jackdeguest/Net-API-REST"
       }
    },
-   "version" : "v1.2.0",
+   "version" : "v1.2.1",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

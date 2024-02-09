@@ -16,7 +16,7 @@ use aliased 'Bio::MUST::Core::Tree';
 for my $infile (@ARGV_infiles) {
 
     ### Processing: $infile
-	my $tree = Tree->load($infile);
+    my $tree = Tree->load($infile);
     my $outfile = change_suffix($infile, '.tpl');
     $tree->store_tpl($outfile);
 }
@@ -31,7 +31,7 @@ tree2tpl.pl - Convert trees to TPL files
 
 =head1 VERSION
 
-version 0.212670
+version 0.240390
 
 =head1 USAGE
 

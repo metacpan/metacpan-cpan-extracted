@@ -23,6 +23,7 @@ Database::Abstraction - database abstraction layer
 # TODO:	Add redis database - could be of use for Geo::Coder::Free
 #	use select() to select a database - use the table arg
 #	new(database => 'redis://servername');
+# TODO:	Add a "key" property, defaulting to "entry", which would be the name of the key
 
 use warnings;
 use strict;
@@ -40,11 +41,11 @@ use constant	MAX_SLURP_SIZE => 16 * 1024;	# CSV files <= than this size are read
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -63,8 +64,6 @@ For example, you can access the files in /var/db/foo.csv via this class:
 
     our @ISA = ('Database::Abstraction');
 
-    1;
-
 You can then access the data using:
 
     my $foo = MyPackageName::Database::Foo->new(directory => '/var/db');
@@ -75,9 +74,10 @@ You can then access the data using:
 CSV files can have empty lines or comment lines starting with '#',
 to make them more readable.
 
-If the table has a column called "entry", sorts are based on that
+If the table has a column called "entry",
+entries are keyed on that and sorts are based on it.
 To turn that off, pass 'no_entry' to the constructor, for legacy
-reasons it's enabled by default
+reasons it's enabled by default.
 
 =head1 SUBROUTINES/METHODS
 
@@ -87,22 +87,29 @@ Set some class level defaults.
 
     MyPackageName::Database::init(directory => '../databases');
 
-See the documentation for new() to see what variables can be set.
+See the documentation for new to see what variables can be set.
 
-Returns a refernce to a hash of the current values.
+Returns a reference to a hash of the current values.
+Therefore when given with no arguments you can get the current default values:
+
+    my $defaults = Database::Abstraction::init();
+    print $defaults->{'directory'}, "\n";
 
 =cut
 
-sub init {
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+sub init
+{
+	if(scalar(@_)) {
+		my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	# $defaults->{'directory'} ||= $args{'directory'};
-	# $defaults->{'logger'} ||= $args{'logger'};
-	# $defaults->{'cache'} ||= $args{'cache'};
-	# $defaults->{'cache_duration'} ||= $args{'cache_duration'};
-	%defaults = (%args, %defaults);
+		# $defaults->{'directory'} ||= $args{'directory'};
+		# $defaults->{'logger'} ||= $args{'logger'};
+		# $defaults->{'cache'} ||= $args{'cache'};
+		# $defaults->{'cache_duration'} ||= $args{'cache_duration'};
+		%defaults = (%defaults, %args)
+	}
 
-	return \%defaults;
+	return \%defaults
 }
 
 =head2 new
@@ -121,15 +128,15 @@ If the arguments are not set, tries to take from class level defaults.
 
 sub new {
 	my $proto = shift;
-        my %args;
+	my %args;
 
-        if(ref($_[0]) eq 'HASH') {
-                %args = %{$_[0]};
-        } elsif(scalar(@_) % 2 == 0) {
-                %args = @_;
-        } elsif(scalar(@_) == 1) {
-                $args{'directory'} = shift;
-        }
+	if(ref($_[0]) eq 'HASH') {
+		%args = %{$_[0]};
+	} elsif(scalar(@_) % 2 == 0) {
+		%args = @_;
+	} elsif(scalar(@_) == 1) {
+		$args{'directory'} = shift;
+	}
 
 	my $class = ref($proto) || $proto;
 
@@ -158,12 +165,12 @@ sub new {
 		# no_entry => $args{'no_entry'} || 0,
 	# }, $class;
 	# Reseen keys take precendence, so defaults come first
-	return bless { no_entry => 0, %defaults, %args }, $class;
+	return bless { no_entry => 0, cache_duration => '1 hour', %defaults, %args }, $class;
 }
 
 =head2	set_logger
 
-Pass a class that will be used for logging
+Pass a class that will be used for logging.
 
 =cut
 
@@ -597,6 +604,9 @@ sub fetchrow_hashref {
 	$sth->execute(@query_args) || croak("$query: @query_args");
 	if($c) {
 		my $rc = $sth->fetchrow_hashref();
+		if(my $logger = $self->{'logger'}) {
+			$logger->debug("Stash $key=>$rc in the cache for ", $self->{'cache_duration'});
+		}
 		$c->set($key, $rc, $self->{'cache_duration'});
 		return $rc;
 	}
@@ -662,13 +672,14 @@ sub updated {
 
 Return the contents of an arbitrary column in the database which match the
 given criteria
-Returns an array of the matches, or just the first entry when called in
-scalar context
+Returns an array of the matches,
+or only the first when called in scalar context
 
-If the first column if the database is "entry" you can do a quick lookup with
-    my $value = $table->column($entry);	# where column is the value you're after
+If the database has a column called "entry" you can do a quick lookup with
 
-Set distinct to 1 if you're after a unique list
+    my $value = $foo->column('123');	# where "column" is the value you're after
+
+Set distinct to 1 if you're after a unique list.
 
 =cut
 
@@ -688,13 +699,13 @@ sub AUTOLOAD {
 	$self->_open() if(!$self->{$table});
 
 	my %params;
-        if(ref($_[0]) eq 'HASH') {
-                %params = %{$_[0]};
-        } elsif((scalar(@_) % 2) == 0) {
-                %params = @_;
-        } elsif(scalar(@_) == 1) {
-                $params{'entry'} = shift;
-        }
+	if(ref($_[0]) eq 'HASH') {
+		%params = %{$_[0]};
+	} elsif((scalar(@_) % 2) == 0) {
+		%params = @_;
+	} elsif(scalar(@_) == 1) {
+		$params{'entry'} = shift;
+	}
 
 	my $query;
 	my $done_where = 0;
@@ -798,6 +809,9 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 The default delimiter for CSV files is set to '!', not ',' for historical reasons.
 I really ought to fix that.
+
+It would be nice for the key column to be called key, not entry,
+however key's a reserved word in SQL.
 
 =head1 LICENSE AND COPYRIGHT
 

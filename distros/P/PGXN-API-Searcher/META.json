@@ -14,11 +14,6 @@
    },
    "name" : "PGXN-API-Searcher",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.4209"
-         }
-      },
       "configure" : {
          "requires" : {
             "Module::Build" : "0.4209"
@@ -28,8 +23,8 @@
          "requires" : {
             "Carp" : "0",
             "File::Spec" : "0",
-            "Lucy" : "0.002001",
-            "perl" : "v5.10.0"
+            "Lucy" : "0.006002",
+            "perl" : "v5.12.0"
          }
       },
       "test" : {
@@ -43,7 +38,7 @@
    "provides" : {
       "PGXN::API::Searcher" : {
          "file" : "lib/PGXN/API/Searcher.pm",
-         "version" : "v0.11.0"
+         "version" : "v0.11.1"
       }
    },
    "release_status" : "stable",
@@ -59,6 +54,6 @@
          "url" : "https://github.com/pgxn/pgxn-api-searcher/"
       }
    },
-   "version" : "v0.11.0",
+   "version" : "v0.11.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }
