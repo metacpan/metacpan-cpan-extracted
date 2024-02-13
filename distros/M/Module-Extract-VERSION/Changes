@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Extract::Version
 
+1.117 2024-02-11T07:18:52Z
+	* refresh distro, update email address, move to BRIANDFOY
+
 1.116 2022-10-25T12:36:09Z
 	* Fix problem with Safe compartment. Don't import version:: since 
 	Safe already does that. Thanks to Graham Knopp (#16).

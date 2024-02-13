@@ -3,8 +3,10 @@
 use strict;
 use warnings;
 
+use Test::Fatal;
 use Test::More qw/no_plan/;
 use FindBin;
+use Compress::BGZF;
 use Compress::BGZF::Reader;
 use Compress::BGZF::Writer;
 use File::Temp qw/tempfile/;
@@ -47,7 +49,7 @@ for my $i (0..$#files) {
     read( $_->[0], $_->[1], 9 ) for @inputs;
     ok ($inputs[0]->[1] eq $inputs[1]->[1], "seek/read check $i.1");
 
-    ok (eof($inputs[0]->[1]) == eof($inputs[1]->[1]), "eof check $i.1");
+    ok (eof($inputs[0]->[0]) == eof($inputs[1]->[0]), "eof check $i.1");
 
     seek( $_->[0], 18, 1 )   for @inputs;
     read( $_->[0], $_->[1], 623, 5) for @inputs;;
@@ -130,5 +132,16 @@ for my $i (0..$#files) {
     ok ($inputs[0]->[0]->opened() eq $inputs[1]->[0]->opened(), "close check $i.1");
 
 }
+
+like(
+    exception { Compress::BGZF::Reader->new_filehandle },
+    qr/input filename required/i,
+    'missing filename caught'
+);
+like(
+    exception { Compress::BGZF::Reader->new_filehandle('foobar_') },
+    qr/failed to open/i,
+    'bad filename caught'
+);
 
 

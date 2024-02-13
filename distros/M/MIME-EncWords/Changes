@@ -1,5 +1,13 @@
 Revision history for Perl module MIME::EncWords
 
+1.015.0 2024-02-12  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * Fix: Correct specials for DISPNAME mode.
+    * Fix: CPAN RT #116463: Remove . from @INC when loading modules
+      dynamically.
+    * Fix: Suppress "Use of uninitialized value" warnings.
+    * CPAN RT #116465: Fix spelling error in manpage.
+
 1.014.3 2014-09-27  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
 
     * Fix: CPAN RT#99160: encode_mimewords() ignores the word "0".

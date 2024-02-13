@@ -5,7 +5,10 @@ my $program = 'blib/script/bcrypt';
 
 subtest 'sanity' => sub {
 	ok( -e $program, "$program exists" );
-	ok( -x $program, "$program is executable" );
+	SKIP: {
+		skip "Windows doesn't think about 'executable'", 1 if $^O eq 'MSWin32';
+		ok( -x $program, "$program is executable" );
+		}
 	};
 
 sub dumper {
@@ -44,3 +47,5 @@ sub run_command ( %hash ) {
 		'exit'  => $exit,
 		};
 	}
+
+1;

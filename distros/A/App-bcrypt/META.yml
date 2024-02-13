@@ -1,7 +1,7 @@
 ---
 abstract: 'A command-line tool to deal with bcrypt password hashing'
 author:
-  - 'brian d foy <bdfoy@cpan.org>'
+  - 'brian d foy <briandfoy@pobox.com>'
 build_requires:
   IPC::Open3: '0'
   Test::More: '1'
@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,12 +21,12 @@ no_index:
     - inc
 requires:
   Crypt::Bcrypt: '0'
-  Crypt::Urandom: '0'
+  Crypt::URandom: '0'
   Encode: '0'
   perl: '5.030'
 resources:
   bugtracker: https://github.com/briandfoy/app-bcrypt/issues
   homepage: https://github.com/briandfoy/app-bcrypt
   repository: https://github.com/briandfoy/app-bcrypt
-version: '1.001'
+version: '1.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

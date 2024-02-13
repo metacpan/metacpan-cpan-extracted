@@ -1,6 +1,7 @@
+!ru:en
 # NAME
 
-Liveman::Project - maker of the new perl-repository
+Liveman::Project - создать новый Perl-репозиторий
 
 # SYNOPSIS
 
@@ -14,37 +15,37 @@ ref $liveman_project  # => Liveman::Project
 
 # DESCRIPTION
 
-Creates a new perl-repository.
+Создает новый Perl-репозиторий.
 
 # SUBROUTINES/METHODS
 
 ## new (@params)
 
-The constructor.
+Конструктор.
 
 ## make ()
 
-Creates a new project.
+Создаёт новый проект.
 
 ## minil_toml ()
 
-Creates a file `minil.toml`.
+Создаёт файл `minil.toml`.
 
 ## cpanfile ()
 
-Creates a cpanfile.
+Создаёт `cpanfile`.
 
 ## mkpm ()
 
-Creates a main module.
+Создает главный модуль.
 
 ## license ()
 
-Creates a license.
+Зоздёт лицензию.
 
 # AUTHOR
 
-Yaroslav O. Kosmina [darviarush@mail.ru](mailto:darviarush@mail.ru)
+Yaroslav O. Kosmina <dart@cpan.org>
 
 # LICENSE
 

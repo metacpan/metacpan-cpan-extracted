@@ -1,5 +1,10 @@
 Revision history for Perl module HTTP::Promise
 
+v0.5.0 2024-02-12T21:30:05+0900
+    - Added method prepare() in HTTP::Promise
+    - Added method host() in HTTP::Promise::Request
+    - Added a warning when parameters are passed as an hash reference and not an hash to methods post, put, patch, etc that rely on _make_request_data()
+
 v0.4.1 2024-02-06T06:30:56+0900
     - Correcting small bug in HTTP::Promise::Body::Form
 

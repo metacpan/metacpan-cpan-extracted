@@ -2,7 +2,7 @@ package Liveman;
 use 5.22.0;
 use common::sense;
 
-our $VERSION = "2.0";
+our $VERSION = "3.0";
 
 use Cwd::utf8 qw/getcwd/;
 use File::Basename qw/dirname/;
@@ -10,6 +10,7 @@ use File::Find::Wanted qw/find_wanted/;
 use File::Spec qw//;
 use File::Slurper qw/read_text write_text/;
 use File::Path qw/mkpath rmtree/;
+use Locale::PO qw//;
 use Markdown::To::POD qw/markdown_to_pod/;
 use Term::ANSIColor qw/colored/;
 use Text::Trim qw/trim/;
@@ -61,7 +62,8 @@ sub transforms {
             my $test = $self->test_path($md);
             my $mdmtime = (stat $md)[9];
             die "Нет файла $md" if !$mdmtime;
-            $self->transform($md, $test) if !-e $test || -e $test && $mdmtime > (stat $test)[9];
+            $self->transform($md, $test) if !-e $test
+                || $mdmtime > (stat $test)[9];
         }
     }
 
@@ -73,8 +75,7 @@ sub transforms {
             $name =~ s!(-|::)!/!g;
             $name = "lib/$name.md";
             if(-f $name && -r $name) {
-                if(!-e "README.md" || -e "README.md"
-                    && (stat $name)[9] > (stat "README.md")[9]) {
+                if(!-e "README.md" || (stat $name)[9] > (stat "README.md")[9]) {
                     write_text "README.md", read_text $name;
                     $is_copy = 1;
                 }
@@ -125,6 +126,114 @@ sub _to_testing {
     }
 }
 
+# Обрезает строки вначале и все пробельные символы в конце
+sub _first_line_trim ($) {
+	local ($_) = @_;
+    s/^([\t ]*\n)*//;
+    s/\s*$//;
+    $_
+}
+
+# Преобразует из строчного формата
+sub _from_str ($) {
+    local ($_) = @_;
+    s/^"(.*)"$/$1/s;
+    s/\\(.)/ $1 eq "n"? "\n": $1 eq "t"? "\t": $1 /ge;
+    $_
+}
+
+# Загрузка po
+sub load_po {
+	my ($self, $md, $from, $to) = @_;
+
+    @$self{qw/from to/} = ($from, $to);
+
+    return $self unless $md;
+
+    my ($volume, $chains) = File::Spec->splitpath($md, 1);
+    my @dirs = File::Spec->splitdir($chains);
+    $dirs[0] = 'i18n'; # Удаляем lib
+    $dirs[$#dirs] =~ s!\.md$!\.$from-$to.po!;
+
+    $self->{po_file} = File::Spec->catfile(@dirs);
+    my $i18n = File::Spec->catfile(@dirs[0..$#dirs-1]);
+    mkpath($i18n);
+
+    my $manager = $self->{po_manager} = Locale::PO->new;
+    my $po = -e $self->{po_file}? $manager->load_file_ashash($self->{po_file}, "utf8"): {};
+
+    my %po;
+    my $lineno = 0;
+    for(keys %$po) {
+        my $val = $po->{$_};
+        $po{_first_line_trim(_from_str($_))} = $val;
+    }
+
+    $self->{po} = \%po;
+
+	$self
+}
+
+# Сохранение po
+sub save_po {
+	my ($self) = @_;
+
+    return $self unless $self->{from};
+
+    my @po = grep $_->{__used}, sort { $a->{loaded_line_number} <=> $b->{loaded_line_number} } values %{$self->{po}};
+
+    $self->{po_manager}->save_file_fromarray($self->{po_file}, \@po, "utf8");
+
+	$self
+}
+
+# Функция переводит текст с одного языка на другой используя утилиту trans
+sub trans {
+	my ($self, $text, $lineno) = @_;
+
+    $text = _first_line_trim($text);
+
+    return $text if $text eq "";
+
+    my $po = $self->{po}{$text};
+    $po->{__used} = 1, $po->loaded_line_number($lineno), return _from_str($po->msgstr) if defined $po;
+
+    my $dir = File::Spec->catfile(File::Spec->tmpdir, ".liveman");
+    my $trans_from = File::Spec->catfile($dir, $self->{from});
+    my $trans_to = File::Spec->catfile($dir, $self->{to});
+    write_text($trans_from, $text);
+
+    if(system "trans -b $self->{from}:$self->{to} < $trans_from > $trans_to") {
+        die "trans: failed to execute: $!" if $? == -1;
+        die printf "trans: child died with signal %d, %s coredump",
+            ($? & 127), ($? & 128) ? 'with' : 'without'
+                if $? & 127;
+        die printf "trans: child exited with value %d", $? >> 8;
+    }
+
+    my $trans = _first_line_trim(read_text($trans_to));
+
+    $po = Locale::PO->new(
+        -msgid => $text,
+        -msgstr => $trans,
+        -loaded_line_number => $lineno,
+    );
+
+    $po->{__used} = 1;
+    $self->{po}{$text} = $po;
+
+    $trans
+}
+
+# Заголовки не переводим
+sub trans_paragraph {
+	my ($self, $paragraph, $lineno) = @_;
+
+    join "", map {
+        /^#/ ? $_: join "", "\n", $self->trans(_first_line_trim($_), $lineno += 0.001), "\n\n"
+    } split m/^(#.*)/m, $paragraph
+}
+
 # Трансформирует md-файл в тест и документацию
 sub transform {
     my ($self, $md, $test) = @_;
@@ -134,6 +243,10 @@ sub transform {
 
     my $markdown = read_text($md);
 
+    my $from; my $to;
+    $markdown =~ s/^!(\w+):(\w+)[\t ]*\n/$from = $1; $to = $2; "\n"/e;
+    $self->load_po($md, $from, $to);
+
     my @pod; my @test; my $title = 'Start'; my $close_subtest; my $use_title = 1;
 
     my @text = split /^(```\w*[ \t]*(?:\n|\z))/mo, $markdown;
@@ -141,7 +254,7 @@ sub transform {
     for(my $i=0; $i<@text; $i+=4) {
         my ($mark, $sec1, $code, $sec2) = @text[$i..$i+4];
 
-        push @pod, markdown_to_pod($mark);
+        push @pod, markdown_to_pod($from? $self->trans_paragraph($mark, $i): $mark);
         push @test, $mark =~ s/^/# /rmg;
 
         last unless defined $sec1;
@@ -266,6 +379,8 @@ END2
 
     $self->{count}++;
 
+    $self->save_po;
+
     print colored("ok", "bright_green"), "\n";
 
     $self
@@ -316,17 +431,17 @@ __END__
 
 =head1 NAME
 
-Liveman - markdown compiller to test and pod
+Liveman - compiler from markdown to tests and documentation
 
 =head1 VERSION
 
-2.0
+3.0
 
 =head1 SYNOPSIS
 
 File lib/Example.md:
 
-	Twice two:
+	Дважды два:
 	\```perl
 	2*2  # -> 2+2
 	\```
@@ -337,58 +452,61 @@ Test:
 	
 	my $liveman = Liveman->new(prove => 1);
 	
-	# compile lib/Example.md file to t/example.t and added pod to lib/Example.pm
+	# Компилировать lib/Example.md файл в t/example.t 
+	# и добавить pod-документацию в lib/Example.pm
 	$liveman->transform("lib/Example.md");
 	
 	$liveman->{count}   # => 1
 	-f "t/example.t"    # => 1
 	-f "lib/Example.pm" # => 1
 	
-	# compile all lib/**.md files with a modification time longer than their corresponding test files (t/**.t)
+	# Компилировать все lib/**.md файлы со временем модификации, превышающим соответствующие тестовые файлы (t/**.t):
 	$liveman->transforms;
 	$liveman->{count}   # => 0
 	
-	# compile without check modification time
+	# Компилировать без проверки времени модификации
 	Liveman->new(compile_force => 1)->transforms->{count} # => 1
 	
-	# start tests with yath
+	# Запустить тесты с yath:
 	my $yath_return_code = $liveman->tests->{exit_code};
 	
 	$yath_return_code           # => 0
 	-f "cover_db/coverage.html" # => 1
 	
-	# limit liveman to these files for operations transforms and tests (without cover)
+	# Ограничить liveman этими файлами для операций, преобразований и тестов (без покрытия):
 	my $liveman2 = Liveman->new(files => [], force_compile => 1);
 
 =head1 DESCRIPION
 
-The problem with modern projects is that the documentation is disconnected from testing.
+The problem with modern projects is that documentation is divorced from testing.
 This means that the examples in the documentation may not work, and the documentation itself may lag behind the code.
 
-Liveman compile C<lib/**>.md files to C<t/**.t> files
-and it added pod-documentation to section C<__END__> to C<lib/**.pm> files.
+Liveman compiles C<lib/**.md> files into C<t/**.t> files
+and adds documentation in the module's C<__END__> section to the C<lib/**.pm> files.
 
-Use C<liveman> command for compile the documentation to the tests in catalog of your project and starts the tests:
+Use the C<liveman> command to compile test documentation in your project directory and run the tests:
 
- liveman
+liveman
 
-Run it with coverage.
+Run it coated.
 
-Option C<-o> open coverage in browser (coverage file: C<cover_db/coverage.html>).
+The C<-o> option opens a code coverage report by tests in the browser (coverage report file: C<cover_db/coverage.html>).
 
-Liveman replace C<our $VERSION = "...";> in C<lib/**.pm> from C<lib/**.md> if it exists in pm and in md.
+Liveman replaces C<our $VERSION = "...";> in C<lib/**.pm> from C<lib/**.md> from the B<VERSION> section if it exists.
 
-If exists file B<minil.toml>, then Liveman read C<name> from it, and copy file with this name and extension C<.md> to README.md.
+If the B<minil.toml> file exists, then Liveman will read C<name> from it and copy the file with that name and C<.md> extension into C<README.md>.
+
+If you need the documentation in C<.md> to be written in one language, and C<pod> in another, then at the beginning of C<.md> you need to indicate C<!from:to> (from which language to translate, for example, for this file: C<!ru:en>).
+
+Files with translations are stored in the C<i18n> directory, for example, C<lib/My/Module.md> -> C<i18n/My/Module.ru-en.po>. Translation is carried out using the C<trans> utility (it must be installed on the system). Translation files can be corrected, because if the translation is already in the file, then it is taken.
 
 =head2 TYPES OF TESTS
 
-Section codes C<noname> or C<perl> writes as code to C<t/**.t>-file. And comment with arrow translates on test from module C<Test::More>.
-
-The test name set as the code-line.
+Section codes without a specified programming language or with C<perl> are written as code in the file C<t/**.t>. And a comment with an arrow (# -> ) turns into a C<Test::More> test.
 
 =head3 C<is>
 
-Compare two expressions for equivalence:
+Compare two equivalent expressions:
 
 	"hi!" # -> "hi" . "!"
 	"hi!" # → "hi" . "!"
@@ -397,12 +515,12 @@ Compare two expressions for equivalence:
 
 Compare two expressions for structures:
 
-	"hi!" # --> "hi" . "!"
+	["hi!"] # --> ["hi" . "!"]
 	"hi!" # ⟶ "hi" . "!"
 
 =head3 C<is> with extrapolate-string
 
-Compare expression with extrapolate-string:
+Compare expression with extrapolated string:
 
 	my $exclamation = "!";
 	"hi!2" # => hi${exclamation}2
@@ -410,46 +528,46 @@ Compare expression with extrapolate-string:
 
 =head3 C<is> with nonextrapolate-string
 
-Compare expression with nonextrapolate-string:
+Compare an expression with a non-extrapolated string:
 
 	'hi${exclamation}3' # \> hi${exclamation}3
 	'hi${exclamation}3' # ↦ hi${exclamation}3
 
 =head3 C<like>
 
-It check a regular expression included in the expression:
+Tests the regular expression included in the expression:
 
 	'abbc' # ~> b+
 	'abc'  # ↬ b+
 
 =head3 C<unlike>
 
-It check a regular expression excluded in the expression:
+It checks the regular expression excluded from the expression:
 
 	'ac' # <~ b+
 	'ac' # ↫ b+
 
 =head2 EMBEDDING FILES
 
-Each test is executed in a temporary directory, which is erased and created when the test is run.
+Each test runs in a temporary directory, which is deleted and created when the test runs.
 
-This directory format is /tmp/.liveman/I<project>/I<path-to-test>/.
+The format of this directory is /tmp/.liveman/I<project>/I<path-to-test>/.
 
-Code section in md-file prefixed line B<< File C<path>: >> write to file in rintime testing.
+The section of code on the line with the md file prefix B<< File C<path>: >> will be written to a file when tested at runtime.
 
-Code section in md-file prefixed line B<< File C<path> is: >> will be compared with the file by the method C<Test::More::is>.
+The code section in the md file prefix line B<< File C<path> is: >> will be compared to the file using the C<Test::More::is> method.
 
 File experiment/test.txt:
 
 	hi!
 
-File experiment/test.txt is:
+The experiment/test.txt file is:
 
 	hi!
 
-B<Attention!> An empty string between the prefix and the code is not allowed!
+B<Attention!> An empty line between the prefix and the code is not allowed!
 
-Prefixes maybe on russan: C<Файл path:> and C<Файл path является:>.
+These prefixes can be in both English and Russian.
 
 =head1 METHODS
 
@@ -459,31 +577,31 @@ Constructor. Has arguments:
 
 =over
 
-=item 1. C<files> (array_ref) — list of md-files for methods C<transforms> and C<tests>.
+=item 1. C<files> (array_ref) - list of md files for the C<transforms> and C<tests> methods.
 
-=item 2. C<open> (boolean) — open coverage in browser. If is B<opera> browser — open in it. Else — open via C<xdg-open>.
+=item 2. C<open> (boolean) — open the coverage in the browser. If the B<opera> browser is installed on your computer, the C<opera> command will be used to open it. Otherwise - C<xdg-open>.
 
-=item 3. C<force_compile> (boolean) — do not check the md-files modification time.
+=item 3. C<force_compile> (boolean) - do not check the modification time of md files.
 
-=item 4. C<options> — add options in command line to yath or prove.
+=item 4. C<options> - add parameters on the command line for verification or proof.
 
-=item 5. C<prove> — use prove, but use'nt yath.
+=item 5. C<prove> - use proof (the C<prove> command to run tests), rather than the C<yath> command.
 
 =back
 
 =head2 test_path ($md_path)
 
-Get the path to the C<t/**.t>-file from the path to the C<lib/**.md>-file:
+Get the path to the C<t/**.t> file from the path to the C<lib/**.md> file:
 
 	Liveman->new->test_path("lib/PathFix/RestFix.md") # => t/path-fix/rest-fix.t
 
 =head2 transform ($md_path, [$test_path])
 
-Compile C<lib/**.md>-file to C<t/**.t>-file.
+Compiles a C<lib/**.md> file into a C<t/**.t> file.
 
-And method C<transform> replace the B<pod>-documentation in section C<__END__> in C<lib/**.pm>-file. And create C<lib/**.pm>-file if it not exists.
+It also replaces the B<pod> documentation in the C<__END__> section in the C<lib/**.pm> file and creates a C<lib/**.pm> file if it does not exist.
 
-File lib/Example.pm is:
+The lib/Example.pm file is:
 
 	package Example;
 	
@@ -493,28 +611,28 @@ File lib/Example.pm is:
 	
 	=encoding utf-8
 	
-	Twice two:
+	Дважды два:
 	
 		2*2  # -> 2+2
 	
 
-File C<lib/Example.pm> was created from file C<lib/Example.md> described in section C<SINOPSIS> in this document.
+The file C<lib/Example.pm> was created from the file C<lib/Example.md>, as described in the C<SINOPSIS> section of this document.
 
 =head2 transforms ()
 
-Compile C<lib/**.md>-files to C<t/**.t>-files.
+Compile C<lib/**.md> files into C<t/**.t> files.
 
-All if C<< $self-E<gt>{files} >> is empty, or C<< $self-E<gt>{files} >>.
+All if C<< $self-E<gt>{files} >> is not set, or C<< $self-E<gt>{files} >>.
 
 =head2 tests ()
 
-Tests C<t/**.t>-files.
+Run tests (C<t/**.t> files).
 
-All if C<< $self-E<gt>{files} >> is empty, or C<< $self-E<gt>{files} >> only.
+All if C<< $self-E<gt>{files} >> is not set, or C<< $self-E<gt>{files} >> only.
 
 =head1 AUTHOR
 
-Yaroslav O. Kosmina LL<mailto:dart@cpan.org>
+Yaroslav O. Kosmina L<mailto:dart@cpan.org>
 
 =head1 LICENSE
 

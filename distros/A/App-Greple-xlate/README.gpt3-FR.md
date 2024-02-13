@@ -10,11 +10,11 @@ App::Greple::xlate - module de support de traduction pour greple
 
 # VERSION
 
-Version 0.29
+Version 0.30
 
 # DESCRIPTION
 
-Le module **xlate** de **greple** trouve les blocs de texte souhaités et les remplace par le texte traduit. Actuellement, les modules DeepL (`deepl.pm`) et ChatGPT (`gpt3.pm`) sont implémentés en tant que moteur de back-end.
+Le module **Greple** **xlate** trouve les blocs de texte souhaités et les remplace par le texte traduit. Actuellement, les modules DeepL (`deepl.pm`) et ChatGPT (`gpt3.pm`) sont implémentés en tant que moteur de back-end. Un support expérimental pour gpt-4 est également inclus.
 
 Si vous souhaitez traduire des blocs de texte normaux dans un document écrit dans le style pod de Perl, utilisez la commande **greple** avec les modules `xlate::deepl` et `perl` de cette manière :
 

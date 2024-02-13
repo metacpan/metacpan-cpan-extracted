@@ -145,7 +145,7 @@ sub as_string
                     {
                         $v2 = $v2->body->as_string( binmode => 'utf-8' );
                     }
-                    warn( "Found a value, within an array for item '$n', that is a reference, but does not stringifies.\n" ) if( ref( $v2 ) && !overload::Method( $v2 => '""' ) && $self->_is_warnings_enabled );
+                    warn( "Found a value, within an array for item '$n', that is a reference, but does not stringify.\n" ) if( ref( $v2 ) && !overload::Method( $v2 => '""' ) && $self->_is_warnings_enabled );
                     push( @pairs, join( '=', $n, URL::Encode::XS::url_encode_utf8( "$v2" ) ) );
                 }
             }
@@ -155,7 +155,7 @@ sub as_string
                 {
                     $v = $v->body->as_string( binmode => 'utf-8' );
                 }
-                warn( "Found a value, for item '$n', that is a reference, but does not stringifies.\n" ) if( ref( $v ) && !overload::Method( $v => '""' ) && $self->_is_warnings_enabled );
+                warn( "Found a value, for form item '$n', that is a reference, but does not stringify.\n" ) if( ref( $v ) && !overload::Method( $v => '""' ) && $self->_is_warnings_enabled );
                 push( @pairs, join( '=', $n, URL::Encode::XS::url_encode_utf8( "$v" ) ) );
             }
         }

@@ -1,5 +1,19 @@
 Revision history for Mojolicious::Plugin::INIConfig::Extended
 
+v0.07 
+
+v0.06 Mon Apr 4 18:54:13 2016 -0400
+
+    * cd9be12 (HEAD -> master, tag: v0.06, origin/master, origin/HEAD) git add milla-generated Makefile.PL
+    * 6bbb6ef tag v0.05
+
+v0.05 Mon Mar 28 19:40:38 2016 -0400 
+
+    * d827255 (tag: v0.05, tag: v0.04) .gitignore archives/
+    * 8ada91d implement use of FindBin in test suite
+    * a8fa310 enables Dist::Zilla::Plugin::Hook::FilePruner, related milla, related distribution code
+    * a2b4410 use Dist::Zilla milla profile, add Changes, git rm LICENSE
+
 v0.02 Sat Feb 13 20:19:26 2016 -0500
 
     * 6bfc16e (HEAD, tag: v0.02, origin/master, origin/HEAD, master) expose default.config_files key as part of $cfg

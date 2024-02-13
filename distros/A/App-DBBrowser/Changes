@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.405  2024-02-12
+        - Bugfixes in the 'search & replace' input filter.
+
 2.404  2024-02-01
         - Update and bugfixes documentation.
 

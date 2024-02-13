@@ -1,5 +1,12 @@
 Revision history for Perl extension Test::Excel.
 
+1.54  Mon Feb 12 11:00:00 2024
+      - Upgraded dependency on Spreadsheet::ParseXLSX v0.31 and
+        Spreadsheet::ParseExcel v0.66 to pull the fix for CVE-2023-7101.
+        https://blogs.perl.org/users/timothy_legge/2024/02/vulnerable-perl-spreadsheet-parsing-modules.html
+      - Updated copyright year.
+      - Tidied up unit test slightly.
+
 1.53  Mon Jul 04 19:40:00 2022
       - Spelling, grammar, and whitespace fixes to docs, thanks @esabol.
       - Updated workflow settings.

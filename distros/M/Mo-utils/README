@@ -15,6 +15,7 @@ SYNOPSIS
      check_code($self, $key);
      check_isa($self, $key, $class);
      check_length($self, $key, $max_length);
+     check_length_fix($self, $key, $length);
      check_number($self, $key);
      check_number_of_items($self, $list_method, $item_method, $object_name, $item_name);
      check_regexp($self, $key, $regexp);
@@ -29,6 +30,8 @@ SUBROUTINES
   "check_angle"
      check_angle($self, $key);
 
+    *Since version 0.20.*
+
     Check parameter defined by $key which is number between 0 and 360.
 
     Put error if check isn't ok.
@@ -38,6 +41,8 @@ SUBROUTINES
   "check_array"
      check_array($self, $key);
 
+    *Since version 0.06.*
+
     Check parameter defined by $key which is reference to array.
 
     Put error if check isn't ok.
@@ -46,6 +51,8 @@ SUBROUTINES
 
   "check_array_object"
      check_array_object($self, $key, $class, $class_name);
+
+    *Since version 0.02. Described functionality since version 0.21.*
 
     Check parameter defined by $key which is reference to array with
     instances of some object type ($class). $class_name is used to error
@@ -58,6 +65,8 @@ SUBROUTINES
   "check_array_required"
      check_array_required($self, $key);
 
+    *Since version 0.18. Described functionality since version 0.19.*
+
     Check parameter defined by $key which is reference to array for at least
     one value inside.
 
@@ -68,6 +77,8 @@ SUBROUTINES
   "check_bool"
      check_bool($self, $key);
 
+    *Since version 0.06.*
+
     Check parameter defined by $key if value is bool or not.
 
     Put error if check isn't ok.
@@ -76,6 +87,8 @@ SUBROUTINES
 
   "check_code"
      check_code($self, $key);
+
+    *Since version 0.12.*
 
     Check parameter defined by $key which is code reference or no.
 
@@ -86,6 +99,8 @@ SUBROUTINES
   "check_isa"
      check_isa($self, $key, $class);
 
+    *Since version 0.01. Described functionality since version 0.08.*
+
     Check parameter defined by $key which is instance of $class or no.
 
     Put error if check isn't ok.
@@ -95,6 +110,8 @@ SUBROUTINES
   "check_length"
      check_length($self, $key, $max_length);
 
+    *Since version 0.04. Described functionality since version 0.05.*
+
     Check length of value for parameter defined by $key. Maximum length is
     defined by $max_length.
 
@@ -102,8 +119,22 @@ SUBROUTINES
 
     Returns undef.
 
+  "check_length_fix"
+     check_length_fix($self, $key, $length);
+
+    *Since version 0.22.*
+
+    Check fixed length of value for parameter defined by $key. Length is
+    defined by $length variable.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
   "check_number"
      check_number($self, $key);
+
+    *Since version 0.01. Described functionality since version 0.09.*
 
     Check parameter defined by $key which is number (positive or negative)
     or no.
@@ -114,6 +145,8 @@ SUBROUTINES
 
   "check_number_of_items"
      check_number_of_items($self, $list_method, $item_method, $object_name, $item_name);
+
+    *Since version 0.01.*
 
     Check amount of unique items defined by $item_method method value. List
     items via $list_method and get value via $item_method method.
@@ -126,6 +159,8 @@ SUBROUTINES
   "check_regexp"
      check_regexp($self, $key, $regexp);
 
+    *Since version 0.17.*
+
     Check parameter defined by $key via regular expression defined by
     c<$regexp>.
 
@@ -136,6 +171,8 @@ SUBROUTINES
   "check_required"
      check_required($self, $key);
 
+    *Since version 0.01.*
+
     Check required parameter defined by $key.
 
     Put error if check isn't ok.
@@ -144,6 +181,8 @@ SUBROUTINES
 
   "check_string_begin"
      check_string_begin($self, $key, $string_base);
+
+    *Since version 0.16.*
 
     Check parameter if it is correct string which begins with base.
 
@@ -154,6 +193,8 @@ SUBROUTINES
 
   "check_strings"
      check_strings($self, $key, $strings_ar);
+
+    *Since version 0.15.*
 
     Check parameter if it is correct string from strings list.
 
@@ -180,6 +221,8 @@ ERRORS
                      Value: %s
                      Reference: %s
              %s isn't '%s' object.
+                     Value: %s
+                     Reference: %s
 
      check_array_required():
              Parameter '%s' is required.
@@ -203,6 +246,10 @@ ERRORS
 
      check_length():
              Parameter '%s' has length greater than '%s'.
+                     Value: %s
+
+     check_length_fix():
+             Parameter '%s' has length different than '%s'.
                      Value: %s
 
      check_number():
@@ -542,6 +589,44 @@ EXAMPLE17
      use strict;
      use warnings;
 
+     $Error::Pure::TYPE = 'Error';
+
+     use Mo::utils qw(check_length_fix);
+
+     my $self = {
+             'key' => 'foo',
+     };
+     check_length_fix($self, 'key', 3);
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # ok
+
+EXAMPLE18
+     use strict;
+     use warnings;
+
+     $Error::Pure::TYPE = 'Error';
+
+     use Mo::utils qw(check_length_fix);
+
+     my $self = {
+             'key' => 'foo',
+     };
+     check_length_fix($self, 'key', 4);
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Parameter 'key' has length different than '4'.
+
+EXAMPLE19
+     use strict;
+     use warnings;
+
      use Mo::utils qw(check_number);
 
      my $self = {
@@ -555,7 +640,7 @@ EXAMPLE17
      # Output:
      # ok
 
-EXAMPLE18
+EXAMPLE20
      use strict;
      use warnings;
 
@@ -574,7 +659,7 @@ EXAMPLE18
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' must be a number.
 
-EXAMPLE19
+EXAMPLE21
      use strict;
      use warnings;
 
@@ -616,7 +701,7 @@ EXAMPLE19
      # Output like:
      # ok
 
-EXAMPLE20
+EXAMPLE22
      use strict;
      use warnings;
 
@@ -658,7 +743,7 @@ EXAMPLE20
      # Output like:
      # #Error [...utils.pm:?] Test for Item 'value1' has multiple values.
 
-EXAMPLE21
+EXAMPLE23
      use strict;
      use warnings;
 
@@ -675,7 +760,7 @@ EXAMPLE21
      # Output:
      # ok
 
-EXAMPLE22
+EXAMPLE24
      use strict;
      use warnings;
 
@@ -695,7 +780,7 @@ EXAMPLE22
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' does not match the specified regular expression.
 
-EXAMPLE23
+EXAMPLE25
      use strict;
      use warnings;
 
@@ -712,7 +797,7 @@ EXAMPLE23
      # Output:
      # ok
 
-EXAMPLE24
+EXAMPLE26
      use strict;
      use warnings;
 
@@ -732,7 +817,7 @@ EXAMPLE24
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' is required.
 
-EXAMPLE25
+EXAMPLE27
      use strict;
      use warnings;
 
@@ -749,7 +834,7 @@ EXAMPLE25
      # Output:
      # ok
 
-EXAMPLE26
+EXAMPLE28
      use strict;
      use warnings;
 
@@ -769,7 +854,7 @@ EXAMPLE26
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' must begin with defined string base.
 
-EXAMPLE27
+EXAMPLE29
      use strict;
      use warnings;
 
@@ -786,7 +871,7 @@ EXAMPLE27
      # Output:
      # ok
 
-EXAMPLE28
+EXAMPLE30
      use strict;
      use warnings;
 
@@ -835,5 +920,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.21
+    0.22
 

@@ -21,6 +21,7 @@ $obj = Data::MARC::Leader->new(
 	'length' => 2200,
 	'length_of_field_portion_len' => 4,
 	'multipart_resource_record_level' => ' ',
+	'raw' => '02200cem a2200541 i 4500',
 	'starting_char_pos_portion_len' => 5,
 	'status' => 'c',
 	'subfield_code_count' => 2,

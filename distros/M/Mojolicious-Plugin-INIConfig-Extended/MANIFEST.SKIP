@@ -1,6 +1,5 @@
 local/
 local/*
-archives/
 cpanfile.snapshot
 ^.*.stderr.log$
 

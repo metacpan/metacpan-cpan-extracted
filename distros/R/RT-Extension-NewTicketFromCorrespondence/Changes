@@ -1,4 +1,9 @@
 Revision history for RT-Extension-NewTicketFromCorrespondence
 
-0.01 Thu Aug 27 2023
+0.04 Mon Feb 12 2024
+ - Installation instructions correction (Codeberg issue #1 / RT #151741)
+ - Action path correction from Andreas Wandel (Codeberg issue #2 / RT #151742)
+ - Perldoc updated to match README
+
+0.01 Thu Aug 17 2023
  - Initial version

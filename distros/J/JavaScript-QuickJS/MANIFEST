@@ -19,6 +19,7 @@ easyxs/ppport.h
 lib/JavaScript/QuickJS.pm
 lib/JavaScript/QuickJS/Date.pm
 lib/JavaScript/QuickJS/Function.pm
+lib/JavaScript/QuickJS/Promise.pm
 lib/JavaScript/QuickJS/RegExp.pm
 quickjs/Changelog
 quickjs/LICENSE
@@ -87,7 +88,9 @@ t/basic.t
 t/callback_err.t
 t/callback_invalid_sv.t
 t/date.t
+t/date_invalid_input.t
 t/export_ref.t
+t/func_call_invalid_input.t
 t/import_os.t
 t/import_std.t
 t/import_std2.t
@@ -96,6 +99,7 @@ t/js_func_to_perl.t
 t/jsfunc_memory_handling.t
 t/memory.t
 t/module.t
+t/promise.t
 t/regexp.t
 t/script_std.t
 t/set_globals.t

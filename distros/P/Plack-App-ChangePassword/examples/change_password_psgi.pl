@@ -84,6 +84,12 @@ Plack::Runner->new->run($app);
 # .form-change-password .messages {
 # 	text-align: center;
 # }
+# .error {
+# 	color: red;
+# }
+# .info {
+# 	color: blue;
+# }
 # .container {
 # 	display: flex;
 # 	align-items: center;

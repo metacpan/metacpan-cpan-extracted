@@ -2,7 +2,6 @@ Build.PL
 Changes
 LICENSE
 MANIFEST.SKIP
-META.json
 README.md
 cpanfile
 lib/OrePAN2.pm
@@ -42,5 +41,6 @@ t/dat/modules/02.packages.txt
 t/index.t
 t/lib/Local/Util.pm
 xt/inject-spiffy-from-cpan.t
+META.json
 META.yml
 MANIFEST

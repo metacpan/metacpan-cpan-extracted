@@ -1,4 +1,4 @@
-package [% module %];
+package « $module »;
 use strict;
 
 use warnings;
@@ -13,11 +13,11 @@ $VERSION = '0.11';
 
 =head1 NAME
 
-[% module %] - [% description %]
+« $module » - « $description »
 
 =head1 SYNOPSIS
 
-	use [% module %];
+	use « $module »;
 
 =head1 DESCRIPTION
 
@@ -58,11 +58,11 @@ it, just ask and we'll work something out.
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+« $author_name », C<< <« $email »> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © [% year %], brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © « $year », « $author_name » <« $email »>. All rights reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

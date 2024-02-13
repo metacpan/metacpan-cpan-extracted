@@ -15,114 +15,19 @@ use Encode 'decode';
 use File::Find 'find';
 
 # SPVM::Builder::Util is used from Makefile.PL
-# so this class must be wrote as pure perl script, not contain XS functions.
+# so this class must be wrote as pure perl. Do not contain XS functions.
 
-sub get_spvm_core_perl_class_file_names {
-  my @spvm_builder_class_file_names = qw(
-    SPVM/BlessedObject/Array.pm
-    SPVM/BlessedObject/Class.pm
-    SPVM/BlessedObject.pm
-    SPVM/BlessedObject/String.pm
-    SPVM/Builder/API.pm
-    SPVM/Builder/CC.pm
-    SPVM/Builder/CompileInfo.pm
-    SPVM/Builder/Compiler.pm
-    SPVM/Builder/Config/Exe.pm
-    SPVM/Builder/Config.pm
-    SPVM/Builder/Env.pm
-    SPVM/Builder/Exe.pm
-    SPVM/Builder/LibInfo.pm
-    SPVM/Builder/LinkInfo.pm
-    SPVM/Builder/ObjectFileInfo.pm
-    SPVM/Builder.pm
-    SPVM/Builder/Resource.pm
-    SPVM/Builder/Runtime.pm
-    SPVM/Builder/Stack.pm
-    SPVM/Builder/Util/API.pm
-    SPVM/Builder/Util.pm
-    SPVM/Document/ExchangeAPI.pm
-    SPVM/ExchangeAPI/Class.pm
-    SPVM/ExchangeAPI/Error.pm
-    SPVM/ExchangeAPI.pm
-    SPVM/Global.pm
-    SPVM.pm
-  );
+sub get_spvm_version_header_file {
   
-  return \@spvm_builder_class_file_names;
-}
-
-sub get_spvm_core_header_file_names {
+  my $builder_dir = &get_builder_dir;
   
-  my @spvm_core_header_file_names = qw(
-    spvm_allocator.h
-    spvm_allow.h
-    spvm_api_allocator.h
-    spvm_api_arg.h
-    spvm_api_basic_type.h
-    spvm_api_class_var.h
-    spvm_api_compiler.h
-    spvm_api_field.h
-    spvm_api.h
-    spvm_api_method.h
-    spvm_api_mutex.h
-    spvm_api_class_file.h
-    spvm_api_runtime.h
-    spvm_api_string_buffer.h
-    spvm_api_type.h
-    spvm_api_internal.h
-    spvm_array_field_access.h
-    spvm_attribute.h
-    spvm_basic_type.h
-    spvm_block.h
-    spvm_call_method.h
-    spvm_case_info.h
-    spvm_check.h
-    spvm_class_var_access.h
-    spvm_class_var.h
-    spvm_compiler.h
-    spvm_constant.h
-    spvm_dumper.h
-    spvm_field_access.h
-    spvm_field.h
-    spvm_hash.h
-    spvm_implement.h
-    spvm_interface.h
-    spvm_list.h
-    spvm_method.h
-    spvm_mutex.h
-    spvm_class_file.h
-    spvm_native.h
-    spvm_object.h
-    spvm_opcode_builder.h
-    spvm_opcode.h
-    spvm_opcode_list.h
-    spvm_op.h
-    spvm_precompile.h
-    spvm_public_api.h
-    spvm_runtime_arg.h
-    spvm_runtime_basic_type.h
-    spvm_runtime_class_var.h
-    spvm_runtime_field.h
-    spvm_runtime.h
-    spvm_runtime_method.h
-    spvm_runtime_string.h
-    spvm_strerror.h
-    spvm_string_buffer.h
-    spvm_string.h
-    spvm_switch_info.h
-    spvm_toke.h
-    spvm_typedecl.h
-    spvm_type.h
-    spvm_use.h
-    spvm_var_decl.h
-    spvm_var.h
-    spvm_vm.h
-    spvm_weaken_backref.h
-    spvm_yacc.h
-    spvm_yacc_util.h
-  );
+  my $spvm_version_header_file = "$builder_dir/include/spvm_version.h";
   
-  return \@spvm_core_header_file_names;
+  unless (-f $spvm_version_header_file) {
+    confess "The SPVM version header file \"$spvm_version_header_file\" is not found.";
+  }
+  
+  return $spvm_version_header_file;
 }
 
 sub get_spvm_core_source_file_names {
@@ -187,37 +92,6 @@ sub get_spvm_core_source_file_names {
   return \@spvm_core_source_file_names;
 }
 
-sub get_spvm_compiler_required_file_names {
-  my @get_spvm_compiler_required_file_names = qw(
-    SPVM/Native/Arg.c
-    SPVM/Native/Arg.spvm
-    SPVM/Native/BasicType.c
-    SPVM/Native/BasicType.spvm
-    SPVM/Native.c
-    SPVM/Native/ClassVar.c
-    SPVM/Native/ClassVar.spvm
-    SPVM/Native/Compiler.c
-    SPVM/Native/Compiler.spvm
-    SPVM/Native/Env.c
-    SPVM/Native/Env.spvm
-    SPVM/Native/Field.c
-    SPVM/Native/Field.spvm
-    SPVM/Native/Method.c
-    SPVM/Native/MethodCall.c
-    SPVM/Native/MethodCall.spvm
-    SPVM/Native/Method.spvm
-    SPVM/Native/ClassFile.c
-    SPVM/Native/ClassFile.spvm
-    SPVM/Native/Runtime.c
-    SPVM/Native/Runtime.spvm
-    SPVM/Native.spvm
-    SPVM/Native/Stack.c
-    SPVM/Native/Stack.spvm
-  );
-  
-  return \@get_spvm_compiler_required_file_names;
-}
-
 sub need_generate {
   my ($opt) = @_;
   
@@ -225,18 +99,6 @@ sub need_generate {
   my $input_files = $opt->{input_files};
   my $output_file = $opt->{output_file};
   
-  # SPVM::Builder classes
-  my $spvm_dependent_files = &get_spvm_dependent_files;
-  
-  my $spvm_dependent_files_mtime_max;
-  $spvm_dependent_files_mtime_max = 0;
-  for my $spvm_core_file (@$spvm_dependent_files) {
-    my $spvm_core_file_mtime = (stat($spvm_core_file))[9];
-    if ($spvm_core_file_mtime > $spvm_dependent_files_mtime_max) {
-      $spvm_dependent_files_mtime_max = $spvm_core_file_mtime;
-    }
-  }
-
   my $need_generate;
   if ($force) {
     $need_generate = 1;
@@ -258,13 +120,15 @@ sub need_generate {
         }
       }
       if ($exists_input_file_at_least_one) {
-        my $output_file_mtime = (stat($output_file))[9];
+        my $spvm_version_header_file = &get_spvm_version_header_file;
         
-        if (defined $spvm_dependent_files_mtime_max) {
-          if ($spvm_dependent_files_mtime_max > $input_files_mtime_max) {
-            $input_files_mtime_max = $spvm_dependent_files_mtime_max;
-          }
+        my $spvm_version_header_file_mtime = (stat($spvm_version_header_file))[9];
+        
+        if ($spvm_version_header_file_mtime > $input_files_mtime_max) {
+          $input_files_mtime_max = $spvm_version_header_file_mtime;
         }
+        
+        my $output_file_mtime = (stat($output_file))[9];
         
         if ($input_files_mtime_max > $output_file_mtime) {
           $need_generate = 1;
@@ -312,6 +176,12 @@ sub file_contains {
 
 sub spurt_binary {
   my ($file, $content) = @_;
+  
+  unless (defined $file) {
+    confess "A file must be defined.";
+  }
+  
+  mkpath dirname $file;
   
   open my $fh, '>:raw', $file
     or confess "Can't open file \"$file\":$!";
@@ -434,42 +304,40 @@ sub create_make_rule_precompile {
   create_make_rule($class_name, 'precompile', @_);
 }
 
-sub create_make_rule {
+sub get_dependent_files {
   my ($class_name, $category, $options) = @_;
   
-  $options ||= {};
-  
-  # Deprecated
-  if ($class_name =~ s/^SPVM:://) {
-    warn "The SPVM:: prefix is no more required in the class name given to the create_make_rule function.";
-  }
+  my @dependent_files;
   
   my $lib_dir = defined $options->{lib_dir} ? $options->{lib_dir} : 'lib';
   
-  my $config_file = "$lib_dir/" . &convert_class_name_to_rel_file($class_name, 'config');
+  my $spvm_class_rel_file_without_ext = &convert_class_name_to_rel_file($class_name);
   
-  my $config_file_without_ext = $config_file;
-  $config_file_without_ext =~ s/\.[^\.]+$//;
+  my $spvm_class_file_without_ext = "$lib_dir/$spvm_class_rel_file_without_ext";
   
-  # Dependency files
-  my @dependent_files;
+  my $spvm_class_rel_file = "$spvm_class_file_without_ext.spvm";
   
-  my $spvm_class_file = "$config_file_without_ext.spvm";
+  my $spvm_class_file = "$spvm_class_file_without_ext.spvm";
   push @dependent_files, $spvm_class_file;
+  
+  my $spvm_version_header_file = &get_spvm_version_header_file;
+  push @dependent_files, $spvm_version_header_file;
   
   # Dependency native class file
   if ($category eq 'native') {
     # Config
+    my $config_file = "$spvm_class_file_without_ext.config";
+    my @mode_config_files = glob "$spvm_class_file_without_ext.*.config";
+    push @dependent_files, $config_file, @mode_config_files;
     my $config = SPVM::Builder::Config->load_config($config_file);
-    push @dependent_files, $config_file;
     
     # Native class
     my $native_class_file_ext = $config->ext;
-    my $native_class_file = "$config_file_without_ext.$native_class_file_ext";
+    my $native_class_file = "$spvm_class_file_without_ext.$native_class_file_ext";
     push @dependent_files, $native_class_file;
     
     # Native include
-    my $native_include_dir = "$config_file_without_ext.native/include";
+    my $native_include_dir = "$spvm_class_file_without_ext.native/include";
     my @native_include_files;
     if (-d $native_include_dir) {
       find({wanted => sub { if (-f $_) { push @native_include_files, $_ } }, no_chdir => 1}, $native_include_dir);
@@ -477,7 +345,7 @@ sub create_make_rule {
     push @dependent_files, @native_include_files;
     
     # Native source
-    my $native_src_dir = "$config_file_without_ext.native/src";
+    my $native_src_dir = "$spvm_class_file_without_ext.native/src";
     my @native_src_files;
     if (-d $native_src_dir) {
       find({wanted => sub { if (-f $_) { push @native_src_files, $_ } }, no_chdir => 1}, $native_src_dir);
@@ -523,6 +391,19 @@ sub create_make_rule {
     }
   }
   
+  return \@dependent_files;
+}
+
+sub create_make_rule {
+  my ($class_name, $category, $options) = @_;
+  
+  $options ||= {};
+  
+  # Deprecated
+  if ($class_name =~ s/^SPVM:://) {
+    warn "The SPVM:: prefix is no more required in the class name given to the create_make_rule function.";
+  }
+  
   # Shared library file
   my $dynamic_lib_rel_file = &convert_class_name_to_dynamic_lib_rel_file($class_name, $category);
   my $dynamic_lib_file = "blib/lib/$dynamic_lib_rel_file";
@@ -534,65 +415,11 @@ sub create_make_rule {
   $make_rule .= "\t\$(NOECHO) \$(NOOP)\n\n";
   
   # Get source files
-  $make_rule .= "$dynamic_lib_file :: @dependent_files\n";
-  $make_rule .= "\t$^X -Mblib -MSPVM::Builder::API -e \"SPVM::Builder::API->new(build_dir => '.spvm_build')->build_dynamic_lib_dist_$category('$class_name')\"\n\n";
+  my $dependent_files = &get_dependent_files($class_name, $category, $options);
+  $make_rule .= "$dynamic_lib_file :: @$dependent_files\n";
+  $make_rule .= "\t$^X -Mblib -MSPVM::Builder::API -e \"SPVM::Builder::API->new(build_dir => '.spvm_build')->build_dynamic_lib_dist_$category('$class_name', {force => 1})\"\n\n";
   
   return $make_rule;
-}
-
-sub get_spvm_dependent_files {
-  
-  my @spvm_dependent_files;
-  if (my $builder_loaded_file = $INC{'SPVM/Builder/Util.pm'}) {
-    my $builder_loaded_dir = $builder_loaded_file;
-    $builder_loaded_dir =~ s|[/\\]SPVM/Builder/Util\.pm$||;
-    
-    # SPVM::Builder class files
-    my $spvm_core_perl_class_file_names = &get_spvm_core_perl_class_file_names();
-    for my $spvm_core_perl_class_file_name (@$spvm_core_perl_class_file_names) {
-      my $spvm_core_perl_class_file = "$builder_loaded_dir/$spvm_core_perl_class_file_name";
-      unless (-f $spvm_core_perl_class_file) {
-        confess "Can't find $spvm_core_perl_class_file";
-      }
-      push @spvm_dependent_files, $spvm_core_perl_class_file;
-    }
-    
-    # SPVM core header files
-    my $spvm_core_header_file_names = &get_spvm_core_header_file_names();
-    for my $spvm_core_header_file_name (@$spvm_core_header_file_names) {
-      my $spvm_core_header_file = "$builder_loaded_dir/SPVM/Builder/include/$spvm_core_header_file_name";
-      unless (-f $spvm_core_header_file) {
-        confess "Can't find $spvm_core_header_file";
-      }
-      push @spvm_dependent_files, $spvm_core_header_file;
-    }
-    
-    # SPVM core source files
-    my $spvm_core_source_file_names  = &get_spvm_core_source_file_names();
-    for my $spvm_core_source_file_name (@$spvm_core_source_file_names) {
-      my $spvm_core_source_file = "$builder_loaded_dir/SPVM/Builder/src/$spvm_core_source_file_name";
-      unless (-f $spvm_core_source_file) {
-        confess "Can't find $spvm_core_source_file";
-      }
-      push @spvm_dependent_files, $spvm_core_source_file;
-    }
-    
-    # SPVM Compiler required file names
-    my $get_spvm_compiler_required_file_names = &get_spvm_compiler_required_file_names();
-    for my $get_spvm_compiler_required_file_name (@$get_spvm_compiler_required_file_names) {
-      my $get_spvm_compiler_required_class_file = "$builder_loaded_dir/$get_spvm_compiler_required_file_name";
-      unless (-f $get_spvm_compiler_required_class_file) {
-        confess "Can't find $get_spvm_compiler_required_class_file";
-      }
-      push @spvm_dependent_files, $get_spvm_compiler_required_class_file;
-    }
-  }
-  
-  unless (@spvm_dependent_files) {
-    confess "[Unexpected Error]SPVM dependent files are not found";
-  }
-  
-  return \@spvm_dependent_files;
 }
 
 sub search_config_file {
@@ -715,9 +542,10 @@ sub get_version_string {
 sub get_spvm_version_string {
   
   my $builder_dir = &get_builder_dir;
-  my $spvm_api_header_file = "$builder_dir/include/spvm_native.h";
+  my $spvm_version_header_file = "$builder_dir/include/spvm_version.h";
   
-  open my $spvm_module_fh, '<', $spvm_api_header_file or die "Can't open the file \"$spvm_api_header_file\": $!";
+  open my $spvm_module_fh, '<', $spvm_version_header_file
+    or die "Can't open the file \"$spvm_version_header_file\": $!";
   local $/;
   my $content = <$spvm_module_fh>;
   my $version_string;
@@ -726,7 +554,7 @@ sub get_spvm_version_string {
   }
   
   unless (defined $version_string) {
-    confess "The version string can't be find in $spvm_api_header_file file";
+    confess "The version string can't be found in \"$spvm_version_header_file\"";
   }
   
   return $version_string;

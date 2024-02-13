@@ -4,6 +4,7 @@ LongDouble.pm
 LongDouble.pod
 LongDouble.xs
 math_longdouble_include.h
+math_longdouble_unused.h
 README
 Changes
 try.in

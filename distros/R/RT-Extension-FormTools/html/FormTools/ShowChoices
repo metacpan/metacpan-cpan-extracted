@@ -1,7 +1,7 @@
 <%init>
 my $queue = $m->notes('queue');
 
-my %all_fields = $m->request_args;
+my %all_fields = %$DECODED_ARGS;
 </%init>
 % foreach my $field (keys %all_fields) {
 % next if $field =~ /-Magic/;

@@ -1,5 +1,9 @@
 Revision history for Compress-BGZF
 
+0.007     2024-02-09
+          Can now emulate htslib EOF empty blocks
+          Increased test suite coverage
+          Tweaks to bgzip.pl demo program
 0.006     2020-01-10
           Fixed missing exception handling for failed buffered writes (thanks to Paul Kolano)
           Fixed variable initialization in Reader causing problems with empty inputs

@@ -72,7 +72,7 @@ my %WriteMakefile = (
 		resources => {
 			repository => {
 				type => 'git',
-				url  => "$github.git",
+				url  => $github,
 				web  => $github,
 				},
 			bugtracker => {
@@ -87,7 +87,7 @@ my %WriteMakefile = (
 				},
 				{
 				name     => 'brian d foy',
-				email    => 'bdfoy@cpan.org',
+				email    => 'briandfoy@pobox.com',
 				github   => 'https://github.com/briandfoy',
 				twitter  => 'https://twitter.com/briandfoy_perl',
 				linkedin => 'https://www.linkedin.com/in/briandfoy/',

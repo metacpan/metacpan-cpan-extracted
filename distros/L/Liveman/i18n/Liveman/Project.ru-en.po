@@ -1,0 +1,33 @@
+msgid "Liveman::Project - создать новый Perl-репозиторий"
+msgstr "Liveman::Project - create a new Perl repository"
+
+msgid "Создает новый Perl-репозиторий."
+msgstr "Creates a new Perl repository."
+
+msgid "Конструктор."
+msgstr "Constructor."
+
+msgid "Создаёт новый проект."
+msgstr "Creates a new project."
+
+msgid "Создаёт файл `minil.toml`."
+msgstr "Creates a file `minil.toml`."
+
+msgid "Создаёт `cpanfile`."
+msgstr "Creates `cpanfile`."
+
+msgid "Создает главный модуль."
+msgstr "Creates a main module."
+
+msgid "Зоздёт лицензию."
+msgstr "Will issue a license."
+
+msgid "Yaroslav O. Kosmina <dart@cpan.org>"
+msgstr "Yaroslav O. Kosmina <dart@cpan.org>"
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Liveman::Project module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Liveman::Project module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

@@ -2,3 +2,6 @@
 1.001 2023-06-14T10:46:01Z
 	* Initial release of a bcrypt utility in Perl
 
+1.002 2024-02-11T21:42:08Z
+	* refresh distro, update email addresses, move to BRIANDFOY
+

@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackde
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Data-Pretty-v0.1.7/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Data-Pretty-v0.1.8/README.md)
 
 ## Author
 

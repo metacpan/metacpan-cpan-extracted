@@ -14,7 +14,7 @@ Readonly::Array our @TYPES => qw(button checkbox color date datetime-local
 	email file hidden image month number password radio range reset search
 	submit tel text time url week);
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 has autofocus => (
 	is => 'ro',
@@ -49,6 +49,10 @@ has min => (
 );
 
 has name => (
+	is => 'ro',
+);
+
+has onclick => (
 	is => 'ro',
 );
 
@@ -158,6 +162,7 @@ Data::HTML::Element::Input - Data object for HTML form element.
  my $max = $obj->max;
  my $min = $obj->min;
  my $name = $obj->name;
+ my $onclick = $obj->onclick;
  my $placeholder = $obj->placeholder;
  my $readonly = $obj->readonly;
  my $required = $obj->required;
@@ -226,6 +231,12 @@ Default value is undef.
 =item * C<name>
 
 Input name.
+
+Default value is undef.
+
+=item * C<onclick>
+
+OnClick code.
 
 Default value is undef.
 
@@ -389,6 +400,14 @@ Get input name value.
 
 Returns string.
 
+=head2 C<onclick>
+
+ my $onclick = $obj->onclick;
+
+Get OnClick code.
+
+Returns string.
+
 =head2 C<placeholder>
 
  my $placeholder = $obj->placeholder;
@@ -522,6 +541,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.10
+0.11
 
 =cut

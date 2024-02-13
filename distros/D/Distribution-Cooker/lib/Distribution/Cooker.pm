@@ -4,7 +4,7 @@ use utf8;
 package Distribution::Cooker;
 use experimental qw(signatures);
 
-our $VERSION = '2.002';
+our $VERSION = '2.003';
 
 use Carp                  qw(croak carp);
 use Cwd;
@@ -140,7 +140,7 @@ sub cook ( $self ) {
 
 		my $contents = decode( 'UTF-8', Mojo::File->new( $file )->slurp );
 		my $rendered = $mt->vars(1)->render( $contents, $vars );
-		Mojo::File->new( $new_file )->spurt( encode( 'UTF-8', $rendered ) );
+		Mojo::File->new( $new_file )->spew( encode( 'UTF-8', $rendered ) );
 		}
 
 	make_path dirname($new);
@@ -346,7 +346,7 @@ sub _git_user_name {
 	}
 
 sub _git_user_email {
-	my $email = `git config user.name`;
+	my $email = `git config user.email`;
 	$email =~ s/\R//g;
 	trim( $email ) if defined $email;
 	$email;
@@ -618,11 +618,11 @@ This module is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2008-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2008-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

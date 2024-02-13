@@ -87,6 +87,12 @@ METHODS
 
     Overload a Config::Tiny configuration, return it as $app->cfg
 
+DEVELOPER NOTES
+    To package and publish this project to cpan
+
+    PERL5LIB="$PWD/local/lib/perl5" perl -I /opt/local/milla/lib/perl5 /opt/local/milla/bin/dzil build
+    PERL5LIB="$PWD/local/lib/perl5" perl -I /opt/local/milla/lib/perl5 /opt/local/milla/bin/dzil release 
+
 BACKWARDS COMPATIBILITY POLICY
     At least for now, in its early stages of development, this module should
     be considered experimental. EXPERIMENTAL features may be changed without
@@ -115,7 +121,7 @@ BUGS
     <http://github.com/hesco/Mojolicious-Plugin-INIConfig-Extended>
 
 COPYRIGHT & LICENSE
-    Copyright 2015 Hugh Esco and YMD Partners LLC, all rights reserved.
+    Copyright 2015-2024 Hugh Esco and YMD Partners LLC, all rights reserved.
 
     with appreciation to the original author for their work: 
     Copyright 2013 Yuki Kimoto, all rights reserved.

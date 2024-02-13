@@ -20,7 +20,9 @@ testin/decode-ascii.txt
 testin/decode-multibyte.txt
 testin/decode-singlebyte.txt
 testin/encode-ascii.txt
+testin/encode-mb-dispname.txt
 testin/encode-multibyte.txt
+testin/encode-sb-dispname.txt
 testin/encode-singlebyte.txt
 testin/encode-utf-8.txt
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,3 +1,8 @@
+0.03 2024-02-10T11:06:23+01:00
+ - Fix initialization of errors.
+ - Fix redirect after post.
+ - Sort constructor parameters in doc.
+
 0.02 2024-02-09T09:40:44+01:00
  - Fix dependency of Tags::HTML::ChangePassword.
 

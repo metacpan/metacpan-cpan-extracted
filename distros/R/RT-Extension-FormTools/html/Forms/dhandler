@@ -302,6 +302,15 @@ if ( $ARGS{Back} and $ARGS{Back} eq 'Back' ) {
         }
     }
 
+    # In case the URL is too long
+    if ( HTML::Mason::Commands->can('ShortenQuery') ) {
+        my $url   = RT->Config->Get('WebURL') . $base_path . $form_name . '/' . $back_page;
+        my $query = $m->comp( '/Elements/QueryString', %ARGS );
+        if ( length "$url?$query" >= 2000 ) {
+            %ARGS = ShortenQuery(%ARGS);
+        }
+    }
+
     # Redirect to the previous page
     MaybeRedirectForResults(
         Path      => $base_path . $form_name . '/' . $back_page,

@@ -4,7 +4,7 @@
       "Bart Lateur (bart.lateur@pandora.be)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -48,7 +48,7 @@
             "name" : "Bart Lateur"
          },
          {
-            "email" : "bdfoy@cpan.org",
+            "email" : "briandfoy@pobox.com",
             "github" : "https://github.com/briandfoy",
             "linkedin" : "https://www.linkedin.com/in/briandfoy/",
             "name" : "brian d foy",
@@ -63,10 +63,10 @@
       "homepage" : "https://github.com/briandfoy/string-sprintf",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/string-sprintf.git",
+         "url" : "https://github.com/briandfoy/string-sprintf",
          "web" : "https://github.com/briandfoy/string-sprintf"
       }
    },
-   "version" : "1.002",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "1.003",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,8 @@
 Revision history for Perl module Business::ISBN
 
+3.009 2024-02-10T21:46:10Z
+	* refresh distro, update email addresses, move to BRIANDFOY
+
 3.008 2023-03-23T19:56:57Z
 	* Fix test for GitHub #24. An ISBN that was invalid is now valid.
 

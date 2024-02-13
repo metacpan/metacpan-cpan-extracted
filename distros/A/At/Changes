@@ -1,5 +1,12 @@
 Revision history for Perl extension At.pm
 
+0.16 2024-02-11T00:04:55Z
+
+    - Work in progress: Refactor methods with more than one optional parameter to accept a hash
+    - Bluesky no longer requires an invite to create an account
+    - Update according to lexicon changes in bluesky-social/atproto@e4ec7af
+       - add date range and comment filter to queryModerationEvents endpoint
+
 0.15 2024-01-27T23:37:51Z
 
     - Minor bug sweep as I work on a functioning client

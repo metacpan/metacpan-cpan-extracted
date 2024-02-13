@@ -11,13 +11,14 @@ App::Greple::xlate - translation support module for greple
 
 # VERSION
 
-Version 0.29
+Version 0.30
 
 # DESCRIPTION
 
 **Greple** **xlate** module find desired text blocks and replace them by
 the translated text.  Currently DeepL (`deepl.pm`) and ChatGPT
-(`gpt3.pm`) module are implemeted as a back-end engine.
+(`gpt3.pm`) module are implemented as a back-end engine.
+Experimental support for gpt-4 is also included.
 
 If you want to translate normal text blocks in a document written in
 the Perl's pod style, use **greple** command with `xlate::deepl` and
@@ -88,7 +89,7 @@ text.
 - **--xlate-labor**
 - **--xlabor**
 
-    Insted of calling translation engine, you are expected to work for.
+    Instead of calling translation engine, you are expected to work for.
     After preparing text to be translated, they are copied to the
     clipboard.  You are expected to paste them to the form, copy the
     result to the clipboard, and hit return.

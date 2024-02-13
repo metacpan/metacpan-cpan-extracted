@@ -1,0 +1,4 @@
+GOOD
+('[B 90 / Die Grünen]', Charset => 'UTF-8', Minimal => 'DISPNAME')
+=?UTF-8?Q?=5BB?= 90 / Die =?UTF-8?Q?Gr=C3=BCnen=5D?=
+

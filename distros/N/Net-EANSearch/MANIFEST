@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README.md
+t/Net-EANSearch.t
+lib/Net/EANSearch.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -5,14 +5,31 @@ NAME
 
 VERSION
 
-    version 0.04
+    version 0.07
 
 SYNOPSIS
+
+    Original procedural interface:
 
      use Test2::V0;
      use Test2::Tools::PerlCritic;
      
      perl_critic_ok ['lib','t'], 'test library files';
+     
+     done_testing;
+
+    New OO interface:
+
+     use Test2::V0;
+     use Test2::Tools::PerlCritic ();
+     use Perl::Critic;
+     
+     my $test_critic = Test2::Tools::PerlCritic->new({
+       files     => ['lib','t'],
+       test_name => 'test library_files',
+     });
+     
+     $test_critic->perl_critic_ok;
      
      done_testing;
 
@@ -68,6 +85,84 @@ FUNCTIONS
     probably better to provide a list of paths, rather than make multiple
     calls.
 
+CONSTRUCTOR
+
+     my $test_critic = Test2::Tools::PerlCritic->new(\%properties);
+
+    Properties:
+
+    files
+
+      (REQUIRED)
+
+      List of files or directories. Directories will be recursively
+      searched for Perl files (.pm, .pl and .t).
+
+    critic
+
+      The Perl::Critic instance. One will be created if not provided.
+
+    test_name
+
+      The name of the test. This is used in diagnostics.
+
+METHODS
+
+ perl_critic_ok
+
+     $test_critic->perl_critic_ok;
+
+    The method version works just like the functional version above, except
+    it doesn't take any additional arguments.
+
+ add_hook
+
+     $test_critic->add_hook($hook_name, \&code);
+
+    Adds the given hook. Available hooks:
+
+    cleanup
+
+       $test_critic->add_hook(cleanup => sub ($test_critic, $global) {
+         ...
+       });
+
+      This hook is called when the Test2::Tools::PerlCritic instance is
+      destroyed.
+
+      If the hook is called during global destruction of the Perl
+      interpreter, $global will be set to a true value.
+
+      This hook can be set multiple times.
+
+    progressive_check
+
+       $test_critic->add_hook(progressive_check => sub ($test_critic, $policy, $file, $count) {
+         ...
+         return $bool;
+       });
+
+      This hook is made available for violations in existing code when new
+      policies are added. Passed in are the Test2::Tools::PerlCritic
+      instance, the policy name, the filename and the number of times the
+      violation was found. If the violations are from an old code base with
+      grandfathered allowed violations, this hook should return true, and
+      the violation will be reported as a note instead of diag and will not
+      cause the test as a whole to fail. Otherwise the violation will be
+      reported using diag and the test as a whole will fail.
+
+      This hook can only be set once.
+
+    violations
+
+       $test_critic->add_hook(violations => sub ($test_critic, @violations) {
+         ...
+       });
+
+      Each time violations are returned from "critique" in Perl::Critic,
+      they are passed into this hook as a list. The order and grouping of
+      violations may change in the future.
+
 CAVEATS
 
     Test::Perl::Critic has been around longer, and probably does at least
@@ -94,7 +189,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2019-2021 by Graham Ollis.
+    This software is copyright (c) 2019-2024 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

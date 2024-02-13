@@ -4,6 +4,10 @@ LICENSE
 META.json
 README.md
 cpanfile
+i18n/Liveman.ru-en.po
+i18n/Liveman/Append.ru-en.po
+i18n/Liveman/MinillaPod2Markdown.ru-en.po
+i18n/Liveman/Project.ru-en.po
 lib/Liveman.md
 lib/Liveman.pm
 lib/Liveman/Append.md

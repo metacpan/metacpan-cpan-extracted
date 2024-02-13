@@ -1,3 +1,7 @@
+0.22 2024-02-11T23:29:01+01:00
+ - Add check_length_fix().
+ - Add information about module version for checks in doc.
+
 0.21 2024-02-03T11:53:31+01:00
  - Add Mo::utils::CSS to SEE ALSO section in doc.
  - Add tests for error parameters.

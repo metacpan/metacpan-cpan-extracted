@@ -3,7 +3,7 @@ use strict;
 use Carp;
 
 use vars qw($VERSION);
-$VERSION     = '1.002';
+$VERSION     = '1.003';
 
 
 sub formatter {  # constructor
@@ -173,7 +173,7 @@ You tell me...?
 
 =head1 SUPPORT
 
-Currently maintained by brian d foy C<< <bdfoy@cpan.org> >> and hosted
+Currently maintained by brian d foy C<< <briandfoy@pobox.com> >> and hosted
 on GitHub (https://github.com/briandfoy/string-sprintf).
 
 =head1 AUTHOR
@@ -191,7 +191,7 @@ L<https://github.com/briandfoy/string-sprintf>
 
 =head1 LICENSE AND COPYRIGHT
 
-(c) Bart Lateur 2006.
+Copyright © Bart Lateur 2006.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

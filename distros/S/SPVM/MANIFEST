@@ -127,6 +127,7 @@ lib/SPVM/Builder/include/spvm_typedecl.h
 lib/SPVM/Builder/include/spvm_use.h
 lib/SPVM/Builder/include/spvm_var.h
 lib/SPVM/Builder/include/spvm_var_decl.h
+lib/SPVM/Builder/include/spvm_version.h
 lib/SPVM/Builder/include/spvm_vm.h
 lib/SPVM/Builder/include/spvm_weaken_backref.h
 lib/SPVM/Builder/include/spvm_yacc.h
@@ -942,6 +943,9 @@ t/04_spvmcc/lib/SPVM/MyExe/Foo/Bar.config
 t/04_spvmcc/lib/SPVM/MyExe/Foo/Bar.spvm
 t/04_spvmcc/lib/SPVM/MyExe/Precompile.spvm
 t/04_spvmcc/lib/SPVM/MyExeCompileError.spvm
+t/04_spvmcc/lib/SPVM/MyExeCompileError/MainHasArguments.spvm
+t/04_spvmcc/lib/SPVM/MyExeCompileError/MainInstantMethod.spvm
+t/04_spvmcc/lib/SPVM/MyExeCompileError/MainNotFound.spvm
 t/04_spvmcc/lib/SPVM/TestCase/NativeAPI2.c
 t/04_spvmcc/lib/SPVM/TestCase/NativeAPI2.config
 t/04_spvmcc/lib/SPVM/TestCase/NativeAPI2.native/include/bar.h

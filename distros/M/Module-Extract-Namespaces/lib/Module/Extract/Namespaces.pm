@@ -6,7 +6,7 @@ use strict;
 use warnings;
 no warnings;
 
-our $VERSION = '1.023';
+our $VERSION = '1.024';
 
 use Carp qw(croak);
 use File::Spec::Functions qw(splitdir catfile);
@@ -337,7 +337,7 @@ This code is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 This module was partially funded by The Perl Foundation
 (www.perlfoundation.org) and LogicLAB (www.logiclab.dk), both of whom
@@ -346,7 +346,7 @@ created this module.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2008-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2008-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the Artistic License 2.0.
 

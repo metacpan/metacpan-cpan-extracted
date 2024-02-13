@@ -9,7 +9,7 @@ Tk::YANoteBook - Yet another NoteBook widget
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 use Tk;
 require Tk::YANoteBook::NameTab;
@@ -61,7 +61,8 @@ Default value is the I<close_icon.xpm> in this distribution.
 
 =item Switch: B<-closetabcall>
 
-Calback, called before a tab is closed. Shoud return a boolean value.
+Calback, called when you press the close button on a tab. By default it calls B<deletePage>.
+If you replace it, you should call B<deletePage> in your callback for the page to actually be removed.
 
 =item Switch: B<-image>
 
@@ -198,7 +199,7 @@ sub Populate {
 		-autoupdate => ['METHOD', undef, undef, 1],
 		-backpagecolor => [{-background => $tabframe}, 'backPageColor', 'BackPageColor', '#8f8f8f'],
 		-closeimage => ['PASSIVE', undef, undef, $self->Pixmap(-file => Tk->findINC('close_icon.xpm'))],
-		-closetabcall => ['CALLBACK', undef, undef, sub { return 1 }],
+		-closetabcall => ['CALLBACK', undef, undef, ['deletePage', $self]],
 		-image => [$morebutton],
 		-onlyselect => ['PASSIVE', undef, undef, 1], 
 		-rigid => ['PASSIVE', undef, undef, 1], 
@@ -266,7 +267,7 @@ sub addPage {
 		-title => $title,
 		-background => $self->cget('-backpagecolor'),
 		-clickcall => ['ClickCall', $self],
-		-closecall => ['deletePage', $self],
+		-closecall => $self->cget('-closetabcall'),
 		-motioncall => ['MotionCall', $self],
 		-releasecall => ['ReleaseCall', $self],
 		-borderwidth => 1,
@@ -311,13 +312,14 @@ sub ClickCall {
 
 sub ConfigureCall {
 	my $self = shift;
-	# fixing deep recursion issue on UpdateTabs
-	my $afterid = $self->{'ccafterid'};
-
-	$self->afterCancel($afterid) if defined $afterid;
-
-	my $id = $self->after(10, [UpdateTabs => $self]);
-	$self->{'ccafterid'} = $id;
+	$self->UpdateTabs;
+#	# fixing deep recursion issue on UpdateTabs
+#	my $afterid = $self->{'ccafterid'};
+#
+#	$self->afterCancel($afterid) if defined $afterid;
+#
+#	my $id = $self->after(50, [UpdateTabs => $self]);
+#	$self->{'ccafterid'} = $id;
 }
 
 =item B<deletePage>I<($name)>
@@ -334,39 +336,36 @@ sub deletePage {
 		warn "Page '$name' does not exist\n";
 		return 0
 	}
-	if ($self->Callback('-closetabcall', $name)) {
-		my $newselect;
-		my $selected = $self->Selected;
-		if ((defined $selected) and ($self->Selected eq $name)) {
-			if ($self->pageCount > 1) {
-				my $pos = $self->tabPosition($name);
-				if (defined $pos) {
-					my $dp = $self->{DISPLAYED};
-					$newselect = $dp->[$pos + 1];
-					$newselect = $dp->[$pos - 1] unless ((defined $newselect) and ($pos > 1));
-				}
+	my $newselect;
+	my $selected = $self->Selected;
+	if ((defined $selected) and ($self->Selected eq $name)) {
+		if ($self->pageCount > 1) {
+			my $pos = $self->tabPosition($name);
+			if (defined $pos) {
+				my $dp = $self->{DISPLAYED};
+				$newselect = $dp->[$pos + 1];
+				$newselect = $dp->[$pos - 1] unless ((defined $newselect) and ($pos > 1));
 			}
-			$self->unselectPage;
 		}
-		if ($self->isDisplayed($name)) {
-			my $dp = $self->{DISPLAYED};
-			my ($pos) = grep { $dp->[$_] eq $name } 0 .. @$dp - 1;
-			splice(@$dp, $pos, 1);
-		} else {
-			my $ud = $self->{UNDISPLAYED};
-			my ($pos) = grep { $ud->[$_] eq $name } 0 .. @$ud - 1;
-			splice(@$ud, $pos, 1);
-		}
-		my $pg = delete $self->{PAGES}->{$name};
-		$pg->[0]->destroy;
-		$pg->[1]->destroy;
-		if ($self->autoupdate) {
-			$self->UpdateTabs;
-			$self->selectPage($newselect) if ((defined $newselect) and ($self->cget('-onlyselect')));
-		}
-		return 1
+		$self->unselectPage;
 	}
-	return 0
+	if ($self->isDisplayed($name)) {
+		my $dp = $self->{DISPLAYED};
+		my ($pos) = grep { $dp->[$_] eq $name } 0 .. @$dp - 1;
+		splice(@$dp, $pos, 1);
+	} else {
+		my $ud = $self->{UNDISPLAYED};
+		my ($pos) = grep { $ud->[$_] eq $name } 0 .. @$ud - 1;
+		splice(@$ud, $pos, 1);
+	}
+	my $pg = delete $self->{PAGES}->{$name};
+	$pg->[0]->destroy;
+	$pg->[1]->destroy;
+	if ($self->autoupdate) {
+		$self->UpdateTabs;
+		$self->selectPage($newselect) if ((defined $newselect) and ($self->cget('-onlyselect')));
+	}
+	return 1
 }
 
 =item B<getPage>I<($name)>
@@ -412,23 +411,22 @@ sub IsFull {
 	my ($self, $newtab) = @_;
 	my $last = $self->lastDisplayed;
 	if (defined $last) {
+		my $baroffset = 6;
 		my $tab = $self->getTab($last);
 		if (($self->{TABSIDE} eq 'top') or ($self->{TABSIDE} eq 'bottom')) {
 			my $tabwidth = $tab->reqwidth;
 			$tabwidth = $tab->width unless defined $tabwidth;
-			my $pos = $tab->x + $tabwidth;
+			my $pos = $tab->x + $tabwidth + $baroffset;
 			$pos = $pos + $newtab->reqwidth if defined $newtab;
-			my $tabbarwidth = $self->Subwidget('TabFrame')->width - 50;
-			$tabbarwidth = $tabbarwidth + $self->Subwidget('MoreButton')->width if (($self->{MOREBUTTONISPACKED}) and (defined $newtab));
+			my $tabbarwidth = $self->Subwidget('TabFrame')->width;
 			return $pos >= $tabbarwidth
 		} else {
 			my $tabheight = $tab->reqheight;
 			$tabheight = $tab->height unless defined $tabheight;
-			my $pos = $tab->y + $tabheight;
+			my $pos = $tab->y + $tabheight + $baroffset;
 			$pos = $pos + $newtab->reqheight if defined $newtab;
 			my $bar = $self->Subwidget('TabFrame');
-			my $tabbarheight = $self->Subwidget('TabFrame')->height - 20;
-			$tabbarheight = $tabbarheight + $self->Subwidget('MoreButton')->height if (($self->{MOREBUTTONISPACKED}) and (defined $newtab));
+			my $tabbarheight = $self->Subwidget('TabFrame')->height;
 			return $pos >= $tabbarheight
 		}
 	}
@@ -785,3 +783,10 @@ Unknown. If you find any, please contact the author.
 =cut
 
 1;
+
+
+
+
+
+
+

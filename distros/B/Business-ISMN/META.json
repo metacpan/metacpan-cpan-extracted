@@ -1,10 +1,10 @@
 {
    "abstract" : "work with International Standard Music Numbers",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.68, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -54,6 +54,6 @@
          "web" : "https://github.com/briandfoy/business-ismn"
       }
    },
-   "version" : "1.203",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "1.204",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

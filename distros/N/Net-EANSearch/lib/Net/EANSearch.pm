@@ -1,0 +1,274 @@
+package Net::EANSearch;
+
+use 5.030000;
+use strict;
+use warnings;
+
+use WWW::Curl::Easy;
+use JSON;
+use URL::Encode;
+use MIME::Base64 qw(decode_base64);
+
+require Exporter;
+
+our @ISA = qw(Exporter);
+
+# Items to export into callers namespace by default. Note: do not export
+# names by default without a very good reason. Use EXPORT_OK instead.
+# Do not simply export all your public functions/methods/constants.
+
+# This allows declaration	use Net::EANSearch ':all';
+# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
+# will save memory.
+our %EXPORT_TAGS = ( 'all' => [ qw(
+	
+) ] );
+
+our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+
+our @EXPORT = qw(
+	
+);
+
+our $VERSION = '1.00';
+
+our $ALL_LANGUAGES = 99;
+our $ENGLISH = 1;
+our $DANISH = 2;
+our $GERMAN = 3;
+our $SPANISH = 4;
+our $FINISH = 5;
+our $FRENCH = 6;
+our $HUNGARIAN = 7;
+our $ITALIAN = 8;
+our $JAPANESE = 9;
+our $DUTCH = 10;
+our $NORWEGIAN = 11;
+our $POLISH = 12;
+our $PORTGUESE = 13;
+our $SWEDISH = 15;
+our $CHECH = 16;
+our $CROATIAN = 18;
+our $ROMAINAN = 19;
+our $BULGARIAN = 20;
+our $GREEK = 21;
+
+my $BASE_URI = 'https://api.ean-search.org/api?token=';
+
+sub new {
+	my $class = shift;
+	my $token = shift;
+
+	my $curl = WWW::Curl::Easy->new;
+	my @myheaders = ('Accept: application/json');
+	$curl->setopt(CURLOPT_HTTPHEADER, \@myheaders);
+	$curl->setopt(CURLOPT_ACCEPT_ENCODING, 'gzip, deflate');
+	$curl->setopt(CURLOPT_SSL_VERIFYPEER, 0); # TODO set better cert store instead ?
+
+	my $self = bless { base_uri => $BASE_URI . $token, curl => $curl }, $class;
+
+    return $self;
+}
+
+sub barcodeLookup {
+	my $self = shift;
+	my $ean = shift;
+	my $lang = shift || 1;
+
+	my $json_str = $self->_apiCall($self->{base_uri} . "&op=barcode-lookup&ean=$ean&language=$lang");
+	my $json = decode_json($json_str);
+	return $json->[0];
+}
+
+sub isbnLookup {
+	my $self = shift;
+	my $isbn = shift;
+	my $lang = shift || 1;
+
+	my $json_str = $self->_apiCall($self->{base_uri} . "&op=barcode-lookup&isbn=$isbn&language=$lang");
+	my $json = decode_json($json_str);
+	return $json->[0];
+}
+
+sub barcodePrefixSearch {
+	my $self = shift;
+	my $prefix = shift;
+	my $lang = shift || 1;
+	my $page = shift || 1;
+
+	my $json_str = $self->_apiCall($self->{base_uri} . "&op=barcode-prefix-search&page=$page&language=$lang&prefix=$prefix");
+	my $json = decode_json($json_str);
+	return @{ $json->{productlist} };
+}
+
+sub productSearch {
+	my $self = shift;
+	my $kw = shift;
+	my $lang = shift || 1;
+	my $page = shift || 1;
+
+	my $json_str = $self->_apiCall($self->{base_uri} . "&op=product-search&page=$page&language=$lang&name="
+		. URL::Encode::url_encode_utf8($kw));
+	my $json = decode_json($json_str);
+	return @{ $json->{productlist} };
+}
+
+sub categorySearch {
+	my $self = shift;
+	my $category = shift;
+	my $kw = shift;
+	my $lang = shift || 1;
+	my $page = shift || 1;
+
+	my $json_str = $self->_apiCall($self->{base_uri} . "&op=category-search&category=$category"
+		. "&page=$page&language=$lang&name=" . URL::Encode::url_encode_utf8($kw));
+	my $json = decode_json($json_str);
+	return @{ $json->{productlist} };
+}
+
+sub issuingCountry {
+	my $self = shift;
+	my $ean = shift;
+
+	my $json_str = $self->_apiCall($self->{base_uri} . "&op=issuing-country&ean=$ean");
+	my $json = decode_json($json_str);
+	return $json->[0]->{issuingCountry};
+}
+
+sub barcodeImage {
+	my $self = shift;
+	my $ean = shift;
+	my $width = shift || 102;
+	my $height = shift || 50;
+
+	my $json_str = $self->_apiCall($self->{base_uri} . "&op=barcode-image&ean=$ean&width=$width&height=$height");
+	my $json = decode_json($json_str);
+	return decode_base64($json->[0]->{barcode});
+}
+
+sub verifyChecksum {
+	my $self = shift;
+	my $ean = shift;
+
+	my $json_str = $self->_apiCall($self->{base_uri} . "&op=verify-checksum&ean=$ean");
+	my $json = decode_json($json_str);
+	return $json->[0]->{valid} + 0;
+}
+
+sub _apiCall {
+	my $self = shift;
+	my $url = shift;
+
+	$self->{curl}->setopt(CURLOPT_URL, $url);
+	my $result;
+	$self->{curl}->setopt(CURLOPT_WRITEDATA, \$result);
+	my $retcode = $self->{curl}->perform;
+	if (!defined($result) || $retcode != 0) {
+		print STDERR 'Network error: ' . $self->{curl}->strerror($retcode) . "\n";
+		return undef;
+	} else {
+		return $result;
+	}
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Net::EANSearch - Perl module for EAN and ISBN lookup and validation using the API on L<https://www.ean-search.org>
+
+=head1 SYNOPSIS
+
+  use Net::EANSearch;
+
+  my $eansearch = EANSearch->new($API_TOKEN);
+
+  my $product = $eansearch->barcodeLookup(5099750442227);
+
+=head1 DESCRIPTION
+
+C<Net::EANSearch> is a class used to search the ean-search.org barcode database by EAN, ISBN or keyword.
+
+=head2 METHODS
+
+=over 4
+
+=item new($token)
+
+Constructs a new C<Net::EANSearch> object, used to send queries.
+Set the API token used for all subsequent queries.
+
+=item barcodeLookup($ean [, $language])
+
+Search the database for an EAN barcode.
+
+Optionally, you can specify a preferred language for the result. See appendix B in the manual for all supported language codes.
+
+=item isbnLookup($isbn)
+
+Search for an ISBN number (ISBN-10 or ISBN-13 format).
+
+=item barcodePrefixSearch($prefix [, $language, $page])
+
+Search for all EANs starting with a certain prefix.
+
+Optionally, you can specify a preferred language for the results.
+
+If there are many results, you may need to page through the results to retrieve them all. Page numbers start at 1.
+
+=item productSearch($name [, $language, $page])
+
+Search a certain product category for a product name or keyword. See appendix C in the API manual for category numbers.
+
+Optionally, you can specify a preferred language for the results.
+
+If there are many results, you may need to page through the results to retrieve them all. Page numbers start at 1.
+
+=item categorySearch($category, $name [, $language, $page])
+
+Search the database by product name or keyword.
+
+Optionally, you can specify a preferred language for the results.
+
+If there are many results, you may need to page through the results to retrieve them all. Page numbers start at 1.
+
+=item issuingCountry($ean)
+
+Look up the country where the EAN code was registered. This may or may not be the country where the product was manufactured.
+
+=item barcodeImage($ean [, $width, $height])
+
+Generate a PNG image with the barcode for the EAN number.
+
+=item verifyChecksum($ean)
+
+Verify if the checksum in the EAN numnber is valid.
+
+=back
+
+=head1 HOMEPAGE
+
+The EAN database is hosted at L<https://www.ean-search.org>.
+
+For API keys visit L<https://www.ean-search.org/ean-database-api.html>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/eansearch/perl-ean-search>.
+
+=head1 AUTHOR
+
+Relaxed Communications GmbH, E<lt>info@relaxedcommunications.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2024 by Relaxed Communications GmbH, E<lt>info@relaxedcommunications.comE<gt>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.30.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+

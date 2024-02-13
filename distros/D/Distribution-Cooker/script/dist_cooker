@@ -16,6 +16,8 @@ dist_cooker - create a Perl distribution skeleton from personal templates
 
 	# from the command line, to create a distribution for Module::Name
 	% dist_cooker Module::Name
+	Description> ...
+	Repository> ...
 
 =head1 DESCRIPTION
 
@@ -38,11 +40,51 @@ these template variables:
 
 =over 4
 
-=item module      => the package name (Foo::Bar)
+=item author_name    => the name of the module author
 
-=item module_file => module file name (Bar.pm)
+The author name is the first true value of the DIST_COOKER_AUTHOR
+environment variable, the value of `git config user.name`, or a
+default value.
 
-=item module_dist => the distribution name (Foo-Bar)
+=item cooker_version => version of Distribution::Cooker
+
+=item cwd            => the current working directory of the new module
+
+=item description    => the module description
+
+Taken from the prompt
+
+=item dir            => path to module file
+
+Derived from the module name
+
+=item dist           => dist name (Foo-Bar)
+
+Derived from the module name
+
+=item email          => author email
+
+The author name is the first true value of the DIST_COOKER_EMAIL
+environment variable, the value of `git config user.email`, or a
+default value.
+
+=item module         => the package name (Foo::Bar)
+
+Taken from the command-line arguments
+
+=item module_path    => module path under lib/ (Foo/Bar.pm)
+
+Derived from the module name
+
+=item repo_name      => lowercase module with hyphens (foo-bar)
+
+Taken from the prompt
+
+=item template_path  => the source of the template files
+
+Taken from the configuration
+
+=item year           => the current year
 
 =back
 
@@ -70,11 +112,11 @@ This module is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2008-2023, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2008-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

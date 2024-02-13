@@ -7,9 +7,9 @@ use warnings;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-30'; # DATE
+our $DATE = '2024-02-10'; # DATE
 our $DIST = 'Term-Detect-Software'; # DIST
-our $VERSION = '0.225'; # VERSION
+our $VERSION = '0.227'; # VERSION
 
 our @EXPORT_OK = qw(detect_terminal detect_terminal_cached);
 
@@ -176,8 +176,13 @@ sub detect_terminal {
             last DETECT;
         }
 
+      DETECT_VIA_PS:
         {
+            # TODO: check under windows, because Proc::ProcessTable also works
+            # under windows
             last if $^O =~ /Win/;
+
+            last unless $ENV{PERL_TERM_DETECT_SOFTWARE_CHECK_PS};
 
             require Proc::Find::Parents;
             my $ppids = Proc::Find::Parents::get_parent_processes();
@@ -215,7 +220,7 @@ sub detect_terminal {
             }
         }
 
-        # generic
+      DETECT_GENERIC:
         {
             unless (exists $info->{color_depth}) {
                 if ($ENV{TERM} =~ /256color/) {
@@ -268,7 +273,7 @@ Term::Detect::Software - Detect terminal (emulator) software and its capabilitie
 
 =head1 VERSION
 
-This document describes version 0.225 of Term::Detect::Software (from Perl distribution Term-Detect-Software), released on 2024-01-30.
+This document describes version 0.227 of Term::Detect::Software (from Perl distribution Term-Detect-Software), released on 2024-02-10.
 
 =head1 SYNOPSIS
 
@@ -369,7 +374,28 @@ we shouldn't display Unicode characters. Another example is color depth:
 Term::Terminfo currently doesn't recognize Konsole's 24bit color support and
 only gives C<max_colors> 256.
 
+=head2 Which terminal software are detected?
+
+See L</PERL_TERM_DETECT_SOFTWARE_ENGINE>.
+
+=head2 Why is my terminal software not detected?
+
+By default, some software are not detected because the heuristics to do so is
+considered rather costly. This includes detecting gnome-terminal, rxvt, mrxvt,
+st, pterm/putty, xvt via checking process name, because listing all processes
+and their details costs tens to hundreds of milliseconds. See
+L</PERL_TERM_DETECT_SOFTWARE_CHECK_PS> to enable it.
+
 =head1 ENVIRONMENT
+
+=head2 PERL_TERM_DETECT_SOFTWARE_CHECK_PS
+
+By default, some software are not detected because the heuristics to do so is
+considered rather costly. This includes detecting gnome-terminal, rxvt, mrxvt,
+st, pterm/putty, xvt via checking process name, because listing all processes
+and their details costs tens to hundreds of milliseconds. To enable this
+checking, set this environment variable to true and install the optional
+dependency L<Proc::Find::Parents>.
 
 =head2 PERL_TERM_DETECT_SOFTWARE_ENGINE
 

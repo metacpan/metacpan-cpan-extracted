@@ -5,8 +5,8 @@ use Test::More;
 my $file = 'CITATION.cff';
 
 SKIP: {
-	my $rc = eval { require YAML; 1 };
-	skip 'Need YAML to test CITATIONS.cff', 1 unless $rc;
+	my $rc = eval { require YAML; YAML->VERSION('1.26'); 1 };
+	skip "Need YAML to test $file", 1 unless $rc;
 
 	subtest citations => sub {
 		ok( -e $file, "$file exists" );

@@ -1,5 +1,13 @@
 Revision history for Perl extension DBD::Excel.
 
+0.07  2024-02-12
+    - added GitHub repo
+    - added some tests
+    - POD improvements, RT #9374
+    - improve distribution folder layout
+    - fix RT #26016: added license information to Makefile.PL
+    - fix RT #3176: added SQL::Statement requirement to Makefile.PL
+
 0.06  Tue Nov 12 19:30 2002
     - Fix Excel.pm    : prefix xlt_ -> xl_
                         ex_dir -> xl_dir (Thank you, Dong Wang)

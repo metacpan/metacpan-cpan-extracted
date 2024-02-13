@@ -10,6 +10,7 @@ my %modules;
 my $post_diag;
 
 $modules{$_} = $_ for qw(
+  Class::Tiny
   ExtUtils::MakeMaker
   Path::Tiny
   Perl::Critic

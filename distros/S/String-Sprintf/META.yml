@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ resources:
       email: bart.lateur@pandora.be
       name: 'Bart Lateur'
     -
-      email: bdfoy@cpan.org
+      email: briandfoy@pobox.com
       github: https://github.com/briandfoy
       linkedin: https://www.linkedin.com/in/briandfoy/
       name: 'brian d foy'
@@ -35,6 +35,6 @@ resources:
   X_doi: 10.5281/zenodo.5912465
   bugtracker: https://github.com/briandfoy/string-sprintf/issues
   homepage: https://github.com/briandfoy/string-sprintf
-  repository: https://github.com/briandfoy/string-sprintf.git
-version: '1.002'
+  repository: https://github.com/briandfoy/string-sprintf
+version: '1.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

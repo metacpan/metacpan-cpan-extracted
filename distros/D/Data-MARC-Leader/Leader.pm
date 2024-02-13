@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Mo qw(build is);
-use Mo::utils qw(check_strings);
+use Mo::utils 0.22 qw(check_length_fix check_strings);
 use Readonly;
 
 Readonly::Array our @BIBLIOGRAPHIC_LEVEL => qw(a b c d i m s);
@@ -22,7 +22,7 @@ Readonly::Array our @TYPE => qw(a c d e f g i j k m o p r t);
 Readonly::Array our @TYPE_OF_CONTROL => (' ', 'a');
 Readonly::Array our @UNDEFINED => ('0');
 
-our $VERSION = 0.04;
+our $VERSION = 0.06;
 
 has bibliographic_level => (
 	is => 'ro',
@@ -61,6 +61,10 @@ has length_of_field_portion_len => (
 );
 
 has multipart_resource_record_level => (
+	is => 'ro',
+);
+
+has raw => (
 	is => 'ro',
 );
 
@@ -118,6 +122,9 @@ sub BUILD {
 	check_strings($self, 'multipart_resource_record_level',
 		\@MULTIPART_RESORCE_RECORD_LEVEL);
 
+	# Check raw.
+	check_length_fix($self, 'raw', 24);
+
 	# Check starting_char_pos_portion_len.
 	check_strings($self, 'starting_char_pos_portion_len',
 		\@STARTING_CHAR_POS_PORTION_LEN);
@@ -167,6 +174,7 @@ Data::MARC::Leader - Data object for MARC leader.
  my $length = $obj->length;
  my $length_of_field_portion_len = $obj->length_of_field_portion_len;
  my $multipart_resource_record_level = $obj->multipart_resource_record_level;
+ my $raw = $obj->raw;
  my $starting_char_pos_portion_len = $obj->starting_char_pos_portion_len;
  my $status = $obj->status;
  my $subfield_code_count = $obj->subfield_code_count;
@@ -241,6 +249,12 @@ Default values is undef.
 =item * C<multipart_resource_record_level>
 
 Multipart resource record level.
+
+Default values is undef.
+
+=item * C<raw>
+
+Raw leader value.
 
 Default values is undef.
 
@@ -364,6 +378,14 @@ Get multipart resource record level.
 
 Returns character.
 
+=head2 C<raw>
+
+ my $raw = $obj->raw;
+
+Get raw leader value.
+
+Returns string.
+
 =head2 C<starting_char_pos_portion_len>
 
  my $starting_char_pos_portion_len = $obj->starting_char_pos_portion_len;
@@ -439,6 +461,8 @@ Returns character.
          Parameter 'multipart_resource_record_level' must be one of defined strings.
                  String: %s
                  Possible strings: ' ' a b c
+         Parameter 'raw' has length different than '24'.
+                 Value: %s
          Parameter 'starting_char_pos_portion_len' must be one of defined strings.
                  String: %s
                  Possible strings: 5
@@ -479,6 +503,7 @@ Returns character.
          'length' => 2200,
          'length_of_field_portion_len' => '4',
          'multipart_resource_record_level' => ' ',
+         'raw' => '02200cem a2200541 i 4500',
          'starting_char_pos_portion_len' => '5',
          'status' => 'c',
          'subfield_code_count' => '2',
@@ -511,6 +536,7 @@ Returns character.
  #         length                            2200,
  #         length_of_field_portion_len       4,
  #         multipart_resource_record_level   " ",
+ #         raw                               "02200cem a2200541 i 4500",
  #         starting_char_pos_portion_len     5,
  #         status                            "c",
  #         subfield_code_count               2,
@@ -544,6 +570,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.06
 
 =cut

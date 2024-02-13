@@ -39,7 +39,7 @@ diag( "Testing App::Pod $App::Pod::VERSION, Perl $], $^X" );
 }
 
 
-my $sample_pod        = catfile( $RealDir, qw( cpan Mojo UserAgent.pm ) );
+my $sample_pod        = catfile( $RealDir, qw( cpan Mojo2 UserAgent.pm ) );
 my $windows_safe_path = $sample_pod =~ s&(\\)&\\$1&gr;
 
 ok( -f $sample_pod, "pod file exists: $sample_pod" );
@@ -182,8 +182,8 @@ my @cases = (
     },
     {
         name =>
-          "class_options - Mojo::UserAgent (flush to avoid last run cache)",
-        input           => [qw( Mojo::UserAgent --class_options --flush )],
+          "class_options - Mojo2::UserAgent (flush to avoid last run cache)",
+        input           => [qw( Mojo2::UserAgent --class_options --flush )],
         expected_output => [
             qw{
               BEGIN
@@ -254,9 +254,9 @@ my @cases = (
         ],
     },
     {
-        name            => "class_options - Mojo::UserAgent2",
-        input           => [qw( Mojo::UserAgent2 --class_options )],
-        expected_output => [ "", "Class not found: Mojo::UserAgent2" ],
+        name            => "class_options - Mojo2::UserAgent2",
+        input           => [qw( Mojo2::UserAgent2 --class_options )],
+        expected_output => [ "", "Class not found: Mojo2::UserAgent2" ],
     },
 
     # --class_options --tool_options
@@ -291,8 +291,8 @@ my @cases = (
         ],
     },
     {
-        name  => "class_options, tool_options - Mojo::UserAgent",
-        input => [qw( Mojo::UserAgent --class_options --tool_options )],
+        name  => "class_options, tool_options - Mojo2::UserAgent",
+        input => [qw( Mojo2::UserAgent --class_options --tool_options )],
         expected_output => [
             "--all",              "--class_options",
             "--co",               "--dd",
@@ -340,8 +340,8 @@ my @cases = (
         ],
     },
     {
-        name  => "class_options, tool_options - Mojo::UserAgent2",
-        input => [qw( Mojo::UserAgent2 --class_options --tool_options )],
+        name  => "class_options, tool_options - Mojo2::UserAgent2",
+        input => [qw( Mojo2::UserAgent2 --class_options --tool_options )],
         expected_output => [
             "--all",      "--class_options",
             "--co",       "--dd",
@@ -354,13 +354,13 @@ my @cases = (
             "-d",         "-e",
             "-f",         "-h",
             "-q",         "-v",
-            "",           'Class not found: Mojo::UserAgent2'
+            "",           'Class not found: Mojo2::UserAgent2'
         ],
     },
     {
-        name  => "class_options, tool_options - Mojo::UserAgent2, no_error",
+        name  => "class_options, tool_options - Mojo2::UserAgent2, no_error",
         input =>
-          [qw( Mojo::UserAgent2 --class_options --tool_options --no_error )],
+          [qw( Mojo2::UserAgent2 --class_options --tool_options --no_error )],
         expected_output => [
             "--all",  "--class_options", "--co",       "--dd",
             "--doc",  "--dump",          "--edit",     "--flush_cache",
@@ -435,17 +435,17 @@ my @cases = (
         ],
     },
     {
-        name            => "Module - Mojo::UserAgent",
-        input           => [qw( Mojo::UserAgent )],
+        name            => "Module - Mojo2::UserAgent",
+        input           => [qw( Mojo2::UserAgent )],
         expected_output => [
             '',
-            'Package: Mojo::UserAgent',
+            'Package: Mojo2::UserAgent',
             'Path:    <PATH>',
             '',
             'Mojo::UserAgent - Non-blocking I/O HTTP and WebSock ...',
             '',
             'Inheritance (3):',
-            ' Mojo::UserAgent',
+            ' Mojo2::UserAgent',
             ' Mojo::EventEmitter',
             ' Mojo::Base',
             '',
@@ -538,13 +538,13 @@ my @cases = (
     # --query good
     {
         name            => "query",
-        input           => [qw( Mojo::UserAgent --query head1[0]/Para )],
+        input           => [qw( Mojo2::UserAgent --query head1[0]/Para )],
         expected_output =>
           ["Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent"],
     },
     {
         name            => "query TOC",
-        input           => [qw( Mojo::UserAgent --query head1 )],
+        input           => [qw( Mojo2::UserAgent --query head1 )],
         expected_output => [
             "NAME",       "SYNOPSIS", "DESCRIPTION", "EVENTS",
             "ATTRIBUTES", "METHODS",  "DEBUGGING",   "SEE ALSO"
@@ -552,19 +552,19 @@ my @cases = (
     },
     {
         name            => "query with class at end",
-        input           => [qw( --query head1[0]/Para Mojo::UserAgent )],
+        input           => [qw( --query head1[0]/Para Mojo2::UserAgent )],
         expected_output =>
           ["Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent"],
     },
     {
         name            => "query with class at end and method",
-        input           => [qw( --query head1[0]/Para Mojo::UserAgent get )],
+        input           => [qw( --query head1[0]/Para Mojo2::UserAgent get )],
         expected_output =>
           ["Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent"],
     },
     {
-        name            => "query_dump",
-        input           => [qw( Mojo::UserAgent --query head1[0]/Para --dump )],
+        name  => "query_dump",
+        input => [qw( Mojo2::UserAgent --query head1[0]/Para --dump )],
         expected_output => [
             "_process_non_main()",
             "Processing: query",
@@ -581,7 +581,7 @@ my @cases = (
             "self={",
             "  \"_args\" => [],",
             "  \"_cache_path\" => \"PATH\",",
-            "  \"_class\" => \"Mojo::UserAgent\",",
+            "  \"_class\" => \"Mojo2::UserAgent\",",
             "  \"_core_flags\" => [],",
             "  \"_method\" => undef,",
             "  \"_non_main_flags\" => [",
@@ -667,11 +667,11 @@ my @cases = (
 
     # Specific modules.
     {
-        name            => "Module - Mojo::File",
-        input           => [qw( Mojo::File )],
+        name            => "Module - Mojo:2:File",
+        input           => [qw( Mojo2::File )],
         expected_output => [
             q(),
-            q(Package: Mojo::File),
+            q(Package: Mojo2::File),
             q(Path:    <PATH>),
             q(),
             q(Mojo::File - File system paths),
@@ -714,22 +714,21 @@ my @cases = (
         ],
     },
     {
-        name            => "Module - Mojo::File --all",
-        input           => [qw( Mojo::File --all )],
+        name            => "Module - Mojo2::File --all",
+        input           => [qw( Mojo2::File --all )],
         expected_output => [
             q(),
-            q(Package: Mojo::File),
+            q(Package: Mojo2::File),
             q(Path:    <PATH>),
             q(),
             q(Mojo::File - File system paths),
             q(),
-            q(Methods (57):),
+            q(Methods (55):),
             q{ (""},
             q{ ((},
             q{ ()},
             q{ (@{}},
             q{ (bool},
-            q( AUTOLOAD),
             q( BEGIN),
             q( EXPORT),
             q( EXPORT_OK),
@@ -738,7 +737,6 @@ my @cases = (
             q( __ANON__),
             q( abs2rel),
             q( basename              - Return the last level of t ...),
-            q( can),
             q( canonpath),
             q( catfile),
             q( child                 - Return a new Mojo::File ob ...),
@@ -821,6 +819,7 @@ for my $case ( @cases ) {
     }
 
     say STDERR _dumper \@lines
+      and last
       unless is_deeply( \@lines, $case->{expected_output}, $case->{name} );
 }
 

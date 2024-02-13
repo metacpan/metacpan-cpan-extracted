@@ -1993,6 +1993,12 @@ static void SetAttribute(pTHX_ struct PackageInfo *info,Image *image,
           }
           break;
         }
+      if (LocaleNCompare(attribute,"registry:",9) == 0)
+        {
+          (void) SetImageRegistry(StringRegistryType,attribute+9,SvPV(sval,na),
+            exception);
+          break;
+        }
       if (LocaleCompare(attribute,"render") == 0)
         {
           sp=SvPOK(sval) ? ParseCommandOption(MagickIntentOptions,MagickFalse,
@@ -2156,6 +2162,13 @@ static void SetAttribute(pTHX_ struct PackageInfo *info,Image *image,
             limit=(MagickSizeType) SiPrefixToDoubleInterval(SvPV(sval,na),
               100.0);
           (void) SetMagickResourceLimit(TimeResource,limit);
+          break;
+        }
+      if (LocaleCompare(attribute,"title") == 0)
+        {
+          for ( ; image; image=image->next)
+            (void) CopyMagickString(image->magick_filename,SvPV(sval,na),
+              MaxTextExtent);
           break;
         }
       if (LocaleCompare(attribute,"transparent-color") == 0)
@@ -5626,6 +5639,18 @@ Get(ref,...)
               PUSHs(s ? sv_2mortal(s) : &sv_undef);
               continue;
             }
+          if (LocaleNCompare(attribute,"registry:",9) == 0)
+            {   
+              const char
+                *value;
+        
+              value=(const char *) GetImageRegistry(StringRegistryType,
+                attribute+9,exception);
+              if (value != (const char *) NULL)
+                s=newSVpv(value,0);
+              PUSHs(s ? sv_2mortal(s) : &sv_undef);
+              continue;
+            }
           if (LocaleCompare(attribute,"rows") == 0)
             {
               if (image != (Image *) NULL)
@@ -5707,6 +5732,13 @@ Get(ref,...)
             {
               if (info && info->image_info->texture)
                 s=newSVpv(info->image_info->texture,0);
+              PUSHs(s ? sv_2mortal(s) : &sv_undef);
+              continue;
+            }
+          if (LocaleCompare(attribute,"title") == 0)
+            {
+              if (image != (Image *) NULL)
+                s=newSVpv(image->magick_filename,0);
               PUSHs(s ? sv_2mortal(s) : &sv_undef);
               continue;
             }

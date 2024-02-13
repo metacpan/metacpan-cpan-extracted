@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.059     2024-02-10 02:29:14Z
+          - now being more strict on conversions from LWP and Plack
+            requests/responses to Mojolicious types
+
 0.058     2024-01-18 04:37:30Z
           - bump internal version requirement for Math::BigInt
 

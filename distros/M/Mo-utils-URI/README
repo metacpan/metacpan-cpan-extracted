@@ -1,0 +1,203 @@
+NAME
+    Mo::utils::URI - Mo utilities for URI.
+
+SYNOPSIS
+     use Mo::utils::URI qw(check_location check_uri check_url);
+
+     check_location($self, $key);
+     check_uri($self, $key);
+     check_url($self, $key);
+
+DESCRIPTION
+    Mo utilities for URI checking of data objects.
+
+SUBROUTINES
+  "check_location"
+     check_location($self, $key);
+
+    Check parameter defined by $key which is valid location. Could be URL or
+    absolute or relative path.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+  "check_uri"
+     check_uri($self, $key);
+
+    Check parameter defined by $key which is valid URI.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+  "check_url"
+     check_url($self, $key);
+
+    Check parameter defined by $key which is valid URL.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+ERRORS
+     check_location():
+             Parameter '%s' doesn't contain valid location.
+                     Value: %s
+
+     check_uri():
+             Parameter '%s' doesn't contain valid URI.
+                     Value: %s
+
+     check_url():
+             Parameter '%s' doesn't contain valid URL.
+                     Value: %s
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Mo::utils::URI qw(check_location);
+
+     my $self = {
+             'key' => 'https://skim.cz',
+     };
+     check_uri($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::URI qw(check_uri);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'urn:isbn:9788072044948',
+     };
+     check_uri($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..utils.pm:?] Parameter 'key' doesn't contain valid location.
+
+EXAMPLE3
+     use strict;
+     use warnings;
+
+     use Mo::utils::URI qw(check_uri);
+
+     my $self = {
+             'key' => 'https://skim.cz',
+     };
+     check_uri($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE4
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::URI qw(check_uri);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'bad_uri',
+     };
+     check_uri($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..utils.pm:?] Parameter 'key' doesn't contain valid URI.
+
+EXAMPLE5
+     use strict;
+     use warnings;
+
+     use Mo::utils::URI qw(check_url);
+
+     my $self = {
+             'key' => 'https://skim.cz',
+     };
+     check_url($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE6
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::URI qw(check_url);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'bad_uri',
+     };
+     check_uri($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..utils.pm:?] Parameter 'key' doesn't contain valid URL.
+
+DEPENDENCIES
+    Data::Validate::URI, Error::Pure, Exporter, Readonly, URI.
+
+SEE ALSO
+    Mo  Micro Objects. Mo is less.
+
+    Mo::utils::CSS
+        Mo CSS utilities.
+
+    Mo::utils::Date
+        Mo date utilities.
+
+    Mo::utils::Language
+        Mo language utilities.
+
+    Mo::utils::Email
+        Mo utilities for email.
+
+    Wikibase::Datatype::Utils
+        Wikibase datatype utilities.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Mo-utils-URI>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

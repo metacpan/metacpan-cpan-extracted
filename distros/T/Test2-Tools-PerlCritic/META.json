@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -26,10 +26,17 @@
          }
       },
       "develop" : {
+         "recommends" : {
+            "Dist::Zilla::Plugin::Author::Plicease::Core" : "0",
+            "Dist::Zilla::Plugin::Author::Plicease::Upload" : "0",
+            "Dist::Zilla::Plugin::MetaNoIndex" : "0",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.69",
+            "Software::License::Perl_5" : "0"
+         },
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
-            "Test2::V0" : "0.000060",
+            "Test2::V0" : "0.000121",
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
@@ -45,19 +52,20 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::Tiny" : "0",
             "Path::Tiny" : "0",
             "Perl::Critic" : "0",
             "Perl::Critic::Utils" : "0",
             "Ref::Util" : "0",
             "Test2::API" : "1.302015",
-            "perl" : "5.020"
+            "perl" : "v5.20.0"
          }
       },
       "test" : {
          "requires" : {
             "Perl::Critic::Policy" : "0",
-            "Test2::V0" : "0.000060",
-            "perl" : "5.020"
+            "Test2::V0" : "0.000121",
+            "perl" : "v5.20.0"
          }
       }
    },
@@ -73,9 +81,9 @@
          "web" : "https://github.com/uperl/Test2-Tools-PerlCritic"
       }
    },
-   "version" : "0.04",
-   "x_generated_by_perl" : "v5.33.6",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "version" : "0.07",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

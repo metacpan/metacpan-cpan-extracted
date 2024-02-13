@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.4.1
+## Version v0.5.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2024/02/06
+## Modified 2024/02/07
 ## All rights reserved.
 ## 
 ## 
@@ -59,7 +59,7 @@ BEGIN
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
     our $SERIALISER = $Promise::Me::SERIALISER;
-    our $VERSION = 'v0.4.1';
+    our $VERSION = 'v0.5.0';
 };
 
 use strict;
@@ -191,6 +191,10 @@ sub delete
     {
         my $req = HTTP::Promise::Request->new( 'DELETE' => @_ ) ||
             return( $self->pass_error( HTTP::Promise::Request->error ) );
+        unless( $req->headers->host )
+        {
+            $req->headers->host( $req->host );
+        }
         my $resp = $self->send( $req ) ||
             return( $self->pass_error );
         return( $resp );
@@ -741,6 +745,28 @@ sub post
     }
 }
 
+sub prepare
+{
+    my $self = shift( @_ );
+    my $meth = shift( @_ ) || return( $self->error( "No HTTP method was provided to prepare the request." ) );
+    my @args = @_;
+    $meth = uc( $meth );
+    if( $meth eq 'GET' || $meth eq 'HEAD' )
+    {
+        return( $self->_make_request_query( $meth, @args ) );
+    }
+    elsif( $meth eq 'OPTIONS' || $meth eq 'PATCH' || $meth eq 'POST' || $meth eq 'PUT' )
+    {
+        return( $self->_make_request_data( $meth, @args ) );
+    }
+    else
+    {
+        my $req = HTTP::Promise::Request->new( $meth, @args ) ||
+            return( $self-pass_error( HTTP::Promise::Request->error ) );
+        return( $req );
+    }
+}
+
 sub prepare_headers
 {
     my $self = shift( @_ );
@@ -809,6 +835,10 @@ sub prepare_headers
     if( $req->uri->scheme eq 'http' && ( !defined( $upgrade_ssl ) || $upgrade_ssl ) )
     {
         $h->upgrade_insecure_requests(1);
+    }
+    unless( $req->headers->host )
+    {
+        $req->headers->host( $req->host );
     }
     return( $req );
 }
@@ -894,6 +924,7 @@ sub send
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{expect_threshold} //= $self->expect_threshold // 0;
     $opts->{total_attempts} //= 0;
+
     my $p = {};
     # my $timeout = time() + $self->timeout;
     my $timeout = $self->timeout;
@@ -1063,7 +1094,6 @@ sub send
     };
 
     # write request
-    # my $method = $req->method || 'GET';
     my $method = $req->method;
     my $connection_header = $self->connection_header;
     # If no connection_header value was provided, let's guess it based on the protocol used
@@ -1144,8 +1174,11 @@ sub send
         }
 
         # finally, set Host header
-        my $request_target = ( $uri->port == $default_port ) ? $uri->host : $uri->host_port;
-        $headers->header( Host => $request_target );
+        unless( $headers->host )
+        {
+            my $request_target = ( $uri->port == $default_port ) ? $uri->host : $uri->host_port;
+            $headers->header( Host => $request_target );
+        }
         
         my $expect_threshold = $opts->{expect_threshold} // $self->expect_threshold;
         if( defined( $expect_threshold ) )
@@ -1572,11 +1605,19 @@ sub _make_request_data
         return( $self->error( "No URL was provided for this HTTP query." ) );
     my $ent = $req->entity;
     my $content;
+    if( scalar( @_ ) == 1 && 
+        defined( $_[0] ) && 
+        ref( $_[0] ) eq 'HASH' &&
+        CORE::exists( $_[0]->{Content} ) )
+    {
+        warn( "It seems you are passing an hash reference of parameters, but this should be avoided as it may be confused with an hash reference of form parameters." ) if( $self->_is_warnings_enabled );
+    }
+
     # Maybe content is provided as the first argument?
     if( scalar( @_ ) && defined( $_[0] ) && 
         (
             $self->_is_array( $_[0] ) || 
-            ref( $_[0] ) eq 'HASH' || 
+            ( ref( $_[0] ) eq 'HASH' && !scalar( grep( /^Content$/i, @_ ) ) ) || 
             $self->_is_a( $_[0] => 'HTTP::Promise::Body::Form' ) ||
             $self->_is_a( $_[0] => 'HTTP::Promise::Body::Form::Data' )
         ) )
@@ -1589,7 +1630,7 @@ sub _make_request_data
            defined( $_[-1] ) &&
            (
                $self->_is_array( $_[-1] ) || 
-               ref( $_[-1] ) eq 'HASH' || 
+               ( ref( $_[-1] ) eq 'HASH' && !scalar( grep( /^Content$/i, @_ ) ) ) || 
                $self->_is_a( $_[-1] => 'HTTP::Promise::Body::Form' ) ||
                $self->_is_a( $_[-1] => 'HTTP::Promise::Body::Form::Data' )
            ) )
@@ -1724,7 +1765,7 @@ sub _make_request_data
                 my $reftype = Scalar::Util::reftype( $content );
                 $self->_load_class( 'HTTP::Promise::Body::Form' ) ||
                     return( $self->pass_error );
-                $form = HTTP::Promise::Body::Form->new( $reftype eq 'ARRAY' ? @$content : $content ) ||
+                $form = HTTP::Promise::Body::Form->new( ( $reftype eq 'ARRAY' && !$self->_can_overload( $content => '""' ) ) ? @$content : $content ) ||
                     return( $self->pass_error( HTTP::Promise::Body::Form->error ) );
             }
             $ent->body( $form );
@@ -2249,10 +2290,21 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
     my $req = HTTP::Promise::Request->new( get => 'https://www.example.org' ) ||
         die( HTTP::Promise::Request->error );
     my $prom = $p->request( $req )->then(sub{ #... })->catch(sub{ # ... });
+    # Prepare the query and get an HTTP::Promise::Request in return
+    # This is useful for debugging
+    my $req = $p->prepare( GET => 'https://example.com',
+        Authorization => "Bearer $some_token",
+        Accept => 'application/json',
+        Query => {
+            param1 => $value1,
+            param2 => $value2,
+        },
+    ) || die( $p->error );
+    say "Request would be: ", $req->as_string;
 
 =head1 VERSION
 
-    v0.4.1
+    v0.5.0
 
 =head1 DESCRIPTION
 
@@ -2890,6 +2942,14 @@ It returns a L<promise|Promise::Me>, which can be used to call one or more L<the
     });
 
 However, if L</use_promise> is set to false, this will return an L<HTTP::Promise::Response> object directly.
+
+=head2 prepare
+
+This takes an HTTP method whose case does not matter, i.e. it could be C<get> or C<GET>, and C<URL>, and a set of HTTP headers or special parameters like C<Content> or C<Query>. You can refer to each standard method L</delete>, L</get>, L</head>, L</options>, L</patch>, L</post>, L</put> for more information.
+
+You can also pass other methods, and your parameters will be passed through directly to L<HTTP::Promise::Request>
+
+If successful, this returns an L<HTTP::Promise::Request> object, otherwise, it sets an L<HTTP::Promise::Exception> and returns C<undef> in scalar context, or an empty list in list context.
 
 =head2 prepare_headers
 

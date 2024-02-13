@@ -46,7 +46,7 @@ __END__
 
 =head1 NAME
 
-Liveman::MinillaPod2Markdown - bung for Minilla. It not make README.md
+Liveman::MinillaPod2Markdown – a stub for Minilla that redirects lib/MainModule.md to README.md
 
 =head1 SYNOPSIS
 
@@ -67,31 +67,31 @@ Liveman::MinillaPod2Markdown - bung for Minilla. It not make README.md
 
 =head1 DESCRIPION
 
-Add C<markdown_maker = "Liveman::MinillaPod2Markdown"> to C<minil.toml>, and Minilla do'nt make README.md.
+Add the line C<markdown_maker = "Liveman::MinillaPod2Markdown"> to C<minil.toml>, and Minilla will not create C<README.md> from the pod documentation of the main module, but will take it from the file of the same name next to the C<*.md> extension.
 
 =head1 SUBROUTINES
 
 =head2 as_markdown ()
 
-The bung.
+Stub.
 
 =head2 new ()
 
-The constructor.
+Constructor.
 
 =head2 parse_from_file ($path)
 
-The bung.
+Stub.
 
 =head1 INSTALL
 
-For install this module in your system run next LL<https://metacpan.org/pod/App::cpm>:
+To install this module on your system, follow these steps LL<https://metacpan.org/pod/App::cpm>:
 
 	sudo cpm install -gvv Liveman::MinillaPod2Markdown
 
 =head1 AUTHOR
 
-Yaroslav O. Kosmina LL<mailto:dart@cpan.org>
+Yaroslav O. Kosmina L<mailto:dart@cpan.org>
 
 =head1 LICENSE
 

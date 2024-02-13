@@ -28,14 +28,14 @@ use constant { true => JSON::PP::true, false => JSON::PP::false };
 use YAML::PP 0.005;
 
 # type can be
-# 'lwp': classes of type URI, HTTP::Headers, HTTP::Request, HTTP::Response
 # 'mojo': classes of type Mojo::URL, Mojo::Headers, Mojo::Message::Request, Mojo::Message::Response
+# 'lwp': classes of type URI, HTTP::Headers, HTTP::Request, HTTP::Response
 # 'plack': classes of type Plack::Request, Plack::Response
-our @TYPES = qw(lwp mojo plack);
+our @TYPES = qw(mojo lwp plack);
 our $TYPE;
 
 # Note: if you want your query parameters or uri fragment to be normalized, set them afterwards
-sub request ($method, $uri_string, $headers = [], $body_content = undef) {
+sub request ($method, $uri_string, $headers = [], $body_content = '') {
   die '$TYPE is not set' if not defined $TYPE;
 
   my $req;
@@ -43,18 +43,17 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
     my $uri = URI->new($uri_string);
     my $host = $uri->$_call_if_can('host');
     $req = HTTP::Request->new($method => $uri, [], $body_content);
-    $req->headers->header(Host => $host) if $host;
-    $req->headers->push_header(@$_) foreach pairs @$headers;
+    $req->headers->push_header(@$_) foreach pairs @$headers, $host ? (Host => $host) : ();
     $req->headers->header('Content-Length' => length($body_content))
-      if defined $body_content and not defined $req->headers->header('Content-Length');
+      if defined $body_content and not defined $req->headers->header('Content-Length')
+        and not defined $req->headers->header('Transfer-Encoding');
     $req->protocol('HTTP/1.1'); # required, but not added by HTTP::Request constructor
   }
   elsif ($TYPE eq 'mojo') {
     my $uri = Mojo::URL->new($uri_string);
     my $host = $uri->host;
     $req = Mojo::Message::Request->new(method => $method, url => Mojo::URL->new($uri_string));
-    $req->headers->header('Host', $host) if $host;
-    $req->headers->add(@$_) foreach pairs @$headers;
+    $req->headers->add(@$_) foreach pairs @$headers, $host ? (Host => $host) : ();
     $req->body($body_content) if defined $body_content;
 
     # add missing Content-Length, etc
@@ -77,22 +76,21 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
   return $req;
 }
 
-sub response ($code, $headers = [], $body_content = undef) {
+sub response ($code, $headers = [], $body_content = '') {
   die '$TYPE is not set' if not defined $TYPE;
 
   my $res;
   if ($TYPE eq 'lwp') {
-    $res = HTTP::Response->new($code, HTTP::Status::status_message($code), $headers, $body_content);
+    $res = HTTP::Response->new($code, HTTP::Status::status_message($code), @$headers ? $headers : (), length $body_content ? $body_content : ());
     $res->protocol('HTTP/1.1'); # not added by HTTP::Response constructor
     $res->headers->header('Content-Length' => length($body_content))
-      if defined $body_content and not defined $res->headers->header('Content-Length');
+      if defined $body_content and not defined $res->headers->header('Content-Length')
+        and not defined $res->headers->header('Transfer-Encoding');
   }
   elsif ($TYPE eq 'mojo') {
     $res = Mojo::Message::Response->new(code => $code);
     $res->message($res->default_message);
-    while (my ($name, $value) = splice(@$headers, 0, 2)) {
-      $res->headers->header($name, $value);
-    }
+    $res->headers->add(@$_) foreach pairs @$headers;
     $res->body($body_content) if defined $body_content;
 
     # add missing Content-Length, etc
@@ -102,7 +100,8 @@ sub response ($code, $headers = [], $body_content = undef) {
     test_needs('Plack::Response', 'HTTP::Message::PSGI', { 'HTTP::Headers::Fast' => 0.21 });
     $res = Plack::Response->new($code, $headers, $body_content);
     $res->headers->header('Content-Length' => length($body_content))
-      if defined $body_content and not defined $res->headers->header('Content-Length');
+      if defined $body_content and not defined $res->headers->header('Content-Length')
+        and not defined $res->headers->header('Transfer-Encoding');
   }
   else {
     die '$TYPE '.$TYPE.' not supported';

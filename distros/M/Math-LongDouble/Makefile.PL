@@ -63,19 +63,17 @@ unless(-e 'try.exe') {
 # But now we need to see whether the linking problem doesn't show up until runtime.
 else {
   my $diag = $^O =~ /mswin32/i ? `try.exe 0.6 2>&1` : `./try.exe 0.6 2>&1`;
-  print WR "erfl & isnanl check (run): $diag\n" if $open;
-  if($diag =~ /(`|'|"|\s)_?erfl('|`|"|\s)/) {
-    print "Aborting:\n$diag\n";
-    close WR if $open;
-    unlink $log if -e $log;
-    exit 0; # abort the build
+  if(defined($diag)) {
+    print WR "erfl & isnanl check (run): $diag\n" if $open; # 66
+    if($diag =~ /(`|'|"|\s)_?erfl('|`|"|\s)/) {             # 67
+      print "Aborting:\n$diag\n";
+      close WR if $open;
+      unlink $log if -e $log;
+      exit 0; # abort the build
+    }
   }
-
-# Also check whether isnanl() is available and
-# implement a workaround if it's not.
-
-  if($out =~ /(`|'|"|\s)_?isnanl('|`|"|\s)/) {
-    $defines .= ' -DISNANL_IS_UNAVAILABLE';
+  else {
+    print WR "Unable to obtain diagnostics re erfl() - assuming it's available\n" if $open;
   }
 }
 
@@ -96,9 +94,14 @@ unless(-e 'try3.exe') {
 }
 else {
   my $diag = $^O =~ /mswin32/i ? `try3.exe 0 2>&1` : `./try3.exe 0 2>&1`;
-  print WR "execution output (nanl check): $diag\n" if $open;
-  unless ($diag =~ /^rop /) {
-    $defines .= ' -DNANL_IS_UNAVAILABLE';
+  if(defined($diag)) {
+    print WR "execution output (nanl check): $diag\n" if $open;   # 99
+    unless ($diag =~ /^rop /) {                                   # 100
+      $defines .= ' -DNANL_IS_UNAVAILABLE';
+    }
+  }
+  else {
+    print WR "Unable to obtain diagnostics re nanl() - assuming it's available\n" if $open;
   }
 }
 
@@ -115,9 +118,13 @@ print WR "build output (nan**0 check):\n$out\n" if $open;
 
 my $diag = $^O =~ /mswin32/i ? `try2.exe nan 0 2>&1` : `./try2.exe nan 0 2>&1`;
 
-print WR "nan**0 check diagnostic: $diag\n" if ($open && defined $diag);
-
-$defines .= ' -DNAN_POW_BUG' if $diag =~ /^NaN/i;
+if(defined($diag)) {
+  print WR "nan**0 check diagnostic: $diag\n" if ($open);
+  $defines .= ' -DNAN_POW_BUG' if $diag =~ /^NaN/i;     # 120
+}
+else {
+    print WR "Unable to determine if nan**0 is buggy - assuming it's NOT buggy\n" if $open;
+}
 
 ###############################################
 
@@ -136,9 +143,14 @@ unless(-e 'try4.exe') {
 }
 else {
   my $diag = $^O =~ /mswin32/i ? `try4.exe 0 2>&1` : `./try4.exe 0 2>&1`;
-  print WR "execution output (signbitl check): $diag\n" if $open;
-  unless ($diag =~ /^ret /) {
-    $defines .= ' -DSIGNBITL_IS_UNAVAILABLE';
+  if(defined($diag)) {
+    print WR "execution output (signbitl check): $diag\n" if $open;        # 139
+    unless ($diag =~ /^ret /) {                                            # 140
+      $defines .= ' -DSIGNBITL_IS_UNAVAILABLE';
+    }
+  }
+  else {
+    print WR "Unable to obtain diagnostics re signbitl() - assuming it's available\n" if $open;
   }
 }
 
@@ -160,9 +172,14 @@ unless(-e 'try5.exe') {
 }
 else {
   my $diag = $^O =~ /mswin32/i ? `try5.exe 0 2>&1` : `./try5.exe 0 2>&1`;
-  print WR "execution output (sincosl check): $diag\n" if $open;
-  unless ($diag =~ /^output: /) {
-    $defines .= ' -DSINCOSL_IS_UNAVAILABLE';
+  if(defined($diag)) {
+    print WR "execution output (sincosl check): $diag\n" if $open;       # 163
+    unless ($diag =~ /^output: /) {                                      # 164
+      $defines .= ' -DSINCOSL_IS_UNAVAILABLE';
+    }
+  }
+  else {
+    print WR "Unable to obtain diagnostics re sincosl() - assuming it's available\n" if $open;
   }
 }
 

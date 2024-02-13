@@ -1,5 +1,8 @@
 Revision history for RT-Extension-FormTools
 
+1.04 2024-02-12
+ - Avoid long redirect URLs resulting from clicking the Back button
+
 1.03 2024-01-31
  - Added ability to mark custom fields on forms as read-only
 

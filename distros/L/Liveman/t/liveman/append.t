@@ -1,6 +1,7 @@
-use common::sense; use open qw/:std :utf8/;  use Carp qw//; use File::Basename qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN {     $SIG{__DIE__} = sub {         my ($s) = @_;         if(ref $s) {             $s->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $s;             die $s;         } else {             die Carp::longmess defined($s)? $s: "undef"         }     };      my $t = File::Slurper::read_text(__FILE__);     my $s =  '/tmp/.liveman/perl-liveman/liveman!append'    ;     File::Path::rmtree($s) if -e $s;     File::Path::mkpath($s);     chdir $s or die "chdir $s: $!";      while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) {         my ($file, $code) = ($1, $2);         $code =~ s/^#>> //mg;         File::Path::mkpath(File::Basename::dirname($file));         File::Slurper::write_text($file, $code);     }  } # # NAME
+use common::sense; use open qw/:std :utf8/;  use Carp qw//; use File::Basename qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN {     $SIG{__DIE__} = sub {         my ($s) = @_;         if(ref $s) {             $s->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $s;             die $s;         } else {             die Carp::longmess defined($s)? $s: "undef"         }     };      my $t = File::Slurper::read_text(__FILE__);     my $s =  '/tmp/.liveman/perl-liveman/liveman!append'    ;     File::Path::rmtree($s) if -e $s;     File::Path::mkpath($s);     chdir $s or die "chdir $s: $!";      while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) {         my ($file, $code) = ($1, $2);         $code =~ s/^#>> //mg;         File::Path::mkpath(File::Basename::dirname($file));         File::Slurper::write_text($file, $code);     }  } # 
+# # NAME
 # 
-# Liveman::Append - append manual by methods from `lib/**.pm` to `lib/**.md`
+# Liveman::Append - добавляет секции для методов и функций из `lib/**.pm` в `lib/**.md`
 # 
 # # SYNOPSIS
 # 
@@ -14,28 +15,28 @@ my $liveman_append = Liveman::Append->new;
 # 
 # # DESCRIPTION
 # 
-# It append manual by methods and features from modules (`lib/**.pm`) to their manuals (`lib/**.md`).
+# Добавляет руководство по методам и функциям модулей (`lib/**.pm`) к их руководствам (`lib/**.md`).
 # 
-# 1. Methods is perl-subroutine starting with keyword `sub`.
-# 1. Features is class property maked OOP-frameworks as `Aion`, `Moose`, `Moo`, `Mo`, and starting with keyword `has`.
+# 1. Методы — это Perl-подпрограмма, начинающаяся с ключевого слова `sub`.
+# 1. Особенности — это свойства экземпляров добавляемые ООП-фреймворками, такими как `Aion`, `Moose`, `Moo`, `Mo`, и начинающиеся с ключевого слова `has`.
 # 
 # # SUBROUTINES
 # 
 # ## new (@params)
 # 
-# The constructor.
+# Конструктор.
 # 
 # ## mkmd ($md)
 # 
-# It make md-file.
+# Создаёт md-файл.
 # 
 # ## appends ()
 # 
-# Append to `lib/**.md` from `lib/**.pm` subroutines and features.
+# Добавляет в `lib/**.md` из `lib/**.pm` подпрограммы и особенности.
 # 
 # ## append ($path)
 # 
-# Append subroutines and features from the module with `$path` into its documentation in the its sections.
+# Добавляет подпрограммы и функции из модуля (`$path`) в его мануал.
 # 
 # File lib/Alt/The/Plan.pm:
 #@> lib/Alt/The/Plan.pm
@@ -140,7 +141,7 @@ The Alt::The::Plan module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All
 # 
 # # AUTHOR
 # 
-# Yaroslav O. Kosmina [dart@cpan.org](dart@cpan.org)
+# Yaroslav O. Kosmina <dart@cpan.org>
 # 
 # # LICENSE
 # 

@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.29";
+our $VERSION = "0.30";
 
 =encoding utf-8
 
@@ -16,13 +16,14 @@ App::Greple::xlate - translation support module for greple
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =head1 DESCRIPTION
 
 B<Greple> B<xlate> module find desired text blocks and replace them by
 the translated text.  Currently DeepL (F<deepl.pm>) and ChatGPT
-(F<gpt3.pm>) module are implemeted as a back-end engine.
+(F<gpt3.pm>) module are implemented as a back-end engine.
+Experimental support for gpt-4 is also included.
 
 If you want to translate normal text blocks in a document written in
 the Perl's pod style, use B<greple> command with C<xlate::deepl> and
@@ -95,7 +96,7 @@ this option.
 
 =item B<--xlabor>
 
-Insted of calling translation engine, you are expected to work for.
+Instead of calling translation engine, you are expected to work for.
 After preparing text to be translated, they are copied to the
 clipboard.  You are expected to paste them to the form, copy the
 result to the clipboard, and hit return.
@@ -591,4 +592,5 @@ option --match-podtext   -Mperl --pod --re '^(\w.*\n)(\S.*\n)*'
 
 option --ifdef-color --re '^#ifdef(?s:.*?)^#endif.*\n'
 
-#  LocalWords:  deepl ifdef unifdef Greple greple perl
+#  LocalWords:  deepl ifdef unifdef Greple greple perl DeepL ChatGPT
+#  LocalWords:  gpt html img src xlabor

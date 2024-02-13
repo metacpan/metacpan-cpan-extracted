@@ -11,7 +11,7 @@ use Plack::Session;
 use Tags::HTML::Container;
 use Tags::HTML::Login::Register;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub _css {
 	my ($self, $env) = @_;
@@ -83,6 +83,7 @@ sub _process_actions {
 			$res->redirect($self->redirect_error);
 		}
 		$self->psgi_app($res->finalize);
+		return;
 	}
 
 	return;
@@ -162,8 +163,6 @@ Plack::App::Register - Plack register application.
  my $obj = Plack::App::Register->new(%parameters);
 
 Constructor.
-
-Returns instance of object.
 
 =over 8
 
@@ -299,6 +298,8 @@ Page title.
 Default value is 'Register page'.
 
 =back
+
+Returns instance of object.
 
 =head2 C<call>
 
@@ -505,6 +506,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

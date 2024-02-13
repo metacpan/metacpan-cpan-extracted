@@ -32,7 +32,7 @@ resources:
   bugtracker: https://github.com/Perl-Toolchain-Gang/Software-License/issues
   homepage: https://github.com/Perl-Toolchain-Gang/Software-License
   repository: https://github.com/Perl-Toolchain-Gang/Software-License.git
-version: '0.104005'
+version: '0.104006'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -43,7 +43,6 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename: []
           exclude_match: []
-          follow_symlinks: 0
           include_dotfiles: 0
           prefix: ''
           prune_directory: []
@@ -51,7 +50,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@RJBS/Git::GatherDir'
-      version: '2.048'
+      version: '2.049'
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: '@RJBS/CheckPrereqsIndexed'
@@ -149,10 +148,10 @@ x_Dist_Zilla:
           version_by_branch: 1
           version_regexp: (?^:^([0-9]+\.[0-9]+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.42.1
+          git_version: 2.43.0
           repo_root: .
       name: '@RJBS/Git::NextVersion'
-      version: '2.048'
+      version: '2.049'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@RJBS/PkgVersion'
@@ -288,7 +287,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::RJBSMisc
       name: '@RJBS/RJBSMisc'
-      version: '5.026'
+      version: '5.025'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@RJBS/GithubMeta'
@@ -305,10 +304,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.42.1
+          git_version: 2.43.0
           repo_root: .
       name: '@RJBS/@Git/Check'
-      version: '2.048'
+      version: '2.049'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -323,12 +322,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.42.1
+          git_version: 2.43.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@RJBS/@Git/Commit'
-      version: '2.048'
+      version: '2.049'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -336,16 +335,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.104005'
+          tag: '0.104006'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.42.1
+          git_version: 2.43.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@RJBS/@Git/Tag'
-      version: '2.048'
+      version: '2.049'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -354,15 +353,15 @@ x_Dist_Zilla:
             - 'github :'
           remotes_must_exist: 0
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.42.1
+          git_version: 2.43.0
           repo_root: .
       name: '@RJBS/@Git/Push'
-      version: '2.048'
+      version: '2.049'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.42.1
+          git_version: 2.43.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -434,6 +433,7 @@ x_contributors:
   - 'Florian Ragwitz <rafl@debian.org>'
   - 'Graham Knop <haarg@haarg.org>'
   - 'Justin Baker <me@jbaker.dev>'
+  - 'jvolkening <jdv@base2bio.com>'
   - 'Kang-min Liu <gugod@gugod.org>'
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Kenichi Ishigaki <ishigaki@cpan.org>'

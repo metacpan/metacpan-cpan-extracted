@@ -8,6 +8,15 @@
     # creates neither a temporary directory, nor a temporary file:
     use Test::Expander;
 
+    # Tries to automatically determine, which class / module and method / subroutine are to be tested.
+    # The determined (and hence exported) values are displayed in green,
+    # the undetermined (and hence unexported) ones in red:
+    use Test::Expander -color => { exported => 'green', unexported => 'red' };
+
+    # Tries to automatically determine, which class / module and method / subroutine are to be tested.
+    # Both determined and undetermined values are displayed uncolorized:
+    use Test::Expander -color => { exported => undef, unexported => undef };
+
     # Tries to automatically determine, which class / module and method / subroutine are to be tested,
     # creates both a temporary directory and a temporary file preventing their removal after execution:
     use Test::Expander -tempdir => { CLEANUP => 0 }, -tempfile => { UNLINK => 0 };
@@ -253,6 +262,21 @@ The following options are accepted:
     - **-builtins** - overrides builtins in the name space of class / module to be tested.
     The expected value is a hash reference, where keys are the names of builtins and
     the values are code references overriding default behavior.
+    - **-color** - controls colorization of read-only variables **$CLASS**, **$METHOD**, and **$METHOD\_REF**
+    in the test notification header.
+    The expected value is a hash reference, the only supported keys are **exported** and **unexported**:
+        - **exported**
+
+            Contains either a string describing the foreground color, in which these variables are displayed
+            if they are being exported, or **undef** in no colorization is required in such case.
+
+            Defaults to **'cyan'**.
+
+        - **unexported**
+
+            The same as above, but for the case if these variables remains undefined and unexported.
+
+            Defaults to **'magenta'**.
     - **-lib** - prepends directory list used by the Perl interpreter for search of modules to be loaded
     (i.e. the **@INC** array) with values supplied in form of array reference.
     Each element of this array is evaluated using [string eval](https://perldoc.perl.org/functions/eval) so that

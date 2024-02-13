@@ -224,7 +224,7 @@ __END__
 
 =head1 NAME
 
-Liveman::Append - append manual by methods from C<lib/**.pm> to C<lib/**.md>
+Liveman::Append - adds sections for methods and functions from C<lib/**.pm> to C<lib/**.md>
 
 =head1 SYNOPSIS
 
@@ -236,13 +236,13 @@ Liveman::Append - append manual by methods from C<lib/**.pm> to C<lib/**.md>
 
 =head1 DESCRIPTION
 
-It append manual by methods and features from modules (C<lib/**.pm>) to their manuals (C<lib/**.md>).
+Adds a manual about module methods and functions (C<lib/**.pm>) to their manuals (C<lib/**.md>).
 
 =over
 
-=item 1. Methods is perl-subroutine starting with keyword C<sub>.
+=item 1. Methods is a Perl subroutine starting with the C<sub> keyword.
 
-=item 2. Features is class property maked OOP-frameworks as C<Aion>, C<Moose>, C<Moo>, C<Mo>, and starting with keyword C<has>.
+=item 2. Features are instance properties added by OOP frameworks such as C<Aion>, C<Moose>, C<Moo>, C<Mo>, and starting with the C<has> keyword.
 
 =back
 
@@ -250,19 +250,19 @@ It append manual by methods and features from modules (C<lib/**.pm>) to their ma
 
 =head2 new (@params)
 
-The constructor.
+Constructor.
 
 =head2 mkmd ($md)
 
-It make md-file.
+Creates an md file.
 
 =head2 appends ()
 
-Append to C<lib/**.md> from C<lib/**.pm> subroutines and features.
+Adds routines and features to C<lib/**.md> from C<lib/**.pm>.
 
 =head2 append ($path)
 
-Append subroutines and features from the module with C<$path> into its documentation in the its sections.
+Adds routines and functions from a module (C<$path>) to its manual.
 
 File lib/Alt/The/Plan.pm:
 
@@ -365,7 +365,7 @@ File lib/Alt/The/Plan.md is:
 
 =head1 AUTHOR
 
-Yaroslav O. Kosmina LL<mailto:dart@cpan.org>
+Yaroslav O. Kosmina L<mailto:dart@cpan.org>
 
 =head1 LICENSE
 

@@ -8,7 +8,7 @@ use Data::Dumper;
 
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $AUTOLOAD);
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 our $AUTOLOAD;
 
 sub new {

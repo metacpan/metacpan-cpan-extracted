@@ -10,6 +10,15 @@ B<Test::Expander> - Expansion of test functionalities that appear to be frequent
   # creates neither a temporary directory, nor a temporary file:
   use Test::Expander;
 
+  # Tries to automatically determine, which class / module and method / subroutine are to be tested.
+  # The determined (and hence exported) values are displayed in green,
+  # the undetermined (and hence unexported) ones in red:
+  use Test::Expander -color => { exported => 'green', unexported => 'red' };
+
+  # Tries to automatically determine, which class / module and method / subroutine are to be tested.
+  # Both determined and undetermined values are displayed uncolorized:
+  use Test::Expander -color => { exported => undef, unexported => undef };
+
   # Tries to automatically determine, which class / module and method / subroutine are to be tested,
   # creates both a temporary directory and a temporary file preventing their removal after execution:
   use Test::Expander -tempdir => { CLEANUP => 0 }, -tempfile => { UNLINK => 0 };
@@ -288,6 +297,29 @@ B<restore_failure_handler>.
 B<-builtins> - overrides builtins in the name space of class / module to be tested.
 The expected value is a hash reference, where keys are the names of builtins and
 the values are code references overriding default behavior.
+
+=item
+
+B<-color> - controls colorization of read-only variables B<$CLASS>, B<$METHOD>, and B<$METHOD_REF>
+in the test notification header.
+The expected value is a hash reference, the only supported keys are B<exported> and B<unexported>:
+
+=over 2
+
+=item B<exported>
+
+Contains either a string describing the foreground color, in which these variables are displayed
+if they are being exported, or B<undef> in no colorization is required in such case.
+
+Defaults to B<'cyan'>.
+
+=item B<unexported>
+
+The same as above, but for the case if these variables remains undefined and unexported.
+
+Defaults to B<'magenta'>.
+
+=back
 
 =item
 

@@ -12,7 +12,7 @@ use File::Basename        qw(basename dirname);
 use File::Path            qw(make_path);
 use File::Spec::Functions qw(catfile);
 
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 
 =encoding utf8
 
@@ -395,11 +395,11 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2020-2022, brian d foy, All Rights Reserved.
+Copyright © 2020-2024, brian d foy, All Rights Reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

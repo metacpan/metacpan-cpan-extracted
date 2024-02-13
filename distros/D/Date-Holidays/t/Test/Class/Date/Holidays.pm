@@ -267,7 +267,7 @@ sub test_bq : Test(5) {
 
         can_ok('Date::Holidays::BQ', qw(holidays is_holiday));
 
-        ok( my $dh = Date::Holidays->new( countrycode => 'aw' ),
+        ok( my $dh = Date::Holidays->new( countrycode => 'bq' ),
             'Testing Date::Holidays::BQ' );
 
         ok( $dh->holidays( year => 2020 ),
@@ -284,6 +284,33 @@ sub test_bq : Test(5) {
             month  => 1,
             day    => 15,
         ), 'Testing Bonaires national holiday');
+    }
+}
+
+sub test_cw : Test(5) {
+    SKIP: {
+        eval { require Date::Holidays::CW };
+        skip 'Date::Holidays::CW not installed', 5 if $EVAL_ERROR;
+
+        can_ok('Date::Holidays::CW', qw(holidays is_holiday));
+
+        ok( my $dh = Date::Holidays->new( countrycode => 'cw' ),
+            'Testing Date::Holidays::CW' );
+
+        ok( $dh->holidays( year => 2020 ),
+            'Testing holidays for Date::Holidays::CW' );
+
+        ok($dh->is_holiday(
+            year   => 2020,
+            month  => 7,
+            day    => 2,
+        ), 'Flag day');
+
+        ok(! $dh->is_holiday(
+            year   => 2020,
+            month  => 7,
+            day    => 3,
+        ), 'The day after flag day');
     }
 }
 

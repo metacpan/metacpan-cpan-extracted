@@ -1,6 +1,7 @@
-use common::sense; use open qw/:std :utf8/;  use Carp qw//; use File::Basename qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN {     $SIG{__DIE__} = sub {         my ($s) = @_;         if(ref $s) {             $s->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $s;             die $s;         } else {             die Carp::longmess defined($s)? $s: "undef"         }     };      my $t = File::Slurper::read_text(__FILE__);     my $s =  '/tmp/.liveman/perl-liveman/liveman!project'    ;     File::Path::rmtree($s) if -e $s;     File::Path::mkpath($s);     chdir $s or die "chdir $s: $!";      while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) {         my ($file, $code) = ($1, $2);         $code =~ s/^#>> //mg;         File::Path::mkpath(File::Basename::dirname($file));         File::Slurper::write_text($file, $code);     }  } # # NAME
+use common::sense; use open qw/:std :utf8/;  use Carp qw//; use File::Basename qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN {     $SIG{__DIE__} = sub {         my ($s) = @_;         if(ref $s) {             $s->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $s;             die $s;         } else {             die Carp::longmess defined($s)? $s: "undef"         }     };      my $t = File::Slurper::read_text(__FILE__);     my $s =  '/tmp/.liveman/perl-liveman/liveman!project'    ;     File::Path::rmtree($s) if -e $s;     File::Path::mkpath($s);     chdir $s or die "chdir $s: $!";      while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) {         my ($file, $code) = ($1, $2);         $code =~ s/^#>> //mg;         File::Path::mkpath(File::Basename::dirname($file));         File::Slurper::write_text($file, $code);     }  } # 
+# # NAME
 # 
-# Liveman::Project - maker of the new perl-repository
+# Liveman::Project - создать новый Perl-репозиторий
 # 
 # # SYNOPSIS
 # 
@@ -14,37 +15,37 @@ my $liveman_project = Liveman::Project->new;
 # 
 # # DESCRIPTION
 # 
-# Creates a new perl-repository.
+# Создает новый Perl-репозиторий.
 # 
 # # SUBROUTINES/METHODS
 # 
 # ## new (@params)
 # 
-# The constructor.
+# Конструктор.
 # 
 # ## make ()
 # 
-# Creates a new project.
+# Создаёт новый проект.
 # 
 # ## minil_toml ()
 # 
-# Creates a file `minil.toml`.
+# Создаёт файл `minil.toml`.
 # 
 # ## cpanfile ()
 # 
-# Creates a cpanfile.
+# Создаёт `cpanfile`.
 # 
 # ## mkpm ()
 # 
-# Creates a main module.
+# Создает главный модуль.
 # 
 # ## license ()
 # 
-# Creates a license.
+# Зоздёт лицензию.
 # 
 # # AUTHOR
 # 
-# Yaroslav O. Kosmina [darviarush@mail.ru](mailto:darviarush@mail.ru)
+# Yaroslav O. Kosmina <dart@cpan.org>
 # 
 # # LICENSE
 # 

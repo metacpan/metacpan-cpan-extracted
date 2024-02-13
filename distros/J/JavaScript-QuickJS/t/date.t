@@ -41,18 +41,36 @@ for my $getter (@getters) {
     is($perl_got, $js_got, "$getter() is the same in Perl and JS");
 }
 
-my $INT32_MAX = ( 1 << 31 ) - 1;
-my $INT32_MIN = -$INT32_MAX - 1;
+my $time_num = (time - 100) * 1000;
+my $time_str = $time_num;
+$time_str .= '';
+
+for my $time ($time_num, $time_str) {
+    my $settime_return = $date->setTime($time);
+    is(
+        $settime_return,
+        $date->getTime(),
+        "setTime() returns as expected",
+    );
+
+    is(
+        $js->eval("mydate.getTime()"),
+        $time,
+        "setTime() has the intended effect",
+    );
+}
 
 for my $settable (@settables) {
-    my $value = '42';   # string on purpose
+    my $value_to_set = '' . (($settable eq 'FullYear') ? 1976 : 11);
 
     for my $settable2 ( $settable, "UTC$settable" ) {
         my $setter = "set$settable2";
 
         my $getter = "get$settable2";
 
-        my $setter_return = $date->$setter($value);
+        # print "calling $setter($value_to_set)\n";
+
+        my $setter_return = $date->$setter($value_to_set);
 
         is(
             $setter_return,
@@ -62,16 +80,19 @@ for my $settable (@settables) {
 
         is(
             $js->eval("mydate.get$settable2()"),
-            $date->$getter(),
-            "$setter($value)",
+            $value_to_set,
+            "$setter($value_to_set)",
         );
 
-        $date->$setter(-$value);
-        is(
-            $js->eval("mydate.get$settable2()"),
-            $date->$getter(),
-            "$setter(-$value)",
-        );
+        # Avoid this bug: https://github.com/bellard/quickjs/issues/238
+        if ($^O ne 'MSWin32' || $settable ne 'FullYear') {
+            $date->$setter(-$value_to_set);
+            is(
+                $js->eval("mydate.get$settable2()"),
+                $date->$getter(),
+                "$setter(-$value_to_set)",
+            );
+        }
     }
 }
 

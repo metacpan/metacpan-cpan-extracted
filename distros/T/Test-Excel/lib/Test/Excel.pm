@@ -1,6 +1,6 @@
 package Test::Excel;
 
-$Test::Excel::VERSION   = '1.53';
+$Test::Excel::VERSION   = '1.54';
 $Test::Excel::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Test::Excel - Interface to test and compare Excel files (.xls/.xlsx).
 
 =head1 VERSION
 
-Version 1.53
+Version 1.54
 
 =cut
 
@@ -746,7 +746,7 @@ that I have just "gotten it wrong" in some places.
 
 =head1 AUTHOR
 
-Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
+Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 CONTRIBUTORS
 
@@ -764,8 +764,7 @@ L<https://github.com/manwar/Test-Excel>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-test-excel at rt.cpan.org>,
-or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Excel>.
+Please report any bugs or feature requests through the web interface at L<https://github.com/manwar/Test-Excel/issues>.
 I will be notified, and then you'll automatically be notified of progress on your
 bug as I make changes.
 
@@ -799,7 +798,7 @@ L<https://metacpan.org/dist/Test-Excel/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 - 2022 Mohammad S Anwar.
+Copyright (C) 2010 - 2024 Mohammad Sajid Anwar.
 
 This  program  is  free software; you can redistribute it  and/or modify it under
 the  terms  of the the Artistic License (2.0). You may  obtain a copy of the full

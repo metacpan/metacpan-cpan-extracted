@@ -50,7 +50,7 @@ my %WriteMakefile = (
 	'ABSTRACT_FROM' => $main_file,
 	'VERSION_FROM'  => $main_file,
 	'LICENSE'       => 'artistic_2',
-	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
+	'AUTHOR'        => 'brian d foy <briandfoy@pobox.com>',
 
 	'EXE_FILES' => [ 'script/dist_cooker' ],
 
@@ -69,7 +69,7 @@ my %WriteMakefile = (
 
 	'PREREQ_PM'     => {
 		'Config::IniFiles'      => '0',
-		'Mojo::Template'        => '0',
+		'Mojolicious'           => '9.35',
 		'Carp'                  => '0',
 		'Cwd'                   => '0',
 		'File::Spec::Functions' => '0',

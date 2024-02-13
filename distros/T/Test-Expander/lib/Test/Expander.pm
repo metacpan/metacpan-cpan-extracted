@@ -2,7 +2,7 @@
 package Test::Expander;
 
 # The versioning is conform with https://semver.org
-our $VERSION = '2.4.0';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '2.5.0';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use strict;
 use warnings
@@ -16,7 +16,7 @@ use Getopt::Long        qw( GetOptions :config posix_default );
 use Importer;
 use Path::Tiny          qw( cwd path );
 use Scalar::Readonly    qw( readonly_on );
-use Term::ANSIColor     qw( colored );
+use Term::ANSIColor     qw( color colored );
 use Test::Builder;
 use Test2::API          qw( context );
 use Test2::API::Context qw();
@@ -26,18 +26,19 @@ use Test2::Tools::Subtest;
 
 use Test::Expander::Constants qw(
   $DIE $FALSE
-  $FMT_INVALID_DIRECTORY $FMT_INVALID_ENV_ENTRY $FMT_INVALID_VALUE $FMT_INVALID_SUBTEST_NUMBER $FMT_KEEP_ENV_VAR
-  $FMT_NEW_FAILED $FMT_NEW_SUCCEEDED $FMT_REPLACEMENT $FMT_REQUIRE_DESCRIPTION $FMT_REQUIRE_IMPLEMENTATION
-  $FMT_SEARCH_PATTERN $FMT_SET_ENV_VAR $FMT_SET_TO $FMT_SKIP_ENV_VAR $FMT_UNSET_VAR $FMT_UNKNOWN_OPTION
-  $FMT_USE_DESCRIPTION $FMT_USE_IMPLEMENTATION $MSG_BAIL_OUT $MSG_ERROR_WAS $MSG_UNEXPECTED_EXCEPTION
+  $FMT_INVALID_COLOR $FMT_INVALID_DIRECTORY $FMT_INVALID_ENV_ENTRY $FMT_INVALID_VALUE $FMT_INVALID_SUBTEST_NUMBER
+  $FMT_KEEP_ENV_VAR $FMT_NEW_FAILED $FMT_NEW_SUCCEEDED $FMT_REPLACEMENT $FMT_REQUIRE_DESCRIPTION
+  $FMT_REQUIRE_IMPLEMENTATION $FMT_SEARCH_PATTERN $FMT_SET_ENV_VAR $FMT_SET_TO $FMT_SKIP_ENV_VAR $FMT_UNSET_VAR
+  $FMT_UNKNOWN_OPTION $FMT_USE_DESCRIPTION $FMT_USE_IMPLEMENTATION $MSG_BAIL_OUT $MSG_ERROR_WAS $MSG_UNEXPECTED_EXCEPTION
   $NOTE
   $REGEX_ANY_EXTENSION $REGEX_CLASS_HIERARCHY_LEVEL $REGEX_TOP_DIR_IN_PATH $REGEX_VERSION_NUMBER
   $TRUE
-  %MOST_CONSTANTS_TO_EXPORT %REST_CONSTANTS_TO_EXPORT
+  %COLORS %MOST_CONSTANTS_TO_EXPORT %REST_CONSTANTS_TO_EXPORT
 );
 
 my $ok_orig = \&Test2::API::Context::ok;
 my ( @subtest_names, @subtest_numbers );
+my %colors = %COLORS;
 
 sub _subtest_selection {
   my $error;
@@ -192,6 +193,12 @@ sub use_ok ( $;@ ) {
   return $require_result;
 }
 
+sub _colorize {
+  my ( $value, $export_type ) = @_;
+
+  return defined( $colors{ $export_type } ) ? colored( $value, $colors{ $export_type } ) : $value;
+}
+
 sub _determine_testee {
   my ( $options, $test_file ) = @_;
 
@@ -259,15 +266,15 @@ sub _export_symbols {
   my %constants = @_;
 
   foreach my $name ( sort keys( %constants ) ) {            # Export defined constants
-    no strict qw( refs );                                   ## no critic (ProhibitProlongedStrictureOverride)
+    no strict qw( refs );
     my $value = eval( "${ \$name }" );
     if ( defined( $value ) ) {
       readonly_on( ${ __PACKAGE__ . '::' . $name =~ s/^.//r } );
       push( @EXPORT, $name );
-      $NOTE->( $FMT_SET_TO, colored( $name, 'cyan' ), $constants{ $name }->( $value, $CLASS ) );
+      $NOTE->( $FMT_SET_TO, _colorize( $name, 'exported' ), $constants{ $name }->( $value, $CLASS ) );
     }
     elsif ( $name =~ /^ \$ (?: CLASS | METHOD | METHOD_REF )$/x ) {
-      $NOTE->( $FMT_UNSET_VAR, colored( $name, 'magenta' ) ) unless defined( $value );
+      $NOTE->( $FMT_UNSET_VAR, _colorize( $name, 'unexported' ) ) unless defined( $value );
     }
   }
 
@@ -293,7 +300,7 @@ sub _new_test_message {
   return $@ ? sprintf( $FMT_NEW_FAILED, $class, _error() ) : sprintf( $FMT_NEW_SUCCEEDED, $class, $class );
 }
 
-sub _parse_options {
+sub _parse_options {                                        ## no critic (ProhibitExcessComplexity)
   my ( $exports, $test_file ) = @_;
 
   my $options = {};
@@ -315,6 +322,19 @@ sub _parse_options {
         $DIE->( $FMT_INVALID_VALUE, $option_name . "->{ $sub_name }", $sub_ref ) if ref( $sub_ref ) ne 'CODE';
       }
       $options->{ $option_name } = $option_value;
+    }
+    elsif ( $option_name eq '-color' ) {
+      while ( my ( $color_name, $color_value ) = each( %colors ) ) {
+        if ( exists( $option_value->{ $color_name } ) ) {
+          my $requested_color = $option_value->{ $color_name };
+          $DIE->( $FMT_INVALID_COLOR, $requested_color, $color_name )
+            if defined( $requested_color ) && !defined( color( $requested_color ) );
+          $colors{ $color_name } = $requested_color;
+        }
+      }
+      foreach my $color_name ( keys( %$option_value ) ) {
+        $DIE->( $FMT_UNKNOWN_OPTION, $option_name, $color_name ) unless exists( $colors{ $color_name } );
+      }
     }
     elsif ( $option_name eq '-lib' ) {
       $DIE->( $FMT_INVALID_VALUE, $option_name, $option_value ) if ref( $option_value ) ne 'ARRAY';
@@ -369,16 +389,16 @@ sub _read_env_file {
       };
       $DIE->( $FMT_INVALID_ENV_ENTRY, $index, $env_file, $line, $@ =~ s/\n//gr =~ s/ at \(eval .+//ir ) if $@;
       if ( defined( $value ) ) {
-        $NOTE->( $FMT_SET_ENV_VAR, colored( $name, 'cyan' ), $value, $env_file );
+        $NOTE->( $FMT_SET_ENV_VAR, _colorize( $name, 'exported' ), $value, $env_file );
         $ENV{ $name } = $env{ $name } = $value;
       }
       else {
-        $NOTE->( $FMT_SKIP_ENV_VAR, colored( $name, 'magenta' ), $env_file );
+        $NOTE->( $FMT_SKIP_ENV_VAR, _colorize( $name, 'unexported' ), $env_file );
       }
     }
     elsif ( exists( $ENV{ $+{ name } } ) ) {
       $env{ $name } = $ENV{ $name };
-      $NOTE->( $FMT_KEEP_ENV_VAR, colored( $name, 'cyan' ), $ENV{ $name }, $env_file );
+      $NOTE->( $FMT_KEEP_ENV_VAR, _colorize( $name, 'exported' ), $ENV{ $name }, $env_file );
     }
   }
 

@@ -15,6 +15,7 @@ SYNOPSIS
      my $length = $obj->length;
      my $length_of_field_portion_len = $obj->length_of_field_portion_len;
      my $multipart_resource_record_level = $obj->multipart_resource_record_level;
+     my $raw = $obj->raw;
      my $starting_char_pos_portion_len = $obj->starting_char_pos_portion_len;
      my $status = $obj->status;
      my $subfield_code_count = $obj->subfield_code_count;
@@ -85,6 +86,12 @@ METHODS
     *       "multipart_resource_record_level"
 
             Multipart resource record level.
+
+            Default values is undef.
+
+    *       "raw"
+
+            Raw leader value.
 
             Default values is undef.
 
@@ -196,6 +203,13 @@ METHODS
 
     Returns character.
 
+  "raw"
+     my $raw = $obj->raw;
+
+    Get raw leader value.
+
+    Returns string.
+
   "starting_char_pos_portion_len"
      my $starting_char_pos_portion_len = $obj->starting_char_pos_portion_len;
 
@@ -264,6 +278,8 @@ ERRORS
              Parameter 'multipart_resource_record_level' must be one of defined strings.
                      String: %s
                      Possible strings: ' ' a b c
+             Parameter 'raw' has length different than '24'.
+                     Value: %s
              Parameter 'starting_char_pos_portion_len' must be one of defined strings.
                      String: %s
                      Possible strings: 5
@@ -301,6 +317,7 @@ EXAMPLE
              'length' => 2200,
              'length_of_field_portion_len' => '4',
              'multipart_resource_record_level' => ' ',
+             'raw' => '02200cem a2200541 i 4500',
              'starting_char_pos_portion_len' => '5',
              'status' => 'c',
              'subfield_code_count' => '2',
@@ -333,6 +350,7 @@ EXAMPLE
      #         length                            2200,
      #         length_of_field_portion_len       4,
      #         multipart_resource_record_level   " ",
+     #         raw                               "02200cem a2200541 i 4500",
      #         starting_char_pos_portion_len     5,
      #         status                            "c",
      #         subfield_code_count               2,
@@ -359,5 +377,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.06
 

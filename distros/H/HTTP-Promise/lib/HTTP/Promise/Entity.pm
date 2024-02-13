@@ -1712,7 +1712,7 @@ sub save_file
 {
     my $self = shift( @_ );
     my $fname = shift( @_ );
-    my $type = $self->type;
+    my $type = $self->headers->type;
     return( '' ) if( lc( substr( $type, 0, 10 ) ) eq 'multipart/' );
     unless( defined( $fname ) && length( "$fname" ) )
     {

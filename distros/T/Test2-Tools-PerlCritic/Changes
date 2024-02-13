@@ -1,5 +1,17 @@
 Revision history for Test2-Tools-PerlCritic
 
+0.07      2024-02-12 16:13:47 -0700
+  - New hook violations (gh#11)
+
+0.06      2024-02-11 18:01:37 -0700
+  - New hook cleanup (gh#10)
+
+0.05      2024-02-11 11:12:33 -0700
+  - Added an optional OO interface, the old Procedural
+    interface still works as before (gh#8)
+  - New method add_hook (gh#8)
+  - New hook progressive_check (gh#8)
+
 0.04      2021-03-24 14:12:47 -0600
   - Updated documentation to make it clear that you can pass
     an array reference to file / directory paths.  (gh#4)

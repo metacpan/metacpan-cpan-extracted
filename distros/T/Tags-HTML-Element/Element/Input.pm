@@ -9,7 +9,7 @@ use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 use Tags::HTML::Element::Utils qw(tags_boolean tags_label tags_value);
 
-our $VERSION = 0.06;
+our $VERSION = 0.08;
 
 sub _cleanup {
 	my $self = shift;
@@ -59,6 +59,7 @@ sub _process {
 		tags_boolean($self, $self->{'_input'}, 'disabled'),
 		tags_value($self, $self->{'_input'}, 'min'),
 		tags_value($self, $self->{'_input'}, 'max'),
+		tags_value($self, $self->{'_input'}, 'onclick'),
 		['e', 'input'],
 	);
 
@@ -104,6 +105,7 @@ sub _process_css {
 		['s', 'input'.$css_class.'[type=date]'],
 		['s', 'input'.$css_class.'[type=number]'],
 		['s', 'input'.$css_class.'[type=email]'],
+		['s', 'input'.$css_class.'[type=checkbox]'],
 		['d', 'width', '100%'],
 		['d', 'padding', '12px 20px'],
 		['d', 'margin', '8px 0'],
@@ -111,6 +113,21 @@ sub _process_css {
 		['d', 'border', '1px solid #ccc'],
 		['d', 'border-radius', '4px'],
 		['d', 'box-sizing', 'border-box'],
+		['e'],
+
+		['s', 'input'.$css_class.'[type=button]'],
+		['d', 'width', '100%'],
+		['d', 'background-color', '#4CAF50'],
+		['d', 'color', 'white'],
+		['d', 'padding', '14px 20px'],
+		['d', 'margin', '8px 0'],
+		['d', 'border', 'none'],
+		['d', 'border-radius', '4px'],
+		['d', 'cursor', 'pointer'],
+		['e'],
+
+		['s', 'input'.$css_class.'[type=button]:hover'],
+		['d', 'background-color', '#45a049'],
 		['e'],
 
 		['s', $css_required],
@@ -324,6 +341,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.08
 
 =cut

@@ -98,6 +98,7 @@ do { my $x = {
                                    'Test::Mojo' => '0',
                                    'Test::More' => '0.96',
                                    'Test::Needs' => '0',
+                                   'Test::Warnings' => '0.033',
                                    'URI' => '0',
                                    'YAML::PP' => '0.005',
                                    'lib' => '0',

@@ -1,7 +1,7 @@
-# NAME
+# RT::Extension::NewTicketFromCorrespondence
 
-RT::Extension::NewTicketFromCorrespondence - Make new tickets from
-correspondence
+[Request Tracker](https://bestpractical.com/request-tracker) extension to
+make new tickets from correspondence.
 
 # DESCRIPTION
 
@@ -30,37 +30,37 @@ Known to work with RT 4.2.16, 4.4.4, and 5.0.1.
 
 # INSTALLATION
 
-\"perl Makefile.PL\"
+- `PREFIX=/opt/rt5/local perl Makefile.PL`
 
-:   
+    Adjust _PREFIX_ to point to your RT "local" directory.
 
-\"make\"
+- `make`
+- `make install`
 
-:   
+    May need root permissions.
 
-\"make install\"
+- Edit your `/opt/rt5/etc/RT_SiteConfig.pm`
 
-:   May need root permissions.
+    Add this line:
 
-Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Plugin('RT::Extension::NewTicketFromCorrespondence');
 
-:   Add this line: `Plugin('RT::Extension::NewTicketFromCorrespondence');`
+- Restart your web server
 
-Clear your mason cache
+- Clear your mason cache
 
-:   `rm -rf /opt/rt4/var/mason_data/obj`
+        rm -rf /opt/rt5/var/mason_data/obj
 
-Restart your web server
+- Restart your web server
 
-:   
+# ISSUES AND CONTRIBUTIONS
 
-# AUTHOR
-
-Andrew Wood
+The project is held on [Codeberg](https://codeberg.org); its issue tracker
+is at [https://codeberg.org/a-j-wood/rt-extension-newticketfromcorrespondence/issues](https://codeberg.org/a-j-wood/rt-extension-newticketfromcorrespondence/issues).
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2023 Andrew Wood.
+Copyright 2023-2024 Andrew Wood.
 
 License GPLv3+: GNU GPL version 3 or later:
 https://gnu.org/licenses/gpl.html

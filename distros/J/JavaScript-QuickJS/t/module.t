@@ -34,7 +34,7 @@ my $js = JavaScript::QuickJS->new()->set_globals(
 
 #----------------------------------------------------------------------
 
-eval { _test_module($js, '(should fail)'); fail 'nonono' };
+eval { _test_module('(should fail)'); fail 'nonono' };
 my $err = $@;
 like($err, qr<ReferenceError>, 'module load should fail without default dir');
 
@@ -60,7 +60,7 @@ is(
     'unset_module_base() returns object',
 );
 
-eval { _test_module('(should fail)'); fail 'nonono' };
+eval { _test_module('(should fail)') };
 $err = $@;
 like($err, qr<ReferenceError>, 'module load should fail without default dir');
 
@@ -74,11 +74,24 @@ sub _test_module {
     my $ret = $js->eval_module(<<END);
         import * as IMPORTED from 'my/module.js';
         _return(IMPORTED.life);
+
+        export const foo = 123;
+
         42;
 END
 
-    # Stringify for Devel::Cover …
-    is("$ret", "$js", 'eval_module() returns JS object');
+    isa_ok($ret, 'JavaScript::QuickJS::Promise', 'eval_module() returns promise');
+
+    my @from_then;
+    my @from_catch;
+    $ret->then(
+        sub { @from_then = @_ },
+        sub { @from_catch = @_ },
+    );
+    $js->await();
+
+    is_deeply(\@from_then, [undef], 'module promise resolution');
+    is_deeply(\@from_catch, [], 'module promise catch');
 
     is( $retval, 42, "$label: module imported and used" );
 

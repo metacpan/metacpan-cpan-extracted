@@ -1,9 +1,8 @@
 package OrePAN2;
-use 5.008005;
 use strict;
 use warnings;
 
-our $VERSION = "0.49";
+our $VERSION = "0.51";
 
 1;
 __END__

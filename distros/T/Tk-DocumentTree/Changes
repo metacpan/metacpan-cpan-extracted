@@ -1,5 +1,8 @@
 Revision history for Perl extension Tk::DocumentTree.
 
+0.05  Sun Fev 11 2-24
+	- Updated documentation.
+
 0.04  Sun Nov 26 2023
 	- Added modified file icon functionality
 
@@ -11,5 +14,6 @@ Revision history for Perl extension Tk::DocumentTree.
 
 0.01  Fri Jun 30 2023
 	- Initial release.
+
 
 

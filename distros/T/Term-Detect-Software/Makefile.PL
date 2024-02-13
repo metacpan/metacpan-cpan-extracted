@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.225",
+  "VERSION" => "0.227",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,9 +55,5 @@ unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
-
-if ( $^O =~ /^(aix|android|bitrig|bsdos|cygwin|darwin|dgux|dragonfly|dynixptx|freebsd|gnu|gnukfreebsd|hpux|interix|iphoneos|irix|linux|machten|midnightbsd|mirbsd|msys|netbsd|next|nto|openbsd|qnx|sco|sco_sv|solaris|sunos|svr4|svr5|unicos|unicosmk)$/i ) {
-	$WriteMakefileArgs{PREREQ_PM}{'Proc::Find::Parents'} = $FallbackPrereqs{'Proc::Find::Parents'} = '0.631';
-}
 
 WriteMakefile(%WriteMakefileArgs);

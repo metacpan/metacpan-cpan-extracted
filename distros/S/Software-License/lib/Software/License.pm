@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Software::License 0.104005;
+package Software::License 0.104006;
 # ABSTRACT: packages that provide templated software licenses
 
 use Data::Section -setup => { header_re => qr/\A__([^_]+)__\Z/ };
@@ -268,7 +268,7 @@ Software::License - packages that provide templated software licenses
 
 =head1 VERSION
 
-version 0.104005
+version 0.104006
 
 =head1 SYNOPSIS
 
@@ -559,7 +559,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Kapranoff Andrew Grangaard Axel Beckert Bernardo Rechea Bernhard Amann bowtie Brian Cassidy Phillips Craig Scrivner Curtis Brandt Dave Rolsky David E. Wheeler Golden Dominique Dumont Dylan William Hardison Flavio Poletti Florian Ragwitz Graham Knop Justin Baker Kang-min Liu Karen Etheridge Kenichi Ishigaki Kivanc Yazan Leon Timmermans magnolia Marcel Telka mikegrb Neil Bowers Nicolas Rochelemagne Olivier Mengué Pablo Rodríguez González Petr Písař Ricardo Signes Shlomi Fish srchulo Syohei YOSHIDA Tomasz Konojacki Van de Bugger Wesley Schwengle
+=for stopwords Alex Kapranoff Andrew Grangaard Axel Beckert Bernardo Rechea Bernhard Amann bowtie Brian Cassidy Phillips Craig Scrivner Curtis Brandt Dave Rolsky David E. Wheeler Golden Dominique Dumont Dylan William Hardison Flavio Poletti Florian Ragwitz Graham Knop Justin Baker jvolkening Kang-min Liu Karen Etheridge Kenichi Ishigaki Kivanc Yazan Leon Timmermans magnolia Marcel Telka mikegrb Neil Bowers Nicolas Rochelemagne Olivier Mengué Pablo Rodríguez González Petr Písař Ricardo Signes Shlomi Fish srchulo Syohei YOSHIDA Tomasz Konojacki Van de Bugger Wesley Schwengle
 
 =over 4
 
@@ -638,6 +638,10 @@ Graham Knop <haarg@haarg.org>
 =item *
 
 Justin Baker <me@jbaker.dev>
+
+=item *
+
+jvolkening <jdv@base2bio.com>
 
 =item *
 
@@ -723,7 +727,7 @@ Wesley Schwengle <wesley@schwengle.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Ricardo Signes.
+This software is copyright (c) 2024 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

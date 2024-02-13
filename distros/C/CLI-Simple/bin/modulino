@@ -6,25 +6,26 @@
 #   modulino Foo::Bar::Baz ...  will create foo_bar_baz
 #
 # To create a modulino link and force the name
-#   modulino Foo/Bar/Baz.pm ... will create Foo_Bar_Baz
+#   modulino Foo/Bar/Baz.pm ... will create foo-bar-baz
 #
 # To run a modulino...
-#   foo_bar_baz
+#   foo-bar-baz
 
 pgm=$(basename $0)
 
 if [ "$pgm" = "modulino" ]; then
     extension="${1##*.}"
+    bindir=$(dirname $(which modulino))
     
     if [ "$extension" = "$(basename $1)" ]; then
-        echo ln -s $(which modulino) $(echo "$1" | tr [A-Z] [a-z] | sed 's/::/_/g;')
+        echo ln -s $(which modulino) ${bindir}/$(echo "$1" | perl -ne 's/::/-/g; print lc;')
     else
         filename="${1%.*}"
-        echo ln -s $(which modulino) $(echo $filename | sed 's/\//_/g')
+        echo ln -s $(which modulino) ${bindir}/$(echo $filename | perl -ne 's/\//-/g; print lc')
     fi
 else  
-    MODULINO_PATH=$(basename $0 | perl -ne 'chomp; printf "%s.pm", join "/", map { ucfirst $_ } split /_/;')
-    MODULINO=$(basename $0 | perl -ne 'chomp; print join "::", map { ucfirst $_ } split /_/;')
+    MODULINO_PATH=$(basename $0 | perl -ne 'chomp; printf "%s.pm", join "/", map { ucfirst $_ } split /-/;')
+    MODULINO=$(basename $0 | perl -ne 'chomp; print join "::", map { ucfirst $_ } split /-/;')
     
     MODULINO_RUN=$(perl -M$MODULINO -e 'print $INC{"'$MODULINO_PATH'"}';)
     

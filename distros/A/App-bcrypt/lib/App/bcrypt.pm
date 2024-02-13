@@ -2,7 +2,7 @@ package App::bcrypt;
 use utf8;
 use v5.30;
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 =encoding utf8
 
@@ -45,7 +45,7 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <brian d foy> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension Liveman
 
+3.0 2024-02-12T15:02:02Z
+
+    - use trans util for translate md to pod
+
 2.0 2024-01-14T19:43:19Z
 
     - use perl-native modules (as File::Spec) for finding, removing and other operations with files

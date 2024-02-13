@@ -10,11 +10,11 @@ App::Greple::xlate - module d'aide à la traduction pour greple
 
 # VERSION
 
-Version 0.29
+Version 0.30
 
 # DESCRIPTION
 
-Le module **Greple** **xlate** recherche les blocs de texte souhaités et les remplace par le texte traduit. Actuellement, les modules DeepL (`deepl.pm`) et ChatGPT (`gpt3.pm`) sont implémentés en tant que moteur dorsal.
+Le module **Greple** **xlate** recherche les blocs de texte souhaités et les remplace par le texte traduit. Actuellement, les modules DeepL (`deepl.pm`) et ChatGPT (`gpt3.pm`) sont mis en œuvre en tant que moteur dorsal. Un support expérimental pour gpt-4 est également inclus.
 
 Si vous souhaitez traduire des blocs de texte normaux dans un document écrit dans le style Perl's pod, utilisez la commande **greple** avec les modules `xlate::deepl` et `perl` comme suit :
 
@@ -64,7 +64,7 @@ Si vous souhaitez traduire un texte entier, utilisez l'option **--match-all**. I
 - **--xlate-labor**
 - **--xlabor**
 
-    Au lieu d'appeler le moteur de traduction, vous êtes censé travailler pour. Après avoir préparé les textes à traduire, ils sont copiés dans le presse-papiers. Vous êtes censé les coller dans le formulaire, copier le résultat dans le presse-papiers et appuyer sur la touche retour.
+    Au lieu d'appeler le moteur de traduction, vous êtes censé travailler pour lui. Après avoir préparé le texte à traduire, il est copié dans le presse-papiers. Vous devez les coller dans le formulaire, copier le résultat dans le presse-papiers et appuyer sur la touche retour.
 
 - **--xlate-to** (Default: `EN-US`)
 

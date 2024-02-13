@@ -1,10 +1,10 @@
 {
    "abstract" : "Read/write blocked GZIP (BGZF) files",
    "author" : [
-      "Jeremy Volkening <jdv@base2bio.com>"
+      "Jeremy Volkening <volkening@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "gpl_3"
    ],
@@ -16,6 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Test::Exception" : "0",
             "Test::More" : "0"
          }
       },
@@ -37,7 +38,7 @@
    "provides" : {
       "Compress::BGZF" : {
          "file" : "lib/Compress/BGZF.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "Compress::BGZF::Reader" : {
          "file" : "lib/Compress/BGZF/Reader.pm"
@@ -55,6 +56,6 @@
          "url" : "https://github.com/jvolkening/p5-Compress-BGZF"
       }
    },
-   "version" : "0.006",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.007",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

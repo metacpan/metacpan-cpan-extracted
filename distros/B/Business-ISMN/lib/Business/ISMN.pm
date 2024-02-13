@@ -23,7 +23,7 @@ my $debug = 0;
 our @EXPORT_OK = qw(is_valid_checksum ean_to_ismn ismn_to_ean
 	INVALID_PUBLISHER_CODE BAD_CHECKSUM GOOD_ISMN BAD_ISMN);
 
-our $VERSION = '1.203';
+our $VERSION = '1.204';
 
 sub INVALID_PUBLISHER_CODE { -3 };
 sub BAD_CHECKSUM           { -1 };
@@ -548,11 +548,11 @@ This source is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2001-2023, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2001-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

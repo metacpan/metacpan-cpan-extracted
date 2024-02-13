@@ -1,12 +1,14 @@
 package Acme::CPANModules::DumpingDataForDebugging;
 
+use strict;
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-07'; # DATE
+our $DATE = '2023-10-29'; # DATE
 our $DIST = 'Acme-CPANModules-DumpingDataForDebugging'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $LIST = {
-    summary => 'Some modules and tips when dumping data structures for debugging',
+    summary => 'List of modules and tips when dumping data structures for debugging',
     description => <<'_',
 
 This list catalogs some of the modules you can you to dump your data structures
@@ -168,7 +170,7 @@ _
 };
 
 1;
-# ABSTRACT: Some modules and tips when dumping data structures for debugging
+# ABSTRACT: List of modules and tips when dumping data structures for debugging
 
 __END__
 
@@ -178,26 +180,26 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::DumpingDataForDebugging - Some modules and tips when dumping data structures for debugging
+Acme::CPANModules::DumpingDataForDebugging - List of modules and tips when dumping data structures for debugging
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::DumpingDataForDebugging (from Perl distribution Acme-CPANModules-DumpingDataForDebugging), released on 2020-02-07.
+This document describes version 0.002 of Acme::CPANModules::DumpingDataForDebugging (from Perl distribution Acme-CPANModules-DumpingDataForDebugging), released on 2023-10-29.
 
 =head1 DESCRIPTION
-
-Some modules and tips when dumping data structures for debugging.
 
 This list catalogs some of the modules you can you to dump your data structures
 for debugging purposes, so the modules will be judged mostly by the
 appropriateness of its output for human viewing (instead of other criteria like
 speed, footprint, etc).
 
-=head1 INCLUDED MODULES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<Data::Dumper>
+=item L<Data::Dumper>
+
+Author: L<NWCLARK|https://metacpan.org/author/NWCLARK>
 
 Everybody knows this module and it's core so sometimes it's the only appropriate
 choice. However, the default setting is not really optimized for viewing by
@@ -213,7 +215,9 @@ By default, L<Data::Dumper> quotes strings using single-quotes and does not
 quote things like "\n" and "\b" making it difficult to spot special characters.
 
 
-=item * L<Data::Dump>
+=item L<Data::Dump>
+
+Author: L<GARU|https://metacpan.org/author/GARU>
 
 A data dumper that produces nicer Perl code output, with features like vertical
 alignment of "=>" when dumping hashes, compacting sequences like 1,2,3,4,5,6 to
@@ -265,20 +269,26 @@ while Data::Dumper will produce:
          };
 
 
-=item * L<Data::Dump::Color>
+=item L<Data::Dump::Color>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 A modification to Data::Dump which adds color (and color theme) support, as well
 as other visual aids like depth and array index/hash pair count indicator. It's
 usually my go-to module for debugging.
 
 
-=item * L<Data::Dumper::Compact>
+=item L<Data::Dumper::Compact>
+
+Author: L<MSTROUT|https://metacpan.org/author/MSTROUT>
 
 A relatively recent module by MSTROUT. I will need to use this more to see if I
 really like the output, but so far I do.
 
 
-=item * L<XXX>
+=item L<XXX>
+
+Author: L<INGY|https://metacpan.org/author/INGY>
 
 A nice little dumper module from the creator of YAML. Obviously, it uses YAML
 output by default but it's configurable to dump in other formats. For example:
@@ -290,7 +300,9 @@ arguments so the dumping can be done in various places in code, making it more
 convenient. More (if not all) dumpers should do this too.
 
 
-=item * L<Data::Printer>
+=item L<Data::Printer>
+
+Author: L<GARU|https://metacpan.org/author/GARU>
 
 Favorites among many Perl programmers, it sports colors, array index indicator,
 as well as nice object dumper showing methods and inheritance information. It's
@@ -299,23 +311,39 @@ dumping is the Perl format (with additional informations/hints as comments) so
 I've never used it in my daily coding activities. I probably should though.
 
 
-=item * L<JSON::Color>
+=item L<JSON::Color>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 JSON is a limited format; it cannot represent many things that Perl supports
 e.g. globs, circular references, or even ASCII NUL. But if you are working only
 with JSON-able data, this JSON dumping module adds color output.
 
 
-=item * L<YAML::Tiny::Color>
+=item L<YAML::Tiny::Color>
+
+Author: L<SHARYANTO|https://metacpan.org/author/SHARYANTO>
 
 =back
 
 =head1 FAQ
 
-=head2 What are ways to use this module?
+=head2 What is an Acme::CPANModules::* module?
 
-Aside from reading it, you can install all the listed modules using
-L<cpanmodules>:
+An Acme::CPANModules::* module, like this module, contains just a list of module
+names that share a common characteristics. It is a way to categorize modules and
+document CPAN. See L<Acme::CPANModules> for more details.
+
+=head2 What are ways to use this Acme::CPANModules module?
+
+Aside from reading this Acme::CPANModules module's POD documentation, you can
+install all the listed modules (entries) using L<cpanm-cpanmodules> script (from
+L<App::cpanm::cpanmodules> distribution):
+
+ % cpanm-cpanmodules -n DumpingDataForDebugging
+
+Alternatively you can use the L<cpanmodules> CLI (from L<App::cpanmodules>
+distribution):
 
     % cpanmodules ls-entries DumpingDataForDebugging | cpanm -n
 
@@ -323,9 +351,15 @@ or L<Acme::CM::Get>:
 
     % perl -MAcme::CM::Get=DumpingDataForDebugging -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-This module also helps L<lcpan> produce a more meaningful result for C<lcpan
-related-mods> when it comes to finding related modules for the modules listed
-in this Acme::CPANModules module.
+or directly:
+
+    % perl -MAcme::CPANModules::DumpingDataForDebugging -E'say $_->{module} for @{ $Acme::CPANModules::DumpingDataForDebugging::LIST->{entries} }' | cpanm -n
+
+This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
+result for C<lcpan related-mods> command when it comes to finding related
+modules for the modules listed in this Acme::CPANModules module.
+See L<App::lcpan::Cmd::related_mods> for more details on how "related modules"
+are found.
 
 =head1 HOMEPAGE
 
@@ -334,14 +368,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANM
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-DumpingDataForDebugging>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-DumpingDataForDebugging>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -353,11 +379,37 @@ L<cpanmodules> - CLI tool to let you browse/view the lists
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-DumpingDataForDebugging>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

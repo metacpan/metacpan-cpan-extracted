@@ -11,9 +11,8 @@ README
 t/00-load.t
 t/01-usage-simple.t
 t/02-trim.t
-t/cpan/Module/Build.pm
-t/cpan/Mojo/File.pm
-t/cpan/Mojo/UserAgent.pm
+t/cpan/Mojo2/File.pm
+t/cpan/Mojo2/UserAgent.pm
 t/cpan/ojo.pm
 t/manifest.t
 t/pod-coverage.t

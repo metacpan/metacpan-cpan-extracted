@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use 5.006;
 use strict;
@@ -7,7 +7,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME               => 'Test::Excel',
-    AUTHOR             => q{Mohammad S Anwar <mohammad.anwar@yahoo.com>},
+    AUTHOR             => q{Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>},
     VERSION_FROM       => 'lib/Test/Excel.pm',
     ABSTRACT_FROM      => 'lib/Test/Excel.pm',
     LICENSE            => 'artistic_2',
@@ -21,8 +21,8 @@ WriteMakefile(
     PREREQ_PM => {
         'Test::Builder'           => 0,
         'Spreadsheet::Read'       => 0.75,
-        'Spreadsheet::ParseExcel' => 0.58,
-        'Spreadsheet::ParseXLSX'  => 0.27,
+        'Spreadsheet::ParseExcel' => 0.66,
+        'Spreadsheet::ParseXLSX'  => 0.31,
         'Scalar::Util'            => 0,
         'Test::Builder::Tester'   => 0,
         'Test::More'              => 0,
@@ -32,7 +32,7 @@ WriteMakefile(
     clean => { FILES => 'Test-Excel-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
-        provides    => { 'Test::Excel' => { file => 'lib/Test/Excel.pm', version => '1.53' } },
+        provides    => { 'Test::Excel' => { file => 'lib/Test/Excel.pm', version => '1.54' } },
         resources   => {
             repository => {
                 type => 'git',

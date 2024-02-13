@@ -1,3 +1,13 @@
+Sun Dec 10 16:46:14 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.0.3]:
+	* VERSION: bump
+	* src/main/oerl/lib/CLI/Simple.pm.in
+	- pod tweaks
+	* src/main/bash/bin/modulino.sh.in
+	- use -, not _ for separator
+	- use perl, not tr
+	
 Sat Nov 18 08:26:26 2023  Rob Lauer  <rlauer6@comcast.net>
 
 	[dependencies]:

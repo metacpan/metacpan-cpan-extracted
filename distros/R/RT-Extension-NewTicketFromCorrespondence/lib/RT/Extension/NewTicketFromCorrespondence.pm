@@ -3,7 +3,7 @@ use warnings;
 
 package RT::Extension::NewTicketFromCorrespondence;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 =head1 NAME
 
@@ -36,7 +36,9 @@ Known to work with RT 4.2.16, 4.4.4, and 5.0.1.
 
 =over
 
-=item C<perl Makefile.PL>
+=item C<PREFIX=/opt/rt5/local perl Makefile.PL>
+
+Adjust I<PREFIX> to point to your RT "local" directory.
 
 =item C<make>
 
@@ -52,30 +54,20 @@ Add this line:
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt5/var/mason_data/obj
 
 =item Restart your web server
 
 =back
 
-=head1 AUTHOR
+=head1 ISSUES AND CONTRIBUTIONS
 
-Andrew Wood
-
-=for html <p>All bugs should be reported via email to <a
-href="mailto:bug-RT-Extension-NewTicketFromCorrespondence@rt.cpan.org">bug-RT-Extension-NewTicketFromCorrespondence@rt.cpan.org</a>
-or via the web at <a
-href="http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-NewTicketFromCorrespondence">rt.cpan.org</a>.</p>
-
-=for text
-    All bugs should be reported via email to
-        bug-RT-Extension-NewTicketFromCorrespondence@rt.cpan.org
-    or via the web at
-        http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-NewTicketFromCorrespondence
+The project is held on Codeberg - https://codeberg.org - and its issue tracker
+is at: https://codeberg.org/a-j-wood/rt-extension-newticketfromcorrespondence/issues
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2023 Andrew Wood.
+Copyright 2023-2024 Andrew Wood.
 
 License GPLv3+: GNU GPL version 3 or later: https://gnu.org/licenses/gpl.html
 

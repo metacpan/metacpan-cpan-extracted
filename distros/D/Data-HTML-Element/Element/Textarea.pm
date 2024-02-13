@@ -7,7 +7,7 @@ use Mo qw(build is);
 use Mo::utils qw(check_bool check_number);
 use Mo::utils::CSS qw(check_css_class);
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 has autofocus => (
 	is => 'ro',
@@ -408,6 +408,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.10
+0.11
 
 =cut

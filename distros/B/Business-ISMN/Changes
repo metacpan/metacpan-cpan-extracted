@@ -1,5 +1,8 @@
 Revision history for Perl module Business::ISMN
 
+1.204 2024-02-11T06:50:27Z
+	* refresh distro, update email address, move to BRIANDFOY
+
 1.203 2023-03-16T11:10:05Z
 	* Fix ean_to_ismn, which was not adding the M to the start.
 

@@ -1,14 +1,14 @@
 ---
 abstract: 'The Mozilla Public Suffix List'
 author:
-  - 'brian d foy <bdfoy@cpan.org>'
+  - 'brian d foy <briandfoy@pobox.com>'
 build_requires:
   Test::More: '1'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,6 +28,6 @@ requires:
 resources:
   bugtracker: https://github.com/briandfoy/net-publicsuffixlist/issues
   homepage: https://github.com/briandfoy/net-publicsuffixlist
-  repository: https://github.com/briandfoy/net-publicsuffixlist.git
-version: '0.502'
+  repository: https://github.com/briandfoy/net-publicsuffixlist
+version: '0.503'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

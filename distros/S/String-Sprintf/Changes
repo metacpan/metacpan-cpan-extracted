@@ -1,5 +1,11 @@
 Revision history for Perl module String::Sprintf
 
+1.003 2024-02-11T06:57:29Z
+	* refresh distro, update email address, move to BRIANDFOY
+
+1.002_01 2022-02-15T17:42:28Z
+	* Try fixing old YAML version failing tests
+
 1.002 2022-02-02T11:03:33Z
 	* Add LICENSE file. It's the perl5 license.
 	* Add CITATION.cff, which GitHub now supports
@@ -15,6 +21,4 @@ Revision history for Perl module String::Sprintf
 
 0.01 Wed Nov 15 02:45:25 2006
     - original version; created by ExtUtils::ModuleMaker 0.47
-0.01 Wed Nov 15 02:45:25 2006
-    - first public release
 

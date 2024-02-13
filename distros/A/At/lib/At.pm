@@ -1,4 +1,4 @@
-package At 0.15 {
+package At 0.16 {
     use v5.38;
     no warnings 'experimental::class', 'experimental::builtin', 'experimental::for_list';    # Be quiet.
     use feature 'class';
@@ -245,29 +245,32 @@ package At 0.15 {
                 $res;
             }
 
-            method admin_queryModerationEvents (
-                $types                 //= (),
-                $createdBy             //= (),
-                $sortDirection         //= (),
-                $subject               //= (),
-                $includeUsed           //= (),
-                $includeAllUserRecords //= (),
-                $limit                 //= (),
-                $cursor                //= ()
-            ) {
+            method admin_queryModerationEvents (%args) {
                 $self->http->session // Carp::confess 'requires an authenticated client';
-                $createdBy = At::Protocol::DID->new( uri => $createdBy ) if defined $createdBy && !builtin::blessed $createdBy;
-                $subject   = URI->new($subject)                          if defined $subject   && !builtin::blessed $subject;
+                $args{createdBy} = At::Protocol::DID->new( uri => $args{createdBy} )
+                    if defined $args{createdBy} && !builtin::blessed $args{createdBy};
+                Carp::confess 'Sort direction must be "asc" or "desc"'
+                    if defined $args{sortDirection} && ( $args{sortDirection} !~ /^(?:asc|desc)$/ );
+                $args{createdAfter} = At::Protocol::Timestamp->new( timestamp => $args{createdAfter} )
+                    if defined $args{createdAfter} && !builtin::blessed $args{createdAfter};
+                $args{subject} = URI->new( $args{subject} ) if defined $args{subject} && !builtin::blessed $args{subject};
+                Carp::confess 'Limit must be in the range 1..100; default is 50' if defined $args{limit} && !( 1 < $args{limit} > 100 );
                 my $res = $self->http->get(
                     sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.queryModerationEvents' ),
                     {   content => +{
-                            defined $types                 ? ( types                 => $types )                 : (),
-                            defined $createdBy             ? ( createdBy             => $createdBy->_raw )       : (),
-                            defined $sortDirection         ? ( sortDirection         => $sortDirection )         : (),
-                            defined $subject               ? ( subject               => $subject->as_string )    : (),
-                            defined $includeAllUserRecords ? ( includeAllUserRecords => $includeAllUserRecords ) : (),
-                            defined $limit                 ? ( limit                 => $limit )                 : (),
-                            defined $cursor                ? ( cursor                => $cursor )                : ()
+                            defined $args{types}                 ? ( types                 => $args{types} )                    : (),
+                            defined $args{createdBy}             ? ( createdBy             => $args{createdBy}->_raw )          : (),
+                            defined $args{sortDirection}         ? ( sortDirection         => $args{sortDirection} )            : (),
+                            defined $args{createdAfter}          ? ( createdAfter          => $args{createdAfter}->_raw )       : (),
+                            defined $args{subject}               ? ( subject               => $args{subject}->as_string )       : (),
+                            defined $args{includeAllUserRecords} ? ( includeAllUserRecords => \!!$args{includeAllUserRecords} ) : (),
+                            defined $args{limit}                 ? ( limit                 => $args{limit} )                    : (),
+                            defined $args{hasComment}            ? ( hasComment            => \!!$args{hasComment} )            : (),
+                            defined $args{comment}               ? ( comment               => $args{comment} )                  : (),
+                            defined $args{addedLabels}           ? ( addedLabels           => $args{addedLabels} )              : (),
+                            defined $args{removedLabels}         ? ( removedLabels         => $args{removedLabels} )            : (),
+                            defined $args{reportTypes}           ? ( reportTypes           => $args{reportTypes} )              : (),
+                            defined $args{cursor}                ? ( cursor                => $args{cursor} )                   : ()
                         }
                     }
                 );
@@ -1649,11 +1652,11 @@ on success.
 
 =head2 C<admin_queryModerationEvents( [...] )>
 
-    $at->admin_queryModerationEvents( 'did:...' );
+    $at->admin_queryModerationEvents( createdBy => 'did:...' );
 
 List moderation events related to a subject.
 
-Expected parameters include:
+Expected parameters should be passed as a hash and include:
 
 =over
 
@@ -1668,6 +1671,14 @@ specified, all events are returned.
 
 Sort direction for the events. C<asc> or C<desc>. Defaults to descending order of created at timestamp.
 
+=item C<createdAfter>
+
+Retrieve events created after a given timestamp.
+
+=item C<createdBefore>
+
+Retrieve events created before a given timestamp.
+
 =item C<subject>
 
 =item C<includeAllUserRecords>
@@ -1677,6 +1688,24 @@ If true, events on all record types (posts, lists, profile etc.) owned by the di
 =item C<limit>
 
 Minimum is 1, maximum is 100, 50 is the default.
+
+=item C<hasComment>
+
+If true, only events with comments are returned.
+
+=item C<comment>
+
+If specified, only events with comments containing the keyword are returned.
+
+=item C<addedLabels>
+
+If specified, only events where all of these labels were added are returned.
+
+=item C<removedLabels>
+
+If specified, only events where all of these labels were removed are returned.
+
+=item C<reportTypes>
 
 =item C<cursor>
 

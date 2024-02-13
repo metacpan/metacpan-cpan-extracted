@@ -5,18 +5,18 @@ use warnings;
 
 use SPVM::Global;
 
-our $VERSION = "0.989069";
+our $VERSION = "0.989071";
 
 require XSLoader;
 XSLoader::load('SPVM', $VERSION);
 
 sub import {
-  my ($class, $basic_type_name) = @_;
-
+  my ($class, $class_name) = @_;
+  
   my ($file, $line) = (caller)[1, 2];
   
-  if (defined $basic_type_name) {
-    SPVM::Global::build_module($basic_type_name, $file, $line);
+  if (defined $class_name) {
+    SPVM::Global::build_class($class_name, $file, $line);
   }
 }
 
@@ -32,9 +32,9 @@ SPVM - SPVM Language
 
 =head1 Description
 
-SPVM is a statically typed programming language with the syntax of Perl.
+SPVM is a statically typed programming language that has Perl-like syntax.
 
-SPVM has not yet reached a stable release of version 1.0. For now, L<backward compatibility|https://github.com/yuki-kimoto/SPVM/wiki/Backward-Compatibility> of methods and features will not be kept.
+SPVM has not yet reached a stable release of version 1.0. For now, there is currently no policy to keep the L<backward compatibility|https://github.com/yuki-kimoto/SPVM/wiki/Backward-Compatibility>.
 
 =head1 Usage
 
@@ -42,7 +42,7 @@ A class of SPVM:
 
   # lib/SPVM/MyMath.spvm
   class MyMath {
-C<static method sum : int ($nums : int[])>
+    static method sum : int ($nums : int[]) {
       
       my $total = 0;
       for (my $i = 0; $i < @$nums; $i++) {
@@ -63,6 +63,28 @@ Calling a SPVM method from Perl:
   
   # Call method
   my $total = SPVM::MyMath->sum([3, 6, 8, 9]);
+
+=head1 Features
+
+=over2 
+
+=item * L<Native threads|SPVM::Thread> and L<goroutines|SPVM::Go>.
+
+=item * L<Generating an executable file|spvmcc>
+
+=item * AOT(Ahead-of-time compilation) and JIT(Just-in-time compilation).
+
+=item * Static types, type inference and L<static analysis|SPVM::Native::Compiler>.
+
+=item * L<C/C++ binding|SPVM::Document::NativeClass> and L<resource system|SPVM::Document::Resource> for C/C++ libraries.
+
+=item * L<Perl binding for SPVM methods|SPVM::ExchangeAPI>.
+
+=item * L<Perl-like syntax|SPVM::Document::Language> with class syntax.
+
+=item * L<High performance|https://github.com/yuki-kimoto/SPVM/wiki/Benchmark>
+
+=back
 
 =head1 Documents
 
@@ -90,14 +112,17 @@ Calling a SPVM method from Perl:
 
 =back
 
-=head1 use
-
-  use SPVM;
+=head1 Loading SPVM Class
+  
+  # Load a SPVM class
   use SPVM 'SomeClass';
+  
+  # Load only SPVM module
+  use SPVM ();
 
-Loads the L<SPVM> module.
+The C<use> statement loads a L<SPVM> class.
 
-If a class name of SPVM is given as the first argument, the SPVM module is loaded and is bound to a Perl module.
+A SPVM class is loaded and is bound to a Perl module.
 
 The bound Perl class name is prefixed with C<SPVM::>.
 

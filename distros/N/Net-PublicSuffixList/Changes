@@ -1,5 +1,8 @@
 # Changes for Net::PublicSuffixList
 
+0.503 2024-02-11T22:14:34Z
+	* refresh distro, update email address, move to BRIANDFOY
+
 0.502 2022-03-19T15:56:32Z
 	* Freshen distro and correct some LICENSE issues. No code changes.
 

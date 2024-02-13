@@ -9,7 +9,7 @@ WriteMakefile(
 	'ABSTRACT_FROM' => 'lib/« $module_path »',
 	'VERSION_FROM'  => 'lib/« $module_path »',
 	'LICENSE'       => 'perl',
-	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
+	'AUTHOR'        => '« $author_name » <« $email »>',
 
 	'PREREQ_PM'    => {
 		'Test::More' => '0.95',

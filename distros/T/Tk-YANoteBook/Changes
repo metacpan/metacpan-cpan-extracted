@@ -1,5 +1,10 @@
 Revision history for Perl extension Tk::YANoteBook.
 
+0.05  Mon Feb 12 2024
+	changed option -closetabcall to call deletePage by default.
+	updated documentation.
+	adjusted the IsFull method to prevent oscillation. Hope it works.
+
 0.04  Thu Sep 14 2023
 	tidied up documentation.
 	gave the NameTab widget it's own pm file
@@ -18,3 +23,4 @@ Revision history for Perl extension Tk::YANoteBook.
 
 0.01  Tue Jun 6 2023
 	Initial release
+

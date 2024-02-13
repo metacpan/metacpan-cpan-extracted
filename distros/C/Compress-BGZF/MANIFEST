@@ -23,6 +23,9 @@ t/corpus/lorem.gz.gzi
 t/corpus/lorem_long
 t/corpus/lorem_long.gz
 t/corpus/lorem_long.gz.gzi
+t/corpus/lorem_mixed
+t/corpus/lorem_mixed.gz
+t/corpus/lorem_mixed.gz.gzi
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

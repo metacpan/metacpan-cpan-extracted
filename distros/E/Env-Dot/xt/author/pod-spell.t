@@ -10,12 +10,15 @@ use Pod::Wordlist;
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+David
 Dot
 Env
 Functions
+Kaufman
 Koivunalho
 Mikko
 ScriptFunctions
+david
 dotenv
 env
 envdot

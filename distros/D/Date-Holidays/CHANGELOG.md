@@ -1,5 +1,9 @@
 # Changes file for Date-Holidays
 
+## 1.36 2024-02-11 Feature release, updated not required
+
+- Addition of support of [Date::Holidays::CW](https://metacpan.org/pod/Date::Holidays::CW) via [Date::Holidays::Adapter::CW](https://metacpan.org/pod/Date::Holidays::Adapter::CW) via PR [#125](https://github.com/jonasbn/perl-date-holidays/pull/125) by Wesley Schwengle (@waterkip) author of: [Date::Holidays::CW], the calendar implementation for Curaçao
+
 ## 1.35 2023-08-16 Maintenance release, update not required
 
 - Merged PR [#113](https://github.com/jonasbn/perl-date-holidays/pull/113) by @haarg. Removing unused explicit imports, where error handling will change in the future, so this is a preemptive change

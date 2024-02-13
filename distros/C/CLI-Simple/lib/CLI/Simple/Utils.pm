@@ -12,7 +12,7 @@ use parent qw(Exporter);
 
 our @EXPORT_OK = qw( slurp slurp_json dump_json normalize_options);
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.3';
 
 ########################################################################
 sub slurp_json {

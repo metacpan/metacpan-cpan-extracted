@@ -19,8 +19,9 @@ if ($OSNAME eq 'MSWin32') {
 	$script =~ s/\\/\//msg;
 }
 my $right_ret = <<"END";
-Usage: $script [-d test_dir] [-h] [-i] [-m match_string] [-v level] [--version] directory
+Usage: $script [-d test_dir] [-f] [-h] [-i] [-m match_string] [-v level] [--version] directory
 	-d test_dir	Test directory (default is directory in system tmp).
+	-f		Print file.
 	-h		Print help.
 	-i		Ignore errors.
 	-m match_string	Match string (default is not defined).

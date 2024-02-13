@@ -33,7 +33,7 @@ subtest 'missing arguments' => sub {
 
   like(
     exception { OpenAPI::Modern->new(openapi_uri => 'foo') },
-    qr/missing required constructor arguments: either openapi_document, or openapi_schema/,
+    qr/missing required constructor arguments: either openapi_document, or openapi_uri and openapi_schema/,
     'need openapi_document or openapi_schema',
   );
 

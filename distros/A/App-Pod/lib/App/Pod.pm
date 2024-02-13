@@ -37,7 +37,7 @@ App::Pod - Quickly show available class methods and documentation.
 
 =cut
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 
 =head1 SYNOPSIS
@@ -1141,7 +1141,8 @@ sub store_cache {
         mkdir $path->dirname or die $!;
     }
 
-    $path->spurt( j $cache );
+    my $writer = $path->can( "spew" ) ? "spew" : "spurt";
+    $path->$writer( j $cache );
 
     # Reset the flag.
     $self->_dirty_cache( 0 );

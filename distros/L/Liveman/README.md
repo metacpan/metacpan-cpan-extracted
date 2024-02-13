@@ -1,81 +1,87 @@
 [![Actions Status](https://github.com/darviarush/perl-liveman/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-liveman/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Liveman.svg)](https://metacpan.org/release/Liveman)
+!ru:en
 # NAME
 
-Liveman - markdown compiller to test and pod
+Liveman - компиллятор из markdown в тесты и документацию
 
 # VERSION
 
-2.0
+3.0
 
 # SYNOPSIS
 
-File lib/Example.md:
+Файл lib/Example.md:
 ```markdown
-Twice two:
+Дважды два:
 \```perl
 2*2  # -> 2+2
 \```
 ```
 
-Test:
+Тест:
 ```perl
 use Liveman;
 
 my $liveman = Liveman->new(prove => 1);
 
-# compile lib/Example.md file to t/example.t and added pod to lib/Example.pm
+# Компилировать lib/Example.md файл в t/example.t 
+# и добавить pod-документацию в lib/Example.pm
 $liveman->transform("lib/Example.md");
 
 $liveman->{count}   # => 1
 -f "t/example.t"    # => 1
 -f "lib/Example.pm" # => 1
 
-# compile all lib/**.md files with a modification time longer than their corresponding test files (t/**.t)
+# Компилировать все lib/**.md файлы со временем модификации, превышающим соответствующие тестовые файлы (t/**.t):
 $liveman->transforms;
 $liveman->{count}   # => 0
 
-# compile without check modification time
+# Компилировать без проверки времени модификации
 Liveman->new(compile_force => 1)->transforms->{count} # => 1
 
-# start tests with yath
+# Запустить тесты с yath:
 my $yath_return_code = $liveman->tests->{exit_code};
 
 $yath_return_code           # => 0
 -f "cover_db/coverage.html" # => 1
 
-# limit liveman to these files for operations transforms and tests (without cover)
+# Ограничить liveman этими файлами для операций, преобразований и тестов (без покрытия):
 my $liveman2 = Liveman->new(files => [], force_compile => 1);
 ```
 
 # DESCRIPION
 
-The problem with modern projects is that the documentation is disconnected from testing.
-This means that the examples in the documentation may not work, and the documentation itself may lag behind the code.
+Проблема современных проектов в том, что документация оторвана от тестирования.
+Это значит, что примеры в документации могут не работать, а сама документация может отставать от кода.
 
-Liveman compile `lib/**`.md files to `t/**.t` files
-and it added pod-documentation to section `__END__` to `lib/**.pm` files.
+Liveman компилирует файлы `lib/**.md` в файлы `t/**.t`
+и добавляет документацию в раздел `__END__` модуля к файлам `lib/**.pm`.
 
-Use `liveman` command for compile the documentation to the tests in catalog of your project and starts the tests:
+Используйте команду `liveman` для компиляции документации к тестам в каталоге вашего проекта и запускайте тесты:
 
     liveman
 
-Run it with coverage.
+Запустите его с покрытием.
 
-Option `-o` open coverage in browser (coverage file: `cover_db/coverage.html`).
+Опция `-o` открывает отчёт о покрытии кода тестами в браузере (файл отчёта покрытия: `cover_db/coverage.html`).
 
-Liveman replace `our $VERSION = "...";` in `lib/**.pm` from `lib/**.md` if it exists in pm and in md.
+Liveman заменяет `our $VERSION = "...";` в `lib/**.pm` из `lib/**.md` из секции **VERSION** если она существует.
 
-If exists file **minil.toml**, then Liveman read `name` from it, and copy file with this name and extension `.md` to README.md.
+Если файл **minil.toml** существует, то Liveman прочитает из него `name` и скопирует файл с этим именем и расширением `.md` в `README.md`.
+
+Если нужно, чтобы документация в `.md` была написана на одном языке, а `pod` – на другом, то в начале `.md` нужно указать `!from:to` (с какого на какой язык перевести, например, для этого файла: `!ru:en`).
+
+Файлы с переводами складываются в каталог `i18n`, например, `lib/My/Module.md` -> `i18n/My/Module.ru-en.po`. Перевод осуществляется утилитой `trans` (она должна быть установлена в системе). Файлы переводов можно подкорректировать, так как если перевод уже есть в файле, то берётся он.
+
+**Внимание!** Будьте осторожны и после редактирования `.md` просматривайте `git diff`, чтобы не потерять подкорректированные перевода в `.po`.
 
 ## TYPES OF TESTS
 
-Section codes `noname` or `perl` writes as code to `t/**.t`-file. And comment with arrow translates on test from module `Test::More`.
-
-The test name set as the code-line.
+Коды секций без указанного языка программирования или с `perl` записываются как код в файл `t/**.t`. А комментарий со стрелкой (# -> )превращается в тест `Test::More`.
 
 ### `is`
 
-Compare two expressions for equivalence:
+Сравнить два эквивалентных выражения:
 
 ```perl
 "hi!" # -> "hi" . "!"
@@ -84,16 +90,16 @@ Compare two expressions for equivalence:
 
 ### `is_deeply`
 
-Compare two expressions for structures:
+Сравнить два выражения для структур:
 
 ```perl
-"hi!" # --> "hi" . "!"
+["hi!"] # --> ["hi" . "!"]
 "hi!" # ⟶ "hi" . "!"
 ```
 
 ### `is` with extrapolate-string
 
-Compare expression with extrapolate-string:
+Сравнить выражение с экстраполированной строкой:
 
 ```perl
 my $exclamation = "!";
@@ -103,7 +109,7 @@ my $exclamation = "!";
 
 ### `is` with nonextrapolate-string
 
-Compare expression with nonextrapolate-string:
+Сравнить выражение с неэкстраполированной строкой:
 
 ```perl
 'hi${exclamation}3' # \> hi${exclamation}3
@@ -112,7 +118,7 @@ Compare expression with nonextrapolate-string:
 
 ### `like`
 
-It check a regular expression included in the expression:
+Проверяет регулярное выражение, включенное в выражение:
 
 ```perl
 'abbc' # ~> b+
@@ -121,7 +127,7 @@ It check a regular expression included in the expression:
 
 ### `unlike`
 
-It check a regular expression excluded in the expression:
+Он проверяет регулярное выражение, исключённое из выражения:
 
 ```perl
 'ac' # <~ b+
@@ -130,43 +136,43 @@ It check a regular expression excluded in the expression:
 
 ## EMBEDDING FILES
 
-Each test is executed in a temporary directory, which is erased and created when the test is run.
+Каждый тест выполняется во временном каталоге, который удаляется и создается при запуске теста.
 
-This directory format is /tmp/.liveman/*project*/*path-to-test*/.
+Формат этого каталога: /tmp/.liveman/*project*/*path-to-test*/.
 
-Code section in md-file prefixed line **File `path`:** write to file in rintime testing.
+Раздел кода в строке с префиксом md-файла **File `path`:** запишется в файл при тестировании во время выполнения.
 
-Code section in md-file prefixed line **File `path` is:** will be compared with the file by the method `Test::More::is`.
+Раздел кода в префиксной строке md-файла **File `path` is:** будет сравниваться с файлом методом `Test::More::is`.
 
-File experiment/test.txt:
+Файл experiment/test.txt:
 ```text
 hi!
 ```
 
-File experiment/test.txt is:
+Файл experiment/test.txt является:
 ```text
 hi!
 ```
 
-**Attention!** An empty string between the prefix and the code is not allowed!
+**Внимание!** Пустая строка между префиксом и кодом не допускается!
 
-Prefixes maybe on russan: `Файл path:` and `Файл path является:`.
+Эти префиксы могут быть как на английском, так и на русском.
 
 # METHODS
 
 ## new (%param)
 
-Constructor. Has arguments:
+Конструктор. Имеет аргументы:
 
-1. `files` (array_ref) — list of md-files for methods `transforms` and `tests`.
-1. `open` (boolean) — open coverage in browser. If is **opera** browser — open in it. Else — open via `xdg-open`.
-1. `force_compile` (boolean) — do not check the md-files modification time.
-1. `options` — add options in command line to yath or prove.
-1. `prove` — use prove, but use'nt yath.
+1. `files` (array_ref) — список md-файлов для методов `transforms` и `tests`.
+1. `open` (boolean) — открыть покрытие в браузере. Если на компьютере установлен браузер **opera**, то будет использоватся команда `opera` для открытия. Иначе — `xdg-open`.
+1. `force_compile` (boolean) — не проверять время модификации md-файлов.
+1. `options` — добавить параметры в командной строке для проверки или доказательства.
+1. `prove` — использовать доказательство (команду `prove` для запуска тестов), а не команду `yath`.
 
 ## test_path ($md_path)
 
-Get the path to the `t/**.t`-file from the path to the `lib/**.md`-file:
+Получить путь к `t/**.t`-файлу из пути к `lib/**.md`-файлу:
 
 ```perl
 Liveman->new->test_path("lib/PathFix/RestFix.md") # => t/path-fix/rest-fix.t
@@ -174,11 +180,11 @@ Liveman->new->test_path("lib/PathFix/RestFix.md") # => t/path-fix/rest-fix.t
 
 ## transform ($md_path, [$test_path])
 
-Compile `lib/**.md`-file to `t/**.t`-file.
+Компилирует `lib/**.md`-файл в `t/**.t`-файл.
 
-And method `transform` replace the **pod**-documentation in section `__END__` in `lib/**.pm`-file. And create `lib/**.pm`-file if it not exists.
+А так же заменяет **pod**-документацию в секции `__END__` в `lib/**.pm`-файле и создаёт `lib/**.pm`-файл, если тот не существует.
 
-File lib/Example.pm is:
+Файл lib/Example.pm является:
 ```perl
 package Example;
 
@@ -188,29 +194,29 @@ __END__
 
 =encoding utf-8
 
-Twice two:
+Дважды два:
 
 	2*2  # -> 2+2
 
 ```
 
-File `lib/Example.pm` was created from file `lib/Example.md` described in section `SINOPSIS` in this document.
+Файл `lib/Example.pm` был создан из файла `lib/Example.md`, что описано в разделе `SINOPSIS` в этом документе.
 
 ## transforms ()
 
-Compile `lib/**.md`-files to `t/**.t`-files.
+Компилировать `lib/**.md`-файлы в `t/**.t`-файлы.
 
-All if `$self->{files}` is empty, or `$self->{files}`.
+Все, если `$self->{files}` не установлен, или `$self->{files}`.
 
 ## tests ()
 
-Tests `t/**.t`-files.
+Запустить тесты (`t/**.t`-файлы).
 
-All if `$self->{files}` is empty, or `$self->{files}` only.
+Все, если `$self->{files}` не установлен, или `$self->{files}` только.
 
 # AUTHOR
 
-Yaroslav O. Kosmina [dart@cpan.org](mailto:dart@cpan.org)
+Yaroslav O. Kosmina <dart@cpan.org>
 
 # LICENSE
 

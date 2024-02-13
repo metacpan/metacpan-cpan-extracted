@@ -11,6 +11,7 @@ use utf8;
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use JSON::Schema::Modern::Utilities 'jsonp';
+use Test::Warnings 0.033 qw(:no_end_test allow_patterns);
 
 use lib 't/lib';
 use Helper;
@@ -402,8 +403,10 @@ YAML
   remove_header($response, 'Content-Length');
 
   cmp_deeply(
-    ($result = $openapi->validate_response($response,
-      { path_template => '/foo', method => 'post' }))->TO_JSON,
+    ($result = do {
+      my $x = allow_patterns(qr/^parse error when converting HTTP::Response/) if $::TYPE eq 'lwp';
+      $openapi->validate_response($response, { path_template => '/foo', method => 'post' });
+    })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -451,7 +454,7 @@ YAML
           instanceLocation => '/response/body',
           keywordLocation => jsonp(qw(/paths /foo post responses default $ref content bloop/html)),
           absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp('/components/responses/default/content', 'bloop/html'))->to_string,
-          error => 'EXCEPTION: unsupported Content-Type "bloop/html": add support with $openapi->add_media_type(...)',
+          error => 'EXCEPTION: unsupported media type "bloop/html": add support with $openapi->add_media_type(...)',
         },
       ],
     },
@@ -580,9 +583,12 @@ YAML
 
 
   cmp_deeply(
-    ($result = $openapi->validate_response(
-      response(400, [ 'Content-Length' => 1, 'Content-Type' => 'text/plain' ], ''), # Content-Length lies!
-      { path_template => '/foo', method => 'post' }))->TO_JSON,
+    ($result = do {
+      my $x = allow_patterns(qr/^parse error when converting HTTP::Response/) if $::TYPE eq 'lwp';
+      $openapi->validate_response(
+        response(400, [ 'Content-Length' => 1, 'Content-Type' => 'text/plain' ], ''), # Content-Length lies!
+          { path_template => '/foo', method => 'post' });
+    })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -600,8 +606,12 @@ YAML
   $response = response(400, [ 'Content-Type' => 'text/plain' ], 'éclair');
   remove_header($response, 'Content-Length');
 
+
   cmp_deeply(
-    ($result = $openapi->validate_response($response, { path_template => '/foo', method => 'post' }))->TO_JSON,
+    ($result = do {
+      my $x = allow_patterns(qr/^parse error when converting HTTP::Response/) if $::TYPE eq 'lwp';
+      $openapi->validate_response($response, { path_template => '/foo', method => 'post' });
+    })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -630,7 +640,7 @@ YAML
 
 
   cmp_deeply(
-    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'text/plain', 'Content-Length' => 20 ], 'I should not have content'),
+    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'text/plain', 'Content-Length' => 25 ], 'I should not have content'),
       { path_template => '/foo', method => 'post' }))->TO_JSON,
     {
       valid => false,

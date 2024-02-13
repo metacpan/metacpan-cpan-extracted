@@ -2,10 +2,10 @@ package Mojolicious::Plugin::INIConfig::Extended;
 use Mojo::Base 'Mojolicious::Plugin::INIConfig';
 use Config::Tiny;
 use File::Spec::Functions 'file_name_is_absolute';
-use Mojo::Util qw/encode decode slurp/;
+use Mojo::Util qw/encode decode/;
 use Data::Dumper;
 
-our $VERSION = '0.06';
+our $VERSION = '0.05';
 
 sub register {
   my ($self, $app, $conf) = @_;

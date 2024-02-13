@@ -11,5 +11,5 @@ $q->Rotate(-90);
 $q->Raise('6x6');
 $q->Annotate(font=>'Generic.ttf',text=>'Push Me',fill=>'black',
   gravity=>'Center',pointsize=>18);
-$q->Write('button.gif');
-$q->Write('win:');
+$q->Write('button.pam');
+$q->Write(magick=>'SHOW',title=>"Button");

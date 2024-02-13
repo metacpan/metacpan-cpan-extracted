@@ -1,5 +1,10 @@
 Revision history for Perl module Distribution::Cooker
 
+2.003 2024-02-11T21:37:32Z
+	* fix templates for Mojo-based templating
+	* document all template vars in dist_cooker
+	* refresh distro, update email addresses, move to BRIANDFOY
+
 2.002 2023-04-02T03:44:20Z
 	* Silence a warning about @_ and signatures for v5.36
 

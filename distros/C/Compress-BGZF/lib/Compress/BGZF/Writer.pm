@@ -11,6 +11,8 @@ use constant HEAD_BYTES  => 18;
 use constant FOOT_BYTES  => 8;
 use constant FLUSH_SIZE  => 2**16 - HEAD_BYTES - FOOT_BYTES - 1;
 use constant BGZF_HEADER => pack "H*", '1f8b08040000000000ff060042430200';
+use constant BGZF_EOF    => pack "H*",
+    '1f8b08040000000000ff0600424302001b0003000000000000000000';
 
 ## no critic
 # allow for filehandle tie'ing
@@ -66,6 +68,7 @@ sub new {
     # these variables are tracked to allow for index creation
     $self->{u_offset} = 0; #uncompressed file offset
     $self->{idx} = [];
+    $self->{write_eof} = 0;
 
     return $self;
 
@@ -84,6 +87,25 @@ sub set_level {
     croak "Invalid compression level (allowed 0-9)"
         if ($level !~ /^\d$/);
     $self->{c_level} = $level;
+
+    return;
+
+}
+
+sub set_write_eof {
+
+    # Sets whether to include htslib-style EOF empty block at end of file
+
+    #-------------------------------------------------------------------------
+    # ARG 0 : (optional) boolean
+    #-------------------------------------------------------------------------
+    # no returns
+    #-------------------------------------------------------------------------
+
+    my ($self, $bool) = @_;
+
+    $bool //= 1;
+    $self->{write_eof} = $bool ? 1 : 0;
 
     return;
 
@@ -208,6 +230,10 @@ sub finalize {
         $self->{buffer} = $unwritten . $self->{buffer}
             if ( length($unwritten) );
 
+    }
+    # write EOF block if requested (only first time finalize() is run)
+    if ($self->{write_eof} && defined fileno($self->{fh})) {
+        print { $self->{fh} } BGZF_EOF;
     }
     if (defined fileno($self->{fh}) ) {
         close $self->{fh}
@@ -346,6 +372,19 @@ Z_NO_COMPRESSION, Z_BEST_SPEED, Z_DEFAULT_COMPRESSION, Z_BEST_COMPRESSION
 (defaults to Z_DEFAULT_COMPRESSION). The author's observations suggest that
 the default is reasonable unless speed is of the essence, in which case
 setting a level of 1-2 can sometimes halve the compression time.
+
+=item B<set_write_eof>
+
+    $writer->set_write_eof;    # turn on
+    $writer->set_write_eof(1); # turn on
+    $writer->set_write_eof(0); # turn off
+
+The L<htslib|https://github.com/samtools/htslib> C<bgzf.c> library, which
+might be considered the reference BGZF implementation, uses a special empty
+block to indicate EOF as an extra check of file integrity. This class method
+turns on or off a flag telling the C<Compress::BGZF::Writer> object whether to
+append this special block to the output file for the sake of compatability.
+Default: off.
 
 =item B<add_data>
 

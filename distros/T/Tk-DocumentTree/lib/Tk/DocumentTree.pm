@@ -8,7 +8,7 @@ Tk::DocumentTree - ITree based document list
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -83,6 +83,11 @@ Callback to execute when the user clicks (selects) and entry.
 Callback for obtaining the file icon. By default it is set
 to a call that returns the default file.xpm in the Perl/Tk
 distribution.
+
+=item Switch: B<-saveiconcall>
+
+Callback for obtaining the save icon. By default it is set
+to a call that returns save icon embedded in this package.
 
 =back
 
@@ -318,6 +323,12 @@ sub entryDelete {
 	}
 }
 
+=item B<entryModified>I<($filename)>
+
+Sets the icon in the $filename entry to the save icon, indicating the entry is modified.
+
+=cut
+
 sub entryModified {
 	my ($self, $entry) = @_;
 	my $sep = $self->cget('-separator');
@@ -325,6 +336,12 @@ sub entryModified {
 	$entry = $self->StripPath($entry);
 	$self->entryconfigure($entry, -image => $self->GetSaveIcon);
 }
+
+=item B<entrySaved>I<($filename)>
+
+Sets the icon in the $filename entry to the default file icon, indicating the entry is saved.
+
+=cut
 
 sub entrySaved {
 	my ($self, $entry) = @_;
@@ -612,4 +629,5 @@ Unknown. If you find any, please contact the author.
 1;
 
 __END__
+
 

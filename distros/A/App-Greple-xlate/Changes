@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-xlate
 
+0.30 2024-02-12T07:19:06Z
+
+    - ad hoc support for ChatGPT-4
+
 0.29 2024-01-22T04:34:48Z
 
     - produce files without engine-name when single engine used

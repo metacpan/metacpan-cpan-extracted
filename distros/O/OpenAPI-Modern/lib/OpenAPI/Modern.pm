@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.057-2-g7e4b25a
+package OpenAPI::Modern; # git description: v0.058-15-g4f48a72
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 use 5.020;
 use utf8;
@@ -22,7 +22,7 @@ use Ref::Util qw(is_plain_hashref is_plain_arrayref is_ref);
 use List::Util 'first';
 use Scalar::Util 'looks_like_number';
 use Feature::Compat::Try;
-use Encode 2.89;
+use Encode 2.89 ();
 use URI::Escape ();
 use JSON::Schema::Modern 0.560;
 use JSON::Schema::Modern::Utilities 0.531 qw(jsonp unjsonp canonical_uri E abort is_equal is_elements_unique);
@@ -61,11 +61,9 @@ around BUILDARGS => sub ($orig, $class, @args) {
     $args->{evaluator} = $args->{openapi_document}->evaluator;
   }
   else {
-    # construct document out of openapi_uri, openapi_schema, evaluator, if provided.
-    croak 'missing required constructor arguments: either openapi_document, or openapi_uri'
-      if not exists $args->{openapi_uri};
-    croak 'missing required constructor arguments: either openapi_document, or openapi_schema'
-      if not exists $args->{openapi_schema};
+    # construct document out of openapi_uri, openapi_schema (and evaluator if provided).
+    croak 'missing required constructor arguments: either openapi_document, or openapi_uri and openapi_schema'
+      if not exists $args->{openapi_uri} or not exists $args->{openapi_schema};
   }
 
   $args->{evaluator} //= JSON::Schema::Modern->new(validate_formats => 1, max_traversal_depth => 80);
@@ -403,13 +401,14 @@ sub find_path ($self, $options) {
 
       # perldoc perlvar, @-: $n coincides with "substr $_, $-[n], $+[n] - $-[n]" if "$-[n]" is defined
       my @capture_values = map
-        Encode::decode('UTF-8', URI::Escape::uri_unescape(substr($uri_path, $-[$_], $+[$_]-$-[$_]))), 1 .. $#-;
+        Encode::decode('UTF-8', URI::Escape::uri_unescape(substr($uri_path, $-[$_], $+[$_]-$-[$_])),
+          Encode::FB_CROAK | Encode::LEAVE_SRC), 1 .. $#-;
       my @capture_names = ($path_template =~ m!\{([^/?#}]+)\}!g);
       my %path_captures; @path_captures{@capture_names} = @capture_values;
 
-      my $indexes = [];
-      return E({ %$state, keyword => 'paths' }, 'duplicate path capture name %s', $capture_names[$indexes->[0]])
-        if not is_elements_unique(\@capture_names, $indexes);
+      if (not is_elements_unique(\@capture_names, my $indexes = [])) {
+        return E({ %$state, keyword => 'paths' }, 'duplicate path capture name %s', $capture_names[$indexes->[0]]);
+      }
 
       return E({ %$state, keyword => 'paths' }, 'provided path_captures values do not match request URI')
         if $options->{path_captures} and not is_equal($options->{path_captures}, \%path_captures);
@@ -462,7 +461,8 @@ sub find_path ($self, $options) {
 
   # perldoc perlvar, @-: $n coincides with "substr $_, $-[n], $+[n] - $-[n]" if "$-[n]" is defined
   my @capture_values = map
-    Encode::decode('UTF-8', URI::Escape::uri_unescape(substr($uri_path, $-[$_], $+[$_]-$-[$_]))), 1 .. $#-;
+    Encode::decode('UTF-8', URI::Escape::uri_unescape(substr($uri_path, $-[$_], $+[$_]-$-[$_])),
+      Encode::FB_CROAK | Encode::LEAVE_SRC), 1 .. $#-;
   return E({ %$state, keyword => 'paths', _schema_path_suffix => $path_template },
       'provided path_captures values do not match request URI')
     if exists $options->{path_captures}
@@ -617,57 +617,42 @@ sub _validate_parameter_content ($self, $state, $param_obj, $content_ref) {
   abort({ %$state, keyword => 'content' }, 'more than one media type entry present')
     if keys $param_obj->{content}->%* > 1;  # TODO: remove, when the spec schema is updated
   my ($media_type) = keys $param_obj->{content}->%*;  # there can only be one key
-  my $schema = $param_obj->{content}{$media_type}{schema};
 
   my $media_type_decoder = $self->get_media_type($media_type);  # case-insensitive, wildcard lookup
-  if (not $media_type_decoder) {
-    # don't fail if the schema would pass on any input
-    return if is_plain_hashref($schema) ? !keys %$schema : $schema;
 
-    abort({ %$state, keyword => 'content', _schema_path_suffix => $media_type},
-      'EXCEPTION: unsupported media type "%s": add support with $openapi->add_media_type(...)', $media_type);
-  }
-
-  try {
-    $content_ref = $media_type_decoder->($content_ref);
-  }
-  catch ($e) {
-    return E({ %$state, keyword => 'content', _schema_path_suffix => $media_type },
-      'could not decode content as %s: %s', $media_type, $e =~ s/^(.*)\n/$1/r);
-  }
-
-  $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type, 'schema'), depth => $state->{depth}+1 };
-  $self->_evaluate_subschema($content_ref, $schema, $state);
+  return $self->_validate_media_type($state, $param_obj->{content}, $media_type, $media_type_decoder, $content_ref);
 }
 
 sub _validate_body_content ($self, $state, $content_obj, $message) {
-  # does not include charset
-  my $content_type = fc((split(/;/, $message->headers->content_type//'', 2))[0] // '');
+  # strip charset from Content-Type
+  my $content_type = (split(/;/, $message->headers->content_type//'', 2))[0] // '';
 
   return E({ %$state, data_path => $state->{data_path} =~ s{body}{header/Content-Type}r, keyword => 'content' },
       'missing header: Content-Type')
     if not length $content_type;
 
-  my $media_type = (first { $content_type eq fc } keys $content_obj->%*)
+  my $media_type = (first { fc($content_type) eq fc } keys $content_obj->%*)
     // (first { m{([^/]+)/\*$} && fc($content_type) =~ m{^\F\Q$1\E/[^/]+$} } keys $content_obj->%*);
-  $media_type = '*/*' if not defined $media_type and exists $content_obj->{'*/*'};
+  $media_type //= '*/*' if exists $content_obj->{'*/*'};
   return E({ %$state, keyword => 'content', recommended_response => [ 415, 'Unsupported Media Type' ] },
       'incorrect Content-Type "%s"', $content_type)
     if not defined $media_type;
 
-  if (exists $content_obj->{$media_type}{encoding}) {
-    my $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type) };
-    # 4.8.14.1 "The key, being the property name, MUST exist in the schema as a property."
-    foreach my $property (sort keys $content_obj->{$media_type}{encoding}->%*) {
-      ()= E({ $state, schema_path => jsonp($state->{schema_path}, 'schema', 'properties', $property) },
-          'encoding property "%s" requires a matching property definition in the schema')
-        if not exists(($content_obj->{$media_type}{schema}{properties}//{})->{$property});
+  # §4.8.14.1 "The encoding object SHALL only apply to requestBody objects when the media type is
+  # multipart or application/x-www-form-urlencoded."
+  if ($content_type =~ m{^\Fmultipart/} or fc($content_type) eq 'application/x-www-form-urlencoded') {
+    if (exists $content_obj->{$media_type}{encoding}) {
+      my $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type) };
+      # 4.8.14.1 "The key, being the property name, MUST exist in the schema as a property."
+      foreach my $property (sort keys $content_obj->{$media_type}{encoding}->%*) {
+        ()= E({ $state, schema_path => jsonp($state->{schema_path}, 'schema', 'properties', $property) },
+            'encoding property "%s" requires a matching property definition in the schema')
+          if not exists(($content_obj->{$media_type}{schema}{properties}//{})->{$property});
+      }
+      return E({ %$state, keyword => 'encoding' }, 'encoding not yet supported');
     }
 
-    # 4.8.14.1 "The encoding object SHALL only apply to requestBody objects when the media type is
-    # multipart or application/x-www-form-urlencoded."
-    return E({ %$state, keyword => 'encoding' }, 'encoding not yet supported')
-      if $content_type =~ m{^multipart/} or $content_type eq 'application/x-www-form-urlencoded';
+    return E($state, '%s is not yet supported', $content_type);
   }
 
   # TODO: handle Content-Encoding header; https://github.com/OAI/OpenAPI-Specification/issues/2868
@@ -684,18 +669,22 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
     }
   }
 
-  my $schema = $content_obj->{$media_type}{schema};
-
   # use the original Content-Type, NOT the possibly wildcard media type from the openapi document
   # lookup is case-insensitive and falls back to wildcard definitions
   my $media_type_decoder = $self->get_media_type($content_type);
+
+  return $self->_validate_media_type($state, $content_obj, $media_type, $media_type_decoder, $content_ref);
+}
+
+sub _validate_media_type ($self, $state, $content_obj, $media_type, $media_type_decoder, $content_ref) {
   $media_type_decoder = sub ($content_ref) { $content_ref } if $media_type eq '*/*';
   if (not $media_type_decoder) {
     # don't fail if the schema would pass on any input
+    my $schema = $content_obj->{$media_type}{schema};
     return if not defined $schema or is_plain_hashref($schema) ? !keys %$schema : $schema;
 
-    abort({ %$state, keyword => 'content', _schema_path_suffix => $media_type },
-      'EXCEPTION: unsupported Content-Type "%s": add support with $openapi->add_media_type(...)', $content_type)
+    abort({ %$state, keyword => 'content', _schema_path_suffix => $media_type},
+      'EXCEPTION: unsupported media type "%s": add support with $openapi->add_media_type(...)', $media_type);
   }
 
   try {
@@ -706,10 +695,10 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
       'could not decode content as %s: %s', $media_type, $e =~ s/^(.*)\n/$1/r);
   }
 
-  return if not defined $schema;
+  return if not exists $content_obj->{$media_type}{schema};
 
   $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type, 'schema'), depth => $state->{depth}+1 };
-  $self->_evaluate_subschema($content_ref, $schema, $state);
+  $self->_evaluate_subschema($content_ref, $content_obj->{$media_type}{schema}, $state);
 }
 
 # wrap a result object around the errors
@@ -800,12 +789,14 @@ sub _convert_request ($request) {
     # we could call $req->fix_headers here to add a missing Content-Length, but proper requests from
     # the network should always have it set.
     $req->parse($request->as_string);
+    warn 'parse error when converting HTTP::Request' if not $req->is_finished;
     return $req;
   }
   elsif ($request->isa('Plack::Request')) {
     my $req = Mojo::Message::Request->new->parse($request->env);
     my $body = $request->content;
     $req->parse($body) if length $body;
+    warn 'parse error when converting Plack::Request' if not $req->is_finished;
     # Plack is unable to distinguish between %2F and /, so the raw (undecoded) uri can be passed
     # here. see PSGI::FAQ
     $req->url(Mojo::URL->new($request->env->{REQUEST_URI})) if exists $request->env->{REQUEST_URI};
@@ -821,8 +812,9 @@ sub _convert_response ($response) {
   if ($response->isa('HTTP::Response')) {
     my $res = Mojo::Message::Response->new;
     $res->parse($response->as_string);
-    # we could call $req->fix_headers here to add a missing Content-Length, but proper requests from
+    # we could call $res->fix_headers here to add a missing Content-Length, but proper requests from
     # the network should always have it set.
+    warn 'parse error when converting HTTP::Response' if not $res->is_finished;
     return $res;
   }
   elsif ($response->isa('Plack::Response')) {
@@ -863,7 +855,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.058
+version 0.059
 
 =head1 SYNOPSIS
 
@@ -978,7 +970,7 @@ than features that seem to work but actually cut corners for simplicity.
 
 =for Pod::Coverage BUILDARGS THAW
 
-=for stopwords schemas jsonSchemaDialect metaschema subschema perlish operationId openapi
+=for stopwords schemas jsonSchemaDialect metaschema subschema perlish operationId openapi Mojolicious
 
 =head1 CONSTRUCTOR ARGUMENTS
 
@@ -1003,7 +995,7 @@ L<https://spec.openapis.org/oas/v3.1.0>). Ignored if L</openapi_document> is pro
 =head2 openapi_document
 
 The L<JSON::Schema::Modern::Document::OpenAPI> document that holds the OpenAPI information to be
-used for validation. If it is not provided to the constructor, then L</openapi_uri> and
+used for validation. If it is not provided to the constructor, then both L</openapi_uri> and
 L</openapi_schema> B<MUST> be provided, and L</evaluator> will also be used if provided.
 
 =head2 evaluator
@@ -1204,6 +1196,13 @@ therefore inadvertently contain perlish numbers rather than strings.
 
 =head1 LIMITATIONS
 
+All message validation is done using L<Mojolicious> objects (L<Mojo::Message::Request> and
+L<Mojo::Message::Response>). If messages of other types are passed, conversion is done on a
+best-effort basis, but since different implementations have different levels of adherence to the RFC
+specs, some validation errors may occur e.g. if a certain required header is missing on the
+original. For best results in validating real messages from the network, parse them directly into
+Mojolicious messages (see L<Mojo::Message/parse>).
+
 Only certain permutations of OpenAPI documents are supported at this time:
 
 =over 4
@@ -1219,6 +1218,10 @@ for query parameters, only C<style: form> and C<explode: true> is supported, onl
 =item *
 
 cookie parameters are not checked at all yet
+
+=item *
+
+C<application/x-www-form-urlencoded> and C<multipart/*> messages are not yet supported
 
 =back
 

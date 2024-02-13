@@ -3,14 +3,17 @@
 use 5.010001;
 use strict;
 use warnings;
+use autodie;
 
 use Carp;
 use Getopt::Long qw/:config bundling no_auto_abbrev no_ignore_case/;
 use Compress::BGZF::Reader;
 use Compress::BGZF::Writer;
 use List::Util qw/any/;
+use Pod::Usage;
 
-my $VERSION = 0.001;
+our $VERSION = 0.002;
+use constant PROGRAM => 'bgzip.pl';
 
 use constant BUFFER_SIZE => 1024**2;
 
@@ -21,20 +24,23 @@ my $gen_index   = 0;
 my $decompress  = 0;
 my $reindex     = 0;
 my $remove_src  = 0;
+my $comp_level  = 5;
 my $return_size;
 my $fn_index;
 
 GetOptions(
-    'b|offset=i'     => \$offset,
-    'd|decompress'   => \$decompress,
-    'c|stdout'       => \$use_stdout,
-    'f|force'        => \$force,
-    'i|index'        => \$gen_index,
-    'r|reindex'      => \$reindex,
-    'I|index-name=s' => \$fn_index,
-    's|size=i'       => \$return_size,
-    'R|remove-src'   => \$remove_src,
-    'h|help'         => sub {print "help\n";},
+    'b|offset=i'         => \$offset,
+    'd|decompress'       => \$decompress,
+    'c|stdout'           => \$use_stdout,
+    'f|force'            => \$force,
+    'i|index'            => \$gen_index,
+    'r|reindex'          => \$reindex,
+    'I|index-name=s'     => \$fn_index,
+    'l|compress-level=i' => \$comp_level,
+    's|size=i'           => \$return_size,
+    'R|remove-src'       => \$remove_src,
+    'h|help'             => sub{ pod2usage(-verbose => 2, -exitval => 0); },
+    'v|version'          => sub{ say 'This is ',PROGRAM,' v', $VERSION; exit },
 );
 
 my $fn_in = $ARGV[0];
@@ -65,6 +71,8 @@ if ($is_write) {
     my $fn_out = $use_stdout ? undef : $fn_in . '.gz';
     check_exists($fn_out);
     my $writer = Compress::BGZF::Writer->new($fn_out);
+    $writer->set_write_eof(1);
+    $writer->set_level($comp_level);
 
     my $buf;
     while (read $fh_in, $buf, BUFFER_SIZE) {
@@ -72,6 +80,7 @@ if ($is_write) {
     }
 
     $writer->finalize();
+
     if ($gen_index) {
         my $fn_index = $fn_index ? $fn_index : "$fn_in.gz.gzi";
         check_exists($fn_index);
@@ -88,6 +97,7 @@ else {
     
     if ($reindex) {
 
+        $reader->rebuild_index;
         my $fn_index = $fn_index ? $fn_index : "$fn_in.gzi";
         check_exists($fn_index);
         $reader->write_index( $fn_index );
@@ -135,7 +145,7 @@ sub check_exists {
     my ($fn) = @_;
     return if ($force || ! defined $fn || ! -e $fn);
     local $| = 1;
-    warn "$fn already exists; overwrite (y/N)? ";
+    print STDERR "$fn already exists; overwrite (y/N)? ";
     chomp (my $char = <STDIN>);
     return if ($char =~ /^y(es)?$/i);
     warn "not overwriting\n";

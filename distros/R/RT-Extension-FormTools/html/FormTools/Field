@@ -94,11 +94,9 @@ if ( RT::Extension::FormTools::is_core_field($name) ) {
     );
 }
 
-my $request_args = $m->request_args();
+my $request_args = $DECODED_ARGS;
 
 if ( $render_as !~ /readonly/ ) {
-    my $request_args = $m->request_args();
-
     if ( $field_type eq 'core' && exists $request_args->{$name} ) {
         $default = $request_args->{$name};
     }

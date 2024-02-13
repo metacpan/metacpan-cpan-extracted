@@ -15,7 +15,7 @@ use Pod::Usage;
 use CLI::Simple::Constants qw(:booleans :chars :log-levels);
 use CLI::Simple::Utils     qw(normalize_options);
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.3';
 
 use parent qw(Class::Accessor::Fast Exporter);
 
@@ -45,7 +45,7 @@ sub use_log4perl {
   my ( $level, $log4perl_conf ) = @args{qw(level config)};
 
   {
-    no strict 'refs'; ## no critic (ProhibitNoStrict)
+    no strict 'refs';  ## no critic (ProhibitNoStrict)
 
     *{"${class}::_use_logger"}         = sub { return $TRUE };
     *{"${class}::_get_log4perl_conf"}  = sub { return $log4perl_conf };
@@ -73,14 +73,13 @@ sub new {
   my ( $default_options, $option_specs, $commands, $extra_options )
     = @args{qw(default_options option_specs commands extra_options)};
 
-  no strict 'refs'; ## no critic
+  no strict 'refs';  ## no critic
 
   my $stash = \%{ $class . $DOUBLE_COLON };
 
-  local (*alias);   ## no critic
+  local (*alias);    ## no critic
 
-  use vars
-    qw($DEFAULT_OPTIONS $EXTRA_OPTIONS $OPTION_SPECS $COMMANDS $LOGGING);
+  use vars qw($DEFAULT_OPTIONS $EXTRA_OPTIONS $OPTION_SPECS $COMMANDS $LOGGING);
 
   *DEFAULT_OPTIONS = $stash->{DEFAULT_OPTIONS} // $EMPTY;
   *EXTRA_OPTIONS   = $stash->{EXTRA_OPTIONS}   // $EMPTY;
@@ -111,10 +110,8 @@ sub new {
 
   my %cli_options;
 
-  my @accessors = (
-    @{ $extra_options || [] },
-    map { ( split /[^[:alpha:]\-_]/xsm )[0] } @{$option_specs}
-  );
+  my @accessors
+    = ( @{ $extra_options || [] }, map { ( split /[^[:alpha:]\-_]/xsm )[0] } @{$option_specs} );
 
   foreach (@accessors) {
     s/\-/_/xsmg;
@@ -325,7 +322,7 @@ Using C<CLI::Simple> to implement this script looks like this...
 
  caller or __PACKAGE__main();
 
- sub send_message {..}
+ sub send_message {...}
 
  sub default {...}
 
@@ -369,7 +366,7 @@ Example:
    receive => \&receive_message,
  }
 
-If your script does accept command, set a C<default> key to the
+If your script does not accept a command, set a C<default> key to the
 subroutine or method that will implement your script.
 
  { default => \&main }
@@ -409,7 +406,7 @@ the script return code.
  get_args(var-name, ... );
 
 In scalar context returns a reference to the hash of arguments. In
-array context will return a hash of key/value pairs.
+array context will return a list of key/value pairs.
 
 Example:
 
@@ -471,7 +468,7 @@ If you want to allow your commands to accept positional arguments you
 can retrieve them as named hash elements.  This can make your code much
 easier to read and understand.
 
- sub send_mesage {
+ sub send_message {
    my ($self) = @_;
 
    my %args = $self->get_args(qw(phone_number message));
@@ -601,7 +598,7 @@ and run your modulino. Running C<modulino> will echo a command you can
 run to create the symlink.
 
  >modulino Foo::Bar
- ln -s /usr/local/bin/modulino foo_bar
+ ln -s /usr/local/bin/modulino foo-bar
 
 =back
 

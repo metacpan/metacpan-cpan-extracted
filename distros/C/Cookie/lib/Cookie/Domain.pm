@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie/Domain.pm
-## Version v0.1.5
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.1.6
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2024/02/02
+## Modified 2024/02/13
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ BEGIN
             )*
         )
     $/x;
-    our $VERSION = 'v0.1.5';
+    our $VERSION = 'v0.1.6';
 };
 
 use strict;
@@ -496,10 +496,12 @@ sub stat
     my $stack = [];
     # The following algorithm is borrowed from IO-Socket-SSL
     # for( my $i = 0; $i < scalar( @$labels ); $i++ )
-    $labels->reverse->for(sub
+    # $labels->reverse->for(sub
+    my $reverse = $labels->reverse;
+    for( my $i = 0; $i < scalar( @$reverse ); $i++ )
     {
-        # my $label = $labels->[$i];
-        my( $i, $label ) = @_;
+        my $label = $reverse->[$i];
+        # my( $i, $label ) = @_;
         my $buff = [];
         if( my $public_label_def = $def->{ $label } )
         {
@@ -550,7 +552,8 @@ sub stat
         # Recall our last entry
         ( $buff, $_[0] ) = @{ pop( @$stack ) };
         goto LABEL;
-    });
+    # });
+    }
     
     # remove all exceptions from wildcards
     delete( @$any{ keys( %$expt ) } ) if( scalar( keys( %$expt ) ) );
@@ -616,7 +619,7 @@ sub suffixes { return( shift->_set_get_hash_as_mix_object( 'suffixes', @_ ) ); }
     sub domain
     {
         my $self = shift( @_ );
-        if( !$self->name->length || !$self->suffix->length )
+        if( !$self->name->length && !$self->suffix->length )
         {
             return( Module::Generic::Scalar->new( '' ) );
         }
@@ -665,7 +668,7 @@ Cookie::Domain - Domain Name Public Suffix Query Interface
 
 =head1 VERSION
 
-    v0.1.5
+    v0.1.6
 
 =head1 DESCRIPTION
 

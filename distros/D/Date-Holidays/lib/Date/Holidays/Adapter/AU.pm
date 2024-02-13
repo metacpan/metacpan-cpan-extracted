@@ -115,7 +115,7 @@ Jonas Brømsø, (jonasbn) - C<< <jonasbn@cpan.org> >>
 =head1 LICENSE AND COPYRIGHT
 
 L<Date::Holidays> and related modules are (C) by Jonas Brømsø, (jonasbn)
-2004-2022
+2004-2024
 
 Date-Holidays and related modules are released under the Artistic License 2.0
 

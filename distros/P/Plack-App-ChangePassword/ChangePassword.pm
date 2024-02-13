@@ -12,15 +12,12 @@ use Plack::Session;
 use Tags::HTML::ChangePassword;
 use Tags::HTML::Container;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub _css {
 	my ($self, $env) = @_;
 
-	$self->{'_tags_change_password'}->process_css({
-		'info' => 'blue',
-		'error' => 'red',
-	});
+	$self->{'_tags_change_password'}->process_css;
 	$self->{'_tags_container'}->process_css;
 
 	return;
@@ -57,6 +54,10 @@ sub _prepare_app {
 		'tags' => $self->tags,
 	);
 	$self->{'_tags_change_password'} = Tags::HTML::ChangePassword->new(%p);
+	$self->{'_tags_change_password'}->prepare({
+		'info' => 'blue',
+		'error' => 'red',
+	});
 	$self->{'_tags_container'} = Tags::HTML::Container->new(%p);
 
 	return;
@@ -84,6 +85,7 @@ sub _process_actions {
 			$res->redirect($self->redirect_error);
 		}
 		$self->psgi_app($res->finalize);
+		return;
 	}
 
 	my $messages_ar = [];
@@ -174,6 +176,14 @@ Author string to HTML head.
 
 Default value is undef.
 
+=item * C<change_password_cb>
+
+Callback for main changing of password.
+Arguments for callback are: C<$env>, C<$old_password> and C<$password>.
+Returns 0/1 for (un)successful changing of password.
+
+Default value is undef.
+
 =item * C<content_type>
 
 Content type for output.
@@ -252,14 +262,6 @@ Default value is undef.
 =item * C<redirect_error>
 
 Redirect URL after error in changing of password.
-
-Default value is undef.
-
-=item * C<change_password_cb>
-
-Callback for main changing of password.
-Arguments for callback are: C<$env>, C<$old_password> and C<$password>.
-Returns 0/1 for (un)successful changing of password.
 
 Default value is undef.
 
@@ -407,6 +409,12 @@ Returns Plack::Component object.
  # .form-change-password .messages {
  # 	text-align: center;
  # }
+ # .error {
+ # 	color: red;
+ # }
+ # .info {
+ # 	color: blue;
+ # }
  # .container {
  # 	display: flex;
  # 	align-items: center;
@@ -509,6 +517,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

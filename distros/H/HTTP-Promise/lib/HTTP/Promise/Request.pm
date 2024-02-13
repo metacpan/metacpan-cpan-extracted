@@ -136,6 +136,13 @@ sub dump
 
 sub headers { return( shift->_set_get_object_without_init( 'headers', 'HTTP::Promise::Headers', @_ ) ); }
 
+sub host
+{
+    my $self = shift( @_ );
+    my $uri = $self->uri;
+    return( ( $uri->port && $uri->port != $uri->default_port ) ? join( ':', $uri->host, $uri->port ) : $uri->host );
+}
+
 sub make_form_data
 {
     my $self = shift( @_ );
@@ -686,6 +693,23 @@ A header object is always created upon instantiation, whether you provided heade
 =head2 headers_as_string
 
 This is inherited from L<HTTP::Promise::Message>. See L<HTTP::Promise::Message/headers_as_string>
+
+=head2 host
+
+    my $req = HTTP::Promise::Request->new( GET => 'https://example.com' );
+    say $req->host; # example.com
+    my $req = HTTP::Promise::Request->new( GET => 'https://example.com:8080' );
+    say $req->host; # example.com:8080
+    my $req = HTTP::Promise::Request->new( GET => 'http://example.com' );
+    say $req->host; # example.com
+    my $req = HTTP::Promise::Request->new( GET => 'http://example.com:8383' );
+    say $req->host; # example.com:8383
+
+Read-only. Returns the request URI host part.
+The port number is added and separated by a colon if the port number is not standard.
+
+So, if the protocol is C<https> and the port number used is something other than 443, it will be suffixed.
+If the protocol is C<http> and the port number used is something other than 80, it will be suffixed.
 
 =head2 is_encoding_supported
 

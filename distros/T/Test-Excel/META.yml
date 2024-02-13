@@ -1,7 +1,7 @@
 ---
 abstract: 'Interface to test and compare Excel files (.xls/.xlsx).'
 author:
-  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>'
 build_requires:
   Test::More: '0'
 configure_requires:
@@ -20,12 +20,12 @@ no_index:
 provides:
   Test::Excel:
     file: lib/Test/Excel.pm
-    version: '1.53'
+    version: '1.54'
 requires:
   File::Spec: '0'
   Scalar::Util: '0'
-  Spreadsheet::ParseExcel: '0.58'
-  Spreadsheet::ParseXLSX: '0.27'
+  Spreadsheet::ParseExcel: '0.66'
+  Spreadsheet::ParseXLSX: '0.31'
   Spreadsheet::Read: '0.75'
   Test::Builder: '0'
   Test::Builder::Tester: '0'
@@ -33,5 +33,5 @@ requires:
   perl: '5.01'
 resources:
   repository: https://github.com/manwar/Test-Excel.git
-version: '1.53'
+version: '1.54'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

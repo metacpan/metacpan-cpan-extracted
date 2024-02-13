@@ -10,7 +10,7 @@ use Scalar::Util qw(blessed);
 use Tags::HTML::Element::Option;
 use Tags::HTML::Element::Utils qw(tags_boolean tags_data tags_label tags_value);
 
-our $VERSION = 0.06;
+our $VERSION = 0.08;
 
 sub _cleanup {
 	my $self = shift;
@@ -290,6 +290,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.08
 
 =cut

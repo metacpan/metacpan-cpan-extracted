@@ -4,10 +4,11 @@
 abstract: Net::PublicSuffixList - The Mozilla Public Suffix List
 authors:
 - alias: briandfoy
-  email: bdfoy@cpan.org
+  email: briandfoy@pobox.com
   family-names: foy
   given-names: brian d
   orcid: 0000-0002-0283-8283
+  email: briandfoy@pobox.com
 cff-version: 1.2.0
 date-released: 2021-01-28
 license: artistic_2

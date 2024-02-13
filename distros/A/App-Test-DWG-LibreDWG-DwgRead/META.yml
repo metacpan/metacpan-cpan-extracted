@@ -42,4 +42,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-Test-DWG-LibreDWG-DwgRead
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Test-DWG-LibreDWG-DwgRead
-version: '0.03'
+version: '0.04'

@@ -333,13 +333,13 @@ on success.
 
 ## `admin_queryModerationEvents( [...] )`
 
-```
-$at->admin_queryModerationEvents( 'did:...' );
+```perl
+$at->admin_queryModerationEvents( createdBy => 'did:...' );
 ```
 
 List moderation events related to a subject.
 
-Expected parameters include:
+Expected parameters should be passed as a hash and include:
 
 - `types`
 
@@ -351,6 +351,14 @@ Expected parameters include:
 
     Sort direction for the events. `asc` or `desc`. Defaults to descending order of created at timestamp.
 
+- `createdAfter`
+
+    Retrieve events created after a given timestamp.
+
+- `createdBefore`
+
+    Retrieve events created before a given timestamp.
+
 - `subject`
 - `includeAllUserRecords`
 
@@ -360,6 +368,23 @@ Expected parameters include:
 
     Minimum is 1, maximum is 100, 50 is the default.
 
+- `hasComment`
+
+    If true, only events with comments are returned.
+
+- `comment`
+
+    If specified, only events with comments containing the keyword are returned.
+
+- `addedLabels`
+
+    If specified, only events where all of these labels were added are returned.
+
+- `removedLabels`
+
+    If specified, only events where all of these labels were removed are returned.
+
+- `reportTypes`
 - `cursor`
 
 Returns a list of events as new `At::Lexicon::com::atproto::admin::modEventView` objects on success.

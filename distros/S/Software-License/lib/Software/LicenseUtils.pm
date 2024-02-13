@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Carp;
 
-package Software::LicenseUtils 0.104005;
+package Software::LicenseUtils 0.104006;
 # ABSTRACT: little useful bits of code for licensey things
 
 use File::Spec;
@@ -277,7 +277,7 @@ Software::LicenseUtils - little useful bits of code for licensey things
 
 =head1 VERSION
 
-version 0.104005
+version 0.104006
 
 =head1 PERL VERSION
 
@@ -353,7 +353,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Ricardo Signes.
+This software is copyright (c) 2024 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

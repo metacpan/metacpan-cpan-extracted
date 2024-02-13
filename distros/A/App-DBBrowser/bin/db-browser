@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.014;
-our $VERSION = '2.404';
+our $VERSION = '2.405';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.404
+Version 2.405
 
 =head1 SYNOPSIS
 
@@ -511,9 +511,9 @@ row-group.
 
 =item Search & Replace
 
-I<s/Pattern/Replacement/Modifiers> (L<1|https://perldoc.perl.org/perlrequick#Search-and-replace>, L<2|https://perldoc.perl.org/perlop#s/PATTERN/REPLACEMENT/msixpodualngcer>)
+I<s/Pattern/Replacement/Modifiers>
 
-E.g. remove all commas: C<s/,//g>
+Remove all commas: C<s/,//g>
 
     id | num                       id | num
     ---|-------------              ---|-----------
@@ -1340,11 +1340,17 @@ Set the search behavior (C<Ctrl-F>).
 
 =over
 
-=item C<disabled>
+=item
 
-=item C<case-insensitive search>
+disabled
 
-=item C<case-sensitive search>
+=item
+
+case-insensitive search
+
+=item
+
+case-sensitive search
 
 =back
 

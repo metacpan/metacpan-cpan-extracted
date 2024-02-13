@@ -47,7 +47,7 @@ your system.
 
 use XSLoader;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 XSLoader::load( __PACKAGE__, $VERSION );
 
@@ -140,12 +140,12 @@ Untrapped exceptions in JavaScript will be rethrown as Perl exceptions.
 
 $JS_CODE is a I<character> string.
 
-=head2 $obj = I<OBJ>->eval_module( $JS_CODE )
+=head2 $obj = $PROMISE = I<OBJ>->eval_module( $JS_CODE )
 
 Runs $JS_CODE as a module, which enables ES6 module syntax.
 Note that no values can be returned directly in this mode of execution.
 
-Returns I<OBJ>.
+Returns a promise that resolves once the module is loaded.
 
 =head2 $obj = I<OBJ>->await()
 

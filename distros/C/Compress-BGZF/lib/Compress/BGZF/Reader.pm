@@ -38,7 +38,7 @@ sub new_filehandle {
     #-------------------------------------------------------------------------
 
     my ($class, $fn_in) = @_;
-    croak "input filename required" if (! defined $fn_in);
+    croak "Input filename required" if (! defined $fn_in);
     my $fh = FileHandle->new;
     tie *$fh, $class, $fn_in or croak "failed to tie filehandle";
     #tie *FH, $class, $fn_in or croak "failed to tie filehandle";
@@ -61,7 +61,7 @@ sub new {
 
     # initialize
     $self->{fn_in} = $fn_in
-        or croak "Input name required";
+        or croak "Input filename required";
 
     # open compressed file in binary mode
     open my $fh, '<:raw', $fn_in or croak "Failed to open input file"; ## no critic
@@ -354,7 +354,6 @@ sub write_index {
 
     croak "missing index output filename" if (! defined $fn_out);
 
-
     $self->_generate_index() if (! defined $self->{idx});
     my @offsets = @{ $self->{idx} };
     shift @offsets; # don't write first
@@ -370,6 +369,15 @@ sub write_index {
     close $fh_out;
 
     return;
+
+}
+
+sub rebuild_index {
+
+    # force rebuilding of index
+    # (added as a public alias of _generate_index() )
+    my ($self) = @_;
+    return $self->_generate_index;
 
 }
 
@@ -398,23 +406,30 @@ sub _load_index {
     close $fh_in;
     unshift @idx, [0,0]; # add initial offsets
 
-    $self->{u_file_size} = $idx[-1]->[1];
-
     # some indices created by htslib bgzip are missing last offset pair
     # check for that here by loading last block in index and proceeding from
     # there. Also calculate uncompressed file size at the same time.
+    # EDIT 2024-02-09: But htslib uses empty last block as EOF indicator,
+    # so only add extra blocks to index if they are not empty.
     my $c_size = $idx[-1]->[0];
-    sysseek $self->{fh}, $idx[-1]->[0], 0;
+    my $u_size = $idx[-1]->[1];
+
+    sysseek $self->{fh}, $c_size, 0;
     my ($c, $u) = $self->_unpack_block(0);
-    $self->{u_file_size} += $u;
     $c_size += $c;
+    $u_size += $u;
+    $self->{u_file_size} = $u_size; # should be correct at this point
+
     while ($c_size < $self->{file_size}) {
-        push @idx, [$idx[-1]->[0]+$c, $idx[-1]->[1]+$u];
-        sysseek $self->{fh}, $idx[-1]->[0], 0;
+        sysseek $self->{fh}, $c_size, 0;
         ($c, $u) = $self->_unpack_block(0);
-        $self->{u_file_size} += $u;
+        push @idx, [$c_size, $u_size]
+            if ($u > 0);
         $c_size += $c;
+        $u_size += $u;
+        $self->{u_file_size} = $u_size;
     }
+
     croak "Unexpected file size/last index mismatch ($c_size v $self->{file_size})"
         if ($c_size != $self->{file_size});
 
@@ -448,10 +463,13 @@ sub _generate_index {
 
     while ($cmp_offset < $self->{file_size}) {
 
-        push @{$self->{idx}}, [$cmp_offset, $uncmp_offset];
         $self->{ridx}->{$cmp_offset} = $uncmp_offset;
-
         my ($block_size, $uncompressed_size) = $self->_unpack_block(0);
+
+        # don't index empty blocks
+        # (should only be final EOF block in practice)
+        push @{$self->{idx}}, [$cmp_offset, $uncmp_offset]
+            if ($uncompressed_size > 0);
 
         $cmp_offset += $block_size;
         $uncmp_offset += $uncompressed_size;
@@ -563,10 +581,11 @@ sub move_to_vo {
 
     my ($self, $vo) = @_;
     my $block_o = $vo >> 16;
+    croak "Invalid block offset"
+        if (! defined $self->{ridx}->{$block_o});
     my $buff_o  = $vo ^ ($block_o << 16);
     $self->_load_block( $block_o );
     $self->{buffer_offset} = $buff_o;
-    croak "invalid block offset" if (! defined $self->{ridx}->{$block_o});
     $self->{u_offset} = $self->{ridx}->{$block_o} + $buff_o;
 
     return;
@@ -588,7 +607,7 @@ sub _safe_sysread {
     my ($fh, $len) = @_;
     my $buf = '';
     my $r = sysread $fh, $buf, $len;
-    croak "returned unexpected byte count" if ($r != $len);
+    croak "Returned unexpected byte count" if ($r != $len);
 
     return $buf;
 
@@ -745,6 +764,12 @@ offsets in the index. The rest of the values consist of pairs of block offsets
 relative to the compressed and uncompressed data. The first offset (always
 0,0) is not included. The index files written by Compress::BGZF should be
 compatible with those of the htslib C<bgzip> software, and vice versa.
+
+=item B<rebuild_index>
+
+    $reader->rebuild_index;
+
+Clears the in-memory index and rebuilds it from scratch
 
 =back
 

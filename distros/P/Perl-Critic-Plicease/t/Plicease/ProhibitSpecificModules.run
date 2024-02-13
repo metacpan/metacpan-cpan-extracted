@@ -1,0 +1,25 @@
+## name Bad1
+## failures 1
+## parms { illicit_modules => 'Foo' }
+## cut
+
+use Foo;
+use Bar;
+use Baz;
+
+## name Bad2
+## failures 2
+## parms { illicit_modules => 'Foo Bar' }
+## cut
+
+use Foo;
+use Bar;
+use Baz;
+
+## name Good1
+## failures 0
+## cut
+
+use Foo;
+use Bar;
+use Baz;

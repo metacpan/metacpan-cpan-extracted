@@ -50,7 +50,7 @@ my %WriteMakefile = (
 	'ABSTRACT_FROM' => $main_file,
 	'VERSION_FROM'  => $main_file,
 	'LICENSE'       => 'artistic_2',
-	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
+	'AUTHOR'        => 'brian d foy <briandfoy@pobox.com>',
 
 	'EXE_FILES'     => [qw(script/bcrypt)],
 
@@ -69,7 +69,7 @@ my %WriteMakefile = (
 
 	'PREREQ_PM' => {
 		'Crypt::Bcrypt'  => '0',
-		'Crypt::Urandom' => '0',
+		'Crypt::URandom' => '0',
 		'Encode'         => '0',
  		},
 

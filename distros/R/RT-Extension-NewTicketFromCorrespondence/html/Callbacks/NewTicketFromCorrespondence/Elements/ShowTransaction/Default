@@ -35,7 +35,7 @@ return if ( not $Object->QueueObj->CurrentUserHasRight('CreateTicket') );
 
 # Now add the action to the list.
 
-my $CreatePath = '/Ticket/Create.html';
+my $CreatePath = RT->Config->Get('WebPath') . '/Ticket/Create.html';
 $CreatePath
     .= '?Queue='
     . $m->interp->apply_escapes( $Object->Queue, 'u' )

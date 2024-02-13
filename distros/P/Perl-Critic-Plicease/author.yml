@@ -10,6 +10,7 @@ pod_spelling_system:
     - SCOP
     - Skytt
     - Ville
+    - perlcriticrc
 
 pod_coverage:
   skip: 0
@@ -18,3 +19,4 @@ pod_coverage:
   private:
     - Perl::Critic::Policy::Plicease::ProhibitUnicodeDigitInRegexp
     - Perl::Critic::Policy::Plicease::ProhibitLeadingZeros
+    - Perl::Critic::Policy::Plicease::ProhibitSpecificModules

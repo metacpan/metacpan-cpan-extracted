@@ -1,10 +1,10 @@
 {
-   "abstract" : "markdown compiller to test and pod",
+   "abstract" : "compiler from markdown to tests and documentation",
    "author" : [
-      "Yaroslav O. Kosmina LL<mailto:dart@cpan.org>"
+      "Yaroslav O. Kosmina L<mailto:dart@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.22",
+   "generated_by" : "Minilla/v3.1.19",
    "license" : [
       "gpl_3"
    ],
@@ -52,6 +52,7 @@
             "File::Path" : "2.18",
             "File::Slurper" : "0.013",
             "File::Spec" : "0",
+            "Locale::PO" : "0.27",
             "Markdown::To::POD" : "0.06",
             "Pod::Markdown" : "0",
             "Template" : "3.101",
@@ -71,7 +72,7 @@
    "provides" : {
       "Liveman" : {
          "file" : "lib/Liveman.pm",
-         "version" : "2.0"
+         "version" : "3.0"
       },
       "Liveman::Append" : {
          "file" : "lib/Liveman/Append.pm"
@@ -95,7 +96,7 @@
          "web" : "https://github.com/darviarush/perl-liveman"
       }
    },
-   "version" : "2.0",
+   "version" : "3.0",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Yaroslav O. Kosmina <dart@cpan.org>",

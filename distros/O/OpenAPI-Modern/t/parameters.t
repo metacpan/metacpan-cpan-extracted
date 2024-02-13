@@ -15,7 +15,7 @@ use lib 't/lib';
 use Helper;
 
 my $openapi = OpenAPI::Modern->new(
-  openapi_uri => '',
+  openapi_uri => 'http://localhost:1234/api',
   openapi_schema => {
     openapi => '3.1.0',
     info => { title => 'Test API', version => '1.2.3' },
@@ -39,7 +39,7 @@ $openapi->evaluator->add_schema({
     array => { type => 'array' },
     object => { type => 'object' },
     deep_string => { '$defs' => { foo => { type => 'string' } } },
-    ref_to_deep_string => { '$ref' => '#/components/schemas/string' },
+    ref_to_deep_string => { '$ref' => 'api#/components/schemas/ref_to_deep_string' },
   },
 });
 
@@ -66,6 +66,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/path/missing',
           keywordLocation => $schema_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$schema_path.'/required',
           error => 'missing path parameter: missing',
         },
       ],
@@ -79,6 +80,7 @@ subtest 'path parameters' => sub {
         {
           instanceLocation => '/request/path/missing_json_content',
           keywordLocation => $schema_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$schema_path.'/required',
           error => 'missing path parameter: missing_json_content',
         },
       ],
@@ -228,7 +230,7 @@ subtest 'path parameters' => sub {
   foreach my $test (@tests) {
     undef $parameter_content;
     my $state = {
-      initial_schema_uri => Mojo::URL->new,
+      initial_schema_uri => $openapi->openapi_uri,
       traversed_schema_path => '',
       schema_path => $schema_path,
       errors => [],
@@ -245,7 +247,7 @@ subtest 'path parameters' => sub {
       [ map $_->TO_JSON, $state->{errors}->@* ],
       $test->{errors}//[],
       'path '.$name.': '.(($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred'),
-    ) or note 'got: ', explain($state->{errors});
+    ) or note 'got: ', explain([ map $_->TO_JSON, $state->{errors}->@* ]);
 
     is_equal(
       $parameter_content,
@@ -270,6 +272,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/query/missing',
           keywordLocation => $schema_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$schema_path.'/required',
           error => 'missing query parameter: missing',
         },
       ],
@@ -282,6 +285,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/query/reserved',
           keywordLocation => $schema_path.'/allowEmptyValue',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$schema_path.'/allowEmptyValue',
           error => 'allowEmptyValue: true is not yet supported',
         },
       ],
@@ -300,6 +304,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/query/missing_encoded_required',
           keywordLocation => $schema_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$schema_path.'/required',
           error => 'missing query parameter: missing_encoded_required',
         },
       ],
@@ -317,6 +322,7 @@ subtest 'query parameters' => sub {
         {
           instanceLocation => '/request/query/reserved',
           keywordLocation => $schema_path.'/allowReserved',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$schema_path.'/required',
           error => 'allowReserved: true is not yet supported',
         },
       ],
@@ -386,7 +392,7 @@ subtest 'query parameters' => sub {
   foreach my $test (@tests) {
     undef $parameter_content;
     my $state = {
-      initial_schema_uri => Mojo::URL->new,
+      initial_schema_uri => $openapi->openapi_uri,
       traversed_schema_path => '',
       schema_path => $schema_path,
       errors => [],
@@ -403,7 +409,7 @@ subtest 'query parameters' => sub {
       [ map $_->TO_JSON, $state->{errors}->@* ],
       $test->{errors}//[],
       'query '.$name.' from '.$test->{queries}.': '.(($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred'),
-    ) or note 'got: ', explain($state->{errors});
+    ) or note 'got: ', explain([ map $_->TO_JSON, $state->{errors}->@* ]);
 
     is_equal(
       $parameter_content,
@@ -448,6 +454,7 @@ subtest 'header parameters' => sub {
         {
           instanceLocation => '/request/header/Missing',
           keywordLocation => $schema_path.'/required',,
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$schema_path.'/required',
           error => 'missing header: Missing',
         },
       ],
@@ -487,7 +494,6 @@ subtest 'header parameters' => sub {
       header_obj => { schema => { '$ref' => 'http://localhost:1234/extras#/$defs/ref_to_deep_string' } },
       values => [ 'foo' ],
       content => 'foo',
-      todo => '_resolve_ref does not know how to verify entities in JSDO objects',
     },
     {
       # a single header is passed as an array iff when array is requested
@@ -559,7 +565,7 @@ subtest 'header parameters' => sub {
   foreach my $test (@tests) {
     undef $parameter_content;
     my $state = {
-      initial_schema_uri => Mojo::URL->new,
+      initial_schema_uri => $openapi->openapi_uri,
       traversed_schema_path => '',
       schema_path => $schema_path,
       errors => [],
@@ -583,7 +589,7 @@ subtest 'header parameters' => sub {
       [ map $_->TO_JSON, $state->{errors}->@* ],
       $test->{errors}//[],
       'header '.$name.': '.(($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred'),
-    ) or note 'got: ', explain($state->{errors});
+    ) or note 'got: ', explain([ map $_->TO_JSON, $state->{errors}->@* ]);
 
     is_equal(
       $parameter_content,

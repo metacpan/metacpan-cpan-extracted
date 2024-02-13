@@ -2,10 +2,10 @@ package Perl::Critic::Plicease;
 
 use strict;
 use warnings;
-use 5.008001;
+use 5.010001;
 
 # ABSTRACT: Some Perl::Critic policies used by Plicease
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Perl::Critic::Plicease - Some Perl::Critic policies used by Plicease
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 
@@ -53,7 +53,7 @@ Ville Skyttä (SCOP)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Graham Ollis.
+This software is copyright (c) 2019-2024 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

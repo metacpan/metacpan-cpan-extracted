@@ -1,9 +1,13 @@
 Changes
-Excel.pm
+lib/DBD/Excel.pm
 Makefile.PL
 MANIFEST
-README
-test.pl
+README.md
+t/00-load.t
+t/01-read.t
+t/02-write-and-delete.t
+t/data/02-test-data.xls
+t/data/test-data.xls
 sample/README
 sample/dbdtest.xls
 sample/testj.pl
@@ -17,3 +21,5 @@ sample/res_hidden
 sample/newxl.xls
 sample/testj.xls
 sample/thidden.xls
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

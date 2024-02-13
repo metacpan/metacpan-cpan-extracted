@@ -13,6 +13,7 @@
 #define PQJS_FUNCTION_CLASS PERL_NS_ROOT "::Function"
 #define PQJS_REGEXP_CLASS   PERL_NS_ROOT "::RegExp"
 #define PQJS_DATE_CLASS     PERL_NS_ROOT "::Date"
+#define PQJS_PROMISE_CLASS  PERL_NS_ROOT "::Promise"
 
 typedef struct {
     JSContext *ctx;
@@ -39,6 +40,7 @@ typedef struct {
     bool ran_js_std_init_handlers;
     JSValue regexp_jsvalue;
     JSValue date_jsvalue;
+    JSValue promise_jsvalue;
 } ctx_opaque_s;
 
 const char* __jstype_name_back[] = {
@@ -277,6 +279,9 @@ static SV* _JSValue_to_SV (pTHX_ JSContext* ctx, JSValue jsval, SV** err_svp) {
                 }
                 else if (JS_IsInstanceOf(ctx, jsval, ctxdata->date_jsvalue)) {
                     RETVAL = _JSValue_special_object_to_SV(aTHX_ ctx, jsval, err_svp, PQJS_DATE_CLASS);
+                }
+                else if (JS_IsInstanceOf(ctx, jsval, ctxdata->promise_jsvalue)) {
+                    RETVAL = _JSValue_special_object_to_SV(aTHX_ ctx, jsval, err_svp, PQJS_PROMISE_CLASS);
                 }
                 else {
                     RETVAL = _JSValue_object_to_SV(aTHX_ ctx, jsval, err_svp);
@@ -560,6 +565,7 @@ static JSContext* _create_new_jsctx( pTHX_ JSRuntime *rt ) {
         .refcount = 1,
         .regexp_jsvalue = JS_GetPropertyStr(ctx, global, "RegExp"),
         .date_jsvalue = JS_GetPropertyStr(ctx, global, "Date"),
+        .promise_jsvalue = JS_GetPropertyStr(ctx, global, "Promise"),
 #ifdef MULTIPLICITY
         .aTHX = aTHX,
 #endif
@@ -622,6 +628,7 @@ static void _free_jsctx(pTHX_ JSContext* ctx) {
     if (--ctxdata->refcount == 0) {
         JS_FreeValue(ctx, ctxdata->regexp_jsvalue);
         JS_FreeValue(ctx, ctxdata->date_jsvalue);
+        JS_FreeValue(ctx, ctxdata->promise_jsvalue);
 
         JSRuntime *rt = JS_GetRuntime(ctx);
 
@@ -690,7 +697,8 @@ static const char* _FUNCTION_ACCESSORS[] = {
 
 #define FUNC_CALL_INITIAL_ARGS 2
 
-static void _svs_to_jsvars(pTHX_ JSContext* jsctx, int32_t params_count, SV** svs, JSValue* jsvars) {
+// returns the SV to croak.
+static SV* _svs_to_jsvars(pTHX_ JSContext* jsctx, int32_t params_count, SV** svs, JSValue* jsvars) {
     SV* error = NULL;
 
     for (int32_t i=0; i<params_count; i++) {
@@ -703,11 +711,13 @@ static void _svs_to_jsvars(pTHX_ JSContext* jsctx, int32_t params_count, SV** sv
                 JS_FreeValue(jsctx, jsvars[i]);
             }
 
-            croak_sv(error);
+            break;
         }
 
         jsvars[i] = jsval;
     }
+
+    return error;
 }
 
 static void _import_module_to_global(pTHX_ JSContext* jsctx, const char* modname) {
@@ -974,18 +984,6 @@ eval (SV* self_sv, SV* js_code_sv)
         // an exception. If not we’ll just discard the return value
         RETVAL = _return_jsvalue_or_croak(aTHX_ ctx, jsret);
 
-        if (ix) {
-
-            // The only thing a JS module should return is null.
-            // If that’s ever not the case, warn:
-            if ( UNLIKELY(RETVAL != &PL_sv_undef) ) {
-                warn("UNEXPECTED: Discarding non-null return from ES module: %" SVf, RETVAL);
-                SvREFCNT_dec(RETVAL);
-            }
-
-            RETVAL = SvREFCNT_inc(self_sv);
-        }
-
     OUTPUT:
         RETVAL
 
@@ -1031,7 +1029,26 @@ setTime (SV* self_sv, SV* num_sv)
         JSContext *ctx = pqjs->ctx;
 
         JSAtom prop = JS_NewAtom(ctx, setter_name);
-        JSValue arg = _sviv_to_js(aTHX_ ctx, num_sv);
+
+        JSValue arg;
+        NV nvval;
+
+        switch (exs_sv_type(num_sv)) {
+
+            // In 32-bit perls setTime() values often overflow IV_MAX.
+            case EXS_SVTYPE_NV:
+            case EXS_SVTYPE_STRING:
+                nvval = SvNV(num_sv);
+                if (nvval > IV_MAX || nvval < IV_MIN) {
+                    arg = JS_NewFloat64(ctx, (double) nvval);
+                    break;
+                }
+
+                // fallthrough
+
+            default:
+                    arg = _sviv_to_js(aTHX_ ctx, num_sv);
+        }
 
         JSValue jsret = JS_Invoke(
             ctx,
@@ -1092,7 +1109,11 @@ toString (SV* self_sv, ...)
 
             JSValue jsargs[params_count];
 
-            _svs_to_jsvars(aTHX_ ctx, params_count, &ST(1), jsargs);
+            SV* error = _svs_to_jsvars(aTHX_ ctx, params_count, &ST(1), jsargs);
+            if (error) {
+                JS_FreeAtom(pqjs->ctx, prop);
+                croak_sv(error);
+            }
 
             jsret = JS_Invoke(
                 ctx,
@@ -1249,17 +1270,99 @@ call( SV* self_sv, SV* this_sv=&PL_sv_undef, ... )
 
         JSValue jsvars[params_count];
 
-        _svs_to_jsvars( aTHX_ pqjs->ctx, params_count, &ST(FUNC_CALL_INITIAL_ARGS), jsvars );
+        error = _svs_to_jsvars( aTHX_ pqjs->ctx, params_count, &ST(FUNC_CALL_INITIAL_ARGS), jsvars );
+        if (error) {
+            JS_FreeValue(pqjs->ctx, thisjs);
+            croak_sv(error);
+        }
 
         JSValue jsret = JS_Call(pqjs->ctx, pqjs->jsobj, thisjs, params_count, jsvars);
-
-        RETVAL = _return_jsvalue_or_croak(aTHX_ pqjs->ctx, jsret);
 
         JS_FreeValue(pqjs->ctx, thisjs);
 
         for (uint32_t i=0; i<params_count; i++) {
             JS_FreeValue(pqjs->ctx, jsvars[i]);
         }
+
+        RETVAL = _return_jsvalue_or_croak(aTHX_ pqjs->ctx, jsret);
+
+    OUTPUT:
+        RETVAL
+
+# ----------------------------------------------------------------------
+
+MODULE = JavaScript::QuickJS        PACKAGE = JavaScript::QuickJS::Promise
+
+SV*
+then( SV* self_sv, SV* on_success=&PL_sv_undef, SV* on_failure=&PL_sv_undef )
+    CODE:
+        PERL_UNUSED_ARG(on_success);
+        PERL_UNUSED_ARG(on_failure);
+
+        perl_qjs_jsobj_s* pqjs = exs_structref_ptr(self_sv);
+
+        SV* error = NULL;
+
+        JSValue jsvars[2];
+        int callbacks_count = sizeof(jsvars) / sizeof(jsvars[0]);
+
+        error = _svs_to_jsvars( aTHX_
+            pqjs->ctx,
+            callbacks_count,
+            &ST(1),
+            jsvars
+        );
+        if (error) {
+            croak_sv(error);
+        }
+
+        JSAtom method_name = JS_NewAtom(pqjs->ctx, "then");
+
+        JSValue jsret = JS_Invoke(
+            pqjs->ctx,
+            pqjs->jsobj,
+            method_name,
+            callbacks_count,
+            jsvars
+        );
+
+        JS_FreeAtom(pqjs->ctx, method_name);
+
+        for (uint32_t i=0; i<callbacks_count; i++) {
+            JS_FreeValue(pqjs->ctx, jsvars[i]);
+        }
+
+        RETVAL = _return_jsvalue_or_croak(aTHX_ pqjs->ctx, jsret);
+
+    OUTPUT:
+        RETVAL
+
+SV*
+catch( SV* self_sv, SV* callback=&PL_sv_undef)
+    ALIAS:
+        finally = 1
+    CODE:
+        perl_qjs_jsobj_s* pqjs = exs_structref_ptr(self_sv);
+
+        SV* error = NULL;
+
+        JSValue callbackjs = _sv_to_jsvalue(aTHX_ pqjs->ctx, callback, &error);
+        if (error) croak_sv(error);
+
+        JSAtom method_name = JS_NewAtom(pqjs->ctx, ix ? "finally" : "catch");
+
+        JSValue jsret = JS_Invoke(
+            pqjs->ctx,
+            pqjs->jsobj,
+            method_name,
+            1,
+            &callbackjs
+        );
+
+        JS_FreeAtom(pqjs->ctx, method_name);
+        JS_FreeValue(pqjs->ctx, callbackjs);
+
+        RETVAL = _return_jsvalue_or_croak(aTHX_ pqjs->ctx, jsret);
 
     OUTPUT:
         RETVAL

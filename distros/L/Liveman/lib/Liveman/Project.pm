@@ -814,7 +814,7 @@ __END__
 
 =head1 NAME
 
-Liveman::Project - maker of the new perl-repository
+Liveman::Project - create a new Perl repository
 
 =head1 SYNOPSIS
 
@@ -826,13 +826,13 @@ Liveman::Project - maker of the new perl-repository
 
 =head1 DESCRIPTION
 
-Creates a new perl-repository.
+Creates a new Perl repository.
 
 =head1 SUBROUTINES/METHODS
 
 =head2 new (@params)
 
-The constructor.
+Constructor.
 
 =head2 make ()
 
@@ -844,7 +844,7 @@ Creates a file C<minil.toml>.
 
 =head2 cpanfile ()
 
-Creates a cpanfile.
+Creates C<cpanfile>.
 
 =head2 mkpm ()
 
@@ -852,11 +852,11 @@ Creates a main module.
 
 =head2 license ()
 
-Creates a license.
+Will issue a license.
 
 =head1 AUTHOR
 
-Yaroslav O. Kosmina LL<mailto:darviarush@mail.ru>
+Yaroslav O. Kosmina L<mailto:dart@cpan.org>
 
 =head1 LICENSE
 

@@ -1,5 +1,12 @@
 Revision history for Perl extension OrePAN2
 
+0.51 2024-02-12T16:20:34Z
+    - fix is_ArrayRef() precedence change if Type::Tiny::XS is installed
+      (GH#67) (XSven)
+
+0.50 2024-02-10T20:06:37Z
+    - Refactor internals (GH#61) (XSven)
+
 0.49 2022-09-06T16:30:13Z
     - Remove copy/pasted docs from orepan2-audit script. Minimum Perl has also
       been bumped from 5.008001 to 5.012000 because of a dependency on
@@ -131,7 +138,7 @@ Revision history for Perl extension OrePAN2
 
 0.21 2014-02-26T09:47:32Z
 
-    - OrePAN2::Indexer: Make temporary file in the same parition.
+    - OrePAN2::Indexer: Make temporary file in the same partition.
         It's required by atomic operation.
         (tokuhirom)
 
@@ -219,7 +226,7 @@ Revision history for Perl extension OrePAN2
 
     - Switch to Module::Metadata instead of Parse::PMFile.
       (tokuhirom)
-    - set prefix => '' to Module::Metadata->provides(); otherwise defalut 'lib' prefix will be used.
+    - set prefix => '' to Module::Metadata->provides(); otherwise default 'lib' prefix will be used.
       (Shoichi Kaji)
 
 0.05 2013-05-25T00:03:26Z

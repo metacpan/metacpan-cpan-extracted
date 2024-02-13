@@ -399,7 +399,7 @@ sub _validate_args ( $processed_args ) {
 	my @errors;
 
 	push @errors, qq(The cost must be a whole number between 5 and 31, inclusively, but got "$c")
-		unless( int($c) == $c and ( 4 < $c < 32 ) );
+		unless( int($c) == $c and ( 4 < $c && $c < 32 ) );
 	push @errors, qq(The type must be one of @{[ _types ]}, but got "$t")
 		unless grep { $t eq $_ } _types();
 	push @errors, sprintf "The salt must be 16 octets, but got %s", _dumper($s) =~ s/\R+\z//r

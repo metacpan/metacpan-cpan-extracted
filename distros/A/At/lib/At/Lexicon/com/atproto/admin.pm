@@ -1,4 +1,4 @@
-package At::Lexicon::com::atproto::admin 0.15 {
+package At::Lexicon::com::atproto::admin 0.16 {
 
     #~ https://github.com/bluesky-social/atproto/blob/main/lexicons/com/atproto/admin/defs.json
     use v5.38;
@@ -40,7 +40,8 @@ package At::Lexicon::com::atproto::admin 0.15 {
                 $event->{'$type'} eq 'com.atproto.admin.defs#modEventAcknowledge'     ||
                 $event->{'$type'} eq 'com.atproto.admin.defs#modEventEscalate'        ||
                 $event->{'$type'} eq 'com.atproto.admin.defs#modEventMute'            ||
-                $event->{'$type'} eq 'com.atproto.admin.defs#modEventEmail';
+                $event->{'$type'} eq 'com.atproto.admin.defs#modEventEmail'           ||
+                $event->{'$type'} eq 'com.atproto.admin.defs#modEventResolveAppeal';
             $subject   = At::_topkg( $subject->{'$type'} )->new(%$subject) if !builtin::blessed $subject && defined $subject->{'$type'};
             $createdBy = At::Protocol::DID->new( uri => $createdBy )             unless builtin::blessed $createdBy;
             $createdAt = At::Protocol::Timestamp->new( timestamp => $createdAt ) unless builtin::blessed $createdAt;
@@ -87,6 +88,7 @@ package At::Lexicon::com::atproto::admin 0.15 {
                 $event->{'$type'} eq 'com.atproto.admin.defs#modEventAcknowledge'     ||
                 $event->{'$type'} eq 'com.atproto.admin.defs#modEventEscalate'        ||
                 $event->{'$type'} eq 'com.atproto.admin.defs#modEventMute'            ||
+                $event->{'$type'} eq 'com.atproto.admin.defs#modEventEmail'           ||
                 $event->{'$type'} eq 'com.atproto.admin.defs#modEventResolveAppeal';
             $subject      = At::_topkg( $subject->{'$type'} )->new(%$subject) if !builtin::blessed $subject && defined $subject->{'$type'};
             $subjectBlobs = [ map { $_ = At::Lexicon::com::atproto::admin::blobView->new(%$_) unless builtin::blessed $_ } @$subjectBlobs ];

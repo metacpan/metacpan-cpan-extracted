@@ -1,21 +1,28 @@
 ---
-abstract: 'Mojolicious Plugin to overload a Configuration '
+abstract: 'Mojolicious Plugin to overload a Configuration'
 author:
   - 'Hugh Esco <hesco@campaignfoundations.com>'
 build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Mojolicious-Plugin-INIConfig-Extended
+provides:
+  Mojolicious::Plugin::INIConfig::Extended:
+    file: lib/Mojolicious/Plugin/INIConfig/Extended.pm
+    version: '0.09'
 requires:
   Config::Tiny: '2.14'
   Mojolicious: '3.84'
   Mojolicious::Plugin::INIConfig: '0.03'
   Test::Mojo::More: '0.05'
   Test::Most: '0.34'
-version: '0.06'
+version: '0.09'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: GPL-2.0-only

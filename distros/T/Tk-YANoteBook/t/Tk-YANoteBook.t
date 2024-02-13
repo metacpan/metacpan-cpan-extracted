@@ -38,6 +38,7 @@ if (defined $app) {
 	}
  	$app->Label(-text => '------')->pack;
 	$app->geometry('700x500+100+100');
+	$app->after(100, ['UpdateTabs', $nb]);
 }
 
 @tests = (
@@ -45,5 +46,6 @@ if (defined $app) {
 );
 
 starttesting;
+
 
 

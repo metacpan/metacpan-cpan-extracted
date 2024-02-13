@@ -77,7 +77,7 @@ sub lsys_execute
     if ($translate{$command}) { &{$translate{$command}}(); }
   }
   $im->Write($filename);
-  $im->Write('win:');
+  $im->Write(magick=>'SHOW',title=>"L-system");
 }
 
 1;

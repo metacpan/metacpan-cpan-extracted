@@ -1,6 +1,6 @@
 package Test::Expander::Constants;
 
-our $VERSION = '2.4.0';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '2.5.0';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use strict;
 use warnings
@@ -22,6 +22,7 @@ const our $EXCEPTION_PREFIX            => 'BEGIN failed--compilation aborted at 
 
 const our $FALSE                       => 0;
 
+const our $FMT_INVALID_COLOR           => "Color '%s' requested for %s variables is not supported\n";
 const our $FMT_INVALID_DIRECTORY       => "Invalid directory name / expression '%s' supplied with option '-lib'%s\n";
 const our $FMT_INVALID_ENV_ENTRY       => "Erroneous line %d of '%s' containing '%s': %s\n";
 const our $FMT_INVALID_VALUE           => "Option '%s' passed along with invalid value '%s'\n";
@@ -53,6 +54,8 @@ const our $REGEX_TOP_DIR_IN_PATH       => qr{^ ( [^/]+ ) }x;
 const our $REGEX_VERSION_NUMBER        => qr/^ \d+ (?: \. \d+ )* $/x;
 
 const our $TRUE                        => 1;
+
+const our %COLORS                      => ( exported => 'cyan', unexported => 'magenta' );
 
 const our %MOST_CONSTANTS_TO_EXPORT    => (
   '$CLASS'      => sub { $_[ 0 ] },

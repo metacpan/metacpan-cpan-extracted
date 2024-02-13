@@ -1,6 +1,7 @@
+!ru:en
 # NAME
 
-Liveman::MinillaPod2Markdown - bung for Minilla. It not make README.md
+Liveman::MinillaPod2Markdown – заглушка для Minilla, которая перебрасывает lib/MainModule.md в README.md
 
 # SYNOPSIS
 
@@ -23,25 +24,25 @@ $mark->as_markdown  # => hi!
 
 # DESCRIPION
 
-Add `markdown_maker = "Liveman::MinillaPod2Markdown"` to `minil.toml`, and Minilla do'nt make README.md.
+Добавьте строку `markdown_maker = "Liveman::MinillaPod2Markdown"` в `minil.toml`, и Minilla не будет создавать `README.md` из pod-документации главного модуля, а возьмёт из одноимённого файла рядом с расширением `*.md`.
 
 # SUBROUTINES
 
 ## as_markdown ()
 
-The bung.
+Заглушка.
 
 ## new ()
 
-The constructor.
+Конструктор.
 
 ## parse_from_file ($path)
 
-The bung.
+Заглушка.
 
 # INSTALL
 
-For install this module in your system run next [command](https://metacpan.org/pod/App::cpm):
+Чтобы установить этот модуль в вашу систему, выполните следующие действия [командой](https://metacpan.org/pod/App::cpm):
 
 ```sh
 sudo cpm install -gvv Liveman::MinillaPod2Markdown
@@ -49,7 +50,7 @@ sudo cpm install -gvv Liveman::MinillaPod2Markdown
 
 # AUTHOR
 
-Yaroslav O. Kosmina [dart@cpan.org](dart@cpan.org)
+Yaroslav O. Kosmina <dart@cpan.org>
 
 # LICENSE
 

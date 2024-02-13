@@ -3,29 +3,15 @@ package SPVM::Builder::Exe;
 use strict;
 use warnings;
 use Carp 'confess';
-use Pod::Usage 'pod2usage';
-use Config;
+use JSON::PP;
+use File::Basename 'basename';
 
 use SPVM::Builder;
 use SPVM::Builder::CC;
 use SPVM::Builder::Util;
 use SPVM::Builder::Config::Exe;
-use JSON::PP;
 
 use SPVM 'Native::Compiler';
-use SPVM 'Native::Runtime';
-
-use File::Spec;
-use File::Find 'find';
-
-use Getopt::Long 'GetOptions';
-
-use File::Copy 'copy', 'move';
-use File::Path 'mkpath';
-use DynaLoader;
-use Scalar::Util 'weaken';
-
-use File::Basename 'dirname', 'basename';
 
 # Fields
 sub builder {
@@ -248,7 +234,6 @@ sub build_exe_file {
   
   # Build directory
   my $build_dir = $self->builder->build_dir;
-  mkpath $build_dir;
   
   # Object files
   my $object_files = [];
@@ -302,7 +287,7 @@ sub get_required_resources {
   
   my $runtime = $self->runtime;
   
-  my $class_names = $runtime->_get_user_defined_basic_type_names;
+  my $class_names = $runtime->_get_user_defined_basic_type_names->to_strings;
   my $all_object_files = [];
   for my $class_name (@$class_names) {
     
@@ -412,7 +397,7 @@ sub compile {
 sub compile_classes {
   my ($self) = @_;
   
-  my $class_names = $self->runtime->_get_user_defined_basic_type_names;
+  my $class_names = $self->runtime->_get_user_defined_basic_type_names->to_strings;
   
   my $object_files = [];
   for my $class_name (@$class_names) {
@@ -425,29 +410,6 @@ sub compile_classes {
   }
   
   return $object_files;
-}
-
-sub create_source_file {
-  my ($self, $options) = @_;
-  
-  # Config
-  my $config_exe = $self->config;
-  
-  my $input_files = $options->{input_files};
-  my $output_file = $options->{output_file};
-  my $create_cb = $options->{create_cb};
-  
-  my $config_exe_loaded_config_files = $config_exe->get_loaded_config_files;
-  my $need_generate_input_files = [@$input_files, @$config_exe_loaded_config_files];
-  my $need_generate = SPVM::Builder::Util::need_generate({
-    force => $self->force || $config_exe->force,
-    output_file => $output_file,
-    input_files => $need_generate_input_files,
-  });
-  
-  if ($need_generate) {
-    $create_cb->();
-  }
 }
 
 sub compile_source_file {
@@ -513,7 +475,7 @@ sub create_bootstrap_header_source {
 
   my $class_name = $self->class_name;
 
-  my $class_names = $self->runtime->_get_user_defined_basic_type_names;
+  my $class_names = $self->runtime->_get_user_defined_basic_type_names->to_strings;
   
   my $source = '';
   
@@ -589,7 +551,7 @@ sub create_bootstrap_main_func_source {
 
   my $class_name = $self->class_name;
 
-  my $class_names = $self->runtime->_get_user_defined_basic_type_names;
+  my $class_names = $self->runtime->_get_user_defined_basic_type_names->to_strings;
 
   my $source = '';
 
@@ -609,22 +571,18 @@ int32_t main(int32_t command_args_length, const char *command_args[]) {
   
   FILE* spvm_stderr = env->api->runtime->get_spvm_stderr(env->runtime);
   
-  // Set precompile method addresses
   SPVM_BOOTSTRAP_create_bootstrap_set_precompile_method_addresses(env);
   
-  // Set native method addresses
   SPVM_BOOTSTRAP_create_bootstrap_set_native_method_addresses(env);
   
   SPVM_VALUE* stack = env->new_stack(env);
   
-  int32_t error = 0;
+  int32_t error_id = 0;
   
   // Set the program name and the command line arguments
   {
-    // Enter scope
     int32_t scope_id = env->enter_scope(env, stack);
     
-    // Program name - string
     void* obj_program_name = env->new_string(env, stack, command_args[0], strlen(command_args[0]));
     
     // ARGV - string[]
@@ -634,58 +592,78 @@ int32_t main(int32_t command_args_length, const char *command_args[]) {
       env->set_elem_object(env, stack, obj_argv, arg_index - 1, obj_arg);
     }
     
-    // Base time
     int64_t base_time = time(NULL);
     
     // Set command info
     {
-      int32_t e;
-      e = env->set_command_info_program_name(env, stack, obj_program_name);
-      assert(e == 0);
-      e = env->set_command_info_argv(env, stack, obj_argv);
-      assert(e == 0);
-      e = env->set_command_info_base_time(env, stack, base_time);
-      assert(e == 0);
+      error_id = env->set_command_info_program_name(env, stack, obj_program_name);
+      
+      if (error_id) {
+        env->print_stderr(env, stack, env->get_exception(env, stack));
+        fprintf(spvm_stderr, "\\n");
+      }
+      else {
+        error_id = env->set_command_info_argv(env, stack, obj_argv);
+        
+        if (error_id) {
+          env->print_stderr(env, stack, env->get_exception(env, stack));
+          fprintf(spvm_stderr, "\\n");
+        }
+        else {
+          error_id = env->set_command_info_base_time(env, stack, base_time);
+          if (error_id) {
+            env->print_stderr(env, stack, env->get_exception(env, stack));
+            fprintf(spvm_stderr, "\\n");
+          }
+        }
+      }
     }
-    // Leave scope
+    
     env->leave_scope(env, stack, scope_id);
-    
   }
   
-  // Call INIT blocks
-  
-  int32_t status = 0;
-  error = env->call_init_methods(env, stack);
-  if (error) {
-    env->print_stderr(env, stack, env->get_exception(env, stack));
-    printf("\\n");
-    status = 255;
-  }
-  else {
-    
-    // Class name
+  if (!error_id) {
     const char* class_name = "$class_name";
     
-    // Class
     void* class_basic_type = env->api->runtime->get_basic_type_by_name(env->runtime, class_name);
     void* method = env->api->basic_type->get_method_by_name(env->runtime, class_basic_type, "main");
     
-    if (!method) {
-      fprintf(spvm_stderr, "The class method %s->main is not defined\\n", class_name);
-      return -1;
-    }
-    
-    // Run
-    int32_t args_width = 0;
-    error = env->call_method(env, stack, method, args_width);
-    
-    if (error) {
-      env->print_stderr(env, stack, env->get_exception(env, stack));
-      printf("\\n");
-      status = 255;
+    if (method) {
+      int32_t is_class_method = env->api->method->is_class_method(env->runtime, method);
+      
+      if (is_class_method) {
+        int32_t args_length = env->api->method->get_args_length(env->runtime, method);
+        
+        if (!(args_length == 0)) {
+          fprintf(spvm_stderr, "The length of the arguments of the \\\"main\\\" method in the \\\"%s\\\" class must be 0.\\n", class_name);
+          error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
+        }
+      }
+      else {
+        fprintf(spvm_stderr, "The \\\"main\\\" method in the \\\"%s\\\" class must be a class method.\\n", class_name);
+        error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
+      }
     }
     else {
-      status = stack[0].ival;
+      fprintf(spvm_stderr, "The \\\"main\\\" method in the \\\"%s\\\" class must be defined.\\n", class_name);
+      error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
+    }
+    
+    if (!error_id) {
+      error_id = env->call_init_methods(env, stack);
+      if (error_id) {
+        env->print_stderr(env, stack, env->get_exception(env, stack));
+        fprintf(spvm_stderr, "\\n");
+      }
+      else {
+        int32_t args_width = 0;
+        error_id = env->call_method(env, stack, method, args_width);
+        
+        if (error_id) {
+          env->print_stderr(env, stack, env->get_exception(env, stack));
+          fprintf(spvm_stderr, "\\n");
+        }
+      }
     }
   }
   
@@ -699,7 +677,7 @@ int32_t main(int32_t command_args_length, const char *command_args[]) {
   
   env_api->free_env(env_api);
   
-  return status;
+  return error_id;
 }
 EOS
 
@@ -719,7 +697,7 @@ static void* SPVM_BOOTSTRAP_get_runtime(SPVM_ENV* env, void* compiler) {
   
 EOS
   
-  my $class_names = $self->runtime->_get_user_defined_basic_type_names;
+  my $class_names = $self->runtime->_get_user_defined_basic_type_names->to_strings;
   
   my $compiler = $self->compiler;
   
@@ -797,7 +775,7 @@ sub create_bootstrap_set_precompile_method_addresses_func_source {
   # Builder
   my $builder = $self->builder;
 
-  my $class_names = $self->runtime->_get_user_defined_basic_type_names;
+  my $class_names = $self->runtime->_get_user_defined_basic_type_names->to_strings;
 
   my $source = '';
 
@@ -829,7 +807,7 @@ sub create_bootstrap_set_native_method_addresses_func_source {
   # Builder
   my $builder = $self->builder;
 
-  my $class_names = $self->runtime->_get_user_defined_basic_type_names;
+  my $class_names = $self->runtime->_get_user_defined_basic_type_names->to_strings;
 
   my $source = '';
 
@@ -863,7 +841,7 @@ sub create_bootstrap_source {
   
   my $class_name = $self->class_name;
   
-  my $class_names = $self->runtime->_get_user_defined_basic_type_names;
+  my $class_names = $self->runtime->_get_user_defined_basic_type_names->to_strings;
   
   my $class_files = [];
   for my $class_name (@$class_names) {
@@ -881,43 +859,55 @@ sub create_bootstrap_source {
   $bootstrap_base =~ s|::|/|g;
   my $bootstrap_source_file = "$build_src_dir/$bootstrap_base.boot.c";
   
-  # Source creating callback
-  my $create_cb = sub {
-    
-    my $bootstrap_source = '';
-    
-    # Header
-    $bootstrap_source .= $self->create_bootstrap_header_source;
-    
-    # main function
-    $bootstrap_source .= $self->create_bootstrap_main_func_source;
-    
-    # Set precompile method addresses function
-    my $config_exe = $self->config;
-    $bootstrap_source .= $self->create_bootstrap_set_precompile_method_addresses_func_source;
-    
-    # Set native method addresses function
-    $bootstrap_source .= $self->create_bootstrap_set_native_method_addresses_func_source;
-    
-    $bootstrap_source .= $self->create_bootstrap_get_runtime_source;
-    
-    # Build source directory
-    my $build_src_dir = SPVM::Builder::Util::create_build_src_path($self->builder->build_dir);
-    mkpath $build_src_dir;
-    mkpath dirname $bootstrap_source_file;
-    
-    open my $bootstrap_source_fh, '>', $bootstrap_source_file
-      or die "Can't open file $bootstrap_source_file:$!";
-    
-    print $bootstrap_source_fh $bootstrap_source;
-  };
+  # Config
+  my $config_exe = $self->config;
   
-  # Create source file
-  $self->create_source_file({
-    input_files => [@$class_files, __FILE__],
-    output_file => $bootstrap_source_file,
-    create_cb => $create_cb,
+  my $input_files = [@$class_files];
+  my $output_file = $bootstrap_source_file;
+  
+  my $config_exe_loaded_config_files = $config_exe->get_loaded_config_files;
+  my $need_generate_input_files = [@$input_files, @$config_exe_loaded_config_files];
+  
+  my $bootstrap_source = '';
+  
+  # Header
+  $bootstrap_source .= $self->create_bootstrap_header_source;
+  
+  # main function
+  $bootstrap_source .= $self->create_bootstrap_main_func_source;
+  
+  # Set precompile method addresses function
+  $bootstrap_source .= $self->create_bootstrap_set_precompile_method_addresses_func_source;
+  
+  # Set native method addresses function
+  $bootstrap_source .= $self->create_bootstrap_set_native_method_addresses_func_source;
+  
+  $bootstrap_source .= $self->create_bootstrap_get_runtime_source;
+  
+  if (defined $config_exe->file) {
+    $bootstrap_source .= "\n// " . $config_exe->file;
+  }
+  
+  my $bootstrap_source_original;
+  if (-f $bootstrap_source_file) {
+    $bootstrap_source_original = SPVM::Builder::Util::slurp_binary($bootstrap_source_file);
+  }
+  
+  my $force = $self->force || $config_exe->force;
+  
+  if (defined $bootstrap_source_original && $bootstrap_source ne $bootstrap_source_original) {
+    $force = 1;
+  }
+  
+  my $need_generate = SPVM::Builder::Util::need_generate({
+    force => $force,
+    output_file => $output_file,
+    input_files => $need_generate_input_files,
   });
+  
+  if ($need_generate) {
+    SPVM::Builder::Util::spurt_binary($bootstrap_source_file, $bootstrap_source);
+  }
 }
 
 sub compile_bootstrap_source_file {
@@ -934,9 +924,6 @@ sub compile_bootstrap_source_file {
   my $class_name_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($target_perl_class_name);
   my $object_file_name = SPVM::Builder::Util::create_build_object_path($self->builder->build_dir, "$class_name_rel_file.boot.o");
   my $source_file = SPVM::Builder::Util::create_build_src_path($self->builder->build_dir, "$class_name_rel_file.boot.c");
-  
-  # Create directory for object file output
-  mkdir dirname $object_file_name;
   
   my $config = $config_exe->config_bootstrap;
   unless ($config) {
@@ -972,7 +959,6 @@ sub compile_spvm_core_source_files {
   
   # Object dir
   my $output_dir = SPVM::Builder::Util::create_build_object_path($self->builder->build_dir);
-  mkpath $output_dir;
   
   # Config
   my $config = $config_exe->config_spvm_core;
@@ -1066,15 +1052,6 @@ sub compile_native_class {
     }
     
     my $config = SPVM::Builder::Config->load_mode_config($config_file, $mode);
-    
-    my $resource_include_dirs = [];
-    my $resource_names = $config_exe->get_resource_names;
-    for my $resource_name (@$resource_names) {
-      my $resource = $config_exe->get_resource($resource_name);
-      my $resource_include_dir = $resource->config->native_include_dir;
-      push @$resource_include_dirs, $resource_include_dir;
-    }
-    $config->add_include_dir(@$resource_include_dirs);
     
     # In an executable file, only resources used in the config of the class for generate an executable file are compiled.
     unless ($class_name eq $self->class_name) {

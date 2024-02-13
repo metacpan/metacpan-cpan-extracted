@@ -13,6 +13,7 @@
 
 
 #include "math_longdouble_include.h"
+#include "math_longdouble_unused.h"
 
 #if defined(LDBL_MANT_DIG)
 #  if LDBL_MANT_DIG == 53
@@ -277,6 +278,7 @@ void LDtoSTR(pTHX_ SV * ld) {
      dXSARGS;
      long double t;
      char * buffer;
+     PERL_UNUSED_VAR(items);
 
      if(sv_isobject(ld)) {
        const char *h = HvNAME(SvSTASH(SvRV(ld)));
@@ -300,6 +302,7 @@ void LDtoSTRP(pTHX_ SV * ld, int decimal_prec) {
      dXSARGS;
      long double t;
      char * buffer;
+     PERL_UNUSED_VAR(items);
 
      if(decimal_prec < 1)croak("2nd arg (precision) to LDtoSTRP  must be at least 1");
 
@@ -396,6 +399,7 @@ SV * _overload_add(pTHX_ SV * a, SV * b, SV * third) {
 
      long double * ld;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG(third);
 
      Newx(ld, 1, long double);
      if(ld == NULL) croak("Failed to allocate memory in _overload_add function");
@@ -443,6 +447,7 @@ SV * _overload_mul(pTHX_ SV * a, SV * b, SV * third) {
 
      long double * ld;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG(third);
 
      Newx(ld, 1, long double);
      if(ld == NULL) croak("Failed to allocate memory in _overload_mul function");
@@ -598,6 +603,7 @@ SV * _overload_div(pTHX_ SV * a, SV * b, SV * third) {
 }
 
 SV * _overload_equiv(pTHX_ SV * a, SV * b, SV * third) {
+     PERL_UNUSED_ARG(third);
 
     if(SvUOK(b)) {
        if(*(INT2PTR(ldbl *, SvIVX(SvRV(a)))) == (ldbl)SvUVX(b)) return newSViv(1);
@@ -636,6 +642,7 @@ SV * _overload_equiv(pTHX_ SV * a, SV * b, SV * third) {
 }
 
 SV * _overload_not_equiv(pTHX_ SV * a, SV * b, SV * third) {
+     PERL_UNUSED_ARG(third);
 
     if(SvUOK(b)) {
        if(*(INT2PTR(ldbl *, SvIVX(SvRV(a)))) != (ldbl)SvUVX(b)) return newSViv(1);
@@ -674,6 +681,7 @@ SV * _overload_not_equiv(pTHX_ SV * a, SV * b, SV * third) {
 }
 
 SV * _overload_true(pTHX_ SV * a, SV * b, SV * third) {
+     PERL_UNUSED_ARG2(b, third);
 
      if(_is_nan(*(INT2PTR(long double *, SvIVX(SvRV(a)))))) return newSViv(0);
      if(*(INT2PTR(long double *, SvIVX(SvRV(a)))) != 0.0L) return newSViv(1);
@@ -681,12 +689,14 @@ SV * _overload_true(pTHX_ SV * a, SV * b, SV * third) {
 }
 
 SV * _overload_not(pTHX_ SV * a, SV * b, SV * third) {
+     PERL_UNUSED_ARG2(b, third);
      if(_is_nan(*(INT2PTR(long double *, SvIVX(SvRV(a)))))) return newSViv(1);
      if(*(INT2PTR(long double *, SvIVX(SvRV(a)))) != 0.0L) return newSViv(0);
      return newSViv(1);
 }
 
 SV * _overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
+     PERL_UNUSED_ARG(third);
 
     SvREFCNT_inc(a);
 
@@ -764,6 +774,7 @@ void broken_overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
 }
 
 SV * _overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
+    PERL_UNUSED_ARG(third);
 
     SvREFCNT_inc(a);
 
@@ -803,6 +814,7 @@ SV * _overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
 }
 
 SV * _overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
+    PERL_UNUSED_ARG(third);
 
     SvREFCNT_inc(a);
 
@@ -842,6 +854,7 @@ SV * _overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
 }
 
 SV * _overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
+    PERL_UNUSED_ARG(third);
 
     SvREFCNT_inc(a);
 
@@ -1181,6 +1194,7 @@ SV * _overload_copy(pTHX_ SV * a, SV * b, SV * third) {
 
      long double * ld;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(b, third);
 
      Newx(ld, 1, long double);
      if(ld == NULL) croak("Failed to allocate memory in _overload_copy function");
@@ -1238,6 +1252,7 @@ SV * _overload_abs(pTHX_ SV * a, SV * b, SV * third) {
 
      long double * ld;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(b, third);
 
      Newx(ld, 1, long double);
      if(ld == NULL) croak("Failed to allocate memory in _overload_abs function");
@@ -1296,6 +1311,7 @@ SV * _overload_int(pTHX_ SV * a, SV * b, SV * third) {
 
      long double * ld;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(b, third);
 
      Newx(ld, 1, long double);
      if(ld == NULL) croak("Failed to allocate memory in _overload_int function");
@@ -1316,6 +1332,7 @@ SV * _overload_sqrt(pTHX_ SV * a, SV * b, SV * third) {
 
      long double * ld;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(b, third);
 
      Newx(ld, 1, long double);
      if(ld == NULL) croak("Failed to allocate memory in _overload_sqrt function");
@@ -1333,6 +1350,7 @@ SV * _overload_log(pTHX_ SV * a, SV * b, SV * third) {
 
      long double * ld;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(b, third);
 
      Newx(ld, 1, long double);
      if(ld == NULL) croak("Failed to allocate memory in _overload_log function");
@@ -1351,6 +1369,7 @@ SV * _overload_exp(pTHX_ SV * a, SV * b, SV * third) {
 
      long double * ld;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(b, third);
 
      Newx(ld, 1, long double);
      if(ld == NULL) croak("Failed to allocate memory in _overload_exp function");
@@ -1369,6 +1388,7 @@ SV * _overload_sin(pTHX_ SV * a, SV * b, SV * third) {
 
      long double * ld;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(b, third);
 
      Newx(ld, 1, long double);
      if(ld == NULL) croak("Failed to allocate memory in _overload_sin function");
@@ -1387,6 +1407,7 @@ SV * _overload_cos(pTHX_ SV * a, SV * b, SV * third) {
 
      long double * ld;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(b, third);
 
      Newx(ld, 1, long double);
      if(ld == NULL) croak("Failed to allocate memory in _overload_cos function");
@@ -1456,10 +1477,12 @@ SV * _overload_atan2(pTHX_ SV * a, SV * b, SV * third) {
 }
 
 void _overload_inc(pTHX_ SV * a, SV * b, SV * third) {
+     PERL_UNUSED_ARG2(b, third);
      *(INT2PTR(long double *, SvIVX(SvRV(a)))) += 1.0L;
 }
 
 void _overload_dec(pTHX_ SV * a, SV * b, SV * third) {
+     PERL_UNUSED_ARG2(b, third);
      *(INT2PTR(long double *, SvIVX(SvRV(a)))) -= 1.0L;
 }
 
@@ -1553,6 +1576,7 @@ SV * _overload_pow(pTHX_ SV * a, SV * b, SV * third) {
 }
 
 SV * _overload_pow_eq(pTHX_ SV * a, SV * b, SV * third) {
+    PERL_UNUSED_ARG(third);
 
     SvREFCNT_inc(a);
 
@@ -1675,7 +1699,6 @@ SV * _get_xs_version(pTHX) {
 SV * _ld_bytes(pTHX_ SV * arg) {
 
   long double ld;
-  int i;
   SV * ret = NEWSV(0, MATH_LONGDOUBLE_SIZE);
 
   if(sv_isobject(arg)) {

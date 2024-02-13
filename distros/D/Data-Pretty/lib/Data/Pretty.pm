@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Data Dump Beautifier - ~/lib/Data/Pretty.pm
-## Version v0.1.8
+## Version v0.1.9
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/08/06
-## Modified 2023/10/11
+## Modified 2024/02/13
 ## All rights reserved
 ## 
 ## 
@@ -28,7 +28,7 @@ BEGIN
     @EXPORT = qw( dd ddx );
     @EXPORT_OK = qw( dump pp dumpf literal quote );
     our $DEBUG = 0;
-    our $VERSION = 'v0.1.8';
+    our $VERSION = 'v0.1.9';
 };
 
 use strict;
@@ -647,7 +647,7 @@ sub _dump
                 $this_type = substr(overload::StrVal($$val // ''), 0, $i);
             }
             # Our child element is also an HASH, and if it is not empty, this would become too much of a cluttered structure to print in just one line.
-            if( defined( $this_type ) && $this_type eq 'HASH' && scalar( keys( %{$rval->{$orig}} ) ) )
+            if( defined( $this_type ) && $this_type eq 'HASH' && ref( $rval->{$orig} ) eq 'HASH' && scalar( keys( %{$rval->{$orig}} ) ) )
             {
                 $need_breakdown++;
             }
@@ -783,7 +783,7 @@ Data::Pretty - Data Dump Beautifier
 
 =head1 VERSION
 
-    v0.1.8
+    v0.1.9
 
 =head1 DESCRIPTION
 

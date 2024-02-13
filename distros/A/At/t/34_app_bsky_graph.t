@@ -87,18 +87,14 @@ subtest 'live' => sub {
         ok my $res = $bsky->graph_getSuggestedFollowsByActor('bsky.app'), '$bsky->graph_getSuggestedFollowsByActor("bsky.app")';
         isa_ok $res->{suggestions}->[0], ['At::Lexicon::app::bsky::actor::profileViewDetailed'], '...contains list of profileViewDetailed objects';
     };
-    {
+SKIP: {
         my $list;
-        subtest 'graph_getLists' => sub {
-            ok my $res   = $bsky->graph_getLists('jacob.gold'), '$bsky->graph_getLists("jacob.gold")';
-            isa_ok $list = $res->{lists}->[0], ['At::Lexicon::app::bsky::graph::listView'], '...contains list of listView objects';
-        };
+        ok my $res = $bsky->graph_getLists('jacob.gold'), '$bsky->graph_getLists("jacob.gold")';
+        skip 'failed to gather graph lists' unless scalar @{ $res->{lists} };
+        isa_ok $list = $res->{lists}->[0], ['At::Lexicon::app::bsky::graph::listView'], '...contains list of listView objects';
         subtest 'graph_getList' => sub {
-        SKIP: {
-                skip 'failed to gather list in previous test' unless defined $list && builtin::blessed $list;
-                ok my $res = $bsky->graph_getList( $list->uri->as_string ), '$bsky->graph_getList(' . $list->uri->as_string . ')';
-                isa_ok $res->{items}->[0], ['At::Lexicon::app::bsky::graph::listItemView'], '...contains list of listItemView objects';
-            }
+            ok my $res = $bsky->graph_getList( $list->uri->as_string ), '$bsky->graph_getList(' . $list->uri->as_string . ')';
+            isa_ok $res->{items}->[0], ['At::Lexicon::app::bsky::graph::listItemView'], '...contains list of listItemView objects';
         };
         subtest 'graph_getListBlocks' => sub {
             ok my $res = $bsky->graph_getListBlocks(), '$bsky->graph_getListBlocks()';
@@ -115,10 +111,10 @@ subtest 'live' => sub {
         SKIP: {
                 skip 'not muting any lists' unless scalar @{ $res->{lists} };
                 isa_ok $res->{lists}->[0], ['At::Lexicon::app::bsky::graph::listView'], '...contains list of listView objects';
+                subtest 'graph_unmuteActorList' => sub {
+                    ok $bsky->graph_unmuteActorList( $list->uri->as_string ), '$bsky->graph_unmuteActorList(' . $list->uri->as_string . ')';
+                };
             }
-        };
-        subtest 'graph_unmuteActorList' => sub {
-            ok $bsky->graph_unmuteActorList( $list->uri->as_string ), '$bsky->graph_unmuteActorList(' . $list->uri->as_string . ')';
         };
         subtest 'graph_muteActor' => sub {
             ok $bsky->graph_muteActor('sankor.bsky.social'), '$bsky->graph_muteActor("sankor.bsky.social")';

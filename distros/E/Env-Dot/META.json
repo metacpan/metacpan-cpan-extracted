@@ -74,15 +74,15 @@
    "provides" : {
       "Env::Dot" : {
          "file" : "lib/Env/Dot.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       },
       "Env::Dot::Functions" : {
          "file" : "lib/Env/Dot/Functions.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       },
       "Env::Dot::ScriptFunctions" : {
          "file" : "lib/Env/Dot/ScriptFunctions.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -97,7 +97,10 @@
          "web" : "https://github.com/mikkoi/env-dot.git"
       }
    },
-   "version" : "0.007",
+   "version" : "0.008",
+   "x_contributors" : [
+      "David Kaufman <david@gigawatt.org>"
+   ],
    "x_generated_by_perl" : "v5.34.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.28",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

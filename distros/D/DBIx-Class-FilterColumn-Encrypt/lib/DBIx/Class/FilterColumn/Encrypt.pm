@@ -1,12 +1,12 @@
 package DBIx::Class::FilterColumn::Encrypt;
-$DBIx::Class::FilterColumn::Encrypt::VERSION = '0.001';
+$DBIx::Class::FilterColumn::Encrypt::VERSION = '0.002';
 use strict;
 use warnings;
 
 use parent 'DBIx::Class';
 __PACKAGE__->load_components(qw/FilterColumn/);
 
-use Crypt::AuthEnc::GCM;
+use Crypt::AuthEnc::GCM 0.048;
 use Crypt::URandom;
 
 my $format = 'w a16 a16 a*';
@@ -59,7 +59,7 @@ DBIx::Class::FilterColumn::Encrypt - Transparently encrypt columns in DBIx::Clas
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -90,7 +90,7 @@ version 0.001
 
 This components transparently encrypts any value with the currently active key, or decrypts them with any known value. This is useful when needing read/write access to values that are too sensitive to store in plaintext, such as credentials for other services. For passwords you should be using L<DBIx::Class::CryptColumn|DBIx::Class::CryptColumn> instead of this module.
 
-To enable encryption, C<encrypt> must be a hash containing the key C<keys>, which shall be a hash mapping numberic identifiers to keys. An optional argument <active_key> may be given which one will be used for encrypting, otherwise the key with the highest numeric value will be used automatically; this allows you to rotate the active key. Also a C<cipher> command may be passed if a cipher other than AES is desired.
+To enable encryption, C<encrypt> must be a hash containing the key C<keys>, which shall be a hash mapping numberic identifiers to keys. An optional argument C<active_key> may be given which one will be used for encrypting, otherwise the key with the highest numeric value will be used automatically; this allows you to rotate the active key. Also a C<cipher> command may be passed if a cipher other than AES is desired.
 
 =head1 AUTHOR
 

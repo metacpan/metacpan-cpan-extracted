@@ -11,11 +11,11 @@ subtest 'init' => sub {
     isa_ok my $at = At->new( host => 'https://bsky.social' ), ['At'], q[At->new( host => 'https://bsky.social' )];
     ok my $desc   = $at->server_describeServer(), '$at->server_describeServer()';
     like $desc->{availableUserDomains}, ['.bsky.social'], '... availableUserDomains';
-    like $desc->{inviteCodeRequired},   !!1,              '... inviteCodeRequired';     # XXX - Might be false in the future
+    ok defined $desc->{inviteCodeRequired}, '... inviteCodeRequired';
     isa_ok $desc->{links}, ['At::Lexicon::com::atproto::server::describeServer::links'], '... links';
     like $desc->{links}->_raw, {
-        privacyPolicy  => qr[https://.+],                                               # https://blueskyweb.xyz/support/privacy-policy
-        termsOfService => qr[https://.+]                                                # https://blueskyweb.xyz/support/tos
+        privacyPolicy  => qr[https://.+],    # https://blueskyweb.xyz/support/privacy-policy
+        termsOfService => qr[https://.+]     # https://blueskyweb.xyz/support/tos
         },
         '... links->_raw';
 };

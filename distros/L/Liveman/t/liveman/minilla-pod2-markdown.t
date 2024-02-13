@@ -1,6 +1,7 @@
-use common::sense; use open qw/:std :utf8/;  use Carp qw//; use File::Basename qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN {     $SIG{__DIE__} = sub {         my ($s) = @_;         if(ref $s) {             $s->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $s;             die $s;         } else {             die Carp::longmess defined($s)? $s: "undef"         }     };      my $t = File::Slurper::read_text(__FILE__);     my $s =  '/tmp/.liveman/perl-liveman/liveman!minilla-pod2-markdown'    ;     File::Path::rmtree($s) if -e $s;     File::Path::mkpath($s);     chdir $s or die "chdir $s: $!";      while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) {         my ($file, $code) = ($1, $2);         $code =~ s/^#>> //mg;         File::Path::mkpath(File::Basename::dirname($file));         File::Slurper::write_text($file, $code);     }  } # # NAME
+use common::sense; use open qw/:std :utf8/;  use Carp qw//; use File::Basename qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN {     $SIG{__DIE__} = sub {         my ($s) = @_;         if(ref $s) {             $s->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $s;             die $s;         } else {             die Carp::longmess defined($s)? $s: "undef"         }     };      my $t = File::Slurper::read_text(__FILE__);     my $s =  '/tmp/.liveman/perl-liveman/liveman!minilla-pod2-markdown'    ;     File::Path::rmtree($s) if -e $s;     File::Path::mkpath($s);     chdir $s or die "chdir $s: $!";      while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) {         my ($file, $code) = ($1, $2);         $code =~ s/^#>> //mg;         File::Path::mkpath(File::Basename::dirname($file));         File::Slurper::write_text($file, $code);     }  } # 
+# # NAME
 # 
-# Liveman::MinillaPod2Markdown - bung for Minilla. It not make README.md
+# Liveman::MinillaPod2Markdown – заглушка для Minilla, которая перебрасывает lib/MainModule.md в README.md
 # 
 # # SYNOPSIS
 # 
@@ -23,25 +24,25 @@ $mark->parse_from_file("X.pm");
 # 
 # # DESCRIPION
 # 
-# Add `markdown_maker = "Liveman::MinillaPod2Markdown"` to `minil.toml`, and Minilla do'nt make README.md.
+# Добавьте строку `markdown_maker = "Liveman::MinillaPod2Markdown"` в `minil.toml`, и Minilla не будет создавать `README.md` из pod-документации главного модуля, а возьмёт из одноимённого файла рядом с расширением `*.md`.
 # 
 # # SUBROUTINES
 # 
 # ## as_markdown ()
 # 
-# The bung.
+# Заглушка.
 # 
 # ## new ()
 # 
-# The constructor.
+# Конструктор.
 # 
 # ## parse_from_file ($path)
 # 
-# The bung.
+# Заглушка.
 # 
 # # INSTALL
 # 
-# For install this module in your system run next [command](https://metacpan.org/pod/App::cpm):
+# Чтобы установить этот модуль в вашу систему, выполните следующие действия [командой](https://metacpan.org/pod/App::cpm):
 # 
 
 # sudo cpm install -gvv Liveman::MinillaPod2Markdown
@@ -49,7 +50,7 @@ $mark->parse_from_file("X.pm");
 # 
 # # AUTHOR
 # 
-# Yaroslav O. Kosmina [dart@cpan.org](dart@cpan.org)
+# Yaroslav O. Kosmina <dart@cpan.org>
 # 
 # # LICENSE
 # 

@@ -8,7 +8,7 @@ define pod <<"=cut"
 
 =head1 NAME
 
-    xlate - Front-end CLI tool for App::Greple::xlate module
+    xlate - translate CLI front-end for App::Greple::xlate module
 
 =head1 SYNOPSIS
 
@@ -21,21 +21,27 @@ define pod <<"=cut"
 	-c   just check translation area
 	-r   refresh cache
 	-s   silent mode
-	-e # translation engine (default deepl, or gpt3)
+	-e # translation engine (default "deepl")
 	-p # pattern to determine translation area
 	-w # wrap line by # width
-	-o # output format (default xtxt, or cm, ifdef)
+	-o # output format (default "xtxt", or "cm", "ifdef")
 	-f # from lang (ignored)
-	-t # to lang
+	-t # to lang (required, no default)
 	-m # max length per API call
 	-l # show library files (XLATE.mk, xlate.el)
         --   terminate option parsing
     Make options
 	-M   run make
+	-n   dry-run
     Docker options
 	-G   mount git top-level directory
 	-B   run in non-interactive (batch) mode
 	-R   mount read-only
+	-E * specify environment variable to be inherited
+	-I * specify altanative docker image (default: tecolicom/xlate:version)
+#	-T * specify docker image version
+#	-L   use the latest version
+#	-V * specify directory to be mounted (default: current directory)
 	-D * run xlate on the container with the rest parameters
 	-C * run following command on the container, or run shell
 
@@ -44,9 +50,11 @@ define pod <<"=cut"
 	*.FORMAT  translation foramt (xtxt, cm, ifdef)
 	*.ENGINE  translation engine (deepl or gpt3)
 
+#	marked as # options are experimental
+
 =head1 VERSION
 
-    Version 0.29
+    Version 0.30
 
 =cut
 
@@ -60,9 +68,12 @@ git_topdir() {
 }
 
 env_pattern() {
-    set +x
     local name
-    while (( $# > 0 )); do name+="${name:+\\|}$1"; shift; done
+    while (( $# > 0 ))
+    do
+	name+="${name:+\\|}$1"
+	shift
+    done
     echo -n ${name:+"^\\($name\\)="}
 }
 
@@ -84,9 +95,18 @@ display=
 define DEFAULT_ENV <<EOF
 LESSANSIENDCHARS=mK
 LESS=-cR
+LANG
+TZ
+TERM_PROGRAM
+TERM_BGCOLOR
+COLORTERM
+DEEPL_AUTH_KEY
+OPENAI_API_KEY
 EOF
 
-while getopts :${EXOPT:=dBI:V:T:LRGCD} OPT
+declare -a ENV
+
+while getopts :${EXOPT:=dBI:V:T:LRE:GCD} OPT
 do
     case $OPT in
 	d)       debug=yes ; set -x ;;
@@ -96,6 +116,8 @@ do
 	T)     version=:"$OPTARG" ;;
 	L)     version=:latest ;;
 	R)  mount_mode=ro ;;
+	E)
+	    DEFAULT_ENV+="$OPTARG"$'\n' ;;
 	G)
 	    [ "$XLATE_RUNNING_ON_DOCKER" ] && break
 	    if [ "${topdir:=$(git_topdir)}" ]
@@ -124,9 +146,7 @@ do
 		D) command=(xlate) ;;
 	    esac
 	    command+=(${1+"$@"})
-	    ENV=(LANG TZ TERM_PROGRAM TERM_BGCOLOR COLORTERM)
-	    ENV+=(DEEPL_AUTH_KEY OPENAI_API_KEY)
-	    ENV_PATTERN=$(env_pattern ${ENV[@]})
+	    [ ${#ENV[@]} -gt 0 ] && ENV_PATTERN="$(env_pattern ${ENV[@]})"
 	    exec docker run --rm \
 		 -e XLATE_RUNNING_ON_DOCKER=1 \
 		 ${interactive:+-it} \
@@ -178,8 +198,7 @@ do
 	    exit
 	    ;;
 	h)
-	    help="$(sed -r -e 's/^=[a-z]+[0-9]* *//' <<< "$pod")"
-	    exec echo "$help"
+	    sed -r -e '/^#/d' -e 's/^=[a-z]+[0-9]* *//' -e '/Version/q' <<< "$pod"
 	    exit
 	    ;;
 	v)
@@ -271,7 +290,7 @@ case $1 in
 	area=(--re '^.+\n')
 	;;
     *)
-	area=(--re '^.+\n')
+	area=(--re '^(.+\n)+')
 	;;
 esac
 

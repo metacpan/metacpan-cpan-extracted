@@ -28,7 +28,7 @@ my $header_component = $self_service ? '/SelfService/Elements/Header' : '/Elemen
 my %cfs = map { $_ => 1} @{ $m->notes('cfs_on_page') || [] };
 my %core_fields = map { $_ => 1} @{ $m->notes('core_fields_on_page') || [] };
 
-my %request_args = $m->request_args;
+my %request_args = %$DECODED_ARGS;
 
 my @results;
 my $real_next = delete $request_args{_form_tools_next};
@@ -133,7 +133,7 @@ $next_for_validation ||= $m->caller(1)->path;
 % next if $forbid_persisting->{$key};
 % next if ($key eq 'user' or $key eq 'pass');
 % next if $key eq 'Submit'; # No need to pass through "Next" button value
-% next if $key =~ /^(?:validation|validation_ok|next_for_validation)$/;
+% next if $key =~ /^(?:validation|validation_ok|next_for_validation|sc)$/;
 <input type="hidden" name="<%$key%>" value="<%$val%>" />
 % }
 % }
