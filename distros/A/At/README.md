@@ -10,9 +10,9 @@ use At;
 my $at = At->new( host => 'https://fun.example' );
 $at->server_createSession( 'sanko', '1111-aaaa-zzzz-0000' );
 $at->repo_createRecord(
-    $at->did,
-    'app.bsky.feed.post',
-    { '$type' => 'app.bsky.feed.post', text => 'Hello world! I posted this via the API.', createdAt => time }
+    repo       => $at->did,
+    collection => 'app.bsky.feed.post',
+    record     => { '$type' => 'app.bsky.feed.post', text => 'Hello world! I posted this via the API.', createdAt => time }
 );
 ```
 
@@ -55,11 +55,11 @@ The API attempts to follow the layout of the underlying protocol so changes to t
 
 ## `new( ... )`
 
-Creates an AT client and initiates an authentication session.
-
 ```perl
 my $at = At->new( host => 'https://bsky.social' );
 ```
+
+Creates an AT client and initiates an authentication session.
 
 Expected parameters include:
 
@@ -70,11 +70,11 @@ Expected parameters include:
 
 ## `resume( ... )`
 
-Resumes an authenticated session.
-
 ```perl
 my $at = At->resume( $session );
 ```
+
+Resumes an authenticated session.
 
 Expected parameters include:
 
@@ -82,11 +82,11 @@ Expected parameters include:
 
 ## `session( )`
 
-Returns data which may be used to resume an authenticated session.
-
 ```perl
 my $restore = $at->session;
 ```
+
+Returns data which may be used to resume an authenticated session.
 
 Note that this data is subject to change in line with the AT protocol.
 
@@ -108,6 +108,10 @@ Returns a true value on success.
 
 ## `admin_disableAccountInvites( ... )`
 
+```
+$at->admin_disableAccountInvites( 'did:...' );
+```
+
 Disable an account from receiving new invite codes, but does not invalidate existing codes.
 
 Expected parameters include:
@@ -120,7 +124,13 @@ Expected parameters include:
 
     Optional reason for disabled invites.
 
-## `admin_disableInviteCodes( )`
+## `admin_disableInviteCodes( [...] )`
+
+```perl
+$at->admin_disableInviteCodes( );
+
+$at->admin_disableInviteCodes( accounts => [ ... ] );
+```
 
 Disable some set of codes and/or all codes associated with a set of users.
 
@@ -240,8 +250,10 @@ Returns an info list of new `At::Lexicon::com::atproto::admin::accountView` obje
 
 ## `admin_getInviteCodes( [...] )`
 
-```
+```perl
 $at->admin_getInviteCodes( );
+
+$at->admin_getInviteCodes( sort => 'usage' );
 ```
 
 Get an admin view of invite codes.
@@ -295,18 +307,21 @@ Returns a new `At::Lexicon::com::atproto::admin::recordViewDetail` object on suc
 $at->admin_getRepo( 'did:...' );
 ```
 
-Get details about a repository.
+Download a repository export as CAR file. Optionally only a 'diff' since a previous revision. Does not require auth;
+implemented by PDS.
 
 Expected parameters include:
 
 - `did` - required
 
+    The DID of the repo.
+
 Returns a new `At::Lexicon::com::atproto::admin::repoViewDetail` object on success.
 
 ## `admin_getSubjectStatus( [...] )`
 
-```
-$at->admin_getSubjectStatus( 'did:...' );
+```perl
+$at->admin_getSubjectStatus( did => 'did:...' );
 ```
 
 Get details about a repository.
@@ -392,7 +407,7 @@ Returns a list of events as new `At::Lexicon::com::atproto::admin::modEventView`
 ## `admin_queryModerationStatuses( [...] )`
 
 ```perl
-$at->admin_queryModerationStatuses( 'did:...' );
+$at->admin_queryModerationStatuses( comment => 'August' );
 ```
 
 List moderation events related to a subject.
@@ -455,8 +470,8 @@ Returns a list of subject statuses as new `At::Lexicon::com::atproto::admin::sub
 
 ## `admin_searchRepos( [...] )`
 
-```
-$at->admin_searchRepos( 'hydra' );
+```perl
+$at->admin_searchRepos( query => 'hydra' );
 ```
 
 Find repositories based on a search term.
@@ -474,8 +489,8 @@ Returns a list of repos as new `At::Lexicon::com::atproto::admin::repoView` obje
 
 ## `admin_sendEmail( ..., [...] )`
 
-```
-$at->admin_sendEmail( 'did:...', 'Hi!', 'did:...' );
+```perl
+$at->admin_sendEmail( recipientDid => 'did:...', senderDid => 'did:...', content => 'Sup.' );
 ```
 
 Send email to a user's account email address.
@@ -584,7 +599,7 @@ Returns the subject and takedown objects on success.
 $at->identity_resolveHandle( 'atproto.bsky.social' );
 ```
 
-Provides the DID of a repo.
+Resolves a handle (domain name) to a DID.
 
 Expected parameters include:
 
@@ -600,21 +615,25 @@ Returns the DID on success.
 $at->identity_updateHandle( 'atproto.bsky.social' );
 ```
 
-Updates the handle of the account.
+Updates the current account's handle. Verifies handle validity, and updates did:plc document if necessary. Implemented
+by PDS, and requires auth.
 
 Expected parameters include:
 
 - `handle` - required
 
+    The new handle.
+
 Returns a true value on success.
 
-## `label_queryLabels( ... )`
+## `label_queryLabels( ..., [...] )`
 
-```
-$at->label_queryLabels( '' );
+```perl
+$at->label_queryLabels( uriPatterns => 'at://...' );
 ```
 
-Find labels relevant to the provided URI patterns.
+Find labels relevant to the provided AT-URI patterns. Public endpoint for moderation services, though may return
+different or additional results with auth.
 
 Expected parameters include:
 
@@ -641,7 +660,8 @@ On success, labels are returned as a list of new `At::Lexicon::com::atproto::lab
 $at->label_subscribeLabels( sub { ... } );
 ```
 
-Subscribe to label updates.
+Subscribe to stream of labels (and negations). Public endpoint implemented by mod services. Uses same sequencing scheme
+as repo event stream.
 
 Expected parameters include:
 
@@ -651,7 +671,7 @@ Expected parameters include:
 
 - `cursor`
 
-    The last known event to backfill from.
+    The last known event seq number to backfill from.
 
 On success, a websocket is initiated. Events we receive include
 `At::Lexicon::com::atproto::label::subscribeLables::labels` and
@@ -685,19 +705,23 @@ On success, a websocket is initiated and a promise is returned. Events we receiv
 $at->moderation_createReport( { '$type' => 'com.atproto.moderation.defs#reasonSpam' }, { '$type' => 'com.atproto.repo.strongRef', uri => ..., cid => ... } );
 ```
 
-Report a repo or a record.
+Submit a moderation report regarding an atproto account or record. Implemented by moderation services (with PDS
+proxying), and requires auth.
 
 Expected parameters include:
 
 - `reasonType` - required
 
-    An `At::Lexicon::com::atproto::moderation::reasonType` object.
+    Indicates the broad category of violation the report is for. An `At::Lexicon::com::atproto::moderation::reasonType`
+    object.
 
 - `subject` - required
 
     An `At::Lexicon::com::atproto::admin::repoRef` or `At::Lexicon::com::atproto::repo::strongRef` object.
 
 - `reason`
+
+    Additional context about the content and violation.
 
 On success, an id, the original reason type, subject, and reason, are returned as well as the DID of the user making
 the report and a timestamp.
@@ -708,13 +732,13 @@ the report and a timestamp.
 $at->repo_applyWrites( $at->did, [ ... ] );
 ```
 
-Apply a batch transaction of creates, updates, and deletes.
+Apply a batch transaction of repository creates, updates, and deletes. Requires auth, implemented by PDS.
 
 Expected parameters include:
 
 - `repo` - required
 
-    The handle or DID of the repo.
+    The handle or DID of the repo (aka, current account).
 
 - `writes`
 
@@ -724,15 +748,16 @@ Expected parameters include:
 
 - `validate` - required
 
-    Flag for validating the records.
+    Can be set to 'false' to skip Lexicon schema validation of record data, for all operations.
 
 - `swapCommit`
+
+    If provided, the entire operation will fail if the current repo commit CID does not match this value. Used to prevent
+    conflicting repo mutations.
 
 Returns a true value on success.
 
 ## `repo_createRecord( ... )`
-
-Create a new record.
 
 ```perl
 $at->repo_createRecord(
@@ -742,11 +767,13 @@ $at->repo_createRecord(
 );
 ```
 
+Create a single new repository record. Requires auth, implemented by PDS.
+
 Expected parameters include:
 
 - `repo` - required
 
-    The handle or DID of the repo.
+    The handle or DID of the repo (aka, current account).
 
 - `collection` - required
 
@@ -754,11 +781,11 @@ Expected parameters include:
 
 - `record` - required
 
-    The record to create.
+    The record itself. Must contain a `$type` field.
 
 - `validate`
 
-    Flag for validating the record.
+    Can be set to 'false' to skip Lexicon schema validation of record data.
 
 - `swapCommit`
 
@@ -766,23 +793,23 @@ Expected parameters include:
 
 - `rkey`
 
-    The key of the record.
+    The Record Key.
 
 Returns the uri and cid of the newly created record on success.
 
 ## `repo_deleteRecord( ... )`
 
-Create a new record.
-
 ```perl
 $at->repo_deleteRecord( repo => $at->did, collection => 'app.bsky.feed.post', rkey => '3kiburrigys27' );
 ```
+
+Delete a repository record, or ensure it doesn't exist. Requires auth, implemented by PDS.
 
 Expected parameters include:
 
 - `repo` - required
 
-    The handle or DID of the repo.
+    The handle or DID of the repo (aka, current account).
 
 - `collection` - required
 
@@ -790,7 +817,7 @@ Expected parameters include:
 
 - `rkey`
 
-    The key of the record.
+    The Record Key.
 
 - `swapRecord`
 
@@ -808,7 +835,7 @@ Returns a true value on success.
 $at->repo_describeRepo( $at->did );
 ```
 
-Get information about the repo, including the list of collections.
+Get information about an account and repository, including the list of collections. Does not require auth.
 
 Expected parameters include:
 
@@ -817,7 +844,7 @@ Expected parameters include:
     The handle or DID of the repo.
 
 On success, returns the repo's handle, did, a didDoc, a list of supported collections, a flag indicating whether or not
-the handle is correct.
+the handle is currently valid.
 
 ## `repo_getRecord( ... )`
 
@@ -825,7 +852,7 @@ the handle is correct.
 $at->repo_getRecord( repo => $at->did, collection => 'app.bsky.feed.post', rkey => '3kiburrigys27' );
 ```
 
-Get a record.
+Get a single record from a repository. Does not require auth.
 
 Expected parameters include:
 
@@ -839,7 +866,7 @@ Expected parameters include:
 
 - `rkey` - required
 
-    The key of the record.
+    The Record Key.
 
 - `cid`
 
@@ -853,7 +880,7 @@ Returns the uri, value, and, optionally, cid of the requested record on success.
 $at->repo_listRecords( $at->did, 'app.bsky.feed.post' );
 ```
 
-List a range of records in a collection.
+List a range of records in a repository, matching a specific collection. Does not require auth.
 
 Expected parameters include:
 
@@ -880,16 +907,16 @@ Expected parameters include:
 ## `repo_putRecord( ... )`
 
 ```perl
-$at->repo_putRecord( repo => $at->did, collection => 'app.bsky.feed.post', rkey => 'aaaaaaaaaaaaaaa', ... );
-```
+   $at->repo_putRecord( repo => $at->did, collection => 'app.bsky.feed.post', rkey => 'aaaaaaaaaaaaaaa', ... );
 
-Write a record, creating or updating it as needed.
+Write a repository record, creating or updating it as needed. Requires auth, implemented by PDS.
+```
 
 Expected parameters include:
 
 - `repo` - required
 
-    The handle or DID of the repo.
+    The handle or DID of the repo (aka, current account).
 
 - `collection` - required
 
@@ -897,7 +924,7 @@ Expected parameters include:
 
 - `rkey` - required
 
-    The key of the record.
+    The Record Key.
 
 - `record` - required
 
@@ -905,11 +932,13 @@ Expected parameters include:
 
 - `validate`
 
-    Flag for validating the record.
+    Can be set to 'false' to skip Lexicon schema validation of record data.
 
 - `swapRecord`
 
     Compare and swap with the previous record by CID.
+
+    WARNING: nullable and optional field; may cause problems with golang implementation.
 
 - `swapCommit`
 
@@ -919,12 +948,20 @@ Returns the record's uri and cid on success.
 
 ## `repo_uploadBlob( ..., [...] )`
 
-Upload a new blob to be added to repo in a later request.
+```
+$at->repo_uploadBlob( $rawdata );
+```
+
+Upload a new blob, to be referenced from a repository record. The blob will be deleted if it is not referenced within a
+time window (eg, minutes). Blob restrictions (mimetype, size, etc) are enforced when the reference is created. Requires
+auth, implemented by PDS.
 
 Expected parameters include:
 
 - `blob` - required
-- `type` - optional `Content-type` header value
+- `type`
+
+    MIME type
 
 On success, the mime type, size, and a link reference are returned.
 
@@ -948,11 +985,11 @@ On success, the access and refresh JSON web tokens, the account's handle, DID an
 
 ## `server_describeServer( )`
 
-Get a document describing the service's accounts configuration.
-
 ```
 $at->server_describeServer( );
 ```
+
+Describes the server's account creation requirements and capabilities. Implemented by PDS.
 
 This method does not require an authenticated session.
 
@@ -975,27 +1012,17 @@ Returns a list of passwords as new `At::Lexicon::com::atproto::server::listAppPa
 $at->server_getSession( );
 ```
 
-Get information about the current session.
+Get information about the current auth session. Requires auth.
 
 Returns the handle, DID, and (optionally) other data.
 
-## `server_getAccountInviteCodes( )`
-
-```
-$at->server_getAccountInviteCodes( );
-```
-
-Get all invite codes for a given account.
-
-Returns codes as a list of new `At::Lexicon::com::atproto::server::inviteCode` objects.
-
 ## `server_getAccountInviteCodes( [...] )`
 
-```
-$at->server_getAccountInviteCodes( );
+```perl
+$at->server_getAccountInviteCodes( includeUsed => !1 );
 ```
 
-Get all invite codes for a given account.
+Get all invite codes for the current account. Requires auth.
 
 Expected parameters include:
 
@@ -1005,7 +1032,7 @@ Expected parameters include:
 
 - `createAvailable`
 
-    Optional boolean flag.
+    Controls whether any new 'earned' but not 'created' invites should be created."
 
 Returns a list of `At::Lexicon::com::atproto::server::inviteCode` objects on success. Note that this method returns an
 error if the session was authorized with an app password.
@@ -1083,13 +1110,15 @@ Expected parameters include:
 $at->server_reserveSigningKey( 'did:...' );
 ```
 
-Reserve a repo signing key for account creation.
+Reserve a repo signing key, for use with account creation. Necessary so that a DID PLC update operation can be
+constructed during an account migration. Public and does not require auth; implemented by PDS. NOTE: this endpoint may
+change when full account migration is implemented.
 
 Expected parameters include:
 
 - `did`
 
-    The did to reserve a new did:key for.
+    The DID to reserve a key for.
 
 On success, a public signing key in the form of a did:key is returned.
 
@@ -1119,7 +1148,7 @@ Request an email with a code to confirm ownership of email.
 $at->server_refreshSession( 'eyJhbGc...' );
 ```
 
-Refresh an authentication session.
+Refresh an authentication session. Requires auth using the 'refreshJwt' (not the 'accessJwt').
 
 Expected parameters include:
 
@@ -1144,7 +1173,7 @@ Initiate a user account deletion via email.
 $at->server_deleteSession( );
 ```
 
-Initiate a user account deletion via email.
+Delete the current session. Requires auth.
 
 ## `server_deleteAccount( )`
 
@@ -1152,7 +1181,8 @@ Initiate a user account deletion via email.
 $at->server_deleteAccount( );
 ```
 
-Delete an actor's account with a token and password.
+Delete an actor's account with a token and password. Can only be called after requesting a deletion token. Requires
+auth.
 
 Expected parameters include:
 
@@ -1216,25 +1246,42 @@ Expected parameters include:
 
 - `name` - required
 
+    A short name for the App Password, to help distinguish them.
+
 On success, a new `At::Lexicon::com::atproto::server::createAppPassword::appPassword` object.
 
 ## `server_createAccount( ..., [...] )`
 
-```
-$at->server_createAccount( 'jsmith....', '*********' );
+```perl
+$at->server_createAccount( handle => 'jsmith....', password => '*********' );
 ```
 
-Create an account.
+Create an account. Implemented by PDS.
 
 Expected parameters include:
 
 - `handle` - required
+
+    Requested handle for the account.
+
 - `email`
 - `password`
+
+    "Initial account password. May need to meet instance-specific password strength requirements.
+
 - `inviteCode`
 - `did`
+
+    Pre-existing atproto DID, being imported to a new account.
+
 - `recoveryKey`
-- `plcOP`
+
+    DID PLC rotation key (aka, recovery key) to be included in PLC creation operation.
+
+- `plcOp`
+
+    A signed DID PLC operation to be submitted as part of importing an existing account to this instance. NOTE: this
+    optional field may be updated when full account migration is implemented.
 
 On success, JSON web access and refresh tokens, the handle, did, and (optionally) a server defined didDoc are returned.
 
@@ -1257,7 +1304,8 @@ Expected parameters include:
 $at->sync_getBlocks( 'did...' );
 ```
 
-Get blocks from a given repo.
+Get data blocks from a given repo, by CID. For example, intermediate MST nodes, or records. Does not require auth;
+implemented by PDS.
 
 Expected parameters include
 
@@ -1273,7 +1321,7 @@ Expected parameters include
 $at->sync_getLatestCommit( 'did...' );
 ```
 
-Get the current commit CID & revision of the repo.
+Get the current commit CID & revision of the specified repo. Does not require auth.
 
 Expected parameters include:
 
@@ -1289,7 +1337,8 @@ Returns the revision and cid on success.
 $at->sync_getRecord( 'did...', ... );
 ```
 
-Get blocks needed for existence or non-existence of record.
+Get data blocks needed to prove the existence or non-existence of record in the current version of repo. Does not
+require auth.
 
 Expected parameters include:
 
@@ -1302,6 +1351,9 @@ Expected parameters include:
     NSID.
 
 - `rkey` - required
+
+    Record Key.
+
 - `commit`
 
     An optional past commit CID.
@@ -1322,15 +1374,15 @@ Expected parameters include:
 
 - `since`
 
-    The revision of the repo to catch up from.
+    The revision ('rev') of the repo to create a diff from.
 
 ## `sync_listBlobs( ..., [...] )`
 
-```
-$at->sync_listBlobs( 'did...' );
+```perl
+$at->sync_listBlobs( did => 'did...' , limit => 50 );
 ```
 
-List blob CIDs since some revision.
+List blob CIDso for an account, since some repo revision. Does not require auth; implemented by PDS.
 
 Expected parameters include:
 
@@ -1352,11 +1404,12 @@ On success, a list of cids is returned and, optionally, a cursor.
 
 ## `sync_listRepos( [...] )`
 
-```
-$at->sync_listRepos( );
+```perl
+$at->sync_listRepos( limit => 1000 );
 ```
 
-List DIDs and root CIDs of hosted repos.
+Enumerates all the DID, rev, and commit CID for all repos hosted by this service. Does not require auth; implemented by
+PDS and Relay.
 
 Expected parameters include:
 
@@ -1374,14 +1427,14 @@ On success, a list of `At::Lexicon::com::atproto::sync::repo` objects is returne
 $at->sync_notifyOfUpdate( 'example.com' );
 ```
 
-Notify a crawling service of a recent update; often when a long break between updates causes the connection with the
-crawling service to break.
+Notify a crawling service of a recent update, and that crawling should resume. Intended use is after a gap between repo
+stream events caused the crawling service to disconnect. Does not require auth; implemented by Relay.
 
 Expected parameters include:
 
 - `hostname` - required
 
-    Hostname of the service that is notifying of update.
+    Hostname of the current service (usually a PDS) that is notifying of update.
 
 Returns a true value on success.
 
@@ -1391,13 +1444,14 @@ Returns a true value on success.
 $at->sync_requestCrawl( 'example.com' );
 ```
 
-Request a service to persistently crawl hosted repos.
+Request a service to persistently crawl hosted repos. Expected use is new PDS instances declaring their existence to
+Relays. Does not require auth.
 
 Expected parameters include:
 
 - `hostname` - required
 
-    Hostname of the service that is requesting to be crawled.
+    Hostname of the current service (eg, PDS) that is requesting to be crawled.
 
 Returns a true value on success.
 
@@ -1407,13 +1461,14 @@ Returns a true value on success.
 $at->sync_getBlob( 'did...', ... );
 ```
 
-Get a blob associated with a given repo.
+Get a blob associated with a given account. Returns the full blob as originally uploaded. Does not require auth;
+implemented by PDS.
 
 Expected parameters include:
 
 - `did` - required
 
-    The DID of the repo.
+    The DID of the account.
 
 - `cid` - required
 
@@ -1425,7 +1480,9 @@ Expected parameters include:
 $at->sync_subscribeRepos( sub {...} );
 ```
 
-Subscribe to repo updates.
+Repository event stream, aka Firehose endpoint. Outputs repo commits with diff data, and identity update events, for
+all repositories on the current server. See the atproto specifications for details around stream sequencing, repo
+versioning, CAR diff format, and more. Public and does not require auth; implemented by PDS and Relay.
 
 Expected parameters include:
 
@@ -1434,11 +1491,7 @@ Expected parameters include:
 
     The last known event to backfill from.
 
-## `sync_subscribeRepos_p( ... )`
-
-TODO
-
-## `temp_checkSignupQueue( [...] )`
+## `temp_checkSignupQueue( )`
 
 ```
 $at->temp_checkSignupQueue;
@@ -1448,23 +1501,6 @@ Check accounts location in signup queue.
 
 Returns a boolean indicating whether signups are activated and, optionally, the estimated time and place in the queue
 the account is on success.
-
-## `temp_fetchLabels( [...] )`
-
-```
-$at->temp_fetchLabels;
-```
-
-Fetch all labels from a labeler created after a certain date.
-
-Expected parameters include:
-
-- `since`
-- `limit`
-
-    Default is 50, minimum is 1, maximum is 250.
-
-Returns a list of labels as new `At::Lexicon::com::atproto::label` objects on success.
 
 ## `temp_pushBlob( ... )`
 
@@ -1486,7 +1522,7 @@ Expected parameters include:
 $at->temp_transferAccount( ... );
 ```
 
-Transfer an account.
+Transfer an account. NOTE: temporary method, necessarily how account migration will be implemented.
 
 Expected parameters include:
 

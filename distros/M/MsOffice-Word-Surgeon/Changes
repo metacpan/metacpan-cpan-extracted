@@ -1,5 +1,8 @@
 Revision history for MsOffice-Word-Surgeon
 
+2.04    13.02.2024
+  - new method reveal_bookmarks()
+
 2.03    10.05.2023
   - fix bug introduced in 2.02: ->document->contents($new_content) must erase the 'was_cleaned_up' flag
 

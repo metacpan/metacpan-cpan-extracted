@@ -12,7 +12,7 @@ subtest 'live' => sub {
     my $at = At->new( host => 'bsky.social' );
 
     # Do not run these tests; they might not be supported upstream...
-    can_ok $at, $_ for qw[temp_checkSignupQueue temp_fetchLabels temp_pushBlob temp_transferAccount temp_importRepo temp_requestPhoneVerification];
+    can_ok $at, $_ for qw[temp_checkSignupQueue temp_pushBlob temp_transferAccount temp_importRepo temp_requestPhoneVerification];
 };
 #
 done_testing;

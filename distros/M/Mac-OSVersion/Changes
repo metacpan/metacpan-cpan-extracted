@@ -1,5 +1,8 @@
 Revision history for Perl module Ma::OSVersion
 
+1.011 2024-02-13T21:50:26Z
+	* refresh distro, update email addresses, move to BRIANDFOY
+
 1.009 2023-06-07T02:20:04Z
 	* Update for macOS 14, Sonoma
 

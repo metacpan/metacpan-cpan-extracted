@@ -89812,3 +89812,15 @@ M/MA/MANWAR/Test-Excel-1.54.tar.gz
 J/JS/JSF/Test-Expander-2.5.0.tar.gz
 H/HA/HANJE/Tk-DocumentTree-0.05.tar.gz
 H/HA/HANJE/Tk-YANoteBook-0.05.tar.gz
+P/PE/PERLANCAR/Acme-CPANModules-EscapingAndQuoting-0.003.tar.gz
+S/SA/SANKO/App-bsky-0.04.tar.gz
+S/SA/SANKO/At-0.17.tar.gz
+P/PE/PERLANCAR/Comparer-0.1.1.tar.gz
+B/BK/BKB/Lingua-JA-Moji-0.60.tar.gz
+B/BR/BRIANDFOY/Mac-OSVersion-1.011.tar.gz
+S/SI/SISYPHUS/Math-Ryu-1.0.tar.gz
+D/DA/DAMI/MsOffice-Word-Surgeon-2.04.tar.gz
+J/JA/JANW/Net-EANSearch-1.02.tar.gz
+P/PE/PERLANCAR/SortKey-0.1.0.tar.gz
+H/HM/HMBRAND/Spreadsheet-Read-0.90.tgz
+K/KI/KIMOTO/SPVM-0.989072.tar.gz

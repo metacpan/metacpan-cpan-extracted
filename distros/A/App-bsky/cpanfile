@@ -1,5 +1,5 @@
 requires 'perl', '5.038000';    # class syntax
-requires 'At',   '0.15';
+requires 'At',   '0.17';
 requires 'Getopt::Long';
 requires 'Pod::Text::Color';
 requires 'Path::Tiny';

@@ -1,5 +1,12 @@
+1.0
+     - Significant changes between 1.0 and 0.7 include removal of some fairly
+       useless functions (which can be reinstated, if requested), and support
+       for -Duselongdouble and -Dusequadmath builds of perl.
+       A debug version of this module is no longer provided - also reinstateable
+       on request.
+
 0.07
-     - Workaround bugs in old shit perls - ie perls prior to 5.30.0.
+     - Workaround bugs in perls older than 5.30.0.
        (Math-Ryu-0.06 failed to allow for these bugs in some of the test sripts
        and I don't know if 0.07 covers them entirely ... time will tell.)
 

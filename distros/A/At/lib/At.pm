@@ -1,4 +1,4 @@
-package At 0.16 {
+package At 0.17 {
     use v5.38;
     no warnings 'experimental::class', 'experimental::builtin', 'experimental::for_list';    # Be quiet.
     use feature 'class';
@@ -94,7 +94,7 @@ package At 0.16 {
         {
 
             method admin_createCommunicationTemplate ( $name, $subject, $contentMarkdown, $createdBy //= () ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->post(
                     sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.createCommunicationTemplate' ),
                     {   content => +{
@@ -109,21 +109,21 @@ package At 0.16 {
             }
 
             method admin_deleteAccount ($did) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res
                     = $self->http->post( sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.deleteAccount' ), { content => +{ did => $did } } );
                 $res->{success};
             }
 
             method admin_deleteCommunicationTemplate ($id) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->post( sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.deleteCommunicationTemplate' ),
                     { content => +{ id => $id } } );
                 $res->{success};
             }
 
             method admin_disableAccountInvites ( $account, $note //= () ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->post(
                     sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.disableAccountInvites' ),
                     { content => +{ account => $account, defined $note ? ( note => $note ) : () } }
@@ -131,15 +131,19 @@ package At 0.16 {
                 $res->{success};
             }
 
-            method admin_disableInviteCodes ( $codes //= (), $accounts //= () ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
-                my $res = $self->http->post( sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.disableInviteCodes' ),
-                    { content => +{ defined $codes ? ( codes => $codes ) : (), defined $accounts ? ( accounts => $accounts ) : () } } );
+            method admin_disableInviteCodes (%args) {
+                $self->http->session // confess 'requires an authenticated client';
+                my $res = $self->http->post(
+                    sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.disableInviteCodes' ),
+                    {   content =>
+                            +{ defined $args{codes} ? ( codes => $args{codes} ) : (), defined $args{accounts} ? ( accounts => $args{accounts} ) : () }
+                    }
+                );
                 $res->{success};
             }
 
             method admin_emitModerationEvent ( $event, $subject, $createdBy, $subjectBlobCids //= () ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 $event     = At::_topkg( $event->{'$type'} )->new(%$event)     if !builtin::blessed $event   && defined $event->{'$type'};
                 $subject   = At::_topkg( $subject->{'$type'} )->new(%$subject) if !builtin::blessed $subject && defined $subject->{'$type'};
                 $createdBy = At::Protocol::DID->new( uri => $createdBy ) unless builtin::blessed $createdBy;
@@ -158,7 +162,7 @@ package At 0.16 {
             }
 
             method admin_enableAccountInvites ( $account, $note //= () ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->post(
                     sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.enableAccountInvites' ),
                     { content => +{ account => $account, defined $note ? ( note => $note ) : (), } }
@@ -167,7 +171,7 @@ package At 0.16 {
             }
 
             method admin_getAccountInfo ($did) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res
                     = $self->http->get( sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.getAccountInfo' ), { content => +{ did => $did } } );
                 $res = At::Lexicon::com::atproto::admin::accountView->new(%$res) if defined $res;
@@ -175,21 +179,21 @@ package At 0.16 {
             }
 
             method admin_getAccountsInfo (@dids) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->get( sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.getAccountsInfo' ),
                     { content => +{ dids => \@dids } } );
                 $res->{infos} = [ map { At::Lexicon::com::atproto::admin::accountView->new(%$_) } @{ $res->{infos} } ] if defined $res->{infos};
                 $res;
             }
 
-            method admin_getInviteCodes ( $sort //= (), $limit //= (), $cursor //= () ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+            method admin_getInviteCodes (%args) {
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->get(
                     sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.getInviteCodes' ),
                     {   content => +{
-                            defined $sort   ? ( sort   => $sort )   : (),
-                            defined $limit  ? ( limit  => $limit )  : (),
-                            defined $cursor ? ( cursor => $cursor ) : ()
+                            defined $args{sort}   ? ( sort   => $args{sort} )   : (),
+                            defined $args{limit}  ? ( limit  => $args{limit} )  : (),
+                            defined $args{cursor} ? ( cursor => $args{cursor} ) : ()
                         }
                     }
                 );
@@ -198,7 +202,7 @@ package At 0.16 {
             }
 
             method admin_getModerationEvent ($id) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res
                     = $self->http->get( sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.getModerationEvent' ), { content => +{ id => $id } } );
                 $res = At::Lexicon::com::atproto::admin::modEventViewDetail->new(%$res) if defined $res;
@@ -206,7 +210,7 @@ package At 0.16 {
             }
 
             method admin_getRecord ( $uri, $cid //= () ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->get(
                     sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.getRecord' ),
                     { content => +{ uri => $uri, defined $cid ? ( cid => $cid ) : () } }
@@ -216,18 +220,21 @@ package At 0.16 {
             }
 
             method admin_getRepo ($did) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->get( sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.getRepo' ), { content => +{ did => $did } } );
                 $res = At::Lexicon::com::atproto::admin::repoViewDetail->new(%$res) if defined $res;
                 $res;
             }
 
-            method admin_getSubjectStatus ( $did //= (), $uri //= (), $blob //= () ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+            method admin_getSubjectStatus (%args) {
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->get(
                     sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.getSubjectStatus' ),
-                    {   content =>
-                            +{ defined $did ? ( did => $did ) : (), defined $uri ? ( uri => $uri ) : (), defined $blob ? ( blob => $blob ) : () }
+                    {   content => +{
+                            defined $args{did}  ? ( did  => $args{did} )  : (),
+                            defined $args{uri}  ? ( uri  => $args{uri} )  : (),
+                            defined $args{blob} ? ( blob => $args{blob} ) : ()
+                        }
                     }
                 );
                 $res->{subject} = At::_topkg( $res->{subject}->{'$type'} )->new( %{ $res->{subject} } )
@@ -237,7 +244,7 @@ package At 0.16 {
             }
 
             method admin_listCommunicationTemplates ( ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->get( sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.listCommunicationTemplates' ) );
                 $res->{communicationTemplates}
                     = [ map { $_ = At::Lexicon::com::atproto::admin::communicationTemplateView->new(%$_) } @{ $res->{communicationTemplates} } ]
@@ -246,15 +253,14 @@ package At 0.16 {
             }
 
             method admin_queryModerationEvents (%args) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 $args{createdBy} = At::Protocol::DID->new( uri => $args{createdBy} )
                     if defined $args{createdBy} && !builtin::blessed $args{createdBy};
-                Carp::confess 'Sort direction must be "asc" or "desc"'
-                    if defined $args{sortDirection} && ( $args{sortDirection} !~ /^(?:asc|desc)$/ );
+                confess 'Sort direction must be "asc" or "desc"' if defined $args{sortDirection} && ( $args{sortDirection} !~ /^(?:asc|desc)$/ );
                 $args{createdAfter} = At::Protocol::Timestamp->new( timestamp => $args{createdAfter} )
                     if defined $args{createdAfter} && !builtin::blessed $args{createdAfter};
                 $args{subject} = URI->new( $args{subject} ) if defined $args{subject} && !builtin::blessed $args{subject};
-                Carp::confess 'Limit must be in the range 1..100; default is 50' if defined $args{limit} && !( 1 < $args{limit} > 100 );
+                confess 'Limit must be in the range 1..100; default is 50' if defined $args{limit} && !( 1 < $args{limit} > 100 );
                 my $res = $self->http->get(
                     sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.queryModerationEvents' ),
                     {   content => +{
@@ -278,53 +284,38 @@ package At 0.16 {
                 $res;
             }
 
-            method admin_queryModerationStatuses (
-                $subject        //= (),
-                $comment        //= (),
-                $reportedAfter  //= (),
-                $reportedBefore //= (),
-                $reviewedAfter  //= (),
-                $reviewedBefore //= (),
-                $includeMuted   //= (),
-                $reviewState    //= (),
-                $ignoreSubjects //= (),
-                $lastReviewedBy //= (),
-                $sortField      //= (),
-                $sortDirection  //= (),
-                $takendown      //= (),
-                $limit          //= (),
-                $cursor         //= ()
-            ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
-                $subject       = URI->new($subject) if defined $subject && !builtin::blessed $subject;
-                $reportedAfter = At::Protocol::Timestamp->new( timestamp => $reportedAfter )
-                    if defined $reportedAfter && !builtin::blessed $reportedAfter;
-                $reportedBefore = At::Protocol::Timestamp->new( timestamp => $reportedBefore )
-                    if defined $reportedBefore && !builtin::blessed $reportedBefore;
-                $reviewedAfter = At::Protocol::Timestamp->new( timestamp => $reviewedAfter )
-                    if defined $reviewedAfter && !builtin::blessed $reviewedAfter;
-                $reviewedBefore = At::Protocol::Timestamp->new( timestamp => $reviewedBefore )
-                    if defined $reviewedBefore && !builtin::blessed $reviewedBefore;
-                $ignoreSubjects = [ map { $_ = URI->new($_) unless builtin::blessed $_ } @{$ignoreSubjects} ];
-                $lastReviewedBy = At::Protocol::DID->new( uri => $lastReviewedBy ) if defined $lastReviewedBy && !builtin::blessed $lastReviewedBy;
+            method admin_queryModerationStatuses (%args) {
+                $self->http->session // confess 'requires an authenticated client';
+                $args{subject}       = URI->new( $args{subject} ) if defined $args{subject} && !builtin::blessed $args{subject};
+                $args{reportedAfter} = At::Protocol::Timestamp->new( timestamp => $args{reportedAfter} )
+                    if defined $args{reportedAfter} && !builtin::blessed $args{reportedAfter};
+                $args{reportedBefore} = At::Protocol::Timestamp->new( timestamp => $args{reportedBefore} )
+                    if defined $args{reportedBefore} && !builtin::blessed $args{reportedBefore};
+                $args{reviewedAfter} = At::Protocol::Timestamp->new( timestamp => $args{reviewedAfter} )
+                    if defined $args{reviewedAfter} && !builtin::blessed $args{reviewedAfter};
+                $args{reviewedBefore} = At::Protocol::Timestamp->new( timestamp => $args{reviewedBefore} )
+                    if defined $args{reviewedBefore} && !builtin::blessed $args{reviewedBefore};
+                $args{ignoreSubjects} = [ map { $_ = URI->new($_) unless builtin::blessed $_ } @{ $args{ignoreSubjects} } ];
+                $args{lastReviewedBy} = At::Protocol::DID->new( uri => $args{lastReviewedBy} )
+                    if defined $args{lastReviewedBy} && !builtin::blessed $args{lastReviewedBy};
                 my $res = $self->http->get(
                     sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.queryModerationStatuses' ),
                     {   content => +{
-                            defined $subject        ? ( subject        => $subject->as_string )                        : (),
-                            defined $comment        ? ( comment        => $comment )                                   : (),
-                            defined $reportedAfter  ? ( reportedAfter  => $reportedAfter->_raw )                       : (),
-                            defined $reportedBefore ? ( reportedBefore => $reportedBefore->_raw )                      : (),
-                            defined $reviewedAfter  ? ( reviewedAfter  => $reviewedAfter->_raw )                       : (),
-                            defined $reviewedBefore ? ( reviewedBefore => $reviewedBefore->_raw )                      : (),
-                            defined $includeMuted   ? ( includeMuted   => \!!$includeMuted )                           : (),
-                            defined $reviewState    ? ( reviewState    => $reviewState )                               : (),
-                            defined $ignoreSubjects ? ( ignoreSubjects => [ map { $_->as_string } @$ignoreSubjects ] ) : (),
-                            defined $lastReviewedBy ? ( lastReviewedBy => $lastReviewedBy->_raw )                      : (),
-                            defined $sortField      ? ( sortField      => $sortField )                                 : (),
-                            defined $sortDirection  ? ( sortDirection  => $sortDirection )                             : (),
-                            defined $takendown      ? ( takendown      => \!!$takendown )                              : (),
-                            defined $limit          ? ( limit          => $limit )                                     : (),
-                            defined $cursor         ? ( cursor         => $cursor )                                    : ()
+                            defined $args{subject}        ? ( subject        => $args{subject}->as_string )                            : (),
+                            defined $args{comment}        ? ( comment        => $args{comment} )                                       : (),
+                            defined $args{reportedAfter}  ? ( reportedAfter  => $args{reportedAfter}->_raw )                           : (),
+                            defined $args{reportedBefore} ? ( reportedBefore => $args{reportedBefore}->_raw )                          : (),
+                            defined $args{reviewedAfter}  ? ( reviewedAfter  => $args{reviewedAfter}->_raw )                           : (),
+                            defined $args{reviewedBefore} ? ( reviewedBefore => $args{reviewedBefore}->_raw )                          : (),
+                            defined $args{includeMuted}   ? ( includeMuted   => \!!$args{includeMuted} )                               : (),
+                            defined $args{reviewState}    ? ( reviewState    => $args{reviewState} )                                   : (),
+                            defined $args{ignoreSubjects} ? ( ignoreSubjects => [ map { $_->as_string } @{ $args{ignoreSubjects} } ] ) : (),
+                            defined $args{lastReviewedBy} ? ( lastReviewedBy => $args{lastReviewedBy}->_raw )                          : (),
+                            defined $args{sortField}      ? ( sortField      => $args{sortField} )                                     : (),
+                            defined $args{sortDirection}  ? ( sortDirection  => $args{sortDirection} )                                 : (),
+                            defined $args{takendown}      ? ( takendown      => \!!$args{takendown} )                                  : (),
+                            defined $args{limit}          ? ( limit          => $args{limit} )                                         : (),
+                            defined $args{cursor}         ? ( cursor         => $args{cursor} )                                        : ()
                         }
                     }
                 );
@@ -333,14 +324,14 @@ package At 0.16 {
                 $res;
             }
 
-            method admin_searchRepos ( $query //= (), $limit //= (), $cursor //= () ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+            method admin_searchRepos (%args) {
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->get(
                     sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.searchRepos' ),
                     {   content => +{
-                            defined $query  ? ( q      => $query )  : (),
-                            defined $limit  ? ( limit  => $limit )  : (),
-                            defined $cursor ? ( cursor => $cursor ) : ()
+                            defined $args{query}  ? ( q      => $args{query} )  : (),
+                            defined $args{limit}  ? ( limit  => $args{limit} )  : (),
+                            defined $args{cursor} ? ( cursor => $args{cursor} ) : ()
                         }
                     }
                 );
@@ -348,17 +339,20 @@ package At 0.16 {
                 $res;
             }
 
-            method admin_sendEmail ( $recipientDid, $senderDid, $content, $subject //= (), $comment //= () ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
-                $recipientDid = At::Protocol::DID->new( uri => $recipientDid ) unless builtin::blessed $recipientDid;
-                $senderDid    = At::Protocol::DID->new( uri => $senderDid )    unless builtin::blessed $senderDid;
+            method admin_sendEmail (%args) {
+                $self->http->session // confess 'requires an authenticated client';
+                confess 'recipientDid is required' unless defined $args{recipientDid};
+                confess 'senderDid is required'    unless defined $args{senderDid};
+                confess 'content is required'      unless defined $args{content};
+                $args{recipientDid} = At::Protocol::DID->new( uri => $args{recipientDid} ) unless builtin::blessed $args{recipientDid};
+                $args{senderDid}    = At::Protocol::DID->new( uri => $args{senderDid} )    unless builtin::blessed $args{senderDid};
                 my $res = $self->http->get(
                     sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.sendEmail' ),
                     {   content => +{
-                            recipientDid => $recipientDid->_raw,
-                            senderDid    => $senderDid->_raw,
-                            content      => $content,
-                            defined $subject ? ( subject => $subject ) : (), defined $comment ? ( comment => $comment ) : ()
+                            recipientDid => $args{recipientDid}->_raw,
+                            senderDid    => $args{senderDid}->_raw,
+                            content      => $args{content},
+                            defined $args{subject} ? ( subject => $args{subject} ) : (), defined $args{comment} ? ( comment => $args{comment} ) : ()
                         }
                     }
                 );
@@ -366,36 +360,34 @@ package At 0.16 {
             }
 
             method admin_updateAccountEmail ( $account, $email ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->post( sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.updateAccountEmail' ),
                     { content => +{ account => $account, email => $email } } );
                 $res->{success};
             }
 
             method admin_updateAccountHandle ( $did, $handle ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 $did = At::Protocol::DID->new( uri => $did ) unless builtin::blessed $did;
                 my $res = $self->http->post( sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.updateAccountHandle' ),
                     { content => +{ did => $did->_raw, handle => $handle } } );
                 $res->{success};
             }
 
-            method admin_updateCommunicationTemplate (
-                $id,
-                $name            //= (),
-                $contentMarkdown //= (),
-                $subject         //= (),
-                $updatedBy       //= (),
-                $disabled        //= ()
-            ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
-                $updatedBy = At::Protocol::DID->new( uri => $did ) if defined $updatedBy && !builtin::blessed $updatedBy;
+            method admin_updateCommunicationTemplate (%args) {
+                $self->http->session // confess 'requires an authenticated client';
+                confess 'id is required' unless defined $args{id};
+                $args{id}        = At::Protocol::DID->new( uri => $args{id} ) if defined $args{id} && !builtin::blessed $args{id};
+                $args{updatedBy} = At::Protocol::DID->new( uri => $args{updatedBy} )
+                    if defined $args{updatedBy} && !builtin::blessed $args{updatedBy};
                 my $res = $self->http->post(
                     sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.updateCommunicationTemplate' ),
                     {   content => +{
-                            id => $id,
-                            defined $name      ? ( name      => $name ) : (), defined $contentMarkdown ? ( contentMarkdown => $contentMarkdown ) : (),
-                            defined $updatedBy ? ( updatedBy => $updatedBy->_raw ) : (), defined $disabled ? ( disabled => \!!$disabled )        : ()
+                            id => $args{id}->_raw,
+                            defined $args{name}            ? ( name            => $args{name} )            : (),
+                            defined $args{contentMarkdown} ? ( contentMarkdown => $args{contentMarkdown} ) : (),
+                            defined $args{updatedBy}       ? ( updatedBy       => $args{updatedBy}->_raw ) : (),
+                            defined $args{disabled}        ? ( disabled        => \!!$args{disabled} )     : ()
                         }
                     }
                 );
@@ -403,7 +395,7 @@ package At 0.16 {
             }
 
             method admin_updateSubjectStatus ( $subject, $takedown //= () ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 $subject  = At::_topkg( $subject->{'$type'} )->new(%$subject)        if !builtin::blessed $subject && defined $subject->{'$type'};
                 $takedown = At::Lexicon::com::atproto::admin::statusAttr->new(%$did) if defined $takedown          && !builtin::blessed $takedown;
                 my $res = $self->http->post( sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.admin.updateSubjectStatus' ),
@@ -426,7 +418,7 @@ package At 0.16 {
             }
 
             method identity_updateHandle ($handle) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 $did = At::Protocol::DID->new( uri => $did ) if defined $did && !builtin::blessed $did;
                 my $res = $self->http->post( sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.identity.updateHandle' ),
                     { content => +{ handle => $handle } } );
@@ -438,13 +430,14 @@ package At 0.16 {
         {
             use At::Lexicon::com::atproto::label;
 
-            method label_queryLabels ( $uriPatterns, $sources //= (), $limit //= (), $cursor //= () ) {
+            method label_queryLabels (%args) {
+                $args{uriPatterns} // confess 'uriPatterns is required';
                 my $res = $self->http->get(
                     sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.label.queryLabels' ),
                     {   content => +{
-                            uriPatterns => $uriPatterns,
-                            defined $sources ? ( sources => $sources ) : (), defined $limit ? ( limit => $limit ) : (),
-                            defined $cursor ? ( cursor => $cursor ) : ()
+                            uriPatterns => $args{uriPatterns},
+                            defined $args{sources} ? ( sources => $args{sources} ) : (), defined $args{limit} ? ( limit => $args{limit} ) : (),
+                            defined $args{cursor} ? ( cursor => $args{cursor} ) : ()
                         }
                     }
                 );
@@ -482,7 +475,7 @@ package At 0.16 {
                     }
                 )->catch(
                     sub ($err) {
-                        Carp::confess "WebSocket error: $err";
+                        confess "WebSocket error: $err";
                     }
                 );
             }
@@ -492,7 +485,7 @@ package At 0.16 {
         {
 
             method moderation_createReport ( $reasonType, $subject, $reason //= () ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 $reasonType = At::Lexicon::com::atproto::moderation::reasonType->new( '$type' => $reasonType->{'$type'} )
                     if !builtin::blessed $reasonType && defined $reasonType->{'$type'};
                 $subject = At::_topkg( $subject->{'$type'} )->new(%$subject) if !builtin::blessed $subject && defined $subject->{'$type'};
@@ -512,16 +505,19 @@ package At 0.16 {
         {
             use At::Lexicon::com::atproto::repo;
 
-            method repo_applyWrites ( $repo, $writes, $validate //= (), $swapCommit //= () ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
-                $repo   = At::Protocol::DID->new( uri => $repo ) unless builtin::blessed $repo;
-                $writes = [ map { $_ = At::_topkg( $_->{'$type'} )->new(%$_) unless builtin::blessed $_; $_ } @$writes ];
+            method repo_applyWrites (%args) {
+                $args{repo}          // confess 'repo is required';
+                $args{writes}        // confess 'writes is required';
+                $self->http->session // confess 'requires an authenticated client';
+                $args{repo}   = At::Protocol::DID->new( uri => $args{repo} ) unless builtin::blessed $args{repo};
+                $args{writes} = [ map { $_ = At::_topkg( $_->{'$type'} )->new(%$_) unless builtin::blessed $_; $_ } @{ $args{writes} } ];
                 my $res = $self->http->post(
                     sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.repo.applyWrites' ),
                     {   content => +{
-                            repo   => $repo->_raw,
-                            writes => [ map { $_->_raw } @$writes ],
-                            defined $validate ? ( validate => \!!$validate ) : (), defined $swapCommit ? ( swapCommit => $swapCommit ) : ()
+                            repo   => $args{repo}->_raw,
+                            writes => [ map { $_->_raw } @{ $args{writes} } ],
+                            defined $args{validate}   ? ( validate   => \!!$args{validate} ) : (),
+                            defined $args{swapCommit} ? ( swapCommit => $args{swapCommit} )  : ()
                         }
                     }
                 );
@@ -575,7 +571,6 @@ package At 0.16 {
             }
 
             method repo_describeRepo ($repo) {
-                $self->http->session // confess 'requires an authenticated client';
                 $repo = At::Protocol::DID->new( uri => $repo ) unless builtin::blessed $repo;
                 my $res = $self->http->get( sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.repo.describeRepo' ),
                     { content => +{ repo => $repo->_raw } } );
@@ -606,16 +601,18 @@ package At 0.16 {
                 $res;
             }
 
-            method repo_listRecords ( $repo, $collection, $limit //= (), $reverse //= (), $cursor //= () ) {
+            method repo_listRecords (%args) {
                 $self->http->session // confess 'requires an authenticated client';
-                $repo = At::Protocol::DID->new( uri => $repo ) unless builtin::blessed $repo;
+                $args{repo}          // confess 'repo is required';
+                $args{collection}    // confess 'collection is required';
+                $args{repo} = At::Protocol::DID->new( uri => $args{repo} ) unless builtin::blessed $args{repo};
                 my $res = $self->http->get(
                     sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.repo.listRecords' ),
                     {   content => +{
-                            repo       => $repo->_raw,
-                            collection => $collection,
-                            defined $limit ? ( limit => $limit ) : (), defined $reverse ? ( reverse => \!!$reverse ) : (),
-                            defined $cursor ? ( cursor => $cursor ) : ()
+                            repo       => $args{repo}->_raw,
+                            collection => $args{collection},
+                            defined $args{limit} ? ( limit => $args{limit} ) : (), defined $args{reverse} ? ( reverse => \!!$args{reverse} ) : (),
+                            defined $args{cursor} ? ( cursor => $args{cursor} ) : ()
                         }
                     }
                 );
@@ -671,28 +668,20 @@ package At 0.16 {
                 $res;
             }
 
-            method server_createAccount (
-                $handle,
-                $email             //= (),
-                $password          //= (),
-                $inviteCode        //= (),
-                $verificationCode  //= (),
-                $verificationPhone //= (),
-                $did               //= (),
-                $recoveryKey       //= (),
-                $plcOP             //= ()
-            ) {
+            method server_createAccount (%args) {
                 Carp::cluck 'likely do not want an authenticated client' if defined $self->http->session;
+                $args{handle} // confess 'handle is required';
                 my $res = $self->http->post(
                     sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.server.createAccount' ),
                     {   content => +{
-                            handle => $handle,
-                            defined $email             ? ( email             => $email )             : (), defined $did ? ( did => $did ) : (),
-                            defined $inviteCode        ? ( inviteCode        => $inviteCode )        : (),
-                            defined $verificationCode  ? ( verificationCode  => $verificationCode )  : (),
-                            defined $verificationPhone ? ( verificationPhone => $verificationPhone ) : (),
-                            defined $password          ? ( password => $password ) : (), defined $recoveryKey ? ( recoveryKey => $recoveryKey ) : (),
-                            defined $plcOP             ? ( plcOP    => $plcOP )    : ()
+                            handle => $args{handle},
+                            defined $args{email}             ? ( email => $args{email} ) : (), defined $args{did} ? ( did => $args{did} ) : (),
+                            defined $args{inviteCode}        ? ( inviteCode        => $args{inviteCode} )        : (),
+                            defined $args{verificationCode}  ? ( verificationCode  => $args{verificationCode} )  : (),
+                            defined $args{verificationPhone} ? ( verificationPhone => $args{verificationPhone} ) : (),
+                            defined $args{password}          ? ( password          => $args{password} )          : (),
+                            defined $args{recoveryKey}       ? ( recoveryKey       => $args{recoveryKey} )       : (),
+                            defined $args{plcOp}             ? ( plcOp             => $args{plcOp} )             : ()
                         }
                     }
                 );
@@ -702,7 +691,7 @@ package At 0.16 {
             }
 
             method server_createAppPassword ($name) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->post( sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.server.createAppPassword' ),
                     { content => +{ name => $name } } );
                 $res->{appPassword} = At::Lexicon::com::atproto::server::createAppPassword::appPassword->new( %{ $res->{appPassword} } )
@@ -711,7 +700,7 @@ package At 0.16 {
             }
 
             method server_createInviteCode ( $useCount, $forAccount //= () ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->post(
                     sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.server.createInviteCode' ),
                     {   content => +{
@@ -724,7 +713,7 @@ package At 0.16 {
             }
 
             method server_createInviteCodes ( $codeCount, $useCount, $forAccounts //= () ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->post(
                     sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.server.createInviteCodes' ),
                     {   content => +{
@@ -751,7 +740,7 @@ package At 0.16 {
             }
 
             method server_deleteAccount ( $did, $password, $token ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->post(
                     sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.server.deleteAccount' ),
                     { content => +{ did => $did, password => $password, token => $token } }
@@ -760,7 +749,7 @@ package At 0.16 {
             }
 
             method server_deleteSession ( ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->post( sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.server.deleteSession' ) );
                 $res;
             }
@@ -771,13 +760,13 @@ package At 0.16 {
                 $res;
             }
 
-            method server_getAccountInviteCodes ( $includeUsed //= (), $createAvailable //= () ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+            method server_getAccountInviteCodes (%args) {
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->get(
                     sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.server.getAccountInviteCodes' ),
                     {   content => +{
-                            defined $includeUsed     ? ( includeUsed     => $includeUsed )     : (),
-                            defined $createAvailable ? ( createAvailable => $createAvailable ) : ()
+                            defined $args{includeUsed}     ? ( includeUsed     => \!!$args{includeUsed} )     : (),
+                            defined $args{createAvailable} ? ( createAvailable => \!!$args{createAvailable} ) : ()
                         }
                     }
                 );
@@ -786,7 +775,7 @@ package At 0.16 {
             }
 
             method server_getSession () {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->get( sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.server.getSession' ) );
                 $res->{handle}         = At::Protocol::Handle->new( id => $res->{handle} ) if defined $res->{handle};
                 $res->{did}            = At::Protocol::DID->new( uri => $res->{did} )      if defined $res->{did};
@@ -795,7 +784,7 @@ package At 0.16 {
             }
 
             method server_listAppPasswords () {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->get( sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.server.listAppPasswords' ) );
                 $res->{passwords} = [ map { $_ = At::Lexicon::com::atproto::server::listAppPasswords::appPassword->new(%$_) } @{ $res->{passwords} } ]
                     if defined $res->{passwords};
@@ -803,8 +792,6 @@ package At 0.16 {
             }
 
             method server_refreshSession ($refreshJwt) {    # TODO: Should this require an unauth'd client?
-
-                #~ $self->http->session // Carp::confess 'requires an authenticated client';
                 my $res = $self->http->post(
                     sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.server.refreshSession' ),
                     { headers => +{ Authorization => 'Bearer ' . $refreshJwt } }
@@ -816,40 +803,43 @@ package At 0.16 {
             }
 
             method server_requestAccountDelete ( ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->post( sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.server.requestAccountDelete' ) );
                 $res;
             }
 
             method server_requestEmailConfirmation ( ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->post( sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.server.requestEmailConfirmation' ) );
                 $res;
             }
 
             method server_requestEmailUpdate ($tokenRequired) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->post( sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.server.requestEmailUpdate' ),
                     { content => +{ tokenRequired => !!$tokenRequired } } );
                 $res;
             }
 
             method server_requestPasswordReset ($email) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->post( sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.server.requestPasswordReset' ),
                     { content => +{ email => $email } } );
                 $res;
             }
 
-            method server_reserveSigningKey ($did) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
-                my $res = $self->http->post( sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.server.reserveSigningKey' ),
-                    { content => +{ defined $did ? ( did => $did ) : () } } );
+            method server_reserveSigningKey ( $did //= () ) {
+                $self->http->session // confess 'requires an authenticated client';
+                $did = At::Protocol::DID->new( uri => $did ) if defined $did && !builtin::blessed $did;
+                my $res = $self->http->post(
+                    sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.server.reserveSigningKey' ),
+                    { content => +{ defined $did ? ( did => $did->_raw ) : () } }
+                );
                 $res;
             }
 
             method server_resetPassword ( $token, $password ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->post(
                     sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.server.resetPassword' ),
                     { content => +{ token => $token, password => $password } }
@@ -858,14 +848,14 @@ package At 0.16 {
             }
 
             method server_revokeAppPassword ($name) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->post( sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.server.revokeAppPassword' ),
                     { content => +{ name => $name } } );
                 $res;
             }
 
             method server_updateEmail ( $email, $token //= () ) {
-                $self->http->session // Carp::confess 'requires an authenticated client';
+                $self->http->session // confess 'requires an authenticated client';
                 my $res = $self->http->post(
                     sprintf( '%s/xrpc/%s', $self->host(), 'com.atproto.server.updateEmail' ),
                     { content => +{ email => $email, defined $token ? ( token => $token ) : () } }
@@ -904,22 +894,27 @@ package At 0.16 {
                 $res;
             }
 
-            method sync_listBlobs ( $did, $since //= (), $limit //= (), $cursor //= () ) {
+            method sync_listBlobs (%args) {
+                $args{did} // confess 'did is required';
                 my $res = $self->http->get(
                     sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.sync.listBlobs' ),
                     {   content => +{
-                            did => $did,
-                            defined $since ? ( since => $since ) : (), defined $limit ? ( limit => $limit ) : (),
-                            defined $cursor ? ( cursor => $cursor ) : ()
+                            did => $args{did},
+                            defined $args{since} ? ( since => $args{since} ) : (), defined $args{limit} ? ( limit => $args{limit} ) : (),
+                            defined $args{cursor} ? ( cursor => $args{cursor} ) : ()
                         }
                     }
                 );
                 $res;
             }
 
-            method sync_listRepos ( $limit //= (), $cursor //= () ) {
-                my $res = $self->http->get( sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.sync.listRepos' ),
-                    { content => +{ defined $limit ? ( limit => $limit ) : (), defined $cursor ? ( cursor => $cursor ) : () } } );
+            method sync_listRepos (%args) {
+                my $res = $self->http->get(
+                    sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.sync.listRepos' ),
+                    {   content =>
+                            +{ defined $args{limit} ? ( limit => $args{limit} ) : (), defined $args{cursor} ? ( cursor => $args{cursor} ) : () }
+                    }
+                );
                 $res->{repos} = [ map { At::Lexicon::com::atproto::sync::repo->new(%$_) } @{ $res->{repos} } ] if defined $res->{repos};
                 $res;
             }
@@ -973,7 +968,7 @@ package At 0.16 {
                     }
                 )->catch(
                     sub ($err) {
-                        Carp::confess "WebSocket error: $err";
+                        confess "WebSocket error: $err";
                     }
                 );
             }
@@ -982,15 +977,8 @@ package At 0.16 {
         #~ class At::Lexicon::AtProto::Temp
         {
 
-            method temp_checkSignupQueue ( $since //= (), $limit //= () ) {
+            method temp_checkSignupQueue ( ) {
                 my $res = $self->http->get( sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.temp.checkSignupQueue' ) );
-                $res;
-            }
-
-            method temp_fetchLabels ( $since //= (), $limit //= () ) {
-                my $res = $self->http->get( sprintf( '%s/xrpc/%s', $self->host, 'com.atproto.temp.fetchLabels' ),
-                    { content => +{ defined $since ? ( since => $since ) : (), defined $limit ? ( limit => $limit ) : () } } );
-                $res->{labels} = [ map { At::Lexicon::com::atproto::label->new(%$_) } @{ $res->{labels} } ] if defined $res->{labels};
                 $res;
             }
 
@@ -1040,7 +1028,6 @@ package At 0.16 {
         class At::Protocol::Timestamp {    # Internal; standardize around Zulu
             field $timestamp : param;
             ADJUST {
-                $timestamp // Carp::confess 'missing timestamp';
                 use Time::Moment;
                 return if builtin::blessed $timestamp;
                 $timestamp = $timestamp =~ /\D/ ? Time::Moment->from_string($timestamp) : Time::Moment->from_epoch($timestamp);
@@ -1295,9 +1282,9 @@ At - The AT Protocol for Social Networking
     my $at = At->new( host => 'https://fun.example' );
     $at->server_createSession( 'sanko', '1111-aaaa-zzzz-0000' );
     $at->repo_createRecord(
-        $at->did,
-        'app.bsky.feed.post',
-        { '$type' => 'app.bsky.feed.post', text => 'Hello world! I posted this via the API.', createdAt => time }
+        repo       => $at->did,
+        collection => 'app.bsky.feed.post',
+        record     => { '$type' => 'app.bsky.feed.post', text => 'Hello world! I posted this via the API.', createdAt => time }
     );
 
 =head1 DESCRIPTION
@@ -1335,9 +1322,9 @@ The API attempts to follow the layout of the underlying protocol so changes to t
 
 =head2 C<new( ... )>
 
-Creates an AT client and initiates an authentication session.
-
     my $at = At->new( host => 'https://bsky.social' );
+
+Creates an AT client and initiates an authentication session.
 
 Expected parameters include:
 
@@ -1352,9 +1339,9 @@ want C<At::Bluesky-E<gt>new(...)> because that client comes with all the bits th
 
 =head2 C<resume( ... )>
 
-Resumes an authenticated session.
-
     my $at = At->resume( $session );
+
+Resumes an authenticated session.
 
 Expected parameters include:
 
@@ -1366,9 +1353,9 @@ Expected parameters include:
 
 =head2 C<session( )>
 
-Returns data which may be used to resume an authenticated session.
-
     my $restore = $at->session;
+
+Returns data which may be used to resume an authenticated session.
 
 Note that this data is subject to change in line with the AT protocol.
 
@@ -1392,6 +1379,8 @@ Returns a true value on success.
 
 =head2 C<admin_disableAccountInvites( ... )>
 
+    $at->admin_disableAccountInvites( 'did:...' );
+
 Disable an account from receiving new invite codes, but does not invalidate existing codes.
 
 Expected parameters include:
@@ -1408,7 +1397,11 @@ Optional reason for disabled invites.
 
 =back
 
-=head2 C<admin_disableInviteCodes( )>
+=head2 C<admin_disableInviteCodes( [...] )>
+
+    $at->admin_disableInviteCodes( );
+
+    $at->admin_disableInviteCodes( accounts => [ ... ] );
 
 Disable some set of codes and/or all codes associated with a set of users.
 
@@ -1550,6 +1543,8 @@ Returns an info list of new C<At::Lexicon::com::atproto::admin::accountView> obj
 
     $at->admin_getInviteCodes( );
 
+    $at->admin_getInviteCodes( sort => 'usage' );
+
 Get an admin view of invite codes.
 
 Expected parameters include:
@@ -1608,7 +1603,8 @@ Returns a new C<At::Lexicon::com::atproto::admin::recordViewDetail> object on su
 
     $at->admin_getRepo( 'did:...' );
 
-Get details about a repository.
+Download a repository export as CAR file. Optionally only a 'diff' since a previous revision. Does not require auth;
+implemented by PDS.
 
 Expected parameters include:
 
@@ -1616,13 +1612,15 @@ Expected parameters include:
 
 =item C<did> - required
 
+The DID of the repo.
+
 =back
 
 Returns a new C<At::Lexicon::com::atproto::admin::repoViewDetail> object on success.
 
 =head2 C<admin_getSubjectStatus( [...] )>
 
-    $at->admin_getSubjectStatus( 'did:...' );
+    $at->admin_getSubjectStatus( did => 'did:...' );
 
 Get details about a repository.
 
@@ -1715,7 +1713,7 @@ Returns a list of events as new C<At::Lexicon::com::atproto::admin::modEventView
 
 =head2 C<admin_queryModerationStatuses( [...] )>
 
-    $at->admin_queryModerationStatuses( 'did:...' );
+    $at->admin_queryModerationStatuses( comment => 'August' );
 
 List moderation events related to a subject.
 
@@ -1783,7 +1781,7 @@ Returns a list of subject statuses as new C<At::Lexicon::com::atproto::admin::su
 
 =head2 C<admin_searchRepos( [...] )>
 
-    $at->admin_searchRepos( 'hydra' );
+    $at->admin_searchRepos( query => 'hydra' );
 
 Find repositories based on a search term.
 
@@ -1805,7 +1803,7 @@ Returns a list of repos as new C<At::Lexicon::com::atproto::admin::repoView> obj
 
 =head2 C<admin_sendEmail( ..., [...] )>
 
-    $at->admin_sendEmail( 'did:...', 'Hi!', 'did:...' );
+    $at->admin_sendEmail( recipientDid => 'did:...', senderDid => 'did:...', content => 'Sup.' );
 
 Send email to a user's account email address.
 
@@ -1929,7 +1927,7 @@ Returns the subject and takedown objects on success.
 
     $at->identity_resolveHandle( 'atproto.bsky.social' );
 
-Provides the DID of a repo.
+Resolves a handle (domain name) to a DID.
 
 Expected parameters include:
 
@@ -1947,7 +1945,8 @@ Returns the DID on success.
 
     $at->identity_updateHandle( 'atproto.bsky.social' );
 
-Updates the handle of the account.
+Updates the current account's handle. Verifies handle validity, and updates did:plc document if necessary. Implemented
+by PDS, and requires auth.
 
 Expected parameters include:
 
@@ -1955,15 +1954,18 @@ Expected parameters include:
 
 =item C<handle> - required
 
+The new handle.
+
 =back
 
 Returns a true value on success.
 
-=head2 C<label_queryLabels( ... )>
+=head2 C<label_queryLabels( ..., [...] )>
 
-    $at->label_queryLabels( '' );
+    $at->label_queryLabels( uriPatterns => 'at://...' );
 
-Find labels relevant to the provided URI patterns.
+Find labels relevant to the provided AT-URI patterns. Public endpoint for moderation services, though may return
+different or additional results with auth.
 
 Expected parameters include:
 
@@ -1992,7 +1994,8 @@ On success, labels are returned as a list of new C<At::Lexicon::com::atproto::la
 
     $at->label_subscribeLabels( sub { ... } );
 
-Subscribe to label updates.
+Subscribe to stream of labels (and negations). Public endpoint implemented by mod services. Uses same sequencing scheme
+as repo event stream.
 
 Expected parameters include:
 
@@ -2004,7 +2007,7 @@ Code reference triggered with every event.
 
 =item C<cursor>
 
-The last known event to backfill from.
+The last known event seq number to backfill from.
 
 =back
 
@@ -2040,7 +2043,8 @@ C<At::Lexicon::com::atproto::label::subscribeLables::info> objects.
 
     $at->moderation_createReport( { '$type' => 'com.atproto.moderation.defs#reasonSpam' }, { '$type' => 'com.atproto.repo.strongRef', uri => ..., cid => ... } );
 
-Report a repo or a record.
+Submit a moderation report regarding an atproto account or record. Implemented by moderation services (with PDS
+proxying), and requires auth.
 
 Expected parameters include:
 
@@ -2048,13 +2052,16 @@ Expected parameters include:
 
 =item C<reasonType> - required
 
-An C<At::Lexicon::com::atproto::moderation::reasonType> object.
+Indicates the broad category of violation the report is for. An C<At::Lexicon::com::atproto::moderation::reasonType>
+object.
 
 =item C<subject> - required
 
 An C<At::Lexicon::com::atproto::admin::repoRef> or C<At::Lexicon::com::atproto::repo::strongRef> object.
 
 =item C<reason>
+
+Additional context about the content and violation.
 
 =back
 
@@ -2065,7 +2072,7 @@ the report and a timestamp.
 
     $at->repo_applyWrites( $at->did, [ ... ] );
 
-Apply a batch transaction of creates, updates, and deletes.
+Apply a batch transaction of repository creates, updates, and deletes. Requires auth, implemented by PDS.
 
 Expected parameters include:
 
@@ -2073,7 +2080,7 @@ Expected parameters include:
 
 =item C<repo> - required
 
-The handle or DID of the repo.
+The handle or DID of the repo (aka, current account).
 
 =item C<writes>
 
@@ -2083,9 +2090,12 @@ objects.
 
 =item C<validate> - required
 
-Flag for validating the records.
+Can be set to 'false' to skip Lexicon schema validation of record data, for all operations.
 
 =item C<swapCommit>
+
+If provided, the entire operation will fail if the current repo commit CID does not match this value. Used to prevent
+conflicting repo mutations.
 
 =back
 
@@ -2093,13 +2103,13 @@ Returns a true value on success.
 
 =head2 C<repo_createRecord( ... )>
 
-Create a new record.
-
     $at->repo_createRecord(
         repo       => $at->did,
         collection => 'app.bsky.feed.post',
         record     => { '$type' => 'app.bsky.feed.post', text => "Hello world! I posted this via the API.", createdAt => gmtime->datetime . 'Z' }
     );
+
+Create a single new repository record. Requires auth, implemented by PDS.
 
 Expected parameters include:
 
@@ -2107,7 +2117,7 @@ Expected parameters include:
 
 =item C<repo> - required
 
-The handle or DID of the repo.
+The handle or DID of the repo (aka, current account).
 
 =item C<collection> - required
 
@@ -2115,11 +2125,11 @@ The NSID of the record collection.
 
 =item C<record> - required
 
-The record to create.
+The record itself. Must contain a C<$type> field.
 
 =item C<validate>
 
-Flag for validating the record.
+Can be set to 'false' to skip Lexicon schema validation of record data.
 
 =item C<swapCommit>
 
@@ -2127,7 +2137,7 @@ Compare and swap with the previous commit by CID.
 
 =item C<rkey>
 
-The key of the record.
+The Record Key.
 
 =back
 
@@ -2135,9 +2145,9 @@ Returns the uri and cid of the newly created record on success.
 
 =head2 C<repo_deleteRecord( ... )>
 
-Create a new record.
-
     $at->repo_deleteRecord( repo => $at->did, collection => 'app.bsky.feed.post', rkey => '3kiburrigys27' );
+
+Delete a repository record, or ensure it doesn't exist. Requires auth, implemented by PDS.
 
 Expected parameters include:
 
@@ -2145,7 +2155,7 @@ Expected parameters include:
 
 =item C<repo> - required
 
-The handle or DID of the repo.
+The handle or DID of the repo (aka, current account).
 
 =item C<collection> - required
 
@@ -2153,7 +2163,7 @@ The NSID of the record collection.
 
 =item C<rkey>
 
-The key of the record.
+The Record Key.
 
 =item C<swapRecord>
 
@@ -2171,7 +2181,7 @@ Returns a true value on success.
 
     $at->repo_describeRepo( $at->did );
 
-Get information about the repo, including the list of collections.
+Get information about an account and repository, including the list of collections. Does not require auth.
 
 Expected parameters include:
 
@@ -2184,13 +2194,13 @@ The handle or DID of the repo.
 =back
 
 On success, returns the repo's handle, did, a didDoc, a list of supported collections, a flag indicating whether or not
-the handle is correct.
+the handle is currently valid.
 
 =head2 C<repo_getRecord( ... )>
 
     $at->repo_getRecord( repo => $at->did, collection => 'app.bsky.feed.post', rkey => '3kiburrigys27' );
 
-Get a record.
+Get a single record from a repository. Does not require auth.
 
 Expected parameters include:
 
@@ -2206,7 +2216,7 @@ The NSID of the record collection.
 
 =item C<rkey> - required
 
-The key of the record.
+The Record Key.
 
 =item C<cid>
 
@@ -2220,7 +2230,7 @@ Returns the uri, value, and, optionally, cid of the requested record on success.
 
     $at->repo_listRecords( $at->did, 'app.bsky.feed.post' );
 
-List a range of records in a collection.
+List a range of records in a repository, matching a specific collection. Does not require auth.
 
 Expected parameters include:
 
@@ -2252,7 +2262,7 @@ Flag to reverse the order of the returned records.
 
     $at->repo_putRecord( repo => $at->did, collection => 'app.bsky.feed.post', rkey => 'aaaaaaaaaaaaaaa', ... );
 
-Write a record, creating or updating it as needed.
+ Write a repository record, creating or updating it as needed. Requires auth, implemented by PDS.
 
 Expected parameters include:
 
@@ -2260,7 +2270,7 @@ Expected parameters include:
 
 =item C<repo> - required
 
-The handle or DID of the repo.
+The handle or DID of the repo (aka, current account).
 
 =item C<collection> - required
 
@@ -2268,7 +2278,7 @@ The NSID of the record collection.
 
 =item C<rkey> - required
 
-The key of the record.
+The Record Key.
 
 =item C<record> - required
 
@@ -2276,11 +2286,13 @@ The record to write.
 
 =item C<validate>
 
-Flag for validating the record.
+Can be set to 'false' to skip Lexicon schema validation of record data.
 
 =item C<swapRecord>
 
 Compare and swap with the previous record by CID.
+
+WARNING: nullable and optional field; may cause problems with golang implementation.
 
 =item C<swapCommit>
 
@@ -2292,7 +2304,11 @@ Returns the record's uri and cid on success.
 
 =head2 C<repo_uploadBlob( ..., [...] )>
 
-Upload a new blob to be added to repo in a later request.
+    $at->repo_uploadBlob( $rawdata );
+
+Upload a new blob, to be referenced from a repository record. The blob will be deleted if it is not referenced within a
+time window (eg, minutes). Blob restrictions (mimetype, size, etc) are enforced when the reference is created. Requires
+auth, implemented by PDS.
 
 Expected parameters include:
 
@@ -2300,7 +2316,9 @@ Expected parameters include:
 
 =item C<blob> - required
 
-=item C<type> - optional C<Content-type> header value
+=item C<type>
+
+MIME type
 
 =back
 
@@ -2328,9 +2346,9 @@ On success, the access and refresh JSON web tokens, the account's handle, DID an
 
 =head2 C<server_describeServer( )>
 
-Get a document describing the service's accounts configuration.
-
     $at->server_describeServer( );
+
+Describes the server's account creation requirements and capabilities. Implemented by PDS.
 
 This method does not require an authenticated session.
 
@@ -2349,23 +2367,15 @@ Returns a list of passwords as new C<At::Lexicon::com::atproto::server::listAppP
 
     $at->server_getSession( );
 
-Get information about the current session.
+Get information about the current auth session. Requires auth.
 
 Returns the handle, DID, and (optionally) other data.
 
-=head2 C<server_getAccountInviteCodes( )>
-
-    $at->server_getAccountInviteCodes( );
-
-Get all invite codes for a given account.
-
-Returns codes as a list of new C<At::Lexicon::com::atproto::server::inviteCode> objects.
-
 =head2 C<server_getAccountInviteCodes( [...] )>
 
-    $at->server_getAccountInviteCodes( );
+    $at->server_getAccountInviteCodes( includeUsed => !1 );
 
-Get all invite codes for a given account.
+Get all invite codes for the current account. Requires auth.
 
 Expected parameters include:
 
@@ -2377,7 +2387,7 @@ Optional boolean flag.
 
 =item C<createAvailable>
 
-Optional boolean flag.
+Controls whether any new 'earned' but not 'created' invites should be created."
 
 =back
 
@@ -2468,7 +2478,9 @@ Expected parameters include:
 
     $at->server_reserveSigningKey( 'did:...' );
 
-Reserve a repo signing key for account creation.
+Reserve a repo signing key, for use with account creation. Necessary so that a DID PLC update operation can be
+constructed during an account migration. Public and does not require auth; implemented by PDS. NOTE: this endpoint may
+change when full account migration is implemented.
 
 Expected parameters include:
 
@@ -2476,7 +2488,7 @@ Expected parameters include:
 
 =item C<did>
 
-The did to reserve a new did:key for.
+The DID to reserve a key for.
 
 =back
 
@@ -2506,7 +2518,7 @@ Request an email with a code to confirm ownership of email.
 
     $at->server_refreshSession( 'eyJhbGc...' );
 
-Refresh an authentication session.
+Refresh an authentication session. Requires auth using the 'refreshJwt' (not the 'accessJwt').
 
 Expected parameters include:
 
@@ -2531,13 +2543,14 @@ Initiate a user account deletion via email.
 
     $at->server_deleteSession( );
 
-Initiate a user account deletion via email.
+Delete the current session. Requires auth.
 
 =head2 C<server_deleteAccount( )>
 
     $at->server_deleteAccount( );
 
-Delete an actor's account with a token and password.
+Delete an actor's account with a token and password. Can only be called after requesting a deletion token. Requires
+auth.
 
 Expected parameters include:
 
@@ -2611,15 +2624,17 @@ Expected parameters include:
 
 =item C<name> - required
 
+A short name for the App Password, to help distinguish them.
+
 =back
 
 On success, a new C<At::Lexicon::com::atproto::server::createAppPassword::appPassword> object.
 
 =head2 C<server_createAccount( ..., [...] )>
 
-    $at->server_createAccount( 'jsmith....', '*********' );
+    $at->server_createAccount( handle => 'jsmith....', password => '*********' );
 
-Create an account.
+Create an account. Implemented by PDS.
 
 Expected parameters include:
 
@@ -2627,17 +2642,28 @@ Expected parameters include:
 
 =item C<handle> - required
 
+Requested handle for the account.
+
 =item C<email>
 
 =item C<password>
+
+"Initial account password. May need to meet instance-specific password strength requirements.
 
 =item C<inviteCode>
 
 =item C<did>
 
+Pre-existing atproto DID, being imported to a new account.
+
 =item C<recoveryKey>
 
-=item C<plcOP>
+DID PLC rotation key (aka, recovery key) to be included in PLC creation operation.
+
+=item C<plcOp>
+
+A signed DID PLC operation to be submitted as part of importing an existing account to this instance. NOTE: this
+optional field may be updated when full account migration is implemented.
 
 =back
 
@@ -2663,7 +2689,8 @@ Expected parameters include:
 
     $at->sync_getBlocks( 'did...' );
 
-Get blocks from a given repo.
+Get data blocks from a given repo, by CID. For example, intermediate MST nodes, or records. Does not require auth;
+implemented by PDS.
 
 Expected parameters include
 
@@ -2681,7 +2708,7 @@ The DID of the repo.
 
     $at->sync_getLatestCommit( 'did...' );
 
-Get the current commit CID & revision of the repo.
+Get the current commit CID & revision of the specified repo. Does not require auth.
 
 Expected parameters include:
 
@@ -2699,7 +2726,8 @@ Returns the revision and cid on success.
 
     $at->sync_getRecord( 'did...', ... );
 
-Get blocks needed for existence or non-existence of record.
+Get data blocks needed to prove the existence or non-existence of record in the current version of repo. Does not
+require auth.
 
 Expected parameters include:
 
@@ -2714,6 +2742,8 @@ The DID of the repo.
 NSID.
 
 =item C<rkey> - required
+
+Record Key.
 
 =item C<commit>
 
@@ -2737,15 +2767,15 @@ The DID of the repo.
 
 =item C<since>
 
-The revision of the repo to catch up from.
+The revision ('rev') of the repo to create a diff from.
 
 =back
 
 =head2 C<sync_listBlobs( ..., [...] )>
 
-    $at->sync_listBlobs( 'did...' );
+    $at->sync_listBlobs( did => 'did...' , limit => 50 );
 
-List blob CIDs since some revision.
+List blob CIDso for an account, since some repo revision. Does not require auth; implemented by PDS.
 
 Expected parameters include:
 
@@ -2771,9 +2801,10 @@ On success, a list of cids is returned and, optionally, a cursor.
 
 =head2 C<sync_listRepos( [...] )>
 
-    $at->sync_listRepos( );
+    $at->sync_listRepos( limit => 1000 );
 
-List DIDs and root CIDs of hosted repos.
+Enumerates all the DID, rev, and commit CID for all repos hosted by this service. Does not require auth; implemented by
+PDS and Relay.
 
 Expected parameters include:
 
@@ -2793,8 +2824,8 @@ On success, a list of C<At::Lexicon::com::atproto::sync::repo> objects is return
 
     $at->sync_notifyOfUpdate( 'example.com' );
 
-Notify a crawling service of a recent update; often when a long break between updates causes the connection with the
-crawling service to break.
+Notify a crawling service of a recent update, and that crawling should resume. Intended use is after a gap between repo
+stream events caused the crawling service to disconnect. Does not require auth; implemented by Relay.
 
 Expected parameters include:
 
@@ -2802,7 +2833,7 @@ Expected parameters include:
 
 =item C<hostname> - required
 
-Hostname of the service that is notifying of update.
+Hostname of the current service (usually a PDS) that is notifying of update.
 
 =back
 
@@ -2812,7 +2843,8 @@ Returns a true value on success.
 
     $at->sync_requestCrawl( 'example.com' );
 
-Request a service to persistently crawl hosted repos.
+Request a service to persistently crawl hosted repos. Expected use is new PDS instances declaring their existence to
+Relays. Does not require auth.
 
 Expected parameters include:
 
@@ -2820,7 +2852,7 @@ Expected parameters include:
 
 =item C<hostname> - required
 
-Hostname of the service that is requesting to be crawled.
+Hostname of the current service (eg, PDS) that is requesting to be crawled.
 
 =back
 
@@ -2830,7 +2862,8 @@ Returns a true value on success.
 
     $at->sync_getBlob( 'did...', ... );
 
-Get a blob associated with a given repo.
+Get a blob associated with a given account. Returns the full blob as originally uploaded. Does not require auth;
+implemented by PDS.
 
 Expected parameters include:
 
@@ -2838,7 +2871,7 @@ Expected parameters include:
 
 =item C<did> - required
 
-The DID of the repo.
+The DID of the account.
 
 =item C<cid> - required
 
@@ -2850,7 +2883,9 @@ The CID of the blob to fetch.
 
     $at->sync_subscribeRepos( sub {...} );
 
-Subscribe to repo updates.
+Repository event stream, aka Firehose endpoint. Outputs repo commits with diff data, and identity update events, for
+all repositories on the current server. See the atproto specifications for details around stream sequencing, repo
+versioning, CAR diff format, and more. Public and does not require auth; implemented by PDS and Relay.
 
 Expected parameters include:
 
@@ -2864,11 +2899,7 @@ The last known event to backfill from.
 
 =back
 
-=head2 C<sync_subscribeRepos_p( ... )>
-
-TODO
-
-=head2 C<temp_checkSignupQueue( [...] )>
+=head2 C<temp_checkSignupQueue( )>
 
     $at->temp_checkSignupQueue;
 
@@ -2876,26 +2907,6 @@ Check accounts location in signup queue.
 
 Returns a boolean indicating whether signups are activated and, optionally, the estimated time and place in the queue
 the account is on success.
-
-=head2 C<temp_fetchLabels( [...] )>
-
-    $at->temp_fetchLabels;
-
-Fetch all labels from a labeler created after a certain date.
-
-Expected parameters include:
-
-=over
-
-=item C<since>
-
-=item C<limit>
-
-Default is 50, minimum is 1, maximum is 250.
-
-=back
-
-Returns a list of labels as new C<At::Lexicon::com::atproto::label> objects on success.
 
 =head2 C<temp_pushBlob( ... )>
 
@@ -2917,7 +2928,7 @@ The DID of the repo.
 
     $at->temp_transferAccount( ... );
 
-Transfer an account.
+Transfer an account. NOTE: temporary method, necessarily how account migration will be implemented.
 
 Expected parameters include:
 
@@ -3048,7 +3059,8 @@ Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 =begin stopwords
 
-didDoc cids cid websocket emails communicationTemplates signup signups
+didDoc cids cid websocket emails communicationTemplates signup signups diff auth did:plc atproto proxying aka mimetype
+nullable versioning refreshJwt accessJwt golang seq eg CIDso
 
 =end stopwords
 

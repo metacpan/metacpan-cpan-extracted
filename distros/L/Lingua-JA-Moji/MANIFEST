@@ -3,6 +3,11 @@ CONTRIBUTING
 examples/onbiki.pl
 examples/syn-kana.pl
 examples/synopsis.pl
+go/go.mod
+go/make-table.pl
+go/moji.go
+go/moji_test.go
+go/table.go
 lib/Lingua/JA/Moji-ja.pod
 lib/Lingua/JA/Moji.pm
 lib/Lingua/JA/Moji.pod

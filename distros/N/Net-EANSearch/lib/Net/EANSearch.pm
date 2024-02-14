@@ -4,7 +4,7 @@ use 5.030000;
 use strict;
 use warnings;
 
-use WWW::Curl::Easy;
+use LWP;
 use JSON;
 use URL::Encode;
 use MIME::Base64 qw(decode_base64);
@@ -30,7 +30,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 our $ALL_LANGUAGES = 99;
 our $ENGLISH = 1;
@@ -53,19 +53,16 @@ our $ROMAINAN = 19;
 our $BULGARIAN = 20;
 our $GREEK = 21;
 
-my $BASE_URI = 'https://api.ean-search.org/api?token=';
+my $BASE_URI = 'https://api.ean-search.org/api?format=json&token=';
 
 sub new {
 	my $class = shift;
 	my $token = shift;
 
-	my $curl = WWW::Curl::Easy->new;
-	my @myheaders = ('Accept: application/json');
-	$curl->setopt(CURLOPT_HTTPHEADER, \@myheaders);
-	$curl->setopt(CURLOPT_ACCEPT_ENCODING, 'gzip, deflate');
-	$curl->setopt(CURLOPT_SSL_VERIFYPEER, 0); # TODO set better cert store instead ?
+	my $ua = LWP::UserAgent->new();
+	$ua->timeout(10);
 
-	my $self = bless { base_uri => $BASE_URI . $token, curl => $curl }, $class;
+	my $self = bless { base_uri => $BASE_URI . $token, ua => $ua }, $class;
 
     return $self;
 }
@@ -159,15 +156,12 @@ sub _apiCall {
 	my $self = shift;
 	my $url = shift;
 
-	$self->{curl}->setopt(CURLOPT_URL, $url);
-	my $result;
-	$self->{curl}->setopt(CURLOPT_WRITEDATA, \$result);
-	my $retcode = $self->{curl}->perform;
-	if (!defined($result) || $retcode != 0) {
-		print STDERR 'Network error: ' . $self->{curl}->strerror($retcode) . "\n";
+	my $doc = $self->{ua}->request(HTTP::Request->new(GET => $url));
+	if (!defined($doc) || $doc->is_error()) {
+		print STDERR 'Network error: ' . (defined($doc) ? $doc->code : 'unknown') . "\n";
 		return undef;
 	} else {
-		return $result;
+		return $doc->content;
 	}
 }
 

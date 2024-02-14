@@ -72,7 +72,7 @@ subtest 'live' => sub {
         isa_ok $followers->{followers}->[0], ['At::Lexicon::app::bsky::actor::profileView'], '...contains list of profileView objects';
     };
     subtest 'graph_getFollows' => sub {
-        ok my $follows = $bsky->graph_getFollows('bsky.app'), '$bsky->graph_getFollows("bsky.app")';
+        ok my $follows = $bsky->graph_getFollows( actor => 'bsky.app' ), '$bsky->graph_getFollows("bsky.app")';
         isa_ok $follows->{follows}->[0], ['At::Lexicon::app::bsky::actor::profileView'], '...contains list of profileView objects';
     };
     subtest 'graph_getRelationships' => sub {
@@ -89,7 +89,7 @@ subtest 'live' => sub {
     };
 SKIP: {
         my $list;
-        ok my $res = $bsky->graph_getLists('jacob.gold'), '$bsky->graph_getLists("jacob.gold")';
+        ok my $res = $bsky->graph_getLists( actor => 'jacob.gold' ), '$bsky->graph_getLists(actor => "jacob.gold")';
         skip 'failed to gather graph lists' unless scalar @{ $res->{lists} };
         isa_ok $list = $res->{lists}->[0], ['At::Lexicon::app::bsky::graph::listView'], '...contains list of listView objects';
         subtest 'graph_getList' => sub {

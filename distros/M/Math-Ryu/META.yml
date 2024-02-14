@@ -20,6 +20,6 @@ no_index:
 requires:
   Test::More: '0.88'
 resources:
-  repository: https://github.com/sisyphus/math-ryu.git
-version: '0.07'
+  repository: https://github.com/sisyphus/math-ryu-l.git
+version: '1.0'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

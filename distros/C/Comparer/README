@@ -5,14 +5,14 @@ SPECIFICATION VERSION
     0.1
 
 VERSION
-    This document describes version 0.1.0 of Comparer (from Perl
-    distribution Comparer), released on 2024-01-22.
+    This document describes version 0.1.1 of Comparer (from Perl
+    distribution Comparer), released on 2024-01-23.
 
 SYNOPSIS
     Basic:
 
      use Comparer::naturally;
-     my $cmp = Comparer::naturally->new;
+     my $cmp = Comparer::naturally::gen_comparer;
 
      my @sorted = sort { $cmp->($a,$b) } ('track1.mp3', 'track10.mp3', 'track2.mp3', 'track1b.mp3', 'track1a.mp3');
      # => ('track1.mp3', 'track1a.mp3', 'track1b.mp3', 'track2.mp3', 'track10.mp3')
@@ -20,7 +20,7 @@ SYNOPSIS
     Specifying arguments:
 
      use Comparer::naturally;
-     my $cmp = Comparer::naturally->new(reverse => 1);
+     my $cmp = Comparer::naturally::gen_comparer(reverse => 1);
      my @sorted = sort { $cmp->($a,$b) } ...;
 
     Specifying comparer on the command-line (for other CLI's):
@@ -70,23 +70,49 @@ SOURCE
     Source repository is at <https://github.com/perlancar/perl-Comparer>.
 
 SEE ALSO
-    Base specifications: DefHash, Sah.
+  Base specifications
+    DefHash
 
-    Related: Sorter
+    Sah
 
-    Previous incarnation: Sort::Sub. "Sorter" and "Comparer" are meant to
-    eventually supersede Sort::Sub. The main improvement upon Sort::Sub is
-    the split into three kinds of subroutines: 1) a sorter (a subroutine
-    that accepts a list of items to sort), where "Sorter::*" modules are
-    meant to generate; 2) a keymaker (a subroutine that converts an item to
-    a string/numeric key suitable for simple comparison using "eq" or "=="
-    during sorting); you can use "Data::Sah::Value::perl::KeyMaker"
-    namespace for this; and 3) comparer (a subroutine that compares two
-    items that can be used in sort()), where "Comparer::*" modules are meant
-    to generate. Perl's sort() allows us to specify a comparer, but
-    oftentimes it's more efficient to sort by key using a keymaker, and
-    sometimes due to preprocessing and/or postprocessing it's more suitable
-    to use the more generic "sorter" interface.
+  Related specifications
+    Sorter
+
+    SortKey
+
+  Previous incarnation
+    Sort::Sub
+
+    "Sorter", "SortKey", and "Comparer" are meant to eventually supersede
+    Sort::Sub. The main improvement over Sort::Sub is the split into three
+    kinds of subroutines:
+
+    1. sorter
+        A subroutine that accepts a list of items to sort.
+
+        "Sorter::*" modules are meant to generate sorters.
+
+    2. sort key generator
+        A subroutine that converts an item to a string/numeric key suitable
+        for simple comparison using "eq" or "==" during sorting.
+
+        "SortKey::*" modules are meant to generate sort key generators.
+
+    3. comparer
+        A subroutine that compares two items. Can be used in sort() as
+        custom sort block.
+
+        "Comparer::*" modules are meant to generate comparers.
+
+        Perl's sort(), as mentioned above, allows us to specify a comparer,
+        but oftentimes it's more efficient to sort by key using key
+        generator, where the keys are often cached. And sometimes due to
+        preprocessing and/or postprocessing it's more suitable to use the
+        more generic sorter interface.
+
+    Aside from the above, "Comparer" also makes Sort::Sub's special
+    arguments "reverse" and "is_ci" become ordinary arguments, because they
+    are not always applicable in all situation, especially "is_ci".
 
 AUTHOR
     perlancar <perlancar@cpan.org>

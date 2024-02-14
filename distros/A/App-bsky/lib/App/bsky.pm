@@ -1,4 +1,4 @@
-package App::bsky 0.03 {
+package App::bsky 0.04 {
     use v5.38;
     use utf8;
     use Bluesky;
@@ -221,8 +221,9 @@ package App::bsky 0.03 {
                 $post = $post->post;
             }
             elsif ( $post->isa('At::Lexicon::app::bsky::feed::threadViewPost') ) {
-                $self->_dump_post( $depth++,   $post->post );
-                $self->_dump_post( $depth + 2, $_->post ) for @{ $post->replies };
+                $self->_dump_post( $depth++, $post->post );
+                my $replies = $post->replies // [];
+                $self->_dump_post( $depth + 2, $_->post ) for @$replies;
                 return;
             }
 
@@ -285,7 +286,7 @@ package App::bsky 0.03 {
             $number //= ();
             my ($id) = @args;
             $id // return $self->cmd_help('thread');
-            my $res = $bsky->feed_getPostThread( $id, $number, $number );    # $uri, depth, $parentHeight
+            my $res = $bsky->feed_getPostThread( uri => $id, depth => $number, parentHeight => $number );    # $uri, depth, $parentHeight
             return unless $res->{thread} && builtin::blessed $res->{thread};
             return $self->say( JSON::Tiny::to_json $res->{thread}->_raw ) if $json;
             $self->_dump_post( 0, $res->{thread} );
@@ -315,7 +316,7 @@ package App::bsky 0.03 {
             my @likes;
             my $cursor = ();
             do {
-                my $likes = $bsky->feed_getLikes( $uri, undef, 100, $cursor );
+                my $likes = $bsky->feed_getLikes( uri => $uri, limit => 100, cursor => $cursor );
                 push @likes, @{ $likes->{likes} };
                 $cursor = $likes->{cursor};
             } while ($cursor);
@@ -344,7 +345,7 @@ package App::bsky 0.03 {
             my @reposts;
             my $cursor = ();
             do {
-                my $reposts = $bsky->feed_getRepostedBy( $uri, undef, 100, $cursor );
+                my $reposts = $bsky->feed_getRepostedBy( uri => $uri, limit => 100, cursor => $cursor );
                 push @reposts, @{ $reposts->{repostedBy} };
                 $cursor = $reposts->{cursor};
             } while ($cursor);
@@ -377,7 +378,7 @@ package App::bsky 0.03 {
             my @follows;
             my $cursor = ();
             do {
-                my $follows = $bsky->graph_getFollows( $handle // $config->{session}{handle}, 100, $cursor );
+                my $follows = $bsky->graph_getFollows( actor => $handle // $config->{session}{handle}, limit => 100, cursor => $cursor );
                 push @follows, @{ $follows->{follows} };
                 $cursor = $follows->{cursor};
             } while ($cursor);
@@ -401,7 +402,7 @@ package App::bsky 0.03 {
             my @followers;
             my $cursor = ();
             do {
-                my $followers = $bsky->graph_getFollowers( $handle // $config->{session}{handle}, 100, $cursor );
+                my $followers = $bsky->graph_getFollowers( actor => $handle // $config->{session}{handle}, limit => 100, cursor => $cursor );
                 if ( defined $followers->{followers} ) {
                     push @followers, @{ $followers->{followers} };
                     $cursor = $followers->{cursor};
@@ -438,7 +439,7 @@ package App::bsky 0.03 {
             my @blocks;
             my $cursor = ();
             do {
-                my $follows = $bsky->graph_getBlocks( 100, $cursor );
+                my $follows = $bsky->graph_getBlocks( limit => 100, cursor => $cursor );
                 push @blocks, @{ $follows->{blocks} };
                 $cursor = $follows->{cursor};
             } while ($cursor);
@@ -478,7 +479,7 @@ package App::bsky 0.03 {
             my @notes;
             my $cursor = ();
             do {
-                my $notes = $bsky->notification_listNotifications( undef, 100, $cursor );
+                my $notes = $bsky->notification_listNotifications( limit => 100, cursor => $cursor );
                 if ( defined $notes->{notifications} ) {
                     push @notes, @{ $notes->{notifications} };
                     $cursor = $all && $notes->{cursor} ? $notes->{cursor} : ();

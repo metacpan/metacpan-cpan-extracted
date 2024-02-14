@@ -2,124 +2,144 @@
 
 =head1 NAME
 
-Math::Ryu - perl interface to Ryu (float-to-string conversion).
+Math::Ryu - perl interface to Ryu (NV-to-string conversion).
 
 =head1 DEPENDENCIES
 
    This module uses the Ryu C implementation,  which is included with
-   this module's source. It is therefore unnecessary to download that
-   Ryu code - but, should you wish to grab it, it's available at:
+   this module's source (in the Ryu_Library/ryu folder). It is therefore
+   unnecessary to download that Ryu code - but, should you wish to grab
+   it, it's also available at:
    https://github.com/ulfjack/ryu/tree/master/ryu
+
+=head1 PREAMBLE
+
+   NVs of type 'double', '__float128' and 'long double' (but not
+   DoubleDouble), are now supported, though the 'long double' and
+   '__float128' support requires that the underlying C compiler
+   provides the uint128_t data type. This caveat probably rules out
+   'long double' and '__float128' support on old 32-bit builds of perl,
+   but not on the vast majority of modern 64-bit builds.
 
 =head1 DESCRIPTION
 
-   Convert an NV to a decimal string, such that no information is
-   lost, yet keeping the string as short as possible.
+   Using functionality provided by the Ryu library, we convert an NV to
+   a decimal string, such that no information is lost, yet keeping the
+   string as short as possible.
+   Stringification of NVs provided by perl's print() fuction does not
+   always adhere to this principle - that is, the condition
+   ( "$nv" == $nv ) is not always true.
+   For example:
+    $nv = 1.4 / 10; # "$nv" != $nv
 
-   NOTE:
-   NVs whose size is greater than 8 bytes are not currently catered for.
+   We can address this by using (s)printf. For example, on a perl whose
+   $Config{nvtype} is 'double', we could do sprintf("%.17g", $nv)
+   to provide the stringification. Then we will find that, except for
+   NaN, the condition ( sprintf("%.17g", $nv) == $nv ) is always true.
+   But this presents another problem in that "%.17g" formatting will
+   sometimes provide more sugnificant decimal digits than are needed.
+   For example:
+    printf("%.17g", 0.1); # prints '0.10000000000000001', even though
+                          # the condition ("0.1" == 0.1) is also true.
+
+   This module provides the nv2s() function which returns a decimal
+   string representation of its (NV) argumennt. Unless $nv is NaN:
+    1) the condition ( nv2s($nv) == $nv ) is always true;
+      and
+    2) the string returned by nv2s($nv) will contain the fewest number of
+       siginificant decimal digits needed for that first condition to hold.
+
+   The aim is that the formatting of the string returned by nv2s() will
+   be the same as provided by python3's print() function.
+   (Please report any variances - especially substantive ones.)
 
 =head1 SYNOPSIS
 
+   For this synopsis, we use nv2s() which first appears in version
+   1.0 of Math::Ryu. From version 1.0 on, nv2s() is the usual "goto"
+   function. Some (not-very-useful) functions from the earlier versions
+   have been removed as of version 1.0. See the "FUNCTIONS" documentation
+   below for a full list of current public functions.
+
    use Math::Ryu qw(:all);
 
-   my $str = d2s(0.1);
-   print $str;           # 1E-1
+   my $str = nv2s(1 / 10);
+   print $str;           # 0.1 (double|long double|__float28)
 
-   $str = d2s(1.4 / 10);
-   print $str;           # 1.3999999999999999E-1
-   print fmtpy($str);    # 0.13999999999999999
+   $str = nv2s(1.4 / 10);
+   print $str; # 0.13999999999999999 (double)
+               # 0.14 (80-bit long double)
+               # 0.13999999999999999999999999999999999 (__float128)
 
-   $str = d2s(sqrt 2);
-   print $str;           # 1.4142135623730951E0
-   print fmtpy($str);    # 1.4142135623730951
-
-   # Also do the reverse of s2d()
-   my $d = s2d('1E-1');
-   printf "%.17g\n", $d;   # 0.10000000000000001
-   print  d2s($d);         # 1E-1
-   print  fmtpy(d2s($d));  # 0.1
-
+   $str = nv2s(sqrt 2);
+   print $str; # 1.4142135623730951 (double)
+               # 1.4142135623730950488 (80-bit long double)
+               # 1.4142135623730950488016887242096982 (__float128)
 
 =head1 FUNCTIONS
 
-   $nv = s2d($str);
-    Converts the string ($str) to a floating point value ($nv)
-    and return $nv.
-
-   $str = d2s($nv);
-    $nv holds a floating point numeric value (NV).
-    $str is a string in floating point format, that accurately
-    and succinctly represents the value held by $nv.
-    $str, when correctly assigned back to a perl number, will
-    always be equivalent to $nv.
-    This in stark contrast to perl's interpolation which does not
-    guarantee that the condition ("$nv" == $nv) is true, even for
-    non-nan values of $nv. (Eg if $nv is sqrt 2.0 or 1.4/10 .)
-    Also, $str will contain as few digits as possible, without
-    compromising that accuracy.
-    Arguments that are not an NV will silently be coerced to an
-    NV, following the rules that perl uses for such a coercion.
+   $str = nv2s($nv);
+    $nv holds a perl floating point numeric value (NV). $str is a string in
+    floating point format, that accurately and succinctly represents the
+    value held by $nv. When $str is correctly assigned to a perl number,
+    that nnumber will be equivalent to $nv. Also, $str will contain as few
+    digits as possible, without compromising that accuracy.
+    $str is formatted by fmtpy() - documented below. (The format is the
+    same as provided by Python3's print() function for the same value.)
+    There is no need for the caller to know the type of NV (nvtype) that
+    $nv is - the nv2s() function handles that.
+    Arguments that are references will be rejected, causing the script to
+    die with an explanatory message. Other arguments that are not an NV
+    will be coerced to NV, following the usual rules that perl employs.
 
    $str = n2s($sv);
-    If the argument is a floating point numeric value, then this
-    function returns the same as d2s().
-    Otherwise, it stringifies the numeric value of the given
-    argument, according to whether that numeric value is an
-    integer value (that fits into an IV or UV) or a floating
-    point value.
-    Some examples, assuming IVSIZE is 8:
-    d2s(~0) returns 1.8446744073709552E19
-    n2s(~0) returns 18446744073709551615
-    n2s("18446744073709551615") returns 18446744073709551615
-    But:
-    n2s("18446744073709551615.0") returns 1.8446744073709552E19,
-    because the string argument "18446744073709551615.0" numifies
-    to an NV - whereas "18446744073709551615" numifies to a UV.
-    References, such as Math::BigInt objects will currently
-    throw an error when passed to n2s() - though this could be
-    changed in the future if there's an appetite for such.
-    If you want to know what happens when the argument is neither
-    a reference, nor an IV/UV, nor a string (PV) nor a floating
-    point value (NV), then you'll have to test that yourself ;-)
+    Handles "integer", "floating point" and "string" values. If the
+    argument is a floating point numeric value, then this function returns
+    the same as nv2s(). Otherwise, it stringifies the numeric value of the
+    given argument, according to whether that numeric value is an integer
+    value (that fits into an IV or UV) or a floating point value.
+    If the argument ($sv) is itself a string, then $str will reflect the
+    value of $sv considered in numeric context. For example
+    n2s('hello world') would return '0.0', not 'hello world'.
 
-   $str = d2fixed($nv, $digits);
-    $str is a $digits-decimal fixed point representation of $nv.
-    For example, d2sfixed(1 / 10000, 6) returns '0.000100'.
+  $str = d2s($nv);  # Use only when $Config{nvtype} is 'double'.
+    Returns a decimal string representation of the value of $nv in the
+    format 'mantissaEexponent' - eg '1E-1' (for 0.1) and
+    '1.4142135623730951E0' (for square root of 2).
 
-   $str = d2exp($nv, $digits);
-    $str is a $digits-decimal floating point representation of $nv.
-    For example, d2exp(1 / 10000, 6) returns '1.000000e-04'.
+  $str = ld2s($nv); # Use only when $Config{nvtype} is 80-bit extended
+                    # precision 'long double'.
+    Returns a decimal string representation of the value of $nv in the
+    format 'mantissaEexponent' - eg '1E-1' (for 0.1) and
+   '1.4142135623730950488E0' (for square root of 2).
 
-   $str = d2s_buffered($nv);                       # Not very useful
-    Returns the same as d2s($nv).
-
-   ($str, $len) = d2s_buffered_n($nv);             # Not very useful
-    $str is the same as returned by d2s($nv).
-    $len is length($str).
-
-   $str = d2fixed_buffered($nv, $digits);           # Not very useful
-    Returns the same as d2fixed($nv, $digits).
-
-   ($str, $len) = d2fixed_buffered_n($nv, $digits); # Not very useful
-    $str is the same as returned by d2fixed($nv, $digits).
-    $len is length($str).
-
-   $str = d2exp_buffered($nv, $digits);             # Not very useful
-    Returns the same as d2exp($nv, $digits).
-
-   ($str, $len) = d2exp_buffered_n($nv, $digits);   # Not very useful
-    $str is the same as returned by d2exp($nv, $digits).
-    $len is length($str).
+  $str = q2s($nv);  # Use only when $Config{nvtype} is either
+                    # '__float128' or IEEE 754 'long double'.
+    Returns a decimal string representation of the value of $nv
+    in the format 'mantissaEexponent' - eg '1E-1' (for 0.1) and
+    '1.4142135623730950488016887242096982E0' (for square root of 2).
 
   $str = fmtpy($s);
-    The argument $s is a string as returned by d2(s) or n2s().
-    We reformat this string to be the same as the string that
-    python3 produces and return it as $str.
+    The argument $s is a string as returned by either d2s() or ld2s()
+    or q2s(). We aim to reformat $s to be the same as the string that
+    python3 would produce, and then return it as $str.
+    NOTE: Doing 'fmtpy(d2s($nv))' or 'fmtpy(ld2s($nv))' or
+          'fmtpy(q2s($nv))' is equivalent to doing 'nv2s($nv))'.
 
-=head1 TODO
+   $bool = ryu_lln($sv);
+    This is an interface to the API function 'looks_like_number'.
+    Returns 1 if $sv looks like a number, else returns 0.
+    There's not really any reason to include this subroutine, but
+    it's there to use if it's ever helpful.
 
-    Cover larger precision NV types (ie long double and __float128)
+   $nv = s2d($str); # string to double
+    BE WARNED: This function generally mishandles inf and nan !!
+    AVOID USING IT if non-finite values might be encountered !!!
+    On perl-5.30.0 and later, perl will perform the task reliably,
+    so just use perl.
+    Available only to perls whose $Config{nvsize} is 8. Converts the
+    string ($str) to a double precision floating point value ($nv)
+    and returns it.
 
 =head1 LICENSE
 
@@ -138,7 +158,7 @@ Math::Ryu - perl interface to Ryu (float-to-string conversion).
     The Boost Software License can be found at:
     https://www.boost.org/LICENSE_1_0.txt
 
-    This perl module is Copyright 2021-24 Sisyphus
+    This perl module is Copyright 2024 Sisyphus
 
 =head1 AUTHOR
 

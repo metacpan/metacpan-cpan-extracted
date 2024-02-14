@@ -38,14 +38,14 @@ subtest 'live' => sub {
     };
     #
     subtest 'feed_searchPosts' => sub {
-        ok my $results = $bsky->feed_searchPosts('perl'), '$bsky->feed_searchPosts("perl")';
+        ok my $results = $bsky->feed_searchPosts( query => 'perl' ), '$bsky->feed_searchPosts(query => "perl")';
         my $post = $results->{posts}->[0];
         isa_ok $post, ['At::Lexicon::app::bsky::feed::postView'], '...contains list of postView objects';
     };
     {
         my $replied;    # Set in getAuthorFeed and used later on
         subtest 'feed_getAuthorFeed' => sub {
-            ok my $results = $bsky->feed_getAuthorFeed('bsky.app'), '$bsky->feed_getAuthorFeed("bsky.app")';
+            ok my $results = $bsky->feed_getAuthorFeed( actor => 'bsky.app' ), '$bsky->feed_getAuthorFeed(actor => "bsky.app")';
             my $post = $results->{feed}->[0];
             isa_ok $post, ['At::Lexicon::app::bsky::feed::feedViewPost'], '...contains list of feedViewPost objects';
 
@@ -54,20 +54,20 @@ subtest 'live' => sub {
         };
         subtest 'feed_getRepostedBy' => sub {
             $replied // skip_all 'failed to find a reposted post';
-            ok my $results = $bsky->feed_getRepostedBy( $replied->post->uri, $replied->post->cid ),
-                sprintf '$bsky->feed_getRepostedBy("%s...", "%s...")', substr( $replied->post->uri->as_string, 0, 25 ),
+            ok my $results = $bsky->feed_getRepostedBy( uri => $replied->post->uri, cid => $replied->post->cid ),
+                sprintf '$bsky->feed_getRepostedBy(uri => "%s...", cid => "%s...")', substr( $replied->post->uri->as_string, 0, 25 ),
                 substr( $replied->post->cid, 0, 10 );
             my $post = $results->{repostedBy}->[0];
             isa_ok $post, ['At::Lexicon::app::bsky::actor::profileView'], '...contains list of profileView objects';
         };
     }
     subtest 'feed_getActorFeeds' => sub {
-        ok my $results = $bsky->feed_getActorFeeds('bsky.app'), '$bsky->feed_getActorFeeds("bsky.app")';
+        ok my $results = $bsky->feed_getActorFeeds( actor => 'bsky.app' ), '$bsky->feed_getActorFeeds(actor => "bsky.app")';
         my $post = $results->{feeds}->[0];
         isa_ok $post, ['At::Lexicon::app::bsky::feed::generatorView'], '...contains list of generatorView objects';
     };
     subtest 'feed_getActorLikes' => sub {
-        ok my $results = $bsky->feed_getActorLikes('atperl.bsky.social'), '$bsky->feed_getActorLikes("atperl.bsky.social")';
+        ok my $results = $bsky->feed_getActorLikes( actor => 'atperl.bsky.social' ), '$bsky->feed_getActorLikes(actor => "atperl.bsky.social")';
         if ( !scalar @{ $results->{feed} } ) { skip_all 1, 'I apparently do not like anything. Weird' }
         else {
             my $post = $results->{feed}->[0];
@@ -86,12 +86,12 @@ subtest 'live' => sub {
         isa_ok $results->{thread}, ['At::Lexicon::app::bsky::feed::threadViewPost'], '...returns a threadViewPost object';
     };
     subtest 'feed_getLikes' => sub {
-        ok my $results = $bsky->feed_getLikes('at://did:plc:ewvi7nxzyoun6zhxrhs64oiz/app.bsky.feed.post/3kftlbujmfk24'),
+        ok my $results = $bsky->feed_getLikes( uri => 'at://did:plc:ewvi7nxzyoun6zhxrhs64oiz/app.bsky.feed.post/3kftlbujmfk24' ),
             '$bsky->feed_getLikes("at://did:plc:ewvi...")';
         isa_ok $results->{likes}->[0], ['At::Lexicon::app::bsky::feed::getLikes::like'], '...contains list of ::feed::getLikes::like objects';
     };
     subtest 'feed_getListFeed' => sub {      # TODO: I should create a new list for this
-        ok my $results = $bsky->feed_getListFeed('at://did:plc:kyttpb6um57f4c2wep25lqhq/app.bsky.graph.list/3k4diugcw3k2p'),
+        ok my $results = $bsky->feed_getListFeed( list => 'at://did:plc:kyttpb6um57f4c2wep25lqhq/app.bsky.graph.list/3k4diugcw3k2p' ),
             '$bsky->feed_getListFeed("at://did:plc:kytt...")';
         isa_ok $results->{feed}->[0], ['At::Lexicon::app::bsky::feed::feedViewPost'], '...contains list of ::feed::feedViewPost objects';
     };

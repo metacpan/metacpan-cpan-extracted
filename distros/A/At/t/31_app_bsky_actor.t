@@ -57,13 +57,13 @@ subtest 'live' => sub {
         isa_ok $ret->{actors}[0], ['At::Lexicon::app::bsky::actor::profileView'], '...returned list of profileView'
     }
     {
-        my $ret = $bsky->actor_searchActorsTypeahead('perl');
-        ok scalar @{ $ret->{actors} }, q[$bsky->actor_searchActorsTypeahead( )];    # should be 10 but the default might change
+        my $ret = $bsky->actor_searchActorsTypeahead( query => 'perl' );
+        ok scalar @{ $ret->{actors} }, q[$bsky->actor_searchActorsTypeahead( query => 'perl' )];    # should be 10 but the default might change
         isa_ok $ret->{actors}[0], ['At::Lexicon::app::bsky::actor::profileView'], '...returned list of profileView'
     }
     {
-        my $ret = $bsky->actor_searchActors('perl');
-        ok scalar @{ $ret->{actors} }, q[$bsky->actor_searchActors( )];             # should be 25 but the default might change
+        my $ret = $bsky->actor_searchActors( query => 'perl' );
+        ok scalar @{ $ret->{actors} }, q[$bsky->actor_searchActors( query => 'perl' )];             # should be 25 but the default might change
         isa_ok $ret->{actors}[0], ['At::Lexicon::app::bsky::actor::profileView'], '...returned list of profileView'
     }
     ok $bsky->actor_putPreferences( { label => 'test', visibility => 'hide', '$type' => 'app.bsky.actor.defs#contentLabelPref' } ),

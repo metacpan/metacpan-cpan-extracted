@@ -2,12 +2,13 @@ package MsOffice::Word::Surgeon::PackagePart;
 use 5.24.0;
 use Moose;
 use MooseX::StrictConstructor;
-use MsOffice::Word::Surgeon::Utils qw(maybe_preserve_spaces is_at_run_level);
+use MsOffice::Word::Surgeon::Utils qw(maybe_preserve_spaces is_at_run_level decode_entities);
 use MsOffice::Word::Surgeon::Run;
 use MsOffice::Word::Surgeon::Text;
 use XML::LibXML;
 use List::Util                     qw(max);
-use Carp                           qw(croak carp);
+use Carp::Clan                     qw(^MsOffice::Word::Surgeon); # will import carp, croak, etc.
+
 
 # syntactic sugar for attributes
 sub has_inner ($@) {my $attr = shift; has($attr => @_, lazy => 1, builder => "_$attr", init_arg => undef)}
@@ -18,7 +19,7 @@ use constant XML_SIMPLE_INDENT => 1;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 
 #======================================================================
@@ -300,35 +301,114 @@ sub reduce_all_noises {
   $self->reduce_noise(@noise_reduction_list);
 }
 
+
+
+sub _split_into_bookmark_nodes {
+  my ($self, $xml) = @_;
+
+  # regex to find bookmark tags
+  state $bookmark_rx = qr{
+     (                               # the whole tag                       -- capture 1
+      <w:bookmark(Start|End)         # kind of tag name                    -- capture 2
+        .+?                          # optional attributes (may be w:colFirst, w:colLast) -- no capture
+        w:id="(\d+)"                 # 'id' attribute, bookmark identifier -- capture 3
+        (?: \h+ w:name="([^"]+)")?   # optional 'name' attribute           -- capture 4
+        \h* />                       # end of this tag
+     )                               # end of capture 1
+    }sx;
+
+  # split the whole xml according to the regex. Captured groups are also added to the stack
+  my @xml_chunks = split /$bookmark_rx/, $xml;
+
+  # walk through the list of fragments and build a stack of hashrefs as bookmark nodes
+  my @bookmark_nodes;
+  while (my @chunk = splice @xml_chunks, 0, 5) {
+    my %node;  @node{qw/xml_before node_xml node_kind id name/} = @chunk; # initialize a node hash
+    $node{$_} //= "" for qw/xml_before node_kind node_xml/;               # empty strings instead of undef
+    push @bookmark_nodes, \%node;
+  }
+  # note : in most cases the last "node" is not really a node : it has no 'node_kind', but only 'xml_before'
+  
+  # return the stack
+  return @bookmark_nodes;
+}
+
+
+
 sub suppress_bookmarks {
   my ($self, @names_to_erase) = @_;
 
-  # closure to decide what to do with bookmark contents
+  # names of special bookmarks (typically ASK fields) for which the content needs to be erased
   my %should_erase_contents = map {($_ => 1)} @names_to_erase;
-  my $deal_with_bookmark_text = sub {
-    my ($bookmark_name, $bookmark_contents) = @_;
-    return $should_erase_contents{$bookmark_name} ? "" : $bookmark_contents;
-  };
 
-  # regex to find bookmarks markup
-  state $bookmark_rx = qr{
-     <w:bookmarkStart         # initial tag
-       .+? w:id="(\d+)"       # 'id' attribute, bookmark identifier -- capture 1
-       .+? w:name="([^"]+)"   # 'name' attribute                    -- capture 2
-       .*? />                 # end of this tag
-       (.*?)                  # bookmark contents (may be empty)    -- capture 3
-     <w:bookmarkEnd           # ending tag
-       \s+ w:id="\1"          # same 'id' attribute
-       .*? />                 # end of this tag
-    }sx;
+  # loop on bookmark nodes
+  my @bookmark_nodes = $self->_split_into_bookmark_nodes($self->contents);
+  my %node_ix_by_id;
+  while (my ($ix, $node) = each @bookmark_nodes) {
+    if ($node->{node_kind} eq 'Start') {
+      $node_ix_by_id{$node->{id}} = $ix;
+    }
+    elsif ($node->{node_kind} eq 'End') {
+      # find the corresponding bookmarkStart node
+      my $start_ix       = $node_ix_by_id{$node->{id}};
+      my $start_node     = $bookmark_nodes[$start_ix];
+      my $bookmark_name  = $start_node->{name};
 
-  # remove bookmarks markup
-  my $contents = $self->contents;
-  $contents    =~ s{$bookmark_rx}{$deal_with_bookmark_text->($2, $3)}eg;
+      # erase the start and end bookmark nodes
+      $start_node->{node_xml} = "";
+      $node->{node_xml}       = "";
 
-  # re-inject the modified contents
-  $self->contents($contents);
+      # if necessary, also erase other xml between start and end
+      if ($should_erase_contents{$bookmark_name}) {
+        for my $erase_ix ($start_ix+1 .. $ix) {
+          my $local_node = $bookmark_nodes[$erase_ix];
+          !$local_node->{node_xml}
+            or die "cannot erase contents of bookmark '$bookmark_name' "
+                  . "because it contains the start of bookmark '$local_node->{name}'";
+          $local_node->{xml_before} = "";
+        }
+      }
+    }
+  }
+
+  # re-build the whole XML from all remaining fragments, and inject it back
+  my $new_contents = join "", map {@{$_}{qw/xml_before node_xml/}} @bookmark_nodes;
+  $self->contents($new_contents);
 }
+
+
+sub reveal_bookmarks {
+  my ($self, @marking_args) = @_;
+
+  # auxiliary objects
+  my $marker            = MsOffice::Word::Surgeon::PackagePart::_BookmarkMarker->new(@marking_args);
+  my $paragraph_tracker = MsOffice::Word::Surgeon::PackagePart::_ParaTracker->new;
+
+  # loop over bookmark nodes
+  my @bookmark_name_by_id;
+
+  my @bookmark_nodes    = $self->_split_into_bookmark_nodes($self->contents);
+  foreach my $node (@bookmark_nodes) {
+
+    # count opening and closing paragraphs in xml before this node
+    $paragraph_tracker->count_paragraphs($node->{xml_before});
+
+    # add visible runs before or after bookmark nodes
+    if ($node->{node_kind} eq 'Start') {
+      $bookmark_name_by_id[$node->{id}] = $node->{name};
+      substr $node->{node_xml}, 0, 0, $paragraph_tracker->maybe_add_paragraph($marker->mark($node->{name}, 0));
+    }
+    elsif ($node->{node_kind} eq 'End') {
+      my $bookmark_name  = $bookmark_name_by_id[$node->{id}];
+      $node->{node_xml} .= $paragraph_tracker->maybe_add_paragraph($marker->mark($bookmark_name, 1));
+    }
+  }
+
+  # re-build the whole XML and inject it back
+  my $new_contents = join "", map {@{$_}{qw/xml_before node_xml/}} @bookmark_nodes;
+  $self->contents($new_contents);
+}
+
 
 sub merge_runs {
   my ($self, %args) = @_;
@@ -507,11 +587,93 @@ sub parse_attrs {  # cheap parsing of attribute lists in an XML node
   my %attr;
   while ($lst_attrs =~ /$attr_pair_regex/g) {
     my ($name, $val) = ($1, $2 // $3);
-    $val =~ s/&(entity_names);/$entity->{$1}/eg;
+    decode_entities($val);
     $attr{$name} = $val;
   }
 
   return %attr;
+}
+
+
+#======================================================================
+# INTERNAL CLASS FOR TRACKING PARAGRAPHS
+#======================================================================
+
+package # hide from PAUSE
+        MsOffice::Word::Surgeon::PackagePart::_ParaTracker;
+use strict;
+use warnings;
+
+sub new {
+  my $class = shift;
+  my $nb_para = 0;
+  bless \$nb_para, $class;
+}
+
+sub count_paragraphs {
+  my ($self, $xml) = @_;
+
+  # count opening and closing paragraph nodes
+  while ($xml =~  m[<(/)?w:p.*?(/)?>]g) {
+    next if $2; # self-ending node -- doesn't change the number of paragraphs
+    $$self += $1 ? -1 : +1;
+  }
+}
+
+sub maybe_add_paragraph {
+  my ($self, $xml) = @_;  
+
+  # add paragraph nodes only if the ParaTracker is currently outside of any paragraph
+  my $is_outside_para = !$$self;
+  return $is_outside_para && $xml ? "<w:p>$xml</w:p>" : $xml;
+};
+  
+
+#======================================================================
+# INTERNAL CLASS FOR INTRODUCING BOOKMARK MARKERS
+#======================================================================
+
+package # hide from PAUSE
+        MsOffice::Word::Surgeon::PackagePart::_BookmarkMarker;
+use strict;
+use warnings;
+use MsOffice::Word::Surgeon::Utils qw(encode_entities);
+use Carp                           qw(croak carp);
+
+sub new {
+  my $class = shift;
+  my %self = @_;
+
+  $self{color} //= "yellow";
+  $self{props} //=  qq{<w:highlight w:val="%s"/>};
+  $self{start} //=  "<%s>";
+  $self{end}   //=  "</%s>";
+  $self{ignore}  = qr/^_/ if not exists $self{ignore};
+
+  $self{color} =~ m{ ^( black     | blue | cyan | darkBlue    | darkCyan |
+                        darkGray  | darkGreen   | darkMagenta | darkRed  | darkYellow | green |
+                        lightGray | magenta     | none        | red      | white      | yellow )$}x
+    or carp "invalid color : $self{color}";                          
+                          
+  bless \%self, $class;
+}
+
+sub mark {
+  my ($self, $bookmark_name, $is_end_node) = @_;
+
+  # some bookmarks are just ignored
+  return ""
+    if $self->{ignore} and $bookmark_name =~ $self->{ignore};
+
+  # build the visible text
+  no warnings 'redundant'; # because sprintf templates may decide not to use their arguments
+  my $sprintf_node = $is_end_node ? $self->{end} : $self->{start};
+  my $text         = sprintf $sprintf_node, $bookmark_name;
+  my $props        = sprintf $self->{props}, $self->{color};
+  encode_entities($text);
+
+  # full xml for a visible run before or after the boookmark node
+  return "<w:r><w:rPr>$props</w:rPr><w:t>$text</w:t></w:r>";
 }
 
 
@@ -754,6 +916,55 @@ intact the contents of the bookmark. However, when the name of a
 bookmark belongs to the list C<< @names_to_erase >>, the contents
 is also removed. Currently this is used for suppressing ASK fields,
 because such fields contain a bookmark content that is never displayed by MsWord.
+
+
+=head3 reveal_bookmarks
+
+  $part->reveal_bookmarks(color => 'green');
+
+Usually bookmarks in MsWord are not visible; the only way to have a visual clue is to turn on
+an option in
+L<https://support.microsoft.com/en-gb/office/troubleshoot-bookmarks-9cad566f-913d-49c6-8d37-c21e0e8d6db0|Advanced / Show document content / Show bookmarks> -- but this only displays where bookmarks start and end, without the names of the bookmarks.
+
+The C<reveal_bookmarks()> method will insert a visible run before each bookmark start and after each bookmark end, showing
+the bookmark name. This is an interesting tool for documenting where bookmarks are located in an existing document.
+
+Options to this method are :
+
+=over
+
+=item color
+
+The highligting color for visible marks. This should be a valid
+highlighting color, i.e black, blue, cyan, darkBlue, darkCyan,
+darkGray, darkGreen, darkMagenta, darkRed, darkYellow, green,
+lightGray, magenta, none, red, white or yellow. Default is yellow.
+
+=item props
+
+A string in C<sprintf> format for building the XML to be inserted in C<< <w:rPr> >> node
+when displaying bookmarks marks, i.e. the style for displaying such marks.
+The default is just a highlighting property :  C<< <w:highlight w:val="%s"/> >>.
+
+=item start
+
+A string in C<sprintf> format for generating text before a bookmark start.
+Default is C<< <%s> >>.
+
+=item end
+
+A string in C<sprintf> format for generating text after a bookmark end.
+Default is C<< </%s> >>.
+
+=item ignore
+
+A regexp for deciding wich bookmarks will not be revealed. Default is C<< qr/^_/ >>,
+because bookmarks with an initidal underscore are usually technical bookmarks inserted
+automatically by MsWord, such as C<_GoBack> or C<_Toc53196147>.
+
+
+=back
+
 
 
 

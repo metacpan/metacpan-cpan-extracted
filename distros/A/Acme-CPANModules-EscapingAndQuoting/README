@@ -1,51 +1,73 @@
 NAME
-    Acme::CPANModules::EscapingAndQuoting - Various modules that
+    Acme::CPANModules::EscapingAndQuoting - List of modules that
     escape/quote data to make it safe
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Acme::CPANModules::EscapingAndQuoting (from Perl distribution
-    Acme-CPANModules-EscapingAndQuoting), released on 2019-12-24.
+    Acme-CPANModules-EscapingAndQuoting), released on 2023-10-29.
 
-DESCRIPTION
-    Various modules that escape/quote data to make it safe.
+ACME::CPANMODULES ENTRIES
+    HTML::Entities
+        Author: OALDERS <https://metacpan.org/author/OALDERS>
 
-INCLUDED MODULES
-    *   HTML::Entities
-
-    *   URI::Escape
+    URI::Escape
+        Author: OALDERS <https://metacpan.org/author/OALDERS>
 
         Alternate modules: URI::Escape::XS
 
-    *   String::PodQuote
+    String::PodQuote
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   String::ShellQuote
+    String::ShellQuote
+        Author: ROSCH <https://metacpan.org/author/ROSCH>
 
         Alternate modules: Win32::ShellQuote, ShellQuote::Any,
         ShellQuote::Any::Tiny
 
-    *   String::ShellQuote
+    String::ShellQuote
+        Author: ROSCH <https://metacpan.org/author/ROSCH>
 
-    *   String::Escape
+    String::Escape
+        Author: EVO <https://metacpan.org/author/EVO>
 
-    *   String::JS
+    String::JS
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Unicode::Escape
+    Unicode::Escape
+        Author: ITWARRIOR <https://metacpan.org/author/ITWARRIOR>
 
-    *   TeX::Encode
+    TeX::Encode
+        Author: ATHREEF <https://metacpan.org/author/ATHREEF>
 
-    *   String::PerlQuote
+    String::PerlQuote
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   MIME::Base64
+    MIME::Base64
+        Author: CAPOEIRAB <https://metacpan.org/author/CAPOEIRAB>
 
-    *   Data::Clean
+    Data::Clean
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Data::Clean::ForJSON
+    Data::Clean::ForJSON
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
 FAQ
-  What are ways to use this module?
-    Aside from reading it, you can install all the listed modules using
-    cpanmodules:
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n EscapingAndQuoting
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
 
         % cpanmodules ls-entries EscapingAndQuoting | cpanm -n
 
@@ -53,9 +75,15 @@ FAQ
 
         % perl -MAcme::CM::Get=EscapingAndQuoting -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-    This module also helps lcpan produce a more meaningful result for "lcpan
-    related-mods" when it comes to finding related modules for the modules
-    listed in this Acme::CPANModules module.
+    or directly:
+
+        % perl -MAcme::CPANModules::EscapingAndQuoting -E'say $_->{module} for @{ $Acme::CPANModules::EscapingAndQuoting::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -65,14 +93,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANModules-EscapingAndQuoting>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Esca
-    pingAndQuoting>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Acme::CPANModules - about the Acme::CPANModules namespace
 
@@ -81,9 +101,34 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2023, 2019 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Esca
+    pingAndQuoting>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

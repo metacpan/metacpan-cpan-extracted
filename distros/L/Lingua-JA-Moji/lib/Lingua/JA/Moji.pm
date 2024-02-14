@@ -7,7 +7,7 @@ use utf8;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 use Carp 'croak';
 use Convert::Moji qw/make_regex length_one unambiguous/;
@@ -32,9 +32,11 @@ our @EXPORT_OK = qw/
     hw2katakana
     is_hiragana
     is_kana
+    is_katakana
     is_romaji
     is_romaji_semistrict
     is_romaji_strict
+    is_small
     is_voiced
     join_sound_marks
     kana2braille
@@ -676,6 +678,16 @@ sub romaji2kana
     return $input;
 }
 
+sub is_small
+{
+    my ($input) = @_;
+    if ($input =~/[ぁぃぅぇぉっゃゅょゕゖゎヮァィゥェォッャュョヵヶ]/) {
+	return 1;
+    }
+    return undef;
+}
+
+
 sub is_voiced
 {
     my ($sound) = @_;
@@ -721,36 +733,36 @@ sub is_romaji_semistrict
 	return undef;
     }
     if ($romaji =~ /
-		       # Don't allow small vowels, small tsu, or fya,
-		       # fye etc.
-		       (fy|l|x|v)y?($vowel_re|ts?u|wa|ka|ke)
-		   |
-		       # Don't allow hyi, hye, yi, ye.
-		       [zh]?y[ieêîē]
-		   |
-		       # Don't allow tye
-		       ty[eêē]
-		   |
-		       # Don't allow wh-, kw-, gw-, dh-, etc.
-		       (wh|kw|gw|dh|thy)$vowel_re
-		   |
-		       # Don't allow "t'i"
-		       [dt]'(i|y?$u_re)
-		   |
-		       # Don't allow dwu, twu
-		       [dt](w$u_re)
-		   |
-		       hwy$u_re
-		   |
-		       # Don't allow "wi" or "we".
-		       w(i|e)
-		   |
-		       # Don't allow some non-Japanese double consonants.
-		       (?:rr|yy)
-		   |
-		       # Don't allow 'thi'
-		       thi
-		   /ix) {
+	# Don't allow small vowels, small tsu, or fya,
+	# fye etc.
+	(fy|l|x|v)y?($vowel_re|ts?u|wa|ka|ke)
+    |
+	# Don't allow hyi, hye, yi, ye.
+	[zh]?y[ieêîē]
+    |
+	# Don't allow tye
+	ty[eêē]
+    |
+	# Don't allow wh-, kw-, gw-, dh-, etc.
+	(wh|kw|gw|dh|thy)$vowel_re
+    |
+	# Don't allow "t'i"
+	[dt]'(i|y?$u_re)
+    |
+	# Don't allow dwu, twu
+	[dt](w$u_re)
+    |
+	hwy$u_re
+    |
+	# Don't allow "wi" or "we".
+	w(i|e)
+    |
+	# Don't allow some non-Japanese double consonants.
+	(?:rr|yy)
+    |
+	# Don't allow 'thi'
+	thi
+    /ix) {
         return undef;
     }
     return 1;
@@ -765,67 +777,67 @@ sub is_romaji_strict
     }
     my $kana = romaji2kana ($romaji);
     if ($kana =~ m!
-		      # Don't allow tanggono
-		      ンッ
-		  |
-		      # Don't allow "nmichi".
-		      ^ン
-		  |
-		      # Don't allow ffun etc.
-		      ^ッ
-		  !x) {
+	# Don't allow tanggono
+	ンッ
+    |
+	# Don't allow "nmichi".
+	^ン
+    |
+	# Don't allow ffun etc.
+	^ッ
+    !x) {
 	return undef;
     }
     if ($romaji =~ m!
-		       (fy|l|x|v)y?($vowel_re|ts?u|wa|ka|ke)
-		   |
-		       # Don't allow hyi, hye, yi, ye.
-		       [zh]?y[ieêîē]
-		   |
-		       # Don't allow tye
-		       ty[eêē]
-		   |
-		       # Don't allow wh-, kw-, gw-, dh-, etc.
-		       (wh|kw|gw|dh|thy)$vowel_re
-		   |
-		       # Don't allow tsa, tsi, tse, tso, fa, fe, fi, fo.
-		       (ts|f)$no_u_vowel_re
-		   |
-		       # Don't allow "t'i"
-		       [dt]'(i|y?$u_re)
-		   |
-		       # Don't allow dwu, twu
-		       [dt](w$u_re)
-		   |
-		       hwy$u_re
-		   |
-		       # Don't allow "wi" or "we".
-		       w(i|e)
-		   |
-		       # Don't allow 'je', 'che', 'she'
-		       (?:[cs]h|j)e
-		   |
-		       # Don't allow some non-Japanese double consonants.
-		       (?:rr|yy)
-		   |
-		       # Don't allow 'thi'/'thu'
-		       th[iu]
-		   |
-		       # Don't allow 'johann'
-		       nn$
-		   |
-		       # Don't allow 'ridzuan' etc.
-		       dz
-		   |
-		       # Qs are out.
-		       q
-		   |
-		       # Double ws, hs, etc. are out
-		       ww|hh|bb
-		   |
-		       # This is allowed by IMEs as "ちゃ" etc.
-		       cy
-		   !ix) {
+	(fy|l|x|v)y?($vowel_re|ts?u|wa|ka|ke)
+    |
+	# Don't allow hyi, hye, yi, ye.
+	[zh]?y[ieêîē]
+    |
+	# Don't allow tye
+	ty[eêē]
+    |
+	# Don't allow wh-, kw-, gw-, dh-, etc.
+	(wh|kw|gw|dh|thy)$vowel_re
+    |
+	# Don't allow tsa, tsi, tse, tso, fa, fe, fi, fo.
+	(ts|f)$no_u_vowel_re
+    |
+	# Don't allow "t'i"
+	[dt]'(i|y?$u_re)
+    |
+	# Don't allow dwu, twu
+	[dt](w$u_re)
+    |
+	hwy$u_re
+    |
+	# Don't allow "wi" or "we".
+	w(i|e)
+    |
+	# Don't allow 'je', 'che', 'she'
+	(?:[cs]h|j)e
+    |
+	# Don't allow some non-Japanese double consonants.
+	(?:rr|yy)
+    |
+	# Don't allow 'thi'/'thu'
+	th[iu]
+    |
+	# Don't allow 'johann'
+	nn$
+    |
+	# Don't allow 'ridzuan' etc.
+	dz
+    |
+	# Qs are out.
+	q
+    |
+	# Double ws, hs, etc. are out
+	ww|hh|bb
+    |
+	# This is allowed by IMEs as "ちゃ" etc.
+	cy
+    !ix) {
         return undef;
     }
     return $canonical;
@@ -866,9 +878,11 @@ sub make_dak_list
 
 sub load_kana2hw2
 {
-    my $conv = Convert::Moji->new (["oneway", "tr", "あ-ん", "ア-ン"],
-				   ["file",
-				    getdistfile ("katakana2hw_katakana")]);
+    my $conv = Convert::Moji->new (
+	["oneway", "tr", "あ-ん", "ア-ン"],
+	["file",
+	 getdistfile ("katakana2hw_katakana")]
+    );
     return $conv;
 }
 
@@ -1023,6 +1037,15 @@ sub is_kana
 {
     my ($may_be_kana) = @_;
     if ($may_be_kana =~ /^[あ-んア-ン]+$/) {
+        return 1;
+    }
+    return;
+}
+
+sub is_katakana
+{
+    my ($may_be_kana) = @_;
+    if ($may_be_kana =~ /^[ア-ン]+$/) {
         return 1;
     }
     return;
@@ -1204,6 +1227,7 @@ sub normalize_romaji
     my $kana = romaji2kana ($romaji, {wapuro => 1});
     $kana =~ s/[っッ]/xtu/g;
     my $romaji_out = kana2romaji ($kana, {ve_type => 'wapuro'});
+    return $romaji_out;
 }
 
 my $new2old_kanji;
@@ -1326,16 +1350,16 @@ sub hangul2kana
 }
 
 my %small2large = qw!
-ゃ や
-ゅ ゆ
-ょ よ
-ぁ あ
-ぃ い
-ぅ う
-ぇ え
-ぉ お
-っ つ
-ゎ わ
+    ゃ や
+    ゅ ゆ
+    ょ よ
+    ぁ あ
+    ぃ い
+    ぅ う
+    ぇ え
+    ぉ お
+    っ つ
+    ゎ わ
 !;
 
 sub kana_to_large
@@ -1566,10 +1590,10 @@ sub kanji2hentai
 }
 
 my %yayuyo = (qw/
-		    ヤ ャ
-		    ユ ュ
-		    ヨ ョ
-		/);
+    ヤ ャ
+    ユ ュ
+    ヨ ョ
+/);
 
 my %l2s = qw!ア ァ イ ィ ウ ゥ エ ェ オ ォ!;
 
@@ -1654,6 +1678,7 @@ sub kana_consonant
 	$first = $not;
     }
     my $con = $siin{$first};
+    return $con;
 }
 
 1;

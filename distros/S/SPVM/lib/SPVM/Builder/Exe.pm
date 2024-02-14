@@ -135,6 +135,17 @@ sub mode {
   }
 }
 
+sub optimize {
+  my $self = shift;
+  if (@_) {
+    $self->{optimize} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{optimize};
+  }
+}
+
 # Methods
 sub new {
   my $class = shift;
@@ -211,6 +222,11 @@ sub new {
   my $compiler = SPVM::Native::Compiler->new;
   $compiler->add_include_dir($_) for @{$builder->include_dirs};
   $self->{compiler} = $compiler;
+  
+  my $optimize = $self->{optimize};
+  if (defined $optimize) {
+    $config->set_global_optimize($optimize);
+  }
   
   return bless $self, $class;
 }
@@ -420,6 +436,8 @@ sub compile_source_file {
   my $config = $options->{config};
   my $config_exe = $self->config;
   
+  $config->config_exe($config_exe);
+  
   my $config_exe_loaded_config_files = $config_exe->get_loaded_config_files;
   my $config_loaded_config_files = $config->get_loaded_config_files;
   my $need_generate_input_files = [$source_file, @$config_loaded_config_files, @$config_exe_loaded_config_files];
@@ -440,9 +458,6 @@ sub compile_source_file {
     quiet => $self->quiet,
     force => $self->force,
   );
-  
-  my $before_each_compile_cbs = $config_exe->before_each_compile_cbs;
-  $config->add_before_compile_cb(@$before_each_compile_cbs);
   
   my $compile_info = SPVM::Builder::CompileInfo->new(
     output_file => $output_file,

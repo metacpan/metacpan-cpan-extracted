@@ -3,12 +3,12 @@ use 5.24.0;
 use Moose;
 use MooseX::StrictConstructor;
 use Moose::Util::TypeConstraints;
-use Carp                           qw(croak);
+use Carp::Clan                     qw(^MsOffice::Word::Surgeon); # will import carp, croak, etc.
 use POSIX                          qw(strftime);
 use MsOffice::Word::Surgeon::Utils qw(maybe_preserve_spaces);
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 subtype 'Date_ISO',
   as      'Str',

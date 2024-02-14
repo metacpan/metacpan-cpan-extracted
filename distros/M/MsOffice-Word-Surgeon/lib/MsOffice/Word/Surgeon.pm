@@ -4,7 +4,7 @@ use Moose;
 use MooseX::StrictConstructor;
 use Archive::Zip                          qw(AZ_OK);
 use Encode                                qw(encode_utf8 decode_utf8);
-use Carp                                  qw(croak);
+use Carp::Clan                            qw(^MsOffice::Word::Surgeon); # will import carp, croak, etc.
 use MsOffice::Word::Surgeon::Revision;
 use MsOffice::Word::Surgeon::PackagePart;
 
@@ -15,7 +15,7 @@ sub has_inner ($@) {my $attr = shift; has_lazy($attr => @_, init_arg => undef)}
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 
 #======================================================================
@@ -80,9 +80,12 @@ sub BUILD {
 sub _zip {
   my $self = shift;
 
+  -f $self->{docx}
+    or croak "file $self->{docx} does not exist";
+
   my $zip = Archive::Zip->new;
   $zip->read($self->{docx}) == AZ_OK
-      or croak "cannot unzip $self->{docx}";
+    or croak "cannot unzip $self->{docx}";
 
   return $zip;
 }
@@ -255,6 +258,9 @@ MsOffice::Word::Surgeon - tamper with the guts of Microsoft docx documents, with
   # extract plain text
   my $main_text    = $surgeon->document->plain_text;
   my @header_texts = map {$surgeon->part($_)->plain_text} $surgeon->headers;
+
+  # reveal bookmarks
+  $surgeon->document->reveal_bookmarks(color => 'cyan');
 
   # anonymize
   my %alias = ('Claudio MONTEVERDI' => 'A_____', 'Heinrich SCHÜTZ' => 'B_____');
@@ -499,6 +505,11 @@ of the inserted text
 
 =back
 
+
+=head2 Operations on parts
+
+See the L<MsOffice::Word::Surgeon::PackagePart> documentation for other
+operations on package parts.
 
 =head1 SEE ALSO
 

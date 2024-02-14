@@ -1,3 +1,13 @@
+0.1.1   2024-01-23  Released-By: PERLANCAR; Urgency: low
+
+        - No spec changes.
+
+        - Reorganize See Also section, mention SortKey specification to replace
+          Data::Sah::Filter::perl.
+
+        - [bugfix] Fix examples.
+
+
 0.1.0   2024-01-22  Released-By: PERLANCAR
 
         - First, early release.

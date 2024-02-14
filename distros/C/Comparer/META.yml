@@ -19,12 +19,12 @@ name: Comparer
 provides:
   Comparer:
     file: lib/Comparer.pm
-    version: v0.1.0
+    version: v0.1.1
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Comparer
   homepage: https://metacpan.org/release/Comparer
   repository: git://github.com/perlancar/perl-Comparer.git
-version: 0.1.0
+version: 0.1.1
 x_Dist_Zilla:
   perl:
     version: '5.038002'

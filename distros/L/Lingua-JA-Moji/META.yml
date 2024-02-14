@@ -1,13 +1,13 @@
 ---
 abstract: 'Handle many kinds of Japanese characters'
 author:
-  - 'Ben Bullock <bkb@cpan.org>'
+  - 'Ben Bullock <benkasminbullock@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,11 +21,11 @@ no_index:
   file:
     - t/LJMT.pm
 requires:
-  Convert::Moji: '0.05'
-  JSON::Parse: '0.61'
+  Convert::Moji: '0.11'
+  JSON::Parse: '0.62'
   perl: '5.008009'
 resources:
   bugtracker: https://github.com/benkasminbullock/Lingua-JA-Moji/issues
   repository: https://github.com/benkasminbullock/Lingua-JA-Moji
-version: '0.59'
+version: '0.60'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

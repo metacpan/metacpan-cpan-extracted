@@ -8,12 +8,12 @@ my $repo = 'https://github.com/benkasminbullock/Lingua-JA-Moji';
 
 WriteMakefile (
     NAME => 'Lingua::JA::Moji',
-    AUTHOR => 'Ben Bullock <bkb@cpan.org>',
+    AUTHOR => 'Ben Bullock <benkasminbullock@gmail.com>',
     VERSION_FROM => $pm,
     ABSTRACT_FROM => $pod,
     PREREQ_PM => {
-        'Convert::Moji' => '0.05',
-	'JSON::Parse' => '0.61',
+        'Convert::Moji' => '0.11',
+	'JSON::Parse' => '0.62',
     },
     META_MERGE => {
         resources => {

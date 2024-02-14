@@ -25,7 +25,7 @@ produces output
     アイウエオ
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.59/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.60/examples/synopsis.pl> in the distribution.)
 
 
 Convert between different forms of kana:
@@ -51,13 +51,13 @@ produces output
     ㋐㋑㋒㋓㋔㋕゛ッ㋫゜㋪゜ョン
 
 
-(This example is included as L<F<syn-kana.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.59/examples/syn-kana.pl> in the distribution.)
+(This example is included as L<F<syn-kana.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.60/examples/syn-kana.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.59
-corresponding to git commit L<be2468e4970005f644414a88bacd3580379a73a1|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/be2468e4970005f644414a88bacd3580379a73a1> made on Thu Feb 18 20:24:17 2021 +0900.
+This document describes Lingua::JA::Moji version 0.60
+corresponding to git commit L<9ad3d6b5308d54f0c1eae61dc5bf7119c2670074|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/9ad3d6b5308d54f0c1eae61dc5bf7119c2670074> made on Wed Feb 14 15:11:13 2024 +0900.
 
 =head1 説明
 
@@ -551,6 +551,40 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 
 入力が仮名のみの場合、真、入力が仮名なでない文字を含む場合、偽(undef)。
+
+
+
+
+
+
+
+=head2 is_katakana 
+
+
+
+    use Lingua::JA::Moji 'is_katakana';
+
+
+Returns a true value if the string is katakana. At the moment this
+doesn't do the half-width katakana or squared symbol katakana.
+
+
+
+
+
+
+
+=head2 is_small 
+
+
+
+    use Lingua::JA::Moji 'is_small';
+    $is_small = ('ぁ');
+
+
+
+Returns a true value for small kana, kana which have a bigger version
+as well, such as ぁ and あ.
 
 
 
@@ -1411,7 +1445,7 @@ produces output
     アッタカ〜イ -> アッタカアイ
 
 
-(This example is included as L<F<onbiki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.59/examples/onbiki.pl> in the distribution.)
+(This example is included as L<F<onbiki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.60/examples/onbiki.pl> in the distribution.)
 
 
 =item L<Lingua::JA::Regular::Unicode>
@@ -1620,7 +1654,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2008-2021
+2008-2024
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

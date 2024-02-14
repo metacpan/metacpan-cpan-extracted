@@ -28,24 +28,24 @@ ok (! is_romaji_strict ('-romaji'), "hyphen as first character rejected");
 ok (! is_romaji_semistrict ('-romaji'), "hyphen as first character rejected");
 #TODO: {
 #    local $TODO = 'Fails from e2k';
-    my @fails = qw!
-		      zathura
-		      tanggono
-		      ridzuan
-		      chathuranga
-		      jorunn
-		      nmichi
-		      waqoo
-		      akeqi
-		      akisaiqin
-		      awwa
-		      bihho
-		      ffun
-		      bicyanide
-		  !;
-    for (@fails) {
-	ok (! is_romaji_strict ($_), "$_ is not Japanese");
-    }
+my @fails = qw!
+    zathura
+    tanggono
+    ridzuan
+    chathuranga
+    jorunn
+    nmichi
+    waqoo
+    akeqi
+    akisaiqin
+    awwa
+    bihho
+    ffun
+    bicyanide
+!;
+for (@fails) {
+    ok (! is_romaji_strict ($_), "$_ is not Japanese");
+}
 #};
 
 # List of romanizations we don't want to allow.
@@ -69,24 +69,24 @@ for my $x (@small_bad) {
 }
 # Other stuff we don't like.
 push @bad_boys, (qw/
-		       je
-		       she
-		       sye
-		       syi
-		       t'i
-		       t'u
-		       t'yu
-		       thi
-		       thy
-		       thya
-		       tsa
-		       tse
-		       tsi
-		       tso
-		       twu
-		       we
-		       wi
-		  /);
+    je
+    she
+    sye
+    syi
+    t'i
+    t'u
+    t'yu
+    thi
+    thy
+    thya
+    tsa
+    tse
+    tsi
+    tso
+    twu
+    we
+    wi
+/);
 
 my %c;
 
@@ -103,10 +103,5 @@ for my $bad_boy (@bad_boys) {
 	ok (is_romaji_semistrict ($bad_boy), "$bad_boy is like Japanese");
     }
 }
-TODO: {
-    local $TODO='bugs';
-# Add bugs here.
-#    ok (! is_romaji_strict ('1'), "'1' is not Japanese");
-};
 
 done_testing ();

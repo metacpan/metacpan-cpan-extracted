@@ -27,11 +27,11 @@ no_index:
 provides:
   App::bsky:
     file: lib/App/bsky.pm
-    version: '0.03'
+    version: '0.04'
   App::bsky::CLI:
     file: lib/App/bsky.pm
 requires:
-  At: '0.15'
+  At: '0.17'
   File::HomeDir: '0'
   Getopt::Long: '0'
   JSON::Tiny: '0'
@@ -43,7 +43,7 @@ resources:
   bugtracker: https://github.com/sanko/App-bsky/issues
   homepage: https://github.com/sanko/App-bsky
   repository: https://github.com/sanko/App-bsky.git
-version: '0.03'
+version: '0.04'
 x_authority: cpan:SANKO
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

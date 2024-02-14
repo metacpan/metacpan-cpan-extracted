@@ -4,7 +4,7 @@
 abstract: Mac::OSVersion - Get the Mac OS X or macOS system version
 authors:
 - alias: briandfoy
-  email: bdfoy@cpan.org
+  email: briandfoy@pobox.com
   family-names: foy
   given-names: brian d
   orcid: 0000-0002-0283-8283

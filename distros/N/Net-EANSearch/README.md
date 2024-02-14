@@ -44,7 +44,7 @@ use Net::EANSearch;
 
 my $API_TOKEN = $ENV{EAN_SEARCH_API_TOKEN};
 
-my $eansearch = EANSearch->new($API_TOKEN);
+my $eansearch = Net::EANSearch->new($API_TOKEN);
 
 my $ean = '5099750442227';
 my $isbn = '1119578884';
@@ -66,7 +66,7 @@ if (!defined($book)) {
 }
 
 my @product_list;
-@product_list = $eansearch->barcodePrefixSearch('885909', $EANSearch::ENGLISH);
+@product_list = $eansearch->barcodePrefixSearch('885909', $Net::EANSearch::ENGLISH);
 foreach my $p (@product_list) {
 	print "EAN $p->{ean} is $p->{name}\n";
 }
@@ -74,7 +74,7 @@ foreach my $p (@product_list) {
 my $page = 0;
 do {
 	$page++;
-	@product_list = $eansearch->productSearch('Bananaboat', $EANSearch::ALL_LANGUAGES, $page);
+	@product_list = $eansearch->productSearch('Bananaboat', $Net::EANSearch::ALL_LANGUAGES, $page);
 
 	foreach my $p (@product_list) {
 		print "EAN $p->{ean} is $p->{name}\n";

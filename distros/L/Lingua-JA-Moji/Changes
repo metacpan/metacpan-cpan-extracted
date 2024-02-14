@@ -1,5 +1,9 @@
 Revision history for perl module Lingua::JA::Moji
 
+0.60 2024-02-14
+
+* Added is_small and is_katakana functions
+
 0.59 2021-02-18
 
 * strip_sound_marks added

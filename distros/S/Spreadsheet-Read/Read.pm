@@ -38,7 +38,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.89";
+our $VERSION = "0.90";
 sub  Version { $VERSION }
 
 use Carp;
@@ -257,7 +257,7 @@ sub parses {
 	$@ = $1;
 	return 0;
 	}
-    return $can{$type};
+    return $can{$type} || 0;
     } # parses
 
 sub sheets {
@@ -572,6 +572,7 @@ sub ReadData {
 		attr	=> [],
 		merged	=> [],
 		active  => 1,
+		hidden	=> 0,
 		},
 	    );
 
@@ -845,6 +846,7 @@ sub ReadData {
 			MaxRow		=> $sh->{row_max},
 			MinCol		=> $sh->{col_min},
 			MaxCol		=> $sh->{row_max},
+			SheetHidden	=> $sh->{sheet_hidden} || 0,
 			RowHidden	=> $sh->{hidden_rows},
 			ColHidden	=> $sh->{hidden_cols},
 			_SheetNo	=> $x++,
@@ -901,6 +903,7 @@ sub ReadData {
 		attr	=> [],
 		merged  => [],
 		active	=> 0,
+		hidden	=> $oWkS->{SheetHidden} || 0,
 		);
 	    # $debug and $sheet{_parser} = $oWkS;
 	    defined $sheet{label}  or  $sheet{label}  = "-- unlabeled --";
@@ -1125,6 +1128,7 @@ sub ReadData {
 		attr	=> [],
 		merged  => [],
 		active	=> 0,
+		hidden	=> 0,
 		);
 	    # $debug and $sheet{_parser} = $oWkS;
 	    defined $sheet{label} or $sheet{label} = "-- unlabeled --";
@@ -1277,6 +1281,7 @@ sub ReadData {
 		attr	=> [],
 		merged  => [],
 		active  => 1,
+		hidden	=> 0,
 		},
 	    );
 
@@ -1384,6 +1389,7 @@ sub ReadData {
 		    attr   => [],
 		    merged => [],
 		    active => 0,
+		    hidden => 0,
 		    );
 		my $sheet_idx = 1 + @data;
 		$debug and print STDERR "\tSheet $sheet_idx '$sheet{label}' $sheet{maxrow} rows\n";
@@ -1528,6 +1534,11 @@ sub active {
     return $sheet->{active};
     } # label
 
+sub hidden {
+    my $sheet = shift;
+    return $sheet->{hidden};
+    } # label
+
 # my @row = $sheet->cellrow (1);
 sub cellrow {
     my ($sheet, $row) = @_;
@@ -1656,6 +1667,7 @@ The data is returned as an array reference:
         attr    => [],
         merged  => [],
         active  => 1,
+        hidden  => 0,
         A1      => 1,
         B5      => "Nugget",
         },
@@ -2003,14 +2015,15 @@ use argument list, or call it fully qualified.
  $book->parses ("CSV"); # OO
 
 C<parses ()> returns Spreadsheet::Read's capability to parse the
-required format. L<C<ReadData>|/ReadData> will pick its preferred parser
-for that format unless overruled. See L<C<parser>|/parser>.
+required format or C<0> if it does not. L<C<ReadData>|/ReadData>
+will pick its preferred parser for that format unless overruled.
+See L<C<parser>|/parser>.
 
-C<parses ()> is not imported by default, so either specify it in the
-use argument list, or call it fully qualified.
+C<parses ()> is not imported by default, so either specify it in
+the use argument list, or call it fully qualified.
 
-If C<$format> is false (C<undef>, C<"">, or C<0>), C<parses ()> will
-return a sorted list of supported types.
+If C<$format> is false (C<undef>, C<"">, or C<0>), C<parses ()>
+will return a sorted list of supported types.
 
  @my types = parses ("");   # e.g: csv, ods, sc, sxc, xls, xlsx
 
@@ -2218,6 +2231,14 @@ Returns 1 if the selected sheet is active, otherwise returns 0.
 
 Currently only works on XLS (as of Spreadsheed::ParseExcel-0.61).
 CSV is always active.
+
+=head3 hidden
+
+ my $sheet_is_hidden = $sheet->hidden;
+
+Returns 1 if the selected sheet is hidden, otherwise returns 0.
+
+Fully depends on the backend supporting this.  CSV and SC are never hidden.
 
 =head2 Using CSV
 
@@ -2460,8 +2481,11 @@ Show (parts of) a spreadsheet in plain text, CSV, or HTML
         --list      Show supported spreadsheet formats and exit
         -u          Use unformatted values
         --strip[=#] Strip leading and/or traing spaces of all cells
+                    # & 01 = leading, # & 02 = trailing, 3 = default
+        --clip=#    Clip cells to max length #
         --noclip    Do not strip empty sheets and
                     trailing empty rows and columns
+        --no-empty  Skip empty rows
          --no-nl[=R] Replace all newlines in cells with R (default space)
         -e <enc>    Set encoding for input and output
         -b <enc>    Set encoding for input
@@ -2479,17 +2503,18 @@ Show (parts of) a spreadsheet in plain text, CSV, or HTML
         -s <sep>    Use separator <sep>. Default '|', \n allowed
                     Overrules ',' when used with --csv
         -L          Line up the columns
+        -B  --box   Like -L but also add outer frame
         -n [skip]   Number lines (prefix with column number)
                     optionally skip <skip> (header) lines
         -A          Show field attributes in ANSI escapes
         -h[#]       Show # header lines
         -D          Dump each record with Data::Peek or Data::Dumper
          --hash     Like -D but as hash with first row as keys
-     Output Index only:
-        -i          Show sheet names and size only
      Output CSV:
         -c          Output CSV, separator = ','
         -m          Output CSV, separator = ';'
+     Output Index only:
+        -i          Show sheet names and size only
      Output HTML:
         -H          Output HTML
      Selection:
@@ -2505,10 +2530,7 @@ Show (parts of) a spreadsheet in plain text, CSV, or HTML
                     #n   - order on column # numeric ascending
                     #r   - order on column # lexical descending
                     #rn  - order on column # numeric descending
-
- Examples:
-     xlscat -i foo.xls
-     xlscat --in-sep=: --sort=3n -L /etc/passwd
+ 
 
 =head2 C<xlsgrep>
 
@@ -2542,18 +2564,19 @@ Show (parts of) a spreadsheet that match a pattern in plain text, CSV, or HTML
         -s <sep>    Use separator <sep>. Default '|', \n allowed
                     Overrules ',' when used with --csv
         -L          Line up the columns
+        -B  --box   Like -L but also add outer frame
         -n [skip]   Number lines (prefix with column number)
                     optionally skip <skip> (header) lines
         -A          Show field attributes in ANSI escapes
         -h[#]       Show # header lines
         -D          Dump each record with Data::Peek or Data::Dumper
          --hash     Like -D but as hash with first row as keys
-     Grep options:
-        -i          Ignore case
-        -w          Match whole words only
      Output CSV:
         -c          Output CSV, separator = ','
         -m          Output CSV, separator = ';'
+     Grep options:
+        -i          Ignore case
+        -w          Match whole words only
      Output HTML:
         -H          Output HTML
      Selection:
@@ -2569,10 +2592,12 @@ Show (parts of) a spreadsheet that match a pattern in plain text, CSV, or HTML
                     #n   - order on column # numeric ascending
                     #r   - order on column # lexical descending
                     #rn  - order on column # numeric descending
-
+ 
  Examples:
-     xlscat -i foo.xls
-     xlscat --in-sep=: --sort=3n -L /etc/passwd
+     xlscat   -i foo.xls
+     xlscat   --in-sep=: --sort=3n -L /etc/passwd
+     xlsgrep  pattern file.ods
+
 
 =head2 C<xlsx2csv>
 

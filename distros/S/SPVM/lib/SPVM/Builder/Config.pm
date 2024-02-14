@@ -197,6 +197,17 @@ sub source_files {
   }
 }
 
+sub after_create_compile_info_cbs {
+  my $self = shift;
+  if (@_) {
+    $self->{after_create_compile_info_cbs} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{after_create_compile_info_cbs};
+  }
+}
+
 sub before_compile_cbs {
   my $self = shift;
   if (@_) {
@@ -293,6 +304,17 @@ sub libs {
   }
   else {
     return $self->{libs};
+  }
+}
+
+sub after_create_link_info_cbs {
+  my $self = shift;
+  if (@_) {
+    $self->{after_create_link_info_cbs} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{after_create_link_info_cbs};
   }
 }
 
@@ -507,6 +529,11 @@ sub new {
     $self->source_files([]);
   }
   
+  # after_create_compile_info_cbs
+  unless (defined $self->{after_create_compile_info_cbs}) {
+    $self->after_create_compile_info_cbs([]);
+  }
+  
   # before_compile_cbs
   unless (defined $self->{before_compile_cbs}) {
     $self->before_compile_cbs([]);
@@ -572,6 +599,11 @@ sub new {
   # libs
   unless (defined $self->{libs}) {
     $self->libs([]);
+  }
+  
+  # after_create_link_info_cbs
+  unless (defined $self->{after_create_link_info_cbs}) {
+    $self->after_create_link_info_cbs([]);
   }
   
   # before_link_cbs
@@ -760,10 +792,22 @@ sub add_source_file {
   push @{$self->{source_files}}, @source_files;
 }
 
+sub add_after_create_compile_info_cb {
+  my ($self, @after_create_compile_info_cbs) = @_;
+  
+  push @{$self->{after_create_compile_info_cbs}}, @after_create_compile_info_cbs;
+}
+
 sub add_before_compile_cb {
   my ($self, @before_compile_cbs) = @_;
   
   push @{$self->{before_compile_cbs}}, @before_compile_cbs;
+}
+
+sub add_after_create_link_info_cb {
+  my ($self, @after_create_link_info_cbs) = @_;
+  
+  push @{$self->{after_create_link_info_cbs}}, @after_create_link_info_cbs;
 }
 
 sub add_before_link_cb {
@@ -1138,6 +1182,17 @@ Gets and sets the C<source_files> field, an array reference of source files used
 
 The source file names are specified as relative paths from the L</"native_src_dir"> field.
 
+=head2 after_create_compile_info_cbs
+
+  my $after_create_compile_info_cbs = $config->after_create_compile_info_cbs;
+  $config->after_create_compile_info_cbs($after_create_compile_info_cbs);
+
+Gets and sets the C<after_create_compile_info_cbs> field, an array reference of callbacks called just after creating compilation information.
+
+The 1th argument of the callback is a L<SPVM::Builder::Config> object.
+
+The 2th argument of the callback is a L<SPVM::Builder::CompileInfo> object.
+
 =head2 before_compile_cbs
 
   my $before_compile_cbs = $config->before_compile_cbs;
@@ -1221,6 +1276,17 @@ Gets and sets the C<ld_optimize> field, an optimization option for the linker L<
 Examples:
 
   $config->ld_optimize("-O3");
+
+=head2 after_create_link_info_cbs
+
+  my $after_create_link_info_cbs = $config->after_create_link_info_cbs;
+  $config->after_create_link_info_cbs($after_create_link_info_cbs);
+
+Gets and sets the C<after_create_link_info_cbs> field, an array reference of callbacks called just after creating link information.
+
+The 1th argument of the callback is a L<SPVM::Builder::Config> object.
+
+The 2th argument of the callback is a L<SPVM::Builder::LinkInfo> object.
 
 =head2 before_link_cbs
 
@@ -1496,6 +1562,10 @@ This is something like C</path/Foo.native/src>.
 
 []
 
+=item * L</"after_create_compile_info_cbs">
+
+[]
+
 =item * L</"before_compile_cbs">
 
 []
@@ -1646,6 +1716,22 @@ Examples:
 
   $config->add_source_file('foo.c', 'bar.c');
 
+=head2 add_after_create_compile_info_cb
+
+  $config->add_after_create_compile_info_cb(@after_create_compile_info_cbs);
+
+Adds callbacks called just after creating compilation information at the end of the L</"after_create_compile_info_cbs"> field.
+
+Examples:
+
+  $config->add_after_create_compile_info_cb(sub {
+    my ($config) = @_;
+    
+    my $cc = $config->cc;
+    
+    # Do something
+  });
+
 =head2 add_before_compile_cb
 
   $config->add_before_compile_cb(@before_compile_cbs);
@@ -1657,7 +1743,7 @@ Examples:
   $config->add_before_compile_cb(sub {
     my ($config, $compile_info) = @_;
     
-    my $cc = $compile_info->cc;
+    my $cc_command = $compile_info->to_command;
     
     # Do something
   });

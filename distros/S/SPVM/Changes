@@ -1,3 +1,33 @@
+0.989072 2023-02-14
+  [New Features]
+    * Add single quote string literal syntax.
+    
+      q'Hello World!'
+    
+    * Add the global_before_create_compile_info_cbs field to the SPVM::Builder::Config::Exe class.
+    * Add the add_global_before_create_compile_info_cb method to the SPVM::Builder::Config::Exe class.
+    * Add the after_create_compile_info_cbs method to the SPVM::Builder::Config class.
+    * Add the add_after_create_compile_info_cb method to the SPVM::Builder::Config class.
+    * Add the after_create_link_info_cbs to the SPVM::Builder::Config class.
+    * Add the add_after_create_link_info_cb to the SPVM::Builder::Config class.
+    * Add the set_global_optimize to the SPVM::Builder::Config::Exe class.
+  [Bug Fix]
+    * Fix the bug that not found basic type names cause segfault in the followin APIs.
+      call_class_method_by_name
+      call_instance_method_static_by_name
+      call_instance_method_by_name
+    * Fix bug that the following methods are not mortal.
+      call_class_method_by_name
+      call_instance_method_static_by_name
+      call_instance_method_by_name
+    * Fix bug that spvmcc do not set config_exe to compile SPVM core source and bootstrap source.
+  [Changes]
+    * Add periods to exception messages in native APIs.
+  [Incompatible Changes]
+    * The before_each_compile_cbs field in the SPVM::Builder::Config::Exe is renamed to global_before_compile_cbs.
+    * The add_before_each_compile_cb method in the SPVM::Builder::Config::Exe is renamed to add_global_before_compile_cb.
+    * before_compile_cbs are executed just before the compilation.
+    * before_link_cbs are executed just before the link.
 0.989071 2023-02-12
   [New Features]
     * Add the input_dir field to SPVM::Builder::Config.

@@ -94,14 +94,14 @@
    "provides" : {
       "At" : {
          "file" : "lib/At.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "At::Bluesky" : {
          "file" : "lib/At/Bluesky.pm"
       },
       "At::Lexicon::app::bsky::actor" : {
          "file" : "lib/At/Lexicon/app/bsky/actor.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "At::Lexicon::app::bsky::actor::adultContentPref" : {
          "file" : "lib/At/Lexicon/app/bsky/actor.pm"
@@ -192,7 +192,7 @@
       },
       "At::Lexicon::app::bsky::feed" : {
          "file" : "lib/At/Lexicon/app/bsky/feed.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "At::Lexicon::app::bsky::feed::blockedAuthor" : {
          "file" : "lib/At/Lexicon/app/bsky/feed.pm"
@@ -274,7 +274,7 @@
       },
       "At::Lexicon::app::bsky::graph" : {
          "file" : "lib/At/Lexicon/app/bsky/graph.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "At::Lexicon::app::bsky::graph::block" : {
          "file" : "lib/At/Lexicon/app/bsky/graph.pm"
@@ -311,11 +311,11 @@
       },
       "At::Lexicon::app::bsky::notification" : {
          "file" : "lib/At/Lexicon/app/bsky/notification.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "At::Lexicon::app::bsky::richtext" : {
          "file" : "lib/At/Lexicon/app/bsky/richtext.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "At::Lexicon::app::bsky::richtext::facet" : {
          "file" : "lib/At/Lexicon/app/bsky/richtext.pm"
@@ -334,7 +334,7 @@
       },
       "At::Lexicon::app::bsky::unspecced" : {
          "file" : "lib/At/Lexicon/app/bsky/unspecced.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "At::Lexicon::app::bsky::unspecced::skeletonSearchActor" : {
          "file" : "lib/At/Lexicon/app/bsky/unspecced.pm"
@@ -347,7 +347,7 @@
       },
       "At::Lexicon::com::atproto::admin" : {
          "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "At::Lexicon::com::atproto::admin::accountView" : {
          "file" : "lib/At/Lexicon/com/atproto/admin.pm",
@@ -435,7 +435,7 @@
       },
       "At::Lexicon::com::atproto::label" : {
          "file" : "lib/At/Lexicon/com/atproto/label.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "At::Lexicon::com::atproto::label::selfLabel" : {
          "file" : "lib/At/Lexicon/com/atproto/label.pm"
@@ -451,7 +451,7 @@
       },
       "At::Lexicon::com::atproto::moderation" : {
          "file" : "lib/At/Lexicon/com/atproto/moderation.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "At::Lexicon::com::atproto::moderation::reasonType" : {
          "file" : "lib/At/Lexicon/com/atproto/moderation.pm",
@@ -459,7 +459,7 @@
       },
       "At::Lexicon::com::atproto::repo" : {
          "file" : "lib/At/Lexicon/com/atproto/repo.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "At::Lexicon::com::atproto::repo::applyWrites::create" : {
          "file" : "lib/At/Lexicon/com/atproto/repo.pm",
@@ -483,7 +483,7 @@
       },
       "At::Lexicon::com::atproto::server" : {
          "file" : "lib/At/Lexicon/com/atproto/server.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "At::Lexicon::com::atproto::server::createAppPassword::appPassword" : {
          "file" : "lib/At/Lexicon/com/atproto/server.pm"
@@ -505,7 +505,7 @@
       },
       "At::Lexicon::com::atproto::sync" : {
          "file" : "lib/At/Lexicon/com/atproto/sync.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "At::Lexicon::com::atproto::sync::commit" : {
          "file" : "lib/At/Lexicon/com/atproto/sync.pm",
@@ -552,7 +552,7 @@
       },
       "Bluesky" : {
          "file" : "lib/Bluesky.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       }
    },
    "release_status" : "stable",
@@ -567,7 +567,7 @@
          "web" : "https://github.com/sanko/At.pm"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

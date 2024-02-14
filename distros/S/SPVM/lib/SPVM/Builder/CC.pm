@@ -232,6 +232,20 @@ sub compile_source_file {
   
   mkpath dirname $output_file;
   
+  my $before_compile_cbs = $config->before_compile_cbs;
+  for my $before_compile_cb (@$before_compile_cbs) {
+    $before_compile_cb->($config, $compile_info);
+  }
+  
+  my $config_exe = $config->config_exe;
+  
+  if ($config_exe) {
+    my $global_before_compile_cbs = $config_exe->global_before_compile_cbs;
+    for my $global_before_compile_cb (@$global_before_compile_cbs) {
+      $global_before_compile_cb->($config, $compile_info);
+    }
+  }
+  
   $cbuilder->do_system(@$cc_cmd)
     or confess "$source_file file cannnot be compiled by the following command:\n@$cc_cmd\n";
 }
@@ -353,11 +367,6 @@ sub compile_class {
   }
   
   $config->class_name($class_name);
-  
-  if ($config_exe) {
-    my $before_each_compile_cbs = $config_exe->before_each_compile_cbs;
-    $config->add_before_compile_cb(@$before_each_compile_cbs);
-  }
   
   my $force = $self->detect_force($config);
   
@@ -485,13 +494,6 @@ sub compile_class {
       config => $config,
       category => $compile_info_category,
     );
-    
-    # Note: before_compile_cbs are executed before the check if a compilation is needed
-    # because this callback maybe change its condition.
-    my $before_compile_cbs = $config->before_compile_cbs;
-    for my $before_compile_cb (@$before_compile_cbs) {
-      $before_compile_cb->($config, $compile_info);
-    }
     
     # Check if object file need to be generated
     my $need_generate;
@@ -686,20 +688,13 @@ sub link {
   
   my $force = $self->detect_force($config);
   
-  my $link_info = $self->create_link_info($class_name, $object_files, $config, $options);
+  my $link_info = $self->create_link_info($class_name, $object_files, $config);
   
   my $output_file = $config->output_file;
   
   my @object_files = map { "$_" } @{$link_info->object_files};
   
   my $input_files = [@object_files];
-  
-  # Note: before_link_cbs are executed before the check if a link is needed
-  # because this callback maybe change its condition.
-  my $before_link_cbs = $config->before_link_cbs;
-  for my $before_link_cb (@$before_link_cbs) {
-    $before_link_cb->($config, $link_info);
-  }
   
   my $need_generate = SPVM::Builder::Util::need_generate({
     force => $force,
@@ -742,6 +737,11 @@ sub link {
     my @link_tmp_files;
     
     mkpath dirname $link_info_output_file;
+    
+    my $before_link_cbs = $config->before_link_cbs;
+    for my $before_link_cb (@$before_link_cbs) {
+      $before_link_cb->($config, $link_info);
+    }
     
     # Create a dynamic library
     if ($output_type eq 'dynamic_lib') {
@@ -833,11 +833,7 @@ sub link {
 }
 
 sub create_link_info {
-  my ($self, $class_name, $object_files, $config, $options) = @_;
-  
-  $options ||= {};
-  
-  my $runtime = $options->{runtime};
+  my ($self, $class_name, $object_files, $config) = @_;
   
   my $category = $config->category;
   

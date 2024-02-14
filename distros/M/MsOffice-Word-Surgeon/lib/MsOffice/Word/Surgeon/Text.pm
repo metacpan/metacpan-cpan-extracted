@@ -3,12 +3,12 @@ use 5.24.0;
 use Moose;
 use MooseX::StrictConstructor;
 use MsOffice::Word::Surgeon::Utils qw(maybe_preserve_spaces is_at_run_level);
-use Carp                           qw(croak);
+use Carp::Clan                     qw(^MsOffice::Word::Surgeon); # will import carp, croak, etc.
 
 use namespace::clean -except => 'meta';
 
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 #======================================================================
 # ATTRIBUTES

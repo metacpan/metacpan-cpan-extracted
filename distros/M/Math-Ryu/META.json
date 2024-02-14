@@ -40,10 +40,10 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/sisyphus/math-ryu.git",
-         "web" : "https://github.com/sisyphus/math-ryu"
+         "url" : "https://github.com/sisyphus/math-ryu-l.git",
+         "web" : "https://github.com/sisyphus/math-ryu-l"
       }
    },
-   "version" : "0.07",
+   "version" : "1.0",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

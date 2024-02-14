@@ -1,11 +1,12 @@
 package MsOffice::Word::Surgeon::Utils;
 use strict;
 use warnings;
+use Carp::Clan  qw(^MsOffice::Word::Surgeon); # will import carp, croak, etc.
+use Exporter    qw/import/;
 
-use Exporter  qw/import/;
-our @EXPORT = qw/maybe_preserve_spaces is_at_run_level/;
+our @EXPORT = qw/maybe_preserve_spaces is_at_run_level decode_entities encode_entities/;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 sub maybe_preserve_spaces {
   my ($txt) = @_;
@@ -17,6 +18,15 @@ sub is_at_run_level {
   return $xml =~ m[</w:(?:r|del|ins)>$];
 }
 
+# Cheap version for encoding/decoding XML Entities.
+# We just need 4 of them, so no need for a module with complete support.
+my %entities        = (quot => '"', amp => '&', 'lt' => '<', gt => '>');
+my $entity_names    = join "|", keys %entities;
+my $entity_chars    = "[" . join("", values %entities) . "]";
+my %entity_for_char = reverse %entities;
+
+sub decode_entities { $_[0] =~ s{&($entity_names);}{$entities{$1}               }eg; }
+sub encode_entities { $_[0] =~ s{($entity_chars)}  {'&'.$entity_for_char{$1}.';'}eg; }
 
 1;
 
@@ -56,6 +66,14 @@ attribute C<<  xml:space="preserve" >>
 Returns true if the given XML fragment ends with a C<< </w:r> >>,
 C<< </w:del> >> or C<< </w:ins> >> node.
 
+=head2 decode_entities
 
+  decode_entities($string)
 
+Decodes XML entities within the supplied string (in-place decoding).
 
+=head2 encode_entities
+
+  encode_entities($string)
+
+Encodes XML entities within the supplied string (in-place encoding).

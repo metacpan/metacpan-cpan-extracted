@@ -10,6 +10,7 @@ MANIFEST			This list of files
 README.md
 t/etc/MsOffice-Word-Surgeon.docx
 t/msoffice-word-surgeon.t
+t/reveal_bookmarks.t
 xt/manifest.t
 xt/pod.t
 META.yml

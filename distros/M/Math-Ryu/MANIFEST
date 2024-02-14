@@ -1,37 +1,21 @@
-MANIFEST
+Apache_License.txt
 Changes
-have_uint128_t.in
 Makefile.PL
+MANIFEST
 math_ryu_include.h
-README
 Ryu.pm
 Ryu.pod
 Ryu.xs
-Bench/bench.p
-Debug/Debug.pm
-Debug/Debug.pod
-Debug/Debug.xs
-Debug/Makefile.PL
-t/_1basic.t
-t/mpfr_checks.t
-t/n2s.t
-t/round_trip.t
-Debug/t/debug_basic.t
-
-# The following are all ryu source files
-# from https://github.com/ulfjack/ryu/tree/master/ryu.
-# The files d2fixed.c, generic_128.c and ryu/generic_128.h
-# have received some superficial modifications because
-# some perl builds do not honor the permissiveness of "C99 mode".
-# Also the paths to the header files, relative to the location
-# of the C files, has been changed.
-
 d2fixed.c
 d2s.c
 s2d.c
-Debug/d2fixed.c
-Debug/d2s.c
-Debug/s2d.c
+
+t/1_basic.t
+t/d2s.t
+t/mpfr_cross_checks.t
+t/round_trip.t
+have_uint128_t.in
+
 ryu_headers/common.h
 ryu_headers/d2fixed_full_table.h
 ryu_headers/d2s_full_table.h
@@ -41,5 +25,44 @@ ryu_headers/digit_table.h
 ryu_headers/ryu.h
 ryu_headers/ryu_parse.h
 
+Ryu_Library/ryu/BUILD
+Ryu_Library/ryu/common.h
+Ryu_Library/ryu/d2fixed.c
+Ryu_Library/ryu/d2fixed_full_table.h
+Ryu_Library/ryu/d2s.c
+Ryu_Library/ryu/d2s_full_table.h
+Ryu_Library/ryu/d2s_intrinsics.h
+Ryu_Library/ryu/d2s_small_table.h
+Ryu_Library/ryu/digit_table.h
+Ryu_Library/ryu/f2s.c
+Ryu_Library/ryu/f2s_full_table.h
+Ryu_Library/ryu/f2s_intrinsics.h
+Ryu_Library/ryu/generic_128.c
+Ryu_Library/ryu/generic_128.h
+Ryu_Library/ryu/generic_128.h_orig
+Ryu_Library/ryu/Makefile
+Ryu_Library/ryu/Makefile_orig
+Ryu_Library/ryu/ryu.h
+Ryu_Library/ryu/ryu.h_orig
+Ryu_Library/ryu/ryu_generic_128.h
+Ryu_Library/ryu/ryu_parse.h
+Ryu_Library/ryu/s2d.c
+Ryu_Library/ryu/s2f.c
+
+Ryu_Library/ryu/benchmark/benchmark.cc
+Ryu_Library/ryu/benchmark/benchmark_fixed.c
+Ryu_Library/ryu/benchmark/benchmark_fixed.cc
+Ryu_Library/ryu/benchmark/BUILD
+
+Ryu_Library/ryu/tests/BUILD
+Ryu_Library/ryu/tests/common_test.cc
+Ryu_Library/ryu/tests/d2fixed_test.cc
+Ryu_Library/ryu/tests/d2s_intrinsics_test.cc
+Ryu_Library/ryu/tests/d2s_table_test.cc
+Ryu_Library/ryu/tests/d2s_test.cc
+Ryu_Library/ryu/tests/f2s_test.cc
+Ryu_Library/ryu/tests/generic_128_test.cc
+Ryu_Library/ryu/tests/s2d_test.cc
+Ryu_Library/ryu/tests/s2f_test.cc
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
